@@ -123,6 +123,8 @@ public final class MonotypeVar extends Monotype
       {
 	// Do the appropriate cast
 	equivalent = value.freshMonotype();
+	if (Typing.dbg) 
+	  Debug.println("Equivalence: " + this + " == " + equivalent);
 
 	// equivalent is null if the kind is that of unconstrained variables
 	if (equivalent != null)

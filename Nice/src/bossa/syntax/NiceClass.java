@@ -23,6 +23,9 @@ import java.util.*;
 import nice.tools.code.Types;
 import nice.tools.code.*;
 
+import gnu.expr.Declaration;
+import gnu.expr.QuoteExp;
+
 /**
    Abstract syntax for a class definition.
    
@@ -48,7 +51,21 @@ public class NiceClass extends ClassDefinition.ClassImplementation
     if (fields == null || fields.size() == 0)
       this.fields = noFields;
     else
-      this.fields = (NewField[]) fields.toArray(new NewField[fields.size()]);
+      {
+        for(Iterator it = fields.iterator(); it.hasNext();)
+          {
+	    Field field = (Field)it.next();
+            if (field.isFinal() && field.sym.getName().toString().equals("serialVersionUID"))
+	      {
+		it.remove();
+		if (field.value instanceof ConstantExp && ((ConstantExp)field.value).value instanceof Long)
+                  serialVersionUIDValue = (Long)((ConstantExp)field.value).value;
+		else
+		  User.error(field.sym, "the value of an serialVersionUID should a constant of type long");
+	      }
+          }
+        this.fields = (NewField[]) fields.toArray(new NewField[fields.size()]);
+      }
   }
 
   public void setOverrides(List overrides) 
@@ -526,12 +543,20 @@ public class NiceClass extends ClassDefinition.ClassImplementation
       (
          " {\n"
        + Util.map("", ";\n", ";\n", fields)
+       + serialUIDFieldString()
        + Util.map("", ";\n", ";\n", overrides)
        + Util.map("{\n", "\n", "}\n", initializers)
        + "}\n\n"
        );
   }
-  
+
+  String serialUIDFieldString()
+  {
+    if (serialVersionUIDValue == null)
+      return "";
+    
+    return "final long serialVersionUID = " + serialVersionUIDValue + "L;\n";
+  }  
   /****************************************************************
    * Code generation
    ****************************************************************/
@@ -780,11 +805,13 @@ public class NiceClass extends ClassDefinition.ClassImplementation
     // We have to do this after resolution, so that bytecode types are known, 
     // but before compilation.
     createFields();
+//    createSerialUIDField();
   }
 
   public void compile()
   {
     recompile();
+    createSerialUIDField();
   }
 
   /**
@@ -889,6 +916,21 @@ public class NiceClass extends ClassDefinition.ClassImplementation
     return addJavaMethod(lambda);
   }
 
+  void createSerialUIDField()
+  {
+    if (serialVersionUIDValue == null)
+      return;
+   
+    Declaration fieldDecl = classe.addDeclaration("serialVersionUID", SpecialTypes.longType);
+    fieldDecl.setSimple(false);
+    fieldDecl.setCanRead(true);
+    fieldDecl.setFlag(Declaration.IS_CONSTANT);
+    fieldDecl.setPrivate(true);
+    fieldDecl.setFlag(Declaration.STATIC_SPECIFIED);
+    fieldDecl.setFlag(Declaration.TYPE_SPECIFIED);
+    fieldDecl.noteValue(new QuoteExp(serialVersionUIDValue, SpecialTypes.longType));
+  }
+
   /****************************************************************
    * Misc.
    ****************************************************************/
@@ -897,4 +939,5 @@ public class NiceClass extends ClassDefinition.ClassImplementation
 
   private NewField[] fields;
   private OverridenField[] overrides;
+  private Long serialVersionUIDValue;
 }

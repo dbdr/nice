@@ -1,0 +1,24 @@
+/// PASS
+  A a = new A(x: 10);
+  let outb = new ByteArrayOutputStream();
+  let outs = new ObjectOutputStream(outb);
+  outs.writeObject(a);
+  let store = outb.toByteArray();
+  let inb = new ByteArrayInputStream(store);
+  let ins = new ObjectInputStream(inb);
+  A b = ins.readObject();
+  assert a.x == b.x;
+  let osc = ObjectStreamClass.lookup(A.class);
+  assert osc.getSerialVersionUID() == 123456789L;
+  /// Toplevel
+  import java.io.*;
+  class A implements java.io.Serializable {
+    final long serialVersionUID = 123456789L;
+    int x;
+  }
+ 
+/// FAIL
+  /// Toplevel
+  class A implements java.io.Serializable {
+    final long /* /// FAIL HERE */serialVersionUID = "xyz";
+  }

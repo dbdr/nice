@@ -27,7 +27,4 @@ public abstract class Symbol extends Node
   }
 
   final LocatedString name;
-
-  // commenting this triggers a bug
-  abstract mlsub.typing.Polytype getType();
 }

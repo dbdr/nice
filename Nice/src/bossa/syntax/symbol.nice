@@ -46,8 +46,7 @@ public abstract class VarSymbol extends Symbol implements Located
 
   public ?Definition getDefinition() = null;
 
-  // uncommenting this triggers a bug
-//  mlsub.typing.Polytype getType();
+  mlsub.typing.Polytype getType();
 
   /**
      @return

@@ -41,9 +41,7 @@ public class LiteralArrayProc extends gnu.mapping.ProcedureN
   
   public void compile (ApplyExp exp, Compilation comp, Target target)
   {
-    // Try to get the precise bytecode type to use from the context.
-    if (target.getType() instanceof ArrayType)
-      arrayType = (ArrayType) target.getType();
+    arrayType = MultiArrayNewProc.creationType(arrayType, target);
 
     Expression[] args = exp.getArgs();
     CodeAttr code = comp.getCode();

@@ -9,7 +9,8 @@ nice (0.7.6) unstable; urgency=low
     Therefore we renamed remove(int) into removeAt(int).
   * Added float(_) and char(_) primitives for value conversion.
   * Parser support for public-read and private-write fields (experimental).
-  * Bugfixes (using anonymous functions while overriding native methods).
+  * Bugfixes (using anonymous functions while overriding native methods, 
+    automatic array conversions in polymorphic code, ...).
 
  --
 

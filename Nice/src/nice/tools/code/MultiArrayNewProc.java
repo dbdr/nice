@@ -50,13 +50,36 @@ public class MultiArrayNewProc extends gnu.mapping.ProcedureN
     for (int i=0; i<nbDimensions; i++)
       args[i].compile(comp, Type.int_type);
 
-    if (target.getType() instanceof ArrayType)
-      arrayType = (ArrayType) target.getType();
+    arrayType = creationType(arrayType, target);
 
     comp.getCode().emitNewArray(arrayType.getComponentType(), nbDimensions);
     target.compileFromStack(comp, arrayType);
   }
-  
+
+  /** Decide the bytecode type to create a new array with,
+      given its computed type and the target.
+   */
+  static ArrayType creationType(ArrayType computedType, Target target)
+  {
+    if (target.getType() instanceof ArrayType)
+      {
+	ArrayType targetType = (ArrayType) target.getType();
+	/* 
+	   By well-typing, we know the target type is a super-type of 
+	   the computed type.
+	   If the target has primitive components, we might as well
+	   use that type to produce better code, since subsumption would need 
+	   copying otherwise.
+	   On the other hand, it would be incorrect (and useless) for 
+	   reference types, in case the arrays comes back in the value of
+	   a function.
+	*/
+	if (targetType.getComponentType() instanceof PrimType)
+	  return targetType;
+      }
+    return computedType;
+  }
+
   public Type getReturnType(Expression[] args)
   {
     return arrayType;

@@ -8,3 +8,8 @@
 abstract class A1 {}
 class A2 extends A1 {}
 class A3 extends A1 {}
+
+/// PASS
+  String[][] s = single(["A"]);
+  /// Toplevel
+  <T> T[][] single(T[] t) = [ t ];

@@ -12,7 +12,7 @@
 
 // File    : IdentType.java
 // Created : Fri Jul 02 17:30:17 1999 by bonniot
-//$Modified: Tue Jul 13 16:28:48 1999 by bonniot $
+//$Modified: Tue Jul 20 14:55:19 1999 by bonniot $
 // Description : Base type (not a function) before scoping resolution
 
 package bossa.syntax;
@@ -20,7 +20,7 @@ package bossa.syntax;
 import java.util.*;
 import bossa.util.*;
 
-public class IdentType extends Monotype
+public class IdentType extends Monotype implements Located
 {
   public IdentType(LocatedString name, Collection parameters)
   {
@@ -36,13 +36,18 @@ public class IdentType extends Monotype
   Monotype resolve(TypeScope typeScope)
   {
     TypeSymbol s=typeScope.lookup(this);
-    User.error(s==null,name.location(),"Unknown type \""+name+"\"");
+    User.error(s==null,this,"Unknown type \""+name+"\"");
     return new TypeSymbolType(s,resolve(typeScope,parameters));
   }
 
   public String toString()
   {
     return "\""+name+Util.map("<",", ",">",parameters)+"\"";
+  }
+
+  public Location location()
+  {
+    return name.location;
   }
 
   LocatedString name;

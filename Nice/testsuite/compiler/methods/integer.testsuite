@@ -83,3 +83,19 @@ foo(1) {}
   void foo(long);
   foo(@long) {}
   foo(#int) {}
+
+/// PASS
+  /// Toplevel
+  abstract class Wrapped { } 
+  class WrappedFoo extends Wrapped { String foo; } 
+  class WrappedBar extends Wrapped { String bar; } 
+  
+  String getStr(int i, Wrapped f); 
+  getStr(i, f@Wrapped) = "failed"; 
+  getStr(i, f@WrappedFoo) = getStr(i, f.foo); 
+  
+  String getStr(int i, String str); 
+  getStr(0, str@String) = "no "+str; 
+  getStr(1, str@String) = "one "+str; 
+  getStr(2, str@String) = "many "+str; 
+  getStr(i, str@String) = "unknown code"; 

@@ -158,9 +158,9 @@ markAsCallFirstArg(e@IdentExp)
   e.enableClassExp = true;
 }
 
-String identString(Expression);
+LocatedString identString(Expression);
 identString(e) = null;
-identString(e@IdentExp) = e.toString();
+identString(e@IdentExp) = e.ident;
 
 analyse(e@CallExp, info)
 {
@@ -175,17 +175,17 @@ analyse(e@CallExp, info)
       
       if (e.declaringClass != null)
 	{
-	  String funName = identString(e.function);
+	  LocatedString funName = identString(e.function);
 	  if (funName == null)
 	    bossa.util.Internal.error(e.function, "This is not a valid class member");
 	  
-	  java.util.List possibilities = JavaMethod.findNativeMethods
-	    (e.declaringClass, funName, e.arguments.size());
+	  java.util.List possibilities = JavaMethod.findJavaMethods
+	    (e.declaringClass, funName.toString(), e.arguments.size());
 
 	  if (possibilities.size() == 0)
-	    User.error(e, "class " + e.declaringClass.getName() +
+	    bossa.util.User.error(e, "class " + e.declaringClass.getName() +
 		       " has no method or field " + funName);
-	    
+	  
 	  e.function = new OverloadedSymbolExp(possibilities, funName);
 
 	  return e;
@@ -194,7 +194,7 @@ analyse(e@CallExp, info)
       PackageExp pkg = e.arguments.packageExp();
       if (pkg != null)
 	{
-	  String nextComponent = identString(e.function);
+	  String nextComponent = identString(e.function).toString();
 	  if (nextComponent == null)
 	    throw unknownIdent(new LocatedString(pkg.getName(), bossa.util.Location.nowhere()));
 	  return ClassExp.create(pkg, nextComponent);

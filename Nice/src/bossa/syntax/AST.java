@@ -65,6 +65,7 @@ public class AST extends Node
 
   public void resolveScoping()
   {
+    Node.setModule(module);
     Location.setCurrentFile(module.toString());
     Location.current = Location.nowhere();
 
@@ -84,6 +85,7 @@ public class AST extends Node
   
   public void typechecking()
   {
+    Node.setModule(module);
     for(Iterator i = children.iterator(); i.hasNext();)
       {
 	Object o = i.next();

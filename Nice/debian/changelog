@@ -22,7 +22,7 @@ nice (0.7.6) unstable; urgency=low
     usage of arrays.
   * Bugfixes (using anonymous functions while overriding native methods, 
     automatic array conversions in polymorphic code, nested literal primitive 
-    arrays, ...).
+    arrays, mutually dependant packages, ...).
   * For convenience of command-line tools (shells) with automatic completion, 
     we allow a directory name instead of the corresponding package name.
     That is, we replace '/' (which is illegal in package names) by '.'.

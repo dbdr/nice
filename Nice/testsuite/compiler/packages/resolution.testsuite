@@ -1,0 +1,68 @@
+/// COMMENT Inter-dependant packages
+
+/// COMMENT Dependency in toplevel declarations
+
+/// PASS
+  /// package origin
+  /// Toplevel
+  class Origin {}
+
+  /// package a import b
+  /// Toplevel
+  class A {}
+
+  /// package b import a
+  /// Toplevel
+  import origin;
+
+  class B extends Origin {}
+
+/// PASS
+  /// package origin
+  /// Toplevel
+  class Origin {}
+
+  /// package b import a
+  /// Toplevel
+  import origin;
+
+  class B extends Origin {}
+
+  /// package a import b
+  /// Toplevel
+  class A {}
+
+
+/// COMMENT Dependency in code
+
+/// PASS
+  /// package origin
+  /// Toplevel
+  class Origin {}
+
+  /// package a import b
+  /// Toplevel
+  void fooA() {}
+
+  /// package b import a
+  /// Toplevel
+  import origin;
+
+  void fooB();
+  fooB() { Origin o; }
+
+/// PASS
+  /// package origin
+  /// Toplevel
+  class Origin {}
+
+  /// package b import a
+  /// Toplevel
+  import origin;
+
+  void fooB();
+  fooB() { Origin o; }
+
+  /// package a import b
+  /// Toplevel
+  void fooA() {}

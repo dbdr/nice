@@ -186,15 +186,17 @@ public final class MonotypeVar extends Monotype
 
   public String toString()
   {
-    if(name != null)
-      return name;
-    else
-      return super.toString();
+    if(name == null)
+      name = newUniqueName();
+
+    return name;
   }
 
-  public String superToString()
+  private static int uniqueNum = 0;
+
+  private static String newUniqueName()
   {
-    return String.valueOf(name) + " " + super.toString();
+    return "t" + (uniqueNum++);
   }
 
   /****************************************************************

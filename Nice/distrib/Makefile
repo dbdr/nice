@@ -17,7 +17,7 @@ SOURCEFILE = Nice-${VERSION}-source.tar.gz
 ZIPFILE = Nice-${VERSION}-windows.zip
 ZIP_ROOT = tmp/Nice
 
-RPMTMP = tmp/Nice-${VERSION}
+RPMTMP  = ${CURDIR}/tmp/Nice-${VERSION}
 RPMDIR  = ${CURDIR}/tmp/noarch
 RPMFILE = Nice-${VERSION}-1.noarch.rpm
 
@@ -46,18 +46,28 @@ deb $(DEB):
 tar ${TARFILE}: $(DEB)
 	${clean-tmp} && mkdir tmp/$(BUILDROOT)
 	cd $(BUILDROOT) && $(MAKE) install PREFIX=${CURDIR}/tmp/$(BUILDROOT)
+	# Preprend a specific message for manual installations
+	echo -e 
+	 ';; Load this file from your .emacs file with:\n' \
+	 ';;   (load "/usr/local/share/emacs/site-lisp/nice/nice-startup.el")'\
+         '\n\n(setq load-path (cons "/usr/local/share/emacs/site-lisp/nice" load-path))\n\n' \
+	> ${CURDIR}/tmp/$(BUILDROOT)/share/emacs/site-lisp/nice/nice-startup.el
+	cat $(BUILDROOT)/lib/share/emacs/site-lisp/nice/nice-startup.el \
+	>>${CURDIR}/tmp/$(BUILDROOT)/share/emacs/site-lisp/nice/nice-startup.el
 	cd tmp && tar -czf ../${TARFILE} $(BUILDROOT) --owner=0 --group=0
 
 .PHONY: rpm
-rpm ${RPMDIR}/${RPMFILE}: ${TARFILE}
+rpm ${RPMDIR}/${RPMFILE}: $(DEB)
 	${clean-tmp}
 	cp rpmmacros ~/.rpmmacros
 	mkdir -p ${RPMTMP}
 	mkdir -p tmp/BUILD
-	cd ${RPMTMP} && tar xzf ${CURDIR}/${TARFILE} && mv nice-$(VERSION) usr
+	cd $(BUILDROOT) && $(MAKE) install\
+		PREFIX=${RPMTMP}/usr \
+		LISPDIR=${RPMTMP}/usr/share/emacs/site-lisp
 	cd tmp && tar zcf ${CURDIR}/tmp/Nice-${VERSION}.tar.gz Nice-${VERSION}
 	sed "s/VERSION/${VERSION}/" Nice.spec > tmp/Nice-${VERSION}.spec
-	rpmbuild --target=noarch --buildroot=${CURDIR}/${RPMTMP} -bb tmp/Nice-${VERSION}.spec
+	rpmbuild --target=noarch --buildroot=${RPMTMP} -bb tmp/Nice-${VERSION}.spec
 
 
 .PHONY: zip

@@ -9,6 +9,8 @@ nice (0.9.6)
     'loop(5, () => { doSomeThing(); });'
   * Stricter parsing of expression used as statement.
   * Improved performance of arrays used as lists.
+  * Fixed the file locations in the RPM package, and added automatic
+    registration of the emacs mode for the SuSE Linux distribution.
   * Bug fixes (checking of local variables in a call position, make it possible
     to use new Object() and dispatch on Object again, code generation of 
     integer constants, overloading of function symbols, printing of string

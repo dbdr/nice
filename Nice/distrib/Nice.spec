@@ -44,6 +44,16 @@ echo build...
 %install
 echo install...
 
+%post
+if [ -f /etc/SuSE-release ]; then
+  ln -sf nice-startup.el /usr/share/emacs/site-lisp/suse-start-nice.el
+fi
+
+%preun
+if [ "$1" = "0" ] ; then # last uninstall
+  rm -f /usr/share/emacs/site-lisp/suse-start-nice.el
+fi
+
 %clean
 echo clean...
 

@@ -148,9 +148,24 @@ class A
     } finally {
       k = 5;
     }
-
     int c = int('\'');
   }
 }
   /// package b import a
   assert new A().x[0];
+
+/// PASS bug
+  /// package a
+  /// Toplevel
+  class A
+  {
+    boolean x = false;
+    {
+      void foo() {
+        x = true;
+      }
+      foo();
+    }
+  }
+  /// package b import a
+  assert new A().x;

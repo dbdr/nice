@@ -1,0 +1,14 @@
+/// PASS bug
+  var p = new Point(angle: 0, distance: 1);
+  assert abs(p.x - 1) < 0.01 && abs(p.y) < 0.01;
+
+  p = new ColoredPoint(angle: 0, distance: 1, color: "red");
+  assert abs(p.x - 1) < 0.01 && abs(p.y) < 0.01;
+
+  /// Toplevel
+  class Point { double x; double y; }
+
+  new Point(double angle, double distance) 
+  { this(x: distance * cos(angle), y: distance * sin(angle)); }
+
+  class ColoredPoint extends Point { String color; }

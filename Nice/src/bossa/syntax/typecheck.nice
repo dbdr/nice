@@ -863,22 +863,19 @@ typecheck(r@ReturnStmt)
     throw bossa.util.User.error(r, "This return is not inside a function");
 
   ?mlsub.typing.Monotype expectedType = function.getExpectedType();
-  if (r.value != null)
+  if (expectedType == null)
+    r.value = notNull(r.value).noOverloading();
+  else
     {
-      if (expectedType == null)
-	r.value = notNull(r.value).noOverloading();
-      else
-	{
-	  if (! r.fake && nice.tools.typing.Types.isVoid(expectedType))
-	    throw bossa.util.User.error(r, "Cannot return a value here");
+      if (! r.fake && nice.tools.typing.Types.isVoid(expectedType))
+	throw bossa.util.User.error(r, "Cannot return a value here");
 	  
-	  r.value = notNull(r.value).resolveOverloading
+      r.value = notNull(r.value).resolveOverloading
 	    (new mlsub.typing.Polytype(expectedType));
-	}
-
-      try { typecheck(r.value); }
-      catch (bossa.util.UserError ex) { throw ensureLocated(ex, r); }
     }
+
+  try { typecheck(r.value); }
+  catch (bossa.util.UserError ex) { throw ensureLocated(ex, r); }
   
   try{
     if (! (r.fake && expectedType != null && nice.tools.typing.Types.isVoid(expectedType)))
@@ -893,6 +890,28 @@ typecheck(r@ReturnStmt)
     throw bossa.util.User.error(r, "The returned value is incompatible with the return type: " + e.previouslyInferredType);
   }
 }
+
+typecheck(r@VoidReturnStmt)
+{
+  ?Function function = Node.currentFunction;
+  if (function == null)
+    throw bossa.util.User.error(r, "This return is not inside a function");
+
+  ?mlsub.typing.Monotype expectedType = function.getExpectedType();
+  
+  try{
+    if (! (expectedType != null && nice.tools.typing.Types.isVoid(expectedType)))
+      function.checkReturnedType(r.returnType());
+  }
+  catch(Function.WrongReturnType e){
+    wrongReturnType(r, notNull(r.returnType()).toString(), 
+		      valueOf(e.expectedReturnType), notNull(e.typingException));
+  }
+  catch(Function.IncompatibleReturnType e){
+    throw bossa.util.User.error(r, "The returned value is incompatible with the return type: " + e.previouslyInferredType);
+  }
+}
+
 
 typecheck(t@TryStmt)
 {

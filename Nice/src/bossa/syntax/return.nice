@@ -20,33 +20,45 @@ import bossa.util.*;
 
 public class ReturnStmt extends Statement
 {
-  ?Expression value;
+  Expression value;
   boolean fake = false;
 
   mlsub.typing.Polytype returnType()
   {
-    if (value == null)
-      return notNull(PrimitiveType.voidPolytype);
-    
-    return notNull(value).getType();
+    return value.getType();
   }
   
   generateCode()
   {
-    if (value == null)
-      return notNull(nice.tools.code.Gen.returnVoid());
-    
-    return nice.tools.code.Gen.returnValue(notNull(value).generateCode());
+    return nice.tools.code.Gen.returnValue(value.generateCode());
   }
   
   toString()
   {
-    return "return" + (value!=null ? " " + notNull(value) : "") + ";";
+    return "return " + value + ";";
   }
-  
 }
 
-public Statement createReturnStmt(Expression value)
+public class VoidReturnStmt extends Statement
+{
+
+  mlsub.typing.Polytype returnType()
+  {
+    return notNull(PrimitiveType.voidPolytype);
+  }
+  
+  generateCode()
+  {
+    return notNull(nice.tools.code.Gen.returnVoid());
+  }
+  
+  toString()
+  {
+    return "return;";
+  }
+}
+
+public Statement createReturnStmt(?Expression value)
 {
   return createReturnStmt(value, false);
 }
@@ -55,11 +67,12 @@ public Statement createReturnStmt(Expression value)
    @param fake  This return was not explicitely written, but is the result
                 of syntactic sugar.
 */
-public Statement createReturnStmt(Expression value, boolean fake)
+public Statement createReturnStmt(?Expression value, boolean fake)
 {
-  let res = new ReturnStmt(value: value, fake: fake);
-  if (value != null)
-    res.setLocation(value.location());
+  if (value == null)
+    return new VoidReturnStmt();
 
+  let res = new ReturnStmt(value: value, fake: fake);
+  res.setLocation(value.location());
   return res;
 }

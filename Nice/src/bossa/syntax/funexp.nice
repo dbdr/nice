@@ -111,7 +111,7 @@ public class FunExp extends Expression implements Function
     if (body instanceof ReturnStmt)
       {
         let ReturnStmt rs = cast(body);
-        bodyValue = notNull(rs.value).toString();
+        bodyValue = rs.value.toString();
       }
     else
       bodyValue = body.toString();

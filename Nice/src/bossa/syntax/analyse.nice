@@ -839,6 +839,11 @@ analyse(r@ReturnStmt, info)
   info.setUnreachable();
 }
 
+analyse(r@VoidReturnStmt, info)
+{
+  info.setUnreachable();
+}
+
 analyse(t@TryStmt, info)
 {
   info.beginCases();

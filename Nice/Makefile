@@ -2,18 +2,20 @@
 TOP=${HOME}/Nice
 TOPCLASSES=${TOP}/classes
 
-JAVAC=javac -classpath ${TOPCLASSES}:${TOP}/src:${TOP}/lib -sourcepath ${TOP}/src -O -g
+JAVAC=javac -classpath ${TOPCLASSES}:${TOP}/src:${TOP}/stdlib -sourcepath ${TOP}/src -O -g
 JAVACC=java -classpath ${HOME}/lib/java/JavaCC/JavaCC.zip COM.sun.labs.javacc.Main
 JAVADOC=javadoc -linkoffline file:///C%7C/Apps/jdk1.2.1/docs/api file:///usr/opt/java122/docs/api
 
 recompile:
-	cd ${TOP}/src; ${JAVAC} -d ${TOP}/classes bossa/syntax/*.java bossa/modules/*.java bossa/parser/*.java nice/tools/*.java bossa/test/Front.java mlsub/*/*.java ../lib/*.java
+	cd src
+	${JAVAC} -d ${TOP}/classes bossa/syntax/*.java bossa/modules/*.java bossa/parser/*.java nice/tools/*.java bossa/test/Front.java mlsub/*/*.java ../stdlib/*.java
 
 recompileGNU:
-	cd ${TOP}/src; ${JAVAC} -d ${TOP}/classes gnu/*/*.java gnu/*/*/*.java kawa/*/*.java
+	cd src
+	${JAVAC} -d ${TOP}/classes gnu/*/*.java gnu/*/*/*.java kawa/*/*.java
 
 parser:
-	cd ${TOP}/src/bossa/parser; ${JAVACC} Parser.jj
+	cd src/bossa/parser; ${JAVACC} Parser.jj
 
 clean:
 	rm -rf ${TOPCLASSES}/*
@@ -21,27 +23,24 @@ clean:
 scratch: clean parser recompile
 
 test:
-	cd ${TOP}/regtest; ./regtest
+	cd regtest; ./regtest
 
 ## Documentation
 
 jdoc:
-	mkdir -p ${TOP}/doc; \
+	mkdir -p doc
 	${JAVADOC} -windowtitle "Nice" -doctitle "The Nice compiler source" \
 	-overview ${TOP}/src/overview.html \
 	-d ${TOP}/doc -private mlsub.typing mlsub.compilation bossa bossa.syntax bossa.util bossa.link gnu.bytecode gnu.expr gnu.math gnu.mapping kawa.standard kawa.lang
 
 tags:
-	cd ${TOP}
 	jtags
 
 jar:
-	cd ${TOP}; cp src/nice/tools/compiler.jar bin/Nice.jar;\
-	jar umf src/mainClass bin/Nice.jar -C classes nice -C classes mlsub -C classes bossa -C classes gnu -C classes kawa ;\
-	cd lib; jar uf ../bin/Nice.jar nice/*/*.nice*; cd .. ;\
-	cd classes; jar uf ../bin/Nice.jar *.class; cd ..
+	cp src/nice/tools/compiler.jar lib/nice/Nice.jar
+	jar umf src/mainClass lib/nice/Nice.jar -C classes nice -C classes mlsub -C classes bossa -C classes gnu -C classes kawa
+	cd stdlib; jar uf ../lib/nice/Nice.jar nice/*/*.nice*; cd ..
+	cd classes; jar uf ../lib/nice/Nice.jar *.class; cd ..
 
 dist: jar
-	cd ${HOME};\
-	tar cf Nice/bin/Nice.tar bin/nicer bin/nicec ;\
-	tar rhf Nice/bin/Nice.tar lib/nice/Nice.jar lib/nice/nice-mode.el
+	tar cf bin/Nice.tar bin/nicer bin/nicec lib/nice/Nice.jar lib/emacs/nice-mode.el

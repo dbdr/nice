@@ -39,9 +39,9 @@ public final class ConsoleOutput extends StatusCodeListener
   {
     super;
     if (location != null)
-      System.out.println("\n" + location + ":\n" + message);
+      System.out.println("\n" + location + ":\nwarning: " + message);
     else
-      System.out.println("\n" + message);
+      System.out.println("\nwarning: " + message);
   }
   
   error(location, message)

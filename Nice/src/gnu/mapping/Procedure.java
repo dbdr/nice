@@ -41,6 +41,11 @@ public abstract class Procedure implements Named, Printable
 
   public abstract Object apply0 ();
 
+  public final void apply()
+  {
+    apply0();
+  }
+
   public abstract Object apply1 (Object arg1);
 
   public abstract Object apply2 (Object arg1,Object arg2);

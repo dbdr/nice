@@ -23,7 +23,11 @@ test_native()
   println("\n### Testing native methods and classes ###\n");
 
   File f = nop(new File("titi"));
-  java.net.ServerSocket s = new java.net.ServerSocket(1235);
+
+  try {
+    java.net.ServerSocket s = new java.net.ServerSocket(1235);
+  } catch(java.net.BindException e) {}
+
   java.lang.System.currentTimeMillis();
 
   Fields.intS = 2;

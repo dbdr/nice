@@ -1,6 +1,5 @@
 
 TOP=${HOME}/Nice
-TOPSRC=${TOP}/src/bossa
 TOPCLASSES=${TOP}/classes
 
 JAVAC=javac -classpath ${TOPCLASSES}:${TOP}/src -sourcepath ${TOP}/src -O -g
@@ -14,10 +13,12 @@ recompileGNU:
 	cd ${TOP}/src; ${JAVAC} -d ${TOP}/classes gnu/*/*.java gnu/*/*/*.java kawa/*/*.java
 
 parser:
-	cd ${TOP}/src; ${JAVACC} bossa/parser/Parser.jj
+	cd ${TOP}/src/bossa/parser; ${JAVACC} Parser.jj
 
 clean:
 	rm -rf ${TOPCLASSES}/*
+
+scratch: clean parser recompile
 
 ## Documentation
 

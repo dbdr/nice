@@ -12,7 +12,7 @@
 
 // File    : Dispatch.java
 // Created : Mon Nov 15 10:36:41 1999 by bonniot
-//$Modified: Tue Jun 20 15:48:26 2000 by Daniel Bonniot $
+//$Modified: Tue Jul 18 16:21:26 2000 by Daniel Bonniot $
 
 package bossa.link;
 
@@ -24,6 +24,8 @@ import mlsub.typing.*;
 import gnu.expr.*;
 
 import java.util.*;
+
+import bossa.util.Debug;
 
 /**
  * Static class to make the coverage and non-ambiguity test.

@@ -12,7 +12,7 @@
 
 // File    : Alternative.java
 // Created : Mon Nov 15 12:20:40 1999 by bonniot
-//$Modified: Tue Jun 13 10:48:32 2000 by Daniel Bonniot $
+//$Modified: Tue Jul 18 16:40:57 2000 by Daniel Bonniot $
 
 package bossa.link;
 
@@ -216,7 +216,7 @@ public class Alternative
   }
 
   private static final gnu.mapping.Procedure instanceProc = 
-    new kawa.standard.instance();
+    new gnu.kawa.reflect.InstanceOf(gnu.expr.Interpreter.getInterpreter());
   
   static gnu.expr.Expression instanceOfExp(gnu.expr.Expression value, gnu.bytecode.Type ct)
   {

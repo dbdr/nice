@@ -12,7 +12,7 @@
 
 // File    : Package.java
 // Created : Wed Oct 13 16:09:47 1999 by bonniot
-//$Modified: Tue Jun 20 11:31:28 2000 by Daniel Bonniot $
+//$Modified: Tue Jul 18 17:06:05 2000 by Daniel Bonniot $
 
 package bossa.modules;
 

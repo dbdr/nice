@@ -1,0 +1,845 @@
+package nice.ui.common;
+
+// --------------------------------------------------------------------------------------------------
+
+<Component T> T init
+  (T this,
+                   
+// optional anonymous functions from java.awt.Component
+
+   ?String propertyName = null,
+   ComponentEvent ?-> void componentHidden = null,
+   ComponentEvent ?-> void componentMoved = null,
+   ComponentEvent ?-> void componentResized = null,
+   ComponentEvent ?-> void componentShown = null,
+   FocusEvent ?-> void focusGained = null,
+   FocusEvent ?-> void focusLost = null,
+   HierarchyEvent ?-> void hierarchyAncestorMoved = null,
+   HierarchyEvent ?-> void hierarchyAncestorResized = null,
+   HierarchyEvent ?-> void hierarchyChanged = null,
+   InputMethodEvent ?-> void caretPositionChanged = null,
+   InputMethodEvent ?-> void inputMethodTextChanged = null,
+   KeyEvent ?-> void keyPressed = null,
+   KeyEvent ?-> void keyReleased = null,
+   KeyEvent ?-> void keyTyped = null, 
+   MouseEvent ?-> void mouseClicked = null,
+   MouseEvent ?-> void mouseEntered = null,
+   MouseEvent ?-> void mouseExited = null,
+   MouseEvent ?-> void mousePressed = null,
+   MouseEvent ?-> void mouseReleased = null,   
+   MouseEvent ?-> void mouseDragged = null,
+   MouseEvent ?-> void mouseMoved = null,
+   PropertyChangeEvent ?-> void propertyChange = null
+//JDK1.4   MouseWheelEvent ?-> void mouseWheelMoved = null          
+   )
+{                            
+  this.addComponentListener
+    (componentHidden: componentHidden,
+     componentMoved: componentMoved,
+     componentResized: componentResized,
+     componentShown: componentShown
+     );
+  this.addFocusListener
+    (focusGained: focusGained,
+     focusLost: focusLost
+     );
+  this.addHierarchyBoundsListener
+    (hierarchyAncestorMoved: hierarchyAncestorMoved,
+     hierarchyAncestorResized: hierarchyAncestorResized
+     );
+  this.addInputMethodListener
+    (caretPositionChanged: caretPositionChanged,
+     inputMethodTextChanged: inputMethodTextChanged
+     );
+  this.addKeyListener
+    (keyPressed: keyPressed,
+     keyReleased: keyReleased,
+     keyTyped: keyTyped
+     );
+  this.addMouseListener
+    (mouseClicked: mouseClicked,
+     mouseEntered: mouseEntered,
+     mouseExited: mouseExited,
+     mousePressed: mousePressed,
+     mouseReleased: mouseReleased
+     ); 
+  this.addMouseMotionListener
+    (mouseDragged: mouseDragged,
+     mouseMoved: mouseMoved
+     );
+  if(propertyName != null && propertyChange != null)
+    this.addPropertyChangeListener
+      (propertyName: propertyName,
+       propertyChange: propertyChange
+       );
+  if(propertyName == null && propertyChange != null)
+    this.addPropertyChangeListener
+      (propertyChange: propertyChange
+       ); 
+//JDK1.4    this.addMouseWheelListener(mouseWheelMoved: mouseWheelMoved);
+
+  return this;
+}
+
+
+<Button T> T init
+  (T this,
+   
+   ActionEvent ?-> void actionPerformed = null,
+                   
+// optional anonymous functions from java.awt.Component
+    
+   ?String propertyName = null,
+   ComponentEvent ?-> void componentHidden = null,
+   ComponentEvent ?-> void componentMoved = null,
+   ComponentEvent ?-> void componentResized = null,
+   ComponentEvent ?-> void componentShown = null,
+   FocusEvent ?-> void focusGained = null,
+   FocusEvent ?-> void focusLost = null,
+   HierarchyEvent ?-> void hierarchyAncestorMoved = null,
+   HierarchyEvent ?-> void hierarchyAncestorResized = null,
+   HierarchyEvent ?-> void hierarchyChanged = null,
+   InputMethodEvent ?-> void caretPositionChanged = null,
+   InputMethodEvent ?-> void inputMethodTextChanged = null,
+   KeyEvent ?-> void keyPressed = null,
+   KeyEvent ?-> void keyReleased = null,
+   KeyEvent ?-> void keyTyped = null, 
+   MouseEvent ?-> void mouseClicked = null,
+   MouseEvent ?-> void mouseEntered = null,
+   MouseEvent ?-> void mouseExited = null,
+   MouseEvent ?-> void mousePressed = null,
+   MouseEvent ?-> void mouseReleased = null,   
+   MouseEvent ?-> void mouseDragged = null,
+   MouseEvent ?-> void mouseMoved = null,
+   PropertyChangeEvent ?-> void propertyChange = null
+//JDK1.4   MouseWheelEvent ?-> void mouseWheelMoved = null            
+                  )
+{
+	if(actionPerformed != null)
+	  this.addActionListener(actionPerformed: actionPerformed);
+	
+	Component c = this;
+  c.init
+    (propertyName: propertyName,
+     componentHidden: componentHidden,
+     componentMoved: componentMoved,
+     componentResized: componentResized,
+     componentShown: componentShown,
+     focusGained: focusGained,
+     focusLost: focusLost,
+     hierarchyAncestorMoved: hierarchyAncestorMoved,
+     hierarchyAncestorResized: hierarchyAncestorResized,
+     hierarchyChanged: hierarchyChanged,
+     caretPositionChanged: caretPositionChanged,
+     inputMethodTextChanged: inputMethodTextChanged,
+     keyPressed: keyPressed,
+     keyReleased: keyReleased,
+     keyTyped: keyTyped, 
+     mouseEntered: mouseEntered,
+     mouseExited: mouseExited,
+     mousePressed: mousePressed,
+     mouseReleased: mouseReleased,   
+     mouseDragged: mouseDragged,
+     mouseMoved: mouseMoved,
+     propertyChange: propertyChange
+//JDK1.4     mouseWheelMoved: mouseWheelMoved 
+     );
+
+  return this;
+}
+
+
+<Checkbox T> T init
+  (T this,
+   
+   ItemEvent ?-> void itemStateChanged = null,
+                   
+// optional anonymous functions from java.awt.Component
+    
+   ?String propertyName = null,
+   ComponentEvent ?-> void componentHidden = null,
+   ComponentEvent ?-> void componentMoved = null,
+   ComponentEvent ?-> void componentResized = null,
+   ComponentEvent ?-> void componentShown = null,
+   FocusEvent ?-> void focusGained = null,
+   FocusEvent ?-> void focusLost = null,
+   HierarchyEvent ?-> void hierarchyAncestorMoved = null,
+   HierarchyEvent ?-> void hierarchyAncestorResized = null,
+   HierarchyEvent ?-> void hierarchyChanged = null,
+   InputMethodEvent ?-> void caretPositionChanged = null,
+   InputMethodEvent ?-> void inputMethodTextChanged = null,
+   KeyEvent ?-> void keyPressed = null,
+   KeyEvent ?-> void keyReleased = null,
+   KeyEvent ?-> void keyTyped = null, 
+   MouseEvent ?-> void mouseClicked = null,
+   MouseEvent ?-> void mouseEntered = null,
+   MouseEvent ?-> void mouseExited = null,
+   MouseEvent ?-> void mousePressed = null,
+   MouseEvent ?-> void mouseReleased = null,   
+   MouseEvent ?-> void mouseDragged = null,
+   MouseEvent ?-> void mouseMoved = null,
+   PropertyChangeEvent ?-> void propertyChange = null
+//JDK1.4   MouseWheelEvent ?-> void mouseWheelMoved = null            
+                  )
+{
+	if(itemStateChanged != null)
+	  this.addItemListener(itemStateChanged: itemStateChanged);
+	
+	Component c = this;
+  c.init
+    (propertyName: propertyName,
+     componentHidden: componentHidden,
+     componentMoved: componentMoved,
+     componentResized: componentResized,
+     componentShown: componentShown,
+     focusGained: focusGained,
+     focusLost: focusLost,
+     hierarchyAncestorMoved: hierarchyAncestorMoved,
+     hierarchyAncestorResized: hierarchyAncestorResized,
+     hierarchyChanged: hierarchyChanged,
+     caretPositionChanged: caretPositionChanged,
+     inputMethodTextChanged: inputMethodTextChanged,
+     keyPressed: keyPressed,
+     keyReleased: keyReleased,
+     keyTyped: keyTyped, 
+     mouseEntered: mouseEntered,
+     mouseExited: mouseExited,
+     mousePressed: mousePressed,
+     mouseReleased: mouseReleased,   
+     mouseDragged: mouseDragged,
+     mouseMoved: mouseMoved,
+     propertyChange: propertyChange
+//JDK1.4     mouseWheelMoved: mouseWheelMoved 
+     );
+
+  return this;
+}
+
+
+<CheckboxMenuItem T> T init
+  (T this,
+   
+   ItemEvent ?-> void itemStateChanged = null,
+                                  
+// optional anonymous functions from java.awt.MenuItem
+
+   ActionEvent ?-> void actionPerformed = null
+   )
+{
+	if(itemStateChanged != null)
+	  this.addItemListener(itemStateChanged: itemStateChanged);
+  
+  return this;
+}
+
+
+<MenuItem T> T init
+  (T this,
+   ActionEvent ?-> void actionPerformed = null
+   )
+{
+  if(actionPerformed != null)
+	  this.addActionListener(actionPerformed: actionPerformed);
+  
+  return this;
+}
+
+
+<Choice T> T init
+  (T this,
+   
+   ItemEvent ?-> void itemStateChanged = null,
+                   
+// optional anonymous functions from java.awt.Component
+    
+   ?String propertyName = null,
+   ComponentEvent ?-> void componentHidden = null,
+   ComponentEvent ?-> void componentMoved = null,
+   ComponentEvent ?-> void componentResized = null,
+   ComponentEvent ?-> void componentShown = null,
+   FocusEvent ?-> void focusGained = null,
+   FocusEvent ?-> void focusLost = null,
+   HierarchyEvent ?-> void hierarchyAncestorMoved = null,
+   HierarchyEvent ?-> void hierarchyAncestorResized = null,
+   HierarchyEvent ?-> void hierarchyChanged = null,
+   InputMethodEvent ?-> void caretPositionChanged = null,
+   InputMethodEvent ?-> void inputMethodTextChanged = null,
+   KeyEvent ?-> void keyPressed = null,
+   KeyEvent ?-> void keyReleased = null,
+   KeyEvent ?-> void keyTyped = null, 
+   MouseEvent ?-> void mouseClicked = null,
+   MouseEvent ?-> void mouseEntered = null,
+   MouseEvent ?-> void mouseExited = null,
+   MouseEvent ?-> void mousePressed = null,
+   MouseEvent ?-> void mouseReleased = null,   
+   MouseEvent ?-> void mouseDragged = null,
+   MouseEvent ?-> void mouseMoved = null,
+   PropertyChangeEvent ?-> void propertyChange = null
+//JDK1.4   MouseWheelEvent ?-> void mouseWheelMoved = null            
+   )
+{
+	if(itemStateChanged != null)
+    this.addItemListener(itemStateChanged: itemStateChanged);
+  
+  Component c = this;
+  c.init
+    (propertyName: propertyName,
+     componentHidden: componentHidden,
+     componentMoved: componentMoved,
+     componentResized: componentResized,
+     componentShown: componentShown,
+     focusGained: focusGained,
+     focusLost: focusLost,
+     hierarchyAncestorMoved: hierarchyAncestorMoved,
+     hierarchyAncestorResized: hierarchyAncestorResized,
+     hierarchyChanged: hierarchyChanged,
+     caretPositionChanged: caretPositionChanged,
+     inputMethodTextChanged: inputMethodTextChanged,
+     keyPressed: keyPressed,
+     keyReleased: keyReleased,
+     keyTyped: keyTyped, 
+     mouseEntered: mouseEntered,
+     mouseExited: mouseExited,
+     mousePressed: mousePressed,
+     mouseReleased: mouseReleased,   
+     mouseDragged: mouseDragged,
+     mouseMoved: mouseMoved,
+     propertyChange: propertyChange
+//JDK1.4     mouseWheelMoved: mouseWheelMoved 
+     );
+     
+  return this;
+}
+
+
+<java.awt.Container T> T init
+  (T this,
+   
+   ContainerEvent ?-> void componentAdded = null, 
+   ContainerEvent ?-> void componentRemoved = null,
+                   
+// optional anonymous functions from java.awt.Component
+    
+   ?String propertyName = null,
+   ComponentEvent ?-> void componentHidden = null,
+   ComponentEvent ?-> void componentMoved = null,
+   ComponentEvent ?-> void componentResized = null,
+   ComponentEvent ?-> void componentShown = null,
+   FocusEvent ?-> void focusGained = null,
+   FocusEvent ?-> void focusLost = null,
+   HierarchyEvent ?-> void hierarchyAncestorMoved = null,
+   HierarchyEvent ?-> void hierarchyAncestorResized = null,
+   HierarchyEvent ?-> void hierarchyChanged = null,
+   InputMethodEvent ?-> void caretPositionChanged = null,
+   InputMethodEvent ?-> void inputMethodTextChanged = null,
+   KeyEvent ?-> void keyPressed = null,
+   KeyEvent ?-> void keyReleased = null,
+   KeyEvent ?-> void keyTyped = null, 
+   MouseEvent ?-> void mouseClicked = null,
+   MouseEvent ?-> void mouseEntered = null,
+   MouseEvent ?-> void mouseExited = null,
+   MouseEvent ?-> void mousePressed = null,
+   MouseEvent ?-> void mouseReleased = null,   
+   MouseEvent ?-> void mouseDragged = null,
+   MouseEvent ?-> void mouseMoved = null,
+   PropertyChangeEvent ?-> void propertyChange = null
+//JDK1.4   MouseWheelEvent ?-> void mouseWheelMoved = null            
+   )
+{
+	this.addContainerListener
+	  (componentAdded: componentAdded,
+     componentRemoved: componentRemoved
+     );
+
+  Component c = this;  
+  c.init
+    (propertyName: propertyName,
+     componentHidden: componentHidden,
+     componentMoved: componentMoved,
+     componentResized: componentResized,
+     componentShown: componentShown,
+     focusGained: focusGained,
+     focusLost: focusLost,
+     hierarchyAncestorMoved: hierarchyAncestorMoved,
+     hierarchyAncestorResized: hierarchyAncestorResized,
+     hierarchyChanged: hierarchyChanged,
+     caretPositionChanged: caretPositionChanged,
+     inputMethodTextChanged: inputMethodTextChanged,
+     keyPressed: keyPressed,
+     keyReleased: keyReleased,
+     keyTyped: keyTyped, 
+     mouseEntered: mouseEntered,
+     mouseExited: mouseExited,
+     mousePressed: mousePressed,
+     mouseReleased: mouseReleased,   
+     mouseDragged: mouseDragged,
+     mouseMoved: mouseMoved,
+     propertyChange: propertyChange
+//JDK1.4     mouseWheelMoved: mouseWheelMoved 
+     );
+     
+  return this;
+}
+
+
+<Window T> T init
+  (T this,
+   
+   WindowEvent ?-> void windowActivated = null,
+   WindowEvent ?-> void windowClosed = null,
+   WindowEvent ?-> void windowClosing = null,
+   WindowEvent ?-> void windowDeactivated = null,
+   WindowEvent ?-> void windowDeiconified = null,
+   WindowEvent ?-> void windowIconified = null,
+   WindowEvent ?-> void windowOpened = null,
+//JDK1.4   WindowEvent ?-> void windowGainedFocus = null,
+//JDK1.4   WindowEvent ?-> void windowLostFocus = null,     
+//JDK1.4   WindowEvent ?-> void windowStateChanged = null,  
+                           
+// optional anonymous functions from java.awt.Container
+                          
+   ContainerEvent ?-> void componentAdded = null, 
+   ContainerEvent ?-> void componentRemoved = null,
+                   
+// optional anonymous functions from java.awt.Component
+    
+   ?String propertyName = null,
+   ComponentEvent ?-> void componentHidden = null,
+   ComponentEvent ?-> void componentMoved = null,
+   ComponentEvent ?-> void componentResized = null,
+   ComponentEvent ?-> void componentShown = null,
+   FocusEvent ?-> void focusGained = null,
+   FocusEvent ?-> void focusLost = null,
+   HierarchyEvent ?-> void hierarchyAncestorMoved = null,
+   HierarchyEvent ?-> void hierarchyAncestorResized = null,
+   HierarchyEvent ?-> void hierarchyChanged = null,
+   InputMethodEvent ?-> void caretPositionChanged = null,
+   InputMethodEvent ?-> void inputMethodTextChanged = null,
+   KeyEvent ?-> void keyPressed = null,
+   KeyEvent ?-> void keyReleased = null,
+   KeyEvent ?-> void keyTyped = null, 
+   MouseEvent ?-> void mouseClicked = null,
+   MouseEvent ?-> void mouseEntered = null,
+   MouseEvent ?-> void mouseExited = null,
+   MouseEvent ?-> void mousePressed = null,
+   MouseEvent ?-> void mouseReleased = null,   
+   MouseEvent ?-> void mouseDragged = null,
+   MouseEvent ?-> void mouseMoved = null,
+   PropertyChangeEvent ?-> void propertyChange = null
+//JDK1.4   MouseWheelEvent ?-> void mouseWheelMoved = null            
+   )
+{
+  this.addWindowListener
+    (windowActivated: windowActivated,
+     windowClosed: windowClosed,
+     windowClosing: windowClosing,
+     windowDeactivated: windowDeactivated,
+     windowDeiconified: windowDeiconified,
+     windowIconified: windowIconified,
+     windowOpened: windowOpened
+//JDK1.4     windowGainedFocus: windowGainedFocus,
+//JDK1.4     windowLostFocus: windowLostFocus,
+//JDK1.4     windowStateChanged: windowStateChanged
+     );
+     
+  java.awt.Container c = this; 
+  c.init
+    (componentAdded: componentAdded,
+     componentRemoved: componentRemoved,
+     propertyName: propertyName,
+     componentHidden: componentHidden,
+     componentMoved: componentMoved,
+     componentResized: componentResized,
+     componentShown: componentShown,
+     focusGained: focusGained,
+     focusLost: focusLost,
+     hierarchyAncestorMoved: hierarchyAncestorMoved,
+     hierarchyAncestorResized: hierarchyAncestorResized,
+     hierarchyChanged: hierarchyChanged,
+     caretPositionChanged: caretPositionChanged,
+     inputMethodTextChanged: inputMethodTextChanged,
+     keyPressed: keyPressed,
+     keyReleased: keyReleased,
+     keyTyped: keyTyped, 
+     mouseEntered: mouseEntered,
+     mouseExited: mouseExited,
+     mousePressed: mousePressed,
+     mouseReleased: mouseReleased,   
+     mouseDragged: mouseDragged,
+     mouseMoved: mouseMoved,
+     propertyChange: propertyChange
+//JDK1.4     mouseWheelMoved: mouseWheelMoved 
+     );
+     
+  return this;
+}
+
+
+<java.awt.List T> T init
+  (T this,
+   
+   ActionEvent ?-> void actionPerformed = null,
+   ItemEvent ?-> void itemStateChanged = null,
+                         
+// optional anonymous functions from java.awt.Component
+             
+   ?String propertyName = null,
+   ComponentEvent ?-> void componentHidden = null,
+   ComponentEvent ?-> void componentMoved = null,
+   ComponentEvent ?-> void componentResized = null,
+   ComponentEvent ?-> void componentShown = null,
+   FocusEvent ?-> void focusGained = null,
+   FocusEvent ?-> void focusLost = null,
+   HierarchyEvent ?-> void hierarchyAncestorMoved = null,
+   HierarchyEvent ?-> void hierarchyAncestorResized = null,
+   HierarchyEvent ?-> void hierarchyChanged = null,
+   InputMethodEvent ?-> void caretPositionChanged = null,
+   InputMethodEvent ?-> void inputMethodTextChanged = null,
+   KeyEvent ?-> void keyPressed = null,
+   KeyEvent ?-> void keyReleased = null,
+   KeyEvent ?-> void keyTyped = null, 
+   MouseEvent ?-> void mouseClicked = null,
+   MouseEvent ?-> void mouseEntered = null,
+   MouseEvent ?-> void mouseExited = null,
+   MouseEvent ?-> void mousePressed = null,
+   MouseEvent ?-> void mouseReleased = null,   
+   MouseEvent ?-> void mouseDragged = null,
+   MouseEvent ?-> void mouseMoved = null,
+   PropertyChangeEvent ?-> void propertyChange = null
+//JDK1.4   MouseWheelEvent ?-> void mouseWheelMoved = null            
+   )
+{
+	if(actionPerformed != null)
+    this.addActionListener(actionPerformed: actionPerformed);
+  
+  if(itemStateChanged != null)
+    this.addItemListener(itemStateChanged: itemStateChanged);
+  
+  Component c = this;
+  c.init
+    (propertyName: propertyName,
+     componentHidden: componentHidden,
+     componentMoved: componentMoved,
+     componentResized: componentResized,
+     componentShown: componentShown,
+     focusGained: focusGained,
+     focusLost: focusLost,
+     hierarchyAncestorMoved: hierarchyAncestorMoved,
+     hierarchyAncestorResized: hierarchyAncestorResized,
+     hierarchyChanged: hierarchyChanged,
+     caretPositionChanged: caretPositionChanged,
+     inputMethodTextChanged: inputMethodTextChanged,
+     keyPressed: keyPressed,
+     keyReleased: keyReleased,
+     keyTyped: keyTyped, 
+     mouseEntered: mouseEntered,
+     mouseExited: mouseExited,
+     mousePressed: mousePressed,
+     mouseReleased: mouseReleased,   
+     mouseDragged: mouseDragged,
+     mouseMoved: mouseMoved,
+     propertyChange: propertyChange
+//JDK1.4     mouseWheelMoved: mouseWheelMoved 
+                        );
+  return this;
+}
+
+
+<Scrollbar T> T init
+  (T this,
+   
+   AdjustmentEvent ?-> void adjustmentValueChanged = null,
+                          
+// optional anonymous functions from java.awt.Component
+              
+   ?String propertyName = null,
+   ComponentEvent ?-> void componentHidden = null,
+   ComponentEvent ?-> void componentMoved = null,
+   ComponentEvent ?-> void componentResized = null,
+   ComponentEvent ?-> void componentShown = null,
+   FocusEvent ?-> void focusGained = null,
+   FocusEvent ?-> void focusLost = null,
+   HierarchyEvent ?-> void hierarchyAncestorMoved = null,
+   HierarchyEvent ?-> void hierarchyAncestorResized = null,
+   HierarchyEvent ?-> void hierarchyChanged = null,
+   InputMethodEvent ?-> void caretPositionChanged = null,
+   InputMethodEvent ?-> void inputMethodTextChanged = null,
+   KeyEvent ?-> void keyPressed = null,
+   KeyEvent ?-> void keyReleased = null,
+   KeyEvent ?-> void keyTyped = null, 
+   MouseEvent ?-> void mouseClicked = null,
+   MouseEvent ?-> void mouseEntered = null,
+   MouseEvent ?-> void mouseExited = null,
+   MouseEvent ?-> void mousePressed = null,
+   MouseEvent ?-> void mouseReleased = null,   
+   MouseEvent ?-> void mouseDragged = null,
+   MouseEvent ?-> void mouseMoved = null,
+   PropertyChangeEvent ?-> void propertyChange = null
+//JDK1.4   MouseWheelEvent ?-> void mouseWheelMoved = null            
+   )
+{
+	if(adjustmentValueChanged != null)
+    this.addAdjustmentListener(adjustmentValueChanged: adjustmentValueChanged);
+  
+  Component c = this;
+  c.init
+    (propertyName: propertyName,
+     componentHidden: componentHidden,
+     componentMoved: componentMoved,
+     componentResized: componentResized,
+     componentShown: componentShown,
+     focusGained: focusGained,
+     focusLost: focusLost,
+     hierarchyAncestorMoved: hierarchyAncestorMoved,
+     hierarchyAncestorResized: hierarchyAncestorResized,
+     hierarchyChanged: hierarchyChanged,
+     caretPositionChanged: caretPositionChanged,
+     inputMethodTextChanged: inputMethodTextChanged,
+     keyPressed: keyPressed,
+     keyReleased: keyReleased,
+     keyTyped: keyTyped, 
+     mouseEntered: mouseEntered,
+     mouseExited: mouseExited,
+     mousePressed: mousePressed,
+     mouseReleased: mouseReleased,   
+     mouseDragged: mouseDragged,
+     mouseMoved: mouseMoved,
+     propertyChange: propertyChange
+//JDK1.4     mouseWheelMoved: mouseWheelMoved 
+                                  );
+  return this;
+}
+
+
+<TextComponent T> T init
+  (T this,
+   
+   TextEvent ?-> void textValueChanged = null,
+                
+// optional anonymous functions from java.awt.Component
+          
+   ?String propertyName = null,
+   ComponentEvent ?-> void componentHidden = null,
+   ComponentEvent ?-> void componentMoved = null,
+   ComponentEvent ?-> void componentResized = null,
+   ComponentEvent ?-> void componentShown = null,
+   FocusEvent ?-> void focusGained = null,
+   FocusEvent ?-> void focusLost = null,
+   HierarchyEvent ?-> void hierarchyAncestorMoved = null,
+   HierarchyEvent ?-> void hierarchyAncestorResized = null,
+   HierarchyEvent ?-> void hierarchyChanged = null,
+   InputMethodEvent ?-> void caretPositionChanged = null,
+   InputMethodEvent ?-> void inputMethodTextChanged = null,
+   KeyEvent ?-> void keyPressed = null,
+   KeyEvent ?-> void keyReleased = null,
+   KeyEvent ?-> void keyTyped = null, 
+   MouseEvent ?-> void mouseClicked = null,
+   MouseEvent ?-> void mouseEntered = null,
+   MouseEvent ?-> void mouseExited = null,
+   MouseEvent ?-> void mousePressed = null,
+   MouseEvent ?-> void mouseReleased = null,   
+   MouseEvent ?-> void mouseDragged = null,
+   MouseEvent ?-> void mouseMoved = null,
+   PropertyChangeEvent ?-> void propertyChange = null
+//JDK1.4   MouseWheelEvent ?-> void mouseWheelMoved = null            
+                            )
+{
+	if(textValueChanged != null)
+    this.addTextListener(textValueChanged: textValueChanged);
+    
+  Component c = this;
+  c.init
+    (propertyName: propertyName,
+     componentHidden: componentHidden,
+     componentMoved: componentMoved,
+     componentResized: componentResized,
+     componentShown: componentShown,
+     focusGained: focusGained,
+     focusLost: focusLost,
+     hierarchyAncestorMoved: hierarchyAncestorMoved,
+     hierarchyAncestorResized: hierarchyAncestorResized,
+     hierarchyChanged: hierarchyChanged,
+     caretPositionChanged: caretPositionChanged,
+     inputMethodTextChanged: inputMethodTextChanged,
+     keyPressed: keyPressed,
+     keyReleased: keyReleased,
+     keyTyped: keyTyped, 
+     mouseEntered: mouseEntered,
+     mouseExited: mouseExited,
+     mousePressed: mousePressed,
+     mouseReleased: mouseReleased,   
+     mouseDragged: mouseDragged,
+     mouseMoved: mouseMoved,
+     propertyChange: propertyChange
+//JDK1.4     mouseWheelMoved: mouseWheelMoved 
+                                      );
+  return this;
+}
+
+
+<TextField T> T init
+  (T this,
+   
+   ActionEvent ?-> void actionPerformed = null,
+                    
+// optional anonymous functions from java.awt.TextComponent
+  
+   TextEvent ?-> void textValueChanged = null,
+                  
+// optional anonymous functions from java.awt.Component
+            
+   ?String propertyName = null,
+   ComponentEvent ?-> void componentHidden = null,
+   ComponentEvent ?-> void componentMoved = null,
+   ComponentEvent ?-> void componentResized = null,
+   ComponentEvent ?-> void componentShown = null,
+   FocusEvent ?-> void focusGained = null,
+   FocusEvent ?-> void focusLost = null,
+   HierarchyEvent ?-> void hierarchyAncestorMoved = null,
+   HierarchyEvent ?-> void hierarchyAncestorResized = null,
+   HierarchyEvent ?-> void hierarchyChanged = null,
+   InputMethodEvent ?-> void caretPositionChanged = null,
+   InputMethodEvent ?-> void inputMethodTextChanged = null,
+   KeyEvent ?-> void keyPressed = null,
+   KeyEvent ?-> void keyReleased = null,
+   KeyEvent ?-> void keyTyped = null, 
+   MouseEvent ?-> void mouseClicked = null,
+   MouseEvent ?-> void mouseEntered = null,
+   MouseEvent ?-> void mouseExited = null,
+   MouseEvent ?-> void mousePressed = null,
+   MouseEvent ?-> void mouseReleased = null,   
+   MouseEvent ?-> void mouseDragged = null,
+   MouseEvent ?-> void mouseMoved = null,
+   PropertyChangeEvent ?-> void propertyChange = null
+//JDK1.4   MouseWheelEvent ?-> void mouseWheelMoved = null            
+   )
+{
+	if(actionPerformed != null)
+    this.addActionListener(actionPerformed: actionPerformed);
+  
+  TextComponent t = this;
+  t.init
+    (textValueChanged: textValueChanged,
+     propertyName: propertyName,
+     componentHidden: componentHidden,
+     componentMoved: componentMoved,
+     componentResized: componentResized,
+     componentShown: componentShown,
+     focusGained: focusGained,
+     focusLost: focusLost,
+     hierarchyAncestorMoved: hierarchyAncestorMoved,
+     hierarchyAncestorResized: hierarchyAncestorResized,
+     hierarchyChanged: hierarchyChanged,
+     caretPositionChanged: caretPositionChanged,
+     inputMethodTextChanged: inputMethodTextChanged,
+     keyPressed: keyPressed,
+     keyReleased: keyReleased,
+     keyTyped: keyTyped, 
+     mouseEntered: mouseEntered,
+     mouseExited: mouseExited,
+     mousePressed: mousePressed,
+     mouseReleased: mouseReleased,   
+     mouseDragged: mouseDragged,
+     mouseMoved: mouseMoved,
+     propertyChange: propertyChange
+//JDK1.4     mouseWheelMoved: mouseWheelMoved 
+     );
+     
+  return this;
+}
+
+
+<DragSourceContext T> T init
+  (T this,
+   
+   DragSourceDropEvent ?-> void dsDragDropEnd = null,
+   DragSourceDragEvent ?-> void dsDragEnter = null,
+   DragSourceDragEvent ?-> void dsDragOver = null,
+   DragSourceDragEvent ?-> void dsDropActionChanged = null,
+   DragSourceEvent ?-> void dsDragExit = null
+//JDK1.4   DragSourceDragEvent ?-> void dragMouseMoved
+   )
+{
+//JDK1.4	if(dragMouseMoved != null)
+//JDK1.4	  this.addDragSourceMotionListener(dragMouseMoved: dragMouseMoved);
+
+  this.addDragSourceListener
+    (dsDragDropEnd: dsDragDropEnd,
+     dsDragEnter: dsDragEnter,
+     dsDragOver: dsDragOver,
+     dsDropActionChanged: dsDropActionChanged,
+     dsDragExit: dsDragExit
+     );
+     
+   return this; 
+}
+
+
+<DropTarget T> T init
+  (T this,
+   
+   DropTargetDropEvent ?-> void dtDrop = null,
+   DropTargetDragEvent ?-> void dtDragEnter = null,
+   DropTargetDragEvent ?-> void dtDragOver = null,
+   DropTargetDragEvent ?-> void dtDropActionChanged = null,
+   DropTargetEvent ?-> void dtDragExit = null
+   )
+{
+  this.addDropTargetListener
+    (dtDrop: dtDrop,
+     dtDragEnter: dtDragEnter,
+     dtDragOver: dtDragOver,
+     dtDropActionChanged: dtDropActionChanged,
+     dtDragExit: dtDragExit
+     );
+     
+  return this; 
+}
+
+//JDK1.4  <DragSource T> T init
+//JDK1.4    (T this,
+//JDK1.4     
+//JDK1.4     DragSourceDropEvent ?-> void dsDragDropEnd = null,
+//JDK1.4     DragSourceDragEvent ?-> void dsDragEnter = null,
+//JDK1.4     DragSourceDragEvent ?-> void dsDragOver = null,
+//JDK1.4     DragSourceDragEvent ?-> void dsDropActionChanged = null,
+//JDK1.4     DragSourceEvent ?-> void dsDragExit = null
+//JDK1.4     DragSourceDragEvent ?-> void dragMouseMoved
+//JDK1.4     )
+//JDK1.4  {
+//JDK1.4  if(dragMouseMoved != null)
+//JDK1.4    this.addDragSourceMotionListener(dragMouseMoved: dragMouseMoved);
+//JDK1.4  	  
+//JDK1.4    this.addDragSourceListener
+//JDK1.4      (dsDragDropEnd: dsDragDropEnd,
+//JDK1.4       dsDragEnter: dsDragEnter,
+//JDK1.4       dsDragOver: dsDragOver,
+//JDK1.4       dsDropActionChanged: dsDropActionChanged,
+//JDK1.4       dsDragExit: dsDragExit
+//JDK1.4       );
+//JDK1.4        
+//JDK1.4    return this;
+//JDK1.4  }
+
+
+//JDK1.4  <KeyboardFocusManager T> T init
+//JDK1.4    (T this,
+//JDK1.4     
+//JDK1.4     ?String propertyName = null,
+//JDK1.4     ?String vetoablePropertyName = null,
+//JDK1.4     PropertyChangeEvent ?-> void propertyChange = null,       
+//JDK1.4     PropertyChangeEvent ?-> void vetoableChange = null
+//JDK1.4     )
+//JDK1.4  {
+//JDK1.4    this.addPropertyChangeListener
+//JDK1.4      (propertyName: propertyName,
+//JDK1.4       propertyChange: propertyChange
+//JDK1.4       );
+//JDK1.4    this.addVetoableChangeListener
+//JDK1.4      (vetoablePropertyName,
+//JDK1.4       vetoableChange: vetoableChange
+//JDK1.4       );
+//JDK1.4  
+//JDK1.4    return this;
+//JDK1.4  }
+                                                  

@@ -151,6 +151,15 @@ let String s3 = s2 + "3";
 let String s2 = s1 + "2";
 let String s1 = "1";
 
+/// PASS
+  assert isFoo;
+  /// Toplevel
+var boolean isFoo = computeFoo();
+
+var java.io.File f  = new java.io.File("foo");
+
+boolean computeFoo() = f.getPath().equals("foo");
+
 /// FAIL
   /// Toplevel
   var String s;

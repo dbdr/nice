@@ -16,6 +16,9 @@ nice (0.9.7)
       import some.java.pkg.* (!);
     Individual methods can be treated specially by retyping them.
   * The 'Any' keyword is now deprecated.
+  * Global constants and global variables are now initialized in a proper order
+    when one depends on another, both directly and through the default 
+    implementation of a method.
 
  --
 

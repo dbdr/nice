@@ -359,5 +359,19 @@ public class NiceMethod extends UserOperator
       super.innerTypecheck();
       implementation.innerTypecheck();
     }
+
+    protected gnu.expr.Expression computeCode()
+    {
+      // We need to store the result before compiling the implementation.
+      code = super.computeCode();
+
+      // Compile the implementation before returning. This is used to detect
+      // dependencies between global variables through default method 
+      // implementations, so that the global variables can be initialized in
+      // the proper order.
+      implementation.getRefExp();
+
+      return code;
+    }
   }
 }

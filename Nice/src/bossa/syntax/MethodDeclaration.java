@@ -426,7 +426,7 @@ public abstract class MethodDeclaration extends Definition
 
   public static final char methodListSeparator = ';';
 
-  private gnu.expr.Expression code;
+  gnu.expr.Expression code;
 
   protected abstract gnu.expr.Expression computeCode();
 

@@ -2,7 +2,6 @@
 <!-- The file was formatted automatically by Eclipse 3.1.0 with maximum line width set to 110. -->
 <project name="Nice" default="check">
   <!-- For Nice arguments see "http://nice.sourceforge.net/cgi-bin/twiki/view/Doc/NicecAntTaskdef". -->
-  <taskdef name="nicec" classname="nice.tools.ant.Nicec" />
   <property environment="env" />
   <property name="compiler" value="modern" description="example: ant -Dcompiler=gcj" />
   <property name="build" value="classes" />
@@ -45,27 +44,37 @@
   </macrodef>
   <macrodef name="mac-nicec-old">
     <attribute name="package" />
+    <attribute name="runtime" default="${NICE_JAR}" />
+    <attribute name="args" default="--recompile-all" />
     <attribute name="sourcepath" default="src" />
     <sequential>
-      <nicec package="@{package}"
-             sourcepath="@{sourcepath}"
-             destination="${build}"
-             runtime="${NICE_JAR}"
-             recompile_all="yes"
-      />
+      <java failonerror="yes"
+            fork="yes"
+            classpath="@{runtime}"
+            classname="nice.tools.compiler.console.dispatch"
+      >
+        <arg value="--sourcepath" />
+        <arg value="@{sourcepath}" />
+        <arg value="--destination" />
+        <arg value="${build}" />
+        <arg line="@{args}" />
+        <arg value="@{package}" />
+      </java>
     </sequential>
   </macrodef>
   <macrodef name="mac-nicec-new">
     <attribute name="package" />
+    <attribute name="runtime" default="${build}/console.jar${path.separator}${build}" />
     <attribute name="args" default="" />
+    <attribute name="sourcepath" default="src${path.separator}stdlib" />
     <sequential>
       <java failonerror="yes"
             fork="yes"
-            classpath="${NICE_JAR}"
+            classpath="@{runtime}"
             classname="nice.tools.compiler.console.dispatch"
       >
         <arg value="--sourcepath" />
-        <arg value="src${path.separator}stdlib" />
+        <arg value="@{sourcepath}" />
         <arg value="--destination" />
         <arg value="${build}" />
         <arg value="--exclude-runtime" />
@@ -132,7 +141,8 @@
       <arg value="https://javacc.dev.java.net/files/documents/17/686/${javaccVersion}.zip" />
     </exec>
   </target>
-  <target name="javacc" depends="javacc-download">
+  <available file="${build}/javacc.jar" property="haveJavaccJar" />
+  <target name="javacc" depends="javacc-download" unless="haveJavaccJar">
     <unzip src="${javaccZip}" dest="${build}">
       <patternset>
         <include name="${javaccVersion}/bin/lib/javacc.jar" />
@@ -141,7 +151,7 @@
     <move file="${build}/${javaccVersion}/bin/lib/javacc.jar" todir="${build}" />
     <delete dir="${build}/${javaccVersion}" />
   </target>
-  <target name="parser">
+  <target name="parser" depends="javacc">
     <java fork="yes" dir="src/bossa/parser" classname="javacc">
       <classpath>
         <pathelement path="${basedir}/${build}/javacc.jar" />
@@ -150,8 +160,8 @@
       <arg value="Parser.jj" />
     </java>
   </target>
-  <target name="recompile">
-    <mac-javac-multi>
+  <target name="recompile" depends="initialize">
+    <mac-javac-multi classpath="${NICE_JAR}">
       <include>
         <include name="bossa/**/*.java" />
         <include name="nice/**/*.java" />
@@ -182,12 +192,15 @@
       <attribute name="Build-Id" value="Nice compiler version ${version} (build ${NICE_DATE})" />
     </manifest>
   </target>
-  <target name="compiler" depends="setDate">
-    <!-- <mac-nicec-new package="nice.lang" /> -->
+  <target name="compiler1" depends="setDate,initialize">
+    <mac-nicec-old package="bossa.syntax" />
+    <mac-nicec-old package="nice.tools.compiler.console" args="--recompile-all --jar ${build}/console.jar" />
+  </target>
+  <target name="compiler2">
     <mac-nicec-new package="bossa.syntax" args="--recompile-all" />
     <mac-nicec-new package="nice.tools.compiler.console" args="--recompile-all --jar ${build}/console.jar" />
   </target>
-  <target name="tools">
+  <target name="tools" depends="initialize">
     <echo message="Compiling nice.tools.doc..." level="info" />
     <mac-nicec-new package="nice.tools.doc" />
 
@@ -209,10 +222,12 @@
     <echo message="Compiling nice.tools.repository.publish..." level="info" />
     <mac-nicec-new package="nice.tools.repository.publish" args="--jar ${build}/nicepublish.jar" />
   </target>
-  <target name="libs">
+  <target name="libs" depends="initialize">
     <mac-nicec-new package="nice.functional" />
   </target>
-  <target name="bootstrap" depends="core-bootstrap,javacc,parser,recompile,compiler,tools,libs" />
+  <target name="bootstrap"
+          depends="core-bootstrap,javacc,parser,recompile,compiler1,compiler2,tools,libs,recompile"
+  />
   <!-- The end of bootstrap targets. -->
 
   <available file="${build}/nice.jar" property="haveArchive" />

@@ -15,6 +15,89 @@ package bossa.syntax;
 import bossa.util.*;
 
 /**
+   A monotype, build by application of
+   a type constructor to type parameters.
+
+*/
+public class MonotypeConstructor extends Monotype
+{
+  public ?TypeIdent tc = null;
+  // used when the lowlevel TC is know in advance
+  private ?mlsub.typing.TypeConstructor lowlevelTC = null;
+  TypeParameters parameters;
+  ?Location loc;
+ 
+  Monotype cloneType() = new MonotypeConstructor(tc:tc,parameters:parameters,loc:loc);
+
+  rawResolve(typeMap)
+  {
+    if (lowlevelTC == null)
+      {
+	let newTC = notNull(this.tc).resolveToTC(typeMap);
+	if (! (newTC instanceof TypeConstructor))
+	  throw User.error(notNull(this.tc), notNull(this.tc)+" should be a type constructor");
+	lowlevelTC = newTC;
+      }
+
+    mlsub.typing.Monotype[] resolvedParams = parameters.resolve(typeMap);
+
+    try{
+      return new mlsub.typing.MonotypeConstructor(lowlevelTC, resolvedParams);
+    }
+    catch(mlsub.typing.BadSizeEx e){
+      // See if this is a class with default type parameters
+      let res = getTypeWithTC(notNull(lowlevelTC), resolvedParams);
+      if (res == null)
+        throw User.error(this, (tc!=null ? "Class "+tc : notNull(lowlevelTC).toString()) +
+		       Util.has(e.expected, "type parameter", e.actual));
+
+      return res;
+    }
+  }
+
+  substitute(map)
+  {
+    let TypeIdent newTC = cast(map.get(notNull(tc))) || notNull(tc);
+    
+    Monotype res = createMonotypeConstructor
+      (newTC,
+       new TypeParameters(Monotype.substitute(map, notNull(parameters.content))),
+       loc);
+    res.nullness = this.nullness;
+    return res;
+  }
+
+  containsAlike() = Monotype.containsAlike(notNull(parameters.content));
+
+  public ?TypeIdent getTC() = tc;
+  
+  public TypeParameters getTP() = parameters;
+  
+  location() = loc || notNull(tc).location();
+
+  toString()
+  {
+    return this.nullnessString() + 
+      (lowlevelTC != null ? notNull(lowlevelTC).toString() : notNull(tc).toString()) 
+      + parameters;
+  }
+
+}
+
+public MonotypeConstructor createMonotypeConstructor(TypeIdent tc, ?TypeParameters parameters,
+			     ?Location loc)
+{
+  return new MonotypeConstructor(tc: tc, 
+	parameters: parameters || new TypeParameters([]), loc: loc);
+}
+
+Monotype createMonotypeConstructor(mlsub.typing.TypeConstructor tc, TypeParameters parameters,
+		      Location loc)
+{
+  return new MonotypeConstructor(lowlevelTC: tc, parameters: parameters, loc: loc);
+}  
+
+/**
    Functional type.
 
  */

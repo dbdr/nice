@@ -53,7 +53,7 @@ public class Alike extends Monotype
     if (tc == null)
       return this;
 
-    Monotype res = new MonotypeConstructor
+    Monotype res = dispatch.createMonotypeConstructor
       ((mlsub.typing.TypeConstructor) tc, 
        new TypeParameters(Monotype.substitute(map, parameters)), 
        location);

@@ -157,7 +157,7 @@ private Monotype getCCReturnType(LocatedString className, Constraint cst)
     return classe;
 
   TypeSymbol[] syms = cst.getBinderArray();
-  Monotype[?] params = cast(new Monotype[syms.length]);
+  Monotype[] params = cast(new Monotype[syms.length]);
 
   for (int i = 0; i < syms.length; i++)
     {
@@ -166,7 +166,7 @@ private Monotype getCCReturnType(LocatedString className, Constraint cst)
       notNull(params)[i] = Monotype.create(cast(syms[i]));
     }
 
-  let res = new MonotypeConstructor
+  let res = createMonotypeConstructor
       (classe, new TypeParameters(params), classe.location());
   res.nullness = Monotype.sure;
   return res;

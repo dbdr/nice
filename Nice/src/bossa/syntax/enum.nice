@@ -66,7 +66,7 @@ public EnumDefinition createEnumDefinition(LocatedString name, List<LocatedStrin
   let shortName = name.toString();
   let classDef = makeClass
 	(name,true,false, null, new ArrayList(),
-	new MonotypeConstructor(new TypeIdent(new LocatedString("nice.lang.Enum",
+	createMonotypeConstructor(new TypeIdent(new LocatedString("nice.lang.Enum",
 		name.location())), null, name.location()), interfaces, null);
   let impl = createNiceClass(classDef);
 

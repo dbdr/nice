@@ -15,6 +15,13 @@ m(x@A) {}
 m(x@B) { super; }
 
 /// PASS
+ /// COMMENT super can appear before the super-implementation.
+ /// Toplevel
+void m(A);
+m(x@B) { super; }
+m(x@A) {}
+
+/// PASS
  /// Toplevel
 void m(A);
 m(x#A) {}
@@ -108,3 +115,14 @@ myclone(c#C) = super;
 <Any T> T myclone(T) = native Object Object.clone();
 
 myclone(a#A) = super;
+
+/// PASS
+  /// COMMENT super defined in an imported package.
+  /// package a
+  /// Toplevel
+void m(A);
+m(a@A) {}
+
+  /// package b import a
+  /// Toplevel
+m(b@B) { super; }

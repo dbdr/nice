@@ -8,7 +8,7 @@ nice (0.7.1) unstable; urgency=low
   * Generate better code when using anonymous functions.
   * Bugfixes (break statement, anonymous functions used in global variables
               inside complex expressions, polymorphic arrays used
-	      across packages, ...).
+	      across packages, super, ...).
 
  --
 

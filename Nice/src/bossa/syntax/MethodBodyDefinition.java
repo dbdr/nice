@@ -140,7 +140,14 @@ public class MethodBodyDefinition extends Definition
       }
     else if (d instanceof NiceMethod)
       // Register this alternative for the link test
-      alternative = new bossa.link.Alternative((NiceMethod) d, this.formals);
+      alternative = new bossa.link.Alternative
+	(((NiceMethod) d).getFullName(), getPatterns())
+	{
+	  public gnu.expr.Expression methodExp()
+	  {
+	    return MethodBodyDefinition.this.getRefExp();
+	  }
+	};
     else
       User.error(this, "Implementations can only be made for methods, but " + 
 		 d.getName() + " is a function.\nIt was defined at:\n" + 
@@ -451,18 +458,30 @@ public class MethodBodyDefinition extends Definition
     return res;
   }
 
+  gnu.expr.ReferenceExp ref;
+
+  public gnu.expr.ReferenceExp getRefExp()
+  {
+    if (ref == null)
+      {
+	if (declaration instanceof NiceMethod)
+	  ref = compile((NiceMethod) declaration);
+	else
+	  compile((JavaMethod) declaration);
+      }
+
+    return ref;
+  }
+
   public void compile()
   {
     if(Debug.codeGeneration)
       Debug.println("Compiling method body " + this);
 
-    if (declaration instanceof NiceMethod)
-      compile((NiceMethod) declaration);
-    else
-      compile((JavaMethod) declaration);
+    getRefExp();
   }
 
-  private void compile (NiceMethod definition)
+  private gnu.expr.ReferenceExp compile (NiceMethod definition)
   {
     gnu.expr.LambdaExp lexp = createMethod(name.toString(), false);
     gnu.expr.ReferenceExp ref = module.addMethod(lexp, true);
@@ -473,7 +492,7 @@ public class MethodBodyDefinition extends Definition
       (new MiscAttr("patterns", 
 		    Pattern.bytecodeRepresentation(formals).getBytes()));
 
-    alternative.setCode(ref);
+    return ref;
   }
 
   final TypeConstructor firstArgument()
@@ -529,9 +548,11 @@ public class MethodBodyDefinition extends Definition
     return name + "(" + Util.map("", ", ", "", formals) + ")";
   }
 
+  public Pattern[] getPatterns() { return formals; }
+
   private MethodDeclaration declaration;
   protected MonoSymbol[] parameters;
-  protected Pattern[] formals;
+  private Pattern[] formals;
   Collection /* of LocatedString */ binders; // Null if type parameters are not bound
   private Statement body;
 }

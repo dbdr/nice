@@ -1,7 +1,7 @@
 /**************************************************************************/
-/*                           B O S S A                                    */
-/*        A simple imperative object-oriented research language           */
-/*                   (c)  Daniel Bonniot 1999                             */
+/*                                N I C E                                 */
+/*             A high-level object-oriented research language             */
+/*                        (c) Daniel Bonniot 2002                         */
 /*                                                                        */
 /*  This program is free software; you can redistribute it and/or modify  */
 /*  it under the terms of the GNU General Public License as published by  */
@@ -9,10 +9,6 @@
 /*  (at your option) any later version.                                   */
 /*                                                                        */
 /**************************************************************************/
-
-// File    : Alternative.java
-// Created : Mon Nov 15 12:20:40 1999 by bonniot
-//$Modified: Fri Oct 06 12:55:08 2000 by Daniel Bonniot $
 
 package bossa.link;
 
@@ -24,7 +20,6 @@ import bossa.syntax.NiceMethod;
 import bossa.syntax.Pattern;
 import bossa.syntax.LocatedString;
 import bossa.syntax.Node;
-import nice.tools.code.*;
 
 import gnu.bytecode.*;
 import gnu.expr.*;
@@ -40,69 +35,12 @@ import java.util.*;
  * @author bonniot
  */
 
-public class Alternative
+public abstract class Alternative
 {
-  /**
-   * When read from a source file.
-   */
-  public Alternative(NiceMethod m, Pattern[] patterns)
+  public Alternative(String methodName, Pattern[] patterns)
   {
-    this.methodName = m.getFullName();
+    this.methodName = methodName;
     this.patterns = patterns;
-    add();
-  }
-
-  /**
-   * When read from a bytecode file.
-   */
-  public static void read(ClassType c, Method method)
-    {
-      String methodName = nice.tools.code.Strings.unescape(method.getName());
-
-      MiscAttr attr = (MiscAttr) Attribute.get(method, "definition");
-      if (attr == null)
-	// this must be a toplevel function, a constructor, ...
-	return;
-
-      new Alternative(c, method, attr);
-    }
-
-  private Alternative(ClassType c, Method method, MiscAttr attr)
-  {
-    methodName = new String(attr.data);
-
-    attr = (MiscAttr) Attribute.get(method, "patterns");
-    if (attr == null)
-      Internal.error("Method " + method.getName() + 
-		     " in class " + c.getName() + " has no patterns");
-    String rep = new String(attr.data);
-
-    this.code = new QuoteExp(new PrimProcedure(method));
-    
-    int[]/*ref*/ at = new int[]{ 0 };
-
-    ArrayList patterns = new ArrayList(5);
-
-    Pattern p;
-    while ((p = Pattern.read(rep, at, methodName)) != null)
-      {
-	if (p.tc == bossa.syntax.ConstantExp.arrayTC)
-	  /* Special treatment for arrays:
-	     they are compiled into Object,
-	     but we want a SpecialArray in the method bytecode type.
-	  */
-	  {
-	    int argnum = patterns.size();
-	    if (method.arg_types[argnum] == Type.pointer_type)
-	      method.arg_types[argnum] = SpecialArray.unknownTypeArray();
-	  }
-
-	patterns.add(p);
-      }
-    
-    this.patterns = (Pattern[]) 
-      patterns.toArray(new Pattern[patterns.size()]);
-    
     add();
   }
 
@@ -149,21 +87,11 @@ public class Alternative
    * Code generation
    ****************************************************************/
 
-  public void setCode(ReferenceExp code)
-  {
-    this.code = code;
-  }
-
   /**
    * @return the expression that represents the method body.
    */
-  public Expression methodExp()
-  {
-    return code;
-  }
+  public abstract Expression methodExp();
 
-  private Expression code;  
-  
   /**
      @return the expression that tests if this alternative matches
      the tuple <code>parameters</code>.

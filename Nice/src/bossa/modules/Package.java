@@ -188,7 +188,7 @@ public class Package implements mlsub.compilation.Module, Located, bossa.syntax.
     for(Method method = source.getBytecode().getMethods();
 	method != null;
 	method = method.getNext())
-      bossa.link.Alternative.read(source.getBytecode(), method);
+      bossa.link.ImportedAlternative.read(source.getBytecode(), method);
   }
   
   /****************************************************************

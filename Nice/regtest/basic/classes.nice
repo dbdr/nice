@@ -1,11 +1,11 @@
 
 package regtest.basic;
 
+String pToString(?Point);
+
 class Point 
 {
   int x; int y;
-
-  String pToString();
 
   pToString() = "(x=" + this.x + ", y=" + this.y + ")";
 
@@ -31,7 +31,7 @@ class ColoredPoint extends Point
   A second, unrelated pToString is defined
   to test overloading resolution of method bodies with additional patterns
 */
-String pToString(String);
+String pToString(?String);
 pToString(s@null(String)) = "Null string";
 pToString(s@String) = "String";
 
@@ -51,10 +51,10 @@ test_classes()
   println ("### Testing classes");
   println(pToString(new Point()));
   println(pToString(new ColoredPoint()));
-  Point p = null;
+  ?Point p = null;
   println(pToString(p));
 
-  String s = null;
+  ?String s = null;
   println(pToString("titi") + ", " + pToString(s));
 
   println(isSimplePoint(new Point()));

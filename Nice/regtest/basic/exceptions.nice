@@ -8,10 +8,10 @@ void test_exceptions();
 test_exceptions()
 {
   println("\n### Testing exceptions ###");
-  String s = null;
+  ?String s = null;
   try{
     try{
-      s.length();
+      notNull(s).length();
     }
     finally{
       println("finally");

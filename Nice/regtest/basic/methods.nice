@@ -13,9 +13,9 @@ test_methods()
   println ("### Testing methods");
   println(name(new C1()));
   println(name(new C2()));
-  C1 c = null;
+  ?C1 c = null;
   try{
-    println(name(c));
+    println(name(notNull(c)));
   }
   catch(NullPointerException ex){
     println("NULL class");

@@ -1,6 +1,17 @@
 package regtest.basic;
 
+void f_iS(?int x, ?String y) {}
+
 void test_null()
 {
   ?List<String> l = null;
+
+  f_iS(null, null);
+
+  try{
+    notNull(null)(null);
+  }
+  catch(NullPointerException e){
+    println("OK");
+  }
 }

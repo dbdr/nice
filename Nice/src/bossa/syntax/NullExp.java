@@ -14,6 +14,11 @@ package bossa.syntax;
 
 import bossa.util.*;
 
+import mlsub.typing.Polytype;
+import mlsub.typing.MonotypeVar;
+import mlsub.typing.TypeSymbol;
+import mlsub.typing.Constraint;
+
 /**
    The 'null' expression.   
 
@@ -32,7 +37,10 @@ public class NullExp extends Expression
 
   void computeType()
   {
-    this.type = mlsub.typing.Polytype.bottom();
+    //this.type = mlsub.typing.Polytype.bottom();
+    MonotypeVar alpha = new MonotypeVar();
+    this.type = new Polytype(new Constraint(new TypeSymbol[]{alpha}, null), 
+			     bossa.syntax.Monotype.maybe(alpha));
   }
   
   protected gnu.expr.Expression compile()

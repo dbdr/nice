@@ -13,7 +13,6 @@
 package bossa.syntax;
 
 import bossa.util.*;
-import bossa.util.Location;
 import bossa.util.Debug;
 
 import mlsub.typing.*;
@@ -136,7 +135,7 @@ public final class JavaClasses
       {
 	ClassType superClass =  ((ClassType) javaType).getSuperclass();
 	if(superClass!=null && !(excluded(blackListClass, superClass)))
-	  {    	
+	  {
 	    TypeConstructor superTC = make(superClass.getName(), superClass);
 
 	    try{
@@ -172,7 +171,7 @@ public final class JavaClasses
 	      }
 	    }
       }
-    
+
     if(javaType instanceof ClassType)
       fetchMethods(res, (ClassType) javaType);
     
@@ -245,7 +244,7 @@ public final class JavaClasses
    * Loads the methods defined in the java class
    * to make them available to the nice code.
    */
-  private static void fetchMethods(TypeConstructor tc, ClassType classType)
+  static void fetchMethods(TypeConstructor tc, ClassType classType)
   {
     try{
       classType.addMethods();

@@ -91,6 +91,7 @@ public class JavaClass extends ClassDefinition
       User.error(javaName, javaName + " was not found in classpath");
     
     setJavaType(gnu.bytecode.Type.make(refClass));
+    JavaClasses.fetchMethods(tc, (gnu.bytecode.ClassType) getJavaType());
   }
 
   private boolean isPrimitive;

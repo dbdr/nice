@@ -14,7 +14,12 @@ p(a)
 }
 
 <Any T> Array<T> reverse(Array<T>);
-reverse<T>(a)
+/* this is an interesting case to keep: 
+   dispatch on Array for a method that only accepts (polymorphic) arrays.
+   The difficulty here is that the bytecode type for the argument is Object,
+   while it would be rawArray if the domain of the method was bigger.
+*/
+reverse<T>(a@Array)
 {
   T[] res = new T[a.length];
   for (int i=0; i<a.length; i++)

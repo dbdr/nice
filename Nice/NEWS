@@ -23,6 +23,8 @@ nice (0.9.10)
   * Java methods and fields with parametric types are given a type with
     UnknownTypes as type parameters instead of being ignored.
   * Number of errors and warning are printed to the console.
+  * Generated classes are smaller, thanks to smaller debugging information.
+  * Native compilation with gcj is twice faster.
   * Bug fixes (disallowed redefinition of parameters, execution order of
     initializers in super classes, visibility checking of java classes,
     cyclic custom constructors, methods and fields in classes with less type

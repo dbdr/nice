@@ -81,9 +81,10 @@ public class Assert extends ProcedureN implements Inlineable
     errorClass = ClassType.make("nice.lang.AssertionFailed");
 
   private static final Method 
-    errorInit = errorClass.getDeclaredMethod("<init>", new Type[]{}),
-    errorInitString = errorClass.getDeclaredMethod
-      ("<init>", new Type[]{Type.string_type});
+    errorInit = errorClass.addMethod
+      ("<init>", Access.PUBLIC, new Type[]{}, Type.void_type),
+    errorInitString = errorClass.addMethod
+      ("<init>", Access.PUBLIC, new Type[]{Type.string_type}, Type.void_type);
 
   public Type getReturnType (Expression[] args)
   {

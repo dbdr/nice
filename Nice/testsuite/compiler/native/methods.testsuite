@@ -8,3 +8,11 @@
   // Static methods are not in the global scope.
   byte->String f = Byte.toString;
   String[] s = [1].map(int i => toString(i));
+
+/// PASS
+  // bug #755742
+  let s1 = "abc";
+  let s2 = "xyz";
+  List<String> list1 = [s1, s2];
+  List<String> list2 = [s1, s2];
+  assert list1.equals(list2);

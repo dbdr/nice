@@ -358,6 +358,15 @@ typecheck(l@LoopStmt)
   typecheck(l.iterationStatements);
 }
 
+typecheck(b@BreakStmt) {}
+typecheck(b@BreakLabelStmt) {}
+typecheck(c@ContinueStmt) {}
+
+typecheck(s@LabeledStmt)
+{
+  typecheck(s.getStatement());
+}
+
 typecheck(r@ReturnStmt)
 {
   r.includingFunction = Node.currentFunction;

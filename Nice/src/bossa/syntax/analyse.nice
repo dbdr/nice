@@ -38,6 +38,7 @@ buildInfo(varScope, typeScope)
   info.globalVarScope = varScope;
   info.globalTypeScope = typeScope;
   info.typeMap = typeMaper(info.typeVars, typeScope);
+  info.labels = new Vector();
   info.flags = 0;
   info.flagsStack = new Vector();
 
@@ -52,7 +53,7 @@ analyse(s@Statement, varScope, typeScope, mustReturnAValue)
     analyse(s, info);
     
     if (mustReturnAValue && !info.getUnreachable())
-      bossa.util.User.error(s, "Missing return statement");
+      throw error(s, "Missing return statement");
   }
   catch(bossa.util.UserError e){
     nice.tools.compiler.OutputMessages.error(e.getMessage());
@@ -73,6 +74,9 @@ class Info
 
   VarScope globalVarScope;
   TypeScope globalTypeScope;
+
+  LoopStmt currentLoop;
+  Vector<LabeledStmt> labels;
 
   /* bit 0: point not reachable 
   */
@@ -238,7 +242,7 @@ analyse(e@CallExp, info)
 	    (e.declaringClass, funName.toString(), args.size());
 
 	  if (possibilities.size() == 0)
-	    bossa.util.User.error(e, "class " + notNull(e.declaringClass).getName() +
+	    throw error(e, "class " + notNull(e.declaringClass).getName() +
 				  " has no method or field " + funName);
 	  
 	  e.function = new OverloadedSymbolExp(possibilities, funName);
@@ -287,7 +291,7 @@ analyse(e@FunExp, info)
   analyse(e.body, info);
   if (!info.getUnreachable() 
       && !nice.tools.code.Types.isVoid(e.inferredReturnType()))
-    bossa.util.User.error(e, "Missing return statement");
+    throw error(e, "Missing return statement");
 
   info.end();
   info.endInner();
@@ -430,7 +434,7 @@ analyse(b@Block, info)
   javaList(notNull(b.locals)).iter(fun(Block.LocalDeclaration l) => analyse(l, info));
   notNull(b.statements).iter(fun(?Statement s)=>{
     if (info.getUnreachable())
-      bossa.util.User.error(s, "This statement is never executed");
+      throw error(s, "This statement is never executed");
     analyse(s, info);
   });
   info.end();
@@ -441,13 +445,83 @@ analyse(s@ExpressionStmt, info)
   s.exp = analyse(s.exp, info);
 }
 
+/****************************************************************
+ * Loops, Labels, Break and Continue
+ ****************************************************************/
+
 analyse(l@LoopStmt, info)
 {
   info.beginInner(false);
   l.whileExp = analyse(l.whileExp, info);
+  LoopStmt save = info.currentLoop;
+  info.currentLoop = l;
   analyse(l.loopBody, info);
+  info.currentLoop = save;
   analyse(l.iterationStatements, info);
   info.endInner();
+}
+
+analyse(b@BreakStmt, info)
+{
+  if (info.currentLoop == null)
+    throw error(b, "continue must only occur inside loops");
+
+  b.loop = info.currentLoop;
+  info.currentLoop.createBlock();
+}
+
+analyse(s@LabeledStmt, info)
+{
+  mustNotFindLabel(notNull(s.getLabel()), info);
+  info.labels.push(s);
+  analyse(s.getStatement(), info);
+  info.labels.pop();
+}
+
+private LabeledStmt findLabel(LocatedString label, Info info) 
+{
+  return info.labels.findLast(fun(LabeledStmt l)=> l.name.equals(label.toString()));
+}
+
+private LabeledStmt mustFindLabel(LocatedString label, Info info) 
+{
+  try {
+    return findLabel(label, info);
+  }
+  catch(java.util.NoSuchElementException e) {
+    throw error(label, "unknown label: " + label);
+  }
+}
+  
+private void mustNotFindLabel(LocatedString label, Info info) 
+{
+  try {
+    findLabel(label, info);
+    throw error(label, "duplicate label: " + label);
+  }
+  catch(java.util.NoSuchElementException e) {
+  }
+}
+  
+analyse(b@BreakLabelStmt, info)
+{
+  b.statement = findLabel(notNull(b.label), info);
+}
+
+analyse(c@ContinueStmt, info)
+{
+  if (c.label == null)
+    {
+      c.loop = info.currentLoop;
+    }
+  else
+    {
+      LabeledStmt l = findLabel(notNull(c.label), info);
+      if (l.getStatement() instanceof bossa.syntax.LoopStmt)
+	c.loop = cast(l.getStatement());
+    }
+  if (c.loop == null)
+    throw error(c, "continue must only occur inside loops");
 }
 
 analyse(r@ReturnStmt, info)
@@ -487,6 +561,14 @@ analyse(t@TryStmt, info)
   if (tryCatchCannotCompleteNormally)
     info.setUnreachable();
 }
+
+/****************************************************************
+ * Misc
+ ****************************************************************/
+
+bossa.util.UserError error(?bossa.util.Located responsible, String message) = 
+     native bossa.util.UserError bossa.util.User.error
+     (bossa.util.Located, String);
 
 // Local Variables:
 // nice-xprogram: "nicec -d \"$HOME/Nice/classes\" --sourcepath=\"$HOME/Nice/src\" --classpath=\"$HOME/Nice/classes\""

@@ -25,6 +25,22 @@ import java.util.*;
 
 public class LoopStmt extends Statement
 {
+  public static LoopStmt forLoop
+    (Expression test, Statement update, Statement body)
+  {
+    return new LoopStmt(test, body, update, true);
+  }
+
+  public static LoopStmt whileLoop(Expression test, Statement body)
+  {
+    return new LoopStmt(test, body, null, true);
+  }
+
+  public static LoopStmt doLoop(Expression test, Statement body)
+  {
+    return new LoopStmt(test, body, null, false);
+  }
+
   /**
    * Create a loop statement.
    *
@@ -36,59 +52,56 @@ public class LoopStmt extends Statement
    * @param testAtTheEnd wether the test should be done before or after
        the first execution of the body.
    */
-  public LoopStmt(Expression whileExp,
-		  Statement loopBody,
-		  Statement iterationStatements,
-		  boolean testAtTheEnd)
+  private LoopStmt(Expression whileExp,
+		   Statement loopBody,
+		   Statement iterationStatements,
+		   boolean testFirst)
   {
     this.whileExp = whileExp;
     this.loopBody = loopBody;
     this.iterationStatements = iterationStatements;
-
-    if(testAtTheEnd)
-      Internal.error("\"do\" not implemented");
+    this.testFirst = testFirst;
   }
 
-  public LoopStmt(Expression whileExp,
-		  Statement body)
+  void createBlock()
   {
-    this(whileExp, body, null, false);
+    mustCreateBlock = true;
   }
 
-  public LoopStmt(Expression whileExp,
-		  Statement body, boolean testAtTheEnd)
-  {
-    this(whileExp, body, null, testAtTheEnd);
-  }
+  private boolean mustCreateBlock = false;
 
-  public LoopStmt(Expression whileExp,
-		  Statement body,
-		  Statement iterationStatements)
-  {
-    this(whileExp, body, iterationStatements, false);
-  }
-  
   /****************************************************************
    * Code generation
    ****************************************************************/
 
+  gnu.expr.LoopExp code;
+  gnu.expr.BlockExp block;
+
   gnu.expr.Expression generateCode()
   {
-    gnu.expr.Expression test,iteration;
-    if(whileExp==null)
+    gnu.expr.Expression test, iteration, res;
+
+    if (whileExp == null)
       test = new gnu.expr.QuoteExp(Boolean.TRUE);
     else
       test = whileExp.generateCode();
     
-    if(iterationStatements==null)
+    if (iterationStatements == null)
       iteration = gnu.expr.QuoteExp.voidExp;
     else
       iteration = iterationStatements.generateCode();
-    
-    return new gnu.expr.LoopExp
-      (test, 
-       loopBody != null ? loopBody.generateCode() : null, 
-       iteration);
+
+    code = new gnu.expr.LoopExp(test, iteration, testFirst);
+    if (mustCreateBlock)
+      res = block = new gnu.expr.BlockExp(code);
+    else
+      res = code;
+
+    code.setBody(loopBody != null ? loopBody.generateCode() : null);
+
+    code = null;
+    block = null;
+    return res;
   }
   
   /****************************************************************
@@ -108,4 +121,5 @@ public class LoopStmt extends Statement
 
   Expression whileExp;
   Statement loopBody, iterationStatements;
+  private boolean testFirst;
 }

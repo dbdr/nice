@@ -12,18 +12,26 @@ public class LoopExp extends Expression
 {
   /**
      @param loopBody can be null to mean "do nothing"
+     @testFirst If true, test before each iteration. 
+                If false, test after each iteration.
   */
   public LoopExp(Expression whileExp,
-		 Expression loopBody,
-		 Expression beforeNextIteration)
+		 Expression beforeNextIteration,
+		 boolean testFirst)
   {
     this.whileExp = whileExp;
-    this.loopBody = loopBody;
     this.beforeNextIteration = beforeNextIteration;
+    this.testFirst = testFirst;
   }
-    
+
+  public void setBody(Expression loopBody)
+  {
+    this.loopBody = loopBody;
+  }
+
   private Expression whileExp, loopBody, beforeNextIteration;
-    
+  private boolean testFirst;
+
   public void compile(Compilation comp, Target target)
   {
     CodeAttr code = comp.getCode();
@@ -36,16 +44,45 @@ public class LoopExp extends Expression
     */
     Label start = new Label(code);
     Label test  = new Label(code);
-      
-    code.emitGoto(test);
+    continueLabel = new Label(code);
+
+    if (testFirst)
+      code.emitGoto(test);
 
     start.define(code);
     if (loopBody != null)
       loopBody.compile(comp, Target.Ignore);
+
+    continueLabel.define(code);
     beforeNextIteration.compile(comp, Target.Ignore);
 
     test.define(code);
     compileIfJump(comp, whileExp, start);
+
+    continueLabel = null;
+  }
+
+  private Label continueLabel;
+
+  /**
+     Break out of the loop.
+  */
+  public class ContinueExp extends Expression
+  {
+    public void compile(Compilation comp, Target target)
+    {
+      comp.getCode().emitGoto(LoopExp.this.continueLabel);
+    }
+
+    public Type getType()
+    {
+      return Type.void_type;
+    }
+
+    public void print(gnu.mapping.OutPort out)
+    {
+      out.print("(Continue)");
+    }
   }
 
   /** 

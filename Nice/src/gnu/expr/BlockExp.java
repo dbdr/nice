@@ -18,6 +18,15 @@ public class BlockExp extends Expression
   /** If non-null, evaluate this, but only if non-normal exit. */
   Expression exitBody;
 
+  public BlockExp ()
+  {
+  }
+
+  public BlockExp (Expression body)
+  {
+    setBody(body);
+  }
+
   public void setBody(Expression body)
   {
     this.body = body;

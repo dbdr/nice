@@ -30,7 +30,7 @@ public final class OutputMessages
   public static void error(String message)
   {
     setStatusCode(ERROR);
-    System.out.println(message);
+    System.err.println(message);
   }
   
   public static void fatal(String message)

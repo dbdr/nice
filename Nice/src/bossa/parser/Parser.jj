@@ -181,6 +181,9 @@ TOKEN: /* Keywords */
 | < NEW:        "new"        	>
 | < NULL:	"null"		>
 
+| < BREAK:	"break"		>
+| < CONTINUE:	"continue"	>
+
 // Statements
 | < RETURN:     "return"     	>
 | < VARIABLE:   "var"   	> /* Nice specific */
@@ -1896,14 +1899,10 @@ Statement Statement() :
   res=DoStatement()
 |
   res=ForStatement()
-
-/*
 |
   res=BreakStatement()
 |
   res=ContinueStatement()
-*/
-
 |
   res=ReturnStatement()
 |
@@ -1927,10 +1926,10 @@ Statement Statement() :
 }
 
 Statement LabeledStatement() :
-{ Statement res; }
+{ LocatedString label; Statement res; }
 {
-  <IDENT> ":" res=Statement()
-  { return res; }
+  label=ident() ":" res=Statement()
+  { return new LabeledStmt(label, res); }
 }
 
 Statement Block() :
@@ -2103,14 +2102,14 @@ Statement WhileStatement() :
 { Expression cond; Statement body; }
 {
   "while" "(" cond=Expression() ")" body=Statement()
-  { return new LoopStmt(cond,body,false); }
+  { return LoopStmt.whileLoop(cond,body); }
 }
 
 Statement DoStatement() :
 { Expression cond; Statement body; }
 {
   "do" body=Statement() "while" "(" cond=Expression() ")" ";"
-  { return new LoopStmt(cond,body,true); }
+  { return LoopStmt.doLoop(cond,body); }
 }
 
 Statement ForStatement() :
@@ -2120,7 +2119,7 @@ Statement ForStatement() :
     [ cond=Expression() ] ";" [ update=StatementExpressionList() ] ")" 
     body=Statement()
   { 
-    loop=new LoopStmt(cond,body,update,false);
+    loop=LoopStmt.forLoop(cond,update,body);
     if(init==null)
       return loop;
 
@@ -2152,19 +2151,21 @@ Statement StatementExpressionList() :
   { return new Block(statements); }
 }
 
-/*
 Statement BreakStatement() :
-{ Statement res; }
+{ LocatedString label = null; }
 {
-  "break" [ <IDENTIFIER> ] ";"
+  "break" [ label=ident() ] ";"
+  { if (label == null) return BreakStmt.instance; 
+    else return new BreakLabelStmt(label); 
+  }
 }
 
 Statement ContinueStatement() :
-{ Statement res; }
+{ Statement res; LocatedString label = null; }
 {
-  "continue" [ <IDENTIFIER> ] ";"
+  "continue" [ label=ident() ] ";"
+  { return ContinueStmt.make(label); }
 }
-*/
 
 Statement ReturnStatement() :
 { Expression val=null; Token t; }

@@ -26,33 +26,33 @@ package bossa.util;
  */
 public final class User
 {
-  public static void error(Located responsible, Exception exn)
+  public static UserError error(Located responsible, Exception exn)
   {
-    error(responsible, exn.toString());
+    return error(responsible, exn.toString());
   }
 
-  public static void error(Exception exn)
+  public static UserError error(Exception exn)
   {
-    error(exn.toString());
+    return error(exn.toString());
   }
 
-  public static void error(Located responsible, String message, String dbgMsg)
-  {
-    if(Debug.powerUser)
-      error(responsible,message+dbgMsg);
-    else
-      error(responsible,message);
-  }
-
-  public static void error(Located responsible, String message, Exception dbgExn)
+  public static UserError error(Located responsible, String message, String dbgMsg)
   {
     if(Debug.powerUser)
-      error(responsible,message+" ["+dbgExn+"]");
+      return error(responsible,message+dbgMsg);
     else
-      error(responsible,message);
+      return error(responsible,message);
   }
 
-  public static void error(Located responsible, String message)
+  public static UserError error(Located responsible, String message, Exception dbgExn)
+  {
+    if(Debug.powerUser)
+      return error(responsible,message+" ["+dbgExn+"]");
+    else
+      return error(responsible,message);
+  }
+
+  public static UserError error(Located responsible, String message)
   {
     if (responsible == null)
       throw new UserError(message);
@@ -60,7 +60,7 @@ public final class User
       throw new UserError(responsible, message);
   }
 
-  public static void error(String message)
+  public static UserError error(String message)
   {
     throw new UserError(message);
   }

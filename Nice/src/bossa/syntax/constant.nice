@@ -319,10 +319,15 @@ public ConstantExp createCharConstant(LocatedString value)
   if (s.length() != 1)
     User.error(value, "Invalid character constant: " + value);
 
-  return createCharConstant(s[0], value.location());
+  let res = new CharConstantExp(tc: nice.tools.typing.PrimitiveType.charTC,
+	value: s[0], representation: "'" + value + "'");
+
+  res.type = nice.tools.typing.PrimitiveType.charPolytype;
+  res.setLocation(value.location());
+  return res;
 }
 
-public ConstantExp createCharConstant(char value, Location loc)
+ConstantExp createCharConstant(char value, Location loc)
 {
   let res = new CharConstantExp(tc: nice.tools.typing.PrimitiveType.charTC,
 	value: value, representation: "'" + value + "'");

@@ -112,7 +112,7 @@ var Map<String,String> classMap = (()=> {
   /// package b import a
   {}
 
-/// PASS bug
+/// PASS
   /// package a
   /// TOPLEVEL
   let char x = '\n';

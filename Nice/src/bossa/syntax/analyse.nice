@@ -415,11 +415,10 @@ Expression analyseIdent(IdentExp e, Info info, boolean assigned)
 	    {
 	      if (sym instanceof Block.LocalVariable.Symbol)
 	        {
-		  Block.LocalVariable.Symbol s = cast(sym);
 		  if (assigned)
-		    setInitialized(s, info, e.location());
+		    setInitialized(sym, info, e.location());
 		  else
-		    checkInitialized(s, info, e.location());
+		    checkInitialized(sym, info, e.location());
 	        }
 	      return new SymbolExp(sym, e.location());
 	    }
@@ -440,13 +439,12 @@ Expression analyseIdent(IdentExp e, Info info, boolean assigned)
 
 	  if (sym instanceof FormalParameters.Parameter.Symbol)
 	    {
-	      FormalParameters.Parameter.Symbol s = cast(sym);
-	      int state = s.getState();
+	      int state = sym.getState();
 	      if (state == 0/*XXX: FormalParameters.Parameter.Symbol.NOT_ACCESSIBLE*/)
 	        throw error(e, "Parameter " + e + " is not accessible");
 
 	      if (state == 1/*XXX: FormalParameters.Parameter.Symbol.ARGUMENT_REFERENCE*/)
-		  return new FormalParameters.Parameter.AccessExp(s, e.location());
+		  return new FormalParameters.Parameter.AccessExp(sym, e.location());
 	      // Otherwise, we are in the normal case.
 	    }
 

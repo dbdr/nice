@@ -20,8 +20,8 @@ package nice.lang;
 */
 
 final class Array<T>
-  implements Sequence
-  finally implements Collection
+  implements Sequence<T>
+  finally implements Collection<T>
   = native;
 
 /** Returns a new copy with newSize elements */

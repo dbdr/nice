@@ -101,8 +101,8 @@ top(l@List) = l.get(l.size() - 1);
  ****************************************************************/
 
 abstract class FList<T> 
-  implements Sequence 
-  finally implements Collection
+  implements Sequence <T> 
+  finally implements Collection<T>
   {}
 
 final class Nil<T>  extends FList<T> {}
@@ -172,7 +172,7 @@ list<T>(l)
  * LinkedList
  ****************************************************************/
 
-final class JavaList<T> implements List
+final class JavaList<T> implements List<T>
 {
   java.util.List impl;  
 
@@ -227,8 +227,8 @@ filter<C,T>(l@JavaList, test)
  ****************************************************************/
 
 class Vector<T> 
-  implements List 
-  finally implements Collection
+  implements List<T> 
+  finally implements Collection<T>
 {
   Array<T> elements;
   int length;
@@ -384,7 +384,8 @@ print(p@PrintStream, s@Sequence)
  ****************************************************************/
 
 interface Map<Key,Element> = native java.util.Map;
-class Hashtable<Key,Element> implements Map = native java.util.HashMap;
+class Hashtable<Key,Element> implements Map<Key, Element> = 
+  native java.util.HashMap;
 
 <Any Key, Any Element> Hashtable<Key, Element> hashtable() = 
   native new java.util.HashMap();

@@ -282,7 +282,7 @@ analyse(e@CallExp, info)
 	  int arity = args.size();
 
 	  if ((! e.hasBrackets) && (arity == 0))
-	    // This case is link java.lang.Byte.toString:
+	    // This case is like java.lang.Byte.toString:
 	    // look for a method with that name and any arity,
 	    // since the method is not called but just referenced.
 	    {

@@ -12,7 +12,7 @@
 
 // File    : ThrowStmt.java
 // Created : Thu May 25 17:33:52 2000 by Daniel Bonniot
-//$Modified: Thu Jun 08 15:45:08 2000 by Daniel Bonniot $
+//$Modified: Thu Sep 07 17:32:07 2000 by Daniel Bonniot $
 
 package bossa.syntax;
 
@@ -76,7 +76,7 @@ public class ThrowStmt extends Statement
   
   public String toString()
   {
-    return "throw "+exn;
+    return "throw " + exn;
   }
 
   private Expression exn;

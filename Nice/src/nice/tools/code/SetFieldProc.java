@@ -12,7 +12,7 @@
 
 // File    : SetFieldProc.java
 // Created : Mon Jul 24 16:34:33 2000 by Daniel Bonniot
-//$Modified: Tue Jul 25 17:09:07 2000 by Daniel Bonniot $
+//$Modified: Thu Sep 07 17:37:47 2000 by Daniel Bonniot $
 
 package nice.tools.code;
 
@@ -20,7 +20,7 @@ import gnu.expr.*;
 import gnu.bytecode.*;
 
 /**
- * Modifies the value of an object field and returns new value.
+ * Modifies the value of an object's field and returns the new value.
  * 
  * @author Daniel Bonniot
  */
@@ -31,9 +31,7 @@ public class SetFieldProc extends gnu.mapping.Procedure2 implements Inlineable
 
   public SetFieldProc (Field field)
   {
-    this.field = field;
-
-    
+    this.field = field; 
   }
 
   public Object apply2 (Object arg1, Object arg2)

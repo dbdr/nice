@@ -12,7 +12,7 @@
 
 // File    : Dispatch.java
 // Created : Mon Nov 15 10:36:41 1999 by bonniot
-//$Modified: Wed Aug 02 18:47:54 2000 by Daniel Bonniot $
+//$Modified: Thu Sep 07 17:35:10 2000 by Daniel Bonniot $
 
 package bossa.link;
 
@@ -260,20 +260,13 @@ public final class Dispatch
     module.compileDispatchMethod(lexp);
   }
   
-  private static final gnu.mapping.Procedure throwProc 
-    = new kawa.standard.prim_throw();
-  
   private static Expression dispatch(Iterator sortedAlternatives, 
 				     boolean voidReturn, 
 				     final BlockExp block, 
 				     Expression[] params)
   {
     if(!sortedAlternatives.hasNext())
-      {
-	Expression[] exn = 
-	{ new QuoteExp(new Error("Message not understood")) };
-	return new ApplyExp(throwProc,exn);
-      }
+      return new ThrowExp(new QuoteExp(new Error("Message not understood")));
     
     Alternative a = (Alternative) sortedAlternatives.next();
     Expression matchTest = a.matchTest(params);

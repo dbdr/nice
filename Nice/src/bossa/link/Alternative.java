@@ -12,7 +12,7 @@
 
 // File    : Alternative.java
 // Created : Mon Nov 15 12:20:40 1999 by bonniot
-//$Modified: Tue Sep 05 17:39:54 2000 by Daniel Bonniot $
+//$Modified: Thu Sep 07 17:26:50 2000 by Daniel Bonniot $
 
 package bossa.link;
 
@@ -125,6 +125,7 @@ public class Alternative
     VISITING  = 2,
     VISITED   = 3;
   
+  /** Marks the state of this node in the graph traversal. */
   int mark = UNVISITED;
   
   /****************************************************************
@@ -178,23 +179,23 @@ public class Alternative
   /**
    * @return the expression that represents the method body.
    */
-  gnu.expr.Expression methodExp()
+  Expression methodExp()
   {
     return new gnu.expr.QuoteExp(primProcedure);
   }
   
   /**
-   * @return the expression that tests if this alternative 
-   * the tuple of 'parameters'.
+     @return the expression that tests if this alternative matches
+     the tuple <code>parameters</code>.
    */
-  gnu.expr.Expression matchTest(gnu.expr.Expression[] parameters)
+  Expression matchTest(Expression[] parameters)
   {
     if (parameters.length != patterns.length)
       Internal.error("Incorrect parameters "+
 		     Util.map("",", ","",parameters)+
 		     " for " + this);
     
-    gnu.expr.Expression result = QuoteExp.trueExp;
+    Expression result = QuoteExp.trueExp;
     
     for(int n = parameters.length-1; n >= 0; n--)
       result = new gnu.expr.IfExp(matchTest(patterns[n],parameters[n]),
@@ -204,8 +205,8 @@ public class Alternative
     return result;
   }
   
-  private static gnu.expr.Expression matchTest(TypeConstructor dom, 
-					       gnu.expr.Expression parameter)
+  private static Expression matchTest(TypeConstructor dom, 
+				      Expression parameter)
   {
     if (dom == null)
       return QuoteExp.trueExp;
@@ -213,27 +214,26 @@ public class Alternative
     return instanceOfExp(parameter, nice.tools.code.Types.javaType(dom));
   }
 
-  static gnu.expr.Expression instanceOfExp(gnu.expr.Expression value, gnu.bytecode.Type ct)
+  static Expression instanceOfExp(Expression value, Type ct)
   {
     return Inline.inline(new InstanceOfProc(ct), value);
   }
   
-  private static final gnu.mapping.Procedure orProc =
-    new kawa.standard.or();
+  /** Procedure to emit <code>or</code>. Shared since it is not parametrized.*/
+  private static final Expression orProc = 
+    new gnu.expr.QuoteExp(new nice.tools.code.OrProc());
   
-  private static gnu.expr.Expression orExp(gnu.expr.Expression e1, gnu.expr.Expression e2)
+  private static Expression orExp(Expression e1, Expression e2)
   {
-    gnu.expr.Expression[] callParams = { e1, e2 };
-    
-    return new ApplyExp(new QuoteExp(orProc),callParams);
+    return new ApplyExp(orProc, new Expression[]{ e1, e2 });
   }
   
   public String toString()
   {
-    return methodName+Util.map("(",", ",")",patterns);
+    return methodName + Util.map("(", ", ", ")", patterns);
   }
 
-  /** The bytecode class this alternative is defined in */
+  /** The bytecode class this alternative is defined in. */
   ClassType definitionClass;
 
   private PrimProcedure primProcedure;
@@ -264,8 +264,6 @@ public class Alternative
   
   static List listOfAlternative(MethodDefinition m)
   {
-    //Debug.println("LOOKING for "+m.getFullName());
-    
     return (List) alternatives.get(m.getFullName());
   }
 }

@@ -196,6 +196,9 @@ public class OverloadedSymbolExp extends Expression
       Debug.println("Overloading resolution (expected type " + expectedType +
 		    ") for " + this);
 
+    // Useful in case of failure.
+    List fieldAccesses = filterFieldAccesses();
+
     VarSymbol s = null;
     Polytype symType = null;
     for(Iterator i = symbols.iterator(); i.hasNext();)
@@ -221,7 +224,10 @@ public class OverloadedSymbolExp extends Expression
 	s.releaseClonedType();
 	return uniqueExpression(s, symType);
       }
-    
+
+    if (fieldAccesses.size() != 0)
+      return accessToFieldInThis(fieldAccesses);
+
     if(symbols.size()==0)
       User.error(this, 
 		 "No alternative has expected type "+expectedType);
@@ -247,7 +253,29 @@ public class OverloadedSymbolExp extends Expression
     if(symbols.size()==1)
       return uniqueExpression();
 
+    List fieldAccesses = filterFieldAccesses();
+    if (fieldAccesses.size() != 0)
+      return accessToFieldInThis(fieldAccesses);
+
     throw new AmbiguityError();
+  }
+
+  private List filterFieldAccesses()
+  {
+    LinkedList res = new LinkedList();
+    for(Iterator i = symbols.iterator(); i.hasNext();)
+      {
+	VarSymbol sym = (VarSymbol) i.next();
+	if (sym.isFieldAccess())
+	  res.add(sym);
+      }
+    return res;
+  }
+
+  private Expression accessToFieldInThis(List fieldAccesses)
+  {
+    return new CallExp(new OverloadedSymbolExp(fieldAccesses, ident),
+		       Arguments.noArguments());
   }
 
   /**

@@ -49,3 +49,36 @@ class B
 {
   int getX() = x;
 }
+
+/// PASS
+  /// Toplevel
+class A{
+  String _field;
+  void f() { _field; }
+}
+
+class B{
+  String _field;
+}
+
+/// PASS
+  /// Toplevel
+class A{
+  String _field;
+  String getField() = _field;
+}
+
+class B{
+  String _field;
+}
+
+/// PASS
+  /// Toplevel
+class A{
+  String _field;
+  String getField() { String res = _field; return res; }
+}
+
+class B{
+  String _field;
+}

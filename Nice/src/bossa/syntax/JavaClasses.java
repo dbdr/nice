@@ -273,7 +273,7 @@ public final class JavaClasses
     if (arity <= 0)
       {
 	gnu.bytecode.Field field = declaringClass.getField(funName);
-	if (field != null && field.getStaticFlag)
+	if (field != null && field.getStaticFlag())
 	  {
 	    MethodDeclaration md = (JavaFieldAccess) retyped.get(field);
 	    if (md == null)

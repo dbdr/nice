@@ -1,20 +1,18 @@
-HERE=${PWD}
 # Get the version from the debian changelog.
 VERSION = ${shell expr "`head -1 ../debian/changelog`" : '.*(\(.*\))'}
 DEB = nice_${VERSION}_all.deb
 TARFILE = Nice-${VERSION}.tar
 ZIPFILE = Nice-${VERSION}-windows.zip
-CVSBUILDDIR = ${HERE}/tmp-deb
+CVSBUILDDIR = ${CURDIR}/tmp-deb
 BUILDROOT = ${CVSBUILDDIR}/nice-${VERSION}
 ZIP_ROOT = tmp/Nice
 RPMTMP = tmp/Nice-${VERSION}
-RPMDIR  = ${HERE}/tmp/noarch
+RPMDIR  = ${CURDIR}/tmp/noarch
 RPMFILE = Nice-${VERSION}-1.noarch.rpm
 
 clean-tmp = rm -rf tmp && mkdir tmp
 
 all: deb tar zip rpm
-
 
 deb $(CVSBUILDDIR)/$(DEB):
 	@echo Creating Debian package version ${VERSION}
@@ -24,7 +22,7 @@ deb $(CVSBUILDDIR)/$(DEB):
 .PHONY: tar
 tar ${TARFILE}: $(CVSBUILDDIR)/$(DEB)
 	${clean-tmp}
-	cd $(CVSBUILDDIR)/nice-$(VERSION) && $(MAKE) install PREFIX=${HERE}/tmp
+	cd $(CVSBUILDDIR)/nice-$(VERSION) && $(MAKE) install PREFIX=${CURDIR}/tmp
 	cd tmp && tar -cf ../${TARFILE} . --owner=0 --group=0
 
 .PHONY: rpm
@@ -33,10 +31,10 @@ rpm ${RPMDIR}/${RPMFILE}: ${TARFILE}
 	cp rpmmacros ~/.rpmmacros
 	mkdir -p ${RPMTMP}/usr
 	mkdir -p tmp/BUILD
-	cd ${RPMTMP}/usr && tar xvf ${HERE}/${TARFILE}
-	cd tmp && tar zcvf ${HERE}/tmp/Nice-${VERSION}.tar.gz Nice-${VERSION}
+	cd ${RPMTMP}/usr && tar xvf ${CURDIR}/${TARFILE}
+	cd tmp && tar zcvf ${CURDIR}/tmp/Nice-${VERSION}.tar.gz Nice-${VERSION}
 	sed "s/VERSION/${VERSION}/" Nice.spec > tmp/Nice-${VERSION}.spec
-	rpmbuild --target=noarch --buildroot=${HERE}/${RPMTMP} -bb tmp/Nice-${VERSION}.spec
+	rpmbuild --target=noarch --buildroot=${CURDIR}/${RPMTMP} -bb tmp/Nice-${VERSION}.spec
 
 
 .PHONY: zip

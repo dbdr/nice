@@ -205,7 +205,9 @@ class HTMLWriter {
  * properly in html
  */
 String htmlSafe(String s) {
-  return s.replaceAll("<", "&lt;").replaceAll(">", "&gt;");
+  return 
+    nice.tools.util.JDK.replaceAll
+      (nice.tools.util.JDK.replaceAll(s, "<", "&lt;"), ">", "&gt;");
 }
 
 /** Returns a string containing everything required up to and including the <body> tag

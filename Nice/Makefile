@@ -169,8 +169,9 @@ bootstrap: parser
 		src/mlsub/compilation/Module.java \
 		src/bossa/modules/Package.java src/bossa/util/*.java \
 		src/gnu/expr/*.java src/gnu/mapping/*.java \
-		src/nice/tools/code/*.java src/mlsub/typing/*.java \
-		src/mlsub/typing/lowlevel/*.java src/bossa/syntax/dispatch.java
+		src/nice/tools/{code/*.java,util/JDK.java} \
+		src/mlsub/typing/{*.java,lowlevel/*.java} \
+		src/bossa/syntax/dispatch.java
 	$(JAVAC_GENERIC) -d classes-inline stdlib/nice/lang/inline/*.java
 	cp -a classes-inline/* classes
 #	We put code used by inline methods inside classes-inline so that it is

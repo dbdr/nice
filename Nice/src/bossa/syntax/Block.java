@@ -104,31 +104,35 @@ public class Block extends Statement
   {
     static class Symbol extends MonoSymbol
     {
-      Symbol(LocatedString name, Monotype type)
+      Symbol(LocatedString name, Monotype type, boolean constant)
       {
 	super(name, type);
+        this.constant = constant;
       }
       
+      boolean isAssignable() 
+      { 
+        /* For a constant symbol with no initial value, index != -1.
+           We allow assignments, but check with dataflow in analyse.nice
+           that assignment occurs only in the uninitialized state.
+        */
+        return ! constant || index != -1;
+      }
+
       /* 
 	 Index to make the initialization analysis or -1 if 
 	 this variable is always initialized.
        */
       int index = -1;
+
+      boolean constant;
     }
 
     public LocalVariable(LocatedString name, Monotype type, 
 			 boolean constant, Expression value)
     {
       this.value = value;
-      if (constant)
-	if (value == null)
-	  throw User.error(name, "A final variable cannot be uninitialized.");
-	else
-	  this.left = new MonoSymbol(name,type) { 
-	      boolean isAssignable() { return false; }
-	    };
-      else
-	this.left = new LocalVariable.Symbol(name,type);
+      this.left = new LocalVariable.Symbol(name, type, constant);
       this.last = this;
     }
     
@@ -144,16 +148,16 @@ public class Block extends Statement
 	return value.generateCode();
     }
 
-    MonoSymbol left;
+    LocalVariable.Symbol left;
 
     int getIndex()
     {
-      return ((LocalVariable.Symbol) left).index;
+      return left.index;
     }
 
     void setIndex(int i)
     {
-      ((LocalVariable.Symbol) left).index = i;
+      left.index = i;
     }
 
     public void addNext(LocatedString name, Expression value)

@@ -211,10 +211,17 @@ void analyse(?Statement, Info);
 analyse(e@Expression, i) = e;
 analyse(null(Expression), info) = null;
 
-void setInitialized (Block.LocalVariable.Symbol v, Info info)
+void setInitialized (Block.LocalVariable.Symbol v, Info info, 
+		     bossa.util.Location loc)
 {
   if (v.index != -1)
-    info.flags |= 1 << v.index;
+    {
+      if (v.constant && info.flags[v.index])
+	bossa.util.User.error(loc, 
+			      "" + v + " cannot be assigned a value twice");
+
+      info.flags |= 1 << v.index;
+    }
 }
 
 Expression analyseAssigned(?Expression, Info);
@@ -388,7 +395,7 @@ Expression analyseIdent(IdentExp e, Info info, boolean assigned)
 	      {
 		Block.LocalVariable.Symbol s = cast(sym);
 		if (assigned)
-		  setInitialized(s, info);
+		  setInitialized(s, info, e.location());
 		else
 		  checkInitialized(s, info, e.location());
 	      }

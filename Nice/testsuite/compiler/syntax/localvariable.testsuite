@@ -1,5 +1,19 @@
-/// PASS bug
+/// PASS
   let int i;
+  i = 0;
+  int j = i;
+
+/// PASS
+  let int i;
+  if (0 == 1)
+    i = 0;
+  else
+    i = 2;
+  int j = i;
+
+/// FAIL
+  let int i;
+  int j = /* /// FAIL HERE */ i;
   i = 0;
 
 /// PASS

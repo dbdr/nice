@@ -34,7 +34,10 @@ typecheck(e@AssignExp)
   Expression to = notNull(notNull(e.to).noOverloading());
   e.to = to;
   typecheck(to);
-  if(!to.isAssignable())
+
+  // This needs to be check during typechecking, since this might involve
+  // overloading resolution (when assigning to a field).
+  if (! to.isAssignable())
     bossa.util.User.error(e, "" + to + " cannot be assigned a value");
   
   try{

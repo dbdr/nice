@@ -9,7 +9,7 @@ nice (0.7.9) unstable; urgency=low
   * Compilation does not fail anymore if some classes on the classpath
     have an invalid bytecode format.
 
- --
+ -- Daniel Bonniot <bonniot@users.sourceforge.net>  Sat, 19 Apr 2003 10:40:02 +0200
 
 nice (0.7.8) unstable; urgency=low
 

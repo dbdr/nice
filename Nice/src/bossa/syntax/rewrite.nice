@@ -41,12 +41,10 @@ rewrite(s@Block)
 
 Statement[] rewrite(Statement[] statements)
 {
-  println("Rewriting:\n");
   for (int i = 0; i < statements.length - 1; i++)
     {
       Statement s = statements[i];
       ?IfExp ifExp = ifExp(s);
-      println("Head: " + ifExp);
       if (ifExp != null)
 	if (ifExp.thenUnreachable)
 	  {
@@ -63,7 +61,6 @@ Statement[] rewrite(Statement[] statements)
 	    return statements.split(to: i);
 	  }
 	}
-  println("Unchanged:\n");
   return statements;
 }
 

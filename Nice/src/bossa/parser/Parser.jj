@@ -1610,10 +1610,7 @@ FunExp endFunExp(List formals, Constraint cst):
   |
     exp=Expression()
     { 
-      if (exp instanceof AssignExp)
-        body=new ExpressionStmt(exp);
-      else
-        body=new ReturnStmt(exp);
+      body=new ReturnStmt(exp);
     }
   )
   { return new FunExp(cst,formals,body); }

@@ -14,6 +14,8 @@ void test_null()
   catch(NullPointerException e){
     println("OK");
   }
+
+  f();
 }
 
 // Testing the coverage test
@@ -52,6 +54,9 @@ void f()
 {
   ?int x = 1;
 
+  while (x != null)
+    x++;
+
   if (x != null)
     x++;
   else
@@ -59,3 +64,9 @@ void f()
   x++;
 }
 
+class NullClass
+{
+  ?String possiblyNull = null;
+}
+
+NullClass nullClass() = new NullClass();

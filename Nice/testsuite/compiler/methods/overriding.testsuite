@@ -171,7 +171,7 @@ boolean foo(A x,int->byte t) = false;
 class A{}
 class B extends A {}
 B foo(A x) = new B();
-/*/// FAIL HERE*/ A foo(B x) = new A();
+A foo(B x) = new A();
 
 /// PASS
   A a = new B();
@@ -194,14 +194,14 @@ abstract class B {} // B does NOT extend A
 abstract class A {}
 abstract class B extends A {}
 <A T> T foo(T x);
-<B T> /*/// FAIL HERE*/ A foo(T x);
+<B T> A foo(T x);
 
 /// FAIL
   /// Toplevel
 abstract class A {}
 abstract class B extends A {}
 <A T1, B U1> U1 foo(A a, T1 t, U1 u);
-<A T2, B U2> /*/// FAIL HERE*/ T2 foo(B b, T2 t, U2 u);
+<A T2, B U2> T2 foo(B b, T2 t, U2 u);
 
 /// PASS
   A<String> a = new B();

@@ -58,7 +58,7 @@ public class TypeScope implements TypeMap
   throws DuplicateName
   {
     Object old = map.get(name);
-    if(old!=null && old!=dummyTypeSymbol)
+    if (old != null)
       throw new DuplicateName(name, (TypeSymbol) old, s);
     
     map.put(name,s);
@@ -72,29 +72,22 @@ public class TypeScope implements TypeMap
       throw new mlsub.typing.BadSizeEx(symbols.length, names.size());
     
     int n = 0;
-    for(Iterator in=names.iterator();
-	in.hasNext();)
-      {
-	Object name_o = in.next();
-	String name;
-	if(name_o instanceof LocatedString)
-	  name = ((LocatedString) name_o).toString();
-	else
-	  name = (String) name_o;
-	
-	if(symbols==null)
-	  addMapping(name, dummyTypeSymbol);
-	else
-	  addMapping(name, symbols[n++]);
-      }
+    for(Iterator in = names.iterator(); in.hasNext();)
+      addMapping((String) in.next(), symbols[n++]);
   }
   
-  /**
-     Used for the search of java classes, as the type symbol of type binders.
-   */
-  private static TypeSymbol dummyTypeSymbol = 
-    new TypeConstructor("dummy type constructor");
-
+  void addMappingsLS(Collection names, TypeSymbol[] symbols) 
+  throws DuplicateName
+  {
+    if(symbols!=null &&
+       names.size()!=symbols.length)
+      throw new mlsub.typing.BadSizeEx(symbols.length, names.size());
+    
+    int n = 0;
+    for(Iterator in = names.iterator(); in.hasNext();)
+      addMapping(((LocatedString) in.next()).toString(), symbols[n++]);
+  }
+  
   public TypeSymbol lookup(String name)
   {
     TypeSymbol res;

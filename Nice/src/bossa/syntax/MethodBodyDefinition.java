@@ -40,7 +40,6 @@ public class MethodBodyDefinition extends Definition
    * @param binders 
    *    used to rebind the type parameters of the method definition. 
    *    Null if one doesn't want to rebind them.
-   * @param newTypeVars list of TypeSymbol
    * @param newConstraint list of AtomicConstraint
    * @param formals list of Pattern
    * @param body s statement representing the body of the method.
@@ -48,15 +47,12 @@ public class MethodBodyDefinition extends Definition
   public MethodBodyDefinition(NiceClass container,
 			      LocatedString name, 
 			      Collection binders,
-			      //List newTypeVars,
 			      List formals, 
 			      Statement body)
   {
     super(name,Node.down);
 
     this.binders = binders; 
-
-    //this.newTypeVars = newTypeVars;
 
     this.formals = formals;
     this.body = body;
@@ -109,31 +105,16 @@ public class MethodBodyDefinition extends Definition
   
   private void setDeclaration(MethodDeclaration d)
   {
-    if(d==null)
-      User.error(this,"Method \""+name+"\" has not been declared");
+    if (d == null)
+      User.error(this, "Method " + name + " is not declared");
 
     this.definition = d;
-    
-    // if the method is not a class member,
-    // the "this" formal is useless
-    /*
-    if(!d.isMember())
-      {
-	if(!((Pattern)formals.get(0)).thisAtNothing())
-	  User.error(this,
-		     "Method \""+name+"\" is a global method"+
-		     ", it cannot have a main pattern");
-
-	formals.remove(0);
-      }
-    */
-    
     parameters = buildSymbols(this.formals,definition.symbol.type.domain());
     scope.addSymbols(parameters);
   }
 
-  /**
-   * Returns the symbol of the method this declaration belongs to
+  /** 
+      Returns the symbol of the method this declaration belongs to.
    */
   private VarSymbol findSymbol(VarScope scope)
   {
@@ -215,32 +196,6 @@ public class MethodBodyDefinition extends Definition
     return null;
   }
   
-  Scopes buildScope(VarScope outer, TypeScope typeOuter)
-  {
-    Scopes res = super.buildScope(outer, typeOuter);
-
-    // we just want Java classes to be discovered at this stage,
-    // to add them in the rigid context.
-
-    // Binders must be taken into account,
-    // to distinguish them from Java Classes
-    if(binders != null) 
-      {
-	try{ this.typeScope.addMappings(binders,null); } 
-	catch(mlsub.typing.BadSizeEx e) {
-	  Internal.error("Should not happen");
-	}
-	catch(TypeScope.DuplicateName e) {
-	  User.error(this, e);
-	}
-      }
-
-    //if(newTypeVars != null)
-    //this.typeScope.addSymbols(newTypeVars);
-    
-    return res;
-  }
-
   void doResolve()
   {
     //Resolution of the body is delayed to enable overloading
@@ -266,21 +221,18 @@ public class MethodBodyDefinition extends Definition
 		 name + " was declared at " + def.location()
 		 );
     
-    //Debug.println("Def for "+this+" is "+s+" "+s.location());
-    
     setDeclaration(def);
 
     // Get type parameters
-    if(binders != null)
+    if (binders != null)
     try{
-      typeScope.addMappings
+      typeScope.addMappingsLS
 	(binders,
 	 definition.getType().getConstraint().binders());
     }
     catch(mlsub.typing.BadSizeEx e){
-      User.error(name,
-		 "Method \"" + name + 
-		 "\" expects " + e.expected + " type parameters");
+      User.error(name, "Method " + name + 
+		 " expects " + e.expected + " type parameters");
     }
     catch(TypeScope.DuplicateName e) {
       User.error(this, e);
@@ -357,11 +309,6 @@ public class MethodBodyDefinition extends Definition
 	User.error(name,"The patterns are not correct", e);
       }
       
-      // New Constraint
-      //if(newTypeVars != null)
-      //Typing.enter(newTypeVars,
-      //"Binding-constraint for "+name);
-      
       for(Iterator f = formals.iterator(), 
 	    p = parameters.iterator();
 	  f.hasNext();)
@@ -411,17 +358,15 @@ public class MethodBodyDefinition extends Definition
   
   void endTypecheck()
   {
-    try{
-      if(entered)
-	{
+    if(entered)
+      try{
 	  Typing.leave();
 	  entered = false;
-	}
-    }
-    catch(TypingEx e){
-      User.error(this,
-		 "Type error in method "+name, " :"+e);
-    }
+      }
+      catch(TypingEx e){
+	User.error(this,
+		   "Type error in method "+name, " :"+e);
+      }
   }
   
   /****************************************************************
@@ -513,17 +458,6 @@ public class MethodBodyDefinition extends Definition
 			       lexp.getMainMethod());
   }
 
-  //  public static void compileMethod(gnu.expr.LambdaExp lexp, ClassType inClass, String name)
-//    {
-//      gnu.expr.Compilation comp = new gnu.expr.Compilation
-//        (inClass,name,
-//         name,"prefix??",false);
-    
-//      lexp.compileAsMethod(comp);
-
-//      comp.compileClassInit();
-//    }
-  
   public static void compileMain(Module module, 
 				 gnu.bytecode.Method mainAlternative)
   {
@@ -570,6 +504,4 @@ public class MethodBodyDefinition extends Definition
   protected List       /* of Patterns */   formals;
   Collection /* of LocatedString */ binders; // Null if type parameters are not bound
   private Statement body;
-
-  //private List /* of TypeSymbol */  newTypeVars;
 }

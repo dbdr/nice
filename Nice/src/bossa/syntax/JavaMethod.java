@@ -212,13 +212,13 @@ public class JavaMethod extends MethodDeclaration
     return possibilities;
   }
     
-  Scopes buildScope(VarScope outer, TypeScope typeOuter)
+  void buildScope(VarScope outer, TypeScope typeOuter)
   {
     // We put this here, since we need 'module' to be computed
     // since it is used to open the imported packages.
     findReflectMethod();    
     
-    return super.buildScope(outer, typeOuter);
+    super.buildScope(outer, typeOuter);
   }
   
   private gnu.bytecode.Type type(LocatedString s)

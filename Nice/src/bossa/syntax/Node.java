@@ -25,7 +25,6 @@ import mlsub.typing.TypeSymbol;
 */
 abstract public class Node
 {
-  static final int forward = 0;
   static final int global  = 1;
   static final int down    = 2;
   static final int upper   = 3;
@@ -167,15 +166,6 @@ abstract public class Node
     typeMapsSymbols.addAll(symbols);
   }
   
-  class Scopes
-  {
-    Scopes(VarScope v, TypeScope t)
-    { scope = v; typeScope = t; }
-
-    VarScope scope;
-    TypeScope typeScope;
-  }
- 
   /**
    * Scopes shared by all modules.
    */
@@ -199,25 +189,20 @@ abstract public class Node
     buildScope(globalScope,globalTypeScope);
   }
   
-  /** Sets up the scope, once the outer scope is given 
-   * return the scope to pass to the following brothers 
-   * (for forward scoping)
-   */
-  Scopes buildScope(VarScope outer, TypeScope typeOuter)
+  /** 
+      Sets up the scope, once the outer scope is given. 
+  */
+  void buildScope(VarScope outer, TypeScope typeOuter)
   {
-    if(scope!=null)
-      scope = null;
-    if(this.scope!=null)
-      Internal.error("Scope set twice for "+this);
+    //if (this.scope != null)
+    //Internal.error("Scope set twice for " + this + this.getClass());
 
-    Scopes res = null;
     switch(propagate)
       {
       case none:
       case down: 
 	this.scope = new VarScope(outer,varSymbols);
 	this.typeScope = new TypeScope(typeOuter);
-	res = new Scopes(outer,typeOuter);
 	break;
 
       case global:
@@ -226,7 +211,6 @@ abstract public class Node
 	this.scope = outer;
 	typeOuter = globalTypeScope;
 	this.typeScope = typeOuter;
-	res = new Scopes(outer,typeOuter);
 	break;
 	
       case upper:
@@ -237,15 +221,8 @@ abstract public class Node
 	if(typeOuter==null)
 	  typeOuter = new TypeScope(null);
 	this.typeScope = typeOuter;
-	res = new Scopes(outer,typeOuter);
 	break;
 	
-      case forward:
-	this.scope = new VarScope(outer,varSymbols);
-	this.typeScope = new TypeScope(typeOuter);
-	res = new Scopes(this.scope,this.typeScope);
-	break;
-
       default:
 	Internal.error("Invalid case in Node.buildScope");
       }
@@ -270,16 +247,12 @@ abstract public class Node
     // builds the scope of the children
     if (children != null)
       {
-	Scopes current = new Scopes(this.scope,this.typeScope);
 	for(Iterator i = children.iterator();i.hasNext();)
 	  {
-	    Object d = i.next();
-	    //if(d!=null)
-	    current = ((Node)d).buildScope(current.scope,current.typeScope);
+	    Node d = (Node) i.next();
+	    d.buildScope(this.scope, this.typeScope);
 	  }
       }
-    
-    return res;
   }
   
   VarScope getScope()
@@ -344,7 +317,7 @@ abstract public class Node
 	return;
       }
     typecheckingDone = true;
-    
+
     typecheck();
     
     if (children != null)

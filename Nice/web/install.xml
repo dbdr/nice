@@ -73,11 +73,13 @@ If you use Emacs, you should also
 <link linkend="emacs">install the &nice; mode</link>.
 </para>
 </section>
+
 <section id="win"><title>Windows</title>
 <para>
-Download <ulink url="Nice.tar">Nice.tar</ulink> along with 
-the <ulink url="nicec.bat">nicec.bat</ulink> file contributed by Jamie McCrindle.
-Further documentation is needed.
+Download <ulink url="Nice.zip">Nice.zip</ulink> and decompress it into
+<literal>C:\</literal>. A <literal>Nice</literal> subdirectory will be created.
+Then read the documentation in 
+<ulink url="http://cvs.sourceforge.net/cgi-bin/viewcvs.cgi/*checkout*/nice/Nice/web/Readme.txt&quest;rev=HEAD&amp;content-type=text/plain"><literal>Readme.txt</literal></ulink>.
 </para>
 
 <para>

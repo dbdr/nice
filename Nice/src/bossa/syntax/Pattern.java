@@ -435,7 +435,6 @@ public class Pattern implements Located
 
   private Location location;
 
-  //XXX change to == NullExp.instance
-  public boolean atNull() { return atValue instanceof NullExp; }
+  public boolean atNull() { return atValue == NullExp.instance; }
   public boolean atAny()  { return atValue == null && tc == null; }
 }

@@ -26,8 +26,6 @@ public class Contract
   private StringBuffer requireRepr = new StringBuffer("requires ");
   private StringBuffer ensureRepr = new StringBuffer("ensures ");
 
-  private ?MonoSymbol result = null;
-
   public void addElement(Expression condition, ?Expression name, boolean precond)
   {
     let sym =  createIdentExp(new LocatedString("alwaysAssert", condition.location()));
@@ -57,29 +55,23 @@ public class Contract
       }
   }
 
-  void resolve(VarScope scope, TypeScope typeScope, 
-	       mlsub.typing.Monotype resultType, 
+  void resolve(VarScope scope, TypeScope typeScope,
+	       mlsub.typing.Monotype resultType,
                Location location)
   {
-    pre = pre.map(Expression e => analyse(e, scope, typeScope)); 
+    pre = pre.map(Expression e => analyse(e, scope, typeScope));
 
     if (post.isEmpty())
       return;
 
+    SymbolTable<VarSymbol> vars = new SymbolTable();
+
+    // Make 'result' a variable in the scope of the post-conditions
     if (! nice.tools.typing.Types.isVoid(resultType))
-      result = new ResultMonoSymbol(new LocatedString("result", location), 
-                              type: resultType);
+      vars["result"] = new ResultMonoSymbol
+        (new LocatedString("result", location), type: resultType);
 
-    try {
-      if (result != null)
-	scope.addSymbol(result);
-
-      post = post.map(Expression e => analyse(e, scope, typeScope)); 
-    }
-    finally {
-      if (result != null)
-	scope.removeSymbol(result);
-    }
+    post = post.map(Expression e => analyse(e, scope, typeScope, vars));
   }
 
   void typecheck()

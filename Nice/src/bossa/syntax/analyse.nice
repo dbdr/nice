@@ -21,15 +21,16 @@ import nice.tools.ast;
 // Interface
 
 Statement analyse(Statement, VarScope, TypeScope, boolean mustReturnAValue);
-Expression analyse(Expression, VarScope, TypeScope);
+Expression analyse(Expression, VarScope, TypeScope,
+		   SymbolTable<VarSymbol> vars = new SymbolTable());
 
 // Implementation
 
-Info buildInfo(VarScope varScope, TypeScope typeScope);
-buildInfo(varScope, typeScope)
+Info buildInfo(VarScope varScope, TypeScope typeScope,
+	       SymbolTable<VarSymbol> vars = new SymbolTable())
 {
   let SymbolTable<mlsub.typing.TypeSymbol> t = new SymbolTable();
-  return new Info(vars: new SymbolTable(), typeVars: t,
+  return new Info(vars: vars, typeVars: t,
 		  outerVarScope: varScope, outerTypeScope: typeScope,
 		  typeMap: new TypeMaper(inner: t, global: typeScope));
 }
@@ -62,8 +63,8 @@ Statement analyseMethodBody(Statement s, VarScope varScope, TypeScope typeScope,
 }
 
 
-analyse(Expression e, varScope, typeScope) = 
-    analyse(e, buildInfo(varScope, typeScope));
+analyse(Expression e, varScope, typeScope, vars) =
+    analyse(e, buildInfo(varScope, typeScope, vars));
 
 List<VarSymbol> lookup(VarScope scope, ?LocatedString i)
 = native List VarScope.lookup(LocatedString);

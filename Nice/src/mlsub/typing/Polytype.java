@@ -348,5 +348,5 @@ public final class Polytype
   private Constraint constraint;
   private Monotype monotype;
 
-  public static boolean noSimplify;
+  public static boolean noSimplify = bossa.util.Debug.noSimplify;
 }

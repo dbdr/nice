@@ -664,5 +664,5 @@ public final class Typing
     return m.getKind() == TopMonotype.TopKind.instance;
   }
 
-  public static boolean dbg;
+  public static boolean dbg = bossa.util.Debug.typing;
 }

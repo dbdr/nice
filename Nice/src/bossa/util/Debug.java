@@ -89,17 +89,9 @@ public abstract class Debug
     passes		= getBoolean("debug.passes",false),
 
     alwaysDumpStack     = getBoolean("debug.alwaysDumpStack", false),
-    ignorePrelude	= getBoolean("debug.ignorePrelude", false);
-  
-  static
-  {
-    mlsub.typing.lowlevel.K0.debugK0 = Debug.K0;
-    mlsub.typing.lowlevel.Engine.dbg = Debug.engine;
-    mlsub.typing.Typing.dbg = Debug.typing;
-    mlsub.typing.Enumeration.linkDbg = Debug.linkTests;
-    mlsub.typing.Polytype.noSimplify = getBoolean("debug.noSimplify", false);
-  }
-  
+    ignorePrelude	= getBoolean("debug.ignorePrelude", false),
+    noSimplify		= getBoolean("debug.noSimplify", false);
+    
   public static final String
     defaultFile = props.getProperty("debug.defaultFile", null);
 }

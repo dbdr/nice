@@ -45,7 +45,7 @@ public final class K0 {
   /***********************************************************************
    * Debugging
    ***********************************************************************/
-  public static boolean debugK0 = S.debugK0;
+  public static boolean debugK0 = bossa.util.Debug.K0;
   private static int IDs = 0;
   private int ID = IDs++;
   

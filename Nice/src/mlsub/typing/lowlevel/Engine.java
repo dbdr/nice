@@ -1086,5 +1086,5 @@ public abstract class Engine
     }
   }
   
-  public static boolean dbg;
+  public static boolean dbg = bossa.util.Debug.engine;
 }

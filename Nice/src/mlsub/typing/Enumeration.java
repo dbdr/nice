@@ -470,5 +470,5 @@ public class Enumeration
     }
   }
 
-  public static boolean linkDbg;
+  public static boolean linkDbg = bossa.util.Debug.linkTests;
 }

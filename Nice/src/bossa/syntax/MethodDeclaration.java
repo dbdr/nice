@@ -237,7 +237,8 @@ abstract public class MethodDeclaration extends Definition
       + " "
       + getName().toQuotedString()
       + "("
-      + Util.map("",", ","",getType().domain())
+      //+ Util.map("",", ","",getType().domain())
+      + parameters.toString()
       + ")"
       ;
   }

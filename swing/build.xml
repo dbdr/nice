@@ -109,6 +109,43 @@
 	<!-- LIBRARY SECTION -->
 	
 	<target 
+	  name="compile-types-beans" 
+	  depends="init-classes-lib" 
+	  description="compile content of nice.common.types.beans from ${src} to ${classes}"
+	  >
+	  <nicec 
+	    package="nice.ui.common.types.beans" 
+	    destination="${classes-lib}" 
+	    sourcepath="${source}"
+	   />
+	</target>	
+	
+	<target 
+	  name="compile-types-awt" 
+	  depends="init-classes-lib" 
+	  description="compile content of nice.common.types.awt from ${src} to ${classes}"
+	  >
+	  <nicec 
+	    package="nice.ui.common.types.awt" 
+	    destination="${classes-lib}" 
+	    sourcepath="${source}"
+	   />
+	</target>	
+
+	
+	<target 
+	  name="compile-types-swing" 
+	  depends="init-classes-lib" 
+	  description="compile content of nice.common.types.swing from ${src} to ${classes}"
+	  >
+	  <nicec 
+	    package="nice.ui.common.types.swing" 
+	    destination="${classes-lib}" 
+	    sourcepath="${source}"
+	   />
+	</target>	
+	
+	<target 
 	  name="compile-common" 
 	  depends="init-classes-lib" 
 	  description="compile content of nice.common from ${src} to ${classes}"
@@ -119,7 +156,7 @@
 	    sourcepath="${source}"
 	   />
 	</target>	
-	
+		
 	<target 
 	  name="compile-beans" 
 	  depends="init-classes-lib" 
@@ -146,7 +183,7 @@
 	
 	<target 
 	  name="deploy-beans" 
-	  depends="init-classes-lib,init-deploy-lib,compile-beans-clean" 
+	  depends="init-deploy-lib,compile-beans-clean" 
 	  description="compile content of nice.ui.beans from ${source} to ${classes} and deploy it in ${deploy-lib}/beans.jar"
 	  >
           <nicec 
@@ -185,7 +222,7 @@
 	
 	<target 
 	  name="deploy-awt" 
-	  depends="init-classes-lib,init-deploy-lib,compile-awt-clean" 
+	  depends="init-deploy-lib,compile-awt-clean" 
 	  description="compile content of nice.ui.beans from ${source} to ${classes-lib} and deploy it in ${deploy-lib}/awt.jar"
 	  >
 	  <nicec 
@@ -224,7 +261,7 @@
 	
 	<target 
 	  name="deploy-swing" 
-	  depends="init-classes-lib,init-deploy-lib,compile-swing-clean" 
+	  depends="init-deploy-lib,compile-swing-clean" 
 	  description="compile content of nice.ui.beans from ${source} to ${classes-lib} and deploy it in ${deploy-lib}/swing.jar"
 	  >
 	  <nicec 
@@ -255,7 +292,7 @@
 	
 	<target 
 	  name="deploy-examples-events" 
-	  depends="init-classes-examples,init-deploy-examples,compile-examples-events" 
+	  depends="init-deploy-examples,compile-examples-events" 
 	  description="compile content of examples.events from ${source} to ${classes-examples} and deploy it in ${deploy-examples}/events.jar"
 	  >
 	  <nicec 
@@ -294,7 +331,7 @@
 	
 	<target 
 	  name="deploy-examples-complete" 
-	  depends="init-classes-examples,init-deploy-examples,compile-examples-complete" 
+	  depends="init-deploy-examples,compile-examples-complete" 
 	  description="compile content of examples.events from ${source} to ${classes-examples} and deploy it in ${deploy-examples}/complete.jar"
 	  >
 	  <nicec 
@@ -333,7 +370,7 @@
 		
 	<target 
 	  name="deploy-examples-helloworld" 
-	  depends="init-classes-examples,init-deploy-examples,compile-examples-helloworld" 
+	  depends="init-deploy-examples,compile-examples-helloworld" 
 	  description="compile content of examples.events from ${source} to ${classes-examples} and deploy it in ${deploy-examples}/helloworld.jar"
 	  >
 	  <nicec 

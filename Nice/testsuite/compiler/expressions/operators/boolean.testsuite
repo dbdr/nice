@@ -79,4 +79,4 @@ boolean fail() { throw new Error(); }
 
 /// PASS
   boolean b = true;
-  b = true ? b^b||10>3<6 : false ^ b && 0 != 5;
+  b = true ? b^b||10>3>1 : false ^ b && 0 != 5;

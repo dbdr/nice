@@ -37,9 +37,14 @@ import java.util.*;
 
 public abstract class Alternative
 {
-  public Alternative(String methodName, Pattern[] patterns)
+  /**
+     The full name uniquely identifies the method by including the 
+     complete type.
+  */
+  public Alternative(String methodName, String fullName, Pattern[] patterns)
   {
     this.methodName = methodName;
+    this.fullName = fullName;
     this.patterns = patterns;
     add();
   }
@@ -119,6 +124,7 @@ public abstract class Alternative
   }
 
   String methodName;
+  String fullName;
   Pattern[] patterns;
 
   public Pattern[] getPatterns() { return patterns; }
@@ -137,12 +143,12 @@ public abstract class Alternative
   
   private void add()
   {
-    List l = (List) alternatives.get(methodName);
+    List l = (List) alternatives.get(fullName);
     if (l == null)
       {
 	// XXX change to LinkedList
 	l = new ArrayList();
-	alternatives.put(methodName,l);
+	alternatives.put(fullName,l);
       }
     // Dispatch.sort(final List alternatives) assumes that new alternatives
     // are added at the end

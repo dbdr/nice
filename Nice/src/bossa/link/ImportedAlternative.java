@@ -39,7 +39,7 @@ public class ImportedAlternative extends Alternative
       // this must be a toplevel function, a constructor, ...
       return;
 
-    String methodName = new String(attr.data);
+    String fullName = new String(attr.data);
 
     attr = (MiscAttr) Attribute.get(method, "patterns");
     if (attr == null)
@@ -52,7 +52,7 @@ public class ImportedAlternative extends Alternative
     ArrayList patterns = new ArrayList(5);
 
     Pattern p;
-    while ((p = Pattern.read(rep, at, methodName)) != null)
+    while ((p = Pattern.read(rep, at, fullName)) != null)
       {
 	if (p.tc == bossa.syntax.PrimitiveType.arrayTC)
 	  /* Special treatment for arrays:
@@ -68,15 +68,15 @@ public class ImportedAlternative extends Alternative
 	patterns.add(p);
       }
     
-    new ImportedAlternative(methodName, (Pattern[]) 
+    new ImportedAlternative(method.getName(), fullName, (Pattern[]) 
 			    patterns.toArray(new Pattern[patterns.size()]),
 			    new QuoteExp(new PrimProcedure(method)));
   }
 
-  private ImportedAlternative(String name, Pattern[] patterns, 
+  private ImportedAlternative(String name, String fullName, Pattern[] patterns, 
 			      gnu.expr.Expression code)
   {
-    super(name, patterns);
+    super(name, fullName, patterns);
     this.code = code;
   }  
 

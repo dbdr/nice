@@ -141,7 +141,7 @@ public class MethodBodyDefinition extends Definition
     else if (d instanceof NiceMethod)
       // Register this alternative for the link test
       alternative = new bossa.link.Alternative
-	(((NiceMethod) d).getFullName(), getPatterns())
+	(d.getName().toString(), ((NiceMethod) d).getFullName(), getPatterns())
 	{
 	  public gnu.expr.Expression methodExp()
 	  {

@@ -249,13 +249,7 @@ public class CallExp extends Expression
       res = new gnu.expr.ApplyExp(function.generateCode(), params);
 
     gnu.bytecode.Type expectedType = Types.javaType(getType());
-    if (res.getType().isSubtype(expectedType))
-      return res;
-    else
-      // Is there any case where this is necessary?
-      // If yes, add a regtest case
-      // If not, remove this case and the EnsureTypeProc class
-      return Inline.inline(new EnsureTypeProc(expectedType), res);
+    return EnsureTypeProc.ensure(res, expectedType);
   }
   
   gnu.expr.Expression compileAssign(gnu.expr.Expression value)

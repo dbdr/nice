@@ -30,7 +30,18 @@ import gnu.bytecode.*;
 public class EnsureTypeProc extends gnu.mapping.Procedure1 
 implements Inlineable
 {
-  public EnsureTypeProc(Type type)
+  public static Expression ensure(Expression exp, Type expectedType)
+  {
+    Type type = exp.getType();
+    
+    if (type instanceof ArrayType && ! (type instanceof SpecialArray)
+	|| !type.isSubtype(expectedType))
+      return Inline.inline(new EnsureTypeProc(expectedType), exp);
+    else
+      return exp;
+  }
+  
+  private EnsureTypeProc(Type type)
   {
     this.type = type;
   }

@@ -66,7 +66,10 @@ public class VersionTracker extends URLStreamHandler
 
   openConnection(URL url)
   {
-    (URL repo, String resource, ?String ver) = parseRepoURL(url);
+    (?URL repo, String resource, ?String ver) = parseRepoURL(url);
+    if (repo == null)
+      return null;
+
     let pkg = getPackage(resource);
 
     ?String currentVer = versions[pkg];
@@ -88,10 +91,14 @@ public class VersionTracker extends URLStreamHandler
   }
 }
 
-(URL,String,?String) parseRepoURL(URL url)
+(?URL,String,?String) parseRepoURL(URL url)
 {
   String s = url.toString();
   int sep = s.indexOf('!');
+  if (sep == -1)
+    // This is not a valid URL inside a repository
+    return (null, "", null);
+
   URL repo = new URL(s.substring(0, sep));
   int pver = s.indexOf('#', sep);
   String resource;

@@ -160,23 +160,20 @@ public final class Types
 
   private static Type rawJavaType(Monotype m)
   {
-    // XXX Handle functional types
-    // XXX Map them into gnu.mapping.Procedure(or a subtype?) instead of Object
-
     if (m instanceof TupleType)
       // not SpecialArray
       return ArrayType.make(componentType((TupleType) m));
     
+    if (m instanceof FunType)
+      return gnu.expr.Compilation.typeProcedure;
+
     if (!(m instanceof MonotypeConstructor))
       return gnu.bytecode.Type.pointer_type;
     
     MonotypeConstructor mc = (MonotypeConstructor) m;
     TypeConstructor tc = mc.getTC();
-    /*if (tc == ConstantExp.sureTC)
-      return javaType(mc.getTP()[0]);
-    else if (tc == ConstantExp.maybeTC)
-      return javaType(mc.getTP()[0]));
-      else*/ if(tc == ConstantExp.arrayTC)
+
+    if (tc == ConstantExp.arrayTC)
       return SpecialTypes.array(javaType(mc.getTP()[0]));
     else
       return javaType(tc);

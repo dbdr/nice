@@ -40,8 +40,7 @@ public final class JavaClasses
    */
   static TypeConstructor make(String name)
   {
-    return make(name,
-		gnu.bytecode.ClassType.make(name));
+    return make(name, ClassType.make(name));
   }
 
   /**
@@ -60,7 +59,7 @@ public final class JavaClasses
     // we put the new JTC in the hashtable in the constructor
     // and not after it returned, to avoid infinite loop
     // if the code of the constructor does a lookup.
-    return create(name,javaType);
+    return create(name, javaType);
   }
 
   /**
@@ -80,21 +79,21 @@ public final class JavaClasses
 
   private static final gnu.bytecode.Type[] blackListClass =
     new gnu.bytecode.Type[] {
-      gnu.bytecode.ClassType.make("java.lang.Object")
-      //,gnu.bytecode.ClassType.make("java.lang.Throwable")
+      ClassType.make("java.lang.Object")
+      //,ClassType.make("java.lang.Throwable")
     }
   ;
   
   private static final gnu.bytecode.Type[] blackListInterface =
     new gnu.bytecode.Type[] {
-      gnu.bytecode.ClassType.make("java.io.Serializable"),
-      gnu.bytecode.ClassType.make("java.lang.Cloneable"),
-      gnu.bytecode.ClassType.make("java.lang.Comparable"),
-      gnu.bytecode.ClassType.make("java.lang.Runnable")
+      ClassType.make("java.io.Serializable"),
+      ClassType.make("java.lang.Cloneable"),
+      ClassType.make("java.lang.Comparable"),
+      ClassType.make("java.lang.Runnable")
     };
   
   private static boolean excluded(gnu.bytecode.Type[] blackList, 
-				  gnu.bytecode.ClassType classType)
+				  ClassType classType)
   {
     for(int i=0; i<blackList.length; i++)
       if(classType==blackList[i])
@@ -137,10 +136,9 @@ public final class JavaClasses
     Typing.introduce(res);
     
     // Recursive search for java super-classes
-    if(javaType instanceof gnu.bytecode.ClassType)
+    if(javaType instanceof ClassType)
       {
-	gnu.bytecode.ClassType superClass = 
-	  ((gnu.bytecode.ClassType) javaType).getSuperclass();
+	ClassType superClass =  ((ClassType) javaType).getSuperclass();
 	if(superClass!=null && !(excluded(blackListClass, superClass)))
 	  {    	
 	    TypeConstructor superTC = make(superClass.getName(), superClass);
@@ -153,7 +151,15 @@ public final class JavaClasses
 	    }
 	  }
 
-	gnu.bytecode.ClassType[] itfs = ((gnu.bytecode.ClassType) javaType).getInterfaces();
+	ClassType[] itfs = null;
+	try{
+	  itfs = ((ClassType) javaType).getInterfaces();
+	}
+	catch(NoClassDefFoundError ex){
+	  User.warning("Interface " + ex.getMessage() + 
+		       " implemented by " + javaType.getName() + 
+		       " was not found in classpath");
+	}
 	if(itfs!=null)
 	  for(int i=0; i<itfs.length; i++)
 	    if(!(excluded(blackListInterface,itfs[i])))
@@ -257,7 +263,7 @@ public final class JavaClasses
     if(!(javaType instanceof ClassType))
       return false;
 
-    return (((gnu.bytecode.ClassType)javaType).getModifiers() 
+    return (((ClassType) javaType).getModifiers() 
 	    & (gnu.bytecode.Access.ABSTRACT|
 	       gnu.bytecode.Access.INTERFACE)) == 0;
   }

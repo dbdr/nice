@@ -1,5 +1,15 @@
 /// COMMENT Special handling of class fields during overloading resolution.
 
+/// PASS bug
+  /// Toplevel
+class Bar {
+  Map<String,String> db;
+}
+class Foo {
+  Map<String,String> db;
+  Object dbLock() = db;
+}
+
 /// PASS
   let i = x;
   assert(i==1);

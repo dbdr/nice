@@ -12,7 +12,7 @@
 
 // File    : TypeConstructor.java
 // Created : Thu Jul 08 11:51:09 1999 by bonniot
-//$Modified: Tue Jun 13 15:56:27 2000 by Daniel Bonniot $
+//$Modified: Thu Jun 22 21:34:26 2000 by Daniel Bonniot $
 
 package mlsub.typing;
 
@@ -30,12 +30,23 @@ public class TypeConstructor
    *
    * A concrete TC is a TC that can tag runtime objects.
    */
-  public TypeConstructor(String name, Variance v, boolean concrete)
+  public TypeConstructor(String name, Variance v, boolean concrete, 
+			 boolean rigid)
   {
     this.name = name;
     this.concrete = concrete;
+    this.rigid = rigid;
+    
     if (v!=null)
       setVariance(v);
+  }
+  
+  /**
+     Creates a non rigid type constructor.
+  */
+  public TypeConstructor(String name)
+  {
+    this(name, null, false, false);
   }
   
   /**
@@ -45,14 +56,13 @@ public class TypeConstructor
    */
   public TypeConstructor(Variance v)
   {
-    if (v!=null)
-      setVariance(v);
+    this(null, v, false, false);
   }
   
 
   public TypeSymbol cloneTypeSymbol()
   {
-    return new TypeConstructor(name, variance, concrete);
+    return new TypeConstructor(name, variance, concrete, rigid);
   }
   
   /**
@@ -147,7 +157,7 @@ public class TypeConstructor
    */
   public void rememberToImplementTop()
   {
-    willImplementTop=true;
+    willImplementTop = true;
   }
 
   /****************************************************************
@@ -163,9 +173,12 @@ public class TypeConstructor
    * Fields
    ****************************************************************/
 
-  public int enumerateTagIndex=-1; // used in Typing.enumerate. ugly ! Subclass
+  public int enumerateTagIndex = -1; // used in Typing.enumerate. ugly ! Subclass
 
   public Variance variance;
   private boolean concrete;
+  private boolean rigid;
+  public final boolean isRigid() { return rigid; };
+  
   String name;
 }

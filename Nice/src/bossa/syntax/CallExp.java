@@ -12,7 +12,7 @@
 
 // File    : CallExp.java
 // Created : Mon Jul 05 16:27:27 1999 by bonniot
-//$Modified: Sat Jun 17 14:16:19 2000 by Daniel Bonniot $
+//$Modified: Thu Jun 22 22:17:30 2000 by Daniel Bonniot $
 
 package bossa.syntax;
 
@@ -148,7 +148,7 @@ public class CallExp extends Expression
 		       Util.map("",", ","",parameters) +
 		       " of type " +
 		       Util.map("",", ","",paramTypes) +
-		       "\" is "+end);      
+		       " is "+end);      
 	}
     }
     return null;
@@ -169,7 +169,7 @@ public class CallExp extends Expression
       throw new ReportErrorEx("Not a function");
 
     Constraint cst = funt.getConstraint();
-    final boolean doEnter = Constraint.hasBinders(cst);
+    final boolean doEnter = true; //Constraint.hasBinders(cst);
     
     if(doEnter) Typing.enter();
     
@@ -363,9 +363,12 @@ public class CallExp extends Expression
   
   public String toString()
   {
-    return fun
-      + "(" + Util.map("",", ","",parameters) + ")"
-      ;
+    if(infix)
+      return parameters.get(0) + "." + fun
+	+ "(" + Util.map("",", ","",parameters.subList(1, parameters.size())) 
+	+ ")";
+    else
+      return fun + "(" + Util.map("",", ","",parameters) + ")";
   }
 
   protected ExpressionRef fun;

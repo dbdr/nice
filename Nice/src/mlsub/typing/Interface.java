@@ -12,7 +12,7 @@
 
 // File    : Interface.java
 // Created : Fri Jun 02 17:26:52 2000 by Daniel Bonniot
-//$Modified: Tue Jun 13 17:59:01 2000 by Daniel Bonniot $
+//$Modified: Thu Jun 22 21:42:02 2000 by Daniel Bonniot $
 
 package mlsub.typing;
 
@@ -61,8 +61,10 @@ public final class Interface implements TypeSymbol
 
   public String toString()
   {
-    if(associatedTC!=null)
+    if (associatedTC != null)
       return associatedTC.toString();
+    else if (name != null)
+      return name;
     else
       return super.toString();
   }
@@ -70,4 +72,7 @@ public final class Interface implements TypeSymbol
   int itf; // lowlevel interface
   Variance variance;
   private TypeConstructor associatedTC;
+
+  /** Can be set for debugging reasons */
+  public String name;
 }

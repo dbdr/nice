@@ -79,16 +79,7 @@ public final class SpecialArray extends gnu.bytecode.ArrayType
 
   public void emitCoerceFromObject (CodeAttr code)
   {
-    if(makeMethod == null)
-      {
-	Type[] args = new Type[] { ArrayType.make(elements) };
-	makeMethod = classType.getDeclaredMethod("make", args, this);
-	
-	if(makeMethod == null)
-	  bossa.util.Internal.error(this + " does not have a make method");
-      }
-    
-    code.emitInvokeStatic(makeMethod);
+    code.emitInvokeStatic(makeMethod());
   }
 
   public Object coerceToObject (Object obj)
@@ -124,7 +115,21 @@ public final class SpecialArray extends gnu.bytecode.ArrayType
   }
   
   private Field field;
-  public Method makeMethod;
+
+  private Method makeMethod;
+  public Method makeMethod()
+  {
+    if(makeMethod == null)
+      {
+	Type[] args = new Type[] { ArrayType.make(elements) };
+	makeMethod = classType.getDeclaredMethod("make", args, this);
+	
+	if(makeMethod == null)
+	  bossa.util.Internal.error(this + " does not have a make method");
+      }
+    return makeMethod;
+  }
+
   private String className;
   
   public String toString()

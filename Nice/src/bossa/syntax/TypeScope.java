@@ -12,7 +12,7 @@
 
 // File    : TypeScope.java
 // Created : Fri Jul 09 11:29:17 1999 by bonniot
-//$Modified: Mon Jun 05 18:18:07 2000 by Daniel Bonniot $
+//$Modified: Thu Jun 22 21:07:41 2000 by Daniel Bonniot $
 
 package bossa.syntax;
 
@@ -20,6 +20,7 @@ import java.util.*;
 import bossa.util.*;
 import mlsub.typing.TypeSymbol;
 import mlsub.typing.TypeConstructor;
+import mlsub.typing.Variance;
 
 /**
  * A Scope level for types.
@@ -94,7 +95,7 @@ public class TypeScope
    * Used for the search of java classes, as the type symbol
    * of type binders. See MethodBodyDefinition.
    */
-  private TypeSymbol dummyTypeSymbol = new TypeConstructor(null);
+  private TypeSymbol dummyTypeSymbol = new TypeConstructor((Variance) null);
 
   public TypeSymbol lookup(String name)
   {

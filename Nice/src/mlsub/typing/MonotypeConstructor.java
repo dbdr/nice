@@ -12,7 +12,7 @@
 
 // File    : MonotypeConstructor.java
 // Created : Thu Jul 22 09:15:17 1999 by bonniot
-//$Modified: Fri Jun 16 15:48:38 2000 by Daniel Bonniot $
+//$Modified: Thu Jun 22 21:11:41 2000 by Daniel Bonniot $
 
 package mlsub.typing;
 
@@ -67,7 +67,7 @@ public final class MonotypeConstructor extends Monotype
   */
   public boolean isRigid()
   {
-    return tc.isConcrete() && Monotype.isRigid(parameters);
+    return tc.isRigid() && Monotype.isRigid(parameters);
   }
   
   /**

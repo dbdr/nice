@@ -12,7 +12,7 @@
 
 // File    : parser.jj
 // Created : Thu Jul 01 10:27:05 1999 by bonniot
-//$Modified: Wed Jun 14 20:28:13 2000 by Daniel Bonniot $
+//$Modified: Thu Jun 22 20:58:19 2000 by Daniel Bonniot $
 // Description : Parseur JavaCC pour Bossa
 //   Tokens based on the Jazz parser
 
@@ -452,7 +452,7 @@ TypeConstructor trueTypeConstructor():
 }
 {
   name=unlocIdent()
-  { return new TypeConstructor(name, null, false); }
+  { return new TypeConstructor(name); }
 }
 
 List typeConstructors():
@@ -1239,7 +1239,7 @@ Expression Expression() :
     e2=Expression()
     {
       if(op.image.length()!=1)
-        e2=CallExp.create(symb(op.image.substring(1),op),e1,e2);
+        e2=CallExp.create(symb(op.image.substring(0, 1),op),e1,e2);
 
       e1=new AssignExp(e1,e2);
     }
@@ -1747,7 +1747,7 @@ Statement StatementExpression() :
     e2=Expression()
     {
       if(op.image.length()!=1)
-        e2=CallExp.create(symb(op.image.substring(1),op),e1,e2);
+        e2=CallExp.create(symb(op.image.substring(0, 1),op),e1,e2);
 
       e1=new AssignExp(e1,e2);
     }

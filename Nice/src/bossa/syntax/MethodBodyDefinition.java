@@ -12,7 +12,7 @@
 
 // File    : MethodBodyDefinition.java
 // Created : Thu Jul 01 18:12:46 1999 by bonniot
-//$Modified: Tue Jun 20 15:08:42 2000 by Daniel Bonniot $
+//$Modified: Wed Jun 21 18:43:59 2000 by Daniel Bonniot $
 
 package bossa.syntax;
 
@@ -492,7 +492,7 @@ public class MethodBodyDefinition extends Definition
     // Call arguments
     gnu.expr.Expression[] eVal = new gnu.expr.Expression[] {
       new gnu.expr.ApplyExp
-	(new gnu.expr.QuoteExp(new gnu.expr.PrimProcedure(bossa.SpecialArray.specialObjectArray().makeMethod)), new gnu.expr.Expression[]{
+	(new gnu.expr.QuoteExp(new gnu.expr.PrimProcedure(bossa.SpecialArray.specialObjectArray().makeMethod())), new gnu.expr.Expression[]{
 	    new gnu.expr.ReferenceExp("args",args)
 	    }
 	 )

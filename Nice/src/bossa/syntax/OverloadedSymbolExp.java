@@ -12,7 +12,7 @@
 
 // File    : OverloadedSymbolExp.java
 // Created : Thu Jul 08 12:20:59 1999 by bonniot
-//$Modified: Wed Jun 14 16:16:57 2000 by Daniel Bonniot $
+//$Modified: Wed Jun 21 18:33:57 2000 by Daniel Bonniot $
 
 package bossa.syntax;
 
@@ -38,6 +38,9 @@ public class OverloadedSymbolExp extends Expression
   OverloadedSymbolExp(List symbols, LocatedString ident,
 		      VarScope originalScope)
   {
+    if(symbols == null)
+      Internal.error("No symbols");
+    
     this.symbols = symbols;
     this.ident = ident;
     this.scope = originalScope;
@@ -77,7 +80,7 @@ public class OverloadedSymbolExp extends Expression
     // in order to enhance the error message
     boolean removedSomething = false;
     
-    for(Iterator i = symbols.iterator();i.hasNext();)
+    for(Iterator i = symbols.iterator(); i.hasNext();)
       {
 	Object s = i.next();
 

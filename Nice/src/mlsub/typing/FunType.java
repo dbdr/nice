@@ -12,7 +12,7 @@
 
 // File    : FunType.java
 // Created : Thu Jul 22 09:15:17 1999 by bonniot
-//$Modified: Fri Jun 16 16:08:15 2000 by Daniel Bonniot $
+//$Modified: Thu Jun 22 21:53:30 2000 by Daniel Bonniot $
 
 package mlsub.typing;
 
@@ -37,7 +37,7 @@ public final class FunType extends Monotype
   */
   public boolean isRigid()
   {
-    return out.isConcrete() && Monotype.isRigid(in);
+    return out.isRigid() && Monotype.isRigid(in);
   }
   
   Monotype substitute(java.util.Map map)

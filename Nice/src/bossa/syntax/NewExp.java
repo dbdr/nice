@@ -12,7 +12,7 @@
 
 // File    : NewExp.java
 // Created : Thu Jul 08 17:15:15 1999 by bonniot
-//$Modified: Tue Jun 13 15:41:28 2000 by Daniel Bonniot $
+//$Modified: Wed Jun 21 19:19:08 2000 by Daniel Bonniot $
 
 package bossa.syntax;
 
@@ -30,19 +30,35 @@ public class NewExp extends CallExp
     this.ti = ti;
   }
 
+  // we cannot assume resolveTC is called from findJavaClasses
+  // for instance, if this new exp belongs to a global variable definition
+  // it is not the case.
+  private void resolveTC()
+  {
+    if (tc != null)
+      return;
+    
+    tc = ti.resolveToTC(typeScope);
+    ti = null;
+  }
+  
   void findJavaClasses()
   {
     super.findJavaClasses();
-    tc = ti.resolveToTC(typeScope);
-    ti = null;
+    resolveTC();
   }
   
   void resolve()
   {
     super.resolve();
+    resolveTC();
+    
+    List constructors = TypeConstructors.getConstructors(tc);
+    if (constructors == null)
+      User.error(this, tc + " has no constructor");
     
     fun = new ExpressionRef // not necessary
-      (new OverloadedSymbolExp(TypeConstructors.getConstructors(tc),
+      (new OverloadedSymbolExp(constructors,
 			       new LocatedString("new "+tc.toString(),
 // not tc.location() which is the location of the definition of the class
 						 location()), 

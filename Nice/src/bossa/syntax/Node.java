@@ -12,7 +12,7 @@
 
 // File    : Node.java
 // Created : Thu Jul 08 10:24:56 1999 by bonniot
-//$Modified: Wed Jun 14 15:44:17 2000 by Daniel Bonniot $
+//$Modified: Thu Jun 22 22:29:35 2000 by Daniel Bonniot $
 
 package bossa.syntax;
 
@@ -330,23 +330,29 @@ abstract public class Node
   
   final void doTypecheck()
   {
-    typecheck();
-
     Function savedFunction = null;
-    if(this instanceof Function)
-      {
-	savedFunction = currentFunction;
-	currentFunction = (Function) this;
-      }
     
-    Iterator i = children.iterator();
-    while(i.hasNext())
-      ((Node)i.next()).doTypecheck();
+    try{
+      typecheck();
 
-    endTypecheck();
-
-    if(savedFunction!=null)
-      currentFunction = savedFunction;
+      if(this instanceof Function)
+	{
+	  savedFunction = currentFunction;
+	  currentFunction = (Function) this;
+	}
+    
+      Iterator i = children.iterator();
+      while(i.hasNext())
+	((Node)i.next()).doTypecheck();
+    }
+    finally{
+      if(savedFunction!=null)
+	currentFunction = savedFunction;
+      
+      // it might be necessary to have this endTypecheck guarded by 
+      // this finally, as a leave() might be in it
+      endTypecheck();    
+    }
   }
 
   /****************************************************************

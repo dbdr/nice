@@ -12,7 +12,7 @@
 
 // File    : ClassDefinition.java
 // Created : Thu Jul 01 11:25:14 1999 by bonniot
-//$Modified: Mon Jun 19 11:02:03 2000 by Daniel Bonniot $
+//$Modified: Thu Jun 22 20:53:46 2000 by Daniel Bonniot $
 
 package bossa.syntax;
 
@@ -94,7 +94,7 @@ abstract public class ClassDefinition extends Definition
     this.extensions = extensions;
 
     this.tc = new mlsub.typing.TypeConstructor
-      (this.name.toString(), variance, isConcrete);
+      (this.name.toString(), variance, isConcrete, true);
 
     if(isInterface)
       associatedInterface = new Interface(variance, tc);

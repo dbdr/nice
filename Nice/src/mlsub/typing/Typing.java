@@ -12,7 +12,7 @@
 
 // File    : Typing.java
 // Created : Tue Jul 20 11:57:17 1999 by bonniot
-//$Modified: Sat Jun 17 14:13:54 2000 by Daniel Bonniot $
+//$Modified: Thu Jun 22 22:26:45 2000 by Daniel Bonniot $
 
 package mlsub.typing;
 
@@ -39,12 +39,13 @@ public final class Typing
    */
   public static int enter()
   {
+    if(dbg) Debug.println("ENTER "+level);
     Engine.enter();
     return level++;
   }
 
   // used to verify that enter abd leaves match
-  static int level=0;
+  static int level = 0;
   
   /**
    * Enters a new typing context
@@ -96,7 +97,7 @@ public final class Typing
   public static int leave()
     throws TypingEx
   {
-    if(dbg) Debug.println("LEAVE");
+    if(dbg) Debug.println("LEAVE "+(level-1));
     try{
       Engine.leave();
     }

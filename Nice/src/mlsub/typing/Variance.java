@@ -12,7 +12,7 @@
 
 // File    : Variance.java
 // Created : Fri Jul 23 12:15:46 1999 by bonniot
-//$Modified: Fri Jun 16 16:13:04 2000 by Daniel Bonniot $
+//$Modified: Thu Jun 22 21:42:57 2000 by Daniel Bonniot $
 
 package mlsub.typing;
 
@@ -33,12 +33,13 @@ public final class Variance
   {
     this.size = n;
     this.top = new Interface(this);
+    this.top.name = "top interface " + this;
   }
 
   public static final Variance make(int n)
   {
     Variance res = variances[n];
-    if (res==null)
+    if (res == null)
       return variances[n] = new Variance(n);
     else
       return res;

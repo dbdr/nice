@@ -12,7 +12,7 @@
 
 // File    : Test.java
 // Created : Fri Jun 02 18:38:57 2000 by Daniel Bonniot
-//$Modified: Tue Jun 06 11:24:54 2000 by Daniel Bonniot $
+//$Modified: Thu Jun 22 21:05:59 2000 by Daniel Bonniot $
 
 package mlsub.typing;
 
@@ -31,7 +31,7 @@ public class Test
     try{
       Variance v0 = Variance.make(0);
 
-      TypeConstructor a = new TypeConstructor("a", v0, true);
+      TypeConstructor a = new TypeConstructor("a", v0, true, false);
       Monotype ma = new MonotypeConstructor(a, null);
       Typing.introduce(a);
       Typing.assertImp(a, v0.top, true);

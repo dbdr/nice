@@ -12,7 +12,7 @@
 
 // File    : Engine.java
 // Created : Tue Jul 27 15:34:53 1999 by bonniot
-//$Modified: Fri Jun 16 12:00:33 2000 by Daniel Bonniot $
+//$Modified: Thu Jun 22 22:14:15 2000 by Daniel Bonniot $
 
 package mlsub.typing.lowlevel;
 
@@ -91,7 +91,8 @@ public abstract class Engine
 	{ 
 	  Engine.Constraint k = (Engine.Constraint)i.next();
 	  try{
-	    if(dbg) Debug.println("** Satisfying "+k);
+	    if(dbg)
+	      Debug.println("** Satisfying "+k);
 	    
 	    k.satisfy();
 	  }

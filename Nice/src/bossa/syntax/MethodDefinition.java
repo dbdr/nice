@@ -12,7 +12,7 @@
 
 // File    : MethodDefinition.java
 // Created : Thu Jul 01 18:12:46 1999 by bonniot
-//$Modified: Thu Jun 15 17:41:22 2000 by Daniel Bonniot $
+//$Modified: Thu Jun 22 20:59:50 2000 by Daniel Bonniot $
 
 package bossa.syntax;
 
@@ -81,7 +81,7 @@ public class MethodDefinition extends Definition
 	  {
 	    TypeConstructor alikeTC = 
 	      new TypeConstructor("Alike", 
-				  c.variance(), false);
+				  c.variance(), false, false);
 	    
 	    constraint.addBinder(alikeTC);
 	    // added in front. Important for rebinding in method alternatives

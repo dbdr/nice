@@ -38,7 +38,7 @@ final class Sure<+T> extends Maybe<T> = native;
 final class Null<+T> extends Maybe<T> = native;
 
 /**
- * Assert that a <code>value</code> it not <code>null</code>.
+ * Assert that a <code>value</code> is not <code>null</code>.
  * Throws java.lang.AssertionError if assertions are enabled and the argument is <code>null</code>.
  */
 <T> !T notNull(?T value)

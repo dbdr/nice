@@ -49,6 +49,22 @@ public class ShortCircuitOp extends Procedure2 implements Inlineable, Branchable
   public void compile (ApplyExp exp, Compilation comp, Target target)
   {
     Expression[] args = exp.getArgs();
+
+    // Optimize some trivial cases
+    if (kind == And)
+      {
+        if (args[0] == QuoteExp.trueExp)
+          {
+            args[1].compile(comp, target);
+            return;
+          }
+        if (args[1] == QuoteExp.trueExp)
+          {
+            args[0].compile(comp, target);
+            return;
+          }
+      }
+
     CodeAttr code = comp.getCode();
     Target stack = new StackTarget(Type.boolean_type);
 
@@ -95,6 +111,9 @@ public class ShortCircuitOp extends Procedure2 implements Inlineable, Branchable
     target.compileFromStack(comp, retType);
   }
 
+  /** 
+      Jump to label if the expression yields true.
+  */
   public void compileJump (Compilation comp, Expression[] args, Label to)
   {
     CodeAttr code = comp.getCode();
@@ -133,6 +152,9 @@ public class ShortCircuitOp extends Procedure2 implements Inlineable, Branchable
     _end.define(code);
   }
 
+  /** 
+      Jump to label if the expression yields false.
+  */
   public void compileJumpNot (Compilation comp, Expression[] args, Label to)
   {
     CodeAttr code = comp.getCode();
@@ -150,6 +172,10 @@ public class ShortCircuitOp extends Procedure2 implements Inlineable, Branchable
       else
 	branchOp.compileJump(comp, brArgs, _end);
     }
+    else if (kind == And && args[0] == QuoteExp.trueExp)
+      {
+        // Optim: do nothing, this argument cannot make the expression false.
+      }
     else
     {
       args[0].compile(comp, stack);
@@ -163,6 +189,10 @@ public class ShortCircuitOp extends Procedure2 implements Inlineable, Branchable
       Expression[] brArgs = ((ApplyExp)args[1]).getArgs();
       branchOp2.compileJumpNot(comp, brArgs, to);
     }
+    else if (kind == And && args[1] == QuoteExp.trueExp)
+      {
+        // Optim: do nothing, this argument cannot make the expression false.
+      }
     else
     {
       args[1].compile(comp, stack);

@@ -153,34 +153,21 @@ public abstract class Alternative implements Located
       Internal.error("Incorrect parameters "+
 		     Util.map("",", ","",parameters)+
 		     " for " + this);
-    
+
     int index = skipFirst ? 1 : 0;
 
     if (parameters.length == index)
       return QuoteExp.trueExp;
 
-    if (parameters.length == index + 1)
-      return patterns[index].matchTest(parameters[index]);
-
     Expression result = QuoteExp.trueExp;
 
-    //find the first non-trivial test
     for(; index<parameters.length; index++)
-      if (!patterns[index].atAny())
-      {
-	result = patterns[index].matchTest(parameters[index]);
-	index++;
-        break;
-      } 
-  
-    for(; index<parameters.length; index++)
-      if (!patterns[index].atAny())
-        result = Gen.shortCircuitAnd(result,
-			patterns[index].matchTest(parameters[index]));
-    
+      result = Gen.shortCircuitAnd
+        (result, patterns[index].matchTest(parameters[index]));
+
     return result;
   }
-  
+
   public String toString()
   {
     return methodName + Util.map("(", ", ", ")", patterns);

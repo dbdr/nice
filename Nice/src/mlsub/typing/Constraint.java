@@ -118,6 +118,33 @@ public final class Constraint
     return res;
   }
   
+  public static Constraint and(Constraint c1, 
+			       TypeSymbol t0, TypeSymbol t1,
+			       AtomicConstraint a1, AtomicConstraint a2)
+  {
+    final int
+      nbinders = (c1 == null ? 0 : c1.nbinders) + 2,
+      natoms   = (c1 == null ? 0 : c1.natoms)   + 2;
+    
+    Constraint res = new Constraint();
+    res.nbinders = nbinders;
+    res.natoms = natoms;
+
+    res.binders = new TypeSymbol[nbinders];
+    for(int i=0; i<nbinders - 2; i++)
+      res.binders[i] = c1.binders[i];
+    res.binders[nbinders - 2] = t0;
+    res.binders[nbinders - 1] = t1;
+    
+    res.atoms = new AtomicConstraint[res.natoms];
+    for(int i=0; i < natoms - 2; i++)
+      res.atoms[i] = c1.atoms[i];
+    res.atoms[natoms - 2] = a2;
+    res.atoms[natoms - 1] = a1;
+    
+    return res;
+  }
+  
   static Constraint and(TypeSymbol m, Constraint c1, Constraint c2,
 			AtomicConstraint a1, AtomicConstraint a2)
   {

@@ -17,6 +17,7 @@ import java.util.*;
 import mlsub.typing.lowlevel.Engine;
 import mlsub.typing.lowlevel.Unsatisfiable;
 import mlsub.typing.lowlevel.BitVector;
+import mlsub.typing.lowlevel.Element;
 
 /**
    Enumeration of the type constructors in a domain.
@@ -34,6 +35,7 @@ public class Enumeration
    *   an element of an array is set to null
    *   if it cannot be matched (e.g. a function type)
    */
+  /*
   public static List enumerate(Domain domain)
   {
     // XXX try LinkedList
@@ -70,9 +72,46 @@ public class Enumeration
 
     return res;
   }
+  */
+
+  /**
+   * Enumerate all the tuples of tags in a Domain
+   *
+   * @return a List of TypeConstructor[]
+   *   an element of an array is set to null
+   *   if it cannot be matched (e.g. a function type)
+   */
+  public static List enumerate(Constraint cst, Element[] tags)
+  {
+    // XXX try LinkedList
+    List res = new ArrayList();
+
+    try
+      {
+	int l = Typing.enter();
+
+	try{
+	  Constraint.assert(cst);
+	  setFloatingKinds(tags, 0, res);
+	}
+	finally{
+	  if (Typing.leave() != l)
+	    throw new InternalError("Unmatched enter and leaves");
+	}
+      }
+    catch(TypingEx e){
+      // There is no solution
+      return new LinkedList();
+    }
+    catch(Unsatisfiable e){
+      throw new InternalError("This shouldn't happen");
+    }
+
+    return res;
+  }
   
   /** Try all combinations of Kinds for free type variables */
-  private static final void setFloatingKinds(Monotype[] tags, 
+  private static final void setFloatingKinds(Element[] tags, 
 					     int minFloating, 
 					     List res) 
     throws Unsatisfiable
@@ -112,7 +151,7 @@ public class Enumeration
       res.addAll(enumerateTags(tags));
   }
   
-  private static List enumerateTags(Monotype[] tags)
+  private static List enumerateTags(Element[] tags)
   {
     TagsList tuples = new TagsList(tags.length);
     List kinds = new ArrayList(tags.length); /* euristic: 
@@ -142,7 +181,12 @@ public class Enumeration
 	     tags[i].getKind() instanceof TupleKind)
 	    continue;
 
-	  TypeConstructor constTC = tags[i].head();
+	  TypeConstructor constTC;
+	  if (tags[i] instanceof TypeConstructor)
+	    constTC = (TypeConstructor) tags[i];
+	  else
+	    constTC = ((Monotype) tags[i]).head();
+	  
 	  if(constTC == null)
 	    throw new InternalError
 	      (tags[i].getKind() + " is not a valid kind in enumerate");

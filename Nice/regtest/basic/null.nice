@@ -18,16 +18,15 @@ void test_null()
 
 // Testing the coverage test
 
-
 <Any T1, Any T2 | T1 <: ?String , T2 <: T1> void cov(T1 s1, T2 s2);
+
+// The domain of cov is exactly (?String, ?String)
+// Therefore there are exactly four cases:
+
 cov(s1@String, s2@String) {}
-cov(s1@null, s2) {}
-
-//this case should not be necessary because T2 <: T1
-cov(s1@String, s2@null) {}
-
-//this case should not be necessary: all cases are already handled
-cov(s1, s2) {}
+cov(s1@String, s2@null)   {}
+cov(s1@null,   s2@String) {}
+cov(s1@null,   s2@null)   {}
 
 // nullness marker with a parameterized type in constraint
 <Any T | T <: ?List<String>> void cov2(T x) {}

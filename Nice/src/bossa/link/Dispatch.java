@@ -23,6 +23,9 @@ import mlsub.typing.Polytype;
 import mlsub.typing.TupleType;
 import mlsub.typing.Monotype;
 import mlsub.typing.MonotypeConstructor;
+import mlsub.typing.Constraint;
+import mlsub.typing.MonotypeLeqCst;
+import mlsub.typing.lowlevel.Element;
 
 import java.util.*;
 
@@ -160,9 +163,9 @@ public final class Dispatch
 	     "\nBytecode name: " + method.getBytecodeName());
 	else
 	  User.warning(method,
-		       "Method "+method+" is not exhaustive:\n"+
-		       "no alternative matches "+Util.map("(",", ",")",tags));
-	  //FIXME: write 'null' for the tags that code null values (maybeTC)
+		       "Method " + method + " is not exhaustive:\n" + 
+		       "no alternative matches " + 
+		       Util.map("(",", ",")",tags));
       }
     return failed;
   }
@@ -173,58 +176,90 @@ public final class Dispatch
      @return a List of TypeConstructor[]
        an element of an array is set to:
          null if it cannot be matched (e.g. a function type)
-	 ConstantExp.maybeTC if it is matche by @null
+	 ConstantExp.nullTC if it can be matched by @null
   **/
   private static List enumerate(Polytype type)
   {
     Monotype[] domains = type.domain();
-    Monotype[] types = new Monotype[domains.length];
-    boolean[] maybeNull = new boolean[domains.length];
+    Constraint cst = type.getConstraint();
+
+    Element[] types = new Element[2 * domains.length];
 
     for (int i = 0; i < domains.length; i++)
       { 
 	Monotype arg = domains[i];
 
-	if (!(arg instanceof MonotypeConstructor))
+	TypeConstructor marker;
+	Monotype raw;
+	// We deconstruct 'arg' as 'marker<raw>'
+	// This is easy and more efficent if arg is already a constructed type
+
+	if (arg instanceof MonotypeConstructor)
 	  {
-	    types[i] = arg;
-	    continue;
+	    MonotypeConstructor mc = (MonotypeConstructor) arg;
+	    marker = mc.getTC();
+	    raw = mc.getTP()[0];
+	  }
+	else
+	  {
+	    marker = new TypeConstructor(ConstantExp.maybeTC.variance);
+	    MonotypeVar var = new MonotypeVar("dispatchType");
+	    raw = var;
+	    Monotype t = new MonotypeConstructor(marker, raw);
+	    cst = Constraint.and(cst, marker, var, 
+				 new MonotypeLeqCst(t, arg),
+				 new MonotypeLeqCst(arg, t));
 	  }
 
-	MonotypeConstructor mc = (MonotypeConstructor) arg;
-	TypeConstructor tc = mc.getTC();
-	if (tc != ConstantExp.sureTC)
-	  maybeNull[i] = true;
-
-	types[i] = mc.getTP()[0];
+	types[2 * i] = marker;
+	types[2 * i + 1] = raw;
       }
-
-    Domain domain = new Domain(type.getConstraint(), new TupleType(types));
-    List res = mlsub.typing.Enumeration.enumerate(domain);
-    return addNullCases(res, maybeNull);
+    List res = mlsub.typing.Enumeration.enumerate(cst, types);
+    return mergeNullCases(res, domains.length);
   }
 
-  /** Extend the list of tuples to add the case where some tags 
-      must be matches by @null
+  /** 
+      Merges all null<*> into null.
+
+      @param tuples a list of tuples.
+        Each tuple has 2 * length elements, 
+	alternatively a nullness marker TC and a normal TC
   */
-  private static List addNullCases(List tuples, boolean[] maybeNull)
+  private static List mergeNullCases(List tuples, int length)
+  {
+    LinkedList res = new LinkedList();
+
+    for (Iterator i = tuples.iterator(); i.hasNext();)
+      add(res, flatten((TypeConstructor[]) i.next(), length));
+
+    return res;
+  }
+
+  private static void add(List tuples, TypeConstructor[] tags)
   {
     // FIXME
     // This implementation creates duplicate tuples
 
-    for(int index = 0; index < maybeNull.length; index++)
-      if (maybeNull[index])
-	{
-	  int size = tuples.size();
+    tuples.add(tags);
+  }
 
-	  // duplicate all entries
-	  for(int i = 0; i < size; i++)
-	    tuples.add(((Object[]) tuples.get(i)).clone());
+  /** 
+      Translates (nullTC, *) into null and (sureTC, tc) into tc
 
-	  // put the @null tag for the first half
-	  for(int i = 0; i < size; i++)
-	    ((TypeConstructor[]) tuples.get(i))[index] = ConstantExp.nullTC;
-	}
-    return tuples;
+      @param tags a list of tuples.
+        Each tuple has 2 * length elements, 
+	alternatively a nullness marker TC and a normal TC
+  */
+  private static TypeConstructor[] flatten(TypeConstructor[] tags, int length)
+  {
+    TypeConstructor[] res = new TypeConstructor[length];
+
+    for (int i = length; --i >= 0 ;)
+      if (tags[2 * i] == ConstantExp.nullTC)
+	res[i] = ConstantExp.nullTC;
+      else
+	res[i] = tags[2 * i + 1];
+
+    return res;
   }
 }

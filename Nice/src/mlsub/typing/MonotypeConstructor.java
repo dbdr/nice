@@ -52,6 +52,19 @@ public final class MonotypeConstructor extends Monotype
   }
 
   /**
+   * Constructs a monotype by application of the type constructor
+   * to one type parameter.
+   *
+   * @param tc the type constructor
+   * @param parameter the type parameter
+   */
+  public MonotypeConstructor(TypeConstructor tc, Monotype parameter)
+  throws BadSizeEx
+  {
+    this(tc, new Monotype[]{ parameter });
+  }
+
+  /**
      Return the head type constructor if this monotype is
      of a known variance, or null.
   */

@@ -955,6 +955,29 @@ public class ClassType extends ObjectType implements AttrContainer {
     return other.compare(this) >= 0;
   }
 
+  private static ClassType collectionType = make("nice.lang.Collection");
+
+  public void emitCoerceFromObject (CodeAttr code)
+  {
+    if (this == collectionType)
+      {
+	// A collection can be in the form of an array of bytecode type Object.
+
+	code.emitDup();
+	code.emitInstanceof(this);
+
+	code.emitIfIntNotZero();
+	code.emitCheckcast(this);
+
+	code.emitElse();
+	nice.tools.code.SpecialArray.unknownTypeArray().
+	  emitCoerceToObject(code);
+	code.emitFi();
+      }
+    else
+      super.emitCoerceFromObject(code);
+  }
+
   public String toString()
   {
     return "ClassType " + getName();

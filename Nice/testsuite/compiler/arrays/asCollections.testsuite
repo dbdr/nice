@@ -1,0 +1,21 @@
+/// PASS
+  new int[0].size();
+
+/// PASS
+  new A(elements: new int[0]).size();
+  /// Toplevel
+  class A<T> { 
+    T[] elements;
+    int size() = this.elements.size();
+  }
+
+/// PASS
+  /// package a
+  /// Toplevel
+  class A<T> { T[] elements; }
+  /// package b import a
+  new B(elements: new int[0]).size();
+  /// Toplevel
+  class B<T> extends A<T> {
+    int size() = this.elements.size();
+  }

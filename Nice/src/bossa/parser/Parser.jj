@@ -1311,7 +1311,7 @@ Pattern pattern():
 void methodBodyDefinitionLookahead():
 {}
 {
-  [ "<" strings() ">" ] identOrBackquoted() [ "<" strings() ">" ] "("
+  [ "<" strings() ">" ] identOrBackquoted() "("
 }
 
 Statement code():

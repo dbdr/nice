@@ -128,17 +128,3 @@ public final class TypeIdent extends bossa.syntax.Monotype implements Located
   location() = notNull(name.location());
 
 }
-
-public Monotype createTypeIdent(LocatedString name)
-{
-  return new TypeIdent(name: name);
-}
-/*
-public mlsub.typing.Interface[?] resolveToItf(TypeMap scope, ?List<TypeIdent> idents)
-{
-  if (idents==null || idents.size()==0)
-    return null;
-    
-  return idents.mapToArray(TypeIdent ti => ti.resolveToItf(scope));
-}
-*/

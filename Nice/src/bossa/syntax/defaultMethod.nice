@@ -84,11 +84,6 @@ public class DefaultMethodImplementation extends MethodImplementation
     // Do not reset scope and typeScope to null.
   }
 
-  void typedResolve()
-  {
-    notNull(declaration).typedResolve();
-  }
-
   void innerTypecheck()
   {
     // If the method we implement specialize others, then we cannot

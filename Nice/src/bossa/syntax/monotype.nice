@@ -75,9 +75,6 @@ public abstract class Monotype implements Located
 
   /** called instead of toString if parenthesis are unnecessary */
   public String toStringExtern() = this.toString(); 
-
-  /** don't print type parameters */
-  public String toStringBase() = this.toString();
 }
 
 /** iterates resolve() on the collection of Monotype */

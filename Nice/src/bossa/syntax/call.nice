@@ -253,15 +253,6 @@ public Expression createCallExp(Expression function,
   return res;
 }
 
-public Expression createCallExp(Expression function, 
-	       Expression param1, Expression param2,
-	       Expression param3)
-{
-  let res = new CallExp(function:function, arguments:new Arguments(arguments: [new Argument(value: param1), new Argument(value: param2), new Argument(value: param3)]));
-  res.setLocation(function.location());
-  return res;
-}
-
 public Expression createCallExp(Expression func, Arguments args, boolean infix, boolean hasBrackets)
 {
   return new CallExp(function: func, arguments: args, infix: infix, hasBrackets: hasBrackets);

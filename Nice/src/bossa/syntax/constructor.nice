@@ -13,8 +13,6 @@
 package bossa.syntax;
 
 import bossa.util.*;
-//import mlsub.typing.Constraint;
-//import mlsub.typing.Monotype;
 
 /**
    An object constructor.

@@ -80,26 +80,6 @@ public class JavaClass extends ClassImplementation
   }
 }
 
-
-/**
-  * Returns a java type constructor with the given name
-  * and the given java type.
-  * <p>
-  * Usefull for primitive types.
-  */
-TypeConstructor makeJavaClass(bossa.modules.Compilation compilation, String name,
-                                gnu.bytecode.Type javaType)
-{
-  ?TypeConstructor tc = compilation.javaTypeConstructors.get(javaType);
-  if(tc!=null)
-    return tc;
-    
-  // we put the new JTC in the hashtable in the constructor
-  // and not after it returned, to avoid infinite loop
-  // if the code of the constructor does a lookup.
-  return createJavaType(compilation, name, javaType);
-}
-
 /**
  * @return null, except if javaName already had an
  * associated TypeConstructor in which case it is returned.

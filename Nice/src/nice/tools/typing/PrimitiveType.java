@@ -36,6 +36,7 @@ public final class PrimitiveType
       {
 	charTC = tc;
 	charType = Types.sureMonotype(new MonotypeConstructor(tc, null));
+        charPolytype = new Polytype(charType);
 	return SpecialTypes.charType;
       }
     
@@ -83,6 +84,7 @@ public final class PrimitiveType
       {
 	doubleTC = tc;
 	doubleType = Types.sureMonotype(new MonotypeConstructor(tc, null));
+	doublePolytype = new Polytype(doubleType);
 	return SpecialTypes.doubleType;
       }
     
@@ -90,6 +92,7 @@ public final class PrimitiveType
       {
 	floatTC = tc;
 	floatType = Types.sureMonotype(new MonotypeConstructor(tc, null));
+	floatPolytype = new Polytype(floatType);
 	return SpecialTypes.floatType;
       }
     
@@ -143,7 +146,7 @@ public final class PrimitiveType
   public static TypeConstructor byteTC, charTC, intTC, longTC, boolTC, shortTC, doubleTC, floatTC, arrayTC, voidTC;
 
   public static mlsub.typing.Monotype byteType, charType, intType, longType, boolType, shortType, doubleType, floatType, voidType;
-  public static Polytype voidPolytype, boolPolytype, bytePolytype, shortPolytype, intPolytype, longPolytype;
+  public static Polytype voidPolytype, boolPolytype, charPolytype ,bytePolytype, shortPolytype, intPolytype, longPolytype, doublePolytype, floatPolytype;
 
   private static Polytype objectPolytype;
   public static Polytype objectPolytype()

@@ -10,6 +10,264 @@
 /*                                                                        */
 /**************************************************************************/
 
+package bossa.syntax;
+
+import bossa.util.*;
+
+/**
+   Constant expressions (values) of basic types.
+
+ */
+public abstract class ConstantExp extends Expression
+{
+  public final ?Object value;
+  private String representation;
+  public ?mlsub.typing.TypeConstructor tc = null;
+
+  ?LocatedString className = null;
+
+/*
+  ConstantExp()
+  {
+  }
+  
+  ConstantExp(Polytype type, TypeConstructor tc, Object value, String representation, 
+	      Location location)
+  {
+    this.type = type;
+    this.tc = tc;
+    this.value = value;
+    this.representation = representation;
+    setLocation(location);
+  }
+  
+  ConstantExp(TypeConstructor tc, Object value, String representation,
+	      Location location)
+  {
+    this(new mlsub.typing.Polytype(Monotype.sure(new mlsub.typing.MonotypeConstructor(tc,null))),
+	 tc, value, representation, location);
+  }
+  
+  ConstantExp(TypeConstructor tc, String representation, Location location)
+  {
+    this(tc, null, representation, location);
+  }
+
+  public ConstantExp(Object value)
+  {
+    this.value = value;
+    this.representation = value.toString();
+  }
+*/  
+
+  computeType()
+  {
+    // The type is known at creation.
+  }
+
+  toString() = representation;
+
+  equals(ConstantExp other) = this.value.equals(other.value);
+
+}
+
+public abstract class NumberConstantExp extends ConstantExp
+{
+  override Number value;
+
+  public ConstantExp makeNegative()
+  {
+    LocatedString newRepres = new LocatedString("-"+representation, this.location());
+
+    if (value instanceof Float || value instanceof Double)
+      return createFloatConstantExp(newRepres);
+
+    return createIntegerConstantExp(newRepres);
+  }
+
+  compile()
+  {
+    return new gnu.expr.QuoteExp(value, nice.tools.code.Types.javaType(type));
+  }
+}
+
+public class IntegerConstantExp extends NumberConstantExp
+{
+  public long longValue()
+  {
+    let Number val = cast(value);
+    return val.longValue();
+  }
+
+  isZero()
+  {
+    let Number val = cast(value);
+    return val.intValue() == 0;
+  }
+ 
+}
+
+public class FloatConstantExp extends NumberConstantExp
+{
+
+}
+
+public class SymbolConstantExp extends ConstantExp
+{
+  override VarSymbol value;
+
+  compile()
+  {
+    let VarSymbol val = cast(value);
+    return val.compile();
+  }
+}
+
+ConstantExp createSymbolConstantExp(?mlsub.typing.TypeConstructor tc, VarSymbol sym, String repres, Location loc)
+{
+  let res = new SymbolConstantExp(tc: tc, value: sym, representation: repres);
+  res.setLocation(loc);
+  return res;
+}
+
+public ConstantExp createIntegerConstantExp(LocatedString representation)
+{
+  String rep = representation.toString();
+
+  int lastCharIndex = rep.length() - 1;
+  char last = rep.charAt(lastCharIndex);
+  boolean isLong = last == 'l' || last == 'L';
+  if (isLong)
+    rep = rep.substring(0, lastCharIndex);
+
+  try {
+    long value = parseInteger(removeUnderscores(rep));
+
+    mlsub.typing.Polytype type;
+    mlsub.typing.TypeConstructor tc;
+    Number object;
+    
+    if (Byte.MIN_VALUE <= value <= Byte.MAX_VALUE && !isLong)
+      {
+	type = notNull(nice.tools.typing.PrimitiveType.bytePolytype);
+        tc = notNull(nice.tools.typing.PrimitiveType.byteTC);
+	object = new Byte(byte(value));
+      }
+    else if (Short.MIN_VALUE <= value <= Short.MAX_VALUE && !isLong)
+      {
+	type = notNull(nice.tools.typing.PrimitiveType.shortPolytype);
+        tc = notNull(nice.tools.typing.PrimitiveType.shortTC);
+	object = new Short(short(value));
+      }
+    else if (Integer.MIN_VALUE <= value <= Integer.MAX_VALUE && !isLong)
+      {
+	type = notNull(nice.tools.typing.PrimitiveType.intPolytype);
+        tc = notNull(nice.tools.typing.PrimitiveType.intTC);
+	object = value;
+      }
+    else
+      {
+	type = notNull(nice.tools.typing.PrimitiveType.longPolytype);
+        tc = notNull(nice.tools.typing.PrimitiveType.longTC);
+	object = value;
+      }
+    
+    let res = new IntegerConstantExp(tc: tc, value: object,
+	representation: ""+value+(isLong ? "L" : ""));
+    res.type = type;
+    res.setLocation(representation.location());
+    return res;
+  }
+  catch(NumberFormatException e) {
+    e.printStackTrace();
+    throw User.error(representation, rep + " is not a valid number");
+  }
+}
+
+ConstantExp createIntConstantExp(int value, Location loc)
+{
+  let res = new IntegerConstantExp(tc: nice.tools.typing.PrimitiveType.intTC,
+	value: value, representation: value.toString());
+  res.type = nice.tools.typing.PrimitiveType.intPolytype;
+  res.setLocation(loc);
+  return res;
+}
+
+ConstantExp createLongConstantExp(long value)
+{
+  return new IntegerConstantExp(tc: nice.tools.typing.PrimitiveType.longTC,
+	value: value, representation: value.toString());
+}
+
+
+private long parseInteger(String rep)
+{
+  int radix = 10;
+  int index = 0;
+  boolean negative = false;
+
+  // Leading minus
+  if (rep.startsWith("-")) {
+    negative = true;
+    index++;
+  }
+
+  // Radix specifier
+  if (rep.startsWith("0x", index) || rep.startsWith("0X", index)) 
+    {
+      index += 2;
+      radix = 16;
+    }
+  else if (rep.startsWith("#", index)) 
+    {
+      index++;
+      radix = 16;
+    }
+  else if (rep.startsWith("0", index) && rep.length() > 1 + index) 
+    {
+      index++;
+      radix = 8;
+    }
+
+  if (rep.startsWith("-", index))
+    throw new NumberFormatException("Negative sign in wrong position");
+
+  long result = new java.math.BigInteger(rep.substring(index), radix).longValue();
+
+  if (negative) 
+    result = -result;
+
+  return result;
+}
+
+private String removeUnderscores(String s)
+{
+  StringBuffer sb = new StringBuffer();
+  for (int i = 0; i<s.length(); i++)
+    if (s.charAt(i) != '_')
+      sb.append(s.charAt(i));
+    
+  return sb.toString();
+}
+
+public ConstantExp createFloatConstantExp(LocatedString representation)
+{
+  String repres = removeUnderscores(representation.toString());
+  if (repres.endsWith("F") || repres.endsWith("f"))
+    {
+      float value = Float.parseFloat(repres);
+      let res = new FloatConstantExp(tc: nice.tools.typing.PrimitiveType.floatTC, value: value, representation:value+"f");
+      res.type = nice.tools.typing.PrimitiveType.floatPolytype;
+      res.setLocation(representation.location());
+      return res;
+    }	
+
+  double value = Double.parseDouble(repres);
+  let res = new FloatConstantExp(tc: nice.tools.typing.PrimitiveType.doubleTC, value: value, representation: value+"");
+  res.type = nice.tools.typing.PrimitiveType.doublePolytype;
+  res.setLocation(representation.location());
+  return res;
+}
 
 /**
    The 'null' expression.   
@@ -39,7 +297,7 @@ public class NullExp extends ConstantExp
 
 ConstantExp createNullExp(bossa.util.Location loc)
 {
-  let res = new NullExp();
+  let res = new NullExp(value: null, representation: "null");
   res.setLocation(loc);
   return res;
 }
@@ -56,18 +314,26 @@ class BooleanConstantExp extends ConstantExp
 
 public ConstantExp createBooleanConstant(boolean value, Location location)
 {
-  return new BooleanConstantExp(nice.tools.typing.PrimitiveType.boolTC,
-	value, value ? "true" : "false", location,
+  let res = new BooleanConstantExp(tc: nice.tools.typing.PrimitiveType.boolTC,
+	value: value, representation: value ? "true" : "false",
 	compiledValue: notNull(value ? gnu.expr.QuoteExp.trueExp : gnu.expr.QuoteExp.falseExp));
+  res.type = nice.tools.typing.PrimitiveType.boolPolytype;
+  res.setLocation(location);
+  return res;
 }
 
 class CharConstantExp extends ConstantExp
 {
-  longValue()
+  public long longValue()
   {
     Character val = cast(this.value);
     return int(val.charValue());
   } 
+
+  compile()
+  {
+    return new gnu.expr.QuoteExp(value, nice.tools.code.Types.javaType(type));
+  }
 }
 
 public ConstantExp createCharConstant(LocatedString value)
@@ -76,8 +342,16 @@ public ConstantExp createCharConstant(LocatedString value)
   if (s.length() != 1)
     User.error(value, "Invalid character constant: " + value);
 
-  return new CharConstantExp(nice.tools.typing.PrimitiveType.charTC,
-	s[0], "'" + s + "'", value.location());
+  return createCharConstant(s[0], notNull(value.location()));
+}
+
+public ConstantExp createCharConstant(char value, Location loc)
+{
+  let res = new CharConstantExp(tc: nice.tools.typing.PrimitiveType.charTC,
+	value: value, representation: "'" + value + "'");
+  res.type = nice.tools.typing.PrimitiveType.charPolytype;
+  res.setLocation(loc);
+  return res;
 }
 
 /**
@@ -86,12 +360,16 @@ public ConstantExp createCharConstant(LocatedString value)
 */
 public class VoidConstantExp extends ConstantExp
 {
+  override value = gnu.mapping.Values.empty;
+  override representation = "{}";
   {
     this.className = voidName;
-    this.value = gnu.mapping.Values.empty;
   }
 
-  toString() = "{}";
+  compile()
+  {
+    return new gnu.expr.QuoteExp(value, nice.tools.code.Types.javaType(type));
+  }
 }
 
 let LocatedString voidName = new LocatedString("void");
@@ -104,7 +382,10 @@ public class StringConstantExp extends ConstantExp
 {
   final String escapedValue;
 
-  toString() = "\""+escapedValue+"\"";
+  compile()
+  {
+    return new gnu.expr.QuoteExp(value, nice.tools.code.Types.javaType(type));
+  }
 }
 
 public ConstantExp createStringConstantExp(String value)
@@ -117,9 +398,7 @@ public StringConstantExp createStringConstantExp(String value, boolean multiline
   if (multiline)
     value = escapeEOL(value);
 
-  let res = new StringConstantExp(escapedValue: value);
-  res.value = unescapeLiteral(value);
-  res.className = stringClassName;
+  let res = new StringConstantExp(value: unescapeLiteral(value), escapedValue: value, representation: "\""+value+"\"" , className: stringClassName);
   return res;
 }
 
@@ -208,22 +487,25 @@ public class TypeConstantExp extends ConstantExp
     return cast(value);
   }
 
-  void setRepresentedType(mlsub.typing.Polytype type, ?gnu.bytecode.Type bytecodeType)
+  TypeConstantExp setRepresentedType(mlsub.typing.Polytype type, ?gnu.bytecode.Type bytecodeType)
   {
-    this.value = bytecodeType;
+    let res = new TypeConstantExp(value: bytecodeType, representation: this.representation);
 
-    this.representedType = type.getMonotype();
+    res.isExpression = this.isExpression;
+    res.isLiteral = this.isLiteral;
+    res.representedType = type.getMonotype();
 
-    this.type = new mlsub.typing.Polytype
+    res.type = new mlsub.typing.Polytype
       (type.getConstraint(),
        Monotype.sure(new mlsub.typing.MonotypeConstructor
         (nice.tools.typing.PrimitiveType.classTC, [type.getMonotype()])));
+    return res;
   }
 
   compile()
   {
     if (isLiteral)
-      return super;
+      return new gnu.expr.QuoteExp(value, nice.tools.code.Types.javaType(type));
 
     gnu.bytecode.Type type = cast(value);
     String representation = type instanceof gnu.bytecode.ArrayType ?
@@ -247,7 +529,9 @@ public class TypeConstantExp extends ConstantExp
 
 public TypeConstantExp createTypeConstantExp(LocatedString name)
 {
-  return new TypeConstantExp(null, null, name, name.toString(), name.location());
+  let res = new TypeConstantExp(value: name, representation: name.toString());
+  res.setLocation(name.location());
+  return res;
 }
 
 /**
@@ -270,8 +554,7 @@ Expression createTypeConstantExp(?PackageExp root, LocatedString name)
       // for instance if the ident was "int"
       if (type instanceof gnu.bytecode.ClassType)
 	{
-	  TypeConstantExp res = new TypeConstantExp(name);
-          res.setRepresentedType(universalPolytype(tc, true), type);
+	  TypeConstantExp res = new TypeConstantExp(value: name, representation: name.toString()).setRepresentedType(universalPolytype(tc, true), type);
 	  res.setLocation(root == null ? name.location() : root.location());
 	  return res;
 	}

@@ -139,6 +139,7 @@ public class CompOp extends Procedure2 implements Branchable, bossa.syntax.Macro
 
   public void checkSpecialRequirements(bossa.syntax.Expression[] arguments)
   {
+    /* TODO: make this work again
     bossa.syntax.ConstantExp literalexp = null;
     bossa.syntax.Expression otherexp = null;
     if (arguments[0] instanceof bossa.syntax.ConstantExp &&
@@ -161,7 +162,8 @@ public class CompOp extends Procedure2 implements Branchable, bossa.syntax.Macro
 	   ! (mlsub.typing.Typing.testRigidLeq(literalexp.tc, tc)))
           bossa.util.User.warning(otherexp, "Comparing a value with a constant outside the range of that value");
       }
-   }
+    */ 
+  }
 
   // Interpretation
 

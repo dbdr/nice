@@ -675,9 +675,7 @@ analyse(TypeConstantExp e, info)
      nice.tools.code.Types.typeRepresentationToBytecode
        (name.toString(), name.location());
 
-  e.setRepresentedType(type, bytecodeType);
-
-  return e;
+  return e.setRepresentedType(type, bytecodeType);
 }
 
 analyse(TupleExp e, info)

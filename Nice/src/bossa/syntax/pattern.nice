@@ -294,12 +294,13 @@ public Pattern createPattern(ConstantExp value, ?TypeIdent additional)
     return new StringPattern(typeConstructor: new TypeIdent(name: new LocatedString("java.lang.String", value.location())),
 				additional: additional, loc: value.location(), atValue: value);
 
-  if (value.tc == nice.tools.typing.PrimitiveType.boolTC)
+  if (value instanceof BooleanConstantExp)
     return new BoolPattern(tc: value.tc, additional: additional, loc: value.location(), atValue: value);
 
-  if (value.tc == nice.tools.typing.PrimitiveType.charTC)
+  if (value instanceof CharConstantExp)
     return new CharPattern(tc: value.tc, additional: additional, loc: value.location(), atValue: value);
 
+  assert value instanceof IntegerConstantExp;
   return new IntPattern(tc: value.tc, additional: additional, loc: value.location(), atValue: value);
 }
 
@@ -391,6 +392,8 @@ public class StringPattern extends ValuePattern
 
 public class CharPattern extends ValuePattern
 {
+  override CharConstantExp atValue;
+
   setDomainTC(domaintc)
   {
     if (domaintc != null)
@@ -403,6 +406,8 @@ public class CharPattern extends ValuePattern
 
 public class IntPattern extends ValuePattern
 {
+  override IntegerConstantExp atValue;
+
   setDomainTC(domaintc)
   {
     if (domaintc != null)
@@ -446,15 +451,15 @@ public class IntComparePattern extends IntPattern
     else
       hi = val+1;
 
-    while(values.any(ConstantExp ce => (ce.value instanceof Number) && (ce.longValue == lo)))
+    while(values.any(ConstantExp ce => (ce instanceof IntegerConstantExp) && (ce.longValue() == lo)))
       lo--;
 
-    values.add(new ConstantExp(new Long(lo)));
+    values.add(createLongConstantExp(lo));
 
-    while(values.any(ConstantExp ce => (ce.value instanceof Number) && (ce.longValue == hi)))
+    while(values.any(ConstantExp ce => (ce instanceof IntegerConstantExp) && (ce.longValue() == hi)))
       hi++;
 
-    values.add(new ConstantExp(new Long(hi)));
+    values.add(createLongConstantExp(hi));
   }
 
   boolean atLess() = (kind == CK_LT || kind == CK_LE);
@@ -473,7 +478,7 @@ public class EnumPattern extends ReferencePattern
   {
     let EnumSymbol esym = cast(atValue.value);
     for (sym : esym.getDefinition().symbols)
-      values.add(new ConstantExp(null, tc, sym, sym.name.toString(), this.location));
+      values.add(createSymbolConstantExp(notNull(tc), sym, sym.name.toString(), this.location));
   }
 
   atTypeMatchingValue() = true;
@@ -497,18 +502,16 @@ matches(BoolPattern p, tag) = tag == nice.tools.typing.PrimitiveType.boolTC;
 matches(IntComparePattern p, tag) = tag != null && mlsub.typing.Typing.testRigidLeq(tag, nice.tools.typing.PrimitiveType.longTC);
 matches(EnumPattern p, tag) = (tag != null) && mlsub.typing.Typing.testRigidLeq(tag, p.tc);
 
+matchesValue(Pattern p, ConstantExp val) = false;
 matchesValue(VariablePattern p, ConstantExp val) = true;
-matchesValue(NullPattern p, ConstantExp val) = false;
-matchesValue(NotNullPattern p, ConstantExp val) = false;
-matchesValue(TypePattern p, ConstantExp val) = false;
 matchesValue(ValuePattern p, ConstantExp val) = p.atValue.equals(val);
-matchesValue(IntPattern p, ConstantExp val)
+matchesValue(IntPattern p, IntegerConstantExp val)
 {
-  return (val.value instanceof Number) && p.atValue.longValue() == val.longValue();
+  return p.atValue.longValue() == val.longValue();
 }
-matchesValue(IntComparePattern p, ConstantExp val)
+matchesValue(IntComparePattern p, IntegerConstantExp val)
 {
-  return val.value instanceof Number && matches(p.kind, val.longValue(), p.atValue.longValue());
+  return matches(p.kind, val.longValue(), p.atValue.longValue());
 }
 
 /**
@@ -737,8 +740,7 @@ resolveGlobalConstants(VariablePattern pattern)
     {
       NewExp val = cast(symbol.getValue());
       return new EnumPattern(name: pattern.name, tc: val.tc, loc: pattern.location(), atValue:
-		new ConstantExp(null, pattern.tc, symbol,
-				notNull(pattern.name).toString(), pattern.location()));
+		createSymbolConstantExp(pattern.tc, symbol, notNull(pattern.name).toString(), pattern.location()));
     }
 
   if (! (symbol instanceof GlobalVarSymbol))
@@ -758,9 +760,9 @@ resolveGlobalConstants(VariablePattern pattern)
     }
   else if (symbol.getValue() instanceof NewExp)
     {
-       NewExp val = cast(symbol.getValue());
+      NewExp val = cast(symbol.getValue());
       return new ReferencePattern(name: pattern.name, tc: val.tc, loc: pattern.location(), atValue:
-		new ConstantExp(null, pattern.tc, symbol,
+		createSymbolConstantExp(pattern.tc, symbol,
 				notNull(pattern.name).toString(), pattern.location()));
     }
   else
@@ -825,14 +827,13 @@ public ?Pattern readPattern(String rep, int[]/*ref*/ pos)
   if (name.length() > 1)
     {
       if (name[0] == '\'')
-	return createPattern(new CharConstantExp(nice.tools.typing.PrimitiveType.charTC,
-		name[1], name, loc));
+	return createPattern(createCharConstant(name[1], loc));
 
       if (name[0] == '-')
-        return createPattern(ConstantExp.makeNumber(new LocatedString(name)));
+        return createPattern(createIntegerConstantExp(new LocatedString(name)));
 
       if (name[0] == '+')
-        return createPattern(ConstantExp.makeNumber(new LocatedString(name.substring(1))));
+        return createPattern(createIntegerConstantExp(new LocatedString(name.substring(1))));
 
       if (name[0] == '\"')
         return createPattern(createStringConstantExp(
@@ -841,7 +842,7 @@ public ?Pattern readPattern(String rep, int[]/*ref*/ pos)
       if (name[0] == '<' || name[0] == '>')
 	{
 	  let prefix = name.substring(0, (name[1] == '=') ? 2 : 1);
-	  return createPattern(prefix, null, ConstantExp.makeNumber(
+	  return createPattern(prefix, null, createIntegerConstantExp(
 		new LocatedString(name.substring(prefix.length()))), null, loc);
         }
 

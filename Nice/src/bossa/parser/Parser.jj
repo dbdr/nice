@@ -1288,7 +1288,7 @@ Pattern pattern():
   ( 
     val=patternLiteral() 
     [ "(" additional=typeIdent() ")" ]
-    { return bossa.syntax.dispatch.createPattern(val, additional);}
+    { return val.createPattern(additional);}
   |
     "@" tc=typeIdent() 
     [ "(" additional=typeIdent() ")" ]
@@ -1613,7 +1613,7 @@ ConstantExp intConstantExp():
 { LocatedString representation; }
 {
   representation=integerLiteral()
-  { return ConstantExp.makeNumber(representation); }
+  { return bossa.syntax.dispatch.createIntegerConstantExp(representation); }
 }
 
 ConstantExp negativeIntConstantExp():
@@ -1622,7 +1622,7 @@ ConstantExp negativeIntConstantExp():
   "-" representation=integerLiteral()
   { 
     representation.prepend("-");
-    return ConstantExp.makeNumber(representation);
+    return bossa.syntax.dispatch.createIntegerConstantExp(representation);
   }
 }
 
@@ -1630,7 +1630,7 @@ ConstantExp floatConstantExp():
 { LocatedString representation; }
 {
   representation=floatingLiteral()
-  { return ConstantExp.makeFloating(representation); }
+  { return bossa.syntax.dispatch.createFloatConstantExp(representation); }
 }
 
 ConstantExp charConstantExp():
@@ -2081,7 +2081,7 @@ Expression RangeExpression() :
     if (t != null)
       {
         if (e1 == null)
-          e1 = ConstantExp.makeNumber(new LocatedString("0", makeLocation(t)));
+          e1 = bossa.syntax.dispatch.createIntegerConstantExp(new LocatedString("0", makeLocation(t)));
 
 	if (e2 == null)
 	  e2 = bossa.syntax.dispatch.createNullExp(makeLocation(t));
@@ -2152,10 +2152,10 @@ Expression UnaryExpression() :
     { res=bossa.syntax.dispatch.createCallExp(symb(t),res); }
   |
     ( t="+" | t="-" ) res=PrimaryExpression() 
-    { if (res instanceof ConstantExp && ((ConstantExp)res).isNumber())
+    { if (res instanceof NumberConstantExp)
       {
         if (t.kind == MINUS)
-          res=((ConstantExp)res).makeNegative();
+          res = ((NumberConstantExp)res).makeNegative();
       } 
       else
 	res=bossa.syntax.dispatch.createCallExp(symb(t),res);

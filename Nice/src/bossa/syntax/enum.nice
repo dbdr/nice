@@ -177,8 +177,7 @@ EnumSymbol createEnumSymbol(EnumDefinition def, LocatedString enumName,
   List<Arguments.Argument> args = new ArrayList(2 + fields.size());
   args.add(new Arguments.Argument(createStringConstantExp(name.toString()),
 		new LocatedString("name",name.location)));
-  args.add(new Arguments.Argument(new ConstantExp(nice.tools.typing.PrimitiveType.intTC, ordinal,
-		ordinal.toString(), name.location()),
+  args.add(new Arguments.Argument(createIntConstantExp(ordinal, notNull(name.location())),
 		new LocatedString("ordinal", name.location)));
   for (int i = 0; i < fields.size(); i++)
     args.add(new Arguments.Argument(argExps[i], fields[i].getName()));

@@ -315,30 +315,14 @@ public abstract class Type {
   /** Return true if this is a "subtype" of other. */
   public boolean isSubtype (Type other)
   {
-    Class thisClass = getReflectClass();
-    Class otherClass = other.getReflectClass();
-    if (thisClass != null && otherClass != null)
-      return otherClass.isAssignableFrom(thisClass);
-    if (other == Type.pointer_type && this instanceof ObjectType)
-      return true;
-
-    if (this instanceof ClassType && other instanceof ClassType)
-      {
-	ClassType me = (ClassType) this;
-	ClassType he = (ClassType) other;
-	
-	if(he.isInterface())
-	  return me.implementsInterface(he);
-	else
-	  return me.isSubclass(he);
-      }
-    
-    return false;
-    /*
     int comp = compare(other);
     return comp == -1 || comp == 0;
-    */
   }
+
+  /** @return true if values of this type can be assigned to other
+      <b>without widening nor conversion</b>.
+  */
+  public abstract boolean isAssignableTo(Type other);
 
   /**
    * Computes the common supertype
@@ -445,8 +429,15 @@ public abstract class Type {
       to toType. */
   public void emitCoerceTo (Type toType, CodeAttr code)
   {
-    // default implementation
+    // Default implementation.
     emitCoerceToObject(code);
+  }
+
+  /** Compile code to convert an object (on the stack) of that Type 
+      to this Type. */
+  public void emitCoerceFrom (Type fromType, CodeAttr code)
+  {
+    // Default implementation: do nothing.
   }
 
   /** Compile code to coerce/convert from Object to this type. */

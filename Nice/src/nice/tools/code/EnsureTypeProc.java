@@ -34,8 +34,7 @@ implements Inlineable
   {
     Type type = exp.getType();
     
-    if (type instanceof ArrayType && ! (type instanceof SpecialArray)
-	|| !type.isSubtype(expectedType))
+    if (! type.isAssignableTo(expectedType))
       return Inline.inline(new EnsureTypeProc(expectedType), exp);
     else
       return exp;

@@ -44,14 +44,15 @@ public class StackTarget extends Target
 	return true;
       }
 
-    // NICE
-    if (stackType.isSubtype(type))
-      return true;
-
     stackType.emitCoerceTo(type, code);
+    type.emitCoerceFrom(code.topType(), code);
     
-    // checks if emitCoerceToObject did a good job
-    return code.topType().isSubtype(type);
+    // Checks if the coercions worked.
+    // We call getImplementationType because we are only interested
+    // in knowning if we can avoid a cast; conversions should have
+    // been performed above.
+    return code.topType().getImplementationType().isAssignableTo
+      (type.getImplementationType());
   }
 
   public static void convert(Compilation comp, Type stackType, Type targetType)

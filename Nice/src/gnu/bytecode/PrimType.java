@@ -285,4 +285,14 @@ public class PrimType extends Type {
       return -1;
     return -2;
   }
+
+  /** @return true if values of this type can be assigned to other
+      <b>without widening nor conversion</b>.
+  */
+  public boolean isAssignableTo(Type other)
+  {
+    // All types of size < 4 are assignable to int.
+    // Others are only assignable to themselves.
+    return this.promote() == other.promote();
+  }
 }

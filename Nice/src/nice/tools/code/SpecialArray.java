@@ -105,25 +105,77 @@ public final class SpecialArray extends gnu.bytecode.ArrayType
       return getSignature(); 
   }
 
+  /****************************************************************
+   * Conversions
+   ****************************************************************/
+
+  public void emitCoerceFrom (Type fromType, CodeAttr code)
+  {
+    if (fromType instanceof ArrayType)
+      {
+	// Any array can fit in the unknownTypeArray.
+	if (unknown)
+	  return;
+
+	ArrayType from = (ArrayType) fromType;
+
+	// Do nothing either if both arrays are the same.
+	if (elements.getSignature().equals(from.elements.getSignature()))
+	  return;
+	
+	code.emitCheckcast(this);
+      }
+    else if (isCollectionArray(fromType))
+      emitCoerceFromCollection(code);
+    else
+      // The only possibility left is that the value is some kind of array.
+      emitCoerceFromArray(code);
+  }
+
+  /** @return true if the given type is one of the types an array can have
+      when considered as a collection. 
+  */
+  private boolean isCollectionArray(Type t)
+  {
+    /* We list explicitely the type between Collection and Array.
+       If the hierarchy was changed, this code should be modified.
+       An alternative is to use 
+       <code>t.isSubType(ClassType.make("nice.lang.Collection")) &&
+             wrappedType.isSubType(t)
+       </code>.
+       However it would only work if we ensured that the class hierarchy
+       at the gnu.bytecode level is correctly set up before any call 
+       to this code. (Additionally it is less efficient)
+    */
+    String name = t.getName();
+    return 
+      "nice.lang.Collection".equals(name) || 
+      "nice.lang.Sequence".equals(name);
+  }
+
   public void emitCoerceFromObject (CodeAttr code)
   {
-    Label cast = new Label(code), end = new Label(code), isArray = new Label(code);
+    bossa.util.Internal.warning
+      ("SpecialArray.coerceFrom should probably be called instead of this");
+    emitCoerceFromArray(code);
+  }
 
-    // first we get the field if the array is wrapped
-    code.emitDup();
-    code.emitInstanceof(wrappedType);
-    code.emitGotoIfIntEqZero(isArray);
-
+  private void emitCoerceFromCollection (CodeAttr code)
+  {
     code.emitCheckcast(wrappedType);
     code.emitGetField(field);
-    
-    // now we have some kind of array
-    isArray.define(code);
 
-    // if this array type is the unknown, we just had to do the unwrapping
+    emitCoerceFromArray(code);
+  }
+
+  private void emitCoerceFromArray (CodeAttr code)
+  {
+    // If this array type is the unknown, we have nothing to do.
     if (unknown)
       return;
     
+    Label cast = new Label(code), end = new Label(code);
+
     code.emitDup();
     code.emitInstanceof(this);
     code.emitGotoIfIntNeZero(cast);
@@ -132,7 +184,7 @@ public final class SpecialArray extends gnu.bytecode.ArrayType
 
     // For non primitive arrays, we pass a string that represents
     // the type of the elements, so that the correct array type
-    // can be created
+    // can be created.
     if (!primitive)
       code.emitPushString
 	(((ObjectType) elements).getInternalName().replace('/', '.'));
@@ -147,20 +199,11 @@ public final class SpecialArray extends gnu.bytecode.ArrayType
     end.define(code);
   }
 
-  // not called for the moment
-  public void emitCoerceFrom (Type fromType, CodeAttr code)
-  {
-    if (fromType instanceof ArrayType)
-      code.emitCheckcast(this);
-    else
-      emitCoerceFromObject(code);
-  }
-
   public void emitCoerceTo (Type toType, CodeAttr code)
   {
     if (toType instanceof ArrayType)
       coerce(code, this, (ArrayType) toType);
-    else if(toType != Type.pointer_type)
+    else if (toType != Type.pointer_type)
       emitCoerceToObject(code);
   }
   
@@ -171,6 +214,10 @@ public final class SpecialArray extends gnu.bytecode.ArrayType
 
   private static void coerce (CodeAttr code, ArrayType from, ArrayType to)
   {
+    // Any array can fit in the unknownTypeArray
+    if (to == unknownTypeArray)
+      return;
+
     Type elements = to.getComponentType();
     if (elements instanceof PrimType)
       {
@@ -196,11 +243,32 @@ public final class SpecialArray extends gnu.bytecode.ArrayType
       }
   }
 
+  /****************************************************************
+   * Typing
+   ****************************************************************/
+
+  public Type getImplementationType()
+  {
+    if (unknown)
+      return Type.pointer_type;
+    else
+      return this;
+  }
+
   public boolean isSubtype (Type other)
   {
     return other instanceof ArrayType &&
     (other == unknownTypeArray ||
      elements.isSubtype(((ArrayType) other).getComponentType()));
+  }
+  
+  public boolean isAssignableTo (Type other)
+  {
+    return
+      other == Type.pointer_type || 
+      other instanceof ArrayType &&
+      (other == unknownTypeArray ||
+       elements.isAssignableTo(((ArrayType) other).getComponentType()));
   }
   
   /****************************************************************

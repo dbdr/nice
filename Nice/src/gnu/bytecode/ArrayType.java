@@ -69,4 +69,19 @@ public class ArrayType extends ObjectType
     else
       return -3;
   }
+
+  /** @return true if values of this type can be assigned to other
+      <b>without widening nor conversion</b>.
+  */
+  public boolean isAssignableTo(Type other)
+  {
+    if (other == pointer_type || this == other)
+      return true;
+
+    if (! (other instanceof ArrayType))
+      return false;
+
+    ArrayType o = (ArrayType) other;
+    return elements.getSignature().equals(o.elements.getSignature());
+  }
 }

@@ -92,6 +92,12 @@ public class ObjectType extends Type
     return other == nullType ? 0 : -1;
   }
 
+  public boolean isAssignableTo(Type other)
+  {
+    // Assume this == nullType.
+    return other instanceof ObjectType;
+  }
+
   /** Convert an object to a value of this Type.
    * Throw a ClassCastException when this is not possible. */
   public Object coerceFromObject (Object obj)

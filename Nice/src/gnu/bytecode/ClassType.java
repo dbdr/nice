@@ -897,10 +897,14 @@ public class ClassType extends ObjectType implements AttrContainer {
 
   public int compare(Type other)
   {
-    if (other == nullType)
-      return 1;
+    if (this == other)
+      return 0;
     if (other instanceof PrimType)
       return swappedCompareResult(((PrimType) other).compare(this));
+    if (other == pointer_type)
+      return -1;
+    if (this == pointer_type || other == nullType)
+      return 1;
     if (other instanceof ArrayType)
       return swappedCompareResult(((ArrayType) other).compare(this));
     if (! (other instanceof ClassType))
@@ -934,6 +938,17 @@ public class ClassType extends ObjectType implements AttrContainer {
     if (this.isInterface() || cother.isInterface())
       return -2;
     return -3;
+  }
+
+  /** @return true if values of this type can be assigned to other
+      <b>without widening nor conversion</b>.
+  */
+  public boolean isAssignableTo(Type other)
+  {
+    if (! (other instanceof ClassType))
+      return false;
+
+    return other.compare(this) >= 0;
   }
 
   public String toString()

@@ -1,4 +1,14 @@
 Nice-*-windows.zip
 Nice-*.tar
+*.tar.gz
+
+# Debian
+*.dsc
+*.deb
+*.diff.gz
+*.changes
+
+# Temp directories
 tmp
 tmp-deb
+nice-*

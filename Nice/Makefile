@@ -31,17 +31,21 @@ TARFILE = Nice-`date +"%Y.%m.%d"`.tar
 CVSBUILDDIR = /tmp/cvs-build
 
 
-all: clean bootstrap compiler1 share/java/nice.jar compiler2 archive
+all: complete
+
+stable:   clean bootstrap compiler1 archive
+complete: stable   compiler2 archive2
+fixpoint: complete compiler3 archive3
 
 compiler1: setDate
 	${NICEC}  bossa.syntax
 	${NICEC}  -R -a src/nice/tools/compiler.jar nice.tools.compiler
 
-compiler2: setDate
+compiler2 compiler3: setDate
 	${NICEC1} -R bossa.syntax
 	${NICEC1} -R -a src/nice/tools/compiler.jar nice.tools.compiler
 
-share/java/nice.jar archive: src/nice/tools/compiler.jar
+archive archive2 archive3 share/java/nice.jar: src/nice/tools/compiler.jar
 	mkdir -p share/java
 	cp src/nice/tools/compiler.jar share/java/nice.jar
 	jar umf src/mainClass share/java/nice.jar -C classes nice -C classes mlsub -C classes bossa -C classes gnu

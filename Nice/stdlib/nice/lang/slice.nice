@@ -57,18 +57,22 @@ public class Slice<T | T <: int, int <: T> {
     }
 }
 
-public OpenRange<int> `..`(int begin, ?int end) 
+public OpenRange<int> `..`(int begin, ?int end)
   requires end == null || end >= 0,
-           begin >= 0  
+           begin >= 0;
+
+`..`(int begin, null)
 {
   let beginIndex = new Index(index: begin, relativeToEnd: false);
-  let endIndex = end == null ? 
-                          new Index(index: 0, relativeToEnd: true)
-                         :new Index(index: end, relativeToEnd: false);
-  if (end == null)
-    return new OpenRange(begin: beginIndex, end: endIndex);
-  else
-    return new Range(begin: beginIndex, end: endIndex);
+  let endIndex = new Index(index: 0, relativeToEnd: true);
+  return new OpenRange(begin: beginIndex, end: endIndex);
+}
+
+public override Range<int> `..`(int begin, int end)
+{
+  let beginIndex = new Index(index: begin, relativeToEnd: false);
+  let endIndex = new Index(index: end, relativeToEnd: false);
+  return new Range(begin: beginIndex, end: endIndex);
 }
 
 public Slice<int> `..` (int begin, Index end)

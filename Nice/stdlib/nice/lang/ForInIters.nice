@@ -27,6 +27,9 @@ Iterator<char> forIterator(StringBuffer sb) = new StringBufferForIterator(strb: 
 
 Iterator<int> forIterator(OpenRange<int> range) = range.openIterator();
 
+// Resolve the ambiguity for Ranges
+override Iterator<int> forIterator(Range<int> range) = range.openIterator();
+
 //The implementations of additional Iterators
 /*
 private class ArrayForIterator<E> implements Iterator<E> {

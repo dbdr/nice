@@ -1,0 +1,3 @@
+/// PASS
+  List<int> l = 0..10;
+  assert l[0] == 0 && l[10] == 10;

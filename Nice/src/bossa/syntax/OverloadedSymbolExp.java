@@ -184,7 +184,8 @@ public class OverloadedSymbolExp extends Expression
 	      return uniqueExpression();
 	    }
       }
-    
+
+    releaseAllClonedTypes();
     throw new AmbiguityError();
   }
 
@@ -224,9 +225,19 @@ public class OverloadedSymbolExp extends Expression
       User.error(this, 
 		 "No alternative has expected type "+expectedType);
     
+    releaseAllClonedTypes();
     throw new AmbiguityError();
   }
-  
+
+  private void releaseAllClonedTypes()
+  {
+    for(Iterator i = symbols.iterator(); i.hasNext();)
+      {
+	VarSymbol s = (VarSymbol) i.next();
+	s.releaseClonedType();
+      }
+  }
+
   Expression noOverloading()
   {
     if(Debug.overloading) 

@@ -1,0 +1,120 @@
+/// PASS
+  ?int x = null;
+  if (x != null)
+    x++;
+
+
+/// PASS
+  ?int x = null;
+  if (x == null)
+    ;
+  else
+    x++;
+
+
+/// PASS
+  ?int x = null;
+  if (x == null)
+    return;
+  x++;
+
+
+/// PASS
+  ?int x = null;
+  if (x != null)
+    ;
+  else
+    return;
+  x++;
+
+
+/// PASS
+  ?int x = 0;
+  if (true)
+    if (x != null)
+      x++;
+    else
+      return;
+  else
+    return;
+  x++;
+
+
+/// FAIL
+  ?int x = null;
+  if (false)
+    if (x == null)
+      return;
+  x++;
+  
+
+/// FAIL
+  ?int x = null;
+  if (false)
+    if (x != null)
+      ;
+    else
+      return;
+  x++;
+
+
+// Assigning a null value
+
+/// PASS
+  ?int x = 0;
+  x = null;
+
+
+/// PASS
+  ?int x = 0;
+  if (x != null)
+    x = null;
+
+
+/// FAIL
+  ?int x = 0;
+  if (x != null)
+    {
+      x = null;
+      x++;
+    }
+
+
+/// PASS
+  ?int x = 0;
+  if (x != null)
+    if (false)
+      x = null;
+    else
+      x++;
+
+
+/// FAIL
+  ?int x = 0;
+  if (x != null)
+    {
+      if (false)
+        x = null;
+      x++;
+    }
+
+
+/// FAIL
+  ?String x = null;
+  ?String y = null;
+  if (y != null)
+    if (x != null)
+      x = x + "";
+  y = y + "";
+
+
+/// PASS
+  ?int x = null;
+  while (x != null)
+    x++;
+
+
+/// FAIL
+  ?int x = null;
+  while (x == null)
+    x++;

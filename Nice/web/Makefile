@@ -34,6 +34,11 @@ manual.html: manual.xsl manual.xml
 manual.pdf manual.ps: manual.xml
 	xmlto $(shell expr match $@ 'manual\.\(.*\)') manual.xml
 
+manual.pdf: manual.xml
+	xsltproc --stringparam fop.extensions 1 -o manual.fo /usr/share/sgml/docbook/stylesheet/xsl/nwalsh/fo/docbook.xsl manual.xml
+	fop manual.fo -pdf manual.pdf
+	rm manual.fo
+
 %.html: %.xml new.xsl
 	if ! $(PROC) new.xsl $*.xml > $@; then rm $@; fi
 

@@ -238,37 +238,69 @@ public class Package implements mlsub.compilation.Module, Located
 
   private boolean scoped = false;
 
+  static nice.tools.util.Chronometer scopeChrono = nice.tools.util.Chronometer.make("Scope");
+  static nice.tools.util.Chronometer resolveChrono = nice.tools.util.Chronometer.make("Resolve");
+  static nice.tools.util.Chronometer readAltChrono = nice.tools.util.Chronometer.make("Read alternatives");
+  static nice.tools.util.Chronometer tresolveChrono = nice.tools.util.Chronometer.make("Typed resolve");
+  static nice.tools.util.Chronometer lresolveChrono = nice.tools.util.Chronometer.make("Local resolve");
+  static nice.tools.util.Chronometer typecheckChrono = nice.tools.util.Chronometer.make("Typecheck");
+
   public void scope()
   {
     if (scoped) return;
     scoped = true;
 
-    ast.buildScope();
+    scopeChrono.start();
+    try {
+      ast.buildScope();
+    } finally {
+      scopeChrono.stop();
+    }
 
     addProgress(PROGRESS_SCOPE);
   }
   
   public void load()
   {
-    ast.resolveScoping();
+    resolveChrono.start();
+    try {
+      ast.resolveScoping();
+    } finally {
+      resolveChrono.stop();
+    }
 
-    // this must be done before freezing
-    if (!compiling())
-      readAlternatives();
+    readAltChrono.start();
+    try {
+      // this must be done before freezing
+      if (!compiling())
+        readAlternatives();
+    } finally {
+      readAltChrono.stop();
+    }
 
     addProgress(PROGRESS_LOAD);
   }
 
   public void typedResolve()
   {
-    ast.typedResolve();
+    tresolveChrono.start();
+    try {
+      ast.typedResolve();
+    } finally {
+      tresolveChrono.stop();
+    }
 
     addProgress(PROGRESS_TYPED_RESOLVE);
   }
 
   public void localResolve()
   {
-    ast.localResolve();
+    tresolveChrono.start();
+    try {
+      ast.localResolve();
+    } finally {
+      tresolveChrono.stop();
+    }
 
     addProgress(PROGRESS_LOCAL_RESOLVE);
   }
@@ -331,8 +363,13 @@ public class Package implements mlsub.compilation.Module, Located
     // this pass.
     if (compiling())
       compilation.progress(this, "typechecking");
-    
-    ast.typechecking(compiling());
+
+    typecheckChrono.start();
+    try {
+      ast.typechecking(compiling());
+    } finally {
+      typecheckChrono.stop();
+    }
 
     addProgress(PROGRESS_TYPECHECK);
   }

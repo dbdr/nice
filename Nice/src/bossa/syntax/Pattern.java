@@ -14,6 +14,7 @@ package bossa.syntax;
 
 import java.util.*;
 import bossa.util.*;
+import mlsub.typing.*;
 import mlsub.typing.TypeConstructor;
 import mlsub.typing.Monotype;
 import mlsub.typing.MonotypeConstructor;
@@ -122,7 +123,15 @@ public class Pattern implements Located
   {
     if (typeConstructor != null)
       {
-	tc = typeConstructor.resolveToTCForPattern(scope);
+        mlsub.typing.TypeSymbol sym = 
+          typeConstructor.resolveToTypeSymbol(scope);
+
+        if (sym instanceof TypeConstructor)
+          tc = (TypeConstructor) sym;
+        else
+          throw User.error(this, typeConstructor + 
+                           " is not a declared class or interface");
+
         if (exactlyAt && !TypeConstructors.instantiable(tc))
           User.error
 	    (typeConstructor.location(), 
@@ -741,7 +750,7 @@ public class Pattern implements Located
       return new Pattern(ConstantExp.makeBoolean(name.equals("true"),
 		Location.nowhere()));
 
-    mlsub.typing.TypeSymbol sym = Node.getGlobalTypeScope().lookup(name);
+    TypeSymbol sym = Node.getGlobalTypeScope().lookup(name);
 
     if (sym == null)
       User.error("Pattern " + name + " of method " + methodName + 

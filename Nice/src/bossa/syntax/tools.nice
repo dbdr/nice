@@ -113,15 +113,19 @@ bossa.util.UserError ensureLocated(bossa.util.UserError e,
     return null;
 
   TypeConstantExp type = cast(arg2);
-  if (type.representedType == null)
+  if (type.getTC() == null)
     return null;
 
-  TypeConstructor tc = notNull(type.representedType);
+  TypeConstructor tc = notNull(type.getTC());
+
+  if (tc == PrimitiveType.arrayTC)
+    return (sym, notNull(type.representedType));
+
   mlsub.typing.Monotype[?] parameters;
 
   if (tc.arity() == 0)
     parameters = null;
-  else 
+  else
     {
       let originalType = nice.tools.typing.Types.rawType(sym.getMonotype());
       if (originalType instanceof mlsub.typing.MonotypeConstructor)
@@ -172,5 +176,5 @@ mlsub.typing.Monotype boolType() = native PrimitiveType.boolType;
 mlsub.typing.Monotype longType() = native PrimitiveType.longType;
 
 // Local Variables:
-// nice-xprogram: "nicec -d \"$HOME/Nice/classes\" --sourcepath=\"$HOME/Nice/src\" --classpath=\"$HOME/Nice/classes\""
+// nice-xprogram: "../bin/nicec -d ../classes --sourcepath=../src"
 // End:

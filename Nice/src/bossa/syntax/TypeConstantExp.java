@@ -12,6 +12,11 @@
 
 package bossa.syntax;
 
+import mlsub.typing.Polytype;
+import mlsub.typing.MonotypeConstructor;
+import mlsub.typing.TypeConstructor;
+import mlsub.typing.MonotypeVar;
+
 /**
    A type used as an expression.
 
@@ -19,18 +24,78 @@ package bossa.syntax;
    @author daniel (bonniot@users.sourceforge.net)
  */
 
-class TypeConstantExp extends ConstantExp
+public class TypeConstantExp extends ConstantExp
 {
-  TypeConstantExp(LocatedString name)
+  public TypeConstantExp(LocatedString name)
   {
-    super(PrimitiveType.typeTC, name, name.toString(), name.location());
+    super(null, null, name, name.toString(), name.location());
   }
 
-  private TypeConstantExp(LocatedString name, gnu.bytecode.Type type)
+  gnu.bytecode.ClassType staticClass()
   {
-    this(name);
-    this.value = type;
+    // If this is a '<name>.class' expression, do not consider it as a
+    // qualified prefix.
+    if (isExpression)
+      return null;
+
+    return (gnu.bytecode.ClassType) value;
   }
+
+  void setRepresentedType(Polytype type, gnu.bytecode.Type bytecodeType)
+  {
+    this.value = bytecodeType;
+
+    this.representedType = type.getMonotype();
+
+    this.type = new Polytype
+      (type.getConstraint(),
+       Monotype.sure
+       (new MonotypeConstructor
+        (PrimitiveType.classTC,
+         new mlsub.typing.Monotype[]{ type.getMonotype() })));
+  }
+
+  protected gnu.expr.Expression compile()
+  {
+    if (isLiteral)
+      return super.compile();
+
+    gnu.bytecode.Type type = (gnu.bytecode.Type) value;
+    String representation = type instanceof gnu.bytecode.ArrayType ?
+      type.getSignature().replace('/', '.') :
+      type.getName();
+
+    return new gnu.expr.ApplyExp
+      (forName,
+       new gnu.expr.Expression[]{
+         new gnu.expr.QuoteExp(representation)});
+  }
+
+  static final gnu.bytecode.Method forName =
+    gnu.bytecode.ClassType.make("java.lang.Class").getDeclaredMethod("forName", 1);
+
+  TypeConstructor getTC()
+  {
+    return nice.tools.typing.Types.rawType(representedType).head();
+  }
+
+  mlsub.typing.Monotype representedType;
+
+  public boolean isExpression = false;
+  public boolean isLiteral = false;
+
+  static Polytype universalPolytype(TypeConstructor tc, boolean sure)
+  {
+    MonotypeVar[] vars = MonotypeVar.news(tc.arity());
+    mlsub.typing.Monotype type = new MonotypeConstructor(tc, vars);
+    return new Polytype
+      (vars == null ? null : new mlsub.typing.Constraint(vars, null),
+       sure ? Monotype.sure(type) : Monotype.maybe(type));
+  }
+
+  /****************************************************************
+   * Type literals
+   ****************************************************************/
 
   /**
      @return an Expression representing ident as a type or package literal.
@@ -39,7 +104,7 @@ class TypeConstantExp extends ConstantExp
   {
     return create(null, ident);
   }
-  
+
   /**
      @return an Expression representing [root].[name]
   */
@@ -48,18 +113,20 @@ class TypeConstantExp extends ConstantExp
     String fullName = name.toString();
     if (root != null)
       fullName = root.name.append(".").append(fullName).toString();
-    
-    mlsub.typing.TypeConstructor tc = 
+
+    TypeConstructor tc =
       Node.getGlobalTypeScope().globalLookup(fullName, name.location());
 
     if(tc != null)
       {
 	gnu.bytecode.Type type = nice.tools.code.Types.javaType(tc);
+
 	// type might not be a class
 	// for instance if the ident was "int"
 	if (type instanceof gnu.bytecode.ClassType)
 	  {
-	    Expression res = new TypeConstantExp(name, type);
+	    TypeConstantExp res = new TypeConstantExp(name);
+            res.setRepresentedType(universalPolytype(tc, true), type);
 	    res.setLocation(root == null ? name.location() : root.location());
 	    return res;
 	  }
@@ -73,11 +140,4 @@ class TypeConstantExp extends ConstantExp
     root.setLocation(name.location());
     return root;
   }
-  
-  gnu.bytecode.ClassType staticClass()
-  {
-    return (gnu.bytecode.ClassType) value;
-  }
-  
-  mlsub.typing.TypeConstructor representedType;
 }

@@ -355,3 +355,17 @@ void f() {
   String /*/// FAIL HERE*/ s = o;
   /// Toplevel
   Object foo() = "";
+
+/// PASS
+  Object o = new String[3];
+  if (o instanceof String[])
+   {
+     ?String[] s = o;
+   }
+
+/// FAIL
+  Object o = new String[3];
+  if (o instanceof String[])
+   {
+     ?java.io.File[] s = o;
+   }

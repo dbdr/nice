@@ -171,6 +171,8 @@ public final class MonotypeVar extends Monotype
 
   void reset()
   {
+    unknown = false;
+
     if (persistentKind == null)
       {
         setKind(null);
@@ -196,6 +198,17 @@ public final class MonotypeVar extends Monotype
             mlsub.typing.lowlevel.Engine.register(raw);
           }
       }
+  }
+
+  private boolean unknown;
+
+  boolean isUnknown() { return unknown; }
+
+  void setUnknown()
+    throws mlsub.typing.lowlevel.Unsatisfiable
+  {
+    super.setUnknown();
+    this.unknown = true;
   }
 
   /** When this variable is discovered to be of some given kind,

@@ -51,10 +51,8 @@ void _testInstances()
  * No arguments
  ****************************************************************/
 
-public <T> T newInstance(Class) = native Object Class.newInstance();
-
 public <T> T newInstance(String className) =
-  newInstance(Class.forName(className));
+  cast(newInstance(Class.forName(className)));
 
 // Testcases
 

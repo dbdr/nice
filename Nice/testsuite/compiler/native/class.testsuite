@@ -15,3 +15,30 @@
 
 /// FAIL
   Class c = NotExisting.class;
+
+/// FAIL
+  Class<NotExisting> c = NotExisting.class;
+
+/// FAIL
+  Class<String> c = NotExisting.class;
+
+/// FAIL
+  Class<String> c = java.io.File.class;
+
+/// FAIL
+  /// Toplevel
+Class<String> unsafe(Class c) = c;
+
+/// PASS
+  /// Toplevel
+boolean isIntClass(Class c) = c == int.class || int.class == c;
+
+<T> boolean foo(T,T) = false;
+
+boolean classTest(Class c) = foo(c, String.class) || foo(String.class, c);
+
+/// PASS
+  foo(String.class);
+  /// Toplevel
+void foo(Class) {}
+<Number T> void foo(Class<T>) {}

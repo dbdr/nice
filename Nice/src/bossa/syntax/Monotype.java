@@ -217,7 +217,7 @@ implements Located
    * Wrapping a mlsub Monotype in a syntactic monotype
    ****************************************************************/
   
-  static Monotype create(mlsub.typing.Monotype m)
+  public static Monotype create(mlsub.typing.Monotype m)
   {
     return new Wrapper(m);
   }

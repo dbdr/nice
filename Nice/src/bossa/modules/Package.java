@@ -288,6 +288,7 @@ public class Package implements mlsub.compilation.Module, Located, bossa.syntax.
     ClassDefinition.reset();
     TypeConstructors.reset();
     JavaClasses.reset();
+    PrimitiveType.reset();
     gnu.bytecode.Type.reset();
   }
 

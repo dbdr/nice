@@ -74,7 +74,7 @@ double doubleValue(Number) = native double Number.doubleValue();
 class Throwable = native java.lang.Throwable;
 class Type = native;
 
-/* 
+/*
    Allows to consider any nice object as an instance of java.lang.Object
    @deprecated object(...) is not needed any more: any value is an Object.
 */
@@ -107,7 +107,7 @@ boolean `!=`(char, char) = inline nice.lang.inline.CompOp("iNe");
 
 <T> String toString(!T) = native String Object.toString();
 <T> String valueOf(T) = native String String.valueOf(Object);
-<T> Class getClass(!T) = native Class Object.getClass();
+<T> Class<!T> getClass(!T) = native Class Object.getClass();
 
 <T> void wait(!T) = native void Object.wait();
 <T> void wait(!T, long) = native void Object.wait(long);

@@ -15,6 +15,7 @@ package bossa.syntax;
 import bossa.util.*;
 import java.util.*;
 import mlsub.typing.TypeConstructor;
+import mlsub.typing.MonotypeConstructor;
 import mlsub.typing.Interface;
 import mlsub.typing.MonotypeVar;
 import mlsub.typing.TypeSymbol;
@@ -77,7 +78,7 @@ public final class TypeIdent extends Monotype implements Located
   mlsub.typing.Monotype rawResolve(TypeMap scope)
   {
     TypeSymbol res = resolveToTypeSymbol(scope);
-    
+
     if (res instanceof mlsub.typing.Monotype)
       return (mlsub.typing.Monotype) res;
 
@@ -86,10 +87,10 @@ public final class TypeIdent extends Monotype implements Located
 	TypeConstructor tc = (TypeConstructor) res;
 
 	try{
-	  return new mlsub.typing.MonotypeConstructor(tc, null);
+	  return nice.tools.typing.Types.zeroArgMonotype(tc);
 	}
 	catch(mlsub.typing.BadSizeEx e){
-	  throw User.error(this, name + 
+	  throw User.error(this, name +
 			   Util.has(e.expected, "type parameter", e.actual));
 	}
       }

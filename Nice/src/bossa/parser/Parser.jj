@@ -520,11 +520,11 @@ LocatedString integerLiteral():
   { return new LocatedString(t.image, makeLocation(t)); }
 }
 
-ConstantExp typeExpression():
+TypeConstantExp typeExpression():
 { LocatedString name; }
 {
   name = doted_array_string()
-  { return ConstantExp.makeType(name); }
+  { return new TypeConstantExp(name); }
 }
 
 /***********************************************************************/
@@ -775,7 +775,12 @@ Monotype simpleMonotype():
   boolean maybe = false, sure = false;
 }
 {
-  [ "?" { maybe = true; } | "!" { sure = true; } ]
+  [
+    // Consume "?" only if it does not appear by itself
+    LOOKAHEAD( "?", { getToken(2).kind != COMMA && getToken(2).kind != GT})
+    "?" { maybe = true; }
+  | "!" { sure = true; }
+  ]
 
   (
   res=funOrTupleMonotype()
@@ -802,6 +807,9 @@ Monotype simpleMonotype():
       res.nullness = res.sure;
   }
   { return res; }
+|
+  "?"
+  { return Monotype.create(mlsub.typing.UnknownMonotype.instance); }
 }
 
 List monotypes():
@@ -2054,10 +2062,10 @@ Expression EqualityExpression() :
 Expression InstanceOfExpression() :
 { Expression res; }
 {
-  res=RelationalExpression() 
-  [ { Token t; ConstantExp type; } 
-    t="instanceof" type=typeExpression() 
-    { return CallExp.create(symb(t), res, type); }
+  res=RelationalExpression()
+  [ { Token t; TypeConstantExp type; }
+    t="instanceof" type=typeExpression()
+    { type.isLiteral = true; return CallExp.create(symb(t), res, type); }
   ]
   { return res; }
 }
@@ -2212,9 +2220,9 @@ Expression PrimaryPrefix() :
   res=newExp()
 |
   LOOKAHEAD( doted_array_string() "." "class" )
-  { ConstantExp type; Token t; }
+  { TypeConstantExp type; Token t; }
   type=typeExpression() "." t="class"
-  { return CallExp.create(symb(t), type); }
+  { type.isExpression = true; return type; }
 |
   //Name()
   res=identExp()

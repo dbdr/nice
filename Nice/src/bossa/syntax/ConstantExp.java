@@ -279,11 +279,6 @@ public class ConstantExp extends Expression
     res.setLocation(representation.location());
     return res;
   }
-  
-  public static ConstantExp makeType(LocatedString representation)
-  {
-    return new TypeConstantExp(representation);
-  }
 
   /****************************************************************
    * Booleans

@@ -37,10 +37,10 @@
     throw new Error();
 
 /// PASS
-  assert [] instanceof Array;
+  assert [] instanceof Object[];
 
   int[] i = [0];
-  assert i instanceof Array;
+  assert i instanceof int[];
 
-  List<String> l = [""];
-  assert l instanceof Array;
+  Object l = [""];
+  assert l instanceof String[];

@@ -241,13 +241,24 @@ public final class Variance
 
     for(int i=0; i<size; i++)
       switch(signs[i]){
+        // TODO: Consider UnknownMonotype in non-invariant cases
       case COVARIANT:
 	mlsub.typing.lowlevel.Engine.leq(tp1[i],tp2[i]);
 	break;
       case CONTRAVARIANT:
 	mlsub.typing.lowlevel.Engine.leq(tp2[i],tp1[i]);
 	break;
+
       case INVARIANT:
+        if (tp2[i].isUnknown())
+          return;
+
+        if (tp1[i].isUnknown())
+          {
+            tp2[i].setUnknown();
+            return;
+          }
+
 	mlsub.typing.lowlevel.Engine.leq(tp1[i],tp2[i]);
 	mlsub.typing.lowlevel.Engine.leq(tp2[i],tp1[i]);
 	break;

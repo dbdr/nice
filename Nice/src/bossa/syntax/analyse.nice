@@ -612,23 +612,51 @@ analyse(ConstantExp c, info)
   return c;
 }
 
+mlsub.typing.Polytype typeRepresentationToPolytype(String name,
+						   ?bossa.util.Location loc,
+						   Info info,
+						   boolean sure = true)
+{
+  if (name.charAt(0) == '[')
+    {
+      mlsub.typing.Polytype res =
+	typeRepresentationToPolytype(name.substring(1), loc, info, sure: false);
+
+      let type = new mlsub.typing.MonotypeConstructor
+        (PrimitiveType.arrayTC, [res.getMonotype()]);
+
+      return new mlsub.typing.Polytype
+        (res.getConstraint(),
+	 sure ? Monotype.sure(type) : Monotype.maybe(type));
+    }
+
+  ?TypeConstructor tc = Node.getGlobalTypeScope().globalLookup(name, loc);
+
+  if (tc == null)
+    {
+      if (name.equals("Object") || name.equals("java.lang.Object"))
+	return PrimitiveType.objectPolytype();
+
+      if (info.typeVars[name] instanceof MonotypeVar)
+        throw new bossa.util.UserError(loc, "A type variable cannot be used here");
+      else
+        throw new bossa.util.UserError(loc, "Class "name" is not declared");
+    }
+
+  return TypeConstantExp.universalPolytype(tc, sure);
+}
+
 analyse(TypeConstantExp e, info)
 {
   LocatedString name = cast(e.value);
-  
-  ?gnu.bytecode.Type type = nice.tools.code.Types.typeRepresentationToBytecode
-    (name.toString(), name.location());
-  
-  if (type == null)
-    {
-      if (info.lookupType(name) instanceof MonotypeVar)
-        throw new bossa.util.UserError(name, "A type variable cannot be used here");
-      else
-        throw new bossa.util.UserError(name, "Class " + name + " is not declared");
-    }
-  e.value = type;
-  e.representedType = bossa.syntax.Node.getGlobalTypeScope().
-    globalLookup(name.toString(), name.location());
+
+  mlsub.typing.Polytype type = typeRepresentationToPolytype(name.toString(), name.location(), info);
+
+  ?gnu.bytecode.Type bytecodeType =
+     nice.tools.code.Types.typeRepresentationToBytecode
+       (name.toString(), name.location());
+
+  e.setRepresentedType(type, bytecodeType);
 
   return e;
 }
@@ -891,5 +919,5 @@ bossa.util.UserError error(?bossa.util.Located responsible, String message) =
      (bossa.util.Located, String);
 
 // Local Variables:
-// nice-xprogram: "nicec -d \"$HOME/Nice/classes\" --sourcepath=\"$HOME/Nice/src\" --classpath=\"$HOME/Nice/classes\""
+// nice-xprogram: "../bin/nicec -d ../classes --sourcepath=../src"
 // End:

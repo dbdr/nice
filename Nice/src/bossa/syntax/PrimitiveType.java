@@ -153,10 +153,9 @@ public class PrimitiveType extends ClassDefinition.ClassImplementation
 	// to differ with the null result, which signals error
 	return gnu.bytecode.Type.pointer_type;
       }
-    
+
     if (name.equals("nice.lang.Type"))
       {
-	typeTC = tc;
 	// to differ with the null result, which signals error
 	return gnu.bytecode.Type.pointer_type;
       }
@@ -181,12 +180,14 @@ public class PrimitiveType extends ClassDefinition.ClassImplementation
     return objectPolytype;
   }
 
+  public static void reset() { objectPolytype = null; }
+
   public static TypeConstructor maybeTC, sureTC, nullTC;
 
   // syntatic types
   public static Monotype synVoidType;
 
-  static TypeConstructor typeTC;
+  public static TypeConstructor classTC;
   static TypeConstructor collectionTC;
   static TypeConstructor throwableTC;
 

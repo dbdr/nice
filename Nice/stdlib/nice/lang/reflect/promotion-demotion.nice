@@ -1,0 +1,105 @@
+/**************************************************************************/
+/*                                N I C E                                 */
+/*             A high-level object-oriented research language             */
+/*                        (c) Daniel Bonniot 2004                         */
+/*                                                                        */
+/*  This program is free software; you can redistribute it and/or modify  */
+/*  it under the terms of the GNU General Public License as published by  */
+/*  the Free Software Foundation; either version 2 of the License, or     */
+/*  (at your option) any later version.                                   */
+/*                                                                        */
+/**************************************************************************/
+
+package nice.lang.reflect;
+
+/**
+   @param source an object of type T
+   @param target the Class of type U, a supertype of T
+   @return a new instance of class U, keeping all relevant fields
+           from object <code>source</code>
+*/
+public
+<T, U | T <: U>
+U demote(T source, Class<U> target)
+{
+  // Create the new object
+  U res = target.newInstance();
+
+  for (field : target.getFields())
+    println(""field[res]" => "field[source]);
+
+  // Initialize all fields of the new object by copy from the source
+  for (field : target.getFields())
+    field[res] = field[source];
+
+  return res;
+}
+
+/**
+   @param source an object of non-null type T
+   @param target the Class of type U, a subtype of T
+   @return a new instance of class U, keeping all fields
+           from object <code>source</code>
+*/
+public
+<!T, U | U <: T>
+U promote(T source, Class<U> target)
+{
+  Class<T> sourceClass = source.getClass();
+
+  U res = target.newInstance();
+
+  for (field : target.getFields())
+    {
+      // Only copy fields that exist in the source class
+      if (field.getDeclaringClass().isAssignableFrom(sourceClass))
+	field[res] = field[source];
+    }
+
+  return res;
+}
+
+// Unit tests
+
+class _Dog
+{
+  String name = "";
+}
+
+class _Dalmatian extends _Dog
+{
+  boolean spotted = false;
+}
+
+class _Chihuahua extends _Dog
+{
+  boolean dancing = false;
+}
+
+void _testDemote()
+{
+  _Dalmatian dalmatian = new _Dalmatian(name: "Dalmatian", spotted: true);
+  _Dog dog = dalmatian.demote(nice.lang.reflect._Dog);
+  assert dog.getClass() == nice.lang.reflect._Dog;
+  assert dog.name.equals("Dalmatian");
+
+  Object o = dog.demote(Object.class);
+
+  // Error detected at compile time:
+  //String s = dog.demote(java.lang.String);
+}
+
+void _testPromote()
+{
+  _Dog dog = new _Dog(name: "Simple dog");
+  _Dalmatian dalmatian = dog.promote(nice.lang.reflect._Dalmatian);
+  assert dalmatian.getClass() == nice.lang.reflect._Dalmatian;
+  assert dalmatian.name.equals("Simple dog");
+  assert ! dalmatian.spotted;
+
+  _Chihuahua chihuahua = new _Chihuahua(name: "Chichi", dancing: true);
+  dalmatian = chihuahua.promote(nice.lang.reflect._Dalmatian);
+  assert dalmatian.getClass() == nice.lang.reflect._Dalmatian;
+  assert dalmatian.name.equals("Chichi");
+  assert ! dalmatian.spotted;
+}

@@ -512,15 +512,17 @@ public final class Types
 	throw new NotIntroducedClassException(tc);
       }
 
-    if (tc.variance != null && tc.arity() != 0)
-      throw new ParametricClassException(tc.toString());
-
     if (tc.getId() == -1)
       throw new NotIntroducedClassException(tc);
-	
-    return new MonotypeConstructor(tc, null);
+
+    try {
+      return nice.tools.typing.Types.zeroArgMonotype(tc);
+    }
+    catch (BadSizeEx ex) {
+      throw new ParametricClassException(tc.toString());
+    }
   }
-  
+
   /****************************************************************
    * Converting string to gnu.bytecode.Type
    ****************************************************************/
@@ -556,12 +558,12 @@ public final class Types
     
     return TypeImport.lookup(s, loc);
   }
-  
+
   /**
-     The type is not necessarily fully qulified. 
+     The type is not necessarily fully qualified.
   */
-  public static final 
-  gnu.bytecode.Type typeRepresentationToBytecode(String type, 
+  public static final
+  gnu.bytecode.Type typeRepresentationToBytecode(String type,
 						 bossa.util.Location loc)
   {
     if(type.charAt(0)=='[')
@@ -572,7 +574,10 @@ public final class Types
 	else
           return SpecialArray.create(res);
       }
-    
+
+    if (type.equals("Object") || type.equals("java.lang.Object"))
+      return Type.pointer_type;
+
     TypeConstructor sym = bossa.syntax.Node.getGlobalTypeScope().
       globalLookup(type, loc);
 

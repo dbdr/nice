@@ -113,7 +113,7 @@ void typecheckAndArgs(Arguments args)
       return;
     }
 
-  enterIf();
+  enterBlock();
   try {
     typecheck(args.getExp(0));
 
@@ -155,7 +155,7 @@ void typecheckOrArgs(Arguments args)
       return;
     }
 
-  enterIf();
+  enterBlock();
   try {
     typecheck(args.getExp(0));
 
@@ -396,7 +396,9 @@ var int ifLevel = 0;
 var Stack<int> levels = new Stack();
 var Stack<(MonoSymbol, mlsub.typing.Monotype)> conditionalTypes = new Stack();
 
-void enterIf() { ifLevel++; }
+void enterBlock() { ifLevel++; }
+
+void exitBlock () { enterElse(); exitIf(); }
 
 void enterElse()
 {
@@ -505,7 +507,7 @@ typecheck(IfExp e)
   checkBooleanCondition(condition);
   e.condition = condition;
 
-  enterIf();
+  enterBlock();
 
   try{
     ?List<MonoSymbol> notNullInThen, notNullInElse;
@@ -716,15 +718,22 @@ typecheck(null(Statement)) {}
 
 typecheck(Block b)
 {
-  b.statements = rewrite(b.statements);
+  enterBlock();
 
-  b.locals.foreach(?Block.LocalDeclaration d => typecheck(d));
-  b.statements.foreach
-  (?Statement s => {
-    try { typecheck(s); } 
-    catch (bossa.util.UserError ex) 
-    { throw ensureLocated(ex, notNull(s)); }
-  });
+  try {
+    b.statements = rewrite(b.statements);
+
+    b.locals.foreach(?Block.LocalDeclaration d => typecheck(d));
+    b.statements.foreach
+    (?Statement s => {
+      try { typecheck(s); }
+      catch (bossa.util.UserError ex)
+      { throw ensureLocated(ex, notNull(s)); }
+    });
+  }
+  finally {
+    exitBlock();
+  }
 }
 
 typecheck(Block.LocalVariable decl)
@@ -815,7 +824,7 @@ typecheck(LoopStmt l)
       checkBooleanCondition(whileExp);
     }
 
-  enterIf();
+  enterBlock();
 
   try {
     if (whileExp != null)

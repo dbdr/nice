@@ -176,7 +176,18 @@ public final class Types
 
     return Typing.lowestInstance(res);
   }
-  
+
+  public static Monotype zeroArgMonotype(TypeConstructor tc)
+    throws BadSizeEx
+  {
+    // Handle 'Class' as 'Class<?>'
+    if (tc == PrimitiveType.classTC)
+      return new MonotypeConstructor
+        (tc, new mlsub.typing.Monotype[]{ UnknownMonotype.instance });
+
+    return new MonotypeConstructor(tc, null);
+  }
+
   /****************************************************************
    * Type parameters
    ****************************************************************/

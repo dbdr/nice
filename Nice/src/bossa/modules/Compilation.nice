@@ -60,8 +60,10 @@ class Compilation extends mlsub.compilation.Compilation
     if (this.destinationDir == null && this.packagePath == null)
       this.packagePath = ".";
 
-    nice.tools.code.Types.setClasspath((this.destinationDir | "") + ":" + 
-				       (this.packagePath | "") + ":" + 
+    nice.tools.code.Types.setClasspath((this.destinationDir | "") + 
+				       java.io.File.pathSeparator + 
+				       (this.packagePath | "") + 
+				       java.io.File.pathSeparator + 
 				       this.runtimeFile);
 
     Package.startNewCompilation();

@@ -1,0 +1,45 @@
+/*
+  Test of core java features:
+  - builtin types (integers, floats, chars)
+  - ...
+
+  Code must go inside the braces. 
+
+  p(String s) is a method that calls System.out.println(s)
+
+  A Java and Nice version will be generated automatically
+  from this file, and their output will be compared.
+ */
+
+{
+
+  //   STRINGS
+  p("Hello, world!");
+  p("String " + "concatenation");
+  
+  //   ARITHMETIC
+
+  // ints
+  p("1 = " + 1);
+  p("1+1 = " + (1+1));
+  
+  int i = 100;
+  long j = 123;
+  p("100 + 123 = " + (i+j));
+  p("" + (i+(j-i)*(j+i*i)-4));
+  
+  // floats
+  float x = 0.1f;
+  double y = 3.4;
+  p("0.1 - 3.4 = " + (x-y));
+  
+  p("" + (i+(j-y)*x));
+  
+  //booleans
+  p("" + ((false && true) | true));
+  boolean b = false;
+  if(b) p("A"); else p("B");
+  p(!b ? "A" : (b ? "B" : "C"));
+  
+}
+

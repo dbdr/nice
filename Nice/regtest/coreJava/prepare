@@ -1,0 +1,12 @@
+#! /bin/sh
+
+# This script must be run after each change to coreJava.code
+# to produce the Java and Nice versions of the test package
+
+sed -e /BODY/"r coreJava.code" -e /BODY/d coreJava.java.template \
+	> coreJava.java
+sed -e /BODY/"r coreJava.code" -e /BODY/d coreJava.nice.template \
+	> coreJava.nice
+
+javac coreJava.java
+java coreJava > ok.out

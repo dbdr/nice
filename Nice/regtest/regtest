@@ -63,7 +63,7 @@ regtest()
 
 status()
 {
-  echo "$pkg_ok OK, $pkg_compile_error compilation failures, $pkg_broken BROKEN, $pkg_new NEW ($pkg_new_ok accepted)"
+  echo "$pkg packages, $pkg_ok OK, $pkg_compile_error compilation failures, $pkg_broken BROKEN, $pkg_new NEW ($pkg_new_ok accepted)"
 }
 
 pkg=0
@@ -74,11 +74,19 @@ pkg_ok=0
 pkg_broken=0
 
 for subdir in *; do
-  [ -d $subdir ] || continue
+  [ -d $subdir -a $subdir != "CVS" ] || continue
 
   pkg=`expr $pkg + 1`
 
-  echo -n "$subdir: $pkg packages, "
+  echo -n "Testing package $subdir"
+
+  # execute package dependant script before compilation
+  if [ -x $subdir/prepare ]; then
+    echo -n " (preparing...)"
+    (cd $subdir; prepare)
+  fi
+  echo
+
   if compile $subdir >$subdir/compile.out 2>&1; then
 
     regtest $subdir

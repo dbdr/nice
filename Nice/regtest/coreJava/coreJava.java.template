@@ -1,0 +1,15 @@
+/*
+  DO NOT MODIFY THIS FILE.
+  See coreJava.code
+ */
+
+public class coreJava 
+{
+  public static void p(String s)
+  {
+    System.out.println(s);
+  }
+
+  public static void main(String[] args)
+  BODY    
+}

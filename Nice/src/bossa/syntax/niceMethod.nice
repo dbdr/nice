@@ -295,7 +295,7 @@ public Definition createMemberMethod
 	    Map<String, bossa.syntax.Monotype> map = new HashMap();
 	    map.put(getAlikeID(), 
 		createMonotypeConstructor(alikeTC,
-			new TypeParameters(new ArrayList()), notNull(name.location())));
+			createTypeParameters(new ArrayList()), notNull(name.location())));
 	    returnType = returnType.substitute(map);
 	    params.substitute(map);
 	  }

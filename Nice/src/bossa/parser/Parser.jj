@@ -673,7 +673,7 @@ Monotype monotypeConstructor():
     { if(p==null) p=new ArrayList(0);
       last=getToken(0);
 
-      return bossa.syntax.fun.createMonotypeConstructor(t,new TypeParameters(p),
+      return bossa.syntax.fun.createMonotypeConstructor(t,bossa.syntax.dispatch.createTypeParameters(p),
 				     makeLocation(first, last)); 
     }
 }
@@ -762,7 +762,7 @@ Monotype arrayMonotype(Monotype res):
     Location loc = res.location();
     res = bossa.syntax.fun.createMonotypeConstructor
       (new TypeIdent(new LocatedString("nice.lang.Array", loc)),
-       new TypeParameters(tp),
+       bossa.syntax.dispatch.createTypeParameters(tp),
        loc);
     res.nullness = maybe ? res.maybe : res.absent;
   }
@@ -934,7 +934,7 @@ MonotypeConstructor superClass():
     // ignore type parameters
     // they should be checked
     [ "<" params = monotypes() ">" ]
-  { return bossa.syntax.fun.createMonotypeConstructor(name, params == null ? null : new TypeParameters(params), name.location()); }
+  { return bossa.syntax.fun.createMonotypeConstructor(name, params == null ? null : bossa.syntax.dispatch.createTypeParameters(params), name.location()); }
 }
 
 List interfaces():

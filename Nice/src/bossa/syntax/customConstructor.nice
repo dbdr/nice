@@ -167,7 +167,7 @@ private Monotype getCCReturnType(LocatedString className, Constraint cst)
     }
 
   let res = createMonotypeConstructor
-      (classe, new TypeParameters(params), classe.location());
+      (classe, new TypeParameters(content: params), classe.location());
   res.nullness = Monotype.sure;
   return res;
 }

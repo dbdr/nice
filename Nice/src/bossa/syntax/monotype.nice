@@ -39,14 +39,14 @@ public class MonotypeConstructor extends Monotype
 	lowlevelTC = newTC;
       }
 
-    mlsub.typing.Monotype[] resolvedParams = parameters.resolve(typeMap);
+    mlsub.typing.Monotype[?] resolvedParams = parameters.resolve(notNull(typeMap));
 
     try{
       return new mlsub.typing.MonotypeConstructor(lowlevelTC, resolvedParams);
     }
     catch(mlsub.typing.BadSizeEx e){
       // See if this is a class with default type parameters
-      let res = getTypeWithTC(notNull(lowlevelTC), resolvedParams);
+      let res = getTypeWithTC(notNull(lowlevelTC), cast(resolvedParams));
       if (res == null)
         throw User.error(this, (tc!=null ? "Class "+tc : notNull(lowlevelTC).toString()) +
 		       Util.has(e.expected, "type parameter", e.actual));
@@ -59,7 +59,7 @@ public class MonotypeConstructor extends Monotype
   {
     Monotype res = createMonotypeConstructor
       (notNull(tc),
-       new TypeParameters(Monotype.substitute(map, notNull(parameters.content))),
+       new TypeParameters(content: Monotype.substitute(map, notNull(parameters.content))),
        loc);
     res.nullness = this.nullness;
     return res;
@@ -86,15 +86,36 @@ public MonotypeConstructor createMonotypeConstructor(TypeIdent tc, ?TypeParamete
 			     ?Location loc)
 {
   return new MonotypeConstructor(tc: tc, 
-	parameters: parameters || new TypeParameters([]), loc: loc);
+	parameters: parameters || new TypeParameters(content: []), loc: loc);
 }
 
 Monotype createMonotypeConstructor(mlsub.typing.TypeConstructor tc, TypeParameters parameters,
 		      Location loc)
 {
   return new MonotypeConstructor(lowlevelTC: tc, parameters: parameters, loc: loc);
+}
+
+/**
+   Type parameters.
+   Holds a colloction of Monotype.
+
+*/
+public class TypeParameters
+{
+  public Monotype[] content;
+
+  mlsub.typing.Monotype[?] resolve(TypeMap ts)
+  {
+    return Monotype.resolve(ts, content);
+  }
+
+  toString() = Util.map("<",", ",">", content);
 }  
 
+public TypeParameters createTypeParameters(List<Monotype> tps)
+{
+  return new TypeParameters(content: Monotype.toArray(tps));
+}
 /**
    Functional type.
 
@@ -172,7 +193,7 @@ public class Alike extends bossa.syntax.Monotype
 
     assert tc instanceof MonotypeConstructor;
     let res = createMonotypeConstructor(notNull(tc.lowlevelTC), 
-       new TypeParameters(Monotype.substitute(map, parameters)), 
+       new TypeParameters(content: Monotype.substitute(map, parameters)), 
        loc);
     res.nullness = this.nullness;
     return res;

@@ -1962,7 +1962,7 @@ public class Main
         statement:
         </para>
 <example>
-  <title>Title</title>
+  <title>Proving the type of an object</title>
 <programlisting lang="nice">
 	void foo(FileOutputStream arg) {...}
 	

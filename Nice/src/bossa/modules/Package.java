@@ -684,9 +684,9 @@ public class Package implements mlsub.compilation.Module, Located
 	  end = path.length();
 	    
 	String pathComponent = path.substring(start, end);
-	if (pathComponent.length()>0)
+	if (pathComponent.length() > 0)
 	  {
-	    File f = new File(pathComponent);
+	    File f = nice.tools.util.System.getFile(pathComponent);
 	    if (f.exists())
 	      {
 		if (pathComponent.endsWith(".jar"))

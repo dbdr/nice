@@ -58,6 +58,18 @@ public class System
       return name;
   }
 
+  /**
+     Return a file from a string describing it.
+     Performs ~ expansion (~ -> user.home property).
+  */
+  public static File getFile(String file)
+  {
+    if (file.charAt(0) == '~')
+      file = home + file.substring(1);
+
+    return new File(file);
+  }
+
   private static final String home = java.lang.System.getProperty("user.home");
   private static final int homeLength = home.length();  
 }

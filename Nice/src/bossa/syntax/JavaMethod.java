@@ -180,11 +180,12 @@ public class JavaMethod extends MethodDeclaration
 
   /** Utility function for analyse.nice */
 
-  List findJavaMethods(ClassType declaringClass, String funName, int arity)
+  static List findJavaMethods
+    (ClassType declaringClass, String funName, int arity)
   {
     List possibilities = new LinkedList();
     declaringClass.addMethods();
-	    
+    
     // search methods
     for(gnu.bytecode.Method method = declaringClass.getMethods();
 	method!=null; method = method.getNext())

@@ -49,22 +49,30 @@ String deleteAtEnd(String source, String what)
 char get(String s, int index) = native char String.charAt(int);
 char charAt(String s, int index) = native char String.charAt(int);
 
-
-List<String> split(String str, String sep)
+/**
+ * Break a string into a <code>List&lt;String&gt;</code> of substrings,
+ * splitting at (and removing) every occurrence of the <code>separator</code>
+ * string.
+ * 
+ * @param str the string to split
+ * @param separator the separator to split on 
+ */ 
+List<String> split(String str, String separator)
+  requires separator.length() > 0 : "separator cannot be the empty string"
 {
   List<String> res = new ArrayList();
   int ntx = 0;
   int pos = 0;
   while(ntx > -1)
     {
-      ntx = str.indexOf(sep, pos);
+      ntx = str.indexOf(separator, pos);
       if (ntx > -1)
 	{
 	  if (ntx > 0)
 	    {
 	      res.add(str.substring(pos, ntx));
 	    }
-	  pos = ntx + sep.length;
+	  pos = ntx + separator.length;
 	}
       else
 	{
@@ -74,7 +82,15 @@ List<String> split(String str, String sep)
   return res;
 }
 
-String join(List<String> strings, String sep)
+/**
+ * Join a collection of strings together, interspersing <code>separator</code>
+ * among them.
+ *
+ * @param strings the strings to join
+ * @param separator the separator string to place between each 
+ *    string and the one before it
+ */
+String join(Collection<String> strings, String separator)
 {
   StringBuffer buff = new StringBuffer();
   Iterator<String> it = strings.iterator();
@@ -82,7 +98,7 @@ String join(List<String> strings, String sep)
     {
       buff.append(it.next());
       if (it.hasNext())
-	buff.append(sep);
+	buff.append(separator);
     }
   return buff.toString();
 }

@@ -112,3 +112,19 @@ class A {
 }
 
 getX(this@A) = x;
+
+/// PASS
+  /// Toplevel
+  // Implicit this used on a functional field.
+class A {
+  String->void avv;
+  void m(String s) = avv(s);
+}
+
+/// PASS
+  /// Toplevel
+  // Implicit this used on a functional field.
+class A {
+  (String,String)->void avv;
+  void m(String s) = avv(s,s);
+}

@@ -47,6 +47,13 @@ public class OverloadedSymbolExp extends Expression
     setLocation(ident.location());
   }
 
+  private OverloadedSymbolExp(List symbols, LocatedString ident, 
+                              boolean noImplicitThis)
+  {
+    this(symbols, ident);
+    this.noImplicitThis = noImplicitThis;
+  }
+
   OverloadedSymbolExp(VarSymbol symbol, LocatedString ident)
   {
     this.symbols = new LinkedList();
@@ -89,6 +96,9 @@ public class OverloadedSymbolExp extends Expression
     // to list possibilities if none matches
     LinkedList removed = new LinkedList();
 
+    // Useful in case of failure, to try adding an implicit 'this'.
+    List fieldAccesses = filterFieldAccesses();
+
     for(Iterator i = symbols.iterator(); i.hasNext();)
       {
 	VarSymbol s = (VarSymbol) i.next();
@@ -118,7 +128,16 @@ public class OverloadedSymbolExp extends Expression
       }
 
     if (symbols.size() == 0)
-      User.error(this, noMatchError(removed, arguments));
+      {
+        if (! noImplicitThis)
+          {
+            Expression res = givePriorityToFields(fieldAccesses);
+            if (res != null)
+              return res;
+          }
+
+        User.error(this, noMatchError(removed, arguments));
+      }
 
     // SECOND PASS: check argument types
 
@@ -155,16 +174,25 @@ public class OverloadedSymbolExp extends Expression
       }
 
     if (symbols.size() == 0)
-      if (removed.size() == 1)
-	User.error(this,
-		   "Arguments " + arguments.printTypes() +
-		   " do not fit: \n" + removed.get(0));
-      else
-	User.error(this, 
-		   "No possible call for " + ident + 
-		   ".\nArguments: " + arguments.printTypes() + 
-		   "\nPossibilities:\n" + 
-		   Util.map("", "\n", "", removed));
+      {
+        if (! noImplicitThis)
+          {
+            Expression res = givePriorityToFields(fieldAccesses);
+            if (res != null)
+              return res;
+          }
+
+        if (removed.size() == 1)
+          User.error(this,
+                     "Arguments " + arguments.printTypes() +
+                     " do not fit: \n" + removed.get(0));
+        else
+          User.error(this, 
+                     "No possible call for " + ident + 
+                     ".\nArguments: " + arguments.printTypes() + 
+                     "\nPossibilities:\n" + 
+                     Util.map("", "\n", "", removed));
+      }
 
     removeNonMinimal(symbols, arguments);
     
@@ -307,7 +335,7 @@ public class OverloadedSymbolExp extends Expression
         if (Node.thisExp != null)
           try {
             CallExp res = new CallExp
-              (new OverloadedSymbolExp(fieldAccesses, ident),
+              (new OverloadedSymbolExp(fieldAccesses, ident, true),
                //Arguments.noArguments());
                new Arguments(new Arguments.Argument[]{new Arguments.Argument(Node.thisExp)}));
 
@@ -530,6 +558,9 @@ public class OverloadedSymbolExp extends Expression
 
   List symbols;
   LocatedString ident;
+
+  /** Do not try to add an implicit 'this' access. */
+  private boolean noImplicitThis;
 
   /****************************************************************
    * Error messages

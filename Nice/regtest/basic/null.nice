@@ -29,3 +29,5 @@ cov(s1@String, s2@null) {}
 //this case should not be necessary: all cases are already handled
 cov(s1, s2) {}
 
+// nullness marker with a parameterized type in constraint
+<Any T | T <: ?List<String>> void cov2(T x) {}

@@ -28,4 +28,6 @@ test_import()
   polymorphic2(new regtest.basic.Multi());
 
   map(["A"], fun(String s)=>{println(s);});
+
+  cov2(null);
 }

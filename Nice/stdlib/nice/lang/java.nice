@@ -78,8 +78,8 @@ PrintStream stderr () = native System.err;
 <Any T> void println (T object) = System.out.println(object);
 
 // Serialization
-<Any T> void writeObject(ObjectOutputStream, T) = native void ObjectOutputStream.writeObject(Object);
-<Any T> T readObject(ObjectInputStream) = native Object ObjectInputStream.readObject();
+<Any T> void writeObject(ObjectOutput, T) = native void ObjectOutput.writeObject(Object);
+<Any T> T readObject(ObjectInput) = native Object ObjectInput.readObject();
 
 //               PACKAGE: java.util
 

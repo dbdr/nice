@@ -32,7 +32,7 @@ import bossa.util.Debug;
    
    Can be 
    - a {@link bossa.syntax.NiceMethod Nice method}, 
-     with several method bodies @see bossa.syntax.
+     with several method bodies @see bossa.syntax.MethodBodyDefinition
    - a {@link bossa.syntax.JavaMethod Java method}
    - an {@link bossa.syntax.InlinedMethod inlined method}
    
@@ -42,21 +42,21 @@ import bossa.util.Debug;
 abstract public class MethodDeclaration extends Definition
 {
   /**
-   * The method is a class member if c!=null.
-   *
-   * @param name the name of the method
-   * @param typeParameters the type parameters
-   * @param constraint the constraint
-   * @param returnType the return type
-   * @param parameters the MonoTypes of the parameters
+     @param name the name of the method
+     @param typeParameters the type parameters
+     @param constraint the constraint
+     @param returnType the return type
+     @param parameters the formal parameters
    */
   public MethodDeclaration(LocatedString name, 
 			   Constraint constraint,
 			   Monotype returnType,
-			   List parameters)
+			   FormalParameters parameters)
   {
     super(name, Node.global);
 
+    this.parameters = parameters;
+    
     if(returnType != null)
       // otherwise, symbol and arity are supposed to be set by someone else
       // a child class for instance
@@ -65,12 +65,13 @@ abstract public class MethodDeclaration extends Definition
 	// remember it to print the interface
 	syntacticConstraint = constraint.toString();
 	
+	List domain = parameters.types();
 	symbol = new MethodDeclaration.Symbol
 	  (name, new Polytype(constraint, 
-			      new FunType(parameters, returnType)));
+			      new FunType(domain, returnType)));
 	addChild(symbol);
 
-	this.arity = parameters.size();
+	this.arity = (domain == null ? 0 : domain.size());
       }
 
     boolean isConstructor = name.toString().equals("<init>");
@@ -87,8 +88,7 @@ abstract public class MethodDeclaration extends Definition
 
   /** 
       Does not specify the type of the method.
-      Used in JavaMethod to lazyfy
-      the lookup of java types.
+      Used in JavaMethod to lazyfy the lookup of java types.
   */
   MethodDeclaration(LocatedString name)
   {
@@ -229,7 +229,7 @@ abstract public class MethodDeclaration extends Definition
       return "method " + getName();
     
     return
-      syntacticConstraint
+    (syntacticConstraint == null ? "" : syntacticConstraint)
       + String.valueOf(getType().codomain())
       + " "
       + getName().toQuotedString()
@@ -241,10 +241,16 @@ abstract public class MethodDeclaration extends Definition
 
   protected MethodContainer memberOf;
   protected int arity;
-
+  private FormalParameters parameters;
+  
   public int getArity()
   {
     return arity;
+  }
+  
+  public FormalParameters formalParameters()
+  {
+    return parameters;
   }
   
   /** 

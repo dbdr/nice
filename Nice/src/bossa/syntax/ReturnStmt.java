@@ -12,7 +12,7 @@
 
 // File    : ReturnStmt.java
 // Created : Mon Jul 05 17:21:40 1999 by bonniot
-//$Modified: Thu Sep 21 17:59:03 2000 by Daniel Bonniot $
+//$Modified: Mon Oct 09 18:27:18 2000 by Daniel Bonniot $
 // Description : return in a function or method
 
 package bossa.syntax;
@@ -63,7 +63,7 @@ public class ReturnStmt extends Statement
 
   public gnu.expr.Expression generateCode()
   {
-    if(value==null)
+    if (value == null)
       return new gnu.expr.ExitExp(includingFunction.getBlock());
     else
       return new gnu.expr.ExitExp(value.generateCode(),

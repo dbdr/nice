@@ -47,12 +47,12 @@ public class NiceMethod extends MethodDeclaration
      LocatedString name, 
      Constraint constraint,
      Monotype returnType,
-     List parameters)
+     FormalParameters parameters)
   {
     // it is a class method, there is an implicit "this" argument
 
     boolean hasAlike = returnType.containsAlike() 
-      || Monotype.containsAlike(parameters);
+      || parameters.containsAlike();
     
     mlsub.typing.MonotypeVar[] thisTypeParams = c.createSameTypeParameters();
     
@@ -110,14 +110,14 @@ public class NiceMethod extends MethodDeclaration
 	    Map map = new HashMap();
 	    map.put(Alike.id, alikeTC);
 	    returnType = returnType.substitute(map);
-	    parameters = Monotype.substitute(map, parameters);
+	    parameters.substitute(map);
 	  }
       }
     else
       thisType = 
 	new mlsub.typing.MonotypeConstructor(tc, thisTypeParams);
     
-    parameters.add(0, Monotype.create(thisType));
+    parameters.addThis(Monotype.create(thisType));
     
     NiceMethod res = new NiceMethod(name, constraint, returnType, parameters);
     res.memberOf = c;
@@ -127,11 +127,11 @@ public class NiceMethod extends MethodDeclaration
 
   public NiceMethod(LocatedString name, 
 		    Constraint constraint, Monotype returnType, 
-		    List parameters)
+		    FormalParameters parameters)
   {
     super(name, constraint, returnType, parameters);
   }
-  
+
   /****************************************************************
    * Typechecking
    ****************************************************************/

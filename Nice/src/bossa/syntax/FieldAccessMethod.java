@@ -12,7 +12,7 @@
 
 // File    : FieldAccessMethod.java
 // Created : Thu Jul 01 18:12:46 1999 by bonniot
-//$Modified: Wed Sep 20 12:33:11 2000 by Daniel Bonniot $
+//$Modified: Mon Oct 09 12:00:23 2000 by Daniel Bonniot $
 
 package bossa.syntax;
 
@@ -40,18 +40,18 @@ public class FieldAccessMethod extends MethodDeclaration
      LocatedString fieldName, Monotype fieldType,
      List classTypeParameters)
   {
-    super(fieldName,new Constraint(classTypeParameters,null),
-	  fieldType,makeList(Monotype.create(classDef.lowlevelMonotype())));
+    super(fieldName, new Constraint(classTypeParameters,null),
+	  fieldType, makeList(Monotype.create(classDef.lowlevelMonotype())));
     this.definition = classDef;
     this.classTC = classDef.tc;
     this.fieldName = fieldName.toString();
   }
   
-  private static List makeList(Monotype t)
+  private static FormalParameters makeList(Monotype t)
   {
-    List res=new LinkedList();
-    res.add(t);
-    return res;
+    List res = new LinkedList();
+    res.add(new FormalParameters.Parameter(t));
+    return new FormalParameters(res);
   }
   
   /** 
@@ -66,6 +66,11 @@ public class FieldAccessMethod extends MethodDeclaration
   /** The java class this method is defined in */
   ClassDefinition definition;
 
+  public void printInterface(java.io.PrintWriter s)
+  {
+    Internal.error("Should not be part of the module interface");
+  }
+  
   /****************************************************************
    * Code generation
    ****************************************************************/

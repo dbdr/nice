@@ -52,7 +52,7 @@ public class JavaMethod extends MethodDeclaration
      LocatedString name, 
      Constraint constraint,
      Monotype returnType,
-     List parameters
+     FormalParameters parameters
     )
   {
     super(name,constraint,returnType,parameters);
@@ -288,7 +288,7 @@ public class JavaMethod extends MethodDeclaration
 		 "Native method " + this.symbol.name + 
 		 " has not the same number of parameters " +
 		 "in Java (" + javaArity +
-		 ") and in Nice (" + arity + ")");    
+		 ") and in Nice (" + arity + ")");
   }
   
   /****************************************************************

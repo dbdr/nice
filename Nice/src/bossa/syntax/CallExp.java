@@ -37,24 +37,24 @@ public class CallExp extends Expression
 {
   /**
      @param fun the function to call
-     @param parameters a collection of Expressions
+     @param arguments the call arguments
    */
-  public CallExp(Expression fun, 
-		 List parameters)
+  public CallExp(Expression fun, Arguments arguments)
   {
     this.fun = expChild(fun);
-    this.parameters = expChildren(parameters);
+    this.arguments = arguments;
+    addChild(arguments);
   }
 
   /**
      @param fun the function to call
-     @param parameters a collection of Expressions
+     @param arguments the call arguments
      @param infix true if the first parameter was written before the function,
      using the dot notation: x1.f(x2, x3)
    */
-  public CallExp(Expression fun, List parameters, boolean infix)
+  public CallExp(Expression fun, Arguments arguments, boolean infix)
   {
-    this(fun, parameters);
+    this(fun, arguments);
     this.infix = infix;
   }
 
@@ -62,8 +62,8 @@ public class CallExp extends Expression
 			       Expression param1)
   {
     List params = new LinkedList();
-    params.add(param1);
-    CallExp res = new CallExp(fun, params);
+    params.add(new Arguments.Argument(param1));
+    CallExp res = new CallExp(fun, new Arguments(params));
     res.setLocation(fun.location());
     return res;
   }
@@ -72,9 +72,9 @@ public class CallExp extends Expression
 			       Expression param1, Expression param2)
   {
     List params = new ArrayList(2);
-    params.add(param1);
-    params.add(param2);
-    CallExp res = new CallExp(fun, params);
+    params.add(new Arguments.Argument(param1));
+    params.add(new Arguments.Argument(param2));
+    CallExp res = new CallExp(fun, new Arguments(params));
     res.setLocation(fun.location());
     return res;
   }
@@ -83,7 +83,7 @@ public class CallExp extends Expression
   {
     if (infix)
       {
-	Expression e = ((ExpressionRef) parameters.get(0)).content();
+	Expression e = arguments.getExp(0);
 	// force the finding of class prefixes to methods
 	// so that java classes are discovered early and put in global context
 	if(e instanceof IdentExp)
@@ -96,15 +96,23 @@ public class CallExp extends Expression
   
   void resolve()
   {
-    // in infix applications, the symbol is either a
-    // class method or a field name, so it must be found in
-    // global scope
-    if(infix)
+    Expression e = fun.content();
+    if (infix)
+      // in infix applications, the symbol is either a
+      // class method or a field name, so it must be found in
+      // global scope
       {
-	Expression e = fun.content();
 	e.scope = Node.getGlobalScope();
-  	if(e instanceof IdentExp)
-	  ((IdentExp) e).ignoreInexistant = true;
+      }
+
+    if(e instanceof IdentExp)
+      {
+	IdentExp ie = (IdentExp) e;
+	if (infix)
+	  // it might be a package or class expression
+	  ie.ignoreInexistant = true;
+	//so type computation happens in OverloadedSymbolExp
+	ie.alwaysOverloadedSymbol = true;
       }
   }
   
@@ -112,8 +120,7 @@ public class CallExp extends Expression
    * Type checking
    ****************************************************************/
 
-  static Polytype wellTyped(Polytype funt,
-			    Polytype[] parameters)
+  static Polytype wellTyped(Polytype funt, Polytype[] parameters)
   {
     try{
       Polytype t = getType(funt, parameters);
@@ -128,7 +135,7 @@ public class CallExp extends Expression
   
   static Polytype getTypeAndReportErrors(Location loc,
 					 Expression fun,
-					 List /* of Expression */ parameters)
+					 Expression[] parameters)
   {
     Polytype[] paramTypes = Expression.getType(parameters);
     
@@ -150,13 +157,13 @@ public class CallExp extends Expression
       if(fun.isFieldAccess())
 	{
 	  // There must be just one parameter in a field access
-	  User.error(loc, parameters.get(0)+
+	  User.error(loc, parameters[0]+
 		     " has no field "+fun);
 	}
       else
 	{
 	  String end = "not within the domain of function \""+fun+"\"";
-	  if(parameters.size()>=2)
+	  if(parameters.length >= 2)
 	    User.error(loc,"Parameters \n"+
 		       Util.map("(",", ",")",parameters) +
 		       "\n of types \n" +
@@ -239,19 +246,14 @@ public class CallExp extends Expression
 
   public Expression noOverloading()
   {
-    parameters = Expression.noOverloading(parameters);
-
-    // case where the parameters is a package, or a package prefix
-    if(parameters.size() == 1)
-      {
-	Expression param0 = ((ExpressionRef) parameters.get(0)).content();
-	if(param0 instanceof PackageExp &&
-	   (fun.content() instanceof IdentExp || 
-	    fun.content() instanceof SymbolExp))
-	  return ClassExp.create((PackageExp) param0, fun.toString());
-      }
+    PackageExp packageExp = arguments.packageExp();
     
-    return this;
+    if (packageExp != null &&
+	(fun.content() instanceof IdentExp || 
+	 fun.content() instanceof SymbolExp))
+      return ClassExp.create(packageExp, fun.toString());
+    else
+      return this;
   }
   
   private boolean overloadingResolved;
@@ -263,21 +265,19 @@ public class CallExp extends Expression
       return;
     overloadingResolved = true;
     
-    parameters = Expression.noOverloading(parameters);
-    
+    arguments.noOverloading();
     resolveStaticClassPrefix();
     
-    fun.resolveOverloading(Expression.getType(parameters), this);
+    fun.resolveOverloading(this);
   }
 
   /** Handle static functions, prefixed by the class name */
   private void resolveStaticClassPrefix()
   {
-    if(parameters.size()>=1)
+    if(infix)
       {
-	declaringClass = 
-	  ((Expression) parameters.get(0)).staticClass();
-
+	declaringClass = arguments.staticClass();
+	
 	Expression funExp = fun.content();
 	    
 	if(declaringClass == null)
@@ -300,17 +300,14 @@ public class CallExp extends Expression
 	  funName = ((SymbolExp) funExp).getName();
 	else
 	  {
-	    Debug.println(this+"");
-		
 	    Internal.error("Unknown case " +
 			   funExp.getClass() + " in CallExp");
 	    return;
 	  }
 
-	parameters.remove(0);
 	List possibilities = new LinkedList();
 	declaringClass.addMethods();
-	int arity = parameters.size();
+	int arity = arguments.size();
 	    
 	// search methods
 	for(gnu.bytecode.Method method = declaringClass.getMethods();
@@ -328,7 +325,7 @@ public class CallExp extends Expression
 	    }
 
 	// search a field
-	if(parameters.size()==0)
+	if (arity == 0)
 	  {
 	    gnu.bytecode.Field field = 
 	      declaringClass.getField(funName.toString());
@@ -345,13 +342,24 @@ public class CallExp extends Expression
 				   fun.content().getScope()));
       }
   }
+
+  /** Hold real parameter, after default parameters
+      and parameter reordering has been done.
+  */
+  Expression[] computedExpressions;
   
   void computeType()
   {
     resolveOverloading();
-    if(type == null)
-      type = getTypeAndReportErrors(location(), fun, parameters);
-
+    if (type == null)
+      // fun should be a function abstraction here
+      // no default arguments
+      {
+	type = getTypeAndReportErrors(location(), fun, 
+				      arguments.inOrder());
+	computedExpressions = arguments.inOrder();
+      }
+    
     type.simplify();
   }
 
@@ -393,7 +401,7 @@ public class CallExp extends Expression
   protected gnu.expr.Expression compile()
   {
     // wraps the arguments that reference methods into LambdaExps
-    gnu.expr.Expression[] params = Expression.compile(parameters);
+    gnu.expr.Expression[] params = Expression.compile(computedExpressions);
     for(int i=0; i<params.length; i++)
       if(params[i] instanceof gnu.expr.QuoteExp)
 	{
@@ -405,11 +413,10 @@ public class CallExp extends Expression
     gnu.expr.Expression res;
     if (fun.isFieldAccess())
       {
-	if (parameters.size() != 1)
+	if (arguments.size() != 1)
 	  Internal.error(this, "A field access should have 1 parameter");
 
-	res = fun.getFieldAccessMethod().compileAccess
-	  ((Expression) parameters.get(0));
+	res = fun.getFieldAccessMethod().compileAccess(arguments.getExp(0));
       }
     else
       res = new gnu.expr.ApplyExp(fun.generateCode(), params);
@@ -421,11 +428,11 @@ public class CallExp extends Expression
   {
     if (!fun.isFieldAccess())
       Internal.error(this, "Assignment to a call that is not a field access");
-    if (parameters.size() != 1)
+    if (arguments.size() != 1)
       Internal.error(this, "A field access should have 1 parameter");
 
     return fun.getFieldAccessMethod().compileAssign
-      ((Expression) parameters.get(0), value);
+      (arguments.getExp(0), value);
   }
 
   /****************************************************************
@@ -437,23 +444,18 @@ public class CallExp extends Expression
     if(infix)
       if (declaringClass != null)
 	return declaringClass.getName() +
-	  "." + fun + 
-	  "(" + 
-	  Util.map("",", ","",parameters) +
-	  ")";
+	  "." + fun + arguments;
       else
 	return
-	  parameters.get(0) + 
+	  arguments.getExp(0) + 
 	  "." + fun + 
-	  "(" + 
-	  Util.map("",", ","",parameters.subList(1, parameters.size())) +
-	  ")";
+	  arguments.toStringInfix();
     else
-      return fun + "(" + Util.map("",", ","",parameters) + ")";
+      return fun.toString() + arguments;
   }
 
   protected ExpressionRef fun;
-  protected List /* of ExpressionRef */ parameters;
+  protected Arguments arguments;
   
   /** true iff the first argument was written before the application: e.f(x) */
   boolean infix;

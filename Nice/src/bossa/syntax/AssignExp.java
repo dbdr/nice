@@ -12,7 +12,7 @@
 
 // File    : AssignExp.java
 // Created : Mon Jul 05 15:49:27 1999 by bonniot
-//$Modified: Tue Oct 03 17:28:45 2000 by Daniel Bonniot $
+//$Modified: Mon Oct 09 17:09:49 2000 by Daniel Bonniot $
 
 package bossa.syntax;
 
@@ -36,15 +36,13 @@ public class AssignExp extends Expression
   */
   public static Expression create(Expression to, Expression value)
   {
-    // Rewrite get(e, i) = v into set(e, i, v)
+    // Rewrite "get(e, i) = v" into "set(e, i, v)"
     if (to instanceof CallExp &&
 	"get".equals(((CallExp) to).fun.toString()))
       {
 	CallExp call = (CallExp) to;
 	((IdentExp) ((ExpressionRef) call.fun).content()).ident.content = "set";
-	ExpressionRef v = new ExpressionRef(value);
-	call.parameters.add(v);
-	call.addChild(v);
+	call.arguments.add(value);
 
 	return call;
       }

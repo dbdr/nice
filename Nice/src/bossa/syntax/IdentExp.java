@@ -12,7 +12,7 @@
 
 // File    : IdentExp.java
 // Created : Mon Jul 05 16:25:58 1999 by bonniot
-//$Modified: Thu Aug 03 14:15:42 2000 by Daniel Bonniot $
+//$Modified: Mon Oct 09 18:21:42 2000 by Daniel Bonniot $
 
 package bossa.syntax;
 
@@ -38,18 +38,20 @@ public class IdentExp extends Expression
   {
     List symbols = scope.lookup(ident);
 
-    if (symbols.size() > 1)
+    if (symbols.size() > 1 || 
+	symbols.size() == 1 && alwaysOverloadedSymbol)
       return new OverloadedSymbolExp(symbols, ident, scope);
+
     if (symbols.size() == 1)
       return new SymbolExp((VarSymbol) symbols.get(0));
 
     // symbols.size() == 0
-    if(ignoreInexistant)
-      return this;
-    else if(enableClassExp)
+    if(enableClassExp)
       return ClassExp.create(ident);
+    else if(ignoreInexistant)
+      return this;
     else
-      User.error(ident, ident + " is not declared");    
+      User.error(ident, ident + " is not declared");
     return null;
   }
 
@@ -100,4 +102,9 @@ public class IdentExp extends Expression
 
   /** Idem, except it should resolve to a ClassExp or a PackageExp. */
   boolean enableClassExp;
+
+  /**
+     Force production of overloaded symbol exp, even if there is just one case.
+   */
+  boolean alwaysOverloadedSymbol;
 }

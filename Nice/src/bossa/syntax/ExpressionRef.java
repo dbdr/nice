@@ -12,7 +12,7 @@
 
 // File    : ExpressionRef.java
 // Created : Tue Aug 17 16:04:40 1999 by bonniot
-//$Modified: Thu Aug 03 14:25:58 2000 by Daniel Bonniot $
+//$Modified: Mon Oct 09 17:25:45 2000 by Daniel Bonniot $
 
 package bossa.syntax;
 
@@ -101,10 +101,9 @@ final public class ExpressionRef extends Expression
     return content.staticClass();
   }  
 
-  Expression resolveOverloading(Polytype[] parameters,
-				CallExp callExp)
+  Expression resolveOverloading(CallExp callExp)
   {
-    content = content.resolveOverloading(parameters, callExp);
+    content = content.resolveOverloading(callExp);
     return this;
   }
   

@@ -110,4 +110,5 @@ main(args)
   test_numeric();
   test_arrays();
   test_comparable();
+  test_optional();
 }

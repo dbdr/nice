@@ -12,7 +12,7 @@
 
 // File    : NewExp.java
 // Created : Thu Jul 08 17:15:15 1999 by bonniot
-//$Modified: Thu Aug 31 16:32:45 2000 by Daniel Bonniot $
+//$Modified: Mon Oct 09 17:27:05 2000 by Daniel Bonniot $
 
 package bossa.syntax;
 
@@ -24,7 +24,7 @@ import java.util.*;
  */
 public class NewExp extends CallExp
 {
-  public NewExp(TypeIdent ti, List arguments)
+  public NewExp(TypeIdent ti, Arguments arguments)
   {
     super(null, arguments);
     this.ti = ti;
@@ -57,7 +57,6 @@ public class NewExp extends CallExp
   
   void resolve()
   {
-    super.resolve();
     resolveTC();
     
     List constructors = TypeConstructors.getConstructors(tc);
@@ -79,7 +78,7 @@ public class NewExp extends CallExp
   public String toString()
   {
     String cl = (ti == null ? tc.toString() : ti.toString());
-    return "new "+cl+"("+Util.map("", ", ", "", parameters)+")";
+    return "new " + cl + arguments;
   }
 
   private TypeIdent ti;

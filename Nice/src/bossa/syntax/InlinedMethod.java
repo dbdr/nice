@@ -35,7 +35,7 @@ public class InlinedMethod extends MethodDeclaration
   public InlinedMethod(LocatedString name, 
 		       Constraint constraint,
 		       Monotype returnType,
-		       List parameters,
+		       FormalParameters parameters,
 		       LocatedString inlineProcedure,
 		       String parameter)
   {

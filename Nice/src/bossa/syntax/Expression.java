@@ -12,7 +12,7 @@
 
 // File    : Expression.java
 // Created : Mon Jul 05 16:25:02 1999 by bonniot
-//$Modified: Mon Oct 02 17:04:56 2000 by Daniel Bonniot $
+//$Modified: Mon Oct 09 16:30:45 2000 by Daniel Bonniot $
 // Description : 
 
 package bossa.syntax;
@@ -90,8 +90,7 @@ public abstract class Expression extends Node
    *
    * @return the resolved expression. Doesn't return if OR is not possible.
    */
-  Expression resolveOverloading(Polytype[] parameters,
-				CallExp callExp)
+  Expression resolveOverloading(CallExp callExp)
   {
     return this;
   }
@@ -158,6 +157,22 @@ public abstract class Expression extends Node
     int n = 0;
     for(Iterator i=expressions.iterator(); i.hasNext();)
       res[n++] = ((Expression) i.next()).getType();
+
+    return res;
+  }
+
+  /**
+   * Maps getType over a collection of Expressions
+   *
+   * @param Expressions the list of Expressions
+   * @return the list of their PolyTypes
+   */
+  static Polytype[] getType(Expression[] expressions)
+  {    
+    Polytype[] res = new Polytype[expressions.length];
+
+    for(int i = 0; i< expressions.length; i++)
+      res[i] = expressions[i].getType();
 
     return res;
   }

@@ -12,7 +12,6 @@
 
 // File    : OverloadedSymbolExp.java
 // Created : Thu Jul 08 12:20:59 1999 by bonniot
-//$Modified: Wed Sep 20 12:32:59 2000 by Daniel Bonniot $
 
 package bossa.syntax;
 
@@ -26,7 +25,10 @@ import mlsub.typing.lowlevel.Kind;
 import mlsub.typing.Polytype;
 
 /**
- * A symbol, for which overloading resolution has yet to be done.
+   A symbol, for which overloading resolution has yet to be done.
+
+   @version $Date :$
+   @author Daniel Bonniot
  */
 public class OverloadedSymbolExp extends Expression
 {
@@ -65,18 +67,16 @@ public class OverloadedSymbolExp extends Expression
     return res;
   }
   
-  Expression resolveOverloading(Polytype[] parameters,
-				CallExp callExp)
+  Expression resolveOverloading(CallExp callExp)
   {
+    Arguments arguments = callExp.arguments;
+    // It's better to do this know. OR is oriented, children first.
+    arguments.computeTypes();
+    
     if(Debug.overloading) 
       Debug.println("Overloading resolution for \n" + this +
-		    "\nwith parameters (" + 
-		    Util.map("", ", ", "", parameters) + ")");
+		    "\nwith parameters " + arguments);
     
-    //addJavaFieldAccess(ident,parameters,symbols);
-    
-    final int arity = parameters.length;
-
     // We remember if some method was discarded
     // in order to enhance the error message
     boolean removedSomething = false;
@@ -89,29 +89,39 @@ public class OverloadedSymbolExp extends Expression
 	  {
 	    Kind k = ((MonoSymbol) s).type.getKind();
 	    if(k instanceof FunTypeKind)
-	      if(((FunTypeKind) k).domainArity!=arity)
+	      if (!arguments.plainApplication(((FunTypeKind) k).domainArity))
 		{ i.remove(); removedSomething = true; continue; }
 	      else ;  
 	    else { i.remove(); continue; }
 	  }
 	else if(s instanceof MethodDeclaration.Symbol)
 	  {
-	    if(((MethodDeclaration.Symbol)s).definition.getArity()!=arity)
+	    MethodDeclaration md = ((MethodDeclaration.Symbol) s).definition;
+	    
+	    if (md.formalParameters() == null)
+	      // true for constructors, for instance. case might be removed
+	      if (!arguments.plainApplication(md.getArity()))
+		{ i.remove(); removedSomething = true; continue; }
+	      else ;  
+	    else if(!md.formalParameters().match(arguments))
 	      { i.remove(); removedSomething = true; continue; }
 	  }
 	else
-	  { Debug.println(s.getClass()+""); i.remove(); continue; }
+	  { 
+	    Internal.warning("Unknown OR case: " + s.getClass()); 
+	    i.remove(); continue; 
+	  }
       }
 
-    if(symbols.size()==0)
+    if(symbols.size() == 0)
       User.error(this, 
 		 removedSomething ?
-		 "No method of arity "+arity+" has name "+ident :
-		 "No method has name "+ident);
+		 "No method with name " + ident + 
+		 " matches call " + arguments :
+		 "No method has name " + ident);
 
-    if(symbols.size()==1)
-      return uniqueExpression();
-    
+    //if(symbols.size() == 1) return uniqueExpression();
+
     Polytype[] types = new Polytype[symbols.size()];
     VarSymbol[] syms = new VarSymbol[symbols.size()];
     int symNum = 0;
@@ -128,7 +138,8 @@ public class OverloadedSymbolExp extends Expression
 	// and we check that cloneType() is not called twice
 	// before the clone type is released
 	s.makeClonedType();
-	Polytype t = CallExp.wellTyped(s.getClonedType(), parameters);
+	Polytype t = CallExp.wellTyped(s.getClonedType(), 
+				       Expression.getType(arguments.getExpressions(symNum)));
 	if (t == null)
 	  {
 	    i.remove();
@@ -153,6 +164,9 @@ public class OverloadedSymbolExp extends Expression
 	  if(syms[i]==res)
 	    {
 	      callExp.type = types[i];
+	      // store the expression (including default arguments)
+	      callExp.computedExpressions = arguments.getExpressions(i);
+	      //callExp.arguments = null; // free memory
 	      return uniqueExpression();
 	    }
       }

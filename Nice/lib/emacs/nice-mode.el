@@ -39,6 +39,7 @@
 (defvar nice-process nil)
 (defvar nice-recompile-flag nil)
 (defvar nice-recompile-all-flag nil)
+(defvar nice-static-flag 't)
 (defvar nice-last-location 1)
 (defconst nice-extension ".nice")
 (defconst nice-extension-regexp "\\.nice$")
@@ -281,6 +282,8 @@
   (define-key nice-mode-map [menu-bar] (make-sparse-keymap))
   (define-key nice-mode-map [menu-bar c]
     (cons "Nice" (make-sparse-keymap "Nice")))
+  (define-key nice-mode-map [menu-bar c nice-toggle-static]
+    '("Toggle static compilation mode" . nice-toggle-static))
   (define-key nice-mode-map [menu-bar c nice-toggle-recompile-all]
     '("Toggle force-recompile-all mode" . nice-toggle-recompile-all))
   (define-key nice-mode-map [menu-bar c nice-toggle-recompile]
@@ -347,6 +350,7 @@ Mode for editing/compiling Nice programs.
   C-c p                   nice-toggle-pretty-print
   C-c r                   nice-toggle-recompile
   C-c R                   nice-toggle-recompile-all
+  C-c s                   nice-toggle-static
 
 * THE MODE IS CONTROLED BY THE FOLLOWING VARIABLES:
 
@@ -420,6 +424,7 @@ Mode for editing/compiling Nice programs.
   (local-set-key "\C-c\C-n" 'nice-next-error)
   (local-set-key "\C-cr" 'nice-toggle-recompile)
   (local-set-key "\C-cR" 'nice-toggle-recompile-all)
+  (local-set-key "\C-cs" 'nice-toggle-static)
   (local-set-key "\C-l" 'nice-fontify-buffer)
   (local-set-key "{" 'c-electric-brace)
   (local-set-key "}" 'c-electric-brace)
@@ -494,8 +499,9 @@ Mode for editing/compiling Nice programs.
           (concat
            (if nice-xprogram nice-xprogram nice-program)
 	   " "
-           (if nice-recompile-flag '("-r "))
-           (if nice-recompile-all-flag '("-R "))
+           (if nice-recompile-flag "-r ")
+           (if nice-recompile-all-flag "-R ")
+           (if nice-static-flag "-s ")
            (nice-buffer-pkg-name))
     )
     
@@ -614,6 +620,12 @@ Mode for editing/compiling Nice programs.
   (interactive)
   (setq nice-recompile-all-flag (not nice-recompile-all-flag))
   (message "Forced recompilation of all packages %s" (if nice-recompile-all-flag "on" "off")))
+
+(defun nice-toggle-static ()
+  "Disable/enable static compilation mode."
+  (interactive)
+  (setq nice-static-flag (not nice-static-flag))
+  (message "Static compilation %s" (if nice-static-flag "on" "off")))
 
 ;; Return the package of a object (nil for global objects)
 (defun nice-object-package (object)

@@ -1,0 +1,28 @@
+package regtest.basic;
+
+/**
+   Test of named and optional parameters.
+*/
+
+int o1(int x, int, int z = 20, int t = 0);
+o1(a, x, z, t) = a + x + 2*z;
+
+int o1(int, int x, int y = 10);
+o1(a, x, y) = a + x + y/2;
+
+void oP(int, int b, int c = 3, int d, int e);
+oP(a,b,c,d,e)
+{
+  println("a=" + a + " b=" + b + " c=" + c + " d=" + d + " e=" + e);
+}
+
+void test_optional();
+test_optional()
+{
+  println("### Testing named and optional parameters ###\n");
+  println(o1(3,x:2));
+
+  oP(1, 2, 3, 4, 5);
+  oP(d:1, b:2, 3, 4, 5);
+  oP(1, 2, d:3, e:4);
+}

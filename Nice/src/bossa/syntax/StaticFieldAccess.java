@@ -12,7 +12,6 @@
 
 // File    : StaticFieldAccess.java
 // Created : Thu Jul 01 18:12:46 1999 by bonniot
-//$Modified: Wed Sep 20 12:35:42 2000 by Daniel Bonniot $
 
 package bossa.syntax;
 
@@ -25,21 +24,22 @@ import java.util.*;
 import bossa.util.Location;
 
 /**
- * A native java static field access.
+   A native java static field access.
+
+   @version $Date$
  */
 public class StaticFieldAccess extends MethodDeclaration
 {
   public StaticFieldAccess(LocatedString className,String fieldName,
 			   LocatedString name,Constraint cst,
-			   Monotype returnType, List parameters)
+			   Monotype returnType, FormalParameters parameters)
   {
-    super(name,cst,returnType,new ArrayList(0));
+    super(name, cst, returnType, parameters);
     this.className = className;
     this.fieldName = fieldName;
     
-    if(parameters.size()!=0)
-      User.error(name,
-		 name+" should have no parameters");    
+    if(arity != 0)
+      User.error(name, name + " should have no parameters");    
   }
   
   private StaticFieldAccess(LocatedString className,String fieldName,

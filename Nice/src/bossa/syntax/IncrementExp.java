@@ -12,7 +12,7 @@
 
 // File    : IncrementExp.java
 // Created : Fri Jul 21 13:58:26 2000 by Daniel Bonniot
-//$Modified: Tue Aug 29 10:43:41 2000 by Daniel Bonniot $
+//$Modified: Mon Oct 09 18:22:17 2000 by Daniel Bonniot $
 
 package bossa.syntax;
 
@@ -76,7 +76,7 @@ public class IncrementExp extends Expression
 
     return Inline.inline
       (new IncrementProc(access.field(), returnOld, increment),
-       ((Expression) call.parameters.get(0)).generateCode());
+       call.arguments.getExp(0).generateCode());
   }
 
   /****************************************************************

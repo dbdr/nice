@@ -12,14 +12,18 @@
 
 // File    : Monotype.java
 // Created : Thu Jul 01 19:28:28 1999 by bonniot
-//$Modified: Thu Jun 08 16:13:07 2000 by Daniel Bonniot $
-// Description : Abstract syntactic type, without constraint
 
 package bossa.syntax;
 
 import java.util.*;
 import bossa.util.*;
 
+/**
+   Syntactic monomorphic type.
+
+   @version $Date$
+   @author Daniel Bonniot
+ */
 abstract public class Monotype
 implements Located
 {
@@ -62,7 +66,7 @@ implements Located
 	return true;
     return false;
   }
-  
+
   /**************************************************************
    * Scoping
    **************************************************************/

@@ -141,6 +141,8 @@ public class MethodBodyDefinition extends Definition
 
     if(symbols.size() == 1)
       return (VarSymbol) symbols.get(0);
+
+    TypeConstructor[] tags = Pattern.getTC(formals);
     
     for(Iterator i = symbols.iterator(); i.hasNext();){
       VarSymbol s = (VarSymbol)i.next();
@@ -170,7 +172,7 @@ public class MethodBodyDefinition extends Definition
 	    
 	try{
 	  Constraint.assert(m.getType().getConstraint());
-	  Typing.leq(Pattern.getTC(formals), m.getType().domain());
+	  Typing.leq(tags, m.getType().domain());
 	}
 	finally{
 	  if(Typing.leave() != level)

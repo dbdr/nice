@@ -82,23 +82,21 @@ int waitFor(Process p, Writer w)
 
   let printer = new PrintWriter(w);
 
-  while (true)
-    {
-      if (out.ready)
-	for (?String line = out.readLine(); line != null; 
-	     line = out.readLine())
-	  printer.println(line);
+  let consumeOut = thread(()=> {
+    for (?String line = out.readLine(); line != null; line = out.readLine())
+      printer.println(line);
+  });
 
-      if (err.ready)
-	for (?String line = err.readLine(); line != null; 
-	     line = err.readLine())
-	  printer.println(line);
+  let consumeErr = thread(()=> {
+    for (?String line = err.readLine(); line != null; line = err.readLine())
+      printer.println(line);
+  });
 
-      try {
-	return p.exitValue();
-      }
-      catch(IllegalThreadStateException e) {
-	// The process is not finished yet.
-      }
-    }
+  consumeOut.start();
+  consumeErr.start();
+
+  consumeOut.join();
+  consumeErr.join();
+
+  return p.waitFor();
 }

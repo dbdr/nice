@@ -498,7 +498,7 @@ public final class Types
 	  try{
 	    File f = nice.tools.util.System.getFile(pathComponent);
 	    if (f.canRead())
-	      components.add(f.toURL());
+	      components.add(f.getCanonicalFile().toURL());
 	    else
 	      {
 		if (!f.exists())
@@ -508,6 +508,9 @@ public final class Types
 	      }
 	  }
 	  catch(java.net.MalformedURLException e){
+	    User.warning("Classpath component " + pathComponent + " is invalid");
+	  }
+	  catch(java.io.IOException e){
 	    User.warning("Classpath component " + pathComponent + " is invalid");
 	  }
 	start = end+1;

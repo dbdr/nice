@@ -64,8 +64,8 @@ void compile(Compilation compilation, String mainPackage,
       uncaughtException.printStackTrace(new java.io.PrintWriter(stackTrace));
 
       compilation.listener.bug
-      (stackTrace: stackTrace.toString(),
-       url: 
+      (/*stackTrace:*/ stackTrace.toString(),
+       /*url:*/ 
          "http://sourceforge.net/tracker/?func=add&group_id=12788&atid=112788"
       );
     }

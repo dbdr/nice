@@ -21,10 +21,10 @@ package bossa.modules;
 import bossa.util.*;
 
 
-interface CompilationListener
+public interface CompilationListener
 {
-  void error  (?Location location, String message);
-  void warning(?Location location, String message);
+  void error  (Location location, String message);
+  void warning(Location location, String message);
 
   /** A bug occured in the compiler. 
       @param url the adress where a bug report should be submitted.

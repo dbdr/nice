@@ -520,6 +520,7 @@ Mode for editing/compiling Nice programs.
      '("successful" . "OK"))
     ((1) '("Compiler bug" . "Bug"))
     ((2) (save-excursion (next-error) '("error" . "error")))
+    ((3) '("successful with warning" . "warning"))
     ('otherwise '("Unknown exit status" . ""))
   ) 
 )

@@ -113,6 +113,16 @@ public final class TypeIdent extends Monotype implements Located
     
     throw User.error(this, this + " is not a class");
   }
+
+  public mlsub.typing.TypeConstructor resolveToTCForPattern(TypeMap scope)
+  {
+    TypeSymbol res = scope.lookup(name);
+
+    if (res instanceof TypeConstructor)
+      return (TypeConstructor) res;
+    
+    throw User.error(this, this + " is not a declared class or interface");
+  }
   
   public TypeSymbol resolvePreferablyToItf(TypeMap scope)
   {

@@ -116,7 +116,7 @@ public class Pattern implements Located
   {
     if (typeConstructor != null)
       {
-	tc = typeConstructor.resolveToTC(scope);
+	tc = typeConstructor.resolveToTCForPattern(scope);
         if (exactlyAt && !TypeConstructors.instantiable(tc))
           User.error
 	    (typeConstructor.location(), 

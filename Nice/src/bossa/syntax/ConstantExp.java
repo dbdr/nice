@@ -12,7 +12,7 @@
 
 // File    : ConstantExp.java
 // Created : Thu Jul 08 15:36:40 1999 by bonniot
-//$Modified: Fri Jul 23 17:33:38 1999 by bonniot $
+//$Modified: Fri Aug 13 12:05:35 1999 by bonniot $
 // Description : Abstract class for values of basic types
 
 package bossa.syntax;
@@ -32,7 +32,8 @@ abstract public class ConstantExp extends Expression
 		   "Base class "+className+
 		   " is not a class !");
 
-    type=new Polytype(new MonotypeConstructor(((TypeConstructor) s),null));
+    type=new Polytype(new MonotypeConstructor(((TypeConstructor) s),null,
+					      null));
     
     // Nothing to do, its already a value
     return this;

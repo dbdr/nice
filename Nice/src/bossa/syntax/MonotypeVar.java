@@ -12,13 +12,14 @@
 
 // File    : MonotypeVar.java
 // Created : Fri Jul 23 15:36:39 1999 by bonniot
-//$Modified: Thu Jul 29 17:42:09 1999 by bonniot $
+//$Modified: Fri Aug 13 15:16:24 1999 by bonniot $
 
 package bossa.syntax;
 
 import java.util.*;
 
 import bossa.util.*;
+import bossa.typing.*;
 import bossa.engine.*;
 
 /**
@@ -30,15 +31,18 @@ import bossa.engine.*;
 public class MonotypeVar extends Monotype
   implements TypeSymbol, bossa.engine.Element
 {
-  public MonotypeVar(LocatedString name)
+  public MonotypeVar(LocatedString name, boolean imperative)
   {
-    this(name,false);
+    this.name=name;
+    this.soft=false;
+    this.imperative=imperative;
   }
 
-  public MonotypeVar(LocatedString name, boolean soft)
+  public MonotypeVar(boolean soft, LocatedString name)
   {
     this.name=name;
     this.soft=soft;
+    this.imperative=false;
   }
 
   Monotype cloneType()
@@ -51,6 +55,15 @@ public class MonotypeVar extends Monotype
     return name.equals(s);
   }
 
+  /****************************************************************
+   * Imperative type variables
+   ****************************************************************/
+
+  public boolean isImperative()
+  {
+    return imperative;
+  }
+  
   /****************************************************************
    * Functional Types
    ****************************************************************/
@@ -74,19 +87,18 @@ public class MonotypeVar extends Monotype
     Internal.error(equivalentCodomain!=null,"equivalentCodomain!=null in MonotypeVar");
     
     equivalentCodomain=Monotype.fresh(new LocatedString(name.content+"0",name.location()));
+    bossa.typing.Typing.introduce(equivalentCodomain);
+    
     equivalentDomain=Monotype.freshs(arity,name);
-
-//      functionalType=new FunType(equivalentDomain,equivalentCodomain);
-	
-//      return functionalType;
+    bossa.typing.Typing.introduce(equivalentDomain);
   }
   
-  TypeConstructor getTC()
+  public TypeConstructor getTC()
   {
     return equivalentTC;
   }
   
-  TypeParameters getTP()
+  public TypeParameters getTP()
   {
     return equivalentTP;
   }
@@ -109,7 +121,8 @@ public class MonotypeVar extends Monotype
     // In this case, it was indeed a type constructor,
     // applied to no type parameters
     if(s instanceof TypeConstructor)
-      return new MonotypeConstructor((TypeConstructor) s, null);
+      return new MonotypeConstructor((TypeConstructor) s, null, 
+				     name.location());
 
     Internal.error(this,this.name+" is not well kinded :"+s.getClass());
     return null;
@@ -160,30 +173,47 @@ public class MonotypeVar extends Monotype
   public void setKind(Kind value)
   {
     // it is ok to reset kind to null
+    if(kind!=null && value!=null)
+      {
+	Internal.warning(this,this+": kind was "+kind+", value is "+value);
+	throw new Error();
+      }
+    
+    
     Internal.error(kind!=null && value!=null,"Variance already set in MonotypeVar");
     
     kind=value;
 
     if(value==null)
-      return;
-
-    // Do the apropriate cast
-    if(value instanceof FunTypeKind)
-      functionalCast(((FunTypeKind)value).domainArity);
-    else if(value instanceof Variance)
       {
-	Variance v=(Variance) value;
-	
-	equivalentTC=new TypeConstructor(this,v);
-	bossa.typing.Typing.introduce(equivalentTC);
-	equivalentTP=new TypeParameters(this.name,v);
+	// Reset the equivalent* fields so that
+	// this variable becomes "free" again
+	equivalentTP=null;
+	equivalentTC=null;
+	equivalentCodomain=null;
+	equivalentDomain=null;
       }
-    // in other cases (kind of the rigid monotype variables)
-    // nothing to do
+    else
+      {
+	// Do the apropriate cast
+	if(value instanceof FunTypeKind)
+	  functionalCast(((FunTypeKind)value).domainArity);
+	else if(value instanceof Variance)
+	  {
+	    Variance v=(Variance) value;
+	
+	    equivalentTC=new TypeConstructor(this,v);
+	    bossa.typing.Typing.introduce(equivalentTC);
+	    equivalentTP=new TypeParameters(this.name,v);
+	    bossa.typing.Typing.introduce(equivalentTP.content);
+	  }
+	// in other cases (kind of the rigid monotype variables)
+	// nothing to do
+      }
   }
   
   /** When this variable is comparable to a functional type */
-  private Monotype equivalentCodomain;
+  private MonotypeVar equivalentCodomain;
   private Collection equivalentDomain;
   private Monotype functionalType;
 
@@ -196,4 +226,6 @@ public class MonotypeVar extends Monotype
    */
 
   private boolean soft;
+
+  private boolean imperative;
 }

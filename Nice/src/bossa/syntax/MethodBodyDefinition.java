@@ -12,7 +12,7 @@
 
 // File    : MethodBodyDefinition.java
 // Created : Thu Jul 01 18:12:46 1999 by bonniot
-//$Modified: Thu Jul 29 16:18:34 1999 by bonniot $
+//$Modified: Fri Aug 13 14:08:47 1999 by bonniot $
 // Description : Abstract syntax for a method body
 
 package bossa.syntax;
@@ -24,11 +24,14 @@ import bossa.typing.*;
 public class MethodBodyDefinition extends Node 
   implements Definition, Located
 {
-  public MethodBodyDefinition(LocatedString name, Collection typeParameters,
+  public MethodBodyDefinition(LocatedString name, 
+			      Collection typeParameters,
+			      Collection binders,
 			      List formals, List body)
   {
     this.name=name;
     this.typeParameters=typeParameters;
+    this.binders=binders; 
     this.formals=formals;
     this.body=new Block(body);
     this.definition=null;
@@ -92,6 +95,7 @@ public class MethodBodyDefinition extends Node
 		   " was defined twice in the body of this method");
       }
 
+    // Get imperative type parameters
     try{
       this.typeScope=TypeScope.makeScope
 	(typeOuter,
@@ -99,10 +103,24 @@ public class MethodBodyDefinition extends Node
 	 definition.type.getTypeParameters());
     }
     catch(BadSizeEx e){
-      User.error(name,"Method \""+name+"\" expects "+e.expected+" type parameters");
+      User.error(name,"Method \""+name+"\" expects "+e.expected+
+		 " imperative type parameters");
     }
 
-    buildScope(definition.scope,this.typeScope,parameters);
+    // Get functional type parameters
+    if(binders!=null)
+    try{
+      this.typeScope=TypeScope.makeScope
+	(this.typeScope,
+	 binders,
+	 definition.type.getConstraint().binders);
+    }
+    catch(BadSizeEx e){
+      User.error(name,"Method \""+name+"\" expects "+e.expected+
+		 " functional type parameters");
+    }
+
+    Node.buildScope(definition.scope,this.typeScope,parameters);
     body.buildScope(this.scope,this.typeScope);
   }
 
@@ -187,5 +205,6 @@ public class MethodBodyDefinition extends Node
   protected Collection /* of FieldSymbol */  parameters;
   protected List       /* of Patterns */   formals;
   protected Collection /* of TypeConstructor */ typeParameters;
+  Collection /* of LocatedString */ binders; // Null if functional type parameters are not bound
   private Block body;
 }

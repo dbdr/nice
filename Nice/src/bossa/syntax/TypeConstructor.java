@@ -12,20 +12,23 @@
 
 // File    : TypeConstructor.java
 // Created : Thu Jul 08 11:51:09 1999 by bonniot
-//$Modified: Thu Jul 29 16:23:07 1999 by bonniot $
-// Description : A class. It "needs" type parameters to become a Monotype
+//$Modified: Fri Aug 13 14:47:16 1999 by bonniot $
 
 package bossa.syntax;
 
 import java.util.*;
 import bossa.util.*;
 import bossa.engine.*;
+import bossa.typing.Variance;
 
+/**
+ * A class. It "needs" type parameters to become a Monotype
+ */
 public class TypeConstructor
   implements Located, TypeSymbol, bossa.engine.Element
 {
   /**
-   * Constructs a new type constructor from a well known class
+   * Constructs a new type constructor from a well known class.
    *
    * @param d the definition of the class
    */
@@ -38,9 +41,9 @@ public class TypeConstructor
   }
 
   /**
-   * Constructs a type constructor whose class is not known yet
+   * Constructs a type constructor whose class is not known yet.
    * We just know the name for the moment, 
-   * the scoping will find the class definition later
+   * the scoping will find the class definition later.
    *
    * @param className the name of the class
    */
@@ -53,14 +56,15 @@ public class TypeConstructor
   }
 
   /**
-   * Constructs a fresh TypeConstructor
+   * Constructs a fresh TypeConstructor.
    *
    * @param source a MonotypeVariable which shall deconstruct to this type constructor
    * @param v the variance of this type constructor
    */
   TypeConstructor(MonotypeVar source, Variance v)
   {
-    this.name=source.name;
+    this.name=new LocatedString(source.name.content+"'",source.name.location());
+
     Internal.error(v==null,name+" : null Variance");
     
     setVariance(v);
@@ -103,7 +107,7 @@ public class TypeConstructor
     
     if(variance.size!=tp.size())
       throw new BadSizeEx(variance.size,tp.size());
-    return new Polytype(new MonotypeConstructor(this,tp));
+    return new Polytype(new MonotypeConstructor(this,tp,this.location()));
   }
 
   /****************************************************************
@@ -184,7 +188,7 @@ public class TypeConstructor
   public void setKind(Kind value)
   {
     Internal.warning("Variance set in TC by engine for "+name);
-    Internal.error(variance!=null,"Variance already set in TypeConstructor");
+    Internal.error(kind!=null,"Variance already set in TypeConstructor");
     
     kind=value;
   }

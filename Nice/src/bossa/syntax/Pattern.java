@@ -12,7 +12,7 @@
 
 // File    : Pattern.java
 // Created : Mon Jul 05 14:36:52 1999 by bonniot
-//$Modified: Wed Jul 28 21:40:26 1999 by bonniot $
+//$Modified: Fri Aug 13 16:14:08 1999 by bonniot $
 // Description : Syntactic pattern for method bodies declaration
 
 package bossa.syntax;
@@ -37,10 +37,14 @@ public class Pattern
   {
     if(typeConstructor==null)
       return Domain.bottom();
-        
+    
+    TypeParameters tp=new TypeParameters(typeConstructor.name,typeConstructor.variance);
+    bossa.typing.Typing.introduce(tp.content);
+    
     return new Domain(Constraint.True(), 
 		      new MonotypeConstructor(typeConstructor,
-					      new TypeParameters(typeConstructor.name,typeConstructor.variance)));
+					      tp,
+					      typeConstructor.location()));
   }
   
   static Collection getDomain(Collection patterns)

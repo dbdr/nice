@@ -12,8 +12,7 @@
 
 // File    : Front.java
 // Created : Thu Jul 01 15:11:18 1999 by bonniot
-//$Modified: Thu Jul 29 10:15:06 1999 by bonniot $
-// Description : Front-end test
+//$Modified: Fri Aug 13 15:48:58 1999 by bonniot $
 
 package bossa.test;
 
@@ -45,7 +44,8 @@ public class Front
       }
     else file=args[0];
     
-    defs.addAll(Loader.open(file));
+    if(!file.equals("stdlib.bossa"))
+      defs.addAll(Loader.open(file));
 
     try{
       AST ast=new AST(defs);

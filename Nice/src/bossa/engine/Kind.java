@@ -12,13 +12,13 @@
 
 // File    : Kind.java
 // Created : Wed Jul 28 14:53:22 1999 by bonniot
-//$Modified: Thu Jul 29 17:59:31 1999 by bonniot $
+//$Modified: Fri Aug 13 11:14:24 1999 by bonniot $
 
 package bossa.engine;
 
 import bossa.util.*;
 
-/** Something that knows how to assert constraint on objects of this "Kind"
+/** Something that knows how to assert constraints on objects of this "Kind"
  * 
  * (implemented by Variance, Low level constraints... )
  * 

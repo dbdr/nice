@@ -12,7 +12,7 @@
 
 // File    : Typing.java
 // Created : Tue Jul 20 11:57:17 1999 by bonniot
-//$Modified: Thu Jul 29 16:20:45 1999 by bonniot $
+//$Modified: Fri Aug 13 16:15:04 1999 by bonniot $
 
 package bossa.typing;
 
@@ -73,6 +73,8 @@ abstract public class Typing
 
   static public void introduce(Element e)
   {
+    if(dbg) Debug.println("Typing.introduce "+e);
+    
     //TODO: this is DIRTY !
     if(e instanceof MonotypeVar)
       e.setKind(null);
@@ -89,7 +91,7 @@ abstract public class Typing
 	if(o instanceof Element)
 	  introduce((Element) o);
 	else
-	  Internal.warning("introducing "+o.getClass());
+	  Internal.warning("introducing a "+o.getClass());
       }
   }
   
@@ -230,54 +232,7 @@ abstract public class Typing
     catch(Unsatisfiable e){
       if(dbg) e.printStackTrace();
       throw new TypingEx(e.getMessage());
-    }
-    
-    
-//      Collection dom1,dom2;
-    
-//      if((dom1=m1.domain())!=null)
-//        {
-//  	m2=m2.functionalCast(dom1.size());
-//  	dom2=m2.domain();
-//  	if(dom2==null)
-//  	  throw new KindingEx(m1,m2);
-//  	leqMono(dom2,dom1);
-//  	leq(m1.codomain(),m2.codomain());
-//        }
-//      else
-//      if((dom2=m2.domain())!=null)
-//        {
-//  	m1=m1.functionalCast(dom2.size());
-//  	if((dom1=m1.domain())==null)
-//  	  throw new KindingEx(m1,m2);
-//  	leqMono(dom2,dom1);
-//  	leq(m1.codomain(),m2.codomain());
-//        }
-//      else
-//        {
-//  	if(m1 instanceof MonotypeVar && m2 instanceof MonotypeVar)
-//  	  Debug.println(m1+" <: "+m2);
-//  	else
-//  	  {
-//  	    Variance v=null;
-//  	    if(m1 instanceof MonotypeConstructor)
-//  	      v=((MonotypeConstructor)m1).tc.variance;
-//  	    else if(m2 instanceof MonotypeConstructor)
-//  	      v=((MonotypeConstructor)m2).tc.variance;
-//  	    else
-//  	      Internal.error("No TypeConstructor in Typing.leq");
-	    
-//  	    TypeConstructor tc1=m1.decomposeTC(v);
-//  	    TypeConstructor tc2=m2.decomposeTC(v);
-//  	    leq(tc1,tc2);
-//  	    try{
-//  	      v.assertLeq(m1.decomposeTP(v),m2.decomposeTP(v));
-//  	    }
-//  	    catch(BadSizeEx e){
-//  	      throw new TypingEx(m1+" and "+m2+" cannot be compared");
-//  	    }
-//  	  }
-//        }
+    }    
   }
   
   /****************************************************************
@@ -302,10 +257,11 @@ abstract public class Typing
   public static void in(Polytype type, Domain domain)
     throws TypingEx
   {
+    if(dbg) Debug.println(type+" in "+domain);
+    
     type.constraint.assert();
     domain.constraint.assert();
     leq(type.monotype,domain.monotype);
-    
   }
   
   /**
@@ -371,5 +327,5 @@ abstract public class Typing
       }
   }
 
-  static boolean dbg = false;
+  static final boolean dbg = false;
 }

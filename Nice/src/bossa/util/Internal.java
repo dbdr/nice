@@ -12,7 +12,7 @@
 
 // File    : Internal.java
 // Created : Wed Jul 07 18:23:19 1999 by bonniot
-//$Modified: Fri Jul 23 17:05:41 1999 by bonniot $
+//$Modified: Fri Aug 13 14:36:01 1999 by bonniot $
 // Description : Internal errors...
 
 package bossa.util;
@@ -23,6 +23,11 @@ package bossa.util;
 
 public class Internal
 {
+  public static void warning(Located loc, String message)
+  {
+    warning(loc.location()+message);
+  }
+  
   public static void warning(String message)
   {
     System.out.println("[Internal warning] "+message);

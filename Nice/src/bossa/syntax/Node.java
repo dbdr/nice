@@ -12,7 +12,7 @@
 
 // File    : Node.java
 // Created : Thu Jul 08 10:24:56 1999 by bonniot
-//$Modified: Tue Jul 20 14:40:15 1999 by bonniot $
+//$Modified: Fri Jul 30 19:16:34 1999 by bonniot $
 // Description : Basic component of the syntax tree
 //   Defines its local scope 
 
@@ -23,11 +23,6 @@ import bossa.util.*;
 
 abstract class Node
 {
-  Node()
-  {
-    
-  }
-
   /** Sets up the scope, once the outer scope is given */
   void buildScope(VarScope outer, TypeScope typeOuter)
   // Default behaviour, must be overriden in nodes

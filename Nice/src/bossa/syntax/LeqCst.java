@@ -12,7 +12,7 @@
 
 // File    : LeqCst.java
 // Created : Mon Jul 19 16:42:14 1999 by bonniot
-//$Modified: Mon Jul 26 15:08:00 1999 by bonniot $
+//$Modified: Fri Aug 13 16:03:46 1999 by bonniot $
 // Description : Inequality between type constructors
 
 package bossa.syntax;
@@ -76,6 +76,15 @@ public class LeqCst extends AtomicConstraint
       }
     return this;
   }
+
+  public void assert()
+  {
+    Internal.error("A LeqCst should not be alive at this stage");
+  }
+  
+  /****************************************************************
+   * Printing
+   ****************************************************************/
 
   public String toString()
   {

@@ -12,7 +12,7 @@
 
 // File    : parser.jj
 // Created : Thu Jul 01 10:27:05 1999 by bonniot
-//$Modified: Thu Jul 29 11:05:35 1999 by bonniot $
+//$Modified: Fri Aug 13 14:18:12 1999 by bonniot $
 // Description : Parseur JavaCC pour Bossa
 //   Tokens based on the Jazz parser
 
@@ -326,30 +326,17 @@ LocatedString string():
     { return new LocatedString(t.image,new Location(t)); }
 }
 
-/*
-Ident identifier():
+Collection strings():
 {
+  Collection res=new ArrayList();
   LocatedString s;
 }
 {
-  s=string()
-  { return new Ident(s); }
+  s=string() { res.add(s); }
+  ( "," s=string() { res.add(s); } )*
+  { return res; }
 }
 
-Collection identifiers():
-{
-    Collection res=new ArrayList();
-    Ident i;
-}
-{
-(
-    i=identifier() { res.add(i); }
-    ( "," i=identifier() { res.add(i); } )*
-    { return res; }
-)
-| { return new ArrayList(); }
-}
-*/
 int integer():
 {
   Token t;
@@ -449,7 +436,7 @@ TypeSymbol binder(Collection atomics):
   MonotypeVar id;
 }
 {
-  "Any" id=monotypeVar()
+  "Any" id=monotypeVar(false)
   { return id;
   }
 |
@@ -541,24 +528,24 @@ Constraint constraint():
 
 //Monotypes
 
-MonotypeVar monotypeVar():
+MonotypeVar monotypeVar(boolean imperative):
 {
   LocatedString name;
 }
 {
   name=string()
-  { return new MonotypeVar(name); }
+  { return new MonotypeVar(name,imperative); }
 }
 
-Collection monotypeVars():
+Collection monotypeVars(boolean imperative):
 {
     Collection res=new ArrayList(0);
     MonotypeVar var;
 }
 {
     ( "<" 
-      var=monotypeVar() { res.add(var); }
-      ( "," var=monotypeVar() { res.add(var); } )*
+      var=monotypeVar(imperative) { res.add(var); }
+      ( "," var=monotypeVar(imperative) { res.add(var); } )*
     ">" )?
     { return res; }
 }
@@ -567,15 +554,19 @@ Monotype monotypeConstructor():
 {
     TypeConstructor t;
     Collection p=null;
+    Token first,last;
 }
 {
+  { first=getToken(1); }
   // monotypeConstructors with no type parameters (and no "<" ">")
-  // are parsed as MonotypeVars.
-  // This is fixed during scoping
+  // are parsed as MonotypeVars, not here.
+  // This is fixed during scoping.
     t=typeConstructor() 
     "<" [  p=monotypes() ] ">"
     { if(p==null) p=new ArrayList(0);
-      return new MonotypeConstructor(t,new TypeParameters(p)); 
+      last=getToken(0);
+      Location loc=new Location(first).englobe(new Location(last));
+      return new MonotypeConstructor(t,new TypeParameters(p),loc); 
     }
 }
 
@@ -601,7 +592,9 @@ Monotype monotype():
   LOOKAHEAD(2)
   res=monotypeConstructor()
 | 
-  res=monotypeVar() 
+  // we don't know yet if it is imperative or not
+  // it depends on the definition of this symbol
+  res=monotypeVar(false) 
   )
   { return res; }
 }
@@ -662,7 +655,7 @@ Type type():
   Collection tp;
 }
 {
-  tp=monotypeVars()
+  tp=monotypeVars(true)
   p=polytype()
   { return Type.newType(tp,p); }
 }
@@ -694,7 +687,7 @@ void methodDecl(ClassDefinition c):
 {
   returnType=monotype()
   name=string()
-  tp=monotypeVars()
+  tp=monotypeVars(true)
   cst=constraint()
   "("
   parameters=monotypes()
@@ -742,7 +735,7 @@ ClassDefinition classDefinition():
 {
   "class"
     name=string() 
-    parameters=monotypeVars() 
+    parameters=monotypeVars(true) 
     { res=new ClassDefinition(name,parameters); }
     ( implementations(res) | abstractions(res) | extensions(res) )*
     "{"
@@ -766,7 +759,7 @@ InterfaceDefinition interfaceDefinition():
 {
   "interface"
   name=string()
-  parameters=monotypeVars()
+  parameters=monotypeVars(true)
   ";"
   { return new InterfaceDefinition(name,parameters); }
 }
@@ -785,7 +778,7 @@ MethodBodyDefinition methodBodyDefinition():
 {
     LocatedString name,i;
     Pattern p;
-    Collection binders;
+    Collection binders=null;
     List parameters=new ArrayList();
     Collection tp;
     List code;
@@ -793,6 +786,7 @@ MethodBodyDefinition methodBodyDefinition():
 {
     name=string()
     tp=typeConstructors()
+    [ "{" binders=strings() "}" ]
     p=pattern(new LocatedString("this",new Location(0,0,0,0))) 
       { parameters.add(p); }
     "("
@@ -804,7 +798,7 @@ MethodBodyDefinition methodBodyDefinition():
     "{"
     code=statements()
     "}"
-    { return new MethodBodyDefinition(name,tp,parameters,code); }
+    { return new MethodBodyDefinition(name,tp,binders,parameters,code); }
 }
 
 MethodDefinition methodDefinition():
@@ -818,7 +812,7 @@ MethodDefinition methodDefinition():
 {
     returnType=monotype()
     name=string()
-    tp=monotypeVars()
+    tp=monotypeVars(true)
     cst=constraint()
     "("
     ( parameters=monotypes() | { parameters=new ArrayList(); } )
@@ -900,15 +894,13 @@ IdentExp identExp():
 
 NewExp newExp():
 {
-  TypeConstructor t;
-  TypeParameters tp=null;
+  Monotype t;
 }
 {
   "new" 
-  t=typeConstructor()
-  [ tp=typeParameters() ]
+  t=monotype()
   "(" ")" 
-  { return new NewExp(t,tp); }
+  { return new NewExp(t); }
 }
 
 CallExp callExp(Expression prefix):

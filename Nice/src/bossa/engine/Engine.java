@@ -12,7 +12,7 @@
 
 // File    : Engine.java
 // Created : Tue Jul 27 15:34:53 1999 by bonniot
-//$Modified: Thu Jul 29 18:05:33 1999 by bonniot $
+//$Modified: Fri Aug 13 15:07:20 1999 by bonniot $
 
 package bossa.engine;
 
@@ -137,12 +137,18 @@ public abstract class Engine
 	  setKind(e1,k2);
 	  k2.leq(e1,e2);
 	}
-      else
+      else // k1==null and k2==null
 	{
 	  if(!(floating.contains(e1)))
-	    floating.add(e1);
+	    {
+	      floating.add(e1);
+	      Internal.warning("Engine: floating added 1 : "+e1);
+	    }
 	  if(!(floating.contains(e2)))
-	    floating.add(e2);
+	    {
+	      floating.add(e2);
+	      Internal.warning("Engine: floating added 2 : "+e2);
+	    }
 	  
 	  frozenLeqs.add(new Leq(e1,e2));
 	}
@@ -238,7 +244,7 @@ public abstract class Engine
 	variablesKind.register(e);
       }
     floating.clear();
-    	
+    
     for(Iterator i=frozenLeqs.iterator();
 	i.hasNext();)
       {
@@ -307,5 +313,5 @@ public abstract class Engine
     }
   }
 
-  static boolean dbg = false;
+  static final boolean dbg = false;
 }

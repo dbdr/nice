@@ -12,7 +12,7 @@
 
 // File    : ClassDefinition.java
 // Created : Thu Jul 01 11:25:14 1999 by bonniot
-//$Modified: Tue Jul 27 16:35:13 1999 by bonniot $
+//$Modified: Fri Aug 13 12:01:36 1999 by bonniot $
 // Description : Abstract syntax for a class definition
 
 package bossa.syntax;
@@ -55,7 +55,8 @@ public class ClassDefinition extends Node
       (typeParameters,
        new Polytype(new MonotypeConstructor
 		    (this.tc,
-		     TypeParameters.fromSymbols(typeParameters))));
+		     TypeParameters.fromSymbols(typeParameters),
+		     name.location())));
   }
 
   void buildScope(VarScope scope, TypeScope ts)

@@ -12,13 +12,15 @@
 
 // File    : Variance.java
 // Created : Fri Jul 23 12:15:46 1999 by bonniot
-//$Modified: Thu Jul 29 16:03:50 1999 by bonniot $
+//$Modified: Fri Aug 13 11:27:13 1999 by bonniot $
 
-package bossa.syntax;
+package bossa.typing;
 
 import java.util.*;
 import bossa.util.*;
+
 import bossa.engine.*;
+import bossa.syntax.*;
 
 /**
  * Variance of a type constructor
@@ -77,13 +79,26 @@ public class Variance
       }
   }
   
-  public boolean isBase()
+  /****************************************************************
+   * Well formedness
+   ****************************************************************/
+
+  /**
+   * Checks wether the type parameters are acceptable
+   * in this variance
+   */
+  public boolean wellFormed(TypeParameters tp)
   {
-    return false;
+    Iterator i=tp.iterator();
+    while(i.hasNext())
+      if(!((Monotype)i.next()).isImperative())
+	return false;
+    return true;
   }
   
   /****************************************************************
-   * Hastable oriented methods : usefull for the Engine to determine the right constraint
+   * Hastable oriented methods : usefull for the Engine 
+   * to determine the right constraint
    ****************************************************************/
   
   public int hashCode()
@@ -96,5 +111,5 @@ public class Variance
     return (o instanceof Variance) && (((Variance) o).size==size);
   }
   
-  int size;
+  public int size;
 }

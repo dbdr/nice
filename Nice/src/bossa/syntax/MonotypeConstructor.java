@@ -12,7 +12,7 @@
 
 // File    : MonotypeConstructor.java
 // Created : Thu Jul 22 09:15:17 1999 by bonniot
-//$Modified: Wed Jul 28 17:30:33 1999 by bonniot $
+//$Modified: Fri Aug 13 12:10:23 1999 by bonniot $
 // Description : A monotype, build by application of
 //   a type constructor to type parameters
 
@@ -32,18 +32,20 @@ public class MonotypeConstructor extends Monotype
    * @param tc the type constructor
    * @param parameters the type parameters
    */
-  public MonotypeConstructor(TypeConstructor tc, TypeParameters parameters)
+  public MonotypeConstructor(TypeConstructor tc, TypeParameters parameters,
+			     Location loc)
   {
     this.tc=tc;
     if(parameters==null)
       this.parameters=new TypeParameters(null);
     else
       this.parameters=parameters;
+    this.loc=loc;
   }
 
   Monotype cloneType()
   {
-    return new MonotypeConstructor(tc,parameters);
+    return new MonotypeConstructor(tc,parameters,loc);
   }
 
   /****************************************************************
@@ -54,6 +56,12 @@ public class MonotypeConstructor extends Monotype
   {
     tc=tc.resolve(typeScope);
     parameters=parameters.resolve(typeScope);
+
+    // Check the monotype is well-formed,
+    // ie all the parameters in imperative positions are imperative
+    User.error(!tc.variance.wellFormed(parameters),
+	       this,"Type parameters must be imperative");
+
     return this;
   }
   
@@ -61,17 +69,31 @@ public class MonotypeConstructor extends Monotype
   {
     return new MonotypeConstructor
       (tc,
-       new TypeParameters(Monotype.substitute(map,parameters.content)));
+       new TypeParameters(Monotype.substitute(map,parameters.content)),
+       loc);
   }
 
-  TypeConstructor getTC()
+  public TypeConstructor getTC()
   {
     return tc;
   }
   
-  TypeParameters getTP()
+  public TypeParameters getTP()
   {
     return parameters;
+  }
+  
+  /****************************************************************
+   * Imperative type variables
+   ****************************************************************/
+
+  public boolean isImperative()
+  {
+    Iterator i=parameters.iterator();
+    while(i.hasNext())
+      if(!((Monotype)i.next()).isImperative())
+	return false;
+    return true;
   }
   
   /****************************************************************
@@ -97,7 +119,10 @@ public class MonotypeConstructor extends Monotype
 
   public Location location()
   {
-    return tc.location();
+    if(loc==null)
+      return tc.location();
+    else
+      return loc;
   }
 
   public String toString()
@@ -107,4 +132,5 @@ public class MonotypeConstructor extends Monotype
 
   public TypeConstructor tc;
   TypeParameters parameters;
+  Location loc;
 }

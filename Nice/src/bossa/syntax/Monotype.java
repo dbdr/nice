@@ -12,7 +12,7 @@
 
 // File    : Monotype.java
 // Created : Thu Jul 01 19:28:28 1999 by bonniot
-//$Modified: Wed Jul 28 21:40:28 1999 by bonniot $
+//$Modified: Fri Aug 13 15:20:37 1999 by bonniot $
 // Description : Abstract syntactic type, without constraint
 
 package bossa.syntax;
@@ -43,7 +43,7 @@ abstract public class Monotype
    */
   static MonotypeVar fresh(LocatedString associatedVariable,Monotype m)
   {
-    MonotypeVar res=new MonotypeVar(associatedVariable,true);
+    MonotypeVar res=new MonotypeVar(true,associatedVariable);
     return res;
   }
   
@@ -56,7 +56,7 @@ abstract public class Monotype
   {
     Collection res=new ArrayList(arity);
     for(int i=1;i<=arity;i++)
-      res.add(fresh(new LocatedString(associatedVariable.content+arity,associatedVariable.location())));
+      res.add(fresh(new LocatedString(associatedVariable.content+i,associatedVariable.location())));
     return res;
   }
   
@@ -89,6 +89,15 @@ abstract public class Monotype
   }
 
   /****************************************************************
+   * Imperative type variables
+   ****************************************************************/
+
+  public boolean isImperative()
+  {
+    return false;
+  }
+  
+  /****************************************************************
    * Functional types
    ****************************************************************/
 
@@ -104,13 +113,13 @@ abstract public class Monotype
     return null;
   }
 
-  TypeConstructor getTC()
+  public TypeConstructor getTC()
   {
     User.error("decomposeTC should not be called in class "+getClass());
     return null;
   }
   
-  TypeParameters getTP()
+  public TypeParameters getTP()
   {
     User.error("decomposeTP should not be called in class "+getClass());
     return null;

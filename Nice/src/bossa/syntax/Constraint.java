@@ -12,7 +12,7 @@
 
 // File    : Constraint.java
 // Created : Fri Jul 02 17:51:35 1999 by bonniot
-//$Modified: Wed Jul 28 23:00:26 1999 by bonniot $
+//$Modified: Fri Aug 13 14:56:25 1999 by bonniot $
 
 package bossa.syntax;
 
@@ -82,7 +82,7 @@ public class Constraint
   public static Constraint and(Constraint c1, Constraint c2)
   {
     Constraint res=c1.cloneConstraint();
-    c1.binders.addAll(c2.binders);
+    c1.addBinders(c2.binders);
 
     return res;
   }
@@ -97,7 +97,7 @@ public class Constraint
 
   void and(Constraint c)
   {
-    this.binders.addAll(c.binders);
+    this.addBinders(c.binders);
     this.atomics.addAll(c.atomics);
   }
   
@@ -144,6 +144,27 @@ public class Constraint
 	+ Util.map("",", ","}",atomics);
   }
 
+  /****************************************************************
+   * Internal manipulation
+   ****************************************************************/
+
+  /**
+   * Adds binders that are not already present
+   *
+   * @param b a collection of TypeSymbol
+   */
+  private void addBinders(Collection b)
+  {
+    Iterator i=b.iterator();
+    while(i.hasNext())
+      {
+	//TODO: optimize by removing the cast
+	TypeSymbol s=(TypeSymbol)i.next();
+	if(!binders.contains(s))
+	  binders.add(s);
+      }
+  }
+  
   public Collection /* of TypeSymbol */ binders;
   Collection /* of AtomicConstraint */ atomics;
 }

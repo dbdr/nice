@@ -12,7 +12,7 @@
 
 // File    : Polytype.java
 // Created : Tue Jul 13 12:51:38 1999 by bonniot
-//$Modified: Wed Jul 28 21:01:22 1999 by bonniot $
+//$Modified: Fri Aug 13 12:04:01 1999 by bonniot $
 
 package bossa.syntax;
 
@@ -48,7 +48,7 @@ public class Polytype extends Type
 
   static Polytype voidType(TypeScope typeScope)
   {
-    Monotype m=new MonotypeConstructor(new TypeConstructor(new LocatedString("void",Location.nowhere())),null);
+    Monotype m=new MonotypeConstructor(new TypeConstructor(new LocatedString("void",Location.nowhere())),null,Location.nowhere());
     m.resolve(typeScope);
     
     return new Polytype(m);

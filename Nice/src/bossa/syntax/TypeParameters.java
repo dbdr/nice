@@ -12,12 +12,13 @@
 
 // File    : TypeParameters.java
 // Created : Mon Jul 12 17:51:12 1999 by bonniot
-//$Modified: Wed Jul 28 21:39:14 1999 by bonniot $
+//$Modified: Fri Aug 13 12:05:38 1999 by bonniot $
 
 package bossa.syntax;
 
 import java.util.*;
 import bossa.util.*;
+import bossa.typing.Variance;
 
 /**
  * Ground type parameters
@@ -48,7 +49,7 @@ public class TypeParameters
     while(i.hasNext())
       {
 	TypeSymbol s=(TypeSymbol) i.next();
-	res.add(new MonotypeConstructor(((ClassDefinition) s).tc,null));
+	res.add(new MonotypeConstructor(((ClassDefinition) s).tc,null,null));
       }
     return new TypeParameters(res);
   }
@@ -63,12 +64,12 @@ public class TypeParameters
     return Util.map("<",", ",">",true,content);
   }
 
-  int size()
+  public int size()
   {
     return content.size();
   }
 
-  Iterator iterator()
+  public Iterator iterator()
   {
     return content.iterator();
   }

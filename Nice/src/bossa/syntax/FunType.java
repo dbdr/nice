@@ -12,12 +12,13 @@
 
 // File    : FunType.java
 // Created : Fri Jul 02 17:41:24 1999 by bonniot
-//$Modified: Wed Jul 28 17:56:08 1999 by bonniot $
+//$Modified: Fri Jul 30 16:08:00 1999 by bonniot $
 
 package bossa.syntax;
 
 import java.util.*;
 import bossa.util.*;
+import bossa.typing.FunTypeKind;
 import bossa.engine.*;
 
 /**

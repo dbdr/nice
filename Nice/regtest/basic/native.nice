@@ -46,6 +46,6 @@ test_native()
 }
 
 // Tests creation of an array with a native type component.
-// java.lang.Void is exotic anough so that it has not been loaded in a previous package
+// java.lang.Void is exotic enough so that it has not been loaded in a previous package
 // (nice.lang), so that we check that this specific situation works.
 Array<?java.lang.Void> noVoids() = new java.lang.Void[0];

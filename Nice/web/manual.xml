@@ -779,9 +779,12 @@ lastItem(coll)
 	<title>Value Dispatch</title>
 	<programlisting lang="nice"><![CDATA[
 String digitToString(int digit, String language)
-  requires digit < 10 && digit >= 0;
+  requires 0 <= digit < 10;
 
-digitToString(digit, language) { throw new Exception("Couldn't convert " + digit + " to language " + language); }
+digitToString(digit, language)
+{
+  throw new Exception("Couldn't convert "digit" to language "language);
+}
 
 digitToString(1, "english") = "one";
 digitToString(2, "english") = "two";
@@ -824,12 +827,12 @@ class Person
 
 let Person BOB = new Person();
 
-void greet(Person p) 
+void greet(Person p)
 {
   println("Hello, anonymous person!");
 }
 
-greet(BOB) 
+greet(BOB)
 {
   println("Hi Bob!");
 }

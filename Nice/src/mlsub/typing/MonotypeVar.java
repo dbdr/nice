@@ -55,10 +55,10 @@ public final class MonotypeVar extends Monotype
   Monotype substitute(java.util.Map map)
   {
     Object newVar = map.get(this);
-    if(newVar==null)
+    if (newVar == null)
       return this;
-    else
-      return (Monotype) newVar;
+
+    return (Monotype) newVar;
   }
   
   /****************************************************************
@@ -83,7 +83,7 @@ public final class MonotypeVar extends Monotype
   
   public int getId() 		{ return id; }
   
-  public void setId(int value) 	{ id=value; }
+  public void setId(int value) 	{ System.out.println( this.superToString() + " has new ID " + value); id=value; }
   
   Kind kind;
   

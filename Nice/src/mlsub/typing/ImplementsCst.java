@@ -41,14 +41,13 @@ public final class ImplementsCst extends AtomicConstraint
    */
   AtomicConstraint substitute(java.util.Map map)
   {
-    Object ttc, tt2;
+    Object ttc;
     ttc = map.get(tc);
     
-    if(ttc==null)
+    if (ttc == null)
       return this;
     
-    return new ImplementsCst
-      ((TypeConstructor) ttc, itf);
+    return new ImplementsCst((TypeConstructor) ttc, itf);
   }
 
   /**

@@ -226,6 +226,11 @@ abstract public class MethodDeclaration extends Definition
     return arity == 1 && "main".equals(name.content);
   }
   
+  String explainWhyMatchFails(Arguments arguments)
+  {
+    return symbol.defaultExplainWhyMatchFails(arguments);
+  }
+
   private MethodDeclaration.Symbol symbol;
   MethodDeclaration.Symbol getSymbol() { return symbol; }
 
@@ -246,7 +251,6 @@ abstract public class MethodDeclaration extends Definition
 	    MethodDeclaration.this.formalParameters(), 
 	    MethodDeclaration.this.arity);
     }
-
 
     FieldAccess getFieldAccessMethod()
     {
@@ -273,6 +277,16 @@ abstract public class MethodDeclaration extends Definition
     gnu.expr.Expression compile()
     {
       return getDefinition().getCode();
+    }
+
+    String explainWhyMatchFails(Arguments arguments)
+    {
+      return MethodDeclaration.this.explainWhyMatchFails(arguments);
+    }
+
+    String defaultExplainWhyMatchFails(Arguments arguments)
+    {
+      return super.explainWhyMatchFails(arguments);
     }
 
     public String toString()

@@ -339,6 +339,28 @@ public class NiceClass extends ClassDefinition.ClassImplementation
 
 	public void printInterface(java.io.PrintWriter s)
 	{ throw new Error("Should not be called"); }
+
+	String explainWhyMatchFails(Arguments arguments)
+	{
+	  String name = NiceClass.this.getName();
+
+	  StringBuffer res = new StringBuffer();
+	  res.append("Class ").append(name);
+	  if (parameters.size == 0)
+	    {
+	      res.append(" has no fields. Therefore its constructor takes no arguments.");
+	      return res.toString();
+	    }
+
+	  res.append(" has the following fields:\n").append(parameters);
+	  res.append('\n');
+	  res.append("Please provide values for the fields, ")
+	    .append("at least for those with no default value.\n")
+	    .append("The syntax is:\n")
+	    .append("new " + name + "(field1: value1, ..., fieldN: valueN)");
+
+	  return res.toString();
+	}
       };
 
     TypeConstructors.addConstructor(definition.tc, constructorMethod);

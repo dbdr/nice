@@ -79,21 +79,7 @@ class FunSymbol extends PolySymbol
 
   String explainWhyMatchFails(Arguments arguments)
   {
-    String name = this.name.toString();
-
-    // If parameters == null, 
-    // this is a native method or a native constructor.
-    boolean isConstructor = parameters != null && 
-      "<init>".equals(name);
-    if (! isConstructor)
-      return "Method " + name + " expects parameters (" + 
-	describeParameters() + ")";
-
-    // Here we assume that ident for constructors is formatted as
-    // "new ClassName". We might want something more robust.
-    return "Class " + name.substring(4) + 
-      " has the following fields:\n" +
-      parameters + "\n" +
-      "Please provide values for the fields, at least for those with no default value.\nThe syntax is:\n  " + name + "(field1: value1, ..., fieldN: valueN)";
+    return "Method " + name + " expects parameters (" + 
+      describeParameters() + ")";
   }
 }

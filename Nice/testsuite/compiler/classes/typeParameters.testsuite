@@ -165,3 +165,16 @@ public class A<java.io.File T | java.io.File <: T>
 
   /// package b import a
 void dummy() {}
+
+/// PASS bug
+class B {}
+class A<T | T <: B, B <: T> extends AbstractSet<T> { }
+
+add(a@A, b@B) = super;
+
+/// PASS bug
+abstract class B {}
+class C extends B {}
+class A<T | T <: B, B <: T> extends AbstractSet<T> { }
+
+add(a@A, b@C) = super;

@@ -107,6 +107,11 @@ class Compilation extends CompilationInterface
   {
     listener.warning(location, notNull(message));
   }
+
+  progress(pkg, phase)
+  {
+    listener.progress(notNull(pkg).getName(), notNull(phase));
+  }
 }
 
 Compilation createCompilation(CompilationListener listener) = 

@@ -118,8 +118,7 @@ public class Package implements mlsub.compilation.Module, Located, bossa.syntax.
     Definition.currentModule = this;
     Node.setModule(this);
     
-    if (Debug.passes)
-      Debug.println(this + ": parsing\n" + source);
+    compilation.progress(this, "parsing");
 
     this.ast = new AST(this, source.getDefinitions(shouldReload));
 
@@ -280,8 +279,7 @@ public class Package implements mlsub.compilation.Module, Located, bossa.syntax.
     if (!compiling())
       return;
 
-    if (Debug.passes)
-      Debug.println(this + ": typechecking");
+    compilation.progress(this, "typechecking");
     
     ast.typechecking();
   }
@@ -294,8 +292,7 @@ public class Package implements mlsub.compilation.Module, Located, bossa.syntax.
     // If at least one package is recompiled, the root will also be recompiled
     if (compiling())
       {
-	if (Debug.passes)
-	  Debug.println(this + ": linking");
+        compilation.progress(this, "linking");
 	bossa.link.Dispatch.test(this);
     
 	finishCompilation();
@@ -504,8 +501,7 @@ public class Package implements mlsub.compilation.Module, Located, bossa.syntax.
       return;
     addedToArchive = true;
 
-    if (Debug.passes)
-      Debug.println(this + ": writing to archive");
+    compilation.progress(this, "writing in archive");
 
     String packagePrefix = getName().replace('.', '/') + "/";
     Content.Stream[] classes = source.getClasses(linkPerformed);
@@ -645,8 +641,8 @@ public class Package implements mlsub.compilation.Module, Located, bossa.syntax.
    */
   private void generateCode()
   {
-    if (compiling() && Debug.passes)
-      Debug.println(this + ": generating code");    
+    if (compiling())
+      compilation.progress(this, "generating code");    
     
     ast.compile(compiling());
   }

@@ -26,5 +26,7 @@ public abstract class CompilationInterface
   public abstract void error(bossa.util.UserError ex);
   public abstract void warning(bossa.util.Location loc, String message);
   public abstract void exitIfErrors();
+
+  public abstract void progress(Package pkg, String phase);
 }
 

@@ -23,10 +23,6 @@ import mlsub.compilation.*;
 void compileComponent(Compilation compilation, List<Module> modules, 
 		      boolean doLink)
 {
-  print("Compiling");
-  modules.foreach(Module m => print(" "+m));
-  println("");
-
   modules.foreach(Module m => m.scope());
   modules.foreach(Module m => m.load());
 

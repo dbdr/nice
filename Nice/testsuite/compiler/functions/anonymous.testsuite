@@ -74,6 +74,6 @@ index.toString());
 /// FAIL
   int->String f = int i => { if (false) throw new Error(); };
 
-/// FAIL bug
+/// FAIL
   /// Toplevel
 <T> void foo(T->int f = T x => x) {}

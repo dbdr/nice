@@ -205,6 +205,7 @@ public class FormalParameters extends Node
     {
       defaultValue = defaultValue.noOverloading();
       //defaultValue = defaultValue.resolveOverloading(new mlsub.typing.Polytype(domain));
+      bossa.syntax.dispatch.typecheck(defaultValue);
 
       try {
 	mlsub.typing.Typing.leq(defaultValue.getType(), domain);

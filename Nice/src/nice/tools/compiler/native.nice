@@ -20,6 +20,8 @@ package nice.tools.compiler;
    @author Daniel Bonniot (bonniot@users.sourceforge.net)
  */
 
+import java.io.*;
+
 void produceNativeProgram(?String nativeCompiler, String pkg, 
 			  String output, String jar)
 {
@@ -36,11 +38,24 @@ void compileWithGcj(?String gcj, String pkg, String output, String jar)
 
   try{
     Process p = Runtime.getRuntime().exec
-      ([gcj, "--main=" + pkg + ".package", 
+      ([gcj, 
+	"--classpath=", // We set the classpath to null to ignore nice.jar
+	"--main=" + pkg + ".fun", 
         "-o", output, jar ]);
     p.waitFor();
     if (p.exitValue() != 0)
-      fail();
+      {
+	fail();
+
+	// Print the content of stderr.
+	let in = new BufferedReader(new InputStreamReader(p.getErrorStream()));
+	try {
+	  for (String line = in.readLine(); line != null;
+	       line = in.readLine())
+	    System.out.println(line);
+	}
+	catch(IOException ex) {}
+      }
   }
   catch(java.io.IOException e) {
     fail(e.getMessage());

@@ -180,8 +180,8 @@ public class MethodBodyDefinition extends Definition
       
       MethodDeclaration m = ((MethodDeclaration.Symbol) s).getDefinition();
 
-      if (!(m instanceof NiceMethod || m instanceof JavaMethod) 
-	  || m.getArity() != formals.length)
+      if (m.getArity() != formals.length
+          || !(m instanceof NiceMethod || m instanceof JavaMethod))
 	{
 	  i.remove();
 	  continue;

@@ -16,6 +16,7 @@ nice (0.9.8)
   * Allow calls to Java methods defined in a Java class that implements
     several Java interfaces declaring that same method, like
     java.io.ObjectOutputStream.flush()
+  * Reduced compilation time and memory consumption.
 
  --
 

@@ -159,11 +159,17 @@ public class NiceMethod extends UserOperator
   {
     super.resolve();
 
-    homonyms = Node.getGlobalScope().lookup(getName());
-    if (homonyms.size() == 1)
-      homonyms = null;
-    else
-      homonyms.remove(getSymbol());
+    // In interface files, we can assume that if the method overrides
+    // any other known method, there is an explicit override keyword.
+    // So we can avoid looking for specializations when there isn't one.
+    if (isOverride || ! module.interfaceFile())
+      {
+        homonyms = Node.getGlobalScope().lookup(getName());
+        if (homonyms.size() == 1)
+          homonyms = null;
+        else
+          homonyms.remove(getSymbol());
+      }
   }
 
   void typedResolve()
@@ -233,6 +239,13 @@ public class NiceMethod extends UserOperator
             ||  Types.typeParameterDispatch(getType(), s.getType()))
           continue;
 
+        // In a compiled package, we don't need checking.
+        if (module.interfaceFile())
+          {
+            addSpecializedMethod(d);
+            continue;
+          }
+
         if (! Types.covariantSpecialization(getType(), s.getType()))
           {
             User.error
@@ -257,14 +270,18 @@ d + "\ndefined in:\n" +
               continue;
           }
 
-        if (specializedMethods == null)
-          specializedMethods = new ArrayList
-            // Heuristic: the maximum number that might be needed
-            (homonyms.size() - i.previousIndex());
-        specializedMethods.add(d);
+        addSpecializedMethod(d);
       }
 
     homonyms = null;
+  }
+
+  private void addSpecializedMethod(MethodDeclaration method)
+  {
+    if (specializedMethods == null)
+      specializedMethods = new ArrayList(5);
+
+    specializedMethods.add(method);
   }
 
   /****************************************************************
@@ -297,6 +314,8 @@ d + "\ndefined in:\n" +
 
   public void printInterface(java.io.PrintWriter s)
   {
+    if (specializedMethods != null)
+      s.print("override ");
     s.print(super.toString() + ";\n");
   }
 

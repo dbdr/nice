@@ -71,6 +71,43 @@ boolean foo(A) = false;
 class B extends A {}
 override boolean foo(B); foo(B x) = true;
 
+/// PASS bug
+ // Should we allow a more general method to be declared in a later package
+ // and still discover overriding?
+  /// package a
+  /// Toplevel
+class A {}
+class B extends A {}
+
+boolean foo(B,B); foo(B x, B y) = true;
+  /// package b import a
+  B b = new B();
+  assert foo(b,b);
+
+  A a = b;
+  assert foo(a,a);
+  /// TOPLEVEL
+boolean foo(A,A) = false;
+
+/// PASS
+  /// package a
+  /// Toplevel
+class A {}
+class B extends A {}
+
+boolean foo(A,A) = false;
+boolean foo(B,B); foo(B x, B y) = true;
+  /// package b import a
+  C c = new C();
+  B b = c;
+  A a = c;
+  assert !foo(a,a);
+  assert !foo(b,b);
+  assert !foo(c,c);
+  /// TOPLEVEL
+class C extends B {}
+foo(C x, C y) = false;
+
 /// PASS
   A a = new C();
   B b = new C();

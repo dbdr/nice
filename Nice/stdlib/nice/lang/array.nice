@@ -148,6 +148,19 @@ override <T> T[] slice(T[] array, int from = 0, int to = array.length - 1) =
   return cast(array);
 }
 
+/** 
+   Fills a newly created array from a collection. 
+   The size of the collection needs to be equal to or larger than the size of the array.
+*/
+<T, U | U <: T> U[] fillWith(T[] array, Collection<U> collection)
+{
+  let iter = collection.iterator();
+  for (int i = 0; i < array.length; i++)
+    array[i] = iter.next();
+
+  return cast(array);
+}
+
 /** Returns an array containing, in order, the elements of both arguments.
 
     The type of the elements of the arguments can be subtypes of the result 

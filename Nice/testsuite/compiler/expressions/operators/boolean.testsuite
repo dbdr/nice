@@ -63,3 +63,20 @@ boolean fail() { throw new Error(); }
 
 /// PASS
   assert (! (false && fail()));
+
+/// COMMENT tests to assure the optimized operators don't break the stack
+/// PASS
+  boolean b = true;
+  b = b ? true : 1==3||4!=4||false;
+
+/// PASS
+  boolean b = false;
+  b = b ? 1<2<=3<4 : false != true;
+
+/// PASS
+  boolean b = true;
+  b = b ? false||1!=0&&1>=5 : false | true & true;
+
+/// PASS
+  boolean b = true;
+  b = true ? b^b||10>3<6 : false ^ b && 0 != 5;

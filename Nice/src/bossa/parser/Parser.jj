@@ -12,7 +12,7 @@
 
 // File    : parser.jj
 // Created : Thu Jul 01 10:27:05 1999 by bonniot
-//$Modified: Tue Oct 03 16:02:21 2000 by Daniel Bonniot $
+//$Modified: Wed Oct 04 10:21:27 2000 by Daniel Bonniot $
 // Description : Parseur JavaCC pour Nice
 //   Tokens based on the Jazz parser
 
@@ -1829,6 +1829,7 @@ Statement StatementExpression() :
       if(op.image.length()!=1)
         e2=CallExp.create(symb(op.image.substring(0, 1),op),e1,e2);
 
+      e1.setLocation(new Location(first, getToken(0)));
       e1=AssignExp.create(e1,e2);
     }
   ]

@@ -164,8 +164,7 @@ version()
 {
   println("Nice compiler beta version (" + buildDate + ")");
   println("Copyright (C) 2001 Daniel Bonniot");
-  println("Visit the Nice homepage: http://purl.org/net/nice");
-  println("Report bugs to d.bonniot@mail.dotcom.fr");
+  println("Visit the Nice homepage: http://nice.sourceforge.net");
   System.exit(0);
 }
 

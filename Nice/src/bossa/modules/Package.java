@@ -329,15 +329,15 @@ public class Package implements mlsub.compilation.Module, Located, bossa.syntax.
   {
     if (!isRoot)
       return;
-    
+
     // If at least one package is recompiled, the root will also be recompiled
     if (compiling())
       {
         compilation.progress(this, "linking");
 	bossa.link.Dispatch.test(this);
-    
+
 	finishCompilation();
-    
+
 	compilation.exitIfErrors();
       }
 
@@ -427,7 +427,7 @@ public class Package implements mlsub.compilation.Module, Located, bossa.syntax.
 	  f.print("import "+m.getName()+";\n");
 	}
       f.println();
-    
+
       for(int i = 0; i < opens.length; i++)
 	{
 	  f.print("import " + opens[i] + ".*" + 
@@ -663,16 +663,6 @@ public class Package implements mlsub.compilation.Module, Located, bossa.syntax.
   private gnu.expr.Package thisPkg;
   private ClassExp implementationClass, dispatchClass;
 
-  private static ModuleExp createModule(String name)
-  {
-    ModuleExp res = new ModuleExp();
-    res.setName(name);
-    res.body = QuoteExp.voidExp;
-    res.setFlag(ModuleExp.STATIC_SPECIFIED);
-    res.setSuperType(gnu.bytecode.Type.pointer_type);
-    return res;
-  }
-
   private ClassExp createClassExp(String name)
   {
     ClassExp res = new ClassExp();
@@ -723,7 +713,7 @@ public class Package implements mlsub.compilation.Module, Located, bossa.syntax.
   private void generateCode()
   {
     if (compiling())
-      compilation.progress(this, "generating code");    
+      compilation.progress(this, "generating code");
     
     ast.compile(compiling());
   }
@@ -735,7 +725,7 @@ public class Package implements mlsub.compilation.Module, Located, bossa.syntax.
     // However if the class exists but is invalid, we create a new one.
 
     String className = this.name + "." + name;
-    ClassType res; 
+    ClassType res;
     try{
       res = ClassType.make(className);
     }
@@ -754,7 +744,7 @@ public class Package implements mlsub.compilation.Module, Located, bossa.syntax.
   private Method lookupClassMethod(ClassType clas, String name,
 				   String attribute, String value)
   {
-    if (clas == null) 
+    if (clas == null)
       return null;
 
     name = nice.tools.code.Strings.escape(name);
@@ -765,7 +755,7 @@ public class Package implements mlsub.compilation.Module, Located, bossa.syntax.
 	  // in the bytecode by appending "$..."
           // but names appended with "$$..." may not be matched because
           // that are escape characters
-	  || m.getName().startsWith(name) 
+	  || m.getName().startsWith(name)
 	  && m.getName().charAt(name.length()) == '$'
           && m.getName().charAt(name.length()+1) != '$')
 	{
@@ -793,13 +783,13 @@ public class Package implements mlsub.compilation.Module, Located, bossa.syntax.
         This would not be the case if we recomputed it,
 	as the precise types are found during typechecking.
     */
-    Method meth = lookupClassMethod(source.getDispatch(), name, 
+    Method meth = lookupClassMethod(source.getDispatch(), name,
 				    "id", def.getFullName());
     if (meth != null) // Reuse existing dispatch method header
       {
 	// The dispatch code will have to be regenerated anyway
 	meth.eraseCode();
-	
+
 	argTypes = meth.arg_types;
 	retType  = meth.return_type;
         // Make sure we use the same bytecode name, since compiled code

@@ -88,7 +88,7 @@ public class NiceMethod extends UserOperator
     if (thisConstraint != null)
       constraint.addAtoms(thisConstraint.getAtoms());
 
-    mlsub.typing.Monotype thisType;
+    Monotype thisType;
 
     // "alike" is not created for a non-abstract interface
     // if alike is not present in the type, since it saves
@@ -108,9 +108,12 @@ public class NiceMethod extends UserOperator
 	else
 	  atom = new mlsub.typing.TypeConstructorLeqCst(alikeTC, tc);
 	constraint.addAtom(AtomicConstraint.create(atom));
-	
-	thisType = new mlsub.typing.MonotypeConstructor(alikeTC, c.getTypeParameters());
-	
+
+	thisType = Monotype.create
+          (Monotype.sure
+           (new mlsub.typing.MonotypeConstructor
+            (alikeTC, c.getTypeParameters())));
+
 	if (hasAlike)
 	  {
 	    Map map = new HashMap();
@@ -120,13 +123,13 @@ public class NiceMethod extends UserOperator
 	  }
       }
     else
-      thisType = 
-	new mlsub.typing.MonotypeConstructor(tc, c.getTypeParameters());
-    
-    params.addThis(Monotype.create(Monotype.sure(thisType)));
-    
+      thisType =
+	Monotype.createSure(tc, c.getTypeParameters());
+
+    params.addThis(thisType);
+
     if (body == null)
-      return new NiceMethod(name, constraint, returnType, params, contract, 
+      return new NiceMethod(name, constraint, returnType, params, contract,
                             isOverride);
     else
       return dispatch.createMethodWithDefault

@@ -16,6 +16,7 @@ import java.util.*;
 import bossa.util.*;
 
 import mlsub.typing.MonotypeVar;
+import mlsub.typing.TypeConstructor;
 import nice.tools.typing.PrimitiveType;
 
 /**
@@ -275,6 +276,48 @@ implements Located
 
       return type;
     }
+  }
+
+  /****************************************************************
+   * Wrapper for delaying resolution of constructed monotypes.
+   ****************************************************************/
+
+  static Monotype createSure(final TypeConstructor tc, final mlsub.typing.Monotype[] params)
+  {
+    return new Monotype() {
+        boolean containsAlike() { return false; }
+
+        public mlsub.typing.Monotype rawResolve(TypeMap typeMap)
+        {
+          try{
+            return sure(new mlsub.typing.MonotypeConstructor(tc, params));
+          }
+          catch(mlsub.typing.BadSizeEx e){
+            // See if this is a class with default type parameters
+            mlsub.typing.Monotype res = dispatch.getTypeWithTC(tc, params);
+            if (res != null)
+              return sure(res);
+
+            throw User.error(this, "Class " + tc +
+                             Util.has(e.expected, "type parameter", e.actual));
+          }
+        }
+
+        Monotype substitute(Map m)
+        {
+          return this;
+        }
+
+        public Location location()
+        {
+          return Location.nowhere();
+        }
+
+        public String toString()
+        {
+          return tc + ( params != null ? Util.map("<",",",">",params) : "");
+        }
+      };
   }
 
   /****************************************************************

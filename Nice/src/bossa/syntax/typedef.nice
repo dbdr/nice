@@ -718,12 +718,12 @@ void resetTypeDefinitionMappings()
 
   if (def == null)
     return null;
-  	
+
   let params = def.parentParams;
-  
+
   if (params == null)
     return null;
-  	
+
   // Look for missing type parameters
   int missing = 0;
 
@@ -741,7 +741,7 @@ void resetTypeDefinitionMappings()
    Returns a monotype based on this tc, provided that the class
    requires exactly these type parameters because it specializes its parent.
  */
-?mlsub.typing.Monotype getTypeWithTC( TypeConstructor tc, mlsub.typing.Monotype[] sourceParams )
+?mlsub.typing.Monotype getTypeWithTC(TypeConstructor tc, mlsub.typing.Monotype[] sourceParams )
 {
   ?CTypeDefinition def = cast(getTypeDefinition(tc));
 
@@ -766,7 +766,7 @@ void resetTypeDefinitionMappings()
     else
       fullParams[i] = params[i];
 
-  if (used < sourceParams.length)
+  if (sourceParams != null && used < sourceParams.length)
     return null;
 
   return new mlsub.typing.MonotypeConstructor(tc, cast(fullParams));

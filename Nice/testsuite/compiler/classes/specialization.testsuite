@@ -55,9 +55,19 @@ class C<T,V> extends A<V, String, T> {}
     int x;
   }
 
-/// PASS bug
+/// PASS
   /// Toplevel
   class A<T> {}
   class B extends A<String> {
     void foo() {}
   }
+
+/// PASS
+  // bug #1084559
+  foo(new Aha());
+  /// Toplevel
+interface Buffer<Elem> {}
+
+class Aha implements Buffer<int> {
+  void foo() {}
+}

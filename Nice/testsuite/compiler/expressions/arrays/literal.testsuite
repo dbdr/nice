@@ -53,3 +53,6 @@ var String[][][] s = [[["A"]]];
   int i;
   lists.foreach(List<T> list => i = list.size);
 }
+
+/// FAIL
+  int[] i = [1, /*/// FAIL HERE*/ ""];

@@ -12,6 +12,7 @@
 
 package bossa.syntax;
 
+import nice.tools.code.Types;
 
 class FunSymbol extends PolySymbol
 {
@@ -38,6 +39,19 @@ class FunSymbol extends PolySymbol
 
   FormalParameters parameters;
   int arity;
+
+  String describeParameters()
+  {
+    if (parameters != null)
+      return parameters.toString();
+
+    mlsub.typing.Monotype m = Types.rawType(getType().getMonotype());
+    if (m instanceof mlsub.typing.FunType)
+      return bossa.util.Util.map("", ", ", "", ((mlsub.typing.FunType) m).domain());
+
+    bossa.util.Internal.warning(this, "Non functional type in a functional symbol");
+    return "";
+  }
 
   /****************************************************************
    * Overloading resolution

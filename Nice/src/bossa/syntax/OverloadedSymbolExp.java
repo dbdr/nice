@@ -349,10 +349,12 @@ public class OverloadedSymbolExp extends Expression
 
       case 1:
 	FunSymbol f = (FunSymbol) removed.get(0);
-	boolean isConstructor = "<init>".equals(f.getName().toString());
+
+	// If f.parameters == null, f is a native method or constructor.
+	boolean isConstructor = f.parameters != null && "<init>".equals(f.getName().toString());
 	if (!isConstructor)
 	  return "Method " + ident + " expects parameters (" + 
-	    f.parameters + ")";
+	    f.describeParameters() + ")";
 
 	// Here we assume that ident for constructors is formatted as
 	// "new ClassName". We might want something more robust.

@@ -461,6 +461,8 @@ public class Package implements mlsub.compilation.Module, Located
   public static final gnu.expr.Compilation dispatchComp;
   static
   {
+    nice.tools.code.NiceInterpreter.init();
+    
     ClassType ct = null;
     gnu.expr.Compilation comp = null;
     try{

@@ -69,24 +69,24 @@ public class JavaFieldAccess extends FieldAccess
   ?gnu.bytecode.Field getField(LocatedString javaClass, String name)
   {
     ?gnu.bytecode.ClassType c = null;
-    try { 
-      let type = nice.tools.code.Types.type(javaClass); 
+    try {
+      let type = nice.tools.code.Types.type(javaClass);
       if (type instanceof gnu.bytecode.ClassType)
         {
           c = type;
-          assert c != null; // Typechecker limitation      
+          assert c != null; // Typechecker limitation
            // remembers the fully qualified name
            className.content = c.getName();
 
-          for (?gnu.bytecode.Field f = c.getFields(); f != null; f = f.getNext() )
-          if (name.equals(f.getName()))
-            return f;
+          for (?gnu.bytecode.Field f = c.getFields(); f != null; f = f.getNext())
+	    if (name.equals(f.getName()))
+	      return f;
         }
       else
-	User.error(javaClass,"Class " + javaClass + " not found");
+	User.error(javaClass, "Class "javaClass" not found");
     }
-    catch(ClassCastException e) { 
-      User.error(javaClass, 
+    catch(ClassCastException e) {
+      User.error(javaClass,
 		 javaClass + " is a primitive type, it has no field");
     }
 

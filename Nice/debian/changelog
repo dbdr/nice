@@ -6,6 +6,7 @@ nice (0.7.7) unstable; urgency=low
     heuristics.
     Additionally, arrays are always considered to have non-null component 
     types.
+    Final fields are considered non-null.
   * Faster compilation for large projects with many classes.
 
  --

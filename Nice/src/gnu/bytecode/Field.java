@@ -50,6 +50,8 @@ public class Field extends Location implements AttrContainer {
     return (flags & Access.STATIC) != 0;
   }
 
+  public final boolean isFinal() { return (flags & Access.FINAL) != 0; }
+
   public final int getFlags() {
     return flags;
   }
@@ -57,7 +59,7 @@ public class Field extends Location implements AttrContainer {
   public final int getModifiers() {
     return flags;
   }
-  
+
   void write (DataOutputStream dstr, ClassType classfile)
        throws java.io.IOException
   {

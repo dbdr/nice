@@ -69,7 +69,7 @@ public class JavaFieldAccess extends FieldAccess
 	 f.getName(),
 	 new LocatedString(f.getName(), Location.nowhere()),
 	 null,
-	 Types.monotype(f.getType()), 
+	 Types.monotype(f.getType(), /* sure: */ f.isFinal()), 
 	 params);
 
       res.field = f;

@@ -71,17 +71,6 @@ abstract public class MethodDeclaration extends Definition
 
 	this.arity = (domain == null ? 0 : domain.size());
       }
-
-    boolean isConstructor = name.toString().equals("<init>");
-    
-    // do not generate mangled names for methods
-    // that are not defined in a bossa file 
-    // (e.g. native methods automatically imported).
-    if(module != null && !isConstructor)
-      bytecodeName = module.mangleName(name.toString());  
-
-    if(!isConstructor)
-      bossa.link.Dispatch.register(this);
   }
 
   /** 
@@ -102,14 +91,34 @@ abstract public class MethodDeclaration extends Definition
     symbol.type = new mlsub.typing.Polytype
       (cst, new mlsub.typing.FunType(parameters, returnType));
   }
-  
+
+  private void register()
+  {
+    /* 
+       This must not be done in constructor:
+       in case both the interface file and the source files are read, 
+       both should not be mangled and registered.
+    */
+    boolean isConstructor = name.toString().equals("<init>");
+    
+    // do not generate mangled names for methods
+    // that are not defined in a bossa file 
+    // (e.g. native methods automatically imported).
+    if(module != null && !isConstructor)
+      bytecodeName = module.mangleName(name.toString());  
+    else
+      bytecodeName = name.toString();
+
+    if(!isConstructor)
+      bossa.link.Dispatch.register(this);
+  }
+
   /****************************************************************
    * Initial Context
    ****************************************************************/
 
   public void createContext()
   {
-    //Nothing
   }
   
   /****************************************************************
@@ -125,6 +134,8 @@ abstract public class MethodDeclaration extends Definition
   
   void typecheck()
   {
+    register();
+
     // what we do here is equivalent to getType().checkWellFormedness();
     // except we also want to find the bytecode types when
     // the constraint is asserted

@@ -80,6 +80,14 @@ public class TupleExp extends bossa.syntax.Expression
     return this;
   }
 
+  bossa.syntax.Expression noOverloading()
+  {
+    for(int i = expressions.length; i-->0;)
+      expressions[i] = expressions[i].noOverloading();
+
+    return this;
+  }
+
   private Monotype[] components;
   private Monotype[] expectedComponents;
 

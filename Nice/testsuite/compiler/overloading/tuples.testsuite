@@ -1,0 +1,12 @@
+/// PASS
+  /// Toplevel
+  class X {
+    String st = "";
+  }
+  class Y {
+    String st = "";
+    void foo() {
+      int z = 0;
+      (st, z) = ("abc", 1);
+    }
+  }

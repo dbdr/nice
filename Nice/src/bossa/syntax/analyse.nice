@@ -32,17 +32,10 @@ TypeMaper typeMaper(SymbolTable<TypeSymbol>,TypeScope) =
 Info buildInfo(VarScope varScope, TypeScope typeScope);
 buildInfo(varScope, typeScope)
 {
-  Info info = new Info();
-  info.vars = symbolTable();
-  info.typeVars = symbolTable();
-  info.globalVarScope = varScope;
-  info.globalTypeScope = typeScope;
-  info.typeMap = typeMaper(info.typeVars, typeScope);
-  info.labels = new Vector();
-  info.flags = 0;
-  info.flagsStack = new Vector();
-
-  return info;
+  final t = new SymbolTable();
+  return new Info(vars: new SymbolTable(), typeVars: t,
+		  globalVarScope: varScope, globalTypeScope: typeScope,
+		  typeMap: typeMaper(t, typeScope));
 }
 
 analyse(s@Statement, varScope, typeScope, mustReturnAValue)
@@ -75,8 +68,8 @@ class Info
   VarScope globalVarScope;
   TypeScope globalTypeScope;
 
-  LoopStmt currentLoop;
-  Vector<LabeledStmt> labels;
+  ?LoopStmt currentLoop = null;
+  Vector<LabeledStmt> labels = makeVector(10);
 
   /* bit 0: point not reachable 
      bit 1..63: indexed local variable is initialized
@@ -85,14 +78,14 @@ class Info
      This sets a hard limit of 63 uninitialized local variables per
      method/function. 
   */
-  long flags; 
-  int varIndex;
+  long flags = 0; 
+  int varIndex = 0;
 
   boolean getUnreachable() = (this.flags & 1) != 0;
   void setUnreachable() { this.flags |=  1; }
   void setReachable()   { this.flags &= ~1; }
 
-  Stack<long> flagsStack;
+  Stack<long> flagsStack = makeVector(10);
 
   void beginInner(boolean reset)
   {
@@ -159,7 +152,7 @@ class Info
   ?VarSymbol lookup(String name) = this.vars[name];
 
   JavaList<VarSymbol> globalLookup(LocatedString name) = 
-    javaList(this.globalVarScope.lookup(name));
+    new JavaList(this.globalVarScope.lookup(name));
 
   ?TypeSymbol lookupType(LocatedString name)
   {
@@ -371,7 +364,7 @@ Expression analyseIdent(IdentExp e, Info info, boolean assigned)
 
   JavaList<VarSymbol> symbols;
   if (e.infix)
-    symbols = javaList(notNull(Node.getGlobalScope()).lookup(e.ident));
+    symbols = new JavaList(notNull(Node.getGlobalScope()).lookup(e.ident));
   else
     symbols = info.globalLookup(notNull(e.ident));
 
@@ -495,7 +488,7 @@ analyse(decl@Block.LocalFunction, info)
 analyse(b@Block, info)
 {
   info.begin();
-  javaList(notNull(b.locals)).iter(fun(Block.LocalDeclaration l) => analyse(l, info));
+  new JavaList(notNull(b.locals)).iter(fun(Block.LocalDeclaration l) => analyse(l, info));
   notNull(b.statements).iter(fun(?Statement s)=>{
     if (info.getUnreachable())
       throw error(s, "This statement is never executed");
@@ -518,7 +511,7 @@ analyse(l@LoopStmt, info)
   info.beginInner(false);
   if (l.isTestFirst())
     l.whileExp = analyse(l.whileExp, info);
-  LoopStmt save = info.currentLoop;
+  ?LoopStmt save = info.currentLoop;
   info.currentLoop = l;
   analyse(l.loopBody, info);
   info.currentLoop = save;
@@ -530,11 +523,12 @@ analyse(l@LoopStmt, info)
 
 analyse(b@BreakStmt, info)
 {
-  if (info.currentLoop == null)
+  ?LoopStmt loop = info.currentLoop;
+  if (loop == null)
     throw error(b, "continue must only occur inside loops");
 
-  b.loop = info.currentLoop;
-  info.currentLoop.createBlock();
+  b.loop = loop;
+  loop.createBlock();
   info.setUnreachable();
 }
 
@@ -604,7 +598,7 @@ analyse(t@TryStmt, info)
   info.beginCases();
   analyse(t.body, info);
 
-  javaList(notNull(t.catches)).iter(fun(TryStmt$Catch c)=>{
+  new JavaList(notNull(t.catches)).iter(fun(TryStmt$Catch c)=>{
     info.otherCase();
     info.begin();
     info.addVar(notNull(c.exnVar));

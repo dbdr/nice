@@ -38,18 +38,19 @@ void test_import()
   cov2(null);
 }
 
-void test_funs()
+void test_funs(Funs f0)
 {
-  Funs f = new Funs();
-  f.f1 = fun(int x) => x;
-  f.f2 = fun(int x) => f.f1;
-  f.f3 = fun(int x) => f.f2;
-  f.f4 = fun(int->int x) => x(0);
-  f.f5 = fun(int->int x) => fun(int y) => x(y);
-  f.f6 = fun(int x, int y) => x - y;
+  Funs f = new Funs
+  (f1 : fun(int x) => x, 
+   f2 : fun(int x) => f0.f1,
+   f3 : fun(int x) => f0.f2,
+   f4 : fun(int->int x) => x(0),
+   f5 : fun(int->int x) => fun(int y) => x(y),
+   f6 : fun(int x, int y) => x - y,
 
-  f.f7 = null;
-  f.f8 = null;
+   f7 : null,
+   f8 : null,
 
-  f.f10 = [ f.f1 ];
+   f9 : fun(int x) => [x],
+   f10 : [ f0.f1 ]);
 }

@@ -24,8 +24,7 @@ test_exceptions()
   }
   
   try{
-    MyEx ex = new MyEx();
-    ex.info = "woula";
+    MyEx ex = new MyEx(info:"woula");
     throw ex;
   }
   catch(MyEx e){
@@ -40,7 +39,7 @@ test_exceptions()
 
     boolean b = s == null;
     if (b) 
-      throw new MyEx();
+      throw new MyEx("");
     else
       return;
   }
@@ -67,7 +66,7 @@ test_exceptions()
 int exnRaiser(boolean b) 
 {
   if (b)
-    throw new MyEx();
+    throw new MyEx("");
   else
     return 1;
 }

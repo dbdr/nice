@@ -88,9 +88,10 @@ public class NiceClass extends ClassDefinition
 
   public static class Field
   {
-    public Field(MonoSymbol sym, boolean isFinal)
+    public Field(MonoSymbol sym, Expression value, boolean isFinal)
     {
       this.sym = sym;
+      this.value = value;
       this.isFinal = isFinal;
     }
 
@@ -98,10 +99,21 @@ public class NiceClass extends ClassDefinition
     {
       return 
 	(isFinal ? "final " : "") +
-	sym;
+	sym + (value == null ? "" : " = " + value);
     }
     
+    FormalParameters.Parameter asParameter()
+    {
+      if (value == null)
+	return new FormalParameters.NamedParameter(sym.syntacticType, 
+						   sym.getName());
+      else
+	return new FormalParameters.OptionalParameter(sym.syntacticType, 
+						      sym.getName(), value);
+    }
+
     MonoSymbol sym;
+    Expression value;
     boolean isFinal;
   }
   
@@ -119,6 +131,14 @@ public class NiceClass extends ClassDefinition
     super.resolve();
 
     classe.supers = computeSupers();
+
+    createConstructor();
+
+    if (constructorMethod != null)
+      {
+	constructorMethod.buildScope(scope, typeScope);
+	constructorMethod.doResolve();
+      }
 
     //optim
     if (fields.length == 0)
@@ -184,7 +204,6 @@ public class NiceClass extends ClassDefinition
     // The module will lookup the existing class if it is already compiled
     // and call createClassExp if not.
     classe = module.getClassExp(this);
-    createConstructor();
   }
 
   gnu.expr.ClassExp classe;
@@ -201,17 +220,38 @@ public class NiceClass extends ClassDefinition
     return classe;
   }
 
+  private FormalParameters.Parameter[] getFieldsAsParameters(int nbFields)
+  {
+    nbFields += this.fields.length;
+    FormalParameters.Parameter[] res;
+    ClassDefinition sup = distinguishedSuperClass();
+    if (sup instanceof NiceClass)
+      res = ((NiceClass) sup).getFieldsAsParameters(nbFields);
+    else
+      res = new FormalParameters.Parameter[nbFields];
+
+    for (int i = fields.length, n = res.length - nbFields + i; --i >= 0;)
+      res[--n] = fields[i].asParameter();
+
+    return res;
+  }
+
+  private MethodDeclaration constructorMethod;
+
   private void createConstructor()
   {
     if (isInterface)
       return;
 
-    mlsub.typing.MonotypeVar[] params = createSameTypeParameters();
-    MethodDeclaration constructorMethod = new MethodDeclaration
+    FormalParameters values = new FormalParameters(getFieldsAsParameters(0));
+    classe.setFieldCount(values.size);
+
+    mlsub.typing.MonotypeVar[] typeParams = createSameTypeParameters();
+    constructorMethod = new MethodDeclaration
       (new LocatedString("<init>", location()),
-       mlsub.typing.Constraint.create(params, null),
-       null, 
-       Monotype.sure(new mlsub.typing.MonotypeConstructor(this.tc, params)))
+       new Constraint(typeParams, null),
+       values, 
+       Monotype.sure(new mlsub.typing.MonotypeConstructor(this.tc, typeParams)))
       {
 	protected gnu.expr.Expression computeCode()
 	{
@@ -221,7 +261,6 @@ public class NiceClass extends ClassDefinition
 	public void printInterface(java.io.PrintWriter s)
 	{ throw new Error("Should not be called"); }
       };
-
     TypeConstructors.addConstructor(tc, constructorMethod);
   }
 

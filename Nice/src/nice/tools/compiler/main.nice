@@ -45,14 +45,13 @@ main(args)
 
   Compilation compilation = new Compilation();
 
-  Program prg = new Program();
-  prg.name = "nicec";
-  prg.longName = "The Nice Compiler";
-  prg.shortDescription = "compiler for the Nice programming language";
-  prg.author = "Daniel Bonniot <bonniot@users.sourceforge.net>, <Daniel.Bonniot@inria.fr>";
-  prg.seeAlso = "http://nice.sourceforge.net        the Nice Home Page\n";
-  prg.manualSection = "1";
-  prg.arguments = "package";
+  Program prg = new Program
+    (name: "nicec", longName: "The Nice Compiler",
+     shortDescription: "compiler for the Nice programming language",
+     author: "Daniel Bonniot <bonniot@users.sourceforge.net>, <Daniel.Bonniot@inria.fr>",
+     seeAlso: "http://nice.sourceforge.net        the Nice Home Page\n",
+     manualSection: "1",
+     arguments: "package", options: cast(null));
   prg.options = 
   [
    option('?', "sourcepath",

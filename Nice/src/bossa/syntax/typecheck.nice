@@ -138,9 +138,9 @@ nullnessInfo(test@CallExp)
 */
 
 var int ifLevel;
-var Stack<int> levels = new Vector();
+var Stack<int> levels = makeVector(10);
 var Stack<<MonoSymbol, mlsub.typing.Monotype>> conditionalTypes = 
-  new Vector();
+  makeVector(10);
 
 void enterIf() { ifLevel++; }
 void exitIf()
@@ -311,7 +311,7 @@ typecheck(@null(Statement)) {}
 
 typecheck(b@Block)
 {
-  javaList(notNull(b.locals)).iter(fun(?Block.LocalDeclaration d)=> typecheck(d));
+  new JavaList(notNull(b.locals)).iter(fun(?Block.LocalDeclaration d)=> typecheck(d));
   notNull(b.statements).iter(fun(?Statement s)=> typecheck(s));
 }
 
@@ -402,7 +402,7 @@ typecheck(r@ReturnStmt)
 typecheck(t@TryStmt)
 {
   typecheck(t.body);
-  javaList(notNull(t.catches)).iter(fun(TryStmt$Catch c)=> typecheck(c.body));
+  new JavaList(notNull(t.catches)).iter(fun(TryStmt.Catch c)=> typecheck(c.body));
   typecheck(t.finallyBody);
 }
 

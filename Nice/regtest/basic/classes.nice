@@ -21,7 +21,7 @@ class Point
 // and even if the function appears before the class to be constructed
 void test_new()
 {
-  Point p = new ColoredPoint();
+  Point p = new ColoredPoint(0,0,0);
 }
 
 class ColoredPoint extends Point
@@ -55,20 +55,20 @@ void test_classes();
 test_classes()
 {
   println ("### Testing classes");
-  println(pToString(new Point()));
-  println(pToString(new ColoredPoint()));
+  println(pToString(new Point(x:0, y:0)));
+  println(pToString(new ColoredPoint(0,0,0)));
   ?Point p = null;
   println(pToString(p));
 
   ?String s = null;
   println(pToString("titi") + ", " + pToString(s));
 
-  println(isSimplePoint(new Point()));
-  println(isSimplePoint(new ColoredPoint()));
+  println(isSimplePoint(new Point(0,0)));
+  println(isSimplePoint(new ColoredPoint(0,0,0)));
 
-  println(new Point().toString());
-  println(new ColoredPoint().toString());
-  Point p = new ColoredPoint();
+  println(new Point(0,0).toString());
+  println(new ColoredPoint(0,0,0).toString());
+  Point p = new ColoredPoint(0,0,0);
   println(p.toString());
 }
 

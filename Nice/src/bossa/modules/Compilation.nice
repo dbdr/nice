@@ -23,25 +23,25 @@ import mlsub.compilation;
 
 class Compilation extends mlsub.compilation.Compilation
 {
-  boolean recompileAll;
-  boolean recompileCommandLine;
+  boolean recompileAll = false;
+  boolean recompileCommandLine = false;
 
   /** Set if at least one package is not up-to-date. */
-  boolean recompilationNeeded;
+  boolean recompilationNeeded = false;
 
-  String sourcePath;
-  String packagePath;
-  String destinationDir;
+  String sourcePath = ".";
+  ?String packagePath = null;
+  ?String destinationDir = null;
 
   /** Archive file in which to write the program. */
-  String output;
+  ?String output = null;
 
   /** Prevent the runtime to be written in the archive.
       Usefull for the compiler itself, if for nothing else.
   */
-  boolean excludeRuntime;
+  boolean excludeRuntime = false;
 
-  Locator locator;
+  ?Locator locator = null;
 
   void setMainPackage(String packageName)
   {
@@ -51,8 +51,6 @@ class Compilation extends mlsub.compilation.Compilation
     // Use the defaults if necessary
     // The default for destinationDir is <null>
     // which means place generated files in the source directory
-    if (this.sourcePath == null)
-      this.sourcePath = ".";
     if (this.destinationDir == null && this.packagePath == null)
       this.packagePath = ".";
 
@@ -66,4 +64,3 @@ class Compilation extends mlsub.compilation.Compilation
     this.root = Package.make(new bossa.syntax.LocatedString(packageName, new bossa.util.Location("Command line")), this, true);
   }
 }
-

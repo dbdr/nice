@@ -108,16 +108,6 @@ abstract class FList<T>
 final class Nil<T>  extends FList<T> {}
 final class Cons<T> extends FList<T> { T head; FList<T> tail; }
 
-<Any T> Cons<T> cons(T, FList<T>);
-cons<T>(elem, t)
-{
-  Cons<T> res = new Cons();
-  res.head = elem;
-  res.tail = t;
-
-  return res;
-}
-
 size(l@Nil ) = 0;
 size(l@Cons) = 1+size(l.tail);
 
@@ -139,13 +129,13 @@ set(l@Nil,  n, elem) { throw new Exception(); }
 
 map(l@Nil, f) = new Nil();
 
-map(l@Cons, ff) = cons(ff(l.head), map(l.tail, ff));
+map(l@Cons, ff) = new Cons(ff(l.head), map(l.tail, ff));
 
 filter(l@Nil , test) = l;
 filter<C,T>(l@Cons, test)
 {
   FList<T> res = filter(l.tail, test);
-  return test(l.head) ? cons(l.head, res) : res;
+  return test(l.head) ? new Cons(l.head, res) : res;
 }
 
 /****************************************************************
@@ -186,38 +176,24 @@ final class JavaList<T> implements List<T>
 java.util.Iterator iterator(java.util.List) =
   native java.util.Iterator java.util.List.iterator();
 
-<Any T> JavaList<T> javaList()
-{
-  JavaList<T> res = new JavaList();
-  res.impl = new java.util.ArrayList();
-  return res;
-}
-
-<Any T> JavaList<T> javaList(java.util.List impl)
-{
-  JavaList<T> res = new JavaList();
-  res.impl = impl;
-  return res;
-}
-
 map<C, T, U> (l@JavaList, f)
 {
-  JavaList<U> res = javaList();
-  for(java.util.Iterator i = l.impl.iterator(); i.hasNext(); )
-    res.add(f(cast(i.next())));
-  return res;
+  java.util.ArrayList res = new java.util.ArrayList(l.size());
+  for (java.util.Iterator i = l.impl.iterator(); i.hasNext(); )
+    res.add(object(f(cast(i.next()))));
+  return new JavaList(res);
 }
 
 filter<C,T>(l@JavaList, test)
 {
-  JavaList<T> res = javaList();
+  java.util.ArrayList res = new java.util.ArrayList(l.size());
   for(java.util.Iterator i = l.impl.iterator(); i.hasNext(); )
     {
       T elem = cast(i.next());
       if (test(elem))
-	res.add(elem);
+	res.add(object(elem));
     }
-  return res;
+  return new JavaList(res);
 }
 
 
@@ -246,14 +222,8 @@ class Vector<T>
   }
 }
 
-<Any T> Vector<T> makeVector(int);
-makeVector<T>(len)
-{
-  Vector<T> res = new Vector();
-  res.elements = new T[len]; 
-
-  return res;
-}
+<Any T> Vector<T> makeVector(int len) = 
+  new Vector(elements:new T[len], length:0); 
 
 size(v@Vector) = v.length;
 get(v@Vector, index) = get(v.elements, index);
@@ -287,8 +257,7 @@ add<T>(v@Vector, element)
 
 filter<C,T>(v@Vector, test)
 {
-  Vector<T> res = new Vector();
-  res.length=0;
+  Vector<T> res = makeVector(v.size);
 
   v.iter(fun(T elem) => { if(test(elem)) res.add(elem); });
 
@@ -383,8 +352,22 @@ class Hashtable<Key,Element> implements Map<Key, Element> =
 <Any Key, Any Element> Hashtable<Key, Element> hashtable() = 
   native new java.util.HashMap();
 
-<Any Key, Any Element> Element get(Map<Key, Element>, Key) = 
+// We give two versions of put and get, working on Maps with
+// null and non-null element types.
+// This is purely for the convenience of the Map type declaration:
+// it does not really make sense to have a non-null type, 
+// as the lookup can always return null if the key is not present.
+
+// The result can be null if the key is not present.
+<Any Key, Any Element> ?Element get(Map<Key, !Element>, Key) = 
+  native Object java.util.Map.get(Object);
+// This function does not overlap with the previous because Map
+// is non-variant (it would be unsafe to have Map covariant on Element).
+<Any Key, Any Element> ?Element get(Map<Key, ?Element>, Key) = 
   native Object java.util.Map.get(Object);
 
-<Any Key, Any Element> Element put(Map<Key, Element>, Key, Element) = 
+// Returns the previous value for that key, which may always be null
+<Any Key, Any Element> ?Element put(Map<Key, !Element>, Key, ?Element) = 
+  native Object java.util.Map.put(Object, Object);
+<Any Key, Any Element> ?Element put(Map<Key, ?Element>, Key, ?Element) = 
   native Object java.util.Map.put(Object, Object);

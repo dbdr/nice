@@ -8,6 +8,11 @@ class A
 {
   int x;
   long y;
+
+  A(int x, long y) {
+    this.x = x;
+    this.y = y;
+  }
 }
 
 public class coreJava 

@@ -29,10 +29,10 @@ class SymbolTable<Sym>
 
 // Implementation
 
-  nice.lang.Hashtable<String, Binder<Sym>> symbols;
+  nice.lang.Hashtable<String, Binder<Sym>> symbols = hashtable();
 
-  ?Binder<Sym> topBinder; // list of the binders added since last begin
-  Binder<Sym> marks;     // remembers topBinders at each begin
+  ?Binder<Sym> topBinder = null; // list of the binders added since last begin
+  ?Binder<Sym> marks = null;     // remembers topBinders at each begin
 }
 
 <Any Sym> ?Sym get(SymbolTable<!Sym>, String name);
@@ -40,21 +40,16 @@ class SymbolTable<Sym>
 class Binder<Sym>
 {
   Sym value;
-  String name;
+  ?String name;
   ?Binder<Sym> nextBinder;
-  Binder<Sym> oldBinding;
+  ?Binder<Sym> oldBinding;
 }
 
-symbolTable<Sym>()
-{
-  SymbolTable<Sym> res = new SymbolTable();
-  res.symbols = hashtable();
-  return res;
-}
+symbolTable<Sym>() = new SymbolTable();
 
 get<Sym>(t@SymbolTable, name)
 {
-  Binder<!Sym> binder = t.symbols.get(name);
+  ?Binder<!Sym> binder = t.symbols.get(name);
   if (binder == null)
     return null;
   else
@@ -63,20 +58,16 @@ get<Sym>(t@SymbolTable, name)
 
 set<Sym>(t@SymbolTable, name, sym)
 {
-  Binder<Sym> binder = new Binder();
-  binder.value = sym;
-  binder.name = name;
-  binder.nextBinder = t.topBinder;
+  Binder<Sym> binder = new Binder(value: sym, name: name, 
+				  nextBinder: t.topBinder, 
+				  oldBinding: t.symbols.get(name));
   t.topBinder = binder;
-  binder.oldBinding = t.symbols.get(name);
   t.symbols.put(name, binder);
 }
 
 begin<Sym>(t@SymbolTable)
 {
-  Binder<Sym> mark = new Binder();
-  mark.nextBinder = t.topBinder;
-  mark.oldBinding = t.marks;
+  Binder<Sym> mark = new Binder(value: cast(null), name: null, nextBinder: t.topBinder, oldBinding: t.marks);
   t.topBinder = null;
   t.marks = mark;
 }
@@ -86,9 +77,9 @@ end<Sym>(t@SymbolTable)
   while (t.topBinder != null)
     {
       Binder<Sym> top = notNull(t.topBinder);
-      t.symbols.put(top.name, top.oldBinding);
+      t.symbols.put(notNull(top.name), top.oldBinding);
       t.topBinder = top.nextBinder;
     }
-  t.topBinder = t.marks.nextBinder;
-  t.marks = t.marks.oldBinding;
+  t.topBinder = notNull(t.marks).nextBinder;
+  t.marks = notNull(t.marks).oldBinding;
 }

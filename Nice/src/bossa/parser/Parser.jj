@@ -939,13 +939,16 @@ void getField(List fields):
 {
   MonoSymbol field;
   boolean isFinal=false;
+  Expression value = null;
 }
 {
   ( ( "final" | "const" ) { isFinal=true; } 
   | "public" | "private"
   )* 
-  field=monoSymbol() ";" 
-  { fields.add(new NiceClass.Field(field, isFinal)); }
+  field=monoSymbol() 
+  [ "=" value=Expression() ]
+  ";" 
+  { fields.add(new NiceClass.Field(field, value, isFinal)); }
 }
 
 void classDefinitionLookahead():
@@ -992,7 +995,7 @@ ClassDefinition classDefinition():
    }
    // internal fields and methods
    (
-      LOOKAHEAD( [ "final" | "const" | "public" | "private" ] monoSymbol() ";")
+      LOOKAHEAD( [ "final"|"const"|"public"|"private" ] monoSymbol() (";"|"="))
       getField(fields)
     |
       [ "public" | "private" ]

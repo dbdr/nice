@@ -1011,6 +1011,12 @@ public class LambdaExp extends ScopeExp
   /** Rembembers stuff to do in <clinit> of this class. */
   Initializer clinitChain;
 
+  void addInitializer(Initializer elem)
+  {
+    elem.next = this.initChain;
+    this.initChain = elem;
+  }
+
   private Field instanceField;
   Field getInstanceField()
   {

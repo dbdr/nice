@@ -126,6 +126,21 @@ public class FormalParameters extends Node
 	addChild(this.parameters[i]);
   }
 
+  FormalParameters(Parameter[] parameters)
+  {
+    super(Node.down);
+
+    if (parameters == null)
+      return;
+
+    this.parameters = parameters;
+    this.size = parameters.length;
+    
+    for (int i = 0; i < size; i++)
+      if (parameters[i] != null)
+	addChild(parameters[i]);
+  }
+
   void addThis(Monotype type)
   {
     if (parameters[0] != null)

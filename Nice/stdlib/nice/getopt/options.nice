@@ -23,22 +23,22 @@ package nice.getopt;
 Option option(char shortName = '?',
 	      String longName,
 	      String purpose, 
-	      fun()() action);
+	      ()->void action);
 
 /** Creates a required parameter option. */
 Option option(char shortName = '?',
 	      String longname,
 	      String purpose,
 	      String optionHint,
-	      fun(String)() actionParam);
+	      String->void actionParam);
 
 /** Creates an optional parameter option. */
 Option option(char shortName = '?',
 	      String longname,
 	      String purpose,
 	      String optionHint,
-	      fun()() actionNoParam,
-	      fun(String)() actionParam);
+	      ()->void actionNoParam,
+	      String->void actionParam);
 
 
 abstract class Option
@@ -46,23 +46,23 @@ abstract class Option
   char shortName;
   String longName;
   String purpose;
-  int optval; // the int value of shortName
+  int optval = 0; // the int value of shortName
 }
 
 class NoParamOption extends Option
 {
-  fun()() action;
+  ()->void action;
 }
 
 class ParamOption extends Option
 {
   String optionHint;
-  fun(String)() actionParam;
+  String->void actionParam;
 }
 
 class OptionalParamOption extends ParamOption
 {
-  fun()() actionNoParam;
+  ()->void actionNoParam;
 }
 
 boolean noShortName(Option o) = o.shortName.equals('?');
@@ -71,36 +71,21 @@ boolean noShortName(Option o) = o.shortName.equals('?');
  * "Constructors"
  ****************************************************************/
 
-option(shortName, longName, purpose, action)
-{
-  NoParamOption res = new NoParamOption();
-  res.shortName=shortName;
-  res.longName=longName;
-  res.purpose=purpose;
-  res.action=action;
-  return res;
-}
+option(shortName, longName, purpose, action) =
+  new NoParamOption(shortName: shortName, longName: longName,
+		    purpose: purpose, action: action);
 
-option(shortName, longName, purpose, optionHint, action)
-{
-  ParamOption res = new ParamOption();
-  res.shortName=shortName;
-  res.longName=longName;
-  res.purpose=purpose;
-  res.optionHint=optionHint;
-  res.actionParam=action;
-  return res;
-}
+option(shortName, longName, purpose, optionHint, action) =
+  new ParamOption(shortName: shortName,
+		  longName: longName,
+		  purpose: purpose,
+		  optionHint: optionHint,
+		  actionParam: action);
 
-option(shortName, longName, purpose, optionHint, actionNoParam, actionParam)
-{
-  OptionalParamOption res = new OptionalParamOption();
-  res.shortName=shortName;
-  res.longName=longName;
-  res.purpose=purpose;
-  res.optionHint=optionHint;
-  res.actionNoParam=actionNoParam;
-  res.actionParam=actionParam;
-  return res;
-}
-
+option(shortName, longName, purpose, optionHint, actionNoParam, actionParam) =
+  new OptionalParamOption(shortName: shortName,
+			  longName: longName,
+			  purpose: purpose,
+			  optionHint: optionHint,
+			  actionNoParam: actionNoParam,
+			  actionParam: actionParam);

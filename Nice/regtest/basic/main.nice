@@ -29,7 +29,7 @@ test_discards()
   // Presently fails
   //id (x); // x is A's field method, of type A->int
 
-  A a = new A();
+  A a = new A(x:2);
   int i = 0;
   boolean b = false;
 
@@ -98,4 +98,5 @@ main(args)
   test_higher_order();
   test_localFunctions();
   test_null();
+  test_constructors();
 }

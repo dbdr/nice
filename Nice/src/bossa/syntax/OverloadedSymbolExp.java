@@ -91,17 +91,17 @@ public class OverloadedSymbolExp extends Expression
 
     // FIRST PASS: only checks the number of parameters
     
-    // We remember if some method was discarded
-    // in order to enhance the error message
-    boolean removedSomething = false;
-    
+    // remembers removed symbols, 
+    // to list possibilities if none matches
+    LinkedList removed = new LinkedList();
+
     for(Iterator i = symbols.iterator(); i.hasNext();)
       {
 	VarSymbol s = (VarSymbol) i.next();
 	
 	switch (s.match(arguments)) {
 	case 0 : // Doesn't match 
-	  removedSomething = true;
+	  removed.add(s);
 	  i.remove();
 	  break;
 	case 1: // Wasn't even a function or method
@@ -118,15 +118,16 @@ public class OverloadedSymbolExp extends Expression
 
     if (symbols.size() == 0)
       User.error(this, 
-		 removedSomething ?
-		 "No method with name " + ident + arguments.explainNoMatch() :
-		 "No method has name " + ident);
+		 removed.size() == 0 ?
+		 "No method has name " + ident :
+		 removed.size() == 1 ?
+		 "Method " + ident + " expects parameters (" 
+		 + ((FunSymbol) removed.get(0)).parameters + ")":
+		 "No method with name " + ident + arguments.explainNoMatch());
 
     // SECOND PASS: check argument types
 
-    // remembers removed symbols, 
-    // to list possibilities if none matches
-    LinkedList removed = new LinkedList();
+    removed.clear();
 
     Polytype[] types = new Polytype[symbols.size()];
     VarSymbol[] syms = new VarSymbol[symbols.size()];

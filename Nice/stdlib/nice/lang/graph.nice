@@ -10,13 +10,11 @@ import gnu.math.*;
     The scc are returned in topological order.
     Tarjan's algorithm (linear).
  */
-<Any T> List<List<T>> stronglyConnectedComponents(T,fun(T)(List<T>));
-
-stronglyConnectedComponents<T>(start, successors)
+<Any T> List<List<T>> stronglyConnectedComponents(T start, 
+						  T->List<T> successors)
 {
-  Ref<int> id = new Ref();
-  id.value=0;
-  Stack<T> stack = new Vector();
+  Ref<int> id = new Ref(0);
+  Stack<T> stack = makeVector(5);
   Map<T,int> mark = hashtable();
 
   List<List<T>> res = makeVector(5);
@@ -25,7 +23,7 @@ stronglyConnectedComponents<T>(start, successors)
   return res;
 }
 
-<Any T> int visit(T node, fun(T)(List<T>) successors, 
+<Any T> int visit(T node, T->List<T> successors, 
 		  Ref<int> id, Stack<T> stack, Map<T,int> mark, 
 		  List<List<T>> res)
 {
@@ -38,7 +36,7 @@ stronglyConnectedComponents<T>(start, successors)
   successors(node).iter(fun(T child)=>{
     int m;
     try{
-      m = mark.get(child);
+      m = notNull(mark.get(child));
     }
     catch(NullPointerException e){
       m = visit(child, successors, id, stack, mark, res);

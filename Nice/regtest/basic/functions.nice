@@ -41,7 +41,7 @@ void overloaded(boolean b) {}
 void test_functions()
 {
   println("### Testing functions");
-  FunctionClass o = identity(new FunctionClass());
+  FunctionClass o = identity(new FunctionClass(1));
   o.setX(quarantedeux(1));
   println("x = " + o.getX());
 

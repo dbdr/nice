@@ -1,3 +1,14 @@
+nice (0.5.1) unstable; urgency=low
+
+  * Constructors now take the initial values of the object's fields as
+    named arguments. A field declaration (inside a class declaration)
+    now accepts an optional value after "=" (like in Java). This value 
+    is used as the default if the field is not mentioned in a call to 
+    the constructor. A field with no default value must be mentioned 
+    in every call to the constructor.
+
+ --
+
 nice (0.5) unstable; urgency=low
 
   * Recognise the standard arrow notation for functional types

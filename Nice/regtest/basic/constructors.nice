@@ -20,3 +20,19 @@ package regtest.basic;
  */
 
 String f(int x) = new String(x == 1 ? "1" : "11");
+
+class Constr
+{
+  int a;
+  String b = "2";
+
+  toString() = this.b + "," + this.a;
+}
+
+void test_constructors()
+{
+  Constr c = new Constr(0, "1");
+  println(c);
+  println(new Constr(0));
+  println(new Constr(b: "", a: 0));
+}

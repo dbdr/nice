@@ -27,7 +27,7 @@ package regtest.basic;
 // return zero, but uses a Literal to store it.
 int getZero()
 {
-  Ref<int> id = new Ref();
+  Ref<int> id = new Ref(0);
   id.value = 0;
   return id.value;
 }

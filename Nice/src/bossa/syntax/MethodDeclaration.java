@@ -85,6 +85,23 @@ abstract public class MethodDeclaration extends Definition
     symbol = new MethodDeclaration.Symbol(name, type);
   }
 
+  /** 
+  */
+  MethodDeclaration(LocatedString name,
+		    bossa.syntax.Constraint cst,
+		    FormalParameters parameters, 
+		    Monotype returnType)
+  {
+    super(name, Node.global);
+
+    this.parameters = parameters;
+    addChild(parameters);
+    arity = parameters.size;
+    symbol = new MethodDeclaration.Symbol(name, cst, bossa.syntax.Monotype.create(returnType));
+    symbol.propagate = Node.global;
+    addChild(symbol);
+  }
+
   private Polytype type;
 
   public final Polytype getType()

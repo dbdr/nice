@@ -26,5 +26,5 @@ package nice.lang;
 
     Currently e2 is evaluated in any case, but this will change.
 */
-<Any T> !T `||`(?T e1, !T e2) = e1 != null ? e1 : e2;
-<Any T> ?T `||`(?T e1, ?T e2) = e1 != null ? e1 : e2;
+<Any T> !T `|`(?T e1, !T e2) = e1 != null ? e1 : e2;
+<Any T> ?T `|`(?T e1, ?T e2) = e1 != null ? e1 : e2;

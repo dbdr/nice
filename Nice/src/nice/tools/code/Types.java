@@ -463,19 +463,18 @@ public final class Types
   }
 
   private static ClassLoader classLoader;
+  private static String currentClasspath = "NOT INITIALIZED";
 
-  static 
-  {
-    setClasspath(null);
-  }
-  
   public static void setClasspath(String classpath)
   {
-    if (classpath == null)
-      {
-	classLoader = ClassLoader.getSystemClassLoader();
-	return;
-      }
+    /* Cache: do not reset the classloader if the classpath is unchanged.
+       This it especially important as it seems the previous classloader
+       and its classes do not get garbage collected.
+    */
+    if (currentClasspath.equals(classpath))
+      return;
+
+    currentClasspath = classpath;
 
     LinkedList components = new LinkedList();
     

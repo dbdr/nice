@@ -63,7 +63,7 @@ int compile(String[] args)
   prg.options = 
   [
    option("sourcepath",
-	  "Lookup path for source packages\nPATH is a list of directories and .jar archives",
+	  "Search path for source packages\nPATH is a list of directories and .jar archives",
 	  "path",
 	  fun(String path) => { compilation.sourcePath = path; }),
 
@@ -72,15 +72,10 @@ int compile(String[] args)
 	  "dir",
 	  fun(String dir)=>{ compilation.destinationDir = dir; }),
 
-   option("packagepath",
-	  "Additional lookup path for compiled packages\nPATH is a list of directories and .jar archives",
+   option("classpath",
+	  "Search path for compiled packages\nPATH is a list of directories and .jar archives",
 	  "path",
 	  fun(String path) =>{ compilation.packagePath = path; }),
-
-   option("classpath",
-	  "Lookup path for external classes",
-	  "path",
-	  fun(String path) => { classpath = path; }),
 
 
    option(letter: 'a', "jar",
@@ -158,9 +153,6 @@ int compile(String[] args)
       usage(prg, OutputMessages.ERROR);
     }
   mainPackage = rest[0];
-
-  if (classpath != null)
-    nice.tools.code.Types.setClasspath(classpath + ":" + compilation.runtimeFile);
 
   compilation.setMainPackage(mainPackage);
   make(compilation);

@@ -51,8 +51,6 @@ class Compilation extends mlsub.compilation.Compilation
 
   void setMainPackage(String packageName)
   {
-    Package.startNewCompilation();
-
     // Normalizes the compilation options.
     this.recompileCommandLine = this.recompileCommandLine || this.recompileAll;
 
@@ -61,6 +59,12 @@ class Compilation extends mlsub.compilation.Compilation
     // which means place generated files in the source directory
     if (this.destinationDir == null && this.packagePath == null)
       this.packagePath = ".";
+
+    nice.tools.code.Types.setClasspath((this.destinationDir | "") + ":" + 
+				       (this.packagePath | "") + ":" + 
+				       this.runtimeFile);
+
+    Package.startNewCompilation();
 
     // Create the locator that uses these two pathes to locate packages.
     this.locator = new Locator(this);

@@ -1,0 +1,117 @@
+/**************************************************************************/
+/*                                N I C E                                 */
+/*             A high-level object-oriented research language             */
+/*                        (c) Daniel Bonniot 2004                         */
+/*                                                                        */
+/*  This program is free software; you can redistribute it and/or modify  */
+/*  it under the terms of the GNU General Public License as published by  */
+/*  the Free Software Foundation; either version 2 of the License, or     */
+/*  (at your option) any later version.                                   */
+/*                                                                        */
+/**************************************************************************/
+
+package bossa.syntax;
+
+import bossa.util.*;
+
+/**
+   Creates an array containing the given elements.
+
+   The array type is infered as the minimal possible type.
+*/
+
+public class LiteralArrayExp extends Expression
+{
+
+  Expression[] elements;
+
+  private boolean wrapAsCollection = false;
+
+  computeType()
+  {
+    let elementType = mlsub.typing.Polytype.union(Expression.getType(elements));
+
+    type = this.array(elementType);
+
+    // If the type cannot be simplified, it must be because elements
+    // have incomparable types. In this case, we give the array the type 
+    // Object[].
+    if (! notNull(type).trySimplify())
+      type = this.array(PrimitiveType.objectPolytype());
+  }
+
+  private mlsub.typing.Polytype array(mlsub.typing.Polytype elementType)
+  {
+    let res = new mlsub.typing.Polytype
+      (elementType.getConstraint(), 
+       bossa.syntax.Monotype.sure(new mlsub.typing.MonotypeConstructor
+	 (PrimitiveType.arrayTC, [elementType.getMonotype()])));
+    res.setNotSimplified();
+    return res;
+  }
+
+  /**
+     Adjust the array type according to the context.
+
+     This is usefull because arrays are non-variant.
+     For instance, different code must be generated 
+     for [ 1, 2 ] in the contexts:
+     List<int[]> i = [[ 1, 2 ]]
+     and 
+     List<List<byte[]>> b = [[ 1, 2 ]]
+  */
+  resolveOverloading(mlsub.typing.Polytype expectedType)
+  {
+    let elementType = nice.tools.typing.Types.getTypeParameter(expectedType, 0);
+
+    if (elementType != null)
+      for (elem : elements)
+        elem.adjustToExpectedType(elementType);
+
+    return this;
+  }
+
+  adjustToExpectedType(mlsub.typing.Monotype expectedType)
+  {
+    let tc = nice.tools.typing.Types.equivalent(expectedType).head();
+
+    // Remember that we will need to wrap the array to make it a collection.
+    // This cannot be found easily during code generation for nested arrays
+    // since the bytecode type of both List<List<T>> and List<T[]> is
+    // simply List.
+    if (tc != PrimitiveType.arrayTC &&
+        tc != null && tc.isRigid() &&
+        mlsub.typing.Typing.testRigidLeq(tc, PrimitiveType.collectionTC))
+      {
+        wrapAsCollection = true;
+      }
+
+    // Adjust nested elements.
+    let elementType = nice.tools.typing.Types.getTypeParameter(expectedType, 0);
+    if (elementType != null)
+      for (elem : elements)
+        elem.adjustToExpectedType(elementType);    
+  }
+
+  compile()
+  {
+    gnu.expr.Expression[] args = Expression.compile(elements);
+    gnu.bytecode.ArrayType t = nice.tools.code.SpecialTypes.array
+      (nice.tools.code.Types.lowestUpperBound(args));
+
+    return new gnu.expr.ApplyExp
+      (new nice.tools.code.LiteralArrayProc
+         (t, elements.length, wrapAsCollection),
+       args);
+  }
+  
+  toString() = "[" + Util.map("", ", ", "", elements) + "]";
+}
+
+public Expression createLiteralArrayExp(?List<Expression> elements)
+{
+  if (elements == null)
+    return new LiteralArrayExp(elements: new Expression[0]);
+
+  return new LiteralArrayExp(elements: toArray(elements));
+}

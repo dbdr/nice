@@ -1,0 +1,643 @@
+/**************************************************************************/
+/*                                N I C E                                 */
+/*             A high-level object-oriented research language             */
+/*                        (c) Daniel Bonniot 2004                         */
+/*                                                                        */
+/*  This program is free software; you can redistribute it and/or modify  */
+/*  it under the terms of the GNU General Public License as published by  */
+/*  the Free Software Foundation; either version 2 of the License, or     */
+/*  (at your option) any later version.                                   */
+/*                                                                        */
+/**************************************************************************/
+
+package bossa.syntax;
+
+import bossa.util.*;
+
+/**
+   A symbol, for which overloading resolution has yet to be done.
+*/
+
+public class OverloadedSymbolExp extends Expression
+{
+  List<VarSymbol> symbols;
+  final LocatedString ident;
+
+  /** Do not try to add an implicit 'this' access. */
+  private final boolean noImplicitThis = false;
+
+  isAssignable()
+  {
+    Internal.error("Overloading resolution should be done before this.");
+    return false;
+  }
+
+  private Expression uniqueExpression()
+  {
+    return new SymbolExp(symbols.get(0), this.location());
+  }
+  
+  private Expression uniqueExpression(VarSymbol sym, mlsub.typing.Polytype t)
+  {
+    SymbolExp res = new SymbolExp(sym, this.location());
+    res.type = t;
+    return res;
+  }
+  
+  resolveOverloading(CallExp callExp)
+  {
+    Arguments arguments = callExp.arguments;
+    // It's better to do this know. OR is oriented, arguments first.
+    arguments.computeTypes();
+
+    if (bossa.util.Debug.overloading) 
+      bossa.util.Debug.println("Overloading resolution for " + this +
+		    "\nwith parameters " + arguments);
+
+    // FIRST PASS: only checks the number of parameters
+    
+    // remembers removed symbols, 
+    // to list possibilities if none matches
+    LinkedList<VarSymbol> removed = new LinkedList();
+
+    // Useful in case of failure, to try adding an implicit 'this'.
+    let fieldAccesses = this.filterFieldAccesses();
+
+    for(let i = symbols.iterator(); i.hasNext();)
+      {
+	let s = i.next();
+	
+        if (s.isIgnored())
+          {
+            removed.add(s);
+            i.remove();
+            continue;
+          }
+
+        let case = s.match(arguments);
+	if (case == 0) // Doesn't match 
+          {
+	    removed.add(s);
+	    i.remove();
+	  }
+	else if (case == 1) // Wasn't even a function or method
+          {
+	    i.remove();
+	  }
+	else if (case == 2) // Matches
+	  { /* do nothing*/ }
+	else // Should not happen
+          {
+	    Internal.warning("Unknown O.R. case: " + s.getClass()); 
+	    i.remove(); 
+	  }
+      }
+
+    if (symbols.size() == 0)
+      {
+        if (! noImplicitThis)
+          {
+            let res = this.givePriorityToFields(fieldAccesses);
+            if (res != null)
+              return res;
+          }
+
+        User.error(this, this.noMatchError(removed, arguments));
+      }
+
+    // SECOND PASS: check argument types
+
+    removed.clear();
+
+    for (let i = symbols.iterator(); i.hasNext(); )
+      {
+	let s = i.next();
+	
+	if(bossa.util.Debug.overloading) 
+	  bossa.util.Debug.println("Overloading: Trying with "+s);
+
+	// we clone the type to avoid clashes with another use
+	// of the same symbol
+	// the cloned type is stored in the VarSymbol
+	// and we check that cloneType() is not called twice
+	// before the clone type is released
+	s.makeClonedType();
+
+        mlsub.typing.Polytype[] argsType = 
+          this.computeArgsType(arguments.getExpressions(s),
+                          s.getClonedType(), arguments.getUsedArguments(s));
+
+	?mlsub.typing.Polytype t = CallExp.wellTyped(s.getClonedType(), argsType);
+
+	if (t == null)
+	  {
+	    removed.add(s);
+	    i.remove();
+	    s.releaseClonedType();
+	  }
+	else
+	  arguments.types.put(s, t);
+      }
+
+    if (symbols.size() == 0)
+      {
+        if (! noImplicitThis)
+          {
+            let res = this.givePriorityToFields(fieldAccesses);
+            if (res != null)
+              return res;
+          }
+
+        if (removed.size() == 1)
+          User.error(this, "Arguments " + arguments.printTypes() +
+                     " do not fit:\n" + removed[0]);
+        else
+          User.error(this, "No possible call for " + ident +
+                     ".\nArguments: " + arguments.printTypes() +
+                     "\nPossibilities:\n" +
+                     Util.map("", "\n", "", removed.toArray()));
+      }
+
+    removeNonMinimal(symbols, arguments);
+    removeOverlappingJavaMethods(symbols);
+    
+    if (symbols.size() == 1)
+      {
+	let res = symbols[0];
+	// store the formal argument types for later use together with the type
+        callExp.setComputedType(arguments.types.get(res),
+                                nice.tools.typing.Types.parameters(res.getClonedType()));
+	res.releaseClonedType();
+
+	// store the expression (including default arguments)
+	callExp.arguments.computedExpressions = cast(arguments.getExpressions(res));
+	//callExp.arguments = null; // free memory
+	return this.uniqueExpression();
+      }
+
+    this.releaseAllClonedTypes();
+    throw new AmbiguityError(this);
+  }
+
+  private mlsub.typing.Polytype[] computeArgsType(Expression[] args,
+                                     mlsub.typing.Polytype functionType,
+                                     int[?] usedArguments)
+  {
+    mlsub.typing.Monotype[?] domain = null;
+
+    /* Where a default value was used, use the declared argument type instead
+       of the value's type. This is more robust, as the application type will
+       not depend on the default value.
+       Furthermore, this avoids running into problems when the default value
+       refers to type parameters (in anonymous functions, by refering to
+       previous arguments, ...) which would not be in sync with the cloned
+       ones.
+       This is only needed when the type is polymorphic.
+    */
+    mlsub.typing.Polytype[] res = fill(new mlsub.typing.Polytype[args.length],
+						int i =>
+      {
+        if (usedArguments != null && usedArguments[i] == 0)
+          {
+            if (domain == null)
+              {
+                mlsub.typing.FunType func = cast(nice.tools.typing.Types.rawType(functionType.getMonotype()));
+                domain = func.domain();
+              }
+
+            return new mlsub.typing.Polytype(notNull(domain)[i]);
+          }
+
+          return args[i].getType();
+      });
+
+    return res;
+  }
+
+  resolveOverloading(mlsub.typing.Polytype expectedType)
+  {
+    if(bossa.util.Debug.overloading) 
+      bossa.util.Debug.println("Overloading resolution (expected type " + expectedType +
+		    ") for " + this);
+
+    // remembers removed symbols, 
+    // to list possibilities if none matches
+    LinkedList<VarSymbol> removed = new LinkedList();
+
+    // Useful in case of failure.
+    let fieldAccesses = this.filterFieldAccesses();
+
+    for (let i = symbols.iterator(); i.hasNext();)
+      {
+	let s = i.next();
+	s.makeClonedType();
+	try{
+	  Typing.leq(s.getClonedType(), expectedType);
+	  if(bossa.util.Debug.overloading)
+	    bossa.util.Debug.println(s + "(" + s.location() + ") of type " +
+			  s.getClonedType() + " matches");
+	}
+	catch(TypingEx e){
+	  removed.add(s);
+	  i.remove();
+	  s.releaseClonedType();
+	  if(bossa.util.Debug.overloading) 
+	    bossa.util.Debug.println("Not "+s+" of type\n" + s.getClonedType() + 
+			  "\nbecause "+e);
+	}
+      }
+
+    if (symbols.size() == 1)
+      {
+	let s = symbols[0];
+	let symType = s.getClonedType();	
+	s.releaseClonedType();
+	return this.uniqueExpression(s, symType);
+      }
+
+    try {
+      let res = this.givePriorityToFields(fieldAccesses);
+      if (res != null)
+        return res;
+
+      if (nice.tools.typing.Types.parameters(expectedType) != null)
+        { // in case of function objects symbols find the most precise match
+	  let nonMin = removeNonMinimal(symbols);
+	  if (symbols.size() == 1)
+            {
+ 	      let s = symbols[0];
+	      let symType = s.getClonedType();	
+	      s.releaseClonedType();
+              symbols = nonMin;
+	      return this.uniqueExpression(s, symType);
+            }
+          else
+            symbols.addAll(nonMin);
+        }
+
+      if (symbols.size() != 0)
+        throw new AmbiguityError(this);
+
+      throw User.error(this, this.noMatchError(removed, expectedType));
+    }
+    finally {
+      this.releaseAllClonedTypes();
+    }
+  }
+
+  private void releaseAllClonedTypes()
+  {
+    for (s : symbols)
+      s.releaseClonedType();
+  }
+
+  noOverloading()
+  {
+    if(bossa.util.Debug.overloading) 
+      bossa.util.Debug.println("(no)Overloading resolution for "+this);
+
+    if(symbols.size()==1)
+      return this.uniqueExpression();
+
+    let res = this.givePriorityToFields(this.filterFieldAccesses());
+    if (res != null)
+      return res;
+
+    List<VarSymbol> globalvars = symbols.filter(VarSymbol sym =>
+			sym instanceof GlobalVarDeclaration.GlobalVarSymbol);
+
+    // If there are global variables, give them the priority
+    // (but not when there are *only* global variables, or it would loop).
+    if (globalvars.size() > 0 && globalvars.size() < symbols.size())
+      return createOverloadedSymbolExp(globalvars, ident).noOverloading();
+
+    if (symbols.size() != 0)
+      throw new AmbiguityError(this);
+
+    throw User.error(this, 
+                     "No variable or field in this class has name " + ident);
+  }
+
+  /**
+     @return null if there is no solution.
+  */
+  private ?Expression givePriorityToFields (List<VarSymbol> fieldAccesses)
+  {
+    if (fieldAccesses.size() != 0)
+      {
+        if (Node.thisExp != null)
+          try {
+            let res = new CallExp
+              (createOverloadedSymbolExp(fieldAccesses, ident, true),
+               //Arguments.noArguments());
+               new Arguments([new Arguments.Argument(Node.thisExp)]));
+
+            res.setLocation(ident.location());
+            res.resolveOverloading();
+            return res;
+          }
+          catch (UserError e) {}
+
+        symbols.removeAll(this.filterFieldAccesses());
+
+        if (symbols.size() == 1)
+          return this.uniqueExpression();
+      }
+
+    // There is no solution.
+    return null;
+  }
+
+  private List<VarSymbol> filterFieldAccesses()
+  {
+    return symbols.filter(VarSymbol sym => sym.isFieldAccess());
+  }
+
+  computeType()
+  {
+    Internal.error(this,ident+" has not been resolved yet.\n"+
+		   "Possibilities are :"+this);
+  }
+
+  compile()
+  {
+    Internal.error("compile in "+this.getClass()+" "+this);
+    return cast(null);
+  }
+  
+
+  toString()
+  {
+    if (symbols.size() <= 1)
+      return "[" + Util.map("", "\n|", "", symbols.toArray()) + "]";
+
+    return "\n[" + Util.map("", "\n|", "", symbols.toArray()) + "]";
+  }
+
+
+  /****************************************************************
+   * Error messages
+   ****************************************************************/
+
+  /** No method in removed matched these arguments. */
+  private String noMatchError(List<VarSymbol> removed, Arguments arguments)
+  {
+    if (removed.size() == 0)
+      return "No method has name " + ident;
+
+    if (removed.size() == 1)
+      {
+	let sym = removed[0];
+        if (sym.isIgnored())
+          return sym.getName() + 
+            " cannot be used because it has been ignored.\n" +
+            "See above for the reason why it has been ignored";
+
+	return sym.explainWhyMatchFails(arguments);
+      }
+
+    return "No method with name " + ident + arguments.explainNoMatch(removed);
+  }
+
+  /** No symbol in removed had the expected type. */
+  private String noMatchError(List<VarSymbol> removed, mlsub.typing.Polytype expectedType)
+  {
+    if (removed.size() == 0)
+      return "No method has name " + ident;
+
+    if (removed.size() == 1)
+      return ident + " has type " + removed[0].getType();
+
+    return "No symbol with name " + ident + " has type " + expectedType + 
+		":\n" + Util.map("", "\n", "", removed.toArray());
+  }
+
+}
+
+/**
+   @param symbols All the possible VarSymbols
+   @param ident the original identifier
+ */
+Expression createOverloadedSymbolExp(List<VarSymbol> symbols, LocatedString ident)
+  {
+    if(symbols == null)
+      Internal.error("No symbols");
+    
+    let res = new OverloadedSymbolExp(symbols: symbols, ident: ident);
+    res.setLocation(ident.location());
+    return res;
+  }
+
+private Expression createOverloadedSymbolExp(List<VarSymbol> symbols, LocatedString ident, 
+                              boolean noImplicitThis)
+  {
+    if(symbols == null)
+      Internal.error("No symbols");
+    
+    let res = new OverloadedSymbolExp(symbols: symbols, ident: ident, noImplicitThis: noImplicitThis);
+    res.setLocation(ident.location());
+    return res;
+  }
+
+Expression createOverloadedSymbolExp(VarSymbol symbol, LocatedString ident)
+{
+  let List<VarSymbol> list = new LinkedList();
+  list.add(symbol);
+  return createOverloadedSymbolExp(list, ident);
+}
+
+class AmbiguityError extends UserError {}
+
+new AmbiguityError(OverloadedSymbolExp sym)
+    {
+      this(sym, 
+	    "Ambiguity for symbol " + sym.ident + 
+	    ". Possibilities are :\n" + 
+	    Util.map("", "\n", "", toArray(sym.symbols)));
+    }
+
+List<VarSymbol> removeNonMinimal(List<VarSymbol> symbols)
+{
+  List<VarSymbol> removed = new ArrayList();
+  // optimization
+  if(symbols.size()<2)
+    return removed;
+    
+  int len = symbols.size();
+  VarSymbol[] syms = new VarSymbol[len].fillWith(symbols);
+  boolean[] remove = new boolean[len];
+    
+  for(int s1 = 0; s1<len; s1++) {
+
+    Domain d1 = nice.tools.typing.Types.domain(syms[s1].getType());
+      
+    for(int s2 = 0; s2<len; s2++)
+      /*
+	Look for symbols s1 and s2 such that
+	  d2 <: d1 and not d1 <: d2
+	In that case s1 can be removed, since it is less specific than s2.
+
+	Optimizations:
+	  Skip the diagonal.
+	  If s2 was removed, then there is s3 below s2.
+	  Therefore s1 will be removed anyway.
+      */
+      if (s1 != s2 && !remove[s2]) {
+
+	Domain d2 = nice.tools.typing.Types.domain(syms[s2].getType());
+
+	try {
+	  Typing.leq(d2, d1);
+	  try {
+	    Typing.leq(d1, d2);
+	  }
+	  catch (TypingEx e) {
+	    remove[s1] = true;
+	    break;
+	  }
+	}
+        catch(TypingEx e){
+	}
+      }
+  }
+
+  for(int i = 0; i<len; i++)
+    if(remove[i])
+      {
+	if (bossa.util.Debug.overloading)
+	  bossa.util.Debug.println("Removing " + syms[i] + " since it is not minimal");
+	  
+        removed.add(syms[i]);
+	symbols.remove(syms[i]);
+       }
+
+  return removed;
+}
+
+/**
+ * Removes the symbols that do not have minimal domain types.
+ *
+ * For instance, if the set of symbols is {s1, s2}
+ * with s1:A->C and s2:B->D with B<:A,
+ * removoNonMinimal will remove s1.
+ *
+ * This allows for java-style overloading, 
+ * where the most precise method is choosen at compile-time.
+ */
+private void removeNonMinimal(List<VarSymbol> symbols, Arguments arguments)
+{
+  // optimization
+  if(symbols.size()<2)
+    return;
+  
+  int len = symbols.size();
+  VarSymbol[] syms = new VarSymbol[len].fillWith(symbols);
+  boolean[] remove = new boolean[len];
+  
+  for(int s1 = 0; s1<len; s1++) {
+
+    Domain d1 = domain(syms[s1].getClonedType(), 
+		 	arguments.getUsedArguments(syms[s1]));
+      
+    for(int s2 = 0; s2<len; s2++)
+      /*
+	Look for symbols s1 and s2 such that
+	  d2 <: d1 and not d1 <: d2
+	In that case s1 can be removed, since it is less specific than s2.
+	  Optimizations:
+	  Skip the diagonal.
+	  If s2 was removed, then there is s3 below s2.
+	  Therefore s1 will be removed anyway.
+      */
+      if (s1 != s2 && !remove[s2]) {
+
+	Domain d2 = domain(syms[s2].getClonedType(), 
+			     arguments.getUsedArguments(syms[s2]));
+
+	try {
+	  Typing.leq(d2, d1);
+	  try {
+	    Typing.leq(d1, d2);
+	  }
+	  catch (TypingEx e) {
+	    remove[s1] = true;
+	    break;
+	  }
+	}
+	catch(TypingEx e){
+	}
+      }
+  }
+
+  for(int i = 0; i<len; i++)
+    if(remove[i])
+      {
+	if (bossa.util.Debug.overloading)
+	  bossa.util.Debug.println("Removing " + syms[i] + " since it is not minimal");
+	  
+	syms[i].releaseClonedType();
+	symbols.remove(syms[i]);
+      }
+}
+
+private Domain domain(mlsub.typing.Polytype t, int[] usedArguments)
+{
+  // remove nullness marker
+  mlsub.typing.Monotype[] m = nice.tools.typing.Types.parameters(t.getMonotype());
+
+  ?mlsub.typing.Monotype[] dom;
+
+  if (usedArguments == null)
+    dom = cast(m);
+  else
+    {
+      int n = usedArguments.count(int x => x != 0);
+
+      dom = new mlsub.typing.Monotype[n];
+
+      for (int i = 0; i < usedArguments.length; i++)
+        if (usedArguments[i] != 0)
+          dom[usedArguments[i] - 1] = m[i];
+    }
+
+  return new Domain(t.getConstraint(), cast(dom));
+}
+
+/**
+   When a Java class implements two interfaces,
+   there is no ambiguity between methods of the same signature
+   defined in both interfaces, since they are implemented by the same
+   method in the class. So this method removes all but one of the 
+   overlapping methods.
+*/
+private void removeOverlappingJavaMethods(List<VarSymbol> symbols)
+{
+  // optimization
+  if(symbols.size()<2)
+    return;
+  
+  int len = symbols.size();
+  VarSymbol[] syms = cast(symbols.toArray(new VarSymbol[len]));
+
+  for (int i = 0; i < syms.length; i++)
+    for (int j = i+1; j < syms.length; j++)
+      if (overlappingJavaMethods(syms[i].getMethodDeclaration(),
+                                 syms[j].getMethodDeclaration()))
+        {
+          // We can remove either, since they lead to the same implementation
+          symbols.remove(syms[i]);
+          // Since we removed i, we don't need to continue this loop.
+          // This would not be true if we decided to remove j.
+          break;
+        }
+}
+
+private boolean overlappingJavaMethods(MethodDeclaration m1,
+                                       MethodDeclaration m2)
+{
+  if (! (m1 instanceof JavaMethod) ||
+      ! (m2 instanceof JavaMethod))
+    return false;
+
+  return Arrays.equals(m1.javaArgTypes(), m2.javaArgTypes());
+}

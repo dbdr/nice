@@ -1,0 +1,155 @@
+/**************************************************************************/
+/*                                N I C E                                 */
+/*             A high-level object-oriented research language             */
+/*                        (c) Daniel Bonniot 2004                         */
+/*                                                                        */
+/*  This program is free software; you can redistribute it and/or modify  */
+/*  it under the terms of the GNU General Public License as published by  */
+/*  the Free Software Foundation; either version 2 of the License, or     */
+/*  (at your option) any later version.                                   */
+/*                                                                        */
+/**************************************************************************/
+
+package bossa.syntax;
+
+import bossa.util.*;
+
+/**
+   General loop statement (used for 'for', 'while do', 'do while' ...)
+*/
+
+public class LoopStmt extends Statement
+{
+  ?Expression whileExp;
+  final Statement loopBody;
+  final ?Block iterationStatements = null;
+  final boolean testFirst;
+
+  ?gnu.expr.LoopExp code = null;
+  private boolean mustCreateBlock = false;
+
+  boolean isTestFirst() = testFirst;
+
+  /****************************************************************
+   * Code generation
+   ****************************************************************/
+
+  void createBlock()
+  {
+    mustCreateBlock = true;
+  }
+
+  /**
+     Returns true iff there exists a break statement that target this loop.
+     This means that the loop can complete abruptly because of that break.
+  */
+  boolean isBreakTarget() = mustCreateBlock;
+
+  /**
+     Returns true iff this loop never completes normally.
+  */
+  boolean isInfinite()
+  {
+    return (whileExp == null || notNull(whileExp).isTrue()) 
+      && ! this.isBreakTarget();
+  }
+
+  generateCode()
+  {
+    gnu.expr.Expression test, iteration, res;
+
+    if (whileExp == null)
+      test = notNull(gnu.expr.QuoteExp.trueExp);
+    else
+      test = notNull(whileExp).generateCode();
+    
+    if (iterationStatements == null)
+      iteration = notNull(gnu.expr.QuoteExp.voidExp);
+    else
+      iteration = notNull(iterationStatements).generateCode();
+
+    code = new gnu.expr.LoopExp(test, iteration, testFirst);
+
+    let savedBlock = currentLoopBlock;
+    if (mustCreateBlock)
+      res = currentLoopBlock = new gnu.expr.BlockExp(code);
+    else
+      res = notNull(code);
+
+    notNull(code).setBody(loopBody != null ? notNull(loopBody).generateCode() : null);
+
+    code = null;
+    currentLoopBlock = savedBlock;
+    return res;
+  }
+  
+  /****************************************************************
+   * Printing
+   ****************************************************************/
+  
+  toString()
+  {
+    if (!testFirst)
+      return "do {\n" + (loopBody == null ? " " : loopBody.toString()) +
+		"}\n while (" + whileExp + ");"; 
+
+    if (iterationStatements == null)
+      return "while (" + whileExp + ")" +
+		(loopBody == null ? ";" : loopBody.toString());
+
+    Statement[] itStatements = cast(notNull(iterationStatements).statements);
+    String itStats = "";
+    for(int i = 0; i<itStatements.length; i++)
+      {
+	String tmp = itStatements[i].toString();
+	itStats += tmp.substring(0, tmp.lastIndexOf(';'));
+	if (i<itStatements.length-1) itStats += ", ";
+      }
+
+    return "for(; " + whileExp + " ;" + itStats + ")\n " +
+	(loopBody == null ? "" : loopBody.toString());
+  }
+}
+
+public LoopStmt createForLoop
+  (Expression test, Block update, Statement body)
+{
+  return new LoopStmt(whileExp:test, loopBody: body, iterationStatements: update, testFirst: true);
+}
+
+public LoopStmt createWhileLoop(Expression test, Statement body)
+{
+  return new LoopStmt(whileExp:test, loopBody: body, testFirst: true);
+}
+
+public LoopStmt createDoLoop(Expression test, Statement body)
+{
+  return new LoopStmt(whileExp: test, loopBody: body, testFirst: false);
+}
+
+public Statement createForInLoop(?Monotype vartype, LocatedString varName, Location loc, Expression container, Statement body)
+{
+  ?Monotype itertype = null;
+
+  if (vartype != null)
+    {
+      List<Monotype> tparams = new ArrayList(1);
+      tparams.add(vartype);	
+      itertype = new MonotypeConstructor(new TypeIdent(new LocatedString("Iterator", loc)),
+	new TypeParameters(tparams), loc);
+      notNull(itertype).nullness = Monotype.sure;
+    }
+
+  let getiter = CallExp.create(new IdentExp(new LocatedString("forIterator", loc)), container); 
+  let iter = new LocatedString(loc.uniqueIdentifier("for_in_iter_"), loc);
+  let init = new Block.LocalVariable(iter, itertype, true, getiter);
+  let iterexp = new IdentExp(iter);
+  let cond = CallExp.create(new IdentExp(new LocatedString("hasNext", loc)), iterexp);
+  let getvar = CallExp.create(new IdentExp(new LocatedString("next", loc)), iterexp);
+  let assign = new Block.LocalVariable(varName, vartype, true, getvar);
+  let loop = createWhileLoop(cond, new Block(new LinkedList([assign, body])));
+  return new Block(new LinkedList([init, loop]));
+
+}
+
+var ?gnu.expr.BlockExp currentLoopBlock = null;

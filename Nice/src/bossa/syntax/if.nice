@@ -1,0 +1,82 @@
+/**************************************************************************/
+/*                                N I C E                                 */
+/*             A high-level object-oriented research language             */
+/*                        (c) Daniel Bonniot 2004                         */
+/*                                                                        */
+/*  This program is free software; you can redistribute it and/or modify  */
+/*  it under the terms of the GNU General Public License as published by  */
+/*  the Free Software Foundation; either version 2 of the License, or     */
+/*  (at your option) any later version.                                   */
+/*                                                                        */
+/**************************************************************************/
+
+package bossa.syntax;
+
+import bossa.util.*;
+
+/**
+   Conditional expression (used in statements too).
+*/
+
+public class IfExp extends Expression
+{
+  Expression condition;
+  Expression thenExp;
+  Expression elseExp;
+
+  /** set to true if the execution of the branch never completes. */
+  boolean thenUnreachable = false;
+  boolean elseUnreachable = false;
+
+  computeType()
+  {
+    this.type = mlsub.typing.Polytype.union(thenExp.getType(), elseExp.getType());
+  }
+  
+  compile()
+  {
+    gnu.expr.Expression thenCode, elseCode;
+    thenCode = thenExp.generateCode();
+    elseCode = elseExp.generateCode();
+    
+    if (elseCode.getType() == nice.tools.code.SpecialTypes.voidType)
+      thenCode = voidify(thenCode);
+    else if (thenCode.getType() == nice.tools.code.SpecialTypes.voidType)
+      elseCode = voidify(elseCode);
+    
+    return new gnu.expr.SimpleIfExp(condition.generateCode(),
+			      thenCode,
+			      elseCode);
+  }
+  
+  toString()
+  {
+    return 
+      "if(" +
+      String.valueOf(condition) +
+      ")\n" +
+      String.valueOf(thenExp) +
+      "\nelse\n" +
+      String.valueOf(elseExp) +
+      "\n"
+      ;
+  }
+}
+
+private gnu.expr.Expression voidify(gnu.expr.Expression e)
+{
+  if (e.getType().isVoid())
+    return e;
+  
+  return new gnu.expr.BeginExp(e, gnu.expr.QuoteExp.voidExp);
+}
+
+public Statement createIfStmt(Expression cond, Statement thenStmt, ?Statement elseStmt, Location loc)
+{
+  let ifExp = new IfExp(condition: cond,
+			thenExp: new StatementExp(statement: thenStmt),
+			elseExp: (elseStmt == null ? new VoidConstantExp() : 
+				new StatementExp(statement: elseStmt)));
+  ifExp.setLocation(loc);
+  return new ExpressionStmt(ifExp);
+}

@@ -1,0 +1,49 @@
+/**************************************************************************/
+/*                                N I C E                                 */
+/*             A high-level object-oriented research language             */
+/*                        (c) Daniel Bonniot 2004                         */
+/*                                                                        */
+/*  This program is free software; you can redistribute it and/or modify  */
+/*  it under the terms of the GNU General Public License as published by  */
+/*  the Free Software Foundation; either version 2 of the License, or     */
+/*  (at your option) any later version.                                   */
+/*                                                                        */
+/**************************************************************************/
+
+package bossa.syntax;
+
+import bossa.util.*;
+
+/**
+   Assignment.
+ */
+public class AssignExp extends Expression
+{
+  Expression to;
+  Expression value;
+
+  computeType()
+  {
+    this.type = value.getType();
+  }
+  
+  compile() = to.compileAssign(value.generateCode());
+  
+  toString() = to + " = " + value;
+}
+
+/**
+   Create the assignment expression, applying rewrite rules first. 
+ */
+public Expression createAssignExp(Expression to, Expression value)
+{
+  // Rewrite "get(e, i) = v" into "set(e, i, v)"
+  if (to instanceof CallExp && "get".equals(notNull(to.function).toString()))
+    return CallExp.create(
+	new IdentExp(new LocatedString("set", notNull(to.function).location())),
+	to.arguments.getExp(0),
+	to.arguments.getExp(1),
+	value);
+  
+  return new AssignExp(to: to, value: value);
+}

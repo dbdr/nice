@@ -79,7 +79,7 @@ public class NewExp extends CallExp
     // OverloadedSymbolExp removes elements from it
     constructors = (LinkedList) constructors.clone();
 
-    function = new OverloadedSymbolExp
+    function = bossa.syntax.dispatch.createOverloadedSymbolExp
       (constructors, new LocatedString("new " + tc, location()));
   }
   

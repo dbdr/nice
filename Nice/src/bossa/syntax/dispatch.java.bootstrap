@@ -1,6 +1,7 @@
 
 package bossa.syntax;
 
+import java.util.List;
 /*
   This file is only useful to bootstrap the compiler,
   since bossa.syntax is implemented both in Java and Nice,
@@ -11,6 +12,24 @@ package bossa.syntax;
 
 public class dispatch
 {
+  public static Statement createReturnStmt(Expression value, boolean fake)
+  { return null; }
+
+  public static Expression createFunExp(bossa.syntax.Constraint cst, List formals, Statement body)
+  { return null; }
+
+  static Expression createFunExp(bossa.syntax.Constraint cst, MonoSymbol[] formals, Statement body)
+  { return null; }
+
+  public static Expression createLiteralArrayExp(List exps)
+  { return null; }
+
+  static Expression createOverloadedSymbolExp(List l, LocatedString s)
+  { return null; }
+
+  static List removeNonMinimal(List l)
+  { return null; }
+
   static Statement  analyse(Statement  s, VarScope v, TypeScope t, boolean r)
   { return null; }
   

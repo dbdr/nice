@@ -1,0 +1,65 @@
+/**************************************************************************/
+/*                                N I C E                                 */
+/*             A high-level object-oriented research language             */
+/*                        (c) Daniel Bonniot 2004                         */
+/*                                                                        */
+/*  This program is free software; you can redistribute it and/or modify  */
+/*  it under the terms of the GNU General Public License as published by  */
+/*  the Free Software Foundation; either version 2 of the License, or     */
+/*  (at your option) any later version.                                   */
+/*                                                                        */
+/**************************************************************************/
+
+package bossa.syntax;
+
+import bossa.util.*;
+
+/**
+   <tt>return</tt> in a function or method.
+*/
+
+public class ReturnStmt extends Statement
+{
+  ?Expression value;
+  boolean fake = false;
+
+  mlsub.typing.Polytype returnType()
+  {
+    if (value == null)
+      return notNull(PrimitiveType.voidPolytype);
+    
+    return notNull(value).getType();
+  }
+  
+  generateCode()
+  {
+    if (value == null)
+      return notNull(nice.tools.code.Gen.returnVoid());
+    
+    return nice.tools.code.Gen.returnValue(notNull(value).generateCode());
+  }
+  
+  toString()
+  {
+    return "return" + (value!=null ? " " + notNull(value) : "") + ";";
+  }
+  
+}
+
+public Statement createReturnStmt(Expression value)
+{
+  return createReturnStmt(value, false);
+}
+
+/**
+   @param fake  This return was not explicitely written, but is the result
+                of syntactic sugar.
+*/
+public Statement createReturnStmt(Expression value, boolean fake)
+{
+  let res = new ReturnStmt(value: value, fake: fake);
+  if (value != null)
+    res.setLocation(value.location());
+
+  return res;
+}

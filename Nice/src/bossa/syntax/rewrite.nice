@@ -49,14 +49,14 @@ rewrite(s@Block)
 	if (ifExp.thenUnreachable)
 	  {
 	    ifExp.elseExp = new StatementExp
-	    (rewrite(makeBlock(notNull(ifExp.elseExp), 
+	    (statement: rewrite(makeBlock(notNull(ifExp.elseExp), 
 			       statements.slice(from: i+1))));
 	    return statements.slice(to: i);
 	  }
 	else if (ifExp.elseUnreachable)
 	  {
 	    ifExp.thenExp = new StatementExp
-	    (rewrite(makeBlock(notNull(ifExp.thenExp), 
+	    (statement: rewrite(makeBlock(notNull(ifExp.thenExp), 
 			       statements.slice(from: i+1))));
 	    return statements.slice(to: i);
 	  }

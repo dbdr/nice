@@ -1,0 +1,162 @@
+/**************************************************************************/
+/*                                N I C E                                 */
+/*             A high-level object-oriented research language             */
+/*                        (c) Daniel Bonniot 2004                         */
+/*                                                                        */
+/*  This program is free software; you can redistribute it and/or modify  */
+/*  it under the terms of the GNU General Public License as published by  */
+/*  the Free Software Foundation; either version 2 of the License, or     */
+/*  (at your option) any later version.                                   */
+/*                                                                        */
+/**************************************************************************/
+
+package bossa.syntax;
+
+import bossa.util.*;
+
+/**
+   Allocate a new instance of an Array type.
+*/
+
+public class NewArrayExp extends Expression
+{
+  final TypeIdent ident;
+  final Expression[] knownDimensions;
+  final int unknownDimensions;
+
+  private ?TypeSymbol resolvedType = null;
+
+
+  void resolveTC(TypeMap typeScope)
+  {
+    resolvedType = ident.resolveToTypeSymbol(typeScope);
+  }
+
+  computeType()
+  {
+    mlsub.typing.Monotype monotype;
+    var cst = mlsub.typing.Constraint.True;
+
+    TypeConstructor[?] nullVars;
+    boolean zero = knownDimensions.any(Expression e => e.isZero());
+    /* 
+       If one of the dimensions is zero, then all unknown dimensions and
+       the component type can be safely assumed to be non-optional.
+       Because arrays are invariant, we give them a type polymorphic in the
+       nullness marker.
+    */
+    if (zero)
+      {
+	nullVars = fill(new TypeConstructor[unknownDimensions + 1], int i => 
+		new TypeConstructor("n" + i, notNull(PrimitiveType.maybeTC).variance, 
+		false, false));
+      }
+    else
+      nullVars = null;
+
+    mlsub.typing.MonotypeVar[?] typeVars = null;
+
+    // Whether the element are surely not null
+    boolean sure = false;
+
+    if (resolvedType instanceof mlsub.typing.MonotypeVar)
+      {
+        let mlsub.typing.MonotypeVar resT = cast(resolvedType);
+        if (resT.getKind() == mlsub.typing.NullnessKind.instance)
+          monotype = nice.tools.typing.Types.rawType(resT.equivalent());
+        else
+          monotype = resT;
+      }
+    else if (resolvedType == mlsub.typing.TopMonotype.instance)
+      {
+        monotype = mlsub.typing.TopMonotype.instance;
+      }
+    else
+      {
+	if (!(resolvedType instanceof mlsub.typing.TypeConstructor))
+	  User.error(ident, ident + " should be a class");
+
+	let mlsub.typing.TypeConstructor resT = cast(resolvedType);
+        typeVars = mlsub.typing.MonotypeVar.news(resT.arity());
+	monotype = new mlsub.typing.MonotypeConstructor(resT, cast(typeVars));
+
+	if (nice.tools.typing.Types.isPrimitive(resT))
+          sure = true;
+      }
+
+    // Add the nullness marker to the element type.
+    if (sure)
+      monotype = bossa.syntax.Monotype.sure(monotype);
+    else if (nullVars == null)
+      monotype = bossa.syntax.Monotype.maybe(monotype);
+    else
+      {
+        monotype = mlsub.typing.MonotypeConstructor.apply
+          (nullVars[nullVars.length - 1], monotype);
+      }
+
+    if (nullVars != null || typeVars != null)
+      {
+        if (nullVars == null)
+          cst = new mlsub.typing.Constraint(cast(typeVars), null);
+        else if (typeVars == null)
+          cst = new mlsub.typing.Constraint(cast(nullVars), null);
+        else
+          {
+            ?mlsub.typing.TypeSymbol[] binders = new mlsub.typing.TypeSymbol[nullVars.length + typeVars.length];
+            System.arraycopy(nullVars, 0, binders, 0, nullVars.length);
+            System.arraycopy(typeVars, 0, binders, nullVars.length, typeVars.length);
+            cst = new mlsub.typing.Constraint(cast(binders), null);
+          }
+      }
+
+    for (int i = 0; i < unknownDimensions; i++)
+      {
+	monotype = new mlsub.typing.MonotypeConstructor
+	  (PrimitiveType.arrayTC, [monotype]);
+	if (nullVars != null)
+	  monotype = mlsub.typing.MonotypeConstructor.apply(nullVars[i], monotype);
+	else
+	  // Unknown dimensions are not initialized: give an option type.
+	  monotype = bossa.syntax.Monotype.maybe(monotype);
+      }
+
+    // Known dimensions are initialized: give a sure type.
+    for (int i = 0; i < knownDimensions.length; i++)
+      monotype = bossa.syntax.Monotype.sure
+	(mlsub.typing.MonotypeConstructor.apply(PrimitiveType.arrayTC, monotype));
+    
+    // set the Expression type
+    type = new mlsub.typing.Polytype(cst, monotype);
+  }
+
+  /****************************************************************
+   * Code generation
+   ****************************************************************/
+
+  compile()
+  {
+    let t = nice.tools.code.Types.javaType(type);
+    
+    return new gnu.expr.ApplyExp(
+		new nice.tools.code.MultiArrayNewProc(cast(t), knownDimensions.length),
+		Expression.compile(knownDimensions));
+  }
+  
+  toString()
+  {
+    let res = new StringBuffer("new " + ident + Util.map("[", "][", "]", knownDimensions));
+
+    for(int i=0; i<unknownDimensions; i++)
+      res.append("[]");
+    
+    return res.toString();
+  }
+}
+
+public new NewArrayExp(TypeIdent type, List<Expression> knownDimensions, 
+		     int unknownDimensions)
+  {
+    this(ident: type, knownDimensions: toArray(knownDimensions), 
+		unknownDimensions: unknownDimensions);
+  }

@@ -1,0 +1,101 @@
+/**************************************************************************/
+/*                                N I C E                                 */
+/*             A high-level object-oriented research language             */
+/*                        (c) Daniel Bonniot 2004                         */
+/*                                                                        */
+/*  This program is free software; you can redistribute it and/or modify  */
+/*  it under the terms of the GNU General Public License as published by  */
+/*  the Free Software Foundation; either version 2 of the License, or     */
+/*  (at your option) any later version.                                   */
+/*                                                                        */
+/**************************************************************************/
+
+package bossa.syntax;
+
+public class BreakStmt extends Statement
+{
+  generateCode() = new gnu.expr.ExitExp(currentLoopBlock);
+
+  toString() = "break;";
+}
+
+public class BreakLabelStmt extends Statement
+{
+  final LocatedString label;
+  ?LabeledStmt statement = null;
+
+  generateCode() = new gnu.expr.ExitExp(notNull(statement).block);
+
+  toString() = "break " + label + ";";
+}
+
+public class ContinueStmt extends Statement
+{
+  final ?LocatedString label;
+  ?LoopStmt loop = null;
+
+  generateCode() = new gnu.expr.LoopExp.ContinueExp(notNull(loop).code);
+
+  toString() = "continue " + (label != null ? notNull(label).toString() : "") + ";";
+
+}
+
+public Statement createBreakStmt(?LocatedString label)
+{
+  if (label == null)
+    return new BreakStmt();
+  else
+    return new BreakLabelStmt(label: label);
+}
+
+public Statement createContinueStmt(LocatedString label)
+{
+  return new ContinueStmt(label: label);
+}
+
+/**
+   A statement anotated by a label (used by break and continue).
+ */
+
+public class LabeledStmt extends Statement
+{
+  private final LocatedString label;
+  private final Statement statement;
+  private final ?LoopStmt loop = null;
+
+  public String name() = label.toString();
+  public LocatedString getLabel() = label;
+  public Statement getStatement() = statement;
+
+  /** @return the loop targeted by this label, or null. */
+  ?LoopStmt getLoop() 
+  { 
+    if (loop != null) 
+      return loop; 
+    if (statement instanceof LoopStmt)
+      return cast(statement);
+    return null;
+  }
+
+  /****************************************************************
+   * Code generation
+   ****************************************************************/
+
+  ?gnu.expr.BlockExp block = null;
+  
+  generateCode()
+  {
+//    if (statement == null)
+//      return notNull(gnu.expr.QuoteExp.voidExp);
+
+    let res = block = new gnu.expr.BlockExp();
+    notNull(block).setBody(statement.generateCode());
+    block = null;
+    return res;
+  } 
+}
+
+public new LabeledStmt(LocatedString label, Statement statement, LoopStmt loop)
+{
+  this(label:label, statement:statement, loop: loop, block: null);
+}

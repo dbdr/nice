@@ -258,7 +258,7 @@ analyseAssigned(e, i) = notNull(analyse(e, i));
 analyseAssigned(e@IdentExp, info) = analyseIdent(e, info, true);
 analyseAssigned(e@TupleExp, info)
 {
-  Array<?Expression> es = notNull(e.expressions);
+  Expression[] es = notNull(e.expressions);
   for (int i = 0; i < es.length; i++)
     es[i] = es[i].analyseAssigned(info);
 
@@ -392,11 +392,11 @@ Expression analyseQualifiedCall(CallExp e, Info info)
       */
       if (possibilities.has(VarSymbol s => s.isFieldAccess()))
 	{
-	  e.function = newOverloadedSymbolExp(possibilities, funName);
+	  e.function = createOverloadedSymbolExp(possibilities, funName);
 	  return e;
 	}
       else
-	return newOverloadedSymbolExp(possibilities, funName);
+	return createOverloadedSymbolExp(possibilities, funName);
     }
 
   List<VarSymbol> possibilities = JavaClasses.findJavaMethods
@@ -409,7 +409,7 @@ Expression analyseQualifiedCall(CallExp e, Info info)
 		 " has no method with "arity" arguments and named ") + 
 		funName);
   
-  e.function = newOverloadedSymbolExp(possibilities, funName);
+  e.function = createOverloadedSymbolExp(possibilities, funName);
 
   return e;
 }
@@ -439,7 +439,7 @@ analyse(e@FunExp, info@Info, noEscape)
     e.constraint = null;
 
     if (e.formals != null)
-      addVars(info, elementsNotNull(notNull(e.formals)));
+      addVars(info, e.formals);
 
     analyse(e.body, info);
     e.setAlwaysReturns(info.getUnreachable());
@@ -480,7 +480,7 @@ Expression analyseIdent(IdentExp e, Info info, boolean assigned)
 	    }
 
 	  if (e.alwaysOverloadedSymbol)
-	    return new OverloadedSymbolExp(sym, e.ident);
+	    return createOverloadedSymbolExp(sym, notNull(e.ident));
 	  else
 	    return new SymbolExp(sym, e.location());
 	}
@@ -512,7 +512,7 @@ Expression analyseIdent(IdentExp e, Info info, boolean assigned)
 	  if (sym.isNonStaticFieldAccess() && Node.thisExp != null)
             {
 	      CallExp res = new CallExp
-	        (newOverloadedSymbolExp(symbols, e.ident),
+	        (createOverloadedSymbolExp(symbols, notNull(e.ident)),
 	        new Arguments([new Arguments.Argument(Node.thisExp)]));
               res.setLocation(e.location());
               return res;
@@ -522,7 +522,7 @@ Expression analyseIdent(IdentExp e, Info info, boolean assigned)
 	    {
 	      // Make an implicit call to fetch the static field's value.
 	      CallExp res = new CallExp
-	        (newOverloadedSymbolExp(symbols, e.ident), 
+	        (createOverloadedSymbolExp(symbols, notNull(e.ident)), 
 	         Arguments.noArguments());
               res.setLocation(e.location());
               return res;
@@ -531,7 +531,7 @@ Expression analyseIdent(IdentExp e, Info info, boolean assigned)
 	  return new SymbolExp(sym, e.location());
         }
       else
-        return newOverloadedSymbolExp(symbols, e.ident);
+        return createOverloadedSymbolExp(symbols, notNull(e.ident));
     }
 
   if (e.enableClassExp)
@@ -565,14 +565,14 @@ analyse(e@IncrementExp, info)
 
 analyse(e@LiteralArrayExp, info)
 {
-  analyseExps(notNull(e.elements), info);
+  analyseExps(cast(e.elements), info);
   return e;
 }
 
 analyse(e@NewArrayExp, info)
 {
   e.resolveTC(info.typeMap);
-  analyseExps(notNull(e.knownDimensions), info);
+  analyseExps(cast(notNull(e.knownDimensions)), info);
   return e;
 }
 
@@ -635,7 +635,7 @@ analyse(e@TypeConstantExp, info)
 
 analyse(e@TupleExp, info)
 {
-  analyseExps(notNull(e.expressions), info);
+  analyseExps(cast(notNull(e.expressions)), info);
   return e;
 }
 
@@ -844,7 +844,7 @@ analyse(t@TryStmt, info)
   info.beginCases();
   analyse(t.body, info);
 
-  t.catches.foreach(TryStmt.Catch c =>{
+  t.catches.foreach(ACatch c =>{
     info.otherCase();
     info.begin();
     info.addVar(notNull(c.exnVar));

@@ -58,7 +58,7 @@ public class EnumDefinition extends Definition
         for (Iterator it = elements.iterator(); it.hasNext(); )
           exps.add(new IdentExp((LocatedString)it.next()));
 
-        Statement body = new ReturnStmt(new LiteralArrayExp(exps), true);
+        Statement body = bossa.syntax.dispatch.createReturnStmt(bossa.syntax.dispatch.createLiteralArrayExp(exps), true);
         LocatedString mName = new LocatedString("family", bossa.util.Location.nowhere());
         Definition mBodyDef = new MethodBodyDefinition(impl, mName, null,
 				new LinkedList(), body);

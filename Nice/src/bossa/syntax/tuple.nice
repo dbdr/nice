@@ -1,0 +1,164 @@
+/**************************************************************************/
+/*                                N I C E                                 */
+/*             A high-level object-oriented research language             */
+/*                        (c) Daniel Bonniot 2004                         */
+/*                                                                        */
+/*  This program is free software; you can redistribute it and/or modify  */
+/*  it under the terms of the GNU General Public License as published by  */
+/*  the Free Software Foundation; either version 2 of the License, or     */
+/*  (at your option) any later version.                                   */
+/*                                                                        */
+/**************************************************************************/
+
+package bossa.syntax;
+
+import bossa.util.*;
+
+/**
+   Creation of a tuple.
+*/
+
+public class TupleExp extends bossa.syntax.Expression
+{
+  final bossa.syntax.Expression[] expressions;
+  private mlsub.typing.Monotype[?] components = null;
+  private mlsub.typing.Monotype[?] expectedComponents= null;
+
+
+  /****************************************************************
+   * Typing
+   ****************************************************************/
+
+  isAssignable() = expressions.all(Expression e => e.isAssignable());
+  
+  /**
+     Adjust the array type according to the context.
+
+     This is usefull because arrays are non-variant.
+     For instance, different code must be generated 
+     for [ 1, 2 ] in the contexts:
+     int[] i = [ 1, 2 ]
+     and 
+     byte[] b = [ 1, 2 ]
+  */
+  resolveOverloading(mlsub.typing.Polytype expectedType)
+  {
+    // This can only help
+    expectedType.simplify();
+
+    this.adjustToExpectedType(expectedType.getMonotype());
+
+    return this;
+  }
+
+  adjustToExpectedType(mlsub.typing.Monotype expectedType)
+  {
+    let m = nice.tools.typing.Types.equivalent(expectedType);
+
+    // Get the expected component types
+    if (m instanceof mlsub.typing.TupleType)
+      {
+        expectedComponents = (m).getComponents();
+
+        // Do the same for the elements of the tuple, since they might be
+        // tuples themselves, literal arrays, ...
+        bossa.syntax.Expression.adjustToExpectedType
+          (expressions, expectedComponents);
+      }
+  }
+
+  noOverloading()
+  {
+    for(int i = expressions.length; i-->0;)
+      expressions[i] = expressions[i].noOverloading();
+
+    return this;
+  }
+
+  computeType()
+  {
+    let types = bossa.syntax.Expression.getType(expressions);
+    // should create a new <tt>and</tt> method without the last dummy parameters
+    let cst = mlsub.typing.Constraint.and(mlsub.typing.Polytype.getConstraint(types), 
+				    null, null);
+    components = mlsub.typing.Polytype.getMonotype(types);
+    let tupleType = new mlsub.typing.TupleType(components);
+    nice.tools.code.Types.setBytecodeType(components);
+    if (expectedComponents == null)
+      expectedComponents = components;
+
+    type = new mlsub.typing.Polytype(cst, bossa.syntax.Monotype.sure(tupleType));
+  }
+
+  /****************************************************************
+   * Code generation
+   ****************************************************************/
+
+  compile()
+  {
+    // Force computation of the component types.
+    this.getType();
+
+    /*
+      We base the array type on the expected type, but we record the
+      real type of the components.
+    */
+    return nice.tools.code.TupleType.createExp
+      (nice.tools.code.Types.lowestCommonSupertype(expectedComponents),
+       nice.tools.code.Types.javaType(expectedComponents), 
+       bossa.syntax.Expression.compile(expressions));
+  }
+
+  compileAssign(gnu.expr.Expression array)
+  {
+    ?gnu.expr.LetExp letExp = null;
+    gnu.expr.Expression tupleExp;
+    
+    let arrayType = array.getType();
+    ?nice.tools.code.TupleType tupleType = null;
+    if (arrayType instanceof nice.tools.code.TupleType)
+      tupleType = arrayType;
+
+    // if array is a complex expression, 
+    // we have to evaluate it and store the result 
+    // to avoid evaluating it several times.
+    if (!(array instanceof gnu.expr.ReferenceExp))
+      {
+	letExp = new gnu.expr.LetExp([array]);
+	let tupleDecl = notNull(letExp).addDeclaration("tupleRef", arrayType);
+
+	//FIXME: CanRead should be set automatically.
+	tupleDecl.setCanRead(true);
+	tupleExp = new gnu.expr.ReferenceExp(tupleDecl);
+      }
+    else
+      tupleExp = array;
+    
+    let gnu.expr.Expression[] stmts = 
+		fill(new gnu.expr.Expression[expressions.length], int i =>
+      {
+	gnu.expr.Expression value = new gnu.expr.ApplyExp(new nice.lang.inline.ArrayGetOp(null),
+				[tupleExp, new gnu.expr.QuoteExp(new Integer(i))]);
+
+	if (tupleType != null)
+	  value = nice.tools.code.EnsureTypeProc.ensure(value, notNull(tupleType.componentTypes)[i]);
+
+	return expressions[i].compileAssign(value);
+      });
+    
+    if (letExp != null)
+      {
+	letExp.setBody(new gnu.expr.BeginExp(stmts));
+	return letExp;
+      }
+    else
+      return new gnu.expr.BeginExp(stmts);
+  }
+
+  toString() = Util.map("(", ", ", ")", expressions);
+}
+
+public new TupleExp(List<bossa.syntax.Expression> expressions)
+{
+  this(expressions: toArray(expressions));
+}

@@ -1,0 +1,108 @@
+/**************************************************************************/
+/*                                N I C E                                 */
+/*             A high-level object-oriented research language             */
+/*                        (c) Daniel Bonniot 2004                         */
+/*                                                                        */
+/*  This program is free software; you can redistribute it and/or modify  */
+/*  it under the terms of the GNU General Public License as published by  */
+/*  the Free Software Foundation; either version 2 of the License, or     */
+/*  (at your option) any later version.                                   */
+/*                                                                        */
+/**************************************************************************/
+
+package bossa.syntax;
+
+import bossa.util.*;
+
+
+/**
+   A try/catch/finally statement  
+*/
+
+public class TryStmt extends Statement
+{
+  final Statement body;
+  ?Statement finallyBody = null;
+  List<ACatch> catches = new LinkedList();
+
+  public void setFinally(Statement body)
+  {
+    finallyBody = body;
+  }
+  
+  public void addCatch(TypeIdent tc, LocatedString varName, Statement body)
+  {
+    this.catches.add(new ACatch(tc, varName, body));
+  }
+  
+  generateCode()
+  {
+    let res = new gnu.expr.TryExp(body.generateCode(), 
+		(finallyBody==null ? null : notNull(finallyBody).generateCode()));
+
+    ?gnu.expr.CatchClause oldc = null;
+    for (c: this.catches)
+      {
+	gnu.expr.CatchClause newc = c.clause();
+
+	if (oldc!=null)
+	  oldc.setNext(newc);
+	else
+	  res.setCatchClauses(newc);
+	
+	oldc = newc;
+      }
+    
+    return res;
+  }
+  
+  toString()
+  {
+    String res = "try\n" + body;
+
+    for (c : this.catches)
+      res += "catch (" + c.t + " " + c.varName + ")\n" + c.body;
+
+    if (finallyBody != null)
+      res += "finally " + finallyBody;
+
+    return res;
+  }
+}
+
+public class ACatch
+{
+  final MonoSymbol exnVar;
+  ?TypeIdent tc;
+  ?mlsub.typing.TypeConstructor t = null;
+  private final LocatedString varName;
+  final Statement body;
+  private final Location typeLocation;
+
+  gnu.expr.CatchClause clause()
+  {
+    try {
+      mlsub.typing.Typing.leq(t, PrimitiveType.throwableTC);
+    }
+    catch (mlsub.typing.TypingEx e) {
+      User.error(typeLocation, notNull(t) + " is not catchable");
+    }
+
+    let res = new gnu.expr.CatchClause(varName.toString(), 
+				cast(nice.tools.code.Types.javaType(t)));
+    
+    exnVar.setDeclaration(res.getDeclaration());
+    res.setBody(body.generateCode());
+    
+    return res;
+  }
+}
+
+public new ACatch(TypeIdent tc, LocatedString varName, Statement body)
+{
+  Monotype type = new MonotypeConstructor(tc, null, tc.location());
+  type.nullness = Monotype.sure;
+
+  this(exnVar: new MonoSymbol(varName, type), tc: tc,
+		typeLocation: tc.location, varName: varName, body: body);
+}

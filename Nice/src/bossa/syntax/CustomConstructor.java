@@ -174,7 +174,7 @@ public abstract class CustomConstructor extends UserOperator
                      "The last statement must be a call to 'this' constructor");
 
         Location loc = ident.location();
-        call.function = new OverloadedSymbolExp
+        call.function = bossa.syntax.dispatch.createOverloadedSymbolExp
           (classe.getConstructorCallSymbols(), FormalParameters.thisName);
         call.function.setLocation(loc);
       }

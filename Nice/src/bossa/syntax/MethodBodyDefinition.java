@@ -242,7 +242,7 @@ public class MethodBodyDefinition extends MethodImplementation
       }
     }
 
-    OverloadedSymbolExp.removeNonMinimal(symbols);
+    bossa.syntax.dispatch.removeNonMinimal(symbols);
 
     if(symbols.size() == 1) 
       return (VarSymbol) symbols.get(0);

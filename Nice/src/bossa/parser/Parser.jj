@@ -876,7 +876,7 @@ FormalParameters.Parameter formalParameter(List statements):
       ident = new LocatedString("tuple_arg_" + first.beginLine + "_" + first.beginColumn, 
 				makeLocation(first, last));
     } else { ident = id; }
-    Expression exp = AssignExp.create(new TupleExp(parts),new IdentExp(ident));
+    Expression exp = bossa.syntax.dispatch.createAssignExp(new TupleExp(parts),new IdentExp(ident));
     exp.setLocation(makeLocation(first,last));
     statements.add(new ExpressionStmt(exp));
     t = new TupleType(types, makeLocation(first, last));
@@ -1339,7 +1339,7 @@ Statement code():
     "=" 
     ( ".." "." { return null; } // toplevel function in interface file
     |
-    exp=Expression() ";" { code = new ReturnStmt(exp, /* fake */ true); }
+    exp=Expression() ";" { code = bossa.syntax.dispatch.createReturnStmt(exp, /* fake */ true); }
     |
       {Statement res;}
       (
@@ -1750,7 +1750,7 @@ MonoSymbol funExpParameter(List statements):
       name = new LocatedString("tuple_arg_" + first.beginLine + "_" + first.beginColumn, 
 				makeLocation(first, last));
     } else { name = ident; }
-    Expression exp = AssignExp.create(new TupleExp(parts),new IdentExp(name));
+    Expression exp = bossa.syntax.dispatch.createAssignExp(new TupleExp(parts),new IdentExp(name));
     exp.setLocation(makeLocation(first,last));
     statements.add(new ExpressionStmt(exp));
     type = new TupleType(types, makeLocation(first, last));
@@ -1760,7 +1760,7 @@ MonoSymbol funExpParameter(List statements):
 )
 }
 
-FunExp funExp():
+Expression funExp():
 {
   List formals = new LinkedList();
   Constraint cst = Constraint.True;
@@ -1785,10 +1785,10 @@ FunExp funExp():
   (
     body=RootShortStatement()
   |
-    exp=Expression() { body = new ReturnStmt(exp); }
+    exp=Expression() { body = bossa.syntax.dispatch.createReturnStmt(exp); }
   )
   { statements.add(body);
-    return new FunExp(cst, formals, new Block(statements)); }
+    return bossa.syntax.dispatch.createFunExp(cst, formals, new Block(statements)); }
 }
 
 /** A statement not terminated by a ";" if applicable. */
@@ -1845,7 +1845,7 @@ Expression arrayLiteralExp():
   Expression e;
 }
 {
-  "[]" { return new LiteralArrayExp(null); }
+  "[]" { return bossa.syntax.dispatch.createLiteralArrayExp(null); }
 |
   "[" { exps = new LinkedList(); }
   [
@@ -1855,7 +1855,7 @@ Expression arrayLiteralExp():
     )*
   ]
   "]"
-  { return new LiteralArrayExp(exps); }
+  { return bossa.syntax.dispatch.createLiteralArrayExp(exps); }
 }
 
 /****************************************************************
@@ -1937,7 +1937,7 @@ Expression Expression() :
         if(op.image.length()!=1)
           e2=CallExp.create(symb(op.image.substring(0, 1),op),e1,e2);
   
-        e1=AssignExp.create(e1,e2);
+        e1=bossa.syntax.dispatch.createAssignExp(e1,e2);
       }
     ]
   )
@@ -2168,15 +2168,15 @@ Expression Pre_crementExpression() :
 { Expression res; Token t; boolean inc = false; }
 {
   ( t="++" {inc = true;} | t="--" ) res=PrimaryExpression()
-  { return new IncrementExp(res, true, inc); }
+  { return bossa.syntax.dispatch.createIncrementExp(res, true, inc); }
 }
 
 Expression PostfixExpression() :
 { Expression res; Token t; }
 {
   res=PrimaryExpression() 
-  [ "++" { res=new IncrementExp(res, false, true); }
-  | "--" { res=new IncrementExp(res, false, false); }
+  [ "++" { res=bossa.syntax.dispatch.createIncrementExp(res, false, true); }
+  | "--" { res=bossa.syntax.dispatch.createIncrementExp(res, false, false); }
   ] 
   { return res; }
 }
@@ -2396,7 +2396,7 @@ Statement LabeledStatement() :
   }
 }
 
-Statement Block() :
+Block Block() :
 { Token first, last; Statement s; List statements; }
 {
   { first = getToken(1); }
@@ -2406,7 +2406,7 @@ Statement Block() :
   "}"
   { 
     last = getToken(0);
-    Statement res = new Block(statements); 
+    Block res = new Block(statements); 
     res.setLocation(makeLocation(first, last));
     return res;
   }
@@ -2490,7 +2490,7 @@ Statement LocalTupleDeclaration(List statements) :
   ( "," part = LocalTuplePart(statements) { parts.add(part); } )+
   last=")"
   "=" e=Expression() ";" 
-  { Expression exp = AssignExp.create(new TupleExp(parts), e);
+  { Expression exp = bossa.syntax.dispatch.createAssignExp(new TupleExp(parts), e);
     exp.setLocation(makeLocation(first,last));
     return new ExpressionStmt(exp); }
 }
@@ -2639,9 +2639,9 @@ Expression PostfixStatementExpression(Expression e1, Token first) :
 {}
 {
   (
-    "++" { e1=new IncrementExp(e1, false, true); }
+    "++" { e1=bossa.syntax.dispatch.createIncrementExp(e1, false, true); }
   |
-    "--" { e1=new IncrementExp(e1, false, false); }
+    "--" { e1=bossa.syntax.dispatch.createIncrementExp(e1, false, false); }
   |
     { Token op; Expression e2; 
       e1.setLocation(makeLocation(first, getToken(0)));
@@ -2652,7 +2652,7 @@ Expression PostfixStatementExpression(Expression e1, Token first) :
       if(op.image.length()!=1)
         e2=CallExp.create(symb(op.image.substring(0, 1),op),e1,e2);
   
-      e1=AssignExp.create(e1,e2);
+      e1=bossa.syntax.dispatch.createAssignExp(e1,e2);
     }
   )
   { return e1; }
@@ -2669,10 +2669,8 @@ Statement IfStatement() :
   first="if" "(" cond=Expression() ")" 
     s1=Statement() [ LOOKAHEAD(1) "else" s2=Statement() ]
   { 
-    ifExp = new IfExp(cond, new StatementExp(s1),
-	              (s2 == null ? null : new StatementExp(s2)));
-    ifExp.setLocation(makeLocation(first, getToken(0)));
-    return new ExpressionStmt(ifExp);
+    return bossa.syntax.dispatch.createIfStmt(cond, s1, s2, 
+				makeLocation(first, getToken(0)));
   }
 }
 
@@ -2687,10 +2685,8 @@ Statement ShortIfStatement() :
   first="if" "(" cond=Expression() ")" 
     s1=ShortStatement() [ LOOKAHEAD(1) "else" s2=ShortStatement() ]
   { 
-    ifExp = new IfExp(cond, new StatementExp(s1),
-	              (s2 == null ? null : new StatementExp(s2)));
-    ifExp.setLocation(makeLocation(first, getToken(0)));
-    return new ExpressionStmt(ifExp);
+    return bossa.syntax.dispatch.createIfStmt(cond, s1, s2, 
+				makeLocation(first, getToken(0)));
   }
 }
 
@@ -2698,18 +2694,19 @@ Statement WhileStatement() :
 { Expression cond; Statement body; }
 {
   "while" "(" cond=Expression() ")" body=Statement()
-  { return LoopStmt.whileLoop(cond,body); }
+  { return bossa.syntax.dispatch.createWhileLoop(cond,body); }
 }
 
 Statement DoStatement() :
 { Expression cond; Statement body; }
 {
   "do" body=Statement() "while" "(" cond=Expression() ")" ";"
-  { return LoopStmt.doLoop(cond,body); }
+  { return bossa.syntax.dispatch.createDoLoop(cond,body); }
 }
 
 Statement ForStatement() :
-{ Statement update = null, loop = null, body, statexp;
+{ Block update = null;
+  Statement loop = null, body, statexp;
   Expression cond = null;
   List init = new ArrayList();
 }
@@ -2728,7 +2725,7 @@ Statement ForStatement() :
     [ cond=Expression() ] ";" [ update=StatementExpressionList() ] ")" 
     body=Statement()
     { 
-      loop=LoopStmt.forLoop(cond,update,body);
+      loop=bossa.syntax.dispatch.createForLoop(cond,update,body);
       List l = new LinkedList();
       l.addAll(init);
       l.add(loop);
@@ -2748,7 +2745,7 @@ Statement ForInStatement() :
   ) 
   t=":" container=Expression() ")"
   body=Statement()
-  { return LoopStmt.forInLoop(vartype,var,makeLocation(t),container,body); }
+  { return bossa.syntax.dispatch.createForInLoop(vartype,var,makeLocation(t),container,body); }
 }
 
 List LocalDeclarationList() :
@@ -2760,7 +2757,7 @@ List LocalDeclarationList() :
   { return declarations; }
 }
 
-Statement StatementExpressionList() :
+Block StatementExpressionList() :
 { Statement s; List statements=new LinkedList(); }
 {
   s=ShortStatementExpression() { statements.add(s); }
@@ -2773,16 +2770,14 @@ Statement BreakStatement() :
 { LocatedString label = null; }
 {
   "break" [ label=ident() ] ";"
-  { if (label == null) return BreakStmt.instance; 
-    else return new BreakLabelStmt(label); 
-  }
+  { return bossa.syntax.dispatch.createBreakStmt(label); }
 }
 
 Statement ContinueStatement() :
 { Statement res; LocatedString label = null; }
 {
   "continue" [ label=ident() ] ";"
-  { return ContinueStmt.make(label); }
+  { return bossa.syntax.dispatch.createContinueStmt(label); }
 }
 
 Statement ReturnStatement() :
@@ -2790,7 +2785,7 @@ Statement ReturnStatement() :
 {
   t="return" [ val=Expression() ] ";"
   {
-    Statement res = new ReturnStmt(val); 
+    Statement res = bossa.syntax.dispatch.createReturnStmt(val); 
     res.setLocation(makeLocation(t));
     return res;
   }

@@ -613,16 +613,16 @@ typecheck(e@IncrementExp)
 
 typecheck(e@LiteralArrayExp)
 {
-  typecheckExps(notNull(e.elements));
+  typecheckExps(cast(e.elements));
 }
 
 typecheck(e@NewArrayExp)
 {
-  ?Expression[] knownDimensions = notNull(e.knownDimensions);
-  typecheckExps(knownDimensions);
+  Expression[] knownDimensions = notNull(e.knownDimensions);
+  typecheckExps(cast(knownDimensions));
   for (int i=0; i<knownDimensions.length; i++)
     {
-      Expression dim = notNull(knownDimensions[i]);
+      Expression dim = knownDimensions[i];
       try{
 	Typing.leq(dim.getType(), PrimitiveType.intPolytype);
       }
@@ -650,7 +650,7 @@ typecheck(e@StatementExp)
 
 typecheck(e@TupleExp)
 {
-  typecheckExps(notNull(e.expressions));
+  typecheckExps(cast(notNull(e.expressions)));
 }
 
 typecheck(e@SuperExp)
@@ -897,7 +897,7 @@ typecheck(r@ReturnStmt)
 typecheck(t@TryStmt)
 {
   typecheck(t.body);
-  t.catches.foreach(TryStmt.Catch c => typecheck(c.body));
+  t.catches.foreach(ACatch c => typecheck(c.body));
   typecheck(t.finallyBody);
 }
 

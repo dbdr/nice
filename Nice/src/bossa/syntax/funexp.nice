@@ -1,0 +1,141 @@
+/**************************************************************************/
+/*                                N I C E                                 */
+/*             A high-level object-oriented research language             */
+/*                        (c) Daniel Bonniot 2004                         */
+/*                                                                        */
+/*  This program is free software; you can redistribute it and/or modify  */
+/*  it under the terms of the GNU General Public License as published by  */
+/*  the Free Software Foundation; either version 2 of the License, or     */
+/*  (at your option) any later version.                                   */
+/*                                                                        */
+/**************************************************************************/
+
+package bossa.syntax;
+
+import bossa.util.*;
+
+/**
+   A functional abstraction expression.
+*/
+public class FunExp extends Expression implements Function
+{
+
+  final MonoSymbol[] formals;
+  ?bossa.syntax.Constraint constraint;
+  final Statement body;
+
+  ?mlsub.typing.Constraint cst = null;
+  boolean mightEscape = true;
+
+  private boolean alwaysReturns = false;
+  private ?mlsub.typing.Polytype _inferredReturnType = null;
+
+
+  getExpectedType()
+  {
+    return cast(null);
+  }
+
+  checkReturnedType(returned)
+  {
+    if (_inferredReturnType == null)
+      _inferredReturnType = returned;
+    else
+      {
+	mlsub.typing.Polytype old = notNull(_inferredReturnType);
+	_inferredReturnType = mlsub.typing.Polytype.union(_inferredReturnType, returned);
+
+	if (! notNull(_inferredReturnType).trySimplify())
+	  throw new Function.IncompatibleReturnType(old);
+      }
+
+    /* This is disabled, since currently default values of class fields are
+       typechecked twice.
+    if (type != null)
+      Internal.error("Return statement discovered after computation of the type");
+    */
+  }
+
+  void setAlwaysReturns(boolean value) { alwaysReturns = value; }
+
+  computeType()
+  {
+    if (_inferredReturnType == null)
+      // There is not return statement in the function.
+      {
+        if (alwaysReturns)
+          /* This function never returns normally since there was no 
+             inferredReturnType, so it always throws an exception.
+             Therefore, it can be considered to return any type.
+          */
+          _inferredReturnType = mlsub.typing.Polytype.bottom();
+        else
+          _inferredReturnType = PrimitiveType.voidPolytype;
+      }
+    else
+      if (! alwaysReturns && 
+	  ! nice.tools.typing.Types.isVoid(_inferredReturnType))
+	throw User.error(this, "Missing return statement");
+
+    mlsub.typing.Monotype t = new mlsub.typing.FunType(MonoSymbol.getMonotype(formals), 
+			     notNull(_inferredReturnType).getMonotype());
+    type = new mlsub.typing.Polytype
+      (mlsub.typing.Constraint.and(cst, notNull(_inferredReturnType).getConstraint()),
+       bossa.syntax.Monotype.sure(t));
+  }
+
+  inferredReturnType()
+  {
+    this.getType();
+    return notNull(_inferredReturnType);
+  }
+
+  /****************************************************************
+   * Code generation
+   ****************************************************************/
+
+  compile()
+  {
+    gnu.expr.LambdaExp res = nice.tools.code.Gen.createMethod
+      (null, 
+       nice.tools.code.Types.javaType(MonoSymbol.getMonotype(formals)), 
+       nice.tools.code.Types.javaType(this.inferredReturnType()), 
+       formals, false);
+    nice.tools.code.Gen.setMethodBody(res, body.generateCode());
+    return res;
+  }
+  
+  toString()
+  {
+    String bodyValue;
+    if (body instanceof ReturnStmt)
+      {
+        let ReturnStmt rs = cast(body);
+        bodyValue = notNull(rs.value).toString();
+      }
+    else
+      bodyValue = body.toString();
+
+    return 
+      (constraint == null ? 
+       mlsub.typing.Constraint.toString(cst) : notNull(constraint).toString())
+      + "("
+      + Util.map("",", ","",formals)
+      + ") => "
+      + bodyValue
+      ;
+  }
+  
+}
+
+public Expression createFunExp(bossa.syntax.Constraint cst, List<MonoSymbol> formals, Statement body)
+{
+  return new FunExp(constraint: cst, formals: formals.toArray(), body: body);
+}
+
+override Expression createFunExp(bossa.syntax.Constraint cst, MonoSymbol[] formals, Statement body)
+{
+  let res = new FunExp(constraint: cst, formals: formals, body: body);
+  res.setLocation(body.location());
+  return res;
+}

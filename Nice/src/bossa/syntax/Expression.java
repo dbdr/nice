@@ -186,6 +186,12 @@ public abstract class Expression
 
     return res;
   }
+  
+  Polytype inferredReturnType()
+  {
+    Internal.error("inferredReturnType called in " + getClass());
+    return null;
+  }
 
   void checkSpecialRequirements(Expression[] arguments)
   {

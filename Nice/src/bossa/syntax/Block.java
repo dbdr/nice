@@ -251,7 +251,7 @@ public class Block extends Statement
        FormalParameters parameters, Statement body)
     {
       Expression value;
-      value = new FunExp(Constraint.True, parameters.getMonoSymbols(), body);
+      value = bossa.syntax.dispatch.createFunExp(Constraint.True, parameters.getMonoSymbols(), body);
 
       FunSymbol symbol = new FunSymbol(name, 
 				       Constraint.True, parameters, 
@@ -275,7 +275,7 @@ public class Block extends Statement
 
     mlsub.typing.Polytype inferredReturnType()
     {
-      return ((FunExp) value).inferredReturnType();
+      return value.inferredReturnType();
     }
 
     mlsub.typing.Monotype declaredReturnType()

@@ -11,6 +11,9 @@ class Point
 
   int twoArgs(int x, int y);
   twoArgs(x, y) = 0;
+
+  // override a native method
+  toString() = "Point";
 }
 
 // check that a constructor is also available from functions
@@ -25,6 +28,9 @@ class ColoredPoint extends Point
 {
   int c;
   pToString() = "(x=" + this.x + ", y=" + this.y + ", c=" + this.c + ")";
+
+  // override a native method
+  toString() = "Colored Point";
 }
 
 /*
@@ -59,5 +65,10 @@ test_classes()
 
   println(isSimplePoint(new Point()));
   println(isSimplePoint(new ColoredPoint()));
+
+  println(new Point().toString());
+  println(new ColoredPoint().toString());
+  Point p = new ColoredPoint();
+  println(p.toString());
 }
 

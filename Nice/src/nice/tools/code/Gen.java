@@ -55,14 +55,14 @@ public class Gen
   /**
      Create a lambda expression to generate code for the method.
 
-     @param can be null if there are no arguments
+     @param args can be null if there are no arguments
   */
   public static LambdaExp createMethod(String bytecodeName,
 				       Type[] argTypes,
 				       Type retType,
 				       MonoSymbol[] args)
   {
-    return createMethod(bytecodeName, argTypes, retType, args, true);
+    return createMethod(bytecodeName, argTypes, retType, args, true, false);
   }
 
   /**
@@ -76,8 +76,29 @@ public class Gen
 				       MonoSymbol[] args,
 				       boolean toplevel)
   {
+    return createMethod(bytecodeName, argTypes, retType, args, toplevel, false);
+  }
+
+  /**
+     Create a lambda expression to generate code for the method.
+
+     @param args can be null if there are no arguments
+     @param member true iff this method is a non-static member of
+                   the class in argTypes[0]
+     @param toplevel If the method can be called from foreign code.
+                     This forces its generation even if it is 
+		     apparently never called.
+  **/
+  public static LambdaExp createMethod(String bytecodeName,
+				       Type[] argTypes,
+				       Type retType,
+				       MonoSymbol[] args,
+				       boolean toplevel,
+				       boolean member)
+  {
     bytecodeName = nice.tools.code.Strings.escape(bytecodeName);
     int arity = args == null ? 0 : args.length;
+    if (member) arity--;
 
     gnu.expr.LambdaExp lexp = new gnu.expr.LambdaExp();
     lexp.setReturnType(retType);
@@ -86,9 +107,11 @@ public class Gen
     lexp.forceGeneration();
     if (toplevel)
       lexp.setCanCall(true);
+    if (member)
+      lexp.setClassMethod(true);
 
     // Parameters
-    for(int n = 0; n < arity; n++)
+    for(int n = (member ? 1 : 0); n < arity; n++)
       {
 	String parameterName = args[n].getName() == null 
 	  ? "anonymous_" + n 

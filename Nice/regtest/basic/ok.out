@@ -54,6 +54,9 @@ Origin
 String, Null string
 true
 false
+Point
+Colored Point
+Colored Point
 ### Testing methods
 C1
 C2

@@ -55,8 +55,6 @@ public class NiceClass extends ClassDefinition
 	  typeParameters, typeParametersVariances,
 	  extensions, implementations, abstractions);
 
-    this.simpleName = name;
-
     // must be called when bytecode types are set, 
     // but before compilation, so that constructors are known
     // even in package variable initializers.
@@ -291,7 +289,7 @@ public class NiceClass extends ClassDefinition
   /** This native method is redefined for this Nice class. */
   void addJavaMethod(gnu.expr.LambdaExp method)
   {
-    Internal.warning(this, "Method " + method + " was ignored (not yet supported)");
+    classe.addMethod(method);
   }
 
   /****************************************************************
@@ -300,7 +298,4 @@ public class NiceClass extends ClassDefinition
 
   private Field[] fields;
   private List methods;
-
-  /** Not the fully qualified name */
-  private LocatedString simpleName;
 }

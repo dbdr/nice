@@ -2,4 +2,4 @@
   int i = /*/// FAIL HERE */ true ? "string" : 0;
 
 /// FAIL
-  final f = true ? "string" : 0;
+  let f = true ? "string" : 0;

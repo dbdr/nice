@@ -1,14 +1,14 @@
 /// PASS
-  final f = (int x)=> x+1;
+  let f = int x => x+1;
 
 /// PASS
-  final f = (int x, int y)=> x+y;
+  let f = (int x, int y)=> x+y;
 
 /// PASS
-  final f = int x => x+1;
+  let f = int x => x+1;
 
 /// PASS
-  final f = int x => int y => x+y;
+  let f = int x => int y => x+y;
 
 /// PASS
   StringBuffer wordBuffer = new StringBuffer(32);

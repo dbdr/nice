@@ -1,6 +1,8 @@
 nice (0.7.8) unstable; urgency=low
 
   * Allow ?(T[]) syntax for optional arrays, as an alternative to T[?].
+  * Allow // comments at then end of a file, without a trailing newline.
+    Also report more nicely /* comments that are not closed.
 
  --
 

@@ -1,0 +1,75 @@
+<?xml version="1.0" standalone="no"?>
+<page>
+<title>Roadmap</title>
+
+<description>
+Plan for the introduction of new features in future versions.
+</description>
+
+<keywords>nice, roadmap, features
+</keywords>
+
+<para>
+This is the current plan for future versions of the language.
+Comments about the new features are welcome. 
+This includes arguing whether they are well designed, proposing alternatives,
+requesting that some feature should be given a higher priority because
+you need them more and proposing new features.
+These discussions can take place on 
+<ulink url="http://sourceforge.net/forum/?group_id=12788">the forums</ulink>, 
+on <ulink url="http://sourceforge.net/mail/?group_id=12788">the mailing list
+</ulink>
+or <ulink url="mailto:bonniot@users.sourceforge.net">privately</ulink>
+(the first two are prefered).
+</para>
+
+<para>
+<variablelist>
+<varlistentry><term>0.6 (May 2002)</term>
+<listitem>
+<para>
+Harmonize syntax for function types as 
+<literal>int->int</literal> and <literal>(String, int)->boolean</literal>.
+Introduce automatic constructors that initialize the fields, using
+optional named parameters. 
+This means that it is not necessary to write the code for the constructor,
+nor for a simple creation function. Example:
+<programlisting><![CDATA[
+class LinkedList<T>
+{
+  T head;
+  ?LinkedList<T> tail;
+}
+...
+LinkedList<int> l = 
+  new LinkedList(head: 1, 
+                 tail: new LinkedList(head: 2, null));
+]]></programlisting>
+</para>
+</listitem>
+</varlistentry>
+<varlistentry><term>0.8 (June 2002)</term>
+<listitem>
+<para>
+Add Java 1.4 style assertions.
+Also consider more Design By Contract features: pre- and post-conditions, 
+class invariants. These might be part of a later release.
+</para>
+</listitem>
+</varlistentry>
+<varlistentry><term>1.0 (July 2002)</term>
+<listitem>
+<para>
+First official stable release of the language. 
+With the above features, the language is rich enough to compete with Java 1.4
+in every aspect. We must have a reasonably complete User's manual by then.
+This will be the time for more widespread publicity. 
+<ulink url="mailto:bonniot@users.sourceforge.net">What are the best places 
+to announce Nice ? Tell me !</ulink>
+</para>
+</listitem>
+</varlistentry>
+</variablelist>
+</para>
+
+</page>

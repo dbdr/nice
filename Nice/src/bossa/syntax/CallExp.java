@@ -292,6 +292,17 @@ public class CallExp extends Expression
     return function.isFieldAccess();
   }
 
+  /**
+     @return the FieldAccess if this expression resolves to a field, 
+     which is true if it is the application a of FieldAccess to an object 
+     value. Returns null otherwise.
+   */
+  FieldAccess getField()
+  {
+    resolveOverloading();
+    return function.getFieldAccessMethod();
+  }  
+
   /****************************************************************
    * Code generation
    ****************************************************************/

@@ -31,9 +31,9 @@ package mlsub.compilation;
  * @author Daniel Bonniot
  */
 
-class Compilation
+public class Compilation
 {
-  boolean skipLink;
+  public boolean skipLink;
 
-  Module root;
+  public Module root;
 }

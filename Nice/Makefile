@@ -116,7 +116,8 @@ bootstrap:
 		src/mlsub/compilation/Module.java \
 		src/bossa/modules/Package.java src/bossa/util/*.java \
 		src/gnu/expr/*.java src/gnu/mapping/*.java \
-		src/nice/tools/code/*.java src/mlsub/typing/*.java src/mlsub/typing/lowlevel/*.java
+		src/nice/tools/code/*.java src/mlsub/typing/*.java src/mlsub/typing/lowlevel/*.java \
+		src/bossa/syntax/dispatch.java
 	cd src; ${NICEC} bossa.modules
 	cd src; ${NICEC} nice.tools.ast
 	cd src/bossa/syntax && \

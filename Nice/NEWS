@@ -9,7 +9,7 @@ nice (0.9.10)
       class B extends A {
         override x = 5;
       }
-    It's possible for final fields too.
+    This also works for final fields.
   * Imported methods can be generalized. That is, it is possible to
     define a new method which is more general than an existing one,
     and the existing method will be recognized as a special case of the
@@ -21,11 +21,11 @@ nice (0.9.10)
     Method java.util.Collection.add() is recognized as implementing
     the new add method, which makes Collection a valid Addable class.
   * Java methods and fields with parametric types are given a type with
-    UnknownTypes as typeparameters instead of being ignored.
+    UnknownTypes as type parameters instead of being ignored.
   * Bug fixes (disallowed redefinition of parameters, execution order of
     initializers in super classes, visibility checking of java classes,
     cyclic custom constructors, methods and fields in classes with less type
-    params, this in custom constructors, ... )
+    parameters, 'this' in custom constructors, ... )
 
  --
 

@@ -83,10 +83,8 @@ class HTMLWriter {
     
     //Initialise a FileWriter
     File dir = new File(outdir, packageName.replace('.','/'));
-    if(!dir.exists()) {
-        if(!dir.mkdirs()) {
-            System.err.println("Error creating directory structure");
-        }
+    if(!dir.exists() && !dir.mkdirs()) {
+        System.err.println("Error creating directory structure");
     }
     String fileName = m.getName().toString();
     //we only want information after the last .
@@ -127,10 +125,8 @@ class HTMLWriter {
   void write(bossa.modules.Package p) {
     try {
       File dir = new File(outdir, p.getName().replace('.','/'));
-      if(!dir.exists()) {
-        if(!dir.mkdirs()) {
+      if(!dir.exists() && !dir.mkdirs()) {
           System.err.println("Error creating directory structure");
-        }
       }
       BufferedWriter writer = new BufferedWriter
         (new FileWriter(new File(dir, "index.html")));
@@ -170,7 +166,8 @@ class HTMLWriter {
       writer.write("<b>Methods:</b>\n");
       writer.write("<ul>\n");
       for(MethodDeclaration m : methods) {
-          writer.write("<li><a href='" + m.getName() + ".html'>" + m.getName() + "</a></li>\n");
+          writer.write("<li><a href='" + m.getName() + ".html'>" + m.getName() + "</a>" +
+                       ": " + m.getType() + "</li>\n");
       }
       writer.write("</ul>\n");
     

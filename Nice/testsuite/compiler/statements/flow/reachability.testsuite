@@ -1,12 +1,25 @@
 /// FAIL bug
   while (false) { 
-    ; // Unreachable
+    /*/// FAIL HERE */ ; // Unreachable
   }
 
 /// FAIL bug
   while (true) ;
-  ; // Unreachable
+  /*/// FAIL HERE */ ; // Unreachable
 
 /// PASS
   while (true) break;
+  ; // Reachable
+
+/// FAIL bug
+  for (;false;) { 
+    /*/// FAIL HERE */ ; // Unreachable
+  }
+
+/// FAIL
+  for (;;) ;
+  /*/// FAIL HERE */ ; // Unreachable
+
+/// PASS
+  for (;;) break;
   ; // Reachable

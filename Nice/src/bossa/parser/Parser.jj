@@ -2479,9 +2479,9 @@ Expression LocalTuplePart(List statements) :
 }
 
 Statement EmptyStatement() :
-{}
+{ Token t; }
 {
-  ";" { return null; }
+  t=";" { return new EmptyStmt(new Location(t)); }
 }
 
 Statement StatementExpression() :

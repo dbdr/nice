@@ -25,6 +25,13 @@ import java.util.*;
 public abstract class Statement
   implements Located
 {
+  Statement () {}
+
+  Statement (Location location)
+  {
+    setLocation(location);
+  }
+
   /****************************************************************
    * Code generation
    ****************************************************************/

@@ -114,6 +114,15 @@ public class LoopStmt extends Statement
   */
   boolean isBreakTarget() { return mustCreateBlock; }
 
+  /**
+     Returns true iff this loop never completes normally.
+  */
+  boolean isInfinite()
+  {
+    return (whileExp == null || whileExp.isTrue()) 
+      && ! isBreakTarget();
+  }
+
   private boolean mustCreateBlock = false;
 
   gnu.expr.Expression generateCode()

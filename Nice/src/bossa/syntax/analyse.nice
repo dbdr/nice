@@ -598,7 +598,7 @@ analyse(l@LoopStmt, info)
 {
   info.beginInner();
 
-  if (l.isTestFirst())
+  if (l.isTestFirst() && l.whileExp != null)
     {
       l.whileExp = analyse(l.whileExp, info);
       if (notNull(l.whileExp).isFalse())
@@ -624,7 +624,7 @@ analyse(l@LoopStmt, info)
 
   info.endInner();
 
-  if (notNull(l.whileExp).isTrue() && ! l.isBreakTarget())
+  if (l.isInfinite())
     info.setUnreachable();
 }
 

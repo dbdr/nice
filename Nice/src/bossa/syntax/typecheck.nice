@@ -536,6 +536,9 @@ typecheck(e@SymbolExp) {}
  ****************************************************************/
 
 typecheck(null(Statement)) {}
+//XXX: Now that there is an EmptyStmt class, it _might_ be possible 
+//XXX: (post 0.8) to remove the null case.
+typecheck(@EmptyStmt) {}
 
 typecheck(b@Block)
 {

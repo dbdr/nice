@@ -1,3 +1,14 @@
+
+/**************************************************************************/
+/*                                                                        */
+/*  This program is free software; you can redistribute it and/or modify  */
+/*  it under the terms of the GNU General Public License as published by  */
+/*  the Free Software Foundation; either version 2 of the License, or     */
+/*  (at your option) any later version.                                   */
+/*                                                                        */
+/**************************************************************************/
+
+
 package nice.ui.common;
 
 
@@ -13,8 +24,10 @@ var Map<Object,?java.util.List<NTableColumnModelListener>> tableColumnModelListe
 var Map<Object,?java.util.List<NUndoableEditListener>> undoableEditListeners = new HashMap();
 
 
+
 /**
- * abstract interfaces to qualify over classes being able to handle events as NiceListenerHandler
+ * abstract interfaces to qualify over classes 
+ * being able to handle events as nice.ui.awt.NiceListenerHandler
  */
 
 abstract interface AncestorListenerHandler extends NiceListenerHandler {}
@@ -42,6 +55,7 @@ abstract interface UndoableEditListenerHandler extends NiceListenerHandler {}
 
 /**
  * existing java classes implement the defined abstract interfaces
+ * thus declaring to be a XxxListenerHandler
  */
 
 class javax.swing.JComboBox implements ItemListenerHandler;
@@ -94,9 +108,6 @@ class javax.swing.text.JTextComponent implements CaretListenerHandler;
 class javax.swing.colorchooser.DefaultColorSelectionModel implements ChangeListenerHandler;
 class javax.swing.text.DefaultCaret implements ChangeListenerHandler;
 class javax.swing.text.AbstractDocument implements DocumentListenerHandler;
-
-//class javax.swing.UIManager implements PropertyChangeListenerHandler;
-//class javax.swing.UIDefaults implements PropertyChangeListenerHandler;
 
 //JDK1.4  class javax.swing.JComboBox implements PopupMenuListenerHandler;
 //JDK1.4  class javax.swing.JSpinner implements ChangeListenerHandler;

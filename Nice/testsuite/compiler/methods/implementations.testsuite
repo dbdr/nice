@@ -1,0 +1,8 @@
+/// FAIL
+  /// TOPLEVEL
+  class A { 
+    void fA() {} // fA is a function
+  }
+
+  // Try to implement a function. This should fail gracefully.
+  fA(x@A) {} // FAIL HERE

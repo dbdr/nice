@@ -364,20 +364,6 @@ toString(s@Sequence)
   return buf.toString();
 }
 */
-
-print(p@PrintStream, s@Sequence)
-{
-  if (s.size() == 0)
-    {
-      p.println("[]");
-      return;
-    }
-  p.print("[");
-  p.print(s[0]);
-  for (int i=1; i<s.size(); i++)
-    p.print(", " + s[i]);
-  p.print("]");
-}
   
 /****************************************************************
  * Map

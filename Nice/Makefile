@@ -151,8 +151,8 @@ web:
 
 parser: src/bossa/parser/Parser.java
 src/bossa/parser/Parser.java: src/bossa/parser/Parser.jj
-	cd src/bossa/parser; CLASSPATH=`${TOP}/external/javacc` \
-		TOP=${TOP} ${java} javacc Parser.jj
+	cd src/bossa/parser; CLASSPATH=`TOP=${TOP} ${TOP}/external/javacc` \
+		${java} javacc Parser.jj
 
 bootstrap: parser
 	cd src/gnu/lists && ./withCollections

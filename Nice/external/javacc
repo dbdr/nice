@@ -14,9 +14,10 @@ jar=${TOP}/external/javacc.jar
 if [ ! -r ${jar} ]; then
   
   wget https://javacc.dev.java.net/files/documents/17/686/${version}.zip \
-    -O ${version}.zip
-  ( cd external; unzip -j ../${version}.zip ${version}/bin/lib/javacc.jar; \
-    rm ../${version}.zip )
+    -O ${TOP}/external/${version}.zip >&2
+  cd ${TOP}/external
+  unzip -j ${version}.zip ${version}/bin/lib/javacc.jar >&2
+  rm ${version}.zip
 fi
 
 echo ${jar}

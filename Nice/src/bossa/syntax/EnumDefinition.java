@@ -97,7 +97,7 @@ public class EnumDefinition extends Definition
     {
       super(name, type);
       List args = new ArrayList(2 + fields.size());
-      args.add(new Arguments.Argument(new StringConstantExp(name.toString()),
+      args.add(new Arguments.Argument(bossa.syntax.dispatch.createStringConstantExp(name.toString()),
 		new LocatedString("name",name.location)));
       Integer val = new Integer(ordinal);
       args.add(new Arguments.Argument(new ConstantExp(PrimitiveType.intTC, val,

@@ -192,6 +192,7 @@ mlsub.typing.Polytype getType(Expression) =
 mlsub.typing.Monotype type(MonoSymbol) = native MonoSymbol.type;
 GlobalTypeScope getGlobalTypeScope() = native GlobalTypeScope Node.getGlobalTypeScope();
 ?gnu.bytecode.ClassType staticClass(Arguments) = native gnu.bytecode.ClassType Arguments.staticClass();
+?gnu.bytecode.ClassType staticClass(Expression) = native gnu.bytecode.ClassType Expression.staticClass();
 List<VarSymbol> findJavaMethods(?gnu.bytecode.ClassType, String, int) = native List JavaClasses.findJavaMethods(gnu.bytecode.ClassType,java.lang.String,int);
 List<VarSymbol> findJavaMethods(?gnu.bytecode.ClassType, String) = native List JavaClasses.findJavaMethods(gnu.bytecode.ClassType,java.lang.String);
 TypeParameters TypeParameters(List<Monotype>) = native new bossa.syntax.TypeParameters(List);

@@ -71,6 +71,9 @@ public class dispatch
   public static Statement createBlock(List statements)
   { return null; }
 
+  public static ConstantExp createStringConstantExp(String value)
+  { return null; }
+
   static Statement  analyse(Statement  s, VarScope v, TypeScope t, boolean r)
   { return null; }
   

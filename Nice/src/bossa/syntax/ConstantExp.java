@@ -273,13 +273,6 @@ public class ConstantExp extends Expression
 				representation.location());
   }
   
-  public static ConstantExp makeString(LocatedString representation)
-  {
-    StringConstantExp res = new StringConstantExp(representation.toString());
-    res.setLocation(representation.location());
-    return res;
-  }
-
   /****************************************************************
    * Booleans
    ****************************************************************/

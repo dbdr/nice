@@ -1,0 +1,262 @@
+/**************************************************************************/
+/*                                N I C E                                 */
+/*             A high-level object-oriented research language             */
+/*                        (c) Daniel Bonniot 2004                         */
+/*                                                                        */
+/*  This program is free software; you can redistribute it and/or modify  */
+/*  it under the terms of the GNU General Public License as published by  */
+/*  the Free Software Foundation; either version 2 of the License, or     */
+/*  (at your option) any later version.                                   */
+/*                                                                        */
+/**************************************************************************/
+
+
+/**
+   The 'null' expression.   
+
+*/
+public class NullExp extends ConstantExp
+{
+  isNull() = true;
+
+  computeType()
+  {
+    // The type needs to be generated each time, since it is polymorphic.
+  }
+  
+  getType()
+  {
+    let alpha = new mlsub.typing.MonotypeVar("any");
+    return new mlsub.typing.Polytype(new mlsub.typing.Constraint([alpha], null), 
+			bossa.syntax.Monotype.maybe(alpha));
+  }
+
+  compile() = notNull(gnu.expr.QuoteExp.nullExp);
+ 
+  toString() = "null";
+}
+
+
+ConstantExp createNullExp(bossa.util.Location loc)
+{
+  let res = new NullExp();
+  res.setLocation(loc);
+  return res;
+}
+
+/**
+   The void constant.
+
+*/
+public class VoidConstantExp extends ConstantExp
+{
+  {
+    this.className = voidName;
+    this.value = gnu.mapping.Values.empty;
+  }
+
+  toString() = "{}";
+}
+
+let LocatedString voidName = new LocatedString("void", bossa.util.Location.nowhere());
+
+/**
+   A String constant.
+
+*/
+public class StringConstantExp extends ConstantExp
+{
+  final String escapedValue;
+
+  toString() = "\""+escapedValue+"\"";
+}
+
+public ConstantExp createStringConstantExp(String value)
+{
+  return createStringConstantExp(value, false);
+}
+
+public StringConstantExp createStringConstantExp(String value, boolean multiline)
+{
+  if (multiline)
+    value = escapeEOL(value);
+
+  let res = new StringConstantExp(escapedValue: value);
+  res.value = unescapeLiteral(value);
+  res.className = stringClassName;
+  return res;
+}
+
+let LocatedString stringClassName =  new LocatedString("java.lang.String", Location.nowhere());
+
+// cf. JLS 3.10.6
+public String unescapeLiteral(String s)
+{
+  let sb = new StringBuffer();
+  int n = s.length();
+  for (int i = 0; i < n; i++) {
+    char c = s[i];
+    if (c == '\\') {
+      i++;
+      char c2 = s[i];
+
+      if (c2 == 'b') sb.append('\b');
+      else if (c2 =='t') sb.append('\t');
+      else if (c2 =='n') sb.append('\n');
+      else if (c2 =='f') sb.append('\f');
+      else if (c2 =='r') sb.append('\r');
+      else if (c2 =='\"') sb.append('\"');
+      else if (c2 =='\'') sb.append('\'');
+      else if (c2 =='\\') sb.append('\\');
+      else {
+        // octal escape
+        int code = int(c2) - int('0');
+        if (i+1 < n) {
+          int ic3 = int(s[i+1]);
+          if (int('0') <= ic3 <= int('7')) {
+            code = 8*code + (ic3 - int('0'));
+            i++;
+            if (int('0') <= int(c2) <= int('3') && i+1 < n) {
+              // try a last number...
+              int ic4 = int(s[i+1]);
+              if (int('0') <= ic4 <= int('7')) {
+                code = 8*code + (ic4 - int('0'));
+		i++;
+              }
+            }
+          }
+        }
+        sb.append(char(code));
+      }
+    } else {
+      sb.append(c);
+    }
+  }
+  return sb.toString();
+}
+
+String escapeEOL(String s)
+{
+  let sb = new StringBuffer();
+  int n = s.length();
+  for (int i = 0; i < n; i++) {
+    char c = s[i];
+    if (c == '\n')
+      sb.append("\\n");
+    else if (c == '\r')
+      {
+	sb.append("\\n");
+        if (s[i+1] == '\n')
+	  i++;
+      }
+    else
+      sb.append(c);
+  }
+  return sb.toString();
+}
+
+/**
+   A type used as an expression.
+
+ */
+public class TypeConstantExp extends ConstantExp
+{
+
+  staticClass()
+  {
+    // If this is a '<name>.class' expression, do not consider it as a
+    // qualified prefix.
+    if (isExpression)
+      return null;
+
+    return cast(value);
+  }
+
+  void setRepresentedType(mlsub.typing.Polytype type, ?gnu.bytecode.Type bytecodeType)
+  {
+    this.value = bytecodeType;
+
+    this.representedType = type.getMonotype();
+
+    this.type = new mlsub.typing.Polytype
+      (type.getConstraint(),
+       Monotype.sure(new mlsub.typing.MonotypeConstructor
+        (PrimitiveType.classTC, [type.getMonotype()])));
+  }
+
+  compile()
+  {
+    if (isLiteral)
+      return super;
+
+    gnu.bytecode.Type type = cast(value);
+    String representation = type instanceof gnu.bytecode.ArrayType ?
+      type.getSignature().replace('/', '.') :
+      type.getName();
+
+    return new gnu.expr.ApplyExp(class_forName, [new gnu.expr.QuoteExp(representation)]);
+  }
+
+  TypeConstructor getTC()
+  {
+    return nice.tools.typing.Types.rawType(representedType).head();
+  }
+
+  ?mlsub.typing.Monotype representedType = null;
+
+  public boolean isExpression = false;
+  public boolean isLiteral = false;
+
+}
+
+public TypeConstantExp createTypeConstantExp(LocatedString name)
+{
+  return new TypeConstantExp(null, null, name, name.toString(), name.location());
+}
+
+/**
+   @return an Expression representing [root].[name] or a type or package literal if root == null
+*/
+Expression createTypeConstantExp(?PackageExp root, LocatedString name)
+{
+  String fullName = name.toString();
+  if (root != null)
+    fullName =notNull(root.name).append(".").append(fullName).toString();
+
+  ?mlsub.typing.TypeConstructor tc =
+      Node.getGlobalTypeScope().globalLookup(fullName, name.location());
+
+  if(tc != null)
+    {
+      gnu.bytecode.Type type = nice.tools.code.Types.javaType(tc);
+
+      // type might not be a class
+      // for instance if the ident was "int"
+      if (type instanceof gnu.bytecode.ClassType)
+	{
+	  TypeConstantExp res = new TypeConstantExp(name);
+          res.setRepresentedType(universalPolytype(tc, true), type);
+	  res.setLocation(root == null ? name.location() : root.location());
+	  return res;
+	}
+    }
+
+  if (root != null)
+    // name has been appended to root's name
+    return root;
+
+  let res = new PackageExp(fullName);
+  res.setLocation(name.location());
+  return res;
+}
+
+mlsub.typing.Polytype universalPolytype(mlsub.typing.TypeConstructor tc, boolean sure)
+{
+  mlsub.typing.MonotypeVar[?] vars = mlsub.typing.MonotypeVar.news(tc.arity());
+  mlsub.typing.Monotype type = new mlsub.typing.MonotypeConstructor(tc, cast(vars));
+  return new mlsub.typing.Polytype
+    (vars == null ? null : new mlsub.typing.Constraint(cast(vars), null),
+     sure ? Monotype.sure(type) : Monotype.maybe(type));
+}
+
+let gnu.bytecode.Method class_forName =   gnu.bytecode.ClassType.make("java.lang.Class").getDeclaredMethod("forName", 1);

@@ -350,7 +350,7 @@ analyse(CallExp e, info)
 	  if (nextComponent == null)
 	    throw unknownIdent(notNull(pkg.locatedName()));
 
-	  return TypeConstantExp.create(pkg, nextComponent);
+	  return createTypeConstantExp(pkg, nextComponent);
 	}
     }
 
@@ -538,7 +538,7 @@ Expression analyseIdent(IdentExp e, Info info, boolean assigned)
     }
 
   if (e.enableClassExp)
-    return notNull(TypeConstantExp.create(e.ident));
+    return createTypeConstantExp(null, notNull(e.ident));
 
   throw unknownIdent(notNull(e.ident));
 }
@@ -646,7 +646,7 @@ mlsub.typing.Polytype typeRepresentationToPolytype(String name,
         throw new bossa.util.UserError(loc, "Class "name" is not declared");
     }
 
-  return TypeConstantExp.universalPolytype(tc, sure);
+  return universalPolytype(tc, sure);
 }
 
 analyse(TypeConstantExp e, info)

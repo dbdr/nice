@@ -524,7 +524,7 @@ TypeConstantExp typeExpression():
 { LocatedString name; }
 {
   name = doted_array_string()
-  { return new TypeConstantExp(name); }
+  { return bossa.syntax.dispatch.createTypeConstantExp(name); }
 }
 
 /***********************************************************************/
@@ -1633,7 +1633,7 @@ ConstantExp nullConstantExp():
 { Token t; }
 {
   t="null" 
-  { return NullExp.create(makeLocation(t)); }
+  { return bossa.syntax.dispatch.createNullExp(makeLocation(t)); }
 }
 
 ConstantExp booleanConstantExp():
@@ -1676,19 +1676,19 @@ ConstantExp charConstantExp():
   }
 }
 
-StringConstantExp stringConstantExp():
+ConstantExp stringConstantExp():
 { String s; }
 {
   s=rawString()
-  { return new StringConstantExp(s); }
+  { return bossa.syntax.dispatch.createStringConstantExp(s); }
 }
 
-StringConstantExp multiLineStringExp():
+ConstantExp multiLineStringExp():
 { Token t; String s; }
 {
   t = <MULTILINESTRING>
   { s = t.image.substring(3, t.image.length() - 3);
-    return new StringConstantExp(s, true);
+    return bossa.syntax.dispatch.createStringConstantExp(s, true);
   }
 }
 
@@ -2118,7 +2118,7 @@ Expression RangeExpression() :
 		  e1 = ConstantExp.makeNumber(
 			new LocatedString("0", makeLocation(t)));
 		if (e2 == null)
-		  e2 = NullExp.create(makeLocation(t));
+		  e2 = bossa.syntax.dispatch.createNullExp(makeLocation(t));
 		e1=bossa.syntax.dispatch.createCallExp(symb(t),e1,e2); 
 	}
      }

@@ -607,8 +607,8 @@ public ?Pattern readPattern(String rep, int[]/*ref*/ pos)
 		name.substring(1), loc)));
 
       if (name[0] == '\"')
-        return createPattern(ConstantExp.makeString(new LocatedString(
-		name.substring(1,name.length()-1), loc)));
+        return createPattern(createStringConstantExp(
+			name.substring(1,name.length()-1)));
 
       if (name[0] == '<' || name[0] == '>')
 	{
@@ -625,7 +625,7 @@ public ?Pattern readPattern(String rep, int[]/*ref*/ pos)
     return createPattern(new LocatedString("_", loc));
 
   if (name.equals("NULL"))
-    return createPattern(NullExp.create(loc));
+    return createPattern(createNullExp(loc));
 
   if (name.equals("true") || name.equals("false") ) 
     return createPattern(ConstantExp.makeBoolean(name.equals("true"), loc));

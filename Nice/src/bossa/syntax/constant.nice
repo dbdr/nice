@@ -204,11 +204,6 @@ private (long, boolean) parseInteger(String rep)
       index += 2;
       radix = 2;
     }
-  else if (rep.startsWith("0", index) && rep.length() > 1 + index) 
-    {
-      index++;
-      radix = 8;
-    }
 
   if (rep.startsWith("-", index))
     throw new NumberFormatException("Negative sign in wrong position");

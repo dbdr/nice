@@ -267,15 +267,12 @@ TOKEN :
   < INTEGER_LITERAL:
         <DECIMAL_LITERAL> (["l","L"])?
       | <HEX_LITERAL> (["l","L"])?
-      | <OCTAL_LITERAL> (["l","L"])?
       | <BIN_LITERAL> (["l","L"])?   
   >
 |
-  < #DECIMAL_LITERAL: ["1"-"9"] (["0"-"9", "_"])* >
+  < #DECIMAL_LITERAL: ["0"-"9"] (["0"-"9", "_"])* >
 |
   < #HEX_LITERAL: "0" ["x","X"] (["0"-"9","a"-"f","A"-"F","_"])+ >
-|
-  < #OCTAL_LITERAL: "0" (["0"-"7","_"])* >
 |
    < #BIN_LITERAL: "0" ["b","B"] (["0","1","_"])+ >
 

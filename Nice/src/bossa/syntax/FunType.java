@@ -74,8 +74,8 @@ public class FunType extends bossa.syntax.Monotype
 
   public String toString()
   {
-    return "(" + Util.map("", ", ", "", in) + ")->" + out;
-    //return "("+toStringExtern()+")";
+    return "(" + Util.map("", ", ", "", in) + 
+      (nullness == maybe ? ")?->" : ")->") + out;
   }
   
   public String toStringExtern()

@@ -1,5 +1,10 @@
 nice (0.7.7) unstable; urgency=low
 
+  * Methods taking a boolean parameter can now dispatch on the cases
+    'true' and 'false':
+      boolean not(boolean);
+      not(@true) = false;
+      not(@false) = true;
   * New policy for typing calls to Java methods. By default, the typing
     is more convenient, considering arguments as possibly null, and 
     results as non-null. With the '-- strict' compiler option, use a stricter

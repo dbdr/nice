@@ -66,6 +66,22 @@ public class Pattern implements Located
     this.atValue = atValue;
     this.exactlyAt = exactlyAt;
     this.location = location;
+    if (tc != null) 
+      {
+	String ident = tc.getName().toString();
+	if (ident.equals("true"))
+	  {
+	    this.atValue = new IdentExp(tc.getName());
+	    this.typeConstructor = 
+                     new TypeIdent(new LocatedString("boolean",location));
+          }
+	else if (ident.equals("false"))
+	  {
+	    this.atValue = new IdentExp(tc.getName());
+	    this.typeConstructor = 
+                     new TypeIdent(new LocatedString("boolean",location));
+	  }
+      }
   }
 
   public Pattern(LocatedString name)
@@ -228,7 +244,7 @@ public class Pattern implements Located
   /**
      Order on pattern that is compatible with the specificity of patterns.
 
-     If that mathes all values that this matches, the result is true.
+     If that matches all values that this matches, the result is true.
      Additionally, if this matches values that are more specific than
      the values that matches, the result is also true. 
 
@@ -255,6 +271,12 @@ public class Pattern implements Located
     if (that.atNull() || this.atNull())
       return false;
 
+    if (that.atBool())
+      return this.atBool() && (this.atTrue() == that.atTrue());
+
+    if (this.atBool())
+      return that.tc == PrimitiveType.boolTC; 
+
     if (this.tc == that.tc)
       return this.exactlyAt || ! that.exactlyAt;
 
@@ -273,6 +295,20 @@ public class Pattern implements Located
     if (tag == null)
       return false;
 
+    if (tag == PrimitiveType.trueBoolTC)
+      {
+	if (atBool())
+          return atTrue();
+        return tc == PrimitiveType.boolTC;
+      }
+
+    if (tag == PrimitiveType.falseBoolTC)
+      {
+	if (atBool())
+          return atFalse();
+        return tc == PrimitiveType.boolTC;
+      }
+	
     if (exactlyAt)
       return Typing.testRigidLeq(tag, tc) && Typing.testRigidLeq(tc, tag);
     else
@@ -289,7 +325,8 @@ public class Pattern implements Located
       return "@null";
     if (atAny())
       return "@_";
-    
+    if (atBool())
+      return "@" + atValue.toString();
     StringBuffer res = new StringBuffer();
     if (name != null)
       res.append(name.toString());
@@ -322,7 +359,10 @@ public class Pattern implements Located
   {
     if (atAny())
       return "@_";
-    
+
+    if (atBool())
+      return "@" + atValue.toString();
+
     return 
       (exactlyAt ? "#" : "@") 
       +
@@ -364,6 +404,11 @@ public class Pattern implements Located
       tc = null;
     else if (name.equals("NULL"))
       atValue = NullExp.instance;
+    else if (name.equals("true") || name.equals("false") ) 
+      {
+	atValue = new IdentExp(new LocatedString(name, Location.nowhere()));
+	tc = PrimitiveType.boolTC;
+      }
     else
       {
 	mlsub.typing.TypeSymbol sym = Node.getGlobalTypeScope().lookup(name);
@@ -392,6 +437,13 @@ public class Pattern implements Located
 
     if (atAny())
       return QuoteExp.trueExp;
+	
+    if (atBool())
+      {
+	if (atFalse())
+          return Inline.inline(nice.lang.inline.BoolNotOp.instance, parameter);
+        return parameter;
+      }
 
     gnu.bytecode.Type ct = nice.tools.code.Types.javaType(tc);
 
@@ -426,10 +478,19 @@ public class Pattern implements Located
   private mlsub.typing.Monotype patternType;
 
   private boolean exactlyAt;
-  private Expression atValue;
+  public Expression atValue;
 
   private Location location;
 
   public boolean atNull() { return atValue == NullExp.instance; }
   public boolean atAny()  { return atValue == null && tc == null; }
+  public boolean atBool() { 
+    return atValue != null && tc == PrimitiveType.boolTC;
+  }
+  public boolean atTrue() { 
+    return atBool() && atValue.toString().equals("true");
+  }
+  public boolean atFalse() { 
+    return atBool() && atValue.toString().equals("false");
+  }
 }

@@ -185,11 +185,11 @@ public final class Dispatch
 	failed = true;
 	if(sortedAlternatives.size()==0)
 	  User.error
-	    (method, "Method " + method + " is declared but never defined:\n" +
+	    (method, "Method " + method + " is declared but never implemented:\n" +
 	     "no alternative matches " + toString(tags));
 	else
 	  User.warning(method,
-		       "Method " + method + " is not exhaustive:\n" + 
+		       "Method " + method + " is not completely covered:\n" + 
 		       "no alternative matches " + 
 		       toString(tags));
       }
@@ -258,7 +258,8 @@ public final class Dispatch
     if (! (len == 0)) throw new Error();
 
     List res = mlsub.typing.Enumeration.enumerate(cst, types, used);
-    return mergeNullCases(res, domains.length);
+    res = mergeNullCases(res, domains.length);
+    return enumerateBooleans(res, domains.length);
   }
 
   /** 
@@ -304,5 +305,35 @@ public final class Dispatch
 	res[i] = tags[2 * i + 1];
 
     return res;
+  }
+
+  /** Expand the 'boolean' case into 'true' and 'false'.
+   */
+  private static List enumerateBooleans(List tags, int length)
+  {
+    if (tags.size() < 1) return tags;
+
+    List res;
+    for (int pos = 0; pos < length; pos++)
+    {
+      res = new ArrayList();  
+      for (Iterator i = tags.iterator(); i.hasNext(); ) 
+      {
+        TypeConstructor[] tc = (TypeConstructor[]) i.next();
+        if (tc[pos] == PrimitiveType.boolTC)
+          {
+	    // Create two copies of this case, one for true and one for false.
+            TypeConstructor[] tc2 = new TypeConstructor[tc.length];
+            System.arraycopy(tc, 0, tc2, 0, tc.length);
+	    tc[pos] = PrimitiveType.trueBoolTC;
+            res.add(tc);
+            tc2[pos] = PrimitiveType.falseBoolTC;
+            res.add(tc2);
+          }
+	else res.add(tc);
+      }
+      tags = res;
+    }
+    return tags;	
   }
 }

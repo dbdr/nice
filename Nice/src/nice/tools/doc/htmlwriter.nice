@@ -6,14 +6,6 @@ package nice.tools.doc;
    @author Francis Barber
 */
 
-/*TODO
- * 1)Make it file system independent by using java.io.File.separator instead of '/'
- * Nice seems to reject this - 
- *    Ambiguity for symbol File. Possibilities are :
- *    java.io.File File(?String, String)
- *    java.io.File File(?File, String)
- */
- 
     /*Below is various info that could be used in the
      *construction of the method entry
      */
@@ -114,7 +106,7 @@ class HTMLWriter {
     writer.write(htmlSafe(gv.toString()));
   
     writer.write("<p>");
-    writer.write("nicedoc comments would go here...");
+    writer.write();
     writer.write("</p>");
  
     writer.write(getFooter());
@@ -184,33 +176,39 @@ class HTMLWriter {
       }
       
       //Write classes
-      writer.write("<b>Classes:</b>\n");
-      writer.write("<ul>\n");
-      for(ClassDefinition.Class c : classes) {
-        String s = c.getName().toString();
-        int index = s.lastIndexOf('.');
-        if(index != s.length()-1)
-            s = s.substring(index+1);
-        writer.write("<li><a href='" + s + ".html'>" + s + "</a></li>\n");
+      if(classes.size() > 0) {
+        writer.write("<b>Classes:</b>\n");
+        writer.write("<ul>\n");
+        for(ClassDefinition.Class c : classes) {
+            String s = c.getName().toString();
+            int index = s.lastIndexOf('.');
+            if(index != s.length()-1)
+                s = s.substring(index+1);
+            writer.write("<li><a href='" + s + ".html'>" + s + "</a></li>\n");
+        }
+        writer.write("</ul>\n");
       }
-      writer.write("</ul>\n");
       
       //Write methods
-      writer.write("<b>Methods:</b>\n");
-      writer.write("<ul>\n");
-      for(MethodDeclaration m : methods) {
-          writer.write("<li><a href='" calculateMethodFilename(m) "'>" m.getName() "</a>" +
-                       ": " m.getType() "</li>\n");
+      if(methods.size() > 0) {
+        writer.write("<b>Methods:</b>\n");
+        writer.write("<ul>\n");
+        for(MethodDeclaration m : methods) {
+            writer.write("<li><a href='" calculateMethodFilename(m) "'>" m.getName() "</a>" +
+                   ": " m.getType() "</li>\n");
+        }
+        writer.write("</ul>\n");
       }
-      writer.write("</ul>\n");
       
       //Write global vars
-      writer.write("<b>Global Variables:</b>\n");
-      writer.write("<ul>\n");
-      for(GlobalVarDeclaration gv : globalVars) {
-           writer.write("<li><a href='gv_" gv.getName() ".html'>" gv.getName() "</a></li>\n");
+      if(globalVars.size() > 0) {
+        writer.write("<b>Global Variables:</b>\n");
+        writer.write("<ul>\n");
+        for(GlobalVarDeclaration gv : globalVars) {
+            writer.write("<li><a href='gv_" gv.getName() ".html'>" gv.getName() "</a></li>\n");
+        }
+        writer.write("</ul>\n");
       }
-      writer.write("</ul>\n");
       
       writer.write(getFooter());
       writer.close();

@@ -19,6 +19,8 @@ import mlsub.typing.*;
 
 import mlsub.typing.TypeConstructor;
 import mlsub.typing.MonotypeConstructor;
+import mlsub.typing.Polytype;
+import mlsub.typing.Constraint;
 
 import nice.tools.code.SpecialTypes;
 
@@ -61,7 +63,7 @@ public class PrimitiveType extends ClassDefinition.ClassImplementation
       {
 	byteTC = tc;
 	byteType = Monotype.sure(new MonotypeConstructor(tc, null));
-	bytePolytype = new mlsub.typing.Polytype(byteType);
+	bytePolytype = new Polytype(byteType);
 	return SpecialTypes.byteType;
       }
     
@@ -69,7 +71,7 @@ public class PrimitiveType extends ClassDefinition.ClassImplementation
       {
 	shortTC = tc;
 	shortType = Monotype.sure(new MonotypeConstructor(tc, null));
-	shortPolytype = new mlsub.typing.Polytype(shortType);
+	shortPolytype = new Polytype(shortType);
 	return SpecialTypes.shortType;
       }
     
@@ -77,7 +79,7 @@ public class PrimitiveType extends ClassDefinition.ClassImplementation
       {
 	intTC = tc;
 	intType = Monotype.sure(new MonotypeConstructor(tc, null));
-	intPolytype = new mlsub.typing.Polytype(intType);
+	intPolytype = new Polytype(intType);
 	return SpecialTypes.intType;
       }
     
@@ -85,7 +87,7 @@ public class PrimitiveType extends ClassDefinition.ClassImplementation
       {
 	longTC = tc;
 	longType = Monotype.sure(new MonotypeConstructor(tc, null));
-	longPolytype = new mlsub.typing.Polytype(longType);
+	longPolytype = new Polytype(longType);
 	return SpecialTypes.longType;
       }
     
@@ -95,7 +97,7 @@ public class PrimitiveType extends ClassDefinition.ClassImplementation
 	trueBoolTC = new TypeConstructor("true");
 	falseBoolTC = new TypeConstructor("false");
 	boolType = Monotype.sure(new MonotypeConstructor(tc, null));
-	boolPolytype = new mlsub.typing.Polytype(boolType);
+	boolPolytype = new Polytype(boolType);
 	return SpecialTypes.booleanType;
       }
     
@@ -118,8 +120,7 @@ public class PrimitiveType extends ClassDefinition.ClassImplementation
 	voidTC = tc;
 	mlsub.typing.lowlevel.Engine.setTop(tc);
 	voidType = Monotype.sure(new MonotypeConstructor(tc, null));
-	voidPolytype = new mlsub.typing.Polytype
-	  (mlsub.typing.Constraint.True, voidType);
+	voidPolytype = new Polytype(Constraint.True, voidType);
 	synVoidType = Monotype.create(voidType);
 	return SpecialTypes.voidType;
       }
@@ -168,7 +169,7 @@ public class PrimitiveType extends ClassDefinition.ClassImplementation
   public static TypeConstructor trueBoolTC, falseBoolTC;
 
   public static mlsub.typing.Monotype byteType, charType, intType, longType, boolType, shortType, doubleType, floatType, voidType;
-  static mlsub.typing.Polytype voidPolytype, boolPolytype, bytePolytype, shortPolytype, intPolytype, longPolytype;
+  static Polytype voidPolytype, boolPolytype, bytePolytype, shortPolytype, intPolytype, longPolytype;
 
   public static TypeConstructor maybeTC, sureTC, nullTC;
 
@@ -182,13 +183,13 @@ public class PrimitiveType extends ClassDefinition.ClassImplementation
     return throwableTC;
   }
 	
-  private static mlsub.typing.Polytype throwableType;
-  static mlsub.typing.Polytype throwableType()
+  private static Polytype throwableType;
+  static Polytype throwableType()
   {
     if (throwableType == null)
       {
-	throwableType = new mlsub.typing.Polytype
-	  (mlsub.typing.Constraint.True, 
+	throwableType = new Polytype
+	  (Constraint.True, 
 	   Monotype.sure(new MonotypeConstructor(throwableTC(), null)));
       }
     return throwableType;

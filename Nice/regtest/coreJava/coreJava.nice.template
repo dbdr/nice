@@ -12,6 +12,7 @@ p(s) = System.out.println(s);
 class A
 {
   int x;
+  long y;
 }
 
 main(args)

@@ -12,7 +12,7 @@
 
 // File    : BossaClass.java
 // Created : Thu Jul 01 11:25:14 1999 by bonniot
-//$Modified: Tue Jun 13 15:44:19 2000 by Daniel Bonniot $
+//$Modified: Mon Jul 24 16:24:00 2000 by Daniel Bonniot $
 
 package bossa.syntax;
 
@@ -65,8 +65,8 @@ public class BossaClass extends ClassDefinition
 
   public void setFieldsAndMethods(List fields, List methods)
   {
-    this.fields = keepFields(fields,isSharp);
-    if(methods!=null)
+    this.fields = keepFields(fields, isSharp);
+    if(methods != null)
       this.methods = addChildren(methods);
 
     computeMethods();
@@ -79,7 +79,7 @@ public class BossaClass extends ClassDefinition
 	// it needs its own classtype
 	classType = module.createClass(simpleName.toString());
 
-    if(classType!=null)
+    if(classType != null)
       bossa.CodeGen.set(tc, classType);
   }
   
@@ -130,13 +130,13 @@ public class BossaClass extends ClassDefinition
   private List keepFields(List fields, boolean local)
   {
     List result = new ArrayList(fields.size());
-    for(Iterator i=fields.iterator();i.hasNext();)
+    for(Iterator i = fields.iterator(); i.hasNext();)
       {
-	Field f=(Field)i.next();
-	if(f.isLocal==local)
+	Field f = (Field) i.next();
+	if(f.isLocal == local)
 	  {
 	    result.add(f);
-	    f.sym.propagate=Node.none; // do not enter into global scope
+	    f.sym.propagate = Node.none; // do not enter into global scope
 	  }
       }
     return result;
@@ -146,16 +146,16 @@ public class BossaClass extends ClassDefinition
   {
     public Field(MonoSymbol sym, boolean isFinal, boolean isLocal)
     {
-      this.sym=sym;
-      this.isFinal=isFinal;
-      this.isLocal=isLocal;
+      this.sym = sym;
+      this.isFinal = isFinal;
+      this.isLocal = isLocal;
     }
 
     public String toString()
     {
       return 
-	(isFinal ? "final" : "") +
-	(isLocal ? "local" : "") +
+	(isFinal ? "final " : "") +
+	(isLocal ? "local " : "") +
 	sym;
     }
     
@@ -166,7 +166,7 @@ public class BossaClass extends ClassDefinition
   
   private void computeMethods()
   {
-    for(Iterator i=fields.iterator(); i.hasNext();)
+    for(Iterator i = fields.iterator(); i.hasNext();)
       {
 	Field f = (Field) i.next();
 
@@ -194,10 +194,9 @@ public class BossaClass extends ClassDefinition
       User.error(this, e);
     }
     
-    for(Iterator i=fields.iterator();
-	i.hasNext();)
+    for(Iterator i = fields.iterator();	i.hasNext();)
       {
-	Field f=(Field)i.next();
+	Field f = (Field) i.next();
 	
 	f.sym.type = f.sym.syntacticType.resolve(localScope);
       }
@@ -212,7 +211,7 @@ public class BossaClass extends ClassDefinition
     super.createContext();
 
     // This is done here for convenience only
-    if(classType!=null)
+    if(classType != null)
       {
 	if(!isInterface)
 	  createConstructor();
@@ -267,55 +266,16 @@ public class BossaClass extends ClassDefinition
   
   Type javaClass()
   {
-    if(associatedConcreteClass!=null)
+    if(associatedConcreteClass != null)
       return javaClass(associatedConcreteClass);
     else
       {
-	if(classType==null)
+	if(classType == null)
 	  Internal.error(name,
 			 name+" has no classType field");
 
 	return classType;
       }
-  }
-  
-  /**
-   * Computes the minimal set S of classes below this concrete class C
-   * such that for all concrete D,
-   * the test D<=C (where <= defined by Bossa (multiple-)inheritance)
-   *
-   * is equivalent to 
-   * 
-   * the test D<C or D<s for some s in S
-   * (where < is the single-inheritance relation in the bytecode)
-   *
-   */
-  public void computeIllegitimateChildren()
-  {
-    if(!isSharp)
-      return;
-    
-    // We are sharp, let's take our immediate parent
-    BossaClass me = (BossaClass) abstractClass();
-    
-    for(Iterator i = listConcreteClasses();
-	i.hasNext();)
-      {
-	ClassDefinition concrete = (ClassDefinition) i.next();
-	ClassDefinition that = concrete.abstractClass();
-	
-	if(
-	   that!=me &&
-	   this.tc.getKind()==that.tc.getKind() &&
-	   Typing.testRigidLeq(that.tc,me.tc) &&
-	   !Typing.testRigidLeq(that.distinguishedSuperClass().tc,me.tc)
-	   )
-	  me.addIllegitimateChild(concrete);
-      }  
-
-    if(Debug.linkTests && me.illegitimateChildren.size()>0)
-      Debug.println(me.name+" has illegitimate childs "+
-		    Util.map("",", ","",me.illegitimateChildren));
   }
   
   /****************************************************************
@@ -324,7 +284,7 @@ public class BossaClass extends ClassDefinition
 
   public void compile()
   {
-    if(classType==null)
+    if(classType == null)
       return;
     
     if(Debug.codeGeneration)
@@ -333,26 +293,22 @@ public class BossaClass extends ClassDefinition
     ClassDefinition me = abstractClass();
 
     ClassType[] itfs = null;
-    if(!isInterface)
-      {
-	classType.setSuper(javaSuperClass());
-      }
+    if(isInterface)
+      classType.setSuper(gnu.bytecode.Type.pointer_type);
     else
-      {
-	classType.setSuper(gnu.bytecode.Type.pointer_type);
-      }
+      classType.setSuper(javaSuperClass());
     
   createItfs:
     if(!isInterface)
       {
-	if(me.impl==null) break createItfs;
+	if(me.impl == null) break createItfs;
 	
 	ArrayList imp = new ArrayList(me.impl.length);
 	for(int i=0; i<me.impl.length; i++)
 	  {
 	    TypeConstructor assocTC = me.impl[i].associatedTC();
 	    
-	    if(assocTC==null)
+	    if(assocTC == null)
 	      continue;
 	    
 	    imp.add(bossa.CodeGen.javaType(assocTC));
@@ -361,13 +317,13 @@ public class BossaClass extends ClassDefinition
       }
     else 
       {
-	if(superClass==null) break createItfs;
+	if(superClass == null) break createItfs;
 	
 	itfs = new ClassType[superClass.length];
 	for(int i=0; i<superClass.length; i++)
 	  {
 	    Interface itf = get(superClass[i]).getAssociatedInterface();
-	    if(itf==null)
+	    if(itf == null)
 	      {
 		Internal.warning("Should not happen. size of itfs gona be wrong");
 		continue;
@@ -379,11 +335,7 @@ public class BossaClass extends ClassDefinition
     classType.setInterfaces(itfs);
     
     addFields(classType);
-    if(me!=this) me.addFields(classType);
-
-    for(Iterator i = illegitimateParents.iterator();
-	i.hasNext();)
-      ((ClassDefinition) i.next()).addFields(classType);
+    if (me != this) me.addFields(classType);
 
     module.addClass(classType);
   }
@@ -429,23 +381,25 @@ public class BossaClass extends ClassDefinition
 
   private static gnu.bytecode.Method constructor(ClassType ct)
   {
-    if(ct==null)
+    if(ct == null)
       ct = gnu.bytecode.Type.pointer_type;
     
-    gnu.bytecode.Method res = ct.addMethod("<init>", Access.PUBLIC, gnu.bytecode.Type.typeArray0, gnu.bytecode.Type.void_type);
-
-    return res;
+    return ct.addMethod
+      ("<init>", Access.PUBLIC, gnu.bytecode.Type.typeArray0, 
+       gnu.bytecode.Type.void_type);
   }
   
   protected void addFields(ClassType c)
   {
-    for(Iterator i=fields.iterator();
-	i.hasNext();)
+    for(Iterator i = fields.iterator(); i.hasNext();)
       {
-	Field f=(Field)i.next();
+	Field f = (Field) i.next();
 	
-	gnu.bytecode.Field field=
-	  c.addField(f.sym.name.toString(),
+	String name = f.sym.name.toString();
+	
+	// The field might have been created by a FieldAccessMethod.compile*()
+	if(c.getDeclaredField(name) == null)
+	  c.addField(name,
 		     bossa.CodeGen.javaType(f.sym.type),
 		     Access.PUBLIC);
       }

@@ -7,6 +7,7 @@
 class A
 {
   int x;
+  long y;
 }
 
 public class coreJava 

@@ -12,7 +12,7 @@
 
 // File    : ConstantExp.java
 // Created : Thu Jul 08 15:36:40 1999 by bonniot
-//$Modified: Thu Jul 20 16:25:45 2000 by Daniel Bonniot $
+//$Modified: Mon Jul 24 20:19:47 2000 by Daniel Bonniot $
 
 package bossa.syntax;
 
@@ -153,11 +153,19 @@ public class ConstantExp extends Expression
   {
     String rep = representation.toString();
 
-    // Does it fit in an int ?
+    // Is in a valid int ?
     try{
       int i = Integer.decode(rep).intValue();
-      return new ConstantExp(primInt, gnu.math.IntNum.make(i), i+"",
-			     representation.location());
+      
+      TypeConstructor type = primInt;
+      
+      if (i >= Byte.MIN_VALUE && i <= Byte.MAX_VALUE)
+	type = primByte;
+      else if (i >= Short.MIN_VALUE && i <= Short.MAX_VALUE)
+	type = primShort;
+      
+      return new ConstantExp(type, gnu.math.IntNum.make(i), 
+			     i+"", representation.location());
     }
     catch(NumberFormatException e){
     }

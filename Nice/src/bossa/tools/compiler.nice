@@ -12,7 +12,7 @@
 
 // File    : compiler.nice
 // Created : Sat Feb 19 16:21:04 2000 by Daniel Bonniot
-//$Modified: Wed Jun 21 18:31:35 2000 by Daniel Bonniot $
+//$Modified: Mon Jul 24 15:48:42 2000 by Daniel Bonniot $
 
 package bossa.tools;
 
@@ -96,10 +96,11 @@ main(args)
     {
       System.out.println
       ("\nAn exception has occured in the compiler\n" +
-       "please report in to d.bonniot@mail.dotcom.fr\n\n" +
+       "please report to d.bonniot@mail.dotcom.fr\n\n" +
        "Exception: " + uncaughtException.toString() +
        "\n\nStack trace:\n");
       uncaughtException.printStackTrace();
+      exit(1);
     }
 }
 

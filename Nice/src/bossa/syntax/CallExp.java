@@ -12,7 +12,7 @@
 
 // File    : CallExp.java
 // Created : Mon Jul 05 16:27:27 1999 by bonniot
-//$Modified: Thu Jun 22 22:17:30 2000 by Daniel Bonniot $
+//$Modified: Mon Jul 24 15:33:58 2000 by Daniel Bonniot $
 
 package bossa.syntax;
 
@@ -346,15 +346,27 @@ public class CallExp extends Expression
 	    params[i] = ((gnu.expr.PrimProcedure) q.getValue()).wrapInLambda();
 	}
     
-    return new gnu.expr.ApplyExp(fun.generateCode(), params);
+    if (fun.isFieldAccess())
+      {
+	if (parameters.size() != 1)
+	  Internal.error(this, "A field access should have 1 parameter");
+
+	return fun.getFieldAccessMethod().compileAccess
+	  ((Expression) parameters.get(0));
+      }
+    else
+      return new gnu.expr.ApplyExp(fun.generateCode(), params);
   }
   
   gnu.expr.Expression compileAssign(gnu.expr.Expression value)
   {
-    if(!fun.isFieldAccess())
-      Internal.error(this,"Assignment to a call that is not a field access.");
-    
-    return fun.getFieldAccessMethod().compileAssign(parameters,value);
+    if (!fun.isFieldAccess())
+      Internal.error(this, "Assignment to a call that is not a field access");
+    if (parameters.size() != 1)
+      Internal.error(this, "A field access should have 1 parameter");
+
+    return fun.getFieldAccessMethod().compileAssign
+      ((Expression) parameters.get(0), value);
   }
 
   /****************************************************************

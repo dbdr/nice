@@ -12,7 +12,7 @@
 
 // File    : Package.java
 // Created : Wed Oct 13 16:09:47 1999 by bonniot
-//$Modified: Wed Jul 19 17:02:26 2000 by Daniel Bonniot $
+//$Modified: Mon Jul 24 20:21:56 2000 by Daniel Bonniot $
 
 package bossa.modules;
 
@@ -175,7 +175,8 @@ public class Package implements mlsub.compilation.Module
   {
     sourcesRead = true;
     
-    bytecode = ClassType.make(name+".package");
+    // Do not use ClassType.make, we want to create a NEW class
+    bytecode = new ClassType(name+".package");
     bytecode.setSuper("java.lang.Object");
     bytecode.setModifiers(Access.FINAL|Access.PUBLIC);
     bytecode.requireExistingClass(false);
@@ -511,7 +512,7 @@ public class Package implements mlsub.compilation.Module
 
   public ClassType createClass(String name)
   {
-    ClassType res = ClassType.make(this.name+"."+name);
+    ClassType res = new ClassType(this.name+"."+name);
     res.requireExistingClass(false);
 
     return res;
@@ -569,13 +570,13 @@ public class Package implements mlsub.compilation.Module
   {
     pkg.addMethod(meth);
     
-    //FIXME: a bit lowlevel
+    //FIXME: a bit too lowlevel
     gnu.expr.ChainLambdas.chainLambdas(meth, comp);
     gnu.expr.PushApply.pushApply(meth);
     gnu.expr.FindTailCalls.findTailCalls(meth);
     meth.setCanRead(true);
     gnu.expr.FindCapturedVars.findCapturedVars(meth);
-    
+
     meth.compileAsMethod(comp);
   }
   
@@ -691,16 +692,25 @@ public class Package implements mlsub.compilation.Module
       return null;
     
     InputStream s = openClass();
-    if(s!=null)
-      try{ bytecode = ClassFileInput.readClassType(s); }
-      catch(IOException e){ s = null; }
+    if(s == null)
+      {
+	User.warning("Bytecode for " + this + 
+		     " was not found, altough its interface exists.\n"+
+		     "Ignoring and recompiling");
+	return null;
+      }
+    
+    try{ bytecode = ClassFileInput.readClassType(s); }
+    catch(LinkageError e){}
+    catch(IOException e){}
 
-    if(s!=null)
+    if(bytecode != null)
       return itf;
     
-    User.warning("Bytecode for "+this+
-		 " was not found, altough its interface exists.\n"+
+    User.warning("Bytecode for " + this + 
+		 " is not correct, altough its interface exists.\n"+
 		 "Ignoring and recompiling");
+    
     return null;
   }
   

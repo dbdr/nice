@@ -12,7 +12,7 @@
 
 // File    : Alternative.java
 // Created : Mon Nov 15 12:20:40 1999 by bonniot
-//$Modified: Wed Jul 19 16:41:06 2000 by Daniel Bonniot $
+//$Modified: Mon Jul 24 15:07:50 2000 by Daniel Bonniot $
 
 package bossa.link;
 
@@ -201,16 +201,6 @@ public class Alternative
   {
     if(dom == null)
       return QuoteExp.trueExp;
-
-    /*
-    ListIterator types = d.getMonotype().getTC().getJavaInstanceTypes();
-    
-    gnu.expr.Expression res =
-      instanceOfExp(parameter,(gnu.bytecode.Type) types.next());
-    
-    while(types.hasNext())
-      res = orExp(instanceOfExp(parameter,(gnu.bytecode.Type) types.next()),res);
-    */
 
     return instanceOfExp(parameter, bossa.CodeGen.javaType(dom));
   }

@@ -12,7 +12,7 @@
 
 // File    : ExpressionRef.java
 // Created : Tue Aug 17 16:04:40 1999 by bonniot
-//$Modified: Fri Jul 21 15:33:48 2000 by Daniel Bonniot $
+//$Modified: Mon Jul 24 18:01:53 2000 by Daniel Bonniot $
 
 package bossa.syntax;
 
@@ -37,9 +37,9 @@ final public class ExpressionRef extends Expression
 {
   public ExpressionRef(Expression e)
   {
-    if(e==null)
+    if(e == null)
       Internal.error("Null expression in a new ExpressionRef");
-    content=e;
+    content = e;
   }
 
   /****************************************************************

@@ -12,7 +12,7 @@
 
 // File    : Typing.java
 // Created : Tue Jul 20 11:57:17 1999 by bonniot
-//$Modified: Thu Jun 22 22:26:45 2000 by Daniel Bonniot $
+//$Modified: Mon Jul 24 20:09:50 2000 by Daniel Bonniot $
 
 package mlsub.typing;
 
@@ -39,7 +39,9 @@ public final class Typing
    */
   public static int enter()
   {
-    if(dbg) Debug.println("ENTER "+level);
+    if(dbg) 
+      Debug.println("ENTER "+level);
+
     Engine.enter();
     return level++;
   }
@@ -97,7 +99,9 @@ public final class Typing
   public static int leave()
     throws TypingEx
   {
-    if(dbg) Debug.println("LEAVE "+(level-1));
+    if(dbg) 
+      Debug.println("LEAVE "+(level-1));
+      
     try{
       Engine.leave();
     }

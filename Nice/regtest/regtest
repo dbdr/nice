@@ -4,7 +4,7 @@
 
 compile()
 {
-  nicec -e regtest."$1"
+  nicec -e -r regtest."$1"
   return $?
 }
 
@@ -24,7 +24,7 @@ compile_error()
   echo
   echo "###############"
   cat $1/compile.out
-  echo "###############\n\n"
+  echo "###############\n"
 }
 
 newpkg()
@@ -36,14 +36,23 @@ newpkg()
   echo
   echo "###############"
   cat $1/current.out
-  echo "###############"
-  echo
+  echo "###############\n"
   echo -n "Is that correct? (y/n) "
   read correct
   if [ "$correct" = "y" -o "$correct" = "yes" ]; then
     pkg_new_ok=`expr $pkg_new_ok + 1`
     mv $1/current.out $1/ok.out
   fi
+}
+
+exec_error()
+{
+  pkg_broken=`expr $pkg_broken + 1`
+  echo "$1 produced messages on stderr. It must be BROKEN."
+  echo
+  echo "###############"
+  cat $1/current.err
+  echo "###############\n"
 }
 
 different_output()
@@ -55,6 +64,8 @@ different_output()
 regtest()
 {
   execute $1 >$1/current.out 2>$1/current.err
+
+  [ -s $1/current.err ] && { exec_error $1; return; }
 
   [ -r $1/ok.out ] || { newpkg $1; return; }
   cmp $1/ok.out $1/current.out || { different_output $1; return; }

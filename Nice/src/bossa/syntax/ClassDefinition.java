@@ -12,7 +12,7 @@
 
 // File    : ClassDefinition.java
 // Created : Thu Jul 01 11:25:14 1999 by bonniot
-//$Modified: Thu Jun 22 20:53:46 2000 by Daniel Bonniot $
+//$Modified: Mon Jul 24 15:05:16 2000 by Daniel Bonniot $
 
 package bossa.syntax;
 
@@ -289,9 +289,6 @@ abstract public class ClassDefinition extends Definition
   // So we choose a class that will be described as the super-class
   // in the bytecode (javaSuperClass)
 
-  // A child class of A whose javaSuperClass is not A
-  // is called an "illegitimate" child
-
   final ClassDefinition superClass(int n)
   {
     return get(superClass[n]);
@@ -343,51 +340,6 @@ abstract public class ClassDefinition extends Definition
     return (ClassType) res;
   }
   
-  /**
-   * illegitimateChildren is a list of ClassDefinition.
-   * It is a list of classes that are below 'this'
-   * but that have not 'this' in their (bytecode) super chain.
-   * 
-   * It would be possible to minimize this list (TODO !)
-   */
-  protected List /* of ClassDefinition */ illegitimateChildren = new LinkedList();
-  protected List /* of ClassDefinition */ illegitimateParents  = new LinkedList();
-
-  // child must be concrete
-  protected void addIllegitimateChild(ClassDefinition child)
-  {
-    illegitimateChildren.add(child.abstractClass());
-    child.illegitimateParents.add(this);
-  }
-  
-  List getIllegitimateChildren()
-  {
-    return illegitimateChildren;
-  }
-  
-  /**
-   * Computes the minimal set S of classes below this concrete class C
-   * such that for all concrete D,
-   *
-   * the test D<=C (where <= defined by Bossa (multiple-)inheritance)
-   *
-   * is equivalent to 
-   * 
-   * the test D<C or D<s for some s in S
-   * (where < is the single-inheritance relation in the bytecode)
-   *
-   */
-  public void computeIllegitimateChildren()
-  {
-  }
-  
-  // Illegitimate children computations are done while typechecking
-
-  void typecheck()
-  {
-    computeIllegitimateChildren();
-  }
-
   abstract protected void addFields(ClassType c);
 
   /****************************************************************

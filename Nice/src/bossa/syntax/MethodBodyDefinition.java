@@ -12,7 +12,7 @@
 
 // File    : MethodBodyDefinition.java
 // Created : Thu Jul 01 18:12:46 1999 by bonniot
-//$Modified: Wed Jun 21 18:43:59 2000 by Daniel Bonniot $
+//$Modified: Mon Jul 24 20:25:24 2000 by Daniel Bonniot $
 
 package bossa.syntax;
 
@@ -74,7 +74,7 @@ public class MethodBodyDefinition extends Definition
   
   private Collection buildSymbols(Collection names, Monotype[] types)
   {
-    if(names.size()!=types.length)
+    if(names.size() != types.length)
       switch(types.length){
       case 0: User.error(this,"Method "+name+" has no parameters");
       case 1: User.error(this,"Method "+name+" has 1 parameter");
@@ -136,9 +136,9 @@ public class MethodBodyDefinition extends Definition
     VarSymbol res;
     
     List symbols = scope.lookup(name);
-    if(symbols.size()==0) return null;
+    if(symbols.size() == 0) return null;
 
-    if(symbols.size()==1)
+    if(symbols.size() == 1)
       return (VarSymbol) symbols.get(0);
     
     for(Iterator i = symbols.iterator(); i.hasNext();){
@@ -152,7 +152,6 @@ public class MethodBodyDefinition extends Definition
 // It doesn't make sense to define a body for a native method, does it ?
 	     m instanceof JavaMethodDefinition
 	     || m instanceof FieldAccessMethod
-	     || m instanceof SetFieldMethod
 	     || m.getArity() != formals.size()
 	     )
 	    {
@@ -172,7 +171,7 @@ public class MethodBodyDefinition extends Definition
 	      Typing.leq(Pattern.getTC(formals), m.getType().domain());
 	    }
 	    finally{
-	      if(Typing.leave()!=level)
+	      if(Typing.leave() != level)
 		Internal.error("Enter/Leave error");
 	    }
 	  }
@@ -217,7 +216,7 @@ public class MethodBodyDefinition extends Definition
 
     // Binders must be taken into account,
     // to distinguish them from Java Classes
-    if(binders!=null) 
+    if(binders != null) 
       {
 	try{ this.typeScope.addMappings(binders,null); } 
 	catch(mlsub.typing.BadSizeEx e) {
@@ -228,7 +227,7 @@ public class MethodBodyDefinition extends Definition
 	}
       }
 
-    //if(newTypeVars!=null)
+    //if(newTypeVars != null)
     //this.typeScope.addSymbols(newTypeVars);
     
     return res;
@@ -264,7 +263,7 @@ public class MethodBodyDefinition extends Definition
     setDefinition(def);
 
     // Get type parameters
-    if(binders!=null)
+    if(binders != null)
     try{
       typeScope.addMappings
 	(binders,
@@ -335,7 +334,7 @@ public class MethodBodyDefinition extends Definition
       }
       
       // New Constraint
-      //if(newTypeVars!=null)
+      //if(newTypeVars != null)
       //Typing.enter(newTypeVars,
       //"Binding-constraint for "+name);
       
@@ -412,9 +411,9 @@ public class MethodBodyDefinition extends Definition
   public void compile()
   {
     if(Debug.codeGeneration)
-      Debug.println("Compiling method body "+name);
+      Debug.println("Compiling method body " + this);
     
-    if(definition==null)
+    if(definition == null)
       Internal.error(this, this+" has no definition");
     
     blockExp = new gnu.expr.BlockExp(definition.javaReturnType());
@@ -515,7 +514,7 @@ public class MethodBodyDefinition extends Definition
 
   public String toString()
   {
-    return name+"("+Util.map("",", ","",parameters)+")";
+    return name + "(" + Util.map("", ", ", "", formals) + ")";
   }
 
   /*private*/ MethodDefinition definition;

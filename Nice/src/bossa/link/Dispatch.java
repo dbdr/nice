@@ -12,7 +12,7 @@
 
 // File    : Dispatch.java
 // Created : Mon Nov 15 10:36:41 1999 by bonniot
-//$Modified: Fri Jul 21 15:14:21 2000 by Daniel Bonniot $
+//$Modified: Mon Jul 24 15:41:04 2000 by Daniel Bonniot $
 
 package bossa.link;
 
@@ -57,17 +57,11 @@ public final class Dispatch
   
   private static void test(MethodDefinition m, bossa.modules.Package module)
   {
-    if(m instanceof JavaMethodDefinition
-       || m instanceof StaticFieldAccess
+    if(m instanceof JavaMethodDefinition || 
+       m instanceof StaticFieldAccess ||
+       m instanceof FieldAccessMethod
        )
       return;
-    
-    if(m instanceof FieldAccessMethod
-       || m instanceof SetFieldMethod)
-      {
-	compile(m,null,module);
-	return;
-      }
     
     List alternatives = Alternative.listOfAlternative(m);
     
@@ -87,7 +81,7 @@ public final class Dispatch
     if(Debug.codeGeneration)
       Debug.println("Generating dispatch function for "+m);
     
-    compile(m,sortedAlternatives,module);
+    compile(m, sortedAlternatives, module);
   }
 
   private static boolean trivialTestOK(Stack alternatives)
@@ -241,11 +235,6 @@ public final class Dispatch
 			      Stack sortedAlternatives, 
 			      bossa.modules.Package module)
   {
-    if(m instanceof JavaMethodDefinition
-       || m instanceof StaticFieldAccess
-       )
-      return;
-
     BlockExp block = new BlockExp(m.javaReturnType());
     LambdaExp lexp = new LambdaExp(block);
     
@@ -261,75 +250,16 @@ public final class Dispatch
 	params[n] = new ReferenceExp(param);
       }
     
-    if(m instanceof FieldAccessMethod)
-      block.setBody(compileFieldAccess((FieldAccessMethod) m, params[0]));
-    else if(m instanceof SetFieldMethod)
-      block.setBody(compileSetField((SetFieldMethod) m, params[0], params[1]));
-    else
-      block.setBody(dispatch(sortedAlternatives.iterator(),
-			     m.javaReturnType()==gnu.bytecode.Type.void_type,
-			     block,
-			     params));
+    block.setBody(dispatch(sortedAlternatives.iterator(),
+			   m.javaReturnType()==gnu.bytecode.Type.void_type,
+			   block,
+			   params));
 
     lexp.setPrimMethod(m.getDispatchPrimMethod());
     
     module.compileDispatchMethod(lexp);
   }
   
-  private static Expression compileFieldAccess(FieldAccessMethod method, 
-					       Expression value)
-  {
-    //ListIterator types = method.classTC.getJavaInstanceTypes();
-    ClassType type = (ClassType) bossa.CodeGen.javaType(method.classTC);
-    
-    Expression[] param = { value };
-    
-    Expression res =
-      new ApplyExp(new kawa.lang.GetFieldProc(type,method.fieldName, method.javaReturnType(), Access.PUBLIC),
-		   param);
-    
-    /*
-    while(types.hasNext())
-      {
-	ClassType type = (ClassType) types.next();
-	res = new gnu.expr.IfExp(Alternative.instanceOfExp(value,type),
-				 new ApplyExp(new kawa.lang.GetFieldProc(type,method.fieldName),param),
-			res);
-      }
-    */
-    return res;
-  }
-
-  private static Expression compileSetField
-    (SetFieldMethod method, Expression obj, Expression value)
-  {
-    //ListIterator types = method.classTC.getJavaInstanceTypes();
-    ClassType type = (ClassType) bossa.CodeGen.javaType(method.classTC);
-    
-    Expression[] params = { obj, value };
-    
-    Expression res = 
-      new ApplyExp(new kawa.lang.SetFieldProc(type, method.fieldName, 
-					      method.javaArgTypes()[1], 
-					      Access.PUBLIC), 
-		   params);
-    /*
-    while(types.hasNext())
-      {
-	ClassType type = (ClassType) types.next();
-	res = new gnu.expr.IfExp
-	  (Alternative.instanceOfExp(value,type),
-	   new ApplyExp(new QuoteExp(new kawa.lang.SetFieldProc
-	     (type,
-	      method.fieldName, 
-	      method.javaArgTypes()[1], 
-	      Access.PUBLIC)), params),
-	      res);
-      }
-    */
-    return res;
-  }
-
   private static final gnu.mapping.Procedure throwProc 
     = new kawa.standard.prim_throw();
   

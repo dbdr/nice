@@ -12,7 +12,7 @@
 
 // File    : prelude.nice
 // Created : Thu Dec 02 11:42:48 1999 by bonniot
-//$Modified: Wed Jun 21 18:27:17 2000 by Daniel Bonniot $
+//$Modified: Mon Jul 24 20:45:10 2000 by Daniel Bonniot $
 
 /**
  * Standard prelude file.
@@ -37,8 +37,8 @@ class float extends double = native;
 class long extends float = native;
 class int extends long = native;
 class short extends int = native;
+class byte extends short = native;
 class char extends int = native;
-class byte extends char = native;
 
 /****************************************************************
  * Basic functions

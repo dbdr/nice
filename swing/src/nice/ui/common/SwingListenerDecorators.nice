@@ -1,0 +1,453 @@
+package nice.ui.common;
+
+
+
+
+public <AncestorListenerHandler H> void addNAncestorListener(H,NAncestorListener);
+public <CaretListenerHandler H> void addNCaretListener(H,NCaretListener);
+public <CellEditorListenerHandler H> void addNCellEditorListener(H,NCellEditorListener);
+public <ChangeListenerHandler H> void addNChangeListener(H,NChangeListener);
+public <DocumentListenerHandler H> void addNDocumentListener(H,NDocumentListener);
+public <HyperlinkListenerHandler H> void addNHyperlinkListener(H,NHyperlinkListener);
+public <InternalFrameListenerHandler H> void addNInternalFrameListener(H,NInternalFrameListener);
+public <ListDataListenerHandler H> void addNListDataListener(H,NListDataListener);
+public <ListSelectionListenerHandler H> void addNListSelectionListener(H,NListSelectionListener);
+public <MenuDragMouseListenerHandler H> void addNMenuDragMouseListener(H,NMenuDragMouseListener);
+public <MenuKeyListenerHandler H> void addNMenuKeyListener(H,NMenuKeyListener);
+public <MenuListenerHandler H> void addNMenuListener(H,NMenuListener);
+public <PopupMenuListenerHandler H> void addNPopupMenuListener(H,NPopupMenuListener);
+public <TableColumnModelListenerHandler H> void addNTableColumnModelListener(H,NTableColumnModelListener);
+public <TableModelListenerHandler H> void addNTableModelListener(H,NTableModelListener);
+public <TreeExpansionListenerHandler H> void addNTreeExpansionListener(H,NTreeExpansionListener);
+public <TreeWillExpandListenerHandler H> void addNTreeWillExpandListener(H,NTreeWillExpandListener);
+public <TreeModelListenerHandler H> void addNTreeModelListener(H,NTreeModelListener);
+public <TreeSelectionListenerHandler H> void addNTreeSelectionListener(H,NTreeSelectionListener);
+public <UndoableEditListenerHandler H> void addNUndoableEditListener(H,NUndoableEditListener);
+
+
+addNVetoableChangeListener(this@javax.swing.JComponent,listener)
+{
+	this.addVetoableChangeListener(listener);
+	this.addInAccessibleListener(listener,vetoableChangeListeners);
+}
+
+addNPropertyChangeListener(this@javax.swing.AbstractAction,listener)
+{
+	this.addPropertyChangeListener(listener);
+	this.addInAccessibleListener(listener,propertyChangeListeners);
+}
+
+//addNPropertyChangeListener(this@javax.swing.UIManager,listener)
+//{
+//	this.addPropertyChangeListener(listener);
+//	this.addInAccessibleListener(listener,propertyChangeListeners);
+//}
+
+//addNPropertyChangeListener(this@javax.swing.UIDefaults,listener)
+//{
+//	this.addPropertyChangeListener(listener);
+//	this.addInAccessibleListener(listener,propertyChangeListeners);
+//}
+
+addNPropertyChangeListener(this@javax.swing.tree.DefaultTreeSelectionModel,listener)
+{
+	this.addPropertyChangeListener(listener);
+	this.addInAccessibleListener(listener,propertyChangeListeners);
+}
+
+addNPropertyChangeListener(this@javax.swing.table.TableColumn,listener)
+{
+	this.addPropertyChangeListener(listener);
+	this.addInAccessibleListener(listener,propertyChangeListeners);
+}
+
+addNTableModelListener(this@javax.swing.table.TableModel,listener)
+{
+	this.addTableModelListener(listener);
+	this.addInAccessibleListener(listener,tableModelListeners);
+}
+
+addNTableColumnModelListener(this@javax.swing.table.TableColumnModel,listener)
+{
+	this.addColumnModelListener(listener);
+	this.addInAccessibleListener(listener,tableColumnModelListeners);
+}
+
+addNChangeListener(this@javax.swing.MenuSelectionManager,listener)
+{
+	this.addChangeListener(listener);
+	this.addInAccessibleListener(listener,changeListeners);
+}
+
+addNChangeListener(this@javax.swing.colorchooser.DefaultColorSelectionModel,listener)
+{
+	this.addChangeListener(listener);
+	this.addInAccessibleListener(listener,changeListeners);
+}
+
+addNUndoableEditListener(this@javax.swing.undo.UndoableEditSupport,listener)
+{
+	this.addUndoableEditListener(listener);
+	this.addInAccessibleListener(listener,undoableEditListeners);
+}
+
+addNActionListener(this@javax.swing.AbstractButton,listener) = this.addActionListener(listener);
+addNActionListener(this@javax.swing.JFileChooser,listener) = this.addActionListener(listener);
+addNActionListener(this@javax.swing.Timer,listener) = this.addActionListener(listener);
+addNActionListener(this@javax.swing.DefaultButtonModel,listener) = this.addActionListener(listener);
+addNActionListener(this@javax.swing.JComboBox,listener) = this.addActionListener(listener);
+addNActionListener(this@javax.swing.JTextField,listener) = this.addActionListener(listener);
+addNAdjustmentListener(this@javax.swing.JScrollBar,listener) = this.addAdjustmentListener(listener);
+addNItemListener(this@javax.swing.AbstractButton,listener) = this.addItemListener(listener);
+addNItemListener(this@javax.swing.DefaultButtonModel,listener) = this.addItemListener(listener);
+addNItemListener(this@javax.swing.JComboBox,listener) = this.addItemListener(listener);
+
+addNAncestorListener(this@javax.swing.JComponent,listener) = this.addAncestorListener(listener);
+addNCaretListener(this@javax.swing.text.JTextComponent,listener) = this.addCaretListener(listener);
+addNCellEditorListener(this@javax.swing.AbstractCellEditor,listener) = this.addCellEditorListener(listener);
+addNChangeListener(this@javax.swing.AbstractButton,listener) = this.addChangeListener(listener);
+addNChangeListener(this@javax.swing.JSlider,listener) = this.addChangeListener(listener);
+addNChangeListener(this@javax.swing.JProgressBar,listener) = this.addChangeListener(listener);
+addNChangeListener(this@javax.swing.DefaultSingleSelectionModel,listener) = this.addChangeListener(listener);
+addNChangeListener(this@javax.swing.DefaultBoundedRangeModel,listener) = this.addChangeListener(listener);
+addNChangeListener(this@javax.swing.DefaultButtonModel,listener) = this.addChangeListener(listener);
+addNChangeListener(this@javax.swing.text.DefaultCaret,listener) = this.addChangeListener(listener);
+addNChangeListener(this@javax.swing.JViewport,listener) = this.addChangeListener(listener);
+addNChangeListener(this@javax.swing.JTabbedPane,listener) = this.addChangeListener(listener);
+addNDocumentListener(this@javax.swing.text.AbstractDocument,listener) = this.addDocumentListener(listener);
+addNHyperlinkListener(this@javax.swing.JEditorPane,listener) = this.addHyperlinkListener(listener);
+addNInternalFrameListener(this@javax.swing.JInternalFrame,listener) = this.addInternalFrameListener(listener);
+addNListDataListener(this@javax.swing.AbstractListModel,listener) = this.addListDataListener(listener);
+addNListSelectionListener(this@javax.swing.JList,listener) = this.addListSelectionListener(listener);
+addNListSelectionListener(this@javax.swing.DefaultListSelectionModel,listener) = this.addListSelectionListener(listener);
+addNMenuDragMouseListener(this@javax.swing.JMenuItem,listener) = this.addMenuDragMouseListener(listener);
+addNMenuKeyListener(this@javax.swing.JMenuItem,listener) = this.addMenuKeyListener(listener);
+addNMenuListener(this@javax.swing.JMenu,listener) = this.addMenuListener(listener);
+addNPopupMenuListener(this@javax.swing.JPopupMenu,listener) = this.addPopupMenuListener(listener);
+addNTreeExpansionListener(this@javax.swing.JTree,listener) = this.addTreeExpansionListener(listener);
+addNTreeWillExpandListener(this@javax.swing.JTree,listener) = this.addTreeWillExpandListener(listener);
+addNTreeModelListener(this@javax.swing.tree.DefaultTreeModel,listener) = this.addTreeModelListener(listener);
+addNTreeSelectionListener(this@javax.swing.JTree,listener) = this.addTreeSelectionListener(listener);
+addNTreeSelectionListener(this@javax.swing.tree.DefaultTreeSelectionModel,listener) = this.addTreeSelectionListener(listener);
+
+//JDK1.4  addNPopupMenuListener(this@javax.swing.JComboBox,listener) = this.addPopupMenuListener(listener);
+//JDK1.4  addNChangeListener(this@javax.swing.AbstractSpinnerModel,listener) = this.addChangeListener(listener);
+//JDK1.4  addNChangeListener(this@javax.swing.JSpinner,listener) = this.addChangeListener(listener);
+
+
+public <MenuListenerHandler H> void addMenuListener
+  (H this,
+   MenuEvent ?-> void menuCanceled = null,
+   MenuEvent ?-> void menuDeselected = null,
+   MenuEvent ?-> void menuSelected = null         
+   )
+{
+  this.addNMenuListener
+    (new NMenuListener
+      (menuCanceled: menuCanceled,
+       menuDeselected: menuDeselected,
+       menuSelected: menuSelected
+       ));
+}
+
+
+public <MenuDragMouseListenerHandler H> void addMenuDragMouseListener
+  (H this,
+   MenuDragMouseEvent ?-> void menuDragMouseDragged = null,
+   MenuDragMouseEvent ?-> void menuDragMouseEntered = null,
+   MenuDragMouseEvent ?-> void menuDragMouseExited = null,
+   MenuDragMouseEvent ?-> void menuDragMouseReleased = null
+   )
+{
+  this.addNMenuDragMouseListener
+    (new NMenuDragMouseListener
+      (menuDragMouseDragged: menuDragMouseDragged,
+       menuDragMouseEntered: menuDragMouseEntered,
+       menuDragMouseExited: menuDragMouseExited,
+       menuDragMouseReleased: menuDragMouseReleased
+       ));
+}
+
+
+public <MenuKeyListenerHandler H> void addMenuKeyListener
+  (H this, 
+   MenuKeyEvent ?-> void menuKeyPressed = null,
+   MenuKeyEvent ?-> void menuKeyReleased = null,
+   MenuKeyEvent ?-> void menuKeyTyped = null       
+   )
+{
+  this.addNMenuKeyListener
+    (new NMenuKeyListener
+      (menuKeyPressed: menuKeyPressed,
+       menuKeyReleased: menuKeyReleased,
+       menuKeyTyped: menuKeyTyped
+       ));
+}
+
+
+public <ChangeListenerHandler H> void addChangeListener
+  (H this,
+   ChangeEvent -> void stateChanged
+   )
+{
+   this.addNChangeListener
+     (new NChangeListener
+       (stateChanged: stateChanged
+       ));       
+}
+
+
+public <UndoableEditListenerHandler H> void addUndoableEditListener
+  (H this,
+   UndoableEditEvent -> void undoableEditHappened      
+   )
+{
+  this.addNUndoableEditListener
+    (new NUndoableEditListener
+      (undoableEditHappened: undoableEditHappened
+       ));                                                 
+}
+
+
+public <TableColumnModelListenerHandler H> void addTableColumnModelListener
+  (H this,
+   TableColumnModelEvent ?-> void columnAdded = null,
+   TableColumnModelEvent ?-> void columnMoved = null,
+   TableColumnModelEvent ?-> void columnRemoved = null,
+   ListSelectionEvent ?-> void columnSelectionChanged = null,
+   ChangeEvent ?-> void columnMarginChanged = null         
+   )
+{
+  this.addNTableColumnModelListener
+    (new NTableColumnModelListener
+      (columnAdded: columnAdded,
+       columnMoved: columnMoved,
+       columnRemoved: columnRemoved,
+       columnSelectionChanged: columnSelectionChanged,
+       columnMarginChanged: columnMarginChanged
+       ));
+}
+
+
+public <TableModelListenerHandler H> void addTableModelListener
+  (H this,
+   TableModelEvent -> void tableChanged            
+   )
+{
+  this.addNTableModelListener
+    (new NTableModelListener
+      (tableChanged: tableChanged
+       ));                                                 
+}
+
+
+public <CellEditorListenerHandler H> void addNiceCellEditorListener
+  (H this,
+   ChangeEvent ?-> void editingCanceled = null,
+   ChangeEvent ?-> void editingStopped = null          
+   )
+{
+  this.addNCellEditorListener
+    (new NCellEditorListener
+      (editingCanceled: editingCanceled,
+       editingStopped: editingStopped
+       ));
+}
+
+
+public <ListSelectionListenerHandler H> void addListSelectionListener
+  (H this,
+   ListSelectionEvent -> void listSelectionValueChanged      
+   )
+{
+  this.addNListSelectionListener
+    (new NListSelectionListener
+      (listSelectionValueChanged: listSelectionValueChanged
+       ));                                                 
+}
+
+
+public <ListDataListenerHandler H> void addListDataListener
+  (H this,
+   ListDataEvent ?-> void contentsChanged = null,
+   ListDataEvent ?-> void intervalAdded = null,
+   ListDataEvent ?-> void intervalRemoved = null        
+   )
+{
+  this.addNListDataListener
+    (new NListDataListener
+      (contentsChanged: contentsChanged,
+       intervalAdded: intervalAdded,
+       intervalRemoved: intervalRemoved
+       ));
+}
+
+
+public <TreeModelListenerHandler H> void addTreeModelListener
+  (H this,
+   TreeModelEvent ?-> void treeNodesChanged = null,
+   TreeModelEvent ?-> void treeNodesInserted = null,
+   TreeModelEvent ?-> void treeNodesRemoved = null,
+   TreeModelEvent ?-> void treeStructureChanged = null        
+   )
+{
+  this.addNTreeModelListener
+    (new NTreeModelListener
+      (treeNodesChanged: treeNodesChanged,
+       treeNodesInserted: treeNodesInserted,
+       treeNodesRemoved: treeNodesRemoved,
+       treeStructureChanged: treeStructureChanged
+       ));
+}
+
+
+public <TreeSelectionListenerHandler H> void addTreeSelectionListener
+  (H this,
+   TreeSelectionEvent -> void treeSelectionValueChanged      
+   )
+{
+  this.addNTreeSelectionListener
+    (new NTreeSelectionListener
+      (treeSelectionValueChanged: treeSelectionValueChanged
+       ));                                             
+}
+
+
+public <DocumentListenerHandler H> void addDocumentListener
+  (H this,
+   DocumentEvent ?-> void changedUpdate = null,
+   DocumentEvent ?-> void insertUpdate = null,
+   DocumentEvent ?-> void removeUpdate = null                                 
+   )
+{
+  this.addNDocumentListener
+    (new NDocumentListener
+      (changedUpdate: changedUpdate,
+       insertUpdate: insertUpdate,
+       removeUpdate: removeUpdate
+       ));                                          
+}
+
+
+public <TreeExpansionListenerHandler H> void addTreeExpansionListener
+  (H this,
+   TreeExpansionEvent ?-> void treeCollapsed = null,
+   TreeExpansionEvent ?-> void treeExpanded = null
+   )
+{   
+  this.addNTreeExpansionListener
+    (new NTreeExpansionListener(treeCollapsed: treeCollapsed,
+     treeExpanded: treeExpanded
+     ));       
+}
+
+   
+public <TreeModelListenerHandler H> void addTreeModelListener
+  (H this,
+   TreeModelEvent ?-> void treeNodesChanged = null,
+   TreeModelEvent ?-> void treeNodesInserted = null,
+   TreeModelEvent ?-> void treeNodesRemoved = null,
+   TreeModelEvent ?-> void treeStructureChanged = null
+   )
+{
+	this.addNTreeModelListener
+	  (new NTreeModelListener
+  	  (treeNodesChanged: treeNodesChanged,
+  	   treeNodesInserted: treeNodesInserted,
+  	   treeNodesRemoved: treeNodesRemoved,
+  	   treeStructureChanged: treeStructureChanged
+  	   ));
+}
+
+public <TreeWillExpandListenerHandler H> void addTreeWillExpandListener
+  (H this,  
+   TreeExpansionEvent ?-> void treeWillExpand = null,
+   TreeExpansionEvent ?-> void treeWillCollapse = null
+   )
+{  
+  this.addNTreeWillExpandListener
+    (new NTreeWillExpandListener
+      (treeWillCollapse: treeWillCollapse,
+       treeWillExpand: treeWillExpand
+       ));  
+}
+
+
+public <InternalFrameListenerHandler H> void addInternalFrameListener
+  (H this,
+   InternalFrameEvent ?-> void internalFrameActivated = null,
+   InternalFrameEvent ?-> void internalFrameClosed = null,
+   InternalFrameEvent ?-> void internalFrameClosing = null,
+   InternalFrameEvent ?-> void internalFrameDeactivated = null,
+   InternalFrameEvent ?-> void internalFrameDeiconified = null,
+   InternalFrameEvent ?-> void internalFrameIconified = null,
+   InternalFrameEvent ?-> void internalFrameOpened = null        
+   )
+{
+  this.addNInternalFrameListener
+    (new NInternalFrameListener
+      (internalFrameActivated: internalFrameActivated,
+       internalFrameClosed: internalFrameClosed,
+       internalFrameClosing: internalFrameClosing,
+       internalFrameDeactivated: internalFrameDeactivated,
+       internalFrameDeiconified: internalFrameDeiconified,
+       internalFrameIconified: internalFrameIconified,
+       internalFrameOpened: internalFrameOpened
+       ));
+}
+
+
+public <PopupMenuListenerHandler H> void addPopupMenuListener
+  (H this,
+   PopupMenuEvent ?-> void popupMenuCanceled = null,
+   PopupMenuEvent ?-> void popupMenuWillBecomeInvisible = null,
+   PopupMenuEvent ?-> void popupMenuWillBecomeVisible = null          
+   )
+{
+  this.addNPopupMenuListener
+    (new NPopupMenuListener
+      (popupMenuCanceled: popupMenuCanceled,
+       popupMenuWillBecomeInvisible: popupMenuWillBecomeInvisible,
+       popupMenuWillBecomeVisible: popupMenuWillBecomeVisible
+       ));
+}
+
+
+public <HyperlinkListenerHandler H> void addHyperlinkListener
+  (H this,
+   HyperlinkEvent -> void hyperlinkUpdate        
+   )
+{
+  this.addNHyperlinkListener
+    (new NHyperlinkListener
+      (hyperlinkUpdate: hyperlinkUpdate
+       ));
+}
+
+
+public <CaretListenerHandler H> void addCaretListener
+  (H this,
+   CaretEvent -> void caretUpdate         
+   )
+{
+  this.addNCaretListener
+    (new NCaretListener
+      (caretUpdate: caretUpdate
+       ));
+}
+
+
+public <AncestorListenerHandler H> void addAncestorListener
+  (H this,
+   AncestorEvent ?-> void ancestorAdded = null,
+   AncestorEvent ?-> void ancestorMoved = null,
+   AncestorEvent ?-> void ancestorRemoved = null       
+)
+{
+  this.addNAncestorListener
+    (new NAncestorListener
+      (ancestorAdded: ancestorAdded,
+       ancestorMoved: ancestorMoved,
+       ancestorRemoved: ancestorRemoved
+       ));
+}

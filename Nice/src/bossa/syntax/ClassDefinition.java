@@ -37,7 +37,7 @@ public abstract class ClassDefinition extends MethodContainer
 			 extensions, implementations, abstractions);
   }
 
-  static class Interface extends ClassDefinition
+  public static class Interface extends ClassDefinition
   {
     Interface(LocatedString name, 
 	      Constraint typeParameters, List typeParametersVariances,
@@ -187,7 +187,7 @@ public abstract class ClassDefinition extends MethodContainer
 		     superClassIdent, implementations, abstractions);
   }
 
-  static class Class extends ClassDefinition
+  public static class Class extends ClassDefinition
   {
     Class(LocatedString name, 
 	  boolean isFinal, boolean isAbstract, 
@@ -245,7 +245,28 @@ public abstract class ClassDefinition extends MethodContainer
 
     TypeConstructor getSuperClass() { return superClass; }
 
+    public ClassDefinition.Class getSuperClassDefinition()
+    {
+      return (ClassDefinition.Class) ClassDefinition.get(superClass);
+    }
+
     mlsub.typing.Interface[] getInterfaces() { return impl; }
+
+    public ClassDefinition.Interface[] getImplementedInterfaces()
+    {
+      if (impl == null) return null;
+      List res = new LinkedList();
+
+      for (int i = 0; i < impl.length; i++)
+        { 
+          Object itf = ClassDefinition.get(impl[i].associatedTC());
+          if (itf != null)
+            res.add(itf);
+        }
+
+      return (ClassDefinition.Interface[])
+        res.toArray(new ClassDefinition.Interface[res.size()]);
+    }
 
     void resolveClass()
     {
@@ -264,13 +285,9 @@ public abstract class ClassDefinition extends MethodContainer
 	  superClassIdent = null;
 	}
 
-      // Resolve the superclass first.
-      if (superClass != null)
-	{
-	  ClassDefinition d = ClassDefinition.get(superClass);
-	  if (d != null)
-	    d.resolve();
-	}
+      ClassDefinition d = getSuperClassDefinition();
+      if (d != null)
+        d.resolve();
 
       super.resolveClass();
     }

@@ -21,7 +21,7 @@ package bossa.syntax;
 
 import bossa.util.User;
 
-class DefaultMethodImplementation extends MethodImplementation
+public class DefaultMethodImplementation extends MethodImplementation
 {
   DefaultMethodImplementation 
     (LocatedString name, 

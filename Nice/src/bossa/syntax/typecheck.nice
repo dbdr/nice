@@ -671,7 +671,7 @@ typecheck(ExpLocalVariable e)
   MonoSymbol target = notNull(decl.left);
 
   if (! target.used)
-    bossa.util.User.warning(decl, "Unused local variable "  + target.name);
+    bossa.util.User.warning(decl, "Unused local variable " + target.name);
 
   ?mlsub.typing.Monotype type = target.getMonotype();
   Expression value = notNull(e.initValue);
@@ -741,7 +741,7 @@ typecheck(Block.LocalVariable decl)
   MonoSymbol target = notNull(decl.left());
 
   if (! target.used)
-    bossa.util.User.warning(decl, "Unused local variable "  + target.name);
+    bossa.util.User.warning(decl, "Unused local variable " + target.name);
 
   ?Expression value = decl.value;
   if (value == null)
@@ -782,7 +782,7 @@ typecheck(Block.LocalVariable decl)
 typecheck(Block.LocalConstant decl)
 {
   if (! notNull(decl.left).used)
-    bossa.util.User.warning(decl, " Unused local variable "  + notNull(decl.left).name);
+    bossa.util.User.warning(decl, "Unused local variable " + notNull(decl.left).name);
 
   typecheck(decl.value);
   decl.value = notNull(decl.value).noOverloading();

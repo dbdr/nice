@@ -151,21 +151,21 @@ class Person extends Object
 
 <td>
 <blockquote>
-<pre>
-&lt;<FONT COLOR="#b7860b">Any</FONT> T&gt; <FONT COLOR="#b7860b">boolean</FONT> equals(T, T); 
+<PRE>
+&lt;<FONT COLOR="#b7860b">Any</FONT> T&gt; <FONT COLOR="#b7860b">boolean</FONT> <FONT COLOR="#cd0000">equals</FONT>(T, T);
 
-<FONT COLOR="#cd0000">equals</FONT>(o1, o2) = o1==o2; 
+<FONT COLOR="#cd0000">equals</FONT>(o1, o2) = o1==o2;
 
-<FONT COLOR="#0000ee">class</FONT> <FONT COLOR="#cd0000">Person</FONT> 
-{ 
-  <FONT COLOR="#b7860b">String</FONT> name; 
-  <FONT COLOR="#b7860b">int</FONT> age; 
-} 
+<FONT COLOR="#0000ee">class</FONT> <FONT COLOR="#cd0000">Person</FONT>
+{
+  <FONT COLOR="#b7860b">String</FONT> <FONT COLOR="#cd0000">name</FONT>;
+  <FONT COLOR="#b7860b">int</FONT> <FONT COLOR="#cd0000">age</FONT>;
+}
 
-<FONT COLOR="#cd0000">equals</FONT>(p1<FONT COLOR="#0000ee">@</FONT><FONT COLOR="#b7860b">Person</FONT>, p2<FONT COLOR="#0000ee">@</FONT><FONT COLOR="#b7860b">Person</FONT>) =  
-  p1.name.equals(p2.name) &amp;&amp; 
-  p1.age==p2.age; 
-</pre>
+<FONT COLOR="#cd0000">equals</FONT>(p1<FONT COLOR="#0000ee">@</FONT><FONT COLOR="#b7860b">Person</FONT>, p2<FONT COLOR="#0000ee">@</FONT><FONT COLOR="#b7860b">Person</FONT>) =
+  p1.name.equals(p2.name) &amp;&amp;
+  p1.age==p2.age;
+</PRE>
 </blockquote>
 </td>
 </tr>
@@ -188,10 +188,10 @@ holding the results. That is:
 <br>map(f, [e1, ..., en]) = [f(e1), ..., f(en)];
 <br>&nbsp;
 <br>&nbsp;
-<center><table BORDER WIDTH="100%" BGCOLOR="#CCCCCC" >
+<center><table BORDER WIDTH="90%" BGCOLOR="#CCCCCC" >
 <tr>
 <td>
-<center>Java + higher order functions</center>
+<center>Java</center>
 </td>
 
 <td>
@@ -200,31 +200,51 @@ holding the results. That is:
 </tr>
 
 <tr>
-<td>interface Collection
-<br>{
-<br>&nbsp; Collection filter(fun(Object)(boolean) f);
-<br>}
-<p>interface List extends Collection { ... }
-<p>boolean f(Object o) {&nbsp; ... }
-<p>void main(String[] args)
-<br>{
-<br>&nbsp; List l1;
-<br>&nbsp; ...
-<br>&nbsp; List l2 = <font color="#FF0000">(List)</font> l1.filter(f);
-<br>}</td>
+<td>
+<blockquote><pre>
 
-<td>interface Collection&lt;T>
-<br>{
-<br>&nbsp; alike&lt;T> filter(fun(T)(boolean) f);
-<br>}
-<p>interface List&lt;T> extends Collection&lt;T> { ... }
-<p>boolean f(int);
-<p>main(args)
-<br>{
-<br>&nbsp; List&lt;int> l1;
-<br>&nbsp; ...
-<br>&nbsp; List l2 = l1.filter(f);
-<br>}</td>
+interface BooleanFunction
+{
+  boolean apply(Object);
+}
+
+interface Collection
+{
+  Collection filter(booleanFunction f);
+}
+
+interface List extends Collection 
+{ ... }
+
+void main(String[] args)
+{
+  List l1;
+  BooleanFunction f;
+  ...
+  List l2 = <font color="#FF0000">(List)</font> l1.filter(f);
+}
+</pre></blockquote>
+</td>
+
+<td>
+<blockquote><pre>
+<FONT COLOR="#0000ee">interface</FONT> <FONT COLOR="#cd0000">Collection</FONT>&lt;T&gt;
+{
+  <FONT COLOR="#0000ee">alike</FONT>&lt;T&gt; <FONT COLOR="#cd0000">filter</FONT>(<FONT COLOR="#0000ee">fun</FONT>(T)(<FONT COLOR="#b7860b">boolean</FONT>) f);
+}
+
+<FONT COLOR="#0000ee">interface</FONT> <FONT COLOR="#cd0000">List</FONT>&lt;T&gt; <FONT COLOR="#0000ee">extends</FONT> <FONT COLOR="#b7860b">Collection</FONT>&lt;T&gt; 
+{ ... }
+
+<FONT COLOR="#cd0000">main</FONT>(args)
+{
+  <FONT COLOR="#b7860b">List</FONT>&lt;<FONT COLOR="#b7860b">int</FONT>&gt; <FONT COLOR="#cd0000">l1</FONT>;
+  <FONT COLOR="#0000ee">fun</FONT>(<FONT COLOR="#b7860b">int</FONT>)(<FONT COLOR="#b7860b">boolean</FONT>) f;
+  ...
+  <FONT COLOR="#b7860b">List</FONT> <FONT COLOR="#cd0000">l2</FONT> = l1.filter(f);
+}
+</pre></blockquote>
+</td>
 </tr>
 </table></center>
 
@@ -239,7 +259,7 @@ one would like to express that the clone method returns an object of the
 same type as its argument. This is possible in Nice, and it allows for
 cast-less use of clone.
 <br>&nbsp;
-<center><table BORDER WIDTH="100%" BGCOLOR="#CCCCCC" >
+<center><table BORDER WIDTH="90%" BGCOLOR="#CCCCCC" >
 <tr>
 <td>
 <center>Java</center>
@@ -251,24 +271,35 @@ cast-less use of clone.
 </tr>
 
 <tr>
-<td>class Object
-<br>{
-<br>&nbsp; Object clone();
-<br>}
-<p>void main(String[] args)
-<br>{
-<br>&nbsp; java.util.Date d1;
-<br>&nbsp; ...
-<br>&nbsp; java.util.Date d2 = <font color="#FF0000">(Date)</font> d1.clone();
-<br>}</td>
+<td>
+<blockquote><pre>
+class Object
+{
+  Object clone();
+}
 
-<td>&lt;Any T> T clone(T);
-<p>main(args)
-<br>{
-<br>&nbsp; java.util.Date d1;
-<br>&nbsp; ...
-<br>&nbsp; java.util.Date d2 = d2.clone();
-<br>}</td>
+void main(String[] args)
+{
+  java.util.Date d1;
+  ...
+  java.util.Date d2 = <font color="#FF0000">(Date)</font> d1.clone();
+}
+</pre></blockquote>
+</td>
+
+<td>
+<blockquote><pre>
+
+&lt;<FONT COLOR="#b7860b">Any</FONT> T&gt; T <FONT COLOR="#cd0000">clone</FONT>(T);
+
+<FONT COLOR="#cd0000">main</FONT>(args)
+{
+  java.util.Date d1;
+  ...
+  java.util.Date d2 = d1.clone();
+}
+</pre></blockquote>
+</td>
 </tr>
 </table></center>
 

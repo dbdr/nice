@@ -82,7 +82,11 @@ jar:
 	cp src/nice/tools/compiler.jar lib/nice/Nice.jar
 	jar umf src/mainClass lib/nice/Nice.jar -C classes nice -C classes mlsub -C classes bossa -C classes gnu
 	cd src; jar uf ../lib/nice/Nice.jar bossa/syntax/*.class nice/tools/ast/*.class
-	cd stdlib; jar uf ../lib/nice/Nice.jar nice/*/*.nice*
+# package.nicei files must be included since the standard library is used
+# to lookup packages when compiling Nice programs
+# the next two lines do just that
+	cd stdlib; ${NICEC_DEV} nice.getopt
+	cd stdlib; jar uf ../lib/nice/Nice.jar nice/*/package.nicei
 
 dist: jar
 	tar cf lib/nice/Nice-`date +"%Y.%m.%d"`.tar bin/nicer bin/nicec lib/nice/Nice.jar lib/emacs/nice-mode.el
@@ -128,7 +132,6 @@ bootstrap: parser
 		src/gnu/expr/*.java src/gnu/mapping/*.java \
 		src/nice/tools/code/*.java src/mlsub/typing/*.java src/mlsub/typing/lowlevel/*.java \
 		src/bossa/syntax/dispatch.java
-#	cd stdlib; ${NICEC} nice.getopt
 	cd src; ${NICEC} bossa.modules
 	cd src; ${NICEC} nice.tools.ast
 	cd src/bossa/syntax && \

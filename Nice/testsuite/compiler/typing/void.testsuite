@@ -34,3 +34,17 @@ void f(void x) {}
 /// FAIL
   /// Toplevel
 void f(void) {}
+
+/// PASS
+  /// Toplevel
+void f() = 1;
+
+/// PASS
+  /// Toplevel
+void f() = true;
+
+/// PASS
+  /// Toplevel
+boolean doSomethingAndReturnAStatusBoolean() = false;
+
+void f() = doSomethingAndReturnAStatusBoolean();

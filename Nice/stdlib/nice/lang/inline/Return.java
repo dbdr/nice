@@ -40,7 +40,8 @@ public class Return extends Procedure1 implements Inlineable
     Expression[] args = exp.getArgs();
 
     if (args != null && args.length != 0)
-      args[0].compile(comp, new StackTarget(code.getMethod().getReturnType()));
+      args[0].compile(comp, 
+                      Target.pushValue(code.getMethod().getReturnType()));
 
     code.emitReturn();
   }

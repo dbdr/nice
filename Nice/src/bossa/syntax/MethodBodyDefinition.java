@@ -12,7 +12,7 @@
 
 // File    : MethodBodyDefinition.java
 // Created : Thu Jul 01 18:12:46 1999 by bonniot
-//$Modified: Thu Jan 27 16:57:23 2000 by Daniel Bonniot $
+//$Modified: Fri Jan 28 18:24:17 2000 by Daniel Bonniot $
 
 package bossa.syntax;
 
@@ -285,11 +285,14 @@ public class MethodBodyDefinition extends Node
       //Typing.enter(newTypeVars,
       //"Binding-constraint for "+name);
       
-      for(Iterator f=formals.iterator(), p=parameters.iterator();
+      for(Iterator f=formals.iterator(), 
+	    p=parameters.iterator(),
+	    d=definition.type.domain().iterator();
 	  f.hasNext();)
 	{
 	  Pattern pat = (Pattern)f.next();
 	  MonoSymbol sym = (MonoSymbol) p.next();
+	  Monotype def = (Monotype) d.next();
 	  
 	  Monotype type = pat.getType();
 	  if(type==null)
@@ -306,14 +309,27 @@ public class MethodBodyDefinition extends Node
 	  
 	  type.setKind(sym.getMonotype().getKind());
 
-	  if(type instanceof MonotypeConstructor)
-	    Typing.introduce(((MonotypeConstructor) type).getTC());
-	  else
-	    Internal.error("Not implemented ?");
-	  
 	  try{
-	    Typing.leq(type, sym.getMonotype());
+	    if(type instanceof MonotypeConstructor)
+	      {
+		TypeConstructor 
+		  tc = ((MonotypeConstructor) type).getTC(),
+		  patTC = pat.getTC();
+		
+		Typing.introduce(tc);
+		
+		InterfaceDefinition i = patTC.getDefinition().getAssociatedInterface();
+		if(i!=null)
+		  Typing.assertImp(tc, i, false);
+		else
+		  Typing.leq(tc,patTC);
+	      }
+	    else
+	      Internal.error("Not implemented ?");
+	  
+	    //Typing.leq(type, sym.getMonotype());
 	    Typing.leq(sym.getMonotype(), type);
+	    //Typing.leq(type, def); // not sound !!!
 	  }
 	  catch(TypingEx e){
 	    User.error(pat.name, 

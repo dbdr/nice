@@ -180,22 +180,7 @@ public class CallExp extends Expression
 	Typing.leave();
     }
 
-    //computes the resulting type
-
-    /*
-      Optimization:
-      If we know codom is a constant,
-      the constraint parameters<dom is useless.
-    */
-    if(codom.isRigid())
-      return new Polytype(Constraint.True, codom);
-
-    cst = Constraint.and
-      (Polytype.getConstraint(parameters),
-       cst,
-       MonotypeLeqCst.constraint(Polytype.getMonotype(parameters),dom));
-    
-    return new Polytype(cst, codom);
+    return Polytype.apply(funt, parameters);
   }
 
   /****************************************************************
@@ -232,8 +217,6 @@ public class CallExp extends Expression
 				      arguments.inOrder());
 	computedExpressions = arguments.inOrder();
       }
-    
-    type.simplify();
   }
 
   boolean isAssignable()

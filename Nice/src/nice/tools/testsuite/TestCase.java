@@ -462,6 +462,8 @@ public abstract class TestCase {
 				contentWriter.close();
 				writer.close();
 
+				TestNice.getOutput().log("");
+
 				LineNumberReader lines = new LineNumberReader
 					(new StringReader(contentWriter.toString()));
 				String file = "file " + sourceFile.getPackage() + "." + sourceFile.getFileName();

@@ -46,13 +46,13 @@ public class NiceSourceFile {
 	 * TODO
 	 * 
 	 */
-	public static final String DEFAULT_PACKAGE = "defaultpackage";
+	public static final String DEFAULT_PACKAGE = "testcase";
 	
 	/**
 	 * TODO
 	 * 
 	 */
-	private String _package = DEFAULT_PACKAGE + TestNice.getFileCounter();
+	private String _package;
 	/**
 	 * TODO
 	 * 
@@ -234,20 +234,19 @@ public class NiceSourceFile {
 	 * 
 	 */
 	public String getPackage() {
+		if (_package == null)
+			_package = DEFAULT_PACKAGE + TestNice.getFileCounter();
+
 		return _package;
 	}
-	
+
 	/**
 	 * Returns the file name.
-	 * The file name is calculated prom the package name suffixed with
-	 * <code>_main.nice</code>
-	 * 
 	 */
 	public String getFileName() {
-		//return _fileName;
-		return _package + "_main.nice";
+		return "main.nice";
 	}
-	
+
 	/**
 	 * Returns the class name.
 	 * 
@@ -265,8 +264,8 @@ public class NiceSourceFile {
 	public void write() throws TestSuiteException {
 		if (isEmpty())
 			return;
-			
-		File packageFolder = new File(TestNice.getTempFolder(), _package.replace('.', File.separatorChar));
+
+		File packageFolder = new File(TestNice.getTempFolder(), getPackage().replace('.', File.separatorChar));
 		if (! packageFolder.exists()  &&  ! packageFolder.mkdirs())
 			throw new TestSuiteException("could not create folder: " + packageFolder);
 			
@@ -314,7 +313,7 @@ public class NiceSourceFile {
 	 */
 	private void writePackage(BufferedWriter writer) throws IOException {
 		writer.write("package ");
-		writer.write(_package);
+		writer.write(getPackage());
 		writer.write(";");
 		writer.newLine();
 		writer.newLine();
@@ -392,4 +391,5 @@ public class NiceSourceFile {
 
 // Local Variables:
 // tab-width: 2
+// indent-tabs-mode: t
 // End:

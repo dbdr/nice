@@ -1,0 +1,59 @@
+/// PASS
+  /// Toplevel
+class A
+{
+  boolean foo;
+
+  boolean getFoo(boolean other) = other || foo;
+}
+int foo() = 42;
+
+/// PASS
+  /// Toplevel
+class A
+{
+  boolean foo;
+
+  boolean getFoo(boolean other) = foo || other;
+}
+int foo() = 42;
+
+/// PASS
+  /// Toplevel
+class A
+{
+  boolean foo;
+
+  boolean getFoo(boolean other) = other && foo;
+}
+int foo() = 42;
+
+/// PASS
+  /// Toplevel
+class A
+{
+  boolean foo;
+
+  boolean getFoo(boolean other) = foo && other;
+}
+int foo() = 42;
+
+/// PASS
+  /// Toplevel
+class A
+{
+  boolean foo;
+
+  boolean getFoo(?String s) = (s == null) || foo;
+}
+int foo() = 42;
+
+/// PASS
+  /// Toplevel
+class A
+{
+  boolean foo;
+
+  boolean getFoo(?String s) = (s != null) && foo;
+}
+int foo() = 42;

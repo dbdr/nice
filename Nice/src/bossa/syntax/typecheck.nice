@@ -116,7 +116,11 @@ void typecheckAndArgs(Arguments args)
       });
 
     typecheck(args.getExp(1));
-    args.getExp(1).getType();
+    if (l != null) {
+      Expression e = args.getExp(1).noOverloading();
+      args.setExp(1, e);
+      e.getType();
+    }
   }
   finally {
     // There is no else part, but this call is necessary to pop off
@@ -147,7 +151,11 @@ void typecheckOrArgs(Arguments args)
       });
 
     typecheck(args.getExp(1));
-    args.getExp(1).getType();
+    if (l != null) {
+      Expression e = args.getExp(1).noOverloading();
+      args.setExp(1, e);
+      e.getType();
+    }
   }
   finally {
     // There is no else part, but this call is necessary to pop off

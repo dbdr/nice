@@ -12,16 +12,17 @@
 
 // File    : TypeScope.java
 // Created : Fri Jul 09 11:29:17 1999 by bonniot
-//$Modified: Thu Jul 22 15:30:23 1999 by bonniot $
-// Description : a Scope level for types.
-//   Is extended in each node that defined a new scope level
-
+//$Modified: Sat Jul 24 16:45:39 1999 by bonniot $
 
 package bossa.syntax;
 
 import java.util.*;
 import bossa.util.*;
 
+/**
+ * A Scope level for types.
+ * Is extended in each node that defined a new scope level.
+ */
 abstract class TypeScope
 {
   public TypeScope(TypeScope outer)

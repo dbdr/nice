@@ -12,7 +12,7 @@
 
 // File    : Monotype.java
 // Created : Thu Jul 01 19:28:28 1999 by bonniot
-//$Modified: Fri Jul 23 18:46:28 1999 by bonniot $
+//$Modified: Sat Jul 24 18:01:14 1999 by bonniot $
 // Description : Abstract syntactic type, without constraint
 
 package bossa.syntax;
@@ -34,6 +34,19 @@ abstract public class Monotype
     return res;
   }
 
+  /**
+   * Constructs a fresh monotype
+   *
+   * @param associatedVariable a hint to make the name understandable by the user
+   * @param m a monotype the new one should be comparable to
+   * @return the fresh monotype
+   */
+  static MonotypeVar fresh(LocatedString associatedVariable,
+			Monotype m)
+  {
+    return new MonotypeVar(associatedVariable,true);
+  }
+  
   /**************************************************************
    * Scoping
    **************************************************************/

@@ -10,49 +10,66 @@
 /*                                                                        */
 /**************************************************************************/
 
-// File    : AtomicConstraint.java
-// Created : Mon Jul 19 16:40:18 1999 by bonniot
-//$Modified: Sat Jul 24 12:09:42 1999 by bonniot $
+// File    : TypeIdent.java
+// Created : Sat Jul 24 14:02:08 1999 by bonniot
+//$Modified: Sat Jul 24 17:09:16 1999 by bonniot $
 
 package bossa.syntax;
 
 import bossa.util.*;
-import java.util.*;
 
 /**
- * A constraint atom. See childs
+ * A syntactic type identifier.
+ * 
+ * After scoping, it will either reveal to be a 
+ * TypeConstructor or a MonotypeVar.
  *
- * @see Constraint
+ * @author bonniot
  */
-public abstract class AtomicConstraint
+
+public class TypeIdent
+  implements TypeSymbol
 {
-  abstract AtomicConstraint substitute(Map map);
+  public TypeIdent(LocatedString name)
+  {
+    this.name=name;
+  }
 
   /****************************************************************
-   * Scoping
+   * 
    ****************************************************************/
 
-  abstract AtomicConstraint resolve(TypeScope scope);
-
-  static Collection resolve(TypeScope scope, Collection c)
+  TypeSymbol resolve(TypeScope scope)
   {
-    Collection res=new ArrayList(c.size());
-    Iterator i=c.iterator();
-
-    while(i.hasNext())
-      res.add( ((AtomicConstraint)i.next()).resolve(scope));
-
+    TypeSymbol res;
+    res=scope.lookup(name);
+    User.error(res==null,this,name+" is not defined");
     return res;
   }
+  
+  /****************************************************************
+   * Printing
+   ****************************************************************/
 
-  static Collection substitute(Map map, Collection c)
+  public String toString()
   {
-    Collection res=new ArrayList(c.size());
-    Iterator i=c.iterator();
-
-    while(i.hasNext())
-      res.add( ((AtomicConstraint)i.next()).substitute(map));
-
-    return res;
+    return "\""+name+"\"";
   }
+
+  public LocatedString getName()
+  {
+    return name;
+  }
+  
+  public boolean hasName(LocatedString name)
+  {
+    return this.name.equals(name);
+  }
+  
+  public Location location()
+  {
+    return name.location();
+  }
+
+  LocatedString name;
 }

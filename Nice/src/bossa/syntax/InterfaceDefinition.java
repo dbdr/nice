@@ -12,7 +12,7 @@
 
 // File    : InterfaceDefinition.java
 // Created : Thu Jul 01 17:00:14 1999 by bonniot
-//$Modified: Fri Jul 23 19:33:55 1999 by bonniot $
+//$Modified: Sat Jul 24 13:36:26 1999 by bonniot $
 // Description : Abstract syntax for a class definition
 
 package bossa.syntax;
@@ -33,6 +33,15 @@ public class InterfaceDefinition extends Node//TypeSymbol
   public boolean hasName(LocatedString s)
   {
     return name.equals(s);
+  }
+
+  /****************************************************************
+   * 
+   ****************************************************************/
+
+  public TypeSymbol resolve(TypeScope scope)
+  {
+    return this;
   }
 
   void resolveScope()
@@ -63,6 +72,11 @@ public class InterfaceDefinition extends Node//TypeSymbol
   public LocatedString getName()
   {
     return name;
+  }
+
+  public Location location()
+  {
+    return name.location();
   }
 
   LocatedString name;

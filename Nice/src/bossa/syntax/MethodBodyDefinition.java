@@ -12,7 +12,7 @@
 
 // File    : MethodBodyDefinition.java
 // Created : Thu Jul 01 18:12:46 1999 by bonniot
-//$Modified: Fri Jul 23 20:06:26 1999 by bonniot $
+//$Modified: Sat Jul 24 19:15:58 1999 by bonniot $
 // Description : Abstract syntax for a method body
 
 package bossa.syntax;
@@ -56,7 +56,7 @@ public class MethodBodyDefinition extends Node
 
   private Collection buildSymbols(Collection names, Collection types)
   {
-    Collection res=new ArrayList();
+    Collection res=new ArrayList(names.size());
     Iterator n=names.iterator();
     Iterator t=types.iterator();
     
@@ -67,8 +67,12 @@ public class MethodBodyDefinition extends Node
 		   "It needs "+types.size()+
 		   ", not "+names.size()
 		   );
-	res.add(new LocalSymb(((Pattern)n.next()).name,
-			      new Polytype((Monotype)t.next())));
+
+	Pattern p=(Pattern)n.next();
+	Monotype domt=(Monotype)t.next();
+	
+	res.add(new LocalSymb(p.name,
+			      new Polytype(Monotype.fresh(p.name,domt))));
       }
     User.error(t.hasNext(),
 	       "Method body "+this.name+" has not enough parameters");
@@ -106,6 +110,7 @@ public class MethodBodyDefinition extends Node
 
   void resolveScope()
   {
+    Pattern.resolve(typeScope,formals);
     resolveScope(parameters);
     body.resolveScope();
   }
@@ -117,6 +122,21 @@ public class MethodBodyDefinition extends Node
   void typecheck()
   {
     Typing.enter(definition.type,"Method body "+name);
+
+    try{
+      Typing.in
+	(VarSymbol.getType(parameters),
+	 Pattern.getDomain(formals));
+    }
+    catch(TypingEx e) {
+      User.error("Typing error in method body "+name+" :"+e.getMessage());
+    }
+    catch(BadSizeEx e){
+      Internal.error("Bad size in MethodBodyDefinition.typecheck()");
+    }
+    
+    Typing.implies();
+    
     body.typecheck();
     try{
       Type t=body.getType();

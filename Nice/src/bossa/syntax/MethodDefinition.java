@@ -12,7 +12,7 @@
 
 // File    : MethodDefinition.java
 // Created : Thu Jul 01 18:12:46 1999 by bonniot
-//$Modified: Fri Jul 23 20:08:14 1999 by bonniot $
+//$Modified: Sat Jul 24 14:38:32 1999 by bonniot $
 // Description : Abstract syntax for a global method declaration
 
 package bossa.syntax;
@@ -74,9 +74,9 @@ public class MethodDefinition extends LocalSymb implements Definition
 
   void buildScope(VarScope outer, TypeScope ts)
   {
-    this.type.buildScope(ts);
-
     scope=outer;
+
+    this.type.buildScope(ts);
     typeScope=type.typeScope;
   }
 

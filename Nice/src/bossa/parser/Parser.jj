@@ -12,7 +12,7 @@
 
 // File    : parser.jj
 // Created : Thu Jul 01 10:27:05 1999 by bonniot
-//$Modified: Fri Jul 23 20:21:50 1999 by bonniot $
+//$Modified: Sat Jul 24 15:02:57 1999 by bonniot $
 // Description : Parseur JavaCC pour Bossa
 //   Tokens based on the Jazz parser
 
@@ -393,6 +393,16 @@ Collection typeConstructors():
   { return res; }
 }
 
+TypeIdent typeIdent():
+{
+  LocatedString name;
+}
+{
+  name=string()
+  { return new TypeIdent(name);
+  }
+}
+
 TypeSymbol typeSymbol():
 {
   TypeSymbol res;
@@ -448,19 +458,18 @@ Collection monoSymbols():
 /*                          Constraints                                */
 /***********************************************************************/
 
-TypeSymbol binder(Collection atomics):
+TypeIdent binder(Collection atomics):
 {
-  TypeSymbol res;
-  TypeConstructor me,other;
+  TypeIdent first,second=null;
 }
 {
-  (
-   LOOKAHEAD(2) res=monotypeVar()
-  |
-   other=typeConstructor() me=typeConstructor()
-   { atomics.add(new LeqCst(me,other)); res=me; }
-  )
-  { return res; }
+   first=typeIdent() [ second=typeIdent() ]
+   { 
+     if(second==null)
+       return first;
+     atomics.add(new LeqCst(second,first)); 
+     return second; 
+   }
 }
 
 Collection binders(Collection atomics):
@@ -476,14 +485,14 @@ Collection binders(Collection atomics):
 
 AtomicConstraint atomicConstraint():
 {
-  TypeSymbol t1,t2;
+  TypeIdent t1,t2;
   AtomicConstraint res;
 }
 {
   (
-  t1=typeSymbol()
+  t1=typeIdent()
   "<:"
-  t2=typeSymbol()
+  t2=typeIdent()
   { res=new LeqCst(t1,t2); }
   )
   { return res; }
@@ -557,6 +566,9 @@ Monotype monotypeConstructor():
     Collection p=null;
 }
 {
+  // monotypeConstructors with no type parameters (and no "<" ">")
+  // are parsed as MonotypeVars.
+  // This is fixed during scoping
     t=typeConstructor() 
     "<" [  p=monotypes() ] ">"
     { if(p==null) p=new ArrayList(0);

@@ -12,14 +12,16 @@
 
 // File    : Polytype.java
 // Created : Tue Jul 13 12:51:38 1999 by bonniot
-//$Modified: Fri Jul 23 20:23:29 1999 by bonniot $
-// Description : A type with a constraint
+//$Modified: Sat Jul 24 19:18:01 1999 by bonniot $
 
 package bossa.syntax;
 
 import java.util.*;
 import bossa.util.*;
 
+/**
+ * A type with a constraint
+ */
 public class Polytype extends Type
 {
   public Polytype(Constraint cst, Monotype monotype)
@@ -34,6 +36,16 @@ public class Polytype extends Type
     this(Constraint.True(),monotype);
   }
 
+  static Polytype bottom()
+  {
+    MonotypeVar alpha=Monotype.fresh(new LocatedString("alpha",
+						       Location.nowhere()),
+				     null);
+    return new Polytype
+      (new Constraint(alpha,null),
+       alpha);
+  }
+  
   Polytype clonePolytype()
   {
     // we don't clone the monotype, it is unnecessary
@@ -82,6 +94,7 @@ public class Polytype extends Type
 
   void resolve()
   {
+    constraint.resolve(typeScope);
     monotype=monotype.resolve(typeScope);
   }
 

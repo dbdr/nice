@@ -29,7 +29,7 @@ typing: ${TYPING_CLASS}
 
 test: ${TEST_CLASS} parser syntax
 
-parser: ${TOP}/parser/Parser.class
+parser: ${TOP}/parser/Parser.java
 
 ${TOP}/parser/Parser.java: ${TOP}/parser/Parser.jj
 	cd ${TOP}/parser; ${JAVACC} Parser.jj

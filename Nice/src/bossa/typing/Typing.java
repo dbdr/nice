@@ -12,7 +12,7 @@
 
 // File    : Typing.java
 // Created : Tue Jul 20 11:57:17 1999 by bonniot
-//$Modified: Fri Jul 23 20:25:18 1999 by bonniot $
+//$Modified: Sat Jul 24 19:16:54 1999 by bonniot $
 
 package bossa.typing;
 
@@ -57,8 +57,30 @@ abstract public class Typing
     Debug.println("\n# Leaving typing context\n");
   }
 
+  public static void implies()
+  {
+    Debug.println("IMPLIES");
+  }
+  
   /****************************************************************
-   * Polytype <= Polytype
+   * Assertions
+   ****************************************************************/
+
+  public static void leq(Collection c1, Collection c2)
+    throws TypingEx
+  {
+    Internal.error(c1.size()!=c2.size(),"Unequal sizes in assertLeq");
+    Iterator i1=c1.iterator();
+    Iterator i2=c2.iterator();
+    
+    while(i1.hasNext())
+      {
+	leq((Type)i1.next(),(Type)i2.next());
+      }
+  }
+  
+  /****************************************************************
+   * Testing Polytype <= Polytype
    ****************************************************************/
 
   public static void leq(Type t1, Type t2) 
@@ -89,23 +111,34 @@ abstract public class Typing
    * Domains 
    ****************************************************************/
 
+  public static void in(Type type, Domain domain)
+    throws TypingEx
+  {
+    Debug.println(type+" in "+domain);
+  }
+  
   /**
-   * Checks wether the types belong to the corresponding domains
+   * Checks wether types belong to domains
    *
-   * @param domain a collection of Monotypes
    * @param types a collection of Types
+   * @param domains a collection of Domains
    * @exception BadSizeEx the lists have different size
    */
   
-  public static void inDomain(
-			      Collection domain,
-			      Collection types)
-    throws BadSizeEx
+  public static void in(
+			Collection types,
+			Collection domains
+			)
+    throws BadSizeEx, TypingEx
   {
-    int expected=domain.size();
+    int expected=domains.size();
     int actual=types.size();
     if(expected!=actual)
       throw new BadSizeEx(expected, actual);
 
+    Iterator t=types.iterator();
+    Iterator d=domains.iterator();
+    while(t.hasNext())
+      in((Type)t.next(),(Domain)d.next());
   }
 }

@@ -12,7 +12,7 @@
 
 // File    : CallExp.java
 // Created : Mon Jul 05 16:27:27 1999 by bonniot
-//$Modified: Fri Jul 23 20:02:47 1999 by bonniot $
+//$Modified: Sat Jul 24 19:19:55 1999 by bonniot $
 
 package bossa.syntax;
 
@@ -52,16 +52,19 @@ public class CallExp extends Expression
 	       "You have to specify the type parameters for function "+
 	       fun);
 
-    Typing.enter(t,this+"");
+    Typing.enter(t,this.fun+"");
     try{
-      Typing.inDomain(
-		      t.domain(),
-		      Expression.getType(parameters));
+      Typing.in(Expression.getType(parameters),
+		Domain.fromMonotypes(t.domain()));
     }
     catch(BadSizeEx e){
       User.error(this,e.expected+" parameters expected "+
 		 ", not "+e.actual);
     }
+    catch(TypingEx e){
+      User.error(this,e.getMessage());
+    }
+    
     Typing.leave();
 
     Monotype res=t.codomain();

@@ -12,7 +12,7 @@
 
 // File    : LeqCst.java
 // Created : Mon Jul 19 16:42:14 1999 by bonniot
-//$Modified: Fri Jul 23 19:36:13 1999 by bonniot $
+//$Modified: Sat Jul 24 14:13:17 1999 by bonniot $
 // Description : Inequality between type constructors
 
 package bossa.syntax;
@@ -21,7 +21,12 @@ import java.util.*;
 import bossa.util.*;
 
 /**
- * Inequality between type constructors
+ * Inequality constraint.
+ * Should not live after scoping, where we determine
+ * if the constraint is on monotypes or on type constructors
+ *
+ * @see MonotypeLeqCst
+ * @see TypeConstructorLeqCst
  */
 public class LeqCst extends AtomicConstraint
 {
@@ -29,10 +34,28 @@ public class LeqCst extends AtomicConstraint
    * The constraint t1 <: t2
    *
    */
-  public LeqCst(TypeSymbol t1, TypeSymbol t2)
+  public LeqCst(TypeIdent t1, TypeIdent t2)
   {
     this.t1=t1;
     this.t2=t2;
+  }
+
+  /****************************************************************
+   * Scoping
+   ****************************************************************/
+
+  AtomicConstraint resolve(TypeScope scope)
+  {
+    TypeSymbol s1=t1.resolve(scope);
+    TypeSymbol s2=t2.resolve(scope);
+    if(s1 instanceof TypeConstructor && s2 instanceof TypeConstructor)
+      return new TypeConstructorLeqCst((TypeConstructor) s1,
+				       (TypeConstructor) s2);
+    else if(s1 instanceof Monotype && s2 instanceof Monotype)
+      return new MonotypeLeqCst((Monotype) s1,
+				(Monotype) s2);
+    User.error(t1,"Constraint is not well kinded");
+    return null;
   }
 
   AtomicConstraint substitute(Map map)
@@ -54,8 +77,8 @@ public class LeqCst extends AtomicConstraint
 
   public String toString()
   {
-    return t1+"<:"+t2;
+    return t1+"<<"+t2;
   }
 
-  TypeSymbol t1,t2;
+  TypeIdent t1,t2;
 }

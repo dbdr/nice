@@ -12,7 +12,7 @@
 
 // File    : Constraint.java
 // Created : Fri Jul 02 17:51:35 1999 by bonniot
-//$Modified: Fri Jul 23 16:35:53 1999 by bonniot $
+//$Modified: Sat Jul 24 17:58:41 1999 by bonniot $
 
 package bossa.syntax;
 
@@ -43,6 +43,16 @@ public class Constraint
     this.atomics=atomics;
   }
 
+  Constraint(MonotypeVar binder, Collection atomics)
+  {
+    this.binders=new ArrayList(1);
+    binders.add(binder);
+
+    if(atomics==null)
+      atomics=new ArrayList(0);
+    this.atomics=atomics;
+  }
+      
   /**
    * Nickname for True()
    *
@@ -75,6 +85,15 @@ public class Constraint
     c1.binders.addAll(c2.binders);
 
     return res;
+  }
+
+  /****************************************************************
+   * Scoping
+   ****************************************************************/
+
+  void resolve(TypeScope scope)
+  {
+    atomics=AtomicConstraint.resolve(scope,atomics);
   }
 
   Constraint substitute(Map map)

@@ -12,7 +12,7 @@
 
 // File    : TypeSymbol.java
 // Created : Fri Jul 09 11:20:46 1999 by bonniot
-//$Modified: Fri Jul 23 19:33:52 1999 by bonniot $
+//$Modified: Sat Jul 24 14:27:37 1999 by bonniot $
 // Description : Used to lookup Type names
 //   Separed from VarSymbol since it can only appear in types 
 //   (and New expression)
@@ -23,8 +23,12 @@ package bossa.syntax;
 import java.util.*;
 import bossa.util.*;
 
-public interface TypeSymbol
+public interface TypeSymbol extends Located
 {
+  /****************************************************************
+   * Scoping
+   ****************************************************************/
+
   boolean hasName(LocatedString name);
   LocatedString getName();
 }

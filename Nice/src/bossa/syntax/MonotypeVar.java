@@ -12,7 +12,7 @@
 
 // File    : MonotypeVar.java
 // Created : Fri Jul 23 15:36:39 1999 by bonniot
-//$Modified: Fri Jul 23 20:20:58 1999 by bonniot $
+//$Modified: Sat Jul 24 17:15:16 1999 by bonniot $
 
 package bossa.syntax;
 
@@ -29,7 +29,13 @@ public class MonotypeVar extends Monotype
 {
   public MonotypeVar(LocatedString name)
   {
+    this(name,false);
+  }
+
+  public MonotypeVar(LocatedString name, boolean soft)
+  {
     this.name=name;
+    this.soft=soft;
   }
 
   bossa.syntax.Monotype cloneType()
@@ -45,15 +51,23 @@ public class MonotypeVar extends Monotype
   /****************************************************************
    * Scoping
    ****************************************************************/
-  
+
   Monotype resolve(TypeScope ts)
   {
+    if(soft)
+      return this;
+    
     TypeSymbol s=ts.lookup(this.name);
     User.error(s==null,this,this.name+" is not defined");
 
     if(s instanceof Monotype)
       return (Monotype) s;
-    
+
+    // In this case, it was indeed a type constructor,
+    // applied to no type parameters
+    if(s instanceof TypeConstructor)
+      return new MonotypeConstructor((TypeConstructor) s, null);
+
     Internal.error(this,this.name+" is not well kinded :"+s.getClass());
     return null;
   }
@@ -85,4 +99,9 @@ public class MonotypeVar extends Monotype
   }
 
   LocatedString name;
+  /**
+   * If true,  this is really a variable monotype
+   * If false, this must be found in scope
+   */
+  boolean soft;
 }

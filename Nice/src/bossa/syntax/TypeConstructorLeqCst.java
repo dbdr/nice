@@ -10,52 +10,42 @@
 /*                                                                        */
 /**************************************************************************/
 
-// File    : LocatedString.java
-// Created : Fri Jul 09 19:09:47 1999 by bonniot
-//$Modified: Sat Jul 24 17:59:48 1999 by bonniot $
-// Description : A string + location information
+// File    : TypeConstructorLeqCst.java
+// Created : Sat Jul 24 12:02:15 1999 by bonniot
+//$Modified: Sat Jul 24 13:47:28 1999 by bonniot $
 
 package bossa.syntax;
 
 import bossa.util.*;
 
-public class LocatedString 
-  implements Located
+/**
+ * Inequality between TypeConstructors
+ * 
+ * @author bonniot
+ */
+
+public class TypeConstructorLeqCst extends AtomicConstraint
 {
-  public LocatedString(String content, Location loc)
+  public TypeConstructorLeqCst(TypeConstructor m1, TypeConstructor m2)
   {
-    this.content=content;
-    this.location=loc;
+    this.m1=m1;
+    this.m2=m2;
+  }
+
+  AtomicConstraint substitute(java.util.Map m)
+  {
+    return this;
+  }
+
+  AtomicConstraint resolve(TypeScope ts)
+  {
+    return this;
   }
 
   public String toString()
   {
-    return content;
+    return m1+" <: "+m2;
   }
 
-  public Location location()
-  {
-    return location;
-  }
-
-  public boolean equals(Object o)
-  {
-    if(o instanceof LocatedString)
-      return equals((LocatedString) o);
-    else
-      return false;
-  }
-
-  public boolean equals(LocatedString s)
-  {
-    return content.equals(s.content);
-  }
-
-  public int hashCode()
-  {
-    return content.hashCode();
-  }
-
-  String content;
-  Location location;
+  TypeConstructor m1,m2;
 }

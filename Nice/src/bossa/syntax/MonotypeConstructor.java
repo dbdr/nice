@@ -12,7 +12,7 @@
 
 // File    : MonotypeConstructor.java
 // Created : Thu Jul 22 09:15:17 1999 by bonniot
-//$Modified: Fri Jul 23 19:00:05 1999 by bonniot $
+//$Modified: Sat Jul 24 14:52:20 1999 by bonniot $
 // Description : A monotype, build by application of
 //   a type constructor to type parameters
 
@@ -59,8 +59,9 @@ public class MonotypeConstructor extends Monotype
   
   Monotype substitute(Map map)
   {
-    return new MonotypeConstructor(tc,
-				   new TypeParameters(Monotype.substitute(map,parameters.content)));
+    return new MonotypeConstructor
+      (tc,
+       new TypeParameters(Monotype.substitute(map,parameters.content)));
   }
 
   /****************************************************************

@@ -12,7 +12,7 @@
 
 // File    : TypeConstructor.java
 // Created : Thu Jul 08 11:51:09 1999 by bonniot
-//$Modified: Fri Jul 23 19:33:03 1999 by bonniot $
+//$Modified: Sat Jul 24 14:23:41 1999 by bonniot $
 // Description : A class. It "needs" type parameters to become a Monotype
 
 package bossa.syntax;
@@ -82,7 +82,7 @@ public class TypeConstructor
    * Scoping
    ****************************************************************/
 
-  TypeConstructor resolve(TypeScope typeScope)
+  public TypeConstructor resolve(TypeScope typeScope)
   {
     //    if(definition==null)
       {
@@ -93,10 +93,10 @@ public class TypeConstructor
 	  return (TypeConstructor)s;
 	else
 	  {
-	    throw new Error();
-	    /* Internal.error(name,"type constructor is not a type symbol but a "
+	    //	    throw new Error();
+	    Internal.error(name,"type constructor is not a type symbol but a "
 	       +s.getClass()); 
-	       return null;*/
+	       return null;
 	  }
       }
   }

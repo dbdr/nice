@@ -19,5 +19,4 @@ public class Enum
 
   hashCode() = ordinal;
   toString() = name;
-  equals(that@Enum) = this == that;
 }

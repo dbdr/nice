@@ -237,7 +237,6 @@ public class OverloadedSymbolExp extends Expression
     for (int i = 0; i < res.length; i++)
       if (usedArguments != null && usedArguments[i] == 0)
         {
-          System.out.println("Fixing " + i);
           if (domain == null)
             {
               mlsub.typing.Monotype fun = Types.rawType(functionType.getMonotype());

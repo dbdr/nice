@@ -243,6 +243,7 @@ public class NiceClass extends ClassDefinition.ClassImplementation
     {
       method.fieldDecl = classe.addField
 	(sym.name.toString(), Types.javaType(sym.type));
+      method.fieldDecl.setFlag(isFinal,     gnu.expr.Declaration.IS_CONSTANT);
       method.fieldDecl.setFlag(isTransient, gnu.expr.Declaration.TRANSIENT);
       method.fieldDecl.setFlag(isVolatile , gnu.expr.Declaration.VOLATILE);
 

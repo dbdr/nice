@@ -1111,12 +1111,10 @@ String concat2(Collection<String> strings)
       </table>
     </section>
 
-    <section id="conversion"><title>Conversion between numeric primitive types</title>
+    <section id="conversion"><title>Conversion between primitive types</title>
       <para>
 	The numeric primitive types are, from the largest to the smallest:
-	<type>double, float, long, int, short, byte</type>, 
-	and <type>char</type> which is smaller than 
-	<type>int</type> but incomparable with <type>short</type>.
+	<type>double, float, long, int, short, byte</type>.
 	Conversion from a smaller to a larger type is automatic.
 	Conversion from a larger to a smaller type must be done explicitly,
 	since they can lose information about the magnitude of the value.
@@ -1134,6 +1132,18 @@ String concat2(Collection<String> strings)
 	syntax in &java;.
       </para>
       <para>
+      	In most cases, characters should be treatead as abstract entities
+	and not as the numbers that happen to encode them. Therefore,
+	the <literal>char</literal> type is not a numeric type in Nice. 
+	Operations on characters can be performed using the methods of class
+	<literal>java.lang.Character</literal>.
+        Additionally, it is possible to convert a character
+	<literal>c</literal> to its integer value with 
+	<literal>int(c)</literal>,
+	and to convert an integer to the character it encodes with
+	<literal>char(i)</literal>.
+      </para>
+      <para>
         For instance, here is code to read
 	characters from a <type>Reader</type>, whose 
 	<literal>read</literal> method returns an <type>int</type> 
@@ -1142,10 +1152,10 @@ String concat2(Collection<String> strings)
 
 	<example><title>Converting a value of a primitive type</title>
 	<programlisting lang="nice">
-BufferedReader r = new BufferedReader(new InputStreamReader(System.in));
+let reader = new BufferedReader(new InputStreamReader(System.in));
 
 int v;
-while ((v = r.read()) != -1) {
+while ((v = reader.read()) != -1) {
   char c = char(v);
   ... // Do something with the character.
 }</programlisting>

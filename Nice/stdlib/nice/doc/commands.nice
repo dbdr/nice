@@ -44,7 +44,8 @@ String printUsage(Program prg)
 {
   StringBuffer res = new StringBuffer("Usage: ");
   res.append(prg.name);
-  res.append(" [OPTIONS]");
+  if (prg.options.length != 0)
+    res.append(" [OPTIONS]");
   if (prg.arguments != null)
     res.append(' ').append(notNull(prg.arguments).toUpperCase());
   res.append('\n');

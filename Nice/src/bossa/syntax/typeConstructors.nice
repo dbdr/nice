@@ -79,5 +79,9 @@ boolean isInterfaceTC(mlsub.typing.TypeConstructor tc)
 
 boolean isClassTC(mlsub.typing.TypeConstructor tc)
 {
-  return nice.tools.code.Types.get(tc) != null;
+  let c = nice.tools.code.Types.get(tc);
+  if (c instanceof gnu.bytecode.ClassType)
+    return ! c.isInterface();
+
+  return false;
 }  

@@ -2,6 +2,7 @@ nice (0.0.020105) unstable; urgency=low
 
   * Allowed to change the type of native class fields.
     This allows in particular to use System.out.println() and such again.
+  * Fixed type of if expressions in the presence of non-nullness inference.
 
  -- Daniel Bonniot <bonniot@users.sourceforge.net>  Sat,  5 Jan 2002 14:50:37 +0100
 

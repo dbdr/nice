@@ -4,7 +4,10 @@ package nice.lang;
    Primitive booleans.
 */
 
-final class boolean implements BooleanAlgebra = native;
+final class boolean 
+  implements BooleanAlgebra 
+  implements Comparable
+= native;
 
 boolean `==`(boolean, boolean) = native boolean Native.eq(boolean,boolean);
 boolean `!=`(boolean, boolean) = native boolean Native.neq(boolean,boolean);
@@ -26,3 +29,5 @@ var boolean false = FALSE();
 boolean `!`(boolean) = inline nice.tools.code.BooleanOperators("!");
 boolean `&`(boolean, boolean) = inline nice.tools.code.BooleanOperators("&");
 boolean `|`(boolean, boolean) = inline nice.tools.code.BooleanOperators("|");
+
+`<`(b1@boolean, b2@boolean) = b2 || !b1;

@@ -29,7 +29,8 @@ package nice.lang;
 
 final class void = native;
 
-class double /*extends gnu.math.Numeric*/ = native;
+class Number implements Comparable = native java.lang.Number;
+class double extends Number = native;
 class float extends double = native;
 
 class long extends float = native;
@@ -38,6 +39,8 @@ class short extends int = native;
 class byte extends short = native;
 
 class char extends int = native;
+
+double doubleValue(Number) = native double Number.doubleValue();
 
 /****************************************************************
  * Basic functions
@@ -51,7 +54,8 @@ char `!=`(char, char) = native char Native.neq(char,char);
 
 
 <Any T> boolean equals(T,T) = native boolean Object.equals(Object);
-// can be overriden
+
+// can be overriden in nice
 <Any T> boolean eq(T,T);
 eq(o1, o2) = equals(o1, o2);
 
@@ -91,6 +95,27 @@ class Ref<T> { T value; }
 
 <Any T> String `+`(String,T);
 `+`(s@String,o) = concat(s,toString(o));
+
+/****************************************************************
+ * Comparison operators
+ ****************************************************************/
+
+/**
+   For a class to implement Comparable, 
+   it is sufficient to implement the `<` method,
+   since the others can be defined in terms of `<` and boolean negation.
+*/
+abstract interface Comparable
+{
+  boolean `<`(alike);
+  boolean `<=`(alike);
+  boolean `>`(alike);
+  boolean `>=`(alike);
+}
+
+`>`(x, y) = y < x;
+`<=`(x, y) = !(y < x);
+`>=`(x, y) = !(x < y);
 
 /****************************************************************
  * Main

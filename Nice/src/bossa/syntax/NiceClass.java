@@ -14,6 +14,8 @@ package bossa.syntax;
 
 import bossa.util.*;
 import mlsub.typing.*;
+import mlsub.typing.Constraint;
+import mlsub.typing.MonotypeConstructor;
 
 import gnu.bytecode.Access;
 import java.util.*;
@@ -134,12 +136,6 @@ public class NiceClass extends ClassDefinition
 
     createConstructor();
 
-    if (constructorMethod != null)
-      {
-	constructorMethod.buildScope(scope, typeScope);
-	constructorMethod.doResolve();
-      }
-
     //optim
     if (fields.length == 0)
       return;
@@ -222,7 +218,7 @@ public class NiceClass extends ClassDefinition
   }
 
   private FormalParameters.Parameter[] getFieldsAsParameters
-    (int nbFields, mlsub.typing.MonotypeVar[] typeParams)
+    (int nbFields, MonotypeVar[] typeParams)
   {
     nbFields += this.fields.length;
     FormalParameters.Parameter[] res;
@@ -266,9 +262,10 @@ public class NiceClass extends ClassDefinition
 
     constructorMethod = new MethodDeclaration
       (new LocatedString("<init>", location()),
-       new Constraint(typeParams, null),
        values, 
-       Monotype.sure(new mlsub.typing.MonotypeConstructor(this.tc, typeParams)))
+       new Constraint(typeParams, null),
+       Monotype.resolve(typeScope, values.types()),
+       Monotype.sure(new MonotypeConstructor(this.tc, typeParams)))
       {
 	protected gnu.expr.Expression computeCode()
 	{
@@ -278,6 +275,9 @@ public class NiceClass extends ClassDefinition
 	public void printInterface(java.io.PrintWriter s)
 	{ throw new Error("Should not be called"); }
       };
+    values.buildScope(scope, typeScope);
+    values.doResolve();
+
     TypeConstructors.addConstructor(tc, constructorMethod);
   }
 

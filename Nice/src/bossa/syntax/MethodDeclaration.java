@@ -78,28 +78,20 @@ abstract public class MethodDeclaration extends Definition
 		    Monotype[] parameters, 
 		    Monotype returnType)
   {
-    super(name, Node.global);
-
-    arity = (parameters == null ? 0 : parameters.length);
-    type = new Polytype(cst, new FunType(parameters, returnType));
-    symbol = new MethodDeclaration.Symbol(name, type);
+    this(name, null, cst, parameters, returnType);
   }
 
-  /** 
-  */
   MethodDeclaration(LocatedString name,
-		    bossa.syntax.Constraint cst,
-		    FormalParameters parameters, 
+		    FormalParameters formals,
+		    Constraint cst,
+		    Monotype[] parameters, 
 		    Monotype returnType)
   {
     super(name, Node.global);
-
-    this.parameters = parameters;
-    addChild(parameters);
-    arity = parameters.size;
-    symbol = new MethodDeclaration.Symbol(name, cst, bossa.syntax.Monotype.create(returnType));
-    symbol.propagate = Node.global;
-    addChild(symbol);
+    this.parameters = formals;
+    arity = (parameters == null ? 0 : parameters.length);
+    type = new Polytype(cst, new FunType(parameters, returnType));
+    symbol = new MethodDeclaration.Symbol(name, type);
   }
 
   private Polytype type;

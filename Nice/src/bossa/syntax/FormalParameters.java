@@ -193,14 +193,14 @@ public class FormalParameters extends Node
 	parameters[i].type = parameters[i].type.substitute(map);
   }
   
-  java.util.List /* of Monotype */ types()
+  Monotype[] types()
   {
     if (parameters == null)
       return null;
     
-    java.util.List res = new java.util.ArrayList(size);
+    Monotype[] res = new Monotype[size];
     for (int i = 0; i < size; i++)
-      res.add(parameters[i].type);
+      res[i] = parameters[i].type;
     return res;
   }
 

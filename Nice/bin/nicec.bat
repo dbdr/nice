@@ -10,6 +10,27 @@ rem ---------------------------------------------------------------------------
 rem -- do we have a nice environment variable?
 if not "%NICE%" == "" goto gotNice
 
+rem -- try some standard places
+
+set NICE=c:\nice
+if exist %NICE%\nice.jar goto gotNice
+
+set NICE=c:\Program Files\nice
+if exist %NICE%\nice.jar goto gotNice
+
+set NICE=c:\programs\nice
+if exist %NICE%\nice.jar goto gotNice
+
+set NICE=d:\nice
+if exist %NICE%\nice.jar goto gotNice
+
+set NICE=d:\Program Files\nice
+if exist %NICE%\nice.jar goto gotNice
+
+set NICE=d:\programs\nice
+if exist %NICE%\nice.jar goto gotNice
+
+
 echo You must set the NICE environment variable to point to the directory you've installed nice in e.g.
 echo set NICE=C:\programs\nice	(note: do not add a ';' at the end) 
 echo You can do it by modifying Autoexec.bat or in the system settings.

@@ -792,6 +792,9 @@ public class Package implements mlsub.compilation.Module, Located, bossa.syntax.
 	
 	argTypes = meth.arg_types;
 	retType  = meth.return_type;
+        // Make sure we use the same bytecode name, since compiled code
+        // can rely on it.
+        name = meth.getName();
       }
     else // Get type information from the nice declaration
       {

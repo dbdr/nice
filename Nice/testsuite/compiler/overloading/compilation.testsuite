@@ -1,0 +1,39 @@
+/// PASS
+  /// package a
+  /// Toplevel
+// Two methods that have the same bytecode type
+int foo(int, int->int) = 1;
+int foo(int, String->int) = 2;
+
+// Calling from the same package
+void test()
+{
+  assert foo(0, int x => 0) == 1;
+  assert foo(0, String x => 0) == 2;
+}
+
+  /// package b import a
+  test();
+  // Now calling from a different package
+  assert foo(0, int x => 0) == 1;
+  assert foo(0, String x => 0) == 2;
+
+/// PASS
+  /// package a
+  /// Toplevel
+// Two methods that have the same bytecode type
+int foo(int, int->int) = 1;
+int foo(int, String->int) = 2;
+
+// Calling from the same package
+void test()
+{
+  assert foo(0, int x => 0) == 1;
+  assert foo(0, String x => 0) == 2;
+}
+
+  /// package b import a
+  test();
+  // Now calling from a different package, in the opposite order
+  assert foo(0, String x => 0) == 2;
+  assert foo(0, int x => 0) == 1;

@@ -7,7 +7,8 @@ nice (0.9.4) unstable; urgency=low
   * Added source-level debugging information for recent debuggers (jsr 45).
   * Generate more efficient code for anonymous functions that do not capture
     the environment. This also avoids a memory leak.
-  * Bug fixes (error reporting for certain overloading by expected type).
+  * Bug fixes (error reporting for certain overloading by expected type,
+    recompilation of overloaded methods with the same bytecode types).
 
  --
 

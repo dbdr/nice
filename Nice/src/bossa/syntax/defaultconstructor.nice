@@ -29,28 +29,34 @@ class DefaultConstructor extends Constructor
   List<NewField> fields;
   ?MethodDeclaration parent;
 
-  /** Call the constructor, with all the arguments. */
-  private ?gnu.expr.Expression initialize = null;
-  /** Call the constructor, with all the arguments, with an implicit this argument. */
-  private ?gnu.expr.Expression initializeFromConstructor = null;
-  /** Call the constructor, with only non-default arguments. */
-  private ?gnu.expr.Expression initializeOmitDefaults = null;
-  /** Instantiate the class, calling the constructor with all the arguments. */
-  private ?gnu.expr.Expression instantiate = null;
+  private CompiledConstructor compiledFull = cast(null);
+  private ?CompiledConstructor compiledMini = null;
 
   getInitializationCode(implicitThis)
   {
     this.getCode();
-    return notNull(initializeFromConstructor);
+    return notNull(compiledFull.initialization);
   }
 
   getConstructorInvocation(omitDefaults)
   {
     this.getCode();
     return
-      // lambdaOmitDefaults is null if the two versions are identical
-      omitDefaults && initializeOmitDefaults != null
-      ? notNull(initializeOmitDefaults) : notNull(initialize);
+      // compiledMini is null if the two versions are identical
+      omitDefaults && compiledMini != null
+    ? notNull(compiledMini).invoke : compiledFull.invoke;
+  }
+
+  void createFirstPass()
+  {
+    // We want to create bytecode methods in two passes to guarantee a
+    // consistent behaviour in case versions with and without defaults omitted
+    // clash.
+
+    // Create the full version first. At the moment class methods are created
+    // in reverse order, so they don't get the priority for unmangled names.
+    compiledFull = new CompiledConstructor(constructor: this);
+    compiledFull.createMethod(false);
   }
 
   computeCode()
@@ -58,68 +64,24 @@ class DefaultConstructor extends Constructor
     if (classe.getDefinition().inInterfaceFile())
       throw new Error("Constructors are loaded from the compiled package");
 
-    this.createBytecode(true);
-    this.createBytecode(false);
-    return notNull(instantiate);
+    compiledMini = new CompiledConstructor(constructor: this).createMethod(true);
+
+    // Add attributes useful for the nice compiler. These are not needed
+    // for the version omitting defaults, since that one is only there for
+    // Java users' sake.
+    compiledFull.lambda.addBytecodeAttribute(notNull(parameters).asBytecodeAttribute());
+    compiledFull.lambda.addBytecodeAttribute(new gnu.bytecode.MiscAttr("default"));
+
+    return notNull(compiledFull.instantiate);
   }
 
-  /**
-     @param omitDefaults if true, do not take the value of fields with
-            default values as parameters, but use that default instead.
-  */
-  private void createBytecode(boolean omitDefaults)
+  compile()
   {
-    gnu.bytecode.ClassType thisType = cast(this.javaReturnType());
-    let thisDecl = new gnu.expr.Declaration("this");
-    thisDecl.setType(thisType);
-    let thisExp = new gnu.expr.ThisExp(thisDecl);
+    this.getCode();
 
-    let fullArgs = notNull(parameters).getMonoSymbols();
-    let fullArgTypes = this.javaArgTypes();
-
-    List<MonoSymbol> args = new LinkedList();
-    List<gnu.bytecode.Type> argTypes = new LinkedList();
-
-    for (int i = 0; i < notNull(parameters).size; i++)
-      {
-        if (omitDefaults && notNull(parameters).hasDefaultValue(i))
-          continue;
-
-        args.add(fullArgs[i]);
-        argTypes.add(fullArgTypes[i]);
-      }
-
-    // Do not create a second constructor omiting defaults if there is
-    // no default to omit!
-    if (omitDefaults && args.size() == fullArgs.length)
-      return;
-
-    let argTypesArray = argTypes.toArray();
-    let argsArray = args.toArray();
-
-    let lambda = generateConstructor
-      (thisDecl, argTypesArray, argsArray);
-    lambda.setSuperCall(this.callSuper(thisExp, fullArgs, omitDefaults));
-
-    nice.tools.code.Gen.setMethodBody(lambda, this.body(thisExp, fullArgs, omitDefaults));
-    classe.getClassExp().addMethod(lambda);
-
-    if (! omitDefaults)
-      {
-        initialize = new gnu.expr.QuoteExp(new gnu.expr.InitializeProc(lambda));
-        initializeFromConstructor = new gnu.expr.QuoteExp(new gnu.expr.InitializeProc(lambda, true));
-        instantiate = new gnu.expr.QuoteExp(new gnu.expr.InstantiateProc(lambda));
-
-        // Add attributes useful for the nice compiler. These are not needed
-        // for the version omitting defaults, since that one is only there for
-        // Java users' sake.
-        lambda.addBytecodeAttribute(notNull(parameters).asBytecodeAttribute());
-        lambda.addBytecodeAttribute(new gnu.bytecode.MiscAttr("default"));
-      }
-    else
-      {
-        initializeOmitDefaults = new gnu.expr.QuoteExp(new gnu.expr.InitializeProc(lambda));
-      }
+    if (compiledMini != null)
+      notNull(compiledMini).compileBody(true);
+    compiledFull.compileBody(false);
   }
 
   private gnu.expr.Expression callSuper(gnu.expr.Expression thisExp, MonoSymbol[] args,
@@ -179,3 +141,86 @@ class DefaultConstructor extends Constructor
 let gnu.expr.Expression objectConstructor = new gnu.expr.QuoteExp
 	(new gnu.expr.InitializeProc(
 	notNull(gnu.bytecode.Type.pointer_type).getDeclaredMethod("<init>", 0)));
+
+/**
+   A wrapper for a bytecode version of this constructor.
+
+   One instance of this class is used to hold the version with all parameters,
+   another one holds the version where fields with default values are omitted.
+*/
+private class CompiledConstructor
+{
+  DefaultConstructor constructor;
+
+  /** Call the constructor. */
+  private gnu.expr.Expression invoke = cast(null);
+
+  /** Call the constructor with an implicit this argument. */
+  private ?gnu.expr.Expression initialization = null;
+
+  /** Instantiate the class then call the constructor. */
+  private ?gnu.expr.Expression instantiate = null;
+
+  // Things that need to be remembered from the method constructor
+  // to the compilation of the body.
+
+  gnu.expr.ConstructorExp lambda = cast(null);
+
+  private MonoSymbol[] fullArgs = cast(null);
+
+  /**
+     @param omitDefaults if true, do not take the value of fields with
+            default values as parameters, but use that default instead.
+  */
+  private ?CompiledConstructor createMethod(boolean omitDefaults)
+  {
+    gnu.bytecode.ClassType thisType = cast(constructor.javaReturnType());
+    let thisDecl = new gnu.expr.Declaration("this");
+    thisDecl.setType(thisType);
+
+    let parameters = constructor.parameters;
+
+    fullArgs = notNull(parameters).getMonoSymbols();
+    let fullArgTypes = constructor.javaArgTypes();
+
+    List<MonoSymbol> args = new LinkedList();
+    List<gnu.bytecode.Type> argTypes = new LinkedList();
+
+    for (int i = 0; i < notNull(parameters).size; i++)
+      {
+        if (omitDefaults && notNull(parameters).hasDefaultValue(i))
+          continue;
+
+        args.add(fullArgs[i]);
+        argTypes.add(fullArgTypes[i]);
+      }
+
+    // Do not create a second constructor omiting defaults if there is
+    // no default to omit!
+    if (omitDefaults && args.size() == fullArgs.length)
+      return null;
+
+    lambda = generateConstructor(thisDecl, argTypes.toArray(), args.toArray());
+    constructor.classe.getClassExp().addMethod(lambda);
+
+    invoke = new gnu.expr.QuoteExp(new gnu.expr.InitializeProc(lambda));
+
+    if (! omitDefaults)
+      {
+	initialization = new gnu.expr.QuoteExp(new gnu.expr.InitializeProc(lambda, true));
+	instantiate = new gnu.expr.QuoteExp(new gnu.expr.InstantiateProc(lambda));
+      }
+
+    return this;
+  }
+
+  private void compileBody(boolean omitDefaults)
+  {
+    let thisExp = new gnu.expr.ThisExp(lambda.getThisDecl());
+
+    lambda.setSuperCall(constructor.callSuper(thisExp, fullArgs, omitDefaults));
+
+    nice.tools.code.Gen.setMethodBody
+      (lambda, constructor.body(thisExp, fullArgs, omitDefaults));
+  }
+}

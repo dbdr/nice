@@ -54,6 +54,8 @@ public class EnumDefinition extends Definition
   {
     for (symbol : symbols)
       symbol.compileValue();
+
+    classDef.compile();
   }
 
   toString() = representation;

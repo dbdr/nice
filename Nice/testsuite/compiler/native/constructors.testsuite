@@ -29,15 +29,18 @@
 
 /// PASS
   /// package pkg
-  /* java.lang.Thread has many constructors, including 
+  /* java.lang.Thread has many constructors, including
      one () and one (Runnable).
      There is therefore ambiguity in A(Runnable x) between
        super.() + this.dummy = x
      and
        super.(x) + this.dummy = null
      In this case the second interpretation must be taken.
+     The rationale is that you should be able to use the inherited constructor
+     as usual. You can always use the full constructor to specify all values.
+     Most important is, this is better specified than random.
   */
-  
+
   Class c = Class.forName("pkg.A");
   Constructor make = c.getConstructor([Runnable.class]);
 
@@ -48,13 +51,29 @@
   instance.start();
   try { instance.join(); }
   catch(InterruptedException ex) {}
-  
+
   assert ran;
 
   /// Toplevel
   import java.lang.reflect.*;
 
   class A extends Thread { ?Runnable dummy = null; }
+
+/// PASS
+  // Simpler testcase than the one using Thread.
+  /// package pkg
+  Class c = Class.forName("pkg.A");
+  Constructor make = c.getConstructor([Collection.class]);
+
+  Collection<Object> col = new ArrayList();
+
+  A<Object> instance = cast(make.newInstance([col]));
+  assert instance.dummy == null;
+
+  /// Toplevel
+  import java.lang.reflect.*;
+
+  class A<T> extends LinkedList<T> { ?Collection<T> dummy = null; }
 
 /// PASS
   // bug #1090888

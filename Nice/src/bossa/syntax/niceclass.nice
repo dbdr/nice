@@ -46,7 +46,7 @@ public class NiceClass extends ClassImplementation
 
   /** List of symbols for calling constructors of this class. */
   private List<MethodSymbol> constructors = new ArrayList();
-  private Constructor[?] constructorMethod = null;
+  private DefaultConstructor[?] constructorMethod = null;
 
   // Used to resolve fields, and constructor constraint.
   private ?TypeScope localScope = null;
@@ -558,7 +558,7 @@ public class NiceClass extends ClassImplementation
     else
       cst = mlsub.typing.Constraint.True;
 
-    constructorMethod = cast(new Constructor[allConstructorParams.size()]);
+    constructorMethod = cast(new DefaultConstructor[allConstructorParams.size()]);
     for (int i = 0; i < allConstructorParams.size(); i++)
       {
         (?MethodDeclaration parent, List<Parameter> params) = allConstructorParams[i];
@@ -596,6 +596,14 @@ public class NiceClass extends ClassImplementation
     // but before compilation.
     for (field : fields)
       field.createField();
+
+    // Creating constructor methods needs to be done even if we don't recompile
+    // since classes are always regenerated.
+    // We want to do it in two passes to guarantee a consistent behaviour
+    // in case versions with and without defaults omitted clash.
+    if (constructorMethod != null)
+      for (cm : notNull(constructorMethod))
+	cm.createFirstPass();
   }
 
   compile()
@@ -613,7 +621,7 @@ public class NiceClass extends ClassImplementation
     // since classes are always regenerated.
     if (constructorMethod != null)
       for (cm : notNull(constructorMethod))
-	cm.getCode();
+	cm.compile();
 
     // Take into account external interface implementations, which 
     // can add new interfaces to implement in the bytecode.

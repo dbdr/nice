@@ -44,6 +44,8 @@ public class ConstructorExp extends LambdaExp
   private ClassType classType;
   private Expression superCall;
 
+  public Declaration  getThisDecl() { return thisDecl; }
+
   ClassType getClassType() { return classType; }
 
   public Method getMainMethod()

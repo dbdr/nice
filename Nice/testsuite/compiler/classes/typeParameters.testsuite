@@ -237,6 +237,7 @@ class II<T> {
 }
 
 /// PASS
+  Foo<int> foo = new Foo();
   /// Toplevel
 interface A<T> {}
 interface C<T> {}

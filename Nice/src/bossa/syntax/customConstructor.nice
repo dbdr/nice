@@ -35,7 +35,7 @@ public class CustomConstructor extends UserOperator
       (this.getType().getConstraint(),
        new mlsub.typing.FunType(this.getArgTypes(), nice.tools.typing.PrimitiveType.voidType));
     notNull(classe).addConstructorCallSymbol(
-	dispatch.createConstructorCallSymbol(this, name, type));
+	createConstructorCallSymbol(this, name, type));
   }
 
   resolve()

@@ -656,6 +656,12 @@ analyse(t@TryStmt, info)
     info.setUnreachable();
 }
 
+analyse(s@SynchronizedStmt, info)
+{
+  s.object = analyse(s.object, info);
+  analyse(s.body, info);
+}
+
 /****************************************************************
  * Misc
  ****************************************************************/

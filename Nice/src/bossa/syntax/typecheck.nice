@@ -501,6 +501,22 @@ typecheck(t@TryStmt)
   typecheck(t.finallyBody);
 }
 
+typecheck(s@SynchronizedStmt)
+{
+  mlsub.typing.Polytype type = notNull(s.object).getType();
+  if (isPrimitive(type))
+    throw bossa.util.User.error(s.object, 
+		     "Synchronization cannot be done on primitive values");
+  try {
+    checkNotNull(type);
+  }
+  catch(TypingEx ex) {
+    throw new bossa.util.UserError(s.object, "" + s.object + " might be null");
+  }
+
+    
+  typecheck(s.body);
+}
 
 /****************************************************************
  * Error handling
@@ -565,6 +581,25 @@ void wrongReturnType(bossa.util.Located responsible,
     message = message + "\n\nLowlevel error: " + e;
 
   throw new bossa.util.UserError(responsible, message);
+}
+
+boolean isPrimitive(mlsub.typing.Polytype type) =
+  nice.tools.code.Types.javaType(type) instanceof gnu.bytecode.PrimType;
+
+void checkNotNull(mlsub.typing.Polytype type)
+{
+  if (type.isMonomorphic())
+    Typing.leq(type.getMonotype(), PrimitiveType.sureTC);
+  else
+    try {
+    Typing.enter();
+    type.getConstraint().assert();
+    Typing.leq(type.getMonotype(), PrimitiveType.sureTC);
+    Typing.implies();
+  }
+  finally {
+    Typing.leave();
+  }
 }
 
 // Local Variables:

@@ -179,6 +179,7 @@ TOKEN: /* Keywords */
 //| < THIS:       "this"       	>
 | < SUPER:      "super"         >
 | < INSTANCEOF: "instanceof" 	>
+| < SYNCHRONIZED: "synchronized">
 | < NEW:        "new"        	>
 | < NULL:	"null"		>
 
@@ -2064,10 +2065,8 @@ Statement Statement() :
 |
   res=TryStatement()
 
-/*
 |
   res=SynchronizedStatement()
-*/
   )
   { 
     if (res != null)
@@ -2402,10 +2401,9 @@ Statement TryStatement() :
   { return res; }
 }
 
-/*
 Statement SynchronizedStatement() :
-{ Statement res; }
+{ Expression object; Statement body; }
 {
-  "synchronized" "(" Expression() ")" Block()
+  "synchronized" "(" object=Expression() ")" body=Block()
+  { return new SynchronizedStmt(object, body); }
 }
-*/

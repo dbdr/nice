@@ -1,5 +1,6 @@
 nice (0.7.2) unstable; urgency=low
 
+  * Implemented synchronized statements.
   * Implemented bitwise complement and "get bit" on long integers.
 
  --

@@ -1,0 +1,17 @@
+/// PASS
+  String s = "A";
+  synchronized(s) { }
+
+/// FAIL
+  // COMMENT Synchronization cannot be done on primitive values.
+  int i = 0;
+  synchronized(i) { }
+
+/// FAIL
+  // COMMENT Synchronization must be done on non-null values.
+  synchronized(null) { }
+
+/// FAIL
+  // COMMENT Synchronization must be done on non-null values.
+  ?String s = "S";
+  synchronized(s) { }

@@ -207,7 +207,7 @@ int compile(String[] args)
   return OutputMessages.getStatusCode();
 }
 
-main(args)
+void main(String[] args)
 {
   int status = compile(args);
 

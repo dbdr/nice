@@ -356,11 +356,10 @@ public abstract class TestCase {
 				if (sourceFile.hasMainMethod()
 					&&  ! _dontCompilePackages.contains(sourceFile.getPackage()))
 				{
+					ClassLoader loader = TestNice.getClassLoader();
 					try {
 						Class c = Class.forName
-							(sourceFile.getPackage() + ".fun",
-							 true,
-							 TestNice.getClassLoader());
+							(sourceFile.getPackage() + ".fun", true, loader);
 						Class[] parameterTypes = new Class[] {String[].class};
 						Method m = c.getMethod("main", parameterTypes);
 						Object[] arguments = new Object[] {new String[0]};
@@ -370,7 +369,8 @@ public abstract class TestCase {
 							throw e.getTargetException();
 						}
 					} catch(Throwable e) {
-						e.printStackTrace(out);
+						nice.lang.dispatch.printStackTraceWithSourceInfo
+							(e, out, loader);
 						throw new TestSuiteException("Exception while invoking main()", e);
 					}
 				}
@@ -461,9 +461,15 @@ public abstract class TestCase {
 				sourceFile.write(writer);
 				contentWriter.close();
 				writer.close();
+
+				LineNumberReader lines = new LineNumberReader
+					(new StringReader(contentWriter.toString()));
+				String file = "file " + sourceFile.getPackage() + "." + sourceFile.getFileName();
+				String line;
+				while ((line = lines.readLine()) != null)
+					TestNice.getOutput().log(file + ":" + lines.getLineNumber(), line);
 			} catch(IOException e) {e.printStackTrace();}
-			TestNice.getOutput().log("file " + sourceFile.getPackage() + "." + sourceFile.getFileName(),
-						contentWriter.toString());
+
 			TestNice.getOutput().log("");
 		}
 		//	global file
@@ -539,4 +545,5 @@ public abstract class TestCase {
 
 // Local Variables:
 // tab-width: 2
+// indent-tabs-mode: t
 // End:

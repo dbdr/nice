@@ -38,7 +38,7 @@ nice (0.9.2) unstable; urgency=low
   * Bugfixes (incrementation of byte local variables, require a default value
     for global variables, ...)
 
- --
+ -- Daniel Bonniot <bonniot@users.sourceforge.net>  Sat, 13 Sep 2003 02:40:46 +0200
 
 nice (0.9.1) unstable; urgency=low
 

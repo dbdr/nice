@@ -3,13 +3,14 @@
 'http://www.oasis-open.org/docbook/xml/4.1.2/docbookx.dtd' [ 
 <!ENTITY nice "Nice">
 <!ENTITY java "Java">
+<!ENTITY NULL "<literal>null</literal>">
 ]>
 
 <book>
   <bookinfo>
     <title>The Nice user's manual</title>
     <author><firstname>Daniel</firstname><surname>Bonniot</surname></author>
-    <copyright><year>2002</year><holder>Daniel Bonniot</holder></copyright>
+    <copyright><year>2003</year><holder>Daniel Bonniot</holder></copyright>
   </bookinfo>
   <preface><title>Foreword</title>
     <para>
@@ -21,6 +22,10 @@
       which contains lots of additional information.
       Both documents currently assume some knowledge of Java, or at least
       of an object oriented language.
+    </para>
+
+    <para>
+      The authors of this manual are Bryn Keller and Daniel Bonniot.
     </para>
   </preface>
 
@@ -180,11 +185,96 @@ void test()
 
     <section><title>Parametric classes</title>
       <para>
+        A powerful feature of Nice is the ability to define 
+        <firstterm>parametric classes</firstterm>.
+        Parametric classes are like templates in C++, or similar constructs in
+        various functional languages. Programming with parametric classes is
+        sometimes called <firstterm>generic programming</firstterm>.
+      </para>      
+      <para>
+        A parametric (or parameterized) class is simply a class which has a 
+        parameter. In this case the parameter is a <emphasis>type</emphasis>
+        rather than a value. You can consider a parametric class as a family
+        of related classes, all of which have the same behavior and structure
+        except for the part that is parameterized. A common case where this
+        is useful is in data structures.
+      </para>
+  <example><title>Simple Java Collection</title>
+	<programlisting lang="java">
+class Stack
+{
+  List contents = new LinkedList();
+  void push(Object o) 
+  {
+    contents.add(o);
+  }
+  
+  //... omitted methods
+
+  public static void main(String[] args)
+  {
+    Stack st = new Stack();
+    st.push("Test");
+    Integer num = (Integer)st.pop(); // Runtime error
+  }
+}
+</programlisting>
+      </example>
+      <para>
+        There is a big type safety problem here.
+        We pushed a String on to the stack, and then tried to pop it off into
+        an Integer, resulting in an exception at runtime. Parametric classes
+        can solve this problem.
+      </para>
+  <example><title>Simple Nice Collection</title>
+	<programlisting lang="nice"><![CDATA[
+class Stack<T>
+{
+  List<T> contents = new LinkedList();
+  void push(T t) 
+  {
+    contents.add(t);
+  }
+  
+  //... omitted methods
+
+}
+
+void main(String[] args)
+{
+  Stack<String> st = new Stack();
+  st.push("Test");
+  Integer num = st.pop(); // Compile time error!
+}
+]]></programlisting>
+      </example>
+      <para>
+        In the Nice version, we've parameterized <classname>Stack</classname> by 
+        a type <type>T</type>. Essentially, <classname>Stack&lt;T&gt;</classname> 
+        is a recipe for the compiler that tells it how to create a Stack that 
+        works for any given type. So now the compiler knows that we only mean 
+        for Strings to go into our stack, and it reports an error when we
+        write code that expects an Integer to come out of our 
+        <classname>Stack&lt;String&gt;</classname>. 
       </para>
     </section>
 
     <section><title>Functions and methods</title>
       <para>
+        Nice makes a simple distinction between functions and methods:
+        Methods can be overridden and specialized, and functions cannot. A 
+        function is just a reusable piece of code, much like a procedure
+        in a language like Pascal or C, whereas a method may use different
+        code depending on the types of its arguments, like methods in most
+        object-oriented languages. We use the term <firstterm>functionals</firstterm>
+        when we want to refer to both functions and methods without making
+        a distinction.
+      </para>
+      <para>        
+        Functions and methods in Nice have some important differences from
+        other languages you may be used to - they are <firstterm>first class</firstterm>,
+        which means they can be passed as arguments to other functionals, or
+        used as return values from functionals.
       </para>
     </section>
   </chapter>
@@ -192,7 +282,25 @@ void test()
   <chapter id="function"><title>Functions</title>
     <section><title>Declaration</title>
       <para>
+       Functions are declared like this:
       </para>
+
+      <para>
+       <literal>[type-parameters] return-type 
+        function-name([parameters]) { body }</literal>
+      </para>
+
+      <para>
+       Where parameters and type-parameters are optional. There is a also
+       a special case for functions whose body consists of a single expression:
+      </para>
+
+      <para>
+       <literal>[type-parameters] return-type function-name([parameters]) 
+        = expression;</literal>
+      </para>
+
+      
     </section>
 
     <section id="namedParameters"><title>Named parameters</title>
@@ -248,11 +356,85 @@ copy(from: f1, to: f2, bufferSize: 4000);</programlisting>
   <chapter id="method"><title>Methods</title>
     <section><title>Declaring methods</title>
       <para>
+        Method declaration takes the following form:
+      </para>
+
+      <para>
+        <literal>[type-parameters] return-type 
+        method-name([parameters]);</literal>
+      </para>
+
+      <para>
+        The syntax is very similar to that for functions, but no body is 
+        provided. Note that in Nice, methods can be defined within the
+        body of a class definition, or outside of it - both are identical
+        for the compiler's purposes.
       </para>
     </section>
     <section><title>Implementing methods</title>
       <para>
+        In comparison to their declarations, method implementations are
+        quite terse:
       </para>
+
+      <para>
+        method-name([arguments]) { body }
+      </para>
+
+      <para>Like functions, there is another form for single expressions:</para>
+
+      <para>
+        method-name([arguments]) = expression;
+      </para>
+
+      <para>
+        The <literal>[arguments]</literal> consist of names, and optionally
+        types, of the form
+      </para>
+
+      <para>
+        <literal>name</literal>
+      </para>
+
+      <para>or</para>
+
+      <para>
+        <literal>name@type</literal>
+      </para>
+
+      <para>
+        The <literal>@type</literal> is used to specialize the method on that 
+        argument. An example should make the difference clear. Also note the
+        use of both the block- and expression-style methods.
+      </para>
+
+      <example>
+        <title>Method Implementation</title>
+        <programlisting lang="nice">
+class Vehicle {}
+class Motorcycle extends Vehicle {}
+class Car extends Vehicle {}
+
+//Declare method
+int numberOfWheels(Vehicle vehicle);
+
+//Default implementation
+numberOfWheels(vehicle) 
+{
+    throw new Exception("Unknown number of wheels!");
+}
+
+//Specialize for Cars
+numberOfWheels(car@Car)
+{ 
+    return 4;
+}
+
+//Specialize for Motorcycles
+numberOfWheels(mc@Motorcycle) = 2;
+
+        </programlisting>
+      </example>
     </section>
     <section><title>Optional parameters</title>
       <para>
@@ -260,7 +442,7 @@ copy(from: f1, to: f2, bufferSize: 4000);</programlisting>
 	They are declared in the method declaration, using the
 	<link linkend="optionalParameters">same syntax as in the case 
 	  of functions</link>.
-	Method implementations must still binds all parameters,
+	Method implementations must still bind all parameters,
 	including the optional ones, and can dispatch on them.
       </para>
     </section>
@@ -272,6 +454,7 @@ copy(from: f1, to: f2, bufferSize: 4000);</programlisting>
         The syntax for assertions is the same as in Java (since 1.4).
         Assertions are statements of the following form:
 	<literal>assert &lt;boolean expression&gt; : &lt;error message&gt;</literal>.
+        The &lt;error message&gt; is optional.
       </para>
       <para>
         Preconditions are introduced with the <literal>requires</literal>
@@ -329,7 +512,8 @@ interface Buffer<Elem>
       <section><title>JDK 1.4 and later</title>
         <para>
 	  The mechanism is the same as for Java assertions. 
-	  Checking can be enabled at runtime with java -ea ....
+	  Checking can be enabled at runtime with 
+	  <literal>java -ea ...</literal>.
 	</para>
       </section>
 
@@ -352,7 +536,8 @@ interface Buffer<Elem>
       <para>
 	Local functions are similar to toplevel functions, 
         except that they are defined inside another function or method,
-        and therefore only usable in that scope.	
+        and therefore only usable in that scope.
+	They can refer to local variables from their context.
       </para>
 
       <example><title>Local function</title>
@@ -465,7 +650,7 @@ BufferedReader r = new BufferedReader(new InputStreamReader(System.in));
 int v;
 while ((v = r.read()) != -1) {
   char c = char(v);
-  ... // Do something the the character.
+  ... // Do something with the character.
 }</programlisting>
       </example>
 
@@ -493,7 +678,10 @@ while ((v = r.read()) != -1) {
 	  For instance, after a declaration
 	  <literal>import java.io.*;</literal> it is possible
 	  to refer to class <literal>java.io.File</literal>
-	  with the short name <literal>File</literal>.
+	  with the short name <literal>File</literal>. It is not possible to 
+          import only a single name, such as 
+          <literal>import java.io.File;</literal>, you must import the whole
+          package.
 	</para>
 
 	<para>
@@ -706,10 +894,57 @@ public class Main
     </para>
 
     <section id="optionTypes"><title>Option types</title>
+<!--
       <para>
         See 
 	<ulink url="http://nice.sourceforge.net/cgi-bin/view/Doc/OptionType">
 	the Wiki site page about option types</ulink>.
+      </para>
+-->
+      <para>
+        Nice (unlike Java) makes a distinction between a type that may be &NULL;, 
+        and one that may not be. So, if you want to allow &NULL; 
+        <classname>String</classname>s, you write <classname>?String</classname> 
+        for the type. If &NULL;s should not be allowed, you just write 
+        <classname>String</classname>. It is not possible to pass a 
+        <classname>?String</classname> where a <classname>String</classname> is 
+        expected, unless the compiler can prove it's not &NULL;. The easiest way
+        to prove that the variable is not &NULL; is to use an 
+        <literal>if</literal> statement:
+      </para>
+
+<example>
+  <title>Using option types</title>
+<programlisting lang="nice">
+	void foo(String arg) {...}
+	
+	void bar(?String arg) {
+		if (arg != null) {
+			//Here Nice knows arg is not null, so it can 
+			// be passed to a method which takes a String!
+			foo(arg);	
+		} 
+		foo(arg); //Here arg may or may not be null, 
+			  //so Nice gives a compile error.
+	}
+</programlisting>
+</example>
+      <para>
+        Therefore, you never have to check that all your arguments 
+        aren't &NULL; again, unless you actually want to allow &NULL;s.
+      </para>
+      <para>
+        Two useful functions for dealing with nulls are 
+        <literal>notNull</literal> and <literal>cast</literal>. The
+        <literal>notNull</literal> function is described above in the
+        <link linkend="optionTypesJava">section on option types and Java
+        code</link>. The <literal>cast</literal> function is used in those
+        (rare) situations where it is necessary to allow a null where one
+        shouldn't normally go, for instance if you need to declare a
+        variable before entering a loop, but don't have a value to initialize
+        it with. These situations are rare, and are usually the result of
+        thinking about the problem in a Java way rather than a Nice way,
+        but sometimes <literal>cast</literal> is the only way.
       </para>
       </section>
 

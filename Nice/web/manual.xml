@@ -1245,7 +1245,7 @@ public class Main
         </para>
         <para>
           There is also a notation for the same class as the declaring class
-	  of a method: <type>alike</type>.
+	  of a method: <literal>alike</literal>.
 	  For instance, the following class <literal>Foo</literal> declares
 	   a method <literal>copy</literal>, such that 
 	   <literal>x.copy()</literal>
@@ -1269,7 +1269,7 @@ class Bar extends Foo
   int id;
 }
 
-copy(b@Bar) = new Bar(value: b.value, id: generateNewId());
+copy(b#Bar) = new Bar(value: b.value, id: generateNewId());
 }</programlisting>
         </example>
 	</para>

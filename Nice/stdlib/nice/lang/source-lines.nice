@@ -56,6 +56,14 @@ public void printStackTraceWithSourceInfo(Throwable t, PrintWriter w)
 Warning: the above stack trace has wrong line numbers for Nice methods.
 Use a JVM version 1.4 or later to get the correct line numbers.""");
   }
+  catch (Exception e) {
+    // We failed to print the source info for Nice, but we should
+    // at least print the original stack.
+    t.printStackTrace(w);
+
+    w.println("\nError while computing Nice line numbers:");
+    e.printStackTrace(w);
+  }
 }
 
 /* Return the index of SourceDebugExtension, or null if it does not appear. */

@@ -77,6 +77,14 @@ public class BitOp
           code.emitPushBoolean(true);
           code.emitFi();
         }
+      else
+        {
+          code.emitIfIntNotZero();
+          code.emitPushBoolean(true);
+          code.emitElse();
+          code.emitPushBoolean(false);
+          code.emitFi();
+        }   
 
       target.compileFromStack(comp, Type.boolean_type);
     }

@@ -118,3 +118,9 @@ var int x = 0;
     ok = false;
   } catch(Throwable e) {}
   assert ok;
+
+/// PASS
+ int x = 0;
+ x[10] = true;
+ boolean[] y = [x[10]];
+ assert y[0];

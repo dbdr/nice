@@ -125,6 +125,15 @@ import nice.tools.compiler.OutputMessages;
 
 public class Nicec extends Task {
 
+	private static final String
+		ERROR_MSG = "Compilation failed with errors.";
+	private static final String
+		BUG_MSG = "Compilation failed because of a bug in the compiler.";
+	private static final String
+		WARNING_MSG = "Compilation successful despite warnings.";
+	private static final String
+		OK_MSG = "Compilation successful.";
+		
 
 
 	/**	Lookup path for source packages
@@ -404,14 +413,14 @@ public class Nicec extends Task {
 		int retval = nice.tools.compiler.fun.compile(argArray);
 		switch (retval) {
 			case OutputMessages.ERROR:
-				throw new BuildException("compile failed with error", location);
+				throw new BuildException(ERROR_MSG, location);
 			case OutputMessages.BUG:
-				throw new BuildException("compile reported a bug", location);
+				throw new BuildException(BUG_MSG, location);
 			case OutputMessages.WARNING:
-				log("compile reported a warning", Project.MSG_WARN);
+				log(WARNING_MSG, Project.MSG_WARN);
 				break;
 			case OutputMessages.OK:
-				log("compile finished without problems", Project.MSG_VERBOSE);
+				log(OK_MSG, Project.MSG_VERBOSE);
 				break;
 		}
 	}

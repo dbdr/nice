@@ -353,7 +353,7 @@ public class TestCase {
 						Method m = c.getMethod("main", parameterTypes);
 						Object[] arguments = new Object[] {new String[0]};
 						m.invoke(c.newInstance(), arguments);
-					} catch(Exception e) {
+					} catch(Throwable e) {
 						throw new TestSuiteException("Exception while invoking main()", e);
 					}
 				}

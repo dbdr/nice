@@ -28,6 +28,7 @@ class Comment {
     
     /*Initialisation*/
     {
+        //println("Comment String = " commentStr);
         tags = parse(commentStr);
     }
 }
@@ -39,62 +40,147 @@ class Comment {
  * @param a comment block beginning with &#47;&#42;&#42; and ending with &#42;&#47;
  * @return a list of tuples mapping tags to values.
  */
+ 
+/* I am going to make some assumptions here:
+ * 1) The general comments section precedes any @ tags
+ * 2) ...
+ */
 List<(?String,String)> parse(String comments) {
-    //an initial capacity of 8 is used becuase I don't expect many values
-    //ArrayList<(?String,String)> list = new ArrayList(8);
     
-    StringBuffer buf = new StringBuffer(comments);
     //the first and last chars should be '/'
-    if(buf.charAt(0) == '/' && buf.charAt(buf.length() - 1) == '/') {
-        buf.deleteCharAt(0);
-        buf.deleteCharAt(buf.length()-1);
+    if(comments.charAt(0) == '/' && comments.charAt(comments.length() - 1) == '/') {
+        comments = comments.substring(1, comments.length() - 1);
     }
-    //else this is a problem - do something
-    for(int i = 0; i < buf.length; /*no increment*/) {
-        if(buf.charAt(i) == '*' && (i == 0 || buf.charAt(i-1) == '\n')) {
-            buf.deleteCharAt(i);
-        }
-        else {
-            i++;
-        }
+    //FIXME: else this is a problem - do something
+    
+    //read one line at a time
+    PushBackTokenizer tok = new PushBackTokenizer(comments, "\n", false /*don't return delimiters*/);
+    
+    //are there any tokens? if not, nothing more to do
+    if(!tok.hasMoreTokens()) {
+        //return an empty list
+        return new LinkedList();
     }
-    for(int i = 0; i < buf.length; i++) {
-        if(buf.charAt(i) == '\n') {
-            buf.replace(i, i+1, " ");
-        }
-    }
-    StringTokenizer st = new StringTokenizer(buf.toString(), "@", true /*return delimiters*/);
-    boolean isParam = false;
-    ?Node root = null;
-    for(int i = 0; st.hasMoreTokens(); i++) {
-        //println("\"Token " i ": " st.nextToken().trim() "\"");
-        String token = st.nextToken().trim();
-        if(token.equals("@")) {
-            //the next token will be a param string
-            isParam = true;
-        }
-        else if(isParam) {
-            /*this token will have the form "<param name> <comment string>"
-             *extract the param name and insert it as the key.  add the rest as a comment
-             */
-            int index = token.indexOf(' ');
-            //list.add(("@" token.substring(0, index), token.substring(index+1)));
-            if(root == null)
-                root = new Node(value: ("@" token.substring(0, index), token.substring(index+1)));
-            else
-                root.insert(new Node(value: ("@" token.substring(0, index), token.substring(index+1))));
-            isParam = false;
-        }
-        else {
-            //this is a general comment
-            //list.add((null, token));
-            if(root == null)
-                root = new Node(value: (null, token));
-            else
-                root.insert(new Node(value: (null, token)));
+    
+    String line = ""; //stops the compiler complaining that it's not initialised.
+    String generalComment = "";
+    //the nicedoc comment starts with a block of text - the general comment.
+    
+    while(tok.hasMoreTokens()) {
+        line = tok.nextToken().trim();
+        
+        //remove the '*' and ' ' if necessary
+        line = trimComment(line);
+        
+        if(line.length() > 0) {
+            //if the first character is a '@' then we are into the tags and
+            //need to break out of this loop, but replace the token first
+            if(line.charAt(0) == '@') {
+                tok.pushBack(line);
+                break;
+            }
+            
+            //append the current line to the general comment
+            generalComment += line + " ";
         }
     }
+    
+    //if the loop finished because there were no more tokens we need to return now
+    if(!tok.hasMoreTokens()) {
+        List<(?String, String)> l = new LinkedList();
+        l.add((null, generalComment));
+        return l;
+    }
+    
+    //root will contain a sorted list of all the tags
+    Node root = new Node(value: (null, generalComment));
+    ?Node lastNode = null;
+
+    while(tok.hasMoreTokens()) {
+        line = tok.nextToken().trim();
+        
+        //remove the '*' and ' ' if necessary
+        line = trimComment(line);
+        
+        if(line.length() > 0) {
+            //this is a new tag
+            if(line.charAt(0) == '@') {
+                //find the first space - this tells us the range of the tag
+                int index = line.indexOf(' ');
+                String tag = line.substring(1, index); //skip the '@'
+                String comment = line.substring(index+1); //+1 because we need to skip the space
+    
+                Node n = new Node(value: (tag, comment));
+                root.insert(n);
+                lastNode = n;
+            }
+            //this is a continuation of the last tag, append this line to the comment
+            else {
+                if(lastNode != null) {
+                    (?String tag, String comment) = lastNode.value;
+                    lastNode.value = (tag, comment + " " + line);
+                }
+                else {
+                    //logically, I don't see how we can get here.
+                    throw new RuntimeException("Error parsing comment");
+                }
+            }
+        }
+    }
+    /*println("Returing:");
+    List<(?String, String)> list = toList(root);
+    Iterator<(?String, String)> iterator = list.iterator();
+    while(iterator.hasNext()) {
+        (?String x, String y) = iterator.next();
+        println("x: " x "\ny: " y);
+    }*/
     return toList(root);
+}
+
+String trimComment(String s) {
+    StringBuffer buf = new StringBuffer(s);
+    while(buf.length() > 0 && (buf.charAt(0) == '*' || buf.charAt(0) == ' '))
+        buf.deleteCharAt(0);
+    return buf.toString();
+}
+
+class PushBackTokenizer extends StringTokenizer {
+    List<String> tokens = new ArrayList();
+
+    countTokens() {
+        return super + tokens.size();
+    }
+    
+    hasMoreElements() {
+        //we need "this" because of a compiler limitation
+        return this.hasMoreTokens();
+    }
+    
+    hasMoreTokens() {
+        if(!tokens.isEmpty())
+            return true;
+        else
+            return super;
+    }
+    
+    nextElement() {
+        return this.nextToken();
+    }
+    
+    nextToken() {
+        if(!tokens.isEmpty())
+            return tokens.removeAt(tokens.size()-1);
+        else
+            return super;
+    }
+    
+    nextToken(String delim) {
+        throw new UnsupportedOperationException("Method not implemented");
+    }
+    
+    void pushBack(String token) {
+        tokens.add(token);
+    }
 }
 
 class Node {

@@ -13,6 +13,14 @@ class Point
   twoArgs(x, y) = 0;
 }
 
+// check that a constructor is also available from functions
+// which are resolved earlier than methods
+// and even if the function appears before the class to be constructed
+void test_new()
+{
+  Point p = new ColoredPoint();
+}
+
 class ColoredPoint extends Point
 {
   int c;

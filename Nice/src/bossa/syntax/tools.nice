@@ -92,6 +92,36 @@ bossa.util.UserError ensureLocated(bossa.util.UserError e,
   return e;
 }
 
+?(MonoSymbol, TypeConstructor) getInstanceof(IfExp ifExp)
+{
+  if (! (ifExp.condition instanceof CallExp))
+    return null;
+
+  CallExp condition = cast(ifExp.condition);
+  if (! condition.isCallTo("instanceof") || condition.arguments.size() != 2)
+    return null;
+
+  Expression arg1 = condition.arguments.getExp(0);
+  if (! (arg1 instanceof SymbolExp))
+    return null;
+
+  SymbolExp symExp = cast(arg1);
+  if (! (symExp.getSymbol() instanceof MonoSymbol))
+    return null;
+
+  MonoSymbol sym = cast(symExp.getSymbol());
+
+  Expression arg2 = condition.arguments.getExp(1);
+  if (! (arg2 instanceof TypeConstantExp))
+    return null;
+
+  TypeConstantExp type = cast(arg2);
+  if (type.representedType == null)
+    return null;
+
+  return (sym, notNull(type.representedType));
+}
+
 /****************************************************************
  * Temporary: this should be solved when AST classes are written 
  * in Nice, with precise types for the fields.

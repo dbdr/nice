@@ -160,4 +160,19 @@ public class MonoSymbol extends VarSymbol
 
   Monotype syntacticType;
   mlsub.typing.Monotype type;
+
+  /****************************************************************
+   * Using a symbol instead of another when a more precise type is known.
+   ****************************************************************/
+
+  static MonoSymbol mock(final MonoSymbol origin, mlsub.typing.Monotype type)
+  {
+    return new MonoSymbol(origin.getName(), type)
+      {
+        gnu.expr.Declaration getDeclaration()
+        {
+          return origin.getDeclaration();
+        }
+      };
+  }
 }

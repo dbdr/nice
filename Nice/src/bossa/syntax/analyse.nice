@@ -173,7 +173,7 @@ class Info
     this.vars[symbol.name.toString()] = symbol;
   }
 
-  void addVar(MonoSymbol symbol)
+  void addVar(MonoSymbol symbol, boolean redefining = false)
   {
     ?Monotype type = symbol.syntacticType;
     if (type != null)
@@ -182,7 +182,8 @@ class Info
 	if (nice.tools.code.Types.isVoid(symbol.type))
 	  throw error(symbol, "A variable cannot have a void type");
       }
-    this.checkNotDefined(symbol);
+    if (! redefining)
+      this.checkNotDefined(symbol);
     this.vars[symbol.name.toString()] = symbol;
   }
 
@@ -477,8 +478,36 @@ analyse(e@IfExp, info)
   e.condition = analyse(e.condition, info);
 
   info.beginCases();
+
+  ?(MonoSymbol, TypeConstructor) test = getInstanceof(e);
+
+  if (test != null)
+    {
+      (MonoSymbol variable, TypeConstructor tc) = test;
+      mlsub.typing.Monotype[?] parameters = null;
+      if (tc.arity() == 0)
+	parameters = null;
+      else if (variable.getMonotype() instanceof mlsub.typing.MonotypeConstructor)
+	{
+	  mlsub.typing.MonotypeConstructor mc = cast(variable.getMonotype());
+	  parameters = mc.getTP();
+	}
+      else
+	test = null;
+
+      if (test != null)
+	{
+	  mlsub.typing.Monotype type = Monotype.sure(new mlsub.typing.MonotypeConstructor(tc, parameters));
+	  info.begin();
+	  info.addVar(MonoSymbol.mock(variable, type), redefining: true);
+	}
+    }
+
   e.thenExp = analyse(e.thenExp, info);
   e.thenUnreachable = info.getUnreachable();
+
+  if (test != null)
+    info.end();
 
   info.otherCase();
   e.elseExp = analyse(e.elseExp, info);
@@ -554,6 +583,8 @@ analyse(e@TypeConstantExp, info)
     throw new bossa.util.UserError(name, "Class " + name + " is not declared");
 
   e.value = object(type);
+  e.representedType = bossa.syntax.Node.getGlobalTypeScope().
+    globalLookup(name.toString(), name.location());
 
   return e;
 }

@@ -1,0 +1,26 @@
+/// global
+class A{}
+class B extends A { int life = 42; }
+
+/// PASS
+  A a;
+  a = new B();
+  if (a instanceof B)
+    assert a.life == 42;
+  else
+    assert false;
+
+/// FAIL
+  A a;
+  a = new A();
+  if (a instanceof B)
+    assert false;
+  else
+    assert a.life == 42;
+
+/// FAIL
+  A a;
+  a = new B();
+  if (a instanceof B)
+    ;
+  assert a.life == 42;

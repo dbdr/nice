@@ -25,4 +25,6 @@ class TypeConstantExp extends ConstantExp
   {
     super(PrimitiveType.typeTC, name, name.toString(), name.location());
   }
+
+  mlsub.typing.TypeConstructor representedType;
 }

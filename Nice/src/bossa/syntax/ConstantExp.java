@@ -63,6 +63,11 @@ public class ConstantExp extends Expression
   {
     return ((Number) this.value).intValue() == 0;
   }
+ 
+  public boolean isNumber()
+  {
+    return this.value instanceof Number && !(this.value instanceof Character);
+  }
 
   void computeType()
   {
@@ -177,7 +182,8 @@ public class ConstantExp extends Expression
 	object = new Long(value);
       }
     
-    return new ConstantExp(type, tc, object, value+"", location);
+    return new ConstantExp(type, tc, object,
+	""+value+(isLong ? "L" : ""), location);
   }
   
   public static ConstantExp makeNumber(LocatedString representation)
@@ -191,7 +197,6 @@ public class ConstantExp extends Expression
       rep = rep.substring(0, lastCharIndex);
 
     try{
-      //long value = Long.decode(rep).longValue();
       long value = parse(rep);
       return makeInt(value, isLong, representation.location());
     }
@@ -200,6 +205,16 @@ public class ConstantExp extends Expression
       User.error(representation, rep + " is not a valid number");
       return null;
     }
+  }
+
+  public ConstantExp makeNegative()
+  {
+    LocatedString newRepres = new LocatedString("-"+representation, location());
+
+    if (value instanceof Float || value instanceof Double)
+      return ConstantExp.makeFloating(newRepres);
+
+    return ConstantExp.makeNumber(newRepres);
   }
   
   private static long parse(String rep) throws NumberFormatException 
@@ -249,7 +264,7 @@ public class ConstantExp extends Expression
     if (repres.endsWith("F") || repres.endsWith("f"))
       {
 	float value = Float.parseFloat(repres);
-	return new ConstantExp(PrimitiveType.floatTC, new Float(value), value+"",
+	return new ConstantExp(PrimitiveType.floatTC, new Float(value), value+"f",
 				representation.location());
       }	
 

@@ -22,7 +22,20 @@ import java.io.*;
   /// Toplevel
   import java.io.*;
   class A implements java.io.Serializable {
-    final long serialVersionUID = 123456789L;
+    final long serialVersionUID = +123456789L;
+    int x;
+  }
+
+/// PASS
+  A a = new A(x: 10);
+  A b = serializeThenDeserialize(a);
+  assert a.x == b.x;
+  let osc = ObjectStreamClass.lookup(A.class);
+  assert osc.getSerialVersionUID() == -123456789L;
+  /// Toplevel
+  import java.io.*;
+  class A implements java.io.Serializable {
+    final long serialVersionUID = -123456789L;
     int x;
   }
  

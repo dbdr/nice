@@ -2008,8 +2008,19 @@ Expression UnaryExpression() :
 { Expression res; Token t=null; }
 {
 (
-  ( t="+" | t="-" | t="~" | t="!" ) res=PrimaryExpression() 
+  ( ( t="~" | t="!" ) res=PrimaryExpression() 
     { res=CallExp.create(symb(t),res); }
+  |
+    ( t="+" | t="-" ) res=PrimaryExpression() 
+    { if (res instanceof ConstantExp && ((ConstantExp)res).isNumber())
+      {
+        if (t.kind == MINUS)
+          res=((ConstantExp)res).makeNegative();
+      } 
+      else
+	res=CallExp.create(symb(t),res);
+    }
+  )
 |
   res=Pre_crementExpression()
 |

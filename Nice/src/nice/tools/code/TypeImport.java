@@ -153,14 +153,23 @@ public class TypeImport
 
     Class c = null;
 
-    try{ 
-      c = classLoader.loadClass(className); 
+    try {
+      c = classLoader.loadClass(className);
     }
     catch(ClassNotFoundException e) {} // The class does not exist.
-    catch(NoClassDefFoundError e){} // idem
+    catch(NoClassDefFoundError e)
+      {
+        User.error("Class "+className+" depends on class "+
+		  e.getMessage().replace( '/', '.' ) + " which is not available on the classpath." );
+      }
+    catch(UnsupportedClassVersionError e)
+      {
+	User.error("Class "+className+" could not be loaded.  The version of its class "+
+			"file is not supported by the running JVM." );
+      }
 
     stringToReflectClass.put(className, c);
-    
+
     return c;
   }
 

@@ -7,7 +7,7 @@ JAVACC=java -classpath ${HOME}/lib/java/JavaCC/JavaCC.zip COM.sun.labs.javacc.Ma
 JAVADOC=javadoc -linkoffline file:///C%7C/Apps/jdk1.2.1/docs/api file:///usr/opt/java122/docs/api
 
 recompile:
-	cd ${TOP}/src; ${JAVAC} -d ${TOP}/classes bossa/syntax/*.java bossa/modules/*.java bossa/parser/*.java mlsub/*/*.java ../lib/*.java
+	cd ${TOP}/src; ${JAVAC} -d ${TOP}/classes bossa/syntax/*.java bossa/modules/*.java bossa/parser/*.java bossa/tools/*.java bossa/test/Front.java mlsub/*/*.java ../lib/*.java
 
 recompileGNU:
 	cd ${TOP}/src; ${JAVAC} -d ${TOP}/classes gnu/*/*.java gnu/*/*/*.java kawa/*/*.java

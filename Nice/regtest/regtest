@@ -1,0 +1,93 @@
+#! /bin/sh
+
+### Nice specific
+
+compile()
+{
+  nicec -e regtest."$1"
+  return $?
+}
+
+execute()
+{
+  nicer -e ${HOME}/Nice/regtest/$1
+}
+
+### Regression test suite
+
+compile_error()
+{
+  pkg_compile_error=`expr $pkg_compile_error + 1`
+  
+  echo "\n\n\n$1 produced a compilation error"
+  echo "Compiler output is:"
+  echo
+  echo "###############"
+  cat $1/compile.out
+  echo "###############\n\n"
+}
+
+newpkg()
+{
+  pkg_new=`expr $pkg_new + 1`
+
+  echo "\n\n\n$1 is a NEW package"
+  echo "Program output is:"
+  echo
+  echo "###############"
+  cat $1/current.out
+  echo "###############"
+  echo
+  echo -n "Is that correct? (y/n) "
+  read correct
+  if [ "$correct" = "y" -o "$correct" = "yes" ]; then
+    pkg_new_ok=`expr $pkg_new_ok + 1`
+    mv $1/current.out $1/ok.out
+  fi
+}
+
+different_output()
+{
+  pkg_broken=`expr $pkg_broken + 1`
+  echo "$1 is BROKEN"
+}
+
+regtest()
+{
+  execute $1 >$1/current.out 2>$1/current.err
+
+  [ -r $1/ok.out ] || { newpkg $1; return; }
+  cmp $1/ok.out $1/current.out || { different_output $1; return; }
+  pkg_ok=`expr $pkg_ok + 1`
+}
+
+status()
+{
+  echo "$pkg_ok OK, $pkg_compile_error compilation failures, $pkg_broken BROKEN, $pkg_new NEW ($pkg_new_ok accepted)"
+}
+
+pkg=0
+pkg_compile_error=0
+pkg_new=0
+pkg_new_ok=0
+pkg_ok=0
+pkg_broken=0
+
+for subdir in *; do
+  [ -d $subdir ] || continue
+
+  pkg=`expr $pkg + 1`
+
+  echo -n "$subdir: $pkg packages, "
+  if compile $subdir >$subdir/compile.out 2>&1; then
+
+    regtest $subdir
+
+  else
+
+    compile_error $subdir
+  
+  fi
+
+  status
+done

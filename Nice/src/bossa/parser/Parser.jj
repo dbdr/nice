@@ -858,28 +858,42 @@ List monotypes():
   { return res; }
 }
 
-List namedMonotypes():
-{
-  List res=new ArrayList();
-  Monotype t;
-}
-{
-  t=monotype() [ident()] { res.add(t); }
-  ( "," t=monotype() [ident()] { res.add(t); } )*
-  { return res; }
-}
-
 /***********************************************************************/
 /*                          Classes                                    */
 /***********************************************************************/
 
-FormalParameters.Parameter formalParameter():
+Expression ParameterTuplePart(List statements, List monotypes):
+{ LocatedString id; Monotype type; }
 {
-  Monotype t;
-  LocatedString id;
-  Expression val;
+( 
+  LOOKAHEAD( monotype() ident() )
+  type=monotype()  id=ident()
+  { monotypes.add(type);
+    statements.add(new Block.LocalVariable(id, type, false, null)); 
+    return new IdentExp(id); }
+| { Token first,last; }
+  first="(" 
+  { List parts = new LinkedList(); Expression part;
+    List types = new LinkedList(); }
+  part = ParameterTuplePart(statements, types) { parts.add(part); }
+  ( "," part = ParameterTuplePart(statements, types) { parts.add(part); } )+
+  last=")"
+  { Monotype t = new TupleType(types, new Location(first, last));
+    t.nullness = Monotype.absent;
+    monotypes.add(t); 
+    return new TupleExp(parts); }
+)
+}
+
+FormalParameters.Parameter formalParameter(List statements):
+{
+  Monotype t = null;
+  LocatedString id = null;
+  Expression val = null;
 }
 {
+(
+  LOOKAHEAD(monotype())
   t = monotype() 
   [ 
     id = ident() 
@@ -890,9 +904,35 @@ FormalParameters.Parameter formalParameter():
     { return new FormalParameters.NamedParameter(t, id); }
   ]
   { return new FormalParameters.Parameter(t); }
+|
+  { Token first,last;
+  List parts = new LinkedList();
+  Expression part;
+  List types = new LinkedList();
+  LocatedString ident; }
+  first="("
+  part = ParameterTuplePart(statements, types) { parts.add(part); }
+  ( "," part = ParameterTuplePart(statements, types) { parts.add(part); } )+
+  last=")"
+  [ id=ident() [ "=" val=Expression() ] ]
+  { if (id == null) {
+      ident = new LocatedString("tuple_arg_" + first.beginLine + "_" + first.beginColumn, 
+				new Location(first, last));
+    } else { ident = id; }
+    Expression exp = AssignExp.create(new TupleExp(parts),new IdentExp(ident));
+    exp.setLocation(new Location(first,last));
+    statements.add(new ExpressionStmt(exp));
+    t = new TupleType(types, new Location(first, last));
+    t.nullness = Monotype.absent;
+    if (val != null)
+      return new FormalParameters.OptionalParameter(t, ident, val);
+
+    return new FormalParameters.NamedParameter(t, ident);
+  }
+)  
 }
 
-FormalParameters formalParameters(boolean leaveRoomForThis):
+FormalParameters formalParameters(boolean leaveRoomForThis, List statements):
 {
   List params = null;
   FormalParameters.Parameter p;
@@ -906,10 +946,10 @@ FormalParameters formalParameters(boolean leaveRoomForThis):
     }
   }
   [
-    p = formalParameter() 
+    p = formalParameter(statements) 
     { if (params ==null) params = new LinkedList(); 
       params.add(p); }
-    ( "," p = formalParameter() { params.add(p); } )*
+    ( "," p = formalParameter(statements) { params.add(p); } )*
   ]
   { return new FormalParameters(params); }
 }
@@ -922,17 +962,18 @@ MethodDeclaration internalMethodOrFunction(MethodContainer c):
   Monotype returnType;
   Statement body = null;
   Contract contract;
+  List statements = new LinkedList();
 }
 {
   cst=constraint()
   returnType=monotype()
   name=identOrBackquoted()
-  "(" parameters = formalParameters(true) ")"
+  "(" parameters = formalParameters(true, statements) ")"
   contract = contract()
-  ( ";" | body = code() )
+  ( ";" | body = code() {statements.add(body);} )
   
   { return NiceMethod.create(c, name, cst, returnType, parameters, 
-                             body, contract); }
+                             body!=null?new Block(statements):null , contract); }
 }
 
 TypeIdent superClass():
@@ -1325,13 +1366,14 @@ MethodDeclaration methodDeclaration():
     FormalParameters parameters;
     Constraint cst;
     MethodDeclaration res;
+    List statements = new LinkedList();
 }
 {
   [ "public" | "private" ]
   cst=constraint()
     returnType=monotype()
     name=identOrBackquoted()
-    "(" parameters = formalParameters(false) ")"
+    "(" parameters = formalParameters(false, statements) ")"
     
     ( LOOKAHEAD(2)
       "=" 
@@ -1352,9 +1394,9 @@ MethodDeclaration methodDeclaration():
       contract = contract()
       (
         { Statement body; }
-        body = code()
+        body=code() { statements.add(body); }
         { res = new ToplevelFunction(name, cst, returnType, parameters, 
-                                     body, contract);}
+                                     body!=null?new Block(statements):null, contract);}
       |
         // Nice method
         ";"
@@ -1534,6 +1576,7 @@ void readDefinitions(List definitions):
   <EOF> 
 }
 
+
 /***********************************************************************/
 /*                          Expressions                                */
 /***********************************************************************/
@@ -1619,39 +1662,77 @@ Expression newExp():
   )
 }
 
-FunExp funExpLookahead():
+void funExpLookahead():
 {}
 {
   ( 
-    LOOKAHEAD ( ["fun"] constraint() "(" monoSymbols() ")" )
-    ["fun"] constraint() "(" monoSymbols() ")"
+    LOOKAHEAD ( "(" ")" ) "(" ")"
   |
+    LOOKAHEAD ( monoSymbol() )
     monoSymbol()
+  |
+    constraint() "(" NestedMonoSymbols() ")"
   ) 
   "=>"
-  { return null; }
+}
+
+MonoSymbol funExpParameter(List statements):
+{
+  Monotype type;
+  LocatedString name;
+}
+{
+(
+  LOOKAHEAD( monotype() )
+  type=monotype() name=ident()
+  { return new MonoSymbol(name,type); }
+| 
+  { Token first,last;
+    List parts = new LinkedList();
+    Expression part;
+    List types = new LinkedList();
+    LocatedString ident = null;
+  }
+
+  first="("
+  part = ParameterTuplePart(statements, types) { parts.add(part); }
+  ( "," part = ParameterTuplePart(statements, types) { parts.add(part); } )+
+  last=")"
+  [ ident=ident() ]
+  { if (ident == null) {
+      name = new LocatedString("tuple_arg_" + first.beginLine + "_" + first.beginColumn, 
+				new Location(first, last));
+    } else { name = ident; }
+    Expression exp = AssignExp.create(new TupleExp(parts),new IdentExp(name));
+    exp.setLocation(new Location(first,last));
+    statements.add(new ExpressionStmt(exp));
+    type = new TupleType(types, new Location(first, last));
+    type.nullness = Monotype.absent;
+    return new MonoSymbol(name, type);
+  }
+)
 }
 
 FunExp funExp():
 {
-  List formals;
+  List formals = new LinkedList();
   Constraint cst = Constraint.True;
   MonoSymbol sym;
   Statement body;
   Expression exp;
-  Token f;
+  List statements = new LinkedList();
 }
 {
   ( 
-    LOOKAHEAD ( ["fun"] constraint() "(" monoSymbols() ")" )
-    [
-      f="fun" { bossa.util.User.warning(new Location(f),
-		 "The 'fun(...) =>' syntax is deprecated, just leave 'fun' away."); } 
-    ] 
-    cst=constraint()
-    "(" formals=monoSymbols() ")"
-  |
-    sym=monoSymbol() { formals = new LinkedList(); formals.add(sym); }
+    LOOKAHEAD ( "(" ")" ) "(" ")"
+  | 
+    LOOKAHEAD ( monoSymbol() ) 
+    sym=monoSymbol() { formals.add(sym); }
+  | 
+    cst=constraint() "(" 
+    sym=funExpParameter(statements) { formals.add(sym); }
+    ( "," sym=funExpParameter(statements) { formals.add(sym); } )*
+    ")"
   ) 
   "=>"
   (
@@ -1659,7 +1740,8 @@ FunExp funExp():
   |
     exp=Expression() { body = new ReturnStmt(exp); }
   )
-  { return new FunExp(cst,formals,body); }
+  { statements.add(body);
+    return new FunExp(cst, formals, new Block(statements)); }
 }
 
 /** A statement not terminated by a ";" if applicable. */
@@ -2473,6 +2555,7 @@ Statement LocalFunctionDeclaration() :
   Statement body;
   boolean constant = true;
   Token t = null;
+  List statements = new LinkedList();
 }
 {
   (  
@@ -2487,8 +2570,9 @@ Statement LocalFunctionDeclaration() :
     )
     type = monotype()
     id=ident()
-    "(" parameters=formalParameters(false) ")" body=code() 
-    { return Block.LocalFunction.make(id, type, parameters, body); }
+    "(" parameters=formalParameters(false, statements) ")" 
+    body=code() { statements.add(body); } 
+    { return Block.LocalFunction.make(id, type, parameters, body!=null?new Block(statements):null); }
   )
 }
 
@@ -2540,13 +2624,13 @@ void LocalTupleDeclarationLookahead() : {}
     correctly parse "(" and ")", so we know the end of the tuple.
   */
 
-  "(" LocalTupleDeclarationContent() ")" "="
+  "(" NestedMonoSymbols() ")" "="
 }
 
-void LocalTupleDeclarationContent() : { }
+void NestedMonoSymbols() : { }
 {
 (
-  "(" LocalTupleDeclarationContent() ")"
+  "(" NestedMonoSymbols() ")"
 // Identifiers, either in types, or as a variable to assign to.
 | <IDENT>
 // All tokens that can be part of a monotype

@@ -1,0 +1,42 @@
+/// PASS
+  List<(String, int)> tuples = new ArrayList();
+  tuples.add(("a", 1));
+  tuples.add(("b", 2));
+  tuples.foreach(((String letter, int number)) =>
+    println("letter: "+letter+" number: "+number) );
+  
+/// PASS
+  let ((String, String))->() foo = ((String s, String t))=> println(s+t);
+  foo(("sdjfl","sdfjl"));
+
+/// PASS
+  ((String, int))->(String, int) foo = ((String s, int i) tuple)=> tuple;
+
+/// PASS bug
+  /// Toplevel
+  let ((String, String))->() foo = ((String s, String t))=> {
+   println(s+t);
+  };
+
+/// PASS
+  /// Toplevel
+  int foo((int i, char c)) = i + int(c);
+
+/// PASS
+  /// Toplevel
+  void foo((String s, String t) tuple) {
+    print(s+t);
+    (String x, String y) = tuple;
+  }
+
+/// PASS  
+  /// Toplevel
+  void foo((String s, String t) tuple = ("abc", "xyz")) {}
+
+/// PASS  
+  /// Toplevel
+  void foo((String s,(char c, int i))) {}
+
+/// PASS  
+  /// Toplevel
+  void foo(((char c, int i),String s)) {}

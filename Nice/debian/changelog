@@ -1,6 +1,6 @@
 nice (0.9.3) unstable; urgency=low
 
-  * Existing interfaces can like classes implement abstract interfaces:
+  * Existing interfaces can (like classes) implement abstract interfaces:
       interface packagename.SomeInterface implements AbstractInterface;
 
  --

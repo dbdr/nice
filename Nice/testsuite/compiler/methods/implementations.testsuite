@@ -35,12 +35,13 @@ class MapWrapper<K, V> implements _Map<K, V> {}
 
 /// FAIL
   /// TOPLEVEL
-  class A { 
-    void fA() {} // fA is a function
+  class A {
+    void fA() {} // default implementation
   }
 
-  // Try to implement a function. This should fail gracefully.
-  /*/// FAIL HERE */ fA(x@A) {}
+  // Try to implement a method for a case equivalent to the default.
+  // This should create an ambiguity.
+  /*/// FAIL HERE */ fA(A a) {}
 
 /// PASS
   /// COMMENT: This tests implementation of a method whose implicit 'this'

@@ -4,5 +4,23 @@
   assert a == "1" && b == "2";
 
 /// PASS
+  ((String a, String b), String name) = (("1","2"), "name");
+  assert name == "name";
+  assert a == "1" && b == "2";
+
+/// PASS
+  // Checks that we do not confuse the type with a tuple.
+  (String, String) -> String s = (String s1, String s2)=>s1;
+
+/// PASS
   // Checks that we do not confuse the first element with a nested tuple.
   ((String, String) -> String s, int i) = ((String s1, String s2)=>s1, 0);
+
+/// PASS
+  let x = 1, y = 2;
+  (x,y).println();
+
+/// PASS
+  var String x, y;
+  (x,y) = ("1","2");
+  assert x.equals("1") && y.equals("2");

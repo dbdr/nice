@@ -1,6 +1,6 @@
 <?xml version="1.0" standalone="no"?>
-<!DOCTYPE book PUBLIC '-//OASIS//DTD DocBook XML V4.1.2//EN' 		     
-'http://www.oasis-open.org/docbook/xml/4.1.2/docbookx.dtd' [ 
+<!DOCTYPE book PUBLIC '-//OASIS//DTD DocBook XML V4.1.2//EN'
+'http://www.oasis-open.org/docbook/xml/4.1.2/docbookx.dtd' [
 <!ENTITY nice "Nice">
 <!ENTITY java "Java">
 <!ENTITY NULL "<literal>null</literal>">
@@ -15,7 +15,7 @@
     <title>The Nice user's manual</title>
     <author><firstname>Daniel</firstname><surname>Bonniot</surname></author>
     <author><firstname>Bryn</firstname><surname>Keller</surname></author>
-    <author><firstname>Francis></firstname><surname>Barber</surname></author>
+    <author><firstname>Francis</firstname><surname>Barber</surname></author>
     <copyright><year>2003</year><holder>Daniel Bonniot</holder></copyright>
   </bookinfo>
   <preface><title>Foreword</title>

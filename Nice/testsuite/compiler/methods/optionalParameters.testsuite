@@ -51,3 +51,9 @@ int test0(int z) {
 // Forward reference to a function with a default value copying a previous argument.
 void foo() { f(0); }
 void f(int x, int y = x) {}
+
+/// PASS
+  foo([1]);
+  /// Toplevel
+// Bytecode has to be emited to convert the copied argument to what Java expects.
+void foo(int[] x, int y = x.size()) {}

@@ -31,7 +31,9 @@ public class CopyArgument extends Expression
 
   public void compile(gnu.expr.Compilation comp, gnu.expr.Target target) 
   {
-    comp.getCode().emitLoad(argument.getCopyVariable());
+    gnu.bytecode.Variable value = argument.getCopyVariable();
+    comp.getCode().emitLoad(value);
+    target.compileFromStack(comp, value.getType());
   }
 
   public void print(gnu.mapping.OutPort out)

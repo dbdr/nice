@@ -653,7 +653,6 @@ typecheck(e@SuperExp)
     throw bossa.util.User.error(e, "super can only be used in method implementations");
 }
 
-typecheck(e@ClassExp) {}
 typecheck(c@ConstantExp){}
 typecheck(e@NullExp) {}
 typecheck(e@OverloadedSymbolExp) {}

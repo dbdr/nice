@@ -325,7 +325,7 @@ analyse(e@CallExp, info)
 	  if (nextComponent == null)
 	    throw unknownIdent(notNull(pkg.locatedName()));
 
-	  return ClassExp.create(pkg, nextComponent);
+	  return TypeConstantExp.create(pkg, nextComponent);
 	}
     }
 
@@ -519,10 +519,7 @@ Expression analyseIdent(IdentExp e, Info info, boolean assigned)
     }
 
   if (e.enableClassExp)
-    return notNull(ClassExp.create(e.ident));
-
-  //if (e.infix)
-    //return e;
+    return notNull(TypeConstantExp.create(e.ident));
 
   throw unknownIdent(notNull(e.ident));
 }

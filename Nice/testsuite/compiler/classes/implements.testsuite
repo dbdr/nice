@@ -36,14 +36,14 @@
 /// PASS
   use(new A());
   /// Toplevel
-  class A implements java.lang.Comparable {}
+  class A implements java.lang.Cloneable {}
 
-  void use(java.lang.Comparable c) {}
+  void use(java.lang.Cloneable c) {}
 
 /// PASS
   use(new A());
   /// Toplevel
-  interface I extends java.lang.Comparable {}
+  interface I extends java.lang.Cloneable {}
   class A implements I {}
 
-  void use(java.lang.Comparable c) {}
+  void use(java.lang.Cloneable c) {}

@@ -21,6 +21,8 @@ import mlsub.typing.Monotype;
 import mlsub.typing.MonotypeVar;
 import mlsub.typing.Constraint;
 import mlsub.typing.MonotypeConstructor;
+import mlsub.typing.Typing;
+import mlsub.typing.TypingEx;
 
 /**
    Represents the information about one argument of a method body.
@@ -38,6 +40,8 @@ public class Pattern
      @param name the name of the argument
      @param tc a TypeConstructor that the argument must match
        for this alternative to be selected
+     @param atValue constant value which the parameter must be equal to
+       in order to match the pattern. Ex: null, 1, true, ...
      @param additional an additional TypeConstructor that 
        the argument must match.
        It must be a super-class of <code>tc</code>.
@@ -47,24 +51,26 @@ public class Pattern
        a type constructor variable with the exact type of the argument.
    */
   public Pattern(LocatedString name, 
-		 TypeIdent tc, boolean atNull, TypeIdent additional,
+		 TypeIdent tc, Expression atValue,
+		 boolean exactlyAt, TypeIdent additional,
 		 bossa.syntax.Monotype type)
   {
     this.name = name;
     this.typeConstructor = tc;
     this.additional = additional;
     this.type = type;
-    this.atNull = atNull;
+    this.atValue = atValue;
+    this.exactlyAt = exactlyAt;
   }
 
   public Pattern(LocatedString name, TypeIdent tc)
   {
-    this(name, tc, false, null, null);
+    this(name, tc, null, false, null, null);
   }
 
   public Pattern(LocatedString name)
   {
-    this(name, null, false, null, null);
+    this(name, null, null, false, null, null);
   }
 
   final mlsub.typing.Monotype getType()
@@ -72,34 +78,21 @@ public class Pattern
     return t;
   }
 
-  final boolean isSharp()
-  {
-    return tc!=null &&
-      TypeConstructors.isSharp(tc);
-  }
-
-  Domain getDomain()
-  {
-    if(tc==null)
-      return Domain.bot;
-    
-    MonotypeVar[] tp = MonotypeVar.news(tc.arity());
-    
-    return new Domain(new Constraint(tp,null),
-		      new MonotypeConstructor(tc, tp));
-  }
-  
   /**
-   * Iterates getDomain on a collection of Pattern.
+     Assert that the monotypes belong the the patterns.
    */
-  static Domain[] getDomain(Pattern[] patterns)
+  static void in(Monotype[] monotypes, Pattern[] patterns)
+  throws TypingEx
   {
-    Domain[] res = new Domain[patterns.length];
+    for (int i = 0; i < monotypes.length; i++)
+      {
+	Pattern p = patterns[i];
+	if (p.tc == null) continue;
 
-    for (int i = 0; i < patterns.length; i++)
-      res[i] = patterns[i].getDomain();
-
-    return res;
+	Typing.leq(monotypes[i], p.tc);
+	if (p.exactlyAt)
+	  Typing.leq(p.tc, monotypes[i]);
+      }
   }
 
   /**
@@ -123,7 +116,7 @@ public class Pattern
     TypeConstructor[] res = new TypeConstructor[patterns.length];
 
     for (int i = 0; i < patterns.length; i++)
-      if (patterns[i].atNull)
+      if (patterns[i].atNull())
 	res[i] = nullTC;
     else
 	res[i] = patterns[i].tc;
@@ -138,33 +131,6 @@ public class Pattern
     for (int i = 0; i < patterns.length; i++)
       res[i] = patterns[i].tc2;
 
-    return res;
-  }
-  
-  Polytype getPolytype()
-  {
-    if(tc==null)
-      return Polytype.bottom();
-    
-    MonotypeVar[] params = MonotypeVar.news(tc.arity());
-    return new Polytype(new Constraint(params, null),
-			new MonotypeConstructor(tc, params));
-  }
-  
-  /**
-   * Iterates getPolytype on a collection of Pattern.
-   */
-  static Polytype[] getPolytype(Collection patterns)
-  {
-    Iterator i=patterns.iterator();
-    Polytype[] res = new Polytype[patterns.size()];
-
-    int n = 0;
-    while(i.hasNext())
-      {
-	Pattern p = (Pattern) i.next();
-	res[n++] = p.getPolytype();
-      }
     return res;
   }
   
@@ -236,7 +202,7 @@ public class Pattern
   public String bytecodeRepresentation()
   {
     String enc = 
-      atNull ? "NULL" : nice.tools.code.Types.bytecodeRepresentation(tc);
+      atNull() ? "NULL" : nice.tools.code.Types.bytecodeRepresentation(tc);
 
     return AT_encoding + enc;
   }
@@ -255,6 +221,8 @@ public class Pattern
   private bossa.syntax.Monotype type;
   private mlsub.typing.Monotype t;
 
-  private boolean atNull;
-  public boolean atNull() { return atNull; }
+  private boolean exactlyAt;
+  private Expression atValue;
+
+  public boolean atNull() { return atValue instanceof NullExp; }
 }

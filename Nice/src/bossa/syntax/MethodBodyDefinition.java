@@ -111,9 +111,6 @@ public class MethodBodyDefinition extends Definition
 	    type = new MonotypeVar(typeName.toString());
 	  }
 
-	if(!p.isSharp())
-	  type.rememberToImplementTop();
-	
 	res[tn] = new MonoSymbol(p.name, type);
       }
     return res;
@@ -288,105 +285,102 @@ public class MethodBodyDefinition extends Definition
 
   void typecheck()
   {
-    if (Debug.typing)
-      Typing.enter("METHOD BODY " + this + "\n\n");
-    else
-      Typing.enter();
-
-    // remeber that enter was called, to leave.
-    // usefull if previous code throws an exception
-    entered = true;
-
     try{
-      try { Constraint.assert(definition.getType().getConstraint()); }
-      catch(TypingEx e){
-	User.error(name,
-		   "the constraint will never be satisfied",
-		   ": "+e.getMessage());
-      }
-      
-      // Introduce the types of the arguments
-      Monotype[] monotypes = MonoSymbol.getMonotype(parameters);
-      Typing.introduce(monotypes);
+      if (Debug.typing)
+	Typing.enter("METHOD BODY " + this + "\n\n");
+      else
+	Typing.enter();
 
-      // The arguments have types below the method declaration domain
-      Monotype[] domain = definition.getType().domain();
-      for (int i = 0; i < monotypes.length; i++)
-	Typing.leq(monotypes[i], domain[i]);
-      
-      // The arguments are specialized by the patterns
+      // remember that enter was called, to leave.
+      // usefull if previous code throws an exception
+      entered = true;
+
       try{
-	Domain[] patDomain = Pattern.getDomain(formals);
+	try { Constraint.assert(definition.getType().getConstraint()); }
+	catch(TypingEx e){
+	  User.error(name,
+		     "the constraint will never be satisfied",
+		     ": "+e.getMessage());
+	}
+	
+	// Introduce the types of the arguments
+	Monotype[] monotypes = MonoSymbol.getMonotype(parameters);
+	Typing.introduce(monotypes);
+
+	// The arguments have types below the method declaration domain
+	Monotype[] domain = definition.getType().domain();
 	for (int i = 0; i < monotypes.length; i++)
-	  Typing.in(monotypes[i], patDomain[i]);
+	  Typing.leq(monotypes[i], domain[i]);
+	
+	// The arguments are specialized by the patterns
+	try{
+	  Pattern.in(monotypes, formals);
 
-	nice.tools.code.Types.setBytecodeType(monotypes);
+	  nice.tools.code.Types.setBytecodeType(monotypes);
 
-	Typing.implies();
-      }
-      catch(TypingEx e){
-	User.error(name,"The patterns are not correct", e);
-      }
+	  Typing.implies();
+	}
+	catch(TypingEx e){
+	  User.error(name,"The patterns are not correct", e);
+	}
       
-      // Introduction of binders for the types of the arguments
-      // as in f(x@C : X)
-      for(int n = 0; n < formals.length; n++)
-	{
-	  Pattern pat = formals[n];
-	  Monotype type = pat.getType();
-	  if (type == null)
-	    continue;
+	// Introduction of binders for the types of the arguments
+	// as in f(x@C : X)
+	for(int n = 0; n < formals.length; n++)
+	  {
+	    Pattern pat = formals[n];
+	    Monotype type = pat.getType();
+	    if (type == null)
+	      continue;
+	    
+	    MonoSymbol sym = parameters[n];
 	  
-	  MonoSymbol sym = parameters[n];
-	  
-	  try{
-	    if(type instanceof MonotypeConstructor)
-	      {
-		TypeConstructor 
-		  tc = ((MonotypeConstructor) type).getTC(),
-		  formalTC = ((MonotypeConstructor) sym.getMonotype()).getTC();
-		
-		tc.setId(formalTC.getId());
-	      }
-	    else
-	      Internal.error("Not implemented ?");
-	  
-	    Typing.eq(type, sym.getMonotype());
+	    try{
+	      if(type instanceof MonotypeConstructor)
+		{
+		  TypeConstructor 
+		    tc = ((MonotypeConstructor) type).getTC(),
+		    formalTC = ((MonotypeConstructor) sym.getMonotype()).getTC();
+		  
+		  tc.setId(formalTC.getId());
+		}
+	      else
+		Internal.error("Not implemented ?");
+	      
+	      Typing.eq(type, sym.getMonotype());
+	    }
+	    catch(TypingEx e){
+	      User.error(pat.name, 
+			 "\":\" constraint for argument "+pat.name+
+			 " is not correct",
+			 ": "+e);
+	    }
 	  }
-	  catch(TypingEx e){
-	    User.error(pat.name, 
-		       "\":\" constraint for argument "+pat.name+
-		       " is not correct",
-		       ": "+e);
-	  }       
+      }
+      catch(mlsub.typing.BadSizeEx e){
+	Internal.error("Bad size in MethodBodyDefinition.typecheck()");
+      }
+      catch(TypingEx e) {
+	User.error(name,"Typing error in method body \""+name+"\":\n"+e);
+      }
+
+      Node.currentFunction = this;
+      bossa.syntax.dispatch.typecheck$0(body);
+    }
+    finally{
+      Node.currentFunction = null;
+      if(entered)
+	try{
+	  Typing.leave();
+	  entered = false;
+	}
+	catch(TypingEx e){
+	  User.error(this, "Type error in method "+name, " :"+e);
 	}
     }
-    catch(mlsub.typing.BadSizeEx e){
-      Internal.error("Bad size in MethodBodyDefinition.typecheck()");
-    }
-    catch(TypingEx e) {
-      User.error(name,"Typing error in method body \""+name+"\":\n"+e);
-    }
-
-    Node.currentFunction = this;
-    bossa.syntax.dispatch.typecheck$0(body);
-    Node.currentFunction = null;
   }
 
   private boolean entered = false;
-  
-  void endTypecheck()
-  {
-    if(entered)
-      try{
-	  Typing.leave();
-	  entered = false;
-      }
-      catch(TypingEx e){
-	User.error(this,
-		   "Type error in method "+name, " :"+e);
-      }
-  }
   
   /****************************************************************
    * Module interface

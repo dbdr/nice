@@ -1,3 +1,10 @@
+nice (0.7.0) unstable; urgency=low
+
+  * Added the possibility to call "super" from a method implementation.
+  * Added support for transient and volatile fields.
+
+ -- Daniel Bonniot <bonniot@users.sourceforge.net>  Tue, 16 Jul 2002 12:59:47 +0200
+
 nice (0.6) unstable; urgency=low
 
   * First stable version, based on 0.5.6

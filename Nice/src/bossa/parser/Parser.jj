@@ -2381,7 +2381,7 @@ Statement LocalDeclaration() :
     id=ident()
     [ "=" e=Expression() ] 
     { res = new Block.LocalVariable(id,type,false,e); }
-    ( LOOKAHEAD( "," <IDENT> ( "=" | ";" ) ) 
+    ( LOOKAHEAD( "," <IDENT> ( "=" | ";" | ",") ) 
       "," id=ident() {e=null;} [ "=" e=Expression() ] { res.addNext(id,e); } )*
   |
     (
@@ -2405,7 +2405,7 @@ Statement LocalDeclaration() :
       id=ident()
       [ "=" e=Expression() ] 
       { res = new Block.LocalVariable(id,type,constant,e); }
-      ( LOOKAHEAD( "," <IDENT> ( "=" | ";") ) 
+      ( LOOKAHEAD( "," <IDENT> ( "=" | ";" | ",") ) 
         "," id=ident() {e=null;} [ "=" e=Expression() ] { res.addNext(id,e); } )*
     )
   )

@@ -67,3 +67,6 @@
 /// PASS
   var i = 0;
   i = 1;
+
+/// PASS
+  int i,j,k;

@@ -768,8 +768,6 @@ boolean isAncestorOf(java.awt.Container, Component)
   = native boolean java.awt.Container.isAncestorOf(Component);
 void processContainerEvent(java.awt.Container, ContainerEvent)
   = native void java.awt.Container.processContainerEvent(ContainerEvent);
-void remove(java.awt.Container, Component)
-  = native void java.awt.Container.remove(Component);
 void setLayout(java.awt.Container, LayoutManager)
   = native void java.awt.Container.setLayout(LayoutManager);
 

@@ -439,10 +439,9 @@ Mode for editing/compiling Nice programs.
         (cond
          ((re-search-forward
            "^package\\s-+\\([\\.a-zA-Z0-9_]*\\)\\s-*[{;]" (point-max) t)
-          (nice-rename-buffer (concat (match-string-no-properties 1) "."
-                                      (file-name-sans-extension
-                                       (file-name-nondirectory
-                                        (buffer-file-name))))))
+          (nice-rename-buffer (concat (match-string-no-properties 1) " "
+                                      (file-name-nondirectory
+                                        (buffer-file-name)))))
          ((nice-file-p name)
           (nice-rename-buffer (file-name-nondirectory
                                (substring name 0 (- (length name) (length nice-extension))))))))))

@@ -1,6 +1,7 @@
 Nice-*.tar
 Nice-*.zip
 classes
+classes-inline
 doc
 share
 testsuite-fail-folder

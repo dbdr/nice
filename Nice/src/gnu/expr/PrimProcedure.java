@@ -212,6 +212,11 @@ public class PrimProcedure extends MethodProc implements gnu.expr.Inlineable
       interpreter.getTypeFor(method.getReturnType().getReflectClass());
   }
 
+  private boolean isConstructor()
+  {
+    return "<init>".equals(method.getName());
+  }
+
   private void init(Method method)
   {
     this.method = method;
@@ -233,6 +238,13 @@ public class PrimProcedure extends MethodProc implements gnu.expr.Inlineable
 	else
 	  this.op_code = 182;  // invokevirtual
       }
+  }
+
+  public static PrimProcedure specialCall(Method method)
+  {
+    PrimProcedure res = new PrimProcedure(method);
+    res.op_code = 183;
+    return res;
   }
 
   public PrimProcedure(Method method, LambdaExp source)
@@ -290,7 +302,7 @@ public class PrimProcedure extends MethodProc implements gnu.expr.Inlineable
 
   public final boolean getStaticFlag()
   {
-    return method == null || method.getStaticFlag() || op_code == 183;
+    return method == null || method.getStaticFlag() || isConstructor();
   }
 
   public final Type[] getParameterTypes() { return argTypes; }
@@ -360,7 +372,7 @@ public class PrimProcedure extends MethodProc implements gnu.expr.Inlineable
   {
     gnu.bytecode.CodeAttr code = comp.getCode();
 
-    if (opcode() == 183) // invokespecial == primitive-constructor
+    if (isConstructor())
       {
 	ClassType type = method.getDeclaringClass();
 	code.emitNew(type);

@@ -634,6 +634,12 @@ analyse(e@TupleExp, info)
   return e;
 }
 
+
+analyse(e@SuperExp, info)
+{
+  e.resolveTC(info.outerTypeScope);
+  return e;
+}
 /****************************************************************
  * Statements
  ****************************************************************/

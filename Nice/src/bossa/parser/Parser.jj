@@ -1642,6 +1642,18 @@ IdentExp identExp():
   { return new IdentExp(i); }
 }
 
+Expression SuperExp() :
+{ TypeIdent typeId;  List types = null; }
+{
+  "super" 
+  [ LOOKAHEAD("(") "(" 
+    typeId=typeIdent() { types=new ArrayList(); types.add(typeId); }
+    ( "," typeId=typeIdent() { types.add(typeId); } )*
+    ")"
+  ]
+  { return new SuperExp(types); }
+}
+
 Expression newExp():
 {
   Token t;
@@ -2148,9 +2160,8 @@ Expression PrimaryPrefix() :
 {
 (
   res=Literal()
-|
-  "super" 
-  { res = new SuperExp(); }
+| 
+  res = SuperExp()
 |
   // This includes the case "(" Expression() ")" to avoid lookahead
   res=tupleExp()
@@ -2532,8 +2543,8 @@ Statement RealStatementExpression() :
 (
   e1=Pre_crementExpression() ";"
 |
-  ( LOOKAHEAD( "super" )
-    "super" ";" { e1 = new SuperExp(); }
+  ( LOOKAHEAD("super")
+    e1=SuperExp() ";"
   |
     e1=PrimaryPrefix()
     ( 
@@ -2564,8 +2575,8 @@ Statement ShortStatementExpression() :
 (
   e1=Pre_crementExpression()
 |
-  ( LOOKAHEAD( "super" )
-    "super" { e1 = new SuperExp(); }
+  ( LOOKAHEAD("super")
+    e1=SuperExp()
   |
     e1=PrimaryPrefix()
     ( 

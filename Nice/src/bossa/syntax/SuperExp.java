@@ -36,11 +36,20 @@ import java.util.*;
 
 public class SuperExp extends Expression
 {
+
+  public SuperExp(List types)
+  {
+    this.types = types;
+  }
+
   void setCurrentMethod(MethodBodyDefinition m)
   {
     currentMethod = m;
 
     MethodDeclaration decl = currentMethod.getDeclaration();
+    if (tc != null && tc.size() != decl.getArity())
+      User.error(this, "Number of types doesn't match the number of arguments");
+      
     superAlternative = getSuper(decl);
   }
 
@@ -48,18 +57,46 @@ public class SuperExp extends Expression
   Alternative superAlternative = null;
   Method superMethod = null;
 
+  private Pattern[] minimumPatterns()
+  {
+    if (tc == null)
+      return null;
+
+    Pattern[] res = new Pattern[tc.size()];
+    for (int i = 0; i < tc.size(); i++)
+      res[i] = new Pattern((TypeConstructor)tc.get(i), false);
+
+    return res;
+  }
+
   private Alternative getSuper(MethodDeclaration decl)
   {
     Alternative superAlt = null;
     Alternative current = currentMethod.getAlternative();
 
     java.util.Iterator alternatives = Alternative.sortedAlternatives(decl).iterator();
+    Pattern[] mPatterns = minimumPatterns();
 
     // Look for the first alternative more general than the current one.
     while (alternatives.hasNext())
       {
 	Alternative a = (Alternative) alternatives.next();
 	if (a == current) continue;
+        
+        if (mPatterns != null)
+          {
+	    boolean match = true;
+            Pattern[] aPatterns = a.getPatterns();
+            for (int i = 0; i < mPatterns.length; i++)
+              if (! aPatterns[i].leq(mPatterns[i]))
+                {
+		  match = false;
+		  break;
+		}
+
+	    if (!match)
+	      continue;
+          }
 
 	if (Alternative.leq(current, a))
 	  if (superAlt == null || Alternative.leq(a, superAlt))
@@ -107,6 +144,16 @@ public class SuperExp extends Expression
     
     return superClass.getMethod(thisMethod.getName(), 
 				thisMethod.getParameterTypes(), true);
+  }
+
+  public void resolveTC(TypeScope scope)
+  {
+    if (types != null)
+      {
+        tc = new ArrayList();
+        for (Iterator it = types.iterator(); it.hasNext();)
+          tc.add(((TypeIdent)it.next()).resolveToTC(scope));
+      }
   }
 
   /****************************************************************
@@ -217,6 +264,9 @@ public class SuperExp extends Expression
   
   public String toString()
   {
-    return "super";
+    return "super" + (types != null ? "" : Util.map("(", ", ", ")", types));
   }
+
+  List/*TypeIdent*/ types;
+  List/*TypeConstructor*/ tc = null;
 }

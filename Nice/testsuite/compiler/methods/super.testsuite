@@ -247,3 +247,21 @@ class M {
   f(b@B) = super;
   f(a)   = 1;
 }
+
+/// PASS
+  assert foo(new Bottom());
+  /// Toplevel
+  interface Top {}
+  interface Left extends Top {}
+  interface Right extends Top {}
+  class Bottom implements Left, Right {}
+  boolean foo(Top x);
+  foo(Left x) = false;
+  foo(Right x) = true;
+  foo(Bottom x) = super(Right);
+
+/// FAIL
+  /// Toplevel 
+  void m(A);
+  m(A x) {}
+  m(B x) { /*///FAIL HERE */super(A,A); }

@@ -13,18 +13,18 @@ TAG     = ${shell if [ `grep '^ --' debian/changelog |head -1|wc -c` -le 10 ]; t
 SHELL = /bin/sh
 TOP=${PWD}
 
+java = java
 javac = javac
-#javac = jikes-classpath
 
 JAVAC_FLAGS = -O -g
 
 JAVAC= ${javac} -classpath "${TOP}/classes:${TOP}/classes.old" -sourcepath "${TOP}/src:${TOP}/stdlib" -d "${TOP}/classes" $(JAVAC_FLAGS)
-JAVACC= CLASSPATH="${TOP}/external/JavaCC.zip:${CLASSPATH}" java COM.sun.labs.javacc.Main
+JAVACC= CLASSPATH="${TOP}/external/JavaCC.zip:${CLASSPATH}" ${java} COM.sun.labs.javacc.Main
 JAVADOC=javadoc
 
 NICEC_ARGS= --exclude-runtime 
-NICEC=CLASSPATH="${TOP}/classes" nicec ${NICEC_ARGS} -d "${TOP}/classes.old" --sourcepath="${TOP}/stdlib.old:${TOP}/stdlib:${TOP}/src.old:${TOP}/src" --classpath="${TOP}/classes"
-NICEC1=${TOP}/bin/nicec ${NICEC_ARGS} -d "${TOP}/classes" --sourcepath="${TOP}/stdlib:${TOP}/src" 
+NICEC=CLASSPATH="${TOP}/classes" JAVA="${java}" nicec ${NICEC_ARGS} -d "${TOP}/classes.old" --sourcepath="${TOP}/stdlib.old:${TOP}/stdlib:${TOP}/src.old:${TOP}/src" --classpath="${TOP}/classes"
+NICEC1=JAVA="${java}" ${TOP}/bin/nicec ${NICEC_ARGS} -d "${TOP}/classes" --sourcepath="${TOP}/stdlib:${TOP}/src" 
 
 
 
@@ -73,10 +73,10 @@ setDate:
 	cd src/nice/tools/compiler; ./setBuildDate ${VERSION} ${TAG}
 
 test:
-	cd regtest; /usr/bin/time ./regtest
+	cd regtest; JAVA="${java}" /usr/bin/time ./regtest
 
 check:
-	/usr/bin/time java -Dassertions=true -classpath "classes" nice.tools.testsuite.TestNice testsuite
+	/usr/bin/time ${java} -Dassertions=true -classpath "classes" nice.tools.testsuite.TestNice testsuite
 
 .PHONY: coverage
 coverage: share/java/nice.jar

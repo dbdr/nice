@@ -42,6 +42,10 @@ public class Instanceof extends Procedure2 implements Inlineable
     Expression value = args[0];
     Type type = (Type) ((QuoteExp) args[1]).getValue();
 
+    if (type instanceof PrimType)
+      throw new bossa.util.UserError
+	(exp, "instanceof cannot be used with primitive types");
+
     value.compile(comp, Target.pushObject);
     code.emitInstanceof(type);
     target.compileFromStack(comp, Type.boolean_type);

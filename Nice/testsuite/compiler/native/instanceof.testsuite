@@ -26,3 +26,6 @@
 /// PASS
   if (0 instanceof String)
     throw new Error();
+
+/// FAIL
+  boolean b = /* /// FAIL HERE */ 1 instanceof int;

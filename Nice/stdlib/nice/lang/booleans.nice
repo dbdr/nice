@@ -5,8 +5,7 @@ package nice.lang;
 */
 
 final class boolean 
-  implements BooleanAlgebra 
-  implements Comparable
+  implements BooleanAlgebra, Comparable
 = native;
 
 boolean `==`(boolean, boolean) = native boolean Native.eq(boolean,boolean);

@@ -62,7 +62,16 @@ public class PrimitiveType extends ClassDefinition.ClassImplementation
       {
 	byteTC = tc;
 	byteType = Monotype.sure(new MonotypeConstructor(tc, null));
+	bytePolytype = new mlsub.typing.Polytype(byteType);
 	return SpecialTypes.byteType;
+      }
+    
+    if(name.equals("nice.lang.short"))
+      {
+	shortTC = tc;
+	shortType = Monotype.sure(new MonotypeConstructor(tc, null));
+	shortPolytype = new mlsub.typing.Polytype(shortType);
+	return SpecialTypes.shortType;
       }
     
     if(name.equals("nice.lang.int"))
@@ -87,13 +96,6 @@ public class PrimitiveType extends ClassDefinition.ClassImplementation
 	boolType = Monotype.sure(new MonotypeConstructor(tc, null));
 	boolPolytype = new mlsub.typing.Polytype(boolType);
 	return SpecialTypes.booleanType;
-      }
-    
-    if(name.equals("nice.lang.short"))
-      {
-	shortTC = tc;
-	shortType = Monotype.sure(new MonotypeConstructor(tc, null));
-	return SpecialTypes.shortType;
       }
     
     if(name.equals("nice.lang.double"))
@@ -161,7 +163,7 @@ public class PrimitiveType extends ClassDefinition.ClassImplementation
   
   public static TypeConstructor byteTC, charTC, intTC, longTC, boolTC, shortTC, doubleTC, floatTC, arrayTC;
   public static mlsub.typing.Monotype byteType, charType, intType, longType, boolType, shortType, doubleType, floatType, voidType;
-  static mlsub.typing.Polytype voidPolytype, boolPolytype, intPolytype, longPolytype;
+  static mlsub.typing.Polytype voidPolytype, boolPolytype, bytePolytype, shortPolytype, intPolytype, longPolytype;
 
   public static TypeConstructor maybeTC, sureTC, nullTC;
 

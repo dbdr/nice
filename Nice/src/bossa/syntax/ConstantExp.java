@@ -14,6 +14,7 @@ package bossa.syntax;
 
 import mlsub.typing.TypeConstructor;
 import mlsub.typing.MonotypeConstructor;
+import mlsub.typing.Polytype;
 
 import bossa.util.*;
 
@@ -29,16 +30,20 @@ public class ConstantExp extends Expression
   {
   }
   
-  ConstantExp(TypeConstructor tc, Object value, String representation,
+  ConstantExp(Polytype type, Object value, String representation, 
 	      Location location)
   {
-    // XXX pass a polytype instead
-    this.type = new mlsub.typing.Polytype
-      (mlsub.typing.Constraint.True, 
-       Monotype.sure(new MonotypeConstructor(tc,null)));
+    this.type = type;
     this.value = value;
     this.representation = representation;
     setLocation(location);
+  }
+  
+  ConstantExp(TypeConstructor tc, Object value, String representation,
+	      Location location)
+  {
+    this(new Polytype(Monotype.sure(new MonotypeConstructor(tc,null))),
+	 value, representation, location);
   }
   
   void computeType()
@@ -122,27 +127,27 @@ public class ConstantExp extends Expression
   private static Expression makeInt(long value, boolean isLong, 
 				    Location location)
   {
-    TypeConstructor type;
+    Polytype type;
     Number object;
     
     if (value >= Byte.MIN_VALUE && value <= Byte.MAX_VALUE && !isLong)
       {
-	type = PrimitiveType.byteTC;
+	type = PrimitiveType.bytePolytype;
 	object = new Byte((byte) value);
       }
     else if (value >= Short.MIN_VALUE && value <= Short.MAX_VALUE && !isLong)
       {
-	type = PrimitiveType.shortTC;
+	type = PrimitiveType.shortPolytype;
 	object = new Short((short) value);
       }
     else if (value >= Integer.MIN_VALUE && value <= Integer.MAX_VALUE && !isLong)
       {
-	type = PrimitiveType.intTC;
+	type = PrimitiveType.intPolytype;
 	object = new Integer((int) value);
       }
     else
       {
-	type = PrimitiveType.longTC;
+	type = PrimitiveType.longPolytype;
 	object = new Long(value);
       }
     

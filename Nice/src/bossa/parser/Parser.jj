@@ -955,7 +955,7 @@ TypeIdent superClass():
 
 List extensions():
 {
-  List res=new ArrayList(0);
+  List res=new LinkedList();
   TypeIdent name;
 }
 {
@@ -967,7 +967,7 @@ List extensions():
 
 List interfaces():
 {
-  List res=new ArrayList(0);
+  List res=new LinkedList();
   TypeIdent name;
 }
 {
@@ -1004,7 +1004,6 @@ ClassDefinition classDefinition():
   LocatedString name;
   List parameters;
   List fields=new ArrayList(),methods=null;
-  List imp=new ArrayList(0),abs=new ArrayList(0);
   List l;
   List typeParametersVariances = new ArrayList(0);
   boolean isFinal=false, isAbstract=false, isInterface=false;
@@ -1027,11 +1026,11 @@ ClassDefinition classDefinition():
   name=ident() 
   parameters=monotypeVars(typeParametersVariances) 
 
-  { TypeIdent sup = null; }
+  { TypeIdent sup = null; List imp = null, abs = null; }
+
   [ "extends" sup = superClass() ]
-  ( "implements" l=interfaces() { imp.addAll(l); } 
-  | "finally" "implements"  l=interfaces() { abs.addAll(l); }
-  )*
+  [ "implements" imp=interfaces() ]
+  [ "finally" "implements"  abs=interfaces() ]
   { res = ClassDefinition.makeClass
 	(name,
 	isFinal,isAbstract,

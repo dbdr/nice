@@ -319,6 +319,8 @@ public final class JavaClasses
     
 	    if (res != null)
 	      TypeConstructors.addConstructor(tc, res);
+	    else if(Debug.javaTypes)
+	      Debug.println("Constructor " + m + " ignored");
 	  }
 	else
 	  {

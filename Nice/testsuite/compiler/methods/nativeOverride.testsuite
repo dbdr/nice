@@ -1,0 +1,14 @@
+/// PASS
+  new SelectionTool().mouseReleased(null);
+  /// Toplevel
+
+class SelectionTool implements java.awt.event.MouseListener {
+  ?java.awt.Point mousePos = null;
+  mouseClicked(event) {}
+  mouseEntered(event) {}
+  mouseExited(event) {}
+  mousePressed(event) {}
+  mouseReleased(event) {
+    mousePos = null;
+  }
+}

@@ -12,7 +12,7 @@ nice (0.7.4) unstable; urgency=low
     and the syntax for class type parameters.
   * Removed the old syntax <T1, T2> for tuples. Use (T1, T2) instead.
   * Bugfixes (forward reference to constructor in field initializer,
-    anonymous functions in field initializer).
+    anonymous functions in field initializer, override of void native method).
 
  --
 

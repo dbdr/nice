@@ -402,8 +402,14 @@ public class Compilation
 		    Number num = (Number) value;
 		    switch (sig1)
 		      {
-		      case 'B':  case 'S':  case 'I': case 'C':
+		      case 'I': case 'C':
 			code.emitPushInt(num.intValue());
+			return;
+		      case 'S':
+			code.emitPushInt(num.shortValue());
+			return;
+		      case 'B':
+			code.emitPushInt(num.byteValue());
 			return;
 		      case 'J':
 			code.emitPushLong(num.longValue());

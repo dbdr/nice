@@ -1,0 +1,19 @@
+/// PASS
+  assert short(32768) == -32768;
+  assert byte(128) == -128;
+
+/// PASS
+  short s = short(32768);
+  assert s == -32768;
+
+  byte b = byte(128);
+  assert b == -128;
+
+/// PASS
+  long l;
+  l = 2147483648;
+  assert int(l) == -2147483648;
+  l = 32768;
+  assert short(l) == -32768;
+  l = 128;
+  assert byte(l) == -128;

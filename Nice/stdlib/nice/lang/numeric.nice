@@ -22,9 +22,10 @@
 
 package nice.lang;
 
-int MAX_INT() = native java.lang.Integer.MAX_VALUE;
-
-int int(double d) = native int nice.lang.Native.intValue(double);
+// Conversions
+int int(double d) = inline nice.lang.inline.Nop();
+short short(double d) = inline nice.lang.inline.Nop();
+byte byte(double d) = inline nice.lang.inline.Nop();
 
 // Comparison
 boolean `<`(double, double) = inline nice.lang.inline.CompOp("dLt");

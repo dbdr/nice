@@ -47,11 +47,11 @@ public class ReturnStmt extends Statement
 
   public gnu.expr.Expression generateCode()
   {
+    gnu.expr.BlockExp block = includingFunction.getBlock();
     if (value == null)
-      return new gnu.expr.ExitExp(includingFunction.getBlock());
+      return new gnu.expr.ExitExp(block);
     else
-      return new gnu.expr.ExitExp(value.generateCode(),
-				  includingFunction.getBlock());
+      return new gnu.expr.ExitExp(value.generateCode(), block);
   }
   
   /****************************************************************

@@ -92,7 +92,7 @@ public class LocatedString
 
   public final boolean equals(LocatedString s)
   {
-    boolean res=content.equals(s.content);
+    boolean res = content.equals(s.content);
     return res;
   }
 

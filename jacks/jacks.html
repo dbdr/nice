@@ -1,0 +1,357 @@
+<html>
+<title>Jacks Project</title>
+
+<body bgcolor="white">
+
+<h1>Jacks (Jacks is an Automated Compiler Killing Suite)</h1>
+
+<p>
+
+<IMG SRC="docs/images/jacks.png" ALIGN=bottom ALT="Jacks Logo">
+Betting on Java? You had better be holding a good hand.
+
+<br>
+<br>
+
+<ul>
+<li>
+<A HREF="#WHATIS">What is Jacks?</A>
+</li>
+<li>
+<A HREF="#INSTALL">Install Requirements</A>
+</li>
+<li>
+<A HREF="#CONFIG">Configure Jacks for your system</A>
+</li>
+<li>
+<A HREF="#RUNING">Running Jacks regression tests</A>
+</li>
+<li>
+<A HREF="#NEWTEST">Adding a new test case</A>
+</li>
+<li>
+<A HREF="#REVIEWTESTS">Review existing test cases</A>
+</li>
+<li>
+<A HREF="#MAIL">Jacks mailing list</A>
+</li>
+</ul>
+
+
+<p>
+
+<A NAME="WHATIS"><H3>What is Jacks?</H3></A>
+Jacks is a free test suite designed to detect bugs
+in a Java compiler. We guarantee that it will
+find at least one bug in any supported Java
+compiler, in fact it may find more than one.
+Jacks is not designed to test a Java runtime
+(JVM) or Java class libraries. The
+<A HREF="http://sourceware.cygnus.com/mauve/">Mauve</A>
+project already aims to do that.
+
+<p>
+
+Jacks includes a collection of Java compiler tests
+contributed by people on the net. Jacks is free software
+licensed under the terms of the
+<A HREF="COPYING">GPL</A>.
+A test case must be licensed under the terms
+of the GPL to be suitable for inclusion into Jacks,
+but authors retain the original copyright.
+The license used by the Jacks test suite does
+not effect your ability to run the suite with
+any free or non-free Java compiler.
+
+<p>
+
+The layout of
+<A HREF="docs/tests.html">
+directories in the Jacks test suite
+</A>
+mimics chapters from the JLS.<br>
+The Java Language Specification Version 2 can be found at:
+<br>
+<br>
+
+<lu>
+<li>
+<A HREF="http://java.sun.com/docs/books/jls/second_edition/html/jTOC.doc.html">
+http://java.sun.com/docs/books/jls/second_edition/html/jTOC.doc.html
+</A>
+</li>
+<li>
+<A HREF="http://java.sun.com/docs/books/jls/html">
+http://java.sun.com/docs/books/jls/html</A> <b>(Old Version)</b>
+</li>
+</ul>
+
+<p>
+
+
+<A NAME="INSTALL"><H3>Install Requirements</H3></A>
+
+Tcl version 8.3 is required as it provides
+the regression testing framework Jacks depends
+on. Older versions of Tcl will not work as they
+do not include the tcltest extension and they
+do not support Unicode character sets.
+
+<p>
+
+Windows users can download the
+<A HREF="http://downloads.activestate.com/ActiveTcl/Windows/8.3.4/ActiveTcl8.3.4.1-9.win32-ix86.exe">
+Tcl/Tk for Windows installer
+</A>.
+
+<p>
+
+Red Hat 6.X Linux (x86) users can
+<A HREF="http://jfontain.free.fr/tcl-8.3.2-1.i386.rpm">
+download an RPM
+</A>. Red Hat 7.X ships with Tcl 8.3.
+
+<p>
+
+Everyone else will need to build it from source:
+
+<A HREF="http://prdownloads.sourceforge.net/tcl/tcl8.3.4.tar.gz">
+tcl8.3.4.tar.gz
+</A>.
+
+<p>
+
+Once Tcl is installed, you will need the Jacks source
+code from the CVS. The CVS module for jacks can be
+fetched like so:
+
+<code>
+<pre>
+setenv CVSROOT :pserver:anoncvs@oss.software.ibm.com:/usr/cvs/jikes
+
+cvs login
+paswsd anoncvs
+
+cvs checkout jacks
+</pre>
+</code>
+
+<p>
+
+<A NAME="CONFIG"><H3>Configure Jacks for your system</H3></A>
+Before running the tests, you will need to tell Jacks
+where you have installed each of the compilers
+you intend to use. A setup file exists for each supported
+compiler. For example, if you want to run tests with
+the jikes compiler, you would need to edit
+the jikes_setup configuration file so that includes
+the path name where your jikes compiler is installed.
+You may also want to set the CLASSPATH that will
+be used for the tests and the optional path name
+of the Java runtime to use for runtime tests. You
+can add any number of configuration files. To
+remove a configuration you do not want, just delete
+the setup file for that configuration.
+
+<ul>
+<li>
+javac_setup (JDK 1.2 or 1.3, JDK 1.1 is discouraged)
+<li>
+jikes_setup (<A HREF="http://www-124.ibm.com/developerworks/opensource/jikes/">Jikes Project</A>)
+<li>
+kaffe_setup (<A HREF="http://www.kaffe.org">Kaffe Project</A>
+uses the
+<A HREF="http://www.dms.at/kopi/kjc.html">Kopi Compiler</A>)
+
+<li>
+gcj_setup (<A HREF="http://gcc.gnu.org/java/">GCJ Project</A>)
+</ul>
+
+
+<p>
+
+<A NAME="RUNING"><H3>Running Jacks regression tests</H3></A>
+
+To run the tests, invoke the
+jacks shell script and pass it the
+name of the compiler you want to
+test. You will want to put the
+toplevel directory on your PATH
+so that you can run the jacks shell
+script.
+
+Test the javac compiler like this:<br><br>
+
+<code>
+<pre>
+% jacks javac
+</pre>
+</code>
+
+<p>
+
+The above command will recurse into
+subdirectories and run all the tests
+it finds using the javac compiler.
+If any of the tests fail, an
+error will be displayed.
+
+<p>
+
+You can also run tests with multiple
+compilers using a single command. This
+example runs the tests using javac
+and then jikes.<br><br>
+
+<code>
+<pre>
+% jacks "javac jikes"
+</pre>
+</code>
+
+<p>
+
+It is also possible to run tests using
+all of the supported compilers. The following
+command shows how this is done:<br><br>
+
+<code>
+<pre>
+% jacks all
+</pre>
+</code>
+
+<p>
+
+You can run the tests in a specific
+subdirectory like this:
+
+<code>
+<pre>
+% cd tests/jls/packages/package-declarations/unnamed-packages
+% jacks jikes
+</pre>
+</code>
+
+<p>
+
+In addition, you can pass patterns as the
+third argument. In this way, you can run only
+those tests that match a given pattern.
+
+<code>
+<pre>
+% jacks jikes "*int*"
+</pre>
+</code>
+
+The above command will run all the test
+with names that match the pattern *int*.
+You can also pass multiple patterns.
+
+<code>
+<pre>
+% jacks jikes "*int* test-1 *foo-1"
+</pre>
+</code>
+
+<p>
+
+The last and perhaps most interesting feature
+of Jacks is the ability to generate
+regression reports. These reports show
+how the current test results have changed
+with respect to the previous results.
+This is very useful since you can run the
+tests and check the results to see if
+any changes you made caused regressions.
+This really makes a big difference when
+there are a large number of tests, since
+otherwise you would not know if a failing
+test was failing before or is now failing
+because of your changes. To generate a
+changes file for the jikes target, run:
+
+<code>
+<pre>
+% jacks loggen jikes
+</pre>
+</code>
+
+That will generate a <code>logging/jikes.changes</code>.
+The first set of entries are the most recent changes.
+A transition of <code>{PASSED FAILED}</code> indicates
+a regression while a transition of
+<code>{FAILED PASSED}</code> indicates a bug fix.
+Note that generating a changes file requires a
+cvs client and network access.
+
+<p>
+
+The Jacks suite also includes test that
+require a Java runtime in addition
+to a Java compiler. These tests are
+located in the
+<code>tests/runtime</code> directory.
+
+<p>
+
+Tests that apply to only a specific compiler
+are included in a top level directory named after
+the compiler. For example, tests in the
+<code>tests/gcj</code> directory will only be
+run when testing with the gcj compiler.
+
+<p>
+
+You can clean up generated files after
+a test run with the following command:
+
+<code>
+<pre>
+% jacks clean
+</pre>
+</code>
+
+<p>
+
+<A NAME="NEWTEST"><H3>Adding a new test case</H3></A>
+
+Adding a new test case to Jacks is very easy. One of the
+main goals for Jacks was to create a set of tests that
+could be extended with minimal effort. A detailed
+example of 
+<A HREF="docs/new_testcase.html">Adding A Test Case</A>
+is provided.
+
+<p>
+
+
+<A NAME="REVIEWTESTS"><H3>Review existing tests</H3></A>
+
+A nicely
+<A HREF="docs/tests.html">
+cross referenced index
+</a>
+of every test in the Jacks
+suite is provided. You can look up a test case by
+test number, find the JLS section that a given test
+directory refers to, review each of the test that
+apply to a given compiler, or simply review all the
+test that apply to a given JLS section.
+
+<p>
+
+<A NAME="MAIL"><H3>Jacks mailing list</H3></A>
+
+You are welcome to join the
+<A HREF="http://www-124.ibm.com/developerworks/oss/mailman/listinfo/jacks">
+Jacks mailing list</A>
+and discuss anything related to the Jacks test-suite.
+
+<br>
+
+<hr>
+
+</body>
+</html>

@@ -1,0 +1,18 @@
+#!/bin/sh
+
+### If you are running under UNIX, make sure
+### the next two commands are uncommented.
+
+# Make sure that we always get core dumps \
+ulimit -c 1000
+
+# exec the tcl shell from the PATH \
+exec tclsh8.3 "$0" ${1+"$@"}
+
+### If you are running under Cygwin,
+###  uncomment this command instead.
+
+# Uncomment the next line to run under Cygwin \
+#exec tclsh83 `cygpath -w "$0"` ${1+$@}
+
+source [file join [file dirname $argv0] jacks.tcl]

@@ -1,0 +1,17 @@
+# Set the paths for your tools in this file
+
+set JAVA_HOME /home/mo/project/install/kaffe
+
+set JAVA_CLASSPATH .
+
+set JAVAC ${JAVA_HOME}/bin/javac
+
+set JAVAC_FLAGS ""
+
+set JAVA ${JAVA_HOME}/bin/kaffe
+
+set JAVA_FLAGS ""
+
+# Activate kaffe only test cases
+set tcltest::testConstraints(kaffe) 1
+

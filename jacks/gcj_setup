@@ -1,0 +1,27 @@
+# Set the paths for your tools in this file
+
+set JAVA_HOME /usr/local/jdk118_v1
+
+set JAVA_CLASSPATH ""
+
+set JAVAC /mnt/image/install/bin/gcj
+
+set JAVAC_FLAGS "-C"
+
+set JAVA ${JAVA_HOME}/bin/java
+
+set JAVA_FLAGS ""
+
+# Set compiler specific test constraints.
+# This one will skip any test marked with
+# the {atfile} constraint when running gcj.
+
+set tcltest::testConstraints(atfiles) 0
+
+# This activates encoding support.
+set JAVAC_ENCODING_FLAG "--encoding="
+set tcltest::testConstraints(encoding) 1
+
+# Activate gcj only test cases
+set tcltest::testConstraints(gcj) 1
+

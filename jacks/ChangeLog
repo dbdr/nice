@@ -1,0 +1,2021 @@
+2001-12-23  Mo DeJong  <supermo@bayarea.net>
+
+	* tests/jls/expressions/additive-operators/string-concatenation-operator/tests.tcl:
+	Add a series of non-constant string concatenation tests that
+	demonstrate regressions in Jikes.
+
+2001-12-22  Mo DeJong  <supermo@bayarea.net>
+
+	* jacks.html: Update Windows download installer to use the
+	8.3.4 release from active state. Remove RH 7.X RPM since
+	Tcl 8.3 is already included on that system. Update URL
+	for tar file. Update Jikes URL along with GCJ URL. Cleanup
+	some minor word usage issue.
+
+2001-12-21  Mo DeJong  <supermo@bayarea.net>
+
+	* tests/jls/blocks-and-statements/if-statement/tests.tcl:
+	Add tests for JLS 14.9, the if statement.
+
+2001-12-15  Eric Blake  <ebb9@email.byu.edu>
+
+	* tests/jls/names/meaning-of-a-name/expression-names/qualified/tests.tcl:
+	* tests/jls/names/meaning-of-a-name/expression-names/simple/tests.tcl:
+	* tests/jls/names/meaning-of-a-name/method-names/qualified/tests.tcl:
+	* tests/jls/names/meaning-of-a-name/method-names/simple/tests.tcl:
+	* tests/jls/names/meaning-of-a-name/package-names/qualified/tests.tcl:
+	* tests/jls/names/meaning-of-a-name/package-names/simple/tests.tcl:
+	* tests/jls/names/meaning-of-a-name/packageortypenames/qualified/tests.tcl:
+	* tests/jls/names/meaning-of-a-name/packageortypenames/simple/tests.tcl:
+	* tests/jls/names/meaning-of-a-name/reclassification/tests.tcl:
+	* tests/jls/names/meaning-of-a-name/syntactic-classification/tests.tcl:
+	* tests/jls/names/meaning-of-a-name/type-names/qualified/tests.tcl:
+	* tests/jls/names/meaning-of-a-name/type-names/simple/tests.tcl:
+	Add all sorts of tests for name resolution.
+
+2001-12-15  Eric Blake  <ebb9@email.byu.edu>
+
+	* tests/runtime/jls/execution/creation-of-new-class-instances/tests.tcl:
+	* tests/runtime/jls/execution/initialization-of-classes-and-interfaces/detailed-initialization-procedure/tests.tcl:
+	Add tests of default initializers, based on discussion on gcj
+	mailing list.
+
+2001-12-14  Mo DeJong  <supermo@bayarea.net>
+
+	* tests/jls/expressions/additive-operators/string-concatenation-operator/tests.tcl:
+	Check for implicit conversion to type string when the additive
+	operator is used with a non-constant primitive type. This example
+	demonstrates a recent regression in Jikes.
+
+2001-12-14  Mo DeJong  <supermo@bayarea.net>
+
+	* tests/non-jls/zip/tests.tcl: check for
+	non-existent zip file on CLASSPATH.
+
+2001-12-13  Mo DeJong  <supermo@bayarea.net>
+
+	* tests/non-jls/zip/ZipComment.zip:
+	* tests/non-jls/zip/ZipCompressed.zip:
+	* tests/non-jls/zip/ZipNoComment.zip:
+	* tests/non-jls/zip/tests.tcl: Add tests cases for loading
+	a class file from a zip archive. Compressed, uncompressed,
+	and a zip that includes a comment field are checked.
+
+2001-12-11  Mo DeJong  <supermo@bayarea.net>
+
+	* tests/non-jls/argument-expansion/tests.tcl:
+	Revert argument expansion changes made on 2001-11-01.
+	We again assume that only one file name per line is
+	supported for an @file.
+
+2001-12-10  Eric Blake  <ebb9@email.byu.edu>
+
+	* docs/tests.html: Regenerate, to account for 3000+ tests
+	* logging/javac.log:
+	* logging/javac.changes: Run with JDK 1.4-beta3
+	* logging/jikes.log:
+	* logging/jikes.changes: Update for latest tests, but still tested
+	on jikes 1.15 for easy check of regressions.
+
+2001-12-10  Eric Blake  <ebb9@email.byu.edu>
+
+	* tests/jikes/jls/blocks-and-statements/labeled-statements/tests.tcl:
+	* tests/jikes/jls/packages/import-declarations/type-import-on-demand-declaration/tests.tcl:
+	* tests/jls/classes/member-type-declarations/static-member-type-declarations/tests.tcl
+	* tests/jls/definite-assignment/expressions/assignment-expressions/tests.tcl:
+	* tests/jls/definite-assignment/tests.tcl:
+	Fix some test typos, add some more definite assignment tests.
+
+2001-12-09  Eric Blake  <ebb9@email.byu.edu>
+
+	* tests/jls/blocks-and-statements/unreachable-statements/tests.tcl:
+	Update some test results to match Sun's claim (bug 4046575) that
+	unchecked exceptions catch clauses are reachable, even in an empty
+	try block.
+
+2001-12-09  Eric Blake  <ebb9@email.byu.edu>
+
+	* tests/jls/definite-assignment/anonymous-classes/tests.tcl:
+	* tests/runtime/jls/definite-assignment/anonymous-classes/tests.tcl:
+	Add tests to expose bug I found in javac.
+
+2001-12-08  Eric Blake  <ebb9@email.byu.edu>
+
+	* tests/jls/blocks-and-statements/labeled-statements/tests.tcl:
+	Fix a typo.
+	* tests/jikes/jls/blocks-and-statements/labeled-statements/tests.tcl:
+	Add a test of a bad error message.
+
+2001-12-08  Eric Blake  <ebb9@email.byu.edu>
+
+	* tests/jls/expressions/primary-expressions/class-literals/tests.tcl:
+	* tests/jls/expressions/method-invocation-expressions/determine-class-or-interface/tests.tcl:
+	* tests/jls/expressions/field-access-expressions/accessing-superclass-members-using-super/tests.tcl:
+	* tests/jls/expressions/primary-expressions/qualified-this/tests.tcl:
+	Add tests of invalid syntax.
+
+2001-12-08  Eric Blake  <ebb9@email.byu.edu>
+
+	* tests/jls/classes/field-declarations/initialization-of-fields/tests.tcl:
+	* tests/jls/classes/instance-initializers/tests.tcl:
+	* tests/jls/classes/static-initializers/tests.tcl: Add more tests,
+	and use ClassNotFoundException instead of Exception.
+
+2001-12-07  Eric Blake  <ebb9@email.byu.edu>
+
+	* tests/jls/conversions-and-promotions/assignment-conversion/tests.tcl:
+	Add more tests of conversions.
+
+2001-12-07  Eric Blake  <ebb9@email.byu.edu>
+
+	* tests/jls/classes/method-declarations/inheritance-overriding-and-hiding/tests.tcl:
+	* tests/runtime/jls/classes/method-declarations/inheritance-overriding-and-hiding/tests.tcl:
+	Add tests of Miranda methods, which were obsoleted by JVMS2.
+
+2001-12-07  Eric Blake  <ebb9@email.byu.edu>
+
+	* tests/jls/expressions/method-invocation-expressions/determine-class-or-interface/tests.tcl:
+	* tests/jls/expressions/field-access-expressions/accessing-superclass-members-using-super/tests.tcl:
+	* tests/jls/expressions/primary-expressions/qualified-this/tests.tcl:
+	Add tests of obscuring classname for qualified super and qualified
+	this, from jikes bug 2465.
+
+2001-12-06  Eric Blake  <ebb9@email.byu.edu>
+
+	* tests/jls/classes/field-declarations/initialization-of-fields/initializers-for-instance-variables/tests.tcl:
+	* tests/jls/classes/field-declarations/initialization-of-fields/initializers-for-static-variables/tests.tcl:
+	Add more tests of field initialization.
+
+2001-12-06  Eric Blake  <ebb9@email.byu.edu>
+
+	* tests/jls/lexical-structure/literals/floating-point-literals/tests.tcl:
+	* tests/runtime/non-jls/assert/tests.tcl: Minor cleanups.
+	* tests/jls/packages/import-declarations/single-type-import-declaration/tests.tcl:
+	* tests/jls/packages/import-declarations/type-import-on-demand-declaration/tests.tcl:
+	Add some more tests.
+
+2001-12-06  Eric Blake  <ebb9@email.byu.edu>
+
+	* tests/jls/classes/class-declaration/superclasses-and-subclasses/tests.tcl:
+	Fix minor typos.
+	* tests/jls/classes/field-declarations/initialization-of-fields/tests.tcl:
+	* tests/jls/classes/instance-initializers/tests.tcl:
+	* tests/jls/classes/static-initializers/tests.tcl: Add new tests
+	of initializers and initializer blocks.
+
+2001-11-30  Eric Blake  <ebb9@email.byu.edu>
+
+	* tests/non-jls/assert/definite-assignment/tests.tcl: Add two
+	tests of one more corner case in asserts.
+
+2001-11-13  Eric Blake  <ebb9@email.byu.edu>
+
+	* tests/non-jls/assert/definite-assignment/tests.tcl:
+	* tests/non-jls/assert/syntax/tests.tcl:
+	* tests/runtime/jls/blocks-and-statements/local-class-declarations/tests.tcl:
+	* tests/jls/classes/method-declarations/method-modifiers/tests.tcl:
+	* tests/jls/definite-assignment/expressions/boolean-conditional-or/tests.tcl:
+	Renumbered to avoid test name conflicts.
+	* docs/tests.html: Regenerate to account for new tests.
+
+2001-11-12  Eric Blake  <ebb9@email.byu.edu>
+
+	* tests/jls/classes/class-declaration/superclasses-and-subclasses/tests.tcl:
+	* tests/jls/classes/class-declaration/superinterfaces/tests.tcl:
+	Add more tests, including some of ill-formed
+	java.lang.Object. Watch compilers coredump!
+
+2001-11-12  Eric Blake  <ebb9@email.byu.edu>
+
+	* tests/jls/interfaces/abstract-method-declarations/overloading/tests.tcl:
+	* tests/jls/interfaces/field-constant-declarations/initialization-of-fields/tests.tcl:
+	* tests/jls/interfaces/interface-declarations/superinterfaces-and-subinterfaces/tests.tcl:
+	Fix some typos.
+	* tests/jls/conversions-and-promotions/kinds-of-conversion/narrowing-primitive-conversions/tests.tcl:
+	* tests/runtime/jls/expressions/constant-expression/tests.tcl:
+	Add tests which uncovered jikes regressions.
+
+2001-11-12  Eric Blake  <ebb9@email.byu.edu>
+
+	* logging/jikes.changes:
+	* logging/jikes.log: Regenerate with jikes 1.15 to account for many
+	recently added tests.
+
+2001-11-12  Eric Blake  <ebb9@email.byu.edu>
+
+	* tests/runtime/jls/classes/constructor-declarations/default-constructor/tests.tcl:
+	Fix typo.
+	* tests/jls/classes/field-declarations/initialization-of-fields/restrictions/tests.tcl:
+	Removed tests that more properly belonged in 9.3.1.
+	* tests/jls/interfaces/interface-declarations/interface-modifiers/tests.tcl:
+	* tests/jls/interfaces/interface-declarations/superinterfaces-and-subinterfaces/tests.tcl:
+	* tests/jls/interfaces/interface-declarations/interface-body-and-member-declarations/tests.tcl:
+	* tests/jls/interfaces/interface-members/tests.tcl:
+	* tests/jls/interfaces/field-constant-declarations/initialization-of-fields/tests.tcl:
+	* tests/jls/interfaces/field-constant-declarations/tests.tcl:
+	* tests/jls/interfaces/abstract-method-declarations/tests.tcl:
+	* tests/jls/interfaces/abstract-method-declarations/inheritance-and-overriding/tests.tcl:
+	* tests/jls/interfaces/abstract-method-declarations/overloading/tests.tcl:
+	Add more tests of interface modifiers, and new tests for interface
+	members.
+
+2001-11-11  Eric Blake  <ebb9@email.byu.edu>
+
+	* tests/jls/packages/import-declarations/single-type-import-declaration/tests.tcl:
+	* tests/jls/packages/import-declarations/type-import-on-demand-declaration/tests.tcl:
+	* tests/jls/packages/import-declarations/automatic-imports/tests.tcl:
+	* tests/jls/packages/import-declarations/strange-example/tests.tcl:
+	Add tests of import statements.
+	* tests/jls/expressions/method-invocation-expressions/determine-method-signature/choose-most-specific/tests.tcl:
+	* tests/jls/expressions/field-access-expressions/using-a-primary/tests.tcl:
+	Add some tests of accessibility avoiding ambiguity of multiple
+	inheritance.
+
+2001-11-11  Eric Blake  <ebb9@email.byu.edu>
+
+	* tests/jls/names/access-control/details-on-protected-access/protected-member/tests.tcl:
+	* tests/jls/names/access-control/details-on-protected-access/protected-constructor/tests.tcl:
+	Add tests of access to protected members and constructors accross
+	package boundaries.
+
+2001-11-08  Eric Blake  <ebb9@email.byu.edu>
+
+	* tests/jls/classes/class-declaration/class-modifiers/abstract-classes/tests.tcl:
+	Added tests of abstract class requirements even when a default
+	abstract method is not inherited.
+
+2001-11-03  Eric Blake  <ebb9@email.byu.edu>
+
+	* tests/non-jls/assert/syntax/tests.tcl:
+	* tests/non-jls/assert/definite-assignment/tests.tcl:
+	* tests/runtime/non-jls/assert/tests.tcl: Add tests of the assert
+	statement added in JDK 1.4.
+	* javac_setup:
+	* jikes_setup: Add comment on how to run assert tests.
+
+2001-11-03  Eric Blake  <ebb9@email.byu.edu>
+
+	* tests/runtime/jls/expressions/unary-operators/tests.tcl:
+	* tests/runtime/jls/expressions/postfix-expressions/tests.tcl:
+	Add tests of incrementing around the boundary of a byte, as this
+	was reported buggy before jikes 1.14.
+
+2001-11-02  Eric Blake  <ebb9@email.byu.edu>
+
+	* tests/jls/lexical-structure/literals/floating-point-literals/tests.tcl:
+	Add more tests of floating point boundaries. Note that one of
+	these is restricted to jikes at the moment, since it causes an
+	infinite loop in javac.
+	* tests/jls/lexical-structure/identifiers/tests.tcl:
+	Test for \u001a in identifier.	
+
+2001-11-02  Eric Blake  <ebb9@email.byu.edu>
+
+	* tests/runtime/jls/expressions/additive-operators/string-conversion/tests.tcl:
+	* tests/runtime/jls/expressions/assignment-operators/compound-assignment-operators/tests.tcl:
+	* tests/runtime/jls/classes/constructor-declarations/default-constructor/tests.tcl:
+	Added more runtime tests.
+
+2001-11-02  Eric Blake  <ebb9@email.byu.edu>
+
+	* tests/runtime/jls/expressions/primary-expressions/qualified-this/tests.tcl:
+	* tests/jls/expressions/primary-expressions/qualified-this/tests.tcl:
+	Add new files for testing qualified this.
+	* tests/jls/classes/class-declaration/superclasses-and-subclasses/tests.tcl:
+	Add test of non-circular class dependencies.
+	* tests/jls/types-values-and-variables/variables/final-variables/tests.tcl:
+	Add tests of final local variables and parameters.
+
+2001-11-02  Eric Blake  <ebb9@email.byu.edu>
+
+	* tests/jls/names/access-control/determining-accessibility/tests.tcl:
+	Add tests for accessibility of array types.
+
+2001-11-02  Eric Blake  <ebb9@email.byu.edu>
+
+	* tests/jls/classes/field-declarations/initialization-of-fields/restrictions/tests.tcl:
+	Add some more tests of initialization order.
+	* tests/jls/definite-assignment/expressions/boolean-conditional-operator/tests.tcl:
+	Fix some typos.
+	* tests/runtime/jls/blocks-and-statements/switch-statement/tests.tcl:
+	Fix a broken test case.
+
+2001-11-01  Mo DeJong  <supermo@bayarea.net>
+
+	* jacks.html: Add mailing list section.
+	* docs/new_testcase.html: Fix some typos, remove
+	mention of mailing list since it now appears on
+	the main page.
+
+2001-11-01  Guillaume Cote  <cote@computer.org>
+
+	* docs/new_testcase.html: Update URL for Jacks mailing list.
+
+2001-11-01  Mo DeJong  <supermo@bayarea.net>
+
+	* tests/jls/names/members-and-inheritance/members-of-a-package/tests.tcl:
+	Add simple test for JLS section 6.4.1.
+
+2001-11-01  Eric Blake  <ebb9@email.byu.edu>
+
+	* tests/non-jls/argument-expansion/tests.tcl: Add more tests of
+	@file expansion. Note that some of these tests fail on a
+	cygwin-compiled executable, since cygwin auto-expands @files on
+	the command-line, using different rules, before the executable
+	even begins.
+
+2001-11-01  Eric Blake  <ebb9@email.byu.edu>
+
+	* tests/jls/lexical-structure/comments/tests.tcl: Fix test 3.7-16
+	to match the recommendations of the Java Spec Report: // comment
+	may end at EOF, not just with newline. Add tests for /*/.
+
+2001-11-01  Martin Lackner  <lackner@dms.at>
+
+	* tests/jls/blocks-and-statements/local-class-declarations/tests.tcl:
+	Fixed misspelled test name.
+
+2001-10-30  Eric Blake  <ebb9@email.byu.edu>
+
+	* docs/new_testcase.html: Update the documentation to point to the
+	Jacks web site as the preferred location for patch
+	submission. Also describe the empty_main and empty_class macros.
+
+2001-10-30  Guillaume Cote'  <cote@computer.org>
+
+	* tests/jls/types-values-and-variables/variables/final-variables/tests.tcl:
+	Add tests of final variable assignment in multiple constructors.
+
+2001-10-30  Eric Blake  <ebb9@email.byu.edu>
+
+	* tests/jls/classes/class-declaration/superclasses-and-subclasses/tests.tcl:
+	Add a test for jikes bug 2293.
+
+2001-10-28  Thomas Graf  <graf@dms.at>
+
+	* tests/runtime/jls/expressions/field-access-expressions/using-a-primary/tests.tcl:
+	Fix a copy-paste bug.
+
+2001-10-25  Eric Blake  <ebb9@email.byu.edu>
+
+	* tests/jls/definite-assignment/expressions/boolean-conditional-or/tests.tcl:
+	* tests/jls/definite-assignment/expressions/boolean-conditional-or/tests.tcl:
+	* tests/jls/definite-assignment/constructors-and-instance-initializers/tests.tcl:
+	Add more tests of definite assignment.
+
+2001-10-17  Eric Blake  <ebb9@email.byu.edu>
+
+	* tests/jls/classes/field-declarations/initialization-of-fields/restrictions/tests.tcl:
+	* tests/jls/definite-assignment/expressions/assignment-expressions/tests.tcl:
+	* tests/jls/definite-assignment/expressions/boolean-conditional-operator/tests.tcl:
+	* tests/jls/definite-assignment/statements/switch-statements/tests.tcl:
+	Added tests regarding definite assignment/definite unassignment,
+	as well as updating some tests that had incorrect pass/fail states.
+
+2001-10-15  Eric Blake  <ebb9@email.byu.edu>
+
+	* tests/runtime/jls/blocks-and-statements/local-class-declarations/tests.tcl:
+	Added tests to see if the static modifier is incorrectly set for a
+	local class.
+
+2001-10-15  C. Scott Ananian  <cananian@alumni.princeton.edu>
+
+	* tests/jls/blocks-and-statements/local-class-declarations/tests.tcl:
+        Added tests for local class declarations in static and non-static
+        methods.  This exposes jikes bug 1954.
+
+2001-10-14  Eric Blake  <ebb9@email.byu.edu>
+
+	* tests/runtime/jls/blocks-and-statements/tests.tcl:
+	Added test for jikes bug 1982, a regression in jikes 1.15.
+
+2001-10-14  Eric Blake  <ebb9@email.byu.edu>
+
+	* tests/runtime/jls/expressions/method-invocation-expressions/runtime-evaluation/compute-target-reference/tests.tcl:
+	Added test for jikes bug 1016, a regression in jikes 1.15.
+
+2001-10-02  Mo DeJong  <supermo@bayarea.net>
+
+	* tests/jls/blocks-and-statements/try-statement/tests.tcl: Fix up
+	test names typos.
+	* tests/jls/expressions/assignment-operators/compound-assignment-operators/tests.tcl:
+	Adjust test identifiers to avoid duplicate ids.
+	* tests/jls/blocks-and-statements/try-statement/tests.tcl: Fix up
+	test names typos.
+	* tests/jls/expressions/assignment-operators/compound-assignment-operators/tests.tcl:
+	Adjust test identifiers to avoid duplicate ids.
+	* tests/jls/packages/top-level-type-declarations/tests.tcl:
+	Adjust test identifiers to avoid duplicate ids.
+
+2001-09-21  Mo DeJong  <supermo@bayarea.net>
+
+	* tests/jls/definite-assignment/tests.tcl:
+	* tests/jls/definite-assignment/expressions/assignment-expressions/tests.tcl:
+	Move assignment tests from section 16 to 16.1.7.
+
+2001-09-20  Eric Blake  <ebb9@email.byu.edu>
+
+	* logging/javac.log:
+	* logging/javac.changes: Regen with javac 1.4-beta2, -source 1.4.
+	* logging/jikes.log:
+	* logging/jikes.changes: Regen with jikes 1.14.
+
+2001-09-18  Eric Blake  <ebb9@email.byu.edu>
+
+	* tests/jls/expressions/field-access-expressions/using-a-primary/tests.tcl:
+	* tests/jls/classes/field-declarations/initialization-of-fields/restrictions/tests.tcl:
+	Added tests of field initialization restrictions.
+
+2001-09-18  Eric Blake  <ebb9@email.byu.edu>
+
+	Patch 184
+	* tests/jls/expressions/primary-expressions/class-literals/tests.tcl:
+	Added tests of the class literal.
+
+2001-09-18  Eric Blake  <ebb9@email.byu.edu>
+
+	Patch 183
+	* tests/jls/blocks-and-statements/synchonized-statement/tests.tcl:
+	Add test of synchronized statement.
+
+2001-09-18  Eric Blake  <ebb9@email.byu.edu>
+
+	Patch 181
+	* tests/jls/expressions/class-instance-creation/anonymous-class-declarations/anonymous-constructors/tests.tcl:
+	* tests/jls/classes/constructor-declarations/tests.tcl:
+	Add tests of constructors in local and anonymous classes.
+
+2001-09-18  Eric Blake  <ebb9@email.byu.edu>
+
+	Patch 180
+	* tests/jls/classes/class-declaration/inner-classes-and-enclosing-instances/tests.tcl:
+	Added tests for static fields and inner classes.
+
+2001-09-18  Eric Blake  <ebb9@email.byu.edu>
+
+	Patch 179
+	* tests/jls/classes/method-declarations/method-modifiers/tests.tcl:
+	Added tests of modifiers for method declarations.
+
+2001-09-18  Eric Blake  <ebb9@email.byu.edu>
+
+	Patch 178
+	* tests/jls/classes/constructor-declarations/constructor-body/explicit-constructor-invocations/tests.tcl:
+	Added tests for qualified explicit constructor invocation.
+	* tests/jls/expressions/array-access-expressions/tests.tcl:
+	Added a test for new int[]{0}[0].
+
+2001-09-18  Eric Blake  <ebb9@email.byu.edu>
+
+	Patch 176
+	* tests/jls/blocks-and-statements/switch-statement/tests.tcl:
+	Updated test to catch assertion failure in jikes bug 136.
+
+2001-09-18  Eric Blake  <ebb9@email.byu.edu>
+
+	Patch 175
+	* tests/jls/packages/top-level-type-declarations/tests.tcl:
+	* tests/jikes/tests.tcl: Add tests of invalid imports from the
+	unnamed package.
+
+2001-09-18  Eric Blake  <ebb9@email.byu.edu>
+
+	Patch 173
+	* tests/jls/blocks-and-statements/local-variable-declaration-statements/scope/tests.tcl):
+	* tests/jls/blocks-and-statements/try-statement/tests.tcl:
+	Added tests of variable name shadowing.
+
+2001-09-18  Eric Blake  <ebb9@email.byu.edu>
+
+	Patch 126
+	* tests/jls/expressions/method-invocation-expressions/determine-method-signature/choose-most-specific/tests.tcl:
+	Added tests of ambiguous method overloads.
+
+2001-09-18  Eric Blake  <ebb9@email.byu.edu>
+
+	Patch 125
+	* tests/runtime/jls/expressions/field-access-expressions/using-a-primary/tests.tcl:
+	* tests/runtime/jls/expressions/method-invocation-expressions/runtime-evaluation/compute-target-reference/tests.tcl:
+	Add runtime tests to see that qualifiers of static member accesses
+	are properly evaluated and discarded.
+
+2001-09-18  Eric Blake  <ebb9@email.byu.edu>
+
+	Patch 124
+	* tests/runtime/jls/expressions/constant-expression/tests.tcl:
+	Added tests for constant string expressions that can't be
+	detected at compile-time, but can at runtime.  (There are
+	still some others that can only be detected by decompilation).
+
+2001-09-18  Eric Blake  <ebb9@email.byu.edu>
+
+	Patch 123
+	* tests/jls/expressions/assignment-operators/compound-assignment-operators/tests.tcl:
+	Added tests for all numerical and logical compound assignments.
+	* tests/jls/definite-assignment/tests.tcl:
+	Added tests for compound assignment to final variables.
+
+2001-06-05  Mo DeJong  <mdejong@redhat.com>
+
+	* tests/jls/packages/top-level-type-declarations/tests.tcl:
+	Rework the 7.6-name-1 and 7.6-name-2 tests so that
+	they do not fail when run a second time. The existing
+	package names were conflicting with the one.java file
+	created later in the file.
+
+2001-06-03  Mo DeJong  <mdejong@redhat.com>
+
+	* tests/jls/packages/top-level-type-declarations/tests.tcl:
+	Fix test 7.6-modifiers-1, it had .java appended to the
+	class name in a FAIL test.
+
+2001-06-01  Mo DeJong  <mdejong@redhat.com>
+
+	* logging/jikes.changes:
+	* logging/jikes.log: Update Jikes results.
+
+2001-05-28  Mo DeJong  <mdejong@redhat.com>
+
+	* tests/jls/expressions/conditional-operator/tests.tcl:
+	Reorder a couple of tests and add a check for a directory
+	name that contains a space.
+
+2001-05-28  Mo DeJong  <mdejong@redhat.com>
+
+	* jacks.tcl (doclean): Split the contents
+	of a .cleanup file based on \n so that
+	file names with spaces get deleted.
+
+2001-05-28  Mo DeJong  <mdejong@redhat.com>
+
+	* tests/non-jls/argument-expansion/tests.tcl: Rename
+	a couple of tests dealing with compiling the same
+	class twice. Add tests for @file that does not exist
+	and parsing of space separated tokens.
+
+2001-05-27  Mo DeJong  <mdejong@redhat.com>
+
+	* tests/jls/expressions/conditional-operator/tests.tcl:
+	Update tests to use non-constant ?: expressions which
+	reveals a nasty bug in javac. Get rid of tests that
+	expect a FAIL by using overloaded methods, one of
+	which raises an exception.
+
+2001-05-27  Mo DeJong  <mdejong@redhat.com>
+
+	* logging/jikes.changes:
+	* logging/jikes.log: Update Jikes results
+	to account for regression fixes.
+
+2001-05-27  Mo DeJong  <mdejong@redhat.com>
+
+	* logging/jikes.changes:
+	* logging/jikes.log: Update results to account
+	for tests that were incorrectly left out of
+	the previous checkin.
+
+2001-05-27  Mo DeJong  <mdejong@redhat.com>
+
+	* gcj_setup: Enable gcj constraint.
+	* jacks.tcl (_dotests): Don't avoid a cd'ing to
+	a directory based on the compiler name. We now
+	use constraints to run compiler specific tests.
+	* javac_setup: Enable javac constraint.
+	* jikes_setup: Enable jikes constraint.
+	* kaffe_setup: Enable kaffe constraint.
+	* tests/gcj/tests.tcl: Add gcj constraint.
+	* tests/jikes/tests.tcl:
+	* tests/jikes/jls/classes/constructor-declarations/constructor-body/explicit-constructor-invocations/tests.tcl:
+	* tests/jikes/jls/classes/method-declarations/method-body/tests.tcl:
+	* tests/jikes/jls/lexical-structure/literals/character-literals/tests.tcl:
+	* tests/jikes/jls/lexical-structure/unicode/tests.tcl:
+	* tests/jikes/jls/packages/import-declarations/type-import-on-demand-declaration/tests.tcl:
+	Add jikes constraint.
+
+2001-05-26  Mark Wielaard  <mark@klomp.org>
+
+	* tests/jls/packages/import-declarations/single-type-import-declaration/tests.tcl:
+	Fix the 7.5.1-1 test case, it incorrectly used ; as
+	a class body instead of {}. This was an expect FAIL
+	so the results should not have been effected.
+
+2001-05-20  Christopher Abbey  <cabbey@bresnanlink.net>
+
+	* jikes_setup: Unset the JIKESPATH, BOOTCLASSPATH, SOURCEPATH
+	and EXTDIRS variables before running Jikes.
+
+2001-05-20  Mo DeJong  <mdejong@redhat.com>
+
+	* logging/jikes.changes:
+	* logging/jikes.log: Update results to account
+	for bug fixed in the Jikes 1.14 release.
+
+2001-05-14  Mo DeJong  <mdejong@redhat.com>
+
+	* docs/tests.html:
+	* logging/gcj.changes:
+	* logging/gcj.log:
+	* logging/javac.changes:
+	* logging/javac.log:
+	* logging/jikes.changes:
+	* logging/jikes.log:
+	* logging/kaffe.changes:
+	* logging/kaffe.log:
+	Regenerate to account for new Jacks test cases. There are
+	now about 1850 tests. Note that gcj suffered some
+	regressions in this run.
+
+2001-05-13  Mo DeJong  <mdejong@redhat.com>
+
+	* tests/jikes/jls/lexical-structure/unicode/tests.tcl: Fix file
+	names and a typo in a test case name.
+
+2001-05-06  Mo DeJong  <mdejong@redhat.com>
+
+	* tests/jls/expressions/conditional-operator/tests.tcl: Add a
+	a series of tests for the ?: conditional operator from JLS 15.25.
+
+2001-05-05  Mo DeJong  <mdejong@redhat.com>
+
+	* jacks.tcl: Don't cd to a SVN subdirectory, adjust
+	argc before sourcing tcltest.tcl.
+	* tests/jls/blocks-and-statements/switch-statement/tests.tcl:
+	Fix up an incorrect test case description. Reformat
+	a couple of switch labels. Add example that crashes
+	on one compiler.
+
+2001-05-03  Thomas Graf  <graf@dms.at>
+
+	* tests/jls/expressions/class-instance-creation/determining-the-class/tests.tcl:
+	Fix 3 typos where an extra n character appeared in a test
+	that was expected to FAIL.
+
+2001-04-30  Mo DeJong  <mdejong@redhat.com>
+
+	* tests/jls/conversions-and-promotions/assignment-conversion/tests.tcl:
+	Rewrite assignment conversion tests to include identity conversions
+	and the full range of valid and invalid primitive conversions. Added
+	some reference assignment tests as well.
+
+2001-04-30  Mark Wielaard  <mark@klomp.org>
+
+	* tests/jls/conversions-and-promotions/assignment-conversion/tests.tcl:
+	Change 5.2-narrow-8 test, it was testing the same thing as 5.2-narrow-5.
+
+2001-04-26  Eric Blake  <ebb9@email.byu.edu>
+
+	* tests/jls/conversions-and-promotions/kinds-of-conversion/widening-primitive-conversions/tests.tcl:
+	Test widening conversion between primitives.
+
+2001-04-23  Erwin Bolwidt  <ejb@klomp.org>
+
+	* tests/jls/expressions/class-instance-creation/determining-the-class/tests.tcl:
+	Fix minor typos in file names passed to saveas.
+
+2001-04-22  Eric Blake  <ebb9@email.byu.edu>
+
+	* tests/jls/expressions/additive-operators/string-concatenation-operator/tests.tcl:
+	Add tests for concatenation of floating point and double
+	values with strings.
+	* tests/jls/expressions/multiplicative-operators/multiplication-operator/tests.tcl:
+	Add test of long multiplication in a constant expression.
+
+2001-04-22  Eric Blake  <ebb9@email.byu.edu>
+
+	* tests/runtime/jls/lexical-structure/literals/floating-point-literals/tests.tcl:
+	* tests/runtime/jls/lexical-structure/literals/integer-literals/tests.tcl:
+	Add runtime tests to double check that compiler's
+	endian calculations are not backwards.
+
+2001-04-22  Christopher Abbey  <cabbey@bresnanlink.net>
+
+	* tests/jikes/jls/lexical-structure/literals/character-literals/tests.tcl:
+	Add tests to verify that the proper \u formatted
+	error message is generated.
+
+2001-04-22  Mo DeJong  <mdejong@redhat.com>
+
+	* tests/jikes/jls/lexical-structure/unicode/tests.tcl:
+	* tests/jls/lexical-structure/unicode/tests.tcl:
+	Move non-ASCII tests into Jikes specific directory.
+
+2001-04-20  Mo DeJong  <mdejong@redhat.com>
+
+	* tests/jls/lexical-structure/unicode/tests.tcl:
+	Add basic tests for non-ASCII characters as
+	described in JLS 3.1.
+
+2001-04-18  Mo DeJong  <mdejong@redhat.com>
+
+	* jacks.html: Document the clean
+	subcommand.
+
+2001-04-17  Mo DeJong  <mdejong@redhat.com>
+
+	* jacks.html: Document the loggen
+	subcommand.
+
+2001-03-17  Mo DeJong  <mdejong@redhat.com>
+
+	* tests/non-jls/encoding/tests.tcl:
+	Add test for single character encoding
+	in the Latin-1 Suppliment.
+
+2001-03-12  Mo DeJong  <mdejong@redhat.com>
+
+	* logging/cvs_changes.tcl: Output message
+	when the log file has not been changed.
+	Check for duplicate test case names in
+	the declared_order list. When a test
+	case is removed it should transition
+	from PASSED or FAILED to {}. Add some
+	basic regression test cases.
+	* logging/gcj.changes:
+	* logging/javac.changes:
+	* logging/jikes.changes:
+	* logging/kaffe.changes: Regenerate
+	to account for test cases that were
+	removed or skipped. The test states
+	now correctly transition to {}.
+
+2001-03-04  Mo DeJong  <mdejong@redhat.com>
+
+	* jacks.tcl: cd to the tests
+	subdirectory before running
+	a clean subcommand.
+
+2001-03-03  Mo DeJong  <mdejong@redhat.com>
+
+	* logging/jikes.changes:
+	* logging/jikes.log: Update test results
+	to account for final results of Jikes
+	1.13 release. The one regression
+	is a result of having disabled
+	floating point emulation.
+
+2001-02-24  Mo DeJong  <mdejong@redhat.com>
+
+	* tests/jls/classes/constructor-declarations/constructor-body/explicit-constructor-invocations/tests.tcl:
+	Added checks for float and double types as
+	arguments to a private superclass constructor
+	in the enclosing type.
+
+2001-02-24  Mo DeJong  <mdejong@redhat.com>
+
+	* tests/jls/expressions/additive-operators/string-concatenation-operator/tests.tcl:
+	Added checks to make sure Double.NaN != 12.0.
+
+2001-02-24  Mo DeJong  <mdejong@redhat.com>
+
+	* logging/jikes.changes:
+	* logging/jikes.log:
+	Update Jikes results to account
+	for new test cases and the fact
+	that an earlier patch for @ file
+	was reverted.
+
+2001-02-24  Mo DeJong  <mdejong@redhat.com>
+
+	* tests/jls/expressions/constant-expression/tests.tcl:
+	Add tests for constant and non-constant
+	String literals in subexpressions. Add tests
+	for divide by zero.
+
+2001-02-24  Mo DeJong  <mdejong@redhat.com>
+
+	* tests/non-jls/argument-expansion/tests.tcl:
+	Add test for tokenization of @file arguments,
+	two file names that appear on one line should
+	be compiled the same as two file names passed
+	in on the command line.
+
+2001-02-21  Christopher Abbey  <cabbey@bresnanlink.net>
+
+	* tests/non-jls/encoding/tests.tcl: Add
+	test case for invalid encoding name.
+
+2001-02-18  Mo DeJong  <mdejong@redhat.com>
+
+	* logging/jikes.changes:
+	* logging/jikes.log:
+	Update to account for recent
+	patches to Jikes. Fixed @file
+	processing and core dumping
+	with synthetic constructors.
+
+2001-02-17  Mo DeJong  <mdejong@redhat.com>
+
+	* logging/jikes.changes:
+	* logging/jikes.log:
+	Update Jikes test results to
+	account for recent patches.
+	This checking fixes three
+	failing tests and fixes a
+	number of core dumps. The
+	15.28-null-4 is recorded
+	as a regression although
+	it seems the test was
+	corrupting memory previously.
+
+2001-02-16  Eric Blake  <ebb9@email.byu.edu>
+
+	* tests/jls/conversions-and-promotions/kinds-of-conversion/widening-primitive-conversions/tests.tcl:
+	Add  comment explaining FP rounding error.
+
+2001-02-12  Mo DeJong  <mdejong@redhat.com>
+
+	* logging/jikes.changes:
+	* logging/jikes.log: Update Jikes test
+	results to account for checkin of
+	fp emulation layer and fixes for
+	edge cases like NaN and others.
+
+2001-02-10  Eric Blake  <ebb9@email.byu.edu>
+
+	* tests/jls/expressions/additive-operators/numeric-types/tests.tcl:
+	Add additional comments to 15.18.2-double-16
+	explaining why it might fail on systems that
+	use 80 bit extended precision. Reformat
+	a couple of tests to fit in 80 char width.
+
+2001-02-09  Mo DeJong  <mdejong@redhat.com>
+
+	* logging/gcj.changes:
+	* logging/gcj.log:
+	* logging/jikes.changes:
+	* logging/jikes.log:
+	* logging/kaffe.changes:
+	* logging/kaffe.log: Update test
+	results to account for float
+	literal changes from yesterday.
+	Jikes and Kaffe note regressions
+	for 3.10.2-float-13 and
+	3.10.2-double-14. These tests
+	were improved to better detect
+	rounding errors, they are not
+	regressions. Also note that
+	no javac changes were checked in
+	since the results were identical.
+
+2001-02-08  Mo DeJong  <mdejong@redhat.com>
+
+	* tests/jls/lexical-structure/literals/floating-point-literals/tests.tcl:
+	Use constant_expression to compare min
+	float and double literals to zero so
+	that tests 3.10.2-float-13 and 3.10.2-double-14
+	don't incorrectly pass when the number
+	is rounded to zero.
+
+2001-02-06  Mo DeJong  <mdejong@redhat.com>
+
+	* jacks.tcl: Don't create a .logold file
+	if Jacks is checked out of the CVS.
+	* kaffe_setup: Add . to the CLASSPATH
+	so that kaffe is able to find .class
+	files for runtime tests.
+
+2001-02-06  Mo DeJong  <mdejong@redhat.com>
+
+	* tests/runtime/jls/classes/constructor-declarations/default-constructor/tests.tcl:
+	* tests/runtime/jls/expressions/class-instance-creation/tests.tcl:
+	Add missing runtime constraint.
+
+2001-02-05  Mo DeJong  <mdejong@redhat.com>
+
+	* logging/gcj.changes:
+	* logging/gcj.log:
+	* logging/javac.changes:
+	* logging/javac.log:
+	* logging/jikes.changes:
+	* logging/jikes.log:
+	* logging/kaffe.changes:
+	* logging/kaffe.log: Run test
+	cases and regenerate change files.
+	There are now about 1,600 test
+	cases in Jacks.
+
+2001-02-03  Mo DeJong  <mdejong@redhat.com>
+
+	* jikes_setup: Unset JIKESPATH
+	env var so that it does not
+	accidently effect test results.
+
+2001-02-02  Mo DeJong  <mdejong@redhat.com>
+
+	* docs/tests.html: Regenerate test
+	case documentation, the total
+	number of cases has increased from
+	1114 to 1610 in this update.
+
+2001-02-02  Mo DeJong  <mdejong@redhat.com>
+
+	* tests/jls/definite-assignment/statements/if-statements/tests.tcl:
+	Add two tests for if blocks that declare final variables
+	in different scopes.
+
+2001-02-02  Eric Blake  <ebb9@email.byu.edu>
+
+	* tests/runtime/jls/execution/creation-of-new-class-instances/tests.tcl:
+	* tests/runtime/jls/expressions/method-invocation-expressions/chosen-method-appropriate/tests.tcl:
+	Add runtime tests to verify proper order and
+	choice of dynamic method invocations.
+
+2001-02-02  Mo DeJong  <mdejong@redhat.com>
+
+	* jacks.tcl: Add loggen target to jacks script.
+	This target will regenerate the .changes file
+	by grabbing the .log file revisions out of
+	the CVS and comparing them.
+	* logging/cvs_changes.tcl: Don't print debug
+	output. Print status messages when reading
+	and writing files.
+
+2001-01-28  Eric Blake  <ebb9@email.byu.edu>
+
+	* tests/runtime/jls/lexical-structure/literals/string-literals/tests.tcl:
+	Add test of final String exceeding JVMS bound
+	of 0xffff for a String of UTF8 bytes.
+
+2001-01-28  Eric Blake  <ebb9@email.byu.edu>
+
+	* tests/runtime/jls/blocks-and-statements/tests.tcl:
+	* tests/runtime/jls/blocks-and-statements/try-statement/try-catch-finally/tests.tcl:
+	Add tests to force a compiler to use goto_w and
+	jsr_w or else a VerifyError is raised at runtime.
+
+2001-01-27  Eric Blake  <ebb9@email.byu.edu>
+
+	* tests/jls/classes/class-declaration/superclasses-and-subclasses/tests.tcl:
+	Add tests for cyclic dependency in class declarations.
+
+2001-01-27  Eric Blake  <ebb9@email.byu.edu>
+
+	* tests/jls/blocks-and-statements/switch-statement/tests.tcl:
+	* tests/jls/conversions-and-promotions/assignment-conversion/tests.tcl:
+	Add assignment test cases.
+	* tests/jls/conversions-and-promotions/kinds-of-conversion/identity-conversions/tests.tcl:
+	Add tests for identity conversions, covering JLS 5.1.1.
+
+2001-01-27  Mo DeJong  <mdejong@redhat.com>
+
+	* tests/jikes/jls/packages/import-declarations/type-import-on-demand-declaration/tests.tcl:
+	* tests/jls/classes/member-type-declarations/access-modifiers/tests.tcl:
+	Correct minor typos in test case names.
+
+2001-01-27  Eric Blake  <ebb9@email.byu.edu>
+
+	* tests/jls/expressions/class-instance-creation/determining-the-class/tests.tcl:
+	Add new tests for instance creation expressions.
+
+2001-01-27  Eric Blake  <ebb9@email.byu.edu>
+
+	* tests/jls/blocks-and-statements/break-statement/tests.tcl:
+	* tests/jls/blocks-and-statements/continue-statement/tests.tcl:
+	Don't define non-local breaks in an inner class function.
+	* tests/jls/blocks-and-statements/labeled-statements/tests.tcl:
+	Add tests for labeled empty statements, keywords
+	invalid as labels, and valid unicode labels.
+	* tests/jls/blocks-and-statements/unreachable-statements/tests.tcl:
+	Clean up and add more tests related to reachable
+	try-catch-finally blocks.
+
+2001-01-27  Mo DeJong  <mdejong@redhat.com>
+
+	* tests/jls/packages/top-level-type-declarations/tests.tcl:
+	Add test for a compilation unit that includes more than
+	one class.
+
+2001-01-27  Mo DeJong  <mdejong@redhat.com>
+
+	* tests/jls/definite-assignment/statements/switch-statements/tests.tcl:
+	Reformat use of the switch_labels command, add two new
+	tests to check for incorrect error reporting related
+	to use of final variables in switch labels.
+
+2001-01-14  Eric Blake  <ebb9@email.byu.edu>
+
+	* tests/jls/lexical-structure/comments/tests.tcl:
+	Fix typo that was causing test to incorrectly fail.
+
+2001-01-14  Eric Blake  <ebb9@email.byu.edu>
+
+	* tests/jls/lexical-structure/comments/tests.tcl:
+	Add test of comments in unicode.
+	* tests/jls/lexical-structure/lexical-translations/tests.tcl:
+	Add additional tests for proper
+	tokenization during parsing.
+
+2001-01-14  Eric Blake  <ebb9@email.byu.edu>
+
+	* tests/jls/arrays/array-initializers/tests.tcl:
+	* tests/jls/expressions/array-creation-expressions/tests.tcl:
+	Add array initializer tests that cover
+	sections 10.6 and 15.10.
+
+2001-01-14  Eric Blake  <ebb9@email.byu.edu>
+
+	* tests/jls/expressions/additive-operators/string-concatenation-operator/tests.tcl:
+	Expanded test of floating-point to String conversion.
+	* tests/jls/expressions/constant-expression/tests.tcl:
+	Fixed some typos, added more tests on qualified
+	names as constants, added instanceof test.
+
+2001-01-14  Mo DeJong  <mdejong@redhat.com>
+
+	* jacks.html: Change the CVSROOT in the
+	download instructions to the oss box.
+
+2001-01-14  Mo DeJong  <mdejong@redhat.com>
+
+	* tests/jls/classes/class-declaration/class-modifiers/tests.tcl:
+	* tests/jls/classes/class-declaration/class-modifiers/final-classes/tests.tcl:
+	* tests/jls/classes/member-type-declarations/access-modifiers/tests.tcl:
+	Add tests for access control modifiers in class declarations.
+
+2001-01-14  Mo DeJong  <mdejong@redhat.com>
+
+	* tests/jls/expressions/class-instance-creation/tests.tcl:
+	* tests/runtime/jls/classes/constructor-declarations/default-constructor/tests.tcl:
+	* tests/runtime/jls/expressions/class-instance-creation/tests.tcl:
+	Add basic tests for section 15.9 and runtime tests for
+	sections 8.8.7 and 15.9.
+
+2001-01-11  Mo DeJong  <mdejong@redhat.com>
+
+	* tests/jls/expressions/method-invocation-expressions/determine-method-signature/applicable-and-accessible/tests.tcl:
+	Add new tests for JLS section 15.12.2.1.
+
+2001-01-02  Mo DeJong  <mdejong@redhat.com>
+
+	* jacks.html: Add note about multiple compilers
+	on the command line.
+	* jacks.tcl: Add support for multiple compilers
+	on the command line.
+
+2001-01-02  Eric Blake  <ebb9@email.byu.edu>
+
+	* tests/jls/expressions/additive-operators/string-concatenation-operator/tests.tcl:
+	Add test for conversion from float to String that
+	checks the rounding behavior of Float.toString().
+
+2001-01-02  Eric Blake  <ebb9@email.byu.edu>
+
+	* tests/jls/blocks-and-statements/switch-statement/tests.tcl:
+	* tests/jls/conversions-and-promotions/assignment-conversion/tests.tcl:
+	Add tests for assignment conversions between sub-integers.
+
+2001-01-01  Eric Blake  <ebb9@email.byu.edu>
+
+	* tests/jls/blocks-and-statements/break-statement/tests.tcl:
+	* tests/jls/blocks-and-statements/continue-statement/tests.tcl:
+	* tests/jls/blocks-and-statements/labeled-statements/tests.tcl:
+	Add tests for control flow involving labels.
+
+2000-12-29  Mo DeJong  <mdejong@redhat.com>
+
+	* tests/jikes/jls/packages/import-declarations/type-import-on-demand-declaration/tests.tcl:
+	Add test to check for the error message printed
+	by Jikes when a package can not be found.
+
+2000-12-28  Mo DeJong  <mdejong@redhat.com>
+
+	* tests/jls/classes/class-members/tests.tcl:
+	Add basic tests for accessibility of class members.
+	* tests/jls/classes/member-type-declarations/static-member-type-declarations/tests.tcl:
+	Add tests for accessibility of a class with respect
+	to a static member class.
+
+2000-12-27  Mo DeJong  <mdejong@redhat.com>
+
+	* logging/gcj.changes:
+	* logging/javac.changes:
+	* logging/jikes.changes:
+	* logging/kaffe.changes: Regenerate changes
+	files to remove duplicate entries from bug in
+	cvs_changes.tcl.
+
+2000-12-27  Mo DeJong  <mdejong@redhat.com>
+
+	* logging/cvs_changes.tcl (get_results_from_diff): Add
+	debug statements. Use correct variable in existence test.
+	If a state transition already exists when a + change
+	is found, don't add duplicate entry. Fix bug that
+	was calling get_results_from_diff twice.
+
+2000-12-20  Mo DeJong  <mdejong@redhat.com>
+
+	* kaffe_setup: Remove extra JAVA_CLASSPATH.
+
+2000-12-18  Mo DeJong  <mdejong@redhat.com>
+
+	* tests/jls/classes/constructor-declarations/tests.tcl:
+	* tests/jls/classes/constructor-declarations/constructor-body/tests.tcl:
+	* tests/jls/classes/constructor-declarations/constructor-body/explicit-constructor-invocations/tests.tcl:
+	* tests/jls/classes/constructor-declarations/constructor-modifiers/tests.tcl:
+	* tests/jls/classes/constructor-declarations/constructor-overloading/tests.tcl:
+	* tests/jls/classes/constructor-declarations/constructor-signature/tests.tcl:
+	* tests/jls/classes/constructor-declarations/default-constructor/tests.tcl:
+	* tests/jls/classes/constructor-declarations/formal-parameters/tests.tcl:
+	Added a whole bunch of tests for JLS section 8.8, constructor declarations.
+
+2000-12-10  Eric Blake  <ebb9@email.byu.edu>
+
+	* tests/jls/conversions-and-promotions/kinds-of-conversion/narrowing-primitive-conversions/tests.tcl:
+	Add tests for narrowing conversion between double and float primitives.
+	* tests/jls/conversions-and-promotions/kinds-of-conversion/widening-primitive-conversions/tests.tcl:
+	Add conversion tests for int to float and int to double boundary values.
+	* tests/jls/expressions/additive-operators/numeric-types/tests.tcl:
+	* tests/jls/expressions/multiplicative-operators/multiplication-operator/tests.tcl:
+	Add tests that might trigger rounding errors in the last bit.
+
+2000-12-09  Eric Blake  <ebb9@email.byu.edu>
+
+	* tests/jls/expressions/constant-expression/tests.tcl: Add 88 tests
+	for constant expressions and operators that produce constant
+	expressions as described in JLS 15.28. Test cover both primitive
+	types and the String type.
+
+2000-12-03  Mo DeJong  <mdejong@redhat.com>
+
+	* logging/gcj.changes:
+	* logging/gcj.log:
+	* logging/javac.changes:
+	* logging/javac.log:
+	* logging/jikes.changes:
+	* logging/jikes.log:
+	* logging/kaffe.changes:
+	* logging/kaffe.log: Run test
+	cases and regenerate change files.
+	There are now about 1,100 test
+	cases in Jacks.
+
+2000-12-02  Mo DeJong  <mdejong@redhat.com>
+
+	* docs/tests.html: Regen.
+
+2000-12-02  Mo DeJong  <mdejong@redhat.com>
+
+	* logging/gcj.changes:
+	* logging/javac.changes:
+	* logging/jikes.changes:
+	* logging/kaffe.changes: Add initial test case
+	changes files generated from the .log files
+	in the CVS.
+
+2000-12-02  Mo DeJong  <mdejong@redhat.com>
+
+	* jacks.tcl (subdirectories): Sort the list of subdirectories
+	so that globs on different systems will not effect the order
+	that test cases are evaluated.
+	* logging/cvs_changes.tcl: Add new tool that will examine each
+	of the generated .log files looking for changes in the test
+	results. A .changes file will be generated for each .log file.
+
+2000-12-01  Eric Blake  <ebb9@email.byu.edu>
+
+	* tests/jls/lexical-structure/literals/floating-point-literals/tests.tcl:
+	Renumber the tests to differentiate between float
+	and double. Add tests for correct parsing of the
+	exact decimal representation of MAX_VALUE.
+	* tests/jls/lexical-structure/literals/integer-literals/tests.tcl:
+	Add tests for 0x with no hex digits.
+
+2000-12-01  Mo DeJong  <mdejong@redhat.com>
+
+	* gcj_setup: Remove call to compiler_encoding_flag
+	and set JAVAC_ENCODING_FLAG style variables.
+	* jacks.tcl (file_encoding, compiler_encoding_flag,
+	_set_compiler_encoding): Remove Tcl based encoding
+	system. Instead, we will encode the characters
+	by hand and then write them to the system in binary.
+	The compiler's encoding will be set by looking at
+	the -encoding flag passed by the user and replacing
+	it with the flag the compiler expects at runtime.
+	* javac_setup:
+	* jikes_setup: Remove call to compiler_encoding_flag
+	and set JAVAC_ENCODING_FLAG style variables.
+	* tests/non-jls/encoding/tests.tcl: Use direct
+	encoding scheme suggested by Chris Abbey.
+
+2000-11-29  Eric Blake  <ebb9@email.byu.edu>
+
+	* tests/jls/blocks-and-statements/unreachable-statements/tests.tcl:
+	Added tests for unreachable block with statement
+	to complement tests for unreachable statement,
+	empty statment, and empty block. Add tests for
+	abrupt exit of finally overriding an abrupt exit
+	in try, causing unreachable statements. Fix tests
+	for unreachable catch blocks.
+
+2000-11-29  Eric Blake  <ebb9@email.byu.edu>
+
+	* utils.tcl (empty_main): Add new helper method that will
+	create an empty class an place code in a main() method.
+	* tests/jls/blocks-and-statements/unreachable-statements/tests.tcl:
+	Add new tests for JLS section 14.20 "Unreachable Statements".
+
+2000-11-28  Mo DeJong  <mdejong@redhat.com>
+
+	* jacks: Set a 10 meg upper limit on core
+	dumps. This will keep a core dump from
+	filling up the entire disk.
+
+2000-11-28  Mo DeJong  <mdejong@redhat.com>
+
+	* gcj_setup: Enable encoding support.
+	* jacks.tcl (file_encoding, compiler_encoding_flag,
+	compile, write_binary, saveas): Add file_encoding
+	command to support setting of the file and
+	compiler encoding in a test case. Add
+	compiler_encoding_flag command to support
+	setting of the compiler specific encoding
+	argument in a setup file and activation
+	of the {encoding} constraint. Merge
+	write_binary into saveas.
+	* javac_setup:
+	* jikes_setup: Enable encoding support.
+	* tests/non-jls/encoding/tests.tcl: Initial
+	encoding test cases.
+
+2000-11-28  Mo DeJong  <mdejong@redhat.com>
+
+	* docs/docgen.tcl (write_map_table, write_section_index,
+	write_cases): Append the section name onto section
+	identifiers. For example, section 10.5.4 would
+	become 10.5.4-jls. Write sections out with this
+	anchor but the same section number. This solves
+	the problem where both the jls and the runtime
+	links could be named 10.5.4.
+	* tests/jls/lexical-structure/literals/string-literals/tests.tcl:
+	Fix a couple of test case names that tagged
+	the test case section incorrectly.
+
+2000-11-27  Mo DeJong  <mdejong@redhat.com>
+
+	* jacks.tcl: Add {runtime} constraint. If the
+	simple runtime check does not pass then all
+	tests that require a runtime will be skipped.
+	* tests/runtime/jls/blocks-and-statements/switch-statement/tests.tcl:
+	* tests/runtime/jls/blocks-and-statements/try-statement/try-catch-finally/tests.tcl:
+	* tests/runtime/jls/expressions/additive-operators/string-conversion/tests.tcl:
+	* tests/runtime/jls/expressions/assignment-operators/compound-assignment-operators/tests.tcl:
+	* tests/runtime/jls/expressions/postfix-expressions/tests.tcl:
+	* tests/runtime/jls/expressions/unary-operators/tests.tcl:
+	* tests/runtime/jls/lexical-structure/literals/string-literals/tests.tcl:
+	Add {runtime} constraint to each test in tests/runtime.
+
+2000-11-27  Mo DeJong  <mdejong@redhat.com>
+
+	* jacks.tcl: Only log test results when run from
+	the toplevel jacks directory. Also fixup some
+	minor typos.
+
+2000-11-26  Eric Blake  <ebb9@email.byu.edu>
+
+	* tests/jls/expressions/additive-operators/numeric-types/tests.tcl: Add
+	check for rounding behavior of + and - operators.
+	* tests/jls/expressions/multiplicative-operators/tests.tcl: Add tests
+	for Object type and void type with a multiplicative operator.
+	* tests/jls/expressions/multiplicative-operators/division-operator/tests.tcl:
+	* tests/jls/expressions/multiplicative-operators/multiplication-operator/tests.tcl:
+	* tests/jls/expressions/multiplicative-operators/remainder-operator/tests.tcl:
+	Add additional tests for floating point rounding, the multiplicative operators,
+	overflow and underflow, NaN, Infinity, and division by zero.
+
+2000-11-26  Eric Blake  <ebb9@email.byu.edu>
+
+	* tests/jls/lexical-structure/comments/tests.tcl:
+	Add tests for \0, \', \x1a, and  \u001a in comments.
+	* tests/jls/lexical-structure/literals/character-literals/tests.tcl:
+	* tests/jls/lexical-structure/literals/string-literals/tests.tcl:
+	Test for ASCII SUB (0x1a) as a string or character literal.
+
+2000-11-26  Eric Blake  <ebb9@email.byu.edu>
+
+	* tests/jls/expressions/unary-operators/tests.tcl:
+	Add tests for precedence of unary operators over multiplicative.
+	* tests/runtime/jls/expressions/postfix-expressions/tests.tcl:
+	* tests/runtime/jls/expressions/unary-operators/tests.tcl:
+	Add runtime tests for postfix ++, -- precedence.
+
+2000-11-23  Mo DeJong  <mdejong@redhat.com>
+
+	* gcj_setup: Turn off the {atfiles} constraint.
+	* jacks.tcl: Set default constraints before
+	loading the compiler setup file.
+	* tests/non-jls/argument-expansion/tests.tcl: Add
+	{atfiles} constraint to each test the uses @file
+	as an argument to the compiler.
+
+2000-11-20  Mo DeJong  <mdejong@redhat.com>
+
+	* jacks.tcl (delete): Add pattern matching functionality to delete command.
+	* tests/jls/expressions/multiplicative-operators/multiplication-operator/tests.tcl:
+	Move and rename test that had a conflicting identifier.
+
+2000-11-20  Eric Blake  <ebb9@email.byu.edu>
+
+	* utils.tcl (empty_class): Add new helper method.
+	* tests/jls/expressions/postfix-expressions/postfix-decrement-operator/tests.tcl:
+	* tests/jls/expressions/postfix-expressions/postfix-increment-operator/tests.tcl:
+	* tests/jls/expressions/unary-operators/tests.tcl:
+	* tests/jls/expressions/unary-operators/bitwise-complement-operator/tests.tcl:
+	* tests/jls/expressions/unary-operators/logical-complement-operator/tests.tcl:
+	* tests/jls/expressions/unary-operators/prefix-decrement-operator/tests.tcl:
+	* tests/jls/expressions/unary-operators/prefix-increment-operator/tests.tcl:
+	* tests/jls/expressions/unary-operators/unary-minus-operator/tests.tcl:
+	* tests/jls/expressions/unary-operators/unary-plus-operator/tests.tcl:
+	Add a variety of tests for JLS sections 15.14 and 15.15.
+
+2000-11-19  Eric Blake  <ebb9@email.byu.edu>
+
+	* tests/jls/packages/top-level-type-declarations/tests.tcl: Add tests
+	for section 7.6.
+
+2000-11-18  Eric Blake  <ebb9@email.byu.edu>
+
+	* tests/jls/expressions/additive-operators/numeric-types/tests.tcl:
+	Test addition operator on primitive numeric types.
+	* tests/jls/packages/compilation-units/tests.tcl: Test validity
+	of various compilation units. This includes the empty file being
+	a valid Java file.
+
+2000-11-18  Eric Blake  <ebb9@email.byu.edu>
+
+	* tests/jls/conversions-and-promotions/kinds-of-conversion/narrowing-primitive-conversions/tests.tcl:
+	* tests/jls/conversions-and-promotions/kinds-of-conversion/widening-primitive-conversions/tests.tcl:
+	Add conversion tests for casting of primitive types.
+
+2000-11-17  Eric Blake  <ebb9@email.byu.edu>
+
+	* tests/jls/expressions/additive-operators/string-concatenation-operator/tests.tcl:
+	Add concatenation tests covering boundary conditions for float and double types.
+
+2000-11-17  Eric Blake  <ebb9@email.byu.edu>
+
+	* tests/jls/lexical-structure/literals/floating-point-literals/tests.tcl:
+	Check that leading zeros in floating point literals are ignored.
+	* tests/jls/lexical-structure/literals/integer-literals/tests.tcl:
+	Add integer literal test to determine that compiler know the
+	difference between a binary and unary '-'.
+	* tests/runtime/jls/blocks-and-statements/switch-statement/tests.tcl:
+	Added tests for fallthrough, and one relating to the final variable
+	initilization in a swich block.
+
+2000-11-17  Mo DeJong  <mdejong@redhat.com>
+
+	* tests/jls/expressions/additive-operators/string-concatenation-operator/tests.tcl:
+	Add integer and long constant concatenation tests.
+	* tests/jls/expressions/multiplicative-operators/multiplication-operator/tests.tcl:
+	Move string concatenation tests into proper section.
+
+2000-11-15  Eric Blake  <ebb9@email.byu.edu>
+
+	* utils.tcl (switch_labels): Add new method.
+	* tests/jls/blocks-and-statements/switch-statement/tests.tcl: Remove
+	switch_block helper, use switch_labels instead. Add new exhaustion tests.
+	* tests/jls/definite-assignment/statements/if-statements/tests.tcl:
+	Add definite assignment checks related to the if statement.
+	* tests/jls/definite-assignment/statements/switch-statements/tests.tcl:
+	Add definite assignment checks related to the switch statement.
+
+2000-11-12  Mo DeJong  <mdejong@redhat.com>
+
+	* tests/jls/blocks-and-statements/switch-statement/tests.tcl:
+	Add new tests for JLS section 14.10, the switch statement.
+	* tests/runtime/jls/blocks-and-statements/switch-statement/tests.tcl:
+	Add FIXME note about the need for runtime switch tests for section 14.10.
+
+2000-11-12  Mo DeJong  <mdejong@redhat.com>
+
+	* logging/javac.log:
+	* logging/jikes.log: First checkin of test
+	results since the JLS 2.0 upgrade. Jacks
+	now includes almost 500 tests. Both the
+	jikes and javac targets now default to
+	JDK 1.3.
+
+2000-11-12  Mo DeJong  <mdejong@redhat.com>
+
+	* jacks: Add more comments about how to edit
+	file under Unix vs Cygwin.
+	* javac_setup:
+	* jikes_setup: Use JDK 1.3 style
+	.../jre/bin/java instead of .../bin/java.
+
+2000-11-11  Mo DeJong  <mdejong@redhat.com>
+
+	* jikes_setup: Change default jikes setup to
+	use 1.3 JVM instead of a 1.1 JVM.
+
+2000-11-11  Mo DeJong  <mdejong@redhat.com>
+
+	* docs/docgen.tcl: Print total number of cases at the top
+	of the all cases index.
+	* docs/tests.html: Regenerate test case documentation.
+
+2000-11-11  Mo DeJong  <mdejong@redhat.com>
+
+	* docs/docgen.tcl: Overhaul documentation generator. It is now
+	up to date with respect to the new directory layout and the
+	new saveas method.
+	* tests/jikes/jls/classes/method-declarations/method-body/tests.tcl: Add
+	old test case that got overlooked somehow.
+	* tests/non-jls/argument-expansion/tests.tcl:
+	* tests/non-jls/random-crashers/tests.tcl: Update test case names
+	to account for new docgen requirements.
+
+2000-11-11  Mo DeJong  <mdejong@redhat.com>
+
+	* jacks.tcl (cleanup): Add new method that provides a way
+	to remove a given file when the user runs "jacks clean".
+	* tests/jikes/tests.tcl: Use new cleanup method.
+
+2000-11-06  Andrew Vajoczki  <vajoczki@sympatico.ca>
+
+	* tests/runtime/jls/blocks-and-statements/switch-statement/tests.tcl: Fix test
+	case name so that it includes the -runtime- string.
+	* tests/runtime/jls/blocks-and-statements/try-statement/try-catch-finally/tests.tcl:
+	Add test case for problem with JVM verifier with jikes emitted code.
+
+2000-11-05  Tom Tromey  <tromey@redhat.com>
+
+	* tests/jls/lexical-structure/identifiers/tests.tcl: Add
+	additional ignoreable character checks.
+
+2000-11-05  Eric Blake  <ebb9@email.byu.edu>
+
+	* tests/jls/expressions/multiplicative-operators/tests.tcl: Add checks for
+	type promotion between integer and floating point types.
+	* tests/jls/expressions/multiplicative-operators/multiplication-operator/tests.tcl:
+	Add tests that cover associativity, commutivity, overflow, NaN and so on.
+
+2000-11-05  Eric Blake  <ebb9@email.byu.edu>
+
+	* tests/jls/expressions/additive-operators/tests.tcl:
+	Test that operands of + are acceptable.
+	* tests/jls/expressions/additive-operators/string-concatenation-operator/tests.tcl:
+	Test various String concatenations using the + operator.
+	* tests/jls/expressions/assignment-operators/compound-assignment-operators/tests.tcl:
+	Test the += operator when dealing with String concatenation.
+	* tests/runtime/jls/expressions/additive-operators/string-conversion/tests.tcl:
+	Runtime test for String + char[].
+	* tests/runtime/jls/expressions/assignment-operators/compound-assignment-operators/tests.tcl:
+	Runtime test for String += char[].
+
+2000-11-05  Mo DeJong  <mdejong@redhat.com>
+
+	* utils.tcl (is_assignable_to): Added support
+	for multiple type/expression options in an
+	assignable test.
+
+2000-11-05  Mo DeJong  <mdejong@redhat.com>
+
+	* jacks.html: Update links for Tcl 8.3.2. Note the
+	change in javac_setup to JDK 1.2 or newer.
+	* javac_setup: Use JDK 1.3 by default for the
+	javac target. Use of JDK 1.1 is still supported
+	but discouraged.
+
+2000-11-05  Mo DeJong  <mdejong@redhat.com>
+
+	* jacks.tcl: Load utils.tcl file on startup.
+	* utils.tcl: Add set utility procs used in regression test suite.
+	* tests/jls/expressions/multiplicative-operators/tests.tcl: Check
+	for various properties of the * / and % operators.
+	* tests/jls/expressions/multiplicative-operators/multiplication-operator/tests.tcl:
+	Add checks for long values, these checks demonstrate bugs in the
+	handing of 64 bit values in Jikes.
+
+2000-11-04  Eric Blake  <ebb9@email.byu.edu>
+
+	* tests/runtime/jls/lexical-structure/literals/string-literals/tests.tcl:
+	Add string literal example from JLS 3.10.5.
+
+2000-11-04  Andrew Vajoczki  <vajoczki@sympatico.ca>
+
+	* tests/runtime/jls/blocks-and-statements/switch-statement/tests.tcl:
+	Add check for problem with JVM verifier and long switch statements.
+
+2000-11-04  Mo DeJong  <mdejong@redhat.com>
+
+	* tests/jls/lexical-structure/unicode-escapes/tests.tcl: Add
+	compile time constant checks for ASCII \u substitutions.
+	* tests/runtime/tests.tcl: Move unicode_range_check into
+	the above unicode JLS section. Do checks at compile time.
+
+2000-11-04  Mo DeJong  <mdejong@redhat.com>
+
+	* jacks.tcl (compile, _exec_impl): Convert file names to
+	the native directory separator. Remove the exec.out file
+	when the exec'ed program returns an error code.
+
+2000-11-04  Mo DeJong  <mdejong@redhat.com>
+
+	* tests/jls/lexical-structure/literals/string-literals/tests.tcl:
+	* tests/jls/lexical-structure/string-literals/tests.tcl: Moved
+	the string literal tests into the proper directory.
+
+2000-11-04  Eric Blake  <ebb9@email.byu.edu>
+
+	* tests/jls/lexical-structure/literals/escape-sequences/tests.tcl:
+	Add tests for escape sequences inside of strings or character
+	literals.
+
+2000-11-04  Mo DeJong  <mdejong@redhat.com>
+
+	* jacks.tcl (compile_and_run, _exec_impl): Make sure
+	class names in a package get passed to java with
+	a . seperator instead of / or \ from the filename.
+	Add a new check for JACKS_EXEC_DEBUG env variable.
+	If it exists, then print what is going to be
+	exec'ed to stderr before doing the exec call.
+
+2000-11-04  Eric Blake  <ebb9@email.byu.edu>
+
+	* tests/jls/lexical-structure/keywords/tests.tcl: Add
+	tests that check for known Java/C/C++ keywords.
+	* tests/jls/lexical-structure/literals/character-literals/tests.tcl:
+	Move compile command into the literal procedure. Quote unicode
+	escapes so that it is clear that Java is doing the subst.
+	* tests/jls/lexical-structure/string-literals/tests.tcl: Add
+	tests for contents of string literals.
+	* tests/jls/lexical-structure/white-space/tests.tcl: Add tests
+	for white space characters.
+
+2000-11-02  Eric Blake  <ebb9@email.byu.edu>
+
+	* tests/jls/lexical-structure/identifiers/tests.tcl: Move
+	the compile command into the identifier command. Fix the
+	tests so that they just call identifier, fix comments.
+
+2000-11-02  Eric Blake  <ebb9@email.byu.edu>
+
+	* tests/jls/lexical-structure/comments/tests.tcl: Add additional
+	tests for comments in literals and comments at the end of the file.
+
+2000-11-02  Mo DeJong  <mdejong@redhat.com>
+
+	* tests/non-jls/argument-expansion/tests.tcl:
+	* tests/non-jls/random-crashers/tests.tcl: Add section
+	for tests that can not be easily mapped to a JLS
+	category.
+
+2000-11-02  Mo DeJong  <mdejong@redhat.com>
+
+	* jikes_setup: Add commented out bit where
+	jikes would normally live.
+	* tests/jikes/tests.tcl: Clean up tests that
+	have been moved into tests/non-jls. Use saveas.
+	* tests/jikes/BrokenDependency.java: Remove.
+
+2000-11-02  Eric Blake  <ebb9@email.byu.edu>
+
+	* tests/jls/lexical-structure/literals/floating-point-literals/tests.tcl:
+	* tests/jls/lexical-structure/literals/integer-literals/tests.tcl: Add
+	tests for floating point and integer literals.
+
+2000-11-02  Eric Blake  <ebb9@email.byu.edu>
+
+	* tests/jls/lexical-structure/unicode-escapes/tests.tcl:
+	Add test to ensure that \\u is not treated as a unicode escape.
+
+2000-11-02  Eric Blake  <ebb9@email.byu.edu>
+
+	* tests/jls/lexical-structure/unicode-escapes/tests.tcl:
+	Change tests that depend on switch statement so that
+	the item being switched on is not a compile time constant.
+
+2000-11-01  Mo DeJong  <mdejong@redhat.com>
+
+	* jacks.tcl: Remove exec.out and exec.err file when
+	they are empty. Add ability to check for ..._config.ignore,
+	this provides a way to ignore a given configuration. Catch
+	errors in exec when running multiple compilers.
+	* tests/jls/lexical-structure/identifiers/tests.tcl: Minor
+	indentation fix for two test cases.
+
+2000-11-01  Mo DeJong  <mdejong@redhat.com>
+
+	* tests/jls/types-values-and-variables/variables/final-variables/tests.tcl:
+	Add tests for JLS section 4.5.4, final variables.
+
+2000-11-01  Eric Blake  <ebb9@email.byu.edu>
+
+	* tests/jls/lexical-structure/unicode-escapes/tests.tcl:
+	Add initial set of tests for unicode escapes.
+
+2000-11-01  Eric Blake  <ebb9@email.byu.edu>
+
+	* tests/jls/lexical-structure/lexical-translations/tests.tcl:
+	Add token parsing check and escape processing check.
+
+2000-10-31  Mo DeJong  <mdejong@redhat.com>
+
+	* jacks.tcl (rm_classes): Rename rm_classes to _rm_classes.
+	Delete files created by runtime sanity check.
+	* tests/jls/lexical-structure/line-terminators/tests.tcl:
+	Use the string "LineTerminator" so we match the JLS.
+
+2000-10-31  Eric Blake  <ebb9@email.byu.edu>
+
+	* tests/jls/lexical-structure/identifiers/tests.tcl:
+	Added tests for JLS section 3.8.
+	* tests/jls/lexical-structure/literals/character-literals/tests.tcl:
+	Fix typos in comments. Add tests for " char literal.
+
+2000-10-30  Mo DeJong  <mdejong@redhat.com>
+
+	* tests/jls/lexical-structure/literals/character-literals/tests.tcl:
+	Add new tests for character literals.
+
+2000-10-29  Mo DeJong  <mdejong@redhat.com>
+
+	* jacks.tcl (rm_err_or_warn, compile, _set_classpath,
+	_verify_files_exist, _exec_impl): Rename rm_err_or_warn
+	to _rm_generated_files. Refactor compile command. Add
+	new compile_and_run, _set_classpath, and _verify_files_exist
+	commands. Add sanity check of new compile_and_run command.
+	* tests/jls/lexical-structure/line-terminators/tests.tcl:
+	Use new saveas command instead of old compile_buffer command.
+	* tests/runtime/tests.tcl: Added new tests that exercise
+	the new compile_and_run command.
+
+2000-10-04  Mo DeJong  <mdejong@redhat.com>
+
+	* jacks.html:
+	* docs/new_testcase.html: Updated the HTML docs
+	so that they describe how to use the compile and
+	saveas commands and reflect the new directory
+	layout.
+
+2000-10-04  Mo DeJong  <mdejong@redhat.com>
+
+	* jacks.tcl: Use compile + saveas instead of the
+	old compile_buffer command.
+
+2000-09-17  Mo DeJong  <mdejong@redhat.com>
+
+	* jacks.html: Updated JLS links to point to JLS version 2.
+	* jacks.tcl (append_file, compile_buffer, doclean, saveas): Add
+	saveas command, removed compile_buffer. saveas can create a new
+	directory, and it gets removed by doclean in the cleanup stage.
+	Renamed append_file to append_to_file. All of these features
+	are there to support the new "inline" style of testing using
+	the saveas command.
+
+2000-09-17  Mo DeJong  <mdejong@redhat.com>
+
+	* tests/jls/packages/import-declarations/single-type-import-declaration/tests.tcl:
+	* tests/jls/packages/import-declarations/type-import-on-demand-declaration/tests.tcl:
+	* tests/jls/packages/package-declarations/named-packages/tests.tcl:
+	* tests/jls/packages/package-declarations/unnamed-packages/tests.tcl: Added new
+	tests that used to live in tests/packages.
+	* tests/packages/import-declarations/on-demand/ImportAllFromGlobal.java:
+	* tests/packages/import-declarations/on-demand/tests.tcl:
+	* tests/packages/import-declarations/single-type/ClassInDefaultPackage.java:
+	* tests/packages/import-declarations/single-type/ClassInDefaultPackage_FailImportFromGlobal.java:
+	* tests/packages/import-declarations/single-type/ClassInDefaultPackage_ImportFromGlobal.java:
+	* tests/packages/import-declarations/single-type/FailImportDoesNotExist.java:
+	* tests/packages/import-declarations/single-type/tests.tcl:
+	* tests/packages/package-declarations/named-packages/ClassInNewPackage.java:
+	* tests/packages/package-declarations/named-packages/tests.tcl:
+	* tests/packages/package-declarations/unnamed-packages/ClassInDefaultPackage.java:
+	* tests/packages/package-declarations/unnamed-packages/ExtendClassInDefaultPackage.java:
+	* tests/packages/package-declarations/unnamed-packages/tests.tcl:
+	Moved to tests/jls/packages.
+
+2000-09-17  Mo DeJong  <mdejong@redhat.com>
+
+	* tests/jls/names/access-control/determining-accessibility/tests.tcl:
+	* tests/jls/names/members-and-inheritance/members-of-a-class-type/tests.tcl:
+	* tests/jls/names/members-and-inheritance/members-of-an-array-type/tests.tcl:
+	* tests/jls/names/members-and-inheritance/members-of-an-interface-type/tests.tcl:
+	* tests/jls/names/scope-of-a-declaration/tests.tcl: Test cases moved from tests/names,
+	some directories required renaming because Sun changed some section titles.
+	* tests/names/members-and-inheritance/members-of-a-class-type/AmbiguousInterfaceMember.java:
+	* tests/names/members-and-inheritance/members-of-a-class-type/tests.tcl:
+	* tests/names/members-and-inheritance/members-of-an-array-type/ArrayIsObject.java:
+	* tests/names/members-and-inheritance/members-of-an-array-type/ArrayLengthIsFinal.java:
+	* tests/names/members-and-inheritance/members-of-an-array-type/tests.tcl:
+	* tests/names/members-and-inheritance/members-of-an-interface-type/AmbiguousExtendedInterfaceMember.java:
+	* tests/names/members-and-inheritance/members-of-an-interface-type/tests.tcl:
+	* tests/names/qualified-names-and-access-control/determining-accessibility/AccessDefaultClassInPackage.java:
+	* tests/names/qualified-names-and-access-control/determining-accessibility/AccessDefaultInterfaceInPackage.java:
+	* tests/names/qualified-names-and-access-control/determining-accessibility/AccessPublicClassInPackage.java:
+	* tests/names/qualified-names-and-access-control/determining-accessibility/AccessPublicInterfaceInPackage.java:
+	* tests/names/qualified-names-and-access-control/determining-accessibility/tests.tcl:
+	* tests/names/qualified-names-and-access-control/determining-accessibility/pkg/AccessDefaultClass.java:
+	* tests/names/qualified-names-and-access-control/determining-accessibility/pkg/AccessPublicClass.java:
+	* tests/names/qualified-names-and-access-control/determining-accessibility/pkg/DefaultClass.java:
+	* tests/names/qualified-names-and-access-control/determining-accessibility/pkg/DefaultInterface.java:
+	* tests/names/qualified-names-and-access-control/determining-accessibility/pkg/PublicClass.java:
+	* tests/names/qualified-names-and-access-control/determining-accessibility/pkg/PublicInterface.java:
+	* tests/names/scope-of-a-simple-name/GlobalOne.java:
+	* tests/names/scope-of-a-simple-name/GlobalTwo.java:
+	* tests/names/scope-of-a-simple-name/IllegalForwardReference.java:
+	* tests/names/scope-of-a-simple-name/LegalForwardReference.java:
+	* tests/names/scope-of-a-simple-name/UseOfTypeBeforeDeclaration.java:
+	* tests/names/scope-of-a-simple-name/tests.tcl: Moved tests.tcl files into tests/jls/names/...
+ 	Moved .java files into new tests.tcl files.
+
+2000-09-15  Mo DeJong  <mdejong@redhat.com>
+
+	* tests/interfaces/interface-declarations/interface-modifiers/SynchronizedInterface.java: Removed.
+	* tests/interfaces/interface-declarations/interface-modifiers/tests.tcl: Moved to test/jls/...
+	* tests/interfaces/interface-declarations/interface-modifiers/abstract-interfaces/AbstractInnerInterface.java:
+	* tests/interfaces/interface-declarations/interface-modifiers/abstract-interfaces/AbstractInnerInterface_InInnerface.java
+	* tests/interfaces/interface-declarations/interface-modifiers/abstract-interfaces/AbstractInterface.java:
+	Removed .java files, sources now live in the tests.tcl file.
+	* tests/interfaces/interface-declarations/interface-modifiers/abstract-interfaces/tests.tcl: Moved to test/jls/...
+	* tests/jls/interfaces/interface-declarations/interface-modifiers/tests.tcl:
+	* tests/jls/interfaces/interface-declarations/interface-modifiers/abstract-interfaces/tests.tcl:
+	Added new tests files.
+
+2000-09-13  Mo DeJong  <mdejong@redhat.com>
+
+	* tests/jls/classes/class-declaration/class-modifiers/abstract-classes/tests.tcl:
+	* tests/jls/classes/method-declarations/method-body/tests.tcl: Clean up some
+	test case descriptions that seem to have been written in the wee hours of the night.
+
+2000-09-13  Mo DeJong  <mdejong@redhat.com>
+
+	* tests/classes/class-declaration/class-modifiers/abstract-classes/AbstractClass.java:
+	* tests/classes/class-declaration/class-modifiers/abstract-classes/AbstractClass_CreateInstanceError.java:
+	* tests/classes/class-declaration/class-modifiers/abstract-classes/AbstractMethodAbstractClass.java:
+	* tests/classes/class-declaration/class-modifiers/abstract-classes/AbstractMethodNonAbstractClass.java:
+	* tests/classes/class-declaration/class-modifiers/abstract-classes/DoubleInheritAbstractClassError.java:
+	* tests/classes/class-declaration/class-modifiers/abstract-classes/DoubleInheritEmptyAbstractClass.java:
+	* tests/classes/class-declaration/class-modifiers/abstract-classes/ImplementInheritedAbstractMethod.java:
+	* tests/classes/class-declaration/class-modifiers/abstract-classes/InheritAbstractClass.java:
+	* tests/classes/class-declaration/class-modifiers/abstract-classes/InheritAbstractClassError.java:
+	* tests/classes/class-declaration/class-modifiers/abstract-classes/InheritAbstractClass_CreateInstanceError.java:
+	* tests/classes/class-declaration/class-modifiers/abstract-classes/InheritEmptyAbstractClass.java:
+	* tests/classes/class-declaration/class-modifiers/abstract-classes/InterfaceSignatureConflict.java: Removed
+	.java files, sources now live in the tests.tcl file.
+	* tests/classes/class-declaration/class-modifiers/abstract-classes/tests.tcl: Moved to test/jls/...
+	* tests/classes/method-declarations/method-body/ConflictingReturnInNonVoid.java:
+	* tests/classes/method-declarations/method-body/ConflictingReturnInVoid.java:
+	* tests/classes/method-declarations/method-body/EmptyAbstractMethodBody.java:
+	* tests/classes/method-declarations/method-body/EmptyBlockMethodBody.java:
+	* tests/classes/method-declarations/method-body/EmptyNativeMethodBody.java:
+	* tests/classes/method-declarations/method-body/ExceptionalReturnInNonVoid.java:
+	* tests/classes/method-declarations/method-body/InvalidAbstractMethodBody.java:
+	* tests/classes/method-declarations/method-body/InvalidEmptyMethodBody.java:
+	* tests/classes/method-declarations/method-body/InvalidNativeMethodBody.java:
+	* tests/classes/method-declarations/method-body/NoExpressionReturnInVoid.java:
+	* tests/classes/method-declarations/method-body/NoReturnInNonVoid.java: Removed
+	.java files, sources now live in the tests.tcl file.
+	* tests/classes/method-declarations/method-body/tests.tcl: Moved to test/jls/...
+	* tests/classes/method-declarations/method-body/jikes/MangleJikesOutputNoReturn.java:
+	* tests/classes/method-declarations/method-body/jikes/tests.tcl: Removed, need to put these
+	in a tests/jikes toplevel directory.
+	* tests/jls/classes/class-declaration/class-modifiers/abstract-classes/tests.tcl:
+	* tests/jls/classes/method-declarations/method-body/tests.tcl: Added new tests files.
+
+2000-09-13  Mo DeJong  <mdejong@redhat.com>
+
+	* tests/jls/lexical-structure/comments/tests.tcl:
+	* tests/jls/lexical-structure/input-elements-and-tokens/tests.tcl:
+	* tests/jls/lexical-structure/line-terminators/tests.tcl: Moved
+	tests over from tests/lexical-structure and updated using saveas.
+	* tests/lexical-structure/comments/tests.tcl:
+	* tests/lexical-structure/input-elements-and-tokens/tests.tcl:
+	* tests/lexical-structure/line-terminators/tests.tcl: Removed.
+
+2000-07-27  Mark Wielaard  <mark@klomp.org>
+
+	* jacks: Use ulimit to allow core dumps
+	on systems that have the limit set to 0.
+
+2000-07-18  Mo DeJong  <mdejong@redhat.com>
+
+	* jacks.tcl (compile): Don't check to
+	see if a .java argument to the compile
+	command exists if the argument is a
+	pattern like *.java.
+
+2000-07-15  Mo DeJong  <mdejong@redhat.com>
+
+	* jacks.html: Added note about setup file.
+	* jacks.tcl: Reorder things. Add checks
+	for file existence (JAVAC and JAVA). Added
+	ability to run tests based on a pattern.
+	Added docgen target. Added compiler sanity
+	check that will get run before the tests.
+	* logging/tcltest.tcl: Changed output to
+	show compiler name in totals.
+
+2000-07-10  Andrew G. Tereschenko  <tag@ibis.odessa.ua>
+
+	* docs/tests.html:
+	* tests/packages/import-declarations/on-demand/ImportAllFromGlobal.java:
+	Fix typo in test case. Does not change the test result.
+
+2000-07-09  Mo DeJong  <mdejong@redhat.com>
+
+	* logging/jikes.log: Update to reflect bug
+	fixes in jikes.
+
+2000-07-09  Andrew G. Tereschenko  <tag@ibis.odessa.ua>
+
+	* docs/tests.html:
+	* logging/gcj.log:
+	* logging/javac.log:
+	* logging/jikes.log:
+	* logging/kaffe.log: Account for new tests.
+	* tests/lexical-structure/line-terminators/tests.tcl: Add 25
+	new test cases for line termination and unicode substitution.
+
+2000-07-08  Mo DeJong  <mdejong@redhat.com>
+
+	* logging/gcj.log: Update to reflect bug
+	fixes in gcj.
+
+2000-07-07  Mo DeJong  <mdejong@redhat.com>
+
+	* jacks: Added comment for Cygwin users.
+	* jacks.tcl (rm_err_or_warn, compile, delete):
+	Add code to remove \r from cmd line input under Cygwin.
+	Add new "docgen" target to jacks. Fix CLASSPATH
+	setting. Make core dump detection work on a per test
+	basis. Add delete command for file cleanup.
+	* docs/tests.html:
+	* logging/gcj.log:
+	* logging/javac.log:
+	* logging/jikes.log:
+	* logging/kaffe.log: Account for new tests.
+	* tests/names/qualified-names-and-access-control/determining-accessibility/AccessDefaultClassInPackage.java:
+	* tests/names/qualified-names-and-access-control/determining-accessibility/AccessDefaultInterfaceInPackage.java:
+	* tests/names/qualified-names-and-access-control/determining-accessibility/AccessPublicClassInPackage.java:
+	* tests/names/qualified-names-and-access-control/determining-accessibility/AccessPublicInterfaceInPackage.java:
+	* tests/names/qualified-names-and-access-control/determining-accessibility/tests.tcl:
+	* tests/names/qualified-names-and-access-control/determining-accessibility/pkg/AccessDefaultClass.java:
+	* tests/names/qualified-names-and-access-control/determining-accessibility/pkg/AccessPublicClass.java:
+	* tests/names/qualified-names-and-access-control/determining-accessibility/pkg/DefaultClass.java:
+	* tests/names/qualified-names-and-access-control/determining-accessibility/pkg/DefaultInterface.java:
+	* tests/names/qualified-names-and-access-control/determining-accessibility/pkg/PublicClass.java:
+	* tests/names/qualified-names-and-access-control/determining-accessibility/pkg/PublicInterface.java:
+	Add new tests for section 6.6.1 of the JLS. Thanks go to Gregory Steuck for pointing out
+	some problems and writing the initial test cases.
+
+2000-06-28  Mo DeJong  <mdejong@redhat.com>
+
+	* COPYING: Added GPL license text.
+	* jacks.html: Reorder install instructions,
+	added note to indicate jacks is covered by the GPL.
+
+2000-06-28  Tom Tromey  <tromey@redhat.com>
+
+	* docs/tests.html: Account for new tests.
+	* logging/gcj.log: Account for new tests and gcj bug fixes.
+	* logging/javac.log: Account for new tests.
+	* logging/jikes.log: Account for new tests.
+	* logging/kaffe.log: Account for new tests.
+	* tests/lexical-structure/input-elements-and-tokens/tests.tcl:
+	Test for control-z at the end of the input stream.
+
+2000-06-26  Mo DeJong  <mdejong@redhat.com>
+
+	* jacks.tcl: cd to tests subdirectory before
+	running the tests.
+	* logging/jikes.log: Update to account for
+	checkin of fix for jikes jitterbug number 253.
+	The following tests transition from FAIL to PASS:
+	3.5-1, 3.5-5, and 3.5-7.
+
+2000-06-25  Mo DeJong  <mdejong@redhat.com>
+
+	* jacks.html: Added note about how to run "jacks all".
+	* jacks.tcl (docleanup, append_file, compile_buffer): Added
+	ability to compile the contents of a passed in buffer.
+	* docs/docgen.tcl: Error if same test name is used twice,
+	don't error if a given source file can not be found, run
+	"jacks clean" before generating documentation.
+	* docs/tests.html: Regen.
+	* logging/gcj.log: Account for new tests.
+	* logging/javac.log: Account for new tests.
+	* logging/jikes.log: Account for new tests.
+	* logging/kaffe.log: Account for new tests.
+	* tests/lexical-structure/Placeholder.java: Removed.
+	* tests/lexical-structure/tests.tcl: Removed.
+	* tests/lexical-structure/comments/tests.tcl: Added.
+	* tests/lexical-structure/input-elements-and-tokens/tests.tcl: Added.
+	* tests/lexical-structure/line-terminators/tests.tcl: Added.
+
+2000-06-24  Mo DeJong  <mdejong@redhat.com>
+
+	* jacks.tcl (write_binary): Added new helper method.
+	* tests/lexical-structure/Placeholder.java: Placeholder
+	file or code that will be written at runtime.
+	* tests/lexical-structure/tests.tcl: Added test
+	for line ending with 0d0d0a.
+
+2000-06-24  Mo DeJong  <mdejong@redhat.com>
+
+	* inner_tests.tcl: Note which tests have been converted.
+	* jacks.tcl: Add "jacks all" support. This allows one
+	to run all the tests with each compiler.
+	* logging/gcj.log:
+	* logging/javac.log:
+	* logging/jikes.log:
+	* logging/kaffe.log: Remove Started and Finished entries.
+	* logging/tcltest.tcl: Remove writing of dates to log files.
+
+2000-06-24  Mo DeJong  <mdejong@redhat.com>
+
+	* jacks.tcl (ok_pass_or_warn): Added new helper method 
+	* docs/tests.html: Regen.
+	* logging/gcj.log: Account for new tests.
+	* logging/javac.log: Account for new tests.
+	* logging/jikes.log: Account for new tests.
+	* logging/kaffe.log: Account for new tests.
+	* tests/interfaces/interface-declarations/interface-modifiers/tests.tcl: Added FIXME note.
+	* tests/interfaces/interface-declarations/interface-modifiers/abstract-interfaces/AbstractInnerInterface.java:
+	* tests/interfaces/interface-declarations/interface-modifiers/abstract-interfaces/AbstractInnerInterface_InInnerface.java:
+	* tests/interfaces/interface-declarations/interface-modifiers/abstract-interfaces/AbstractInterface.java:
+	* tests/interfaces/interface-declarations/interface-modifiers/abstract-interfaces/tests.tcl: New
+	test for abstract keyword applied to interfaces.
+
+2000-06-24  Mo DeJong  <mdejong@redhat.com>
+
+	* docs/tests.html: Regen.
+	* logging/gcj.log: New test added.
+	* tests/gcj/PR198.java: Example gcj specific test case.
+	* tests/gcj/tests.tcl: Added gcj test.
+
+2000-06-24  Mo DeJong  <mdejong@redhat.com>
+
+	* jacks.tcl (compile): Added check to make sure .java files really exist.
+	* docs/docgen.tcl: Added FIXME note.
+	* logging/tcltest.tcl: Remove warning output.
+
+2000-06-24  Mo DeJong  <mdejong@redhat.com>
+
+	* jacks.tcl: Add regression logging support.
+	* logging/gcj.log: Initial test results.
+	* logging/javac.log: Initial test results.
+	* logging/jikes.log: Initial test results.
+	* logging/kaffe.log: Initial test results.
+	* logging/tcltest.tcl: Added logging support.
+
+2000-06-24  Mo DeJong  <mdejong@redhat.com>
+
+	* jacks.tcl: Use local tcltest.tcl file.
+	* logging/tcltest.tcl: Import from Tcl cvs.
+
+2000-06-23  Mo DeJong  <mdejong@redhat.com>
+
+	* jacks.tcl: Fixed core dump detection.
+	* docs/tests.html: Regen.
+	* tests/classes/class-declaration/class-modifiers/abstract-classes/AbstractClass.java:
+	* tests/classes/class-declaration/class-modifiers/abstract-classes/AbstractClass_CreateInstanceError.java:
+	* tests/classes/class-declaration/class-modifiers/abstract-classes/AbstractMethodAbstractClass.java:
+	* tests/classes/class-declaration/class-modifiers/abstract-classes/AbstractMethodNonAbstractClass.java:
+	* tests/classes/class-declaration/class-modifiers/abstract-classes/DoubleInheritAbstractClassError.java:
+	* tests/classes/class-declaration/class-modifiers/abstract-classes/DoubleInheritEmptyAbstractClass.java:
+	* tests/classes/class-declaration/class-modifiers/abstract-classes/ImplementInheritedAbstractMethod.java:
+	* tests/classes/class-declaration/class-modifiers/abstract-classes/InheritAbstractClass.java:
+	* tests/classes/class-declaration/class-modifiers/abstract-classes/InheritAbstractClassError.java:
+	* tests/classes/class-declaration/class-modifiers/abstract-classes/InheritAbstractClass_CreateInstanceError.java:
+	* tests/classes/class-declaration/class-modifiers/abstract-classes/InheritEmptyAbstractClass.java:
+	* tests/classes/class-declaration/class-modifiers/abstract-classes/InterfaceSignatureConflict.java:
+	* tests/classes/class-declaration/class-modifiers/abstract-classes/tests.tcl: Added new test cases that
+	cover abstract class declarations.
+
+2000-06-22  Mo DeJong  <mdejong@redhat.com>
+
+	* jacks.html: Add link for new tests.html file.
+	* docs/docgen.tcl: Generate tests.html.
+	* docs/jls_map.html: Removed.
+	* docs/new_testcase.html: Updated link.
+	* docs/tests.html: Regen.
+
+2000-06-21  Mo DeJong  <mdejong@redhat.com>
+
+	* jacks.tcl: Added detection of core dump to compile command.
+	* tests/jikes/BrokenDependency.java:
+	* tests/jikes/tests.tcl: Added test for bug in jikes related
+	to use of +M for with a dependency that does not exist.
+
+2000-06-21  Mo DeJong  <mdejong@redhat.com>
+
+	* tests/names/members-and-inheritance/members-of-a-class-type/AmbiguousInterfaceMember.java:
+	* tests/names/members-and-inheritance/members-of-a-class-type/tests.tcl:
+	* tests/names/members-and-inheritance/members-of-an-array-type/ArrayIsObject.java:
+	* tests/names/members-and-inheritance/members-of-an-array-type/ArrayLengthIsFinal.java:
+	* tests/names/members-and-inheritance/members-of-an-array-type/tests.tcl:
+	* tests/names/members-and-inheritance/members-of-an-interface-type/AmbiguousExtendedInterfaceMember.java:
+	* tests/names/members-and-inheritance/members-of-an-interface-type/tests.tcl:
+	* tests/names/scope-of-a-simple-name/GlobalOne.java:
+	* tests/names/scope-of-a-simple-name/GlobalTwo.java:
+	* tests/names/scope-of-a-simple-name/IllegalForwardReference.java:
+	* tests/names/scope-of-a-simple-name/LegalForwardReference.java:
+	* tests/names/scope-of-a-simple-name/UseOfTypeBeforeDeclaration.java:
+	* tests/names/scope-of-a-simple-name/tests.tcl: Added new test cases.
+
+2000-06-20  Mo DeJong  <mdejong@redhat.com>
+
+	* ChangeLog: Imported new regression
+	testing framework into the jikes CVS
+	using the module name jacks.

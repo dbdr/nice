@@ -1,7 +1,7 @@
 /**************************************************************************/
-/*                             N I C E                                    */
-/*        A simple imperative object-oriented research language           */
-/*                   (c)  Daniel Bonniot 1999                             */
+/*                                N I C E                                 */
+/*             A high-level object-oriented research language             */
+/*                        (c) Daniel Bonniot 2002                         */
 /*                                                                        */
 /*  This program is free software; you can redistribute it and/or modify  */
 /*  it under the terms of the GNU General Public License as published by  */
@@ -21,6 +21,12 @@ package nice.tools.compiler;
 
 public final class OutputMessages
 {
+  /** Should be called when the compilation starts, before any message is printed. */
+  public static void start()
+  {
+    statusCode = OK;
+  }
+
   public static void warning(String message)
   {
     setStatusCode(WARNING);
@@ -39,32 +45,37 @@ public final class OutputMessages
     exitIfErrors();
   }
   
+  /** A bug has occured inside the compiler. */
   public static void bug(String message)
   {
     setStatusCode(BUG);
     System.err.println(message);
   }
   
+  /** If errors have been reported, throw an exception to stop the compilation. */
   public static void exitIfErrors()
   {
     if (statusCode == ERROR || statusCode == BUG)
-      exit();
+      throw new Exit(statusCode);
   }
 
-  public static void exit()
+  public static class Exit extends RuntimeException
   {
-    // A non-zero code is interpreted as error, e.g. by make
-    if (statusCode == WARNING)
-      System.exit(OK);
-    else
-      System.exit(statusCode);
+    public final int statusCode;
+
+    Exit(int statusCode)
+    {
+      this.statusCode = statusCode;
+    }
   }
-  
+
   public static final int 
     OK      = 0, // Normal exit (compilation sucessful, version message)
     BUG     = 1, // Abnormal termination (bug in the compiler)
     ERROR   = 2, // Error reported (file missing, type error, ...)
     WARNING = 3; // Warning reported
+
+  public static int getStatusCode() { return statusCode; }
 
   private static int statusCode = OK;
 

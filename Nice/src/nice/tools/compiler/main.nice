@@ -34,7 +34,11 @@ import nice.getopt;
 import nice.doc;
 import bossa.modules;
 
-main(args)
+/**
+   @return a status code describing if the compilation was successful.
+     The codes are found in OutputMessages (OK, WARNING, ERROR, BUG).
+*/
+int compile(String[] args)
 {
   ?Throwable uncaughtException = null;
   boolean memInfo = false;
@@ -44,6 +48,8 @@ main(args)
   ?String classpath = null;
 
   try{
+
+  OutputMessages.start();
 
   Compilation compilation = new Compilation();
 
@@ -154,13 +160,17 @@ main(args)
   mainPackage = rest[0];
 
   if (classpath != null)
-    nice.tools.code.Types.setClasspath(compilation.runtimeFile + ":" + classpath);
+    nice.tools.code.Types.setClasspath(classpath + ":" + compilation.runtimeFile);
 
   compilation.setMainPackage(mainPackage);
   make(compilation);
 
   if (nativeProgram != null)
     produceNativeProgram(nativeCompiler, mainPackage, nativeProgram);
+  }
+  catch(OutputMessages.Exit e) {
+    // Compilation was interrupted.
+    return e.statusCode;
   }
   catch(bossa.util.UserError e){
     bossa.util.Internal.warning("user error only caught in main"); 
@@ -177,21 +187,31 @@ main(args)
     {
       Throwable exn = uncaughtException;
 
-      println
+      OutputMessages.bug
       ("\nAn exception has occured in the compiler\n" +
        "Please fill-in a bug report at the following webpage:\n" +
        "http://sourceforge.net/tracker/?func=add&group_id=12788&atid=112788" +
        "\n\nException: " + exn.toString() +
        "\n\nStack trace:\n");
       exn.printStackTrace();
-      System.exit(1);
     }
-
-  OutputMessages.exitIfErrors();
 
   if (memInfo) printMemoryUsage();
 
-  OutputMessages.exit();
+  return OutputMessages.getStatusCode();
+}
+
+main(args)
+{
+  int status = compile(args);
+
+  // A non-zero code is interpreted as error, e.g. by make.
+  // We do not want that if there are just warnings.
+  // When called from an editor it does not matter, as it should be able to interpret warnings.
+  if (! bossa.util.Location.editorMode && status == OutputMessages.WARNING)
+    status = OutputMessages.OK;
+
+  System.exit(status);
 }
 
 void version()

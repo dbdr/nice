@@ -1,0 +1,17 @@
+
+package regtest.basic;
+
+/**
+   Test for toplevel global variables.
+*/
+
+var int one = 1;
+var int three = 3 * one;
+
+var String globalVar = "Global Variables: ";
+
+void test_global();
+test_global()
+{
+  println(globalVar + one + ", " + three);
+}

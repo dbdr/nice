@@ -24,46 +24,32 @@ or <ulink url="mailto:bonniot@users.sourceforge.net">privately</ulink>
 </para>
 
 <para>
-<variablelist>
-<varlistentry><term>0.6 (June 2002)</term>
-<listitem>
-<para>
-Harmonize syntax for function types as 
-<literal>int->int</literal> and <literal>(String, int)->boolean</literal>.
-Introduce automatic constructors that initialize the fields, using
-optional named parameters. 
-This means that it is not necessary to write the code for the constructor,
-nor for a simple creation function. Example:
-<programlisting><![CDATA[
-class LinkedList<T>
-{
-  T head;
-  ?LinkedList<T> tail;
-}
-...
-LinkedList<int> l = 
-  new LinkedList(head: 1, 
-                 tail: new LinkedList(head: 2, tail: null));
-]]></programlisting>
+The current stable version is 0.6, released July 11th, 2002.
 </para>
-</listitem>
-</varlistentry>
-<varlistentry><term>0.8 (June 2002)</term>
+
+<para>
+<variablelist>
+<varlistentry><term>0.8 (August 2002)</term>
 <listitem>
 <para>
-Add various missing Java constructs: synchronized statements
+Add various missing Java constructs: super, synchronized statements
 and Java 1.4 style assertions.
 Also consider more Design By Contract features: pre- and post-conditions, 
 class invariants. These might be part of a later release.
 </para>
 </listitem>
 </varlistentry>
-<varlistentry><term>1.0 (July 2002)</term>
+<varlistentry><term>1.0 (September 2002)</term>
 <listitem>
 <para>
-First official stable release of the language. 
+Implement visibility modifiers (private, default, public).
+Finish a first version of the User's manual.
+</para>
+
+<para>
+This will be the first official stable release of the language. 
 With the above features, the language is rich enough to compete with Java 1.4
-in every aspect. We must have a reasonably complete User's manual by then.
+in every aspect. 
 This will be the time for more widespread publicity. 
 <ulink url="mailto:bonniot@users.sourceforge.net">What are the best places 
 to announce Nice ? Tell me !</ulink>

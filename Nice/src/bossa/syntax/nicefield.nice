@@ -59,7 +59,7 @@ abstract class NiceField
 		nameRequired: true, defaultValue: notNull(value));
   }
 
-  void typecheck()
+  void typecheck(boolean compiled)
   {
     if (value != null)
       {
@@ -68,6 +68,15 @@ abstract class NiceField
 	mlsub.typing.Polytype declaredType = sym.getType();
 	value = notNull(value).resolveOverloading(declaredType);
 	typecheck(notNull(value));
+
+	if (compiled)
+	  {
+	    // Just make sure that the value's type is computed now
+	    // (when the typing context is right).
+	    // We don't need to check the type against the declared type.
+	    notNull(value).getType();
+	    return;
+	  }
 
 	try {
 	  mlsub.typing.Typing.leq(notNull(value).getType(), declaredType);
@@ -178,7 +187,7 @@ final class OverridenField extends NiceField
         }
   } 
 
-  typecheck()
+  typecheck(compiled)
   {
     ?gnu.expr.Declaration decl = null;
 
@@ -270,7 +279,7 @@ public final class ValueOverride
     value = analyse(value, scope, typeScope);
   }
 
-  void typecheck()
+  void typecheck(boolean compiled)
   {
     boolean exists = false;
 

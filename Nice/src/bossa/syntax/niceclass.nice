@@ -193,7 +193,7 @@ public class NiceClass extends ClassImplementation
       return null;
   }
 
-  private boolean checkValueOverride(LocatedString name, Expression value)
+  boolean checkValueOverride(LocatedString name, Expression value)
   {
     ?NiceField original = null;
 
@@ -303,15 +303,17 @@ public class NiceClass extends ClassImplementation
 
   typecheck()
   {
+    let compiled = definition.module.compiled();
+
     try {
       for (field : fields)
-	field.typecheck();
+	field.typecheck(compiled);
 
       for (or : overrides)
-	or.typecheck();
+	or.typecheck(compiled);
 
       for (valueOverride : valueOverrides)
-        valueOverride.typecheck();
+        valueOverride.typecheck(compiled);
 
       if (! initializers.isEmpty())
         {

@@ -17,7 +17,7 @@ JAVA=${JAVA-java}
 
 echo()
 {
-  /bin/echo -e "$@"
+  /bin/echo "$@"
 }
 
 ### Nice specific

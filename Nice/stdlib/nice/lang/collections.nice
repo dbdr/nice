@@ -108,6 +108,12 @@ U foldRight(List<T> list, (T, U)->U func, U init, int from)
   return res;
 }
 
+<T> void foreach(Enumeration<T> enumeration, T->void f)
+{
+  while (enumeration.hasMoreElements())
+    f(enumeration.nextElement());
+}
+
 /****************************************************************
  * Implementations
  ****************************************************************/

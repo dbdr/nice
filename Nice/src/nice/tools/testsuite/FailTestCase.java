@@ -33,10 +33,8 @@ public class FailTestCase extends TestCase {
 			checkFailPositions();
 			if (getFailPositions().isEmpty())
 				pass();
-			else {
-				fail();
-				TestNice.increaseWarning();
-			}
+			else
+				warning();
 			return;
 		} catch(CompilerBugException e) {
 			fail();

@@ -391,6 +391,40 @@ public class TestCase {
 	public void fail() {
 		TestNice.increaseFailed();
 		
+		//	log the sources
+		printSources();
+		
+		//	compiler messages
+		TestNice.getOutput().log("nicec", getCompilerMessages());
+		TestNice.getOutput().endTestCase(false);
+		
+		//	move contents of temp folder to a new folder in the fail folder
+		TestNice.moveFilesToFailFolder();
+	}
+	
+	/**
+		Called if a warning occures. For example if FAIL_HERE is at a wrong position.
+	*/
+	public void warning() {
+		TestNice.increaseWarning();
+		
+		//	log the sources
+		printSources();
+		
+		//	compiler messages
+		TestNice.getOutput().log("nicec", getCompilerMessages());
+		TestNice.getOutput().endTestCase(false);
+		
+		//	move contents of temp folder to a new folder in the fail folder
+		TestNice.moveFilesToFailFolder();	
+	}
+	
+	
+	
+	/**
+		Print global and local sources that are involved in this testcase.
+	*/
+	private void printSources() {
 		BufferedWriter writer;
 		StringWriter contentWriter;
 		//	ordinary files
@@ -420,14 +454,10 @@ public class TestCase {
 						contentWriter.toString());
 			TestNice.getOutput().log("");
 		}
-		
-		//	compiler messages
-		TestNice.getOutput().log("nicec", getCompilerMessages());
-		TestNice.getOutput().endTestCase(false);
-		
-		//	move contents of temp folder to a new folder in the fail folder
-		TestNice.moveFilesToFailFolder();
 	}
+	
+	
+	
 	
 	/**
 		Returns the compiler messages as String

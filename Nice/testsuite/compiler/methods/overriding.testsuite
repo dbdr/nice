@@ -1,0 +1,119 @@
+/// PASS
+  B b = new B();
+  assert foo(b);
+
+  A a = b;
+  assert foo(a);
+  /// Toplevel
+class A {}
+class B extends A {}
+
+boolean foo(A) = false;
+boolean foo(B x); foo(B x) = true;
+
+/// PASS
+  B b = new B();
+  assert foo(b);
+
+  A a = b;
+  assert foo(a);
+  /// Toplevel
+class A {}
+class B extends A {}
+
+boolean foo(A) = false;
+boolean foo(B) = true;
+
+/// PASS
+  /// package a
+  /// Toplevel
+class A {}
+class B extends A {}
+
+boolean foo(A) = false;
+boolean foo(B x); foo(B x) = true;
+  /// package b import a
+  B b = new B();
+  assert foo(b);
+
+  A a = b;
+  assert foo(a);
+
+/// PASS
+  /// package b import a
+  /// Toplevel
+class B extends A {}
+boolean foo(B); foo(B x) = true;
+  /// package a import b
+  B b = new B();
+  assert foo(b);
+
+  A a = b;
+  assert foo(a);
+  /// Toplevel
+class A {}
+
+boolean foo(A) = false;
+
+/// PASS
+  /// package a import b
+  B b = new B();
+  assert foo(b);
+
+  A a = b;
+  assert foo(a);
+  /// Toplevel
+class A {}
+
+boolean foo(A) = false;
+  /// package b import a
+  /// Toplevel
+class B extends A {}
+boolean foo(B); foo(B x) = true;
+
+/// PASS
+  /// Toplevel
+class A{}
+<T> void foo(A,Object) {}
+<A T> void foo(T,String) {}
+
+/// PASS
+  /// Toplevel
+void foo(Throwable,Object) {}
+<Throwable T> void foo(T,String); foo(x, String s) {}
+foo(RuntimeException re, String) {}
+
+/// PASS
+  /// Toplevel
+class A{}
+class B extends A {}
+class Z {}
+
+void foo(A,?Z) {}
+void foo(A,Z) {}
+foo(B x,z) {}
+
+/// PASS
+  /// Toplevel
+class A{}
+class B extends A {}
+
+void foo(A,int ?-> int) {}
+void foo(A,int->int) {}
+foo(B x,z) {}
+
+/// PASS
+  /// Toplevel
+class A{}
+class B extends A {}
+void foo(A x,int t) {}
+void foo(B x,int t) {}
+
+/// PASS
+  assert  foo(new A(), int x => x);
+  assert !foo(new A(), int x => 0);
+  /// Toplevel
+class A{}
+class B extends A {}
+boolean foo(A x,int->int t) = true;
+boolean foo(A x,int->byte t) = false;

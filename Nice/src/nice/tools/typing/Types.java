@@ -66,6 +66,15 @@ public final class Types
       && ((MonotypeConstructor) m).getTC() == PrimitiveType.sureTC;
   }
 
+  public static boolean isDispatchable(Monotype m)
+  {
+    // Functional types are not dispatchable
+    if (parameters(m) != null)
+      return false;
+
+    return ! isPrimitive(m);
+  }
+
   /****************************************************************
    * Handling of option types
    ****************************************************************/
@@ -153,6 +162,23 @@ public final class Types
   public static TypeConstructor constructor(Monotype type)
   {
     return equivalent(type).head();
+  }
+
+  /**
+     Return a concrete type constructor that represents as closely as
+     possible the given type. 
+
+     The constraint that introduces type variables occuring in the type must be
+     entered in the context before calling this method.
+  */
+  public static TypeConstructor concreteConstructor(Monotype type)
+  {
+    TypeConstructor res = constructor(type);
+
+    if (res == null || res.isConcrete())
+      return res;
+
+    return Typing.lowestInstance(res);
   }
   
   /****************************************************************

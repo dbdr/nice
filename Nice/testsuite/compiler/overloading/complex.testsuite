@@ -7,10 +7,14 @@
 /// PASS
   String[] sa1 = ["xyz"];
   eq2(sa1, [null]);
+
+  ?String s = "";
+  assert  eq2(s, s);
+  assert !eq2(null, null);
   /// Toplevel
   <T,U,V | U <: T, V <: T> boolean eq2(U[] u, V[] v) = false;
-  <Any T> boolean eq2(!T,!T) = true;
-  <Any T> boolean eq2(?T, ?T) = false;
+  <T> boolean eq2(!T,!T) = true;
+  <T> boolean eq2(?T,?T) = false;
   
 /// PASS
   List<String> list1 = new ArrayList();
@@ -18,5 +22,5 @@
   test(list1,list2);
   /// Toplevel
   <T,U> boolean test(List<T> , List<U>) = false;
-  <Any T> boolean test(!T,!T) = true;
-  <Any T> boolean test(?T, ?T) = false;
+  <T> boolean test(!T,!T) = true;
+  <T> boolean test(?T, ?T) = false;

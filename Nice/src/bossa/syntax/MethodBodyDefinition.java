@@ -111,9 +111,6 @@ public class MethodBodyDefinition extends MethodImplementation
 		 d.getName() + " is a function.\nIt was defined at:\n" + 
 		 d.location());
 
-    // Register this alternative for the link test
-    alternative = new bossa.link.SourceAlternative(this);
-
     buildSymbols();
   }
 
@@ -342,7 +339,8 @@ public class MethodBodyDefinition extends MethodImplementation
       User.error(this, e);
     }
 
-    removeUnnecessaryDispatch();
+    if (! declaration.specializesMethods())
+      removeUnnecessaryDispatch();
   }
 
   private void removeUnnecessaryDispatch()
@@ -481,6 +479,12 @@ public class MethodBodyDefinition extends MethodImplementation
 	  User.error(this, "Type error in method "+name, ": "+e);
       }
     }
+
+    // If the method we implement specialize others, then we cannot
+    // omit the patterns, as we do handle only a special case of those
+    // more general methods.
+    if (declaration.specializesMethods())
+      addPatterns();
   }
 
   /****************************************************************
@@ -514,11 +518,6 @@ public class MethodBodyDefinition extends MethodImplementation
   {
     return VarSymbol.compile(parameters);
   }
-
-  private bossa.link.Alternative alternative;
-
-  bossa.link.Alternative getAlternative() { return alternative; }
-
 
   /****************************************************************
    * Printing

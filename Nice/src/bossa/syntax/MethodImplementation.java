@@ -23,6 +23,7 @@ import nice.tools.typing.Types;
 import nice.tools.code.Gen;
 import mlsub.typing.Typing;
 import mlsub.typing.TypeConstructor;
+import mlsub.typing.Monotype;
 import mlsub.typing.MonotypeVar;
 import gnu.bytecode.*;
 import bossa.util.Debug;
@@ -95,6 +96,25 @@ public abstract class MethodImplementation extends Definition
     parameters = res;
   }
   
+  /** Where no patterns are present, add those corresponding to the method
+      declaration.
+  */
+  void addPatterns()
+  {
+    Monotype[] parameters = Types.parameters(declaration.getType());
+    for (int i = 0; i < formals.length; i++)      
+      if (formals[i].tc == null)
+        {
+          formals[i].tc = Types.concreteConstructor(parameters[i]);
+
+          if (formals[i].tc == null && Types.isSure(parameters[i]))
+            formals[i].tc = PrimitiveType.sureTC;
+
+          if (Types.isPrimitive(formals[i].tc))
+            formals[i].tc = null;
+        }
+  }
+
   void resolveBody()
   {
     if (hasThis())
@@ -107,7 +127,14 @@ public abstract class MethodImplementation extends Definition
     finally {
       Node.thisExp = null;
     }
+
+    // Register this alternative for the link test
+    alternative = new bossa.link.SourceAlternative(this);
   }
+
+  private bossa.link.Alternative alternative;
+
+  bossa.link.Alternative getAlternative() { return alternative; }
 
   /****************************************************************
    * Type checking
@@ -177,7 +204,7 @@ public abstract class MethodImplementation extends Definition
 		       true, false);
 
     compiledMethod.addBytecodeAttribute
-      (new MiscAttr("definition", declaration.getFullName().getBytes()));
+      (new MiscAttr("definition", declaration.getAllFullNames().getBytes()));
     compiledMethod.addBytecodeAttribute
       (new MiscAttr("patterns", 
 		    Pattern.bytecodeRepresentation(formals).getBytes()));

@@ -393,6 +393,39 @@ public abstract class MethodDeclaration extends Definition
     return "NONE";
   }
 
+  public boolean specializesMethods()
+  {
+    return false;
+  }
+
+  public Iterator listSpecializedMethods()
+  {
+   return null;
+  }
+
+  /** @return a string that uniquely represents this method 
+      and those that it specializes. 
+  */
+  String getAllFullNames()
+  {
+    Iterator i = listSpecializedMethods();
+
+    if (i == null)
+      return getFullName();
+
+    StringBuffer res = new StringBuffer();
+    res.append(getFullName());
+    while (i.hasNext())
+      {
+        res.append(methodListSeparator);
+        res.append(((MethodDeclaration) i.next()).getFullName());
+      }
+
+    return res.toString();
+  }
+
+  public static final char methodListSeparator = ';';
+
   private gnu.expr.Expression code;
 
   protected abstract gnu.expr.Expression computeCode();

@@ -31,7 +31,7 @@ import nice.tools.code.Gen;
    @see MethodBodyDefinition
 
    @version $Date$
-   @author Daniel Bonniot (d.bonniot@mail.dotcom.fr)
+   @author Daniel Bonniot (bonniot@users.sf.net)
 */
 public class Pattern implements Located
 {
@@ -395,6 +395,15 @@ public class Pattern implements Located
     if (that.atNull() || this.atNull())
       return false;
 
+    if (that.atNonNull())
+      // The only reason it could be false is if we are atNull, but that's
+      // already handled.
+      return true;
+
+    // that is not atNonNull nor atAny at this point
+    if (this.atNonNull())
+      return false;
+
     if (that.atBool())
       return this.atBool() && (this.atTrue() == that.atTrue());
 
@@ -435,6 +444,9 @@ public class Pattern implements Located
 
     if (atNull())
       return tag == PrimitiveType.nullTC;
+
+    if (atNonNull())
+      return tag != PrimitiveType.nullTC;
 
     // a null tc is an unmatchable argument (e.g. function)
     if (tag == null)
@@ -855,6 +867,12 @@ public class Pattern implements Located
     return atValue != null && !atBool() && !atNull() &&!atIntCompare();
   }
   public boolean atNull() { return atValue instanceof NullExp; }
+  /** This pattern only specifies that the vlaue is not null.
+      This cannot be explicitely used in source programs, but it is useful
+      when a method with a non-null parameter specializes one where that 
+      parameter can be null.
+  */
+  public boolean atNonNull() { return tc == PrimitiveType.sureTC; }
   public boolean atAny()  { return atValue == null && tc == null; }
   public boolean atBool() { 
     return atValue != null && tc == PrimitiveType.boolTC;

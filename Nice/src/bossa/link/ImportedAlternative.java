@@ -75,10 +75,14 @@ public class ImportedAlternative extends Alternative
 	patterns.add(p);
       }
     
-    new ImportedAlternative(method.getName(), fullName, (Pattern[]) 
-			    patterns.toArray(new Pattern[patterns.size()]),
-			    new QuoteExp(new PrimProcedure(method)),
-			    location);
+    Alternative alt = 
+      new ImportedAlternative(method.getName(), (Pattern[]) 
+                              patterns.toArray(new Pattern[patterns.size()]),
+                              new QuoteExp(new PrimProcedure(method)),
+                              location);
+
+    alt.add(nice.tools.util.System.split
+            (fullName, MethodDeclaration.methodListSeparator));
   }
 
   /**
@@ -110,10 +114,10 @@ public class ImportedAlternative extends Alternative
       }
   }
 
-  private ImportedAlternative(String name, String fullName, Pattern[] patterns,
+  private ImportedAlternative(String name, Pattern[] patterns,
 			      gnu.expr.Expression code, Location location)
   {
-    super(name, fullName, patterns);
+    super(name, patterns);
     this.code = code;
     this.location = location;
   }

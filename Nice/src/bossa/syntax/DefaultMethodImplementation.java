@@ -77,11 +77,16 @@ public class DefaultMethodImplementation extends MethodImplementation
   void resolveBody()
   {
     super.resolveBody();
-    /*alternative =*/ new bossa.link.SourceAlternative(this);
   }
 
   void innerTypecheck() throws mlsub.typing.TypingEx
   {
+    // If the method we implement specialize others, then we cannot
+    // omit the patterns, as we do handle only a special case of those
+    // more general methods.
+    if (declaration.specializesMethods())
+      addPatterns();
+
     Node.currentFunction = this;
     if (hasThis())
       Node.thisExp = new SymbolExp(parameters[0], location());

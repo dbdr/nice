@@ -27,9 +27,18 @@ public class SourceAlternative extends Alternative implements Located
   public SourceAlternative(MethodImplementation implementation)
   {
     super(implementation.getDeclaration().getName().toString(), 
-	  implementation.getDeclaration().getFullName(), 
 	  implementation.getPatterns());
     this.implementation = implementation;
+
+    add(implementation.getDeclaration().getFullName());
+
+    java.util.Iterator specializedMethods = 
+      implementation.getDeclaration().listSpecializedMethods();
+    if (specializedMethods != null)
+      for (; specializedMethods.hasNext();)
+        {
+          add(((MethodDeclaration) specializedMethods.next()).getFullName());
+        }
   }
 
   private MethodImplementation implementation;

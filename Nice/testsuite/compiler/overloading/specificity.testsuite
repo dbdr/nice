@@ -50,8 +50,7 @@ void f(B a, String s, int i = 0) { }
   class B extends A {}
   void foo(A);
   void foo(B);
-  foo(@B(A)) {}
-  foo(@B(B)) {}
+  foo(@B) {}
 
 /// PASS
   /// Toplevel
@@ -70,10 +69,7 @@ void f(B a, String s, int i = 0) { }
   void foo(A, B);
   void foo(B, A);
   void foo(B, B);
-  foo(@B(A) ,@B(A)) {}
-  foo(@B(A) ,@B(B)) {}
-  foo(@B(B) ,@B(A)) {}
-  foo(@B(B) ,@B(B)) {}
+  foo(@B,@B) {}
 
 /// FAIL
   /// Toplevel
@@ -84,15 +80,16 @@ void f(B a, String s, int i = 0) { }
   foo(@B(A)) {}
   foo(@B(B)) {}
 
-/// FAIL
+/// PASS
   /// Toplevel
   abstract class A {}
   class B extends A {}
   void foo(A, String);
   void foo(B ,Number);
   void foo(B ,Integer);
-  foo(@B(A) ,s) {}
-  foo(@B(B) ,s) {}
+  foo(@B, s@String) {}
+  foo(@B, s@Number) {}
+  foo(@B, s@Integer) {}
   
 /// PASS
   /// Toplevel

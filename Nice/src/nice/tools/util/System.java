@@ -21,6 +21,9 @@ import java.util.jar.JarFile;
 import java.util.Date;
 import java.text.DateFormat;
 
+import java.util.List;
+import java.util.ArrayList;
+
 /**
    Communication with the system environment.
    
@@ -86,4 +89,33 @@ public class System
   }
 
   private static final DateFormat longDate = DateFormat.getDateTimeInstance();
+
+  /**
+     String operations.
+  */
+
+  public static String[] split(String str, char separator)
+  {
+    List res = new ArrayList();
+    int ntx = 0;
+    int pos = 0;
+    while(ntx > -1)
+      {
+        ntx = str.indexOf(separator, pos);
+        if (ntx > -1)
+          {
+            if (ntx > 0)
+              {
+                res.add(str.substring(pos, ntx));
+              }
+            pos = ntx + 1;
+          }
+        else
+          {
+            res.add(pos == 0 ? str : str.substring(pos));
+          }
+      }
+
+    return (String[]) res.toArray(new String[res.size()]);
+  }
 }

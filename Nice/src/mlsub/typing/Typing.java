@@ -334,6 +334,26 @@ public final class Typing
       leq(ms1[i], ms2[i]);
   }
 
+  /** @param dispatchable when true, we require that non dispatchable types be
+                          equal, not mere subtypes.
+  */
+  public static void leq(Monotype[] ms1, Monotype[] ms2, boolean dispatchable)
+    throws TypingEx
+  {
+    if (! dispatchable)
+      for(int i = 0; i < ms1.length; i++)
+        leq(ms1[i], ms2[i]);
+    else
+      for(int i = 0; i < ms1.length; i++)
+        {
+          Monotype m1 = ms1[i];
+          Monotype m2 = ms2[i];
+          leq(m1, m2);
+          if (! nice.tools.typing.Types.isDispatchable(m2))
+            leq(m2, m1);
+        }
+  }
+
   /****************************************************************
    * Type constructors
    ****************************************************************/
@@ -387,6 +407,16 @@ public final class Typing
   public static void leq(Domain d1, Domain d2)
     throws TypingEx
   {
+    leq(d1, d2, false);
+  }
+
+  /** Test if d1 is a subdomain of d2.
+      @param dispatchable when true, we require that non dispatchable types be
+                          equal, not mere subtypes.
+  */
+  public static void leq(Domain d1, Domain d2, boolean dispatchable)
+    throws TypingEx
+  {
     if(dbg) Debug.println(d1+" leq "+d2);
     
     if(d1 == Domain.bot)
@@ -395,7 +425,7 @@ public final class Typing
     if (!(Constraint.hasBinders(d1.getConstraint()) || 
 	  Constraint.hasBinders(d2.getConstraint())))
       {
-	leq(d1.getMonotypes(), d2.getMonotypes());
+	leq(d1.getMonotypes(), d2.getMonotypes(), dispatchable);
 	return;
       }
     
@@ -406,13 +436,38 @@ public final class Typing
       Typing.implies();
 
       Constraint.enter(d2.getConstraint());
-      leq(d1.getMonotypes(), d2.getMonotypes());
+      leq(d1.getMonotypes(), d2.getMonotypes(), dispatchable);
     }
     finally{
       leave();
     }
   }
-  
+
+  public static boolean smaller(Domain d1, Domain d2)
+  {
+    try {
+      leq(d1, d2);
+      return true;
+    }
+    catch(TypingEx ex) {
+      return false;
+    }
+  }
+
+  /** @param dispatchable when true, we require that non dispatchable types be
+                          equal, not mere subtypes.
+  */
+  public static boolean smaller(Domain d1, Domain d2, boolean dispatchable)
+  {
+    try {
+      leq(d1, d2, dispatchable);
+      return true;
+    }
+    catch(TypingEx ex) {
+      return false;
+    }
+  }
+
   /** Test if a polytype is in a domain. */
   public static void in(Polytype type, Monotype domain)
     throws TypingEx

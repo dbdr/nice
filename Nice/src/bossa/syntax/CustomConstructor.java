@@ -130,6 +130,8 @@ public abstract class CustomConstructor extends UserOperator
 
     void resolve()
     {
+      super.resolve();
+
       TypeConstructor tc = Node.getGlobalTypeScope().globalLookup(className);
       TypeConstructors.addConstructor(tc, this);
       classe = NiceClass.get(tc);
@@ -272,6 +274,7 @@ public abstract class CustomConstructor extends UserOperator
 
     void resolve()
     {
+      super.resolve();
       addConstructorCallSymbol();
     }
 

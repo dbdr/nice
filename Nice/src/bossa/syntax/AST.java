@@ -129,17 +129,17 @@ public class AST extends Node
   {
     Node.setModule(module);
 
-    for (int i = 0; i < methodImplementations.length; i++)
+    for (int i = 0; i < methods.length; i++)
       try{
-        methodImplementations[i].lateBuildScope();
+        methods[i].typedResolve();
       }
       catch(UserError ex){
         module.compilation().error(ex);
       }
 
-    for (int i = 0; i < methods.length; i++)
+    for (int i = 0; i < methodImplementations.length; i++)
       try{
-        methods[i].typedResolve();
+        methodImplementations[i].lateBuildScope();
       }
       catch(UserError ex){
         module.compilation().error(ex);

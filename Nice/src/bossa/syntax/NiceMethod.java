@@ -14,6 +14,7 @@ package bossa.syntax;
 
 import bossa.util.*;
 import mlsub.typing.*;
+import nice.tools.typing.Types;
 
 import gnu.bytecode.*;
 import gnu.expr.*;
@@ -145,6 +146,87 @@ public class NiceMethod extends UserOperator
       return false;
 
     return getType().domain()[0].toString().equals("java.lang.String[]");
+  }
+
+  void resolve()
+  {
+    homonyms = Node.getGlobalScope().lookup(getName());
+    homonyms.remove(getSymbol());
+  }
+
+  void typedResolve()
+  {
+    findSpecializedMethods();
+
+    super.typedResolve();
+  }
+
+  private List homonyms;
+
+  private List specializedMethods = null;
+
+  public Iterator listSpecializedMethods()
+  {
+    return specializedMethods == null ? null : specializedMethods.iterator();
+  }
+
+  public boolean specializesMethods()
+  {
+    //if (homonyms != null)
+    //throw new Error(this.toString());
+
+    return specializedMethods != null;
+  }
+
+  void findSpecializedMethods()
+  {
+    if (homonyms.isEmpty())
+      {
+        homonyms = null;
+        return;
+      }
+
+    Domain ourDomain = Types.domain(getType());
+
+    for (ListIterator i = homonyms.listIterator(); i.hasNext();)
+      {
+        VarSymbol s = (VarSymbol) i.next();
+        MethodDeclaration d = s.getMethodDeclaration();
+
+        // Ignore non-methods.
+        if (d == null || d.isIgnored())
+          continue;
+
+        // Check that we have the same number of arguments
+        if (d.getArity() != this.getArity())
+          continue;
+
+        Domain itsDomain = Types.domain(s.getType());
+
+        // Do we have a smaller domain?
+        if (! (Typing.smaller(ourDomain, itsDomain, true)))
+          continue;
+
+        if (Typing.smaller(itsDomain, ourDomain))
+          {
+            if (module == d.module)
+              User.error(this, "This method has a domain identical to " +
+                         d + ", which is defined at " + d.location());
+            else
+              // Methods with identical domains in different packages are
+              // accepted, but they do not specialize each other.
+              // They can be refered to unambiguously by using their
+              // fully qualified name.
+              continue;
+          }
+
+        if (specializedMethods == null)
+          specializedMethods = new ArrayList
+            (homonyms.size() - i.previousIndex());
+        specializedMethods.add(d);
+      }
+
+    homonyms = null;
   }
 
   /****************************************************************

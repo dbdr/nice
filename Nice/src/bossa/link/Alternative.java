@@ -44,12 +44,10 @@ public abstract class Alternative implements Located
      The full name uniquely identifies the method by including the 
      complete type.
   */
-  public Alternative(String methodName, String fullName, Pattern[] patterns)
+  public Alternative(String methodName, Pattern[] patterns)
   {
     this.methodName = methodName;
-    this.fullName = fullName;
     this.patterns = patterns;
-    add();
   }
 
   /****************************************************************
@@ -175,7 +173,6 @@ public abstract class Alternative implements Located
   }
 
   String methodName;
-  String fullName;
   Pattern[] patterns;
 
   public Pattern[] getPatterns() { return patterns; }
@@ -190,7 +187,7 @@ public abstract class Alternative implements Located
     alternatives = new HashMap();
   }
   
-  private void add()
+  protected void add(String fullName)
   {
     List l = (List) alternatives.get(fullName);
     if (l == null)
@@ -204,6 +201,12 @@ public abstract class Alternative implements Located
     l.add(this);
   }
   
+  protected void add(String[] fullNames)
+  {
+    for (int i = 0; i < fullNames.length; i++)
+      add(fullNames[i]);
+  }
+
   public static Stack sortedAlternatives(MethodDeclaration m)
   {
     List list = (List) alternatives.get(m.getFullName());

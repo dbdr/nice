@@ -46,7 +46,7 @@ install: build
 	dh_installdirs
 
 	# Add here commands to install the package into debian/nice.
-	$(MAKE) install DESTDIR=$(CURDIR)/debian/nice PREFIX=/usr
+	$(MAKE) install PREFIX=$(CURDIR)/debian/nice/usr
 
 
 # Build architecture-independent files here.

@@ -12,7 +12,7 @@
 
 // File    : parser.jj
 // Created : Thu Jul 01 10:27:05 1999 by bonniot
-//$Modified: Wed Sep 20 12:59:23 2000 by Daniel Bonniot $
+//$Modified: Wed Sep 20 17:47:58 2000 by Daniel Bonniot $
 // Description : Parseur JavaCC pour Nice
 //   Tokens based on the Jazz parser
 
@@ -612,21 +612,32 @@ MonotypeVar monotypeVar():
   String name;
 }
 {
-  //TMP
-  [ "+" ]
   name=unlocIdent()
   { return new MonotypeVar(name); }
 }
 
-List monotypeVars():
+MonotypeVar taggedMonotypeVar(List tags):
+{
+  MonotypeVar mv;
+}
+{
+  ( "+" { tags.add(Boolean.TRUE); }
+  | "-" { tags.add(Boolean.FALSE); }
+  |     { tags.add(null); }
+  )
+  mv = monotypeVar()
+  { return mv; }
+}
+
+List monotypeVars(List tags):
 {
     List res=new ArrayList(0);
     MonotypeVar var;
 }
 {
     ( "<" 
-      var=monotypeVar() { res.add(var); }
-      ( "," var=monotypeVar() { res.add(var); } )*
+      var=taggedMonotypeVar(tags) { res.add(var); }
+      ( "," var=taggedMonotypeVar(tags) { res.add(var); } )*
     ">" )?
     { return res; }
 }
@@ -827,6 +838,7 @@ ClassDefinition classDefinition():
   List fields=new ArrayList(),methods=new ArrayList(0);
   List ext=new ArrayList(0),imp=new ArrayList(0),abs=new ArrayList(0);
   List l;
+  List typeParametersVariances = new ArrayList(0);
   boolean isFinal=false, isAbstract=false, isInterface=false;
   MethodDeclaration m;
   ClassDefinition res;
@@ -841,7 +853,7 @@ ClassDefinition classDefinition():
   "interface" { isInterface=true; }
 )
   name=ident() 
-  parameters=monotypeVars() 
+  parameters=monotypeVars(typeParametersVariances) 
 
   ( "implements" l=interfaces() { imp.addAll(l); } 
   | "finally" "implements"  l=interfaces() { abs.addAll(l); }
@@ -854,7 +866,7 @@ ClassDefinition classDefinition():
      res=new NiceClass
      (name,
       isFinal,isAbstract,isInterface,
-      false,parameters,
+      false,parameters,typeParametersVariances,
       ext,imp,abs);
    }   
    (
@@ -877,12 +889,12 @@ ClassDefinition classDefinition():
      res = new JavaClass
        (name,
 	isFinal,isAbstract,isInterface,
-	parameters,
+	parameters,typeParametersVariances,
 	ext,imp,abs,javaName);
    }
   ) 
   { 
-    return res; 
+    return res;
   }
 }
 
@@ -892,14 +904,16 @@ InterfaceDefinition interfaceDefinition():
   LocatedString name;
   Collection parameters;
   List extensions=null;
+  List typeParametersVariances = new ArrayList(0);
 }
 {
   "abstract" "interface"
   name=ident()
-  parameters=monotypeVars()
+  parameters=monotypeVars(typeParametersVariances)
   [ "extends" extensions=interfaces() ]
   ";"
-  { return new InterfaceDefinition(name,parameters,extensions,true); }
+  { return new InterfaceDefinition(name,parameters,typeParametersVariances,
+				   extensions,true); }
 }
 */
 Pattern pattern(LocatedString name):

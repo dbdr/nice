@@ -12,7 +12,7 @@
 
 // File    : ClassDefinition.java
 // Created : Thu Jul 01 11:25:14 1999 by bonniot
-//$Modified: Mon Aug 07 15:31:54 2000 by Daniel Bonniot $
+//$Modified: Wed Sep 20 18:35:04 2000 by Daniel Bonniot $
 
 package bossa.syntax;
 
@@ -48,6 +48,7 @@ abstract public class ClassDefinition extends Definition
 			 boolean isFinal, boolean isAbstract, 
 			 boolean isInterface,
 			 List typeParameters,
+			 List typeParametersVariances,
 			 List extensions, 
 			 List implementations, List abstractions
 			 )
@@ -85,11 +86,10 @@ abstract public class ClassDefinition extends Definition
     if(typeParameters==null)
       this.typeParameters = new ArrayList(0);
     else
-      {
-	this.typeParameters = typeParameters;
-	//addTypeSymbols(typeParameters);    
-      }
-    this.variance = mlsub.typing.Variance.make(typeParameters.size());
+      this.typeParameters = typeParameters;
+    this.typeParametersVariances = typeParametersVariances;
+    
+    this.variance = makeVariance(typeParametersVariances);
     
     this.extensions = extensions;
 
@@ -117,7 +117,20 @@ abstract public class ClassDefinition extends Definition
   {
     return variance;
   }
-  
+
+  private Variance makeVariance(List typeParametersVariances)
+  {
+    int[] variances = new int[typeParametersVariances.size()];
+    for (int i = typeParametersVariances.size(); --i >= 0;)
+      if (typeParametersVariances.get(i) != null)
+	if (typeParametersVariances.get(i) == Boolean.TRUE)
+	  variances[i] = Variance.COVARIANT;
+	else
+	  variances[i] = Variance.CONTRAVARIANT;
+
+    return Variance.make(variances);
+  }
+    
   /****************************************************************
    * Map TypeConstructors to ClassDefinitions
    ****************************************************************/
@@ -154,25 +167,6 @@ abstract public class ClassDefinition extends Definition
     return thisTypeParams;
   }
 
-  /*
-  Polytype getType()
-  {
-    return new Polytype(new Constraint(typeParameters,null), getMonotype());
-  }
-  */
-  /**
-   * Returns the 'Monotype' part of the type.
-   * Private use only (to compute the type of the field access methods).
-   */
-  /*
-  protected Monotype getMonotype()
-  {
-    return new MonotypeConstructor
-      (new TypeIdent(this.name), //TODO: optimize, no lookup
-       TypeParameters.fromMonotypeVars(typeParameters),
-       name.location());
-  }
-  */
   protected mlsub.typing.Monotype lowlevelMonotype()
   {
     return new mlsub.typing.MonotypeConstructor
@@ -234,7 +228,7 @@ abstract public class ClassDefinition extends Definition
       catch(KindingEx e){
 	User.error(name,
 		   "Class "+name+" cannot extend "+e.t2+
-		   ": they do not have the same kind");
+		   ": they do not have the number or kind of type parameters");
       }
       
       if(impl!=null)
@@ -404,6 +398,7 @@ abstract public class ClassDefinition extends Definition
   mlsub.typing.TypeConstructor tc;
 
   List /* of TypeSymbol */ typeParameters;
+  List /* of Boolean */ typeParametersVariances;
   protected List
     /* of TypeConstructor */ extensions,
     /* of Interface */ implementations,

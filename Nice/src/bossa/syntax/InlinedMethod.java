@@ -109,8 +109,8 @@ public class InlinedMethod extends MethodDeclaration
 
   public void printInterface(java.io.PrintWriter s)
   {
-    s.print(super.toString());
-    s.print(" = inline " + 
+    s.print(super.toString() +
+	    " = inline " + 
 	    inlineProcedure + 
 	    (parameter!=null ? "(\""+parameter+"\");\n" : ";\n"));
   }

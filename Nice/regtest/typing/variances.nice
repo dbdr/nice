@@ -1,0 +1,24 @@
+class AInv<T> {}
+class BInv<T> extends AInv<T> {}
+
+class ACov<+T> {}
+class BCov<+T> extends ACov<T> {}
+
+class AContrav<-T> {}
+class BContrav<-T> extends AContrav<T> {}
+
+void test_variances();
+test_variances()
+{
+  AInv<int> aii;
+  BInv<int> bii;
+  aii = bii;
+
+  ACov<float> acf;
+  BCov<int> bci;
+  acf = bci;
+
+  AContrav<int> acti;
+  BContrav<float> bctf;
+  acti = bctf;
+}

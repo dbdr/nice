@@ -47,10 +47,12 @@ public class NiceClass extends ClassDefinition
 		   boolean isFinal, boolean isAbstract, 
 		   boolean isInterface, boolean isSharp,
 		   List typeParameters,
+		   List typeParametersVariances,
 		   List extensions, List implementations, List abstractions)
   {
     super(name.cloneLS(), isSharp || isFinal, isFinal, isAbstract, isInterface,
-	  typeParameters, extensions, implementations, abstractions);
+	  typeParameters, typeParametersVariances,
+	  extensions, implementations, abstractions);
 
     this.simpleName = name;
     this.isSharp = isSharp;
@@ -95,7 +97,7 @@ public class NiceClass extends ClassDefinition
     name.prepend("#");
 
     NiceClass c = new NiceClass
-      (name,true,false,false,true,typeParameters,
+      (name,true,false,false,true,typeParameters, typeParametersVariances,
        null, null, null);
     c.superClass = new TypeConstructor[]{ this.tc };
     
@@ -115,7 +117,7 @@ public class NiceClass extends ClassDefinition
     return !isSharp;
   }
   
-    static private List concreteClasses = new LinkedList();
+  static private List concreteClasses = new LinkedList();
 
   static public ListIterator listConcreteClasses()
   {
@@ -355,15 +357,6 @@ public class NiceClass extends ClassDefinition
     code.emitLoad(thisVar);    
     code.emitInvokeSpecial(constructor(javaSuperClass()));
     code.emitReturn();
-    /*
-    TypeParameters tp = new TypeParameters(name, tc.variance);
-
-    MethodDeclaration md = new MethodDeclaration
-      (null, new LocatedString("<init>", location()),
-       new Constraint(tp.content, null),
-       new MonotypeConstructor(new TypeIdent(name),tp,location()),
-       new LinkedList());
-    */
 
     mlsub.typing.MonotypeVar[] params = createSameTypeParameters();
     MethodDeclaration md = new NiceMethod

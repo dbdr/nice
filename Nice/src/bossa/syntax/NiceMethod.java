@@ -33,9 +33,9 @@ import bossa.util.Debug;
 public class NiceMethod extends MethodDeclaration
 {
   /**
-   * The method is a class member if c!=null.
+   * The method is a class member.
    *
-   * @param c the class this method belongs to, or 'null'
+   * @param c the class this method belongs to.
    * @param name the name of the method
    * @param typeParameters the type parameters
    * @param constraint the constraint
@@ -49,70 +49,59 @@ public class NiceMethod extends MethodDeclaration
      Monotype returnType,
      List parameters)
   {
-    List params = null;
+    //it is a class method, there is an implicit "this" argument
 
-    // if it is a class method, there is an implicit "this" argument
-    if(c != null)
+    boolean hasAlike = returnType.containsAlike() 
+      || Monotype.containsAlike(parameters);
+    
+    // create type parameters with the same names as in the class
+    mlsub.typing.MonotypeVar[] thisTypeParams =
+      c.createSameTypeParameters();
+    
+    int thisTypeParamsLen = (thisTypeParams == null ? 0 
+			     : thisTypeParams.length);
+    
+    // if the constraint is True
+    // we must create a new one, otherwise we would
+    // modify other methods!
+    if(constraint == Constraint.True)
+      constraint = new Constraint
+	(new ArrayList(thisTypeParamsLen + (hasAlike ? 1 : 0)),
+	 new ArrayList((hasAlike ? 1 : 0)));
+	
+    constraint.addBinders(thisTypeParams);
+	
+    mlsub.typing.Monotype thisType;
+    if(hasAlike)
       {
-	boolean hasAlike = returnType.containsAlike() 
-	  || Monotype.containsAlike(parameters);
-
-	// create type parameters with the same names as in the class
-	mlsub.typing.MonotypeVar[] thisTypeParams =
-	  c.createSameTypeParameters();
-
-	int thisTypeParamsLen = (thisTypeParams == null ? 0 
-				 : thisTypeParams.length);
-	    
-	// if the constraint is True
-	// we must create a new one, otherwise we would
-	// modify other methods!
-	if(constraint == Constraint.True)
-	  constraint = new Constraint
-	    (new ArrayList(thisTypeParamsLen + (hasAlike ? 1 : 0)),
-	     new ArrayList((hasAlike ? 1 : 0)));
+	TypeConstructor alikeTC = 
+	  new TypeConstructor("Alike", c.variance(), false, false);
 	
-	constraint.addBinders(thisTypeParams);
+	constraint.addBinder(alikeTC);
+	// added in front. Important for rebinding in method alternatives
 	
-	mlsub.typing.Monotype thisType;
-	if(hasAlike)
-	  {
-	    TypeConstructor alikeTC = 
-	      new TypeConstructor("Alike", 
-				  c.variance(), false, false);
-	    
-	    constraint.addBinder(alikeTC);
-	    // added in front. Important for rebinding in method alternatives
-
-	    mlsub.typing.AtomicConstraint atom;
-	    if(c.getAssociatedInterface()!=null)
-	      atom = new mlsub.typing.ImplementsCst
-		(alikeTC, c.getAssociatedInterface());
-	    else
-	      atom = new mlsub.typing.TypeConstructorLeqCst(alikeTC, c.tc);
-	    constraint.addAtom(AtomicConstraint.create(atom));
-	    
-	    thisType = new mlsub.typing.MonotypeConstructor(alikeTC, thisTypeParams);
-
-	    Map map = new HashMap();
-	    map.put(Alike.id, alikeTC);
-	    returnType = returnType.substitute(map);
-	    parameters = Monotype.substitute(map, parameters);
-	  }
+	mlsub.typing.AtomicConstraint atom;
+	if(c.getAssociatedInterface()!=null)
+	  atom = new mlsub.typing.ImplementsCst
+	    (alikeTC, c.getAssociatedInterface());
 	else
-	  thisType = 
-	    new mlsub.typing.MonotypeConstructor(c.tc, thisTypeParams);
+	  atom = new mlsub.typing.TypeConstructorLeqCst(alikeTC, c.tc);
+	constraint.addAtom(AtomicConstraint.create(atom));
 	
-	params = new ArrayList(parameters.size()+1);
-	params.add(Monotype.create(thisType));
+	thisType = new mlsub.typing.MonotypeConstructor(alikeTC, thisTypeParams);
+	
+	Map map = new HashMap();
+	map.put(Alike.id, alikeTC);
+	returnType = returnType.substitute(map);
+	parameters = Monotype.substitute(map, parameters);
       }
-
-    if(params == null)
-      params = parameters;
     else
-      params.addAll(parameters);
-
-    NiceMethod res = new NiceMethod(name, constraint, returnType, params);
+      thisType = 
+	new mlsub.typing.MonotypeConstructor(c.tc, thisTypeParams);
+    
+    parameters.add(0, Monotype.create(thisType));
+    
+    NiceMethod res = new NiceMethod(name, constraint, returnType, parameters);
     res.memberOf = c;
     
     return res;
@@ -170,6 +159,6 @@ public class NiceMethod extends MethodDeclaration
 
   public void printInterface(java.io.PrintWriter s)
   {
-    s.print(super.toString() + ");\n");
-  }  
+    s.print(super.toString() + ";\n");
+  }
 }

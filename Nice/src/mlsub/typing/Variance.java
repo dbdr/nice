@@ -12,7 +12,7 @@
 
 // File    : Variance.java
 // Created : Fri Jul 23 12:15:46 1999 by bonniot
-//$Modified: Wed Aug 30 13:25:16 2000 by Daniel Bonniot $
+//$Modified: Wed Sep 20 18:17:43 2000 by Daniel Bonniot $
 
 package mlsub.typing;
 
@@ -21,32 +21,90 @@ import java.util.*;
 import mlsub.typing.lowlevel.*;
 
 /**
- * Variance of a type constructor.
- * 
- * @author bonniot
+   Variance of a type constructor.
+   
+   There is one instance of this class per Variance,
+   so pointer equality can be used on variances.
+   
+   @author Daniel Bonniot
  */
-
 public final class Variance 
   implements Kind /* Variance is the Kind of MonotypeConstructors */
 {
-  private Variance(int n)
+  private Variance(int[] signs)
   {
-    this.size = n;
+    this.size = signs.length;
+    this.signs = signs;
+
     this.top = new Interface(this);
     this.top.name = "top interface " + this;
   }
 
-  public static final Variance make(int n)
+  /** 
+      Array specifying subtyping properties for each parameter:
+      covariant, contravariant or invariant.
+  */
+  private int[] signs;
+
+  public static final Variance make(int[] signs)
   {
-    Variance res = variances[n];
+    int encoding = encoding(signs);
+    Variance res = get(encoding);
+    
     if (res == null)
-      return variances[n] = new Variance(n);
+      return set(encoding, new Variance(signs));
     else
-      return res;
+      return res;    
   }
   
-  private static final Variance[] variances = new Variance[20];
+  /** Compute a small integer that uniquely identifies a variance. */
+  private static int encoding(int[] signs)
+  {
+    int res = 0;
 
+    int base = 1;
+    for (int i=0; i<signs.length; i++)
+      {
+	res = res + (signs[i] + 2) * base;
+	base *= 4;
+      }
+    return res;
+  }
+  
+  /****************************************************************
+   * Repository of created variances
+   ****************************************************************/
+
+  private static final ArrayList variances = new ArrayList(64);
+
+  private static Variance get(int index)
+  {
+    if (index >= variances.size())
+      return null;
+    return (Variance) variances.get(index);
+  }
+  
+  private static Variance set(int index, Variance v)
+  {
+    // make the list grow
+    while (index >= variances.size())
+      variances.add(null);
+    
+    variances.set(index, v);
+    return v;
+  }
+  
+  /****************************************************************
+   * Empty Variance
+   ****************************************************************/
+
+  public static Variance empty()
+  {
+    return empty;
+  }
+  
+  private static Variance empty = Variance.make(new int[0]);
+  
   /****************************************************************
    * The top interface
    ****************************************************************/
@@ -163,33 +221,26 @@ public final class Variance
 	//OK
 	return;
       else
-	throw new InternalError("Incorrect sizes" + tp2.length);
+	throw new InternalError("Incorrect sizes " + 
+				tp1.length + " and " + tp2.length);
     
     if(tp1.length!=size)
       throw new BadSizeEx(size,tp1.length);
     if(tp2.length!=size)
       throw new BadSizeEx(size,tp2.length);
     for(int i=0; i<size; i++)
-      {
-	//Non-variant
+      switch(signs[i]){
+      case COVARIANT:
+	mlsub.typing.lowlevel.Engine.leq(tp1[i],tp2[i]);
+	break;
+      case CONTRAVARIANT:
+	mlsub.typing.lowlevel.Engine.leq(tp2[i],tp1[i]);
+	break;
+      case INVARIANT:
 	mlsub.typing.lowlevel.Engine.leq(tp1[i],tp2[i]);
 	mlsub.typing.lowlevel.Engine.leq(tp2[i],tp1[i]);
+	break;
       }
-  }
-  
-  /****************************************************************
-   * Hastable oriented methods : usefull for the Engine 
-   * to determine the right constraint
-   ****************************************************************/
-  
-  public int hashCode()
-  {
-    return size;
-  }
-  
-  public boolean equals(Object o)
-  {
-    return (o instanceof Variance) && (((Variance) o).size==size);
   }
   
   /****************************************************************
@@ -198,7 +249,25 @@ public final class Variance
 
   public String toString()
   {
-    return "Variance (arity "+size+")";
+    StringBuffer sb = new StringBuffer();
+    for (int i=0; i<size; i++)
+      {
+	if (i>0) 
+	  sb.append(", ");
+	switch(signs[i]){
+	case COVARIANT:
+	  sb.append("+");
+	  break;
+	case CONTRAVARIANT:
+	  sb.append("-");
+	  break;
+	case INVARIANT:
+	  sb.append("=");
+	  break;
+	}
+      }
+    
+    return "Variance (" + sb.toString() + ")";
   }
   
   public int size;
@@ -217,6 +286,6 @@ public final class Variance
     if (monotypes == null) return;
     
     for (int i = 0; i<monotypes.length; i++)
-      monotypes[i].tag(INVARIANT);
+      monotypes[i].tag(signs[i]);
   }  
 }

@@ -297,30 +297,14 @@ public class JavaMethod extends MethodDeclaration
 
   public void printInterface(java.io.PrintWriter s)
   {
-    s.print(interfaceString());
-  }
-
-  private String interfaceString()
-  {
-    String res =
-      syntacticConstraint
-      + symbol.type.codomain()
-      + " "
-      + symbol.name.toQuotedString()
-      + "("
-      + Util.map("",", ","",symbol.type.domain())
-      + ")"
-      + " = native ";
-    if(methodName.equals("<init>"))
-       res += "new " + className;
-    else
-      res +=  javaTypes.get(0) 
-	+ " " + className 
-	+ "." + methodName;
-    
-    return res
-      + mapGetName(javaArgTypes())
-      + ";\n";
+    s.print(super.toString() +
+	    " = native " +
+	    (methodName.equals("<init>") 
+	     ?  "new " + className
+	     : javaTypes.get(0) 
+	     + " " + className 
+	     + "." + methodName) +
+	    mapGetName(javaArgTypes()) + ";\n");
   }
   
   private static String mapGetName(gnu.bytecode.Type[] types)

@@ -12,7 +12,7 @@
 
 // File    : JavaClass.java
 // Created : Wed Feb 02 16:20:12 2000 by Daniel Bonniot
-//$Modified: Tue Sep 05 18:40:30 2000 by Daniel Bonniot $
+//$Modified: Wed Sep 20 17:36:16 2000 by Daniel Bonniot $
 
 package bossa.syntax;
 
@@ -52,11 +52,13 @@ public class JavaClass extends ClassDefinition
 		   boolean isFinal, boolean isAbstract, 
 		   boolean isInterface,
 		   List typeParameters,
+		   List typeParametersVariances,
 		   List extensions, List implementations, List abstractions,
 		   LocatedString javaName)
   {
     super(name, true, isFinal, isAbstract, isInterface,
-	  typeParameters, extensions, implementations, abstractions);
+	  typeParameters, typeParametersVariances,
+	  extensions, implementations, abstractions);
     this.javaName = javaName;
 
     if(name.toString().equals("nice.lang.Array"))

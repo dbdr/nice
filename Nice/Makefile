@@ -63,7 +63,20 @@ jar:
 dist: jar
 	tar cf lib/nice/Nice.tar bin/nicer bin/nicec lib/nice/Nice.jar lib/emacs/nice-mode.el
 
-# CVS
+### CVS
 
 status:
 	cvs status 2>&1 | egrep "File:|Examining" | grep -v "Up-to-date"
+
+# src/gnu has two repositories:
+# - a 'Nice' repository
+# - a 'Kawa' repository
+
+cvs-Kawa:
+	find ${TOP}/src/gnu -type d -name 'CVS-Kawa' \
+	-exec sh -c 'dir=`dirname "$$0"`; ln -sf $${dir}/CVS-Kawa $${dir}/CVS' {} \;
+
+cvs-Nice:
+	find ${TOP}/src/gnu -type d -name 'CVS-Kawa' \
+	-exec sh -c 'dir=`dirname "$$0"`; mv -i $${dir}/CVS-Kawa $${dir}/CVS' {} \;
+

@@ -12,7 +12,7 @@
 
 // File    : JavaClasses.java
 // Created : Thu Jul 08 11:51:09 1999 by bonniot
-//$Modified: Wed Sep 20 12:33:06 2000 by Daniel Bonniot $
+//$Modified: Wed Sep 20 18:12:28 2000 by Daniel Bonniot $
 
 package bossa.syntax;
 
@@ -121,7 +121,7 @@ public final class JavaClasses
       // to assert it. It doesn't matter, as this type is not used
       // explicitely.
       {
-	res.setKind(Variance.make(0).getConstraint());
+	res.setKind(Variance.empty().getConstraint());
 	return res;
       }
 
@@ -230,7 +230,7 @@ public final class JavaClasses
 	if(tc.getKind() == null)
 	  try{
 	    mlsub.typing.lowlevel.Engine.setKind
-	      (tc, Variance.make(0).getConstraint());
+	      (tc, Variance.empty().getConstraint());
 	  }
 	  catch(mlsub.typing.lowlevel.Unsatisfiable e){
 	    User.error("Java class " + tc + " is not well kinded");

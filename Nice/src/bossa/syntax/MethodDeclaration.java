@@ -229,8 +229,7 @@ abstract public class MethodDeclaration extends Definition
       return "method " + getName();
     
     return
-      mlsub.typing.Constraint.toString(getType().getConstraint())
-      // syntacticConstraint?
+      syntacticConstraint
       + String.valueOf(getType().codomain())
       + " "
       + getName().toQuotedString()

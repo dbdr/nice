@@ -10,7 +10,7 @@ if [ ${JDK_VERSION} ] && expr "${JDK_VERSION}" '<' 1.4.0 >/dev/null; then
 fi
 
 if [ ! -r flow4j ]; then
-  if [ ! -r flow4j-src-0.5.tar.gz ]; then
+  if [ ! -r ${SOURCES} ]; then
       wget http://flow4j.sf.net/releases/${SOURCES}
   fi
   mkdir flow4j

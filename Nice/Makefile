@@ -94,6 +94,8 @@ jar: stdlib.jar
 
 
 dist: jar
+	# make sure that nicec is executable
+	chown a+rx bin/nicec
 	tar cf Nice-`date +"%Y.%m.%d"`.tar bin/nicer bin/nicec lib/nice/Nice.jar lib/nice/stdlib.jar lib/emacs/nice-mode.el
 
 

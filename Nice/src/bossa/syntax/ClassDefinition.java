@@ -44,7 +44,7 @@ abstract public class ClassDefinition extends MethodContainer
       super(name, typeParameters, typeParametersVariances);
       this.extensions = extensions;
 
-      createTC();
+      this.createTC();
       associatedInterface = new mlsub.typing.Interface(variance, tc);
     }
 
@@ -189,7 +189,7 @@ abstract public class ClassDefinition extends MethodContainer
       this.implementations = implementations;
       this.abstractions = abstractions;
 
-      createTC();
+      this.createTC();
     }
 
     public boolean isConcrete()

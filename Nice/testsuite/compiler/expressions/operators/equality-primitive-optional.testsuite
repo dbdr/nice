@@ -1,0 +1,97 @@
+/// COMMENT Boolean jumps, non-primitive first
+/// PASS
+  // bug #1090679
+  var ?int charcode = 64+1;
+  assert charcode == 65;
+  assert !(charcode == 0);
+  assert !(charcode == null);
+
+/// PASS
+  var ?int charcode = 64+1;
+  assert !(charcode != 65);
+  assert charcode != 0;
+  assert charcode != null;
+
+
+
+/// COMMENT Boolean jumps, primitive first
+/// PASS
+  var ?int charcode = 64+1;
+  assert 65 == charcode;
+  assert !(0 == charcode);
+  assert !(null == charcode);
+
+/// PASS
+  var ?int charcode = 64+1;
+  assert !(65 != charcode);
+  assert 0 != charcode;
+  assert null != charcode;
+
+
+
+/// COMMENT Boolean assignments, non-primitive first
+/// PASS
+  var ?int charcode = 64+1;
+  var res = charcode == 65;
+  assert res;
+
+  res = charcode == 0;
+  assert !res;
+
+  res = charcode == null;
+  assert !res;
+
+/// PASS
+  var ?int charcode = 64+1;
+  var res = charcode != 65;
+  assert !res;
+
+  res = charcode != 0;
+  assert res;
+
+  res = charcode != null;
+  assert res;
+
+
+
+/// COMMENT Boolean assignments, primitive first
+/// PASS
+  var ?int charcode = 64+1;
+  var res = 65 == charcode;
+  assert res;
+
+  res = 0 == charcode;
+  assert !res;
+
+  res = null == charcode;
+  assert !res;
+
+/// PASS
+  var ?int charcode = 64+1;
+  var res = 65 != charcode;
+  assert !res;
+
+  res = 0 != charcode;
+  assert res;
+
+  res = null != charcode;
+  assert res;
+
+
+
+/// PASS
+  // check evaluation order
+  var ?int charcode = 0;
+  // If the left hand side is evaluated before the right, the result is true.
+  assert (()=> charcode = 1)() == charcode;
+
+
+/// PASS
+  var ?boolean b = ! false;
+  var res = b == true;
+  assert res;
+  res = true == b;
+  assert res;
+
+  assert b == true;
+  assert true == b;

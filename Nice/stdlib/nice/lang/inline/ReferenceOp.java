@@ -47,20 +47,37 @@ public class ReferenceOp extends Procedure2 implements Branchable, bossa.syntax.
   public void compile (ApplyExp exp, Compilation comp, Target target)
   {
     Expression[] args = exp.getArgs();
+    compile(args, comp, target);
+  }
+
+  void compile (Expression[] args, Compilation comp, Target target)
+  {
     CodeAttr code = comp.getCode();
     Target stack = Target.pushObject;
     Label _else = new Label(code);
     Label _end = new Label(code);
 
-    if (args[0] instanceof QuoteExp &&
-       ((QuoteExp)args[0]).getType() == Type.nullType)
+    boolean prim0 = args[0].getType() instanceof PrimType;
+    boolean prim1 = args[1].getType() instanceof PrimType;
+
+    if (prim1 && ! prim0)
+      {
+        compilePrimitive(false, args[0], args[1], comp);
+        return;
+      }
+    else if (prim0 && ! prim1)
+      {
+        compilePrimitive(true,  args[1], args[0], comp);
+        return;
+      }
+    else if (args[0] instanceof QuoteExp &&
+             ((QuoteExp)args[0]).getType() == Type.nullType)
     {
       args[1].compile(comp, stack);
       if (kind == Eq)
 	code.emitGotoIfNotNull(_else);
       else
 	code.emitGotoIfNull(_else);
-
     }
     else if (args[1] instanceof QuoteExp &&
        ((QuoteExp)args[1]).getType() == Type.nullType)
@@ -70,7 +87,6 @@ public class ReferenceOp extends Procedure2 implements Branchable, bossa.syntax.
 	code.emitGotoIfNotNull(_else);
       else
 	code.emitGotoIfNull(_else);
-
     }
     else
     {
@@ -92,12 +108,50 @@ public class ReferenceOp extends Procedure2 implements Branchable, bossa.syntax.
     target.compileFromStack(comp, retType);
   }
 
+  private void compilePrimitive
+    (boolean primFirst, Expression nonPrimArg, Expression primArg,
+     Compilation comp)
+  {
+    CodeAttr code = comp.getCode();
+    Target stack = Target.pushObject;
+    Target primTarget = new StackTarget(primArg.getType());
+    boolean eq = kind == Eq;
+
+    if (primFirst)
+      primArg.compile(comp, primTarget);
+    nonPrimArg.compile(comp, stack);
+    code.emitDup();
+
+    code.emitIfNotNull();
+      primTarget.compileFromStack(comp, code.topType());
+      if (! primFirst)
+        primArg.compile(comp, primTarget);
+      code.emitIfEq();
+        code.emitPushBoolean(eq);
+      code.emitElse();
+        code.emitPushBoolean(!eq);
+      code.emitFi();
+    code.emitElse();
+      code.emitPop(primFirst ? 2 : 1);
+      code.emitPushBoolean(!eq);
+    code.emitFi();
+  }
+
   public void compileJump (Compilation comp, Expression[] args, Label to)
   {
     CodeAttr code = comp.getCode();
     Target stack = Target.pushObject;
 
-    if (args[0] instanceof QuoteExp &&
+    boolean prim0 = args[0].getType() instanceof PrimType;
+    boolean prim1 = args[1].getType() instanceof PrimType;
+
+    if (prim1 && ! prim0 || prim0 && ! prim1)
+      {
+        compile(args, comp, StackTarget.getInstance(Type.boolean_type));
+        code.emitGotoIfIntNeZero(to);
+      }
+
+    else if (args[0] instanceof QuoteExp &&
        ((QuoteExp)args[0]).getType() == Type.nullType)
     {
       if (args[1].getType() instanceof PrimType)
@@ -150,7 +204,16 @@ public class ReferenceOp extends Procedure2 implements Branchable, bossa.syntax.
     CodeAttr code = comp.getCode();
     Target stack = Target.pushObject;
 
-    if (args[0] instanceof QuoteExp &&
+    boolean prim0 = args[0].getType() instanceof PrimType;
+    boolean prim1 = args[1].getType() instanceof PrimType;
+
+    if (prim1 && ! prim0 || prim0 && ! prim1)
+      {
+        compile(args, comp, StackTarget.getInstance(Type.boolean_type));
+        code.emitGotoIfIntEqZero(to);
+      }
+
+    else if (args[0] instanceof QuoteExp &&
        ((QuoteExp)args[0]).getType() == Type.nullType)
     {
       if (args[1].getType() instanceof PrimType)

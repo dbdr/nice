@@ -26,7 +26,8 @@ nice (0.9.10)
   * Bug fixes (disallowed redefinition of parameters, execution order of
     initializers in super classes, visibility checking of java classes,
     cyclic custom constructors, methods and fields in classes with less type
-    parameters, 'this' in custom constructors, ... )
+    parameters, 'this' in custom constructors, comparison of possibly null
+    values with primitive values, ... )
 
  --
 

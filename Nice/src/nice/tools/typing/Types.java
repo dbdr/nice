@@ -306,6 +306,41 @@ public final class Types
   }
 
   /**
+     @returns true if functional types t1 and t2 have a partly common domain.
+              that is, there exists some types that belong to both domains.
+  */
+  public static boolean domainsIntersect(Polytype t1, Polytype t2)
+  {
+    Typing.enter();
+
+    try {
+
+      try {
+
+        Constraint.enter(t1.getConstraint());
+        Constraint.enter(t2.getConstraint());
+
+        // There exists argument types ...
+        Monotype[] args = MonotypeVar.news(parameters(t2).length);
+        Typing.introduce(args);
+
+        // ... that can be used for both methods ...
+        Typing.leq(args, parameters(t1));
+        Typing.leq(args, parameters(t2));
+      }
+      finally {
+        Typing.leave();
+      }
+    }
+    catch (TypingEx ex) {
+      return false;
+    }
+
+    // OK, there is an intersection
+    return true;
+  }
+
+  /**
      @returns true if the spec type specializes type parameters of the original
        type (which can not be checked at runtime during dispatch, and therefore
        should not count as overriding).

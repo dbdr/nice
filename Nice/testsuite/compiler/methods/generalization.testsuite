@@ -34,6 +34,56 @@ abstract interface Fooable
 class a.Collection implements Fooable;
 
 /// PASS
+  /// package a
+  /// Toplevel
+class Top {} class Bot extends Top {}
+
+class A
+{
+  boolean ran = false;
+
+  void foo(Top x) { ran = true; }
+}
+
+  /// package b import a
+  let a = new a.A();
+  doIt(a);
+  assert a.ran;
+
+  /// Toplevel
+abstract interface Fooable
+{
+  void foo(Bot b);
+}
+
+class a.A implements Fooable;
+
+<Fooable F> void doIt(F fooable) = fooable.foo(new Bot());
+
+
+/// PASS
+  // Real-world situation for the above.
+  doIt(System.out);
+
+  using(let w = new PrintWriter(new OutputStreamWriter(System.out))) {
+    doIt(w);
+  }
+
+  /// Toplevel
+import java.io.*;
+
+abstract interface Printer
+{
+  void print(String);
+}
+
+class java.io.PrintStream implements Printer;
+class java.io.PrintWriter implements Printer;
+
+<Printer P> void doIt(P printer) = printer.print("hello\n");
+
+
+/// PASS
   let c = new ArrayList();
   c.addTwice("A");
   assert c.size() == 2;

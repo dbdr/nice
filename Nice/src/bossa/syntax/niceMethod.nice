@@ -151,7 +151,11 @@ public class NiceMethod extends UserOperator
       return false;
 
     return
-      mlsub.typing.Typing.smaller(itsDomain, ourDomain, true) &&
+      // if the two domains have some types in common (they intersect)
+      // then we can consider this is specialized by d
+      // (provided we already know d it not more general than this, in which
+      //  we would have said that this specializes d).
+      nice.tools.typing.Types.domainsIntersect(this.getType(), s.getType()) &&
     ! nice.tools.typing.Types.typeParameterDispatch(s.getType(), this.getType());
   }
 

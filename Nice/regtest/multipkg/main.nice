@@ -13,7 +13,7 @@ import java.util.*;
 class AA extends regtest.multipkg.a.A {}
 class BB extends B {}
 
-main(args)
+void main(String[] args)
 {
   println(f(new regtest.multipkg.a.A()) + " " + 
 	  f(new B()) + " " + 

@@ -80,7 +80,7 @@ test_captures()
   println(""+(fun()=>j=2*j)());
 }
 
-main(args)
+void main(String[] args)
 {
   test_discards();
   test_captures();

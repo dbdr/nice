@@ -3,6 +3,6 @@ package regtest.typing;
 // Typing doesn't need execution
 // fake main
 
-main(args)
+void main(String[] args)
 {
 }

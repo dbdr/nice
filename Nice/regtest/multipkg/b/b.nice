@@ -6,7 +6,7 @@ class B extends A {}
 
 f(x@B) = "B";
 
-main(args)
+void main(String[] args)
 {
   println(f(new B()));
   println(f(new A()));

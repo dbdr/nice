@@ -17,7 +17,7 @@ class A
 
 A createA(int x, long y) = new A(x: x, y: y);
 
-main(args)
+void main(String[] args)
 {
 BODY
 }

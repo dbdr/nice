@@ -42,8 +42,6 @@ public class SymbolExp extends Expression
 
   void computeType()
   {
-    //Internal.printStackTrace();
-    
     // Very important: each SymbolExp gets a copy of the type of the symbol.
     // Thus it has fresh binders.
     // Otherwise there would be an "aliasing" effect.

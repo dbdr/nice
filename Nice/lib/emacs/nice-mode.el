@@ -50,7 +50,7 @@
 (defconst nice-extension ".nice")
 (defconst nice-extension-regexp "\\.nice$")
 
-(defvar nice-compile-buffer "*Nice*"
+(defvar nice-compilation-buffer "*Nice*"
   "Name of buffer fo Nice compilations")
 
 (defvar nice-export-directory "."
@@ -320,9 +320,11 @@
 
 (defconst c-Nice-comment-start-regexp "/\\(/\\|[*][*]?\\)")
 
+(defconst c-Nice-protection-key "\\<\\(public\\|private\\)\\>")
+
 (defconst c-Nice-class-key
   (concat
-   "\\(" c-protection-key "\\s +\\)?"
+   "\\(" c-Nice-protection-key "\\s +\\)?"
    "\\(interface\\|class\\|device\\)\\s +"
    c-symbol-key                         ;name of the class
    "\\(\\s *extends\\s *" c-symbol-key "\\)?" ;maybe followed by superclass 
@@ -424,6 +426,7 @@ Mode for editing/compiling Nice programs.
 
   ;(make-local-variable 'compilation-exit-message-function)
   (setq compilation-exit-message-function 'nice-compilation-exit)
+  (setq compilation-finish-function 'nice-compilation-finish-function)
 
   (local-set-key "\C-c\C-b" 'nice-compile-buffer)
   (local-set-key "\C-c\C-c" 'nice-comment-region-or-line)
@@ -497,8 +500,8 @@ Mode for editing/compiling Nice programs.
     (setq nice-variable-stack nil)
     (if nice-process
         (delete-process nice-process))
-    (if (get-buffer nice-compile-buffer)
-        (kill-buffer nice-compile-buffer))
+    (if (get-buffer nice-compilation-buffer)
+        (kill-buffer nice-compilation-buffer))
     (save-buffer)
 
     ;; Build process command
@@ -518,34 +521,51 @@ Mode for editing/compiling Nice programs.
 	  (nice-root (file-name-directory (buffer-file-name))))
     (setq default-directory nice-directory)
 
-    (setq nice-compile-buffer (compile-internal cmd "No more errors"))
+    (setq nice-compilation-buffer (compile-internal cmd "No more errors"))
 
     ;; Start process
     ;(setq nice-process (nice-start-process nice-directory cmd))
     ;; User feedback
     ;(setq nice-compiling t)
     ;; Display the compilation buffer
-    ;(display-buffer nice-compile-buffer)
+    ;(display-buffer nice-compilation-buffer)
   )
 )
 
-(defun nice-compilation-exit (process-status exit-status exit-message)
+(defun nice-remove-empty (l)
+  (if l 
+      (if (equal (car l) "") 
+	  (nice-remove-empty (cdr l)) (cons (car l) (nice-remove-empty (cdr l))))
+    nil))
+
+(defun nice-compilation-exit (process-status exit-status &optional exit-message)
+; XEmacs (21.4) does not seem to always provide exit-message
+; and its exit-status is a string like "Exited with status code X".
+  (let ((exit-status 
+	 (if (integerp exit-status) exit-status
+	   (string-to-number (car (last (nice-remove-empty (split-string exit-status))))))))
   (cond 
-    ((eq exit-status 0) 
-     (let ((win (get-buffer-window nice-compile-buffer)))
-       (if win (delete-window win)))
-     '("successful" . "OK"))
+    ((eq exit-status 0) '("successful" . "OK"))
     ((eq exit-status 1) '("Compiler bug" . "Bug"))
     ((eq exit-status 2) (save-excursion (next-error) '("error" . "error")))
     ((eq exit-status 3) '("successful with warning" . "warning"))
     (t '("Unknown exit status" . ""))
   ) 
+))
+
+(defun nice-compilation-finish-function (buffer result)
+  "Handle the end of a Nice compilation."
+  (let ((ok 
+	 (if (integerp result)
+	     (eq result 0)
+	     (not (string-match "abnormally" result)))))
+    (if ok (delete-window (get-buffer-window buffer))))
 )
 
 (defun nice-next-error ()
   "Find next Nice error."
   (interactive)
-  (let ((buffer (get-buffer nice-compile-buffer))
+  (let ((buffer (get-buffer nice-compilation-buffer))
         start file l1 c1 l2 c2)
     (if (not buffer)
         (message "Error: buffer not compiled" (beep))
@@ -674,7 +694,8 @@ Mode for editing/compiling Nice programs.
 
 ;; Return the root a of package given a file of the package
 (defun nice-root (file)
-  (let* ((spl (split-string file "/"))
+; Under XEmacs (21.4), split-string returns leading and trailing "" elements.
+  (let* ((spl (nice-remove-empty (split-string file "/")))
 	 (pkg (split-string (nice-buffer-pkg-name) "[.]"))
 	 (nlevels (length pkg)))
   (defun remove-n (s n)
@@ -1188,7 +1209,7 @@ Mode for editing/compiling Nice programs.
   (message "%s//%s" dir cmd)
   (let (process
         (default-directory dir))
-    (setq process (apply #'start-process "nice" nice-compile-buffer (car cmd) (cdr cmd)))
+    (setq process (apply #'start-process "nice" nice-compilation-buffer (car cmd) (cdr cmd)))
     (set-process-filter process 'nice-process-filter)
     (set-process-sentinel process 'nice-process-sentinel)
     process))
@@ -1264,7 +1285,7 @@ Mode for editing/compiling Nice programs.
 (defun nice-select-file (name other l1 c1 l2 c2)
   (if (string-match "^[0-9]+$" name)
       (save-excursion
-        (set-buffer nice-compile-buffer)
+        (set-buffer nice-compilation-buffer)
         (goto-char (point-max))
         (if (nice-search-backward
              (concat name

@@ -104,3 +104,10 @@ var Map<String,String> classMap = (()=> {
   let int x = 0;
   /// package b import a
   x = 1;
+
+/// PASS 
+  /// package a 
+  /// TOPLEVEL
+  let char x = 'x';
+  /// package b import a
+  ;

@@ -1,0 +1,41 @@
+/// PASS
+  assert(foo("abc"));
+  /// Toplevel
+  boolean foo(String);
+  foo(s) = false;
+  foo("abc") = true;
+  foo("xyz") = false;
+
+/// PASS
+  /// package a
+  /// Toplevel
+  void foo(String);
+  foo(s) {}
+  foo("X") {}
+
+  /// package b import a
+  ;
+
+/// FAIL
+  /// Toplevel
+  void foo(String);
+  foo(s) {}
+  foo("abc") {}
+  foo("abc") {}
+
+/// FAIL
+  /// Toplevel
+  void foo(String, String);
+  foo(s1 ,s2) {}
+  foo("abc", s2) {}
+  foo(s1, "xyz") {}
+
+/// PASS
+  foo(null, null);
+  /// Toplevel
+  void foo(?String, ?String);
+  foo(s1 ,s2) {}
+  foo("abc", s2) {}
+  foo(s1, "xyz") {}
+  foo("abc", "xyz") {}
+  foo(null ,null) {}

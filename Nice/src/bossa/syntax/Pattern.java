@@ -62,8 +62,14 @@ public class Pattern implements Located
     this.exactlyAt = exactlyAt;
     this.location = location;
 
-    if (atValue != null)
-      this.tc = atValue.tc;
+    if (atValue != null) 
+      {
+	if (atValue instanceof StringConstantExp)
+	  this.typeConstructor = new TypeIdent(
+		new LocatedString("String" ,atValue.location()));
+	else
+	  this.tc = atValue.tc;
+      }
   }
 
   Pattern(LocatedString name, TypeIdent tc)
@@ -406,6 +412,10 @@ public class Pattern implements Located
         if (name.charAt(0) == '+')
           return new Pattern(ConstantExp.makeNumber(new LocatedString(
 		name.substring(1), Location.nowhere())));
+
+        if (name.charAt(0) == '\"')
+          return new Pattern(ConstantExp.makeString(new LocatedString(
+		name.substring(1,name.length()-1), Location.nowhere())));
       }
 
     if (name.equals("_"))
@@ -453,6 +463,9 @@ public class Pattern implements Located
     if (atIntValue())
       return Gen.integerComparison("Eq", parameter, atValue.longValue());
 
+    if (atString())
+      return Gen.stringEquals((String)atValue.value, parameter);
+
     gnu.bytecode.Type ct = Types.javaType(tc);
     if (exactlyAt)
       return Gen.isOfClass(parameter, ct);
@@ -494,5 +507,5 @@ public class Pattern implements Located
   }
   public boolean atTrue() { return atValue != null && atValue.isTrue(); }
   public boolean atFalse() { return atValue != null && atValue.isFalse(); }
-
+  public boolean atString() { return atValue instanceof StringConstantExp; }
 }

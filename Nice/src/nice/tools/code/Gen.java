@@ -65,6 +65,11 @@ public class Gen
 			value2);
   }
 
+  public static Expression stringEquals(String value1, Expression value2)
+  {
+    return Inline.inline(new EqualsMethodProc(),
+      new gnu.expr.QuoteExp(value1, gnu.bytecode.Type.string_type), value2);
+  }
 
   /**
      Create a lambda expression to generate code for the method.

@@ -112,8 +112,7 @@ public class AST extends Node
     for(Iterator i = children.iterator();i.hasNext();)
       {
 	Node n = (Node) i.next();
-	if (!(n instanceof ClassDefinition))
-	  resolve(n);
+        resolve(n);
       }
 
     module.compilation().exitIfErrors();

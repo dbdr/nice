@@ -164,7 +164,7 @@ public class TypeImport
     return c;
   }
 
-  private static ClassLoader classLoader;
+  private static java.net.URLClassLoader classLoader;
   private static String currentClasspath = "NOT INITIALIZED";
 
   public static void setClasspath(String classpath)

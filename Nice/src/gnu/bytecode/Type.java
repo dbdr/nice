@@ -100,12 +100,12 @@ public abstract class Type {
     return type;
   }
 
-  private static nice.tools.util.ClassLoader loader;
+  private static nice.tools.code.ClassLoader loader;
   static {
     String runtime = nice.tools.code.TypeImport.getRuntime();
-    loader = new nice.tools.util.ClassLoader
+    loader = new nice.tools.code.ClassLoader
       (runtime, 
-       new nice.tools.util.ClassLoader.Registrar() {
+       new nice.tools.code.ClassLoader.Registrar() {
 	 public void register(String name, ClassType type)
 	 {
 	   getMapNameToType().put(name, type);

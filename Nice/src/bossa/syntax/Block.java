@@ -207,9 +207,6 @@ public class Block extends Statement
       {
 	Object s = i.next();
 	
-	if (s == null) // emptyStatement
-	  continue;
-	
         if (s instanceof LocalValue)
           {
             LocalValue decl = (LocalValue) s;
@@ -236,14 +233,11 @@ public class Block extends Statement
       {
 	Object s = i.next();
 	
-	if (s == null) // emptyStatement
-	  continue;
-	
 	if (s instanceof LocalDeclaration)
 	  {
-	    // Removes all the statements already in res, 
-	    // keeps this LocalDeclStmt.
-	    res.add(new Block(statements.subList(i.previousIndex(),statements.size())));
+	    // Create a subblock with all the statements starting from this one
+	    res.add(new Block(statements.subList(i.previousIndex(),
+						 statements.size())));
 	    break;
 	  }
 	

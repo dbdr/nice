@@ -51,7 +51,7 @@ setDate:
 
 deb:
 	@echo Creating Debian package version ${VERSION}
-	env CVSROOT=:pserver:anonymous@cvs.nice.sourceforge.net:/cvsroot/nice cvs-buildpackage -MNice -W${CVSBUILDDIR} -us -uc -rfakeroot
+	env CVSROOT=:pserver:anonymous@cvs.nice.sourceforge.net:/cvsroot/nice cvs-buildpackage -MNice -W${CVSBUILDDIR} -us -uc -rfakeroot -F
 
 dist:
 	rm -rf ${TOP}/dist

@@ -23,3 +23,8 @@ nonnull(x) {}
 {                            
   return this;
 }
+
+/// PASS
+  f(null, null);
+  /// Toplevel
+void f(?String, int ?-> int) {}

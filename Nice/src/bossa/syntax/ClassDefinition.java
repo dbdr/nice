@@ -187,7 +187,18 @@ abstract public class ClassDefinition extends MethodContainer
    * Resolution
    ****************************************************************/
 
+  private boolean resolved = false;
+
   void resolve()
+  {
+    if (resolved)
+      return;
+
+    resolved = true;
+    resolveClass();
+  }
+
+  void resolveClass()
   {
     // If superClass is non null, it was build before.
     // Extensions should be null in that case.
@@ -196,7 +207,15 @@ abstract public class ClassDefinition extends MethodContainer
 	superClass = TypeIdent.resolveToTC(typeScope, extensions);
 	extensions = null;
       }
-    
+
+    // Resolve the superclass first.
+    if (superClass != null)
+      {
+	ClassDefinition d = ClassDefinition.get(superClass[0]);
+	if (d != null)
+	  d.resolve();
+      }
+
     impl = TypeIdent.resolveToItf(typeScope, implementations);
     abs = TypeIdent.resolveToItf(typeScope, abstractions);
     

@@ -176,9 +176,9 @@ public class NiceClass extends ClassDefinition
     NiceFieldAccess method;
   }
   
-  void resolve()
+  void resolveClass()
   {
-    super.resolve();
+    super.resolveClass();
     classe.supers = computeSupers();
     resolveFields();
     createConstructor();

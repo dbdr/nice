@@ -1,0 +1,8 @@
+/// PASS
+  /// COMMENT Check that bytecode class implements statement is correct
+  /// COMMENT when classes are defined in reverse order.  
+  assert(new A() instanceof I);
+  /// Toplevel
+  interface I {}
+  class B extends A {}
+  class A implements I {}

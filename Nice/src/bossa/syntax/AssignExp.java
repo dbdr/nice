@@ -20,6 +20,8 @@ import bossa.util.*;
 import mlsub.typing.*;
 import mlsub.typing.Polytype;
 
+import bossa.util.Debug;
+
 /**
  * Assignment.
  */

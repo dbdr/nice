@@ -7,12 +7,14 @@ JAVADOC=javadoc #-linkoffline file:///C%7C/Apps/jdk1.2.1/docs/api file:///usr/op
 
 # run this first when you just checked out a fresh version
 first: parser
-	cd src; nicec bossa.modules
+	cd stdlib; nicec nice.getopt
+	${TOP}/src/nice/tools/compiler/setBuildDate ${TOP}/src/nice/tools/compiler
+	cd src; NICEJAR=${HOME}/Nice/stdlib nicec nice.tools.compiler
 	mkdir -p classes
 	cd classes; jar xf ../external/java-getopt-1.0.7.jar gnu
 	ln -sf nicec bin/nicer
 	cd src;\
-	${JAVAC} bossa/modules/Package.java nice/tools/runJar.java gnu/bytecode/dump.java ../stdlib/nice/*/*.java
+	${JAVAC} bossa/modules/Package.java nice/tools/runJar.java nice/tools/code/*.java gnu/bytecode/dump.java ../stdlib/nice/*/*.java
 
 recompile:
 	cd src; ${JAVAC} bossa/modules/Package.java

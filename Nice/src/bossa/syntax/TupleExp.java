@@ -71,7 +71,7 @@ public class TupleExp extends bossa.syntax.Expression
 
     Monotype m = expectedType.getMonotype();
     // get rid of the nullness part
-    m = ((MonotypeConstructor) m).getTP()[0];
+    m = Types.rawType((MonotypeConstructor) m);
 
     // Get the expected component types
     if (m instanceof TupleType)

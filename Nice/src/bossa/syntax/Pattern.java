@@ -220,7 +220,7 @@ public class Pattern implements Located
 
     // the argument is not null
     Typing.leq(mc.getTC(), PrimitiveType.sureTC);
-    Monotype type = mc.getTP()[0];
+    Monotype type = Types.rawType(mc);
 
     if (constraint != null)
       {

@@ -59,7 +59,7 @@ public final class TypeConstructorLeqMonotypeCst extends AtomicConstraint
   throws TypingEx
   {
     // Use the raw type of t2, after the nullness marker.
-    Typing.leq(t1, ((MonotypeConstructor) t2.equivalent()).getTP()[0]);
+    Typing.leq(t1, nice.tools.code.Types.rawType(t2));
   }
   
   public String toString()

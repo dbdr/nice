@@ -379,7 +379,7 @@ public final class Dispatch
 	  {
 	    MonotypeConstructor mc = (MonotypeConstructor) arg;
 	    marker = mc.getTC();
-	    raw = mc.getTP()[0];
+	    raw = nice.tools.code.Types.rawType(mc);
 	  }
 	else
 	  {

@@ -23,6 +23,8 @@ import mlsub.typing.FunType;
 import mlsub.typing.TupleType;
 import mlsub.typing.Monotype;
 
+import nice.tools.code.Types;
+
 /**
    A symbol, for which overloading resolution has yet to be done.
 
@@ -361,9 +363,7 @@ public class OverloadedSymbolExp extends Expression
   private static Domain domain(Polytype t, int[] usedArguments)
   {
     // remove nullness marker
-    Monotype[] m = ((FunType)
-      ((mlsub.typing.MonotypeConstructor) t.getMonotype()).getTP()[0])
-      .domain();
+    Monotype[] m = ((FunType) Types.rawType(t.getMonotype())).domain();
 
     Monotype[] dom;
 

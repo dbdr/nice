@@ -302,8 +302,7 @@ public class MethodBodyDefinition extends Definition
 
     Types.setMarkedKind(m1);
     Types.setMarkedKind(m2);
-    Typing.leq(((MonotypeConstructor) m1.equivalent()).getTP()[0],
-	       ((MonotypeConstructor) m2.equivalent()).getTP()[0]);
+    Typing.leq(Types.rawType(m1), Types.rawType(m2));
   }
   void doResolve()
   {

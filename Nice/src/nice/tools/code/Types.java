@@ -650,6 +650,12 @@ public final class Types
       return ((MonotypeConstructor) m).getTP()[0];
   }
 
+  /** return the type with nullness markers removed */
+  public static Monotype rawType(MonotypeConstructor mc)
+  {
+    return mc.getTP()[0];
+  }
+
   /** @return the domain of a functional polytype with nullness marker */
   public static Monotype[] domain(Polytype type)
   {

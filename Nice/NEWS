@@ -1,3 +1,11 @@
+nice (0.9.8)
+
+  * Nice methods are now compiled inside classes whenever possible. This does
+    not make any difference for Nice programs, but simplifies integration with
+    Java tools and usage of Nice code from Java sources.
+
+ --
+
 nice (0.9.7)
 
   * Methods can be overriden using the override keyword:

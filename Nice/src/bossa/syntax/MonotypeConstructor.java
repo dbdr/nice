@@ -12,7 +12,7 @@
 
 // File    : MonotypeConstructor.java
 // Created : Thu Jul 22 09:15:17 1999 by bonniot
-//$Modified: Mon Sep 20 19:15:00 1999 by bonniot $
+//$Modified: Mon Oct 25 14:59:55 1999 by bonniot $
 
 package bossa.syntax;
 
@@ -52,18 +52,6 @@ public class MonotypeConstructor extends Monotype
   }
 
   /****************************************************************
-   * Imperative type variables
-   ****************************************************************/
-
-  public boolean appear(TypeSymbol s, boolean imperatively)
-  {
-    if(imperatively)
-      return tc.variance.appearImperatively(s,parameters);
-    else
-      return Monotype.appear(s,false,parameters.content);
-  }
-  
-  /****************************************************************
    * Scoping
    ****************************************************************/
 
@@ -96,23 +84,6 @@ public class MonotypeConstructor extends Monotype
   {
     User.error(tc.variance.size!=parameters.size(),this,
 	       tc.variance.size+" type parameters expected for "+tc);
-    // Check the monotype is well-formed,
-    // ie all the parameters in imperative positions are imperative
-    User.error(!tc.variance.wellFormed(parameters),
-	       this,"Type parameters must be imperative ("+parameters+")");    
-  }
-  
-  /****************************************************************
-   * Imperative type variables
-   ****************************************************************/
-
-  public boolean isImperative()
-  {
-    Iterator i=parameters.iterator();
-    while(i.hasNext())
-      if(!((Monotype)i.next()).isImperative())
-	return false;
-    return true;
   }
   
   /****************************************************************

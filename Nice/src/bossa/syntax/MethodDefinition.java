@@ -12,7 +12,7 @@
 
 // File    : MethodDefinition.java
 // Created : Thu Jul 01 18:12:46 1999 by bonniot
-//$Modified: Wed Oct 13 18:18:11 1999 by bonniot $
+//$Modified: Mon Oct 25 13:09:15 1999 by bonniot $
 
 package bossa.syntax;
 
@@ -36,7 +36,6 @@ public class MethodDefinition extends PolySymbol implements Definition
    */
   public MethodDefinition(ClassDefinition c,
 			  LocatedString name, 
-			  List typeParameters,
 			  Constraint constraint,
 			  Monotype returnType,
 			  Collection parameters)
@@ -52,9 +51,7 @@ public class MethodDefinition extends PolySymbol implements Definition
     params.addAll(parameters);
     
     this.arity=params.size();
-    this.type=Type.newType(typeParameters,
-			   new Polytype(constraint,
-					new FunType(params,returnType)));
+    this.type=new Polytype(constraint,new FunType(params,returnType));
     addChild(type);
 
     this.memberOf=c;
@@ -62,12 +59,11 @@ public class MethodDefinition extends PolySymbol implements Definition
 
   /** the Method is global */
   public MethodDefinition(LocatedString name,
-			  List typeParameters,
 			  Constraint constraint,
 			  Monotype returnType,
 			  Collection parameters)
   {
-    this(null,name,typeParameters,constraint,returnType,parameters);
+    this(null,name,constraint,returnType,parameters);
   }
 
   public Collection associatedDefinitions()
@@ -90,18 +86,6 @@ public class MethodDefinition extends PolySymbol implements Definition
   int getArity()
   {
     return arity;
-  }
-  
-  /****************************************************************
-   * Typecheck
-   ****************************************************************/
-
-  public void typecheck()
-  // We can change the type here, since resolution is done now
-  // TODO: it should maybe be done earlier in case of forward reference to this method
-  {
-    removeChild(type);
-    type=type.removeUnusefullTypeParameters();
   }
   
   /****************************************************************

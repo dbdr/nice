@@ -12,7 +12,7 @@
 
 // File    : Constraint.java
 // Created : Fri Jul 02 17:51:35 1999 by bonniot
-//$Modified: Wed Oct 13 18:12:05 1999 by bonniot $
+//$Modified: Mon Oct 25 14:32:54 1999 by bonniot $
 
 package bossa.syntax;
 
@@ -155,13 +155,13 @@ public class Constraint extends Node
   public String toString()
   {
     if(atomics.size()==0)
-      return Util.map("{",", ","}",binders,Printable.inConstraint);
+      return Util.map("<",", ",">",binders,Printable.inConstraint);
     else if(binders.size()==0)
-      return Util.map("{",", ","}",atomics);
+      return Util.map("<",", ",">",atomics);
     else 
       {
 	// Put in a parsable format.
-	String res="{";
+	String res="<";
 	boolean first=true;
 	
 	Constraint c=this.shallowClone();
@@ -195,7 +195,8 @@ public class Constraint extends Node
 		  
 	return 
 	  res+Util.map(", ",", ","",c.binders,Printable.inConstraint)
-	  + Util.map("|",", ","",c.atomics)+"}";
+	  + Util.map("|",", ","",c.atomics)
+	  + ">";
       }
   }
 

@@ -12,7 +12,7 @@
 
 // File    : FunExp.java
 // Created : Mon Jul 12 15:09:50 1999 by bonniot
-//$Modified: Fri Aug 27 17:20:54 1999 by bonniot $
+//$Modified: Mon Oct 25 12:43:41 1999 by bonniot $
 // Description : A functional expression
 
 package bossa.syntax;
@@ -22,10 +22,8 @@ import bossa.util.*;
 
 public class FunExp extends Expression
 {
-  public FunExp(List typeParameters, 
-		Constraint cst, List formals, List body)
+  public FunExp(Constraint cst, List formals, List body)
   {
-    this.typeParameters=typeParameters;
     this.formals=addChildren(formals);
     this.constraint=cst;
     this.body=new Block(body);
@@ -43,22 +41,14 @@ public class FunExp extends Expression
       User.error(this,"functional expression is ill-typed");
     }
     
-    Type returnType=body.getType();
+    Polytype returnType=body.getType();
     
     User.error(returnType==null,"The last statement of "+this+
 	       "must be a return statement");
  
-    List tp=returnType.getTypeParameters();
-    if(tp==null)
-      tp=typeParameters;
-    else
-      tp.addAll(typeParameters);
-
-    type=Type.newType
-      (tp,
-       new Polytype(Constraint.and(constraint,returnType.getConstraint()),
-		    new FunType(MonoSymbol.getMonotype(formals),
-				returnType.getMonotype())));
+    type=new Polytype(Constraint.and(constraint,returnType.getConstraint()),
+		      new FunType(MonoSymbol.getMonotype(formals),
+				  returnType.getMonotype()));
   }
   
   /****************************************************************
@@ -76,7 +66,6 @@ public class FunExp extends Expression
       ;
   }
   
-  List /* of TypeSymbol*/ typeParameters;
   Collection /* of FieldSymbol */ formals;
   Constraint constraint;
   Block body;

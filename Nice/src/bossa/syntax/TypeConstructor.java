@@ -12,7 +12,7 @@
 
 // File    : TypeConstructor.java
 // Created : Thu Jul 08 11:51:09 1999 by bonniot
-//$Modified: Wed Oct 13 17:56:27 1999 by bonniot $
+//$Modified: Mon Oct 25 14:36:12 1999 by bonniot $
 
 package bossa.syntax;
 
@@ -25,7 +25,7 @@ import bossa.typing.Variance;
  * A class. It "needs" type parameters to become a Monotype
  */
 public class TypeConstructor
-  implements Located, TypeSymbol, bossa.engine.Element
+  implements Located, TypeSymbol, bossa.engine.Element, Printable
 {
   /**
    * Constructs a new type constructor from a well known class.
@@ -113,14 +113,14 @@ public class TypeConstructor
     return name.equals(s);
   }
 
-  Type getType()
+  Polytype getType()
   {
     if(!(definition instanceof ClassDefinition))
       return null;
     return ((ClassDefinition)definition).getType();
   }
 
-  Type instantiate(TypeParameters tp)
+  Polytype instantiate(TypeParameters tp)
     throws BadSizeEx
   {
     Internal.error(variance==null,"Null variance in TypeConstructor");
@@ -207,6 +207,11 @@ public class TypeConstructor
     return res;
   }
 
+  public String toString(int param)
+  {
+    return toString();
+  }
+  
   public LocatedString getName()
   {
     return name;

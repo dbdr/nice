@@ -12,7 +12,7 @@
 
 // File    : OverloadedSymbolExp.java
 // Created : Thu Jul 08 12:20:59 1999 by bonniot
-//$Modified: Thu Sep 30 18:01:19 1999 by bonniot $
+//$Modified: Mon Oct 25 13:09:52 1999 by bonniot $
 
 package bossa.syntax;
 
@@ -40,8 +40,7 @@ public class OverloadedSymbolExp extends Expression
     return false;
   }
 
-  Expression resolveOverloading(List /* of Type */ parameters,
-				TypeParameters typeParameters)
+  Expression resolveOverloading(List /* of Type */ parameters)
   {
     User.debug("Overloading resolution for "+this);
     Iterator i=symbols.iterator();
@@ -55,19 +54,10 @@ public class OverloadedSymbolExp extends Expression
 	  }
 	if(((MethodDefinition)s).getArity()!=parameters.size())
 	  { i.remove(); continue; }
-	Type t=s.getType();
-	if(typeParameters==null)
-	  if(t instanceof PolytypeConstructor)
-	    { i.remove(); continue; }
-	  else ;
-	else
-	  if(!(t instanceof PolytypeConstructor)
-	     || ((PolytypeConstructor)t).getTypeParameters().size()!=typeParameters.size())
-	    { i.remove(); continue; }
       }
 
     User.error(symbols.size()==0,this,
-	       "No alternative has "+parameters.size()+" parameters");
+	       "No method has name "+ident);
 
     if(symbols.size()>=2)
       {
@@ -77,8 +67,7 @@ public class OverloadedSymbolExp extends Expression
 	    VarSymbol s=(VarSymbol)i.next();
 	    User.debug("OVERLOADING: Trying with "+s);
 	    
-	    if(!CallExp.wellTyped(InstantiateExp.create(new SymbolExp(s,location()),typeParameters),
-				  parameters))
+	    if(!CallExp.wellTyped(new SymbolExp(s,location()),parameters))
 	      i.remove();
 	  }
       }
@@ -94,22 +83,14 @@ public class OverloadedSymbolExp extends Expression
     return null;
   }
   
-  Expression resolveOverloading(Type expectedType,TypeParameters typeParameters)
+  Expression resolveOverloading(Polytype expectedType)
   {
     User.debug("Overloading resolution (expected type "+expectedType+") for "+this);
     Iterator i=symbols.iterator();
     while(i.hasNext())
       {
 	VarSymbol s=(VarSymbol)i.next();
-	Type t=s.getType();
-	if(typeParameters!=null)
-	  try{
-	    t=t.instantiate(typeParameters);
-	    if(t==null)
-	      { i.remove(); continue; }
-	  }
-	  catch(BadSizeEx e)
-	    { i.remove(); continue; }
+	Polytype t=s.getType();
 	try{
 	  bossa.typing.Typing.leq(t,expectedType);
 	}

@@ -12,7 +12,7 @@
 
 // File    : Expression.java
 // Created : Mon Jul 05 16:25:02 1999 by bonniot
-//$Modified: Thu Sep 30 17:02:15 1999 by bonniot $
+//$Modified: Mon Oct 25 13:04:35 1999 by bonniot $
 // Description : 
 
 package bossa.syntax;
@@ -65,10 +65,9 @@ public abstract class Expression extends Node
   /**
    * Resolves overloading, taking into account the parameters the expressions is applied to.
    *
-   * @param tp type parameters to instantiate before applying the parameters, or null.
    * @return the resolved expression. Doesn't return if OR is not possible.
    */
-  Expression resolveOverloading(List /* of Expression */ parameters, TypeParameters tp)
+  Expression resolveOverloading(List /* of Expression */ parameters)
   {
     return this;
   }
@@ -80,7 +79,7 @@ public abstract class Expression extends Node
    * @param expectedType the type this expression should have.
    * @return the resolved expression. Doesn't return if OR is not possible.
    */
-  Expression resolveOverloading(Type expectedType, TypeParameters typeParameters)
+  Expression resolveOverloading(Polytype expectedType)
   {
     return this;
   }
@@ -88,7 +87,7 @@ public abstract class Expression extends Node
   /** computes the static type of the expression */
   abstract void computeType();
 
-  final Type getType()
+  final Polytype getType()
   {
     if(type==null)
       computeType();
@@ -128,7 +127,7 @@ public abstract class Expression extends Node
 
     while(i.hasNext())
       {
-	Type t=((Expression) i.next()).getType();
+	Polytype t=((Expression) i.next()).getType();
 	if(!(t instanceof Polytype))
 	  return null;
 	res.add(t);
@@ -148,5 +147,5 @@ public abstract class Expression extends Node
   }
 
   Location loc=Location.nowhere();
-  protected Type type;
+  protected Polytype type;
 }

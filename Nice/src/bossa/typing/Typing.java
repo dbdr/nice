@@ -12,7 +12,7 @@
 
 // File    : Typing.java
 // Created : Tue Jul 20 11:57:17 1999 by bonniot
-//$Modified: Thu Oct 14 10:17:57 1999 by bonniot $
+//$Modified: Mon Oct 25 15:41:17 1999 by bonniot $
 
 package bossa.typing;
 
@@ -151,8 +151,8 @@ abstract public class Typing
     
     while(i1.hasNext())
       {
-	leq((Type)i1.next(),
-	    (Type)i2.next());
+	leq((Polytype)i1.next(),
+	    (Polytype)i2.next());
       }
   }
   
@@ -185,27 +185,12 @@ abstract public class Typing
    * Testing Polytype <= Polytype
    ****************************************************************/
 
-  public static void leq(Type t1, Type t2) 
-    throws TypingEx
-  {
-    if(t1.getClass()
-       !=t2.getClass())
-      throw new KindingEx(t1,t2);
-    if(t1 instanceof Polytype)
-      leq((Polytype) t1,(Polytype) t2);
-    else
-      leq((PolytypeConstructor) t1, (PolytypeConstructor) t2);
-  }
-
   public static void leq(Polytype t1, Polytype t2) 
     throws TypingEx
   {
     if(dbg) Debug.println("Polytype leq: "+t1+" <: "+t2);
     
-    if(dbg)
-      enter("#");
-    else
-      enter();
+    if(dbg) enter("#"); else enter();
     
     t2.getConstraint().assert();
 
@@ -214,24 +199,6 @@ abstract public class Typing
     t1.getConstraint().assert();
     leq(t1.getMonotype(),t2.getMonotype());
 
-    leave();
-  }
-
-  public static void leq(PolytypeConstructor t1, PolytypeConstructor t2) 
-    throws TypingEx
-  {
-    if(dbg) Debug.println("PolytypeConstructor leq : "+t1+" <: "+t2);
-    Collection tp1=t1.getTypeParameters();
-    Collection tp2=t2.getTypeParameters();
-    
-    enter();
-    // Maybe optimise, since tp1"=="tp2
-    introduce(tp1);
-    introduce(tp2);
-    leqMono(tp1,tp2);
-    leqMono(tp2,tp1);
-    implies();
-    leq(t1.polytype,t2.polytype);
     leave();
   }
 
@@ -271,21 +238,6 @@ abstract public class Typing
    * Domains 
    ****************************************************************/
 
-  public static void in(Type type, Domain domain)
-    throws TypingEx
-  {
-    if(type instanceof Polytype)
-      in((Polytype)type,domain);
-    else if(type instanceof PolytypeConstructor)
-      {
-	PolytypeConstructor ptc=(PolytypeConstructor)type;
-	introduce(ptc.getTypeParameters());
-	in(ptc.polytype,domain);
-      }
-    else
-      Internal.error("Unknown kind of Type");
-  }
-      
   public static void in(Polytype type, Domain domain)
     throws TypingEx
   {
@@ -318,7 +270,7 @@ abstract public class Typing
     Iterator t=types.iterator();
     Iterator d=domains.iterator();
     while(t.hasNext())
-      in((Type)t.next(),(Domain)d.next());
+      in((Polytype)t.next(),(Domain)d.next());
   }
 
   /****************************************************************

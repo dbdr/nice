@@ -12,7 +12,7 @@
 
 // File    : Variance.java
 // Created : Fri Jul 23 12:15:46 1999 by bonniot
-//$Modified: Mon Aug 30 08:33:23 1999 by bonniot $
+//$Modified: Mon Oct 25 14:58:01 1999 by bonniot $
 
 package bossa.typing;
 
@@ -82,35 +82,6 @@ public class Variance
 	bossa.engine.Engine.leq(m1,m2);
 	bossa.engine.Engine.leq(m2,m1);
       }
-  }
-  
-  /****************************************************************
-   * Well formedness
-   ****************************************************************/
-
-  /**
-   * Checks wether the type parameters are acceptable
-   * in this variance
-   */
-  public boolean wellFormed(TypeParameters tp)
-  {
-    Iterator i=tp.iterator();
-    while(i.hasNext())
-      if(!((Monotype)i.next()).isImperative())
-	return false;
-    return true;
-  }
-  
-  public boolean appearImperatively(TypeSymbol s, TypeParameters tp)
-  {
-    //TODO: change when all variance ahs non-imperative holes
-    for(Iterator i=tp.iterator();i.hasNext();)
-      {
-	Monotype m=(Monotype)i.next();
-	if(m.appear(s,false))
-	  return true;
-      }
-    return false;
   }
   
   /****************************************************************

@@ -12,7 +12,7 @@
 
 // File    : LocalDeclarationStmt.java
 // Created : Tue Jul 06 12:06:20 1999 by bonniot
-//$Modified: Wed Oct 13 18:21:05 1999 by bonniot $
+//$Modified: Mon Oct 25 13:10:43 1999 by bonniot $
 
 package bossa.syntax;
 
@@ -27,7 +27,7 @@ import java.util.*;
 public class LocalDeclarationStmt extends Statement
   implements Definition
 {
-  public LocalDeclarationStmt(LocatedString name, Type type, Expression value, boolean global)
+  public LocalDeclarationStmt(LocatedString name, Polytype type, Expression value, boolean global)
   {
     if(global)
       this.propagate=Node.global;
@@ -54,7 +54,7 @@ public class LocalDeclarationStmt extends Statement
   {
     if(value==null) return;
     try{
-      value.resolveOverloading(left.getType(),null);
+      value.resolveOverloading(left.getType());
       Typing.leq(value.getType(),left.getType());
     }
     catch(TypingEx e){
@@ -83,7 +83,7 @@ public class LocalDeclarationStmt extends Statement
       (value==null?"":" = "+value);
   }
 
-  protected Type type;
+  protected Polytype type;
   protected ExpressionRef value=null;
   // "name" after scoping
   VarSymbol left;

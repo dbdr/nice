@@ -12,7 +12,7 @@
 
 // File    : Engine.java
 // Created : Tue Jul 27 15:34:53 1999 by bonniot
-//$Modified: Thu Oct 14 10:14:30 1999 by bonniot $
+//$Modified: Mon Oct 25 15:40:44 1999 by bonniot $
 
 package bossa.engine;
 

@@ -12,7 +12,7 @@
 
 // File    : MonoSymbol.java
 // Created : Fri Jul 16 17:10:53 1999 by bonniot
-//$Modified: Tue Aug 24 15:11:27 1999 by bonniot $
+//$Modified: Mon Oct 25 12:48:18 1999 by bonniot $
 
 package bossa.syntax;
 
@@ -37,7 +37,7 @@ public class MonoSymbol extends VarSymbol
     this.memberOf=memberOf;
   }
 
-  public Type getType()
+  public Polytype getType()
   {
     if(memberOf!=null)
       return new Polytype(memberOf.getConstraint(),type);

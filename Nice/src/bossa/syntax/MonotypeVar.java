@@ -12,7 +12,7 @@
 
 // File    : MonotypeVar.java
 // Created : Fri Jul 23 15:36:39 1999 by bonniot
-//$Modified: Wed Oct 13 14:54:30 1999 by bonniot $
+//$Modified: Mon Oct 25 15:01:25 1999 by bonniot $
 
 package bossa.syntax;
 
@@ -31,23 +31,21 @@ import bossa.engine.*;
 public class MonotypeVar extends Monotype
   implements TypeSymbol, bossa.engine.Element, Printable
 {
-  public MonotypeVar(LocatedString name, boolean imperative)
+  public MonotypeVar(LocatedString name)
   {
     this.name=name;
     this.soft=false;
-    this.imperative=imperative;
   }
 
   public MonotypeVar(boolean soft, LocatedString name)
   {
     this.name=name;
     this.soft=soft;
-    this.imperative=false;
   }
 
   public TypeSymbol cloneTypeSymbol()
   {
-    MonotypeVar res=new MonotypeVar(name,imperative);
+    MonotypeVar res=new MonotypeVar(name);
     res.soft=soft;
     res.kind=null;
     res.id=-1;
@@ -64,23 +62,6 @@ public class MonotypeVar extends Monotype
     return name.equals(s);
   }
 
-  /****************************************************************
-   * Imperative type variables
-   ****************************************************************/
-
-  public boolean appear(TypeSymbol s, boolean imperatively)
-  {
-    if(imperatively)
-      return false;
-    else
-      return name.equals(s.getName());
-  }
-  
-  public boolean isImperative()
-  {
-    return imperative;
-  }
-  
   /****************************************************************
    * Functional Types
    ****************************************************************/
@@ -269,8 +250,6 @@ public class MonotypeVar extends Monotype
    * If false, this must be found in scope
    */
   private boolean soft;
-
-  private boolean imperative;
 
   /****************************************************************
    * The Top interface

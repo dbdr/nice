@@ -12,7 +12,7 @@
 
 // File    : parser.jj
 // Created : Thu Jul 01 10:27:05 1999 by bonniot
-//$Modified: Wed Oct 13 18:20:24 1999 by bonniot $
+//$Modified: Mon Oct 25 15:04:06 1999 by bonniot $
 // Description : Parseur JavaCC pour Bossa
 //   Tokens based on the Jazz parser
 
@@ -51,8 +51,7 @@ class Parser
     List statements=new ArrayList(1);
     if(exp!=null)
       statements.add(new ReturnStmt(exp));
-    return new FunExp(new ArrayList(0),
-		      Constraint.True(),
+    return new FunExp(Constraint.True(),
 		      new ArrayList(0),
 		      statements);
   }
@@ -66,8 +65,7 @@ class Parser
 
     List statements=new ArrayList(1);
     statements.add(statement);
-    return new FunExp(new ArrayList(0),
-		      Constraint.True(),
+    return new FunExp(Constraint.True(),
 		      new ArrayList(0),
 		      statements);
   }
@@ -477,15 +475,15 @@ TypeSymbol binder(Collection atomics):
   MonotypeVar id;
 }
 {
-  "Any" id=monotypeVar(false)
+  "Any" id=monotypeVar()
   { return id;
   }
 |
   first=typeConstructor() 
   second=typeConstructor()
   { 
-    if(second==null)
-      return first;
+    //if(second==null)
+      //return first;
     atomics.add(new TypeConstructorLeqCst(second,first)); 
     return second; 
   }
@@ -548,13 +546,13 @@ Constraint constraint():
 }
 {
   (
-    ( "{" 
+    ( "<" 
       ( 
 	LOOKAHEAD(2) atoms=atomics(atoms) 
       | 
         b=binders(atoms) [ "|" atoms=atomics(atoms) ] 
       )
-      "}" 
+      ">" 
       
       { res=new Constraint(b,atoms); }
     )
@@ -569,7 +567,7 @@ Constraint constraint():
 
 //Monotypes
 
-MonotypeVar monotypeVar(boolean imperative):
+MonotypeVar monotypeVar():
 {
   LocatedString name;
 }
@@ -577,18 +575,18 @@ MonotypeVar monotypeVar(boolean imperative):
   //TMP
   [ "+" ]
   name=string()
-  { return new MonotypeVar(name,imperative); }
+  { return new MonotypeVar(name); }
 }
 
-List monotypeVars(boolean imperative):
+List monotypeVars():
 {
     List res=new ArrayList(0);
     MonotypeVar var;
 }
 {
     ( "<" 
-      var=monotypeVar(imperative) { res.add(var); }
-      ( "," var=monotypeVar(imperative) { res.add(var); } )*
+      var=monotypeVar() { res.add(var); }
+      ( "," var=monotypeVar() { res.add(var); } )*
     ">" )?
     { return res; }
 }
@@ -641,9 +639,7 @@ Monotype monotype():
   LOOKAHEAD(2)
   res=monotypeConstructor()
 | 
-  // we don't know yet if it is imperative or not
-  // it depends on the definition of this symbol
-  res=monotypeVar(false) 
+  res=monotypeVar() 
   )
   { return res; }
 }
@@ -698,17 +694,6 @@ Polytype polytype():
   { return res; }
 }
 
-Type type():
-{
-  Polytype p;
-  List tp;
-}
-{
-  tp=monotypeVars(true)
-  p=polytype()
-  { return Type.newType(tp,p); }
-}
-
 /***********************************************************************/
 /*                          Classes                                    */
 /***********************************************************************/
@@ -716,7 +701,7 @@ Type type():
 MethodDefinition methodDef(ClassDefinition c):
 {
   LocatedString name;
-  List parameters,tp;
+  List parameters;
   Constraint cst;
   Monotype returnType;
   MethodDefinition def;
@@ -724,13 +709,12 @@ MethodDefinition methodDef(ClassDefinition c):
 {
   returnType=monotype()
   name=string()
-  tp=monotypeVars(true)
   cst=constraint()
   "("
   parameters=monotypes()
   ")"
   ";"
-  { return new MethodDefinition(c,name,tp,cst,returnType,parameters); }
+  { return new MethodDefinition(c,name,cst,returnType,parameters); }
 }
 
 List extensions():
@@ -770,7 +754,7 @@ ClassDefinition classDefinition():
   [ "final" { isFinal=true; } ]
   "class"
     name=string() 
-    parameters=monotypeVars(true) 
+    parameters=monotypeVars() 
 
   ( "implements" l=interfaces() { imp.addAll(l); } 
   | "abstracts"  l=interfaces() { abs.addAll(l); }
@@ -799,7 +783,7 @@ InterfaceDefinition interfaceDefinition():
 {
   "interface"
   name=string()
-  parameters=monotypeVars(true)
+  parameters=monotypeVars()
   [ "extends" extensions=interfaces() ]
   ";"
   { return new InterfaceDefinition(name,parameters,extensions); }
@@ -823,16 +807,14 @@ MethodBodyDefinition methodBodyDefinition():
     Pattern p;
     Collection binders=null;
     List parameters=new ArrayList();
-    List tp;
     List code;
     Expression exp;
 }
 {
     name=string()
-    tp=typeConstructors()
-    [ "{" binders=strings() "}" ]
+    [ "<" binders=strings() ">" ]
     p=pattern(new LocatedString("this",new Location(0,0,0,0))) 
-      { parameters.add(p); }
+    { parameters.add(p); }
     "("
     ( 
 	i=string() p=pattern(i) { parameters.add(p); }
@@ -850,38 +832,37 @@ MethodBodyDefinition methodBodyDefinition():
 	code.add(new ReturnStmt(exp));
       }
     )
-    { return new MethodBodyDefinition(name,tp,binders,parameters,code); }
+    { return new MethodBodyDefinition(name,binders,parameters,code); }
 }
 
 MethodDefinition methodDefinition():
 {
     LocatedString name;
     Monotype returnType;
-    List parameters,tp;
+    List parameters;
     Constraint cst;
     MethodDefinition res;
 }
 {
     returnType=monotype()
     name=string()
-    tp=monotypeVars(true)
     cst=constraint()
     "("
     ( parameters=monotypes() | { parameters=new ArrayList(); } )
     ")"
     ";"
-    { return new MethodDefinition(name,tp,cst,returnType,parameters); }
+    { return new MethodDefinition(name,cst,returnType,parameters); }
 }
 
 Definition globalVariable():
 {
   LocatedString name;
-  Type t;
+  Polytype t;
   Expression value=null;
 }
 {
   "variable"
-  t=type()
+  t=polytype()
   name=string()
   [ "=" value=expression() ]
   ";"
@@ -1006,11 +987,11 @@ IdentExp identExp():
 
 NewExp newExp():
 {
-  Monotype t;
+  TypeConstructor t;
 }
 {
   "new" 
-  t=monotype()
+  t=typeConstructor()
   "(" ")" 
   { return new NewExp(t); }
 }
@@ -1036,9 +1017,6 @@ Expression computedExp(Expression prefix):
   (
     "." name=string()
     { res=FieldExp.create(res,name); }
-  | 
-    tp=typeParameters()
-    { res=new InstantiateExp(res,tp); }
   |
     res=callExp(res)
   )*
@@ -1048,18 +1026,16 @@ Expression computedExp(Expression prefix):
 FunExp funExp():
 {
   List formals;
-  List tp;
   Constraint cst;
   List body;
 }
 {
   "fun" 
-  tp=typeConstructors()
   cst=constraint()
   "(" formals=monoSymbols() ")"
   "=>"
   "{" body=statements() "}"
-  { return new FunExp(tp,cst,formals,body); }
+  { return new FunExp(cst,formals,body); }
 }
 
 Expression expression1():
@@ -1156,12 +1132,12 @@ AffectationStmt affectation(Expression left):
 
 LocalDeclarationStmt localDeclaration():
 {
-  Type t;
+  Polytype t;
   LocatedString id;
   Expression e=null;
 }
 {
-  t=type()
+  t=polytype()
   id=string()
   [ "=" e=expression() ]
   { return new LocalDeclarationStmt(id,t,e,false); }
@@ -1214,8 +1190,7 @@ Statement whileStmt():
     return new ExpressionStmt(CallExp.create
 			      (symb("_while",whiletoken),
 			       lazyExp(test),
-			       new FunExp(new ArrayList(0),
-					  Constraint.True(),
+			       new FunExp(Constraint.True(),
 					  new ArrayList(0),
 					  stmts)));
   }
@@ -1240,7 +1215,7 @@ Statement statement():
 |
   res=whileStmt()
 |  
-  LOOKAHEAD(type() string())
+  LOOKAHEAD(polytype() string())
   res=localDeclaration() ";" 
 | 
   (

@@ -12,10 +12,10 @@
 
 // File    : stdlib.bossa
 // Created : Thu Jul 08 16:20:19 1999 by bonniot
-//$Modified: Wed Oct 13 15:21:42 1999 by bonniot $
+//$Modified: Mon Oct 25 14:27:21 1999 by bonniot $
 // Description : Prolog file, included before all bossa file
 
-variable {Any T} T null;
+variable <Any T> T null;
 
 final class void {}
 
@@ -43,7 +43,7 @@ and(b1,b2)             = true;
 // "if(cond) t else e endif" 
 // is rewritten *by the parser* into asbtract syntax for 
 // "_if(cond,fun()=>{return t;},fun()=>{return e;})"
-T _if { Any T } (Boolean,fun()(T),fun()(T));
+T _if <Any T> (Boolean,fun()(T),fun()(T));
 
 _if(cond@True,t,e) = t();
 
@@ -67,15 +67,15 @@ _while(test,body)
 //It is a type class !
 interface Comparable;
 
-Boolean equals{/*Comparable*/ Any T}(T,T);
+Boolean equals</*Comparable*/ Any T>(T,T);
 
 // Numeric
 interface Num extends Comparable;
-N add {Num N} (N,N);
-T sub {Num T} (T,T);
+N add <Num N> (N,N);
+T sub <Num T> (T,T);
 
 interface Ordinal;
-T succ {Ordinal T} (T);
+T succ <Ordinal T> (T);
 
 class Float implements Num {}
 class Integer extends Float 
@@ -107,24 +107,24 @@ String concat(String,String);
 class Array<T>{}
 
 T 
-get<T>(Array<T>, Integer);
+get<Any T>(Array<T>, Integer);
 
 void 
-set<T>(Array<T>, Integer, T);
+set<Any T>(Array<T>, Integer, T);
 
 Integer
-capacity<T>(Array<T>);
+capacity<Any T>(Array<T>);
 
 void
-resize<R>(Array<R>, Integer);
+resize<Any R>(Array<R>, Integer);
 
 // List
 interface Container<T>;
 interface List<T> extends Container;
 
-list<B> map<A,B>{List list}(fun(A)(B),list<A>);
-T fold_left{Any T, Any U, List list}(fun(T,U)(T),T,list<U>);
-U fold_right{Any T, Any U, List list}(fun(T,U)(U),list<T>);
+list<B> map <Any A, Any B, List list>(fun(A)(B),list<A>);
+T fold_left <Any T, Any U, List list>(fun(T,U)(T),T,list<U>);
+U fold_right<Any T, Any U, List list>(fun(T,U)(U),list<T>);
 
 // Main function, called with command line arguments in an array
 Integer main(Array<String>);

@@ -12,7 +12,7 @@
 
 // File    : VarSymbol.java
 // Created : Wed Jul 07 16:56:06 1999 by bonniot
-//$Modified: Wed Oct 13 18:12:25 1999 by bonniot $
+//$Modified: Mon Oct 25 12:38:53 1999 by bonniot $
 // Description : A variable (local, field, parameter)
 
 package bossa.syntax;
@@ -39,7 +39,7 @@ abstract class VarSymbol extends Node
     return true;
   }
 
-  abstract Type getType();
+  abstract Polytype getType();
 
   /**
    * Maps getType over a collection of VarSymbols

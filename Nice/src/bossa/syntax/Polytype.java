@@ -12,7 +12,7 @@
 
 // File    : Polytype.java
 // Created : Tue Jul 13 12:51:38 1999 by bonniot
-//$Modified: Thu Sep 02 17:16:36 1999 by bonniot $
+//$Modified: Mon Oct 25 15:06:13 1999 by bonniot $
 
 package bossa.syntax;
 
@@ -20,12 +20,13 @@ import java.util.*;
 import bossa.util.*;
 
 /**
- * A type with a constraint
+ * A constrained monotype
  */
-public class Polytype extends Type
+public class Polytype extends Node
 {
   public Polytype(Constraint cst, Monotype monotype)
   {
+    super(Node.down);
     this.constraint=cst;
     this.monotype=monotype;
     addChild(cst);
@@ -37,11 +38,6 @@ public class Polytype extends Type
     this(Constraint.True(),monotype);
   }
 
-  boolean allImperative(List symbols)
-  {
-    return monotype.allImperative(symbols);
-  }
-  
   static Polytype bottom()
   {
     MonotypeVar alpha=Monotype.fresh(new LocatedString("alpha",
@@ -69,7 +65,7 @@ public class Polytype extends Type
     return res;
   }
   
-  public Type cloneType()
+  public Polytype cloneType()
   {
     //Optimization
     if(!constraint.hasBinders())
@@ -98,6 +94,24 @@ public class Polytype extends Type
     return constraint;
   }
 
+  static Collection getConstraint(Collection c)
+  {
+    Collection res=new ArrayList(c.size());
+    for(Iterator i=c.iterator();
+	i.hasNext();)
+      res.add(((Polytype)i.next()).getConstraint());
+    return res;
+  }
+  
+  static Collection getMonotype(Collection c)
+  {
+    Collection res=new ArrayList(c.size());
+    for(Iterator i=c.iterator();
+	i.hasNext();)
+      res.add(((Polytype)i.next()).getMonotype());
+    return res;
+  }
+  
   public Monotype getMonotype()
   {
     return monotype;

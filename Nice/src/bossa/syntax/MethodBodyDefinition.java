@@ -12,7 +12,7 @@
 
 // File    : MethodBodyDefinition.java
 // Created : Thu Jul 01 18:12:46 1999 by bonniot
-//$Modified: Wed Oct 13 14:03:07 1999 by bonniot $
+//$Modified: Mon Oct 25 14:20:33 1999 by bonniot $
 
 package bossa.syntax;
 
@@ -27,13 +27,11 @@ public class MethodBodyDefinition extends Node
   implements Definition, Located
 {
   public MethodBodyDefinition(LocatedString name, 
-			      Collection typeParameters,
 			      Collection binders,
 			      List formals, List body)
   {
     super(Node.down);
     this.name=name;
-    this.typeParameters=typeParameters;
     this.binders=binders; 
     this.formals=formals;
     this.body=new Block(body);
@@ -159,19 +157,7 @@ public class MethodBodyDefinition extends Node
     User.error(!(s instanceof MethodDefinition),this,name+" is not a method");
     setDefinition((MethodDefinition)s);
 
-    // Get imperative type parameters
-    if(typeParameters.size()>0)
-      try{
-	addTypeMaps
-	  (TypeConstructor.toLocatedString(typeParameters),
-	   definition.type.getTypeParameters());
-      }
-      catch(BadSizeEx e){
-	User.error(name,"Method \""+name+"\" expects "+e.expected+
-		   " imperative type parameters");
-      }
-
-    // Get functional type parameters
+    // Get type parameters
     if(binders!=null)
     try{
       addTypeMaps
@@ -180,7 +166,7 @@ public class MethodBodyDefinition extends Node
     }
     catch(BadSizeEx e){
       User.error(name,"Method \""+name+"\" expects "+e.expected+
-		 " functional type parameters");
+		 " type parameters");
     }
 
     Scopes res=super.buildScope(outer,typeOuter);
@@ -236,7 +222,7 @@ public class MethodBodyDefinition extends Node
   void endTypecheck()
   {
     try{
-      Type t=body.getType();
+      Polytype t=body.getType();
       if(t==null)
 	User.error(this,"Last statement of body should be \"return\"");
       Typing.leq(t,new Polytype(definition.type.codomain()));
@@ -281,7 +267,6 @@ public class MethodBodyDefinition extends Node
   protected LocatedString name;
   protected Collection /* of FieldSymbol */  parameters;
   protected List       /* of Patterns */   formals;
-  protected Collection /* of TypeConstructor */ typeParameters;
-  Collection /* of LocatedString */ binders; // Null if functional type parameters are not bound
+  Collection /* of LocatedString */ binders; // Null if type parameters are not bound
   private Block body;
 }

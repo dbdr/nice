@@ -12,7 +12,7 @@
 
 // File    : CallExp.java
 // Created : Mon Jul 05 16:27:27 1999 by bonniot
-//$Modified: Thu Sep 30 18:02:39 1999 by bonniot $
+//$Modified: Mon Oct 25 13:12:15 1999 by bonniot $
 
 package bossa.syntax;
 
@@ -58,7 +58,7 @@ public class CallExp extends Expression
 			   List /* of Type */ parameters)
   {
     try{
-      Type t=getType(fun,parameters);
+      Polytype t=getType(fun,parameters);
       if(t==null) return false;
     }
     catch(ReportErrorEx e){
@@ -73,7 +73,7 @@ public class CallExp extends Expression
     return true;
   }
   
-  static Type getTypeAndReportErrors(Location loc,
+  static Polytype getTypeAndReportErrors(Location loc,
 				     Expression fun,
 				     List /* of Expression */ parameters)
   {
@@ -106,11 +106,11 @@ public class CallExp extends Expression
     ReportErrorEx(String msg) { super(msg); }
   }
   
-  private static Type getType(Expression fun,
-			      List /* of Type */ parameters)
+  private static Polytype getType(Expression fun,
+			      List /* of Polytype */ parameters)
     throws TypingEx,BadSizeEx,ReportErrorEx
   {
-    Type funt=fun.getType();
+    Polytype funt=fun.getType();
 
     Collection dom=funt.domain();
     Monotype codom=funt.codomain();
@@ -144,21 +144,21 @@ public class CallExp extends Expression
     Typing.leave();
 
     //computes the resulting type
-    Constraint cst=funt.getConstraint().and(Type.getConstraint(parameters));
-    cst.and(MonotypeLeqCst.constraint(Type.getMonotype(parameters),dom));
+    Constraint cst=funt.getConstraint().and(Polytype.getConstraint(parameters));
+    cst.and(MonotypeLeqCst.constraint(Polytype.getMonotype(parameters),dom));
     return new Polytype(cst,codom);
   }
   
   void computeType()
   {
-    fun=fun.resolveOverloading(Expression.getType(parameters),null);
+    fun=fun.resolveOverloading(Expression.getType(parameters));
     type=getTypeAndReportErrors(location(),fun,parameters);
   }
 
   boolean isAssignable()
   {
     //TODO: decide where to resolve overloading, and do it just once
-    fun=fun.resolveOverloading(Expression.getType(parameters),null);
+    fun=fun.resolveOverloading(Expression.getType(parameters));
     return fun.isFieldAccess();
   }
   

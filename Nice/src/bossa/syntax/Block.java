@@ -12,7 +12,7 @@
 
 // File    : Block.java
 // Created : Wed Jul 07 17:42:15 1999 by bonniot
-//$Modified: Fri Aug 27 17:17:20 1999 by bonniot $
+//$Modified: Mon Oct 25 13:00:15 1999 by bonniot $
 // Description : A block : a list of statements with local variables
 
 package bossa.syntax;
@@ -49,7 +49,7 @@ public class Block extends Statement
    * Type checking
    ****************************************************************/
 
-  Type getType()
+  Polytype getType()
   {
     if(statements.size()>0)
       {

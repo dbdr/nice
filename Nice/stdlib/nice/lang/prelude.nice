@@ -60,14 +60,14 @@ final class void = native;
 
 class Number implements Comparable = native java.lang.Number;
 class double extends Number = native;
-class float extends double = native;
+class float  extends double = native;
 
-class long extends float = native;
-class int extends long = native;
-class short extends int = native;
-class byte extends short = native;
+class long   extends float  = native;
+class int    extends long   = native;
+class short  extends int    = native;
+class byte   extends short  = native;
 
-class char extends int = native;
+class char   extends int    = native;
 
 double doubleValue(Number) = native double Number.doubleValue();
 

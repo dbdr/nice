@@ -52,7 +52,7 @@ implements Function
     super(name, constraint, returnType, parameters);
 
     this.body = body;
-    this.voidReturn = returnType.toString().equals("nice.lang.void");
+    this.voidReturn = returnType.toString().equals("void");
   }
 
   /** Can be null if this funtion is taken from an interface file. */
@@ -74,7 +74,7 @@ implements Function
       }
     
     if(body != null)
-      body = dispatch.analyse$0(body, scope, typeScope, voidReturn);
+      body = dispatch.analyse$0(body, scope, typeScope, !voidReturn);
   }
 
   private void buildParameterSymbols()

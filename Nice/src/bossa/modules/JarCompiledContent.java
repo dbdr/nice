@@ -46,8 +46,8 @@ class JarCompiledContent extends CompiledContent
     return new JarCompiledContent
       (pkg, jar, itfEntry, bytecodeEntry, dispatchEntry);
   }
-  
-  JarCompiledContent(Package pkg, JarFile jar, JarEntry itfEntry, 
+
+  JarCompiledContent(Package pkg, JarFile jar, JarEntry itfEntry,
 		     JarEntry bytecodeEntry, JarEntry dispatchEntry)
   {
     this.pkg = pkg;
@@ -57,9 +57,18 @@ class JarCompiledContent extends CompiledContent
     this.bytecodeEntry = bytecodeEntry;
     this.dispatchEntry = dispatchEntry;
 
-    this.lastCompilation = 
+    this.lastCompilation =
       Math.min(itfEntry.getTime(),
-	       Math.min(bytecodeEntry.getTime(), dispatchEntry.getTime()));
+      Math.min(bytecodeEntry.getTime(),
+               dispatchEntry.getTime()));
+
+    /* Use the date of creation of the jar file if it is later.
+       The package might have been compiled earlier, but we probably did
+       not get to see it before it was put into this jar.
+       This is in particular the case if the jar is an upgraded library.
+    */
+    this.lastCompilation =
+      Math.max(new File(jar.getName()).lastModified(), this.lastCompilation);
   }
 
   Content.Unit[] getDefinitions()

@@ -166,7 +166,7 @@ public final class Dispatch
     boolean[] isValue = new boolean[method.getArity()];
     List values = generateValues(sortedAlternatives, isValue);
     boolean hasValues = values.size() > 0;
-   
+    List errors = new ArrayList(3); 
     int nb_errors = 0;
     for(Iterator i = multitags.iterator(); i.hasNext();)
       {
@@ -182,20 +182,21 @@ public final class Dispatch
 	      continue;
 	  }
 	
-	if (test(method, tags, sortedAlternatives, firstArg))
+	if (test(method, tags, sortedAlternatives, firstArg, errors))
 	{
 	  if (++nb_errors > 3)
 	    break;
         }
 	else if (hasValues && 
-	      testValues(method, tags, values, isValue, sortedAlternatives) )
+	      testValues(method, tags, values, isValue, sortedAlternatives, errors) )
 	  if (++nb_errors > 0)
 	    break;
 
       }
     if (nb_errors > 0)
       User.error(method, "The implementation test failed for method " + 
-		 method.getName());
+		 method.toString() + ":\n" + 
+		 Util.map("", "\n", "", errors));
   }
 
   private static ClassType classTypeOfNiceClass(TypeConstructor tc)
@@ -220,7 +221,8 @@ public final class Dispatch
   private static boolean test(MethodDeclaration method, 
 			      TypeConstructor[] tags, 
 			      final Stack sortedAlternatives,
-			      ClassType firstArg)
+			      ClassType firstArg,
+			      List errors)
   {
     boolean failed = false;
 
@@ -242,10 +244,7 @@ public final class Dispatch
 		   !a.containsTypeMatchingValue())
 	    {
 	      failed = true;
-	      User.warning
-		(method,
-		 "Ambiguity for method "+method+
-		 "\nFor parameters of type " + toString(tags)+
+	      errors.add("ambiguity for parameters of type " + toString(tags)+
 		 "\nboth\n" + first.printLocated() + 
 		 "\nand\n" + a.printLocated() + "\nmatch.");
 	    }
@@ -268,10 +267,7 @@ public final class Dispatch
 	    (method, "Method " + method + " is declared but never implemented:\n" +
 	     "no alternative matches " + toString(tags));
 	else
-	  User.warning(method,
-		       "Method " + method + " is not completely covered:\n" + 
-		       "no alternative matches " + 
-		       toString(tags));
+	  errors.add("no alternative matches " + toString(tags));
       }
     return failed;
   }
@@ -284,7 +280,8 @@ public final class Dispatch
      TypeConstructor[] tags,
      List valueCombis,
      boolean[] isValue, 
-     final Stack sortedAlternatives)
+     final Stack sortedAlternatives,
+     List errors)
   {
     boolean failed = false;
     List sortedTypeMatches = new ArrayList();
@@ -309,10 +306,7 @@ public final class Dispatch
 	  else if (!Alternative.less(first, a))
 	    {
 	      failed = true;
-	      User.warning
-		(method,
-		 "Ambiguity for method "+method+
-		 "\nFor parameters of type/value " + toString(tags, values, isValue)+
+	      errors.add("ambiguity for parameters of type/value " + toString(tags, values, isValue)+
 		 "\nboth\n" + first.printLocated() + 
 		 "\nand\n" + a.printLocated() + "\nmatch.");
               break outer;
@@ -321,10 +315,7 @@ public final class Dispatch
       if(first==null)
       {
 	failed = true;
-	User.warning(method,
-		       "Method " + method + " is not completely covered:\n" + 
-		       "no alternative matches " + 
-		       toString(tags, values, isValue));
+	errors.add("no alternative matches "+ toString(tags, values, isValue));
 	break;
       }
     }

@@ -429,7 +429,8 @@ public class Package implements mlsub.compilation.Module, Located, bossa.syntax.
 	if (e instanceof RuntimeException)
 	  throw (RuntimeException) e;
 	else
-	  User.error(this, "Error while writing archive", e);
+	  User.error(this, "Error while writing archive (" +
+		     e.getMessage() + ")", e);
       }
   }
   
@@ -465,13 +466,18 @@ public class Package implements mlsub.compilation.Module, Located, bossa.syntax.
   private static void writeRuntime(String runtimeJar, JarOutputStream jarStream)
   throws IOException
   {
-    if (runtimeJar == null)
+    JarFile runtime = null;
+    
+    if (runtimeJar != null)
+      try {
+	runtime = new JarFile(runtimeJar);
+      } catch(java.util.zip.ZipException e) {}
+
+    if (runtime == null)
       {
 	Internal.warning("Runtime was not found. The archive is not self-contained");
 	return;
       }
-      
-    JarFile runtime = new JarFile(runtimeJar);
 
     // add individual classes
     String[] classes = 

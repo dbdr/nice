@@ -97,3 +97,14 @@ let A->int x = A a => 1;
 class A {
   int x = 0;
 }
+
+/// PASS
+  /// Toplevel
+class A
+{
+  boolean foo;
+  // Initializer
+  { boolean b = false || foo; }
+}
+int foo() = 42;
+

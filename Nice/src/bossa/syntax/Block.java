@@ -117,9 +117,12 @@ public class Block extends Statement
     {
       this.value = value;
       if (constant)
-	this.left = new MonoSymbol(name,type) { 
-	    boolean isAssignable() { return false; }
-	  };
+	if (value == null)
+	  throw User.error(name, "A final variable cannot be uninitialized.");
+	else
+	  this.left = new MonoSymbol(name,type) { 
+	      boolean isAssignable() { return false; }
+	    };
       else
 	this.left = new LocalVariable.Symbol(name,type);
       this.last = this;

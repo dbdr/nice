@@ -1926,10 +1926,20 @@ Statement Statement() :
 }
 
 Statement LabeledStatement() :
-{ LocatedString label; Statement res; }
+{ LocatedString label; Statement res; boolean forLoop; }
 {
-  label=ident() ":" res=Statement()
-  { return new LabeledStmt(label, res); }
+  label=ident() ":" 
+  { forLoop = "for".equals(getToken(1).toString()); }
+  res=Statement()
+  { 
+    // Fix labeling of for loops:
+    // for(int i, ...) is parsed as a block defining a local variable i
+    // however we want the label to target the loop so that continue works
+    if (forLoop && !(res instanceof LoopStmt))
+      return new LabeledStmt(label, res, (LoopStmt) ((Block) res).last());
+    else
+      return new LabeledStmt(label, res); 
+  }
 }
 
 Statement Block() :

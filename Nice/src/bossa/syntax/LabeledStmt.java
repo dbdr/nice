@@ -27,12 +27,30 @@ public class LabeledStmt extends Statement
     this.statement = statement;
   }
 
+  /** @param loop the loop this label targets, if different from statement. */
+  public LabeledStmt(LocatedString label, Statement statement, LoopStmt loop)
+  {
+    this(label, statement);
+    this.loop = loop;
+  }
+
   private LocatedString label;
   private Statement statement;
+  private LoopStmt loop;
 
   public String name() { return label.toString(); }
   public LocatedString getLabel() { return label; }
   public Statement getStatement() { return statement; }
+
+  /** @return the loop targeted by this label, or null. */
+  LoopStmt getLoop() 
+  { 
+    if (loop != null) 
+      return loop; 
+    if (statement instanceof LoopStmt)
+      return (LoopStmt) statement;
+    return null;
+  }
 
   /****************************************************************
    * Code generation
@@ -42,6 +60,9 @@ public class LabeledStmt extends Statement
   
   public gnu.expr.Expression generateCode()
   {
+    if (statement == null)
+      return gnu.expr.QuoteExp.voidExp;
+
     gnu.expr.BlockExp res = block = new gnu.expr.BlockExp();
     block.setBody(statement.generateCode());
     block = null;

@@ -30,6 +30,11 @@ public class Block extends Statement
     this.statements = cutInBlocks(statements);
   }
 
+  public Statement last()
+  {
+    return statements[statements.length - 1];
+  }
+
   static abstract class LocalDeclaration extends Statement
   {
     abstract gnu.expr.Expression compile(gnu.expr.LetExp let);

@@ -517,8 +517,7 @@ analyse(c@ContinueStmt, info)
   else
     {
       LabeledStmt l = findLabel(notNull(c.label), info);
-      if (l.getStatement() instanceof bossa.syntax.LoopStmt)
-	c.loop = cast(l.getStatement());
+      c.loop = l.getLoop();
     }
   if (c.loop == null)
     throw error(c, "continue must only occur inside loops");

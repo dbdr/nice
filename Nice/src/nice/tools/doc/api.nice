@@ -53,5 +53,6 @@ void generate(Compilation compilation, String mainPackage, ?File outDirectory)
   }
   catch (bossa.modules.Exit e) {
     // There was an error. Stop working.
+    println("\nnicedoc generation stopped because of errors in the source code.");
   }
 }

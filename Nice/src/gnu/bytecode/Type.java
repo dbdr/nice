@@ -314,8 +314,18 @@ public abstract class Type {
       {
 	int end = sig.indexOf(';', offset[0]);
 	type = TypeVariable.lookup(sig.substring(offset[0], end));
+
+	/* This happens for F-bounded types. For instance
+	   java.util.Collections.reverse:
+	   <T:Ljava/lang/Object;:Ljava/lang/Comparable<TT;>;>(Ljava/util/List<TT;>;TT;)I
+	   
+	   Ignore for now. This give a smaller (less restrictive) type.
+
 	if (type == null)
-	  throw new Error("Could not look up " + sig.substring(offset[0], end));
+	  throw new Error("Could not look up " + 
+			  sig.substring(offset[0], end));
+	*/
+
 	offset[0] = end + 1;
 	return type;
       }

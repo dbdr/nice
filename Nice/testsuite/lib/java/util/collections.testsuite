@@ -9,3 +9,11 @@
   List<String> l = new LinkedList();
   l.add("AA");
   assert (l.contains("AA"));
+
+/// PASS
+  int nSize = 10;
+  ArrayList<int> L1 = new ArrayList(nSize);
+  for (int j = 1; j <= nSize; j++) L1.add(j);
+
+  Collections.reverse(L1);
+  assert L1[0] == nSize;

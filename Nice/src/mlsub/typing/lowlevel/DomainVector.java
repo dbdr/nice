@@ -45,19 +45,19 @@ final class DomainVector extends java.util.Vector {
   }
   public void reduce(int x, boolean unit, BitVector domain)
   throws LowlevelUnsatisfiable {
-    S.assert(S.a&& isValidSoft(x));
+    S.assume(S.a&& isValidSoft(x));
     Domain d = getDomain(x);
     d.reduce(unit, domain);
   }
   public void exclude(int x, BitVector domain)
   throws LowlevelUnsatisfiable {
-    S.assert(S.a&& isValidSoft(x));
+    S.assume(S.a&& isValidSoft(x));
     Domain d = getDomain(x);
     d.exclude(domain);
   }
 
   public void merge(int src, int dest) throws LowlevelUnsatisfiable {
-    S.assert(S.a&& isValidSoft(src));
+    S.assume(S.a&& isValidSoft(src));
     Domain srcDomain = getDomain(src);
     if (dest >= offset) {
       // don't forget unit !
@@ -65,7 +65,7 @@ final class DomainVector extends java.util.Vector {
     }
     else {
       // dest is rigid
-      S.assert(S.a&& srcDomain.get(dest),src+" merged with "+dest);
+      S.assume(S.a&& srcDomain.get(dest),src+" merged with "+dest);
     }
     clear(src);
   }
@@ -79,8 +79,8 @@ final class DomainVector extends java.util.Vector {
     }
   }
   public void move(int src, int dest) {
-    S.assert(S.a&& isValidSoft(src));
-    S.assert(S.a&& isGarbage(dest));
+    S.assume(S.a&& isValidSoft(src));
+    S.assume(S.a&& isGarbage(dest));
     setElementAt(getDomain(src), dest - offset);
     clear(src);
   }

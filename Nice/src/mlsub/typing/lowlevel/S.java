@@ -93,10 +93,10 @@ public class S {
     return (x == null ? "null" : Integer.toString(x.hashCode() % 10000));
   }
 
-  public static void assert(boolean cond) {
-    assert(cond, "");
+  public static void assume(boolean cond) {
+    assume(cond, "");
   }
-  public static void assert(boolean cond, Object message) {
+  public static void assume(boolean cond, Object message) {
     if (allowAssert && !cond) {
       S.panic("assertion failed: " + message);
     }

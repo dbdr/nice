@@ -196,7 +196,7 @@ public final class K0 {
   }
 
   private BitVector weakComponent(int x0) {
-    S.assert(S.a&& isValidIndex(x0));
+    S.assume(S.a&& isValidIndex(x0));
     BitVector component = new BitVector();
     BitVector toInclude = new BitVector();
     toInclude.set(x0);
@@ -378,7 +378,7 @@ public final class K0 {
   
   /***********************************************************************/
   private void setSize(int n) {
-    S.assert(S.a&& n >= m);
+    S.assume(S.a&& n >= m);
     this.n = n;
     C.setSize(n);
     Ct.setSize(n);
@@ -489,7 +489,7 @@ public final class K0 {
    * Add a new interface to the constraint and returns its ID
    **/
   public int newInterface() {
-    S.assert(S.a&& !hasBeenInitialized);
+    S.assume(S.a&& !hasBeenInitialized);
     int iid = nInterfaces();
     Interface iface = new Interface(this, iid);
     interfaces.addElement(iface);
@@ -504,7 +504,7 @@ public final class K0 {
    * Assume if1 and if2 are >=0 and < nInterfaces()
    **/
   public void subInterface(int iid1, int iid2) {
-    S.assert(S.a&& !hasBeenInitialized);
+    S.assume(S.a&& !hasBeenInitialized);
     getInterface(iid2).subInterfaces.set(iid1);
   }
 
@@ -512,7 +512,7 @@ public final class K0 {
    * Enter the initial assertion that x : iid
    **/
   public void initialImplements(int x, int iid) {
-    S.assert(S.a&& !hasBeenInitialized);
+    S.assume(S.a&& !hasBeenInitialized);
     getInterface(iid).implementors.set(x);
   }
 
@@ -521,7 +521,7 @@ public final class K0 {
    * This means that no node strictly x may implement iid
    **/
   public void initialAbstracts(int x, int iid) {
-    S.assert(S.a&& !hasBeenInitialized);
+    S.assume(S.a&& !hasBeenInitialized);
     getInterface(iid).abstractors.set(x);
   }
 
@@ -529,7 +529,7 @@ public final class K0 {
    * Enter the initial assertion that x <= y
    **/
   public void initialLeq(int x, int y) {
-    S.assert(S.a&& !hasBeenInitialized);
+    S.assume(S.a&& !hasBeenInitialized);
     C.set(x, y);
     Ct.set(y, x);
   }
@@ -541,7 +541,7 @@ public final class K0 {
   public void createInitialContext() 
     throws LowlevelUnsatisfiable
   {
-    S.assert(S.a&& !hasBeenInitialized);
+    S.assume(S.a&& !hasBeenInitialized);
     
     // put in R and Rt, the constraint saturated under
     // x < y and y < z => x < z
@@ -589,7 +589,7 @@ public final class K0 {
    * Assume x is a valid index and iid is a valid interface id
    **/
   public void indexImplements(int x, int iid) throws Unsatisfiable {
-    S.assert(S.a&& hasBeenInitialized);
+    S.assume(S.a&& hasBeenInitialized);
     if (LowlevelUnsatisfiable.refinedReports) {
       try {
         indexImplements0(x, iid);
@@ -637,7 +637,7 @@ public final class K0 {
    * Assume x1 and x2 are valid indexes.
    **/
   public void leq(int x1, int x2) throws Unsatisfiable {
-    S.assert(S.a&& hasBeenInitialized);
+    S.assume(S.a&& hasBeenInitialized);
     if (LowlevelUnsatisfiable.refinedReports) {
       try {
         leq0(x1, x2);
@@ -818,7 +818,7 @@ public final class K0 {
 
   public void reduceDomain(int x, boolean unit, BitVector set)
   throws LowlevelUnsatisfiable {
-    S.assert(S.a&& x >= -1);
+    S.assume(S.a&& x >= -1);
     if (x == -1) {
       if (!unit) {
         throw new LowlevelUnsatisfiable();
@@ -1154,7 +1154,7 @@ public final class K0 {
   // XXX: refine Unsatisfiable ??
   public void enumerate(LowlevelSolutionHandler handler)
   throws Unsatisfiable {
-    S.assert(S.a&& hasBeenInitialized);
+    S.assume(S.a&& hasBeenInitialized);
     prepareConstraint();
     domains.trimToSize();
     if (m == 0 || m == n) {
@@ -1173,7 +1173,7 @@ public final class K0 {
   // XXX: spec ??
   public void enumerate(BitVector observers,
 			LowlevelSolutionHandler handler) {
-    S.assert(S.a&& hasBeenInitialized);
+    S.assume(S.a&& hasBeenInitialized);
     try {
       prepareConstraint();
     } catch (Unsatisfiable e) {
@@ -1192,7 +1192,7 @@ public final class K0 {
   }
 
   public void satisfy() throws Unsatisfiable {
-    S.assert(S.a&& hasBeenInitialized);
+    S.assume(S.a&& hasBeenInitialized);
 
     if (m == 0 || m == n)
       return;
@@ -1280,7 +1280,7 @@ public final class K0 {
    * You must have called satisfy before
    **/
   public void rigidify() {
-    S.assert(S.a&& hasBeenInitialized);
+    S.assume(S.a&& hasBeenInitialized);
     R = (BitMatrix)C.clone();
     R.closure();
     Rt = (BitMatrix)Ct.clone();
@@ -1349,15 +1349,15 @@ public final class K0 {
   private Backup backup = null;
 
   public void mark() {
-    S.assert(S.a&& hasBeenInitialized);
+    S.assume(S.a&& hasBeenInitialized);
 
     backup = new Backup();
   }
 
   // backtrack to the situation the last time mark() has been called
   public void backtrack() {
-    S.assert(S.a&& hasBeenInitialized);
-    S.assert(S.a&& backup != null, "backtrack() without corresponding mark()");
+    S.assume(S.a&& hasBeenInitialized);
+    S.assume(S.a&& backup != null, "backtrack() without corresponding mark()");
 
     this.m = backup.savedM;
     this.R.setSize(m);
@@ -1486,7 +1486,7 @@ public final class K0 {
   private int weakMarkedSize = -1;
   private int weakMarkedM = -1;
   public void weakMark() {
-    S.assert(S.a&& weakMarkedSize == -1);
+    S.assume(S.a&& weakMarkedSize == -1);
     weakMarkedSize = n;
     weakMarkedM = m;
     if (debugK0) {
@@ -1494,7 +1494,7 @@ public final class K0 {
     }
   }
   public void weakBacktrack() {
-    S.assert(S.a&& weakMarkedSize >= 0);
+    S.assume(S.a&& weakMarkedSize >= 0);
     R.setSize(weakMarkedM);
     Rt.setSize(weakMarkedM);
     for (int iid = 0; iid < nInterfaces(); iid++) {
@@ -1531,7 +1531,7 @@ public final class K0 {
 
   // the size of the constraint when startSimplify() has been called
   public void startSimplify() {
-    S.assert(S.a&& hasBeenInitialized);
+    S.assume(S.a&& hasBeenInitialized);
     weakMark();
 
     // necessary ?
@@ -1539,7 +1539,7 @@ public final class K0 {
     negTagged.fill(n);
   }
   public void stopSimplify() {
-    S.assert(S.a&& hasBeenInitialized);
+    S.assume(S.a&& hasBeenInitialized);
     weakBacktrack();
   }
 
@@ -1568,7 +1568,7 @@ public final class K0 {
 
   // simplify all the variables introduced since last weakMark()
   public void simplify() {
-    S.assert(S.a&& hasBeenInitialized);
+    S.assume(S.a&& hasBeenInitialized);
 
     if (weakMarkedSize >= 0) {
       if (weakMarkedSize == n) {
@@ -1586,7 +1586,7 @@ public final class K0 {
     }
   }
   public void simplify(IndexSelector selector) {
-    S.assert(S.a&& hasBeenInitialized);
+    S.assume(S.a&& hasBeenInitialized);
     BitVector simplified = new BitVector(n);
     boolean empty = true;
     for (int i = 0; i < n; i++) {
@@ -1646,7 +1646,7 @@ public final class K0 {
           // now, we know that simplified.get(x) is true
           
           // can't simplify rigid variable of the initial context
-          S.assert(S.a&& x >= m0);
+          S.assume(S.a&& x >= m0);
           BitVector ux = R.getRow(x);
           if (ux != null) {
             for (int x0 = ux.getLowestSetBit();
@@ -1830,7 +1830,7 @@ public final class K0 {
           }
           if (posTagged(x) || negTagged(x)) {
             // sx can't be -1 because unit is not comparable with x
-            S.assert(S.a&& sx >= 0);
+            S.assume(S.a&& sx >= 0);
             // discard x by merging with sx
             if (S.debugSimpl) {
               System.err.println("Merge " + x + " and " + sx);
@@ -2029,7 +2029,7 @@ public final class K0 {
   } // end of inner class Simplify
 
   public void deleteAllSoft() {
-    S.assert(S.a&& hasBeenInitialized);
+    S.assume(S.a&& hasBeenInitialized);
     setSize(m);
     n = m;
   }
@@ -2061,8 +2061,8 @@ public final class K0 {
    * possibilities if this makes the constraint unsatisfiable
    **/
   private void solveOverloading(int what, int x, BitVector possibilities) {
-    S.assert(S.a&& hasBeenInitialized);
-    S.assert(S.a&& isValidIndex(x));
+    S.assume(S.a&& hasBeenInitialized);
+    S.assume(S.a&& isValidIndex(x));
     if (isRigid(x)) {
       if (what == OVERLOADING_CONSTRUCTOR) {
         // R.getRow(x) is Up(x)

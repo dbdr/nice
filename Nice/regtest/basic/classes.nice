@@ -77,7 +77,7 @@ test_classes()
   Point pt = new ColoredPoint(x:0,y:0,c:0);
   println(pt.toString());
 
-  new TestFieldInitializers();
+  let test = new TestFieldInitializers();
 }
 
 class TestFieldInitializers

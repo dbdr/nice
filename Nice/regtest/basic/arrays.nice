@@ -157,8 +157,8 @@ void test_literal_arrays()
   longarray([0]);
 
   // Calling native methods using arrays
-  new String(['S', 'z', 'i', 'a']);
-  new String(id(['S', 'z', 'i', 'a']));
+  let s1 = new String(['S', 'z', 'i', 'a']);
+  let s2 = new String(id(['S', 'z', 'i', 'a']));
 }
 
 // We test how functions on polymorphic arrays deal with native type components

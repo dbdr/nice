@@ -23,11 +23,11 @@ void main(String[] args)
   // Tests constructors call with discarded result
   // and access to symbols both with full qualified names and imported names.
   // The order was significant in a bug (false ambiguity).
-  new regtest.multipkg.AA();
-  new AA();
+  let aa1 = new regtest.multipkg.AA();
+  let aa2 = new AA();
 
-  new java.util.TreeSet();
-  new TreeSet();
+  let TreeSet<String> ts1 = new java.util.TreeSet();
+  let TreeSet<String> ts2 = new TreeSet();
 
   test_import();
 }

@@ -77,8 +77,14 @@ public final class TypeConstructors
   static boolean isInterface(TypeConstructor tc)
   {
     ClassDefinition def = ClassDefinition.get(tc);
-    return def instanceof ClassDefinition.Interface || 
-      def == null && ((gnu.bytecode.ClassType) Types.get(tc)).isInterface();
+    if (def instanceof ClassDefinition.Interface)
+      return true;
+
+    if (def != null)
+      return false;
+
+    gnu.bytecode.ClassType c = (gnu.bytecode.ClassType) Types.get(tc);
+    return c != null && c.isInterface();
   }
 
   static boolean isClass(TypeConstructor tc)

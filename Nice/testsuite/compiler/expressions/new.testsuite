@@ -1,2 +1,7 @@
 /// FAIL
 Object o = /*/// FAIL HERE */ java.lang.Object();
+
+/// FAIL
+  /// Toplevel
+class Param<T> {}
+<Param P, T> P<T> f() = /*/// FAIL HERE */ new P();

@@ -25,12 +25,11 @@ String printMan(Program prg)
 {
   StringBuffer res = new StringBuffer();
 
-  void appendSection(String section, ?String txt)
+  void appendSection(String section, ?String text)
   {
-    if (txt == null)
+    if (text == null)
       return;
 
-    String text = notNull(txt);
     res.append(".SH ").append(section).append('\n');
     res.append(text);
     if (text.length() > 0 && text[text.length() - 1] != '\n')

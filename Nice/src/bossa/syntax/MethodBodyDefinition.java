@@ -269,6 +269,19 @@ public class MethodBodyDefinition extends Definition
 
       }
 
+    outer: for(Iterator it = symbols.iterator(); it.hasNext();) {
+      MethodDeclaration m = ((MethodDeclaration.Symbol) it.next()).getDefinition();
+      if( m instanceof NiceMethod) {
+        FormalParameters params = m.formalParameters();
+	for (int i = params.hasThis() ? 1 : 0; i < formals.length; i++)
+          if (formals[i].atAny() && formals[i].name != null && params.getName(i) != null &&
+		!formals[i].name.toString().equals(params.getName(i).toString())) {
+	    it.remove();
+	    continue outer;
+          }
+      }
+    }
+
     if(symbols.size() == 1) 
       return (VarSymbol) symbols.get(0);
 

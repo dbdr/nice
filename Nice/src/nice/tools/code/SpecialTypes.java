@@ -53,9 +53,14 @@ public class SpecialTypes
     //Type.flushTypeChanges();
   }
 
+  /**
+     @return an array type containing the specificied elements,
+       or the array type with unknown elements (can be primitive)
+       if elements is null.
+  */
   static public Type array(Type elements)
   {
-    if (elements == Type.pointer_type)
+    if (elements == null)
       return SpecialArray.unknownTypeArray();
     
     return SpecialArray.create(elements);

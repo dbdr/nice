@@ -111,7 +111,7 @@ public final class Types
 	Monotype param = ((MonotypeConstructor) m).getTP()[0];
 
 	setBytecodeType(param);
-	Types.set(m, SpecialTypes.array(javaType(param)));
+	Types.set(m, SpecialTypes.array(javaTypeOrNull(param)));
       }
     else
       Types.set(tc, Types.get(rigidTC));
@@ -160,13 +160,32 @@ public final class Types
    */
   public static Type javaType(Monotype m)
   {
-    boolean maybe = isMaybe(m.equivalent());
-    Type res = rawJavaType(equivalent(m));
+    Type res = javaTypeOrNull(m);
+    if (res != null)
+      return res;
+    else
+      return Type.pointer_type;
+  }
 
+  /**
+     @return the java type of a monotype, or null when no precise type can
+     be given (for an unconstrained type parameter, for instance).
+
+     It is useful to distinguish the "no precise type" from the Object type,
+     in the case where Object is explicitely mentioned in the source,
+     because Object[] is Object[] in bytecode, while T[] is Object.
+  */
+  private static Type javaTypeOrNull(Monotype m)
+  {
+    Type res = rawJavaType(equivalent(m));
+    if (res == null)
+      return null;
+
+    boolean maybe = isMaybe(m.equivalent());
     if (maybe) 
       return equivalentObjectType(res);
     else
-      return res;
+      return res;    
   }
 
   private static Type rawJavaType(Monotype m)
@@ -182,13 +201,13 @@ public final class Types
       return gnu.expr.Compilation.typeProcedure;
 
     if (!(m instanceof MonotypeConstructor))
-      return gnu.bytecode.Type.pointer_type;
+      return null;
     
     MonotypeConstructor mc = (MonotypeConstructor) m;
     TypeConstructor tc = mc.getTC();
 
     if (tc == PrimitiveType.arrayTC)
-      return SpecialTypes.array(javaType(mc.getTP()[0]));
+      return SpecialTypes.array(javaTypeOrNull(mc.getTP()[0]));
     else
       return javaType(tc);
   }

@@ -37,3 +37,14 @@ class Item {}
 void heapsort(T[] ra) {
   ra[1] = ra[0];
 }
+
+/// PASS
+  // Check that Object[] is really compiled as an object array, not just Object
+  foo([object("1")]);
+  /// Toplevel
+void foo(Object[] oo)
+{
+  java.lang.Integer i = cast
+    (java.lang.Integer.class.getConstructor([String.class]).newInstance(oo));
+  assert i.intValue() == 1;
+}

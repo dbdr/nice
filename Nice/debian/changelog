@@ -8,6 +8,7 @@ nice (0.7.7) unstable; urgency=low
     types.
     Final fields are considered non-null.
   * Faster compilation for large projects with many classes.
+  * Bugfixes (anonymous functions inside functionals with constracts).
 
  --
 

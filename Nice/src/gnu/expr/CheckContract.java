@@ -54,6 +54,19 @@ public class CheckContract extends Expression
     code.endPostcondition();
   }
 
+  protected void walkChildren (ExpWalker walker)
+  {
+    walker.walkExps(pre);
+    if (walker.exitValue != null)
+      return;
+
+    body = body.walk(walker);
+    if (walker.exitValue != null)
+      return;
+
+    walker.walkExps(post);
+  }
+
   public void print (gnu.mapping.OutPort ps)
   {
     ps.print("(Check ...)");

@@ -1,0 +1,8 @@
+/// PASS
+/// COMMENT Checks that variables are normally captured
+  /// Toplevel
+  void f(int dummy) requires dummy > 0
+  {
+    int i = 0;
+    [].foreach(int j => i = j);
+  }

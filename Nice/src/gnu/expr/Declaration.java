@@ -153,8 +153,10 @@ public class Declaration
           {
             loadOwningObject(comp);
             code.emitSwap();
+            code.emitPutField(field);
           }
-	code.emitPutField(field);
+        else
+          code.emitPutStatic(field);          
       }
   }
 

@@ -91,12 +91,12 @@ class B extends A { int life = 42; }
       break;
     }
 
-/// FAIL bug
+/// FAIL
   B b = new B();
   if (b instanceof A)
     b = new A();
 
-/// FAIL bug
+/// FAIL
   Y y = new D();
   if (y instanceof X)
     y = new C();

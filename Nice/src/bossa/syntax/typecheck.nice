@@ -39,13 +39,14 @@ typecheck(e@AssignExp)
   // overloading resolution (when assigning to a field).
   if (! to.isAssignable())
     bossa.util.User.error(e, "" + to + " cannot be assigned a value");
+
+  let variable = localVariable(to);
   
   try{
     e.value = notNull(e.value).resolveOverloading(to.getType());
     checkAssignment(to.getType(), notNull(e.value));
   }
   catch(TypingEx t){
-    ?MonoSymbol variable = localVariable(to);
     if (variable != null) {
       let originalType = getOriginalType(variable);
       if (originalType != null)
@@ -77,6 +78,19 @@ typecheck(e@AssignExp)
     throw assignmentError(e, to.toString(), 
 			  to.getType().toString(), notNull(e.value));
   }
+
+  if (variable != null)
+    {
+      let originalType = getOriginalType(variable);
+      if (originalType != null)
+	try {
+	  checkAssignment(new mlsub.typing.Polytype(originalType), notNull(e.value));
+	} catch (TypingEx t) {
+	  throw assignmentError(e, to.toString(), 
+		to.getType().toString(), notNull(e.value));
+	}
+    }
+
 }
 
 boolean hasConditionalType(MonoSymbol v)

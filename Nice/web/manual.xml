@@ -4,6 +4,10 @@
 <!ENTITY nice "Nice">
 <!ENTITY java "Java">
 <!ENTITY NULL "<literal>null</literal>">
+<!ENTITY LT "<literal>&lt;</literal>">
+<!ENTITY GT "<literal>&gt;</literal>">
+<!ENTITY LBRACE "<literal>{</literal>">
+<!ENTITY RBRACE "<literal>}</literal>">
 ]>
 
 <book>
@@ -85,8 +89,41 @@
 
   </chapter>
 
-  <chapter><title>Packages</title>
+  <chapter id = "packages" ><title>Packages</title>
     <para>
+     A <firstterm>package</firstterm> is a group of related classes, functions,
+     methods, and variables. You can declare that all the code in a particular
+     <literal>.nice</literal> file belongs to a certain package with the 
+     declaration:
+    </para>
+    <para>
+      <literal>package</literal> package-name<literal>;</literal>
+    </para>
+    <para>
+     To make use of all the public entities from another Nice package,
+     use the <literal>import</literal> statement:
+    </para>
+    <para>
+      <literal>import</literal> package-name<literal>;</literal>
+    </para>
+    <para>
+      Note that this is somewhat different from Java packages.
+      In Java, a class can be used independantly of its declaring package.
+      In Nice methods can be declared outside classes, so importing
+      the whole package is important to know the methods available for a
+      given class.
+      This probably implies that Nice projects should be designed with
+      smaller, self-contained packages that Java projects.
+    </para>
+    <para>
+      Therefore, only whole packages can be imported.
+      It is not possible to import a single class.
+      Likewise, there is no need to 
+      include a <literal>.*</literal> after the package name as in Java. 
+      In fact, using <literal>.*</literal> indicates that you wish to import 
+      the contents of a Java package rather than a Nice package. 
+      See the section on <link linkend="importJava">Java imports</link> 
+      for details.
     </para>
   </chapter>
 
@@ -287,11 +324,12 @@ void main(String[] args)
 
       <para>
        <literal>[type-parameters] return-type 
-        function-name([parameters]) { body }</literal>
+        function-name([parameters]) &LBRACE; body &RBRACE;</literal>
       </para>
 
       <para>
-       Where parameters and type-parameters are optional. There is a also
+       Where <literal>[parameters]</literal> and 
+       <literal>[type-parameters]</literal> are optional. There is a also
        a special case for functions whose body consists of a single expression:
       </para>
 
@@ -323,7 +361,7 @@ copy(from: f1, to: f2);
 copy(to: f3, from: f4);</programlisting>
 	</example>
 	
-	Of course it is still possible to omit the names of the parameters,
+	It is of course still possible to omit the names of the parameters,
 	in which case the arguments must be given in the order of the 
 	declaration.
       </para>
@@ -349,6 +387,14 @@ copy(from: f1, to: f2, bufferSize: 4000);</programlisting>
 	listed after the required parameters. This is needed to allow 
 	calls that do not name the arguments and want to use the default
 	values for the optional parameters.
+      </para>
+      <para>
+       Note that the optional values of parameters can be based on other
+       parameters, for example:
+      </para>
+      <para>
+       <literal> T[] slice(T[] array, int from = 0, 
+       int to = array.length - 1);</literal>.
       </para>
     </section>
   </chapter>
@@ -378,7 +424,7 @@ copy(from: f1, to: f2, bufferSize: 4000);</programlisting>
       </para>
 
       <para>
-        method-name([arguments]) { body }
+        method-name([arguments]) &LBRACE; body &RBRACE;
       </para>
 
       <para>Like functions, there is another form for single expressions:</para>
@@ -435,6 +481,83 @@ numberOfWheels(mc@Motorcycle) = 2;
 
         </programlisting>
       </example>
+
+      <para id="exactMatching">
+       It is also possible to specialize a method on the 
+       <emphasis>exact</emphasis> type of the argument. Then the method will
+       apply to arguments which match the type exactly, and 
+       <emphasis>not</emphasis> to an argument which is a subtype of the type
+       specified. The syntax for exact matching is:
+      </para>
+      <para>
+       name<literal>#</literal>type
+      </para>
+      <para>     
+       When specializing a method with type parameters, it is not necessary 
+       or possible to restate the type parameters in the method implementation. 
+       However, if you need access to the type parameters as in the example
+       below, use the syntax:
+      </para>
+      <para>
+       <literal>method-name&LT;type-parameters&GT; (...) &LBRACE; body &RBRACE;
+       </literal>
+      </para>
+      <example>
+       <title>Using Type Parameters in Method Implementations</title>
+       <programlisting lang="nice"><![CDATA[
+
+//Method definition
+<T> T lastItem(Collection<T> coll);
+
+
+/*
+This version won't compile because the T type isn't in scope:
+
+lastItem(coll)
+{
+  Iterator<T> it = coll.iterator();
+  //...
+}
+*/
+
+/*
+This one won't compile because Iterator needs a type argument:
+
+lastItem(coll)
+{
+  Iterator it = coll.iterator();
+  //...
+}
+*/
+
+//This one will work correctly
+lastItem<T>(coll)
+{
+  Iterator<T> = coll.iterator();
+  //...
+}
+  
+]]>
+       </programlisting>
+      </example>
+        <para>
+         Note that it is not possible to dispatch a method call on an array 
+         type, nor to specialize a method on the subtype of a type parameter. 
+         This means that methods of the form:
+        </para>
+        <para>
+         <literal><![CDATA[foo(string@Collection<String>){}]]></literal>
+        </para>
+        <para>or</para>
+        <para>
+         <literal><![CDATA[foo(array@String[]){}]]></literal>
+        </para>
+        <para>
+         are not valid. You should use respectively the specializers
+	 <literal>@Collection</literal> and 
+	 <literal>@Array</literal> instead.
+        </para>        
+       
     </section>
     <section><title>Optional parameters</title>
       <para>
@@ -476,7 +599,7 @@ numberOfWheels(mc@Motorcycle) = 2;
 	It is guaranteed that <literal>isEmpty</literal> returns true
 	if, and only if, <literal>size</literal> returns <literal>0</literal>.
 	The <literal>add</literal> method can be called only when the buffer
-	is not full. It is guarantedd to make the buffer non-empty, and
+	is not full. It is guaranteed to make the buffer non-empty, and
 	to increase the size by one.
 
 	<example>
@@ -491,7 +614,7 @@ interface Buffer<Elem>
 
   void add(Elem element)
     requires
-         ! isfull() : "not full"         // A comma here is optional
+         !isfull() : "not full"          // A comma here is optional
     ensures
          !isEmpty() : "not empty",       // Note the comma
          size() == old(size()) + 1 : "count inc";
@@ -532,6 +655,18 @@ interface Buffer<Elem>
   </chapter>
 
   <chapter><title>Statements</title>
+    <section id="packageVars"><title>Package variables</title>
+     <para>
+      Since Nice uses <link linkend="packages">packages</link> as its largest
+      conceptual unit, variable declarations may appear outside class
+      definitions, and are useful in the same way that static variables in
+      Java are. Here is the syntax:
+     </para>
+     <para>
+      <literal>var</literal> type-name variable-name [= initializer]
+      <literal>;</literal>
+     </para>
+    </section>
     <section id="localFunctions"><title>Local functions</title>
       <para>
 	Local functions are similar to toplevel functions, 
@@ -620,9 +755,58 @@ void main(String[] args)
 
     </section>
 
-    <section><title>Anonymous functions</title>
+    <section id="anonymousFunctions"><title>Anonymous functions</title>
       <para>
+       Since Nice allows functions and methods to be passed as arguments, and
+       returned as results, it is convenient to allow small anonymous functions
+       to be defined at the same point in the program in which they are used,
+       similar to the use of anonymous classes in Java.       
       </para>
+      <para>
+       The syntax of anonymous functions is:
+      </para>
+      <para>
+       ([parameters]) <literal>=></literal> &LBRACE; body &RBRACE;
+      </para>
+      <para>
+       As with the other functionals, there is also a single-expression format:
+      </para>
+      <para>
+       ([parameters]) <literal>=></literal> expression
+      </para>
+      <para>
+       The brackets around the parameters are optional if there is only one
+       parameter.
+      </para>
+      <para>
+       The return type of an anonymous function is automatically determined by 
+       the compiler using a process called 
+       <firstterm>type inference</firstterm>, so it is not necessary or possible
+       to specify it.
+      </para>
+<example>
+<title>Using Anonymous Functions</title>
+<programlisting lang="nice"><![CDATA[
+String concat(Collection<String> strings) 
+{
+    StringBuffer buff = new StringBuffer();
+    strings.foreach(String s =>  {
+        buff.append(s);
+    });
+    return buff.toString()
+}
+
+var String[] numberStrings = [1,2,3,4,5].map(int num => String.valueOf(num));
+
+//Another way of defining "concat"
+String concat2(Collection<String> strings)
+{
+  return strings.foldLeft((String accum, String s) => accum + s, "");
+}
+
+
+]]></programlisting>
+</example>
     </section>
 
     <section id="conversion"><title>Conversion between primitive types</title>
@@ -813,7 +997,7 @@ String getName(MyJavaClass) = native String MyJavaClass.getName();</programlisti
       <example><title>Using Nice from Java</title>
 	<para>
 	Let's see an example that illustrates all these features.
-	Suppose you Nice library looks like this:
+	Suppose your Nice library looks like this:
 	<programlisting lang="nice">
 package my.nice.pkg;
 
@@ -894,13 +1078,6 @@ public class Main
     </para>
 
     <section id="optionTypes"><title>Option types</title>
-<!--
-      <para>
-        See 
-	<ulink url="http://nice.sourceforge.net/cgi-bin/view/Doc/OptionType">
-	the Wiki site page about option types</ulink>.
-      </para>
--->
       <para>
         Nice (unlike Java) makes a distinction between a type that may be &NULL;, 
         and one that may not be. So, if you want to allow &NULL; 
@@ -946,9 +1123,122 @@ public class Main
         thinking about the problem in a Java way rather than a Nice way,
         but sometimes <literal>cast</literal> is the only way.
       </para>
+
+      <para>
+        For more details, see 
+	<ulink url="http://nice.sourceforge.net/cgi-bin/twiki/view/Doc/OptionType">
+	the Wiki page about option types</ulink>.
+      </para>
+
+      <para>
+       There is related type, which is prefixed with an exclamation point
+       (<literal>!</literal>). This is used to specify a non-&NULL; type
+       when it is not known if the original type allowed &NULL; or not. This
+       generally happens with parameterized types, for instance the type
+      </para>
+      <para>
+       <type><![CDATA[<T> T myFunction(Collection<T>)]]></type>
+      </para>
+      <para>
+       can be
+       instantiated at <emphasis>any</emphasis> type, including option types
+       like <type>?String</type>. If it is necessary to exclude option types
+       from the domain of T, the type is specified this way:
+      </para>
+      <para>
+       <type><![CDATA[<!T> !T myFunction(Collection<!T>)]]></type>.
+      </para>
       </section>
+      <section id = "typeParameters"><title>Type Parameters</title>
+        <para>
+          Classes, functions, and methods can all be parameterized with type
+          variables in Nice as is demonstrated in each of their respective
+          chapters. In addition to the ability to introduce type variables,
+          Nice provides the ability to constrain those types in certain ways.
+          <link linkend="optionTypes">Option types</link> are one such constraint.
+        </para>
+        <para>
+          Simple type parameters of the form
+        </para>
+        <para>
+          <type>&LT;type-variable[, type-variable...]&GT;</type>
+        </para>
+        <para>
+          are commonly encountered in Nice, but are a simplified form of a more
+          general syntax. <type>&lt;T&gt;</type> is actually shorthand for
+          <type>&lt;Any T&gt;</type>, which says that <type>T</type> may be any 
+          type at all. It is possible to constrain <type>T</type> so that it 
+          must be a subtype of some other type. This example shows that
+          <literal>filter</literal> may be implemented for any type 
+          <type>T</type>, but <type>C</type> must be a subclass of Collection.
+        </para>
+        <para>
+          <literal>
+<![CDATA[<Collection C, Any T> C<T> filter(C<T>, T->boolean);]]>
+          </literal>
+        </para>
+        <para>
+          It's also possible to enforce some relation among the type parameters,
+          such that one must be a subtype of the other, as in this example from
+          the standard library, which can be read as "Any T and U, so long as U
+          is a subtype of T".
+        </para>
+        <para>
+          <literal>
+<![CDATA[<Any T, Any U | U <: T> U[] fill(T[] array, int->U value)]]>
+          </literal>
+        </para>
+        <para>
+         Note the notation <literal>&lt;T | T &lt;: SomeType &gt;</literal> means the
+         same thing as <literal>&lt;SomeType T&gt;</literal>.
+        </para>
+        <para>
+          There is also a notation for the same class as the declaring class
+	  of a method: <type>alike</type>.
+	  For instance, the following class <literal>Foo</literal> declares
+	   a method <literal>copy</literal>, such that 
+	   <literal>x.copy()</literal>
+	  has the same type as <literal>x</literal>, <literal>x</literal> 
+	  being of any subclass of <literal>Foo</literal>.
+        </para>
+        <para>
+	<example><title>A copy method with an exact type</title>
+	<programlisting lang="nice">
+class Foo
+{
+  String value;
+
+  alike copy();
+}
+
+copy(f#Foo) = new Foo(value: f.value);
+
+class Bar extends Foo
+{
+  int id;
+}
+
+copy(b@Bar) = new Bar(value: b.value, id: generateNewId());
+}</programlisting>
+        </example>
+	</para>
+        <para>
+          Note that <link linkend="exactMatching">exact matching</link>
+	  is required to implement the
+	  <literal>copy</literal> method.
+        </para>
+      </section>
+ <!--
+      <section id = "abstractInterfaces">
+        <title>Abstract Interfaces</title>
+        <para>
+          TODO: Link to Daniel's paper, explain.
+        </para>
+      </section>      
+ -->
 
   </chapter>
+  
 
 </book>
 

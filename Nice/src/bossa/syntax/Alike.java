@@ -49,7 +49,8 @@ public class Alike extends Monotype
   Monotype substitute(Map map)
   {
     Object res = map.get(id);
-    if(res==null)
+
+    if (res == null)
       return this;
     else
       return new MonotypeConstructor

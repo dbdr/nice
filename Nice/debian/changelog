@@ -3,13 +3,18 @@ nice (0.5.4) unstable; urgency=low
   * Added short syntax for anonymous functions:
       int i => i+1          /* function of one argument */
       (int i, int j) => i+j /* function of several arguments */
-  * Fixed inference for possibly null variables in some complex cases.
+  * Renamed `iter` to `foreach`. `iter` is still accepted, 
+    but will probably be removed sometime in the future.
+    Together with the syntax change for anonymous functions,
+    this gives a nice and user-friendly syntax for iterations:
+    
+      names.foreach(String name => println(name));
+
   * Anonymous function cannot appear where a statement is expected 
     (some expressions can). This is good since an anonymous function which 
     is not called cannot have side-effects, and therefore this case was
     meaningless and probably buggy.
-  * Renamed `iter` to `foreach`. `iter` is still accepted, 
-    but will probably be removed sometime in the future.
+  * Fixed inference for possibly null variables in some complex cases.
   * Other bugfixes (valid error message when trying to implement a function).
 
  --

@@ -8,6 +8,9 @@ class Point
   String pToString();
 
   pToString() = "(x=" + this.x + ", y=" + this.y + ")";
+
+  int twoArgs(int x, int y);
+  twoArgs(x, y) = 0;
 }
 
 class ColoredPoint extends Point

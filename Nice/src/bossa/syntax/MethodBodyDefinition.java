@@ -71,7 +71,7 @@ public class MethodBodyDefinition extends Definition
     res[0] = new Pattern(THIS, new TypeIdent(container.getName()));
     int n = 1;
     for(Iterator f = formals.iterator(); f.hasNext(); n++)
-      res[n++] = (Pattern) f.next();
+      res[n] = (Pattern) f.next();
     return res;
   }
 

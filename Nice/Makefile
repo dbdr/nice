@@ -94,6 +94,7 @@ release-file:
          echo lcd ${CVSBUILDDIR}; echo put ${DEB} )\
         | ftp -n upload.sourceforge.net
 	echo "Redirect /Nice.tar http://prdownloads.sourceforge.net/nice/${TARFILE}" > web/.htaccess
+	echo "Redirect /nice.deb http://prdownloads.sourceforge.net/nice/${DEB}" >> web/.htaccess
 
 .PHONY: web
 web:

@@ -13,7 +13,6 @@
 package bossa.syntax;
 
 import bossa.util.*;
-import java.util.*;
 
 /**
    Call of an object constructor.

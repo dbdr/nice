@@ -44,7 +44,7 @@ public class VoidReturnStmt extends Statement
 
   mlsub.typing.Polytype returnType()
   {
-    return notNull(PrimitiveType.voidPolytype);
+    return PrimitiveType.voidPolytype;
   }
   
   generateCode()

@@ -85,9 +85,6 @@ public class LabeledStmt extends Statement
   
   generateCode()
   {
-//    if (statement == null)
-//      return notNull(gnu.expr.QuoteExp.voidExp);
-
     let res = block = new gnu.expr.BlockExp();
     notNull(block).setBody(statement.generateCode());
     block = null;

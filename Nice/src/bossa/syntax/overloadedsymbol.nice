@@ -419,9 +419,6 @@ public class OverloadedSymbolExp extends Expression
  */
 Expression createOverloadedSymbolExp(List<VarSymbol> symbols, LocatedString ident)
   {
-    if(symbols == null)
-      Internal.error("No symbols");
-    
     let res = new OverloadedSymbolExp(symbols: symbols, ident: ident);
     res.setLocation(ident.location());
     return res;
@@ -430,9 +427,6 @@ Expression createOverloadedSymbolExp(List<VarSymbol> symbols, LocatedString iden
 private Expression createOverloadedSymbolExp(List<VarSymbol> symbols, LocatedString ident, 
                               boolean noImplicitThis)
   {
-    if(symbols == null)
-      Internal.error("No symbols");
-    
     let res = new OverloadedSymbolExp(symbols: symbols, ident: ident, noImplicitThis: noImplicitThis);
     res.setLocation(ident.location());
     return res;

@@ -148,7 +148,7 @@ public Statement createBlock(List<Statement> statements)
     let res = new Block(statements: cast(null));
     let stmts = res.cutInBlocks(statements);
     res.statements = stmts;
-    if (stmts != null && stmts.length > 0 && stmts[0] != null)
+    if (stmts.length > 0)
       res.setLocation(stmts[0].location());
     return res;
 }

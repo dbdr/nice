@@ -272,7 +272,7 @@ analyse(AssignExp e, i)
   return e;
 }
 
-void analyseExps(?Expression[] exps, Info info)
+void analyseExps(Expression[] exps, Info info)
 {
   for (int i = 0; i < exps.length; i++)
     exps[i] = analyse(exps[i], info);
@@ -302,7 +302,7 @@ markAsCallFirstArg(IdentExp e)
 analyse(ExpLocalVariable e, info)
 {
   e.initValue = analyse(e.initValue, info);
-  setInitialized(notNull(notNull(e.variable).left), info, e.location());
+  setInitialized(e.variable.left, info, e.location());
   return e;
 }
 
@@ -357,7 +357,7 @@ analyse(CallExp e, info)
   boolean cannotReturn = e.isCallTo("throw") || 
     e.isCallTo("assert") && args.size() > 0 && args.getExp(0).isFalse();
 
-  markAsCallFun(notNull(e.function), e.infix);
+  markAsCallFun(e.function, e.infix);
   e.function = analyse(e.function, info);
   
   if (cannotReturn)
@@ -568,14 +568,14 @@ analyse(IncrementExp e, info)
 
 analyse(LiteralArrayExp e, info)
 {
-  analyseExps(cast(e.elements), info);
+  analyseExps(e.elements, info);
   return e;
 }
 
 analyse(NewArrayExp e, info)
 {
   e.resolveTC(info.typeMap);
-  analyseExps(cast(notNull(e.knownDimensions)), info);
+  analyseExps(e.knownDimensions, info);
   return e;
 }
 
@@ -666,7 +666,7 @@ analyse(TypeConstantExp e, info)
 
 analyse(TupleExp e, info)
 {
-  analyseExps(cast(notNull(e.expressions)), info);
+  analyseExps(e.expressions, info);
   return e;
 }
 
@@ -690,23 +690,23 @@ analyse(LocalVariable decl, info)
   else
     decl.setIndex(++info.varIndex);
 
-  info.addVar(notNull(decl.left));
+  info.addVar(decl.left);
 
-  if (info.localsOfCurrentLoop != null && notNull(decl.left).constant)
-    notNull(info.localsOfCurrentLoop).add(notNull(decl.left));
+  if (info.localsOfCurrentLoop != null && decl.left.constant)
+    notNull(info.localsOfCurrentLoop).add(decl.left);
 }
 
 analyse(LocalConstant decl, info)
 {
   decl.value = analyse(decl.value, info);
-  info.addVar(notNull(decl.left));
+  info.addVar(decl.left);
 }
 
 analyse(LocalFunction decl, info)
 {
-  notNull(decl.parameters).resolveCalledFromAnalyse(cast(info));
+  decl.parameters.resolveCalledFromAnalyse(cast(info));
 
-  info.addVar(notNull(decl.left));
+  info.addVar(decl.left);
   decl.value = analyse(decl.value, info);
 }
 
@@ -796,7 +796,7 @@ analyse(BreakStmt b, info)
 
 analyse(LabeledStmt s, info)
 {
-  mustNotFindLabel(notNull(s.getLabel()), info);
+  mustNotFindLabel(s.getLabel(), info);
   info.labels.push(s);
   analyse(s.getStatement(), info);
   info.labels.pop();
@@ -829,7 +829,7 @@ private void mustNotFindLabel(LocatedString label, Info info)
   
 analyse(BreakLabelStmt b, info)
 {
-  LabeledStmt target = b.statement = mustFindLabel(notNull(b.label), info);
+  LabeledStmt target = b.statement = mustFindLabel(b.label, info);
   ?LoopStmt loop = target.getLoop(); 
 
   if (loop != null)
@@ -883,7 +883,7 @@ analyse(TryStmt t, info)
   t.catches.foreach(ACatch c =>{
     info.otherCase();
     info.begin();
-    info.addVar(notNull(c.exnVar));
+    info.addVar(c.exnVar);
     c.t = notNull(c.tc).resolveToTC(info.typeMap);
     c.tc = null;
     analyse(c.body, info);

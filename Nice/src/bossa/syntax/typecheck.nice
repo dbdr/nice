@@ -39,7 +39,7 @@ typecheck(null(Expression)) {}
 
 typecheck(AssignExp e)
 {
-  Expression to = notNull(notNull(e.to).noOverloading());
+  Expression to = e.to.noOverloading();
   e.to = to;
   typecheck(to);
 
@@ -51,8 +51,8 @@ typecheck(AssignExp e)
   let variable = localVariable(to);
   
   try{
-    e.value = notNull(e.value).resolveOverloading(to.getType());
-    checkAssignment(to.getType(), notNull(e.value));
+    e.value = e.value.resolveOverloading(to.getType());
+    checkAssignment(to.getType(), e.value);
   }
   catch(TypingEx t){
     if (variable != null) {
@@ -60,7 +60,7 @@ typecheck(AssignExp e)
       if (originalType != null)
       try
         {
-	  checkAssignment(originalType, notNull(e.value));
+	  checkAssignment(originalType, e.value);
 
 	  // It is OK to assign the variable, considering it has the original 
 	  // type.
@@ -79,12 +79,12 @@ typecheck(AssignExp e)
     else
       toName = field.getName().toString();
 
-    reportNullAssignmentError(e, t, value: notNull(e.value), 
+    reportNullAssignmentError(e, t, value: e.value, 
 			      toName, 
 			      to.getType().getMonotype(), 
 			      field != null);
     throw assignmentError(e, to.toString(), 
-			  to.getType().toString(), notNull(e.value));
+			  to.getType().toString(), e.value);
   }
 
   if (variable != null)
@@ -92,16 +92,16 @@ typecheck(AssignExp e)
       let originalType = getOriginalType(variable);
       if (originalType != null)
 	try {
-	  checkAssignment(originalType, notNull(e.value));
+	  checkAssignment(originalType, e.value);
 	} catch (TypingEx t) {
 	  throw assignmentError(e, to.toString(), 
-		to.getType().toString(), notNull(e.value));
+		to.getType().toString(), e.value);
 	}
     }
 
 }
 
-void typecheckExps(?Expression[] exps)
+void typecheckExps(Expression[] exps)
 {
   for (int i = 0; i < exps.length; i++)
     typecheck(exps[i]);
@@ -507,9 +507,9 @@ void exitClosure()
 
 typecheck(IfExp e)
 {
-  Expression condition = notNull(e.condition);
-  Expression thenExp = notNull(e.thenExp);
-  Expression elseExp = notNull(e.elseExp);
+  Expression condition = e.condition;
+  Expression thenExp = e.thenExp;
+  Expression elseExp = e.elseExp;
 
   condition = condition.resolveOverloading(PrimitiveType.boolPolytype);
   checkBooleanCondition(condition);
@@ -538,7 +538,7 @@ typecheck(IfExp e)
         instanceofInThen.foreach( ((MonoSymbol variable, mlsub.typing.Monotype type)) =>
 	  setVarType(variable, now: type, otherBranch: variable.type));
 
-      e.thenExp = thenExp = notNull(thenExp.noOverloading());
+      e.thenExp = thenExp = thenExp.noOverloading();
       typecheck(thenExp);
       // since the type of the variable is destructively changed,
       // it is important to compute the branch's type and to store it now.
@@ -560,7 +560,7 @@ typecheck(IfExp e)
       instanceofInElse.foreach( ((MonoSymbol variable, mlsub.typing.Monotype type)) =>
 	setVarType(variable, now: type, out: variable.type));
 
-    e.elseExp = elseExp = notNull(elseExp.noOverloading());
+    e.elseExp = elseExp = elseExp.noOverloading();
     typecheck(elseExp);
     // since the type of the variable is destructively changed,
     // it is important to compute the branch's type and to store it now.
@@ -609,26 +609,26 @@ private void setVarType(MonoSymbol variable,
 typecheck(IncrementExp e)
 {
   try{
-    e.variable = notNull(e.variable).resolveOverloading(PrimitiveType.longPolytype);
-    checkAssignment(PrimitiveType.longType, notNull(e.variable));
+    e.variable = e.variable.resolveOverloading(PrimitiveType.longPolytype);
+    checkAssignment(PrimitiveType.longType, e.variable);
   }
   catch(TypingEx t){
     if (notNullError(t, e, String.valueOf(e.variable)))
       throw new bossa.util.UserError
       (e, 
-       notNull(e.description()) + " is only valid on integers.\n" + 
-       e.variable + " has type " + notNull(e.variable).getType());
+       e.description() + " is only valid on integers.\n" + 
+       e.variable + " has type " + e.variable.getType());
   }
 }
 
 typecheck(LiteralArrayExp e)
 {
-  typecheckExps(cast(e.elements));
+  typecheckExps(e.elements);
 }
 
 typecheck(NewArrayExp e)
 {
-  Expression[] knownDimensions = notNull(e.knownDimensions);
+  Expression[] knownDimensions = e.knownDimensions;
  
   for (int i=0; i<knownDimensions.length; i++)
     {
@@ -661,7 +661,7 @@ typecheck(StatementExp e)
 
 typecheck(TupleExp e)
 {
-  typecheckExps(cast(notNull(e.expressions)));
+  typecheckExps(e.expressions);
 }
 
 typecheck(SuperExp e)
@@ -677,13 +677,13 @@ typecheck(SuperExp e)
 typecheck(ExpLocalVariable e)
 {
   let decl = e.variable;
-  MonoSymbol target = notNull(decl.left);
+  MonoSymbol target = decl.left;
 
   if (! target.used)
     bossa.util.User.warning(decl, "Unused local variable " + target.name);
 
   ?mlsub.typing.Monotype type = target.getMonotype();
-  Expression value = notNull(e.initValue);
+  Expression value = e.initValue;
 
   if (type == null)
     {
@@ -732,12 +732,12 @@ typecheck(Block b)
   try {
     b.statements = rewrite(b.statements);
 
-    b.locals.foreach(?LocalDeclaration d => typecheck(d));
+    b.locals.foreach(LocalDeclaration d => typecheck(d));
     b.statements.foreach
-    (?Statement s => {
+    (Statement s => {
       try { typecheck(s); }
       catch (bossa.util.UserError ex)
-      { throw ensureLocated(ex, notNull(s)); }
+      { throw ensureLocated(ex, s); }
     });
   }
   finally {
@@ -747,7 +747,7 @@ typecheck(Block b)
 
 typecheck(LocalVariable decl)
 {
-  MonoSymbol target = notNull(decl.left());
+  MonoSymbol target = decl.left;
 
   if (! target.used)
     bossa.util.User.warning(decl, "Unused local variable " + target.name);
@@ -764,7 +764,7 @@ typecheck(LocalVariable decl)
       target.type = ensureMonomorphic(value.getType(), decl);
       if (target.type == PrimitiveType.byteType || 
           target.type == PrimitiveType.shortType)
-	target.type = notNull(PrimitiveType.intType);
+	target.type = PrimitiveType.intType;
 
       if (nice.tools.typing.Types.isVoid(target.type))
         throw error(decl, "A variable cannot have a void type");
@@ -790,16 +790,16 @@ typecheck(LocalVariable decl)
 
 typecheck(LocalConstant decl)
 {
-  if (! notNull(decl.left).used)
-    bossa.util.User.warning(decl, "Unused local variable " + notNull(decl.left).name);
+  if (! decl.left.used)
+    bossa.util.User.warning(decl, "Unused local variable " + decl.left.name);
 
   typecheck(decl.value);
   decl.value = notNull(decl.value).noOverloading();
   mlsub.typing.Polytype type = notNull(decl.value).getType();
 
-  notNull(decl.left).type = ensureMonomorphic(type, decl);
+  decl.left.type = ensureMonomorphic(type, decl);
 
-  if (nice.tools.typing.Types.isVoid(notNull(decl.left).type))
+  if (nice.tools.typing.Types.isVoid(decl.left.type))
      throw error(decl, "A variable cannot have a void type");
 
 }
@@ -882,14 +882,13 @@ typecheck(ReturnStmt r)
 
   ?mlsub.typing.Monotype expectedType = function.getExpectedType();
   if (expectedType == null)
-    r.value = notNull(r.value).noOverloading();
+    r.value = r.value.noOverloading();
   else
     {
       if (! r.fake && nice.tools.typing.Types.isVoid(expectedType))
 	throw bossa.util.User.error(r, "Cannot return a value here");
 	  
-      r.value = notNull(r.value).resolveOverloading
-	    (new mlsub.typing.Polytype(expectedType));
+      r.value = r.value.resolveOverloading(new mlsub.typing.Polytype(expectedType));
     }
 
   try { typecheck(r.value); }
@@ -901,7 +900,7 @@ typecheck(ReturnStmt r)
   }
   catch(Function.WrongReturnType e){
     if (notNullError(notNull(e.typingException), r, String.valueOf(r.value)))
-      wrongReturnType(r, notNull(r.returnType()).toString(), 
+      wrongReturnType(r, r.returnType().toString(), 
 		      valueOf(e.expectedReturnType), notNull(e.typingException));
   }
   catch(Function.IncompatibleReturnType e){
@@ -922,7 +921,7 @@ typecheck(VoidReturnStmt r)
       function.checkReturnedType(r.returnType());
   }
   catch(Function.WrongReturnType e){
-    wrongReturnType(r, notNull(r.returnType()).toString(), 
+    wrongReturnType(r, r.returnType().toString(), 
 		      valueOf(e.expectedReturnType), notNull(e.typingException));
   }
   catch(Function.IncompatibleReturnType e){
@@ -940,8 +939,8 @@ typecheck(TryStmt t)
 
 typecheck(SynchronizedStmt s)
 {
-  s.object = notNull(s.object).noOverloading();
-  mlsub.typing.Polytype type = notNull(s.object).getType();
+  s.object = s.object.noOverloading();
+  mlsub.typing.Polytype type = s.object.getType();
   if (nice.tools.typing.Types.isPrimitive(type))
     throw bossa.util.User.error(s.object, 
 		     "Synchronization cannot be done on primitive values");

@@ -59,12 +59,12 @@ public class LoopStmt extends Statement
     gnu.expr.Expression test, iteration, res;
 
     if (whileExp == null)
-      test = notNull(gnu.expr.QuoteExp.trueExp);
+      test = gnu.expr.QuoteExp.trueExp;
     else
       test = notNull(whileExp).generateCode();
     
     if (iterationStatements == null)
-      iteration = notNull(gnu.expr.QuoteExp.voidExp);
+      iteration = gnu.expr.QuoteExp.voidExp;
     else
       iteration = notNull(iterationStatements).generateCode();
 
@@ -76,7 +76,7 @@ public class LoopStmt extends Statement
     else
       res = notNull(code);
 
-    notNull(code).setBody(loopBody != null ? notNull(loopBody).generateCode() : null);
+    notNull(code).setBody(loopBody.generateCode());
 
     code = null;
     currentLoopBlock = savedBlock;
@@ -90,12 +90,10 @@ public class LoopStmt extends Statement
   toString()
   {
     if (!testFirst)
-      return "do {\n" + (loopBody == null ? " " : loopBody.toString()) +
-		"}\n while (" + whileExp + ");"; 
+      return "do {\n" + loopBody + "}\n while (" + whileExp + ");"; 
 
     if (iterationStatements == null)
-      return "while (" + whileExp + ")" +
-		(loopBody == null ? ";" : loopBody.toString());
+      return "while (" + whileExp + ")" + loopBody;
 
     Block itbl = cast(iterationStatements);
     Statement[] itStatements = itbl.statements;
@@ -107,8 +105,7 @@ public class LoopStmt extends Statement
 	if (i<itStatements.length-1) itStats += ", ";
       }
 
-    return "for(; " + whileExp + " ;" + itStats + ")\n " +
-	(loopBody == null ? "" : loopBody.toString());
+    return "for(; " + whileExp + " ;" + itStats + ")\n " + loopBody;
   }
 }
 

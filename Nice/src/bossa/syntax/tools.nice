@@ -210,9 +210,12 @@ boolean matchesValue(Pattern, ConstantExp) = native boolean Pattern.matchesValue
 
 mlsub.typing.Polytype boolPolytype() = native PrimitiveType.boolPolytype;
 mlsub.typing.Polytype longPolytype() = native PrimitiveType.longPolytype;
+mlsub.typing.Polytype voidPolytype() = native PrimitiveType.voidPolytype;
 mlsub.typing.Monotype boolType() = native PrimitiveType.boolType;
 mlsub.typing.Monotype intType() = native PrimitiveType.intType;
 mlsub.typing.Monotype longType() = native PrimitiveType.longType;
+gnu.expr.QuoteExp trueExp() = native gnu.expr.QuoteExp.trueExp;
+gnu.expr.QuoteExp voidExp() = native gnu.expr.QuoteExp.voidExp;
 
 // Local Variables:
 // nice-xprogram: "../bin/nicec -d ../classes"

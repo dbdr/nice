@@ -26,9 +26,6 @@ public class StatementExp extends Expression
 
   compile()
   {
-    if (statement == null)
-      return notNull(gnu.expr.QuoteExp.voidExp);
-
     return new gnu.expr.BeginExp(statement.generateCode(), gnu.expr.QuoteExp.voidExp);
   }
   

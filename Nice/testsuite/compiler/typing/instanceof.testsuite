@@ -90,3 +90,18 @@ class B extends A { int life = 42; }
       i = a.life;
       break;
     }
+
+/// FAIL bug
+  B b = new B();
+  if (b instanceof A)
+    b = new A();
+
+/// FAIL bug
+  Y y = new D();
+  if (y instanceof X)
+    y = new C();
+  /// Toplevel
+  interface X {}
+  interface Y {}
+  class C implements X {}
+  class D implements X,Y {}

@@ -1697,7 +1697,7 @@ Expression newExp():
   t="new" classe=typeConstructorIdent()
   ( 
     { Arguments arguments; }
-    arguments = arguments(false)
+    arguments = arguments()
     { e = bossa.syntax.fun.createNewExp(classe, arguments); 
       e.setLocation(makeLocation(t));
       return e;
@@ -2241,23 +2241,23 @@ Expression PrimarySuffix(Expression start) :
   t="[" res=Expression() {bracketArgs.add(new Argument(res));} 
     ( "," res=Expression() {bracketArgs.add(new Argument(res));} )*
   "]"
-  { return bossa.syntax.dispatch.createCallExp(symb("get",t,false),bossa.syntax.dispatch.createArguments(bracketArgs)); }
+  { return bossa.syntax.dispatch.createCallExp(symb("get",t,false),new Arguments(bracketArgs)); }
 |
   "." res=identExp()
   [ LOOKAHEAD(1) // a.f(x) is parsed as f(a, x), not as (f(a))(x)
-    args = arguments(true) ]
+    args = arguments() ]
   { 
     boolean hasBrackets = args != null;
 
     if (args == null)
-      args = new Arguments(new Argument[]{new Argument(start)});
+      args = bossa.syntax.dispatch.createArguments(new Argument[]{new Argument(start)});
     else
       args.addReceiver(start);
 
     return bossa.syntax.dispatch.createCallExp(res, args, true, hasBrackets); 
   }
 |
-  args = arguments(false)
+  args = arguments()
   { return bossa.syntax.dispatch.createCallExp(start, args); }
 }
 
@@ -2298,7 +2298,7 @@ Expression atExpression() :
 { Token t; }
 {
   (t="@")
-  { return bossa.syntax.dispatch.createCallExp(symb(t), new Arguments(new Argument[0])); }
+  { return bossa.syntax.dispatch.createCallExp(symb(t), bossa.syntax.dispatch.createArguments(new Argument[0])); }
 }
 
 ConstantExp patternLiteral() :
@@ -2350,20 +2350,19 @@ Argument argument():
   { return new Argument(e, id); }
 }
 
-Arguments arguments(boolean leaveRoomForReceiver):
+Arguments arguments():
 {
   List res = new ArrayList();
   Argument a;
 }
 {
   "("
-  { if (leaveRoomForReceiver) res.add(null); }
   [
     a = argument() { res.add(a); }
     ( "," a = argument() { res.add(a); } )*
   ]
   ")"
-  { return bossa.syntax.dispatch.createArguments(res); }
+  { return new Arguments(res); }
 }
 
 /*

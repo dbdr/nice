@@ -40,12 +40,12 @@ public Expression createAssignExp(Expression to, Expression value)
   // Rewrite "get(e, i, ...) = v" into "set(e, i, ... , v)"
   if (to instanceof CallExp && "get".equals(to.function.toString()))
     {
-      List<Argument> args = new ArrayList(to.arguments.arguments);
-      args.add(new Argument(value: value)); 
+      let args = new Arguments(arguments: new ArrayList(to.arguments.arguments));
+      args.add(value, null); 
 
       return new CallExp(
 	function: createIdentExp(new LocatedString("set", to.function.location())),
-        arguments: new Arguments(arguments: args.toArray()));
+        arguments: args);
     }  
 
   return new AssignExp(to: to, value: value);

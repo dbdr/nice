@@ -151,7 +151,7 @@ public class RetypedJavaMethod extends JavaMethod
     else
       javaArity = javaTypes.size();
 
-    if (javaTypes != null && javaArity != arity)
+    if (javaArity != arity)
       User.error(this,
 		 "Native method " + this.getSymbol().name + 
 		 " has not the same number of parameters " +

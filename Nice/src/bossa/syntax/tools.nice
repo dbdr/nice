@@ -192,6 +192,8 @@ Map<gnu.bytecode.Type,mlsub.typing.TypeConstructor> javaTypeConstructors(bossa.m
 mlsub.typing.AtomicConstraint[?] atoms(mlsub.typing.Constraint) = native mlsub.typing.AtomicConstraint[] mlsub.typing.Constraint.atoms();
 ?gnu.bytecode.Type Types_get(mlsub.typing.TypeConstructor) = native gnu.bytecode.Type nice.tools.code.Types.get(mlsub.typing.TypeConstructor);
 gnu.bytecode.ClassType Type_pointer_type() = native gnu.bytecode.Type.pointer_type;
+?mlsub.typing.TypeConstructor TypeConstructor_fromTypeSymbol(mlsub.typing.TypeSymbol) = native mlsub.typing.TypeConstructor mlsub.typing.TypeConstructor.fromTypeSymbol(mlsub.typing.TypeSymbol);
+?gnu.bytecode.Type TypeImport_lookup(String, ?Location) = native gnu.bytecode.Type nice.tools.code.TypeImport.lookup(String, Location);
 
 // Retypings needed since java types are not strict.
 mlsub.typing.Polytype boolPolytype() = native nice.tools.typing.PrimitiveType.boolPolytype;

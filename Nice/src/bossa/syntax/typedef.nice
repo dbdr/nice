@@ -12,23 +12,10 @@
 
 package bossa.syntax;
 
-// Abstract
-// These are used by nice code only, therefore do not need to be in the
-// java file.
-int getBytecodeFlags(TypeDefinition c);
-?mlsub.typing.TypeConstructor getSuperClass(TypeDefinition c);
-boolean implementsJavaInterface(TypeDefinition c, String name);
-?mlsub.typing.Monotype lowlevelMonotype(TypeDefinition c);
-List<mlsub.typing.Interface> getInterfaces(TypeDefinition c);
-mlsub.typing.TypeConstructor[?] getJavaInterfaces(TypeDefinition c);
-?ClassDefinition getSuperClassDefinition(TypeDefinition c);
-int getVariance(TypeDefinition t);
-InterfaceDefinition[] getImplementedInterfaces(TypeDefinition c);
-
 /**
    Abstract syntax for a type definition.
- */
 
+ */
 public abstract class TypeDefinition extends MethodContainer
 {
   Modifiers modifiers = new Modifiers();
@@ -72,7 +59,7 @@ public abstract class TypeDefinition extends MethodContainer
 
   boolean isConcrete() = !modifiers.isAbstract();
     
-  implementsJavaInterface(name)
+  boolean implementsJavaInterface(String name)
   {
     let ji = javaInterfaces;
     if (ji != null)
@@ -87,13 +74,13 @@ public abstract class TypeDefinition extends MethodContainer
   
   ?mlsub.typing.Interface getAssociatedInterface() = null;
 
-  getSuperClass() = null;
+  ?mlsub.typing.TypeConstructor getSuperClass() = null;
   
-  getSuperClassDefinition() = null;
+  ?ClassDefinition getSuperClassDefinition() = null;
   
   mlsub.typing.TypeConstructor getTC() = tc;
   
-  getImplementedInterfaces()
+  InterfaceDefinition[] getImplementedInterfaces()
   {
     if (interfaces.size() == 0) return new InterfaceDefinition[0];
     List<InterfaceDefinition> res = new LinkedList();
@@ -163,7 +150,7 @@ public abstract class TypeDefinition extends MethodContainer
    * Selectors
    ****************************************************************/
   
-  lowlevelMonotype()
+  ?mlsub.typing.Monotype lowlevelMonotype()
   {
     try {
       return new mlsub.typing.MonotypeConstructor(tc, this.getTypeParameters());
@@ -423,14 +410,14 @@ public abstract class TypeDefinition extends MethodContainer
       classConstraint = this.specialize(this.classConstraint, params);
   }
   
-  getInterfaces() = interfaces.toArray();
+  List<mlsub.typing.Interface> getInterfaces() = interfaces;
 
   void addInterfaceImplementation(mlsub.typing.Interface itf)
   {
     interfaces.add(itf);
   }
 
-  getJavaInterfaces() = javaInterfaces;
+  mlsub.typing.TypeConstructor[?] getJavaInterfaces() = javaInterfaces;
 
   void setJavaType(gnu.bytecode.Type javaType)
   {
@@ -447,7 +434,7 @@ public abstract class TypeDefinition extends MethodContainer
 
   ClassImplementation getImplementation() = notNull(implementation);
   
-  getBytecodeFlags() = modifiers.getBits();
+  int getBytecodeFlags() = modifiers.getBits();
 }
 
 /**
@@ -797,7 +784,7 @@ public mlsub.typing.Monotype[?] getTypeDefTypeParameters(mlsub.typing.TypeConstr
 
 // Variance lookup
 
-getVariance(TypeDefinition t)
+int getVariance(TypeDefinition t)
 {
   int arity = getVariance(t.implementations);
   if (arity != -1)

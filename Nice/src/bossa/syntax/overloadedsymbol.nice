@@ -163,7 +163,7 @@ public class OverloadedSymbolExp extends Expression
 	res.releaseClonedType();
 
 	// store the expression (including default arguments)
-	callExp.arguments.computedExpressions = cast(arguments.getExpressions(res));
+	callExp.arguments.computedExpressions = arguments.getExpressions(res);
 	//callExp.arguments = null; // free memory
 	return this.uniqueExpression();
       }
@@ -352,17 +352,15 @@ public class OverloadedSymbolExp extends Expression
 
   compile()
   {
-    Internal.error("compile in "+this.getClass()+" "+this);
-    return cast(null);
+    throw Internal.error("compile in "+this.getClass()+" "+this);
   }
-  
 
   toString()
   {
     if (symbols.size() <= 1)
-      return "[" + Util.map("", "\n|", "", symbols.toArray()) + "]";
+      return "[" + Util.map("", "\n|", "", symbols) + "]";
 
-    return "\n[" + Util.map("", "\n|", "", symbols.toArray()) + "]";
+    return "\n[" + Util.map("", "\n|", "", symbols) + "]";
   }
 
 
@@ -403,7 +401,7 @@ public class OverloadedSymbolExp extends Expression
        return "No possible call for " + ident +
                      ".\nArguments: " + arguments.printTypes() +
                      "\nPossibilities:\n" +
-                     Util.map("", "\n", "", removed.toArray());
+                     Util.map("", "\n", "", removed);
   }
 
   /** No symbol in removed had the expected type. */
@@ -416,7 +414,7 @@ public class OverloadedSymbolExp extends Expression
       return ident + " has type " + removed[0].getType();
 
     return "No symbol with name " + ident + " has type " + expectedType + 
-		":\n" + Util.map("", "\n", "", removed.toArray());
+		":\n" + Util.map("", "\n", "", removed);
   }
 
 }
@@ -454,7 +452,7 @@ new AmbiguityError(OverloadedSymbolExp sym)
       this(sym, 
 	    "Ambiguity for symbol " + sym.ident + 
 	    ". Possibilities are :\n" + 
-	    Util.map("", "\n", "", toArray(sym.symbols)));
+	    Util.map("", "\n", "", sym.symbols));
     }
 
 List<VarSymbol> removeNonMinimal(List<VarSymbol> symbols)
@@ -646,11 +644,7 @@ private boolean overlappingJavaMethods(?MethodDeclaration m1,
 
 ?String explainNoMatch(Arguments args, List<VarSymbol> noMatches)
 {
-  List<String> argnames = new LinkedList();
-  for (int i = 0; i < args.arguments.length; i++)
-    if (args.arguments[i].name != null)
-      argnames.add(notNull(args.arguments[i].name).toString());
-
+  List<String> argnames = args.getNames();
   if (!argnames.isEmpty())
     {
       for (noMatch : noMatches)
@@ -666,14 +660,8 @@ private boolean overlappingJavaMethods(?MethodDeclaration m1,
 
 List<String> noMatchByName(Arguments args, ?FormalParameters parameters)
 {
-  List<String> res = new LinkedList();
-  for (int i = 0; i < args.arguments.length; i++)
-    if (args.arguments[i].name != null)
-    { 
-      String s = notNull(args.arguments[i].name).toString();
-      if (parameters == null || !parameters.hasMatchFor(s))
-        res.add(s);
-    }
+  if (parameters == null)
+    return new ArrayList();
 
-  return res;
+  return args.getNames().filter(String n => !parameters.hasMatchFor(n));
 }

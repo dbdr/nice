@@ -12,7 +12,6 @@
 
 package bossa.syntax;
 
-import java.util.*;
 import bossa.util.*;
 
 /**
@@ -21,7 +20,7 @@ import bossa.util.*;
  */
 public class Arguments
 {
-  Argument[] arguments;
+  List<Argument> arguments;
 
   /** Hold real parameter, after default parameters
       and parameter reordering has been done.
@@ -36,18 +35,12 @@ public class Arguments
 
   public void addReceiver(Expression value)
   {
-    if (arguments[0] != null)
-      Internal.error("No room for \"receiver\"");
-    
-    arguments[0] = new Argument(value: value);
+    arguments.add(0, new Argument(value: value));
   }
 
   void add(Expression arg, ?LocatedString name)
   {
-    Argument[] newArgs = cast(new Argument[arguments.length + 1]);
-    System.arraycopy(arguments, 0, newArgs, 0, arguments.length);
-    newArgs[arguments.length] = new Argument(value: arg, name: name);
-    arguments = newArgs;
+    arguments.add(new Argument(value: arg, name: name));
   }
 
   int size()
@@ -55,7 +48,7 @@ public class Arguments
     if (computedExpressions != null)
       return notNull(computedExpressions).length;
     else
-      return arguments.length;
+      return arguments.size();
   }
   
   Argument get(int num)
@@ -78,27 +71,19 @@ public class Arguments
 
   void noOverloading()
   {
-    for (int i = arguments.length; --i>=0; )
-      arguments[i].value = arguments[i].value.noOverloading();
+    for (arg : arguments)
+      arg.noOverloading();
   }
   
   void computeTypes()
   {
-    for (int i = arguments.length; --i>=0; )
-      arguments[i].value.getType();
+    for (arg : arguments)
+      arg.value.getType();
   }
   
   Expression[] inOrder()
   {
-    if (arguments.length == 0)
-      return [];
-
-    Expression[] res = cast(new Expression[arguments.length]);
-    
-    for (int i = arguments.length; --i>=0; )
-      res[i] = arguments[i].value;
-
-    return res;
+    return arguments.mapToArray(Argument arg => arg.value);
   }
   
   ?gnu.bytecode.ClassType staticClass()
@@ -107,11 +92,7 @@ public class Arguments
     
     if (res != null)
       // the first argument was fake, remove it
-      {
-	Argument[] newArgs = cast(new Argument[arguments.length - 1]);
-	System.arraycopy(arguments, 1, newArgs, 0, newArgs.length);
-	arguments = newArgs;
-      }
+      arguments.removeAt(0);
     
     return res;
   }
@@ -125,15 +106,24 @@ public class Arguments
   */
   boolean plainApplication(int arity, VarSymbol symbol)
   {
-    if (arguments.length != arity)
+    if (arguments.size() != arity)
       return false;
 
-    for (int i = 0; i<arguments.length; i++)
-      if (arguments[i].name != null)
-	return false;
+    if (arguments.any(Argument arg => arg.name != null))    
+      return false;
 
     applicationExpressions.put(symbol, this.inOrder());
     return true;
+  }
+
+  List<String> getNames()
+  {
+    List<String> res = new ArrayList();
+    for (arg : arguments)
+      if (arg.name != null)
+        res.add(notNull(arg.name).toString());
+ 
+    return res;
   }
 
   toString() = "(" + Util.map("", ", ", "", arguments) + ")";
@@ -141,26 +131,25 @@ public class Arguments
   public String toStringInfix()
   {
     StringBuffer res = new StringBuffer("(");
-    for (int i = 1; i<arguments.length; i++)
+    for (int i = 1; i<arguments.size(); i++)
       res.append(arguments[i].toString() + 
-		 (i + 1 < arguments.length ? ", " : ""));
+		 (i + 1 < arguments.size() ? ", " : ""));
     return res.append(")").toString();
   }
 
   public String printTypes()
   {
     StringBuffer res = new StringBuffer("(");
-    for (int i = 0; i<arguments.length; i++)
-      res.append((arguments[i].name == null ? "" : notNull(arguments[i].name) + ":") + 
-		 arguments[i].value.getType() + 
-		 (i + 1 < arguments.length ? ", " : ""));
+    for (int i = 0; i<arguments.size(); i++)
+      res.append(arguments[i].printType() + 
+		 (i + 1 < arguments.size() ? ", " : ""));
     return res.append(")").toString();
   }
 }
 
-public Arguments createArguments(List<Argument> args)
+public Arguments createArguments(Argument[] args)
 {
-  return new Arguments(arguments: args.toArray());
+  return new Arguments(arguments: new ArrayList(args));
 }
 
 public class Argument
@@ -168,5 +157,12 @@ public class Argument
   private Expression value;
   ?LocatedString name = null;
 
+  void noOverloading()
+  {
+    value = value.noOverloading();
+  }
+
   toString() = (name == null ? "" : notNull(name) + ":" ) + value;
+
+  String printType() = (name==null ? "" : notNull(name) + ":") + value.getType();
 }

@@ -136,29 +136,19 @@ abstract class Constructor extends MethodDeclaration
 List<Parameter> missingArgs(Arguments args, FormalParameters parameters)
 {
   List<Parameter> missing = new LinkedList();
-  Iterator<Parameter> reqParams = parameters.getRequiredParameters().iterator();
   int lastUsedPositional = -1;
-  while(reqParams.hasNext()) 
+  for (param : parameters.getRequiredParameters()) 
     {
       boolean found = false;
-      let param = reqParams.next();
       if (param.value() != null)
         continue;
       if (param instanceof NamedParameter) 
         {
-          for (int i = 0; i < args.arguments.length; i++)
-            if (args.arguments[i].name != null)
-              { 
-                String s = notNull(args.arguments[i].name).toString();
-                if (param.match(s))
-                  {
-                    found = true;
-                    break;
-                  }
-              }
+          if (args.getNames().any(String n => param.match(n)))
+            found = true;
         }
       else {
-        for(int i = lastUsedPositional + 1; i <args.arguments.length; i++)
+        for (int i = lastUsedPositional + 1; i <args.arguments.size(); i++)
           {
             if (args.arguments[i].name == null) 
               {
@@ -171,5 +161,6 @@ List<Parameter> missingArgs(Arguments args, FormalParameters parameters)
       if (!found)
         missing.add(param);
     }
+
   return missing;
 }

@@ -56,9 +56,9 @@ boolean isFieldAccess(Expression exp)
 /**
  * Maps {@link #generateCode()} over an array of expressions.
  */
-public gnu.expr.Expression[] Expression_compile(Expression[] expressions)
+public gnu.expr.Expression[] Expression_compile(List<Expression> expressions)
 {
-  gnu.expr.Expression[] res = cast(new gnu.expr.Expression[expressions.length]);
+  gnu.expr.Expression[] res = cast(new gnu.expr.Expression[expressions.size()]);
   for (int i=0; i<res.length; i++)
     res[i] = expressions[i].generateCode();
 

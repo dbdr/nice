@@ -375,16 +375,16 @@ public class ImportedAlternative extends Alternative
  */
 public void readImportedAlternative(gnu.bytecode.ClassType c, gnu.bytecode.Method method, Location location)
 {
-  ?gnu.bytecode.MiscAttr attr = cast(gnu.bytecode.Attribute.get(method, "definition"));
-  if (attr == null)
+  ?gnu.bytecode.MiscAttr defattr = cast(gnu.bytecode.Attribute.get(method, "definition"));
+  if (defattr == null)
     // this must be a toplevel function, a constructor, ...
     return;
 
-  String fullName = new String(attr.data);
+  String fullName = new String(defattr.data);
 
   registerJavaMethod(fullName);
 
-  attr = cast(gnu.bytecode.Attribute.get(method, "patterns"));
+  ?gnu.bytecode.MiscAttr attr = cast(gnu.bytecode.Attribute.get(method, "patterns"));
   if (attr == null)
     throw Internal.error("Method " + method.getName() + 
 		     " in class " + c.getName() + " has no patterns");

@@ -26,5 +26,8 @@ public class Compilation extends mlsub.compilation.Compilation
   public boolean excludeRuntime;
 
   public Locator locator;
+
+  public java.util.Map packages;
+  public java.util.Map javaTypeConstructors;
 }
 

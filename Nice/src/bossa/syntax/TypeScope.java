@@ -166,10 +166,13 @@ public class TypeScope implements TypeMap
     return null;
   }
 
+  /** The current compilation. This is not thread safe! */
+  static bossa.modules.Compilation compilation;
+
   private TypeSymbol lookupNative(String name, Location loc)
   {
     TypeSymbol res = null;
-    TypeConstructor tc = JavaClasses.lookup(name);
+    TypeConstructor tc = JavaClasses.lookup(compilation, name);
 	
     if (tc != null)
       return tc;
@@ -182,7 +185,7 @@ public class TypeScope implements TypeMap
 	for (int i = 0; i < pkgs.length; i++)
 	  {
 	    String fullName = pkgs[i] + "." + name;
-	    tc = JavaClasses.lookup(fullName);
+	    tc = JavaClasses.lookup(compilation, fullName);
 	    if (tc != null)
 	      if (res == null)
 		{

@@ -172,13 +172,13 @@ abstract public class Node
    * Scopes shared by all modules.
    */
 
-  private static final VarScope globalScope = new VarScope(null);
+  private static VarScope globalScope;
   public static final VarScope getGlobalScope()
   {
     return globalScope;
   }
   
-  private static final TypeScope globalTypeScope= new TypeScope(null);
+  private static TypeScope globalTypeScope;
   public static final TypeScope getGlobalTypeScope()
   {
     return globalTypeScope;
@@ -186,6 +186,14 @@ abstract public class Node
   
   void buildScope(Module module)
   {
+    // For multiple compilations in the same JVM:
+    // If we are starting a new compilation, reset the global scopes.
+    if (TypeScope.compilation != module.compilation())
+      {
+	TypeScope.compilation = module.compilation();
+	globalScope = new VarScope(null);
+	globalTypeScope= new TypeScope(null);
+      }
     globalTypeScope.module = module;
     
     buildScope(globalScope,globalTypeScope);

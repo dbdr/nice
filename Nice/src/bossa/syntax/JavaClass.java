@@ -70,7 +70,7 @@ public class JavaClass extends ClassDefinition
       {
 	TypeConstructor old = 
 	  JavaClasses.setTypeConstructorForJavaClass
-	  (this.tc, javaName.toString());
+	  (compilation(), this.tc, javaName.toString());
 
 	if(old!=null)
 	  User.error(this, javaName + 

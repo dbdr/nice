@@ -44,15 +44,13 @@ public class Package implements mlsub.compilation.Module, Located, bossa.syntax.
 		compilation, isRoot);
   }
   
-  private static final Map map = new HashMap();
-  
   public static Package make(LocatedString lname, 
 			     Compilation compilation,
 			     boolean isRoot)
   {
     String name = lname.toString();
 
-    Package res = (Package) map.get(name);
+    Package res = (Package) compilation.packages.get(name);
     if (res != null)
       return res;
     
@@ -78,7 +76,7 @@ public class Package implements mlsub.compilation.Module, Located, bossa.syntax.
     this.compilation = compilation;
     this.isRoot = isRoot;
     
-    map.put(name.toString(),this);
+    compilation.packages.put(name.toString(), this);
 
     imports = new LinkedList();
     
@@ -269,7 +267,22 @@ public class Package implements mlsub.compilation.Module, Located, bossa.syntax.
     generateCode();
     saveInterface();
   }
-  
+
+  public static void startNewCompilation()
+  {
+    // Perform resets to discard static information gathered during the 
+    // previous compilation. This is a workaround, full non-staticness
+    // would be better.
+
+    mlsub.typing.Typing.startNewCompilation();
+    nice.tools.code.Types.reset();
+    nice.tools.code.SpecialTypes.init();
+    bossa.link.Alternative.reset();
+    bossa.link.Dispatch.reset();
+    ClassDefinition.reset();
+    TypeConstructors.reset();
+  }
+
   public void freezeGlobalContext()
   {
     contextFrozen = true;
@@ -628,17 +641,6 @@ public class Package implements mlsub.compilation.Module, Located, bossa.syntax.
 
   static
   {
-    try{
-      nice.tools.code.SpecialTypes.init();
-    }
-    catch(ExceptionInInitializerError e){
-      e.getException().printStackTrace();
-      Internal.error("Exception in initializer: "+e.getException());
-    }
-  }
-
-  static
-  {
     nice.tools.code.NiceInterpreter.init();
   }
 
@@ -820,6 +822,8 @@ public class Package implements mlsub.compilation.Module, Located, bossa.syntax.
   /** The compilation that is in process. */
   Compilation compilation;
   
+  public Compilation compilation() { return compilation; }
+
   /** 
       @return true if this package was loaded from an interface file,
       not a source file

@@ -20,8 +20,8 @@ import mlsub.compilation.*;
  * @author Daniel Bonniot (d.bonniot@mail.dotcom.fr)
  */
 
-void compileComponent(List<Module>, boolean doLink);
-compileComponent(modules, doLink)
+void compileComponent(Compilation compilation, List<Module> modules, 
+		      boolean doLink)
 {
   print("Compiling");
   modules.iter(fun(Module m) => print(" "+m));
@@ -33,8 +33,7 @@ compileComponent(modules, doLink)
   modules.iter(fun(Module m) => m.scope());
   modules.iter(fun(Module m) => m.load());
 
-  if (modules.size() >= 1)
-    modules.get(0).freezeGlobalContext();
+  notNull(compilation.root).freezeGlobalContext();
 
   try {
     modules.iter(fun(Module m) => m.compile());
@@ -43,20 +42,18 @@ compileComponent(modules, doLink)
       modules.iter(fun(Module m) => m.link());
   }
   finally {
-    if (modules.size() >= 1)
-      modules.get(0).unfreezeGlobalContext();
+    notNull(compilation.root).unfreezeGlobalContext();
   }
 }
 
-void make(mlsub.compilation.Compilation);
-make(compilation@mlsub.compilation.Compilation)
+void make(mlsub.compilation.Compilation compilation)
 {
   List<List<Module>> sccs =
     stronglyConnectedComponents
       (notNull(compilation.root), fun(Module m) => new JavaList(impl: notNull(m.getRequirements())));
   try{
     sccs.iter(fun(List<Module> scc) => 
-      { compileComponent(scc,
+      { compileComponent(compilation, scc,
 			 !compilation.skipLink); });
   }
   catch(bossa.util.UserError e){

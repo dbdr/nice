@@ -525,7 +525,7 @@ public abstract class Engine
   }
   
   /** Maps a Kind to its lowlevel constraint */
-  private static final HashMap kindsMap = new HashMap();
+  private static HashMap kindsMap; 
   
   public static Engine.Constraint getConstraint(Kind kind)
   {
@@ -538,7 +538,7 @@ public abstract class Engine
 
     if(dbg)
       Debug.println("Creating new Lowlevel constraint for "+kind);
-    
+
     res = new Engine.Constraint("kind "+kind.toString());
     res.associatedKind = kind;
     // if the constraint is created after the initial context has been defined,
@@ -563,25 +563,29 @@ public abstract class Engine
   private static final BackableList floating = new BackableList();
   
   /** The constraint of monotype variables */
-  public static final Engine.Constraint variablesConstraint;
-  static
-  {
-    variablesConstraint = new Engine.Constraint("type variables",true);
-    //kindsMap.put(variablesConstraint,variablesConstraint);
-  }  
+  public static Engine.Constraint variablesConstraint;
   
   /** The list of Constraints */
-  private static final ArrayList constraints;
-  static
-  {
-    constraints = new ArrayList(10);
-    constraints.add(variablesConstraint);
-  }
+  private static ArrayList constraints;
+
   public static Iterator listConstraints()
   {
     return constraints.iterator();
   }
-  
+
+  /** Return to the initial virgin state. */
+  public static void reset()
+  {
+    kindsMap = new HashMap();
+    variablesConstraint = new Engine.Constraint("type variables",true);
+    //kindsMap.put(variablesConstraint,variablesConstraint);
+
+    constraints = new ArrayList(10);
+    constraints.add(variablesConstraint);
+
+    initialContext = true;
+  }
+
   public static void createInitialContext()
     throws Unsatisfiable
   {

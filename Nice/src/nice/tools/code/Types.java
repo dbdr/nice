@@ -36,7 +36,7 @@ public final class Types
    * Mapping TCs to gnu.bytecode.Types
    ****************************************************************/
 
-  private static final HashMap tcToGBType = new HashMap();
+  private static HashMap tcToGBType;
   
   public static void set(TypeConstructor tc, Type type)
   {
@@ -422,7 +422,7 @@ public final class Types
     return null;
   }
   
-  private static final HashMap stringToReflectClass = new HashMap();
+  private static HashMap stringToReflectClass;
   
   /** 
       Searches a native class given by its fully qualified name
@@ -615,5 +615,15 @@ public final class Types
     return new Polytype
       (type.getConstraint(), 
        bossa.syntax.Monotype.sure(type.getMonotype()));
+  }
+
+  /****************************************************************
+   * Reset the state for a new compilation.
+   ****************************************************************/
+
+  public static void reset()
+  {
+    tcToGBType = new HashMap();
+    stringToReflectClass = new HashMap();
   }
 }

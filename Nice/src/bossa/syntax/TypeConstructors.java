@@ -53,7 +53,8 @@ public final class TypeConstructors
     l.add(m.getSymbol());
   }
 
-  private static final HashMap constructors = new HashMap();
+  private static HashMap constructors;
+  public static void reset() { constructors = new HashMap(); }
 
   /****************************************************************
    * Accessors

@@ -22,6 +22,7 @@ package bossa.syntax;
 public interface Module extends mlsub.compilation.Module
 {
   String[] listImplicitPackages();
+  bossa.modules.Compilation compilation();
 
   /****************************************************************
    * Code generation

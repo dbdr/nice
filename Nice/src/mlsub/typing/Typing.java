@@ -124,6 +124,15 @@ public final class Typing
     }    
   }
 
+  /** Called before each independant compilation.
+      This must clear any side-effect of previous compilations. 
+  */
+  public static void startNewCompilation()
+  {
+    Engine.reset();
+    FunTypeKind.reset();
+  }
+
   public static void createInitialContext()
   {
     try{

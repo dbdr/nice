@@ -323,6 +323,8 @@ public class ConstantExp extends Expression
     if (name.equals("nice.lang.Maybe"))
       {
 	maybeTC = tc;
+	// Reset the cached type of Null, since it is a persistent expression.
+	NullExp.instance.computeType();
 	// to differ with the null result, which signals error
 	return gnu.bytecode.Type.pointer_type;
       }
@@ -353,13 +355,9 @@ public class ConstantExp extends Expression
   // syntatic types
   public static Monotype synVoidType;
 
-  private static TypeConstructor throwableTC;
+  static TypeConstructor throwableTC;
   static TypeConstructor throwableTC()
   {
-    if(throwableTC==null)
-      throwableTC = JavaClasses.make
-	("java.lang.Throwable", gnu.bytecode.Type.throwable_type);
-
     return throwableTC;
   }
 	

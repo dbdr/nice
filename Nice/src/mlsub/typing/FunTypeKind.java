@@ -33,7 +33,8 @@ public class FunTypeKind implements Kind
     return funtypeKinds[domainArity];
   }
   
-  private static final FunTypeKind[] funtypeKinds = new FunTypeKind[40];
+  private static FunTypeKind[] funtypeKinds;
+  public static void reset() { funtypeKinds = new FunTypeKind[40]; }
   
   private FunTypeKind(int domainArity)
   {

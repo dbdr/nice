@@ -196,7 +196,11 @@ public class Alternative
    * Regrouping alternatives per method
    ****************************************************************/
 
-  private static HashMap alternatives = new HashMap();
+  private static HashMap alternatives;
+  public static void reset()
+  {
+    alternatives = new HashMap();
+  }
   
   private void add()
   {

@@ -124,8 +124,12 @@ abstract public class ClassDefinition extends MethodContainer
 	ConstantExp.registerPrimType(name.toString(),tc);
       }
     else
-      tc = new mlsub.typing.TypeConstructor
-	(name.toString(), variance, isConcrete(), true);
+      {
+	tc = new mlsub.typing.TypeConstructor
+	  (name.toString(), variance, isConcrete(), true);
+	if (name.equals("nice.lang.Throwable"))
+	  ConstantExp.throwableTC = tc;
+      }
 
     if(isInterface)
       associatedInterface = new Interface(variance, tc);
@@ -144,7 +148,8 @@ abstract public class ClassDefinition extends MethodContainer
    * Map TypeConstructors to ClassDefinitions
    ****************************************************************/
 
-  private static final HashMap tcToClassDef = new HashMap();
+  private static HashMap tcToClassDef;
+  public static void reset() { tcToClassDef = new HashMap(); }
   
   static final ClassDefinition get(TypeConstructor tc)
   {

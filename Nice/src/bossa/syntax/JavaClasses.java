@@ -16,6 +16,7 @@ import bossa.util.*;
 import bossa.util.Debug;
 
 import mlsub.typing.*;
+import bossa.modules.Compilation;
 
 import gnu.bytecode.*;
 
@@ -37,9 +38,9 @@ public final class JavaClasses
    * If an existing JTC has the same name, returns it,
    * else creates a new one.
    */
-  static TypeConstructor make(String name)
+  static TypeConstructor make(Compilation compilation, String name)
   {
-    return make(name, ClassType.make(name));
+    return make(compilation, name, ClassType.make(name));
   }
 
   /**
@@ -48,34 +49,32 @@ public final class JavaClasses
    * <p>
    * Usefull for primitive types.
    */
-  static TypeConstructor make(String name, 
-			      gnu.bytecode.Type javaType)
+  static TypeConstructor make
+    (Compilation compilation, String name, gnu.bytecode.Type javaType)
   {
-    Object o = hash.get(name);
+    Object o = compilation.javaTypeConstructors.get(name);
     if(o!=null)
       return (TypeConstructor) o;
     
     // we put the new JTC in the hashtable in the constructor
     // and not after it returned, to avoid infinite loop
     // if the code of the constructor does a lookup.
-    return create(name, javaType);
+    return create(compilation, name, javaType);
   }
 
   /**
      @return null, except if javaName already had an
      associated TypeConstructor in which case it is returned.
    */
-  static TypeConstructor setTypeConstructorForJavaClass(TypeConstructor tc, 
-							String javaName)
+  static TypeConstructor setTypeConstructorForJavaClass
+    (Compilation compilation, TypeConstructor tc, String javaName)
   {
-    Object old = hash.put(javaName, tc);
+    Object old = compilation.javaTypeConstructors.put(javaName, tc);
     return (TypeConstructor) old;
   }
   
   private gnu.bytecode.Type javaType;
   
-  private static HashMap hash = new HashMap();
-
   private static final gnu.bytecode.Type[] blackListClass =
     new gnu.bytecode.Type[] {
       ClassType.make("java.lang.Object")
@@ -100,8 +99,8 @@ public final class JavaClasses
     return false;
   }
       
-  private static TypeConstructor create(String className, 
-					gnu.bytecode.Type javaType)
+  private static TypeConstructor create
+    (Compilation compilation, String className, gnu.bytecode.Type javaType)
   {
     if(Debug.javaTypes)
       Debug.println("Registering java class "+className);
@@ -114,7 +113,7 @@ public final class JavaClasses
       
     TypeConstructor res = new TypeConstructor(className, null, 
 					      instantiable, true);
-    hash.put(className, res);
+    compilation.javaTypeConstructors.put(className, res);
 
     nice.tools.code.Types.set(res, javaType);
     
@@ -136,7 +135,7 @@ public final class JavaClasses
 	ClassType superClass =  ((ClassType) javaType).getSuperclass();
 	if(superClass!=null && !(excluded(blackListClass, superClass)))
 	  {
-	    TypeConstructor superTC = make(superClass.getName(), superClass);
+	    TypeConstructor superTC = make(compilation, superClass.getName(), superClass);
 
 	    try{
 	      Typing.initialLeq(res, superTC);
@@ -159,7 +158,7 @@ public final class JavaClasses
 	  for(int i=0; i<itfs.length; i++)
 	    if(!(excluded(blackListInterface,itfs[i])))
 	    {
-	      TypeConstructor superTC = make(itfs[i].getName(), itfs[i]);
+	      TypeConstructor superTC = make(compilation, itfs[i].getName(), itfs[i]);
 	      
 	      try{
 		Typing.initialLeq(res, superTC);
@@ -343,7 +342,7 @@ public final class JavaClasses
 
   private final Vector objects = new Vector(5);
   
-  TypeConstructor object(int arity)
+  TypeConstructor object(Compilation compilation, int arity)
   {
     if(arity>=objects.size())
       objects.setSize(arity+1);
@@ -351,24 +350,24 @@ public final class JavaClasses
     TypeConstructor res = (TypeConstructor) objects.get(arity);
     if(res==null)
       {
-	res = make("java.lang.Object", gnu.bytecode.Type.pointer_type);
+	res = make(compilation, "java.lang.Object", gnu.bytecode.Type.pointer_type);
       }
     return res;
   }
   
-  static TypeConstructor lookup(String className)
+  static TypeConstructor lookup(Compilation compilation, String className)
   {
-    if(hash.containsKey(className))
-      return (TypeConstructor) hash.get(className);
+    if (compilation.javaTypeConstructors.containsKey(className))
+      return (TypeConstructor) compilation.javaTypeConstructors.get(className);
     
     Class c = nice.tools.code.Types.lookupQualifiedJavaClass(className);    
     
     if(c==null)
       {
-	hash.put(className,null);
+	compilation.javaTypeConstructors.put(className,null);
 	return null;
       }
     
-    return create(c.getName(), gnu.bytecode.Type.make(c));
+    return create(compilation, c.getName(), gnu.bytecode.Type.make(c));
   }
 }

@@ -48,7 +48,8 @@ public final class Dispatch
     methods.add(m);
   }
   
-  private static Collection methods = new ArrayList();
+  private static Collection methods;
+  public static void reset() { methods = new ArrayList(); }
 
   public static void test(bossa.modules.Package module)
   {

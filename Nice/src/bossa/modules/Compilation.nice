@@ -46,8 +46,13 @@ class Compilation extends mlsub.compilation.Compilation
 
   ?Locator locator = null;
 
+  Map<String,Package> packages = hashtable();
+  Map<String,mlsub.typing.TypeConstructor> javaTypeConstructors = hashtable();
+
   void setMainPackage(String packageName)
   {
+    Package.startNewCompilation();
+
     // Normalizes the compilation options.
     this.recompileCommandLine = this.recompileCommandLine || this.recompileAll;
 

@@ -24,19 +24,19 @@ void compileComponent(Compilation compilation, List<Module> modules,
 		      boolean doLink)
 {
   print("Compiling");
-  modules.iter(Module m => print(" "+m));
+  modules.foreach(Module m => print(" "+m));
   println("");
 
-  modules.iter(Module m => m.scope());
-  modules.iter(Module m => m.load());
+  modules.foreach(Module m => m.scope());
+  modules.foreach(Module m => m.load());
 
   notNull(compilation.root).freezeGlobalContext();
 
   try {
-    modules.iter(Module m => m.compile());
+    modules.foreach(Module m => m.compile());
 
     if (doLink)
-      modules.iter(Module m => m.link());
+      modules.foreach(Module m => m.link());
   }
   finally {
     notNull(compilation.root).unfreezeGlobalContext();
@@ -49,7 +49,7 @@ void make(mlsub.compilation.Compilation compilation)
     stronglyConnectedComponents
       (notNull(compilation.root), Module m => m.getRequirements());
   try{
-    sccs.iter(List<Module> scc => 
+    sccs.foreach(List<Module> scc => 
       { compileComponent(compilation, scc,
 			 !compilation.skipLink); });
   }

@@ -1,7 +1,5 @@
 #! /bin/sh
 
-cd $1
-
 echo > dateBuild.nice
 echo "package nice.tools.compiler;\n" > dateBuild.nice
 echo "var String buildDate = \"Paris, "`date -u +"%Y.%m.%d, %T %Z"`"\";" > dateBuild.nice

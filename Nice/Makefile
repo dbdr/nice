@@ -1,5 +1,5 @@
 
-TOP=${HOME}/Nice
+TOP=${PWD}
 
 JAVAC=javac -classpath ${TOP}/classes:${TOP}/src:${TOP}/stdlib -sourcepath ${TOP}/src -d ${TOP}/classes -O -g
 JAVACC=java -classpath ${TOP}/external/JavaCC.zip COM.sun.labs.javacc.Main
@@ -7,8 +7,9 @@ JAVADOC=javadoc #-linkoffline file:///C%7C/Apps/jdk1.2.1/docs/api file:///usr/op
 
 # run this first when you just checked out a fresh version
 first: parser
+	cd ${TOP}/src/nice/tools/compiler; ./setBuildDate
 	cd stdlib; nicec nice.getopt
-	${TOP}/src/nice/tools/compiler/setBuildDate ${TOP}/src/nice/tools/compiler
+	cd src; nicec bossa.modules
 	cd src; NICEJAR=${HOME}/Nice/stdlib nicec -Rs nice.tools.compiler
 	mkdir -p classes
 	cd classes; jar xf ../external/java-getopt-1.0.7.jar gnu
@@ -17,7 +18,7 @@ first: parser
 	${JAVAC} bossa/modules/Package.java nice/tools/runJar.java nice/tools/code/*.java gnu/bytecode/dump.java ../stdlib/nice/*/*.java
 
 recompile:
-	cd src; ${JAVAC} bossa/modules/Package.java
+	${JAVAC} src/bossa/modules/Package.java
 #	${JAVAC} bossa/*/*.java nice/**/*.java mlsub/*/*.java ../stdlib/nice/lang/*.java
 
 recompileGNU:
@@ -27,7 +28,7 @@ recompileSTDLIB:
 	${JAVAC} ${TOP}/stdlib/nice/lang/*.java
 
 compiler:
-	${TOP}/src/nice/tools/compiler/setBuildDate ${TOP}/src/nice/tools/compiler
+	cd ${TOP}/src/nice/tools/compiler; ./setBuildDate
 	cd src; nicec -e -Rs nice.tools.compiler
 
 parser:
@@ -82,3 +83,5 @@ cvs-Nice:
 	find ${TOP}/src/gnu -type d -name 'CVS-Kawa' \
 	-exec sh -c 'dir=`dirname "$$0"`; mv -i $${dir}/CVS-Kawa $${dir}/CVS' {} \;
 
+dumm:
+	echo ${TOP}

@@ -88,7 +88,6 @@ public abstract class Debug
     skipLinkTests       = getBoolean("debug.skipLinkTests",false),
     passes		= getBoolean("debug.passes",false),
 
-    niceResolve         = getBoolean("debug.niceResolve", false),
     alwaysDumpStack     = getBoolean("debug.alwaysDumpStack", false),
     ignorePrelude	= getBoolean("debug.ignorePrelude", false);
   

@@ -51,6 +51,21 @@ void set(char[],   int, char)    = inline nice.lang.inline.ArraySetOp("c");
 void set(float[],  int, float)   = inline nice.lang.inline.ArraySetOp("f");
 void set(double[], int, double)  = inline nice.lang.inline.ArraySetOp("d");
 
+
+<Any T> void copy(!T[] from, int, ?T[] to, int, int) = 
+  native void System.arraycopy(Object, int, Object, int, int);
+
+<Any T> T[] split(T[] array, int from = 0, int to = -1)
+{
+  if (to == -1) 
+    to = array.length - 1;
+
+  T[] res = new T[to - from + 1];
+  for (int i = from; i <= to; i++)
+    res[i - from] = array[i];
+  return res;
+}
+
 // Define collection methods
 
 get(a@Array, n) = get(a, n);

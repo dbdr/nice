@@ -319,6 +319,11 @@ public final class Polytype
     return Constraint.toString(constraint) + monotype.toString();
   }
 
+  public String toStringNoSimplify()
+  {
+    return Constraint.toString(constraint) + monotype.toString();
+  }
+
   private Constraint constraint;
   private Monotype monotype;  
 }

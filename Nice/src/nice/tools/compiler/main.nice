@@ -43,16 +43,12 @@ int compile(String[] args)
   nice.tools.util.Chronometer chrono = notNull(nice.tools.util.Chronometer.make("Total"));
   chrono.start();
 
-  ?Throwable uncaughtException = null;
   boolean memInfo = false, timeInfo = false;
   String mainPackage;
   ?String nativeProgram = null;
   ?String nativeCompiler = null;
   ?String classpath = null;
-
-  try{
-
-  OutputMessages.start();
+  boolean editorMode = false;
 
   Compilation compilation = new Compilation();
 
@@ -68,28 +64,28 @@ int compile(String[] args)
    option("sourcepath",
 	  "Search path for source packages\nPATH is a list of directories and .jar archives",
 	  "path",
-	  fun(String path) => { compilation.sourcePath = path; }),
+	  String path => { compilation.sourcePath = path; }),
 
    option(letter: 'd', "destination",
 	  "Destination directory for compiled packages",
 	  "dir",
-	  fun(String dir)=>{ compilation.destinationDir = dir; }),
+	  String dir => { compilation.destinationDir = dir; }),
 
    option("classpath",
 	  "Search path for compiled packages and libraries\nPATH is a list of directories and .jar archives",
 	  "path",
-	  fun(String path) =>{ compilation.packagePath = path; }),
+	  String path => { compilation.packagePath = path; }),
 
 
    option(letter: 'a', "jar",
 	  "Compile to archive\nYou can then run the program with 'java -jar FILE'",
 	  "file",
-	  fun(String output) => { compilation.output = output; }),
+	  String output => { compilation.output = output; }),
 
    option(letter: 'o', "output",
 	  "Generate native executable",
 	  "file",
-	  fun(String output) => { 
+	  String output => { 
 	    compilation.output = output + ".jar"; 
 	    nativeProgram = output;
 	  }),
@@ -97,15 +93,15 @@ int compile(String[] args)
 
    option(letter: 'r', "recompile",
 	  "Force recompilation of package",
-	  fun() => { compilation.recompileCommandLine = true; }),
+	  () => { compilation.recompileCommandLine = true; }),
 
    option(letter: 'R', "recompile-all",
 	  "Force recompilation of all dependant packages",
-	  fun() => { compilation.recompileAll = true; }),
+	  () => { compilation.recompileAll = true; }),
 
    option(letter: 'c', "compile",
 	  "Compile packages but do not link them",
-	  fun() => { compilation.skipLink = true; }),
+	  () => { compilation.skipLink = true; }),
 
 
    // PRIVATE OPTIONS
@@ -114,41 +110,41 @@ int compile(String[] args)
    // Should not be advertised since it should not be usefull otherwise
    option("exclude-runtime", 
 	  "Avoid inclusion of the runtime in the archive", 
-	  fun() => { compilation.excludeRuntime = true; }),
+	  () => { compilation.excludeRuntime = true; }),
    option("runtime", 
 	  "Location of nice.jar", 
 	  "file",
-	  fun(String file) => { compilation.runtimeFile = file; }),
+	  String file => { compilation.runtimeFile = file; }),
    option("native-compiler", 
 	  "Location of the native compiler binary (gcj)", 
 	  "file",
-	  fun(String file) => { nativeCompiler = file; }),
+	  String file => { nativeCompiler = file; }),
 
 
    option(letter: 'h', "help", "Print help message and exit",
-	  fun()=> help(prg)),
+	  () => help(prg)),
 
    option("editor", "Tell nicec that it is called by an editor.",
-	  fun()=> { bossa.util.Location.editorMode = true; }),
+	  () => { editorMode = true; }),
 
    option("man", "Print man page to stdout",
-	  fun()=> man(prg)),
+	  () => man(prg)),
 
    option("version",
 	  "Print version info and exit",
-	  fun()=>version()),
+	  () => version()),
 
    option("usage",
 	  "Print usage information and exit",
-	  fun()=>usage(prg)),
+	  () => usage(prg)),
 
    option("memory",
 	  "Print memory usage information after compilation",
-	  fun()=>{ memInfo = true; }),
+	  () => { memInfo = true; }),
 
    option("benchmark",
 	  "Print time usage information after compilation",
-	  fun()=>{ timeInfo = true; })
+	  () => { timeInfo = true; })
   ];
 
   List<String> rest = parse(prg, args);
@@ -161,40 +157,8 @@ int compile(String[] args)
     }
   mainPackage = rest[0];
 
-  nice.tools.code.TypeImport.setRuntime(compilation.runtimeFile);
-  compilation.setMainPackage(mainPackage);
-  make(compilation);
-
-  if (nativeProgram != null)
-    produceNativeProgram(nativeCompiler, mainPackage, nativeProgram);
-  }
-  catch(OutputMessages.Exit e) {
-    // Compilation was interrupted.
-    return e.statusCode;
-  }
-  catch(bossa.util.UserError e){
-    bossa.util.Internal.warning("user error only caught in main"); 
-    nice.tools.compiler.OutputMessages.error(e.getMessage());
-  }
-  catch(ExceptionInInitializerError e){
-    uncaughtException = e.getException();
-  }
-  catch(Throwable e){
-    uncaughtException = e;
-  }
-
-  if (uncaughtException != null)
-    {
-      Throwable exn = uncaughtException;
-
-      OutputMessages.bug
-      ("\nAn exception has occured in the compiler\n" +
-       "Please fill-in a bug report at the following webpage:\n" +
-       "http://sourceforge.net/tracker/?func=add&group_id=12788&atid=112788" +
-       "\n\nException: " + exn.toString() +
-       "\n\nStack trace:\n");
-      exn.printStackTrace();
-    }
+  int res = compile(compilation, mainPackage, nativeProgram, nativeCompiler,
+		    editorMode);
 
   if (memInfo) printMemoryUsage();
 
@@ -205,7 +169,7 @@ int compile(String[] args)
       nice.tools.util.Chronometer.printAll();
     }
 
-  return OutputMessages.getStatusCode();
+  return res;
 }
 
 void main(String[] args)

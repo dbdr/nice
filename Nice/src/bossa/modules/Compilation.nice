@@ -42,7 +42,7 @@ class Compilation extends mlsub.compilation.Compilation
   boolean excludeRuntime = false;
 
   /** Location of the nice.jar file. */
-  String runtimeFile = "";
+  ?String runtimeFile = null;
 
   ?Locator locator = null;
 
@@ -79,3 +79,5 @@ class Compilation extends mlsub.compilation.Compilation
     this.root = Package.make(new bossa.syntax.LocatedString(packageName, new bossa.util.Location("Command line")), this, true);
   }
 }
+
+Compilation createCompilation() = new Compilation();

@@ -19,97 +19,82 @@ package nice.tools.compiler;
    @author Daniel Bonniot (bonniot@users.sourceforge.net)
  */
 
-/**
-   The arguments match the command line arguments. 
-   For now, see the output of nicec -h for their meaning.
-   @return a status code describing if the compilation was successful.
-     The codes are found in OutputMessages (OK, WARNING, ERROR, BUG).
-*/
-public int compile
-  (String mainPackage,
-   ?String sourcepath = null,
-   ?java.io.File destination = null,
-   ?String classpath = null,
-   ?String jar = null,
-   ?String output = null,
-   boolean recompile,
-   boolean recompileAll,
-   boolean compileOnly,
-   boolean excludeRuntime,
-   ?String runtime = null,
-   ?String nativeCompiler = null,
-   boolean help,
-   boolean editor,
-   boolean man,
-   boolean version,
-   boolean usage,
-   boolean memory
-  )
+int compile(Compilation compilation, String mainPackage,
+	    ?String nativeProgram = null, ?String nativeCompiler = null,
+	    boolean editorMode = false)
 {
-  ArrayList<String> args = new java.util.ArrayList();
-  if (sourcepath != null) {
-    args.add("--sourcepath");
-    args.add(sourcepath);
-  }
-  if (destination != null) {
-    args.add("--destination");
-    args.add(destination.getAbsolutePath());
-  }
-  if (classpath != null) {
-    args.add("--classpath");
-    args.add(classpath);
-  }
-  if (jar != null) {
-    args.add("--jar");
-    args.add(jar);
-  }
-  if (output != null) {
-    args.add("--output");
-    args.add(output);
-  }
-  if (recompile) {
-    args.add("--recompile");
-  }
-  if (recompileAll) {
-    args.add("--recompile-all");
-  }
-  if (compileOnly) {
-    args.add("--compile");
-  }
-  if (excludeRuntime) {
-    args.add("--exclude-runtime");
-  }
-  if (runtime != null) {
-    args.add("--runtime");
-    args.add(runtime);
-  }
-  if (nativeCompiler != null) {
-    args.add("--native-compiler");
-    args.add(nativeCompiler);
-  }
-  if (help) {
-    args.add("--help");
-  }
-  if (editor) {
-    args.add("--editor");
-  }
-  if (man) {
-    args.add("--man");
-  }
-  if (version) {
-    args.add("--version");
-  }
-  if (usage) {
-    args.add("--usage");
-  }
-  if (memory) {
-    args.add("--memory");
-  }
-  args.add(mainPackage);
+  ?Throwable uncaughtException = null;
 
-  return compile(args.toArray());
+  try {
+
+    OutputMessages.start();
+
+    bossa.util.Location.editorMode = editorMode;
+    if (compilation.runtimeFile == null)
+      compilation.runtimeFile = getNiceRuntime();
+    nice.tools.code.TypeImport.setRuntime(compilation.runtimeFile);
+    compilation.setMainPackage(mainPackage);
+    make(compilation);
+
+    ?String jar = compilation.output;
+    if (nativeProgram != null && jar != null)
+      produceNativeProgram(nativeCompiler, mainPackage, 
+			   nativeProgram, jar);
+  }
+  catch(OutputMessages.Exit e) {
+    // Compilation was interrupted.
+    return e.statusCode;
+  }
+  catch(bossa.util.UserError e){
+    bossa.util.Internal.warning("user error only caught in main"); 
+    nice.tools.compiler.OutputMessages.error(e.getMessage());
+  }
+  catch(ExceptionInInitializerError e){
+    uncaughtException = e.getException();
+  }
+  catch(Throwable e){
+    uncaughtException = e;
+  }
+
+  if (uncaughtException != null)
+    {
+      Throwable exn = uncaughtException;
+
+      OutputMessages.bug
+      ("\nAn exception has occured in the compiler\n" +
+       "Please fill-in a bug report at the following webpage:\n" +
+       "http://sourceforge.net/tracker/?func=add&group_id=12788&atid=112788" +
+       "\n\nException: " + exn.toString() +
+       "\n\nStack trace:\n");
+      exn.printStackTrace();
+    }
+
+  return OutputMessages.getStatusCode();
 }
 
+/**
+ * Determines the location of the nice runtime.
+ * 
+ */
+private ?String getNiceRuntime() 
+{
+  String resource = "/nice/tools/compiler/fun.class";
+
+  // Attempt to locate the file using the class loader.
+  ?java.net.URL classUrl = dispatch.class.getResource(resource);
+		
+  if (classUrl == null)
+    return null;
+
+  String file = notNull(classUrl.getFile());
+  try {
+    //	handle as jarfile
+    return file.substring(file.indexOf(":")+1, file.indexOf("!"));
+  } catch(StringIndexOutOfBoundsException e) {
+    //	oops it is a class file
+    return file.substring(0, file.indexOf(resource));
+  }
+}
 
 // Local Variables:
 // nice-xprogram: "nicec -d \"$HOME/Nice/classes\" --sourcepath=\"$HOME/Nice/src\" --classpath=\"$HOME/Nice/classes\""

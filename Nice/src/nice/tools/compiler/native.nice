@@ -20,12 +20,13 @@ package nice.tools.compiler;
    @author Daniel Bonniot (bonniot@users.sourceforge.net)
  */
 
-void produceNativeProgram(?String nativeCompiler, String pkg, String output)
+void produceNativeProgram(?String nativeCompiler, String pkg, 
+			  String output, String jar)
 {
-  compileWithGcj(nativeCompiler, pkg, output);
+  compileWithGcj(nativeCompiler, pkg, output, jar);
 }
 
-void compileWithGcj(?String gcj, String pkg, String output)
+void compileWithGcj(?String gcj, String pkg, String output, String jar)
 {
   if (gcj == null)
     {
@@ -36,7 +37,7 @@ void compileWithGcj(?String gcj, String pkg, String output)
   try{
     Process p = Runtime.getRuntime().exec
       ([gcj, "--main=" + pkg + ".package", 
-        "-o", output, output + ".jar" ]);
+        "-o", output, jar ]);
     p.waitFor();
     if (p.exitValue() != 0)
       fail();

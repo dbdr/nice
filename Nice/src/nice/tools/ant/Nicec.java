@@ -4,6 +4,7 @@ import org.apache.tools.ant.*;
 import java.io.File;
 import java.util.Vector;
 import nice.tools.compiler.OutputMessages;
+import bossa.modules.Compilation;
 
 /**
 		<h2><a name="java">Nicec</a></h2>
@@ -78,33 +79,8 @@ import nice.tools.compiler.OutputMessages;
 				<td align="center" valign="top">No</td>
 			</tr>
 			<tr>
-				<td valign="top">help</td>
-				<td valign="top">Print help message and exit.</td>
-				<td align="center" valign="top">No</td>
-			</tr>
-			<tr>
 				<td valign="top">editor</td>
 				<td valign="top">Tell nicec that it is called by an editor.</td>
-				<td align="center" valign="top">No</td>
-			</tr>
-			<tr>
-				<td valign="top">man</td>
-				<td valign="top">Print man page to stdout.</td>
-				<td align="center" valign="top">No</td>
-			</tr>
-			<tr>
-				<td valign="top">version</td>
-				<td valign="top">Print version info and exit.</td>
-				<td align="center" valign="top">No</td>
-			</tr>
-			<tr>
-				<td valign="top">usage</td>
-				<td valign="top">Print usage information and exit.</td>
-				<td align="center" valign="top">No</td>
-			</tr>
-			<tr>
-				<td valign="top">memory</td>
-				<td valign="top">Print memory usage information after compilation.</td>
 				<td align="center" valign="top">No</td>
 			</tr>
 		</table>
@@ -223,7 +199,7 @@ public class Nicec extends Task {
 
 	/**	Location of nice.jar
 	 */
-	private String runtime = getRuntime();
+	private String runtime = null;
 
 	public void setRuntime(String runtime)
 	{
@@ -240,22 +216,6 @@ public class Nicec extends Task {
 	}
 
 
-
-
-
-
-
-
-	/**	Print help message and exit
-	 */
-	private boolean help;
-
-	public void setHelp(boolean help)
-	{
-		this.help = help;
-	}
-
-
 	/**	Tell nicec that it is called by an editor.
 	 */
 	private boolean editor;
@@ -265,45 +225,6 @@ public class Nicec extends Task {
 		this.editor = editor;
 	}
 
-
-	/**	Print man page to stdout
-	 */
-	private boolean man;
-
-	public void setMan(boolean man)
-	{
-		this.man = man;
-	}
-
-
-	/**	Print version info and exit
-	 */
-	private boolean version;
-
-	public void setVersion(boolean version)
-	{
-		this.version = version;
-	}
-
-
-	/**	Print usage information and exit
-	 */
-	private boolean usage;
-
-	public void setUsage(boolean usage)
-	{
-		this.usage = usage;
-	}
-
-
-	/**	Print memory usage information after compilation
-	 */
-	private boolean memory;
-
-	public void setMemory(boolean memory)
-	{
-		this.memory = memory;
-	}
 
 	/**	The package to compile
 	 */
@@ -323,76 +244,33 @@ public class Nicec extends Task {
 	/**	Executes the ant Nice compiler.
 	 */
 	public void execute() throws BuildException {
-		log("runtime: " + getRuntime(), Project.MSG_VERBOSE);
+	  log("runtime: " + runtime, Project.MSG_VERBOSE);
 
-		int retval = nice.tools.compiler.fun.compile
-			(pack,
-			sourcepath,
-			destination,
-			classpath,
-			jar,
-			output,
-			recompile,
-			recompile_all,
-			compile,
-			exclude_runtime,
-			runtime,
-			native_compiler,
-			help,
-			editor,
-			man,
-			version,
-			usage,
-			memory);
+	  Compilation compilation = bossa.modules.fun.createCompilation();
+	  compilation.sourcePath = sourcepath;
+	  compilation.destinationDir = destination.getAbsolutePath();
+	  compilation.packagePath = classpath;
+	  compilation.output = jar;
+	  compilation.recompileCommandLine = recompile;
+	  compilation.recompileAll = recompile_all;
+	  compilation.skipLink = compile;
+	  compilation.excludeRuntime = exclude_runtime;
+	  compilation.runtimeFile = runtime;
+	  int retval = nice.tools.compiler.fun.compile
+	    (compilation, pack, output, native_compiler, editor);
 
-		switch (retval) {
-			case OutputMessages.ERROR:
-				throw new BuildException(ERROR_MSG, location);
-			case OutputMessages.BUG:
-				throw new BuildException(BUG_MSG, location);
-			case OutputMessages.WARNING:
-				log(WARNING_MSG, Project.MSG_WARN);
-				break;
-			case OutputMessages.OK:
-				log(OK_MSG, Project.MSG_INFO);
-				break;
-		}
-	}
-
-
-
-	/**
-	 * Determines the location of the nice runtime.
-	 *
-	 */
-	private String getRuntime() {
-		//	when Nicec is in the nice.jar, then we should use
-		//	nice.tools.ant.Nicec dummy = new ...
-		nice.tools.runJar dummy = new nice.tools.runJar();
-		String resource = nice.tools.runJar.class.getName();
-
-		// Format the file name into a valid resource name.
-		if (!resource.startsWith("/")) {
-			resource = "/" + resource;
-		}
-		resource = resource.replace('.', '/');
-		resource = resource + ".class";
-
-		// Attempt to locate the file using the class loader.
-		java.net.URL classUrl = Nicec.class.getResource(resource);
-		
-		if (classUrl == null) {
-			return null;
-		} else {
-			String file = classUrl.getFile();
-			try {
-				//	handle as jarfile
-				return file.substring(file.indexOf(":")+1, file.indexOf("!"));
-			} catch(StringIndexOutOfBoundsException e) {
-				//	oops it is a class file
-				return file.substring(0, file.indexOf(resource));
-			}
-		}
+	  switch (retval) {
+	  case OutputMessages.ERROR:
+	    throw new BuildException(ERROR_MSG, location);
+	  case OutputMessages.BUG:
+	    throw new BuildException(BUG_MSG, location);
+	  case OutputMessages.WARNING:
+	    log(WARNING_MSG, Project.MSG_WARN);
+	    break;
+	  case OutputMessages.OK:
+	    log(OK_MSG, Project.MSG_INFO);
+	    break;
+	  }
 	}
 
 
@@ -409,5 +287,3 @@ public class Nicec extends Task {
 
 
 }
-
-

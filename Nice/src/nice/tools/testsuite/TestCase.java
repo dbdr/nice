@@ -18,6 +18,7 @@ import java.util.*;
 import java.lang.reflect.*;
 
 import nice.tools.compiler.OutputMessages;
+import bossa.modules.Compilation;
 
 
 
@@ -319,26 +320,12 @@ public class TestCase {
 	 * @exception	TestSuiteException	TODO
 	 */
 	private int compilePackage(String packageName) throws TestSuiteException {
-		return nice.tools.compiler.fun.compile
-			(packageName,
-			TestNice.getTempFolder().getAbsolutePath(),
-			TestNice.getTempFolder(),
-			null,//classpath,
-			null,//jar,
-			null,//output,
-			false,//recompile,
-			false,//recompile_all,
-			false,//compile,
-			false,//exclude_runtime,
-			getRuntime(),
-			null,//native_compiler,
-			false,//help,
-			false,//editor,
-			false,//man,
-			false,//version,
-			false,//usage,
-			false//memory
-			);
+	  Compilation compilation = bossa.modules.fun.createCompilation();
+	  String tempDir = TestNice.getTempFolder().getAbsolutePath();
+	  compilation.sourcePath = tempDir;
+	  compilation.destinationDir = tempDir;
+	  return nice.tools.compiler.fun.compile
+	    (compilation, packageName, null, null, false);
 	}
 	
 	/**
@@ -479,36 +466,6 @@ public class TestCase {
 	}
 	
 	
-	/**
-	 * Determines the location of the nice runtime.
-	 * This method is also used by Nicec
-	 * 
-	 */
-	private String getRuntime() {
-		//	when Nicec is in the nice.jar, then we should use
-		//	nice.tools.ant.Nicec dummy = new ...
-		nice.tools.runJar dummy = new nice.tools.runJar();
-		String resource = "/nice/tools/ant/Nicec.class";
-
-		// Attempt to locate the file using the class loader.
-		java.net.URL classUrl = TestNice.class.getResource(resource);
-		
-		if (classUrl == null) {
-			return null;
-		} else {
-			String file = classUrl.getFile();
-			try {
-				//	handle as jarfile
-				return file.substring(file.indexOf(":")+1, file.indexOf("!"));
-			} catch(StringIndexOutOfBoundsException e) {
-				//	oops it is a class file
-				return file.substring(0, file.indexOf(resource));
-			}
-		}
-	}
-
-
-
 
 
 	/**

@@ -2928,7 +2928,7 @@ Statement ShortAssertStatement() :
   |
     {
       message = bossa.syntax.dispatch.createStringConstantExp(condition.toString()
-        + " failed at " + condition.location().toString().replace('\\','/'));
+        + " failed at " + condition.location().toShortString());
       call = bossa.syntax.dispatch.createCallExp(symb(t), condition, message);
     }
   )

@@ -50,3 +50,21 @@
   foo(red) = false;
   foo(blue) = false;
   foo(green) = true;
+
+/// PASS
+  assert red.toString().equals("red");
+  assert blue.toString().equals("blue");
+  assert green.toString().equals("green");
+  assert red.ordinal == 0;
+  assert blue.ordinal == 1;
+  assert green.ordinal == 2;
+  /// Toplevel
+  enum Color {red, blue, green}
+
+/// PASS
+  Color c = red;
+  assert c.equals(red);
+  assert !c.equals(blue);
+  assert !c.equals(green);
+  /// Toplevel
+  enum Color {red, blue, green}

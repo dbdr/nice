@@ -30,7 +30,9 @@ public class EnumDefinition extends Definition
     super(name, Node.global);
     shortName = name.toString();
     classDef = ClassDefinition.makeClass
-	(name,true,false, null, new ArrayList(0),null,null,null);
+	(name,true,false, null, new ArrayList(0),
+	new TypeIdent(new LocatedString("nice.lang.Enum",name.location())),
+	null,null);
     NiceClass impl = new NiceClass(classDef);
     impl.setFields(new ArrayList(0));
     classDef.setImplementation(impl);
@@ -40,11 +42,13 @@ public class EnumDefinition extends Definition
     this.elements = elements;
     
     symbols = new LinkedList();
+    int ord = 0;  
     for (Iterator it = elements.iterator(); it.hasNext(); )
       {
         Monotype type = new TypeIdent(name);
         type.nullness = Monotype.absent;
-        symbols.add(new EnumSymbol(name, (LocatedString)it.next(), type));
+        symbols.add(new EnumSymbol(name, (LocatedString)it.next(), type, ord));
+        ord++;
       }
     addChildren(symbols);
     
@@ -52,10 +56,17 @@ public class EnumDefinition extends Definition
 
   class EnumSymbol extends MonoSymbol 
   {
-    EnumSymbol(LocatedString enumName, LocatedString name, Monotype type)
+    EnumSymbol(LocatedString enumName, LocatedString name, Monotype type, int ordinal)
     {
       super(name, type);
-      this.value = new NewExp(new TypeIdent(enumName), Arguments.noArguments());
+      List args = new ArrayList(2);
+      args.add(new Arguments.Argument(new StringConstantExp(name.toString()),
+		new LocatedString("name",name.location)));
+      Integer val = new Integer(ordinal);
+      args.add(new Arguments.Argument(new ConstantExp(PrimitiveType.intTC, val,
+		val.toString(), name.location()),
+		new LocatedString("ordinal",name.location)));
+      this.value = new NewExp(new TypeIdent(enumName), new Arguments(args));
     }
       
     boolean isAssignable()

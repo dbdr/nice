@@ -58,41 +58,10 @@ public class Package implements mlsub.compilation.Module, Located
     read(true);
   }
   
-  public void compile()
-  {    
-    typecheck();
-    generateCode();
-    saveInterface();
-  }
-  
   /****************************************************************
    * Loading
    ****************************************************************/
-  /*
-  public static Package make(String name, 
-			     bossa.modules$Compilation compilation,
-			     boolean isRoot)
-  {
-    return make(new LocatedString(name, bossa.util.Location.nowhereAtAll()), 
-		compilation, isRoot);
-  }
-  
-  public static Package make(LocatedString lname, 
-			     bossa.modules$Compilation compilation,
-			     boolean isRoot)
-  {
-    Compilation c = new Compilation();
-    c.skipLink = compilation.skipLink;
-    c.root = compilation.root;
 
-    c.recompileAll = compilation.recompileAll;
-    c.recompileCommandLine = compilation.recompileCommandLine;
-    c.staticLink = compilation.staticLink;
-    c.recompilationNeeded = compilation.recompilationNeeded;
-
-    return make(lname, c, isRoot);
-  }
-  */
   public static Package make(String name, 
 			     Compilation compilation,
 			     boolean isRoot)
@@ -266,6 +235,10 @@ public class Package implements mlsub.compilation.Module, Located
     
     return false;
   }
+
+  /****************************************************************
+   * Package dependencies
+   ****************************************************************/
   
   public List /* of Package */ getRequirements()
   {
@@ -277,6 +250,35 @@ public class Package implements mlsub.compilation.Module, Located
     return opens.listIterator();
   }
   
+  private List /* of LocatedString */ imports;
+  private List /* of Package */ importedPackages;
+
+  private List getImports()
+  {
+    if (importedPackages == null)
+      computeImportedPackages();
+    
+    return importedPackages; 
+  }
+  
+  private void computeImportedPackages()
+  {
+    importedPackages = new ArrayList(imports.size());
+
+    for(Iterator i = imports.iterator(); i.hasNext();)
+      {
+	LocatedString s = (LocatedString) i.next();
+	importedPackages.add(make(s, compilation, false));
+      }
+  }
+
+  /** List of the LocatedStrings of packages implicitely opened. */
+  List opens;
+
+  /****************************************************************
+   * Passes
+   ****************************************************************/
+
   public void scope()
   {
     ast.buildScope();
@@ -297,6 +299,13 @@ public class Package implements mlsub.compilation.Module, Located
     }
   }
 
+  public void compile()
+  {    
+    typecheck();
+    generateCode();
+    saveInterface();
+  }
+  
   public void freezeGlobalContext()
   {
     contextFrozen = true;
@@ -348,76 +357,10 @@ public class Package implements mlsub.compilation.Module, Located
   {
     if (jar != null)
       closeJar();
-    else
+    else if (!Debug.skipLinkTests)
       addClass(dispatchClass);
   }
-  
-  private static JarOutputStream jar;
-  private static File jarDestFile;
-  
-  public void createJar()
-  {
-    if (jar != null)
-      Internal.error(this + " can't create a jar file again");
-    
-    String name = this.name.toString();
-    int lastDot = name.lastIndexOf('.');
-    if (lastDot!=-1)
-      name = name.substring(lastDot+1, name.length());
-    
-    try{
-      jarDestFile = new File(source.getOutputDirectory().getParent(), name + ".jar");
-      
-      OutputStream out = new FileOutputStream(jarDestFile);
-      Manifest manifest = new Manifest();
 
-      manifest.getMainAttributes().put(Attributes.Name.MANIFEST_VERSION,"1.0");
-      manifest.getMainAttributes().put(Attributes.Name.MAIN_CLASS, 
-				       this.name + ".package");
-     
-      jar = new JarOutputStream(out, manifest);
-    }
-    catch(IOException e){
-      User.error(this.name, "Error during creation of executable file: " + e);
-    }
-  }
-  
-  private void closeJar()
-  {
-    try{
-      for (Iterator i = dispatchClasses.iterator(); i.hasNext();)
-	{
-	  ClassType dispatchClass = (ClassType) i.next();
-	  JarEntry dispatchEntry = 
-	    new JarEntry(dispatchClass.getName().replace('.','/') + ".class");
-	  jar.putNextEntry(dispatchEntry);
-	  dispatchClass.writeToStream(jar);
-	}
-      jar.close();
-      jar = null;
-      jarDestFile = null;
-    }
-    catch(IOException e){
-      User.error(this.name, "Error during creation of executable file: "+e);
-    }
-  }
-
-  static
-  {
-    System.runFinalizersOnExit(true);
-  }
-  
-  protected void finalize()
-  {
-    if (jarDestFile != null)
-      // The jar file was not completed
-      // it must be corrupt, so it's cleaner to delete it
-      {
-	jarDestFile.delete();
-	jarDestFile = null;
-      }
-  }
-  
   private void saveInterface()
   {
     // do not save the interface 
@@ -524,6 +467,72 @@ public class Package implements mlsub.compilation.Module, Located
     dispatchComp = comp;
 
     dispatchClasses.add(dispatchClass);
+  }
+  
+  private static JarOutputStream jar;
+  private static File jarDestFile;
+  
+  public void createJar()
+  {
+    if (jar != null)
+      Internal.error(this + " can't create a jar file again");
+    
+    String name = this.name.toString();
+    int lastDot = name.lastIndexOf('.');
+    if (lastDot!=-1)
+      name = name.substring(lastDot+1, name.length());
+    
+    try{
+      jarDestFile = new File(source.getOutputDirectory().getParent(), name + ".jar");
+      
+      OutputStream out = new FileOutputStream(jarDestFile);
+      Manifest manifest = new Manifest();
+
+      manifest.getMainAttributes().put(Attributes.Name.MANIFEST_VERSION,"1.0");
+      manifest.getMainAttributes().put(Attributes.Name.MAIN_CLASS, 
+				       this.name + ".package");
+     
+      jar = new JarOutputStream(out, manifest);
+    }
+    catch(IOException e){
+      User.error(this.name, "Error during creation of executable file: " + e);
+    }
+  }
+  
+  private void closeJar()
+  {
+    try{
+      for (Iterator i = dispatchClasses.iterator(); i.hasNext();)
+	{
+	  ClassType dispatchClass = (ClassType) i.next();
+	  JarEntry dispatchEntry = 
+	    new JarEntry(dispatchClass.getName().replace('.','/') + ".class");
+	  jar.putNextEntry(dispatchEntry);
+	  dispatchClass.writeToStream(jar);
+	}
+      jar.close();
+      jar = null;
+      jarDestFile = null;
+    }
+    catch(IOException e){
+      User.error(this.name, "Error during creation of executable file: "+e);
+    }
+  }
+
+  static
+  {
+    System.runFinalizersOnExit(true);
+  }
+  
+  protected void finalize()
+  {
+    if (jarDestFile != null)
+      // The jar file was not completed
+      // it must be corrupt, so it's cleaner to delete it
+      {
+	jarDestFile.delete();
+	jarDestFile = null;
+      }
   }
   
   /**
@@ -793,31 +802,6 @@ public class Package implements mlsub.compilation.Module, Located
   
   public LocatedString name;
   
-  private List /* of LocatedString */ imports;
-  private List /* of Package */ importedPackages;
-
-  private List getImports()
-  {
-    if (importedPackages == null)
-      computeImportedPackages();
-    
-    return importedPackages; 
-  }
-  
-  private void computeImportedPackages()
-  {
-    importedPackages = new ArrayList(imports.size());
-
-    for(Iterator i = imports.iterator(); i.hasNext();)
-      {
-	LocatedString s = (LocatedString) i.next();
-	importedPackages.add(make(s, compilation, false));
-      }
-  }
-
-  /** List of the LocatedStrings of packages implicitely opened. */
-  List opens;
-
   private AST ast;
 
   /** The "source" where this package resides. */

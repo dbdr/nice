@@ -1642,15 +1642,16 @@ Expression Expression() :
   { 
     last=getToken(0);
     e1.setLocation(new Location(first, last));
-    return e1; 
+    return e1;
   }
 }
 
 Expression ClassicExpression() :
-{ Expression e1,e2; Token op; }
+{ Expression e1,e2; Token op, start = getToken(1); }
 {
   e1=ConditionalExpression()
   [ 
+    { e1.setLocation(new Location(start, getToken(0))); }
     op=AssignmentOperator() 
     e2=Expression()
     {
@@ -2276,14 +2277,15 @@ Statement StatementExpression() :
   |
     "--" { e1=new IncrementExp(e1, false, false); }
   |
-    { Token op; Expression e2; }
+    { Token op; Expression e2; 
+      e1.setLocation(new Location(first, getToken(0)));
+    }
     op=AssignmentOperator() 
     e2=Expression()
     {
       if(op.image.length()!=1)
         e2=CallExp.create(symb(op.image.substring(0, 1),op),e1,e2);
 
-      e1.setLocation(new Location(first, getToken(0)));
       e1=AssignExp.create(e1,e2);
     }
   ]

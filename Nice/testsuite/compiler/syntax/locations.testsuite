@@ -1,0 +1,5 @@
+/// COMMENT: Checks that locations are present and correct in error messages.
+
+/// FAIL
+  int x = 0;
+  x = /*/// FAIL HERE */ x && x = x;

@@ -13,7 +13,7 @@
   class Nice { String s = "default"; int i = 17; }
 
 /// PASS
-  new Nice(s: "");
+  let dummy = new Nice(s: "");
   /// Toplevel
   class Nice { String s; }
 

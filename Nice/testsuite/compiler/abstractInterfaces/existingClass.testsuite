@@ -11,7 +11,7 @@
   abstract interface I {}
   class java.lang.String implements I;
   /// package b import a
-  true;
+  {}
 
 /// FAIL
   /// package a

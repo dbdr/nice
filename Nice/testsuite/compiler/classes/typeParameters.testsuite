@@ -27,7 +27,7 @@ class Coord<Point P>
 }
 
 /// FAIL
-  new Coord(p: "");
+  Coord<Point> dummy = new Coord(p: "");
   /// Toplevel
 class Point { int x; }
 
@@ -131,7 +131,7 @@ public class Elem<!E> {
   public E getData() = data;
 }
   /// package b import a
-  new Elem(data: "");
+ Elem<String> dummy = new Elem(data: "");
 
 /// FAIL
   /// package a
@@ -140,7 +140,7 @@ public class Elem<!E> {
   E data;
 }
   /// package b import a
-  /* /// FAIL HERE */ new Elem(data: null);
+  Elem<String> dummy = /* /// FAIL HERE */ new Elem(data: null);
 
 /// PASS
   /// Toplevel
@@ -155,7 +155,7 @@ public class Elem<List<String> E> {
   E data;
 }
   /// package b import a
-  new Elem(data: "");
+  Elem<List<Sting>> dummy = new Elem(data: "");
 
 /// PASS
   /// package a
@@ -251,7 +251,7 @@ class Foo<T> {
 }
 
 /// PASS
-  new B();
+  let B<String> dummy = new B();
   /// Toplevel
 class A<T> { T->T f = T x => { T tmp = x; return tmp; }; }
 class B<T> extends A<T> {}
@@ -277,7 +277,7 @@ abstract interface A {
 }
 
 /// FAIL bug
-  new AWrapper();
+  new AWrapper().getClass();
   /// Toplevel
 class A<T> {}
 <A SomeA> class AWrapper<SomeA> {

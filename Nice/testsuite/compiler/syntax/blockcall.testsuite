@@ -11,4 +11,4 @@
 
 /// FAIL
   int x;
-  /* ///FAIL HERE */(x = 0) { print("abc"); }
+  (x = 0)/* ///FAIL HERE */{ print("abc"); }

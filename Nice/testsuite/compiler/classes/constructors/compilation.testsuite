@@ -1,6 +1,8 @@
 /// PASS
   if (false)
-    new A();
+  {
+    let dummy = new A();
+  }
   /// Toplevel
   class A {}
 
@@ -10,11 +12,11 @@
 class A { String name = ""; }
 
   /// package b import a
-new A();
+let dummy = new A();
 
 /// PASS
   /// package b import a
-new A();
+let dummy = new A();
 
   /// package a import b
   /// Toplevel
@@ -79,4 +81,4 @@ void foo() {
   /// package c import a
   {} 
   /// package d import a,c 
-  new AA(x:null);
+  AA<?String> dummy = new AA(x:null);

@@ -62,7 +62,7 @@ class B
   /// Toplevel
 class A{
   String _field;
-  void f() { _field; }
+  void f() { let s = _field; }
 }
 
 class B{

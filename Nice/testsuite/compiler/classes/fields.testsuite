@@ -6,7 +6,7 @@
   }
 
 /// PASS
-  new A();
+  let dummy = new A();
   /// TOPLEVEL
   class A
   {
@@ -51,7 +51,7 @@
   }
 
 /// PASS
-  new A();
+  let dummy = new A();
   /// Toplevel
   class A
   {
@@ -71,7 +71,7 @@
 /// PASS
   /// Toplevel
 
-  void doSomething(String s) { new Martin(); }
+  void doSomething(String s) { let dummy = new Martin(); }
 
   class Martin
   {
@@ -80,7 +80,7 @@
 
 /// PASS
   /// Toplevel
-  void g() { new Martin(); }
+  void g() { let dummy = new Martin(); }
 
   class Martin
   {

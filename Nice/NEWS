@@ -5,6 +5,7 @@ nice (0.9.6)
   * Alternative syntax for calling methods that takes an closure with no 
     arguments. For example 'loop(5) { doSomeThing(); }' is shorthand for
     'loop(5, () => { doSomeThing(); });'
+  * Stricter parsing of expression used as statement.
   * Bug fixes (checking of local variables in a call position, make it possible
     to use new Object() and dispatch on Object again, ... )
 

@@ -1,14 +1,14 @@
 /// PASS
-  new MyEx();
-  new MyEx("Super!");
+  let dummy1 = new MyEx();
+  let dummy2 = new MyEx("Super!");
   /// Toplevel
   class MyEx extends Exception {}
 
 /// PASS
-  new MyEx();
-  new MyEx("Super!");
-  new MyEx(i: 1);
-  new MyEx("Super!", i: 2);
+  let dummy1 = new MyEx();
+  let dummy2 = new MyEx("Super!");
+  let dummy3 = new MyEx(i: 1);
+  let dummy4 = new MyEx("Super!", i: 2);
   /// Toplevel
   class MyEx extends Exception { int i = 0; }
 

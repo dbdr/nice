@@ -1,5 +1,5 @@
 /// PASS
-  new A(i: cst);
+  let dummy = new A(i: cst);
   /// Toplevel
   let int cst = 42;
 
@@ -24,7 +24,7 @@
 /// PASS
   boolean ok = false;
   try {
-    new A();
+    let dummy = new A();
   }
   catch(Error e) { ok = true; }
   assert ok;
@@ -39,7 +39,7 @@
 /// PASS
   boolean ok = false;
   try {
-    new B();
+    let dummy = new B();
   }
   catch(Error e) { ok = true; }
   catch(Exception e) { ok = false; }
@@ -57,7 +57,7 @@
 
 /// PASS bug
   // Initializers should be executed after all the instance variables are set
-  new B();
+  let dummy = new B();
 
   /// Toplevel
   class A 
@@ -188,7 +188,7 @@ class A
 
 /// PASS
   // Capture of 'this' inside an initializer
-  new TestA(a: "ABC").b.equals("ABC");
+  let dummy = new TestA(a: "ABC").b.equals("ABC");
   /// Toplevel
 class TestA 
 {

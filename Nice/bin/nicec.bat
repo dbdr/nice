@@ -12,9 +12,6 @@ rem questions to jamie@thecodecollective.com
 rem
 rem ---------------------------------------------------------------------------
 
-rem -- save the original classpath
-set ORIGINALCLASSPATH=%CLASSPATH%
-
 rem -- do we have a nice environment variable?
 if not "%NICE%" == "" goto gotNice
 
@@ -34,11 +31,9 @@ goto cleanup
 
 rem -- set up the reference to the nice jar file
 set NICEJAR=%NICE%\nice.jar
-set CLASSPATH=%NICEJAR%;%CLASSPATH%
-java nice.tools.compiler.fun --runtime=%NICEJAR% %1 %2 %3 %4 %5 %6 %7 %8 %9
+java -classpath %NICEJAR%;%CLASSPATH% nice.tools.compiler.fun --runtime=%NICEJAR% %1 %2 %3 %4 %5 %6 %7 %8 %9
 
 rem -- cleanup environment variables
 :cleanup
 set NICEJAR=
-set CLASSPATH=%ORIGINALCLASSPATH%
 :finish

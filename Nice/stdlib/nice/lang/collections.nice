@@ -153,6 +153,7 @@ similarEmptyCollection(c#Vector) = new Vector(c.size());
 
 similarEmptyCollection(c#Stack) = new Stack();
 
+similarEmptyCollection(c#HashSet) = new HashSet(c.size());
 /****************************************************************
  * Sort
  ****************************************************************/

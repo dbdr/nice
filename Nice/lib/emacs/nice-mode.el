@@ -129,11 +129,11 @@
         'nice-link-face))
    
    ;; Package import
-   '("^\\s-*require\\s-+\\([\\.a-zA-Z0-9_]+\\)"
-     1 (nice-link-create
-        (match-beginning 1) (match-end 1)
-        (cons 'package (match-string-no-properties 1))
-        'nice-link-face))
+;   '("^\\s-*require\\s-+\\([\\.a-zA-Z0-9_]+\\)"
+;     1 (nice-link-create
+;        (match-beginning 1) (match-end 1)
+;        (cons 'package (match-string-no-properties 1))
+;        'nice-link-face))
    
    ;; Method declaration
    (funcall highlight
@@ -195,11 +195,11 @@
    (list type 1 'nice-type-face)
    
    ;; Keywords
-   '("\\<\\(fun\\|static\\|final\\|transient\\|volatile\\|const\\|extends\\|implements\\|abstract\\|public\\|private\\|var\\|class\\|interface\\|new\\|else\\|native\\|inline\\|import\\|require\\|package\\|alike\\|Any\\|return\\|break\\|continue\\|super\\|try\\|catch\\|finally\\|throw\\|instanceof\\)\\>\\|@\\|=>"
+   '("\\<\\(fun\\|static\\|final\\|transient\\|volatile\\|const\\|extends\\|implements\\|abstract\\|public\\|private\\|var\\|class\\|interface\\|new\\|else\\|native\\|inline\\|import\\|package\\|alike\\|Any\\|return\\|break\\|continue\\|super\\|try\\|catch\\|finally\\|throw\\|instanceof\\|requires\\|ensures\\|assert\\|do\\)\\>\\|@\\|=>"
      0 nice-keyword-face)
    
    ;; for/if/assert followed by '('
-   '("^\\s-*\\(dynamic\\|assert\\|for\\|while\\|if\\)\\s-*("
+   '("^\\s-*\\(for\\|while\\|if\\)\\s-*("
      1 nice-keyword-face t)
    )
   "Nice mode keywords.")

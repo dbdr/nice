@@ -2336,9 +2336,14 @@ Statement Block() :
 Statement BlockStatement(List statements) :
 { Statement res; }
 {
-  (
+(
   LOOKAHEAD( "final" | "const" | "var" | "let" | monotype() <IDENT>)
-    res = LocalDeclaration() 
+  ( 
+    LOOKAHEAD( [ "final" | "const" | "var" | "let" ] monotype() <IDENT> "(" )
+    res = LocalFunctionDeclaration() 
+  |
+    res = LocalDeclaration() ";"
+  )
 |
   // There are two cases for tuples (declaring a variable or not). 
   // Since it seems we cannot have a lookahead inside another we 
@@ -2363,14 +2368,59 @@ Statement LocalDeclaration() :
 {
   Monotype type = null;
   LocatedString id;
+  Expression e = null;
+  boolean constant = true;
+  Token t = null;
+  Block.LocalValue res;
+}
+{
+  ( LOOKAHEAD ( monotype() ident() )
+    type=monotype()
+    id=ident()
+    [ "=" e=Expression() ] 
+    { res = new Block.LocalVariable(id,type,false,e); }
+    ( LOOKAHEAD( "," <IDENT> ( "=" | ";" ) ) 
+      "," id=ident() {e=null;} [ "=" e=Expression() ] { res.addNext(id,e); } )*
+  |
+    (
+      (t="final" | t="const") 
+        {User.warning(new Location(t),
+		"'"+t.toString()+"' is deprecated. Use 'let' instead.");
+	}
+    | "let"
+    | "var" {constant = false;}
+    )
+    (  LOOKAHEAD ( <IDENT> "=" )
+      id=ident()
+      "=" e=Expression()
+      { if (constant) { res = new Block.LocalConstant(id,e);}
+        else { res = new Block.LocalVariable(id, null, constant, e);}
+      }
+      ( LOOKAHEAD( "," <IDENT> "=" ) 
+	"," id=ident() "=" e=Expression() { res.addNext(id,e); } )*
+    |
+      type=monotype()
+      id=ident()
+      [ "=" e=Expression() ] 
+      { res = new Block.LocalVariable(id,type,constant,e); }
+      ( LOOKAHEAD( "," <IDENT> ( "=" | ";") ) 
+        "," id=ident() {e=null;} [ "=" e=Expression() ] { res.addNext(id,e); } )*
+    )
+  )
+  { return res; }
+}
+
+Statement LocalFunctionDeclaration() :
+{
+  Monotype type = null;
+  LocatedString id;
   FormalParameters parameters;
   Statement body;
-  Expression e=null;
   boolean constant = true;
   Token t = null;
 }
 {
-  (  LOOKAHEAD( [ ("final"|"const"|"let"|"var") ] monotype() ident() )
+  (  
     (
       (t="final" | t="const")
         {User.warning(new Location(t),
@@ -2382,36 +2432,11 @@ Statement LocalDeclaration() :
     )
     type = monotype()
     id=ident()
-    (
     "(" parameters=formalParameters(false) ")" body=code() 
-      { return Block.LocalFunction.make(id, type, parameters, body); }
-    | 
-      [ "=" e=Expression() ] 
-      { Block.LocalVariable res = new Block.LocalVariable(id,type,constant,e); }
-      ( "," id=ident() {e=null;} [ "=" e=Expression() ] { res.addNext(id,e); } )*
-      ";" 
-      { return res; }
-    )
-  |
-    (
-      (t="final" | t="const") 
-        {User.warning(new Location(t),
-		"'"+t.toString()+"' is deprecated. Use 'let' instead.");
-	}
-    | "let"
-    | "var" {constant = false;}
-    )
-    id=ident()
-    "=" e=Expression()
-    { Block.LocalValue res;
-      if (constant) { res = new Block.LocalConstant(id,e);}
-      else { res = new Block.LocalVariable(id, null, constant, e);}
-    }
-    ( "," id=ident() "=" e=Expression() { res.addNext(id,e); } )*
-    ";" 
-    { return res; }
+    { return Block.LocalFunction.make(id, type, parameters, body); }
   )
 }
+
 
 Statement LocalTupleDeclaration(List statements) :
 {
@@ -2559,27 +2584,31 @@ Statement DoStatement() :
 }
 
 Statement ForStatement() :
-{ Statement init=null,update=null,body,loop,block; Expression cond=null; }
+{ Statement update = null, loop = null, body, statexp;
+  Expression cond = null;
+  List init = new ArrayList();
+}
 {
   "for" "(" 
   (  
-    LOOKAHEAD( monotype() <IDENT> ":" ) block=ForInStatement()
-  |
-    ( init=ForInit() | ";" )
+    LOOKAHEAD( monotype() <IDENT> ":" ) loop=ForInStatement()
+  | (
+      LOOKAHEAD( "final" | "const" | "var" | "let" | monotype() <IDENT>) 
+      init=LocalDeclarationList() 
+    | statexp=StatementExpression() ";" {init.add(statexp);}
+    | ";"
+    )
     [ cond=Expression() ] ";" [ update=StatementExpressionList() ] ")" 
     body=Statement()
     { 
       loop=LoopStmt.forLoop(cond,update,body);
-      if(init==null)
-        return loop;
-  
       List l = new LinkedList();
-      l.add(init);
+      l.addAll(init);
       l.add(loop);
-      block = new Block(l);
+      loop = new Block(l);
     }
   )
-  { return block; }
+  { return loop; }
 }
 
 Statement ForInStatement() :                                                
@@ -2590,23 +2619,20 @@ Statement ForInStatement() :
   {return LoopStmt.forInLoop(vartype,var,new Location(t),container,body); }
 }
 
-Statement ForInit() :
-{ Statement res; }
+List LocalDeclarationList() :
+{ Statement d; List declarations = new ArrayList(); }
 {
-  (
-  LOOKAHEAD( [ "final" | "const" ] monotype() <IDENT> )
-  res=LocalDeclaration()
-|
-  res=StatementExpressionList() ";"
-  )
-  { return res; }
+  d=LocalDeclaration() {declarations.add(d);} 
+  ( "," d=LocalDeclaration() {declarations.add(d);} )*
+  ";"
+  { return declarations; }
 }
 
 Statement StatementExpressionList() :
 { Statement s; List statements=new LinkedList(); }
 {
   s=StatementExpression() { statements.add(s); }
-  ( "," StatementExpression() { statements.add(s); }
+  ( "," s=StatementExpression() { statements.add(s); }
   )*
   { return new Block(statements); }
 }

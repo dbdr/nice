@@ -19,6 +19,7 @@ package nice.tools.util;
  */
 
 import java.io.*;
+import nice.lang.reflect;
 
 public void printStackTraceWithSourceInfo(Throwable t) = 
   printStackTraceWithSourceInfo(t, java.lang.System.err);
@@ -26,20 +27,27 @@ public void printStackTraceWithSourceInfo(Throwable t) =
 public void printStackTraceWithSourceInfo(Throwable t, PrintStream s) =
   printStackTraceWithSourceInfo(t, new PrintWriter(s));
 
+String STE_getClassName(Object ste) = ste.call("getClassName");
+?String STE_getFileName(Object ste) = ste.call("getFileName");
+String STE_getMethodName(Object ste) = ste.call("getMethodName");
+int STE_getLineNumber(Object ste) = ste.call("getLineNumber");
+boolean STE_isNativeMethod(Object ste) = ste.call("isNativeMethod");
+
 public void printStackTraceWithSourceInfo(Throwable t, PrintWriter w)
 {
   w.println("Exception in thread \"" Thread.currentThread().getName "\" " t);
   try {
-    let elements = t.getStackTrace();
-    elements.foreach(StackTraceElement e => {
+    let getSTMethod = t.getClass().getMethod("getStackTrace", null);
+    let Object[] elements = cast(getSTMethod.invoke(t, null));
+    elements.foreach(Object e => {
       (?String file, int line) = 
-        getSourceLocation(e.getClassName(), e.getLineNumber())
-        || (e.getFileName(), e.getLineNumber());
+        getSourceLocation(e.STE_getClassName(), e.STE_getLineNumber())
+        || (e.STE_getFileName(), e.STE_getLineNumber());
       let location =
-        file == null ? (e.isNativeMethod ? "Native Method" : "Unknown Source")
+        file == null ? (e.STE_isNativeMethod ? "Native Method" : "Unknown Source")
       : line < 0 ? file
       : (file + ":" + line);
-      w.println("\tat " e.getClassName "." e.getMethodName "(" location ")");
+      w.println("\tat " e.STE_getClassName "." e.STE_getMethodName "(" location ")");
     });
   } catch (NoSuchMethodError e) {
     // Fallback in case method Throwable.getStackTrace() is not available.

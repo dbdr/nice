@@ -1,0 +1,6 @@
+/// FAIL bug
+  // bug #1060712
+  //let a = new A(); // this would trigger a verification error
+  /// Toplevel
+// Try to extends a class that has only private constructors
+class A extends javax.swing.KeyStroke {}

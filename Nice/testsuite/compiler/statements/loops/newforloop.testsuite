@@ -29,3 +29,15 @@
     for(int i : array3) j+=i;
   assert(j==10);
   
+/// PASS
+  String[] arr = ["a","bc","def","ghij","klmno"];
+  String t = "";
+  for (s : arr) t+=s;
+  assert(t.equals("abcdefghijklmno"));
+
+/// PASS
+  int[][] array2 = [[1,2],[3,4]];
+  int j = 0;
+  for(array3 : array2) 
+    for(i : array3) j+=i;
+  assert(j==10);

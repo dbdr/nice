@@ -73,8 +73,6 @@ public class Block extends Statement
       return left.name.location();
     }
 
-    MonoSymbol getLeft() { return left; }
-
     MonoSymbol left;
   }
 
@@ -127,8 +125,6 @@ public class Block extends Statement
     {
       return left.name.location();
     }
-
-    FunSymbol getLeft() { return left; }
 
     FunSymbol left;
   }

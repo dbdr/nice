@@ -105,3 +105,78 @@ class B extends A { int life = 42; }
   interface Y {}
   class C implements X {}
   class D implements X,Y {}
+
+/// PASS
+  A x = new B();
+  if (!( x instanceof B))
+    assert false;
+  else
+    assert x.life == 42;
+
+/// PASS
+  assert foo(new B()) == 42;
+  /// Toplevel
+  int foo(A x) {
+    if (!( x instanceof B))
+      return 0;
+
+    return x.life;    
+   }
+
+/// FAIL
+  A x = new B();
+  int i = 0;
+  if (x instanceof B)
+    i = x.life;
+  else
+    i = x./* /// FAIL HERE */life;
+
+/// FAIL
+  A x = new B();
+  int i = 0;
+  if (x instanceof B)
+    i = x.life;
+
+  i = x./* /// FAIL HERE */life;
+
+/// PASS
+  A x = new B();
+  A y = new B();
+  int i = 0;
+  if (x instanceof B && y instanceof B)
+    i = x.life + y.life;
+  else
+    assert false;
+
+/// PASS
+  A x = new B();
+  A y = new B();
+  int i = 0;
+  if (!(x instanceof B) || !(y instanceof B))
+    assert false;
+  else
+    i = x.life + y.life;
+
+/// PASS
+  A x = new B();
+  if (x instanceof B && x.life == 42)
+    assert true;
+  else
+    assert false;
+
+/// FAIL
+  A x = new B();
+  if ((!(x instanceof B)) && x./* /// FAIL HERE */life == 42)
+    assert true;
+
+/// PASS
+  A x = new B();
+  if ((!(x instanceof B)) || x.life == 42)
+    assert true;
+  else
+    assert false;
+
+/// FAIL
+  A x = new B();
+  if (x instanceof B || x./* /// FAIL HERE */life == 42)
+    assert true;

@@ -119,8 +119,15 @@ void typecheckAndArgs(Arguments args)
 	setVarType(variable, now: sureType, out: type);
       });
 
+    ?List<(MonoSymbol, mlsub.typing.Monotype)> instanceofIfSucceeds =
+	first_(instanceofInfo(args.getExp(0)));
+
+    if (instanceofIfSucceeds != null)
+      instanceofIfSucceeds.foreach(((MonoSymbol variable, mlsub.typing.Monotype type)) =>
+	setVarType(variable, now: type, out: variable.type));
+
     typecheck(args.getExp(1));
-    if (l != null) {
+    if (l != null || instanceofIfSucceeds != null) {
       Expression e = args.getExp(1).noOverloading();
       args.setExp(1, e);
       e.getType();
@@ -154,8 +161,16 @@ void typecheckOrArgs(Arguments args)
 	setVarType(variable, now: sureType, out: type);
       });
 
+    ?List<(MonoSymbol, mlsub.typing.Monotype)> instanceofIfFails =
+	second_(instanceofInfo(args.getExp(0)));
+
+    if (instanceofIfFails != null)
+      instanceofIfFails.foreach(((MonoSymbol variable, mlsub.typing.Monotype type)) =>
+	setVarType(variable, now: type, out: variable.type));
+
     typecheck(args.getExp(1));
-    if (l != null) {
+
+    if (l != null || instanceofIfFails != null)  {
       Expression e = args.getExp(1).noOverloading();
       args.setExp(1, e);
       e.getType();
@@ -227,10 +242,10 @@ nullnessInfo(test@CallExp)
 
   if (test.isCallTo("||"))
     {
-      (?List<MonoSymbol> notNullIfTrue0, ?List<MonoSymbol> notNullIfFalse0) =
-	nullnessInfo(notNull(test.arguments.getExp(0)));
-      (?List<MonoSymbol> notNullIfTrue1, ?List<MonoSymbol> notNullIfFalse1) =
-	nullnessInfo(notNull(test.arguments.getExp(1)));
+      ?List<MonoSymbol> notNullIfFalse0 = 
+	 second_(nullnessInfo(notNull(test.arguments.getExp(0))));
+      ?List<MonoSymbol> notNullIfFalse1 = 
+	second_(nullnessInfo(notNull(test.arguments.getExp(1))));
 
       // If this test is false, it is because both subtests are.
       return (null, combine(notNullIfFalse0, notNullIfFalse1));
@@ -238,10 +253,10 @@ nullnessInfo(test@CallExp)
 
   if (test.isCallTo("&&"))
     {
-      (?List<MonoSymbol> notNullIfTrue0, ?List<MonoSymbol> notNullIfFalse0) =
-	nullnessInfo(notNull(test.arguments.getExp(0)));
-      (?List<MonoSymbol> notNullIfTrue1, ?List<MonoSymbol> notNullIfFalse1) =
-	nullnessInfo(notNull(test.arguments.getExp(1)));
+      ?List<MonoSymbol> notNullIfTrue0 =
+	first_(nullnessInfo(notNull(test.arguments.getExp(0))));
+      ?List<MonoSymbol> notNullIfTrue1 =
+	first_(nullnessInfo(notNull(test.arguments.getExp(1))));
 
       // If this test is true, it is because both subtests are.
       return (combine(notNullIfTrue0, notNullIfTrue1), null);
@@ -275,8 +290,9 @@ nullnessInfo(test@CallExp)
     return (l, null);
 }
 
+
 // Returns a list combining l1 and l2, possibly modifying l1.
-private ?List<MonoSymbol> combine(?List<MonoSymbol> l1, ?List<MonoSymbol> l2)
+private <T> ?List<T> combine(?List<T> l1, ?List<T> l2)
 {
   if (l1 == null)
     return l2;
@@ -285,6 +301,9 @@ private ?List<MonoSymbol> combine(?List<MonoSymbol> l1, ?List<MonoSymbol> l2)
     l1.addAll(l2);
   return l1;
 }
+
+private <T> T first_((T t1, T t2)) = t1;
+private <T> T second_((T t1, T t2)) = t2;
 
 ?List<MonoSymbol> variablesNotNullIfTestSucceeds(Expression test)
 {
@@ -298,6 +317,50 @@ private ?List<MonoSymbol> combine(?List<MonoSymbol> l1, ?List<MonoSymbol> l2)
   (?List<MonoSymbol> notNullIfTrue, ?List<MonoSymbol> notNullIfFalse) = 
     nullnessInfo(test);
   return notNullIfFalse;
+}
+
+
+(?List<(MonoSymbol, mlsub.typing.Monotype)>, ?List<(MonoSymbol, mlsub.typing.Monotype)>) instanceofInfo(Expression test);
+instanceofInfo(test) = (null, null);
+instanceofInfo(test@CallExp)
+{
+  if (test.isCallTo("||"))
+    {
+      ?List<(MonoSymbol, mlsub.typing.Monotype)> instanceofIfFalse0 = 
+	 second_(instanceofInfo(notNull(test.arguments.getExp(0))));
+      ?List<(MonoSymbol, mlsub.typing.Monotype)> instanceofIfFalse1 = 
+	second_(instanceofInfo(notNull(test.arguments.getExp(1))));
+
+      return (null, combine(instanceofIfFalse0, instanceofIfFalse1));
+    }
+
+  if (test.isCallTo("&&"))
+    {
+      ?List<(MonoSymbol, mlsub.typing.Monotype)> instanceofIfTrue0 =
+	first_(instanceofInfo(notNull(test.arguments.getExp(0))));
+      ?List<(MonoSymbol, mlsub.typing.Monotype)> instanceofIfTrue1 =
+	first_(instanceofInfo(notNull(test.arguments.getExp(1))));
+
+      return (combine(instanceofIfTrue0, instanceofIfTrue1), null);
+    }
+
+  if (test.isCallTo("!"))
+    {
+	(?List<(MonoSymbol, mlsub.typing.Monotype)> ifTrue, 
+		?List<(MonoSymbol, mlsub.typing.Monotype)> ifFalse) =
+ 		instanceofInfo(notNull(test.arguments.getExp(0)));
+	return (ifFalse, ifTrue);
+    }
+
+  ?(MonoSymbol, mlsub.typing.Monotype) info = getInstanceof(test);
+
+  if (info == null)
+    return (null, null);
+
+  List<(MonoSymbol, mlsub.typing.Monotype)> list = new LinkedList();
+  list.add(info);
+  
+  return (list, null);
 }
 
 /** 
@@ -391,14 +454,14 @@ typecheck(e@IfExp)
 	setVarType(variable, now: sureType, otherBranch: type);
       });
 
-    ?(MonoSymbol, mlsub.typing.Monotype) test = getInstanceof(notNull(e.condition));
-    if (test != null)
-      {
-	(MonoSymbol variable, mlsub.typing.Monotype type) = test;
-	setVarType(variable, now: type, otherBranch: variable.type);
-      }
+    (?List<(MonoSymbol, mlsub.typing.Monotype)> instanceofInThen,
+	?List<(MonoSymbol, mlsub.typing.Monotype)> instanceofInElse) = 
+      	instanceofInfo(condition);
 
-
+    if (instanceofInThen != null) 
+      instanceofInThen.foreach( ((MonoSymbol variable, mlsub.typing.Monotype type)) =>
+	setVarType(variable, now: type, otherBranch: variable.type));
+      
     e.thenExp = thenExp = notNull(thenExp.noOverloading());
     typecheck(thenExp);
     // since the type of the variable is destructively changed,
@@ -413,6 +476,10 @@ typecheck(e@IfExp)
 	mlsub.typing.Monotype sureType = makeSure(type);
 	setVarType(variable, now: sureType, out: type);
       });
+
+    if (instanceofInElse != null) 
+      instanceofInElse.foreach( ((MonoSymbol variable, mlsub.typing.Monotype type)) =>
+	setVarType(variable, now: type, out: variable.type));
 
     e.elseExp = elseExp = notNull(elseExp.noOverloading());
     typecheck(elseExp);
@@ -642,12 +709,12 @@ typecheck(l@LoopStmt)
 					now: makeSure(variable.type), 
 					out: variable.type));
 
-	?(MonoSymbol, mlsub.typing.Monotype) test = getInstanceof(notNull(whileExp));
-	if (test != null)
-	{
-	  (MonoSymbol variable, mlsub.typing.Monotype type) = test;
-	  setVarType(variable, now: type, otherBranch: variable.type);
-	}
+	?List<(MonoSymbol, mlsub.typing.Monotype)> instanceofIfTrue = 
+		first_(instanceofInfo(notNull(whileExp)));
+
+	if (instanceofIfTrue != null)
+	  instanceofIfTrue.foreach( ((MonoSymbol variable, mlsub.typing.Monotype type)) =>
+		setVarType(variable, now: type, out: variable.type));
       }
 
   typecheck(l.loopBody);

@@ -12,7 +12,6 @@
 
 // File    : ClassExp.java
 // Created : Wed Mar 29 14:30:13 2000 by Daniel Bonniot
-//$Modified: Mon Aug 07 15:31:53 2000 by Daniel Bonniot $
 
 package bossa.syntax;
 
@@ -25,6 +24,7 @@ import bossa.util.*;
  * java.lang.System is a ClassExp, and is considered temporarilly
  * as an additional argument.
  * 
+ * @version $Revision$, $Date$
  * @author Daniel Bonniot
  */
 

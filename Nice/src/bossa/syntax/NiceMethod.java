@@ -168,6 +168,22 @@ public class NiceMethod extends UserOperator
     if (isOverride && specializedMethods == null)
       User.error(this, "This method does not override any other method");
 
+    if (! inInterfaceFile() && ! isOverride && specializedMethods != null)
+      {
+        MethodDeclaration parent = 
+          (MethodDeclaration) specializedMethods.get(0);
+        boolean sameResult = 
+          getReturnType().toString().equals(parent.getReturnType().toString());
+
+        if (sameResult)
+          User.warning(this, "This method overrides " + parent +
+"\nYou should make this explicit, either by omitting the return type" +
+                       "\nor by using the 'override' keyword");
+        else
+          User.warning(this, "This method overrides " + parent +
+"\nYou should make this explicit by using the 'override' keyword");
+      }
+
     super.typedResolve();
   }
 

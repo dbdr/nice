@@ -45,8 +45,13 @@ public abstract class MethodDeclaration extends Definition
 
   buildScope(outer, typeOuter)
   {
-    module.scope.addSymbol(symbol);
+    this.addToScope();
     super;
+  }
+
+  void addToScope()
+  {
+    module.scope.addSymbol(symbol);
   }
 
   public ?mlsub.typing.Polytype getType()

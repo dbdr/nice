@@ -40,3 +40,28 @@ abstract class A implements javax.swing.Action {
 public class Flow4JEditPartFactory implements javax.swing.Action {
   putValue(editPart, model) {}
 }
+
+
+/// PASS
+  /// package lib
+  /// Toplevel
+public class A
+{
+  public void foo() {}
+}
+
+  /// package a
+  // We don't import the 'lib' package, so as to see it as a "native" package
+  /// Toplevel
+class A<T> = native lib.A;
+<T> A<T> A() = native new lib.A();
+<T> void foo(A<T>) = native void lib.A.foo();
+
+  /// package b import a
+  {}
+
+  /// package c import b
+  // It's questionable whether the retyped version of foo or the raw one
+  // is visible here. In both cases this testcase should be.
+  // Failing with "foo is not declared" is not OK.
+  new lib.A().foo();

@@ -161,8 +161,10 @@ class Content
   {
     if (sourceRead)
       return source.getName();
-    else
+    else if (compiled != null)
       return compiled.getName();
+    else
+      return "";
   }
 
   /** return a longer string that identifies the type of package source too. */

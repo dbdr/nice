@@ -24,7 +24,13 @@ public class ChainLambdas extends ExpWalker
     ScopeExp saveScope = currentScope;
     try
       {
-	exp.outer = currentScope;
+	/* Nice: We keep outer if it exists. This is used for Nice classes,
+	   whose outer is the 'fun' class which holds the anonymous
+	   functions occuring in the class methods (overriding of
+	   native methods).
+	*/
+	if (exp.outer == null)
+	  exp.outer = currentScope;
 	currentScope = exp;
 	exp.walkChildren(this);
 	return exp;

@@ -75,7 +75,7 @@ public class Package implements mlsub.compilation.Module, Located, bossa.syntax.
     this.name = name;
     this.compilation = compilation;
     this.isRoot = isRoot;
-    
+
     compilation.packages.put(name.toString(), this);
 
     source = compilation.locator.find(this);
@@ -84,10 +84,10 @@ public class Package implements mlsub.compilation.Module, Located, bossa.syntax.
 
     loadImports();
 
+    prepareCodeGeneration();
+
     read(compilation.recompileAll || 
 	 isRoot && compilation.recompileCommandLine);
-    
-    thisPkg = new gnu.expr.Package(getName());
   }
 
   private void loadImports()
@@ -542,6 +542,7 @@ public class Package implements mlsub.compilation.Module, Located, bossa.syntax.
   public void addImplementationClass(gnu.expr.ClassExp classe)
   {
     thisPkg.addClass(classe);
+    classe.outer = getImplementationClass();
   }
 
   public gnu.expr.Declaration addGlobalVar(String name, Type type)
@@ -560,7 +561,7 @@ public class Package implements mlsub.compilation.Module, Located, bossa.syntax.
       }
     else
       {
-	implementationClass.addDeclaration(declaration);
+	getImplementationClass().addDeclaration(declaration);
 	declaration.setFlag(Declaration.STATIC_SPECIFIED|Declaration.TYPE_SPECIFIED);
       }
     
@@ -605,21 +606,36 @@ public class Package implements mlsub.compilation.Module, Located, bossa.syntax.
     nice.tools.code.NiceInterpreter.init();
   }
 
+  private void prepareCodeGeneration()
+  {
+    thisPkg = new gnu.expr.Package(getName());
+
+    dispatchClass = createClassExp(name + ".dispatch");
+  }
+
+  /** Creates the implementation class lazily. */
+  private ClassExp getImplementationClass()
+  {
+    if (implementationClass == null)
+      {
+	System.out.println("Creating fun.class for " + this);
+	implementationClass = createClassExp(name + "." + packageClassName);
+      }
+
+    return implementationClass;
+  }
+
   /**
    * Creates bytecode for the alternatives defined in the module.
    */
   private void generateCode()
   {
-    dispatchClass = createClassExp(name + ".dispatch");
-
     if (!compiling())
       return;
 
     if (Debug.passes)
       Debug.println(this + ": generating code");    
     
-    implementationClass = createClassExp(name + "." + packageClassName);
-
     ast.compile();
   }
 
@@ -727,7 +743,7 @@ public class Package implements mlsub.compilation.Module, Located, bossa.syntax.
   /** Add a method to this package and return an expression to refer it. */
   public ReferenceExp addMethod(LambdaExp method, boolean packageMethod)
   {
-    ClassExp classe = packageMethod ? implementationClass : dispatchClass;
+    ClassExp classe = packageMethod ? getImplementationClass() : dispatchClass;
     return classe.addMethod(method);
   }
 

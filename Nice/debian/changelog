@@ -1,3 +1,9 @@
+nice (0.7.6) unstable; urgency=low
+
+  * Bugfixes (using anonymous functions while overriding native methods).
+
+ --
+
 nice (0.7.5) unstable; urgency=low
 
   * Addition of design by contract: assertions, pre- and post-conditions.

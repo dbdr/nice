@@ -282,6 +282,7 @@ public class NiceClass extends ClassDefinition.ClassImplementation
     classe.setFile(definition.location().getFile());
     classe.setSimple(true);
     classe.setAccessFlags(definition.getBytecodeFlags());
+    definition.module.addImplementationClass(classe);
     return classe;
   }
 
@@ -441,8 +442,6 @@ public class NiceClass extends ClassDefinition.ClassImplementation
     if (constructorMethod != null)
       for (int i = 0; i < constructorMethod.length; i++)
 	constructorMethod[i].getCode();
-
-    definition.module.addImplementationClass(classe);
   }
 
   private gnu.expr.Expression typeExpression(TypeConstructor tc)

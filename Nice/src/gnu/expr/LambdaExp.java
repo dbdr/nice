@@ -671,7 +671,8 @@ public class LambdaExp extends ScopeExp
 	if (exp == null)
 	  return null;
 	if (exp instanceof ModuleExp
-	    || exp instanceof ClassExp
+	    || (exp instanceof ClassExp 
+		&& ((ClassExp) exp).needsConstructor)
 	    || (exp instanceof LambdaExp 
 		&& ((LambdaExp) exp).heapFrame != null))
 	  return (LambdaExp) exp;
@@ -1120,6 +1121,7 @@ public class LambdaExp extends ScopeExp
     if (instanceField != null)
       {
 	comp.generateConstructor(this);
+	//ClassType type = getHeapFrameType(); // Is this more correct?
 	code.emitNew(type);
 	code.emitDup(type);
 	code.emitInvokeSpecial(type.constructor);

@@ -1,0 +1,12 @@
+/// PASS
+  List<String> joueurs = new ArrayList();
+  joueurs.add("A");
+  assert new Ordres(joueurs: joueurs).toString().equals("A");
+  /// Toplevel
+class Parent {}
+class Ordres extends Parent
+{
+  List<String> joueurs;
+
+  toString() = joueurs.map(String j => j.toString())[0];
+}

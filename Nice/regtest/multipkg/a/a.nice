@@ -1,0 +1,7 @@
+package regtest.multipkg.a;
+
+class A {}
+
+String f(A);
+
+f(x@A) = "A";

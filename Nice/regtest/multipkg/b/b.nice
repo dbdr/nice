@@ -1,0 +1,13 @@
+package regtest.multipkg.b;
+
+import regtest.multipkg.a;
+
+class B extends A {}
+
+f(x@B) = "B";
+
+main(args)
+{
+  println(f(new B()));
+  println(f(new A()));
+}

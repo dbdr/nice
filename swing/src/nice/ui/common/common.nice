@@ -1,0 +1,106 @@
+package nice.ui.common;
+
+
+/**
+ * tagging interface that must be implemented
+ * by all NiceListeners defined in the lib
+ * and outside
+ */
+ 
+interface NiceListener {}
+
+
+
+/**
+ * tagging interface that must be implemented
+ * by all NiceListeners that CAN BE mapped to 
+ * a ListenerKey
+ */
+ 
+interface MappableListener extends NiceListener {}
+
+
+
+/**
+ * tagging interface that must be implemented
+ * by all NiceListenerHandlers defined in the lib
+ * and outside
+ */
+
+abstract interface NiceListenerHandler {}
+
+
+
+/**
+ * tagging interface that must be implemented
+ * by all NiceListeners that map their listeners 
+ * to keys
+ */
+abstract interface MappableListenerHandler extends NiceListenerHandler {}
+
+
+
+/**
+ * tagging interface that must be implemented
+ * by all classes that are keys to certain listeners
+ */
+abstract interface ListenerKey {}
+
+
+
+/**
+ * Exception to mark an occurance of a non-nice (-> java) listener
+ */
+class NoNiceListenerException extends Exception 
+{
+  private EventListener listener;
+  
+  EventListener getListener();
+}
+
+getListener(this@NoNiceListenerException) = this.listener;
+
+
+/**
+ * function to support getting listeners that would not be
+ * gettable in JDK1.3.
+ */
+ 
+<NiceListenerHandler H, NiceListener L> void addInAccessibleListener
+  (H key, 
+   L listener,
+   Map<Object,?java.util.List<L>> map
+   )
+{
+  ?java.util.List<L> list = map.get(key.object());
+	if(list != null) list.add(listener);
+	else 
+	{
+		list = new LinkedList();
+		list.add(listener);
+		map.put(key.object(),list);
+	}
+}
+
+
+/**
+ * method to support getting listeners that are mapped to keys
+ * JDK1.3 does not support this
+ */
+
+<MappableListenerHandler H, ListenerKey K, MappableListener L> void addMappableListener
+  (H this,
+   K key,
+   L listener,
+   Map<(Object,K),?java.util.List<L>> map
+   )
+{
+  ?java.util.List<L> list = map.get((this.object(),key));
+	if(list != null) list.add(listener);
+	else 
+	{
+		list = new LinkedList();
+		list.add(listener);
+		map.put((this.object(),key),list);
+	}
+}

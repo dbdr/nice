@@ -1,6 +1,6 @@
 nice (0.9.1) unstable; urgency=low
 
-  * Final fields can be overriden in sub-classes, with a more precise type
+  * Final fields can be overriden in sub-classes with a more precise type
     and a different default value. In particular, this removes the need for 
     a cast when reading the field's value from an instance of the sub-class.
       class A 
@@ -11,6 +11,7 @@ nice (0.9.1) unstable; urgency=low
       {
         override LinkedList<String> names;
       }
+    This is only possible for final fields for type safety reasons.
   * A class can now have initializers, which are executed each time an instance
     is created.
       class A 
@@ -22,13 +23,13 @@ nice (0.9.1) unstable; urgency=low
       }
   * Package-level constants and variables are now automatically initialized
     in the correct order when they directly depend on each other.
-  * The type declaration in the enhanced forloop is now optional but only if
+  * The type declaration in the enhanced for loop is now optional but only if
     the type is inferable.
       int[] array = [1,2,3,4,5];
       for (elem : array) println(elem);
   * Bugfixes (parameter's default value refering to previous parameters, ...)
 
- --
+ -- Daniel Bonniot <bonniot@users.sourceforge.net>  Sat,  9 Aug 2003 23:19:41 +0200
 
 nice (0.9.0) unstable; urgency=low
 

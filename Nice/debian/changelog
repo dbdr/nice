@@ -37,7 +37,7 @@ nice (0.7.5) unstable; urgency=low
     clotures, returning a value inside try/finally or synchronized, ...).
   * Fixed the nicec script on Max OS X, when gcj is not present.
 
- --
+ -- Daniel Bonniot <bonniot@users.sourceforge.net>  Wed, 20 Nov 2002 13:32:55 +0100
 
 nice (0.7.4) unstable; urgency=low
 

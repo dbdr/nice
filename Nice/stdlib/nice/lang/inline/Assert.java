@@ -51,7 +51,7 @@ public class Assert extends ProcedureN implements Inlineable
     CodeAttr code = comp.getCode();
     Label end = new Label(code);
     
-    if (this.assertEnableCheck)
+    if (this.assertEnableCheck && args[0] != QuoteExp.falseExp)
 	code.ifAssertionsDisabledGoto
              (((ClassExp)comp.topLambda).getAssertionEnabledField(), end);
 
@@ -59,6 +59,10 @@ public class Assert extends ProcedureN implements Inlineable
     if (branchOp != null)
       {
         branchOp.compileJump(comp, ((ApplyExp)args[0]).getArgs(), end);
+      }
+    else if (args[0] == QuoteExp.falseExp)
+      {
+        //always continue to throwing exception
       }
     else
       {

@@ -1106,7 +1106,7 @@ public class CodeAttr extends Attribute implements AttrContainer
 
     if (! Access.legal(getMethod().getDeclaringClass(), method, receiverType))
       throw new VerificationError
-        ("Method " + method.getName() + " is not accessible");
+        ("Method " + method.toString() + " is not accessible");
 
     put1(opcode);  // invokevirtual, invokespecial, or invokestatic
     putIndex2(getConstants().addMethodRef(method));

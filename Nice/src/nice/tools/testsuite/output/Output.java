@@ -52,37 +52,22 @@ public interface Output {
 
 
 	/**
+	 * Logs a statement to this Appender.
+	 * 
+	 * @param	statement	TODO
+	 */
+	public void log(String statement);
+
+	/**
 	 * Logs a statement with the given prefix in angled braces.
 	 * 
 	 * @param	prefix	TODO
 	 * @param	statement	TODO
 	 */
 	public void log(String prefix, String statement);
-	/**
-	 * Logs a statement.
-	 * 
-	 * @param	statement	TODO
-	 */
-	public void log(String statement);
-	
-	
-	/**
-	 * Logs an exception.
-	 * 
-	 * @param	exception	TODO
-	 */
-	public void log(Throwable exception);
-	
-	
-	/**
-	 * Logs a statement and an exception.
-	 * 
-	 * @param	statement	TODO
-	 * @param	exception	TODO
-	 */
-	public void log(String statement, Throwable exception);
 
 
+	public void close();
 
 }
 

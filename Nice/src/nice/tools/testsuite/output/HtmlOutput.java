@@ -7,29 +7,22 @@ import java.util.*;
 import nice.tools.testsuite.*;
 
 /**
- * Appender logs the statements to the console.
+ * Output logs the statements in a html file.
  * 
  * @author	Alex Greif <a href="mailto:alex.greif@web.de">alex.greif@web.de</a>
  * @version	$Id$
  */
-public class HtmlOutput implements Output {
+public class HtmlOutput extends AbstractOutput {
 
-	StringBuffer _html = new StringBuffer();
-	int _mark = 0;
-
-
-	private void append(String s) {
-		_html.append(s);
+	/**
+	 * TODO
+	 * 
+	 * @param	out	TODO
+	 */
+	public HtmlOutput(Writer out) {
+		super(out);
 	}
 
-
-	private void mark() {
-		_mark = _html.length();
-	}
-
-	private void reset() {
-		_html.delete(_mark, _html.length());
-	}
 
 
 	/**
@@ -37,11 +30,11 @@ public class HtmlOutput implements Output {
 	 * 
 	 */
 	public void startApplication() {
-		append("<html><head><title>Nice Testsuite</title></head><body>");
-		append("<h2>");
-		append(new Date().toString());
-		append("</h2>");
-		append("<table border=1>");
+		log("<html><head><title>Nice Testsuite</title></head><body>");
+		log("<h2>");
+		log(new Date().toString());
+		log("</h2>");
+		log("<table border=1>");
 	}
 	
 	
@@ -50,28 +43,19 @@ public class HtmlOutput implements Output {
 	 * 
 	 */
 	public void endApplication() {
-		append("</table>");
-		append("<table><tr><td colspan=2 nowrap>");
-		append("number of testcases:</td>");
-		append("<td>" + (TestNice.getTestCasesSucceeded() + TestNice.getTestCasesFailed()) + "<td>");
-		append("</tr><tr>");
-		append("<td width=30>&nbsp;</td>");
-		append("<td>succeeded:</td><td>" + TestNice.getTestCasesSucceeded() + "</td>");
-		append("</tr><tr>");
-		append("<td width=30>&nbsp;</td>");
-		append("<td>failed:</td><td>" + TestNice.getTestCasesFailed() + "</td>");
-		append("</tr></table>");
+		log("</table>");
+		log("<table><tr><td colspan=2 nowrap>");
+		log("number of testcases:</td>");
+		log("<td>" + (TestNice.getTestCasesSucceeded() + TestNice.getTestCasesFailed()) + "<td>");
+		log("</tr><tr>");
+		log("<td width=30>&nbsp;</td>");
+		log("<td>succeeded:</td><td>" + TestNice.getTestCasesSucceeded() + "</td>");
+		log("</tr><tr>");
+		log("<td width=30>&nbsp;</td>");
+		log("<td>failed:</td><td>" + TestNice.getTestCasesFailed() + "</td>");
+		log("</tr></table>");
 
-		append("</body></html>");
-		
-		//write to disc
-		try {
-			FileWriter writer = new FileWriter(new File(TestNice.getTempFolder(), "output.html"));
-			writer.write(_html.toString());
-			writer.close();
-		} catch(IOException e) {
-			e.printStackTrace();
-		}
+		log("</body></html>");
 	}
 	
 	
@@ -82,7 +66,7 @@ public class HtmlOutput implements Output {
 	 * @param	testSuite	TODO
 	 */
 	public void startTestSuite(TestSuite testSuite) {
-		append("<tr><td>testsuite: " + testSuite.getFile() + "</td></tr>");
+		log("<tr><td>testsuite: " + testSuite.getFile() + "</td></tr>");
 	}
 	
 	
@@ -102,7 +86,7 @@ public class HtmlOutput implements Output {
 	 */
 	public void startTestCase(TestCase testCase) {
 		mark();
-		append("<tr><td><pre>");
+		log("<tr><td><pre>");
 	}
 	
 	
@@ -115,72 +99,20 @@ public class HtmlOutput implements Output {
 		if (pass)
 			reset();
 		else
-			append("</pre></td></tr>");
-	}
-	
-	
-
-
-	/**
-	 * Logs a statement to this Appender.
-	 * 
-	 * @param	statement	TODO
-	 */
-	public void log(String statement) {
-		log(null, statement);
-	}
-
-	/**
-	 * Logs a statement with the given prefix in angled braces.
-	 * 
-	 * @param	prefix	TODO
-	 * @param	statement	TODO
-	 */
-	public void log(String prefix, String statement) {
-		if (statement.length() == 0)	//	workaround, reader returns null for ""
-			append((prefix == null ? "" : "["+prefix+"] ") + statement + "<br>");
-		
-		BufferedReader reader = null;
-		String line = "";
-		try {
-			reader = new BufferedReader(new StringReader(statement));
-			while((line = reader.readLine()) != null) {
-				append((prefix == null ? "" : "["+prefix+"] ") + line + "<br>");
-			}
-		} catch(IOException e) {
-			e.printStackTrace();
-		} finally {
-			if (reader != null)
-				try {
-					reader.close();
-				} catch(IOException e) {
-					e.printStackTrace();
-				}
-		}
+			log("</pre></td></tr>");
 	}
 	
 	
 	/**
-	 * Logs an exception.
+	 * TODO
 	 * 
-	 * @param	exception ?statement?	TODO
 	 */
-	public void log(Throwable exception) {
-		exception.printStackTrace();
-	}
-	
-	
-	/**
-	 * Logs a statement and an exception.
-	 * 
-	 * @param	statement	TODO
-	 * @param	exception	TODO
-	 */
-	public void log(String statement, Throwable exception) {
-		append(statement + "<br>");
-		exception.printStackTrace();
+	protected String getLineBreak() {
+		return "<br>";
 	}
 
+
+	
 	
 
 }

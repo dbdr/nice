@@ -107,7 +107,7 @@ public class TestNice {
 		The Output where log statements should be written.
 		ConsoleOutput is the default Output.
 	*/
-	private static Output _output = new ConsoleOutput();
+	private static Output _output;
 
 
 
@@ -122,6 +122,14 @@ public class TestNice {
 			System.exit(1);
 		}
 		
+		/*try {
+			_output = new HtmlOutput(new FileWriter(new File(TestNice.getTempFolder().getParent(), "testsuite_output.html")));
+		} catch(IOException e) {
+			e.printStackTrace();
+		}*/
+		_output = new ConsoleOutput();
+		
+		
 		_output.startApplication();
 		cleanupTempFolder();
 		
@@ -131,6 +139,9 @@ public class TestNice {
 			e.printStackTrace();
 		}
 		_output.endApplication();
+		
+		//	close writer
+		_output.close();
 	}
 
 	/**

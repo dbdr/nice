@@ -175,12 +175,12 @@ public final class Dispatch
 	
 	if (test(method, tags, sortedAlternatives, firstArg))
 	{
-	  if (++nb_errors > 9)
+	  if (++nb_errors > 3)
 	    break;
         }
 	else if (hasValues && 
 	      testValues(method, tags, values, isValue, sortedAlternatives) )
-	  if (++nb_errors > 9)
+	  if (++nb_errors > 3)
 	    break;
 
       }
@@ -223,7 +223,7 @@ public final class Dispatch
     Alternative first = null;
 
     for(Iterator i = sortedAlternatives.iterator();
-	i.hasNext();)
+	i.hasNext() && !failed;)
       {
 	Alternative a = (Alternative) i.next();
 	if (a.matches(tags))
@@ -289,7 +289,7 @@ public final class Dispatch
     {
       Alternative first = null;
       ConstantExp[] values = (ConstantExp[]) valit.next();
-      for (Iterator i = sortedTypeMatches.iterator(); i.hasNext();)
+      for (Iterator i = sortedTypeMatches.iterator(); i.hasNext() && !failed;)
       {
 	Alternative a = (Alternative) i.next();
 	if (a.matchesValuePart(values, isValue))

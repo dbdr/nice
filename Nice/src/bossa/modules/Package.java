@@ -15,7 +15,7 @@
 
 package bossa.modules;
 
-import mlsub.compilation.*;
+//import bossa.modules.Compilation;
 
 import bossa.util.*;
 import bossa.syntax.*;
@@ -26,7 +26,6 @@ import java.util.*;
 import java.util.jar.*;
 import java.io.*;
 
-import bossa.modules.Compilation;
 import bossa.util.Location;
 
 /**
@@ -71,8 +70,33 @@ public class Package implements mlsub.compilation.Module, Located
   /****************************************************************
    * Loading
    ****************************************************************/
+  /*
+  public static Package make(String name, 
+			     bossa.modules$Compilation compilation,
+			     boolean isRoot)
+  {
+    return make(new LocatedString(name, bossa.util.Location.nowhereAtAll()), 
+		compilation, isRoot);
+  }
   
-  public static Package make(String name, Compilation compilation,
+  public static Package make(LocatedString lname, 
+			     bossa.modules$Compilation compilation,
+			     boolean isRoot)
+  {
+    Compilation c = new Compilation();
+    c.skipLink = compilation.skipLink;
+    c.root = compilation.root;
+
+    c.recompileAll = compilation.recompileAll;
+    c.recompileCommandLine = compilation.recompileCommandLine;
+    c.staticLink = compilation.staticLink;
+    c.recompilationNeeded = compilation.recompilationNeeded;
+
+    return make(lname, c, isRoot);
+  }
+  */
+  public static Package make(String name, 
+			     Compilation compilation,
 			     boolean isRoot)
   {
     return make(new LocatedString(name, bossa.util.Location.nowhereAtAll()), 
@@ -81,7 +105,8 @@ public class Package implements mlsub.compilation.Module, Located
   
   private static final Map map = new HashMap();
   
-  public static Package make(LocatedString lname, Compilation compilation,
+  public static Package make(LocatedString lname, 
+			     Compilation compilation,
 			     boolean isRoot)
   {
     String name = lname.toString();
@@ -104,7 +129,8 @@ public class Package implements mlsub.compilation.Module, Located
    * Single Constructor
    ****************************************************************/
   
-  private Package(LocatedString name, Compilation compilation,
+  private Package(LocatedString name, 
+		  Compilation compilation,
 		  boolean isRoot)
   {
     this.name = name;
@@ -135,6 +161,7 @@ public class Package implements mlsub.compilation.Module, Located
     opens.addAll(imports);
 
     computeImportedPackages();
+    initDispatch();
   }
 
   private void read(boolean forceReload)
@@ -357,10 +384,14 @@ public class Package implements mlsub.compilation.Module, Located
   private void closeJar()
   {
     try{
-      JarEntry dispatchEntry = new JarEntry("dispatch.class");
-      jar.putNextEntry(dispatchEntry);
-      dispatchClass.writeToStream(jar);
-
+      for (Iterator i = dispatchClasses.iterator(); i.hasNext();)
+	{
+	  ClassType dispatchClass = (ClassType) i.next();
+	  JarEntry dispatchEntry = 
+	    new JarEntry(dispatchClass.getName().replace('.','/') + ".class");
+	  jar.putNextEntry(dispatchEntry);
+	  dispatchClass.writeToStream(jar);
+	}
       jar.close();
       jar = null;
       jarDestFile = null;
@@ -466,20 +497,24 @@ public class Package implements mlsub.compilation.Module, Located
   
   private boolean isRoot;
   
-  public static final ClassType dispatchClass;
-  public static final gnu.expr.Compilation dispatchComp;
+  private static LinkedList dispatchClasses = new LinkedList();
+  public /*static final*/ ClassType dispatchClass;
+  public /*static final*/ gnu.expr.Compilation dispatchComp;
   static
   {
     nice.tools.code.NiceInterpreter.init();
-    
+  }
+  private void initDispatch()
+  {
     ClassType ct = null;
     gnu.expr.Compilation comp = null;
     try{
-      ct = new ClassType("dispatch");
+      String name = this.name.toString();
+      ct = new ClassType(name);
       ct.setSuper(Type.pointer_type);
       ct.setModifiers(Access.PUBLIC|Access.FINAL);
-      comp = new gnu.expr.Compilation(ct, "dispatch",
-				      "dispatch", "prefix", false);
+      comp = new gnu.expr.Compilation(ct, name,
+				      name, "prefix", false);
     }
     catch(ExceptionInInitializerError e){
       Internal.error("Error initializing Package class:\n"+
@@ -487,6 +522,8 @@ public class Package implements mlsub.compilation.Module, Located
     }
     dispatchClass = ct;
     dispatchComp = comp;
+
+    dispatchClasses.add(dispatchClass);
   }
   
   /**
@@ -532,9 +569,9 @@ public class Package implements mlsub.compilation.Module, Located
     
     comp.compileClassInit(initStatements);
     
-    addClass(outputBytecode);
+    addClass(outputBytecode, true);
     for (int iClass = 0;  iClass < comp.numClasses;  iClass++)
-      addClass(comp.classes[iClass]);
+      addClass(comp.classes[iClass], true);
   }
 
   private void copyStreams(InputStream in, OutputStream out)
@@ -565,7 +602,7 @@ public class Package implements mlsub.compilation.Module, Located
     // objects representing this class.
     // However if the class exists but is invalid, we create a new one.
 
-    String className = this.name + "." + name;
+    String className = this.name + "$" + name;
     ClassType res; 
     try{
       res = ClassType.make(className);
@@ -577,27 +614,43 @@ public class Package implements mlsub.compilation.Module, Located
     res.requireExistingClass(false);
     return res;
   }
-  
+
   public void addClass(ClassType c)
+  {
+    addClass(c, false);
+  }
+
+  public void addClass(ClassType c, boolean inSub)
   {
     // if we did not have to recompile, no class has to be regenerated
     if (!sourcesRead)
       return;
     
     try{
-      c.setSourceFile(name+sourceExt);
-      String filename = c.getName();
+      if (c.sourcefile == null)
+	c.setSourceFile(name+sourceExt);
+      else
+	 c.setSourceFile(c.sourcefile);
+
+      int lastDot = c.getName().lastIndexOf('.');
+      StringBuffer filename = new StringBuffer(c.getName());
+
+      boolean putInJar = jar != null && compilation.staticLink;
+
+      // Jar and Zip files use forward slashes
+      char sepChar = putInJar ? '/' : File.separatorChar;
+
+      //filename.setCharAt(lastDot, inSub ? '/' : '$');
+      for (int i = 0; i < lastDot+1; i++)
+	if (filename.charAt(i) == '.')
+	  filename.setCharAt(i, sepChar);
+      filename.append(".class");
 
       if (jar == null || !compilation.staticLink)
-	{
-	  filename = filename.replace('.', File.separatorChar) + ".class";
-	  c.writeToFile(new File(rootDirectory, filename));
-	}
+	c.writeToFile(new File(rootDirectory, filename.toString()));
       else
 	{
-	  // Jar and Zip files use forward slashes
-	  filename = filename.replace('.', '/') + ".class";
-	  jar.putNextEntry(new JarEntry(filename));
+	  jar.putNextEntry(new JarEntry(filename.toString()));
 	  c.writeToStream(jar);
 	}
     }
@@ -609,7 +662,7 @@ public class Package implements mlsub.compilation.Module, Located
   public gnu.bytecode.Method addDispatchMethod(MethodDeclaration def)
   {
     return dispatchClass.addMethod
-      (nice.tools.code.Strings.escape(def.getFullName()),
+      (nice.tools.code.Strings.escape(def.getBytecodeName()),
        Access.PUBLIC|Access.STATIC|Access.FINAL,
        def.javaArgTypes(),def.javaReturnType());
   }

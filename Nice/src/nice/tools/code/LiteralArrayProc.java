@@ -1,7 +1,7 @@
 /**************************************************************************/
-/*                             N I C E                                    */
-/*        A simple imperative object-oriented research language           */
-/*                   (c)  Daniel Bonniot 1999                             */
+/*                                N I C E                                 */
+/*             A high-level object-oriented research language             */
+/*                        (c) Daniel Bonniot 2002                         */
 /*                                                                        */
 /*  This program is free software; you can redistribute it and/or modify  */
 /*  it under the terms of the GNU General Public License as published by  */
@@ -9,10 +9,6 @@
 /*  (at your option) any later version.                                   */
 /*                                                                        */
 /**************************************************************************/
-
-// File    : MultiArrayNewProc.java
-// Created : Mon Aug 28 14:42:14 2000 by Daniel Bonniot
-//$Modified: Tue Aug 29 12:11:19 2000 by Daniel Bonniot $
 
 package nice.tools.code;
 
@@ -45,6 +41,10 @@ public class LiteralArrayProc extends gnu.mapping.ProcedureN
   
   public void compile (ApplyExp exp, Compilation comp, Target target)
   {
+    // Try to get the precise bytecode type to use from the context.
+    if (target.getType() instanceof ArrayType)
+      arrayType = (ArrayType) target.getType();
+
     Expression[] args = exp.getArgs();
     CodeAttr code = comp.getCode();
 

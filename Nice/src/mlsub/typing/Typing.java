@@ -1,7 +1,7 @@
 /**************************************************************************/
-/*                           B O S S A                                    */
-/*        A simple imperative object-oriented research language           */
-/*                   (c)  Daniel Bonniot 1999                             */
+/*                                N I C E                                 */
+/*             A high-level object-oriented research language             */
+/*                        (c) Daniel Bonniot 2002                         */
 /*                                                                        */
 /*  This program is free software; you can redistribute it and/or modify  */
 /*  it under the terms of the GNU General Public License as published by  */
@@ -9,9 +9,6 @@
 /*  (at your option) any later version.                                   */
 /*                                                                        */
 /**************************************************************************/
-
-// File    : Typing.java
-// Created : Tue Jul 20 11:57:17 1999 by bonniot
 
 package mlsub.typing;
 
@@ -548,10 +545,11 @@ public final class Typing
   }
   
   /**
-     Find a type constructor greater than the parameter
+     Find an instance of the parameter
      that can exist at runtime (isConcrete() is true).
+     It's better to return a lower (more precise) one.
   */
-  public static TypeConstructor lowestRigidSuperTC(TypeConstructor tc)
+  public static TypeConstructor lowestInstance(TypeConstructor tc)
   {
     Engine.Constraint cst = (Engine.Constraint) tc.getKind();
     
@@ -560,12 +558,11 @@ public final class Typing
       // be careful to call lowestRigidSuperTC when the context is appropriate.
       {
 	System.out.println
-	  ("Warning: lowestRigidSuperTC called inapropriately for " + tc);
+	  ("Warning: lowestInstance called inapropriately for " + tc);
 	return null;
       }
     
-    // the allowWidening last parameter should be removed if always use it as false
-    return (TypeConstructor) cst.lowestRigidSuperElement(tc, false);
+    return (TypeConstructor) cst.lowestInstance(tc);
   }
   
   public static boolean dbg;

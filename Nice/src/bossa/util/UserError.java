@@ -22,7 +22,7 @@ public class UserError extends RuntimeException
 
   UserError(String message)
   {
-    super(message);
+    this.message = message;
 
     if(Debug.alwaysDumpStack)
       Internal.printStackTrace();    
@@ -30,6 +30,18 @@ public class UserError extends RuntimeException
 
   public UserError(Located responsible, String message)
   {
-    this(responsible.location() + ":\n" + message);
+    this(message);
+    this.responsible = responsible;
   }
+
+  public String getMessage()
+  {
+    if (responsible == null || responsible.location() == null)
+      return message;
+    else
+      return responsible.location() + ":\n" + message;
+  }
+
+  public String message;
+  public Located responsible;
 }

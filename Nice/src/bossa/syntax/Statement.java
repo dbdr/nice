@@ -34,8 +34,21 @@ public abstract class Statement
   static gnu.expr.Expression[] compile(Statement[] statements)
   {
     gnu.expr.Expression[] res = new gnu.expr.Expression[statements.length];
-    for(int i = 0; i < statements.length; i++)
-      res[i] = statements[i].generateCode();
+    for (int i = 0; i < statements.length; i++)
+      {
+	try {
+	  res[i] = statements[i].generateCode();
+	}
+	catch(UserError e) {
+	  // Make sure that the error is attached to a location.
+	  // If not, it's better than nothing to located the error in
+	  // the contianing statement.
+	  if (e.responsible == null)
+	    e.responsible = statements[i];
+	  // Rethrow.
+	  throw e;
+	}
+      }
     return res;
   }
 

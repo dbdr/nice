@@ -1,7 +1,7 @@
 /**************************************************************************/
 /*                                N I C E                                 */
 /*             A high-level object-oriented research language             */
-/*                        (c) Daniel Bonniot 2000                         */
+/*                        (c) Daniel Bonniot 2002                         */
 /*                                                                        */
 /*  This program is free software; you can redistribute it and/or modify  */
 /*  it under the terms of the GNU General Public License as published by  */
@@ -11,6 +11,8 @@
 /**************************************************************************/
 
 package nice.lang;
+
+import java.lang.reflect.Array;
 
 /**
    Class used to wrap native arrays when considered as part of the 
@@ -37,18 +39,20 @@ public final class rawArray implements nice.lang.Sequence
     if (value == null)
       return null;
     return new rawArray(value);
-  }  
+  }
 
   // CONVERSIONS
 
   public static boolean[] convert_boolean(Object[] array)
   {
+    if (array == null)
+      return null;
+
     boolean[] res = new boolean[array.length];
     for (int i = array.length; --i >= 0;)
       {
 	Object o = array[i];
-	if (o != null)
-	  res[i] = ((Boolean) o).booleanValue();
+	res[i] = ((Boolean) o).booleanValue();
       }
     
     return res;
@@ -56,12 +60,14 @@ public final class rawArray implements nice.lang.Sequence
 
   public static char[] convert_char(Object[] array)
   {
+    if (array == null)
+      return null;
+
     char[] res = new char[array.length];
     for (int i = array.length; --i >= 0;)
       {
 	Object o = array[i];
-	if (o != null)
-	  res[i] = ((Character) o).charValue();
+	res[i] = ((Character) o).charValue();
       }
     
     return res;
@@ -69,12 +75,14 @@ public final class rawArray implements nice.lang.Sequence
 
   public static byte[] convert_byte(Object[] array)
   {
+    if (array == null)
+      return null;
+
     byte[] res = new byte[array.length];
     for (int i = array.length; --i >= 0;)
       {
 	Object o = array[i];
-	if (o != null)
-	  res[i] = ((Number) o).byteValue();
+	res[i] = ((Number) o).byteValue();
       }
     
     return res;
@@ -82,12 +90,14 @@ public final class rawArray implements nice.lang.Sequence
 
   public static short[] convert_short(Object[] array)
   {
+    if (array == null)
+      return null;
+
     short[] res = new short[array.length];
     for (int i = array.length; --i >= 0;)
       {
 	Object o = array[i];
-	if (o != null)
-	  res[i] = ((Number) o).shortValue();
+	res[i] = ((Number) o).shortValue();
       }
     
     return res;
@@ -95,17 +105,19 @@ public final class rawArray implements nice.lang.Sequence
 
   public static int[] convert_int(Object[] array)
   {
+    if (array == null)
+      return null;
+
     int[] res = new int[array.length];
     for (int i = array.length; --i >= 0;)
       {
 	Object o = array[i];
-	if (o != null)
-	  try{
-	    res[i] = ((Number) o).intValue();
-	  }
-	  catch(ClassCastException e){
-	    res[i] = ((Character) o).charValue();
-	  }
+	try{
+	  res[i] = ((Number) o).intValue();
+	}
+	catch(ClassCastException e){
+	  res[i] = ((Character) o).charValue();
+	}
       }
     
     return res;
@@ -113,17 +125,19 @@ public final class rawArray implements nice.lang.Sequence
 
   public static long[] convert_long(Object[] array)
   {
+    if (array == null)
+      return null;
+
     long[] res = new long[array.length];
     for (int i = array.length; --i >= 0;)
       {
 	Object o = array[i];
-	if (o != null)
-	  try{
-	    res[i] = ((Number) o).longValue();
-	  }
-	  catch(ClassCastException e){
-	    res[i] = ((Character) o).charValue();
-	  }
+	try{
+	  res[i] = ((Number) o).longValue();
+	}
+	catch(ClassCastException e){
+	  res[i] = ((Character) o).charValue();
+	}
       }
     
     return res;
@@ -131,17 +145,19 @@ public final class rawArray implements nice.lang.Sequence
 
   public static float[] convert_float(Object[] array)
   {
+    if (array == null)
+      return null;
+
     float[] res = new float[array.length];
     for (int i = array.length; --i >= 0;)
       {
 	Object o = array[i];
-	if (o != null)
-	  try{
-	    res[i] = ((Number) o).floatValue();
-	  }
-	  catch(ClassCastException e){
-	    res[i] = ((Character) o).charValue();
-	  }
+	try{
+	  res[i] = ((Number) o).floatValue();
+	}
+	catch(ClassCastException e){
+	  res[i] = ((Character) o).charValue();
+	}
       }
     
     return res;
@@ -149,17 +165,19 @@ public final class rawArray implements nice.lang.Sequence
 
   public static double[] convert_double(Object[] array)
   {
+    if (array == null)
+      return null;
+
     double[] res = new double[array.length];
     for (int i = array.length; --i >= 0;)
       {
 	Object o = array[i];
-	if (o != null)
-	  try{
-	    res[i] = ((Number) o).doubleValue();
-	  }
-	  catch(ClassCastException e){
-	    res[i] = ((Character) o).charValue();
-	  }
+	try{
+	  res[i] = ((Number) o).doubleValue();
+	}
+	catch(ClassCastException e){
+	  res[i] = ((Character) o).charValue();
+	}
       }
     
     return res;
@@ -172,10 +190,191 @@ public final class rawArray implements nice.lang.Sequence
   */
   public static Object convert(Object[] array, String componentClass)
   {
+    if (array == null)
+      return null;
+
     try{
       Object res = java.lang.reflect.Array.newInstance
 	(Class.forName(componentClass), array.length);
       java.lang.System.arraycopy(array, 0, res, 0, array.length);
+      return res;
+    }
+    catch(ClassNotFoundException e){
+      throw new Error("Could not find class " + componentClass +
+		      " during array conversion");
+    }
+  }
+
+  /****************************************************************
+   * Conversion from generic Object array
+   ****************************************************************/
+
+  public static boolean[] gconvert_boolean(Object array)
+  {
+    if (array == null)
+      return null;
+
+    int len = Array.getLength(array);
+    boolean[] res = new boolean[len];
+    for (int i = len; --i >= 0;)
+      {
+	Object o = Array.get(array, i);
+	res[i] = ((Boolean) o).booleanValue();
+      }
+    
+    return res;
+  }
+
+  public static char[] gconvert_char(Object array)
+  {
+    if (array == null)
+      return null;
+
+    int len = Array.getLength(array);
+    char[] res = new char[len];
+    for (int i = len; --i >= 0;)
+      {
+	Object o = Array.get(array, i);
+	res[i] = ((Character) o).charValue();
+      }
+    
+    return res;
+  }
+
+  public static byte[] gconvert_byte(Object array)
+  {
+    if (array == null)
+      return null;
+
+    int len = Array.getLength(array);
+    byte[] res = new byte[len];
+    for (int i = len; --i >= 0;)
+      {
+	Object o = Array.get(array, i);
+	res[i] = ((Number) o).byteValue();
+      }
+    
+    return res;
+  }
+
+  public static short[] gconvert_short(Object array)
+  {
+    if (array == null)
+      return null;
+
+    int len = Array.getLength(array);
+    short[] res = new short[len];
+    for (int i = len; --i >= 0;)
+      {
+	Object o = Array.get(array, i);
+	res[i] = ((Number) o).shortValue();
+      }
+    
+    return res;
+  }
+
+  public static int[] gconvert_int(Object array)
+  {
+    if (array == null)
+      return null;
+
+    int len = Array.getLength(array);
+    int[] res = new int[len];
+    for (int i = len; --i >= 0;)
+      {
+	Object o = Array.get(array, i);
+	try{
+	  res[i] = ((Number) o).intValue();
+	}
+	catch(ClassCastException e){
+	  res[i] = ((Character) o).charValue();
+	}
+      }
+    
+    return res;
+  }
+
+  public static long[] gconvert_long(Object array)
+  {
+    if (array == null)
+      return null;
+
+    int len = Array.getLength(array);
+    long[] res = new long[len];
+    for (int i = len; --i >= 0;)
+      {
+	Object o = Array.get(array, i);
+	try{
+	  res[i] = ((Number) o).longValue();
+	}
+	catch(ClassCastException e){
+	  res[i] = ((Character) o).charValue();
+	}
+      }
+    
+    return res;
+  }
+
+  public static float[] gconvert_float(Object array)
+  {
+    if (array == null)
+      return null;
+
+    int len = Array.getLength(array);
+    float[] res = new float[len];
+    for (int i = len; --i >= 0;)
+      {
+	Object o = Array.get(array, i);
+	try{
+	  res[i] = ((Number) o).floatValue();
+	}
+	catch(ClassCastException e){
+	  res[i] = ((Character) o).charValue();
+	}
+      }
+    
+    return res;
+  }
+
+  public static double[] gconvert_double(Object array)
+  {
+    if (array == null)
+      return null;
+
+    int len = Array.getLength(array);
+    double[] res = new double[len];
+    for (int i = len; --i >= 0;)
+      {
+	Object o = Array.get(array, i);
+	try{
+	  res[i] = ((Number) o).doubleValue();
+	}
+	catch(ClassCastException e){
+	  res[i] = ((Character) o).charValue();
+	}
+      }
+    
+    return res;
+  }
+
+  /**
+     Return a T[] array, 
+     where T is given by componentClass (T should not be primitive),
+     holding the same elements as <code>array</code>.
+  */
+  public static Object[] gconvert(Object array, String componentClass)
+  {
+    if (array == null)
+      return null;
+
+    try{
+      int len = Array.getLength(array);
+      Object[] res = (Object[]) java.lang.reflect.Array.newInstance
+	(Class.forName(componentClass), len);
+
+      for (int i = len; --i >= 0;)
+	res[i] = Array.get(array, i);
+
       return res;
     }
     catch(ClassNotFoundException e){

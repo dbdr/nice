@@ -69,6 +69,12 @@ public final class SpecialArray extends gnu.bytecode.ArrayType
 	  bossa.util.Internal.warning("Null refclass for " + elements.getName());
 	else
 	  {
+	    if (c == Void.TYPE)
+	      // It is illegal to construct an array of void values.
+	      // This situation most probably originates in a bug 
+	      // in the source program, so let's notify it.
+	      bossa.util.User.error(null, "Arrays cannot contain void values");
+
 	    c = java.lang.reflect.Array.newInstance(c, 0).getClass();
 	    Type.registerTypeForClass(c, this);
 	  }
@@ -76,11 +82,19 @@ public final class SpecialArray extends gnu.bytecode.ArrayType
 	Type.registerTypeForName("[" + elements.getSignature(), this);
       }
     
-    makeMethod = wrappedType.getDeclaredMethod("make", 1);
     if (primitive)
-      convertMethod = wrappedType.getDeclaredMethod("convert_"+prefix, 1);
+       {
+	 convertMethod = wrappedType.getDeclaredMethod("convert_"+prefix, 1);
+	 genericConvertMethod = wrappedType.getDeclaredMethod("gconvert_"+prefix, 1);
+       }
     else
-      convertMethod = wrappedType.getDeclaredMethod("convert", 2);
+      {
+	convertMethod = wrappedType.getDeclaredMethod("convert", 2);
+	genericConvertMethod = wrappedType.getDeclaredMethod("gconvert", 2);
+      }
+
+    if (convertMethod == null)
+      bossa.util.Internal.error(this + " has no array conversion method");
   }
 
   public String getInternalName()
@@ -115,9 +129,7 @@ public final class SpecialArray extends gnu.bytecode.ArrayType
     code.emitGotoIfIntNeZero(cast);
     
     code.emitCheckcast(objectArray);
-    if (convertMethod == null)
-      bossa.util.Internal.error(this + " has no convert method");
-    
+
     // For non primitive arrays, we pass a string that represents
     // the type of the elements, so that the correct array type
     // can be created
@@ -147,14 +159,7 @@ public final class SpecialArray extends gnu.bytecode.ArrayType
   public void emitCoerceTo (Type toType, CodeAttr code)
   {
     if (toType instanceof ArrayType)
-      if(toType != unknownTypeArray && !unknown)
-	code.emitCheckcast(toType);
-      else 
-	{
-	  // could it be better?
-	  //code.popType();
-	  //code.pushType(toType);
-	}
+      coerce(code, this, (ArrayType) toType);
     else if(toType != Type.pointer_type)
       emitCoerceToObject(code);
   }
@@ -162,6 +167,33 @@ public final class SpecialArray extends gnu.bytecode.ArrayType
   public void emitCoerceToObject (CodeAttr code)
   {
     code.emitInvokeStatic(makeMethod);
+  }
+
+  private static void coerce (CodeAttr code, ArrayType from, ArrayType to)
+  {
+    Type elements = to.getComponentType();
+    if (elements instanceof PrimType)
+      {
+	code.emitInvokeStatic(((SpecialArray) SpecialArray.create(elements)).genericConvertMethod);
+      }
+    else
+      {
+	boolean generic = ! from.getSignature().startsWith("[L");
+
+	// For non primitive arrays, we pass a string that represents
+	// the type of the elements, so that the correct array type
+	// can be created
+	code.emitPushString
+	  (((ObjectType) elements).getInternalName().replace('/', '.'));
+
+	if (generic)
+	  code.emitInvokeStatic(unknownTypeArray.genericConvertMethod);
+	else
+	  code.emitInvokeStatic(unknownTypeArray.convertMethod);
+
+	// Assert what we now guarantee.
+	code.emitCheckcast(to);
+      }
   }
 
   public boolean isSubtype (Type other)
@@ -186,7 +218,8 @@ public final class SpecialArray extends gnu.bytecode.ArrayType
   private static ArrayType objectArray = new ArrayType(Type.pointer_type);  
 
   private Method convertMethod;
-  private Method makeMethod;
+  private Method genericConvertMethod;
+  private static Method makeMethod = wrappedType.getDeclaredMethod("make", 1);
 
   public String toString()
   {

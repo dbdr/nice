@@ -766,8 +766,14 @@ public abstract class Engine
       k0.minimal(e.getId());
     }
     
-    public Element lowestRigidSuperElement(Element e, boolean allowWidening)
+    public Element lowestInstance(Element e)
     {
+      //FIXME: We don't really fulfill the contract.
+      // We should make sure we really return an instance.
+      // Maybe this should be done by enumeration of the solutions 
+      // of the constraint. 
+      // The current code works in simple cases, though...
+      
       int id = e.getId();
       int res = -1;
       
@@ -781,7 +787,7 @@ public abstract class Engine
 	if (k0.wasEntered(id, i) && (res == -1 || k0.isLeq(i, res)))
 	  res = i;
 
-      if (res == -1 && allowWidening)
+      if (res == -1)
 	for (int i = 0; i < k0.initialContextSize(); i++)
 	  if (k0.wasEntered(i, id) && (res == -1 || k0.isLeq(res, i)))
 	    res = i;

@@ -37,6 +37,9 @@ test_arrays()
   p(reverse(a));
   test_collection_arrays(a);
   test_polymorphism();
+
+  test_literal_arrays();
+  test_null_arrays();
 }
 
 
@@ -108,6 +111,7 @@ test_collection_arrays(a)
   cs[0] = 'A';
   double[] ds = map(cs, id);
   p(ds);
+  Number[] ns = map(ds, id);
 
   // idem with non primitive arrays
   ?String[] ss = new String[5];
@@ -153,6 +157,10 @@ void test_literal_arrays()
 {
   // longarray must be passed an object of bytecode type long[]
   longarray([0]);
+
+  // Calling native methods using arrays
+  new String(['S', 'z', 'i', 'a']);
+  new String(id(['S', 'z', 'i', 'a']));
 }
 
 // We test how functions on polymorphic arrays deal with native type components
@@ -193,6 +201,31 @@ void test_polymorphism()
   b = [];
   d = [ ];
 }
+
+void test_null_arrays()
+{
+  ?Array<boolean> aB = id(null);
+  aB= arrayId(aB);
+  ?Array<byte> ab = id(null);
+  ab = arrayId(ab);
+  ?Array<short> as = id(null);
+  as = arrayId(as);
+  ?Array<char> ac = id(null);
+  ac = arrayId(ac);
+  ?Array<int> ai = id(null);
+  ai = arrayId(ai);
+  ?Array<long> al = id(null);
+  al = arrayId(al);
+  ?Array<float> af = id(null);
+  af = arrayId(af);
+  ?Array<double> ad = id(null);
+  ad = arrayId(ad);
+
+  ?Array<String> aS = id(null);
+  aS = arrayId(aS);
+}
+
+<Any T> ?Array<T> arrayId(?Array<T> a) = id(a);
 
 // Using array -> Collection implicit conversion in the returned value
 <Any T> Collection<T> wrap(T x) = [ x ];

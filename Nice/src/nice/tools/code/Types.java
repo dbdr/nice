@@ -84,7 +84,9 @@ public final class Types
 	  // OK, nothing to do
 	  return;
 	
-	rigidTC = Typing.lowestRigidSuperTC(tc);
+	// We try to approximate a polymorphic type by a monomorphic one.
+	// So any instance will do, but a lower one is better.
+	rigidTC = Typing.lowestInstance(tc);
 
 	if (rigidTC == null)
 	  // We don't know

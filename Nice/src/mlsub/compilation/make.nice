@@ -1,7 +1,7 @@
 /**************************************************************************/
-/*                           B O S S A                                    */
-/*        A simple imperative object-oriented research language           */
-/*                   (c)  Daniel Bonniot 1999                             */
+/*                                N I C E                                 */
+/*             A high-level object-oriented research language             */
+/*                        (c) Daniel Bonniot 2000                         */
 /*                                                                        */
 /*  This program is free software; you can redistribute it and/or modify  */
 /*  it under the terms of the GNU General Public License as published by  */
@@ -9,10 +9,6 @@
 /*  (at your option) any later version.                                   */
 /*                                                                        */
 /**************************************************************************/
-
-// File    : make.nice
-// Created : Tue Feb 01 18:20:51 2000 by Daniel Bonniot
-//$Modified: Fri Jul 28 15:24:13 2000 by Daniel Bonniot $
 
 package mlsub.compilation;
 
@@ -24,6 +20,18 @@ import mlsub.compilation.*;
  * @author Daniel Bonniot (d.bonniot@mail.dotcom.fr)
  */
 
+/**
+ * Stores information about a mlsub compilation.
+ *
+ * Information includes:
+ *   - whether to perform link tests
+ *   - ...
+ * 
+ * Only information needed to perform the steps
+ * of compilation should go here.
+ * Other language specific options should go in a 
+ * subclass.
+ */
 class Compilation
 {
   boolean skipLink;
@@ -38,7 +46,7 @@ compileComponent(modules, doLink)
   println("");
 
   modules.iter(fun(Module m) =>
-	       m.lastModifiedRequirement(max(javaList(m.getImports()).map(fun(Module mi)=>mi.lastModification()))));
+	       m.lastModifiedRequirement(max(javaList(m.getRequirements()).map(fun(Module mi)=>mi.lastModification()))));
 
   modules.iter(fun(Module m) => m.scope());
   modules.iter(fun(Module m) => m.load());
@@ -59,8 +67,8 @@ void make(mlsub.compilation.Compilation);
 make(compilation@mlsub.compilation.Compilation)
 {
   List<List<Module>> sccs =
-    stronglyConnectedComponents(compilation.root, 
-				fun(Module m) => javaList(m.getImports()));
+    stronglyConnectedComponents
+      (compilation.root, fun(Module m) => javaList(m.getRequirements()));
   sccs.iter(fun(List<Module> scc) => 
     { compileComponent(scc,
 		       !compilation.skipLink); });
@@ -68,23 +76,3 @@ make(compilation@mlsub.compilation.Compilation)
   if (!compilation.skipLink) 
     compilation.root.endOfLink();
 }
-
-/****************************************************************
- * Wrappers
- ****************************************************************/
-
-java.util.List getImports(Module) = 
-  native java.util.List Module.getRequirements();
-
-void lastModifiedRequirement(Module, long) = native void Module.lastModifiedRequirement(long);
-long lastModification(Module) = native long Module.lastModification();
-boolean isRunnable(Module) = native boolean Module.isRunnable();
-
-void scope(Module) = native void Module.scope();
-void load(Module) = native void Module.load();
-void compile(Module) = native void Module.compile();
-void link(Module) = native void Module.link();
-
-void freezeGlobalContext(Module) = native void Module.freezeGlobalContext();
-void unfreezeGlobalContext(Module) = native void Module.unfreezeGlobalContext();
-void endOfLink(Module) = native void Module.endOfLink();

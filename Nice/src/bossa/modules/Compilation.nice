@@ -18,6 +18,10 @@ package bossa.modules;
 
 import mlsub.compilation;
 
+/**
+   Stores information about a Nice compilation.
+ */
+
 class Compilation extends mlsub.compilation.Compilation
 {
   boolean recompileAll;

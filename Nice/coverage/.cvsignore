@@ -1,0 +1,10 @@
+*.cvg
+bin
+iclass.map
+instrumented.jar
+instrumented.jar.gjbak
+instrumented.map
+report
+share
+testsuite-fail-folder
+testsuite-temp-folder

@@ -1,0 +1,6 @@
+/// PASS
+  new Flowlet();
+  /// Toplevel
+  class Flowlet {
+    java.util.Set<String> connectors = new java.util.HashSet();
+  }

@@ -97,7 +97,7 @@ public class NiceMethod extends UserOperator
     if(hasAlike || tc == null)
       {
 	TypeConstructor alikeTC = 
-	  new TypeConstructor("alike", c.variance, false, false);
+	  new TypeConstructor("Alike", c.variance, false, false);
 	
 	constraint.addBinder(alikeTC);
 	// added in front. Important for rebinding in method alternatives

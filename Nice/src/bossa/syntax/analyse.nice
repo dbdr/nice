@@ -606,7 +606,7 @@ analyse(e@TypeConstantExp, info)
   if (type == null)
     throw new bossa.util.UserError(name, "Class " + name + " is not declared");
 
-  e.value = object(type);
+  e.value = type;
   e.representedType = bossa.syntax.Node.getGlobalTypeScope().
     globalLookup(name.toString(), name.location());
 

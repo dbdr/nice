@@ -22,8 +22,6 @@ package nice.lang;
 */
 public final class Native
 {
-  public static Object object(Object o) { return o; }  
-
   // Operations on "polymorphic" arrays
   // Arrays of unknown component type are of type Object
   // Methods in java.lang.reflect.Array allow to handle them.

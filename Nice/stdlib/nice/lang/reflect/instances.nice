@@ -40,10 +40,10 @@ class _TestI { int i; }
 
 void _testInstances()
 {
-  _TestS tS = newInstance("nice.lang.reflect._TestS", [object("ABC")]);
+  _TestS tS = newInstance("nice.lang.reflect._TestS", ["ABC"]);
   assert tS.s.equals("ABC");
 
-  _TestI tI = newInstance("nice.lang.reflect._TestI", [object(int(42))]);
+  _TestI tI = newInstance("nice.lang.reflect._TestI", [int(42)]);
   assert tI.i == 42;
 }
 
@@ -77,7 +77,7 @@ public <T, !A1> T newInstance(Class cl, A1 arg1)
 {
   Class argClass1 = arg1.canonicalClass();
   let constructor = cl.getConstructor([argClass1]);
-  return cast(constructor.newInstance([object(arg1)]));
+  return cast(constructor.newInstance([arg1]));
 }
 
 // Testcases
@@ -103,7 +103,7 @@ public <T, !A1, !A2> T newInstance(Class cl, A1 arg1, A2 arg2)
   Class argClass1 = arg1.canonicalClass();
   Class argClass2 = arg2.canonicalClass();
   let constructor = cl.getConstructor([argClass1, argClass2]);
-  return cast(constructor.newInstance([object(arg1),object(arg2)]));
+  return cast(constructor.newInstance([arg1,arg2]));
 }
 
 // Testcases

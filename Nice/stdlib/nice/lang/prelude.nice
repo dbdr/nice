@@ -76,8 +76,9 @@ class Type = native;
 
 /* 
    Allows to consider any nice object as an instance of java.lang.Object
+   @deprecated object(...) is not needed any more: any value is an Object.
 */
-<Any T> Object object(T) = native Object Native.object(Object);
+<T> ?Object object(T x) = x;
 
 /** Unsafe cast operator. UNSAFE! */
 <Any T, Any U> U cast(T) = inline nice.lang.inline.Nop();

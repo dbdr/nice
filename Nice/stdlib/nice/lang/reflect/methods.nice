@@ -26,7 +26,7 @@ public <!T, R> R call(T obj, String methodName, Object[] args)
 {
   let cl = obj.getClass();
   let method = cl.getMethod(methodName, args.map(canonicalClass));
-  return cast( method.invoke(object(obj), args) );
+  return cast( method.invoke(obj, args) );
 }
 
 // Testcases
@@ -36,7 +36,7 @@ void _testCall()
   java.io.File f1 = new java.io.File(".");
   java.io.File f2 = new java.io.File(".");
 
-  int res = f1.call("compareTo", [object(f2)]);
+  int res = f1.call("compareTo", [f2]);
   assert res == 0;
 }
 
@@ -47,7 +47,7 @@ void _testCall()
 public <!T, R> R call(T obj, String methodName)
 {
   let method = obj.getClass().getMethod(methodName, null);
-  return cast( method.invoke(object(obj), null) );
+  return cast( method.invoke(obj, null) );
 }
 
 // Testcases
@@ -67,7 +67,7 @@ void _testCall0()
 public <!T, !A1, R> R call(T obj, String methodName, A1 arg1)
 {
   let method = obj.getClass().getMethod(methodName, [canonicalClass(arg1)]);
-  return cast( method.invoke(object(obj), [object(arg1)]) );
+  return cast( method.invoke(obj, [arg1]) );
 }
 
 // Testcases

@@ -30,7 +30,7 @@ public abstract class Enum implements Serializable
   {
     for (elem : this.family())
       if (this.name.equals(elem.name))
-        return object(elem);
+        return elem;
 
     throw new InvalidObjectException("unknown enum element"); 
   }

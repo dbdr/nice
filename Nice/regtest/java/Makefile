@@ -1,7 +1,9 @@
+nicec = $(NICE_TOP)/bin/nicec -e --sourcepath "${NICE_TOP}"
+
 all: B/BIj.class B/BAj.class J/J.class J/Other.class
 
 A/An.class A/In.class: A/A.nice
-	nicec --sourcepath "${NICE_TOP}" regtest.java.A
+	$(nicec) regtest.java.A
 
 B/BAj.class: A/An.class B/BAj.java
 	javac -classpath "${NICE_TOP}" B/BAj.java

@@ -81,14 +81,18 @@ public abstract class MethodContainer extends Definition
   }
 
   final Constraint classConstraint;
+  mlsub.typing.AtomicConstraint[] resolvedConstraints;
 
-  bossa.syntax.Constraint getClassConstraint()
+  void resolve()
   {
-    if (classConstraint == null)
-      return bossa.syntax.Constraint.True;
-    else
-      return new bossa.syntax.Constraint(classConstraint.typeParameters, 
-					 classConstraint.atoms);
+    if (classConstraint != null)
+      {
+	TypeScope scope = new TypeScope(this.typeScope);
+	try { scope.addSymbols(classConstraint.typeParameters); }
+	catch(TypeScope.DuplicateName ex) {}
+	resolvedConstraints = 
+	  AtomicConstraint.resolve(scope, classConstraint.atoms);
+      }
   }
 
   mlsub.typing.MonotypeVar[] getTypeParameters ()
@@ -97,6 +101,15 @@ public abstract class MethodContainer extends Definition
       return null;
     else
       return classConstraint.typeParameters;
+  }
+
+  mlsub.typing.Constraint getResolvedConstraint()
+  {
+    if (classConstraint == null)
+      return mlsub.typing.Constraint.True;
+    else
+      return new  mlsub.typing.Constraint
+	(classConstraint.typeParameters, resolvedConstraints);
   }
 
   /****************************************************************

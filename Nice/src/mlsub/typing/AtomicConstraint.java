@@ -37,8 +37,8 @@ public abstract class AtomicConstraint
    */
   abstract AtomicConstraint substitute(java.util.Map map);
 
-  final static AtomicConstraint[] substitute(java.util.Map map, 
-					     AtomicConstraint[] atoms)
+  final public static AtomicConstraint[] substitute
+    (java.util.Map map, AtomicConstraint[] atoms)
   {
     if(atoms==null)
       return null;

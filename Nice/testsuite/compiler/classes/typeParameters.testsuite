@@ -67,3 +67,44 @@ class Coord<Point P>
   toString() = "Coord " + this.p;
 }
 
+/// PASS
+  /// Toplevel
+class Point { int x; }
+
+class Coord<P | P <: Point>
+{
+}
+
+/// PASS
+  /// Toplevel
+class Game<S | S <: Number>
+//class Game<Number S>
+{
+  void play(Number p);
+  play(p@Number) { }
+}
+
+/// PASS
+  /// Toplevel
+class Game<S | S <: Number>
+{
+  void play(Game<S> p);
+  play(p@Game) { }
+}
+
+/// PASS
+  /// package game dontcompile
+  /// Toplevel
+abstract class State<Move M> {}
+
+abstract class Move 
+{}
+  /// package game.ai import game dontcompile
+  /// Toplevel
+abstract class State<Move M> extends game.State {}
+
+abstract class Move extends game.Move {}
+
+  /// package game.schnapsen import game, game.ai
+  /// Toplevel
+class State<M> extends game.ai.State<M> {}

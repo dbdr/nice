@@ -60,8 +60,10 @@ public class AbstractInterface extends MethodContainer
    * Resolution
    ****************************************************************/
 
-  public void resolve()
+  void resolve()
   {
+    super.resolve();
+
     surinterfaces = TypeIdent.resolveToItf(typeScope, extensions);
     extensions = null;
 

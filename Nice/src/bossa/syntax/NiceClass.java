@@ -332,26 +332,30 @@ public class NiceClass extends ClassDefinition.ClassImplementation
     if (fields.length == 0 && definition.classConstraint == null)
       return res;
 
-    TypeScope map = Node.getGlobalTypeScope();
+    TypeScope scope = Node.getGlobalTypeScope();
+    Map map = null;
     if (typeParams != null)
       {
 	// Constructs a type scope that maps the type parameters of this
 	// class to the corresponding symbol in the constructor.
-	map = new TypeScope(map);
+	scope = new TypeScope(scope);
+	map = new HashMap();
 	for (int i = 0; i < typeParams.length; i++)
 	  try {
-	    map.addMapping(definition.classConstraint.typeParameters[i].getName(), typeParams[i]);
+	    scope.addMapping(definition.classConstraint.typeParameters[i].getName(), typeParams[i]);
+	    map.put(definition.classConstraint.typeParameters[i], typeParams[i]);
 	  } catch(TypeScope.DuplicateName e) {}
       }
 
     for (int j = 0; j < res.length; j++)
       for (int i = fields.length, n = res[j].length - nbFields + i; --i >= 0;)
-	res[j][--n] = fields[i].asParameter(map);
+	res[j][--n] = fields[i].asParameter(scope);
 
     if (definition.classConstraint != null)
       {
 	AtomicConstraint[] newAtoms = 
-	  bossa.syntax.AtomicConstraint.resolve(map, definition.classConstraint.atoms);
+	  AtomicConstraint.substitute(map, definition.resolvedConstraints);
+
 	if (newAtoms != null)
 	  for (int i = 0; i < newAtoms.length; i++)
 	    constraints.add(newAtoms[i]);

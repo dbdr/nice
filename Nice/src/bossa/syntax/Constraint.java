@@ -44,7 +44,15 @@ public class Constraint extends Node
     super(Node.upper);
     construct(arrayToList(binders),atomics);
   }
-  
+
+  static Constraint create(TypeSymbol[] binders)
+  {
+    if (binders == null)
+      return True;
+    else
+      return new Constraint(binders, null);
+  }
+
   private List arrayToList(Object[] a)
   {
     if (a == null || a.length == 0)

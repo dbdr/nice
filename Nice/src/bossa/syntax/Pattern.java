@@ -112,12 +112,7 @@ public class Pattern implements Located
     if (def == null)
       return;
 
-    bossa.syntax.Constraint cst = def.getClassConstraint();
-    if (cst == bossa.syntax.Constraint.True)
-      return;
-
-    cst.typeScope = scope;
-    constraint = cst.resolveToLowlevel();
+    constraint = def.getResolvedConstraint();
     patternType = new MonotypeConstructor(tc, def.getTypeParameters());
   }
   

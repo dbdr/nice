@@ -36,7 +36,8 @@ public class NiceFieldAccess extends FieldAccess
 {
   public NiceFieldAccess (NiceClass classDef, NiceClass.Field field)
   {
-    super(field.sym.name, classDef.definition.getClassConstraint(),
+    super(field.sym.name, 
+	  Constraint.create(classDef.definition.getTypeParameters()),
 	  makeList(Monotype.sure(classDef.definition.lowlevelMonotype())),
 	  field.sym.syntacticType);
 

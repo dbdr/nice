@@ -6,7 +6,8 @@ nice (0.9.6)
     arguments. For example 'loop(5) { doSomeThing(); }' is shorthand for
     'loop(5, () => { doSomeThing(); });'
   * Bug fixes (checking of local variables in a call position, make it possible
-    to use new Object() again, ... )
+    to use new Object() and dispatch on Object again, ... )
+
  --
 
 nice (0.9.5)

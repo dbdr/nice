@@ -73,7 +73,7 @@ int compile(String[] args)
 	  fun(String dir)=>{ compilation.destinationDir = dir; }),
 
    option("classpath",
-	  "Search path for compiled packages\nPATH is a list of directories and .jar archives",
+	  "Search path for compiled packages and libraries\nPATH is a list of directories and .jar archives",
 	  "path",
 	  fun(String path) =>{ compilation.packagePath = path; }),
 
@@ -240,3 +240,7 @@ void printMemoryUsage()
   println("Memory allocated: " + prettyBytes(total) + 
 	  ", used: " + prettyBytes(total - free));
 }
+
+// Local Variables:
+// nice-xprogram: "nicec -d \"$HOME/Nice/classes\" --sourcepath=\"$HOME/Nice/src\" --classpath=\"$HOME/Nice/classes\""
+// End:

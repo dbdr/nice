@@ -1,0 +1,175 @@
+
+/**************************************************************************/
+/*                                                                        */
+/*  This program is free software; you can redistribute it and/or modify  */
+/*  it under the terms of the GNU General Public License as published by  */
+/*  the Free Software Foundation; either version 2 of the License, or     */
+/*  (at your option) any later version.                                   */
+/*                                                                        */
+/**************************************************************************/
+
+
+package nice.ui.common;
+
+
+/**
+ * Methods to safely convert java listeners to their nice pendants.
+ * Raise a NoNiceListenerException if this is not possible. The exception
+ * has to be initialized with the listener that was found to not be a nice one.
+ * so that code calling these methods can work on with the non nice
+ * listener, if it wants to do so
+ */
+
+NActionListener toNiceActionListener(EventListener);
+toNiceActionListener(this@NActionListener) = this;
+toNiceActionListener(this)
+{ 
+  throw new NoNiceListenerException("" + this.getClass().getName() + "is no instance of NActionListener", listener: this);
+}
+
+NItemListener toNiceItemListener(EventListener);
+toNiceItemListener(this@NItemListener) = this;
+toNiceItemListener(this)
+{ 
+  throw new NoNiceListenerException("" + this.getClass().getName() + "is no instance of NItemListener", listener: this);
+}
+
+NTextListener toNiceTextListener(EventListener);
+toNiceTextListener(this@NTextListener) = this;
+toNiceTextListener(this)
+{ 
+  throw new NoNiceListenerException("" + this.getClass().getName() + "is no instance of NTextListener", listener: this);
+}
+
+NAdjustmentListener toNiceAdjustmentListener(EventListener);
+toNiceAdjustmentListener(this@NAdjustmentListener) = this;
+toNiceAdjustmentListener(this)
+{ 
+  throw new NoNiceListenerException("" + this.getClass().getName() + "is no instance of NAdjustmentListener", listener: this);
+}
+
+NContainerListener toNiceContainerListener(EventListener);
+toNiceContainerListener(this@NContainerListener) = this;
+toNiceContainerListener(this)
+{ 
+  throw new NoNiceListenerException("" + this.getClass().getName() + "is no instance of NContainerListener", listener: this);
+}
+
+NWindowListener toNiceWindowListener(EventListener);
+toNiceWindowListener(this@NWindowListener) = this;
+toNiceWindowListener(this)
+{ 
+  throw new NoNiceListenerException("" + this.getClass().getName() + "is no instance of NWindowListener", listener: this);
+}
+
+NComponentListener toNiceComponentListener(EventListener);
+toNiceComponentListener(this@NComponentListener) = this;
+toNiceComponentListener(this)
+{ 
+  throw new NoNiceListenerException("" + this.getClass().getName() + "is no instance of NComponentListener", listener: this);
+}
+
+NFocusListener toNiceFocusListener(EventListener);
+toNiceFocusListener(this@NFocusListener) = this;
+toNiceFocusListener(this)
+{ 
+  throw new NoNiceListenerException("" + this.getClass().getName() + "is no instance of NFocusListener", listener: this);
+}
+
+NHierarchyBoundsListener toNiceHierarchyBoundsListener(EventListener);
+toNiceHierarchyBoundsListener(this@NHierarchyBoundsListener) = this;
+toNiceHierarchyBoundsListener(this)
+{ 
+  throw new NoNiceListenerException("" + this.getClass().getName() + "is no instance of NHierarchyBoundsListener", listener: this);
+}
+
+NHierarchyListener toNiceHierarchyListener(EventListener);
+toNiceHierarchyListener(this@NHierarchyListener) = this;
+toNiceHierarchyListener(this)
+{ 
+  throw new NoNiceListenerException("" + this.getClass().getName() + "is no instance of NHierarchyListener", listener: this);
+}
+
+NInputMethodListener toNiceInputMethodListener(EventListener);
+toNiceInputMethodListener(this@NInputMethodListener) = this;
+toNiceInputMethodListener(this)
+{ 
+  throw new NoNiceListenerException("" + this.getClass().getName() + "is no instance of NInputMethodListener", listener: this);
+}
+
+NKeyListener toNiceKeyListener(EventListener);
+toNiceKeyListener(this@NKeyListener) = this;
+toNiceKeyListener(this)
+{ 
+  throw new NoNiceListenerException("" + this.getClass().getName() + "is no instance of NKeyListener", listener: this);
+}
+
+NMouseListener toNiceMouseListener(EventListener);
+toNiceMouseListener(this@NMouseListener) = this;
+toNiceMouseListener(this)
+{ 
+  throw new NoNiceListenerException("" + this.getClass().getName() + "is no instance of NMouseListener", listener: this);
+}
+
+NMouseMotionListener toNiceMouseMotionListener(EventListener);
+toNiceMouseMotionListener(this@NMouseMotionListener) = this;
+toNiceMouseMotionListener(this)
+{ 
+  throw new NoNiceListenerException("" + this.getClass().getName() + "is no instance of NMouseMotionListener", listener: this);
+}
+
+NDragSourceListener toNiceDragSourceListener(EventListener);
+toNiceDragSourceListener(this@NDragSourceListener) = this;
+toNiceDragSourceListener(this)
+{ 
+  throw new NoNiceListenerException("" + this.getClass().getName() + "is no instance of NDragSourceListener", listener: this);
+}
+
+NDragGestureListener toNiceDragGestureListener(EventListener);
+toNiceDragGestureListener(this@NDragGestureListener) = this;
+toNiceDragGestureListener(this)
+{ 
+  throw new NoNiceListenerException("" + this.getClass().getName() + "is no instance of NDragGestureListener", listener: this);
+}
+
+NDropTargetListener toNiceDropTargetListener(EventListener);
+toNiceDropTargetListener(this@NDropTargetListener) = this;
+toNiceDropTargetListener(this)
+{ 
+  throw new NoNiceListenerException("" + this.getClass().getName() + "is no instance of NDropTargetListener", listener: this);
+}
+
+//JDK1.4  NAWTEventListener toNiceAWTEventListener(EventListener);
+//JDK1.4  toNiceAWTEventListener(this@NAWTEventListener) = this;
+//JDK1.4  toNiceAWTEventListener(this)
+//JDK1.4  { 
+//JDK1.4    throw new NoNiceListenerException("" + this.getClass().getName() + "is no instance of NAWTEventListener", listener: this);
+//JDK1.4  }
+
+//JDK1.4  NWindowFocusListener toNiceWindowFocusListener(EventListener);
+//JDK1.4  toNiceWindowFocusListener(this@NWindowFocusListener) = this;
+//JDK1.4  toNiceWindowFocusListener(this)
+//JDK1.4  { 
+//JDK1.4    throw new NoNiceListenerException("" + this.getClass().getName() + "is no instance of NWindowFocusListener", listener: this);
+//JDK1.4  }
+
+//JDK1.4  NWindowStateListener toNiceWindowStateListener(EventListener);
+//JDK1.4  toNiceWindowStateListener(this@NWindowStateListener) = this;
+//JDK1.4  toNiceWindowStateListener(this)
+//JDK1.4  { 
+//JDK1.4    throw new NoNiceListenerException("" + this.getClass().getName() + "is no instance of NWindowStateListener", listener: this);
+//JDK1.4  }
+
+//JDK1.4  NMouseWheelListener toNiceMouseWheelListener(EventListener);
+//JDK1.4  toNiceMouseWheelListener(this@NMouseWheelListener) = this;
+//JDK1.4  toNiceMouseWheelListener(this) 
+//JDK1.4  { 
+//JDK1.4    throw new NoNiceListenerException("" + this.getClass().getName() + "is no instance of NMouseWheelListener", listener: this);
+//JDK1.4  }
+
+//JDK1.4  NDragSourceMotionListener toNiceDragSourceMotionListener(EventListener);
+//JDK1.4  toNiceDragSourceMotionListener(this@NDragSourceMotionListener) = this;
+//JDK1.4  toNiceDragSourceMotionListener(this)
+//JDK1.4  { 
+//JDK1.4    throw new NoNiceListenerException("" + this.getClass().getName() + "is no instance of NDragSourceMotionListener", listener: this);
+//JDK1.4  }

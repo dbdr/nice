@@ -53,7 +53,6 @@ public class TestSuite {
 	*/
 	public TestSuite(File testSuiteFile) throws TestSuiteException {
 		_file = testSuiteFile;			
-		//System.out.println("testsuite " + _testSuiteFile);
 		
 		TestNice.getOutput().startTestSuite(this);
 		readTestCases();

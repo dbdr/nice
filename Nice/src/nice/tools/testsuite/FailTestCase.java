@@ -31,6 +31,9 @@ public class FailTestCase extends TestCase {
 		} catch(TestSuiteException e) {
 			pass();
 			return;
+		} catch(CompilerBugException e) {
+			fail();
+			return;
 		}
 		
 		fail();

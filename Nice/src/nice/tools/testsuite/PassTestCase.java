@@ -34,7 +34,9 @@ public class PassTestCase extends TestCase {
 			runMain();
 		} catch(TestSuiteException e) {
 			fail();
-			//e.printStackTrace();
+			return;
+		} catch(CompilerBugException e) {
+			fail();
 			return;
 		}
 		

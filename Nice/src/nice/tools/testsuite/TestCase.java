@@ -152,7 +152,7 @@ public class TestCase {
 	 * Compiles all packages of this testcase.
 	 * 
 	 */
-	public void compilePackages() throws TestSuiteException {
+	public void compilePackages() throws TestSuiteException, CompilerBugException {
 		_compilerMessagesStream = new ByteArrayOutputStream();
 		PrintStream out = new PrintStream(_compilerMessagesStream);
 		PrintStream origOut = System.out;
@@ -173,7 +173,7 @@ public class TestCase {
 						throw new TestSuiteException(ERROR_MSG);
 					case OutputMessages.BUG:
 						showMessages = true;
-						throw new TestSuiteException(BUG_MSG);
+						throw new CompilerBugException(BUG_MSG);
 					case OutputMessages.WARNING:
 						showMessages = true;
 						break;

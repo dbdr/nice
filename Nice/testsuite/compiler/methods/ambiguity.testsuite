@@ -6,7 +6,7 @@ void /*/// FAIL HERE */ f(A);
 f(x@A) {}
 f(x@A) {}
 
-/// PASS bug
+/// PASS
   assert foo(null);
   /// Toplevel
 class A {}

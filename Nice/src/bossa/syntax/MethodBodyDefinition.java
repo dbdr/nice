@@ -128,6 +128,10 @@ public class MethodBodyDefinition extends MethodImplementation
       if (additionalTags[i] != null)
         hasAdditionalTags = true;
 
+    // Try to remember what caused the error when no symbol could be found.
+    UserError error = null;
+    boolean multipleErrors = false;
+
     for(Iterator i = symbols.iterator(); i.hasNext();){
       VarSymbol s = (VarSymbol)i.next();
       if(s.getMethodDeclaration() == null)
@@ -135,7 +139,7 @@ public class MethodBodyDefinition extends MethodImplementation
 	  i.remove();
 	  continue;
 	}
-      
+
       MethodDeclaration m = s.getMethodDeclaration();
       if (m.isIgnored())
         {
@@ -149,7 +153,7 @@ public class MethodBodyDefinition extends MethodImplementation
 	  i.remove();
 	  continue;
 	}
-	  
+
       try{
 	int level;
 	if (Debug.overloading)
@@ -161,7 +165,21 @@ public class MethodBodyDefinition extends MethodImplementation
 	try{
 	  mlsub.typing.Polytype t = m.getType();
 	  Constraint.enter(t.getConstraint());
-          Pattern.inDomain(formals, t.domain());
+          Monotype[] domain = t.domain();
+          for (int p = 0; p < domain.length; p++)
+            try {
+              formals[p].inDomain(domain[p]);
+            }
+            catch (TypingEx e) {
+              if (error == null)
+                error = new UserError(formals[p],
+                                      "Pattern " + formals[p] +
+                                      " is incompatible with " + domain[p]);
+              else
+                multipleErrors = true;
+
+              throw e;
+            }
 	}
 	finally{
 	  if(Typing.leave() != level)
@@ -244,13 +262,18 @@ public class MethodBodyDefinition extends MethodImplementation
 
     bossa.syntax.dispatch.removeNonMinimal(symbols);
 
-    if(symbols.size() == 1) 
+    if(symbols.size() == 1)
       return (VarSymbol) symbols.get(0);
 
-    if(symbols.size()==0)
-      User.error(this,
-		 "No method called " + name + 
-		 " is compatible with these patterns");
+    if (symbols.size() == 0)
+      {
+        if (error != null && ! multipleErrors)
+          throw error;
+        else
+          User.error(this,
+                     "No method called " + name +
+                     " is compatible with these patterns");
+      }
 
     String methods = "";
     for(Iterator i = symbols.iterator(); i.hasNext();)

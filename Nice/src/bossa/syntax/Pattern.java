@@ -197,30 +197,28 @@ public abstract class Pattern implements Located
 	  }
       }
   }
-  
-  static void inDomain(Pattern[] patterns, Monotype[] types) throws TypingEx
-  {
-    for (int i = 0; i < patterns.length; i++)
-      Types.setMarkedKind(types[i]);
 
-    for (int i = 0; i < patterns.length; i++)
-      patterns[i].inDomain(Types.rawType(types[i]));
-  }
-
-  private void inDomain(Monotype type) throws TypingEx
+  void inDomain(Monotype type) throws TypingEx
   {
+    Types.setMarkedKind(type);
+
+    if (this.atNull())
+      Typing.leq(PrimitiveType.maybeTC, type.head());
+
+    Monotype rawType = Types.rawType(type);
+
     if (constraint != null)
       {
 	constraint.enter();
-	Typing.leq(patternType, type);
+	Typing.leq(patternType, rawType);
       }
     else
       {
-	Typing.leq(tc, type);
+	Typing.leq(tc, rawType);
       }
 
     if (tc2 != null)
-      Typing.leq(tc2, type);
+      Typing.leq(tc2, rawType);
   }
 
   static TypeConstructor[] getTC(Pattern[] patterns)

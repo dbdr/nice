@@ -65,14 +65,14 @@
 
 /// FAIL
   ///Toplevel
-  class A{}                                         
-  class B extends A{}                               
-  interface I<+T | B <: T>{}                        
-  class X<+T | A <: T> implements I<T>{}            
+  class A {}
+  class B extends A {}
+  interface I<+T | B <: T> {}
+  class X<+T | A <: T> implements I<T> {}
 
-  void foo(I<B>);                                   
-  /*/// FAIL HERE */ foo(@X){} 
-  //@X is not in the domain of foo 
+  void foo(I<B>);
+  foo(/*/// FAIL HERE */X x){}
+  // X is not in the domain of foo
 
 /// FAIL
   /// Toplevel

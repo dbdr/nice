@@ -118,7 +118,7 @@ void f(B a, String s, int i = 0) { }
   void foo(A x) {}
   void foo(B x) {}
 
-/// PASS bug
+/// PASS
   assert foo(null) == null;
   let String s = foo("abc");
   ///Toplevel

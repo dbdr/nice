@@ -20,4 +20,11 @@ var String defaultStylesheet =
 "/*Default stylesheet for nicedoc*/\n" +
 "body {\n" +
 "    /*background-color: #003300;*/\n" +
+"}\n" +
+"/*this could be used in the index page for a package" +
+" *for Classes, Methods, and GlobalVar headings\n" + 
+" *not used a present because style sheets are broken*/\n" +
+"h3.listheading {\n" +
+"  font-size: medium;\n" +
+"  margin: 0px 0px 0px 0px;\n" +
 "}\n";

@@ -119,15 +119,7 @@ public class MethodBodyDefinition extends Definition
 	      // anonymous pattern
 	      type = new MonotypeVar("anonymous argument " + tn);
 	    else
-	      // XXX optimize using this:
-	      // type = new MonotypeVar("type(" + p.name + ")<" + types[tn]);
-	      {
-		LocatedString typeName;
-		typeName = p.name.cloneLS();
-		typeName.prepend("type(");	
-		typeName.append(")<" + types[tn]);
-		type = new MonotypeVar(typeName.toString());
-	      }
+	      type = new MonotypeVar("type(" + p.name + ")<" + types[tn]);
 	  }
 
 	res[tn] = new MonoSymbol(p.name, type);

@@ -279,11 +279,7 @@ public final class Types
 				  TypeSymbol[] niceTypeVariables)
     throws ParametricClassException, NotIntroducedClassException
   {
-    Monotype res = getMonotype(javaType, typeVariables, niceTypeVariables);
-    if (sure)
-      return bossa.syntax.Monotype.sure(res);
-    else
-      return bossa.syntax.Monotype.maybe(res);
+    return monotype(javaType, sure, typeVariables, niceTypeVariables, false);
   }
 
   public static Monotype monotype(Type javaType)
@@ -328,7 +324,7 @@ public final class Types
     	else
 	  return bossa.syntax.Monotype.maybe(res);
       }
-    return res;	
+    return res;
   }
   private static Monotype getMonotype(Type javaType,
 				      TypeVariable[] typeVariables,

@@ -144,5 +144,19 @@ char `^`(char, char) = inline nice.lang.inline.NumOp("iXOr");
 boolean get(long x, int bit) = (x & (1 << bit)) != 0;
 boolean get(int  x, int bit) = (x & (1 << bit)) != 0;
 
+/****************************************************************
+ * Native methods
+ ****************************************************************/
+
+double max(double, double) = native double Math.max(double, double);
+double min(double, double) = native double Math.min(double, double);
+float  max(float , float ) = native float  Math.max(float , float );
+float  min(float , float ) = native float  Math.min(float , float );
+long   max(long  , long  ) = native long   Math.max(long  , long  );
+long   min(long  , long  ) = native long   Math.min(long  , long  );
+int    max(int   , int   ) = native int    Math.max(int   , int   );
+int    min(int   , int   ) = native int    Math.min(int   , int   );
+
+
 // Comparable interface
 `<`(n1@Number, n2@Number) = n1.doubleValue() < n2.doubleValue();

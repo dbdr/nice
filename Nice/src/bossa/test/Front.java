@@ -12,7 +12,7 @@
 
 // File    : Front.java
 // Created : Thu Jul 01 15:11:18 1999 by bonniot
-//$Modified: Mon Mar 13 17:42:49 2000 by Daniel Bonniot $
+//$Modified: Thu May 04 12:28:02 2000 by Daniel Bonniot $
 
 package bossa.test;
 
@@ -62,8 +62,8 @@ public class Front
     bossa.modules.Compilation compilation = new bossa.modules.Compilation();
     
     bossa.modules.Package p;
-    if(!file.equals("bossa.lang"))
-      Package.make("bossa.lang",compilation,false);
+    if(!file.equals("nice.lang"))
+      Package.make("nice.lang",compilation,false);
     p = Package.make(file,compilation,true);
     
     List req = p.getRequirements();
@@ -76,14 +76,7 @@ public class Front
     
     p.scope();
     p.load();
-
-    try{
-      bossa.syntax.JavaTypeConstructor.createContext();
-      bossa.engine.Engine.createInitialContext();
-    }
-    catch(bossa.engine.Unsatisfiable e){
-      bossa.util.User.error("Unsatisfiable initial context: "+e.getMessage());
-    }
+    p.freezeGlobalContext();
     
     for(Iterator i = req.iterator(); i.hasNext();)
       {

@@ -12,7 +12,7 @@
 
 // File    : JavaMethodDefinition.java
 // Created : Tue Nov 09 11:49:47 1999 by bonniot
-//$Modified: Wed Apr 05 14:48:50 2000 by Daniel Bonniot $
+//$Modified: Thu May 04 12:56:40 2000 by Daniel Bonniot $
 
 package bossa.syntax;
 
@@ -52,9 +52,9 @@ public class JavaMethodDefinition extends MethodDefinition
   {
     super(name,constraint,returnType,parameters);
     
-    this.className=className;
-    this.methodName=methodName;
-    this.javaTypes=javaTypes;
+    this.className = className;
+    this.methodName = methodName;
+    this.javaTypes = javaTypes;
   }
 
   /****************************************************************
@@ -99,13 +99,13 @@ public class JavaMethodDefinition extends MethodDefinition
       }
   }
   
-  private static JavaMethodDefinition make(Method m)
+  private static JavaMethodDefinition make(Method m, boolean constructor)
   {
     JavaMethodDefinition res;
 
     Type[] paramTypes = m.getParameterTypes();
     List params;
-    if(m.getStaticFlag())
+    if(m.getStaticFlag() || constructor)
       params = new ArrayList(paramTypes.length);
     else
       {
@@ -116,11 +116,17 @@ public class JavaMethodDefinition extends MethodDefinition
     for(int i=0; i<paramTypes.length; i++)
       params.add(getMonotype(paramTypes[i]));
     
+    Monotype retType;
+    if(constructor)
+      retType = getMonotype(m.getDeclaringClass());
+    else
+      retType = getMonotype(m.getReturnType());
+    
     res = new JavaMethodDefinition(null, m.getName(), null,
 				   new LocatedString(m.getName(), 
 						     Location.nowhere()),
 				   Constraint.True,
-				   getMonotype(m.getReturnType()),
+				   retType,
 				   params);
 
     res.reflectMethod = m;
@@ -135,13 +141,33 @@ public class JavaMethodDefinition extends MethodDefinition
 
   private static Map declaredMethods = new HashMap();
   
+  /**
+   * Creates a bossa method for the fiven native method
+   * and puts it in global scope.
+   *
+   * @param m the native method.
+   * @return the created JavaMethodDefinition.
+   */
   public static JavaMethodDefinition addFetchedMethod(Method m)
   {
     if(declaredMethods.get(m)!=null)
       return null;
 
-    JavaMethodDefinition md = JavaMethodDefinition.make(m);
+    JavaMethodDefinition md = JavaMethodDefinition.make(m, false);
+
     Node.getGlobalScope().addSymbol(md.symbol);
+    return md;
+  }
+
+  public static JavaMethodDefinition addFetchedConstructor
+    (Method m,
+     JavaTypeConstructor declaringClass)
+  {
+    if(declaredMethods.get(m)!=null)
+      return null;
+
+    JavaMethodDefinition md = JavaMethodDefinition.make(m, true);
+    declaringClass.addConstructor(md);
     return md;
   }
 
@@ -187,7 +213,6 @@ public class JavaMethodDefinition extends MethodDefinition
     if(s.equals("int"))  	return bossa.SpecialTypes.intType;
     if(s.equals("long")) 	return bossa.SpecialTypes.longType;
     if(s.equals("boolean")) 	return bossa.SpecialTypes.booleanType;
-    //if(s.equals("_Array"))	return bossa.SpecialTypes.arrayType;
     
     Class clas = JavaTypeConstructor.lookupJavaClass(s);
     if(clas==null)
@@ -337,6 +362,6 @@ public class JavaMethodDefinition extends MethodDefinition
 
   public String toString()
   {
-    return "native "+className+"."+methodName+mapGetName(javaArgTypes());
+    return "native "+super.toString();
   }
 }

@@ -10,11 +10,11 @@
 /*                                                                        */
 /**************************************************************************/
 
-// File    : compiler.bossa
+// File    : compiler.nice
 // Created : Sat Feb 19 16:21:04 2000 by Daniel Bonniot
-//$Modified: Mon Apr 03 15:46:55 2000 by Daniel Bonniot $
+//$Modified: Thu May 04 14:36:48 2000 by Daniel Bonniot $
 
-package bossa.tools;
+package nice.tools;
 
 /**
  * Bossa compiler main file.
@@ -23,7 +23,7 @@ package bossa.tools;
  */
 
 import mlsub.compilation;
-import bossa.opt;
+import nice.opt;
 import bossa.modules;
 
 main(args)
@@ -49,6 +49,10 @@ main(args)
 		      }
 		    }));
 
+  opts.add(option('R', "recompileAll",
+		  "recompile all packages",
+                  fun()=>{ recAll = true; }));
+
   opts.add(option('c',"compile",
 		  "just compile packages, do not link them",
   		  fun()=>{ddoLink=false;}));
@@ -64,7 +68,7 @@ main(args)
 		  "print usage information and exit",
 		  fun()=>usage()));
 
-  Sequence<String> rest = parse("bossac", args, opts);
+  Sequence<String> rest = parse("nicec", args, opts);
   if((rest.size()<1) | (rest.size()>1))
     {
       usage();
@@ -82,7 +86,7 @@ main(args)
 void usage();
 usage()
 {
-  println("Usage: bossac <package name>");
-  println("Type \"bossac --help\" for a list of options");
+  println("Usage: nicec <package name>");
+  println("Type \"nicec --help\" for a list of options");
   exit(-1);
 }

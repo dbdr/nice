@@ -12,7 +12,7 @@
 
 // File    : ClassDefinition.java
 // Created : Thu Jul 01 11:25:14 1999 by bonniot
-//$Modified: Thu Apr 27 18:52:29 2000 by Daniel Bonniot $
+//$Modified: Tue May 02 14:27:54 2000 by Daniel Bonniot $
 
 package bossa.syntax;
 
@@ -41,14 +41,13 @@ abstract public class ClassDefinition extends Definition
    * @param extensions a list of TypeConstructors
    * @param implementations a list of Interfaces
    * @param abstractions a list of Interfaces
-   * @param fields a list of ClassDefinition.Field
-   * @param methods a list of MethodDefinition. Class methods.
    */
   public ClassDefinition(LocatedString name, 
 			 boolean isFinal, boolean isAbstract, 
 			 boolean isInterface,
 			 List typeParameters,
-			 List extensions, List implementations, List abstractions
+			 List extensions, 
+			 List implementations, List abstractions
 			 )
   {
     super(name, Node.upper);
@@ -119,7 +118,7 @@ abstract public class ClassDefinition extends Definition
    * Returns the 'Monotype' part of the type.
    * Private use only (to compute the type of the field access methods).
    */
-  private Monotype getMonotype()
+  protected Monotype getMonotype()
   {
     return new MonotypeConstructor
       (this.tc,

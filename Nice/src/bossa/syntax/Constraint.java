@@ -12,7 +12,7 @@
 
 // File    : Constraint.java
 // Created : Fri Jul 02 17:51:35 1999 by bonniot
-//$Modified: Thu Apr 27 19:16:41 2000 by Daniel Bonniot $
+//$Modified: Tue May 02 12:40:43 2000 by Daniel Bonniot $
 
 package bossa.syntax;
 
@@ -78,10 +78,18 @@ public class Constraint extends Node
    */
   private Constraint shallowClone()
   {
-    return new Constraint((List)((ArrayList)binders).clone(),
-			  (List)((ArrayList)atomics).clone());
+    return new Constraint(cloneList(binders),
+			  cloneList(atomics));
   }
 
+  private List cloneList(List l)
+  {
+    if(l instanceof ArrayList)
+      return (List) ((ArrayList) l).clone();
+    else
+      return (List) ((LinkedList) l).clone();
+  }
+  
   public static Constraint and(Constraint c1, Constraint c2)
   {
     Constraint res=c1.shallowClone();

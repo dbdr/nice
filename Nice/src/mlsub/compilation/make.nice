@@ -12,11 +12,9 @@
 
 // File    : make.bossa
 // Created : Tue Feb 01 18:20:51 2000 by Daniel Bonniot
-//$Modified: Wed Mar 01 18:00:47 2000 by Daniel Bonniot $
+//$Modified: Wed May 03 17:22:55 2000 by Daniel Bonniot $
 
 package mlsub.compilation;
-
-import bossa.lang;
 
 import mlsub.compilation.*;
 
@@ -26,7 +24,7 @@ import mlsub.compilation.*;
  * @author Daniel Bonniot
  */
 
-void compileComponent(bossa.lang.List<Module>,boolean);
+void compileComponent(nice.lang.List<Module>, boolean doLink);
 compileComponent(modules,ddoLink)
 {
   print("Compiling");
@@ -51,24 +49,17 @@ compileComponent(modules,ddoLink)
     modules.get(0).unfreezeGlobalContext();
 }
 
-void make(Module/*, boolean, boolean*/);
-make(module@Module /*, recompileAll, doLink*/)
-{
-  List<List<Module>> sccs =
-    stronglyConnectedComponents(module, fun(Module m)=> list(m.getImports()));
-  sccs.iter(fun(List<Module> scc)=> { compileComponent(scc,true/*doLink*/); } );
-  /*if(doLink)*/ module.endOfLink();
-}
-
 void make(Compilation);
 make(compilation@Compilation)
 {
   List<List<Module>> sccs =
     stronglyConnectedComponents(compilation.root, 
 				fun(Module m)=> list(m.getImports()));
-  sccs.iter(fun(List<Module> scc)=> { compileComponent(scc,
-						       compilation.doLink); });
-  if(compilation.doLink) 
+  sccs.iter(fun(List<Module> scc)=> 
+    { compileComponent(scc,
+		       !compilation.skipLink); });
+  
+  if(!compilation.skipLink) 
     compilation.root.endOfLink();
 }
 

@@ -12,7 +12,7 @@
 
 // File    : Location.java
 // Created : Tue Jul 13 11:55:08 1999 by bonniot
-//$Modified: Fri Apr 28 15:32:45 2000 by Daniel Bonniot $
+//$Modified: Tue May 02 11:48:44 2000 by Daniel Bonniot $
 
 package bossa.util;
 
@@ -91,7 +91,9 @@ public class Location implements Located
 	return res+"[no location]";
       else
 	return res;
-    return res+"line "+startLine+", column "+(startColumn-1);
+    return res+
+      (res.length()>0 ? ": " : "")+
+      "line "+startLine+", column "+(startColumn-1);
   }
 
   public boolean isValid()

@@ -12,7 +12,7 @@
 
 // File    : OverloadedSymbolExp.java
 // Created : Thu Jul 08 12:20:59 1999 by bonniot
-//$Modified: Mon Apr 03 17:55:28 2000 by Daniel Bonniot $
+//$Modified: Tue May 02 12:09:13 2000 by Daniel Bonniot $
 
 package bossa.syntax;
 
@@ -246,7 +246,7 @@ public class OverloadedSymbolExp extends Expression
   /** Recollects the symbols without stopping at the frontiers */
   private boolean notFound()
   {
-    if(refinementInProgress)
+    if(refinementInProgress || scope==null)
       return false;
     symbols = scope.lookupGlobal(ident);
     refinementInProgress = true;
@@ -257,7 +257,7 @@ public class OverloadedSymbolExp extends Expression
   {
     boolean res = notFound();
     if(!res)
-      User.error(this,errorMessage," in "+scope);
+      User.error(this,errorMessage,(scope!=null ? " in "+scope : ""));
     return res;
   }
   

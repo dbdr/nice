@@ -12,7 +12,7 @@
 
 // File    : MethodBodyDefinition.java
 // Created : Thu Jul 01 18:12:46 1999 by bonniot
-//$Modified: Wed Apr 26 16:41:06 2000 by Daniel Bonniot $
+//$Modified: Tue May 02 15:42:48 2000 by Daniel Bonniot $
 
 package bossa.syntax;
 
@@ -58,7 +58,7 @@ public class MethodBodyDefinition extends Definition
     
     addChild(this.body);
 
-    if(name.content.equals("main") && formals.size()==1+1) // a dummy "this" parameter
+    if(name.content.equals("main") && formals.size()==1) // no dummy "this" parameter
       module.isRunnable(true);
   }
 

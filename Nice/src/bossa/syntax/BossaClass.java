@@ -12,7 +12,7 @@
 
 // File    : BossaClass.java
 // Created : Thu Jul 01 11:25:14 1999 by bonniot
-//$Modified: Wed Apr 26 16:47:10 2000 by Daniel Bonniot $
+//$Modified: Tue May 02 15:24:48 2000 by Daniel Bonniot $
 
 package bossa.syntax;
 
@@ -195,9 +195,9 @@ public class BossaClass extends ClassDefinition
 	ClassDefinition me = abstractClass();
 
 	classType.setModifiers(Access.PUBLIC 
-			       | (me.isAbstract ? Access.ABSTRACT : 0)
-			       | (me.isFinal    ? Access.FINAL    : 0)
-			       | (me.isInterface? Access.INTERFACE: 0)
+			       | (me.isAbstract  ? Access.ABSTRACT  : 0)
+			       | (me.isFinal     ? Access.FINAL     : 0)
+			       | (me.isInterface ? Access.INTERFACE : 0)
 			       );
       }
   }
@@ -377,6 +377,18 @@ public class BossaClass extends ClassDefinition
     code.emitLoad(thisVar);    
     code.emitInvokeSpecial(constructor(javaSuperClass()));
     code.emitReturn();
+
+    TypeParameters tp = new TypeParameters(tc.name,tc.variance);
+
+    MethodDefinition md = new MethodDefinition
+      (null, new LocatedString("<init>", location()),
+       new Constraint(tp.content, null),
+       new MonotypeConstructor(tc,tp,tc.location()),
+       new LinkedList());
+
+    md.setDispatchMethod(new gnu.expr.PrimProcedure
+      (classType, gnu.bytecode.Type.typeArray0));
+    abstractClass().tc.addConstructor(md);
   }
 
   private static gnu.bytecode.Method constructor(ClassType ct)

@@ -12,7 +12,7 @@
 
 // File    : TypeConstructor.java
 // Created : Thu Jul 08 11:51:09 1999 by bonniot
-//$Modified: Mon Apr 03 16:22:06 2000 by Daniel Bonniot $
+//$Modified: Tue May 02 14:30:17 2000 by Daniel Bonniot $
 
 package bossa.syntax;
 
@@ -316,6 +316,29 @@ public class TypeConstructor
     return getDefinition().abstractClass().name.toString();
   }
 
+  /****************************************************************
+   * Constructors
+   ****************************************************************/
+
+  protected final LinkedList constructors = new LinkedList();
+  
+  final void addConstructor(MethodDefinition constructor)
+  {
+    constructors.add(constructor.symbol);
+  }  
+
+  /**
+     The list can be modified by the caller. It should thus be cloned 
+     each time.
+     
+     @return a list of the MethodDefinition.Symbols of each constructor of
+     this class.
+   */
+  final List getConstructors()
+  {
+    return (List) constructors.clone();
+  }
+  
   /****************************************************************
    * Fields
    ****************************************************************/

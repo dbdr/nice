@@ -79,7 +79,7 @@ public class SpecialArray extends gnu.bytecode.ArrayType
   {
     _ArrayType = ClassType.make("_Array");
     
-    ClassType sequence = ClassType.make("bossa.lang.Sequence");
+    ClassType sequence = ClassType.make("nice.lang.Sequence");
     sequence.access_flags = Access.PUBLIC|Access.INTERFACE;
     _ArrayType.setInterfaces(new ClassType[]{sequence});
     

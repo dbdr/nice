@@ -12,7 +12,7 @@
 
 // File    : JavaTypeConstructor.java
 // Created : Thu Jul 08 11:51:09 1999 by bonniot
-//$Modified: Fri Apr 28 15:20:59 2000 by Daniel Bonniot $
+//$Modified: Tue May 02 14:29:35 2000 by Daniel Bonniot $
 
 package bossa.syntax;
 
@@ -189,22 +189,27 @@ public class JavaTypeConstructor extends TypeConstructor
 		 "You probably need to install the corresponding package.");
     }
     
-  addFetchedMethod:
+  addingFetchedMethod:
     for(Method m = classType.getMethods(); m!=null; m = m.getNext())
       {
-	// skips m if it was just overriden in classType
-	// but declared in a superclass or superinterface.
-	ClassType superClass = classType.getSuperclass();
-	if(superClass!=null
-	   && alreadyHasMethod(superClass,m))
-	  continue;
-	ClassType[] itfs = classType.getInterfaces();
-	if(itfs!=null)
-	  for(int i=0; i<itfs.length; i++)
-	    if(alreadyHasMethod(itfs[i],m))
-	      continue addFetchedMethod;
+	if(m.isConstructor())
+	  JavaMethodDefinition.addFetchedConstructor(m, this);
+	else
+	  {  
+	    // skips m if it was just overriden in classType
+	    // but declared in a superclass or superinterface.
+	    ClassType superClass = classType.getSuperclass();
+	    if(superClass!=null
+	       && alreadyHasMethod(superClass,m))
+	      continue;
+	    ClassType[] itfs = classType.getInterfaces();
+	    if(itfs!=null)
+	      for(int i=0; i<itfs.length; i++)
+		if(alreadyHasMethod(itfs[i],m))
+		  continue addingFetchedMethod;
 	
-	JavaMethodDefinition.addFetchedMethod(m);
+	    JavaMethodDefinition.addFetchedMethod(m);
+	  }
       }
   }
   
@@ -230,7 +235,7 @@ public class JavaTypeConstructor extends TypeConstructor
 	  }
       }
   }
-    
+  
   public TypeSymbol cloneTypeSymbol()
   {
     return this;

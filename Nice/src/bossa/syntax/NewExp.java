@@ -12,37 +12,49 @@
 
 // File    : NewExp.java
 // Created : Thu Jul 08 17:15:15 1999 by bonniot
-//$Modified: Tue May 02 11:27:53 2000 by Daniel Bonniot $
-// Description : Allocation of a new object
+//$Modified: Tue May 02 14:59:56 2000 by Daniel Bonniot $
 
 package bossa.syntax;
 
 import bossa.util.*;
+import java.util.*;
 
-public class NewExp extends Expression
+/**
+ * Call of an object constructor.
+ */
+public class NewExp extends CallExp
 {
-  public NewExp(TypeConstructor tc)
+  public NewExp(TypeConstructor tc, List arguments)
   {
+    super(null, arguments);
     this.tc = tc;
   }
 
   void findJavaClasses()
   {
+    super.findJavaClasses();
     tc.resolve(typeScope);
   }
   
   void resolve()
   {
+    super.resolve();
     tc = tc.resolve(typeScope);
+    fun = new ExpressionRef // not necessary
+      (new OverloadedSymbolExp(tc.getConstructors(),
+			       new LocatedString("new "+tc.getName(),
+// not tc.location() which is the location of the definition of the class
+						 location()), 
+			       null));
   }
-  
+  /*
   void computeType()
-  {  
+  {
     TypeParameters tp = new TypeParameters(tc.name,tc.variance);
     type = new Polytype(new Constraint(tp.content,null),
 			new MonotypeConstructor(tc,tp,tc.location()));
   }
-
+  */
   void typecheck()
   {
     if(!tc.instantiable())
@@ -52,12 +64,13 @@ public class NewExp extends Expression
       else
 	User.error(this,
 		   tc+" is a type variable, it can't be instantiated");
+    super.typecheck();
   }
   
   /****************************************************************
    * Code generation
    ****************************************************************/
-
+  /*
   public gnu.expr.Expression compile()
   {
     gnu.bytecode.ClassType ct = (gnu.bytecode.ClassType) tc.getJavaType();
@@ -67,14 +80,14 @@ public class NewExp extends Expression
 			     (ct,gnu.bytecode.Type.typeArray0)),
        new gnu.expr.Expression[0]);
   }
-  
+  */
   /****************************************************************
    * Printing
    ****************************************************************/
 
   public String toString()
   {
-    return "new "+tc;
+    return "new "+tc+"("+Util.map("", ", ", "", parameters)+")";
   }
 
   TypeConstructor tc;

@@ -12,7 +12,7 @@
 
 // File    : Package.java
 // Created : Wed Oct 13 16:09:47 1999 by bonniot
-//$Modified: Thu Apr 27 19:12:32 2000 by Daniel Bonniot $
+//$Modified: Thu May 04 12:57:32 2000 by Daniel Bonniot $
 
 package bossa.modules;
 
@@ -106,12 +106,14 @@ public class Package implements mlsub.compilation.Module
     this.name = name;
     this.compilation = compilation;
     
+    Debug.println(name+"");
+    
     map.put(name.toString(),this);
 
     imports = new LinkedList();
     
-    if(!name.toString().equals("bossa.lang"))
-      imports.add(new LocatedString("bossa.lang", 
+    if(!name.toString().equals("nice.lang"))
+      imports.add(new LocatedString("nice.lang", 
 				    bossa.util.Location.nowhere()));
     
     opens  = new LinkedList();
@@ -131,6 +133,7 @@ public class Package implements mlsub.compilation.Module
 
   private void read(boolean forceReload)
   {
+    Package oldModule = Definition.currentModule;
     Definition.currentModule = this;
     
     List definitions = new LinkedList();
@@ -158,6 +161,8 @@ public class Package implements mlsub.compilation.Module
       }
     
     this.ast = new AST(this, expand(definitions));
+
+    Definition.currentModule = oldModule;
   }
   
   private void sourcesRead()
@@ -314,7 +319,7 @@ public class Package implements mlsub.compilation.Module
   
   public void endOfLink()
   {
-    if(isRunnable())
+    if(jar!=null)
       closeJar();
   }
   
@@ -328,8 +333,9 @@ public class Package implements mlsub.compilation.Module
       name = name.substring(lastDot+1, name.length());
     
     try{
-      OutputStream out = new FileOutputStream(new File(directory.getParent(),
-						       name+".jar"));
+      File dest = new File(directory.getParent(), name+".jar");
+      
+      OutputStream out = new FileOutputStream(dest);
       Manifest manifest = new Manifest();
 
       manifest.getMainAttributes().put(Attributes.Name.MANIFEST_VERSION,"1.0");
@@ -363,7 +369,7 @@ public class Package implements mlsub.compilation.Module
 
     try{
       PrintWriter f=new PrintWriter
-	(new BufferedWriter(new FileWriter(new File(directory,"package.bossi"))));
+	(new BufferedWriter(new FileWriter(new File(directory,"package.nicei"))));
 
       for(Iterator i = getImports().iterator(); i.hasNext();)
 	{
@@ -550,8 +556,10 @@ public class Package implements mlsub.compilation.Module
     int i=0;
     String res = str+"$0";
     while(takenNames.containsKey(res))
-      res = str + "$" + (++i);
-  
+      {
+	res = str + "$" + (++i);
+      }
+    
     takenNames.put(res,null);
     return res;
   }
@@ -560,12 +568,12 @@ public class Package implements mlsub.compilation.Module
    * File searching
    ****************************************************************/
 
-  private static final String sourceExt = ".bossa";
+  private static final String sourceExt = ".nice";
   
   private static final Object[] packageRoots;
   static 
   {
-    String path = Debug.getProperty("bossa.package.path",".");
+    String path = Debug.getProperty("nice.package.path",".");
     LinkedList res = new LinkedList();
     
     int start=0;
@@ -621,8 +629,8 @@ public class Package implements mlsub.compilation.Module
     if(res==null)
       User.error(name,"Could not list source files in "+name);
     
-    // put bossa.lang.prelude first if it exists
-    if(name.content.equals("bossa.lang"))
+    // put nice.lang.prelude first if it exists
+    if(name.toString().equals("nice.lang"))
       for(int i=0; i<res.length; i++)
 	if(res[i].getName().equals("prelude"+sourceExt))
 	  {
@@ -637,7 +645,7 @@ public class Package implements mlsub.compilation.Module
 
   private File getInterface()
   {
-    File itf = new File(directory,"package.bossi");
+    File itf = new File(directory,"package.nicei");
 
     if(!itf.exists())
       return null;
@@ -675,7 +683,7 @@ public class Package implements mlsub.compilation.Module
       else
 	{
 	  JarFile jar = (JarFile) packageRoots[i];
-	  JarEntry ent = jar.getJarEntry(rname+"/package.bossi");
+	  JarEntry ent = jar.getJarEntry(rname+"/package.nicei");
 	  if(ent!=null)
 	    try{
 	      itfFromJar = new BufferedReader
@@ -735,7 +743,7 @@ public class Package implements mlsub.compilation.Module
   /** The directory where this package resides. */
   private File directory;
 
-  /** The component of the package path this package was found in. */ 
+  /** The component of the package path this package was found in. */
   private File rootDirectory;
 
   /** The interface file of the package if it was found in a jar file */
@@ -765,7 +773,7 @@ public class Package implements mlsub.compilation.Module
   public gnu.bytecode.Method getMainAlternative()
   {
     return mainAlternative;
-  }  
+  }
   
   public boolean generatingBytecode()
   {

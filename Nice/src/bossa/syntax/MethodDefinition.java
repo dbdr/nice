@@ -12,7 +12,7 @@
 
 // File    : MethodDefinition.java
 // Created : Thu Jul 01 18:12:46 1999 by bonniot
-//$Modified: Thu Apr 27 19:19:18 2000 by Daniel Bonniot $
+//$Modified: Tue May 02 17:48:08 2000 by Daniel Bonniot $
 
 package bossa.syntax;
 
@@ -67,9 +67,16 @@ public class MethodDefinition extends Definition
       (name, new Polytype(constraint, new FunType(params, returnType)), this);
     addChild(symbol);
 
-    bytecodeName = module.mangleName(symbol.name.toString());
+    boolean isConstructor = name.toString().equals("<init>");
+    
+    // do not generate mangled names for methods
+    // that are not defined in a bossa file 
+    // (e.g. native methods automatically imported).
+    if(module!=null && !isConstructor)
+      bytecodeName = module.mangleName(name.toString());  
 
-    bossa.link.Dispatch.register(this);
+    if(!isConstructor)
+      bossa.link.Dispatch.register(this);
   }
 
   public MethodDefinition(LocatedString name, 
@@ -182,6 +189,14 @@ public class MethodDefinition extends Definition
     return new gnu.expr.PrimProcedure(dispatchPrimMethod);
   }
   
+  public final void setDispatchMethod(gnu.mapping.Procedure p) 
+  {
+    if(dispatchMethod!=null)
+      Internal.error("dispatch method already set");
+    
+    dispatchMethod = p;
+  }
+  
   public final gnu.mapping.Procedure getDispatchMethod() 
   { 
     if(dispatchMethod==null)
@@ -248,6 +263,7 @@ public class MethodDefinition extends Definition
   public String toString()
   {
     return
+      module+" "+
       getType().getConstraint().toString()
       + String.valueOf(getType().codomain())
       + " "
@@ -285,7 +301,7 @@ public class MethodDefinition extends Definition
     return symbol.getType();
   }
   
-  private String bytecodeName;
+  String bytecodeName;
   MethodDefinition.Symbol symbol;
 
   class Symbol extends PolySymbol

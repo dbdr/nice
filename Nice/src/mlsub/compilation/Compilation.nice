@@ -12,7 +12,7 @@
 
 // File    : Compilation.bossa
 // Created : Wed Mar 01 17:01:48 2000 by Daniel Bonniot
-//$Modified: Wed Mar 01 18:01:56 2000 by Daniel Bonniot $
+//$Modified: Fri Mar 03 12:29:53 2000 by Daniel Bonniot $
 
 package mlsub.compilation;
 
@@ -33,7 +33,7 @@ package mlsub.compilation;
 
 class Compilation
 {
-  boolean doLink;
+  boolean skipLink;
 
   Module root;
 }

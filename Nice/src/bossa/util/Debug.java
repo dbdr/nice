@@ -12,7 +12,7 @@
 
 // File    : Debug.java
 // Created : Thu Jul 22 15:37:02 1999 by bonniot
-//$Modified: Thu Apr 20 16:56:25 2000 by Daniel Bonniot $
+//$Modified: Wed May 03 13:36:25 2000 by Daniel Bonniot $
 
 package bossa.util;
 
@@ -21,7 +21,7 @@ import java.util.*;
 import java.io.*;
 
 /**
- * Static class for debug output
+ * Static class for debug output.
  * 
  * @author bonniot
  */
@@ -44,7 +44,7 @@ public abstract class Debug
     props=new Properties();
     try {
       File f = new File(System.getProperty("user.home"),
-			".bossa.conf");
+			".nice.conf");
       
       FileInputStream in = new FileInputStream(f);
       props.load(new BufferedInputStream(in));

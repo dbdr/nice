@@ -12,7 +12,7 @@
 
 // File    : JavaClass.java
 // Created : Wed Feb 02 16:20:12 2000 by Daniel Bonniot
-//$Modified: Fri Apr 28 15:28:43 2000 by Daniel Bonniot $
+//$Modified: Thu May 04 12:58:00 2000 by Daniel Bonniot $
 
 package bossa.syntax;
 
@@ -57,7 +57,7 @@ public class JavaClass extends ClassDefinition
 	  typeParameters, extensions, implementations, abstractions);
     this.javaName = javaName;
 
-    if(name.toString().equals("bossa.lang.Array"))
+    if(name.toString().equals("nice.lang.Array"))
       ConstantExp.arrayTC = this.tc;
     
     if(javaName == null) // primitive type

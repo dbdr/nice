@@ -1,7 +1,11 @@
 /// PASS
   byte[] b = f(new byte[2]);
+  short[] s = f(new short[2]);
+  int[] i = f(new int[2]);
+  long[] l = f(new long[2]);
+  float[] f = f(new float[2]);
   /// Toplevel
-  <int T> T[] f(T[] t) = t; 
+  <double T> T[] f(T[] t) = t; 
 
 /// PASS
   ?String[][] s = single(new String[1]);

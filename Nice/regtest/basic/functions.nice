@@ -37,7 +37,7 @@ void test_functions()
 {
   println("### Testing functions");
   FunctionClass o = identity(new FunctionClass());
-  o.setX(quarentedeux());
+  o.setX(quarantedeux(1));
   println("x = " + o.getX());
 
   println(optFun("Functions") + optFun("a Nice feature", end:"!"));

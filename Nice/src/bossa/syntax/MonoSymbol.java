@@ -48,7 +48,7 @@ public class MonoSymbol extends VarSymbol
     if(memberOf!=null)
       return null; //new Polytype(memberOf.getConstraint(),type);
     else
-      return new Polytype(mlsub.typing.Constraint.True, type);
+      return new Polytype(type);
   }
 
   public mlsub.typing.Monotype getMonotype()

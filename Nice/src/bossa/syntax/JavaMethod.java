@@ -212,7 +212,7 @@ public class JavaMethod extends MethodDeclaration
       ((ClassType) holder).getDeclaredMethod (methodName, javaArgType);
     
     if(reflectMethod == null)
-      User.error(this, "method " + methodName + 
+      User.error(this, "Method " + methodName + 
 		 " was not found in class " + holder.getName());
 
     // use the following, or the Type.flushTypeChanges() in SpecialTypes

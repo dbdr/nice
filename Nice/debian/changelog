@@ -13,7 +13,8 @@ nice (0.7.7) unstable; urgency=low
       String s = Integer.toHexString(100);
     It's now also possible to refer to static methods as anonymous functions:
       String[] s = integerArray.map(Integer.toHexString);
-  * Allow the ?(T->U) syntax for optional functional types.
+  * Allow the ?(T->U) syntax for optional functional types as an alternative
+    to T ?-> U, and void -> Type as an alternative to () -> Type.
   * Added the 'concat' function on arrays.
   * Faster compilation for large projects with many classes.
   * Bugfixes (anonymous functions inside functionals with constracts,

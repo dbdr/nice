@@ -747,7 +747,14 @@ Monotype monotype():
   [ "?" { maybe = true; } ]
   "->"
   { Monotype codomain; } codomain = monotype()
-  { res = new FunType(new Monotype[]{ res }, codomain); 
+  { 
+    Monotype[] domain;
+    // Make void->... mean the same as ()->...
+    if (res.isVoid())
+      domain = null;
+    else
+      domain = new Monotype[]{ res };
+    res = new FunType(domain, codomain); 
     res.nullness = maybe ? res.maybe : res.absent; }
 ]
 

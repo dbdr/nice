@@ -74,6 +74,8 @@ implements Located
     return false;
   }
 
+  public boolean isVoid() { return false; }
+
   /**************************************************************
    * Scoping
    **************************************************************/

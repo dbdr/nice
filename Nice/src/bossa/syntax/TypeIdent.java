@@ -51,6 +51,11 @@ public final class TypeIdent extends Monotype implements Located
     return false;
   }
   
+  public boolean isVoid()
+  {
+    return "void".equals(getName().toString());
+  }
+
   Monotype substitute(Map map)
   {
     Monotype res = (Monotype) map.get(this);

@@ -21,3 +21,6 @@
 
 /// PASS
   ?(int -> int) f = null;
+
+/// PASS
+  void->int f = () => 1;

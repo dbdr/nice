@@ -41,6 +41,19 @@
 var List<String> test2 = (()=> new ArrayList()) ();
 
 /// PASS
+  /// Toplevel
+// Checks proper closures inside initialization expressions.
+var Map<String,String> classMap = (()=> {
+  Map<String,String> classMap' = new HashMap();
+  [("int", "java.lang.Integer")].foreach((String,String) pair => {
+    (String key, String value) = pair;
+    classMap'.put(key, value);
+  });
+  return classMap';
+})();
+
+
+/// PASS
   /* Modifying a global var. */
   x = 1;
   /// TOPLEVEL

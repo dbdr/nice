@@ -552,6 +552,14 @@ public class ClassExp extends LambdaExp
 	     child != null && walker.exitValue == null;
 	     child = child.nextSibling)
 	  walker.walkLambdaExp(child);
+
+	// Walk static fields. This is particularly important for
+	// those initialized to some value, since that value might
+	// include closures that need to be walked.
+	for (Declaration decl = firstDecl(); decl != null; 
+	     decl = decl.nextDecl())
+	  if (decl.isStatic() && decl.value != null)
+	    walker.walkExpression(decl.value);
       }
     finally
       {

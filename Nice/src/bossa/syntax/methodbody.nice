@@ -412,7 +412,10 @@ public class MethodBodyDefinition extends MethodImplementation
 	  mlsub.typing.Typing.implies();
 	}
 	catch(mlsub.typing.TypingEx e) {
-	  throw User.error(name, "Type error in method body \""+name+"\":\n"+e);
+	  if (Debug.powerUser)
+	    throw User.error(name, "Type error in method body \""+name+"\":\n"+e);
+	  else
+	    throw User.error(name, "Type error in method implementation");
 	}
 
 	Node.currentFunction = this;

@@ -101,25 +101,31 @@ printOptions(os)
   return res;
 }
 
-String printOption(Option);
-printOption(opt)
+String printOption(Option opt)
 {
-  int column = 22;
+  int column = 28;
+  String tab = "\n" + pad("", column, ' ');
 
   String res = opt.noShortName ? "    " : ("  -" + opt.shortName);
   if(opt.longName != null)
-    res = res + (opt.noShortName ? " " : ",") + " --"+opt.longName;
+    res = res + (opt.noShortName ? " " : ",") + " --" + opt.longName;
   
+  res += paramString(opt);
+
   if (res.length() < column-1)
     res = pad(res, column, ' ');
   else
-    res = res + "\n" + pad("", column, ' ');
+    res = res + tab;
 
-  return res + opt.purpose + "\n";
+  return res + opt.purpose.replace('\n', tab) + "\n";
 }
 
-String pad(String, int, char);
-pad(s,len, c)
+String paramString(Option);
+paramString(@NoParamOption) = "";
+paramString(o@ParamOption) = " " + o.optionHint.toUpperCase();
+paramString(o@OptionalParamOption) = "[=" + o.optionHint.toUpperCase() + "]";
+
+String pad(String s, int len, char c)
 {
   String res = "";
   for(int i = s.length(); i<len; i++)

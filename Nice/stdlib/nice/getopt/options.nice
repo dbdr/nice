@@ -27,11 +27,18 @@ Option option(char shortName = '?',
 
 /** Creates a required parameter option. */
 Option option(char shortName = '?',
-	      String,String,String,fun(String)());
+	      String longname,
+	      String purpose,
+	      String optionHint,
+	      fun(String)() actionParam);
 
 /** Creates an optional parameter option. */
 Option option(char shortName = '?',
-	      String,String,String,fun()(),fun(String)());
+	      String longname,
+	      String purpose,
+	      String optionHint,
+	      fun()() actionNoParam,
+	      fun(String)() actionParam);
 
 
 abstract class Option

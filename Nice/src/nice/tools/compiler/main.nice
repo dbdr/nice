@@ -45,67 +45,51 @@ main(args)
   Sequence<Option> options;
   options = 
   [
-   option('r', "recompile",
-	  "Force recompilation of package",
-	  "none/command-line/all",
-	  fun()=>{ compilation.recompileCommandLine = true; },
-	  fun(String arg)=>
-          {
-	    if ("all".equals(arg))
-	      compilation.recompileAll = true;
-	    else if ("command-line".equals(arg))
-	      compilation.recompileCommandLine = true;
-	    else if ("none".equals(arg))
-	      {
-		compilation.recompileCommandLine = false;
-		compilation.recompileAll = false;
-	      }
-	    else println("Unkown argument to \'recompile\': " + arg);
-	  }),
-
-   option('R', "recompileAll",
-	  "Force recompilation of all dependant packages",
-	  fun()=>{ compilation.recompileAll = true; }),
-
-   option('c', "compile",
-	  "Compile packages, do not link them",
-	  fun()=>{ compilation.skipLink = true; }),
-
-
-
    option('?', "sourcepath",
-	  "Lookup path for source packages",
-	  ": separated list of directories and jar archives",
+	  "Lookup path for source packages\nPATH is a list of directories and .jar archives",
+	  "path",
 	  fun(String path) => { compilation.sourcePath = path; }),
 
    option('d', "destination",
 	  "Destination directory for compiled packages",
-	  "directory",
+	  "dir",
 	  fun(String dir)=>{ compilation.destinationDir = dir; }),
 
    option('?', "packagepath",
-	  "Additional lookup path for compiled packages",
-	  ": separated list of directories and jar archives",
-	  fun() => nice.tools.code.Types.setClasspath(null),
+	  "Additional lookup path for compiled packages\nPATH is a list of directories and .jar archives",
+	  "path",
 	  fun(String path) =>{ compilation.packagePath = path; }),
 
    option('?', "classpath",
 	  "Lookup path for external classes",
-	  ": separated list of directories and jar archives",
-	  fun() => nice.tools.code.Types.setClasspath(null),
+	  "path",
 	  fun(String path) => nice.tools.code.Types.setClasspath(path)),
 
 
    option('a', "jar",
-	  "Compile to archive",
+	  "Compile to archive\nYou can then run the program with 'java -jar FILE'",
 	  "file",
-	  fun(String output)=>{ compilation.output = output; }),
+	  fun(String output) => { compilation.output = output; }),
 
    // This will specify native compilation in the future
    option('o', "output",
-	  "Compile to archive",
+	  "Generate native executable (not supported yet)",
 	  "file",
-	  fun(String output)=>{ compilation.output = output; }),
+	  fun(String output) => { compilation.output = output; }),
+
+
+   option('r', "recompile",
+	  "Force recompilation of package",
+	  fun() => { compilation.recompileCommandLine = true; }),
+
+   option('R', "recompile-all",
+	  "Force recompilation of all dependant packages",
+	  fun() => { compilation.recompileAll = true; }),
+
+   option('c', "compile",
+	  "Compile packages but do not link them",
+	  fun() => { compilation.skipLink = true; }),
+
 
    // This options is usefull for the compiler itself. 
    // Should not be advertised since it should not be usefull otherwise

@@ -23,6 +23,21 @@ package nice.lang;
 <Any R> String `+`(String,R);
 `+`(s@String,o) = s.concat(toString(o));
 
+String replace(String source, char c, String with)
+{
+  StringBuffer res = new StringBuffer();
+  char[] tab = source.toCharArray();
+  int pos = 0;
+  int newpos;
+  while ((newpos = source.indexOf(c, pos)) != -1)
+    {
+      res.append(tab, pos, newpos - pos);
+      res.append(with);
+      pos = newpos + 1;
+    }
+  return res.append(tab, pos, tab.length - pos).toString();
+}
+
 /****************************************************************
  * Java methods
  ****************************************************************/
@@ -31,3 +46,4 @@ package nice.lang;
 String concat(String, String) = native String String.concat(String);
 StringBuffer append(StringBuffer, ?String) 
 = native StringBuffer StringBuffer.append(String);
+char[] toCharArray(String) = native char[] String.toCharArray();

@@ -922,8 +922,13 @@ typecheck(s@SynchronizedStmt)
 */
 void checkAssignment(mlsub.typing.Polytype left, Expression right)
 {
-  typecheck(right);
-  Typing.leq(right.getType(), left);
+  if (left.isMonomorphic)
+    checkAssignment(left.getMonotype(), right);
+  else
+    {
+      typecheck(right);
+      Typing.leq(right.getType(), left);
+    }
 }
 
 void checkAssignment(mlsub.typing.Monotype left, Expression right)

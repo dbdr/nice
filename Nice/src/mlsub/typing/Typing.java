@@ -300,9 +300,12 @@ public final class Typing
     int l = enter(true);
     
     try{
-      Constraint.enter(t2.getConstraint());
+      if (! t2.isMonomorphic())
+        {
+          Constraint.enter(t2.getConstraint());
 
-      implies();
+          implies();
+        }
     
       Constraint.enter(t1.getConstraint());
       leq(t1.getMonotype(), t2.getMonotype());
@@ -326,18 +329,14 @@ public final class Typing
     if(dbg)
       Debug.println("Polytype leq: "+t1+" <: "+m2);
 
-    // The additions we are going to make should be discarded at the end,
-    // so as not to influence existential type variables in the context.
-    int l = enter(true);
+    int l = enter();
     
     try{
-      implies();
-    
       Constraint.enter(t1.getConstraint());
       leq(t1.getMonotype(), m2);
     }
     finally{
-      if(leave(true, false) != l)
+      if(leave() != l)
 	throw new InternalError("Unmatched enters and leaves");
     }
   }

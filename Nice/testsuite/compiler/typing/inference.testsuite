@@ -107,7 +107,7 @@ foo() {
     key = each.getKey;
   }
 
-/// PASS bug
+/// PASS
   let L1 = new LinkedList();
   for (var j = 1; j <= 10; j++) L1.add(j);
 
@@ -140,3 +140,29 @@ foo() {
    testmap[s] = Integer.parseInt(s);
  for(s : testmap.keySet())
    println(s + " => " + testmap[s]);
+
+/// PASS
+ let testmap = new HashMap();
+ for(s : ["1", "2", "3"])
+   testmap[s] = Integer.parseInt(s);
+ for(String s : testmap.keySet())
+   println(s + " => " + testmap[s]);
+
+/// PASS
+  let l = new ArrayList();
+  (List<String> l0, List<String> l1) = foo(l);
+  /// Toplevel
+<T,U | U <: T> (List<T>,List<U>) foo(List<U> x) = (new ArrayList(x), x);
+
+/// FAIL
+  let l = new ArrayList();
+  (List<String> l0, List<String> l1) = foo(l);
+  /*/// FAIL HERE */ (List<Number> l2, List<Number> l3) = foo(l);
+
+  /* Without failure above, then we could do:
+  l1.add("");
+  Number n = l3.get(0); // Bang!
+  */
+
+  /// Toplevel
+<T,U | U <: T> (List<T>,List<U>) foo(List<U> x) = (new ArrayList(x), x);

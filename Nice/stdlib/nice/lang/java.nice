@@ -22,5 +22,14 @@
 
 package nice.lang;
 
+import java.text.*;
+
+//               PACKAGE: java.lang
+
 // result is non-null
 Runtime getRuntime() = native Runtime Runtime.getRuntime();
+
+//               PACKAGE: java.text
+
+DateFormat getDateInstance() = native DateFormat DateFormat.getDateInstance();
+DateFormat getDateInstance(int style) = native DateFormat DateFormat.getDateInstance(int);

@@ -359,9 +359,13 @@ toString(s@Sequence)
 interface Map<Key,Element> = native java.util.Map;
 class Hashtable<Key,Element> implements Map<Key, Element> = 
   native java.util.HashMap;
+class WeakHashtable<Key,Element> implements Map<Key, Element> = 
+  native java.util.WeakHashMap;
 
 <Any Key, Any Element> Hashtable<Key, Element> hashtable() = 
   native new java.util.HashMap();
+<Any Key, Any Element> WeakHashtable<Key, Element> weakHashtable() = 
+  native new java.util.WeakHashMap();
 
 // We give two versions of put and get, working on Maps with
 // null and non-null element types.

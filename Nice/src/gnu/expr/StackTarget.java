@@ -47,6 +47,9 @@ public class StackTarget extends Target
 	return true;
       }
 
+    if (code.topType().isAssignableTo(type))
+      return true;
+
     stackType.emitCoerceTo(type, code);
     type.emitCoerceFrom(code.topType(), code);
     

@@ -39,11 +39,11 @@ let String[] NICE_KEYWORDS = [
 				"override", "new", "else", "native", "inline", "import", 
 				"package", "alike", "Any", "return", "break", "continue", 
 				"super", "try", "catch", "finally", "throw", "instanceof", 
-				"requires", "ensures", "assert", "do"];
+				"requires", "ensures", "assert", "do", "this"];
 
 
 let String[] NICE_WORD_FRAGMENT_KEYWORDS = [
-				"@", "!", "=>", "?", "#"];
+				"@", "=>", "?", "#"];
 
 
 

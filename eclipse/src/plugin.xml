@@ -67,7 +67,7 @@
 			name="Nice Source File"
 			class="nice.eclipse.ui.wizards.NewNiceFileCreationWizard"
 			category="net.sf.nice.nice_wizard_category"
-			icon="icons/full/ctool16/newclass_wiz.gif">
+			icon="wiz.gif">
 			<description>Create a Nice File</description>
 		</wizard>
 	</extension>

@@ -87,8 +87,8 @@ public final class Dispatch
       return false;
     
     Alternative a = (Alternative) alternatives.peek();
-    for(int i = 0; i<a.patterns.length; i++)
-      if(a.patterns[i]!=null)
+    for (int i = 0; i<a.patterns.length; i++)
+      if (! a.patterns[i].atAny())
 	  return false;
     return true;
   }

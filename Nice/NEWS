@@ -42,7 +42,7 @@ nice (0.9.5)
     duplication of constructors in bytecode, disappearing contracts during 
     recompilation, ... )
 
- --
+ -- Wed, 10 Dec 2003 20:17:43 +0100
 
 nice (0.9.4)
 

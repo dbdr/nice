@@ -732,6 +732,51 @@ FunType funmonotype():
 }
 
 Monotype monotype():
+{ Monotype res; }
+{
+
+  res=arrayMonotype()
+  
+[ LOOKAHEAD(1)
+  { boolean maybe = false; }
+  [ "?" { maybe = true; } ]
+  "->"
+  { Monotype codomain; } codomain = monotype()
+  { res = new FunType(new Monotype[]{ res }, codomain); 
+    res.nullness = maybe ? res.maybe : res.sure; }
+]
+
+  { return res; }
+}
+
+Monotype arrayMonotype():
+{
+  Monotype res;
+  Token end;
+}
+{
+  res=simpleMonotype()
+
+( LOOKAHEAD(1)
+  { boolean maybe = false; }
+  ( end="[]" | end="[?]" { maybe = true; } )
+  { 
+    List tp = new LinkedList();
+    tp.add(res);
+    Location loc = res.location().englobe(new Location(end));
+    res = new MonotypeConstructor
+      (new TypeIdent(new LocatedString("Array", loc)),
+       new TypeParameters(tp),
+       loc);
+    res.nullness = maybe ? res.maybe : res.sure;
+  }
+)*
+
+  { return res; }
+  
+}
+
+Monotype simpleMonotype():
 {
   Monotype res;
   List p=null;
@@ -739,7 +784,6 @@ Monotype monotype():
   boolean maybe = false, sure = false;
 }
 {
-
   [ "?" { maybe = true; } | "!" { sure = true; } ]
 
   (
@@ -765,7 +809,7 @@ Monotype monotype():
   res=typeIdent() 
   { res.nullness = res.absent; }
   )
-  
+
   { 
     if (maybe)
       res.nullness = res.maybe;
@@ -773,35 +817,7 @@ Monotype monotype():
       res.nullness = res.sure;
   }
 
-// T[] as a shortcut for Array<T>
-// ?T[] is equivalent to Array<?T>, 
-// so setting the nullness must be done as above
-(
-  end="[]" 
-  { 
-    List tp = new LinkedList();
-    tp.add(res);
-    Location loc = res.location().englobe(new Location(end));
-    res = new MonotypeConstructor
-      (new TypeIdent(new LocatedString("Array", loc)),
-       new TypeParameters(tp),
-       loc);
-    res.nullness = res.sure;
-  }
-
-  |
-  { maybe = false; }
-  [ "?" { maybe = true; } ]
-  "->"
-  { Monotype codomain; } codomain = monotype()
-  { res = new FunType(new Monotype[]{ res }, codomain); 
-    res.nullness = maybe ? res.maybe : res.sure; }
-  
-)*
-
-  { 
-    return res; 
-  }
+  { return res; }
 }
 
 List monotypes():
@@ -1509,6 +1525,18 @@ Expression Expression() :
 {
   { first=getToken(1); }
 
+  ( e1=funExp() | e1=ClassicExpression() )
+
+  { 
+    last=getToken(0);
+    e1.setLocation(new Location(first, last));
+    return e1; 
+  }
+}
+
+Expression ClassicExpression() :
+{ Expression e1,e2; Token op; }
+{
   e1=ConditionalExpression()
   [ 
     op=AssignmentOperator() 
@@ -1520,11 +1548,7 @@ Expression Expression() :
       e1=AssignExp.create(e1,e2);
     }
   ]
-  { 
-    last=getToken(0);
-    e1.setLocation(new Location(first, last));
-    return e1; 
-  }
+  { return e1; }
 }
 
 Token AssignmentOperator() :
@@ -1545,7 +1569,8 @@ Expression ConditionalExpression() :
 { Expression res,e1,e2; Token start; }
 {
   res=ConditionalOrExpression() 
-    [ "?" e1=Expression() start=":" e2=ConditionalExpression() 
+    [
+      "?" e1=Expression() start=":" e2=ConditionalExpression() 
       { e2.setLocation(new Location(start, getToken(0))); 
         res=new IfExp(res,e1,e2); }
     ]
@@ -1629,20 +1654,20 @@ Expression RelationalExpression() :
 }
 
 Expression ShiftExpression() :
-{ Expression e1,e2; Token t,t1=null,t2=null; boolean left=false; }
+{ Expression e1,e2; Token t,t1=null; boolean left=false; }
 {
   e1=AdditiveExpression() 
-    ( 
-     ( t="<" { left=true; } [ t1="<" ] 
-     | t=">" [ t1=">" [ t2=">" ]] 
+    ( LOOKAHEAD(2)
+     ( t="<" "<" { left=true; }
+     | t=">" ">" [ t1=">" ]
      )
      e2=AdditiveExpression() 
      { 
        String func;
        if(left)
-         func = t1==null ? "<" : "<<";
+         func = "<<";
        else
-         func = t1==null ? ">" : t2==null ? ">>" : ">>>";
+         func = t1==null ? ">>" : ">>>";
        e1=CallExp.create(symb(func,t),e1,e2); }
       )*
   { return e1; }
@@ -1776,16 +1801,13 @@ Expression PrimaryPrefix() :
 */
 
 |
-  // This includes the case "(" Expression() ")" to avoids lookahead
+  // This includes the case "(" Expression() ")" to avoid lookahead
   res=tupleExp()
 |
   res=arrayLiteralExp() 
 |
   //AllocationExpression()
   res=newExp()
-|
-  // Nice specific
-  res=funExp()
 
 /* What's that ?
 |
@@ -1823,7 +1845,8 @@ Expression PrimarySuffix(Expression start) :
 
 |
   "." res=identExp()
-  [ args = arguments(true) ]
+  [ LOOKAHEAD(1) // a.f(x) is parsed as f(a, x), not as (f(a))(x)
+    args = arguments(true) ]
   { 
     if (args == null)
       {

@@ -1,0 +1,14 @@
+/// PASS
+  void f(int->int[] x) { x(0); }
+
+/// PASS
+  void f(Array<int->int> x) { x[0](0); }
+
+/// PASS
+  void f(int->int->int x) { x(0)(0); }
+
+/// FAIL
+  void f((int->int)->int x) { x(0)(0); }
+
+/// PASS
+  int[?] a = null;

@@ -279,7 +279,7 @@ static void main(String[] args)
 <blockquote>
 <pre><font color="#0000EE">interface</font> <font color="#CD0000">Collection</font>&lt;T>
 {
-&nbsp; <font color="#0000EE">alike</font>&lt;T> <font color="#CD0000">filter</font>(<font color="#0000EE">fun</font>(T)(<font color="#B7860B">boolean</font>) f);
+&nbsp; <font color="#0000EE">alike</font>&lt;T> <font color="#CD0000">filter</font>(T-><font color="#B7860B">boolean</font> f);
 }
 
 <font color="#0000EE">interface</font> <font color="#CD0000">List</font>&lt;T>
@@ -289,7 +289,7 @@ static void main(String[] args)
 <font color="#CD0000">main</font>(args)
 {
 &nbsp; <font color="#B7860B">List</font>&lt;<font color="#B7860B">int</font>> <font color="#CD0000">l1</font>;
-&nbsp; <font color="#0000EE">fun</font>(<font color="#B7860B">int</font>)(<font color="#B7860B">boolean</font>) f;
+&nbsp; <font color="#B7860B">int</font>-><font color="#B7860B">boolean</font> f;
 &nbsp; ...
 &nbsp; <font color="#B7860B">List</font>&lt;<font color="#B7860B">int</font>> <font color="#CD0000">l2</font> = l1.filter(f);
 }</pre>
@@ -396,8 +396,10 @@ type of the returned expressions.</li>
 
 <li>
 <b>Functional arguments</b>. A function or a method can have functional
-arguments. The concrete syntax for functional type <i>(T1, T2, ..., Tn)
--> T</i> is <tt>fun(T1, T2, ..., Tn)(T)</tt>.</li>
+arguments. The syntax for functional types is <tt>(T1, T2, ..., Tn)
+-> T</tt>. The parentheses can be ommited if there is only one argument type:
+<tt>int->int</tt>.
+</li>
 
 <li>
 <b>Functional-like syntax for method definitions</b>. One can write <tt>f(x@P)

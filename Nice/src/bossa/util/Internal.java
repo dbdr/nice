@@ -52,39 +52,40 @@ public final class Internal
       }
   }
 
-  public static void error(Located loc, String message, String dbgMsg)
+  public static Error error(Located loc, String message, String dbgMsg)
   {
     if(Debug.powerUser)
-      error(loc, message + dbgMsg);
+      return error(loc, message + dbgMsg);
     else
-      error(loc, message);
+      return error(loc, message);
   }
   
-  public static void error(Located loc, String message)
+  public static Error error(Located loc, String message)
   {
     Location l = loc.location();
-    if(l==null)
-      error(message);
+    if (l == null)
+      return error(message);
     else
-      error(l+":\n"+message);
+      return error(l + ":\n" + message);
   }
 
-  public static void error(String message, String dbgMsg)
+  public static Error error(String message, String dbgMsg)
   {
-    if(Debug.powerUser)
-      error(message+dbgMsg);
+    if (Debug.powerUser)
+      return error(message + dbgMsg);
     else
-      error(message);
+      return error(message);
   }
   
-  public static void error(String message)
+  public static Error error(String message)
   {
     System.out.println("[Internal error]\n" + message);
     printStackTrace();
     System.exit(1);
+    return null;
   }
   
-  public static void error(Throwable e)
+  public static Error error(Throwable e)
   {
     if(e instanceof ExceptionInInitializerError)
       {
@@ -103,6 +104,7 @@ public final class Internal
     System.out.println("Internal error:\n");
     printStackTrace();
     System.exit(1);
+    return null;
   }
 
 }

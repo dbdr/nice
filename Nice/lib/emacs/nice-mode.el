@@ -508,7 +508,9 @@ Mode for editing/compiling Nice programs.
     )
     
     ;; Save the current directory
-    (setq nice-directory (file-name-directory (buffer-file-name)))
+    (setq nice-directory 
+	  (nice-root (file-name-directory (buffer-file-name))))
+    (setq default-directory nice-directory)
 
     (setq nice-compile-buffer (compile-internal cmd "No more errors"))
 
@@ -652,6 +654,22 @@ Mode for editing/compiling Nice programs.
 ;; Return the object without its package qualification
 (defun nice-object-name (object)
   (car (last (split-string object "\\."))))
+
+;; Return the root a of package given a file of the package
+(defun nice-root (file)
+  (let* ((spl (split-string file "/"))
+	(pkg (split-string (nice-buffer-pkg-name)))
+	(nlevels (length pkg)))
+  (defun remove-n (s n)
+    (if (eq n 0) s
+      (remove-n (cdr s) (- n 1))))
+    (concat "/" 
+	    (mapconcat 
+	     'identity (reverse (remove-n (reverse spl) nlevels)) "/")
+	    "/"
+	    )
+    )
+  )
 
 ;; Find the object "oname" of the kind "kind" in package "opackage" (directory
 ;; "odir" is the relative path corresponding to package "opackage")
@@ -941,6 +959,12 @@ Mode for editing/compiling Nice programs.
     (remove-text-properties (point-min) (point-max) '(mouse-face))
     (font-lock-fontify-buffer)
     (set-buffer-modified-p modified)))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;
+;;                          HTML / LaTeX
+;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (defun nice-html-link (beg end)
   (let ((link (get-text-property beg 'nice-link)))

@@ -15,6 +15,270 @@ package bossa.syntax;
 import bossa.util.*;
 
 /**
+   A list of binders + atomic constraints.
+   
+   @see AtomicConstraint
+
+ */
+public class Constraint extends Node
+{
+  private List<TypeSymbol> binders;
+  private List<AtomicConstraint> atomics;
+
+  /**
+   * Returns a new constraint.
+   * The lists are new, but the list elements are the same.
+   */
+  Constraint shallowClone()
+  {
+    return createConstraint(new ArrayList(binders), new ArrayList(atomics));
+  }
+  
+  mlsub.typing.Constraint resolveToLowlevel()
+  { 
+    return mlsub.typing.Constraint.create(
+	binders.isEmpty() ? null : binders.toArray(),
+	atomics.isEmpty() ? null : atomics.mapToArray(
+		AtomicConstraint ac => ac.resolve(notNull(typeScope))));
+  }
+
+  toString()
+  {
+    if (atomics.isEmpty())
+      return Util.map("<",", ","> ",binders);
+
+    if (binders.isEmpty())
+      return Util.map("<",", ","> ",atomics);
+
+    // Put in a parsable format.
+    StringBuffer res = new StringBuffer("<");
+    boolean first = true;
+	
+    Constraint c = this.shallowClone();
+
+    let i = c.binders.iterator();
+    while (i.hasNext())
+      {
+        TypeSymbol s = i.next();
+        if (!(s instanceof TypeConstructor))
+          // Handle the ! constraint
+          {
+            MonotypeVar mv = cast(s);
+            let j = c.atomics.iterator();
+            while (j.hasNext())
+              {
+                AtomicConstraint atom = j.next();
+                if (atom.isSureConstraintFor(mv))
+                  {
+                    if (first)
+                      first = false;
+                    else
+                      res.append(',');
+                    res.append('!').append(s);
+                    j.remove();
+                    i.remove();
+                    break;
+                  }
+              }
+		
+            continue;
+          }
+
+        TypeConstructor tc = s;
+        boolean ok = false;
+        let j = c.atomics.iterator();
+        while (j.hasNext())
+          {
+            AtomicConstraint atom = j.next();
+            let parent = atom.getParentFor(tc);
+            if (parent!=null)
+              {
+                if (first)
+                  first = false;
+                else
+                  res.append(',');
+                res.append(parent).append(' ').append(tc);
+                j.remove();
+                i.remove();
+                ok = true;
+                break;
+              }
+          }
+        if (!ok)
+	  Internal.error("Unable to print the constraint in a parsable form because of "+tc);
+      }
+	
+    res.append(Util.map((res.length()>1 ? ", " : ""),", ","", c.binders));
+    res.append(Util.map(" | ",", ","",c.atomics)).append("> ");
+    return res.toString();
+  }
+
+  /**
+     Add the binder to the front of the list of binders.
+  */
+  void addFirstBinder(TypeSymbol s)
+  {
+    binders.add(0, s);
+    this.addTypeSymbol(s);
+  }
+
+  /**
+     Add the binder if it is not already there.
+  */
+  void addBinder(TypeSymbol s)
+  {
+    if (!binders.contains(s))
+      {
+	binders.add(s);
+	this.addTypeSymbol(s);
+      }
+  }
+
+  /**
+   * Adds binders that are not already present
+   *
+   * @param b a collection of TypeSymbol
+   */
+  void addBinders(TypeSymbol[?] bs)
+  {
+    if (bs==null)
+      return;
+    
+    for (int i = 0; i<bs.length; i++)
+      this.addBinder(bs[i]);
+  }
+
+  void addAtom(AtomicConstraint atom)
+  {
+    atomics.add(atom);
+  }
+
+  void addAtoms(List<AtomicConstraint> l)
+  {
+    atomics.addAll(l);
+  }
+
+  public boolean isTrivial() = binders.isEmpty() && atomics.isEmpty();
+
+  List<TypeSymbol> getBinders() = binders;
+  List<AtomicConstraint> getAtoms() = atomics;
+}
+
+/**
+ * Creates the constraint \forall binders . atomics
+ *
+ * @param binders a collection of TypeSymbols
+ * @param atomics a collection of AtomicConstraints
+ */
+public Constraint createConstraint(?List<TypeSymbol> binders, ?List<AtomicConstraint> atomics)
+{
+  if (binders == null && atomics == null)
+    return trueConstraint;
+
+  let res = new Constraint(Node.upper, binders: binders || new ArrayList(),
+		atomics: atomics || new ArrayList());
+  if (binders != null)
+    for (b : binders)
+      res.addTypeSymbol(b);
+
+  return res;
+}
+
+/**
+ * The trivial constraint.
+ *
+ * This field is final, so pointer equality can be used 
+ * to test whether a constraint is True.
+ *
+ * @return a constraint with no binders, always true
+ */
+let Constraint trueConstraint = new Constraint(Node.upper, binders: new ArrayList(0), atomics: new ArrayList(0));
+
+/**
+   An abstract constraint atom. See children.
+   
+   @see Constraint
+ */
+public abstract class AtomicConstraint
+{
+
+  mlsub.typing.AtomicConstraint resolve(TypeScope scope);
+
+  /**
+   * Returns a string that represents a constraint element
+   * another element was introduced in comparison of.
+   *
+   * For instance, in <Num N | ... >
+   * getParentFor(N) should be "Num".
+   * Used to reproduce a parsable form of the constraint.
+   *
+   * @param tc a constraint element
+   * @return the representation of its "parent", or <code>null</code>
+   */
+  ?String getParentFor(mlsub.typing.TypeConstructor tc)
+  {
+    return null;
+  }
+
+  boolean isSureConstraintFor(mlsub.typing.MonotypeVar mv)
+  {
+    return false;
+  }
+}
+
+public AtomicConstraint createSureTypeVar(mlsub.typing.MonotypeVar tv)
+{
+  return new AtomicConstraintWrapper
+    (atom: new mlsub.typing.MonotypeLeqTcCst(tv, nice.tools.typing.PrimitiveType.sureTC));
+}
+
+/**
+   Wrapper for lowlevel AtomicConstraint
+ */
+final class AtomicConstraintWrapper extends AtomicConstraint
+{
+  private final mlsub.typing.AtomicConstraint atom;
+    
+  resolve(scope) = atom;
+
+  getParentFor(tc)
+  {
+    if (atom instanceof mlsub.typing.TypeConstructorLeqCst)
+      {
+	mlsub.typing.TypeConstructorLeqCst leq = cast(atom);
+	if (leq.t1()==tc)
+	  return leq.t2().toString();
+	else
+	  return null;
+      }
+
+    if (atom instanceof mlsub.typing.ImplementsCst)
+      {
+        mlsub.typing.ImplementsCst leq = cast(atom);
+        if (leq.tc()==tc)
+          return leq.itf().toString();
+        else
+          return null;
+      }
+      
+    return null;
+  }
+
+  isSureConstraintFor(mv)
+  {
+    if (atom instanceof mlsub.typing.MonotypeLeqTcCst)
+      {
+        let mlsub.typing.MonotypeLeqTcCst a = cast(atom);
+        return a.m == mv;
+      }
+
+    return false;
+  }
+
+  toString() = atom.toString();
+}
+
+/**
    Syntactic inequality between monotypes.
 
 */
@@ -23,7 +287,7 @@ public class MonotypeLeqCst extends AtomicConstraint
   Monotype m1;
   Monotype m2;
 
-  resolve(ts)
+  resolve(TypeScope ts)
   {
     return new mlsub.typing.MonotypeLeqCst
       (m1.resolve(ts), m2.resolve(ts));
@@ -36,12 +300,12 @@ public class MonotypeLeqCst extends AtomicConstraint
    Inequality between TypeConstructors.
 
 */
-public class TypeConstructorLeqCst extends AtomicConstraint
+public class TypeConstructorLeqCst extends bossa.syntax.AtomicConstraint
 {
   mlsub.typing.TypeConstructor t1;
   TypeIdent t2;
 
-  resolve(ts)
+  resolve(TypeScope ts)
   {
     // If t2 resolve to an interface definition,
     // this constraint meant t1 implements t2

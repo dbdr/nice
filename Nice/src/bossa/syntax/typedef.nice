@@ -387,7 +387,7 @@ public abstract class TypeDefinition extends MethodContainer
 
     if (our != null)
     {
-      binders.addAll(Arrays.asList(our.getBinderArray()));
+      binders.addAll(our.getBinders());
       atoms.addAll(our.getAtoms());
     }
 
@@ -410,8 +410,13 @@ public abstract class TypeDefinition extends MethodContainer
       atoms.add(new MonotypeLeqCst(m1: v, m2: bossa.syntax.Monotype.create(params[i])));
     }
 
-    return new ClassConstraint(binders, atoms,
+    let res = new ClassConstraint(Node.upper, binders: binders, atomics: atoms,
 	typeParameters: cast(typeParameters));
+
+    for (b : binders)
+      res.addTypeSymbol(b);
+
+    return res;
   }
 
 

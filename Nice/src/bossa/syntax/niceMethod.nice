@@ -247,8 +247,6 @@ public Definition createMemberMethod
   let thisConstraint = c.classConstraint;
   mlsub.typing.TypeSymbol[?] thisBinders = c.getBinders();
     
-  int thisBindersLen = (thisBinders == null ? 0 : thisBinders.length);
-
   mlsub.typing.TypeSymbol container = c.getTypeSymbol();
   // contains the interface if container is one
   ?mlsub.typing.Interface itf = null;
@@ -265,12 +263,8 @@ public Definition createMemberMethod
   // if the constraint is True
   // we must create a new one, otherwise we would
   // modify other methods!
-  if (constraint == Constraint.True)
-      constraint = new Constraint
-	(new ArrayList(thisBindersLen + (hasAlike ? 1 : 0)),
-	 new ArrayList((hasAlike ? 1 : 0) + 
-                       (thisConstraint == null ? 0 : 
-                        thisConstraint.getAtoms().size())));
+  if (constraint == trueConstraint)
+      constraint = createConstraint(new ArrayList(), new ArrayList());
 
   constraint.addBinders(thisBinders);
   if (thisConstraint != null)
@@ -295,7 +289,7 @@ public Definition createMemberMethod
 	  atom = new mlsub.typing.ImplementsCst(alikeTC, itf);
 	else
 	  atom = new mlsub.typing.TypeConstructorLeqCst(alikeTC, tc);
-	constraint.addAtom(AtomicConstraint.create(atom));
+	constraint.addAtom(new AtomicConstraintWrapper(atom: atom));
 
 	thisType = Monotype.create
           (Monotype.sure

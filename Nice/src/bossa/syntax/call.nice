@@ -275,7 +275,7 @@ public Expression createCallExp(Expression func, Arguments args)
 public void addBlockArgument(Expression callexp, Statement block, LocatedString name)
 {
   let CallExp exp = cast(callexp);
-  exp.arguments.add(createFunExp(bossa.syntax.Constraint.True, [], block), name);
+  exp.arguments.add(createFunExp(trueConstraint, [], block), name);
 } 
 
 ?mlsub.typing.Polytype wellTyped(mlsub.typing.Polytype funt, mlsub.typing.Polytype[] parameters)

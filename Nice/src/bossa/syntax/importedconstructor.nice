@@ -99,7 +99,7 @@ public ?ImportedConstructor loadImportedConstructor(CNiceClass def, gnu.bytecode
       (new mlsub.typing.MonotypeConstructor(classDef.getTC(), classDef.getTypeParameters())));
 
   let constraint = classDef.classConstraint == null ?
-          bossa.syntax.Constraint.True : notNull(classDef.classConstraint).shallowClone();
+          trueConstraint : notNull(classDef.classConstraint).shallowClone();
 
   let name = new LocatedString("<init>",def.getDefinition().location());
   let parameters = readParametersFromBytecodeAttribute(attr, 

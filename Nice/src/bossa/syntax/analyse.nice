@@ -453,7 +453,7 @@ analyse(FunExp e, Info info, noEscape)
     else
       info.anonFunDepth = info.depth;
 
-    if (e.constraint != Constraint.True && e.constraint != null)
+    if (e.constraint != trueConstraint && e.constraint != null)
       {
 	e.cst = notNull(e.constraint).resolveToLowlevel();
 	addTypeVars(info, notNull(e.cst).binders());

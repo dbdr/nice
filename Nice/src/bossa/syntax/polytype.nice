@@ -20,7 +20,7 @@ import bossa.util.*;
 */
 public class Polytype extends Node
 {
-  private Constraint constraint = Constraint.True;
+  private Constraint constraint = trueConstraint;
   private Monotype monotype;
 
   {

@@ -49,8 +49,8 @@ public abstract class MethodContainer extends Definition
           scope.addSymbols(notNull(classConstraint).getBinders());
         }
 	catch(TypeScope.DuplicateName ex) {}
-	resolvedConstraints = 
-	  AtomicConstraint.resolve(scope, notNull(classConstraint).getAtoms());
+	resolvedConstraints = notNull(classConstraint).getAtoms().mapToArray(
+		AtomicConstraint ac => ac.resolve(scope));
       }
   }
 
@@ -60,11 +60,11 @@ public abstract class MethodContainer extends Definition
     if (classConstraint == null)
       return null;
     else
-      return notNull(classConstraint).getBinderArray();
+      return notNull(classConstraint).getBinders().toArray();
   }
 
   /** The type parameters of the class. */
-  public mlsub.typing.Monotype[?] getTypeParameters ()
+  public mlsub.typing.Monotype[?] getTypeParameters()
   {
     if (classConstraint == null)
       return null;
@@ -78,7 +78,7 @@ public abstract class MethodContainer extends Definition
       return mlsub.typing.Constraint.True;
     else
       return new mlsub.typing.Constraint
-	(notNull(classConstraint).getBinderArray(), resolvedConstraints);
+	(notNull(classConstraint).getBinders().toArray, resolvedConstraints);
   }
 
   /**
@@ -149,7 +149,7 @@ public ClassConstraint createClassConstraint(?bossa.syntax.Constraint cst,
   List<AtomicConstraint> constraints;
   boolean resolve;
 
-  if (cst == bossa.syntax.Constraint.True || cst == null) 
+  if (cst == trueConstraint || cst == null) 
     {
       binders = cast(typeParameters);
       constraints = atoms;
@@ -158,7 +158,7 @@ public ClassConstraint createClassConstraint(?bossa.syntax.Constraint cst,
   else
     {
        constraints = cst.getAtoms();
-       binders = cst.getBinderArray();
+       binders = cst.getBinders().toArray();
        resolve = true;
     }
 
@@ -197,5 +197,11 @@ ClassConstraint createClassConstraint(mlsub.typing.TypeSymbol[] binders, List<At
   for (tp : typeParameters)
     nice.tools.typing.Types.makeMarkedType(tp);
 
-  return new ClassConstraint(binders, atoms, typeParameters: tps);
+  let res = new ClassConstraint(Node.upper, binders: new ArrayList(binders),
+	atomics: atoms, typeParameters: tps);
+
+  for (b : binders)
+    res.addTypeSymbol(b);
+
+  return res;
 }

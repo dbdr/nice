@@ -592,7 +592,7 @@ TypeSymbol binder(Collection atomics):
   id=monotypeVar()
   { 
     if (sure)
-      atomics.add(AtomicConstraint.sureTypeVar(id));
+      atomics.add(bossa.syntax.dispatch.createSureTypeVar(id));
     return id; 
   }
 }
@@ -638,9 +638,9 @@ Constraint constraint():
 {
   [ { List b=null, atoms=new ArrayList(); }
     "<" b=binders(atoms) [ "|" atomics(atoms) ] ">" 
-    { return new Constraint(b,atoms); }
+    { return bossa.syntax.dispatch.createConstraint(b,atoms); }
   ]
-  { return Constraint.True; }
+  { return bossa.syntax.dispatch.createConstraint(null,null); }
 }
 
 /***********************************************************************/
@@ -1177,7 +1177,7 @@ ClassConstraint classTypeParameters(Constraint prefix, List tags):
   {
     // For the moment, disallow constraints to come from both the prefix
     // and the type parameters.
-    if (prefix != Constraint.True && atoms.size() > 0)
+    if ((! prefix.isTrivial()) && atoms.size() > 0)
       throw bossa.util.User.error
         (loc, "Constraints on type parameters should all be specified in the prefix constraint");
 
@@ -1211,7 +1211,7 @@ MonotypeVar taggedMonotypeVar(List tags, List atoms):
         atoms.add(new MonotypeLeqCst(Monotype.createVar(mv), bound)); 
       }
 
-    if (sure) atoms.add(AtomicConstraint.sureTypeVar(mv));
+    if (sure) atoms.add(bossa.syntax.dispatch.createSureTypeVar(mv));
 
     return mv;
   }
@@ -1758,7 +1758,7 @@ MonoSymbol funExpParameter(List statements):
 Expression funExp():
 {
   List formals = new LinkedList();
-  Constraint cst = Constraint.True;
+  Constraint cst = bossa.syntax.dispatch.createConstraint(null, null);
   MonoSymbol sym;
   Statement body;
   Expression exp;
@@ -1783,7 +1783,7 @@ Expression funExp():
     exp=Expression() { body = bossa.syntax.dispatch.createReturnStmt(exp); }
   )
   { statements.add(body);
-    return bossa.syntax.dispatch.createFunExp(cst, formals, bossa.syntax.dispatch.createBlock(statements)); }
+    return cst.createFunExp(formals, bossa.syntax.dispatch.createBlock(statements)); }
 }
 
 /** A statement not terminated by a ";" if applicable. */

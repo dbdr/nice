@@ -229,7 +229,6 @@ boolean equals(LocatedString, LocatedString) = native boolean LocatedString.equa
 void printInterface(Definition, java.io.PrintWriter) = native void Definition.printInterface(java.io.PrintWriter);
 ?gnu.expr.Declaration getDeclaration(VarSymbol) = native gnu.expr.Declaration VarSymbol.getDeclaration();
 void printInterface(ClassImplementation, java.io.PrintWriter) = native void ClassImplementation.printInterface(java.io.PrintWriter);
-List<AtomicConstraint> getAtoms(Constraint) = native List Constraint.getAtoms();
 mlsub.typing.Monotype[?] resolve(TypeMap, Monotype[?]) = native mlsub.typing.Monotype[] Monotype.resolve(TypeMap, Monotype[]);
 ?gnu.bytecode.Type TypeImport_lookup(LocatedString) = native gnu.bytecode.Type nice.tools.code.TypeImport.lookup(LocatedString);
 List<Node> children(Node) = native Node.children;
@@ -237,8 +236,6 @@ LocatedString name(Definition) = native Definition.name;
 void addMappingsLS(TypeScope, Collection<LocatedString>, TypeSymbol[]) = native void TypeScope.addMappingsLS(Collection, TypeSymbol[]);
 gnu.expr.CopyArgument CopyArgument(Stack<gnu.bytecode.Variable>) = native new gnu.expr.CopyArgument(Stack);
 AST AST(List<Definition>, int) = native new AST(List, int);
-?String getParentFor(AtomicConstraint, mlsub.typing.TypeConstructor) = native String AtomicConstraint.getParentFor(mlsub.typing.TypeConstructor);
-mlsub.typing.AtomicConstraint resolve(AtomicConstraint, TypeScope) = native mlsub.typing.AtomicConstraint AtomicConstraint.resolve(TypeScope);
 bossa.syntax.Monotype substitute(bossa.syntax.Monotype,Map<String,bossa.syntax.Monotype>) = native bossa.syntax.Monotype bossa.syntax.Monotype.substitute(Map);
 List<bossa.syntax.Monotype> substitute(Map<String,bossa.syntax.Monotype>,Collection<bossa.syntax.Monotype>) = native List bossa.syntax.Monotype.substitute(Map,Collection);
 boolean containsAlike(List<bossa.syntax.Monotype>) = native boolean bossa.syntax.Monotype.containsAlike(List);
@@ -250,11 +247,8 @@ bossa.syntax.Monotype[] substitute(Map<String,bossa.syntax.Monotype>,bossa.synta
 Monotype[] Monotype_toArray(?List<Monotype>) = native Monotype[] Monotype.toArray(List);
 List<VarSymbol> lookup(VarScope, LocatedString) = native List VarScope.lookup(LocatedString);
 Map<gnu.bytecode.Type,mlsub.typing.TypeConstructor> javaTypeConstructors(bossa.modules.Compilation ) = native bossa.modules.Compilation.javaTypeConstructors;
-bossa.syntax.Constraint newConstraint(List<TypeSymbol>, List<AtomicConstraint>) = native new Constraint(List, List);
-void addAtoms(Constraint, List<AtomicConstraint>) = native void Constraint.addAtoms(List);
 Map<VarSymbol, int[]> usedArguments(Arguments) = native Arguments.usedArguments;
 Map<VarSymbol, Expression[]> applicationExpressions(Arguments) = native Arguments.applicationExpressions;
-Constraint _Constraint(mlsub.typing.TypeSymbol[], List<AtomicConstraint>) = native new Constraint(mlsub.typing.TypeSymbol[], List);
 
 // Retypings needed since java types are not strict.
 mlsub.typing.Polytype boolPolytype() = native nice.tools.typing.PrimitiveType.boolPolytype;

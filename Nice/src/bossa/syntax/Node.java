@@ -101,17 +101,7 @@ abstract public class Node
   {
     addTypeMap(s.toString(), s);
   }
-  
-  void addTypeSymbols(Collection c)
-  {
-    if(c!=null)
-      for(Iterator i=c.iterator(); i.hasNext();)
-	{
-	  TypeSymbol s = (TypeSymbol) i.next();
-	  addTypeMap(s.toString(), s);
-	}
-  }
-  
+
   void addTypeMap(String name, TypeSymbol symbol)
   {
     if (typeMapsNames == null)

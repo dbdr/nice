@@ -93,7 +93,10 @@ extends ProcedureN implements Inlineable
     else if (kind == Comp) // Bitwise complement
       {
 	// ~x == (x xor -1)
-	code.emitPushInt(-1);
+	if (type == Type.long_type)
+	  code.emitPushLong(-1);
+	else
+	  code.emitPushInt(-1);
 	code.emitXOr();
       }
     else if (kind >= Shl && kind <= uShr)

@@ -155,7 +155,7 @@ public class CallExp extends Expression
 
     gnu.expr.Expression res;
     if (function.isFieldAccess())
-      res = function.getFieldAccessMethod().compileAccess(this.compileParams());
+      res = notNull(function.getFieldAccessMethod()).compileAccess(this.compileParams());
     else
       res = new gnu.expr.ApplyExp(function.generateCodeInCallPosition(), this.compileParams());
     this.location().write(res);
@@ -197,7 +197,7 @@ public class CallExp extends Expression
     if (!function.isFieldAccess())
       Internal.error(this, "Assignment to a call that is not a field access");
 
-    FieldAccess access = function.getFieldAccessMethod();
+    FieldAccess access = notNull(function.getFieldAccessMethod());
 
     if (access.isFinal())
       Internal.error(this, "Field " + access + " is final");

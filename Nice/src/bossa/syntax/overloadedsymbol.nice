@@ -573,7 +573,7 @@ private void removeNonMinimal(List<VarSymbol> symbols, Arguments arguments)
       }
 }
 
-private Domain domain(mlsub.typing.Polytype t, int[] usedArguments)
+private Domain domain(mlsub.typing.Polytype t, int[?] usedArguments)
 {
   // remove nullness marker
   mlsub.typing.Monotype[] m = nice.tools.typing.Types.parameters(t.getMonotype());

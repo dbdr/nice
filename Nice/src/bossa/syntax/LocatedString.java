@@ -28,6 +28,11 @@ public class LocatedString
     this(content,loc,false);
   }
 
+  public LocatedString(String content)
+  {
+    this(content, Location.nowhere(), false);
+  }
+
   /**
    * @param content the underlying raw string
    * @param loc the location of this string in the source

@@ -121,7 +121,7 @@ public class SuperExp extends Expression
 	monotype = cast(type.getMonotype());
         mlsub.typing.Monotype[] m = monotype.domain();
         List<mlsub.typing.AtomicConstraint> newAtoms = new ArrayList();
-        mlsub.typing.AtomicConstraint[?] oldAtoms = type.getConstraint().atoms();
+        mlsub.typing.AtomicConstraint[?] oldAtoms = notNull(type.getConstraint()).atoms();
        
         if (oldAtoms != null)
 	  newAtoms.addAll(oldAtoms);
@@ -148,7 +148,7 @@ public class SuperExp extends Expression
               newAtoms.add(new mlsub.typing.MonotypeLeqCst(bossa.syntax.Monotype.sure(mlsub.typing.TopMonotype.instance), m[0]));
 	  }
 
-        constraint = new mlsub.typing.Constraint(type.getConstraint().binders(), 
+        constraint = new mlsub.typing.Constraint(notNull(type.getConstraint()).binders(), 
 			new mlsub.typing.AtomicConstraint[newAtoms.size()].fillWith(newAtoms));
 
       }
@@ -169,7 +169,7 @@ public class SuperExp extends Expression
       // It does not matter which method is called (the super method or
       // the base method), a call to super is emited.
       {
-        let NiceClass nc = cast(ClassDefinition.get(notNull(currentMethod).firstArgument()).implementation);
+        let NiceClass nc = cast(notNull(ClassDefinition.get(notNull(currentMethod).firstArgument())).implementation);
         code = nc.callSuperMethod(notNull(superMethod));
       }
 

@@ -55,11 +55,11 @@ public class NewExp extends CallExp
       }
 
     // Make sure that the constructors have been created.
-    ClassDefinition definition = ClassDefinition.get(tc);
+    let definition = ClassDefinition.get(tc);
     if (definition != null)
       definition.resolve();
     
-    LinkedList<VarSymbol> constructors = TypeConstructors.getConstructors(tc);
+    ?LinkedList<VarSymbol> constructors = TypeConstructors.getConstructors(tc);
     if (constructors == null)
       {
 	if (tc.arity() > 0)
@@ -74,7 +74,7 @@ public class NewExp extends CallExp
     // OverloadedSymbolExp removes elements from it
     constructors = constructors.clone();
 
-    function = createOverloadedSymbolExp(constructors, new LocatedString("new " + tc, this.location()));
+    function = createOverloadedSymbolExp(notNull(constructors), new LocatedString("new " + tc, this.location()));
   }
   
   private void setObject()
@@ -84,7 +84,7 @@ public class NewExp extends CallExp
     function = new SymbolExp(method.getSymbol(), ti.location());
   }
 
-  toString() = "new " + ti.toString() + arguments;
+  toString() = "new " + ti + arguments;
 }
 
 public Expression createNewExp(TypeIdent ti, Arguments arguments) 

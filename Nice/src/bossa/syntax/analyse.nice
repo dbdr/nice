@@ -533,7 +533,7 @@ Expression analyseIdent(IdentExp e, Info info, boolean assigned)
 	  if (sym.isNonStaticFieldAccess() && Node.thisExp != null)
             {
 	      CallExp res = new CallExp(function: createOverloadedSymbolExp(symbols, notNull(e.ident)),
-	        	arguments: new Arguments([new Arguments.Argument(Node.thisExp)]));
+	        	arguments: Arguments.singleArgument(Node.thisExp));
               res.setLocation(e.location());
               return res;
             }

@@ -59,7 +59,7 @@ public class EnumDefinition extends Definition
           exps.add(new IdentExp((LocatedString)it.next()));
 
         Statement body = bossa.syntax.dispatch.createReturnStmt(bossa.syntax.dispatch.createLiteralArrayExp(exps), true);
-        LocatedString mName = new LocatedString("family", bossa.util.Location.nowhere());
+        LocatedString mName = new LocatedString("family");
         Definition mBodyDef = new MethodBodyDefinition(impl, mName, null,
 				new LinkedList(), body);
         globalDefs.add(mBodyDef);

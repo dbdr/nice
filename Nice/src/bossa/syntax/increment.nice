@@ -41,24 +41,22 @@ public class IncrementExp extends Expression
 	(decl, (short) (increment ? 1 : -1), !returnOld);
 
     // variable is not a local variable, so it must be a field
-    ?CallExp call = null;
-    if (variable instanceof CallExp)
-      call = cast(variable);
-    
-    if (call == null)
+    if (! (variable instanceof CallExp))
       Internal.error(this, "\"var\" is assignable and not a local, " +
 		     "so it should be a call to a FieldAccessMethod");
 
-    let access = notNull(call).function.getFieldAccessMethod();
+    CallExp call = cast(variable);
+
+    let access = call.function.getFieldAccessMethod();
     if (access == null)
       Internal.error(this, "\"var\" is assignable and not a local, " +
 		     "so it should be a call to a FieldAccessMethod");
 
-    if (access.isFinal())
+    if (notNull(access).isFinal())
       User.error(this, "Field " + access + " is final");
 
-    return NiceUtils.doInline(new nice.tools.code.IncrementProc(access.fieldDecl, returnOld, increment),
-		notNull(call).arguments.getExp(0).generateCode());
+    return NiceUtils.doInline(new nice.tools.code.IncrementProc(notNull(access).fieldDecl, returnOld, increment),
+		call.arguments.getExp(0).generateCode());
   }
 
   /****************************************************************

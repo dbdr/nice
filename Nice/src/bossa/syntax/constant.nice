@@ -58,7 +58,7 @@ public class VoidConstantExp extends ConstantExp
   toString() = "{}";
 }
 
-let LocatedString voidName = new LocatedString("void", bossa.util.Location.nowhere());
+let LocatedString voidName = new LocatedString("void");
 
 /**
    A String constant.
@@ -87,7 +87,7 @@ public StringConstantExp createStringConstantExp(String value, boolean multiline
   return res;
 }
 
-let LocatedString stringClassName =  new LocatedString("java.lang.String", Location.nowhere());
+let LocatedString stringClassName =  new LocatedString("java.lang.String");
 
 // cf. JLS 3.10.6
 public String unescapeLiteral(String s)
@@ -197,9 +197,9 @@ public class TypeConstantExp extends ConstantExp
     return new gnu.expr.ApplyExp(class_forName, [new gnu.expr.QuoteExp(representation)]);
   }
 
-  TypeConstructor getTC()
+  ?TypeConstructor getTC()
   {
-    return nice.tools.typing.Types.rawType(representedType).head();
+    return notNull(nice.tools.typing.Types.rawType(representedType)).head();
   }
 
   ?mlsub.typing.Monotype representedType = null;

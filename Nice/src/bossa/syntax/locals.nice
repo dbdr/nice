@@ -125,13 +125,7 @@ public class LocalVariable extends LocalValue
     last = notNull(last.next);
   }
 
-  display()
-  {
-    if (left.constant)
-      return "let "+ super;
-    else
-      return "var " + super;
-  }
+  display() = (left.constant ? "let " : "var ") + super;
 }
 
 class LocalVariableSymbol extends MonoSymbol

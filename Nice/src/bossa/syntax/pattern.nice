@@ -602,12 +602,10 @@ public ?Pattern readPattern(String rep, int[]/*ref*/ pos)
 		new Character(name[1]), name, loc));
 
       if (name[0] == '-')
-        return createPattern(ConstantExp.makeNumber(new LocatedString(name,
-		 loc)));
+        return createPattern(ConstantExp.makeNumber(new LocatedString(name)));
 
       if (name[0] == '+')
-        return createPattern(ConstantExp.makeNumber(new LocatedString(
-		name.substring(1), loc)));
+        return createPattern(ConstantExp.makeNumber(new LocatedString(name.substring(1))));
 
       if (name[0] == '\"')
         return createPattern(createStringConstantExp(
@@ -617,15 +615,15 @@ public ?Pattern readPattern(String rep, int[]/*ref*/ pos)
 	{
 	  let prefix = name.substring(0, (name[1] == '=') ? 2 : 1);
 	  return createPattern(prefix, null, ConstantExp.makeNumber(
-		new LocatedString(name.substring(prefix.length()), loc)), null, loc);
+		new LocatedString(name.substring(prefix.length()))), null, loc);
         }
 
       if (name[0] == '=')
-        return resolveGlobalConstants(new VariablePattern(new LocatedString(name.substring(1), loc), loc));
+        return resolveGlobalConstants(new VariablePattern(new LocatedString(name.substring(1)), loc));
     }
 
   if (name.equals("_"))
-    return createPattern(new LocatedString("_", loc));
+    return createPattern(new LocatedString("_"));
 
   if (name.equals("NONNULL"))
     return new NotNullPattern(null, PrimitiveType.sureTC, loc);

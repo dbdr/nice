@@ -75,7 +75,7 @@ mlsub.typing.Monotype ensureMonomorphic(mlsub.typing.Polytype type,
       // are discarded when the typechecking of the current method is over.
       MethodDeclaration.enterLocalContext();
 
-      type.getConstraint.enter(true);
+      notNull(type.getConstraint).enter(true);
     }
 
   return type.getMonotype();
@@ -191,6 +191,8 @@ void _printStackTraceWithSourceInfo(Throwable t) =
 
 LocatedString name(VarSymbol) = native VarSymbol.name;
 Arguments.Argument[] arguments(Arguments) = native Arguments.arguments;
+Arguments Argument(List<Arguments.Argument>) = native new Arguments(List);
+Arguments Argument(Arguments.Argument[]) = native new Arguments(Arguments.Argument[]);
 mlsub.typing.Polytype getType(Expression) = 
   native mlsub.typing.Polytype Expression.getType();
 mlsub.typing.Monotype type(MonoSymbol) = native MonoSymbol.type;
@@ -211,8 +213,19 @@ List<VarSymbol> symbols(EnumDefinition) = native EnumDefinition.symbols;
 void addValues(Pattern, List<ConstantExp>) = native void Pattern.addValues(List);
 ?mlsub.typing.TypeConstructor getRuntimeTC(Pattern) = native mlsub.typing.TypeConstructor Pattern.getRuntimeTC();
 boolean matchesValue(Pattern, ConstantExp) = native boolean Pattern.matchesValue(ConstantExp);
-public ?LocatedString getName(Pattern) = native LocatedString Pattern.getName();
-
+?LocatedString getName(Pattern) = native LocatedString Pattern.getName();
+?mlsub.typing.lowlevel.Kind getKind(mlsub.typing.lowlevel.Element) = native mlsub.typing.lowlevel.Kind mlsub.typing.lowlevel.Element.getKind();
+?gnu.expr.Declaration getDeclaration(Expression) = native gnu.expr.Declaration Expression.getDeclaration();
+?FieldAccess getFieldAccessMethod(Expression) = native FieldAccess Expression.getFieldAccessMethod();
+?FieldAccess getField(Expression) = native FieldAccess Expression.getField();
+?mlsub.typing.Monotype Types_getTypeParameter(mlsub.typing.Polytype, int) = native mlsub.typing.Monotype nice.tools.typing.Types.getTypeParameter(mlsub.typing.Polytype, int);
+?mlsub.typing.Monotype Types_getTypeParameter(mlsub.typing.Monotype, int) = native mlsub.typing.Monotype nice.tools.typing.Types.getTypeParameter(mlsub.typing.Monotype, int);
+mlsub.typing.Monotype[?] Types_parameters(mlsub.typing.Polytype) = native mlsub.typing.Monotype[] nice.tools.typing.Types.parameters(mlsub.typing.Polytype);
+?mlsub.typing.TypeConstructor head(mlsub.typing.Monotype) = native mlsub.typing.TypeConstructor mlsub.typing.Monotype.head();
+?ClassDefinition ClassDefinition_get(mlsub.typing.TypeConstructor) = native ClassDefinition ClassDefinition.get(mlsub.typing.TypeConstructor);
+?gnu.bytecode.ClassType getSuperclass(gnu.bytecode.ClassType) = native gnu.bytecode.ClassType gnu.bytecode.ClassType.getSuperclass();
+int[?] getUsedArguments(Arguments, VarSymbol) = native int[] Arguments.getUsedArguments(VarSymbol);
+?mlsub.typing.Constraint getConstraint(mlsub.typing.Polytype) = native mlsub.typing.Constraint mlsub.typing.Polytype.getConstraint();
 // Retypings needed since java types are not strict.
 
 mlsub.typing.Polytype boolPolytype() = native PrimitiveType.boolPolytype;

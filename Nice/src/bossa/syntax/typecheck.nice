@@ -1057,7 +1057,7 @@ void checkNotNull(mlsub.typing.Polytype type)
   else
     try {
     Typing.enter();
-    type.getConstraint().enter();
+    notNull(type.getConstraint()).enter();
     Typing.leq(type.getMonotype(), PrimitiveType.sureTC);
     Typing.implies();
   }

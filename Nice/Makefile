@@ -139,7 +139,6 @@ src/bossa/parser/Parser.java: src/bossa/parser/Parser.jj
 bootstrap: parser
 	cd src/gnu/lists && ./withCollections
 	mkdir -p classes
-	cd classes; jar xf ../external/gj.jar java
 	-cd src/bossa/syntax && mv -f dispatch.java.bootstrap dispatch.java
 	${JAVAC} \
 		stdlib/nice/lang/Native.java stdlib/nice/lang/inline/*.java \

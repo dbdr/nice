@@ -100,6 +100,14 @@ public class ReferenceOp extends Procedure2 implements Branchable, bossa.syntax.
     if (args[0] instanceof QuoteExp && 
        ((QuoteExp)args[0]).getType() == Type.nullType)
     {
+      if (args[1].getType() instanceof PrimType)
+        {
+          if (kind == Ne)
+            code.emitGoto(to);
+
+          return;
+        }
+
       args[1].compile(comp, stack);
       if (kind == Eq)
 	code.emitGotoIfNull(to);
@@ -110,6 +118,14 @@ public class ReferenceOp extends Procedure2 implements Branchable, bossa.syntax.
     else if (args[1] instanceof QuoteExp && 
        ((QuoteExp)args[1]).getType() == Type.nullType)
     {
+      if (args[0].getType() instanceof PrimType)
+        {
+          if (kind == Ne)
+            code.emitGoto(to);
+
+          return;
+        }
+
       args[0].compile(comp, stack);
       if (kind == Eq)
 	code.emitGotoIfNull(to);
@@ -137,6 +153,14 @@ public class ReferenceOp extends Procedure2 implements Branchable, bossa.syntax.
     if (args[0] instanceof QuoteExp && 
        ((QuoteExp)args[0]).getType() == Type.nullType)
     {
+      if (args[1].getType() instanceof PrimType)
+        {
+          if (kind == Eq)
+            code.emitGoto(to);
+
+          return;
+        }
+
       args[1].compile(comp, stack);
       if (kind == Eq)
 	code.emitGotoIfNotNull(to);
@@ -147,6 +171,14 @@ public class ReferenceOp extends Procedure2 implements Branchable, bossa.syntax.
     else if (args[1] instanceof QuoteExp && 
        ((QuoteExp)args[1]).getType() == Type.nullType)
     {
+      if (args[0].getType() instanceof PrimType)
+        {
+          if (kind == Eq)
+            code.emitGoto(to);
+
+          return;
+        }
+
       args[0].compile(comp, stack);
       if (kind == Eq)
 	code.emitGotoIfNotNull(to);

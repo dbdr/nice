@@ -76,4 +76,10 @@ test_arrays()
 	println("");
       }
   }
+
+  // Literal arrays
+  String[] ts = [ "A", "B" ];
+  ts.iter(fun(String s)=>println(s));
+
+  float[] tf = [ 1.2, 1, 0 ];
 }

@@ -193,6 +193,10 @@ public final class Typing
     if(t == null)
       return;
     
+    if (isTop(m))
+      // Trivially true.
+      return;
+
     AtomicKind v = t.variance;
     if(v == null)
       throw new InternalError("Don't know how to handle this");
@@ -584,5 +588,14 @@ public final class Typing
     return (TypeConstructor) cst.lowestInstance(tc);
   }
   
+  /****************************************************************
+   * Tools
+   ****************************************************************/
+
+  static boolean isTop(Monotype m)
+  {
+    return m.getKind() == TopMonotype.TopKind.instance;
+  }
+
   public static boolean dbg;
 }

@@ -121,7 +121,9 @@ f(x@A) = x.i;
 f(null) = 0;
 
 /// PASS
-  foo(new Object());
+  assert foo(new Object());
+  assert !foo("");
   /// Toplevel
-void foo(Object o);
-foo(Object o) { }
+boolean foo(Object o);
+foo(Object o) = true;
+foo(String s) = false;

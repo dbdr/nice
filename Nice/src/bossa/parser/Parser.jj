@@ -1810,8 +1810,8 @@ Expression ImpliesExpression() :
 { Expression e1,e2; Token t; }
 {
   e1=ConditionalOrExpression() 
-    ( t="->" e2=ConditionalOrExpression() 
-      { e1=CallExp.create(symb(t), e1, e2); } )?
+//    ( t="->" e2=ConditionalOrExpression() 
+//      { e1=CallExp.create(symb(t), e1, e2); } )?
   { return e1; }
 }
 

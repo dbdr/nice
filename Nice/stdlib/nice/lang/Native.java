@@ -5,6 +5,8 @@ package nice.lang;
 */
 public final class Native
 {
+  public static Object object(Object o) { return o; }  
+    
   public static boolean eq (Object o1, Object o2) { return o1 == o2; }
   public static boolean neq(Object o1, Object o2) { return o1 != o2; }
   

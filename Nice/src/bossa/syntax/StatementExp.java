@@ -35,8 +35,11 @@ public class StatementExp extends Expression
 
   public gnu.expr.Expression compile()
   {
-    return new gnu.expr.BeginExp
-      (statement.generateCode(), gnu.expr.QuoteExp.voidExp);
+    if (statement == null)
+      return gnu.expr.QuoteExp.voidExp;
+    else
+      return new gnu.expr.BeginExp
+	(statement.generateCode(), gnu.expr.QuoteExp.voidExp);
   }
   
   void computeType()

@@ -96,10 +96,7 @@ public class TestNice {
 	 * @exception	Exception	TODO
 	 */
 	static public void main(String[] args) {
-		if (_tempFolder.exists())
-			deleteFolder(_tempFolder);
-			
-		_tempFolder.mkdir();
+		cleanupTempFolder();
 		
 		try {
 			new TestNice().performTests(args[0]);
@@ -108,6 +105,13 @@ public class TestNice {
 		}
 	}
 
+
+	static void cleanupTempFolder() {
+		if (_tempFolder.exists())
+			deleteFolder(_tempFolder);
+			
+		_tempFolder.mkdir();
+	}
 
 
 	static int getFileCounter() {

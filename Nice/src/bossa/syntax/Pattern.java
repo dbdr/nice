@@ -560,18 +560,18 @@ public class Pattern implements Located
       return atValue.toString();
 
     if (atAny())
-      return "@_";
+      return name != null ? name.toString() : "Any";
 
     StringBuffer res = new StringBuffer();
-    if (name != null)
-      res.append(name);
-
-    res.append(exactlyAt ? '#' : '@');
+    res.append(exactlyAt ? "#" : (name != null ? "" : "@"));
     
     if (typeConstructor != null)
       res.append(typeConstructor);
     else if (tc != null)
       res.append(tc);
+
+    if (name != null)
+      res.append(" " + name);
     
     return res.toString();
   }

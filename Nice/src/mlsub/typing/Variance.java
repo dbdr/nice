@@ -139,11 +139,22 @@ public final class Variance
    * Interfaces
    ****************************************************************/
 
-  int newInterface()
+  private Vector interfaces = new Vector(10);
+  
+  int newInterface(Interface i)
   {
-    return getConstraint().newInterface();
+    int res = getConstraint().newInterface();
+    if (res >= interfaces.size())
+      interfaces.setSize(res + 1);
+    interfaces.set(res, i);
+    return res;
   }
 
+  public Interface getInterface(int iid)
+  {
+    return (Interface) interfaces.get(iid);
+  }
+  
   void subInterface(int i1, int i2)
   {
     getConstraint().subInterface(i1,i2);

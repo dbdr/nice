@@ -144,7 +144,11 @@ public class Pattern
 
 	Typing.leq(monotypes[i], p.tc);
 	if (p.exactlyAt)
-	  Typing.leq(p.tc, monotypes[i]);
+	  {
+	    Typing.leq(p.tc, monotypes[i]);
+	    MonotypeConstructor mc = (MonotypeConstructor) monotypes[i].equivalent();
+	    Typing.assertMinimal(mc.getTC());
+	  }
       }
   }
 
@@ -219,14 +223,21 @@ public class Pattern
 
   public String toString()
   {
+    if (atNull())
+      return "@null";
+    if (atAny())
+      return "@_";
+    
     StringBuffer res = new StringBuffer();
     if (name != null)
       res.append(name.toString());
 
+    res.append(exactlyAt ? '#' : '@');
+    
     if (typeConstructor != null)
-      res.append("@").append(typeConstructor.toString());
+      res.append(typeConstructor.toString());
     else if (tc != null)
-      res.append("@").append(tc.toString());
+      res.append(tc.toString());
     
     return res.toString();
   }

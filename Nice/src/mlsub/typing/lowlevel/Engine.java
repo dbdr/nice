@@ -285,25 +285,42 @@ public abstract class Engine
      Return the simplified constraint.
      Must be surrounded by startSimplify and stopSimplify.
   */
-  public static void simplify(ArrayList binders, ArrayList atoms)
+  public static void simplify(final ArrayList binders, final ArrayList atoms)
   {
     for(Iterator it = constraints.iterator();
 	it.hasNext();)
       { 
-	Engine.Constraint k = (Engine.Constraint) it.next();
+	final Engine.Constraint k = (Engine.Constraint) it.next();
 	k.simplify();
 	
-	int n = k.k0.size();
-	for (int b = k.k0.weakMarkedSize(); b < n; b++)
+	final int soft = k.k0.weakMarkedSize();
+	final int n = k.k0.size();
+	for (int b = soft; b < n; b++)
 	  binders.add(k.getElement(b));
 	
+	// add 'implements' constraints
+	try{
+	  k.k0.implementsIter(new K0.ImplementsIterator(){
+	      protected void iter(int x, int iid)
+	      {
+		if (x < soft) return;
+		
+		mlsub.typing.TypeConstructor tc = 
+		  (mlsub.typing.TypeConstructor) k.getElement(x);
+		atoms.add(new mlsub.typing.ImplementsCst
+		  (tc, tc.variance.getInterface(iid)));
+	      }
+	    });
+
 	// add every constraint, except between two rigid varaibles
-	for (int b = k.k0.weakMarkedSize(); b < n; b++)
+	for (int b = soft; b < n; b++)
 	  for (int i = 0; i < n; i++)
 	    addIfLeq(b, i, k, atoms);
-	for (int i = 0; i < k.k0.weakMarkedSize(); i++)
-	  for (int b = k.k0.weakMarkedSize(); b < n; b++)
+	for (int i = 0; i < soft; i++)
+	  for (int b = soft; b < n; b++)
 	    addIfLeq(i, b, k, atoms);
+	}
+	catch(Unsatisfiable ex) {}
       }
   }
   
@@ -731,6 +748,9 @@ public abstract class Engine
 
     public final void assertMinimal(Element e)
     {
+      if(dbg)
+	Debug.println("Minimal: "+ e);
+
       k0.minimal(e.getId());
     }
     

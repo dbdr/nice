@@ -388,6 +388,7 @@ public final class K0 {
     garbage.truncate(n);
     posTagged.truncate(n);
     negTagged.truncate(n);
+    minimal.truncate(n);
     for (int iid = 0; iid < nInterfaces(); iid++) {
       getInterface(iid).setIndexSize(n);
     }
@@ -895,65 +896,85 @@ public final class K0 {
   private void computeInitialArrows()
     throws LowlevelUnsatisfiable
   {
-    for(int iid=0; iid<nInterfaces(); iid++)
+    for (int iid = 0; iid < nInterfaces(); iid++)
       {
-	Interface i=getInterface(iid);
+	Interface i = getInterface(iid);
 	BitVector abstractors = i.abstractors;
-
 	BitVector subInterfaces = i.subInterfaces;
 	
-	for(int abs = abstractors.getLowestSetBit(); 
-	    abs != BitVector.UNDEFINED_INDEX;
-	    abs = abstractors.getNextBit(abs))
-	  for(int jid = subInterfaces.getLowestSetBit(); 
-	      jid != BitVector.UNDEFINED_INDEX;
-	      jid = subInterfaces.getNextBit(jid))
-	    {
-	      // abs is a constant that abstracts i
-	      // and j is a subInterface of i
-	      Interface j = getInterface(jid);  
-	      BitVector implementors= j.rigidImplementors;
-   
-	      boolean toCheck=false;
-	      int approx=BitVector.UNDEFINED_INDEX;
-	      
-	      //optimize if abs:i ?
-
-	      // finds a minimum node above 'abs' that implements 'i'
-	      for (int x = implementors.getLowestSetBit();
-		   x != BitVector.UNDEFINED_INDEX;
-		   x = implementors.getNextBit(x)) 
-		{
-		  if(R.get(abs,x))
-		    if(approx==BitVector.UNDEFINED_INDEX || R.get(x,approx))
-		      approx=x;
-		    else
-		      // optimize ? :
-		      // make tocheck an int, -1 at start. first to check-> N, second to check->-2
-		      // if at then end toCHeck =N, it's fast !
-		      toCheck=true;
-		}
-
-	      // verifies it is minimal
-	      if(toCheck)
-		for (int x = implementors.getLowestSetBit();
-		     x != BitVector.UNDEFINED_INDEX;
-		     x = implementors.getNextBit(x)) 
-		  if(R.get(abs,x) && !R.get(approx,x))
-		    throw new LowlevelUnsatisfiable("Node "+approx+" and "+x+" are uncomparable and both implement "+jid+
-						    " above "+abs);
-	      if(debugK0) 
-		S.dbg.println("Initial approximation for " +
-			      interfaceToString(jid) + ": " +
-			      indexToString(abs) + " -> " + 
-			      indexToString(approx));
-	      j.setApprox(abs,approx);
-	    }
+	for (int abs = abstractors.getLowestSetBit(); 
+	     abs != BitVector.UNDEFINED_INDEX;
+	     abs = abstractors.getNextBit(abs))
+	  for (int jid = subInterfaces.getLowestSetBit(); 
+	       jid != BitVector.UNDEFINED_INDEX;
+	       jid = subInterfaces.getNextBit(jid))
+	    // abs is a constant that abstracts i
+	    // and j is a subInterface of i
+	    setApproxToMinAbove(abs, getInterface(jid), R);
       }
+    computeApproxMinimals(0, R);
+  }
+
+  /**
+     Compute arrows for nodes in [min, n[
+  */
+  private void computeApproxMinimals(int min, BitMatrix leq)
+    throws LowlevelUnsatisfiable
+  {
+    for (int node = minimal.getLowestSetBit(min);
+	 node != BitVector.UNDEFINED_INDEX;
+	 node = minimal.getNextBit(node))
+      for (int iid = 0; iid < nInterfaces(); iid++)
+	setApproxToMinAbove(node, getInterface(iid), leq);
   }
   
-  private void computeArrows(BitMatrix leq)
+  /** 
+      Finds a minimum rigid node above 'abs' that implements 'j'
+      and set it as the approximation of 'abs' for 'j'.
+  */
+  private void setApproxToMinAbove(int abs, Interface j, BitMatrix leq)
+    throws LowlevelUnsatisfiable
   {
+    BitVector implementors = j.rigidImplementors;
+   
+    boolean toCheck = false;
+    int approx = BitVector.UNDEFINED_INDEX;
+	      
+    for (int x = implementors.getLowestSetBit();
+	 x != BitVector.UNDEFINED_INDEX && x < m0;
+	 x = implementors.getNextBit(x)) 
+      {
+	if (leq.get(abs,x))
+	  if (approx==BitVector.UNDEFINED_INDEX || leq.get(x,approx))
+	    approx = x;
+	  else
+	    // optimize ? :
+	    // make tocheck an int, -1 at start. first to check-> N, second to check->-2
+	    // if at then end toCHeck =N, it's fast !
+	    toCheck = true;
+      }
+
+    // verifies it is minimal
+    if(toCheck)
+      for (int x = implementors.getLowestSetBit();
+	   x != BitVector.UNDEFINED_INDEX;
+	   x = implementors.getNextBit(x)) 
+	if(leq.get(abs,x) && !leq.get(approx,x))
+	  throw new LowlevelUnsatisfiable("Node "+approx+" and "+x+" are uncomparable and both implement "+ j +
+					  " above "+abs);
+    if(debugK0) 
+      S.dbg.println("Initial approximation for " +
+		    j + ": " +
+		    indexToString(abs) + " -> " + 
+		    indexToString(approx));
+    j.setApprox(abs,approx);
+  }
+
+  private void computeArrows(BitMatrix leq)
+    throws LowlevelUnsatisfiable
+  {
+    computeApproxMinimals(m, leq);
+
     for(int iid=0; iid<nInterfaces(); iid++)
       {
 	Interface i=getInterface(iid);
@@ -966,7 +987,7 @@ public final class K0 {
 	    int approx=i.getApprox(x);
 	    if(approx!=BitVector.UNDEFINED_INDEX)
 	      {
-		// The approximation on below m is fixed
+		// The approximation for indexes below m is fixed
 		for(int node=m;node<n;node++)
 		  if(leq.get(node,x))
 		    {
@@ -1348,6 +1369,7 @@ public final class K0 {
 
     this.garbage = backup.savedGarbage;
     this.domains = backup.savedDomains;
+    this.minimal.truncate(n);
     
     for (int iid = 0; iid < nInterfaces(); iid++) {
       Interface I = getInterface(iid);

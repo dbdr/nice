@@ -31,7 +31,7 @@ public final class Interface implements TypeSymbol
   public Interface(Variance variance)
   {
     this.variance = variance;
-    itf = variance.newInterface();
+    itf = variance.newInterface(this);
   }
 
   /**
@@ -51,6 +51,8 @@ public final class Interface implements TypeSymbol
   {
     this(variance);
     this.name = name;
+    if (bossa.util.Debug.engine)
+      Debug.println(this + " has ID " + itf);
   }
   
   public TypeSymbol cloneTypeSymbol()

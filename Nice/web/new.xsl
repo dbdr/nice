@@ -129,7 +129,10 @@
          <tr>
           <td bgcolor="#ffffff">
            &nbsp;<span class="small">o</span><xsl:text> </xsl:text>
-           <a class="nav" href="Wiki">Collaborative site (Wiki)</a>
+           <!-- <a class="nav" href="Wiki">Collaborative site (Wiki)</a>-->
+           <span class="nav">Wiki&nbsp;&nbsp;</span>
+           <a class="nav" href="/cgi-bin/twiki/view/Dev/WebHome">Dev</a>
+           &nbsp;<a class="nav" href="/cgi-bin/twiki/view/Doc/WebHome">Doc</a>
            <br />
            &nbsp;<span class="small">o</span><xsl:text> </xsl:text>
            <a class="nav" href="http://sourceforge.net/forum/forum.php?forum_id=40268">Forums</a>

@@ -2,12 +2,12 @@ Source: nice
 Section: devel
 Priority: optional
 Maintainer: Daniel Bonniot <bonniot@users.sourceforge.net>
-Build-Depends-Indep: debhelper (>> 3.0.0), java-compiler, nice, groff
+Build-Depends-Indep: debhelper (>> 3.0.0), java-compiler, groff
 Standards-Version: 3.5.9
 
 Package: nice
 Architecture: all
-Depends: java-virtual-machine
+Depends: java-virtual-machine, java1-runtime
 Suggests: emacsen
 Description: Extension of Java with parametric types, multi-methods, and more
  Nice is a new object-oriented programming language.

@@ -123,8 +123,8 @@ and install it with <literal>rpm -i Nice_*.rpm</literal>.
 
 <section id="unix"><title>Unix</title>
 <para>
-Download the <ulink url="Nice.tar">Nice.tar</ulink> file and 
-save it as <literal>/tmp/Nice.tar</literal>.
+Download the <ulink url="Nice.tar">Nice.tar.gz</ulink> file and
+save it as <literal>/tmp/Nice.tar.gz</literal>.
 </para>
 
 <variablelist>
@@ -134,7 +134,7 @@ save it as <literal>/tmp/Nice.tar</literal>.
 Uncompress the archive:
 <programlisting>
 cd /usr/local
-tar xf /tmp/Nice.tar
+tar zxf /tmp/Nice.tar.gz
 </programlisting>
 </para>
 </listitem>
@@ -146,7 +146,7 @@ tar xf /tmp/Nice.tar
 Uncompress the archive in your home directory:
 <programlisting>
 cd
-tar xf /tmp/Nice.tar
+tar zxf /tmp/Nice.tar.gz
 </programlisting>
 The &nice; tools are placed in the <literal>bin</literal> subdirectory. 
 It is be a good idea to include it in your <literal>PATH</literal>.

@@ -12,11 +12,9 @@
 
 // File    : Element.java
 // Created : Wed Jul 28 10:42:50 1999 by bonniot
-//$Modified: Wed May 31 10:29:02 2000 by Daniel Bonniot $
+//$Modified: Wed Aug 02 17:53:52 2000 by Daniel Bonniot $
 
 package mlsub.typing.lowlevel;
-
-import bossa.util.*;
 
 /** Something that can be constrained in this engine
  * 

@@ -12,7 +12,7 @@
 
 // File    : MethodBodyDefinition.java
 // Created : Thu Jul 01 18:12:46 1999 by bonniot
-//$Modified: Tue Aug 01 18:25:00 2000 by Daniel Bonniot $
+//$Modified: Wed Aug 02 17:47:34 2000 by Daniel Bonniot $
 
 package bossa.syntax;
 
@@ -354,7 +354,7 @@ public class MethodBodyDefinition extends Definition
 	      {
 		TypeConstructor 
 		  tc = ((MonotypeConstructor) type).getTC(),
-		  formalTC = sym.getMonotype().getTC();
+		  formalTC = ((MonotypeConstructor) sym.getMonotype()).getTC();
 		
 		tc.setId(formalTC.getId());
 	      }

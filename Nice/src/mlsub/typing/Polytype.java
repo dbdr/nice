@@ -12,7 +12,7 @@
 
 // File    : Domain.java
 // Created : Fri Jun 02 16:59:06 2000 by Daniel Bonniot
-//$Modified: Fri Jun 16 16:13:54 2000 by Daniel Bonniot $
+//$Modified: Wed Aug 02 18:41:49 2000 by Daniel Bonniot $
 
 package mlsub.typing;
 
@@ -145,12 +145,20 @@ public final class Polytype
 
   public Monotype[] domain()
   {
-    return monotype.domain();
+    Monotype m = monotype.equivalent();
+    if (!(m instanceof FunType))
+      return null;
+    
+    return ((FunType) m).domain();
   }
 
   public Monotype codomain()
   {
-    return monotype.codomain();
+    Monotype m = monotype.equivalent();
+    if (!(m instanceof FunType))
+      return null;
+    
+    return ((FunType) m).codomain();
   }
 
   /****************************************************************
@@ -162,14 +170,14 @@ public final class Polytype
    *
    * @return a 'tuple' Domain
    */
-  public TupleDomain getDomain()
+  public Domain getDomain()
   {
-    Monotype[] domains = monotype.domain();
+    Monotype[] domains = domain();
 
-    if(domains==null)
+    if(domains == null)
       throw new InternalError("getDomain on non functional polytype "+this);
     
-    return new TupleDomain(constraint,domains);
+    return new Domain(constraint, new TupleType(domains));
   }
   
   /****************************************************************

@@ -12,7 +12,7 @@
 
 // File    : StaticFieldAccess.java
 // Created : Thu Jul 01 18:12:46 1999 by bonniot
-//$Modified: Wed Jun 14 19:39:07 2000 by Daniel Bonniot $
+//$Modified: Wed Aug 02 17:46:47 2000 by Daniel Bonniot $
 
 package bossa.syntax;
 
@@ -86,6 +86,9 @@ public class StaticFieldAccess extends MethodDefinition
       return res;
     }
     catch(bossa.CodeGen.ParametricClassException e){
+      return null;
+    }
+    catch(bossa.CodeGen.NotIntroducedClassException e){
       return null;
     }
   }

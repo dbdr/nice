@@ -12,7 +12,7 @@
 
 // File    : Kind.java
 // Created : Wed Jul 28 14:53:22 1999 by bonniot
-//$Modified: Wed May 31 10:47:45 2000 by Daniel Bonniot $
+//$Modified: Wed Aug 02 16:51:36 2000 by Daniel Bonniot $
 
 package mlsub.typing.lowlevel;
 
@@ -38,4 +38,12 @@ public interface Kind
    * @param e 
    */
   void register(Element e);
+
+  /**
+     Return a fresh monotype of this kind, or null if that does not make sense.
+
+     This makes a dependancy from mlsub.typing.lowlevel to mlsub.typing,
+     but they are likely to be used together anyway.
+  */
+  mlsub.typing.Monotype freshMonotype();
 }

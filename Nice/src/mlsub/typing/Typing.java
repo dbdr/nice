@@ -12,7 +12,7 @@
 
 // File    : Typing.java
 // Created : Tue Jul 20 11:57:17 1999 by bonniot
-//$Modified: Tue Jul 25 15:52:50 2000 by Daniel Bonniot $
+//$Modified: Wed Aug 02 18:50:44 2000 by Daniel Bonniot $
 
 package mlsub.typing;
 
@@ -202,7 +202,7 @@ public final class Typing
     catch(Unsatisfiable e){
       throw new TypingEx(t+" < "+m+"'s head");
     }
-    leq(t, m.getTC());
+    leq(t, ((MonotypeConstructor) m.equivalent()).getTC());
   }
   
   public static void leq(TypeConstructor[] ts, Monotype[] ms)
@@ -509,11 +509,17 @@ public final class Typing
    *   an element of an array is set to null
    *   if it cannot be matched (e.g. a function type)
    */
-  public static List enumerate(TupleDomain domain)
+  public static List enumerate(Domain domain)
   {
     List res = new ArrayList();
 
-    Monotype[] tags = domain.getTuple();
+    Monotype[] tags = null;
+    
+    if (domain.getMonotype().equivalent() instanceof TupleType)
+      tags = ((TupleType) domain.getMonotype().equivalent()).types;
+    
+    if (tags == null)
+      throw new InternalError("enumerate should be done on a tuple domain");
 
     try
       {
@@ -602,12 +608,16 @@ public final class Typing
 	  else
 	    obs = (mlsub.typing.lowlevel.BitVector) observers.get(idx);
 	
-	  if(tags[i].getKind() instanceof FunTypeKind)
+	  // ignore non matchable kinds
+	  if(tags[i].getKind() instanceof FunTypeKind ||
+	     tags[i].getKind() instanceof TupleKind)
 	    {
 	      continue;
 	    }
 
-	  TypeConstructor constTC = tags[i].getTC();
+	  TypeConstructor constTC = null;
+	  if (tags[i].equivalent() instanceof MonotypeConstructor)
+	    constTC = ((MonotypeConstructor) tags[i].equivalent()).getTC();
 	  if(constTC == null)
 	    throw new InternalError
 	      (tags[i].getKind() + " is not a valid kind in enumerate");
@@ -619,7 +629,7 @@ public final class Typing
 	  introduce(varTC);
 	  obs.set(varTC.getId());
 	  try{
-	    k.leq(varTC,constTC);
+	    k.leq(varTC, constTC);
 	    k.reduceDomainToConcrete(varTC);
 	  }
 	  catch(Unsatisfiable e){

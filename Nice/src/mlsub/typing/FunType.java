@@ -12,7 +12,7 @@
 
 // File    : FunType.java
 // Created : Thu Jul 22 09:15:17 1999 by bonniot
-//$Modified: Thu Jun 22 21:53:30 2000 by Daniel Bonniot $
+//$Modified: Wed Aug 02 18:17:42 2000 by Daniel Bonniot $
 
 package mlsub.typing;
 
@@ -23,12 +23,18 @@ import mlsub.typing.lowlevel.Kind;
  */
 public final class FunType extends Monotype
 {
+  FunType(FunTypeKind kind, Monotype[] in, Monotype out)
+  {
+    this.in = (in == null ? Monotype.zeroMonotypes : in);
+    this.out = out;
+    this.kind = kind;
+  }
+
   public FunType(Monotype[] in, Monotype out)
   {
-    this.in = (in == null ? zeroMonotypes : in);
+    this.in = (in == null ? Monotype.zeroMonotypes : in);
     this.out = out;
-
-    this.kind = new FunTypeKind(this.in.length);
+    this.kind = FunTypeKind.get(this.in.length);
   }
   
   /** 

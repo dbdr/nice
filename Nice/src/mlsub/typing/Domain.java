@@ -12,7 +12,7 @@
 
 // File    : Domain.java
 // Created : Fri Jun 02 16:59:06 2000 by Daniel Bonniot
-//$Modified: Fri Jun 16 16:14:34 2000 by Daniel Bonniot $
+//$Modified: Wed Aug 02 18:39:43 2000 by Daniel Bonniot $
 
 package mlsub.typing;
 
@@ -24,8 +24,7 @@ package mlsub.typing;
 
 public class Domain
 {
-  public Domain(Constraint constraint,
-		Monotype monotype)
+  public Domain(Constraint constraint, Monotype monotype)
   {
     this.constraint = constraint;
     this.monotype = monotype;

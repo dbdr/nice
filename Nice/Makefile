@@ -7,11 +7,11 @@ JAVACC=java -classpath ${HOME}/lib/java/JavaCC/JavaCC.zip COM.sun.labs.javacc.Ma
 JAVADOC=javadoc -linkoffline file:///C%7C/Apps/jdk1.2.1/docs/api file:///usr/opt/java122/docs/api
 
 recompile:
-	cd src
+	cd src;\
 	${JAVAC} -d ${TOP}/classes bossa/syntax/*.java bossa/modules/*.java bossa/parser/*.java nice/tools/*.java bossa/test/Front.java mlsub/*/*.java ../stdlib/*.java
 
 recompileGNU:
-	cd src
+	cd src;\
 	${JAVAC} -d ${TOP}/classes gnu/*/*.java gnu/*/*/*.java kawa/*/*.java
 
 parser:
@@ -31,7 +31,7 @@ jdoc:
 	mkdir -p doc
 	${JAVADOC} -windowtitle "Nice" -doctitle "The Nice compiler source" \
 	-overview ${TOP}/src/overview.html \
-	-d ${TOP}/doc -private mlsub.typing mlsub.compilation bossa bossa.syntax bossa.util bossa.link gnu.bytecode gnu.expr gnu.math gnu.mapping kawa.standard kawa.lang
+	-d ${TOP}/doc -private mlsub.typing mlsub.typing.lowlevel mlsub.compilation bossa bossa.syntax bossa.util bossa.link gnu.bytecode gnu.expr gnu.math gnu.mapping kawa.standard kawa.lang
 
 tags:
 	jtags

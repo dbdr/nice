@@ -12,7 +12,7 @@
 
 // File    : Monotype.java
 // Created : Thu Jul 01 19:28:28 1999 by bonniot
-//$Modified: Fri Jun 16 15:48:02 2000 by Daniel Bonniot $
+//$Modified: Wed Aug 02 17:39:09 2000 by Daniel Bonniot $
 
 package mlsub.typing;
 
@@ -28,16 +28,6 @@ abstract public class Monotype implements mlsub.typing.lowlevel.Element
      Can be shared, since it's empty, thus immutable.
   */
   static final Monotype[] zeroMonotypes = new Monotype[0];
-
-  public TypeConstructor getTC()
-  {
-    return null;
-  }
-  
-  public Monotype[] getTP()
-  {
-    return null;
-  }
 
   final public boolean isConcrete()
   {
@@ -91,19 +81,19 @@ abstract public class Monotype implements mlsub.typing.lowlevel.Element
   }
 
   /****************************************************************
-   * Functional types
+   * Equivalent types
    ****************************************************************/
 
-  /** the list of input Monotypes if this type is functional */
-  public Monotype[] domain()
-  {
-    return null;
-  }
+  /**
+     Return the monotype used for type checking.
 
-  /** the return type if this type is functional */
-  public Monotype codomain()
+     Should be <tt>this</tt>, except in class MonotypeVar
+     where equivalent is a monotype with the correct Kind
+     once the kind is known.
+  */
+  public Monotype equivalent()
   {
-    return null;
-  }
+    return this;
+  }  
 }
 

@@ -12,7 +12,7 @@
 
 // File    : CodeGen.java
 // Created : Mon Jun 05 11:28:10 2000 by Daniel Bonniot
-//$Modified: Fri Jul 28 21:09:34 2000 by Daniel Bonniot $
+//$Modified: Wed Aug 02 17:28:21 2000 by Daniel Bonniot $
 
 package bossa;
 
@@ -64,13 +64,15 @@ public final class CodeGen
 
   public static Type javaType(mlsub.typing.Monotype m)
   {
+    m = m.equivalent();
+
     if (!(m instanceof mlsub.typing.MonotypeConstructor))
       return gnu.bytecode.Type.pointer_type;
     
     MonotypeConstructor mc = (MonotypeConstructor) m;
-    TypeConstructor tc = m.getTC();
+    TypeConstructor tc = mc.getTC();
     if(tc == ConstantExp.arrayTC)
-      return SpecialTypes.makeArrayType(javaType(m.getTP()[0]));
+      return SpecialTypes.makeArrayType(javaType(mc.getTP()[0]));
     else
       return javaType(tc);
   }
@@ -279,24 +281,29 @@ public final class CodeGen
 
   public static Expression defaultValue(Monotype m)
   {
-    TypeConstructor tc = m.getTC();
+    m = m.equivalent();
     
-    if(tc!=null)
-      if(tc==ConstantExp.primInt ||
-	 tc==ConstantExp.primByte ||
-	 tc==ConstantExp.primChar ||
-	 tc==ConstantExp.primShort ||
-	 tc==ConstantExp.primLong)
+    TypeConstructor tc = null;
+
+    if(m instanceof MonotypeConstructor)
+      tc = ((MonotypeConstructor) m).getTC();
+    
+    if (tc != null)
+      if(tc == ConstantExp.primInt ||
+	 tc == ConstantExp.primByte ||
+	 tc == ConstantExp.primChar ||
+	 tc == ConstantExp.primShort ||
+	 tc == ConstantExp.primLong)
 	return zeroInt;
-      else if(tc==ConstantExp.primFloat ||
-	      tc==ConstantExp.primDouble)
+      else if(tc == ConstantExp.primFloat ||
+	      tc == ConstantExp.primDouble)
 	return zeroFloat;
     
-    return gnu.expr.QuoteExp.nullExp;
+    return QuoteExp.nullExp;
   }
 
   private static gnu.expr.Expression zeroInt = 
-    new gnu.expr.QuoteExp(new gnu.math.IntNum(0));
+    new QuoteExp(new gnu.math.IntNum(0));
   private static gnu.expr.Expression zeroFloat = 
-    new gnu.expr.QuoteExp(new gnu.math.DFloNum(0.0));
+    new QuoteExp(new gnu.math.DFloNum(0.0));
 }

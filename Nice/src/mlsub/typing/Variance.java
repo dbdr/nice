@@ -12,7 +12,7 @@
 
 // File    : Variance.java
 // Created : Fri Jul 23 12:15:46 1999 by bonniot
-//$Modified: Thu Jun 22 21:42:57 2000 by Daniel Bonniot $
+//$Modified: Wed Aug 02 17:19:23 2000 by Daniel Bonniot $
 
 package mlsub.typing;
 
@@ -21,7 +21,7 @@ import java.util.*;
 import mlsub.typing.lowlevel.*;
 
 /**
- * Variance of a type constructor
+ * Variance of a type constructor.
  * 
  * @author bonniot
  */
@@ -59,6 +59,17 @@ public final class Variance
   public mlsub.typing.lowlevel.Engine.Constraint getConstraint()
   {
     return mlsub.typing.lowlevel.Engine.getConstraint(this);
+  }
+
+  public Monotype freshMonotype()
+  {
+    TypeConstructor tc = new TypeConstructor(this);	    
+    Typing.introduce(tc);
+
+    Monotype[] tp = MonotypeVar.news(this.size);
+    Typing.introduce(tp);
+
+    return new MonotypeConstructor(tc, tp);
   }
   
   public void register(Element e)
@@ -113,15 +124,24 @@ public final class Variance
   public void leq(Element e1, Element e2)
     throws Unsatisfiable
   {
-    Monotype m1 = (Monotype) e1,  m2 = (Monotype) e2;
+    MonotypeConstructor m1 = mc(e1), m2 = mc(e2);
     
-    TypeConstructor tc1 = m1.getTC();
-    TypeConstructor tc2 = m2.getTC();
-    Monotype[] tp1 = m1.getTP();
-    Monotype[] tp2 = m2.getTP();
-    
-    mlsub.typing.lowlevel.Engine.leq(tc1,tc2);
-    assertEq(tp1,tp2);
+    mlsub.typing.lowlevel.Engine.leq(m1.getTC(), m2.getTC());
+    assertEq(m1.getTP(), m2.getTP());
+  }
+  
+  private MonotypeConstructor mc(Element e)
+  {
+    try
+      {
+	return (MonotypeConstructor) ((Monotype) e).equivalent();
+      }
+    catch(ClassCastException ex)
+      {
+	throw new InternalError
+	  (e + " was expected to be a monotype constructor, " +
+	   " it's a " + e.getClass());
+      }
   }
   
   /**

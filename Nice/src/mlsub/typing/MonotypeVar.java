@@ -12,7 +12,7 @@
 
 // File    : MonotypeVar.java
 // Created : Fri Jun 02 17:12:32 2000 by Daniel Bonniot
-//$Modified: Tue Jun 13 17:07:02 2000 by Daniel Bonniot $
+//$Modified: Wed Aug 02 17:42:43 2000 by Daniel Bonniot $
 
 package mlsub.typing;
 
@@ -76,48 +76,6 @@ public final class MonotypeVar extends Monotype
     return res;
   }
   
-  private void functionalCast(int arity)
-  {
-    if(equivalentCodomain!=null)
-      throw new InternalError("equivalentCodomain!=null in MonotypeVar");
-    
-    equivalentCodomain = new MonotypeVar();
-    Typing.introduce(equivalentCodomain);
-    
-    if(arity==0)
-      equivalentDomain = zeroMonotypes;
-    else
-      equivalentDomain = MonotypeVar.news(arity);
-    
-    Typing.introduce(equivalentDomain);
-  }
-  
-  /****************************************************************
-   * Functional types
-   ****************************************************************/
-
-  /** the list of input Monotypes if this type is functional */
-  public Monotype[] domain()
-  {
-    return equivalentDomain;
-  }
-
-  /** the return type if this type is functional */
-  public Monotype codomain()
-  {
-    return equivalentCodomain;
-  }
-
-  public TypeConstructor getTC()
-  {
-    return equivalentTC;
-  }
-  
-  public Monotype[] getTP()
-  {
-    return equivalentTP;
-  }
-  
   /****************************************************************
    * low-level interface
    ****************************************************************/
@@ -135,64 +93,62 @@ public final class MonotypeVar extends Monotype
   public void setKind(Kind value)
   {
     // it is ok to reset kind to null
-    if(kind!=null && value!=null
+    if(kind!=null 
+       && value!=null
        && kind!=value) //TODO: not sure if this case is OK to happen
       throw new InternalError("Variance already set in MonotypeVar "+
 			      this+":\nkind was "+kind+", value is "+value);
     
+    if (kind == value)
+      return;
+    
     kind = value;
-    if(value==null)
+    if(value == null)
       {
-	// Reset the equivalent* fields so that
+	// Reset the equivalent field so that
 	// this variable becomes "free" again
-	equivalentTP=null;
-	equivalentTC=null;
-	equivalentCodomain=null;
-	equivalentDomain=null;
+	equivalent = null;
 	id=-1;
 	//willImplementTop=false;
       }
     else
       {
 	// Do the apropriate cast
-	if(value instanceof FunTypeKind)
-	  functionalCast(((FunTypeKind)value).domainArity);
-	else if(value instanceof Variance)
-	  {
-	    Variance v=(Variance) value;
+	equivalent = value.freshMonotype();
+	if (equivalent != null)
+	  return;
 	
-	    equivalentTC = new TypeConstructor(v);
-	    equivalentTC.name = this.name+"'";
+	if (equivalent instanceof MonotypeConstructor)
+	  {
+	    MonotypeConstructor mc = (MonotypeConstructor) equivalent;
+
+	    // set the name for debug or display purposes
+	    mc.getTC().name = this.name + "'";
 	    
-	    Typing.introduce(equivalentTC);
-	    equivalentTP = MonotypeVar.news(v.size);
-	    Typing.introduce(equivalentTP);
-	    if(willImplementTop){
+	    if (willImplementTop)
 	      try{
 		Typing.assertImp
-		  (equivalentTC, v.top, false);
+		  (mc.getTC(), mc.getTC().variance.top, false);
 	      }
 	      catch(TypingEx e){
 		throw new InternalError("Variable "+this+" couln't implement top");
 	      }
 	      finally{
-		willImplementTop=false;
+		willImplementTop = false;
 	      }
-	    }
 	  }
-	// in other cases (kind of the rigid monotype variables)
-	// nothing to do
       }
   }
   
-  /** When this variable is comparable to a functional type */
-  private MonotypeVar equivalentCodomain;
-  private Monotype[] equivalentDomain;
-  private Monotype functionalType;
-
-  private TypeConstructor equivalentTC;
-  private Monotype[] equivalentTP;
-
+  /** When this variable is discovered to be of some given kind,
+      an equivalent monotype is created. */
+  private Monotype equivalent;
+  // overrides Monotype.equivalent()
+  public Monotype equivalent()
+  {
+    return equivalent;
+  }
+  
   /****************************************************************
    * The Top interface
    ****************************************************************/
@@ -203,7 +159,7 @@ public final class MonotypeVar extends Monotype
    * we will have to assert that the corresponding type constructor
    * implements the correct Top<n> interface
    */
-  private boolean willImplementTop=false;
+  private boolean willImplementTop = false;
 
   /**
    * Marks that as soon as this variable is deconstructed
@@ -213,7 +169,7 @@ public final class MonotypeVar extends Monotype
    */
   public void rememberToImplementTop()
   {
-    willImplementTop=true;
+    willImplementTop = true;
   }
 
   /****************************************************************
@@ -222,7 +178,7 @@ public final class MonotypeVar extends Monotype
 
   public String toString()
   {
-    if(name!=null)
+    if(name != null)
       return name;
     else
       return super.toString();

@@ -12,7 +12,7 @@
 
 // File    : Dispatch.java
 // Created : Mon Nov 15 10:36:41 1999 by bonniot
-//$Modified: Fri Jul 28 17:11:21 2000 by Daniel Bonniot $
+//$Modified: Wed Aug 02 18:47:54 2000 by Daniel Bonniot $
 
 package bossa.link;
 
@@ -170,7 +170,7 @@ public final class Dispatch
       }
     
 
-    TupleDomain domain = method.getType().getDomain();
+    Domain domain = method.getType().getDomain();
     
     List multitags = Typing.enumerate(domain);
 

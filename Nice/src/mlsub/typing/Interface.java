@@ -12,7 +12,7 @@
 
 // File    : Interface.java
 // Created : Fri Jun 02 17:26:52 2000 by Daniel Bonniot
-//$Modified: Thu Jun 22 21:42:02 2000 by Daniel Bonniot $
+//$Modified: Wed Aug 02 16:01:05 2000 by Daniel Bonniot $
 
 package mlsub.typing;
 
@@ -35,13 +35,13 @@ public final class Interface implements TypeSymbol
 
     // variance.top should be null only if this interface is top,
     // as a top interface is created automatically with the Variance object
-    if(variance.top!=null)
+    if(variance.top != null)
       variance.subInterface(itf, variance.top.itf);
   }
 
-  /** 
-      @param associatedTC a type constructor linked to this interface
-      (should this go outside mlsub.typing?)
+  /**
+     @param associatedTC a type constructor linked to this interface
+     (should this go outside mlsub.typing?)
   */
   public Interface(Variance variance, TypeConstructor associatedTC)
   {

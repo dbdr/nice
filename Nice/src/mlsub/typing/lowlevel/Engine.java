@@ -12,7 +12,7 @@
 
 // File    : Engine.java
 // Created : Tue Jul 27 15:34:53 1999 by bonniot
-//$Modified: Thu Jun 22 22:14:15 2000 by Daniel Bonniot $
+//$Modified: Wed Aug 02 18:09:44 2000 by Daniel Bonniot $
 
 package mlsub.typing.lowlevel;
 
@@ -134,7 +134,7 @@ public abstract class Engine
   {
     if (e1.length != e2.length)
       throw new IllegalArgumentException
-	("Bad size in Engine.leq(Collections)");
+	("Bad size in Engine.leq(Element[])");
     
     for(int i = e1.length-1;i>=0;i--)
       leq(e1[i], e2[i]);
@@ -320,7 +320,7 @@ public abstract class Engine
     s.push(element);
     while(!s.empty())
       {
-	Element e = (Element)s.pop();
+	Element e = (Element) s.pop();
 	
 	e.setKind(k);
 	k.register(e);
@@ -495,6 +495,12 @@ public abstract class Engine
     }
 
     private boolean variables = false;
+    
+    // this is not too logical to have this...
+    public mlsub.typing.Monotype freshMonotype()
+    {
+      return null;
+    }
     
     /**
      * Returns true iff there is a concrete #class in this constraint.

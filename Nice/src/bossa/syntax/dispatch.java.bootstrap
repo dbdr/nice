@@ -12,18 +12,6 @@ import java.util.List;
 
 public class dispatch
 {
-  public static NiceClass createNiceClass(ClassDefinition cdef)
-  {return null;}
-
-  public static Statement createReturnStmt(Expression value, boolean fake)
-  { return null; }
-
-  public static Expression createLiteralArrayExp(List exps)
-  { return null; }
-
-  public static Expression createNewExp(TypeIdent ti, Arguments arguments) 
-  { return null; }
-
   public static Expression createCallExp(Expression function, Expression param1)
   { return null; }
 
@@ -80,12 +68,6 @@ public class dispatch
   public static boolean disjoint(Pattern a, Pattern b)
   { return false; }
   
-  public static Statement createBlock(List statements)
-  { return null; }
-
-  public static ConstantExp createStringConstantExp(String value)
-  { return null; }
-
   static Statement analyse(Statement  s, VarScope v, TypeScope t, boolean r)
   { return null; }
 

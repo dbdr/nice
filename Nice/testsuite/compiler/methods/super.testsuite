@@ -227,3 +227,14 @@ class Bar<T> extends AbstractList<T>
   size() = 0;
   get(i) = cast(null);
 }
+
+/// PASS
+  /// Toplevel
+abstract class A {}
+class B extends A {}
+
+class M {  
+  int f(A);
+  f(b@B) = super;
+  f(a)   = 1;
+}

@@ -137,7 +137,7 @@ new FunSymbol(LocatedString name, Constraint constraint,
 				FormalParameters parameters, Monotype returnType)
 {
   this(name, parameters: parameters, arity: parameters.size, syntacticType:
-	new Polytype(constraint, new FunType(parameters.types(), returnType)));
+	new Polytype(constraint, createFunType(parameters.types(), returnType)));
 }
 
 /**
@@ -199,7 +199,7 @@ new MethodSymbol(MethodDeclaration declaration, LocatedString name,
 {
   FormalParameters parameters = declaration.formalParameters();
   this(name, declaration: declaration, parameters: parameters, arity: parameters.size,
-	syntacticType: new Polytype(constraint, new FunType(parameters.types(), returnType)));
+	syntacticType: new Polytype(constraint, createFunType(parameters.types(), returnType)));
 }
 
 new MethodSymbol(MethodDeclaration declaration, LocatedString name,

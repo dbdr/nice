@@ -1,0 +1,63 @@
+/**************************************************************************/
+/*                                N I C E                                 */
+/*             A high-level object-oriented research language             */
+/*                        (c) Daniel Bonniot 2004                         */
+/*                                                                        */
+/*  This program is free software; you can redistribute it and/or modify  */
+/*  it under the terms of the GNU General Public License as published by  */
+/*  the Free Software Foundation; either version 2 of the License, or     */
+/*  (at your option) any later version.                                   */
+/*                                                                        */
+/**************************************************************************/
+
+package bossa.syntax;
+
+import bossa.util.*;
+
+/**
+   Functional type.
+
+ */
+public class FunType extends bossa.syntax.Monotype
+{
+  private bossa.syntax.Monotype[] in;
+  private bossa.syntax.Monotype out;
+
+  rawResolve(typeMap)
+  {
+    return new mlsub.typing.FunType
+      (bossa.syntax.Monotype.resolve(notNull(typeMap), in),
+       out.resolve(typeMap));
+  }
+
+ substitute(map)
+  {
+    bossa.syntax.Monotype res = new bossa.syntax.FunType
+      (in: bossa.syntax.Monotype.substitute(map,in), out: out.substitute(map));
+    res.nullness = this.nullness;
+    return res;
+  }
+
+  containsAlike() = Monotype.containsAlike(in) || out.containsAlike();
+  
+  location() = out.location();
+
+  toString()
+  {
+    return "(" + Util.map("", ", ", "", in) + 
+      (nullness == maybe ? ")?->" : ")->") + out;
+  }
+  
+  toStringExtern() = "(" + Util.map("", ", ", "", in) + ")->" + out.toStringExtern();
+}
+
+public FunType createFunType(?List<bossa.syntax.Monotype> in, 
+		 bossa.syntax.Monotype out)
+{
+  return new FunType(in: (in != null ? in.toArray() : []), out: out);
+}
+
+public FunType createFunType_(bossa.syntax.Monotype[?] in, bossa.syntax.Monotype out)
+{
+  return new FunType(in: (in != null ? in : []), out: out);
+}

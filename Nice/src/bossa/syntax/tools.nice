@@ -259,6 +259,9 @@ List<String> noMatchByName(Arguments, FormalParameters) = native List Arguments.
 List<FormalParameters.Parameter> missingArgs(Arguments, FormalParameters) = native List Arguments.missingArgs(FormalParameters);
 List<FormalParameters.Parameter> getRequiredParameters(FormalParameters) = native List FormalParameters.getRequiredParameters();
 List<FormalParameters.Parameter> asList(FormalParameters) = native List FormalParameters.asList();
+boolean containsAlike(Monotype[]) = native boolean Monotype.containsAlike(Monotype[]);
+bossa.syntax.Monotype[] substitute(Map<String,bossa.syntax.Monotype>,bossa.syntax.Monotype[]) = native bossa.syntax.Monotype[] bossa.syntax.Monotype.substitute(Map,bossa.syntax.Monotype[]);
+Monotype[?] types(FormalParameters) = native Monotype[] FormalParameters.types();
 
 // Retypings needed since java types are not strict.
 mlsub.typing.Polytype boolPolytype() = native nice.tools.typing.PrimitiveType.boolPolytype;

@@ -692,7 +692,7 @@ Monotype funOrTupleMonotype():
   "->"
   codomain = monotype()
   { 
-    FunType res = new FunType(domain, codomain); 
+    FunType res = bossa.syntax.dispatch.createFunType(domain, codomain); 
     res.nullness = maybe ? res.maybe : res.absent;
     return res; 
   }
@@ -732,7 +732,7 @@ Monotype monotype():
       domain = null;
     else
       domain = new Monotype[]{ res };
-    res = new FunType(domain, codomain); 
+    res = bossa.syntax.dispatch.createFunType_(domain, codomain); 
     res.nullness = maybe ? res.maybe : res.absent; }
 ]
   { return res; }

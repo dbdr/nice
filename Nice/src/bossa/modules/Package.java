@@ -12,7 +12,7 @@
 
 // File    : Package.java
 // Created : Wed Oct 13 16:09:47 1999 by bonniot
-//$Modified: Tue Jul 18 17:06:05 2000 by Daniel Bonniot $
+//$Modified: Wed Jul 19 16:09:20 2000 by Daniel Bonniot $
 
 package bossa.modules;
 
@@ -256,7 +256,7 @@ public class Package implements mlsub.compilation.Module
 	   )
 	  continue;
 
-	new bossa.link.Alternative(methodName,bytecode,method);
+	new bossa.link.Alternative(methodName, bytecode, method);
       }
   }
   

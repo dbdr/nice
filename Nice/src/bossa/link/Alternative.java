@@ -12,7 +12,7 @@
 
 // File    : Alternative.java
 // Created : Mon Nov 15 12:20:40 1999 by bonniot
-//$Modified: Tue Jul 18 16:40:57 2000 by Daniel Bonniot $
+//$Modified: Wed Jul 19 16:41:06 2000 by Daniel Bonniot $
 
 package bossa.link;
 
@@ -268,6 +268,8 @@ public class Alternative
 	l = new ArrayList();
 	alternatives.put(methodName,l);
       }
+    // Dispatch.sort(final List alternatives) assumes that new alternatives
+    // are added at the end
     l.add(this);
   }
   

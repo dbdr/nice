@@ -12,7 +12,7 @@
 
 // File    : Dispatch.java
 // Created : Mon Nov 15 10:36:41 1999 by bonniot
-//$Modified: Tue Jul 18 16:21:26 2000 by Daniel Bonniot $
+//$Modified: Wed Jul 19 16:42:36 2000 by Daniel Bonniot $
 
 package bossa.link;
 
@@ -74,6 +74,7 @@ public final class Dispatch
       // if its domain is void.
       // this will be checked later
       alternatives = new LinkedList();
+   
     
     Stack sortedAlternatives = sort(alternatives);
     
@@ -111,19 +112,28 @@ public final class Dispatch
   {
     Stack sortedAlternatives = new Stack();
     
-    for(Iterator i = alternatives.iterator();i.hasNext();)
+    if (alternatives.size() == 0)
+      return sortedAlternatives;
+
+    // Test if another sort has been done before.
+    // In that case reset the marks.
+    // This can happen if several dependant packages are runnable
+    if (((Alternative) alternatives.get(0)).mark != Alternative.UNVISITED)
+      for(Iterator i = alternatives.iterator(); i.hasNext();)
+	((Alternative) i.next()).mark = Alternative.UNVISITED;
+	
+    for(Iterator i = alternatives.iterator(); i.hasNext();)
       {
 	Alternative a = (Alternative) i.next();
-	if(a.mark==Alternative.UNVISITED)
-	  visit(a,alternatives,sortedAlternatives);
+	if (a.mark == Alternative.UNVISITED)
+	  visit(a, alternatives, sortedAlternatives);
       }
 
     return sortedAlternatives;
   }
   
   private final static void visit
-    (
-     final Alternative a, 
+    (final Alternative a, 
      final List alternatives,
      final Stack sortedAlternatives
      )
@@ -143,8 +153,8 @@ public final class Dispatch
 	i.hasNext();)
       {
 	Alternative daughter = (Alternative) i.next();
-	if(daughter!=a 
-	   && daughter.mark==Alternative.UNVISITED 
+	if(daughter != a 
+	   && daughter.mark == Alternative.UNVISITED 
 	   && Alternative.leq(daughter,a))
 	  visit(daughter,alternatives,sortedAlternatives);
       }
@@ -157,9 +167,8 @@ public final class Dispatch
   {
     if(Debug.linkTests)
       {
-	Debug.print("\nLink test for "+method);
-	for(Iterator i = sortedAlternatives.iterator();
-	    i.hasNext();)
+	Debug.println("\nLink test for "+method);
+	for(Iterator i = sortedAlternatives.iterator(); i.hasNext();)
 	  Debug.println("Alternative: "+i.next().toString());
       }
     

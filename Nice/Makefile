@@ -2,12 +2,12 @@
 TOP=${HOME}/Nice
 TOPCLASSES=${TOP}/classes
 
-JAVAC=javac -classpath ${TOPCLASSES}:${TOP}/src -sourcepath ${TOP}/src -O -g
+JAVAC=javac -classpath ${TOPCLASSES}:${TOP}/src:${TOP}/lib -sourcepath ${TOP}/src -O -g
 JAVACC=java -classpath ${HOME}/lib/java/JavaCC/JavaCC.zip COM.sun.labs.javacc.Main
 JAVADOC=javadoc -linkoffline file:///C%7C/Apps/jdk1.2.1/docs/api file:///usr/opt/java122/docs/api
 
 recompile:
-	cd ${TOP}/src; ${JAVAC} -d ${TOP}/classes bossa/syntax/*.java bossa/modules/*.java bossa/parser/*.java mlsub/*/*.java
+	cd ${TOP}/src; ${JAVAC} -d ${TOP}/classes bossa/syntax/*.java bossa/modules/*.java bossa/parser/*.java mlsub/*/*.java ../lib/*.java
 
 recompileGNU:
 	cd ${TOP}/src; ${JAVAC} -d ${TOP}/classes gnu/*/*.java gnu/*/*/*.java kawa/*/*.java

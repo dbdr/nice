@@ -81,19 +81,77 @@ void _test_makeEnv() {
   Env env = new Env(new HashMap());
 }
 
-/// PASS bug
-  // bug #1097571 
+/// PASS
+  // bug #1097571
   /// Toplevel
   class A<T> {}
   class B extends A<boolean> {}
   class C extends B {}
 
-/// PASS bug
-  // bug #1097571 
+/// PASS
+  // bug #1097571
   /// Toplevel
   interface A<T> {}
   interface B extends A<boolean> {}
   class C implements B {}
+
+/// PASS
+  // bug #1097571
+  /// Toplevel
+interface Term<T> {
+  T value();
+}
+interface Bool implements Term<boolean> {}
+class BoolImpl implements Bool {
+  value() = true;
+}
+
+/// PASS
+  // bug #1097571
+  /// Toplevel
+interface Term<T> {
+  T value();
+}
+interface Bool implements Term<boolean> {}
+class BoolImpl implements Bool {
+}
+value(BoolImpl this) = true;
+
+/// PASS
+  /// Toplevel
+class A<T,U> {}
+class B<T> extends A<T,String> {}
+class C extends B<boolean> {}
+
+/// PASS
+  /// Toplevel
+class A<T> {}
+class B extends A<String> {}
+class C extends B {
+  void foo() {}
+}
+
+/// PASS
+  /// Toplevel
+class A<T> {}
+class B extends A<String> {}
+class C extends B {}
+void foo(C this) {}
+
+/// PASS
+  C c = new C();
+  /// Toplevel
+class A<T> {}
+class B extends A<String> {}
+class C extends B {}
+
+/// PASS bug
+  C c = new C(0);
+  /// Toplevel
+class A<T> {}
+class B extends A<String> {}
+class C extends B {}
+new C(int x) = this();
 
 /// PASS
   /// package a
@@ -112,3 +170,24 @@ class B<T> extends A<T,String> {}
 
   /// package b import a
   B<int> b = new B(x: 0);
+
+/// PASS
+  /// package a
+  /// Toplevel
+class A<T> {}
+class B extends A<String> {}
+class C extends B {}
+
+  /// package b import a
+  C c = new C();
+
+/// PASS
+  /// package a
+  /// Toplevel
+class A<T> {}
+class B extends A<String> {}
+class C extends B {}
+new C(int x) = this();
+
+  /// package b import a
+  C c = new C(0);

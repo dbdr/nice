@@ -37,28 +37,32 @@ public abstract class TypeDefinition extends MethodContainer
 	// Parameters
   ?mlsub.typing.Monotype[?] parentParams = null;
   int[?] parentTypeParameterMap = null;
-  	
+
   {
     modifiers.makePublic();
-   
+    this.computeVariance();
+  }
+
+  void computeVariance()
+  {
     int arity = getVariance(this);
-   	 
+
     let tpv = notNull( typeParametersVariances );
 
     if (arity == -1 || arity <= tpv.size())
       this.variance = makeVariance(tpv);
     else
       this.variance = mlsub.typing.Variance.make(new int[arity]);
-    
+
     this.createTC();
     typeParametersVariances = null;
-    
+
     if( modifiers.isFinal() )
 		tc.setMinimal();
   }
 
   boolean isConcrete() = !modifiers.isAbstract();
-    
+
   boolean implementsJavaInterface(String name)
   {
     let ji = javaInterfaces;
@@ -233,6 +237,8 @@ public abstract class TypeDefinition extends MethodContainer
         if (d != null)
           d.resolve();
       }
+
+    this.recomputeVariance();
 
     this.createContext();
   }
@@ -520,10 +526,9 @@ class ClassDefinition extends TypeDefinition
 class InterfaceDefinition extends TypeDefinition
 {
   ?mlsub.typing.Interface associatedInterface = null;
- 
+
   {
-    modifiers.makeInterface(); 
-    associatedInterface = new mlsub.typing.Interface(variance, tc);
+    modifiers.makeInterface();
   }
 
   isConcrete() = false;
@@ -532,7 +537,13 @@ class InterfaceDefinition extends TypeDefinition
 
   getTypeSymbol() =
       notNull( associatedInterface );
-  
+
+  computeVariance()
+  {
+    super;
+    associatedInterface = new mlsub.typing.Interface(variance, tc);
+  }
+
   resolveClass()
   {
     this.resolveInterfaces(extensions);
@@ -746,7 +757,7 @@ public mlsub.typing.Monotype[?] getTypeDefTypeParameters(mlsub.typing.TypeConstr
        missing++;
 
   if (missing == 0)
-    return new mlsub.typing.MonotypeConstructor(tc, cast(params) );
+    return new mlsub.typing.MonotypeConstructor(def.tc, cast(params) );
 
   return null;
 }
@@ -799,7 +810,7 @@ public mlsub.typing.Monotype[?] getTypeDefTypeParameters(mlsub.typing.TypeConstr
   if (fullParams == null)
     return null;
 
-  return new mlsub.typing.MonotypeConstructor(tc, cast(fullParams));
+  return new mlsub.typing.MonotypeConstructor(def.tc, cast(fullParams));
 }
 
 <T> int find(T o, T[?] array)
@@ -858,6 +869,48 @@ int getVariance(?MonotypeConstructor parent)
 
   // Assume non-variance
   return notNull(parent.parameters).content.length;
+}
+
+// Variance lookup after resolution
+
+void recomputeVariance(TypeDefinition this)
+{
+  for (itf : interfaces)
+    {
+      let itfDef = getTypeDefinition(itf.associatedTC());
+      if (itfDef != null)
+	{
+	  this.copyVariance(itfDef);
+	  return;
+	}
+    }
+}
+
+recomputeVariance(ClassDefinition this)
+{
+  let superClass = this.getSuperClassDefinition();
+  if (superClass != null)
+    this.copyVariance(superClass);
+  else
+    super;
+}
+
+private void copyVariance(TypeDefinition this, TypeDefinition from)
+{
+  if (this.variance != from.variance)
+    {
+      this.variance = from.variance;
+      tc.discard();
+      let constructors = getConstructors(tc);
+      this.createTC();
+      if (constructors != null)
+	for (c : constructors)
+	  addConstructor(tc, c.getMethodDeclaration());
+      Node.getGlobalTypeScope().updateMapping(tc.toString(), tc);
+      classConstraint = from.classConstraint;
+      parentParams = from.parentParams;
+      parentTypeParameterMap = from.parentTypeParameterMap;
+    }
 }
 
 // Constructors

@@ -940,7 +940,13 @@ public abstract class Engine
     {
       return k0.isMinimal(e.getId());
     }
-    
+
+    public final void discard(Element e)
+    {
+      concreteElements.clear(e.getId());
+      k0.discard(e.getId());
+    }
+
     public Element lowestInstance(Element e)
     {
       //FIXME: Suboptimal: doesn't always return an instance when there is one.

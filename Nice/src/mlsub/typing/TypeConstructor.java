@@ -92,6 +92,11 @@ public class TypeConstructor
     setKind(v.getConstraint());
   }
 
+  public void discard()
+  {
+    variance.getConstraint().discard(this);
+  }
+
   public int arity()
   {
     if(variance==null)

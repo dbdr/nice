@@ -140,15 +140,15 @@ public  final class SureMonotypeWrapper extends Monotype
 
   rawResolve(tm)
   {
+    // See if this is a class with default type parameters
+    let res = getTypeWithTC(tc, params);
+    if (res != null)
+      return sureMonotype(res);
+
     try{
       return sureMonotype(new mlsub.typing.MonotypeConstructor(tc, params));
     }
     catch(mlsub.typing.BadSizeEx e){
-      // See if this is a class with default type parameters
-      let res = getTypeWithTC(tc, params);
-      if (res != null)
-        return sureMonotype(res);
-
       throw User.error(this, "Class " + tc + Util.has(e.expected, "type parameter", e.actual));
     }
   }

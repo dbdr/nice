@@ -73,6 +73,12 @@ public class TypeScope implements TypeMap
       throw new DuplicateName(name);
   }
 
+  /** Change a previous mapping. */
+  void updateMapping(String name, TypeSymbol s)
+  {
+    map.put(name, s);
+  }
+
   void addMappings(Collection names, TypeSymbol[] symbols) 
   throws DuplicateName
   {

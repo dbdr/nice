@@ -265,7 +265,7 @@ public abstract class ClassDefinition extends MethodContainer
       Monotype[] params = null;
       if (superClassIdent != null)
 	{
-          params = resolveParent(superClassIdent, getLocalScope());
+          useInheritanceParams(resolveParams(superClassIdent, getLocalScope()));
 	  superClass = superClassIdent.tc.resolveToTC(typeScope);
 
 	  if (superClass.isMinimal())
@@ -284,10 +284,8 @@ public abstract class ClassDefinition extends MethodContainer
         {
           d.resolve();
 
-          useParent(d, params);
-
-          if(d.getImplementation() instanceof PrimitiveType && ! 
-		(this.getImplementation() instanceof PrimitiveType))
+          if (d.getImplementation() instanceof PrimitiveType &&
+              ! (this.getImplementation() instanceof PrimitiveType))
             User.error(this, "A class can't extends a primitive");
         }
       super.resolveClass();
@@ -576,7 +574,8 @@ public abstract class ClassDefinition extends MethodContainer
     for (Iterator i = names.iterator(); i.hasNext();)
       {
         MonotypeConstructor parent = (MonotypeConstructor) i.next();
-        Monotype[] params = resolveParent(parent, getLocalScope());
+
+        useInheritanceParams(resolveParams(parent, getLocalScope()));
 
 	TypeIdent name = parent.tc;
 	TypeSymbol s = name.resolvePreferablyToItf(typeScope);
@@ -584,10 +583,6 @@ public abstract class ClassDefinition extends MethodContainer
 	if (s instanceof mlsub.typing.Interface)
 	  {
             interfaces.add(s);
-
-            ClassDefinition def = ClassDefinition.get((mlsub.typing.Interface) s);
-            if (def != null)
-              useParent(def, params);
           }
 	else
 	  {
@@ -607,7 +602,7 @@ public abstract class ClassDefinition extends MethodContainer
         javaInterfaces.toArray(new TypeConstructor[javaInterfaces.size()]);
   }
 
-  Monotype[] resolveParent(MonotypeConstructor parent, TypeScope typeScope)
+  Monotype[] resolveParams(MonotypeConstructor parent, TypeScope typeScope)
   {
     if (parent.parameters == null)
       return null;
@@ -751,12 +746,8 @@ public abstract class ClassDefinition extends MethodContainer
   private int[] parentTypeParameterMap;
 
   MethodContainer.Constraint specialize(MethodContainer.Constraint our,
-                                        MethodContainer.Constraint parent,
                                         Monotype[] params)
   {
-    if (parent == null)
-      return null;
-
     if (params == null)
       return our;
 
@@ -832,11 +823,11 @@ public abstract class ClassDefinition extends MethodContainer
     return parent.parameters.content.length;
   }
 
-  void useParent(MethodContainer parent, Monotype[] params)
+  void useInheritanceParams(Monotype[] params)
   {
     if (parentParams == null)
       classConstraint =
-        specialize(this.classConstraint, parent.classConstraint, params);
+        specialize(this.classConstraint, params);
 
   }
 

@@ -41,6 +41,9 @@ class A<T,U,V> { T x; U y; V z; }
 class B<T,V> extends A<T, String, V> {}
 class C<T,V> extends A<V, String, T> {}
 
-/// PASS bug
+/// PASS
+  Foo foo = new Foo();
+  foo["a"] = "1";
+  assert foo["a"].equals("1");
   /// Toplevel
   class Foo extends HashMap<String, String> {}

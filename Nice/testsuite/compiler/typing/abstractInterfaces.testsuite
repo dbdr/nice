@@ -1,0 +1,17 @@
+/// PASS
+  /// COMMENT This is a simplification of a case by Martin Gamsjaeger 
+  /// COMMENT in SwingLib, that triggered a subttle bug in the lowlevel
+  /// COMMENT type-checker.
+  /// Toplevel
+abstract interface WindowListenerHandler {}
+class NWindowListener {}
+
+<WindowListenerHandler H> void addNWindowListener(H,NWindowListener);
+
+public <WindowListenerHandler HH> void addNiceWindowListener
+  (HH this,
+   String ?-> void windowActivated = null
+   )
+{        
+   this.addNWindowListener (new NWindowListener());
+}

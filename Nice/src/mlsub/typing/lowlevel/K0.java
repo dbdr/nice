@@ -1373,7 +1373,7 @@ public final class K0 {
     
     for (int iid = 0; iid < nInterfaces(); iid++) {
       Interface I = getInterface(iid);
-      I.setIndexSize(m);
+      I.setIndexSize(n);
       //I.implementors = backup.savedImplementors[iid];
     }
     

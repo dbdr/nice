@@ -126,3 +126,19 @@ m(a@A) {}
   /// package b import a
   /// Toplevel
 m(b@B) { super; }
+
+/// PASS
+  assert (new C().foo() == 1);
+  /// Toplevel
+class A {
+  int foo();
+  foo() = 0;
+}
+
+class B extends A {
+  foo() = 1;
+}
+
+class C extends B{
+  foo() = super;
+}

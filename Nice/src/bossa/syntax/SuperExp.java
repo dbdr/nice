@@ -65,10 +65,16 @@ public class SuperExp extends Expression
 	if (a == current) continue;
 
 	if (Alternative.leq(current, a))
-	  if (superAlt == null)
+	  if (superAlt == null || Alternative.leq(a, superAlt))
 	    superAlt = a;
+	  else if (Alternative.leq(superAlt, a))
+	    ; // superAlt is a more direct parent than a, so ignore a.
 	  else
-	    throw User.error(this, "This call to super is ambiguous");
+	    {
+	      String message = "This call to super is ambiguous. " + 
+		"Possible parents are:\n" + superAlt + "\nand\n" + a;
+	      throw User.error(this, message);
+	    }
       }
 
     if (superAlt == null)

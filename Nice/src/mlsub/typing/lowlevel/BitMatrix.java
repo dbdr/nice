@@ -91,7 +91,7 @@ final public class BitMatrix implements Cloneable {
    *
    * <p>If the matrix is reflexive, the row MUST NOT be modified by the caller.
    **/
-  BitVector getRow(int i) {
+  final BitVector getRow(int i) {
     if (i < size) {
       if (reflexive && rows[i] == null)
 	{
@@ -121,13 +121,35 @@ final public class BitMatrix implements Cloneable {
    * get element at position (i, j), i.e., returns the value of i < j.
    * Assume i and j are valid indexes
    **/
-  public boolean get(int i, int j) {
+  final public boolean get(int i, int j) {
     if (i == j && reflexive)
       return true;
     
     BitVector row = rows[i];
     return row != null && row.get(j);
   }
+
+  /**
+   * get index next set bit greater than j in row i.
+   * Assume i and j are valid indexes.
+   **/
+  final public int getNextSetInRow(int i, int j) {
+    BitVector row = rows[i];
+    if (reflexive) {
+      if (row == null) {
+	if (i > j) return i;
+	return BitVector.UNDEFINED_INDEX;
+      }
+      int k = row.getNextBit(j);
+      if ( (i > j) && ((k < 0) || (k > i)) )
+        return i;
+      return k;
+    }	
+    if (row == null) return BitVector.UNDEFINED_INDEX;
+    return row.getNextBit(j);
+  }
+
+
 
   /**
    * Set element at position (i, j) to true. Assume i and j are valid indexes.

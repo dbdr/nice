@@ -76,12 +76,12 @@ public class IntVect {
     }
   }
   public int get(int index) {
-    checkIndex(index);
+//    checkIndex(index);//only useful for debuging
     return elementData[index];
   }
 
   public void set(int index, int x) {
-    checkIndex(index);
+//    checkIndex(index);//only useful for debuging
     elementData[index] = x;
   }
   

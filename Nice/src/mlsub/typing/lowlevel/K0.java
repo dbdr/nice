@@ -1252,18 +1252,19 @@ public final class K0 {
   BitVector[] closeImplements(BitMatrix R, BitMatrix Rt) {
     BitVector[] rigidImplementors = new BitVector[nInterfaces()];
     for (int iid = 0; iid < nInterfaces(); iid++) {
-      Interface I = getInterface(iid);
-      rigidImplementors[iid] = (BitVector)I.implementors.clone();
-      for (int x = 0; x < n; x++) {
-        if (I.implementors.get(x)) {
+      BitVector I_impls = getInterface(iid).implementors;
+      rigidImplementors[iid] = (BitVector)I_impls.clone();
+      for (int x = I_impls.getLowestSetBit();
+           x != BitVector.UNDEFINED_INDEX;
+           x = I_impls.getNextBit(x)) {
           // x: iid
           // for all y ~ x, add y: iid
           rigidImplementors[iid].orAnd(Rt.getRow(x),R.getRow(x));
-        }
       }
     }
-    for (int iid1 = 0; iid1 < nInterfaces(); iid1++) {
-      for (int iid2 = 0; iid2 < nInterfaces(); iid2++) {
+    int nInt = nInterfaces();
+    for (int iid1 = 0; iid1 < nInt; iid1++) {
+      for (int iid2 = 0; iid2 < nInt; iid2++) {
         if (getInterface(iid2).subInterfaces.get(iid1)) {
           // I1 < I2
           // for all x: I1, add x: I2
@@ -1415,14 +1416,17 @@ public final class K0 {
       from2 = weakMarkedSize;
     else
       from2 = 0;
-	
+    boolean[] notgarb = new boolean[n];
+    for (int i = 0; i < n; i++)
+      notgarb[i] = !garbage.get(i);
+    
     for (int i = from1; i < to1; i++) {
-      if (!garbage.get(i)) {
-        for (int j = from2; j < to2; j++) {
-          if (!garbage.get(j)) {
-            if (C.get(i, j)) {
+      if (notgarb[i]) {
+        for (int j = C.getNextSetInRow(i, from2-1);
+             j != BitVector.UNDEFINED_INDEX;
+             j = C.getNextSetInRow(i, j)) {
+          if (notgarb[j]) {
               iterator.iter(i, j);
-            }
           }
         }
       }
@@ -1892,8 +1896,10 @@ public final class K0 {
           // uk is necessarily non-null (at least k <* k)
           BitVector uk = R.getRow(k);
           BitVector lk = Rt.getRow(k);
-          for (int j = 0; j < n; j++) {
-            if (!garbage.get(j) && lk.get(j) && !uk.get(j)) {
+          for (int j = lk.getLowestSetBit();
+               j != BitVector.UNDEFINED_INDEX;
+               j = lk.getNextBit(j)) {
+            if (!garbage.get(j) && !uk.get(j)) {
               // j <* k and not k <* j
               BitVector uj = C.getRow(j);
               if (uj != null) {

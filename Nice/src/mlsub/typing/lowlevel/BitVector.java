@@ -427,7 +427,7 @@ public class BitVector implements Cloneable, java.io.Serializable {
     if (bits1 == null)
       return 1;
     
-    int n = length();
+    int n = bits1.length;
     while (n > 0 && bits1[n-1] == 0L) { n--; }
     return n;
   }

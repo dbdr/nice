@@ -23,7 +23,8 @@ returnLong()
 <int, int> min_max(int, int);
 min_max(x,y) = x < y ? (x, y) : (y, x);
 
-main(args)
+void test_discards();
+test_discards()
 {
   A a = new A();
   int i;
@@ -63,17 +64,28 @@ main(args)
 
   String s1;
   fun(String s2) => { s1 = s2; };
+}
 
+void test_captures();
+test_captures()
+{
   // modification of a variable captured in a lambda
   int j=2;
   println("" + j);
   println(""+(fun()=>--j)());
   println(""+(fun()=>j++)());
   println(""+(fun()=>j=2*j)());
+}
+
+main(args)
+{
+  test_discards();
+  test_captures();
 
   // Arrays
 
-  Vector<String> v = makeVector(1, "");
+  Vector<String> v = makeVector(1);
+  String[] elements = v.elements;
   v.elements.size();
 
   // Tuples
@@ -86,15 +98,16 @@ main(args)
   (s1, s2) = (s2, s1);
   println(s1 + s2);
 
-  int a; 
+  int a;
   int b;
   (a,b) = min_max(17, 14);
   println("" + a + " < " + b);
 
   <int, long> t1;
   <long, long> t2;
-  t2 = t1;  
+  t2 = t1;
 
   test_numeric();
   test_arrays();
+  test_comparable();
 }

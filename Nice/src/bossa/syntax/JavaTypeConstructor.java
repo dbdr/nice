@@ -12,7 +12,7 @@
 
 // File    : JavaTypeConstructor.java
 // Created : Thu Jul 08 11:51:09 1999 by bonniot
-//$Modified: Mon Apr 03 13:35:55 2000 by Daniel Bonniot $
+//$Modified: Tue Apr 04 18:37:32 2000 by Daniel Bonniot $
 
 package bossa.syntax;
 
@@ -186,8 +186,30 @@ public class JavaTypeConstructor extends TypeConstructor
 		 "You probably need to install the corresponding package.");
     }
     
+  addFetchedMethod:
     for(Method m = classType.getMethods(); m!=null; m = m.getNext())
-      JavaMethodDefinition.addFetchedMethod(m);
+      {
+	// skips m if it was just overriden in classType
+	// but declared in a superclass or superinterface.
+	ClassType superClass = classType.getSuperclass();
+	if(superClass!=null
+	   && alreadyHasMethod(superClass,m))
+	  continue;
+	ClassType[] itfs = classType.getInterfaces();
+	if(itfs!=null)
+	  for(int i=0; i<itfs.length; i++)
+	    if(alreadyHasMethod(itfs[i],m))
+	      continue addFetchedMethod;
+	
+	JavaMethodDefinition.addFetchedMethod(m);
+      }
+  }
+  
+  private static boolean alreadyHasMethod(ClassType c, Method m)
+  {
+    // not exact if the new method overload the old one 
+    // with more precise types.
+    return c.getMethod(m.getName(), m.getParameterTypes())!=null;
   }
   
   public static void createContext()

@@ -12,7 +12,7 @@
 
 // File    : JavaMethodDefinition.java
 // Created : Tue Nov 09 11:49:47 1999 by bonniot
-//$Modified: Fri Mar 31 20:32:25 2000 by Daniel Bonniot $
+//$Modified: Tue Apr 04 16:26:35 2000 by Daniel Bonniot $
 
 package bossa.syntax;
 
@@ -139,7 +139,6 @@ public class JavaMethodDefinition extends MethodDefinition
   {
     if(declaredMethods.get(m)!=null)
       return null;
-    declaredMethods.put(m, Boolean.TRUE);
 
     JavaMethodDefinition md = JavaMethodDefinition.make(m);
     Node.getGlobalScope().addSymbol(md.symbol);

@@ -128,10 +128,10 @@ U foldRight(List<T> list, (T, U)->U func, U init, int from)
  * Implementations
  ****************************************************************/
 
-<T> foreach(coll@java.util.Collection, func) 
+<T> foreach(collection@java.util.Collection, action)
 {
-  for (T elem : coll)
-    func(elem);
+  for (T elem : collection)
+    action(elem);
 }
 
 <C,T,U> map(coll, func)

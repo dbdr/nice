@@ -71,6 +71,12 @@ public abstract class Expression
     return null;
   }
   
+  boolean isZero()
+  {
+    return this instanceof ConstantExp &&
+      ((Number) ((ConstantExp) this).value).intValue() == 0;
+  }
+
   /**
    * Resolves overloading, taking into account the parameters 
    * the expressions is applied to.

@@ -60,42 +60,101 @@ public class NewArrayExp extends Expression
     Monotype monotype;
     Constraint cst;
 
+    TypeConstructor[] nullVars;
+    boolean zero = findZero(knownDimensions);
+    /* 
+       If one of the dimensions is zero, then all unknown dimensions and
+       the component type can be safely assumed to be non-optional.
+       Because arrays are invariant, we give them a type polymorphic in the
+       nullness marker.
+    */
+    if (zero)
+      {
+	nullVars = new TypeConstructor[unknownDimensions + 1];
+	for (int i = 0; i < nullVars.length; i++)
+	  nullVars[i] = new TypeConstructor("n" + i, 
+					    PrimitiveType.maybeTC.variance, 
+					    false, false);
+      }
+    else
+      nullVars = null;
+    
     if (resolvedType instanceof MonotypeVar)
       {
 	MonotypeVar res = (MonotypeVar) resolvedType;
 	TypeConstructor tc = new TypeConstructor("nullness", PrimitiveType.maybeTC.variance, false, false);
 	MonotypeVar raw = new MonotypeVar(res.getName()+"raw");
-	MonotypeConstructor eq = new MonotypeConstructor(tc, new Monotype[]{raw});
-	cst = new Constraint(new TypeSymbol[]{tc, raw},
-			     new AtomicConstraint[]{
-			       new TypeConstructorLeqCst(tc, PrimitiveType.maybeTC),
-			       new MonotypeLeqCst(eq, res),
-			       new MonotypeLeqCst(res, eq)});
-	monotype = bossa.syntax.Monotype.maybe(raw);
+	MonotypeConstructor eq = MonotypeConstructor.apply(tc, raw);
+	TypeSymbol[] vars;
+	if (nullVars == null)
+	  vars = new TypeSymbol[]{tc, raw};
+	else
+	  {
+	    vars = new TypeSymbol[nullVars.length + 2];
+	    System.arraycopy(nullVars, 0, vars, 2, nullVars.length);
+	    vars[0] = tc;
+	    vars[1] = raw;
+	  }
+	cst = new Constraint(vars, new AtomicConstraint[]{
+	  new TypeConstructorLeqCst(tc, PrimitiveType.maybeTC),
+	  new MonotypeLeqCst(eq, res),
+	  new MonotypeLeqCst(res, eq)});
+
+	if (nullVars != null)
+	  monotype = MonotypeConstructor.apply(nullVars[nullVars.length - 1],
+					       raw);
+	else
+	  monotype = bossa.syntax.Monotype.maybe(raw);
       }
     else
       {
 	if (!(resolvedType instanceof TypeConstructor))
 	  User.error(ident, ident + " should be a class");
     
+	cst = Constraint.True;
+
 	TypeConstructor tc = (TypeConstructor) resolvedType;
 	monotype = new MonotypeConstructor(tc, MonotypeVar.news(tc.arity()));
 	if (Types.isPrimitive(tc))
 	  monotype = bossa.syntax.Monotype.sure(monotype);
+	else if (nullVars != null)
+	  {
+	    monotype = MonotypeConstructor.apply(nullVars[nullVars.length - 1],
+						 monotype);
+	    cst = new Constraint(nullVars, null);
+	  }
 	else
 	  monotype = bossa.syntax.Monotype.maybe(monotype);	  
-
-	cst = Constraint.True;
       }
     
-    for (int i = 0; i<knownDimensions.length + unknownDimensions; i++)
-      monotype = bossa.syntax.Monotype.sure(new MonotypeConstructor
-	(PrimitiveType.arrayTC, new Monotype[]{monotype}));
+    for (int i = 0; i < unknownDimensions; i++)
+      {
+	monotype = new MonotypeConstructor
+	  (PrimitiveType.arrayTC, new Monotype[]{monotype});
+	if (nullVars != null)
+	  monotype = MonotypeConstructor.apply(nullVars[i], monotype);
+	else
+	  // Unknown dimensions are not initialized: give an option type.
+	  monotype = bossa.syntax.Monotype.maybe(monotype);
+      }
+
+    // Known dimensions are initialized: give a sure type.
+    for (int i = 0; i < knownDimensions.length; i++)
+      monotype = bossa.syntax.Monotype.sure
+	(MonotypeConstructor.apply(PrimitiveType.arrayTC, monotype));
     
     // set the Expression type
     type = new Polytype(cst, monotype);
   }
-  
+
+  private static boolean findZero(Expression[] exps)
+  {
+    for (int i = 0; i < exps.length; i++)
+      if (exps[i].isZero())
+	return true;
+    return false;
+  }
+
   /****************************************************************
    * Code generation
    ****************************************************************/

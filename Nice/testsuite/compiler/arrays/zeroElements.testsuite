@@ -1,0 +1,27 @@
+/// COMMENT Arrays with zero elements have special types, since
+/// COMMENT one can safely use them with option and non-option component types.
+
+/// PASS
+  String[] a = new String[0];
+
+/// PASS
+  ?String[] a = new String[0];
+
+/// PASS
+  int[] a = new int[0];
+
+/// PASS
+  String[][] a = new String[0][];
+
+/// PASS
+  ?String[][] a = new String[0][];
+
+/// PASS
+  ?String[][?] a = new String[0][];
+
+/// PASS
+  /// Toplevel
+<Any T> void f()
+{
+  T[] a = new T[0];
+}

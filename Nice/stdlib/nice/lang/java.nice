@@ -40,18 +40,15 @@ class Class<T> = native java.lang.Class;
 Runtime getRuntime() = native Runtime Runtime.getRuntime();
 Process exec(Runtime, String[]) = native Process Runtime.exec(String[]);
 
-// Class classForName(String name) = native Class Class.forName(String);
-// Field[] getFields(Class) = native Field[] Class.getFields();
-// Method[] getMethods(Class) = native Method[] Class.getMethods();
+Class classForName(String name) = native Class Class.forName(String);
+Field[] getFields(Class) = native Field[] Class.getFields();
+Method[] getMethods(Class) = native Method[] Class.getMethods();
+Class getType(Field) = native Class Field.getType();
+<T> T newInstance(Class<T>) = native Object Class.newInstance();
 
-/*TBD*/<T> Method getMethod(Class<T>, String, ?(Class<Object>[])) = native Method[] Class.getMethod(String, Class[]);
-/*TBD*/<T> String getName(Class<T>) = native String Class.getName();
 <T, V> V get(Field, T) = native Object Field.get(Object);
 <T, V> void set(Field, T, V) = native void Field.set(Object, Object);
 String getName(Field) = native String Field.getName();
-// Class getType(Field) = native Class Field.getType();
-/*TBD*/<T> java.net.URL getResource(Class<T>, String) = native java.net.URL Class.getResource(String);
-<T> T newInstance(Class<T>) = native Object Class.newInstance();
 
 String concat(String, String) = native String String.concat(String);
 StringBuffer append(StringBuffer, ?String) = 

@@ -28,8 +28,3 @@ void `throw`(java.lang.Throwable exception) = inline nice.lang.inline.Throw();
 
 <T,U> boolean `instanceof`(T value, Class<U>) =
   inline nice.lang.inline.Instanceof();
-
-<T> boolean `instanceof`(T value, Type) = 
-  inline nice.lang.inline.Instanceof();
-
-<T> Class<T> `class`(Type) = inline nice.lang.inline.Class();

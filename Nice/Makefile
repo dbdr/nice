@@ -12,14 +12,12 @@ TAG     = ${shell if [ `grep '^ --' NEWS |head -1|wc -c` -le 10 ]; then echo pre
 
 # ANT classpath; we will use NICE_ANTJAR or ANT_HOME (in that order) 
 # if present, otherwise try good default
-ANT_CLASSPATH= ${shell if [ "z${NICE_ANTJAR}" != "z" ] ; \
-	then echo "${NICE_ANTJAR}"; \
-	elif [ "z${ANT_HOME}" != "z" ] ; \
-	then echo "${ANT_HOME}/lib/ant.jar"; \
-	else if [ "z${CLASSPATH}" != "z" ]; \
-	        then echo "/usr/share/java/ant.jar:./external/ant.jar:${CLASSPATH}"; \
-		else echo "/usr/share/java/ant.jar:./external/ant.jar:"; \
-	    	fi \
+ANT_CLASSPATH= ${shell if [ -n "${NICE_ANTJAR}" ] ; \
+		then echo "${NICE_ANTJAR}"; \
+	elif [ -n "${ANT_HOME}" ] ; \
+		then echo "${ANT_HOME}/lib/ant.jar"; \
+	else \
+		echo "/usr/share/ant/lib/ant.jar:./external/ant.jar:${CLASSPATH}"; \
 	fi }
 
 SHELL = /bin/sh

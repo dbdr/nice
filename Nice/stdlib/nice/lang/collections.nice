@@ -43,7 +43,7 @@ import java.util.*;
 <Any T, Any U> U foldLeft(java.util.List<T> l, (U, T)->U f, U init)
 {
   U res = init;
-  l.iter(T elem => { res = f(res, elem); });
+  l.foreach(T elem => { res = f(res, elem); });
   return res;
 }
 
@@ -100,21 +100,21 @@ map(c, f)
 map<C,T,U>(c#ArrayList, f)
 {
   ArrayList<U> res = new ArrayList(c.size());
-  c.iter(T elem => { res.add(f(elem)); });
+  c.foreach(T elem => { res.add(f(elem)); });
   return res;
 }
 
 map<C,T,U>(c#java.util.Vector, f)
 {
   java.util.Vector<U> res = new java.util.Vector(c.size());
-  c.iter(T elem => { res.add(f(elem)); });
+  c.foreach(T elem => { res.add(f(elem)); });
   return res;
 }
 
 map<C,T,U>(c#java.util.Stack, f)
 {
   java.util.Stack<U> res = new java.util.Stack();
-  c.iter(T elem => { res.add(f(elem)); });
+  c.foreach(T elem => { res.add(f(elem)); });
   return res;
 }
 
@@ -126,21 +126,21 @@ filter(c, f)
 filter<C,T>(c#ArrayList, test)
 {
   ArrayList<T> res = new ArrayList(c.size());
-  c.iter(T elem => { if(test(elem)) res.add(elem); });
+  c.foreach(T elem => { if(test(elem)) res.add(elem); });
   return res;
 }
 
 filter<C,T>(c#java.util.Vector, test)
 {
   java.util.Vector<T> res = new java.util.Vector(c.size());
-  c.iter(T elem => { if(test(elem)) res.add(elem); });
+  c.foreach(T elem => { if(test(elem)) res.add(elem); });
   return res;
 }
 
 filter<C,T>(c#java.util.Stack, test)
 {
   java.util.Stack<T> res = new java.util.Stack();
-  c.iter(T elem => { if(test(elem)) res.add(elem); });
+  c.foreach(T elem => { if(test(elem)) res.add(elem); });
   return res;
 }
 
@@ -249,19 +249,3 @@ toString(s@List)
   c.foreach(T elem => res[i++] = elem);
   return res;
 }
-
-
-/****************************************************************
- * Maps
- ****************************************************************/
-
-<Key, Element> boolean containsKey(Map<Key, Element>, Key) = 
-  native boolean java.util.Map.containsKey(Object);
-
-// The results can be null even if the value type is non-optional.
-<K, V0, V | V <: ?V0> ?V0 remove(java.util.Map<K, V>, K)=
-  native Object java.util.Map.remove(Object);
-<K, V0, V | V <: ?V0> ?V0 get(java.util.Map<K, V>, K)=
-  native Object java.util.Map.get(Object);
-<K, V0, V | V <: ?V0> ?V0 put(java.util.Map<K, V>, K, V)=
-  native Object java.util.Map.put(Object, Object);

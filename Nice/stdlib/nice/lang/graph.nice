@@ -31,7 +31,7 @@ package nice.lang;
   stack.push(node);
 
   int min = id.value;
-  successors(node).iter(fun(T child)=>{
+  successors(node).foreach(T child=>{
     int m;
     try{
       m = notNull(mark.get(child));

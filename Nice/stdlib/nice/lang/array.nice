@@ -64,6 +64,13 @@ void set(double[], int, double)  = inline nice.lang.inline.ArraySetOp("d");
     to[i] = from[toIndex + i];
 }
 
+<T, U | U <: T> T[] copy(U[] array)
+{
+  T[] res = cast(new T[array.length]); // we shall fill it just next line
+  System.arraycopy(array, 0, res, 0, array.length);
+  return res;
+}
+
 <Any T> T[] slice(T[] array, int from = 0, int to = -1)
 {
   if (to == -1) 
@@ -87,13 +94,13 @@ filter<C, T>(a@Array, test) = a.filter(test);
 
   T[] res = cast(new T[l]);
 
-  a.iter(fun(T elem) =>
+  a.foreach(T elem =>
 	{ if(test(elem)) res.set(found++, elem); } );
 
   return resize(res, found);
 }
 
-<Any T> void iter(T[] a, (T)->void f)
+<Any T> void foreach(T[] a, (T)->void f)
 {
   for (int i = 0; i < a.length; i++)
     f(a[i]);

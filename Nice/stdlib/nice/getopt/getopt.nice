@@ -24,7 +24,7 @@ parse(progName@String, args, options)
   List<LongOpt> longOptions = new ArrayList(options.length);
   String shortOptions = "";
 
-  options.iter(Option o =>
+  options.foreach(Option o =>
     {
       if(o.longName != null)
       {
@@ -98,7 +98,7 @@ var int uniqId = 256;
 printOptions(os)
 {
   String res = "";
-  os.filter(Option o => o.visible).iter(Option o => res += printOption(o));
+  os.filter(Option o => o.visible).foreach(Option o => res += printOption(o));
   return res;
 }
 

@@ -78,7 +78,7 @@ public class JavaFieldAccess extends FieldAccess
            // remembers the fully qualified name
            className.content = c.getName();
 
-          for (?gnu.bytecode.Field f = c.getFields(); f != null; f = f.next )
+          for (?gnu.bytecode.Field f = c.getFields(); f != null; f = f.getNext() )
           if (name.equals(f.getName()))
             return f;
         }

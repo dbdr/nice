@@ -54,6 +54,7 @@ public class InstantiateProc extends ProcedureN implements Inlineable
       args[i].compile(comp, types[i]);
 
     code.emitInvokeSpecial(constructor);
+    target.compileFromStack(comp, type);
   }
 
   public Type getReturnType (Expression[] args)
@@ -61,7 +62,7 @@ public class InstantiateProc extends ProcedureN implements Inlineable
     if (constructor != null)
       return constructor.getDeclaringClass();
     else
-      return method.getReturnType();
+      return method.getClassType();
   }
 
   /****************************************************************

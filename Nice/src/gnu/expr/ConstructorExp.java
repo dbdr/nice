@@ -30,6 +30,8 @@ public class ConstructorExp extends LambdaExp
 
   private ClassType classType;
 
+  ClassType getClassType() { return classType; }
+
   public Method getMainMethod()
   {
     if (primMethods == null)

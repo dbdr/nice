@@ -1,0 +1,5 @@
+/// PASS
+  if (false)
+    new A();
+  /// Toplevel
+  class A {}

@@ -13,6 +13,9 @@ recompile:
 recompileGNU:
 	cd ${TOP}/src; ${JAVAC} -d ${TOP}/classes gnu/*/*.java gnu/*/*/*.java kawa/*/*.java
 
+parser:
+	cd ${TOP}/src; ${JAVACC} bossa/parser/Parser.jj
+
 clean:
 	rm -rf ${TOPCLASSES}/*
 

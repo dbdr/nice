@@ -33,26 +33,25 @@ public class JavaClass extends ClassDefinition.ClassImplementation
   {
     this.definition = definition;
     this.javaName = javaName;
-
-    TypeConstructor old = 
-      JavaClasses.setTypeConstructorForJavaClass
-      (definition.compilation(), definition.tc, javaName.toString());
-
-    if (old != null)
-      User.error(definition, javaName + 
-		 " was already associated with the Nice class " + old);
   }
 
   ClassDefinition definition;
 
   void resolveClass()
   {
-    gnu.bytecode.Type classType
-      = nice.tools.code.TypeImport.lookup(javaName.toString());
+    gnu.bytecode.Type classType = nice.tools.code.TypeImport.lookup(javaName);
     
     if (classType == null)
       User.error(javaName, javaName + " was not found in classpath");
     
+
+    TypeConstructor old = 
+      JavaClasses.setTypeConstructorForJavaClass
+      (definition.compilation(), definition.tc, classType);
+
+    if (old != null)
+      User.error(definition, javaName + 
+		 " was already associated with the Nice class " + old);
     definition.setJavaType(classType);
     JavaClasses.fetchMethods(definition.tc, (gnu.bytecode.ClassType) classType);
   }

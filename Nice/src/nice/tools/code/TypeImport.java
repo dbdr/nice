@@ -39,20 +39,46 @@ public class TypeImport
 
   public static String getRuntime() { return runtime; }
 
-  public static Type lookup(String className)
+  public static Type lookup(bossa.syntax.LocatedString className)
+  {
+    return lookup(className.toString(), className.location());
+  }
+
+  public static Type lookup(String className, bossa.util.Location loc)
   {
     Type res = lookupQualified(className);
 
     if (res != null)
       return res;
-    
+
     String[] pkgs = bossa.syntax.Node.getGlobalTypeScope().module.listImplicitPackages();
     for (int i = 0; i < pkgs.length; i++)
-	{
-	  res = lookupQualified(pkgs[i] + "." + className);
-	  if (res != null)
-	    return res;
-	}
+      {
+	Type found = lookupQualified(pkgs[i] + "." + className);
+	if (found != null)
+	  {
+	    if (i == 0) // The current package: no ambiguity possible
+	      return found;
+
+	    if (res != null)
+	      User.error(loc, "Ambiguity for native class " + className + 
+			 ":\n" + res.getName() + " and " + found.getName() +
+			 " both exist");
+
+	    res = found;
+	  }
+      }
+    if (res != null)
+      return res;
+
+    int lastDot = className.lastIndexOf('.');
+    if (lastDot != -1)
+      {
+	char[] chars = className.toCharArray();
+	chars[lastDot] = '$';
+	return lookup(new String(chars), loc);
+      }
+
     return null;
   }
 

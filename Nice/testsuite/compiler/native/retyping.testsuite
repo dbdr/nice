@@ -15,3 +15,12 @@
   java.awt.Color black = black();
   /// Toplevel
   java.awt.Color black() = native java.awt.Color.black;
+
+/// PASS
+  /// Toplevel
+  
+  // Use an inner class in a retyping.
+  int getRunLimit(java.text.AttributedCharacterIterator,
+                  java.text.AttributedCharacterIterator.Attribute attribute) =
+   native int java.text.AttributedCharacterIterator.getRunLimit
+     (java.text.AttributedCharacterIterator.Attribute);

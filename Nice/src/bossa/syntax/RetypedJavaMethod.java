@@ -82,7 +82,7 @@ public class RetypedJavaMethod extends JavaMethod
 
   private static gnu.bytecode.Type type(LocatedString s)
   {
-    Type res = Types.type(s.toString());
+    Type res = Types.type(s);
     if(res == null)
       User.error(s, "Unknown java class " + s);
     return res;
@@ -102,7 +102,7 @@ public class RetypedJavaMethod extends JavaMethod
     if(reflectMethod != null)
       return;
     
-    Type holder = TypeImport.lookup(className.toString());
+    Type holder = TypeImport.lookup(className);
     if(holder == null)
       User.error(this,
 		 "Class " + className + " was not found");

@@ -1,0 +1,7 @@
+/// COMMENT Import of a package name space.
+
+/// PASS
+  /// Toplevel
+  import java.text.*;
+
+  void f(AttributedCharacterIterator.Attribute a) {}

@@ -423,14 +423,19 @@ public final class Types
    * Converting string to gnu.bytecode.Type
    ****************************************************************/
 
-  public static final gnu.bytecode.Type type(String s)
+  public static final gnu.bytecode.Type type(bossa.syntax.LocatedString name)
+  {
+    return type(name.toString(), name.location());
+  }
+
+  public static final gnu.bytecode.Type type(String s, bossa.util.Location loc)
   {
     if(s.length()==0)
       return null;
     
     if(s.charAt(0)=='[')
       {
-	Type res = type(s.substring(1));
+	Type res = type(s.substring(1), loc);
 	if(res==null)
 	  return null;
 	else
@@ -447,10 +452,7 @@ public final class Types
     if(s.equals("float")) 	return SpecialTypes.floatType;
     if(s.equals("double")) 	return SpecialTypes.doubleType;
     
-    Class clas = TypeImport.lookupJavaClass(s);
-    if (clas == null)
-      return null;
-    return Type.make(clas);
+    return TypeImport.lookup(s, loc);
   }
   
   /**

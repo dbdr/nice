@@ -14,6 +14,7 @@ package bossa.syntax;
 
 import bossa.util.*;
 import bossa.util.Debug;
+import bossa.util.Location;
 
 import mlsub.typing.*;
 import bossa.modules.Compilation;
@@ -42,7 +43,7 @@ public final class JavaClasses
   static TypeConstructor make
     (Compilation compilation, String name, gnu.bytecode.Type javaType)
   {
-    Object o = compilation.javaTypeConstructors.get(name);
+    Object o = compilation.javaTypeConstructors.get(javaType);
     if(o!=null)
       return (TypeConstructor) o;
     
@@ -57,9 +58,9 @@ public final class JavaClasses
      associated TypeConstructor in which case it is returned.
    */
   static TypeConstructor setTypeConstructorForJavaClass
-    (Compilation compilation, TypeConstructor tc, String javaName)
+    (Compilation compilation, TypeConstructor tc, Type type)
   {
-    Object old = compilation.javaTypeConstructors.put(javaName, tc);
+    Object old = compilation.javaTypeConstructors.put(type, tc);
     return (TypeConstructor) old;
   }
   
@@ -102,7 +103,7 @@ public final class JavaClasses
       
     TypeConstructor res = new TypeConstructor(className, null, 
 					      instantiable, true);
-    compilation.javaTypeConstructors.put(className, res);
+    compilation.javaTypeConstructors.put(javaType, res);
 
     nice.tools.code.Types.set(res, javaType);
     
@@ -401,18 +402,18 @@ public final class JavaClasses
   /** The current compilation. This is not thread safe! */
   static bossa.modules.Compilation compilation;
 
-  public static TypeConstructor lookup(String className)
+  /**
+     Lookup a (possibly unqualified) class name.
+  */
+  public static TypeConstructor lookup(String className, Location loc)
   {
-    if (compilation.javaTypeConstructors.containsKey(className))
-      return (TypeConstructor) compilation.javaTypeConstructors.get(className);
-
-    Type classType = nice.tools.code.TypeImport.lookupQualified(className);
+    Type classType = nice.tools.code.TypeImport.lookup(className, loc);
     if (classType == null)
-      {
-	compilation.javaTypeConstructors.put(className, null);
-	return null;
-      }
-    else
-      return create(compilation, classType.getName(), classType);
+      return null;
+
+    if (compilation.javaTypeConstructors.containsKey(classType))
+      return (TypeConstructor) compilation.javaTypeConstructors.get(classType);
+
+    return create(compilation, classType.getName(), classType);
   }
 }

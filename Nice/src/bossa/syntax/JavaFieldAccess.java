@@ -129,7 +129,7 @@ public class JavaFieldAccess extends FieldAccess
   {
     ClassType c = null;
     try { 
-      c = (ClassType) Types.type(javaClass.toString()); 
+      c = (ClassType) Types.type(javaClass); 
       if (c == null)
 	User.error(javaClass,"Class " + javaClass + " not found");
     }

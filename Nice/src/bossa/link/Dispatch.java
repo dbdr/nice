@@ -205,7 +205,7 @@ public final class Dispatch
 	    marker = new TypeConstructor(ConstantExp.maybeTC.variance);
 	    MonotypeVar var = new MonotypeVar("dispatchType");
 	    raw = var;
-	    Monotype t = new MonotypeConstructor(marker, raw);
+	    Monotype t = MonotypeConstructor.apply(marker, raw);
 	    cst = Constraint.and(cst, marker, var, 
 				 new MonotypeLeqCst(t, arg),
 				 new MonotypeLeqCst(arg, t));

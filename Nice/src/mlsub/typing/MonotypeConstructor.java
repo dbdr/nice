@@ -58,10 +58,11 @@ public final class MonotypeConstructor extends Monotype
    * @param tc the type constructor
    * @param parameter the type parameter
    */
-  public MonotypeConstructor(TypeConstructor tc, Monotype parameter)
+  public static MonotypeConstructor apply (TypeConstructor tc, 
+					   Monotype parameter)
   throws BadSizeEx
   {
-    this(tc, new Monotype[]{ parameter });
+    return new MonotypeConstructor(tc, new Monotype[]{ parameter });
   }
 
   /**

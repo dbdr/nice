@@ -1,0 +1,175 @@
+<!doctype html public "-//w3c//dtd html 4.0 transitional//en">
+<html>
+<head>
+   <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+   <meta name="Author" content="Daniel Bonniot">
+   <meta name="GENERATOR" content="Mozilla/4.76 [en] (X11; U; OSF1 V4.0 alpha) [Netscape]">
+   <meta name="Description" content="Shows how multi-methods advantageously replace the visitor pattern.">
+   <meta name="Keywords" content="visitor,pattern,multi-method,multimethod,multiple dispatch">
+   <title>Visitor pattern considered useless</title>
+<link rel=stylesheet href="style.css">
+</head>
+<body text="#000000" bgcolor="#FFFFFF" link="#0000EF" vlink="#51188E" alink="#FF0000">
+
+<center>
+<h1>
+Visitor Pattern Versus Multimethods</h1></center>
+
+<ol>
+<h2>
+The Visitor Pattern</h2>
+The visitor pattern is a programming pattern that has been advocated strongly
+for writing code operating on a hierarchy of classes. <a href="http://www.ti.et-inf.uni-siegen.de/Entwurfsmuster/ArtikelImport/osefa/patterns/visitor/intent.htm">A
+thorough description is available there</a> from the <i>Design Patterns</i>
+book.
+<p>A typical exemple is the definition of operations on an Abstract Syntax
+Tree:
+<PRE>
+<FONT COLOR="#0000ee">abstract</FONT> <FONT COLOR="#0000ee">class</FONT> <FONT COLOR="#cd0000">ExpressionVisitor</FONT> 
+{ 
+  <FONT COLOR="#0000ee">abstract</FONT> <FONT COLOR="#b7860b">void</FONT> visitIntExp(<FONT COLOR="#b7860b">IntExp </FONT>e); 
+  <FONT COLOR="#0000ee">abstract</FONT> <FONT COLOR="#b7860b">void</FONT> visitAddExp(<FONT COLOR="#b7860b">AddExp </FONT>e); 
+} 
+
+<FONT COLOR="#0000ee">abstract</FONT> <FONT COLOR="#0000ee">class</FONT> <FONT COLOR="#cd0000">Expression</FONT> 
+{ 
+  <FONT COLOR="#0000ee">abstract</FONT> <FONT COLOR="#b7860b">void</FONT> accept(<FONT COLOR="#b7860b">ExpressionVisitor </FONT>v); 
+} 
+
+<FONT COLOR="#0000ee">class</FONT> <FONT COLOR="#cd0000">IntExp</FONT> <FONT COLOR="#0000ee">extends</FONT> <FONT COLOR="#b7860b">Expression </FONT>
+{ 
+  <FONT COLOR="#b7860b">int</FONT> <FONT COLOR="#cd0000">value</FONT>; 
+
+  <FONT COLOR="#b7860b">void</FONT> <FONT COLOR="#cd0000">accept</FONT>(<FONT COLOR="#b7860b">ExpressionVisitor </FONT>v)
+  {
+    v.visitIntExp(<FONT COLOR="#8080ff">this</FONT>);
+  }
+} 
+
+<FONT COLOR="#0000ee">class</FONT> <FONT COLOR="#cd0000">AddExp</FONT> <FONT COLOR="#0000ee">extends</FONT> <FONT COLOR="#b7860b">Expression </FONT>
+{ 
+  <FONT COLOR="#b7860b">Expression </FONT>e1, e2; 
+  <FONT COLOR="#b7860b">void</FONT> <FONT COLOR="#cd0000">accept</FONT>(<FONT COLOR="#b7860b">ExpressionVisitor </FONT>v)
+  {
+    v.visitAddExp(<FONT COLOR="#8080ff">this</FONT>);
+  }
+} 
+
+<FONT COLOR="#008b00">// Behaviour can now be defined on Expressions 
+</FONT>
+<FONT COLOR="#0000ee">class</FONT> <FONT COLOR="#cd0000">PrettyPrint</FONT> <FONT COLOR="#0000ee">extends</FONT> <FONT COLOR="#b7860b">ExpressionVisitor </FONT>
+{
+  <FONT COLOR="#b7860b">void</FONT> <FONT COLOR="#cd0000">visitIntExp</FONT>(<FONT COLOR="#b7860b">IntExp </FONT>e) 
+  { 
+    <FONT COLOR="#b7860b">System</FONT>.out.print(e.value); 
+  } 
+
+  <FONT COLOR="#b7860b">void</FONT> <FONT COLOR="#cd0000">visitAddExp</FONT>(<FONT COLOR="#b7860b">AddExp </FONT>e) 
+  { 
+    e.e1.accept(<FONT COLOR="#8080ff">this</FONT>); 
+    <FONT COLOR="#b7860b">System</FONT>.out.print(<FONT COLOR="#a020f0">&quot; + &quot;</FONT>); 
+    e.e2.accept(<FONT COLOR="#8080ff">this</FONT>); 
+  } 
+}</PRE>
+
+It is thus possible to define operations on expressions without modifying
+the expression hierarchy classes (has would happen with a <tt>prettyPrint</tt>
+member method) and without the burden of testing the argument with <tt>instanceof</tt>
+and downcasts.
+<br>&nbsp;
+<h2>
+Shortcomings of the Visitor pattern</h2>
+
+<ol>
+<li>
+An obvious problem is that the arguments and the return type of visiting
+methods have to be known in advance. In this exemple, to define a <tt>prettyPrint</tt>
+function that returns a <tt>String</tt>, a new Visitor class has tyo be
+defined, as well as a new <tt>accept</tt> method <b>in every class of the
+hierarchy</b>. And the same job has to be done again to define an evaluation
+function that returns an integer. The same problem occurs if the visiting
+methods needs parameters.</li>
+
+<li>
+The code is more obscure. In particular with recursive calls: in <tt>e.e1.accept(this)</tt>
+one cannot see that the call is indeed a prettyprint. One would expect
+<tt>prettyPrint(e.e1)</tt> there.</li>
+
+<li>
+A lot of code has to be written to prepare the use of visitors: the visitor
+class with one abstract method per class, and a accept method per class.
+This code is tedious and boring to write.
+If we add a new class, the visitor class needs a new method. Furthermore,
+it is indeed likely that a new visiting method will need the definition
+of a new visitor pattern, as seen in point 1. At the least, several patterns
+have often to be written.</li>
+
+<li>
+If a visitor pattern has not been written in the first time, the hierarchy
+has to be modified to implement it. In particular, if the hierarchy cannot
+be modified because you are not allowed to, the visitor pattern cannot
+be applied at all.</li>
+</ol>
+
+<h2>
+Alternative solution with Multimethods</h2>
+Here is the same exemple, using multi-methods, 
+in <a href="index.html"><font face="Comic Sans MS">Nice</font></a>. 
+As you can see, it is much
+shorter and natural, and it solves all the problems above.
+<p>
+<PRE>
+<FONT COLOR="#0000ee">abstract</FONT> <FONT COLOR="#0000ee">class</FONT> <FONT COLOR="#cd0000">Expression</FONT> { } 
+
+<FONT COLOR="#0000ee">class</FONT> <FONT COLOR="#cd0000">IntExp</FONT> <FONT COLOR="#0000ee">extends</FONT> <FONT COLOR="#b7860b">Expression </FONT>
+{ 
+  <FONT COLOR="#b7860b">int</FONT> <FONT COLOR="#cd0000">value</FONT>; 
+} 
+
+<FONT COLOR="#0000ee">class</FONT> <FONT COLOR="#cd0000">AddExp</FONT> <FONT COLOR="#0000ee">extends</FONT> <FONT COLOR="#b7860b">Expression </FONT>
+{ 
+  <FONT COLOR="#b7860b">Expression </FONT>e1, e2; 
+} 
+
+<FONT COLOR="#008b00">// Behaviour can now be defined on Expressions 
+</FONT>
+<FONT COLOR="#b7860b">void</FONT> <FONT COLOR="#cd0000">prettyPrint</FONT>(<FONT COLOR="#b7860b">Expression </FONT>e); 
+
+<FONT COLOR="#cd0000">prettyPrint</FONT>(e<FONT COLOR="#0000ee">@</FONT><FONT COLOR="#b7860b">IntExp</FONT>) 
+{ 
+  <FONT COLOR="#b7860b">System</FONT>.out.print(e.value); 
+} 
+
+<FONT COLOR="#cd0000">prettyPrint</FONT>(e<FONT COLOR="#0000ee">@</FONT><FONT COLOR="#b7860b">AddExp</FONT>) 
+{ 
+  prettyPrint(e.e1); 
+  <FONT COLOR="#b7860b">System</FONT>.out.print(<FONT COLOR="#a020f0">&quot; + &quot;</FONT>); 
+  prettyPrint(e.e2); 
+} 
+</PRE>
+
+<h2>
+Comparison of the two approches</h2>
+Multi-methods allow to solve the situation at which the Visitor pattern
+aims, without carrying its disavantages:
+<ol>
+<li>
+There is no need to write preliminary code to "prepare the way" for visitors.
+This solves points 1, 2 and 4 above.</li>
+
+<li>
+The code is shorter and more natural. Recursive calls appear as such.</li>
+</ol>
+
+<p><br>The Visitor pattern is a trick to introduce multiple dispatch in
+a language that lacks it. However, it raises serious issues. Language support
+for multi-methods makes it much easier and elegant to handle the common
+situation where the Visitor pattern applies.
+<br>&nbsp;
+<h2>
+General information about <font face="Comic Sans MS">Nice</font> : 
+the <a href="index.html">Nice home page</a></h2>
+</ol>
+
+</body>
+</html>

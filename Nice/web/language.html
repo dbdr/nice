@@ -1,146 +1,145 @@
-<HTML>
-<HEAD>
-   <META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=iso-8859-1">
-   <META NAME="Author" CONTENT="Daniel Bonniot">
-   <META NAME="GENERATOR" CONTENT="Mozilla/4.05 [en] (X11; I; OSF1 V4.0 alpha) [Netscape]">
-   <TITLE>The Nice programming language</TITLE>
-<LINK rel=stylesheet href="style.css">
-</HEAD>
-<BODY TEXT="#000000" BGCOLOR="#FFFFFF" LINK="#0000EF" VLINK="#51188E" ALINK="#FF0000">
+<!doctype html public "-//w3c//dtd html 4.0 transitional//en">
+<html>
+<head>
+   <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+   <meta name="Author" content="Daniel Bonniot">
+   <meta name="GENERATOR" content="Mozilla/4.76 [en] (X11; U; OSF1 V4.0 alpha) [Netscape]">
+   <title>The Nice programming language</title>
+<link rel=stylesheet href="style.css">
+</head>
+<body text="#000000" bgcolor="#FFFFFF" link="#0000EF" vlink="#51188E" alink="#FF0000">
 
-<CENTER>
-<H1>
-The <FONT FACE="Comic Sans MS">Nice</FONT> programming language</H1></CENTER>
+<center>
+<h1>
+The <font face="Comic Sans MS">Nice</font> programming language</h1></center>
 
-<BLOCKQUOTE>This page is intended to provide a gentle introduction to the
+<blockquote>This page is intended to provide a gentle introduction to the
 Nice programming language. The goal is to help you write your first Nice
 programs. It does not describe every feature of the language, nor gives
 it a complete description of the powerfull type system.
-<BR>&nbsp;
-<H2>
-Requirements</H2>
+<br>&nbsp;
+<h2>
+Requirements</h2>
 For simplicity and conciseness, this tutorial presents Nice as an extension
 of the Java programming language. You should therefore be familiar with
-Java. If not, you could read about it, for example <A HREF="http://web2.java.sun.com/docs/books/tutorial/">Javasoft's
-tutorial</A>.
-<BR>&nbsp;
-<H2>
-Declaring classes and methods</H2>
+Java. If not, you could read about it, for example <a href="http://web2.java.sun.com/docs/books/tutorial/">Javasoft's
+tutorial</a>.
+<br>&nbsp;
+<h2>
+Declaring classes and methods</h2>
 Classes and methods can be declared as in Java:
+<PRE>
+<FONT COLOR="#0000ee">class</FONT> <FONT COLOR="#cd0000">Person</FONT> 
+{ 
+  <FONT COLOR="#b7860b">String </FONT><FONT COLOR="#cd0000">name</FONT>; 
+  <FONT COLOR="#b7860b">int</FONT> <FONT COLOR="#cd0000">age</FONT>; 
+  
+  <FONT COLOR="#b7860b">String </FONT><FONT COLOR="#cd0000">display</FONT>(); 
+} 
 
-<P><TT>class Person</TT>
-<BR><TT>{</TT>
-<BR><TT>&nbsp; String name;</TT>
-<BR><TT>&nbsp; int age;</TT>
-
-<P><TT>&nbsp; String display();</TT>
-<BR><TT>}</TT>
-
-<P><TT>class Worker extends Person</TT>
-<BR><TT>{</TT>
-<BR><TT>&nbsp; int salary;</TT>
-<BR><TT>}</TT>
-
-<P>Note that <TT>String display(); </TT><B>declares</B> a method, that
-is informs that this method exists. Now we have to <B>define</B> it, that
+<FONT COLOR="#0000ee">class</FONT> <FONT COLOR="#cd0000">Worker</FONT> <FONT COLOR="#0000ee">extends</FONT> <FONT COLOR="#b7860b">Person </FONT>
+{ 
+  <FONT COLOR="#b7860b">int</FONT> <FONT COLOR="#cd0000">salary</FONT>; 
+} 
+</PRE>
+<p>Note that <tt>String display(); </tt><b>declares</b> a method, that
+is informs that this method exists. Now we have to <b>define</b> it, that
 is tell what code is to be executed, depending on the runtime type of the
-person (in this short example either <TT>Person</TT> or <TT>Worker</TT>).
-<BR>&nbsp;
-<H2>
-Defining methods</H2>
+person (in this short example either <tt>Person</tt> or <tt>Worker</tt>).
+<br>&nbsp;
+<h2>
+Defining methods</h2>
 Method definitions are place outside of classes. Their order does not matter
 at all. The definitions of a single method may even occur in several files
 (this is not a flaw, it's an important feature that allows modularity).
+<p>So after the two above class definitions, we define to <b>alternatives</b>
+for method <tt>display </tt>:
+<PRE>
+<FONT COLOR="#cd0000">display</FONT>(p<FONT COLOR="#0000ee">@</FONT><FONT COLOR="#b7860b">Person</FONT>) 
+{ 
+  <FONT COLOR="#0000ee">return</FONT> p.name + <FONT COLOR="#a020f0">&quot; (age=&quot;</FONT> + p.age + <FONT COLOR="#a020f0">&quot;)&quot;</FONT>; 
+} 
 
-<P>So after the two above class definitions, we define to <B>alternatives</B>
-for method <TT>display </TT>:
-
-<P><TT>display(p@Person)</TT>
-<BR><TT>{</TT>
-<BR><TT>&nbsp; return p.name + " (age=" + p.age + ")";</TT>
-<BR><TT>}</TT>
-
-<P><TT>display(p@Worker)</TT>
-<BR><TT>{</TT>
-<BR><TT>&nbsp; return p.name + " (age+" + p.age + ", salary=" + p.salary
-+ ")";</TT>
-<BR><TT>}</TT>
-<BR>&nbsp;
-<H2>
-Parametric classes</H2>
-Classes and interfaces can have type parameters. For example, the <TT>Collection</TT>
+<FONT COLOR="#cd0000">display</FONT>(p<FONT COLOR="#0000ee">@</FONT><FONT COLOR="#b7860b">Worker</FONT>) 
+{ 
+  <FONT COLOR="#0000ee">return</FONT> p.name + <FONT COLOR="#a020f0">&quot; (age+&quot;</FONT> + p.age + <FONT COLOR="#a020f0">&quot;, salary=&quot;</FONT> + p.salary + <FONT COLOR="#a020f0">&quot;)&quot;</FONT>; 
+} 
+</PRE>
+<br>&nbsp;
+<h2>
+Parametric classes</h2>
+Classes and interfaces can have type parameters. For example, the <tt>Collection</tt>
 interface is parametrized by the type of its elements:
-
-<P><TT>interface Collection&lt;T></TT>
-<BR><TT>{</TT>
-<BR><TT>&nbsp; ...</TT>
-<BR><TT>}</TT>
-
-<P>If a class (resp. interface) has type parameters, then all its sub-classes
+<p>
+<PRE>
+<FONT COLOR="#0000ee">interface</FONT> <FONT COLOR="#cd0000">Collection</FONT>&lt;T&gt; 
+{ 
+  ... 
+} 
+</PRE>
+<p>If a class (resp. interface) has type parameters, then all its sub-classes
 (resp. sub-interfaces and implementing classes) must have the same type
 parameters.
-
-<P><TT>class LinkedList&lt;T> implements Collection&lt;T></TT>
-<BR><TT>{</TT>
-<BR><TT>&nbsp; T head;</TT>
-<BR><TT>&nbsp; LinkedList&lt;T> tail;</TT>
-<BR><TT>}</TT>
-
-<P>A consequence of this rule is that there is no class (like <TT>Object</TT>
+<p>
+<PRE>
+<FONT COLOR="#0000ee">class</FONT> <FONT COLOR="#cd0000">LinkedList</FONT>&lt;T&gt; <FONT COLOR="#0000ee">implements</FONT> <FONT COLOR="#b7860b">Collection&lt;T&gt; </FONT>
+{ 
+  <FONT COLOR="#b7860b">T </FONT><FONT COLOR="#cd0000">head</FONT>;
+  <FONT COLOR="#b7860b">LinkedList&lt;T&gt; </FONT><FONT COLOR="#cd0000">tail</FONT>; 
+} 
+</PRE>
+<p>A consequence of this rule is that there is no class (like <tt>Object</tt>
 in Java) that is an ancestor of all classes. There could not be, since
 all classes do not have the same number of type parameters.
-<BR>However, it is possible to express that a method takes arguments of
+<br>However, it is possible to express that a method takes arguments of
 any type. For instance the equals method is declared in Nice:
-<BR><TT>&lt;Any T> boolean equals(T, T);</TT>
-
-<P>One can read this as "for Any type T, the method equals takes two objects
+<br>
+<PRE>
+&lt;<FONT COLOR="#b7860b">Any T</FONT>&gt; <FONT COLOR="#b7860b">boolean</FONT> <FONT COLOR="#cd0000">equals</FONT>(<FONT COLOR="#b7860b">T</FONT>, <FONT COLOR="#b7860b">T</FONT>); 
+</PRE>
+<p>One can read this as "for Any type T, the method equals takes two objects
 of type T, and returns a boolean".
-
-<P>Thanks to the usual subsumption rule, this type makes it possible to
+<p>Thanks to the usual subsumption rule, this type makes it possible to
 call equals with arguments of different type, as long as they are compatible
 (have a common super type). For instance, it's legal to use equals to compare
-expressions of type <TT>Collection&lt;int></TT> and <TT>LinkedList&lt;int></TT>,
-while it is not with types <TT>Collection&lt;String></TT> and <TT>String</TT>.
-
-<P>This approach is more sensible than Java's one, where the laters would
+expressions of type <tt>Collection&lt;int></tt> and <tt>LinkedList&lt;int></tt>,
+while it is not with types <tt>Collection&lt;String></tt> and <tt>String</tt>.
+<p>This approach is more sensible than Java's one, where the laters would
 be allowed and would always return false (not even raising a runtime error),
 while it is very likely a bug to compare a collection of strings to a string.
-
-<P>Note that it is also possible to define a function that takes two unrelated
+<p>Note that it is also possible to define a function that takes two unrelated
 and unconstrained types. So it would be possible to define equals to have
 the same typing behaviour it has in Java:
-<BR><TT>&lt;Any T, Any U> boolean equals(T, U);</TT>
+<br><PRE>&lt;<FONT COLOR="#b7860b">Any T</FONT>, <FONT COLOR="#b7860b">Any U</FONT>&gt; <FONT COLOR="#b7860b">boolean</FONT> <FONT COLOR="#cd0000">equals</FONT>(<FONT COLOR="#b7860b">T</FONT>, <FONT COLOR="#b7860b">U</FONT>);</PRE>
+<p>A more sensible example is the pair creation function:
+<br><PRE><FONT COLOR="#0000ee">class</FONT> <FONT COLOR="#cd0000">Pair</FONT>&lt;<FONT COLOR="#b7860b">T</FONT>, <FONT COLOR="#b7860b">U</FONT>&gt; { ... } 
 
-<P>A more sensible example is the pair creation function:
-<BR><TT>class Pair&lt;T, U> { ... }</TT>
-
-<P><TT>&lt;Any T, Any U> Pair&lt;T, U> pair(T, U);</TT>
-<BR>&nbsp;
-<H2>
-Multiple dispatch</H2>
+&lt;<FONT COLOR="#b7860b">Any T</FONT>, <FONT COLOR="#b7860b">Any U</FONT>&gt; <FONT COLOR="#b7860b">Pair</FONT>&lt;<FONT COLOR="#b7860b">T</FONT>, <FONT COLOR="#b7860b">U</FONT>&gt; pair(<FONT COLOR="#b7860b">T</FONT>, <FONT COLOR="#b7860b">U</FONT>);</PRE>
+<br>&nbsp;
+<h2>
+Multiple dispatch</h2>
 In Nice, the choice of the method alternative is made at run-time, based
-on <B>all</B> parameters (in java, only the first, implicit parameter is
-used to choose the alternative).
-
-<P>Let's take the example of the equals method, that tests if any two objects
+on <b>all</b> parameters (in java, only the first, implicit parameter is
+used to choose the alternative). Such methods are thus called <b>multi-methods</b>.
+<p>Let's take the example of the equals method, that tests if any two objects
 are equal.
-<BR>&nbsp;
-<BR>&nbsp;
-<CENTER><TABLE BORDER WIDTH="85%" BGCOLOR="#CCCCCC" >
-<TR>
-<TD>
-<CENTER>Java</CENTER>
-</TD>
+<br>&nbsp;
+<br>&nbsp;
+<center><table BORDER WIDTH="85%" BGCOLOR="#CCCCCC" >
+<tr>
+<td>
+<center>Java</center>
+</td>
 
-<TD>
-<CENTER>Nice</CENTER>
-</TD>
-</TR>
+<td>
+<center>Nice</center>
+</td>
+</tr>
 
-<TR>
-<TD>
-<BLOCKQUOTE>
-<PRE>class Object
+<tr>
+<td>
+<blockquote>
+<pre>class Object
 {
 &nbsp; boolean equals(Object that)
 &nbsp; {
@@ -155,68 +154,73 @@ class Person extends Object&nbsp;
 
 &nbsp; boolean equals(Object that)
 &nbsp; {
-&nbsp;&nbsp;&nbsp; <FONT COLOR="#FF0000">if(!(that instanceof Person))
+&nbsp;&nbsp;&nbsp; <font color="#FF0000">if(!(that instanceof Person))
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; return false;
-</FONT>&nbsp;&nbsp;&nbsp; return 
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; name.equals((<FONT COLOR="#FF0000">(Person)</FONT> that).name)
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &amp;&amp; age==(<FONT COLOR="#FF0000">(Person)</FONT> that).age;
+</font>&nbsp;&nbsp;&nbsp; return&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; name.equals((<font color="#FF0000">(Person)</font> that).name)
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &amp;&amp; age==(<font color="#FF0000">(Person)</font> that).age;
 &nbsp; }
-}</PRE>
-</BLOCKQUOTE>
-</TD>
+}</pre>
+</blockquote>
+</td>
 
-<TD>
-<BLOCKQUOTE>
-<PRE>&lt;<FONT COLOR="#B7860B">Any</FONT> T> <FONT COLOR="#B7860B">boolean</FONT> <FONT COLOR="#CD0000">equals</FONT>(T, T);
+<td>
+<blockquote>
+<pre>&lt;<font color="#B7860B">Any</font> T> <font color="#B7860B">boolean</font> <font color="#CD0000">equals</font>(T, T);
 
-<FONT COLOR="#CD0000">equals</FONT>(o1, o2) = o1==o2;
+<font color="#CD0000">equals</font>(o1, o2) = o1==o2;
 
-<FONT COLOR="#0000EE">class</FONT> <FONT COLOR="#CD0000">Person
-</FONT>{
-&nbsp; <FONT COLOR="#B7860B">String</FONT> <FONT COLOR="#CD0000">name</FONT>;
-&nbsp; <FONT COLOR="#B7860B">int</FONT> <FONT COLOR="#CD0000">age</FONT>;
+<font color="#0000EE">class</font> <font color="#CD0000">Person
+</font>{
+&nbsp; <font color="#B7860B">String</font> <font color="#CD0000">name</font>;
+&nbsp; <font color="#B7860B">int</font> <font color="#CD0000">age</font>;
 }
 
-<FONT COLOR="#CD0000">equals</FONT>(p1<FONT COLOR="#0000EE">@</FONT><FONT COLOR="#B7860B">Person</FONT>, p2<FONT COLOR="#0000EE">@</FONT><FONT COLOR="#B7860B">Person</FONT>) =
+<font color="#CD0000">equals</font>(p1<font color="#0000EE">@</font><font color="#B7860B">Person</font>, p2<font color="#0000EE">@</font><font color="#B7860B">Person</font>) =
 &nbsp; p1.name.equals(p2.name) &amp;&amp;
-&nbsp; p1.age==p2.age;</PRE>
-</BLOCKQUOTE>
-</TD>
-</TR>
-</TABLE></CENTER>
-<P>
-In the Nice version, the last <TT>equals</TT> alternative will be executed
+&nbsp; p1.age==p2.age;</pre>
+</blockquote>
+</td>
+</tr>
+</table></center>
+
+<p>In the Nice version, the last <tt>equals</tt> alternative will be executed
 when both parameters are instance of class Person. So the type of the second
 argument is also known, and no manual instanceof and no cast are necessary
 (red parts of the java code). This job is sort of automatically done by
 the compiler for you. The code looks cleaner, is simpler to understand,
 and it is automatically guaranteed that no runtime exception will occur
 (this simple java code would not break either, but you have to think about
-it, and it becomes extremely difficult in large projects).
-<H2>
-Precise types</H2>
+it to get this confidence, and it becomes extremely difficult in large
+projects).
+<p>Another great advantage of multi-methods is that they offer an attractive
+alternative to the Visitor Pattern. <a href="visitor.html">This solution
+is presented in a full example</a>.
+<br>&nbsp;
+<h2>
+Precise types</h2>
 Java's type system is too simple to express many usefull types. For instance,
 let's suppose we want to declare the method map on Collections. Map applies
 a function to each element of the collection, and returns a new collection
 holding the results. That is:
-<BR>map(f, [e1, ..., en]) = [f(e1), ..., f(en)];
-<BR>&nbsp;
-<BR>&nbsp;
-<CENTER><TABLE BORDER WIDTH="85%" BGCOLOR="#CCCCCC" >
-<TR>
-<TD>
-<CENTER>Java</CENTER>
-</TD>
+<br>map(f, [e1, ..., en]) = [f(e1), ..., f(en)];
+<br>&nbsp;
+<br>&nbsp;
+<center><table BORDER WIDTH="85%" BGCOLOR="#CCCCCC" >
+<tr>
+<td>
+<center>Java</center>
+</td>
 
-<TD>
-<CENTER>Nice</CENTER>
-</TD>
-</TR>
+<td>
+<center>Nice</center>
+</td>
+</tr>
 
-<TR>
-<TD>
-<BLOCKQUOTE>
-<PRE>interface BoolFunction
+<tr>
+<td>
+<blockquote>
+<pre>interface BoolFunction
 {
 &nbsp; boolean apply(Object);
 }
@@ -234,62 +238,60 @@ void main(String[] args)
 &nbsp; List l1;
 &nbsp; BoolFunction f;
 &nbsp; ...
-&nbsp; List l2 = <FONT COLOR="#FF0000">(List)</FONT> l1.filter(f);
-}</PRE>
-</BLOCKQUOTE>
-</TD>
+&nbsp; List l2 = <font color="#FF0000">(List)</font> l1.filter(f);
+}</pre>
+</blockquote>
+</td>
 
-<TD>
-<BLOCKQUOTE>
-<PRE><FONT COLOR="#0000EE">interface</FONT> <FONT COLOR="#CD0000">Collection</FONT>&lt;T>
+<td>
+<blockquote>
+<pre><font color="#0000EE">interface</font> <font color="#CD0000">Collection</font>&lt;T>
 {
-&nbsp; <FONT COLOR="#0000EE">alike</FONT>&lt;T> <FONT COLOR="#CD0000">filter</FONT>(<FONT COLOR="#0000EE">fun</FONT>(T)(<FONT COLOR="#B7860B">boolean</FONT>) f);
+&nbsp; <font color="#0000EE">alike</font>&lt;T> <font color="#CD0000">filter</font>(<font color="#0000EE">fun</font>(T)(<font color="#B7860B">boolean</font>) f);
 }
 
-<FONT COLOR="#0000EE">interface</FONT> <FONT COLOR="#CD0000">List</FONT>&lt;T>
-<FONT COLOR="#0000EE">extends</FONT> <FONT COLOR="#B7860B">Collection</FONT>&lt;T>&nbsp;
+<font color="#0000EE">interface</font> <font color="#CD0000">List</font>&lt;T>
+<font color="#0000EE">extends</font> <font color="#B7860B">Collection</font>&lt;T>&nbsp;
 { ... }
 
-<FONT COLOR="#CD0000">main</FONT>(args)
+<font color="#CD0000">main</font>(args)
 {
-&nbsp; <FONT COLOR="#B7860B">List</FONT>&lt;<FONT COLOR="#B7860B">int</FONT>> <FONT COLOR="#CD0000">l1</FONT>;
-&nbsp; <FONT COLOR="#0000EE">fun</FONT>(<FONT COLOR="#B7860B">int</FONT>)(<FONT COLOR="#B7860B">boolean</FONT>) f;
+&nbsp; <font color="#B7860B">List</font>&lt;<font color="#B7860B">int</font>> <font color="#CD0000">l1</font>;
+&nbsp; <font color="#0000EE">fun</font>(<font color="#B7860B">int</font>)(<font color="#B7860B">boolean</font>) f;
 &nbsp; ...
-&nbsp; <FONT COLOR="#B7860B">List</FONT>&lt;<FONT COLOR="#B7860B">int</FONT>> <FONT COLOR="#CD0000">l2</FONT> = l1.filter(f);
-}</PRE>
-</BLOCKQUOTE>
-</TD>
-</TR>
-</TABLE></CENTER>
-<P>
-In the Nice version, the alike keyword is a type that means "the same type
-as the implicit receiver argument".
+&nbsp; <font color="#B7860B">List</font>&lt;<font color="#B7860B">int</font>> <font color="#CD0000">l2</font> = l1.filter(f);
+}</pre>
+</blockquote>
+</td>
+</tr>
+</table></center>
 
-<P>Note that there is not special treatment for the alike construct in
+<p>In the Nice version, the alike keyword is a type that means "the same
+type as the implicit receiver argument".
+<p>Note that there is not special treatment for the alike construct in
 the core type system. Alike is syntactic sugar for a more general concept:
 polymorphic constrained types.
-
-<P>The clone example might be more familiar to Java users. In Java, the
+<p>The clone example might be more familiar to Java users. In Java, the
 clone method, defined in class Object, has a Object return type. In fact,
 one would like to express that the clone method returns an object of the
 same type as its argument. This is possible in Nice, and it allows for
 cast-less use of clone.
-<BR>&nbsp;
-<CENTER><TABLE BORDER WIDTH="85%" BGCOLOR="#CCCCCC" >
-<TR>
-<TD>
-<CENTER>Java</CENTER>
-</TD>
+<br>&nbsp;
+<center><table BORDER WIDTH="85%" BGCOLOR="#CCCCCC" >
+<tr>
+<td>
+<center>Java</center>
+</td>
 
-<TD>
-<CENTER>Nice</CENTER>
-</TD>
-</TR>
+<td>
+<center>Nice</center>
+</td>
+</tr>
 
-<TR>
-<TD>
-<BLOCKQUOTE>
-<PRE>class Object
+<tr>
+<td>
+<blockquote>
+<pre>class Object
 {
 &nbsp; Object clone();
 &nbsp; ...
@@ -299,155 +301,145 @@ void main(String[] args)
 {
 &nbsp; java.util.Date d1;
 &nbsp; ...
-&nbsp; java.util.Date d2 = <FONT COLOR="#FF0000">(Date)</FONT> d1.clone();
-}</PRE>
-</BLOCKQUOTE>
-</TD>
+&nbsp; java.util.Date d2 = <font color="#FF0000">(Date)</font> d1.clone();
+}</pre>
+</blockquote>
+</td>
 
-<TD>
-<BLOCKQUOTE>
-<PRE>&lt;<FONT COLOR="#B7860B">Any</FONT> T> T <FONT COLOR="#CD0000">clone</FONT>(T);
+<td>
+<blockquote>
+<pre>&lt;<font color="#B7860B">Any</font> T> T <font color="#CD0000">clone</font>(T);
 
-<FONT COLOR="#CD0000">main</FONT>(args)
+<font color="#CD0000">main</font>(args)
 {
 &nbsp; java.util.Date d1;
 &nbsp; ...
 &nbsp; java.util.Date d2 = d1.clone();
-}</PRE>
-</BLOCKQUOTE>
-</TD>
-</TR>
-</TABLE></CENTER>
+}</pre>
+</blockquote>
+</td>
+</tr>
+</table></center>
 
-<H2>
-Instructions and expressions</H2>
-The code of a method alternative, that goes between <TT>{</TT> and <TT>}</TT>,
+<h2>
+Instructions and expressions</h2>
+The code of a method alternative, that goes between <tt>{</tt> and <tt>}</tt>,
 can be virtually any legal Java code.
-<BR>Here is a list of the differences:
-<CENTER></CENTER>
+<br>Here is a list of the differences:
+<center><b>Missing constructs</b></center>
 
-<CENTER><B>Missing constructs</B></CENTER>
-
-<UL>
-<LI>
-<B>No casts</B>. We claim that our powerfull type system makes it possible
+<ul>
+<li>
+<b>No casts</b>. We claim that our powerfull type system makes it possible
 to avoid nearly every cast used in other object-oriented languages (say
 95% of them!). For the 5% remaining, it is possible to write methods that
 do the same job, except you have to explicitely write what happends if
-the "cast" fails, which is a nice property.</LI>
+the "cast" fails, which is a nice property.</li>
 
-<LI>
-<B>Visibility modifiers</B> (<TT>public, private</TT>) are accepted for
+<li>
+<b>Visibility modifiers</b> (<tt>public, private</tt>) are accepted for
 class members, but are currently ignored. There is no theoretical problem
-to add visibility modifiers. This is future work to handle them.</LI>
-</UL>
+to add visibility modifiers. This is future work to handle them.</li>
+</ul>
 
-<CENTER><B>Additional constructs</B></CENTER>
+<center><b>Additional constructs</b></center>
 
-<UL>
-<LI>
-<B>Closures</B> (functions written inside expressions). The expression
-<TT>fun(T1 p1, T2 p2)=>e</TT> is the two parameters function that returns
-<TT>e</TT>. The return type of the function is computed, so you don't have
-to write it. Parameters <TT>p1</TT> and <TT>p2 </TT>can of course occur
-in <TT>e</TT>. Outside variables can also safely occur in e, in which case
-their <B>reference</B> is captured (not their value). An alternate syntax
-is <TT>fun(T1 p1, T2 p2)=>{ inst1; ...; instn; }</TT>. Every execution
-of the body should lead to a return statement. The return type of the function
-is the lowest common type of the returned expressions.</LI>
+<ul>
+<li>
+<b>Closures</b> (functions written inside expressions). The expression
+<tt>fun(T1
+p1, T2 p2)=>e</tt> is the two parameters function that returns
+<tt>e</tt>.
+The return type of the function is computed, so you don't have to write
+it. Parameters <tt>p1</tt> and <tt>p2 </tt>can of course occur in <tt>e</tt>.
+Outside variables can also safely occur in e, in which case their <b>reference</b>
+is captured (not their value). An alternate syntax is <tt>fun(T1 p1, T2
+p2)=>{ inst1; ...; instn; }</tt>. Every execution of the body should lead
+to a return statement. The return type of the function is the lowest common
+type of the returned expressions.</li>
 
-<LI>
-<B>Functional arguments</B>. A function or a method can have functional
-arguments. The concrete syntax for functional type <I>(T1, T2, ..., Tn)
--> T</I> is <TT>fun(T1, T2, ..., Tn)(T)</TT>.</LI>
+<li>
+<b>Functional arguments</b>. A function or a method can have functional
+arguments. The concrete syntax for functional type <i>(T1, T2, ..., Tn)
+-> T</i> is <tt>fun(T1, T2, ..., Tn)(T)</tt>.</li>
 
-<LI>
-<B>Functional-like syntax for method definitions</B>. One can write <TT>f(x@P)
-= e; </TT>as an equivalent form for <TT>f(x@p) { return e; }</TT>. This
+<li>
+<b>Functional-like syntax for method definitions</b>. One can write <tt>f(x@P)
+= e; </tt>as an equivalent form for <tt>f(x@p) { return e; }</tt>. This
 is very handy when defining methods that return simple values, depending
-on the type of the argument -- that is doing <I>pattern-matching</I>.</LI>
+on the type of the argument -- that is doing <i>pattern-matching</i>.</li>
 
-<LI>
-<B>Tuples</B>. Tuples allow for grouping several values in a single expression,
-without the pain of creating a specific class. For instance, <TT>("String",
-2*3, x.toString())</TT> is a tuple (a triplet in that case). It's type
-is written <TT>&lt;String, int, String></TT>. Tuple types are covariant,
-so a couple of <TT>int</TT> can be used where a couple of <TT>long</TT>
+<li>
+<b>Tuples</b>. Tuples allow for grouping several values in a single expression,
+without the pain of creating a specific class. For instance, <tt>("String",
+2*3, x.toString())</tt> is a tuple (a triplet in that case). It's type
+is written <tt>&lt;String, int, String></tt>. Tuple types are covariant,
+so a couple of <tt>int</tt> can be used where a couple of <tt>long</tt>
 is expected. A funny feature is that swapping two variables can be done
-without a temporary variable, using tuples: <TT>(x, y) = (y, x)</TT>.</LI>
+without a temporary variable, using tuples: <tt>(x, y) = (y, x)</tt>.</li>
 
-<LI>
-<B>Named and optional parameters</B>. If a method is declared with named
+<li>
+<b>Named and optional parameters</b>. If a method is declared with named
 parameters, it is possible to specify them at the call site, which makes
 it unnecessary to remember the order of the parameters, and makes the call
-clearer. For instance:</LI>
+clearer. For instance:</li>
 
-<BR><TT>void copy(File from, File to);</TT>
-<BR><TT>...</TT>
-<BR><TT>copy(from: f1, to: f2);</TT>
-<BR><TT>copy(to: f3, from: f4);</TT>
-
-<P>It is possible to omit the names at the call site, in which case the
+<br><tt>void copy(File from, File to);</tt>
+<br><tt>...</tt>
+<br><tt>copy(from: f1, to: f2);</tt>
+<br><tt>copy(to: f3, from: f4);</tt>
+<p>It is possible to omit the names at the call site, in which case the
 usual declaration order is used:
-<BR><TT>copy(f1, f2); // from f1 to f2</TT>
-
-<P>Additionally, named parameters can be given a default value, in which
+<br><tt>copy(f1, f2); // from f1 to f2</tt>
+<p>Additionally, named parameters can be given a default value, in which
 case their presence is optional at the call site.
+<p><tt>void copy(File from, File to, int bufferSize = 1000);</tt>
+<br><tt>...</tt>
+<br><tt>copy(from: f1, to: f2); // with a buffer size of 1000</tt>
+<br><tt>copy(from: f1, to: f2, bufferSize = 4000);</tt>
+<br>&nbsp;
+<br>&nbsp;</ul>
+</blockquote>
 
-<P><TT>void copy(File from, File to, int bufferSize = 1000);</TT>
-<BR><TT>...</TT>
-<BR><TT>copy(from: f1, to: f2); // with a buffer size of 1000</TT>
-<BR><TT>copy(from: f1, to: f2, bufferSize = 4000);</TT>
-<BR>&nbsp;
-<BR>&nbsp;</UL>
-</BLOCKQUOTE>
-
-<BLOCKQUOTE>
-<H2>
-Interfacing with Java</H2>
+<blockquote>
+<h2>
+Interfacing with Java</h2>
 It is possible to use java classes and methods from Nice programs. This
 is a great advantage, since it gives access to the gigantic and evergrowing
 set of Java libraries.
-
-<P>One can just use java classes in types, and call java methods in Nice
+<p>One can just use java classes in types, and call java methods in Nice
 code. It is not necessary to explicitely import classes or methods. An
 import statement can be used if one does not want to reapeat a package
 name.
-
-<P><TT>import java.io.*;</TT>
-
-<P><TT>{</TT>
-<BR><TT>&nbsp; String s;</TT>
-<BR><TT>&nbsp; ...</TT>
-<BR><TT>&nbsp; java.io.Writer w = new FileWriter(s);</TT>
-<BR><TT>&nbsp; w.write("Hello world");</TT>
-<BR><TT>&nbsp; w.close();</TT>
-<BR><TT>}</TT>
-<BR>&nbsp;
-
-<P>However, one might want to explicitely import methods to give them a
+<p><tt>import java.io.*;</tt>
+<p><tt>{</tt>
+<br><tt>&nbsp; String s;</tt>
+<br><tt>&nbsp; ...</tt>
+<br><tt>&nbsp; java.io.Writer w = new FileWriter(s);</tt>
+<br><tt>&nbsp; w.write("Hello world");</tt>
+<br><tt>&nbsp; w.close();</tt>
+<br><tt>}</tt>
+<br>&nbsp;
+<p>However, one might want to explicitely import methods to give them a
 more precise type (to benefit from parametric types for instance). Here
-is a more sophisticated example for the <TT>java.util.Map</TT> interface:
-
-<P><TT>interface Map&lt;Key,Element> = native java.util.Map;</TT>
-
-<P><TT>&lt;Any Key, Any Element> Element get(Map&lt;Key,Element>, Key)
-=</TT>
-<BR><TT>&nbsp; native Object java.util.Map.get(Object);</TT>
-<BR>&nbsp;
-
-<P>Calling Nice code from Java is also possible, but is not so straightforward
+is a more sophisticated example for the <tt>java.util.Map</tt> interface:
+<p><tt>interface Map&lt;Key,Element> = native java.util.Map;</tt>
+<p><tt>&lt;Any Key, Any Element> Element get(Map&lt;Key,Element>, Key)
+=</tt>
+<br><tt>&nbsp; native Object java.util.Map.get(Object);</tt>
+<br>&nbsp;
+<p>Calling Nice code from Java is also possible, but is not so straightforward
 because the generated methods get mangled names, and because of the different
 dispatch mecanism. This could be worked on if necessary.
-<BR>&nbsp;
-<H2>
-<FONT COLOR="#000000">What else?</FONT></H2>
-<FONT COLOR="#000000">Many features are missing in this tutorial: abstract
-interfaces, general constraints, final implementation, ...</FONT>
-<H2>
-<FONT COLOR="#000000">General information about Nice : the <A HREF="index.html">Nice
-home page</A></FONT></H2>
-&nbsp;</BLOCKQUOTE>
+<br>&nbsp;
+<h2>
+<font color="#000000">What else?</font></h2>
+<font color="#000000">Many features are missing in this tutorial: abstract
+interfaces, general constraints, final implementation, ...</font>
+<h2>
+<font color="#000000">General information about Nice : the <a href="index.html">Nice
+home page</a></font></h2>
+&nbsp;</blockquote>
 
-</BODY>
-</HTML>
+</body>
+</html>

@@ -32,8 +32,7 @@ int testMethod(double testvar) {
  *Comment
  */
 class HTMLWriter {
-  //mainPackage = mainPackage.deleteAtEnd("/").replace('/', ".");
-  
+    
   /**
    * Default implementation - does nothing
    * @param d a definition to document
@@ -58,6 +57,8 @@ class HTMLWriter {
     //that is, nice.lang.Maybe -> Maybe
     //this should also work when "." is not found
     fileName = fileName.substring(fileName.lastIndexOf(".") + 1);
+    //escape any characters that might be illegal for the filesystem
+    fileName = escapeFilename(fileName);
     BufferedWriter writer = new BufferedWriter
       (new FileWriter(new File(dir, fileName + ".html")));
     
@@ -138,7 +139,7 @@ class HTMLWriter {
     }
     
     BufferedWriter writer = new BufferedWriter
-      (new FileWriter(new File(dir, "gv_" gv.getName() ".html")));
+      (new FileWriter(new File(dir, "gv_" escapeFilename("" gv.getName()) ".html")));
     
     writer.write(getHeader(gv.getName().toString()));
   
@@ -169,7 +170,7 @@ class HTMLWriter {
     }
     
     BufferedWriter writer = new BufferedWriter
-      (new FileWriter(new File(dir, calculateMethodFilename(m))));
+      (new FileWriter(new File(dir, escapeFilename(getMethodFilename(m)) + ".html")));
     
     writer.write(getHeader(m.getName().toString()));
   
@@ -236,7 +237,7 @@ class HTMLWriter {
             int index = s.lastIndexOf('.');
             if(index != s.length()-1)
                 s = s.substring(index+1);
-            writer.write("<li><a href='" + s + ".html'>" + s + "</a></li>\n");
+            writer.write("<li><a href='" + escapeFilename(s) + ".html'>" + s + "</a></li>\n");
         }
         writer.write("</ul>\n");
       }
@@ -246,7 +247,7 @@ class HTMLWriter {
         writer.write("<b>Methods:</b>\n");
         writer.write("<ul>\n");
         for(MethodDeclaration m : methods) {
-            writer.write("<li><a href='" calculateMethodFilename(m) "'>" m.getName() "</a>" +
+            writer.write("<li><a href='" escapeFilename(getMethodFilename(m)) ".html'>" m.getName() "</a>" +
                    ": " m.getType() "</li>\n");
         }
         writer.write("</ul>\n");
@@ -257,7 +258,7 @@ class HTMLWriter {
         writer.write("<b>Global Variables:</b>\n");
         writer.write("<ul>\n");
         for(GlobalVarDeclaration gv : globalVars) {
-            writer.write("<li><a href='gv_" gv.getName() ".html'>" gv.getName() "</a></li>\n");
+            writer.write("<li><a href='gv_" escapeFilename("" gv.getName()) ".html'>" gv.getName() "</a></li>\n");
         }
         writer.write("</ul>\n");
       }
@@ -381,8 +382,31 @@ String getFooter() {
 /** Methods can be overloaded - we can't just use the method name as a file name.
  * This method returns a file name based upon the method name and its arguments.
  */
-String calculateMethodFilename(MethodDeclaration md) {
-    String filename = md.getName().toString() + md.getType().toString().hashCode();
-    filename = filename.replace('/', "@slash").replace('.', "@dot");
-    return filename + ".html";
+String getMethodFilename(MethodDeclaration md) {
+     return md.getName().toString() + md.getType().toString().hashCode();
+}
+
+/**
+ * Checks a filename to make sure it doesn't contain funny characters.
+ */
+String escapeFilename(String filename) {
+    char[] chars = filename.toCharArray();
+    StringBuffer buf = new StringBuffer();
+    for(char c : chars) {
+        if(!Character.isLetterOrDigit(c)) {
+            buf.append('$');
+            buf.append(hexEncode(int(c)));
+        }
+        else {
+            buf.append(c);
+        }
+    }
+    return buf.toString();
+}
+
+String hexEncode(int i) {
+    String num = Integer.toHexString(i);
+    for(int pad = num.length(); pad < 4; pad++)
+        num = "0" + num;
+    return num.toUpperCase();
 }

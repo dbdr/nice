@@ -140,6 +140,15 @@ public class Gen
     return res;
   }
 
+  public static ConstructorExp createCustomConstructor
+    (ClassType classType, Type[] argTypes, MonoSymbol[] args)
+  {
+    ConstructorExp res = new ConstructorExp(classType);
+    createMethod(res, "<init>", argTypes, Type.void_type, args, 
+                 true, false, true);
+    return res;
+  }
+
   /**
      Create a lambda expression to generate code for the method.
 

@@ -15,6 +15,9 @@ package bossa.syntax;
 import bossa.util.*;
 import java.util.*;
 import mlsub.typing.*;
+import gnu.expr.*;
+import gnu.bytecode.ClassType;
+import nice.tools.code.Gen;
 
 /**
    A user defined constructor.
@@ -51,10 +54,23 @@ public class CustomConstructor extends UserOperator
 
   protected gnu.expr.Expression computeCode()
   {
-    return gnu.expr.QuoteExp.nullExp;
+    if (classe.definition.inInterfaceFile())
+      {
+        return new QuoteExp(classe.getClassExp().getClassType().getDeclaredMethod
+          ("<init>", javaArgTypes()));
+      }
+
+    ConstructorExp lambda = Gen.createCustomConstructor
+      ((ClassType) javaReturnType(), javaArgTypes(), parameters.getMonoSymbols());
+
+    Gen.setMethodBody(lambda, body.generateCode());
+    classe.getClassExp().addMethod(lambda);
+
+    return lambda;
   }
 
   LocatedString className;
   Block body;
   TypeConstructor classTC;
+  NiceClass classe;
 }

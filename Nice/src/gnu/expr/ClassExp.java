@@ -300,6 +300,8 @@ public class ClassExp extends LambdaExp
 		  flags |= Access.TRANSIENT;
 		if (decl.getFlag(Declaration.VOLATILE))
 		  flags |= Access.VOLATILE;
+                if (decl.getFlag(Declaration.IS_CONSTANT))
+                  flags |= Access.FINAL;
 		String fname
 		  = Compilation.mangleNameIfNeeded(decl.getName());
 		decl.field

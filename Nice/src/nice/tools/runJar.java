@@ -59,48 +59,52 @@ public class runJar
 	System.exit(2);
       }
     
+    Class main = null;
     try{
-      Class main = Class.forName(mainClass);
-      try{
-	Class[] sv = new Class[1];
-	sv[0] = args.getClass(); // ie String[]
-	Method mainMethod = main.getMethod("main", sv);
-	String[] newArgs = new String[args.length-1];
-	System.arraycopy(args, 1, newArgs, 0, newArgs.length);
-	try{
-	  mainMethod.invoke(null, new Object[]{newArgs});
-	}
-	catch(IllegalAccessException e){
-	  System.err.println(e.toString());
-	}
-	catch(java.lang.reflect.InvocationTargetException e){
-	  try{
-	    throw e.getTargetException();
-	  }
-	  catch(NoClassDefFoundError ex){
-	    System.err.println("nicer: Class "+
-			       ex.getMessage().replace('/','.')+
-			       " not found"+
-			       "\nInstall the adequate package in your CLASSPATH");
-	    System.exit(1);
-	  }
-	  catch(Throwable ex){
-	    System.err.println("Uncaught exception: " + e);
-	    ex.printStackTrace();
-	    System.exit(1);
-	  }
-	}
-      }
-      catch(NoSuchMethodException e){
-	System.err.println(mainClass+" has no main method");
-	System.exit(1);
-      }
-      
+      main = Class.forName(mainClass);
     }
     catch(ClassNotFoundException e){
       System.err.println(jar+" indicates "+mainClass+
 			 " as its main class, but no such class was found");
       System.exit(1);
+    }
+
+    Class[] sv = new Class[1];
+    sv[0] = args.getClass(); // ie String[]
+
+    Method mainMethod = null;
+    try{
+      mainMethod = main.getMethod("main", sv);
+    }
+    catch(NoSuchMethodException e){
+      System.err.println(mainClass+" has no main method");
+      System.exit(1);
+    } 
+     
+    String[] newArgs = new String[args.length-1];
+    System.arraycopy(args, 1, newArgs, 0, newArgs.length);
+    try{
+      mainMethod.invoke(null, new Object[]{newArgs});
+    }
+    catch(IllegalAccessException e){
+      System.err.println(e.toString());
+    }
+    catch(java.lang.reflect.InvocationTargetException e){
+      try{
+	throw e.getTargetException();
+      }
+      catch(NoClassDefFoundError ex){
+	System.err.println("nicer: Class "+
+			   ex.getMessage().replace('/','.')+
+			   " not found"+
+			   "\nInstall the adequate package in your CLASSPATH");
+	System.exit(1);
+      }
+      catch(Throwable ex){
+	System.err.println("Uncaught exception: ");
+	ex.printStackTrace();
+	System.exit(1);
+      }
     }
   }
 }

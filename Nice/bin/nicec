@@ -82,8 +82,6 @@ while true; do
 	NICE=${NICE_DEVEL-${HOME}/Nice/classes:${HOME}/Nice/stdlib:${HOME}/Nice/src:${HOME}/Nice/src/nice/tools/.compiler.jar}
 	NICEJAR=${HOME}/Nice/stdlib
 	doTest=false;;
-    x-eold)
-	JARNAME=Nice0.jar;;
     *) break;;
     esac
   shift

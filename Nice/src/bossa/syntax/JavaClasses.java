@@ -126,8 +126,7 @@ public final class JavaClasses
       // to assert it. It doesn't matter, as this type is not used
       // explicitely.
       {
-	//System.out.println(className + " added late");
-	//Internal.printStackTrace();
+	Internal.warning(className + " added late");
 	
 	res.setKind(Variance.empty().getConstraint());
 	return res;
@@ -232,6 +231,10 @@ public final class JavaClasses
     return c.getMethod(m.getName(), m.getParameterTypes())!=null;
   }
   
+  /**
+     Assume that native classes have a 0 arity
+     unless it was asserted otherwise.
+  */
   public static void createContext()
   {
     for(Iterator i = javaTypeConstructors.iterator(); i.hasNext();)

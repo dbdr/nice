@@ -20,6 +20,8 @@ package nice.lang;
 
 import java.io.*;
 
+let boolean rawTraces = "true".equals(System.getProperty("nice.raw-traces"));
+
 public <!T, R> R call__(T obj, String methodName)
 {
   let method = obj.getClass().getMethod(methodName, null);
@@ -43,6 +45,12 @@ public void printStackTraceWithSourceInfo(Throwable t, PrintWriter w) =
 public void printStackTraceWithSourceInfo(Throwable t, PrintWriter w,
 					  ?ClassLoader loader)
 {
+  if (rawTraces)
+    {
+      t.printStackTrace(w);
+      return;
+    }
+
   w.println("Exception in thread \"" Thread.currentThread().getName "\" " t);
   try {
     let getSTMethod = t.getClass().getMethod("getStackTrace", null);

@@ -44,6 +44,42 @@ ConstantExp createNullExp(bossa.util.Location loc)
   return res;
 }
 
+class BooleanConstantExp extends ConstantExp
+{
+  private gnu.expr.QuoteExp compiledValue;
+
+  isFalse() = compiledValue == gnu.expr.QuoteExp.falseExp;
+  isTrue() = compiledValue == gnu.expr.QuoteExp.trueExp;
+
+  compile() = compiledValue;
+}
+
+public ConstantExp createBooleanConstant(boolean value, Location location)
+{
+  return new BooleanConstantExp(nice.tools.typing.PrimitiveType.boolTC,
+	value, value ? "true" : "false", location,
+	compiledValue: notNull(value ? gnu.expr.QuoteExp.trueExp : gnu.expr.QuoteExp.falseExp));
+}
+
+class CharConstantExp extends ConstantExp
+{
+  longValue()
+  {
+    Character val = cast(this.value);
+    return int(val.charValue());
+  } 
+}
+
+public ConstantExp createCharConstant(LocatedString value)
+{
+  let s = unescapeLiteral(value.toString());
+  if (s.length() != 1)
+    User.error(value, "Invalid character constant: " + value);
+
+  return new CharConstantExp(nice.tools.typing.PrimitiveType.charTC,
+	s[0], "'" + s + "'", value.location());
+}
+
 /**
    The void constant.
 

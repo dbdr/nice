@@ -1605,8 +1605,8 @@ ConstantExp nullConstantExp():
 ConstantExp booleanConstantExp():
 { Token t; }
 {
-  t = "true"  { return ConstantExp.makeBoolean(true,  makeLocation(t)); }
-| t = "false" { return ConstantExp.makeBoolean(false, makeLocation(t)); }
+  t = "true"  { return bossa.syntax.dispatch.createBooleanConstant(true,  makeLocation(t)); }
+| t = "false" { return bossa.syntax.dispatch.createBooleanConstant(false, makeLocation(t)); }
 }
 
 ConstantExp intConstantExp():
@@ -1637,7 +1637,7 @@ ConstantExp charConstantExp():
 { Token t; }
 {
   t = <CHARACTER_LITERAL> 
-  { return ConstantExp.makeChar
+  { return bossa.syntax.dispatch.createCharConstant
       (new LocatedString(t.image.substring(1, t.image.length() - 1),
 			 makeLocation(t)));
   }

@@ -67,7 +67,7 @@ public class ConstantExp extends Expression
  
   public boolean isNumber()
   {
-    return this.value instanceof Number && !(this.value instanceof Character);
+    return this.value instanceof Number;
   }
 
   void computeType()
@@ -103,53 +103,6 @@ public class ConstantExp extends Expression
   /****************************************************************
    * Creating constant expressions for the parser
    ****************************************************************/
-
-  public static ConstantExp makeChar(LocatedString value)
-  {
-    String s = value.toString();
-    char c;
-
-  findChar:
-    if (s.length() != 0 && s.charAt(0) == '\\')
-      // \ escape sequence. See JLS 3.10.6
-      {
-	if (s.length() == 2)
-	  {
-	    char c2 = s.charAt(1);
-	    switch(c2)
-	      {
-	      case 'b' : c = '\b'; break findChar;
-	      case 't' : c = '\t'; break findChar;
-	      case 'n' : c = '\n'; break findChar;
-	      case 'f' : c = '\f'; break findChar;
-	      case 'r' : c = '\r'; break findChar;
-	      case '\"': c = '\"'; break findChar;
-	      case '\'': c = '\''; break findChar;
-	      case '\\': c = '\\'; break findChar;
-	      }
-	  }
-
-	try{
-	  int code = Integer.parseInt(s.substring(1), 8);
-	  if(code<0 || code>255)
-	    throw new NumberFormatException();
-	  c = (char) code;
-	}
-	catch(NumberFormatException e){
-	  throw User.error(value, "Invalid escape sequence: " + value);
-	}
-      }
-    else
-      {
-	if(s.length()!=1)
-	  User.error(value, "Invalid character constant: " + value);
-
-	c = s.charAt(0);
-      }
-  
-    return new ConstantExp(PrimitiveType.charTC, new Character(c), 
-			   "'" + s + "'", value.location());
-  }
 
   private static ConstantExp makeInt(long value, boolean isLong, 
 				    Location location)
@@ -284,60 +237,13 @@ public class ConstantExp extends Expression
 				representation.location());
   }
   
-  /****************************************************************
-   * Booleans
-   ****************************************************************/
-
-  public static ConstantExp makeBoolean(boolean value, Location location)
-  {
-    return new ConstantExp.Boolean(value, location);
-  }
-
-  private static class Boolean extends ConstantExp
-  {
-    Boolean(boolean value, Location location)
-    {
-      super(PrimitiveType.boolTC, value ? "true" : "false", location);
-      compiledValue = value ? QuoteExp.trueExp : QuoteExp.falseExp;
-    }
-
-    boolean isFalse()
-    {
-      return compiledValue == QuoteExp.falseExp;
-    }
-
-    boolean isTrue()
-    {
-      return compiledValue == QuoteExp.trueExp;
-    }
-
-    protected gnu.expr.Expression compile()
-    {
-      return compiledValue;
-    }
-
-    public boolean equals(Object other)
-    {
-      return other instanceof ConstantExp.Boolean &&
-	(isTrue() == ((ConstantExp.Boolean)other).isTrue());
-    }
-
-    private QuoteExp compiledValue;
-  }
-
   public long longValue()
   {
-    if (value instanceof Character)
-      return ((Character)value).charValue();
-
     return ((Number)value).longValue();
   }
 
   public boolean equals(Object other)
   {
-    if (other instanceof ConstantExp.Boolean)
-      return false;
-
     return other instanceof ConstantExp &&
 	value.equals(((ConstantExp)other).value);
   }

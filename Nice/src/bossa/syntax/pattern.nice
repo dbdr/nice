@@ -149,8 +149,8 @@ public class BoolPattern extends ValuePattern
 {
   addValues(values)
   {
-    values.add(ConstantExp.makeBoolean(true, this.location));
-    values.add(ConstantExp.makeBoolean(false, this.location));
+    values.add(createBooleanConstant(true, this.location));
+    values.add(createBooleanConstant(false, this.location));
   }
 
   atTypeMatchingValue() = true;
@@ -597,8 +597,8 @@ public ?Pattern readPattern(String rep, int[]/*ref*/ pos)
   if (name.length() > 1)
     {
       if (name[0] == '\'')
-	return createPattern(new ConstantExp(nice.tools.typing.PrimitiveType.charTC,
-		new Character(name[1]), name, loc));
+	return createPattern(new CharConstantExp(nice.tools.typing.PrimitiveType.charTC,
+		name[1], name, loc));
 
       if (name[0] == '-')
         return createPattern(ConstantExp.makeNumber(new LocatedString(name)));
@@ -631,7 +631,7 @@ public ?Pattern readPattern(String rep, int[]/*ref*/ pos)
     return createPattern(createNullExp(loc));
 
   if (name.equals("true") || name.equals("false") ) 
-    return createPattern(ConstantExp.makeBoolean(name.equals("true"), loc));
+    return createPattern(createBooleanConstant(name.equals("true"), loc));
 
   ?TypeSymbol sym = Node.getGlobalTypeScope().lookup(name);
 

@@ -182,7 +182,7 @@ class StackImpl<T> {
   /// package b import a
 {}
 
-/// PASS bug
+/// PASS
   int x = new B().getFoo();
   /// Toplevel
 class A

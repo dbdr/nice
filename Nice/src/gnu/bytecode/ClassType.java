@@ -737,10 +737,13 @@ public class ClassType extends ObjectType implements AttrContainer {
   Method refineMethod (Method method)
   {
     Method res = getMethod(method.getName(), method.arg_types);
-    if (res == method)
+
+    if (res == method || res == null ||
+        // A method with a non-subtype return type is not a refinement
+        ! res.getReturnType().isSubtype(method.getReturnType()))
       return null;
-    else
-      return res;
+
+    return res;
   }
 
   /** Do various fixups after generating code but before we can write it out.

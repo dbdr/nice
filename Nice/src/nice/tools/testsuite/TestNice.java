@@ -239,8 +239,6 @@ public class TestNice {
 
 		if (getTestCasesWarning() > 0)
 			System.exit(2);
-
-		System.exit(0);
 	}
 
 	private static void reclaimMemory(boolean clear)

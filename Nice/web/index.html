@@ -25,16 +25,18 @@ type system</a> can be used in practice.
 <br><font face="Comic Sans MS">Nice</font> is an object-oriented language,
 with parametric, polymorphic types, higher-order functions, and more. It
 combines the advantages of object-orientation and functional programming.
-<p>Using Java libraries within Nice programs is straightforward. The Nice
-compiler produces java bytecode, which means Nice programs can be executed
-on virtually any platform, with any Java Virtual Machine. The compiler
-is itself written in Java (and partly in Nice). <font color="#FF0000">The
-compiler needs a 1.2 or higher JVM to run</font>.
+<p>The current implementation is tightly integrated with the Java environment,
+which offers several advantages. Using Java libraries within Nice programs
+is straightforward. The Nice compiler produces java bytecode, which means
+Nice programs can be executed on virtually any platform, with any Java
+Virtual Machine. The compiler is itself written in Java (and partly in
+Nice). <font color="#FF0000">The compiler needs a 1.2 or higher JVM to
+run (Java 2)</font>.
 <br>&nbsp;
 <h2>
 &nbsp;&nbsp;&nbsp; The language</h2>
-<p>This short <b><a href="language.html">tutorial</a></b> should help
-you to start with the language, but it's not complete in any way.
+This short <b><a href="language.html">tutorial</a></b> should help you
+to start with the language, but it's not complete in any way.
 <p>There is no real manual for the moment. You can find information about
 the rationale of the language in my <a href="DEA.ps">graduation report</a>.
 <p>Having a look at the <a href="collections.nice">collection.nice</a>
@@ -45,41 +47,16 @@ file can help you discover features not presented in the <a href="language.html"
 The <font face="Comic Sans MS">Nice</font> compiler is freely available
 (a source release is planned) on the <a href="install.html">installation
 page</a>.
+<br>&nbsp;
 <h2>
-&nbsp;&nbsp;&nbsp; Compiling instructions</h2>
-<font face="Comic Sans MS">Nice</font> source files are grouped by <i>packages</i>.
-You don't compile files, you compile packages.
-<br>Each package resides in a separate directory.
-<br>I suggest you create a root directory for your nice packages:
-<br><tt>cd</tt>
-<br><tt>mkdir nice</tt>
-<p>Each time you begin writing a new package, just create a directory for
-it.
-<br>For instance, for package <tt>my.package:</tt>
-<br><tt>cd ~/nice</tt>
-<br><tt>mkdir -p my/package</tt>
-<p>Then you put all the <font face="Comic Sans MS">Nice</font> source files,
-with <tt>.nice</tt> extension, in that directory. The names of the files
-have no importance (for the compiler, but they should be meaningful to
-you of course).
-<br>To compile your new package:
-<br><tt>cd ~/nice</tt>
-<br><tt>nicec my.package</tt>
-<p>To get a list of the compiler's command line options, use:
-<br><tt>nicec --help </tt>or <tt>nicec -h</tt> (GNU style options are used,
-thanks to package <tt>nice.opt</tt>).
-<p>If your package has a <tt>main(args) </tt>method (args has type<i> </i><tt>Array&lt;String></tt>),
-then it is executable, and the compilation will create a jar file, which
-can be executed with
-<br><tt>nicer my/package.jar</tt>
-<p>All imported packages are found automatically, and recompiled if necessary.
-<br>Nice enjoys separate compilation.
+&nbsp;&nbsp;&nbsp; Compilation instructions</h2>
+The <a href="compilation.html">compilation instructions</a> detail how
+to structure your programs, compile and run them.
 <br>&nbsp;
 <h2>
 <font color="#000000">&nbsp;&nbsp;&nbsp; Contact</font></h2>
 <font color="#000000">Feel free to contact <a href="mailto:d.bonniot@mail.dotcom.fr">Daniel
-Bonniot</a> for any question, any request or to offer help!</font>
-<br><font color="#000000"></font>&nbsp;</blockquote>
+Bonniot</a> for any question, any request or to offer help!</font></blockquote>
 
 </body>
 </html>

@@ -120,6 +120,7 @@ test_collection_arrays(a)
   ?String[] ss2 = filter(ss, fun(?String s)=>s!=null);
   p(ss2);
   p(map(ss2, fun(?String s)=>{ String str = notNull(s); return str + str; }));
+  iter(id(ss), fun(?String s)=>{});
 
   // using an array that is the field of an object
   Fields f = new Fields();
@@ -166,6 +167,10 @@ void test_literal_arrays()
 // We test how functions on polymorphic arrays deal with native type components
 <Any T> T getFirst(T[] a) = a[0];
 
+// Use a polymorphic array as a collection after losing its type
+// because of bytecode types' monomorphicity.
+<Any T> void polyArrayAsCollection(T[] a) { a = id(a).map(id); }
+
 void test_polymorphism()
 {
   // polymorphic array field
@@ -195,6 +200,8 @@ void test_polymorphism()
   int iii = getFirst(getFirst(ddim));
 
   println("Polymorphic arrays: " + bb + ss + ii + ll + ff + dd + SS + iii);
+
+  polyArrayAsCollection(S);
 
   // empty array
   // can be written with or without space inside the brackets
@@ -229,4 +236,3 @@ void test_null_arrays()
 
 // Using array -> Collection implicit conversion in the returned value
 <Any T> Collection<T> wrap(T x) = [ x ];
-

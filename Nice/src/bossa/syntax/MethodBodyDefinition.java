@@ -330,6 +330,44 @@ public class MethodBodyDefinition extends MethodImplementation
     catch(TypeScope.DuplicateName e) {
       User.error(this, e);
     }
+
+    removeUnnecessaryDispatch();
+  }
+
+  private void removeUnnecessaryDispatch()
+  {
+    boolean entered = false;
+
+    if (Constraint.hasBinders(declaration.getType().getConstraint()))
+      {
+        Typing.enter();
+        entered = true;
+      }
+
+    try {
+      try {
+        Constraint.enter(declaration.getType().getConstraint());
+        Typing.implies();
+
+        Monotype[] domain = declaration.getType().domain();
+        for (int n = 0; n < formals.length; n++)
+          {
+            TypeConstructor tc = Types.rawType(domain[n]).head();
+
+            if (formals[n].tc != null)
+              formals[n].setDomainEq(tc != null &&
+                                     Types.isSure(domain[n]) && 
+                                     Typing.testLeq(tc, formals[n].tc));
+          }
+      }
+      finally {
+        if (entered)
+          Typing.leave();
+      }
+    }
+    catch(TypingEx ex) {
+      Internal.warning(ex.toString());
+    }
   }
 
   /****************************************************************
@@ -409,14 +447,6 @@ public class MethodBodyDefinition extends MethodImplementation
 	catch(TypingEx e) {
 	  throw User.error(name, "Type error in method body \""+name+"\":\n"+e);
 	}
-
-	for(int n = 0; n < formals.length; n++)
-	{
-	  TypeConstructor tc = Types.rawType(domain[n]).head();
-	  if (tc != null && formals[n].tc != null)
-	    formals[n].setDomainEq(Types.isSure(domain[n]) && Typing.testRigidLeq(tc, formals[n].tc));
-
-        }
 
 	Node.currentFunction = this;
 	if (hasThis())

@@ -353,6 +353,21 @@ public final class Typing
     }
   }
   
+  public static boolean testLeq(TypeConstructor t1, TypeConstructor t2)
+  {
+    if(t1.getKind() == null 
+       || t2.getKind() == null)
+      throw new InternalError("Null kind for "+t1+" or "+t2);
+    
+    try{
+      Engine.leq(t1,t2,false);
+      return true;
+    }
+    catch(Unsatisfiable e){
+      return false;
+    }
+  }
+  
   /****************************************************************
    * Domains 
    ****************************************************************/

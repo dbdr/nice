@@ -403,8 +403,7 @@ public class MethodBodyDefinition extends Definition
 	}
 
       Node.currentFunction = this;
-      if (declaration.formalParameters() != null &&
-	  declaration.formalParameters().hasThis())
+      if (declaration.hasThis())
 	Node.thisExp = new SymbolExp(parameters[0], location());
 
       try{

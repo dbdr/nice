@@ -143,6 +143,11 @@ public class JavaMethod extends MethodDeclaration
     return res;
   }
   
+  boolean hasThis()
+  {
+    return true;
+  }
+
   /** The java class this method is defined in */
   LocatedString className;
 

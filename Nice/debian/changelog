@@ -1,8 +1,9 @@
 nice (0.7.3) unstable; urgency=low
 
   * Fixed implicit access to fields of the current class in ambiguous
-    situations.
-  * Improved compilation speed, especially for programs using many classes.
+    situations, and when overriding nitive methods.
+  * Improved compilation speed, especially for programs using many classes
+    (up to 2x faster).
 
  --
 

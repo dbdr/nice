@@ -111,6 +111,12 @@ abstract public class MethodDeclaration extends Definition
     return type.codomain();
   }
   
+  boolean hasThis()
+  {
+    return formalParameters() != null &&
+      formalParameters().hasThis();
+  }
+
   /****************************************************************
    * Typechecking
    ****************************************************************/

@@ -38,6 +38,14 @@ class A
   getX() = x;
 }
 
+/// PASS
+  /// Toplevel
+class A
+{
+  int x;
+  toString() = "" + x;
+}
+
 /// FAIL
   /// Toplevel
 class A

@@ -11,8 +11,9 @@
 /**************************************************************************/
 
 // File    : Internal.java
+// $Author$
 // Created : Wed Jul 07 18:23:19 1999 by bonniot
-//$Modified: Fri Jul 09 21:24:26 1999 by bonniot $
+//$Modified: Fri Jul 09 22:16:29 1999 by bonniot $
 // Description : Internal errors...
 
 package bossa.util;

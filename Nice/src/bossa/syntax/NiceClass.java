@@ -213,11 +213,14 @@ public class NiceClass extends ClassDefinition.ClassImplementation
       method.fieldDecl.setFlag(isTransient, gnu.expr.Declaration.TRANSIENT);
       method.fieldDecl.setFlag(isVolatile , gnu.expr.Declaration.VOLATILE);
 
-      String fname = sym.getName().toString();
-      String suffix = Character.toUpperCase(fname.charAt(0)) + fname.substring(1);
-      createGetter(suffix);
-      if (!isFinal)
-        createSetter(suffix);
+      if (! definition.inInterfaceFile())
+        {
+          String fname = sym.getName().toString();
+          String suffix = Character.toUpperCase(fname.charAt(0)) + fname.substring(1);
+          createGetter(suffix);
+          if (!isFinal)
+            createSetter(suffix);
+        }
     }
  
     void createGetter(String nameSuffix)

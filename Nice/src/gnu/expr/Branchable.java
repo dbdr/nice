@@ -14,15 +14,4 @@ public interface Branchable extends Inlineable
   */
   public void compileJumpNot (Compilation comp, Expression[] args, Label to);
 
-  /** 
-      Creates an 'if' of the expression
-  */
-  public void compileIf (Compilation comp, Expression[] args);
-
-  /** 
-      Creates an 'if not' of the expression
-  */
-  public void compileIfNot (Compilation comp, Expression[] args);
-
-
 }

@@ -40,14 +40,17 @@ public class BoolNotOp extends Procedure1 implements Inlineable, Branchable
     CodeAttr code = comp.getCode();
     Target stack = new StackTarget(Type.boolean_type);
     Branchable branchOp = args[0].getBranchable();
+    Label _else = new Label(code);
+    Label _end = new Label(code);
 
     if (branchOp != null)
     {
-      branchOp.compileIfNot(comp, ((ApplyExp)args[0]).getArgs());
+      branchOp.compileJump(comp, ((ApplyExp)args[0]).getArgs(), _else);
       code.emitPushBoolean(true);
-      code.emitElse();
+      code.emitGoto(_end);
+      _else.define(code);
       code.emitPushBoolean(false);
-      code.emitFi();
+      _end.define(code);
     }
     else
     {
@@ -89,41 +92,6 @@ public class BoolNotOp extends Procedure1 implements Inlineable, Branchable
     {
       args[0].compile(comp, stack);
       code.emitGotoIfIntNeZero(to);
-    }
-
-  }
-
-  public void compileIf (Compilation comp, Expression[] args)
-  {
-    CodeAttr code = comp.getCode();
-    Target stack = new StackTarget(Type.boolean_type);
-    Branchable branchOp = args[0].getBranchable();
-    if (branchOp != null)
-    {
-      branchOp.compileIfNot(comp, ((ApplyExp)args[0]).getArgs());
-    }
-    else
-    {
-      args[0].compile(comp, stack);
-      code.emitIfIntZero();
-    }
-
-  }
-
-  public void compileIfNot (Compilation comp, Expression[] args)
-  {
-    CodeAttr code = comp.getCode();
-    Target stack = new StackTarget(Type.boolean_type);
-    Branchable branchOp = args[0].getBranchable();
-
-    if (branchOp != null)
-    {
-      branchOp.compileIf(comp, ((ApplyExp)args[0]).getArgs());
-    }
-    else
-    {
-      args[0].compile(comp, stack);
-      code.emitIfIntNotZero();
     }
 
   }

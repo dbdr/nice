@@ -129,43 +129,6 @@ public class CompOp extends Procedure2 implements Inlineable,Branchable
     }    
   }
 
-  public void compileIf (Compilation comp, Expression[] args)
-  {
-    CodeAttr code = comp.getCode();
-    Target stack = new StackTarget(argType);
-
-    args[0].compile(comp, stack);
-    args[1].compile(comp, stack);
-
-    switch(kind){
-    case Eq: code.emitIfEq(); break;
-    case Le: code.emitIfLe(); break;
-    case Ge: code.emitIfGe(); break;
-    case Lt: code.emitIfLt(); break;
-    case Gt: code.emitIfGt(); break;
-    case Ne: code.emitIfNEq(); break;
-    }
-  }
-
-  public void compileIfNot (Compilation comp, Expression[] args)
-  {
-    CodeAttr code = comp.getCode();
-    Target stack = new StackTarget(argType);
-
-    args[0].compile(comp, stack);
-    args[1].compile(comp, stack);
-
-    switch(kind){
-    case Eq: code.emitIfNEq(); break;
-    case Le: code.emitIfGt(); break;
-    case Ge: code.emitIfLt(); break;
-    case Lt: code.emitIfGe(); break;
-    case Gt: code.emitIfLe(); break;
-    case Ne: code.emitIfEq(); break;
-    }
-  }
-
-
   private final PrimType argType;
   private final Type retType = Type.boolean_type;
   

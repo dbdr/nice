@@ -21,7 +21,7 @@ import gnu.bytecode.*;
 
    @author Daniel Bonniot
 */
-public class ShortCircuitOp extends Procedure2 implements Inlineable
+public class ShortCircuitOp extends Procedure2 implements Inlineable, Branchable
 {
   private final static int
     And = 2,
@@ -93,6 +93,82 @@ public class ShortCircuitOp extends Procedure2 implements Inlineable
     _end.define(code);
 
     target.compileFromStack(comp, retType);
+  }
+
+  public void compileJump (Compilation comp, Expression[] args, Label to)
+  {
+    CodeAttr code = comp.getCode();
+    Target stack = new StackTarget(Type.boolean_type);
+
+    Branchable branchOp = args[0].getBranchable();
+    Branchable branchOp2 = args[1].getBranchable();
+    Label _end = new Label(code);
+
+    if (branchOp != null)
+    {
+      Expression[] brArgs = ((ApplyExp)args[0]).getArgs();
+      if (kind == And)
+	branchOp.compileJumpNot(comp, brArgs, _end);
+      else
+	branchOp.compileJump(comp, brArgs, to);
+    }
+    else
+    {
+      args[0].compile(comp, stack);
+      if (kind == And)
+	code.emitGotoIfIntEqZero(_end);
+      else
+	code.emitGotoIfIntNeZero(to);
+    }
+    if (branchOp2 != null)
+    {
+      Expression[] brArgs = ((ApplyExp)args[1]).getArgs();
+      branchOp2.compileJump(comp, brArgs, to);
+    }
+    else
+    {
+      args[1].compile(comp, stack);
+      code.emitGotoIfIntNeZero(to);
+    }
+    _end.define(code);
+  }
+
+  public void compileJumpNot (Compilation comp, Expression[] args, Label to)
+  {
+    CodeAttr code = comp.getCode();
+    Target stack = new StackTarget(Type.boolean_type);
+
+    Branchable branchOp = args[0].getBranchable();
+    Branchable branchOp2 = args[1].getBranchable();
+    Label _end = new Label(code);
+
+    if (branchOp != null)
+    {
+      Expression[] brArgs = ((ApplyExp)args[0]).getArgs();
+      if (kind == And)
+	branchOp.compileJumpNot(comp, brArgs, to);
+      else
+	branchOp.compileJump(comp, brArgs, _end);
+    }
+    else
+    {
+      args[0].compile(comp, stack);
+      if (kind == And)
+	code.emitGotoIfIntEqZero(to);
+      else
+	code.emitGotoIfIntNeZero(_end);
+    }
+    if (branchOp2 != null)
+    {
+      Expression[] brArgs = ((ApplyExp)args[1]).getArgs();
+      branchOp2.compileJumpNot(comp, brArgs, to);
+    }
+    else
+    {
+      args[1].compile(comp, stack);
+      code.emitGotoIfIntEqZero(to);
+    }
+    _end.define(code);
   }
 
   private static final Type retType = Type.boolean_type;

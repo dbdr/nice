@@ -290,7 +290,7 @@ Map<VarSymbol,mlsub.typing.Polytype> types(Arguments) = native Arguments.types;
 <T> String map(String, String, String, T[]) = native String bossa.util.Util.map(String, String, String, Object[]);
 Stack<bossa.link.Alternative> sortedAlternatives(MethodDeclaration) = native Stack bossa.link.Alternative.sortedAlternatives(MethodDeclaration);
 List<VarSymbol> getConstructorCallSymbols(NiceClass) = native List NiceClass.getConstructorCallSymbols();
-
+LinkedList<VarSymbol> getConstructors(mlsub.typing.TypeConstructor) = native LinkedList TypeConstructors.getConstructors(mlsub.typing.TypeConstructor);
 // Retypings needed since java types are not strict.
 
 Block newBlock(?Statement[] statements) = native new Block(Statement[]);

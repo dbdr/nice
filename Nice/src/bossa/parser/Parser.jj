@@ -1708,7 +1708,7 @@ Expression newExp():
   ( 
     { Arguments arguments; }
     arguments = arguments(false)
-    { e = new NewExp(classe, arguments); 
+    { e = bossa.syntax.dispatch.createNewExp(classe, arguments); 
       e.setLocation(makeLocation(t));
       return e;
     }

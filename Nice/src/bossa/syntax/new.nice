@@ -1,7 +1,7 @@
 /**************************************************************************/
 /*                                N I C E                                 */
 /*             A high-level object-oriented research language             */
-/*                        (c) Daniel Bonniot 2000                         */
+/*                        (c) Daniel Bonniot 2004                         */
 /*                                                                        */
 /*  This program is free software; you can redistribute it and/or modify  */
 /*  it under the terms of the GNU General Public License as published by  */
@@ -14,36 +14,32 @@ package bossa.syntax;
 
 import bossa.util.*;
 import java.util.*;
-import mlsub.typing.TypeSymbol;
-import mlsub.typing.TypeConstructor;
 
 /**
    Call of an object constructor.
 
-   @version $Date$
-   @author Daniel Bonniot (d.bonniot@mail.dotcom.fr)
 */
 public class NewExp extends CallExp
 {
-  public NewExp(TypeIdent ti, Arguments arguments)
-  {
-    super(null, arguments);
-    this.ti = ti;
-  }
+
+  private final TypeIdent ti;
+
+  /** Can be null if the class instantiated is Object. */
+  ?mlsub.typing.TypeConstructor tc = null;
 
   void resolve(TypeMap typeScope)
   {
-    TypeSymbol sym = ti.resolveToTypeSymbol(typeScope);
+    mlsub.typing.TypeSymbol sym = ti.resolveToTypeSymbol(typeScope);
 
     if (sym == mlsub.typing.TopMonotype.instance)
-      setObject();
-    else if (sym instanceof TypeConstructor)
-      setTC((TypeConstructor) sym);
+      this.setObject();
+    else if (sym instanceof mlsub.typing.TypeConstructor)
+      this.setTC(sym);
     else
       throw User.error(ti, ti + " is not a class" + sym.getClass());
   }
 
-  private void setTC(TypeConstructor tc)
+  private void setTC(mlsub.typing.TypeConstructor tc)
   {
     this.tc = tc;
 
@@ -64,7 +60,7 @@ public class NewExp extends CallExp
     if (definition != null)
       definition.resolve();
     
-    LinkedList constructors = TypeConstructors.getConstructors(tc);
+    LinkedList<VarSymbol> constructors = TypeConstructors.getConstructors(tc);
     if (constructors == null)
       {
 	if (tc.arity() > 0)
@@ -77,10 +73,9 @@ public class NewExp extends CallExp
 
     // the list of constructors must be cloned, as
     // OverloadedSymbolExp removes elements from it
-    constructors = (LinkedList) constructors.clone();
+    constructors = constructors.clone();
 
-    function = bossa.syntax.dispatch.createOverloadedSymbolExp
-      (constructors, new LocatedString("new " + tc, location()));
+    function = createOverloadedSymbolExp(constructors, new LocatedString("new " + tc, this.location()));
   }
   
   private void setObject()
@@ -89,19 +84,11 @@ public class NewExp extends CallExp
 
     function = new SymbolExp(method.getSymbol(), ti.location());
   }
-  
-  /****************************************************************
-   * Printing
-   ****************************************************************/
 
-  public String toString()
-  {
-    String cl = ti.toString();
-    return "new " + cl + arguments;
-  }
+  toString() = "new " + ti.toString() + arguments;
+}
 
-  private TypeIdent ti;
-
-  /** Can be null if the class instantiated is Object. */
-  TypeConstructor tc = null;
+public Expression createNewExp(TypeIdent ti, Arguments arguments) 
+{
+  return new NewExp(null, arguments, ti: ti);
 }

@@ -107,7 +107,7 @@ public class EnumDefinition extends Definition
          args.add(new Arguments.Argument((Expression)argExps.get(i),
 		((MonoSymbol)fields.get(i)).getName()));
 
-      this.value = new NewExp(new TypeIdent(enumName), new Arguments(args));
+      this.value = bossa.syntax.dispatch.createNewExp(new TypeIdent(enumName), new Arguments(args));
     }
       
     boolean isAssignable()

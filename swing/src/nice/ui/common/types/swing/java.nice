@@ -542,3 +542,21 @@ void addImpl(ScrollPane, Component, Object, int)
   = native void ScrollPane.addImpl(Component, Object, int);
 void setScrollPosition(ScrollPane, Point)
   = native void ScrollPane.setScrollPosition(Point);
+
+// class JOptionPane (not complete).
+<T> String showInternalInputDialog(Component parentComponent, T message)
+  = native String JOptionPane.showInternalInputDialog(Component, Object);
+<T> String showInternalInputDialog(Component parentComponent, T message, String title, int messageType)
+  = native String JOptionPane.showInternalInputDialog(Component, Object, String, int);
+<T> void showInternalMessageDialog(Component parentComponent, T message)
+  = native void JOptionPane.showInternalMessageDialog(Component, Object);
+<T> void showInternalMessageDialog(Component parentComponent, T message, String title, int messageType)
+  = native void JOptionPane.showInternalMessageDialog(Component, Object, String, int);
+<T> void showInternalMessageDialog(Component parentComponent, T message, String title, int messageType, Icon icon)
+  = native void JOptionPane.showInternalMessageDialog(Component, Object, String, int, Icon);
+<T> void showMessageDialog(Component parentComponent, T message)
+  = native void JOptionPane.showMessageDialog(Component, Object);
+<T> void showMessageDialog(Component parentComponent, T message, String title, int messageType)
+  = native void JOptionPane.showMessageDialog(Component, Object, String, int);
+<T> void showMessageDialog(Component parentComponent, T message, String title, int messageType, Icon icon)
+  = native void JOptionPane.showMessageDialog(Component, Object, String, int, Icon);

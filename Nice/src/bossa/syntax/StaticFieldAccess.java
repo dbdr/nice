@@ -12,7 +12,7 @@
 
 // File    : StaticFieldAccess.java
 // Created : Thu Jul 01 18:12:46 1999 by bonniot
-//$Modified: Wed Aug 02 17:46:47 2000 by Daniel Bonniot $
+//$Modified: Thu Aug 03 14:21:27 2000 by Daniel Bonniot $
 
 package bossa.syntax;
 
@@ -158,7 +158,7 @@ public class StaticFieldAccess extends MethodDefinition
 
   public void printInterface(java.io.PrintWriter s)
   {
-    s.print(toString());
+    s.print(interfaceString());
   }
   
   private String interfaceString()
@@ -182,6 +182,9 @@ public class StaticFieldAccess extends MethodDefinition
 
   public String toString()
   {
-    return interfaceString();
+    if (getType() == null)
+      return "StaticFieldAccess " + symbol.name;
+    else
+      return interfaceString();
   }
 }

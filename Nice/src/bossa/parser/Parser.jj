@@ -12,7 +12,7 @@
 
 // File    : parser.jj
 // Created : Thu Jul 01 10:27:05 1999 by bonniot
-//$Modified: Mon Jul 24 19:30:13 2000 by Daniel Bonniot $
+//$Modified: Thu Aug 03 19:04:28 2000 by Daniel Bonniot $
 // Description : Parseur JavaCC pour Bossa
 //   Tokens based on the Jazz parser
 
@@ -464,6 +464,7 @@ TypeConstructor trueTypeConstructor():
   { return new TypeConstructor(name); }
 }
 
+/*
 List typeConstructors():
 {
   List res=new ArrayList();
@@ -478,7 +479,7 @@ List typeConstructors():
   ]
   { return res; }
 }
-
+*/
 TypeIdent typeIdent():
 {
   LocatedString name;
@@ -586,25 +587,31 @@ List atomics(List init):
   { return res; }
 }
 
-Constraint constraint():
+Constraint nonVoidConstraint():
 {
-  Constraint res;
   List b=null;
   List atoms=new ArrayList();
 }
 {
-  (
-    ( "<" 
-      ( 
-	LOOKAHEAD(atomics(null)) atoms=atomics(atoms) 
-      | 
-        b=binders(atoms) [ "|" atoms=atomics(atoms) ] 
-      )
-      ">" 
-      
-      { res=new Constraint(b,atoms); }
-    )
-    | { res=Constraint.True; }
+  "<"
+  ( 
+    LOOKAHEAD(atomics(null)) atoms=atomics(atoms) 
+  | 
+    b=binders(atoms) [ "|" atoms=atomics(atoms) ] 
+  )
+  ">" 
+  { return new Constraint(b,atoms); }
+}
+
+Constraint constraint():
+{
+  Constraint res;
+}
+{
+  ( LOOKAHEAD(nonVoidConstraint())
+    res = nonVoidConstraint()
+  |
+    { res = Constraint.True; }
   )
   { return res; }
 }
@@ -654,8 +661,9 @@ Monotype monotypeConstructor():
     "<" [  p=monotypes() ] ">"
     { if(p==null) p=new ArrayList(0);
       last=getToken(0);
-      Location loc=new Location(first).englobe(new Location(last));
-      return new MonotypeConstructor(t,new TypeParameters(p),loc); 
+
+      return new MonotypeConstructor(t,new TypeParameters(p),
+				     new Location(first, last)); 
     }
 }
 
@@ -680,14 +688,19 @@ Monotype monotype():
 {
   Monotype res;
   List p=null;
-  Token t;
+  Token start, end;
 }
 {
   (
   res=funmonotype()
 |
-  t="alike" [ "<" p=monotypes() ">" ]
-  { res=new Alike(p, new Location(t)); }
+  start="alike" [ "<" p=monotypes() ">" ]
+  { res=new Alike(p, new Location(start)); }
+|
+  start="<"
+  p=monotypes()
+  end=">"
+  { res = new TupleType(p, new Location(start, end)); }
 |
   LOOKAHEAD(monotypeConstructor())
   res=monotypeConstructor()
@@ -733,7 +746,7 @@ TypeParameters typeParameters():
 }
 
 //Polytypes
-
+/*
 Polytype funpolytype():
 {
     Monotype codom;
@@ -757,7 +770,7 @@ Polytype polytype():
   { res=new Polytype(cst,m); }
   { return res; }
 }
-
+*/
 /***********************************************************************/
 /*                          Classes                                    */
 /***********************************************************************/
@@ -1177,6 +1190,33 @@ FunExp funExp():
   { return new FunExp(cst,formals,body); }
 }
 
+Expression tupleExp():
+{
+  List exps;
+  Expression e;
+}
+{
+  // A tuple must have at least two elements (thus a ",")
+  // which avoids ambiguity with expression grouping thru "(" ")"
+
+  "(" { exps = new LinkedList(); }
+  e=Expression() 
+
+  // either we have another expression ans it's a real tuple
+  // either we close the parenthesis and it was grouping
+  (
+    ")" { return e; }
+  |
+    { exps.add(e); }
+    "," e=Expression() { exps.add(e); }
+    (
+      "," e=Expression() { exps.add(e); }
+    )*
+    ")"
+    { return new TupleExp(exps); }
+  )
+}
+
 /****************************************************************
  * Imported Packages
  ****************************************************************/
@@ -1255,7 +1295,7 @@ Expression Expression() :
   ]
   { 
     last=getToken(0);
-    e1.setLocation(new Location(first).englobe(new Location(last)));
+    e1.setLocation(new Location(first, last));
     return e1; 
   }
 }
@@ -1506,7 +1546,11 @@ Expression PrimaryPrefix() :
 */
 
 |
-  "(" res=Expression() ")"
+  // This includes the case "(" res=Expression() ")"
+  // (tuple with just one element!)
+  // which avoids lookahead
+  res=tupleExp()
+
 |
   //AllocationExpression()
   res=newExp()
@@ -1767,8 +1811,7 @@ Statement StatementExpression() :
   )
   { 
     last = getToken(0);
-    Location loc=new Location(first).englobe(new Location(last));
-    e1.setLocation(loc);
+    e1.setLocation(new Location(first, last));
     return new ExpressionStmt(e1); 
   }
 }

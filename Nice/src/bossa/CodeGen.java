@@ -12,7 +12,7 @@
 
 // File    : CodeGen.java
 // Created : Mon Jun 05 11:28:10 2000 by Daniel Bonniot
-//$Modified: Wed Aug 02 17:28:21 2000 by Daniel Bonniot $
+//$Modified: Wed Aug 02 19:36:51 2000 by Daniel Bonniot $
 
 package bossa;
 
@@ -66,6 +66,9 @@ public final class CodeGen
   {
     m = m.equivalent();
 
+    if (m instanceof mlsub.typing.TupleType)
+      return SpecialTypes.arrayType;
+    
     if (!(m instanceof mlsub.typing.MonotypeConstructor))
       return gnu.bytecode.Type.pointer_type;
     

@@ -12,7 +12,7 @@
 
 // File    : main.nice
 // Created : Sat Feb 19 16:21:04 2000 by Daniel Bonniot
-//$Modified: Wed Aug 02 15:10:00 2000 by Daniel Bonniot $
+//$Modified: Thu Aug 03 18:04:47 2000 by Daniel Bonniot $
 
 package nice.tools.compiler;
 
@@ -118,7 +118,7 @@ main(args)
     {
       System.out.println
       ("\nAn exception has occured in the compiler\n" +
-       "please report a simple case showing this behavious to d.bonniot@mail.dotcom.fr\n\n" +
+       "please report a simple case showing this behaviour to d.bonniot@mail.dotcom.fr\n\n" +
        "Exception: " + uncaughtException.toString() +
        "\n\nStack trace:\n");
       uncaughtException.printStackTrace();

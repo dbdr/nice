@@ -12,7 +12,7 @@
 
 // File    : ExpressionRef.java
 // Created : Tue Aug 17 16:04:40 1999 by bonniot
-//$Modified: Wed Jul 26 14:53:54 2000 by Daniel Bonniot $
+//$Modified: Thu Aug 03 14:25:58 2000 by Daniel Bonniot $
 
 package bossa.syntax;
 
@@ -61,7 +61,7 @@ final public class ExpressionRef extends Expression
   {
     content = content.resolveExp();
     if(content == null)
-      User.error(this, this+" was not declared");
+      User.error(this, this + " was not declared");
   }
   
   void typecheck()

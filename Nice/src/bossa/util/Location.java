@@ -12,11 +12,13 @@
 
 // File    : Location.java
 // Created : Tue Jul 13 11:55:08 1999 by bonniot
-//$Modified: Wed May 24 16:04:06 2000 by Daniel Bonniot $
+//$Modified: Wed Aug 02 19:12:14 2000 by Daniel Bonniot $
 
 package bossa.util;
 
 import java.util.*;
+
+import bossa.parser.Token;
 
 /**
  * Represents a portion of the input file.
@@ -63,9 +65,17 @@ public class Location implements Located
     this.abstractLocation = abstractLocation;
   }
 
-  public Location(bossa.parser.Token t)
+  public Location(Token t)
   {
     this(t.beginLine,t.beginColumn,t.endLine,t.endColumn);
+  }
+
+  /**
+     Return a location that goes from start to end.
+   */
+  public Location(Token start, Token end)
+  {
+    this(start.beginColumn, start.beginColumn, end.endLine, end.endColumn);
   }
 
   /** returns the "invalid" location */

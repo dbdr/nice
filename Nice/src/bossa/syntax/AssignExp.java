@@ -12,7 +12,7 @@
 
 // File    : AssignExp.java
 // Created : Mon Jul 05 15:49:27 1999 by bonniot
-//$Modified: Mon Jul 24 12:27:02 2000 by Daniel Bonniot $
+//$Modified: Thu Aug 03 14:16:23 2000 by Daniel Bonniot $
 
 package bossa.syntax;
 
@@ -48,17 +48,17 @@ public class AssignExp extends Expression
     to = to.noOverloading();
 
     if(!to.isAssignable())
-      User.error(this, to+" cannot be assigned a value");
+      User.error(this, to + " cannot be assigned a value");
 
     try{
       checkAssignment(to.getType(), value);
     }
     catch(TypingEx t){
       User.error(this,
-		 "Typing error : "+to+
-		 " cannot be assigned value "+value+
-		 "\nof type "+value.getType(),
-		 "\n"+t.getMessage());
+		 "Typing error : " + to + 
+		 " cannot be assigned value " + value + 
+		 "\nof type " + value.getType(),
+		 "\n" + t.getMessage());
     }
   }
 

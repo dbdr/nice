@@ -12,7 +12,7 @@
 
 // File    : Typing.java
 // Created : Tue Jul 20 11:57:17 1999 by bonniot
-//$Modified: Wed Aug 02 18:50:44 2000 by Daniel Bonniot $
+//$Modified: Wed Aug 02 19:31:11 2000 by Daniel Bonniot $
 
 package mlsub.typing;
 
@@ -282,14 +282,17 @@ public final class Typing
   public static void leq(Monotype m1, Monotype m2)
     throws TypingEx
   {
-    if(dbg) Debug.println("Monotype leq: "+m1+" <: "+m2);
+    if(dbg) 
+      Debug.println("Monotype leq: " + m1 + " <: " + m2);
 
     try{
       Engine.leq(m1,m2);
     }
     catch(Unsatisfiable e){
-      if(dbg) e.printStackTrace();
-      throw new TypingEx("Typing.leq("+m1+","+m2+") [was "+e.getMessage()+"]");
+      if(dbg) 
+	e.printStackTrace();
+      throw new TypingEx("Typing.leq(" + m1 + ", " + m2 + ")" +
+			 " [was " + e.getMessage()+"]");
     }    
   }
   

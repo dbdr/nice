@@ -67,6 +67,15 @@ public final class SpecialArray extends gnu.bytecode.ArrayType
     code.emitGetField(field);
   }
 
+  // not called for the moment
+  public void emitCoerceFrom (Type fromType, CodeAttr code)
+  {
+    if (fromType instanceof ArrayType)
+      code.emitCheckcast(this);
+    else
+      emitCoerceFromObject(code);
+  }
+
   public Object coerceToObject (Object obj)
   {
     return super.coerceToObject(obj);
@@ -76,8 +85,8 @@ public final class SpecialArray extends gnu.bytecode.ArrayType
   {
     if (toType instanceof ArrayType)
       code.emitCheckcast(toType);
-    else
-      code.emitInvokeStatic(makeMethod());
+    else if(toType != Type.pointer_type)
+      emitCoerceToObject(code);
   }
   
   public void emitCoerceToObject (CodeAttr code)

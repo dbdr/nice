@@ -12,7 +12,7 @@
 
 // File    : Expression.java
 // Created : Mon Jul 05 16:25:02 1999 by bonniot
-//$Modified: Wed Jul 26 14:30:49 2000 by Daniel Bonniot $
+//$Modified: Thu Aug 03 14:02:26 2000 by Daniel Bonniot $
 // Description : 
 
 package bossa.syntax;
@@ -54,6 +54,7 @@ public abstract class Expression extends Node
     return res;
   }
 
+  /** @return true iff this expression can be assigned a value. */
   boolean isAssignable()
   {
     return false;

@@ -12,7 +12,7 @@
 
 // File    : IdentExp.java
 // Created : Mon Jul 05 16:25:58 1999 by bonniot
-//$Modified: Wed Jul 26 14:02:07 2000 by Daniel Bonniot $
+//$Modified: Thu Aug 03 14:15:42 2000 by Daniel Bonniot $
 
 package bossa.syntax;
 
@@ -20,7 +20,7 @@ import java.util.*;
 import bossa.util.*;
 
 /**
- * Identifier supposed to be a variable (not a type)
+   Identifier supposed to be a variable (not a type).
  */
 public class IdentExp extends Expression
 {
@@ -49,7 +49,7 @@ public class IdentExp extends Expression
     else if(enableClassExp)
       return ClassExp.create(ident);
     else
-      User.error(ident, "Variable "+ident+" is not declared");    
+      User.error(ident, "Variable " + ident + " is not declared");    
     return null;
   }
 
@@ -60,9 +60,9 @@ public class IdentExp extends Expression
   void computeType()
   {
     if(ignoreInexistant)
-      User.error(ident, "Variable "+ident+" is not declared");
+      User.error(ident, "Variable " + ident + " is not declared");
     else
-      Internal.error("computeType in IdentExp ("+this+")");
+      Internal.error("computeType in IdentExp (" + this + ")");
   }
 
   /****************************************************************

@@ -31,7 +31,8 @@ jdoc:
 	mkdir -p doc
 	${JAVADOC} -windowtitle "Nice" -doctitle "The Nice compiler source" \
 	-overview ${TOP}/src/overview.html \
-	-d ${TOP}/doc -private mlsub.typing mlsub.typing.lowlevel mlsub.compilation bossa bossa.syntax bossa.util bossa.link gnu.bytecode gnu.expr gnu.math gnu.mapping kawa.standard kawa.lang
+	-d ${TOP}/doc -private -author -version \
+	mlsub.typing mlsub.typing.lowlevel mlsub.compilation bossa bossa.syntax bossa.util bossa.link gnu.bytecode gnu.expr gnu.math gnu.mapping kawa.standard kawa.lang
 
 tags:
 	jtags

@@ -17,6 +17,9 @@ returnLong()
   return j=j;
 }
 
+<int, int> min_max(int, int);
+min_max(x,y) = x < y ? (x, y) : (y, x);
+
 main(args)
 {
   A a = new A();
@@ -72,6 +75,20 @@ main(args)
 
   // Tuples
 
-  <String, String> cs = ("1", "2");
-  println(cs);
+  <String, String> cs = ("world!", "Hello, ");
+  String s1;
+  String s2;
+  s1 = " toto";
+  (s1, s2) = cs;
+  (s1, s2) = (s2, s1);
+  println(s1 + s2);
+
+  int a; 
+  int b;
+  (a,b) = min_max(17, 14);
+  println("" + a + " < " + b);
+
+  <int, long> t1;
+  <long, long> t2;
+  t2 = t1;  
 }

@@ -12,7 +12,7 @@
 
 // File    : Node.java
 // Created : Thu Jul 08 10:24:56 1999 by bonniot
-//$Modified: Mon Jul 24 20:04:12 2000 by Daniel Bonniot $
+//$Modified: Thu Aug 03 14:24:19 2000 by Daniel Bonniot $
 
 package bossa.syntax;
 
@@ -100,9 +100,9 @@ abstract public class Node
   List addChildren(List c)
   {
     if(c==null) return new LinkedList();
-    for(Iterator i = c.iterator();
-	i.hasNext();)
+    for(Iterator i = c.iterator(); i.hasNext();)
       addChild((Node) i.next());
+
     return c;
   }
     
@@ -280,7 +280,7 @@ abstract public class Node
   void doResolve()
   {
     if(Debug.resolution)
-      Debug.println("Resolving "+this+" ["+this.getClass()+"]");
+      Debug.println("Resolving " + this + " [" + this.getClass() + "]");
     
     resolve();
 
@@ -289,7 +289,7 @@ abstract public class Node
       ((Node)i.next()).doResolve();
 
     if(Debug.resolution)
-      Debug.println("Resolved to "+this);
+      Debug.println("Resolved to "+this + " [" + this.getClass() + "]");
   }
 
   /****************************************************************

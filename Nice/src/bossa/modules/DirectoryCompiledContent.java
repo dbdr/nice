@@ -81,7 +81,7 @@ class DirectoryCompiledContent extends CompiledContent
     if (!itf.exists())
       return null;
     
-    bytecode = readClass(pkg.getName() + ".package");
+    bytecode = readClass(pkg.getName() + "." + Package.packageClassName);
     dispatch = readClass(pkg.getName() + ".dispatch");
 
     if (bytecode == null || dispatch == null)

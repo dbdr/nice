@@ -460,7 +460,7 @@ public class Package implements mlsub.compilation.Module, Located, bossa.syntax.
     Manifest manifest = new Manifest();
     manifest.getMainAttributes().put(Attributes.Name.MANIFEST_VERSION,"1.0");
     manifest.getMainAttributes().put(Attributes.Name.MAIN_CLASS, 
-                                       this.name + ".package");
+                                       this.name + "." + packageClassName);
     return new JarOutputStream(new FileOutputStream(jarFile), manifest);
   }
 
@@ -551,6 +551,11 @@ public class Package implements mlsub.compilation.Module, Located, bossa.syntax.
    * Code generation
    ****************************************************************/
 
+  /** The name of the class package functions and method implementations
+      are stored in. 
+  **/
+  static final String packageClassName = "fun";
+
   public void addImplementationClass(gnu.expr.ClassExp classe)
   {
     thisPkg.addClass(classe);
@@ -639,7 +644,7 @@ public class Package implements mlsub.compilation.Module, Located, bossa.syntax.
     if (Debug.passes)
       Debug.println(this + ": generating code");    
     
-    implementationClass = createClassExp(name + ".package");
+    implementationClass = createClassExp(name + "." + packageClassName);
 
     ast.compile();
   }

@@ -34,7 +34,8 @@ class JarCompiledContent extends CompiledContent
     if (itfEntry == null)
       return null;
     
-    JarEntry bytecodeEntry = jar.getJarEntry(pkgName + "/package.class");
+    JarEntry bytecodeEntry = jar.getJarEntry
+      (pkgName + "/" + Package.packageClassName + ".class");
     if (bytecodeEntry == null)
       return null;
     

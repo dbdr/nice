@@ -92,7 +92,7 @@ case $progname in
       system_args="${system_args} --native-compiler=`which gcj 2>/dev/null`"
     fi
 
-    exec ${JAVA} nice.tools.compiler.package ${system_args} "$@"
+    exec ${JAVA} nice.tools.compiler.fun ${system_args} "$@"
   ;;
   nicer) 
     jar=$1

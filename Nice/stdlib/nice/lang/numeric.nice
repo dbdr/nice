@@ -155,7 +155,7 @@ char `^`(char, char) = inline nice.lang.inline.NumOp("iXOr");
 /**
    Get the <code>i</code>th bit of <code>x</code>.
 
-   <code>x</code> can have any numeric type. 
+   <code>x</code> can have any integral type. 
    If <code>bit</code> is larger than the number of bits of 
    <code>x</code>, this function returns <ocde>false</code>.
 
@@ -171,7 +171,7 @@ boolean get(long x, int bit) = inline nice.lang.inline.BitOp("get");
 
    <code>x</code> must be assignable (a variable or a field).
 
-   <code>x</code> can have any numeric type. 
+   <code>x</code> can have any integral type. 
    If <code>bit</code> is larger than the number of bits of 
    <code>x</code>, this function has no effect.
 

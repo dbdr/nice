@@ -478,6 +478,9 @@ public abstract class Type {
   static public ClassType boolean_ctype = ClassType.make("java.lang.Boolean");
   static public ClassType throwable_type = ClassType.make("java.lang.Throwable");
 
+  static public ClassType short_ctype = ClassType.make("java.lang.Short");
+  static public ClassType byte_ctype = ClassType.make("java.lang.Byte");
+
   static public Type[] typeArray0 = new Type[0];
   static public Method toString_method
   = pointer_type.addMethod ("toString", typeArray0,

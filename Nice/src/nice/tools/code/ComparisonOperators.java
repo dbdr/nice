@@ -89,7 +89,7 @@ public class ComparisonOperators extends Procedure2 implements Inlineable
     case Eq: code.emitIfEq(); break;
     case Le: code.emitIfLe(); break;
     case Ge: code.emitIfGe(); break;
-    case Lt: code.emitIfIntLt(); break;
+    case Lt: code.emitIfLt(); break;
     case Gt: code.emitIfGt(); break;
     case Ne: code.emitIfNEq(); break;
     }

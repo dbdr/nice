@@ -321,11 +321,17 @@ public final class Types
     if (t instanceof ObjectType)
       return (ObjectType) t;
     
-    if (t == Type.boolean_type)
-      return Type.boolean_ctype;
+    if (t == Type.boolean_type) return Type.boolean_ctype;
+    else if (t == Type.double_type) return PrimType.double_ctype;
+    else if (t == Type.float_type) return PrimType.float_ctype;
+    else if (t == Type.long_type) return PrimType.long_ctype;
+    else if (t == Type.int_type) return PrimType.int_ctype;
+    else if (t == Type.short_type) return Type.short_ctype;
+    else if (t == Type.byte_type) return Type.byte_ctype;
+    else if (t == Type.char_type) return PrimType.char_ctype;
     
-    bossa.util.Internal.error("Equivalent type for " + t +
-			      " is not defined yet");
+    bossa.util.Internal.error
+      ("Equivalent type for " + t + " is not defined yet");
     return null;
   }
   

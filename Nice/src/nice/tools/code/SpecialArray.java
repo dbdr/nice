@@ -28,7 +28,7 @@ public final class SpecialArray extends gnu.bytecode.ArrayType
     return new SpecialArray(elements, prefix, false);
   }
 
-  static SpecialArray unknownTypeArray()
+  public static SpecialArray unknownTypeArray()
   {
     if (unknownTypeArray == null)
       unknownTypeArray = new SpecialArray(Type.pointer_type, null, true);
@@ -64,9 +64,15 @@ public final class SpecialArray extends gnu.bytecode.ArrayType
     
     if (!unknown)
       {
-	Type.registerTypeForClass(java.lang.reflect.Array.newInstance
-				  (elements.getReflectClass(), 0).getClass(), 
-				  this);
+	Class c = elements.getReflectClass();
+	if (c == null)
+	  bossa.util.Internal.warning("Null refclass for " + elements);
+	else
+	  {
+	    c = java.lang.reflect.Array.newInstance(c, 0).getClass();
+	    Type.registerTypeForClass(c, this);
+	  }
+	
 	Type.registerTypeForName("[" + elements.getSignature(), this);
       }
     

@@ -50,10 +50,10 @@ public class PrimType extends Type {
     return ! (value instanceof Boolean) || ((Boolean) value).booleanValue();
   }
 
-  private Field trueBoolean;
-  private Field falseBoolean;
-  private ClassType integer_ctype, long_ctype, char_ctype, float_ctype, double_ctype;
-  private Method integer_init, long_init, char_init, float_init, double_init;
+  private static Field trueBoolean;
+  private static Field falseBoolean;
+  public static ClassType int_ctype, long_ctype, char_ctype, float_ctype, double_ctype;
+  private static Method int_init, long_init, char_init, float_init, double_init;
   
   public void emitCoerceToObject (CodeAttr code)
   {
@@ -75,16 +75,16 @@ public class PrimType extends Type {
 	code.emitFi();
 	return;
       case 'I': case 'S': case 'B': // int, short, byte
-	if (integer_ctype == null)
+	if (int_ctype == null)
 	  {
-	    integer_ctype = ClassType.make("java.lang.Integer");
-	    integer_init = integer_ctype.getDeclaredMethod("<init>", new Type[]{int_type});
+	    int_ctype = ClassType.make("java.lang.Integer");
+	    int_init = int_ctype.getDeclaredMethod("<init>", new Type[]{int_type});
 	  }
 	
-	code.emitNew(integer_ctype);
+	code.emitNew(int_ctype);
 	code.emitDupX();
 	code.emitSwap();
-	code.emitInvokeSpecial(integer_init);
+	code.emitInvokeSpecial(int_init);
 	return;
       case 'J': // long
 	if (long_ctype == null)

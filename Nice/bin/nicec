@@ -86,17 +86,13 @@ case $progname in
     fi
     export CLASSPATH
 
-# properties should be removed when the stable compiler understands --runtime
-    properties="-Dnice.systemJar=${NICEC} -Dnice.runtime=${NICEC}"
-    args="--runtime=${NICEC}"
+    system_args="--runtime=${NICEC}"
 
     if which gcj >/dev/null 2>&1; then
-# properties should be removed when the stable compiler understands --runtime
-      properties="$properties -Dgcj=`which gcj 2>/dev/null`"
-      args="${args} --native-compiler=`which gcj 2>/dev/null`"
+      system_args="${system_args} --native-compiler=`which gcj 2>/dev/null`"
     fi
 
-    exec ${JAVA} ${properties} nice.tools.compiler.package ${args} "$@"
+    exec ${JAVA} nice.tools.compiler.package ${system_args} "$@"
   ;;
   nicer) 
     jar=$1

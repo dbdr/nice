@@ -156,7 +156,7 @@
      type spaces
      "\\(\\)" ;; what we are looking for!
      "\\<\\(\\w+\\)\\>" ;; field name
-     spaces ".*[=;]"
+     spaces "[=;]"
      )
     'nice-declaration-face)
    
@@ -183,7 +183,7 @@
      1 nice-type-face)
    
    ;; Keywords
-   '("\\<\\(fun\\|static\\|final\\|extends\\|implements\\|abstract\\|public\\|var\\|class\\|interface\\|new\\|for\\|if\\|else\\|native\\|import\\|require\\|package\\|alike\\|Any\\|try\\|catch\\|finally\\|throw\\)\\>\\|@"
+   '("\\<\\(fun\\|static\\|final\\|extends\\|implements\\|abstract\\|public\\|var\\|class\\|interface\\|new\\|for\\|if\\|else\\|native\\|import\\|require\\|package\\|alike\\|Any\\|return\\|try\\|catch\\|finally\\|throw\\)\\>\\|@"
      0 nice-keyword-face)
    
    ;; For/if/assert

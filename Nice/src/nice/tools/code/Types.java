@@ -149,9 +149,17 @@ public final class Types
    */
   public static Type javaType(Monotype m)
   {
-    //boolean maybe = isMaybe(m);
-    m = equivalent(m);
+    boolean maybe = isMaybe(m.equivalent());
+    Type res = rawJavaType(equivalent(m));
 
+    if (maybe) 
+      return equivalentObjectType(res);
+    else
+      return res;
+  }
+
+  private static Type rawJavaType(Monotype m)
+  {
     // XXX Handle functional types
     // XXX Map them into gnu.mapping.Procedure(or a subtype?) instead of Object
 
@@ -172,13 +180,6 @@ public final class Types
       return SpecialTypes.array(javaType(mc.getTP()[0]));
     else
       return javaType(tc);
-
-    /*
-    if (maybe) 
-      return equivalentObjectType(res);
-    else
-      return res;
-    */
   }
   
   public static Type[] javaType(Monotype[] ms)
@@ -380,7 +381,7 @@ public final class Types
    * Manipulating bytecode types
    ****************************************************************/
 
-  public static ObjectType equivalentObjectType(Type t)
+  public static Type equivalentObjectType(Type t)
   {
     if (t instanceof ObjectType)
       return (ObjectType) t;
@@ -393,6 +394,8 @@ public final class Types
     else if (t == Type.short_type) return Type.short_ctype;
     else if (t == Type.byte_type) return Type.byte_ctype;
     else if (t == Type.char_type) return PrimType.char_ctype;
+    // Fix-up.
+    else if (t == Type.void_type) return PrimType.void_type;
     
     bossa.util.Internal.error
       ("Equivalent type for " + t + " is not defined yet");
@@ -576,6 +579,13 @@ public final class Types
   /****************************************************************
    * Manipulations on nice types
    ****************************************************************/
+
+  static boolean isMaybe(Monotype m)
+  {
+    // This is prob. laxist, since getTC() might be different but equivalent to maybeTC (?)
+    return (m instanceof MonotypeConstructor)
+      && ((MonotypeConstructor) m).getTC() == ConstantExp.maybeTC;
+  }
 
   static Monotype equivalent(Monotype m)
   {

@@ -64,7 +64,10 @@ public abstract class MethodContainer extends Definition
     mlsub.typing.MonotypeVar[] thisTypeParams = 
       new mlsub.typing.MonotypeVar[typeParameters.length];
     for(int i=0; i<thisTypeParams.length; i++)
-      thisTypeParams[i] = new MonotypeVar(typeParameters[i].toString());
+      {
+	thisTypeParams[i] = new MonotypeVar(typeParameters[i].toString());
+	nice.tools.code.Types.makeMarkedType(thisTypeParams[i]);
+      }
     return thisTypeParams;
   }
 

@@ -15,6 +15,9 @@ INSTALLATION STEPS
    Otherwise you must edit the "nicec.bat" script file as explained there.
 
 3. Add the "Nice" directory in your PATH:
+     * On Windows 2000, open Control Panel, double-click on System, 
+       select the Advanced tab, click the "Environment Variables..." button,
+       click on user variable PATH and add C:\Nice; in front of its value.
      * On Windows NT, open Control Panel, double-click on System, 
        select the Environment tab, click on user variable PATH and 
        add C:\Nice; in front of its value. 

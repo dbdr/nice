@@ -1545,9 +1545,10 @@ FunExp funExp():
   Constraint cst;
   Statement body;
   Expression exp;
+  Token f = null;
 }
 {
-  "fun" 
+  f = "fun" 
   cst=constraint()
   "(" formals=monoSymbols() ")"
   "=>"
@@ -1559,7 +1560,11 @@ FunExp funExp():
       body=new ReturnStmt(exp);
     }
   )
-  { return new FunExp(cst,formals,body); }
+  {
+    if (f != null) 
+      bossa.util.User.warning(new Location(f), "The 'fun(...) =>' syntax is deprecated, just leave 'fun' away."); 
+    return new FunExp(cst,formals,body);
+  }
 }
 
 FunExp simpleVarFunExp():

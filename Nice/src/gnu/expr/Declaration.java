@@ -103,7 +103,7 @@ public class Declaration
 	LambdaExp lambda = (LambdaExp) value;
 	lambda.flags |= LambdaExp.NO_FIELD;
 	lambda.compileAsMethod(comp);
-	comp.topLambda.applyMethods.addElement(lambda);
+	comp.topLambda.addApplyMethod(lambda);
 	makeField(comp, value);
       }
 

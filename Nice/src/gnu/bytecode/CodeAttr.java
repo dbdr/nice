@@ -1216,6 +1216,12 @@ public class CodeAttr extends Attribute implements AttrContainer
   public final void emitGotoIfIntLeZero(Label label)
   { emitGotoIfCompare1(label, 158); }
 
+  public final void emitGotoIfNull(Label label)
+  { emitGotoIfCompare1(label, 198); } //ifnull
+  public final void emitGotoIfNotNull(Label label)
+  { emitGotoIfCompare1(label, 199); } //ifnonnull
+
+
   public final void emitGotoIfCompare2 (Label label, int logop)
   { 
     if( logop < 155 || logop > 158 )

@@ -51,15 +51,37 @@ public class ReferenceOp extends Procedure2 implements Inlineable, Branchable
     Target stack = new StackTarget(Type.pointer_type);
     Label _else = new Label(code);
     Label _end = new Label(code);
+    
+    if (args[0] instanceof QuoteExp && 
+       ((QuoteExp)args[0]).getType() == Type.nullType)
+    {
+      args[1].compile(comp, stack);
+      if (kind == Eq)
+	code.emitGotoIfNotNull(_else);
+      else
+	code.emitGotoIfNull(_else);
 
-    args[0].compile(comp, stack);
-    args[1].compile(comp, stack);
+    }
+    else if (args[1] instanceof QuoteExp && 
+       ((QuoteExp)args[1]).getType() == Type.nullType)
+    {
+      args[0].compile(comp, stack);
+      if (kind == Eq)
+	code.emitGotoIfNotNull(_else);
+      else
+	code.emitGotoIfNull(_else);
 
-    if (kind == Eq)
-      code.emitGotoIfNE(_else);
+    }
     else
-      code.emitGotoIfEq(_else);
+    {
+      args[0].compile(comp, stack);
+      args[1].compile(comp, stack);
+      if (kind == Eq)
+	code.emitGotoIfNE(_else);
+      else
+	code.emitGotoIfEq(_else);
 
+    }
     code.emitPushBoolean(true);
     code.emitGoto(_end);
     code.popType(); //simulate 'else' otherwise gnu.bytecode don't like it
@@ -75,13 +97,36 @@ public class ReferenceOp extends Procedure2 implements Inlineable, Branchable
     CodeAttr code = comp.getCode();
     Target stack = new StackTarget(Type.pointer_type);
 
-    args[0].compile(comp, stack);
-    args[1].compile(comp, stack);
+    if (args[0] instanceof QuoteExp && 
+       ((QuoteExp)args[0]).getType() == Type.nullType)
+    {
+      args[1].compile(comp, stack);
+      if (kind == Eq)
+	code.emitGotoIfNull(to);
+      else
+	code.emitGotoIfNotNull(to);
 
-    if (kind == Eq)
-      code.emitGotoIfEq(to);
+    }
+    else if (args[1] instanceof QuoteExp && 
+       ((QuoteExp)args[1]).getType() == Type.nullType)
+    {
+      args[0].compile(comp, stack);
+      if (kind == Eq)
+	code.emitGotoIfNull(to);
+      else
+	code.emitGotoIfNotNull(to);
+
+    }
     else
-      code.emitGotoIfNE(to);
+    {
+      args[0].compile(comp, stack);
+      args[1].compile(comp, stack);
+      if (kind == Eq)
+	code.emitGotoIfEq(to);
+      else
+	code.emitGotoIfNE(to);
+
+    }
   }
 
   public void compileJumpNot (Compilation comp, Expression[] args, Label to)
@@ -89,13 +134,36 @@ public class ReferenceOp extends Procedure2 implements Inlineable, Branchable
     CodeAttr code = comp.getCode();
     Target stack = new StackTarget(Type.pointer_type);
 
-    args[0].compile(comp, stack);
-    args[1].compile(comp, stack);
+    if (args[0] instanceof QuoteExp && 
+       ((QuoteExp)args[0]).getType() == Type.nullType)
+    {
+      args[1].compile(comp, stack);
+      if (kind == Eq)
+	code.emitGotoIfNotNull(to);
+      else
+	code.emitGotoIfNull(to);
 
-    if (kind == Eq)
-      code.emitGotoIfNE(to);
+    }
+    else if (args[1] instanceof QuoteExp && 
+       ((QuoteExp)args[1]).getType() == Type.nullType)
+    {
+      args[0].compile(comp, stack);
+      if (kind == Eq)
+	code.emitGotoIfNotNull(to);
+      else
+	code.emitGotoIfNull(to);
+
+    }
     else
-      code.emitGotoIfEq(to);
+    {
+      args[0].compile(comp, stack);
+      args[1].compile(comp, stack);
+      if (kind == Eq)
+	code.emitGotoIfNE(to);
+      else
+	code.emitGotoIfEq(to);
+
+    }
   }
 
   private static final Type retType = Type.boolean_type;

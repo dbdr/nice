@@ -74,9 +74,13 @@ implements Function
 	User.error(this, e);
       }
     
-    if(body != null)
-      body = dispatch.analyse(body, scope, typeScope, !voidReturn);
+    // Save the scopes, since we need them later, but they get null'ed.
+    thisScope = scope;
+    thisTypeScope = typeScope;
   }
+
+  private VarScope thisScope;
+  private TypeScope thisTypeScope;
 
   private void buildParameterSymbols()
   {
@@ -92,6 +96,12 @@ implements Function
 	  symbols[i].type = paramTypes[i];
 	  scope.addSymbol(symbols[i]);
 	}
+  }
+
+  void resolveBody()
+  {
+    if (body != null)
+      body = dispatch.analyse(body, thisScope, thisTypeScope, !voidReturn);
   }
 
   /****************************************************************

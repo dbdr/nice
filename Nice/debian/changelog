@@ -1,6 +1,6 @@
 nice (0.7.1) unstable; urgency=low
 
-  * Made "instanceof" to work with classes defined in the same package.
+  * Made "instanceof" work with classes defined in the same package.
   * Enhanced error message for invalid calls to anonymous functions.
 
  --

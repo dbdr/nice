@@ -9,6 +9,11 @@
   /// Toplevel
   class Local {}
 
+/// PASS
+  /// Toplevel
+  boolean f() = "A" instanceof Local;
+  class Local {}
+
 /// FAIL
   boolean b = "A" instanceof not.Existing;
 

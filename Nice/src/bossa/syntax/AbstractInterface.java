@@ -66,6 +66,17 @@ public class AbstractInterface extends MethodContainer
     extensions = null;
   }
 
+  void resolveBody()
+  {
+    if (children != null)
+      for (Iterator i = children.iterator(); i.hasNext();)
+	{
+	  Object child = i.next();
+	  if (child instanceof ToplevelFunction)
+	    ((ToplevelFunction) child).resolveBody();
+	}
+  }
+
   /****************************************************************
    * Initial Context
    ****************************************************************/

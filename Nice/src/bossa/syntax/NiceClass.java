@@ -182,6 +182,17 @@ public class NiceClass extends ClassDefinition
       fields[i].resolve(scope, localScope);
   }
 
+  void resolveBody()
+  {
+    if (children != null)
+      for (Iterator i = children.iterator(); i.hasNext();)
+	{
+	  Object child = i.next();
+	  if (child instanceof ToplevelFunction)
+	    ((ToplevelFunction) child).resolveBody();
+	}
+  }
+
   public void createContext()
   {
     super.createContext();

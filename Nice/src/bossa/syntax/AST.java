@@ -99,14 +99,13 @@ public class AST extends Node
     module.unfreezeGlobalContext();
     for(Iterator i = definitions.iterator(); i.hasNext();)
       {
-	Object o = i.next();
-	if (o instanceof MethodBodyDefinition)
-	  try{
-	    ((MethodBodyDefinition) o).resolveBody();
-	  }
-	  catch(UserError ex){
-	    nice.tools.compiler.OutputMessages.error(ex.getMessage());
-	  }
+	Definition d = (Definition) i.next();
+	try{
+	  d.resolveBody();
+	}
+	catch(UserError ex){
+	  nice.tools.compiler.OutputMessages.error(ex.getMessage());
+	}
       }
     nice.tools.compiler.OutputMessages.exitIfErrors();
     module.freezeGlobalContext();

@@ -1,18 +1,18 @@
-/// FAIL
+/// FAIL no-location
   new A().run();
   /// Toplevel
 class A implements Runnable {
   // missing implementation for run()
 }
 
-/// FAIL
+/// FAIL no-location
   new A().getValueAt(0, 0);
   /// Toplevel
 class A implements javax.swing.table.TableModel {
   // missing implementation for getValueAt()
 }
 
-/// FAIL bug
+/// FAIL no-location bug
   new A().getValueAt(0, 0);
   /// Toplevel
   // The same case, but now getValueAt is retyped.

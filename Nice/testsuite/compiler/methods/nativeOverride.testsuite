@@ -148,7 +148,7 @@ boolean equals(String dummy1, boolean dummy2) = false;
   ///Toplevel
 /*/// FAIL HERE */ toString(String s) = "";
 
-/// FAIL
+/// FAIL no-location
   /// COMMENT Ambiguity for equals(B,B)
   /// Toplevel
 class A
@@ -161,7 +161,7 @@ class B extends A
   equals(A that) = true;
 }
 
-/// FAIL
+/// FAIL no-location
   /// Toplevel
 class A implements Runnable
 {
@@ -172,7 +172,7 @@ class B extends A
   run() {}
 }
 
-/// FAIL
+/// FAIL no-location
   /// Toplevel
 class A extends java.lang.Number
 {

@@ -1,7 +1,7 @@
-/// FAIL
+/// FAIL no-location
   /// Toplevel
 class B implements nice.lang.Comparable {
- // `<` not implemented  
+ // `<` not implemented
 }
 
 /// FAIL

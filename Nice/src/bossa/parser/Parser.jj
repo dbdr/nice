@@ -2269,7 +2269,7 @@ ExpLocalVariable ExpLocalVariable():
   Expression value;
 }
 {
-  ( "var" | "let" {constant = true;} )
+  [ "var" | "let" {constant = true;} ]
   [LOOKAHEAD(monotype() ident()) type=monotype() ]
   name=ident()
   "="
@@ -2284,10 +2284,11 @@ Arguments.Argument argument():
 }
 {
 (
+  LOOKAHEAD( "let" | "var" | (monotype() ident() "=") )
+  e = ExpLocalVariable()
+|
   [ LOOKAHEAD(ident() ":") id = ident() ":" ]
   e = Expression()
-|
-  e = ExpLocalVariable()
 )
   { return new Arguments.Argument(e, id); }
 }

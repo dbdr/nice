@@ -45,3 +45,8 @@
     assert y == 8;
     assert z == 40;
   }
+
+/// PASS
+  int foo(int a, int b, int c) = a + b + c;
+
+  assert foo(int x = 1, int y = x + 1, y + 1) == 6;

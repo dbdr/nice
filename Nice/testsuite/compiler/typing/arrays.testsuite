@@ -16,7 +16,7 @@
 
 /// PASS
   /// Toplevel
-  <Any R> R[] reverse(R[] x) = 
+  <Any R> R[] myReverse(R[] x) = 
     superfill(new R[x.length], int i => x[x.length - 1 - i]);
 
 <Any T, Any U | U <: T> U[] superfill(T[] array, int->U value)

@@ -82,7 +82,7 @@ public class Alternative implements Located
     return strictly;
   }
 
-  static boolean disjoint(Alternative a, Alternative b)
+  public static boolean disjoint(Alternative a, Alternative b)
   {
     for(int i = 0; i<a.patterns.length; i++)
       if (bossa.syntax.dispatch.disjoint(a.patterns[i], b.patterns[i]))
@@ -91,7 +91,7 @@ public class Alternative implements Located
     return false;
   }
 
-  static Alternative greatestLowerBound(Alternative a, Alternative b)
+  public static Alternative greatestLowerBound(Alternative a, Alternative b)
   {
     Pattern[] pats = new Pattern[a.patterns.length];
     for (int i = 0; i < a.patterns.length; i++)
@@ -110,7 +110,7 @@ public class Alternative implements Located
   /**
    * Tests the matching of tags against a method alternative.
    */
-  boolean matches(TypeConstructor[] tags)
+ public boolean matches(TypeConstructor[] tags)
   {
     for(int i = 0; i < patterns.length; i++)
       if (!patterns[i].matches(tags[i]))
@@ -119,7 +119,7 @@ public class Alternative implements Located
     return true;
   }
 
-  boolean matchesTypePart(TypeConstructor[] tags, boolean[] isValue)
+  public boolean matchesTypePart(TypeConstructor[] tags, boolean[] isValue)
   {
     for(int i = 0; i < patterns.length; i++)
       if (!isValue[i] && !patterns[i].matches(tags[i]))
@@ -128,7 +128,7 @@ public class Alternative implements Located
     return true;
   }
 
-  boolean matchesValuePart(ConstantExp[] values, boolean[] isValue)
+  public boolean matchesValuePart(ConstantExp[] values, boolean[] isValue)
   {
     for(int i = 0; i < patterns.length; i++)
       if (isValue[i] && !patterns[i].matchesValue(values[i]))
@@ -137,7 +137,7 @@ public class Alternative implements Located
     return true;
   }
 
-  boolean containsTypeMatchingValue()
+  public boolean containsTypeMatchingValue()
   {
     for(int i = 0; i < patterns.length; i++)
       if (patterns[i].atTypeMatchingValue())
@@ -146,7 +146,7 @@ public class Alternative implements Located
     return false;
   }
 
-  boolean allAtAny()
+  public boolean allAtAny()
   {
     for (int i = 0; i<patterns.length; i++)
       if (! patterns[i].atAny())
@@ -194,13 +194,13 @@ public class Alternative implements Located
     return methodName + Util.map("(", ", ", ")", patterns);
   }
 
-  String printLocated()
+  public String printLocated()
   {
     return toString();
   }
 
   String methodName;
-  Pattern[] patterns;
+  public Pattern[] patterns;
 
   public Pattern[] getPatterns() { return patterns; }
 

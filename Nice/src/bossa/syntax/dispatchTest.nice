@@ -1,0 +1,573 @@
+/**************************************************************************/
+/*                                N I C E                                 */
+/*             A high-level object-oriented research language             */
+/*                        (c) Daniel Bonniot 2004                         */
+/*                                                                        */
+/*  This program is free software; you can redistribute it and/or modify  */
+/*  it under the terms of the GNU General Public License as published by  */
+/*  the Free Software Foundation; either version 2 of the License, or     */
+/*  (at your option) any later version.                                   */
+/*                                                                        */
+/**************************************************************************/
+
+package bossa.syntax;
+
+import bossa.link.*;
+import bossa.util.*;
+
+List<mlsub.typing.TypeConstructor[]> enumerate(?mlsub.typing.Constraint, mlsub.typing.lowlevel.Element[], boolean[]) = native List mlsub.typing.Enumeration.enumerate(mlsub.typing.Constraint, mlsub.typing.lowlevel.Element[], boolean[]);
+
+boolean matchesValuePart(Alternative, ?ConstantExp[], boolean[]) = native void Alternative.matchesValuePart(ConstantExp[], boolean[]);
+
+
+/**
+   Methods performing the coverage and non-ambiguity test.
+   
+ */
+
+public void registerDispatchTest(NiceMethod m)
+{
+    dispatchTestMethods.add(m);
+}
+
+public void registerDispatchTest(JavaMethod m)
+{
+  dispatchTestJavaMethods.add(m);
+}
+  
+public void unregisterDispatchTest(MethodDeclaration m)
+{
+  dispatchTestJavaMethods.remove(m);
+}
+  
+private var List<NiceMethod> dispatchTestMethods = new ArrayList();
+private var List<JavaMethod> dispatchTestJavaMethods = new ArrayList();
+public void resetDispatchTest()
+{
+  dispatchTestMethods = new ArrayList();
+  dispatchTestJavaMethods = new ArrayList();
+}
+
+private var nice.tools.util.Chronometer dispatchTestChrono = nice.tools.util.Chronometer.make("Dispatch tests");
+
+public void testCoverage(bossa.modules.Package module)
+{
+  dispatchTestChrono.start();
+  try {
+    for (method : dispatchTestMethods)
+     testNiceMethod(method, module);
+
+    for (method : dispatchTestJavaMethods)
+	testJavaMethod(method, module);
+    }
+  finally {
+    dispatchTestChrono.stop();
+  }
+}
+  
+private void testNiceMethod(NiceMethod m, bossa.modules.Package module)
+{
+  Stack<Alternative> sortedAlternatives = Alternative.sortedAlternatives(m);
+
+  if (! trivialTestOK(sortedAlternatives))
+    if (! shortTestOk(m, sortedAlternatives))
+     testMethod(m, sortedAlternatives, false);
+
+  if(bossa.util.Debug.codeGeneration)
+    bossa.util.Debug.println("Generating dispatch function for "+m);
+    
+  Compilation.compile(m, sortedAlternatives, module);
+}
+
+private void testJavaMethod(MethodDeclaration/*JavaMethod*/ m, bossa.modules.Package module)
+{
+  Stack<Alternative> sortedAlternatives = Alternative.sortedAlternatives(m);
+
+  if (! trivialTestJava(m, sortedAlternatives))
+    testMethod(m, sortedAlternatives, true);
+
+  if(bossa.util.Debug.codeGeneration)
+    bossa.util.Debug.println("Generating dispatch function for " + m);
+
+  Compilation.compile(m, sortedAlternatives, module);
+}
+
+private boolean trivialTestOK(Stack<Alternative> alternatives)
+{
+  // return true iff
+  //   there is only one alternative and it does not constrain its arguments
+  if(alternatives.size()!=1)
+    return false;
+
+  return alternatives.peek().allAtAny();
+}
+
+private boolean trivialTestJava(MethodDeclaration m, Stack<Alternative> alternatives)
+{
+  gnu.bytecode.Method reflectMethod = m.getReflectMethod();
+
+  // Static methods and constructors cannot be overriden, so there is
+  // no problem.
+  if (reflectMethod.getStaticFlag() || reflectMethod.isConstructor())
+    return true;
+
+  if (! reflectMethod.isAbstract())
+    // The only risk with a non abstract method is that it might be
+    // ambiguous.
+    // We know this won't happen in two cases:
+    //   1) if there is only one argument (single
+    //      inheritance, since the root must be a class),
+    //   2) if there are less than two implementations.
+    return m.getArity() == 1 || alternatives.size() < 2;
+
+  // This method will need testing.
+  return false;
+}
+
+private boolean shortTestOk(NiceMethod method, Stack<Alternative> alternatives)
+{
+  if (alternatives.size() < 2)
+    return false;
+
+  //check for default implementation
+  if (! alternatives.peek().allAtAny())
+    return false;
+
+  for (int i = 0; i < alternatives.size(); i++)
+    for (int k = i+1; k < alternatives.size(); k++)
+      {
+        Alternative altA = alternatives[i];
+        Alternative altB = alternatives[k];
+
+        if (Alternative.leq(altB, altA))
+	  User.error(method, "ambiguity because of equivalent patterns in:\n" +
+				altA.printLocated() + "\nand\n" +
+				altB.printLocated());
+
+        if (! (Alternative.leq(altA, altB) || Alternative.disjoint(altA, altB)))
+          {
+            let glb = Alternative.greatestLowerBound(altA, altB);
+            if (glb == null)
+              return false;
+
+            boolean glbMatch = false;
+            for (int j = i-1; j >= 0; j--)
+              if (Alternative.leq(glb, alternatives[j]))
+                {
+                  glbMatch = true;
+                  break;
+                }
+
+            if (! glbMatch)
+              return false;
+          }
+      }
+
+  return true;
+}
+
+private boolean[] findUsedPositions(int len, Stack<Alternative> alternatives)
+{
+  // We want all solutions for both the nullness marker and the tag,
+  // if that position is used.
+
+  boolean[] res = new boolean[len * 2];
+
+  for (a : alternatives)
+    {
+      if (len != notNull(a.patterns).length)
+        Internal.error("Expected number of patterns is " + len + 
+		".\nThe incorrect alternative: " + a);
+
+       for (int i = 0; i < len; i++)
+         if (! notNull(a.patterns)[i].atAny())
+           res[2*i] = res[2*i + 1] = true;
+    }
+
+  return res;
+}
+
+private void testMethod(MethodDeclaration method,
+			   Stack<Alternative> sortedAlternatives,
+			   boolean isJavaMethod)
+{
+  if (bossa.util.Debug.linkTests)
+    {
+      bossa.util.Debug.println("\nLink test for "+method);
+      for (alt : sortedAlternatives)
+        bossa.util.Debug.println("Alternative: "+alt.toString());
+    }
+
+  boolean[] used = findUsedPositions(method.getArity(), sortedAlternatives);
+
+  let type = method.getType();
+  if (type == null)
+    throw Internal.error(method + " is not in a proper state.");
+
+  List<mlsub.typing.TypeConstructor[]> multitags = enumerateTags(type, used);
+
+  boolean[] isValue = new boolean[method.getArity()];
+  List<?ConstantExp[]> values = generateValues(sortedAlternatives, isValue);
+  boolean hasValues = values.size() > 0;
+  List<String> errors = new ArrayList(3); 
+  int nb_errors = 0;
+  for (tags : multitags)
+    {
+      // For java methods, we are only concerned with cases
+      // where the first argument is a Nice class.
+      ?gnu.bytecode.ClassType firstArg = null;
+      if (isJavaMethod)
+	{
+	  firstArg = classTypeOfNiceClass(tags[0]);
+	  if (firstArg == null)
+	    continue;
+        }
+
+      if (testTypes(method, tags, sortedAlternatives, firstArg, errors))
+        {
+          if (++nb_errors > 3)
+	    break;
+        }
+      else if (hasValues && testValues(method, tags, values, isValue, sortedAlternatives, errors))
+        if (++nb_errors > 0)
+          break;
+    }
+
+  if (nb_errors > 0)
+    User.error(method, "The implementation test failed for method " + 
+		 method.toString() + ":\n" + 
+		 Util.map("", "\n", "", errors));
+}
+
+private ?gnu.bytecode.ClassType classTypeOfNiceClass(mlsub.typing.TypeConstructor tc)
+{
+  let def = getTypeDefinition(tc);
+
+  if (def == null || ! (def.getImplementation() instanceof NiceClass))
+    return null;
+
+  let NiceClass nc = cast(def.getImplementation());
+  return nc.getClassExp().getClassType();
+}
+
+/**
+   Tests that the 'tags' tuple has a best-match in alternatives
+     
+   @param method the method being tested
+   @param tags a tuple of TypeConstructors
+   @param alternatives a list of Alternatives
+     
+   @return true if the test failed
+ */
+private boolean testTypes(MethodDeclaration method, 
+                          mlsub.typing.TypeConstructor[] tags, 
+			  Stack<Alternative> sortedAlternatives,
+			  ?gnu.bytecode.ClassType firstArg,
+			  List<String> errors)
+{
+  boolean failed = false;
+
+  if (bossa.util.Debug.linkTests)
+    bossa.util.Debug.println(Util.map("Multitag: ",", ","",tags));
+
+  // Tests that a match exists, and that the first match is a "best-match"
+  ?Alternative first = null;
+
+  for (a : sortedAlternatives)
+    {
+      if (a.matches(tags))
+        if (first == null)
+          first = a;
+        else if (!Alternative.less(first, a) && !a.containsTypeMatchingValue())
+          {
+            failed = true;
+            errors.add("ambiguity for parameters of type " + tagsToString(tags)+
+		 "\nboth\n" + first.printLocated() + 
+		 "\nand\n" + a.printLocated() + "\nmatch.");
+            break;
+          }
+     }
+
+  if (first == null)
+    {
+      if (firstArg != null)
+        {
+          let superImplementation = getImplementationAbove(method, firstArg);
+          if (superImplementation != null && superImplementation.isAbstract() == false)
+            // It's OK, this case is covered by a Java implementation.
+            return false;
+        }
+
+      failed = true;
+      if (sortedAlternatives.size()==0)
+        User.error
+	    (method, "Method " + method + " is declared but never implemented:\n" +
+	     "no alternative matches " + tagsToString(tags));
+      else
+        errors.add("no alternative matches " + tagsToString(tags));
+    }
+  return failed;
+}
+
+/**
+   Special version of above that tests tags with all combinations of integer values.
+ */
+private boolean testValues
+    (MethodDeclaration method, 
+     mlsub.typing.TypeConstructor[] tags,
+     List<?ConstantExp[]> valueCombis,
+     boolean[] isValue, 
+     Stack<Alternative> sortedAlternatives,
+     List<String> errors)
+{
+  boolean failed = false;
+  List<Alternative> sortedTypeMatches = new ArrayList();
+  for (a : sortedAlternatives)
+    if (a.matchesTypePart(tags, isValue))
+      sortedTypeMatches.add(a);
+
+  for (values : valueCombis)
+    {
+      ?Alternative first = null;
+      outer:
+      for (a : sortedTypeMatches)
+        {
+          if (a.matchesValuePart(values, isValue))
+            if (first == null)
+              first = a;
+            else if (!Alternative.less(first, a))
+              {
+                failed = true;
+                errors.add("ambiguity for parameters of type/value " + tagsToString(tags, values, isValue)+
+		    "\nboth\n" + first.printLocated() + 
+		    "\nand\n" + a.printLocated() + "\nmatch.");
+                break outer;
+              }
+        }
+
+      if (first==null)
+        {
+          failed = true;
+          errors.add("no alternative matches "+ tagsToString(tags, values, isValue));
+          bossa.util.Debug.println(sortedAlternatives.toString() + "\n" + tagsToString(tags, values, isValue));
+          break;
+        }
+    }
+  return failed;
+}
+
+private String tagsToString(mlsub.typing.TypeConstructor[] tags)
+{
+  let res = new StringBuffer();
+  res.append('(');
+  for (int i = 0, n = 0; i < tags.length; i++)
+    {
+      res.append(tags[n++]);
+      if (i + 1 < tags.length)
+        res.append(", ");
+    }
+  return res.append(')').toString();
+}
+
+private String tagsToString(mlsub.typing.TypeConstructor[] tags, ?ConstantExp[] values, boolean[] isValue)
+{
+  let res = new StringBuffer();
+  res.append('(');
+  for (int i = 0, n = 0; i < tags.length; i++)
+    {
+      if (isValue[n]) 
+        res.append(values[n++]);
+      else
+        res.append(tags[n++]);
+      if (i + 1 < tags.length)
+        res.append(", ");
+    }
+  return res.append(')').toString();
+}
+
+/**
+   Enumerate all the tuples of tags in the domain of a polytype.
+     
+   @return a List of TypeConstructor[]
+   an element of an array is set to:
+   null if it cannot be matched (e.g. a function type)
+   PrimtiveType.nullTC if it can be matched by @null
+**/
+private List<mlsub.typing.TypeConstructor[]> enumerateTags(mlsub.typing.Polytype type, boolean[] used)
+{
+  mlsub.typing.Monotype[] domains = type.domain();
+  ?mlsub.typing.Constraint cst = type.getConstraint();
+
+  int len = used.length;
+
+  mlsub.typing.lowlevel.Element[] types = cast(new mlsub.typing.lowlevel.Element[len]);
+
+  for (int i = domains.length; --i >= 0;)
+    {
+      mlsub.typing.Monotype arg = domains[i];
+
+      mlsub.typing.TypeConstructor marker;
+      mlsub.typing.Monotype raw;
+      // We deconstruct 'arg' as 'marker<raw>'
+      // This is easy and more efficent if arg is already a constructed type
+
+      if (arg instanceof mlsub.typing.MonotypeConstructor)
+        {
+          marker = arg.getTC();
+          raw = nice.tools.typing.Types.rawType(arg);
+        }
+      else
+        {
+          marker = new mlsub.typing.TypeConstructor(notNull(nice.tools.typing.PrimitiveType.maybeTC).variance);
+          mlsub.typing.MonotypeVar mvar = new mlsub.typing.MonotypeVar("dispatchType");
+          raw = mvar;
+          mlsub.typing.Monotype t = mlsub.typing.MonotypeConstructor.apply(marker, raw);
+          cst = mlsub.typing.Constraint.and(cst, marker, mvar, 
+				 new mlsub.typing.MonotypeLeqCst(t, arg),
+				 new mlsub.typing.MonotypeLeqCst(arg, t));
+        }
+
+     types[--len] = raw;
+     types[--len] = marker;
+    }
+  if (len != 0)
+    throw new Error();
+
+  List<mlsub.typing.TypeConstructor[]> res = mlsub.typing.Enumeration.enumerate(cst, types, used);
+  return mergeNullCases(res, domains.length);
+}
+
+/** 
+    Merges all null<*> into null.
+
+    @param tuples a list of tuples.
+    Each tuple has 2 * length elements, 
+    alternatively a nullness marker TC and a normal TC
+*/
+private List<mlsub.typing.TypeConstructor[]> mergeNullCases(List<mlsub.typing.TypeConstructor[]> tuples, int length)
+{
+  LinkedList<mlsub.typing.TypeConstructor[]> res = new LinkedList();
+  Set<mlsub.typing.TypeConstructor[]> tupleSet = new TreeSet(tagComp);
+  for (tuple : tuples)
+    {
+      mlsub.typing.TypeConstructor[] tags = flattenTags(tuple, length);
+      //add only non duplicate tags
+      if (tupleSet.add(tags))
+        res.add(tags);
+    }
+  return res;
+}
+
+private let Comparator<mlsub.typing.TypeConstructor[]> tagComp = new TagComparator();
+
+private class TagComparator<-T> implements Comparator<T>
+{
+  compare(o1, o2)
+  {
+    mlsub.typing.TypeConstructor[] tc1 = cast(o1);
+    mlsub.typing.TypeConstructor[] tc2 = cast(o2);
+
+    for(int i = 0; i<tc1.length; i++)
+      {
+        if (tc1[i] == null)
+          {
+            if (tc2[i] == null) return 0;
+            return -1;
+          }
+        if (tc2[i] == null)
+          return 1;
+        int a = tc1[i].getId();
+        int b = tc2[i].getId();
+        if (a<b)
+          return -1;
+        if (a>b)
+          return 1;
+      }
+    return 0;
+  }
+
+  equals(obj)
+  { 
+    return false;
+  }
+
+}
+
+/** 
+    Translates (nullTC, *) into nullTC and (sureTC, tc) into tc
+
+    @param tags a list of tuples.
+    Each tuple has 2 * length elements, 
+    alternatively a nullness marker TC and a normal TC
+*/
+private mlsub.typing.TypeConstructor[] flattenTags(mlsub.typing.TypeConstructor[] tags, int length)
+{
+  mlsub.typing.TypeConstructor[] res = cast(new mlsub.typing.TypeConstructor[length]);
+  for (int i = length; --i >= 0 ;)
+    if (tags[2 * i] == nice.tools.typing.PrimitiveType.nullTC)
+      res[i] = notNull(nice.tools.typing.PrimitiveType.nullTC);
+    else
+      res[i] = tags[2 * i + 1];
+
+  return res;
+}
+
+/** Generate all combinations of values from the alternatives
+ * @return List<ConstantExp>
+ */
+private List<?ConstantExp[]> generateValues(List<Alternative> alternatives, boolean[] isValue)
+{
+  List<?ConstantExp[]> values = new ArrayList();
+  if (alternatives.size() < 1)
+    return values;
+
+  int len = isValue.length;
+  for (int pos = 0; pos < len; pos++)
+    {
+      List<ConstantExp> valuesAtPos = new ArrayList();  
+      for (a : alternatives)
+      {
+        Pattern pat = a.getPatterns()[pos];
+	if (pat.atValue())
+          {
+            isValue[pos] = true;
+            pat.addValues(valuesAtPos);
+          }
+      }
+
+      //remove duplicates
+/*      for (int i = 0; i < valuesAtPos.size(); i++)
+	for (int j = i+1; j < valuesAtPos.size(); j++)
+	  if (valuesAtPos.get(i).equals(valuesAtPos.get(j)))
+	    valuesAtPos.remove(j--);	
+*/
+
+      int valueCount = valuesAtPos.size();
+
+      if (valueCount > 0)
+        {
+          List<?ConstantExp[]> res = new ArrayList();
+
+          if (values.size() == 0)
+            for (int i = 0; i < valueCount; i++)
+              {
+                ?ConstantExp[] arr2 = new ConstantExp[len];
+                arr2[pos] = valuesAtPos[i];
+                res.add(arr2);
+              }
+
+          else
+            for (arr : values)
+              for (int i = 0; i < valueCount; i++)
+                {
+                  ?ConstantExp[] arr2 = new ConstantExp[len];
+                  System.arraycopy(arr,0,arr2,0,len);
+                  arr2[pos] = valuesAtPos[i];
+                  res.add(arr2);
+                }
+
+          values = res;
+        }
+    }
+  return values;
+}

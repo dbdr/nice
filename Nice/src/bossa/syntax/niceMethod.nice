@@ -27,7 +27,7 @@ public class NiceMethod extends UserOperator
   private ?List<MethodDeclaration> specializedMethods = null;
 
   {
-    bossa.link.DispatchTest.register(this);
+    registerDispatchTest(this);
   }
 
   isMain()

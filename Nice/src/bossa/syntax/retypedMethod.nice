@@ -174,7 +174,7 @@ public class RetypedJavaMethod extends JavaMethod
 
     this.ignoredRetyping = true;
 
-    bossa.link.DispatchTest.unregister(this);
+    unregisterDispatchTest(this);
   }
  
   getConstructorInvocation(omitDefaults)
@@ -281,5 +281,5 @@ void registerNativeField(JavaFieldAccess f, gnu.bytecode.Field reflectField)
 private void removeFromScope(MethodDeclaration m)
 {
   Node.getGlobalScope().removeSymbol(m.getSymbol());
-  bossa.link.DispatchTest.unregister(m);
+  unregisterDispatchTest(m);
 }

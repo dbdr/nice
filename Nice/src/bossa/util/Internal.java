@@ -29,7 +29,7 @@ public final class Internal
       throw new Exception();
     }
     catch(Exception e){
-      bossa.syntax.dispatch.printStackTraceWithSourceInfo(e);
+      bossa.syntax.dispatch._printStackTraceWithSourceInfo(e);
     }
   }
 

@@ -136,7 +136,7 @@ bossa.util.UserError ensureLocated(bossa.util.UserError e,
 }
 
 // For bootstrap
-void bootstrapPrintStackTraceWithSourceInfo(Throwable t) =
+void _printStackTraceWithSourceInfo(Throwable t) =
   printStackTraceWithSourceInfo(t);
 
 /****************************************************************

@@ -159,6 +159,7 @@ public class ClassFileInput extends DataInputStream
 	Attribute attr = readAttribute(nameConstant.string, length, container);
 	if (attr != null)
 	  {
+	    attr.setContainer(container);
 	    if (attr.getNameIndex() == 0)
 	      attr.setNameIndex(index);
 	    if (last == null)

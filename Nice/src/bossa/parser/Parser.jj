@@ -1190,10 +1190,12 @@ MonotypeVar taggedMonotypeVar(List tags, List atoms):
 Pattern pattern():
 {
   Pattern res = null;
+  Expression val = null;
   LocatedString i;
 }
 {
 ( res = anonymousPattern(null)
+| val = patternLiteral() { res = new Pattern(null,null,val,false,null,null,val.location()); }
 | i = ident()
   ( res = anonymousPattern(i) | { res = new Pattern(i); } )
 )

@@ -67,9 +67,13 @@ public class Gen
 
   public static Expression stringEquals(String value1, Expression value2)
   {
-    return Inline.inline(new EqualsMethodProc(),
-      new gnu.expr.QuoteExp(value1, gnu.bytecode.Type.string_type), value2);
+    return new ApplyExp
+      (equals, 
+       new Expression[] { new QuoteExp(value1, Type.string_type), value2 });
   }
+
+  private static final Expression equals = new QuoteExp
+    (new PrimProcedure(Type.pointer_type.getDeclaredMethod("equals", 1)));
 
   /**
      Create a lambda expression to generate code for the method.

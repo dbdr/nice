@@ -1,0 +1,14 @@
+/// PASS
+  new MyEx();
+  new MyEx("Super!");
+  /// Toplevel
+  class MyEx extends Exception {}
+
+/// PASS
+  new MyEx();
+  new MyEx("Super!");
+  new MyEx(i: 1);
+  new MyEx("Super!", i: 2);
+  /// Toplevel
+  class MyEx extends Exception { int i = 0; }
+

@@ -12,13 +12,18 @@
 
 // File    : main.nice
 // Created : Sat Feb 19 16:21:04 2000 by Daniel Bonniot
-//$Modified: Fri Jul 28 22:11:55 2000 by Daniel Bonniot $
+//$Modified: Mon Jul 31 20:32:58 2000 by Daniel Bonniot $
 
 package nice.tools.compiler;
 
 /**
    Nice compiler main program.
-   
+
+   Exit code table:
+   0 : Normal exit (compilation sucessful, version message)
+   1 : Abnormal termination (bug in the compiler)
+   2 : Error reported (file missing, type error, ...)
+
    @author Daniel Bonniot (d.bonniot@mail.dotcom.fr)
  */
 
@@ -37,7 +42,7 @@ main(args)
   boolean doLink = true;
   boolean staticLink = false;
   List<Option> opts = makeVector(10);
-
+ 
   opts.add(option('r', "recompile",
 		  "Force recompilation of package",
 		  "none/command-line/all",
@@ -129,11 +134,12 @@ usage()
   System.exit(0);
 }
 
-void version();
+/* version info */ void version();
 version()
 {
   println("Nice compiler alpha version");
   println("Copyright (C) 2000 Daniel Bonniot");
+  println("Visit Nice homepage: http://purl.org/net/nice");
   println("Report bugs to d.bonniot@mail.dotcom.fr");
   System.exit(0);
 }

@@ -23,7 +23,7 @@
   "Nice compiler name.")
 
 (defvar nice-xprogram nil
-  "Nice compiler name plus arguments")
+  "Nice compiler name plus arguments.")
 
 (defvar nice-mode-hook nil
   "Nice mode hook.")
@@ -43,6 +43,9 @@
 (defconst nice-extension ".nice")
 (defconst nice-extension-regexp "\\.nice$")
 
+(defvar nice-compile-buffer "*Nice*"
+  "Name of buffer fo Nice compilations")
+
 (defvar nice-export-directory "."
   "Export directory for HTML version of Nice source files.")
 
@@ -55,7 +58,41 @@
 (defvar nice-loc-regexp
   "\\([0-9]+\\):\\([0-9]+\\)\\.\\([0-9]+\\)-\\([0-9]+\\)\\.\\([0-9]+\\)")
 
-(defvar nice-mode-keywords
+(let* 
+ (
+  (package "\\<\\w+\\>\\(\\.\\<\\w+\\>\\)*")
+  (opt-package-prefix (concat "\\(" package "\\.\\)?"))
+
+  (type (concat opt-package-prefix "\\<\\w+\\>\\(<\\w+>\\)?")) ;; eg. nice.lang.List<String>
+
+  (ident "\\(\\<\\w+\\>\\)")
+  (spaces "\\s-*") ;; should be the same as spaces-or-comment, but this would be too expensive
+  ;; space-or-comment allows just for one comment
+  ;; it's much faster, and sufficient in practice!
+  (spaces-or-comment "\\s-*\\(/\\*[^\\*]*\\*/\\s-*\\)?")
+
+  ;; it's boring to count the \\(, so a I place a \\(\\) just before
+  ;; the desired match, and locate it automatically
+  (match-rank 
+   (lambda (regexp) 
+     (save-match-data 
+       (let ((count 0) start res)
+	 (while (string-match "\\\\(" regexp start)
+	   (setq count (1+ count) start (match-end 0))
+	   (if (string-match "\\\\)" regexp start)
+	       (if (eq (match-beginning 0) start)
+		   (setq res count)))
+	   )
+	 (1+ res)))))
+  (highlight
+   (lambda (regexp face)
+     (let ((rank (funcall match-rank regexp)))
+       (if rank
+	   (list regexp rank face)
+	 (message "%s has no \\(\\) marker")
+	 nil))))
+  )
+ (defvar nice-mode-keywords
   (list
    ;; Class declaration
    '("\\<\\(class\\|interface\\)\\>\\s-+\\<\\(\\w+\\)\\>"
@@ -85,26 +122,43 @@
         'nice-link-face))
    
    ;; Method declaration
-   '("^\\s-*\\(\\<\\(static\\|public\\|fun\\|final\\|native\\)\\>\\s-+\\)*\\(\\<\\w+\\>\\.\\)?\\(\\<\\w+\\>\\)\\s-*\\(<\\(\\w\\|\\s-\\|[,:]\\)*>\\)?\\s-*\\(@\\s-*\\w+\\(<\\(\\w\\|\\s-\\|[,:]\\)*>\\)?\\)?\\s-*([^#!@%&\\*\\+-/<>=\\^|~]"
-     4 nice-declaration-face)
-   
-   ;; Bogus method declaration
-   '("\\<\\(native\\)\\s-*("
-     1 nil t)
-   
-   ;; Bogus method declaration
-   '("[-?:,=*+/)(]\\s-*
-+\\s-*\\(\\<[a-z][A-Z_a-z0-9']*\\>\\.\\)?\\<\\(\\w+\\)\\>\\s-*("
-     2 nil t)
-   
-   ;; Method declaration after comments
-   '("^\\s-*//.*
-+\\s-*\\<\\(\\w+\\)\\>\\s-*("
-     1 nice-declaration-face t)
-   
-   ;; Field declaration
-   '("^\\s-*\\(\\<\\(static\\|input\\|output\\|public\\|dynamic\\)\\>\\s-+\\)*\\<\\(\\w+\\)\\>\\s-*:.*[=;]"
-     3 nice-declaration-face)
+   (funcall highlight
+     (concat 
+      "^" spaces-or-comment
+      "\\(\\<\\(static\\|public\\|private\\|final\\|native\\)\\>\\s-+\\)*" ;; visibility
+      "\\(<\\(\\w\\|\\s-\\|,\\)*>\\)?" ;; type quantification
+      spaces type ;; return type
+      spaces "\\(\\<\\w+\\>\\.\\)?" ;; package prefix
+      "\\(\\)" ;; what we are looking for!
+      ident ;; method name
+      spaces "\\(<\\(\\w\\|\\s-\\|,\\)*>\\)?" ;; rebinders
+      spaces "\\(@\\s-*\\w+\\(<\\(\\w\\|\\s-\\|[,:]\\)*>\\)?\\)?" ;; this@
+      spaces "([^#!@%&\\*\\+-/<>=\\^|~]" ;; start of argument spec
+      )
+     'nice-declaration-face)
+
+   ;; Method definition
+   (funcall highlight
+     (concat
+      "^" spaces-or-comment
+      "\\(\\)" ;; MARKER
+      ident spaces
+      "([^\)]*)" spaces "\\(\n" spaces "\\)?"
+      "[={]" 
+      )
+     'nice-declaration-face)
+
+   ;; Field or local variable declaration
+   (funcall highlight
+    (concat
+     "^" spaces-or-comment
+     "\\(\\<\\(static\\|private\\|public\\|local\\)\\>\\s-+\\)*" ;; visibility
+     type spaces
+     "\\(\\)" ;; what we are looking for!
+     "\\<\\(\\w+\\)\\>" ;; field name
+     spaces ".*[=;]"
+     )
+    'nice-declaration-face)
    
    ;; Variable declaration
    '("^\\s-*\\<var\\>\\s-+\\<\\(\\w+\\)\\>\\s-*\\(:\\s-*[^=;]*\\)?\\s-*[;=]"
@@ -121,29 +175,24 @@
      1 nice-declaration-face t)
    
    ;; Constants
-   '("\\<\\(true\\|false\\|this\\|null\\|[A-Z][A-Z_]+\\)\\>"
+   '("\\<\\(true\\|false\\|this\\|null\\|[A-Z][A-Z_]+\\|0\\|[1-9][0-9]*\\|0[xX][0-9a-fA-F]+\\|0[0-7]+\\)\\>"
      1 nice-constant-face)
    
-   ;; Classes
+   ;; Classes (begin with a capital, or prim types)
    '("[^\\.]\\<\\(_?[A-Z][a-zA-Z][a-zA-Z_'0-9]*\\|void\\|double\\|float\\|long\\|int\\|char\\|short\\|byte\\|boolean\\)\\>"
      1 nice-type-face)
    
-   ;; Classes
-   '("^\\<\\(_?[A-Z][a-zA-Z][a-zA-Z_'0-9]*\\|void\\|double\\|float\\|long\\|int\\|char\\|short\\|byte\\|boolean\\)\\>"
-     1 nice-type-face)
-   
-   ;; Field definition
-   '("^\\s-*_?[A-Z][a-zA-Z_][a-zA-Z_'0-9]*\\.\\(\\w+\\)\\s-*="
-     1 nice-declaration-face)
-   
    ;; Keywords
-   '("\\<\\(pragma\\|fun\\|print\\|error\\|static\\|final\\|extends\\|implements\\|abstract\\|abstracts\\|public\\|var\\|dynamic\\|class\\|interface\\|device\\|new\\|device\\|as\\|export\\|instanceof\\|for\\|if\\|else\\|input\\|output\\|div\\|native\\|extern\\|reset\\|enable\\|import\\|require\\|package\\|alike\\|try\\|catch\\|finally\\|throw\\)\\>\\|@"
+   '("\\<\\(fun\\|static\\|final\\|extends\\|implements\\|abstract\\|public\\|var\\|class\\|interface\\|new\\|for\\|if\\|else\\|native\\|import\\|require\\|package\\|alike\\|Any\\|try\\|catch\\|finally\\|throw\\)\\>\\|@"
      0 nice-keyword-face)
    
    ;; For/if/assert
    '("^\\s-*\\(dynamic\\|assert\\|for\\|reset\\|enable\\|if\\)\\s-*("
-     1 nice-keyword-face t))
+     1 nice-keyword-face t)
+   )
   "Nice mode keywords.")
+ )
+
 
 (defvar cc-imenu-nice-generic-expression
   (`
@@ -299,15 +348,6 @@ Mode for editing/compiling Nice programs.
   C-c r                   nice-toggle-recompile
   C-c R                   nice-toggle-recompile-all
 
-* NET LISTS CAN BE INSPECTED WITH THE FOLLOWING COMMANDS:
-
-  Key                     Command
-  ---                     -------
-  
-  Tab                     nice-find-variable
-  S-Tab                   nice-previous-location
-  Space                   nice-locate
-
 * THE MODE IS CONTROLED BY THE FOLLOWING VARIABLES:
 
   nice-program            Name of nice compiler (default = \"nicec\")
@@ -429,6 +469,11 @@ Mode for editing/compiling Nice programs.
   )
 )
 
+(defvar nice-compiling nil)
+(or (assq 'nice-compiling minor-mode-alist)
+    (setq minor-mode-alist (cons '(nice-compiling " Compiling")
+                                 minor-mode-alist)))
+
 (defun nice-compile-buffer ()
   "Compile a nice buffer."
   (interactive)
@@ -437,8 +482,8 @@ Mode for editing/compiling Nice programs.
     (setq nice-variable-stack nil)
     (if nice-process
         (delete-process nice-process))
-    (if (get-buffer "*Nice*")
-        (kill-buffer "*Nice*"))
+    (if (get-buffer nice-compile-buffer)
+        (kill-buffer nice-compile-buffer))
     (save-buffer)
 
     ;; Build process command
@@ -459,27 +504,16 @@ Mode for editing/compiling Nice programs.
     ;; User feedback
     (setq nice-compiling t)
     
-    ;; Bindings
-    (let ((name (nice-buffer-name (current-buffer))))
-      (save-excursion
-        (set-buffer "*Nice*")
-        (set (make-variable-buffer-local 'nice-output-name) name)
-        (delete-region (point-min) (point-max))
-        (local-set-key " " 'nice-find-variable)
-        (local-set-key [S-tab] 'nice-previous-location)
-        (local-set-key "\C-c\C-e" 'nice-export-output)
-        (local-set-key " " 'nice-locate)))
-
     ;; Display the compilation buffer
-    (display-buffer "*Nice*")))
+    (display-buffer nice-compile-buffer)))
 
 (defun nice-next-error ()
   "Find next Nice error."
   (interactive)
-  (let ((buffer (get-buffer "*Nice*"))
-        start file l1 c1 l2 c3)
+  (let ((buffer (get-buffer nice-compile-buffer))
+        start file l1 c1 l2 c2)
     (if (not buffer)
-        (message "Error: buffer not compiled." (beep))
+        (message "Error: buffer not compiled" (beep))
       (if nice-last-location
           (save-excursion
             (set-buffer buffer)
@@ -555,13 +589,13 @@ Mode for editing/compiling Nice programs.
   "Disable/enable recompile mode."
   (interactive)
   (setq nice-recompile-flag (not nice-recompile-flag))
-  (message "Forced recompilation %s." (if nice-recompile-flag "on" "off")))
+  (message "Forced recompilation %s" (if nice-recompile-flag "on" "off")))
 
 (defun nice-toggle-recompile-all ()
   "Disable/enable the recompile-all mode."
   (interactive)
   (setq nice-recompile-all-flag (not nice-recompile-all-flag))
-  (message "Forced recompilation of all packages %s." (if nice-recompile-all-flag "on" "off")))
+  (message "Forced recompilation of all packages %s" (if nice-recompile-all-flag "on" "off")))
 
 ;; Return the package of a object (nil for global objects)
 (defun nice-object-package (object)
@@ -755,8 +789,7 @@ Mode for editing/compiling Nice programs.
             (local-set-key [mouse-1] 'nice-link-activate)
             (local-set-key "\C-c\C-h" 'nice-html-export)
             (local-set-key "\C-c\C-l" 'nice-latex-export)
-            (local-set-key "\C-c\C-e" 'nice-export-package)
-            (when export (nice-export ""))))))
+            (when export (nice-export (eq export 'latex)))))))
 
      ;; Source file
      ((eq kind 'file)
@@ -771,7 +804,7 @@ Mode for editing/compiling Nice programs.
               (nice-select window (match-beginning 1)
                            (match-end 1)))))))
      (t
-      (message "Object \"%s\" not found." object)))))
+      (message "Object \"%s\" not found" object)))))
 
 (defun nice-rename-buffer (name)
   (if (get-buffer name)
@@ -818,46 +851,6 @@ Mode for editing/compiling Nice programs.
           (when buf
             (or (framep window) (select-window window))
             (switch-to-buffer buf))))))
-
-(defun nice-previous-location ()
-  "Jump back to the initial location after a nice-find-variable."
-  (interactive)
-  (if (not nice-variable-stack)
-      (message "No previous variable." (beep))
-    (goto-char (car nice-variable-stack))
-    (setq nice-variable-stack (cdr nice-variable-stack))
-    (nice-locate)))
-  
-(defun nice-find-variable ()
-  "Locate a variable definition."
-  (interactive)
-  (let (point eol bol var found input)
-    (setq point (point))
-    (save-excursion
-      (beginning-of-line)
-      (setq bol (point))
-      (goto-char point)
-      (if (and (nice-search-backward "[^0-9]" bol)
-               (looking-at ".\\([0-9]+\\)"))
-          (progn
-            (setq var (match-string-no-properties 1))
-            (goto-char (point-min))
-            (if (nice-search-forward (concat "^ " var ":.* = ") (point-max))
-                (setq found (match-beginning 0))
-              (progn
-                (goto-char (point-min))
-                (setq input (concat "^inputs {[^}]* " var " "))
-                (if (nice-search-forward input (point-max))
-                    (progn
-                      (message "Input variable." (beep))
-                      (setq input t))))))))
-    (if (not found)
-        (if (not input)
-            (message "Definition not found." (beep)))
-      (progn
-        (setq nice-variable-stack (cons point nice-variable-stack))
-        (goto-char found)
-        (nice-locate)))))
 
 (defun nice-comment-region-or-line ()
    "Comment the region, or the line if the mark is not active."
@@ -957,11 +950,7 @@ Mode for editing/compiling Nice programs.
   (interactive)
   (nice-export t))
   
-(defun nice-export-package ()
-  (interactive)
-  (nice-export))
-
-(defun nice-export-all-packages-in-dir (dir prefix)
+(defun nice-export-all-packages-in-dir (dir prefix latex)
   (let ((files (directory-files dir t nil nil)))
     (while files
       (let ((file (car files)))
@@ -969,43 +958,35 @@ Mode for editing/compiling Nice programs.
         (when (nice-file-p file)
           (save-excursion
             (set-buffer (find-file-noselect file))
-            (nice-export)))
+            (nice-export latex)))
         
         ;; Sub-package
         (when (nice-package-p file)
           (let* ((name (file-name-nondirectory file))
                  (package (if prefix (concat prefix "." name) name)))
             (nice-display-object 'package package t)
-            (nice-export-all-packages-in-dir (car files) package))))
+            (nice-export-all-packages-in-dir (car files) package latex))))
       (setq files (cdr files)))))
   
-(defun nice-export-all-packages ()
+(defun nice-export-all-packages (latex)
   (interactive)
   (let ((path (cons "." (split-string (or (getenv "JAZZPATH") ".")
                                       nice-path-separator)))
         packages)
     (while path
-      (nice-export-all-packages-in-dir (car path) nil)
+      (nice-export-all-packages-in-dir (car path) nil latex)
       (setq path (cdr path)))))
                                  
-(defun nice-export-output ()
-  (interactive)
-  (let* ((output (buffer-string))
-         (name nice-output-name)
-         (html "*nice-html-listing*")
-         (file (concat nice-output-directory
-                       "/" (concat nice-output-name ".out.html"))))
-    (save-excursion
-      (set-buffer (get-buffer-create html))
-      (delete-region (point-min) (point-max))
-      (insert "<HTML>\n<HEAD><TITLE>Output of &quot;")
-      (insert name)
-      (insert "&quot;</TITLE></HEAD>\n<BODY BGCOLOR=\"#ffffff\">\n<PRE>\n")
-      (insert output)
-      (insert "</PRE>\n</BODY>\n</HTML>")
-      (write-file file nil)
-      (set-file-modes file 420)
-      (kill-buffer nil))))
+(defvar nice-html-faces-alist
+  '((nice-keyword-face     . ("<FONT COLOR=\"#0000ee\">" . "</FONT>"))
+    (nice-constant-face    . ("<FONT COLOR=\"#8080ff\">" . "</FONT>"))
+    (nice-declaration-face . ("<FONT COLOR=\"#cd0000\">" . "</FONT>"))
+    (nice-link-face        . ("<FONT COLOR=\"#000000\"><U>" . "</U></FONT>"))
+    (nice-link-declaration-face
+     . ("<FONT COLOR=\"#cd0000\"><U>" . "</U></FONT>"))
+    (nice-comment-face     . ("<FONT COLOR=\"#008b00\">" . "</FONT>"))
+    (nice-type-face        . ("<FONT COLOR=\"#b7860b\">" . "</FONT>"))
+    (nice-string-face      . ("<FONT COLOR=\"#a020f0\">" . "</FONT>"))))
 
 (defun nice-html-listing ()
   "Formats current buffer in HTML"
@@ -1013,7 +994,7 @@ Mode for editing/compiling Nice programs.
   (when (buffer-file-name) (nice-fontify-buffer))
   (let ((temp-buffer-show-function '(lambda (buffer))))
     (with-output-to-temp-buffer "*nice-html-listing*"
-      (princ "<HTML><BODY BGCOLOR=\"#ffffff\"><PRE>\n")
+      (princ "<HTML>\n<BODY BGCOLOR=\"#ffffff\">\n<PRE>\n")
       (let ((close nil)
             (beg 1)
             (end 0)
@@ -1038,18 +1019,7 @@ Mode for editing/compiling Nice programs.
             (setq close (and spec (cdr spec)))
             (setq beg end)))
         (if close (princ close)))
-      (princ "</PRE></BODY></HTML>"))))
-
-(defvar nice-html-faces-alist
-  '((nice-keyword-face     . ("<FONT COLOR=\"#0000ee\">" . "</FONT>"))
-    (nice-constant-face    . ("<FONT COLOR=\"#8080ff\">" . "</FONT>"))
-    (nice-declaration-face . ("<FONT COLOR=\"#cd0000\">" . "</FONT>"))
-    (nice-link-face        . ("<FONT COLOR=\"#000000\"><U>" . "</U></FONT>"))
-    (nice-link-declaration-face
-     . ("<FONT COLOR=\"#cd0000\"><U>" . "</U></FONT>"))
-    (nice-comment-face     . ("<FONT COLOR=\"#008b00\">" . "</FONT>"))
-    (nice-type-face        . ("<FONT COLOR=\"#b7860b\">" . "</FONT>"))
-    (nice-string-face      . ("<FONT COLOR=\"#a020f0\">" . "</FONT>"))))
+      (princ "</PRE>\n</BODY>\n</HTML>\n"))))
 
 (defun nice-html-print-segment (close open beg end)
   (let (char)
@@ -1065,6 +1035,16 @@ Mode for editing/compiling Nice programs.
        ((= char ?\t) (princ "  "))
        (t (write-char char)))
       (setq beg (1+ beg)))))
+
+(defvar nice-latex-color-alist
+  '((nice-keyword-face     . "#0000ee")
+    (nice-constant-face    . "#8080ff")
+    (nice-declaration-face . "#cd0000")
+    (nice-link-face        . "#000000")
+    (nice-link-declaration-face . "#cd0000")
+    (nice-comment-face     . "#008b00")
+    (nice-type-face        . "#b7860b")
+    (nice-string-face      . "#a020f0")))
 
 (defun nice-latex-listing ()
   "Formats current buffer in LaTeX"
@@ -1092,16 +1072,6 @@ Mode for editing/compiling Nice programs.
 	    (setq beg end))))
       (princ "\\end{alltt}")
       (princ "\\endgroup"))))
-
-(defvar nice-latex-color-alist
-  '((nice-keyword-face     . "#0000ee")
-    (nice-constant-face    . "#8080ff")
-    (nice-declaration-face . "#cd0000")
-    (nice-link-face        . "#000000")
-    (nice-link-declaration-face . "#cd0000")
-    (nice-comment-face     . "#008b00")
-    (nice-type-face        . "#b7860b")
-    (nice-string-face      . "#a020f0")))
 
 (defun nice-color (color i)
   (/ (string-to-int (substring color (+ 1 (* 2 i)) (+ 3 (* 2 i))) 16) 255.0))
@@ -1145,16 +1115,11 @@ Mode for editing/compiling Nice programs.
   (message "%s//%s" dir cmd)
   (let (process
         (default-directory dir))
-    (setq process (apply #'start-process "nice" "*Nice*" (car cmd) (cdr cmd)))
+    (setq process (apply #'start-process "nice" nice-compile-buffer (car cmd) (cdr cmd)))
     (set-process-filter process 'nice-process-filter)
     (set-process-sentinel process 'nice-process-sentinel)
     process))
  
-(defvar nice-compiling nil)
-(or (assq 'nice-compiling minor-mode-alist)
-    (setq minor-mode-alist (cons '(nice-compiling " Compiling")
-                                 minor-mode-alist)))
-
 (defun nice-search-forward (regexp limit)
   (let ((case-fold-search nil))
     (re-search-forward regexp limit t)))
@@ -1226,7 +1191,7 @@ Mode for editing/compiling Nice programs.
 (defun nice-select-file (name other l1 c1 l2 c2)
   (if (string-match "^[0-9]+$" name)
       (save-excursion
-        (set-buffer "*Nice*")
+        (set-buffer nice-compile-buffer)
         (goto-char (point-max))
         (if (nice-search-backward
              (concat name
@@ -1251,41 +1216,6 @@ Mode for editing/compiling Nice programs.
 
 (defun nice-no-more-errors ()
   (beep)
-  (message "No more errors."))
-
-(defun nice-locate ()
-  "Display the location indicated by the pragma at the end of the line."
-  (interactive)
-  (let ((window (selected-window))
-        bol loc file l1 c1 l2 c2)
-    (save-excursion
-      (beginning-of-line)
-      (setq bol (point))
-      (end-of-line)
-      (cond
-       ((nice-search-backward nice-file-location-regexp bol)
-        (nice-select-file
-         (match-string-no-properties 1)
-         t
-         (nice-match-to-int 2)
-         (nice-match-to-int 3)
-         (nice-match-to-int 4)
-         (nice-match-to-int 5))
-        (select-window window))
-       ((nice-search-backward "%\\([0-9]+\\)%" bol)
-        (save-excursion
-          (setq loc (concat "[^0-9]"
-                            (match-string-no-properties 1)
-                            ": %loc:[ ]*"
-                            nice-loc-regexp))
-          (goto-char (point-max))
-          (if (nice-search-backward loc (point-min))
-              (let ((file (match-string-no-properties 1))
-                    (l1 (nice-match-to-int 2))
-                    (c1 (nice-match-to-int 3))
-                    (l2 (nice-match-to-int 4))
-                    (c2 (nice-match-to-int 5)))
-                (nice-select-file file t l1 c1 l2 c2)
-                (select-window window)))))))))
+  (message "No more errors"))
 
 (provide 'nice-mode)

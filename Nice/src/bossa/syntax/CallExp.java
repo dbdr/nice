@@ -315,12 +315,40 @@ public class CallExp extends Expression
   protected gnu.expr.Expression compile()
   {
     gnu.expr.Expression res;
+    gnu.expr.LetExp firstLetExp = null;
+    gnu.expr.Expression letExpRes = null;
+    if (localVars != null)
+      {
+        for(int i = localVars.length-1; i >= 0; i--)
+	  {
+            gnu.expr.Expression[] eVal = new gnu.expr.Expression[1];
+            gnu.expr.LetExp letExp = new gnu.expr.LetExp(eVal);
+            eVal[0] = localVars[i].variable.compile(letExp);
+            if (i == 0)
+              {
+		firstLetExp = letExp;
+              }
+            else
+              {
+                letExp.setBody(letExpRes);
+              }
+
+       	    letExpRes = letExp;
+	  }
+      }
+
     if (function.isFieldAccess())
       res = function.getFieldAccessMethod().compileAccess(compileParams());
     else
       res = new gnu.expr.ApplyExp(function.generateCodeInCallPosition(), 
                                   compileParams());
     location().write(res);
+
+    if (firstLetExp != null)
+      {
+        firstLetExp.setBody(res);
+	res = letExpRes;
+      }
 
     return EnsureTypeProc.ensure(res, Types.javaType(type));
   }
@@ -403,4 +431,6 @@ public class CallExp extends Expression
 
   /** Class this static method is defined in, or null */
   gnu.bytecode.ClassType declaringClass = null;
+
+  ExpLocalVariable[] localVars = null;
 }

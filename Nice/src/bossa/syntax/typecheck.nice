@@ -653,6 +653,45 @@ typecheck(e@SuperExp)
     throw bossa.util.User.error(e, "super can only be used in method implementations");
 }
 
+typecheck(e@ExpLocalVariable)
+{
+  Block.LocalVariable decl = notNull(e.variable);
+  MonoSymbol target = notNull(decl.left);
+
+  if (! target.used)
+    bossa.util.User.warning(decl, "Unused local variable "  + target.name);
+
+  ?mlsub.typing.Monotype type = target.getMonotype();
+  Expression value = notNull(e.initValue);
+
+  if (type == null)
+    {
+      value.typecheck();
+      e.initValue = decl.value = value = value.noOverloading();
+      target.type = checkMonomorphic(value.getType(), decl);
+
+      if (nice.tools.code.Types.isVoid(target.type))
+        throw error(decl, "A variable cannot have a void type");
+    } 
+  else
+    {
+      try{
+	mlsub.typing.Polytype polytype = new mlsub.typing.Polytype(type);
+	e.initValue = decl.value = value = value.resolveOverloading(polytype);
+	checkAssignment(polytype, value);
+      } 
+      catch(TypingEx t){
+	reportNullAssignmentError(decl, t, value: value, 
+				  target.name.toString(),
+				  target.getMonotype());
+	throw assignmentError(target, target.name.toString(), 
+			      String.valueOf(target.getMonotype), 
+			      value);
+      }
+    }
+   decl.value = null;
+}
+
 typecheck(c@ConstantExp){}
 typecheck(e@NullExp) {}
 typecheck(e@OverloadedSymbolExp) {}

@@ -1,0 +1,39 @@
+/// PASS
+  foo(let x = "abc") { assert x.equals("abc"); }
+  /// Toplevel
+  void foo(String x, ()->void func)
+  {
+    assert x.equals("abc");
+    func();
+  }
+
+/// PASS
+  foo(var x = false) 
+  { 
+    x = true;
+    assert x;
+  }
+  /// Toplevel
+  void foo(boolean x, ()->void func)
+  {
+    assert !x;
+    func();
+  }
+
+/// PASS
+  foo(let List<int> x1 = [1,2], [x1[0], x1[1]]);
+  /// Toplevel
+  void foo(List<int> x1, List<int> x2)
+  {
+    assert x1[0] == 1;
+    assert x1[1] == 2;
+    assert x2[0] == 1;
+    assert x2[1] == 2;
+  }
+
+/// FAIL
+  foo(var x = "abc") {}
+  /* ///FAIL HERE */x = "xyz";
+  /// Toplevel
+  void foo(String x, ()->void func) {}
+  

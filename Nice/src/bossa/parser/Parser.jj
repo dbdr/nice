@@ -2247,14 +2247,34 @@ ConstantExp patternLiteral() :
 { return res; }
 }
 
+ExpLocalVariable ExpLocalVariable():
+{
+  boolean constant = false;
+  LocatedString name;
+  Monotype type = null;
+  Expression value;
+}
+{
+  ( "var" | "let" {constant = true;} )
+  [LOOKAHEAD(monotype() ident()) type=monotype() ]
+  name=ident()
+  "="
+  value=Expression()
+  { return new ExpLocalVariable(name, value, constant, type); }
+}
+
 Arguments.Argument argument():
 {
   Expression e;
   LocatedString id = null;
 }
 {
+(
   [ LOOKAHEAD(ident() ":") id = ident() ":" ]
   e = Expression()
+|
+  e = ExpLocalVariable()
+)
   { return new Arguments.Argument(e, id); }
 }
 

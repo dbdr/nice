@@ -298,17 +298,36 @@ markAsCallFirstArg(e@IdentExp)
   e.enableClassExp = true;
 }
 
+analyse(e@ExpLocalVariable, info)
+{
+  e.initValue = analyse(e.initValue, info);
+  setInitialized(notNull(notNull(e.variable).left), info, e.location());
+  return e;
+}
+
 analyse(e@CallExp, info)
 {
   Arguments args = e.arguments;
+  
+  let ExpLocalVariable[?] expLocals = e.localVars = cast(args.extractLocalVars());  
 
   if (e.infix)
     markAsCallFirstArg(notNull(args.getExp(0)));
+
+  if (expLocals != null)
+    {
+      info.begin();
+      for (local : expLocals)
+        analyse(local.variable, info);
+    }
 
   boolean noEscape = args.size() == 2 &&
     (e.isCallTo("foreach") || e.isCallTo("forbreak") || e.isCallTo("map") ||
      e.isCallTo("filter"));
   args.analyse(info, noEscape);
+
+  if (expLocals != null)
+    info.end();
 
   if (e.infix)
     {

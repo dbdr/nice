@@ -55,3 +55,5 @@ Instance field is: 3
 finally
 NullPointerException
 MyEx
+ID
+LAMBDA

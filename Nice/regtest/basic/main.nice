@@ -11,6 +11,9 @@ id(x) = x;
 void test_higher_order();
 test_higher_order()
 {
+  println(id("ID"));
+  println((fun<Any T>(T x)=>x)("LAMBDA"));
+
   // Presently fails
   //id (x); // x is A's field method, of type A->int
 }
@@ -105,4 +108,5 @@ main(args)
   test_global();
   test_native();
   test_exceptions();
+  test_higher_order();
 }

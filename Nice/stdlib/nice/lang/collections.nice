@@ -314,9 +314,9 @@ print(p@PrintStream, s@Sequence)
  ****************************************************************/
 
 interface Map<Key,Element> = native java.util.Map;
-class HashMap<Key,Element> implements Map = native java.util.HashMap;
+class Hashtable<Key,Element> implements Map = native java.util.HashMap;
 
-<Any Key, Any Element> HashMap<Key, Element> newHashMap() = 
+<Any Key, Any Element> Hashtable<Key, Element> hashtable() = 
   native new java.util.HashMap();
 
 <Any Key, Any Element> Element get(Map<Key, Element>, Key) = 

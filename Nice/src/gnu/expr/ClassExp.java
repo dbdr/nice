@@ -184,7 +184,7 @@ public class ClassExp extends LambdaExp
     if (! partsDeclared)
       {
 	getType();
-	declareParts();
+	declareParts(comp);
       }
     if (type.getName() == null)
       {
@@ -293,11 +293,13 @@ public class ClassExp extends LambdaExp
 
   boolean partsDeclared;
 
-  public void declareParts()
+  public void declareParts(Compilation comp)
   {
     if (partsDeclared)
       return;
     partsDeclared = true;
+    comp.topLambda = this;
+    comp.topClass = this.type;
     for (Declaration decl = firstDecl();
 	 decl != null;  decl = decl.nextDecl())
       {
@@ -317,7 +319,16 @@ public class ClassExp extends LambdaExp
 		type.addMethod(slotToMethodName("set",decl.getName()),
 			       flags, stypes, Type.void_type);
 	      }
+	    else if (decl.value instanceof LambdaExp)
+	      // This handles global variables with LambdaExp initial values.
+	      {
+		LambdaExp l = (LambdaExp) decl.value;
+		l.outer = this;
+		l.addMethodFor(type, comp, null);
+		l.compileAsMethod(comp);
+	      }
 	    else
+	      // This handles class fields.
 	      {
 		String fname
 		  = Compilation.mangleNameIfNeeded(decl.getName());

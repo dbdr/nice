@@ -14,6 +14,24 @@
   var ?String x = null;
 
 /// PASS
+  /// TOPLEVEL
+  /* A global var can have a functional value. */
+  var int->int x = int y => y + 1;
+
+/// PASS
+  x(1);
+  /// TOPLEVEL
+  /* A global var can have a functional value. */
+  var int->int x = int y => y + 1;
+  
+/// PASS
+  int->int f = x;
+  f(1);
+  /// TOPLEVEL
+  /* A global var can have a functional value. */
+  var int->int x = int y => y + 1;
+  
+/// PASS
   /* Modifying a global var. */
   x = 1;
   /// TOPLEVEL

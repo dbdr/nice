@@ -1554,7 +1554,7 @@ public class Compilation
     FindCapturedVars.findCapturedVars(pkg);
 
     for (LambdaExp c = pkg.firstClass; c != null; c = c.nextSibling)
-      ((ClassExp) c).declareParts();
+      ((ClassExp) c).declareParts(this);
   }
 
   /** Create a new Compilation environment.

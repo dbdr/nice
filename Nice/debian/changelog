@@ -1,3 +1,9 @@
+nice (0.7.8) unstable; urgency=low
+
+  * Allow ?(T[]) syntax for optional arrays, as an alternative to T[?].
+
+ --
+
 nice (0.7.7) unstable; urgency=low
 
   * Methods taking a boolean parameter can now dispatch on the cases

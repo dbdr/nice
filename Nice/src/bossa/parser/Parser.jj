@@ -793,7 +793,7 @@ Monotype arrayMonotype(Monotype res):
       (new TypeIdent(new LocatedString("Array", loc)),
        new TypeParameters(tp),
        loc);
-    res.nullness = maybe ? res.maybe : res.sure;
+    res.nullness = maybe ? res.maybe : res.absent;
   }
 ]
 

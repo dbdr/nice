@@ -62,3 +62,28 @@
   var ((int,int))->int f = ((int,int) tuple)=> 0;
   /// package b import a
   f((65536,1));
+
+/// PASS
+  ?(String[]) s1;
+  s1 = null;
+  s1 = [ "A" ];
+              
+  String[?] s1';
+  s1' = null;
+  s1' = [ "A" ];
+              
+  (?String)[] s2;
+  s2 = [ null ];
+  s2 = [ "A" ];
+
+  ?String[] s2';
+  s2' = [ null ];
+  s2' = [ "A" ];
+
+  ?(?String[]) s3;
+  s3 = null;
+  s3 = [ null ];
+
+  ?String[?] s3';
+  s3' = null;
+  s3' = [ null ];

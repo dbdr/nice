@@ -43,7 +43,7 @@ public class TypeConstructorLeqCst extends AtomicConstraint
       return new mlsub.typing.ImplementsCst(t1, (Interface) s);
     
     if (!(s instanceof TypeConstructor))
-      Internal.error(t2+" resolved to a "+s.getClass());
+      User.error(t2, t2 + " is not a class");
 
     TypeConstructor tc2 = (TypeConstructor) s;
 

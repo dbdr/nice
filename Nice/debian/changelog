@@ -221,8 +221,8 @@ nice (0.7.9) unstable; urgency=low
   * Changed the syntax for local variables. The "final" keyword is deprecated 
     now for local variables, use "let" instead. In addition to the standard 
     "type name = ..." syntax two new forms are allowed:
-    let [ type ] name = [ expression ] 
-    var [ type ] name = [ expression ]
+    let [ type ] name [ = expression ] ; 
+    var [ type ] name [ = expression ] ;
     At least a type or a default value are required.
     The type can only be left away when the compiler is able to interfere 
     the type which is not always possible.
@@ -386,7 +386,7 @@ nice (0.7.5) unstable; urgency=low
   * Forbade @null patterns for method arguments that cannot be null.
   * Report duplicate implementations of a method with the same patterns.
   * Bugfixes (compilation of tuples with primitive types using subtyping,
-    clotures, returning a value inside try/finally or synchronized, ...).
+    closures, returning a value inside try/finally or synchronized, ...).
   * Fixed the nicec script on Max OS X, when gcj is not present.
 
  -- Daniel Bonniot <bonniot@users.sourceforge.net>  Wed, 20 Nov 2002 13:32:55 +0100

@@ -120,11 +120,9 @@ public final class MonotypeConstructor extends Monotype
   
   public Kind getKind() 	  { return tc.variance; }  
   public void setKind(Kind value) { 
-    /* This could be correct, but never happens at the moment
-    if (tc.variance == null && value instanceof Variance)
-      tc.setVariance((Variance) value);
+    if (tc.variance == value)
+      return;
     else
-    */
       throw new Error("SetKind in " + this); 
   }
   

@@ -17,7 +17,7 @@ package nice.tools.doc;
  * instance variable <i>tags</i> contains an ArrayList of tuples that map tag
  * strings to values.  The value <b>null</b> maps to the general comment.
  * The constructor of this class should be used put a comment block in 
- * <i>commentStr</i> (the default value is the empty string.
+ * <i>commentStr</i> (the default value is the empty string).
  * @author Francis Barber
  */
 class Comment {

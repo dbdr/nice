@@ -107,19 +107,21 @@ class HTMLWriter {
         
         Comment c = new Comment(commentStr: comments);
         List<(?String, String)> tags = c.tags;
+        //write the general comment
+        (?String a, String b) = tags.removeAt(0);
+        writer.write("<div class='generalComment' >\n");
+        writer.write(b + "\n");
+        writer.write("</div\n");
         writer.write("<table>\n");
         for((?String, String) tag : tags) {
             writer.write("<tr>\n");
             (?String x, String y) = tag;
-            writer.write("<td>" x "</td>\n");
+            writer.write("<td style='font-style: italic'>" x ":</td>\n");
             writer.write("<td>" y "</td>\n");
             writer.write("</tr>\n");
         }
         writer.write("</table>\n");
     }
-    else
-        comments = "null";
-    writer.write(comments + "\n");
     writer.write("</p>\n");
 
     writer.write(getFooter());

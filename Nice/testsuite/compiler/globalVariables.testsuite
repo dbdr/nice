@@ -19,6 +19,11 @@
   var int->int x = int y => y + 1;
 
 /// PASS
+  /// TOPLEVEL
+  <Any T> T id(T x) = x;
+  var int->int x = id(int y => y + 1);
+
+/// PASS
   x(1);
   /// TOPLEVEL
   /* A global var can have a functional value. */

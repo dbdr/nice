@@ -1598,9 +1598,8 @@ public class Compilation
 	topClass = (ClassType) c.getType();
 	
 	curClass = topClass;
-	generateApplyMethods(c);
-
 	c.generateClassInit(this);
+	generateApplyMethods(c);
       }
   }
 

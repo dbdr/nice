@@ -1057,8 +1057,43 @@ public class LambdaExp extends ScopeExp
     code.emitGoto(lab2);
 
     lab0.define(code);
-    comp.dumpInitializers(clinitChain, method);
-    method.getCode().emitReturn();
+
+    if (clinitChain != null)
+      {
+	Label lastClinit = new Label(code);
+	code.emitGoto(lastClinit);
+	Label previous = null;
+
+	/* Dumping initializers can make new initielizers to be added,
+	   so we loop until none is added.
+	   The order of execution is reversed, the last ones being required
+	   by the first ones.
+	*/
+	while (clinitChain != null)
+	  {
+	    Label current = new Label(code);
+	    current.define(code);
+
+	    Initializer chain = clinitChain;
+	    clinitChain = null;
+	    comp.dumpInitializers(chain, method);
+
+	    if (previous != null)
+	      code.emitGoto(previous);
+	    else
+	      method.getCode().emitReturn();
+
+	    if (clinitChain == null)
+	      {
+		lastClinit.define(code);
+		code.emitGoto(current);
+	      }
+	    else
+	      previous = current;
+	  }
+      }
+    else
+      method.getCode().emitReturn();
 
     lab1.define(code);
     comp.literalsChain = literalsChain;
@@ -1078,6 +1113,11 @@ public class LambdaExp extends ScopeExp
 	code.emitInvokeSpecial(type.constructor);
 	code.emitPutStatic(instanceField);
       }
+    else if (this instanceof ClassExp)
+      // generateConstructor might have been called earlier, but we call it 
+      // again because the super-class (gnu.expr.ModuleBody )
+      // seems to be found late.
+      comp.generateConstructor(this);
     code.emitGoto(lab1);
   }
 
@@ -1313,6 +1353,15 @@ public class LambdaExp extends ScopeExp
     LambdaExp save_lambda = comp.curLambda;
     Variable saveStackContext = comp.callStackContext;
     comp.curLambda = this;
+
+    if (primMethods == null)
+      {
+	// This happens for lambdas that are not toplevel nor contained
+	// in a toplevel lambda (eg: global variables values).
+	outer = (ClassExp) comp.topLambda;
+	addMethodFor(comp.topClass, comp, null);
+	compileAsMethod(comp);
+      }
 
     Method method = primMethods[0];
     boolean isStatic = method.getStaticFlag();

@@ -67,11 +67,11 @@ class FunSymbol extends PolySymbol
   int match(Arguments arguments)
   {
     if (parameters == null)
-    {
-      // true for constructors, for instance. case might be removed
-      if (!arguments.plainApplication(arity, this))
-	return 0;
-    }
+      {
+        // true for constructors, for instance. case might be removed
+        if (!arguments.plainApplication(arity, this))
+	  return 0;
+      }
     else if (!parameters.match(arguments, this))
       return 0;
 
@@ -80,18 +80,13 @@ class FunSymbol extends PolySymbol
 
   String explainWhyMatchFails(Arguments arguments)
   {
-    if (parameters != null && arguments.size() > parameters.size)
-      return "No method named " + name + " has as many as " +
-		arguments.size() + " parameters";
+    if (isFieldAccess())
+      {
+        if (arguments.size() == 0)
+          return name + " is not defined";
 
-    if (this instanceof MethodDeclaration.Symbol &&
-	((MethodDeclaration.Symbol)this).getFieldAccessMethod() != null)
-    {
-      if (arguments.size() == 0)
-        return name + " is not defined";
-
-      return name + " is a field of class " + describeParameters();
-    }
+        return name + " is a field of class " + describeParameters();
+      }
 
     return "Method " + name + " expects parameters (" + 
       describeParameters() + ")";

@@ -152,38 +152,32 @@ TOKEN: /* Keywords */
   < CLASS:      "class"		>
 | < INTERFACE:  "interface"	>
 | < IMPLEMENTS: "implements"	>
-| < DOMAIN:     "domain"     	>
+| < EXTENDS:    "extends"    	>
+
+// Packages
+| < IMPORT:     "import"     	>
+| < PACKAGE:    "package"    	>
+
 | < AT:         "@"          	>
 | < EXACTLY_AT: "#"          	>
+| < ANY_:	"Any"        	>
+
+// Expressions
 //| < ASSERT:     "assert"     	>
-| < INPUT:      "input"      	>
-| < OUTPUT:     "output"     	>
 | < FOR:        "for"        	>
 | < IF:         "if"         	>
 | < ELSE:       "else"       	>
-| < ENDIF:      "endif"      	>
 | < WHILE:      "while"      	>
 | < DO:		"do"		>
 //| < TRUE:       "true"       	>
 //| < FALSE:      "false"      	>
-| < ERROR:      "error"      	>
 | < FUN:        "fun"        	>
 | < ALIKE:      "alike"      	>
 //| < THIS:       "this"       	>
-| < EXTENDS:    "extends"    	>
-| < FINALLY:    "finally"    	>
 //| < INSTANCEOF: "instanceof" 	>
-| < DYNAMIC:    "dynamic"    	>
 | < NEW:        "new"        	>
 | < NULL:	"null"		>
-| < IMPORT:     "import"     	>
-| < PACKAGE:    "package"    	>
-| < REQUIRE:    "require"    	>
-| < EXPORT:     "export"     	>
-| < EXTERN:     "extern"     	>
-| < AS:         "as"         	>
 
-| < ANY_:	"Any"        	>
 // Statements
 | < RETURN:     "return"     	>
 | < VARIABLE:   "var"   	>
@@ -203,6 +197,7 @@ TOKEN: /* Keywords */
 | < THROW:	"throw"		>
 | < TRY:	"try" 		>
 | < CATCH:	"catch" 	>
+| < FINALLY:    "finally"    	>
 }
 
 

@@ -1094,12 +1094,15 @@ public final class K0 {
 	    int approx=i.getApprox(x);
 	    if(approx!=BitVector.UNDEFINED_INDEX)
 	      {
-		for(int node=0;node<n;node++)
+		// The approximation on below m is fixed
+		for(int node=m;node<n;node++)
 		  if(Leq.get(node,x))
 		    {
 		      i.setApprox(node,approx);
-		      if(debugK0) S.dbg.println("Approximation for "+iid+": "+
-						indexToString(node)+" -> "+indexToString(approx));
+		      if(debugK0) 
+			S.dbg.println("Approximation for "+iid+": "+
+				      indexToString(node)+" -> "
+				      +indexToString(approx));
 		    }
 	      }
 	  }
@@ -1137,6 +1140,7 @@ public final class K0 {
 			   indexToString(n1)+" <: "+
 			   indexToString(p)+
 			   " (node="+indexToString(node)+")\n"+
+			   "interface "+interfaceToString(iid)+", "+
 			   this);
 		      else ;
 		    else 

@@ -12,7 +12,7 @@
 
 // File    : Node.java
 // Created : Thu Jul 08 10:24:56 1999 by bonniot
-//$Modified: Tue Feb 29 20:29:16 2000 by Daniel Bonniot $
+//$Modified: Tue Mar 14 17:20:41 2000 by Daniel Bonniot $
 
 package bossa.syntax;
 
@@ -156,7 +156,12 @@ abstract public class Node
    * Scopes shared by all modules.
    */
 
-  private static final VarScope globalScope=new VarScope(null);
+  private static final VarScope globalScope=new VarScope(null, true);
+  public static final VarScope getGlobalScope()
+  {
+    return globalScope;
+  }
+  
   private static final TypeScope globalTypeScope;
   static
   {
@@ -192,7 +197,7 @@ abstract public class Node
       {
       case none:
       case down: 
-	this.scope=new VarScope(outer,varSymbols);
+	this.scope=new VarScope(outer,varSymbols, true);
 	this.typeScope=new TypeScope(typeOuter);
 	res=new Scopes(outer,typeOuter);
 	break;
@@ -208,7 +213,7 @@ abstract public class Node
 	
       case upper:
 	if(outer==null)
-	  outer=new VarScope(null);
+	  outer=new VarScope(null, true);
 	outer.addSymbols(varSymbols);
 	this.scope=outer;
 	if(typeOuter==null)
@@ -218,7 +223,7 @@ abstract public class Node
 	break;
 	
       case forward:
-	this.scope=new VarScope(outer,varSymbols);
+	this.scope=new VarScope(outer,varSymbols, false);
 	this.typeScope=new TypeScope(typeOuter);
 	res=new Scopes(this.scope,this.typeScope);
 	break;
@@ -334,6 +339,7 @@ abstract public class Node
     Iterator i=children.iterator();
     while(i.hasNext())
       ((Node)i.next()).doTypecheck();
+
     endTypecheck();
 
     if(savedFunction!=null)

@@ -12,7 +12,7 @@
 
 // File    : MonotypeConstructor.java
 // Created : Thu Jul 22 09:15:17 1999 by bonniot
-//$Modified: Fri Feb 18 21:41:47 2000 by Daniel Bonniot $
+//$Modified: Tue Mar 14 16:59:30 2000 by Daniel Bonniot $
 
 package bossa.syntax;
 
@@ -92,7 +92,7 @@ public class MonotypeConstructor extends Monotype
       User.error(this,
 		 "Class "+tc+" has "+
 		 (arity==0 ? "no" : ""+arity)+
-		 " type parameter"+(arity>1 ? "" : "s"));
+		 " type parameter"+(arity>1 ? "s" : ""));
   }
   
   /****************************************************************
@@ -109,6 +109,31 @@ public class MonotypeConstructor extends Monotype
     if(value instanceof bossa.typing.Variance)
       tc.setVariance((bossa.typing.Variance) value);
   }
+  
+  /****************************************************************
+   * Code generation
+   ****************************************************************/
+
+  /** The value of an initialized variable of this monotype. */
+  gnu.expr.Expression defaultValue()
+  {
+    if(tc==ConstantExp.primByte ||
+       tc==ConstantExp.primChar ||
+       tc==ConstantExp.primShort ||
+       tc==ConstantExp.primInt ||
+       tc==ConstantExp.primLong)
+      return zeroInt;
+    else if(tc==ConstantExp.primFloat ||
+	    tc==ConstantExp.primDouble)
+      return zeroFloat;
+    else
+      return super.defaultValue();
+  }
+  
+  private gnu.expr.Expression zeroInt = 
+    new gnu.expr.QuoteExp(new gnu.math.IntNum(0));
+  private gnu.expr.Expression zeroFloat = 
+    new gnu.expr.QuoteExp(new gnu.math.DFloNum(0.0));
   
   /****************************************************************
    * Printing

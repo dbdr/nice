@@ -12,7 +12,7 @@
 
 // File    : JavaMethodDefinition.java
 // Created : Tue Nov 09 11:49:47 1999 by bonniot
-//$Modified: Thu Feb 24 14:54:59 2000 by Daniel Bonniot $
+//$Modified: Fri Mar 31 20:32:25 2000 by Daniel Bonniot $
 
 package bossa.syntax;
 
@@ -20,6 +20,8 @@ import bossa.util.*;
 
 import gnu.bytecode.*;
 import gnu.expr.*;
+
+import bossa.util.Location;
 
 import java.util.*;
 
@@ -49,43 +51,122 @@ public class JavaMethodDefinition extends MethodDefinition
 			      )
   {
     super(name,constraint,returnType,parameters);
+    
     this.className=className;
     this.methodName=methodName;
     this.javaTypes=javaTypes;
   }
 
-  public void createContext()
+  /****************************************************************
+   * Converting a bytecode type (coming from reflection
+   * into a bossa type.
+   * Used for automatic declaration of jav methods.
+   ****************************************************************/
+  
+  static Monotype getMonotype(Type javaType)
   {
-    super.createContext();
+    return getMonotype(javaType.getName());
+  }
+  
+  static Monotype getMonotype(String name)
+  {
+    if(name.endsWith("[]"))
+      {
+	name=name.substring(0,name.length()-2);
+	List params = new LinkedList();
+	params.add(getMonotype(name));
+	return new MonotypeConstructor
+	  (ConstantExp.arrayTC, 
+	   new TypeParameters(params),
+	   Location.nowhere());
+      }
+    
+    TypeSymbol ts = Node.getGlobalTypeScope().lookup(name);
+    if(ts==null)
+      Internal.error(name+" is not known");
+    if(ts instanceof JavaTypeConstructor)
+      return ((JavaTypeConstructor) ts).getMonotype();
+    // for primitive types, maybe temporary
+    else if(ts instanceof TypeConstructor)
+      return new MonotypeConstructor((TypeConstructor) ts,null,
+				     Location.nowhere());
+    else if(ts instanceof Monotype)
+      return (Monotype) ts;
+    else
+      {
+	Internal.error("Bad java type: "+name+" ("+ts.getClass()+")");
+	return null;
+      }
+  }
+  
+  private static JavaMethodDefinition make(Method m)
+  {
+    JavaMethodDefinition res;
 
+    Type[] paramTypes = m.getParameterTypes();
+    List params;
+    if(m.getStaticFlag())
+      params = new ArrayList(paramTypes.length);
+    else
+      {
+	params = new ArrayList(paramTypes.length+1);
+	params.add(getMonotype(m.getDeclaringClass()));
+      }
+    
+    for(int i=0; i<paramTypes.length; i++)
+      params.add(getMonotype(paramTypes[i]));
+    
+    res = new JavaMethodDefinition(null, m.getName(), null,
+				   new LocatedString(m.getName(), 
+						     Location.nowhere()),
+				   Constraint.True,
+				   getMonotype(m.getReturnType()),
+				   params);
+
+    res.reflectMethod = m;
+    return res;
+  }
+  
+  /****************************************************************
+   * Store automatically fetched java methods.
+   * Do not take them into account if an explicit java method
+   * was declared for the same reflect method.
+   ****************************************************************/
+
+  private static Map declaredMethods = new HashMap();
+  
+  public static JavaMethodDefinition addFetchedMethod(Method m)
+  {
+    if(declaredMethods.get(m)!=null)
+      return null;
+    declaredMethods.put(m, Boolean.TRUE);
+
+    JavaMethodDefinition md = JavaMethodDefinition.make(m);
+    Node.getGlobalScope().addSymbol(md.symbol);
+    return md;
+  }
+
+  public static MethodDefinition addFetchedMethod(Field m)
+  {
+    MethodDefinition md = StaticFieldAccess.make(m);
+    Node.getGlobalScope().addSymbol(md.symbol);
+    return md;
+  }
+
+  Scopes buildScope(VarScope outer, TypeScope typeOuter)
+  {
     // We put this here, since we need 'module' to be computed
     // since it is used to open the imported packages.
-
-    findReflectMethod();
+    findReflectMethod();    
     
-    flags = reflectMethod.getModifiers();
-    
-    if((flags & Access.STATIC) != 0 || methodName.equals("<init>"))
-      javaArity=arity;
-    else
-      javaArity=arity-1;
-
-    if(className==null)
-      MethodDefinition.addMethod(this);
-
-    if(javaTypes!=null && javaTypes.size()-1!=javaArity)
-      User.error(this,
-		 "Native method "+this.symbol.name+
-		 " has not the same number of parameters "+
-		 "in Java ("+javaArity+
-		 ") and in Bossa ("+arity+")");
+    return super.buildScope(outer, typeOuter);
   }
   
   private gnu.bytecode.Type type(LocatedString s)
   {
     Type res = type(s.toString());
     if(res==null)
-      User.error(s, s+" is not a valid java type");
+      User.error(s, "Unknown java class "+s);
     return res;
   }
   
@@ -109,7 +190,10 @@ public class JavaMethodDefinition extends MethodDefinition
     if(s.equals("boolean")) 	return bossa.SpecialTypes.booleanType;
     //if(s.equals("_Array"))	return bossa.SpecialTypes.arrayType;
     
-    return Type.make(JavaTypeConstructor.lookupJavaClass(s));
+    Class clas = JavaTypeConstructor.lookupJavaClass(s);
+    if(clas==null)
+      return null;
+    return Type.make(clas);
   }
   
   /** The java class this method is defined in */
@@ -118,7 +202,7 @@ public class JavaMethodDefinition extends MethodDefinition
   /** Its name in the java class */
   String methodName;
   
-  List /* of LocatedString */ javaTypes;
+  private List /* of LocatedString */ javaTypes;
   
   /** Access flags */
   private int flags;
@@ -146,14 +230,17 @@ public class JavaMethodDefinition extends MethodDefinition
   
   private void findReflectMethod()
   {
+    if(reflectMethod!=null)
+      return;
+    
     javaArgType = new Type[javaTypes.size()-1];
     
     for(int i=1;i<javaTypes.size();i++)
       {
 	LocatedString t = (LocatedString) javaTypes.get(i);
-	    
+	
 	javaArgType[i-1]=type(t);
-	    
+	
 	// set the fully qualified name back
 	javaTypes.set(i,new LocatedString(javaArgType[i-1].getName(),
 					  t.location()));
@@ -164,7 +251,7 @@ public class JavaMethodDefinition extends MethodDefinition
     
     // set the fully qualified name of the return type back
     javaTypes.set(0,new LocatedString(javaRetType.getName(),t.location()));
-	
+    
     Type holder = type(className.toString());
     className = new LocatedString(holder.getName(),className.location());
     
@@ -176,9 +263,23 @@ public class JavaMethodDefinition extends MethodDefinition
     //reflectMethod.arg_types = javaArgType;
     //if(!methodName.equals("<init>"))
     //reflectMethod.return_type = javaRetType;
-    
+
     if(reflectMethod==null)
       User.error(this, this+" was not found");
+
+    declaredMethods.put(reflectMethod, Boolean.TRUE);
+
+    if(reflectMethod.getStaticFlag() || methodName.equals("<init>"))
+      javaArity=arity;
+    else
+      javaArity=arity-1;
+
+    if(javaTypes!=null && javaTypes.size()-1!=javaArity)
+      User.error(this,
+		 "Native method "+this.symbol.name+
+		 " has not the same number of parameters "+
+		 "in Java ("+javaArity+
+		 ") and in Bossa ("+arity+")");    
   }
   
   /****************************************************************
@@ -239,6 +340,5 @@ public class JavaMethodDefinition extends MethodDefinition
   public String toString()
   {
     return "native "+className+"."+methodName+mapGetName(javaArgTypes());
-    
   }
 }

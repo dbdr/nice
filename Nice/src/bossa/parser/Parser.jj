@@ -12,7 +12,7 @@
 
 // File    : parser.jj
 // Created : Thu Jul 01 10:27:05 1999 by bonniot
-//$Modified: Tue Feb 29 20:52:56 2000 by Daniel Bonniot $
+//$Modified: Mon Mar 13 17:35:42 2000 by Daniel Bonniot $
 // Description : Parseur JavaCC pour Bossa
 //   Tokens based on the Jazz parser
 
@@ -678,6 +678,17 @@ List monotypes():
   { return res; }
 }
 
+List namedMonotypes():
+{
+  List res=new ArrayList();
+  Monotype t;
+}
+{
+  t=monotype() [ident()] { res.add(t); }
+  ( "," t=monotype() [ident()] { res.add(t); } )*
+  { return res; }
+}
+
 TypeParameters typeParameters():
 {
   List res=new ArrayList();
@@ -734,7 +745,7 @@ MethodDefinition classMethodDefinition(ClassDefinition c):
   name=ident()
   cst=constraint()
   "("
-  parameters=monotypes()
+  parameters=namedMonotypes()
   ")"
   ";"
   { 
@@ -843,7 +854,7 @@ InterfaceDefinition interfaceDefinition():
   parameters=monotypeVars()
   [ "extends" extensions=interfaces() ]
   ";"
-  { return new InterfaceDefinition(name,parameters,extensions); }
+  { return new InterfaceDefinition(name,parameters,extensions,true); }
 }
 
 Pattern pattern(LocatedString name):
@@ -916,7 +927,7 @@ MethodDefinition methodDefinition():
     returnType=monotype()
     name=methodName()
     "("
-    ( parameters=monotypes() | { parameters=new ArrayList(); } )
+    ( parameters=namedMonotypes() | { parameters=new ArrayList(); } )
     ")"
     
     (
@@ -946,7 +957,7 @@ MethodDefinition methodDefinition():
       | 
        { 
 	 javaTypes=new ArrayList();
-	 if(!isNew) javaTypes.add(s); 
+	 if(!isNew) javaTypes.add(s);
        }
        method=doted_array_string()
        "("
@@ -961,16 +972,19 @@ MethodDefinition methodDefinition():
 	if(isNew)
 	{
 	  javaTypes.add(0,method);
-	  return new JavaMethodDefinition(method,"<init>",javaTypes,name,cst,returnType,parameters);
+	  return new JavaMethodDefinition(method,"<init>",javaTypes,
+					  name,cst,returnType,parameters);
 	}
 	int dot=method.toString().lastIndexOf('.');
 	String methodName=method.toString().substring(dot+1,method.toString().length());
 	LocatedString className=method.substring(0,dot);
 
 	if(javaTypes!=null)
-	  return new JavaMethodDefinition(className,methodName,javaTypes,name,cst,returnType,parameters);
+	  return new JavaMethodDefinition(className,methodName,javaTypes,
+					  name,cst,returnType,parameters);
 	else
-	  return new StaticFieldAccess(className,methodName,name,cst,returnType,parameters);
+	  return new StaticFieldAccess(className,methodName,
+				       name,cst,returnType,parameters);
       }
     )
 }
@@ -1157,7 +1171,8 @@ void module(List definitions,
  * JAVA statements and expressions
  ****************************************************************/
 
-// Respects Java 1.1 syntax (comes from Java1.1.jj file)
+// Java 1.1 syntax-compliant 
+// Derived from the Java1.1.jj file that comes with JavaCC
 
 /*
  * Expression syntax follows.

@@ -29,7 +29,7 @@ class Interface {
   
   // the approximation of each node of the original context
   private final IntVect approx=new IntVect(BitVector.UNDEFINED_INDEX);
-
+  
   public void setApprox(int node, int approx)
   {
     if(node>=this.approx.size())

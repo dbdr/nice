@@ -12,7 +12,7 @@
 
 // File    : Engine.java
 // Created : Tue Jul 27 15:34:53 1999 by bonniot
-//$Modified: Fri Feb 25 20:11:49 2000 by Daniel Bonniot $
+//$Modified: Mon Mar 13 16:30:36 2000 by Daniel Bonniot $
 
 package bossa.engine;
 
@@ -94,11 +94,11 @@ public abstract class Engine
 	  Engine.Constraint k=(Engine.Constraint)i.next();
 	  try{
 	    if(dbg) Debug.println("** Satisfying "+k);
-	  
+	    
 	    k.satisfy();
 	  }
 	  catch(Unsatisfiable e){
-	    if(dbg) Debug.println("** In "+k);
+	    if(dbg) Debug.println("** Exception in "+k+e);
 	    throw e;
 	  }
 	}
@@ -536,6 +536,7 @@ public abstract class Engine
       protected void indexMoved(int src, int dest) {
 	if(dbg)
 	  Debug.println("Changed index of "+indexToString(src));
+
 	// indexToString(dest) is meaningless
 
 	Element movedElement = getElement(src);
@@ -546,7 +547,7 @@ public abstract class Engine
 	if(dbg)
 	  Debug.println("Discarded "+indexToString(index));
 	getElement(index).setId(-2);
-	elements.set(index,null); // enable garbage collection, maybe
+	elements.set(index,null); // enable garbage collection
       }
       /*
        * Pretty printing

@@ -12,7 +12,7 @@
 
 // File    : InterfaceDefinition.java
 // Created : Thu Jul 01 17:00:14 1999 by bonniot
-//$Modified: Wed Feb 16 16:14:00 2000 by Daniel Bonniot $
+//$Modified: Mon Mar 13 17:36:55 2000 by Daniel Bonniot $
 
 package bossa.syntax;
 
@@ -29,13 +29,15 @@ public class InterfaceDefinition extends Definition
 {
   public InterfaceDefinition(LocatedString name, 
 			     Collection typeParameters, 
-			     List extensions)
+			     List extensions,
+			     boolean isSymbol)
   {
     super(name, Node.global);
 
     this.parameters=typeParameters;
     this.variance=Variance.make(typeParameters.size());
-    addTypeSymbol(this);
+    if(isSymbol)
+      addTypeSymbol(this);
     this.extensions=addChildren(extensions);
     itf=variance.newInterface();
   }
@@ -80,7 +82,7 @@ public class InterfaceDefinition extends Definition
 
   public TypeSymbol cloneTypeSymbol()
   {
-    return new InterfaceDefinition(name,parameters,extensions);
+    return new InterfaceDefinition(name,parameters,extensions,false);
   }
   
   public boolean hasName(LocatedString s)

@@ -12,7 +12,7 @@
 
 // File    : VarScope.java
 // Created : Fri Jul 09 11:28:11 1999 by bonniot
-//$Modified: Sat Dec 04 14:10:13 1999 by bonniot $
+//$Modified: Wed Mar 29 14:45:42 2000 by Daniel Bonniot $
 
 package bossa.syntax;
 
@@ -25,15 +25,18 @@ import bossa.util.*;
  */
 class VarScope
 {
-  public VarScope(VarScope outer)
+  public VarScope(VarScope outer, boolean isStop)
   {
     this.outer=outer;
     this.defs=new HashMultiTable();
+    this.stop = isStop;
   }
   
-  public VarScope(VarScope outer, Collection /* of VarSymbol */ defs)
+  public VarScope(VarScope outer, 
+		  Collection /* of VarSymbol */ defs,
+		  boolean isStop)
   {
-    this(outer);
+    this(outer, isStop);
     addSymbols(defs);
   }
 
@@ -66,10 +69,34 @@ class VarScope
   public Collection lookup(LocatedString i)
   {
     Collection res=defs.getAll(i);
-    if(res==null)
-      res=new ArrayList();
+    
     if(outer!=null)
-      res.addAll(outer.lookup(i));
+      if(!stop || res==null)
+	{
+	  if(res==null)
+	    res = new ArrayList();
+	  res.addAll(outer.lookup(i));
+	}
+    
+    if(res==null)
+      res = new LinkedList();
+    return res;
+  }
+
+  /** Do not stop at stops. */
+  public Collection lookupGlobal(LocatedString i)
+  {
+    Collection res=defs.getAll(i);
+    
+    if(outer!=null)
+      {
+	if(res==null)
+	  res = new ArrayList();
+	res.addAll(outer.lookupGlobal(i));
+      }
+    
+    if(res==null)
+      res = new LinkedList();
     return res;
   }
 
@@ -131,9 +158,10 @@ class VarScope
   
   public String toString()
   {
-    return defs+";;\n"+outer;
+    return defs.elementCount()+";;\n"+outer;
   }
   
   private VarScope outer;
   private HashMultiTable defs;
+  private boolean stop;
 }

@@ -12,7 +12,7 @@
 
 // File    : MethodBodyDefinition.java
 // Created : Thu Jul 01 18:12:46 1999 by bonniot
-//$Modified: Wed Mar 01 20:47:38 2000 by Daniel Bonniot $
+//$Modified: Mon Mar 13 17:42:08 2000 by Daniel Bonniot $
 
 package bossa.syntax;
 
@@ -137,6 +137,13 @@ public class MethodBodyDefinition extends Definition
       else
 	{
 	  MethodDefinition m=(MethodDefinition)((MethodDefinition.Symbol)s).definition;
+	  if(m instanceof JavaMethodDefinition)
+// It doesn't make sense to define a body for a native method, does it ?
+	    {
+	      i.remove();
+	      continue;
+	    }
+	  
 	  try{
 	    int level=Typing.enter("Trying definition "+m+" for method body "+name);
 	    try{
@@ -160,17 +167,25 @@ public class MethodBodyDefinition extends Definition
 	  }
 	}
     }
+
     if(symbols.size()==1) return (VarSymbol)symbols.iterator().next();
 
     if(symbols.size()==0)
       User.error(this,
 		 "No definition of \""+name+"\" is compatible with the patterns");
 
+    String methods="";
+    for(Iterator i=symbols.iterator();i.hasNext();){
+      MethodDefinition m = 
+	((MethodDefinition.Symbol)i.next()).definition;
+      methods+=m+" defined "+m.location()+"\n";
+    }
+    
     User.error(this,"There is an ambiguity about which version of the overloaded method \""+
 	       name+"\" this alternative belongs to.\n"+
 	       "Try to use more patterns.\n\n"+
-	       "Methods considered:\n"+
-	       Util.map("","\n","",symbols));
+	       "Possible methods:\n"+
+	       methods);
     return null;
   }
   
@@ -375,7 +390,8 @@ public class MethodBodyDefinition extends Definition
 
     gnu.expr.LambdaExp lexp = new gnu.expr.LambdaExp(blockExp);
     Statement.currentScopeExp = lexp;
-    
+    lexp.setName(name.toString());
+
     lexp.setPrimMethod(module.getBytecode().addMethod
       (bossa.Bytecode.escapeString(definition.getBytecodeName()+Pattern.bytecodeRepresentation(formals)),
        definition.javaArgTypes(),definition.javaReturnType(),

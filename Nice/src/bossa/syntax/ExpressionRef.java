@@ -12,7 +12,7 @@
 
 // File    : ExpressionRef.java
 // Created : Tue Aug 17 16:04:40 1999 by bonniot
-//$Modified: Thu Feb 03 13:34:51 2000 by Daniel Bonniot $
+//$Modified: Wed Mar 29 16:01:50 2000 by Daniel Bonniot $
 
 package bossa.syntax;
 
@@ -88,12 +88,17 @@ final public class ExpressionRef extends Expression
   {
     return content.isAssignable();
   }
-  
+
   FieldAccessMethod getFieldAccessMethod()
   {
     return content.getFieldAccessMethod();
   }
   
+  gnu.bytecode.ClassType staticClass()
+  {
+    return content.staticClass();
+  }  
+
   Expression resolveOverloading(List /* of Expression */ parameters)
   {
     content=content.resolveOverloading(parameters);
@@ -146,5 +151,10 @@ final public class ExpressionRef extends Expression
     return content.toString();
   }
 
+  Expression content()
+  {
+    return content;
+  }
+  
   private Expression content;
 }

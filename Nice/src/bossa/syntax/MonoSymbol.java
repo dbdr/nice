@@ -12,7 +12,7 @@
 
 // File    : MonoSymbol.java
 // Created : Fri Jul 16 17:10:53 1999 by bonniot
-//$Modified: Tue Feb 15 22:03:23 2000 by Daniel Bonniot $
+//$Modified: Tue Mar 14 17:18:22 2000 by Daniel Bonniot $
 
 package bossa.syntax;
 
@@ -73,6 +73,15 @@ public class MonoSymbol extends VarSymbol
     type=type.resolve(typeScope);
   }
 
+  /****************************************************************
+   * Typechecking
+   ****************************************************************/
+
+  void typecheck()
+  {
+    type.typecheck();
+  }
+  
   /****************************************************************
    * Printing
    ****************************************************************/

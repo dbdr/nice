@@ -12,7 +12,7 @@
 
 // File    : JavaTypeConstructor.java
 // Created : Thu Jul 08 11:51:09 1999 by bonniot
-//$Modified: Fri Feb 25 16:48:50 2000 by Daniel Bonniot $
+//$Modified: Fri Mar 31 20:27:33 2000 by Daniel Bonniot $
 
 package bossa.syntax;
 
@@ -20,7 +20,9 @@ import bossa.util.*;
 import bossa.engine.*;
 import bossa.typing.*;
 
-import gnu.bytecode.Type;
+import gnu.bytecode.*;
+
+import bossa.util.Location;
 
 import java.util.*;
 
@@ -64,10 +66,10 @@ public class JavaTypeConstructor extends TypeConstructor
     if(o!=null)
       return (TypeConstructor) o;
     
-    JavaTypeConstructor res=new JavaTypeConstructor(name,javaType);
-
-    hash.put(name.content,res);
-    return res;
+    // we put the new JTC in the hashtable in the constructor
+    // and not after it returned, to avoid infinite loop
+    // if the code of the constructor does a lookup.
+    return new JavaTypeConstructor(name,javaType);
   }
 
   static void registerTypeConstructorForJavaClass
@@ -106,13 +108,22 @@ public class JavaTypeConstructor extends TypeConstructor
     return false;
   }
       
-  private JavaTypeConstructor(LocatedString className, gnu.bytecode.Type javaType)
+  private JavaTypeConstructor(LocatedString className, 
+			      gnu.bytecode.Type javaType)
   {
     super(className);
+    hash.put(className.content, this);
+    this.javaType = javaType;
+
+    if(Debug.javaTypes)
+      Debug.println("Registering java class "+className);
     
+    if(bossa.modules.Package.contextFrozen())
+      // we should not add new classes at this point    
+      return;
+
     //setVariance(Variance.make(0));
     bossa.typing.Typing.introduce(this);
-    this.javaType = javaType;
     
     // Recursive searching for java super classes
     if(javaType instanceof gnu.bytecode.ClassType)
@@ -149,11 +160,36 @@ public class JavaTypeConstructor extends TypeConstructor
 	      }
 	    }
       }
+    Node.getGlobalTypeScope().addSymbol(this);
+    fetchMethods();
     javaTypeConstructors.add(this);
   }
 
   private static List javaTypeConstructors = new ArrayList(100);
 
+  /**
+   * Loads the methods defined in the java class
+   * to make them available to the bossa code.
+   */
+  private void fetchMethods()
+  {
+    if(!(javaType instanceof ClassType))
+      return;
+    ClassType classType = (ClassType) javaType;
+    try{
+      classType.addMethods();
+    }
+    catch(NoClassDefFoundError e){
+      User.error(this,
+		 "Class "+e.getMessage().replace('/','.')+
+		 " was not found.\n"+
+		 "You probably need to install the corresponding package.");
+    }
+    
+    for(Method m = classType.getMethods(); m!=null; m = m.getNext())
+      JavaMethodDefinition.addFetchedMethod(m);
+  }
+  
   public static void createContext()
   {
     for(Iterator i = javaTypeConstructors.iterator(); i.hasNext();)
@@ -161,7 +197,7 @@ public class JavaTypeConstructor extends TypeConstructor
 	JavaTypeConstructor tc = (JavaTypeConstructor) i.next();
 	if(tc.getKind()==null)
 	  try{
-	    Engine.setKind(tc,Variance.make(0).getConstraint());
+	    Engine.setKind(tc, Variance.make(0).getConstraint());
 	  }
 	  catch(Unsatisfiable e){
 	    User.error(tc,
@@ -198,9 +234,14 @@ public class JavaTypeConstructor extends TypeConstructor
       
   Polytype getType()
   {
-    return new Polytype(new MonotypeConstructor(this,null,name.location()));
+    return new Polytype(getMonotype());
   }
 
+  Monotype getMonotype()
+  {
+    return new MonotypeConstructor(this,null,name.location());
+  }
+  
   boolean instantiable()
   {
     if(!(javaType instanceof gnu.bytecode.ClassType))
@@ -276,7 +317,26 @@ public class JavaTypeConstructor extends TypeConstructor
    * On the fly lookup of java types
    ****************************************************************/
 
+  /** Search className in opened packages too */
   static java.lang.Class lookupJavaClass(String className)
+  {
+    Class res = internLookupJavaClass(className);
+
+    if(res==null)
+      for(Iterator i=Node.getGlobalTypeScope().module.listImplicitPackages(); 
+	  i.hasNext();)
+	{
+	  String pkg = ((LocatedString) i.next()).toString();
+
+	  res = internLookupJavaClass(pkg+"."+className);
+	  if(res!=null)
+	    break;
+	}
+    return res;
+  }
+  
+  /** Do not search in opened packages */
+  private static java.lang.Class internLookupJavaClass(String className)
   {
     Class c = null;
 
@@ -289,46 +349,25 @@ public class JavaTypeConstructor extends TypeConstructor
       // can occur in Windows
       { }
       
-    if(c!=null)
-      return c;
-    
-    if(Node.getGlobalTypeScope().module!=null)
-      for(Iterator i = Node.getGlobalTypeScope().module.listImplicitPackages();
-	  i.hasNext();)
-	{
-	  String pkg = ((LocatedString) i.next()).toString();
-	  
-	  try{ c=Class.forName(pkg+"."+className); break; }
-	  catch(ClassNotFoundException e){ }
-	}
-    
     return c;
   }
 
   static TypeConstructor lookup(String className)
   {
-    Class c = lookupJavaClass(className);    
+    if(hash.containsKey(className))
+      return (TypeConstructor) hash.get(className);
+    
+    Class c = internLookupJavaClass(className);    
     
     if(c==null)
-      return null;
-
-    if(Debug.javaTypes)
-      Debug.println("Registering java class "+c.getName());
-    
-    TypeConstructor res = JavaTypeConstructor.make
-      (c.getName(),gnu.bytecode.Type.make(c));
-    Node.getGlobalTypeScope().addSymbol(res);
-    
-    // Remembers the short name as an alias
-    if(!(className.equals(c.getName())))
       {
-	if(Debug.javaTypes)
-	  Debug.println("Registering alias "+className);
-
-	Node.getGlobalTypeScope().addMapping(className,res);
+	hash.put(className,null);
+	return null;
       }
     
-    return res;
+    return new JavaTypeConstructor
+      (new LocatedString(c.getName(), Location.nowhere()),
+       gnu.bytecode.Type.make(c));
   }
 
   String bytecodeRepresentation()

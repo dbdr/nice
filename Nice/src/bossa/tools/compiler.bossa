@@ -12,7 +12,7 @@
 
 // File    : compiler.bossa
 // Created : Sat Feb 19 16:21:04 2000 by Daniel Bonniot
-//$Modified: Wed Mar 01 18:06:05 2000 by Daniel Bonniot $
+//$Modified: Tue Mar 14 14:39:32 2000 by Daniel Bonniot $
 
 package bossa.tools;
 
@@ -22,36 +22,30 @@ package bossa.tools;
  * @author Daniel Bonniot
  */
 
-import bossa.lang;
 import mlsub.compilation;
 import bossa.opt;
+import bossa.modules;
 
 main(args)
 {
-  boolean recompileCommandLine = false;
-  boolean recompileAll = false;
-  boolean ddoLink=true;
+  boolean recompileCL = false;
+  boolean recAll = false;
+  boolean ddoLink = true;
   List<Option> opts = makeVector(10);
 
-  opts.add(option('h',"help","print help message and exit",
-		  fun()=>
-                  {
-		    println(printOptions(opts));
-		    exit(1);
-		  }));
   opts.add(option('r',"recompile",
-		  "forces recompilation of packages given on the command line",
+		  "force recompilation of packages given on the command line",
 		  "no/command-line/all",
-  		  fun()=>{recompileCommandLine=true;},
+  		  fun()=>{recompileCL=true;},
   		  fun(String arg)=>{
 		    if("all".equals(arg))
-		      recompileAll=true;
+		      recAll=true;
 		    else if("command-line".equals(arg))
-		      recompileCommandLine=true;
+		      recompileCL=true;
 		    else if("none".equals(arg))
 		      {
-		        recompileCommandLine=false;
-		        recompileAll=false;
+		        recompileCL=false;
+		        recAll=false;
 		      }
 		    }));
 
@@ -59,30 +53,30 @@ main(args)
 		  "just compile packages, do not link them",
   		  fun()=>{ddoLink=false;}));
 
+  opts.add(option('h',"help","print help message and exit",
+		  fun()=>
+                  {
+		    println(printOptions(opts));
+		    exit(1);
+		  }));
+
   opts.add(option('?',"usage",
 		  "print usage information and exit",
 		  fun()=>usage()));
 
   Sequence<String> rest = parse("bossac", args, opts);
   if((rest.size()<1) | (rest.size()>1))
-    {
-      usage();
-    };
+    usage();
+
   String packageName = rest.get(0);
 
-  println("Bossa compiler");
+  //println("Bossa compiler");
 
-  if(!(packageName.equals("bossa.lang")))
-    readPackage("bossa.lang", false);
+  bossa.modules.Compilation compilation = 
+    make(packageName, ddoLink, recompileCL, recAll);
 
-  mlsub.compilation.Module rootModule = 
-    readPackage(packageName,recompileCommandLine);
-
-  make(rootModule /*, recompileAll, doLink*/);
+  make(compilation);
 }
-
-bossa.modules.Package readPackage(String, boolean) =
-  native bossa.modules.Package bossa.modules.Package.make(String, boolean);
 
 void usage();
 usage()

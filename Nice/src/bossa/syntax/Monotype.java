@@ -12,7 +12,7 @@
 
 // File    : Monotype.java
 // Created : Thu Jul 01 19:28:28 1999 by bonniot
-//$Modified: Tue Feb 15 22:02:00 2000 by Daniel Bonniot $
+//$Modified: Tue Mar 14 14:25:17 2000 by Daniel Bonniot $
 // Description : Abstract syntactic type, without constraint
 
 package bossa.syntax;
@@ -158,6 +158,16 @@ abstract public class Monotype
     for(Iterator i=types.iterator();
 	i.hasNext();)
       ((Monotype) i.next()).resolve(typeScope);
+  }
+
+  /****************************************************************
+   * Code generation
+   ****************************************************************/
+
+  /** The value of an initialized variable of this monotype. */
+  gnu.expr.Expression defaultValue()
+  {
+    return gnu.expr.QuoteExp.nullExp;
   }
   
   /****************************************************************

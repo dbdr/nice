@@ -12,7 +12,7 @@
 
 // File    : StaticFieldAccess.java
 // Created : Thu Jul 01 18:12:46 1999 by bonniot
-//$Modified: Wed Mar 01 21:45:23 2000 by Daniel Bonniot $
+//$Modified: Wed Mar 29 16:57:46 2000 by Daniel Bonniot $
 
 package bossa.syntax;
 
@@ -22,6 +22,7 @@ import gnu.bytecode.*;
 import gnu.expr.*;
 
 import java.util.*;
+import bossa.util.Location;
 
 /**
  * A native java static field access.
@@ -39,6 +40,26 @@ public class StaticFieldAccess extends MethodDefinition
     if(parameters.size()!=0)
       User.error(name,
 		 name+" should have no parameters");    
+  }
+  
+  static MethodDefinition make(Field f)
+  {
+    Monotype retType = JavaMethodDefinition.getMonotype(f.getType());
+
+    List params = new LinkedList();
+    if(!f.getStaticFlag())
+      params.add(JavaMethodDefinition.getMonotype(f.getDeclaringClass()));
+    
+    StaticFieldAccess res =
+      new StaticFieldAccess(new LocatedString(f.getDeclaringClass().getName(),
+					      Location.nowhere()),
+			    f.getName(),
+			    new LocatedString(f.getName(),
+					      Location.nowhere()),
+			    Constraint.True,
+			    retType, params);
+    res.field = f.getReflectField();
+    return res;
   }
   
   public void createContext()

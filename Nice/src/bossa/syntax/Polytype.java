@@ -12,7 +12,7 @@
 
 // File    : Polytype.java
 // Created : Tue Jul 13 12:51:38 1999 by bonniot
-//$Modified: Tue Feb 15 22:02:52 2000 by Daniel Bonniot $
+//$Modified: Sat Mar 11 16:00:20 2000 by Daniel Bonniot $
 
 package bossa.syntax;
 
@@ -80,7 +80,7 @@ public class Polytype extends Node
     return res;
   }
   
-  public Polytype cloneType()
+  Polytype cloneType()
   {
     //Optimization
     if(!constraint.hasBinders())

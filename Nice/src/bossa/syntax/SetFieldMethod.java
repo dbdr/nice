@@ -12,7 +12,7 @@
 
 // File    : SetFieldMethod.java
 // Created : Thu Jul 01 18:12:46 1999 by bonniot
-//$Modified: Fri Feb 25 13:43:04 2000 by Daniel Bonniot $
+//$Modified: Sat Mar 11 15:27:06 2000 by Daniel Bonniot $
 
 package bossa.syntax;
 
@@ -39,8 +39,6 @@ public class SetFieldMethod extends MethodDefinition
     this.definition=classDef;
     this.classTC = classDef.tc;
     this.fieldName = fieldName.toString();
-    
-    MethodDefinition.addMethod(this);
   }
   
   private static List makeList(Monotype t1, Monotype t2)

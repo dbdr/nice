@@ -12,7 +12,7 @@
 
 // File    : Expression.java
 // Created : Mon Jul 05 16:25:02 1999 by bonniot
-//$Modified: Fri Feb 04 11:48:42 2000 by Daniel Bonniot $
+//$Modified: Wed Mar 29 15:28:43 2000 by Daniel Bonniot $
 // Description : 
 
 package bossa.syntax;
@@ -70,6 +70,15 @@ public abstract class Expression extends Node
    * @return the FieldAccessMethod behind this expression, or null
    */
   FieldAccessMethod getFieldAccessMethod()
+  {
+    return null;
+  }
+  
+  /** 
+      @return null, or the underlying java class if this
+      expression is a constant class (used in static method calls).
+  */
+  gnu.bytecode.ClassType staticClass()
   {
     return null;
   }

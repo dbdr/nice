@@ -12,7 +12,7 @@
 
 // File    : Block.java
 // Created : Wed Jul 07 17:42:15 1999 by bonniot
-//$Modified: Thu Mar 02 14:55:53 2000 by Daniel Bonniot $
+//$Modified: Tue Mar 14 17:22:21 2000 by Daniel Bonniot $
 // Description : A block : a list of statements with local variables
 
 package bossa.syntax;
@@ -40,7 +40,7 @@ public class Block extends Statement
       if(value!=null)
 	this.value=expChild(value);
     }
-
+    
     public gnu.expr.Expression generateCode()
     {
       Internal.error("Should not be called");
@@ -137,9 +137,14 @@ public class Block extends Statement
 
   /**
    * Checks that the local bindings are type-safe.
+   *
    * This may involve overloading resolution on the values.
+   * 
+   * Typecheking is done after the children, since
+   * an error in a child is more intuitive.
+   * There is no dependency in the order.
    */
-  void typecheck()
+  void endTypecheck()
   {
     for(Iterator i=locals.iterator();
 	i.hasNext();)
@@ -153,7 +158,9 @@ public class Block extends Statement
 	catch(bossa.typing.TypingEx t){
 	  User.error(local.left,"Typing error : "+local.left.name+
 		     " cannot be assigned value \""+local.value+"\"",
-		     " of type "+local.value.getType());
+		     " of type "+local.value.getType()+" since "+
+		     local.left.name+" has type "+
+		     local.left.type);
 	}
       }
   }
@@ -214,9 +221,9 @@ public class Block extends Statement
     Statement.currentScopeExp = res;
     
     if(local.value==null)
-      eVal[0]=gnu.expr.QuoteExp.nullExp;
+      eVal[0] = local.left.type.defaultValue();
     else
-      eVal[0]=local.value.generateCode();
+      eVal[0] = local.value.generateCode();
     local.left.setDeclaration
       (res.addDeclaration(local.left.name.toString(),
 			  local.left.type.getJavaType()));

@@ -12,7 +12,7 @@
 
 // File    : MethodDefinition.java
 // Created : Thu Jul 01 18:12:46 1999 by bonniot
-//$Modified: Wed Feb 23 17:36:28 2000 by Daniel Bonniot $
+//$Modified: Fri Mar 31 19:16:18 2000 by Daniel Bonniot $
 
 package bossa.syntax;
 
@@ -47,7 +47,8 @@ public class MethodDefinition extends Definition
 			  List parameters)
   {
     super(name, Node.global);
-    
+    this.memberOf=c;
+
     List params=new ArrayList();
     // if it is a class method, there is an implicit "this" argument
     //TODO    if(c!=null)
@@ -60,8 +61,6 @@ public class MethodDefinition extends Definition
       (name,new Polytype(constraint,new FunType(params,returnType)),this);
     addChild(symbol);
 
-    this.memberOf=c;
-
     bytecodeName = module.mangleName(symbol.name.toString());
 
     bossa.link.Dispatch.register(this);
@@ -73,6 +72,16 @@ public class MethodDefinition extends Definition
 			  List parameters)
   {
     this(null,name,constraint,returnType,parameters);
+  }
+  
+  /** 
+      Does not specify the type of the method.
+      Used in JavaMethodDefinition to lazyfy
+      the lookup of java types.
+  */
+  MethodDefinition(LocatedString name)
+  {
+    super(name, Node.global);
   }
   
   public Collection associatedDefinitions()
@@ -95,23 +104,6 @@ public class MethodDefinition extends Definition
   int getArity()
   {
     return arity;
-  }
-  
-  /****************************************************************
-   * Native methods
-   ****************************************************************/
-
-  private static ArrayList methods = new ArrayList();
-  
-  static void addMethod(MethodDefinition m)
-  {
-    methods.add(m);
-  }
-  
-  static void compileMethods(bossa.modules.Package module)
-  {
-    //for(Iterator i=methods.iterator();i.hasNext();)
-    //((MethodDefinition)i.next()).compile();
   }
   
   /****************************************************************

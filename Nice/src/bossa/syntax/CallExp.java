@@ -12,7 +12,7 @@
 
 // File    : CallExp.java
 // Created : Mon Jul 05 16:27:27 1999 by bonniot
-//$Modified: Tue Feb 29 17:53:35 2000 by Daniel Bonniot $
+//$Modified: Thu Mar 30 19:23:21 2000 by Daniel Bonniot $
 
 package bossa.syntax;
 
@@ -21,7 +21,7 @@ import bossa.util.*;
 import bossa.typing.*;
 
 /**
- * A function call
+ * A function call.
  */
 public class CallExp extends Expression
 {
@@ -58,8 +58,8 @@ public class CallExp extends Expression
 			   List /* of Polytype */ parameters)
   {
     try{
-      Polytype t=getType(fun,parameters);
-      if(t==null) return false;
+      Polytype t = getType(fun,parameters);
+      return true;
     }
     catch(ReportErrorEx e){
       return false;
@@ -70,7 +70,6 @@ public class CallExp extends Expression
     catch(BadSizeEx e){
       return false;
     }
-    return true;
   }
   
   static Polytype getTypeAndReportErrors(Location loc,
@@ -165,10 +164,60 @@ public class CallExp extends Expression
     return new Polytype(cst,codom);
   }
 
+  private boolean overloadingResolved;
+  
   private void resolveOverloading()
-  //TODO: decide where to resolve overloading, and do it just once
   {
+    // do not resolve twice
+    if(overloadingResolved)
+      return;
+    overloadingResolved = true;
+    
     parameters=Expression.noOverloading(parameters);
+
+    if(parameters.size()>=1)
+      {
+	gnu.bytecode.ClassType javaClass = 
+	  ((Expression) parameters.get(0)).staticClass();
+	if(javaClass!=null)
+	  // A static function is called
+	  {
+	    if(!(fun.content() instanceof OverloadedSymbolExp))
+	      Internal.error("Should not happen for the time being");
+	    LocatedString funName = 
+	      ((OverloadedSymbolExp) fun.content()).ident;
+
+	    parameters.remove(0);
+	    Collection possibilities = new LinkedList();
+	    javaClass.addMethods();
+	    
+	    // search methods
+	    for(gnu.bytecode.Method method = javaClass.getMethods();
+		method!=null; method = method.getNext())
+	      if(method.getName().equals(funName.content) &&
+		 method.arg_types.length==parameters.size())
+		{
+		  MethodDefinition md = 
+		    JavaMethodDefinition.addFetchedMethod(method);
+		  if(md!=null)
+		    possibilities.add(md.symbol);
+		}
+	    
+
+	    // search a field
+	    if(parameters.size()==0)
+	      {
+		gnu.bytecode.Field field = javaClass.getField(funName.toString());
+		if(field!=null)
+		  possibilities.add(JavaMethodDefinition.addFetchedMethod(field).symbol);
+	      }
+	    
+	    fun = new ExpressionRef
+	      (new OverloadedSymbolExp(possibilities, funName,
+				       fun.content().getScope()));
+	  }
+      }
+    
     fun.resolveOverloading(Expression.getType(parameters));
   }
   
@@ -200,7 +249,6 @@ public class CallExp extends Expression
 
   public gnu.expr.Expression compile()
   {
-    //resolveOverloading();
     return new gnu.expr.ApplyExp(fun.generateCode(),
 				 Expression.compile(parameters));
   }

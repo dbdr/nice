@@ -12,7 +12,7 @@
 
 // File    : ConstantExp.java
 // Created : Thu Jul 08 15:36:40 1999 by bonniot
-//$Modified: Tue Feb 29 21:36:19 2000 by Daniel Bonniot $
+//$Modified: Tue Mar 14 11:52:38 2000 by Daniel Bonniot $
 
 package bossa.syntax;
 
@@ -130,12 +130,24 @@ public class ConstantExp extends Expression
 	return bossa.SpecialTypes.charType;
       }
     
+    if(name.equals("bossa.lang.byte"))
+      {
+	primByte = tc;
+	return bossa.SpecialTypes.byteType;
+      }
+    
     if(name.equals("bossa.lang.int"))
       {
 	primInt = tc;
 	return 
 	  bossa.SpecialTypes.intType;
-	//gnu.bytecode.ClassType.make("gnu.math.IntNum");
+      }
+    
+    if(name.equals("bossa.lang.long"))
+      {
+	primLong = tc;
+	return 
+	  bossa.SpecialTypes.longType;
       }
     
     if(name.equals("bossa.lang.boolean"))
@@ -143,6 +155,24 @@ public class ConstantExp extends Expression
 	primBool = tc;
 	boolType = new MonotypeConstructor(primBool, null, tc.location());
 	return bossa.SpecialTypes.booleanType;
+      }
+    
+    if(name.equals("bossa.lang.short"))
+      {
+	primShort = tc;
+	return bossa.SpecialTypes.shortType;
+      }
+    
+    if(name.equals("bossa.lang.double"))
+      {
+	primDouble = tc;
+	return bossa.SpecialTypes.doubleType;
+      }
+    
+    if(name.equals("bossa.lang.float"))
+      {
+	primFloat = tc;
+	return bossa.SpecialTypes.floatType;
       }
     
     if(name.equals("bossa.lang.void"))
@@ -154,6 +184,7 @@ public class ConstantExp extends Expression
     return null;
   }
       
-  static TypeConstructor primChar, primInt, primBool;
+  static TypeConstructor primByte, primChar, primInt, primLong, primBool, 
+    primShort, primDouble, primFloat, arrayTC;
   static Monotype voidType, boolType;
 }

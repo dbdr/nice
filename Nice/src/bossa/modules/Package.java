@@ -12,7 +12,7 @@
 
 // File    : Package.java
 // Created : Wed Oct 13 16:09:47 1999 by bonniot
-//$Modified: Wed Mar 01 21:53:28 2000 by Daniel Bonniot $
+//$Modified: Fri Mar 31 20:28:25 2000 by Daniel Bonniot $
 
 package bossa.modules;
 
@@ -21,9 +21,12 @@ import mlsub.compilation.*;
 import bossa.util.*;
 import bossa.syntax.*;
 import gnu.bytecode.*;
+import gnu.expr.*;
 
 import java.util.*;
 import java.io.*;
+
+import bossa.modules.Compilation;
 
 /**
  * A Bossa Package.
@@ -67,21 +70,18 @@ public class Package implements mlsub.compilation.Module
   /****************************************************************
    * Loading
    ****************************************************************/
-
-  public static Package make(String name, boolean forceReload)
+  
+  public static Package make(String name, Compilation compilation,
+			     boolean forceReload)
   {
     return make(new LocatedString(name, bossa.util.Location.nowhere()), 
-		forceReload);
-  }
-  
-  public static Package make(String name)
-  {
-    return make(name, false);
+		compilation,forceReload);
   }
   
   private static final Map map = new HashMap();
   
-  public static Package make(LocatedString lname, boolean forceReload)
+  public static Package make(LocatedString lname, Compilation compilation,
+			     boolean forceReload)
   {
     String name = lname.toString();
 
@@ -89,16 +89,26 @@ public class Package implements mlsub.compilation.Module
     if(res!=null)
       return res;
     
-    return new Package(lname, forceReload);
+    return new Package(lname, compilation, forceReload);
   }
+
+  /****************************************************************
+   * Single Constructor
+   ****************************************************************/
   
-  private Package(LocatedString name, boolean forceReload)
+  private Package(LocatedString name, Compilation compilation,
+		  boolean forceReload)
   {
-    this.name=name;
+    this.name = name;
+    this.compilation = compilation;
     
     map.put(name.toString(),this);
 
     imports = new LinkedList();
+    if(!name.toString().equals("bossa.lang"))
+      imports.add(new LocatedString("bossa.lang", 
+				    bossa.util.Location.nowhere()));
+
     opens  = new LinkedList();
     opens.add(this.name);
     opens.add(new LocatedString("java.lang", bossa.util.Location.nowhere()));
@@ -106,8 +116,9 @@ public class Package implements mlsub.compilation.Module
     findPackageDirectory();
     if(directory==null)
       User.error(name,"Could not find package "+name);
-
-    read(forceReload);
+    //Debug.println("Dir of "+this+" is "+directory.getPath());
+    
+    read(forceReload || compilation.recompileAll);
     
     // when we import a bossa package, we also open it.
     opens.addAll(imports);
@@ -240,6 +251,7 @@ public class Package implements mlsub.compilation.Module
 
   public void freezeGlobalContext()
   {
+    contextFrozen=true;
     try{
       bossa.syntax.JavaTypeConstructor.createContext();
       bossa.engine.Engine.createInitialContext();
@@ -251,9 +263,16 @@ public class Package implements mlsub.compilation.Module
 
   public void unfreezeGlobalContext()
   {
+    contextFrozen=false;
     bossa.engine.Engine.releaseInitialContext();
   }
 
+  private static boolean contextFrozen;
+  public static boolean contextFrozen()
+  {
+    return contextFrozen;
+  }
+  
   private void typecheck()
   {
     //if(!sourcesRead)
@@ -320,22 +339,37 @@ public class Package implements mlsub.compilation.Module
     return name;
   }
   
-  private gnu.bytecode.ClassType bytecode;
-  public  gnu.bytecode.ClassType getBytecode() { return bytecode; }
+  private ClassType bytecode;
+  public  ClassType getBytecode() { return bytecode; }
 
-  private gnu.expr.Compilation compilation;
-  public  gnu.expr.Compilation getCompilation() { return compilation; }
+  private static ModuleExp pkg;
+  public ScopeExp getPackageScopeExp()
+  {
+    return pkg;
+  }
+  static
+  {
+    // pkg is shared ny all packages for now
+    // if we change this, there should be a "super-ModuleExp"
+    // (or change FindCapturedVars, and maybe others...)
+    pkg = new ModuleExp();
+    pkg.setName("packageExp");
+    pkg.body = QuoteExp.voidExp;
+  }
+
+  private gnu.expr.Compilation comp;
+  public  gnu.expr.Compilation getCompilation() { return comp; }
   
-  public static final gnu.bytecode.ClassType dispatchClass;
+  public static final ClassType dispatchClass;
   public static final gnu.expr.Compilation dispatchComp;
   static
   {
-    gnu.bytecode.ClassType ct=null;
+    ClassType ct=null;
     gnu.expr.Compilation comp=null;
     try{
       kawa.standard.Scheme.registerEnvironment();
       
-      ct = new gnu.bytecode.ClassType("dispatchClass");
+      ct = new ClassType("dispatchClass");
       ct.setSuper(Type.pointer_type);
       ct.setModifiers(Access.PUBLIC|Access.FINAL);
       comp = new gnu.expr.Compilation(ct,"dispatchClass",
@@ -354,28 +388,35 @@ public class Package implements mlsub.compilation.Module
    */
   private void generateCode()
   {
-    //if(!sourcesRead)
-    //return;
+    if(!sourcesRead)
+      {
+	ast.compile();
+	return;
+      }
 
     if(Debug.passes)
       Debug.println("Generating code for "+this);    
     
-    compilation = new gnu.expr.Compilation(bytecode,name.toString(),name.toString(),"prefix",false);
+    //comp = new gnu.expr.Compilation(pkg, name.toString()+"DUMMY",
+    //name.toString()+".", false);
+
+    comp = new gnu.expr.Compilation(bytecode,name.toString(),name.toString(),"prefix",false);
     
     ast.compile();
-    if(isRunnable())     
+
+    if(isRunnable()) 
       MethodBodyDefinition.compileMain(this, mainAlternative);
 
-    compilation.compileClassInit(initStatements);
+    comp.compileClassInit(initStatements);
     
     addClass(bytecode);
-    for (int iClass = 0;  iClass < compilation.numClasses;  iClass++)
-      addClass(compilation.classes[iClass]);
+    for (int iClass = 0;  iClass < comp.numClasses;  iClass++)
+      addClass(comp.classes[iClass]);
   }
 
   public ClassType createClass(String name)
   {
-    ClassType res = gnu.bytecode.ClassType.make(this.name+"."+name);
+    ClassType res = ClassType.make(this.name+"."+name);
     res.requireExistingClass(false);
 
     return res;
@@ -414,6 +455,8 @@ public class Package implements mlsub.compilation.Module
 
   public void compileMethod(gnu.expr.LambdaExp meth)
   {
+    pkg.addMethod(meth);
+    
     //FIXME
     gnu.expr.ChainLambdas.chainLambdas(meth);
     gnu.expr.PushApply.pushApply(meth);
@@ -421,7 +464,7 @@ public class Package implements mlsub.compilation.Module
     meth.setCanRead(true);
     gnu.expr.FindCapturedVars.findCapturedVars(meth);
     
-    meth.compileAsMethod(compilation);
+    meth.compileAsMethod(comp);
   }
   
   public void compileDispatchMethod(gnu.expr.LambdaExp meth)
@@ -585,11 +628,13 @@ public class Package implements mlsub.compilation.Module
     for(Iterator i = imports.iterator(); i.hasNext();)
       {
 	LocatedString s = (LocatedString) i.next();
-	importedPackages.add(make(s, false));
+	importedPackages.add(make(s, compilation, false));
       }
   }
-  
-  List /* of LocatedString */ opens; /* package open */
+
+  /** List of the LocatedStrings of packages implicitely opened. */
+  List opens;
+
   private AST ast;
 
   /** The directory where this package resides. */
@@ -597,6 +642,9 @@ public class Package implements mlsub.compilation.Module
 
   /** The component of the package path this package was found in. */ 
   private File rootDirectory;
+  
+  /** The compilation that is in process. */
+  private Compilation compilation;
   
   public boolean isRunnable()
   {

@@ -61,8 +61,8 @@ public class SpecialArray extends gnu.bytecode.ArrayType
   public boolean isSubtype (Type other)
   {
     boolean res = other instanceof SpecialArray || _ArrayType.isSubtype(other);
-    if(!res)
-      bossa.util.Debug.println("SpecialArray is not subtype of "+other);
+    //if(!res)
+    //bossa.util.Debug.println("SpecialArray is not subtype of "+other);
     
     return res;
   }

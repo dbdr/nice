@@ -12,7 +12,7 @@
 
 // File    : AST.java
 // Created : Thu Jul 01 11:01:56 1999 by bonniot
-//$Modified: Tue Feb 22 17:46:29 2000 by Daniel Bonniot $
+//$Modified: Mon Mar 13 18:09:40 2000 by Daniel Bonniot $
 
 package bossa.syntax;
 
@@ -64,16 +64,13 @@ public class AST extends Node
 
   public void compile()
   {
-    // compile all the field accesses that have been generated
-    MethodDefinition.compileMethods(module);
-    
     for(Iterator i=definitions.iterator();i.hasNext();)
       ((Definition)i.next()).compile();
   }
   
   public String toString()
   {
-    return Util.map(definitions);
+    return "Abstract Syntax Tree ("+definitions.size()+" definitions)";
   }
 
   private bossa.modules.Package module;

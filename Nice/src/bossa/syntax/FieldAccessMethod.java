@@ -12,7 +12,7 @@
 
 // File    : FieldAccessMethod.java
 // Created : Thu Jul 01 18:12:46 1999 by bonniot
-//$Modified: Mon Feb 21 11:31:44 2000 by Daniel Bonniot $
+//$Modified: Sat Mar 11 15:09:54 2000 by Daniel Bonniot $
 
 package bossa.syntax;
 
@@ -46,8 +46,6 @@ public class FieldAccessMethod extends MethodDefinition
     this.classTC = classDef.tc;
     this.fieldName = fieldName.toString();
     
-    MethodDefinition.addMethod(this);
-
     setMethod = new SetFieldMethod(classDef,fieldName,fieldType,classTypeParameters);
     addChild(setMethod);
   }

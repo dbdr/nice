@@ -12,7 +12,7 @@
 
 // File    : SpecialTypes.java
 // Created : Mon Jan 17 14:19:30 2000 by bonniot
-//$Modified: Fri Feb 25 16:13:03 2000 by Daniel Bonniot $
+//$Modified: Sat Mar 11 16:51:01 2000 by Daniel Bonniot $
 
 package bossa;
 
@@ -29,13 +29,18 @@ import kawa.standard.Scheme;
 
 public class SpecialTypes
 {
-  static public final Type intType, longType, charType, booleanType, voidType, arrayType;
+  static public final Type intType, longType, byteType, charType, 
+    shortType, floatType, doubleType, booleanType, voidType, arrayType;
 
   static 
   {
     intType = Scheme.intType;
     longType = Scheme.longType;
     charType = Scheme.charType;
+    byteType = Scheme.byteType;
+    shortType = Scheme.shortType;
+    floatType = Scheme.floatType;
+    doubleType = Scheme.doubleType;
     booleanType = Scheme.booleanType;
     voidType = gnu.bytecode.Type.void_type;
 

@@ -12,7 +12,7 @@
 
 // File    : VarSymbol.java
 // Created : Wed Jul 07 16:56:06 1999 by bonniot
-//$Modified: Thu Mar 02 15:27:10 2000 by Daniel Bonniot $
+//$Modified: Thu Mar 02 17:14:43 2000 by Daniel Bonniot $
 
 package bossa.syntax;
 
@@ -77,7 +77,8 @@ abstract class VarSymbol extends Node implements Located
     this.decl.setLine(name.location().getLine());
     this.decl.setCanRead(true);
     this.decl.setCanWrite(true);
-    if(declaration.getContext()==null)
+
+    if(declaration.getContext() == null)
       Internal.error(this+" has no englobing context");
   }
   

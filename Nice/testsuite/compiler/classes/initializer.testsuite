@@ -148,6 +148,8 @@ class A
     } finally {
       k = 5;
     }
+
+    int c = int('\'');
   }
 }
   /// package b import a

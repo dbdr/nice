@@ -609,6 +609,9 @@ public class Pattern implements Located
         if (atValue.value instanceof Number)
           return "@" + (atValue.longValue() >= 0 ? "+" : "") + atValue;
 
+        if (atValue.value instanceof Character)
+          return "@\'" + atValue.value + "\'";
+
 	if (atReference())
           return "@=" + name;
 

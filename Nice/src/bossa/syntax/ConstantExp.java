@@ -142,7 +142,7 @@ public class ConstantExp extends Expression
       }
   
     return new ConstantExp(PrimitiveType.charTC, new Character(c), 
-			   "'" + c + "'", value.location());
+			   "'" + s + "'", value.location());
   }
 
   private static ConstantExp makeInt(long value, boolean isLong, 

@@ -144,7 +144,8 @@ bootstrap: parser
 	${JAVAC} \
 		stdlib/nice/lang/Native.java stdlib/nice/lang/inline/*.java \
 		src/mlsub/compilation/Module.java \
-		src/bossa/modules/Package.java src/bossa/util/*.java \
+		src/bossa/modules/Package.java src/bossa/modules/CompilationListener.java \
+		src/bossa/util/*.java \
 		src/gnu/expr/*.java src/gnu/mapping/*.java \
 		src/nice/tools/code/*.java src/mlsub/typing/*.java \
 		src/mlsub/typing/lowlevel/*.java src/bossa/syntax/dispatch.java

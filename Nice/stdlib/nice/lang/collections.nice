@@ -207,7 +207,7 @@ class Vector<T>
   implements List<T> 
   finally implements Collection<T>
 {
-  Array<T> elements;
+  T[] elements;
   int length;
 
   remove<T>(index)
@@ -225,7 +225,7 @@ class Vector<T>
 }
 
 <Any T> Vector<T> makeVector(int len) = 
-  new Vector(elements:new T[len], length:0); 
+  new Vector(elements:cast(new T[len]), length:0); 
 
 size(v@Vector) = v.length;
 get(v@Vector, index) = get(v.elements, index);
@@ -245,7 +245,7 @@ add<T>(v@Vector, element)
 {
   if(v.elements==null)
     {
-      v.elements = new T[10];
+      v.elements = cast(new T[10]);
       v.length = 0;
     }
 
@@ -358,7 +358,7 @@ toString(s@Sequence)
 
 <Any T> T[] toArray(Collection<T> c)
 {
-  T[] res = new T[c.size()];
+  T[] res = cast(new T[c.size()]);
 
   int i = 0;
   c.foreach(T elem => res[i++] = elem);

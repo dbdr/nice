@@ -67,8 +67,8 @@ public final class Typing
     // a monotype var introduced earlier must be given a new null kind
     // the cleaner way would be to reset it to null when we leave this level
     // but it would be a pain, and the result is the same
-    if(e instanceof MonotypeVar)
-      e.setKind(null);
+    if (e instanceof MonotypeVar)
+      ((MonotypeVar) e).reset();
     
     Engine.register(e);
   }

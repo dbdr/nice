@@ -589,13 +589,26 @@ public final class Types
     return rawType(m).equivalent();
   }
 
+  public static void setMarkedKind(Monotype m)
+  {
+    m.setKind(ConstantExp.maybeTC.variance);
+  }
+
+  public static void makeMarkedType(MonotypeVar m)
+  {
+    m.setPersistentHeadLeq(ConstantExp.maybeTC);
+  }
+
   /** return the type with nullness markers removed */
   public static Monotype rawType(Monotype m)
   {
     m = m.equivalent();
     if (!(m instanceof MonotypeConstructor))
-      // It is probably a bug if this happens
-      return m;
+      {
+	// It is probably a bug if this happens
+	//Internal.warning("Not kinded monotype: " + m);
+	return m;
+      }
     else
       return ((MonotypeConstructor) m).getTP()[0];
   }

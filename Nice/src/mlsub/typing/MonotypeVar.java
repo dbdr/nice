@@ -126,6 +126,30 @@ public final class MonotypeVar extends Monotype
       }
   }
   
+  public void setPersistentHeadLeq(TypeConstructor h)
+  {
+    persistentHeadLeq = h;
+  }
+
+  TypeConstructor persistentHeadLeq;
+
+  void reset()
+  {
+    if (persistentHeadLeq == null)
+      setKind(null);
+    else
+      {
+	// Force update of the equivalent.
+	kind = null;
+	setKind(persistentHeadLeq.variance);
+	try {
+	  Typing.leq(((MonotypeConstructor) equivalent).getTC(), persistentHeadLeq);
+	} catch(TypingEx ex) {
+	  bossa.util.Internal.error("Reset of type variable failed");
+	}
+      }
+  }
+
   /** When this variable is discovered to be of some given kind,
       an equivalent monotype is created. */
   private Monotype equivalent;

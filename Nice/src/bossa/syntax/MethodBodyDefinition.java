@@ -230,7 +230,7 @@ public class MethodBodyDefinition extends Definition
   {
     for (int i = 0; i<tags.length; i++)
       {
-	types[i].setKind(ConstantExp.maybeTC.variance);
+	Types.setMarkedKind(types[i]);
 	Monotype type = types[i].equivalent();
 	Typing.leq(tags[i], ((MonotypeConstructor) type).getTP()[0]);
       }

@@ -60,10 +60,7 @@ void set(double[], int, double)  = inline nice.lang.inline.ArraySetOp("d");
   if (to == -1) 
     to = array.length - 1;
 
-  T[] res = new T[to - from + 1];
-  for (int i = from; i <= to; i++)
-    res[i - from] = array[i];
-  return res;
+  return fill(new T[to - from + 1], int i => array[i + from]);
 }
 
 // Define collection methods
@@ -72,24 +69,14 @@ get(a@Array, n) = get(a, n);
 set(a@Array, n, e) = set(a,n,e);
 size(a@Array) = a.length;
 
-map<C,T,U>(a@Array, f)
-{
-  int l = a.length;
-
-  U[] res = new U[l];
-
-  for(int i=0; i<l; i=i+1)
-    res[i] = f(a[i]);
-
-  return res;
-}
+map<C,T,U>(a@Array, f) = fill(new U[a.length], int i => f(a[i]));
 
 filter<C, T>(a@Array, test)
 {
   int l = a.length;
   int found = 0;
 
-  T[] res = new T[l];
+  T[] res = cast(new T[l]);
 
   a.iter(fun(T elem) =>
 	{ if(test(elem)) res.set(found++, elem); } );
@@ -118,7 +105,9 @@ filter<C, T>(a@Array, test)
    There is no danger as long as the array is created inside the call, 
    like in the above example.
 */
-<Any T> !T[] fill(?T[] array, int->!T value)
+<Any T, Any U | U <: T> U[] fill(T[] array, int->U value)
+// In particular, this is useful with T = ?X and U = !X.
+// The above type is more general, and useful when the component type is a type variable.
 {
   for (int i = 0; i < array.length; i++)
     array[i] = value(i);

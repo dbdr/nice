@@ -15,6 +15,8 @@ package bossa.syntax;
 import java.util.*;
 import bossa.util.*;
 
+import mlsub.typing.MonotypeVar;
+
 /**
    Syntactic monomorphic type.
 
@@ -106,8 +108,11 @@ implements Located
       case maybe: return maybe(raw);
       case sure:  return sure(raw);
       case absent:
-	if (raw instanceof mlsub.typing.MonotypeVar)
-	  return raw;
+	if (raw instanceof MonotypeVar)
+	  {
+	    nice.tools.code.Types.makeMarkedType((MonotypeVar) raw);
+	    return raw;
+	  }
 	else
 	  return sure(raw);
       }

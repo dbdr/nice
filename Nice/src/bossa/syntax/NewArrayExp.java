@@ -24,6 +24,9 @@ import mlsub.typing.MonotypeConstructor;
 import mlsub.typing.MonotypeVar;
 import mlsub.typing.Polytype;
 import mlsub.typing.Constraint;
+import mlsub.typing.AtomicConstraint;
+import mlsub.typing.MonotypeLeqCst;
+import mlsub.typing.TypeConstructorLeqCst;
 import mlsub.typing.TypeConstructor;
 import mlsub.typing.TypeSymbol;
 
@@ -55,9 +58,21 @@ public class NewArrayExp extends Expression
   void computeType()
   {
     Monotype monotype;
+    Constraint cst;
 
     if (resolvedType instanceof MonotypeVar)
-      monotype = (MonotypeVar) resolvedType;
+      {
+	MonotypeVar res = (MonotypeVar) resolvedType;
+	TypeConstructor tc = new TypeConstructor("nullness", ConstantExp.maybeTC.variance, false, false);
+	MonotypeVar raw = new MonotypeVar(res.getName()+"raw");
+	MonotypeConstructor eq = new MonotypeConstructor(tc, new Monotype[]{raw});
+	cst = new Constraint(new TypeSymbol[]{tc, raw},
+			     new AtomicConstraint[]{
+			       new TypeConstructorLeqCst(tc, ConstantExp.maybeTC),
+			       new MonotypeLeqCst(eq, res),
+			       new MonotypeLeqCst(res, eq)});
+	monotype = bossa.syntax.Monotype.maybe(raw);
+      }
     else
       {
 	if (!(resolvedType instanceof TypeConstructor))
@@ -69,6 +84,8 @@ public class NewArrayExp extends Expression
 	  monotype = bossa.syntax.Monotype.sure(monotype);
 	else
 	  monotype = bossa.syntax.Monotype.maybe(monotype);	  
+
+	cst = Constraint.True;
       }
     
     for (int i = 0; i<knownDimensions.length + unknownDimensions; i++)
@@ -76,7 +93,7 @@ public class NewArrayExp extends Expression
 	(ConstantExp.arrayTC, new Monotype[]{monotype}));
     
     // set the Expression type
-    type = new Polytype(Constraint.True, monotype);
+    type = new Polytype(cst, monotype);
   }
   
   /****************************************************************

@@ -1241,10 +1241,8 @@ MethodDeclaration nativeMethodDeclaration(LocatedString name,
 			      name,cst,returnType,parameters);
       }
     int dot=method.toString().lastIndexOf('.');
-    if(dot==-1){
-      System.err.println("class or method name missing");
-      System.exit(-1);
-    }
+    if(dot==-1)
+      throw bossa.util.User.error(method, "Class or method name missing");
     
     String methodName=method.toString();
     methodName = methodName.substring(dot+1,methodName.length());

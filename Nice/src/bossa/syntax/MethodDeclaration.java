@@ -311,11 +311,15 @@ public abstract class MethodDeclaration extends Definition
 
     void resolve()
     {
-      super.resolve();
+      // Check that resolving has not already been done.
+      if (syntacticType != null)
+        {
+          super.resolve();
 
-      // The method has a raw type, while the symbol needs a nullness marker
-      MethodDeclaration.this.type = this.type;
-      this.type = Types.addSure(this.type);
+          // The method has a raw type, while the symbol needs a nullness marker
+          MethodDeclaration.this.type = this.type;
+          this.type = Types.addSure(this.type);
+        }
     }
 
     public Definition getDefinition()

@@ -57,12 +57,8 @@ public class PolySymbol extends VarSymbol
 
   void resolve()
   {
-    // Check that resolving has not already been done.
-    if (syntacticType != null)
-      {
-        type = syntacticType.resolveToLowlevel();
-        syntacticType = null;
-      }
+    type = syntacticType.resolveToLowlevel();
+    syntacticType = null;
   }
   
   /****************************************************************

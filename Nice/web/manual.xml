@@ -318,7 +318,7 @@ void main(String[] args)
        Interfaces are declared just like classes, except that they may
        not contain data fields, only methods. Unlike in Java, they may
        also contain default implementations of the methods, making 
-       iterfaces more convenient and useful than Java interfaces.
+       interfaces more convenient and useful than Java interfaces.
      </para>
      <para>
        To say even this much is still to think of interfaces in Java terms,
@@ -384,7 +384,7 @@ int getArea(Component comp)
         </programlisting>
       </example>      
       and in fact, it's fine to mix the two styles, declaring 
-      some of the methods inside the <literal>iterface</literal>
+      some of the methods inside the <literal>interface</literal>
       block, and some outside. One good practice might be to
       declare those methods which have no default implementation
       inside the <literal>interface</literal> block, and those

@@ -52,7 +52,7 @@ boolean `>`(int, int) = inline nice.lang.inline.CompOp("iGt");
 
 boolean `>=`(double, double) = inline nice.lang.inline.CompOp("dGe");
 boolean `>=`(float, float) = inline nice.lang.inline.CompOp("fGe");
-boolean `>=`(float, float) = inline nice.lang.inline.CompOp("lGe");
+boolean `>=`(long, long) = inline nice.lang.inline.CompOp("lGe");
 boolean `>=`(int, int) = inline nice.lang.inline.CompOp("iGe");
 
 // Equality

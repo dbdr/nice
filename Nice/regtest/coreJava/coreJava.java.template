@@ -22,6 +22,11 @@ public class coreJava
     System.out.println(s);
   }
 
+  public static void p(boolean b)
+  {
+    System.out.println("" + b);
+  }
+
   static A createA(int x, long y)
   {
     return new A(x, y);

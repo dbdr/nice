@@ -58,11 +58,11 @@ class A
 }
 int foo() = 42;
 
-/// PASS bug
+/// PASS
   /// Toplevel
   void foo(long e) requires e >= 0 {}
 
-/// PASS bug
+/// PASS
   /// Toplevel
   void foo(float e) requires e >= 0 {}
 

@@ -5,9 +5,9 @@
 
 package regtest.coreJava;
 
-void p(String);
-p(s) = println(s);
+void p(String s) = println(s);
 
+void p(boolean b) = println("" + b);
 
 class A
 {

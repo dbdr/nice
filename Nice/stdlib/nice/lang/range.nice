@@ -62,6 +62,8 @@ public class Range<T | T <: int, int <: T>  extends OpenRange<T>
   remove(elem) = throw new UnsupportedOperationException();
   removeAt(index) = throw new UnsupportedOperationException();
   removeAll(elems) = throw new UnsupportedOperationException();
+
+  set(index, elem) = throw new UnsupportedOperationException();
 }
 
 public class OpenRangeIterator<T | T <: int, int <: T> implements Iterator<T> {

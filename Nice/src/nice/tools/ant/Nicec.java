@@ -420,7 +420,7 @@ public class Nicec extends Task {
 				log(WARNING_MSG, Project.MSG_WARN);
 				break;
 			case OutputMessages.OK:
-				log(OK_MSG, Project.MSG_VERBOSE);
+				log(OK_MSG, Project.MSG_INFO);
 				break;
 		}
 	}

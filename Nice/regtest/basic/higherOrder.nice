@@ -20,6 +20,7 @@ void test_higher_order()
   println((fun<Any T>(T x)=>x)("LAMBDA"));
   println(apply(fun<Any T>(T x)=>x, "LAMBDA"));
   println(apply(nativeToString, "Using native methods as first class values"));
+  println(apply(intIdentity, 42));
 }
 
 String nativeToString(String) = native String Object.toString();

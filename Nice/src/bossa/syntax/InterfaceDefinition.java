@@ -12,7 +12,7 @@
 
 // File    : InterfaceDefinition.java
 // Created : Thu Jul 01 17:00:14 1999 by bonniot
-//$Modified: Fri Oct 29 12:24:19 1999 by bonniot $
+//$Modified: Thu Nov 04 13:43:04 1999 by bonniot $
 
 package bossa.syntax;
 
@@ -35,7 +35,7 @@ public class InterfaceDefinition extends Node
     this.variance=new Variance(typeParameters.size());
     addTypeSymbol(this);
     this.extensions=addChildren(extensions);
-    itf=variance.getConstraint().newInterface();
+    itf=variance.newInterface();
   }
 
   public Collection associatedDefinitions()
@@ -55,7 +55,7 @@ public class InterfaceDefinition extends Node
     this.variance=new Variance(arity);
     addTypeSymbol(this);
     extensions=null;
-    itf=variance.getConstraint().newInterface();
+    itf=variance.newInterface();
   }
   
   static private Vector tops=new Vector();

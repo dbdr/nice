@@ -12,8 +12,9 @@ import bossa.util.Debug;
  *
  * @version $OrigRevision: 1.22 $, $OrigDate: 1999/10/28 10:56:58 $
  * @author Alexandre Frey
+ * @author Daniel Bonniot (Abstractable Interfaces)
  **/
-public class K0 implements Cloneable {
+public final class K0 {
   public static abstract class Callbacks  {
     /**
      * Called when indexes src and dest have been merged.  Only dest remains
@@ -49,7 +50,7 @@ public class K0 implements Cloneable {
   /***********************************************************************
    * Debugging
    ***********************************************************************/
-  private static boolean debugK0 = false;
+  static boolean debugK0 = S.debugK0;
   private static int IDs = 0;
   private int ID = IDs++;
   
@@ -194,18 +195,7 @@ public class K0 implements Cloneable {
       if (isValidIndex(i)) {
         sb.append("D(").append(indexToString(i)).append(") = ");
         Domain d = (hasBeenInitialized ? domains.getDomain(i) : null);
-        if (d == null) {
-          sb.append(d);
-        } else {
-          sb.append("{");
-          Separator sep = new Separator(", ");
-          for (int a = 0; a < m; a++) {
-            if (d.get(a)) {
-              sb.append(sep).append(indexToString(a));
-            }
-          }
-          sb.append("}");
-        }
+	sb.append(d);
         sb.append("; ");
       }
     }
@@ -577,6 +567,7 @@ public class K0 implements Cloneable {
 
   /**
    * Enter the initial assertion that x:: iid
+   * This means that no node strictly x may implement iid
    **/
   public void initialAbstracts(int x, int iid) {
     S.assert(S.a&& !hasBeenInitialized);
@@ -595,7 +586,9 @@ public class K0 implements Cloneable {
   /***********************************************************************
    * Initial rigidification
    ***********************************************************************/
-  public void createInitialContext() {
+  public void createInitialContext() 
+    throws LowlevelUnsatisfiable
+  {
     S.assert(S.a&& !hasBeenInitialized, this.getName() + " is already initialized ??");
     
     try {
@@ -615,7 +608,7 @@ public class K0 implements Cloneable {
     // saturate the interface subtyping under
     // I < J and J < K => I < K
     closeInterfaceRelation();
-    computeApprox();
+    computeInitialArrows();
     
     BitVector[] rigidImplementors  = closeImplements(R, Rt);
     for (int iid = 0; iid < nInterfaces(); iid++) {
@@ -653,7 +646,7 @@ public class K0 implements Cloneable {
   // this method makes no effort to report refined unsatisfiability
   private void indexImplements0(int x, int iid) throws LowlevelUnsatisfiable {
     if (debugK0) {
-      S.dbg.println("#" + ID + " -> " + x + ": " + iid);
+      S.dbg.println("#" + ID + " -> " + indexToString(x) + ": " + interfaceToString(iid));
     }
     Interface iface = getInterface(iid);
     if (iface.implementors.get(x)) {
@@ -714,7 +707,7 @@ public class K0 implements Cloneable {
   // in case of rigid clash
   private void leq0(int x1, int x2) throws LowlevelUnsatisfiable {
     if (debugK0) {
-      S.dbg.println("#" + ID + " -> " + x1 + " <: " + x2);
+      S.dbg.println("#" + ID + " -> " + indexToString(x1) + " <: " + indexToString(x2));
     }
     if (x1 == x2) { return; }
     if (C.get(x1, x2)) { return; }
@@ -759,6 +752,8 @@ public class K0 implements Cloneable {
     if (K0.debugK0) {
       S.dbg.println("Trying to refine " + e);
       S.dbg.println("The constraint is " + this.toString());
+      S.dbg.println("The rigid constraint is " + dumpRigid());
+      e.printStackTrace();
     }
     if (e instanceof LowlevelRigidClash
         ||
@@ -880,6 +875,11 @@ public class K0 implements Cloneable {
         throw new LowlevelUnsatisfiable();
       }
     } else {
+      if(debugK0){
+	S.dbg.println("Reducing domain of "+x);
+	S.dbg.println("from "+domains.getDomain(x));
+	S.dbg.println("with "+set);
+      }
       domains.reduce(x, unit, set);
     }
   }
@@ -971,97 +971,136 @@ public class K0 implements Cloneable {
    * Algorithms on interfaces
    ****************************************************************/
 
-  private int findApprox(int iid, int node)
-  {
-    int res=-1;
-    boolean toCheck=false;
-    boolean absOk=false; // Set to true if some surinterface of i is abstracted at node 
-
-    Interface i=getInterface(iid);
-    for(int j=0; j<nInterfaces(); j++)
-      {
-	Interface sup=getInterface(j);
-	if(sup.subInterfaces.get(iid)
-	   && sup.abstractors.get(node))
-	  {
-	    absOk=true;
-	    break;
-	  }
-      }
-    
-    if(!absOk)
-      return -1;
-      
-    for(int walk=0; walk<n; walk++)
-      if(R.get(node,walk))
-	{
-	  if(i.implementors.get(walk))
-	    if(res==-1 || R.get(walk,res))
-	      res=walk;
-	    else
-	      toCheck=true;
-	}
-    // Optimization (the less we produce arrows, the better) :
-    // We can get rid of  a ->_i b  if  b ->_i b
-    if(res==-1 || res!=node && i.abstractors.get(res))
-      return -1;
-    if(toCheck)
-      // check that res is minimal
-      for(int walk=0;walk<n;walk++)
-	if(R.get(node,walk) && i.implementors.get(walk)
-	   && !R.get(res,walk))
-	  return -1;
-    if(debugK0) S.dbg.println("Approximation for "+iid+": "+node+" -> "+res);
-    return res;
-  }
-	
-  private void computeApprox()
+  private void computeInitialArrows()
+    throws LowlevelUnsatisfiable
   {
     for(int iid=0; iid<nInterfaces(); iid++)
       {
 	Interface i=getInterface(iid);
-	int[] approx=new int[m0];
+	BitVector implementors=i.implementors;
 	for(int node=0;node<m0;node++)
-	  approx[node]=findApprox(iid,node);
-	i.setApprox(approx);
+	  {
+	    boolean toCheck=false;
+	    int approx=BitVector.UNDEFINED_INDEX;
+	    
+	    // finds a minimum node above 'node' that implements 'i'
+	    for (int x = implementors.getLowestSetBit();
+		 x != BitVector.UNDEFINED_INDEX;
+		 x = implementors.getNextBit(x)) 
+	      {
+		if(R.get(node,x))
+		  if(approx==BitVector.UNDEFINED_INDEX || R.get(x,approx))
+		    approx=x;
+		  else
+		    toCheck=true;
+	      }
+	    // verifies it is minimal
+	    if(toCheck)
+	      for (int x = implementors.getLowestSetBit();
+		   x != BitVector.UNDEFINED_INDEX;
+		   x = implementors.getNextBit(x)) 
+		if(R.get(node,x) && !R.get(approx,x))
+		  throw new LowlevelUnsatisfiable("Node "+approx+" and "+x+" are uncomparable and both implement "+iid+
+						  " above "+node);
+	    if(debugK0) S.dbg.println("Initial approximation for "+interfaceToString(iid)+": "+
+				      indexToString(node)+" -> "+indexToString(approx));
+	    i.setApprox(node,approx);
+	  }
       }
   }
   
-  private void saturateAbs()
-    throws Unsatisfiable
+  private void computeArrows(BitMatrix Leq)
   {
-    C.closure();
     for(int iid=0; iid<nInterfaces(); iid++)
       {
 	Interface i=getInterface(iid);
-	int n1;
-	for(int node=0;node<m0;node++)
-	  if((n1=i.getApprox(node))!=-1)
-	    for(int p1=0;p1<n;p1++)
-	      if(i.implementors.get(p1))
+	i.setIndexSize(n);
+	BitVector abstractors=i.abstractors;
+	for (int x = abstractors.getLowestSetBit();
+	     x != BitVector.UNDEFINED_INDEX;
+	     x = abstractors.getNextBit(x)) 
+	  {
+	    int approx=i.getApprox(x);
+	    if(approx!=BitVector.UNDEFINED_INDEX)
+	      {
+		for(int node=0;node<n;node++)
+		  if(Leq.get(node,x))
+		    {
+		      i.setApprox(node,approx);
+		      if(debugK0) S.dbg.println("Approximation for "+iid+": "+
+						indexToString(node)+" -> "+indexToString(approx));
+		    }
+	      }
+	  }
+      }
+  }
+  
+  /**
+   * Saturate the constraint under the Abs axiom.
+   */
+  private void saturateAbs(BitMatrix Leq)
+    throws Unsatisfiable
+  {
+    boolean changed;
+    //boolean first=true;
+    do
+      {
+	changed=false;
+
+	/*
+	if(!first)
+	  Leq.closure();
+	else
+	  first=false;
+	*/
+
+	for(int iid=0; iid<nInterfaces(); iid++)
+	  {
+	    Interface i=getInterface(iid);
+	    int n1;
+	    for(int node=0;node<n;node++)
+	      if((n1=i.getApprox(node))!=BitVector.UNDEFINED_INDEX)
+		// node  ->_i  n1
 		for(int p=0;p<n;p++)
-		  if(C.get(p,p1) && C.get(p,node))
-		    if(this.isRigid(p1))
-		      if(!C.get(n1,p1))
-			throw new LowlevelUnsatisfiable("saturateAbs: there should be "+n1+" <: "+p1);
+		  if(i.implementors.get(p)
+		     && Leq.get(node,p))
+		    if(this.isRigid(p))
+		      if(!Leq.get(n1,p))
+			throw new LowlevelUnsatisfiable("saturateAbs: there should be "+n1+" <: "+p+
+							" (node="+node+")");
 		      else ;
 		    else 
-		      {
-			if(debugK0) 
-			  S.dbg.println("Abs rule applied : "+n1+" < "+p1);
-			C .set(n1,p1);
-			Ct.set(p1,n1);
-		      }
-      }	    
+		      if(!Leq.get(n1,p))
+			 {
+			   if(debugK0) 
+			     S.dbg.println("Abs rule applied : "+n1+" < "+p);
+			   C .set(n1,p);
+			   Ct.set(p,n1);
+			   Leq.set(n1,p);
+			   changed=true;
+			 }
+	  }
+	Leq.closure();
+      }
+    while(changed);
   }
 
+  private void condense()
+    throws Unsatisfiable
+  {
+    BitMatrix T=(BitMatrix)C.clone();
+    T.closure();
+    condense(T);
+  }
+  
   /**
    * Condense the relation by merging equivalent indexes and collecting the
    * garbage nodes.
+   * T is a closure of C
    **/
-  private void condense() throws Unsatisfiable {
-    if(true)
-      return;
+  private void condense(BitMatrix T) throws Unsatisfiable {
+    //if(true)
+    //return;
     
     // XXX: TODO: verify safety when indexMerged creates new nodes
     // XXX: actually, the specification should say that indexMerged
@@ -1075,8 +1114,8 @@ public class K0 implements Cloneable {
     // 2. it allows early test of satisfiability (if C* violates assertions
     //           on rigid variables
     // 3. it is obviously correct (Tarjan algorithm is a mess to debug...)
-    BitMatrix T = (BitMatrix)C.clone();
-    T.closure();
+    //BitMatrix T = (BitMatrix)C.clone();
+    //T.closure();
 
     if (m > 0) {
       if (T.includedIn(m, R) != null) {
@@ -1086,6 +1125,11 @@ public class K0 implements Cloneable {
     }
     BitMatrix Tt = (BitMatrix)Ct.clone();
     Tt.closure();
+
+    if(debugK0){
+      S.dbg.println(toString());
+      S.dbg.println(domainsToString());
+    }
     
     for (int i = 0; i < n; i++) {
       if (!garbage.get(i)) {
@@ -1127,9 +1171,12 @@ public class K0 implements Cloneable {
 
   private void prepareConstraint() throws Unsatisfiable {
     saturateOrigin();
-    collapseMinimal();
-    saturateAbs();
-    condense();
+    //collapseMinimal();
+    BitMatrix Leq=(BitMatrix)C.clone();
+    Leq.closure();
+    computeArrows(Leq);
+    saturateAbs(Leq);
+    condense(Leq);
   }
 
 
@@ -1227,7 +1274,7 @@ public class K0 implements Cloneable {
   /**
    * Saturate the "implements" constraint under the following axioms:
    * x: I and I < J => x: J
-   * x < y and y: I => y: I
+   * x ~ y and y: I => x: I
    *
    * Returns an array of BitVector rigidImplementors
    * rigidImplementors[iid] is the set of x such that x :* iid
@@ -1240,8 +1287,8 @@ public class K0 implements Cloneable {
       for (int x = 0; x < n; x++) {
         if (I.implementors.get(x)) {
           // x: iid
-          // for all y < x, add y: iid
-          rigidImplementors[iid].or(Rt.getRow(x));
+          // for all y ~ x, add y: iid
+          rigidImplementors[iid].orAnd(Rt.getRow(x),R.getRow(x));
         }
       }
     }
@@ -1347,7 +1394,7 @@ public class K0 implements Cloneable {
     this.domains = backup.savedDomains;
     for (int iid = 0; iid < nInterfaces(); iid++) {
       Interface I = getInterface(iid);
-      I.rigidImplementors.truncate(m);
+      I.setIndexSize(m);
       I.implementors = backup.savedImplementors[iid];
     }
     clearTags();
@@ -1902,16 +1949,16 @@ public class K0 implements Cloneable {
           //
           // Propagate the "implements" constraints that go thru x
           //
-          for (int iid = 0; iid < nInterfaces(); iid++) {
-            Interface I = getInterface(iid);
-            if (I.implementors.get(x)) {
-              // for all y < x, add y: I
-              BitVector lx = Ct.getRow(x);
-              if (lx != null) {
-                I.implementors.or(lx);
-              }
-            }
-          }
+//            for (int iid = 0; iid < nInterfaces(); iid++) {
+//              Interface I = getInterface(iid);
+//              if (I.implementors.get(x)) {
+//                // for all y < x, add y: I
+//                BitVector lx = Ct.getRow(x);
+//                if (lx != null) {
+//                  I.implementors.or(lx);
+//                }
+//              }
+//            }
           // should clear C Ct ?
           Sdomains.clear(x);
           Sdomains.exclude(x);

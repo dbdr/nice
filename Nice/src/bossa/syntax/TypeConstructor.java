@@ -12,7 +12,7 @@
 
 // File    : TypeConstructor.java
 // Created : Thu Jul 08 11:51:09 1999 by bonniot
-//$Modified: Thu Oct 28 11:35:13 1999 by bonniot $
+//$Modified: Thu Nov 04 15:31:30 1999 by bonniot $
 
 package bossa.syntax;
 
@@ -37,7 +37,10 @@ public class TypeConstructor
     this.definition=d;
     this.name=d.name;
     setVariance(new Variance(d.typeParameters.size()));
-    this.id=-1-new Random().nextInt(100000);
+    bossa.typing.Typing.introduce(this); /* The introduction is done here,
+					  * in order to enable recursive class definitions
+					  * (the id is determined here)
+					  */
   }
 
   /**
@@ -241,7 +244,7 @@ public class TypeConstructor
   public void setKind(Kind value)
   {
     Internal.error(kind!=null,"Variance already set in TypeConstructor");
-    variance=(Variance)((Engine.K)value).associatedKind;
+    variance=(Variance)((Engine.Constraint)value).associatedKind;
     kind=value;
   }
   

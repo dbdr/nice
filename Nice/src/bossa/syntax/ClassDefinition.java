@@ -12,7 +12,7 @@
 
 // File    : ClassDefinition.java
 // Created : Thu Jul 01 11:25:14 1999 by bonniot
-//$Modified: Thu Oct 28 15:46:56 1999 by bonniot $
+//$Modified: Wed Nov 03 17:47:02 1999 by bonniot $
 
 package bossa.syntax;
 
@@ -49,7 +49,7 @@ public class ClassDefinition extends Node
 
     this.tc=new TypeConstructor(this);
     addTypeSymbol(this.tc);
-
+            
     if(isSharp)
       // The sharp class must not declare children, 
       // since the associated class has already done so.
@@ -174,7 +174,6 @@ public class ClassDefinition extends Node
   public void createContext()
   {
     try{
-      Typing.introduce(tc);
       Typing.initialLeq(tc,extensions);
       Typing.assertImp(tc,implementations,true);
       Typing.assertImp(tc,abstractions,true);

@@ -12,7 +12,7 @@
 
 // File    : Front.java
 // Created : Thu Jul 01 15:11:18 1999 by bonniot
-//$Modified: Wed Oct 13 16:51:38 1999 by bonniot $
+//$Modified: Wed Nov 03 20:11:33 1999 by bonniot $
 
 package bossa.test;
 
@@ -39,7 +39,7 @@ public class Front
 	System.out.println("Usage: bossa file.bossa");
 	//System.exit(0);
 	//file="GJ-loophole.bossa";
-	file="vector.bossa";
+	file="pb.bossa";
       }
     else file=args[0];
     

@@ -12,7 +12,7 @@
 
 // File    : AST.java
 // Created : Thu Jul 01 11:01:56 1999 by bonniot
-//$Modified: Thu Oct 28 15:55:39 1999 by bonniot $
+//$Modified: Thu Nov 04 14:52:51 1999 by bonniot $
 
 package bossa.syntax;
 
@@ -37,10 +37,7 @@ public class AST extends Node
   
   public void load()
   {
-    Debug.println("Scoping (build  )");
     buildScope();
-
-    Debug.println("Scoping (resolve)");
     doResolve();
   }
   
@@ -54,7 +51,6 @@ public class AST extends Node
   
   public void typechecking()
   {
-    Debug.println("Typechecking");
     doTypecheck();
   }
 

@@ -12,7 +12,7 @@
 
 // File    : OverloadedSymbolExp.java
 // Created : Thu Jul 08 12:20:59 1999 by bonniot
-//$Modified: Mon Oct 25 13:09:52 1999 by bonniot $
+//$Modified: Thu Nov 04 14:57:58 1999 by bonniot $
 
 package bossa.syntax;
 
@@ -42,7 +42,7 @@ public class OverloadedSymbolExp extends Expression
 
   Expression resolveOverloading(List /* of Type */ parameters)
   {
-    User.debug("Overloading resolution for "+this);
+    if(Debug.overloading) Debug.println("Overloading resolution for "+this);
     Iterator i=symbols.iterator();
     while(i.hasNext())
       {
@@ -65,7 +65,7 @@ public class OverloadedSymbolExp extends Expression
 	while(i.hasNext())
 	  {
 	    VarSymbol s=(VarSymbol)i.next();
-	    User.debug("OVERLOADING: Trying with "+s);
+	    if(Debug.overloading) Debug.println("OVERLOADING: Trying with "+s);
 	    
 	    if(!CallExp.wellTyped(new SymbolExp(s,location()),parameters))
 	      i.remove();
@@ -85,7 +85,7 @@ public class OverloadedSymbolExp extends Expression
   
   Expression resolveOverloading(Polytype expectedType)
   {
-    User.debug("Overloading resolution (expected type "+expectedType+") for "+this);
+    if(Debug.overloading) Debug.println("Overloading resolution (expected type "+expectedType+") for "+this);
     Iterator i=symbols.iterator();
     while(i.hasNext())
       {

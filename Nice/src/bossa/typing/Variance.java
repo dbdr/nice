@@ -12,7 +12,7 @@
 
 // File    : Variance.java
 // Created : Fri Jul 23 12:15:46 1999 by bonniot
-//$Modified: Thu Oct 28 16:05:30 1999 by bonniot $
+//$Modified: Thu Nov 04 15:16:54 1999 by bonniot $
 
 package bossa.typing;
 
@@ -36,13 +36,40 @@ public class Variance
     this.size=n;
   }
 
-  public bossa.engine.Engine.K getConstraint()
+  bossa.engine.Engine.Constraint getConstraint()
   {
     return bossa.engine.Engine.getConstraint(this);
   }
   
   public void register(Element e)
   {
+    // Nothing to do
+  }
+  
+
+  public int newInterface()
+  {
+    return getConstraint().newInterface();
+  }
+
+  public void subInterface(int i1, int i2)
+  {
+    getConstraint().subInterface(i1,i2);
+  }
+  
+  public void initialImplements(int x, int iid)
+  {
+    getConstraint().initialImplements(x,iid);
+  }
+  
+  public void initialAbstracts(int x, int iid)
+  {
+    getConstraint().initialAbstracts(x,iid);
+  }
+  
+  public void indexImplements(int x, int iid) throws Unsatisfiable
+  {
+    getConstraint().indexImplements(x,iid);
   }
   
   public void leq(Element e1, Element e2, boolean initial)

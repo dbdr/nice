@@ -12,7 +12,7 @@
 
 // File    : Engine.java
 // Created : Tue Jul 27 15:34:53 1999 by bonniot
-//$Modified: Wed Nov 03 16:34:23 1999 by bonniot $
+//$Modified: Thu Nov 04 15:25:08 1999 by bonniot $
 
 package bossa.engine;
 
@@ -29,6 +29,11 @@ import java.util.*;
  */
 public abstract class Engine
 {
+  static
+  {
+    LowlevelUnsatisfiable.refinedReports=true;
+  }
+  
   /**
    * Enters a new typing context
    */
@@ -37,10 +42,10 @@ public abstract class Engine
     if(dbg) Debug.println("Enter");
     floating.mark();
     frozenLeqs.mark();
-    for(Iterator i=kinds.iterator();
+    for(Iterator i=constraints.iterator();
 	i.hasNext();)
       { 
-	K k=(K)i.next();
+	Engine.Constraint k=(Engine.Constraint)i.next();
 	k.mark();
 	//k.rigidify();
       }
@@ -59,10 +64,10 @@ public abstract class Engine
 
     if(dbg) Debug.println("Implies");
 
-    for(Iterator i=kinds.iterator();
+    for(Iterator i=constraints.iterator();
 	i.hasNext();)
       { 
-	K k=(K)i.next();
+	Engine.Constraint k=(Engine.Constraint)i.next();
 	k.satisfy();
 	k.rigidify();
       }
@@ -80,10 +85,10 @@ public abstract class Engine
 
     if(dbg) Debug.println("Leave");
       
-    for(Iterator i=kinds.iterator();
+    for(Iterator i=constraints.iterator();
 	i.hasNext();)
       { 
-	K k=(K)i.next();
+	Engine.Constraint k=(Engine.Constraint)i.next();
 	k.satisfy();
       }
     backtrack();
@@ -91,10 +96,10 @@ public abstract class Engine
   
   public static void backtrack()
   {
-    for(Iterator i=kinds.iterator();
+    for(Iterator i=constraints.iterator();
 	i.hasNext();)
       { 
-	K k=(K)i.next();
+	Engine.Constraint k=(Engine.Constraint)i.next();
 	k.backtrack();
       }
     floating.backtrack();
@@ -206,13 +211,11 @@ public abstract class Engine
   
   public static boolean isRigid(Element e)
   {
-    int id=e.getId();
-    Internal.error(id<0,"Engine.isRigid :"+e+" is not known");
     Kind kind=e.getKind();
     Internal.error(kind==null,"null kind in Engine.isRigid for "+e);
-    K k=getConstraint(kind);
+    Engine.Constraint k=getConstraint(kind);
     Internal.error(k==null,"null constraint in Engine.isRigid for "+e);
-    return k.isRigid(id);
+    return k.isRigid(e);
   }
   
   /****************************************************************
@@ -257,7 +260,7 @@ public abstract class Engine
 	
 	floating.remove(e);
 
-	//Propagates the kind to all comparable elements
+	// Propagates the kind to all comparable elements
 	for(Iterator i=frozenLeqs.iterator();
 	    i.hasNext();)
 	  {
@@ -288,7 +291,7 @@ public abstract class Engine
   }
   
   /**
-   * Enter all the 'floating' elements into the variablesKind
+   * Enter all the 'floating' elements into the variablesConstraint
    * and add their frozen constraints
    *
    */
@@ -302,8 +305,8 @@ public abstract class Engine
 	
 	if(dbg) Debug.println("Registering variable "+e);
 	
-	e.setKind(variablesKind);
-	variablesKind.register(e);
+	e.setKind(variablesConstraint);
+	variablesConstraint.register(e);
       }
     floating.endOfIteration();
     floating.clear();
@@ -312,7 +315,7 @@ public abstract class Engine
 	i.hasNext();)
       {
 	Leq leq=(Leq)i.next();
-	variablesKind.leq(leq.e1,leq.e2);
+	variablesConstraint.leq(leq.e1,leq.e2);
       }
     frozenLeqs.endOfIteration();
     frozenLeqs.clear();
@@ -321,57 +324,55 @@ public abstract class Engine
   /** The elements that have not yet been added to a Kind  */
   private static final BackableList floating=new BackableList();
   
-  /** The constraint of type variables */
-  private static final K variablesKind=new K(){
-    public String toString()
-    { 
-      return "Kind of type variables";
-    }
-  };
+  /** The constraint of monotype variables */
+  private static final Engine.Constraint variablesConstraint=new Engine.Constraint("type variables");
   
-  private static final ArrayList createKinds()
+  /** The list of Constraints */
+  private static final ArrayList constraints;
+  static
   {
-    ArrayList res=new ArrayList(10);
-    res.add(variablesKind);
-    return res;
+    constraints=new ArrayList(10);
+    constraints.add(variablesConstraint);
   }
-  
-  /** The list of Kinds */
-  private static final ArrayList kinds=createKinds();
   
   /** Maps a Kind to its lowlevel constraint */
   private static final HashMap kindsMap=new HashMap();
   
-  public static K getConstraint(Kind kind)
+  public static Engine.Constraint getConstraint(Kind kind)
   {
-    K res=(K) kindsMap.get(kind);
+    Engine.Constraint res=(Engine.Constraint) kindsMap.get(kind);
     if(res!=null)
       return res;
 
     if(dbg) Debug.println("Creating new Lowlevel constraint for "+kind);
     
-    res=new K();
+    res=new Engine.Constraint("kind "+kind.toString());
     res.associatedKind=kind;
     // if the constraint is created after the initial context has been defined,
     // we have to change the state of the constraint here
     if(!initialContext)
-      res.createInitialContext();
-    
-    kinds.add(res);
+      try{
+	res.createInitialContext();
+      }
+    catch(Unsatisfiable e){
+      Internal.error("This shouldn't happen, Engine.Constraint is empty here !");
+    }
+    constraints.add(res);
     kindsMap.put(kind,res);
     return res;
   }
   
   /****************************************************************
-   * K
+   * Engine.Constraint
    ****************************************************************/
 
   public static void createInitialContext()
+    throws Unsatisfiable
   {
-    for(Iterator i=kinds.iterator();
+    for(Iterator i=constraints.iterator();
 	i.hasNext();)
       { 
-	K k=(K)i.next();
+	Engine.Constraint k=(Engine.Constraint)i.next();
 	k.createInitialContext();
       }
     initialContext=false;
@@ -379,34 +380,79 @@ public abstract class Engine
   
   private static boolean initialContext=true;
   
-  public static class K extends K0
+  public static class Constraint
     implements Kind
   {
-    K()
+    static
     {
-      super(K0.BACKTRACK_UNLIMITED,
-	    new K0.Callbacks()
-	    {
-	      protected void indexMerged(int src, int dest) {
-		Internal.warning("Engine: Indexes merged");
-	      }
-	      protected void indexMoved(int src, int dest) {
-		Internal.warning("Engine: Index moved");
-	      }
-	      protected void indexDiscarded(int index) {
-		Internal.warning("Engine: Index discarded");
-	      }
-	    }
-	    );
+      K0.debugK0=Debug.K0;
     }
     
-    public Kind associatedKind; /* the kind of the elements of this constraint
-				   This is used in TypeConstructor.setKind
-				*/
+    Constraint(String name)
+    {
+      this.name=name;  
+    }
+    private String name;
+    
+    final K0 k0=new K0(K0.BACKTRACK_UNLIMITED,new Callbacks());
+    
+    private Vector elements=new Vector(10); // ArrayList would be better, but has no setSize method
+    
+    public final void register(Element e)
+    {
+      int id=k0.extend();
+      e.setId(id);
+      if(id>=elements.size())
+	elements.setSize(id+1);
+      elements.set(id,e);
+      
+      if(dbg) Debug.println(e+" has id "+e.getId());
+    }    
+  
+    private Element getElement(int index)
+    {
+      return (Element)elements.get(index);
+    }
+    
+    class Callbacks extends K0.Callbacks
+    {
+      protected void indexMerged(int src, int dest) {
+	getElement(src).setId(dest);
+      }
+      protected void indexMoved(int src, int dest) {
+	getElement(src).setId(dest);
+      }
+      protected void indexDiscarded(int index) {
+	Internal.warning("Engine: Index discarded");
+	getElement(index).setId(-2);
+      }
+      /*
+       * Pretty printing
+       */
+      protected String getName() {
+	return name;
+      }
+      protected String indexToString(int x) {
+	if(x==BitVector.UNDEFINED_INDEX)
+	  return "[NONE]";
+	else if(x==-1)
+	  return "[BOTTOM]";
+	else
+	  return getElement(x).toString();
+      }
+      protected String interfaceToString(int iid) {
+	return Integer.toString(iid);
+      }
+    }
+    
+    public Kind associatedKind; 
+    /* the kind of the elements of this constraint
+     * This is used in TypeConstructor.setKind
+     */
   
     public String toString()
     {
-      return "Constraint for "+associatedKind+":\n"+super.toString();
+      return "Constraint for "+associatedKind+":\n"+k0.toString();
     }
     
     public final void leq(Element e1, Element e2)
@@ -421,9 +467,9 @@ public abstract class Engine
       if(dbg) Debug.println(e1+" <: "+e2+" ("+e1.getId()+" <: "+e2.getId()+")");
       try{ 
 	if(initial)
-	  initialLeq(e1.getId(),e2.getId()); 
+	  k0.initialLeq(e1.getId(),e2.getId());
 	else
-	  leq(e1.getId(),e2.getId()); 
+	  k0.leq(e1.getId(),e2.getId()); 
       }
       catch(Unsatisfiable e){
 	// We call backtrack here to go the good state
@@ -435,12 +481,61 @@ public abstract class Engine
       }
     }
 
-    public final void register(Element e)
+    void mark()
     {
-      e.setId(extend());
-      if(dbg) Debug.println(e+" has id "+e.getId());
-    }    
-  }
+      k0.mark();
+    }
 
-  static boolean dbg = true;
+    void backtrack()
+    {
+      k0.backtrack();
+    }
+    
+    void satisfy() throws Unsatisfiable
+    {
+      k0.satisfy();
+    }
+
+    void rigidify()
+    {
+      k0.rigidify();
+    }
+
+    boolean isRigid(Element e)
+    {
+      return k0.isRigid(e.getId());
+    }
+    
+    void createInitialContext() throws Unsatisfiable
+    {
+      k0.createInitialContext();
+    }
+
+    public int newInterface()
+    {
+      return k0.newInterface();
+    }
+    
+    public void subInterface(int i1, int i2)
+    {
+      k0.subInterface(i1,i2);
+    }
+    
+    public void initialImplements(int x, int iid)
+    {
+      k0.initialImplements(x,iid);
+    }
+  
+    public void initialAbstracts(int x, int iid)
+    {
+      k0.initialAbstracts(x,iid);
+    }
+  
+    public void indexImplements(int x, int iid) throws Unsatisfiable
+    {
+      k0.indexImplements(x,iid);
+    }
+  }
+  
+  static boolean dbg = Debug.engine;
 }

@@ -12,7 +12,7 @@
 
 // File    : Typing.java
 // Created : Tue Jul 20 11:57:17 1999 by bonniot
-//$Modified: Wed Nov 03 13:00:25 1999 by bonniot $
+//$Modified: Thu Nov 04 14:49:21 1999 by bonniot $
 
 package bossa.typing;
 
@@ -299,7 +299,7 @@ abstract public class Typing
   {
     if(dbg) Debug.println(i+" < "+j);
     User.error(!(i.variance.equals(j.variance)),i+" and "+j+" are not comparable");
-    i.variance.getConstraint().subInterface(i.itf,j.itf);
+    i.variance.subInterface(i.itf,j.itf);
   }
   
   public static void assertLeq(InterfaceDefinition itf, Collection c)
@@ -322,18 +322,11 @@ abstract public class Typing
 		     +i+" has variance "+i.variance.getConstraint()));
     }
 
-    //if(Engine.isRigid(t))
-    //  if(imp(t,i))
-    //return;
-    //  else
-    //unsatisfiable(new TypingEx(t+" doesn't implement "+i));
-
-    // 't' implements 'i' and all interfaces above 'i'
     try{
       if(initial)
-	t.variance.getConstraint().initialImplements(t.getId(),i.itf);
+	t.variance.initialImplements(t.getId(),i.itf);
       else
-	t.variance.getConstraint().indexImplements(t.getId(),i.itf);
+	t.variance.indexImplements(t.getId(),i.itf);
     }
     catch(Unsatisfiable e){
       unsatisfiable(new TypingEx(e.getMessage()));
@@ -349,7 +342,7 @@ abstract public class Typing
 		   "Abstraction required on a rigid type constructor : \n"+
 		   t+" required to abstract "+i);
     
-    i.variance.getConstraint().initialAbstracts(t.getId(),i.itf);
+    i.variance.initialAbstracts(t.getId(),i.itf);
   }
 
   public static void assertImp(TypeConstructor t, Collection c, boolean initial)
@@ -368,5 +361,5 @@ abstract public class Typing
       assertAbs(t,((Interface)i.next()).definition);
   }
 
-  public static boolean dbg = true;
+  public static boolean dbg = Debug.typing;
 }

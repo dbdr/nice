@@ -1,5 +1,7 @@
 package bossa.engine;
 
+import bossa.util.*;
+
 class Interface {
   Interface(K0 k0, int iid) {
     this.k0 = k0;
@@ -26,26 +28,29 @@ class Interface {
   BitVector abstractors = new BitVector();
   
   // the approximation of each node of the original context
-  private int[] approx;
+  private final IntVect approx=new IntVect(BitVector.UNDEFINED_INDEX);
 
-  public void setApprox(int[] approx)
+  public void setApprox(int node, int approx)
   {
-    this.approx=approx;
+    if(node>=this.approx.size())
+      this.approx.setSize(node+1,BitVector.UNDEFINED_INDEX);
+    this.approx.set(node,approx);
   }
   
   /**
    * Get the approximation of a node
    *
-   * @param node the index of a node from the initial context (0 <= node < k0.m0)
+   * @param node the index of a node
    * @return its approximation
    */
   public int getApprox(int node)
   {
-    return approx[node];
+    return approx.get(node);
   }
 
   void setIndexSize(int n) {
     implementors.truncate(n);
+    approx.setSize(n,BitVector.UNDEFINED_INDEX);
   }
   void indexMove(int src, int dest) {
     implementors.bitCopy(src, dest);

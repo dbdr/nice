@@ -19,7 +19,7 @@ import java.util.*;
 
 
 /**
- * Class represents a testsuite file with its testcases.
+ * A testsuite file with its testcases.
  * 
  * @author	Alex Greif <a href="mailto:alex.greif@web.de">alex.greif@web.de</a>
  * @version	$Id$
@@ -223,4 +223,6 @@ public class TestSuite {
 
 }
 
-
+// Local Variables:
+// tab-width: 2
+// End:

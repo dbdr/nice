@@ -47,7 +47,6 @@ public class TestSuiteException extends Exception {
 	
 }
 
-
-
-
-
+// Local Variables:
+// tab-width: 2
+// End:

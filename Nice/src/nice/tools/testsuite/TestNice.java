@@ -439,22 +439,8 @@ public class TestNice {
 		return _testCasesWarning;
 	}
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 }
 
-
+// Local Variables:
+// tab-width: 2
+// End:

@@ -62,3 +62,6 @@ public class TestSuiteClassLoader extends ClassLoader {
 	}
 }
 
+// Local Variables:
+// tab-width: 2
+// End:

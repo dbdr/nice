@@ -367,4 +367,6 @@ public class NiceSourceFile {
 	
 }
 
-
+// Local Variables:
+// tab-width: 2
+// End:

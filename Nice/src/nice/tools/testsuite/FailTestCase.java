@@ -15,7 +15,7 @@ package nice.tools.testsuite;
 import java.util.Iterator;
 
 /**
- * TestCase class fot the case that the test should fail
+ * TestCase class for test cases that should fail.
  * 
  * @author	Alex Greif <a href="mailto:alex.greif@web.de">alex.greif@web.de</a>
  * @version	$Id$
@@ -61,8 +61,8 @@ public class FailTestCase extends TestCase {
 	
 	/**
 	 * Parses the compiler messages for line, column, filename and compares them with the
-	 * Expected failure positions that the user defined. If the user definied more expected 
-	 * failure positions than the compiler recognized than a warning is shown.
+	 * expected failure positions that the user defined. If the user defined more expected 
+	 * failure positions than the compiler recognized then a warning is shown.
 	 * A warning is also shown when the user expected a failure at another position than the
 	 * compiler recognized.
 	 * 
@@ -126,3 +126,6 @@ public class FailTestCase extends TestCase {
 
 }
 
+// Local Variables:
+// tab-width: 2
+// End:

@@ -49,3 +49,7 @@ public class GlobalSourceFile extends NiceSourceFile {
 	}
 
 }
+
+// Local Variables:
+// tab-width: 2
+// End:

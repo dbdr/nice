@@ -57,3 +57,6 @@ public class PassTestCase extends TestCase {
 
 }
 
+// Local Variables:
+// tab-width: 2
+// End:

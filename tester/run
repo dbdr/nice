@@ -17,9 +17,9 @@ if [ "$1" != "updated" ]; then
 fi
 
 # Set up variables, that can be overriden in the setup file.
-machine="`hostname -f`"
+machine="`hostname`"
 system="`uname -a`"
-user="$USER"
+user="`whoami`"
 
 export CVS_SOURCEFORGE="cvs.sourceforge.net"
 
@@ -48,7 +48,7 @@ ORIGINAL_PATH="$PATH"
 for conffile in ../config.*; do
     name="`expr match $conffile '../config\.\(.*\)'`"
 
-    # Blamk the variable, so it does not keep the previous value if it
+    # Blank the variable, so it does not keep the previous value if it
     # is not reset to a new value.
     JDK_VERSION=
 
@@ -120,9 +120,11 @@ if [ -r $results_dir ]; then
   cp ./*.id ./*.res ./*.html $results_dir
 else
   scp -p ./*.id ./*.res ./*.html $user@shell.sourceforge.net:$results_dir
+  # update the results page
+  ssh $user@shell.sourceforge.net "sh -c 'cd $results_dir/.. && ./run'"
 
   # If everything went OK, upload the new development version.
-  if [ $failed = false -a "$NICE_MASTER" ]; then
+  if [ "$failed" = false -a "$NICE_MASTER" ]; then
     scp Nice/share/java/nice.jar bonniot@shell.sourceforge.net:/home/groups/n/ni/nice/htdocs
 fi
 

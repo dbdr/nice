@@ -13,7 +13,7 @@ sed -e /BODY/"r coreJava.code" -e /BODY/d coreJava.java.template \
 sed -e /BODY/"r coreJava.code" -e /BODY/d coreJava.nice.template \
 	> coreJava.nice
 
-if javac coreJava.java; then
+if CLASSPATH=.:$CLASSPATH javac coreJava.java; then
   java coreJava > ok.out
   exit $?
 else

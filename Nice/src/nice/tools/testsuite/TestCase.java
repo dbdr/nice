@@ -371,7 +371,7 @@ public abstract class TestCase {
 
 	public void runJVM(String jvm, String main) throws TestSuiteException {
 		try {
-			Process p = Runtime.getRuntime().exec(jvm + " -classpath classes:" + TestNice.getTempFolder() + " " + main);
+			Process p = Runtime.getRuntime().exec(jvm + " -classpath " + TestNice.getTempFolder() + ":classes " + main);
 			CharArrayWriter out = new CharArrayWriter();
 			int exitValue = nice.tools.compiler.dispatch.waitFor(p, out);
 			// Print the output of the execution.

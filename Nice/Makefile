@@ -47,6 +47,12 @@ complete: stable   compiler2 archive2
 fixpoint: complete compiler3 archive3
 world:    fixpoint check test
 
+# The bootstrap at the end of the universe ;-)
+universe:
+	$(MAKE) complete
+	cp share/java/nice.jar external/nice-bootstrap.jar
+	$(MAKE) world
+
 src/nice/tools/compiler/console.jar:
 	$(MAKE) complete
 

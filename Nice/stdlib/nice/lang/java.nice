@@ -178,6 +178,10 @@ DateFormat getDateInstance(int style) = native DateFormat DateFormat.getDateInst
 <K,V> HashMap<K,V> HashMap(int) = native new HashMap(int);
 <K,V> HashMap<K,V> HashMap(int,float) = native new HashMap(int,float);
 <K,K0,V,V0 | K0 <: K, V0 <: V> HashMap<K,V> HashMap(Map<K0,V0>) = native new HashMap(Map);
+<K,V> WeakHashMap<K,V> WeakHashMap() = native new WeakHashMap();
+<K,V> WeakHashMap<K,V> WeakHashMap(int) = native new WeakHashMap(int);
+<K,V> WeakHashMap<K,V> WeakHashMap(int,float) = native new WeakHashMap(int,float);
+<K,K0,V,V0 | K0 <: K, V0 <: V> WeakHashMap<K,V> WeakHashMap(Map<K0,V0>) = native new WeakHashMap(Map);
 <K,V> IdentityHashMap<K,V> IdentityHashMap() = native new IdentityHashMap();
 <K,V> IdentityHashMap<K,V> IdentityHashMap(int) = native new IdentityHashMap(int);
 <K,K0,V,V0 | K0 <: K, V0 <: V> IdentityHashMap<K,V> IdentityHashMap(Map<K0,V0>) = native new IdentityHashMap(Map);
@@ -228,7 +232,6 @@ class Stack<T> extends Vector<T> = native java.util.Stack;
 class TreeMap<K,V> extends AbstractMap<K,V> implements SortedMap<K,V> = native java.util.TreeMap;
 class TreeSet<T> extends AbstractSet<T> implements SortedSet<T> = native java.util.TreeSet;
 class Vector<T> extends AbstractList<T> = native java.util.Vector;
-class WeakHashMap<K,V> extends AbstractMap<K,V> = native java.util.WeakHashMap;
 
 <T> Iterator<T> iterator(Collection<T>) = 
   native Iterator Collection.iterator();
@@ -344,6 +347,18 @@ class WeakHashMap<K,V> extends AbstractMap<K,V> = native java.util.WeakHashMap;
 
 <T> List<T> asList(T[]) = native List Arrays.asList(Object[]);
 
+// Properties 
+class Properties<String K, String V> extends Hashtable<K,V> = native java.util.Properties;
+Properties<String, String> Properties() = native new Properties();
+Properties<String, String> Properties(Properties<String, String>) = native new Properties(Properties);
+?String getProperty(Properties<String, String>, String) = native String Properties.getProperty(String);
+<T | T <: ?String> T getProperty(Properties<String, String>, String, T) = native String Properties.getProperty(String, String);
+void list(Properties<String, String>, PrintStream) = native void Properties.list(PrintStream);
+void list(Properties<String, String>, PrintWriter) = native void Properties.list(PrintWriter);
+void load(Properties<String, String>, InputStream) = native void Properties.load(InputStream);
+?String setProperty(Properties<String, String>, String, String) = native Object Properties.setProperty(String, String);
+void store(Properties<String, String>, OutputStream, String) = native void Properties.store(OutputStream, String);
+
 /* StringTokenizer inherits from Enumeration, which makes it 
    wrongly parameterized. We ignore that inheritance.
 */
@@ -365,6 +380,7 @@ class ReferenceQueue<T> = native java.lang.ref.ReferenceQueue;
 <T> SoftReference<T> SoftReference(T) = native new SoftReference(Object);
 <T,U | T <: U > SoftReference<T> SoftReference(T, ReferenceQueue<U>) = native new SoftReference(Object, ReferenceQueue);
 <T,U | T <: U > PhantomReference<T> PhantomReference(T, ReferenceQueue<U>) = native new PhantomReference(Object, ReferenceQueue);
+<T> ReferenceQueue<T> ReferenceQueue() = native new ReferenceQueue();
 
 <T> void clear(Reference<T>) = native void Reference.clear();
 <T> boolean enqueue(Reference<T>) = native boolean Reference.enqueue();

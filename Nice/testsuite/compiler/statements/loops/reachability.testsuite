@@ -10,3 +10,11 @@
     }
     return -1;
   }
+
+/// PASS bug
+  loop: while(true)
+    {
+      assert true;
+      break loop;
+    }
+  assert true;

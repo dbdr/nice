@@ -309,7 +309,7 @@ public class ConstantExp extends Expression
   static mlsub.typing.Polytype voidPolytype, boolPolytype, intPolytype;
 
   // syntatic types
-  static Monotype synVoidType;
+  public static Monotype synVoidType;
 
   private static TypeConstructor throwableTC;
   static TypeConstructor throwableTC()

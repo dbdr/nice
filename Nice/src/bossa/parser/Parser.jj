@@ -702,11 +702,10 @@ FunType funmonotype():
 {
     "fun" "(" [ dom=monotypes() ] ")" 
     t="(" [ codom=monotype() ] ")"
-    { if(codom==null) codom=
-      new MonotypeConstructor
-      (new TypeIdent(new LocatedString("void",new Location(t))),
-       new TypeParameters(null),new Location(t)); }
-    { return new FunType(dom,codom); }
+    { 
+      if (codom == null) codom = ConstantExp.synVoidType;
+      return new FunType(dom, codom); 
+    }
 }
 
 Monotype monotype():

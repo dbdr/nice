@@ -47,7 +47,7 @@ public class NewArrayExp extends Expression
 
   void resolveTC(TypeMap typeScope)
   {
-    if (tc != null)
+    if (ti == null)
       return;
     
     TypeSymbol ts = ti.resolveToTypeSymbol(typeScope);
@@ -60,7 +60,7 @@ public class NewArrayExp extends Expression
 	if (!(ts instanceof TypeConstructor))
 	  User.error(ti, ti + " should be a class");
     
-	tc = (TypeConstructor) ts;
+	TypeConstructor tc = (TypeConstructor) ts;
 	monotype = new MonotypeConstructor(tc, MonotypeVar.news(tc.arity()));
 	if (Types.isPrimitive(tc))
 	  monotype = bossa.syntax.Monotype.sure(monotype);
@@ -100,8 +100,7 @@ public class NewArrayExp extends Expression
   {
     StringBuffer res = new StringBuffer
       ("new " +
-       (ti != null ? ti.toString() : 
-	tc != null ? tc.toString() : type.toString()) +
+       (ti != null ? ti.toString() : type.toString()) +
        Util.map("[", "]", "]", knownDimensions));
 
     for(int i=0; i<unknownDimensions; i++)
@@ -111,7 +110,6 @@ public class NewArrayExp extends Expression
   }
 
   TypeIdent ti;
-  TypeConstructor tc;
 
   Expression[] knownDimensions;
   private int unknownDimensions;

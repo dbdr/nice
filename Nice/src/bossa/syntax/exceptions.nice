@@ -1,7 +1,7 @@
 
 package bossa.syntax;
 
-class UnknownIdentException extends RuntimeException 
+class UnknownIdentException extends bossa.util.UserError
 {
   LocatedString ident;
 }
@@ -12,4 +12,16 @@ unknownIdent(name)
   UnknownIdentException res = new UnknownIdentException();
   res.ident = name;
   return res;
+}
+
+bossa.util.UserError assignmentError(bossa.util.Located responsible,
+				     String target,
+				     String targetType,
+				     Expression value)
+{
+  StringBuffer msg = new StringBuffer(100);
+  msg.append("Incorrect type in assignment to ").append(target);
+  msg.append("\nFound   : ").append(value.getType().toString());
+  msg.append("\nExpected: ").append(targetType);
+  return new bossa.util.UserError(responsible, msg.toString());
 }

@@ -55,19 +55,6 @@ public class AssignExp extends Expression
    * Type cheking
    ****************************************************************/
   
-  /**
-     Checks that right can be assigned to a variable of type left.
-     Returns a new expression to be used instead of right,
-     since overloading resolution is done on the expected type.
-  */
-  static Expression checkAssignment(Polytype left, Expression right)
-    throws TypingEx
-  {
-    Expression val = right.resolveOverloading(left);
-    Typing.leq(val.getType(), left);
-    return val;
-  }
-  
   void computeType()
   {
     this.type = value.getType();

@@ -17,5 +17,13 @@ public class UserError extends RuntimeException
   UserError(String message)
   {
     super(message);
+
+    if(Debug.alwaysDumpStack)
+      Internal.printStackTrace();    
+  }
+
+  public UserError(Located responsible, String message)
+  {
+    this(responsible.location() + ":\n" + message);
   }
 }

@@ -54,11 +54,8 @@ typecheck(e@AssignExp)
     e.value = checkAssignment(e.to.getType(), e.value);
   }
   catch(TypingEx t){
-    bossa.util.User.error(e,
-	       "Typing error : " + e.to + 
-	       " cannot be assigned value " + e.value + 
-	       " of type " + e.value.getType(),
-	       "\n" + t.getMessage());
+    throw assignmentError(e, 
+			  e.to.toString(), e.to.getType().toString(), e.value);
   }
 }
 
@@ -186,18 +183,14 @@ typecheck(decl@Block$LocalDeclaration)
   if (decl.value == null)
     return;
 
+  MonoSymbol target = decl.left;
+
   try{
-    decl.value = checkAssignment(decl.left.getType(),decl.value);
+    decl.value = checkAssignment(target.getType(), decl.value);
   }
   catch(TypingEx t){
-    bossa.util.User.error
-    (decl.left,
-     "Typing error : " + decl.left.name +
-     " cannot be assigned value " + decl.value +
-     " of type " + decl.value.getType(),
-     " since " +
-     decl.left.name + " has type " + 
-     decl.left.type);
+    throw assignmentError(target, target.name.toString(), 
+			  target.getMonotype().toString(), decl.value);
   }
 }
 

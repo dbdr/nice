@@ -497,7 +497,8 @@ public class NiceClass extends ClassDefinition.ClassImplementation
     s.print
       (
          " {\n"
-       + Util.map("",";\n",";\n",fields)
+       + Util.map("", ";\n", ";\n", fields)
+       + Util.map("", ";\n", ";\n", overrides)
        + "}\n\n"
        );
   }

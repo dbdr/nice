@@ -190,3 +190,19 @@ class FOOB extends FOOA {
 class FOOC extends FOOB {
     override byte b = 2;
 }
+
+/// PASS
+  /// package a
+  /// Toplevel
+abstract class A {}
+class B extends A {}
+
+abstract class AA {
+  final A val;
+}
+class BB extends AA {
+  override B val;
+}
+
+  /// package b import a
+B b = new BB(val: new B()).val;

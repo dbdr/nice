@@ -5,5 +5,10 @@ package regtest.basic;
 void syntaxTest()
 {
   // While with empty body
-  while(false);
+  while(false)
+    ;
+
+  // If with empty body
+  if (true)
+    ;
 }

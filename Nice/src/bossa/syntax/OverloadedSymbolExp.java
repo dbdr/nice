@@ -12,7 +12,7 @@
 
 // File    : OverloadedSymbolExp.java
 // Created : Thu Jul 08 12:20:59 1999 by bonniot
-//$Modified: Wed Jun 21 18:33:57 2000 by Daniel Bonniot $
+//$Modified: Fri Sep 01 16:42:12 2000 by Daniel Bonniot $
 
 package bossa.syntax;
 
@@ -225,10 +225,10 @@ public class OverloadedSymbolExp extends Expression
   }
 
   /**
-   * Removes the symbols that do not have minimal types.
+   * Removes the symbols that do not have minimal domain types.
    *
    * For instance, if the set of symbols is {s1, s2}
-   * with s1:A->C and s2:B->C with B<:A,
+   * with s1:A->C and s2:B->D with B<:A,
    * removoNonMinimal will remove s1.
    *
    * This allows for java-style overloading, 
@@ -239,7 +239,7 @@ public class OverloadedSymbolExp extends Expression
     removeNonMinimal(symbols);
   }
   
-  static void removeNonMinimal(List symbols)
+  private static void removeNonMinimal(List symbols)
   {
     // optimization
     if(symbols.size()<2)
@@ -251,14 +251,20 @@ public class OverloadedSymbolExp extends Expression
     boolean[] remove = new boolean[len];
     
     for(int s1 = 0; s1<len; s1++)
-      for(int s2 = s1+1; s2<len; s2++)
-	try{
-	  Typing.leq(syms[s2].getClonedType(), syms[s1].getClonedType());
-	  remove[s1] = true;
-	  break;
-	}
-	catch(TypingEx e){
-	}
+      for(int s2 = 0; s2<len; s2++)
+	if (s1 != s2)
+	  try{
+	    Debug.println("TRYING " + 
+			  syms[s2].getClonedType() + " << " +
+			  syms[s1].getClonedType());
+	    Typing.leq(syms[s2].getClonedType().getDomain(), 
+		       syms[s1].getClonedType().getDomain());
+	    Debug.println("SUCCESS");
+	    remove[s1] = true;
+	    break;
+	  }
+	  catch(TypingEx e){
+	  }
     for(int i = 0; i<len; i++)
       if(remove[i])
 	{

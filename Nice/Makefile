@@ -73,9 +73,9 @@ install: share/java/nice.jar
                  ${MANDIR} ${LISPDIR} ${DOCDIR}
 	cp bin/nicec ${INSTALLDIR}/bin/
 	cp share/java/nice.jar ${INSTALLDIR}/share/java/ 
-	cp lib/emacs/nice-mode.el ${LISPDIR}
+	cp lib/emacs/nice-mode.el lib/emacs/nice-startup.el ${LISPDIR}
 	./bin/nicec --man > ${MANDIR}/nicec.1
-	groff -mandoc -Thtml ${MANDIR}/nicec.1 > ${DOCDIR}/nicec.html
+	-groff -mandoc -Thtml ${MANDIR}/nicec.1 > ${DOCDIR}/nicec.html
 
 test:
 	cd regtest; /usr/bin/time ./regtest

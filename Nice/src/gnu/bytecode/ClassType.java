@@ -711,6 +711,19 @@ public class ClassType extends ObjectType implements AttrContainer {
     return result;
   }
 
+  /**
+     Return an equivalent method when the receiver is of this type.
+     Return null if no more precise method exists.
+  */
+  Method refineMethod (Method method)
+  {
+    Method res = getMethod(method.getName(), method.arg_types);
+    if (res == method)
+      return null;
+    else
+      return res;
+  }
+
   /** Do various fixups after generating code but before we can write it out.
    * This includes assigning constant pool indexes where needed,
    * finalizing labels, etc. */
@@ -990,6 +1003,9 @@ public class ClassType extends ObjectType implements AttrContainer {
 	nice.tools.code.SpecialArray.unknownTypeArray().
 	  emitCoerceToObject(code);
 	code.emitFi();
+
+        // Set the type
+        code.popType(); code.pushType(collectionType);
       }
     else
       super.emitCoerceFromObject(code);

@@ -16,3 +16,10 @@
   List<String> list1 = [s1, s2];
   List<String> list2 = [s1, s2];
   assert list1.equals(list2);
+
+/// PASS
+  assert foo(true).equals("1");
+  assert foo(false).equals("2");
+  ///Toplevel
+  String foo(boolean b) =
+    (b ? new Integer(1) : new Long(2)).toString();

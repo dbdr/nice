@@ -237,9 +237,7 @@ public final class SpecialArray extends gnu.bytecode.ArrayType
     code.emitElse();
 
     code.emitPop(1);
-    code.emitPushNull();
-    // Set the type
-    code.popType(); code.pushType(toType);
+    code.emitPushNull(toType);
 
     code.emitFi();
   }

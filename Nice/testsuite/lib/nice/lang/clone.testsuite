@@ -1,4 +1,4 @@
-/// PASS bug
+/// PASS
   let a1 = new A(x: 1);
   let a2 = a1.clone();
   assert a2 != a1;

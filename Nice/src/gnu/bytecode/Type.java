@@ -459,6 +459,10 @@ public abstract class Type {
     if (t1 == null || t2 == null)
      return null;
 
+    // Optimization
+    if (t1 == t2)
+      return t1;
+
     if (t1.isSubtype(t2))
       return t2;
     else if (t2.isSubtype(t1))
@@ -559,6 +563,15 @@ public abstract class Type {
   public void emitCoerceFromObject (CodeAttr code)
   {
     throw new Error ("unimplemented emitCoerceFromObject for "+this);
+  }
+
+  /**
+     Return an equivalent method when the receiver is of this type.
+     Return null if no more precise method exists.
+  */
+  Method refineMethod (Method method)
+  {
+    return null;
   }
 
   public static final PrimType byte_type

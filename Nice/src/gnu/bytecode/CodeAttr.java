@@ -636,9 +636,17 @@ public class CodeAttr extends Attribute implements AttrContainer
 
   public void emitPushNull ()
   {
+    emitPushNull(Type.pointer_type);
+  }
+
+  /**
+     @param type the type <code>null</code> is considered to have.
+  */
+  public void emitPushNull (Type type)
+  {
     reserve(1);
     put1(1);  // aconst_null
-    pushType(Type.pointer_type);
+    pushType(type);
   }
 
   public final void emitPushThis()
@@ -1055,8 +1063,35 @@ public class CodeAttr extends Attribute implements AttrContainer
     if (is_invokestatic != ((method.access_flags & Access.STATIC) != 0))
       throw new Error
 	("emitInvokeXxx static flag mis-match method.flags="+method.access_flags);
+    while (--arg_count >= 0)
+      popType();
     if (!is_invokestatic)
-      arg_count++;
+      {
+        arg_count++;
+        Type receiverType = popType();
+        // Don't change anything is the call is an invokespecial
+        if (opcode != 183 && receiverType != method.getDeclaringClass())
+          {
+            // We try to find a more precise method, given the known
+            // type of the receiver.
+            Method preciseMethod = receiverType.refineMethod(method);
+
+            if (preciseMethod != null &&
+                // Don't choose a more precise method if it is an
+                // interface method, and the original is a class method
+                // (can happen if the original class is Object, like in
+                // Object.equals, refined in List.equals).
+                ((! preciseMethod.getDeclaringClass().isInterface()) ||
+                 method.getDeclaringClass().isInterface()))
+              {
+                method = preciseMethod;
+                // It could be that the call was an invokeinterface, and
+                // now became an invokevirtual.
+                if (opcode == 185 && ! method.getDeclaringClass().isInterface())
+                  opcode = 182;
+              }
+          }
+      }
     put1(opcode);  // invokevirtual, invokespecial, or invokestatic
     putIndex2(getConstants().addMethodRef(method));
     if (opcode == 185)  // invokeinterface
@@ -1064,8 +1099,6 @@ public class CodeAttr extends Attribute implements AttrContainer
 	put1(words(method.arg_types)+1); // 1 word for 'this'
 	put1(0);
       }
-    while (--arg_count >= 0)
-      popType();
     if (method.return_type.size != 0)
       pushType(method.return_type);
   }
@@ -1478,6 +1511,21 @@ public class CodeAttr extends Attribute implements AttrContainer
 			    then_clause_stack_size
 			    + " while SP at end of 'else' was " + SP);
 	  }
+        else
+          {
+            // Reconcile the types on the stack.
+            for (int i = 0; i < if_stack.then_stacked_types.length; i++)
+              {
+                Type t1 = if_stack.then_stacked_types[i];
+                Type t2 = stack_types[if_stack.start_stack_size + i];
+
+                Type common = Type.lowestCommonSuperType(t1, t2);
+                if (common == null)
+                  common = Type.pointer_type;
+
+                stack_types[if_stack.start_stack_size + i] = common;
+              }
+          }
       }
     else if (unreachable_here)
       make_unreachable = true;

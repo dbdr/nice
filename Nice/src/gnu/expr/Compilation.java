@@ -448,7 +448,7 @@ public class Compilation
 		if (sig1 == 'Z')
 		  {
 		    boolean val = ((PrimType) type).booleanValue(value);
-		    code.emitPushInt(val ? 1 : 0);
+		    code.emitPushBoolean(val);
 		    return;
 		  }
 		if (sig1 == 'V' && value == Values.empty)

@@ -1,0 +1,18 @@
+/// PASS
+  let filename = "color.ser";
+
+  let outf = new FileOutputStream(filename);
+  let outs = new ObjectOutputStream(outf);
+  outs.writeObject(red);
+  outf.close();
+
+  let inf = new FileInputStream(filename);
+  let ins = new ObjectInputStream(inf);
+  let Color color = ins.readObject();
+  assert color == red;
+
+  /// Toplevel
+  import java.io.*;
+
+  enum Color {red, blue, green}
+

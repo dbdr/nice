@@ -39,7 +39,7 @@ public final class Internal
     if(l==null)
       warning(message);
     else
-      warning(l+": "+message);
+      warning(l+":\n"+message);
   }
   
   public static void warning(String message)
@@ -63,7 +63,7 @@ public final class Internal
     if(l==null)
       error(message);
     else
-      error(l+": "+message);
+      error(l+":\n"+message);
   }
 
   public static void error(String message, String dbgMsg)

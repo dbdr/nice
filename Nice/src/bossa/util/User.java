@@ -56,10 +56,10 @@ public final class User
   public static void error(Located responsible, String message)
   {
     Location loc = responsible.location();
-    if(loc==null)
+    if (loc == null)
       error(message);
     else
-      error(loc+": "+message);
+      error(loc + ":\n" + message);
   }
 
   public static void error(String message)
@@ -73,7 +73,7 @@ public final class User
 
   public static void warning(Located responsible, String message)
   {
-    warning(responsible.location()+": "+message);
+    warning(responsible.location() + ":\n" + message);
   }
 
   public static void warning(String message)

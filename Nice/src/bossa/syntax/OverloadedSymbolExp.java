@@ -162,11 +162,16 @@ public class OverloadedSymbolExp extends Expression
       }
 
     if (symbols.size() == 0)
-      User.error(this, 
-		 "No possible call for " + ident + 
-		 ".\nArguments: " + arguments.printTypes() + 
-		 "\nPossibilities:\n" + 
-		 Util.map("", "\n", "", removed));
+      if (removed.size() == 1)
+	User.error(this,
+		   "Arguments " + arguments.printTypes() +
+		   " do not fit: \n" + removed.get(0));
+      else
+	User.error(this, 
+		   "No possible call for " + ident + 
+		   ".\nArguments: " + arguments.printTypes() + 
+		   "\nPossibilities:\n" + 
+		   Util.map("", "\n", "", removed));
 
     removeNonMinimal();
     

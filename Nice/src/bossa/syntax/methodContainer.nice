@@ -17,7 +17,7 @@ import bossa.util.*;
 /**
    An entity in which methods can be declared.
 
-   It can have type parameters, that are implicitely added 
+   It can have type parameters, that are implicitely added
    to the englobed methods.
 
 */
@@ -48,7 +48,7 @@ public abstract class MethodContainer extends Definition
     if (classConstraint != null)
       {
 	TypeScope scope = new TypeScope(this.typeScope);
-	try { 
+	try {
           scope.addSymbols(notNull(classConstraint).getBinders());
         }
 	catch(TypeScope.DuplicateName ex) {}
@@ -86,7 +86,7 @@ public abstract class MethodContainer extends Definition
 
   /**
      Children should call this implementation (super) then print
-     their specific information. 
+     their specific information.
    */
   printInterface(s)
   {
@@ -108,7 +108,7 @@ public abstract class MethodContainer extends Definition
     for (int n = 0; n < typeParameters.length; n++)
       {
         let vari = notNull(variance).getVariance(n);
-	if (vari == mlsub.typing.Variance.CONTRAVARIANT) 
+	if (vari == mlsub.typing.Variance.CONTRAVARIANT)
           res.append("-");
         else if (vari == mlsub.typing.Variance.COVARIANT)
           res.append("+");
@@ -144,15 +144,16 @@ public class ClassConstraint extends Constraint
 /**
    @param cst an additional constraint for the type parameters of this class.
 */
-public ClassConstraint createClassConstraint(?Constraint cst, 
-                                  mlsub.typing.MonotypeVar[] typeParameters, List<AtomicConstraint> atoms,
-                                  Location loc)
+public ClassConstraint createClassConstraint
+  (?Constraint cst,
+   mlsub.typing.MonotypeVar[] typeParameters, List<AtomicConstraint> atoms,
+   Location loc)
 {
   mlsub.typing.TypeSymbol[] binders;
   List<AtomicConstraint> constraints;
   boolean resolve;
 
-  if (cst == trueConstraint || cst == null) 
+  if (cst == trueConstraint || cst == null)
     {
       binders = cast(typeParameters);
       constraints = atoms;

@@ -95,3 +95,34 @@ foo() {
       l./*/// FAIL HERE*/ add(0);
     }
   String s = l.get(0);
+
+/// PASS bug
+  var n = 5;
+  let table1 = new HashMap(10);
+  for (int i = 0; i <= n; i++) 
+    table1["foo_" + i] = i;
+
+  String key; 
+  for (each : table1.entrySet) {
+    key = each.getKey;
+  }
+
+/// PASS bug
+  let L1 = new LinkedList();
+  for (var j = 1; j <= 10; j++) L1.add(j);
+
+  LinkedList<int> L2 = new LinkedList(L1);
+
+/// PASS bug
+  let L1 = new LinkedList();
+  for (var j = 1; j <= 10; j++)
+    L1.add(j);
+
+  let L3 = new LinkedList();
+  while (!L1.isEmpty)
+    L3.add( L1.removeFirst );
+
+/// PASS bug
+  let L1 = new LinkedList();
+  L1.add(999);         
+  println( L1[0] );

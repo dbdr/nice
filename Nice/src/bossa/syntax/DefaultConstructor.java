@@ -179,7 +179,8 @@ class DefaultConstructor extends Constructor
   private Expression body(Expression thisExp,
                           MonoSymbol[] fullArgs, boolean omitDefaults)
   {
-    int len = fields.length + classe.nbInitializers();
+    Expression initializer = classe.getInitializer();
+    int len = fields.length + (initializer == null ? 0 : 1);
 
     if (len == 0)
       return QuoteExp.voidExp;
@@ -203,9 +204,18 @@ class DefaultConstructor extends Constructor
         body[i] = fields[i].method.compileAssign(thisExp, fieldValue);
       }
 
-    classe.setThisExp(thisExp);
-    for (int i = 0; i < classe.nbInitializers(); i++)
-      body[fields.length + i] = classe.compileInitializer(i);
+    if (initializer != null)
+      {
+        Expression isDirectInstance =
+          Gen.isOfClass(thisExp, classe.classe.getType(), false);
+
+        body[fields.length] =
+          new gnu.expr.IfExp
+            (isDirectInstance,
+             new gnu.expr.ApplyExp
+               (initializer, new Expression[]{ thisExp }),
+             QuoteExp.voidExp);
+      }
 
     return new BeginExp(body);
   }

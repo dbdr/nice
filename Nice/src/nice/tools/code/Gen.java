@@ -28,9 +28,10 @@ public class Gen
 		new QuoteExp(ct));
   }
   
-  public static Expression isOfClass(Expression value, Type ct)
+  public static Expression isOfClass(Expression value, Type ct,
+                                     boolean possiblyNull)
   {
-    return Inline.inline(new IsOfClassProc(ct), value);
+    return Inline.inline(new IsOfClassProc(ct, possiblyNull), value);
   }
 
   public static Expression isNullExp(Expression value)
@@ -226,7 +227,9 @@ public class Gen
      Type retType,
      Expression[] params)
   {
-    LambdaExp lexp = new LambdaExp();
+    Declaration thisDecl = new Declaration("this");
+    LambdaExp lexp = new MemberLambdaExp(thisDecl);
+
     bytecodeName = nice.tools.code.Strings.escape(bytecodeName);
     int arity = 1 + (argTypes == null ? 0 : argTypes.length);
 
@@ -246,8 +249,7 @@ public class Gen
 	gnu.expr.Declaration d;
 	if (isThis)
 	  {
-	    d = new Declaration(parameterName);
-	    d.context = lexp;
+	    d = thisDecl;
 	    d.setType(receiver);
 	    params[n] = new ThisExp(d);
 	  }
@@ -260,8 +262,8 @@ public class Gen
 	d.noteValue(null);
 	d.setCanRead(true);
 	d.setCanWrite(true);
-        
       }
+
     return lexp;
   }
 
@@ -349,5 +351,16 @@ public class Gen
     
     lambda.body = new ApplyExp(proc, args);
     return lambda;
-  }  
+  }
+
+  public static Expression superCall(Expression method, Expression[] args)
+  {
+    return new ApplyExp(method, args, true);
+  }
+
+
+  public static Expression superCaller(Method method)
+  {
+    return new QuoteExp(PrimProcedure.specialCall(method));
+  }
 }

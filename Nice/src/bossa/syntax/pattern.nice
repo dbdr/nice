@@ -408,7 +408,7 @@ matchTest(TypePattern p, parameter, dispatchMade)
   let ct = nice.tools.code.Types.javaType(p.tc);
 
   if (p.exactlyAt)
-    return nice.tools.code.Gen.isOfClass(parameter, ct);
+    return nice.tools.code.Gen.isOfClass(parameter, ct, true);
     
   return nice.tools.code.Gen.instanceOfExp(parameter, ct);
 }

@@ -18,30 +18,42 @@ import gnu.expr.*;
 
 public class IsOfClassProc extends Procedure1 implements Inlineable
 {
-  public IsOfClassProc(Type type)
+  public IsOfClassProc(Type type, boolean possiblyNull)
   {
     this.type = type;
+    this.possiblyNull = possiblyNull;
   }
 
   private Type type;
-  
+  private boolean possiblyNull;
+
   public void compile (ApplyExp exp, Compilation comp, Target target)
   {
     Expression[] args = exp.getArgs();
     CodeAttr code = comp.getCode();
 
-    //first a check is needed for the case that the argument is null
     args[0].compile(comp, Target.pushObject);
-    code.emitDup();
-    code.emitIfNotNull();
+
+    if (possiblyNull)
+      {
+        //first a check is needed for the case that the argument is null
+        code.emitDup();
+        code.emitIfNotNull();
+      }
+
     code.emitInvokeVirtual(getClassMethod);
     code.emitInvokeVirtual(getNameMethod);
     code.emitPushString(type.getName());
     code.emitInvokeVirtual(equalsMethod);
-    code.emitElse();
-    code.emitPop(1);
-    code.emitPushBoolean(false);
-    code.emitFi();
+
+    if (possiblyNull)
+      {
+        code.emitElse();
+        code.emitPop(1);
+        code.emitPushBoolean(false);
+        code.emitFi();
+      }
+
     target.compileFromStack(comp, Type.boolean_type);
   }
 

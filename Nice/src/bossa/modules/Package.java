@@ -629,7 +629,7 @@ public class Package implements mlsub.compilation.Module, Located, bossa.syntax.
 	method != null;
 	method = method.getNext())
       {
-        Definition d = ImportedConstructor.load(def, method);
+        Definition d = def.importMethod(method);
         if (d != null)
           definitions.add(d);
       }

@@ -92,26 +92,10 @@ public class ConstructorExp extends LambdaExp
   void enterFunction (Compilation comp)
   {
     if (primary)
-      {
-	// The super call has to come before anything else.
-	superCall.compile(comp, Target.Ignore);
-	
-	// Do the normal stuff.
-	super.enterFunction(comp);
-	
-	// Save 'this' if it is captured
-	if (thisDecl.field != null)
-	  {
-	    CodeAttr code = comp.getCode();
-	    thisDecl.loadOwningObject(comp);
-	    code.emitPushThis();
-	    code.emitPutField(thisDecl.field);
-	  }
-      }
-    else
-      {
-        // nothing special to do for custom constructors.
-	super.enterFunction(comp);
-      }
+      // The super call has to come before anything else.
+      superCall.compile(comp, Target.Ignore);
+
+    // Do the normal stuff.
+    super.enterFunction(comp);
   }
 }

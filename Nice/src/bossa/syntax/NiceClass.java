@@ -475,7 +475,7 @@ public class NiceClass extends ClassDefinition.ClassImplementation
     initializers = (Statement[]) inits.toArray(new Statement[inits.size()]);
   }
 
-  public int nbInitializers() { return initializers.length; }
+  private int nbInitializers() { return initializers.length; }
 
   private void resolveIntitializers()
   {
@@ -510,14 +510,48 @@ public class NiceClass extends ClassDefinition.ClassImplementation
   private MonoSymbol thisSymbol;
   private gnu.expr.Expression thisExp;
 
-  void setThisExp(gnu.expr.Expression thisExp)
-  {
-    this.thisExp = thisExp;
-  }
+  /**
+     Reference to the method performing instance initialization for this class.
+  */
+  private gnu.expr.Expression initializer;
 
-  gnu.expr.Expression compileInitializer(int index)
+  gnu.expr.Expression getInitializer()
   {
-    return initializers[index].generateCode();
+    if (initializer != null)
+      return initializer;
+
+    gnu.expr.Expression parentInitializer = null;
+    NiceClass parent = this.getParent();
+    if (parent != null)
+      {
+        parentInitializer = parent.getInitializer();
+      }
+
+    if (nbInitializers() == 0 && parentInitializer == null)
+      return null;
+
+    gnu.expr.Expression[] params = new gnu.expr.Expression[1];
+    gnu.expr.LambdaExp lambda = Gen.createMemberMethod
+      ("$init", classe.getType(), null, gnu.bytecode.Type.void_type, params);
+    thisExp = params[0];
+
+    int nPrefix = parentInitializer == null ? 0 : 1;
+    gnu.expr.Expression[] body = new gnu.expr.Expression
+      [nPrefix + nbInitializers()];
+
+    // Call the parent initializer if present
+    if (parentInitializer != null)
+      body[0] = Gen.superCall
+        (parentInitializer, new gnu.expr.Expression[]{ thisExp });
+
+    // Compile the initializers of this class
+    for (int i = 0; i < nbInitializers(); i++)
+      body[nPrefix + i] = initializers[i].generateCode();
+
+    Gen.setMethodBody(lambda, new gnu.expr.BeginExp(body));
+    initializer = addJavaMethod(lambda);
+
+    return initializer;
   }
 
   /****************************************************************
@@ -625,9 +659,9 @@ public class NiceClass extends ClassDefinition.ClassImplementation
 
     gnu.expr.Expression[] params = new gnu.expr.Expression[1];
     gnu.expr.LambdaExp lambda = createJavaMethod("clone", cloneMethod, params);
-    Gen.setMethodBody(lambda, 
-		      new gnu.expr.ApplyExp(new gnu.expr.QuoteExp(gnu.expr.PrimProcedure.specialCall(cloneMethod)), params));
-    addJavaMethod(lambda);    
+    Gen.setMethodBody
+      (lambda, new gnu.expr.ApplyExp(Gen.superCaller(cloneMethod), params));
+    addJavaMethod(lambda);
   }
 
   public gnu.expr.ClassExp createClassExp()
@@ -1016,6 +1050,20 @@ public class NiceClass extends ClassDefinition.ClassImplementation
     fieldDecl.setFlag(Declaration.STATIC_SPECIFIED);
     fieldDecl.setFlag(Declaration.TYPE_SPECIFIED);
     fieldDecl.noteValue(new QuoteExp(serialVersionUIDValue, SpecialTypes.longType));
+  }
+
+  public Definition importMethod(gnu.bytecode.Method method)
+  {
+    if (method.isConstructor())
+      return ImportedConstructor.load(this, method);
+
+    if (method.getArity() == 0 && method.getName().equals("$init"))
+      {
+        initializer = Gen.superCaller(method);
+        return null;
+      }
+
+    return null;
   }
 
   /****************************************************************

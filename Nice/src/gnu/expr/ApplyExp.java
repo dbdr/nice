@@ -13,6 +13,9 @@ public class ApplyExp extends Expression
   Expression[] args;
   boolean tailCall;
 
+  /** true if this is a special (super) call. */
+  boolean special;
+
   /** Containing LambdaExp. */
   LambdaExp context;
 
@@ -26,7 +29,10 @@ public class ApplyExp extends Expression
   public final boolean isTailCall() { return tailCall; }
   public final void setTailCall(boolean tailCall) { this.tailCall = tailCall; }
 
-  public ApplyExp (Expression f, Expression[] a) { func = f; args = a; }
+  public ApplyExp (Expression f, Expression[] a) { this(f, a, false); }
+
+  public ApplyExp (Expression f, Expression[] a, boolean special)
+  { func = f; args = a; this.special = special; }
 
   public ApplyExp (Procedure p, Expression[] a) { func = new QuoteExp(p); args = a; }
 
@@ -236,7 +242,10 @@ public class ApplyExp extends Expression
 				      func_lambda.isClassMethod() ? (Type) method.getDeclaringClass() : extraArg > 0 ? Type.void_type : null,
 				      argTypes, varArgs,
 				      func_name, func_lambda, comp);
-	    code.emitInvoke(method);
+            if (exp.special)
+              code.emitInvokeSpecial(method);
+            else
+              code.emitInvoke(method);
 	    target.compileFromStack(comp, func_lambda.getReturnType());
 	    return;
 	  }

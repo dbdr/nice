@@ -204,8 +204,8 @@ abstract public class MethodDeclaration extends Definition
       + getName().toQuotedString()
       + "("
       // parameters can be null if type was set lowlevel (native code, ...)
-      + (getType().domain() != null ? 
-	 Util.map("",", ","", getType().domain()) : parameters.toString())
+      + (parameters != null ?
+	 parameters.toString() : Util.map("",", ","", getType().domain()))
       + ")"
       ;
   }

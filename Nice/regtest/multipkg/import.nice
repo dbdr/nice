@@ -36,6 +36,10 @@ void test_import()
   /* Must fail: map(["A"], fun(String s)=>{println(s);}); */
 
   cov2(null);
+
+  // Tests using function with optional parameters from an imported package.
+  oP(1, b:3, d:3, e:4, skip:true);
+  oPFunction(1, b:3, d:3, e:4, skip:true);
 }
 
 void test_funs(Funs f0)

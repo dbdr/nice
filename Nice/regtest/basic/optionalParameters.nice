@@ -18,6 +18,8 @@ oP(a,b,c,d,e, skip)
   println("a=" + a + " b=" + b + " c=" + c + " d=" + d + " e=" + e);
 }
 
+void oPFunction(int, int b, int c = 3, int d, int e, boolean skip = false) {}
+
 <Any T> void printAny(T what = "Nothing");
 printAny(what) = println(what);
 

@@ -54,6 +54,9 @@ public class AST extends Node
     if (children == null)
       return;
 
+    Location.setCurrentFile(module.toString());
+    Location.current = Location.nowhere();
+
     // Classes are resolved first, since code can depend on them
     for(Iterator i = children.iterator();i.hasNext();)
       {

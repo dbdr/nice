@@ -59,10 +59,10 @@ class JavaMethod extends MethodDeclaration
     if (constructor)
       res = new JavaConstructor
 	(new LocatedString
-	 ("new " + m.getDeclaringClass().getName(), Location.nowhere()),
+	 ("new " + m.getDeclaringClass().getName(), Location.current),
 	 type, m);
     else
-      res = new JavaMethod(new LocatedString(m.getName(), Location.nowhere()),
+      res = new JavaMethod(new LocatedString(m.getName(), Location.current),
 			   type, m);
     return res;
   }

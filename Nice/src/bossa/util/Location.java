@@ -39,6 +39,8 @@ public class Location implements Located
   }
   private static String currentFile = null;
 
+  public static Location current = null;
+
   public Location(String file,
 		  int startLine, int startColumn,
 		  int endLine, int endColumn)

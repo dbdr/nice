@@ -128,8 +128,7 @@ public class GlobalVarDeclaration extends Definition
 
   public String toString()
   {
-    return left.type+" "+left+
-      (value==null?"":" = "+value);
+    return left + (value==null ? "" : " = " + value);
   }
 
   protected ExpressionRef value=null;

@@ -29,7 +29,7 @@ nice (0.7.6) unstable; urgency=low
     That is, we replace '/' (which is illegal in package names) by '.'.
     It is therefore possible to type 'nicec my/package/'.
 
- --
+ -- Daniel Bonniot <bonniot@users.sourceforge.net>  Tue, 21 Jan 2003 17:20:36 +0100
 
 nice (0.7.5) unstable; urgency=low
 

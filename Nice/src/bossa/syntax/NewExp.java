@@ -29,10 +29,7 @@ public class NewExp extends CallExp
     this.ti = ti;
   }
 
-  // we cannot assume resolveTC is called from findJavaClasses
-  // for instance, if this new exp belongs to a global variable definition
-  // it is not the case.
-  private void resolveTC()
+  private void resolveTC(TypeMap typeScope)
   {
     if (tc != null)
       return;
@@ -48,15 +45,9 @@ public class NewExp extends CallExp
 		   tc+" is a type variable, it can't be instantiated");
   }
   
-  void findJavaClasses()
+  void resolve(TypeMap typeScope)
   {
-    super.findJavaClasses();
-    ti.resolveToTC(typeScope);
-  }
-  
-  void resolve()
-  {
-    resolveTC();
+    resolveTC(typeScope);
     
     LinkedList constructors = TypeConstructors.getConstructors(tc);
     if (constructors == null)
@@ -66,10 +57,8 @@ public class NewExp extends CallExp
     // OverloadedSymbolExp removes elements from it
     constructors = (LinkedList) constructors.clone();
 
-    function = new ExpressionRef // not necessary
-      (new OverloadedSymbolExp(constructors,
-			       new LocatedString("new " + tc, location()), 
-			       null));
+    function = new OverloadedSymbolExp
+      (constructors, new LocatedString("new " + tc, location()), null);
   }
 
   /****************************************************************

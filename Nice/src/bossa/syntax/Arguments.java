@@ -87,28 +87,6 @@ public class Arguments extends Node
     arguments[num].value = value;
   }
 
-  Scopes buildScope(VarScope outer, TypeScope typeOuter)
-  {
-    Scopes res = super.buildScope(outer, typeOuter);
-    
-    for (int i = arguments.length; --i>=0; )
-      arguments[i].value.buildScope(res.scope, res.typeScope);
-    
-    return res;
-  }
-  
-  void findJavaClasses()
-  {
-    for (int i = arguments.length; --i>=0; )
-      arguments[i].value.doFindJavaClasses();
-  }
-  
-  void resolve()
-  {
-    for (int i = arguments.length; --i>=0; )
-      arguments[i].value = arguments[i].value.resolveExp();
-  }
-  
   void typecheck()
   {
     for (int i = arguments.length; --i>=0; )

@@ -81,6 +81,12 @@ public class GlobalVarDeclaration extends Definition
     
     left.setDeclaration(declaration);
   }
+
+  void resolve()
+  {
+    if (value != null)
+      value = bossa.syntax.dispatch.analyse$1(value, scope, typeScope);
+  }
   
   /****************************************************************
    * Type cheking
@@ -131,7 +137,7 @@ public class GlobalVarDeclaration extends Definition
     return left + (value==null ? "" : " = " + value);
   }
 
-  protected ExpressionRef value=null;
+  protected Expression value=null;
   // "name" after scoping
   MonoSymbol left;
 }

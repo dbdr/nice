@@ -103,17 +103,6 @@ implements Located
   }
 
   /****************************************************************
-   * JavaClasses
-   ****************************************************************/
-
-  static void findJavaClasses(List types, TypeMap typeScope)
-  {
-    for(Iterator i=types.iterator();
-	i.hasNext();)
-      ((Monotype) i.next()).resolve(typeScope);
-  }
-
-  /****************************************************************
    * Printing
    ****************************************************************/
 

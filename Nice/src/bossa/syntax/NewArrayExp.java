@@ -43,10 +43,7 @@ public class NewArrayExp extends Expression
     this.unknownDimensions = unknownDimensions;
   }
 
-  // we cannot assume resolveTC is called from findJavaClasses
-  // for instance, if this new exp belongs to a global variable definition
-  // it is not the case.
-  private void resolveTC()
+  void resolveTC(TypeMap typeScope)
   {
     if (tc != null)
       return;
@@ -75,23 +72,10 @@ public class NewArrayExp extends Expression
     ti = null;
   }
   
-  void findJavaClasses()
-  {
-    super.findJavaClasses();
-    ti.resolveToTC(typeScope);
-  }
-  
-  void resolve()
-  {
-    super.resolve();
-    resolveTC();
-  }
-
   void computeType()
   {
-    resolveTC();
   }
-
+  
   void typecheck()
   {
     for (int i=0; i<knownDimensions.length; i++)

@@ -63,14 +63,19 @@ public class FormalParameters extends Node
       (Monotype type, LocatedString name, Expression defaultValue)
     { 
       super(type, name); 
-      this.defaultValue = expChild(defaultValue); 
+      this.defaultValue = defaultValue;
     }
 
-    ExpressionRef defaultValue;
+    Expression defaultValue;
+
+    void resolve()
+    {
+      defaultValue = dispatch.analyse$1(defaultValue, scope, typeScope);
+    }
 
     void typecheck(mlsub.typing.Monotype domain)
     {
-      defaultValue.noOverloading();
+      defaultValue = defaultValue.noOverloading();
       //defaultValue = defaultValue.resolveOverloading(new mlsub.typing.Polytype(domain));
 
       try {

@@ -37,9 +37,7 @@ public class Block extends Statement
     {
       super(Node.forward);
       this.left = new MonoSymbol(name,type);
-      
-      if (value != null)
-	this.value = new ExpressionRef(value);
+      this.value = value;
     }
     
     public gnu.expr.Expression generateCode()
@@ -119,23 +117,8 @@ public class Block extends Statement
   }
 
   /****************************************************************
-   * Java Classes
-   ****************************************************************/
-
-  void findJavaClasses()
-  {
-    for(Iterator i = locals.iterator();
-	i.hasNext();)
-      {
-	LocalDeclaration d = (LocalDeclaration) i.next();
-	d.left.getSyntacticMonotype().resolve(typeScope);
-      }
-  }
-  
-  /****************************************************************
    * Type checking
    ****************************************************************/
-
   
   /**
      Checks that the local bindings are type-safe.

@@ -30,31 +30,6 @@ public class IdentExp extends Expression
   }
   
   /****************************************************************
-   * Scoping
-   ****************************************************************/
-
-  Expression resolveExp()
-  {
-    List symbols = scope.lookup(ident);
-
-    if (symbols.size() > 1 || 
-	symbols.size() == 1 && alwaysOverloadedSymbol)
-      return new OverloadedSymbolExp(symbols, ident, scope);
-
-    if (symbols.size() == 1)
-      return new SymbolExp((VarSymbol) symbols.get(0));
-
-    // symbols.size() == 0
-    if(enableClassExp)
-      return ClassExp.create(ident);
-    else if(ignoreInexistant)
-      return this;
-    else
-      User.error(ident, ident + " is not declared");
-    return null;
-  }
-
-  /****************************************************************
    * Unimplemented methods
    ****************************************************************/
 

@@ -1,7 +1,15 @@
 
 package bossa.syntax;
 
-class UnknownIdentException extends Exception 
+class UnknownIdentException extends RuntimeException 
 {
   LocatedString ident;
+}
+
+UnknownIdentException unknownIdent(LocatedString);
+unknownIdent(name)
+{
+  UnknownIdentException res = new UnknownIdentException();
+  res.ident = name;
+  return res;
 }

@@ -316,23 +316,6 @@ abstract public class Node
   }
 
   /****************************************************************
-   * Java Classes
-   ****************************************************************/
-  
-  /**
-   * Add the java classes in the expression to the rigid context.
-   */
-  void findJavaClasses() { }
-
-  final void doFindJavaClasses()
-  {
-    findJavaClasses();
-    if (children != null)
-      for(Iterator i = children.iterator();i.hasNext();)
-	((Node)i.next()).doFindJavaClasses();
-  }
-  
-  /****************************************************************
    * Type checking
    ****************************************************************/
 
@@ -394,14 +377,13 @@ abstract public class Node
    * Creates a reference to an expression, 
    * adds it as a child and returns it.
    */
-  ExpressionRef expChild(Expression value)
+  Expression expChild(Expression value)
   {
     if(value==null)
       return null;
     
-    ExpressionRef res = new ExpressionRef(value);
-    addChild(res);
-    return res;
+    addChild(value);
+    return value;
   }
 
   /**
@@ -409,12 +391,10 @@ abstract public class Node
    */
   List expChildren(List values)
   {
-    List res = new ArrayList(values.size());
+    for(Iterator i = values.iterator(); i.hasNext();)
+      expChild((Expression) i.next());
     
-    for(Iterator i = values.iterator();i.hasNext();)
-      res.add(expChild((Expression) i.next()));
-    
-    return res;
+    return values;
   }
 
   /*

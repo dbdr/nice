@@ -76,43 +76,6 @@ public class CallExp extends Expression
     return res;
   }
   
-  void findJavaClasses()
-  {
-    if (infix)
-      {
-	Expression e = arguments.getExp(0);
-	// force the finding of class prefixes to methods
-	// so that java classes are discovered early and put in global context
-	if(e instanceof IdentExp)
-	  {
-	    ((IdentExp) e).enableClassExp = true;
-	    e.resolveExp();
-	  }
-      }
-  }
-  
-  void resolve()
-  {
-    Expression e = function.content();
-    if (infix)
-      // in infix applications, the symbol is either a
-      // class method or a field name, so it must be found in
-      // global scope
-      {
-	e.scope = Node.getGlobalScope();
-      }
-
-    if(e instanceof IdentExp)
-      {
-	IdentExp ie = (IdentExp) e;
-	if (infix)
-	  // it might be a package or class expression
-	  ie.ignoreInexistant = true;
-	//so type computation happens in OverloadedSymbolExp
-	ie.alwaysOverloadedSymbol = true;
-      }
-  }
-  
   /****************************************************************
    * Type checking
    ****************************************************************/
@@ -240,18 +203,6 @@ public class CallExp extends Expression
    * Overloading resolution
    ****************************************************************/
 
-  public Expression noOverloading()
-  {
-    PackageExp packageExp = arguments.packageExp();
-    
-    if (packageExp != null &&
-	(function.content() instanceof IdentExp || 
-	 function.content() instanceof SymbolExp))
-      return ClassExp.create(packageExp, function.toString());
-    else
-      return this;
-  }
-  
   private boolean overloadingResolved;
   
   private void resolveOverloading()
@@ -274,30 +225,28 @@ public class CallExp extends Expression
       {
 	declaringClass = arguments.staticClass();
 	
-	Expression funExp = function.content();
-	    
 	if(declaringClass == null)
 	  // check that the function was found in scope
 	  {
-	    if (funExp instanceof IdentExp)
-	      User.error(funExp, 
-			 funExp + " is not declared");
+	    if (function instanceof IdentExp)
+	      User.error(function, 
+			 function + " is not declared");
 	    return;
 	  }
 	
 	// A static function is called
 	LocatedString funName;
 	    
-	if(funExp instanceof OverloadedSymbolExp)
-	  funName = ((OverloadedSymbolExp) funExp).ident;
-	else if(funExp instanceof IdentExp)
-	  funName = ((IdentExp) funExp).getIdent();
-	else if(funExp instanceof SymbolExp)
-	  funName = ((SymbolExp) funExp).getName();
+	if(function instanceof OverloadedSymbolExp)
+	  funName = ((OverloadedSymbolExp) function).ident;
+	else if(function instanceof IdentExp)
+	  funName = ((IdentExp) function).getIdent();
+	else if(function instanceof SymbolExp)
+	  funName = ((SymbolExp) function).getName();
 	else
 	  {
 	    Internal.error("Unknown case " +
-			   funExp.getClass() + " in CallExp");
+			   function.getClass() + " in CallExp");
 	    return;
 	  }
 
@@ -333,9 +282,8 @@ public class CallExp extends Expression
 	  User.error(this, "class " + declaringClass.getName() +
 		     " has no method or field " + funName);
 	    
-	function = new ExpressionRef
-	  (new OverloadedSymbolExp(possibilities, funName,
-				   function.content().getScope()));
+	function = new OverloadedSymbolExp
+	  (possibilities, funName, function.getScope());
       }
   }
 

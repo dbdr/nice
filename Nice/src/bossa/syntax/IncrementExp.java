@@ -55,12 +55,6 @@ public class IncrementExp extends Expression
     CallExp call = null;
     if (variable instanceof CallExp)
       call = (CallExp) variable;
-    else if (variable instanceof ExpressionRef)
-      {
-	Expression e = ((ExpressionRef) variable).content();
-	if (e instanceof CallExp)
-	  call = (CallExp) e;
-      }
     
     if (call == null)
       Internal.error(this, "\"var\" is assignable and not a local, " +

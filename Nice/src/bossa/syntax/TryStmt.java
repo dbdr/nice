@@ -95,18 +95,6 @@ public class TryStmt extends Statement
       this.body = this.child(body);
     }
 
-    void findJavaClasses()
-    {
-      t = tc.resolveToTC(this.typeScope);
-      tc = null;
-    }
-    
-    void resolve()
-    {
-      // done in findJavaClasses
-      //tc = tc.resolve(typeScope);
-    }
-    
     CatchClause clause()
     {
       try{
@@ -128,8 +116,8 @@ public class TryStmt extends Statement
     }
     
     MonoSymbol exnVar;
-    private TypeIdent tc;
-    private TypeConstructor t;
+    TypeIdent tc;
+    TypeConstructor t;
     private LocatedString var;
     Statement body;
     private Location typeLocation;

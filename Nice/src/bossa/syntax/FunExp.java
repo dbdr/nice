@@ -79,12 +79,6 @@ public class FunExp extends Expression implements Function
     return null;
   }
   
-  void findJavaClasses()
-  {
-    List types = MonoSymbol.getSyntacticMonotype(formals);
-    bossa.syntax.Monotype.findJavaClasses(types, typeScope);
-  }
-  
   /****************************************************************
    * Code generation
    ****************************************************************/

@@ -16,27 +16,41 @@
 
 package bossa.syntax;
 
-//import bossa.syntax.*;
 import nice.tools.ast;
 import mlsub.typing.*;
 
 // Interface
 
 Statement analyse(Statement, VarScope, TypeScope);
+Expression analyse(Expression, VarScope, TypeScope);
 
-analyse(s, varScope, typeScope)
+TypeMaper typeMaper(SymbolTable<TypeSymbol>,TypeScope) = 
+  native new TypeMaper(SymbolTable, TypeScope);
+
+// Implementation
+
+Info buildInfo(VarScope, TypeScope);
+buildInfo(varScope, typeScope)
 {
   Info info = new Info();
-  info.vars = new SymbolTable();
-  info.typeVars = new SymbolTable();
+  info.vars = symbolTable();
+  info.typeVars = symbolTable();
   info.globalVarScope = varScope;
   info.globalTypeScope = typeScope;
+  info.typeMap = typeMaper(info.typeVars, typeScope);
 
-  analyse(s, info);
+  return info;
+}
+
+analyse(s@Statement, varScope, typeScope)
+{
+  analyse(s, buildInfo(varScope, typeScope));
+
   return s;
 }
 
-// Implementation
+analyse(e@Expression, varScope, typeScope) = 
+    analyse(e, buildInfo(varScope, typeScope));
 
 class Info
 {
@@ -45,6 +59,10 @@ class Info
 
   VarScope globalVarScope;
   TypeScope globalTypeScope;
+
+  // Abstract type for uniform lookup in both scopes
+  // Shall probably go away sometime (at least the TypeMaper)
+  TypeMap typeMap;
 
   void begin();
   begin()
@@ -63,12 +81,29 @@ class Info
   VarSymbol lookup(String);
   lookup(name) = this.vars[name];
 
-  LinkedList<VarSymbol> globalLookup(LocatedString);
-  globalLookup(name) = linkedList(this.globalVarScope.lookup(name));
+  JavaList<VarSymbol> globalLookup(LocatedString);
+  globalLookup(name) = javaList(this.globalVarScope.lookup(name));
 
-  void addVars(List<VarSymbol>);
-  addVars(symbols) = symbols.iter(fun(VarSymbol s)=>this.vars[s.toString()]=s);
-    
+  TypeSymbol lookupType(String);
+  lookupType(name)
+  {
+    TypeSymbol res = this.typeVars[name];
+    if (res != null)
+      return res;
+    else
+      return this.globalTypeScope.lookup(name);
+  }
+
+  void addVar(MonoSymbol);
+  addVar(symbol)
+  {
+    symbol.type = symbol.syntacticType.resolve(this.typeMap);
+    this.vars[symbol.name.toString()] = symbol;
+  }
+
+  void addVars(List<MonoSymbol>);
+  addVars(symbols) = symbols.iter(fun(MonoSymbol s)=>this.addVar(s));
+  
   void addTypeVars(List<TypeSymbol>);
   addTypeVars(symbols) = symbols.iter(fun(TypeSymbol s)=>this.typeVars[s.toString()]=s);
 }
@@ -116,18 +151,44 @@ markAsCallFun(e@IdentExp, infix)
   e.alwaysOverloadedSymbol = true;
 }
 
-analyse(e@CallExp, i)
+void markAsCallFirstArg(Expression);
+markAsCallFirstArg(e) {}
+markAsCallFirstArg(e@IdentExp)
 {
+  e.enableClassExp = true;
+}
+
+String identString(Expression);
+identString(e) = null;
+identString(e@IdentExp) = e.toString();
+
+analyse(e@CallExp, info)
+{
+  if (e.infix)
+    markAsCallFirstArg(e.arguments.getExp(0));
+  e.arguments.analyse(info);
+  if (e.infix)
+    {
+      PackageExp pkg = e.arguments.packageExp();
+      if (pkg != null)
+	{
+	  String nextComponent = identString(e.function);
+	  if (nextComponent == null)
+	    throw unknownIdent(new LocatedString(pkg.getName(), bossa.util.Location.nowhere()));
+	  return ClassExp.create(pkg, nextComponent);
+	}
+    }
+
   markAsCallFun(e.function, e.infix);
-  e.function = analyse(e.function, i);
-  e.arguments.analyse(i);
+  e.function = analyse(e.function, info);
+
   return e;
 }
 
 analyse(e@FunExp, info)
 {
   info.begin();
-  addVars(info, linkedList(e.formals));
+  addVars(info, javaList(e.formals));
   analyse(e.body, info);
   info.end();
   return e;
@@ -136,7 +197,7 @@ analyse(e@FunExp, info)
 analyse(e@IdentExp, i)
 {
   String name = e.ident.toString();
-
+  
   if (!e.infix) // infix symbols can only come from the global scope
     {
       VarSymbol s = i.lookup(name);
@@ -144,23 +205,28 @@ analyse(e@IdentExp, i)
 	if (!e.alwaysOverloadedSymbol)
 	  return new SymbolExp(s);
 	else
-	  {
-	    //List<VarSymbol> symbols = new LinkedList();
-	    //symbols.add(s);
-	    return new OverloadedSymbolExp(s, e.ident);
-	  }
+	  return new OverloadedSymbolExp(s, e.ident);
     }
 
-  LinkedList<VarSymbol> symbols = i.globalLookup(e.ident);
-  if (symbols != null)
-    return new OverloadedSymbolExp(javaList(symbols), e.ident, null);
+  JavaList<VarSymbol> symbols;
+  if (e.infix)
+    symbols = javaList(Node.getGlobalScope().lookup(e.ident));
+  else
+    symbols = i.globalLookup(e.ident);
+
+  if (symbols != null && symbols.size() > 0)
+    if (!e.alwaysOverloadedSymbol() && symbols.size() == 1)
+      return new SymbolExp(symbols[0]);
+    else
+      return new OverloadedSymbolExp(symbols.impl, e.ident, null);
+
+  if (e.enableClassExp)
+    return ClassExp.create(e.ident);
 
   if (e.infix)
     return e;
 
-  UnknownIdentException exn = new UnknownIdentException();
-  exn.ident = e.ident;
-  throw exn;
+  throw unknownIdent(e.ident);
   return null; // work-around pb with non-reachable code
 }
 
@@ -186,12 +252,15 @@ analyse(e@LiteralArrayExp, info)
 
 analyse(e@NewArrayExp, info)
 {
+  e.resolveTC(info.typeMap);
   analyseExps(e.knownDimensions, info);
   return e;
 }
 
 analyse(e@NewExp, info)
 {
+  e.arguments.analyse(info);
+  e.resolve(info.typeMap);
   return e;
 }
 
@@ -201,9 +270,30 @@ analyse(e@StatementExp, info)
   return e;
 }
 
+analyse(c@ConstantExp, info)
+{
+  if (c.type != null)
+    return c;
+    
+  TypeSymbol s = info.lookupType(c.className);
+    
+  if (s == null)
+    bossa.util.Internal.error
+      ("Base type " + c.className + " was not found in the standard library");
+
+  TypeConstructor tc = TypeConstructor.fromTypeSymbol(s);
+  if (s == null)
+    bossa.util.Internal.error("Base type " + c.className + " is not valid");
+  
+  c.type = new mlsub.typing.Polytype
+    (new mlsub.typing.MonotypeConstructor(tc, null));
+
+  return c;
+}
+
 analyse(e@TupleExp, info)
 {
-  //e.expressions = analyse(ex.expressions)
+  analyseExps(e.expressions, info);
   return e;
 }
 
@@ -215,10 +305,49 @@ analyse(s@Statement, info) {}
 
 analyse(b@Block, info)
 {
-  iter(linkedList(b.statements), fun(Statement s)=>analyse(s, info));
+  info.begin();
+  javaList(b.locals).iter(fun(Block$LocalDeclaration l)=>{
+    if (l.value != null)
+      l.value = analyse(l.value, info);
+    info.addVar(l.left);
+  });
+  javaList(b.statements).iter(fun(Statement s)=>analyse(s, info));
+  info.end();
 }
 
-main(args)
+analyse(s@ExpressionStmt, info)
 {
-
+  s.exp = analyse(s.exp, info);
 }
+
+analyse(l@LoopStmt, info)
+{
+  l.whileExp = analyse(l.whileExp, info);
+  analyse(l.loopBody, info);
+  analyse(l.iterationStatements, info);
+}
+
+analyse(r@ReturnStmt, info)
+{
+  r.value = analyse(r.value, info);
+}
+
+analyse(t@ThrowStmt, info)
+{
+  t.exn = analyse(t.exn, info);
+}
+
+analyse(t@TryStmt, info)
+{
+  analyse(t.body, info);
+  analyse(t.finallyBody, info);
+  javaList(t.catches).iter(fun(TryStmt$Catch c)=>{
+    info.begin();
+    info.addVar(c.exnVar);
+    c.t = c.tc.resolveToTC(info.typeMap);
+    c.tc = null;
+    analyse(c.body, info);
+    info.end();
+  });
+}
+

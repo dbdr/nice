@@ -130,3 +130,50 @@ class A{}
 class B extends A {}
 boolean foo(A x,int->int t) = true;
 boolean foo(A x,int->byte t) = false;
+
+/// FAIL
+  /// Toplevel
+class A{}
+class B extends A {}
+B foo(A x) = new B();
+/*/// FAIL HERE*/ A foo(B x) = new A();
+
+/// PASS
+  A a = new B();
+  foo(a);
+  /// Toplevel
+abstract class A {}
+class B extends A {}
+<A T> T foo(T x) { throw new Error(); }
+<B T> T foo(T x) = x;
+
+/// PASS
+  /// Toplevel
+abstract class A {}
+abstract class B {} // B does NOT extend A
+<A T> T foo(T x);
+<B T> A foo(T x);
+
+/// FAIL
+  /// Toplevel
+abstract class A {}
+abstract class B extends A {}
+<A T> T foo(T x);
+<B T> /*/// FAIL HERE*/ A foo(T x);
+
+/// FAIL
+  /// Toplevel
+abstract class A {}
+abstract class B extends A {}
+<A T1, B U1> U1 foo(A a, T1 t, U1 u);
+<A T2, B U2> /*/// FAIL HERE*/ T2 foo(B b, T2 t, U2 u);
+
+/// PASS
+  A<String> a = new B();
+  foo(a, a);
+  /// Toplevel
+abstract class A<T> {}
+class B<T> extends A<T> {}
+
+<T, T1, T2 | T1 <: T, T2 <: T> A<T> foo(A<T1> a1, A<T2> a2);
+<U, U1, U2 | U1 <: U, U2 <: U> B<U> foo(B<U1> a1, B<U2> a2) = new B();

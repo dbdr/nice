@@ -213,4 +213,63 @@ public final class Types
 
     return new Domain(t.getConstraint(), m);
   }
+
+  /****************************************************************
+   * Covariant specialization
+   ****************************************************************/
+
+  /**
+     @returns true if the spec type is a covariant specialization of origin,
+              false if the return type is not a subtype of the original subtype
+  */
+  public static boolean covariantSpecialization(Polytype spec, Polytype origin)
+  {
+    boolean entered = false;
+
+    if (Constraint.hasBinders(spec.getConstraint()) || 
+        Constraint.hasBinders(origin.getConstraint()))
+      {
+        entered = true;
+        Typing.enter();
+      }
+
+    try {
+
+      try {
+        if (entered) {
+          Polytype clonedSpec = spec.cloneType();
+
+          Constraint.enter(origin.getConstraint());
+          Constraint.enter(clonedSpec.getConstraint());
+
+          // For all argument types ...
+          Monotype[] args = MonotypeVar.news(parameters(origin).length);
+          Typing.introduce(args);
+
+          // ... that can be used for both methods ...
+          Typing.leq(args, parameters(origin));
+          Typing.leq(args, parameters(clonedSpec));
+
+          Typing.implies();
+
+          // ... apply those args to the 'specialized' method ...
+          Constraint.enter(spec.getConstraint());
+          Typing.leq(args, parameters(spec));
+        }
+
+        // ... and check that the result is indeed more precise.
+        Typing.leq(result(spec), result(origin));
+      }
+      finally {
+        if (entered)
+          Typing.leave();
+      }
+    }
+    catch (TypingEx ex) {
+      return false;
+    }
+
+    // OK, spec is a covariant specialization
+    return true;
+  }
 }

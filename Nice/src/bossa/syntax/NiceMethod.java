@@ -137,8 +137,11 @@ public class NiceMethod extends UserOperator
 		    Contract contract)
   {
     super(name, constraint, returnType, parameters, contract);
+    this.returnTypeLocation = returnType.location();
     bossa.link.Dispatch.register(this);
   }
+
+  private bossa.util.Location returnTypeLocation;
 
   public boolean isMain()
   {
@@ -207,6 +210,16 @@ public class NiceMethod extends UserOperator
         if (! (Typing.smaller(ourDomain, itsDomain, true)))
           continue;
 
+        if (! Types.covariantSpecialization(getType(), s.getType()))
+          {
+            User.error
+              (returnTypeLocation != null ? returnTypeLocation : location(), 
+"The return type is less precise than the original return type defined in:\n" +
+               d.location());
+          }
+
+        // Check if we are a proper specialization, or if we actually have
+        // the same domain.
         if (Typing.smaller(itsDomain, ourDomain))
           {
             if (module == d.module)
@@ -222,6 +235,7 @@ public class NiceMethod extends UserOperator
 
         if (specializedMethods == null)
           specializedMethods = new ArrayList
+            // Heuristic: the maximum number that might be needed
             (homonyms.size() - i.previousIndex());
         specializedMethods.add(d);
       }

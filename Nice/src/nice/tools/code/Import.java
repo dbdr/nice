@@ -93,30 +93,15 @@ public class Import
         boolean nonNullArgs = strictPackages.contains
           (m.getDeclaringClass().getPackageName());
 
-        if (nonNullArgs)
-	{
-	  for (int i = 0; i < paramTypes.length; i++)
-	  //arguments of a method are considered not null 
-	    params[n++] = Types.monotype(paramTypes[i], true, typeParameters,
-				       niceTP, true);
-	} else {
-	  for (int i = 0; i < paramTypes.length; i++)
-	  //arguments maybe null
-	    params[n++] = Types.monotype(paramTypes[i], false, typeParameters,
-					niceTP, true);
-	}
+	for (int i = 0; i < paramTypes.length; i++)
+	  params[n++] = Types.monotype(paramTypes[i], /*sure:*/nonNullArgs,
+			typeParameters, niceTP);
 
-	mlsub.typing.Monotype retType;
-	if (constructor)
-        {
-	    // the return type is surely not null
-	    retType = Types.monotype(declaringClass.thisType(), true,
-				     typeParameters, niceTP);
-        } else {
-	   // returntype not null.
-	   retType = Types.monotype(m.getFullReturnType(), true,
-				    typeParameters, niceTP, true);
-	}	  
+        gnu.bytecode.Type javaRetType = 
+		constructor ? declaringClass.thisType()	: m.getFullReturnType();
+	mlsub.typing.Monotype retType = 
+		Types.monotype(javaRetType, true, typeParameters, niceTP);
+
 	Constraint cst = niceTP == null ? null : new Constraint(niceTP, null);
 	return new Polytype(cst, new FunType(params, retType));
       }

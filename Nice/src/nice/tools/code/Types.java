@@ -318,7 +318,7 @@ public final class Types
     int len = javaTypes.length;
     Monotype[] res = new Monotype[len];
     for (int i = 0; i < len; i++)
-      res[i] = monotype(javaTypes[i], typeVariables, niceTypeVariables);
+      res[i] = monotype(javaTypes[i], true, typeVariables, niceTypeVariables);
     return res;
   }
 
@@ -328,47 +328,16 @@ public final class Types
     return monotype(javaType, sure, null, null);
   }
 
+  /**
+    Special version for use in Import.java,
+    it always checks whether nullness info may be added.
+  */
   public static Monotype monotype(Type javaType, boolean sure,
-				  TypeVariable[] typeVariables,
-				  TypeSymbol[] niceTypeVariables)
-    throws ParametricClassException, NotIntroducedClassException
-  {
-    return monotype(javaType, sure, typeVariables, niceTypeVariables, false);
-  }
-
-  public static Monotype monotype(Type javaType)
-    throws ParametricClassException, NotIntroducedClassException
-  {
-    return monotype(javaType, null, null);
-  }
-
-  public static Monotype monotype(Type javaType,
 				  TypeVariable[] typeVariables,
 				  TypeSymbol[] niceTypeVariables)
     throws ParametricClassException, NotIntroducedClassException
   {
     Monotype res = getMonotype(javaType, typeVariables, niceTypeVariables);
-    if (javaType instanceof ObjectType &&
-	! (javaType instanceof TypeVariable))
-      return bossa.syntax.Monotype.maybe(res);
-    else
-      // the sure is already there in getMonotype
-      return res;
-  }
-
-  /**
-    Special version for use in Import.java,
-    it always checks whether nullness info may be added.
-    And can handle arrays different(not yet implemented)
-  */
-  public static Monotype monotype(Type javaType, boolean sure,
-				  TypeVariable[] typeVariables,
-				  TypeSymbol[] niceTypeVariables,
-				  boolean arraySure)
-    throws ParametricClassException, NotIntroducedClassException
-  {
-    Monotype res = getMonotype(javaType, typeVariables, niceTypeVariables,
-			       arraySure);
     //primitivetypes and typevariables should not get nullness info
     if (javaType instanceof ObjectType &&
 	! (javaType instanceof TypeVariable))
@@ -380,18 +349,10 @@ public final class Types
       }
     return res;
   }
-  private static Monotype getMonotype(Type javaType,
-				      TypeVariable[] typeVariables,
-				      TypeSymbol[] niceTypeVariables)
-    throws ParametricClassException, NotIntroducedClassException
-  {
-    return getMonotype(javaType, typeVariables, niceTypeVariables, false);
-  }
 
   private static Monotype getMonotype(Type javaType,
 				      TypeVariable[] typeVariables,
-				      TypeSymbol[] niceTypeVariables,
-				      boolean arraySure)
+				      TypeSymbol[] niceTypeVariables)
     throws ParametricClassException, NotIntroducedClassException
   {
     if(javaType.isVoid())
@@ -414,22 +375,12 @@ public final class Types
       return PrimitiveType.doubleType;
 
     if (javaType instanceof ArrayType)
-      if (arraySure)
-	//making the component of an array sure
-	return new MonotypeConstructor
-	  (PrimitiveType.arrayTC, 
+      return new MonotypeConstructor(PrimitiveType.arrayTC, 
 	   new Monotype[]{
 	     monotype(((ArrayType) javaType).getComponentType(), true, 
-		      typeVariables, niceTypeVariables, true)
+		      typeVariables, niceTypeVariables)
 	   });
-      else
-	return new MonotypeConstructor
-	(PrimitiveType.arrayTC, 
-	 new Monotype[]{
-	   monotype(((ArrayType) javaType).getComponentType(), 
-		    typeVariables, niceTypeVariables)
-	 });
-    
+
     if (javaType instanceof ParameterizedType)
       {
 	ParameterizedType p = (ParameterizedType) javaType;

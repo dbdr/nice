@@ -95,7 +95,10 @@ public final class TypeIdent extends Monotype implements Located
 	return type;
       }
     
-    Internal.error("Invalid type ident");
+    if (res instanceof mlsub.typing.Interface)
+      User.error(this, "This abstract interface cannot be used as a type");
+
+    Internal.error("Invalid type ident: " + res.getClass() + " = " + res);
     return null;
   }
   

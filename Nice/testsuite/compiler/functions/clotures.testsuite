@@ -10,3 +10,8 @@ void stripClass(String s) {
 
 void stripChar(char c, boolean b) {
 }
+
+/// PASS
+  // Capture a long.
+  long l = 0;
+  [1].foreach(int i => { println(l); });

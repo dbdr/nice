@@ -5,7 +5,7 @@
                 xmlns="http://www.w3.org/TR/xhtml1/transitional"
                 exclude-result-prefixes="#default">
 
-<xsl:import href="http://docbook.sourceforge.net/release/xsl/snapshot/html/docbook.xsl"/>
+<xsl:import href="http://docbook.sourceforge.net/release/xsl/current/html/docbook.xsl"/>
 
 <xsl:param name="css.decoration">0</xsl:param>
 
@@ -129,7 +129,7 @@
          <tr>
           <td bgcolor="#ffffff">
            &nbsp;<span class="small">o</span><xsl:text> </xsl:text>
-           <a class="nav" href="testimonials.html">Testimonials</a>
+           <a class="nav" href="Wiki">Collaborative site (Wiki)</a>
            <br />
            &nbsp;<span class="small">o</span><xsl:text> </xsl:text>
            <a class="nav" href="http://sourceforge.net/forum/forum.php?forum_id=40268">Forums</a>

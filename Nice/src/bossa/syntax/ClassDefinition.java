@@ -120,7 +120,12 @@ abstract public class ClassDefinition extends MethodContainer
       s.print("interface ");
       s.print(getSimpleName());
       s.print(this.printTP());
-      s.print(Util.map(" extends ",", ","",extendedInterfaces));
+      if (extendedInterfaces != null || javaInterfaces != null)
+	{
+	  s.print(" extends ");
+	  s.print(Util.map("", ", ", "", extendedInterfaces));
+	  s.print(Util.map("", ", ", "", javaInterfaces));	  
+	}
       implementation.printInterface(s);
     }
 
@@ -328,7 +333,12 @@ abstract public class ClassDefinition extends MethodContainer
       s.print(this.printTP());
       if (superClass != null)
 	s.print(" extends " + superClass);
-      s.print(Util.map(" implements ",", ","",impl));
+      if (impl != null || javaInterfaces != null)
+	{
+	  s.print(" implements ");
+	  s.print(Util.map("", ", ", "", impl));
+	  s.print(Util.map("", ", ", "", javaInterfaces));	  
+	}
       s.print(Util.map(" finally implements ",", ","",abs));
       implementation.printInterface(s);
     }

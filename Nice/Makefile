@@ -142,7 +142,7 @@ ant:
 
 testengine:
 	@echo "Building the testsuite engine..."
-	@${JAVAC} src/nice/tools/testsuite/TestNice.java ||\
+	@${JAVAC} src/nice/tools/testsuite/*.java ||\
 	echo "Compilation of the testsuite engine failed."
 
 

@@ -1,0 +1,11 @@
+/// PASS
+  int?->int f = null;
+
+/// PASS
+  /// COMMENT: Maybe this should not be allowed.
+  ?(int)->int f = null;
+
+/// FAIL
+  /// COMMENT: Redondant nullness qualifier.
+  ?(int)?->int f;
+

@@ -15,3 +15,12 @@
 
 /// PASS
   int[?] a = null;
+
+/// PASS
+  (int,int) tuple = (1,2);
+
+/// PASS
+  (int,int)->int f = (int x, int y)=> x+y;
+
+/// PASS
+  ((int,int))->int f = ((int,int) tuple)=> 0;

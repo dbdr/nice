@@ -727,21 +727,28 @@ FunType OLDfunmonotype():
     }
 }
 
-FunType funmonotype():
+Monotype funOrTupleMonotype():
 {
   Monotype codomain;
   List domain = null;
   boolean maybe = false;
+  Token start,end;
 }
 {
-  "(" [ domain = monotypes() ] ")" 
+  start="(" [ domain = monotypes() ] end=")" 
+  [ LOOKAHEAD("?"|"->")
   [ "?" { maybe = true; } ]
   "->"
   codomain = monotype()
   { 
     FunType res = new FunType(domain, codomain); 
-    res.nullness = maybe ? res.maybe : res.sure;
+    res.nullness = maybe ? res.maybe : res.absent;
     return res; 
+  }
+  ]
+  { TupleType res = new TupleType(domain, new Location(start, end)); 
+    res.nullness = res.absent;
+    return res;
   }
 }
 
@@ -802,19 +809,19 @@ Monotype simpleMonotype():
 
   (
   res=OLDfunmonotype()
-  { res.nullness = res.sure; }
+  { res.nullness = res.absent; }
 |
-  res=funmonotype()
+  res=funOrTupleMonotype()
 |
   start="alike" [ "<" p=monotypes() ">" ]
   { res=new Alike(p, new Location(start)); }
-  { res.nullness = res.sure; }
+  { res.nullness = res.absent; }
 |
   start="<"
   p=monotypes()
   end=">"
   { res = new TupleType(p, new Location(start, end)); }
-  { res.nullness = res.sure; }
+  { res.nullness = res.absent; }
 |
   LOOKAHEAD(monotypeConstructor())
   res=monotypeConstructor()
@@ -825,6 +832,10 @@ Monotype simpleMonotype():
   )
 
   { 
+    if ((maybe || sure) && 
+        (res.nullness != res.absent))
+      throw bossa.util.User.error
+        (res, "Nullness is specified in two ways for " + res);
     if (maybe)
       res.nullness = res.maybe;
     else if (sure)

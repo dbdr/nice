@@ -126,7 +126,7 @@ used to choose the alternative).
 are equal.
 <BR>&nbsp;
 <BR>&nbsp;
-<CENTER><TABLE BORDER WIDTH="90%" BGCOLOR="#CCCCCC" >
+<CENTER><TABLE BORDER WIDTH="85%" BGCOLOR="#CCCCCC" >
 <TR>
 <TD>
 <CENTER>Java</CENTER>
@@ -157,7 +157,8 @@ class Person extends Object&nbsp;
 &nbsp; {
 &nbsp;&nbsp;&nbsp; <FONT COLOR="#FF0000">if(!(that instanceof Person))
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; return false;
-</FONT>&nbsp;&nbsp;&nbsp; return name.equals((<FONT COLOR="#FF0000">(Person)</FONT> that).name)
+</FONT>&nbsp;&nbsp;&nbsp; return 
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; name.equals((<FONT COLOR="#FF0000">(Person)</FONT> that).name)
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &amp;&amp; age==(<FONT COLOR="#FF0000">(Person)</FONT> that).age;
 &nbsp; }
 }</PRE>
@@ -183,6 +184,7 @@ class Person extends Object&nbsp;
 </TD>
 </TR>
 </TABLE></CENTER>
+<P>
 In the Nice version, the last <TT>equals</TT> alternative will be executed
 when both parameters are instance of class Person. So the type of the second
 argument is also known, and no manual instanceof and no cast are necessary
@@ -200,7 +202,7 @@ holding the results. That is:
 <BR>map(f, [e1, ..., en]) = [f(e1), ..., f(en)];
 <BR>&nbsp;
 <BR>&nbsp;
-<CENTER><TABLE BORDER WIDTH="90%" BGCOLOR="#CCCCCC" >
+<CENTER><TABLE BORDER WIDTH="85%" BGCOLOR="#CCCCCC" >
 <TR>
 <TD>
 <CENTER>Java</CENTER>
@@ -214,23 +216,23 @@ holding the results. That is:
 <TR>
 <TD>
 <BLOCKQUOTE>
-<PRE>interface BooleanFunction
+<PRE>interface BoolFunction
 {
 &nbsp; boolean apply(Object);
 }
 
 interface Collection
 {
-&nbsp; Collection filter(booleanFunction f);
+&nbsp; Collection filter(BoolFunction f);
 }
 
-interface List extends Collection&nbsp;
+interface List extends Collection
 { ... }
 
 void main(String[] args)
 {
 &nbsp; List l1;
-&nbsp; BooleanFunction f;
+&nbsp; BoolFunction f;
 &nbsp; ...
 &nbsp; List l2 = <FONT COLOR="#FF0000">(List)</FONT> l1.filter(f);
 }</PRE>
@@ -244,7 +246,8 @@ void main(String[] args)
 &nbsp; <FONT COLOR="#0000EE">alike</FONT>&lt;T> <FONT COLOR="#CD0000">filter</FONT>(<FONT COLOR="#0000EE">fun</FONT>(T)(<FONT COLOR="#B7860B">boolean</FONT>) f);
 }
 
-<FONT COLOR="#0000EE">interface</FONT> <FONT COLOR="#CD0000">List</FONT>&lt;T> <FONT COLOR="#0000EE">extends</FONT> <FONT COLOR="#B7860B">Collection</FONT>&lt;T>&nbsp;
+<FONT COLOR="#0000EE">interface</FONT> <FONT COLOR="#CD0000">List</FONT>&lt;T>
+<FONT COLOR="#0000EE">extends</FONT> <FONT COLOR="#B7860B">Collection</FONT>&lt;T>&nbsp;
 { ... }
 
 <FONT COLOR="#CD0000">main</FONT>(args)
@@ -258,7 +261,8 @@ void main(String[] args)
 </TD>
 </TR>
 </TABLE></CENTER>
-In the nice version, the alike keyword is a type that means "the same type
+<P>
+In the Nice version, the alike keyword is a type that means "the same type
 as the implicit receiver argument".
 
 <P>Note that there is not special treatment for the alike construct in
@@ -271,7 +275,7 @@ one would like to express that the clone method returns an object of the
 same type as its argument. This is possible in Nice, and it allows for
 cast-less use of clone.
 <BR>&nbsp;
-<CENTER><TABLE BORDER WIDTH="90%" BGCOLOR="#CCCCCC" >
+<CENTER><TABLE BORDER WIDTH="85%" BGCOLOR="#CCCCCC" >
 <TR>
 <TD>
 <CENTER>Java</CENTER>
@@ -288,6 +292,7 @@ cast-less use of clone.
 <PRE>class Object
 {
 &nbsp; Object clone();
+&nbsp; ...
 }
 
 void main(String[] args)

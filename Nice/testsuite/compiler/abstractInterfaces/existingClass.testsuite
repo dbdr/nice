@@ -122,3 +122,12 @@ interface ITest<T> { String test(); }
 
 interface /*/// FAIL HERE */ java.util.Collection implements ITest;
 test(Collection a) = "done";
+
+/// FAIL
+  // a primitive can't implement a non abstract interface
+  /// Toplevel
+  interface I {
+    int foo();
+  } 
+  class /*/// FAIL HERE */nice.lang.int implements I;
+  foo(x) = x;

@@ -1128,7 +1128,7 @@ public class LambdaExp extends ScopeExp
 	code.emitGoto(lastClinit);
 	Label previous = null;
 
-	/* Dumping initializers can make new initielizers to be added,
+	/* Dumping initializers can add new initializers,
 	   so we loop until none is added.
 	   The order of execution is reversed, the last ones being required
 	   by the first ones.

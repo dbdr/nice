@@ -399,7 +399,7 @@ public class CallExp extends Expression
   final boolean infix;
 
   /** true iff this call was made using brackets (i.e. not like 'x.f'). */
-  final boolean hasBrackets;
+  public final boolean hasBrackets;
 
   /** Class this static method is defined in, or null */
   gnu.bytecode.ClassType declaringClass = null;

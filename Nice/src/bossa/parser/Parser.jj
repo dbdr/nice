@@ -2470,6 +2470,19 @@ void LocalTupleExpContent() : { }
 )* 
 }
 
+void PostfixBlocks(Expression exp) :
+{ LocatedString name; Statement block; }
+{
+(
+  block=Block()
+  { if ( exp instanceof CallExp && ((CallExp)exp).hasBrackets && ! (exp instanceof NewExp) )
+      ((CallExp)exp).addBlockArgument(block, null);
+    else
+      throw bossa.util.User.error(exp,"Block arguments can only be added to normal function calls");
+  }
+)
+}
+
 Statement RealStatementExpression() :
 { Expression e1; Token first, last; Statement block; }
 {
@@ -2479,12 +2492,7 @@ Statement RealStatementExpression() :
 |
   e1=PrimaryExpression()
   ( 
-    block=Block()
-    { if ( e1 instanceof CallExp && ! (e1 instanceof NewExp) )
-        ((CallExp)e1).addBlockArgument(block, null);
-      else
-        throw bossa.util.User.error(e1,"Block arguments can only be added to normal function calls");
-    }
+    PostfixBlocks(e1)
   |
     e1=PostfixStatementExpression(e1, first) ";"
   )
@@ -2505,12 +2513,7 @@ Statement ShortStatementExpression() :
 |
   e1=PrimaryExpression()
   ( 
-    block=Block() 
-    { if ( e1 instanceof CallExp && ! (e1 instanceof NewExp) )
-        ((CallExp)e1).addBlockArgument(block, null);
-      else
-        throw bossa.util.User.error(e1,"Block arguments can only be added to normal function calls");
-    }
+    PostfixBlocks(e1)
   |
     e1=PostfixStatementExpression(e1, first)
   )

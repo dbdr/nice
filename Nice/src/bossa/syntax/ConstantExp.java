@@ -197,7 +197,7 @@ public class ConstantExp extends Expression
       rep = rep.substring(0, lastCharIndex);
 
     try{
-      long value = parse(rep);
+      long value = parse(removeUnderscores(rep));
       return makeInt(value, isLong, representation.location());
     }
     catch(NumberFormatException e){
@@ -258,9 +258,19 @@ public class ConstantExp extends Expression
     return result;
   }
 
+  static String removeUnderscores(String s)
+  {
+    StringBuffer sb = new StringBuffer();
+    for (int i = 0; i<s.length(); i++)
+      if (s.charAt(i) != '_')
+        sb.append(s.charAt(i));
+    
+    return sb.toString();
+  }
+
   public static ConstantExp makeFloating(LocatedString representation)
   {
-    String repres = representation.toString();
+    String repres = removeUnderscores(representation.toString());
     if (repres.endsWith("F") || repres.endsWith("f"))
       {
 	float value = Float.parseFloat(repres);

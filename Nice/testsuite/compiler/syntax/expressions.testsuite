@@ -20,3 +20,10 @@
   ("a".f4)("b")("c");
   /// TOPLEVEL
   String->String->void f4(String x) = String y => String z => {};
+
+
+/// PASS
+  assert 123456 == 123_456;
+  assert 0x1_2_3_4 == 0x1234;
+  assert 0.000_012 == 0.000012;
+  assert 1_000.000_1d == 1000.0001d;

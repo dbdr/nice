@@ -23,6 +23,8 @@ nice (0.9.9)
 
   * Improved speed of coverage tests for some methods.
   * Removed the '--strict' compiler option.
+  * Underscores are allowed and ignored in literal numbers. example:
+      long x = 1_000_123_000_456;
   * Lists now support a wide array of slicing and indexing
     operations. There is a new bit of syntax, '@', which indicates
     the index of the last item in a list, which can be used for working

@@ -151,7 +151,10 @@ U foldRight(List<T> list, (T, U)->U func, U init, int from)
 
 similarEmptyCollection(c) 
 {
-  throw new Error("The method similarEmptyCollection is not yet implemented for " + c.getClass());
+  // This implementation is type-correct for any anonymous or 
+  // invisible (private) collection class (hence the cast).
+  // It should be overriden for others.
+  return cast(new ArrayList(c.size()));
 }
 
 similarEmptyCollection(c#ArrayList) = new ArrayList(c.size());
@@ -163,8 +166,6 @@ similarEmptyCollection(c#Vector) = new Vector(c.size());
 similarEmptyCollection(c#Stack) = new Stack();
 
 similarEmptyCollection(c#HashSet) = new HashSet(c.size());
-
-similarEmptyCollection(c#HashMap.Values) = new ArrayList(c.size());
 
 /****************************************************************
  * Sort

@@ -7,7 +7,6 @@ public class PrimType extends Type {
     super(nam, sig);
     size = siz;
     this.reflectClass = reflectClass;
-
     Type.registerTypeForClass(reflectClass, this);
   }
 
@@ -26,14 +25,42 @@ public class PrimType extends Type {
       {
       case 'B':	return new Byte(((Number) obj).byteValue());
       case 'S':	return new Short(((Number) obj).shortValue());
-      case 'I':	return new Integer(((Number) obj).intValue());
-      case 'J':	return new Long(((Number) obj).longValue());
+      case 'I':	return new Integer(intValue(obj));
+      case 'J':	return new Long(longValue(obj));
       case 'F':	return new Float(((Number) obj).floatValue());
       case 'D':	return new Double(((Number) obj).doubleValue());
       }
     throw new ClassCastException("don't know how to coerce "
 				 + obj.getClass().getName() + " to "
 				 + getName());
+  }
+
+  /** Coerce value to an int.
+   * Only defined if getSignature() is "I". */
+  public int intValue (Object value)
+  {
+    try
+      {
+	return ((Number) value).intValue();
+      }
+    catch(ClassCastException e)
+      {
+	return ((Character) value).charValue();
+      }
+  }
+
+  /** Coerce value to a long.
+   * Only defined if getSignature() is "L". */
+  public long longValue (Object value)
+  {
+    try
+      {
+	return ((Number) value).longValue();
+      }
+    catch(ClassCastException e)
+      {
+	return ((Character) value).charValue();
+      }
   }
 
   /** Coerce value to a char.
@@ -48,98 +75,6 @@ public class PrimType extends Type {
   public boolean booleanValue (Object value)
   {
     return ! (value instanceof Boolean) || ((Boolean) value).booleanValue();
-  }
-
-  private static Field trueBoolean;
-  private static Field falseBoolean;
-  public static ClassType int_ctype, long_ctype, char_ctype, float_ctype, double_ctype;
-  private static Method int_init, long_init, char_init, float_init, double_init;
-  
-  public void emitCoerceToObject (CodeAttr code)
-  {
-    char sig1 = (signature == null || signature.length() != 1) ? ' '
-      : signature.charAt(0);
-    switch (sig1)
-      {
-      case 'Z':  // boolean
-	if (trueBoolean == null)
-	  {
-	    trueBoolean = boolean_ctype.getDeclaredField("TRUE");
-	    falseBoolean = boolean_ctype.getDeclaredField("FALSE");
-	  }
-	
-	code.emitIfIntNotZero();
-	code.emitGetStatic(trueBoolean);
-	code.emitElse();
-	code.emitGetStatic(falseBoolean);
-	code.emitFi();
-	return;
-      case 'I': case 'S': case 'B': // int, short, byte
-	if (int_ctype == null)
-	  {
-	    int_ctype = ClassType.make("java.lang.Integer");
-	    int_init = int_ctype.getDeclaredMethod("<init>", new Type[]{int_type});
-	  }
-	
-	code.emitNew(int_ctype);
-	code.emitDupX();
-	code.emitSwap();
-	code.emitInvokeSpecial(int_init);
-	return;
-      case 'J': // long
-	if (long_ctype == null)
-	  {
-	    long_ctype = ClassType.make("java.lang.Long");
-	    long_init = long_ctype.getDeclaredMethod("<init>", new Type[]{this});
-	  }
-	
-	code.emitNew(long_ctype);
-	code.emitDupX();
-	code.emitDupX();
-	code.emitPop(1);
-	code.emitInvokeSpecial(long_init);
-	return;
-      case 'F': // float
-	if (float_ctype == null)
-	  {
-	    float_ctype = ClassType.make("java.lang.Float");
-	    float_init = float_ctype.getDeclaredMethod("<init>", new Type[]{float_type});
-	  }
-	
-	code.emitNew(float_ctype);
-	code.emitDupX();
-	code.emitSwap();
-	code.emitInvokeSpecial(float_init);
-	return;
-      case 'D': // double
-	if (double_ctype == null)
-	  {
-	    double_ctype = ClassType.make("java.lang.Double");
-	    double_init = double_ctype.getDeclaredMethod("<init>", new Type[]{double_type});
-	  }
-	
-	code.emitNew(double_ctype);
-	code.emitDupX();
-	code.emitDupX();
-	code.emitPop(1);
-	code.emitInvokeSpecial(double_init);
-	return;
-      case 'C': // char
-	if (char_ctype == null)
-	  {
-	    char_ctype = ClassType.make("java.lang.Character");
-	    char_init = char_ctype.getDeclaredMethod("<init>", new Type[]{this});
-	  }
-	
-	code.emitNew(char_ctype);
-	code.emitDupX();
-	code.emitSwap();
-	code.emitInvokeSpecial(char_init);
-	return;
-      }
-    
-    throw new Error ("unimplemented emitCoerceToObject for "+this);
-    //new kawa.lang.SpecialType(this).emitCoerceToObject(code);
   }
 
   public void emitCoerceFromObject (CodeAttr code)
@@ -172,6 +107,104 @@ public class PrimType extends Type {
 	else
 	  super.emitCoerceFromObject(code);
       }
+  }
+
+  private static Field trueBoolean;
+  private static Field falseBoolean;
+  public static ClassType int_ctype, long_ctype, char_ctype;
+  public static ClassType float_ctype, double_ctype;
+  private static Method int_init, long_init, char_init;
+  private static Method float_init, double_init;
+  
+  public void emitCoerceToObject (CodeAttr code)
+  {
+    char sig1 = (signature == null || signature.length() != 1) ? ' '
+      : signature.charAt(0);
+    switch (sig1)
+      {
+      case 'Z':  // boolean
+	if (trueBoolean == null)
+	  {
+	    trueBoolean = boolean_ctype.getDeclaredField("TRUE");
+	    falseBoolean = boolean_ctype.getDeclaredField("FALSE");
+	  }
+	
+	code.emitIfIntNotZero();
+	code.emitGetStatic(trueBoolean);
+	code.emitElse();
+	code.emitGetStatic(falseBoolean);
+	code.emitFi();
+	return;
+      case 'I': case 'S': case 'B': // int, short, byte
+	if (int_ctype == null)
+	  {
+	    int_ctype = ClassType.make("java.lang.Integer");
+	    int_init = int_ctype.getDeclaredMethod("<init>", 
+						   new Type[]{int_type});
+	  }
+	
+	code.emitNew(int_ctype);
+	code.emitDupX();
+	code.emitSwap();
+	code.emitInvokeSpecial(int_init);
+	return;
+      case 'J': // long
+	if (long_ctype == null)
+	  {
+	    long_ctype = ClassType.make("java.lang.Long");
+	    long_init = long_ctype.getDeclaredMethod("<init>", 
+						     new Type[]{this});
+	  }
+	
+	code.emitNew(long_ctype);
+	code.emitDupX();
+	code.emitDupX();
+	code.emitPop(1);
+	code.emitInvokeSpecial(long_init);
+	return;
+      case 'F': // float
+	if (float_ctype == null)
+	  {
+	    float_ctype = ClassType.make("java.lang.Float");
+	    float_init = float_ctype.getDeclaredMethod("<init>", 
+						       new Type[]{float_type});
+	  }
+	
+	code.emitNew(float_ctype);
+	code.emitDupX();
+	code.emitSwap();
+	code.emitInvokeSpecial(float_init);
+	return;
+      case 'D': // double
+	if (double_ctype == null)
+	  {
+	    double_ctype = ClassType.make("java.lang.Double");
+	    double_init = double_ctype.getDeclaredMethod("<init>", 
+							 new Type[]{double_type});
+	  }
+	
+	code.emitNew(double_ctype);
+	code.emitDupX();
+	code.emitDupX();
+	code.emitPop(1);
+	code.emitInvokeSpecial(double_init);
+	return;
+      case 'C': // char
+	if (char_ctype == null)
+	  {
+	    char_ctype = ClassType.make("java.lang.Character");
+	    char_init = char_ctype.getDeclaredMethod("<init>", 
+						     new Type[]{this});
+	  }
+	
+	code.emitNew(char_ctype);
+	code.emitDupX();
+	code.emitSwap();
+	code.emitInvokeSpecial(char_init);
+	return;
+      }
+    
+    throw new Error ("unimplemented emitCoerceToObject for " + this);
   }
 
   public static int compare(PrimType type1, PrimType type2)

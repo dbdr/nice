@@ -284,9 +284,18 @@ public final class Polytype
       Engine.stopSimplify();
     }
 
+    int nbinders = binders.size(), natoms = atoms.size();
+
+    if (nbinders >= constraint.binders().length)
+      {
+        // The "simplified" version is longer than the original, so we
+        // keep the original.
+        simplified = true;
+        return;
+      }
+
     monotype = monotype.canonify();
 
-    int nbinders = binders.size(), natoms = atoms.size();
     constraint = Constraint.create
       (nbinders == 0 ? null 
        : (TypeSymbol[]) binders.toArray(new TypeSymbol[nbinders]),

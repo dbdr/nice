@@ -1,0 +1,6 @@
+/// PASS bug
+  /// Toplevel
+abstract interface I {}
+
+class A1<I T> {}
+class A2<T | T : I> {}

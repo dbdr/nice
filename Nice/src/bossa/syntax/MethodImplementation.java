@@ -193,33 +193,34 @@ public abstract class MethodImplementation extends Definition
   private void createSerializationMethod()
   {
     final int arity = formals.length;
+    String name = this.name.toString();
+    boolean isPrivate;
 
-    if (arity != 2)
+    if ((arity == 2) && (name.equals("writeObject") || name.equals("readObject")))
+      isPrivate = true;
+    else if ((arity == 1) && (name.equals("writeReplace") || name.equals("readResolve")))
+      isPrivate = false;
+    else 
       return;
 
-    String name = this.name.toString();
+    ClassDefinition def = ClassDefinition.get(firstArgument());
+    if (def == null || ! (def.getImplementation() instanceof NiceClass))
+      return;
 
-    if (name.equals("writeObject") || name.equals("readObject"))
-      {
-        ClassDefinition def = ClassDefinition.get(firstArgument());
-        if (def == null || ! (def.getImplementation() instanceof NiceClass))
-          return;
+    NiceClass c = (NiceClass) def.getImplementation();
 
-        NiceClass c = (NiceClass) def.getImplementation();
-
-	gnu.expr.Expression[] params = new gnu.expr.Expression[arity];
-        gnu.expr.LambdaExp method = Gen.createMemberMethod
+    gnu.expr.Expression[] params = new gnu.expr.Expression[arity];
+    gnu.expr.LambdaExp method = Gen.createMemberMethod
           (name.toString(), 
            c.getClassExp().getType(),
-           new Type[]{declaration.javaArgTypes()[1]},
+           arity==2 ? new Type[]{declaration.javaArgTypes()[1]} : null,
            declaration.javaReturnType(),
            params);
 
-        Gen.setMethodBody(method, 
-                          new gnu.expr.ApplyExp(getRefExp(), params));
+    Gen.setMethodBody(method, new gnu.expr.ApplyExp(getRefExp(), params));
 
-        c.getClassExp().addMethod(method, true);
-      }
+    c.getClassExp().addMethod(method, isPrivate);
+
   }
 
   /****************************************************************

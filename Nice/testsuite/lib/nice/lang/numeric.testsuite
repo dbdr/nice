@@ -109,3 +109,12 @@ var int x = 0;
   assert 5**3**2 == 5**(3**2);
   assert 5**3**2 != (5**3)**2;
   assert 5**3**2 == 1953125;
+
+/// PASS
+  int i = -1;
+  boolean ok = true;
+  try {
+    long j = 3 ** i;
+    ok = false;
+  } catch(Throwable e) {}
+  assert ok;

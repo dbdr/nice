@@ -213,8 +213,9 @@ int    min(int   , int   ) = native int    Math.min(int   , int   );
 `<`(n1@Number, n2@Number) = n1.doubleValue() < n2.doubleValue();
 
 // exponential functions
-long `**`(long x, long e) {
-  if (e < 0) throw new IllegalArgumentException();
+long `**`(long x, long e) 
+  requires e >= 0 : "Exponent should be positive. It was " + e
+{
   if (e == 0) return 1;
 
   long res = 1;

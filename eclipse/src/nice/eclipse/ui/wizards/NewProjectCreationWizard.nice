@@ -1,0 +1,148 @@
+/**************************************************************************/
+/*                          Nice Eclipse-Plugin                           */
+/*                          (c) Alex Greif 2003                           */
+/*                                                                        */
+/*  This program is free software; you can redistribute it and/or modify  */
+/*  it under the terms of the GNU General Public License as published by  */
+/*  the Free Software Foundation; either version 2 of the License, or     */
+/*  (at your option) any later version.                                   */
+/*                                                                        */
+/**************************************************************************/
+
+package nice.eclipse.ui.wizards;
+
+public class NewProjectCreationWizard extends BasicNewResourceWizard
+	implements IExecutableExtension
+{
+	
+	WizardNewProjectCreationPage newProjWizardPage = cast(null);
+	IProject newProject = cast(null);
+	?IConfigurationElement configElement = null;
+	//IWorkbench workbench = cast(null);
+	//IStructuredSelection currentSelection = cast(null);
+	
+	
+	//	initializer
+	{
+		this.setWindowTitle(getResourceString("NewProjectCreationWizard.windowTitle"));
+	}
+	
+	
+	void setNewProject(IProject project) {
+		newProject = project;
+	}
+	
+	selectAndReveal(newResource) {
+		super;
+		//BasicNewResourceWizard.selectAndReveal(newResource, workbench.getActiveWorkbenchWindow());
+	}
+
+	
+	addPages() {
+		super;
+		newProjWizardPage = new WizardNewProjectCreationPage(
+						getResourceString("WizardNewProjectCreationPage.pageName"));
+		newProjWizardPage.setTitle(getResourceString("WizardNewProjectCreationPage.pageTitle"));
+		newProjWizardPage.setDescription(getResourceString("WizardNewProjectCreationPage.pageDescription"));
+
+		this.addPage(newProjWizardPage);
+	}
+
+
+	performFinish() {
+		System.out.println("NewProjectCreationWizard.performFinish()");
+		IRunnableWithProgress r = new WorkspaceModifyDelegatingOperation(new ProjectCreationRunnable(wizard: this, wizardPage: newProjWizardPage));
+		try {
+			this.getContainer().run(false, true, r);
+		} catch  (Exception e) {
+			java.lang.reflect.InvocationTargetException ex = cast(e);
+			//CoreException exx = cast(ex);
+			//println(exx.getStatus());
+			//exx.printStackTrace();
+			e.printStackTrace();
+			return false;
+		}
+
+		BasicNewProjectResourceWizard.updatePerspective(configElement);
+		this.selectAndReveal(newProject);
+
+		return true;
+	}
+	
+	
+	setInitializationData(configElem, propertyName, data) {
+		configElement = configElem;
+	}
+
+}
+
+/*
+init(wiz@NewProjectCreationWizard(BasicNewResourceWizard), theWorkbench, theCurrentSelection) {
+	super;
+	wiz.workbench = notNull(theWorkbench);
+	wiz.currentSelection = notNull(theCurrentSelection);
+}
+*/
+
+
+
+
+
+
+class ProjectCreationRunnable implements IRunnableWithProgress {
+	NewProjectCreationWizard wizard;
+	WizardNewProjectCreationPage wizardPage;
+	
+	run(monitor) {
+		//System.out.println("IRunnableWithProgress.run()");
+		notNull(monitor).beginTask("Create new Nice project", int(10));
+		IProject newProject = wizardPage.getProjectHandle();
+		//System.out.println("  newProject: "+newProject);
+		wizard.setNewProject(newProject);
+		
+		IWorkspace workspace = getWorkspace();
+		IProjectDescription description = workspace.newProjectDescription(newProject.getName());
+
+		IPath path = Platform.getLocation();
+		IPath customPath = wizardPage.getLocationPath();
+		if (! path.equals(customPath)) {
+			path = customPath;
+			description.setLocation(path);
+		}
+
+		try {
+			//System.out.println("  newProject.exist?: "+newProject.exists());
+			if (! newProject.exists())
+				newProject.create(description, new SubProgressMonitor(monitor, 1));
+			//System.out.println("  newProject.isOpen?: "+newProject.isOpen());
+			if (! newProject.isOpen())
+				newProject.open(new SubProgressMonitor(monitor, 1));
+			
+			//System.out.println("  addNiceNature");	
+			addNiceNature(newProject, new SubProgressMonitor(monitor, 1));
+		} catch(Exception e) {
+			e.printStackTrace();
+		} finally {
+			notNull(monitor).done();
+		}
+	}
+}
+
+
+void addNiceNature(IProject project, IProgressMonitor monitor) {
+	//println("monitor: "+monitor);
+	//println("project: "+project);
+	if (!project.hasNature(NICE_NATURE_ID)) {
+		IProjectDescription description = project.getDescription();
+		//println("description: "+description);
+		//println("description.getNatureIds(): "+description.getNatureIds());
+		description.setNatureIds(description.getNatureIds()+[NICE_NATURE_ID]);
+		try {
+			project.setDescription(description, monitor);
+		} catch(CoreException e) {
+			println("getMessage: "+e.getStatus().getMessage());
+			e.getStatus().getException().printStackTrace();
+		}
+	}
+}
+

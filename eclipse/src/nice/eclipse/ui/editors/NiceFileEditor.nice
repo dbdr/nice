@@ -1,0 +1,34 @@
+/**************************************************************************/
+/*                          Nice Eclipse-Plugin                           */
+/*                          (c) Alex Greif 2003                           */
+/*                                                                        */
+/*  This program is free software; you can redistribute it and/or modify  */
+/*  it under the terms of the GNU General Public License as published by  */
+/*  the Free Software Foundation; either version 2 of the License, or     */
+/*  (at your option) any later version.                                   */
+/*                                                                        */
+/**************************************************************************/
+
+package nice.eclipse.ui.editors;
+
+
+
+class NiceFileEditor extends TextEditor {
+	
+	initializeEditor() {
+		this.configurePreferenceStore();
+	}
+	
+	setPreferenceStore(preferenceStore) {
+		super;
+	}
+	
+	void configurePreferenceStore() {
+		IPreferenceStore prefStore = getNicePlugin().getPreferenceStore();
+		this.setPreferenceStore(prefStore);
+
+		WorkbenchChainedTextFontFieldEditor.startPropagate(prefStore, JFaceResources.TEXT_FONT);
+	}
+	
+}
+

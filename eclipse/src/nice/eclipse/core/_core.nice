@@ -1,0 +1,56 @@
+/**************************************************************************/
+/*                          Nice Eclipse-Plugin                           */
+/*                          (c) Alex Greif 2003                           */
+/*                                                                        */
+/*  This program is free software; you can redistribute it and/or modify  */
+/*  it under the terms of the GNU General Public License as published by  */
+/*  the Free Software Foundation; either version 2 of the License, or     */
+/*  (at your option) any later version.                                   */
+/*                                                                        */
+/**************************************************************************/
+
+package nice.eclipse.core;
+
+import java.util.*;
+
+import org.eclipse.core.resources.*;
+import org.eclipse.core.runtime.*;
+import org.eclipse.ui.plugin.*;
+
+
+
+import nice.eclipse.core.element;
+
+
+
+
+
+//	force to compile
+import nice.eclipse.ui.wizards;
+import nice.eclipse.ui.views;
+import nice.eclipse.ui.editors;
+import nice.eclipse.ui.preferences;
+import nice.eclipse.ui.properties;
+import nice.eclipse.core.builder;
+
+
+
+let String NICE_PLUGIN_ID = "net.sf.nice";
+let String NICE_RESOURCES_VIEW_ID = NICE_PLUGIN_ID + ".nice_resources_view";
+let String NICE_NATURE_ID = NICE_PLUGIN_ID + ".nice_nature";
+let String NICE_BUILDER_ID = NICE_PLUGIN_ID + ".nice_builder";
+
+
+
+
+//	will be set in the initializer of Niceplugin
+var NicePlugin nicePluginInstance = cast(null);
+
+NicePlugin getNicePlugin() = nicePluginInstance;
+
+
+
+
+
+
+

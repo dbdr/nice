@@ -1,0 +1,150 @@
+/**************************************************************************/
+/*                          Nice Eclipse-Plugin                           */
+/*                          (c) Alex Greif 2003                           */
+/*                                                                        */
+/*  This program is free software; you can redistribute it and/or modify  */
+/*  it under the terms of the GNU General Public License as published by  */
+/*  the Free Software Foundation; either version 2 of the License, or     */
+/*  (at your option) any later version.                                   */
+/*                                                                        */
+/**************************************************************************/
+
+package nice.eclipse.core;
+
+
+
+class NiceProject implements IProjectNature, INiceElement {
+	
+	IProject project = cast(null);
+	
+	
+	getUnderlyingResource() = project;
+	
+	
+	configure() {
+		this.addToBuildSpec(NICE_BUILDER_ID);
+	}
+	
+	deconfigure() {}
+	
+	getProject() = project;
+	
+	setProject(aProject) {
+		if (aProject == null)	return;
+		project = aProject;
+	}
+
+
+
+
+	void addToBuildSpec(String builderId) {
+		IProjectDescription description = project.getDescription();
+		?ICommand niceCommand = this.getNiceCommand(description);
+		if (niceCommand == null) {
+			// Add a Nice command to the build spec
+			ICommand command = description.newCommand();
+			command.setBuilderName(builderId);
+			this.setNiceCommand(description, command);
+		}
+	}
+
+
+
+	?ICommand getNiceCommand(IProjectDescription description) {
+		ICommand[] commands = description.getBuildSpec();
+		for (int i = 0; i < commands.length; ++i) {
+			if (commands[i]
+				.getBuilderName()
+				.equals(NICE_BUILDER_ID)) {
+				return commands[i];
+			}
+		}
+		return null;
+	}
+
+
+	void setNiceCommand(IProjectDescription description, ICommand newCommand) {
+		ICommand[] oldCommands = description.getBuildSpec();
+		?ICommand oldNiceCommand = this.getNiceCommand(description);
+		ICommand[] newCommands;
+
+		if (oldNiceCommand == null) {
+			newCommands = oldCommands+[newCommand];
+		} else {
+			for (int i = 0, max = oldCommands.length; i < max; i++) {
+				if (oldCommands[i] == oldNiceCommand) {
+					oldCommands[i] = newCommand;
+					break;
+				}
+			}
+			newCommands = oldCommands;
+		}
+
+		// Commit the spec change into the project
+		description.setBuildSpec(newCommands);
+		project.setDescription(description, null);
+	}
+
+}
+
+
+
+
+
+
+
+let String MAIN_PACKAGE_STORE_ID = NICE_PLUGIN_ID + ".main_package_store_id";
+let QualifiedName MAIN_PACKAGE_STORE_ID_QNAME = new QualifiedName(NICE_PLUGIN_ID, NICE_PLUGIN_ID + ".main_package_store_id");
+//let QualifiedName MAIN_PACKAGE_STORE_ID_QNAME = new QualifiedName(NICE_PLUGIN_ID, MAIN_PACKAGE_STORE_ID);
+
+//let String CLASSPATH_STORE_ID = NICE_PLUGIN_ID + ".classpath_store_id";
+let QualifiedName CLASSPATH_STORE_ID_QNAME = new QualifiedName(NICE_PLUGIN_ID, NICE_PLUGIN_ID + ".classpath_store_id");
+
+//let String SOURCEPATH_STORE_ID = NICE_PLUGIN_ID + ".sourcepath_store_id";
+let QualifiedName SOURCEPATH_STORE_ID_QNAME = new QualifiedName(NICE_PLUGIN_ID, NICE_PLUGIN_ID + ".sourcepath_store_id");
+
+//let String JAR_NAME_STORE_ID = NICE_PLUGIN_ID + ".jar_name_store_id";
+let QualifiedName JAR_NAME_STORE_ID_QNAME = new QualifiedName(NICE_PLUGIN_ID, NICE_PLUGIN_ID + ".jar_name_store_id");
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+String getMainPackageProperty(IResource resource) {
+	?String prop = resource.getPersistentProperty(MAIN_PACKAGE_STORE_ID_QNAME);
+	if (prop == null)
+		return "";
+	return prop;
+}
+
+String getClasspathProperty(IResource resource) {
+	?String prop = resource.getPersistentProperty(CLASSPATH_STORE_ID_QNAME);
+	if (prop == null)
+		return "";
+	return prop;
+}
+
+String getSourcepathProperty(IResource resource) {
+	?String prop = resource.getPersistentProperty(SOURCEPATH_STORE_ID_QNAME);
+	if (prop == null)
+		return "";
+	return prop;
+}
+
+String getJarNameProperty(IResource resource) {
+	?String prop = resource.getPersistentProperty(JAR_NAME_STORE_ID_QNAME);
+	if (prop == null)
+		return "project.jar";
+	return prop;
+}
+

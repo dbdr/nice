@@ -1,0 +1,251 @@
+/**************************************************************************/
+/*                          Nice Eclipse-Plugin                           */
+/*                          (c) Alex Greif 2003                           */
+/*                                                                        */
+/*  This program is free software; you can redistribute it and/or modify  */
+/*  it under the terms of the GNU General Public License as published by  */
+/*  the Free Software Foundation; either version 2 of the License, or     */
+/*  (at your option) any later version.                                   */
+/*                                                                        */
+/**************************************************************************/
+
+package nice.eclipse.core.builder;
+
+
+
+class NiceBuilder extends IncrementalProjectBuilder {
+	
+	IProject currentProject = cast(null);
+	?IProgressMonitor monitor = cast(null);
+	BuildNotifier notifier = cast(null);
+	
+	build(kind, argsMap, aMonitor) {
+		//println("NiceBuilder.build()");
+		currentProject = this.getProject();
+		monitor = aMonitor;
+		//if (currentProject.isAccessible())
+		//	return new IProject[0];
+
+		notifier = new BuildNotifier(monitor: monitor, project: currentProject);
+		notifier.begin();
+		notifier.checkCancel();
+		this.buildAll();
+
+		notifier.done();
+		//return new IProject[0];
+		return null;
+	}
+
+
+	void buildAll() {
+		NicePluginCompilationListener embedded =
+			new NicePluginCompilationListener(monitor: monitor, notifier: notifier, project: currentProject);
+
+		Plugin plugin = getNicePlugin();
+		try {
+			this.getProject().deleteMarkers(
+				NICE_MODEL_PROBLEM_MARKER, true, IResource.DEPTH_INFINITE);
+
+			Compilation compilation =
+				bossa.modules.fun.createCompilation(embedded);
+
+			File projectFolder = currentProject.getLocation().toFile();
+			compilation.sourcePath = new File(projectFolder, getSourcepathProperty(currentProject)).toString();
+			compilation.destinationDir = compilation.sourcePath;
+			//	sourcePath must be before this line
+			compilation.output = new File(projectFolder, getJarNameProperty(currentProject)).getAbsolutePath();
+			compilation.packagePath = getClasspathProperty(currentProject);
+
+			//println("sourcePath: " + compilation.sourcePath);
+			//println("destinationDir: " + compilation.destinationDir);
+
+			nice.tools.compiler.fun.compile(
+					compilation,
+					getMainPackageProperty(currentProject),
+					null,
+					//output,
+					null, //native_compiler,
+					false //editor
+				);
+
+			//int retval = console.statusCode;
+
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+}
+
+
+
+
+<T> void setAttribute (IMarker, String, ?T) = native void IMarker.setAttribute(String, Object);
+void setAttribute (IMarker, String, int) = native void IMarker.setAttribute(String, int);
+
+
+
+
+
+
+
+class NicePluginCompilationListener implements CompilationListener {
+	?IProgressMonitor monitor;
+	BuildNotifier notifier;
+	IProject project;
+	
+	error(location, message) {println("nicec error: "+message);}
+	error(location@Location.Source, message) {
+		IResource resource = this.getAffectedResource(location);
+		//println("nicec error in source: "+resource+"   line: "+location.getLine()+":"+
+		//		location.getColumn()+"\n"+message);
+		try {
+			IMarker marker = resource.createMarker(NICE_MODEL_PROBLEM_MARKER);
+			marker.setAttribute(IMarker.MESSAGE, message);
+			marker.setAttribute(IMarker.SEVERITY, IMarker.SEVERITY_ERROR);
+			marker.setAttribute(IMarker.LINE_NUMBER, location.getLine());
+			marker.setAttribute(IMarker.CHAR_START, location.getColumn());
+		} catch (Throwable e) {
+			e.printStackTrace();
+		}
+	}
+
+	warning(location, message) {println("nicec warning: "+message);}
+	warning(location@Location.Source, message) {
+		IResource resource = this.getAffectedResource(location);
+		//println("nicec warning in source: "+resource+"   line: "+location.getLine()+":"+
+		//		location.getColumn()+"\n"+message);
+		try {
+			IMarker marker = resource.createMarker(NICE_MODEL_PROBLEM_MARKER);
+			marker.setAttribute(IMarker.MESSAGE, message);
+			marker.setAttribute(IMarker.SEVERITY, IMarker.SEVERITY_WARNING);
+			marker.setAttribute(IMarker.LINE_NUMBER, location.getLine());
+			marker.setAttribute(IMarker.CHAR_START, location.getColumn());
+		} catch (CoreException e) {
+			e.printStackTrace();
+		}
+	}
+
+	/** A bug occured in the compiler. 
+		@param url the adress where a bug report should be submitted.
+	 */
+	bug(stackTrace, url) {
+		System.out.println(
+			"nicec bug  stackTrace: " + stackTrace + "  url: " + url);
+	}
+
+	/** Reports the progress of compilation.
+		phase can be: parsing, type-checking, generating code, ...
+		the package can be null if the phase applies to the whole program 
+		(testing dispatch, creating the archive, compiling to native code, ...).
+	*/
+	progress(packageName, phase) {
+		let monitor = this.monitor;
+		if (monitor == null)	return;
+		monitor.subTask("" + phase + " package: " + packageName);
+	}
+
+	/** Gives an approximation of how much of the compilation has been completed.
+	*/
+	progress(proportion) {
+		notifier.updateProgress(proportion);
+	}
+
+
+	IResource getAffectedResource(Location);
+	
+	getAffectedResource(location) {
+		throw new RuntimeException("getAffectedResource() not implemented");
+	}
+	getAffectedResource(location@Location.Source) {
+		String projectPath = project.getLocation().toFile().getAbsolutePath();
+		String resourcePath = location.getFile().getAbsolutePath();
+		Path path = new Path(resourcePath.substring(projectPath.length()));
+		return project.getFile(path);
+	}
+
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+public class BuildNotifier {
+	?IProgressMonitor monitor;
+	IProject project;
+
+	int workDone = 0;
+	int totalWork = 1000000;
+	float proportionComplete = 0f;
+
+
+
+	void begin() {
+		if (monitor == null)
+			return;
+		notNull(monitor).beginTask("", totalWork); //$NON-NLS-1$
+	}
+
+	
+	void checkCancel() {
+		if (monitor == null)
+			return;
+		if (notNull(monitor).isCanceled())
+			throw new OperationCanceledException();
+	}
+
+
+	public void done() {
+		this.updateProgress(1.0f);
+		if (monitor == null)
+			return;
+		notNull(monitor).done();
+	}
+
+
+	public void updateProgress(float newProportionComplete) {
+		if (newProportionComplete > proportionComplete) {
+			proportionComplete = Math.min(newProportionComplete, 1.0f);
+			int work = Math.round(proportionComplete * totalWork);
+			if (work > workDone) {
+				if (monitor == null)
+					return;
+				notNull(monitor).worked(work - workDone);
+				workDone = work;
+			}
+		}
+	}
+
+	public void updateProgressDelta(float proportionWorked) {
+		this.updateProgress(proportionComplete + proportionWorked);
+	}
+
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

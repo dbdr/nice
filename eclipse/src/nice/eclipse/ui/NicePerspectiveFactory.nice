@@ -1,0 +1,37 @@
+/**************************************************************************/
+/*                          Nice Eclipse-Plugin                           */
+/*                          (c) Alex Greif 2003                           */
+/*                                                                        */
+/*  This program is free software; you can redistribute it and/or modify  */
+/*  it under the terms of the GNU General Public License as published by  */
+/*  the Free Software Foundation; either version 2 of the License, or     */
+/*  (at your option) any later version.                                   */
+/*                                                                        */
+/**************************************************************************/
+
+package nice.eclipse.ui;
+
+
+
+class NicePerspectiveFactory implements IPerspectiveFactory {
+	
+	createInitialLayout(pageLayout) {
+		if (pageLayout == null)	return;
+		String existingEditorArea = pageLayout.getEditorArea();
+		
+		IFolderLayout niceResourcesArea = pageLayout.createFolder("niceResourcesArea", IPageLayout.LEFT, float(0.25), existingEditorArea);
+		niceResourcesArea.addView(NICE_RESOURCES_VIEW_ID);
+		
+		IFolderLayout consoleArea = pageLayout.createFolder("consoleArea", IPageLayout.BOTTOM, float(0.75), existingEditorArea);
+		consoleArea.addView(IDebugUIConstants.ID_CONSOLE_VIEW);
+		
+		pageLayout.addActionSet(IDebugUIConstants.LAUNCH_ACTION_SET);
+		
+		pageLayout.addShowViewShortcut(IDebugUIConstants.ID_CONSOLE_VIEW);
+
+		pageLayout.addShowViewShortcut(NICE_RESOURCES_VIEW_ID);
+	}
+
+	
+}
+

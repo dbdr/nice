@@ -1,0 +1,205 @@
+/**************************************************************************/
+/*                          Nice Eclipse-Plugin                           */
+/*                          (c) Alex Greif 2003                           */
+/*                                                                        */
+/*  This program is free software; you can redistribute it and/or modify  */
+/*  it under the terms of the GNU General Public License as published by  */
+/*  the Free Software Foundation; either version 2 of the License, or     */
+/*  (at your option) any later version.                                   */
+/*                                                                        */
+/**************************************************************************/
+
+package nice.eclipse.ui.views;
+
+
+class NiceResourcesView extends ViewPart implements ISetSelectionTarget, IMenuListener {
+	
+	TreeViewer treeViewer = cast(null);
+	Action openTextEditorAction = cast(null);
+	?MainActionGroup mainActionGroup = null;
+	
+	
+	createPartControl(parentComposite) {
+		treeViewer = new TreeViewer(parentComposite, SWT.MULTI | SWT.H_SCROLL | SWT.V_SCROLL);
+		treeViewer.addFilter(new NiceResourcesViewerFilter());
+		treeViewer.setContentProvider(new WorkbenchContentProvider());
+		treeViewer.setLabelProvider(new WorkbenchLabelProvider());
+		treeViewer.setInput(this.getInitialInput());
+		treeViewer.addOpenListener(new NiceResourcesViewOpenListener(view: this));
+
+		MenuManager menuMgr = new MenuManager("net.sf.nice.ui.PopupMenu"); //$NON-NLS-1$
+		menuMgr.setRemoveAllWhenShown(true);
+		menuMgr.addMenuListener(this);
+
+		Menu fContextMenu = menuMgr.createContextMenu(treeViewer.getTree());
+		treeViewer.getTree().setMenu(fContextMenu);
+
+		// Register viewer with site. This must be done before making the actions.
+		IWorkbenchPartSite site = this.getSite();
+		site.registerContextMenu(menuMgr, treeViewer);
+	}
+	
+	
+	TreeViewer getViewer() = treeViewer;
+	
+	Object getInitialInput() {
+		IAdaptable input = this.getSite().getPage().getInput();
+		?IResource resource = null;
+		if (input instanceof IResource) {
+			resource = cast(input);
+		} else {
+			resource = cast(input.getAdapter(IResource.class));
+		}
+		
+		if (resource != null) {
+			int type = resource.getType();
+			if (type == IResource.FILE)
+				return cast(resource.getParent());
+			else if (type == IResource.FOLDER  ||  type == IResource.PROJECT  ||  type == IResource.ROOT)
+				return cast(resource);
+		}
+		return cast(getWorkspace().getRoot());
+	}
+	
+	
+	setFocus() {
+		treeViewer.getControl().setFocus();
+	}
+	
+	menuAboutToShow(menuManager) {
+		if (menuManager == null)	return;
+		IStructuredSelection selection = cast(treeViewer.getSelection());
+		this.getMainActionGroup().setContext(new ActionContext(selection));
+		this.getMainActionGroup().fillContextMenu(menuManager);
+		this.getMainActionGroup().setContext(null);
+	}
+
+
+	selectReveal(selection) {
+		treeViewer.setSelection(selection, true);
+	}
+
+	
+	MainActionGroup getMainActionGroup() {
+		if (mainActionGroup == null) {
+			// lazy initialization, because this.getSite() delivers null in constructor
+			mainActionGroup = new MainActionGroup(niceResourcesView: this);
+		}
+		return notNull(mainActionGroup);
+	}
+
+
+}
+
+
+void setInput(TreeViewer, IWorkspaceRoot) = native void org.eclipse.jface.viewers.StructuredViewer.setInput(Object);
+
+
+
+
+
+
+
+
+
+
+class NiceResourcesViewerFilter extends ViewerFilter {
+	select(viewer, parent, element) {
+		//System.out.println("NiceViewerFilter.select()  element: "+element);
+		if (element instanceof IFolder)
+			return true;
+			
+		IAdaptable adaptable = cast(element);
+		?Object niceElement = adaptable.getAdapter(INiceElement.class);
+		//System.out.println("  niceElement: "+niceElement);
+		if (niceElement != null)
+			return true;
+
+		return false;
+	}
+}
+
+
+
+
+
+
+class NiceResourcesViewOpenListener implements IOpenListener {
+	NiceResourcesView view;
+	
+	open(openEvent) {
+		IStructuredSelection sel = cast(openEvent.getSelection());
+		view.getMainActionGroup().runDefaultAction(sel);
+	}
+}
+
+
+void open(IOpenListener, OpenEvent) = native void IOpenListener.open(OpenEvent);
+
+
+
+
+
+
+
+class MainActionGroup extends ActionGroup {
+	NiceResourcesView niceResourcesView;
+	OpenActionGroup openActionGroup = cast(null);
+	RefreshAction refreshAction = cast(null);
+	
+	//	initializer
+	{
+		NiceResourceNavigator adapter = new NiceResourceNavigator(niceResourcesView: niceResourcesView) ;
+		openActionGroup = new OpenActionGroup(adapter);
+		Shell shell = niceResourcesView.getSite().getShell();
+		refreshAction = new RefreshAction(shell) ;
+	}
+	
+	fillContextMenu(menuManager) {
+		openActionGroup.fillContextMenu(menuManager);
+		menuManager.add(new Separator());
+		menuManager.add(refreshAction) ;		
+		menuManager.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
+		menuManager.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS + "-end")); //$NON-NLS-1$ 
+	}
+
+	setContext(actionContext) {
+		openActionGroup.setContext(actionContext);
+	}
+
+	
+	void runDefaultAction(IStructuredSelection structuredSelection) {
+		openActionGroup.runDefaultAction(structuredSelection);
+	}
+}
+
+void fillContextMenu(ActionGroup, IMenuManager) = native void ActionGroup.fillContextMenu(IMenuManager);
+
+
+
+
+
+
+
+class NiceResourceNavigator extends ResourceNavigator {
+	NiceResourcesView niceResourcesView;
+	
+	getViewer() = niceResourcesView.getViewer();
+	
+	getViewSite() = niceResourcesView.getViewSite();
+	
+	getSite() = niceResourcesView.getSite();
+	
+	getTitle() = niceResourcesView.getTitle();
+	
+	getTitleImage() = niceResourcesView.getTitleImage();
+	
+	getTitleToolTip() = niceResourcesView.getTitleToolTip();
+}
+
+getAdapter(navi@NiceResourceNavigator(ResourceNavigator),clazz) = navi.niceResourcesView.getAdapter(clazz);
+
+
+
+
+

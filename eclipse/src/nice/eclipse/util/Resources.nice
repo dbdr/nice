@@ -1,0 +1,39 @@
+/**************************************************************************/
+/*                          Nice Eclipse-Plugin                           */
+/*                          (c) Alex Greif 2003                           */
+/*                                                                        */
+/*  This program is free software; you can redistribute it and/or modify  */
+/*  it under the terms of the GNU General Public License as published by  */
+/*  the Free Software Foundation; either version 2 of the License, or     */
+/*  (at your option) any later version.                                   */
+/*                                                                        */
+/**************************************************************************/
+
+package nice.eclipse.util;
+
+
+let String RESOURCE_BUNDLE= "nice.eclipse.util.Resources";
+let ResourceBundle resourceBundle= ResourceBundle.getBundle(RESOURCE_BUNDLE);
+
+
+String getResourceString(String key) {
+	try {
+		return resourceBundle.getString(key);
+	} catch (MissingResourceException e) {
+		return "!" + key + "!";
+	}
+}
+
+String getFormattedResourceString(String key, String arg) {
+	return getFormattedResourceString(key, [arg]);
+}
+
+String getFormattedResourceString(String key, String[] args) {
+	return MessageFormat.format(getResourceString(key), args);	
+}
+
+ResourceBundle getResourceBundle() {
+	return resourceBundle;
+}
+
+

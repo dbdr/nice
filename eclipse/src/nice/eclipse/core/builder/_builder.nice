@@ -1,0 +1,50 @@
+/**************************************************************************/
+/*                          Nice Eclipse-Plugin                           */
+/*                          (c) Alex Greif 2003                           */
+/*                                                                        */
+/*  This program is free software; you can redistribute it and/or modify  */
+/*  it under the terms of the GNU General Public License as published by  */
+/*  the Free Software Foundation; either version 2 of the License, or     */
+/*  (at your option) any later version.                                   */
+/*                                                                        */
+/**************************************************************************/
+
+package nice.eclipse.core.builder;
+
+import java.io.*;
+
+import org.eclipse.core.resources.*;
+import org.eclipse.core.runtime.*;
+
+import bossa.modules.*;
+import bossa.util.*;
+
+import nice.eclipse.core;
+
+
+?(IProject[]) build(IncrementalProjectBuilder, int, ?Map<String,String>, ?IProgressMonitor)
+	= native IProject[] IncrementalProjectBuilder.build(int, Map, IProgressMonitor);
+
+
+
+let String NICE_MODEL_PROBLEM_MARKER = NICE_PLUGIN_ID + ".problem"; //$NON-NLS-1$
+//let String NICE_MODEL_WARNING_MARKER = NICE_PLUGIN_ID + ".warning"; //$NON-NLS-1$
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,194 @@
+/**************************************************************************/
+/*                          Nice Eclipse-Plugin                           */
+/*                          (c) Alex Greif 2003                           */
+/*                                                                        */
+/*  This program is free software; you can redistribute it and/or modify  */
+/*  it under the terms of the GNU General Public License as published by  */
+/*  the Free Software Foundation; either version 2 of the License, or     */
+/*  (at your option) any later version.                                   */
+/*                                                                        */
+/**************************************************************************/
+
+package nice.eclipse.ui.properties;
+
+
+
+Control createContents(org.eclipse.jface.preference.PreferencePage, Composite)
+	= native Control org.eclipse.jface.preference.PreferencePage.createContents(Composite);
+
+<T> void setLayoutData(Control, T) = native void Control.setLayoutData(Object);
+
+void addModifyListener(Text, ModifyListener)
+	= native void Text.addModifyListener(ModifyListener);
+
+
+
+
+
+class NiceProjectPropertyPage extends PropertyPage implements ModifyListener {
+	
+	Text packageTextField = cast(null);
+	Text classpathTextField = cast(null);
+	Text sourcepathTextField = cast(null);
+	Text jarTextField = cast(null);
+	
+	
+	createContents(parentComposite) {
+		this.noDefaultAndApplyButton();
+		?NiceProject workingProject = this.getNiceProject(this.getElement());
+		
+		if (workingProject == null || ! workingProject.getProject().isOpen())
+			return this.createClosedProjectPageContents(parentComposite);
+
+		return this.createProjectPageContents(parentComposite);
+	}
+	
+	
+	//	protected
+	noDefaultAndApplyButton() {super;}
+	
+	
+	?NiceProject getNiceProject(?IAdaptable);
+	//getNiceProject(selectedElement@NiceProject) = selectedElement;
+	
+	getNiceProject(selectedElement) {
+		println("### " + selectedElement);
+		return null;
+	}
+	
+	getNiceProject(aProject@IProject) {
+		try {
+			if (aProject.hasNature(NICE_NATURE_ID)) {
+				NiceProject niceProject = new NiceProject();
+				niceProject.setProject(aProject);
+				
+				return niceProject;
+			}
+		} catch (CoreException e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
+	
+	
+	
+	
+	Control createClosedProjectPageContents(Composite parentComposite) {
+		Label label = new Label(parentComposite, SWT.NONE);
+		label.setText("ClosedNicePrjectPropertyPage"); //$NON-NLS-1$
+		return label;
+	}
+
+
+
+	Control createProjectPageContents(Composite parentComposite) {
+		Composite compositeTextField = this.createComposite(parentComposite, 2);
+		this.createLabel(compositeTextField, "Main package"); //$NON-NLS-1$
+		packageTextField = this.createTextField(compositeTextField);
+
+		compositeTextField = this.createComposite(parentComposite, 2);
+		this.createLabel(compositeTextField, "classpath"); //$NON-NLS-1$
+		classpathTextField = this.createTextField(compositeTextField);
+
+		compositeTextField = this.createComposite(parentComposite, 2);
+		this.createLabel(compositeTextField, "sourcepath"); //$NON-NLS-1$
+		sourcepathTextField = this.createTextField(compositeTextField);
+
+		compositeTextField = this.createComposite(parentComposite, 2);
+		this.createLabel(compositeTextField, "compiled jar name"); //$NON-NLS-1$
+		jarTextField = this.createTextField(compositeTextField);
+
+		this.initializeValues();
+
+		return new Composite(parentComposite, SWT.NULL);
+	}
+	
+	
+	
+	Composite createComposite(Composite parent, int numColumns) {
+		Composite composite = new Composite(parent, SWT.NULL);
+
+		//GridLayout
+		GridLayout layout = new GridLayout();
+		layout.numColumns = numColumns;
+		composite.setLayout(layout);
+
+		//GridData
+		GridData data = new GridData();
+		data.verticalAlignment = GridData.FILL;
+		data.horizontalAlignment = GridData.FILL;
+		composite.setLayoutData(data);
+		return composite;
+	}
+		
+	Label createLabel(Composite parent, String text) {
+		Label label = new Label(parent, SWT.LEFT);
+		label.setText(text);
+		GridData data = new GridData();
+		data.horizontalSpan = 2;
+		data.horizontalAlignment = GridData.FILL;
+		label.setLayoutData(data);
+		return label;
+	}
+
+		
+	Text createTextField(Composite parent) {
+		Text text = new Text(parent, SWT.SINGLE | SWT.BORDER);
+		text.addModifyListener(this);
+		GridData data = new GridData();
+		data.horizontalAlignment = GridData.FILL;
+		data.grabExcessHorizontalSpace = true;
+		data.verticalAlignment = GridData.CENTER;
+		data.grabExcessVerticalSpace = false;
+		text.setLayoutData(data);
+		return text;
+	}
+	
+	
+	void initializeValues() {
+		try {
+			IResource resource = cast(this.getElement());
+			packageTextField.setText(getMainPackageProperty(resource));
+			classpathTextField.setText(getClasspathProperty(resource));
+			sourcepathTextField.setText(getSourcepathProperty(resource));
+			jarTextField.setText(getJarNameProperty(resource));
+		} catch (CoreException e) {
+			e.printStackTrace();
+		}
+	}
+
+
+	performOk() {
+		try {
+			this.storeValues();
+		} catch (CoreException e) {
+			e.printStackTrace();
+			return false;
+		}
+		return true;
+	}
+
+
+	void storeValues() {
+		IResource resource = cast(this.getElement());
+		resource.setPersistentProperty(MAIN_PACKAGE_STORE_ID_QNAME, packageTextField.getText());
+		resource.setPersistentProperty(CLASSPATH_STORE_ID_QNAME, classpathTextField.getText());
+		resource.setPersistentProperty(SOURCEPATH_STORE_ID_QNAME, sourcepathTextField.getText());
+		resource.setPersistentProperty(JAR_NAME_STORE_ID_QNAME, jarTextField.getText());
+	}
+
+
+
+
+
+	//	protected
+	performDefaults() {super;}
+
+	modifyText(modifyEvent) {
+		//Do nothing on a modification in this example
+	}
+
+}
+
+
+

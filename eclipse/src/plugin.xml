@@ -1,0 +1,179 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<plugin
+   id="net.sf.nice"
+   name="Nice Plug-in"
+   version="0.1.4"
+   provider-name="Alex Greif"
+   class="nice.eclipse.core.NicePlugin">
+
+   <runtime>
+      <library name="niceplugin.jar">
+         <export name="*"/>
+      </library>
+      <library name="lib/nice.jar">
+         <export name="*"/>
+      </library>
+   </runtime>
+   <requires>
+      <import plugin="org.eclipse.core.resources"/>
+      <import plugin="org.eclipse.ui"/>
+      <import plugin="org.eclipse.debug.ui"/>
+   </requires>
+
+	<!-- =================================================================================== -->
+	<!-- Extension: Nice Nature                                                              -->
+	<!-- =================================================================================== -->
+
+	<extension 
+		point="org.eclipse.core.resources.natures" 
+		id="nice_nature"
+		name="NiceNatureName">
+		<runtime>
+			<run class="nice.eclipse.core.NiceProject">
+			</run>
+		</runtime>
+	</extension>
+
+
+	<!-- =================================================================================== -->
+	<!-- Extension: Nice file type                                                     -->
+	<!-- =================================================================================== -->
+	<extension point="org.eclipse.team.core.fileTypes">
+	  <fileTypes extension="nice" type="text"/>
+	</extension>
+
+
+	<!-- =================================================================================== -->
+	<!-- Extension: Wizards                                                       -->
+	<!-- =================================================================================== -->
+	<extension point="org.eclipse.ui.newWizards">
+		<category
+		   id="net.sf.nice.nice_wizard_category"
+		   name="Nice">
+		</category>
+		<wizard 
+			id="net.sf.nice.new_nice_project_creation_wizard"
+			name="NewNiceProject.label"
+			class="nice.eclipse.ui.wizards.NewProjectCreationWizard"
+			category="net.sf.nice.nice_wizard_category"
+			project="true"
+			finalPerspective="net.sf.nice.nice_perspective"
+			preferredPerspectives="net.sf.nice.nice_perspective"
+			icon="icons/full/ctool16/newjprj_wiz.gif">
+			<description>NewNiceProject.description</description>
+	    </wizard>	
+	</extension>
+
+
+	<!-- =================================================================================== -->
+	<!-- Extension: Perspectives                                                       -->
+	<!-- =================================================================================== -->
+	<extension 
+		point="org.eclipse.ui.perspectives">
+		<perspective
+			id="net.sf.nice.nice_perspective"
+			name="Nice Perspective"
+			icon="icons/full/cview16/nperspective.gif"
+			class="nice.eclipse.ui.NicePerspectiveFactory">
+		</perspective>
+	</extension>
+
+
+	<!-- =================================================================================== -->
+	<!-- Extension: Views                                                       -->
+	<!-- =================================================================================== -->
+   <extension
+         point="org.eclipse.ui.views">
+      <view
+            name="Nice resources View"
+            icon="icons/full/ctool16/nice.png"
+            class="nice.eclipse.ui.views.NiceResourcesView"
+            id="net.sf.nice.nice_resources_view">
+      </view>
+   </extension>
+
+
+
+ 	<!-- =================================================================================== -->
+	<!-- Extension: Editors                                                       -->
+	<!-- =================================================================================== -->
+   <extension
+         point="org.eclipse.ui.editors">
+      <editor
+            name="Nice Editor"
+            icon="icons/full/ctool16/nice_page.gif"
+            extensions="nice"
+            class="nice.eclipse.ui.editors.NiceFileEditor"
+            id="net.sf.nice.nice_file_editor">
+           <!--contributorClass="net.sf.nice.internal.ui.niceeditor.NiceEditorActionContributor"-->
+      </editor>
+   </extension>
+
+
+ 	<!-- =================================================================================== -->
+	<!-- Extension: Properties                                                       -->
+	<!-- =================================================================================== -->
+   <extension
+         point="org.eclipse.ui.propertyPages">
+      <page
+            objectClass="org.eclipse.core.resources.IProject"
+            name="Nice Project Properties"
+            class="nice.eclipse.ui.properties.NiceProjectPropertyPage"
+            id="net.sf.nice.nice_project_property_page">
+         <filter
+               name="nature"
+               value="net.sf.nice.nice_nature">
+         </filter>
+      </page>
+      <page
+            objectClass="nice.eclipse.core.NiceProject"
+            name="Nice Project Properties"
+            class="nice.eclipse.ui.properties.NiceProjectPropertyPage"
+            id="net.sf.nice.nice_project_property_page">
+         <filter
+               name="nature"
+               value="net.sf.nice.nice_nature">
+         </filter>
+      </page>
+   </extension>
+
+
+	<!-- =================================================================================== -->
+	<!-- Extension: Nice Builder                                                             -->
+	<!-- =================================================================================== -->
+	<extension 
+		point="org.eclipse.core.resources.builders" 
+		id="nice_builder"
+		name="Nice Builder">
+		<builder>
+			<run class="nice.eclipse.core.builder.NiceBuilder">
+			</run>
+		</builder>
+	</extension>
+
+
+	<!-- =================================================================================== -->
+	<!-- Extension: Nice Markers                                                             -->
+	<!-- =================================================================================== -->
+
+
+	<extension id="problem" point="org.eclipse.core.resources.markers" name="Nice Problem">
+		<super type="org.eclipse.core.resources.problemmarker"/>
+		<super type="org.eclipse.core.resources.textmarker"/>
+		<persistent value="true"/>
+		<attribute name="id"/>
+		<attribute name="flags"/>
+		<attribute name="arguments"/>
+	</extension>   
+
+	<!--<extension id="warning" point="org.eclipse.core.resources.markers" name="Nice Warning">
+		<super type="org.eclipse.core.resources.warningmarker"/>
+		<super type="org.eclipse.core.resources.textmarker"/>
+		<persistent value="true"/>
+		<attribute name="id"/>
+		<attribute name="flags"/>
+		<attribute name="arguments"/>
+	</extension>  --> 
+
+
+</plugin>

@@ -1,0 +1,99 @@
+/**************************************************************************/
+/*                          Nice Eclipse-Plugin                           */
+/*                          (c) Alex Greif 2003                           */
+/*                                                                        */
+/*  This program is free software; you can redistribute it and/or modify  */
+/*  it under the terms of the GNU General Public License as published by  */
+/*  the Free Software Foundation; either version 2 of the License, or     */
+/*  (at your option) any later version.                                   */
+/*                                                                        */
+/**************************************************************************/
+
+package nice.eclipse.core;
+
+
+
+class NiceElementAdapterFactory implements IAdapterFactory {
+	
+	getAdapter(adaptableObject, adapterType) {
+		INiceElement niceElement = cast(adaptableObject);
+		
+		if (IResource.class.equals(adapterType))
+			return this.getResource(niceElement);
+
+		return null;
+	}
+
+	getAdapterList() = ELEMENT_ADAPTERS_LIST;
+	
+	IResource getResource(INiceElement niceElement) = niceElement.getUnderlyingResource();
+}
+
+
+
+let Class[] ELEMENT_ADAPTERS_LIST = [IResource.class];
+let Class[] RESOURCE_ADAPTERS_LIST = [INiceElement.class, NiceFile.class, NiceProject.class];
+
+
+
+class NiceResourceAdapterFactory implements IAdapterFactory {
+
+	getAdapter(adaptableObject, adapterType) {
+		if (NiceFile.class.equals(adapterType))
+			return cast(createNiceFileResource(cast(adaptableObject)));
+
+		if (NiceProject.class.equals(adapterType))
+			return cast(createNiceProjectResource(cast(adaptableObject)));
+
+		if (INiceElement.class.equals(adapterType)) {
+			if (adaptableObject instanceof IFile)
+				return cast(createNiceFileResource(cast(adaptableObject)));
+
+			if (adaptableObject instanceof IProject)
+				return cast(createNiceProjectResource(cast(adaptableObject)));
+		}
+
+		return null;
+	}
+
+
+	getAdapterList() = RESOURCE_ADAPTERS_LIST;
+}
+
+
+
+?NiceFile createNiceFileResource(IFile file) {
+	//System.out.println("NiceCore.createFile()  file: "+file);
+	if (NICE_FILE_EXTENSION.equalsIgnoreCase(file.getFileExtension()))
+		return new NiceFile(underlyingFile:file);
+
+	return null;
+}
+
+
+?NiceProject createNiceProjectResource(IProject aProject) {
+	//System.out.println("NiceCore.createProject()  project: "+aProject);
+	try {
+		if (aProject.hasNature(NICE_NATURE_ID)) {
+			NiceProject project = new NiceProject();
+			project.setProject(aProject);
+			return project;
+		}
+	} catch (CoreException e) {
+		System.err.println("Exception occurred in createNiceProjectResource: " + e.toString());
+		e.printStackTrace();
+	}
+
+	return null;
+}
+
+
+
+
+//?Object getAdapter(IAdapterFactory, Object, Class)
+//<?T, !U> T getAdapter(IAdapterFactory, U, Class)
+?IResource getAdapter(IAdapterFactory, Object, Class)
+	= native Object IAdapterFactory.getAdapter(Object, Class);
+
+
+

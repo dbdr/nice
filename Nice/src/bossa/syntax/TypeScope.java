@@ -1,7 +1,7 @@
 /**************************************************************************/
 /*                                N I C E                                 */
 /*             A high-level object-oriented research language             */
-/*                        (c) Daniel Bonniot 2000                         */
+/*                        (c) Daniel Bonniot 2002                         */
 /*                                                                        */
 /*  This program is free software; you can redistribute it and/or modify  */
 /*  it under the terms of the GNU General Public License as published by  */
@@ -117,14 +117,14 @@ public class TypeScope implements TypeMap
     // This is the global type scope
     boolean notFullyQualified = name.indexOf('.') == -1;
 	
-    /* Try first to find the symbol in Nice definitions.
-       The first package is the current package.
-       If the symbol is not found there, we check there is no 
-       ambiguity with another symbol from another package.
-    */
-    boolean first = true;
     if (notFullyQualified && (module != null))
       {
+	/* Try first to find the symbol in Nice definitions.
+	   The first package is the current package.
+	   If the symbol is not found there, we check there is no 
+	   ambiguity with another symbol from another package.
+	*/
+	boolean first = true;
 	String[] pkgs = module.listImplicitPackages();
 	for (int i = 0; i < pkgs.length; i++)
 	  {
@@ -143,7 +143,7 @@ public class TypeScope implements TypeMap
 	    first = false;
 	  }
       }
-    
+
     if (res != null)
       return res;
 

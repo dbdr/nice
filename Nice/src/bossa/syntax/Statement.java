@@ -36,15 +36,19 @@ public abstract class Statement
     gnu.expr.Expression[] res = new gnu.expr.Expression[statements.length];
     for (int i = 0; i < statements.length; i++)
       {
+	Statement s = statements[i];
+
 	try {
-	  res[i] = statements[i].generateCode();
+	  res[i] = s == null 
+	    ? gnu.expr.QuoteExp.voidExp 
+	    : statements[i].generateCode();
 	}
 	catch(UserError e) {
 	  // Make sure that the error is attached to a location.
 	  // If not, it's better than nothing to located the error in
-	  // the contianing statement.
+	  // the containing statement.
 	  if (e.responsible == null)
-	    e.responsible = statements[i];
+	    e.responsible = s;
 	  // Rethrow.
 	  throw e;
 	}

@@ -4,7 +4,8 @@ nice (0.5) unstable; urgency=low
       int->int  (int,int)->int  (int->int)->int
     The old notation fun(int)(int) is deprecated and will be removed
     before version 1.0
-  * All nullness errors are really errors now, not just warnings.
+  * Assigning a possibly null value to a variable of non-null type
+    now produces an error instead of a warning.
   * Fixes bug that considered that 
       int a = 10, b;
     initializes both a and b to 10.
@@ -13,6 +14,7 @@ nice (0.5) unstable; urgency=low
   * Fixed bug on MS-Windows with archive creation because of the 
     case-insensivity of the file system.
   * Fixed creation of archive from up-to-date packages stored in jar.
+  * Accept anonymous functions that do nothing.
 
  --
 

@@ -28,8 +28,6 @@ package nice.tools.visibility;
   ?Scope<Sym> s = this;
   while (s != null)
     {
-      assert this != null;
-
       ?List<Sym> temp = s.map[key];
       if (temp != null)
 	res.addAll(temp);

@@ -1,6 +1,6 @@
 nice (0.7.1) unstable; urgency=low
 
-  * Fields can be accessed without specifying this.
+  * Fields can be accessed without specifying "this".
   * The default syntax for tuple types is now (T1, ..., Tn)
   * Made "instanceof" work with classes defined in the same package.
   * Enhanced error message for invalid calls to anonymous functions.
@@ -10,7 +10,7 @@ nice (0.7.1) unstable; urgency=low
               inside complex expressions, polymorphic arrays used
 	      across packages, super, ...).
 
- --
+ -- Daniel Bonniot <bonniot@users.sourceforge.net>  Fri,  2 Aug 2002 09:29:19 +0200
 
 nice (0.7.0) unstable; urgency=low
 

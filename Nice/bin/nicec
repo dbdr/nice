@@ -55,7 +55,7 @@ find_home()
   done
 
   APPHOME=`expr "$PRG" : '\(.*\)/bin'`
-  if [ -z ${APPHOME} ]; 
+  if [ -z "${APPHOME}" ]; 
     then APPHOME=`dirname "$PRG"`/..
   fi
 }
@@ -82,7 +82,7 @@ case $progname in
   nicec) 
     # Having a trailing ":" at the end of CLASSPATH seems to act as ":." on some platforms.
     # We don't want that by default (if CLASSPATH is empty).
-    if [ -z ${CLASSPATH} ]; then
+    if [ -z "${CLASSPATH}" ]; then
 	CLASSPATH=${NICEC}
     else
 	CLASSPATH=${NICEC}:${CLASSPATH}

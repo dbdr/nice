@@ -413,6 +413,12 @@ String getMethodFilename(MethodDeclaration md) {
  * Checks a filename to make sure it doesn't contain funny characters.
  */
 String escapeFilename(String filename) {
+    // Make sure we don't generate another index.html, as it would overwrite
+    // the index (with care to case-insensitive filesystems)
+    if (filename.equalsIgnoreCase("index"))
+      // XXX: we should make sure this is unique
+      return "_index";
+
     char[] chars = filename.toCharArray();
     StringBuffer buf = new StringBuffer();
     for(char c : chars) {

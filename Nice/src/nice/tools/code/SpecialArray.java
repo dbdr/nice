@@ -6,7 +6,7 @@ import gnu.expr.*;
 import bossa.util.Debug;
 
 /**
-   Arrays that are wrapped on the flw into objects implementing java.util.List 
+   Arrays that are wrapped on the fly into objects implementing java.util.List 
    when needed.
  */
 

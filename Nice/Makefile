@@ -66,7 +66,7 @@ dist: jar
 ### CVS
 
 status:
-	cvs status 2>&1 | egrep "File:|Examining" | grep -v "Up-to-date"
+	cvs status 2>&1 | awk -f bin/parse_cvs_status.awk
 
 # src/gnu has two repositories:
 # - a 'Nice' repository

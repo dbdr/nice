@@ -741,7 +741,12 @@ Monotype funOrTupleMonotype():
       {
         return (Monotype) domain.get(0);
       }
-    TupleType res = new TupleType(domain, new Location(start, end)); 
+    Monotype res;
+    if (domain != null)
+      res = new TupleType(domain, new Location(start, end)); 
+    else
+      res = new TypeIdent(new LocatedString("void",new Location(start, end)));
+ 
     res.nullness = res.absent;
     return res;
   }

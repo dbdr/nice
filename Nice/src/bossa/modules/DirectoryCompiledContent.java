@@ -65,7 +65,8 @@ class DirectoryCompiledContent extends CompiledContent
     if (s == null)
       return null;
     
-    ClassType res = null;    
+    ClassType res = null;
+    s = new BufferedInputStream( s );
     try{ res = gnu.bytecode.ClassFileInput.readClassType(name, s); }
     catch(LinkageError e){}
     catch(IOException e){}

@@ -12,7 +12,7 @@
 
 // File    : parser.jj
 // Created : Thu Jul 01 10:27:05 1999 by bonniot
-//$Modified: Thu Jan 20 15:52:35 2000 by bonniot $
+//$Modified: Fri Jan 21 13:36:35 2000 by Daniel Bonniot $
 // Description : Parseur JavaCC pour Bossa
 //   Tokens based on the Jazz parser
 
@@ -1140,6 +1140,8 @@ Expression expression1():
 {
   { first=getToken(1); }
   (
+  "(" res=expression() ")"
+|
   res=constantExp()
 | 
   res=ifExp()

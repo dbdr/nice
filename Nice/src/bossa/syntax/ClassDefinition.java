@@ -12,7 +12,7 @@
 
 // File    : ClassDefinition.java
 // Created : Thu Jul 01 11:25:14 1999 by bonniot
-//$Modified: Thu Jan 20 16:45:13 2000 by bonniot $
+//$Modified: Fri Jan 21 13:30:23 2000 by Daniel Bonniot $
 
 package bossa.syntax;
 
@@ -146,6 +146,14 @@ public class ClassDefinition extends Node
       this.isLocal=isLocal;
     }
 
+    public String toString()
+    {
+      return 
+	(isFinal ? "final" : "") +
+	(isLocal ? "local" : "") +
+	sym;
+    }
+    
     MonoSymbol sym;
     boolean isFinal;
     boolean isLocal;

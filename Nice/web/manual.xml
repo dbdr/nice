@@ -266,6 +266,35 @@ copy(from: f1, to: f2, bufferSize: 4000);</programlisting>
     </section>
   </chapter>
 
+  <chapter><title>Statements</title>
+    <section><title>Local functions</title>
+      <para>
+	Local functions are similar to toplevel functions, 
+        except that they are defined inside another function or method,
+        and therefore only usable in that scope.	
+      </para>
+
+      <example><title>Local function</title>
+	<programlisting lang="nice">
+Window createMyWindow()
+{
+  Window w = new Window();
+  
+  void addMyButton(String text)
+  {
+    w.addButton(new Button(text));
+  }
+
+  addMyButton("One");
+  addMyButton("Two");
+  addMyButton("Three");
+}</programlisting>
+      </example>
+
+    </section>
+
+  </chapter>
+
   <chapter><title>Expressions</title>
     <section><title>Tuples</title>
       <para>

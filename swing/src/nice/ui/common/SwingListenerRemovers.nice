@@ -17,7 +17,7 @@ package nice.ui.common;
  * from all nice.ui.swing.NiceListenerHandler
  */
  
-public <AncestorListenerHandler H> void removeNAncestorListener
+public <AncestorListenerHandler H> void removeAncestorListener
   (H this,
    AncestorEvent ?-> void ancestorAdded = null,
    AncestorEvent ?-> void ancestorMoved = null,
@@ -36,9 +36,9 @@ public <AncestorListenerHandler H> void removeNAncestorListener
      );
 }
  
-public <CaretListenerHandler H> void removeNCaretListener
+public <CaretListenerHandler H> void removeCaretListener
   (H this,
-   CaretEvent ?-> void caretUpdate
+   CaretEvent -> void caretUpdate
    ) 
 {
 	NCaretListener[?] listeners = this.getNiceCaretListeners();
@@ -46,12 +46,12 @@ public <CaretListenerHandler H> void removeNCaretListener
   listeners.foreach
     (NCaretListener l =>
      {
-       if(caretUpdate != null && l.getCaretUpdate() == caretUpdate) l.setCaretUpdate(null);
+       if(l.getCaretUpdate() == caretUpdate) l.setCaretUpdate(null);
      }
      );
 }
  
-public <CellEditorListenerHandler H> void removeNCellEditorListener
+public <CellEditorListenerHandler H> void removeCellEditorListener
   (H this,
    ChangeEvent ?-> void editingCanceled = null,
    ChangeEvent ?-> void editingStopped = null
@@ -68,9 +68,9 @@ public <CellEditorListenerHandler H> void removeNCellEditorListener
      );
 }
  
-public <ChangeListenerHandler H> void removeNChangeListener
+public <ChangeListenerHandler H> void removeChangeListener
   (H this,
-   ChangeEvent ?-> void stateChanged
+   ChangeEvent -> void stateChanged
    ) 
 {
 	NChangeListener[?] listeners = this.getNiceChangeListeners();
@@ -78,12 +78,12 @@ public <ChangeListenerHandler H> void removeNChangeListener
   listeners.foreach
     (NChangeListener l =>
      {
-       if(stateChanged != null && l.getStateChanged() == stateChanged) l.setStateChanged(null);
+       if(l.getStateChanged() == stateChanged) l.setStateChanged(null);
      }
      );
 } 
  
-public <DocumentListenerHandler H> void removeNDocumentListener
+public <DocumentListenerHandler H> void removeDocumentListener
   (H this,
    DocumentEvent ?-> void changedUpdate = null,
    DocumentEvent ?-> void insertUpdate = null,
@@ -102,9 +102,9 @@ public <DocumentListenerHandler H> void removeNDocumentListener
      );
 } 
  
-public <HyperlinkListenerHandler H> void removeNHyperlinkListener
+public <HyperlinkListenerHandler H> void removeHyperlinkListener
   (H this,
-   HyperlinkEvent ?-> void hyperlinkUpdate
+   HyperlinkEvent -> void hyperlinkUpdate
    )
 {
 	NHyperlinkListener[?] listeners = this.getNiceHyperlinkListeners();
@@ -112,12 +112,12 @@ public <HyperlinkListenerHandler H> void removeNHyperlinkListener
   listeners.foreach
     (NHyperlinkListener l =>
      {
-       if(hyperlinkUpdate != null && l.getHyperlinkUpdate() == hyperlinkUpdate) l.setHyperlinkUpdate(null);
+       if(l.getHyperlinkUpdate() == hyperlinkUpdate) l.setHyperlinkUpdate(null);
      }
      );
 }  
  
-public <InternalFrameListenerHandler H> void removeNInternalFrameListener
+public <InternalFrameListenerHandler H> void removeInternalFrameListener
   (H this,
    InternalFrameEvent ?-> void internalFrameActivated = null,
    InternalFrameEvent ?-> void internalFrameClosed = null,
@@ -144,7 +144,7 @@ public <InternalFrameListenerHandler H> void removeNInternalFrameListener
      );
 } 
  
-public <ListDataListenerHandler H> void removeNListDataListener
+public <ListDataListenerHandler H> void removeListDataListener
   (H this,
    ListDataEvent ?-> void contentsChanged = null,
    ListDataEvent ?-> void intervalAdded = null,
@@ -163,9 +163,9 @@ public <ListDataListenerHandler H> void removeNListDataListener
      );
 } 
  
-public <ListSelectionListenerHandler H> void removeNListSelectionListener
+public <ListSelectionListenerHandler H> void removeListSelectionListener
   (H this,
-   ListSelectionEvent ?-> void listSelectionValueChanged
+   ListSelectionEvent -> void listSelectionValueChanged
    )  
 {
 	NListSelectionListener[?] listeners = this.getNiceListSelectionListeners();
@@ -173,12 +173,12 @@ public <ListSelectionListenerHandler H> void removeNListSelectionListener
   listeners.foreach
     (NListSelectionListener l =>
      {
-       if(listSelectionValueChanged != null && l.getListSelectionValueChanged() == listSelectionValueChanged) l.setListSelectionValueChanged(null);
+       if(l.getListSelectionValueChanged() == listSelectionValueChanged) l.setListSelectionValueChanged(null);
      }
      );
 }  
  
-public <MenuDragMouseListenerHandler H> void removeNMenuDragMouseListener
+public <MenuDragMouseListenerHandler H> void removeMenuDragMouseListener
   (H this,
    MenuDragMouseEvent ?-> void menuDragMouseDragged = null,
    MenuDragMouseEvent ?-> void menuDragMouseEntered = null,
@@ -199,7 +199,7 @@ public <MenuDragMouseListenerHandler H> void removeNMenuDragMouseListener
      );
 }    
  
-public <MenuKeyListenerHandler H> void removeNMenuKeyListener
+public <MenuKeyListenerHandler H> void removeMenuKeyListener
   (H this,
    MenuKeyEvent ?-> void menuKeyPressed = null,
    MenuKeyEvent ?-> void menuKeyReleased = null,
@@ -218,7 +218,7 @@ public <MenuKeyListenerHandler H> void removeNMenuKeyListener
      );
 }
  
-public <MenuListenerHandler H> void removeNMenuListener
+public <MenuListenerHandler H> void removeMenuListener
   (H this,
    MenuEvent ?-> void menuCanceled = null,
    MenuEvent ?-> void menuDeselected = null,
@@ -237,7 +237,7 @@ public <MenuListenerHandler H> void removeNMenuListener
      );
 }    
  
-public <PopupMenuListenerHandler H> void removeNPopupMenuListener
+public <PopupMenuListenerHandler H> void removePopupMenuListener
   (H this,
    PopupMenuEvent ?-> void popupMenuCanceled = null,
    PopupMenuEvent ?-> void popupMenuWillBecomeInvisible = null,
@@ -256,7 +256,7 @@ public <PopupMenuListenerHandler H> void removeNPopupMenuListener
      );
 }
  
-public <TableColumnModelListenerHandler H> void removeNTableColumnModelListener
+public <TableColumnModelListenerHandler H> void removeTableColumnModelListener
   (H this,
    TableColumnModelEvent ?-> void columnAdded = null,
    TableColumnModelEvent ?-> void columnMoved = null,
@@ -279,9 +279,9 @@ public <TableColumnModelListenerHandler H> void removeNTableColumnModelListener
      );
 }      
  
-public <TableModelListenerHandler H> void removeNTableModelListener
+public <TableModelListenerHandler H> void removeTableModelListener
   (H this,
-   TableModelEvent ?-> void tableChanged
+   TableModelEvent -> void tableChanged
    )  
 {
 	NTableModelListener[?] listeners = this.getNiceTableModelListeners();
@@ -289,12 +289,12 @@ public <TableModelListenerHandler H> void removeNTableModelListener
   listeners.foreach
     (NTableModelListener l =>
      {
-       if(tableChanged != null && l.getTableChanged() == tableChanged) l.setTableChanged(null);
+       if(l.getTableChanged() == tableChanged) l.setTableChanged(null);
      }
      );
 }    
  
-public <TreeExpansionListenerHandler H> void removeNTreeExpansionListener
+public <TreeExpansionListenerHandler H> void removeTreeExpansionListener
   (H this,
    TreeExpansionEvent ?-> void treeCollapsed = null,
    TreeExpansionEvent ?-> void treeExpanded = null
@@ -311,7 +311,7 @@ public <TreeExpansionListenerHandler H> void removeNTreeExpansionListener
      );
 } 
  
-public <TreeModelListenerHandler H> void removeNTreeModelListener
+public <TreeModelListenerHandler H> void removeTreeModelListener
   (H this,
    TreeModelEvent ?-> void treeNodesChanged = null,
    TreeModelEvent ?-> void treeNodesInserted = null,
@@ -332,9 +332,9 @@ public <TreeModelListenerHandler H> void removeNTreeModelListener
      );
 }
  
-public <TreeSelectionListenerHandler H> void removeNTreeSelectionListener
+public <TreeSelectionListenerHandler H> void removeTreeSelectionListener
   (H this,
-   TreeSelectionEvent ?-> void treeSelectionValueChanged
+   TreeSelectionEvent -> void treeSelectionValueChanged
    ) 
 {
 	NTreeSelectionListener[?] listeners = this.getNiceTreeSelectionListeners();
@@ -342,12 +342,12 @@ public <TreeSelectionListenerHandler H> void removeNTreeSelectionListener
   listeners.foreach
     (NTreeSelectionListener l =>
      {
-       if(treeSelectionValueChanged != null && l.getTreeSelectionValueChanged() == treeSelectionValueChanged) l.setTreeSelectionValueChanged(null);
+       if(l.getTreeSelectionValueChanged() == treeSelectionValueChanged) l.setTreeSelectionValueChanged(null);
      }
      );
 }  
  
-public <TreeWillExpandListenerHandler H> void removeNTreeWillExpandListener
+public <TreeWillExpandListenerHandler H> void removeTreeWillExpandListener
   (H this,
    TreeExpansionEvent ?-> void treeWillCollapse = null,
    TreeExpansionEvent ?-> void treeWillExpand = null
@@ -364,9 +364,9 @@ public <TreeWillExpandListenerHandler H> void removeNTreeWillExpandListener
      );
 } 
  
-public <UndoableEditListenerHandler H> void removeNUndoableEditListener
+public <UndoableEditListenerHandler H> void removeUndoableEditListener
   (H this,
-   UndoableEditEvent ?-> void undoableEditHappened
+   UndoableEditEvent -> void undoableEditHappened
    ) 
 {
 	NUndoableEditListener[?] listeners = this.getNiceUndoableEditListeners();
@@ -374,7 +374,7 @@ public <UndoableEditListenerHandler H> void removeNUndoableEditListener
   listeners.foreach
     (NUndoableEditListener l =>
      {
-       if(undoableEditHappened != null && l.getUndoableEditHappened() == undoableEditHappened) l.setUndoableEditHappened(null);
+       if(l.getUndoableEditHappened() == undoableEditHappened) l.setUndoableEditHappened(null);
      }
      );
 }

@@ -17,9 +17,9 @@ package nice.ui.common;
  * from all nice.ui.beans.NiceListenerHandler
  */ 
  
-public <PropertyChangeListenerHandler H> void removeNPropertyChangeListener
+public <PropertyChangeListenerHandler H> void removePropertyChangeListener
   (H this,
-   PropertyChangeEvent ?-> void propertyChange
+   PropertyChangeEvent -> void propertyChange
    )
 {
   NPropertyChangeListener[?] listeners = this.getNicePropertyChangeListeners(); 
@@ -27,14 +27,14 @@ public <PropertyChangeListenerHandler H> void removeNPropertyChangeListener
   listeners.foreach
     (NPropertyChangeListener l =>
      {
-       if(propertyChange != null && l.getPropertyChange() == propertyChange) l.setPropertyChange(null);
+       if(l.getPropertyChange() == propertyChange) l.setPropertyChange(null);
      }
      ); 
 }
  
-public <VetoableChangeListenerHandler H> void removeNVetoableChangeListener
+public <VetoableChangeListenerHandler H> void removeVetoableChangeListener
   (H this,
-   PropertyChangeEvent ?-> void vetoableChange
+   PropertyChangeEvent -> void vetoableChange
    )
 {
   NVetoableChangeListener[?] listeners = this.getNiceVetoableChangeListeners();
@@ -42,7 +42,7 @@ public <VetoableChangeListenerHandler H> void removeNVetoableChangeListener
   listeners.foreach
     (NVetoableChangeListener l =>
      {
-       if(vetoableChange != null && l.getVetoableChange() == vetoableChange) l.setVetoableChange(null);
+       if(l.getVetoableChange() == vetoableChange) l.setVetoableChange(null);
      }
      );
 } 
@@ -68,7 +68,7 @@ public <VetoableChangeListenerHandler H> void removeNVetoableChangeListener
   
 //JDK1.4   public <BeanContextServicesListenerHandler H> void removeBeanContextServicesListener
 //JDK1.4     (H this,
-//JDK1.4      BeanContextServiceAvailableEvent ?-> void serviceAvailable
+//JDK1.4      BeanContextServiceAvailableEvent -> void serviceAvailable
 //JDK1.4      )
 //JDK1.4   {
 //JDK1.4     NBeanContextServicesListener[?] listeners = this.getNiceBeanContextServicesListeners();
@@ -76,7 +76,7 @@ public <VetoableChangeListenerHandler H> void removeNVetoableChangeListener
 //JDK1.4     listeners.foreach
 //JDK1.4       (NBeanContextServicesListener l =>
 //JDK1.4        {
-//JDK1.4          if(serviceAvailable != null && l.getServiceAvailable() == serviceAvailable) l.setServiceAvailable(null);
+//JDK1.4          if(l.getServiceAvailable() == serviceAvailable) l.setServiceAvailable(null);
 //JDK1.4        }
 //JDK1.4        );
 //JDK1.4   }
@@ -84,7 +84,7 @@ public <VetoableChangeListenerHandler H> void removeNVetoableChangeListener
   
 //JDK1.4   public <BeanContextServiceRevokedListenerHandler H> void removeBeanContextServiceRevokedListener
 //JDK1.4     (H this,
-//JDK1.4      BeanContextServiceRevokedEvent ?-> void serviceRevoked
+//JDK1.4      BeanContextServiceRevokedEvent -> void serviceRevoked
 //JDK1.4      )
 //JDK1.4   {
 //JDK1.4     NBeanContextServiceRevokedListener[?] listeners = this.getNiceBeanContextServiceRevokedListeners();
@@ -92,7 +92,7 @@ public <VetoableChangeListenerHandler H> void removeNVetoableChangeListener
 //JDK1.4     listeners.foreach
 //JDK1.4       (NBeanContextServiceRevokedListener l =>
 //JDK1.4        {
-//JDK1.4          if(serviceRevoked != null && l.getServiceRevoked() == serviceRevoked) l.setServiceRevoked(null);
+//JDK1.4          if(l.getServiceRevoked() == serviceRevoked) l.setServiceRevoked(null);
 //JDK1.4        }
 //JDK1.4        );
 //JDK1.4   }
@@ -100,7 +100,7 @@ public <VetoableChangeListenerHandler H> void removeNVetoableChangeListener
   
 //JDK1.4   public <ExceptionListenerHandler H> void removeExceptionListener
 //JDK1.4     (H this,
-//JDK1.4      Exception ?-> void exceptionThrown
+//JDK1.4      Exception -> void exceptionThrown
 //JDK1.4      )
 //JDK1.4   {
 //JDK1.4     NExceptionListener[?] listeners = this.getNiceExceptionListeners();
@@ -108,7 +108,7 @@ public <VetoableChangeListenerHandler H> void removeNVetoableChangeListener
 //JDK1.4     listeners.foreach
 //JDK1.4       (NExceptionListener l =>
 //JDK1.4        {
-//JDK1.4          if(exceptionThrown != null && l.getExceptionThrown() == exceptionThrown) l.setExceptionThrown(null);
+//JDK1.4          if(l.getExceptionThrown() == exceptionThrown) l.setExceptionThrown(null);
 //JDK1.4        }
 //JDK1.4        );
 //JDK1.4   }

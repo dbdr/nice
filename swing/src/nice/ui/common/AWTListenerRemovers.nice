@@ -20,7 +20,7 @@ package nice.ui.common;
  
 public <ActionListenerHandler H> void removeActionListener
   (H this,
-   ActionEvent ?-> void actionPerformed
+   ActionEvent -> void actionPerformed
    )
 {  
 	NActionListener[?] listeners = this.getNiceActionListeners();
@@ -28,7 +28,7 @@ public <ActionListenerHandler H> void removeActionListener
   listeners.foreach
     (NActionListener l =>
      {
-       if(actionPerformed != null && l.getActionPerformed() == actionPerformed) l.setActionPerformed(null);
+       if(l.getActionPerformed() == actionPerformed) l.setActionPerformed(null);
      }
      );
 }
@@ -36,7 +36,7 @@ public <ActionListenerHandler H> void removeActionListener
   
 public <AdjustmentListenerHandler H> void removeAdjustmentListener
   (H this,
-   AdjustmentEvent ?-> void adjustmentValueChanged
+   AdjustmentEvent -> void adjustmentValueChanged
    ) 
 {
   NAdjustmentListener[?] listeners = this.getNiceAdjustmentListeners();
@@ -44,7 +44,7 @@ public <AdjustmentListenerHandler H> void removeAdjustmentListener
   listeners.foreach
     (NAdjustmentListener l =>
      {
-       if(adjustmentValueChanged != null && l.getAdjustmentValueChanged() == adjustmentValueChanged) l.setAdjustmentValueChanged(null);
+       if(l.getAdjustmentValueChanged() == adjustmentValueChanged) l.setAdjustmentValueChanged(null);
      }
      );
 }
@@ -128,7 +128,7 @@ public <HierarchyBoundsListenerHandler H> void removeHierarchyBoundsListener
   
 public <HierarchyListenerHandler H> void removeHierarchyListener
   (H this,
-   HierarchyEvent ?-> void hierarchyChanged
+   HierarchyEvent -> void hierarchyChanged
    ) 
 {
   NHierarchyListener[?] listeners = this.getNiceHierarchyListeners();
@@ -136,7 +136,7 @@ public <HierarchyListenerHandler H> void removeHierarchyListener
   listeners.foreach
     (NHierarchyListener l =>
      {
-       if(hierarchyChanged != null && l.getHierarchyChanged() == hierarchyChanged) l.setHierarchyChanged(null);
+       if(l.getHierarchyChanged() == hierarchyChanged) l.setHierarchyChanged(null);
      }
      );
 }
@@ -162,7 +162,7 @@ public <InputMethodListenerHandler H> void removeInputMethodListener
 
 public <ItemListenerHandler H> void removeItemListener
   (H this,
-   ItemEvent ?-> void itemStateChanged
+   ItemEvent -> void itemStateChanged
    )  
 {
   NItemListener[?] listeners = this.getNiceItemListeners();
@@ -170,7 +170,7 @@ public <ItemListenerHandler H> void removeItemListener
   listeners.foreach
     (NItemListener l =>
      {
-       if(itemStateChanged != null && l.getItemStateChanged() == itemStateChanged) l.setItemStateChanged(null);
+       if(l.getItemStateChanged() == itemStateChanged) l.setItemStateChanged(null);
      }
      );
 }   
@@ -240,7 +240,7 @@ public <MouseMotionListenerHandler H> void removeMouseMotionListener
   
 public <TextListenerHandler H> void removeTextListener
   (H this,
-   TextEvent ?-> void textValueChanged
+   TextEvent -> void textValueChanged
    ) 
 {
   NTextListener[?] listeners = this.getNiceTextListeners();
@@ -248,7 +248,7 @@ public <TextListenerHandler H> void removeTextListener
   listeners.foreach
     (NTextListener l =>
      {
-       if(textValueChanged != null && l.getTextValueChanged() == textValueChanged) l.setTextValueChanged(null);
+       if(l.getTextValueChanged() == textValueChanged) l.setTextValueChanged(null);
      }
      );
 }  
@@ -307,7 +307,7 @@ public <DragSourceListenerHandler H> void removeDragSourceListener
   
 public <DragGestureListenerHandler H> void removeDragGestureListener
   (H this,
-   DragGestureEvent ?-> void dragGestureRecognized
+   DragGestureEvent -> void dragGestureRecognized
    ) 
 {
   NDragGestureListener[?] listeners = this.getNiceDragGestureListeners();
@@ -315,7 +315,7 @@ public <DragGestureListenerHandler H> void removeDragGestureListener
   listeners.foreach
     (NDragGestureListener l =>
      {
-       if(dragGestureRecognized != null && l.getDragGestureRecognized() == dragGestureRecognized) l.setDragGestureRecognized(null);
+       if(l.getDragGestureRecognized() == dragGestureRecognized) l.setDragGestureRecognized(null);
      }
      );
 }
@@ -347,7 +347,7 @@ public <DropTargetListenerHandler H> void removeDropTargetListener
 
 //JDK1.4  public <AWTEventListenerHandler H> void removeAWTEventListener
 //JDK1.4    (H this,
-//JDK1.4     AWTEvent ?-> void eventDispatched
+//JDK1.4     AWTEvent -> void eventDispatched
 //JDK1.4     )
 //JDK1.4  {
 //JDK1.4    NAWTEventListener[?] listeners = this.getNiceAWTListeners();
@@ -355,7 +355,7 @@ public <DropTargetListenerHandler H> void removeDropTargetListener
 //JDK1.4    listeners.foreach
 //JDK1.4      (NAWTEventListener l =>
 //JDK1.4       {
-//JDK1.4         if(eventDispatched != null && l.getEventDispatched() == eventDispatched) l.setEventDispatched(null);
+//JDK1.4         if(l.getEventDispatched() == eventDispatched) l.setEventDispatched(null);
 //JDK1.4       }
 //JDK1.4       );
 //JDK1.4  }
@@ -363,7 +363,7 @@ public <DropTargetListenerHandler H> void removeDropTargetListener
 
 //JDK1.4  public <MouseWheelListenerHandler H> void removeMouseWheelListener
 //JDK1.4    (H this,
-//JDK1.4     MouseWheelEvent ?-> void mouseWheelMoved
+//JDK1.4     MouseWheelEvent -> void mouseWheelMoved
 //JDK1.4     )   
 //JDK1.4  {
 //JDK1.4    NMouseWheelListener[?] listeners = this.getNiceMouseWheelListeners();
@@ -371,7 +371,7 @@ public <DropTargetListenerHandler H> void removeDropTargetListener
 //JDK1.4    listeners.foreach
 //JDK1.4      (NMouseWheelListener l =>
 //JDK1.4       {
-//JDK1.4         if(mouseWheelMoved != null && l.getMouseWheelMoved() == mouseWheelMoved) l.setMouseWheelMoved(null);
+//JDK1.4         if(l.getMouseWheelMoved() == mouseWheelMoved) l.setMouseWheelMoved(null);
 //JDK1.4       }
 //JDK1.4       );
 //JDK1.4  } 
@@ -397,7 +397,7 @@ public <DropTargetListenerHandler H> void removeDropTargetListener
    
 //JDK1.4  public <WindowStateListenerHandler H> void removeWindowStateListener
 //JDK1.4    (H this,
-//JDK1.4     WindowEvent ?-> void windowStateChanged
+//JDK1.4     WindowEvent -> void windowStateChanged
 //JDK1.4     ) 
 //JDK1.4  {
 //JDK1.4    NWindowStateListener[?] listeners = this.getNiceWindowStateListeners();
@@ -405,7 +405,7 @@ public <DropTargetListenerHandler H> void removeDropTargetListener
 //JDK1.4    listeners.foreach
 //JDK1.4      (NWindowStateListener l =>
 //JDK1.4       {
-//JDK1.4         if(windowStateChanged != null && l.getWindowStateChanged() == windowStateChanged) l.setWindowStateChanged(null);
+//JDK1.4         if(l.getWindowStateChanged() == windowStateChanged) l.setWindowStateChanged(null);
 //JDK1.4       }
 //JDK1.4       );
 //JDK1.4  }
@@ -413,7 +413,7 @@ public <DropTargetListenerHandler H> void removeDropTargetListener
   
 //JDK1.4  public <DragSourceMotionListenerHandler H> void removeDragSourceMotionListener
 //JDK1.4    (H this,
-//JDK1.4     DragSourceDragEvent ?-> void dragMouseMoved
+//JDK1.4     DragSourceDragEvent -> void dragMouseMoved
 //JDK1.4     ) 
 //JDK1.4  {
 //JDK1.4    NDragSourceMotionListener[?] listeners = this.getNiceDragSourceMotionListeners();
@@ -421,7 +421,7 @@ public <DropTargetListenerHandler H> void removeDropTargetListener
 //JDK1.4    listeners.foreach
 //JDK1.4      (NDragSourceMotionListener l =>
 //JDK1.4       {
-//JDK1.4         if(dragMouseMoved != null && l.getDragMouseMoved() == dragMouseMoved) l.setDragMouseMoved(null);
+//JDK1.4         if(l.getDragMouseMoved() == dragMouseMoved) l.setDragMouseMoved(null);
 //JDK1.4       }
 //JDK1.4       );
 //JDK1.4  }

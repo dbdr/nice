@@ -74,11 +74,11 @@ begin<Sym>(t@SymbolTable)
 
 end<Sym>(t@SymbolTable)
 {
-  while (t.topBinder != null)
+  ?Binder<Sym> top = t.topBinder;
+  while (top != null)
     {
-      Binder<Sym> top = notNull(t.topBinder);
-      t.symbols.put(notNull(top.name), top.oldBinding);
-      t.topBinder = top.nextBinder;
+      t.symbols.put(cast(top.name), cast(top.oldBinding));
+      top = t.topBinder = top.nextBinder;
     }
   t.topBinder = notNull(t.marks).nextBinder;
   t.marks = notNull(t.marks).oldBinding;

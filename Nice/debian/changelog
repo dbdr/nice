@@ -3,7 +3,7 @@ nice (0.9.10-1) unstable; urgency=low
   * New upstream version.
   * Version 0.9.9-1 was not uploaded to the Debian archive.
 
- -- Daniel Bonniot <bonniot@users.sf.net>  Sun, 13 Feb 2005 11:10:44 +0100
+ -- Daniel Bonniot <bonniot@users.sf.net>  Fri, 25 Feb 2005 17:13:30 +0100
 
 nice (0.9.9-1) unstable; urgency=low
 

@@ -79,7 +79,12 @@ public final class ClassExp extends Expression
 	  }
       }
 
-    // name has been appended to root's name
+    if (root != null)
+      // name has been appended to root's name
+      return root;
+
+    root = new PackageExp(fullName);
+    root.setLocation(name.location());
     return root;
   }
   

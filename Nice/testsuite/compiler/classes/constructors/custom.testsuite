@@ -124,3 +124,15 @@ new B(int x) {
   new /*/// FAIL HERE */A(int n) { 
     this(n);
   }
+
+/// PASS bug
+  // bug #1070579
+  let x = new X(5);
+  /// Toplevel
+  class X {}
+  new X(int a) {
+    int n = 0;
+    void foo() { n++; }
+    foo(); 
+    this();
+  }

@@ -107,7 +107,10 @@ public class TestNice {
 		The Output where log statements should be written.
 		ConsoleOutput is the default Output.
 	*/
-	private static Output _output;
+	private static Output _output = new ConsoleOutput();
+	
+	
+	private static List _testSuites = new ArrayList();
 
 
 
@@ -117,7 +120,7 @@ public class TestNice {
 	 * @param	args	console arguments
 	 */
 	static public void main(String[] args) {
-		if (args.length != 1) {
+		if (!processArgs(args)) {
 			usage();
 			System.exit(1);
 		}
@@ -126,15 +129,17 @@ public class TestNice {
 			_output = new HtmlOutput(new FileWriter(new File(TestNice.getTempFolder().getParent(), "testsuite_output.html")));
 		} catch(IOException e) {
 			e.printStackTrace();
-		}*/
+		}
 		_output = new ConsoleOutput();
-		
+		*/
 		
 		_output.startApplication();
 		cleanupTempFolder();
 		
 		try {
-			new TestNice().performTests(args[0]);
+			//	iterate through testsuites
+			for (Iterator iter = _testSuites.iterator(); iter.hasNext();)
+				new TestNice().performTests((String)iter.next());
 		} catch(TestSuiteException e) {
 			e.printStackTrace();
 		}
@@ -143,6 +148,47 @@ public class TestNice {
 		//	close writer
 		_output.close();
 	}
+
+
+
+	/**
+	 * Processes the command line arguments. Returns true if everything is ok.
+	 */
+	private static boolean processArgs(String[] args) {
+		for(int i = 0; i < args.length;) {
+			String s = args[i];
+			i++;
+			if(s.startsWith("-")) {
+				if ("-output".equalsIgnoreCase(s)) {
+					setOutput(args[i++]);
+				} else
+					return false;
+			} else 
+				_testSuites.add(s);
+		}
+		return true;
+	}
+
+	/**
+		Sets the output of the test engine
+	*/
+	private static void setOutput(String output) {
+		if ("console".equalsIgnoreCase(output)) {
+			_output = new ConsoleOutput();
+			return;
+		}
+		
+		output = output.toLowerCase();
+		if (output.endsWith(".html")  ||  output.endsWith(".htm"))
+			try {
+				_output = new HtmlOutput(new FileWriter(new File(output)));
+			} catch(IOException e) {
+				e.printStackTrace();
+			}
+	}
+
+
+
 
 	/**
 	 * Prints the usage of this application.

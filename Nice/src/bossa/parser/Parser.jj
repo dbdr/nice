@@ -2217,7 +2217,6 @@ Statement Statement() :
   LOOKAHEAD(2)
   res=LabeledStatement()
 | res=Block()
-| res=EmptyStatement()
 | res=StatementExpression() ";"
 | res=IfStatement()
 | res=WhileStatement()
@@ -2419,12 +2418,6 @@ void LocalTupleExpContent() : { }
   | doted_string()
   )
 )* 
-}
-
-Statement EmptyStatement() :
-{ Token t; }
-{
-  t=";" { return new EmptyStmt(Location.make(t)); }
 }
 
 Statement StatementExpression() :

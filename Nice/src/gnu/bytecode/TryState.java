@@ -8,13 +8,13 @@ import java.io.*;
 
 public class TryState {
   /** The surrounding TryState, if any. */
-  TryState previous;
+  public final TryState previous;
 
   /** The label for the code following the entire try-statement. */
   Label end_label;
 
   /** If this "try" has a "finally", the Label of the "finally" sub-routine. */
-  Label finally_subr;
+  public Label finally_subr;
 
   /** Used for the return address of the finally subroutine (if any). */
   Variable finally_ret_addr;

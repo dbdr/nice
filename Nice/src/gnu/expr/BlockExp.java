@@ -58,7 +58,10 @@ public class BlockExp extends Expression
     gnu.bytecode.CodeAttr code = comp.getCode();
     exitLabel = new Label(code);
     this.subTarget = exitBody == null ? subTarget : Target.Ignore;
+
+    initialTryState = code.getTryStack();
     body.compileWithPosition(comp, subTarget);
+
     if (exitBody != null)
       {
         Label doneLabel = new Label(code);
@@ -71,6 +74,22 @@ public class BlockExp extends Expression
       exitLabel.define(code);
     if (subTarget != target)
       target.compileFromStack(comp, subTarget.getType());
+  }
+
+  // The try state in place at the beginning of the block
+  TryState initialTryState;
+
+  void exit(CodeAttr code)
+  {
+    // Run enclosing finally clauses
+    for (TryState st = code.getTryStack(); st != initialTryState;
+         st = st.previous)
+      {
+        if (st.finally_subr != null)
+          code.emitJsr(st.finally_subr);
+      }
+
+    code.emitGoto(exitLabel);
   }
 
   protected Expression walk (ExpWalker walker)

@@ -42,7 +42,7 @@
   for(;;)
     continue /*/// FAIL HERE */ undefined_label;
 
-/// PASS bug
+/// PASS
   boolean doneFinally = false;
   for(;;)
     try {
@@ -51,6 +51,24 @@
       doneFinally = true;
     }
   assert doneFinally;
+
+/// PASS
+  boolean doneFinally = false;
+  try {
+    for(;;)
+      break;
+    assert !doneFinally;
+  } finally {
+    doneFinally = true;
+  }
+
+/// PASS
+  let s = "abc";
+  while(true) {
+    synchronized(s){
+      if (s == "abc") break;
+    }
+  }
 
 /// FAIL
   label:

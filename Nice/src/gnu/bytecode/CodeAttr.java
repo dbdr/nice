@@ -67,6 +67,8 @@ public class CodeAttr extends Attribute implements AttrContainer
   /** The stack of currently active try statements. */
   TryState try_stack;
 
+  public final TryState getTryStack() { return try_stack; }
+
   public final Method getMethod() { return (Method) getContainer(); }
 
   public final int getPC() { return PC; }

@@ -1,0 +1,7 @@
+
+package bossa.syntax;
+
+class UnknownIdentException extends Exception 
+{
+  LocatedString ident;
+}

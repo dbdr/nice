@@ -1,0 +1,148 @@
+/**************************************************************************/
+/*                                N I C E                                 */
+/*             A high-level object-oriented research language             */
+/*                        (c) Daniel Bonniot 2000                         */
+/*                                                                        */
+/*  This program is free software; you can redistribute it and/or modify  */
+/*  it under the terms of the GNU General Public License as published by  */
+/*  the Free Software Foundation; either version 2 of the License, or     */
+/*  (at your option) any later version.                                   */
+/*                                                                        */
+/**************************************************************************/
+
+/*
+   Scoping resolution, variable initialization test
+*/
+
+package bossa.syntax;
+
+//import bossa.syntax.*;
+import nice.tools.ast;
+import mlsub.typing.*;
+
+// Interface
+
+Expression analyse(Expression, Info);
+Statement analyse(Statement, Info);
+
+// Implementation
+
+class Info
+{
+  SymbolTable<VarSymbol> vars;
+  SymbolTable<TypeSymbol> typeVars;
+
+  void begin();
+  void end();
+}
+
+VarSymbol lookup(String, Info);
+VarSymbol[] globalLookup(String, Info);
+
+void setInitialized(Expression, Info);
+setInitialized(e, i) {}
+setInitialized(e@SymbolExp, i) {}
+
+void addVars(Info, java.util.Collection);
+void addTypeVars(Info, java.util.Collection);
+
+analyse(e@Expression, i) = e;
+
+analyse(e@AssignExp, i)
+{
+  e.value = analyse(e.value, i);
+  e.to = analyse(e.to, i);
+  setInitialized(e.to, i);
+  return e;
+}
+
+void analyseExps(Expression[], Info);
+analyseExps(exps, info)
+{
+  for (int i = 0; i < exps.length; i++)
+    exps[i] = analyse(exps[i], info);
+}
+
+void analyse(Arguments, Info);
+analyse(args@Arguments, info)
+{
+  for (int i = 0; i < args.arguments.length; i++)
+    args.setExp(i, analyse(args.getExp(i), info));
+}
+
+void markAsCallFun(Expression, boolean);
+markAsCallFun(e, infix) {}
+markAsCallFun(e@IdentExp, infix)
+{
+  e.infix = infix;
+  e.alwaysOverloadedSymbol = true;
+}
+
+analyse(e@CallExp, i)
+{
+  markAsCallFun(e.function, e.infix);
+  e.function = analyse(e.function, i);
+  e.arguments.analyse(i);
+  return e;
+}
+
+analyse(e@FunExp, info)
+{
+  info.begin();
+  addVars(info, e.formals);
+  e.body = analyse(e.body, info);
+  info.end();
+  return e;
+}
+
+analyse(e@IdentExp, i)
+{
+  String name = e.ident.toString();
+
+  if (!e.infix) // infix symbols can only come from the global scope
+    {
+      VarSymbol s = lookup(name, i);
+      if (s != null)
+	if (!e.alwaysOverloadedSymbol)
+	  return new SymbolExp(s);
+	else
+	  {
+	    //List<VarSymbol> symbols = new LinkedList();
+	    //symbols.add(s);
+	    return new OverloadedSymbolExp(s, e.ident);
+	  }
+    }
+
+  Array<VarSymbol> symbols = globalLookup(name, i);
+  if (symbols != null)
+    return new OverloadedSymbolExp(symbols, e.ident);
+
+  if (e.infix)
+    return e;
+
+  UnknownIdentException exn = new UnknownIdentException();
+  exn.ident = e.ident;
+  throw exn;
+  return null; // work-around pb with non-reachable code
+}
+
+analyse(e@IfExp, i)
+{
+  e.condition = analyse(e.condition, i);
+  e.thenExp = analyse(e.thenExp, i);
+  e.elseExp = analyse(e.elseExp, i);
+  return e;
+}
+
+analyse(e@IncrementExp, i)
+{
+  e.variable = analyse(e.variable, i);
+  return e;
+}
+
+analyse(e@LiteralArrayExp, info)
+{
+  analyseExps(e.elements, info);
+  return e;
+}
+

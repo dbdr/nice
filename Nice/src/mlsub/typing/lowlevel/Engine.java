@@ -183,12 +183,12 @@ public abstract class Engine
   }
   
   /**
-   * Asserts that elements have some ordering relation.
-   *
-   * @param e1 a value of type 'Element'
-   * @param e2 a value of type 'Element'
-   * @exception Unsatisfiable if the constraint is not satisfiable.
-   * However this fact may also be discovered later
+     Asserts that elements have some ordering relation.
+     
+     @param e1 a value of type 'Element'
+     @param e2 a value of type 'Element'
+     @exception Unsatisfiable if the constraint is not satisfiable.
+     However this fact may also be discovered later.
    */
   public static final void leq(Element e1, Element e2, boolean initial) 
     throws Unsatisfiable

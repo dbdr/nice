@@ -40,7 +40,7 @@ public class S {
 
   final public static boolean debug = getBoolean(false, "debug");
 
-  final public static boolean debugK0 = getBoolean(true, "debug.K0");
+  final public static boolean debugK0 = getBoolean(false, "debug.K0");
 
   final public static boolean debugBlock = getBoolean(false, "debug.block");
   final public static boolean contextSimpl = getBoolean(true, "context.simplify");

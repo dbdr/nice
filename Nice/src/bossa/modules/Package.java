@@ -244,17 +244,12 @@ public class Package implements mlsub.compilation.Module, Located, bossa.syntax.
   
   public void load()
   {
-    try{
-      ast.resolveScoping();
-      ast.createContext();
+    ast.resolveScoping();
+    ast.createContext();
 
-      // this must be done before freezing
-      if (!compiling())
-	readAlternatives();
-    }
-    catch(Throwable e){
-      Internal.error(e);
-    }
+    // this must be done before freezing
+    if (!compiling())
+      readAlternatives();
   }
 
   public void compile()

@@ -5,7 +5,7 @@ STYLEOPT=
 
 .PHONY : clean
 
-all: safety.html
+all: safety.html install.html
 
 include depends.tabular
 

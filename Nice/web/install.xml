@@ -1,0 +1,124 @@
+<?xml version="1.0" standalone="no"?>
+<!DOCTYPE website PUBLIC "-//Norman Walsh//DTD Website V2.0b1//EN"
+          "http://docbook.sourceforge.net/release/website/2.0b1/website.dtd" [
+<!ENTITY nice "Nice">
+<!ENTITY java "Java">
+]>
+<webpage id="install">
+<config param="footlink" value="home" altval="Home"/>
+<config param="desc" value="Installing the Nice compiler"/>
+<config param="rcsdate" value="$Date$"/>
+<head>
+<title>Installing the &nice; compiler</title>
+<keywords>nice, compiler, install, windows, debian, linux, unix</keywords>
+</head>
+
+<para>
+Select your system:
+<link linkend="deb">Debian</link>
+<link linkend="unix">Unix</link>
+<link linkend="win">Windows</link>
+<link linkend="other">Other</link>
+</para>
+
+<section id="deb"><title>Debian Linux</title>
+<orderedlist>
+<listitem>
+<para>download the <ulink url="nice.deb">Debian package</ulink>.</para>
+</listitem>
+
+<listitem>
+<para>install the package with <literal>dpkg -i nice_*.deb</literal>. </para>
+</listitem>
+</orderedlist>
+</section>
+
+<section id="unix"><title>Unix</title>
+<para>
+Download the <ulink url="Nice.tar">Nice.tar</ulink> file and 
+save it as <literal>/tmp/Nice.tar</literal>.
+
+<variablelist>
+<varlistentry><term>System installation (if you are root)</term>
+<listitem>
+<para>
+Uncompress the archive:
+<programlisting>
+cd /usr
+tar xf /tmp/Nice.tar
+</programlisting>
+</para>
+</listitem>
+</varlistentry>
+<varlistentry><term>User installation</term>
+<listitem>
+<para>
+Uncompress the archive in your home directory:
+<programlisting>
+cd
+tar xf /tmp/Nice.tar
+</programlisting>
+The &nice; tools are placed in the <literal>bin</literal> subdirectory. 
+It is be a good idea to include it in your <literal>PATH</literal>.
+</para>
+</listitem>
+</varlistentry>
+</variablelist>
+
+That's it! &nice; automatically recognizes where it is installed.
+</para>
+
+<para>
+If you use Emacs, you should also 
+<link linkend="emacs">install the &nice; mode</link>.
+</para>
+</section>
+<section id="win"><title>Windows</title>
+<para>
+Download <a href="Nice.tar">Nice.tar</a> along with 
+the <a href="nicec.bat">nicec.bat</a> file contributed by Jamie McCrindle. 
+Further documentation is needed.
+</para>
+<para>
+If you use Emacs, you should also 
+<link linkend="emacs">install the &nice; mode</link>.
+</para>
+</section>
+
+<section id="other"><title>Other</title>
+<para>
+There are no specific instructions for other systems.
+Howevever &nice; can be used on any system that works with &java;.
+If you are in this situation, please 
+<ulink url="mailto:bonniot@users.sourceforge.net">contact me</ulink>
+to share your experience and augment the documentation.
+</para>
+</section>
+
+<section id="emacs"><title>Emacs mode</title>
+<para>
+There is an <ulink url="http://www.gnu.org/software/emacs/">Emacs</ulink> mode
+for &nice; which makes Emacs the editor of choice for &nice; programs!
+To enable it, place this in your <literal>.emacs</literal> file:
+<programlisting>
+;; Nice
+;; Remove the ; in the next line if you installed Nice in your home directory
+;(setq load-path (cons "~/share/emacs/site-lisp" load-path))
+(setq auto-mode-alist (cons '("\\.nice$" . nice-mode) auto-mode-alist))
+(autoload 'nice-mode "nice-mode" "Major mode for editing Nice programs." t)
+</programlisting>
+
+The first line is there to ensure that the <literal>nice-mode.el</literal> file
+is in your Emacs <literal>load-path</literal>. 
+You may also do that by moving the file to some standard directory. 
+Or you may have to replace <literal>~</literal> by <literal>/usr</literal>
+or <literal>/usr/local</literal> depending on where you installed Nice.
+</para>
+<para>
+The &nice; mode will then be loaded automatically when you open 
+<literal>.nice</literal> files. 
+Type <literal>C-h m</literal> for the documentation of the mode.
+</para>
+</section>
+
+</webpage>

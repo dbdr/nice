@@ -116,7 +116,7 @@ void typecheckAndArgs(Arguments args)
       });
 
     typecheck(args.getExp(1));
-    args.getExp(1).computeType();
+    args.getExp(1).getType();
   }
   finally {
     // There is no else part, but this call is necessary to pop off
@@ -147,7 +147,7 @@ void typecheckOrArgs(Arguments args)
       });
 
     typecheck(args.getExp(1));
-    args.getExp(1).computeType();
+    args.getExp(1).getType();
   }
   finally {
     // There is no else part, but this call is necessary to pop off
@@ -380,7 +380,7 @@ typecheck(e@IfExp)
     typecheck(thenExp);
     // since the type of the variable is destructively changed,
     // it is important to compute the branch's type and to store it now.
-    thenExp.computeType();
+    thenExp.getType();
 
     enterElse();
 
@@ -395,7 +395,7 @@ typecheck(e@IfExp)
     typecheck(elseExp);
     // since the type of the variable is destructively changed,
     // it is important to compute the branch's type and to store it now.
-    elseExp.computeType();
+    elseExp.getType();
 
   }
   finally{

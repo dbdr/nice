@@ -11,6 +11,7 @@ nice (0.7.8) unstable; urgency=low
     Also report more nicely /* comments that are not closed.
   * Allow nested tuples on the left side of a tuple assignment:
       (String a, (String b, String c)) = ("a", ("b", "c"));
+  * Bugfixes.
 
  --
 

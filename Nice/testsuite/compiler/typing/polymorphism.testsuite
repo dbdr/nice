@@ -20,3 +20,25 @@ void usePolymorphicFunction () {
 <Any T> int m(T);
 m(x) = 0;
 m(c@Collection) = c.size();
+
+/// PASS
+  /// Toplevel
+class A{}
+
+A[?] foo()
+{
+  return (true) ? null : fill(new A[0], int i => new A());
+}
+
+/// PASS
+  /// Toplevel
+
+// Variation on the previous case.
+class A{}
+
+<T, U | T <: U, U <: T> U[] poly(T[] x) = x;
+
+A[?] foo()
+{
+  return (true) ? null : poly(new A[0]);
+}

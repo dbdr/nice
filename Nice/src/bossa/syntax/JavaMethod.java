@@ -287,11 +287,12 @@ public class JavaMethod extends MethodDeclaration
 					  t.location()));
       }
     
-    LocatedString t = (LocatedString) javaTypes.get(0);
-    javaRetType = type(t);
+    LocatedString retTypeString = (LocatedString) javaTypes.get(0);
+    javaRetType = type(retTypeString);
     
     // set the fully qualified name of the return type back
-    javaTypes.set(0, new LocatedString(javaRetType.getName(), t.location()));
+    javaTypes.set(0, new LocatedString(javaRetType.getName(), 
+				       retTypeString.location()));
     
     reflectMethod = ((ClassType) holder).getDeclaredMethod
       (methodName, javaArgType);
@@ -304,6 +305,14 @@ public class JavaMethod extends MethodDeclaration
     //reflectMethod.arg_types = javaArgType;
     //if(!methodName.equals("<init>"))
     //reflectMethod.return_type = javaRetType;
+
+    if (! reflectMethod.isConstructor() &&
+	! reflectMethod.return_type.getName().equals(javaRetType.getName()))
+      User.error(retTypeString,
+		 "Method " + methodName +
+		 " has not the indicated return type." +
+		 "\nIndicated: " + javaRetType.getName() +
+		 "\nFound    : " + reflectMethod.return_type.getName());
     
     declaredMethods.put(reflectMethod, Boolean.TRUE);
     

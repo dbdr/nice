@@ -12,7 +12,7 @@
 
 // File    : PackageExp.java
 // Created : Wed Jun 14 12:36:45 2000 by Daniel Bonniot
-//$Modified: Wed Jun 14 15:59:04 2000 by Daniel Bonniot $
+//$Modified: Tue Jul 25 14:36:31 2000 by Daniel Bonniot $
 
 package bossa.syntax;
 
@@ -50,7 +50,8 @@ class PackageExp extends Expression
 
   private void error()
   {
-    User.error(this, name + " is neither a valid expression nor a valid package");
+    User.error(this, 
+	       name + " is neither a valid expression nor a valid package");
   }
 
   void computeType()

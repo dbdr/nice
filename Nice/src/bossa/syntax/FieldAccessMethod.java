@@ -12,11 +12,12 @@
 
 // File    : FieldAccessMethod.java
 // Created : Thu Jul 01 18:12:46 1999 by bonniot
-//$Modified: Mon Jul 24 18:08:19 2000 by Daniel Bonniot $
+//$Modified: Tue Jul 25 18:30:01 2000 by Daniel Bonniot $
 
 package bossa.syntax;
 
 import bossa.util.*;
+import nice.tools.code.*;
 
 import mlsub.typing.TypeConstructor;
 
@@ -95,20 +96,21 @@ public class FieldAccessMethod extends MethodDefinition
   
   gnu.expr.Expression compileAccess(Expression parameter)
   {
-    return new ApplyExp
+    gnu.expr.Expression res = Inline.inline1
       (new kawa.lang.GetFieldProc((ClassType) bossa.CodeGen.javaType(classTC),
 				  fieldName, 
 				  fieldType(), 
 				  Access.PUBLIC),
-       new gnu.expr.Expression[]{ parameter.generateCode() });
+       parameter.generateCode());
+
+    return res;
     
   }
   
   gnu.expr.Expression compileAssign(Expression parameter, 
 				    gnu.expr.Expression value)
   {
-    return new ApplyExp
-      (new nice.tools.code.SetFieldProc(field()), 
-       new gnu.expr.Expression[]{ parameter.generateCode(), value });
+    return Inline.inline2
+      (new SetFieldProc(field()), parameter.generateCode(), value);
   }
 }

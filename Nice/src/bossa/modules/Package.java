@@ -12,7 +12,7 @@
 
 // File    : Package.java
 // Created : Wed Oct 13 16:09:47 1999 by bonniot
-//$Modified: Mon Jul 24 20:21:56 2000 by Daniel Bonniot $
+//$Modified: Wed Jul 26 15:44:19 2000 by Daniel Bonniot $
 
 package bossa.modules;
 
@@ -332,11 +332,12 @@ public class Package implements mlsub.compilation.Module
   
   public void endOfLink()
   {
-    if(jar!=null)
+    if(jar != null)
       closeJar();
   }
   
   private static JarOutputStream jar;
+  private static File jarDestFile;
   
   private void createJar()
   {
@@ -349,14 +350,14 @@ public class Package implements mlsub.compilation.Module
       name = name.substring(lastDot+1, name.length());
     
     try{
-      File dest = new File(directory.getParent(), name+".jar");
+      jarDestFile = new File(directory.getParent(), name + ".jar");
       
-      OutputStream out = new FileOutputStream(dest);
+      OutputStream out = new FileOutputStream(jarDestFile);
       Manifest manifest = new Manifest();
 
       manifest.getMainAttributes().put(Attributes.Name.MANIFEST_VERSION,"1.0");
       manifest.getMainAttributes().put(Attributes.Name.MAIN_CLASS, 
-				       this.name+".package");
+				       this.name + ".package");
      
       jar = new JarOutputStream(out, manifest);
     }
@@ -373,10 +374,28 @@ public class Package implements mlsub.compilation.Module
       dispatchClass.writeToStream(jar);
 
       jar.close();
+      jar = null;
+      jarDestFile = null;
     }
     catch(IOException e){
       User.error(this.name, "Error during creation of executable file: "+e);
     }
+  }
+
+  static
+  {
+    System.runFinalizersOnExit(true);
+  }
+  
+  protected void finalize()
+  {
+    if (jarDestFile != null)
+      // The jar file was not completed
+      // it must be corrupt, so it's cleaner to delete it
+      {
+	jarDestFile.delete();
+	jarDestFile = null;
+      }
   }
   
   private void saveInterface()
@@ -512,7 +531,7 @@ public class Package implements mlsub.compilation.Module
 
   public ClassType createClass(String name)
   {
-    ClassType res = new ClassType(this.name+"."+name);
+    ClassType res = ClassType.make(this.name+"."+name);
     res.requireExistingClass(false);
 
     return res;

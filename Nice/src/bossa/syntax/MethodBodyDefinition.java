@@ -12,7 +12,7 @@
 
 // File    : MethodBodyDefinition.java
 // Created : Thu Jul 01 18:12:46 1999 by bonniot
-//$Modified: Mon Jul 24 20:25:24 2000 by Daniel Bonniot $
+//$Modified: Tue Jul 25 21:05:40 2000 by Daniel Bonniot $
 
 package bossa.syntax;
 
@@ -489,16 +489,12 @@ public class MethodBodyDefinition extends Definition
     args.setType(gnu.bytecode.ArrayType.make(Type.string_type));
 
     // Call arguments
-    gnu.expr.Expression[] eVal = new gnu.expr.Expression[] {
-      new gnu.expr.ApplyExp
-	(new gnu.expr.QuoteExp(new gnu.expr.PrimProcedure(bossa.SpecialArray.specialObjectArray().makeMethod())), new gnu.expr.Expression[]{
-	    new gnu.expr.ReferenceExp("args",args)
-	    }
-	 )
-    };
+    gnu.expr.Expression[] eVal = new gnu.expr.Expression[] 
+    { new gnu.expr.ReferenceExp("args",args) };
 
     block.setBody
-      (new gnu.expr.ApplyExp(new gnu.expr.QuoteExp(new gnu.expr.PrimProcedure(mainAlternative)),eVal));
+      (new gnu.expr.ApplyExp(new gnu.expr.PrimProcedure(mainAlternative),
+			     eVal));
 
     lexp.setPrimMethod(module.getBytecode().addMethod
       ("main",

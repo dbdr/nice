@@ -12,7 +12,7 @@
 
 // File    : CallExp.java
 // Created : Mon Jul 05 16:27:27 1999 by bonniot
-//$Modified: Mon Jul 24 15:33:58 2000 by Daniel Bonniot $
+//$Modified: Wed Jul 26 14:32:40 2000 by Daniel Bonniot $
 
 package bossa.syntax;
 
@@ -47,7 +47,7 @@ public class CallExp extends Expression
      @param fun the function to call
      @param parameters a collection of Expressions
      @param infix true if the first parameter was written before the function,
-     using dot notation: e.f(x)
+     using the dot notation: x1.f(x2, x3)
    */
   public CallExp(Expression fun, List parameters, boolean infix)
   {
@@ -69,7 +69,7 @@ public class CallExp extends Expression
     List params = new ArrayList(2);
     params.add(param1);
     params.add(param2);
-    return new CallExp(fun,params);
+    return new CallExp(fun, params);
   }
   
   void resolve()
@@ -118,8 +118,9 @@ public class CallExp extends Expression
       return getType(fun.getType(), paramTypes);
     }
     catch(BadSizeEx e){
-      User.error(loc, e.expected+" parameters expected, "+
-		 "not "+e.actual);
+      User.error(loc, fun.toString(Printable.detailed) + 
+		 " expects " + e.expected + " parameters, " +
+		 "not " + e.actual);
     }
     catch(ReportErrorEx e){
       User.error(loc, e.getMessage());
@@ -160,7 +161,7 @@ public class CallExp extends Expression
   
   private static Polytype getType(Polytype funt,
 				  Polytype[] parameters)
-    throws TypingEx,BadSizeEx,ReportErrorEx
+    throws TypingEx, BadSizeEx, ReportErrorEx
   {
     Monotype[] dom = funt.domain();
     Monotype codom = funt.codomain();
@@ -182,13 +183,17 @@ public class CallExp extends Expression
 	}
     
 	if(Typing.dbg)
-	  Debug.println("Parameters:\n"+
-			Util.map("",", ","\n",parameters));
+	  {
+	    Debug.println("Parameters:\n"+
+			  Util.map("",", ","\n",parameters));
+	    Debug.println("Domain:\n"+
+			  Util.map("",", ","\n",dom));
+	  }
 	
 	Typing.in(parameters, Domain.fromMonotypes(dom));
       }
     finally{
-      if(doEnter) 
+      if(doEnter)
 	Typing.leave();
     }
 
@@ -252,9 +257,9 @@ public class CallExp extends Expression
   {
     if(parameters.size()>=1)
       {
-	gnu.bytecode.ClassType javaClass = 
+	declaringClass = 
 	  ((Expression) parameters.get(0)).staticClass();
-	if(javaClass!=null)
+	if(declaringClass != null)
 	  // A static function is called
 	  {
 	    Expression funExp = fun.content();
@@ -278,10 +283,10 @@ public class CallExp extends Expression
 
 	    parameters.remove(0);
 	    List possibilities = new LinkedList();
-	    javaClass.addMethods();
+	    declaringClass.addMethods();
 	    
 	    // search methods
-	    for(gnu.bytecode.Method method = javaClass.getMethods();
+	    for(gnu.bytecode.Method method = declaringClass.getMethods();
 		method!=null; method = method.getNext())
 	      if(method.getName().equals(funName.content) &&
 		 method.arg_types.length==parameters.size())
@@ -295,7 +300,8 @@ public class CallExp extends Expression
 	    // search a field
 	    if(parameters.size()==0)
 	      {
-		gnu.bytecode.Field field = javaClass.getField(funName.toString());
+		gnu.bytecode.Field field = 
+		  declaringClass.getField(funName.toString());
 		if(field!=null)
 		  possibilities.add(JavaMethodDefinition.addFetchedMethod(field).symbol);
 	      }
@@ -310,7 +316,7 @@ public class CallExp extends Expression
   void computeType()
   {
     resolveOverloading();
-    if(type==null)
+    if(type == null)
       type = getTypeAndReportErrors(location(), fun, parameters);
   }
 
@@ -376,9 +382,19 @@ public class CallExp extends Expression
   public String toString()
   {
     if(infix)
-      return parameters.get(0) + "." + fun
-	+ "(" + Util.map("",", ","",parameters.subList(1, parameters.size())) 
-	+ ")";
+      if (declaringClass != null)
+	return declaringClass.getName() +
+	  "." + fun + 
+	  "(" + 
+	  Util.map("",", ","",parameters) +
+	  ")";
+      else
+	return
+	  parameters.get(0) + 
+	  "." + fun + 
+	  "(" + 
+	  Util.map("",", ","",parameters.subList(1, parameters.size())) +
+	  ")";
     else
       return fun + "(" + Util.map("",", ","",parameters) + ")";
   }
@@ -388,4 +404,6 @@ public class CallExp extends Expression
   
   /** true iff the first argument was written before the application: e.f(x) */
   boolean infix;
+  /** Class this static method is defined in, or null */
+  gnu.bytecode.ClassType declaringClass = null;
 }

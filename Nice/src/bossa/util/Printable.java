@@ -12,11 +12,9 @@
 
 // File    : Printable.java
 // Created : Wed Oct 13 14:52:35 1999 by bonniot
-//$Modified: Wed Oct 13 14:54:09 1999 by bonniot $
+//$Modified: Wed Jul 26 14:28:09 2000 by Daniel Bonniot $
 
 package bossa.util;
-
-import bossa.util.*;
 
 /**
  * Interface of classes with a parametrized toString function.
@@ -27,7 +25,8 @@ import bossa.util.*;
 public interface Printable
 {
   /** toString parameters  */
-  static final int inConstraint=0;
+  static final int inConstraint = 0;
+  static final int detailed = 1;
   
   public String toString(int param);
 }

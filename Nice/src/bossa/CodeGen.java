@@ -12,7 +12,7 @@
 
 // File    : CodeGen.java
 // Created : Mon Jun 05 11:28:10 2000 by Daniel Bonniot
-//$Modified: Tue Jun 20 15:06:47 2000 by Daniel Bonniot $
+//$Modified: Tue Jul 25 20:46:59 2000 by Daniel Bonniot $
 
 package bossa;
 
@@ -161,7 +161,7 @@ public final class CodeGen
 	if(res==null)
 	  return null;
 	else
-	  return gnu.bytecode.ArrayType.make(res);
+	  return bossa.SpecialArray.create(res);
       }
     
     if(s.equals("void")) 	return bossa.SpecialTypes.voidType;

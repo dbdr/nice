@@ -12,7 +12,7 @@
 
 // File    : MethodDefinition.java
 // Created : Thu Jul 01 18:12:46 1999 by bonniot
-//$Modified: Thu Jun 22 20:59:50 2000 by Daniel Bonniot $
+//$Modified: Wed Jul 26 14:34:24 2000 by Daniel Bonniot $
 
 package bossa.syntax;
 
@@ -353,6 +353,11 @@ public class MethodDefinition extends Definition
       this.definition = MethodDefinition.this;
     }
 
+    public String toString()
+    {
+      return definition.toString();
+    }
+    
     MethodDefinition definition;
   }
 }

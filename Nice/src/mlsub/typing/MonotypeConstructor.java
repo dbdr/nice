@@ -12,7 +12,7 @@
 
 // File    : MonotypeConstructor.java
 // Created : Thu Jul 22 09:15:17 1999 by bonniot
-//$Modified: Thu Jun 22 21:11:41 2000 by Daniel Bonniot $
+//$Modified: Wed Jul 26 14:45:00 2000 by Daniel Bonniot $
 
 package mlsub.typing;
 
@@ -38,10 +38,10 @@ public final class MonotypeConstructor extends Monotype
   {
     this.tc = tc;
     this.parameters = parameters;
-    if(parameters!=null && parameters.length==0)
-      throw new Error();
+    if(parameters != null && parameters.length == 0)
+      throw new Error("Not optimal");
     
-    // variance is not know yet for java classes
+    // variance is not known yet for java classes
     // ill-formedness shall be discovered later, hopefully
     if (tc.variance != null)
       {

@@ -1,9 +1,12 @@
 package bossa;
+
 import gnu.bytecode.*;
 import gnu.math.IntNum;
 import gnu.math.DFloNum;
 import gnu.expr.*;
 import kawa.lang.*;
+
+import bossa.util.Debug;
 
 /**
    Arrays that are wrapped into objects implementing Sequence when needed.
@@ -11,6 +14,23 @@ import kawa.lang.*;
 
 public final class SpecialArray extends gnu.bytecode.ArrayType
 {
+  /**
+     Return a SpecialArray holding elements of type <tt>elements</tt>.
+  */
+  public static Type create(Type elements)
+  {
+    String prefix;
+    if(elements instanceof PrimType)
+      prefix = elements.getName();
+    else
+      prefix = "Object";
+    Type res = Type.lookupType("[" + elements.getSignature());
+    if(res != null && res instanceof SpecialArray)
+      return res;
+    
+    return new SpecialArray(elements, prefix);
+  }
+  
   private SpecialArray (Type elements, String prefix)
   {
     super (elements);
@@ -19,59 +39,23 @@ public final class SpecialArray extends gnu.bytecode.ArrayType
       specialObjectArray = this;
     
     className = prefix+"Array";
-    setSignature("L"+className+";");
-    //setSignature("["+elements.getSignature());
+    setSignature("["+elements.getSignature());
 
     classType = ClassType.make(className);
     
-    ClassType sequence = ClassType.make("nice.lang.Sequence");
-    sequence.access_flags = Access.PUBLIC|Access.INTERFACE;
-    classType.setInterfaces(new ClassType[]{sequence});
-    
     field = new Field(classType);
     field.setName("value");
-    field.setType(ArrayType.make(elements));
+    field.setType(this);
 
-    try{
-      Type.registerTypeForClass(Class.forName(className), this);
-    }
-    catch(ClassNotFoundException e){
-      bossa.util.Internal.error("Nice class for " + 
-				elements + " arrays not found");
-    }
-    Type.registerTypeForName(className, this);
-  }
-  
-  /**
-     Return a SpecialArray holding elements of type <tt>elements</tt>.
-   */
-  public static Type create(Type elements)
-  {
-    String prefix;
-    if(elements instanceof PrimType)
-      prefix = elements.getName();
-    else
-      {
-	prefix = "Object";
-	elements = Type.pointer_type;
-      }
-    Type res = Type.lookupType(prefix + "Array");
-    if(res!=null && res instanceof SpecialArray)
-      return res;
+    Type.registerTypeForClass(java.lang.reflect.Array.newInstance
+			      (elements.getReflectClass(), 0).getClass(), 
+			      this);
+    Type.registerTypeForName("["+elements.getSignature(), this);
     
-    return new SpecialArray(elements, prefix);
+    makeMethod = classType.getDeclaredMethod("make", 1);
+    
   }
-  
-  public String getNameOrSignature()
-  {
-    return className;
-  }
-  
-  public String getName()
-  {
-    return className;
-  }
-  
+
   public Object coerceFromObject (Object obj)
   {
     return super.coerceFromObject(obj);
@@ -79,7 +63,8 @@ public final class SpecialArray extends gnu.bytecode.ArrayType
 
   public void emitCoerceFromObject (CodeAttr code)
   {
-    code.emitInvokeStatic(makeMethod());
+    code.emitCheckcast(classType);
+    code.emitGetField(field);
   }
 
   public Object coerceToObject (Object obj)
@@ -87,15 +72,23 @@ public final class SpecialArray extends gnu.bytecode.ArrayType
     return super.coerceToObject(obj);
   }
 
+  public void emitCoerceTo (Type toType, CodeAttr code)
+  {
+    if (toType instanceof ArrayType)
+      code.emitCheckcast(toType);
+    else
+      code.emitInvokeStatic(makeMethod());
+  }
+  
   public void emitCoerceToObject (CodeAttr code)
   {
-    code.emitCheckcast(classType);
-    code.emitGetField(field);
+    code.emitInvokeStatic(makeMethod());
   }
 
   public boolean isSubtype (Type other)
   {
-    return other instanceof SpecialArray || classType.isSubtype(other);
+    return other instanceof ArrayType &&
+      elements.isSubtype(((ArrayType) other).getComponentType());
   }
   
   /****************************************************************
@@ -119,14 +112,6 @@ public final class SpecialArray extends gnu.bytecode.ArrayType
   private Method makeMethod;
   public Method makeMethod()
   {
-    if(makeMethod == null)
-      {
-	Type[] args = new Type[] { ArrayType.make(elements) };
-	makeMethod = classType.getDeclaredMethod("make", args, this);
-	
-	if(makeMethod == null)
-	  bossa.util.Internal.error(this + " does not have a make method");
-      }
     return makeMethod;
   }
 
@@ -134,6 +119,6 @@ public final class SpecialArray extends gnu.bytecode.ArrayType
   
   public String toString()
   {
-    return "Special "+super.toString();
+    return "SpecialArray(" + elements + ")";
   }
 }

@@ -12,7 +12,7 @@
 
 // File    : ClassExp.java
 // Created : Wed Mar 29 14:30:13 2000 by Daniel Bonniot
-//$Modified: Wed Jun 14 16:06:20 2000 by Daniel Bonniot $
+//$Modified: Wed Jul 26 14:20:34 2000 by Daniel Bonniot $
 
 package bossa.syntax;
 
@@ -69,7 +69,7 @@ public final class ClassExp extends Expression
     mlsub.typing.TypeConstructor tc = (mlsub.typing.TypeConstructor)
       Node.getGlobalTypeScope().lookup(ident);
 
-    if(tc!=null)
+    if(tc != null)
       {
 	gnu.bytecode.Type type = bossa.CodeGen.javaType(tc);
 	// type might not be a class
@@ -77,9 +77,12 @@ public final class ClassExp extends Expression
 	if (type instanceof gnu.bytecode.ClassType)
 	  res = new ClassExp((gnu.bytecode.ClassType) type);
       }
+
     if(res == null)
       res = new PackageExp(ident);
+
     res.setLocation(loc);
+    
     return res;
   }
   

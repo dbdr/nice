@@ -67,12 +67,12 @@ parse(progName, args, options)
 
   options.iter(fun(Option o)=>
     {
-      if(o.longName!=null)
+      if(o.longName != null)
       {
 	LongOpt l;
 	if(o.noShortName)
 	  {
-	    uniqId=uniqId+1;
+	    uniqId = uniqId+1;
 	    l = new LongOpt(o.longName,optType(o),null,uniqId);
 	  }
 	else
@@ -80,32 +80,32 @@ parse(progName, args, options)
 
 	o.optval = l.getVal();
 
-	if(longOptions==null)
+	if(longOptions == null)
 	  longOptions = makeVector(options.size, l);
 	
 	longOptions.add(l);
       }
 
       if(!o.noShortName)
-        shortOptions=shortOptions+toString(o.shortName)+optSuffix(o);
+        shortOptions = shortOptions + toString(o.shortName) + optSuffix(o);
     });
 
   Getopt g = new Getopt(progName, args, shortOptions, longOptions.elements);
 
   // Parsing loop
-  int c=g.getopt();
+  int c = g.getopt();
   while(!(c.equals(-1)))
     {
       Option choosen = options.find(fun(Option o)=>o.optval.equals(c));
-      if(choosen!=null)
+      if(choosen != null)
 	choosen.doAction(g);
       
-      c=g.getopt();
+      c = g.getopt();
     }
 
   int index = getOptind(g);
   Vector<String> res = makeVector(args.size()-index);
-  for(; index<args.size(); index=index+1)
+  for(; index<args.size(); index = index+1)
     res.add(args.get(index));
 
   return res;
@@ -117,7 +117,7 @@ doAction(o@RequiredParamOption,g) = action(o)(g.getOptarg());
 doAction(o@OptionalParamOption,g)
 {
   String arg = g.getOptarg();
-  if(arg==null)
+  if(arg == null)
     actionNoParam(o)();
   else
     actionParam(o)(arg);
@@ -131,28 +131,33 @@ var int uniqId = 256;
 
 printOptions(os)
 {
-  String res="";
-  os.iter(fun(Option o)=> { res=res+printOption(o); });
+  String res = "";
+  os.iter(fun(Option o)=> { res = res + printOption(o); });
   return res;
 }
 
 String printOption(Option);
 printOption(opt)
 {
-  String res= opt.noShortName ? "    " : ("  -" + opt.shortName);
-  if(opt.longName!=null)
+  int column = 22;
+
+  String res = opt.noShortName ? "    " : ("  -" + opt.shortName);
+  if(opt.longName != null)
     res = res + (opt.noShortName ? " " : ",") + " --"+opt.longName;
   
-  res = pad(res,20,' ') + opt.purpose;
+  if (res.length() < column-1)
+    res = pad(res, column, ' ');
+  else
+    res = res + "\n" + pad("", column, ' ');
 
-  return res+"\n";
+  return res + opt.purpose + "\n";
 }
 
 String pad(String, int, char);
 pad(s,len, c)
 {
   String res = "";
-  for(int i=s.length(); i<len; i=i+1)
+  for(int i = s.length(); i<len; i++)
     res = res + toString(c);
   return s+res;
 }

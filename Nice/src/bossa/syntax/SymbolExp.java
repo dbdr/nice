@@ -12,7 +12,7 @@
 
 // File    : SymbolExpr.java
 // Created : Thu Jul 08 12:20:59 1999 by bonniot
-//$Modified: Fri Jul 21 14:25:04 2000 by Daniel Bonniot $
+//$Modified: Wed Jul 26 14:33:10 2000 by Daniel Bonniot $
 
 package bossa.syntax;
 
@@ -119,6 +119,15 @@ public class SymbolExp extends Expression
   public String toString()
   {
     return symbol.name.toString();
+  }
+
+  public String toString(int param)
+  {
+    if (param == Printable.detailed && 
+	symbol instanceof MethodDefinition.Symbol)
+      return symbol.toString();
+    else
+      return super.toString(param);
   }
 
   private VarSymbol symbol;

@@ -12,7 +12,7 @@
 
 // File    : SpecialTypes.java
 // Created : Mon Jan 17 14:19:30 2000 by bonniot
-//$Modified: Tue Jun 20 14:35:50 2000 by Daniel Bonniot $
+//$Modified: Tue Jul 25 21:23:54 2000 by Daniel Bonniot $
 
 package bossa;
 

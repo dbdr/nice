@@ -12,7 +12,7 @@
 
 // File    : Expression.java
 // Created : Mon Jul 05 16:25:02 1999 by bonniot
-//$Modified: Mon Jul 24 17:38:40 2000 by Daniel Bonniot $
+//$Modified: Wed Jul 26 14:30:49 2000 by Daniel Bonniot $
 // Description : 
 
 package bossa.syntax;
@@ -23,7 +23,7 @@ import bossa.util.*;
 import mlsub.typing.Polytype;
 
 public abstract class Expression extends Node 
-  implements Located
+  implements Located, Printable
 {
   Expression()
   {
@@ -212,6 +212,7 @@ public abstract class Expression extends Node
   }
   
   gnu.expr.Expression compileAssign(gnu.expr.Expression value)
+  // default implementation using getDeclaration()
   {
     gnu.expr.Declaration decl = getDeclaration();
     if (decl != null)
@@ -240,6 +241,13 @@ public abstract class Expression extends Node
     return location;
   }
 
+  // from interface bossa.util.Printable
+  public String toString(int param)
+  {
+    // default implementation
+    return toString();
+  }
+  
   private Location location = Location.nowhere();
   protected Polytype type;
 }

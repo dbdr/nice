@@ -12,7 +12,7 @@
 
 // File    : TypeIdent.java
 // Created : Sat Jul 24 14:02:08 1999 by bonniot
-//$Modified: Tue Jun 13 18:51:12 2000 by Daniel Bonniot $
+//$Modified: Wed Jul 26 14:52:08 2000 by Daniel Bonniot $
 
 package bossa.syntax;
 
@@ -70,16 +70,23 @@ public final class TypeIdent extends Monotype implements Located
   public mlsub.typing.Monotype resolve(TypeScope scope)
   {
     TypeSymbol res = resolveToTypeSymbol(scope);
-    if(res==null)
-      User.error(this, name+" is not defined"," in "+scope);
-
+    if (res == null)
+      User.error(this, name + " is not defined", " in " + scope);
+    
     if (res instanceof MonotypeVar)
       return (MonotypeVar) res;
 
     if (res instanceof TypeConstructor)
       {
 	TypeConstructor tc = (TypeConstructor) res;
-	return new mlsub.typing.MonotypeConstructor(tc, null);
+	try{
+	  return new mlsub.typing.MonotypeConstructor(tc, null);
+	}
+	catch(mlsub.typing.BadSizeEx e){
+	  User.error(this, name + " has " + 
+		     e.expected + 
+		     " type parameter" + (e.expected>1 ? "s" : ""));
+	}
       }
     
     Internal.error("Invalid type ident");
@@ -89,7 +96,7 @@ public final class TypeIdent extends Monotype implements Located
   public mlsub.typing.TypeConstructor resolveToTC(TypeScope scope)
   {
     TypeSymbol res = resolveToTypeSymbol(scope);
-    if(res==null)
+    if (res == null)
       User.error(this, name+" is not defined"," in "+scope);
 
     if (res instanceof TypeConstructor)

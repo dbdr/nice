@@ -12,7 +12,7 @@
 
 // File    : JavaMethodDefinition.java
 // Created : Tue Nov 09 11:49:47 1999 by bonniot
-//$Modified: Tue Jun 20 14:35:08 2000 by Daniel Bonniot $
+//$Modified: Wed Jul 26 14:56:43 2000 by Daniel Bonniot $
 
 package bossa.syntax;
 
@@ -71,7 +71,7 @@ public class JavaMethodDefinition extends MethodDefinition
 			       mlsub.typing.Monotype[] parameters
 			       )
   {
-    super(name, null ,null , null);
+    super(name, null, null , null);
     
     this.className = className;
     this.methodName = methodName;
@@ -98,7 +98,7 @@ public class JavaMethodDefinition extends MethodDefinition
 	    params[n++] = bossa.CodeGen.getMonotype(m.getDeclaringClass());
 	  }
     
-	for(int i=0; i<paramTypes.length; i++)
+	for(int i = 0; i<paramTypes.length; i++)
 	  params[n++] = bossa.CodeGen.getMonotype(paramTypes[i]);
     
 	mlsub.typing.Monotype retType;
@@ -139,12 +139,12 @@ public class JavaMethodDefinition extends MethodDefinition
    */
   public static JavaMethodDefinition addFetchedMethod(Method m)
   {
-    if(declaredMethods.get(m)!=null)
+    if(declaredMethods.get(m) != null)
       return null;
 
     JavaMethodDefinition md = JavaMethodDefinition.make(m, false);
 
-    if(md!=null)
+    if(md != null)
       Node.getGlobalScope().addSymbol(md.symbol);
 
     return md;
@@ -154,12 +154,12 @@ public class JavaMethodDefinition extends MethodDefinition
     (Method m,
      TypeConstructor declaringClass)
   {
-    if(declaredMethods.get(m)!=null)
+    if(declaredMethods.get(m) != null)
       return null;
     
     JavaMethodDefinition md = JavaMethodDefinition.make(m, true);
     
-    if(md!=null)
+    if(md != null)
       TypeConstructors.addConstructor(declaringClass, md);
 
     return md;
@@ -184,7 +184,7 @@ public class JavaMethodDefinition extends MethodDefinition
   private gnu.bytecode.Type type(LocatedString s)
   {
     Type res = bossa.CodeGen.type(s.toString());
-    if(res==null)
+    if(res == null)
       User.error(s, "Unknown java class "+s);
     return res;
   }
@@ -223,27 +223,8 @@ public class JavaMethodDefinition extends MethodDefinition
   
   private void findReflectMethod()
   {
-    if(reflectMethod!=null)
+    if(reflectMethod != null)
       return;
-    
-    javaArgType = new Type[javaTypes.size()-1];
-    
-    for(int i=1;i<javaTypes.size();i++)
-      {
-	LocatedString t = (LocatedString) javaTypes.get(i);
-	
-	javaArgType[i-1] = type(t);
-	
-	// set the fully qualified name back
-	javaTypes.set(i,new LocatedString(javaArgType[i-1].getName(),
-					  t.location()));
-      }
-
-    LocatedString t = (LocatedString) javaTypes.get(0);
-    javaRetType = type(t);
-    
-    // set the fully qualified name of the return type back
-    javaTypes.set(0,new LocatedString(javaRetType.getName(),t.location()));
     
     Type holder = bossa.CodeGen.type(className.toString());
     if(holder == null)
@@ -260,27 +241,51 @@ public class JavaMethodDefinition extends MethodDefinition
     
     className = new LocatedString(holder.getName(), className.location());
     
+    javaArgType = new Type[javaTypes.size()-1];
+    
+    for(int i = 1; i<javaTypes.size(); i++)
+      {
+	LocatedString t = (LocatedString) javaTypes.get(i);
+	
+	javaArgType[i-1] = type(t);
+	
+	// set the fully qualified name back
+	javaTypes.set(i,new LocatedString(javaArgType[i-1].getName(),
+					  t.location()));
+      }
+    
+    LocatedString t = (LocatedString) javaTypes.get(0);
+    javaRetType = type(t);
+    
+    // set the fully qualified name of the return type back
+    javaTypes.set(0, new LocatedString(javaRetType.getName(), t.location()));
+    
     reflectMethod = ((ClassType) holder).getDeclaredMethod
-      (methodName,javaArgType);
+    (methodName, javaArgType);
+    
+    if(reflectMethod==null)
+      reflectMethod = ((ClassType) holder).getDeclaredMethod
+      (methodName, javaArgType);
+    
+    if(reflectMethod == null)
+      User.error(this, this + " was not found in " + holder);
+
     // use the following, or the Type.flushTypeChanges() in SpecialTypes
     //reflectMethod.arg_types = javaArgType;
     //if(!methodName.equals("<init>"))
     //reflectMethod.return_type = javaRetType;
-
-    if(reflectMethod == null)
-      User.error(this, this + " was not found in " + holder);
-
+    
     declaredMethods.put(reflectMethod, Boolean.TRUE);
-
+    
     //if (reflectMethod.isConstructor())
     //.addConstructor(this);
     
     if(reflectMethod.getStaticFlag() || reflectMethod.isConstructor())
-      javaArity=arity;
+      javaArity = arity;
     else
-      javaArity=arity-1;
-
-    if(javaTypes!=null && javaTypes.size()-1!=javaArity)
+      javaArity = arity-1;
+    
+    if(javaTypes != null && javaTypes.size()-1 != javaArity)
       User.error(this,
 		 "Native method "+this.symbol.name+
 		 " has not the same number of parameters "+
@@ -311,7 +316,7 @@ public class JavaMethodDefinition extends MethodDefinition
     if(methodName.equals("<init>"))
        res += "new " + className;
     else
-      res +=  javaReturnType().getName() 
+      res +=  javaTypes.get(0) 
 	+ " " + className 
 	+ "." + methodName;
     
@@ -325,25 +330,16 @@ public class JavaMethodDefinition extends MethodDefinition
     if(types == null)
       return "((NULL))";
     
-    String res="(";
-    for(int n=0;n<types.length;n++)
+    String res = "(";
+    for(int n = 0; n<types.length; n++)
       {
-	if(n!=0)
-	  res+=", ";
+	if(n != 0)
+	  res += ", ";
 	if(types[n] == null)
-	  res+="[NULL]";
+	  res += "[NULL]";
 	else
-	  res+=types[n].getName();
+	  res += types[n].getName();
       }
-    return res+")";
-  }
-    
-  /************************************************************
-   * Printing
-   ************************************************************/
-
-  public String toString()
-  {
-    return "native "+super.toString();
-  }
+    return res + ")";
+  }    
 }

@@ -1,0 +1,59 @@
+package regtest.basic;
+
+class A
+{
+  int x;
+}
+
+void bidon();
+bidon()
+{}
+
+main(args)
+{
+  A a = new A();
+  int i;
+  boolean b = false;
+
+  // test how surabondant value is discarded
+  
+  if (b)
+    i = 14;
+  else
+    bidon();
+
+  if (b)
+    i++;
+  else
+    bidon();
+
+  if (b)
+    --i;
+  else
+    bidon();
+
+  if (b)
+    a.x = 17;
+  else
+    bidon();
+
+  if (b)
+    a.x--;
+  else
+    bidon();
+  
+  if (b)
+    ++a.x;
+  else
+    bidon();
+
+  bidon(1, 2);
+
+  String s1;
+  fun(String s2) => { s1 = s2; };
+
+  // Arrays
+
+  Vector<String> v = makeVector(1);
+  v.elements.size();
+}

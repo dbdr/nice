@@ -12,7 +12,7 @@
 
 // File    : ExpressionRef.java
 // Created : Tue Aug 17 16:04:40 1999 by bonniot
-//$Modified: Mon Jul 24 18:01:53 2000 by Daniel Bonniot $
+//$Modified: Wed Jul 26 14:53:54 2000 by Daniel Bonniot $
 
 package bossa.syntax;
 
@@ -156,6 +156,11 @@ final public class ExpressionRef extends Expression
   public String toString()
   {
     return content.toString();
+  }
+
+  public String toString(int param)
+  {
+    return content.toString(param);
   }
 
   Expression content()

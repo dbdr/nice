@@ -12,7 +12,7 @@
 
 // File    : IdentExp.java
 // Created : Mon Jul 05 16:25:58 1999 by bonniot
-//$Modified: Sat Jun 17 13:29:15 2000 by Daniel Bonniot $
+//$Modified: Wed Jul 26 14:02:07 2000 by Daniel Bonniot $
 
 package bossa.syntax;
 
@@ -37,18 +37,20 @@ public class IdentExp extends Expression
   Expression resolveExp()
   {
     List symbols = scope.lookup(ident);
-    if(symbols.size()>1)
-       return new OverloadedSymbolExp(symbols, ident, scope);
 
-    if (symbols.size() == 0)
-      if(ignoreInexistant)
-	return this;
-      else if(enableClassExp)
-	return ClassExp.create(ident);
-      else
-	User.error(ident, "Variable "+ident+" is not declared");
-    
-    return new SymbolExp((VarSymbol) symbols.get(0));
+    if (symbols.size() > 1)
+      return new OverloadedSymbolExp(symbols, ident, scope);
+    if (symbols.size() == 1)
+      return new SymbolExp((VarSymbol) symbols.get(0));
+
+    // symbols.size() == 0
+    if(ignoreInexistant)
+      return this;
+    else if(enableClassExp)
+      return ClassExp.create(ident);
+    else
+      User.error(ident, "Variable "+ident+" is not declared");    
+    return null;
   }
 
   /****************************************************************

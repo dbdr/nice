@@ -167,6 +167,11 @@ void test_polymorphism()
   double[] d = [ 14, 17 ];
   String[] S = [ "Quatorze", "Dix-sept" ];
 
+  // empty array
+  // can be written with or without space inside the brackets
+  b = [];
+  d = [ ];
+
   byte bb   = getFirst(b);
   short ss  = getFirst(s);
   int ii    = getFirst(i);

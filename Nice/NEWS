@@ -41,7 +41,7 @@ nice (0.9.6)
     integer constants, overloading of function symbols, printing of string
     literals with escaped chars, implicit 'this' for functional fields, ... )
 
- --
+ -- Fri, 20 Feb 2004 18:04:18 +0100
 
 nice (0.9.5)
 

@@ -369,6 +369,8 @@ public gnu.expr.Expression getDispatchMethod(NiceMethod def, Module module)
         receiver = null;
     }
 
+  let fullName = def.getFullName();
+
   /*
     If this package is not recompiled,
     we fetch the bytecode type information
@@ -379,8 +381,8 @@ public gnu.expr.Expression getDispatchMethod(NiceMethod def, Module module)
       as the precise types are found during typechecking.
   */
   ?gnu.bytecode.Method meth = module.pkg.lookupDispatchClassMethod
-   (receiver == null ? null : receiver.getClassType(),
-    name, "id", def.getFullName());
+    (receiver == null ? null : receiver.getClassType(), name, "id", fullName);
+
   if (meth != null) // Reuse existing dispatch method header
     {
       // The dispatch code will have to be regenerated anyway
@@ -409,7 +411,7 @@ public gnu.expr.Expression getDispatchMethod(NiceMethod def, Module module)
 
   // add unique information to disambiguate which method this represents
   res.addBytecodeAttribute
-    (new gnu.bytecode.MiscAttr("id", def.getFullName().getBytes()));
+    (new gnu.bytecode.MiscAttr("id", fullName.getBytes()));
 
   if (receiver != null)
     return receiver.addJavaMethod(res);

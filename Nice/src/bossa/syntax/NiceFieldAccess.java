@@ -34,7 +34,7 @@ import java.util.*;
  */
 public class NiceFieldAccess extends FieldAccess
 {
-  public NiceFieldAccess (NiceClass classDef, NiceClass.Field field)
+  NiceFieldAccess (NiceClass classDef, NiceClass.Field field)
   {
     super(field.sym.name, 
 	  Constraint.create(classDef.definition.getTypeParameters()),

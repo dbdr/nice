@@ -293,7 +293,17 @@ public class MethodBodyDefinition extends Definition
 
     // We can resolve now
     Pattern.resolveType(this.typeScope, formals);
-    super.doResolve();
+
+    if (!Debug.niceResolve)
+      super.doResolve();
+    else
+      try{
+	body = bossa.syntax.dispatch.analyse$0(body, scope, typeScope);
+      }
+      catch(RuntimeException e){
+	Debug.println("Nice analysis error: " + e);
+	e.printStackTrace();
+      }
   }
 
   /****************************************************************
@@ -317,9 +327,7 @@ public class MethodBodyDefinition extends Definition
   void typecheck()
   {
     lateBuildScope();
-
-    bossa.syntax.analyse$0(body, scope, typeScope);
-
+    
     Typing.enter("METHOD BODY " + this + "\n\n");
     // remeber that enter was called, to leave.
     // usefull if previous code throws an exception

@@ -1,0 +1,268 @@
+/****************************************************************************
+ *                                 N I C E                                  *
+ *              A high-level object-oriented research language              *
+ *                         (c) Daniel Bonniot 2003                          *
+ *                                                                          *
+ *  This package is free software; you can redistribute it and/or modify    *
+ *  it under the terms of the GNU General Public License as published by    *
+ *  Free Software Foundation; either version 2 of the License, or (at your  *
+ *  option) any later version.                                              *
+ *                                                                          *
+ *  As a special exception, the copyright holders of this library give you  *
+ *  permission to link this library with independent modules to produce an  *
+ *  executable, regardless of the license terms of these independent        *
+ *  modules, and to copy and distribute the resulting executable under      *
+ *  terms of your choice.                                                   *
+ ****************************************************************************/
+
+/**
+ * Methods for operating on files and directories.
+ *
+ * @author Bryn Keller <xoltar@xoltar.org>
+ */
+
+package nice.io;
+
+import nice.functional;
+
+class File = native java.io.File;
+
+/** Path concatenation */
+<T> File `/`(File dir, !T file) = new File(dir.getCanonicalPath() 
+				     + separator + file.toString());
+
+private class NiceFilter implements java.io.FileFilter {
+  File->boolean acceptFunc;
+  accept(file) = acceptFunc(file);
+}
+
+/**
+ * Returns all the files and directories in the given directory.
+ * If the filter function is provided, then only files and
+ * directories for which the filter function returns true will
+ * be included.
+ */
+File[] listDir(File dir, File->boolean filter = always(true)) =
+  cast(java.io.File.listFiles(dir, new NiceFilter(acceptFunc: filter)));
+
+
+/**
+ * Traverses a directory structure and returns a preordered
+ * list of all files/directories in
+ * all subdirectories which match the filter.
+ */
+void->File traverse(File dir, File->boolean filter = always(true))
+  requires dir.isDirectory() :  "Only directories can be passed to traverse()."
+{ 
+  //Explicit stack management, since 
+  //Java doesn't do tail call elimination...
+  let stack = new Stack();
+  var current = dir.listDir(filter).iterator();
+  return () => {
+    while(!current.hasNext()) {
+      if (stack.isEmpty()) {
+	stop();
+      } else {
+	current = stack.pop();
+      } 
+    }
+    let f = current.next();
+    if (f.isDirectory()) {
+      stack.push(current);
+      current = f.listDir(filter).iterator();
+    }
+    return f;
+  };
+}
+
+private let String TEST = "This is a test.\nThis is only a test";
+
+
+/** 
+ * Opens a file, writes the given text to it, and closes the file.
+ */
+void write(File file, String text, ?String encoding = null) 
+  requires file.isFile() : "Only files can be written"
+{
+  let writer = (encoding == null)
+               ? new java.io.FileWriter(file)
+               : new java.io.OutputStreamWriter(
+				new java.io.FileOutputStream(file),
+				encoding);
+  using(writer) {
+    writer.write(text);
+  }
+}
+
+var int blockSize = 2048;
+
+/**
+ * Opens a file and reads the contents into a String.
+ */
+String read(File file, ?String encoding = null) 
+    requires file.exists(): "File " file " does not exist",
+            file.isFile(): file + " is not a normal file. Only normal files can be read."
+{
+  let chars = new char[blockSize];
+  let buff = new StringBuffer();
+  let input = new BufferedReader(
+                    (encoding == null) 
+                        ? new java.io.FileReader(file)
+                        : new java.io.InputStreamReader(
+			                new java.io.FileInputStream(file), encoding)
+                            );
+  using(input) {
+    var count = 0;
+    while((count = input.read(chars, 0, blockSize)) > 0)
+      buff.append(chars, 0, count);
+  }
+  return buff.toString();
+}
+
+/**
+ * Opens a file and returns a generator which yields the lines contained in the file,
+ * one by one.
+ */
+void->String readLines(File file, ?encoding = null)
+    requires file.exists(): "File " file " does not exist",
+            file.isFile(): file + " is not a normal file. Only normal files can be read."
+{
+  let input = new BufferedReader(
+                    (encoding == null) 
+                        ? new java.io.FileReader(file)
+                        : new java.io.InputStreamReader(
+			                new java.io.FileInputStream(file), encoding)
+                            );
+  void close() { input.close(); stop(); }
+  return ()=> try {
+    return input.readLine() || close();
+    } catch (Throwable t) {
+        input.close();
+        throw t;
+    }
+}
+
+/**
+ * Returns the standard temp directory. 
+ */
+File getTempDir() {
+  //There must be a better way?
+  let f = createTempFile("getTempDir", "test");
+  let d = f.getParentFile().notNull();
+  f.delete();
+  return d;
+}
+
+void _testReadWriteFile() {
+  let f = createTempFile("_testReadWriteFile", ".tmp");
+  f.write(TEST);
+  let s = f.read();
+  assert s.equals(TEST);
+  f.delete();
+}
+
+void _testReadWriteWithEncoding() {
+  let f = createTempFile("_testReadWriteFileWithEncoding", ".tmp");
+  f.write(TEST, "UTF-16");
+  let s2 = f.read("UTF-16");
+  assert s2.equals(TEST);
+  f.delete();
+}
+
+class DirFixture implements Disposable {
+  List<File> dirs = [];
+  List<File> files = [];
+  {
+    /*
+      one
+        a.txt
+	b.bmp
+        two
+	    c.txt
+	    three
+	four
+	    d.txt
+    */
+    let tmpdir = getTempDir();
+    let one = tmpdir/"one";
+    let two = one/"two";
+    let three = two/"three";
+    let four = one/"four";
+    dirs = [one,two,three,four];
+    dirs.map(mkdir);
+    let f1 = new File(one, "a.txt");
+    let f2 = new File(one, "b.bmp");
+    let f3 = new File(two, "c.txt");
+    let f4 = new File(four, "d.txt");
+    files = [f1,f2,f3,f4];
+    files.map(createNewFile);
+  }
+  dispose() {
+    for(f:files) delete(f);
+    for(f:dirs) delete(f);
+  }
+}
+
+void _testTraverse() {
+  using(new DirFixture()) {
+    let tmpdir = getTempDir();
+    let gen = traverse(tmpdir/"one");
+    void test(File file) {
+      let res = gen();
+      assert res.equals(file) : "Expected " + file + " got " + res;
+    }
+    test(tmpdir/"one"/"two");  
+    test(tmpdir/"one"/"two"/"three");
+    test(tmpdir/"one"/"two"/"c.txt");
+    test(tmpdir/"one"/"four");
+    test(tmpdir/"one"/"four"/"d.txt");
+    test(tmpdir/"one"/"a.txt");
+    test(tmpdir/"one"/"b.bmp");    
+    try {
+      gen();
+      assert false;
+    } catch (GeneratorEnd e) {}
+  }
+}
+
+void _testTraverseWithFilter() {
+  using(new DirFixture()) {
+    let tmpdir = getTempDir();
+    let gen = traverse(tmpdir/"one", isDirectory);
+    void test(File file) {
+      let res = gen();
+      assert res.equals(file) : "Expected " + file + " got " + res;
+    }
+    test(tmpdir/"one"/"two");  
+    test(tmpdir/"one"/"two"/"three");
+    test(tmpdir/"one"/"four");
+    try {
+      gen();
+      assert false;
+    } catch (GeneratorEnd e) {}
+  }
+}
+
+void _testTraverseWithFilter2() {
+  using(new DirFixture()) {
+    let tmpdir = getTempDir();
+    let gen = traverse(tmpdir/"one", 
+		File f => f.toString().endsWith(".bmp")
+		         || f.isDirectory());
+    void test(File file) {
+      let res = gen();
+      assert res.equals(file) : "Expected " + file + " got " + res;
+    }
+    test(tmpdir/"one"/"two");  
+    test(tmpdir/"one"/"two"/"three");
+    test(tmpdir/"one"/"four");
+    test(tmpdir/"one"/"b.bmp");    
+    try {
+      gen();
+      assert false;
+    } catch (GeneratorEnd e) {}
+  }
+}
+
+
+

@@ -211,6 +211,7 @@ publish:
 libs:
 	@echo "Building libraries..."
 	$(NICEC1) nice.functional
+	$(NICEC1) nice.io
 
 testengine:
 	@echo "Building the testsuite engine..."

@@ -61,7 +61,7 @@ public class Keyword extends CpsProcedure implements Printable, Externalizable
 
   /**
    * Search vals[0:offset-1] for a keyword.
-   * Each key at vals[i] is followed by a value at keys[i+1].
+   * Each key at vals[i] is followed by a value at vals[i+1].
    * (This is used to search for a keyword parameter in an argument list.)
    * @param vals the list to search in
    * @param offset the index in vals to start the search at

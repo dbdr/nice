@@ -109,6 +109,7 @@
     />
     <mac-javac-single includes="nice/tools/util/System.java" />
     <mac-nicec-old package="nice.tools.repository" args="-R" />
+    <mac-nicec-old package="nice.tools.visibility" args="-r" />
     <mac-javac-multi>
       <include>
         <include name="bossa/syntax/dispatch.java" />

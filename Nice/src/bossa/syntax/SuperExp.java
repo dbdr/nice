@@ -40,18 +40,14 @@ public class SuperExp extends Expression
 
     MethodDeclaration decl = currentMethod.getDeclaration();
     gnu.expr.Expression code;
-    if (decl instanceof NiceMethod)
-      superAlternative = getSuper((NiceMethod) decl);
-    else
-      getSuper((JavaMethod) decl);
+    superAlternative = getSuper(decl);
   }
 
   MethodBodyDefinition currentMethod;
   Alternative superAlternative = null;
-  MethodBodyDefinition superImplementation = null;
   Method superMethod = null;
 
-  private Alternative getSuper(NiceMethod decl)
+  private Alternative getSuper(MethodDeclaration decl)
   {
     Alternative superAlt = null;
     Alternative current = currentMethod.getAlternative();
@@ -77,38 +73,39 @@ public class SuperExp extends Expression
 	    }
       }
 
-    if (superAlt == null)
-      throw User.error(this, "There is no super implementation to call");
+    if (superAlt != null)
+      return superAlt;
 
-    return superAlt;
+    if (decl instanceof JavaMethod)
+      {
+	getSuper((JavaMethod) decl);
+	return null;
+      }
+    else
+      throw User.error(this, "There is no super implementation to call");
   }
 
   private void getSuper(JavaMethod decl)
   {
-    for (java.util.Iterator i = decl.getImplementations();
-	 i.hasNext();)
-      {
-	MethodBodyDefinition impl = (MethodBodyDefinition) i.next();
-	if (leq(impl, currentMethod))
-	  continue;
-	
-	if (superImplementation == null || leq(impl, superImplementation))
-	  superImplementation = impl;
-      }
-
-    Method thisMethod = decl.reflectMethod;
     Type firstArg = nice.tools.code.Types.get(currentMethod.firstArgument());
     if (! (firstArg instanceof ClassType))
       throw User.error(this, "The first argument of this method is not a class");
-    ClassType superClass = ((ClassType) firstArg).getSuperclass();
-    if (superClass != null)
-      {
-	superMethod = superClass.getMethod(thisMethod.getName(), thisMethod.getParameterTypes());
-	if (superMethod != null)
-	  return;
-      }
+    superMethod = getImplementationAbove(decl, (ClassType) firstArg);
+    if (superMethod != null)
+      return;
 
     throw User.error(this, "There is no super implementation to call");
+  }
+
+  public static Method getImplementationAbove(JavaMethod decl, ClassType firstArg)
+  {
+    Method thisMethod = decl.reflectMethod;
+    ClassType superClass = firstArg.getSuperclass();
+    if (superClass == null)
+      return null;
+    
+    return superClass.getMethod(thisMethod.getName(), 
+				thisMethod.getParameterTypes());
   }
 
   private boolean leq(MethodBodyDefinition a, MethodBodyDefinition b)
@@ -136,24 +133,20 @@ public class SuperExp extends Expression
 	  constraint = addLeq(type.getConstraint(), superAlternative.getPatterns(), monotype.domain());
 	else
 	  {
-	    TypeConstructor superTC;
-	    if (superImplementation != null)
-	      superTC = superImplementation.firstArgument();
-	    else
+	    TypeConstructor superTC = findTCforClass
+	      (currentMethod.firstArgument(), 
+	       superMethod.getDeclaringClass());
+
+	    if (superTC == null)
 	      {
-		superTC = findTCforClass
-		  (currentMethod.firstArgument(), superMethod.getDeclaringClass());
-		if (superTC == null)
-		  {
-		    // This probably means that super comes from a special
-		    // class that is not in the Nice hierarchy, like
-		    // java.lang.Object (because of variances).
+		// This probably means that super comes from a special
+		// class that is not in the Nice hierarchy, like
+		// java.lang.Object (because of variances).
 		    
-		    // Our safe bet is to assert that the argument is 
-		    // above Object
-		    superTC = JavaClasses.object
-		      (currentMethod.firstArgument().variance.arity());
-		  }
+		// Our safe bet is to assert that the argument is 
+		// above Object
+		superTC = JavaClasses.object
+		  (currentMethod.firstArgument().variance.arity());
 	      }
 
 	    constraint = addLeq
@@ -211,7 +204,8 @@ public class SuperExp extends Expression
     else
       // It does not matter which method is called (the super method or
       // the base method), a call to super is emited.
-      code = new QuoteExp(PrimProcedure.specialCall(superMethod));
+      code = ((NiceClass) ClassDefinition.get(currentMethod.firstArgument()).implementation).
+	callSuperMethod(superMethod);
 
     return new gnu.expr.ApplyExp(code, currentMethod.compiledArguments());
   }

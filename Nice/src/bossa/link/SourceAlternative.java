@@ -22,17 +22,22 @@ import bossa.syntax.*;
    @author Daniel Bonniot (bonniot@users.sourceforge.net)
  */
 
-public class SourceAlternative extends Alternative
+public class SourceAlternative extends Alternative implements Located
 {
   public SourceAlternative(MethodBodyDefinition implementation)
   {
     super(implementation.getDeclaration().getName().toString(), 
-	  ((NiceMethod) implementation.getDeclaration()).getFullName(), 
+	  implementation.getDeclaration().getFullName(), 
 	  implementation.getPatterns());
     this.implementation = implementation;
   }
 
   private MethodBodyDefinition implementation;
+
+  public Location location()
+  {
+    return implementation.location();
+  }
 
   String printLocated()
   {

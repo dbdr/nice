@@ -146,15 +146,7 @@ that tests if any two objects are equal.
 <tr>
 <td>
 <blockquote>
-<pre>class Object
-{
-&nbsp; boolean equals(Object that)
-&nbsp; {
-&nbsp;&nbsp;&nbsp; return this == that;
-&nbsp; }
-}
-
-class Person extends Object&nbsp;
+<pre>class Person
 {
 &nbsp; String name;
 &nbsp; int age;
@@ -173,11 +165,7 @@ class Person extends Object&nbsp;
 
 <td>
 <blockquote>
-<pre>&lt;<font color="#B7860B">Any</font> T> <font color="#B7860B">boolean</font> <font color="#CD0000">equals</font>(T, T);
-
-<font color="#CD0000">equals</font>(o1, o2) = o1==o2;
-
-<font color="#0000EE">class</font> <font color="#CD0000">Person
+<pre><font color="#0000EE">class</font> <font color="#CD0000">Person
 </font>{
 &nbsp; <font color="#B7860B">String</font> <font color="#CD0000">name</font>;
 &nbsp; <font color="#B7860B">int</font> <font color="#CD0000">age</font>;
@@ -191,11 +179,11 @@ class Person extends Object&nbsp;
 </tr>
 </table></center>
 
-<p>In the Nice version, the last <tt>equals</tt> alternative will be executed
-when both parameters are instance of class <tt>Person</tt>. 
+<p>In the Nice version, this implementation of <tt>equals</tt> will be executed
+when both parameters are instances of class <tt>Person</tt>. 
 So the type of the second argument is also known, and no manual 
 <tt>instanceof</tt> and no cast are necessary (red parts of the java code). 
-This job is sort of automatically done by the compiler for you. 
+This job is automatically done by the compiler for you. 
 The code looks cleaner, it is simpler to understand,
 and it is automatically guaranteed that no runtime exception will occur
 (this simple java code would not break either, but you have to think about

@@ -444,7 +444,7 @@ abstract public class ClassDefinition extends MethodContainer
   private static HashMap tcToClassDef;
   public static void reset() { tcToClassDef = new HashMap(); }
   
-  static final ClassDefinition get(TypeConstructor tc)
+  public static final ClassDefinition get(TypeConstructor tc)
   {
     return (ClassDefinition) tcToClassDef.get(tc);
   }
@@ -664,5 +664,10 @@ abstract public class ClassDefinition extends MethodContainer
   }
 
   ClassImplementation implementation;
+
+  public ClassImplementation getImplementation()
+  {
+    return implementation;
+  }
 }
 

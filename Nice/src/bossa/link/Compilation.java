@@ -21,6 +21,7 @@ import gnu.bytecode.ClassType;
 import gnu.expr.Expression;
 
 import nice.tools.code.Gen;
+import bossa.util.User;
 
 import java.util.*;
 
@@ -94,8 +95,117 @@ public final class Compilation
       return matchCase;
     else
       return gnu.expr.SimpleIfExp.make
-	(alt.matchTest(params), 
+	(alt.matchTest(params, false), 
 	 matchCase, 
 	 dispatch(sortedAlternatives, returnType, voidReturn, params));
+  }
+
+  /****************************************************************
+   * Java Methods
+   ****************************************************************/
+
+  static void compile(JavaMethod m, 
+		      Stack sortedAlternatives, 
+		      bossa.modules.Package module)
+  {
+    int arity = m.getArity();
+
+    while (sortedAlternatives.size() > 0) 
+      {
+	// We pick a class, and compile all implementations whose
+	// first argument is at that class.
+	Iterator i = sortedAlternatives.iterator();
+	Alternative a = (Alternative) i.next();
+	NiceClass c = declaringClass(m, a);
+	i.remove();
+
+	List l = new LinkedList();
+	l.add(a);
+	while (i.hasNext())
+	  {
+	    a = (Alternative) i.next();
+	    if (declaringClass(m, a) == c)
+	      {
+		l.add(a);
+		i.remove();
+	      }
+	  }
+
+	Expression[] params = new Expression[arity];
+	LambdaExp lambda = 
+	  Gen.createMemberMethod
+	    (m.getName().toString(), 
+	     c.getClassExp().getType(), 
+	     m.javaArgTypes(),
+	     m.javaReturnType(),
+	     params);
+
+	c.addJavaMethod(lambda);
+	Expression body = dispatchJavaMethod
+	  (l.iterator(), m.javaReturnType(), m.javaReturnType().isVoid(), 
+	   params, (ClassType) c.getClassExp().getType(), m);
+	Gen.setMethodBody(lambda, body);
+      }
+  }
+
+  private static NiceClass declaringClass(JavaMethod m, Alternative alt)
+  {
+    mlsub.typing.TypeConstructor firstArgument = alt.getPatterns()[0].tc;
+    ClassDefinition def = ClassDefinition.get(firstArgument);
+
+    if (def == null || ! (def.getImplementation() instanceof NiceClass))
+      throw User.error(alt, 
+		       m + " is a native method.\n" + 
+		       "It can not be overriden because the first argument" +
+		       (firstArgument == null 
+			? "" 
+			: " " + firstArgument.toString())
+		       + " is not a class defined in Nice");
+
+    return (NiceClass) def.getImplementation();
+  }
+
+  private static Expression dispatchJavaMethod
+    (Iterator sortedAlternatives, 
+     Type returnType, 
+     boolean voidReturn,
+     Expression[] params,
+     ClassType c, JavaMethod m)
+  {
+    if (!sortedAlternatives.hasNext())
+      {
+	// Call super.
+	ClassType superClass = c.getSuperclass();
+	gnu.bytecode.Method superMethod = superClass.getMethod
+	  (m.getName().toString(), m.javaArgTypes());
+	if (superMethod != null)
+	  return new ApplyExp
+	    (new QuoteExp(PrimProcedure.specialCall(superMethod)), params);
+	
+	// We produce code that should never be reached at run-time.
+
+	Expression message = new QuoteExp("Message not understood");
+	Expression exception = new ApplyExp(new InstantiateProc(newError), 
+					    new Expression[]{ message });
+	Expression throwExp = 
+	  new ApplyExp(nice.lang.inline.Throw.instance,
+		       new Expression[]{exception});
+
+	return throwExp;
+      }
+
+    Alternative alt = (Alternative) sortedAlternatives.next();
+    Expression matchCase = new ApplyExp(alt.methodExp(), params);
+
+    if(voidReturn)
+      matchCase = new BeginExp(matchCase, Gen.returnVoid());
+    else
+      matchCase = Gen.returnValue(matchCase);
+    
+    return gnu.expr.SimpleIfExp.make
+      (alt.matchTest(params, /* skip first */ true), 
+       matchCase, 
+       dispatchJavaMethod(sortedAlternatives, returnType, voidReturn, 
+			  params, c, m));
   }
 }

@@ -28,7 +28,7 @@ import gnu.expr.ClassExp;
    A Nice package.
    
    @version $Date$
-   @author Daniel Bonniot (d.bonniot@mail.dotcom.fr)
+   @author Daniel Bonniot (bonniot@users.sourceforge.net)
  */
 public class Package implements mlsub.compilation.Module, Located, bossa.syntax.Module
 {
@@ -153,7 +153,8 @@ public class Package implements mlsub.compilation.Module, Located, bossa.syntax.
     for(Method method = source.getBytecode().getMethods();
 	method != null;
 	method = method.getNext())
-      bossa.link.ImportedAlternative.read(source.getBytecode(), method);
+      bossa.link.ImportedAlternative.read(source.getBytecode(), method,
+					  location());
   }
   
   /****************************************************************
@@ -552,7 +553,6 @@ public class Package implements mlsub.compilation.Module, Located, bossa.syntax.
   public void addImplementationClass(gnu.expr.ClassExp classe)
   {
     thisPkg.addClass(classe);
-    classe.outer = getImplementationClass();
   }
 
   public gnu.expr.Declaration addGlobalVar(String name, Type type)
@@ -749,21 +749,6 @@ public class Package implements mlsub.compilation.Module, Located, bossa.syntax.
   {
     ClassExp classe = packageMethod ? getImplementationClass() : dispatchClass;
     return classe.addMethod(method);
-  }
-
-  public ClassExp getClassExp(NiceClass def)
-  {
-    if (compiling())
-      return def.createClassExp();
-
-    String name = def.getName().toString();
-    ClassType classe = source.readClass(name);
-    if (classe == null)
-      Internal.error("Compiled class " + def + " was not found");
-
-    Type.registerTypeForName(name, classe);
-
-    return new ClassExp(classe);
   }
 
   public String bytecodeName()

@@ -202,6 +202,8 @@ public class ApplyExp extends Expression
 	// but we do not have the right information until the rewrite pass
 	// is finished.  Perhaps InlineCalls would work?  FIXME
         String msg = null;
+	if (func_lambda.isClassMethod())
+	  args_length--;
 	if (args_length < func_lambda.min_args)
           msg = "too few args for ";
 	else if (func_lambda.max_args >= 0
@@ -231,7 +233,7 @@ public class ApplyExp extends Expression
 
 	    boolean varArgs = func_lambda.restArgType() != null;
 	    PrimProcedure.compileArgs(args,
-				      extraArg > 0 ? Type.void_type : null,
+				      func_lambda.isClassMethod() ? (Type) method.getDeclaringClass() : extraArg > 0 ? Type.void_type : null,
 				      argTypes, varArgs,
 				      func_name, func_lambda, comp);
 	    code.emitInvoke(method);

@@ -150,6 +150,41 @@ void m(A);
 m(@A) { if (false) m(new A()); }
 
 /// PASS
+  /// COMMENT super defined in an imported package for a java method.
+  /// package a
+  /// Toplevel
+class C
+{
+  toString() = "C";
+}
+
+  /// package b import a
+  assert new D().toString().equals("CD");
+  /// Toplevel
+class D extends C
+{
+  toString() = super + "D";
+}
+
+/// FAIL
+  /// COMMENT super defined in an imported package for a java method.
+  /// package a
+  /// Toplevel
+abstract class C {}
+abstract class D extends C {}
+
+equals(x@C, y@D) = true;
+equals(x@D, y@C) = true;
+
+
+  /// package b import a
+  /// Toplevel
+abstract class E extends D
+{
+  equals(x@D) = /*/// FAIL HERE */ super; // This is ambiguous.
+}
+
+/// PASS
   assert (new C().foo() == 1);
   /// Toplevel
 class A {

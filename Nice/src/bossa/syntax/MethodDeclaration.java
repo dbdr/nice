@@ -236,7 +236,7 @@ abstract public class MethodDeclaration extends Definition
   private MethodDeclaration.Symbol symbol;
   MethodDeclaration.Symbol getSymbol() { return symbol; }
 
-  class Symbol extends FunSymbol
+  public class Symbol extends FunSymbol
   {
     Symbol(LocatedString name, bossa.syntax.Constraint constraint, 
 	   bossa.syntax.Monotype returnType)
@@ -270,7 +270,7 @@ abstract public class MethodDeclaration extends Definition
       this.type = Types.addSure(this.type);
     }
 
-    MethodDeclaration getDefinition()
+    public MethodDeclaration getDefinition()
     {
       return MethodDeclaration.this;
     }
@@ -299,6 +299,12 @@ abstract public class MethodDeclaration extends Definition
   /****************************************************************
    * Code generation
    ****************************************************************/
+
+  /** @return a string that uniquely represents this method */
+  public String getFullName()
+  {
+    return "NONE";
+  }
 
   private gnu.expr.Expression code;
 

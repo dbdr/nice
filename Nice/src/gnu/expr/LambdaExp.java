@@ -366,7 +366,7 @@ public class LambdaExp extends ScopeExp
 	Variable parentFrame = parent.heapFrame != null ?  parent.heapFrame
 	  : parent.closureEnv;
 	if (isClassMethod())
-	  closureEnv = declareThis(type);
+	  /*closureEnv =*/ declareThis(type);
 	else if (parent.heapFrame == null && ! parent.getNeedsStaticLink()
 		 && ! (parent instanceof ModuleExp))
 	  closureEnv = null;
@@ -374,7 +374,7 @@ public class LambdaExp extends ScopeExp
 	  {
 	    Method primMethod = getMainMethod();
 	    if (! primMethod.getStaticFlag())
-	      closureEnv = declareThis(primMethod.getDeclaringClass());
+	      /*closureEnv =*/ declareThis(primMethod.getDeclaringClass());
 	    else
 	      {
 		Type envType = primMethod.getParameterTypes()[0];
@@ -435,7 +435,10 @@ public class LambdaExp extends ScopeExp
       }
     else
       {
-	code.emitLoad(curLambda.closureEnv);
+	if (curLambda.closureEnv == null)
+	  code.emitPushThis();
+	else
+	  code.emitLoad(curLambda.closureEnv);
 	LambdaExp parent = curLambda.outerLambda();
 	while (parent != this)
 	  {
@@ -755,7 +758,10 @@ public class LambdaExp extends ScopeExp
     if (ctype.isInterface())
       mflags |= Access.ABSTRACT;
     if (! isStatic)
-      closureEnv = declareThis(ctype);
+      if (isClassMethod())
+	declareThis(ctype);
+      else
+	closureEnv = declareThis(ctype);
 
     Type rtype
       = (getFlag(SEQUENCE_RESULT)

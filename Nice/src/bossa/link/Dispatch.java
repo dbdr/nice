@@ -24,6 +24,8 @@ import mlsub.typing.Constraint;
 import mlsub.typing.MonotypeLeqCst;
 import mlsub.typing.lowlevel.Element;
 
+import gnu.bytecode.ClassType;
+
 import java.util.*;
 
 import bossa.util.Debug;
@@ -46,8 +48,17 @@ public final class Dispatch
     methods.add(m);
   }
   
-  private static Collection methods;
-  public static void reset() { methods = new ArrayList(); }
+  public static void register(JavaMethod m)
+  {
+    javaMethods.add(m);
+  }
+  
+  private static Collection methods, javaMethods;
+  public static void reset() 
+  { 
+    methods = new ArrayList(); 
+    javaMethods = new ArrayList();
+  }
 
   private static Chronometer chrono = Chronometer.make("Dispatch tests");
 
@@ -57,6 +68,9 @@ public final class Dispatch
     try {
       for(Iterator i = methods.iterator(); i.hasNext();)
 	test((NiceMethod) i.next(), module);
+
+      for (Iterator i = javaMethods.iterator(); i.hasNext();)
+	test((JavaMethod) i.next(), module);
     } 
     finally {
       chrono.stop();
@@ -68,10 +82,23 @@ public final class Dispatch
     Stack sortedAlternatives = Alternative.sortedAlternatives(m);
     
     if (!(m.isMain() || trivialTestOK(sortedAlternatives)))
-      test(m, sortedAlternatives);
+      test(m, sortedAlternatives, false);
     
     if(Debug.codeGeneration)
       Debug.println("Generating dispatch function for "+m);
+    
+    Compilation.compile(m, sortedAlternatives, module);
+  }
+
+  private static void test(JavaMethod m, bossa.modules.Package module)
+  {
+    Stack sortedAlternatives = Alternative.sortedAlternatives(m);
+    
+    if (! trivialTestOK(sortedAlternatives))
+      test(m, sortedAlternatives, true);
+    
+    if(Debug.codeGeneration)
+      Debug.println("Generating dispatch function for " + m);
     
     Compilation.compile(m, sortedAlternatives, module);
   }
@@ -108,8 +135,9 @@ public final class Dispatch
     return res;
   }
 
-  private static void test(NiceMethod method,
-			   final Stack sortedAlternatives)
+  private static void test(MethodDeclaration method,
+			   final Stack sortedAlternatives,
+			   boolean isJavaMethod)
   {
     if(Debug.linkTests)
       {
@@ -134,8 +162,18 @@ public final class Dispatch
     for(Iterator i = multitags.iterator(); i.hasNext();)
       {
 	TypeConstructor[] tags = (TypeConstructor[]) i.next();
+
+	// For java methods, we are only concerned with cases
+	// where the first argument is a Nice class.
+	ClassType firstArg = null;
+	if (isJavaMethod)
+	  {
+	    firstArg = classTypeOfNiceClass(tags[0]);
+	    if (firstArg == null)
+	      continue;
+	  }
 	
-	if (test(method, tags, sortedAlternatives))
+	if (test(method, tags, sortedAlternatives, firstArg))
 	{
 	  if (++nb_errors > 9)
 	    break;
@@ -150,7 +188,17 @@ public final class Dispatch
       User.error(method, "The implementation test failed for method " + 
 		 method.getName());
   }
-  
+
+  private static ClassType classTypeOfNiceClass(TypeConstructor tc)
+  {
+    ClassDefinition def = ClassDefinition.get(tc);
+
+    if (def == null || ! (def.getImplementation() instanceof NiceClass))
+      return null;
+
+    return ((NiceClass) def.getImplementation()).getClassExp().getClassType();
+  }
+
   /**
      Tests that the 'tags' tuple has a best-match in alternatives
      
@@ -160,9 +208,10 @@ public final class Dispatch
      
      @return true if the test failed
    */
-  private static boolean test(NiceMethod method, 
+  private static boolean test(MethodDeclaration method, 
 			      TypeConstructor[] tags, 
-			      final Stack sortedAlternatives)
+			      final Stack sortedAlternatives,
+			      ClassType firstArg)
   {
     boolean failed = false;
 
@@ -191,8 +240,18 @@ public final class Dispatch
 		 "\nand\n" + a.printLocated() + "\nmatch.");
 	    }
       }
-    if(first==null)
+    if (first == null)
       {
+	if (firstArg != null)
+	  {
+	    gnu.bytecode.Method superImplementation = SuperExp.getImplementationAbove
+	      ((JavaMethod) method, firstArg);
+	    if (superImplementation != null &&
+		superImplementation.isAbstract() == false)
+	      // It's OK, this case is covered by a Java implementation.
+	      return false;
+	  }
+
 	failed = true;
 	if(sortedAlternatives.size()==0)
 	  User.error
@@ -210,11 +269,12 @@ public final class Dispatch
   /**
      Special version of above that tests tags with all combinations of integer values.
    */
-  private static boolean testValues(NiceMethod method, 
-			      TypeConstructor[] tags,
-			      List valueCombis,
-			      boolean[] isValue, 
-			      final Stack sortedAlternatives)
+  private static boolean testValues
+    (MethodDeclaration method, 
+     TypeConstructor[] tags,
+     List valueCombis,
+     boolean[] isValue, 
+     final Stack sortedAlternatives)
   {
     boolean failed = false;
     List sortedTypeMatches = new ArrayList();

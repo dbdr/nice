@@ -135,22 +135,15 @@ public class MethodBodyDefinition extends Definition
     
     this.declaration = d;
 
-    // Overriding a mono-method can currently not dispatch on other args
     if (d instanceof JavaMethod)
-      {
-	for (int i = 1; i < formals.length; i++)
-	  if (!(formals[i].atAny()))
-	    User.error(this, this + " is a native method. Dispatch can only occur on the first argument");
-
-	((JavaMethod) d).addImplementation(this);
-      }
-    else if (d instanceof NiceMethod)
-      // Register this alternative for the link test
-      alternative = new bossa.link.SourceAlternative(this);
-    else
+      ((JavaMethod) d).registerForDispatch();
+    else if (! (d instanceof NiceMethod))
       User.error(this, "Implementations can only be made for methods, but " + 
 		 d.getName() + " is a function.\nIt was defined at:\n" + 
 		 d.location());
+
+    // Register this alternative for the link test
+    alternative = new bossa.link.SourceAlternative(this);
 
     if (d.isMain())
       User.warning(this, "This syntax for the main function is deprecated.\nPlease use instead the following:\n\nvoid main(String[] args)\n{\n  ...\n}");
@@ -475,12 +468,7 @@ public class MethodBodyDefinition extends Definition
   public gnu.expr.ReferenceExp getRefExp()
   {
     if (ref == null)
-      {
-	if (declaration instanceof NiceMethod)
-	  ref = compile((NiceMethod) declaration);
-	else
-	  compile((JavaMethod) declaration);
-      }
+      ref = createRef();
 
     return ref;
   }
@@ -494,13 +482,13 @@ public class MethodBodyDefinition extends Definition
     Gen.setMethodBody(compiledMethod, body.generateCode());
   }
 
-  private gnu.expr.ReferenceExp compile (NiceMethod definition)
+  private gnu.expr.ReferenceExp createRef ()
   {
     createMethod(name.toString(), false);
     gnu.expr.ReferenceExp ref = module.addMethod(compiledMethod, true);
 
     compiledMethod.addBytecodeAttribute
-      (new MiscAttr("definition", definition.getFullName().getBytes()));
+      (new MiscAttr("definition", declaration.getFullName().getBytes()));
     compiledMethod.addBytecodeAttribute
       (new MiscAttr("patterns", 
 		    Pattern.bytecodeRepresentation(formals).getBytes()));
@@ -511,26 +499,6 @@ public class MethodBodyDefinition extends Definition
   final TypeConstructor firstArgument()
   {
     return formals[0].tc;
-  }
-
-  NiceClass declaringClass()
-  {
-    ClassDefinition def = ClassDefinition.get(firstArgument());
-
-    if (def == null || ! (def.implementation instanceof NiceClass))
-      throw User.error(this, declaration + " is a native method.\n" + 
-		       "It can not be overriden because " + formals[0].tc + 
-		       " is not a class defined in Nice");
-
-    return (NiceClass) def.implementation;
-  }
-
-  private void compile (JavaMethod declaration)
-  {
-    createMethod(declaration.getName().toString(), true);
-
-    // Compile as a method in the class of the first argument
-    declaringClass().addJavaMethod(compiledMethod);
   }
 
   private void createMethod (String bytecodeName, boolean member)

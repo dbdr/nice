@@ -16,7 +16,7 @@ import bossa.util.*;
 
 import mlsub.typing.*;
 
-import bossa.syntax.NiceMethod;
+import bossa.syntax.MethodDeclaration;
 import bossa.syntax.Pattern;
 import bossa.syntax.LocatedString;
 import bossa.syntax.Node;
@@ -37,7 +37,7 @@ import java.util.*;
  * @author bonniot
  */
 
-public abstract class Alternative
+public abstract class Alternative implements Located
 {
   /**
      The full name uniquely identifies the method by including the 
@@ -138,21 +138,22 @@ public abstract class Alternative
      @return the expression that tests if this alternative matches
      the tuple <code>parameters</code>.
    */
-  Expression matchTest(Expression[] parameters)
+  Expression matchTest(Expression[] parameters, boolean skipFirst)
   {
     if (parameters.length != patterns.length)
       Internal.error("Incorrect parameters "+
 		     Util.map("",", ","",parameters)+
 		     " for " + this);
     
-    if (parameters.length == 0)
+    int index = skipFirst ? 1 : 0;
+
+    if (parameters.length == index)
       return QuoteExp.trueExp;
 
-    if (parameters.length == 1)
-      return patterns[0].matchTest(parameters[0]);
+    if (parameters.length == index + 1)
+      return patterns[index].matchTest(parameters[index]);
 
     Expression result = QuoteExp.trueExp;
-    int index = 0;
 
     //find the first non-trivial test
     for(; index<parameters.length; index++)
@@ -211,7 +212,7 @@ public abstract class Alternative
     l.add(this);
   }
   
-  public static Stack sortedAlternatives(NiceMethod m)
+  public static Stack sortedAlternatives(MethodDeclaration m)
   {
     List list = (List) alternatives.get(m.getFullName());
     

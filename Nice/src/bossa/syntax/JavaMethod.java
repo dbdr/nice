@@ -27,7 +27,7 @@ import java.util.*;
    @version $Date$
    @author Daniel Bonniot (d.bonniot@mail.dotcom.fr)
 */
-class JavaMethod extends MethodDeclaration
+public class JavaMethod extends MethodDeclaration
 {
   JavaMethod(LocatedString name, Constraint constraint,
 	     Monotype returnType, FormalParameters parameters)
@@ -71,6 +71,19 @@ class JavaMethod extends MethodDeclaration
    * Code generation
    ****************************************************************/
 
+  public static final String fullNamePrefix = "JAVA:";
+
+  /** @return a string that uniquely represents this method */
+  public String getFullName()
+  {
+    return fullNamePrefix + name + ':' + getType();
+  }
+
+  public final LambdaExp getLambda()
+  {
+    return nice.tools.code.Gen.dereference(getCode());
+  }
+
   Method reflectMethod;
 
   public gnu.bytecode.Type javaReturnType() 
@@ -97,15 +110,14 @@ class JavaMethod extends MethodDeclaration
    * List of implementations
    ****************************************************************/
 
-  Iterator getImplementations()
-  {
-    return implementations.iterator();
-  }
+  private boolean registered;
 
-  private LinkedList implementations = new LinkedList();
-
-  void addImplementation(MethodBodyDefinition impl)
+  public void registerForDispatch()
   {
-    implementations.add(impl);
+    if (registered)
+      return;
+
+    bossa.link.Dispatch.register(this);
+    registered = true;
   }
 }

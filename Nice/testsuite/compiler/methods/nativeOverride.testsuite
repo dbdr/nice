@@ -20,3 +20,168 @@ class A
 {
   toString() = (["A"].map(String s => s + "."))[0].toString();
 }
+
+/// PASS
+  assert new A(x: 1).equals(new A(x: 1));
+
+  /// Toplevel
+class A 
+{
+  int x;
+
+  equals(that@A) = this.x == that.x;
+}
+
+/// PASS
+  assert ! new B(x: 1).equals(new A());
+  assert new B(x: 1).equals(new B(x: 1));
+
+  /// Toplevel
+class A {}
+
+class B extends A
+{
+  int x;
+
+  equals(that@B) = this.x == that.x;
+}
+
+/// PASS
+  assert new B(x: 1).equals(new A());
+
+  /// Toplevel
+class A {
+  equals(that@A) = true;
+}
+
+class B extends A
+{
+  int x;
+
+  equals(that@B) = this.x == that.x;
+}
+
+/// PASS
+  assert new A(x: 1).equals(new A(x: 1));
+  assert new A(x: 1).equals(new B(x: 1, y: 0));
+  assert ! new A(x: 1).equals(new B(x: 1, y: 2));
+
+  /// Toplevel
+class A 
+{
+  int x;
+
+  equals(that@A) = this.x == that.x;
+  equals(that@B) = this.x == that.x && that.y == 0;
+}
+
+class B extends A
+{
+  int y;
+
+  equals(that@B) = this.x == that.x && this.y == that.y;
+}
+
+/// PASS
+  /// package a
+  /// Toplevel
+class A 
+{
+  int x;
+
+  equals(that@A) = this.x == that.x;
+}
+
+  /// package b import a
+  assert new A(x: 1).equals(new A(x: 1));
+
+/// PASS
+  /// package a
+  /// Toplevel
+class A 
+{
+  int x;
+
+  equals(that) = false;
+  equals(that@A) = this.x == that.x;
+}
+
+  /// package b import a
+  assert new A(x: 1).equals(new A(x: 1));
+
+/// PASS
+  /// package a
+  /// Toplevel
+class A 
+{
+  int x;
+
+  equals(that@A) = this.x == that.x;
+}
+
+  /// package b import a
+  assert ! new A(x: 1).equals(new B(x: 1));
+  /// Toplevel
+class B extends A
+{
+  equals(that@A) = super;
+}
+equals(this@A, that@B) = false;
+equals(this@B, that@B) = true;
+
+/// PASS
+  /// package a
+  /// Toplevel
+class A 
+{
+  int x;
+
+  equals(that@A) = this.x == that.x;
+}
+
+boolean equals(String dummy1, boolean dummy2) = false;
+
+  /// package b import a
+  assert new A(x: 1).equals(new A(x: 1));
+
+/// FAIL
+  ///Toplevel
+/*/// FAIL HERE */ toString(s@String) = "";
+
+/// FAIL
+  /// COMMENT Ambiguity for equals(B,B)
+  /// Toplevel
+class A
+{
+  equals(that@B) = false;
+}
+
+class B extends A
+{
+  equals(that@A) = true;
+}
+
+/// FAIL
+  /// Toplevel
+class A implements Runnable
+{
+}
+
+class B extends A
+{
+  run() {}
+}
+
+/// FAIL
+  /// Toplevel
+class A extends java.lang.Number
+{
+}
+
+class B extends A
+{
+  doubleValue() = 0;
+  floatValue() = 0;
+  longValue() = 0;
+  intValue() = 0;
+}

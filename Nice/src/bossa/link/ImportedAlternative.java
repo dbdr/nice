@@ -13,12 +13,16 @@
 package bossa.link;
 
 import bossa.syntax.Pattern;
+import bossa.syntax.LocatedString;
+import bossa.syntax.MethodDeclaration;
+import bossa.syntax.JavaMethod;
 import nice.tools.code.*;
 
 import gnu.bytecode.*;
 import gnu.expr.*;
 import java.util.*;
 import bossa.util.*;
+import bossa.util.Location;
 
 /**
    An alternative imported from a compiled package.
@@ -32,7 +36,7 @@ public class ImportedAlternative extends Alternative
   /**
    * When read from a bytecode file.
    */
-  public static void read(ClassType c, Method method)
+  public static void read(ClassType c, Method method, Location location)
   {
     MiscAttr attr = (MiscAttr) Attribute.get(method, "definition");
     if (attr == null)
@@ -40,6 +44,8 @@ public class ImportedAlternative extends Alternative
       return;
 
     String fullName = new String(attr.data);
+
+    registerJavaMethod(fullName);
 
     attr = (MiscAttr) Attribute.get(method, "patterns");
     if (attr == null)
@@ -70,17 +76,52 @@ public class ImportedAlternative extends Alternative
     
     new ImportedAlternative(method.getName(), fullName, (Pattern[]) 
 			    patterns.toArray(new Pattern[patterns.size()]),
-			    new QuoteExp(new PrimProcedure(method)));
+			    new QuoteExp(new PrimProcedure(method)),
+			    location);
   }
 
-  private ImportedAlternative(String name, String fullName, Pattern[] patterns, 
-			      gnu.expr.Expression code)
+  /**
+     If this full name refers to a java method, make sure it participates
+     to the link tests and dispatch code generation.
+  */
+  private static void registerJavaMethod(String fullName)
+  {
+    if (! fullName.startsWith(JavaMethod.fullNamePrefix))
+      return;
+
+    int end = fullName.lastIndexOf(':');
+    LocatedString methodName = new LocatedString
+      (fullName.substring(JavaMethod.fullNamePrefix.length(), end),
+       bossa.util.Location.nowhereAtAll());
+
+    List methods = bossa.syntax.Node.getGlobalScope().lookup(methodName);
+    for (Iterator i = methods.iterator(); i.hasNext();)
+      {
+	Object next = i.next();
+	if (! (next instanceof MethodDeclaration.Symbol))
+	  continue;
+	MethodDeclaration md = ((MethodDeclaration.Symbol) next).getDefinition();
+	if (md.getFullName().equals(fullName))
+	  {
+	    ((JavaMethod) md).registerForDispatch();
+	    return;
+	  }
+      }
+  }
+
+  private ImportedAlternative(String name, String fullName, Pattern[] patterns,
+			      gnu.expr.Expression code, Location location)
   {
     super(name, fullName, patterns);
     this.code = code;
-  }  
+    this.location = location;
+  }
 
   public Expression methodExp() { return code; }
 
   private Expression code;
+
+  public Location location() { return location; }
+
+  private Location location;
 }

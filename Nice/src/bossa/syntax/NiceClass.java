@@ -269,14 +269,17 @@ public class NiceClass extends ClassDefinition.ClassImplementation
 
   private void prepareCodeGeneration()
   {
-    // The module will lookup the existing class if it is already compiled
-    // and call createClassExp if not.
-    classe = definition.module.getClassExp(this);
+    /* 
+       We always generate a new ClassExp object, even for classes from
+       already compiled packages. The reason is that we might need to
+       add methods for the multiple dispatch of java methods in the class 
+       (and maybe for adding fields, or optimizing the dispatch of Nice
+       methods in the future).
+    */
+    classe = createClassExp();
   }
 
-  gnu.expr.ClassExp classe;
-
-  public gnu.expr.ClassExp createClassExp()
+  private gnu.expr.ClassExp createClassExp()
   {
     gnu.expr.ClassExp classe = new gnu.expr.ClassExp();
     classe.setName(definition.name.toString());
@@ -287,7 +290,9 @@ public class NiceClass extends ClassDefinition.ClassImplementation
     return classe;
   }
 
-  gnu.expr.ClassExp getClassExp()
+  gnu.expr.ClassExp classe;
+
+  public gnu.expr.ClassExp getClassExp()
   {
     return classe;
   }
@@ -506,9 +511,40 @@ public class NiceClass extends ClassDefinition.ClassImplementation
   }
 
   /** This native method is redefined for this Nice class. */
-  void addJavaMethod(gnu.expr.LambdaExp method)
+  public gnu.expr.Expression addJavaMethod(gnu.expr.LambdaExp method)
   {
-    classe.addMethod(method);
+    return classe.addMethod(method);
+  }
+
+  public gnu.expr.LambdaExp createJavaMethod(String name, 
+					     gnu.bytecode.Method likeMethod,
+					     gnu.expr.Expression[] params)
+  {
+    gnu.expr.LambdaExp lambda = 
+      Gen.createMemberMethod
+        (name, 
+	 getClassExp().getType(), 
+	 likeMethod.getParameterTypes(),
+	 likeMethod.getReturnType(),
+	 params);
+    return lambda;
+  }
+
+  /**
+     Returns an expression to call a super method from outside a class method.
+
+     This is needed because the JVM restricts call to a specific implementation
+     to occur inside a method of the same class. So this generates a stub class
+     method that calls the desired super method, and return a reference to this
+     stub.
+  */
+  gnu.expr.Expression callSuperMethod(gnu.bytecode.Method superMethod)
+  {
+    gnu.expr.Expression[] params = new gnu.expr.Expression[superMethod.getParameterTypes().length + 1];
+    gnu.expr.LambdaExp lambda = createJavaMethod("$super$" + superMethod.getName(), superMethod, params);
+    Gen.setMethodBody(lambda, 
+		      new gnu.expr.ApplyExp(new gnu.expr.QuoteExp(gnu.expr.PrimProcedure.specialCall(superMethod)), params));
+    return addJavaMethod(lambda);
   }
 
   /****************************************************************

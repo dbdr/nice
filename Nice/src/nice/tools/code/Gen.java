@@ -175,6 +175,62 @@ public class Gen
       }
   }
 
+  /**
+     Create a lambda expression to generate code for the method.
+
+     @param args can be null if there are no arguments
+     @param member true iff this method is a non-static member of
+                   the class in argTypes[0]
+     @param toplevel If the method can be called from foreign code.
+                     This forces its generation even if it is 
+		     apparently never called.
+  **/
+  public static LambdaExp createMemberMethod
+    (String bytecodeName,
+     Type receiver,
+     Type[] argTypes,
+     Type retType,
+     Expression[] params)
+  {
+    LambdaExp lexp = new LambdaExp();
+    bytecodeName = nice.tools.code.Strings.escape(bytecodeName);
+    int arity = 1 + (argTypes == null ? 0 : argTypes.length);
+
+    lexp.setReturnType(retType);
+    lexp.setName(bytecodeName);
+    lexp.min_args = lexp.max_args = arity - 1;
+    lexp.forceGeneration();
+    lexp.setCanCall(true);
+    lexp.setClassMethod(true);
+
+    // Parameters
+    for(int n = 0; n < arity; n++)
+      {
+	boolean isThis = n == 0;
+	String parameterName = "anonymous_" + n;
+
+	gnu.expr.Declaration d;
+	if (isThis)
+	  {
+	    d = new Declaration(parameterName);
+	    d.context = lexp;
+	    d.setType(receiver);
+	    params[n] = new ThisExp(d);
+	  }
+	else
+	  {
+	    d = lexp.addDeclaration(parameterName);
+	    d.setType(argTypes[n - 1]);
+	    params[n] = new ReferenceExp(d);
+	  }
+	d.noteValue(null);
+	d.setCanRead(true);
+	d.setCanWrite(true);
+        
+      }
+    return lexp;
+  }
+
   public static void setMethodBody(LambdaExp method, Expression body)
   {
     method.body = body;

@@ -546,6 +546,9 @@ typecheck(r@ReturnStmt)
       wrongReturnType(r, notNull(r.returnType()).toString(), 
 		      valueOf(e.expectedReturnType), notNull(e.typingException));
   }
+  catch(Function.IncompatibleReturnType e){
+    throw bossa.util.User.error(r, "The returned value is incompatible with the return type: " + e.previouslyInferredType);
+  }
 }
 
 typecheck(t@TryStmt)

@@ -56,3 +56,11 @@ index.toString());
 }
   /// package b import a
   ;
+
+/// FAIL
+  () -> int f = () => { 
+  if (true) 
+    return 1; 
+  else 
+    /* /// FAIL HERE */ return ""; 
+  };

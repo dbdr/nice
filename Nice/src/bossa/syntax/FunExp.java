@@ -54,12 +54,18 @@ public class FunExp extends Expression implements Function
   }
 
   public void checkReturnedType(mlsub.typing.Polytype returned)
-    throws Function.WrongReturnType
+    throws Function.ReturnTypeError
   {
     if (inferredReturnType == null)
       inferredReturnType = returned;
     else
-      inferredReturnType = Polytype.union(inferredReturnType, returned);
+      {
+	Polytype old = inferredReturnType;
+	inferredReturnType = Polytype.union(inferredReturnType, returned);
+
+	if (! inferredReturnType.trySimplify())
+	  throw new FunExp.IncompatibleReturnType(old);
+      }
 
     /* This is disabled, since currently default values of class fields are
        typechecked twice.
@@ -80,8 +86,6 @@ public class FunExp extends Expression implements Function
       if (! alwaysReturns && 
 	  ! nice.tools.code.Types.isVoid(inferredReturnType))
 	throw User.error(this, "Missing return statement");
-
-    inferredReturnType.simplify();
 
     Monotype t = new FunType(MonoSymbol.getMonotype(formals), 
 			     inferredReturnType.getMonotype());

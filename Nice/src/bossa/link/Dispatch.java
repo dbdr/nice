@@ -373,12 +373,14 @@ public final class Dispatch
     {
       TypeConstructor[] tc1 = (TypeConstructor[])o1;
       TypeConstructor[] tc2 = (TypeConstructor[])o2;
-      if (tc1 == null) return -1; //these cases does happen
-      if (tc2 == null) return 1;  //for some strange reason
 
       for(int i = 0; i<tc1.length; i++)
       {
-        if (tc1[i] == null) return -1;
+        if (tc1[i] == null)
+	{
+          if (tc2[i] == null) return 0;
+	  return -1;
+	}
         if (tc2[i] == null) return 1;
 	int a = tc1[i].getId();
         int b = tc2[i].getId();

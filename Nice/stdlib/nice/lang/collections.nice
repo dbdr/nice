@@ -18,19 +18,15 @@ import java.util.*;
  * Collection
  ****************************************************************/
 
-<Any T> void foreach(java.util.Collection<T>, T->void);
+<T> void foreach(Collection<T> coll, T->void func);
 // Backward compatibility. `iter` will probably be removed sometime.
-<Any T> void iter(java.util.Collection<T> c, T->void f) = c.foreach(f);
+<T> void iter(Collection<T> coll, T->void func) = coll.foreach(func);
 
-<java.util.Collection C, T, U> C<U> similarEmptyCollection(C<T>);
+<Collection C, T, U> C<U> similarEmptyCollection(C<T>);
 
-<java.util.Collection C, Any T, Any U> C<U> map(C<T>, T->U);
+<Collection C, T, U> C<U> map(C<T> coll, T->U func);
 
-// A more precise type for filter would be:
-// <Collection C, T, U | T <: U> C<U> filter(C<T>, T -> boolean);
-// This would allow List<A> lA = lB.filter(...) where B is a subclass of A.
-
-<java.util.Collection C, Any T> C<T> filter(C<T>, T->boolean);
+<Collection C, T, U | T <: U> C<U> filter(C<T>, T->boolean);
 
 /** Return a collection containing all elements for which converter
     returns a non-null value.
@@ -41,22 +37,22 @@ import java.util.*;
 <Collection C, T, U> C<!U> filter(C<T> source, T->?U converter)
 {
   C<!U> res = source.similarEmptyCollection();
-  source.foreach(T elem => {
-    ?U converted = converter(elem);
-    if (converted != null)
-      res.add(converted);
-  });
+  for(T elem : source)
+    {
+      ?U converted = converter(elem);
+      if (converted != null)
+        res.add(converted);
+    }
   return res;
 }
 
-
 /** @deprecated */
-<T> void keep  (Collection<T> c, T->boolean test) = c.retain(test);
+<T> void keep(Collection<T> coll, T->boolean test) = coll.retain(test);
 
 /** Modifies c, only keeping the elements for which test returns true. */
-<T> void retain (Collection<T> c, T->boolean test)
+<T> void retain(Collection<T> coll, T->boolean test)
 {
-  Iterator<T> i = c.iterator();
+  Iterator<T> i = coll.iterator();
   while (i.hasNext())
     {
       T element = i.next();
@@ -66,9 +62,9 @@ import java.util.*;
 }
 
 /** Modifies c, removing the elements for which test returns true. */
-<T> void remove (Collection<T> c, T->boolean test)
+<T> void remove(Collection<T> coll, T->boolean test)
 {
-  Iterator<T> i = c.iterator();
+  Iterator<T> i = coll.iterator();
   while (i.hasNext())
     {
       T element = i.next();
@@ -77,27 +73,28 @@ import java.util.*;
     }
 }
 
-
-<Any T, Any U> U foldLeft(java.util.List<T> l, (U, T)->U f, U init)
+<T, U> U foldLeft(List<T> list, (U, T)->U func, U init)
 {
   U res = init;
-  l.foreach(T elem => { res = f(res, elem); });
+  for (T elem : list) 
+    res = func(res, elem);
+
   return res;
 }
 
-<Any T, Any U> U foldRight(java.util.List<T> l, (T, U)->U f, U init) =
-  foldRight(l, f, init, 0);
+<T, U> U foldRight(List<T> list, (T, U)->U func, U init) =
+  foldRight(list, func, init, 0);
 
-private <Any T, Any U> 
-U foldRight(java.util.List<T> l, (T, U)->U f, U init, int from)
+private <T, U> 
+U foldRight(List<T> list, (T, U)->U func, U init, int from)
 {
-  if (from < l.size())
-    return f(l[from], l.foldRight(f, init, from + 1));
+  if (from < list.size())
+    return func(list[from], list.foldRight(func, init, from + 1));
   else
     return init;
 }
 
-<Any T> List<T> slice(List<T> list, int from = 0, int to = -1)
+<T> List<T> slice(List<T> list, int from = 0, int to = -1)
 {
   if (to == -1) 
     to = list.size() - 1;
@@ -105,6 +102,7 @@ U foldRight(java.util.List<T> l, (T, U)->U f, U init, int from)
   List<T> res = new ArrayList(to - from + 1);
   for (int i = from; i <= to; i++)
     res.add(list[i]);
+
   return res;
 }
 
@@ -112,35 +110,28 @@ U foldRight(java.util.List<T> l, (T, U)->U f, U init, int from)
  * Implementations
  ****************************************************************/
 
-/** 
-    Default implementation, using an Iterator.
-*/
-<T> foreach(c@java.util.Collection, f) 
+<T> foreach(coll@java.util.Collection, func) 
 {
-  for (java.util.Iterator<T> i = c.iterator(); i.hasNext();)
-    f(i.next());
+  for (T elem : coll)
+    func(elem);
 }
 
-/** 
-    A more efficient implementation for lists: doesn't allocate an Iterator.
-*/
-foreach(l@java.util.List, f)
+<C,T,U> map(coll, func)
 {
-  for (int i = 0; i < l.size; i++)
-    f(l.get(i));
-}
+  C<U> res = coll.similarEmptyCollection();
+  for (T elem : coll)
+    res.add(func(elem));
 
-<C,T,U> map(c, f)
-{
-  C<U> res = c.similarEmptyCollection();
-  c.foreach(T elem => { res.add(f(elem)); });
   return res;
 }
 
-<C,T> filter(c, test)
+<C,T,U> filter(coll, test)
 {
-  C<T> res = c.similarEmptyCollection();
-  c.foreach(T elem => { if(test(elem)) res.add(elem); });
+  C<U> res = coll.similarEmptyCollection();
+  for (T elem : coll)
+    if (test(elem))
+      res.add(elem);
+
   return res;
 }
 
@@ -182,25 +173,70 @@ class NiceComparator<T> implements java.util.Comparator
  ****************************************************************/
 
 /** @deprecated */
-<Any T> boolean has (java.util.List<T> s, T->boolean test) = s.contains(test);
+<T> boolean has (Collection<T> coll, T->boolean test) = coll.contains(test);
 
-<Any T> boolean contains (java.util.List<T> s, T->boolean test)
+<T> boolean contains (Collection<T> coll, T->boolean test)
 {
-  for (int i = 0; i < s.size(); i++)
-    if (test(s[i]))
+  for (T elem : coll)
+    if (test(elem))
       return true;
 
   return false;
 }
 
+<T, U, V | T <: V, U <: V> boolean containsAny (Collection<T> coll1, Collection<U> coll2)
+{
+  for (T elem : coll1)
+    if (coll2.contains(elem))
+      return true;
+
+  return false;
+}
+
+<T> int count (Collection<T> coll, T->boolean test)
+{
+  int res = 0;
+  for (T elem : coll)
+    if (test(elem)) res++;
+
+  return res;
+}
+
+<T> boolean any (Collection<T> coll, T->boolean test)
+{
+  for (T elem : coll)
+    if (test(elem))
+      return true;
+
+  return false;
+}
+
+<T> boolean all (Collection<T> coll, T->boolean test)
+{
+  for (T elem : coll)
+    if (!test(elem))
+      return false;
+
+  return true;
+}
+
+<T> boolean none (Collection<T> coll, T->boolean test)
+{
+  for (T elem : coll)
+    if (test(elem))
+      return false;
+
+  return true;
+}
+
 /** Find the first element that passes the given test.
     @throw java.util.NoSuchElementException if there is no such element.
 */
-<Any T> T find (java.util.List<T> s, T->boolean test)
+<T> T find (List<T> list, T->boolean test)
 {
-  for (int i = 0; i < s.size(); i++)
-    if (test(s[i]))
-      return s[i];
+  for (T elem : list)
+    if (test(elem))
+      return elem;
 
   throw new java.util.NoSuchElementException();
 }
@@ -208,11 +244,11 @@ class NiceComparator<T> implements java.util.Comparator
 /** Find the last element that passes the given test.
     @throw java.util.NoSuchElementException if there is no such element.
 */
-<Any T> T findLast (java.util.List<T> s, T->boolean test)
+<T> T findLast (List<T> list, T->boolean test)
 {
-  for (int i = s.size(); --i >= 0;)
-    if (test(s[i]))
-      return s[i];
+  for (int i = list.size(); --i >= 0;)
+    if (test(list[i]))
+      return list[i];
 
   throw new java.util.NoSuchElementException();
 }
@@ -220,11 +256,11 @@ class NiceComparator<T> implements java.util.Comparator
 /** Find the first element that passes the given test.
     Returns <code>null</code> if there is no such element.
 */
-<Any T> ?T search (java.util.List<!T> s, !T->boolean test)
+<Any T> ?T search (java.util.List<!T> list, !T->boolean test)
 {
-  for (int i = 0; i < s.size(); i++)
-    if (test(s[i]))
-      return s[i];
+  for (!T elem : list)
+    if (test(elem))
+      return elem;
 
   return null;
 }
@@ -232,7 +268,7 @@ class NiceComparator<T> implements java.util.Comparator
 /** Find the last element that passes the given test.
     Returns <code>null</code> if there is no such element.
 */
-<Any T> ?T searchLast (java.util.List<!T> s, !T->boolean test)
+<T> ?T searchLast (List<!T> s, !T->boolean test)
 {
   for (int i = s.size(); --i >= 0;)
     if (test(s[i]))
@@ -242,33 +278,75 @@ class NiceComparator<T> implements java.util.Comparator
 }
 
 /** @deprecated */
-<Any T> int findIndex (List<T> s, T->boolean test) = s.findIndex(test);
+<T> int findIndex (List<T> list, T->boolean test) = list.findIndex(test);
 
-<Any T> int indexOf (List<T> s, T->boolean test)
+<T> int indexOf (List<T> list, T->boolean test)
 {
-  for (int i = 0; i < s.size(); i++)
-    if (test(s[i]))
+  for (int i = 0; i < list.size(); i++)
+    if (test(list[i]))
       return i;
 
-  throw new java.util.NoSuchElementException();
+  throw new NoSuchElementException();
 }
 
-boolean or(java.util.List<boolean> s)
+boolean or(List<boolean> list)
 {
-  for (int i = 0; i < s.size(); i++)
-    if (s[i])
+  for (boolean elem : list)
+    if (elem)
       return true;
 
   return false;
 }
 
-long max(java.util.List<long> s) requires !s.isEmpty()
+boolean and(List<boolean> list)
+{
+  for (boolean elem : list)
+    if (!elem)
+      return false;
+
+  return true;
+}
+
+long max(List<long> list) requires !list.isEmpty()
 {
   long res = Long.MIN_VALUE;
 
-  for(int i = 0; i < s.size(); i++)
-    if (s[i] > res)
-      res = s[i];
+  for(long elem : list)
+    if (elem > res)
+      res = elem;
+
+  return res;
+}
+
+long min(List<long> list) requires !list.isEmpty()
+{
+  long res = Long.MAX_VALUE;
+
+  for(long elem : list)
+    if (elem < res)
+      res = elem;
+
+  return res;
+}
+
+int max(List<int> list) requires !list.isEmpty()
+{
+  int res = Integer.MIN_VALUE;
+
+  for(int elem : list)
+    if (elem > res)
+      res = elem;
+
+  return res;
+}
+
+int min(List<int> list) requires !list.isEmpty()
+{
+  int res = Integer.MAX_VALUE;
+
+  for(int elem : list)
+    if (elem < res)
+      res = elem;
 
   return res;
 }
@@ -283,38 +361,79 @@ long max(java.util.List<long> s) requires !s.isEmpty()
 }
 
 /****************************************************************
- * Printing
- ****************************************************************/
-
-/*
-We need overriding of native methods for this
-toString(s@List)
-{
-  if (s.size() == 0)
-    return "[]";
-
-  StringBuffer buf = new StringBuffer();
-  buf.append("[");
-  buf.append(s[0].toString());
-  for (int i=1; i<s.size(); i++)
-    {
-      buf.append(", ");
-      buf.append(s[i].toString());
-    }
-  buf.append("]");
-  return buf.toString();
-}
-*/
-
-/****************************************************************
  * toArray
  ****************************************************************/
 
-<Any T> T[] toArray(java.util.Collection<T> c)
+<T, U | T <: U> U[] toArray(Collection<T> coll)
 {
-  T[] res = cast(new T[c.size()]);
-
+  U[] res = cast(new U[coll.size()]);
   int i = 0;
-  c.foreach(T elem => res[i++] = elem);
+  for (T elem : coll)
+    res[i++] = elem;
+
+  return res;
+}
+
+<T, U> U[] mapToArray(List<T> list, T->U func)
+{
+  U[] res = cast(new U[list.size()]);
+  int i = 0;
+  for (T elem : list)
+    res[i++] = func(elem);
+ 
+  return res;
+}
+
+/****************************************************************
+ * Set operations
+ ****************************************************************/
+
+<T, U, V | U <: T, V <: T> Set<T> union(Set<U> set1, Set<V> set2)
+{
+  let Set<T> res = new HashSet(set1);
+  res.addAll(set2);
+  return res;
+}
+
+<T, U, V | U <: T, V <: T> Set<T> intersection(Set<U> set1, Set<V> set2)
+{
+  Set<T> res = new HashSet();
+  if (set1.size() > set2.size())
+    {
+      for (V elem : set2)
+        if (set1.contains(elem))
+	  res.add(elem);
+    }  
+  else
+    {
+      for (U elem : set1)
+        if (set2.contains(elem))
+	  res.add(elem);
+    }
+
+  return res;
+}
+
+<T, U, V | U <: T, V <: T> Set<T> disjunction(Set<U> set1, Set<V> set2)
+{
+  Set<T> res = new HashSet();
+  for (U elem : set1)
+    if (! set2.contains(elem))
+      res.add(elem);
+
+  for (V elem : set2)
+    if (! set1.contains(elem))
+      res.add(elem);
+
+  return res;
+}
+
+<T, U, V, W | U <: T, V <: W, W <: U> Set<T> difference(Set<U> set1, Set<V> set2)
+{
+  Set<T> res = new HashSet();
+  for (U elem : set1)
+    if (! set2.contains(elem))
+      res.add(elem);
+
   return res;
 }

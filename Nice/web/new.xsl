@@ -87,8 +87,8 @@
            &nbsp;<span class="small">o</span><xsl:text> </xsl:text>
            <a class="nav" href="manual.html">Manual</a>
            (<a class="nav" href="manual.html">online</a>,
-            <a class="nav" href="manual.pdf">PDF</a>,
-            <a class="nav" href="manual.ps">PS</a>)
+            <a class="nav" href="NiceManual.pdf">PDF</a>,
+            <a class="nav" href="NiceManual.ps">PS</a>)
            <br />
            &nbsp;<span class="small">o</span><xsl:text> </xsl:text>
            <a class="nav" href="compilation.html">Using the compiler</a>
@@ -186,6 +186,9 @@
            <br />
            &nbsp;<span class="small">o</span><xsl:text> </xsl:text>
            <a class="nav" href="tests.html">Tests</a>
+           <br />
+           &nbsp;<span class="small">o</span><xsl:text> </xsl:text>
+           <a class="nav" href="coverage/">Coverage</a>
            <br />
            &nbsp;<span class="small">o</span><xsl:text>&nbsp;</xsl:text>
            <a class="nav" href="/cgi-bin/twiki/view/Dev/WebHome">Wiki</a>

@@ -15,8 +15,16 @@ PROC=xsltproc --nonet
 all: index.html research.html compilation.html testimonials.html install.html \
      irc.html roadmap.html safety.html manual.html manual.pdf manual.ps
 
-send: all
-	scp -r *.css *.html .htaccess images *.pdf *.ps bonniot@shell.sourceforge.net:/home/groups/n/ni/nice/htdocs
+send: all send_manual_pdf send_manual_ps
+	scp -r *.css *.html .htaccess images bonniot@shell.sourceforge.net:/home/groups/n/ni/nice/htdocs
+
+send_manual_pdf: manual.pdf
+	scp manual.pdf bonniot@shell.sourceforge.net:/home/groups/n/ni/nice/htdocs/NiceManual.pdf
+	touch send_manual_pdf
+
+send_manual_ps: manual.ps
+	scp manual.ps bonniot@shell.sourceforge.net:/home/groups/n/ni/nice/htdocs/NiceManual.ps
+	touch send_manual_ps
 
 old: safety.html
 

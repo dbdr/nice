@@ -136,7 +136,7 @@ class Compilation extends CompilationInterface
   addProgress(weight)
   {
     totalProgress += weight / totalNumberOfDeclarations;
-    listener.progress(totalProgress * 100);
+    listener.progress(totalProgress);
   }
 }
 

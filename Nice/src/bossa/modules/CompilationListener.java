@@ -15,7 +15,7 @@ package bossa.modules;
 /**
    The listener interface for compilation events.
 
-   @author  (bonniot@users.sourceforge.net)
+   @author Daniel Bonniot (bonniot@users.sourceforge.net)
  */
 
 import bossa.util.*;
@@ -39,6 +39,8 @@ public interface CompilationListener
   void progress(String packageName, String phase);
 
   /** Gives an approximation of how much of the compilation has been completed.
+      @param proportion the current progress 
+        (0.0 = just started, 1.0 = complete).
   */
-  void progress(float percent);
+  void progress(float proportion);
 }

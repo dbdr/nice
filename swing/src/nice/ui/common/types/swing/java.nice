@@ -1,6 +1,6 @@
 package nice.ui.common.types.swing;
 
-// all imports for this package 
+// all imports for this package
 // are defined in this file
 
 import java.awt.*;
@@ -84,7 +84,7 @@ void menuDragMouseEntered(MenuDragMouseListener, MenuDragMouseEvent)
 void menuDragMouseExited(MenuDragMouseListener, MenuDragMouseEvent)
   = native void MenuDragMouseListener.menuDragMouseExited(MenuDragMouseEvent);
 void menuDragMouseReleased(MenuDragMouseListener, MenuDragMouseEvent)
-  = native void MenuDragMouseListener.menuDragMouseReleased(MenuDragMouseEvent);  
+  = native void MenuDragMouseListener.menuDragMouseReleased(MenuDragMouseEvent);
 
 // interface MenuKeyListener
 void menuKeyPressed(MenuKeyListener, MenuKeyEvent)
@@ -197,3 +197,22 @@ EventListener[?] getListeners(DefaultTreeModel, Class)
 // class DefaultListSelectionModel
 EventListener[?] getListeners(DefaultListSelectionModel, Class)
   = native EventListener[] DefaultListSelectionModel.getListeners(Class);
+
+
+
+// class CellRendererPane
+void addImpl(CellRendererPane, Component, Object, int)
+  = native void CellRendererPane.addImpl(Component, Object, int);
+void paintComponent(CellRendererPane, Graphics, Component, Container, int, int, int, int)
+  = native void CellRendererPane.paintComponent(Graphics, Component, Container, int, int, int, int);
+void paintComponent(CellRendererPane, Graphics, Component, Container, int, int, int, int, boolean)
+  = native void CellRendererPane.paintComponent(Graphics, Component, Container, int, int, int, int, boolean);
+void paintComponent(CellRendererPane, Graphics, Component, Container, Rectangle)
+  = native void CellRendererPane.paintComponent(Graphics, Component, Container, Rectangle);
+
+
+// class ScrollPane
+void addImpl(ScrollPane, Component, Object, int)
+  = native void ScrollPane.addImpl(Component, Object, int);
+void setScrollPosition(ScrollPane, Point)
+  = native void ScrollPane.setScrollPosition(Point);

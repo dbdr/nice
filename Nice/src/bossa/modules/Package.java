@@ -108,8 +108,7 @@ public class Package implements mlsub.compilation.Module, Located, bossa.syntax.
     Definition.currentModule = this;
     
     List definitions = new LinkedList();
-    TreeSet opens = new TreeSet();
-    opens.add(this.name.toString());
+    Set opens = new TreeSet();
     opens.add("java.lang");    
 
     if (Debug.passes)
@@ -128,7 +127,12 @@ public class Package implements mlsub.compilation.Module, Located, bossa.syntax.
     // when we import a bossa package, we also open it.
     for (Iterator i = imports.iterator(); i.hasNext();)
       opens.add(((LocatedString) i.next()).toString());
-    this.opens = (String[]) opens.toArray(new String[opens.size()]);
+
+    int len = opens.size();
+    this.opens = (String[]) opens.toArray(new String[len + 1]);
+    // We must guarantee that this package is the first element of 'open'.
+    this.opens[len] = this.opens[0];
+    this.opens[0] = this.name.toString();
 
     Definition.currentModule = oldModule;
   }
@@ -203,7 +207,8 @@ public class Package implements mlsub.compilation.Module, Located, bossa.syntax.
     return opens;
   }
   
-  /** List of the packages implicitely opened, a la 'import pkg.*' 
+  /** List of the packages implicitely opened, a la 'import pkg.*'.
+      The first element must be this package itself.
    */
   private String[] opens;
   private List /* of LocatedString */ imports;

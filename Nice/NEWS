@@ -20,8 +20,12 @@ nice (0.9.10)
 
     Method java.util.Collection.add() is recognized as implementing
     the new add method, which makes Collection a valid Addable class.
+  * Java methods and fields with parametric types are given a type with
+    UnknownTypes as typeparameters instead of being ignored.
   * Bug fixes (disallowed redefinition of parameters, execution order of
-    initializers in super classes, ... )
+    initializers in super classes, visibility checking of java classes,
+    cyclic custom constructors, methods and fields in classes with less type
+    params, this in custom constructors, ... )
 
  --
 

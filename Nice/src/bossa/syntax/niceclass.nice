@@ -236,7 +236,7 @@ public class CNiceClass extends NiceClass
     mlsub.typing.Monotype thisType =
       Monotype.sure(new mlsub.typing.MonotypeConstructor(definition.getTC(),
 			definition.getTypeParameters()));
-    thisSymbol = new ThisSymbol(thisName, thisType, declaringClass: this);
+    thisSymbol = new ThisSymbol(thisName, type: thisType, declaringClass: this);
 
     Node.thisExp = createSymbolExp(notNull(thisSymbol), definition.location());
     scope.addSymbol(thisSymbol);

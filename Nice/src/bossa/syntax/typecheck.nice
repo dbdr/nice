@@ -487,7 +487,7 @@ boolean enterClosure()
   for (int i = levels.size(); i-- > 0;)
     {
       (MonoSymbol variable, mlsub.typing.Monotype type) = conditionalTypes[i];
-      replaced.add((variable, variable.type));
+      replaced.add((variable, notNull(variable.type)));
       variable.type = type;
     }
   
@@ -712,7 +712,7 @@ typecheck(ExpLocalVariable e)
       catch(TypingEx t){
 	reportNullAssignmentError(decl, t, value: value, 
 				  target.name.toString(),
-				  target.getMonotype());
+				  notNull(target.getMonotype()));
 	throw assignmentError(target, target.name.toString(), 
 			      String.valueOf(target.getMonotype), 
 			      value);
@@ -788,7 +788,7 @@ typecheck(LocalVariable decl)
       catch(TypingEx t){
 	reportNullAssignmentError(decl, t, value: value, 
 				  target.name.toString(),
-				  target.getMonotype());
+				  notNull(target.getMonotype()));
 	throw assignmentError(target, target.name.toString(), 
 			      String.valueOf(target.getMonotype), 
 			      value);
@@ -851,8 +851,8 @@ typecheck(LoopStmt l)
 	  if (variables != null)
 	    variables.foreach (MonoSymbol variable => 
 			       setVarType(variable, 
-					  now: makeSure(variable.type), 
-					  out: variable.type));
+					  now: makeSure(notNull(variable.type)), 
+					  out: notNull(variable.type)));
 
 	  ?List<(MonoSymbol, mlsub.typing.Monotype)> instanceofIfTrue = 
 	    first_(instanceofInfo(notNull(whileExp)));

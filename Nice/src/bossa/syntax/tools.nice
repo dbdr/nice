@@ -202,7 +202,6 @@ Arguments Argument(List<Arguments.Argument>) = native new Arguments(List);
 Arguments Argument(Arguments.Argument[]) = native new Arguments(Arguments.Argument[]);
 mlsub.typing.Polytype getType(Expression) = 
   native mlsub.typing.Polytype Expression.getType();
-mlsub.typing.Monotype type(MonoSymbol) = native MonoSymbol.type;
 GlobalTypeScope getGlobalTypeScope() = native GlobalTypeScope Node.getGlobalTypeScope();
 ?gnu.bytecode.ClassType staticClass(Arguments) = native gnu.bytecode.ClassType Arguments.staticClass();
 ?gnu.bytecode.ClassType staticClass(Expression) = native gnu.bytecode.ClassType Expression.staticClass();

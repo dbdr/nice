@@ -12,6 +12,117 @@
 
 package bossa.syntax;
 
+
+/**
+   A variable symbol which has a monotype (eg a function parameter)
+ 
+   @see PolySymbol
+*/
+public class MonoSymbol extends VarSymbol
+{
+  ?Monotype syntacticType = null;
+  ?mlsub.typing.Monotype type = null;
+
+  boolean captured = false;
+
+  /** The depth of nested block at which this variable is defined. */
+  int depth = 0;
+
+  boolean used = false;
+
+/*  public MonoSymbol(LocatedString name, Monotype type)
+  {
+    super(name);
+    this.syntacticType=type;
+  }
+  
+  public MonoSymbol(LocatedString name, mlsub.typing.Monotype type)
+  {
+    super(name);
+    this.type = type;
+  }
+*/  
+  getType() = new mlsub.typing.Polytype(type);
+
+  public ?mlsub.typing.Monotype getMonotype()
+  {
+    return type;
+  }
+
+  resolve()
+  {
+    type = notNull(syntacticType).resolve(typeScope);
+    syntacticType = null;
+
+    if (nice.tools.typing.Types.isVoid(type))
+      throw User.error(name, "A variable cannot have a void type");
+  }
+
+  /**
+     @return
+     0 : doesn't match
+     1 : wasn't even a function
+     2 : matches
+  */
+  match(arguments)
+  {
+    let k = nice.tools.typing.Types.rawType(type).getKind();
+    if (k instanceof FunTypeKind)
+      if (!notNull(arguments).plainApplication(k.domainArity, this))
+	return 0;
+      else
+	return 2;
+    else 
+      return 1;
+  }
+
+  explainWhyMatchFails(arguments)
+  {
+    let k = nice.tools.typing.Types.rawType(type).getKind();
+    if (k instanceof FunTypeKind)
+      { 
+	int arity = k.domainArity;
+	if (notNull(arguments).size() != arity)
+	  return name + Util.has(arity, "parameter", notNull(arguments).size());
+	else
+	  // If the number of arguments is correct, it must be that
+	  // some arguments are named.
+	  return name + " does not have named parameters";
+      }
+    else 
+      return name + " is not a function";
+  }
+
+  // explained in OverloadedSymbolExp
+  makeClonedType() {}
+  releaseClonedType() {}
+  getClonedType() = this.getType();
+  
+  toString()
+  {
+    if (type == null)
+      return notNull(syntacticType) + " " + name;
+
+    return notNull(type) + " " + name;
+  }
+}
+
+public MonoSymbol createMonoSymbol(LocatedString name, Monotype type)
+{
+  return new MonoSymbol(name, syntacticType: type);
+}
+
+/**
+   Maps getMonotype over an array of MonoSymbols.
+ */
+mlsub.typing.Monotype[?] getMonotypes(MonoSymbol[?] symbols)
+{
+  if (symbols == null)
+    return null;
+
+  return symbols.mapToArray(MonoSymbol sym => notNull(sym.getMonotype()));
+}
+
 /**
    A variable symbol which has a polytype (eg a method symbol)
    

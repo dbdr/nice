@@ -68,7 +68,7 @@ public class Contract
 
     if (! nice.tools.typing.Types.isVoid(resultType))
       result = new ResultMonoSymbol(new LocatedString("result", location), 
-                              resultType);
+                              type: resultType);
 
     try {
       if (result != null)

@@ -150,7 +150,7 @@ class LocalVariableSymbol extends MonoSymbol
 
 public new LocalVariable(LocatedString name, ?Monotype type, boolean constant, ?Expression value)
 {
-  this(value: value, left:new LocalVariableSymbol(name, type, constant: constant));
+  this(value: value, left:new LocalVariableSymbol(name, syntacticType: type, constant: constant));
 }
 
 public class LocalConstant extends LocalValue
@@ -181,7 +181,7 @@ class LocalConstantSymbol extends MonoSymbol
 public new LocalConstant(LocatedString name, Expression value)
 {
   ?Monotype t = null;
-  this(value: value, left: new LocalConstantSymbol(name,t));
+  this(value: value, left: new LocalConstantSymbol(name, syntacticType: t));
 }
 
 

@@ -565,7 +565,7 @@ MonoSymbol monoSymbol():
 {
   type=monotype()
   name=ident()
-  { return new MonoSymbol(name,type); }
+  { return bossa.syntax.dispatch.createMonoSymbol(name,type); }
 }
 
 /***********************************************************************/
@@ -1727,7 +1727,7 @@ MonoSymbol funExpParameter(List statements):
 (
   LOOKAHEAD( monotype() )
   type=monotype() name=ident()
-  { return new MonoSymbol(name,type); }
+  { return bossa.syntax.dispatch.createMonoSymbol(name,type); }
 | 
   { Token first,last;
     List parts = new LinkedList();
@@ -1750,7 +1750,7 @@ MonoSymbol funExpParameter(List statements):
     statements.add(bossa.syntax.dispatch.createExpressionStmt(exp));
     type = new TupleType(types, makeLocation(first, last));
     type.nullness = Monotype.absent;
-    return new MonoSymbol(name, type);
+    return bossa.syntax.dispatch.createMonoSymbol(name, type);
   }
 )
 }

@@ -363,7 +363,8 @@ public class MethodBodyDefinition extends MethodImplementation
 	}
 
 	// Introduce the types of the arguments
-	mlsub.typing.Monotype[] monotypes = MonoSymbol.getMonotype(parameters);
+	mlsub.typing.Monotype[] monotypes = notNull(parameters).mapToArray(
+		MonoSymbol sym => notNull(sym.getMonotype()));
 
 	for (int n = 0; n < formals.length; n++)
 	  {

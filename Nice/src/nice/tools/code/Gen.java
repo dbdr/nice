@@ -14,7 +14,8 @@ package nice.tools.code;
 
 import gnu.bytecode.*;
 import gnu.expr.*;
-import bossa.syntax.MonoSymbol;
+//import bossa.syntax.MonoSymbol;
+import bossa.syntax.VarSymbol;
 
 /**
    Code generation functions.
@@ -96,7 +97,7 @@ public class Gen
   public static LambdaExp createMethod(String bytecodeName,
 				       Type[] argTypes,
 				       Type retType,
-				       MonoSymbol[] args)
+				       /*MonoSymbol*/VarSymbol[] args)
   {
     return createMethod(bytecodeName, argTypes, retType, args, true, false);
   }
@@ -109,7 +110,7 @@ public class Gen
   public static LambdaExp createMethod(String bytecodeName,
 				       Type[] argTypes,
 				       Type retType,
-				       MonoSymbol[] args,
+				       /*MonoSymbol*/VarSymbol[] args,
 				       boolean toplevel)
   {
     return createMethod(bytecodeName, argTypes, retType, args, toplevel, false);
@@ -128,7 +129,7 @@ public class Gen
   public static LambdaExp createMethod(String bytecodeName,
 				       Type[] argTypes,
 				       Type retType,
-				       MonoSymbol[] args,
+				       /*MonoSymbol*/VarSymbol[] args,
 				       boolean toplevel,
 				       boolean member)
   {
@@ -138,7 +139,7 @@ public class Gen
   }
 
   public static ConstructorExp createConstructor
-    (Declaration thisDecl, Type[] argTypes, MonoSymbol[] args)
+    (Declaration thisDecl, Type[] argTypes, /*MonoSymbol*/VarSymbol[] args)
   {
     ConstructorExp res = new ConstructorExp(thisDecl);
     createMethod(res, "<init>", argTypes, Type.void_type, args, 
@@ -147,7 +148,7 @@ public class Gen
   }
 
   public static ConstructorExp createCustomConstructor
-    (ClassType classType, Type[] argTypes, MonoSymbol[] args)
+    (ClassType classType, Type[] argTypes, /*MonoSymbol*/VarSymbol[] args)
   {
     ConstructorExp res = new ConstructorExp(classType);
     createMethod(res, "<init>", argTypes, Type.void_type, args, 
@@ -170,7 +171,7 @@ public class Gen
      String bytecodeName,
      Type[] argTypes,
      Type retType,
-     MonoSymbol[] args,
+     /*MonoSymbol*/VarSymbol[] args,
      boolean toplevel,
      boolean member,
      boolean constructor)

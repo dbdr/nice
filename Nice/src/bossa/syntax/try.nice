@@ -103,6 +103,6 @@ public new ACatch(TypeIdent tc, LocatedString varName, Statement body)
   Monotype type = createMonotypeConstructor(tc, null, tc.location());
   type.nullness = Monotype.sure;
 
-  this(exnVar: new MonoSymbol(varName, type), tc: tc,
+  this(exnVar: new MonoSymbol(varName, syntacticType: type), tc: tc,
 		typeLocation: tc.location, varName: varName, body: body);
 }

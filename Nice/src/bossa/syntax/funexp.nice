@@ -96,7 +96,7 @@ public class FunExp extends Expression implements Function
 	  ! nice.tools.typing.Types.isVoid(_inferredReturnType))
 	throw User.error(this, "Missing return statement");
 
-    mlsub.typing.Monotype t = new mlsub.typing.FunType(MonoSymbol.getMonotype(formals), 
+    mlsub.typing.Monotype t = new mlsub.typing.FunType(getMonotypes(formals), 
 			     notNull(_inferredReturnType).getMonotype());
     type = new mlsub.typing.Polytype
       (mlsub.typing.Constraint.and(cst, notNull(_inferredReturnType).getConstraint()),
@@ -117,9 +117,9 @@ public class FunExp extends Expression implements Function
   {
     gnu.expr.LambdaExp res = nice.tools.code.Gen.createMethod
       (null, 
-       nice.tools.code.Types.javaType(MonoSymbol.getMonotype(formals)), 
+       nice.tools.code.Types.javaType(getMonotypes(formals)), 
        nice.tools.code.Types.javaType(this.inferredReturnType()), 
-       formals, false);
+       cast(formals), false);
     nice.tools.code.Gen.setMethodBody(res, body.generateCode());
     return res;
   }

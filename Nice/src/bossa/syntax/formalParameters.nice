@@ -352,7 +352,7 @@ public class Parameter
 
   ParameterSymbol getSymbol()
   {
-    symbol = new ParameterSymbol(this.getName(), type);
+    symbol = new ParameterSymbol(this.getName(), syntacticType: type);
     return notNull(symbol);
   }
 }

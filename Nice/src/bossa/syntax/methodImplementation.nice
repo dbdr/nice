@@ -82,7 +82,7 @@ public abstract class MethodImplementation extends Definition
 	  }
 
         LocatedString argName = p.getName() != null ? notNull(p.getName()) : new LocatedString("argument_"+tn, bossa.util.Location.nowhere());
-	res[tn] = new MonoSymbol(argName, type);
+	res[tn] = new MonoSymbol(argName, type: type);
       }
     notNull(scope).addSymbols(res);
     parameters = cast(res);
@@ -169,7 +169,7 @@ public abstract class MethodImplementation extends Definition
       nice.tools.code.Gen.createMethod(bytecodeName, 
 		       this.javaArgTypes(),
 		       notNull(declaration).javaReturnType(),
-		       parameters,
+		       cast(parameters),
 		       true, false);
 
     notNull(compiledMethod).addBytecodeAttribute

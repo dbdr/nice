@@ -96,7 +96,7 @@ public GlobalVarDeclaration createGlobalVarDeclaration(LocatedString name,
 {
     let res = new GlobalVarDeclaration(name, Node.global, left: cast(null),
 			value: value, constant: constant);
-    res.left = new GlobalVarSymbol(name, type, definition: res);
+    res.left = new GlobalVarSymbol(name, syntacticType: type, definition: res);
     res.addChild(res.left);
     return res;
 }

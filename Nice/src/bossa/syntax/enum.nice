@@ -182,6 +182,6 @@ EnumSymbol createEnumSymbol(EnumDefinition def, LocatedString enumName,
   for (int i = 0; i < fields.size(); i++)
     args.add(new Arguments.Argument(argExps[i], fields[i].getName()));
 
-  return new EnumSymbol(name, type, definition: def, value: 
+  return new EnumSymbol(name, syntacticType: type, definition: def, value: 
 	createNewExp(new TypeIdent(name: enumName), new Arguments(args)));
 }

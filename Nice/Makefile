@@ -26,6 +26,7 @@ test:
 ## Documentation
 
 jdoc:
+	mkdir -p ${TOP}/doc; \
 	${JAVADOC} -windowtitle "Nice" -doctitle "The Nice compiler source" \
 	-overview ${TOP}/src/overview.html \
 	-d ${TOP}/doc -private mlsub.typing mlsub.compilation bossa bossa.syntax bossa.util bossa.link gnu.bytecode gnu.expr gnu.math gnu.mapping kawa.standard kawa.lang

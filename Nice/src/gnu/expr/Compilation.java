@@ -60,8 +60,6 @@ public class Compilation
   // Various standard classes
   static public ClassType typeObject = Type.pointer_type;
   static public ClassType scmBooleanType = ClassType.make("java.lang.Boolean");
-  static public Type booleanType = Type.make(java.lang.Boolean.TYPE);
-  
   static public ClassType typeString = ClassType.make("java.lang.String");
   static public ClassType javaStringType = typeString;
   static public ClassType scmSymbolType = typeString;
@@ -302,6 +300,7 @@ public class Compilation
   {
     ClassType sup = module.getSuperType();
     return (sup != null ? sup
+	    : usingCPStyle() ? typeCallFrame
 	    : generateApplet ? typeApplet
 	    : generateServlet ? typeServlet
 	    : typeModuleBody);
@@ -442,9 +441,9 @@ public class Compilation
           }
         catch (Exception ex)
           {
-            error('w', "cannot convert literal '" + value + "' (of type "
+            error('w', "cannot convert literal (of type "
                   + value.getClass().getName() + ") to "
-                  + type.getName() + " class="+type.getClass());
+                  + type.getName());
           }
       }
     compileConstant(value);
@@ -461,7 +460,7 @@ public class Compilation
     method = save;
   }
 
-  void dumpInitializers (Initializer inits)
+  private void dumpInitializers (Initializer inits)
   {
     for (Initializer init = Initializer.reverse(inits);
          init != null;  init = init.next)
@@ -1314,9 +1313,9 @@ public class Compilation
     // if (usingCPStyle())   code.addParamLocals();
 
     thisDecl = method.getStaticFlag() ? null : module.declareThis(new_class);
+    module.closureEnv = module.thisVariable;
     module.heapFrame = module.thisVariable;
-    if (! (fewerClasses && curClass == mainClass))
-      module.allocChildClasses(this);
+    module.allocChildClasses(this);
 
     if (module.isHandlingTailCalls() || usingCPStyle())
       {
@@ -1354,6 +1353,9 @@ public class Compilation
 	code.emitLoad(callStackContext);
         code.emitGetField(pcCallContextField);
         fswitch = new SwitchState(code);
+	Label l = new Label(code);
+	l.define(code);
+	fswitch.addCase(0, l, code);
       }
 
     try
@@ -1446,7 +1448,7 @@ public class Compilation
   }
 
   public static boolean usingCPStyle() { return usingCPStyle; }
-  public static boolean usingTailCalls() { return usingTailCalls; }
+  public boolean usingTailCalls() { return usingTailCalls; }
 
   int localFieldIndex; 
   public Field allocLocalField (Type type, String name)
@@ -1455,6 +1457,14 @@ public class Compilation
       name = "tmp_"+(++localFieldIndex);
     Field field = curClass.addField(name, type, 0);
     return field;
+  }
+
+  /** Generate code to push the current CallContext on the JVM stack.
+   * Assumes that callStackContext has been set for the current function.
+   * (Later we should call a routine to get it via the current thread.) */
+  public final void loadCallContext()
+  {
+    getCode().emitLoad(callStackContext);
   }
 
   public void freeLocalField (Field field)

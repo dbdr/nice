@@ -400,6 +400,14 @@ implements Consumer, PositionConsumer, Consumable
 
   public void writeObject(Object v)
   {
+    if (v instanceof SeqPosition)
+      {
+	// A SeqPosition is used as a temporary cursor (see NodeType),
+	// so we need to save the current position.
+	SeqPosition pos = (SeqPosition) v;
+        writePosition(pos.sequence, pos.ipos, pos.xpos);
+	return;
+      }
     ensureSpace(3);
     int index = find(v);
     if (index < 0x1000)
@@ -1359,7 +1367,17 @@ implements Consumer, PositionConsumer, Consumable
 			break;
 		      case END_ATTRIBUTE: out.print("=END_ATTRIBUTE"); break;
 		      case POSITION_TRIPLE_FOLLOWS:
-			out.println("=POSITION_TRIPLE_FOLLOWS");
+			out.print("=POSITION_TRIPLE_FOLLOWS seq:");
+			{
+			  j = getIntN(i+1);  out.print(j);  out.print("=@");
+			  Object seq = objects[j];
+			  if (seq == null) out.print("null");
+			  else out.print(System.identityHashCode(seq));
+			  out.print(" ipos:");
+			  out.print(getIntN(i+3));
+			  out.print(" xpos:");
+			  out.print(getIntN(i+5));
+			}
 			toskip = 6;
 			/*
 			AbstractSequence seq = (AbstractSequence) objects[getIntN(i+1)];

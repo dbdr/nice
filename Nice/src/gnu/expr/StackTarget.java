@@ -52,11 +52,6 @@ public class StackTarget extends Target
     
     // checks if emitCoerceToObject did a good job
     return code.topType().isSubtype(type);
-
-    /* KAWA
-    stackType.emitCoerceToObject(code);
-    return type instanceof ClassType && stackType.isSubtype(type);
-    */
   }
 
   public static void convert(Compilation comp, Type stackType, Type targetType)

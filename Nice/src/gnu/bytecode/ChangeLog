@@ -1,3 +1,34 @@
+2001-11-23  Per Bothner  <per@bothner.com>
+
+	* ClassType.java  (isSubclass):  Handle other class an interface,
+	(compare):  Simplify, due to above change.
+
+	* ClassType.java  (isSubclass):  Special test for tostring_type.
+	(compare):  Likewise.
+	* ObjectType.java (coerceFromObject):  Allow null when tostring_type.
+	(emitCoerceFromObject):  Emit code that tests input for null.
+
+2001-11-21  Per Bothner  <per@bothner.com>
+
+	* ClassType.java (noClasses):  New static field.
+	(getInterfaces):  Use getReflectClass().
+	Use noClasses when there are no intefaces.
+	(getMethods):  Search interface also of super-classes.
+	Fixes problem reported by Valtteri Vuorikoski.
+
+	* ClassType.java (getMethods):  Context is now a package name, rather
+	than a ClassType.  Fixes problem reported by Walter Pelissero, where
+	Sun has a private java.lang.UnixProcess which we considered to be in
+	the same package as java.lang.Object, which used to mean "any class",
+
+2001-11-17  Per Bothner  <per@bothner.com>
+
+	* ClassType.java (getPackageName):  New method.
+	(getMethods):  New overload uses Vector.
+
+	* Type.java (make):  Don't set interface flag here since it prevents
+	future getModifiers calls from getting the reflectClass's modifiers. 
+
 2001-11-05  Per Bothner  <per@bothner.com>
 
 	* ArrayType.java (getImplementationType):  New method

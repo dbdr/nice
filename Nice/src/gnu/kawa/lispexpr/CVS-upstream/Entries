@@ -1,9 +1,5 @@
 /COPYING/1.1/Tue Oct 30 15:16:50 2001//
 /LispInterpreter.java/1.2/Tue Oct 30 15:16:50 2001//
-/LispReader.java/1.6/Tue Oct 30 15:16:50 2001//
-/Makefile.am/1.7/Tue Oct 30 15:16:50 2001//
-/Makefile.in/1.12/Tue Oct 30 15:16:50 2001//
-/ReadTable.java/1.1/Tue Oct 30 15:16:50 2001//
 /ReadTableEntry.java/1.1/Tue Oct 30 15:16:50 2001//
 /ReaderDispatch.java/1.4/Tue Oct 30 15:16:50 2001//
 /ReaderDispatchMacro.java/1.2/Tue Oct 30 15:16:50 2001//
@@ -15,7 +11,12 @@
 /ReaderQuote.java/1.1/Tue Oct 30 15:16:50 2001//
 /ReaderString.java/1.1/Tue Oct 30 15:16:50 2001//
 /ReaderVector.java/1.1/Tue Oct 30 15:16:50 2001//
-/ScmRead.java/1.8/Tue Oct 30 15:16:50 2001//
-/ChangeLog/1.23/Thu Nov 15 13:35:40 2001//
 /LangPrimType.java/1.5/Thu Nov 15 13:35:40 2001//
+/ChangeLog/1.26/Sun Nov 25 14:12:10 2001//
+/LispReader.java/1.7/Sun Nov 25 14:12:10 2001//
+/Makefile.am/1.8/Sun Nov 25 14:12:10 2001//
+/Makefile.in/1.14/Sun Nov 25 14:12:10 2001//
+/ReadTable.java/1.2/Sun Nov 25 14:12:10 2001//
+/ReaderTypespec.java/1.1/Sat Nov 24 21:42:34 2001//
+/ScmRead.java/1.10/Sun Nov 25 14:12:10 2001//
 D

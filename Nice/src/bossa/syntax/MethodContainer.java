@@ -12,18 +12,63 @@
 
 package bossa.syntax;
 
+import mlsub.typing.Variance;
+import mlsub.typing.MonotypeVar;
+
 /**
    An entity in which methods can be declared.
 
+   It can have type parameters, that are implicitely added 
+   to the englobed methods.
+
    @version $Date$
-   @author Daniel Bonniot (d.bonniot@mail.dotcom.fr)
+   @author Daniel Bonniot (bonniot@users.sourceforge.net)
 */
 
-public interface MethodContainer
+public abstract class MethodContainer extends Definition
 {
-  mlsub.typing.Variance variance();
-  mlsub.typing.TypeSymbol getTypeSymbol();
+  MethodContainer (LocatedString name, int propagate, 
+		   java.util.List typeParameters, java.util.List variance)
+  {
+    super(name, propagate);
 
-  /** Create type parameters with the same names as in the entity. */
-  mlsub.typing.MonotypeVar[] createSameTypeParameters();
+    this.variance = makeVariance(variance);
+
+    if (typeParameters==null || typeParameters.size() == 0)
+      this.typeParameters = null;
+    else
+      this.typeParameters = (MonotypeVar[]) 
+	typeParameters.toArray(new MonotypeVar[typeParameters.size()]);
+  }
+
+  final MonotypeVar[] typeParameters;
+  mlsub.typing.Variance variance;
+
+  abstract mlsub.typing.TypeSymbol getTypeSymbol();
+
+  /** Create type parameters with the same names as in this entity. */
+  mlsub.typing.MonotypeVar[] createSameTypeParameters ()
+  {
+    if (typeParameters == null)
+      return null;
+    
+    mlsub.typing.MonotypeVar[] thisTypeParams = 
+      new mlsub.typing.MonotypeVar[typeParameters.length];
+    for(int i=0; i<thisTypeParams.length; i++)
+      thisTypeParams[i] = new MonotypeVar(typeParameters[i].toString());
+    return thisTypeParams;
+  }
+
+  private static Variance makeVariance(java.util.List typeParametersVariances)
+  {
+    int[] variances = new int[typeParametersVariances.size()];
+    for (int i = typeParametersVariances.size(); --i >= 0;)
+      if (typeParametersVariances.get(i) != null)
+	if (typeParametersVariances.get(i) == Boolean.TRUE)
+	  variances[i] = Variance.COVARIANT;
+	else
+	  variances[i] = Variance.CONTRAVARIANT;
+
+    return Variance.make(variances);
+  }
 }

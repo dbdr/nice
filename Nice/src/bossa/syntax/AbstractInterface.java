@@ -23,10 +23,9 @@ import mlsub.typing.Typing;
    Declaration of an abstract interface (i.e. a ML-Sub interface).
 
    @version $Date$
-   @author Daniel Bonniot
+   @author Daniel Bonniot (bonniot@users.sourceforge.net)
  */
-public class AbstractInterface extends Definition
-  implements MethodContainer
+public class AbstractInterface extends MethodContainer
 {
   public AbstractInterface(LocatedString name, 
 			   List typeParameters, 
@@ -34,10 +33,7 @@ public class AbstractInterface extends Definition
 			   List extensions
 			  )
   {
-    super(name, Node.global);
-
-    this.parameters = typeParameters;
-    this.variance = ClassDefinition.makeVariance(typeParametersVariances);
+    super(name, Node.global, typeParameters, typeParametersVariances);
 
     this.extensions = extensions;
 
@@ -55,14 +51,9 @@ public class AbstractInterface extends Definition
     addChild(m);
   }
   
-  public mlsub.typing.TypeSymbol getTypeSymbol()
+  mlsub.typing.TypeSymbol getTypeSymbol()
   {
     return itf;
-  }
-  
-  public mlsub.typing.MonotypeVar[] createSameTypeParameters()
-  {
-    return ClassDefinition.createSameTypeParameters(parameters);
   }
   
   /****************************************************************
@@ -108,7 +99,7 @@ public class AbstractInterface extends Definition
   {
     w.print("abstract interface "
             +name
-            +Util.map("<",", ",">",parameters)
+            +Util.map("<",", ",">", typeParameters)
             +Util.map(" extends ",", ","",extensions)
             +"{}\n");
 
@@ -137,13 +128,6 @@ public class AbstractInterface extends Definition
   public String toString()
   {
     return name.toString();
-  }
-
-  List /* of TypeSymbol */ parameters;
-  private Variance variance;
-  public Variance variance()
-  {
-    return variance;
   }
 
   /** ML-Sub interface. */

@@ -22,10 +22,9 @@ import java.util.*;
    Abstract syntax for a class definition.
 
    @version $Date$
-   @author Daniel Bonniot (d.bonniot@mail.dotcom.fr)
+   @author Daniel Bonniot (bonniot@users.sourceforge.net)
  */
-abstract public class ClassDefinition extends Definition
-  implements MethodContainer
+abstract public class ClassDefinition extends MethodContainer
 {
   /**
    * Creates a class definition.
@@ -50,7 +49,7 @@ abstract public class ClassDefinition extends Definition
 			 List implementations, List abstractions
 			 )
   {
-    super(name, Node.upper);
+    super(name, Node.upper, typeParameters, typeParametersVariances);
 
     if(isInterface)
       isAbstract = true;
@@ -77,14 +76,6 @@ abstract public class ClassDefinition extends Definition
     this.isFinal = isFinal;
     this.isAbstract = isAbstract;
     this.isInterface = isInterface;
-    
-    if(typeParameters==null || typeParameters.size() == 0)
-      this.typeParameters = null;
-    else
-      this.typeParameters = (MonotypeVar[]) 
-	typeParameters.toArray(new MonotypeVar[typeParameters.size()]);
-    
-    this.variance = makeVariance(typeParametersVariances);
     
     this.extensions = extensions;
     this.implementations = implementations;
@@ -143,25 +134,6 @@ abstract public class ClassDefinition extends Definition
     return null;
   }
 
-  private Variance variance;
-  public  Variance variance()
-  {
-    return variance;
-  }
-
-  static Variance makeVariance(List typeParametersVariances)
-  {
-    int[] variances = new int[typeParametersVariances.size()];
-    for (int i = typeParametersVariances.size(); --i >= 0;)
-      if (typeParametersVariances.get(i) != null)
-	if (typeParametersVariances.get(i) == Boolean.TRUE)
-	  variances[i] = Variance.COVARIANT;
-	else
-	  variances[i] = Variance.CONTRAVARIANT;
-
-    return Variance.make(variances);
-  }
-    
   /****************************************************************
    * Map TypeConstructors to ClassDefinitions
    ****************************************************************/
@@ -176,38 +148,6 @@ abstract public class ClassDefinition extends Definition
   /****************************************************************
    * Selectors
    ****************************************************************/
-
-  /** Create type parameters with the same names as in the class. */
-  public mlsub.typing.MonotypeVar[] createSameTypeParameters()
-  {
-    return createSameTypeParameters(this.typeParameters);
-  }
-  
-  public static mlsub.typing.MonotypeVar[] createSameTypeParameters
-    (List typeParameters)
-  {
-    if (typeParameters == null || typeParameters.size() == 0)
-      return null;
-    
-    mlsub.typing.MonotypeVar[] thisTypeParams = 
-      new mlsub.typing.MonotypeVar[typeParameters.size()];
-    for(int i=0; i<thisTypeParams.length; i++)
-      thisTypeParams[i] = new MonotypeVar(typeParameters.get(i).toString());
-    return thisTypeParams;
-  }
-
-  public static mlsub.typing.MonotypeVar[] createSameTypeParameters
-    (MonotypeVar[] typeParameters)
-  {
-    if (typeParameters == null)
-      return null;
-    
-    mlsub.typing.MonotypeVar[] thisTypeParams = 
-      new mlsub.typing.MonotypeVar[typeParameters.length];
-    for(int i=0; i<thisTypeParams.length; i++)
-      thisTypeParams[i] = new MonotypeVar(typeParameters[i].toString());
-    return thisTypeParams;
-  }
 
   public mlsub.typing.TypeSymbol getTypeSymbol()
   {
@@ -466,7 +406,6 @@ abstract public class ClassDefinition extends Definition
   
   mlsub.typing.TypeConstructor tc;
 
-  final MonotypeVar[] typeParameters;
   protected List
     /* of TypeConstructor */ extensions,
     /* of Interface */ implementations,

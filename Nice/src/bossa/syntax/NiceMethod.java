@@ -93,7 +93,7 @@ public class NiceMethod extends MethodDeclaration
     if(hasAlike || tc == null)
       {
 	TypeConstructor alikeTC = 
-	  new TypeConstructor("Alike", c.variance(), false, false);
+	  new TypeConstructor("Alike", c.variance, false, false);
 	
 	constraint.addBinder(alikeTC);
 	// added in front. Important for rebinding in method alternatives

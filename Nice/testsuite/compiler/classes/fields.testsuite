@@ -116,7 +116,7 @@ class C extends B {}
 class A { final int x = 1; }
 int f(A a) = a.x++;
 
-/// PASS bug
+/// PASS
   // accessing a final static field of an interface implemented by ObjectInputStream
   int x = ObjectInputStream.TC_NULL;
   /// Toplevel

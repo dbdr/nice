@@ -301,23 +301,42 @@ public final class JavaClasses
 
     // search a field
     if (arity <= 0)
-      {
-	gnu.bytecode.Field field = declaringClass.getField(funName);
-	if (field != null && field.getStaticFlag())
-	  {
-	    MethodDeclaration md = (JavaFieldAccess) retyped.get(field);
-	    if (md == null)
-	      md = JavaFieldAccess.make(field);
-	    if (md != null)
-	      possibilities.add(md.getSymbol());
-	    else
-	      if(Debug.javaTypes)
-		Debug.println("Field " + field + " ignored");
-	  }
-      }
+      findStaticJavaFields(declaringClass, funName, possibilities);
 
     return possibilities;
   }    
+
+  /**search recursively in superclasses and interfaces for static java fields*/
+  private static void findStaticJavaFields 
+	(ClassType declaringClass, String fieldName, List possibilities)
+  { 
+    declaringClass.addMethods();
+
+    gnu.bytecode.Field field = declaringClass.getField(fieldName);
+    if (field != null && field.getStaticFlag())
+      {
+	MethodDeclaration md = (JavaFieldAccess) retyped.get(field);
+	if (md == null)
+	   md = JavaFieldAccess.make(field);
+	if (md != null)
+	  {
+            if (! possibilities.contains(md.getSymbol()))
+	      possibilities.add(md.getSymbol());
+          }
+	else
+	  if(Debug.javaTypes)
+	    Debug.println("Field " + field + " ignored");
+      }
+    
+    ClassType superClass = declaringClass.getSuperclass();
+    if (superClass != null)
+      findStaticJavaFields(superClass, fieldName, possibilities);
+
+    ClassType[] interfaces = declaringClass.getInterfaces();
+    if (interfaces != null)
+      for (int i = 0; i < interfaces.length; i++)
+	findStaticJavaFields(interfaces[i], fieldName, possibilities);
+  }
 
   /**
    * Loads the methods defined in the java class

@@ -43,3 +43,8 @@
   (String s, longs) = ("A", (1,2));
   (long i, long j) = longs;
   i += j;
+
+/// PASS bug
+  (String fst, String snd) = foo("abc","xyz");
+  /// Toplevel
+  <T,U> (T,U) foo(T x, U y) = (x,y); 

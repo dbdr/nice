@@ -728,6 +728,11 @@ public abstract class Engine
 	k0.leq(e1.getId(),e2.getId()); 
     }
 
+    public final void assertMinimal(Element e)
+    {
+      k0.minimal(e.getId());
+    }
+    
     public Element lowestRigidSuperElement(Element e, boolean allowWidening)
     {
       int id = e.getId();

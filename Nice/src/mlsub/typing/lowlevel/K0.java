@@ -51,7 +51,7 @@ public final class K0 {
   
   // When a K0 is created it is in a special mode where the initial rigid
   // context is created. In this mode, one can use methods extend, initialLeq,
-  // newInterface, subInterface, and initialImplements. Then,
+  // minimal, newInterface, subInterface, and initialImplements. Then,
   // one must call method createInitialContext()
   //
   // The constraint is then in normal mode, one can no more use the
@@ -72,6 +72,7 @@ public final class K0 {
     this.C = new BitMatrix();
     this.Ct = new BitMatrix();
     this.n = 0;
+    this.minimal = new BitVector();
     this.garbage = new BitVector();
     this.posTagged = new BitVector();
     this.negTagged = new BitVector();
@@ -146,6 +147,17 @@ public final class K0 {
 
   public int size() {
     return n;
+  }
+  
+  /**
+   * Maintains the information "x is minimal" on [0, m0[
+   **/
+  private BitVector minimal;
+  public boolean isMinimal(int x) {
+    return minimal.get(x);
+  }
+  public void minimal(int x) {
+    minimal.set(x);
   }
   
   // tells if an index should be collected in the next call to collect()
@@ -417,7 +429,7 @@ public final class K0 {
     garbage.clear(dest);
     C.indexMove(src, dest);
     Ct.indexMove(src, dest);
-
+    
     // notify the user of K0
     callbacks.indexMoved(src, dest);
   }
@@ -433,7 +445,6 @@ public final class K0 {
     garbage.set(src);
     posTagged.bitMerge(src, dest);
     negTagged.bitMerge(src, dest);
-
     // notify the subclass
     callbacks.indexMerged(src, dest);
   }
@@ -466,6 +477,13 @@ public final class K0 {
     return (Interface)interfaces.elementAt(iid);
   }
 
+  /***********************************************************************
+   * Construction of the initial rigid context
+   ***********************************************************************/
+  private boolean hasBeenInitialized = false;
+  public boolean hasBeenInitialized() {
+    return hasBeenInitialized;
+  }
   /**
    * Add a new interface to the constraint and returns its ID
    **/
@@ -513,15 +531,6 @@ public final class K0 {
     S.assert(S.a&& !hasBeenInitialized);
     C.set(x, y);
     Ct.set(y, x);
-  }
-
-  /***********************************************************************
-   * Construction of the initial rigid context
-   ***********************************************************************/
-
-  private boolean hasBeenInitialized = false;
-  public boolean hasBeenInitialized() {
-    return hasBeenInitialized;
   }
 
   /***********************************************************************
@@ -675,19 +684,15 @@ public final class K0 {
       // !isRigid(x2)
       // exclude unit since unit is not comparable to x1
       reduceDomain(x2, false, R.getRow(x1));
-      /*if (origins.get(x1)) {
-        // x1 = x2
-        leq0(x2, x1);
-	}*/
     }
     if (isRigid(x2)) {
       // !isRigid(x1)
       // exclude unit
       reduceDomain(x1, false, Rt.getRow(x2));
-      /*if (minimal.get(x2)) {
+      if (minimal.get(x2)) {
         // x1 = x2;
         leq0(x2, x1);
-	}*/
+      }
     }
   }
 
@@ -836,9 +841,48 @@ public final class K0 {
   /***********************************************************************
    * Constraint preparation
    ***********************************************************************/
+
   // The constraint is "prepared" by
-  // 1. saturate it under Abs axioms
+  // 1. saturate it under Min and Abs axioms
   // 2. condensing equivalent nodes
+
+  /**
+   * Saturate the constraint C, Ct under the axiom:
+   * x <* y and Min(y) => y < x (hence x ~ y)
+   **/
+  private void collapseMinimal() throws Unsatisfiable {
+    for (int y = 0; y < m0; y++) {
+      if (minimal.get(y)) {
+        BitVector uy = R.getRow(y);
+        // breadth-first search of the lower ideal of y
+        _collapsed.clearAll();
+        _toCollapse.clearAll();
+        _toCollapse.set(y);
+        while (true) {
+          int x = _toCollapse.getLowestSetBitNotIn(_collapsed);
+          if (x == BitVector.UNDEFINED_INDEX) {
+            break;
+          }
+          _collapsed.set(x);
+          BitVector lx = Ct.getRow(x);
+          if (lx != null) {
+            _toCollapse.or(lx);
+          }
+          if (x != y && !C.get(y, x)) {
+            // set y < x
+            C.set(y, x);
+            Ct.set(x, y);
+            // exclude from D(x) all elements outside uy
+            // exclude unit as well
+            reduceDomain(x, false, uy);
+          }
+        }
+      }
+    }
+  }
+  // preallocate these bit-vectors
+  private BitVector _collapsed = new BitVector(256);
+  private BitVector _toCollapse = new BitVector(256);
 
   /****************************************************************
    * Algorithms on interfaces
@@ -906,8 +950,8 @@ public final class K0 {
 	      j.setApprox(abs,approx);
 	    }
       }
-  }  
-
+  }
+  
   private void computeArrows(BitMatrix leq)
   {
     for(int iid=0; iid<nInterfaces(); iid++)
@@ -1072,6 +1116,7 @@ public final class K0 {
   }
 
   private void prepareConstraint() throws Unsatisfiable {
+    collapseMinimal();
     BitMatrix leq = (BitMatrix)C.clone();
     leq.closure();
     computeArrows(leq);
@@ -1215,10 +1260,6 @@ public final class K0 {
    **/
   public void rigidify() {
     S.assert(S.a&& hasBeenInitialized);
-
-    if (m == 0 || m == n)
-      return;
-    
     R = (BitMatrix)C.clone();
     R.closure();
     Rt = (BitMatrix)Ct.clone();
@@ -1285,7 +1326,7 @@ public final class K0 {
   }
 
   private Backup backup = null;
-  
+
   public void mark() {
     S.assert(S.a&& hasBeenInitialized);
 
@@ -1302,9 +1343,9 @@ public final class K0 {
     this.Rt.setSize(m);
 
     this.n = backup.savedN;
-    this.C.setSize(this.n);
-    this.Ct.setSize(this.n);
-    
+    this.C.setSize(n);
+    this.Ct.setSize(n);
+
     this.garbage = backup.savedGarbage;
     this.domains = backup.savedDomains;
     
@@ -1409,146 +1450,10 @@ public final class K0 {
     }
   }
 
-  /***********************************************************************
-   * Constraint snapping
-   ***********************************************************************/
   static abstract public class IndexSelector {
     abstract protected boolean select(int index);
   }
 
-  final public class Snap {
-    BitVector quantified;
-    BitMatrix snapC;
-    // for each interface iid, snapImplementors[iid] is the vector of the
-    // snapped nodes who implement iid
-    BitVector[] snapImplementors;
-    int snapN;
-    
-    // selector selects the quantified indexes
-    Snap(IndexSelector selector) {
-      snapN = n;
-      quantified = new BitVector(n);
-      for (int i = 0; i < n; i++) {
-        if (!garbage.get(i) && selector.select(i)) {
-          quantified.set(i);
-        }
-      }
-      if (!quantified.isEmpty()) {
-        // XXX: Possible optimization: keep only the quantified rows
-        // XXX: drawback: needs to keep C and Ct
-        snapC = (BitMatrix)C.clone();
-        //        snapCt = (BitMatrix)Ct.clone();
-        
-        // the constraint has been satisfied. Hence it is in condensed
-        // form, so no need to bother with garbage...
-      }
-      snapImplementors = new BitVector[nInterfaces()];
-      for (int iid = 0; iid < snapImplementors.length; iid++) {
-        snapImplementors[iid]
-          = (BitVector)getInterface(iid).implementors.clone();
-      }
-    }
-
-    public void indexIter(boolean quant, IndexIterator iterator) {
-      for (int i = 0; i < snapN; i++) {
-        if (quant == quantified.get(i)) {
-          iterator.iter(i);
-        }
-      }
-    }
-    public boolean isQuantified(int i) {
-      return quantified.get(i);
-    }
-    public void quantifiedIter(IndexIterator iterator) {
-      indexIter(true, iterator);
-    }
-
-    
-    public void ineqIter(IneqIterator iterator) throws Unsatisfiable {
-      // enumerate the i <: j where one of i or j is quantified
-      for (int i = 0; i < snapN; i++) {
-        if (quantified.get(i)) {
-          for (int j = 0; j < snapN; j++) {
-            if (snapC.get(i, j)) {
-              iterator.iter(i, j);
-            }
-          }
-        } else {
-          for (int j = 0; j < snapN; j++) {
-            if (quantified.get(j) && snapC.get(i, j)) {
-              iterator.iter(i, j);
-            }
-          }
-        }
-      }
-    }
-
-    public void implementsIter(ImplementsIterator iterator )
-    throws Unsatisfiable {
-      for (int x = 0; x < snapN; x++) {
-        if (quantified.get(x)) {
-          for (int iid = 0; iid < snapImplementors.length; iid++) {
-            if (snapImplementors[iid].get(x)) {
-              iterator.iter(x, iid);
-            }
-          }
-        }
-      }
-    }
-
-    public String toString() {
-      final StringBuffer sb = new StringBuffer();
-      quantifiedIter
-        (new IndexIterator() {
-          protected void iter(int i) {
-            sb.append(i).append("; ");
-          }
-        });
-      try {
-        ineqIter
-          (new IneqIterator() {
-            protected void iter(int i, int j) {
-              sb.append(i).append(" <: ").append(j).append("; ");
-            }
-          });
-        implementsIter
-          (new ImplementsIterator() {
-            protected void iter(int x, int iid) {
-              sb.append(x).append(": ").append(iid).append("; ");
-            }
-          });
-      } catch (Unsatisfiable e) {
-        throw S.panic();
-      }
-      return sb.toString();
-    }
-  }    
-  
-  /**
-   * Get a snapshot of this constraint. The quantified indexes are selected by
-   * selector.
-   **/
-  public Snap getSnap(IndexSelector selector) {
-    Snap result = new Snap(selector);
-    if (result.quantified.isEmpty()) {
-      return null;
-    } else {
-      return result;
-    }
-  }
-
-  /**
-   * Snap all the constraint
-   **/
-  public Snap getSnap() {
-    return getSnap(allSelector);
-  }
-  private static IndexSelector allSelector = new IndexSelector() { 
-    protected boolean select(int index) {
-      return true;
-    }
-  };
-    
   /***********************************************************************
    * Weak marking / Backtracking (only keeps track of the sizes)
    * NB: calls to mark/backtrack and weakMark/weakBacktrack mustn't
@@ -1642,6 +1547,7 @@ public final class K0 {
   // simplify all the variables introduced since last weakMark()
   public void simplify() {
     S.assert(S.a&& hasBeenInitialized);
+
     if (weakMarkedSize >= 0) {
       if (weakMarkedSize == n) {
         return;

@@ -208,6 +208,23 @@ public final class Typing
       leq(ts[i], ms[i]);
   }
   
+  /** Test that t is geq that m's head */
+  public static void leq(Monotype m, TypeConstructor t)
+  throws TypingEx
+  {
+    Variance v = t.variance;
+    if(v == null)
+      throw new InternalError("Don't know how to handle this");
+    
+    try{
+      Engine.setKind(m, v);
+    }
+    catch(Unsatisfiable e){
+      throw new TypingEx(t+" < "+m+"'s head");
+    }
+    leq(((MonotypeConstructor) m.equivalent()).getTC(), t);
+  }
+  
   /****************************************************************
    * Testing Polytype <= Polytype
    ****************************************************************/
@@ -302,6 +319,11 @@ public final class Typing
   /****************************************************************
    * Type constructors
    ****************************************************************/
+
+  public static void assertMinimal(TypeConstructor t1)
+  {
+    t1.variance.getConstraint().assertMinimal(t1);
+  }
 
   public static void initialLeq(TypeConstructor t1, TypeConstructor t2)
     throws TypingEx

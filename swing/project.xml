@@ -1,0 +1,138 @@
+<?xml version="1.0" encoding="latin1" ?>
+<project>
+  <pomVersion>3</pomVersion>
+  <name>Swing adapter for Nice</name>
+  <id>nice-swing</id>
+  <currentVersion>0.1</currentVersion>
+  <organization>
+    <name>The Nice project</name>
+    <url>http://nice.sf.net/</url>
+  </organization>
+  <inceptionYear>2004</inceptionYear>
+  <package>nice.ui.common</package>
+
+  <shortDescription>Extension of the Swing toolkit to make use of Nice advanced features</shortDescription>
+
+  <description>
+    This library allows you to write a Swing user interface in Nice programs.
+    It allows a more elegant programming style than Swing programs written in
+    Java by using Nice's features like anonymous functions and named 
+    and optional method parameters.
+  </description>
+
+  <url>http://nice.sourceforge.net/cgi-bin/twiki/view/Doc/NiceSwing</url>
+  <issueTrackingUrl>
+    http://sourceforge.net/tracker/?group_id=12788&amp;atid=112788
+  </issueTrackingUrl>
+  <siteAddress>nice.sf.net</siteAddress>
+  <siteDirectory>
+    /home/groups/n/ni/nice/htdocs/packages/swing
+  </siteDirectory>
+  <distributionDirectory>
+    /home/groups/n/ni/nice/packages/builds
+  </distributionDirectory>
+
+  <repository>
+    <connection>
+      scm:cvs:pserver:anonymous@cvs.sf.net:/cvsroot/nice:swing
+    </connection>
+    <url>
+      http://cvs.sourceforge.net/viewcvs.py/nice/swing/
+    </url>
+  </repository>
+
+  <versions>
+    <version>
+      <id>0.1</id>
+      <name>0.1</name>
+      <tag>HEAD</tag>
+    </version>
+  </versions>
+
+  <mailingLists>
+    <mailingList>
+      <name>Nice User List</name>
+      <subscribe>http://lists.sourceforge.net/lists/listinfo/nice-info</subscribe>
+      <unsubscribe>http://lists.sourceforge.net/lists/listinfo/nice-info</unsubscribe>
+      <archive>http://sourceforge.net/mailarchive/forum.php?forum=nice-info</archive>
+    </mailingList>
+  </mailingLists>
+
+  <developers>
+
+    <developer>
+      <name>Martin Gamsjaeger</name>
+      <id>gamsl</id>
+      <email>gamsl@abschneiden.com</email>
+      <organization></organization>
+      <roles>
+        <role>Initial design</role>
+	<role>Implementation</role>
+      </roles>
+    </developer>
+
+    <developer>
+      <name>Daniel Bonniot</name>
+      <id>bonniot</id>
+      <email>bonniot@users.sf.net</email>
+      <organization></organization>
+      <timezone>+1</timezone>
+      <roles>
+        <role>Initial design</role>
+      </roles>
+    </developer>
+
+    <developer>
+      <name>Arjan Boeijink</name>
+      <id>arjanb</id>
+      <email>arjanb@users.sf.net</email>
+      <organization></organization>
+      <roles>
+        <role>Patches</role>
+      </roles>
+    </developer>
+
+    <developer>
+      <name>Lodewijk Vöge</name>
+      <id>voge</id>
+      <email></email>
+      <organization></organization>
+      <roles>
+        <role>Patches</role>
+      </roles>
+    </developer>
+
+  </developers>
+
+  <build>
+
+    <nagEmailAddress>
+      nice-devel@lists.sf.net
+    </nagEmailAddress>
+
+    <sourceDirectory>src</sourceDirectory>
+
+    <unitTestSourceDirectory>src/test</unitTestSourceDirectory>
+
+    <!-- Unit test cases -->
+    <unitTest>
+      <includes>
+        <include>**/*Test.java</include>
+      </includes>
+      <excludes>
+        <exclude>**/RepositoryTest.java</exclude>
+      </excludes>
+    </unitTest>
+              
+    <!-- J A R  R E S O U R C E S -->
+    <!-- Resources that are packaged up inside the JAR file -->
+    <resources>
+    </resources>
+
+    <!-- Integration unit test cases -->
+    <integrationUnitTest/>
+
+    <jars>
+    </jars>
+  </build>
+</project>

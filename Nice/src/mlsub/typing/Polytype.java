@@ -172,7 +172,7 @@ public final class Polytype
   
   public static Polytype union(Polytype[] types)
   {
-    if (types.length == 0) return null;
+    if (types.length == 0) return bottom();
 
     MonotypeVar t = new MonotypeVar();
     

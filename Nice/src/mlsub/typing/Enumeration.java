@@ -84,6 +84,10 @@ public class Enumeration
 
     if(minFloating<tags.length)
       {
+	// There might be a garbagy Engine.variablesConstraint 
+	// in the monotype variable variable
+	tags[minFloating].setKind(null);
+
 	for(Iterator cs = Engine.listConstraints(); cs.hasNext();)
 	  {
 	    Engine.Constraint c = (Engine.Constraint) cs.next();

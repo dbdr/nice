@@ -112,6 +112,16 @@
 
   </developers>
 
+   <dependencies>
+    <dependency>
+      <groupId>nice</groupId>
+      <artifactId>maven-nice-plugin</artifactId>
+      <type>plugin</type>
+      <version>SNAPSHOT</version>
+      <url>http://nice.sf.net/</url>
+    </dependency>
+  </dependencies>
+
   <build>
 
     <nagEmailAddress>

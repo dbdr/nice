@@ -98,7 +98,7 @@ var int uniqId = 256;
 printOptions(os)
 {
   String res = "";
-  os.iter(Option o => { res = res + printOption(o); });
+  os.filter(Option o => o.visible).iter(Option o => res += printOption(o));
   return res;
 }
 

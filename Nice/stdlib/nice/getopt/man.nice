@@ -23,7 +23,7 @@ package nice.getopt;
 String man(List<Option> os)
 {
   String res = ".SH OPTIONS\n";
-  os.iter(Option o => { res = res + man(o); });
+  os.filter(Option o => o.visible).iter(Option o => res = res + man(o));
   return res;
 }
 

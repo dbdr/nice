@@ -23,14 +23,16 @@ package nice.getopt;
 Option option(String name,
 	      String purpose, 
 	      ()->void action,
-	      char letter = '?');
+	      char letter = '?',
+	      boolean visible = true);
 
 /** Creates a required parameter option. */
 Option option(String name,
 	      String purpose,
 	      String optionHint,
 	      String->void actionParam,
-	      char letter = '?');
+	      char letter = '?',
+	      boolean visible = true);
 
 /** Creates an optional parameter option. */
 Option option(String name,
@@ -38,7 +40,8 @@ Option option(String name,
 	      String optionHint,
 	      ()->void actionNoParam,
 	      String->void actionParam,
-	      char letter = '?');
+	      char letter = '?',
+	      boolean visible = true);
 
 
 abstract class Option
@@ -47,6 +50,8 @@ abstract class Option
   String longName;
   String purpose;
   int optval = 0; // the int value of shortName
+
+  boolean visible;
 }
 
 class NoParamOption extends Option
@@ -71,21 +76,24 @@ boolean noShortName(Option o) = o.shortName.equals('?');
  * "Constructors"
  ****************************************************************/
 
-option(longName, purpose, action, shortName) =
+option(longName, purpose, action, shortName, visible) =
   new NoParamOption(shortName: shortName, longName: longName,
-		    purpose: purpose, action: action);
+		    purpose: purpose, action: action, visible: visible);
 
-option(longName, purpose, optionHint, action, shortName) =
+option(longName, purpose, optionHint, action, shortName, visible) =
   new ParamOption(shortName: shortName,
 		  longName: longName,
 		  purpose: purpose,
 		  optionHint: optionHint,
-		  actionParam: action);
+		  actionParam: action,
+		  visible: visible);
 
-option(longName, purpose, optionHint, actionNoParam, actionParam, shortName) =
+option(longName, purpose, optionHint, actionNoParam, actionParam, shortName,
+       visible) =
   new OptionalParamOption(shortName: shortName,
 			  longName: longName,
 			  purpose: purpose,
 			  optionHint: optionHint,
 			  actionNoParam: actionNoParam,
-			  actionParam: actionParam);
+			  actionParam: actionParam, 
+			  visible: visible);

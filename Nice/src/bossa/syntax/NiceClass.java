@@ -689,21 +689,24 @@ public class NiceClass extends ClassDefinition.ClassImplementation
   }
 
   private List getParentConstructorParameters
-    (List constraints, TypeSymbol[] binders)
+    (List constraints, mlsub.typing.Monotype[] typeParameters)
   {
     TypeScope scope = Node.getGlobalTypeScope();
     Map map = null;
-    if (binders != null)
+    if (typeParameters != null)
       {
         // Constructs a type scope that maps the type parameters of this
         // class to the corresponding symbol in the constructor.
 	scope = new TypeScope(scope);
         map = new HashMap();
-        TypeSymbol[] ourBinders = definition.getBinders();
-	for (int i = 0; i < binders.length; i++)
+        mlsub.typing.Monotype[] ourTypeParameters = 
+          definition.getTypeParameters();
+	for (int i = 0; i < ourTypeParameters.length; i++)
 	  try {
-	    scope.addMapping(ourBinders[i].toString(), binders[i]);
-	    map.put(ourBinders[i], binders[i]);
+            TypeSymbol ourSym = asTypeSymbol(ourTypeParameters[i]);
+            TypeSymbol sym = asTypeSymbol(typeParameters[i]);
+            scope.addMapping(ourSym.toString(), sym);
+            map.put(ourSym, sym);
 	  } catch(TypeScope.DuplicateName e) {}
       }
 
@@ -733,7 +736,16 @@ public class NiceClass extends ClassDefinition.ClassImplementation
     return res;
   }
 
-  private List getConstructorParameters(List constraints, TypeSymbol[] binders)
+  private TypeSymbol asTypeSymbol(mlsub.typing.Monotype type)
+  {
+    if (type instanceof TypeSymbol)
+      return (TypeSymbol) type;
+    else
+      return ((MonotypeConstructor) type).getTC();
+  }
+
+  private List getConstructorParameters(List constraints, 
+                                        mlsub.typing.Monotype[] typeParameters)
   {
     TypeConstructor supTC = definition.getSuperClass();
 
@@ -742,7 +754,7 @@ public class NiceClass extends ClassDefinition.ClassImplementation
     if (sup == null)
       res = getNativeConstructorParameters(supTC, constraints);
     else
-      res = sup.getParentConstructorParameters(constraints, binders);
+      res = sup.getParentConstructorParameters(constraints, typeParameters);
 
     if (overrides.length > 0)
       for (Iterator i = res.iterator(); i.hasNext();)
@@ -806,7 +818,10 @@ public class NiceClass extends ClassDefinition.ClassImplementation
     else 
       constraints = new LinkedList();
 
-    List allConstructorParams = getConstructorParameters(constraints, binders);
+    mlsub.typing.Monotype[] typeParameters = definition.getTypeParameters();
+
+    List allConstructorParams = 
+      getConstructorParameters(constraints, typeParameters);
 
     Constraint cst;
     if (binders != null)

@@ -282,3 +282,21 @@ abstract interface A {
 class A<T> {}
 <A SomeA> class AWrapper<SomeA> {
 }
+
+/// PASS
+  Translated<SimpleShape<void>> t = new Translated(someShape: new SimpleShape());
+  /// Toplevel
+abstract class Shape<T> {}
+
+class SimpleShape<T> extends Shape<T> {}
+
+<Shape S, ST, T | S<ST> <: T <: S<ST> >
+class Translated<T> extends Shape {
+  T someShape;
+}
+
+/// PASS
+  /// Toplevel
+class A<T> {}
+
+<String S> class B<S> extends A<S> {}

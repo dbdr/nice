@@ -238,3 +238,15 @@ class M {
   f(b@B) = super;
   f(a)   = 1;
 }
+
+/// PASS bug
+  /// package a
+  /// Toplevel
+  class Tokenizer2 extends java.io.StreamTokenizer {
+    nextToken() {
+      return super;
+    }
+  }
+  /// package b import a
+  let x = new Tokenizer2(System.in);
+  x.nextToken();

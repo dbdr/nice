@@ -347,6 +347,8 @@ public class Package implements mlsub.compilation.Module, Located, bossa.syntax.
     // Write the archive even if nothing was compiled.
     // This is useful to bundle the application after it was compiled.
     writeArchive();
+
+    compilation.locator.save();
   }
 
   /**

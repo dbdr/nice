@@ -13,6 +13,8 @@
 package bossa.modules;
 
 import mlsub.compilation;
+import nice.tools.locator;
+import nice.tools.repository;
 
 /**
    Stores information about a Nice compilation.
@@ -48,7 +50,7 @@ class Compilation extends CompilationInterface
   /** Location of the nice.jar file. */
   ?String runtimeFile = null;
 
-  ?Locator locator = null;
+  ?bossa.modules.Locator locator = null;
 
   CompilationListener listener;
 
@@ -79,8 +81,10 @@ class Compilation extends CompilationInterface
 
     Package.startNewCompilation();
 
+    let repository = System.getProperty
+      ("nice.repository", "http://packages.sourceforge.net/repository/");
     // Create the locator that uses these two pathes to locate packages.
-    this.locator = new Locator(this, classpath);
+    this.locator = new bossa.modules.Locator(this, classpath, new java.net.URL(repository));
 
     // forces reading nice.lang first
     if(!(packageName.equals("nice.lang")) && !bossa.util.Debug.ignorePrelude())

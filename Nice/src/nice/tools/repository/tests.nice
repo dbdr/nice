@@ -1,0 +1,147 @@
+/**************************************************************************/
+/*                                N I C E                                 */
+/*             A high-level object-oriented research language             */
+/*                        (c) Daniel Bonniot 2004                         */
+/*                                                                        */
+/*  This program is free software; you can redistribute it and/or modify  */
+/*  it under the terms of the GNU General Public License as published by  */
+/*  the Free Software Foundation; either version 2 of the License, or     */
+/*  (at your option) any later version.                                   */
+/*                                                                        */
+/**************************************************************************/
+
+package nice.tools.repository;
+
+/**
+   @author Daniel Bonniot (bonniot@users.sourceforge.net)
+ */
+
+import nice.tools.locator;
+
+import java.io.*;
+import java.util.jar.*;
+
+Locator _setupSingle()
+{
+  File tmp = makeTempDir();
+  tmp.addJar("foo.bar", "1",
+	     [ "foo/bar/a.txt", "a" ]);
+
+  let vt = new VersionTracker();
+  let path = [vt.repository(tmp.toURL())];
+  return new Locator(path: path);
+}
+
+void _testSingle()
+{
+  assert _setupSingle().get("foo/bar/a.txt").is("a");
+  assert _setupSingle().get("foo/bar/a.txt#1").is("a");
+  assert _setupSingle().get("foo/bar/a.txt#42") == null;
+}
+
+Locator _setupMultiple(?VersionTracker vt = null)
+{
+  File tmp = makeTempDir();
+  tmp.addJar("foo.bar", "1",
+	     [ "foo/bar/a.txt", "a1" ]);
+  tmp.addJar("foo.bar", "2",
+	     [ "foo/bar/a.txt", "a2",
+	       "foo/bar/b.txt", "b2"]);
+
+  let v = vt || new VersionTracker();
+  let path = [v.repository(tmp.toURL())];
+  return new Locator(path: path);
+}
+
+void _testMultipleLatest2()
+{
+  // Like Latest, but create the jars in reverse order
+  File tmp = makeTempDir();
+  tmp.addJar("foo.bar", "2",
+	     [ "foo/bar/a.txt", "a2",
+	       "foo/bar/b.txt", "b2"]);
+  tmp.addJar("foo.bar", "1",
+	     [ "foo/bar/a.txt", "a1" ]);
+
+  let locator = new Locator(path: [new VersionTracker().repository(tmp.toURL())]);
+  assert locator.get("foo/bar/a.txt").is("a2");
+}
+
+void _testMultipleLatest() = assert _setupMultiple().get("foo/bar/a.txt").is("a2");
+void _testMultipleOld() = assert _setupMultiple().get("foo/bar/a.txt#1").is("a1");
+void _testMultipleNew() = assert _setupMultiple().get("foo/bar/a.txt#2").is("a2");
+void _testMultipleUnknown() = assert _setupMultiple().get("foo/bar/a.txt#42") == null;
+
+void _testMultipleConflict()
+{
+  let locator = _setupMultiple();
+  assert locator.get("foo/bar/a.txt").is("a2");
+  try {
+    locator.get("foo/bar/a.txt#1");
+    assert false : "Incompatible versions expected";
+  }
+  catch(IncompatibleVersions e) {}
+}
+
+void _testMultipleMemory1()
+{
+  let f = new File("/tmp/versions");
+  f.delete();
+  let vt = new VersionTracker(store: f);
+  let locator = _setupMultiple(vt);
+  assert locator.get("foo/bar/a.txt#1").is("a1");
+  vt.save();
+  assert locator.get("foo/bar/a.txt").is("a1");
+}
+
+void _testMultipleMemory2()
+{
+  let f = new File("/tmp/versions");
+  f.delete();
+  let vt = new VersionTracker(store: f);
+  let locator = _setupMultiple(vt);
+  assert locator.get("foo/bar/a.txt#1").is("a1");
+  vt.save();
+  assert locator.get("foo/bar/b.txt") == null;
+}
+
+/// TOOLS
+
+boolean is(?URLConnection c, String value) =
+  c != null &&
+  c.getInputStream().readAll().equals(value);
+
+private var int id = 0;
+
+File makeTempDir()
+{
+  let f = new File("/tmp/ntl" + (id++));
+  deleteAll(f);
+  f.mkdirs();
+  return f;
+}
+
+void deleteAll(File f)
+{
+  if (f.isDirectory())
+    notNull(f.listFiles()).foreach(deleteAll);
+  f.delete();
+}
+
+void addJar(File dir, String pkg, String ver, String[] content)
+{
+  let filename = packagePath(pkg) + pkg + "-"ver".jar";
+  let file = new File(dir, filename);
+  notNull(file.getParentFile()).mkdirs();
+  let jar = new JarOutputStream(new FileOutputStream(file));
+  for (int i = 0; i < content.length; i += 2)
+    {
+      let name = content[i];
+      let value = content[i+1];
+      jar.putNextEntry(new JarEntry(name));
+      jar.write(value.getBytes());
+    }
+  jar.close();
+}
+
+void main(String[] args) = _testSingle();

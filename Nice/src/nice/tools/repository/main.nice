@@ -1,0 +1,238 @@
+/**************************************************************************/
+/*                                N I C E                                 */
+/*             A high-level object-oriented research language             */
+/*                        (c) Daniel Bonniot 2004                         */
+/*                                                                        */
+/*  This program is free software; you can redistribute it and/or modify  */
+/*  it under the terms of the GNU General Public License as published by  */
+/*  the Free Software Foundation; either version 2 of the License, or     */
+/*  (at your option) any later version.                                   */
+/*                                                                        */
+/**************************************************************************/
+
+package nice.tools.repository;
+
+/**
+   Load versioned resources from a repository.
+
+   @author Daniel Bonniot (bonniot@users.sourceforge.net)
+ */
+
+import java.net.*;
+
+public URL repository(VersionTracker vt, URL base) = new URL(base, "!/", vt);
+
+public class IncompatibleVersions extends RuntimeException
+{
+  String ver1;
+  String ver2;
+}
+
+VersionTracker versionTracker(File store) = new VersionTracker(store: store);
+
+public class VersionTracker extends URLStreamHandler
+{
+  ?File store = null;
+    {
+      ?File store = this.store;
+      if (store != null && store.exists)
+	this.load(store);
+    }
+
+  private void load(File store)
+  {
+    new FileInputStream(store).lines(String line => {
+      int sep = line.indexOf(':');
+      String pkg = line.substring(0, sep);
+      String ver = line.substring(sep + 1);
+      this.versions[pkg] = ver;
+    });
+  }
+
+  public void save()
+  {
+    if (store != null && versions.size() > 0)
+      this.save(notNull(store));
+  }
+
+  private void save(File store)
+  {
+    let out = new PrintWriter(new FileWriter(store));
+    versions.foreach((String pkg, String ver) => out.println(pkg+':'+ver));
+    out.close();
+  }
+
+  private Map<String,String> versions = new HashMap();
+
+  openConnection(URL url)
+  {
+    (URL repo, String resource, ?String ver) = parseRepoURL(url);
+    let pkg = getPackage(resource);
+
+    ?String currentVer = versions[pkg];
+    if (ver == null)
+      {
+	ver = currentVer || latestVersion(repo, pkg);
+	if (ver == null)
+	  return null;
+      }
+    else
+      if (currentVer != null && ! ver.equals(currentVer))
+	throw new IncompatibleVersions(ver1: currentVer, ver2: ver);
+    versions[pkg] = notNull(ver);
+
+    let jar = localCopy(repo, packagePath(pkg)+getPackage(resource)+"-"ver".jar");
+
+    let res = new URL("jar", "", jar+"!/"resource);
+    return res.openConnection();
+  }
+}
+
+(URL,String,?String) parseRepoURL(URL url)
+{
+  String s = url.toString();
+  int sep = s.indexOf('!');
+  URL repo = new URL(s.substring(0, sep));
+  int pver = s.indexOf('#', sep);
+  String resource;
+  ?String ver;
+  if (pver == -1)
+    {
+      resource = s.substring(sep + 2);
+      ver = null;
+    }
+  else
+    {
+      resource =s.substring(sep + 2, pver);
+      ver= s.substring(pver + 1);
+    }
+
+  return (repo,resource,ver);
+}
+
+public String getPackage(String resource) =
+  resource.substring(0, resource.lastIndexOf('/')).replace('/', '.');
+
+public String packagePath(String pkg) = pkg.replace('.', '/') + '/';
+
+?String latestVersion(URL repo, String pkg)
+{
+  if (remote(repo))
+    return latestVersionRemote(repo, pkg);
+  else
+    return latestVersionLocal(repo, pkg);
+}
+
+/**
+   Find the latest version of a give package, but searching for
+   a 'latest' file in the repository.
+*/
+private ?String latestVersionRemote(URL repo, String pkg)
+{
+  ?String latest = null;
+  let url = new URL(repo, packagePath(pkg) + "/latest");
+  try {
+    url.openStream().lines(String ver => {
+      latest = ver;
+    });
+  }
+  catch(IOException e) {}
+
+  return latest;
+}
+
+/**
+   Find the latest version of a give package, by listing all versions.
+*/
+private ?String latestVersionLocal(URL repo, String pkg)
+{
+  ?String latest = null;
+  let url = new URL(repo, packagePath(pkg));
+  try {
+    url.openStream().lines(String ver => {
+      if (ver.startsWith(pkg))
+        latest = ver;
+    });
+  }
+  catch(IOException e) {}
+
+  let res = latest;
+  if (res == null)
+    return null;
+  else
+    return res.substring(res.lastIndexOf('-') + 1, res.lastIndexOf('.'));
+}
+
+URL localCopy(URL repo, String jar)
+{
+  if (! remote(repo))
+    return new URL(repo, jar);
+
+  return download(repo, jar).toURL();
+}
+
+boolean remote(URL url)
+{
+  String protocol = url.getProtocol();
+  if (protocol.equals("file"))
+    return false;
+
+  return true;
+}
+
+let File cache = new File(System.getProperty("user.home"), ".nice-repository");
+
+File download(URL repo, String jar)
+{
+  URL url = new URL(repo, jar);
+
+  let cached = new File(cache, jar);
+
+  if (! cached.exists)
+    // Really download it
+    {
+      println("Downloading "url);
+
+      notNull(cached.getParentFile()).mkdirs();
+      copy(url.openStream(), cached);
+    }
+
+  return cached;
+}
+
+// Utilities
+
+?URLConnection openConnection(URLStreamHandler,URL) =
+  native URLConnection URLStreamHandler.openConnection(URL);
+
+void lines(InputStream i, String->void action) =
+  lines(new BufferedReader(new InputStreamReader(i)), action);
+
+void lines(BufferedReader in, String->void action)
+{
+  ?String line;
+  for (; (line = in.readLine()) != null;)
+    action(line);
+}
+
+String readAll(InputStream in)
+{
+  let res = new StringBuffer(in.available());
+  let reader = new InputStreamReader(in);
+  char[] buf = new char[100];
+  int len;
+  while ((len = reader.read(buf)) > 0)
+    res.append(buf, 0, len);
+  return res.toString();
+}
+
+void copy(InputStream in, File dest)
+{
+  using (let out = new FileOutputStream(dest)) {
+    let buf = new byte[4196];
+
+    int read;
+    while ((read = in.read(buf)) != -1)
+      out.write(buf, 0, read);
+  }
+}

@@ -24,8 +24,11 @@ get(Locator this, String resource)
     try {
       let url = new URL(base, resource);
       let connection = url.openConnection();
-      connection.connect();
-      return connection;
+      if (connection != null)
+	{
+	  connection.connect();
+	  return connection;
+	}
     }
     catch(java.io.IOException e) {}
   }

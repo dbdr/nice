@@ -1,0 +1,61 @@
+/**************************************************************************/
+/*                                N I C E                                 */
+/*             A high-level object-oriented research language             */
+/*                        (c) Daniel Bonniot 2004                         */
+/*                                                                        */
+/*  This program is free software; you can redistribute it and/or modify  */
+/*  it under the terms of the GNU General Public License as published by  */
+/*  the Free Software Foundation; either version 2 of the License, or     */
+/*  (at your option) any later version.                                   */
+/*                                                                        */
+/**************************************************************************/
+
+package nice.tools.repository.publish;
+
+/**
+   Publish a library on a public repository.
+
+   @author Daniel Bonniot (bonniot@users.sourceforge.net)
+ */
+
+import nice.tools.repository;
+import nice.tools.compiler.console;
+import nice.tools.unit.console;
+
+let java.text.DateFormat fmt = getVerDateFormat();
+java.text.DateFormat getVerDateFormat()
+{
+  let res = new java.text.SimpleDateFormat("yyyyMMddhhmm");
+  res.setTimeZone(TimeZone.getTimeZone("UTC"));
+  return res;
+}
+
+void main(String[] args)
+{
+  let dest = args[0];
+  let pkg = args[1];
+  let ver = "0.0";
+  let datedVer = ver + "." fmt.format(new Date());
+  let jar = pkg + "-" datedVer ".jar";
+
+  if (compile(args.slice(2) + [ "-a", jar, pkg ]) != OK)
+    System.exit(1);
+
+  let listener = new TestListener();
+  runTests(pkg, listener, jar);
+  if (listener.failed)
+    System.exit(1);
+
+  send(datedVer, jar, dest + '/' + packagePath(pkg));
+}
+
+class TestListener extends nice.tools.unit.console.Listener
+{
+  boolean failed = false;
+
+  failure(test, cause)
+  {
+    super;
+    failed = true;
+  }
+}

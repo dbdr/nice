@@ -31,3 +31,5 @@ public class Locator
 
 new Locator(String path, String->void warning) =
   this(path: parsePath(path, warning));
+
+new Locator(URL url) = this(path: [url]);

@@ -14,9 +14,10 @@ package bossa.modules;
 
 import java.io.*;
 import java.util.LinkedList;
-import java.util.jar.JarFile;
+import java.net.URL;
 import bossa.util.Debug;
 import bossa.util.User;
+import nice.tools.repository.VersionTracker;
 
 /**
    Locates package definitions.
@@ -27,27 +28,22 @@ import bossa.util.User;
 
 final class Locator
 {
-  Locator (Compilation compilation, String classpath)
+  Locator (Compilation compilation, String classpath, URL repository)
   {
-    sources = new nice.tools.locator.Locator
-      (compilation.sourcePath,
-       new gnu.mapping.Procedure1() {
-         public Object apply1(Object o) {
-           String message = (String) o;
-           User.warning(message);
-           return null;
-         }
-       });
+    gnu.mapping.Procedure1 warning = new gnu.mapping.Procedure1() {
+        public Object apply1(Object o) {
+          String message = (String) o;
+          User.warning(message);
+          return null;
+        }
+      };
 
-    packages = new nice.tools.locator.Locator
-      (classpath,
-       new gnu.mapping.Procedure1() {
-         public Object apply1(Object o) {
-           String message = (String) o;
-           User.warning(message);
-           return null;
-         }
-       });
+    sources = new nice.tools.locator.Locator(compilation.sourcePath, warning);
+    packages = new nice.tools.locator.Locator(classpath, warning);
+
+    vt = nice.tools.repository.dispatch.versionTracker
+      (new File("nice.versions").getAbsoluteFile());
+    remote = new nice.tools.locator.Locator(vt.repository(repository));
   }
 
   Content find (Package pkg)
@@ -63,6 +59,10 @@ final class Locator
     if (sroot != null)
       source = DirectorySourceContent.create(pkg, sroot.getURL());
 
+    // If the package couldn't be found locally, try remotely.
+    if (source == null && croot == null)
+      croot = remote.get(name + "/package.nicei");
+
     if (croot != null)
       compiled = CompiledContent.create(pkg, croot.getURL());
 
@@ -74,6 +74,11 @@ final class Locator
     return res;
   }
 
+  void save()
+  {
+    vt.save();
+  }
+
   /****************************************************************
    * Private
    ****************************************************************/
@@ -83,4 +88,9 @@ final class Locator
 
   /** where to find compiled packages. */
   private final nice.tools.locator.Locator packages;
+
+  /** remote location where to find imported packages. */
+  private final nice.tools.locator.Locator remote;
+
+  private VersionTracker vt;
 }

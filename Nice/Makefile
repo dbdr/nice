@@ -48,7 +48,7 @@ complete: stable   compiler2 tools libs archive2
 fixpoint: complete compiler3 archive3
 world:    fixpoint check test
 
-tools: nicedoc unit ant
+tools: nicedoc unit ant publish
 
 # The bootstrap at the end of the universe ;-)
 universe:
@@ -64,7 +64,6 @@ compiler1: setDate
 	${NICEC}  -R -a src/nice/tools/compiler/console.jar nice.tools.compiler.console
 
 compiler2 compiler3: setDate
-	${NICEC1} -r nice.tools.locator
 	${NICEC1} -R bossa.syntax
 	${NICEC1} -R -a src/nice/tools/compiler/console.jar nice.tools.compiler.console
 
@@ -160,7 +159,7 @@ core-bootstrap:
 	ln -sf nicec bin/nicedoc; ln -sf nicec bin/niceunit
 	-cd src/bossa/syntax && mv -f dispatch.java.bootstrap dispatch.java
 	${JAVAC} src/nice/tools/util/System.java
-	${NICEC} -r nice.tools.locator
+	${NICEC} -R nice.tools.repository
 	${JAVAC} \
 		src/bossa/syntax/dispatch.java \
 		src/mlsub/typing/TypeConstructorLeqMonotypeCst.java \
@@ -203,6 +202,9 @@ nicedoc:
 unit:
 	@echo "Building niceunit..."
 	$(NICEC1) nice.tools.unit.console
+
+publish:
+	$(NICEC1) -a nicepublish.jar nice.tools.repository.publish
 
 libs:
 	@echo "Building libraries..."

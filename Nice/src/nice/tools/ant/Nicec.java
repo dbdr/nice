@@ -29,7 +29,7 @@ import nice.tools.compiler.OutputMessages;
 			</tr>
 			<tr>
 				<td valign="top">sourcepath</td>
-				<td valign="top">Lookup path for source packages. Is a list of directories and .jar archives.</td>
+				<td valign="top">Search path for source packages. Is a list of directories and .jar archives.</td>
 				<td align="center" valign="top">No</td>
 			</tr>
 			<tr>
@@ -38,13 +38,8 @@ import nice.tools.compiler.OutputMessages;
 				<td align="center" valign="top">No</td>
 			</tr>
 			<tr>
-				<td valign="top">packagepath</td>
-				<td valign="top">Additional lookup path for compiled packages. Is a list of directories and .jar archives</td>
-				<td align="center" valign="top">No</td>
-			</tr>
-			<tr>
 				<td valign="top">classpath</td>
-				<td valign="top">Lookup path for external classes.</td>
+				<td valign="top">Search path for compiled packages and libraries.</td>
 				<td align="center" valign="top">No</td>
 			</tr>
 			<tr>
@@ -136,7 +131,7 @@ public class Nicec extends Task {
 		
 
 
-	/**	Lookup path for source packages
+	/**	Search path for source packages
 	 PATH is a list of directories and .jar archives
 	 */
 	private String sourcepath;
@@ -157,18 +152,7 @@ public class Nicec extends Task {
 	}
 
 
-	/**	Additional lookup path for compiled packages
-	 PATH is a list of directories and .jar archives
-	 */
-	private String packagepath;
-
-	public void setPackagepath(String packagepath)
-	{
-		this.packagepath = packagepath;
-	}
-
-
-	/**	Lookup path for external classes
+	/**	Search path for compiled packages and libraries
 	 */
 	private String classpath;
 
@@ -349,10 +333,6 @@ public class Nicec extends Task {
 		if (destination != null) {
 			args.addElement("--destination");
 			args.addElement(destination.getAbsolutePath());
-		}
-		if (packagepath != null) {
-			args.addElement("--packagepath");
-			args.addElement(packagepath);
 		}
 		if (classpath != null) {
 			args.addElement("--classpath");

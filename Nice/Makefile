@@ -79,7 +79,7 @@ dist: jar
 #****************************************************************
 
 status:
-	cvs status 2>&1 | awk -f bin/parse_cvs_status.awk
+	cvs -z 9 status 2>&1 | awk -f bin/parse_cvs_status.awk
 
 # src/gnu has two repositories:
 # - a 'Nice' repository

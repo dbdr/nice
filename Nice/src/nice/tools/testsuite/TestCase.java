@@ -383,8 +383,11 @@ public abstract class TestCase {
 	 * 
 	 */
 	public void pass() {
-		if (isKnownBug)
+		if (isKnownBug) {
 			TestNice.increaseFixed();
+			printSources();
+			TestNice.getOutput().logAndFlush("The above known bug is now FIXED!");
+		}
 		else
 			TestNice.increaseSucceeded();
 		TestNice.getOutput().endTestCase(true);

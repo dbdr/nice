@@ -3,15 +3,15 @@ package regtest.multipkg;
 import regtest.multipkg.a;
 import regtest.multipkg.b;
 
-class AA extends A {}
+class AA extends regtest.multipkg.a.A {}
 class BB extends B {}
 
 main(args)
 {
-  println(f(new A()) + " " + 
+  println(f(new regtest.multipkg.a.A()) + " " + 
 	  f(new B()) + " " + 
 	  f(new AA()) + " " + 
 	  f(new BB()));
 
-  test_import();  
+  test_import();
 }

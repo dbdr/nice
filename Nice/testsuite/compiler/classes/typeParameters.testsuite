@@ -1,0 +1,53 @@
+/// PASS
+  /// Toplevel
+  class C<T>
+  {
+    List<T> l;
+  }
+
+/// PASS
+  /// Toplevel
+  class C<T>
+  {
+    T x1;
+    T x2;
+  }
+
+/// PASS
+  assert (new Coord(p: new Point(x: 2)).sq() == 4);
+  /// Toplevel
+class Point { int x; }
+
+class Coord<Point P>
+{
+  P p;
+
+  P getP() = p;
+  int sq() = p.x * p.x;
+}
+
+/// FAIL
+  new Coord(p: "");
+  /// Toplevel
+class Point { int x; }
+
+class Coord<Point P>
+{
+  P p;
+}
+
+/// FAIL
+  Coord<String> c = new Coord();
+  /// Toplevel
+class Point { int x; }
+
+class Coord<Point P> {}
+
+/// FAIL
+  /// COMMENT class constraints must be "inherited" by subclasses.
+  Coord<String> c = new Coord2();
+  /// Toplevel
+class Point { int x; }
+
+class Coord<Point P> {}
+class Coord2<Q> extends Coord {}

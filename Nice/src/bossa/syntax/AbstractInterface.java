@@ -28,7 +28,7 @@ import mlsub.typing.Typing;
 public class AbstractInterface extends MethodContainer
 {
   public AbstractInterface(LocatedString name, 
-			   List typeParameters, 
+			   MethodContainer.Constraint typeParameters, 
 			   List typeParametersVariances,
 			   List extensions
 			  )
@@ -104,7 +104,7 @@ public class AbstractInterface extends MethodContainer
   {
     w.print("abstract interface "
             + getSimpleName()
-            + Util.map("<",", ",">", typeParameters)
+            + printTypeParameters()
             + Util.map(" extends ",", ","", surinterfaces)
             + "{}\n");
 

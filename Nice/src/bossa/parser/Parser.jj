@@ -623,16 +623,14 @@ AtomicConstraint atomicConstraint():
   { return res; }
 }
 
-List atomics(List init):
+void atomics(List res):
 // if init is null, we just want lookahead
 {
-  List res=init;
   AtomicConstraint k;
 }
 {
   k=atomicConstraint() { if(res!=null) res.add(k); }
   ( "," k=atomicConstraint() { if(res!=null) res.add(k); } ) *
-  { return res; }
 }
 
 Constraint nonVoidConstraint():
@@ -641,11 +639,7 @@ Constraint nonVoidConstraint():
   List atoms=new ArrayList();
 }
 {
-  "<"
-  ( 
-    b=binders(atoms) [ "|" atoms=atomics(atoms) ] 
-  )
-  ">" 
+  "<" b=binders(atoms) [ "|" atomics(atoms) ] ">" 
   { return new Constraint(b,atoms); }
 }
 
@@ -675,32 +669,6 @@ MonotypeVar monotypeVar():
 {
   name=unlocIdent()
   { return new MonotypeVar(name); }
-}
-
-MonotypeVar taggedMonotypeVar(List tags):
-{
-  MonotypeVar mv;
-}
-{
-  ( "+" { tags.add(Boolean.TRUE); }
-  | "-" { tags.add(Boolean.FALSE); }
-  |     { tags.add(null); }
-  )
-  mv = monotypeVar()
-  { return mv; }
-}
-
-List monotypeVars(List tags):
-{
-    List res=new ArrayList(0);
-    MonotypeVar var;
-}
-{
-    ( "<" 
-      var=taggedMonotypeVar(tags) { res.add(var); }
-      ( "," var=taggedMonotypeVar(tags) { res.add(var); } )*
-    ">" )?
-    { return res; }
 }
 
 Monotype monotypeConstructor():
@@ -1017,7 +985,7 @@ ClassDefinition classDefinition():
 {
   ClassDefinition res;
   LocatedString name;
-  List parameters;
+  MethodContainer.Constraint parameters;
   List fields=new ArrayList(),methods=null;
   List l;
   List typeParametersVariances = new ArrayList(0);
@@ -1028,7 +996,7 @@ ClassDefinition classDefinition():
 (
   "interface"
   name=ident() 
-  parameters=monotypeVars(typeParametersVariances) 
+  parameters=classTypeParameters(typeParametersVariances) 
   { List ext = null; }
   [ ext = extensions() ]
   { res = ClassDefinition.makeInterface
@@ -1039,7 +1007,7 @@ ClassDefinition classDefinition():
   ]
   "class"
   name=ident() 
-  parameters=monotypeVars(typeParametersVariances) 
+  parameters=classTypeParameters(typeParametersVariances) 
 
   { TypeIdent sup = null; List imp = null, abs = null; }
 
@@ -1100,7 +1068,7 @@ ClassDefinition classDefinition():
 AbstractInterface interfaceDefinition():
 {
   LocatedString name;
-  List parameters;
+  MethodContainer.Constraint parameters;
   List extensions=null;
   List typeParametersVariances = new ArrayList(0);
   AbstractInterface res;
@@ -1108,7 +1076,7 @@ AbstractInterface interfaceDefinition():
 {
   "abstract" "interface"
   name=ident()
-  parameters=monotypeVars(typeParametersVariances)
+  parameters=classTypeParameters(typeParametersVariances)
   [ "extends" extensions=interfaces() ]
   "{"
   { res = new AbstractInterface(name,parameters,typeParametersVariances,
@@ -1133,6 +1101,62 @@ AbstractInterfaceImplementation abstractInterfaceImplementation():
   ";"
   { return new AbstractInterfaceImplementation(className, interfaceName); }
 }
+
+
+MethodContainer.Constraint classTypeParameters(List tags):
+{}
+{
+  [
+    {
+      List binders = new ArrayList(3);
+      List atoms = new ArrayList(3);
+      MonotypeVar var;
+    }
+
+    "<" 
+    var=taggedMonotypeVar(tags, atoms) { binders.add(var); }
+    ( "," var=taggedMonotypeVar(tags, atoms) { binders.add(var); } )*
+    [ "|" atomics(atoms) ]
+    ">" 
+    { 
+      MonotypeVar[] b = (MonotypeVar[]) binders.toArray(new MonotypeVar[binders.size()]);
+      return new MethodContainer.Constraint(b, atoms); 
+    }
+  ]
+  { return null; }
+}
+
+MonotypeVar taggedMonotypeVar(List tags, List atoms):
+{
+  MonotypeVar mv;
+  TypeIdent bound = null;
+}
+{
+  [ LOOKAHEAD( typeIdent() ("+" | "-" | monotypeVar()) )
+    bound=typeIdent() 
+  ]
+
+  ( "+" { tags.add(Boolean.TRUE); }
+  | "-" { tags.add(Boolean.FALSE); }
+  |     { tags.add(null); }
+  )
+
+  mv = monotypeVar()
+
+  { 
+    if (bound != null)
+      {
+        bound.nullness = Monotype.absent;
+        atoms.add(new MonotypeLeqCst(Monotype.createVar(mv), bound)); 
+      }
+
+    return mv;
+  }
+}
+
+/***********************************************************************/
+/*                          Methods                                    */
+/***********************************************************************/
 
 Pattern pattern():
 {

@@ -172,8 +172,8 @@ abstract public class MethodDeclaration extends Definition
     }
     catch(TypingEx e){
       User.error(this,
-		 "The type of method "+symbol.name+
-		 " is not well formed");
+		 "The type of method " + symbol.name +
+		 " is not well formed: " + type + "\n" + e);
     }
   }
 

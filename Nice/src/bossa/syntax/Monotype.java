@@ -217,7 +217,7 @@ implements Located
     return new Wrapper(m);
   }
   
-  private static final class Wrapper extends Monotype
+  private static class Wrapper extends Monotype
   {
     Wrapper(mlsub.typing.Monotype m)
     {
@@ -246,7 +246,29 @@ implements Located
       return String.valueOf(type);
     }
     
-    private final mlsub.typing.Monotype type;
+    final mlsub.typing.Monotype type;
+  }
+
+  public static Monotype createVar(mlsub.typing.MonotypeVar m)
+  {
+    return new VarWrapper(m);
+  }
+  
+  private static final class VarWrapper extends Wrapper
+  {
+    VarWrapper(mlsub.typing.MonotypeVar m)
+    {
+      super(m);
+    }
+
+    public mlsub.typing.Monotype rawResolve(TypeMap s)
+    {
+      mlsub.typing.TypeSymbol res = s.lookup(type.toString());
+      if (res != null)
+	return (mlsub.typing.Monotype) res;
+      else
+	return type;
+    }
   }
 
   /****************************************************************

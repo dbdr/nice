@@ -16,6 +16,7 @@ import bossa.util.*;
 import mlsub.typing.*;
 import mlsub.typing.Constraint;
 import mlsub.typing.MonotypeConstructor;
+import mlsub.typing.AtomicConstraint;
 
 import gnu.bytecode.Access;
 import java.util.*;
@@ -106,7 +107,6 @@ public class NiceClass extends ClassDefinition.ClassImplementation
 	User.error(sym, "A field cannot have void type");
 
       this.scope = scope;
-      this.typeScope = typeScope;
     }
 
     void createField()
@@ -118,13 +118,12 @@ public class NiceClass extends ClassDefinition.ClassImplementation
     }
 
     private VarScope scope;
-    private TypeScope typeScope;
 
     void typecheck(NiceClass c)
     {
       if (value != null)
 	{
-	  value = dispatch.analyse(value, scope, typeScope);
+	  value = dispatch.analyse(value, scope, localScope);
 	  dispatch.typecheck(value);
 
 	  c.enterTypingContext();
@@ -154,7 +153,7 @@ public class NiceClass extends ClassDefinition.ClassImplementation
 	return new FormalParameters.NamedParameter(type, sym.getName(), true);
       else
 	return new FormalParameters.OptionalParameter
-	  (type, sym.getName(), true, value, scope, typeScope);
+	  (type, sym.getName(), true, value, scope, localScope);
     }
 
     MonoSymbol sym;
@@ -166,9 +165,13 @@ public class NiceClass extends ClassDefinition.ClassImplementation
     NiceFieldAccess method;
   }
   
+  // Used to resolve fields, and constructor cosntraint.
+  private TypeScope localScope;
+
   void resolveClass()
   {
     classe.supers = computeSupers();
+    localScope = definition.getLocalScope();
     resolveFields();
     createConstructor();
     createFields();
@@ -179,8 +182,6 @@ public class NiceClass extends ClassDefinition.ClassImplementation
   {
     if (fields.length == 0)
       return;
-
-    TypeScope localScope = definition.getLocalScope();
     
     for (int i = 0; i < fields.length; i++)
       fields[i].resolve(definition.scope, localScope);
@@ -233,11 +234,11 @@ public class NiceClass extends ClassDefinition.ClassImplementation
 
   private void enterTypingContext()
   {
-    if (entered || definition.typeParameters == null) 
+    if (entered || definition.classConstraint == null) 
       return;
     Typing.enter();
     entered = true;
-    Typing.introduce(definition.typeParameters);
+    Typing.introduce(definition.classConstraint.typeParameters);
     try {
       Typing.implies();
     }
@@ -290,13 +291,18 @@ public class NiceClass extends ClassDefinition.ClassImplementation
     return classe;
   }
 
+  /**
+     Collect in 'constraints' the constraints set by each class
+     on the type parameters.
+  */
   private static FormalParameters.Parameter[][] getFieldsAsParameters
-    (TypeConstructor tc, int nbFields, MonotypeVar[] typeParams)
+    (TypeConstructor tc, int nbFields, List constraints, 
+     MonotypeVar[] typeParams)
   {
     ClassDefinition sup = ClassDefinition.get(tc);
     if (sup != null && sup.implementation instanceof NiceClass)
       return ((NiceClass) sup.implementation).
-	getFieldsAsParameters(nbFields, typeParams);
+	getFieldsAsParameters(nbFields, constraints, typeParams);
 
     List constructors = TypeConstructors.getConstructors(tc);
     if (constructors == null)
@@ -318,13 +324,13 @@ public class NiceClass extends ClassDefinition.ClassImplementation
   }
 
   private FormalParameters.Parameter[][] getFieldsAsParameters
-    (int nbFields, MonotypeVar[] typeParams)
+    (int nbFields, List constraints, MonotypeVar[] typeParams)
   {
     nbFields += this.fields.length;
     FormalParameters.Parameter[][] res = getFieldsAsParameters
-      (definition.getSuperClass(), nbFields, typeParams);
+      (definition.getSuperClass(), nbFields, constraints, typeParams);
 
-    if (fields.length == 0)
+    if (fields.length == 0 && definition.classConstraint == null)
       return res;
 
     TypeScope map = Node.getGlobalTypeScope();
@@ -335,13 +341,22 @@ public class NiceClass extends ClassDefinition.ClassImplementation
 	map = new TypeScope(map);
 	for (int i = 0; i < typeParams.length; i++)
 	  try {
-	    map.addMapping(definition.typeParameters[i].getName(), typeParams[i]);
+	    map.addMapping(definition.classConstraint.typeParameters[i].getName(), typeParams[i]);
 	  } catch(TypeScope.DuplicateName e) {}
       }
 
     for (int j = 0; j < res.length; j++)
       for (int i = fields.length, n = res[j].length - nbFields + i; --i >= 0;)
 	res[j][--n] = fields[i].asParameter(map);
+
+    if (definition.classConstraint != null)
+      {
+	AtomicConstraint[] newAtoms = 
+	  bossa.syntax.AtomicConstraint.resolve(map, definition.classConstraint.atoms);
+	if (newAtoms != null)
+	  for (int i = 0; i < newAtoms.length; i++)
+	    constraints.add(newAtoms[i]);
+      }
 
     return res;
   }
@@ -353,10 +368,23 @@ public class NiceClass extends ClassDefinition.ClassImplementation
     if (definition instanceof ClassDefinition.Interface)
       return;
 
-    mlsub.typing.MonotypeVar[] typeParams = 
-      definition.createSameTypeParameters();
+    List constraints;
+    mlsub.typing.MonotypeVar[] typeParams = definition.getTypeParameters();
+    if (typeParams == null)
+      constraints = null;
+    else 
+      constraints = new LinkedList();
+
     FormalParameters.Parameter[][] params = 
-      getFieldsAsParameters(0, typeParams);
+      getFieldsAsParameters(0, constraints, typeParams);
+
+    Constraint cst;
+    if (typeParams != null)
+      cst = new Constraint
+	(typeParams, (AtomicConstraint[])
+	 constraints.toArray(new AtomicConstraint[constraints.size()]));
+    else
+      cst = Constraint.True;
 
     constructorMethod = new Constructor[params.length];
     for (int i = 0; i < params.length; i++)
@@ -366,7 +394,7 @@ public class NiceClass extends ClassDefinition.ClassImplementation
 	constructorMethod[i] = new Constructor
 	  (this, fields, i, definition.location(),
 	   values, 
-	   new Constraint(typeParams, null),
+	   cst,
 	   Monotype.resolve(definition.typeScope, values.types()),
 	   Monotype.sure(new MonotypeConstructor(definition.tc, typeParams)));
 

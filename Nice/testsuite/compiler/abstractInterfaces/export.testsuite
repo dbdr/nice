@@ -1,0 +1,19 @@
+/// PASS
+  /// package a
+  /// TOPLEVEL
+  abstract interface AI<java.awt.Point P>
+  {
+  }
+  /// package b import a
+  ;
+
+/// PASS
+  /// package a
+  /// TOPLEVEL
+  class A {}
+  abstract interface AI<A +P>
+  {
+  }
+  /// package b import a
+  /// Toplevel
+  class A<+T> implements AI {}

@@ -5,6 +5,10 @@ nice (0.7.4) unstable; urgency=low
     These replace the previous (very partial) collections from nice.lang.
     Functionals on collections (foreach, map, has, ...) are applicable
     to java.util Collections.
+  * Allow class type parameters to be constrained:
+      class MyClass<Bound P> { ...}
+    This allow MyClass to be instantiated only on subtypes of Bound
+    in the constructor and the class methods.
   * Fixed error message for calling new on an interface or Java abstract
     class, and when a class or interface (indirectly) implements itself.
   * Allow the <T> syntax to introduce type variables, in addition to

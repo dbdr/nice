@@ -33,7 +33,12 @@ public class TypeMaper implements TypeMap
   
   public TypeSymbol lookup(LocatedString name)
   {
-    TypeSymbol res = (TypeSymbol) nice.tools.ast.dispatch.get(inner, name.toString());
+    return lookup(name.toString());
+  }
+
+  public TypeSymbol lookup(String name)
+  {
+    TypeSymbol res = (TypeSymbol) nice.tools.ast.dispatch.get(inner, name);
     if (res != null)
       return res;
     else

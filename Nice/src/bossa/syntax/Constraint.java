@@ -214,7 +214,12 @@ public class Constraint extends Node
   {
     atomics.add(atom);
   }
-  
+
+  void addAtoms(List l)
+  {
+    atomics.addAll(l);
+  }
+
   private List /* of TypeSymbol */ binders;
   private List /* of AtomicConstraint */ atomics;
 }

@@ -14,6 +14,7 @@ package bossa.syntax;
 
 import mlsub.typing.Variance;
 import mlsub.typing.MonotypeVar;
+import java.util.List;
 
 /**
    An entity in which methods can be declared.
@@ -28,19 +29,15 @@ import mlsub.typing.MonotypeVar;
 public abstract class MethodContainer extends Definition
 {
   MethodContainer (LocatedString name, int propagate, 
-		   java.util.List typeParameters, java.util.List variance)
+		   MethodContainer.Constraint classConstraint, 
+		   List variance)
   {
     super(name, propagate);
 
     this.name.prepend(module.getName() + ".");
     
     this.variance = makeVariance(variance);
-
-    if (typeParameters==null || typeParameters.size() == 0)
-      this.typeParameters = null;
-    else
-      this.typeParameters = (MonotypeVar[]) 
-	typeParameters.toArray(new MonotypeVar[typeParameters.size()]);
+    this.classConstraint = classConstraint;
   }
 
   /** The name of this method container without package qualification. */
@@ -50,26 +47,9 @@ public abstract class MethodContainer extends Definition
     return name.substring(name.lastIndexOf('.') + 1);
   }
 
-  final MonotypeVar[] typeParameters;
   mlsub.typing.Variance variance;
 
   abstract mlsub.typing.TypeSymbol getTypeSymbol();
-
-  /** Create type parameters with the same names as in this entity. */
-  mlsub.typing.MonotypeVar[] createSameTypeParameters ()
-  {
-    if (typeParameters == null)
-      return null;
-    
-    mlsub.typing.MonotypeVar[] thisTypeParams = 
-      new mlsub.typing.MonotypeVar[typeParameters.length];
-    for(int i=0; i<thisTypeParams.length; i++)
-      {
-	thisTypeParams[i] = new MonotypeVar(typeParameters[i].toString());
-	nice.tools.code.Types.makeMarkedType(thisTypeParams[i]);
-      }
-    return thisTypeParams;
-  }
 
   private static Variance makeVariance(java.util.List typeParametersVariances)
   {
@@ -82,5 +62,69 @@ public abstract class MethodContainer extends Definition
 	  variances[i] = Variance.CONTRAVARIANT;
 
     return Variance.make(variances);
+  }
+
+  /****************************************************************
+   * Class type parameters
+   ****************************************************************/
+
+  public static class Constraint
+  {
+    public Constraint(MonotypeVar[] typeParameters, List atoms)
+    {
+      this.typeParameters = typeParameters;
+      this.atoms = atoms;
+    }
+
+    MonotypeVar[] typeParameters;
+    List atoms;
+  }
+
+  final Constraint classConstraint;
+
+  bossa.syntax.Constraint getClassConstraint()
+  {
+    if (classConstraint == null)
+      return bossa.syntax.Constraint.True;
+    else
+      return new bossa.syntax.Constraint(classConstraint.typeParameters, 
+					 classConstraint.atoms);
+  }
+
+  mlsub.typing.MonotypeVar[] getTypeParameters ()
+  {
+    if (classConstraint == null)
+      return null;
+    else
+      return classConstraint.typeParameters;
+  }
+
+  /****************************************************************
+   * Module Interface
+   ****************************************************************/
+
+  String printTypeParameters()
+  {
+    if (classConstraint == null)
+      return "";
+
+    MonotypeVar[] typeParameters = classConstraint.typeParameters;
+    StringBuffer res = new StringBuffer("<");
+    for (int n = 0; n < typeParameters.length; n++)
+      {
+	switch (variance.getVariance(n)) 
+	  {
+	  case Variance.CONTRAVARIANT: 
+	    res.append("-");
+	    break;
+	  case Variance.COVARIANT: 
+	    res.append("+");
+	    break;
+	  }
+	res.append(typeParameters[n].toString());
+	if (n + 1 < typeParameters.length)
+	  res.append(", ");
+      }
+    return res.append(">").toString();
   }
 }

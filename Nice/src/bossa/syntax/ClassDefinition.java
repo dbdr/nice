@@ -29,7 +29,8 @@ abstract public class ClassDefinition extends MethodContainer
 {
   public static 
     Interface makeInterface(LocatedString name, 
-			    List typeParameters, List typeParametersVariances,
+			    Constraint typeParameters, 
+			    List typeParametersVariances,
 			    List extensions)
   {
     return new Interface(name, typeParameters, typeParametersVariances, 
@@ -39,7 +40,7 @@ abstract public class ClassDefinition extends MethodContainer
   static class Interface extends ClassDefinition
   {
     Interface(LocatedString name, 
-	      List typeParameters, List typeParametersVariances,
+	      Constraint typeParameters, List typeParametersVariances,
 	      List extensions)
     {
       super(name, typeParameters, typeParametersVariances);
@@ -119,7 +120,7 @@ abstract public class ClassDefinition extends MethodContainer
     {
       s.print("interface ");
       s.print(getSimpleName());
-      s.print(this.printTP());
+      s.print(this.printTypeParameters());
       if (extendedInterfaces != null || javaInterfaces != null)
 	{
 	  s.print(" extends ");
@@ -171,7 +172,7 @@ abstract public class ClassDefinition extends MethodContainer
   public static 
     Class makeClass(LocatedString name, 
 		    boolean isFinal, boolean isAbstract, 
-		    List typeParameters,
+		    Constraint typeParameters,
 		    List typeParametersVariances,
 		    TypeIdent superClassIdent, 
 		    List implementations, List abstractions
@@ -186,7 +187,7 @@ abstract public class ClassDefinition extends MethodContainer
   {
     Class(LocatedString name, 
 	  boolean isFinal, boolean isAbstract, 
-	  List typeParameters,
+	  Constraint typeParameters,
 	  List typeParametersVariances,
 	  TypeIdent superClassIdent, 
 	  List implementations, List abstractions
@@ -327,7 +328,7 @@ abstract public class ClassDefinition extends MethodContainer
       if (isAbstract) s.print("abstract ");
       s.print("class ");
       s.print(getSimpleName());
-      s.print(this.printTP());
+      s.print(this.printTypeParameters());
       if (superClass != null)
 	s.print(" extends " + superClass);
       if (impl != null || javaInterfaces != null)
@@ -359,7 +360,8 @@ abstract public class ClassDefinition extends MethodContainer
    * @param extensions a list of TypeConstructors
    */
   public ClassDefinition(LocatedString name, 
-			 List typeParameters, List typeParametersVariances)
+			 Constraint typeParameters, 
+			 List typeParametersVariances)
   {
     super(name, Node.upper, typeParameters, typeParametersVariances);
   }
@@ -432,10 +434,10 @@ abstract public class ClassDefinition extends MethodContainer
   TypeScope getLocalScope()
   {
     TypeScope localScope = typeScope;
-    if (typeParameters != null)
+    if (classConstraint != null)
       try{
 	localScope = new TypeScope(localScope);
-	localScope.addSymbols(typeParameters);
+	localScope.addSymbols(classConstraint.typeParameters);
       }
       catch(TypeScope.DuplicateName e){
 	User.error(this, e);
@@ -464,7 +466,7 @@ abstract public class ClassDefinition extends MethodContainer
   
   protected mlsub.typing.Monotype lowlevelMonotype()
   {
-    return new mlsub.typing.MonotypeConstructor(tc, typeParameters);
+    return new mlsub.typing.MonotypeConstructor(tc, getTypeParameters());
   }
   
   public abstract boolean isConcrete();
@@ -573,34 +575,6 @@ abstract public class ClassDefinition extends MethodContainer
    ****************************************************************/
 
   abstract void createContext();
-
-  /****************************************************************
-   * Module Interface
-   ****************************************************************/
-
-  String printTP()
-  {
-    if (typeParameters == null)
-      return "";
-
-    StringBuffer res = new StringBuffer("<");
-    for (int n = 0; n < typeParameters.length; n++)
-      {
-	switch (variance.getVariance(n)) 
-	  {
-	  case Variance.CONTRAVARIANT: 
-	    res.append("-");
-	    break;
-	  case Variance.COVARIANT: 
-	    res.append("+");
-	    break;
-	  }
-	res.append(typeParameters[n].toString());
-	if (n + 1 < typeParameters.length)
-	  res.append(", ");
-      }
-    return res.append(">").toString();
-  }
 
   /****************************************************************
    * Class hierarchy

@@ -55,8 +55,9 @@ public class NiceMethod extends MethodDeclaration
 
     boolean hasAlike = returnType.containsAlike() 
       || params.containsAlike();
-    
-    mlsub.typing.MonotypeVar[] thisTypeParams = c.createSameTypeParameters();
+
+    MethodContainer.Constraint thisConstraint = c.classConstraint;
+    mlsub.typing.MonotypeVar[] thisTypeParams = c.getTypeParameters();
     
     int thisTypeParamsLen = (thisTypeParams == null ? 0 
 			     : thisTypeParams.length);
@@ -80,10 +81,13 @@ public class NiceMethod extends MethodDeclaration
     if(constraint == Constraint.True)
       constraint = new Constraint
 	(new ArrayList(thisTypeParamsLen + (hasAlike ? 1 : 0)),
-	 new ArrayList((hasAlike ? 1 : 0)));
+	 new ArrayList((hasAlike ? 1 : 0) + (thisConstraint == null ? 0 
+					     : thisConstraint.atoms.size())));
 	
     constraint.addBinders(thisTypeParams);
-    
+    if (thisConstraint != null)
+      constraint.addAtoms(thisConstraint.atoms);
+
     mlsub.typing.Monotype thisType;
 
     // "alike" is not created for a non-abstract interface

@@ -44,17 +44,17 @@ find_home()
   # Resolve symlinks.
   while [ -h "$PRG" ]; do
     lsResult=`ls -ld "$PRG"`
-    # d'apres /usr/bin/expr sous linux, ^ est implicite 
+    # d'apres expr sous linux, ^ est implicite 
     # au debut de la deuxieme chaine et il ne faut pas le mettre
-    link=`/usr/bin/expr "$lsResult" : '.*-> \(.*\)$'`
-    if /usr/bin/expr "$link" : '/.*' > /dev/null; then
+    link=`expr "$lsResult" : '.*-> \(.*\)$'`
+    if expr "$link" : '/.*' > /dev/null; then
         PRG="$link"
     else
         PRG="`dirname $PRG`/$link"
     fi
   done
 
-  APPHOME=`/usr/bin/expr "$PRG" : '\(.*\)/bin'`
+  APPHOME=`expr "$PRG" : '\(.*\)/bin'`
   if [ -z ${APPHOME} ]; 
     then APPHOME=`dirname "$PRG"`/..
   fi

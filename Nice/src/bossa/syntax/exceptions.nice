@@ -32,3 +32,7 @@ bossa.util.UserError assignmentError(bossa.util.Located responsible,
   msg.append("\nExpected: ").append(targetType);
   return new bossa.util.UserError(responsible, msg.toString());
 }
+
+// Local Variables:
+// nice-xprogram: "nicec -d \"$HOME/Nice/classes\" --sourcepath=\"$HOME/Nice/src\" --classpath=\"$HOME/Nice/classes\""
+// End:

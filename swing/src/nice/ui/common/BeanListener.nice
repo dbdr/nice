@@ -91,7 +91,9 @@ class NiceBeanContextMembershipListener implements BeanContextMembershipListener
 }
 
 
-class NiceBeanContextServicesListener implements BeanContextServicesListener, NiceListener
+class NiceBeanContextServicesListener 
+  extends NiceBeanContextServiceRevokedListener
+  implements BeanContextServicesListener
 {
   private BeanContextServiceAvailableEvent ?-> void serviceAvailable;
 

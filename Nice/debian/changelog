@@ -7,9 +7,9 @@ nice (0.9.4) unstable; urgency=low
   * Added source-level debugging information for recent debuggers (jsr 45).
   * Generate more efficient code for anonymous functions that do not capture
     the environment. This also avoids a memory leak.
-  * Retypings of classes and methods that can't be found by the compiler will
-    generate a warning now. (this makes it possible to add java 1.4 specific
-    retypings without breaking anything when compiling with an older jvm.)
+  * Retypings of classes and methods that can't be found by the compiler only
+    generate a warning now. This makes it possible to add JDK 1.4 specific
+    retypings without failing when compiling with an older JDK.
   * Bug fixes (error reporting for certain overloading by expected type,
     recompilation of overloaded methods with the same bytecode types).
 

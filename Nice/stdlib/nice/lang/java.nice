@@ -401,7 +401,7 @@ void store(Properties<String, String>, OutputStream, String) = native void Prope
 */
 
 class StringTokenizer = native java.util.StringTokenizer;
-boolean hasMoreElement(StringTokenizer) = native boolean java.util.StringTokenizer.hasMoreElements();
+boolean hasMoreElements(StringTokenizer) = native boolean java.util.StringTokenizer.hasMoreElements();
 String nextElement(StringTokenizer) = native Object java.util.StringTokenizer.nextElement();
 
 <T> void update(Observer, Observable, T) = 

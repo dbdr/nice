@@ -21,7 +21,7 @@ RPMTMP  = ${CURDIR}/tmp/Nice-${VERSION}
 RPMDIR  = ${CURDIR}/tmp/noarch
 RPMFILE = Nice-${VERSION}-1.noarch.rpm
 
-CVSROOT=:pserver:anonymous@cvs.nice.sourceforge.net:/cvsroot/nice 
+CVSROOT=:pserver:anonymous@cvs.sourceforge.net:/cvsroot/nice 
 DOWNLOADROOT = http://prdownloads.sourceforge.net/nice
 
 clean-tmp = rm -rf tmp && mkdir tmp

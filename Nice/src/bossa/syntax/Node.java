@@ -127,8 +127,8 @@ abstract public class Node
    * Scopes shared by all modules.
    */
 
-  private static GlobalVarScope globalScope;
-  public static final GlobalVarScope getGlobalScope()
+  private static VarScope globalScope;
+  public static final VarScope getGlobalScope()
   {
     return globalScope;
   }
@@ -146,7 +146,7 @@ abstract public class Node
     if (JavaClasses.compilation != module.compilation())
       {
 	JavaClasses.compilation = module.compilation();
-	globalScope = new GlobalVarScope();
+	globalScope = dispatch.createGlobalVarScope();
 	globalTypeScope = new GlobalTypeScope();
       }
     globalTypeScope.module = module;

@@ -12,6 +12,9 @@ import java.util.List;
 
 public class dispatch
 {
+  static VarScope createGlobalVarScope()
+  { return null; }
+
   static String getAlikeID()
   { return null; }
 

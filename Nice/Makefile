@@ -106,6 +106,7 @@ bootstrap:
 	ln -sf nicec bin/nicer
 	mkdir -p classes
 	cd classes; jar xf ../external/java-getopt-1.0.7.jar gnu
+	cd src/bossa/syntax && mv -f dispatch.java.bootstrap dispatch.java;true
 	${JAVAC} \
 		stdlib/nice/lang/Native.java stdlib/nice/lang/inl/*.java \
 		src/mlsub/compilation/Module.java \
@@ -113,7 +114,6 @@ bootstrap:
 	cd src; ${NICEC} bossa.modules
 	cd src; ${NICEC} nice.tools.ast
 	cd src/bossa/syntax && \
-	mv dispatch.java.bootstrap dispatch.java; \
 	${JAVAC} *.java && \
 	mv dispatch.java dispatch.java.bootstrap
 	rm classes/bossa/syntax/dispatch.class

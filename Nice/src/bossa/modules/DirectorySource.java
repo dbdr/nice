@@ -50,9 +50,6 @@ class DirectorySource extends PackageSource
   private File[] sources;
   private File itf;
 
-  /** Date of the last successful compilation */
-  private long lastCompilation = -1;
-
   /** @return true if this directory indeed hosts a Nice package. */
   private boolean isValid()
   {

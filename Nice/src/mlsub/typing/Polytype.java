@@ -281,7 +281,12 @@ public final class Polytype
   public String toString()
   {
     // We want a simple form for printing
-    simplify();
+    try {
+      simplify();
+    } catch(InternalError e) {
+      return Constraint.toString(constraint) + monotype.toString() +
+      " (Ill-formed type)";
+    }
 
     return Constraint.toString(constraint) + monotype.toString();
   }

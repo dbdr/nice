@@ -10,45 +10,32 @@
 /*                                                                        */
 /**************************************************************************/
 
-// File    : SymbolExpr.java
-// Created : Thu Jul 08 12:20:59 1999 by bonniot
-//$Modified: Mon Jul 19 19:01:07 1999 by bonniot $
-// Description : Access to the value of a symbol
+// File    : AtomicConstraint.java
+// Created : Mon Jul 19 16:40:18 1999 by bonniot
+//$Modified: Fri Jul 23 15:56:58 1999 by bonniot $
 
 package bossa.syntax;
 
-import java.util.*;
 import bossa.util.*;
+import java.util.*;
 
-public class SymbolExp extends Expression
+/**
+ * A constraint atom. See childs
+ *
+ * @see Constraint
+ */
+public abstract class AtomicConstraint
 {
-  SymbolExp(VarSymbol s)
-  {
-    this.symbol=s;
-  }
+  abstract AtomicConstraint substitute(Map map);
 
-  boolean isAssignable()
+  static Collection substitute(Map map, Collection c)
   {
-    return symbol.isAssignable();
-  }
+    Collection res=new ArrayList(c.size());
+    Iterator i=c.iterator();
 
-  Type getType()
-  {
-    return symbol.getType();
-  }
+    while(i.hasNext())
+      res.add( ((AtomicConstraint)i.next()).substitute(map));
 
-  Expression resolve(VarScope s, TypeScope t)
-  {
-    Internal.error("resolve in SymbolExp : it has already been done !");
-    return this;
+    return res;
   }
-
-  public String toString()
-  {
-    return 
-      symbol.name.toString()
-      ;
-  }
-
-  VarSymbol symbol;
 }

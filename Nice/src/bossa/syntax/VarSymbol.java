@@ -12,7 +12,7 @@
 
 // File    : VarSymbol.java
 // Created : Wed Jul 07 16:56:06 1999 by bonniot
-//$Modified: Fri Jul 16 19:18:31 1999 by bonniot $
+//$Modified: Fri Jul 23 13:13:58 1999 by bonniot $
 // Description : A variable (local, field, parameter)
 
 package bossa.syntax;
@@ -22,12 +22,12 @@ import bossa.util.*;
 
 abstract class VarSymbol extends Node
 {
-  public VarSymbol(Ident name)
+  public VarSymbol(LocatedString name)
   {
     this.name=name;
   }
 
-  public boolean hasName(Ident i)
+  public boolean hasName(LocatedString i)
   {
     return this.name.equals(i);
   }
@@ -37,7 +37,24 @@ abstract class VarSymbol extends Node
     return true;
   }
 
-  abstract Polytype getType();
+  abstract Type getType();
+
+  /**
+   * Maps getType over a collection of VarSymbols
+   *
+   * @param varsymbols the colleciton of Varsymbols
+   * @return the collection of their Types
+   */
+  static Collection getType(Collection varsymbols)
+  {
+    Iterator i=varsymbols.iterator();
+    Collection res=new ArrayList(varsymbols.size());
+
+    while(i.hasNext())
+      res.add(((VarSymbol)i.next()).getType());
+
+    return res;
+  }
 
   static void resolveScope(Collection c)
   {
@@ -46,5 +63,5 @@ abstract class VarSymbol extends Node
       ((VarSymbol)i.next()).resolveScope();
   }
 
-  Ident name;
+  LocatedString name;
 }

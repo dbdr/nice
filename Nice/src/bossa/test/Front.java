@@ -12,7 +12,7 @@
 
 // File    : Front.java
 // Created : Thu Jul 01 15:11:18 1999 by bonniot
-//$Modified: Mon Jul 12 16:37:58 1999 by bonniot $
+//$Modified: Fri Jul 23 19:44:30 1999 by bonniot $
 // Description : Front-end test
 
 package bossa.test;
@@ -27,10 +27,18 @@ public class Front
   public static void main(String[] args) throws Exception
   {
     try{
+      bossa.util.Location.currentFile="stdlib.bossa";
       Reader r = new FileReader("stdlib.bossa");
       Parser p=new Parser(r);
       Collection defs=p.definitions();
-      r = new FileReader(args[0]);
+      if(args.length==0)
+	{
+	  System.out.println("Usage: bossa file.bossa");
+	  System.exit(0);
+	}
+      String file=args[0];
+      bossa.util.Location.currentFile=file;
+      r = new FileReader(file);
       p.ReInit(r);
       defs.addAll(p.definitions());
 

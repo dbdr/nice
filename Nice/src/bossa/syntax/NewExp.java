@@ -12,7 +12,7 @@
 
 // File    : NewExp.java
 // Created : Thu Jul 08 17:15:15 1999 by bonniot
-//$Modified: Tue Jul 13 17:06:40 1999 by bonniot $
+//$Modified: Fri Jul 23 17:42:32 1999 by bonniot $
 // Description : Allocation of a new object
 
 package bossa.syntax;
@@ -21,26 +21,43 @@ import bossa.util.*;
 
 public class NewExp extends Expression
 {
-  public NewExp(Monotype type)
+  public NewExp(TypeConstructor typeConstructor, TypeParameters tp)
   {
-    this.type=type;
+    this.tc=typeConstructor;
+    if(tp==null)
+      this.tp=new TypeParameters(null);
+    else
+      this.tp=tp;
   }
-
+  
   Expression resolve(VarScope s, TypeScope ts)
   {
-    type=type.resolve(ts);
+    tc=tc.resolve(ts);
+    tp=tp.resolve(ts);
     return this;
   }
-
-  Polytype getType()
+  
+  Type getType()
   {
-    return new Polytype(type);
+//      Type t=tc.getType();
+//      User.error(tc==null,this,"Can't use an interface in a new expression");
+    Type res=null;
+    try{
+      res=tc.instantiate(tp);
+    }
+    catch(BadSizeEx e){
+      User.error(this,e.expected+" type parameters expected "+
+		 ", not "+e.actual);
+    }
+
+    return res;
   }
 
   public String toString()
   {
-    return "new "+type;
+    return "new "+tc+tp;
   }
 
-  Monotype type;
+  TypeConstructor tc;
+  TypeParameters tp;
 }

@@ -10,41 +10,59 @@
 /*                                                                        */
 /**************************************************************************/
 
-// File    : TypeSymbolType.java
-// Created : Fri Jul 09 15:32:38 1999 by bonniot
-//$Modified: Thu Jul 22 10:25:48 1999 by bonniot $
-// Description : Type made of a symbol
+// File    : MonotypeVar.java
+// Created : Fri Jul 23 15:36:39 1999 by bonniot
+//$Modified: Fri Jul 23 20:20:58 1999 by bonniot $
 
 package bossa.syntax;
 
-import java.util.*;
 import bossa.util.*;
 
-public class TypeSymbolType extends Monotype
+/**
+ * A monotype variable.
+ * 
+ * @author bonniot
+ */
+
+public class MonotypeVar extends Monotype
+  implements TypeSymbol
 {
-  public TypeSymbolType(TypeSymbol s, Collection parameters)
+  public MonotypeVar(LocatedString name)
   {
-    this.symbol=s;
-    if(parameters==null)
-      this.parameters=new ArrayList(0);
-    else
-      this.parameters=parameters;
+    this.name=name;
   }
 
-  Monotype cloneType()
+  bossa.syntax.Monotype cloneType()
   {
     return this;
   }
 
-  Monotype resolve(TypeScope typeScope)
+  public boolean hasName(LocatedString s)
   {
-    // Nothing to do !
-    return this;
+    return name.equals(s);
   }
 
-  VarScope memberScope()
+  /****************************************************************
+   * Scoping
+   ****************************************************************/
+  
+  Monotype resolve(TypeScope ts)
   {
-    return symbol.memberScope();
+    TypeSymbol s=ts.lookup(this.name);
+    User.error(s==null,this,this.name+" is not defined");
+
+    if(s instanceof Monotype)
+      return (Monotype) s;
+    
+    Internal.error(this,this.name+" is not well kinded :"+s.getClass());
+    return null;
+  }
+
+  Monotype substitute(java.util.Map map)
+  {
+    if(map.containsKey(name))
+      return (Monotype) map.get(name);
+    return this;
   }
 
   /****************************************************************
@@ -53,23 +71,18 @@ public class TypeSymbolType extends Monotype
 
   public Location location()
   {
-    return symbol.location().englobe(parameters);
+    return name.location();
   }
 
   public String toString()
   {
-    Internal.warning(parameters==null,"null parameters in "+symbol.name);
-    return 
-      toStringBase()
-      + Util.map("<",", ",">",parameters);
+    return "\""+name+"\"";
   }
 
-  public String toStringBase()
+  public LocatedString getName()
   {
-    Internal.error(symbol==null,"null symbol");
-    return symbol.name.toString();
+    return name;
   }
 
-  TypeSymbol symbol;
-  Collection /* of Monotype */ parameters;
+  LocatedString name;
 }

@@ -10,45 +10,52 @@
 /*                                                                        */
 /**************************************************************************/
 
-// File    : SymbolExpr.java
-// Created : Thu Jul 08 12:20:59 1999 by bonniot
-//$Modified: Mon Jul 19 19:01:07 1999 by bonniot $
-// Description : Access to the value of a symbol
+// File    : InstantiateExp.java
+// Created : Mon Jul 12 17:48:04 1999 by bonniot
+//$Modified: Wed Jul 21 17:50:11 1999 by bonniot $
+// Description : instantiation of type parameters
 
 package bossa.syntax;
 
-import java.util.*;
 import bossa.util.*;
 
-public class SymbolExp extends Expression
+public class InstantiateExp extends Expression
 {
-  SymbolExp(VarSymbol s)
+  public InstantiateExp(Expression exp, TypeParameters tp)
   {
-    this.symbol=s;
+    this.exp=exp;
+    this.typeParameters=tp;
+    loc=exp.location().englobe(tp.content);
   }
 
-  boolean isAssignable()
+  Expression resolve(VarScope s, TypeScope ts)
   {
-    return symbol.isAssignable();
+    exp=exp.resolve(s,ts);
+    typeParameters=typeParameters.resolve(ts);
+    return this;
   }
 
   Type getType()
   {
-    return symbol.getType();
-  }
-
-  Expression resolve(VarScope s, TypeScope t)
-  {
-    Internal.error("resolve in SymbolExp : it has already been done !");
-    return this;
+    Polytype res=null;
+    try{
+      res=exp.getType().instantiate(typeParameters);
+      }
+    catch(BadSizeEx e){
+      User.error(this,e.expected+" type parameters expected "+
+		 ", not "+e.actual);      
+    }
+    
+    User.error(res==null,this,"You cannot try to instantiate "+this.exp+
+	       ", it has not a parametric type");
+    return res;
   }
 
   public String toString()
   {
-    return 
-      symbol.name.toString()
-      ;
+    return ""+ exp + typeParameters;
   }
 
-  VarSymbol symbol;
+  Expression exp;
+  TypeParameters typeParameters;
 }

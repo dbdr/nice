@@ -12,7 +12,7 @@
 
 // File    : Expression.java
 // Created : Mon Jul 05 16:25:02 1999 by bonniot
-//$Modified: Tue Jul 13 14:27:17 1999 by bonniot $
+//$Modified: Thu Jul 22 14:52:38 1999 by bonniot $
 // Description : 
 
 package bossa.syntax;
@@ -20,20 +20,8 @@ package bossa.syntax;
 import java.util.*;
 import bossa.util.*;
 
-public abstract class Expression
+public abstract class Expression implements Located
 {
-  /*
-  class Resolution
-  {
-    Resolution(Expression e, Scope s)
-    {
-      exp=e; scope=s;
-    }
-    Expression expr;
-    Scope scope;
-  }
-  */
-
   /** return an equivalent expression with scoping resolved */
   abstract Expression resolve(VarScope vs, TypeScope ts);
 
@@ -54,15 +42,43 @@ public abstract class Expression
   }
 
   /** returns the static type of the expression */
-  abstract Polytype getType();
+  abstract Type getType();
+
+  /**
+   * Maps getType over a collection of Expressions
+   *
+   * @param Expressions the colleciton of Expressions
+   * @return the collection of their Types
+   */
+  static Collection getType(Collection expressions)
+  {
+    Iterator i=expressions.iterator();
+    Collection res=new ArrayList(expressions.size());
+
+    while(i.hasNext())
+      res.add( ((Expression) i.next()) .getType());
+
+    return res;
+  }
 
   /** return the scope in which fields may be found */
   VarScope memberScope()
   {
-    Polytype t=getType();
+    Type t=getType();
     VarScope res=t.memberScope();
-    User.error(res==null,this+" is not a record, it has type "+t);
+    User.error(res==null,this+" is not a class, it has type "+t);
     return res;
   }
 
+  public void setLocation(Location l)
+  {
+    loc=l;
+  }
+
+  public Location location()
+  {
+    return loc;
+  }
+
+  Location loc=Location.nowhere();
 }

@@ -10,45 +10,20 @@
 /*                                                                        */
 /**************************************************************************/
 
-// File    : SymbolExpr.java
-// Created : Thu Jul 08 12:20:59 1999 by bonniot
-//$Modified: Mon Jul 19 19:01:07 1999 by bonniot $
-// Description : Access to the value of a symbol
+// File    : Located.java
+// Created : Tue Jul 20 14:50:17 1999 by bonniot
+//$Modified: Fri Jul 23 11:52:22 1999 by bonniot $
 
-package bossa.syntax;
+package bossa.util;
 
-import java.util.*;
 import bossa.util.*;
 
-public class SymbolExp extends Expression
+/**
+ * Interface for objects that have a location in a source file
+ *
+ * @see Location
+ */
+public interface Located
 {
-  SymbolExp(VarSymbol s)
-  {
-    this.symbol=s;
-  }
-
-  boolean isAssignable()
-  {
-    return symbol.isAssignable();
-  }
-
-  Type getType()
-  {
-    return symbol.getType();
-  }
-
-  Expression resolve(VarScope s, TypeScope t)
-  {
-    Internal.error("resolve in SymbolExp : it has already been done !");
-    return this;
-  }
-
-  public String toString()
-  {
-    return 
-      symbol.name.toString()
-      ;
-  }
-
-  VarSymbol symbol;
+  public Location location();
 }

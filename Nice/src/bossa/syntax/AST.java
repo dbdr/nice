@@ -12,25 +12,37 @@
 
 // File    : AST.java
 // Created : Thu Jul 01 11:01:56 1999 by bonniot
-//$Modified: Fri Jul 09 19:31:35 1999 by bonniot $
-// Description : the Abstract Syntax Tree, father of all nodes
-//   May its mighty name be blessed
+//$Modified: Fri Jul 23 17:18:55 1999 by bonniot $
 
 package bossa.syntax;
 
 import java.util.*;
 import bossa.util.*;
 
+/**
+ * The Abstract Syntax Tree :
+ * A collection of definitions
+ *
+ * @see Definition
+ */
 public class AST extends Node
 {
   public AST(Collection defs)
   {
     this.definitions=defs;
-    this.scope=VarScope.makeScope(null,findSymbols(defs,false));
+    
+    try{
+      this.scope=VarScope.makeScope(null,findSymbols(defs,false));
+    }
+    catch(DuplicateIdentEx e){
+      User.error(e.ident,"Identifier "+e.ident+" defined twice at toplevel");
+    }
+
     this.typeScope=TypeScope.makeScope(null,findSymbols(defs,true));
     buildScope();
     linkMethodBodiesToDefinitions();
     resolveScope();
+    typecheck();
   }
 
   private void buildScope()
@@ -53,7 +65,8 @@ public class AST extends Node
 	if(d instanceof MethodBodyDefinition)
 	  {
 	    MethodBodyDefinition m=(MethodBodyDefinition)d;
-	    m.setDefinition((MethodDefinition)scope.lookup(m.name));
+	    m.setDefinitionAndBuildScope
+	      ((MethodDefinition)scope.lookup(m.name),scope,typeScope);
 	  }
       }						  
   }
@@ -72,13 +85,23 @@ public class AST extends Node
     while(i.hasNext())
       {
 	Object d=i.next();
-	if(types && d instanceof TypeSymbol
-	   || !types && d instanceof VarSymbol)
+	if(types && d instanceof ClassDefinition)
+	  res.add(((ClassDefinition)d).tc);
+	else if(!types && d instanceof VarSymbol)
 	  res.add(d);
 	if(!types && d instanceof ClassDefinition)
 	  res.addAll(((ClassDefinition)d).methodDefinitions());
       }
     return res;
+  }
+
+  /****************************************************************
+   * Type checking
+   ****************************************************************/
+
+  void typecheck()
+  {
+    typecheck(definitions);
   }
 
   public String toString()

@@ -12,12 +12,13 @@
 
 // File    : parser.jj
 // Created : Thu Jul 01 10:27:05 1999 by bonniot
-//$Modified: Fri Jul 16 19:29:19 1999 by bonniot $
-// Description : Parseur JavaCC
+//$Modified: Fri Jul 23 20:21:50 1999 by bonniot $
+// Description : Parseur JavaCC pour Bossa
+//   Tokens based on the Jazz parser
 
 options {
-    JAVA_UNICODE_ESCAPE = true;
-    //DEBUG_LOOKAHEAD=true;
+  JAVA_UNICODE_ESCAPE = true;
+  //DEBUG_LOOKAHEAD = true;
 }
 
 PARSER_BEGIN(Parser)
@@ -321,9 +322,10 @@ LocatedString string():
 }
 {
     t=<IDENT> 
-    { return new LocatedString(t.image,new Location(t.beginLine,t.beginColumn,t.endLine,t.endColumn)); }
+    { return new LocatedString(t.image,new Location(t)); }
 }
 
+/*
 Ident identifier():
 {
   LocatedString s;
@@ -346,7 +348,7 @@ Collection identifiers():
 )
 | { return new ArrayList(); }
 }
-
+*/
 int integer():
 {
   Token t;
@@ -364,21 +366,202 @@ double floating():
 }
 
 /***********************************************************************/
+/*                          Type Symbols                               */
+/***********************************************************************/
+
+TypeConstructor typeConstructor():
+{
+  LocatedString name;
+}
+{
+  name=string()
+  { return new TypeConstructor(name); }
+}
+
+Collection typeConstructors():
+{
+  Collection res=new ArrayList();
+  TypeConstructor t;
+}
+{
+  [
+   "<" 
+      t=typeConstructor() { res.add(t); }
+      ( "," t=typeConstructor() { res.add(t); } )*   
+   ">"
+  ]
+  { return res; }
+}
+
+TypeSymbol typeSymbol():
+{
+  TypeSymbol res;
+}
+{
+  ( LOOKAHEAD(2)
+   res=typeConstructor()
+  |
+   res=monotypeVar()
+  )
+  { return res; }
+}
+/*
+Collection typeSymbols():
+{
+    Collection res=new ArrayList(0);
+    TypeSymbol name;
+}
+{
+    ( "<" 
+      name=typeSymbol() { res.add(name); }
+      ( "," name=typeSymbol() { res.add(name); } )*
+    ">" )?
+    { return res; }
+}
+*/
+
+FieldSymb fieldSymb():
+{
+  LocatedString name;
+  Monotype type;
+}
+{
+  type=monotype()
+  name=string()
+  { return new FieldSymb(name,type,null); }
+}
+
+Collection monoSymbols():
+{
+  Collection res=new ArrayList();
+  FieldSymb name;
+}
+{
+  (
+    name=fieldSymb() { res.add(name); }
+    ( "," name=fieldSymb() { res.add(name); } )*
+  )?
+  { return res; }
+}
+
+/***********************************************************************/
+/*                          Constraints                                */
+/***********************************************************************/
+
+TypeSymbol binder(Collection atomics):
+{
+  TypeSymbol res;
+  TypeConstructor me,other;
+}
+{
+  (
+   LOOKAHEAD(2) res=monotypeVar()
+  |
+   other=typeConstructor() me=typeConstructor()
+   { atomics.add(new LeqCst(me,other)); res=me; }
+  )
+  { return res; }
+}
+
+Collection binders(Collection atomics):
+{
+    Collection res=new ArrayList();
+    TypeSymbol t;
+}
+{
+    t=binder(atomics) { res.add(t); }
+    ( "," t=binder(atomics) { res.add(t); } )*
+    { return res; }
+}
+
+AtomicConstraint atomicConstraint():
+{
+  TypeSymbol t1,t2;
+  AtomicConstraint res;
+}
+{
+  (
+  t1=typeSymbol()
+  "<:"
+  t2=typeSymbol()
+  { res=new LeqCst(t1,t2); }
+  )
+  { return res; }
+}
+
+Collection atomics(Collection init):
+{
+  Collection res=init;
+  AtomicConstraint k;
+}
+{
+  k=atomicConstraint() { res.add(k); }
+  ( "," k=atomicConstraint() { res.add(k); } ) *
+  { return res; }
+}
+
+Constraint constraint():
+{
+  Constraint res;
+  Collection b=null;
+  Collection atoms=new ArrayList();
+}
+{
+  (
+    ( "{" 
+      ( 
+	LOOKAHEAD(2) atoms=atomics(atoms) 
+      | 
+        b=binders(atoms) [ "|" atoms=atomics(atoms) ] 
+      )
+      "}" 
+      
+      { res=new Constraint(b,atoms); }
+    )
+    | { res=Constraint.True(); }
+  )
+  { return res; }
+}
+
+/***********************************************************************/
 /*                          Types                                      */
 /***********************************************************************/
 
 //Monotypes
 
-IdentType identType():
+MonotypeVar monotypeVar():
 {
-    LocatedString s;
+  LocatedString name;
+}
+{
+  name=string()
+  { return new MonotypeVar(name); }
+}
+
+Collection monotypeVars():
+{
+    Collection res=new ArrayList(0);
+    MonotypeVar var;
+}
+{
+    ( "<" 
+      var=monotypeVar() { res.add(var); }
+      ( "," var=monotypeVar() { res.add(var); } )*
+    ">" )?
+    { return res; }
+}
+
+Monotype monotypeConstructor():
+{
+    TypeConstructor t;
     Collection p=null;
 }
 {
-    s=string() 
-    ( "<" p=monotypes() ">" )?
+    t=typeConstructor() 
+    "<" [  p=monotypes() ] ">"
     { if(p==null) p=new ArrayList(0);
-      return new IdentType(s,p); }
+      return new MonotypeConstructor(t,new TypeParameters(p)); 
+    }
 }
 
 FunType funmonotype():
@@ -398,8 +581,12 @@ Monotype monotype():
 }
 {
   (
-  res=identType()
-| res=funmonotype()
+  LOOKAHEAD(monotypeConstructor())
+  res=monotypeConstructor()
+|
+  res=monotypeVar() 
+| 
+  res=funmonotype()
   )
   { return res; }
 }
@@ -415,6 +602,18 @@ Collection monotypes():
   { return res; }
 }
 
+TypeParameters typeParameters():
+{
+  Collection res=new ArrayList();
+  Monotype t;
+}
+{
+  ( "<" 
+    t=monotype() { res.add(t); }
+    ( "," t=monotype() { res.add(t); } )*
+  ">" )
+  { return new TypeParameters(res); }
+}
 
 //Polytypes
 
@@ -442,36 +641,15 @@ Polytype polytype():
   { return res; }
 }
 
-/***********************************************************************/
-/*                          Constraints                                */
-/***********************************************************************/
-
-Collection binders():
+Type type():
 {
-    Collection res=new ArrayList();
-    TypeSymbol t;
+  Polytype p;
+  Collection tp;
 }
 {
-    t=typeSymbol() { res.add(t); }
-    ( "," t=typeSymbol() { res.add(t); } )*
-    { return res; }
-}
-
-Constraint constraint():
-{
-    Constraint res;
-    Collection b;
-}
-{
-  (
-    ( "<" 
-      b=binders()
-      ">" 
-      { res=new Constraint(b); }
-    )
-    | { res=Constraint.emptyConstraint(); }
-  )
-  { return res; }
+  tp=monotypeVars()
+  p=polytype()
+  { return Type.newType(tp,p); }
 }
 
 /***********************************************************************/
@@ -481,78 +659,80 @@ Constraint constraint():
 void field(ClassDefinition c):
 {
   Monotype t;
-  Ident name;
+  LocatedString name;
 }
 {
   t=monotype()
-  name=identifier()
+  name=string()
   ";"
   { c.addField(name,t); }
 }
 
 void methodDecl(ClassDefinition c):
 {
-  Ident name;
-  Collection parameters;
+  LocatedString name;
+  Collection parameters,tp;
   Constraint cst;
   Monotype returnType;
   MethodDefinition def;
 }
 {
   returnType=monotype()
-  name=identifier()
+  name=string()
+  tp=monotypeVars()
   cst=constraint()
   "("
   parameters=monotypes()
   ")"
   ";"
-  { c.addMethod(new MethodDefinition(c,name,cst,returnType,parameters)); }
+  { c.addMethod(new MethodDefinition(c,name,tp,cst,returnType,parameters)); }
 }
 
 void extensions(ClassDefinition c):
 {
-    IdentType name;
+    TypeConstructor name;
 }
 {
     "extends"
-    name=identType() { c.addExtension(name); }
-    ( "," name=identType() { c.addExtension(name); } )*
+    name=typeConstructor() { c.addExtension(name); }
+    ( "," name=typeConstructor() { c.addExtension(name); } )*
 }
 
 void implementations(ClassDefinition c):
 {
-    IdentType name;
+    TypeConstructor name;
 }
 {
     "implements"
-    name=identType() { c.addImplementation(name); }
-    ( "," name=identType() { c.addImplementation(name); } )*
+    name=typeConstructor() { c.addImplementation(name); }
+    ( "," name=typeConstructor() { c.addImplementation(name); } )*
 }
 
 void abstractions(ClassDefinition c):
 {
-    IdentType name;
+    TypeConstructor name;
 }
 {
     "abstracts"
-    name=identType() { c.addAbstraction(name); }
-    ( "," name=identType() { c.addAbstraction(name); } )*
+    name=typeConstructor() { c.addAbstraction(name); }
+    ( "," name=typeConstructor() { c.addAbstraction(name); } )*
 }
 
 ClassDefinition classDefinition():
 {
     ClassDefinition res;
-    Ident name;
+    LocatedString name;
     Collection parameters;
 }
 {
     "class"
-    name=identifier() 
-    parameters=typeSymbols() { res=new ClassDefinition(name,parameters); }
+    name=string() 
+    parameters=monotypeVars() 
+    { res=new ClassDefinition(name,parameters); }
     ( implementations(res) | abstractions(res) | extensions(res) )*
     "{"
     ( 
-      (LOOKAHEAD(3) field(res) | methodDecl(res))
+      (LOOKAHEAD(field(res)) field(res) | methodDecl(res))
     )*
     "}"
     { return res; }
@@ -560,100 +740,41 @@ ClassDefinition classDefinition():
 
 InterfaceDefinition interfaceDefinition():
 {
-    Ident name;
+    LocatedString name;
 }
 {
-    "interface" name=identifier() ";"
+    "interface" name=string() ";"
     { return new InterfaceDefinition(name); }
 }
 
-Collection typeParameters():
+Pattern pattern(LocatedString name):
 {
-    Collection res=new ArrayList();
-    Monotype t;
+    TypeConstructor tc;
 }
 {
-    ( "<" 
-      t=monotype() { res.add(t); }
-      ( "," t=monotype() { res.add(t); } )*
-    ">" )
-    { return res; }
-}
-
-TypeSymbol typeSymbol():
-{
-  Ident name;
-}
-{
-  name=identifier()
-  { return new TypeSymbol(name); }
-}
-
-Collection typeSymbols():
-{
-    Collection res=new ArrayList();
-    TypeSymbol name;
-}
-{
-    ( "<" 
-      name=typeSymbol() { res.add(name); }
-      ( "," name=typeSymbol() { res.add(name); } )*
-    ">" )?
-    { return res; }
-}
-
-FieldSymb fieldSymb():
-{
-  Ident name;
-  IdentType type;
-}
-{
-  type=identType()
-  name=identifier()
-  { return new FieldSymb(name,type,null); }
-}
-
-Collection monoSymbols():
-{
-    Collection res=new ArrayList();
-    FieldSymb name;
-}
-{
-    (
-      name=fieldSymb() { res.add(name); }
-      ( "," name=fieldSymb() { res.add(name); } )*
-    )?
-    { return res; }
-}
-
-Pattern pattern(Ident name):
-{
-    Ident i;
-    Collection tp=null;
-}
-{
-    "@" i=identifier() [ tp=typeParameters() ] 
-    { return new Pattern(name,i,tp); }
+    "@" tc=typeConstructor() 
+    { return new Pattern(name,tc); }
   | { return new Pattern(name); }
 }
 
 MethodBodyDefinition methodBodyDefinition():
 {
-    Ident name,i;
+    LocatedString name,i;
     Pattern p;
     Collection binders;
     List parameters=new ArrayList();
-    Collection tp,code;
+    Collection tp;
+    List code;
 }
 {
-    name=identifier()
-    tp=typeSymbols()
-    p=pattern(new Ident(new LocatedString("this",new Location(0,0,0,0)))) 
+    name=string()
+    tp=typeConstructors()
+    p=pattern(new LocatedString("this",new Location(0,0,0,0))) 
       { parameters.add(p); }
     "("
     ( 
-	i=identifier() p=pattern(i) { parameters.add(p); }
-	( "," i=identifier() p=pattern(i) { parameters.add(p); } )*
+	i=string() p=pattern(i) { parameters.add(p); }
+	( "," i=string() p=pattern(i) { parameters.add(p); } )*
     )?
     ")"
     "{"
@@ -664,21 +785,22 @@ MethodBodyDefinition methodBodyDefinition():
 
 MethodDefinition methodDefinition():
 {
-    Ident name;
+    LocatedString name;
     Monotype returnType;
-    Collection parameters;
+    Collection parameters,tp;
     Constraint cst;
     MethodDefinition res;
 }
 {
     returnType=monotype()
-    name=identifier()
+    name=string()
+    tp=monotypeVars()
     cst=constraint()
     "("
     ( parameters=monotypes() | { parameters=new ArrayList(); } )
     ")"
     ";"
-    { return new MethodDefinition(name,cst,returnType,parameters); }
+    { return new MethodDefinition(name,tp,cst,returnType,parameters); }
 }
 
 Definition definition():
@@ -744,19 +866,24 @@ ConstantExp constantExp():
 
 IdentExp identExp():
 {
-  Ident i;
+  LocatedString i;
 }
 {
-  i=identifier()
+  i=string()
   { return new IdentExp(i); }
 }
 
 NewExp newExp():
 {
-  Monotype t;
+  TypeConstructor t;
+  TypeParameters tp=null;
 }
 {
-  "new" t=monotype() "(" ")" { return new NewExp(t); }
+  "new" 
+  t=typeConstructor()
+  [ tp=typeParameters() ]
+  "(" ")" 
+  { return new NewExp(t,tp); }
 }
 
 CallExp callExp(Expression prefix):
@@ -773,16 +900,16 @@ CallExp callExp(Expression prefix):
 Expression computedExp(Expression prefix):
 {
   Expression res=prefix;
-  Collection tp;
-  Ident name;
+  TypeParameters tp=null;
+  LocatedString name;
 }
 {
   (
-    "." name=identifier()
+    "." name=string()
     { res=new FieldExp(res,name); }
   | 
     tp=typeParameters()
-    { res=new InstantiateExp(res,new TypeParameters(tp)); }
+    { res=new InstantiateExp(res,tp); }
   |
     res=callExp(res)
   )*
@@ -792,24 +919,28 @@ Expression computedExp(Expression prefix):
 FunExp funExp():
 {
   Collection formals;
+  Collection tp;
   Constraint cst;
-  Collection body;
+  List body;
 }
 {
   "fun" 
+  tp=typeConstructors()
   cst=constraint()
   "(" formals=monoSymbols() ")"
   "=>"
   "{" body=statements() "}"
-  { return new FunExp(cst,formals,body); }
+  { return new FunExp(tp,cst,formals,body); }
 }
 
 Expression expression():
 {
   Expression res;
   IdentExp e;
+  Token first,last;
 }
 {
+  { first=getToken(1); }
   (
   res=constantExp()
 | 
@@ -819,7 +950,11 @@ Expression expression():
 | 
   e=identExp() res=computedExp(e)
   )
-  { return res; }
+  { 
+    last=getToken(0); 
+    res.setLocation(new Location(first).englobe(new Location(last)));
+    return res; 
+  }
 }
 
 Collection expressions():
@@ -852,13 +987,13 @@ AffectationStmt affectation():
 
 LocalDeclarationStmt localDeclaration():
 {
-  Polytype t;
-  Ident id;
+  Type t;
+  LocatedString id;
   Expression e=null;
 }
 {
-  t=polytype()
-  id=identifier()
+  t=type()
+  id=string()
   [ "=" e=expression() ]
   { return new LocalDeclarationStmt(id,t,e); }
 }
@@ -867,21 +1002,29 @@ Statement statement():
 {
   Statement res;
   Expression e;
+  Token first,last;
 }
 {
-  "return" e=expression() ";" { return new ReturnStmt(e); }
+  { first=getToken(1); }
+  (
+  "return" e=expression() ";" { res=new ReturnStmt(e); }
 |
-  LOOKAHEAD([ "final" ] polytype() identifier())
-  res=localDeclaration() ";" {return res; }
+  LOOKAHEAD([ "final" ] type() string())
+  res=localDeclaration() ";" 
 | 
-  LOOKAHEAD(expression() ";") e=expression() ";" { return new ExpressionStmt(e); }
+  LOOKAHEAD(expression() ";") e=expression() ";" 
+  { res=new ExpressionStmt(e); }
 | 
-  res=affectation() ";" { return res; }
+  res=affectation() ";" 
+  )
+  { last=getToken(0); 
+    res.setLocation(new Location(first).englobe(new Location(last)));
+    return res; }
 }
 
-Collection statements():
+List statements():
 {
-  Collection res=new ArrayList();
+  List res=new ArrayList();
   Statement s;
 }
 {

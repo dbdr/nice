@@ -12,44 +12,70 @@
 
 // File    : CallExp.java
 // Created : Mon Jul 05 16:27:27 1999 by bonniot
-//$Modified: Tue Jul 13 14:21:41 1999 by bonniot $
-// Description : A method call
+//$Modified: Fri Jul 23 20:02:47 1999 by bonniot $
 
 package bossa.syntax;
 
 import java.util.*;
 import bossa.util.*;
+import bossa.typing.*;
 
+/**
+ * A function call
+ */
 public class CallExp extends Expression
 {
-  public CallExp(Expression method, 
+  /**
+   *
+   * @param fun the function to call
+   * @param parameters a collection of Expressions
+   */
+  public CallExp(Expression fun, 
 		 Collection parameters)
   {
-    this.method=method;
+    this.fun=fun;
     this.parameters=parameters;
   }
 
   Expression resolve(VarScope scope, TypeScope ts)
   {
-    method=method.resolve(scope,ts);
+    fun=fun.resolve(scope,ts);
     parameters=resolve(scope,ts,parameters);
     return this;
   }
 
-  Polytype getType()
+  Type getType()
   {
-    Polytype res=method.getType().codomain();
-    User.error(res==null,method+" is not a function");
-    return res;
+    Type t=fun.getType();
+
+    User.error(!(t instanceof Polytype),this,
+	       "You have to specify the type parameters for function "+
+	       fun);
+
+    Typing.enter(t,this+"");
+    try{
+      Typing.inDomain(
+		      t.domain(),
+		      Expression.getType(parameters));
+    }
+    catch(BadSizeEx e){
+      User.error(this,e.expected+" parameters expected "+
+		 ", not "+e.actual);
+    }
+    Typing.leave();
+
+    Monotype res=t.codomain();
+    User.error(res==null,this,fun+" is not a function");
+    return new Polytype(res);
   }
 
   public String toString()
   {
-    return method
+    return fun
       + "(" + Util.map("",", ","",parameters) + ")"
       ;
   }
 
-  protected Expression method;
-  protected Collection parameters;
+  protected Expression fun;
+  protected Collection /* of Expression */ parameters;
 }

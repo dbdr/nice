@@ -12,36 +12,76 @@
 
 // File    : Constraint.java
 // Created : Fri Jul 02 17:51:35 1999 by bonniot
-//$Modified: Fri Jul 16 18:59:50 1999 by bonniot $
-// Description : Syntaxic constraint
+//$Modified: Fri Jul 23 16:35:53 1999 by bonniot $
 
 package bossa.syntax;
 
 import java.util.*;
 import bossa.util.*;
 
+/**
+ * A constraint between type constructors
+ *
+ * @see AtomicConstraint
+ */
 public class Constraint
 {
-  public Constraint(Collection binders)
+  /**
+   * Creates the constraint \forall binders . atomics
+   *
+   * @param binders a collection of TypeSymbols
+   * @param atomics a collection of AtomicConstraints
+   */
+  public Constraint(Collection binders, Collection atomics)
   {
+    if(binders==null)
+      binders=new ArrayList(0);
     this.binders=binders;
+
+    if(atomics==null)
+      atomics=new ArrayList(0);
+    this.atomics=atomics;
   }
 
+  /**
+   * Nickname for True()
+   *
+   * @return the trivial constraint
+   */
   public static final Constraint emptyConstraint()
   { 
-    return new Constraint(new ArrayList());
+    return new Constraint(new ArrayList(0),new ArrayList(0));
   }
 
-  Constraint instantiate(TypeParameters typeParameters)
+  /**
+   * The trivial constraint 
+   *
+   * @return a constraint with no binders, always true
+   */
+  public static final Constraint True()
   { 
-    Constraint res;
-    int nb1,nb2;
-    User.error((nb1=binders.size())!=
-	       (nb2=typeParameters.size()),
-	       nb1+" type parameters expected "+
-	       ", not "+nb2);
-    //TODO
-    return emptyConstraint();
+    return new Constraint(new ArrayList(0),new ArrayList(0));
+  }
+
+  Constraint cloneConstraint()
+  {
+    return new Constraint((Collection)((ArrayList)binders).clone(),
+			  (Collection)((ArrayList)atomics).clone());
+  }
+
+  public static Constraint and(Constraint c1, Constraint c2)
+  {
+    Constraint res=c1.cloneConstraint();
+    c1.binders.addAll(c2.binders);
+
+    return res;
+  }
+
+  Constraint substitute(Map map)
+  {
+    //TODO:check binders do not conflict with keys in map,
+    // or is it done before ?
+    return new Constraint(binders,AtomicConstraint.substitute(map,atomics));
   }
 
   /****************************************************************
@@ -50,8 +90,16 @@ public class Constraint
 
   public String toString()
   {
-    return Util.map("<",", ",">",binders);
+    if(atomics.size()==0)
+      return Util.map("{",", ","}",binders);
+    else if(binders.size()==0)
+      return Util.map("{",", ","}",atomics);
+    else 
+      return 
+	Util.map("{",", ","|",binders)
+	+ Util.map("",", ","}",atomics);
   }
 
   Collection /* of TypeSymbol */ binders;
+  Collection /* of AtomicConstraint */ atomics;
 }

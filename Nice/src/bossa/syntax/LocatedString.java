@@ -12,14 +12,15 @@
 
 // File    : LocatedString.java
 // Created : Fri Jul 09 19:09:47 1999 by bonniot
-//$Modified: Tue Jul 13 11:59:37 1999 by bonniot $
+//$Modified: Fri Jul 23 18:57:16 1999 by bonniot $
 // Description : A string + location information
 
 package bossa.syntax;
 
 import bossa.util.*;
 
-public class LocatedString
+public class LocatedString 
+  implements Located
 {
   public LocatedString(String content, Location loc)
   {
@@ -35,6 +36,24 @@ public class LocatedString
   public Location location()
   {
     return location;
+  }
+
+  public boolean equals(Object o)
+  {
+    if(o instanceof LocatedString)
+      return equals((LocatedString) o);
+    else
+      return false;
+  }
+
+  public boolean equals(LocatedString s)
+  {
+    return content.equals(s.content);
+  }
+
+  public int hashCode()
+  {
+    return content.hashCode();
   }
 
   String content;

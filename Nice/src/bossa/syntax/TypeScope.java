@@ -12,7 +12,7 @@
 
 // File    : TypeScope.java
 // Created : Fri Jul 09 11:29:17 1999 by bonniot
-//$Modified: Fri Jul 16 19:21:30 1999 by bonniot $
+//$Modified: Thu Jul 22 15:30:23 1999 by bonniot $
 // Description : a Scope level for types.
 //   Is extended in each node that defined a new scope level
 
@@ -29,25 +29,40 @@ abstract class TypeScope
     this.outer=outer;
   }
 
-  /** as to be defined in each extension */
-  protected abstract TypeSymbol has(IdentType i);
+  /** has to be defined in each extension */
+  protected abstract TypeSymbol has(LocatedString name);
 
-  public TypeSymbol lookup(IdentType i)
+  public TypeSymbol lookup(LocatedString name)
   {
-    TypeSymbol res=has(i);
+    TypeSymbol res=has(name);
     if(res!=null)
       return res;
     if(outer!=null)
-      return outer.lookup(i);
+      return outer.lookup(name);
     return null;
   }
 
+  /**
+   * Creates a scope which defines
+   * the provided TypeSymbols
+   *
+   * @param outer the outer scope
+   * @param locals collection of TypeSymbols
+   * @return the new Scope
+   * @exception NOT DuplicateIdentEx if the same identifer occurs twice
+   */
   static TypeScope makeScope(TypeScope outer, 
 			     final Collection /* of TypeSymbol */ locals)
   {
+    Iterator ii=locals.iterator();
+    while(ii.hasNext())
+      {
+	TypeSymbol s=(TypeSymbol)ii.next();
+      }
+
     TypeScope res=new TypeScope(outer)
     {
-      public TypeSymbol has(IdentType id)
+      public TypeSymbol has(LocatedString id)
       {
 	Iterator i=locals.iterator();
 	while(i.hasNext())
@@ -60,11 +75,34 @@ abstract class TypeScope
       }
     };
 
-    //TODO: watch this
-    // set the scope of the symbols
-    //    Iterator i=locals.iterator();
-    //while(i.hasNext())
-    //  ((Symbol)i.next()).buildScope(res);
+    return res;
+  }
+
+  /** returns a new TypeScope that maps vars to values */
+  static TypeScope makeScope(TypeScope outer, 
+			     final Collection /* of LocatedString */ vars,
+			     final Collection /* of TypeSymbol*/ values)
+    throws BadSizeEx
+  {
+    if(vars.size()!=values.size())
+      throw new BadSizeEx(vars.size(),values.size());
+
+    TypeScope res=new TypeScope(outer)
+    {
+      public TypeSymbol has(LocatedString id)
+      {
+	Iterator ivar=vars.iterator();
+	Iterator ival=values.iterator();
+	while(ivar.hasNext())
+	{
+	  LocatedString s=(LocatedString)ivar.next();
+	  TypeSymbol v=(TypeSymbol)ival.next();
+	  if(s.equals(id))
+            return v;
+	}
+	return null;
+      }
+    };
 
     return res;
   }

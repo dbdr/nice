@@ -10,45 +10,21 @@
 /*                                                                        */
 /**************************************************************************/
 
-// File    : SymbolExpr.java
-// Created : Thu Jul 08 12:20:59 1999 by bonniot
-//$Modified: Mon Jul 19 19:01:07 1999 by bonniot $
-// Description : Access to the value of a symbol
+// File    : TypingEx.java
+// Created : Tue Jul 20 12:06:53 1999 by bonniot
+//$Modified: Thu Jul 22 19:34:53 1999 by bonniot $
+// Description : Generic type exception
 
-package bossa.syntax;
+package bossa.typing;
 
-import java.util.*;
 import bossa.util.*;
+import bossa.syntax.*;
 
-public class SymbolExp extends Expression
+abstract public class TypingEx extends Exception
 {
-  SymbolExp(VarSymbol s)
+  TypingEx(String msg)
   {
-    this.symbol=s;
+    super(msg);
   }
-
-  boolean isAssignable()
-  {
-    return symbol.isAssignable();
-  }
-
-  Type getType()
-  {
-    return symbol.getType();
-  }
-
-  Expression resolve(VarScope s, TypeScope t)
-  {
-    Internal.error("resolve in SymbolExp : it has already been done !");
-    return this;
-  }
-
-  public String toString()
-  {
-    return 
-      symbol.name.toString()
-      ;
-  }
-
-  VarSymbol symbol;
 }
+

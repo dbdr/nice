@@ -12,24 +12,46 @@
 
 // File    : MethodBodyDefinition.java
 // Created : Thu Jul 01 18:12:46 1999 by bonniot
-//$Modified: Fri Jul 16 19:27:10 1999 by bonniot $
+//$Modified: Fri Jul 23 20:06:26 1999 by bonniot $
 // Description : Abstract syntax for a method body
 
 package bossa.syntax;
 
 import java.util.*;
 import bossa.util.*;
+import bossa.typing.*;
 
-public class MethodBodyDefinition extends Node implements Definition
+public class MethodBodyDefinition extends Node 
+  implements Definition, Located
 {
-  public MethodBodyDefinition(Ident name, Collection typeParameters,
-			      List formals, Collection body)
+  public MethodBodyDefinition(LocatedString name, Collection typeParameters,
+			      List formals, List body)
   {
     this.name=name;
     this.typeParameters=typeParameters;
     this.formals=formals;
     this.body=new Block(body);
     this.definition=null;
+  }
+
+  void setDefinitionAndBuildScope(MethodDefinition d,VarScope scope,
+				  TypeScope typeScope)
+  {
+    User.error(d==null,this,"Method \""+name+"\" has not been declared");
+    this.definition=d;
+
+    // if the method is not a class member,
+    // the "this" formal is useless
+    if(!d.isMember())
+      {
+	User.error(!((Pattern)formals.get(0)).thisAtNothing(),
+		   this,
+		   "Method \""+name+"\" is a global method"+
+		   ", it cannot have a main pattern");
+	formals.remove(0);
+      }
+
+    buildScope(scope,typeScope);
   }
 
   private Collection buildSymbols(Collection names, Collection types)
@@ -46,37 +68,39 @@ public class MethodBodyDefinition extends Node implements Definition
 		   ", not "+names.size()
 		   );
 	res.add(new LocalSymb(((Pattern)n.next()).name,
-			      new Polytype(definition.type.constraint,(Monotype)t.next())));
+			      new Polytype((Monotype)t.next())));
       }
     User.error(t.hasNext(),
 	       "Method body "+this.name+" has not enough parameters");
     return res;
   }
   
-  void setDefinition(MethodDefinition d)
-  {
-    User.error(d==null,"Method \""+name+"\" has not been declared");
-    this.definition=d;
-
-    // if the method is not a class member,
-    // the "this" formal is useless
-    if(!d.isMember())
-      {
-	User.error(!((Pattern)formals.get(0)).thisAtNothing(),
-		   "Method \""+name+"\" is a global method"+
-		   ", it cannot have a main pattern");
-	formals.remove(0);
-      }
-
-    buildScope(d.getScope(),d.getTypeScope());
-  }
-
   void buildScope(VarScope outer, TypeScope typeOuter)
   {
     parameters=buildSymbols(this.formals,definition.type.domain());
-    this.scope=VarScope.makeScope(outer,this.parameters);
-    this.typeScope=TypeScope.makeScope(typeOuter,this.typeParameters);
-    buildScope(this.scope,this.typeScope,parameters);
+    try
+      {
+	this.scope=VarScope.makeScope(outer,this.parameters);
+      }
+    catch(DuplicateIdentEx e)
+      {
+	User.error(this.name,"Identifier "+e.ident+
+		   " was defined twice in the body of this method");
+      }
+
+    try{
+      this.typeScope=TypeScope.makeScope
+	(typeOuter,
+	 TypeConstructor.toLocatedString(this.typeParameters),
+	 definition.type.getTypeParameters());
+    }
+    catch(BadSizeEx e){
+      User.error(name,"Bad number of type parameters for method \""+
+		 name+"\" : I want "+
+		 e.expected+", not "+e.actual);
+    }
+
+    buildScope(definition.scope,definition.typeScope,parameters);
     body.buildScope(this.scope,this.typeScope);
   }
 
@@ -84,6 +108,35 @@ public class MethodBodyDefinition extends Node implements Definition
   {
     resolveScope(parameters);
     body.resolveScope();
+  }
+
+  /****************************************************************
+   * Type checking
+   ****************************************************************/
+
+  void typecheck()
+  {
+    Typing.enter(definition.type,"Method body "+name);
+    body.typecheck();
+    try{
+      Type t=body.getType();
+      if(t==null)
+	User.error(this,"Last statement of body should be \"return\"");
+      Typing.leq(t,new Polytype(definition.type.codomain()));
+    }
+    catch(TypingEx e){
+      User.error(this,"Bad return type: "+e.getMessage());
+    }
+    Typing.leave();
+  }
+
+  /****************************************************************
+   * Printing
+   ****************************************************************/
+
+  public Location location()
+  {
+    return name.location();
   }
 
   public String toString()
@@ -99,9 +152,9 @@ public class MethodBodyDefinition extends Node implements Definition
   }
 
   private MethodDefinition definition;
-  protected Ident name;
+  protected LocatedString name;
   protected Collection /* of VarSymbol */  parameters;
   protected List       /* of Patterns */   formals;
-  protected Collection /* of TypeSymbol */ typeParameters;
+  protected Collection /* of TypeConstructor */ typeParameters;
   private Block body;
 }

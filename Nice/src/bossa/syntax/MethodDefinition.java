@@ -12,7 +12,7 @@
 
 // File    : MethodDefinition.java
 // Created : Thu Jul 01 18:12:46 1999 by bonniot
-//$Modified: Fri Jul 16 19:08:18 1999 by bonniot $
+//$Modified: Fri Jul 23 20:08:14 1999 by bonniot $
 // Description : Abstract syntax for a global method declaration
 
 package bossa.syntax;
@@ -24,7 +24,8 @@ public class MethodDefinition extends LocalSymb implements Definition
 {
   /** the Method is a class member */
   public MethodDefinition(ClassDefinition c,
-			  Ident name, 
+			  LocatedString name, 
+			  Collection typeParameters,
 			  Constraint constraint,
 			  Monotype returnType,
 			  Collection parameters)
@@ -38,17 +39,21 @@ public class MethodDefinition extends LocalSymb implements Definition
     //params.add(c.type);
     params.addAll(parameters);
 
-    this.type=new Polytype(constraint,new FunType(params,returnType));
+    this.type=Type.newType(typeParameters,
+			   new Polytype(constraint,
+					new FunType(params,returnType)));
+
     this.memberOf=c;
   }
 
   /** the Method is global */
-  public MethodDefinition(Ident name, 
+  public MethodDefinition(LocatedString name, 
+			  Collection typeParameters,
 			  Constraint constraint,
 			  Monotype returnType,
 			  Collection parameters)
   {
-    this(null,name,constraint,returnType,parameters);
+    this(null,name,typeParameters,constraint,returnType,parameters);
   }
 
   /** true iff the method was declared inside a class */
@@ -80,6 +85,15 @@ public class MethodDefinition extends LocalSymb implements Definition
     type.resolve();
   }
 
+  /****************************************************************
+   * Type checking
+   ****************************************************************/
+
+  void typecheck()
+  {
+    //Nothing
+  }
+
   /************************************************************
    * Printing
    ************************************************************/
@@ -89,8 +103,8 @@ public class MethodDefinition extends LocalSymb implements Definition
     return
       type.codomain().toString()
       + " "
-      + name.toString()
-      + type.constraint.toString()
+      + name
+      + type.getConstraint().toString()
       + "("
       + Util.map("",", ","",type.domain())
       + ");\n"

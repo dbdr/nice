@@ -10,45 +10,52 @@
 /*                                                                        */
 /**************************************************************************/
 
-// File    : SymbolExpr.java
-// Created : Thu Jul 08 12:20:59 1999 by bonniot
-//$Modified: Mon Jul 19 19:01:07 1999 by bonniot $
-// Description : Access to the value of a symbol
+// File    : LeqCst.java
+// Created : Mon Jul 19 16:42:14 1999 by bonniot
+//$Modified: Fri Jul 23 19:36:13 1999 by bonniot $
+// Description : Inequality between type constructors
 
 package bossa.syntax;
 
 import java.util.*;
 import bossa.util.*;
 
-public class SymbolExp extends Expression
+/**
+ * Inequality between type constructors
+ */
+public class LeqCst extends AtomicConstraint
 {
-  SymbolExp(VarSymbol s)
+  /**
+   * The constraint t1 <: t2
+   *
+   */
+  public LeqCst(TypeSymbol t1, TypeSymbol t2)
   {
-    this.symbol=s;
+    this.t1=t1;
+    this.t2=t2;
   }
 
-  boolean isAssignable()
+  AtomicConstraint substitute(Map map)
   {
-    return symbol.isAssignable();
-  }
-
-  Type getType()
-  {
-    return symbol.getType();
-  }
-
-  Expression resolve(VarScope s, TypeScope t)
-  {
-    Internal.error("resolve in SymbolExp : it has already been done !");
+    if(map.containsKey(t1.getName()) || map.containsKey(t2.getName()))
+      {
+	Monotype m1,m2;
+	try{
+	  m1=(Monotype)map.get(t1.getName());
+	  m2=(Monotype)map.get(t2.getName());
+	  return new MonotypeLeqCst(m1,m2);
+	}
+	catch(ClassCastException e) {
+	  User.error(t1+" and "+t2+" cannot be compared");
+	}
+      }
     return this;
   }
 
   public String toString()
   {
-    return 
-      symbol.name.toString()
-      ;
+    return t1+"<:"+t2;
   }
 
-  VarSymbol symbol;
+  TypeSymbol t1,t2;
 }

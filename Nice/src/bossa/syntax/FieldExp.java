@@ -12,7 +12,7 @@
 
 // File    : FieldExp.java
 // Created : Mon Jul 05 17:29:46 1999 by bonniot
-//$Modified: Tue Jul 13 14:31:34 1999 by bonniot $
+//$Modified: Fri Jul 23 12:52:59 1999 by bonniot $
 // Description : Access to the field of an expression
 //   the field may be the name of a method
 //   since it can be considered as a field holding a closure
@@ -23,12 +23,12 @@ import bossa.util.*;
 
 public class FieldExp extends Expression
 {
-  public FieldExp(Expression prefix, Ident field)
+  public FieldExp(Expression prefix, LocatedString field)
   {
     this.prefix=prefix;
     this.field=field;
   }
-
+  
   Expression resolve(VarScope scope, TypeScope ts)
   {
     prefix=prefix.resolve(scope,ts);
@@ -43,10 +43,10 @@ public class FieldExp extends Expression
     return access.isAssignable();
   }
 
-  Polytype getType()
+  Type getType()
   {
     Internal.error(access==null,"getType while access is still null");
-    return access.type;
+    return access.getType();
   }
 
   public String toString()
@@ -55,6 +55,6 @@ public class FieldExp extends Expression
   }
 
   Expression prefix;
-  Ident field; // before scoping resolution
+  LocatedString field; // before scoping resolution
   VarSymbol access; // after
 }

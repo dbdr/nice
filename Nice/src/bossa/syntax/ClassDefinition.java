@@ -12,36 +12,49 @@
 
 // File    : ClassDefinition.java
 // Created : Thu Jul 01 11:25:14 1999 by bonniot
-//$Modified: Fri Jul 16 19:20:44 1999 by bonniot $
+//$Modified: Fri Jul 23 17:42:07 1999 by bonniot $
 // Description : Abstract syntax for a class definition
 
 package bossa.syntax;
 
 import java.util.*;
-import bossa.util.Util;
+import bossa.util.*;
 
-public class ClassDefinition extends TypeSymbol implements Definition
+public class ClassDefinition extends Node //extends TypeSymbol 
+  implements Definition
 {
-  public ClassDefinition(Ident name, Collection typeParameters)
+  public ClassDefinition(LocatedString name, Collection typeParameters)
   {
-    super(name);
-    this.tc=new TypeConstructor(this);
-    this.typeParameters=typeParameters;
+    this.name=name;
+    if(typeParameters==null)
+      this.typeParameters=new ArrayList(0);
+    else
+      this.typeParameters=typeParameters;
     extensions=new ArrayList();
     implementations=new ArrayList();
     abstractions=new ArrayList();
     methods=new ArrayList();
     fields=new ArrayList();
+    this.tc=new TypeConstructor(this);
   }
-
+  
   Constraint getConstraint()
   {
-    return new Constraint(typeParameters);
+    return new Constraint(typeParameters,null);
   }
 
   boolean isAssignable()
   {
     return false;
+  }
+
+  Type getType()
+  {
+    return Type.newType
+      (typeParameters,
+       new Polytype(new MonotypeConstructor
+		    (this.tc,
+		     TypeParameters.fromSymbols(typeParameters))));
   }
 
   void buildScope(VarScope scope, TypeScope ts)
@@ -54,33 +67,46 @@ public class ClassDefinition extends TypeSymbol implements Definition
 
   void resolveScope()
   {
-    extensions=Monotype.resolve(typeScope,extensions);
-    implementations=Monotype.resolve(typeScope,implementations);
-    abstractions=Monotype.resolve(typeScope,abstractions);
+    extensions=TypeConstructor.resolve(typeScope,extensions);
+    implementations=TypeConstructor.resolve(typeScope,implementations);
+    abstractions=TypeConstructor.resolve(typeScope,abstractions);
     resolveScope(fields);
   }
 
   VarScope memberScope()
   {
-    return VarScope.makeScope(null,fields);
+    VarScope res=null;
+
+    try{
+      res=VarScope.makeScope(null,fields);
+    }
+    catch(DuplicateIdentEx e){
+      User.error(this.name,"Identifier "+e.ident+" defined twice in this class");
+    }
+
+    return res;
   }
 
-  public void addExtension(IdentType name)
+  public void typecheck()
+  {
+  }
+
+  public void addExtension(TypeConstructor name)
   {
     extensions.add(name);
   }
 
-  public void addImplementation(IdentType name)
+  public void addImplementation(TypeConstructor name)
   {
     implementations.add(name);
   }
 
-  public void addAbstraction(IdentType name)
+  public void addAbstraction(TypeConstructor name)
   {
     abstractions.add(name);
   }
 
-  public void addField(Ident name, Monotype type)
+  public void addField(LocatedString name, Monotype type)
   {
     fields.add(new FieldSymb(name,type,this));
   }
@@ -111,11 +137,12 @@ public class ClassDefinition extends TypeSymbol implements Definition
     return methods;
   }
 
+  LocatedString name;
   TypeConstructor tc;
-  private Collection /* of TypeSymbol */ typeParameters;
-  private Collection /* of IdentType */ extensions;
-  private Collection /* of IdentType */ implementations;
-  private Collection /* of IdentType */ abstractions;
+  Collection /* of TypeSymbol */ typeParameters;
+  private Collection /* of TypeConstructor */ extensions;
+  private Collection /* of TypeConstructor */ implementations;
+  private Collection /* of TypeConstructor */ abstractions;
   private Collection /* of VarSymbol */ fields;
   private Collection methods;
 }

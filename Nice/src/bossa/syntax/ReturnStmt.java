@@ -12,7 +12,7 @@
 
 // File    : ReturnStmt.java
 // Created : Mon Jul 05 17:21:40 1999 by bonniot
-//$Modified: Fri Jul 09 15:20:58 1999 by bonniot $
+//$Modified: Tue Jul 20 12:34:40 1999 by bonniot $
 // Description : return in a function or method
 
 package bossa.syntax;
@@ -30,6 +30,18 @@ public class ReturnStmt extends Statement
   {
     value=value.resolve(scope,typeScope);
   }
+
+  /****************************************************************
+   * Type checking
+   ****************************************************************/
+
+  void typecheck()
+  {
+  }
+
+  /****************************************************************
+   * Printing
+   ****************************************************************/
 
   public String toString()
   {

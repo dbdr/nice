@@ -12,17 +12,18 @@
 
 // File    : LocalDeclarationStmt.java
 // Created : Tue Jul 06 12:06:20 1999 by bonniot
-//$Modified: Fri Jul 16 19:46:34 1999 by bonniot $
+//$Modified: Fri Jul 23 11:59:43 1999 by bonniot $
 // Description : Declaration of a local variable
 //   with optional initial value
 
 package bossa.syntax;
 
 import bossa.util.*;
+import bossa.typing.*;
 
 public class LocalDeclarationStmt extends Statement
 {
-  public LocalDeclarationStmt(Ident name, Polytype type, Expression value)
+  public LocalDeclarationStmt(LocatedString name, Type type, Expression value)
   {
     this.name=name;
     this.type=type;
@@ -38,15 +39,36 @@ public class LocalDeclarationStmt extends Statement
       value=value.resolve(scope,typeScope);
   }
 
+  /****************************************************************
+   * Type cheking
+   ****************************************************************/
+  
+  void typecheck()
+  {
+    if(value!=null){
+      try{
+	Typing.leq(value.getType(),left.getType());
+      }
+      catch(TypingEx t){
+	User.error(this,left+" cannot be assigned value "+value+" : "+
+		   t.getMessage());
+      }
+    }
+  }
+
+  /****************************************************************
+   * Printing
+   ****************************************************************/
+
   public String toString()
   {
     return type+" "+name+
       (value==null?"":" = "+value);
   }
 
-  protected Ident name;
-  protected Polytype type;
+  protected LocatedString name;
+  protected Type type;
   protected Expression value;
-  // after scoping
+  // "name" after scoping
   VarSymbol left;
 }

@@ -12,7 +12,7 @@
 
 // File    : Block.java
 // Created : Wed Jul 07 17:42:15 1999 by bonniot
-//$Modified: Fri Jul 16 18:00:22 1999 by bonniot $
+//$Modified: Fri Jul 23 11:59:28 1999 by bonniot $
 // Description : A block : a list of statements with local variables
 
 package bossa.syntax;
@@ -22,7 +22,7 @@ import bossa.util.*;
 
 public class Block extends Statement
 {
-  public Block(Collection statements)
+  public Block(List statements)
   {
     this.statements=statements;
   }
@@ -30,7 +30,14 @@ public class Block extends Statement
   void buildScope(VarScope outer, TypeScope typeOuter)
   {
     Collection locals=findLocals(statements);
-    this.scope=VarScope.makeScope(outer,locals);
+    
+    try{
+      this.scope=VarScope.makeScope(outer,locals);
+    }
+    catch(DuplicateIdentEx e){
+      User.error(e.ident,"Identifier "+e.ident+" defined twice");
+    }
+
     this.typeScope=typeOuter;
     buildScope(this.scope,this.typeScope,statements);
   }
@@ -57,6 +64,28 @@ public class Block extends Statement
     resolveScope(statements);
   }
 
+  /****************************************************************
+   * Type checking
+   ****************************************************************/
+
+  Type getType()
+  {
+    Object o=statements.get(statements.size()-1);
+    if(o instanceof ReturnStmt)
+      return ((ReturnStmt)o).value.getType();
+    else
+      return null;
+  }
+
+  void typecheck()
+  {
+    typecheck(statements);
+  }
+
+  /****************************************************************
+   * Printing
+   ****************************************************************/
+
   public String toString()
   {
     return "{\n"
@@ -64,5 +93,5 @@ public class Block extends Statement
       + "}\n";
   }
 
-  private Collection /* of Statement */ statements;
+  private List /* of Statement */ statements;
 }

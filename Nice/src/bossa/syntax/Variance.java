@@ -10,45 +10,26 @@
 /*                                                                        */
 /**************************************************************************/
 
-// File    : SymbolExpr.java
-// Created : Thu Jul 08 12:20:59 1999 by bonniot
-//$Modified: Mon Jul 19 19:01:07 1999 by bonniot $
-// Description : Access to the value of a symbol
+// File    : Variance.java
+// Created : Fri Jul 23 12:15:46 1999 by bonniot
+//$Modified: Fri Jul 23 12:20:02 1999 by bonniot $
 
 package bossa.syntax;
 
-import java.util.*;
 import bossa.util.*;
 
-public class SymbolExp extends Expression
+/**
+ * Variance of a type constructor
+ * 
+ * @author bonniot
+ */
+
+public class Variance
 {
-  SymbolExp(VarSymbol s)
+  public Variance(int n)
   {
-    this.symbol=s;
+    this.size=n;
   }
 
-  boolean isAssignable()
-  {
-    return symbol.isAssignable();
-  }
-
-  Type getType()
-  {
-    return symbol.getType();
-  }
-
-  Expression resolve(VarScope s, TypeScope t)
-  {
-    Internal.error("resolve in SymbolExp : it has already been done !");
-    return this;
-  }
-
-  public String toString()
-  {
-    return 
-      symbol.name.toString()
-      ;
-  }
-
-  VarSymbol symbol;
+  int size;
 }

@@ -12,7 +12,7 @@
 
 // File    : Pattern.java
 // Created : Mon Jul 05 14:36:52 1999 by bonniot
-//$Modified: Fri Jul 09 21:16:42 1999 by bonniot $
+//$Modified: Fri Jul 23 13:17:23 1999 by bonniot $
 // Description : Syntactic pattern for method bodies declaration
 
 package bossa.syntax;
@@ -22,26 +22,22 @@ import bossa.util.*;
 
 public class Pattern
 {
-  public Pattern(Ident name)
+  public Pattern(LocatedString name)
   {
-    this.name=name;
-    this.className=null;
-    this.typeParameters=null;
+    this(name,null);
   }
 
-  public Pattern(Ident name, Ident className, Collection typeParameters)
+  public Pattern(LocatedString name, TypeConstructor tc)
   {
     this.name=name;
-    this.className=className;
-    this.typeParameters=typeParameters;
+    this.typeConstructor=tc;
   }
 
   public String toString()
   {
     String res=name.toString();
-    if(className!=null)
-      res=res+"@"+className+
-	Util.map("<",", ",">",typeParameters);
+    if(typeConstructor!=null)
+      res=res+"@"+typeConstructor;
     return res;
   }
 
@@ -50,10 +46,9 @@ public class Pattern
    */
   boolean thisAtNothing()
   {
-    return className==null && name.equals("this");
+    return typeConstructor==null && name.content.equals("this");
   }
 
-  Ident name;
-  Ident className;
-  Collection typeParameters;
+  LocatedString name;
+  TypeConstructor typeConstructor;
 }

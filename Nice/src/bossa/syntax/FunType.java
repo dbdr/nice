@@ -12,14 +12,16 @@
 
 // File    : FunType.java
 // Created : Fri Jul 02 17:41:24 1999 by bonniot
-//$Modified: Tue Jul 13 13:18:56 1999 by bonniot $
-// Description : Functional type
+//$Modified: Fri Jul 23 16:47:04 1999 by bonniot $
 
 package bossa.syntax;
 
 import java.util.*;
 import bossa.util.*;
 
+/**
+ * Functional type
+ */
 public class FunType extends Monotype
 {
   public FunType(Collection /* of Type */ in, Monotype out)
@@ -50,6 +52,20 @@ public class FunType extends Monotype
     in=resolve(typeScope,in);
     out=out.resolve(typeScope);
     return this;
+  }
+
+  Monotype substitute(Map map)
+  {
+    return new FunType(Monotype.substitute(map,in),out.substitute(map));
+  }
+
+  /****************************************************************
+   * Printing
+   ****************************************************************/
+
+  public Location location()
+  {
+    return out.location().englobe(in);
   }
 
   public String toString()

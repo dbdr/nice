@@ -12,15 +12,43 @@
 
 // File    : Statement.java
 // Created : Mon Jul 05 15:48:25 1999 by bonniot
-//$Modified: Thu Jul 08 10:54:53 1999 by bonniot $
+//$Modified: Tue Jul 20 18:54:34 1999 by bonniot $
 // Description : Abstract ancestor for all statements
 //   Descendants have "Stmt" suffix
 
 package bossa.syntax;
 
 import bossa.util.*;
+import java.util.*;
 
 public abstract class Statement extends Node
+  implements Located
 {
+  /****************************************************************
+   * Type cheking
+   ****************************************************************/
+  
+  abstract void typecheck();
 
+  void typecheck(Collection c)
+  {
+    Iterator i=c.iterator();
+    while(i.hasNext())
+      {
+	Statement s=(Statement)i.next();
+	s.typecheck();
+      }
+  }
+
+  public Location location()
+  {
+    return loc;
+  }
+
+  public void setLocation(Location l)
+  {
+    loc=l;
+  }
+
+  Location loc;
 }

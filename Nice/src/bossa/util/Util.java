@@ -12,7 +12,7 @@
 
 // File    : Util.java
 // Created : Fri Jul 02 18:35:58 1999 by bonniot
-//$Modified: Mon Jul 05 18:57:08 1999 by bonniot $
+//$Modified: Fri Jul 23 19:38:43 1999 by bonniot $
 // Description : Usefull fonctions used everywhere
 
 package bossa.util;
@@ -21,7 +21,9 @@ import java.util.*;
 
 public class Util
 {
-  /*              String Iterations */
+  /****************************************************************
+   * String Iterations
+   ****************************************************************/
 
   /** iterates toString on the collection */
   public static String map(Collection c)
@@ -46,8 +48,11 @@ public class Util
   }
 
   public static String map(String init, String delim, String end, 
-			   boolean noInitEndIfOneElement, Collection c)
+			   boolean alwaysInitEnd, Collection c)
   {
+    if(alwaysInitEnd)
+      return init+map("",delim,"",c)+end;
+    
     switch(c.size())
       {
       case 0 : return "";

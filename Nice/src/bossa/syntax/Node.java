@@ -12,7 +12,7 @@
 
 // File    : Node.java
 // Created : Thu Jul 08 10:24:56 1999 by bonniot
-//$Modified: Mon Jul 12 16:29:52 1999 by bonniot $
+//$Modified: Tue Jul 20 14:40:15 1999 by bonniot $
 // Description : Basic component of the syntax tree
 //   Defines its local scope 
 
@@ -64,6 +64,19 @@ abstract class Node
   TypeScope getTypeScope()
   {
     return typeScope;
+  }
+
+  /****************************************************************
+   * Type checking
+   ****************************************************************/
+
+  abstract void typecheck();
+
+  void typecheck(Collection nodes)
+  {
+    Iterator i=nodes.iterator();
+    while(i.hasNext())
+      ((Node)i.next()).typecheck();
   }
 
   VarScope scope;

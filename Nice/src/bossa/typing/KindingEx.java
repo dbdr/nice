@@ -10,45 +10,27 @@
 /*                                                                        */
 /**************************************************************************/
 
-// File    : SymbolExpr.java
-// Created : Thu Jul 08 12:20:59 1999 by bonniot
-//$Modified: Mon Jul 19 19:01:07 1999 by bonniot $
-// Description : Access to the value of a symbol
+// File    : KindingEx.java
+// Created : Thu Jul 22 19:33:34 1999 by bonniot
+//$Modified: Thu Jul 22 19:35:24 1999 by bonniot $
 
-package bossa.syntax;
+package bossa.typing;
 
-import java.util.*;
 import bossa.util.*;
+import bossa.syntax.*;
 
-public class SymbolExp extends Expression
+/**
+ * Reports that two types that have to be compared 
+ * do not have the same kind
+ * 
+ * @author bonniot
+ */
+
+class KindingEx extends TypingEx
 {
-  SymbolExp(VarSymbol s)
+  KindingEx(Type t1, Type t2)
   {
-    this.symbol=s;
+    super(t1+" and "+t2+" do not have the same kind : "+
+	  t1.getClass()+" and "+t2.getClass());
   }
-
-  boolean isAssignable()
-  {
-    return symbol.isAssignable();
-  }
-
-  Type getType()
-  {
-    return symbol.getType();
-  }
-
-  Expression resolve(VarScope s, TypeScope t)
-  {
-    Internal.error("resolve in SymbolExp : it has already been done !");
-    return this;
-  }
-
-  public String toString()
-  {
-    return 
-      symbol.name.toString()
-      ;
-  }
-
-  VarSymbol symbol;
 }

@@ -10,45 +10,22 @@
 /*                                                                        */
 /**************************************************************************/
 
-// File    : SymbolExpr.java
-// Created : Thu Jul 08 12:20:59 1999 by bonniot
-//$Modified: Mon Jul 19 19:01:07 1999 by bonniot $
-// Description : Access to the value of a symbol
+// File    : BadSizeEx.java
+// Created : Wed Jul 21 17:23:36 1999 by bonniot
+//$Modified: Wed Jul 21 17:25:01 1999 by bonniot $
+// Description : Thrown when to lists do not have the same size
 
 package bossa.syntax;
 
-import java.util.*;
 import bossa.util.*;
 
-public class SymbolExp extends Expression
+public class BadSizeEx extends Exception
 {
-  SymbolExp(VarSymbol s)
+  public BadSizeEx(int expected, int actual)
   {
-    this.symbol=s;
+    this.expected=expected;
+    this.actual=actual;
   }
 
-  boolean isAssignable()
-  {
-    return symbol.isAssignable();
-  }
-
-  Type getType()
-  {
-    return symbol.getType();
-  }
-
-  Expression resolve(VarScope s, TypeScope t)
-  {
-    Internal.error("resolve in SymbolExp : it has already been done !");
-    return this;
-  }
-
-  public String toString()
-  {
-    return 
-      symbol.name.toString()
-      ;
-  }
-
-  VarSymbol symbol;
+  int expected,actual;
 }

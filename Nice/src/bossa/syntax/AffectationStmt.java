@@ -12,13 +12,14 @@
 
 // File    : AffectationStmt.java
 // Created : Mon Jul 05 15:49:27 1999 by bonniot
-//$Modified: Fri Jul 09 18:30:33 1999 by bonniot $
+//$Modified: Wed Jul 21 13:01:24 1999 by bonniot $
 // Description : Affectation
 
 package bossa.syntax;
 
 import bossa.util.*;
 import bossa.parser.ParseException;
+import bossa.typing.*;
 
 public class AffectationStmt extends Statement
 {
@@ -38,6 +39,26 @@ public class AffectationStmt extends Statement
     User.error(!to.isAssignable(),to+" cannot be assigned a value");
     value=value.resolve(scope,typeScope);
   }
+  
+  /****************************************************************
+   * Type cheking
+   ****************************************************************/
+  
+  void typecheck()
+  {
+    try{
+      Typing.leq(to.getType(),value.getType());
+    }
+    catch(TypingEx t){
+      User.error(to+" cannot be assigned value "+value+" : "+
+		 t.getMessage());
+    }
+
+  }
+
+  /****************************************************************
+   * Printing
+   ****************************************************************/
 
   public String toString()
   {

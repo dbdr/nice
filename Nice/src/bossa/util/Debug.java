@@ -10,45 +10,24 @@
 /*                                                                        */
 /**************************************************************************/
 
-// File    : SymbolExpr.java
-// Created : Thu Jul 08 12:20:59 1999 by bonniot
-//$Modified: Mon Jul 19 19:01:07 1999 by bonniot $
-// Description : Access to the value of a symbol
+// File    : Debug.java
+// Created : Thu Jul 22 15:37:02 1999 by bonniot
+//$Modified: Thu Jul 22 15:38:12 1999 by bonniot $
 
-package bossa.syntax;
+package bossa.util;
 
-import java.util.*;
 import bossa.util.*;
 
-public class SymbolExp extends Expression
+/**
+ * Static class for debug output
+ * 
+ * @author bonniot
+ */
+
+public abstract class Debug
 {
-  SymbolExp(VarSymbol s)
+  public static void println(String msg)
   {
-    this.symbol=s;
+    System.out.println(msg);
   }
-
-  boolean isAssignable()
-  {
-    return symbol.isAssignable();
-  }
-
-  Type getType()
-  {
-    return symbol.getType();
-  }
-
-  Expression resolve(VarScope s, TypeScope t)
-  {
-    Internal.error("resolve in SymbolExp : it has already been done !");
-    return this;
-  }
-
-  public String toString()
-  {
-    return 
-      symbol.name.toString()
-      ;
-  }
-
-  VarSymbol symbol;
 }

@@ -32,7 +32,7 @@ TypeMaper typeMaper(SymbolTable<TypeSymbol>,TypeScope) =
 Info buildInfo(VarScope varScope, TypeScope typeScope);
 buildInfo(varScope, typeScope)
 {
-  final SymbolTable<TypeSymbol> t = new SymbolTable();
+  let SymbolTable<TypeSymbol> t = new SymbolTable();
   return new Info(vars: new SymbolTable(), typeVars: t,
 		  outerVarScope: varScope, outerTypeScope: typeScope,
 		  typeMap: typeMaper(t, typeScope));

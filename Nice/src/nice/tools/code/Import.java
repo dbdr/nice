@@ -92,7 +92,11 @@ public class Import
 
 	boolean strictImport =  bossa.modules.Package.currentCompilation.
 					strictJavaTypes;
-        if (strictImport)
+
+        boolean nonNullArgs = strictPackages.contains
+          (m.getDeclaringClass().getPackageName());
+
+        if (strictImport || nonNullArgs)
 	{
 	  for (int i = 0; i < paramTypes.length; i++)
 	  //arguments of a method are considered not null 
@@ -172,5 +176,18 @@ public class Import
     for (int i = 0; i < vars.length; i++)
       res[i] = new MonotypeVar(vars[i].getName());
     return res;
+  }
+
+  /****************************************************************
+   * Retyping policies
+   ****************************************************************/
+
+  private static java.util.HashSet strictPackages = new java.util.HashSet();
+
+  static void reset() { strictPackages.clear(); }
+
+  public static void addStrictPackage(String name)
+  {
+    strictPackages.add(name);
   }
 }

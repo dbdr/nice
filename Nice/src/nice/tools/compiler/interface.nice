@@ -34,6 +34,9 @@ int compile(Compilation compilation, String mainPackage,
       compilation.runtimeFile = getNiceRuntime();
     nice.tools.code.TypeImport.setRuntime(compilation.runtimeFile);
     compilation.setMainPackage(mainPackage);
+
+    bossa.modules.Package.currentCompilation = compilation;
+
     make(compilation);
 
     ?String jar = compilation.output;

@@ -103,19 +103,22 @@ int compile(String[] args)
 	  "Compile packages but do not link them",
 	  () => { compilation.skipLink = true; }),
 
+   option("strict",
+	  "Type-check uses of java classes more stricly",
+	  () => { compilation.strictJavaTypes = true; }),
 
    // PRIVATE OPTIONS
 
-   // This options is usefull for compiling the compiler itself. 
-   // Should not be advertised since it should not be usefull otherwise
-   option("exclude-runtime", 
+   // This options are only usefull for compiling the compiler itself, 
+   // so they should not be advertised.
+   option("exclude-runtime", visible: false,
 	  "Avoid inclusion of the runtime in the archive", 
 	  () => { compilation.excludeRuntime = true; }),
-   option("runtime", 
+   option("runtime", visible: false,
 	  "Location of nice.jar", 
 	  "file",
 	  String file => { compilation.runtimeFile = file; }),
-   option("native-compiler", 
+   option("native-compiler", visible: false,
 	  "Location of the native compiler binary (gcj)", 
 	  "file",
 	  String file => { nativeCompiler = file; }),

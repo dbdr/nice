@@ -24,6 +24,7 @@ public class Compilation extends mlsub.compilation.Compilation
 
   public String output;
   public boolean excludeRuntime;
+  public boolean strictJavaTypes;
 
   public Locator locator;
 

@@ -814,4 +814,10 @@ public class Package implements mlsub.compilation.Module, Located, bossa.syntax.
   {
     return source.sourceRead;
   }
+
+  /****************************************************************
+   * Static link to the current Compilation object (not thread safe!)
+   ****************************************************************/
+
+  public static Compilation currentCompilation;
 }

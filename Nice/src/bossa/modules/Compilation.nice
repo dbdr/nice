@@ -41,6 +41,10 @@ class Compilation extends mlsub.compilation.Compilation
   */
   boolean excludeRuntime = false;
 
+  /** Give stricter type to java methods.
+   */
+  boolean strictJavaTypes = false;
+
   /** Location of the nice.jar file. */
   ?String runtimeFile = null;
 

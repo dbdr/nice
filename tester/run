@@ -74,11 +74,21 @@ for conffile in ../config.*; do
 	echo "Running $testname"
 	echo "======================"
 	echo ""
-	if $test; then
-	    echo "$testname OK"  >> $config.res
-	else
-	    echo "$testname FAILURE"  >> $config.res
-	fi
+
+	set +e
+	$test
+	code=$?
+	set -e
+        {
+	    echo -n "$testname "
+	    case "$code" in
+		0) echo "OK"         ;;
+		1) echo "FAILURE"    ;;
+		2) echo "SKIP"       ;;
+		3) echo "IMPOSSIBLE" ;;
+		*) echo "OTHER"      ;;
+	    esac
+	} >> $config.res
     done
 
     echo '</pre></body></html>'

@@ -4,6 +4,11 @@ SOURCES=flow4j-src-latest.tar.gz
 
 set -e
 
+if [ ${JDK_VERSION} ] && expr "${JDK_VERSION}" '<' 1.4.0 >/dev/null; then
+    echo "JDK 1.4 needed for the Flow4j test. Skipping."
+    exit 2
+fi
+
 if [ ! -r flow4j ]; then
   if [ ! -r flow4j-src-0.5.tar.gz ]; then
       wget http://flow4j.sf.net/releases/${SOURCES}

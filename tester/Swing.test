@@ -1,8 +1,14 @@
 #! /bin/sh
 
 if [ ! -r swing ]; then
-  cvs -d:pserver:anonymous@$CVS_SOURCEFORGE:/cvsroot/nice export -rHEAD swing
+
+  ../cvs swing || exit 3
+
 fi
+
 cd swing
 
-CLASSPATH=${NICE_JAR} ant clean-all compile-common
+if ! CLASSPATH=${NICE_JAR} ant clean-all compile-common; then
+    # The test failed
+    exit 1
+fi

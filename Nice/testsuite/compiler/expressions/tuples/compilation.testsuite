@@ -23,3 +23,7 @@
 
   mapTest.put("test", (1,2));
   ?(int,int) res = mapTest.get("test");
+
+/// PASS bug
+  (int,int) ints;
+  (String s, ints) = ("A", (1,2));

@@ -24,7 +24,7 @@ import mlsub.compilation.*;
  * @author Daniel Bonniot (d.bonniot@mail.dotcom.fr)
  */
 
-void compileComponent(nice.lang.List<Module>, boolean doLink);
+void compileComponent(List<Module>, boolean doLink);
 compileComponent(modules, doLink)
 {
   print("Compiling");

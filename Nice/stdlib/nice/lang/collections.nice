@@ -96,11 +96,8 @@ U foldRight(List<T> list, (T, U)->U func, U init, int from)
     return init;
 }
 
-<T> List<T> slice(List<T> list, int from = 0, int to = -1)
+<T> List<T> slice(List<T> list, int from = 0, int to = list.size() - 1)
 {
-  if (to == -1) 
-    to = list.size() - 1;
-
   List<T> res = new ArrayList(to - from + 1);
   for (int i = from; i <= to; i++)
     res.add(list[i]);

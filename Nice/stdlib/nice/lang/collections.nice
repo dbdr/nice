@@ -358,9 +358,9 @@ print(p@PrintStream, s@Sequence)
       return;
     }
   p.print("[");
-  p.print(s.get(0));
+  p.print(s[0]);
   for (int i=1; i<s.size(); i++)
-    p.print(", " + s.get(i));
+    p.print(", " + s[i]);
   p.print("]");
 }
   

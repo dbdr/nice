@@ -24,3 +24,34 @@ class B extends A { int life = 42; }
   if (a instanceof B)
     ;
   assert a.life == 42;
+
+/// PASS
+  A a;
+  a = new B();
+  if (a instanceof B)
+    ;
+  else
+    throw new Error();
+  assert a.life == 42;
+
+/// COMMENT Assignments.
+/// PASS
+  A a = new B();
+  if (a instanceof B)
+    {
+      int i = a.life;
+      if (i == 42)
+        a = new A();
+      else
+        i = a.life + 1;
+    }
+
+/// FAIL
+  A a = new B();
+  if (a instanceof B)
+    {
+      int i = a.life;
+      if (i == 42)
+        a = new A();
+      i = a.life;
+    }

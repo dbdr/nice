@@ -46,17 +46,18 @@ typecheck(e@AssignExp)
   }
   catch(TypingEx t){
     ?MonoSymbol variable = localVariable(to);
-    if (variable != null)
-      if (hasConditionalType(variable) && isNullError(t)) {
+    if (variable != null) {
+      let originalType = getOriginalType(variable);
+      if (originalType != null)
       try
         {
-	  let unsureType = makeUnsure(variable.type);
-	  checkAssignment(new mlsub.typing.Polytype(unsureType), notNull(e.value));
+	  checkAssignment(new mlsub.typing.Polytype(originalType), notNull(e.value));
 
-	  // It is OK to assign the variable with a null value.
-	  variable.setVarType(now: unsureType,
+	  // It is OK to assign the variable, considering it has the original 
+	  // type.
+	  variable.setVarType(now: originalType,
 			      otherBranch: variable.type,
-			      overrideOut: unsureType);
+			      overrideOut: originalType);
 	  return;
 	}
       catch (TypingEx newError) { t = newError; }
@@ -356,6 +357,17 @@ void overrideOuterType(MonoSymbol variable, mlsub.typing.Monotype newType)
       }
 }
 
+?mlsub.typing.Monotype getOriginalType(MonoSymbol variable)
+{
+  for (int i = 0; i < levels.size(); i++)
+    {
+      (MonoSymbol v, mlsub.typing.Monotype t) = conditionalTypes.get(i);
+      if (variable == v)
+	return t;
+    }
+  return null;
+}
+
 typecheck(e@IfExp)
 {
   Expression condition = notNull(e.condition);
@@ -378,6 +390,29 @@ typecheck(e@IfExp)
 	mlsub.typing.Monotype sureType = makeSure(type);
 	setVarType(variable, now: sureType, otherBranch: type);
       });
+
+    ?(MonoSymbol, TypeConstructor) test = getInstanceof(e);
+    if (test != null)
+      {
+	(MonoSymbol variable, TypeConstructor tc) = test;
+	mlsub.typing.Monotype[?] parameters = null;
+	if (tc.arity() == 0)
+	  parameters = null;
+	else if (variable.getMonotype() instanceof mlsub.typing.MonotypeConstructor)
+	  {
+	    mlsub.typing.MonotypeConstructor mc = cast(variable.getMonotype());
+	    parameters = mc.getTP();
+	  }
+	else
+	  test = null;
+
+	if (test != null)
+	  {
+	    mlsub.typing.Monotype type = Monotype.sure(new mlsub.typing.MonotypeConstructor(tc, parameters));
+	    setVarType(variable, now: type, otherBranch: variable.type);
+	  }
+      }
+
 
     e.thenExp = thenExp = notNull(thenExp.noOverloading());
     typecheck(thenExp);

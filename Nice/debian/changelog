@@ -1,5 +1,10 @@
 nice (0.9.2) unstable; urgency=low
 
+  * More dynamic type inference implemented. The type of a local variable is 
+    made more precise after a succesful instanceof:
+    A a = ...;
+    if (a instanceof B)
+      // Here a has type B
   * Classes that implement java.lang.Cloneable now automatically support 
     the clone method.
   * The deprecated 'main(args) { ... }' syntax for the main function is not

@@ -1,4 +1,28 @@
-/// PASS
+/// FAIL
+  B /* FAIL HERE*/ b = bar(new B());
+  /// Toplevel
+interface I {}
+<I T> T foo(T);
+
+<I T> T bar(T t);
+  
+class A implements I {}
+bar(#A x) = x;
+foo(#A x) = x;
+
+<T> bar(x@B : X)
+{
+  X /*/// FAIL HERE*/ res = foo(x);
+  bug(res);
+  return res;
+}
+
+class B extends A {
+  void bug() {}
+}
+foo(#B) = new A();
+
+/// PASS bug
   /// Toplevel
 <Collection C, T, U> C<U> bar(C<T>, T->U);
 bar(x, f) { throw new Error(); }

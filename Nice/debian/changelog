@@ -29,7 +29,8 @@ nice (0.7.9-1) unstable; urgency=low
         // so we could not declare its type as List<U>.
         return res;
       }
-  * Improved error messages for possibly null values in assignments.
+  * Improved error messages for possibly null values in assignments (Daniel),
+    and for incorrect calls to constructors (Bryn Keller).
   * Bugfix (overloaded symbols used inside && or || expressions).
 
  -- Daniel Bonniot <bonniot@users.sourceforge.net>  Sat, 19 Apr 2003 10:40:02 +0200

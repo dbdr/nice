@@ -12,7 +12,7 @@
 
 // File    : ConstantExp.java
 // Created : Thu Jul 08 15:36:40 1999 by bonniot
-//$Modified: Thu May 04 12:59:25 2000 by Daniel Bonniot $
+//$Modified: Mon May 22 12:11:38 2000 by Daniel Bonniot $
 
 package bossa.syntax;
 
@@ -120,6 +120,12 @@ public class ConstantExp extends Expression
     User.error(representation,
 	       rep+" is not a valid number");
     return null;
+  }
+  
+  public static Expression makeDouble(double value, Location location)
+  {
+    return new ConstantExp(primFloat, gnu.math.DFloNum.make(value), value+"",
+			   location);
   }
   
   static gnu.bytecode.Type registerPrimType(String name, TypeConstructor tc)

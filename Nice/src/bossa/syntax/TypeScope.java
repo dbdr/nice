@@ -12,7 +12,7 @@
 
 // File    : TypeScope.java
 // Created : Fri Jul 09 11:29:17 1999 by bonniot
-//$Modified: Thu Apr 27 19:13:12 2000 by Daniel Bonniot $
+//$Modified: Thu May 18 17:30:32 2000 by Daniel Bonniot $
 
 package bossa.syntax;
 
@@ -93,18 +93,21 @@ class TypeScope
 	if(tc!=null)
 	  return tc;
 	    
-	for(Iterator i = module.listImplicitPackages(); i.hasNext();)
-	  {
-	    String pkg = ((LocatedString) i.next()).toString();
-	    String fullName = pkg+"."+name;
+	if(module!=null)
+	  for(Iterator i = module.listImplicitPackages(); i.hasNext();)
+	    {
+	      String pkg = ((LocatedString) i.next()).toString();
+	      String fullName = pkg+"."+name;
 
-	    if(map.containsKey(fullName))
-	      return (TypeSymbol)map.get(fullName);
+	      if(map.containsKey(fullName))
+		return (TypeSymbol)map.get(fullName);
 
-	    tc = JavaTypeConstructor.lookup(fullName);
-	    if(tc!=null)
-	      return tc;
-	  }
+	      tc = JavaTypeConstructor.lookup(fullName);
+	      if(tc!=null)
+		return tc;
+	    }
+	else
+	  Internal.warning("null module in TypeScope");
       }
     
     return null;

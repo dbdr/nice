@@ -12,7 +12,7 @@
 
 // File    : parser.jj
 // Created : Thu Jul 01 10:27:05 1999 by bonniot
-//$Modified: Mon May 15 17:38:01 2000 by Daniel Bonniot $
+//$Modified: Mon May 22 12:15:02 2000 by Daniel Bonniot $
 // Description : Parseur JavaCC pour Bossa
 //   Tokens based on the Jazz parser
 
@@ -414,14 +414,6 @@ LocatedString number():
 }
 {
   t = <LINT> { return new LocatedString(t.image, new Location(t)); }
-}
-
-double floating():
-{
-  Token t;
-}
-{
-  t = <FLOATING_POINT_LITERAL> { return Double.parseDouble(t.image); }
 }
 
 /***********************************************************************/
@@ -1089,13 +1081,13 @@ Expression intConstantExp():
   { return ConstantExp.makeNumber(representation); }
 }
 
-FloatConstantExp floatConstantExp():
+Expression floatConstantExp():
 {
-  double d;
+  Token t;
 }
 {
-  d=floating()
-  { return new FloatConstantExp(d); }
+  t = <FLOATING_POINT_LITERAL> 
+  { return ConstantExp.makeDouble(Double.parseDouble(t.image), new Location(t)); }
 }
 
 StringConstantExp stringConstantExp():

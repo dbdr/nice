@@ -12,7 +12,7 @@
 
 // File    : BossaClass.java
 // Created : Thu Jul 01 11:25:14 1999 by bonniot
-//$Modified: Tue May 16 17:19:02 2000 by Daniel Bonniot $
+//$Modified: Fri May 19 14:32:21 2000 by Daniel Bonniot $
 
 package bossa.syntax;
 

@@ -12,7 +12,7 @@
 
 // File    : TupleExp.java
 // Created : Wed Aug 02 19:49:23 2000 by Daniel Bonniot
-//$Modified: Thu Aug 03 18:23:55 2000 by Daniel Bonniot $
+//$Modified: Fri Aug 04 12:00:52 2000 by Daniel Bonniot $
 
 package bossa.syntax;
 
@@ -118,7 +118,6 @@ public class TupleExp extends bossa.syntax.Expression
 	Declaration tupleDecl = let.addDeclaration
 	  ("tupleRef", ArrayType.make(elementType));
 	tupleExp = new ReferenceExp(tupleDecl);
-	Debug.println("TUPLE " + array.getClass()+"");
       }
     else
       tupleExp = array;

@@ -24,12 +24,15 @@ or <ulink url="mailto:bonniot@users.sourceforge.net">privately</ulink>
 </para>
 
 <para>
-The current stable version is 0.6, released July 11th, 2002.
+<!-- The current stable version is 0.6, released July 11th, 2002. -->
+The latest version is 0.7.5, released November 20th, 2002.
+It includes all the planned features for version 0.8, which should be
+released soon.
 </para>
 
 <para>
 <variablelist>
-<varlistentry><term>0.8 (August 2002)</term>
+<varlistentry><term>0.8</term>
 <listitem>
 <para>
 Add various missing Java constructs: super, synchronized statements
@@ -39,7 +42,7 @@ class invariants. These might be part of a later release.
 </para>
 </listitem>
 </varlistentry>
-<varlistentry><term>1.0 (September 2002)</term>
+<varlistentry><term>1.0</term>
 <listitem>
 <para>
 Implement visibility modifiers (private, default, public).

@@ -50,17 +50,23 @@ public class NewArrayExp extends Expression
     if (ti == null)
       return;
     
-    TypeSymbol ts = ti.resolveToTypeSymbol(typeScope);
+    resolvedType = ti.resolveToTypeSymbol(typeScope);
+  }
+  
+  private TypeSymbol resolvedType;
+
+  void computeType()
+  {
     Monotype monotype;
-    
-    if (ts instanceof MonotypeVar)
-      monotype = (MonotypeVar) ts;
+
+    if (resolvedType instanceof MonotypeVar)
+      monotype = (MonotypeVar) resolvedType;
     else
       {
-	if (!(ts instanceof TypeConstructor))
+	if (!(resolvedType instanceof TypeConstructor))
 	  User.error(ti, ti + " should be a class");
     
-	TypeConstructor tc = (TypeConstructor) ts;
+	TypeConstructor tc = (TypeConstructor) resolvedType;
 	monotype = new MonotypeConstructor(tc, MonotypeVar.news(tc.arity()));
 	if (Types.isPrimitive(tc))
 	  monotype = bossa.syntax.Monotype.sure(monotype);
@@ -76,10 +82,6 @@ public class NewArrayExp extends Expression
     type = new Polytype(Constraint.True, monotype);
 
     ti = null;
-  }
-  
-  void computeType()
-  {
   }
   
   /****************************************************************

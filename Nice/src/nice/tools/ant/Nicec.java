@@ -1,4 +1,4 @@
-//	Daniel, please set the package.
+package nice.tools.ant;
 
 
 

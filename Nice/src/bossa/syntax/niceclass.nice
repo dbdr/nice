@@ -407,7 +407,7 @@ public class CNiceClass extends NiceClass
 
 	List<Parameter> params = new ArrayList();
 	for (arg : m.getArgTypes())
-	  params.add(new Parameter(type: Monotype.create(arg)));
+	  params.add(new Parameter(type: new Monotype.MonotypeWrapper(arg)));
 
         res.add((m, params));
       }

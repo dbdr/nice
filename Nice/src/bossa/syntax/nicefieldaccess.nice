@@ -45,7 +45,7 @@ NiceFieldAccess createNiceFieldAccess(NiceField field)
   let classDef = field.getTypeDefinition();
   let argType = sureMonotype(classDef.lowlevelMonotype());
 
-  let params = createFormalParameters([new Parameter(type: Monotype.create(argType))]);
+  let params = createFormalParameters([new Parameter(type: new Monotype.MonotypeWrapper(argType))]);
   let constr = createConstraint(classDef.getBinders(), null);
   let res = new NiceFieldAccess(field.getName(), Node.down,
 	parameters: params,

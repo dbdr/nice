@@ -86,7 +86,7 @@ public class CustomConstructor extends UserOperator
     Map<String, Monotype> res = new HashMap(source.length);
 
     for (int i = 0; i < source.length; i++)
-      res.put(source[i].toString(), Monotype.create(destination[i]));
+      res.put(source[i].toString(), new Monotype.MonotypeWrapper(destination[i]));
 
     return res;
   }
@@ -176,7 +176,7 @@ private Monotype getCCReturnType(LocatedString className, Constraint cst)
     {
       if (! (syms[i] instanceof mlsub.typing.MonotypeVar))
         User.error(classe, syms[i] + " is not a type");
-      notNull(params)[i] = Monotype.create(cast(syms[i]));
+      notNull(params)[i] = new Monotype.MonotypeWrapper(cast(syms[i]));
     }
 
   let res = createMonotypeConstructor

@@ -39,7 +39,7 @@ public final class TypeIdent extends bossa.syntax.Monotype implements Located
     return map.get(name.toString()) || this;
   }
 
-  resolveToTypeSymbol(scope)
+  public mlsub.typing.TypeSymbol resolveToTypeSymbol(TypeMap scope)
   {
     let res = notNull(scope).lookup(name);
     if (res == null)
@@ -50,7 +50,7 @@ public final class TypeIdent extends bossa.syntax.Monotype implements Located
   
   rawResolve(scope)
   {
-    let res = this.resolveToTypeSymbol(scope);
+    let res = this.resolveToTypeSymbol(notNull(scope));
 
     if (res instanceof mlsub.typing.Monotype)
       return res;

@@ -821,7 +821,7 @@ Monotype simpleMonotype():
   { return res; }
 |
   ("unknown"  | "?")
-  { return Monotype.create(mlsub.typing.UnknownMonotype.instance); }
+  { return new Monotype.MonotypeWrapper(mlsub.typing.UnknownMonotype.instance); }
 }
 
 List monotypes():
@@ -1217,7 +1217,7 @@ MonotypeVar taggedMonotypeVar(List tags, List atoms):
     if (bound != null)
       {
         bound.nullness = /*absent*/3;
-        atoms.add(new MonotypeLeqCst(Monotype.createVar(mv), bound)); 
+        atoms.add(new MonotypeLeqCst(new Monotype.MonotypeVarWrapper(mv), bound)); 
       }
 
     if (sure) atoms.add(bossa.syntax.dispatch.createSureTypeVar(mv));

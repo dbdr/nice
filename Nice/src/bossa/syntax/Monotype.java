@@ -15,29 +15,12 @@ package bossa.syntax;
 import java.util.*;
 import bossa.util.*;
 
-import mlsub.typing.MonotypeVar;
-import mlsub.typing.TypeConstructor;
-import nice.tools.typing.PrimitiveType;
-
 /**
    Syntactic monomorphic type.
 
-   @version $Date$
-   @author Daniel Bonniot (d.bonniot@mail.dotcom.fr)
 */
-public abstract class Monotype
-implements Located
+public abstract class Monotype implements Located
 {
-  
-  /** @return true if "alike" appears inside this monotype. */
-  abstract boolean containsAlike();
-  
-  public boolean isVoid() { return false; }
-
-  /**************************************************************
-   * Scoping
-   **************************************************************/
-
   /** Set by the parser. */
   public byte nullness;
 /*
@@ -47,43 +30,58 @@ implements Located
     sure = 2,
     absent = 3;
 */
-  final String nullnessString()
-  {
-    switch(nullness) 
-      {
-      case /*maybe*/1: return "?";
-      case /*sure*/2:  return "!";
-      default:    return "";
-      }
-  }
 
-  // public since it is called from bossa.dispatch
-  public final mlsub.typing.Monotype resolve(TypeMap tm)
-  {
-    mlsub.typing.Monotype raw = rawResolve(tm);
-    
-    switch (nullness) 
-      {
-      case /*none*/0:  return raw;
-      case /*maybe*/1: return sourceMaybe(raw);
-      case /*sure*/2:  return sourceSure(raw);
-      case /*absent*/3:
-	if (raw instanceof MonotypeVar)
-	  {
-	    nice.tools.typing.Types.makeMarkedType((MonotypeVar) raw);
-	    return raw;
-	  }
-	else
-	  return sure(raw);
-      default: 
-	throw Internal.error("Bad nullness tag");
-      }
-  }
+  /** @return true if "alike" appears inside this monotype. */
+  abstract boolean containsAlike();
 
   abstract mlsub.typing.Monotype rawResolve(TypeMap tm);
 
+  abstract Monotype substitute(Map/*<String,Monotype>*/ map);
+  
+  public boolean isVoid() { return false; }
+
+  String nullnessString()
+  {
+    if (nullness == /*maybe*/1)
+      return "?";
+    else if (nullness == /*sure*/2)
+      return "!";
+    else
+      return "";
+  }
+
+  public mlsub.typing.Monotype resolve(TypeMap tm)
+  {
+    mlsub.typing.Monotype raw = rawResolve(tm);
+
+    if (nullness == /*none*/0)
+      return raw;
+    else if (nullness == /*maybe*/1)
+      return nice.tools.typing.Types.maybeMonotype(nice.tools.typing.Types.rawType(raw));
+    else if (nullness ==  /*sure*/2)
+      return nice.tools.typing.Types.sureMonotype(nice.tools.typing.Types.rawType(raw));
+    else if (nullness == /*absent*/3)
+      {
+	if (raw instanceof mlsub.typing.MonotypeVar)
+	  {
+	    nice.tools.typing.Types.makeMarkedType((mlsub.typing.MonotypeVar) raw);
+	    return raw;
+	  }
+	else
+	  return nice.tools.typing.Types.sureMonotype(raw);
+      }
+    else
+      throw Internal.error("Bad nullness tag");
+  }
+
+  /** called instead of toString if parenthesis are unnecessary */
+  public String toStringExtern() { return this.toString(); }
+
+  /** don't print type parameters */
+  public String toStringBase() { return this.toString(); }
+
   /** iterates resolve() on the collection of Monotype */
-  static final mlsub.typing.Monotype[] resolve(TypeMap s, Monotype[] c)
+  static mlsub.typing.Monotype[] resolve(TypeMap s, Monotype[] c)
   {
     if(c == null || c.length == 0)
       return null;
@@ -102,87 +100,40 @@ implements Located
       }
     return res;
   }
-  
-  abstract Monotype substitute(Map map);
-
-  //temporarily method to call on TypeIdent's
-  public mlsub.typing.TypeSymbol resolveToTypeSymbol(TypeMap scope)
+ 
+  /**
+    Wrapping a mlsub Monotype in a syntactic monotype
+   */
+  public static class MonotypeWrapper extends Monotype
   {
-    return null;
-  }
+    final mlsub.typing.Monotype type;
 
-  /****************************************************************
-   * Printing
-   ****************************************************************/
-
-  /** called instead of toString if parenthesis are unnecessary */
-  public String toStringExtern()
-  {
-    return toString();
-  }
-
-  /** don't print type parameters */
-  public String toStringBase()
-  {
-    return toString();
-  }
-
-  /****************************************************************
-   * Wrapping a mlsub Monotype in a syntactic monotype
-   ****************************************************************/
-  
-  public static Monotype create(mlsub.typing.Monotype m)
-  {
-    return new Wrapper(m);
-  }
-  
-  private static class Wrapper extends Monotype
-  {
-    Wrapper(mlsub.typing.Monotype m)
+    public MonotypeWrapper(mlsub.typing.Monotype m)
     {
       this.type = m;
     }
 
     boolean containsAlike() { return false; }
     
-    public mlsub.typing.Monotype rawResolve(TypeMap s)
-    {
-      return type;
-    }
+    public mlsub.typing.Monotype rawResolve(TypeMap tm) { return type; }
 
-    Monotype substitute(Map m)
-    {
-      return this;
-    }
+    Monotype substitute(Map map) { return this; }
 
-    public Location location()
-    {
-      return Location.nowhere();
-    }
+    public Location location() { return Location.nowhere(); }
 
-    public String toString() 
-    {
-      return String.valueOf(type);
-    }
-    
-    final mlsub.typing.Monotype type;
+    public String toString() { return String.valueOf(type); }
   }
 
-  public static Monotype createVar(mlsub.typing.MonotypeVar m)
+  public static final class MonotypeVarWrapper extends MonotypeWrapper
   {
-    return new VarWrapper(m);
-  }
-  
-  private static final class VarWrapper extends Wrapper
-  {
-    VarWrapper(mlsub.typing.MonotypeVar m)
+    public MonotypeVarWrapper(mlsub.typing.MonotypeVar m)
     {
       super(m);
     }
 
-    public mlsub.typing.Monotype rawResolve(TypeMap s)
+    public mlsub.typing.Monotype rawResolve(TypeMap tm)
     {
-      mlsub.typing.TypeSymbol res = s.lookup(type.toString());
+      mlsub.typing.TypeSymbol res = tm.lookup(type.toString());
       if (res != null)
 	return (mlsub.typing.Monotype) res;
 
@@ -190,82 +141,44 @@ implements Located
     }
   }
 
-  /****************************************************************
-   * Wrapper for delaying resolution of constructed monotypes.
-   ****************************************************************/
-
-  static Monotype createSure(final TypeConstructor tc, final mlsub.typing.Monotype[] params)
-  {
-    return new Monotype() {
-        boolean containsAlike() { return false; }
-
-        public mlsub.typing.Monotype rawResolve(TypeMap typeMap)
-        {
-          try{
-            return sure(new mlsub.typing.MonotypeConstructor(tc, params));
-          }
-          catch(mlsub.typing.BadSizeEx e){
-            // See if this is a class with default type parameters
-            mlsub.typing.Monotype res = dispatch.getTypeWithTC(tc, params);
-            if (res != null)
-              return sure(res);
-
-            throw User.error(this, "Class " + tc +
-                             Util.has(e.expected, "type parameter", e.actual));
-          }
-        }
-
-        Monotype substitute(Map m)
-        {
-          return this;
-        }
-
-        public Location location()
-        {
-          return Location.nowhere();
-        }
-
-        public String toString()
-        {
-          return tc + ( params != null ? Util.map("<",",",">",params) : "");
-        }
-      };
-  }
-
-  /****************************************************************
-   * Nullness markers
-   ****************************************************************/
-
   /**
-     Return a maybe type based on the raw type of the argument
-     if the argument is a full type.
-  */
-  static mlsub.typing.Monotype sourceMaybe(mlsub.typing.Monotype type)
+    Wrapper for delaying resolution of constructed monotypes.
+   */
+  public static final class SureMonotypeWrapper extends Monotype
   {
-    mlsub.typing.Monotype raw = nice.tools.typing.Types.rawType(type);
-    return maybe(raw);
-  }
+    mlsub.typing.TypeConstructor tc;
+    mlsub.typing.Monotype[] params;
 
-  public static mlsub.typing.Monotype maybe(mlsub.typing.Monotype type)
-  {
-    return new mlsub.typing.MonotypeConstructor
-      (PrimitiveType.maybeTC, new mlsub.typing.Monotype[]{type});
-  }
+    public SureMonotypeWrapper(mlsub.typing.TypeConstructor tc, mlsub.typing.Monotype[] params)
+    {
+      this.tc = tc;
+      this.params = params;
+    }
+ 
+    boolean containsAlike() { return false; }
 
-  /**
-     Return a sure type based on the raw type of the argument
-     if the argument is a full type.
-  */
-  static mlsub.typing.Monotype sourceSure(mlsub.typing.Monotype type)
-  {
-    mlsub.typing.Monotype raw = nice.tools.typing.Types.rawType(type);
-    return sure(raw);
-  }
+    public mlsub.typing.Monotype rawResolve(TypeMap tm)
+    {
+      try{
+        return nice.tools.typing.Types.sureMonotype(new mlsub.typing.MonotypeConstructor(tc, params));
+      }
+      catch(mlsub.typing.BadSizeEx e){
+        // See if this is a class with default type parameters
+        mlsub.typing.Monotype res = dispatch.getTypeWithTC(tc, params);
+        if (res != null)
+          return nice.tools.typing.Types.sureMonotype(res);
 
-  public static mlsub.typing.Monotype sure(mlsub.typing.Monotype type)
-  {
-    return new mlsub.typing.MonotypeConstructor
-      (PrimitiveType.sureTC, new mlsub.typing.Monotype[]{type});
+        throw User.error(this, "Class " + tc + Util.has(e.expected, "type parameter", e.actual));
+      }
+    }
+
+    Monotype substitute(Map map) { return this; }
+
+    public Location location() { return Location.nowhere(); }
+
+    public String toString()
+    {
+      return tc + ( params != null ? Util.map("<",",",">",params) : "");
+    }
   }
 }
-

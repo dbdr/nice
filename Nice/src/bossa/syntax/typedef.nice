@@ -405,9 +405,9 @@ public abstract class TypeDefinition extends MethodContainer
       binders.add(mvar);
       typeParameters[i] = mvar;
 
-      bossa.syntax.Monotype v = bossa.syntax.Monotype.create(mvar);
-      atoms.add(new MonotypeLeqCst(m1: bossa.syntax.Monotype.create(params[i]), m2: v));
-      atoms.add(new MonotypeLeqCst(m1: v, m2: bossa.syntax.Monotype.create(params[i])));
+      bossa.syntax.Monotype v = new Monotype.MonotypeWrapper(mvar);
+      atoms.add(new MonotypeLeqCst(m1: new Monotype.MonotypeWrapper(params[i]), m2: v));
+      atoms.add(new MonotypeLeqCst(m1: v, m2: new Monotype.MonotypeWrapper(params[i])));
     }
 
     let res = new ClassConstraint(Node.upper, binders: binders, atomics: atoms,

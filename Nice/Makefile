@@ -99,18 +99,6 @@ dist: jar
 status:
 	cvs -z 9 status 2>&1 | awk -f bin/parse_cvs_status.awk
 
-# src/gnu has two repositories:
-# - a 'Nice' repository
-# - a 'Kawa' repository
-
-cvs-Kawa:
-	find ${TOP}/src/gnu -type d -name 'CVS-Kawa' \
-	-exec sh -c 'dir=`dirname "$$0"`; ln -sf $${dir}/CVS-Kawa $${dir}/CVS' {} \;
-
-cvs-Nice:
-	find ${TOP}/src/gnu -type d -name 'CVS-Kawa' \
-	-exec sh -c 'dir=`dirname "$$0"`; mv -i $${dir}/CVS-Kawa $${dir}/CVS' {} \;
-
 # Sourceforge
 
 sourceforge:
@@ -123,7 +111,7 @@ sourceforge:
 bootstrap: parser
 	ln -sf nicec bin/nicer
 	mkdir -p classes
-	cd classes; jar xf ../external/java-getopt-1.0.7.jar gnu
+	cd classes; jar xf ../external/java-getopt.jar gnu
 	-cd src/bossa/syntax && mv -f dispatch.java.bootstrap dispatch.java
 	${JAVAC} \
 		stdlib/nice/lang/Native.java stdlib/nice/lang/inline/*.java \

@@ -30,3 +30,28 @@ cov(s1@null,   s2@null)   {}
 
 // nullness marker with a parameterized type in constraint
 <Any T | T <: ?List<String>> void cov2(T x) {}
+
+// Test inference of non-nullness
+
+?String double1(?String s)
+{
+  if (s == null)
+    return null;
+
+  return s + s;
+}
+
+?String double2(?String s) = s == null ? null : s + s;
+?String double3(?String s) = s != null ? s + s : null;
+
+void f()
+{
+  ?int x;
+
+  if (x != null)
+    x++;
+  else
+    return;
+  x++;
+}
+

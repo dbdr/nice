@@ -8,6 +8,8 @@ if expr match $NICE_TOP '.*regtest$' >/dev/null; then
 fi
 export NICE_TOP
 
+JAVA=${JAVA-java}
+
 echo()
 {
   /bin/echo -e "$@"
@@ -25,7 +27,7 @@ compile()
 
 execute()
 {
-  java -jar "$1.jar"
+  $JAVA -jar "$1.jar"
 }
 
 ### Regression test suite

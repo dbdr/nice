@@ -46,8 +46,8 @@ public class SymbolExp extends Expression
     if(symbol instanceof MethodDeclaration.Symbol)
       {
         MethodDeclaration.Symbol s = (MethodDeclaration.Symbol) symbol;
-        if(s.definition instanceof FieldAccess)
-          return (FieldAccess)s.definition;
+        if(s.getDefinition() instanceof FieldAccess)
+          return (FieldAccess) s.getDefinition();
       }
     return null;
   }
@@ -79,8 +79,8 @@ public class SymbolExp extends Expression
   {
     if(symbol instanceof MethodDeclaration.Symbol)
       {
-        gnu.mapping.Procedure proc = 
-          ((MethodDeclaration.Symbol)symbol).definition.getDispatchMethod();
+        gnu.mapping.Procedure proc = ((MethodDeclaration.Symbol) symbol)
+	  .getDefinition().getDispatchMethod();
 
         return new QuoteExp(proc);
       }

@@ -136,8 +136,7 @@ public class MethodBodyDefinition extends Definition
 	  continue;
 	}
       
-      MethodDeclaration m = 
-	(MethodDeclaration)((MethodDeclaration.Symbol)s).definition;
+      MethodDeclaration m = ((MethodDeclaration.Symbol) s).getDefinition();
 
       // It doesn't make sense to define a body for a native method, does it ?
       if(!(m instanceof NiceMethod) 
@@ -180,11 +179,12 @@ public class MethodBodyDefinition extends Definition
 		 "No definition of \""+name+"\" is compatible with the patterns");
 
     String methods = "";
-    for(Iterator i = symbols.iterator(); i.hasNext();){
-      MethodDeclaration m = 
-	((MethodDeclaration.Symbol)i.next()).definition;
-      methods+=m+" defined "+m.location()+"\n";
-    }
+    for(Iterator i = symbols.iterator(); i.hasNext();)
+      {
+	MethodDeclaration m = 
+	  ((MethodDeclaration.Symbol) i.next()).getDefinition();
+	methods += m + " defined " + m.location() + "\n";
+      }
     
     User.error(this,
 	       "There is an ambiguity about which version " + 
@@ -213,7 +213,7 @@ public class MethodBodyDefinition extends Definition
     if(!(s instanceof MethodDeclaration.Symbol))
       User.error(this, name+" is not a method");
 
-    MethodDeclaration def = ((MethodDeclaration.Symbol) s).definition;
+    MethodDeclaration def = ((MethodDeclaration.Symbol) s).getDefinition();
     
     if(!(def instanceof NiceMethod))
       User.error(this, name + " is not a Nice method.\n" +

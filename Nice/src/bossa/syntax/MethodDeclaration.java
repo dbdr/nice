@@ -153,11 +153,10 @@ abstract public class MethodDeclaration extends Definition
    ****************************************************************/
 
   private gnu.mapping.Procedure dispatchMethod;
-  protected gnu.bytecode.Method   dispatchPrimMethod;
 
   protected abstract gnu.mapping.Procedure computeDispatchMethod();
   
-  public final void setDispatchMethod(gnu.mapping.Procedure p) 
+  final void setDispatchMethod(gnu.mapping.Procedure p) 
   {
     if(dispatchMethod != null)
       Internal.error("dispatch method already set");
@@ -165,7 +164,7 @@ abstract public class MethodDeclaration extends Definition
     dispatchMethod = p;
   }
   
-  public final gnu.mapping.Procedure getDispatchMethod() 
+  final gnu.mapping.Procedure getDispatchMethod() 
   {
     if(dispatchMethod == null)
       {
@@ -176,17 +175,6 @@ abstract public class MethodDeclaration extends Definition
       }
     
     return dispatchMethod;
-  }
-  
-  public final gnu.bytecode.Method getDispatchPrimMethod() 
-  { 
-    if(dispatchMethod == null)
-      dispatchMethod = computeDispatchMethod();
- 
-    if(dispatchPrimMethod == null)
-      Internal.error(this, "dispatchPrimMethod not computed in "+this);
-    
-    return dispatchPrimMethod;
   }
   
   public gnu.bytecode.Type javaReturnType()
@@ -271,9 +259,13 @@ abstract public class MethodDeclaration extends Definition
     Symbol(LocatedString name, Polytype type)
     {
       super(name, type);
-      this.definition = MethodDeclaration.this;
     }
 
+    MethodDeclaration getDefinition()
+    {
+      return MethodDeclaration.this;
+    }
+    
     /****************************************************************
      * Overloading resolution
      ****************************************************************/
@@ -286,36 +278,21 @@ abstract public class MethodDeclaration extends Definition
     */
     int match(Arguments arguments)
     {
-      if (definition.formalParameters() == null)
+      if (MethodDeclaration.this.formalParameters() == null)
 	// true for constructors, for instance. case might be removed
-	if (!arguments.plainApplication(definition.getArity()))
+	if (!arguments.plainApplication(MethodDeclaration.this.getArity()))
 	  return 0;
 	else
 	  return 2;
-      else if(!definition.formalParameters().match(arguments))
+      else if (!MethodDeclaration.this.formalParameters().match(arguments))
 	return 0;
       else
 	return 2;
     }
 
-    FieldAccess getFieldAccessMethod()
-    {
-      if(definition instanceof FieldAccess)
-	return (FieldAccess) definition;
-      else
-	return null;
-    }
-
-    gnu.mapping.Procedure getDispatchMethod()
-    {
-      return definition.getDispatchMethod();
-    }
-
     public String toString()
     {
-      return definition.toString();
+      return MethodDeclaration.this.toString();
     }
-    
-    MethodDeclaration definition;
   }
 }

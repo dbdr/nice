@@ -188,10 +188,18 @@ public class NiceMethod extends MethodDeclaration
     return module.getName().replace('.','$')+'$'+bytecodeName;
   }
 
+  private gnu.bytecode.Method dispatchPrimMethod;
+
   protected gnu.mapping.Procedure computeDispatchMethod()
   {
     dispatchPrimMethod = module.addDispatchMethod(this);
     return new gnu.expr.PrimProcedure(dispatchPrimMethod);
+  }
+  
+  public final gnu.bytecode.Method getDispatchPrimMethod() 
+  { 
+    getDispatchMethod();
+    return dispatchPrimMethod;
   }
   
   public gnu.bytecode.Type javaReturnType()

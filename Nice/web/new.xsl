@@ -179,6 +179,9 @@
            <a class="nav" href="roadmap.html">Roadmap</a>
            <br />
            &nbsp;<span class="small">o</span><xsl:text> </xsl:text>
+           <a class="nav" href="tests.html">Tests</a>
+           <br />
+           &nbsp;<span class="small">o</span><xsl:text> </xsl:text>
            <a class="nav" href="http://sourceforge.net/cvs/?group_id=12788">CVS</a>
            <br />
           </td>

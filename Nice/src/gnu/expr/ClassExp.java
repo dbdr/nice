@@ -338,6 +338,8 @@ public class ClassExp extends LambdaExp
 	if (isMakingClassPair())
 	  child.addMethodFor(instanceType, null, type);
       }
+
+    addAttributes(instanceType);
   }
 
   /** Return implementation method matching name and param types.

@@ -27,6 +27,13 @@ public class MiscAttr extends Attribute
     this(name, data, 0, data.length);
   }
   
+  public static Attribute synthetic()
+  {
+    return new MiscAttr("Synthetic", nobytes);
+  }
+
+  private static final byte[] nobytes = new byte[0];
+
   public int getLength() { return length; }
 
   public void write (DataOutputStream dstr)

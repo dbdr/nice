@@ -1697,12 +1697,12 @@ public class LambdaExp extends ScopeExp
 
   private gnu.bytecode.Attribute attributes;
 
-  private void addAttributes(Method m)
+  void addAttributes(AttrContainer bytecode)
   {
     for (Attribute a = attributes; a != null; )
       {
 	Attribute next = a.getNext();
-	a.addToFrontOf(m);
+	a.addToFrontOf(bytecode);
 	a = next;
       }
   }

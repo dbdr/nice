@@ -57,13 +57,6 @@ public class Class extends Procedure1 implements Inlineable
 
   public Object apply1 (Object arg1)
   {
-    // Throw it if it is not a checked exception
-    if (arg1 instanceof Throwable)
-      throw ((RuntimeException) arg1);
-    else if (arg1 instanceof Error)
-      throw ((Error) arg1);
-    // Otherwise wrap it
-    else
-      throw (new RuntimeException(arg1.toString()));
+    throw new Error("Not implemented");
   }
 }

@@ -23,8 +23,10 @@ for writing code operating on a hierarchy of classes. <a href="http://www.ti.et-
 thorough description is available there</a> from the <i>Design Patterns</i>
 book.
 <p>A typical exemple is the definition of operations on an Abstract Syntax
-Tree:
+Tree. Here is Java code using a Visitor:
 <PRE>
+<FONT COLOR="#0000ee">package</FONT> syntax;
+
 <FONT COLOR="#0000ee">abstract</FONT> <FONT COLOR="#0000ee">class</FONT> <FONT COLOR="#cd0000">ExpressionVisitor</FONT> 
 { 
   <FONT COLOR="#0000ee">abstract</FONT> <FONT COLOR="#b7860b">void</FONT> visitIntExp(<FONT COLOR="#b7860b">IntExp </FONT>e); 
@@ -49,14 +51,25 @@ Tree:
 <FONT COLOR="#0000ee">class</FONT> <FONT COLOR="#cd0000">AddExp</FONT> <FONT COLOR="#0000ee">extends</FONT> <FONT COLOR="#b7860b">Expression </FONT>
 { 
   <FONT COLOR="#b7860b">Expression </FONT>e1, e2; 
+
   <FONT COLOR="#b7860b">void</FONT> <FONT COLOR="#cd0000">accept</FONT>(<FONT COLOR="#b7860b">ExpressionVisitor </FONT>v)
   {
     v.visitAddExp(<FONT COLOR="#8080ff">this</FONT>);
   }
 } 
+</PRE>
 
+The interest of this construction is that 
+it is now possible to define operations on expressions
+by subclassing ExpressionVisitor.
+This can even be done in a different package,
+without modifying the expression hierarchy classes.
+
+<PRE>
 <FONT COLOR="#008b00">// Behaviour can now be defined on Expressions 
 </FONT>
+<FONT COLOR="#0000ee">package</FONT> tools;
+
 <FONT COLOR="#0000ee">class</FONT> <FONT COLOR="#cd0000">PrettyPrint</FONT> <FONT COLOR="#0000ee">extends</FONT> <FONT COLOR="#b7860b">ExpressionVisitor </FONT>
 {
   <FONT COLOR="#b7860b">void</FONT> <FONT COLOR="#cd0000">visitIntExp</FONT>(<FONT COLOR="#b7860b">IntExp </FONT>e) 
@@ -72,14 +85,21 @@ Tree:
   } 
 }</PRE>
 
-It is thus possible to define operations on expressions without modifying
-the expression hierarchy classes (has would happen with a <tt>prettyPrint</tt>
-member method) and without the burden of testing the argument with <tt>instanceof</tt>
-and downcasts.
+Without visitors, the classes have to be modified each time a new
+operations is added.
+In this case, a <tt>prettyPrint</tt> member method
+would be added to each class.
+<p>
+Anothe possiblity would be to define a static method
+in the new package. But then it would be necessary to test 
+the argument with <tt>instanceof</tt> and use downcasts.
+In short, loose the benefits of object-orientation.
+
 <br>&nbsp;
 <h2>
 Shortcomings of the Visitor pattern</h2>
 
+However, the Visitor pattern has serious flaws:
 <ol>
 <li>
 An obvious problem is that the arguments and the return type of visiting
@@ -119,6 +139,8 @@ As you can see, it is much
 shorter and natural, and it solves all the problems above.
 <p>
 <PRE>
+<FONT COLOR="#0000ee">package</FONT> syntax;
+
 <FONT COLOR="#0000ee">abstract</FONT> <FONT COLOR="#0000ee">class</FONT> <FONT COLOR="#cd0000">Expression</FONT> { } 
 
 <FONT COLOR="#0000ee">class</FONT> <FONT COLOR="#cd0000">IntExp</FONT> <FONT COLOR="#0000ee">extends</FONT> <FONT COLOR="#b7860b">Expression </FONT>
@@ -133,6 +155,8 @@ shorter and natural, and it solves all the problems above.
 
 <FONT COLOR="#008b00">// Behaviour can now be defined on Expressions 
 </FONT>
+<FONT COLOR="#0000ee">package</FONT> tools;
+
 <FONT COLOR="#b7860b">void</FONT> <FONT COLOR="#cd0000">prettyPrint</FONT>(<FONT COLOR="#b7860b">Expression </FONT>e); 
 
 <FONT COLOR="#cd0000">prettyPrint</FONT>(e<FONT COLOR="#0000ee">@</FONT><FONT COLOR="#b7860b">IntExp</FONT>) 

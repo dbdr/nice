@@ -30,8 +30,11 @@ public abstract class Expression
 {
   final static Expression[] toArray(List expressions)
   {
-    return 
-      (Expression[]) expressions.toArray(new Expression[expressions.size()]);
+    if (expressions == null || expressions.size() == 0)
+      return noExpressions;
+    else
+      return (Expression[]) 
+	expressions.toArray(new Expression[expressions.size()]);
   }
   
   public static final Expression[] noExpressions = new Expression[0];

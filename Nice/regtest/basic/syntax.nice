@@ -11,4 +11,8 @@ void syntaxTest()
   // If with empty body
   if (true)
     ;
+
+  // [] is the empty array
+  if ([] == null)
+    throw new Error();
 }

@@ -1377,6 +1377,8 @@ Expression arrayLiteralExp():
   Expression e;
 }
 {
+  "[]" { return new LiteralArrayExp(null); }
+|
   "[" { exps = new LinkedList(); }
   
   [

@@ -18,6 +18,10 @@ are currently from Europe, and we are there during the day or the evening).
 </para>
 
 <para>
+The channel <irc-users/> (two of these are probably robots).
+</para>
+
+<para>
 To participate, you will need an IRC client. Set it up to
 connect to the server <literal>irc.freenode.net</literal>. Then
 <literal>/join #nice</literal>. In some web-browsers, you can simply

@@ -292,4 +292,9 @@
 <h3><xsl:apply-templates/></h3>
 </xsl:template>
 
+<xsl:template match="irc-users">
+  <script language="JavaScript" src="http://searchirc.com/searchirc_chan_stats.php?n=59&amp;c=I25pY2U=&amp;o=1"></script>
+</xsl:template>
+
+
 </xsl:stylesheet>

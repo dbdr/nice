@@ -1,11 +1,14 @@
 SHELL = /bin/zsh
 TOP=${PWD}
+NICEJAR=/usr/local/lib/nice/Nice.jar
 
+# Compile with stable version
+JC=javac -classpath ${TOP}/classes:${NICEJAR} -sourcepath ${TOP}/src -d ${TOP}/classes -O -g
 JAVAC=  javac -classpath ${TOP}/classes:${TOP}/src:${TOP}/stdlib -sourcepath ${TOP}/src -d ${TOP}/classes -O -g
 JAVACC= CLASSPATH=${TOP}/external/JavaCC.zip:${CLASSPATH} java COM.sun.labs.javacc.Main
 JAVADOC=javadoc #-linkoffline file:///C%7C/Apps/jdk1.2.1/docs/api file:///usr/opt/java122/docs/api
 
-NICEC= NICEJAR="${TOP}/stdlib" CLASSPATH="${TOP}/classes" nicec --classpath="${TOP}/stdlib:${TOP}/classes:${TOP}/src"
+NICEC= nicec --classpath="${TOP}/stdlib:${TOP}/classes:${TOP}/src"
 NICEC_DEV= CLASSPATH=${TOP}/src/nice/tools/.compiler.jar:${TOP}/src:${TOP}/classes java -Dnice.systemJar=${TOP}/stdlib nice.tools.compiler.package --classpath="${TOP}/stdlib:${TOP}/classes:${TOP}/src"
 
 # run this first when you just checked out a fresh version
@@ -125,6 +128,7 @@ bootstrap: parser
 		src/gnu/expr/*.java src/gnu/mapping/*.java \
 		src/nice/tools/code/*.java src/mlsub/typing/*.java src/mlsub/typing/lowlevel/*.java \
 		src/bossa/syntax/dispatch.java
+#	cd stdlib; ${NICEC} nice.getopt
 	cd src; ${NICEC} bossa.modules
 	cd src; ${NICEC} nice.tools.ast
 	cd src/bossa/syntax && \
@@ -133,7 +137,7 @@ bootstrap: parser
 	rm classes/bossa/syntax/dispatch.class
 	cd src; ${NICEC} bossa.syntax
 	cd src;\
-	${JAVAC} bossa/modules/Package.java nice/tools/runJar.java ../stdlib/nice/lang/rawArray.java gnu/bytecode/dump.java
+	${JC} bossa/modules/Package.java nice/tools/runJar.java ../stdlib/nice/lang/rawArray.java gnu/bytecode/dump.java
 
 nice-pass: 
 	cd src; ${NICEC} bossa.syntax

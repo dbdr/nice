@@ -340,8 +340,9 @@ public class OverloadedSymbolExp extends Expression
     AmbiguityError()
     {
       super(OverloadedSymbolExp.this, 
-	    "Ambiguity for symbol " + ident + ". Possibilities are :\n" + 
-	    Util.map("", "\n", "", symbols));
+	    "Ambiguity for symbol " + OverloadedSymbolExp.this.ident + 
+	    ". Possibilities are :\n" + 
+	    Util.map("", "\n", "", OverloadedSymbolExp.this.symbols));
     }
   }
 }

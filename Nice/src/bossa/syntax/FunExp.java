@@ -124,7 +124,8 @@ public class FunExp extends Expression implements Function
       + "fun ("
       + Util.map("",", ","",formals)
       + ") => "
-      + body
+      + (body instanceof ReturnStmt ? 
+	 ((ReturnStmt) body).value.toString() : body.toString())
       ;
   }
   

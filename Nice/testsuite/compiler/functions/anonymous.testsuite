@@ -46,3 +46,13 @@
 /// PASS
   int k; k = 2;
   [0].foreach(int a => println(k));
+
+/// PASS
+  /// package a
+  /// Toplevel
+class Test{
+String[] array = new String[5].fill(int index =>
+index.toString());
+}
+  /// package b import a
+  ;

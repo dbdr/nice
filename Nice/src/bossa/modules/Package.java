@@ -237,13 +237,23 @@ public class Package implements mlsub.compilation.Module, Located, bossa.syntax.
    * Passes
    ****************************************************************/
 
+  private boolean scoped = false;
+
   public void scope()
   {
+    if (scoped) return;
+    scoped = true;
+
     ast.buildScope();
   }
   
+  private boolean loaded = false;
+
   public void load()
   {
+    if (loaded) return;
+    loaded = true;
+
     ast.resolveScoping();
     ast.createContext();
 

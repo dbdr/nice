@@ -14,9 +14,9 @@ NICEC1=${TOP}/bin/nicec ${NICEC_ARGS} --sourcepath="${TOP}/stdlib:${TOP}/src"
 
 
 
-all: clean compiler1 lib/nice/Nice.jar compiler2 archive
+all: clean bootstrap compiler1 lib/nice/Nice.jar compiler2 archive
 
-compiler1: bootstrap setDate
+compiler1: setDate
 	${NICEC}  bossa.syntax
 	${NICEC}  -R -a src/nice/tools/compiler.jar nice.tools.compiler
 
@@ -57,8 +57,17 @@ status:
 
 # Sourceforge
 
-sourceforge:
-	scp web/*.html web/*.css bonniot@shell.sourceforge.net:/home/groups/n/ni/nice/htdocs
+release: release-file web
+
+release-file:
+	(echo user anonymous bonniot@users.sf.net; \
+         echo binary; echo cd incoming; echo put Nice-`date +"%Y.%m.%d"`.tar)\
+        | ftp -n upload.sourceforge.net
+	echo "Redirect /Nice.tar http://prdownloads.sourceforge.net/nice/Nice-`date +'%Y.%m.%d'`.tar" > web/.htaccess
+
+.PHONY: web
+web:
+	scp web/*.html web/*.css web/.htaccess bonniot@shell.sourceforge.net:/home/groups/n/ni/nice/htdocs
 
 #****************************************************************
 #    Bootstrap
@@ -134,7 +143,7 @@ jdoc:
 	nice.tools.code \
 	mlsub.typing mlsub.typing.lowlevel mlsub.compilation \
 	bossa.syntax bossa.util bossa.link bossa.modules \
-	gnu.bytecode gnu.expr gnu.math gnu.mapping gnu.kawa.reflect
+	gnu.bytecode gnu.expr gnu.math gnu.mapping
 
 tags:
 	jtags

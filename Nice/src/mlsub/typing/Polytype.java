@@ -179,6 +179,12 @@ public final class Polytype
   {
     if (types.length == 0) return bottom();
 
+    /* Even if there is only one type, we quantify over all super-types.
+       This is needed when a non-variant type constructor like []
+       is added around the returned type. Probably this means a wrong
+       spec for this union function. 
+    */
+
     MonotypeVar t = new MonotypeVar();
     
     Constraint c = new Constraint(new TypeSymbol[]{t}, null);

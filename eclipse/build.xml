@@ -143,6 +143,10 @@
       </classpath>
     </nicec>
   
+    <jar destfile="${build.dir}/${plugin.jar.name}"
+      basedir="${src.dir}"
+      update="yes"
+      includes="nice/eclipse/util/Resources.properties"/>
   </target>
 
 

@@ -247,8 +247,10 @@ public class Nicec extends Task {
 	  log("runtime: " + runtime, Project.MSG_VERBOSE);
 
 	  Compilation compilation = bossa.modules.fun.createCompilation();
-	  compilation.sourcePath = sourcepath;
-	  compilation.destinationDir = destination.getAbsolutePath();
+	  if (sourcepath != null)
+	    compilation.sourcePath = sourcepath;
+	  if (destination != null)
+	    compilation.destinationDir = destination.getAbsolutePath();
 	  compilation.packagePath = classpath;
 	  compilation.output = jar;
 	  compilation.recompileCommandLine = recompile;

@@ -25,9 +25,6 @@ public class dispatch
 
   public static void resetConstructorsMap() {}
 
-  public static mlsub.typing.TypeConstructor lookupJavaClass(String className, bossa.util.Location loc)
-  { return null; }
-  
   public static void resetJavaClasses() {}
 
   static VarScope createGlobalVarScope()
@@ -39,9 +36,6 @@ public class dispatch
   { return null; }
   
   public static mlsub.typing.Monotype[] getTypeDefTypeParameters(mlsub.typing.TypeConstructor tc)
-  { return null; }
-
-  public static mlsub.typing.Monotype getTypeWithTC(mlsub.typing.TypeConstructor tc, mlsub.typing.Monotype[] sourceParams )
   { return null; }
 
   public static AST createAST(Module module, List defs)

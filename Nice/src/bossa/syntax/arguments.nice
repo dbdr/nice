@@ -91,7 +91,7 @@ public class Arguments
   Expression[] inOrder()
   {
     if (arguments.length == 0)
-      return Expression.noExpressions;
+      return [];
 
     Expression[] res = cast(new Expression[arguments.length]);
     

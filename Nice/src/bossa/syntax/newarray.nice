@@ -140,7 +140,7 @@ public class NewArrayExp extends Expression
     
     return new gnu.expr.ApplyExp(
 		new nice.tools.code.MultiArrayNewProc(cast(t), knownDimensions.length),
-		Expression.compile(knownDimensions));
+		Expression_compile(knownDimensions));
   }
   
   toString()

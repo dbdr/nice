@@ -1,0 +1,120 @@
+/**************************************************************************/
+/*                                N I C E                                 */
+/*             A high-level object-oriented research language             */
+/*                        (c) Daniel Bonniot 2004                         */
+/*                                                                        */
+/*  This program is free software; you can redistribute it and/or modify  */
+/*  it under the terms of the GNU General Public License as published by  */
+/*  the Free Software Foundation; either version 2 of the License, or     */
+/*  (at your option) any later version.                                   */
+/*                                                                        */
+/**************************************************************************/
+
+package bossa.syntax;
+
+/**
+   Methods on defined on Expressions.
+
+*/
+
+/**
+   @return true iff this expression is a method 
+   to access to the field of a class.
+ */
+boolean isFieldAccess(Expression exp)
+{
+  return exp.getFieldAccessMethod() != null;
+}
+
+/**
+ * @return the FieldAccess behind this expression, or null
+ */
+?FieldAccess getFieldAccessMethod(Expression exp)
+{
+  return null;
+}  
+
+/**
+   @return the FieldAccess if this expression resolves to a field, 
+   which is true if it is the application a of FieldAccess to an object 
+   value. Returns null otherwise.
+ */
+?FieldAccess getField(Expression exp)
+{
+  return null;
+}  
+
+/** 
+    @return null, or the underlying java class if this
+    expression is a constant class (used in static method calls).
+*/
+?gnu.bytecode.ClassType staticClass(Expression exp)
+{
+  return null;
+}
+
+/**
+ * Maps {@link #generateCode()} over an array of expressions.
+ */
+public gnu.expr.Expression[] Expression_compile(Expression[] expressions)
+{
+  gnu.expr.Expression[] res = cast(new gnu.expr.Expression[expressions.length]);
+  for (int i=0; i<res.length; i++)
+    res[i] = expressions[i].generateCode();
+
+  return res;
+}
+
+/**
+ * Creates the bytecode expression to evaluate this Expression.
+ *
+ * This must be overrided in any Expression, but not called directly. 
+ * Call {@link #generateCode()} instead.
+ */
+gnu.expr.Expression compile(Expression exp);
+  
+/**
+ * Creates the bytecode expression to evaluate this Expression.
+ * This method should not be overriden.
+ */
+gnu.expr.Expression generateCode(Expression exp)
+{
+  gnu.expr.Expression res = exp.compile();
+  exp.location().write(res);
+    
+  return res;
+}
+  
+/**
+   Creates the bytecode expression to evaluate this Expression,
+   when it is used as a function that is immediately called.
+ */
+gnu.expr.Expression generateCodeInCallPosition(Expression exp)
+{
+  // Default implementation.
+  return exp.generateCode();
+}
+
+  
+/** @return the declaration of the local variable denoted by this expression,
+    or <code>null</code> if this expression is not a local variable.
+*/
+?gnu.expr.Declaration getDeclaration(Expression exp)
+{
+  return null;
+}
+  
+gnu.expr.Expression compileAssign(Expression exp, gnu.expr.Expression value)
+// default implementation using getDeclaration()
+{
+  let decl = exp.getDeclaration();
+  if (decl != null)
+    {
+      let res = new gnu.expr.SetExp(decl, value);
+      res.setHasValue(true);
+      return res;
+    }
+
+  throw Internal.error(exp, exp + " doesn't know how to be modified, it is a " +
+		   exp.getClass());
+}

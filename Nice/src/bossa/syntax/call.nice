@@ -110,7 +110,7 @@ public class CallExp extends Expression
   isAssignable()
   {
     this.resolveOverloading();
-    let ?FieldAccess fa = cast(function.getFieldAccessMethod());
+    let ?FieldAccess fa = function.getFieldAccessMethod();
     return fa != null && ! fa.isFinal();
   }
 
@@ -155,7 +155,7 @@ public class CallExp extends Expression
 
     gnu.expr.Expression res;
     if (function.isFieldAccess())
-      res = cast(function.getFieldAccessMethod()).compileAccess(this.compileParams());
+      res = notNull(function.getFieldAccessMethod()).compileAccess(this.compileParams());
     else
       res = new gnu.expr.ApplyExp(function.generateCodeInCallPosition(), this.compileParams());
     this.location().write(res);
@@ -173,7 +173,7 @@ public class CallExp extends Expression
   { 
     bossa.syntax.Expression[] compexps = cast(arguments.computedExpressions);
 
-    gnu.expr.Expression[] params = Expression.compile(compexps);
+    gnu.expr.Expression[] params = Expression_compile(compexps);
 
     // Make sure the arguments have the expected bytecode type,
     // matching the instantiated type of the (polymorphic) function.
@@ -197,7 +197,7 @@ public class CallExp extends Expression
     if (!function.isFieldAccess())
       Internal.error(this, "Assignment to a call that is not a field access");
 
-    FieldAccess access = cast(function.getFieldAccessMethod());
+    FieldAccess access = notNull(function.getFieldAccessMethod());
 
     if (access.isFinal())
       Internal.error(this, "Field " + access + " is final");

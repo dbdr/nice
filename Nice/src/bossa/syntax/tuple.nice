@@ -131,7 +131,7 @@ public class TupleExp extends bossa.syntax.Expression
     return nice.tools.code.TupleType.createExp
       (nice.tools.code.Types.lowestCommonSupertype(expectedComponents),
        nice.tools.code.Types.javaType(expectedComponents), 
-       bossa.syntax.Expression.compile(expressions));
+       Expression_compile(expressions));
   }
 
   compileAssign(gnu.expr.Expression array)

@@ -29,59 +29,12 @@ import mlsub.typing.Monotype;
 public abstract class Expression
   implements Located, Printable
 {
-  static final Expression[] toArray(List expressions)
-  {
-    if (expressions == null || expressions.size() == 0)
-      return noExpressions;
-
-    return (Expression[]) 
-	expressions.toArray(new Expression[expressions.size()]);
-  }
-  
-  public static final Expression[] noExpressions = new Expression[0];
-
   /** @return true iff this expression can be assigned a value. */
   public boolean isAssignable()
   {
     return false;
   }
 
-  /**
-     @return true iff this expression is a method 
-     to access to the field of a class.
-   */
-  final boolean isFieldAccess()
-  {
-    return getFieldAccessMethod() != null;
-  }
-
-  /**
-   * @return the FieldAccess behind this expression, or null
-   */
-  /*FieldAccess*/Object getFieldAccessMethod()
-  {
-    return null;
-  }  
-
-  /**
-     @return the FieldAccess if this expression resolves to a field, 
-     which is true if it is the application a of FieldAccess to an object 
-     value. Returns null otherwise.
-   */
-  /*FieldAccess*/Object getField()
-  {
-    return null;
-  }  
-
-  /** 
-      @return null, or the underlying java class if this
-      expression is a constant class (used in static method calls).
-  */
-  gnu.bytecode.ClassType staticClass()
-  {
-    return null;
-  }
-  
   boolean isZero()
   {
     return false;
@@ -191,79 +144,6 @@ public abstract class Expression
   {
     // Do nothing by default.
   }
-
-  /****************************************************************
-   * Code generation
-   ****************************************************************/
-  
-  /**
-   * Creates the bytecode expression to evaluate this Expression.
-   *
-   * This must be overrided in any Expression, but not called directly. 
-   * Call {@link #generateCode()} instead.
-   */
-  protected abstract gnu.expr.Expression compile();
-  
-  /**
-   * Creates the bytecode expression to evaluate this Expression.
-   */
-  final gnu.expr.Expression generateCode()
-  {
-    gnu.expr.Expression res = compile();
-    location().write(res);
-    
-    return res;
-  }
-  
-  /**
-     Creates the bytecode expression to evaluate this Expression,
-     when it is used as a function that is immediately called.
-   */
-  gnu.expr.Expression generateCodeInCallPosition()
-  {
-    // Default implementation.
-    return generateCode();
-  }
-  
-  /**
-   * Maps {@link #generateCode()} over an array of expressions.
-   */
-  public static gnu.expr.Expression[] compile(Expression[] expressions)
-  {
-    gnu.expr.Expression[] res = new gnu.expr.Expression[expressions.length];
-    for (int i=0; i<res.length; i++)
-      res[i] = expressions[i].generateCode();
-
-    return res;
-  }
-  
-  /** @return the declaration of the local variable denoted by this expression,
-      or <code>null</code> if this expression is not a local variable.
-  */
-  gnu.expr.Declaration getDeclaration()
-  {
-    return null;
-  }
-  
-  gnu.expr.Expression compileAssign(gnu.expr.Expression value)
-  // default implementation using getDeclaration()
-  {
-    gnu.expr.Declaration decl = getDeclaration();
-    if (decl != null)
-      {
-	gnu.expr.SetExp res = new gnu.expr.SetExp(decl, value);
-	res.setHasValue(true);
-	return res;
-      }
-
-    Internal.error(this, this + " doesn't know how to be modified, it is a " +
-		   this.getClass());
-    return null;
-  }
-  
-  /****************************************************************
-   * Locations
-   ****************************************************************/
 
   public void setLocation(Location l)
   {

@@ -93,8 +93,8 @@ public class Contract
 
   public gnu.expr.Expression compile(gnu.expr.Expression body)
   {
-    return new gnu.expr.CheckContract(Expression.compile(pre.toArray()), 
-				      Expression.compile(post.toArray()), 
+    return new gnu.expr.CheckContract(Expression_compile(pre.toArray()), 
+				      Expression_compile(post.toArray()), 
 				      body);
   }
 

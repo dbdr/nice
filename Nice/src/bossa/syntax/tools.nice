@@ -163,13 +163,9 @@ void _printStackTraceWithSourceInfo(Throwable t) =
 mlsub.typing.Polytype getType(Expression) = 
   native mlsub.typing.Polytype Expression.getType();
 GlobalTypeScope getGlobalTypeScope() = native GlobalTypeScope Node.getGlobalTypeScope();
-?gnu.bytecode.ClassType staticClass(Expression) = native gnu.bytecode.ClassType Expression.staticClass();
 <T> String map(String, String, String, T[]) = native String bossa.util.Util.map(String, String, String, Object[]);
 <T> String map(String, String, String, ?Collection<T>) = native String bossa.util.Util.map(String, String, String, Collection);
 ?mlsub.typing.lowlevel.Kind getKind(mlsub.typing.lowlevel.Element) = native mlsub.typing.lowlevel.Kind mlsub.typing.lowlevel.Element.getKind();
-?gnu.expr.Declaration getDeclaration(Expression) = native gnu.expr.Declaration Expression.getDeclaration();
-?Object getFieldAccessMethod(Expression) = native Object Expression.getFieldAccessMethod();
-?Object getField(Expression) = native Object Expression.getField();
 ?mlsub.typing.Monotype Types_getTypeParameter(mlsub.typing.Polytype, int) = native mlsub.typing.Monotype nice.tools.typing.Types.getTypeParameter(mlsub.typing.Polytype, int);
 ?mlsub.typing.Monotype Types_getTypeParameter(mlsub.typing.Monotype, int) = native mlsub.typing.Monotype nice.tools.typing.Types.getTypeParameter(mlsub.typing.Monotype, int);
 mlsub.typing.Monotype[?] Types_parameters(mlsub.typing.Polytype) = native mlsub.typing.Monotype[] nice.tools.typing.Types.parameters(mlsub.typing.Polytype);

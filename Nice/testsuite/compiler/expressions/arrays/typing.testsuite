@@ -19,3 +19,26 @@
 
 /// PASS
   ?List<String>[] myArray = new List[10];
+
+/// PASS
+  /// Toplevel
+class ByteReader
+{
+  int defaultSize = 100;
+
+  byte[] alloc() = new byte[defaultSize];
+}
+
+class FastByteReader
+{
+  int defaultSize = 1000;
+}
+
+/// PASS
+  /// Toplevel
+let int size = 10;
+let String size = "size";
+
+int size(String s) = s.length();
+
+let byte[] buf = new byte[size];

@@ -296,8 +296,9 @@ Block newBlock(?Statement[] statements) = native new Block(Statement[]);
 mlsub.typing.Polytype boolPolytype() = native PrimitiveType.boolPolytype;
 mlsub.typing.Polytype longPolytype() = native PrimitiveType.longPolytype;
 mlsub.typing.Monotype boolType() = native PrimitiveType.boolType;
+mlsub.typing.Monotype intType() = native PrimitiveType.intType;
 mlsub.typing.Monotype longType() = native PrimitiveType.longType;
 
 // Local Variables:
-// nice-xprogram: "../bin/nicec -d ../classes --sourcepath=../src"
+// nice-xprogram: "../bin/nicec -d ../classes"
 // End:

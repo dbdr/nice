@@ -160,7 +160,7 @@ core-bootstrap:
 	ln -sf nicec bin/nicedoc; ln -sf nicec bin/niceunit
 	-cd src/bossa/syntax && mv -f dispatch.java.bootstrap dispatch.java
 	${JAVAC} src/nice/tools/util/System.java
-	${NICEC} nice.tools.locator
+	${NICEC} -r nice.tools.locator
 	${JAVAC} \
 		src/bossa/syntax/dispatch.java \
 		src/mlsub/typing/TypeConstructorLeqMonotypeCst.java \

@@ -62,8 +62,7 @@ JFrame makeFrame()
 	frame.addWindowListener(windowClosing: (WindowEvent e) => System.exit(0));
 	
   // add the panel to the contentPane of this frame
-  ?java.awt.Container contentPane = frame.getContentPane();
-  if(contentPane != null) contentPane.add(BorderLayout.CENTER,makePanel());
+  frame.getContentPane().add(BorderLayout.CENTER,makePanel());
    
   // set dimensions and show
   frame.setSize(500,100);

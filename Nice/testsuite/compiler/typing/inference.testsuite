@@ -1,0 +1,97 @@
+/// Global
+class A<FOO>
+{
+  void poly(FOO) {}
+}
+class B<BAR> extends A<FOO> {}
+
+/// PASS
+  let x = new A();
+  x.poly("");
+
+/// FAIL
+  let x = new B();
+  x.poly("");
+  x. /*/// FAIL HERE*/ poly(0);
+
+/// PASS
+  /// Toplevel
+<T> void foo() {
+  let x = new A();
+  x.poly("");
+}
+
+/// FAIL
+  /// Toplevel
+<T> void foo() {
+  let x = new A();
+  x.poly("");
+  x. /*/// FAIL HERE*/ poly(0);
+}
+
+/// PASS
+  /// Toplevel
+void foo();
+foo() {
+  let x = new A();
+  x.poly("");
+}
+
+/// FAIL
+  /// Toplevel
+void foo();
+foo() {
+  let x = new A();
+  x.poly("");
+  x. /*/// FAIL HERE*/ poly(0);
+}
+
+/// PASS
+  let l = new ArrayList();
+  l.add("...");
+
+/// FAIL
+  let l = new ArrayList();
+  l.add("...");
+  l. /*/// FAIL HERE*/ add(0);
+
+/// PASS
+  let l1 = new ArrayList();
+  let l2 = new ArrayList();
+  l1.add("...");
+  l2.add(l1.get(0));
+  l2.add(".");
+
+/// FAIL
+  let l1 = new ArrayList();
+  let l2 = new ArrayList();
+  l1.add("...");
+  l2.add(l1.get(0));
+  l2. /*/// FAIL HERE*/ add(0);
+
+
+/// PASS
+  let l1 = new ArrayList();
+  let l2 = new ArrayList();
+  ()->void action = () => l2.add(l1.get(0));
+  l1.add("...");
+  action();
+  l2.add(".");
+
+/// FAIL
+  let l1 = new ArrayList();
+  let l2 = new ArrayList();
+  ()->void action = () => l2.add(l1.get(0));
+  l1.add("...");
+  action();
+  l2. /*/// FAIL HERE*/ add(0);
+
+/// FAIL
+  var l = new LinkedList();
+  l.add("");
+  if (l.size == 1)
+    {
+      l = new LinkedList();
+      l./*/// FAIL HERE*/ add(0);
+    }
+  String s = l.get(0);

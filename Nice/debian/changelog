@@ -6,6 +6,7 @@ nice (0.0.020300) unstable; urgency=low
   * Abstract interfaces are fully qualified just like classes and 
     correctly list their super-interfaces in the package interface.
     This really makes it possible to use them across packages.
+  * Various other bugfixes.
 
  --
 

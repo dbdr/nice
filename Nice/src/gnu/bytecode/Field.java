@@ -50,7 +50,8 @@ public class Field extends Location implements AttrContainer {
     return (flags & Access.STATIC) != 0;
   }
 
-  public final boolean isFinal() { return (flags & Access.FINAL) != 0; }
+  public final boolean isFinal()  { return (flags & Access.FINAL) != 0; }
+  public final boolean isStatic() { return (flags & Access.STATIC) != 0; }
 
   public final int getFlags() {
     return flags;

@@ -82,6 +82,7 @@ public class JavaFieldAccess extends FieldAccess
   }
   
   public boolean isFinal() { return field.isFinal(); }
+  public boolean isStatic() { return field.isStatic(); }
 
   void buildScope(VarScope outer, TypeScope typeOuter)
   {

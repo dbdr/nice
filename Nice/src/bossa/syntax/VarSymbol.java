@@ -48,6 +48,18 @@ public abstract class VarSymbol extends Node implements Located
     return getFieldAccessMethod() != null;
   }
 
+  final boolean isNonStaticFieldAccess()
+  {
+    FieldAccess access = getFieldAccessMethod();
+    return access != null && ! access.isStatic();
+  }
+
+  final boolean isStaticFieldAccess()
+  {
+    FieldAccess access = getFieldAccessMethod();
+    return access != null && access.isStatic();
+  }
+
   FieldAccess getFieldAccessMethod()
   {
     return null;

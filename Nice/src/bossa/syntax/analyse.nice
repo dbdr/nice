@@ -441,7 +441,7 @@ Expression analyseIdent(IdentExp e, Info info, boolean assigned)
 	    // Otherwise, we are in the normal case.
 	  }
 
-	if (sym.isFieldAccess() && Node.thisExp != null)
+	if (sym.isNonStaticFieldAccess() && Node.thisExp != null)
           {
 	    CallExp res = new CallExp
 	      (newOverloadedSymbolExp(symbols, e.ident),
@@ -449,6 +449,16 @@ Expression analyseIdent(IdentExp e, Info info, boolean assigned)
             res.setLocation(e.location());
             return res;
           }
+	else if (sym.isStaticFieldAccess())
+	  // Refering to an unqualified static field.
+	  {
+	    // Make an implicit call to fetch the static field's value.
+	    CallExp res = new CallExp
+	      (newOverloadedSymbolExp(symbols, e.ident), 
+	       Arguments.noArguments());
+            res.setLocation(e.location());
+            return res;
+	  }
 	return new SymbolExp(sym, e.location());
       }
     else

@@ -213,3 +213,13 @@ class A<T>
     return res;
   }
 }
+
+
+/// PASS bug
+  /// Toplevel
+  class Impl<T> {
+    T ?-> int bar = T t1 => 0;
+  }
+  class Foo<T> {
+    Impl<int> w = new Impl();
+  }

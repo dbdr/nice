@@ -104,6 +104,25 @@ public abstract class Alternative
     return true;
   }
 
+  boolean matchesTypePart(TypeConstructor[] tags, boolean[] isValue)
+  {
+    for(int i = 0, n = 0; i < patterns.length; i++)
+      if (!isValue[i] && !patterns[i].matches(tags[n++]))
+	return false;
+
+    return true;
+  }
+
+  boolean matchesValuePart(long[] values, boolean[] isValue)
+  {
+    for(int i = 0, n = 0; i < patterns.length; i++)
+      if (isValue[i] && !patterns[i].matchesValue(values[n++]))
+	return false;
+
+    return true;
+  }
+
+
   /****************************************************************
    * Code generation
    ****************************************************************/

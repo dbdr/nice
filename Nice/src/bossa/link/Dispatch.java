@@ -126,14 +126,25 @@ public final class Dispatch
 
     List multitags = enumerate(type, used);
 
+    boolean[] isValue = new boolean[method.getArity()];
+    List values = generateValues(sortedAlternatives, isValue);
+    boolean hasValues = values.size() > 0;  
+   
     int nb_errors = 0;
     for(Iterator i = multitags.iterator(); i.hasNext();)
       {
 	TypeConstructor[] tags = (TypeConstructor[]) i.next();
 	
 	if (test(method, tags, sortedAlternatives))
+	{
 	  if (++nb_errors > 9)
 	    break;
+        }
+	else if (hasValues && 
+	      testValues(method, tags, values, isValue, sortedAlternatives) )
+	  if (++nb_errors > 9)
+	    break;
+
       }
     if (nb_errors > 0)
       User.error(method, "The implementation test failed for method " + 
@@ -196,6 +207,58 @@ public final class Dispatch
     return failed;
   }
 
+  /**
+     Special version of above that tests tags with all combinations of integer values.
+   */
+  private static boolean testValues(NiceMethod method, 
+			      TypeConstructor[] tags,
+			      List valueCombis,
+			      boolean[] isValue, 
+			      final Stack sortedAlternatives)
+  {
+    boolean failed = false;
+    List sortedTypeMatches = new ArrayList();
+    for (Iterator i = sortedAlternatives.iterator(); i.hasNext(); )
+    {
+      Alternative a = (Alternative) i.next();
+      if (a.matchesTypePart(tags, isValue))
+	sortedTypeMatches.add(a);
+    }
+  
+    for (Iterator valit = valueCombis.iterator(); valit.hasNext(); )
+    {
+      Alternative first = null;
+      long[] values = (long[]) valit.next();
+      for (Iterator i = sortedTypeMatches.iterator(); i.hasNext();)
+      {
+	Alternative a = (Alternative) i.next();
+	if (a.matchesValuePart(values, isValue))
+	  if (first == null)
+	    first = a;
+	  else if (!Alternative.less(first, a))
+	    {
+	      failed = true;
+	      User.warning
+		(method,
+		 "Ambiguity for method "+method+
+		 "\nFor parameters of type/value " + toString(tags, values, isValue)+
+		 "\nboth\n" + first.printLocated() + 
+		 "\nand\n" + a.printLocated() + "\nmatch.");
+	    }
+      }
+      if(first==null)
+      {
+	failed = true;
+	User.warning(method,
+		       "Method " + method + " is not completely covered:\n" + 
+		       "no alternative matches " + 
+		       toString(tags, values, isValue));
+      }
+    }
+    return failed;
+  }
+
+
   private static String toString(TypeConstructor[] tags)
   {
     StringBuffer res = new StringBuffer();
@@ -208,6 +271,23 @@ public final class Dispatch
       }
     return res.append(')').toString();
   }
+
+  private static String toString(TypeConstructor[] tags, long[] values, boolean[] isValue)
+  {
+    StringBuffer res = new StringBuffer();
+    res.append('(');
+    for (int i = 0, n = 0; i < tags.length; i++)
+      {
+	if(isValue[n]) 
+	  res.append(values[n++]);
+	else
+	 res.append(tags[n++]);
+	if (i + 1 < tags.length)
+	  res.append(", ");
+      }
+    return res.append(')').toString();
+  }
+
 
   /**
      Enumerate all the tuples of tags in the domain of a polytype.
@@ -336,4 +416,60 @@ public final class Dispatch
     }
     return tags;	
   }
+
+  /** Generate all combinations of integer values from the alternatives
+   */
+  private static List generateValues(List alternatives, boolean[] isValue)
+  {
+    List values = new ArrayList();
+    if (alternatives.size() < 1) return values;
+    int len = isValue.length;
+    for (int pos = 0; pos < len; pos++)
+    {
+      long[] valuesAtPos = new long[alternatives.size()];  
+      int valueCount = 0;
+      for (Iterator i = alternatives.iterator(); i.hasNext(); ) 
+      {
+	Pattern pat = ((Alternative)i.next()).getPatterns()[pos];
+	if (pat.atIntValue) {
+	  isValue[pos] = true;
+          valuesAtPos[valueCount++] = pat.value;
+	}	   
+      }
+      if (valueCount > 0)
+      {
+	List res = new ArrayList();
+	//remove duplicates
+	for (int i = 0; i < valueCount; i++)
+	  for (int j = i+1; j < valueCount; j++)
+	    if (valuesAtPos[i] == valuesAtPos[j])
+	      valuesAtPos[i] = valuesAtPos[--valueCount];	
+
+	if (values.size() == 0)
+	  for (int i = 0; i < valueCount; i++)
+	  {
+	    long[] arr2 = new long[len];
+	    arr2[pos] = valuesAtPos[i];
+	    res.add(arr2);
+	  }
+
+	else
+	  for (Iterator it = values.iterator(); it.hasNext(); )
+	  {
+	    long[] arr = (long[])it.next();
+	    for (int i = 0; i < valueCount; i++)
+	    {
+	      long[] arr2 = new long[len];
+	      System.arraycopy(arr,0,arr2,0,len);
+	      arr2[pos] = valuesAtPos[i];
+	        res.add(arr2);
+	    }
+	  }
+
+	values = res;
+      }
+    }
+    return values;
+  }
+  
 }

@@ -66,6 +66,7 @@ public class Pattern implements Located
     this.atValue = atValue;
     this.exactlyAt = exactlyAt;
     this.location = location;
+
     if (tc != null) 
       {
 	String ident = tc.getName().toString();
@@ -82,6 +83,36 @@ public class Pattern implements Located
                      new TypeIdent(new LocatedString("boolean",location));
 	  }
       }
+    else if (atValue != null && atValue instanceof ConstantExp)
+      {
+	this.atIntValue = true;
+	String typeName = "";
+ 	Object val = ((ConstantExp)atValue).value;
+
+	if (val instanceof Byte) {
+	  this.value = ((Byte)val).byteValue();
+	  typeName = "byte";
+        }
+	else if (val instanceof Short) {
+	  this.value = ((Short)val).shortValue();
+	  typeName = "short";
+        }
+	else if (val instanceof Character) {
+	  this.value = ((Character)val).charValue();
+	  typeName = "char";
+        }
+	else if (val instanceof Integer) {
+	  this.value = ((Integer)val).intValue();
+	  typeName = "int";
+        }
+	else if (val instanceof Long) {
+	  this.value = ((Long)val).longValue();
+	  typeName = "long";
+        }
+	this.typeConstructor = 
+                 new TypeIdent(new LocatedString(typeName,location));
+      }
+
   }
 
   public Pattern(LocatedString name)
@@ -100,6 +131,15 @@ public class Pattern implements Located
     this.atValue = atValue;
     this.exactlyAt = exactlyAt;
   }
+
+  Pattern(TypeConstructor tc, Expression atValue, long value)
+  {
+    this.tc = tc;
+    this.atValue = atValue;
+    this.value = value;
+    this.atIntValue = true;
+  }
+
 
   final mlsub.typing.Monotype getType()
   {
@@ -282,6 +322,9 @@ public class Pattern implements Located
     if (this.atBool())
       return that.tc == PrimitiveType.boolTC; 
 
+    if (that.atIntValue)
+      return this.atIntValue && (this.value == that.value);
+
     if (this.tc == that.tc)
       return this.exactlyAt || ! that.exactlyAt;
 
@@ -298,6 +341,9 @@ public class Pattern implements Located
 
     // a null tc is an unmatchable argument (e.g. function)
     if (tag == null)
+      return false;
+
+    if (atIntValue)
       return false;
 
     if (tag == PrimitiveType.trueBoolTC)
@@ -320,6 +366,15 @@ public class Pattern implements Located
       return Typing.testRigidLeq(tag, tc);
   }
 
+  public boolean matchesValue(long val)
+  {
+    if (atAny())
+      return true;
+    if (atIntValue)
+      return this.value == val;
+    return atPrimTypeFitting(val);
+  }
+
   /****************************************************************
    * Printing
    ****************************************************************/
@@ -330,7 +385,7 @@ public class Pattern implements Located
       return "@null";
     if (atAny())
       return "@_";
-    if (atBool())
+    if (atBool() || atIntValue)
       return "@" + atValue.toString();
     StringBuffer res = new StringBuffer();
     if (name != null)
@@ -368,6 +423,12 @@ public class Pattern implements Located
     if (atBool())
       return "@" + atValue.toString();
 
+    if (atIntValue)
+      if (tc == PrimitiveType.charTC) 
+	return "@" + atValue.toString();
+      else 
+        return "@" + (value >= 0 ? "+" : "") + Long.toString(value);
+
     return 
       (exactlyAt ? "#" : "@") 
       +
@@ -404,6 +465,28 @@ public class Pattern implements Located
 
     TypeConstructor tc = null;
     Expression atValue = null;
+
+    if (name.length() > 1)
+      {
+	if (name.charAt(0) == '\'')
+	  {
+	    atValue = ConstantExp.makeChar(new LocatedString(name.substring(1,name.length()-1),Location.nowhere()));
+	    return new Pattern(PrimitiveType.charTC, atValue, ((Character)((ConstantExp)atValue).value).charValue());
+	  }
+	if (name.charAt(0) == '+' || name.charAt(0) == '-')
+	  {
+	    if (name.charAt(0) == '+')
+	      name = name.substring(1);
+	    Object val = ((ConstantExp)ConstantExp.makeNumber(new LocatedString(name,Location.nowhere()))).value;
+	    if (val instanceof Byte)
+              return new Pattern(PrimitiveType.byteTC, null, ((Byte)val).byteValue());
+	    if (val instanceof Short)
+              return new Pattern(PrimitiveType.shortTC, null, ((Short)val).shortValue());
+	    if (val instanceof Integer)
+              return new Pattern(PrimitiveType.intTC, null, ((Integer)val).intValue());
+            return new Pattern(PrimitiveType.longTC, null, ((Long)val).longValue());
+	  }		
+      }
 
     if (name.equals("_"))
       tc = null;
@@ -450,6 +533,11 @@ public class Pattern implements Located
         return parameter;
       }
 
+    if (atIntValue)
+      return Inline.inline(nice.lang.inline.CompOp.create("lEq"),
+	 new gnu.expr.QuoteExp(new Long(value), gnu.bytecode.Type.long_type),
+         parameter);	
+
     gnu.bytecode.Type ct = nice.tools.code.Types.javaType(tc);
 
     if (exactlyAt)
@@ -487,6 +575,9 @@ public class Pattern implements Located
 
   private Location location;
 
+  public long value;
+  public boolean atIntValue = false;
+
   public boolean atNull() { return atValue == NullExp.instance; }
   public boolean atAny()  { return atValue == null && tc == null; }
   public boolean atBool() { 
@@ -498,4 +589,12 @@ public class Pattern implements Located
   public boolean atFalse() { 
     return atBool() && atValue.toString().equals("false");
   }
+  public boolean atPrimTypeFitting(long val){
+    return ( tc == PrimitiveType.longTC ) ||
+      (tc == PrimitiveType.intTC && val >= Integer.MIN_VALUE && val <= Integer.MAX_VALUE) ||
+      (tc == PrimitiveType.shortTC && val >= Short.MIN_VALUE && val <= Short.MAX_VALUE) ||
+      (tc == PrimitiveType.charTC && val >= Character.MIN_VALUE && val <= Character.MAX_VALUE) ||
+      (tc == PrimitiveType.byteTC && val >= Byte.MIN_VALUE && val <= Byte.MAX_VALUE);
+  }
+
 }

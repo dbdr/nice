@@ -1,3 +1,14 @@
+
+/**************************************************************************/
+/*                                                                        */
+/*  This program is free software; you can redistribute it and/or modify  */
+/*  it under the terms of the GNU General Public License as published by  */
+/*  the Free Software Foundation; either version 2 of the License, or     */
+/*  (at your option) any later version.                                   */
+/*                                                                        */
+/**************************************************************************/
+
+
 package nice.ui.common;
 
 
@@ -12,24 +23,6 @@ public <MappableVetoableChangeListenerHandler H, PropertyChangeKey K> NVetoableC
 //JDK1.4  public <ExceptionListenerHandler H> NExceptionListener[?] getNiceExceptionListeners(H);
 
 
-
-/**
- * methods to safely cast java listeners to their nice pendants
- * raises a NoNiceListenerException if this is not possible
- */
-
-NPropertyChangeListener toNicePropertyChangeListener(EventListener);
-toNicePropertyChangeListener(this) { throw new NoNiceListenerException("" + this.getClass().getName() + "is no instance of NPropertyChangeListener", listener: this); }
-toNicePropertyChangeListener(this@NPropertyChangeListener) = this;
-
-NVetoableChangeListener toNiceVetoableChangeListener(EventListener);
-toNiceVetoableChangeListener(this) { throw new NoNiceListenerException("" + this.getClass().getName() + "is no instance of NVetoableChangeListener", listener: this); }
-toNiceVetoableChangeListener(this@NVetoableChangeListener) = this;
-
-//JDK1.4  NExceptionListener toNiceExceptionListener(EventListener);
-//JDK1.4  toNiceExceptionListener(this) { throw new NoNiceListenerException("" + this.getClass().getName() + "is no instance of NExceptionListener", listener: this); }
-//JDK1.4  toNiceExceptionListener(this@NExceptionListener) = this;
-
 /**
  * DEFINITION of functions to make sure that NAWTFooListeners can only be requested 
  * from Gui Controls that are able to handle those NAWTFooListeners
@@ -40,12 +33,6 @@ getNicePropertyChangeListeners(this)
 	?java.util.List<NPropertyChangeListener> result = propertyChangeListeners.get(this.object());
 	return (result == null) ? null : result.toArray();
 }
-
-//getNicePropertyChangeListeners(this@PropertyChangeSupport)
-//{
-//	?java.util.List<NPropertyChangeListener> result = propertyChangeListeners.get(this.object());
-//	return (result == null) ? null : result.toArray();
-//}
 
 getNiceVetoableChangeListeners(this)
 {
@@ -65,17 +52,14 @@ getNiceVetoableChangeListeners(this,propertyName@String)
 	return (result == null) ? null : result.toArray();
 }
 
-//getNicePropertyChangeListeners(this@BeanContextChildSupport,propertyName@String)
-//{
-//	?java.util.List<NPropertyChangeListener> result = mappablePropertyChangeListeners.get((this.object(),propertyName));
-//	return (result == null) ? null : result.toArray();
-//}
-//
-//getNiceVetoableChangeListeners(this@BeanContextChildSupport,propertyName@String)
-//{
-//	?java.util.List<NVetoableChangeListener> result = mappableVetoableChangeListeners.get((this.object(),propertyName));
-//	return (result == null) ? null : result.toArray();
-//}
+//JDK1.4  getNiceExceptionListeners(this@Encoder)
+//JDK1.4  {
+//JDK1.4    EventListener[?] listeners = this.getExceptionListeners();
+//JDK1.4    return (listeners == null) ? null : fill(new NExceptionListener[listeners.length], int i => listeners[i].toNiceExceptionListener());
+//JDK1.4  }
 
-//JDK1.4  getNiceExceptionListeners(this@Encoder) = cast(this.getExceptionListeners());
-//JDK1.4  getNiceExceptionListeners(this@XMLDecoder) = cast(this.getExceptionListeners());
+//JDK1.4  getNiceExceptionListeners(this@XMLDecoder)
+//JDK1.4  {
+//JDK1.4    EventListener[?] listeners = this.getExceptionListeners();
+//JDK1.4    return (listeners == null) ? null : fill(new NExceptionListener[listeners.length], int i => listeners[i].toNiceExceptionListener());
+//JDK1.4  }

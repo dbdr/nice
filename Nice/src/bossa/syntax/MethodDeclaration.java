@@ -125,6 +125,11 @@ public abstract class MethodDeclaration extends Definition
     return String.valueOf(getReturnType());
   }
 
+  boolean isIgnored()
+  {
+    return false;
+  }
+
   /****************************************************************
    * Typechecking
    ****************************************************************/
@@ -185,6 +190,9 @@ public abstract class MethodDeclaration extends Definition
   
   void typecheck()
   {
+    if (isIgnored())
+      return;
+
     // what we do here is equivalent to getType().checkWellFormedness();
     // except we also want to find the bytecode types when
     // the constraint is asserted
@@ -309,6 +317,11 @@ public abstract class MethodDeclaration extends Definition
       return null;
     }
 
+    boolean isIgnored()
+    {
+      return getMethodDeclaration().isIgnored();
+    }
+
     void checkSpecialRequirements(Expression[] arguments)
     {
       getMethodDeclaration().checkSpecialRequirements(arguments);
@@ -316,6 +329,9 @@ public abstract class MethodDeclaration extends Definition
 
     void resolve()
     {
+      if (isIgnored())
+        return;
+
       // Check that resolving has not already been done.
       if (syntacticType != null)
         {

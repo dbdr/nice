@@ -70,6 +70,11 @@ public abstract class VarSymbol extends Node implements Located
     return null;
   }
 
+  boolean isIgnored()
+  {
+    return false;
+  }
+
   void checkSpecialRequirements(Expression[] arguments)
   {
     // Do nothing by default.

@@ -77,6 +77,11 @@ public class RetypedJavaMethod extends JavaMethod
   
   private List /* of LocatedString */ javaTypes;
   
+  boolean isIgnored()
+  {
+    return ignoredRetyping;
+  }
+
   /****************************************************************
    * Code generation
    ****************************************************************/
@@ -230,8 +235,6 @@ public class RetypedJavaMethod extends JavaMethod
     if (!inInterfaceFile())
       User.warning(loc, message);
 
-    //trick to avoid errors later in compilation
-    getSymbol().syntacticType = new Polytype(PrimitiveType.synVoidType);
     ignoredRetyping = true;
   }
  

@@ -25,8 +25,9 @@ ANT_CLASSPATH= ${shell if [ "z${NICE_ANTJAR}" != "z" ] ; \
 SHELL = /bin/sh
 TOP=${PWD}
 
-java = java
+java  = java
 javac = javac
+jar   = jar
 
 JAVAC_FLAGS = -O -g
 
@@ -67,14 +68,14 @@ compiler2 compiler3: setDate
 archiveOld: src/nice/tools/compiler/console.jar
 	mkdir -p share/java
 	cp src/nice/tools/compiler/console.jar share/java/nice.jar
-	jar umf src/nice/tools/compiler/Manifest share/java/nice.jar -C classes nice -C classes mlsub -C classes bossa -C classes gnu -C classes.old bossa -C classes.old mlsub -C classes.old nice
-	if [ -r classes/lang/package.nicei ]; then cd classes; jar uf ../share/java/nice.jar nice/*/package.nicei; fi
+	$(jar) umf src/nice/tools/compiler/Manifest share/java/nice.jar -C classes nice -C classes mlsub -C classes bossa -C classes gnu -C classes.old bossa -C classes.old mlsub -C classes.old nice
+	if [ -r classes/lang/package.nicei ]; then cd classes; $(jar) uf ../share/java/nice.jar nice/*/package.nicei; fi
 
 archive archive2 archive3 share/java/nice.jar: src/nice/tools/compiler/console.jar
 	mkdir -p share/java
 	cp src/nice/tools/compiler/console.jar share/java/nice.jar
-	jar umf src/nice/tools/compiler/Manifest share/java/nice.jar -C classes nice -C classes mlsub -C classes bossa -C classes gnu
-	if [ -r classes/lang/package.nicei ]; then cd classes; jar uf ../share/java/nice.jar nice/*/package.nicei; fi
+	$(jar) umf src/nice/tools/compiler/Manifest share/java/nice.jar -C classes nice -C classes mlsub -C classes bossa -C classes gnu
+	if [ -r classes/lang/package.nicei ]; then cd classes; $(jar) uf ../share/java/nice.jar nice/*/package.nicei; fi
 
 
 install: share/java/nice.jar
@@ -120,12 +121,12 @@ GCJ=gcj
 GCJTEMP = /tmp/Nice-gcj.jar
 gcj:
 	cp src/nice/tools/compiler/console.jar $(GCJTEMP)
-	jar umf src/mainClass $(GCJTEMP) -C classes nice/doc -C classes nice/getopt -C classes nice/lang -C classes nice/tools/ast -C classes nice/tools/code -C classes nice/tools/compiler -C classes nice/tools/util -C classes mlsub -C classes bossa -C classes gnu
+	$(jar) umf src/mainClass $(GCJTEMP) -C classes nice/doc -C classes nice/getopt -C classes nice/lang -C classes nice/tools/ast -C classes nice/tools/code -C classes nice/tools/compiler -C classes nice/tools/util -C classes mlsub -C classes bossa -C classes gnu
 	$(GCJ) --main=nice.tools.compiler.fun -o bin/nicec.bin $(GCJTEMP)
 
 gcj-testsuite:
 	cp src/nice/tools/compiler/console.jar $(GCJTEMP)
-	jar umf src/mainClass $(GCJTEMP) -C classes nice/doc -C classes nice/getopt -C classes nice/lang -C classes nice/tools/ast -C classes nice/tools/code -C classes nice/tools/compiler -C classes nice/tools/util -C classes nice/tools/testsuite -C classes mlsub -C classes bossa -C classes gnu
+	$(jar) umf src/mainClass $(GCJTEMP) -C classes nice/doc -C classes nice/getopt -C classes nice/lang -C classes nice/tools/ast -C classes nice/tools/code -C classes nice/tools/compiler -C classes nice/tools/util -C classes nice/tools/testsuite -C classes mlsub -C classes bossa -C classes gnu
 	$(GCJ) -g --main=nice.tools.testsuite.TestNice -o bin/testsuite.bin $(GCJTEMP)
 
 clean:

@@ -229,43 +229,46 @@ public class MethodBodyDefinition extends Definition
         MethodDeclaration.Symbol[] tempSymbols = new MethodDeclaration.Symbol[symbols.size()];
 	symbols.toArray(tempSymbols);
         int size = symbols.size();
+	symbols = new LinkedList();
         int len = formals.length;
 	boolean[] removed = new boolean[size];
         for (int m1 = 0; m1 < size; m1++)
           {
 	    Monotype[] dom1 = tempSymbols[m1].getDefinition().getType().domain();
-	    for (int m2 = 0; m2 < size && !removed[m1]; m2++)
+	    for (int m2 = 0; m2 < size; m2++)
 	      if (m1 != m2)
                 {
                   boolean remove = true;
 		  boolean additionalsEqual = true;
 		  Monotype[] dom2 = tempSymbols[m2].getDefinition().getType().domain();
-		  for (int i = 0; i < len && remove; i++)
-                    {
-	  	      try {
-		        domainMonotypeLeq(dom2[i], dom1[i]);
-		        try {
-		          domainMonotypeLeq(dom1[i], dom2[i]);
-		        }
-		        catch (TypingEx e) {
-                          if (additionalTags[i] != null)
+		  for (int i = 0; i < len; i++)
+		    if (additionalTags[i] != null)
+		      {
+	  	        try {
+		          domainMonotypeLeq(dom2[i], dom1[i]);
+		          try {
+		            domainMonotypeLeq(dom1[i], dom2[i]);
+		          }
+		          catch (TypingEx e) {
 			    additionalsEqual = false;
+		          }
+		        }
+		        catch(TypingEx e) {
+		          remove = false;
+                          break;
 		        }
 		      }
-		      catch(TypingEx e) {
-                        //ignore arguments with additional.
-		        remove = additionalTags[i] == null;
-		      }
-		    }
+
                   //may not remove a method that is equal for the arguments with an additional.
 		  removed[m1] = remove && !additionalsEqual;
+                  if (removed[m1])
+		    break;
 	        }
+
+	    if (!removed[m1])
+	      symbols.add(tempSymbols[m1]);
 	  }
 
-        symbols = new LinkedList();
-	for (int i = 0; i < size; i++)
-	  if (!removed[i])
-	    symbols.add(tempSymbols[i]);
       }
 
     if(symbols.size() == 1) 

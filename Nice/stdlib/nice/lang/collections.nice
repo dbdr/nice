@@ -39,8 +39,11 @@ import java.util.*;
 }
 
 
+/** @deprecated */
+<T> void keep  (Collection<T> c, T->boolean test) = c.retain(test);
+
 /** Modifies c, only keeping the elements for which test returns true. */
-<T> void keep  (Collection<T> c, T->boolean test)
+<T> void retain (Collection<T> c, T->boolean test)
 {
   Iterator<T> i = c.iterator();
   while (i.hasNext())
@@ -52,7 +55,7 @@ import java.util.*;
 }
 
 /** Modifies c, removing the elements for which test returns true. */
-<T> void remove(Collection<T> c, T->boolean test)
+<T> void remove (Collection<T> c, T->boolean test)
 {
   Iterator<T> i = c.iterator();
   while (i.hasNext())
@@ -167,24 +170,33 @@ class NiceComparator<T> implements java.util.Comparator
  * Standard operations
  ****************************************************************/
 
-<Any T> boolean has (java.util.List<T> s, T->boolean test)
+/** @deprecated */
+<Any T> boolean has (java.util.List<T> s, T->boolean test) = s.contains(test);
+
+<Any T> boolean contains (java.util.List<T> s, T->boolean test)
 {
   for (int i = 0; i < s.size(); i++)
-    if (test(s.get(i)))
+    if (test(s[i]))
       return true;
 
   return false;
 }
 
+/** Find the first element that passes the given test.
+    @throw java.util.NoSuchElementException if there is no such element.
+*/
 <Any T> T find (java.util.List<T> s, T->boolean test)
 {
   for (int i = 0; i < s.size(); i++)
-    if (test(s.get(i)))
-      return s.get(i);
+    if (test(s[i]))
+      return s[i];
 
   throw new java.util.NoSuchElementException();
 }
 
+/** Find the last element that passes the given test.
+    @throw java.util.NoSuchElementException if there is no such element.
+*/
 <Any T> T findLast (java.util.List<T> s, T->boolean test)
 {
   for (int i = s.size(); --i >= 0;)
@@ -194,19 +206,37 @@ class NiceComparator<T> implements java.util.Comparator
   throw new java.util.NoSuchElementException();
 }
 
-<Any T> ?T find (java.util.List<!T> s, !T->boolean test)
+/** Find the first element that passes the given test.
+    Returns <code>null</code> if there is no such element.
+*/
+<Any T> ?T search (java.util.List<!T> s, !T->boolean test)
 {
   for (int i = 0; i < s.size(); i++)
-    if (test(s.get(i)))
-      return s.get(i);
+    if (test(s[i]))
+      return s[i];
 
   return null;
 }
 
-<Any T> int findIndex (List<T> s, T->boolean test)
+/** Find the last element that passes the given test.
+    Returns <code>null</code> if there is no such element.
+*/
+<Any T> ?T searchLast (java.util.List<!T> s, !T->boolean test)
+{
+  for (int i = s.size(); --i >= 0;)
+    if (test(s[i]))
+      return s[i];
+
+  return null;
+}
+
+/** @deprecated */
+<Any T> int findIndex (List<T> s, T->boolean test) = s.findIndex(test);
+
+<Any T> int indexOf (List<T> s, T->boolean test)
 {
   for (int i = 0; i < s.size(); i++)
-    if (test(s.get(i)))
+    if (test(s[i]))
       return i;
 
   throw new java.util.NoSuchElementException();
@@ -215,7 +245,7 @@ class NiceComparator<T> implements java.util.Comparator
 boolean or(java.util.List<boolean> s)
 {
   for (int i = 0; i < s.size(); i++)
-    if (s.get(i))
+    if (s[i])
       return true;
 
   return false;
@@ -226,8 +256,8 @@ long max(java.util.List<long> s)
   long res = 0;
 
   for(int i = 0; i < s.size(); i++)
-    if (s.get(i) > res)
-      res = s.get(i);
+    if (s[i] > res)
+      res = s[i];
 
   return res;
 }

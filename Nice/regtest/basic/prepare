@@ -1,0 +1,14 @@
+#! /bin/sh
+
+# This script must be run after each change to coreJava.code
+# to produce the Java and Nice versions of the test package
+
+if newer Nop.class Nop.java; then
+  echo "(skipped)"
+  exit
+fi
+
+CLASSPATH=.:$CLASSPATH
+export CLASSPATH
+
+javac -classpath $PWD/../../classes Nop.java

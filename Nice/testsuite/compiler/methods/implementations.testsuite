@@ -76,6 +76,13 @@ paint(p@java.awt.Component, g) {
 
 /// FAIL
   /// Toplevel
+  abstract class X {}
+ 
+  void foo(X);
+  foo(#X){}
+
+/// FAIL
+  /// Toplevel
 class A {}
 class B extends A{}
 

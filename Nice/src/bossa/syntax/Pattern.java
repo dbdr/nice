@@ -109,11 +109,11 @@ public class Pattern implements Located
     if (typeConstructor != null)
       {
 	tc = typeConstructor.resolveToTC(scope);
-        if (exactlyAt && TypeConstructors.isInterface(tc))
+        if (exactlyAt && !TypeConstructors.instantiable(tc))
           User.error
 	    (typeConstructor.location(), 
 	     "Pattern #" + typeConstructor +
-	     " cannot be matched because interfaces do not have direct instances.");
+	     " cannot be matched because interfaces and abstract classes do not have direct instances.");
 	typeConstructor = null;
       }
     if (additional != null)

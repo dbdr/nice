@@ -83,12 +83,12 @@
   let Color red = new Color();
   let Color blue = new Color();
   let Color green = new Color();
-  String string(Color);
-  string(color) = "unknown color";
-  string(=red) = "red";
-  string(=blue) = "blue";
-  string(=green) = "green";
+  String name(Color);
+  name(color) = "unknown color";
+  name(=red) = "red";
+  name(=blue) = "blue";
+  name(=green) = "green";
   /// package b import a
-  assert red.string().equals("red");
-  assert blue.string().equals("blue");
-  assert green.string().equals("green");
+  assert red.name().equals("red");
+  assert blue.name().equals("blue");
+  assert green.name().equals("green");

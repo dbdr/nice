@@ -44,12 +44,12 @@
 /// PASS
   /// package a
   /// Toplevel
-  void foo(char);
-  foo(@char) {}
-  foo(='a') {}
-
+  boolean foo(char);
+  foo(@char) = false;
+  foo(='\1') = true;
+  foo(='\3') = false;
   /// package b import a
-  ;
+  assert foo('\1');
 
 /// FAIL
  /// Toplevel

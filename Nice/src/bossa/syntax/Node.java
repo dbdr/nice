@@ -90,7 +90,7 @@ abstract public class Node
     return c;
   }
 
-  void addSymbol(VarSymbol s)
+  void addSymbol(/*VarSymbol*/Symbol s)
   {
     if (varSymbols == null)
       varSymbols = new ArrayList();

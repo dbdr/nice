@@ -202,29 +202,21 @@ void _printStackTraceWithSourceInfo(Throwable t) =
  * in Nice, with precise types for the fields.
  ****************************************************************/
 
-LocatedString name(VarSymbol) = native VarSymbol.name;
-Arguments.Argument[] arguments(Arguments) = native Arguments.arguments;
-Arguments Argument(List<Arguments.Argument>) = native new Arguments(List);
-Arguments Argument(Arguments.Argument[]) = native new Arguments(Arguments.Argument[]);
 mlsub.typing.Polytype getType(Expression) = 
   native mlsub.typing.Polytype Expression.getType();
 GlobalTypeScope getGlobalTypeScope() = native GlobalTypeScope Node.getGlobalTypeScope();
-?gnu.bytecode.ClassType staticClass(Arguments) = native gnu.bytecode.ClassType Arguments.staticClass();
 ?gnu.bytecode.ClassType staticClass(Expression) = native gnu.bytecode.ClassType Expression.staticClass();
-Map<VarSymbol,mlsub.typing.Polytype> types(Arguments) = native Arguments.types;
 <T> String map(String, String, String, T[]) = native String bossa.util.Util.map(String, String, String, Object[]);
 <T> String map(String, String, String, ?Collection<T>) = native String bossa.util.Util.map(String, String, String, Collection);
 ?mlsub.typing.lowlevel.Kind getKind(mlsub.typing.lowlevel.Element) = native mlsub.typing.lowlevel.Kind mlsub.typing.lowlevel.Element.getKind();
 ?gnu.expr.Declaration getDeclaration(Expression) = native gnu.expr.Declaration Expression.getDeclaration();
 ?Object getFieldAccessMethod(Expression) = native Object Expression.getFieldAccessMethod();
 ?Object getField(Expression) = native Object Expression.getField();
-?Object getFieldAccessMethod(VarSymbol) = native Object VarSymbol.getFieldAccessMethod();
 ?mlsub.typing.Monotype Types_getTypeParameter(mlsub.typing.Polytype, int) = native mlsub.typing.Monotype nice.tools.typing.Types.getTypeParameter(mlsub.typing.Polytype, int);
 ?mlsub.typing.Monotype Types_getTypeParameter(mlsub.typing.Monotype, int) = native mlsub.typing.Monotype nice.tools.typing.Types.getTypeParameter(mlsub.typing.Monotype, int);
 mlsub.typing.Monotype[?] Types_parameters(mlsub.typing.Polytype) = native mlsub.typing.Monotype[] nice.tools.typing.Types.parameters(mlsub.typing.Polytype);
 ?mlsub.typing.TypeConstructor head(mlsub.typing.Monotype) = native mlsub.typing.TypeConstructor mlsub.typing.Monotype.head();
 ?gnu.bytecode.ClassType getSuperclass(gnu.bytecode.ClassType) = native gnu.bytecode.ClassType gnu.bytecode.ClassType.getSuperclass();
-int[?] getUsedArguments(Arguments, VarSymbol) = native int[] Arguments.getUsedArguments(VarSymbol);
 ?mlsub.typing.Constraint getConstraint(mlsub.typing.Polytype) = native mlsub.typing.Constraint mlsub.typing.Polytype.getConstraint();
 mlsub.typing.AtomicConstraint[?] AtomicConstraint_substitute(java.util.Map<mlsub.typing.TypeSymbol,mlsub.typing.TypeSymbol>, AtomicConstraint[?]) = native mlsub.typing.AtomicConstraint[] mlsub.typing.AtomicConstraint.substitute(java.util.Map, mlsub.typing.AtomicConstraint[]);
 Module module(Definition) = native Definition.module;
@@ -232,7 +224,6 @@ Module module(Definition) = native Definition.module;
 boolean equals(LocatedString, LocatedString) = native boolean LocatedString.equals(LocatedString);
 ?gnu.bytecode.Attribute get(gnu.bytecode.AttrContainer, String) = native gnu.bytecode.Attribute gnu.bytecode.Attribute.get(gnu.bytecode.AttrContainer, String);
 void printInterface(Definition, java.io.PrintWriter) = native void Definition.printInterface(java.io.PrintWriter);
-?gnu.expr.Declaration getDeclaration(VarSymbol) = native gnu.expr.Declaration VarSymbol.getDeclaration();
 void printInterface(ClassImplementation, java.io.PrintWriter) = native void ClassImplementation.printInterface(java.io.PrintWriter);
 ?gnu.bytecode.Type TypeImport_lookup(LocatedString) = native gnu.bytecode.Type nice.tools.code.TypeImport.lookup(LocatedString);
 List<Node> children(Node) = native Node.children;
@@ -244,8 +235,7 @@ AST AST(List<Definition>, int) = native new AST(List, int);
 ?mlsub.typing.TypeSymbol lookup(TypeMap, String) = native mlsub.typing.TypeSymbol TypeMap.lookup(String);
 List<VarSymbol> lookup(VarScope, LocatedString) = native List VarScope.lookup(LocatedString);
 Map<gnu.bytecode.Type,mlsub.typing.TypeConstructor> javaTypeConstructors(bossa.modules.Compilation ) = native bossa.modules.Compilation.javaTypeConstructors;
-Map<VarSymbol, int[]> usedArguments(Arguments) = native Arguments.usedArguments;
-Map<VarSymbol, Expression[]> applicationExpressions(Arguments) = native Arguments.applicationExpressions;
+LocatedString name(Symbol) = native Symbol.name;
 
 // Retypings needed since java types are not strict.
 mlsub.typing.Polytype boolPolytype() = native nice.tools.typing.PrimitiveType.boolPolytype;

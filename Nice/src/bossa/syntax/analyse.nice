@@ -533,7 +533,7 @@ Expression analyseIdent(IdentExp e, Info info, boolean assigned)
 	  if (sym.isNonStaticFieldAccess() && Node.thisExp != null)
             {
 	      CallExp res = new CallExp(function: createOverloadedSymbolExp(symbols, notNull(e.ident)),
-	        	arguments: Arguments.singleArgument(Node.thisExp));
+	        	arguments: new Arguments(arguments: [new Argument(value: notNull(Node.thisExp))]));
               res.setLocation(e.location());
               return res;
             }
@@ -542,7 +542,7 @@ Expression analyseIdent(IdentExp e, Info info, boolean assigned)
 	    {
 	      // Make an implicit call to fetch the static field's value.
 	      CallExp res = new CallExp(function: createOverloadedSymbolExp(symbols, notNull(e.ident)), 
-	         		arguments: Arguments.noArguments());
+	         		arguments: new Arguments(arguments: []));
               res.setLocation(e.location());
               return res;
 	    }

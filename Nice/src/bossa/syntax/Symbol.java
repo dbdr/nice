@@ -12,41 +12,22 @@
 
 package bossa.syntax;
 
-import bossa.util.*;
-
 /**
-   Assignment.
- */
-public class AssignExp extends Expression
-{
-  Expression to;
-  Expression value;
+   A variable (local, field of a class, parameter of a method or function).
+   temporarily abstract superclass of VarSymbol
+*/
 
-  computeType()
+public abstract class Symbol extends Node
+{
+  public Symbol(LocatedString name)
   {
-    this.type = value.getType();
+    super(Node.upper);
+    this.name = name;
+    addSymbol(this);
   }
-  
-  compile() = to.compileAssign(value.generateCode());
-  
-  toString() = to + " = " + value;
-}
 
-/**
-   Create the assignment expression, applying rewrite rules first. 
- */
-public Expression createAssignExp(Expression to, Expression value)
-{
-  // Rewrite "get(e, i, ...) = v" into "set(e, i, ... , v)"
-  if (to instanceof CallExp && "get".equals(to.function.toString()))
-    {
-      List<Argument> args = new ArrayList(to.arguments.arguments);
-      args.add(new Argument(value: value)); 
+  LocatedString name;
 
-      return createCallExp(
-	createIdentExp(new LocatedString("set", to.function.location())),
-        new Arguments(arguments: args.toArray()));
-    }  
-
-  return new AssignExp(to: to, value: value);
+  // commenting this triggers a bug
+  abstract mlsub.typing.Polytype getType();
 }

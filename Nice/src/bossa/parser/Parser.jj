@@ -2237,11 +2237,11 @@ Expression PrimarySuffix(Expression start) :
 }
 {
   { Token t; List bracketArgs = new ArrayList();
-    bracketArgs.add(new Arguments.Argument(start)); }
-  t="[" res=Expression() {bracketArgs.add(new Arguments.Argument(res));} 
-    ( "," res=Expression() {bracketArgs.add(new Arguments.Argument(res));} )*
+    bracketArgs.add(new Argument(start)); }
+  t="[" res=Expression() {bracketArgs.add(new Argument(res));} 
+    ( "," res=Expression() {bracketArgs.add(new Argument(res));} )*
   "]"
-  { return bossa.syntax.dispatch.createCallExp(symb("get",t,false),new Arguments(bracketArgs)); }
+  { return bossa.syntax.dispatch.createCallExp(symb("get",t,false),bossa.syntax.dispatch.createArguments(bracketArgs)); }
 |
   "." res=identExp()
   [ LOOKAHEAD(1) // a.f(x) is parsed as f(a, x), not as (f(a))(x)
@@ -2250,7 +2250,7 @@ Expression PrimarySuffix(Expression start) :
     boolean hasBrackets = args != null;
 
     if (args == null)
-      args = Arguments.singleArgument(start);
+      args = new Arguments(new Argument[]{new Argument(start)});
     else
       args.addReceiver(start);
 
@@ -2298,7 +2298,7 @@ Expression atExpression() :
 { Token t; }
 {
   (t="@")
-  { return bossa.syntax.dispatch.createCallExp(symb(t), Arguments.noArguments()); }
+  { return bossa.syntax.dispatch.createCallExp(symb(t), new Arguments(new Argument[0])); }
 }
 
 ConstantExp patternLiteral() :
@@ -2334,7 +2334,7 @@ Expression ExpLocalVariable():
   { return bossa.syntax.dispatch.createExpLocalVariable(name, value, constant, type); }
 }
 
-Arguments.Argument argument():
+Argument argument():
 {
   Expression e;
   LocatedString id = null;
@@ -2347,13 +2347,13 @@ Arguments.Argument argument():
   [ LOOKAHEAD(ident() ":") id = ident() ":" ]
   e = Expression()
 )
-  { return new Arguments.Argument(e, id); }
+  { return new Argument(e, id); }
 }
 
 Arguments arguments(boolean leaveRoomForReceiver):
 {
   List res = new ArrayList();
-  Arguments.Argument a;
+  Argument a;
 }
 {
   "("
@@ -2363,7 +2363,7 @@ Arguments arguments(boolean leaveRoomForReceiver):
     ( "," a = argument() { res.add(a); } )*
   ]
   ")"
-  { return new Arguments(res); }
+  { return bossa.syntax.dispatch.createArguments(res); }
 }
 
 /*

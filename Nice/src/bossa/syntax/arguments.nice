@@ -1,7 +1,7 @@
 /**************************************************************************/
 /*                                N I C E                                 */
 /*             A high-level object-oriented research language             */
-/*                        (c) Daniel Bonniot 2000                         */
+/*                        (c) Daniel Bonniot 2004                         */
 /*                                                                        */
 /*  This program is free software; you can redistribute it and/or modify  */
 /*  it under the terms of the GNU General Public License as published by  */
@@ -18,80 +18,42 @@ import bossa.util.*;
 /**
    Arguments of a function call.
 
-   @version $Date$
-   @author Daniel Bonniot (d.bonniot@mail.dotcom.fr)
  */
-
 public class Arguments
 {
-  public static class Argument
-  {
-    public Argument(Expression value)
-    {
-      this.value = value;
-    }
-    
-    public Argument(Expression value, LocatedString name)
-    {
-      this.value = value;
-      this.name = name;
-    }
+  Argument[] arguments;
 
-    public String toString()
-    {
-      return (name == null ? "" : name + ":" ) + value;
-    }
-    
-    private Expression value;
-    LocatedString name;
-  }
+  /** Hold real parameter, after default parameters
+      and parameter reordering has been done.
+  */
+  Expression[?] computedExpressions = null;
+
+  java.util.Map<VarSymbol, Expression[]> applicationExpressions = new java.util.HashMap();
+  // Map actual arguments to formal arguments. Indexes are 1-based.
+  java.util.Map<VarSymbol, int[]> usedArguments = new java.util.HashMap();
   
-  public Arguments(java.util.List args)
-  {
-    this.arguments = (Argument[]) args.toArray(new Argument[args.size()]);
-  }
-
-  public Arguments(Argument[] arguments)
-  {
-    this.arguments = arguments;
-  }
-
-  public static Arguments noArguments() 
-  {
-    return new Arguments(new Argument[0]);
-  }
-
-  public static Arguments singleArgument(Expression value)
-  {
-    Argument[] args = {new Argument(value)};
-    return new Arguments(args);
-  }
+  java.util.Map<VarSymbol,mlsub.typing.Polytype> types = new java.util.HashMap();
 
   public void addReceiver(Expression value)
   {
     if (arguments[0] != null)
       Internal.error("No room for \"receiver\"");
     
-    arguments[0] = new Argument(value, null);
+    arguments[0] = new Argument(value: value);
   }
 
-  void add(Expression arg, LocatedString name)
+  void add(Expression arg, ?LocatedString name)
   {
-    Argument[] newArgs = new Argument[arguments.length + 1];
+    Argument[] newArgs = cast(new Argument[arguments.length + 1]);
     System.arraycopy(arguments, 0, newArgs, 0, arguments.length);
-    newArgs[arguments.length] = new Argument(arg, name);
+    newArgs[arguments.length] = new Argument(value: arg, name: name);
     arguments = newArgs;
   }
 
-  /** Hold real parameter, after default parameters
-      and parameter reordering has been done.
-  */
-  Expression[] computedExpressions;
-  
   int size()
   {
     if (computedExpressions != null)
-      return computedExpressions.length;
+      return notNull(computedExpressions).length;
     else
       return arguments.length;
   }
@@ -104,7 +66,7 @@ public class Arguments
   Expression getExp(int num)
   {
     if (computedExpressions != null)
-      return computedExpressions[num];
+      return notNull(computedExpressions)[num];
     else
       return arguments[num].value;
   }
@@ -131,7 +93,7 @@ public class Arguments
     if (arguments.length == 0)
       return Expression.noExpressions;
 
-    Expression[] res = new Expression[arguments.length];
+    Expression[] res = cast(new Expression[arguments.length]);
     
     for (int i = arguments.length; --i>=0; )
       res[i] = arguments[i].value;
@@ -139,37 +101,24 @@ public class Arguments
     return res;
   }
   
-  gnu.bytecode.ClassType staticClass()
+  ?gnu.bytecode.ClassType staticClass()
   {
-    gnu.bytecode.ClassType res = getExp(0).staticClass();
+    let res = this.getExp(0).staticClass();
     
     if (res != null)
       // the first argument was fake, remove it
       {
-	Argument[] newArgs = new Argument[arguments.length - 1];
+	Argument[] newArgs = cast(new Argument[arguments.length - 1]);
 	System.arraycopy(arguments, 1, newArgs, 0, newArgs.length);
 	arguments = newArgs;
       }
     
     return res;
   }
-
-  java.util.Map applicationExpressions = new java.util.HashMap();
   
-  Expression[] getExpressions(VarSymbol s)
-  {
-    return (Expression[]) applicationExpressions.get(s);
-  }
+  Expression[?] getExpressions(VarSymbol s) = applicationExpressions.get(s);
   
-  // Map actual arguments to formal arguments. Indexes are 1-based.
-  java.util.Map usedArguments = new java.util.HashMap();
-  
-  int[] getUsedArguments(VarSymbol s)
-  {
-    return (int[]) usedArguments.get(s);
-  }
-  
-  java.util.Map types = new java.util.HashMap();
+  int[?] getUsedArguments(VarSymbol s) = usedArguments.get(s);
 
   /**
      return true if there are arity non-tagged arguments.
@@ -183,14 +132,11 @@ public class Arguments
       if (arguments[i].name != null)
 	return false;
 
-    applicationExpressions.put(symbol, inOrder());
+    applicationExpressions.put(symbol, this.inOrder());
     return true;
   }
 
-  public String toString()
-  {
-    return "(" + Util.map("", ", ", "", arguments) + ")";
-  }
+  toString() = "(" + Util.map("", ", ", "", arguments) + ")";
 
   public String toStringInfix()
   {
@@ -205,11 +151,22 @@ public class Arguments
   {
     StringBuffer res = new StringBuffer("(");
     for (int i = 0; i<arguments.length; i++)
-      res.append((arguments[i].name == null ? "" : arguments[i].name + ":") + 
+      res.append((arguments[i].name == null ? "" : notNull(arguments[i].name) + ":") + 
 		 arguments[i].value.getType() + 
 		 (i + 1 < arguments.length ? ", " : ""));
     return res.append(")").toString();
   }
+}
 
-  Argument[] arguments;
+public Arguments createArguments(List<Argument> args)
+{
+  return new Arguments(arguments: args.toArray());
+}
+
+public class Argument
+{
+  private Expression value;
+  ?LocatedString name = null;
+
+  toString() = (name == null ? "" : notNull(name) + ":" ) + value;
 }

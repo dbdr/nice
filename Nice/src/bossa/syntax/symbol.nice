@@ -12,6 +12,113 @@
 
 package bossa.syntax;
 
+import bossa.util.*;
+
+/**
+   A variable (local, field of a class, parameter of a method or function).
+
+*/
+public abstract class VarSymbol extends Symbol implements Located
+{
+  private ?gnu.expr.Declaration decl = null;
+  private boolean isThis = false;
+
+  location() = notNull(name.location());
+  
+  public LocatedString getName() = name;
+
+  public boolean hasName(LocatedString i) = this.name.equals(i);
+
+  boolean isAssignable() = true;
+
+  boolean isFieldAccess() = this.getFieldAccessMethod() != null;
+
+  ?FieldAccess getFieldAccessMethod() = null;
+
+  public ?MethodDeclaration getMethodDeclaration() = null;
+
+  boolean isIgnored() = false;
+
+  void checkSpecialRequirements(Expression[?] arguments)
+  {
+    // Do nothing by default.
+  }
+
+  public ?Definition getDefinition() = null;
+
+  // uncommenting this triggers a bug
+//  mlsub.typing.Polytype getType();
+
+  /**
+     @return
+     0 : doesn't match
+     1 : wasn't even a function
+     2 : matches
+  */
+  int match(Arguments arguments) = 1;
+
+  /**
+   * Specialized by MethodSymbol only.
+   */
+  String defaultExplainWhyMatchFails(Arguments arguments)
+  {
+    return this.explainWhyMatchFails(arguments);
+  }
+    
+  /** This returns a generic explanation.
+      A more precise message should be returned if possible in subclasses.
+  */
+  String explainWhyMatchFails(Arguments arguments)
+  {
+    return "Incorrect call to " + name;
+  }
+
+  // explained in OverloadedSymbolExp
+  void makeClonedType();
+  void releaseClonedType();
+  mlsub.typing.Polytype getClonedType();
+  
+  /** @return code that accesses this variable. */
+  gnu.expr.Expression compile()
+  {
+    // Allow a sub-class to compute decl a la demande in getDeclaration().
+    let decl = this.getDeclaration();
+
+    if (decl == null)
+      Internal.error(this + " has no bytecode declaration");
+    
+    if (isThis)
+      return new gnu.expr.ThisExp(decl);
+    else
+      return new gnu.expr.ReferenceExp(name == null ? null : name.toString(), 
+				       decl);
+  }
+
+  /** @return code that accesses this variable, when it is used
+      as the function of a call. */
+  gnu.expr.Expression compileInCallPosition()
+  {
+    // Default implementation.
+    return this.compile();
+  }
+
+  ?gnu.expr.Declaration getDeclaration() = decl;
+
+  public void setDeclaration(gnu.expr.Declaration declaration)
+  {
+    this.setDeclaration(declaration, false);
+  }
+
+  public void setDeclaration(gnu.expr.Declaration declaration, boolean isThis)
+  {
+    this.decl = declaration;
+    this.isThis = isThis;
+    if (name != null) 
+      notNull(name.location).write(notNull(this.decl));
+    notNull(this.decl).setCanRead(true);
+    notNull(this.decl).setCanWrite(true);
+  }
+}
 
 /**
    A variable symbol which has a monotype (eg a function parameter)
@@ -30,18 +137,6 @@ public class MonoSymbol extends VarSymbol
 
   boolean used = false;
 
-/*  public MonoSymbol(LocatedString name, Monotype type)
-  {
-    super(name);
-    this.syntacticType=type;
-  }
-  
-  public MonoSymbol(LocatedString name, mlsub.typing.Monotype type)
-  {
-    super(name);
-    this.type = type;
-  }
-*/  
   getType() = new mlsub.typing.Polytype(type);
 
   public ?mlsub.typing.Monotype getMonotype()
@@ -185,9 +280,7 @@ class FunSymbol extends PolySymbol
   ?FormalParameters parameters;
   int arity;
 
-  isFunSymbol() = true;
-
-  getFormalParameters() = cast(this.parameters);
+  ?FormalParameters getFormalParameters() = this.parameters;
 
   String describeParameters() 
   {

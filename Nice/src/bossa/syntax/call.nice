@@ -223,7 +223,7 @@ public class CallExp extends Expression
     if (function instanceof SymbolExp)
       {
         SymbolExp func = cast(function);
-	Definition def = func.symbol.getDefinition();
+	let def = func.symbol.getDefinition();
 
 	if (def instanceof RetypedJavaMethod)
           return func.toString() + arguments;
@@ -240,7 +240,7 @@ public class CallExp extends Expression
 public Expression createCallExp(Expression function, 
 	       Expression param1)
 {
-  let res = new CallExp(function:function, arguments:new Arguments([new Arguments.Argument(param1)]));
+  let res = new CallExp(function:function, arguments:new Arguments(arguments: [new Argument(value: param1)]));
   res.setLocation(function.location());
   return res;
 }
@@ -248,7 +248,7 @@ public Expression createCallExp(Expression function,
 public Expression createCallExp(Expression function, 
 	       Expression param1, Expression param2)
 {
-  let res = new CallExp(function:function, arguments:new Arguments([new Arguments.Argument(param1), new Arguments.Argument(param2)]));
+  let res = new CallExp(function:function, arguments:new Arguments(arguments: [new Argument(value: param1), new Argument(value: param2)]));
   res.setLocation(function.location());
   return res;
 }
@@ -257,7 +257,7 @@ public Expression createCallExp(Expression function,
 	       Expression param1, Expression param2,
 	       Expression param3)
 {
-  let res = new CallExp(function:function, arguments:new Arguments([new Arguments.Argument(param1), new Arguments.Argument(param2), new Arguments.Argument(param3)]));
+  let res = new CallExp(function:function, arguments:new Arguments(arguments: [new Argument(value: param1), new Argument(value: param2), new Argument(value: param3)]));
   res.setLocation(function.location());
   return res;
 }

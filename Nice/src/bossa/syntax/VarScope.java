@@ -36,7 +36,7 @@ public class VarScope
     addSymbols(defs);
   }
 
-  void addSymbol(VarSymbol s)
+  void addSymbol(/*VarSymbol*/Symbol s)
   {
     this.defs.put(s.name,s);
   }
@@ -51,15 +51,16 @@ public class VarScope
     Iterator i = c.iterator();
     while(i.hasNext())
       {
-	VarSymbol s = (VarSymbol)i.next();
+	/*VarSymbol*/Symbol s = (/*VarSymbol*/Symbol)i.next();
 	addSymbol(s);
+
       }
   }
   
   /**
      Adds a collection of VarSymbols
    */
-  void addSymbols(VarSymbol[] s)
+  void addSymbols(/*VarSymbol*/Symbol[] s)
   {
     if (s == null) return;
 
@@ -68,7 +69,7 @@ public class VarScope
 	addSymbol(s[i]);
   }
   
-  void removeSymbol(VarSymbol sym)
+  void removeSymbol(/*VarSymbol*/Symbol sym)
   {
     defs.remove(sym.name, sym);
   }

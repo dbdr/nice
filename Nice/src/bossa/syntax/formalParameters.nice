@@ -137,7 +137,7 @@ public class FormalParameters extends Node
     // first pass, fill holes with names given at the call site
     for (int i = 0; i< args.size(); i++)
       {
-	Arguments.Argument a = args.get(i);
+	Argument a = args.get(i);
 	if (a.name != null)
 	  if (this.fill(map, notNull(a.name).toString(), i))
 	    return false;
@@ -146,7 +146,7 @@ public class FormalParameters extends Node
     // second pass, fill with the positional parameters
     for (int i = 0; i< args.size(); i++)
       {
-	Arguments.Argument a = args.get(i);
+	Argument a = args.get(i);
 	if (a.name == null)
 	  if (this.fill(map, i))
 	    return false;

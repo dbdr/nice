@@ -71,7 +71,7 @@ class GlobalVarSymbol extends MonoSymbol
       {
         res = new gnu.expr.Declaration
             (name.toString(), nice.tools.code.Types.javaType(type));
-        this.setDeclaration(res);
+        this.setDeclaration(notNull(res));
 
         if (! definition.inInterfaceFile())
           {

@@ -14,8 +14,6 @@ package nice.tools.code;
 
 import gnu.bytecode.*;
 import gnu.expr.*;
-//import bossa.syntax.MonoSymbol;
-import bossa.syntax.VarSymbol;
 
 /**
    Code generation functions.

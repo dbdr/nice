@@ -247,6 +247,7 @@ public final class JavaClasses
   private static void removeFromScope(MethodDeclaration m)
   {
     Node.getGlobalScope().removeSymbol(m.getSymbol());
+    bossa.link.Dispatch.unregister(m);
   }
 
   /** Utility function for analyse.nice */

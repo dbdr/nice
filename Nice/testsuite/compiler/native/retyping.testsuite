@@ -24,3 +24,19 @@
                   java.text.AttributedCharacterIterator.Attribute attribute) =
    native int java.text.AttributedCharacterIterator.getRunLimit
      (java.text.AttributedCharacterIterator.Attribute);
+
+/// PASS
+  /// package a
+  /// Toplevel
+
+abstract class A implements javax.swing.Action {
+  putValue(x, y) {}
+}
+  /// package b import a
+  /// Toplevel
+<T> void putValue(javax.swing.Action, String, T) = 
+  native void javax.swing.Action.putValue(String, Object);
+
+public class Flow4JEditPartFactory implements javax.swing.Action {
+  putValue(editPart, model) {}
+}

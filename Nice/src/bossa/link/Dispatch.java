@@ -53,6 +53,11 @@ public final class Dispatch
     javaMethods.add(m);
   }
   
+  public static void unregister(MethodDeclaration m)
+  {
+    javaMethods.remove(m);
+  }
+  
   private static Collection methods, javaMethods;
   public static void reset() 
   { 

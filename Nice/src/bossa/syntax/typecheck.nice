@@ -560,7 +560,22 @@ typecheck(decl@Block.LocalVariable)
 typecheck(decl@Block.LocalConstant)
 {
   typecheck(decl.value);
-  notNull(decl.left).type = notNull(decl.value).getType();
+  mlsub.typing.Polytype type = notNull(decl.value).getType();
+  notNull(decl.left).type = type;
+
+  // Check that the type is not polymorphic, as this could be unsafe.
+  if (type.isMonomorphic())
+    return;
+  
+  type.simplify();
+  if (type.isMonomorphic())
+    return;
+  
+  throw new bossa.util.UserError
+    (decl, 
+     "The value has a polymorphic type: " + type +
+     "\nOmitting the type here is not supported by Nice yet." + 
+     "\nPlease declare the monomorphic type of " + decl.getName());
 }
 
 typecheck(decl@Block.LocalFunction)

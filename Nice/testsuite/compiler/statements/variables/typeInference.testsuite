@@ -1,0 +1,9 @@
+/// PASS
+  final x = 3;
+  int y = x + 1;
+
+/// FAIL
+  // An incorrect use of a polymorphic reference.
+  final /* /// FAIL HERE */ l = new ArrayList();
+  l.add("Hello");
+  java.io.File f = l.get(0);

@@ -106,46 +106,59 @@ public class NiceMethod extends UserOperator
 
         let itsDomain = nice.tools.typing.Types.domain(s.getType());
 
-        // Do we have a smaller domain?
-        if (! (mlsub.typing.Typing.smaller(ourDomain, itsDomain, true))
-            ||  nice.tools.typing.Types.typeParameterDispatch(this.getType(), s.getType()))
+	if (this.specializes(s, ourDomain, itsDomain))
+	  {
+	    // In a compiled package, we don't need checking.
+	    if (! module.compiled())
+	      if (! this.checkOverride(s, d, ourDomain, itsDomain))
+		// Ignore. Errors are reported by checkOverride.
+		continue;
+
+	    this.addSpecializedMethod(d);
+	  }
+	else if (this.isSpecializedBy(d, s, ourDomain, itsDomain))
           {
-            // If the method is imported,
-            // check if the reverse relation holds with that method
-            if (d.module != null && d.module.compiled() &&
-                mlsub.typing.Typing.smaller(itsDomain, ourDomain, true) &&
-                ! nice.tools.typing.Types.typeParameterDispatch(s.getType(), this.getType()))
-              {
-                if (! nice.tools.typing.Types.covariantSpecialization(s.getType(), this.getType()))
-		  this.reportReturnTypeError(shouldBeLess: true, than: d);
+	    if (! nice.tools.typing.Types.covariantSpecialization(s.getType(), this.getType()))
+	      this.reportReturnTypeError(shouldBeLessPrecise: true, than: d);
 
-                // d is a specialized version of this.
-                if (d instanceof NiceMethod)
-                  d.addSpecializedMethod(this);
+	    // d is a specialized version of this.
+	    if (d instanceof NiceMethod)
+	      d.addSpecializedMethod(this);
 
-                // Therefore, all its implementations also belong to this.
-                addAllAlternatives(d, this);
-              }
-
-            continue;
-          }
-
-        // In a compiled package, we don't need checking.
-        if (! module.compiled())
-	  if (! this.checkOverride(s, d, ourDomain, itsDomain))
-	    // Ignore. Errors are reported by checkOverride.
-            continue;
-
-        this.addSpecializedMethod(d);
+	    // Therefore, all its implementations also belong to this.
+	    addAllAlternatives(d, this);
+	  }
       }
 
     homonyms = null;
   }
 
-  private UserError reportReturnTypeError
-    (boolean shouldBeLess, MethodDeclaration than)
+  private boolean specializes
+    (VarSymbol s,
+     mlsub.typing.Domain ourDomain, mlsub.typing.Domain itsDomain)
+  =
+     mlsub.typing.Typing.smaller(ourDomain, itsDomain, true)
+  && ! nice.tools.typing.Types.typeParameterDispatch(this.getType(), s.getType());
+
+  private boolean isSpecializedBy
+    (MethodDeclaration d, VarSymbol s,
+     mlsub.typing.Domain ourDomain, mlsub.typing.Domain itsDomain)
   {
-    let message = shouldBeLess ?
+    // Only consider imported methods.
+    // Methods being compiled will be found in the direct way
+    // if they override this method.
+    if (d.module == null || ! d.module.compiled())
+      return false;
+
+    return
+      mlsub.typing.Typing.smaller(itsDomain, ourDomain, true) &&
+    ! nice.tools.typing.Types.typeParameterDispatch(s.getType(), this.getType());
+  }
+
+  private UserError reportReturnTypeError
+    (boolean shouldBeLessPrecise, MethodDeclaration than)
+  {
+    let message = shouldBeLessPrecise ?
 "This return type should be less precise than the return type of method" :
 "This return type is less precise than the original return type of method";
 
@@ -162,7 +175,7 @@ public class NiceMethod extends UserOperator
      mlsub.typing.Domain ourDomain, mlsub.typing.Domain itsDomain)
   {
     if (! nice.tools.typing.Types.covariantSpecialization(this.getType(), s.getType()))
-      this.reportReturnTypeError(shouldBeLess: false, than: d);
+      this.reportReturnTypeError(shouldBeLessPrecise: false, than: d);
 
     // Check if we are a proper specialization, or if we actually have
     // the same domain.

@@ -1,0 +1,7 @@
+/// PASS
+  (?String,?String) s = (null, null);
+
+/// PASS
+  (?String,?String) s = f();
+  /// Toplevel
+(?String,?String) f() = (null, null);

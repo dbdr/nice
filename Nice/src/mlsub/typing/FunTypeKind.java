@@ -34,7 +34,7 @@ public class FunTypeKind implements Kind
   }
   
   private static FunTypeKind[] funtypeKinds;
-  public static void reset() { funtypeKinds = new FunTypeKind[40]; }
+  public static void reset() { funtypeKinds = new FunTypeKind[400]; }
   
   private FunTypeKind(int domainArity)
   {

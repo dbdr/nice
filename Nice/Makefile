@@ -30,11 +30,12 @@ javac = javac
 
 JAVAC_FLAGS = -O -g
 
-JAVAC= ${javac} -classpath "${TOP}/classes:${TOP}/classes.old" -sourcepath "${TOP}/src:${TOP}/stdlib" -d "${TOP}/classes" $(JAVAC_FLAGS)
+JAVAC_GENERIC= ${javac} -classpath "${TOP}/classes:${TOP}/classes.old" -sourcepath "${TOP}/src:${TOP}/stdlib" $(JAVAC_FLAGS)
+JAVAC= ${JAVAC_GENERIC} -d "${TOP}/classes"
 JAVADOC=javadoc
 
 NICEC_ARGS= --exclude-runtime 
-NICEC=CLASSPATH="${TOP}/classes" JAVA="${java}" ./bin/nicec.bootstrap ${NICEC_ARGS} -d "${TOP}/classes.old" --sourcepath="${TOP}/stdlib.old:${TOP}/stdlib:${TOP}/src.old:${TOP}/src" --classpath="${TOP}/classes"
+NICEC=CLASSPATH="${TOP}/classes" JAVA="${java} -Dnice.inlined=classes-inline" ./bin/nicec.bootstrap ${NICEC_ARGS} -d "${TOP}/classes.old" --sourcepath="${TOP}/stdlib.old:${TOP}/stdlib:${TOP}/src.old:${TOP}/src" --classpath="${TOP}/classes"
 NICEC1=JAVA="${java}" ${TOP}/bin/nicec ${NICEC_ARGS} -d "${TOP}/classes" --sourcepath="${TOP}/stdlib:${TOP}/src" 
 
 
@@ -123,7 +124,7 @@ gcj-testsuite:
 
 clean:
 	rm -f src/nice/tools/compiler/console.jar
-	-rm -rf classes share/java src/bossa/parser/{Parse*.java,Token*.java,ASCII_*.java}
+	-rm -rf classes classes-inline share/java src/bossa/parser/{Parse*.java,Token*.java,ASCII_*.java}
 	find "${TOP}" \( -name "*.class" -o -name "*.nicei" -o -name "*~" \) -exec rm {} \;
 
 
@@ -155,15 +156,17 @@ src/bossa/parser/Parser.java: src/bossa/parser/Parser.jj
 
 bootstrap: parser
 	cd src/gnu/lists && ./withCollections
-	mkdir -p classes
+	mkdir -p classes classes-inline
 	-cd src/bossa/syntax && mv -f dispatch.java.bootstrap dispatch.java
 	${JAVAC} \
-		stdlib/nice/lang/Native.java stdlib/nice/lang/inline/*.java \
+		stdlib/nice/lang/Native.java \
 		src/mlsub/compilation/Module.java \
 		src/bossa/modules/Package.java src/bossa/util/*.java \
 		src/gnu/expr/*.java src/gnu/mapping/*.java \
 		src/nice/tools/code/*.java src/mlsub/typing/*.java \
 		src/mlsub/typing/lowlevel/*.java src/bossa/syntax/dispatch.java
+	$(JAVAC_GENERIC) -d classes-inline stdlib/nice/lang/inline/*.java
+	cp -a classes-inline/* classes
 	${NICEC} -R bossa.modules
 	${NICEC} -r nice.tools.ast
 	cd src/bossa/syntax && \

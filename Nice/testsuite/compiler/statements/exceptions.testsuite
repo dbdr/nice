@@ -1,2 +1,2 @@
 /// FAIL
-  throw /*/// FAIL HERE */ java.lang.Exception;
+  /*/// FAIL HERE */ throw java.lang.Exception;

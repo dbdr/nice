@@ -593,9 +593,8 @@ typecheck(decl@Block.LocalConstant)
   typecheck(decl.value);
   decl.value = notNull(decl.value).noOverloading();
   mlsub.typing.Polytype type = notNull(decl.value).getType();
-  notNull(decl.left).type = type;
 
-  checkMonomorphic(type, decl);
+  notNull(decl.left).type = checkMonomorphic(type, decl);
 }
 
 typecheck(decl@Block.LocalFunction)

@@ -170,10 +170,26 @@ public class Block extends Statement
 
   public static class LocalConstant extends LocalValue
   {
+    static class Symbol extends MonoSymbol
+    {
+      Symbol(LocatedString name, Monotype type)
+      {
+	super(name, type);
+      }
+      
+      boolean isAssignable() { return false; }
+
+      /* 
+	 Index to make the initialization analysis or -1 if 
+	 this variable is always initialized.
+       */
+      int index = -1;
+    }
+
     public LocalConstant(LocatedString name, Expression value)
     {
       this.value = value;
-      this.left = new PolySymbol(name,null);
+      this.left = new LocalConstant.Symbol(name,null);
       this.last = this;
     }
     
@@ -181,7 +197,7 @@ public class Block extends Statement
     VarSymbol getSymbol() { return left; }
     gnu.bytecode.Type getBytecodeType() { return Types.javaType(left.type); }
 
-    PolySymbol left;
+    MonoSymbol left; 
 
     public void addNext(LocatedString name, Expression value)
     {

@@ -1,0 +1,36 @@
+/// PASS
+  ?String str = "abc";
+  let s = str;
+  if (s != null)
+    s.trim();
+
+/// FAIL
+  ?String str = "abc";
+  let s = str;
+  if (s == null)
+    s.trim();
+
+/// PASS
+  ?String str = "abc";
+  let s = str;
+  assert (s != null && s.startsWith("a"));
+
+/// PASS
+  /// Toplevel
+  class A { 
+    ?String cache; 
+    void get() { 
+      let c = cache; 
+      if (c != null) {  
+        String s = c;
+      } 
+    } 
+  } 
+
+/// FAIL
+  ?String str = "abc";
+  let s = str;
+  s = "xyz";
+
+
+  

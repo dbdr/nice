@@ -159,13 +159,10 @@ core-bootstrap:
 	ln -sf nicec bin/nicedoc; ln -sf nicec bin/niceunit
 	-cd src/bossa/syntax && mv -f dispatch.java.bootstrap dispatch.java
 	${JAVAC} \
+		src/bossa/syntax/dispatch.java \
 		stdlib/nice/lang/{Native,rawArray}.java \
 		src/bossa/modules/{Package,CompilationListener}.java \
-		src/bossa/util/*.java \
-		src/gnu/expr/*.java src/gnu/mapping/*.java \
-		src/nice/tools/{code/*.java,util/JDK.java} \
-		src/mlsub/typing/{*.java,lowlevel/*.java} \
-		src/bossa/syntax/dispatch.java
+		src/nice/tools/{code/*.java,util/JDK.java}
 	$(JAVAC_GENERIC) -d classes-inline stdlib/nice/lang/inline/*.java
 	cp -a classes-inline/* classes
 #	We put code used by inline methods inside classes-inline so that it is

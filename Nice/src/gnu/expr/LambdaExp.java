@@ -275,7 +275,7 @@ public class LambdaExp extends ScopeExp
 
   /** Get the method that contains the actual body of the procedure.
    * (The other methods are just stubs that call that method.) */
-  public final Method getMainMethod()
+  public Method getMainMethod()
   {
     Method[] methods = primMethods;
     return methods == null ? null : methods[methods.length-1];
@@ -1115,7 +1115,7 @@ public class LambdaExp extends ScopeExp
       }
     else if (this instanceof ClassExp)
       // generateConstructor might have been called earlier, but we call it 
-      // again because the super-class (gnu.expr.ModuleBody )
+      // again because the super-class (gnu.expr.ModuleBody)
       // seems to be found late.
       comp.generateConstructor(this);
     code.emitGoto(lab1);

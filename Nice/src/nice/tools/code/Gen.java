@@ -96,10 +96,42 @@ public class Gen
 				       boolean toplevel,
 				       boolean member)
   {
+    LambdaExp res = new LambdaExp();
+    createMethod(res, bytecodeName, argTypes, retType, args, toplevel, member, false);
+    return res;
+  }
+
+  public static ConstructorExp createConstructor
+    (ClassType classType, Type[] argTypes, MonoSymbol[] args)
+  {
+    ConstructorExp res = new ConstructorExp(classType);
+    createMethod(res, "<init>", argTypes, Type.void_type, args, true, false, true);
+    return res;
+  }
+
+  /**
+     Create a lambda expression to generate code for the method.
+
+     @param args can be null if there are no arguments
+     @param member true iff this method is a non-static member of
+                   the class in argTypes[0]
+     @param toplevel If the method can be called from foreign code.
+                     This forces its generation even if it is 
+		     apparently never called.
+  **/
+  private static void createMethod
+    (LambdaExp lexp, 
+     String bytecodeName,
+     Type[] argTypes,
+     Type retType,
+     MonoSymbol[] args,
+     boolean toplevel,
+     boolean member,
+     boolean constructor)
+  {
     bytecodeName = nice.tools.code.Strings.escape(bytecodeName);
     int arity = args == null ? 0 : args.length;
 
-    gnu.expr.LambdaExp lexp = new gnu.expr.LambdaExp();
     lexp.setReturnType(retType);
     lexp.setName(bytecodeName);
     lexp.min_args = lexp.max_args = member ? arity - 1 : arity;
@@ -127,8 +159,6 @@ public class Gen
 	d.noteValue(null);
 	args[n].setDeclaration(d, isThis);
       }
-
-    return lexp;
   }
 
   public static void setMethodBody(LambdaExp method, Expression body)

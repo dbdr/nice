@@ -71,7 +71,7 @@ public final class Compilation
 	// We produce code that should never be reached at run-time.
 
 	Expression message = new QuoteExp("Message not understood");
-	Expression exception = new ApplyExp(newError, 
+	Expression exception = new ApplyExp(new InstantiateProc(newError), 
 					    new Expression[]{ message });
 	Expression throwExp = 
 	  new ApplyExp(nice.lang.inline.Throw.instance,

@@ -282,16 +282,44 @@ public class NiceClass extends ClassDefinition.ClassImplementation
     return classe;
   }
 
-  private FormalParameters.Parameter[] getFieldsAsParameters
+  gnu.expr.ClassExp getClassExp()
+  {
+    return classe;
+  }
+
+  private static FormalParameters.Parameter[][] getFieldsAsParameters
+    (TypeConstructor tc, int nbFields, MonotypeVar[] typeParams)
+  {
+    ClassDefinition sup = ClassDefinition.get(tc);
+    if (sup != null && sup.implementation instanceof NiceClass)
+      return ((NiceClass) sup.implementation).
+	getFieldsAsParameters(nbFields, typeParams);
+
+    List constructors = TypeConstructors.getConstructors(tc);
+    if (constructors == null)
+      return new FormalParameters.Parameter[][]
+        { new FormalParameters.Parameter[nbFields] };
+
+    FormalParameters.Parameter[][] res = 
+      new FormalParameters.Parameter[constructors.size()][];
+    int n = 0;
+    for (Iterator i = constructors.iterator(); i.hasNext(); n++)
+      {
+	MethodDeclaration.Symbol m = (MethodDeclaration.Symbol) i.next();
+	res[n] = new FormalParameters.Parameter[nbFields + m.arity];
+	mlsub.typing.Monotype[] args = m.getDefinition().getArgTypes();
+	for (int j = 0; j < args.length; j++)
+	  res[n][j] = new FormalParameters.Parameter(Monotype.create(args[j]));
+      }
+    return res;
+  }
+
+  private FormalParameters.Parameter[][] getFieldsAsParameters
     (int nbFields, MonotypeVar[] typeParams)
   {
     nbFields += this.fields.length;
-    FormalParameters.Parameter[] res;
-    ClassDefinition sup = ClassDefinition.get(definition.getSuperClass());
-    if (sup != null && sup.implementation instanceof NiceClass)
-      res = ((NiceClass) sup.implementation).getFieldsAsParameters(nbFields, typeParams);
-    else
-      res = new FormalParameters.Parameter[nbFields];
+    FormalParameters.Parameter[][] res = getFieldsAsParameters
+      (definition.getSuperClass(), nbFields, typeParams);
 
     if (fields.length == 0)
       return res;
@@ -308,62 +336,62 @@ public class NiceClass extends ClassDefinition.ClassImplementation
 	  } catch(TypeScope.DuplicateName e) {}
       }
 
-    for (int i = fields.length, n = res.length - nbFields + i; --i >= 0;)
-      res[--n] = fields[i].asParameter(map);
+    for (int j = 0; j < res.length; j++)
+      for (int i = fields.length, n = res[j].length - nbFields + i; --i >= 0;)
+	res[j][--n] = fields[i].asParameter(map);
 
     return res;
   }
 
-  private MethodDeclaration constructorMethod;
+  private Constructor[] constructorMethod;
 
   private void createConstructor()
   {
     if (definition instanceof ClassDefinition.Interface)
       return;
 
-    mlsub.typing.MonotypeVar[] typeParams = definition.createSameTypeParameters();
-    FormalParameters values = new FormalParameters(getFieldsAsParameters(0, typeParams));
-    classe.setFieldCount(values.size);
+    mlsub.typing.MonotypeVar[] typeParams = 
+      definition.createSameTypeParameters();
+    FormalParameters.Parameter[][] params = 
+      getFieldsAsParameters(0, typeParams);
 
-    constructorMethod = new MethodDeclaration
-      (new LocatedString("<init>", definition.location()),
-       values, 
-       new Constraint(typeParams, null),
-       Monotype.resolve(definition.typeScope, values.types()),
-       Monotype.sure(new MonotypeConstructor(definition.tc, typeParams)))
+    constructorMethod = new Constructor[params.length];
+    for (int i = 0; i < params.length; i++)
       {
-	protected gnu.expr.Expression computeCode()
-	{
-	  return classe.instantiate();
-	}
+	FormalParameters values = new FormalParameters(params[i]);
 
-	public void printInterface(java.io.PrintWriter s)
-	{ throw new Error("Should not be called"); }
+	constructorMethod[i] = new Constructor
+	  (this, fields, i, definition.location(),
+	   values, 
+	   new Constraint(typeParams, null),
+	   Monotype.resolve(definition.typeScope, values.types()),
+	   Monotype.sure(new MonotypeConstructor(definition.tc, typeParams)));
 
-	String explainWhyMatchFails(Arguments arguments)
-	{
-	  String name = NiceClass.this.getName();
+	TypeConstructors.addConstructor(definition.tc, constructorMethod[i]);
+      }
+  }
 
-	  StringBuffer res = new StringBuffer();
-	  res.append("Class ").append(name);
-	  if (parameters.size == 0)
-	    {
-	      res.append(" has no fields. Therefore its constructor takes no arguments.");
-	      return res.toString();
-	    }
+  private static gnu.expr.Expression objectConstructor =
+    new gnu.expr.QuoteExp
+    (new gnu.expr.InitializeProc
+     (gnu.bytecode.Type.pointer_type.getDeclaredMethod("<init>", 0)));
 
-	  res.append(" has the following fields:\n").append(parameters);
-	  res.append('\n');
-	  res.append("Please provide values for the fields, ")
-	    .append("at least for those with no default value.\n")
-	    .append("The syntax is:\n")
-	    .append("new " + name + "(field1: value1, ..., fieldN: valueN)");
+  gnu.expr.Expression getSuper(int index)
+  {
+    TypeConstructor tc = definition.getSuperClass();
+    
+    if (tc == null)
+      return objectConstructor;
 
-	  return res.toString();
-	}
-      };
+    ClassDefinition sup = ClassDefinition.get(tc);
+    if (sup != null && sup.implementation instanceof NiceClass)
+      return ((NiceClass) sup.implementation).
+	constructorMethod[index].getConstructorInvocation();
 
-    TypeConstructors.addConstructor(definition.tc, constructorMethod);
+    List constructors = TypeConstructors.getConstructors(tc);
+    JavaConstructor m = (JavaConstructor)
+      ((MethodDeclaration.Symbol) constructors.get(index)).getDefinition();
+    return m.getConstructorInvocation();
   }
 
   public void compile()
@@ -375,6 +403,10 @@ public class NiceClass extends ClassDefinition.ClassImplementation
 	  if (child instanceof ToplevelFunction)
 	    ((ToplevelFunction) child).compile();
 	}
+
+    if (constructorMethod != null)
+      for (int i = 0; i < constructorMethod.length; i++)
+	constructorMethod[i].getCode();
 
     definition.module.addImplementationClass(classe);
   }

@@ -1,5 +1,8 @@
 nice (0.7.3) unstable; urgency=low
 
+  * Allow subclasses of Java classes to call any of the super-constructors,
+    not just the no-arg one. The arguments of the super-constructor used are
+    just the first, not-named arguments of the automatic constructor.
   * Fixed implicit access to fields of the current class in ambiguous
     situations, and when overriding native methods.
   * Improved compilation speed, especially for programs using many classes

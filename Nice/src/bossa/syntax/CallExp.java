@@ -306,7 +306,7 @@ public class CallExp extends Expression
     case 0:
       return access.compileAssign(value);
     case 1:
-      return access.compileAssign(arguments.getExp(0), value);
+      return access.compileAssign(arguments.getExp(0).generateCode(), value);
     default:
       Internal.error(this, "A field access should have 0 or 1 parameter");
       return null;

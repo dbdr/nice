@@ -107,9 +107,12 @@ public class JavaMethod extends MethodDeclaration
       else
 	retType = Types.monotype(m.getReturnType());
     
-      res = new JavaMethod(null, m.getName(), null,
-			   new LocatedString(m.getName(),Location.nowhere()),
-			   null, retType, params);
+      LocatedString name = new LocatedString(m.getName(),Location.nowhere());
+      if (constructor)
+	res = new JavaConstructor(m.getName(), name, retType, params);
+      else
+	res = new JavaMethod(null, m.getName(), null, 
+			     name, null, retType, params);
       res.reflectMethod = m;
       return res;
     }

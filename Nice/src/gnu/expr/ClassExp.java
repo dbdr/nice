@@ -5,6 +5,8 @@ import java.util.Vector;
 
 public class ClassExp extends LambdaExp
 {
+  public boolean needsConstructor;
+
   boolean simple;
   public boolean isSimple() { return simple; }
   public void setSimple(boolean value) { simple = value; }
@@ -40,7 +42,6 @@ public class ClassExp extends LambdaExp
 
   /** List of base classes and implemented interfaces. */
   public Expression[] supers;
-  ClassExp superClass;
 
   public LambdaExp initMethod;
 
@@ -61,27 +62,6 @@ public class ClassExp extends LambdaExp
     this.type = this.instanceType = type;
   }
 
-  private int fieldRank = 0;
-  int numFieldsSuper;
-  private Type[] constructorArgs;
-  Type[] getConstructorArgs()
-  {
-    if (superClass != null && fieldRank < constructorArgs.length
-	&& constructorArgs[fieldRank] == null)
-      {
-	Type[] sup = superClass.getConstructorArgs();
-	numFieldsSuper = sup.length;
-	System.arraycopy(constructorArgs, 0, constructorArgs, sup.length, constructorArgs.length - sup.length); 
-	System.arraycopy(sup, 0, constructorArgs, 0, sup.length);
-      }
-    return constructorArgs;
-  }
-
-  public void setFieldCount(int count)
-  {
-    constructorArgs = new Type[count];
-  }
-
   public Declaration addField(String name, Type type)
   {
     Declaration res = addDeclaration(name, type);
@@ -94,10 +74,6 @@ public class ClassExp extends LambdaExp
     // If the class already exists, find the corresponding field there.
     if (instanceType != null)
       res.field = instanceType.getDeclaredField(name);
-
-    addInitializer(new FieldInitializer(this, res, fieldRank));
-    constructorArgs[fieldRank] = type;
-    fieldRank++;
 
     return res;
   }
@@ -230,8 +206,6 @@ public class ClassExp extends LambdaExp
 	    if (j < i)
 	      throw new Error("duplicate superclass");
 	    superType = t;
-	    if (supers[i] instanceof ClassExp)
-	      superClass = (ClassExp) supers[i];
 	  }
 	else
 	  superTypes[j++] = t;
@@ -529,15 +503,6 @@ public class ClassExp extends LambdaExp
      The instance is initialized by calling the default constructor.
   */
   public final Expression instantiate ()
-  {
-    return new QuoteExp(new PrimProcedure(getDefaultConstructor()));
-  }
-
-  /**
-     Return code to create an instance of this class.
-     The instance is initialized by calling the default constructor.
-  */
-  public final Expression instantiateDefault ()
   {
     return new QuoteExp(new PrimProcedure(getDefaultConstructor()));
   }

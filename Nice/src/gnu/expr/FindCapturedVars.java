@@ -320,7 +320,7 @@ public class FindCapturedVars extends ExpWalker
   protected Expression walkThisExp (ThisExp exp)
   {
     // FIXME - not really right, but works in simple cases.
-    getCurrentLambda ().setImportsLexVars();
+    if (false) getCurrentLambda ().setImportsLexVars();
     return exp;
   }
 

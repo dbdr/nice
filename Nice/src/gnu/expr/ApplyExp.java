@@ -215,7 +215,11 @@ public class ApplyExp extends Expression
 	    int extraArg = 0;
 	    Type[] argTypes = method.getParameterTypes();
 	    // ?? Procedure.checkArgCount(this, args.length); // FIXME
-	    if (! is_static || func_lambda.declareClosureEnv() != null)
+	    /* For Per, it seems that when a function is static the
+	       this parameter is implicit, which is why he wants to
+	       load the heap frame. I remove it for Nice.
+	    */
+	    if (/*! is_static || */func_lambda.declareClosureEnv() != null)
 	      {
 		if (is_static)
 		  extraArg = 1;

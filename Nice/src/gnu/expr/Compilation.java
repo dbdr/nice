@@ -883,7 +883,7 @@ public class Compilation
 	args[0] = lexp.staticLinkField.getType();
       }
     else
-      args = constructorArgs(lexp);
+      args = apply0args;
     return clas.addMethod("<init>", Access.PUBLIC, args, Type.void_type);
   }
 
@@ -892,18 +892,11 @@ public class Compilation
     generateConstructor (lexp.getHeapFrameType(), lexp);
   }
 
-  private static Type[] constructorArgs(LambdaExp lexp)
-  {
-    Type[] args = null;
-    if (lexp instanceof ClassExp)
-      args = ((ClassExp) lexp).getConstructorArgs();
-    if (args == null)
-      args = apply0args;
-    return args;
-  }
-
   public final void generateConstructor (ClassType clas, LambdaExp lexp)
   {
+    if (lexp instanceof ClassExp && ! ((ClassExp) lexp).needsConstructor)
+      return;
+
     Method save_method = method;
     ClassType save_class = curClass;
     curClass = clas;
@@ -911,23 +904,13 @@ public class Compilation
     clas.constructor = constructor_method;
     constructor_method.eraseCode();
 
-    Type[] superArgs = apply0args;
-    if (lexp instanceof ClassExp)
-      {
-	ClassExp cexp = (ClassExp) lexp;
-	if (cexp.superClass != null)
-	  superArgs = cexp.superClass.getConstructorArgs();
-      }
     Method superConstructor
       = clas.getSuperclass().addMethod("<init>", Access.PUBLIC,
-				       superArgs, Type.void_type);
+				       apply0args, Type.void_type);
     method = constructor_method;
     constructor_method.init_param_slots ();
     CodeAttr code = getCode();
     code.emitPushThis();
-    // Pass our first arguments to the super constructor.
-    for (int i = 0; i < superArgs.length; i++)
-      code.emitLoad (code.getCurrentScope().getVariable(i + 1));
     code.emitInvokeSpecial(superConstructor);
 
     if (lexp instanceof ClassExp && lexp.staticLinkField != null)

@@ -77,11 +77,11 @@ abstract class FieldAccess extends MethodDeclaration
       (new SetStaticFieldProc(fieldDecl), value);
   }
 
-  public gnu.expr.Expression compileAssign(bossa.syntax.Expression parameter, 
+  public gnu.expr.Expression compileAssign(gnu.expr.Expression parameter, 
 					   gnu.expr.Expression value)
   {
     return Inline.inline
-      (new SetFieldProc(fieldDecl), parameter.generateCode(), value);
+      (new SetFieldProc(fieldDecl), parameter, value);
   }
 }
 

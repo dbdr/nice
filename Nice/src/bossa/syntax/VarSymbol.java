@@ -135,7 +135,8 @@ abstract class VarSymbol extends Node implements Located
     if (isThis)
       return new gnu.expr.ThisExp(decl);
     else
-      return new gnu.expr.ReferenceExp(name.toString(), decl);
+      return new gnu.expr.ReferenceExp(name == null ? null : name.toString(), 
+				       decl);
   }
 
   static gnu.expr.Expression[] compile(VarSymbol[] syms)

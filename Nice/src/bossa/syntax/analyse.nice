@@ -152,7 +152,7 @@ class Info
   ?VarSymbol lookup(String name) = this.vars[name];
 
   JavaList<VarSymbol> globalLookup(LocatedString name) = 
-    new JavaList(this.globalVarScope.lookup(name));
+    new JavaList(impl: this.globalVarScope.lookup(name));
 
   ?TypeSymbol lookupType(LocatedString name)
   {
@@ -364,7 +364,7 @@ Expression analyseIdent(IdentExp e, Info info, boolean assigned)
 
   JavaList<VarSymbol> symbols;
   if (e.infix)
-    symbols = new JavaList(notNull(Node.getGlobalScope()).lookup(e.ident));
+    symbols = new JavaList(impl: notNull(Node.getGlobalScope()).lookup(e.ident));
   else
     symbols = info.globalLookup(notNull(e.ident));
 
@@ -488,7 +488,7 @@ analyse(decl@Block.LocalFunction, info)
 analyse(b@Block, info)
 {
   info.begin();
-  new JavaList(notNull(b.locals)).iter(fun(Block.LocalDeclaration l) => analyse(l, info));
+  new JavaList(impl: notNull(b.locals)).iter(fun(Block.LocalDeclaration l) => analyse(l, info));
   notNull(b.statements).iter(fun(?Statement s)=>{
     if (info.getUnreachable())
       throw error(s, "This statement is never executed");
@@ -598,7 +598,7 @@ analyse(t@TryStmt, info)
   info.beginCases();
   analyse(t.body, info);
 
-  new JavaList(notNull(t.catches)).iter(fun(TryStmt$Catch c)=>{
+  new JavaList(impl: notNull(t.catches)).iter(fun(TryStmt$Catch c)=>{
     info.otherCase();
     info.begin();
     info.addVar(notNull(c.exnVar));

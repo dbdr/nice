@@ -129,13 +129,13 @@ set(l@Nil,  n, elem) { throw new Exception(); }
 
 map(l@Nil, f) = new Nil();
 
-map(l@Cons, ff) = new Cons(ff(l.head), map(l.tail, ff));
+map(l@Cons, ff) = new Cons(head: ff(l.head), tail: map(l.tail, ff));
 
 filter(l@Nil , test) = l;
 filter<C,T>(l@Cons, test)
 {
   FList<T> res = filter(l.tail, test);
-  return test(l.head) ? new Cons(l.head, res) : res;
+  return test(l.head) ? new Cons(head: l.head, tail: res) : res;
 }
 
 /****************************************************************
@@ -181,7 +181,7 @@ map<C, T, U> (l@JavaList, f)
   java.util.ArrayList res = new java.util.ArrayList(l.size());
   for (java.util.Iterator i = l.impl.iterator(); i.hasNext(); )
     res.add(object(f(cast(i.next()))));
-  return new JavaList(res);
+  return new JavaList(impl: res);
 }
 
 filter<C,T>(l@JavaList, test)
@@ -193,7 +193,7 @@ filter<C,T>(l@JavaList, test)
       if (test(elem))
 	res.add(object(elem));
     }
-  return new JavaList(res);
+  return new JavaList(impl: res);
 }
 
 

@@ -311,7 +311,7 @@ typecheck(@null(Statement)) {}
 
 typecheck(b@Block)
 {
-  new JavaList(notNull(b.locals)).iter(fun(?Block.LocalDeclaration d)=> typecheck(d));
+  new JavaList(impl: notNull(b.locals)).iter(fun(?Block.LocalDeclaration d)=> typecheck(d));
   notNull(b.statements).iter(fun(?Statement s)=> typecheck(s));
 }
 
@@ -402,7 +402,7 @@ typecheck(r@ReturnStmt)
 typecheck(t@TryStmt)
 {
   typecheck(t.body);
-  new JavaList(notNull(t.catches)).iter(fun(TryStmt.Catch c)=> typecheck(c.body));
+  new JavaList(impl: notNull(t.catches)).iter(fun(TryStmt.Catch c)=> typecheck(c.body));
   typecheck(t.finallyBody);
 }
 

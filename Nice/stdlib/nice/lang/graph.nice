@@ -13,7 +13,7 @@ import gnu.math.*;
 <Any T> List<List<T>> stronglyConnectedComponents(T start, 
 						  T->List<T> successors)
 {
-  Ref<int> id = new Ref(0);
+  Ref<int> id = new Ref(value: 0);
   Stack<T> stack = makeVector(5);
   Map<T,int> mark = hashtable();
 

@@ -20,7 +20,7 @@ void test_higher_order()
   println((fun<Any T>(T x)=>x)("LAMBDA"));
   println(apply(fun<Any T>(T x)=>x, "LAMBDA"));
   println(apply(nativeToString, "Using native methods as first class values"));
-  println(apply(intIdentity, 42));
+  println(apply(id(intIdentity), 42));
 }
 
 String nativeToString(String) = native String Object.toString();
@@ -29,3 +29,10 @@ int intIdentity(int x) = id(x);
 
 // Using int -> long implicit conversion in the returned value
 long intWidening(int x) = x;
+
+void unboundVariable(String v)
+{
+  throw new Error();
+}
+
+void passAsValue() = println(unboundVariable);

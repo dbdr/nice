@@ -129,12 +129,10 @@ public class OverloadedSymbolExp extends Expression
     // to list possibilities if none matches
     LinkedList removed = new LinkedList();    
 
-    //if(symbols.size() == 1) return uniqueExpression();
-
     Polytype[] types = new Polytype[symbols.size()];
     VarSymbol[] syms = new VarSymbol[symbols.size()];
-    int sym = 0, good = 0;
-    for(Iterator i = symbols.iterator();i.hasNext();)
+    int sym = 0;
+    for(Iterator i = symbols.iterator(); i.hasNext(); sym++)
       {
 	VarSymbol s = (VarSymbol) i.next();
 	
@@ -158,11 +156,9 @@ public class OverloadedSymbolExp extends Expression
 	  }
 	else
 	  {
-	    types[good] = t;
-	    syms[good] = s;
-	    good++;
+	    types[sym] = t;
+	    syms[sym] = s;
 	  }
-	sym++;
       }
 
     if (symbols.size() == 0)

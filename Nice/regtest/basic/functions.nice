@@ -33,6 +33,11 @@ String optFun(String value, String end = ": ") = value + end;
 // (it would also be acceptable for this to fail graciously)
 int quarantedeux(int) = 42;
 
+// overloading together with default args
+void overloaded(int x) {}
+void overloaded(String s, int y = 2) {}
+void overloaded(boolean b) {}
+
 void test_functions()
 {
   println("### Testing functions");
@@ -41,5 +46,7 @@ void test_functions()
   println("x = " + o.getX());
 
   println(optFun("Functions") + optFun("a Nice feature", end:"!"));
+
+  overloaded("Deuxieme");
 }
 

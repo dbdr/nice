@@ -23,6 +23,8 @@ import gnu.bytecode.*;
 import gnu.expr.*;
 
 import java.util.*;
+import java.io.File;
+import java.net.URL;
 
 /**
    Conversion between Nice and bytecode types.
@@ -367,7 +369,7 @@ public final class Types
     
     Class c = null;
 
-    try{ c=Class.forName(className); }
+    try{ c = classLoader.loadClass(className); }
     catch(ClassNotFoundException e)
       // when the class does not exist
       { }
@@ -379,6 +381,55 @@ public final class Types
     stringToReflectClass.put(className, c);
     
     return c;
+  }
+
+  private static ClassLoader classLoader;
+
+  public static void setClasspath(String classpath)
+  {
+    if (classpath == null)
+      {
+	classLoader = ClassLoader.getSystemClassLoader();
+	return;
+      }
+
+    LinkedList components = new LinkedList();
+    
+    int start = 0;
+    // skip starting separators
+    while (start<classpath.length() && 
+	   classpath.charAt(start) == File.pathSeparatorChar)
+      start++;
+    
+    while(start<classpath.length())
+      {
+	int end = classpath.indexOf(File.pathSeparatorChar, start);
+	if (end == -1)
+	  end = classpath.length();
+	    
+	String pathComponent = classpath.substring(start, end);
+	if (pathComponent.length() > 0)
+	  try{
+	    File f = new File(pathComponent);
+	    if (f.canRead())
+	      components.add(f.toURL());
+	    else
+	      {
+		if (!f.exists())
+		  User.warning("Classpath component " + pathComponent + " does not exist");
+		else
+		  User.warning("Classpath component " + pathComponent + " is not readable");
+	      }
+	  }
+	  catch(java.net.MalformedURLException e){
+	    User.warning("Classpath component " + pathComponent + " is invalid");
+	  }
+	start = end+1;
+      }
+
+    classLoader = new java.net.URLClassLoader
+      ((URL[]) components.toArray(new URL[components.size()]), 
+       /* no parent */ null);
   }
 
   /****************************************************************

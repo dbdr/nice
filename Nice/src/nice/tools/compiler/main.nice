@@ -47,6 +47,7 @@ main(args)
   boolean recAll = false;
   boolean doLink = true;
   boolean staticLink = false;
+
   List<Option> opts = makeVector(10);
  
   opts.add(option('r', "recompile",
@@ -73,6 +74,10 @@ main(args)
   opts.add(option('c', "compile",
 		  "Compile packages, do not link them",
   		  fun()=>{ doLink=false; }));
+
+  opts.add(option('?', "classpath",
+		  "path for searching external class",
+  		  fun(String path)=> nice.tools.code.Types.setClasspath(path) ));
 
   opts.add(option('s', "static",
 		  "Store compiled packages in the jar file",

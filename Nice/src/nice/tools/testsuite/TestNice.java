@@ -132,7 +132,9 @@ public class TestNice extends Task {
 
 
 	/**
-		Write the sources to the filesystem
+		Performs the junit tests.
+		Creates the java source for the testsuite and compiles it.
+		Then it starts the junit tests upon the java source.
 	*/
 	private void performTests(Project project) throws BuildException {
 		//	compose the test class
@@ -164,7 +166,7 @@ public class TestNice extends Task {
 			catch(IOException e) {}
 		}
 		
-		//	compile the tet class
+		//	compile the test class
 		Javac javacTask = (Javac)project.createTask("javac");
 		javacTask.setSrcdir(new Path(project, testCasesSourceFile.getParentFile().getAbsolutePath()));
 		javacTask.setDestdir(testCasesSourceFile.getParentFile());

@@ -17,7 +17,7 @@ echo()
 
 compile()
 {
-  (cd ..; nicec -e -Rs --classpath=$PWD/regtest/"$1":$PWD/classes regtest."$1")
+  (cd ..; nicec -e -s --classpath=$PWD/regtest/"$1":$PWD/classes regtest."$1")
   return $?
 }
 

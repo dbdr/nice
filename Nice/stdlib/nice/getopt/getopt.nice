@@ -19,7 +19,7 @@ optSuffix(o@NoParamOption) = "";
 optSuffix(o@ParamOption) = ":";
 optSuffix(o@OptionalParamOption) = "::";
 
-parse(progName, args, options)
+parse(progName@String, args, options)
 {
   Vector<LongOpt> longOptions = makeVector(options.size);
   String shortOptions = "";

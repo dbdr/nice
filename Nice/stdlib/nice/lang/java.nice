@@ -153,3 +153,9 @@ PrintStream stderr () = native System.err;
   native int java.util.Dictionary.size();
 <K, V> boolean _isEmpty(java.util.Dictionary<K, V>)=
   native boolean java.util.Dictionary.isEmpty();
+
+/* StringTokenizer inherits from Enumeration, which makes it 
+   wrongly parameterized. We ignore that inheritance.
+*/
+
+class StringTokenizer = native java.util.StringTokenizer;

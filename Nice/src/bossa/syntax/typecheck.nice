@@ -189,8 +189,6 @@ typecheck(e@IfExp)
       {
 	typecheck(e.thenExp);
 	typecheck(e.elseExp);
-	// FIXME: handle finally properly and this can go out
-	exitIf();
 	return;
       }
 

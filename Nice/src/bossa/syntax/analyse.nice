@@ -180,6 +180,7 @@ void analyse(Statement, Info);
  ****************************************************************/
 
 analyse(e@Expression, i) = e;
+analyse(@null(Expression), info) = null;
 
 analyse(e@AssignExp, i)
 {
@@ -405,6 +406,7 @@ analyse(e@TupleExp, info)
  ****************************************************************/
 
 analyse(s@Statement, info) {}
+analyse(s@null(Statement), info) {}
 
 analyse(b@Block, info)
 {

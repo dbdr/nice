@@ -10,3 +10,10 @@
   f((0,0));
   /// Toplevel
   void f((int, int)) {}
+
+/// PASS
+  (float,float) f = ( 1,2 );
+  (double, double) d = f;
+  (double d1, double d2) = d;
+  assert d1 == 1;
+  assert d2 == 2;

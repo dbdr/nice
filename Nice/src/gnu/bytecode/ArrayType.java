@@ -84,4 +84,76 @@ public class ArrayType extends ObjectType
     ArrayType o = (ArrayType) other;
     return elements.getSignature().equals(o.elements.getSignature());
   }
+
+  public void emitCoerceFrom (Type fromType, CodeAttr code)
+  {
+    if (! (fromType instanceof ArrayType))
+      {
+	super.emitCoerceFrom (fromType, code);
+	return;
+      }
+
+    Type from = ((ArrayType) fromType).elements;
+    
+    if (elements == from)
+      // Nothing to do
+      return;
+
+    if (! (elements instanceof PrimType && from instanceof PrimType))
+      // Java arrays are covariant for reference types. Nothing to do.
+      return;
+
+    /*
+      Create a new array, then convert all the elements 
+      and put them in the new array.
+    */
+
+    Scope scope = code.pushScope();
+
+    Variable old = code.addLocal(fromType);
+    code.emitStore(old);
+
+    Variable newArray = code.addLocal(this);
+    code.emitLoad(old);
+    code.emitArrayLength();
+    code.emitNewArray(elements, 1);
+    code.emitStore(newArray);
+    
+    // Counter to go though each element.
+    Variable elem = code.addLocal(Type.int_type);
+    code.emitPushInt(0);
+    code.emitStore(elem);
+
+    Label test = new Label(code);
+    Label copy = new Label(code);
+
+    code.emitGoto(test);
+
+    copy.define(code);
+    
+    // Prepare the store in the new array.
+    code.emitLoad(newArray);
+    code.emitLoad(elem);
+
+    // Load an element from the source array, and convert it.
+    code.emitLoad(old);
+    code.emitLoad(elem);
+    code.emitArrayLoad(from);
+    code.emitConvert(from, elements);
+
+    code.emitArrayStore(elements);
+
+    code.emitInc(elem, (short) 1);
+
+    // Check if there are more elements to copy.
+    test.define(code);
+    code.emitLoad(elem);
+    code.emitLoad(old);
+    code.emitArrayLength();
+    code.emitGotoIfLt(copy);
+
+    // The new array is the result.
+    code.emitLoad(newArray);
+    code.popScope();
+  }
 }

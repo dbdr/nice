@@ -65,10 +65,10 @@ String AFTER_LAST_LINE() = native BorderLayout.AFTER_LAST_LINE;
 String AFTER_LINE_ENDS() = native BorderLayout.AFTER_LINE_ENDS;
 String BEFORE_FIRST_LINE() = native BorderLayout.BEFORE_FIRST_LINE;
 String BEFORE_LINE_BEGINS() = native BorderLayout.BEFORE_LINE_BEGINS;
-String LINE_END() = native BorderLayout.LINE_END;
-String LINE_START() = native BorderLayout.LINE_START;
-String PAGE_END() = native BorderLayout.PAGE_END;
-String PAGE_START() = native BorderLayout.PAGE_START;
+//JDK1.4 String LINE_END() = native BorderLayout.LINE_END;
+//JDK1.4 String LINE_START() = native BorderLayout.LINE_START;
+//JDK1.4 String PAGE_END() = native BorderLayout.PAGE_END;
+//JDK1.4 String PAGE_START() = native BorderLayout.PAGE_START;
 
 
 /**

@@ -2,18 +2,24 @@ nice (0.9.9)
 
   * Assertions about the type of variables are used by the typechecker, so that
     casts are not necessary. For instance:
+
       Object o = ...;
       // We happen to know by design than the object must be a string
       assert o instanceof String;
       // Here o can be used as a string without cast
+
   * java.lang.Class is now parameterized by the type it represents.
     In particular, newInstance is now declared in nice.lang with
+
       <T> T newInstance(Class<T>);
+
     This make it possible to write type-safe code that uses reflexion,
     in particular when using class literals.
   * Subclasses can have less type parameters than their parent by fixing
     the value of the others. For instance:
+
       class BitField implements List<boolean> { ... }
+
   * Improved speed of coverage tests for some methods.
   * Removed the '--strict' compiler option.
 
@@ -46,7 +52,7 @@ nice (0.9.8)
 
 nice (0.9.7)
 
-  * Methods can be overriden using the override keyword:
+  * Methods can be overridden using the override keyword:
       class A {
         A doSomething() { ... }
       }
@@ -55,7 +61,7 @@ nice (0.9.7)
       }
     An important aspect is that the return type can be more precise than the
     original type (covariance).
-    Overriding without the override keyword (a la Java) is accepted but 
+    Overriding without the override keyword (a la Java) is accepted but
     generates a warning.
   * When importing a java package, it is possible to specify that its methods
     do not accept null arguments:
@@ -63,7 +69,7 @@ nice (0.9.7)
     Individual methods can be treated specially by retyping them.
   * The 'Any' keyword is now deprecated.
   * Global constants and global variables are now initialized in a proper order
-    when one depends on another, both directly and through the default 
+    when one depends on another, both directly and through the default
     implementation of a method.
   * The Eclipse plugin now works with Eclipse 3.0 M7 (although 2.1 is still the
     preferred version at this point).
@@ -75,18 +81,18 @@ nice (0.9.6)
   * It is now possible to create custom constructors:
       class Point { double x; double y; }
 
-      new Point(double angle, double distance) 
-      { 
+      new Point(double angle, double distance)
+      {
         this(x: distance * cos(angle), y: distance * sin(angle));
       }
-    It is then possible to create a Point with either 
+    It is then possible to create a Point with either
     new Point(x: ..., y: ...) or new Point(angle: ..., distance: ...).
-  * Additional fields can be defined for enums and enums can implement 
+  * Additional fields can be defined for enums and enums can implement
     interfaces, for instance:
       enum Coin(int value) implements Currency
 	{penny(1), nickel(5), dime(10), quarter(25)}
   * Alternative syntax for calling methods that takes an anonymous function
-    with no arguments. For example 'loop(5) { doSomeThing(); }' is a 
+    with no arguments. For example 'loop(5) { doSomeThing(); }' is a
     shorthand for 'loop(5, () => { doSomeThing(); });'
   * "using" statement, as in C#, defined in nice.lang using (!) the above
     syntax.
@@ -98,20 +104,20 @@ nice (0.9.6)
       }
   * Stricter parsing of expressions used as statements.
   * Improved performance for arrays used as lists.
-  * New methods (in package nice.functional) for working with iterators 
+  * New methods (in package nice.functional) for working with iterators
     and generators.
   * Applications that stop because of an uncaught exception will now
     print a stack trace the include correct Nice source files and line numbers.
     Applications that need to print a stack trace can do so by using
-    printStackTraceWithSourceInfo(e) (defined in nice.lang) instead of 
+    printStackTraceWithSourceInfo(e) (defined in nice.lang) instead of
     e.printStackTrace(), and similarly for versions that specify a stream
-    or writer to print into.  
+    or writer to print into.
   * A super call can have types to resolve ambiguities. Example of usage:
       foo(BarSub b, s) = super(Bar, String);
   * Fixed the file locations in the RPM package, and added automatic
     registration of the emacs mode for the SuSE Linux distribution.
   * Bug fixes (checking of local variables in a call position, make it possible
-    to use new Object() and dispatch on Object again, code generation of 
+    to use new Object() and dispatch on Object again, code generation of
     integer constants, overloading of function symbols, printing of string
     literals with escaped chars, implicit 'this' for functional fields, ... )
 
@@ -127,7 +133,7 @@ nice (0.9.5)
 	equals(Dummy other) = this.x == other.x;
       }
     This syntax should be more consistent and familiar, and is now
-    prefered to the old one, which will eventually be deprecated.
+    preferred to the old one, which will eventually be deprecated.
   * Object is now recognized as a super-type of every type. This allows
     easier use of Java libraries, creation of heterogeneous collections,
     and type-safe handling of values with unknown types.
@@ -148,8 +154,8 @@ nice (0.9.5)
   * Safe dynamic type inference in presence of anonymous and local functions.
   * Unused local variables will give a warning.
   * Nested multi-line comments are allowed.
-  * Empty statements (made of a single ';') have been removed. This avoids the 
-    risk of an accidental ';' changing the meaning of a statement. Empty 
+  * Empty statements (made of a single ';') have been removed. This avoids the
+    risk of an accidental ';' changing the meaning of a statement. Empty
     statements are very rarely needed, and can easily be replaced by '{}'.
   * The Emacs mode is updated to work with recent versions of GNU and XEmacs.
   * Reduced memory usage when repeatedly compiling in the same JVM (eclipse
@@ -157,21 +163,21 @@ nice (0.9.5)
   * The compiler is now more clever about loading imported Java classes
     only if they are actually used. This reduces memory usage and improves
     compilation speed.
-  * Bug fixes (accessing static fields of an superclass or interface, 
-    compilation of polymorphic tuples, captured 'this' in initializer, 
-    duplication of constructors in bytecode, disappearing contracts during 
+  * Bug fixes (accessing static fields of an superclass or interface,
+    compilation of polymorphic tuples, captured 'this' in initializer,
+    duplication of constructors in bytecode, disappearing contracts during
     recompilation, ... )
 
  -- Thu, 11 Dec 2003 16:05:18 +0100
 
 nice (0.9.4)
 
-  * The compiler now knows that the statement 'assert false' never terminates. 
-    Therefore that statement can be used in a branch that is known to be 
+  * The compiler now knows that the statement 'assert false' never terminates.
+    Therefore that statement can be used in a branch that is known to be
     unused, without needing to return a dummy value when the method does not
     return void.
   * Added source-level debugging information for recent debuggers (jsr 45).
-  * Constraints on class type parameters can be written as a prefix of 
+  * Constraints on class type parameters can be written as a prefix of
     class declarations:
       <Bound T> class MyClass<T> { ... }
     This syntax is required when Bound is an abstract interface.
@@ -192,7 +198,7 @@ nice (0.9.3)
     may take multiple lines and will include the line breaks.
   * Existing interfaces can (like classes) implement abstract interfaces:
       interface packagename.SomeInterface implements AbstractInterface;
-  * Bugfixes (various pretty printing issues, type hole in instanceof 
+  * Bugfixes (various pretty printing issues, type hole in instanceof
     inference, calls to abstract methods, chained assignments with arrays like
     'x = arr[y] = z;', error messages of integer dispatch, reachability of
     labeled breaks, ...)
@@ -204,7 +210,7 @@ nice (0.9.2)
   * Removed the concept of function. Now everything is a method, which is more
     flexible.
     The syntax that used to define a function is still valid: it now
-    declares a method together with a default implementation. Exemple:
+    declares a method together with a default implementation. Example:
       class A {
         // Declares a method f, with a default implementation that returns 1.
         int f() = 1;
@@ -216,16 +222,16 @@ nice (0.9.2)
         f() = 2;
       }
     The same applies for methods outside classes.
-  * More dynamic type inference implemented. The type of a local variable is 
-    made more precise after a succesful instanceof:
+  * More dynamic type inference implemented. The type of a local variable is
+    made more precise after a successful instanceof:
     A a = ...;
     if (a instanceof B)
       // Here a has type B
-  * Classes that implement java.lang.Cloneable now automatically support 
+  * Classes that implement java.lang.Cloneable now automatically support
     the clone method.
   * The deprecated 'main(args) { ... }' syntax for the main function is not
     supported anymore. Please use instead: 'void main(String[] args) { ... }'
-  * Floating point literals are now of type double by default, adding 
+  * Floating point literals are now of type double by default, adding
     'f' or 'F' at the end will make them of type float.
   * Method parameters that are not dispatched on simply get their declared
     type. This avoids some type errors, and simplifies error messages.
@@ -234,7 +240,7 @@ nice (0.9.2)
     from a to b (inclusive) where b >= a. Example usage:
       for (i : 1..10) println(i);
   * In local variable declarations like 'var x = exp', the inferred type
-    for x is int when 'exp' is of type byte or short. This will avoid 
+    for x is int when 'exp' is of type byte or short. This will avoid
     unexpected behaviour in some cases.
   * Bugfixes (incrementation of byte local variables, require a default value
     for global variables, ...)
@@ -243,10 +249,10 @@ nice (0.9.2)
 
 nice (0.9.1)
 
-  * Final fields can be overriden in sub-classes with a more precise type
-    and a different default value. In particular, this removes the need for 
+  * Final fields can be overridden in sub-classes with a more precise type
+    and a different default value. In particular, this removes the need for
     a cast when reading the field's value from an instance of the sub-class.
-      class A 
+      class A
       {
         final List<String> names;
       }
@@ -257,10 +263,10 @@ nice (0.9.1)
     This is only possible for final fields for type safety reasons.
   * A class can now have initializers, which are executed each time an instance
     is created.
-      class A 
+      class A
       {
         // Initializer
-        { 
+        {
           // Initialization code goes here.
         }
       }
@@ -271,7 +277,7 @@ nice (0.9.1)
       int[] array = [1,2,3,4,5];
       for (elem : array) println(elem);
   * The compiler now warns about non-existing sourcepath entries.
-  * Bugfixes (parameter's default value refering to previous parameters, ...)
+  * Bugfixes (parameter's default value referring to previous parameters, ...)
 
  -- Sat,  9 Aug 2003 23:19:41 +0200
 
@@ -318,18 +324,18 @@ nice (0.9.0)
       void foo(int number);
       foo(number) { ... } //correct
       //foo(num) { ... } //not valid
-    This is important, so that a typo in a global constant or enum name 
+    This is important, so that a typo in a global constant or enum name
     in a method implementation does not lead to a default implementation.
   * Added operator ** to calculate powers of longs, doubles and BigIntegers.
-  * The 'char' type is no longer a subtype of int. The integer unicode 
+  * The 'char' type is no longer a subtype of int. The integer unicode
     representation of a character c can be obtained by int(c).
   * Interfaces can now implement (finally or not) abstract interfaces.
   * 'true' and 'false' are now keywords, and better code is generated for them.
-    The termination properties of loops with literal boolean values are now 
+    The termination properties of loops with literal boolean values are now
     recognized, as in Java.
   * Redefining of local variables in their scope is not allowed anymore.
   * Method bodies with a single statement can be written without brackets.
-    example: void foo() = throw new Exception(); 
+    example: void foo() = throw new Exception();
   * It is possible to bind the values of tuple arguments to functions:
       String foo((String s, String t)) = s + t;
     It also works for anonymous functions:
@@ -347,7 +353,7 @@ nice (0.9.0)
   * Bugfixes (Parsing of nested tuples, global constants of type char,
     overloading resolution of method implementations with additional tc's, ...)
   * Improved some error messages.
-  
+
  -- Fri, 18 Jul 2003 01:40:25 +0200
 
 nice (0.8)
@@ -355,14 +361,14 @@ nice (0.8)
   * Stable version, based on 0.7.9
   * Added operators to compute with java.math.BigInteger (+,-,*,/,%,...).
   * In functional types, '()' is always equivalent to 'void'. Ex: int->()
-  * Anonymous functions that never return normally can be used with any 
+  * Anonymous functions that never return normally can be used with any
     return type.
   * Bugfixes (some cases of optional parameters, allowing arbitrarily nested
     tuples on the left side of an assignment, recursion for local functions,
     allow method parameter's default values to refer to 'this' when the method
     is declared inside a class, declaration of multiple local variables,
     nested type parameters in method declarations, improved some error messages,
-    resolving overloading between fields and global variables, implemented 
+    resolving overloading between fields and global variables, implemented
     nullness inference for local constants).
 
  -- Wed, 14 May 2003 16:30:15 +0200
@@ -390,19 +396,19 @@ nice (0.7.9)
 
         // Now we use the fact the res is a list.
         // Therefore, it would be impossible to declare its type as C<U>.
-        res.add(res[0]); 
+        res.add(res[0]);
 
         // By returning res, we need the fact that it is a subtype of C<U>,
         // so we could not declare its type as List<U>.
         return res;
       }
-  * Changed the syntax for local variables. The "final" keyword is deprecated 
-    now for local variables, use "let" instead. In addition to the standard 
+  * Changed the syntax for local variables. The "final" keyword is deprecated
+    now for local variables, use "let" instead. In addition to the standard
     "type name = ..." syntax two new forms are allowed:
-    let [ type ] name [ = expression ] ; 
+    let [ type ] name [ = expression ] ;
     var [ type ] name [ = expression ] ;
     At least a type or a default value are required.
-    The type can only be left away when the compiler is able to interfere 
+    The type can only be left away when the compiler is able to interfere
     the type which is not always possible.
     A non function example to show some aspects the new syntax:
       let int[] arr = [1,2,3,4]; // here type interference doesn't work.
@@ -430,8 +436,8 @@ nice (0.7.9)
 
 nice (0.7.8)
 
-  * Some error messages are more usefull.
-  * All operators are inlined and some operators (&&, ||, ! and comparisons) 
+  * Some error messages are more useful.
+  * All operators are inlined and some operators (&&, ||, ! and comparisons)
     and if-statements generate better bytecode now.
   * Improved bytecode generation of pre/post-condition.
   * Implemented the enhanced for loop (similar to java 1.5 proposal).
@@ -449,7 +455,7 @@ nice (0.7.8)
     Also report more nicely /* comments that are not closed.
   * Allow nested tuples on the left side of a tuple assignment:
       (String a, (String b, String c)) = ("a", ("b", "c"));
-  * Bugfixes (solved problems with case insentive filenames, ...).
+  * Bugfixes (solved problems with case-insensitive filenames, ...).
 
  -- Tue,  8 Apr 2003 21:03:43 +0200
 
@@ -473,14 +479,14 @@ nice (0.7.7)
   * The '@' in '@null' patterns is deprecated, '@' should be omitted.
   * The 'fun' keyword for anonymous functions is deprecated. It can be omitted.
   * New policy for typing calls to Java methods. By default, the typing
-    is more convenient, considering arguments as possibly null, and 
+    is more convenient, considering arguments as possibly null, and
     results as non-null. The '--strict' compiler option enforces a stricter
     heuristic.
-    Additionally, arrays are always considered to have non-null component 
+    Additionally, arrays are always considered to have non-null component
     types.
     Final fields are considered non-null.
   * Static native methods are not (wrongly) imported in the global name space
-    anymore. One can just use them as in Java, by prefixing with the class 
+    anymore. One can just use them as in Java, by prefixing with the class
     name:
       String s = Integer.toHexString(100);
     It's now also possible to refer to static methods as anonymous functions:
@@ -489,7 +495,7 @@ nice (0.7.7)
     to T ?-> U, and void -> Type as an alternative to () -> Type.
   * Added the 'concat' function on arrays, and sort function for lists.
   * Faster compilation for large projects with many classes.
-  * Bugfixes (anonymous functions inside functionals with constracts,
+  * Bugfixes (anonymous functions inside functionals with contracts,
     typechecking loop tests, other fixes to reduce the difference between
     what the parser accepts and the compiler can handle, ...).
 
@@ -497,13 +503,13 @@ nice (0.7.7)
 
 nice (0.7.6)
 
-  * Implemented optional parameters' default value refering to 
+  * Implemented optional parameters' default value referring to
     previous parameters, like 'to' in the following example:
       <T> T[] slice(T[] array, int from = 0, int to = array.length - 1);
   * Added syntax for multiple comparisons (thanks to Arjan Boeijink):
       if (0 < i < N) ...
   * Fixed several issues with generic collections.
-    In particular, for List<int> there was an ambiguity between 
+    In particular, for List<int> there was an ambiguity between
       remove(int) and remove(T) (since T=int).
     Therefore we renamed remove(int) into removeAt(int).
   * Added float(_) and char(_) primitives for value conversion.
@@ -515,13 +521,13 @@ nice (0.7.6)
   * 'this' can now be left implicit even in implementations of methods
     declared externally to a class.
   * Parser support for public-read and private-write fields (experimental).
-  * Performance improvement for anonymous functions and for polymorphic 
+  * Performance improvement for anonymous functions and for polymorphic
     usage of arrays.
   * Improved references to source lines in the bytecode (stack traces).
-  * Bugfixes (using anonymous functions while overriding native methods, 
-    automatic array conversions in polymorphic code, nested literal primitive 
-    arrays, mutually dependant packages, ...).
-  * For convenience of command-line tools (shells) with automatic completion, 
+  * Bugfixes (using anonymous functions while overriding native methods,
+    automatic array conversions in polymorphic code, nested literal primitive
+    arrays, mutually dependent packages, ...).
+  * For convenience of command-line tools (shells) with automatic completion,
     we allow a directory name instead of the corresponding package name.
     That is, we replace '/' (which is illegal in package names) by '.'.
     It is therefore possible to type 'nicec my/package/'.
@@ -536,7 +542,7 @@ nice (0.7.5)
       class Elem<!A> { ... }
   * Addition of the || operator on optional values:
       e1 || e2
-    evalues e1 and returns its value if it is not null (without evaluating e2).
+    evaluates e1 and returns its value without evaluating e2 if e1 is not null.
     If e1 evaluates to null it returns the value of e2.
     It is equivalent to e1 != null ? e1 : e2, except e1 is not evaluated twice.
     This operator is handy to sequence expression to produce a value:
@@ -545,14 +551,14 @@ nice (0.7.5)
     equivalent to Java's (int), (short) and (byte).
   * Short anonymous functions made of one assignment now return void. Allows:
       [1,2,3].foreach(int j => i += j);
-    instead of 
+    instead of
       [1,2,3].foreach(int j => { i += j; });
   * Arrays created with 0 elements have a non-option component type:
       String[] s0 = new String[0];
       ?String[] s1 = new String[1];
     They can still be used with option component type:
       ?String[] s0 = new String[0];
-  * Changed suffix notation for multiple-dimension array types, to match 
+  * Changed suffix notation for multiple-dimension array types, to match
     initialization. Dimensions are listed in order, instead of reverse order.
     For instance,
       String[][?]
@@ -571,7 +577,7 @@ nice (0.7.5)
 
 nice (0.7.4)
 
-  * Added support for Generic Java types. This allows in particular to use 
+  * Added support for Generic Java types. This allows in particular to use
     java.util.* collections with parameterized types (e.g. List<String>).
     These replace the previous (very partial) collections from nice.lang.
     Functionals on collections (foreach, map, has, ...) are applicable
@@ -583,7 +589,7 @@ nice (0.7.4)
   * Fixed error message for calling new on an interface or Java abstract
     class, and when a class or interface (indirectly) implements itself.
   * Allow the <T> syntax to introduce type variables, in addition to
-    <Any T> (that is, any is optional). This is consistent with GJ, 
+    <Any T> (that is, any is optional). This is consistent with GJ,
     and the syntax for class type parameters.
   * Improved overloading resolution when used on functions with optional
     arguments.
@@ -651,9 +657,9 @@ nice (0.5.6)
 
   * Added the ".class" construct.
   * Completed the "instanceof" construct.
-  * Calling new T[size] where T is a type variable now correctly returns 
+  * Calling new T[size] where T is a type variable now correctly returns
     an array with optional element type. It can be filled with non-null values
-    using the 'fill' function, e.g. 
+    using the 'fill' function, e.g.
         fill(new T[size], int i => f(x[i]))
 
  -- Sat,  6 Jul 2002 12:44:51 +0200
@@ -664,8 +670,8 @@ nice (0.5.5)
     This is simpler, and the behaviour is more logical.
   * The compiler is now reentrant. This should not make any difference
     when running from the command-line, but this is important to allow
-    tools written in Java or Nice (like the Ant task, the testsuite, 
-    an IDE) to call the compiler repetively, without starting a new JVM.
+    tools written in Java or Nice (like the Ant task, the testsuite,
+    an IDE) to call the compiler repetitively, without starting a new JVM.
   * Fixed several bugs (export of optional functional types, ...).
 
  -- Fri, 21 Jun 2002 09:18:20 +0200
@@ -675,15 +681,15 @@ nice (0.5.4)
   * Added short syntax for anonymous functions:
       int i => i+1          /* function of one argument */
       (int i, int j) => i+j /* function of several arguments */
-  * Renamed `iter` to `foreach`. `iter` is still accepted, 
+  * Renamed `iter` to `foreach`. `iter` is still accepted,
     but will probably be removed sometime in the future.
     Together with the syntax change for anonymous functions,
     this gives a nice and user-friendly syntax for iterations:
-    
+
       names.foreach(String name => println(name));
 
-  * Anonymous function cannot appear where a statement is expected 
-    (some expressions can). This is good since an anonymous function which 
+  * Anonymous function cannot appear where a statement is expected
+    (some expressions can). This is good since an anonymous function which
     is not called cannot have side-effects, and therefore this case was
     meaningless and probably buggy.
   * Fixed inference for possibly null variables in some complex cases.
@@ -693,14 +699,14 @@ nice (0.5.4)
 
 nice (0.5.3)
 
-  * Testing a variable against null in a while or for loop condition now 
+  * Testing a variable against null in a while or for loop condition now
     allows to use it as non-null, until is it assigned a possibly null value.
-  * Added many mathematical functions (sin, cos, round, max, min, ...). 
+  * Added many mathematical functions (sin, cos, round, max, min, ...).
     This makes it unnecessary to prefix them with (java.lang.)Math.
-  * It is now possible to use "." (current directory) in 
-    the --classpath argument (this needed a workaround for 
+  * It is now possible to use "." (current directory) in
+    the --classpath argument (this needed a workaround for
     a probable bug in Sun's URLClassLoader, at least in 1.3).
-  * Other bugfixes (creating arrays of "exotic" types, using arrays in field 
+  * Other bugfixes (creating arrays of "exotic" types, using arrays in field
     initializers).
 
  -- Thu, 30 May 2002 12:57:46 +0200
@@ -722,9 +728,9 @@ nice (0.5.1)
 
   * Constructors now take the initial values of the object's fields as
     named arguments. A field declaration (inside a class declaration)
-    now accepts an optional value after "=" (like in Java). This value 
-    is used as the default if the field is not mentioned in a call to 
-    the constructor. A field with no default value must be mentioned 
+    now accepts an optional value after "=" (like in Java). This value
+    is used as the default if the field is not mentioned in a call to
+    the constructor. A field with no default value must be mentioned
     in every call to the constructor.
   * Compile properly functions declared inside abstract interfaces.
   * Allow optional parameters to be used across modules.
@@ -739,13 +745,13 @@ nice (0.5)
     before version 1.0
   * Assigning a possibly null value to a variable of non-null type
     now produces an error instead of a warning.
-  * Fixes bug that considered that 
+  * Fixes bug that considered that
       int a = 10, b;
     initializes both a and b to 10.
   * Fixed variable initialization analysis for do-while loops.
   * Make the compiler compatible with JDK 1.4
-  * Fixed bug on MS-Windows with archive creation because of the 
-    case-insensivity of the file system.
+  * Fixed bug on MS-Windows with archive creation because of the
+    case-insensitivity of the file system.
   * Fixed creation of archive from up-to-date packages stored in jar.
   * Accept anonymous functions that do nothing.
   * Editor (emacs) mode is now driven by command-line instead of inspecting
@@ -769,7 +775,8 @@ nice (0.0.020405)
     Most failures come from the difference in the syntax of method declaration.
   * Arrays of void values are forbidden. They most probably originate from
     a bug in the source program.
-  * Better handling of inhomogenous tuples with native types (e.g. <int, long>)
+  * Better handling of inhomogeneous tuples with native types
+    (e.g. <int, long>).
   * Better wrapping/unwrapping code for arrays used as Collections.
   * Bugfixes for some polymorphic operations on arrays.
   * Bugfixed the bitshift operators >>, >>> and <<.
@@ -778,10 +785,10 @@ nice (0.0.020405)
 
 nice (0.0.020226)
 
-  * Fixed bug that prevented using "this" in overriden native methods.
+  * Fixed bug that prevented using "this" in overridden native methods.
   * Better error messages for method calls with wrong number of arguments.
   * Accept methods with no implementation when their domain is empty.
-  * Abstract interfaces are fully qualified just like classes and 
+  * Abstract interfaces are fully qualified just like classes and
     correctly list their super-interfaces in the package interface.
     This really makes it possible to use them across packages.
   * Various other bugfixes.
@@ -796,9 +803,9 @@ nice (0.0.020205)
   	(int x, int y) = f(0);
   * Added 'break' and 'continue' statements.
   * Implemented 'do' loops.
-  * Allow overriding of native java methods. It is now possible to 
+  * Allow overriding of native java methods. It is now possible to
     define a subclass of a java class or interface and override the methods.
-  * Changed compilation scheme for method alternatives. This results in 
+  * Changed compilation scheme for method alternatives. This results in
     shorter class files and more intuitive stack traces.
 
  -- Tue,  5 Feb 2002 13:15:03 +0100
@@ -816,8 +823,8 @@ nice (0.0.020102)
   * Made nicec smart about when a local variable might be null.
   * Added the 'instanceof' and '~' (bitwise complement) keywords.
   * Do not stop at the first syntax or type error in more situations.
-  * Ehanced error messages.
-  * Emacs mode: allow to interactively set the compiler's location 
+  * Enhanced error messages.
+  * Emacs mode: allow to interactively set the compiler's location
     (the string variable 'nice-program').
 
  -- Wed,  2 Jan 2002 20:31:31 +0100

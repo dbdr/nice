@@ -47,11 +47,12 @@ public class ReturnStmt extends Statement
 
   public gnu.expr.Expression generateCode()
   {
-    gnu.expr.BlockExp block = includingFunction.getBlock();
     if (value == null)
-      return new gnu.expr.ExitExp(block);
+      return nice.tools.code.Gen.returnVoid();
     else
-      return new gnu.expr.ExitExp(value.generateCode(), block);
+      return nice.tools.code.Gen.returnValue
+	(value.generateCode(), 
+	 nice.tools.code.Types.javaType(value.getType()));
   }
   
   /****************************************************************

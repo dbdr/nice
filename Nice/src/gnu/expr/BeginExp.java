@@ -76,7 +76,11 @@ public class BeginExp extends Expression
   {
     int n = length, i;
     for (i = 0; i < n - 1; i++)
-      exps[i].compileWithPosition(comp, Target.Ignore);
+      {
+	exps[i].compileWithPosition(comp, Target.Ignore);
+	if (! comp.getCode().reachableHere())
+	  return;
+      }
     exps[i].compileWithPosition(comp, target);
   }
 

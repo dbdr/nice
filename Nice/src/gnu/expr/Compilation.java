@@ -1546,6 +1546,7 @@ public class Compilation
     for (LambdaExp c = pkg.firstClass; c != null; c = c.nextSibling)
       {
 	literalTable = new Hashtable (100);
+	c.literalTable = literalTable;
 	topLambda = c;
 	topClass = (ClassType) c.getType();
 	c.compileChildMethods(this);
@@ -1554,11 +1555,13 @@ public class Compilation
     for (LambdaExp c = pkg.firstClass; c != null; c = c.nextSibling)
       {
 	topLambda = c;
+	literalTable = c.literalTable;
 	topClass = (ClassType) c.getType();
-	c.generateClassInit(this);
 	
 	curClass = topClass;
 	generateApplyMethods(c);
+
+	c.generateClassInit(this);
       }
   }
 

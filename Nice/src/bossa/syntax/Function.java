@@ -28,6 +28,4 @@ interface Function
    * or null if no typecheking must be done.
    */
   mlsub.typing.Monotype getReturnType();
-  
-  gnu.expr.BlockExp getBlock();
 }

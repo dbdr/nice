@@ -21,6 +21,7 @@ import java.util.*;
 import bossa.util.Debug;
 import bossa.util.Location;
 import nice.tools.code.Types;
+import nice.tools.code.Gen;
 
 import mlsub.typing.Monotype;
 import mlsub.typing.MonotypeConstructor;
@@ -440,9 +441,6 @@ public class MethodBodyDefinition extends Definition
    * Code generation
    ****************************************************************/
 
-  private gnu.expr.BlockExp blockExp;
-  public gnu.expr.BlockExp getBlock() { return blockExp; }
-  
   private Type[] javaArgTypes()
   {
     Type[] res = new Type[parameters.length];
@@ -465,16 +463,15 @@ public class MethodBodyDefinition extends Definition
       Pattern.bytecodeRepresentation(formals);
 
     gnu.expr.LambdaExp lexp = 
-      nice.tools.code.Gen.createMethod(bytecodeName, 
-				       javaArgTypes(),
-				       definition.javaReturnType(),
-				       parameters);
-    gnu.expr.ReferenceExp ref = nice.tools.code.Gen.referenceTo(lexp);
+      Gen.createMethod(bytecodeName, 
+		       javaArgTypes(),
+		       definition.javaReturnType(),
+		       parameters);
+    gnu.expr.ReferenceExp ref = Gen.referenceTo(lexp);
 
     //FIXME: comment the next line?
     Statement.currentScopeExp = lexp;
-    blockExp = (gnu.expr.BlockExp) lexp.body;
-    blockExp.setBody(body.generateCode());
+    Gen.setMethodBody(lexp, body.generateCode());
     module.addMethod(lexp, true);
 
     lexp.addBytecodeAttribute

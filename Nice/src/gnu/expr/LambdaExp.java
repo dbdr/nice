@@ -1013,6 +1013,7 @@ public class LambdaExp extends ScopeExp
 
   /** Rembembers literals to initialize (in <clinit>). */
   Literal literalsChain;
+  java.util.Hashtable literalTable;
 
   void generateClassInit(Compilation comp)
   {
@@ -1562,9 +1563,19 @@ public class LambdaExp extends ScopeExp
     properties = Procedure.setProperty(properties, key, value);
   }
 
+  private Type returnType;
+
+  public final void setReturnType(Type returnType)
+  {
+    this.returnType = returnType;
+  }
+
   public final Type getReturnType()
   {
-    return body.getType();
+    if (returnType != null)
+      return returnType;
+    else
+      return body.getType();
   }
 
   /**

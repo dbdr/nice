@@ -66,27 +66,26 @@ public class Gen
   }
 
   /**
-     @param forceGeneration
+     @param toplevel If the method can be called from foreign code.
+                     This forces its generation even if it is 
+		     apparently never called.
   **/
   public static LambdaExp createMethod(String bytecodeName,
 				       Type[] argTypes,
 				       Type retType,
 				       MonoSymbol[] args,
-				       boolean forceGeneration)
+				       boolean toplevel)
   {
     bytecodeName = nice.tools.code.Strings.escape(bytecodeName);
     int arity = args == null ? 0 : args.length;
 
-    BlockExp blockExp = new gnu.expr.BlockExp(retType);
-
-    gnu.expr.LambdaExp lexp = new gnu.expr.LambdaExp(blockExp);
+    gnu.expr.LambdaExp lexp = new gnu.expr.LambdaExp();
+    lexp.setReturnType(retType);
     lexp.setName(bytecodeName);
     lexp.min_args = lexp.max_args = arity;
-    if (forceGeneration)
-      {
-	lexp.setCanCall(true);
-	lexp.forceGeneration();
-      }
+    lexp.forceGeneration();
+    if (toplevel)
+      lexp.setCanCall(true);
 
     // Parameters
     for(int n = 0; n < arity; n++)
@@ -103,6 +102,11 @@ public class Gen
       }
 
     return lexp;
+  }
+
+  public static void setMethodBody(LambdaExp method, Expression body)
+  {
+    method.body = body;
   }
 
   /**
@@ -123,5 +127,16 @@ public class Gen
   public static LambdaExp dereference(Expression ref)
   {
     return (LambdaExp) ((ReferenceExp) ref).getBinding().getValue();
+  }
+
+  public static Expression returnVoid()
+  {
+    return nice.tools.code.Inline.inline(nice.lang.inline.Return.returnVoid);
+  }
+
+  public static Expression returnValue(Expression value, Type type)
+  {
+    return nice.tools.code.Inline.inline(nice.lang.inline.Return.create(type),
+					 value);
   }
 }

@@ -27,7 +27,11 @@ public class StackTarget extends Target
   {
     if (type == stackType)
       return true;
+
     CodeAttr code = comp.getCode();
+    if (! code.reachableHere())
+      return true;
+
     if (stackType.isVoid())
       {
 	comp.compileConstant (Values.empty);

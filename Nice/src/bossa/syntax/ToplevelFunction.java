@@ -123,9 +123,6 @@ implements Function
    * Code generation
    ****************************************************************/
 
-  private gnu.expr.BlockExp blockExp;
-  public gnu.expr.BlockExp getBlock() { return blockExp; }
-
   protected gnu.expr.Expression computeCode()
   {
     if (body == null)
@@ -156,8 +153,7 @@ implements Function
     LambdaExp lexp = nice.tools.code.Gen.dereference(getCode());
 
     Statement.currentScopeExp = lexp;
-    blockExp = (gnu.expr.BlockExp) lexp.body;
-    blockExp.setBody(body.generateCode());
+    nice.tools.code.Gen.setMethodBody(lexp, body.generateCode());
   }
 
   /****************************************************************

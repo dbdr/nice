@@ -89,19 +89,18 @@ public class FunExp extends Expression implements Function
    * Code generation
    ****************************************************************/
 
-  private gnu.expr.BlockExp blockExp;
-  public gnu.expr.BlockExp getBlock() { return blockExp; }
-
   public gnu.expr.Expression compile()
   {
     gnu.expr.LambdaExp res = nice.tools.code.Gen.createMethod
-      (null, null, nice.tools.code.Types.javaType(getType()), formals, false);
+      (null, 
+       nice.tools.code.Types.javaType(MonoSymbol.getMonotype(formals)), 
+       nice.tools.code.Types.javaType(inferredReturnType()), 
+       formals, false);
 
     gnu.expr.ScopeExp save = Statement.currentScopeExp;
     Statement.currentScopeExp = res;       // push
 
-    this.blockExp = (gnu.expr.BlockExp) res.body;
-    this.blockExp.setBody(body.generateCode());
+    nice.tools.code.Gen.setMethodBody(res, body.generateCode());
     
     Statement.currentScopeExp = save; // pop
 

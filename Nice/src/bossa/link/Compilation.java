@@ -16,9 +16,11 @@ import bossa.syntax.*;
 
 import gnu.expr.*;
 import gnu.bytecode.Access;
+import gnu.bytecode.Type;
 import gnu.bytecode.ClassType;
 import gnu.expr.Expression;
 
+import nice.tools.code.Gen;
 
 import java.util.*;
 
@@ -36,7 +38,6 @@ public final class Compilation
 		      bossa.modules.Package module)
   {
     LambdaExp lexp = m.getLambda();
-    BlockExp block = (gnu.expr.BlockExp) lexp.body;
     
     // parameters of the alternative function are the same in each case, 
     // so we compute them just once
@@ -47,20 +48,18 @@ public final class Compilation
 	param = param.nextDecl())
       params[rank++] = new ReferenceExp(param);
 
-    block.setBody(dispatch(sortedAlternatives.iterator(),
-			   m.getType().codomain(),
-			   m.javaReturnType().isVoid(),
-			   block,
-			   params));
+    Gen.setMethodBody
+      (lexp, 
+       dispatch(sortedAlternatives.iterator(),
+		m.javaReturnType(), m.javaReturnType().isVoid(), params));
   }
   
   private static gnu.bytecode.Method newError =
     ClassType.make("java.lang.Error").getDeclaredMethod("<init>", 1);
 
   private static Expression dispatch(Iterator sortedAlternatives, 
-				     mlsub.typing.Monotype returnType, 
+				     Type returnType, 
 				     boolean voidReturn,
-				     final BlockExp block, 
 				     Expression[] params)
   {
     if(!sortedAlternatives.hasNext())
@@ -74,19 +73,17 @@ public final class Compilation
 	  new ApplyExp(nice.lang.inline.Throw.instance,
 		       new Expression[]{exception});
 
-	if (voidReturn)
-	  return throwExp;
-	else
-	  return new BeginExp
-	    (throwExp, nice.tools.code.Types.defaultValue(returnType));
+	return throwExp;
       }
 
     Alternative a = (Alternative) sortedAlternatives.next();
     Expression matchTest = a.matchTest(params);
 
     Expression matchCase = new ApplyExp(a.methodExp(), params);
-    if(!voidReturn)
-      matchCase = new ExitExp(matchCase, block);
+    if(voidReturn)
+      matchCase = new BeginExp(matchCase, Gen.returnVoid());
+    else
+      matchCase = Gen.returnValue(matchCase, returnType);
     
     boolean optimize = false;
 
@@ -95,6 +92,6 @@ public final class Compilation
     else
       return new gnu.expr.IfExp
 	(matchTest, matchCase, 
-	 dispatch(sortedAlternatives, returnType, voidReturn, block, params));
+	 dispatch(sortedAlternatives, returnType, voidReturn, params));
   }
 }

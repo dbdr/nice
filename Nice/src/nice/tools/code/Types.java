@@ -181,6 +181,9 @@ public final class Types
   
   public static Type[] javaType(Monotype[] ms)
   {
+    if (ms == null)
+      return null;
+
     Type[] res = new Type[ms.length];
     for(int i=0; i<ms.length; i++)
       res[i] = javaType(ms[i]);

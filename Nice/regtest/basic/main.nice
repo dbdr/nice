@@ -77,7 +77,7 @@ test_captures()
   println("" + j);
   println(""+(()=>--j)());
   println(""+(()=>j++)());
-  println(""+(()=>j=2*j)());
+  println(""+(()=>{ return j=2*j; })());
 }
 
 void main(String[] args)

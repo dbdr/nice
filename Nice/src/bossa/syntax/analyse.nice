@@ -516,12 +516,15 @@ analyse(s@ExpressionStmt, info)
 analyse(l@LoopStmt, info)
 {
   info.beginInner(false);
-  l.whileExp = analyse(l.whileExp, info);
+  if (l.isTestFirst())
+    l.whileExp = analyse(l.whileExp, info);
   LoopStmt save = info.currentLoop;
   info.currentLoop = l;
   analyse(l.loopBody, info);
   info.currentLoop = save;
   analyse(l.iterationStatements, info);
+  if (! l.isTestFirst())
+    l.whileExp = analyse(l.whileExp, info);
   info.endInner();
 }
 

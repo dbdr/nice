@@ -51,7 +51,7 @@ stronglyConnectedComponents<T>(start, successors)
   if(equals(min,mark.get(node)))
     {
       Vector<T> scc = makeVector(5);
-      T element = null;
+      T element;
       do
 	{
 	  element = stack.pop();

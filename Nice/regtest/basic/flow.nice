@@ -1,0 +1,55 @@
+/**************************************************************************/
+/*                                N I C E                                 */
+/*             A high-level object-oriented research language             */
+/*                        (c) Daniel Bonniot 2002                         */
+/*                                                                        */
+/*  This program is free software; you can redistribute it and/or modify  */
+/*  it under the terms of the GNU General Public License as published by  */
+/*  the Free Software Foundation; either version 2 of the License, or     */
+/*  (at your option) any later version.                                   */
+/*                                                                        */
+/**************************************************************************/
+
+package regtest.basic;
+
+/**
+   Test various flow analyses.
+
+   @version $Date$
+   @author daniel (bonniot@users.sourceforge.net)
+ */
+
+void test_VariableInitialization()
+{
+  int x = 1;
+  int y;
+  y = 2;
+  int z;
+  if (x == 0)
+    z = 3;
+  else
+    z = 4;
+  (int a, int b) = (5, 6);
+  int c; int d;
+  (c, d) = (7, 8);
+
+  int e;
+  if (d == d)
+    e = 9;
+  else
+    return;
+
+  int f;
+  if (e != e)
+    throw new Error();
+  else
+    f = 10;
+
+  // Checks that all variables are considered initialized by using them.
+  println("" + x + y + z + a + b + c + d + e + f);
+
+  int g;
+  do {
+    g = 0;
+  } while (g > 0);
+}

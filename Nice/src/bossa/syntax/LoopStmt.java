@@ -63,12 +63,7 @@ public class LoopStmt extends Statement
     this.testFirst = testFirst;
   }
 
-  void createBlock()
-  {
-    mustCreateBlock = true;
-  }
-
-  private boolean mustCreateBlock = false;
+  boolean isTestFirst() { return testFirst; }
 
   /****************************************************************
    * Code generation
@@ -76,6 +71,13 @@ public class LoopStmt extends Statement
 
   gnu.expr.LoopExp code;
   gnu.expr.BlockExp block;
+
+  void createBlock()
+  {
+    mustCreateBlock = true;
+  }
+
+  private boolean mustCreateBlock = false;
 
   gnu.expr.Expression generateCode()
   {

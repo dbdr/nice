@@ -1,3 +1,14 @@
+/// Global
+  class Point { double x; double y; }
+
+/// PASS bug
+  /// Toplevel
+/* Use the custom constructor before its declaration. */
+let Point origin = new Point(angle: 0, distance: 0);
+
+new Point(double angle, double distance) 
+{ this(x: distance * cos(angle), y: distance * sin(angle)); }
+
 /// PASS bug
   var p = new Point(angle: 0, distance: 1);
   assert abs(p.x - 1) < 0.01 && abs(p.y) < 0.01;
@@ -6,8 +17,6 @@
   assert abs(p.x - 1) < 0.01 && abs(p.y) < 0.01;
 
   /// Toplevel
-  class Point { double x; double y; }
-
   new Point(double angle, double distance) 
   { this(x: distance * cos(angle), y: distance * sin(angle)); }
 

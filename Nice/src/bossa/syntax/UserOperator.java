@@ -42,8 +42,14 @@ abstract class UserOperator extends MethodDeclaration
    * Resolution
    ****************************************************************/
 
+  private boolean resolved = false;
+
   void doResolve()
   {
+    if (resolved)
+      return;
+    resolved = true;
+
     // the type must be found before
     removeChild(getSymbol());
     getSymbol().doResolve();

@@ -38,6 +38,12 @@ public class CustomConstructor extends UserOperator
     return res;
   }
 
+  void resolve()
+  {
+    classTC = Node.getGlobalTypeScope().globalLookup(className);
+    TypeConstructors.addConstructor(classTC, this);
+  }
+
   public void printInterface(java.io.PrintWriter s)
   {
     s.print("new " + className + "(" + parameters + ");\n");
@@ -45,10 +51,10 @@ public class CustomConstructor extends UserOperator
 
   protected gnu.expr.Expression computeCode()
   {
-    return null;
+    return gnu.expr.QuoteExp.nullExp;
   }
 
   LocatedString className;
   Block body;
-
+  TypeConstructor classTC;
 }

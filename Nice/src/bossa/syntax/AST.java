@@ -47,12 +47,18 @@ public class AST extends Node
     ArrayList classes = new ArrayList(children.size());
     ArrayList methods = new ArrayList(children.size());
     ArrayList globals = new ArrayList(10);
+    ArrayList customConstructors = new ArrayList(10);
 
     for(Iterator i = children.iterator(); i.hasNext();)
       {
 	Object node = i.next();
 	if (node instanceof ClassDefinition)
 	  classes.add(node);
+        else if (node instanceof CustomConstructor)
+          {
+            customConstructors.add(node);
+            methods.add(node);
+          }
         else if (node instanceof MethodDeclaration)
           methods.add(node);
         else if (node instanceof EnumDefinition)
@@ -71,6 +77,9 @@ public class AST extends Node
 
     this.globals = (GlobalVarDeclaration[])
       globals.toArray(new GlobalVarDeclaration[globals.size()]);
+
+    this.customConstructors = (CustomConstructor[])
+      customConstructors.toArray(new CustomConstructor[customConstructors.size()]);
   }
   
   public void buildScope()
@@ -95,6 +104,10 @@ public class AST extends Node
     // Classes are resolved first, since code can depend on them
     for(int i = 0; i < classes.length; i++)
       resolve(classes[i]);
+
+    // Custom constructors depend classes, and code can depend on them
+    for(int i = 0; i < customConstructors.length; i++)
+      resolve(customConstructors[i]);
 
     for(Iterator i = children.iterator();i.hasNext();)
       {
@@ -218,5 +231,6 @@ public class AST extends Node
   private ClassDefinition[] classes;
   private MethodDeclaration[] methods;
   private GlobalVarDeclaration[] globals;
+  private CustomConstructor[] customConstructors;
 }
 

@@ -27,6 +27,8 @@ void typecheck(Expression);
  * Expressions
  ****************************************************************/
 
+typecheck(@null(Expression)) {}
+
 /**
    Checks that right can be assigned to a variable of type left.
    Returns a new expression to be used instead of right,
@@ -134,10 +136,10 @@ typecheck(e@NewArrayExp)
   typecheckExps(e.knownDimensions);
   for (int i=0; i<e.knownDimensions.length; i++)
     try{
-      mlsub.typing.Typing.leq(e.knownDimensions[i].getType(),
+      Typing.leq(e.knownDimensions[i].getType(),
 			      ConstantExp.intPolytype);
     }
-    catch(mlsub.typing.TypingEx ex){
+    catch(TypingEx ex){
       bossa.util.User.error(e.knownDimensions[i],
 			    ""+e.knownDimensions[i] + " should be an integer");
     }
@@ -145,6 +147,8 @@ typecheck(e@NewArrayExp)
 
 typecheck(e@NewExp)
 {
+  // force computation of type
+  e.getType();
   e.arguments.typecheck();
 }
 
@@ -169,6 +173,8 @@ typecheck(e@SymbolExp) {}
  * Statements
  ****************************************************************/
 
+typecheck(@null(Statement)) {}
+
 typecheck(b@Block)
 {
   javaList(b.locals).iter(fun(Block$LocalDeclaration d)=> typecheck(d));
@@ -183,7 +189,7 @@ typecheck(decl@Block$LocalDeclaration)
   try{
     decl.value = checkAssignment(decl.left.getType(),decl.value);
   }
-  catch(mlsub.typing.TypingEx t){
+  catch(TypingEx t){
     bossa.util.User.error
     (decl.left,
      "Typing error : " + decl.left.name +
@@ -242,10 +248,6 @@ typecheck(t@ThrowStmt)
 
 typecheck(t@TryStmt)
 {
-  // Temporary. Use @null instead
-  if (t == null)
-    return;
-
   typecheck(t.body);
   javaList(t.catches).iter(fun(TryStmt$Catch c)=> typecheck(c.body));
   typecheck(t.finallyBody);

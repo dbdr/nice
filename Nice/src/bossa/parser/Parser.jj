@@ -1315,8 +1315,7 @@ MethodDeclaration methodDeclaration():
                                      body, contract);}
       |
         // Nice method
-        // Match a ";" only if there is not one already (from the contract)
-        [ LOOKAHEAD( { contract == Contract.noContract } ) ";" ]
+        ";"
         { res = new NiceMethod(name,cst,returnType,parameters,contract); }
       )
     )
@@ -1409,29 +1408,31 @@ Contract contract() :
   [ "requires" 
     { res = new Contract(); }
 
-      condition = Expression() 
-      ( ":" name = Expression() { res.addRequire(condition, name); }
+      condition = SideEffectFreeExpression() 
+      ( ":" name = SideEffectFreeExpression() 
+        { res.addRequire(condition, name); }
       | { res.addRequire(condition); } )
 
-    ( "," 
-      condition = Expression() 
-      ( ":" name = Expression() { res.addRequire(condition, name); }
+    ( "," [ // Trailing "," allowed for easy reordering, removal of last line..
+      condition = SideEffectFreeExpression() 
+      ( ":" name = SideEffectFreeExpression() 
+        { res.addRequire(condition, name); }
       | { res.addRequire(condition); } )
-    )*
-    ";"
+    ] )*
   ]
   [ "ensures" { if (res == Contract.noContract) res = new Contract(); }
 
-      condition = Expression() 
-      ( ":" name = Expression() { res.addEnsure(condition, name); }
+      condition = SideEffectFreeExpression() 
+      ( ":" name = SideEffectFreeExpression() 
+        { res.addEnsure(condition, name); }
       | { res.addEnsure(condition); } )
 
-    ( ","
-      condition = Expression() 
-      ( ":" name = Expression() { res.addEnsure(condition, name); }
+    ( "," [ // Trailing "," allowed for easy reordering, removal of last line..
+      condition = SideEffectFreeExpression() 
+      ( ":" name = SideEffectFreeExpression() 
+        { res.addEnsure(condition, name); }
       | { res.addEnsure(condition); } )
-    )*
-    ";"
+    ] )*
   ]
   { return res; }
 }
@@ -1756,6 +1757,13 @@ Expression ClassicExpression() :
     }
   ]
   { return e1; }
+}
+
+Expression SideEffectFreeExpression() :
+{ Expression e; }
+{
+  e = ConditionalExpression()
+  { return e; }
 }
 
 Token AssignmentOperator() :

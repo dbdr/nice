@@ -1,5 +1,6 @@
 /// PASS
   /// Toplevel
+class A {
 int f(int x, int y)
   requires 
     x > 3 : "x is big enough",
@@ -7,55 +8,70 @@ int f(int x, int y)
   ensures 
     result > 3
 = x;
+}
 
 /// FAIL
   /// Toplevel
+class A {
 int f(int x, int y)
   requires 
     /*/// FAIL HERE */ x : "x is big enough"
 = x;
+}
 
 /// FAIL
   /// Toplevel
+class A {
 void f(int x)
   ensures result == result
 {}
+}
 
 /// PASS
-  f(1);
+  new A().f(1);
   /// Toplevel
+class A {
 int f(int x)
   ensures result > 0
 = x;
+}
 
 /// PASS
   try {
-    f(0);
+    new A().f(0);
     throw new Exception();
   } catch (AssertionFailed e) {}
   /// Toplevel
+class A {
 int f(int x)
   ensures result > 0
 = x;
+}
 
 /// PASS
-  f();
+  new A().f();
   /// Toplevel
+class A {
 void f()
   ensures true
 {}
+}
 
 /// PASS
   try {
-    f();
+    new A().f();
     throw new Exception();
   } catch(AssertionFailed e) {}
   /// Toplevel
+class A {
 void f()
   ensures false
 {}
+}
 
 /// FAIL
   /// Toplevel
+class A {
   int f() ensures ((/*/// FAIL HERE */ result = 0) == 0)
   = 1;
+}

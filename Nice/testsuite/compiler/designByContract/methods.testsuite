@@ -3,7 +3,7 @@
 int f(int x, int y)
   requires 
     x > 3 : "x is big enough",
-    y < x;
+    y < x
   ensures 
     result > 3;
 

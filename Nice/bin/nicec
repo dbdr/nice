@@ -120,7 +120,7 @@ case $progname in
     shift
 
     CLASSPATH=$jar:${NICE}:$CLASSPATH
-    export CLASPATH
+    export CLASSPATH
     exec ${JAVA} nice.tools.runJar ${jar} "$@"
   ;;
   *)

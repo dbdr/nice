@@ -388,12 +388,14 @@ public class Package implements mlsub.compilation.Module, Located, bossa.syntax.
 	  Package m = (Package) i.next();
 	  f.print("import "+m.getName()+";\n");
 	}
+      f.println();
     
       for(int i = 0; i < opens.length; i++)
 	{
 	  f.print("import " + opens[i] + ".*;\n");
 	}
-    
+      f.println();
+
       ast.printInterface(f);
       f.close();
     }

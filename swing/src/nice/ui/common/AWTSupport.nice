@@ -1,3 +1,14 @@
+
+/**************************************************************************/
+/*                                                                        */
+/*  This program is free software; you can redistribute it and/or modify  */
+/*  it under the terms of the GNU General Public License as published by  */
+/*  the Free Software Foundation; either version 2 of the License, or     */
+/*  (at your option) any later version.                                   */
+/*                                                                        */
+/**************************************************************************/
+
+
 package nice.ui.common;
 
 
@@ -14,8 +25,6 @@ interface MappableAWTEventListener extends MappableListener {}
 abstract interface AWTEventKey extends ListenerKey {}
 
 
-
-
 /**
  * static HashMaps to store references to the added listeners
  * used for classes that don't allow the getXxxListener operation
@@ -24,13 +33,13 @@ abstract interface AWTEventKey extends ListenerKey {}
 var Map<Object,?java.util.List<NDragSourceListener>> dragSourceListeners = new HashMap();
 var Map<Object,?java.util.List<NDragGestureListener>> dragGestureListeners = new HashMap();
 var Map<Object,?java.util.List<NDropTargetListener>> dropTargetListeners = new HashMap();
-
 var Map<(Object,long),?java.util.List<NAWTEventListener>> mappableAWTEventListeners = new HashMap();
 
 
 
 /**
- * abstract interfaces to qualify over classes being able to handle events as nice.ui.awt.NiceListenerHandler
+ * abstract interfaces to qualify over classes 
+ * being able to handle events as nice.ui.awt.NiceListenerHandler
  */
 abstract interface ActionListenerHandler extends NiceListenerHandler {}
 abstract interface ItemListenerHandler extends NiceListenerHandler {}
@@ -58,6 +67,7 @@ abstract interface DropTargetListenerHandler extends NiceListenerHandler {}
 
 /**
  * existing java classes implement the defined abstract interfaces
+ * thus declaring to be a XxxListenerHandler
  */
 
 class nice.lang.long implements AWTEventKey;

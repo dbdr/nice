@@ -1,6 +1,28 @@
+
+/**************************************************************************/
+/*                                                                        */
+/*  This program is free software; you can redistribute it and/or modify  */
+/*  it under the terms of the GNU General Public License as published by  */
+/*  the Free Software Foundation; either version 2 of the License, or     */
+/*  (at your option) any later version.                                   */
+/*                                                                        */
+/**************************************************************************/
+
+
 package nice.ui.common;
 
-// --------------------------------------------------------------------------------------------------
+
+
+/**
+ * This file defines functions that allow to initialize
+ * all java.awt and java.awt.dnd classes to be initialized
+ * with all the listeners they can handle.
+ *
+ * The listener methods are optional arguments of these functions
+ * So it is possible to initialize the class with just the
+ * listeners it should have , in one call.
+ */
+
 
 <Component T> T init
   (T this,

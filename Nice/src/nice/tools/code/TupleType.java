@@ -21,7 +21,7 @@ package nice.tools.code;
 
 import gnu.bytecode.*;
 
-public class TupleType extends ArrayType
+public class TupleType extends SpecialArray
 {
   TupleType (Type arrayType, Type[] componentTypes)
   {

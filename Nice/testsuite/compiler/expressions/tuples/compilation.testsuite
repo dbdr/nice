@@ -44,7 +44,7 @@
   (long i, long j) = longs;
   i += j;
 
-/// PASS bug
+/// PASS
   (String fst, String snd) = foo("abc","xyz");
   /// Toplevel
   <T,U> (T,U) foo(T x, U y) = (x,y); 

@@ -10,7 +10,7 @@ import bossa.util.Debug;
    when needed.
  */
 
-public final class SpecialArray extends gnu.bytecode.ArrayType
+public class SpecialArray extends gnu.bytecode.ArrayType
 {
   /**
      Return a SpecialArray holding elements of type <tt>elements</tt>.
@@ -26,13 +26,13 @@ public final class SpecialArray extends gnu.bytecode.ArrayType
     if(res != null && res instanceof SpecialArray)
       return res;
     
-    return new SpecialArray(elements, prefix, false);
+    return new SpecialArray(elements, prefix, false, true);
   }
 
   public static SpecialArray unknownTypeArray()
   {
     if (unknownTypeArray == null)
-      unknownTypeArray = new SpecialArray(objectType, null, true);
+      unknownTypeArray = new SpecialArray(objectType, null, true, true);
     return unknownTypeArray;
   }
   
@@ -48,7 +48,15 @@ public final class SpecialArray extends gnu.bytecode.ArrayType
   */
   private boolean unknown;
   
-  private SpecialArray (Type elements, String prefix, boolean unknown)
+  protected SpecialArray (Type elements)
+  {
+    this(elements, 
+         elements instanceof PrimType ? elements.getName() : null,
+         false, false);
+  }
+
+  private SpecialArray (Type elements, String prefix, boolean unknown,
+                        boolean register)
   {
     super (elements);
 
@@ -64,7 +72,7 @@ public final class SpecialArray extends gnu.bytecode.ArrayType
     field.setName("value");
     field.setType(objectType);
     
-    if (!unknown)
+    if (register && !unknown)
       {
 	Class c = elements.getReflectClass();
 	if (c == null)

@@ -11,7 +11,8 @@ nice (0.9.5) unstable; urgency=low
         class X implements java.io.Serializable {
           final long serialVersionUID = 123456789L;
         }
-  * Bug fixes (accessing static fields of an superclass or interface, ...)
+  * Bug fixes (accessing static fields of an superclass or interface, 
+    compilation of polymorphic tuples, ...)
 
  --
 

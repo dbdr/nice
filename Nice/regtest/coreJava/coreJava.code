@@ -48,6 +48,13 @@
     j=--i;
     int k=++i;
     p("" + i + " " + j + " " + k);
+
+    A a = new A();
+    p("x=" + a.x);
+    a.x = 3;
+    p("x=" + a.x);
+    a.x++;
+    p("x=" + a.x);
     
     // floats
     float x = 0.1f;
@@ -77,4 +84,3 @@
   //   ARRAYS
   //String[] t = { "Hello, ", "world!" };
 }
-

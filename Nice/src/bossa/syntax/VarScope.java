@@ -12,7 +12,7 @@
 
 // File    : VarScope.java
 // Created : Fri Jul 09 11:28:11 1999 by bonniot
-//$Modified: Fri Jun 16 11:35:53 2000 by Daniel Bonniot $
+//$Modified: Mon Jul 24 12:07:11 2000 by Daniel Bonniot $
 
 package bossa.syntax;
 
@@ -61,7 +61,7 @@ final class VarScope
    * from its name
    *
    * @param i the identifier to lookup
-   * @return the symbols if it was found, null otherwise
+   * @return the symbols if some were found, null otherwise
    */
   public List lookup(LocatedString i)
   {

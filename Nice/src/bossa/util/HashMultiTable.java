@@ -73,7 +73,7 @@ public class HashMultiTable {
   public List getAll(final Object key) {
     if(!containsKey(key))
       return null;
-    List res=new ArrayList();
+    List res = new ArrayList();
 
     Bucket walker = (Bucket)HashMultiTable.this.table.get(key);
     while(walker != null)

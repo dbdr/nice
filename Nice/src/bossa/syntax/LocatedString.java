@@ -12,7 +12,7 @@
 
 // File    : LocatedString.java
 // Created : Fri Jul 09 19:09:47 1999 by bonniot
-//$Modified: Tue Apr 25 12:18:11 2000 by Daniel Bonniot $
+//$Modified: Mon Jul 24 12:06:18 2000 by Daniel Bonniot $
 // Description : A string + location information
 
 package bossa.syntax;
@@ -89,7 +89,7 @@ public class LocatedString
       return false;
   }
 
-  public boolean equals(LocatedString s)
+  public final boolean equals(LocatedString s)
   {
     boolean res=content.equals(s.content);
     return res;

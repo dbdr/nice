@@ -8,6 +8,12 @@ package regtest.coreJava;
 void p(String);
 p(s) = System.out.println(s);
 
+
+class A
+{
+  int x;
+}
+
 main(args)
 {
 BODY

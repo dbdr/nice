@@ -3,6 +3,12 @@
   See coreJava.code
  */
 
+
+class A
+{
+  int x;
+}
+
 public class coreJava 
 {
   public static void p(String s)

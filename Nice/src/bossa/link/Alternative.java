@@ -230,7 +230,7 @@ public class Alternative implements Located
     l.add(this);
   }
   
-  protected void add(String[] fullNames)
+  public void add(String[] fullNames)
   {
     for (int i = 0; i < fullNames.length; i++)
       add(fullNames[i]);

@@ -12,6 +12,8 @@ import java.util.List;
 
 public class dispatch
 {
+  public static void readImportedAlternative(gnu.bytecode.ClassType c, gnu.bytecode.Method method, bossa.util.Location location) {}
+
   public static bossa.link.Alternative createJavaAlternative(bossa.syntax.MethodDeclaration method)
   { return null; }
 

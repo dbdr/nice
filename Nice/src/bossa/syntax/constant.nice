@@ -43,7 +43,11 @@ public abstract class NumberConstantExp extends ConstantExp
 
   public ConstantExp makeNegative()
   {
-    LocatedString newRepres = new LocatedString("-"+representation, this.location());
+    LocatedString newRepres;
+    if (representation[0] == '-')
+      newRepres = new LocatedString(representation.substring(1), this.location());
+    else
+      newRepres = new LocatedString("-"+representation, this.location());
 
     if (value instanceof Float || value instanceof Double)
       return createFloatConstantExp(newRepres);

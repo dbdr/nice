@@ -31,6 +31,8 @@
   assert 0xFF == 0b11111111;
   assert 0xF000 == 0B1111_0000_0000_0000;
 
+  assert -(-5) == 5;
+
 /// PASS
   let a = new A(_b: 0);
   let x = a._b;

@@ -66,12 +66,7 @@ public class Char implements Printable, Externalizable
     for (int i = 128; --i >= 0; )
       ascii[i] = new Char(i);
   }
-  
-  public static Char make (char ch)
-  {
-    return make ((int) ch);
-  }
-  
+
   public static Char make (int ch)
   {
     if (ch < 128)
@@ -158,8 +153,6 @@ public class Char implements Printable, Externalizable
 
   public String toString ()
   {
-    return String.valueOf((char) value);
-    /*
     StringBuffer buf = new StringBuffer();
     buf.append("[Char '");
     if (value >= (int) ' ' && value < 127)
@@ -171,7 +164,6 @@ public class Char implements Printable, Externalizable
       }
     buf.append("']");
     return buf.toString();
-    */
   }
 
   public static String toScmReadableString (int ch)

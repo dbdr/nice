@@ -2,8 +2,15 @@
 TOP=${HOME}/Nice
 
 JAVAC=javac -classpath ${TOP}/classes:${TOP}/src:${TOP}/stdlib -sourcepath ${TOP}/src -d ${TOP}/classes -O -g
-JAVACC=java -classpath ${HOME}/lib/java/JavaCC/JavaCC.zip COM.sun.labs.javacc.Main
+JAVACC=java -classpath ${TOP}/external/JavaCC.zip COM.sun.labs.javacc.Main
 JAVADOC=javadoc -linkoffline file:///C%7C/Apps/jdk1.2.1/docs/api file:///usr/opt/java122/docs/api
+
+# run this first when you just checked out a fresh version
+first: parser
+	cd src; nicec bossa.modules
+	mkdir -p classes
+	cd src;\
+	${JAVAC} bossa/modules/Package.java
 
 recompile:
 	cd src;\

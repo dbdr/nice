@@ -66,7 +66,6 @@ public class AssignExp extends Expression
 
   public gnu.expr.Expression compile()
   {
-    to = to.noOverloading();
     return to.compileAssign(value.generateCode());
   }
   

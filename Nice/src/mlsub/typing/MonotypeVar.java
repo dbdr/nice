@@ -31,6 +31,11 @@ public final class MonotypeVar extends Monotype
   {
   }
 
+  public MonotypeVar(boolean existential)
+  {
+    this.existential = existential;
+  }
+
   public MonotypeVar(String name)
   {
     this.name = name;
@@ -74,12 +79,17 @@ public final class MonotypeVar extends Monotype
   
   public static MonotypeVar[] news(int n)
   {
+    return news(n, false);
+  }
+
+  static MonotypeVar[] news(int n, boolean existential)
+  {
     if (n == 0) return null;
     
     MonotypeVar[] res = new MonotypeVar[n];
     for(int i=0; i<n; i++)
       {
-	res[i] = new MonotypeVar();
+	res[i] = new MonotypeVar(existential);
 	res[i].persistentKind = NullnessKind.instance;
       }
     return res;
@@ -122,8 +132,8 @@ public final class MonotypeVar extends Monotype
     else
       {
 	// Do the appropriate cast
-	equivalent = value.freshMonotype();
-	if (Typing.dbg) 
+	equivalent = value.freshMonotype(existential);
+	if (Typing.dbg)
 	  Debug.println("Equivalence: " + this + " == " + equivalent);
 
 	// equivalent is null if the kind is that of unconstrained variables
@@ -188,6 +198,11 @@ public final class MonotypeVar extends Monotype
     else
       return null;
   }
+
+  private boolean existential;
+
+  public void setExistential()   { existential = true; }
+  public boolean isExistential() { return existential; }
 
   /****************************************************************
    * Misc.

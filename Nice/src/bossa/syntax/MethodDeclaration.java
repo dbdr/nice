@@ -210,22 +210,32 @@ public abstract class MethodDeclaration extends Definition
 	return;
       }
     
+    UserError error = null;
     try{
       Typing.enter();
     
       try{
 	type.getConstraint().enter();
-	innerTypecheck();
+
+        try {
+          innerTypecheck();
+        } catch(UserError e){
+          error = e;
+        }
       }
       finally{
 	Typing.leave();
       }
     }
     catch(TypingEx e){
-      User.error(this,
-		 "The type of method " + symbol.name +
-		 " is not well formed: " + type + "\n" + e);
+      // If we got an earlier error, it's preferable to report that one.
+      if (error == null)
+        User.error(this,
+                   "The type of method " + symbol.name +
+                   " is not well formed: " + type + "\n" + e);
     }
+    if (error != null)
+      throw error;
   }
 
   /** Typechecking when the package has already been compiled. */

@@ -42,13 +42,19 @@ public abstract class Engine
     if(dbg) Debug.println("Enter");
     floating.mark();
     soft.mark();
-    frozenLeqs.mark();
-    for(Iterator i = constraints.iterator();
-	i.hasNext();)
-      { 
-	Engine.Constraint k = (Engine.Constraint)i.next();
-	k.mark();
-	//k.rigidify();
+
+    // Once we are in existential mode, we don't mark/backtrack.
+    if (existentialLevel > 0)
+      existentialLevel++;
+    else
+      {
+        frozenLeqs.mark();
+
+        for(Iterator i = constraints.iterator(); i.hasNext();)
+          {
+            Engine.Constraint k = (Engine.Constraint)i.next();
+            k.mark();
+          }
       }
   }
   
@@ -126,19 +132,29 @@ public abstract class Engine
   
   public static void backtrack()
   {
-    for(Iterator i = constraints.iterator();
-	i.hasNext();)
-      { 
-	Engine.Constraint k = (Engine.Constraint)i.next();
-	k.backtrack();
+    if (existentialLevel <= 1)
+      {
+        for(Iterator i = constraints.iterator();
+            i.hasNext();)
+          { 
+            Engine.Constraint k = (Engine.Constraint) i.next();
+            k.backtrack();
+          }
+
+        frozenLeqs.backtrack();
       }
+
     floating.backtrack();
     soft.backtrack();
-    for(Iterator i = floating.iterator();i.hasNext();)
-      ((Element)i.next()).setKind(null);
-    floating.endOfIteration();
-    frozenLeqs.backtrack();
+
+    if (existentialLevel > 0)
+      existentialLevel--;
   }
+
+  /** Marker used to know how deep we are inside existential mode, so that
+      we know when to exit from it.
+  */
+  public static int existentialLevel = 0;
 
   public static void startSimplify()
   {
@@ -276,7 +292,11 @@ public abstract class Engine
   public static void register(Element e)
   {
     if(dbg) Debug.println("Registering "+e);
-    
+
+    if (e.isExistential())
+      if (existentialLevel == 0)
+        existentialLevel = 1;
+
     if(e.getKind()!=null)
       e.getKind().register(e);
     else
@@ -310,8 +330,9 @@ public abstract class Engine
   public static void tag(Element e, int variance)
   {
     Kind kind = e.getKind();
-    if(kind==null)
-      throw new InternalError("null kind for "+e);
+    if(kind==null) 
+      return;
+      //throw new InternalError("null kind for "+e);
     Engine.Constraint k = getConstraint(kind);
     if(k==null)
       throw new InternalError("null constraint for "+e);
@@ -380,8 +401,8 @@ public abstract class Engine
   public static Element canonify(Element e)
   {
     Kind kind = e.getKind();
-    if(kind==null)
-      throw new InternalError("null kind for "+e);
+    if(kind==null) return e;
+    //throw new InternalError("null kind for "+e);
     Engine.Constraint k = getConstraint(kind);
     if(k==null)
       throw new InternalError("null constraint for "+e);
@@ -420,7 +441,7 @@ public abstract class Engine
     while(!s.empty())
       {
 	Element e = (Element)s.pop();
-	
+
 	if(e.getKind()!=null)
 	  if(e.getKind()==k)
 	    continue;
@@ -545,13 +566,34 @@ public abstract class Engine
     soft.clear();
 
     try {
+      for(Iterator i = frozenLeqs.iterator(); i.hasNext();)
+	{
+	  Leq leq = (Leq) i.next();
+          Element e1 = leq.e1;
+          Element e2 = leq.e2;
+
+          // If at least one of the two is existential, then we must
+          // keep 
+          if (e1.isExistential())
+            ((mlsub.typing.MonotypeVar) e2).setExistential();
+          else if (e2.isExistential())
+            ((mlsub.typing.MonotypeVar) e1).setExistential();
+	}
+    }
+    finally{
+      frozenLeqs.endOfIteration();
+    }
+
+    try {
       for(Iterator i = floating.iterator();
 	  i.hasNext();)
 	{
 	  Element e = (Element) i.next();
 	  
 	  // useful for nullness head on monotype vars
-	  if (e.getKind() != null)
+          // we don't set existential in stone either, because they
+          // might be put into a kind later on.
+	  if (e.getKind() != null || e.isExistential())
             continue;
 
 	  if(dbg) Debug.println("Registering variable "+e);
@@ -569,13 +611,21 @@ public abstract class Engine
       for(Iterator i = frozenLeqs.iterator(); i.hasNext();)
 	{
 	  Leq leq = (Leq) i.next();
+          Element e1 = leq.e1;
+          Element e2 = leq.e2;
+
+          // By the above code, if e2 is existential, e1 was marked as
+          // existential too, so we don't need to test e2.
+          if (e1.isExistential())
+            continue;
+
 	  variablesConstraint.leq(leq.e1, leq.e2, initialContext);
+          i.remove();
 	}
     }
     finally {
       frozenLeqs.endOfIteration();
     }
-    frozenLeqs.clear();
   }
   
   /** Maps a Kind to its lowlevel constraint */
@@ -691,7 +741,7 @@ public abstract class Engine
     private boolean variables = false;
     
     // this is not too logical to have this...
-    public mlsub.typing.Monotype freshMonotype()
+    public mlsub.typing.Monotype freshMonotype(boolean existential)
     {
       return null;
     }

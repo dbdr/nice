@@ -292,6 +292,17 @@ public final class Constraint
 	atoms[i].enter();
   }
   
+  public void enter(boolean existential)
+    throws TypingEx
+  {
+    if (existential && binders != null)
+      for(int i=0; i < nbinders; i++)
+        if (binders[i] instanceof MonotypeVar)
+          ((MonotypeVar) binders[i]).setExistential();
+
+    enter();
+  }
+  
   /****************************************************************
    * Printing
    ****************************************************************/

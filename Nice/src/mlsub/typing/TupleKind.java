@@ -45,9 +45,9 @@ public class TupleKind implements Kind
   /** Arity arbitrarily limited to 200 for implementation reasons. */
   private static final TupleKind tupleKinds[] = new TupleKind[200];
   
-  public Monotype freshMonotype()
+  public Monotype freshMonotype(boolean existential)
   {
-    Monotype[] args = MonotypeVar.news(arity);
+    Monotype[] args = MonotypeVar.news(arity, existential);
     Typing.introduce(args);
 
     return new TupleType(args);

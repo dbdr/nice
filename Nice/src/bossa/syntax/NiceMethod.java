@@ -348,7 +348,11 @@ d + "\ndefined in:\n" +
     void innerTypecheck() throws TypingEx
     {
       super.innerTypecheck();
-      implementation.innerTypecheck();
+      try {
+        implementation.innerTypecheck();
+      } finally {
+        mlsub.typing.lowlevel.Engine.existentialLevel = 0;
+      }
     }
 
     protected gnu.expr.Expression computeCode()

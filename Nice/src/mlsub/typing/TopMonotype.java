@@ -72,7 +72,7 @@ public class TopMonotype extends Monotype implements TypeSymbol
       // Nothing to do.
     }
 
-    public Monotype freshMonotype()
+    public Monotype freshMonotype(boolean existential)
     {
       return null;
     }

@@ -44,12 +44,12 @@ public class FunTypeKind implements Kind
     Engine.getConstraint(this);
   }
 
-  public Monotype freshMonotype()
+  public Monotype freshMonotype(boolean existential)
   {
-    Monotype codomain = new MonotypeVar();
+    Monotype codomain = new MonotypeVar(existential);
     Typing.introduce(codomain);
     
-    Monotype[] domain = MonotypeVar.news(domainArity);
+    Monotype[] domain = MonotypeVar.news(domainArity, existential);
     Typing.introduce(domain);
     
     return new FunType(this, domain, codomain);

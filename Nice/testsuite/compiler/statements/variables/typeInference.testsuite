@@ -4,6 +4,6 @@
 
 /// FAIL
   // An incorrect use of a polymorphic reference.
-  let /* /// FAIL HERE */ l = new ArrayList();
+  let l = new ArrayList();
   l.add("Hello");
-  java.io.File f = l.get(0);
+  java.io.File /* /// FAIL HERE */ f = l.get(0);

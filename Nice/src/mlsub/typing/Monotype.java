@@ -54,6 +54,13 @@ abstract public class Monotype implements mlsub.typing.lowlevel.Element
     return true;
   }
 
+  public boolean isExistential()
+  {
+    // This is a default implementation. Only MonotypeVar need to be
+    // considered existential.
+    return false;
+  }
+  
   /****************************************************************
    * Substitution
    ****************************************************************/

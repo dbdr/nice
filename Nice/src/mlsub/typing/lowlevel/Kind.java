@@ -1,7 +1,7 @@
 /**************************************************************************/
-/*                           B O S S A                                    */
-/*        A simple imperative object-oriented research language           */
-/*                   (c)  Daniel Bonniot 1999                             */
+/*                                N I C E                                 */
+/*             A high-level object-oriented research language             */
+/*                        (c) Daniel Bonniot 2004                         */
 /*                                                                        */
 /*  This program is free software; you can redistribute it and/or modify  */
 /*  it under the terms of the GNU General Public License as published by  */
@@ -10,17 +10,13 @@
 /*                                                                        */
 /**************************************************************************/
 
-// File    : Kind.java
-// Created : Wed Jul 28 14:53:22 1999 by bonniot
-//$Modified: Wed Aug 02 16:51:36 2000 by Daniel Bonniot $
-
 package mlsub.typing.lowlevel;
 
 /** Something that knows how to assert constraints on objects of this "Kind"
  * 
  * (implemented by Variance, Low level constraints... )
  * 
- * @author bonniot
+ * @author Daniel Bonniot
  */
 public interface Kind
 {
@@ -45,5 +41,5 @@ public interface Kind
      This makes a dependancy from mlsub.typing.lowlevel to mlsub.typing,
      but they are likely to be used together anyway.
   */
-  mlsub.typing.Monotype freshMonotype();
+  mlsub.typing.Monotype freshMonotype(boolean existential);
 }

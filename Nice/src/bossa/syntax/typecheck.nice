@@ -668,7 +668,7 @@ typecheck(e@ExpLocalVariable)
     {
       value.typecheck();
       e.initValue = decl.value = value = value.noOverloading();
-      target.type = checkMonomorphic(value.getType(), decl);
+      target.type = ensureMonomorphic(value.getType(), decl);
 
       if (nice.tools.typing.Types.isVoid(target.type))
         throw error(decl, "A variable cannot have a void type");
@@ -733,7 +733,7 @@ typecheck(decl@Block.LocalVariable)
     {
       value.typecheck();
       decl.value = value = value.noOverloading();
-      target.type = checkMonomorphic(value.getType(), decl);
+      target.type = ensureMonomorphic(value.getType(), decl);
       if (target.type == PrimitiveType.byteType || 
           target.type == PrimitiveType.shortType)
 	target.type = notNull(PrimitiveType.intType);
@@ -769,7 +769,8 @@ typecheck(decl@Block.LocalConstant)
   decl.value = notNull(decl.value).noOverloading();
   mlsub.typing.Polytype type = notNull(decl.value).getType();
 
-  notNull(decl.left).type = checkMonomorphic(type, decl);
+  notNull(decl.left).type = ensureMonomorphic(type, decl);
+
   if (nice.tools.typing.Types.isVoid(notNull(decl.left).type))
      throw error(decl, "A variable cannot have a void type");
 
@@ -1002,5 +1003,5 @@ void checkNotNull(mlsub.typing.Polytype type)
 }
 
 // Local Variables:
-// nice-xprogram: "nicec -d \"$HOME/Nice/classes\" --sourcepath=\"$HOME/Nice/src\" --classpath=\"$HOME/Nice/classes\""
+// nice-xprogram: "$HOME/Nice/bin/nicec -d ../classes"
 // End:

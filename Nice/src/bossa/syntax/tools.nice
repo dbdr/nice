@@ -65,25 +65,22 @@ mlsub.typing.Monotype makeSure(mlsub.typing.Monotype m) =
 mlsub.typing.Monotype makeUnsure(mlsub.typing.Monotype m) = 
   notNull(bossa.syntax.Monotype.maybe(nice.tools.typing.Types.rawType(m)));
 
-mlsub.typing.Monotype checkMonomorphic(mlsub.typing.Polytype type,
-				       Block.LocalValue decl)
+mlsub.typing.Monotype ensureMonomorphic(mlsub.typing.Polytype type,
+					Block.LocalValue decl)
 {
-  if (! type.isMonomorphic())
-    {
-      type.simplify();
+  type.simplify();
 
-      if (! type.isMonomorphic())
-	throw new bossa.util.UserError
-	(decl, 
-	 "The value has a polymorphic type: " + type +
-	 "\nOmitting the type here is not supported by Nice yet." + 
-	 "\nPlease declare the monomorphic type of " + decl.getName());
+  if (type.getConstraint != null)
+    {
+      // If the type is polymorphic, we treat the type variables as soft:
+      // we enter them in the context, so they are not generalized.
+      type.getConstraint.enter(true);
     }
 
   return type.getMonotype();
 }
 
-/* 
+/*
    Make sure that the error is attached to a location.
    If not, located it a the given located object (which should be a close 
    container of the entity creating the error).

@@ -115,12 +115,12 @@ public final class Variance
     return mlsub.typing.lowlevel.Engine.getConstraint(this);
   }
 
-  public Monotype freshMonotype()
+  public Monotype freshMonotype(boolean existential)
   {
     TypeConstructor tc = new TypeConstructor(this);
     Typing.introduce(tc);
 
-    Monotype[] tp = MonotypeVar.news(this.size);
+    Monotype[] tp = MonotypeVar.news(this.size, existential);
     Typing.introduce(tp);
 
     return new MonotypeConstructor(tc, tp);

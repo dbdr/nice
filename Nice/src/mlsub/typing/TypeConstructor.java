@@ -105,6 +105,12 @@ public class TypeConstructor
     return concrete;
   }
   
+  public boolean isExistential()
+  {
+    // Only MonotypeVars need to be marked as existential.
+    return false;
+  }
+  
   /****************************************************************
    * Kinding
    ****************************************************************/

@@ -34,4 +34,6 @@ public interface Element
    * Returns true if this element can exist at runtime.
    */
   boolean isConcrete();
+
+  boolean isExistential();
 }

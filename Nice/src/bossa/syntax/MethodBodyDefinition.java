@@ -145,48 +145,48 @@ public class MethodBodyDefinition extends Definition
     for(Iterator i = symbols.iterator(); i.hasNext();){
       VarSymbol s = (VarSymbol)i.next();
       if(!(s instanceof MethodDeclaration.Symbol))
-	i.remove();
-      else
 	{
-	  MethodDeclaration m = (MethodDeclaration)((MethodDeclaration.Symbol)s).definition;
-	  if(
-// It doesn't make sense to define a body for a native method, does it ?
-	     m instanceof JavaMethod
-	     || m instanceof FieldAccessMethod
-	     || m.getArity() != formals.size()
-	     )
-	    {
-	      i.remove();
-	      continue;
-	    }
-	  
-	  try{
-	    int level;
-	    if(Debug.overloading)
-	      level = Typing.enter("Trying definition "+m+" for method body "+name);
-	    else
-	      level = Typing.enter();
-	    
-	    try{
-	      Constraint.assert(m.getType().getConstraint());
-	      Typing.leq(Pattern.getTC(formals), m.getType().domain());
-	    }
-	    finally{
-	      if(Typing.leave() != level)
-		Internal.error("Enter/Leave error");
-	    }
-	  }
-	  catch(TypingEx e){
-	    if(Debug.typing) Debug.println("Not the right choice :"+e);
-	    i.remove();
-	  }
-	  catch(mlsub.typing.BadSizeEx e){
-	    i.remove();
-	  }
+	  i.remove();
+	  continue;
 	}
+      
+      MethodDeclaration m = 
+	(MethodDeclaration)((MethodDeclaration.Symbol)s).definition;
+
+      // It doesn't make sense to define a body for a native method, does it ?
+      if(!(m instanceof NiceMethod) 
+	 || m.getArity() != formals.size())
+	{
+	  i.remove();
+	  continue;
+	}
+	  
+      try{
+	int level;
+	if(Debug.overloading)
+	  level = Typing.enter("Trying definition "+m+" for method body "+name);
+	else
+	  level = Typing.enter();
+	    
+	try{
+	  Constraint.assert(m.getType().getConstraint());
+	  Typing.leq(Pattern.getTC(formals), m.getType().domain());
+	}
+	finally{
+	  if(Typing.leave() != level)
+	    Internal.error("Enter/Leave error");
+	}
+      }
+      catch(TypingEx e){
+	if(Debug.typing) Debug.println("Not the right choice :"+e);
+	i.remove();
+      }
+      catch(mlsub.typing.BadSizeEx e){
+	i.remove();
+      }
     }
 
-    if(symbols.size()==1) 
+    if(symbols.size() == 1) 
       return (VarSymbol) symbols.get(0);
 
     if(symbols.size()==0)
@@ -200,10 +200,12 @@ public class MethodBodyDefinition extends Definition
       methods+=m+" defined "+m.location()+"\n";
     }
     
-    User.error(this,"There is an ambiguity about which version of the overloaded method \""+
-	       name+"\" this alternative belongs to.\n"+
-	       "Try to use more patterns.\n\n"+
-	       "Possible methods:\n"+
+    User.error(this,
+	       "There is an ambiguity about which version " + 
+	       " of the overloaded method \"" + name + 
+	       "\" this alternative belongs to.\n" +
+	       "Try to use more patterns.\n\n" +
+	       "Possible methods:\n" +
 	       methods);
     return null;
   }

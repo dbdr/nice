@@ -178,12 +178,6 @@ public class Block extends Statement
       }
       
       boolean isAssignable() { return false; }
-
-      /* 
-	 Index to make the initialization analysis or -1 if 
-	 this variable is always initialized.
-       */
-      int index = -1;
     }
 
     public LocalConstant(LocatedString name, Expression value)

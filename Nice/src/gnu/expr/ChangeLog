@@ -1,0 +1,1103 @@
+2000-06-20  Daniel Bonniot  <d.bonniot@mail.dotcom.fr>
+
+	* StackTarget.java (compileFromStack0): returns true if
+	emitCoerceToObject guaranties the correct type will be on the stack.
+	Safely reduces the number of casts in the generated code.
+
+	* BlockExp.java (<init>(Type)):  New constructor.
+	Makes it possible to specify the type of a BlockExp.
+
+2000-06-26  Per Bothner  <per@bothner.com>
+
+	* Interpreter.java (languages):  Add ".cl" extension for Common Lisp.
+
+2000-06-24  Per Bothner  <per@bothner.com>
+
+	* Interpreter.java (languages):  Add Common Lisp.
+
+	* Special.java (print):  Also print #!" prefix.
+
+	* SetExp.java (compile):  Add missing compileFromStack call.
+
+2000-06-17  Per Bothner  <per@bothner.com>
+
+	* ConditionalTarget.java (<init>(Label,Label)):  Remove constructor.
+
+	* LambdaExp.java (properties):  New field.
+	(getProperty, setProperty):  New methods.
+	* ExpFullWalker.java (walkLambdaExp):  Also walk properties.
+	* ProcInitializer.java (emit):  Also handle properties list.
+
+	* Compilation.java (addClass):  Generate numArgs if --full-tailcalls.
+
+	* GenericProc.java (make$V):  Renamed to plain make.
+
+	* Interpreter.java (asType):  New method.
+
+	* MethodProc.java:  Moved to gnu.mapping.
+	* Makefile.am:  Update accordingly.
+
+2000-06-09  Per Bothner  <per@bothner.com>
+
+	* QuoteExp.java (getType):  If value is null, type is Type.nullType.
+	* Literal.java (nullLiteral):  Its type is now Type.nullType.
+	* LitTable.java (emit):  Handle null value.
+
+	* Compilation.java (literalsChain):  New field.
+	(addClass):  Call Literal.emit.  Do it *after* processing clinitChain,
+	but make sure it is executed first.  (Gotos - sigh.)
+	* Literal.java:  New longer inherit from Initializer.
+	(next, field):  New fields (no longer inherited).
+	(assign(Field,Compilation)):  New overload.
+	Link on new comp.literalsChain, not comp.clinitChain.
+	(emit):  Make static.
+	* LambdaExp.java (evalToClass):  Update accordingly.
+	* LitTable.java (emit):  Literals are no longer in clinitChain.
+	* BindingInitializer.java (emit):  Add optimization.
+
+	* Compilation.java (nameField):  Removed, since sym_name is gone.
+	(setNameMethod):  New method.
+	(addClass): Invoke setNameMethod instead of setting nameField.
+
+	* LitTable.java (emit(Literal,booolen)):  Serialization spec says
+	readResolve should return Object.  Hence, add needed cast.
+	* Keyword.java (readResolve):  Fix return type to Object.
+	* Special.java (readResolve):  Likewise.
+
+	* Keyword.java (<init>):  Don't copy argument String.
+
+	* Declaration.java (makeField):  New method, based on code from
+	BindingInitializer constructor.
+	* ModuleExp.java (allocFields):  Use Declaration's makeField method.
+	* BindingInitializer.java (<init>):  Likewise.
+	* SetExp.java (compile):  Use Declaration's new makeField method.
+	Do nothing here for constant ModuleExp fields.
+
+	* Declaration.java (noteValue):  If same Expression, same value.
+
+	* CompiledProc.java:  Removed old file.
+
+	* GenericProc.java (make$V):  New method.
+
+	* Interpreter.java (languages):  Add language file extensions.
+
+2000-06-05  Per Bothner  <per@bothner.com>
+
+	* MethodProc.java (mostSpecific):  Fix type comparisons.
+
+2000-05-28  Per Bothner  <per@bothner.com>
+
+	* Compilation.java (mangleName):  Readable mangling of initial digit.
+
+	* LambdaExp.java (addmethodFor):  Check for conflicting method names.
+
+	* ModuleBody.java (apply0):  Use Values.noArgs, not rocedure.noArgs.
+
+	* ModuleExp.java (SUPERTYPE_SPECIFIED):  New flag constant.
+	(isStatic): Not default static if SUPERTYPE_SPECIFIED.
+
+2000-05-27  Per Bothner  <per@bothner.com>
+
+	Support (module-static ...) and (module-export ...).
+	* ExpWalker.java (walkModuleExp):  New method.
+	* ModuleExp.java (<init>):  Don't declareThis here.
+	(isStatic, walk):  New methods.
+	(allocFields):  Alloc field if !isSimple even if private.
+	Add special test (kludge) for Macro.
+	Don't setIndirectBinding here (do it in BindingInitializer instead).
+	(EXPORT_SPECIFIED, EXPORT_SPECIFIED, NONSTATIC_SPECIFIED):  new flags.
+	* FindTailCalls.java (walkDecls, walkModuleExp):  New methods.
+	* ScopeExp.java (getDefine, getNoDefine):  New methods.
+	* Declaration.java (fieldNum, assignField):  Unused, removed.
+	(NOT_DEFINING, EXPORT_SPECIFIED, STATIC_SPECIFIED, NONSTATIC_SPECIFIED,
+	TYPE_SPECIFIED, IS_CONSTANT):  New flag constants.
+	(getFlag, setFlag, needsInit):  New methods.
+	(setCanRead, setCanCall):  New method overloading.
+	(needInit):  New method.
+	* LambdaExp.java (NEXT_AVAIL_FLAG):  New constant.
+	(declareClosureEnv):  Check if parent is ModuleExp.
+	(allocFieldFor, addMethodFor):  Check if decl has STATIC_SPECIFIED.
+	(allodFrame, enterFunction):  Check if ModuleExp.
+	* ObjectExp.java (getType):  New method.
+	(getCompiledClassType):  Now does not handle superclasses.
+	* FindCapturedVars.java (capture):  Handle STATIC_SPECIFIED.
+	If declaration has a 'base', handle it even if non-simple.
+	* ModuleBody.java (run):  Make non-abstract.
+	* Compilation.java (moduleStatic):  New static field.
+	(instanceField):  New field.
+	(allocClass):  Don't addClass if ModuleExp (since already done).
+	(initBindingFields, startClassInit):  New method.
+	(addClass, generateConstructor):  Call initBindingFields.
+	(addClass):  Some extra complications to handle static modules.
+	* ChainLambdas.java (comp):  New Compilation field.
+	(walkObjectExp):  Create and name ClassType for ObjectExp.
+	* ProcInitializer.java:  If field is static, link on initChain.
+	(emitLoadModuleMethod):  If method static get comp's instanceField.
+	* BindingInitializer.java:  Handle static vars and explicit types.
+	* LetExp.java (store_rest, compile):  Use new Declaration needs_init.
+
+	* Compilation.java (mangleName):  Uppercase following $-escape.
+	Handle special characters in switch statement.
+
+	More efficient handling of simple aliases.
+	* Declaration.java (followAliases):  New method.
+	(allocateVariable):  Call it.
+	* FindTailCalls.java (walkApplyExp, walkReferenceExp, walkSetExp):
+	Call Declaration.followAliases.
+	* FindCapturedVars.java:  Likewise.
+	* SetExp.java (compile):  Call Declaration.followAliases.
+	* ReferenceExp.java (compile):  Likewise.
+
+2000-05-23  Per Bothner  <per@bothner.com>
+
+	* Compilation.java (makeNullPairMethod, makePairMethod):  Removed.
+	(Reported by Edouard G. Parmelan <Edouard.Parmelan@quadratec.fr>.)
+
+2000-05-22  Per Bothner  <per@bothner.com>
+
+	* LitTable.java:  New class, manages the literals of a Compilation.
+	* Compilable.java:   Removed, no longer used.
+	* Makefile.am (java_JAVA):  Update accordingly.
+	* Literal.java (argVlaues, argTypes0:  New fields.
+	(ALLOCATING, ALLOCATED, INITIALIZED, ASSIGNED):  Removed flags values.
+	(WRITING, WRITTEN, CYCLIC, EMITTED):  New flags values.
+	(emitArray, emit(Compilation,boolean)):  Remove now-unused methods.
+	* Compilation.java (scmListType):  Renamed to typeLList.
+	(emptyConstant):  New Field field.
+	(litTable):  New field.
+	(findLiteral):  Nothing to do now if we already have literal.
+	No special handling for Compilable or Object[].
+	(emitLiteral):  Remove unused now-methods.
+
+	* Interpreter.java (getTypeFor):  New methods.
+	(string2Type):  New static method, based on method in Scheme class.
+ 	
+	* Keyword.java:  No longer implements Compilable.
+	* Special.java:  No longer implements Compilable.
+
+	* PrimProcedure.java (<init>(Method, Interpreter):  New constructor.
+
+	* MethodProc.java (mostSpecific):  Use Type.compare once instead
+	of isSubtype twice.
+
+2000-05-09  Per Bothner  <per@bothner.com>
+
+	* Keyword.java:  Implement java.io.Externalizable
+	* Special.java:  Likewise.
+	Change so name does not include "#!" prefix.
+	
+	* PrimProcedure.java (<init>):  Call non-deprecated addMethod version.
+
+	* Parser.java (current_filename, current_line, current_column,
+	messages):  Move fields here from Translator.
+	(<init>):  New constructor.
+	(error(char,Declaration,String,String)):  New method.
+	(getMessages, setMessages, error):  Methods moved from Translator.
+	(getFile, getLine, getColumn, setFile, setLine, setColumn
+
+	* Interpreter.java (languages):  New static table.
+	(getInstance):  New overloaded static methods.
+
+2000-05-07  Per Bothner  <per@bothner.com>
+
+	* ApplyExp.java (compile):  If calling a name bound to a constant
+	that is not a procedure, emit a warning (instead of an exception).
+	Based on a patch from Daniel Bonniot <bonniot@cma.ensmp.fr>.
+
+	* Expression.java (makeWhile):  Remove old unsafe overloaded variant.
+
+2000-04-22  Per Bothner  <per@bothner.com>
+
+	* PrimProcedure.java (init):  New private helper method.
+	New constructors take java.lang.reflect.Method and Interpreter.
+	(getMethodFor):  New method overloads use new constructor/
+	* ApplyExp.java (compile):  Pass interpreter to
+	PrimProcedure.getMethodFor.
+
+2000-04-21  Per Bothner  <per@bothner.com>
+
+	* Parser.java:  A new class, an abstract super-class for Translator.
+	* Expression.java (makeWhile):  New overload, uses Parser.
+	* Makefile.am (java_JAVA):  Add parser.java.
+
+	* LambdaExp.java (addMethodFor):  Don't make method FINAL
+	(the user may want to inherit from this module).
+
+	* ModuleMethod.java:  Change to extend MethodProc.
+	(getVarBuffer, match, applyV):  New methods.
+
+	* SetExp.java (getType):  Handle the HAS_VALUE case.
+
+	* Interpreter.java (emitPushBoolean, emitCoerceToBoolean): New methods.
+
+2000-04-13  Per Bothner  <per@bothner.com>
+
+	* SetExp (eval, compile):  If define-alias, create an AliasConstraint.
+	* Declaration.java (IS_ALIAS):  New flag.
+	(isAlias, setAlias):  New methods.
+	* ReferenceExp.java (eval, compile, getType):  Handle case when
+	getDontDereference() is true.  (Return Location instead.)
+	
+	* ModuleExp.java (compileToFiles):  If module name is specified,
+	always set topname from module name (even if compound).
+	Set prefix from module name only if prefix is not specified.
+	Use File.mkdirs to create missing output directories.
+
+	* Interpreter.java (coerceToObject(int)):  New method.
+
+	* Compilation.java (mangleName): Change mangling for '!', '->', '%'.
+	(demangle2):  New static method.
+
+2000-03-21  Per Bothner  <per@bothner.com>
+
+	* gnu/expr/Compilation.java (typeRunnable):  New static.
+	(allocClass):  Handle explicit super-class and interfaces.
+	(generateApplyMethods):  Set generateApplyMethodContainer whenever
+	super class is not Procedure.
+	(addClass):  Handle "run" method differently if explicit superclass.
+	(getMethodProcType):  Made static;  takes ClassType argument.
+	(getModuleSuperType):  Take ModuleExp parameter, check its supertype.
+	* LambdaExp.java (allocFieldFor):   Update getMethodProcType call.
+	* ProcInitializer.java (emitLoadModuleMethod):  Likewise.
+	* gnu/expr/ModuleExp.java (superType, interfaces):  New field.
+	(getSuperType, setSuperType, getInterfaces, setInterfaces):  New.
+	(compileToFiles):  Handle explicit specified module name.
+
+2000-03-12  Per Bothner  <per@bothner.com>
+
+	* Compilation.java (mangleName):  Add manglings for ascii characters.
+
+	* Expression.java (makeWhile):  New static.
+	(noExpressions):  New static field.
+
+	* Expression.java (flags):  New field.
+	(setFlag, getFlag, getFlags):  New methods.
+	* ReferenceExp.java:  Use inherited flags field and conventions.
+	(PREFER_BINDING2):  New flag bit.
+	(eval, compile):  More kludges for ELisp support.
+	* SetExp.java:  Use inherited flags field and conventions.
+	(PREFER_BINDING2):  New flag bit.
+	(eval, compile):  Get "noValue" from Interpreter.
+	(eval, compile):  More kludges for ELisp support.
+	* LambdaExp.java (flags, getFlags, setFlags):  Now inherited.
+
+	* IfExp.java (compile):  Pass interpreter to ConditionalTarget.
+	* Interpreter.java (getInterpreter):  New static method.
+	* ConditionalTarget.java (interpreter):  New field.
+	(<init>):  Take Interpreter argument.
+	(compileFromStack):  Use interpreter's boolean values.
+	
+2000-03-06  Per Bothner  <per@bothner.com>
+
+	* ApplyExp.java (compile):  Handle identifier bound to declaration
+	with constant value (as created by `require').
+	* Declaration.java *base):  New field.
+	(loadOwningObject):  If base is non-null, load that.
+	* FindCapturedVars.java (capture):  If captured Declaration has a
+	null-null base, mark it as readable, and capture it as well.
+	* PrimProcedure.java (compile):  Split into two methods.
+	(getMethodFor):  Likewise.
+
+	* LambdaExp.java (getCaller):  Don't loop looking for inlined callers.
+
+	* LambdaExp.java (enterFunction):  Use main methods parameter
+	types to set stack type.
+
+	* FindTailCalls (walkSetExp):  Check for decl.isPublic, rather
+	if the context is a ModuleExp (which doesn't work for private decls).
+
+	* Special.java (print):  Just print the name.
+
+2000-03-02  Per Bothner  <per@bothner.com>
+
+	* CheckedTarget.java (emitCheckedCoerce):  Don't add handler if we
+	didn't add any coercion code.  Slightly modified from a patch from
+	Daniel Bonniot <bonniot@cma.ensmp.fr>.
+
+	* ExitExp.java (getType):  New method - return Type.neverReturnsType.
+
+2000-02-29  Per Bothner  <per@bothner.com>
+
+	* LambdaExp.java (allocChildClasses):  Set firstArgsArrayArg for
+	child when isClassGenerated().  Fixes bug reported by Bruce R. Lewis.
+
+2000-02-27  Per Bothner  <per@bothner.com>
+
+	Various tweaks for better javadoc processing.
+	* overview.html:  Renamed to package.html.
+
+	* Compilation.java (nameField):  Now name is in Procedure, not Named.
+	* LambdaExp.java (compileAlloc):  Update for setName method.
+
+2000-02-26  Per Bothner  <per@bothner.com>
+
+	* Literal.java (nullIteral):  New final static field.
+	(emit):  Handle null value.
+	* Compilation.java (findLiteral):  Handle null value.
+	(emitLiteral):  Likewise.
+
+2000-02-25  Per Bothner  <per@bothner.com>
+
+	* ExpFullWalker.java (walkDefaultArgs):  New method.
+	(walkLambdaExp):  Call walkDefaultArgs.
+	* FindCapturedVars.java (walkDefaultArgs):  New method.
+	Check if default expression captures a parameter.
+	* LambdaExp.java (DEFAULT_CAPTURES_ARG):  New flag.
+	(setFlag): New (non-public) method.
+	(addMethodFor):  Generate stubs unless DEFAULT_CAPTURES_ARG is set.
+	(compileAsMethod):  For stubs, make parameter be simple.
+
+2000-02-12  Per Bothner  <per@bothner.com>
+
+	* Compilation.java (typeApplyMethodContainer):  New static field.
+	(generateApplyMethods):  If applet. implement ApplyMethodContent.
+	Add generateApplyMethodContainer local variable.
+	* LambdaExp.java (addMethodFor):  Set closureEnv for applets.
+	Make method non-static if thisVariable is set.
+
+	* ThisExp.java:  New class; extends ReferenceExp.
+	* Makefile.am, Makefile.in (java_JAVA):  Added ThisExp.java.
+	* ExpWalker.java (walkThisExp):  New virtual method.
+	* FindCapturedVars.java (walkThisExp):  New method.
+
+2000-02-11  Per Bothner  <per@bothner.com>
+
+	* BindingInitializer.java:  Create Binding2 instead of Binding
+	if the languge hasSeparateFunctionNamespace().
+	* Declaration.java (isProcedureDecl, setProcedureDecl):  New flags.
+	* Interpreter.java (hasSeparateFunctionNamespace):  New method.
+	* ApplyExp.java (eval, compile):  Remove hacks for checking "function
+	binding" - let ReferenceExp.isProcedureDecl() handle it instead.
+	* ModuleBody.java (runAsMain):  Don't create kawa.standard.Scheme here;
+	instead compiler inserts call to Scheme.registerEnvironment.
+	* ReferenceExp.java (flags):  New int field.
+	(dontereference):  Folded into flags field.
+	(isProcedureName, setProcedureName):  New methods.
+	(eval, compile):  Use function name space, if appropriate.
+	* SetExp.java (getHasValue, setHasValue, isFuncDef, setFunDef,
+	isSetIfBound, setSetIfUnbound):  New methods.
+	(eval, compile):  Update to use new flags.
+
+	* Compilation.java (scmInterpreterType):  Renamed to typeInterpreter.
+	(typeBinding2, functionValueBinding2Field, getBindingEnvironmentMethod,
+	getBinding2Method, defineFunctionMethod, typeApplet, typeValues,
+	noArgsField):  New static fields.
+	(apply*ModuleMethod etc):  Remove many no-longer-needed fields.
+	(generateAppletDefault, generateAppletDefault):  New fields.
+	(getMethodProcType, getModuleSuperType):  New method.
+	(generateApplyMethods):  Fix various small but critical bugs.
+	Handle the main class inheriting from Applet.
+	(addClass):  Generate code to "registerEnvironment" if main or applet.
+	* LambdaExp.java (addMethodFor):  Declare `this' for applet methods.
+	(compileAsMethod):  Fix various small but serious bugs.
+
+	* Compilation.java (mangleName):  Mangle initial digit.
+
+	* ProcInitializer.java (emitLoadModuleMethod):  Get ModuleMethod's
+	<init> method using ClassType.getDeclaredMethod.
+	(constructor_args, initModuleMethod):  No longer needed.
+
+2000-01-31  Per Bothner  <per@bothner.com>
+
+	* ApplyExp.java (eval):  Use getProcedure to get function value.
+	* Interpreter.java:  Moved from kawa.lang.
+	(defaultInterpreter):  New static field.
+	(isTrue, booleanObject, noValue):  New methods.
+	(boolObject):  Removed method.
+	(getName):  Made abstract.
+	* Makefile.am, Makefile.in (java_JAVA):  Added Interpreter.java.
+	* Compilation.java (getInterpreter):  New method.
+	(scmInterpreterType):  Interpreter moved from kawa.lang to gnu.expr.
+	(compileConstant):  Use getInterpreter().isTrue method.
+	* IfExp.java (eval, compile):  Likewise.
+	(getInterpreter):  New method.
+	(is_true):  Removed method.
+
+	* SetExp.java (HAS_VALUE):  New flag.
+	(getHasValue, setHasValue):  New methods.
+	(eval):  If getHasValue() return RHS, else return 
+	(compile):  Likewise.
+
+	* QuoteExp.java (getType):  If value is null, type is Object.
+
+2000-01-25  Daniel Bonniot <bonniot@cma.ensmp.fr>
+
+	* QuoteExp.java: (getType):  For null, return Type.pointer_type.
+
+2000-01-24  Per Bothner  <per@bothner.com>
+
+	* BeginExp.java (<init>):  New default constructor.
+	(setExpressions):  New method.
+	(getExpression):  Make private.
+
+2000-01-22  Per Bothner  <per@bothner.com>
+
+	* BindingInitializer.java:  New class, inherits from Initializer.
+	* Makefile.am, Makefile.in (java_JAVA):  Add BindingInitializer.java.
+
+	* Compilation.java (argsArray):  Removed field.
+	(typemacro, typeLocation, getLocationMethod):  New static fields.
+	(findLiteral):  If empty Object[], use noArgsProcedureField.
+	Handle Object[] where some elements are null.
+	(mangleName):  If name starts with "->" mangle to "to", not "To".
+	(generateConstructor):  More robust loop for processing initChain.
+	Generate code to initialize bindingFields fields (not in "run").
+	(generateApplyMethods):  New method.  Code moved from addClass,
+	and generalized to handle LambdaExps with multiple primMethods.
+	* LambdaExp.java (argArray, firstArgsArrayArg):  New fields.
+	(flags):  Make protected.
+	(METHODS_COMPILED, NO_FIELD):  New flag enums.
+	(isClassgenerated):  Needing closure no longer forces class generation.
+	(primMethod):  Rmeoved field; replaced by ...
+	(primMethods):  New field.
+	(getMethod, getmainmethod, restTypeArgs):  New methods.
+	(declareArgsArray):  Removed method.
+	(allocFieldFor, compileSetField):  New methods.
+	(compile):  Use new methods.
+	(addMethodFor):  New interface - can generate multiple Methods.
+	(allocParameters, enterFunction):  New longer takes argsArray argument.
+	(enterFunction):  Handle both fix args plus final var args array/list.
+	Generate better coed for keywordw when default is constant.
+	(compileAsMethod):  Handle multiple methods;  generate stubs.
+	* ObjectExp.java (compile):  Use LambdaExp's getMainMethod.
+	* ApplyExp.java (compile):  Use LambdaExp's getMethod.
+	Call that method using PrimProcedure.compileArgs.
+
+	* FindTailCalls.java: Use Declaration's getValue method.
+	* FindCapturedVars.java (walkApplyExp):  New method.
+	(capture):  No longer return immediately if decl.isStatic().
+	No need to chain decl on owner's capturedVars if decl is public.
+	* Keyword.java (searchForKeyword):  New static method.
+	* ModuleExp.java (evalModule):  Call ClassMemberConstraint.defineAll.
+	(allocFields, print):   New methods.
+	
+	* SetExp.java (compile):  Various hacks mostly so that top-level
+	definitions get exported as fields.
+	* Literal.java (assign):  New overloaded method.
+	(emit):  Better error message if Compilable not implemented.
+
+	* PrimProcedure.java (match):  Optimize if rest arg is LList.
+	(compileArgs):  New static helper method.
+	(compile):  Use it.
+	* ProcInitializer.java (emitLoadModuleMethod):  New static method.
+	(emit):  Use emitLoadModuleMethod.
+	(<init>):  New constructor.
+	* ReferenceExp.java (compile):  Use Compilation.getLocationMethod.
+	Handle non-static Binding method.
+	
+	* Declaration.java (shadowed):  Removed fields.
+	(getValue):  Make final.
+	(isPublic):  New method.
+
+1999-12-24  Per Bothner  <per@bothner.com>
+
+	* Initializer.java:  New abstract class.
+	* ProcInitializer.java:  New class;  extends Initializer.
+	* Makefile.am, Makefile.in (java_JAVA):  Add new classes.
+	* Literal.java:  New inherits from Initializer,
+	(next, field):  Replace by super-class fields.
+	(assign):  Like to comp.comp.clinitChain not comp.comp.literalsChain.
+	(emit):  New method (to satisfy super's abstract method).
+	* Compilation.java (dumpLiterals):  Replaced by dumpInitializers.
+	(literalsChain):  Rename to clinitChain;  change type to Initializer.
+	(initChain):  New field.
+	(generateConstructor):  Do dumpInitializers(initChain).
+
+	* Compilation.java (addClass):  Remove now-unused "apply" generation.
+
+	* Expression.java (compileNotePosition):  Do not use a try-finally
+	to restore linenumber.
+	* Compilation.java (addClass):  If an exception (internal error)
+	is thrown while compiling, catch it and print an error.
+
+	* Declaration.java:  No longer inherit from Variable.
+	(sym):  Field re-named to `name'.
+	(string_name, symbol):  Renmoved methods;  use getName instead.
+	(next, var):  New fields.
+	(IS_SIMPLE):  New flag.
+	(getName, setName, setType, getType, nextDecl, getVariable, isSimple,
+	setSimple):  New methods.
+	(load, compileStore, initBinding):  Pass getVariable() instead of this.
+	(allocateVariable):  New method.
+	* ScopeExp.java (decls, last):  New fields.
+	(firstDecl, add):  New methods.
+	(addDeclaration):  Use new add method.
+	* CatchClause.java (compile):  Change Declaration catchDecl
+ 	to Variable catchVar.
+	* LambdaExp.java (declareThis, declareClosureEnv, declareArgsArray):
+  	Now return Variables.
+	(isClassGenerated):  Always generate class for ObjectExp;  never
+	if outerLambda is a ModuleExp. 
+ 	(heapFrame, closureEnv, thisVariable):	Change from Declaration
+ 	to Variable.
+	* Compilation.java (thisDecl, callStackContext):  Likewise.
+	* ObjectExp.java (compile):  May need staticLink even of caller's
+	closureEnv is null.  Call the Variable "closureEnv", not "staticLink".
+	* FindTailCalls.java:   Update to use Declaration instead of Variable.
+	* ApplyExp.java, FluidLetExp.java, LetExp.java, SerExp.java:  Likewise.
+	* FindCapturedVars.java:  Likewise.
+	(capture):  The heapFrame of a ModuleExp is its thisVariable.
+	* ModuleExp.java (<init>):  Call declareThis.
+
+1999-12-17  Per Bothner  <per@bothner.com>
+
+	* CheckedTarget.java (emitCheckedCoerce): Use "lambda" as default name.
+
+1999-12-11  Per Bothner  <per@bothner.com>
+
+	* FindCapturedVars.java (walkLetExp)  Don't optimize if FluidLetExp.
+	* gnu/expr/FindTailCalls.java (walkFluidLetExp):  New method.  Fixes
+	bug reported by Walter C. Pelissero <wcp@lpds.sublink.org>.
+	* gnu/expr/PushApply.java (walkApplyExp):  Don't re-write if
+	function is FluidLetExp.
+
+1999-12-06  Per Bothner  <per@bothner.com>
+
+	* PrimProcedure.java (compile):  If too few/many arguments,
+	call comp.error instead of throwing WrongArguments.
+
+1999-12-06  Bruce R. Lewis  <brlewis@alum.mit.edu>
+
+	* ModuleExp.java (compileToArchive):  Re-write to use java.util.zip.*
+	instead of gnu.bytecode.ZipArchive.
+
+1999-12-05  Daniel Bonniot <bonniot@cma.ensmp.fr>
+
+	* Declaration.java (load):  Call emitPutStatic if appropriate.
+	* SetExp.java (compile):  Likewise.
+
+1999-11-28  Per Bothner  <per@bothner.com>
+
+	* FindCapturedVars.java (capture):  When chasing down callers of
+	inline-only functions, watch out for infinite cycles.
+	* FindTailCalls.java (walkLambdaExp): If child has one *or zero*
+ 	callers, mark it as inline-only.
+
+1999-11-27  Per Bothner  <per@bothner.com>
+
+	* FindCapturedVars.java (capture):  If the captured decl is an
+	inline-only procedure, we're done.  Likewise if we're calling ourself.
+	Fixes bugs reported by Walter C. Pelissero <wcp@lpds.sublink.org>.
+	Don't "capture" decl is it is a call-only variable.  (We don't
+	need a closureEnv for a call-only ufnction.)  Instead, rely on
+	new setCallersNeedStaticLink/setNeedsStaticLink() methods.
+	* LambdaExp.java (getNeedsClosureEnv):  New method.  Use it various
+ 	places instead of (getImportsLexVars() || getNeedsStaticLink()).
+	(setNeedsStaticLink()):  New method (overload).
+	(setCallersNeedStaticLink):  New helper method.
+	(declareThis): Remove duplicate semi-colon.
+	(allocChildClasses):  Keep searching parent chain for closureEnvType.
+
+1999-11-26  Per Bothner  <per@bothner.com>
+
+	* Compilation.java (compileConstant): Coerce value to target type.
+	Tell compileFromStack that the current type is the value's class.
+	Suggested by Daniel Bonniot <bonniot@cma.ensmp.fr>.
+
+1999-11-16  Per Bothner  <per@bothner.com>
+
+	* ApplyExp.java (compile):  Minor fix for tail-recursion with many
+	arguments. (Bug reported by Walter C. Pelissero <wcp@lpds.sublink.org>)
+
+1999-11-15  Per Bothner  <per@bothner.com>
+
+	Suggested by Daniel Bonniot <bonniot@cma.ensmp.fr>:
+	* ExpFullWalker.java (walkBlockExp):  Test if exitBody is null.
+	* Compilation.java (findLiteral):  Use Type.make(value.getClass()).
+
+	* ObjectExp.java (getCompiledClassType):  Use Scheme.exp2Type.
+
+	* MethodProc.java (isApplicable):  Fix incorrect return code.
+	(mostSpecific):  New method.
+	* GenericProc.java (applyN):  Select most specific matching method.
+
+	* PrimProcedure.java (getParameterType):  Adjust for static/non-static.
+	(getMethodFor):  If class is ModuleMethod, get the module's class.
+
+1999-11-03  Per Bothner  <per@bothner.com>
+
+	* ApplyExp.java (compile):  If function is Inlineable but we didn't
+	line it, try PrimProcedure.getMethodFor.
+	* MethodProc.java (isApplicable):  Change arg types and return codes.
+	Implementation now uses Type.compare.
+	(numParameters, getParameterType, mostSpecific):  New methods.
+	* GenericProc.java (isApplicable):  Change arg types and return codes.
+	* PrimProcedure.java (setReturnType, getParameterType): New methods.
+	(getMethodFor):  New static method.  (Code moved from Translator.)
+
+1999-10-25  Per Bothner  <per@bothner.com>
+
+	* ApplyExp.java (popParams):  Take extra argument.
+	(compile):  Handle tail-recursion for varargs functions.
+
+	* ClassExp.java:  New class; extends ObjectExp.
+	* Makefile.am, Makefile.in (java_JAVA):  Added ClassExp.java.
+	* Compilation.java (addClass):  ClassExp cannot have "apply" method.
+	* LambdaExp.java (evalToClass):  New method.
+
+	* PrimProcedure.java (compile):  Handle takesVarArgs() methods.
+
+1999-09-14  Per Bothner  <per@bothner.com>
+
+	* GenericProc.java:  New inherits from MethodProc.
+	(getVarBuffer, isApplicable, match, applyV):  New methods.
+
+	* PrimProcedure.java:  Interpret methods whose names end in "$V"
+	as taking a variable number of arguments;  the excess ones are
+	bundled in an array passed as the last argument.
+
+1999-09-08  Per Bothner  <per@bothner.com>
+
+	No longer create new class for top-level procedures;
+	instead allocate a ModuleMethod for each procedure.
+	* LambdaExp.java (isClassGenerated):  Update for new behavior.
+	(selectorValue, getSelectorValue):  New field and method.
+	(compile):  Generate static methods, plus allocate ModuleMethod.
+	(addMethodFor):  Better way of selectiing method names.
+	* ModuleMethod.java (apply4):  Add "missing" method.
+	* ModuleBody.java (apply4):  Likewise.
+	(applyN):  Try calling apply0 .. apply4, if appropriate.
+	* Compilation.java:  Allocate static types and methods needed.
+	(addClass):  Generate the ModuleBody applyX methods.
+
+	* Declaration.java:  New fields and methods for line number info.
+
+	* Compilation.java (typeObject):  Renamed from scmObjectType.
+	(typeString, typePair):  New preferred field names.
+	* Literal.java, ReferenceExp.java, SetApplyExp.java:  Update
+ 	references accordingly.
+
+1999-09-05  Per Bothner  <per@bothner.com>
+
+	* Declaration.java (PRIVATE, isPrivate, setPrivate):  New flag.
+	(isStatic, isLexical):  New methods.
+	(load, compileStore):  Don't loadOwningObject if field is static.
+	* SetExp.java (eval, compile):  Handle binding to static Declaration.
+	* ReferenceExp.java (eval.compile):  Likewise.
+	* FindTailCalls.java (walkSetExp):  Likewise.
+	* FindCapturedVars.java (capture):  Do nothing if decl.isStatic().
+
+	* ModuleMethod.java:  New class, which extends ProcedureN.
+	* ModuleBody.java:  New apply methods that take a ModuleMethod.
+	* Makefile.am, Makefile.in (java_JAVA):  Add ModuleMethod.java.
+
+1999-08-26  Per Bothner  <per@bothner.com>
+
+	* GenericProc.java:  New class;  inherits from ProcedureN.
+	* MethodProc.java:  New class;  inherits from ProcedureN.
+	* Makefile.am, Makefile.in (java_JAVA):  Add new .java files.
+	* PrimProcedure.java:   Re-organized to inherit from MethodProc.
+
+	* Declaration.java (sym, value):  Make fields protected.
+	(<init>):  New protected empty constructor (for kawa.lang.Syntax).
+
+	* ReferenceExp.java (compile):  Indirect bindings are now Locations.
+	* SetExp.java (compile):  Likewise.
+
+1999-08-22  Per Bothner  <per@bothner.com>
+
+	* Compilation.java (error):  New methods, like those in Translator.
+	(addClass):  Use new ApplyExp constructor.
+	(scmPatternType):  Removed - no longer needed.
+	* ApplyExp.java (<init>):  New constructor.
+	(compile):  Use new Compilation.error methods.
+
+	* Expression.java (compileNotePosition):  New method.
+
+	* LambdaExp.java:  Provide a cache for evaluated value.
+
+	* BlockExp.java (exitBody):  New field.
+	(setBody):  New overloaded methods.
+	(compile): Handle exitBody.  Set this.exitLabel.
+	* Declaration.java (getValue):  New method.
+	(<init>(String, Type)):  Handle the name being null.
+	* IfExp.java (compile):  Optimize if else part is ExitExp.
+	* ExpFullWalker.java (walkBlockExp, walkExitExp):  New methods.
+	* ExitExp.java (<init>):  New constructors.
+	(compile):  Remove bogus compilation of void.	
+	* BeginExp.java (<init>):  New convenience constructor.
+	* LetExp.java (getBody, setBody):  New methods.
+	* ReferenceExp.java (<init>):  New overloaded constructor.
+
+1999-08-18  Per Bothner  <per@bothner.com>
+
+	* PrimProcedure.java (getName):  Use super.getName() instead of
+ 	deprecated name().
+
+1999-08-17  Per Bothner  <per@bothner.com>
+
+	* FindTailCalls.java (walkObjectExp):   Don't call super.walkObjectExp,
+	instead call walkLambdaExp on each method so setCanRead is not called.
+	* LambdaExp.java (allocFrame):  Don't create closureEnvField here,
+	since it is not appropriate for ObjectExp.
+	(allocChildClasses):  Create closureEnvField here instead.
+	* ObjectExp.java (compile):  Don't create staticLinkField if this is
+	our parent's heapFrameLambda (since parent has already done it).
+
+1999-08-06  Per Bothner  <per@bothner.com>
+
+	* CheckedTarget.java:  New class, extends StackTarget.
+	* Makefile.am, Makefile.in:  Update accordingly.
+	* StackTarget.java (compileFromStack0):  New protected method.
+	* Compilation.java (addClass):  Specificy LambdaExp to PrimProcedure.
+	* LambdaExp.java (enterFunction):  Do checked coerce on argument.
+	* PrimProcedure.java (applyN):  Catch ClassCastException.
+	(<init>):  New overload.
+	(compile):  Catch ClassCastException.
+	(getVerboseName):  New method.
+
+1999-07-19  Per Bothner  <per@bothner.com>
+
+	* ApplyExp.java (compile):  When doing a direct method call,
+	pass the correct closure environment.
+	* LambdaExp.java (getCaller):  New method.
+	(declareClosureEnv):  Fix problems with inline functions.
+
+1999-07-15  Per Bothner  <per@bothner.com>
+
+	* Target.java (pushValue, returnValue):  New static methods.
+	* IgnoreTarget.java (compileFromStack):  Use Type.isVoid().
+	* TailTarget.java (getInstance):  New method.
+	* Compilation.java (addClass):  Use Target.returnValue().
+	* ObjectExp.java (compile):  Likewise.
+	* Expression.java (compile):  Use StackTarget.getInstance.
+	* StackTarget.java (getInstance):  New method.
+	(compileFromStack):  Use Type.isVoid and Type.isSubtype.
+	* LambdaExp.java (compileAsMethod):  Likewise.
+
+	* ObjectExp.java (print):  New method.
+	(getCompiledClassType):  Fix incorrect implied superclass handling.
+
+	* ApplyExp.java (compile):  Check real parent (even if inline), when
+	seeing if we need to pass a closure when calling a method directly.	
+	* LambdaExp.java (allocFrame):  When allocating closureEnvField, check
+ 	real parent (even if inline).  Inline functions can have heapFrame.
+	(enterFunction):  Fix logic bug when renaming duplicate field.
+
+1999-04-22  Per Bothner  <bothner@Magnus.Cygnus.COM>
+
+	* LetExp.java (compile):  Target for init expr is decl type.
+
+1999-04-22  Per Bothner  <bothner@cygnus.com>
+
+	* Compilation.java (addClass):  Remove (commented-out) call to
+ 	declareClosureEnv.
+	* FindTailCalls.java (walkSetExp):  Don't call walkLambdaExp if the
+	value is an ObjectExp.
+	* expr/LambdaExp.java (declareClosureEnv):  If isClassMethod(),
+	then the closureEnv variable is "this".
+	* expr/ObjectExp.java (compile):  Create staticLinkField if needed.
+
+1999-04-15  Per Bothner  <bothner@Magnus.Cygnus.COM>
+
+	* Compilation.java (addClass):  Don't create primitive methods here.
+	* LambdaExp.java (allocChildClasses):  Do it here instead,
+	* Compilation.java (addClass):  Don't compiled child methods here.
+	* LambdaExp.java (compileChildMethods):  Do it here instead (new).
+	(compileAsMethod):  New - logic taken from Compilation.addClass.
+	* ApplyExp.java (compile):  Call compileChildMethods if inline call.
+	* ObjectExp.java (compile):  Likewise for child methods.
+
+1999-04-11  Per Bothner  <bothner@cygnus.com>
+
+	* LambdaExp.java (declareClosureEnv):  Fix for object methods.
+
+Wed Apr  7 18:04:27 1999  Per Bothner  <bothner@Magnus.Cygnus.COM>
+
+	* FluidLetExp.java:  New LetExp class.
+	* BlockExp.java:  New Expression class (untested).
+	* ExitExp.java:  New Expression class (untested).
+	* Makefile.am (java_JAVA), Makefile.in:  Update for new classes.
+
+	* Declaration.java (IS_FLUID):  New flag bit.
+	(setFlag, isFluid, setFluid):  New methods.
+	* ExpWalker.java (walkBlockExp, walkExitExp, walkFluidLetExp):  New.
+	* LetExp.java (getType):  New method.
+	* SetExp.java (getType):  New method.
+	* ReferenceExp.java (compile, getType):  Check if isFluid().
+	* SetExp.java (compile):  Check if isFluid().
+
+Tue Mar 30 17:15:14 1999  Per Bothner  <bothner@Magnus.Cygnus.COM>
+
+	* LambdaExp.java (CLASS_METHOD):  New flag.
+	(isClassMethod, setClassMethod):  New methods.
+	(isHandlingTailCalls):  Return false if isClassMethod/
+	* ObjectExp (compile):  Call compileExp on actual child method.
+
+Mon Mar 29 23:28:59 1999  Per Bothner  <bothner@cygnus.com>
+
+	* LambdaExp.java (getCompiledClassType):  Add Compilation parameter.
+	* ObjectExp.java (getCompiledClassType):  Likewise.
+	Call Compilation.generateClassName to avoid duplicate names.
+	(compile):  Call super.allocFrame.
+	* Compilation.java, LambdaExp.java:  Fix getCompiledClassType calls.
+	* LambdaExp.java (declareClosureEnv):  If parent is ObjectExp,
+	get its parent instead.  Re-order logic for object methods.
+	(allocChildClasses):  Move latter half into new method allocFrame.
+	(allocFrame):  New method.  Use outerLambdaNotInline.
+	(enterFunction):  Initialize closureEnv also for methods in ObjectExp.
+
+	* ApplyExp.java (compile), ReferenceExp.java (compile):  Verifier
+	in JDK1.2 rejects emitInvokeSpecial so use emitInvokeVirtual instead.
+
+	* PrimProcedure.java (applyN):  Check for thrown Error.
+
+Sat Mar 20 11:25:01 1999  Per Bothner  <bothner@Magnus.Cygnus.COM>
+
+	* Declaration.java (pushIndirectBinding):  New method.
+	(initBinding):  Use pushIndirectBinding.
+	* LambdaExp.java (isClassGenerated):  Use isHandlingTailCalls.
+	(allocParameters, enterFunction):  Handle isIndirectBinding.
+	* ModuleBody.java (runAsMain):  Re-enable, for now.
+	* ObjectExp.java (<init>):  Call setCanRead to force class generation.
+	* PrimProcedure.java (compile):  Use new Type.isVoid().
+	* ReferenceExp.java (lookup):  Remove - no longer used.
+	(eval):  Just call env.getChecked.
+	(compile):  Use Binding.get rather than Environment.lookup.
+	* ApplyExp.java:  If function is a globally-bound symbol,
+	emit (get Binding).getProcedure().
+	* Compilation (getBindingField):  New method.
+	(typeBinding, getBindingMethod, getProcedureBindingMethod,
+	getBindingEnvironmentMethod, getCurrentEnvironmentMethod): New statics.
+	(addClass):  Move generateConstructor to end.
+	Emit code to allocate global Bindings.
+
+	* Compilation (scmProcedureType):  Renamed to typeProcedure.
+	(scmEnvironmentType):  Renamed to typeEnvironment.
+	* ApplyExp,java, LambdaExp.java, SetApplyExp.java:
+  	Update scmProcedureType -> typeProcedure.
+
+Sun Mar  7 17:28:59 1999  Per Bothner  <bothner@Magnus.Cygnus.COM>
+
+	* ApplyExp.java (compileToArray, compile):  Handle full tailcalls.
+	* Compilation.java:  Various new static fields.
+	(fwitchIndex, callStackContext):  New fields.
+	(findLiteral):  Check for null array elements.
+	(allocClass):  Set superType differently if handling tailscalls.
+	(addClass):  Some things are different if handling tailcalls.
+	* Declaration.java (assignField):  New field.
+	(ignorable):  Different rules for full tailcalls.
+	* FindTailCalls.java (walkBeginExp, walfIfExp):  Last expr is in
+	tail context only if whole expr is.
+	(walkLambdaExp):  Do setInlineOnly here, not  in FindCapturedVars.
+	* FindCapturedVars.java (walkLetExp):  Optimize letrec-style forms.
+	(walkLambdaExp):  Removed;  functionality handled by FindTailCalls.
+	(capture):  Handle full tail calls;  various bug fixes.
+	* LambdaExp.java (closureEnvField, closureEnv):  New fields.
+	(NEEDS_STATIC_LINK, CANNOT_INLINE):  New flags.
+	(getNeedsStaticLink, setNeedsStaticLink):  New methods.
+	(isClassGenerated, isHandlingTailCalls):  New methods.
+	(outerLambdaNotInline, declareClosureEnv, compileEnv):  New methods.
+	(thisVariable): New field.
+	(declareThis):  Set/use thisVariable.
+	(compile(Compilation)):  Save/restore comp.callStackContext.
+	(compileAlloc):  Simplify by using new closureEnvField.
+	(compile(Compilation,Target)):   Redo.  Preliminary cps support.
+	(addMethodFor):  Change call interface.  Various changes.
+	(loadHeapFrame, allocChildClasses):  Extensive changes.
+	(allocParameters, enterFunction):  Still more changes.
+	* ModuleBody.java (run):  No longer takes environment arguemnt.
+	* ModuleExp.java (evalModule):  ModuleBody.run no longer takes env.
+	* ObjectExp.java (compile):  Use compileEnd.
+	Update for new LambdaExp.addMethodFor.
+	* PrimProcedure.java (applyN):  Catch InvocationTargetException.
+	* TailTarget.java (compileFromStack):  New method, for full tailcalls.
+	* TryExp.java (compile):  Fix to handle more general Targets.
+	* Literal.java (emitArray):  Nothing to do if value is null.
+
+Fri Jan 15 20:30:58 1999  Per Bothner  <bothner@cygnus.com>
+
+	* ApplyExp.java (compile):  Even if a function is inlined, we
+	need to call allocChildClasses.
+
+Wed Dec 23 13:51:35 1998  Per Bothner  <bothner@Magnus.Cygnus.COM>
+
+	Literals in immediate mode are now allocated to fields (instead
+	of a literals array), just like for non-immediate mode.
+	Use reflection to initialize the fields.
+	* Compilation.java (literalsField):  Removed field.
+	(compileConstant):  Don't generate code to index from literalsField.
+	(<init>):  Don't initialize literalsField.
+	* LambdaExp.java (compile_setLiterals):  Removed method.
+	(eval):  Don't call compile_setLiterals.  Don't create literals array.
+	Don't set lierals[literal.index] to literal.value.  Instead, use
+	reflection to set the static field uses for the literal.
+	* Literal.java (assign):  Create a field, even if immediate.
+	(<init>):  Set type from the value's class.
+	* Makefile.am (java_JAVA), Makefile.in:  Rmeoved Compiledproc.java.
+	* ReferenceExp.java (compile):  No longer need cast if immediate.
+
+	* Compilation.java (mangleName):  More natural mangling.
+	E.g.  "foo-bar?" now becomes "isFooBar".
+
+	* ObjectExp.java (initMethod):  New field.
+	(getCompiledClassType):  Allow extended super-types and implemented
+	interfaces to come in any order.
+	(compile):  New method, to make sure $finit$ is called.
+ 	(compile):  Don't add field for declarations corresponding to methods.
+	
+	* QuoteExp.java (getType):  If value is Values.empty, type is void.
+	* SetExp.java (compile):  Compile rhs to correct type.
+
+	* Expression (compile): Re-use Target.pushObject if possible.
+
+Tue Dec 15 10:50:53 1998  Per Bothner  <bothner@Magnus.Cygnus.COM>
+
+	* ChainLambdas.java:  New ExpFullWalker sub-class.
+	* PushApply.java:  New ExpFullWalker sub-class.
+	* Makefile.am, Makefile.in (java_Java):  Add new source files.
+	* FindTailCalls.java:  Moved some functionality to ChainLambdas
+	and PushApply in order to keep things less convoluted.
+	(walkObjectExp):  New method.
+	* ExpWalker.java (walkObjectExp):  New trivial method.
+	* ExpFullWalker.java (walkObjectExp):  New method.
+	* Compilation.java (<init>): Invoke ChainLambdas and PushApply walkers.
+
+	* Compilation.java (allocClass):  Use getJavaName.
+ 	(allocClass):  Use getCompiledClassType for ObjectExp.
+	* LambdaExp.java (isSharedSwitchMethod): New (currently unused) method.
+	(getJavaName):  New method.
+	(eval):  Use getJavaName,
+	(loadHeapFrame, allocChildClasses):  Test for and handle ObjectExp.
+	(toString):  Tolerate null body (as in ObjectExp).
+	* ObjectExp.java (<init>):  Set type initially to null.
+	(getJavaName, getCompiledClassType, walk, toString):  New methods.
+	* ReferenceExp.java:  Remove Scheme-specific support for <TYPE>.
+	(This functionality has moved to kawa.standard.ScmEnv.)
+
+Mon Nov 23 16:04:42 1998  Per Bothner  <bothner@cygnus.com>
+
+	* Inlineable.java (getReturnType):  New method.
+	* PrimProcedure.java (getReturnType):  New method.
+	* ApplyExp.java (getType):  Generalize with Inlineable.getReturnType;
+
+	* ObjectExp.java:  New Expression class.
+	* BeginExp.java (getExpressions):  New method.
+	* Compilation.java (addClass):  Remove unused local 'main'.
+	* FindTailCalls.java (walkLambdaExp):  Allow null body.
+	* ExpFullWalker.java (walkLambdaExp):  Allow null body.
+	* LambdaExp.java (firstChild, nextSibling):  Make public.
+	* Makefile.am, Makefile.in (java_JAVA):  Add ObjectExp.java.
+
+Sun Nov 15 21:31:59 1998  Per Bothner  <bothner@cygnus.com>
+
+	* ReferenceExp.java (lookup):  Remove magic for Scheme <TYPE>
+	(that is now handled by kawa.standard.ScmEnv).
+
+Sat Oct 17 13:23:50 1998  Per Bothner  <bothner@Magnus.Cygnus.COM>
+
+	* SynchronizedExp.java:  New class.
+	* Makefile.am (java_JAVA), Makefile.in:  Add SynchronizedExp.java.
+	* ExpWalker.java (walkSynchronizedExp):  New method.
+	* ExpFullWalker.java (walkSynchronizedExp):  New method.
+	* FindTailCalls.java (walkSynchronizedExp):  New method.
+
+	* StackTarget.java (compileFromStack):  Use two-argument emitConvert.
+
+Thu Sep 24 19:35:14 1998  Per Bothner  <bothner@cygnus.com>
+
+	* ExpFullWalker.java:  New conventions to support replacement.
+	* FindCapturedVars.java, FindTailCalls.java:  Change to new convention.
+	* FindTailCalls.java:  Add some extra optimizations.
+	* FindCapturedVars.java (walkLambdaExp):  Inline if single caller.
+	* LambdaExp.java (returnContinuation, unknownContinuation):
+	New fields, used to determine if local function can be inlined.
+
+	* ApplyExp.java (popParams):  Handle zero parameters, not even "this".
+
+Sun Sep 13 13:00:01 1998  Per Bothner  <bothner@cygnus.com>
+
+	* ApplyExp.java (context, nextCall):  New fields.
+	* FindTailCalls.java (walkApplyExp):  Set context and nextCall.
+	* Declaration.java (nextCall):  New field.
+	(noteValue):  Update LambdaExp.nameDecl.
+	* FindCapturedVars.java:  Call new setImportsLexVars variant.
+	* LambdaExp.java (nameDecl):  New field. 
+	(setImportsLexVars):  New method - also chases down callers.
+
+Fri Sep 11 20:20:12 1998  Per Bothner  <bothner@cygnus.com>
+
+	More efficient procedure representation:  Inlining, directly
+	callable statics, procedures that don't require own Classes.
+	* ApplyExp.java (compileToArray):  New method.
+	(compile):  Handle different kinds of apply methods.
+	* Compilation.java (generateConstructor, allocClass):  New methods.
+	(addClass):  Handle specialized more efficient procedure schemes.
+	* Declaration.java:  Add various flags, getters, and setters.
+	* FindCapturedVars.java (capture):  More general (and complex).
+	* FindTailCalls.java:  Also setCanRead, setCancall etc of
+	of Declarations and LambdaExps, and chain LambdaExp children together.
+	* LambdaExp.java:  Add various flags.
+	(declareArgsArray, loadHeapFrame, addMethodFor,
+	allocChildClasses):  New methods.
+	(eval):  Dumping .zip files is now controlled by static dumpZipPrefix.
+	* LetExp.java (store_rest):  Don't initBinding if decl is ignorable.
+	(compile):  Ignore init expression if target is ignorable.
+	
+	* PrimProcedure.java:  Moved from kawa.lang package.
+	* Makefile.am, Makefile.in:  Update accordingly.
+
+	* QuoteExp.java (nullExp):  New static.
+
+	* QuoteExp.java (getType):  New method.
+	* BeginExp.java (getType):  New method.
+	* ReferenceExp.java (getType):  New method.
+
+	* SetExp.java (compile):  If lhs is ignorable, target is Ignore.
+	* StackTarget.java (compileFromStack):  If stack type inherits
+	from target type, we can avoid coercion.
+
+	* TryExp.java (print):  Handle null finally_clause.
+
+Sat Aug 29 20:32:46 1998  Per Bothner  <bothner@cygnus.com>
+
+	* FindCapturedVars.java (capture):  Handle inline functions better.
+	* Compilation.java (addClass):  Move lots of stuff to LambdaExp.
+	* LambdaExp.java (allocParameters, enterFunctions):  New functions
+	* ApplyExp.java:  Handle inlined functions.
+	* Declaration.java (loadOwningObject):  Skip inlined functions first.
+	* ScopeExp.java (currentLambda):  Inline functions are not special.
+	* SetExp.java (<init>):  Handle do special form specially.
+
+	* Compilation.java, Special.java:  Do ClassType.make instead of
+	new ClassType.
+
+Sat Aug 29 09:16:01 1998  Per Bothner  <bothner@cygnus.com>
+
+	* ApplyExp.java (compile):  Fix problems with tails-calls.
+	* Compilation.java (addClass):  Fix procedure prologue for tails-calls.
+
+	* Declaration.java (toString):  Print with name and new uid.
+
+1998-08-28  Per Bothner  <bothner@cygnus.com>
+
+	* ExpWalker.java, ExpFullWalker.java, FindTailCalls.java,
+	FindCapturedVars.java:  New tree-walker (visitor) classes.
+	* Expression.java (walk):  New method.
+	* *Exp.java:  Add walk method to Expression sub-classes.
+
+	* ApplyExp.java (tailCall, isTailCall, setTailCall):  New flag, methods.
+	(compile):  Inline function if it has the getInlineOnly() flag.
+
+	Changed a bunch of stuff for new closure implementation.
+	* LambdaExp.java (compileAlloc):  New method.
+	* Declaration.java (loadOwningObject, load, compileStore, initBinding):
+	New methods for new closures.
+	* ReferenceExp.java (compile_load):  Removed.
+	* Compilation.java (<init>):  Merge constructors.  Call walkers.
+
+	* LambdaExp.java, ReferenceExp.java:  Add unique number to ease debugging.
+
+1998-08-25  Per Bothner  <bothner@cygnus.com>
+
+	* Declaration.java (isIndirectBinding, setIndirectBinding):  New.
+
+Fri Jul 24 16:11:36 1998  Lynn Quam <quam@ai.sri.com>
+
+	* Compilation.java (putGlobalMethod):  New static field.
+	* SetExp.java (compile):  If !isDefining(), compile
+	putGlobalMethod instead of defineGlobalMethod.
+
+Wed Jul 22 21:42:42 1998  Per Bothner  <bothner@cygnus.com>
+
+	New directory.  Files mostly moved from ../../kawa/lang.

@@ -1,0 +1,85 @@
+// Copyright (c) 1999  Per M.A. Bothner.
+// This is free software;  for terms and warranty disclaimer see ./COPYING.
+
+package gnu.expr;
+import gnu.mapping.*;
+
+/** Call a specified method in in a ModuleBody.
+ * We use an extra level of indirection, but we save by having
+ * to create fewer classes than in the one-class-per-procedure
+ * scheme, without having to use (slow) reflection.
+ *
+ * ModuleMethod is redundant, since it could be replaced by ApplyMethodProc.
+ * However, ModuleMethod uses virtual method calls, while ApplyMethodProc
+ * uses the possibly much slower interface method calls.
+ */
+
+public class ModuleMethod extends MethodProc
+{
+  ModuleBody module;
+  public final int selector;
+  private int numArgs;
+
+  public ModuleMethod(ModuleBody module, int selector,
+                      String name, int numArgs)
+  {
+    this.module = module;
+    this.selector = selector;
+    this.numArgs = numArgs;
+    setName(name);
+  }
+
+  public int numArgs() { return numArgs; }
+
+  public Object apply0()
+  {
+    return module.apply0(this);
+  }
+
+  public Object apply1(Object arg1)
+  {
+    return module.apply1(this, arg1);
+  }
+
+  public Object apply2(Object arg1, Object arg2)
+  {
+    return module.apply2(this, arg1, arg2);
+  }
+
+  public Object apply3(Object arg1, Object arg2, Object arg3)
+  {
+    return module.apply3(this, arg1, arg2, arg3);
+  }
+
+  public Object apply4(Object arg1, Object arg2, Object arg3, Object arg4)
+  {
+    return module.apply4(this, arg1, arg2, arg3, arg4);
+  }
+
+  public Object applyN(Object[] args)
+  {
+    return module.applyN(this, args);
+  }
+
+  public Object getVarBuffer()
+  {
+    return new Object[1];
+  }
+
+  // FIXME - only checks argument length.
+  public RuntimeException match (Object vars, Object[] args)
+  {
+    int argCount = args.length;
+    int num = numArgs();
+    if (argCount < (num & 0xFFF)
+	|| (num >= 0 && argCount > (num >> 12)))
+      return new WrongArguments(this, argCount);
+    ((Object[]) vars)[0] = args;
+    return null;
+  }
+
+  public Object applyV(Object vars)
+  {
+    return applyN((Object[]) ((Object[]) vars)[0]);
+  }
+}

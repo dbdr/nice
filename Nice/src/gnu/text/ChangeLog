@@ -1,0 +1,88 @@
+2000-06-20  Daniel Bonniot  <d.bonniot@mail.dotcom.fr>
+
+	* Char.java (make(char)):  New method.
+
+2000-06-19  Per Bothner  <per@bothner.com>
+
+	* Char.java:  New file, moved from gnu.kawa.util.
+	($Eq, $Ls, $Gt, $Ls$Eq, $Ls$gr):  New static methods.
+
+	* IntegerFormat.java:  New class, bases on old LispIntegerFormat
+	from kawa/standard/LispFormat.java.
+	* ReportFormat.java (PARAM_FROM_LIST, PARAM_FROM_COUNT,
+	PARAM_UNSPECIFIED):  Moved from kawa/standard/LispFormat.
+	(getFormat):  Static methods moved from LispFormat.
+
+2000-05-28  Per Bothner  <per@bothner.com>
+
+	* CharArrayInPort.java:  Moved to gnu.mapping.
+	* LispReader.java:  Moved to new package gnu.kawa.lispexpr.
+	* Makefile.am (java_JAVA):  Updated accordingly.
+
+2000-03-17  Per Bothner  <per@bothner.com>
+
+	* LispReader.java (readEscape):  Split into two overloaded methods.
+	(Mainly so `?\ ' in ELisp can be treated as space.)
+
+2000-02-27  Per Bothner  <per@bothner.com>
+
+	Various tweaks for better javadoc processing.
+	* overview.html:  Renamed to package.html.
+
+2000-02-19  Per Bothner  <per@bothner.com>
+
+	* LineBufferedReader.java (fill):  Change parameters.
+
+2000-01-24  Per Bothner  <per@bothner.com>
+
+	* QueueReader.java:  New classes, moved from kawa/lang.
+	* Makefile.am, Makefile.in (java_JAVA):  Add QueueReader.java.
+
+2000-01-23  Per Bothner  <per@bothner.com>
+
+	* SourceMessages.java (errorCount):  Make private.
+	* Lexer.java (clearErrors):  Use SourceMessages.errorCount method.
+
+1999-12-10  Per Bothner  <per@bothner.com>
+
+	* NullReader.java, CharArrayInPort.java:  Moved from kawa/lang.
+	* Makefile.am, Makefile.in (java_JAVA):  Add new files.
+
+1999-10-20  Bruce Lewis  <brlewis@alum.mit.edu>
+
+	* gnu/text/LispReader.java: readListBody now takes an int
+	argument for endDelimiter; -1 means read to EOF.  This facilitates
+	reading an entire file with line/column info.
+
+1999-09-05  Per Bothner  <per@bothner.com>
+
+	* LineBufferedReader.java (readLine):  New overloaded version.
+
+	* SourceMessages.java (checkErrors):  New method overloading.
+	For both versions, do not return true if only warnings were seen.
+
+	* LispReader.java (readEscape):  Move here from ELispReader.
+
+1999-06-30  Per Bothner  <per@bothner.com>
+
+	* PadFormat.java (format):  Trivial optimization.
+
+1999-04-22  Per Bothner  <bothner@Magnus.Cygnus.COM>
+
+	* SourceMessages.java:  New class (collection of SourceError).
+	* Makefile.am, Makefile.in (java_JAVA):  Add SourceMessages.java.
+	* Lexer.java:  Re-written - error handling now using SourceMessages.
+	* LispReader.java (readlistBody, readList):  New overloads that
+	take an explicit end delimiter, not just ')'.
+	* SourceError.java (printAll):  Replaced by SourceMessages.printAll.
+	* SyntaxException.java (lexer):  Lexer field replaced by ...
+	(messages):  ... new SourceMessages field.  Change methods to match.
+
+Thu Mar 11 11:14:49 1999  Per Bothner  <bothner@Magnus.Cygnus.COM>
+
+	* LispReader.java:  New class.
+	* Makefile.am (java_JAVA), Makefile.in:  Add LispReader.java.
+
+Thu Jun 25 22:36:19 1998  Per Bothner  <bothner@cygnus.com>
+
+	New directory.

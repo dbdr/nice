@@ -1,0 +1,45 @@
+2000-05-28  Per Bothner  <per@bothner.com>
+
+	* kawa/lispexpr:  New package gnu.kawa.lispexpr.
+	* kawa/Makefile.am (SUBDIRS):  Added new directory lispexpr.
+	* Makefile.am (SUBDIRS):  Do text before mapping, now that text
+	no longer depends on mapping (but mapping still depends on text).
+
+1999-09-14  Per Bothner  <per@bothner.com>
+
+	* kawa, kawa.reflect:  New packages.
+
+1999-08-08  Per Bothner  <per@bothner.com>
+
+	* jemacs:  New package gnu.jemacs.
+	Move gnu.elisp to gnu.jemacs.text.
+	Move gnu.emacs to gnu.jemacs.buffer.
+	* Makefile.am, Makefile.in (SUBDIRS):  Update accordingly.
+
+1999-06-20  Per Bothner  <per@bothner.com>
+
+	* Makefile.am (SUBDIRS):  Add emacs.
+
+Sun Mar 21 11:03:23 1999  Per Bothner  <bothner@Magnus.Cygnus.COM>
+
+	* elisp:  New package gnu.elisp.
+	* Makefile.am, makefile.in (SUBDIRS):  Add elisp.
+
+Thu Jul 23 08:45:29 1998  Per Bothner  <bothner@cygnus.com>
+
+	* Makefile.am (SUBDIRS):  Added mapping and expr.
+	(install-html, install-subdir-html):  New rules.
+
+Mon Jun 29 18:59:08 1998  Per Bothner  <bothner@cygnus.com>
+
+	* Makefile.am, Makefile.in (SUBDIRS):  Added text sub-package.
+
+Sat Apr  4 17:43:34 1998  Per Bothner  <bothner@cygnus.com>
+
+	* ecmascript:  New sub-directory.
+	* Makefile.am (SUBDIRS):  Added ecmascript.
+
+Mon Mar 31 16:44:57 1997  Per Bothner  <bothner@deneb.cygnus.com>
+
+	* PACKAGES:  New list of "gnu." Java packages.
+	* Makefile.{am, in}:  Contains bytecode and math sub-directories.

@@ -79,7 +79,7 @@
 
 /// PASS
   // bug #904327
-  // When implementing a non-abstract interface, the class must really 
+  // When implementing a non-abstract interface, the class must really
   // implement that interface in the bytecode.
 
   /// package vendor
@@ -96,3 +96,16 @@ public interface ITest {}
 public void vend(ITest i){ println("ITest"); }
 
 class vendor.Vendor implements ITest;
+
+/// FAIL
+  // bug #989049
+  // Making an existing class implement a non-abstract interface
+  // can only be done with classes defined in Nice.
+  String a = "hello";
+  println( a.test() );
+
+  /// Toplevel
+interface ITest { String test(); }
+
+class /*/// FAIL HERE */ java.lang.String implements ITest;
+test(String a) = "done";

@@ -67,6 +67,9 @@ public class AbstractInterfaceImplementation extends Definition
     ClassDefinition def = ClassDefinition.get(classTC);
     if (def != null)
       def.addInterfaceImplementation(interfaceITF);
+    else if (interfaceITF.associatedTC() != null)
+      User.error(this, classTC + " is not a class defined in Nice.\n" +
+                 "It can only implement abstract interfaces.");
 
     createContext();
   }

@@ -7,3 +7,23 @@
   ?String[][] s = single(new String[1]);
   /// Toplevel
   <T> T[][] single(T[] t) = [ t ];
+
+/// PASS
+
+  TestClass t = new TestClass();
+  
+  // We check that the field is indeed of bytecode type Item[], not Object[].
+  assert t.a instanceof Item[];
+
+  // Check that the array is not copied to arrabge the types, which would 
+  // discard the side-effect.
+  t.a[0] = new Item();
+  assert t.a[0] != null;
+
+  /// Toplevel
+class TestClass{
+   private ?Item[] a = new Item[1];
+}
+// This bug originated from the class being declared after its use, and thus
+// its bytecode type not yet known.
+class Item {}

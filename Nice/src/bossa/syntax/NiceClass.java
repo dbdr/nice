@@ -173,7 +173,6 @@ public class NiceClass extends ClassDefinition.ClassImplementation
     localScope = definition.getLocalScope();
     resolveFields();
     createConstructor();
-    createFields();
     definition.setJavaType(classe.getType());
   }
 
@@ -429,6 +428,13 @@ public class NiceClass extends ClassDefinition.ClassImplementation
     return m.getConstructorInvocation();
   }
 
+  public void precompile()
+  {
+    // We have to do this after resolution, so that bytecode types are known, 
+    // but before compilation.
+    createFields();
+  }
+
   public void compile()
   {
     if (methods != null)
@@ -506,6 +512,8 @@ public class NiceClass extends ClassDefinition.ClassImplementation
   /****************************************************************
    * Misc.
    ****************************************************************/
+
+  public String toString() { return definition.toString(); }
 
   private Field[] fields;
   private List methods;

@@ -129,8 +129,18 @@ public class AST extends Node
       ((Definition) i.next()).printInterface(s);
   }
 
-  public void compile()
+  /**
+     @param generateCode
+       false if the current module was already compiled and up-to-date.
+  */
+  public void compile(boolean generateCode)
   {
+    for(int i = 0; i < classes.length; i++)
+      classes[i].precompile();
+
+    if (! generateCode)
+      return;
+
     for(Iterator i = children.iterator();i.hasNext();)
       ((Definition)i.next()).compile();
   }

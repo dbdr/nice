@@ -627,13 +627,10 @@ public class Package implements mlsub.compilation.Module, Located, bossa.syntax.
    */
   private void generateCode()
   {
-    if (!compiling())
-      return;
-
-    if (Debug.passes)
+    if (compiling() && Debug.passes)
       Debug.println(this + ": generating code");    
     
-    ast.compile();
+    ast.compile(compiling());
   }
 
   public ClassType createClass(String name)

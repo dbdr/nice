@@ -563,6 +563,12 @@ abstract public class ClassDefinition extends MethodContainer
     // Typechecking is done earlier, in typecheckClass.
   }
 
+  void precompile()
+  {
+    if (implementation instanceof NiceClass)
+      ((NiceClass) implementation).precompile();
+  }
+
   void compile()
   {
     implementation.compile();

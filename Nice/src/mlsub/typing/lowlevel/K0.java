@@ -549,9 +549,9 @@ public final class K0 {
     
     // put in R and Rt, the constraint saturated under
     // x < y and y < z => x < z
-    R = (BitMatrix)C.clone();
+    R = new BitMatrix(C);
     R.closure();
-    Rt = (BitMatrix)Ct.clone();
+    Rt = new BitMatrix(Ct);
     Rt.closure();
     m0 = m = n;
     
@@ -1078,7 +1078,7 @@ public final class K0 {
   private void condense()
     throws Unsatisfiable
   {
-    BitMatrix T=(BitMatrix)C.clone();
+    BitMatrix T = new BitMatrix(C);
     T.closure();
     condense(T);
   }
@@ -1108,7 +1108,7 @@ public final class K0 {
         throw LowlevelUnsatisfiable.instance; // will be refined if necessary
       }
     }
-    BitMatrix Tt = (BitMatrix)Ct.clone();
+    BitMatrix Tt = new BitMatrix(Ct);
     Tt.closure();
 
     if(debugK0){
@@ -1156,7 +1156,7 @@ public final class K0 {
 
   private void prepareConstraint() throws Unsatisfiable {
     collapseMinimal();
-    BitMatrix leq = (BitMatrix)C.clone();
+    BitMatrix leq = new BitMatrix(C);
     leq.closure();
     computeArrows(leq);
     saturateAbs(leq);
@@ -1300,9 +1300,9 @@ public final class K0 {
    **/
   public void rigidify() {
     S.assume(S.a&& hasBeenInitialized);
-    R = (BitMatrix)C.clone();
+    R = new BitMatrix(C);
     R.closure();
-    Rt = (BitMatrix)Ct.clone();
+    Rt = new BitMatrix(Ct);
     Rt.closure();
     m = n;
     BitVector[] rigidImplementors  = closeImplements(R, Rt);
@@ -1355,7 +1355,7 @@ public final class K0 {
       // We only need to save C if there are soft variables, since
       // others can't be modified anyway.
       if (K0.this.m != K0.this.n)
-        this.savedC = (BitMatrix) K0.this.C.clone();
+        this.savedC = new BitMatrix(K0.this.C);
 
       this.savedGarbage = K0.this.garbage.cloneVector();
       this.savedDomains = (DomainVector)K0.this.domains.clone();
@@ -1653,9 +1653,9 @@ public final class K0 {
     Simplifier(BitVector simplified) {
       this.simplified = simplified;
       this.initN = simplified.getLowestSetBit();
-      R = (BitMatrix)C.clone();
+      R = new BitMatrix(C);
       R.closure();
-      Rt = (BitMatrix)Ct.clone();
+      Rt = new BitMatrix(Ct);
       Rt.closure();
 
       implementors = closeImplements(R, Rt);

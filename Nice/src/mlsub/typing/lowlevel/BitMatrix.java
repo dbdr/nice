@@ -9,7 +9,7 @@ import java.util.ArrayList;
    @author Alexandre Frey
    @author Daniel Bonniot (Optimization for sparse and reflexives matrices)
  **/
-final public class BitMatrix implements Cloneable {
+final public class BitMatrix {
   /**
    * a vector of BitVectors. rows.get(i) is the ith line of
    * the matrix. 
@@ -31,6 +31,24 @@ final public class BitMatrix implements Cloneable {
     if(rowCapacity==0)
       rowCapacity=5;
     rows = new BitVector[rowCapacity];
+  }
+
+  /**
+   * Creates a copy of a matrix
+   **/
+  public BitMatrix(BitMatrix old) {
+    BitVector[] oldRows = old.rows;
+    BitVector[] newRows = new BitVector[oldRows.length];
+    for (int i = old.size-1; i >= 0; i--)
+      {
+        BitVector row = oldRows[i];
+        if (row != null && !row.isEmpty())
+          newRows[i] = row.cloneVector();
+      }
+
+    this.rows = newRows;
+    this.size = old.size;
+    this.reflexive = old.reflexive;
   }
 
   /**
@@ -190,8 +208,8 @@ final public class BitMatrix implements Cloneable {
    **/
   public void closure() {
     if (S.debug) {
-      BitMatrix testcopy = (BitMatrix)this.clone();
-      BitMatrix original = (BitMatrix)this.clone();
+      BitMatrix testcopy = new BitMatrix(this);
+      BitMatrix original = new BitMatrix(this);
       this.closure2();
       testcopy.closure1();
       boolean equal = true;
@@ -321,31 +339,6 @@ final public class BitMatrix implements Cloneable {
     return m;
   }
 
-  public Object clone() {
-    try {
-      BitMatrix m = (BitMatrix)super.clone();
-      BitVector[] v = (BitVector[])rows.clone();
-      
-      for (int i = 0; i < size; i++) {
-        BitVector row = v[i];
-        if (row != null) {
-          if (!row.isEmpty())
-	    v[i] = row.cloneVector();
-          else
- 	    v[i] = null;
-        }
-      }
-      m.rows = v;
-      m.size = size;
-      m.reflexive = reflexive;
-      return m;
-    } catch (CloneNotSupportedException e) {
-      throw new InternalError
-	("Should never happen, since BitMatrix implements Cloneable");
-    }
-  }
-
-  
   public String toString() {
     StringBuffer sb = new StringBuffer("{");
 

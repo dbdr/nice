@@ -16,6 +16,7 @@ import bossa.util.*;
 import bossa.syntax.*;
 import gnu.bytecode.*;
 import gnu.expr.*;
+import nice.tools.code.Import;
 
 import java.util.*;
 import java.util.jar.*;
@@ -429,7 +430,8 @@ public class Package implements mlsub.compilation.Module, Located, bossa.syntax.
     
       for(int i = 0; i < opens.length; i++)
 	{
-	  f.print("import " + opens[i] + ".*;\n");
+	  f.print("import " + opens[i] + ".*" + 
+		   (Import.isStrictPackage(opens[i]) ? "(!)" : "") + ";\n");
 	}
       f.println();
 

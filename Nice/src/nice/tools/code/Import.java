@@ -190,4 +190,9 @@ public class Import
   {
     strictPackages.add(name);
   }
+
+  public static boolean isStrictPackage(String name)
+  {
+    return strictPackages.contains(name);
+  }
 }

@@ -105,7 +105,7 @@ String read(File file, ?String encoding = null)
 {
   let chars = new char[blockSize];
   let buff = new StringBuffer();
-  let input = new BufferedReader(
+  let input = new java.io.BufferedReader(
                     (encoding == null) 
                         ? new java.io.FileReader(file)
                         : new java.io.InputStreamReader(
@@ -123,23 +123,25 @@ String read(File file, ?String encoding = null)
  * Opens a file and returns a generator which yields the lines contained in the file,
  * one by one.
  */
-void->String readLines(File file, ?encoding = null)
+void->String readLines(File file, ?String encoding = null)
     requires file.exists(): "File " file " does not exist",
             file.isFile(): file + " is not a normal file. Only normal files can be read."
 {
-  let input = new BufferedReader(
+  let input = new java.io.BufferedReader(
                     (encoding == null) 
                         ? new java.io.FileReader(file)
                         : new java.io.InputStreamReader(
 			                new java.io.FileInputStream(file), encoding)
                             );
   void close() { input.close(); stop(); }
-  return ()=> try {
-    return input.readLine() || close();
+  return ()=> {
+    try {
+      return input.readLine() || close();
     } catch (Throwable t) {
-        input.close();
-        throw t;
+      input.close();
+      throw t;
     }
+  };
 }
 
 /**

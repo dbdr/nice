@@ -19,7 +19,7 @@ public abstract class ProcedureN extends Procedure
 
   public Object apply0 () throws Throwable
   {
-    return applyN(Values.noArgs);
+    return applyN(new Object[0]);
   }
 
   public Object apply1 (Object arg1) throws Throwable

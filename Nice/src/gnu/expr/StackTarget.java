@@ -34,7 +34,8 @@ public class StackTarget extends Target
 
     if (stackType.isVoid())
       {
-	comp.compileConstant (Values.empty);
+	// The value will be ignored anyway.
+	comp.compileConstant(null);
 	stackType = Type.pointer_type;
       }
     else if (stackType instanceof PrimType && type instanceof PrimType)

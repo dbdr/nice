@@ -10,8 +10,11 @@ import gnu.lists.*;
  * faster virtual method calls instead of slower interface calls).
  */
 
-public abstract class ModuleBody extends CpsProcedure implements Runnable
+// NICE: Avoid being dependant of gnu.mapping.MethodProc
+// NICE: This is bad because this class is needed ar runtime
+public abstract class ModuleBody extends ProcedureN implements Runnable
 {
+  /*
   public void apply (CallContext stack)
   {
   }
@@ -37,6 +40,7 @@ public abstract class ModuleBody extends CpsProcedure implements Runnable
     ctx.proc = this;
     return applyV(ctx);
   }
+  */
 
   private static boolean mainPrintValues;
 
@@ -53,6 +57,7 @@ public abstract class ModuleBody extends CpsProcedure implements Runnable
 
 
   /** This is invoked by main when ModuleBody is compiled with --main. */
+  /*
   public final void runAsMain (String[] args)
   {
     //NICE: removes spurious dependancy
@@ -82,6 +87,7 @@ public abstract class ModuleBody extends CpsProcedure implements Runnable
 	gnu.mapping.OutPort.runCleanups();
       }
   }
+  */
 
   /**
    * A subclass will typically override this like:
@@ -94,7 +100,7 @@ public abstract class ModuleBody extends CpsProcedure implements Runnable
 
   public Object apply0(ModuleMethod method)
   {
-    return applyN(method, Values.noArgs);
+    return applyN(method, new Object[0]);
   }
 
   public Object apply1(ModuleMethod method, Object arg1)

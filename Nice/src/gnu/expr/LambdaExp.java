@@ -524,7 +524,10 @@ public class LambdaExp extends ScopeExp
   final void addApplyMethod(LambdaExp lexp)
   {
     if (applyMethods == null)
-      applyMethods = new Vector();
+      {
+	applyMethods = new Vector();
+	type.setSuper(Compilation.typeModuleBody);
+      }
     applyMethods.addElement(lexp);
   }
 
@@ -1006,7 +1009,6 @@ public class LambdaExp extends ScopeExp
       {
 	instanceField = type.addField
 	  ("$instance", type, Access.STATIC|Access.FINAL|Access.PUBLIC);
-	type.setSuper(Compilation.typeModuleBody);
       }
     return instanceField;
   }

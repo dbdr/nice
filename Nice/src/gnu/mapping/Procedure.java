@@ -98,7 +98,7 @@ public abstract class Procedure implements Named, Printable
   /** Call this Procedure using the explicit-CallContext-convention.
    * The input arguments are (by default) in stack.args;
    * the result is (by default) left in stack.value. */
-
+  /*
   public void apply (CallContext ctx) throws Throwable
   {
     Object result;
@@ -150,8 +150,10 @@ public abstract class Procedure implements Named, Printable
       return new Setter1(this);
     return new Setter(this);
   }
+  */
 
   /** If HasSetter, the Procedure is called in the LHS of an assignment. */
+  /*
   public void set0(Object result) throws Throwable
   {
     getSetter().apply1(result);
@@ -166,6 +168,7 @@ public abstract class Procedure implements Named, Printable
   {
     getSetter().applyN(args);
   }
+  */
 
   public void print(java.io.PrintWriter ps)
   {

@@ -425,18 +425,24 @@ public class Package implements mlsub.compilation.Module, Located, bossa.syntax.
 
     File jarFile = createJarFile();
 
-    try{
-      JarOutputStream jarStream = createJarStream(jarFile);
-      addToArchive(jarStream);
-      closeJar(jarStream);
-      jarFile = null;
-    }
-    finally{
-      if (jarFile != null)
+    try
+      {
+	JarOutputStream jarStream = createJarStream(jarFile);
+	writeRuntime(jarStream);
+	this.addToArchive(jarStream);
+	jarStream.close();
+      }
+    catch(Exception e)
+      {
 	// The jar file was not completed
 	// it must be corrupt, so it's cleaner to delete it
 	jarFile.delete();
-    }
+
+	if (e instanceof RuntimeException)
+	  throw (RuntimeException) e;
+	else
+	  User.error(this, "Error while writing archive", e);
+      }
   }
   
   private File createJarFile()
@@ -445,40 +451,62 @@ public class Package implements mlsub.compilation.Module, Located, bossa.syntax.
       compilation.output = compilation.output + ".jar";
     
     File jarFile = new File(compilation.output);
+
     // Create the directory if necessary
-    jarFile.getParentFile().mkdirs();
+    File parent = jarFile.getParentFile();
+    // The parent is null (i.e. current dir) if it is not specified. 
+    if (parent != null)
+      parent.mkdirs();
 
     return jarFile;
   }
 
   private JarOutputStream createJarStream(File jarFile)
+  throws IOException
   {
-    try{
-      Manifest manifest = new Manifest();
-      manifest.getMainAttributes().put(Attributes.Name.MANIFEST_VERSION,"1.0");
-      manifest.getMainAttributes().put(Attributes.Name.MAIN_CLASS, 
+    Manifest manifest = new Manifest();
+    manifest.getMainAttributes().put(Attributes.Name.MANIFEST_VERSION,"1.0");
+    manifest.getMainAttributes().put(Attributes.Name.MAIN_CLASS, 
                                        this.name + ".package");
-      return new JarOutputStream(new FileOutputStream(jarFile), manifest);
-    }
-    catch(IOException e){
-      User.error(this.name, "Error during creation of executable file: " + e);
-      return null;
-    }    
+    return new JarOutputStream(new FileOutputStream(jarFile), manifest);
   }
 
-  private void closeJar(JarOutputStream jar)
+  /**
+     Write all base classes that are needed to run generated code.
+  */
+  private static void writeRuntime(JarOutputStream jarStream)
+  throws IOException
   {
-    try{
-      jar.close();
-    }
-    catch(IOException e){
-      User.error(this.name, "Error during creation of executable file: " + e);
-    }
+    String filename = System.getProperty("nice.runtime");
+    if (filename == null)
+      {
+	Internal.warning("Runtime was not found. The archive is not self-contained");
+	return;
+      }
+      
+    JarFile runtime = new JarFile(filename);
+
+    // add individual classes
+    String[] classes = 
+    { "nice/lang/Native.class", "nice/lang/rawArray.class", 
+      "gnu/mapping/Procedure.class", "gnu/mapping/Procedure0.class", "gnu/mapping/Procedure1.class", "gnu/mapping/Procedure2.class", "gnu/mapping/Procedure3.class", "gnu/mapping/ProcedureN.class", "gnu/mapping/Named.class", "gnu/mapping/Printable.class", "gnu/mapping/WrongArguments.class", "gnu/mapping/WrongType.class", "gnu/mapping/WrappedException.class", 
+      "gnu/expr/ModuleBody.class", "gnu/expr/ModuleMethod.class"
+    };
+
+    for (int i = 0; i < classes.length; i++)
+      {
+	JarEntry entry = runtime.getJarEntry(classes[i]);
+	if (entry == null)
+	  System.out.println("Runtime: " + classes[i] + " not found");
+	else
+	  addEntry(classes[i], runtime.getInputStream(entry), jarStream);
+      }
   }
 
   private boolean addedToArchive;
 
   private void addToArchive(JarOutputStream jarStream)
+  throws IOException
   {
     if (addedToArchive)
       return;
@@ -487,26 +515,25 @@ public class Package implements mlsub.compilation.Module, Located, bossa.syntax.
     if (Debug.passes)
       Debug.println(this + ": writing to archive");
 
-    try{
-      String packagePrefix = getName().replace('.', '/') + "/";
-      Content.Stream[] classes = source.getClasses();
+    String packagePrefix = getName().replace('.', '/') + "/";
+    Content.Stream[] classes = source.getClasses();
       
-      for (int i = 0; i < classes.length; i++)
-	{
-	  Content.Stream s = classes[i];
-	  jarStream.putNextEntry(new JarEntry(packagePrefix + s.name));
-	  copyStreams(s.stream, jarStream);
-	}
-    }
-    catch(IOException e){
-      User.error(this, "Error writing bytecode in archive", e);
-    }
+    for (int i = 0; i < classes.length; i++)
+      addEntry(packagePrefix + classes[i].name, classes[i].stream, jarStream);
 
     for (Iterator i = getImports().iterator(); i.hasNext();)
       ((Package) i.next()).addToArchive(jarStream);
   }
 
-  private static void copyStreams(InputStream in, OutputStream out)
+  private static void addEntry(String name, InputStream data, 
+			       JarOutputStream out)
+  throws IOException
+  {
+    out.putNextEntry(new JarEntry(name));
+    copy(data, out);
+  }
+
+  private static void copy(InputStream in, OutputStream out)
   throws IOException
   {
     int size = in.available();

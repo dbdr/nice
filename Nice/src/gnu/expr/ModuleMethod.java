@@ -14,8 +14,9 @@ import java.lang.reflect.*;
  * However, ModuleMethod uses virtual method calls, while ApplyMethodProc
  * uses the possibly much slower interface method calls.
  */
-
-public class ModuleMethod extends MethodProc
+// NICE: Avoid being dependant of gnu.mapping.MethodProc
+// NICE: This is bad because this class is needed ar runtime
+public class ModuleMethod extends ProcedureN
 {
   ModuleBody module;
   public final int selector;
@@ -33,6 +34,7 @@ public class ModuleMethod extends MethodProc
   /** Figure out parameter types.
    * Uses reflection to get method parameter types.
    * INCOMPLETE - does not handle procedures with optional or rest args. */
+  /*
   protected void resolveParameterTypes()
   {
     Method method = null;
@@ -72,6 +74,7 @@ public class ModuleMethod extends MethodProc
     if (argTypes == null)
       super.resolveParameterTypes();
   }
+  */
 
   public int numArgs() { return numArgs; }
 
@@ -105,6 +108,7 @@ public class ModuleMethod extends MethodProc
     return module.applyN(this, args);
   }
 
+  /*
   public int match (CallContext ctx, Object[] args)
   {
     int argCount = args.length;
@@ -131,4 +135,5 @@ public class ModuleMethod extends MethodProc
   {
     return applyN((Object[]) ctx.value1);
   }
+  */
 }

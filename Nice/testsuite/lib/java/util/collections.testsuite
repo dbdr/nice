@@ -17,3 +17,8 @@
 
   Collections.reverse(L1);
   assert L1[0] == nSize;
+
+/// PASS
+  ArrayList<int> alist = new ArrayList();
+  alist.add(10);
+  alist.remove(10);

@@ -933,7 +933,7 @@ public class Pattern implements Located
   public boolean atNonBoolValue() { 
     return atValue != null && !atBool() && !atNull() &&!atIntCompare();
   }
-  public boolean atNull() { return atValue instanceof NullExp; }
+  public boolean atNull() { return (atValue != null) && atValue.isNull(); }
   /** This pattern only specifies that the vlaue is not null.
       This cannot be explicitely used in source programs, but it is useful
       when a method with a non-null parameter specializes one where that 

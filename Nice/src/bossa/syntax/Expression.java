@@ -97,6 +97,11 @@ public abstract class Expression
     return false;
   }
 
+  public boolean isNull()
+  {
+    return false;
+  }
+
   /**
    * Resolves overloading, taking into account the parameters 
    * the expressions is applied to.

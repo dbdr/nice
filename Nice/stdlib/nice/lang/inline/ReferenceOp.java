@@ -176,9 +176,9 @@ public class ReferenceOp extends Procedure2 implements Branchable, bossa.syntax.
   public void checkSpecialRequirements(bossa.syntax.Expression[] arguments)
   {
     bossa.syntax.Expression exp = null;
-    if (arguments[0] instanceof bossa.syntax.NullExp)
+    if (arguments[0].isNull())
       exp = arguments[1];
-    else if (arguments[1] instanceof bossa.syntax.NullExp)
+    else if (arguments[1].isNull())
       exp = arguments[0];
 
  

@@ -34,10 +34,6 @@ boolean isCallTo(CallExp e, String name)
     return f.toString().equals(name);
 }
 
-boolean isNullExp(Expression);
-isNullExp(Expression e) = false;
-isNullExp(NullExp e) = true;
-
 ?MonoSymbol localVariable(Expression);
 localVariable(Expression e) = null;
 localVariable(SymbolExp e)

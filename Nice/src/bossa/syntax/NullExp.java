@@ -42,6 +42,11 @@ public class NullExp extends ConstantExp
     return res;
   }
 
+  public boolean isNull()
+  {
+    return true;
+  }
+
   void computeType()
   {
     // The type needs to be generated each time, since it is polymorphic.

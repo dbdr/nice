@@ -43,8 +43,8 @@ Archives of the IRC discussions</ulink> are available.
 <para>
 This service is provided by <ulink url="http://www.freenode.net">
 <inlinemediaobject><imageobject>
-<imagedata fileref="http://irc.wearlab.de/images/freenode_logo.jpg"
-width="237px" depth="68px" align="center" />
+<imagedata fileref="images/freenode.png"
+contentwidth="117px" contentdepth="32px" align="center" />
 </imageobject></inlinemediaobject>
 </ulink>
 </para>

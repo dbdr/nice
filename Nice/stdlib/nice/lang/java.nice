@@ -171,14 +171,13 @@ PrintStream stderr () = native System.err;
 <T> void trimToSize(Vector<T>) = native void Vector.trimToSize();
 <T> void removeAllElements(Vector<T>) = native void Vector.removeAllElements();
 
-/*
 <T> AbstractCollection<T> AbstractCollection() = native new AbstractCollection();
 <T> AbstractList<T> AbstractList() = native new AbstractList();
 <T> AbstractSequentialList<T> AbstractSequentialList() = native new AbstractSequentialList();
 <T> AbstractSet<T> AbstractSet() = native new AbstractSet();
-<T> AbstractMap<K,V> AbstractMap() = native new AbstractMap();
+<K,V> AbstractMap<K,V> AbstractMap() = native new AbstractMap();
 <T> ArrayList<T> ArrayList() = native new ArrayList();        
-<T> ArrayList<T> ArrayArrayList(int) = native new ArrayList(int);
+<T> ArrayList<T> ArrayList(int) = native new ArrayList(int);
 <T,U | U <: T> ArrayList<T> ArrayList(Collection<U>) = native new ArrayList(Collection);
 <T> LinkedList<T> LinkedList() = native new LinkedList();
 <T,U | U <: T> LinkedList<T> LinkedList(Collection<U>) = native new LinkedList(Collection);
@@ -211,9 +210,9 @@ PrintStream stderr () = native System.err;
 <K,V,T | K <: T> TreeMap<K,V> TreeMap(Comparator<T>) = native new TreeMap(Comparator);
 <K,K0,V,V0 | K0 <: K, V0 <: V> TreeMap<K,V> TreeMap(Map<K0,V0>) = native new TreeMap(Map);
 <K,V> TreeMap<K,V> TreeMap(SortedMap<K,V>) = native new TreeMap(SortedMap);
-*/
-/*
+
 interface Collection<T> = native java.util.Collection;
+interface Comparator<T> = native java.util.Comparator;
 interface List<T> extends Collection<T> = native java.util.List;
 interface Set<T> extends Collection<T> = native java.util.Set;
 interface SortedSet<T> extends Set<T> = native java.util.SortedSet;
@@ -222,12 +221,13 @@ interface ListIterator<T> extends Iterator<T> = native java.util.ListIterator;
 interface Map<K,V> = native java.util.Map;
 interface SortedMap<K,V> extends Map<T> = native java.util.SortedMap;
 interface Map$Entry<K,V> = native java.util.Map.Entry;
-class AbstractCollection<T> = native java.util.AbstractCollection;
+class AbstractCollection<T> implements Collection<T> = native java.util.AbstractCollection;
 class AbstractList<T> extends AbstractCollection<T> implements List<T> = native java.util.AbstractList;
 class AbstractSequentialList<T> extends AbstractList<T> = native java.util.AbstractSequentialList;
 class AbstractSet<T> extends AbstractCollection<T> implements Set<T> = native java.util.AbstractSet;
 class AbstractMap<K,V> implements Map<K,V> = native java.util.AbstractMap;
 class ArrayList<T> extends AbstractList<T> = native java.util.ArrayList;
+class Dictionary<K,V> = native java.util.Dictionary;
 class HashMap<K,V> extends AbstractMap<K,V> = native java.util.HashMap;
 class HashSet<T> extends AbstractSet<T> = native java.util.HashSet;
 class Hashtable<K,V> implements Map<K,V> = native java.util.Hashtable;
@@ -237,7 +237,6 @@ class TreeMap<K,V> extends AbstractMap<K,V> implements SortedMap<K,V> = native j
 class TreeSet<T> extends AbstractSet<T> implements SortedSet<T> = native java.util.TreeSet;
 class Vector<T> extends AbstractList<T> = native java.util.Vector;
 class WeakHashMap<K,V> extends AbstractMap<K,V> = native java.util.WeakHashMap;
-*/
 
 <T> Iterator<T> iterator(Collection<T>) = 
   native Iterator Collection.iterator();
@@ -329,6 +328,8 @@ class WeakHashMap<K,V> extends AbstractMap<K,V> = native java.util.WeakHashMap;
   native Object Collections.max(Collection, Comparator);
 <T,U | T <: U> T min(Collection<T>, Comparator<U>) = 
   native Object Collections.max(Collection, Comparator);
+<T> void sort(List<T>, Comparator<T>) = 
+  native void Collections.sort(List, Comparator);
 
 <T,U,V | U <: T, V <: T> boolean Arrays_equals(U[], V[]) = 
   native boolean Arrays.equals(Object[],Object[]);

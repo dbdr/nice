@@ -17,7 +17,7 @@ if newer coreJava.code ok.out; then
     CLASSPATH=.:$CLASSPATH
     export CLASSPATH
 
-    if javac coreJava.java; then
+    if javac -encoding latin1 coreJava.java; then
 	java coreJava > ok.out
 	exit $?
     else

@@ -1604,7 +1604,7 @@ FunExp endFunExp(List formals):
 {
   "=>"
   (
-    body=Block()
+    body = RootShortStatement()
   |
     exp=Expression()
     { 
@@ -1616,6 +1616,37 @@ FunExp endFunExp(List formals):
     }
   )
   { return new FunExp(Constraint.True,formals,body); }
+}
+
+/** A statement not terminated by a ";" if applicable. */
+Statement RootShortStatement() :
+{
+  Statement res;
+}
+{
+  (
+  res = Block()
+|
+  res = ShortIfStatement()
+|
+  res = ShortAssertStatement()
+|
+  res = ShortThrowStatement()
+  )
+  { return res; }
+}
+
+Statement ShortStatement() :
+{
+  Statement res;
+}
+{
+  (
+  res = RootShortStatement()
+|
+  res = StatementExpression()
+  )
+  { return res; }
 }
 
 // ( e1, ..., en )
@@ -2446,6 +2477,24 @@ Statement IfStatement() :
   }
 }
 
+Statement ShortIfStatement() :
+/*
+ * The disambiguating algorithm of JavaCC automatically binds dangling
+ * else's to the innermost if statement.  The LOOKAHEAD specification
+ * is to tell JavaCC that we know what we are doing.
+ */
+{ Token first; Statement s1,s2=null; Expression cond; IfExp ifExp; }
+{
+  first="if" "(" cond=Expression() ")" 
+    s1=ShortStatement() [ LOOKAHEAD(1) "else" s2=ShortStatement() ]
+  { 
+    ifExp = new IfExp(cond, new StatementExp(s1),
+	              (s2 == null ? null : new StatementExp(s2)));
+    ifExp.setLocation(new Location(first, getToken(0)));
+    return new ExpressionStmt(ifExp);
+  }
+}
+
 Statement WhileStatement() :
 { Expression cond; Statement body; }
 {
@@ -2526,11 +2575,18 @@ Statement ReturnStatement() :
   }
 }
 
-Statement ThrowStatement() :
+Statement ShortThrowStatement() :
 { Expression e; Token t; }
 {
-  t="throw" e=Expression() ";"
+  t="throw" e=Expression()
   { return new ExpressionStmt(CallExp.create(symb(t),e)); }
+}
+
+Statement ThrowStatement() :
+{ Statement res; }
+{
+  res = ShortThrowStatement() ";"
+  { return res; }
 }
 
 Statement TryStatement() :
@@ -2552,7 +2608,7 @@ Statement TryStatement() :
   { return res; }
 }
 
-Statement AssertStatement() :
+Statement ShortAssertStatement() :
 {
   Token t;
   Expression condition, message;
@@ -2566,8 +2622,15 @@ Statement AssertStatement() :
   |
     { call = CallExp.create(symb(t), condition); }
   )
-  ";"
   { return new ExpressionStmt(call); }
+}
+
+Statement AssertStatement() :
+{ Statement res; }
+{
+  res = ShortAssertStatement()
+  ";"
+  { return res; }
 }
 
 Statement SynchronizedStatement() :

@@ -9,3 +9,13 @@
 
 /// PASS
   final f = int x => int y => x+y;
+
+/// PASS
+  StringBuffer wordBuffer = new StringBuffer(32);
+  char[] r = "ABC".toCharArray();
+
+  r.foreach(char c => if (Character.isLetter(c)) wordBuffer.append(c));
+  r.foreach(char c => assert c != 'Z');
+  r.foreach(char c => if (! Character.isLetter(c)) assert false);
+  r.foreach(char c => if (! Character.isLetter(c)) throw new Error());
+

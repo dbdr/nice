@@ -8,6 +8,9 @@ nice (0.7.6) unstable; urgency=low
       remove(int) and remove(T) (since T=int).
     Therefore we renamed remove(int) into removeAt(int).
   * Added float(_) and char(_) primitives for value conversion.
+  * Allows anonymous functions to be made of one statement without braces:
+      (char c => if (Character.isLetter(c)) wordBuffer.append(c))
+      (char c => assert c != 'Z')
   * Parser support for public-read and private-write fields (experimental).
   * Bugfixes (using anonymous functions while overriding native methods, 
     automatic array conversions in polymorphic code, ...).

@@ -1,0 +1,20 @@
+package nice.lang;
+
+class AssertionFailed extends Exception
+{}
+
+void assert(boolean condition);
+void assert(boolean condition, String message);
+
+assert(condition)
+{
+  if (!condition)
+    throw new AssertionFailed();
+}
+
+assert(condition, message)
+{
+  // message is ignored. Needs constructors, super...
+  if (!condition)
+    throw new AssertionFailed();
+}

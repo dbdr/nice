@@ -110,7 +110,8 @@ public class CallExp extends Expression
   isAssignable()
   {
     this.resolveOverloading();
-    return function.isFieldAccess();
+    let ?FieldAccess fa = function.getFieldAccessMethod();
+    return fa != null && ! fa.isFinal();
   }
 
   /**
@@ -199,7 +200,7 @@ public class CallExp extends Expression
     FieldAccess access = function.getFieldAccessMethod();
 
     if (access.isFinal())
-      User.error(this, "Field " + access + " is final");
+      Internal.error(this, "Field " + access + " is final");
 
     if (arguments.size() == 0)
       return access.compileAssign(value);

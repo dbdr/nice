@@ -70,3 +70,13 @@
      }
      return res;
   }
+
+/// PASS
+  List<A> listA = new ArrayList();
+  List<B> listB = new ArrayList();
+  listB.add(new B());
+  listA.addAll(listB);
+  assert listA.containsAll(listB);
+  /// Toplevel
+  class A{}
+  class B extends A{}

@@ -103,11 +103,11 @@ PrintStream stderr () = native System.err;
 <T, U | U <: T> boolean addAll(List<T>, int, Collection<U>) =
   native boolean java.util.List.addAll(int, java.util.Collection);
 
-<T, U | T <: U> boolean containsAll(Collection<T>, Collection<U>) =
+<T, U, V | T <: V, U <: V> boolean containsAll(Collection<T>, Collection<U>) =
   native boolean java.util.Collection.containsAll(java.util.Collection);
-<T, U | T <: U> boolean removeAll(Collection<T>, Collection<U>) =
+<T, U, V | T <: V, U <: V> boolean removeAll(Collection<T>, Collection<U>) =
   native boolean java.util.Collection.removeAll(java.util.Collection);
-<T, U | T <: U> boolean retainAll(Collection<T>, Collection<U>) =
+<T, U, V | T <: V, U <: V> boolean retainAll(Collection<T>, Collection<U>) =
   native boolean java.util.Collection.retainAll(java.util.Collection);
 
 <E,T | E <: T> boolean contains(java.util.Collection<E>, T) =

@@ -344,16 +344,16 @@ public final class Types
   /** Search className in opened packages too */
   public final static java.lang.Class lookupJavaClass(String className)
   {
-    Class res = lookupJavaClass0(className);
+    Class res = lookupQualifiedJavaClass(className);
 
-    if(res==null)
-      for(Iterator i=bossa.syntax.Node.getGlobalTypeScope().module.listImplicitPackages(); 
-	  i.hasNext();)
+    if (res == null)
+      for (Iterator i = bossa.syntax.Node.getGlobalTypeScope()
+	     .module.listImplicitPackages(); i.hasNext();)
 	{
 	  String pkg = ((bossa.syntax.LocatedString) i.next()).toString();
 
-	  res = lookupJavaClass0(pkg+"."+className);
-	  if(res!=null)
+	  res = lookupQualifiedJavaClass(pkg + "." + className);
+	  if(res != null)
 	    break;
 	}
     return res;
@@ -361,10 +361,22 @@ public final class Types
   
   private static final HashMap stringToReflectClass = new HashMap();
   
-  /** Do not search in opened packages */
-  public final static java.lang.Class lookupJavaClass0(String className)
+  /** 
+      Searches a native class given by its fully qualified name
+      in the user classpath.
+      
+      This is to be prefered to Class.forName, which searches 
+      in compiler's runtime classpath.
+      
+      This method does not search in opened packages.
+      It uses a hash-table, to speed up multiple lookups on the same name.
+
+      @return the java.lang.Class object corresponding to the class name,
+      or null if the class does not exists or is ill-formed.
+  */
+  public final static Class lookupQualifiedJavaClass(String className)
   {
-    if(stringToReflectClass.containsKey(className))
+    if (stringToReflectClass.containsKey(className))
       return (Class) stringToReflectClass.get(className);
 
     Class c = null;

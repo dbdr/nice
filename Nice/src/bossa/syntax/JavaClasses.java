@@ -290,7 +290,7 @@ public final class JavaClasses
     if(hash.containsKey(className))
       return (TypeConstructor) hash.get(className);
     
-    Class c = nice.tools.code.Types.lookupJavaClass0(className);    
+    Class c = nice.tools.code.Types.lookupQualifiedJavaClass(className);    
     
     if(c==null)
       {

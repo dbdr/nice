@@ -82,10 +82,18 @@ for conffile in ../config.*; do
 	echo "======================"
 	echo ""
 
+	rm -f METRICS
+
 	set +e
 	$test
 	code=$?
 	set -e
+
+	if [ -r METRICS ]; then
+	  echo -n "`date +'%F %R'` " >> ../$testname.metrics
+	  cat METRICS >> ../$testname.metrics
+	fi
+
         {
 	    echo -n "$testname "
 	    case "$code" in

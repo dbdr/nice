@@ -1,3 +1,5 @@
 builds
 config.*
 setup
+METRICS
+*.metrics

@@ -1,0 +1,7 @@
+/// PASS
+  /// Toplevel
+<T> T->T foo(T->T f = T x => x) = f;
+<X> void bar()
+{
+  int->int f = foo();
+}

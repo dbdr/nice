@@ -117,7 +117,11 @@ public abstract class VarSymbol extends Node implements Located
 
   // explained in OverloadedSymbolExp
 
-  abstract void makeClonedType();
+  /** @param argTypes some types can contain unquantified occurences
+      of the type parameters of this symbol, in which case they must be
+      cloned too to keep the relationship.
+  */
+  abstract void makeClonedType(Polytype[] argTypes);
   abstract void releaseClonedType();
   abstract Polytype getClonedType();
   

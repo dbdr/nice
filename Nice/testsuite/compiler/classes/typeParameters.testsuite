@@ -215,7 +215,7 @@ class A<T>
 }
 
 
-/// PASS bug
+/// PASS
   /// Toplevel
   class Impl<T> {
     T ?-> int bar = T t1 => 0;

@@ -68,12 +68,22 @@ public class PolySymbol extends VarSymbol
 
   private Polytype clonedType;
   
-  final void makeClonedType()
+  final void makeClonedType(Polytype[] argTypes)
   {
     if(clonedType != null)
       Internal.error(this, "clonedType in use");
     
-    clonedType = type.cloneType();
+    java.util.Map map = type.getCloningMap();
+    if (map == null)
+      {
+	clonedType = type;
+	return;
+      }
+
+    clonedType = type.cloneType(map);
+    if (argTypes != null)
+      for (int i = 0; i < argTypes.length; i++)
+	argTypes[i] = argTypes[i].applyMap(map);
   }
   
   void releaseClonedType()

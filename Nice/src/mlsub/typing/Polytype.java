@@ -18,6 +18,7 @@ package mlsub.typing;
 
 import mlsub.typing.lowlevel.Engine;
 import java.util.ArrayList;
+import java.util.Map;
 
 /**
    A constrained monotype.
@@ -47,11 +48,24 @@ public final class Polytype
 
   public Polytype cloneType()
   {
+    Map map = getCloningMap();
+    if (map == null)
+      return this;
+    else
+      return cloneType(map);
+  }
+
+  public Map getCloningMap()
+  {
     //Optimization
     if (isMonomorphic())
-      return this;
+      return null;
 
-    java.util.Map map = new java.util.HashMap();
+    return new java.util.HashMap();
+  }
+
+  public Polytype cloneType(Map map)
+  {
     TypeSymbol[] binders = constraint.binders();
     TypeSymbol[] newBinders = new TypeSymbol[binders.length];
     
@@ -66,7 +80,16 @@ public final class Polytype
 		      AtomicConstraint.substitute(map, constraint.atoms())), 
        monotype.substitute(map));
   }
-  
+
+  public Polytype applyMap(Map map)
+  {
+    return new Polytype
+      (isMonomorphic() ? Constraint.True
+       : new Constraint(constraint.binders(), 
+			AtomicConstraint.substitute(map, constraint.atoms())),
+       monotype.substitute(map));
+  }
+
   public Constraint getConstraint()
   {
     return constraint;
@@ -112,7 +135,7 @@ public final class Polytype
   throws TypingEx
   {
     // Optimization
-    if (isMonomorphic())
+    if(!Constraint.hasBinders(constraint))
       return;
     
     Typing.enter();
@@ -256,7 +279,7 @@ public final class Polytype
 
   public void simplify()
   {
-    if (isMonomorphic() || simplified || Polytype.noSimplify)
+    if (!Constraint.hasBinders(constraint) || simplified || Polytype.noSimplify)
       return;
 
     ArrayList binders = new ArrayList(), atoms = new ArrayList();

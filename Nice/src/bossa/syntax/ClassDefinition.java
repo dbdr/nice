@@ -429,7 +429,11 @@ abstract public class ClassDefinition extends MethodContainer
     if (classConstraint != null)
       try{
 	localScope = new TypeScope(localScope);
-	localScope.addSymbols(classConstraint.typeParameters);
+        mlsub.typing.MonotypeVar[] typeParams = classConstraint.typeParameters;
+	//add only nonvariant type parameter so no possibly unsafe co/contra-variant fields can exist.
+        for (int i = 0; i < typeParams.length; i++)
+	  if (variance.getVariance(i) == mlsub.typing.Variance.INVARIANT)
+	    localScope.addSymbol(typeParams[i]);
       }
       catch(TypeScope.DuplicateName e){
 	User.error(this, e);

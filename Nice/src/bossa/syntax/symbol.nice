@@ -238,3 +238,16 @@ VarSymbol createMethodSymbol(MethodDeclaration declaration,
 VarSymbol createConstructorCallSymbol(MethodDeclaration declaration,
 	LocatedString name, mlsub.typing.Polytype type ) =
 		new ConstructorCallSymbol(declaration,name,type);
+
+
+boolean isNonStaticFieldAccess(VarSymbol sym)
+{
+  FieldAccess access = cast(sym.getFieldAccessMethod());
+  return access != null && ! access.isStatic();
+}
+
+boolean isStaticFieldAccess(VarSymbol sym)
+{
+  FieldAccess access = cast(sym.getFieldAccessMethod());
+  return access != null && access.isStatic();
+}

@@ -1485,7 +1485,7 @@ MethodDeclaration nativeMethodDeclaration(LocatedString name,
       return bossa.syntax.dispatch.createRetypedJavaMethod(className,methodName,javaTypes,
 			           name,cst,returnType,parameters);
     else
-      return new JavaFieldAccess(className,methodName,
+      return bossa.syntax.dispatch.createJavaFieldAccess(className,methodName,
 				 name,cst,returnType,parameters);
   }
 }

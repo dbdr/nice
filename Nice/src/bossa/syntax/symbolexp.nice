@@ -48,7 +48,7 @@ public class SymbolExp extends Expression
     try {
       return symbol.compile();
     }
-    catch(FieldAccess.UsingAsValue e) {
+    catch(UsingFieldAsValue e) {
       throw User.error(this, 
 		       "You must supply the object that contains this field");
     }
@@ -61,7 +61,7 @@ public class SymbolExp extends Expression
       this.location().write(res);
       return res;
     }
-    catch(FieldAccess.UsingAsValue e) {
+    catch(UsingFieldAsValue e) {
       throw User.error(this, 
 		       "You must supply the object that contains this field");
     }

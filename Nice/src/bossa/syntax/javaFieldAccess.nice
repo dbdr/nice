@@ -106,14 +106,15 @@ public class JavaFieldAccess extends FieldAccess
       + ";";
 }
 
-new JavaFieldAccess(LocatedString className,String fieldName,
+JavaFieldAccess createJavaFieldAccess(LocatedString className,String fieldName,
      LocatedString name,Constraint cst,
      Monotype returnType, FormalParameters parameters)
 {
-  this(name, cst, parameters, returnType,
+  return new JavaFieldAccess(name, cst, returnType, parameters,
     className : className,
     fieldName : fieldName );
 }
+
   
 new JavaFieldAccess(gnu.bytecode.Field field, mlsub.typing.Monotype[?] parameters)
 {

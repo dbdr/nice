@@ -58,7 +58,7 @@ public abstract class Expression
   /**
    * @return the FieldAccess behind this expression, or null
    */
-  FieldAccess getFieldAccessMethod()
+  /*FieldAccess*/Object getFieldAccessMethod()
   {
     return null;
   }  
@@ -68,7 +68,7 @@ public abstract class Expression
      which is true if it is the application a of FieldAccess to an object 
      value. Returns null otherwise.
    */
-  FieldAccess getField()
+  /*FieldAccess*/Object getField()
   {
     return null;
   }  

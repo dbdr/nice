@@ -1,7 +1,7 @@
 /**************************************************************************/
 /*                                N I C E                                 */
 /*             A high-level object-oriented research language             */
-/*                        (c) Daniel Bonniot 2002                         */
+/*                        (c) Daniel Bonniot 2004                         */
 /*                                                                        */
 /*  This program is free software; you can redistribute it and/or modify  */
 /*  it under the terms of the GNU General Public License as published by  */
@@ -14,9 +14,6 @@ package bossa.syntax;
 
 import bossa.util.*;
 
-import nice.tools.code.*;
-import gnu.expr.*;
-
 /**
    A field access.
    
@@ -24,67 +21,44 @@ import gnu.expr.*;
    that is returned when the access to a field is done,
    either a 'get' or a 'set'.
 
-   @version $Date$
-   @author Daniel Bonniot (d.bonniot@mail.dotcom.fr)
  */
 abstract class FieldAccess extends MethodDeclaration
 {
-  public FieldAccess(LocatedString name, 
-		     bossa.syntax.Constraint constraint,
-		     FormalParameters parameters,
-		     bossa.syntax.Monotype returnType)
-  {
-    super(name, constraint, returnType, parameters);
-  }
-  
-  FieldAccess(LocatedString name,
-	      mlsub.typing.Constraint cst,
-	      mlsub.typing.Monotype[] parameters, 
-	      mlsub.typing.Monotype returnType)
-  {
-    super(name, cst, parameters, returnType);
-  }
+  ?gnu.expr.Declaration fieldDecl = null;
 
   /** 
    * true if this method represent the access to the field of an object.
    */
-  public boolean isFieldAccess() { return true; }
+  isFieldAccess() = true;
 
-  public abstract boolean isFinal();
-  public boolean isStatic() { return false; }
+  public boolean isFinal();
+  public boolean isStatic() = false;
 
-  /****************************************************************
-   * Code generation
-   ****************************************************************/
-
-  class UsingAsValue extends Error {}
-
-  protected gnu.expr.Expression computeCode()
+  computeCode()
   {
-    throw new UsingAsValue();
+    throw new UsingFieldAsValue();
   }
 
-  protected Declaration fieldDecl;
-  
   public gnu.expr.Expression compileAccess(gnu.expr.Expression[] arguments)
   {
     if (arguments.length == 0)
-      return Inline.inline(new GetFieldProc(fieldDecl));
+      return NiceUtils.doInline(new nice.tools.code.GetFieldProc(fieldDecl));
     else
-      return Inline.inline(new GetFieldProc(fieldDecl), arguments[0]);
+      return NiceUtils.doInline(new nice.tools.code.GetFieldProc(fieldDecl), arguments[0]);
   }
   
   public gnu.expr.Expression compileAssign(gnu.expr.Expression value)
   {
-    return Inline.inline
-      (new SetStaticFieldProc(fieldDecl), value);
+    return NiceUtils.doInline(
+	new nice.tools.code.SetStaticFieldProc(fieldDecl), value);
   }
 
   public gnu.expr.Expression compileAssign(gnu.expr.Expression parameter, 
 					   gnu.expr.Expression value)
   {
-    return Inline.inline
-      (new SetFieldProc(fieldDecl), parameter, value);
+    return NiceUtils.doInline(
+	new nice.tools.code.SetFieldProc(fieldDecl), parameter, value);
   }
 }
 
+class UsingFieldAsValue extends Error {}

@@ -47,8 +47,9 @@ NiceFieldAccess createNiceFieldAccess(NiceField field)
 
   return new NiceFieldAccess(field.getName(),
           Constraint.create(classDef.getBinders()),
+	  field.sym.syntacticType,
 	  new FormalParameters([new FormalParameters.Parameter(Monotype.create(argType))]),
-	  field.sym.syntacticType, field: field);
+	  field: field);
 }
 
 private FormalParameters makeList(mlsub.typing.Monotype t)

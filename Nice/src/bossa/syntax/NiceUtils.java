@@ -14,6 +14,11 @@ package bossa.syntax;
 
 public final class NiceUtils
 {
+  public static gnu.expr.Expression doInline(gnu.mapping.Procedure1 proc)
+  {
+     return nice.tools.code.Inline.inline(proc);
+  }
+
   public static gnu.expr.Expression doInline(gnu.mapping.Procedure1 proc, gnu.expr.Expression arg1)
   {
      return nice.tools.code.Inline.inline(proc, arg1);

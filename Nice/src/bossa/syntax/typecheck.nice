@@ -72,7 +72,7 @@ typecheck(AssignExp e)
       catch (TypingEx newError) { t = newError; }
     }
 
-    ?FieldAccess field = to.getField();
+    ?FieldAccess field = cast(to.getField());
     String toName;
     if (field == null)
       toName = to.toString();

@@ -49,7 +49,7 @@ This observation naturally leads to our motto: that
 <emphasis>programming languages should rule out as many trivial errors 
 from programs as possible</emphasis>. The programmer can then
 concentrate on higher level issues. The degree in which a language
-guarantees that a correct program while not fail at runtime is
+guarantees that a correct program will not fail at runtime is
 sometimes called <emphasis>static safety</emphasis>. 
 All in all, this approach can lead to easier to create 
 and more reliable software.
@@ -144,7 +144,7 @@ from the situation: the code that follows relies on the fact that
 <literal>e</literal> has indeed type <literal>T</literal>. Therefore
 <javaexn name="ClassCastException"/>s are usually not caught before 
 the very top level of the program, making at least a whole feature to fail.
-It would be great to ensure that no vast can fail. Even better, not
+It would be great to ensure that no cast can fail. Even better, not
 to have casts at all.
 </para>
 
@@ -455,7 +455,7 @@ safe: when they are used in a read-only way.
 In &nice;, arrays are not covariant. Therefore run time errors like
 <javaexn name="ArrayStoreException"/> never occur. Moreover, it is still
 possible to use arrays covariantly while only reading from them. This
-require &nice;'s powerful type system: constrained type parameters:
+requires &nice;'s powerful type system: constrained type parameters:
 <literal>&lt;java.awt.Component T> void read(T[]);</literal>
 can be applied to arrays whose component types are subtypes of
 <classname>java.awt.Component</classname>. 

@@ -48,3 +48,41 @@ String deleteAtEnd(String source, String what)
 
 char get(String s, int index) = native char String.charAt(int);
 char charAt(String s, int index) = native char String.charAt(int);
+
+
+List<String> split(String str, String sep)
+{
+  List<String> res = new ArrayList();
+  int ntx = 0;
+  int pos = 0;
+  while(ntx > -1)
+    {
+      ntx = str.indexOf(sep, pos);
+      if (ntx > -1)
+	{
+	  if (ntx > 0)
+	    {
+	      res.add(str.substring(pos, ntx));
+	    }
+	  pos = ntx + sep.length;
+	}
+      else
+	{
+	  res.add(pos == 0 ? str : str.substring(pos));
+	}
+    }
+  return res;
+}
+
+String join(List<String> strings, String sep)
+{
+  StringBuffer buff = new StringBuffer();
+  Iterator<String> it = strings.iterator();
+  while(it.hasNext())
+    {
+      buff.append(it.next());
+      if (it.hasNext())
+	buff.append(sep);
+    }
+  return buff.toString();
+}

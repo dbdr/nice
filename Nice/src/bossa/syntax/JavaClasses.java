@@ -211,13 +211,30 @@ public final class JavaClasses
     MethodDeclaration auto = (MethodDeclaration) retyped.put(reflectMethod, m);
     /*
       If auto is a RetypedJavaMethod, we are explicitely declaring two
-      methods forthe same native method. This is useful to give it several
+      methods for the same native method. This is useful to give it several
       incomparable types.
       Otherwise, auto is an implicit java method, and we discard it
       in favor of the new explicit one.
     */
     if (auto != null && ! (auto instanceof RetypedJavaMethod))
       removeFromScope(auto);
+  }
+
+  static void registerNativeConstructor(RetypedJavaMethod m, 
+                                        Method reflectMethod,
+                                        TypeConstructor classe)
+  {
+    MethodDeclaration auto = (MethodDeclaration) retyped.put(reflectMethod, m);
+    /*
+      If auto is a RetypedJavaMethod, we are explicitely declaring two
+      constructors for the same native constructor. 
+      This is useful to give it several
+      incomparable types.
+      Otherwise, auto is an implicit java constructor, and we discard it
+      in favor of the new explicit one.
+    */
+    if (auto != null && ! (auto instanceof RetypedJavaMethod))
+      TypeConstructors.removeConstructor(classe, auto);
   }
 
   static void registerNativeField(JavaFieldAccess f, Field reflectField)
@@ -229,7 +246,7 @@ public final class JavaClasses
 
   private static void removeFromScope(MethodDeclaration m)
   {
-    Node.getGlobalScope().removeSymbol(m.getSymbol());    
+    Node.getGlobalScope().removeSymbol(m.getSymbol());
   }
 
   /** Utility function for analyse.nice */
@@ -300,37 +317,42 @@ public final class JavaClasses
 	if (retyped.get(f) == null)
 	  addSymbol(f, JavaFieldAccess.make(f));
 
-      for (Method m = classType.getMethods(); m!=null; m = m.getNext())
-	if(m.isConstructor())
-	  {
-	    JavaMethod res = JavaMethod.make(m, true);
+      for (Method m = classType.getMethods(); m != null; m = m.getNext())
+        {
+          // Ignore the method if it is explicitely retyped
+          if (retyped.get(m) != null)
+            continue;
 
-	    if (res != null)
-	      TypeConstructors.addConstructor(tc, res);
-	    else if(Debug.javaTypes)
-	      Debug.println("Constructor " + m + " ignored");
-	  }
-	else
-	  {
-	    /* We don't need to put static methods in the global scope.
-	       They can and must be access by specifying the class explicitely,
-	       like in Java. 
-	    */
-	    if (m.getStaticFlag())
-	      continue;
+          if (m.isConstructor())
+            {
+              JavaMethod res = JavaMethod.make(m, true);
 
-	    Method base = baseMethod(classType, m);
-	    if (base != null)
-	      continue;
+              if (res != null)
+                {
+                  TypeConstructors.addConstructor(tc, res);
+                  retyped.put(m, res);
+                }
+              else if(Debug.javaTypes)
+                Debug.println("Constructor " + m + " ignored");
+            }
+          else
+            {
+              /* We don't need to put static methods in the global scope.
+                 They can and must be accessed by specifying the class 
+                 explicitely, like in Java. 
+              */
+              if (m.getStaticFlag())
+                continue;
 
-	    // Ignore the method if it is explicitely retyped
-	    if (retyped.get(m) == null)
-	      {
-		if (Debug.javaTypes)
-		  Debug.println("Loaded native method " + m);
-		addSymbol(m, JavaMethod.make(m, false));
-	      }
-	  }
+              Method base = baseMethod(classType, m);
+              if (base != null)
+                continue;
+
+              if (Debug.javaTypes)
+                Debug.println("Loaded native method " + m);
+              addSymbol(m, JavaMethod.make(m, false));
+            }
+        }
     }
     catch(NoClassDefFoundError e){
       User.warning("Class " + e.getMessage().replace('/','.') + 

@@ -54,6 +54,15 @@ public final class TypeConstructors
     l.add(m.getSymbol());
   }
 
+  static void removeConstructor(TypeConstructor tc, MethodDeclaration m)
+  {
+    List l = (List) constructors.get(tc);
+    if (l == null)
+      return;
+
+    l.remove(m.getSymbol());
+  }
+
   private static HashMap constructors;
   public static void reset() { constructors = new HashMap(); }
 

@@ -170,18 +170,21 @@ public class RetypedJavaMethod extends JavaMethod
 		 "\nIndicated: " + javaRetType.getName() +
 		 "\nFound    : " + reflectMethod.return_type.getName());
     
-    JavaClasses.registerNativeMethod(this, reflectMethod);    
-
     if (reflectMethod.isConstructor())
       {
 	try {
 	  mlsub.typing.TypeConstructor tc = Types.typeConstructor(holder);
 	  if (tc != null)
-	    TypeConstructors.addConstructor(tc, this);
+            {
+              TypeConstructors.addConstructor(tc, this);
+              JavaClasses.registerNativeConstructor(this, reflectMethod, tc);
+            }
 	}
 	catch(Types.NotIntroducedClassException ex) {}
       }
-    
+    else
+      JavaClasses.registerNativeMethod(this, reflectMethod);    
+      
     int javaArity;
     if(reflectMethod.getStaticFlag() || reflectMethod.isConstructor())
       javaArity = javaTypes.size()-1;

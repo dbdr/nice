@@ -22,6 +22,9 @@ public ConsoleOutput consoleOutput() = new ConsoleOutput();
 
 public final class ConsoleOutput extends StatusCodeListener
 {
+  int errorCount = 0;
+  int warningCount = 0;
+
   progress(packageName, phase)
   {
     if (packageName != null)
@@ -38,6 +41,7 @@ public final class ConsoleOutput extends StatusCodeListener
   warning(location, message)
   {
     super;
+    warningCount++;
     if (location != null)
       System.out.println("\n" + location + ":\nwarning: " + message);
     else
@@ -47,6 +51,7 @@ public final class ConsoleOutput extends StatusCodeListener
   error(location, message)
   {
     super;
+    errorCount++;
     if (location != null)
       System.err.println("\n" + location + ":\n" + message);
     else

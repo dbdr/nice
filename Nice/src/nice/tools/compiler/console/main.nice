@@ -165,6 +165,23 @@ int compile(String[] args)
   compile(compilation, mainPackage, nativeProgram, nativeCompiler, editorMode);
   int res = consOutput.statusCode;
 
+  if (res != BUG)
+    {
+      if (consOutput.errorCount > 0)
+        {
+          String msg = "compilation failed with " + consOutput.errorCount 
+		+ " error" + (consOutput.errorCount > 1 ? "s" : "");
+          if (consOutput.warningCount > 0)
+            msg = msg + " and " + consOutput.warningCount 
+		+ " warning" + (consOutput.warningCount > 1 ? "s" : "");
+
+          println(msg);
+        }
+      else if (consOutput.warningCount > 0)
+        println("compilation completed with " + consOutput.warningCount
+		+ " warning" + (consOutput.warningCount > 1 ? "s" : ""));
+    }
+
   if (memInfo) printMemoryUsage();
 
   if (timeInfo)

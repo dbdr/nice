@@ -393,7 +393,7 @@ public class Pattern implements Located
 	tc == PrimitiveType.shortTC ||
 	tc == PrimitiveType.charTC ||
 	tc == PrimitiveType.byteTC) ) 
-      User.error(typeConstructor,"A pattern cannot have a primitive type that is different from the declararion.");
+      User.error(location, "A pattern cannot have a primitive type that is different from the declaration.");
 
   }     
         

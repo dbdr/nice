@@ -1,0 +1,3 @@
+/// FAIL
+  ///Toplevel
+toString(/*/// FAIL HERE */ i@int) = "";

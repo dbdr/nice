@@ -1,0 +1,325 @@
+
+package nice.lang;
+
+/****************************************************************
+ * Collection
+ ****************************************************************/
+
+interface Collection<T>
+{
+  int size();
+  void iter(fun(T)());
+
+  alike<T> filter(fun(T)(boolean));
+  <Any U> alike<U> map( fun(T)(U) );
+}
+
+//<Collection C, Any T, Any U> C<U> map(C<T>, fun(T)(U));
+
+//<Collection C, Any T> C<T> filter(C<T>, fun(T)(boolean));
+
+
+/** A growable Collection */
+interface Container<T> 
+  extends Collection<T> 
+{
+  void add(T);
+}
+
+
+/** An ordered Collection */
+interface Sequence<T> 
+  extends Collection<T>
+{
+  T    get(int);
+  void set(int, T);
+}
+
+iter(l@Sequence, f)
+{
+  for(int i=0; i<l.size; i=i+1)
+    f(l.get(i));
+}
+
+/** A growable ordered Collection. */
+interface List<T> 
+  extends Sequence<T>, Container<T>
+  {}
+
+//  filter<C,T>[<L>](l@List : L<T>, test)
+//  {
+//    L<T> res;
+//    res=emptyCollection(l);
+
+//    l.iter(fun(T elem) => if (test(elem)) res.add(elem) );
+
+//   return res;
+//  }
+
+/****************************************************************
+ * Arrays
+ ****************************************************************/
+
+class Array<T> 
+  implements Sequence
+  finally implements Collection 
+  = native Array;
+
+// Wrappers
+<Any T> Array<T> newArray(int) = native Object[] ObjectArray.newInstance(int);
+<Any T> Array<T> newArray(int,T) = native Object[] ObjectArray.newInstance(int,Object);
+
+<Any T> Array<T> resize(Array<T>, int) = native Object[] ObjectArray.resizeArray(Object[], int);
+<Any T> T array_get(Array<T>, int) = native Object Array.get(int);
+<Any T> void array_set(Array<T>, int, T) = native void Array.set(int,Object);
+<Any T> int native_length(Array<T>) = native int Array.getLength();
+
+
+get(a@Array, n) = array_get(a,n);
+set(a@Array, n, e) = array_set(a,n,e);
+size(a@Array) = native_length(a);
+
+map<C,T,U>(a@Array, f)
+{
+  int l = size(a);
+
+  Array<U> res = newArray(l);
+
+  for(int i=0; i<l; i=i+1)
+    res.set(i,f(a.get(i)));
+
+  return res;
+}
+
+filter<C, T>(a@Array, test)
+{
+  int l = size(a);
+  int found = 0;
+
+  Array<T> res = newArray(l);
+  
+  a.iter(fun(T elem) => 
+	{ if(test(elem)) { res.set(found,elem); found=found+1; }} );
+
+  return resize(res,found);
+}
+
+/****************************************************************
+ * Linked Lists
+ ****************************************************************/
+
+abstract class LinkedList<T> 
+  implements Sequence 
+  //finally implements Collection
+  {}
+
+final class Nil<T>  extends LinkedList<T> {}
+final class Cons<T> extends LinkedList<T> { T head; LinkedList<T> tail; }
+
+<Any T> Cons<T> cons(T, LinkedList<T>);
+cons<T>(elem, t)
+{
+  Cons<T> res = new Cons();
+  res.head = elem;
+  res.tail = t;
+
+  return res;
+}
+
+size(l@Nil ) = 0;
+size(l@Cons) = 1+size(l.tail);
+
+get(l@Cons, n) = n == 0 ? head(l) : get(l.tail, n-1);
+get<T>(l@Nil, n) = null;
+
+set(l@Cons, n, elem)
+{
+  if(n == 0) 
+    head(l)=elem; 
+  else 
+    l.tail.set(n-1, elem);
+}
+
+set(l@Nil,  n, elem) { /* error */ }
+
+map(l@Nil, f) = new Nil();
+
+map(l@Cons, f) = cons(f(l.head), map(l.tail, f));
+
+filter(l@Nil , test) = new Nil();
+filter<C,T>(l@Cons, test)
+{
+  LinkedList<T> res = filter(l.tail,test);
+  return test(l.head) ? cons(l.head, res) : res;
+}
+
+/****************************************************************
+ * Vector
+ ****************************************************************/
+
+class Vector<T> 
+  implements List 
+  finally implements Collection
+{
+  Array<T> elements;
+  int length;
+}
+
+<Any T> Vector<T> makeVector(int);
+makeVector<T>(len)
+{
+  Vector<T> res = new Vector();
+  res.elements = newArray(len);
+  res.length = 0;
+  return res;
+}
+
+<Any T> Vector<T> makeVector(int, T);
+makeVector<T>(len, sample)
+{
+  Vector<T> res = new Vector();
+  res.elements = newArray(len, sample);
+  res.length = 0;
+  return res;
+}
+
+size(v@Vector) = v.length;
+
+map<C,T,U>(v@Vector, f)
+{
+  Vector<U> res = makeVector(v.length);
+
+  for(int i=0; i<v.length; i=i+1)
+    res.elements.set(i, f( v.get(i) ));
+
+  return res;
+}
+
+get(v@Vector, index) = get(v.elements, index);
+set(v@Vector, index, element) = v.elements.set(index, element);
+
+add(v@Vector, element)
+{
+  if(v.elements==null)
+    {
+      v.elements = newArray(10);
+      v.length = 0;
+    }
+
+  if (v.length >= 
+      v.elements.size)
+    v.elements = v.elements.resize(v.length * 2);
+
+  v.elements.set(v.length, element);
+  v.length = v.length+1;
+}
+
+filter<C,T>(v@Vector, test)
+{
+  Vector<T> res = new Vector();
+  res.length=0;
+
+  v.iter(fun(T elem) => { if(test(elem)) res.add(elem); });
+
+  return res;
+}
+
+/****************************************************************
+ * Wrappers for java.util.Collection
+ ****************************************************************/
+
+// unsafe !
+<Any T> T next(java.util.Iterator) = 
+  native Object java.util.Iterator.next();
+
+<Any T> List<T> list(java.util.List);
+list<T>(l)
+{
+  Vector<T> res = makeVector(l.size());
+
+  for(java.util.Iterator i = l.iterator(); i.hasNext();)
+    res.add(i.next());
+
+  return res;
+}
+
+/****************************************************************
+ * Stack
+ ****************************************************************/
+
+class Stack<T> extends Vector<T>
+{
+  boolean empty();
+  T pop();
+  void push(T);
+}
+
+empty(s) = s.size==0;
+
+pop<T>(s)
+{
+  s.length=s.length-1;
+  T res = s.elements.get(s.length);
+  // enables garbage collection of the object
+  s.elements.set(s.length,null);
+
+  return res;
+}
+
+push(stack, element)
+{
+  stack.add(element);
+}
+
+/****************************************************************
+ * Standard operations
+ ****************************************************************/
+
+<Any T> T find(Sequence<T>, fun(T)(boolean));
+find(s, test)
+{
+  for(int i=0; i<s.size(); i=i+1)
+    if(test(s.get(i)))
+      return s.get(i);
+
+  return null;
+}
+
+boolean or(Sequence<boolean>);
+or(s)
+{
+  for(int i=0; i<s.size(); i=i+1)
+    if(s.get(i))
+      return true;
+
+  return false;
+}
+
+long max(Sequence<long>);
+max(s)
+{
+  long res=0;
+
+  for(int i=0; i<s.size(); i=i+1)
+    if(s.get(i)>res)
+      res=s.get(i);
+
+  return res;
+}
+
+/****************************************************************
+ * Map
+ ****************************************************************/
+
+interface Map<Key,Element> = native java.util.Map;
+class HashMap<Key,Element> implements Map = native java.util.HashMap;
+
+<Any Key, Any Element> HashMap<Key, Element> newHashMap() = 
+  native new java.util.HashMap();
+
+<Any Key, Any Element> Element get(Map<Key, Element>, Key) = 
+  native Object java.util.Map.get(Object);
+
+<Any Key, Any Element> Element put(Map<Key, Element>, Key, Element) = 
+  native Object java.util.Map.put(Object, Object);
+

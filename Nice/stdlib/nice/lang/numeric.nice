@@ -1,0 +1,71 @@
+/**************************************************************************/
+/*                           B O S S A                                    */
+/*        A simple imperative object-oriented research language           */
+/*                   (c)  Daniel Bonniot 1999                             */
+/*                                                                        */
+/*  This program is free software; you can redistribute it and/or modify  */
+/*  it under the terms of the GNU General Public License as published by  */
+/*  the Free Software Foundation; either version 2 of the License, or     */
+/*  (at your option) any later version.                                   */
+/*                                                                        */
+/**************************************************************************/
+
+// File    : numeric.nice
+// Created : Wed Dec 01 15:44:03 1999 by bonniot
+//$Modified: Thu Jun 22 22:04:44 2000 by Daniel Bonniot $
+
+/**
+ * Numerical hierarchy.
+ * 
+ * Wrapper for {@link gnu.math <code>gnu.math</code>}.
+ *
+ * @author bonniot
+ */
+
+package nice.lang;
+
+import gnu.math.*;
+
+<Numeric N> N `+`(N, N) = native Numeric Numeric.add(Object);
+<Numeric N> N `-`(N, N) = native Numeric Numeric.sub(Object);
+<Numeric N> N `*`(N, N) = native Numeric Numeric.mul(Object);
+<Numeric NN> NN `/`(NN, NN) = native Numeric Numeric.div(Object);
+Numeric `^`(Numeric, IntNum)  = native Numeric Numeric.power(IntNum);
+
+<Numeric N> N `-`(N) = native Numeric Numeric.neg();
+
+boolean `>` (Numeric, Numeric) = native boolean Numeric.grt(Object);
+boolean `>=`(Numeric, Numeric) = native boolean Numeric.geq(Object);
+
+boolean `<=`(Numeric, Numeric);
+`<=`(x,y) = y>=x;
+
+boolean `<`(Numeric, Numeric);
+`<`(x,y) = y>x;
+
+IntNum numerator(RatNum) = native IntNum RatNum.numerator();
+IntNum denominator(RatNum) = native IntNum RatNum.denominator();
+
+/****************************************************************
+ * Infinity
+ ****************************************************************/
+
+RatNum native_infinity(Numeric) = native RatNum RatNum.infinity(int);
+
+RatNum positiveInfinity();
+positiveInfinity() = native_infinity(1);
+RatNum negativeInfinity();
+negativeInfinity() = native_infinity(0-1);
+
+IntNum num(int);
+num(i) = new gnu.math.IntNum(i);
+
+int MAX_INT() = native java.lang.Integer.MAX_VALUE;
+
+<Any T, Any U, Any V> V apply2(fun(T,U)(V), T, U);
+apply2(f, x, y) = f(x, y);
+
+void test();
+test(){
+  `+`(1, 2);
+}

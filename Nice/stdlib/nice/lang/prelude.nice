@@ -1,0 +1,115 @@
+/**************************************************************************/
+/*                           B O S S A                                    */
+/*        A simple imperative object-oriented research language           */
+/*                   (c)  Daniel Bonniot 1999                             */
+/*                                                                        */
+/*  This program is free software; you can redistribute it and/or modify  */
+/*  it under the terms of the GNU General Public License as published by  */
+/*  the Free Software Foundation; either version 2 of the License, or     */
+/*  (at your option) any later version.                                   */
+/*                                                                        */
+/**************************************************************************/
+
+// File    : prelude.nice
+// Created : Thu Dec 02 11:42:48 1999 by bonniot
+//$Modified: Wed Jun 21 18:27:17 2000 by Daniel Bonniot $
+
+/**
+ * Standard prelude file.
+ *
+ * Should be imported automatically by any bossa module.
+ * 
+ * @author bonniot
+ */
+
+package nice.lang;
+
+/****************************************************************
+ * Primitive types
+ ****************************************************************/
+
+final class void = native;
+final class boolean = native;
+
+class double extends gnu.math.Numeric = native;
+class float extends double = native;
+
+class long extends float = native;
+class int extends long = native;
+class short extends int = native;
+class char extends int = native;
+class byte extends char = native;
+
+/****************************************************************
+ * Basic functions
+ ****************************************************************/
+
+<Any T> boolean `==`(T,T) = 
+  native boolean Native.pointerEquality(Object,Object);
+<Any T> boolean equals(T,T) = 
+  native boolean Object.equals(Object);
+
+<Any T> boolean `!=`(T,T);
+`!=`(x,y) = !(x==y);
+
+boolean TRUE() = native Boolean.TRUE;
+boolean FALSE() = native Boolean.FALSE;
+var boolean true  = TRUE();
+var boolean false = FALSE();
+
+boolean `!`(boolean);
+`!`(b) = b ? false : true;
+
+boolean `&`(boolean, boolean);
+`&`(b1,b2) = b1 ? b2 : false;
+
+boolean `|`(boolean, boolean);
+`|`(b1,b2) = b1 ? true : b2;
+
+<Any T> String toString(T) = native String String.valueOf(Object);
+<Any T> Class getClass(T) = native Class Object.getClass();
+
+void traceInstructions(boolean);
+traceInstructions(on) =
+  traceInstructions(getRuntime(),on);
+
+Runtime getRuntime() = native Runtime Runtime.getRuntime();
+java.util.Properties<String,String> getProperties() = 
+  native java.util.Properties java.lang.System.getProperties();
+
+/****************************************************************
+ * Ref
+ ****************************************************************/
+
+class Ref<T> { T value; }
+
+/****************************************************************
+ * Pairs
+ ****************************************************************/
+
+//  class Pair<+A,+B> { A first; B second; }
+
+//  <Any A, Any B> Pair<A,B> pair(A, B);
+//  pair<A,B>(a,b)
+//  {
+//    Pair<A,B> res = new Pair();
+//    res.first = a;
+//    res.second = b;
+//    return res;
+//  }
+
+/****************************************************************
+ * Strings
+ ****************************************************************/
+
+//<Any T> String add(T,String);
+//add(o@Object,s@String) = add(toString(o),s);
+
+<Any T> String `+`(String,T);
+`+`(s@String,o) = concat(s,toString(o));
+
+/****************************************************************
+ * Main
+ ****************************************************************/
+
+void main(Array<String>);

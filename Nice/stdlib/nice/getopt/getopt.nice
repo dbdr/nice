@@ -1,0 +1,159 @@
+
+package nice.opt;
+
+import gnu.getopt.*;
+
+/** Creates a no parameter option. */
+Option option(char shortName,
+	      String longName,
+	      String purpose, 
+	      fun()() action);
+
+/** Creates a required parameter option. */
+Option option(char,String,String,String,fun(String)());
+
+/** Creates an optional parameter option. */
+Option option(char,String,String,String,fun()(),fun(String)());
+
+/** Parses the list of strings according to the options,
+    and returns the non-options arguments. */
+Sequence<String> parse(String, Array<String>,Sequence<Option>);
+
+String printOptions(Sequence<Option>);
+
+abstract class Option
+{
+  char shortName;
+
+  String longName;
+
+  String purpose;
+
+  int optval; // the int value of shortName
+}
+
+class NoParamOption extends Option
+{
+  fun()() action;
+}
+
+class RequiredParamOption extends Option
+{
+  String optionHint;
+  fun(String)() action;
+}
+
+class OptionalParamOption extends Option
+{
+  String optionHint;
+  fun()() actionNoParam;
+  fun(String)() actionParam;
+}
+
+int optType(Option);
+optType(o@NoParamOption) = LongOpt.NO_ARGUMENT();
+optType(o@RequiredParamOption) = LongOpt.REQUIRED_ARGUMENT();
+optType(o@OptionalParamOption) = LongOpt.OPTIONAL_ARGUMENT();
+
+String optSuffix(Option);
+optSuffix(o@NoParamOption) = "";
+optSuffix(o@RequiredParamOption) = ":";
+optSuffix(o@OptionalParamOption) = "::";
+
+parse(progName, args, options)
+{
+  Vector<LongOpt> longOptions = null;
+  String shortOptions = "";
+
+  options.iter(fun(Option o)=>
+    {
+      if(o.longName!=null)
+      {
+	LongOpt l;
+	if(o.noShortName)
+	  {
+	    uniqId=uniqId+1;
+	    l = new LongOpt(o.longName,optType(o),null,uniqId);
+	  }
+	else
+	  l = new LongOpt(o.longName,optType(o),null,o.shortName);
+
+	o.optval = l.getVal();
+
+	if(longOptions==null)
+	  longOptions = makeVector(options.size, l);
+	
+	longOptions.add(l);
+      }
+
+      if(!o.noShortName)
+        shortOptions=shortOptions+toString(o.shortName)+optSuffix(o);
+    });
+
+  Getopt g = new Getopt(progName, args, shortOptions, longOptions.elements);
+
+  // Parsing loop
+  int c=g.getopt();
+  while(!(c.equals(-1)))
+    {
+      Option choosen = options.find(fun(Option o)=>o.optval.equals(c));
+      if(choosen!=null)
+	choosen.doAction(g);
+      
+      c=g.getopt();
+    }
+
+  int index = getOptind(g);
+  Vector<String> res = makeVector(args.size()-index);
+  for(; index<args.size(); index=index+1)
+    res.add(args.get(index));
+
+  return res;
+}
+
+void doAction(Option, Getopt);
+doAction(o@NoParamOption,g) = action(o)();
+doAction(o@RequiredParamOption,g) = action(o)(g.getOptarg());
+doAction(o@OptionalParamOption,g)
+{
+  String arg = g.getOptarg();
+  if(arg==null)
+    actionNoParam(o)();
+  else
+    actionParam(o)(arg);
+}
+
+var int uniqId = 256;
+
+/****************************************************************
+ * Displaying options
+ ****************************************************************/
+
+printOptions(os)
+{
+  String res="";
+  os.iter(fun(Option o)=> { res=res+printOption(o); });
+  return res;
+}
+
+String printOption(Option);
+printOption(opt)
+{
+  String res= opt.noShortName ? "    " : ("  -" + opt.shortName);
+  if(opt.longName!=null)
+    res = res + (opt.noShortName ? " " : ",") + " --"+opt.longName;
+  
+  res = pad(res,20,' ') + opt.purpose;
+
+  return res+"\n";
+}
+
+String pad(String, int, char);
+pad(s,len, c)
+{
+  String res = "";
+  for(int i=s.length(); i<len; i=i+1)
+    res = res + toString(c);
+  return s+res;
+}
+

@@ -1,0 +1,62 @@
+package nice.lang;
+
+import gnu.math.*;
+
+/** 
+    Returns the strongly connected components
+    of the graph rooted at the first argument,
+    which edges are given by the function argument.
+ 
+    The scc are returned in topological order.
+    Tarjan's algorithm (linear).
+ */
+<Any T> List<List<T>> stronglyConnectedComponents(T,fun(T)(List<T>));
+
+stronglyConnectedComponents<T>(start, successors)
+{
+  Ref<int> id = new Ref();
+  id.value=0;
+  Stack<T> stack = new Stack();
+  Map<T,int> mark = newHashMap();
+
+  List<List<T>> res = new Vector();
+  visit(start,successors,id,stack,mark,res);
+  
+  return res;
+}
+
+<Any T> int visit(T, fun(T)(List<T>), Ref<int>, Stack<T>, Map<T,int>,
+		  List<List<T>>);
+visit<T>(node, successors, id, stack, mark, res)
+{
+  value(id)=value(id)+1;
+
+  mark.put(node, value(id));
+  stack.push(node);
+
+  int min = id.value;
+  successors(node).iter(fun(T child)=>{
+    int m;
+    if(mark.get(child)==null)
+      m = visit(child, successors, id, stack, mark, res);
+    else
+      m = mark.get(child);
+    
+    if(m<min) 
+      min=m;
+  });
+
+  if(equals(min,mark.get(node)))
+    {
+      Vector<T> scc = new Vector();
+      T element = null;
+      while(element!=node)
+	{
+	  element = stack.pop();
+	  scc.add(element);
+	  mark.put(element,MAX_INT());
+	}
+      res.add(scc);
+    }
+  return min;
+}

@@ -96,7 +96,7 @@ public abstract class Debug
     mlsub.typing.lowlevel.K0.debugK0 = Debug.K0;
     mlsub.typing.lowlevel.Engine.dbg = Debug.engine;
     mlsub.typing.Typing.dbg = Debug.typing;
-    mlsub.typing.Typing.linkDbg = Debug.linkTests;
+    mlsub.typing.Enumeration.linkDbg = Debug.linkTests;
   }
   
   public static final String

@@ -36,46 +36,34 @@ test_installation()
 }
 
 
-## Try to find utils
-
-if [ -f /bin/basename ]; then
-  basename=/bin/basename
-else
-  basename=/usr/bin/basename
-fi
-
-if [ -f /bin/ls ]; then
-  ls=/bin/ls
-else
-  ls=/usr/bin/ls
-fi
-
 ## Locating nice home
 
 find_home()
 {
-PRG="$0"
-# Resolve symlinks.
-while [ -h "$PRG" ]; do
-    lsResult=`$ls -ld "$PRG"`
-# d'apres /usr/bin/expr sous linux, ^ est implicite au debut de la deuxieme chaine et il ne faut pas le mettre
+  PRG="$0"
+  # Resolve symlinks.
+  while [ -h "$PRG" ]; do
+    lsResult=`ls -ld "$PRG"`
+    # d'apres /usr/bin/expr sous linux, ^ est implicite 
+    # au debut de la deuxieme chaine et il ne faut pas le mettre
     link=`/usr/bin/expr "$lsResult" : '.*-> \(.*\)$'`
     if /usr/bin/expr "$link" : '/.*' > /dev/null; then
         PRG="$link"
     else
-        PRG="`/usr/bin/dirname $PRG`/$link"
+        PRG="`dirname $PRG`/$link"
     fi
-done
-APPHOME=`/usr/bin/expr "$PRG" : '\(.*\)/bin'`
-if [ -z ${APPHOME} ]; 
-then APPHOME=`/usr/bin/dirname "$PRG"`/..
-fi
+  done
+
+  APPHOME=`/usr/bin/expr "$PRG" : '\(.*\)/bin'`
+  if [ -z ${APPHOME} ]; 
+    then APPHOME=`dirname "$PRG"`/..
+  fi
 }
 
 ## Main part
 
 scriptName="$0"
-progname=`$basename $0`
+progname=`basename $0`
 doTest=true
 
 while true; do 
@@ -111,8 +99,9 @@ fi
 
 case $progname in
   nicec) 
-    ${JAVA} -classpath ${NICE}:$CLASSPATH \
-	-Dnice.systemJar=${NICEJAR-${NICE}} nice.tools.compiler.package "$@"
+    CLASSPATH=${NICE}:${CLASSPATH} ${JAVA} \
+	-Dnice.systemJar=${NICEJAR-${NICE}} \
+	nice.tools.compiler.package "$@"
   ;;
   nicer) 
     jar=$1
@@ -128,9 +117,7 @@ case $progname in
     fi
     shift
 
-    CLASSPATH=$jar:${NICE}:$CLASSPATH
-    export CLASSPATH
-    ${JAVA} nice.tools.runJar ${jar} "$@"
+    CLASSPATH=$jar:${NICE}:$CLASSPATH ${JAVA} nice.tools.runJar ${jar} "$@"
   ;;
   *)
     echo "unknow nice command: ${progname}"

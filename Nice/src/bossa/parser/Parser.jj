@@ -1815,8 +1815,9 @@ void ArrayDimsAndInits() :
  */
 
 Statement Statement() :
-{ Statement res; }
+{ Token first, last; Statement res; }
 {
+  { first = getToken(1); }
   (
   LOOKAHEAD(2)
   res=LabeledStatement()
@@ -1860,7 +1861,11 @@ Statement Statement() :
   res=SynchronizedStatement()
 */
   )
-  { return res; }
+  { 
+    last = getToken(0);
+    res.setLocation(new Location(first, last));
+    return res; 
+  }
 }
 
 Statement LabeledStatement() :
@@ -1871,13 +1876,19 @@ Statement LabeledStatement() :
 }
 
 Statement Block() :
-{ Statement s; List statements; }
+{ Token first, last; Statement s; List statements; }
 {
+  { first = getToken(1); }
   "{" 
   { statements = new LinkedList(); }
   ( s=BlockStatement() { statements.add(s); } )* 
   "}"
-  { return new Block(statements); }
+  { 
+    last = getToken(0);
+    Statement res = new Block(statements); 
+    res.setLocation(new Location(first, last));
+    return res;
+  }
 }
 
 Statement BlockStatement() :

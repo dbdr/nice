@@ -1,0 +1,443 @@
+package nice.ui.common;
+
+
+
+/**
+ * DECLARATION of functions to make sure that NSwingFooListeners can only be requested 
+ * from Gui Controls that are able to handle those NSwingFooListeners
+ */
+
+public <AncestorListenerHandler H> NAncestorListener[?] getNiceAncestorListeners(H);
+public <CaretListenerHandler H> NCaretListener[?] getNiceCaretListeners(H);
+public <CellEditorListenerHandler H> NCellEditorListener[?] getNiceCellEditorListeners(H);
+public <ChangeListenerHandler H> NChangeListener[?] getNiceChangeListeners(H);
+public <DocumentListenerHandler H> NDocumentListener[?] getNiceDocumentListeners(H);
+public <HyperlinkListenerHandler H> NHyperlinkListener[?] getNiceHyperlinkListeners(H);
+public <InternalFrameListenerHandler H> NInternalFrameListener[?] getNiceInternalFrameListeners(H);
+public <ListDataListenerHandler H> NListDataListener[?] getNiceListDataListeners(H);
+public <ListSelectionListenerHandler H> NListSelectionListener[?] getNiceListSelectionListeners(H);
+public <MenuDragMouseListenerHandler H> NMenuDragMouseListener[?] getNiceMenuDragMouseListeners(H);
+public <MenuKeyListenerHandler H> NMenuKeyListener[?] getNiceMenuKeyListeners(H);
+public <MenuListenerHandler H> NMenuListener[?] getNiceMenuListeners(H);
+public <PopupMenuListenerHandler H> NPopupMenuListener[?] getNicePopupMenuListeners(H);
+public <TableColumnModelListenerHandler H> NTableColumnModelListener[?] getNiceTableColumnModelListeners(H);
+public <TableModelListenerHandler H> NTableModelListener[?] getNiceTableModelListeners(H);
+public <TreeExpansionListenerHandler H> NTreeExpansionListener[?] getNiceTreeExpansionListeners(H);
+public <TreeWillExpandListenerHandler H> NTreeWillExpandListener[?] getNiceTreeWillExpandListeners(H);
+public <TreeModelListenerHandler H> NTreeModelListener[?] getNiceTreeModelListeners(H);
+public <TreeSelectionListenerHandler H> NTreeSelectionListener[?] getNiceTreeSelectionListeners(H);
+public <UndoableEditListenerHandler H> NUndoableEditListener[?] getNiceUndoableEditListeners(H);
+
+
+
+/**
+ * methods to safely cast java listeners to their nice pendants
+ * raises a NoNiceListenerException if this is not possible
+ */
+
+NAncestorListener toNiceAncestorListener(EventListener);
+toNiceAncestorListener(this) { throw new NoNiceListenerException("" + this.getClass().getName() + "is no instance of NAncestorListener", listener: this); }
+toNiceAncestorListener(this@NAncestorListener) = this;
+
+NCaretListener toNiceCaretListener(EventListener);
+toNiceCaretListener(this) { throw new NoNiceListenerException("" + this.getClass().getName() + "is no instance of NCaretListener", listener: this); }
+toNiceCaretListener(this@NCaretListener) = this;
+
+NCellEditorListener toNiceCellEditorListener(EventListener);
+toNiceCellEditorListener(this) { throw new NoNiceListenerException("" + this.getClass().getName() + "is no instance of NCellEditorListener", listener: this); }
+toNiceCellEditorListener(this@NCellEditorListener) = this;
+
+NChangeListener toNiceChangeListener(EventListener);
+toNiceChangeListener(this) { throw new NoNiceListenerException("" + this.getClass().getName() + "is no instance of NChangeListener", listener: this); }
+toNiceChangeListener(this@NChangeListener) = this;
+
+NDocumentListener toNiceDocumentListener(EventListener);
+toNiceDocumentListener(this) { throw new NoNiceListenerException("" + this.getClass().getName() + "is no instance of NDocumentListener", listener: this); }
+toNiceDocumentListener(this@NDocumentListener) = this;
+
+NHyperlinkListener toNiceHyperlinkListener(EventListener);
+toNiceHyperlinkListener(this) { throw new NoNiceListenerException("" + this.getClass().getName() + "is no instance of NHyperlinkListener", listener: this); }
+toNiceHyperlinkListener(this@NHyperlinkListener) = this;
+
+NInternalFrameListener toNiceInternalFrameListener(EventListener);
+toNiceInternalFrameListener(this) { throw new NoNiceListenerException("" + this.getClass().getName() + "is no instance of NInternalFrameListener", listener: this); }
+toNiceInternalFrameListener(this@NInternalFrameListener) = this;
+
+NListDataListener toNiceListDataListener(EventListener);
+toNiceListDataListener(this) { throw new NoNiceListenerException("" + this.getClass().getName() + "is no instance of NListDataListener", listener: this); }
+toNiceListDataListener(this@NListDataListener) = this;
+
+NListSelectionListener toNiceListSelectionListener(EventListener);
+toNiceListSelectionListener(this) { throw new NoNiceListenerException("" + this.getClass().getName() + "is no instance of NListSelectionListener", listener: this); }
+toNiceListSelectionListener(this@NListSelectionListener) = this;
+
+NMenuDragMouseListener toNiceMenuDragMouseListener(EventListener);
+toNiceMenuDragMouseListener(this) { throw new NoNiceListenerException("" + this.getClass().getName() + "is no instance of NMenuDragMouseListener", listener: this); }
+toNiceMenuDragMouseListener(this@NMenuDragMouseListener) = this;
+
+NMenuKeyListener toNiceMenuKeyListener(EventListener);
+toNiceMenuKeyListener(this) { throw new NoNiceListenerException("" + this.getClass().getName() + "is no instance of NMenuKeyListener", listener: this); }
+toNiceMenuKeyListener(this@NMenuKeyListener) = this;
+
+NMenuListener toNiceMenuListener(EventListener);
+toNiceMenuListener(this) { throw new NoNiceListenerException("" + this.getClass().getName() + "is no instance of NMenuListener", listener: this); }
+toNiceMenuListener(this@NMenuListener) = this;
+
+NPopupMenuListener toNicePopupMenuListener(EventListener);
+toNicePopupMenuListener(this) { throw new NoNiceListenerException("" + this.getClass().getName() + "is no instance of NPopupMenuListener", listener: this); }
+toNicePopupMenuListener(this@NPopupMenuListener) = this;
+
+NTableColumnModelListener toNiceTableColumnModelListener(EventListener);
+toNiceTableColumnModelListener(this) { throw new NoNiceListenerException("" + this.getClass().getName() + "is no instance of NTableColumnModelListener", listener: this); }
+toNiceTableColumnModelListener(this@NTableColumnModelListener) = this;
+
+NTableModelListener toNiceTableModelListener(EventListener);
+toNiceTableModelListener(this) { throw new NoNiceListenerException("" + this.getClass().getName() + "is no instance of NTableModelListener", listener: this); }
+toNiceTableModelListener(this@NTableModelListener) = this;
+
+NTreeExpansionListener toNiceTreeExpansionListener(EventListener);
+toNiceTreeExpansionListener(this) { throw new NoNiceListenerException("" + this.getClass().getName() + "is no instance of NTreeExpansionListener", listener: this); }
+toNiceTreeExpansionListener(this@NTreeExpansionListener) = this;
+
+NTreeWillExpandListener toNiceTreeWillExpandListener(EventListener);
+toNiceTreeWillExpandListener(this) { throw new NoNiceListenerException("" + this.getClass().getName() + "is no instance of NTreeWillExpandListener", listener: this); }
+toNiceTreeWillExpandListener(this@NTreeWillExpandListener) = this;
+
+NTreeModelListener toNiceTreeModelListener(EventListener);
+toNiceTreeModelListener(this) { throw new NoNiceListenerException("" + this.getClass().getName() + "is no instance of NTreeModelListener", listener: this); }
+toNiceTreeModelListener(this@NTreeModelListener) = this;
+
+NTreeSelectionListener toNiceTreeSelectionListener(EventListener);
+toNiceTreeSelectionListener(this) { throw new NoNiceListenerException("" + this.getClass().getName() + "is no instance of NTreeSelectionListener", listener: this); }
+toNiceTreeSelectionListener(this@NTreeSelectionListener) = this;
+
+NUndoableEditListener toNiceUndoableEditListener(EventListener);
+toNiceUndoableEditListener(this) { throw new NoNiceListenerException("" + this.getClass().getName() + "is no instance of NUndoableEditListener", listener: this); }
+toNiceUndoableEditListener(this@NUndoableEditListener) = this;
+
+
+
+
+/**
+ * DEFINITION of functions to make sure that NAWTFooListeners can only be requested 
+ * from Gui Controls that are able to handle those NAWTFooListeners
+ */
+
+//getNiceVetoableChangeListeners(this@javax.swing.JComponent)
+//{
+//	?java.util.List<NVetoableChangeListener> result = vetoableChangeListeners.get(this.object());
+//	return (result == null) ? null : result.toArray();
+//}
+//
+//getNicePropertyChangeListeners(this@javax.swing.AbstractAction)
+//{
+//	?java.util.List<NPropertyChangeListener> result = propertyChangeListeners.get(this.object());
+//	return (result == null) ? null : result.toArray();
+//}
+//
+//getNicePropertyChangeListeners(this@javax.swing.table.TableColumn)
+//{
+//	?java.util.List<NPropertyChangeListener> result = propertyChangeListeners.get(this.object());
+//	return (result == null) ? null : result.toArray();
+//}
+
+getNiceTableModelListeners(this@javax.swing.table.TableModel)
+{
+	?java.util.List<NTableModelListener> result = tableModelListeners.get(this.object());
+	return (result == null) ? null : result.toArray();
+}
+
+getNiceTableColumnModelListeners(this@javax.swing.table.TableColumnModel)
+{
+	?java.util.List<NTableColumnModelListener> result = tableColumnModelListeners.get(this.object());
+	return (result == null) ? null : result.toArray();
+}
+
+//getNicePropertyChangeListeners(this@javax.swing.tree.DefaultTreeSelectionModel)
+//{
+//	?java.util.List<NPropertyChangeListener> result = propertyChangeListeners.get(this.object());
+//	return (result == null) ? null : result.toArray();
+//}
+
+//getNicePropertyChangeListeners(this@javax.swing.UIManager)
+//{
+//	?java.util.List<NPropertyChangeListener> result = propertyChangeListeners.get(this.object());
+//	return (result == null) ? null : result.toArray();
+//}
+
+//getNicePropertyChangeListeners(this@javax.swing.UIDefaults)
+//{
+//	?java.util.List<NPropertyChangeListener> result = propertyChangeListeners.get(this.object());
+//	return (result == null) ? null : result.toArray();
+//}
+
+getNiceCellEditorListeners(this@javax.swing.AbstractCellEditor)
+{
+	?java.util.List<NCellEditorListener> result = cellEditorListeners.get(this.object());
+	return (result == null) ? null : result.toArray();
+}
+
+getNiceChangeListeners(this@javax.swing.colorchooser.DefaultColorSelectionModel)
+{
+	?java.util.List<NChangeListener> result = changeListeners.get(this.object());
+	return (result == null) ? null : result.toArray();
+}
+
+getNiceChangeListeners(this@javax.swing.MenuSelectionManager)
+{
+	?java.util.List<NChangeListener> result = changeListeners.get(this.object());
+	return (result == null) ? null : result.toArray();
+}
+
+getNiceUndoableEditListeners(this@javax.swing.undo.UndoableEditSupport)
+{
+	?java.util.List<NUndoableEditListener> result = undoableEditListeners.get(this.object());
+	return (result == null) ? null : result.toArray();
+}
+
+getNiceActionListeners(this@javax.swing.AbstractButton)
+{
+  EventListener[?] listeners = this.getListeners(ActionListener.class);
+  return (listeners == null) ? null : fill(new NActionListener[listeners.length], int i => listeners[i].toNiceActionListener());
+}
+
+getNiceActionListeners(this@javax.swing.DefaultButtonModel)
+{
+  EventListener[?] listeners = this.getListeners(ActionListener.class);
+  return (listeners == null) ? null : fill(new NActionListener[listeners.length], int i => listeners[i].toNiceActionListener());
+}
+
+getNiceActionListeners(this@javax.swing.JComboBox)
+{
+  EventListener[?] listeners = this.getListeners(ActionListener.class);
+  return (listeners == null) ? null : fill(new NActionListener[listeners.length], int i => listeners[i].toNiceActionListener());
+}
+
+getNiceActionListeners(this@javax.swing.JFileChooser)
+{
+  EventListener[?] listeners = this.getListeners(ActionListener.class);
+  return (listeners == null) ? null : fill(new NActionListener[listeners.length], int i => listeners[i].toNiceActionListener());
+}
+
+getNiceActionListeners(this@javax.swing.JTextField)
+{
+  EventListener[?] listeners = this.getListeners(ActionListener.class);
+  return (listeners == null) ? null : fill(new NActionListener[listeners.length], int i => listeners[i].toNiceActionListener());
+}
+
+getNiceActionListeners(this@javax.swing.Timer)
+{
+  EventListener[?] listeners = this.getListeners(ActionListener.class);
+  return (listeners == null) ? null : fill(new NActionListener[listeners.length], int i => listeners[i].toNiceActionListener());
+}
+
+getNiceItemListeners(this@javax.swing.DefaultButtonModel)
+{
+  EventListener[?] listeners = this.getListeners(ItemListener.class);
+  return (listeners == null) ? null : fill(new NItemListener[listeners.length], int i => listeners[i].toNiceItemListener());
+}
+
+getNiceItemListeners(this@javax.swing.AbstractButton)
+{
+  EventListener[?] listeners = this.getListeners(ItemListener.class);
+  return (listeners == null) ? null : fill(new NItemListener[listeners.length], int i => listeners[i].toNiceItemListener());
+}
+
+getNiceItemListeners(this@javax.swing.JComboBox)
+{
+  EventListener[?] listeners = this.getListeners(ItemListener.class);
+  return (listeners == null) ? null : fill(new NItemListener[listeners.length], int i => listeners[i].toNiceItemListener());
+}
+
+getNiceAdjustmentListeners(this@javax.swing.JScrollBar)
+{
+  EventListener[?] listeners = this.getListeners(AdjustmentListener.class);
+  return (listeners == null) ? null : fill(new NAdjustmentListener[listeners.length], int i => listeners[i].toNiceAdjustmentListener());
+}
+
+getNiceCaretListeners(this@javax.swing.text.JTextComponent)
+{
+  EventListener[?] listeners = this.getListeners(CaretListener.class);
+  return (listeners == null) ? null : fill(new NCaretListener[listeners.length], int i => listeners[i].toNiceCaretListener());
+}
+
+getNiceChangeListeners(this@javax.swing.AbstractButton)
+{
+  EventListener[?] listeners = this.getListeners(ChangeListener.class);
+  return (listeners == null) ? null : fill(new NChangeListener[listeners.length], int i => listeners[i].toNiceChangeListener());
+}
+
+getNiceChangeListeners(this@javax.swing.DefaultBoundedRangeModel)
+{
+  EventListener[?] listeners = this.getListeners(ChangeListener.class);
+  return (listeners == null) ? null : fill(new NChangeListener[listeners.length], int i => listeners[i].toNiceChangeListener());
+}
+
+getNiceChangeListeners(this@javax.swing.DefaultSingleSelectionModel)
+{
+  EventListener[?] listeners = this.getListeners(ChangeListener.class);
+  return (listeners == null) ? null : fill(new NChangeListener[listeners.length], int i => listeners[i].toNiceChangeListener());
+}
+
+getNiceChangeListeners(this@javax.swing.text.DefaultCaret)
+{
+  EventListener[?] listeners = this.getListeners(ChangeListener.class);
+  return (listeners == null) ? null : fill(new NChangeListener[listeners.length], int i => listeners[i].toNiceChangeListener());
+}
+
+getNiceChangeListeners(this@javax.swing.JProgressBar)
+{
+  EventListener[?] listeners = this.getListeners(ChangeListener.class);
+  return (listeners == null) ? null : fill(new NChangeListener[listeners.length], int i => listeners[i].toNiceChangeListener());
+}
+
+getNiceChangeListeners(this@javax.swing.JSlider)
+{
+  EventListener[?] listeners = this.getListeners(ChangeListener.class);
+  return (listeners == null) ? null : fill(new NChangeListener[listeners.length], int i => listeners[i].toNiceChangeListener());
+}
+
+getNiceChangeListeners(this@javax.swing.JTabbedPane)
+{
+  EventListener[?] listeners = this.getListeners(ChangeListener.class);
+  return (listeners == null) ? null : fill(new NChangeListener[listeners.length], int i => listeners[i].toNiceChangeListener());
+}
+
+getNiceChangeListeners(this@javax.swing.JViewport)
+{
+  EventListener[?] listeners = this.getListeners(ChangeListener.class);
+  return (listeners == null) ? null : fill(new NChangeListener[listeners.length], int i => listeners[i].toNiceChangeListener());
+}
+
+getNiceChangeListeners(this@javax.swing.JTabbedPane)
+{
+  EventListener[?] listeners = this.getListeners(ChangeListener.class);
+  return (listeners == null) ? null : fill(new NChangeListener[listeners.length], int i => listeners[i].toNiceChangeListener());
+}
+
+getNiceChangeListeners(this@javax.swing.DefaultButtonModel)
+{
+  EventListener[?] listeners = this.getListeners(ChangeListener.class);
+  return (listeners == null) ? null : fill(new NChangeListener[listeners.length], int i => listeners[i].toNiceChangeListener());
+}
+
+getNiceChangeListeners(this@javax.swing.DefaultSingleSelectionModel)
+{
+  EventListener[?] listeners = this.getListeners(ChangeListener.class);
+  return (listeners == null) ? null : fill(new NChangeListener[listeners.length], int i => listeners[i].toNiceChangeListener());
+}
+
+getNiceListDataListeners(this@javax.swing.AbstractListModel)
+{
+  EventListener[?] listeners = this.getListeners(ListDataListener.class);
+  return (listeners == null) ? null : fill(new NListDataListener[listeners.length], int i => listeners[i].toNiceListDataListener());
+}
+
+getNiceListSelectionListeners(this@javax.swing.DefaultListSelectionModel)
+{
+  EventListener[?] listeners = this.getListeners(ListSelectionListener.class);
+  return (listeners == null) ? null : fill(new NListSelectionListener[listeners.length], int i => listeners[i].toNiceListSelectionListener());
+}
+
+getNiceListSelectionListeners(this@javax.swing.JList)
+{
+  EventListener[?] listeners = this.getListeners(ListSelectionListener.class);
+  return (listeners == null) ? null : fill(new NListSelectionListener[listeners.length], int i => listeners[i].toNiceListSelectionListener());
+}
+
+getNiceAncestorListeners(this@javax.swing.JComponent)
+{
+  EventListener[?] listeners = this.getListeners(AncestorListener.class);
+  return (listeners == null) ? null : fill(new NAncestorListener[listeners.length], int i => listeners[i].toNiceAncestorListener());
+}
+
+getNiceHyperlinkListeners(this@javax.swing.JEditorPane)
+{
+  EventListener[?] listeners = this.getListeners(HyperlinkListener.class);
+  return (listeners == null) ? null : fill(new NHyperlinkListener[listeners.length], int i => listeners[i].toNiceHyperlinkListener());
+}
+
+getNiceInternalFrameListeners(this@javax.swing.JInternalFrame)
+{
+  EventListener[?] listeners = this.getListeners(InternalFrameListener.class);
+  return (listeners == null) ? null : fill(new NInternalFrameListener[listeners.length], int i => listeners[i].toNiceInternalFrameListener());
+}
+
+getNiceMenuListeners(this@javax.swing.JMenu)
+{
+  EventListener[?] listeners = this.getListeners(MenuListener.class);
+  return (listeners == null) ? null : fill(new NMenuListener[listeners.length], int i => listeners[i].toNiceMenuListener());
+}
+
+getNiceMenuDragMouseListeners(this@javax.swing.JMenuItem)
+{
+  EventListener[?] listeners = this.getListeners(MenuDragMouseListener.class);
+  return (listeners == null) ? null : fill(new NMenuDragMouseListener[listeners.length], int i => listeners[i].toNiceMenuDragMouseListener());
+}
+
+getNiceMenuKeyListeners(this@javax.swing.JMenuItem)
+{
+  EventListener[?] listeners = this.getListeners(MenuKeyListener.class);
+  return (listeners == null) ? null : fill(new NMenuKeyListener[listeners.length], int i => listeners[i].toNiceMenuKeyListener());
+}
+
+getNicePopupMenuListeners(this@javax.swing.JPopupMenu)
+{
+  EventListener[?] listeners = this.getListeners(PopupMenuListener.class);
+  return (listeners == null) ? null : fill(new NPopupMenuListener[listeners.length], int i => listeners[i].toNicePopupMenuListener());
+}
+
+getNiceTreeExpansionListeners(this@javax.swing.JTree)
+{
+  EventListener[?] listeners = this.getListeners(TreeExpansionListener.class);
+  return (listeners == null) ? null : fill(new NTreeExpansionListener[listeners.length], int i => listeners[i].toNiceTreeExpansionListener());
+}
+
+getNiceTreeWillExpandListeners(this@javax.swing.JTree)
+{
+  EventListener[?] listeners = this.getListeners(TreeWillExpandListener.class);
+  return (listeners == null) ? null : fill(new NTreeWillExpandListener[listeners.length], int i => listeners[i].toNiceTreeWillExpandListener());
+}
+
+getNiceTreeSelectionListeners(this@javax.swing.JTree)
+{
+  EventListener[?] listeners = this.getListeners(TreeSelectionListener.class);
+  return (listeners == null) ? null : fill(new NTreeSelectionListener[listeners.length], int i => listeners[i].toNiceTreeSelectionListener());
+}
+
+getNiceTreeSelectionListeners(this@javax.swing.tree.DefaultTreeSelectionModel)
+{
+  EventListener[?] listeners = this.getListeners(TreeSelectionListener.class);
+  return (listeners == null) ? null : fill(new NTreeSelectionListener[listeners.length], int i => listeners[i].toNiceTreeSelectionListener());
+}
+
+getNiceTreeModelListeners(this@javax.swing.tree.DefaultTreeModel)
+{
+  EventListener[?] listeners = this.getListeners(TreeModelListener.class);
+  return (listeners == null) ? null : fill(new NTreeModelListener[listeners.length], int i => listeners[i].toNiceTreeModelListener());
+}
+
+
+//JDK1.4  getNicePopupMenuListeners(this@javax.swing.JComboBox)
+//JDK1.4  {
+//JDK1.4    EventListener[?] listeners = this.getListeners(PopupMenuListener.class);
+//JDK1.4    return (listeners == null) ? null : fill(new NPopupMenuListener[listeners.length], int i => listeners[i].toNicePopupMenuListener());
+//JDK1.4  }
+
+//JDK1.4  getNiceChangeListeners(this@javax.swing.MenuSelectionManager)
+//JDK1.4  {
+//JDK1.4    EventListener[?] listeners = this.getListeners(ChangeListener.class);
+//JDK1.4    return (listeners == null) ? null : fill(new NChangeListener[listeners.length], int i => listeners[i].toNiceChangeListener());
+//JDK1.4  }
+
+//JDK1.4  getNiceChangeListeners(this@javax.swing.JSpinner)
+//JDK1.4  {
+//JDK1.4    EventListener[?] listeners = this.getListeners(ChangeListener.class);
+//JDK1.4    return (listeners == null) ? null : fill(new NChangeListener[listeners.length], int i => listeners[i].toNiceChangeListener());
+//JDK1.4  }
+
+//JDK1.4  getNiceChangeListeners(this@javax.swing.AbstractSpinnerModel)
+//JDK1.4  {
+//JDK1.4    EventListener[?] listeners = this.getListeners(ChangeListener.class);
+//JDK1.4    return (listeners == null) ? null : fill(new NChangeListener[listeners.length], int i => listeners[i].toNiceChangeListener());
+//JDK1.4  }

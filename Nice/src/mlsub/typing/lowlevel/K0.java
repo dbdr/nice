@@ -178,7 +178,7 @@ public final class K0 {
   private String indexToString(int index) {
     return callbacks.indexToString(index);
   }
-  private String interfaceToString(int iid) {
+  String interfaceToString(int iid) {
     return callbacks.interfaceToString(iid);
   }
 

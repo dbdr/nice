@@ -83,6 +83,6 @@ class Interface {
 
   public String toString()
   {
-    return "" + iid;
+    return k0.interfaceToString(iid);
   }
 }

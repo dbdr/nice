@@ -139,7 +139,7 @@ public final class Typing
       Engine.createInitialContext();
     }
     catch(Unsatisfiable e){
-      throw new InternalError("Initial context is not satisfiable");
+      throw new InternalError("Initial context is not satisfiable: " + e);
     }
   }
   

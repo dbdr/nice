@@ -726,7 +726,7 @@ public abstract class Engine
 	  return String.valueOf(getElement(x))+ "[" + x + "]";
       }
       protected String interfaceToString(int iid) {
-	return Integer.toString(iid);
+	return "" + ((mlsub.typing.Variance) associatedKind).getInterface(iid);
       }
     }
     

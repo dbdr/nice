@@ -193,6 +193,14 @@ public class NiceClass extends ClassDefinition
 
   public void compile()
   {
+    if (children != null)
+      for (Iterator i = children.iterator(); i.hasNext();)
+	{
+	  Object child = i.next();
+	  if (child instanceof ToplevelFunction)
+	    ((ToplevelFunction) child).compile();
+	}
+
     if(Debug.codeGeneration)
       Debug.println("Compiling class "+name);
     

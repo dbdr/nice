@@ -50,7 +50,7 @@ abstract public class MethodDeclaration extends Definition
 			   Monotype returnType,
 			   FormalParameters parameters)
   {
-    super(name, Node.global);
+    super(name, Node.down);
 
     if(returnType != null)
       // otherwise, symbol and arity are supposed to be set by someone else
@@ -67,6 +67,7 @@ abstract public class MethodDeclaration extends Definition
 	symbol = new MethodDeclaration.Symbol
 	  (name, new Polytype(constraint, 
 			      new FunType(domain, returnType)));
+	symbol.propagate = Node.global;
 	addChild(symbol);
 
 	this.arity = (domain == null ? 0 : domain.size());
@@ -124,6 +125,7 @@ abstract public class MethodDeclaration extends Definition
     if (!mlsub.typing.Constraint.hasBinders(type.getConstraint()))
       {
 	parameters.typecheck(getType().domain());
+	innerTypecheck();
 	return;
       }
     

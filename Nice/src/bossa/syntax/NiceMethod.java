@@ -33,26 +33,28 @@ import bossa.util.Debug;
 public class NiceMethod extends MethodDeclaration
 {
   /**
-   * The method is a class or interface member.
-   *
-   * @param c the class this method belongs to.
-   * @param name the name of the method
-   * @param typeParameters the type parameters
-   * @param constraint the constraint
-   * @param returnType the return type
-   * @param parameters the MonoTypes of the parameters
+     The method is a class or interface member.
+    
+     @param c the class this method belongs to.
+     @param name the name of the method
+     @param typeParams the type parameters
+     @param constraint the constraint
+     @param returnType the return type
+     @param params the MonoTypes of the parameters
+     @param body the body of the function, or null if this is a real method
    */
-  public static NiceMethod create
+  public static MethodDeclaration create
     (MethodContainer c,
      LocatedString name, 
      Constraint constraint,
      Monotype returnType,
-     FormalParameters parameters)
+     FormalParameters params,
+     Statement body)
   {
     // it is a class method, there is an implicit "this" argument
 
     boolean hasAlike = returnType.containsAlike() 
-      || parameters.containsAlike();
+      || params.containsAlike();
     
     mlsub.typing.MonotypeVar[] thisTypeParams = c.createSameTypeParameters();
     
@@ -110,16 +112,19 @@ public class NiceMethod extends MethodDeclaration
 	    Map map = new HashMap();
 	    map.put(Alike.id, alikeTC);
 	    returnType = returnType.substitute(map);
-	    parameters.substitute(map);
+	    params.substitute(map);
 	  }
       }
     else
       thisType = 
 	new mlsub.typing.MonotypeConstructor(tc, thisTypeParams);
     
-    parameters.addThis(Monotype.create(thisType));
+    params.addThis(Monotype.create(thisType));
     
-    return new NiceMethod(name, constraint, returnType, parameters);
+    if (body == null)
+      return new NiceMethod(name, constraint, returnType, params);
+    else
+      return new ToplevelFunction(name, constraint, returnType, params, body);
   }
 
   public NiceMethod(LocatedString name, 

@@ -99,11 +99,13 @@ abstract class VarSymbol extends Node implements Located
   
   LocatedString name;
 
+  public final LocatedString getName() { return name; }
+
   /****************************************************************
    * Code generation
    ****************************************************************/
 
-  void setDeclaration(gnu.expr.Declaration declaration)
+  public void setDeclaration(gnu.expr.Declaration declaration)
   {
     this.decl = declaration;
     if (name != null) this.decl.setLine(name.location().getLine());

@@ -9,7 +9,7 @@ LISPDIR=${PREFIX}/share/emacs/site-lisp/nice
 # Get the version from the debian changelog.
 VERSION = ${shell expr "`head -1 debian/changelog`" : '.*(\(.*\))'}
 
-SHELL = /bin/zsh
+SHELL = /bin/sh
 TOP=${PWD}
 
 javac = javac

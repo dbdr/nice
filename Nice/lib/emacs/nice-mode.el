@@ -195,7 +195,7 @@
    (list type 1 'nice-type-face)
    
    ;; Keywords
-   '("\\<\\(fun\\|static\\|final\\|const\\|extends\\|implements\\|abstract\\|public\\|var\\|class\\|interface\\|new\\|else\\|native\\|inline\\|import\\|require\\|package\\|alike\\|Any\\|return\\|try\\|catch\\|finally\\|throw\\|instanceof\\)\\>\\|@"
+   '("\\<\\(fun\\|static\\|final\\|const\\|extends\\|implements\\|abstract\\|public\\|var\\|class\\|interface\\|new\\|else\\|native\\|inline\\|import\\|require\\|package\\|alike\\|Any\\|return\\|break\\|continue\\|try\\|catch\\|finally\\|throw\\|instanceof\\)\\>\\|@"
      0 nice-keyword-face)
    
    ;; for/if/assert followed by '('

@@ -181,8 +181,7 @@ final class DomainVector extends java.util.Vector {
   
   /**
    * Choose a non-null, non-singleton, domain and return its index. Return -1
-   * if all the domains are instantiated. Assume the field cardUp or cardDown
-   * are correct in the domains.
+   * if all the domains are instantiated. 
    **/
   public int chooseDomain() {
     return chooseDomain(null);
@@ -200,9 +199,12 @@ final class DomainVector extends java.util.Vector {
     for (int i = 0; i < elementCount; i++) {
       if (set == null || set.get(i + offset)) {
         Domain d = (Domain)elementAt(i);
-        if (d != null && d.cardUp < leastCard && d.cardUp > 1) {
-          least = i + offset;
-          leastCard = d.cardUp;
+        if (d != null){
+          int card = d.cardinal();
+	  if (card < leastCard && card > 1) {
+            least = i + offset;
+            leastCard = card;
+          }
         }
       }
     }

@@ -81,3 +81,26 @@ class B extends A{}
 
 void foo(B);
 foo(@A){}
+
+/// PASS
+  /// Toplevel
+  abstract class A<T> {} 
+  class B<T> extends A<T> { 
+  A<T> cons; 
+  } 
+  class C<T> extends A<T> { 
+  A<T> cons; 
+  } 
+  <Any T> A<T> j(A<A<T>>); 
+  j(b@B) = new B(cons: j(b.cons)); 
+  j(c@C) = new C(cons: j(c.cons)); 
+
+/// FAIL
+  /// Toplevel
+  class A<T> {} 
+  class B<T> extends A<T> {} 
+  <T> void j(A<A<T>>); 
+
+/// FAIL
+  /// Toplevel
+  void f(List<Array<String>>);

@@ -32,7 +32,7 @@ final class Domain extends BitVector {
   }
 
   // size of this domain (possibly including unit)
-  private int cardinal() {
+  int cardinal() {
     if (containsUnit) {
       return super.bitCount() + 1;
     } else {
@@ -201,7 +201,7 @@ final class Domain extends BitVector {
   /**
    * Iteration thru the domain elements
    **/
-  int getFirstBit() {
+  int getFirstBit() { // unused method ???
     int result = super.getLowestSetBit();
     if (result == UNDEFINED_INDEX && containsUnit) {
       // don't forget unit !

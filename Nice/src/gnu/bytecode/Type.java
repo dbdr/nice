@@ -463,12 +463,13 @@ public abstract class Type {
     = new PrimType ("boolean", "Z", 1, java.lang.Boolean.TYPE);
   public static final PrimType char_type
     = new PrimType ("char", "C", 2, java.lang.Character.TYPE);
-  public static final PrimType void_type
-    = new PrimType ("void", "V", 0, java.lang.Void.TYPE);
-
+  // place never-returns first, so that void is registered for Void.TYPE
   /** The "return type" of an expression that never returns, e.g. a throw. */
   public static final PrimType neverReturnsType
     = new PrimType ("(never-returns)", "V", 0, java.lang.Void.TYPE);
+  public static final PrimType void_type
+    = new PrimType ("void", "V", 0, java.lang.Void.TYPE);
+
 
   /** The magic type of null. */
   public static final ObjectType nullType = new ObjectType("(type of null)");

@@ -15,7 +15,7 @@ nice (0.9.2) unstable; urgency=low
     type. This avoids some type errors, and simplifies error messages.
   * Some more methods are added to nice.lang.
   * Implemented simple range expressions. 'a..b' is an immutable list of int's
-    from a to b(inclusive) where b >= a. Example usage:
+    from a to b (inclusive) where b >= a. Example usage:
       for (i : 1..10) println(i);
   * In local variable declarations like 'var x = exp', the inferred type
     for x is int when 'exp' is of type byte or short. This will avoid 
@@ -129,7 +129,7 @@ nice (0.9.0) unstable; urgency=low
     from Java source or by reflexion, especially if a no-arg constructor is
     required for some reason.
   * Bugfixes (Parsing of nested tuples, global constants of type char,
-    Overloading resolving of methods implementation with additional tc's, ...)
+    overloading resolution of method implementations with additional tc's, ...)
   * Improved some error messages.
   
  -- Daniel Bonniot <bonniot@users.sourceforge.net>  Fri, 18 Jul 2003 01:40:25 +0200

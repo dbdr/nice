@@ -12,7 +12,7 @@
 
 // File    : InterfaceDefinition.java
 // Created : Thu Jul 01 17:00:14 1999 by bonniot
-//$Modified: Fri Jul 09 11:34:08 1999 by bonniot $
+//$Modified: Mon Jul 12 11:23:26 1999 by bonniot $
 // Description : Abstract syntax for a class definition
 
 package bossa.syntax;
@@ -32,6 +32,11 @@ public class InterfaceDefinition extends TypeSymbol implements Definition
   void resolveScope()
   {
     
+  }
+
+  VarScope memberScope()
+  {
+    return null;
   }
 
   public String toString()

@@ -12,7 +12,7 @@
 
 // File    : Constraint.java
 // Created : Fri Jul 02 17:51:35 1999 by bonniot
-//$Modified: Fri Jul 09 20:26:58 1999 by bonniot $
+//$Modified: Fri Jul 16 18:59:50 1999 by bonniot $
 // Description : Syntaxic constraint
 
 package bossa.syntax;
@@ -31,6 +31,22 @@ public class Constraint
   { 
     return new Constraint(new ArrayList());
   }
+
+  Constraint instantiate(TypeParameters typeParameters)
+  { 
+    Constraint res;
+    int nb1,nb2;
+    User.error((nb1=binders.size())!=
+	       (nb2=typeParameters.size()),
+	       nb1+" type parameters expected "+
+	       ", not "+nb2);
+    //TODO
+    return emptyConstraint();
+  }
+
+  /****************************************************************
+   * Printing
+   ****************************************************************/
 
   public String toString()
   {

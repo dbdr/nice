@@ -12,11 +12,13 @@
 
 // File    : Ident.java
 // Created : Thu Jul 01 15:04:41 1999 by bonniot
-//$Modified: Fri Jul 09 19:39:47 1999 by bonniot $
+//$Modified: Tue Jul 13 12:21:17 1999 by bonniot $
 // Description : Identifier
 //   any string that comes from the parser should have this type
 
 package bossa.syntax;
+
+import bossa.util.*;
 
 public class Ident
 {
@@ -28,6 +30,11 @@ public class Ident
   public String toString()
   {
     return name.toString();
+  }
+
+  public Location location()
+  {
+    return name.location();
   }
 
   public boolean equals(Ident i)

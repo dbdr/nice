@@ -12,7 +12,7 @@
 
 // File    : LocatedString.java
 // Created : Fri Jul 09 19:09:47 1999 by bonniot
-//$Modified: Fri Jul 09 19:35:25 1999 by bonniot $
+//$Modified: Tue Jul 13 11:59:37 1999 by bonniot $
 // Description : A string + location information
 
 package bossa.syntax;
@@ -21,22 +21,22 @@ import bossa.util.*;
 
 public class LocatedString
 {
-  public LocatedString(String content, 
-	       int startLine, int startColumn,
-	       int endLine, int endColumn)
+  public LocatedString(String content, Location loc)
   {
     this.content=content;
-    this.startLine=startLine;
-    this.startColumn=startColumn;
-    this.endLine=endLine;
-    this.endColumn=endColumn;
+    this.location=loc;
   }
 
   public String toString()
   {
-    return content/*+":"+startLine+":"+startColumn*/;
+    return content;
+  }
+
+  public Location location()
+  {
+    return location;
   }
 
   String content;
-  int startLine,startColumn,endLine,endColumn;
+  Location location;
 }

@@ -12,7 +12,7 @@
 
 // File    : LocalDeclarationStmt.java
 // Created : Tue Jul 06 12:06:20 1999 by bonniot
-//$Modified: Fri Jul 09 18:36:02 1999 by bonniot $
+//$Modified: Fri Jul 16 19:46:34 1999 by bonniot $
 // Description : Declaration of a local variable
 //   with optional initial value
 
@@ -22,7 +22,7 @@ import bossa.util.*;
 
 public class LocalDeclarationStmt extends Statement
 {
-  public LocalDeclarationStmt(Ident name, Type type, Expression value)
+  public LocalDeclarationStmt(Ident name, Polytype type, Expression value)
   {
     this.name=name;
     this.type=type;
@@ -31,7 +31,8 @@ public class LocalDeclarationStmt extends Statement
 
   void resolveScope()
   {
-    type=type.resolve(typeScope);
+    type.buildScope(typeScope);
+    type.resolve();
     left=scope.lookup(name);
     if(value!=null)
       value=value.resolve(scope,typeScope);
@@ -44,7 +45,7 @@ public class LocalDeclarationStmt extends Statement
   }
 
   protected Ident name;
-  protected Type type;
+  protected Polytype type;
   protected Expression value;
   // after scoping
   VarSymbol left;

@@ -12,7 +12,7 @@
 
 // File    : TypeSymbolType.java
 // Created : Fri Jul 09 15:32:38 1999 by bonniot
-//$Modified: Fri Jul 09 20:55:27 1999 by bonniot $
+//$Modified: Tue Jul 13 13:22:04 1999 by bonniot $
 // Description : Type made of a symbol
 
 package bossa.syntax;
@@ -20,7 +20,7 @@ package bossa.syntax;
 import java.util.*;
 import bossa.util.*;
 
-public class TypeSymbolType extends Type
+public class TypeSymbolType extends Monotype
 {
   public TypeSymbolType(TypeSymbol s, Collection parameters)
   {
@@ -28,29 +28,36 @@ public class TypeSymbolType extends Type
     this.parameters=parameters;
   }
 
-  Type resolve(TypeScope s)
+  Monotype cloneType()
   {
-    Internal.warning("resolve in TypeSymbolType : it has already been done");
     return this;
   }
 
-  Type instantiate(Collection c)
+  Monotype resolve(TypeScope typeScope)
   {
-    //TODO:
+    // Nothing to do !
     return this;
+  }
+
+  VarScope memberScope()
+  {
+    return symbol.memberScope();
   }
 
   public String toString()
   {
-    Internal.warning(symbol==null,"null symbol");
-    if(symbol==null)
-      return "?";
     Internal.warning(parameters==null,"null parameters in "+symbol.name);
     return 
-      symbol.name.toString()
+      toStringBase()
       + Util.map("<",", ",">",parameters);
   }
 
+  public String toStringBase()
+  {
+    Internal.error(symbol==null,"null symbol");
+    return symbol.name.toString();
+  }
+
   TypeSymbol symbol;
-  Collection /* of Type */ parameters;
+  Collection /* of Monotype */ parameters;
 }

@@ -12,11 +12,12 @@
 
 // File    : IdentExp.java
 // Created : Mon Jul 05 16:25:58 1999 by bonniot
-//$Modified: Fri Jul 09 12:11:19 1999 by bonniot $
-// Description : Just an identifier
+//$Modified: Tue Jul 13 14:28:23 1999 by bonniot $
+// Description : Identifier supposed to be a variable (not a type)
 
 package bossa.syntax;
 
+import java.util.*;
 import bossa.util.*;
 
 public class IdentExp extends Expression
@@ -25,8 +26,8 @@ public class IdentExp extends Expression
   {
     this.ident=i;
   }
-
-  Type getType()
+  
+  Polytype getType()
   {
     Internal.error("getType in IdentExp");
     return null;
@@ -35,13 +36,15 @@ public class IdentExp extends Expression
   Expression resolve(VarScope scope, TypeScope ts)
   {
     VarSymbol s=scope.lookup(ident);
-    User.error(s==null,ident+" is not defined");
+    User.error(s==null,ident.location(),"Variable \""+ident+"\" is not defined");
     return new SymbolExp(s);
   }
 
   public String toString()
   {
-    return ident.toString();
+    return "\""
+      +ident.toString()
+      +"\"";
   }
 
   protected Ident ident;

@@ -12,7 +12,7 @@
 
 // File    : TypeScope.java
 // Created : Fri Jul 09 11:29:17 1999 by bonniot
-//$Modified: Fri Jul 09 18:43:11 1999 by bonniot $
+//$Modified: Fri Jul 16 19:21:30 1999 by bonniot $
 // Description : a Scope level for types.
 //   Is extended in each node that defined a new scope level
 

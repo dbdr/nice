@@ -12,7 +12,7 @@
 
 // File    : MethodDefinition.java
 // Created : Thu Jul 01 18:12:46 1999 by bonniot
-//$Modified: Fri Jul 09 20:27:34 1999 by bonniot $
+//$Modified: Fri Jul 16 19:08:18 1999 by bonniot $
 // Description : Abstract syntax for a global method declaration
 
 package bossa.syntax;
@@ -20,13 +20,13 @@ package bossa.syntax;
 import java.util.*;
 import bossa.util.*;
 
-public class MethodDefinition extends VarSymbol implements Definition
+public class MethodDefinition extends LocalSymb implements Definition
 {
   /** the Method is a class member */
   public MethodDefinition(ClassDefinition c,
 			  Ident name, 
 			  Constraint constraint,
-			  Type returnType,
+			  Monotype returnType,
 			  Collection parameters)
   {
     // hack, super must be the first call
@@ -34,19 +34,18 @@ public class MethodDefinition extends VarSymbol implements Definition
 
     Collection params=new ArrayList();
     // if it is a class method, there is an implicit "this" argument
-    if(c!=null)
-      params.add(c.type);
+    //TODO    if(c!=null)
+    //params.add(c.type);
     params.addAll(parameters);
 
-    this.type=new FunType(params,returnType);
+    this.type=new Polytype(constraint,new FunType(params,returnType));
     this.memberOf=c;
-    this.constraint=constraint;
   }
 
   /** the Method is global */
   public MethodDefinition(Ident name, 
 			  Constraint constraint,
-			  Type returnType,
+			  Monotype returnType,
 			  Collection parameters)
   {
     this(null,name,constraint,returnType,parameters);
@@ -64,24 +63,34 @@ public class MethodDefinition extends VarSymbol implements Definition
     return false;
   }
 
+  /****************************************************************
+   * Scoping
+   ****************************************************************/
+
   void buildScope(VarScope outer, TypeScope ts)
   {
+    this.type.buildScope(ts);
+
     scope=outer;
-    typeScope=TypeScope.makeScope(ts,constraint.binders);
+    typeScope=type.typeScope;
   }
 
   void resolveScope()
   {
-    type=type.resolve(typeScope);
+    type.resolve();
   }
+
+  /************************************************************
+   * Printing
+   ************************************************************/
 
   public String toString()
   {
     return
-      type.codomain().toStringExtern()
+      type.codomain().toString()
       + " "
       + name.toString()
-      + constraint.toString()
+      + type.constraint.toString()
       + "("
       + Util.map("",", ","",type.domain())
       + ");\n"
@@ -89,5 +98,4 @@ public class MethodDefinition extends VarSymbol implements Definition
   }
 
   private ClassDefinition memberOf;
-  private Constraint constraint;
 }

@@ -12,7 +12,7 @@
 
 // File    : Node.java
 // Created : Thu Jul 08 10:24:56 1999 by bonniot
-//$Modified: Fri Jul 09 20:31:41 1999 by bonniot $
+//$Modified: Mon Jul 12 16:29:52 1999 by bonniot $
 // Description : Basic component of the syntax tree
 //   Defines its local scope 
 
@@ -39,7 +39,7 @@ abstract class Node
   }
 
   /** iterates on the collection of nodes */
-  void buildScope(VarScope outer, TypeScope typeOuter, Collection c)
+  static void buildScope(VarScope outer, TypeScope typeOuter, Collection c)
   {
     Iterator i=c.iterator();
     while(i.hasNext())
@@ -49,7 +49,7 @@ abstract class Node
   /** uses the scope to replace identifiers with their meaning */
   abstract void resolveScope();
 
-  void resolveScope(Collection c)
+  static void resolveScope(Collection c)
   {
     Iterator i=c.iterator();
     while(i.hasNext())

@@ -12,7 +12,7 @@
 
 // File    : TypeSymbol.java
 // Created : Fri Jul 09 11:20:46 1999 by bonniot
-//$Modified: Fri Jul 09 19:56:41 1999 by bonniot $
+//$Modified: Mon Jul 12 11:26:34 1999 by bonniot $
 // Description : Used to lookup Type names
 //   Separed from VarSymbol since it can only appear in types 
 //   (and New expression)
@@ -39,6 +39,12 @@ public class TypeSymbol extends Node
     //Nothing to do, whe are already a symbol
   }
 
+  VarScope memberScope()
+  {
+    Internal.error("TypeSymbol.memberScope should not be called");
+    return null;
+  }
+    
   public String toString()
   {
     return name.toString();

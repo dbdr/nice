@@ -12,7 +12,7 @@
 
 // File    : FunType.java
 // Created : Fri Jul 02 17:41:24 1999 by bonniot
-//$Modified: Fri Jul 09 20:13:05 1999 by bonniot $
+//$Modified: Tue Jul 13 13:18:56 1999 by bonniot $
 // Description : Functional type
 
 package bossa.syntax;
@@ -20,12 +20,17 @@ package bossa.syntax;
 import java.util.*;
 import bossa.util.*;
 
-public class FunType extends Type
+public class FunType extends Monotype
 {
-  public FunType(Collection/* of Type */ in, Type out)
+  public FunType(Collection /* of Type */ in, Monotype out)
   {
     this.in=in;
     this.out=out;
+  }
+
+  Monotype cloneType()
+  {
+    return new FunType(cloneTypes(in),out.cloneType());
   }
 
   /** the list of input types */
@@ -35,21 +40,15 @@ public class FunType extends Type
   }
 
   /** the return type */
-  Type codomain()
+  Monotype codomain()
   {
     return out;
   }
 
-  Type instantiate(Collection parameters)
+  Monotype resolve(TypeScope typeScope)
   {
-    Internal.error("to implement");
-    return null;
-  }
-
-  Type resolve(TypeScope s)
-  {
-    in=resolve(s,in);
-    out=out.resolve(s);
+    in=resolve(typeScope,in);
+    out=out.resolve(typeScope);
     return this;
   }
 
@@ -64,5 +63,5 @@ public class FunType extends Type
   }
 
   private Collection in;
-  private Type out;
+  private Monotype out;
 }

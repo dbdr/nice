@@ -12,11 +12,12 @@
 
 // File    : SymbolExpr.java
 // Created : Thu Jul 08 12:20:59 1999 by bonniot
-//$Modified: Fri Jul 09 12:11:37 1999 by bonniot $
+//$Modified: Fri Jul 16 19:12:25 1999 by bonniot $
 // Description : Access to the value of a symbol
 
 package bossa.syntax;
 
+import java.util.*;
 import bossa.util.*;
 
 public class SymbolExp extends Expression
@@ -31,9 +32,9 @@ public class SymbolExp extends Expression
     return symbol.isAssignable();
   }
 
-  Type getType()
+  Polytype getType()
   {
-    return symbol.type;
+    return symbol.getType();
   }
 
   Expression resolve(VarScope s, TypeScope t)
@@ -44,7 +45,9 @@ public class SymbolExp extends Expression
 
   public String toString()
   {
-    return symbol.name.toString();
+    return 
+      symbol.name.toString()
+      ;
   }
 
   VarSymbol symbol;

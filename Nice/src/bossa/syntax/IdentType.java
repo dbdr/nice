@@ -12,15 +12,15 @@
 
 // File    : IdentType.java
 // Created : Fri Jul 02 17:30:17 1999 by bonniot
-//$Modified: Fri Jul 09 19:23:28 1999 by bonniot $
-// Description : Base type (not a function)
+//$Modified: Tue Jul 13 16:28:48 1999 by bonniot $
+// Description : Base type (not a function) before scoping resolution
 
 package bossa.syntax;
 
 import java.util.*;
 import bossa.util.*;
 
-public class IdentType extends Type
+public class IdentType extends Monotype
 {
   public IdentType(LocatedString name, Collection parameters)
   {
@@ -28,29 +28,21 @@ public class IdentType extends Type
     this.parameters=parameters;
   }
 
-  Type instantiate(Collection typeParameters)
+  Monotype cloneType()
   {
-    //TODO : transform to error
-    Internal.warning("IdentType can not be instanciated, it shouldn't live so late in the passes");
     return this;
   }
 
-  Type resolve(TypeScope scope)
+  Monotype resolve(TypeScope typeScope)
   {
-    TypeSymbol s=scope.lookup(this);
-    User.warning(s==null,"Unknown type : "+name);
-    return new TypeSymbolType(s,resolve(scope,parameters));
+    TypeSymbol s=typeScope.lookup(this);
+    User.error(s==null,name.location(),"Unknown type \""+name+"\"");
+    return new TypeSymbolType(s,resolve(typeScope,parameters));
   }
 
   public String toString()
   {
     return "\""+name+Util.map("<",", ",">",parameters)+"\"";
-  }
-
-  public String toStringExtern()
-  /* it is usefull only for FunType */
-  {
-    return toString();
   }
 
   LocatedString name;

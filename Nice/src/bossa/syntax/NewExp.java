@@ -12,7 +12,7 @@
 
 // File    : NewExp.java
 // Created : Thu Jul 08 17:15:15 1999 by bonniot
-//$Modified: Fri Jul 09 18:33:22 1999 by bonniot $
+//$Modified: Tue Jul 13 17:06:40 1999 by bonniot $
 // Description : Allocation of a new object
 
 package bossa.syntax;
@@ -21,7 +21,7 @@ import bossa.util.*;
 
 public class NewExp extends Expression
 {
-  public NewExp(Type type)
+  public NewExp(Monotype type)
   {
     this.type=type;
   }
@@ -32,9 +32,9 @@ public class NewExp extends Expression
     return this;
   }
 
-  Type getType()
+  Polytype getType()
   {
-    return type;
+    return new Polytype(type);
   }
 
   public String toString()
@@ -42,5 +42,5 @@ public class NewExp extends Expression
     return "new "+type;
   }
 
-  Type type;
+  Monotype type;
 }

@@ -12,7 +12,7 @@
 
 // File    : FieldExp.java
 // Created : Mon Jul 05 17:29:46 1999 by bonniot
-//$Modified: Fri Jul 09 15:02:09 1999 by bonniot $
+//$Modified: Tue Jul 13 14:31:34 1999 by bonniot $
 // Description : Access to the field of an expression
 //   the field may be the name of a method
 //   since it can be considered as a field holding a closure
@@ -33,6 +33,8 @@ public class FieldExp extends Expression
   {
     prefix=prefix.resolve(scope,ts);
     access=prefix.memberScope().lookup(field);
+    // If we reach this point, prefix should be a class
+    User.error(access==null,"Field \""+field+"\" not found in class "+prefix.getType().toString/*Base*/());
     return this;
   }
 
@@ -41,7 +43,7 @@ public class FieldExp extends Expression
     return access.isAssignable();
   }
 
-  Type getType()
+  Polytype getType()
   {
     Internal.error(access==null,"getType while access is still null");
     return access.type;

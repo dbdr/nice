@@ -12,12 +12,12 @@
 
 // File    : parser.jj
 // Created : Thu Jul 01 10:27:05 1999 by bonniot
-//$Modified: Fri Jul 09 21:05:36 1999 by bonniot $
+//$Modified: Fri Jul 16 19:29:19 1999 by bonniot $
 // Description : Parseur JavaCC
 
 options {
     JAVA_UNICODE_ESCAPE = true;
-//    DEBUG_LOOKAHEAD=true;
+    //DEBUG_LOOKAHEAD=true;
 }
 
 PARSER_BEGIN(Parser)
@@ -27,12 +27,13 @@ package bossa.parser;
 import java.io.*;
 import java.util.*;
 
+import bossa.util.*;
 import bossa.syntax.*;
 
 public class Parser
 {
-    // it is better to get a Collection than an AST
-    // it is easier to get some definitions from a prolog first
+    // it is better to get a Collection than an AST:
+    // it is thus easier to get some definitions from a prolog first
     public static Collection parse(Reader r) throws ParseException
     {
 	Parser p=new Parser(r);
@@ -320,7 +321,7 @@ LocatedString string():
 }
 {
     t=<IDENT> 
-    { return new LocatedString(t.image,t.beginLine,t.beginColumn,t.endLine,t.endColumn); }
+    { return new LocatedString(t.image,new Location(t.beginLine,t.beginColumn,t.endLine,t.endColumn)); }
 }
 
 Ident identifier():
@@ -366,46 +367,79 @@ double floating():
 /*                          Types                                      */
 /***********************************************************************/
 
+//Monotypes
 
-FunType funtype():
-{
-    Type dom,codom;
-    Collection in;
-}
-{
-    "fun" dom=type() "->" codom=type()
-    { in=new ArrayList();
-      in.add(dom);
-      return new FunType(in,codom);
-    }
-}
-
-Collection types():
-{
-  Collection res=new ArrayList();
-  Type t;
-}
-{
-  t=type() { res.add(t); }
-  ( "," t=type() { res.add(t); } )*
-  { return res; }
-}
-
-Type type():
+IdentType identType():
 {
     LocatedString s;
-    Type ft;
     Collection p=null;
 }
 {
-    LOOKAHEAD(2) ft=funtype() { return ft; }
-  | (
-     s=string() 
-     ( "<" p=types() ">" )?
-     { if(p==null) p=new ArrayList(0);
-       return new IdentType(s,p); }
-    )
-    
+    s=string() 
+    ( "<" p=monotypes() ">" )?
+    { if(p==null) p=new ArrayList(0);
+      return new IdentType(s,p); }
+}
+
+FunType funmonotype():
+{
+    Monotype codom;
+    Collection dom;
+    Constraint cst;
+}
+{
+    "fun" "(" dom=monotypes() ")" "(" codom=monotype() ")"
+    { return new FunType(dom,codom); }
+}
+
+Monotype monotype():
+{
+  Monotype res;
+}
+{
+  (
+  res=identType()
+| res=funmonotype()
+  )
+  { return res; }
+}
+
+Collection monotypes():
+{
+  Collection res=new ArrayList();
+  Monotype t;
+}
+{
+  t=monotype() { res.add(t); }
+  ( "," t=monotype() { res.add(t); } )*
+  { return res; }
+}
+
+
+//Polytypes
+
+Polytype funpolytype():
+{
+    Monotype codom;
+    Collection dom;
+    Constraint cst;
+}
+{
+    "fun" cst=constraint() "(" dom=monotypes() ")" "(" codom=monotype() ")"
+    { return new Polytype(cst,new FunType(dom,codom)); }
+}
+
+Polytype polytype():
+{
+  Polytype res;
+  Constraint cst;
+  Monotype m;
+}
+{
+  cst=constraint()
+  m=monotype() 
+  { res=new Polytype(cst,m); }
+  { return res; }
 }
 
 /***********************************************************************/
@@ -429,65 +463,80 @@ Constraint constraint():
     Collection b;
 }
 {
-    (
+  (
     ( "<" 
       b=binders()
+      ">" 
       { res=new Constraint(b); }
-    ">" )
-    | { res=Constraint.emptyConstraint(); }
     )
-    { return res; }
+    | { res=Constraint.emptyConstraint(); }
+  )
+  { return res; }
 }
 
 /***********************************************************************/
 /*                          Classes                                    */
 /***********************************************************************/
 
-void field(Type t, ClassDefinition c):
+void field(ClassDefinition c):
 {
-    Ident name;
+  Monotype t;
+  Ident name;
 }
 {
-    name=identifier()
-    ";"
-    { c.addField(name,t); }
+  t=monotype()
+  name=identifier()
+  ";"
+  { c.addField(name,t); }
 }
 
-void methodDecl(Type returnType,ClassDefinition c):
+void methodDecl(ClassDefinition c):
 {
-    Ident name;
-    Collection parameters;
-    Constraint cst;
-    MethodDefinition def;
+  Ident name;
+  Collection parameters;
+  Constraint cst;
+  Monotype returnType;
+  MethodDefinition def;
 }
 {
-    name=identifier()
-    cst=constraint()
-    "("
-    parameters=types()
-    ")"
-    ";"
-    { c.addMethod(new MethodDefinition(c,name,cst,returnType,parameters)); }
+  returnType=monotype()
+  name=identifier()
+  cst=constraint()
+  "("
+  parameters=monotypes()
+  ")"
+  ";"
+  { c.addMethod(new MethodDefinition(c,name,cst,returnType,parameters)); }
+}
+
+void extensions(ClassDefinition c):
+{
+    IdentType name;
+}
+{
+    "extends"
+    name=identType() { c.addExtension(name); }
+    ( "," name=identType() { c.addExtension(name); } )*
 }
 
 void implementations(ClassDefinition c):
 {
-    Ident name;
+    IdentType name;
 }
 {
     "implements"
-    name=identifier() { c.addImplementation(name); }
-    ( "," name=identifier() { c.addImplementation(name); } )*
+    name=identType() { c.addImplementation(name); }
+    ( "," name=identType() { c.addImplementation(name); } )*
 }
 
 void abstractions(ClassDefinition c):
 {
-    Ident name;
+    IdentType name;
 }
 {
     "abstracts"
-    name=identifier() { c.addAbstraction(name); }
-    ( "," name=identifier() { c.addAbstraction(name); } )*
+    name=identType() { c.addAbstraction(name); }
+    ( "," name=identType() { c.addAbstraction(name); } )*
 }
 
 ClassDefinition classDefinition():
@@ -495,17 +544,15 @@ ClassDefinition classDefinition():
     ClassDefinition res;
     Ident name;
     Collection parameters;
-    Type t;
 }
 {
     "class"
     name=identifier() 
     parameters=typeSymbols() { res=new ClassDefinition(name,parameters); }
-    ( implementations(res) | abstractions(res) )*
+    ( implementations(res) | abstractions(res) | extensions(res) )*
     "{"
     ( 
-      t=type() /* type is common to both, and this reduces Lookahead */
-      (LOOKAHEAD(2) field(t,res) | LOOKAHEAD(2) methodDecl(t,res))
+      (LOOKAHEAD(3) field(res) | methodDecl(res))
     )*
     "}"
     { return res; }
@@ -523,13 +570,13 @@ InterfaceDefinition interfaceDefinition():
 Collection typeParameters():
 {
     Collection res=new ArrayList();
-    Type t;
+    Monotype t;
 }
 {
     ( "<" 
-      t=type() { res.add(t); }
-      ( "," t=type() { res.add(t); } )*
-    ">" )?
+      t=monotype() { res.add(t); }
+      ( "," t=monotype() { res.add(t); } )*
+    ">" )
     { return res; }
 }
 
@@ -555,14 +602,39 @@ Collection typeSymbols():
     { return res; }
 }
 
+FieldSymb fieldSymb():
+{
+  Ident name;
+  IdentType type;
+}
+{
+  type=identType()
+  name=identifier()
+  { return new FieldSymb(name,type,null); }
+}
+
+Collection monoSymbols():
+{
+    Collection res=new ArrayList();
+    FieldSymb name;
+}
+{
+    (
+      name=fieldSymb() { res.add(name); }
+      ( "," name=fieldSymb() { res.add(name); } )*
+    )?
+    { return res; }
+}
+
 Pattern pattern(Ident name):
 {
     Ident i;
-    Collection tp;
+    Collection tp=null;
 }
 {
-    "@" i=identifier() tp=typeParameters() { return new Pattern(name,i,tp); }
-    | { return new Pattern(name); }
+    "@" i=identifier() [ tp=typeParameters() ] 
+    { return new Pattern(name,i,tp); }
+  | { return new Pattern(name); }
 }
 
 MethodBodyDefinition methodBodyDefinition():
@@ -576,7 +648,7 @@ MethodBodyDefinition methodBodyDefinition():
 {
     name=identifier()
     tp=typeSymbols()
-    p=pattern(new Ident(new LocatedString("this",0,0,0,0))) 
+    p=pattern(new Ident(new LocatedString("this",new Location(0,0,0,0)))) 
       { parameters.add(p); }
     "("
     ( 
@@ -593,17 +665,17 @@ MethodBodyDefinition methodBodyDefinition():
 MethodDefinition methodDefinition():
 {
     Ident name;
-    Type returnType;
+    Monotype returnType;
     Collection parameters;
     Constraint cst;
     MethodDefinition res;
 }
 {
-    returnType=type()
+    returnType=monotype()
     name=identifier()
     cst=constraint()
     "("
-    ( parameters=types() | { parameters=new ArrayList(); } )
+    ( parameters=monotypes() | { parameters=new ArrayList(); } )
     ")"
     ";"
     { return new MethodDefinition(name,cst,returnType,parameters); }
@@ -614,13 +686,16 @@ Definition definition():
     Definition res;
 }
 {
-    (
-     res=classDefinition()
-     | res=interfaceDefinition()
-     | LOOKAHEAD(methodBodyDefinition()) res=methodBodyDefinition()
-     | res=methodDefinition()
-    )
-    { return res; }
+  (
+    res=classDefinition()
+  | 
+    res=interfaceDefinition()
+  | 
+    LOOKAHEAD(methodDefinition()) res=methodDefinition()
+  | 
+    res=methodBodyDefinition()
+  )
+  { return res; }
 }
 
 Collection definitions():
@@ -678,36 +753,55 @@ IdentExp identExp():
 
 NewExp newExp():
 {
-  Type t;
+  Monotype t;
 }
 {
-  "new" t=type() { return new NewExp(t); }
+  "new" t=monotype() "(" ")" { return new NewExp(t); }
 }
 
 CallExp callExp(Expression prefix):
 {
-  Collection typeParameters=null,parameters;
+  Collection parameters;
 }
 {
-  ( "<" typeParameters=types() ">" )?
   "("
   parameters=expressions()
   ")"
-  { return new CallExp(prefix,typeParameters,parameters); }
+  { return new CallExp(prefix,parameters); }
 }
 
 Expression computedExp(Expression prefix):
 {
   Expression res=prefix;
+  Collection tp;
   Ident name;
 }
 {
   (
-  "." name=identifier()
-  { res=new FieldExp(res,name); }
-| res=callExp(res)
+    "." name=identifier()
+    { res=new FieldExp(res,name); }
+  | 
+    tp=typeParameters()
+    { res=new InstantiateExp(res,new TypeParameters(tp)); }
+  |
+    res=callExp(res)
   )*
   { return res; }
+}
+
+FunExp funExp():
+{
+  Collection formals;
+  Constraint cst;
+  Collection body;
+}
+{
+  "fun" 
+  cst=constraint()
+  "(" formals=monoSymbols() ")"
+  "=>"
+  "{" body=statements() "}"
+  { return new FunExp(cst,formals,body); }
 }
 
 Expression expression():
@@ -718,8 +812,12 @@ Expression expression():
 {
   (
   res=constantExp()
-| res=newExp()
-| e=identExp() res=computedExp(e)
+| 
+  res=newExp()
+|
+  res=funExp()
+| 
+  e=identExp() res=computedExp(e)
   )
   { return res; }
 }
@@ -754,12 +852,12 @@ AffectationStmt affectation():
 
 LocalDeclarationStmt localDeclaration():
 {
-  Type t;
+  Polytype t;
   Ident id;
   Expression e=null;
 }
 {
-  t=type()
+  t=polytype()
   id=identifier()
   [ "=" e=expression() ]
   { return new LocalDeclarationStmt(id,t,e); }
@@ -771,11 +869,14 @@ Statement statement():
   Expression e;
 }
 {
-  LOOKAHEAD([ "final" ] type() identifier())
+  "return" e=expression() ";" { return new ReturnStmt(e); }
+|
+  LOOKAHEAD([ "final" ] polytype() identifier())
   res=localDeclaration() ";" {return res; }
-| LOOKAHEAD(expression() ";") e=expression() ";" { return new ExpressionStmt(e); }
-| LOOKAHEAD(expression() "=") res=affectation() ";" { return res; }
-| "return" e=expression() ";" { return new ReturnStmt(e); }
+| 
+  LOOKAHEAD(expression() ";") e=expression() ";" { return new ExpressionStmt(e); }
+| 
+  res=affectation() ";" { return res; }
 }
 
 Collection statements():

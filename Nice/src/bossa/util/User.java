@@ -12,13 +12,22 @@
 
 // File    : User.java
 // Created : Wed Jul 07 18:20:58 1999 by bonniot
-//$Modified: Fri Jul 09 19:26:31 1999 by bonniot $
+//$Modified: Tue Jul 13 11:58:39 1999 by bonniot $
 // Description : Messages for the user
 
 package bossa.util;
 
 public class User
 {
+  public static void error(boolean condition, Location loc, String message)
+  {
+    if(condition)
+      {
+	System.out.println(loc+message);
+	System.exit(1);
+      }
+  }
+
   public static void error(boolean condition, String message)
   {
     if(condition)

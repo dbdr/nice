@@ -12,7 +12,7 @@
 
 // File    : MethodBodyDefinition.java
 // Created : Thu Jul 01 18:12:46 1999 by bonniot
-//$Modified: Fri Jul 09 20:53:14 1999 by bonniot $
+//$Modified: Fri Jul 16 19:27:10 1999 by bonniot $
 // Description : Abstract syntax for a method body
 
 package bossa.syntax;
@@ -45,8 +45,8 @@ public class MethodBodyDefinition extends Node implements Definition
 		   "It needs "+types.size()+
 		   ", not "+names.size()
 		   );
-	res.add(new VarSymbol(((Pattern)n.next()).name,
-			      (Type)t.next()));
+	res.add(new LocalSymb(((Pattern)n.next()).name,
+			      new Polytype(definition.type.constraint,(Monotype)t.next())));
       }
     User.error(t.hasNext(),
 	       "Method body "+this.name+" has not enough parameters");

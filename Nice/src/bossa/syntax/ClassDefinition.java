@@ -12,7 +12,7 @@
 
 // File    : ClassDefinition.java
 // Created : Thu Jul 01 11:25:14 1999 by bonniot
-//$Modified: Fri Jul 09 20:40:33 1999 by bonniot $
+//$Modified: Fri Jul 16 19:20:44 1999 by bonniot $
 // Description : Abstract syntax for a class definition
 
 package bossa.syntax;
@@ -25,12 +25,18 @@ public class ClassDefinition extends TypeSymbol implements Definition
   public ClassDefinition(Ident name, Collection typeParameters)
   {
     super(name);
-    this.type=new ClassType(this);
+    this.tc=new TypeConstructor(this);
     this.typeParameters=typeParameters;
+    extensions=new ArrayList();
     implementations=new ArrayList();
     abstractions=new ArrayList();
     methods=new ArrayList();
     fields=new ArrayList();
+  }
+
+  Constraint getConstraint()
+  {
+    return new Constraint(typeParameters);
   }
 
   boolean isAssignable()
@@ -48,22 +54,35 @@ public class ClassDefinition extends TypeSymbol implements Definition
 
   void resolveScope()
   {
+    extensions=Monotype.resolve(typeScope,extensions);
+    implementations=Monotype.resolve(typeScope,implementations);
+    abstractions=Monotype.resolve(typeScope,abstractions);
     resolveScope(fields);
   }
 
-  public void addImplementation(Ident name)
+  VarScope memberScope()
+  {
+    return VarScope.makeScope(null,fields);
+  }
+
+  public void addExtension(IdentType name)
+  {
+    extensions.add(name);
+  }
+
+  public void addImplementation(IdentType name)
   {
     implementations.add(name);
   }
 
-  public void addAbstraction(Ident name)
+  public void addAbstraction(IdentType name)
   {
     abstractions.add(name);
   }
 
-  public void addField(Ident name, Type type)
+  public void addField(Ident name, Monotype type)
   {
-    fields.add(new VarSymbol(name,type));
+    fields.add(new FieldSymb(name,type,this));
   }
 
   public void addMethod(MethodDefinition m)
@@ -77,6 +96,7 @@ public class ClassDefinition extends TypeSymbol implements Definition
       "class "
       + name.toString()
       + Util.map("<",", ",">",typeParameters)
+      + Util.map(" extends ",", ","",extensions)
       + Util.map(" implements ",", ","",implementations)
       + Util.map(" abstract ",", ","",abstractions)
       + " {\n"
@@ -91,10 +111,11 @@ public class ClassDefinition extends TypeSymbol implements Definition
     return methods;
   }
 
-  Type type;
+  TypeConstructor tc;
   private Collection /* of TypeSymbol */ typeParameters;
-  private Collection implementations;
-  private Collection abstractions;
+  private Collection /* of IdentType */ extensions;
+  private Collection /* of IdentType */ implementations;
+  private Collection /* of IdentType */ abstractions;
   private Collection /* of VarSymbol */ fields;
   private Collection methods;
 }

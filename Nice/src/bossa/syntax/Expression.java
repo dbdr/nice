@@ -12,7 +12,7 @@
 
 // File    : Expression.java
 // Created : Mon Jul 05 16:25:02 1999 by bonniot
-//$Modified: Fri Jul 09 12:14:27 1999 by bonniot $
+//$Modified: Tue Jul 13 14:27:17 1999 by bonniot $
 // Description : 
 
 package bossa.syntax;
@@ -54,13 +54,14 @@ public abstract class Expression
   }
 
   /** returns the static type of the expression */
-  abstract Type getType();
+  abstract Polytype getType();
 
   /** return the scope in which fields may be found */
   VarScope memberScope()
   {
-    VarScope res=getType().memberScope();
-    User.error(res==null,this+" is not a record");
+    Polytype t=getType();
+    VarScope res=t.memberScope();
+    User.error(res==null,this+" is not a record, it has type "+t);
     return res;
   }
 

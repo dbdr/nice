@@ -12,19 +12,19 @@
 
 // File    : VarSymbol.java
 // Created : Wed Jul 07 16:56:06 1999 by bonniot
-//$Modified: Fri Jul 09 20:55:04 1999 by bonniot $
+//$Modified: Fri Jul 16 19:18:31 1999 by bonniot $
 // Description : A variable (local, field, parameter)
 
 package bossa.syntax;
 
+import java.util.*;
 import bossa.util.*;
 
-public class VarSymbol extends Node
+abstract class VarSymbol extends Node
 {
-  public VarSymbol(Ident name, Type type)
+  public VarSymbol(Ident name)
   {
     this.name=name;
-    this.type=type;
   }
 
   public boolean hasName(Ident i)
@@ -37,16 +37,14 @@ public class VarSymbol extends Node
     return true;
   }
 
-  void resolveScope()
-  {
-    type=type.resolve(typeScope);
-  }
+  abstract Polytype getType();
 
-  public String toString()
+  static void resolveScope(Collection c)
   {
-    return type+" "+name;
+    Iterator i=c.iterator();
+    while(i.hasNext())
+      ((VarSymbol)i.next()).resolveScope();
   }
 
   Ident name;
-  Type type;
 }

@@ -135,7 +135,6 @@ public class Arguments
   
   PackageExp packageExp()
   {
-    noOverloading();
     // case where the parameters is a package, or a package prefix
     if(arguments.length == 1)
       {

@@ -233,7 +233,7 @@ public class CallExp extends Expression
 
   private boolean overloadingResolved;
   
-  private void resolveOverloading()
+  void resolveOverloading()
   {
     // do not resolve twice
     if(overloadingResolved)

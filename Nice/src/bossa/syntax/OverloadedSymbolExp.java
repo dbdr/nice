@@ -126,8 +126,7 @@ public class OverloadedSymbolExp extends Expression
 
     removed.clear();
 
-    int sym = 0;
-    for(Iterator i = symbols.iterator(); i.hasNext(); sym++)
+    for (Iterator i = symbols.iterator(); i.hasNext(); )
       {
 	VarSymbol s = (VarSymbol) i.next();
 	
@@ -224,15 +223,14 @@ public class OverloadedSymbolExp extends Expression
 	return uniqueExpression(s, symType);
       }
 
-    if (fieldAccesses.size() != 0)
-      return accessToFieldInThis(fieldAccesses);
-
-    if(symbols.size()==0)
-      User.error(this, 
-		 "No alternative has expected type "+expectedType);
-    
-    releaseAllClonedTypes();
-    throw new AmbiguityError();
+    try {
+      return givePriorityToFields(fieldAccesses, 
+                                  "No symbol named " + ident + 
+                                  " has expected type " + expectedType);
+    }
+    finally {
+      releaseAllClonedTypes();
+    }
   }
 
   private void releaseAllClonedTypes()
@@ -252,10 +250,31 @@ public class OverloadedSymbolExp extends Expression
     if(symbols.size()==1)
       return uniqueExpression();
 
-    // Field access has precedence over method call.
-    List fieldAccesses = filterFieldAccesses();
+    return givePriorityToFields
+      (filterFieldAccesses(),
+       "No variable or field in this class has name " + ident);
+  }
+
+  private Expression givePriorityToFields
+    (List fieldAccesses, String errorMessage)
+  {
     if (fieldAccesses.size() != 0)
-      return accessToFieldInThis(fieldAccesses);
+      try {
+        CallExp res = new CallExp
+          (new OverloadedSymbolExp(fieldAccesses, ident),
+           Arguments.noArguments());
+        res.resolveOverloading();
+        return res;
+      }
+      catch (UserError e) {
+        symbols.removeAll(filterFieldAccesses());
+
+        if (symbols.size() == 0)
+          User.error(this, errorMessage);
+
+        if (symbols.size() == 1)
+          return uniqueExpression();
+      }
 
     throw new AmbiguityError();
   }
@@ -270,12 +289,6 @@ public class OverloadedSymbolExp extends Expression
 	  res.add(sym);
       }
     return res;
-  }
-
-  private Expression accessToFieldInThis(List fieldAccesses)
-  {
-    return new CallExp(new OverloadedSymbolExp(fieldAccesses, ident),
-		       Arguments.noArguments());
   }
 
   /**

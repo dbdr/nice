@@ -1,0 +1,99 @@
+/// COMMENT Special handling of class fields during overloading resolution.
+
+/// PASS
+  let i = x;
+  assert(i==1);
+  /// Toplevel
+  let int x = 1;
+  class A {
+    int x = 0;
+  }
+
+/// PASS
+  new A().foo();
+  /// Toplevel
+  let int x = 1;
+  class A {
+    int x = 0;
+    void foo() {
+    let i = x;
+    assert(i==0);
+    }
+  }
+
+/// PASS
+  let i = foo();
+  assert(i==1);
+  /// Toplevel
+  class X {
+    int foo = 0;
+  }
+  int foo() = 1;
+
+/// PASS
+  let i = foo;
+  assert(i==1);
+  /// Toplevel
+  class X {
+    int foo = 0;
+  }
+  var int foo = 1;
+
+/// PASS
+  new A().foo();
+  ///Toplevel
+  class A {
+    int x = 1;
+    void foo() {
+      let i = x;
+      assert(i==1);
+    }
+  }
+  class B {
+    int x = 0;
+  }
+
+/// FAIL
+  let i = x;
+  /// Toplevel
+  class A {
+    int x;
+  }
+
+/// PASS
+  new A().foo();
+  /// Toplevel
+  interface I {}
+  class A implements I {
+    int x = 0;
+    void foo() {
+      let z = x;
+      assert(z==0);
+    }
+  }
+  class B implements I {
+   int x = 1;
+  }
+
+/// PASS
+  /// Toplevel
+class A
+{
+  String[] overloaded;
+}
+
+class B
+{
+  String[] overloaded;
+  int next() = overloaded.length;
+}
+
+/// PASS
+let A->int i = x;
+assert i(new A()) == 1;
+
+  /// Toplevel
+let A->int x = A a => 1;
+class A {
+  int x = 0;
+}

@@ -236,10 +236,7 @@ public class Arguments
       {
 	Object noMatch = i.next();
         if (noMatch instanceof FunSymbol)
-        {
           argnames.retainAll(noMatchByName(((FunSymbol)noMatch).parameters));
-          User.warning(Util.map("", ", ", "", noMatchByName(((FunSymbol)noMatch).parameters))); 
-        }
       }
       if (!argnames.isEmpty())
 	return " has an argument named " + argnames.get(0);

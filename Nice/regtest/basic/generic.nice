@@ -1,0 +1,20 @@
+package regtest.basic;
+
+class Parameterized<T>
+{
+  T x;
+
+  void setX_fun(T value)
+  {
+    T tmp = value;
+    this.x = tmp;
+  }
+
+  void setX_meth(T value);
+  setX_meth(val)
+  {
+    T tmp = value;
+    this.x = tmp;
+  }
+}
+

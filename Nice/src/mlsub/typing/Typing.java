@@ -12,7 +12,7 @@
 
 // File    : Typing.java
 // Created : Tue Jul 20 11:57:17 1999 by bonniot
-//$Modified: Fri Aug 04 14:09:54 2000 by Daniel Bonniot $
+//$Modified: Tue Aug 08 16:39:47 2000 by Daniel Bonniot $
 
 package mlsub.typing;
 
@@ -499,6 +499,26 @@ public final class Typing
       return false;
 
     return ((Engine.Constraint) t1.getKind()).isLeq(t1,t2);
+  }
+  
+  /**
+     Find a type constructor greater than the parameter
+     that can exist at runtime (isConcrete() is true).
+  */
+  public static TypeConstructor lowestRigidSuperTC(TypeConstructor tc)
+  {
+    Engine.Constraint cst = (Engine.Constraint) tc.getKind();
+    
+    if (!cst.isValid(tc))
+      // we are not in the context for TC anymore
+      // be careful to call lowestRigidSuperTC when the context is appropriate.
+      {
+	System.out.println
+	  ("Warning: lowestRigidSuperTC called inapropriately for " + tc);
+	return null;
+      }
+    
+    return (TypeConstructor) cst.lowestRigidSuperElement(tc);
   }
   
   /****************************************************************

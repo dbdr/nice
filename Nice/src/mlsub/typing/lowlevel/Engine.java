@@ -12,7 +12,7 @@
 
 // File    : Engine.java
 // Created : Tue Jul 27 15:34:53 1999 by bonniot
-//$Modified: Wed Aug 02 18:09:44 2000 by Daniel Bonniot $
+//$Modified: Tue Aug 08 15:01:38 2000 by Daniel Bonniot $
 
 package mlsub.typing.lowlevel;
 
@@ -587,6 +587,12 @@ public abstract class Engine
     {
       return "Constraint for "+associatedKind+":\n"+k0.toString();
     }
+
+    public final boolean isValid(Element e)
+    {
+      int id = e.getId();
+      return id>=0 && id<k0.size();
+    }
     
     public final void leq(Element e1, Element e2)
       throws Unsatisfiable
@@ -613,6 +619,20 @@ public abstract class Engine
 	k0.leq(e1.getId(),e2.getId()); 
     }
 
+    public Element lowestRigidSuperElement(Element e)
+    {
+      int id = e.getId();
+      int res = -1;
+      
+      for (int i = 0; i < k0.initialContextSize(); i++)
+	// we use wasEntered, since id is assumed not to be rigid
+	// i and res are rigid, so we use isLeq
+	if (k0.wasEntered(id, i) && (res == -1 || k0.isLeq(i, res)))
+	  res = i;
+      
+      return getElement(res);
+    }
+    
     void mark()
     {
       k0.mark();

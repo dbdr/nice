@@ -12,7 +12,7 @@
 
 // File    : Constraint.java
 // Created : Fri Jun 02 17:02:45 2000 by Daniel Bonniot
-//$Modified: Fri Jun 16 15:06:11 2000 by Daniel Bonniot $
+//$Modified: Tue Aug 08 14:19:53 2000 by Daniel Bonniot $
 
 package mlsub.typing;
 
@@ -227,7 +227,7 @@ public final class Constraint
       c.assert(true);
   }
   
-  void assert(boolean implementTop)
+  public void assert(boolean implementTop)
     throws TypingEx
   {
     if(binders!=null) Typing.introduceTypeSymbols(binders);

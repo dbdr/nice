@@ -12,7 +12,7 @@
 
 // File    : TupleExp.java
 // Created : Wed Aug 02 19:49:23 2000 by Daniel Bonniot
-//$Modified: Mon Aug 07 17:41:00 2000 by Daniel Bonniot $
+//$Modified: Tue Aug 08 16:01:30 2000 by Daniel Bonniot $
 
 package bossa.syntax;
 
@@ -60,11 +60,14 @@ public class TupleExp extends bossa.syntax.Expression
     // should create a new <tt>and</tt> method without the last dummy parameters
     Constraint cst = Constraint.and(Polytype.getConstraint(types), 
 				    null, null);
-    this.tupleType = new TupleType(Polytype.getMonotype(types));
+    TupleType tupleType = new TupleType(Polytype.getMonotype(types));
+    nice.tools.code.Types.setBytecodeType(tupleType);
+    this.componentType = nice.tools.code.Types.componentType(tupleType);
+    
     type = new Polytype(cst, tupleType);
   }
 
-  private TupleType tupleType;
+  private Type componentType;
   
   /****************************************************************
    * Code genaration
@@ -73,25 +76,24 @@ public class TupleExp extends bossa.syntax.Expression
   protected gnu.expr.Expression compile()
   {
     int len = expressions.size();
-    Type elementType = nice.tools.code.Types.componentType(tupleType);
     
     // The array is not a special array, since it has nothing to
     // do with collections.
     
     Expression arrayVal = 
-      new ApplyExp(new gnu.kawa.reflect.ArrayNew(elementType),
+      new ApplyExp(new gnu.kawa.reflect.ArrayNew(componentType),
 		   new Expression[]{intExp(len)});
 
     LetExp let = new LetExp(new Expression[]{arrayVal});
     let.outer = Statement.currentScopeExp;
     Declaration arrayDecl = let.addDeclaration("tuple", 
-					       ArrayType.make(elementType));
+					       ArrayType.make(componentType));
     Expression array = new ReferenceExp(arrayDecl);
     
     Expression[] stmts = new Expression[1 + len];
     for (int i=0; i<len; i++)
       stmts[i] = 
-	new ApplyExp(new gnu.kawa.reflect.ArraySet(elementType),
+	new ApplyExp(new gnu.kawa.reflect.ArraySet(componentType),
 		     new Expression[]{
 		       array, intExp(i),
 		       ((bossa.syntax.Expression) expressions.get(i))
@@ -108,7 +110,6 @@ public class TupleExp extends bossa.syntax.Expression
   gnu.expr.Expression compileAssign(gnu.expr.Expression array)
   {
     int len = expressions.size();
-    Type elementType = nice.tools.code.Types.componentType(tupleType);
 
     LetExp let = null;
     Expression tupleExp;
@@ -121,7 +122,7 @@ public class TupleExp extends bossa.syntax.Expression
 	let = new LetExp(new Expression[]{array});
 	let.outer = Statement.currentScopeExp;
 	Declaration tupleDecl = let.addDeclaration
-	  ("tupleRef", ArrayType.make(elementType));
+	  ("tupleRef", ArrayType.make(componentType));
 	tupleExp = new ReferenceExp(tupleDecl);
       }
     else
@@ -129,11 +130,11 @@ public class TupleExp extends bossa.syntax.Expression
     
     Expression[] stmts = new Expression[len];
     for (int i=0; i<len; i++)
-      stmts[i] = ((bossa.syntax.Expression) expressions.get(i)).
-	compileAssign(new ApplyExp(new gnu.kawa.reflect.ArrayGet(elementType),
-				   new Expression[]{
-				     tupleExp, 
-				     intExp(i)}));
+      stmts[i] = ((bossa.syntax.Expression) expressions.get(i)).compileAssign
+	(new ApplyExp(new gnu.kawa.reflect.ArrayGet(componentType),
+		      new Expression[]{
+			tupleExp, 
+			intExp(i)}));
     
     if (let != null)
       {

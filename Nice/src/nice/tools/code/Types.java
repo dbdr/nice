@@ -12,7 +12,7 @@
 
 // File    : Types.java
 // Created : Mon Jun 05 11:28:10 2000 by Daniel Bonniot
-//$Modified: Mon Aug 07 17:57:42 2000 by Daniel Bonniot $
+//$Modified: Tue Aug 08 16:12:52 2000 by Daniel Bonniot $
 
 package nice.tools.code;
 
@@ -52,24 +52,70 @@ public final class Types
   public static Type javaType(TypeConstructor tc)
   {
     Type res = get(tc);
-    if(res==null)
+    if (res == null)
       return gnu.bytecode.Type.pointer_type;
     else
       return res;
+  }
+  
+  /**
+     Prepare <tt>m</tt> to be given a precise bytecode type if possible.
+     
+     Be careful: 
+     Type components of <tt>m</tt> must be valid.
+     That is, englobing constraints must be asserted.
+  */
+  public static void setBytecodeType(Monotype m)
+  {
+    m = m.equivalent();
+    
+    if (m instanceof TupleType)
+      setBytecodeType(((TupleType) m).getComponents());
+    
+    if (!(m instanceof MonotypeConstructor))
+      return;
+
+    TypeConstructor tc = ((MonotypeConstructor) m).getTC();
+
+    if (Types.get(tc) != null)
+      // OK, nothing to do
+      return;
+    
+    TypeConstructor rigidTC = Typing.lowestRigidSuperTC(tc);
+    if (rigidTC == null)
+      // We don't know
+      return;
+    
+    Types.set(tc, Types.get(rigidTC));
+  }
+
+  /**
+     Iter setBytecodeType.
+  */
+  public static void setBytecodeType(Monotype[] ms)
+  {
+    for (int i = 0; i<ms.length; i++)
+      setBytecodeType(ms[i]);
   }
   
   /****************************************************************
    * Mapping monotypes to java types
    ****************************************************************/
 
-  public static Type javaType(mlsub.typing.Monotype m)
+  /**
+     Return the bytecode type used to represent objects of this type.
+     
+     You might want use the {@link #setBytecodeType(mlsub.typing.Monotype)}
+     method before to make result more precise.
+   */
+  public static Type javaType(Monotype m)
   {
     m = m.equivalent();
 
-    if (m instanceof mlsub.typing.TupleType)
-      return ArrayType.make(componentType((mlsub.typing.TupleType) m));
+    if (m instanceof TupleType)
+      return ArrayType.make(componentType((TupleType) m));
     
-    if (!(m instanceof mlsub.typing.MonotypeConstructor))
+    if (!(m instanceof MonotypeConstructor))
       return gnu.bytecode.Type.pointer_type;
     
     MonotypeConstructor mc = (MonotypeConstructor) m;
@@ -80,7 +126,7 @@ public final class Types
       return javaType(tc);
   }
   
-  public static Type[] javaType(mlsub.typing.Monotype[] ms)
+  public static Type[] javaType(Monotype[] ms)
   {
     Type[] res = new Type[ms.length];
     for(int i=0; i<ms.length; i++)
@@ -88,17 +134,17 @@ public final class Types
     return res;
   }
 
-  public static Type javaType(mlsub.typing.Polytype t)
+  public static Type javaType(Polytype t)
   {
     return javaType(t.getMonotype());
   }
 
   /** Returns the common bytecode type used for elements of this tuple. */
-  public static Type componentType(mlsub.typing.TupleType t)
+  public static Type componentType(TupleType t)
   {
     // would work if we write a better javaType function that works for type variables too.
-    //return lowestCommonSuperType(javaType(t.getComponents()));
-    return Type.pointer_type;
+    return lowestCommonSuperType(javaType(t.getComponents()));
+    //return Type.pointer_type;
   }
   
   private static Type lowestCommonSuperType(Type[] types)
@@ -142,9 +188,9 @@ public final class Types
       return ConstantExp.doubleType;
 
     if (javaType instanceof ArrayType)
-      return new mlsub.typing.MonotypeConstructor
+      return new MonotypeConstructor
 	(ConstantExp.arrayTC, 
-	 new mlsub.typing.Monotype[]
+	 new Monotype[]
 	  {getMonotype(((ArrayType) javaType).getComponentType())});
     
     return getMonotype(javaType.getName());

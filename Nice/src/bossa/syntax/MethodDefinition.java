@@ -12,12 +12,13 @@
 
 // File    : MethodDefinition.java
 // Created : Thu Jul 01 18:12:46 1999 by bonniot
-//$Modified: Mon Aug 07 15:31:47 2000 by Daniel Bonniot $
+//$Modified: Tue Aug 08 15:58:08 2000 by Daniel Bonniot $
 
 package bossa.syntax;
 
 import bossa.util.*;
 import mlsub.typing.*;
+import nice.tools.code.Types;
 
 import gnu.bytecode.*;
 import gnu.expr.*;
@@ -206,8 +207,38 @@ public class MethodDefinition extends Definition
 
   void typecheck()
   {
+    // what we do here is equivalent to getType().checkWellFormedness();
+    // except we also want to find the bytecode types when
+    // the constraint is asserted
+
+    // see getType().checkWellFormedness
+
+    mlsub.typing.Polytype type = getType();
+    
+    if (!mlsub.typing.Constraint.hasBinders(type.getConstraint()))
+      return;
+    
     try{
-      getType().checkWellFormedness();
+      Typing.enter();
+    
+      try{
+	type.getConstraint().assert(false);
+
+	if (this instanceof JavaMethodDefinition)
+	  // No need to find bytecode types in that case, they are given
+	  /// code in 'finally' is executed after 'return' ;-)
+	  return;
+    
+	// set bytecode types for type variables
+	mlsub.typing.FunType ft = 
+	  (mlsub.typing.FunType) type.getMonotype();
+
+	Types.setBytecodeType(ft.domain());
+	Types.setBytecodeType(ft.codomain());
+      }
+      finally{
+	Typing.leave();
+      }
     }
     catch(TypingEx e){
       User.error(this,
@@ -263,12 +294,12 @@ public class MethodDefinition extends Definition
   
   public gnu.bytecode.Type javaReturnType()
   {
-    return nice.tools.code.Types.javaType(getType().codomain());
+    return Types.javaType(getType().codomain());
   }
   
   public gnu.bytecode.Type[] javaArgTypes()
   {
-    return nice.tools.code.Types.javaType(getType().domain());
+    return Types.javaType(getType().domain());
   }
   
   public void compile()

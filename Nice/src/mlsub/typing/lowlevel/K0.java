@@ -108,6 +108,11 @@ public final class K0 {
    **/
   private int m0;
 
+  int initialContextSize()
+  {
+    return m0;
+  }
+  
   /**
    * Returns an index that is guaranteed to be greater than any rigid index
    * and less or equal to any non-rigid index.
@@ -250,7 +255,7 @@ public final class K0 {
     // enumerate the (x, y) where x < y and at least one of x or y is >= m0
     for (int x = 0; x < n; x++) {
       if (component.get(x)) {
-        for (int y = (x < m0 ? x+1 /*m0*/ : x+1); y < n; y++) {
+        for (int y = (x < m0 ? m0 : x+1); y < n; y++) {
           if (component.get(y)) {
             if (C.get(y, x)) {
               sb.append(sep).append(ineqToString(y, x));
@@ -1085,7 +1090,7 @@ public final class K0 {
       }
   }
   
-  private void computeArrows(BitMatrix Leq)
+  private void computeArrows(BitMatrix leq)
   {
     for(int iid=0; iid<nInterfaces(); iid++)
       {
@@ -1101,7 +1106,7 @@ public final class K0 {
 	      {
 		// The approximation on below m is fixed
 		for(int node=m;node<n;node++)
-		  if(Leq.get(node,x))
+		  if(leq.get(node,x))
 		    {
 		      i.setApprox(node,approx);
 		      if(debugK0) 
@@ -1117,7 +1122,7 @@ public final class K0 {
   /**
    * Saturate the constraint under the Abs axiom.
    */
-  private void saturateAbs(BitMatrix Leq)
+  private void saturateAbs(BitMatrix leq)
     throws Unsatisfiable
   {
     boolean changed;
@@ -1137,9 +1142,9 @@ public final class K0 {
 		  // is implementors OK ?
 		  // or should not we compute rigidImplementors first ?
 		  if(i.implementors.get(p)
-		     && Leq.get(node,p))
+		     && leq.get(node,p))
 		    if(this.isRigid(p))
-		      if(!Leq.get(n1,p))
+		      if(!leq.get(n1,p))
 			throw new LowlevelUnsatisfiable
 			  ("saturateAbs: there should be "+
 			   indexToString(n1)+" <: "+
@@ -1149,7 +1154,7 @@ public final class K0 {
 			   this);
 		      else ;
 		    else 
-		      if(!Leq.get(n1,p))
+		      if(!leq.get(n1,p))
 			 {
 			   if(debugK0) 
 			     S.dbg.println("Abs rule applied : "+
@@ -1158,13 +1163,13 @@ public final class K0 {
 					   " for interface "+interfaceToString(iid));
 			   C .set(n1,p);
 			   Ct.set(p,n1);
-			   Leq.set(n1,p);
+			   leq.set(n1,p);
 			   changed=true;
 			 }
 	  }
 
 	if(changed)
-	  Leq.closure();
+	  leq.closure();
       }
     while(changed);
   }
@@ -1256,11 +1261,11 @@ public final class K0 {
   private void prepareConstraint() throws Unsatisfiable {
     saturateOrigin();
     //collapseMinimal();
-    BitMatrix Leq = (BitMatrix)C.clone();
-    Leq.closure();
-    computeArrows(Leq);
-    saturateAbs(Leq);
-    //condense(Leq);
+    BitMatrix leq = (BitMatrix)C.clone();
+    leq.closure();
+    computeArrows(leq);
+    saturateAbs(leq);
+    //condense(leq);
   }
 
 
@@ -2271,6 +2276,13 @@ public final class K0 {
    **/
   public boolean isLeq(int i1, int i2) {
     return R.get(i1, i2);
+  }
+
+  /**
+   * Test if a constraint i1 <: i2 was explicitely entered.
+   **/
+  public boolean wasEntered(int i1, int i2) {
+    return C.get(i1, i2);
   }
 
   /***********************************************************************

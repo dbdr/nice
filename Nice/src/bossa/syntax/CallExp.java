@@ -241,7 +241,8 @@ public class CallExp extends Expression
        However, it is probably not perfect. setByteCodetype should be usefull.
        FIXME and test me with regtest case.
     */
-    //type.simplify();
+    type.simplify();
+    //Types.setBytecodeType(type);
   }
 
   boolean isAssignable()
@@ -277,9 +278,9 @@ public class CallExp extends Expression
     if ("notNull".equals(function.toString()))
       {
 	expectedType = Types.javaType(getType());
-	System.out.println(this + ", " + res.getType() + "; " + expectedType + "^" + getType());
+	//System.out.println(this + ", " + res.getType() + "; " + expectedType + "^" + getType());
 	expectedType = Types.javaType(getType());
-	System.out.println(this + ", " + res.getType() + "; " + expectedType + "^" + getType());
+	//System.out.println(this + ", " + res.getType() + "; " + expectedType + "^" + getType());
       }
     expectedType = Types.javaType(getType());
     return EnsureTypeProc.ensure(res, expectedType);

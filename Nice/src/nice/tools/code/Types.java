@@ -112,7 +112,29 @@ public final class Types
     for (int i = 0; i<ms.length; i++)
       setBytecodeType(ms[i]);
   }
-  
+
+  public static void setBytecodeType(Polytype t)
+  {
+    Constraint cst = t.getConstraint();
+    if (Constraint.hasBinders(cst))
+      {
+	Typing.enter();
+	try{
+	  Constraint.assert(cst);
+	  setBytecodeType(t.getMonotype());
+	}
+	catch(TypingEx e) {}
+	finally{
+	  try{
+	    Typing.leave();
+	  }
+	  catch(TypingEx e) {}
+	}
+      }
+    else
+      setBytecodeType(t.getMonotype());
+  }
+
   /****************************************************************
    * Mapping monotypes to java types
    ****************************************************************/

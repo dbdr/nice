@@ -43,16 +43,6 @@ public abstract class CustomConstructor extends UserOperator
 	  returnType(className, cst), params, Contract.noContract);
   }
 
-  CustomConstructor(NiceClass def, FormalParameters parameters)
-  {
-    super(new LocatedString("<init>", def.definition.location()), 
-          def.definition.classConstraint == null ? 
-          null : def.definition.classConstraint.shallowClone(), 
-	  returnType(def.definition), parameters, 
-          Contract.noContract);
-    classe = def;
-  }
-
   void addConstructorCallSymbol()
   {
     mlsub.typing.Polytype type = new mlsub.typing.Polytype
@@ -89,13 +79,6 @@ public abstract class CustomConstructor extends UserOperator
       (classe, new TypeParameters(params), classe.location());
     res.nullness = Monotype.sure;
     return res;
-  }
-
-  private static Monotype returnType(ClassDefinition def)
-  {
-    mlsub.typing.Monotype res = Monotype.sure
-      (new mlsub.typing.MonotypeConstructor(def.tc, def.getTypeParameters()));
-    return Monotype.create(res);
   }
 
   public void printInterface(java.io.PrintWriter s)
@@ -218,83 +201,5 @@ public abstract class CustomConstructor extends UserOperator
     Statement body;
     gnu.expr.Expression initializationCode;
     gnu.expr.Expression initializationCodeImplicitThis;
-  }
-
-  /****************************************************************
-   * Loading compiled custom constructors.
-   ****************************************************************/
-
-  public static CustomConstructor load(NiceClass def, Method method)
-  {
-    if (! method.isConstructor())
-      return null;
-
-    MiscAttr attr = (MiscAttr) Attribute.get(method, "parameters");
-    if (attr == null)
-      return null;
-
-    return new ImportedCustomConstructor(def, method, attr);
-  }
-
-  static class ImportedCustomConstructor extends CustomConstructor
-  {
-    ImportedCustomConstructor(NiceClass def, Method method, MiscAttr attr)
-    {
-      super(def, FormalParameters.readBytecodeAttribute
-            (attr, JavaClasses.compilation.parser));
-      this.method = method;
-      TypeConstructors.addConstructor(classe.definition.tc, this);
-    }
-
-    void resolve()
-    {
-      super.resolve();
-      addConstructorCallSymbol();
-    }
-
-    protected gnu.expr.Expression computeCode()
-    {
-      int dummyArgs = method.arg_types.length - arity;
-      return new QuoteExp(new InstantiateProc(method, dummyArgs));
-    }
-
-    gnu.expr.Expression getConstructorInvocation(boolean omitDefaults)
-    {
-      int dummyArgs = method.arg_types.length - arity;
-      Method calledMethod = omitDefaults ? getMethodUsingDefaults() : method;
-      return new QuoteExp(new InitializeProc(calledMethod, false, dummyArgs));
-    }
-
-    gnu.expr.Expression getInitializationCode(boolean implicitThis)
-    {
-      int dummyArgs = method.arg_types.length - arity;
-      return new QuoteExp(new InitializeProc(method, implicitThis, dummyArgs));
-    }
-
-    private Method method;
-
-    /** 
-       Return the Method for this constructor with the optional parameters
-       left out.
-    */
-    private Method getMethodUsingDefaults()
-    {
-      Type[] fullArgTypes = method.arg_types;
-      List argTypes = new LinkedList();
-
-      for (int i = 0; i < parameters.size; i++)
-        {
-          if (parameters.hasDefaultValue(i))
-            continue;
-
-          argTypes.add(fullArgTypes[i]);
-        }
-
-      Type[] argTypesArray = (Type[]) argTypes.toArray
-        (new Type[argTypes.size()]);
-
-      return method.getDeclaringClass().getDeclaredMethod
-        ("<init>", argTypesArray);
-    }
   }
 }

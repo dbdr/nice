@@ -872,7 +872,7 @@ public class NiceClass extends ClassDefinition.ClassImplementation
 
 	FormalParameters values = new FormalParameters(args);
 
-	constructorMethod[i] = new Constructor
+	constructorMethod[i] = new DefaultConstructor
 	  (this, fields, parent, definition.location(),
 	   values, 
 	   cst,

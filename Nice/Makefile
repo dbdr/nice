@@ -129,7 +129,7 @@ release-file: ${TARFILE} ${ZIPFILE}
 
 .PHONY: web
 web:
-	scp -r web/*.html web/*.css web/.htaccess web/images bonniot@shell.sourceforge.net:/home/groups/n/ni/nice/htdocs
+	$(MAKE) -C web send
 
 #****************************************************************
 #    Bootstrap

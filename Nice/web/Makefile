@@ -4,10 +4,13 @@ STYLESHEET=common.xsl
 STYLEOPT=
 DOCBK=/usr/share/sgml/docbook/stylesheet/xsl/nwalsh/html/docbook.xsl
 
-.PHONY : clean
+.PHONY : clean send
 
 all: index.html research.html compilation.html testimonials.html install.html \
-     roadmap.html
+     roadmap.html manual.html
+
+send: all
+	scp -r *.html *.css .htaccess images bonniot@shell.sourceforge.net:/home/groups/n/ni/nice/htdocs
 
 old: safety.html
 

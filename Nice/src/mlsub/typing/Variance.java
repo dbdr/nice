@@ -228,8 +228,11 @@ public final class Variance
 	//OK
 	return;
       else
-	throw new InternalError("Incorrect sizes " + 
-				tp1.length + " and " + tp2.length);
+	throw new InternalError
+	  ("Incorrect sizes " + 
+	   (tp1 == null ? "null" : Integer.toString(tp1.length)) + 
+	   " and " + 
+	   (tp2 == null ? "null" : Integer.toString(tp2.length)));
     
     if (tp1 == null || tp1.length != size)
       throw new BadSizeEx(size, tp1 == null ? 0 : tp1.length);

@@ -81,7 +81,7 @@ interface List<T>
  * Linked Lists
  ****************************************************************/
 
-abstract class LinkedList<T3> 
+abstract class LinkedList<T> 
   implements Sequence 
   //finally implements Collection
   {}

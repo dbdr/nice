@@ -1,0 +1,23 @@
+import java.io.*;
+
+/**
+ * Writes a stylesheet to the root folder
+ */
+void writeStylesheet() {
+    try {
+        BufferedWriter writer = new BufferedWriter(new FileWriter(new File(outdir, "main.css")));
+        writer.write(defaultStylesheet);
+        writer.close();
+    } catch(IOException ioe) {
+      ioe.printStackTrace();
+    }
+}
+
+/**
+ * Returns the default style sheet as a string.
+ */
+var String defaultStylesheet = 
+"/*Default stylesheet for nicedoc*/\n" +
+"body {\n" +
+"    /*background-color: #003300;*/\n" +
+"}\n";

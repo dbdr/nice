@@ -1,7 +1,7 @@
 /**************************************************************************/
 /*                                N I C E                                 */
 /*             A high-level object-oriented research language             */
-/*                        (c) Daniel Bonniot 2001                         */
+/*                        (c) Daniel Bonniot 2002                         */
 /*                                                                        */
 /*  This program is free software; you can redistribute it and/or modify  */
 /*  it under the terms of the GNU General Public License as published by  */
@@ -40,6 +40,10 @@ public class Throw extends Procedure1 implements Inlineable
   {
     gnu.bytecode.CodeAttr code = comp.getCode();
     exp.getArgs()[0].compile(comp, Target.pushObject);
+    // Ensure that the object is Throwable so that the bytecode is well-formed.
+    // This is only necessary in presence of fancy polymorphism.
+    if (!(code.topType().isSubtype(Type.throwable_type)))
+      code.emitCheckcast(Type.throwable_type);
     code.emitThrow();
   }
 

@@ -10,7 +10,7 @@ package mlsub.typing.lowlevel;
  * @version $OrigRevision: 1.9 $, $OrigDate: 1999/10/03 17:37:05 $
  * @author Alexandre Frey
  **/
-final class DomainVector extends java.util.Vector {
+final class DomainVector extends java.util.ArrayList {
   int offset;                 // offset
   int width;                  // size of domains
   
@@ -20,17 +20,21 @@ final class DomainVector extends java.util.Vector {
   }
   public DomainVector(int offset, int width, int n) {
     super(n);
-    setSize(n);
     //if (width > 0) {
       for (int i = 0; i < n; i++) {
-        setElementAt(new Domain(width), i);
+        add(new Domain(width));
       }
       //} 
     this.offset = offset;
     this.width = width;
   }
   public Domain getDomain(int x) {
-    return (Domain)elementAt(x - offset);
+    return (Domain)get(x - offset);
+  }
+
+  void truncate(int x)
+  {
+    removeRange(x, size());
   }
 
   private boolean isValidSoft(int x) {
@@ -41,7 +45,7 @@ final class DomainVector extends java.util.Vector {
   }
   
   public void clear(int x) {
-    setElementAt(null, x - offset);
+    set(x - offset, null);
   }
   public void reduce(int x, boolean unit, BitVector domain)
   throws LowlevelUnsatisfiable {
@@ -71,8 +75,8 @@ final class DomainVector extends java.util.Vector {
   }
 
   public void exclude(int value) throws LowlevelUnsatisfiable {
-    for (int i = 0; i < elementCount; i++) {
-      Domain d = (Domain)elementData[i];
+    for (int i = 0; i < size(); i++) {
+      Domain d = (Domain)get(i);
       if (d != null) {
         d.exclude(value);
       }
@@ -81,12 +85,12 @@ final class DomainVector extends java.util.Vector {
   public void move(int src, int dest) {
     S.assume(S.a&& isValidSoft(src));
     S.assume(S.a&& isGarbage(dest));
-    setElementAt(getDomain(src), dest - offset);
+    set(dest - offset, getDomain(src));
     clear(src);
   }
   public void extend() {
     // if (width > 0) {
-    addElement(new Domain(width));
+    add(new Domain(width));
     //} else {
     //addElement(null);
     //}
@@ -94,10 +98,10 @@ final class DomainVector extends java.util.Vector {
 
   public Object clone() {
     DomainVector result = (DomainVector)super.clone();
-    for (int i = 0; i < elementCount; i++) {
-      Domain d = ((Domain)elementData[i]);
+    for (int i = 0; i < size(); i++) {
+      Domain d = ((Domain)get(i));
       if (d != null) {
-        result.elementData[i] = new Domain(d);
+        result.set(i, new Domain(d));
       }
     }
     return result;
@@ -131,7 +135,7 @@ final class DomainVector extends java.util.Vector {
           ideal.addProduct(R, dx);
           
           // and intersect the domain of all element j above x with ideal
-          for (int j = offset; j < offset + elementCount; j++) {
+          for (int j = offset; j < offset + size(); j++) {
             Domain dj = getDomain(j);
             if (dj != null && C.get(x, j)) {
 	      if(K0.debugK0){
@@ -171,8 +175,8 @@ final class DomainVector extends java.util.Vector {
   }
 
   void initGfpCardinals() {
-    for (int i = 0; i < elementCount; i++) {
-      Domain d = (Domain)elementData[i];
+    for (int i = 0; i < size(); i++) {
+      Domain d = (Domain)get(i);
       if (d != null) {
         d.initGfpCardinals();
       }
@@ -196,9 +200,9 @@ final class DomainVector extends java.util.Vector {
      */
     int leastCard = Integer.MAX_VALUE;
     int least = Integer.MIN_VALUE;
-    for (int i = 0; i < elementCount; i++) {
+    for (int i = 0; i < size(); i++) {
       if (set == null || set.get(i + offset)) {
-        Domain d = (Domain)elementAt(i);
+        Domain d = (Domain)get(i);
         if (d != null){
           int card = d.cardinal();
 	  if (card < leastCard && card > 1) {
@@ -216,13 +220,13 @@ final class DomainVector extends java.util.Vector {
   public String dump() {
     Separator sep = new Separator(", ");
     StringBuffer sb = new StringBuffer();
-    for (int i = 0; i < elementCount; i++) {
-      if (elementData[i] != null) {
+    for (int i = 0; i < size(); i++) {
+      if (get(i) != null) {
         sb.append(sep)
           .append("D(")
           .append(i + offset)
           .append(") = ")
-          .append(elementData[i]);
+          .append(get(i));
       }
     }
     return sb.toString();

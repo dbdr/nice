@@ -1,6 +1,6 @@
 package mlsub.typing.lowlevel;
 
-import java.util.Vector;
+import java.util.ArrayList;
 
 /**
  * A lowlevel constraint on integers.
@@ -76,7 +76,7 @@ public final class K0 {
     this.garbage = new BitVector();
     this.posTagged = new BitVector();
     this.negTagged = new BitVector();
-    this.interfaces = new Vector();
+    this.interfaces = new ArrayList();
     if (debugK0) {
       System.err.println("created K0 #" + ID);
     }
@@ -387,7 +387,7 @@ public final class K0 {
     C.setSize(n);
     Ct.setSize(n);
     if (domains != null) {
-      domains.setSize(n - m);
+      domains.truncate(n - m);
     }
     garbage.truncate(n);
     posTagged.truncate(n);
@@ -468,7 +468,7 @@ public final class K0 {
   }
 
   // a vector of all the Interfaces in this constraint
-  private Vector interfaces;
+  private ArrayList interfaces;
   /**
    * Returns the number of interfaces. Interfaces are garanteed to be
    * numbered from 0 to nInterfaces()-1
@@ -479,7 +479,7 @@ public final class K0 {
 
   // assume 0 <= iid < nInterfaces()
   Interface getInterface(int iid) {
-    return (Interface)interfaces.elementAt(iid);
+    return (Interface)interfaces.get(iid);
   }
 
   /***********************************************************************
@@ -496,7 +496,7 @@ public final class K0 {
     S.assume(S.a&& !hasBeenInitialized);
     int iid = nInterfaces();
     Interface iface = new Interface(this, iid);
-    interfaces.addElement(iface);
+    interfaces.add(iface);
     if (debugK0) {
       System.err.println("newInterface in #" + ID + " -> " + iid);
     }

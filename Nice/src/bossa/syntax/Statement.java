@@ -39,13 +39,6 @@ public abstract class Statement
     return res;
   }
 
-  /**
-   * The block corresponding to the method beeing compiled.
-   * Usefull for 'return'.
-   * Maybe this would be nicer not to be global.
-   */
-  static gnu.expr.ScopeExp currentScopeExp = null;
-  
   static gnu.expr.Expression sequence(gnu.expr.Expression e1, gnu.expr.Expression e2)
   {
     gnu.expr.Expression[] array=new gnu.expr.Expression[2];

@@ -104,7 +104,6 @@ public class TryStmt extends Statement
       CatchClause res = new CatchClause
 	(var.toString(), 
 	 (gnu.bytecode.ClassType) nice.tools.code.Types.javaType(t));
-      res.outer = Statement.currentScopeExp;
       
       exnVar.setDeclaration(res.getDeclaration());
       res.setBody(body.generateCode());

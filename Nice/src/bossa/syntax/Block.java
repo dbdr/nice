@@ -238,8 +238,6 @@ public class Block extends Statement
 
   public gnu.expr.Expression generateCode()
   {
-    gnu.expr.ScopeExp save = Statement.currentScopeExp;
-
     gnu.expr.Expression body;
 
     if (statements.length != 0)
@@ -255,8 +253,6 @@ public class Block extends Statement
     if (statements.length != 0)
       ((gnu.expr.BeginExp) body).setExpressions(Statement.compile(statements));
 
-    Statement.currentScopeExp = save;
-
     return res;
   }
 
@@ -271,9 +267,6 @@ public class Block extends Statement
     gnu.expr.Expression[] eVal = new gnu.expr.Expression[1];
     gnu.expr.LetExp res = new gnu.expr.LetExp(eVal);
 
-    res.outer = Statement.currentScopeExp;
-    Statement.currentScopeExp = res;
-    
     eVal[0] = local.compile(res);
     
     res.setBody(addLocals(vars,body));

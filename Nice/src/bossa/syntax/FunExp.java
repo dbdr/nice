@@ -96,14 +96,7 @@ public class FunExp extends Expression implements Function
        nice.tools.code.Types.javaType(MonoSymbol.getMonotype(formals)), 
        nice.tools.code.Types.javaType(inferredReturnType()), 
        formals, false);
-
-    gnu.expr.ScopeExp save = Statement.currentScopeExp;
-    Statement.currentScopeExp = res;       // push
-
     nice.tools.code.Gen.setMethodBody(res, body.generateCode());
-    
-    Statement.currentScopeExp = save; // pop
-
     return res;
   }
   

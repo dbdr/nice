@@ -25,7 +25,7 @@ import java.util.*;
    with an optional initial value.
    
    @version $Date$
-   @author Daniel Bonniot (d.bonniot@mail.dotcom.fr)
+   @author Daniel Bonniot (bonniot@users.sourceforge.net)
 */
 public class GlobalVarDeclaration extends Definition
 {
@@ -62,11 +62,18 @@ public class GlobalVarDeclaration extends Definition
       
       if (res == null)
         {
-          res = module.addGlobalVar
-    			(left.name.toString(),
-		    	 nice.tools.code.Types.javaType(left.type),
-			 constant);
+          res = new gnu.expr.Declaration
+            (name.toString(), nice.tools.code.Types.javaType(type));
           setDeclaration(res);
+
+          if (! inInterfaceFile())
+            {
+              // Compute the value first, which might use another global value,
+              // which will then be properly initialized before use.
+              res.noteValue(GlobalVarDeclaration.this.compileValue());
+            }
+
+          module.addGlobalVar(res, constant);
         }
     
       return res;
@@ -127,21 +134,15 @@ public class GlobalVarDeclaration extends Definition
    * Code generation
    ****************************************************************/
 
-  public void precompile()
-  {
-    // Compute the value first, and this might use another global value,
-    // which will then be properly initialized before use.
-    gnu.expr.Expression value = 
-      this.value != null ? this.value.compile() : null;
-
-    gnu.expr.Declaration declaration = left.getDeclaration();
-    if (constant) declaration.setFlag(Declaration.IS_CONSTANT);
-
-    declaration.noteValue(value);
-  }
-
   public void compile()
   {
+    left.getDeclaration();
+  }
+
+  private gnu.expr.Expression compileValue()
+  {
+    return
+      this.value != null ? this.value.compile() : null;
   }
 
   /****************************************************************

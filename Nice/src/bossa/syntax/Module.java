@@ -30,7 +30,7 @@ public interface Module extends mlsub.compilation.Module
    ****************************************************************/
 
   gnu.bytecode.ClassType createClass(String name);
-  gnu.expr.Declaration addGlobalVar(String name, gnu.bytecode.Type type, boolean constant);
+  void addGlobalVar(gnu.expr.Declaration declaration, boolean constant);
   gnu.expr.Expression getDispatchMethod(NiceMethod def);
   gnu.expr.ReferenceExp addMethod(gnu.expr.LambdaExp method, 
 				  boolean packageMethod);

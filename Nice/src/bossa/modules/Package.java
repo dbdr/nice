@@ -638,29 +638,26 @@ public class Package implements mlsub.compilation.Module, Located, bossa.syntax.
       classe.outer = getImplementationClass();
   }
 
-  public gnu.expr.Declaration addGlobalVar(String name, Type type, boolean constant)
+  public void addGlobalVar(gnu.expr.Declaration decl, 
+                           boolean constant)
   {
-    gnu.expr.Declaration declaration = new gnu.expr.Declaration(name, type);
-
     if (!compiling())
       // The code is already there
       {
-	declaration.setSimple(false);
-	declaration.field = source.getBytecode().getField(name);
+	decl.setSimple(false);
+	decl.field = source.getBytecode().getField(decl.getName());
 
-	if (declaration.field == null)
+	if (decl.field == null)
 	  Internal.error(this,
-			 "The compiled file is not consistant with the interface file for global variable " + name);
+			 "The compiled file is not consistant with the interface file for global variable " + decl.getName());
       }
     else
       {
-	getImplementationClass().addDeclaration(declaration);
-        if (constant) declaration.setFlag(Declaration.IS_CONSTANT);
+	getImplementationClass().addDeclaration(decl);
+        if (constant) decl.setFlag(Declaration.IS_CONSTANT);
 
-	declaration.setFlag(Declaration.STATIC_SPECIFIED|Declaration.TYPE_SPECIFIED);
+	decl.setFlag(Declaration.STATIC_SPECIFIED|Declaration.TYPE_SPECIFIED);
       }
-    
-    return declaration;
   }
 
   private gnu.expr.Package thisPkg;

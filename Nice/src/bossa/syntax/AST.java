@@ -212,10 +212,10 @@ public class AST extends Node
         // Globals are compiled first, so that we can find out their 
         // dependencies, and initialize them in the right order.
 	for (int i = 0; i < globals.length; i++)
-	  globals[i].precompile();
+	  globals[i].compile();
 
-	for(Iterator i = children.iterator();i.hasNext();)
-	  ((Definition)i.next()).compile();
+	for (Iterator i = children.iterator();i.hasNext();)
+	  ((Definition) i.next()).compile();
       }
   }
   

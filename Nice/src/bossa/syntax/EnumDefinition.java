@@ -121,8 +121,10 @@ public class EnumDefinition extends Definition
       
       if (res == null)
         {
-          res = module.addGlobalVar(name.toString(), Types.javaType(type), true);
+          res = new gnu.expr.Declaration
+            (name.toString(), Types.javaType(type));
           setDeclaration(res);
+          module.addGlobalVar(res, true);
         }
     
       return res;

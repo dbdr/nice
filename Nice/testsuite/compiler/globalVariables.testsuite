@@ -143,6 +143,14 @@ let QualifiedName QNAME = new QualifiedName(a: A, b: B);
 
 class QualifiedName { String a; String b; }
 
+/// PASS
+  assert s4.equals("1234");
+  /// Toplevel
+let String s4 = s3 + "4";
+let String s3 = s2 + "3";
+let String s2 = s1 + "2";
+let String s1 = "1";
+
 /// FAIL
   /// Toplevel
   var String s;

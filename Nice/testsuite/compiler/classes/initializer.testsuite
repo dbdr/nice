@@ -169,3 +169,18 @@ class A
   }
   /// package b import a
   assert new A().x;
+
+/// PASS bug
+  /// package a
+  /// Toplevel
+  class TestA {
+    {
+      this.foo((String s) => {});
+    }
+  
+    void foo(String->void f) {
+      (f)("xyz");
+    }
+  }
+  /// package b import a
+  let x = new TestA();

@@ -195,6 +195,7 @@ public class OverloadedSymbolExp extends Expression
       }
 
     removeNonMinimal(symbols, arguments);
+    removeOverlappingJavaMethods(symbols);
     
     if (symbols.size() == 1)
       {
@@ -520,6 +521,46 @@ public class OverloadedSymbolExp extends Expression
       }
 
     return new Domain(t.getConstraint(), dom);
+  }
+
+  /**
+     When a Java class implements two interfaces,
+     there is no ambiguity between methods of the same signature
+     defined in both interfaces, since they are implemented by the same
+     method in the class. So this method removes all but one of the 
+     overlapping methods.
+  */
+  private static void removeOverlappingJavaMethods(List symbols)
+  {
+    // optimization
+    if(symbols.size()<2)
+      return;
+    
+    int len = symbols.size();
+    VarSymbol[] syms = (VarSymbol[])
+      symbols.toArray(new VarSymbol[len]);
+
+    for (int i = 0; i < syms.length; i++)
+      for (int j = i+1; j < syms.length; j++)
+        if (overlappingJavaMethods(syms[i].getMethodDeclaration(),
+                                   syms[j].getMethodDeclaration()))
+          {
+            // We can remove either, since they lead to the same implementation
+            symbols.remove(syms[i]);
+            // Since we removed i, we don't need to continue this loop.
+            // This would not be true if we decided to remove j.
+            break;
+          }
+  }
+
+  private static boolean overlappingJavaMethods(MethodDeclaration m1,
+                                                MethodDeclaration m2)
+  {
+    if (! (m1 instanceof JavaMethod) ||
+        ! (m2 instanceof JavaMethod))
+      return false;
+
+    return Arrays.equals(m1.javaArgTypes(), m2.javaArgTypes());
   }
 
   void computeType()

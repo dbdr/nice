@@ -1,0 +1,12 @@
+/// PASS
+  // When a Java class implements two interfaces,
+  // there is no ambiguity between methods of the same signature
+  // defined in both interfaces, since they are implemented by the same
+  // method in the class
+  /// Toplevel
+  import java.io.*;
+
+  void foo(ObjectOutputStream o)
+  {
+    o.flush();
+  }

@@ -107,7 +107,13 @@ public class ApplyExp extends Expression
 
   public void compile (Compilation comp, Target target)
   {
-    compile(this, comp, target, true);
+    try {
+      compile(this, comp, target, true);
+    }
+    catch (VerificationError e) {
+      throw bossa.util.User.error(bossa.util.Location.make(this),
+                                  e.getMessage());
+    }
   }
 
   public static void compile (ApplyExp exp, Compilation comp, Target target)

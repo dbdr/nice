@@ -271,5 +271,5 @@ public class Block extends Statement
       + "}\n";
   }
 
-  private List /* of Statement */ statements;
+  List /* of Statement */ statements;
 }

@@ -149,7 +149,7 @@ public class FunExp extends Expression implements Function
       ;
   }
   
-  Collection /* of MonoSymbol */ formals;
+  List /* of MonoSymbol */ formals;
   bossa.syntax.Constraint constraint;
   Constraint cst;
   Statement body;

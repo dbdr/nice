@@ -45,5 +45,5 @@ public class StatementExp extends Expression
     type = ConstantExp.voidPolytype;
   }
   
-  private Statement statement;
+  Statement statement;
 }

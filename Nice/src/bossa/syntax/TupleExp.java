@@ -156,5 +156,5 @@ public class TupleExp extends bossa.syntax.Expression
     return Util.map("(", ", ", ")", expressions);
   }
 
-  private List expressions;
+  List expressions;
 }

@@ -133,9 +133,9 @@ public class NewArrayExp extends Expression
     return res.toString();
   }
 
-  private TypeIdent ti;
-  private TypeConstructor tc;
+  TypeIdent ti;
+  TypeConstructor tc;
 
-  private Expression[] knownDimensions;
+  Expression[] knownDimensions;
   private int unknownDimensions;
 }

@@ -48,7 +48,7 @@ public class Block extends Statement
       return null;
     }
     
-    protected ExpressionRef value = null;
+    protected Expression value = null;
     MonoSymbol left;
   }
 
@@ -174,7 +174,7 @@ public class Block extends Statement
 	if (local.value == null)
 	  continue;
 	try{
-	  AssignExp.checkAssignment(local.left.getType(),local.value);
+	  local.value = AssignExp.checkAssignment(local.left.getType(),local.value);
 	}
 	catch(mlsub.typing.TypingEx t){
 	  User.error(local.left,

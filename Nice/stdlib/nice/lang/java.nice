@@ -27,7 +27,15 @@ import java.text.*;
 //               PACKAGE: java.lang
 
 // result is non-null
+
 Runtime getRuntime() = native Runtime Runtime.getRuntime();
+
+String concat(String, String) = native String String.concat(String);
+StringBuffer append(StringBuffer, ?String) = 
+  native StringBuffer StringBuffer.append(String);
+StringBuffer append(StringBuffer, char) = 
+  native StringBuffer StringBuffer.append(char);
+char[] toCharArray(String) = native char[] String.toCharArray();
 
 //               PACKAGE: java.text
 

@@ -1,0 +1,124 @@
+package nice.beans;
+
+import java.util.*;
+import java.beans.*;
+import java.beans.beancontext.*;
+
+
+// ------------------------------------------------------------------------------------------------
+
+PropertyChangeSupport PropertyChangeSupport(Object sourceBean,
+                                            ?String propertyName = null,
+                                            PropertyChangeEvent ?-> void propertyChange = null       
+                                            )
+{
+   PropertyChangeSupport support = new PropertyChangeSupport(sourceBean);
+   
+   support.addPropertyChangeSupportListeners(propertyName: propertyName,
+                                             propertyChange: propertyChange
+                                             ); 
+   return support;                                               
+}
+
+
+// ------------------------------------------------------------------------------------------------
+
+VetoableChangeSupport VetoableChangeSupport(Object sourceBean,
+                                            ?String propertyName = null,
+                                            PropertyChangeEvent ?-> void vetoableChange = null       
+                                            )
+{
+   VetoableChangeSupport support = new VetoableChangeSupport(sourceBean);
+   
+   support.addVetoableChangeSupportListeners(propertyName: propertyName,
+                                             vetoableChange: vetoableChange
+                                             ); 
+   
+   return support;                                               
+}
+
+
+// ------------------------------------------------------------------------------------------------
+
+PropertyEditorSupport PropertyEditorSupport(?Object sourceBean = null,
+                                            PropertyChangeEvent ?-> void propertyChange = null       
+                                            )
+{
+   PropertyEditorSupport support;
+   if(sourceBean != null) support = new PropertyEditorSupport(sourceBean);
+   else support = new PropertyEditorSupport();
+   
+   
+   support.addPropertyEditorSupportListeners(propertyChange: propertyChange); 
+
+   return support;                                               
+}
+
+
+
+// ------------------------------------------------------------------------------------------------
+
+BeanContextChildSupport BeanContextChildSupport(?BeanContextChild bcc = null,
+                                                ?String propertyName = null,
+                                                PropertyChangeEvent ?-> void propertyChange = null,       
+                                                PropertyChangeEvent ?-> void vetoableChange = null
+                                                )
+{
+   BeanContextChildSupport support;
+   if(bcc != null) support = new BeanContextChildSupport(bcc);
+   else support = new BeanContextChildSupport();
+   
+   support.addBeanContextChildSupportListeners(propertyName: propertyName,
+                                               propertyChange: propertyChange,
+                                               vetoableChange: vetoableChange
+                                               ); 
+   return support;                                               
+}
+
+
+// ------------------------------------------------------------------------------------------------
+
+BeanContextServicesSupport BeanContextServicesSupport(?BeanContextServices peer = null,
+                                                      ?Locale locale = null,
+                                                      boolean designTime = false,
+                                                      BeanContextServiceAvailableEvent ?-> void serviceAvailable = null      
+                                                      )
+{
+   BeanContextServicesSupport support;
+   if(peer != null) support = new BeanContextServicesSupport(peer);
+   else support = new BeanContextServicesSupport();
+   if(locale != null) support.setLocale(locale);
+   support.setDesignTime(designTime);
+   
+   support.addBeanContextServicesSupportListeners(serviceAvailable: serviceAvailable); 
+   
+   return support;                                               
+}
+
+
+// ------------------------------------------------------------------------------------------------
+
+BeanContextSupport BeanContextSupport(?BeanContext peer = null,
+                                      ?Locale locale = null,
+                                      boolean designTime = false,
+                                      boolean visible = false,
+                                      BeanContextMembershipEvent ?-> void childrenAdded = null,
+                                      BeanContextMembershipEvent ?-> void childrenRemoved = null    
+                                      )
+{
+   BeanContextSupport support;
+   if(peer != null && locale == null) support = new BeanContextSupport(peer);
+   if(peer != null && locale != null) support = new BeanContextSupport(peer,locale,designTime,visible);
+   else support = new BeanContextSupport();
+   if(locale != null) support.setLocale(locale);
+   support.setDesignTime(designTime);
+   
+   // I found no way to implicitly set visible, thus a call only providing visible will not have the desired effects
+   // one needs to pass at least peer and locale to be able to manipulate visibility ...
+   
+   support.addBeanContextSupportListeners(childrenAdded: childrenAdded,
+                                          childrenRemoved: childrenRemoved
+                                          ); 
+   
+   return support;                                               
+}

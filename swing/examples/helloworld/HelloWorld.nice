@@ -1,0 +1,86 @@
+package examples.helloworld;
+
+import nice.swing;
+
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.*;
+
+class HelloWorldFrame extends javax.swing.JFrame
+{
+   void initComponents();
+}
+
+class HelloWorldPanel extends javax.swing.JPanel
+{
+   private ?String greeting = "Hello Nice World !";
+   
+   public void sayHello(ActionEvent e, boolean hello = true) 
+   {
+      if(hello) this.greeting = "Hello Nice World !";
+      else this.greeting = "Bye   Nice   World !";
+           
+      this.repaint();
+   }
+   
+   public void changeColor(MouseEvent e, boolean hello = true) 
+   {
+      if(hello) this.setBackground(Color.yellow);
+      else this.setBackground(Color.green);
+            
+      this.repaint();
+   }   
+   
+ 
+   paintComponent(graphics)
+   {
+      // Should call super.
+      
+      Graphics g = notNull(graphics);
+      
+      Font font = new Font("SansSerif", Font.BOLD + Font.ITALIC, 32);
+      g.setFont(font);
+      g.setColor(Color.blue);
+      ?String greeting = this.greeting;
+      if(greeting != null) notNull(g).drawString(greeting,10,200);
+
+   }   
+
+   
+   void initComponents() = this.addJComponentListeners(mouseEntered: (MouseEvent e) => this.changeColor(e),
+                                                       mouseExited: (MouseEvent e) => this.changeColor(e,false)
+                                                       );
+   
+}  
+
+
+initComponents(frame@HelloWorldFrame)
+{
+   frame.addWindowListeners(windowClosing: (WindowEvent e) => System.exit(0));
+   
+   HelloWorldPanel panel = new HelloWorldPanel();
+   panel.initComponents();
+   
+   panel.add(JButton(text: "Hello",
+                     actionPerformed: (ActionEvent e) => panel.sayHello(e)
+                     )
+            );
+            
+   panel.add(JButton(text: "Bye",
+                     actionPerformed: (ActionEvent e) => panel.sayHello(e,false)
+                     )
+            );
+               
+   ?java.awt.Container container = frame.getContentPane();
+   if(container != null) container.add(BorderLayout.CENTER,panel);
+
+   frame.setSize(300,300);
+   frame.setResizable(false);
+   frame.show();
+} 
+
+main(args)
+{
+   HelloWorldFrame frame = new HelloWorldFrame();
+   frame.initComponents();
+}

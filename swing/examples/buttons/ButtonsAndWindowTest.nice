@@ -1,0 +1,121 @@
+package examples.buttons;
+
+import nice.swing;
+
+import javax.swing.*;
+import javax.swing.event.*;
+import java.awt.*;
+import java.awt.event.*;
+
+// --------------------------------------------------------------------------------------------
+
+// Indicactions to the compiler about the precise types of some Swing features.
+// The colors are not null:
+Color blue() = native Color.blue;
+Color cyan() = native Color.cyan;
+
+
+class TestFrame extends JFrame 
+{
+  private ?String title = "TestFrame";
+  public void initComponents();
+}
+
+// color changing functions
+
+void changeColor(ActionEvent event, JPanel component, Color color = Color.blue);
+
+void switchOffButton(ActionEvent e, JButton button)
+{
+   button.addAbstractButtonListeners(actionPerformed: null);
+}
+
+changeColor(event@ActionEvent, component@JPanel, color@Color) = component.setBackground(color);
+
+
+// opens new frame stepping to the right bottom edge
+
+
+var int xpos = 10;
+var int ypos = 10;
+
+void step10() 
+{
+  xpos += 10;
+  ypos += 10;
+}
+
+void step50()
+{
+  xpos += 50;
+  ypos += 50;
+}
+
+void openTestFrame(?ActionEvent event = null, () -> void step = step10);
+
+openTestFrame(event,step) 
+{
+  TestFrame frame;
+  if(event != null) frame = new TestFrame(title: event.getActionCommand());
+  else frame = new TestFrame();
+  
+  step();
+  frame.initComponents();
+  frame.show();
+} 
+
+
+initComponents(frame@TestFrame) 
+{  
+
+  JPanel buttonPanel = new JPanel();
+  JPanel actionPanel = new JPanel();
+
+  JButton blueButton   = JButton(text: "BLUE", actionPerformed: (ActionEvent e) => changeColor(e,actionPanel,Color.blue));
+  JButton step10Button = JButton(text: "STEP10", actionPerformed: (ActionEvent e) => openTestFrame(e,step10));
+  JButton step20Button = JButton(text: "STEP20", actionPerformed: (ActionEvent e) => openTestFrame(e,step50));
+  JButton exitButton   = JButton(text: "QUIT", actionPerformed: (ActionEvent e) => System.exit(0));
+  JButton offButton   = JButton(text: "OFF", actionPerformed: (ActionEvent e) => switchOffButton(e,step10Button));
+  JButton noopButton   = JButton(text: "NOOP");
+  
+  JCheckBox check = JCheckBox(text:"check", selected: true, actionPerformed: (ActionEvent e) => changeColor(e,actionPanel,Color.blue));
+  
+  JButton testButton = new JButton("Test2");
+  testButton.addAbstractButtonListeners(actionPerformed: (ActionEvent e) => changeColor(e,actionPanel,Color.cyan));
+  
+  frame.addWindowListeners(windowClosing: (WindowEvent e) => System.exit(0), windowIconified: (WindowEvent e) => System.exit(0));
+  
+  blueButton.setActionCommand("BLUE");
+  step10Button.setActionCommand("STEP10");
+  step20Button.setActionCommand("STEP20");
+  exitButton.setActionCommand("EXIT");
+  
+  buttonPanel.add(blueButton);
+  buttonPanel.add(noopButton);
+  buttonPanel.add(step10Button);
+  buttonPanel.add(step20Button);
+  buttonPanel.add(testButton);
+  buttonPanel.add(exitButton);
+  buttonPanel.add(offButton); 
+  buttonPanel.add(check); 
+  
+  ?java.awt.Container contentPane = frame.getContentPane();
+  if(contentPane != null) {
+    contentPane.add(BorderLayout.SOUTH,buttonPanel);
+    contentPane.add(BorderLayout.CENTER,actionPanel);
+  }
+  
+  
+  
+  frame.setSize(600,200);
+  frame.setLocation(xpos,ypos);
+  frame.setTitle("EventHandlingTestFrame");
+
+}
+
+
+main(args) 
+{  
+  openTestFrame();
+}
+

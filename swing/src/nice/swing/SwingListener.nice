@@ -1,0 +1,792 @@
+package nice.swing;
+
+import javax.swing.event.*;
+
+class NiceListener extends Object, java.util.EventListener {}
+
+/** 
+ * class that implements the javax.swing.event.AncestorListener interface
+ * and delegates the actions to optional anonymous functions.
+ */
+class NiceAncestorListener extends NiceListener, AncestorListener
+{
+  /** 
+   * A field that stores optional anonymous functions for each required action. 
+   */
+  private AncestorEvent ?-> void ancestorAdded = null;
+  private AncestorEvent ?-> void ancestorMoved = null;
+  private AncestorEvent ?-> void ancestorRemoved = null;
+  
+  /** 
+   * The implementation of the method ancestorAdded defined in javax.swing.event.AncestorListener. 
+   */
+  ancestorAdded(e)
+  {
+    AncestorEvent ?-> void ancestorAdded = this.ancestorAdded;
+    if(ancestorAdded != null) ancestorAdded(notNull(e));
+  }
+  
+    /** 
+   * The implementation of the method ancestorMoved defined in javax.swing.event.AncestorListener. 
+   */
+  ancestorMoved(e)
+  {
+    AncestorEvent ?-> void ancestorMoved = this.ancestorMoved;
+    if(ancestorMoved != null) ancestorMoved(notNull(e));
+  }
+  
+    /** 
+   * The implementation of the method ancestorRemoved defined in javax.swing.event.AncestorListener. 
+   */
+  ancestorRemoved(e)
+  {
+    AncestorEvent ?-> void ancestorRemoved = this.ancestorRemoved;
+    if(ancestorRemoved != null) ancestorRemoved(notNull(e));
+  }
+}
+
+// --------------------------------------------------------------------------------------------------
+// --------------------------------------------------------------------------------------------------
+
+/** 
+ * class that implements the javax.swing.event.CaretListener interface
+ * and delegates the action to an optional anonymous function.
+ */
+class NiceCaretListener extends NiceListener, CaretListener
+{
+  /** 
+   * A field that stores an optional anonymous function. 
+   */
+  private CaretEvent ?-> void caretUpdate = null;
+
+  /** 
+   * The implementation of the method caretUpdate defined in javax.swing.event.CaretListener. 
+   */
+  caretUpdate(e)
+  {
+    CaretEvent ?-> void caretUpdate = this.caretUpdate;
+    if(caretUpdate != null) caretUpdate(notNull(e));
+  }
+}
+
+// --------------------------------------------------------------------------------------------------
+// --------------------------------------------------------------------------------------------------
+
+/** 
+ * class that implements the javax.swing.event.CellEditorListener interface
+ * and delegates the actions to optional anonymous functions.
+ */
+class NiceCellEditorListener extends NiceListener, CellEditorListener
+{
+  /** 
+   * A field that store optional anonymous function for each required action. 
+   */
+  private ChangeEvent ?-> void editingCanceled = null;
+  private ChangeEvent ?-> void editingStopped = null;
+
+  /** 
+   * The implementation of the method editingCanceled defined in javax.swing.event.CellEditorListener. 
+   */
+  editingCanceled(e)
+  {
+    ChangeEvent ?-> void editingCanceled = this.editingCanceled;
+    if(editingCanceled != null) editingCanceled(notNull(e));
+  }
+  
+  /** 
+   * The implementation of the method editingStopped defined in javax.swing.event.CellEditorListener. 
+   */
+  editingStopped(e)
+  {
+    ChangeEvent ?-> void editingStopped = this.editingStopped;
+    if(editingStopped != null) editingStopped(notNull(e));
+  }
+}
+
+// --------------------------------------------------------------------------------------------------
+// --------------------------------------------------------------------------------------------------
+
+/** 
+ * class that implements the javax.swing.event.ChangeListener interface
+ * and delegates the action to an optional anonymous function.
+ */
+class NiceChangeListener extends NiceListener, ChangeListener
+{
+  /** 
+   * A field that stores an optional anonymous function. 
+   */
+  private ChangeEvent ?-> void stateChanged = null;
+
+  /** 
+   * The implementation of the method stateChanged defined in javax.swing.event.ChangeListener. 
+   */
+  stateChanged(e)
+  {
+    ChangeEvent ?-> void stateChanged = this.stateChanged;
+    if(stateChanged != null) stateChanged(notNull(e));
+  }
+}
+
+// --------------------------------------------------------------------------------------------------
+// --------------------------------------------------------------------------------------------------
+
+/** 
+ * class that implements the javax.swing.event.DocumentListener interface
+ * and delegates the actions to optional anonymous functions.
+ */
+class NiceDocumentListener extends NiceListener, DocumentListener
+{
+  /** 
+   * fields that store optional anonymous functions for each required action 
+   */
+  private DocumentEvent ?-> void changedUpdate = null;
+  private DocumentEvent ?-> void insertUpdate = null;
+  private DocumentEvent ?-> void removeUpdate = null;
+  
+  /** 
+   * The implementation of the method changedUpdate defined in javax.swing.event.DocumentListener. 
+   */
+  changedUpdate(e)
+  {
+    DocumentEvent ?-> void changedUpdate = this.changedUpdate;
+    if(changedUpdate != null) changedUpdate(notNull(e));
+  }
+  
+    /** 
+   * The implementation of the method insertUpdate defined in javax.swing.event.DocumentListener. 
+   */
+  insertUpdate(e)
+  {
+    DocumentEvent ?-> void insertUpdate = this.insertUpdate;
+    if(insertUpdate != null) insertUpdate(notNull(e));
+  }
+  
+    /** 
+   * The implementation of the method removeUpdate defined in javax.swing.event.DocumentListener. 
+   */
+  removeUpdate(e)
+  {
+    DocumentEvent ?-> void removeUpdate = this.removeUpdate;
+    if(removeUpdate != null) removeUpdate(notNull(e));
+  }
+}
+
+// --------------------------------------------------------------------------------------------------
+// --------------------------------------------------------------------------------------------------
+
+/** 
+ * class that implements the javax.swing.event.HyperlinkListener interface
+ * and delegates the action to an optional anonymous function.
+ */
+class NiceHyperlinkListener extends NiceListener, HyperlinkListener
+{
+  /** 
+   * A field that stores an optional anonymous function. 
+   */
+  private HyperlinkEvent ?-> void hyperlinkUpdate = null;
+
+  /** 
+   * The implementation of the method hyperlinkUpdate defined in javax.swing.event.HyperlinkListener. 
+   */
+  hyperlinkUpdate(e)
+  {
+    HyperlinkEvent ?-> void hyperlinkUpdate = this.hyperlinkUpdate;
+    if(hyperlinkUpdate != null) hyperlinkUpdate(notNull(e));
+  }
+}
+
+// --------------------------------------------------------------------------------------------------
+// --------------------------------------------------------------------------------------------------
+
+/** 
+ * class that implements a java.awt.event.InternalFrameListener interface
+ * and delegates the actions to optional anonymous functions.
+ */
+class NiceInternalFrameListener extends NiceListener, InternalFrameListener
+{
+  /** 
+   * fields that store anonymous functions for all required methods. 
+   */
+  private InternalFrameEvent ?-> void internalFrameActivated = null;
+  private InternalFrameEvent ?-> void internalFrameClosed = null;
+  private InternalFrameEvent ?-> void internalFrameClosing = null;
+  private InternalFrameEvent ?-> void internalFrameDeactivated = null;
+  private InternalFrameEvent ?-> void internalFrameDeiconified = null;
+  private InternalFrameEvent ?-> void internalFrameIconified = null;
+  private InternalFrameEvent ?-> void internalFrameOpened = null;
+  
+
+  /** 
+   * The implementation of the method internalFrameActivated defined in javax.swing.event.InternalFrameListener. 
+   */
+   internalFrameActivated(e)
+   {
+     InternalFrameEvent ?-> void internalFrameActivated = this.internalFrameActivated;
+     if(internalFrameActivated != null) internalFrameActivated(notNull(e));
+   }
+   
+  /** 
+   * The implementation of the method internalFrameClosed defined in javax.swing.event.InternalFrameListener. 
+   */
+   internalFrameClosed(e)
+   {
+     InternalFrameEvent ?-> void internalFrameClosed = this.internalFrameClosed;
+     if(internalFrameClosed != null) internalFrameClosed(notNull(e));
+   }
+ 
+  /** 
+   * The implementation of the method internalFrameClosing defined in javax.swing.event.InternalFrameListener. 
+   */
+   internalFrameClosing(e)
+   {
+     InternalFrameEvent ?-> void internalFrameClosing = this.internalFrameClosing;
+     if(internalFrameClosing != null) internalFrameClosing(notNull(e));
+   }
+   
+  /** 
+   * The implementation of the method internalFrameDeactivated defined in javax.swing.event.InternalFrameListener. 
+   */
+   internalFrameDeactivated(e)
+   {
+     InternalFrameEvent ?-> void internalFrameDeactivated = this.internalFrameDeactivated;
+     if(internalFrameDeactivated != null) internalFrameDeactivated(notNull(e));
+   }
+      
+  /** 
+   * The implementation of the method internalFrameDeiconified defined in javax.swing.event.InternalFrameListener. 
+   */
+   internalFrameDeiconified(e)
+   {
+     InternalFrameEvent ?-> void internalFrameDeiconified = this.internalFrameDeiconified;
+     if(internalFrameDeiconified != null) internalFrameDeiconified(notNull(e));
+   }
+         
+  /** 
+   * The implementation of the method internalFrameIconified defined in javax.swing.event.InternalFrameListener. 
+   */
+   internalFrameIconified(e)
+   {
+     InternalFrameEvent ?-> void internalFrameIconified = this.internalFrameIconified;
+     if(internalFrameIconified != null) internalFrameIconified(notNull(e));
+   }
+         
+  /** 
+   * The implementation of the method internalFrameOpened defined in javax.swing.event.InternalFrameListener. 
+   */
+   internalFrameOpened(e)
+   {
+     InternalFrameEvent ?-> void internalFrameOpened = this.internalFrameOpened;
+     if(internalFrameOpened != null) internalFrameOpened(notNull(e));
+   }
+}
+
+// --------------------------------------------------------------------------------------------------
+// --------------------------------------------------------------------------------------------------
+
+/** 
+ * class that implements the javax.swing.event.ListDataListener interface
+ * and delegates the actions to optional anonymous functions.
+ */
+class NiceListDataListener extends NiceListener, ListDataListener
+{
+  /** 
+   * fields that stores optional anonymous functions for each required action 
+   */
+  private ListDataEvent ?-> void contentsChanged = null;
+  private ListDataEvent ?-> void intervalAdded = null;
+  private ListDataEvent ?-> void intervalRemoved = null;
+  
+  /** 
+   * The implementation of the method contentsChanged defined in javax.swing.event.ListDataListener. 
+   */
+  contentsChanged(e)
+  {
+    ListDataEvent ?-> void contentsChanged = this.contentsChanged;
+    if(contentsChanged != null) contentsChanged(notNull(e));
+  }
+  
+    /** 
+   * The implementation of the method intervalAdded defined in javax.swing.event.ListDataListener. 
+   */
+  intervalAdded(e)
+  {
+    ListDataEvent ?-> void intervalAdded = this.intervalAdded;
+    if(intervalAdded != null) intervalAdded(notNull(e));
+  }
+  
+    /** 
+   * The implementation of the method intervalRemoved defined in javax.swing.event.ListDataListener. 
+   */
+  intervalRemoved(e)
+  {
+    ListDataEvent ?-> void intervalRemoved = this.intervalRemoved;
+    if(intervalRemoved != null) intervalRemoved(notNull(e));
+  }
+}
+
+// --------------------------------------------------------------------------------------------------
+// --------------------------------------------------------------------------------------------------
+
+/** 
+ * class that implements the javax.swing.event.ListSelectionListener interface
+ * and delegates the action to an optional anonymous function.
+ */
+class NiceListSelectionListener extends NiceListener, ListSelectionListener
+{
+  /** 
+   * A field that stores an anonymous function. 
+   */
+  private ListSelectionEvent ?-> void listSelectionValueChanged = null;
+
+  /** 
+   * The implementation of the method valueChanged defined in javax.swing.event.ListSelectionListener. 
+   */
+  valueChanged(e)
+  {
+    ListSelectionEvent ?-> void listSelectionValueChanged = this.listSelectionValueChanged;
+    if(listSelectionValueChanged != null) listSelectionValueChanged(notNull(e));
+  }
+}
+
+// --------------------------------------------------------------------------------------------------
+// --------------------------------------------------------------------------------------------------
+
+/** 
+ * class that implements the javax.swing.event.MenuDragMouseListener interface
+ * and delegates the actions to optional anonymous functions.
+ */
+class NiceMenuDragMouseListener extends NiceListener, MenuDragMouseListener
+{
+  /** 
+   * A field that store optional anonymous functions for each required action. 
+   */
+  private MenuDragMouseEvent ?-> void menuDragMouseDragged = null;
+  private MenuDragMouseEvent ?-> void menuDragMouseEntered = null;
+  private MenuDragMouseEvent ?-> void menuDragMouseExited = null;
+  private MenuDragMouseEvent ?-> void menuDragMouseReleased = null;
+
+  /** 
+   * The implementation of the method menuDragMouseDragged defined in javax.swing.event.MenuDragMouseListener. 
+   */
+  menuDragMouseDragged(e)
+  {
+    MenuDragMouseEvent ?-> void menuDragMouseDragged = this.menuDragMouseDragged;
+    if(menuDragMouseDragged != null) menuDragMouseDragged(notNull(e));
+  }
+  
+  /** 
+   * The implementation of the method menuDragMouseEntered defined in javax.swing.event.MenuDragMouseListener. 
+   */
+  menuDragMouseEntered(e)
+  {
+    MenuDragMouseEvent ?-> void menuDragMouseEntered = this.menuDragMouseEntered;
+    if(menuDragMouseEntered != null) menuDragMouseEntered(notNull(e));
+  }
+  
+  /** 
+   * The implementation of the method menuDragMouseExited defined in javax.swing.event.MenuDragMouseListener. 
+   */
+  menuDragMouseExited(e)
+  {
+    MenuDragMouseEvent ?-> void menuDragMouseExited = this.menuDragMouseExited;
+    if(menuDragMouseExited != null) menuDragMouseExited(notNull(e));
+  }
+  /** 
+   * The implementation of the method menuDragMouseReleased defined in javax.swing.event.MenuDragMouseListener. 
+   */
+  menuDragMouseReleased(e)
+  {
+    MenuDragMouseEvent ?-> void menuDragMouseReleased = this.menuDragMouseReleased;
+    if(menuDragMouseReleased != null) menuDragMouseReleased(notNull(e));
+  }
+}
+
+// --------------------------------------------------------------------------------------------------
+// --------------------------------------------------------------------------------------------------
+
+/** 
+ * class that implements the javax.swing.event.MenuKeyListener interface
+ * and delegates the actions to optional anonymous functions.
+ */
+class NiceMenuKeyListener extends NiceListener, MenuKeyListener
+{
+  /** 
+   * fields that store optional anonymous functions for each required action 
+   */
+  private MenuKeyEvent ?-> void menuKeyPressed = null;
+  private MenuKeyEvent ?-> void menuKeyReleased = null;
+  private MenuKeyEvent ?-> void menuKeyTyped = null;
+  
+  /** 
+   * The implementation of the method menuKeyPressed defined in javax.swing.event.MenuKeyListener. 
+   */
+  menuKeyPressed(e)
+  {
+    MenuKeyEvent ?-> void menuKeyPressed = this.menuKeyPressed;
+    if(menuKeyPressed != null) menuKeyPressed(notNull(e));
+  }
+  
+  /** 
+   * The implementation of the method menuKeyReleased defined in javax.swing.event.MenuKeyListener. 
+   */
+  menuKeyReleased(e)
+  {
+    MenuKeyEvent ?-> void menuKeyReleased = this.menuKeyReleased;
+    if(menuKeyReleased != null) menuKeyReleased(notNull(e));
+  }
+  
+  /** 
+   * The implementation of the method menuKeyTyped defined in javax.swing.event.MenuKeyListener. 
+   */
+  menuKeyTyped(e)
+  {
+    MenuKeyEvent ?-> void menuKeyTyped = this.menuKeyTyped;
+    if(menuKeyTyped != null) menuKeyTyped(notNull(e));
+  }
+}
+
+// --------------------------------------------------------------------------------------------------
+// --------------------------------------------------------------------------------------------------
+
+/** 
+ * class that implements the javax.swing.event.MenuListener interface
+ * and delegates the actions to optional anonymous functions.
+ */
+class NiceMenuListener extends NiceListener, MenuListener
+{
+  /** 
+   * fields that store optional anonymous functions for each required action 
+   */
+  private MenuEvent ?-> void menuCanceled = null;
+  private MenuEvent ?-> void menuDeselected = null;
+  private MenuEvent ?-> void menuSelected = null;
+  
+  /** 
+   * The implementation of the method menuCanceled defined in javax.swing.event.MenuListener. 
+   */
+  menuCanceled(e)
+  {
+    MenuEvent ?-> void menuCanceled = this.menuCanceled;
+    if(menuCanceled != null) menuCanceled(notNull(e));
+  }
+  
+  /** 
+   * The implementation of the method menuDeselected defined in javax.swing.event.MenuListener. 
+   */
+  menuDeselected(e)
+  {
+    MenuEvent ?-> void menuDeselected = this.menuDeselected;
+    if(menuDeselected != null) menuDeselected(notNull(e));
+  }
+  
+  /** 
+   * The implementation of the method menuSelected defined in javax.swing.event.MenuListener. 
+   */
+  menuSelected(e)
+  {
+    MenuEvent ?-> void menuSelected = this.menuSelected;
+    if(menuSelected != null) menuSelected(notNull(e));
+  }
+}
+
+// --------------------------------------------------------------------------------------------------
+// --------------------------------------------------------------------------------------------------
+
+/** 
+ * class that implements the javax.swing.event.PopupMenuListener interface
+ * and delegates the actions to optional  anonymous functions.
+ */
+class NicePopupMenuListener extends NiceListener, PopupMenuListener
+{
+  /** 
+   * fields that store optional anonymous functions for each required action 
+   */
+  private PopupMenuEvent ?-> void popupMenuCanceled = null;
+  private PopupMenuEvent ?-> void popupMenuWillBecomeInvisible = null;
+  private PopupMenuEvent ?-> void popupMenuWillBecomeVisible = null;
+  
+  /** 
+   * The implementation of the method popupMenuCanceled defined in javax.swing.event.PopupMenuListener. 
+   */
+  popupMenuCanceled(e)
+  {
+    PopupMenuEvent ?-> void popupMenuCanceled = this.popupMenuCanceled;
+    if(popupMenuCanceled != null) popupMenuCanceled(notNull(e));
+  }
+  
+  /** 
+   * The implementation of the method popupMenuWillBecomeInvisible defined in javax.swing.event.PopupMenuListener. 
+   */
+  popupMenuWillBecomeInvisible(e)
+  {
+    PopupMenuEvent ?-> void popupMenuWillBecomeInvisible = this.popupMenuWillBecomeInvisible;
+    if(popupMenuWillBecomeInvisible != null) popupMenuWillBecomeInvisible(notNull(e));
+  }
+  
+  /** 
+   * The implementation of the method popupMenuWillBecomeVisible defined in javax.swing.event.PopupMenuListener. 
+   */
+  popupMenuWillBecomeVisible(e)
+  {
+    PopupMenuEvent ?-> void popupMenuWillBecomeVisible = this.popupMenuWillBecomeVisible;
+    if(popupMenuWillBecomeVisible != null) popupMenuWillBecomeVisible(notNull(e));
+  }
+}
+
+// --------------------------------------------------------------------------------------------------
+// --------------------------------------------------------------------------------------------------
+
+/** 
+ * class that implements the javax.swing.event.TableColumnModelListener interface
+ * and delegates the actions to optional anonymous functions.
+ */
+class NiceTableColumnModelListener extends NiceListener, TableColumnModelListener
+{
+  /** 
+   * fields that store optional anonymous functions for each required action 
+   */
+  private TableColumnModelEvent ?-> void columnAdded = null;
+  private TableColumnModelEvent ?-> void columnMoved = null;
+  private TableColumnModelEvent ?-> void columnRemoved = null;
+  private ListSelectionEvent    ?-> void columnSelectionChanged = null;
+  private ChangeEvent           ?-> void columnMarginChanged = null;
+  
+  /** 
+   * The implementation of the method columnAdded defined in javax.swing.event.TableColumnModelListener. 
+   */
+  columnAdded(e)
+  {
+    TableColumnModelEvent ?-> void columnAdded = this.columnAdded;
+    if(columnAdded != null) columnAdded(notNull(e));
+  }
+  
+  /** 
+   * The implementation of the method columnMarginChanged defined in javax.swing.event.TableColumnModelListener. 
+   */
+  columnMarginChanged(e)
+  {
+    ChangeEvent ?-> void columnMarginChanged = this.columnMarginChanged;
+    if(columnMarginChanged != null) columnMarginChanged(notNull(e));
+  }
+  
+  /** 
+   * The implementation of the method columnMoved defined in javax.swing.event.TableColumnModelListener. 
+   */
+  columnMoved(e)
+  {
+    TableColumnModelEvent ?-> void columnMoved = this.columnMoved;
+    if(columnMoved != null) columnMoved(notNull(e));
+  }
+    
+  /** 
+   * The implementation of the method columnRemoved defined in javax.swing.event.TableColumnModelListener. 
+   */
+  columnRemoved(e)
+  {
+    TableColumnModelEvent ?-> void columnRemoved = this.columnRemoved;
+    if(columnRemoved != null) columnRemoved(notNull(e));
+  }
+  
+  /** 
+   * The implementation of the method columnSelectionChanged defined in javax.swing.event.TableColumnModelListener. 
+   */
+  columnSelectionChanged(e)
+  {
+    ListSelectionEvent ?-> void columnSelectionChanged = this.columnSelectionChanged;
+    if(columnSelectionChanged != null) columnSelectionChanged(notNull(e));
+  }
+}
+
+// --------------------------------------------------------------------------------------------------
+// --------------------------------------------------------------------------------------------------
+
+/** 
+ * class that implements the javax.swing.event.TableModelListener interface
+ * and delegates the action to an optional anonymous function.
+ */
+class NiceTableModelListener extends NiceListener, TableModelListener
+{
+  /** 
+   * A field that stores an optional anonymous function. 
+   */
+  private TableModelEvent ?-> void tableChanged = null;
+
+  /** 
+   * The implementation of the method tableChanged defined in javax.swing.event.TableModelListener. 
+   */
+  tableChanged(e)
+  {
+    TableModelEvent ?-> void tableChanged = this.tableChanged;
+    if(tableChanged != null) tableChanged(notNull(e));
+  }
+}
+
+// --------------------------------------------------------------------------------------------------
+// --------------------------------------------------------------------------------------------------
+
+/** 
+ * class that implements the javax.swing.event.TreeExpansionListener interface
+ * and delegates the actions to optional anonymous functions.
+ */
+class NiceTreeExpansionListener extends NiceListener, TreeExpansionListener
+{
+  /** 
+   * fields that store optional anonymous function for each required action 
+   */
+  private TreeExpansionEvent ?-> void treeCollapsed = null;
+  private TreeExpansionEvent ?-> void treeExpanded = null;
+  
+  /** 
+   * The implementation of the method treeCollapsed defined in javax.swing.event.TreeExpansionListener. 
+   */
+  treeCollapsed(e)
+  {
+    TreeExpansionEvent ?-> void treeCollapsed = this.treeCollapsed;
+    if(treeCollapsed != null) treeCollapsed(notNull(e));
+  }
+  
+    /** 
+   * The implementation of the method treeExpanded defined in javax.swing.event.TreeExpansionListener. 
+   */
+  treeExpanded(e)
+  {
+    TreeExpansionEvent ?-> void treeExpanded = this.treeExpanded;
+    if(treeExpanded != null) treeExpanded(notNull(e));
+  }
+}
+
+// --------------------------------------------------------------------------------------------------
+// --------------------------------------------------------------------------------------------------
+
+/** 
+ * class that implements the javax.swing.event.TreeModelListener interface
+ * and delegates the actions to optional anonymous functions.
+ */
+class NiceTreeModelListener extends NiceListener, TreeModelListener
+{
+  /** 
+   * Fields that store optional anonymous functions for each required action. 
+   */
+  private TreeModelEvent ?-> void treeNodesChanged = null;
+  private TreeModelEvent ?-> void treeNodesInserted = null;
+  private TreeModelEvent ?-> void treeNodesRemoved = null;
+  private TreeModelEvent ?-> void treeStructureChanged = null;
+
+  /** 
+   * The implementation of the method treeNodesChanged defined in javax.swing.event.TreeModelListener. 
+   */
+  treeNodesChanged(e)
+  {
+    TreeModelEvent ?-> void treeNodesChanged = this.treeNodesChanged;
+    if(treeNodesChanged != null) treeNodesChanged(notNull(e));
+  }
+  
+  /** 
+   * The implementation of the method treeNodesInserted defined in javax.swing.event.TreeModelListener. 
+   */
+  treeNodesInserted(e)
+  {
+    TreeModelEvent ?-> void treeNodesInserted = this.treeNodesInserted;
+    if(treeNodesInserted != null) treeNodesInserted(notNull(e));
+  }
+  
+  /** 
+   * The implementation of the method treeNodesRemoved defined in javax.swing.event.TreeModelListener. 
+   */
+  treeNodesRemoved(e)
+  {
+    TreeModelEvent ?-> void treeNodesRemoved = this.treeNodesRemoved;
+    if(treeNodesRemoved!= null) treeNodesRemoved(notNull(e));
+  }
+  
+  /** 
+   * The implementation of the method treeStructureChanged defined in javax.swing.event.TreeModelListener. 
+   */
+  treeStructureChanged(e)
+  {
+    TreeModelEvent ?-> void treeStructureChanged = this.treeStructureChanged;
+    if(treeStructureChanged!= null) treeStructureChanged(notNull(e));
+  }
+}
+
+// --------------------------------------------------------------------------------------------------
+// --------------------------------------------------------------------------------------------------
+
+/** 
+ * class that implements the javax.swing.event.TreeSelectionListener interface
+ * and delegates the action to an optional anonymous function.
+ */
+class NiceTreeSelectionListener extends NiceListener, TreeSelectionListener
+{
+  /** 
+   * A field that stores an optional anonymous function. 
+   */
+  private TreeSelectionEvent ?-> void treeSelectionValueChanged = null;
+
+  /** 
+   * The implementation of the method valueChanged defined in javax.swing.event.TreeSelectionListener. 
+   */
+  valueChanged(e)
+  {
+    TreeSelectionEvent ?-> void treeSelectionValueChanged = this.treeSelectionValueChanged;
+    if(treeSelectionValueChanged != null) treeSelectionValueChanged(notNull(e));
+  }
+}
+
+// --------------------------------------------------------------------------------------------------
+// --------------------------------------------------------------------------------------------------
+
+/** 
+ * class that implements the javax.swing.event.TreeWillExpandListener interface
+ * and delegates the actions to optional anonymous functions.
+ */
+class NiceTreeWillExpandListener extends NiceListener, TreeWillExpandListener
+{
+  /** 
+   * fields that store optional anonymous function for each method 
+   */
+  private TreeExpansionEvent ?-> void treeWillCollapse = null;
+  private TreeExpansionEvent ?-> void treeWillExpand = null;
+  
+  /** 
+   * The implementation of the method treeWillCollapse defined in javax.swing.event.TreeWillExpandListener. 
+   */
+  treeWillCollapse(e)
+  {
+    TreeExpansionEvent ?-> void treeWillCollapse = this.treeWillCollapse;
+    if(treeWillCollapse != null) treeWillCollapse(notNull(e));
+  }
+  
+    /** 
+   * The implementation of the method treeWillExpand defined in javax.swing.event.TreeWillExpandListener. 
+   */
+  treeWillExpand(e)
+  {
+    TreeExpansionEvent ?-> void treeWillExpand = this.treeWillExpand;
+    if(treeWillExpand != null) treeWillExpand(notNull(e));
+  }
+}
+
+// --------------------------------------------------------------------------------------------------
+// --------------------------------------------------------------------------------------------------
+
+/** 
+ * class that implements the javax.swing.event.UndoableEditListener interface
+ * and delegates the action to an optional anonymous function.
+ */
+class NiceUndoableEditListener extends NiceListener, UndoableEditListener
+{
+  /** 
+   * A field that stores an optional anonymous function. 
+   */
+  private UndoableEditEvent ?-> void undoableEditHappened = null;
+
+  /** 
+   * The implementation of the method undoableEditHappened defined in javax.swing.event.UndoableEditListener. 
+   */
+  undoableEditHappened(e)
+  {
+    UndoableEditEvent ?-> void undoableEditHappened = this.undoableEditHappened;
+    if(undoableEditHappened != null) undoableEditHappened(notNull(e));
+  }
+}

@@ -1,0 +1,164 @@
+package nice.beans;
+
+import java.beans.*;
+import java.beans.beancontext.*;
+
+
+
+// --------------------------------------------------------------------------------------------------
+// --------------------------------------------------------------------------------------------------
+
+/** 
+ * class that implements the javax.swing.event.PropertyChangeListener interface
+ * and delegates the action to an optional anonymous function.
+ */
+class NicePropertyChangeListener extends PropertyChangeListener
+{
+  /** 
+   * A field that stores an optional anonymous function. 
+   */
+  private PropertyChangeEvent ?-> void propertyChange = null;
+
+  /** 
+   * The implementation of the method propertyChange defined in javax.swing.event.PropertyChangeListener. 
+   */
+  propertyChange(e)
+  {
+    PropertyChangeEvent ?-> void propertyChange = this.propertyChange;
+    if(propertyChange != null) propertyChange(notNull(e));
+  }
+}
+
+// --------------------------------------------------------------------------------------------------
+// --------------------------------------------------------------------------------------------------
+
+/** 
+ * class that implements the javax.swing.event.VetoableChangeListener interface
+ * and delegates the action to an optional anonymous function.
+ */
+class NiceVetoableChangeListener extends VetoableChangeListener
+{
+  /** 
+   * A field that stores an optional anonymous function. 
+   */
+  private PropertyChangeEvent ?-> void vetoableChange = null;
+
+  /** 
+   * The implementation of the method vetoableChange defined in javax.swing.event.VetoableChangeListener. 
+   */
+  vetoableChange(e)
+  {
+    PropertyChangeEvent ?-> void vetoableChange = this.vetoableChange;
+    if(vetoableChange != null) vetoableChange(notNull(e));
+  }
+}
+
+
+// --------------------------------------------------------------------------------------------------
+// --------------------------------------------------------------------------------------------------
+
+/** 
+ * class that implements the java.beans.beancontext.BeanContextMembershipListener interface
+ * and delegates the actions to optional anonymous functions.
+ */
+class NiceBeanContextMembershipListener extends BeanContextMembershipListener
+{
+  /** 
+   * fields that store optional anonymous function for each required action 
+   */
+  private BeanContextMembershipEvent ?-> void childrenAdded = null;
+  private BeanContextMembershipEvent ?-> void childrenRemoved = null;
+  
+  /** 
+   * The implementation of the method childrenAdded defined in java.beans.beancontext.BeanContextMembershipListener. 
+   */
+  childrenAdded(e)
+  {
+    BeanContextMembershipEvent ?-> void childrenAdded = this.childrenAdded;
+    if(childrenAdded != null) childrenAdded(notNull(e));
+  }
+  
+    /** 
+   * The implementation of the method childrenRemoved defined in java.beans.beancontext.BeanContextMembershipListener. 
+   */
+  childrenRemoved(e)
+  {
+    BeanContextMembershipEvent ?-> void childrenRemoved = this.childrenRemoved;
+    if(childrenRemoved != null) childrenRemoved(notNull(e));
+  }
+}
+
+
+
+// --------------------------------------------------------------------------------------------------
+// --------------------------------------------------------------------------------------------------
+
+/** 
+ * class that implements the java.beans.beancontext.BeanContextServicesListener interface
+ * and delegates the actions to optional anonymous functions.
+ */
+class NiceBeanContextServicesListener extends BeanContextServicesListener
+{
+  /** 
+   * fields that store optional anonymous function for each required action 
+   */
+  private BeanContextServiceAvailableEvent ?-> void serviceAvailable = null;
+  
+  /** 
+   * The implementation of the method serviceAvailable defined in java.beans.beancontext.BeanContextServicesListener. 
+   */
+  serviceAvailable(e)
+  {
+    BeanContextServiceAvailableEvent ?-> void serviceAvailable = this.serviceAvailable;
+    if(serviceAvailable != null) serviceAvailable(notNull(e));
+  }
+}
+
+
+// --------------------------------------------------------------------------------------------------
+// --------------------------------------------------------------------------------------------------
+//
+///** 
+// * class that implements the java.beans.ExceptionListener interface
+// * and delegates the actions to optional anonymous functions.
+// */
+//class NiceExceptionListener extends ExceptionListener
+//{
+//  /** 
+//   * fields that store optional anonymous function for each required action 
+//   */
+//  private Exception ?-> void exceptionThrown = null;
+//  
+//  /** 
+//   * The implementation of the method exceptionThrown defined in java.beans.ExceptionListener. 
+//   */
+//  exceptionThrown(e)
+//  {
+//    Exception ?-> void exceptionThrown = this.exceptionThrown;
+//    if(exceptionThrown != null) exceptionThrown(notNull(e));
+//  }
+//}
+
+// --------------------------------------------------------------------------------------------------
+// --------------------------------------------------------------------------------------------------
+
+/** 
+ * class that implements the java.beans.beancontext.BeanContextServiceRevokedListener interface
+ * and delegates the actions to optional anonymous functions.
+ */
+class NiceBeanContextServiceRevokedListener extends BeanContextServiceRevokedListener
+{
+  /** 
+   * fields that store optional anonymous function for each required action 
+   */
+  private BeanContextServiceRevokedEvent ?-> void serviceRevoked = null;
+  
+  /** 
+   * The implementation of the method serviceRevoked defined in java.beans.beancontext.BeanContextServiceRevokedListener. 
+   */
+  serviceRevoked(e)
+  {
+    BeanContextServiceRevokedEvent ?-> void serviceRevoked = this.serviceRevoked;
+    if(serviceRevoked != null) serviceRevoked(notNull(e));
+  }
+}

@@ -19,7 +19,7 @@ public class Separator {
   }
 
   public void setContent(String content) {
-    this.content2 = content2;
+    this.content2 = content;
   }
   
   public String toString() {

@@ -153,11 +153,10 @@ class DirectoryCompiledContent extends CompiledContent
   {
     File f = new File(directory, name);
 
-    if (f != null)
-      try{
-	return new FileInputStream(f);
-      }
-      catch(FileNotFoundException e){}
+    try{
+      return new FileInputStream(f);
+    }
+    catch(FileNotFoundException e){}
 
     return null;
   } 

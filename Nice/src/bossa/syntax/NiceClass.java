@@ -97,11 +97,20 @@ public class NiceClass extends ClassDefinition
       this.isFinal = isFinal;
     }
 
+    void resolve(VarScope scope, TypeScope typeScope)
+    {
+      sym.type = sym.syntacticType.resolve(typeScope);
+      
+      if (Types.isVoid(sym.type))
+	User.error(sym, "Fields cannot have void type");
+
+      value = dispatch.analyse(value, scope, typeScope);
+    }
+
     void typecheck(NiceClass c)
     {
       if (value != null)
 	{
-	  System.out.println("Tc " + this);
 	  c.enterTypingContext();
 	  mlsub.typing.Polytype declaredType = sym.getType();
 	  value = value.resolveOverloading(declaredType);
@@ -149,15 +158,16 @@ public class NiceClass extends ClassDefinition
   void resolve()
   {
     super.resolve();
-
     classe.supers = computeSupers();
-
+    resolveFields();
     createConstructor();
+  }
 
-    //optim
+  private void resolveFields()
+  {
     if (fields.length == 0)
       return;
-    
+
     TypeScope localScope = typeScope;
     if (typeParameters != null)
       try{
@@ -169,14 +179,7 @@ public class NiceClass extends ClassDefinition
       }
     
     for (int i = 0; i < fields.length; i++)
-      {
-	Field f = fields[i];
-	
-	f.sym.type = f.sym.syntacticType.resolve(localScope);
-
-	if (Types.isVoid(f.sym.type))
-	  User.error(f.sym, "Fields cannot have void type");
-      }
+      fields[i].resolve(scope, localScope);
   }
 
   public void createContext()
@@ -230,6 +233,12 @@ public class NiceClass extends ClassDefinition
     Typing.enter();
     entered = true;
     Typing.introduce(typeParameters);
+    try {
+      Typing.implies();
+    }
+    catch(TypingEx ex) {
+      Internal.error(ex);
+    }
   }
 
 
@@ -332,8 +341,6 @@ public class NiceClass extends ClassDefinition
 	public void printInterface(java.io.PrintWriter s)
 	{ throw new Error("Should not be called"); }
       };
-    values.buildScope(scope, typeScope);
-    values.doResolve();
 
     TypeConstructors.addConstructor(tc, constructorMethod);
   }

@@ -91,7 +91,8 @@ public abstract class Expression
    */
   Expression resolveOverloading(Polytype expectedType)
   {
-    return this;
+    // Default implementation: do not consider the expected type.
+    return noOverloading();
   }
   
   /**

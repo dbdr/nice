@@ -24,7 +24,8 @@ unknownIdent(name)
 bossa.util.UserError assignmentError(bossa.util.Located responsible,
 				     String target,
 				     String targetType,
-				     Expression value)
+				     Expression value);
+assignmentError(responsible, target, targetType, value)
 {
   StringBuffer msg = new StringBuffer(100);
   msg.append("Incorrect type in assignment to ").append(target);

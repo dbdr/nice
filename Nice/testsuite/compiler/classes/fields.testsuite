@@ -6,8 +6,23 @@
   }
 
 /// PASS
+  new A();
+  /// TOPLEVEL
+  class A
+  {
+    boolean x = false;
+  }
+
+/// PASS
   /// TOPLEVEL
   class A<T>
   {
     ?T x = null;
+  }
+
+/// PASS
+  /// TOPLEVEL
+  class SymbolTable<Sym>
+  {
+    nice.lang.Hashtable<String, Sym> symbols = hashtable();
   }

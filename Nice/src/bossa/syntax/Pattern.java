@@ -123,10 +123,13 @@ public class Pattern implements Located
   {
     if (typeConstructor != null)
       {
-        mlsub.typing.TypeSymbol sym = 
-          typeConstructor.resolveToTypeSymbol(scope);
+        TypeSymbol sym = typeConstructor.resolveToTypeSymbol(scope);
 
-        if (sym instanceof TypeConstructor)
+        if (sym == TopMonotype.instance)
+          {
+            // This is @Object, which is always true, nothing to test.
+          }
+        else if (sym instanceof TypeConstructor)
           tc = (TypeConstructor) sym;
         else
           throw User.error(this, typeConstructor + 

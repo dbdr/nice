@@ -119,3 +119,9 @@ class A { int i; }
 int f(?A);
 f(x@A) = x.i;
 f(null) = 0;
+
+/// PASS
+  foo(new Object());
+  /// Toplevel
+void foo(Object o);
+foo(Object o) { }

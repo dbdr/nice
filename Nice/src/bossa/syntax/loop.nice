@@ -132,16 +132,16 @@ public Statement createForInLoop(?Monotype vartype, LocatedString varName, Locat
 	parameters: new TypeParameters(content: [vartype]),
 	loc: loc, nullness: /*sure*/2);
 
-  let getiter = createCallExp(createIdentExp(new LocatedString("forIterator", loc)), container); 
+  let getiter = createCallExp(createIdentExp(new LocatedString("forIterator", loc)), container);
   let iter = new LocatedString(loc.uniqueIdentifier("for_in_iter_"), loc);
   let init = new LocalVariable(iter, itertype, true, getiter);
   let iterexp = createIdentExp(iter);
   let cond = createCallExp(createIdentExp(new LocatedString("hasNext", loc)), iterexp);
   let getvar = createCallExp(createIdentExp(new LocatedString("next", loc)), iterexp);
   let assign = new LocalVariable(varName, vartype, true, getvar);
-  let loop = new LoopStmt(whileExp: cond, loopBody: createBlock(new LinkedList([assign, body])), testFirst: true);
-  return createBlock(new LinkedList([init, loop]));
+  let loop = new LoopStmt(whileExp: cond, loopBody: createBlock([assign, body]), testFirst: true);
 
+  return createBlock([init, loop]);
 }
 
 var ?gnu.expr.BlockExp currentLoopBlock = null;

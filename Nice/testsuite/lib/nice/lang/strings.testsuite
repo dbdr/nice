@@ -1,29 +1,14 @@
 /// PASS
   List<String> splits = split("foo,bar,baz", ",");
   assert splits.size == 3;
-
-/// PASS
-  List<String> splits = split("foo,bar,baz", ",");
   assert splits[0].equals("foo");		
-
-/// PASS
-  List<String> splits = split("foo,bar,baz", ",");
   assert splits[1].equals("bar");		
-
-/// PASS
-  List<String> splits = split("foo,bar,baz", ",");
   assert splits[2].equals("baz");		
 
 /// PASS
   List<String> splits = split("foo,bar,foo,baz", "foo,");
   assert splits.size == 2;
-
-/// PASS
-  List<String> splits = split("foo,bar,foo,baz", "foo,");
   assert splits[0].equals("bar,");		
-
-/// PASS
-  List<String> splits = split("foo,bar,foo,baz", "foo,");
   assert splits[1].equals("baz");		
 
 /// PASS

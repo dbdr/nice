@@ -5,6 +5,9 @@ class A
   int x;
 }
 
+<Any I> I id(I);
+id(x) = x;
+
 void bidon();
 bidon()
 {
@@ -92,18 +95,6 @@ main(args)
   <long, long> t2;
   t2 = t1;  
 
-  // testing default values
-  {
-    boolean bo;
-    byte by;
-    short s;
-    int i;
-    long l;
-    char c;
-    // should do something so that c==0 returns true.
-
-    println("" + (bo==false) + (by==0) + (s==0) + (i==0) + (l==0));
-  }
-
+  test_numeric();
   test_arrays();
 }

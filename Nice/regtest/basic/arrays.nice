@@ -1,0 +1,76 @@
+package regtest.basic;
+
+// native arrays
+// Array<T> and T[] are synonyms
+
+<Any T> void p(Array<T>);
+p(a)
+{
+  print("size = " + a.length + ", elements = ");
+  for(int i = 0; i<a.length; i++)
+    print(""+ a[i] + " ");
+  println("");
+}
+
+<Any T> Array<T> reverse(Array<T>);
+reverse<T>(a)
+{
+  T[] res = new T[a.length];
+  for (int i=0; i<a.length; i++)
+    res[i] = a[a.length - i - 1];
+  return res;
+}
+
+void test_arrays();
+test_arrays()
+{
+  println("\n### Testing native arrays ###\n");
+
+  int[] a = new int[10];
+  for(int i=0; i<10; i++)
+    a[i] = i;
+  p(a);
+  p(reverse(a));
+  
+  // using collection functions on arrays
+  int[] b = map(a, fun(int i) => i+4);
+  p(b);
+  p(filter(reverse(b), fun(int i)=> i>6));
+
+  long[] ls = map(a, id);
+  ls[0] = Long.MAX_VALUE;
+  p(ls);
+
+  byte[] bs = new byte[1];
+  bs = map(bs, id);
+  bs[0] = 127;
+  short[] shs = map(bs, id);
+  shs[0] = 129;
+  char[] cs = new char[1];
+  cs[0] = 'A';
+  double[] ds = map(cs, id);
+  p(ds);
+
+  // idem with non primitive arrays
+  String[] ss = new String[5];
+  ss[2] = "e2"; ss[4] = "e4";
+  p(ss);
+  String[] ss2 = filter(ss, fun(String s)=>s!=null);
+  p(ss2);
+  p(map(ss2, fun(String s) => s+s));
+
+  // multidimentional arrays
+  {
+    int N = 4;
+    int[][] aa = new int[N][N];
+    for (int i=0; i<N; i++)
+      {
+	for (int j=0; j<N; j++)
+	  {
+	    aa[i][j] = i*2+j;
+	    print("" + aa[i][j] + " ");
+	  }
+	println("");
+      }
+  }
+}

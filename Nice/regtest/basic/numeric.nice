@@ -1,0 +1,35 @@
+
+package regtest.basic;
+
+/**
+   Test of primitive numbers.
+   Especially tests that cannot be done in coreJava 
+   for comparison with Java.
+   */
+
+void test_numeric();
+test_numeric()
+{
+  // testing default values
+  boolean bo;
+  byte by;
+  short s;
+  int i;
+  long l;
+  char c;
+  float f;
+  double d;
+  // should do something so that c==0 returns true.
+
+  println("" + (bo==false) + (by==0) + (s==0) + (i==0) + (l==0));
+
+  // testing correct wrapping/unwrapping
+  bo = id(bo);
+  by = id(by);
+  s  = id(s);
+  i  = id(i);
+  l  = id(l);
+  c  = id(c);
+  f  = id(f);
+  d  = id(d);
+}

@@ -265,3 +265,29 @@ override void foo(A<String> x) {}
   class B extends A {}
   void foo(?A x) {}
   override void foo(?B x) {}
+
+/// PASS
+  /// Toplevel
+abstract class A
+{
+  void foo(?String s);
+}
+
+class B extends A
+{
+  override void foo(?String s) {}
+}
+
+/// PASS
+  /// package a
+  /// Toplevel
+abstract class A
+{
+  void foo(?String s);
+}
+  /// package b import a
+  /// Toplevel
+class B extends A
+{
+  override void foo(?String s) {}
+}

@@ -263,7 +263,7 @@ public Pattern createPattern(?LocatedString name, ?mlsub.typing.TypeConstructor 
   if (sure && tc == null)
     return new NotNullPattern(name: name, tc: nice.tools.typing.PrimitiveType.sureTC, loc: loc);
 
-  if (tc == null)
+  if (tc == null || !sure)
     return new VariablePattern(name: name, loc: loc);
 
   return new TypePattern(name: name, tc: tc, loc: loc, exactlyAt: false);

@@ -113,6 +113,7 @@ class Info
     // the computation. Otherwise merge information with previous branches.
     if (! this.getUnreachable())
       tempResult &= this.flags;
+
     this.flagsStack.push(tempResult);
 
     // Start the next branch with the state preceding the cases.
@@ -169,6 +170,7 @@ class Info
 	symbol.type = notNull(symbol.syntacticType).resolve(this.typeMap);
 	symbol.syntacticType = null;
       }
+
     this.checkNotDefined(symbol);
     this.vars[symbol.name.toString()] = symbol;
   }
@@ -182,14 +184,15 @@ class Info
 	if (nice.tools.code.Types.isVoid(symbol.type))
 	  throw error(symbol, "A variable cannot have a void type");
       }
+
     this.checkNotDefined(symbol);
     this.vars[symbol.name.toString()] = symbol;
   }
 
-  void addVars(Array<?MonoSymbol> symbols) = 
-    symbols.foreach(?MonoSymbol s => this.addVar(notNull(s)));
+  void addVars(MonoSymbol[] symbols) = 
+    symbols.foreach(MonoSymbol s => this.addVar(s));
   
-  void addTypeVars(Array<TypeSymbol> symbols) = 
+  void addTypeVars(TypeSymbol[] symbols) = 
     symbols.foreach(TypeSymbol s => this.typeVars[s.toString()] = s);
 
   void checkNotDefined(VarSymbol symbol)
@@ -244,6 +247,7 @@ analyseAssigned(e@TupleExp, info)
   Array<?Expression> es = notNull(e.expressions);
   for (int i = 0; i < es.length; i++)
     es[i] = es[i].analyseAssigned(info);
+
   return e;
 }
 
@@ -378,13 +382,12 @@ analyse(e@FunExp, info)
   if (e.constraint != Constraint.True && e.constraint != null)
     {
       e.cst = notNull(e.constraint).resolveToLowlevel();
-      ///TODO: remove the cast when base compiler > 0.7.6 (new java types)
-      addTypeVars(info, cast(notNull(e.cst).binders()));
+      addTypeVars(info, notNull(e.cst).binders());
     }
   e.constraint = null;
 
   if (e.formals != null)
-    addVars(info, notNull(e.formals));
+    addVars(info, elementsNotNull(notNull(e.formals)));
 
   analyse(e.body, info);
   e.setAlwaysReturns(info.getUnreachable());
@@ -403,67 +406,75 @@ Expression analyseIdent(IdentExp e, Info info, boolean assigned)
       ?VarSymbol sym = info.lookup(notNull(e.ident).toString());
 
       if (sym != null)
-	if (e.alwaysOverloadedSymbol)
-	  return new OverloadedSymbolExp(sym, e.ident);
-	else
-	  {
-	    if (sym instanceof Block.LocalVariable.Symbol)
-	      {
-		Block.LocalVariable.Symbol s = cast(sym);
-		if (assigned)
-		  setInitialized(s, info, e.location());
-		else
-		  checkInitialized(s, info, e.location());
-	      }
-	    return new SymbolExp(sym, e.location());
-	  }
+        {
+	  if (e.alwaysOverloadedSymbol)
+            {
+	      return new OverloadedSymbolExp(sym, e.ident);
+            }
+	  else
+	    {
+	      if (sym instanceof Block.LocalVariable.Symbol)
+	        {
+		  Block.LocalVariable.Symbol s = cast(sym);
+		  if (assigned)
+		    setInitialized(s, info, e.location());
+		  else
+		    checkInitialized(s, info, e.location());
+	        }
+	      return new SymbolExp(sym, e.location());
+	    }
+	}
     }
 
-  List<VarSymbol> symbols;
+  ?List<VarSymbol> symbols;
   if (e.infix)
     symbols = cast(notNull(Node.getGlobalScope()).lookup(e.ident));
   else
     symbols = info.globalLookup(notNull(e.ident));
 
   if (symbols != null && symbols.size() > 0)
-    if (!e.alwaysOverloadedSymbol() && symbols.size() == 1)
-      {
-	VarSymbol sym = symbols[0];
+    {
+      if (!e.alwaysOverloadedSymbol() && symbols.size() == 1)
+        {
+	  VarSymbol sym = symbols[0];
 
-	if (sym instanceof FormalParameters.Parameter.Symbol)
-	  {
-	    FormalParameters.Parameter.Symbol s = cast(sym);
-	    int state = s.getState();
-	    if (state == 0/*XXX: FormalParameters.Parameter.Symbol.NOT_ACCESSIBLE*/)
-	      throw error(e, "Parameter " + e + " is not accessible");
+	  if (sym instanceof FormalParameters.Parameter.Symbol)
+	    {
+	      FormalParameters.Parameter.Symbol s = cast(sym);
+	      int state = s.getState();
+	      if (state == 0/*XXX: FormalParameters.Parameter.Symbol.NOT_ACCESSIBLE*/)
+	        throw error(e, "Parameter " + e + " is not accessible");
 
-	    if (state == 1/*XXX: FormalParameters.Parameter.Symbol.ARGUMENT_REFERENCE*/)
-		return new FormalParameters.Parameter.AccessExp(s, e.location());
-	    // Otherwise, we are in the normal case.
-	  }
+	      if (state == 1/*XXX: FormalParameters.Parameter.Symbol.ARGUMENT_REFERENCE*/)
+		  return new FormalParameters.Parameter.AccessExp(s, e.location());
+	      // Otherwise, we are in the normal case.
+	    }
 
-	if (sym.isNonStaticFieldAccess() && Node.thisExp != null)
-          {
-	    CallExp res = new CallExp
-	      (newOverloadedSymbolExp(symbols, e.ident),
-	      new Arguments([new Arguments.Argument(Node.thisExp)]));
-            res.setLocation(e.location());
-            return res;
-          }
-	else if (sym.isStaticFieldAccess())
-	  // Refering to an unqualified static field.
-	  {
-	    // Make an implicit call to fetch the static field's value.
-	    CallExp res = new CallExp
-	      (newOverloadedSymbolExp(symbols, e.ident), 
-	       Arguments.noArguments());
-            res.setLocation(e.location());
-            return res;
-	  }
-	return new SymbolExp(sym, e.location());
-      }
-    else
-      return newOverloadedSymbolExp(symbols, e.ident);
+	  if (sym.isNonStaticFieldAccess() && Node.thisExp != null)
+            {
+	      CallExp res = new CallExp
+	        (newOverloadedSymbolExp(symbols, e.ident),
+	        new Arguments([new Arguments.Argument(Node.thisExp)]));
+              res.setLocation(e.location());
+              return res;
+            }
+	  else if (sym.isStaticFieldAccess())
+	    // Refering to an unqualified static field.
+	    {
+	      // Make an implicit call to fetch the static field's value.
+	      CallExp res = new CallExp
+	        (newOverloadedSymbolExp(symbols, e.ident), 
+	         Arguments.noArguments());
+              res.setLocation(e.location());
+              return res;
+	    }
+
+	  return new SymbolExp(sym, e.location());
+        }
+      else
+        return newOverloadedSymbolExp(symbols, e.ident);
+    }
+
   if (e.enableClassExp)
     return notNull(ClassExp.create(e.ident));
 
@@ -581,6 +592,7 @@ analyse(decl@Block.LocalVariable, info)
     decl.value = analyse(decl.value, info);
   else
     decl.setIndex(++info.varIndex);
+
   info.addVar(notNull(decl.left));
 
   if (info.localsOfCurrentLoop != null && notNull(decl.left).constant)
@@ -619,6 +631,7 @@ void analyse(?Statement[] statements, Info info)
       ?Statement s = statements[i];
       if (info.getUnreachable())
 	throw error(s, "This statement is never executed");
+
       analyse(s, info);
     }
 }
@@ -747,8 +760,10 @@ analyse(c@ContinueStmt, info)
       LabeledStmt l = mustFindLabel(notNull(c.label), info);
       c.loop = l.getLoop();
     }
+
   if (c.loop == null)
     throw error(c, "continue must only occur inside loops");
+
   info.setUnreachable();
 }
 

@@ -42,6 +42,11 @@ public final class Types
     return nice.tools.code.Types.javaType(tc) instanceof gnu.bytecode.PrimType;
   }
 
+  public static boolean isPrimitive(Monotype t)
+  {
+    return nice.tools.code.Types.javaType(t) instanceof gnu.bytecode.PrimType;
+  }
+
   public static boolean isPrimitive(Polytype t)
   {
     return nice.tools.code.Types.javaType(t) instanceof gnu.bytecode.PrimType;
@@ -141,6 +146,15 @@ public final class Types
        bossa.syntax.Monotype.sure(type.getMonotype()));
   }
 
+  /****************************************************************
+   * Constructor
+   ****************************************************************/
+
+  public static TypeConstructor constructor(Monotype type)
+  {
+    return equivalent(type).head();
+  }
+  
   /****************************************************************
    * Type parameters
    ****************************************************************/

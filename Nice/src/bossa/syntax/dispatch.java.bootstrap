@@ -20,7 +20,7 @@ public class dispatch
   static void typecheck$0(Statement s) {}
   static void typecheck$1(Expression e) {}
 
-  static UnknownIdentException unknownIdent$0(LocatedString ident)
+  static bossa.util.UserError unknownIdent$0(LocatedString ident)
   {
     return null;
   }

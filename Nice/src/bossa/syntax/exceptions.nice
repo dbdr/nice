@@ -9,13 +9,16 @@ class UnknownIdentException extends bossa.util.UserError
 // should be a method and not a toplvel function
 // so that it is compiled in dispatch.class
 // it is looked there in TypeIdent.java
-// We can change this with TypeJava.nice ;-)
-UnknownIdentException unknownIdent(LocatedString name);
+// We can change this with TypeIdent.nice ;-)
+bossa.util.UserError unknownIdent(LocatedString name);
 unknownIdent(name)
 {
+  /*
   UnknownIdentException res = new UnknownIdentException();
   res.ident = name;
   return res;
+  */
+  return new bossa.util.UserError(name, "" + name + " is not declared");
 }
 
 bossa.util.UserError assignmentError(bossa.util.Located responsible,

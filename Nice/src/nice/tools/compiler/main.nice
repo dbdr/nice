@@ -138,6 +138,7 @@ main(args)
   make(compilation);
   }
   catch(bossa.util.UserError e){
+    bossa.util.Internal.warning("user error only caught in main"); 
     nice.tools.compiler.OutputMessages.error(e.getMessage());
   }
   catch(ExceptionInInitializerError e){

@@ -44,9 +44,6 @@ public class AST extends Node
     try{
       n.doResolve();
     }
-    catch(UnknownIdentException e){
-      bossa.util.User.error(e.ident, e.ident + " is not declared");
-    }
     catch(UserError ex){
       nice.tools.compiler.OutputMessages.error(ex.getMessage());
     }
@@ -85,15 +82,26 @@ public class AST extends Node
       {
 	Object o = i.next();
 	if (o instanceof MethodBodyDefinition)
-	  ((MethodBodyDefinition) o).lateBuildScope();
+	  try{
+	    ((MethodBodyDefinition) o).lateBuildScope();
+	  }
+	  catch(UserError ex){
+	    nice.tools.compiler.OutputMessages.error(ex.getMessage());
+	  }
       }
+    nice.tools.compiler.OutputMessages.exitIfErrors();
 
     module.unfreezeGlobalContext();
     for(Iterator i = definitions.iterator(); i.hasNext();)
       {
 	Object o = i.next();
 	if (o instanceof MethodBodyDefinition)
-	  ((MethodBodyDefinition) o).resolveBody();
+	  try{
+	    ((MethodBodyDefinition) o).resolveBody();
+	  }
+	  catch(UserError ex){
+	    nice.tools.compiler.OutputMessages.error(ex.getMessage());
+	  }
       }
     nice.tools.compiler.OutputMessages.exitIfErrors();
     module.freezeGlobalContext();

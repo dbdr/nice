@@ -110,8 +110,6 @@ TOKEN: /* Separators, Delimiters */
 | < RBRK:       "]"   >
 | < LBRACE:     "{"   >
 | < RBRACE:     "}"   >
-// | < LPRAGMA:    "<*"  >
-// | < RPRAGMA:    "*>"  >
 | < DOT:        "."   >
 | < COLON:      ":"   >
 | < COMMA:      ","   >
@@ -633,7 +631,7 @@ AtomicConstraint atomicConstraint():
 }
 
 void atomics(List res):
-// if init is null, we just want lookahead
+// if res is null, we just want lookahead
 {
   AtomicConstraint k;
 }
@@ -857,20 +855,6 @@ List namedMonotypes():
   { return res; }
 }
 
-/* 
-TypeParameters typeParameters():
-{
-  List res=new ArrayList();
-  Monotype t;
-}
-{
-  ( "<" 
-    t=monotype() { res.add(t); }
-    ( "," t=monotype() { res.add(t); } )*
-  ">" )
-  { return new TypeParameters(res); }
-}
-*/
 /***********************************************************************/
 /*                          Classes                                    */
 /***********************************************************************/

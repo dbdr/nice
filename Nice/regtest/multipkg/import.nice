@@ -3,11 +3,15 @@ package regtest.multipkg;
 /*
   This file test usage of methods defined in another package.
   We use methods from regtest.basic, which must have been compiled earlier
-  and should be recompiled together with regtest.multipkg
+  and should NOT be recompiled together with regtest.multipkg, but only loaded
   (this is done by the regtest script).
 */
 
 import regtest.basic;
+
+// test kind extension accross packages
+final class KAA implements I2 {}
+kf(k@KAA) = k;
 
 void test_import();
 test_import()

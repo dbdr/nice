@@ -1,7 +1,7 @@
 /**************************************************************************/
 /*                                N I C E                                 */
 /*             A high-level object-oriented research language             */
-/*                        (c) Daniel Bonniot 2000                         */
+/*                        (c) Daniel Bonniot 2002                         */
 /*                                                                        */
 /*  This program is free software; you can redistribute it and/or modify  */
 /*  it under the terms of the GNU General Public License as published by  */
@@ -98,10 +98,10 @@ public class AbstractInterface extends MethodContainer
   public void printInterface(java.io.PrintWriter w)
   {
     w.print("abstract interface "
-            +name
-            +Util.map("<",", ",">", typeParameters)
-            +Util.map(" extends ",", ","",extensions)
-            +"{}\n");
+            + getSimpleName()
+            + Util.map("<",", ",">", typeParameters)
+            + Util.map(" extends ",", ","", surinterfaces)
+            + "{}\n");
 
     if (children != null)
       for(Iterator i = children.iterator(); i.hasNext(); )

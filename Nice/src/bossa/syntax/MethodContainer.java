@@ -32,6 +32,8 @@ public abstract class MethodContainer extends Definition
   {
     super(name, propagate);
 
+    this.name.prepend(module.getName() + ".");
+    
     this.variance = makeVariance(variance);
 
     if (typeParameters==null || typeParameters.size() == 0)
@@ -39,6 +41,13 @@ public abstract class MethodContainer extends Definition
     else
       this.typeParameters = (MonotypeVar[]) 
 	typeParameters.toArray(new MonotypeVar[typeParameters.size()]);
+  }
+
+  /** The name of this method container without package qualification. */
+  String getSimpleName()
+  {
+    String name = getName().toString();
+    return name.substring(name.lastIndexOf('.') + 1);
   }
 
   final MonotypeVar[] typeParameters;

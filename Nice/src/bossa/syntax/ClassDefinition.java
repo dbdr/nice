@@ -70,9 +70,6 @@ abstract public class ClassDefinition extends MethodContainer
 		     "Interfaces can't abstract anything");	  
       }
     
-    this.simpleName = this.name.toString();
-    this.name.prepend(module.getName()+".");
-    
     this.isFinal = isFinal;
     this.isAbstract = isAbstract;
     this.isInterface = isInterface;
@@ -258,7 +255,7 @@ abstract public class ClassDefinition extends MethodContainer
          (isFinal ? "final " : "")
        + (isInterface ? "interface " : 
 	  (isAbstract ? "abstract " : "") + "class ")
-       + simpleName
+       + getSimpleName()
        + printTP()
        + Util.map(" extends ",", ","",superClass)
        + Util.map(" implements ",", ","",impl)
@@ -411,9 +408,6 @@ abstract public class ClassDefinition extends MethodContainer
     return "class "+name;
   }
 
-  /** The name of the class without package qualification. */
-  String simpleName;
-  
   mlsub.typing.TypeConstructor tc;
 
   protected List

@@ -5,7 +5,7 @@ abstract interface I {}
 
 class KA implements I {}
 class KB extends KA {}
-class KC extends KB implements I {}
+class KC extends KB implements regtest.basic.I {}
 final class KD extends KC implements I {}
 
 <I T> T kf(T);
@@ -17,6 +17,9 @@ kf(k#KB) = new KA();
 kf(k@KB) = k;
 
 kf(x@KD) = new KD();
+
+// test kind extension (see regtest.multipkg) 
+abstract interface I2 extends I {}
 
 void test_kinds()
 {

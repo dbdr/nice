@@ -92,7 +92,9 @@ public class LabeledStmt extends Statement
     notNull(block).setBody(statement.generateCode());
     block = null;
     return res;
-  } 
+  }
+
+  toString() = this.name() + ":\n" + statement; 
 }
 
 public new LabeledStmt(LocatedString label, Statement statement, LoopStmt loop)

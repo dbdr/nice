@@ -20,8 +20,8 @@ ANT_CLASSPATH= ${shell if [ -n "${NICE_ANTJAR}" ] ; \
 		echo "/usr/share/ant/lib/ant.jar:./external/ant.jar:${CLASSPATH}"; \
 	fi }
 
-SHELL = /bin/sh
-TOP=${PWD}
+SHELL := /bin/sh
+PWD   := $(shell pwd)
 
 java  = java
 javac = javac
@@ -29,14 +29,15 @@ jar   = jar
 
 JAVAC_FLAGS = -O -g
 
-JAVAC_GENERIC= ${javac} -classpath "${TOP}/classes:${TOP}/classes.old" -sourcepath "${TOP}/src:${TOP}/stdlib" $(JAVAC_FLAGS)
-JAVAC= ${JAVAC_GENERIC} -d "${TOP}/classes"
+JAVAC_GENERIC= ${javac} -classpath "${PWD}/classes:${PWD}/classes.old" -sourcepath "${PWD}/src:${PWD}/stdlib" ${JAVAC_FLAGS}
+JAVAC= ${JAVAC_GENERIC} -d "${PWD}/classes"
 JAVADOC=javadoc
 
-NICEC_ARGS= --exclude-runtime 
-NICEC=CLASSPATH="${TOP}/classes" JAVA="${java} -Dnice.inlined=classes-inline" ./bin/nicec.bootstrap ${NICEC_ARGS} -d "${TOP}/classes.old" --sourcepath="${TOP}/stdlib.old:${TOP}/stdlib:${TOP}/src.old:${TOP}/src" --classpath="${TOP}/classes"
-NICEC1=JAVA="${java}" ${TOP}/bin/nicec ${NICEC_ARGS} -d "${TOP}/classes" --sourcepath="${TOP}/stdlib:${TOP}/src" 
+NICEC_ARGS= --exclude-runtime
+NICEC=CLASSPATH=classes JAVA="${java} -Dnice.inlined=classes-inline" bin/nicec.bootstrap ${NICEC_ARGS} -d classes.old --sourcepath=stdlib.old:stdlib:src.old:src --classpath=classes
+NICEC1=JAVA="${java}" bin/nicec ${NICEC_ARGS} -d classes --sourcepath=stdlib:src
 
+MANIFEST = src/nice/tools/compiler/Manifest
 
 
 all: src/nice/tools/compiler/console.jar compiler
@@ -72,13 +73,13 @@ compiler2 compiler3: setDate
 archiveOld: src/nice/tools/compiler/console.jar
 	mkdir -p share/java
 	cp src/nice/tools/compiler/console.jar share/java/nice.jar
-	$(jar) umf src/nice/tools/compiler/Manifest share/java/nice.jar -C classes nice -C classes mlsub -C classes bossa -C classes gnu -C classes.old bossa -C classes.old mlsub -C classes.old nice
+	$(jar) umf $(MANIFEST) share/java/nice.jar -C classes nice -C classes mlsub -C classes bossa -C classes gnu -C classes.old bossa -C classes.old mlsub -C classes.old nice
 	if [ -r classes/lang/package.nicei ]; then cd classes; $(jar) uf ../share/java/nice.jar nice/*/package.nicei; fi
 
 archive archive2 archive3 share/java/nice.jar: src/nice/tools/compiler/console.jar
 	mkdir -p share/java
 	cp src/nice/tools/compiler/console.jar share/java/nice.jar
-	$(jar) umf src/nice/tools/compiler/Manifest share/java/nice.jar -C classes nice -C classes mlsub -C classes bossa -C classes gnu
+	$(jar) umf $(MANIFEST) share/java/nice.jar -C classes nice -C classes mlsub -C classes bossa -C classes gnu
 	if [ -r classes/lang/package.nicei ]; then cd classes; $(jar) uf ../share/java/nice.jar nice/*/package.nicei; fi
 
 
@@ -95,7 +96,7 @@ install: share/java/nice.jar
 
 
 setDate:
-	cd src; ${JAVAC} nice/tools/compiler/JavaVersion.java
+	${JAVAC} src/nice/tools/compiler/JavaVersion.java
 	${java} -classpath classes nice.tools.compiler.JavaVersion > src/nice/tools/compiler/javaVersion
 	@echo "We are using compiler `cat src/nice/tools/compiler/javaVersion` (at least our java version let us assume that)"
 	cd src/nice/tools/compiler; ./setBuildDate "${VERSION}" "`cat javaVersion`" "${TAG}"
@@ -119,12 +120,12 @@ GCJ=gcj
 GCJTEMP = /tmp/Nice-gcj.jar
 gcj:
 	cp src/nice/tools/compiler/console.jar $(GCJTEMP)
-	$(jar) umf src/mainClass $(GCJTEMP) -C classes nice/doc -C classes nice/getopt -C classes nice/lang -C classes nice/tools/ast -C classes nice/tools/code -C classes nice/tools/compiler -C classes nice/tools/util -C classes mlsub -C classes bossa -C classes gnu
-	$(GCJ) --main=nice.tools.compiler.fun -o bin/nicec.bin $(GCJTEMP)
+	$(jar) umf $(MANIFEST) $(GCJTEMP) -C classes nice/doc -C classes nice/getopt -C classes nice/lang -C classes nice/tools/ast -C classes nice/tools/code -C classes nice/tools/compiler -C classes nice/tools/util -C classes nice/tools/typing -C classes mlsub -C classes bossa -C classes gnu
+	$(GCJ) --main=nice.tools.compiler.console.fun -o bin/nicec.bin $(GCJTEMP)
 
 gcj-testsuite:
 	cp src/nice/tools/compiler/console.jar $(GCJTEMP)
-	$(jar) umf src/mainClass $(GCJTEMP) -C classes nice/doc -C classes nice/getopt -C classes nice/lang -C classes nice/tools/ast -C classes nice/tools/code -C classes nice/tools/compiler -C classes nice/tools/util -C classes nice/tools/testsuite -C classes mlsub -C classes bossa -C classes gnu
+	$(jar) umf src/mainClass $(GCJTEMP) -C classes nice/doc -C classes nice/getopt -C classes nice/lang -C classes nice/tools/ast -C classes nice/tools/code -C classes nice/tools/compiler -C classes nice/tools/util -C classes nice/tools/testsuite -C classes nice/tools/typing -C classes mlsub -C classes bossa -C classes gnu
 	$(GCJ) -g --main=nice.tools.testsuite.TestNice -o bin/testsuite.bin $(GCJTEMP)
 
 clean:
@@ -132,7 +133,7 @@ clean:
 	rm -rf classes classes-inline share/java src/bossa/parser/{Parse*.java,Token*.java,*CharStream.java}
 	rm -f bin/{nicedoc,niceunit}
 	[ -r src/bossa/syntax/dispatch.java ] && mv src/bossa/syntax/dispatch.java src/bossa/syntax/dispatch.java.bootstrap || true
-	find "${TOP}" \( -name "*.class" -o -name "*.nicei" -o -name "*~" \) -exec rm {} \;
+	find . \( -name "*.class" -o -name "*.nicei" -o -name "*~" \) -exec rm {} \;
 
 
 #****************************************************************
@@ -186,7 +187,7 @@ core-bootstrap:
 	${NICEC} -r bossa.syntax
 
 src/bossa/parser/Parser.java: src/bossa/parser/Parser.jj
-	cd src/bossa/parser; CLASSPATH=`TOP=${TOP} ${TOP}/external/javacc` \
+	cd src/bossa/parser; CLASSPATH=`TOP=${PWD} ${PWD}/external/javacc` \
 		${java} javacc Parser.jj
 
 bootstrap: core-bootstrap src/bossa/parser/Parser.java
@@ -219,6 +220,9 @@ testengine:
 	@${JAVAC} src/nice/tools/testsuite/*.java ||\
 	echo "Compilation of the testsuite engine failed."
 
+visibility:
+	$(NICEC1) -a visibility.jar nice.tools.visibility
+
 
 #****************************************************************
 #    Recompilations
@@ -227,7 +231,7 @@ testengine:
 # erase out-of-date class files and 'make dep' to recompile if javac 
 # has no -[X]depend
 dep:
-	cd src; ${JAVAC} bossa/modules/Package.java
+	${JAVAC} src/bossa/modules/Package.java
 
 parser: src/bossa/parser/Parser.java
 	${JAVAC} src/bossa/parser/Parser.java
@@ -240,7 +244,7 @@ recompileGNU:
 	cd src; ${JAVAC} gnu/*/*.java gnu/*/*/*.java
 
 recompileSTDLIB:
-	${JAVAC} "${TOP}"/stdlib/nice/lang/*.java
+	${JAVAC} stdlib/nice/lang/*.java
 
 # Compile individual files with: F=file.java make compile
 compile:
@@ -260,8 +264,8 @@ native:
 jdoc:
 	mkdir -p doc
 	cd src; ${JAVADOC} -windowtitle "Nice" -doctitle "The Nice compiler source" \
-	-overview "${TOP}"/src/overview.html \
-	-d "${TOP}"/doc -private -author -version \
+	-overview src/overview.html \
+	-d doc -private -author -version \
 	nice.tools.code \
 	mlsub.typing mlsub.typing.lowlevel mlsub.compilation \
 	bossa.syntax bossa.util bossa.link bossa.modules \

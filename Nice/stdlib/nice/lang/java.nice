@@ -341,17 +341,17 @@ class Vector<T> extends AbstractList<T> = native java.util.Vector;
   native List Collections.singletonList(Object);
 <K,K0,V,V0 | K <: K0, V <: V0> Map<K0,V0> singletonMap(K, V) =
   native Map Collections.singletonMap(Object, Object);
-<T,U | T <: U> Collection<U> synchronizedCollection(Collection<T>) =
+<T> Collection<T> synchronizedCollection(Collection<T>) =
   native Collection Collections.synchronizedCollection(Collection);
-<T,U | T <: U> List<U> synchronizedList(List<T>) =
+<T> List<T> synchronizedList(List<T>) =
   native List Collections.synchronizedList(List);
-<K,K0,V,V0 | K <: K0, V <: V0> Map<K0,V0> synchronizedMap(Map<K,V>) =
+<K,V> Map<K,V> synchronizedMap(Map<K,V>) =
   native Map Collections.synchronizedMap(Map);
-<T,U | T <: U> Set<U> synchronizedSet(Set<T>) = 
+<T> Set<T> synchronizedSet(Set<T>) = 
   native Set Collections.synchronizedSet(Set);
-<K,K0,V,V0 | K <: K0, V <: V0> SortedMap<K0,V0> synchronizedSortedMap(SortedMap<K,V>) =
+<K,V> SortedMap<K,V> synchronizedSortedMap(SortedMap<K,V>) =
   native SortedMap Collections.synchronizedSortedMap(SortedMap);
-<T,U | T <: U> SortedSet<U> synchronizedSortedSet(SortedSet<T>) =
+<T> SortedSet<T> synchronizedSortedSet(SortedSet<T>) =
   native SortedSet Collections.synchronizedSortedSet(SortedSet);
 <T,U | T <: U> Collection<U> unmodifiableCollection(Collection<T>) = 
   native Collection Collections.unmodifiableCollection(Collection);

@@ -25,7 +25,7 @@ package nice.lang;
     The scc are returned in topological order.
     Tarjan's algorithm (linear).
  */
-<Any T> List<List<T>> 
+<T> List<List<T>> 
   stronglyConnectedComponents(T start, T->List<T> successors)
 {
   Ref<int> id = new Ref(value: 0);
@@ -38,7 +38,7 @@ package nice.lang;
   return res;
 }
 
-<Any T> int visit(T node, T->List<T> successors, 
+<T> int visit(T node, T->List<T> successors, 
 		  Ref<int> id, Stack<T> stack, Map<T,int> mark, 
 		  List<List<T>> res)
 {

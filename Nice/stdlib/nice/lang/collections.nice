@@ -269,7 +269,7 @@ class NiceComparator<-T> implements java.util.Comparator<T>
 /** Find the first element that passes the given test.
     Returns <code>null</code> if there is no such element.
 */
-<Any T> ?T search (java.util.List<!T> list, !T->boolean test)
+<T> ?T search (java.util.List<!T> list, !T->boolean test)
 {
   for (!T elem : list)
     if (test(elem))

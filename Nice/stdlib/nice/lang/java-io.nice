@@ -35,8 +35,8 @@ PrintStream stdout () = native System.out;
 PrintStream stderr () = native System.err;
 
 /** Convenience: printing on the standard output. */
-<Any T> void print   (T object) = System.out.print  (object);
-<Any T> void println (T object) = System.out.println(object);
+<T> void print   (T object) = System.out.print  (object);
+<T> void println (T object) = System.out.println(object);
 
 // Constructors
 BufferedInputStream BufferedInputStream(InputStream) = native new BufferedInputStream(InputStream);

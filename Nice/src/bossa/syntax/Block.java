@@ -236,8 +236,10 @@ public class Block extends Statement
 	if (s instanceof LocalDeclaration)
 	  {
 	    // Create a subblock with all the statements starting from this one
-	    res.add(new Block(statements.subList(i.previousIndex(),
-						 statements.size())));
+	    Block end = new Block(statements.subList(i.previousIndex(),
+						     statements.size()));
+	    end.setLocation(((LocalDeclaration) s).location());
+	    res.add(end);
 	    break;
 	  }
 	

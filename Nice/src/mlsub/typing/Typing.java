@@ -45,7 +45,7 @@ public final class Typing
     return level++;
   }
 
-  // used to verify that enter abd leaves match
+  // used to verify that enter and leaves match
   static int level = 0;
   
   /**

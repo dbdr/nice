@@ -125,6 +125,9 @@ abstract public class ClassDefinition extends Definition
 	  public String toString(mlsub.typing.Monotype[] parameters)
 	  { return "?" + parameters[0].toString(); }
 	};
+    else if (name.equals("nice.lang.Null"))
+      tc = new mlsub.typing.TypeConstructor
+	("null", variance, isConcrete(), true)
     else
       tc = new mlsub.typing.TypeConstructor
 	(name.toString(), variance, isConcrete(), true);

@@ -222,8 +222,7 @@ public class Pattern
       return true;
 
     if (atNull())
-      // maybeTC is used to encode a null argument in link tests
-      return tag == ConstantExp.maybeTC;
+      return tag == ConstantExp.nullTC;
 
     // a null tc is an unmatchable argument (e.g. function)
     if (tag == null)

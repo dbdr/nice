@@ -323,6 +323,13 @@ public class ConstantExp extends Expression
 	return gnu.bytecode.Type.pointer_type;
       }
     
+    if (name.equals("nice.lang.Null"))
+      {
+	nullTC = tc;
+	// to differ with the null result, which signals error
+	return gnu.bytecode.Type.pointer_type;
+      }
+    
     return null;
   }
   
@@ -330,7 +337,7 @@ public class ConstantExp extends Expression
   public static mlsub.typing.Monotype byteType, charType, intType, longType, boolType, shortType, doubleType, floatType, voidType;
   static mlsub.typing.Polytype voidPolytype, boolPolytype, intPolytype, longPolytype;
 
-  public static TypeConstructor maybeTC, sureTC;
+  public static TypeConstructor maybeTC, sureTC, nullTC;
 
   // syntatic types
   public static Monotype synVoidType;

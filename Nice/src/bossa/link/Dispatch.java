@@ -183,14 +183,15 @@ public final class Dispatch
 
     for (int i = 0; i < domains.length; i++)
       { 
-	if (!(domains[i] instanceof MonotypeConstructor))
-	  // Unconstrained type variable
+	Monotype arg = domains[i];
+
+	if (!(arg instanceof MonotypeConstructor))
 	  {
-	    types[i] = domains[i];
+	    types[i] = arg;
 	    continue;
 	  }
 
-	MonotypeConstructor mc = (MonotypeConstructor) domains[i];
+	MonotypeConstructor mc = (MonotypeConstructor) arg;
 	TypeConstructor tc = mc.getTC();
 	if (tc != ConstantExp.sureTC)
 	  maybeNull[i] = true;
@@ -222,7 +223,7 @@ public final class Dispatch
 
 	  // put the @null tag for the first half
 	  for(int i = 0; i < size; i++)
-	    ((TypeConstructor[]) tuples.get(i))[index] = ConstantExp.maybeTC;
+	    ((TypeConstructor[]) tuples.get(i))[index] = ConstantExp.nullTC;
 	}
     return tuples;
   }

@@ -135,7 +135,7 @@ public class ConsoleOutput implements Output {
 		BufferedReader reader = null;
 		String line = "";
 		try {
-			reader = new BufferedReader(new StringReader(statement));;
+			reader = new BufferedReader(new StringReader(statement));
 			while((line = reader.readLine()) != null) {
 				indent();
 				System.out.println((prefix == null ? "" : "["+prefix+"] ") + line);

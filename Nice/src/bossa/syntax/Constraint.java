@@ -49,12 +49,6 @@ public class Constraint extends Node
     this.atomics = addChildren(atomics);
   }
 
-  //REMOVE
-//    boolean hasBinders()
-//    {
-//      return binders.size()>0;
-//    }
-  
   /**
    * The trivial constraint.
    *
@@ -84,30 +78,6 @@ public class Constraint extends Node
       return (List) ((LinkedList) l).clone();
   }
   
-  /*public static Constraint and(Constraint c1, Constraint c2)
-  {
-    Constraint res=c1.shallowClone();
-    res.addBinders(c2.binders);
-    res.atomics.addAll(c2.atomics);
-    
-    return res;
-  }
-
-  Constraint and(Collection c)
-  {
-    Constraint res=shallowClone();
-    for(Iterator i=c.iterator();
-	i.hasNext();)
-      res.and((Constraint) i.next());
-    return res;
-  }
-
-  void and(Constraint c)
-  {
-    this.addBinders(c.binders);
-    this.atomics.addAll(c.atomics);
-  }
-  /*
   /****************************************************************
    * Scoping
    ****************************************************************/

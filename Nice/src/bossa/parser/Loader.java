@@ -66,7 +66,10 @@ public abstract class Loader
 	parser = new Parser(r);
       else
 	parser.ReInit(r);
-    
+
+      // set to 0 (required when recovered from error)
+      ParserTokenManager.nestingLevel = 0;
+  
       try{
 	parser.module(definitions);
       }

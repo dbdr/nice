@@ -55,9 +55,14 @@ public class JavaClass extends ClassDefinition.ClassImplementation
     }
     
     if (classType == null)
-      User.error(javaName, javaName + " was not found in classpath");
+      {
+	if (!definition.inInterfaceFile())
+          User.warning(javaName, javaName + " was not found in classpath so this retyping is ignored");
 
-    
+	ignoredRetyping = true;
+	return;
+      }
+
     // Check that we don't give a wrong arity to a generic class.
     int nativeArity = classType.getArity();
     if (nativeArity != -1 && nativeArity != definition.tc.arity())
@@ -76,6 +81,9 @@ public class JavaClass extends ClassDefinition.ClassImplementation
 
   void resolveClass()
   {
+    if (ignoredRetyping)
+      return;
+
     JavaClasses.fetchMethods(definition.tc, 
 			     (gnu.bytecode.ClassType) definition.getJavaType());
   }
@@ -87,4 +95,5 @@ public class JavaClass extends ClassDefinition.ClassImplementation
   
   /** The qualified name of the existing java type. */
   private LocatedString javaName;
+  boolean ignoredRetyping;
 }

@@ -78,6 +78,11 @@ public abstract class Definition extends Node implements bossa.util.Located
   protected Module module;
   public static Module currentModule;
 
+  public boolean inInterfaceFile()
+  {
+    return ((bossa.modules.Package)module).interfaceFile();
+  }
+
   bossa.modules.Compilation compilation()
   {
     return module.compilation();

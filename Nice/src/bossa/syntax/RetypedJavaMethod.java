@@ -57,6 +57,7 @@ public class RetypedJavaMethod extends JavaMethod
     this.className = className;
     this.methodName = methodName;
     this.javaTypes = javaTypes;
+    this.syntacticReturnType = returnType.toString();
   }
 
   void buildScope(VarScope outer, TypeScope typeOuter)
@@ -80,11 +81,12 @@ public class RetypedJavaMethod extends JavaMethod
    * Code generation
    ****************************************************************/
 
-  private static gnu.bytecode.Type type(LocatedString s)
+  private gnu.bytecode.Type type(LocatedString s)
   {
     Type res = Types.type(s);
-    if(res == null)
-      User.error(s, "Unknown java class " + s);
+    if(res == null && !ignoredRetyping)
+      setIgnoredRetyping(s, "Ignoring retyping because java class " + s + " is not known");
+
     return res;
   }
   
@@ -104,15 +106,21 @@ public class RetypedJavaMethod extends JavaMethod
     
     Type holderType = TypeImport.lookup(className);
     if (holderType == null)
-      User.error(this,
-		 "Class " + className + " was not found");
-    
+      {
+        setIgnoredRetyping(this, "Ignoring retyping because class " + 
+		className + " was not found");
+
+        javaArgType = new Type[javaTypes.size()-1];
+        return;
+      }
+
     if (!(holderType instanceof ClassType))
       User.error(className, className + " is a primitive type");
+
     ClassType holder = (ClassType) holderType;
-    
+
     className = new LocatedString(holder.getName(), className.location());
-    
+
     javaArgType = new Type[javaTypes.size()-1];
     
     for(int i = 1; i<javaTypes.size(); i++)
@@ -120,6 +128,9 @@ public class RetypedJavaMethod extends JavaMethod
 	LocatedString t = (LocatedString) javaTypes.get(i);
 	
 	javaArgType[i-1] = type(t);
+
+        if (javaArgType[i-1] == null)
+          continue;
 	
 	// set the fully qualified name back
 	javaTypes.set(i,new LocatedString(javaArgType[i-1].getName(),
@@ -128,11 +139,14 @@ public class RetypedJavaMethod extends JavaMethod
     
     LocatedString retTypeString = (LocatedString) javaTypes.get(0);
     javaRetType = type(retTypeString);
+
+    if (ignoredRetyping)
+      return;
     
     // set the fully qualified name of the return type back
     javaTypes.set(0, new LocatedString(javaRetType.getName(), 
 				       retTypeString.location()));
-    
+
     reflectMethod = holder.getDeclaredMethod(methodName, javaArgType);
     
     if (reflectMethod == null)
@@ -146,11 +160,15 @@ public class RetypedJavaMethod extends JavaMethod
 	if (reflectMethod == null)
 	  {
             if (methodName.equals("<init>"))
-              User.error(className, "class " + holder.getName() + " has no constructor with " + javaArgType.length + " arguments");
-	    else
-              User.error(className, "No method named " + methodName + " with " +
-		javaArgType.length + " arguments was found in class " +
-		holder.getName());
+              setIgnoredRetyping(className, "Ignored retyping because class " + 
+			holder.getName() + " has no constructor with " + 
+			javaArgType.length + " arguments");
+	    else 
+	      setIgnoredRetyping(className, "Ignored retyping because no method named " +
+			methodName + " with " +	javaArgType.length + 
+			" arguments was found in class " + holder.getName());
+
+            return;
 	  }
 
         User.error(className, "The types of the arguments don't match the declaration:\n"
@@ -198,38 +216,68 @@ public class RetypedJavaMethod extends JavaMethod
 		 "in Java (" + javaArity +
 		 ") and in Nice (" + arity + ")");
   }
+
+  void typedResolve()
+  {
+    if (ignoredRetyping)
+      return;
+
+    super.typedResolve();
+  }
   
+  void setIgnoredRetyping(Located loc, String message)
+  {
+    if (!inInterfaceFile())
+      User.warning(loc, message);
+
+    //trick to avoid errors later in compilation
+    getSymbol().syntacticType = new Polytype(PrimitiveType.synVoidType);
+    ignoredRetyping = true;
+  }
+ 
   /****************************************************************
    * Module interface
    ****************************************************************/
 
   public void printInterface(java.io.PrintWriter s)
   {
-    s.print(super.toString() +
-	    " = native " +
+    s.print(super.toString() + " = native " +
 	    (methodName.equals("<init>") 
 	     ?  "new " + className
 	     : javaTypes.get(0) 
 	     + " " + className 
 	     + "." + methodName) +
-	    mapGetName(javaArgTypes()) + ";\n");
+	    mapJavaArgTypes() + ";\n");
   }
   
-  private static String mapGetName(gnu.bytecode.Type[] types)
+  private String mapJavaArgTypes()
   {
-    if(types == null)
+    if(javaArgType == null)
       return "((NULL))";
     
     String res = "(";
-    for(int n = 0; n<types.length; n++)
+    for(int n = 0; n<javaArgType.length; n++)
       {
 	if(n != 0)
 	  res += ", ";
-	if(types[n] == null)
-	  res += "[NULL]";
+	if(javaArgType[n] == null)
+	  res += javaTypes.get(n+1);
 	else
-	  res += types[n].getName();
+	  res += javaArgType[n].getName();
       }
     return res + ")";
   }
+
+  public String getSyntacticReturnType()
+  {
+    if (ignoredRetyping)
+      return syntacticReturnType;
+
+    return super.getSyntacticReturnType();
+  }
+
+  String syntacticReturnType;
+
+  boolean ignoredRetyping;
+
 }

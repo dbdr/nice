@@ -178,3 +178,13 @@ class C extends B {}
 class A<T | T <: B, B <: T> extends AbstractSet<T> { }
 
 add(a@A, b@C) = super;
+
+/// PASS bug
+  // Toplevel
+  class A {}
+  void do_something( List<A> x ) {}
+  class B<A T> extends LinkedList<T> {}
+  add(x@B, o) {
+    do_something(x);
+    return super;
+  }

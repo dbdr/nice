@@ -23,6 +23,7 @@ public interface Module extends mlsub.compilation.Module
 {
   String[] listImplicitPackages();
   bossa.modules.Compilation compilation();
+  boolean interfaceFile();
 
   /****************************************************************
    * Code generation

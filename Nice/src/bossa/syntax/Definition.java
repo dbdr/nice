@@ -80,7 +80,7 @@ public abstract class Definition extends Node implements bossa.util.Located
 
   public boolean inInterfaceFile()
   {
-    return ((bossa.modules.Package)module).interfaceFile();
+    return module.interfaceFile();
   }
 
   bossa.modules.Compilation compilation()

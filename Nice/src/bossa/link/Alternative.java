@@ -12,7 +12,7 @@
 
 // File    : Alternative.java
 // Created : Mon Nov 15 12:20:40 1999 by bonniot
-//$Modified: Mon Nov 29 17:56:04 1999 by bonniot $
+//$Modified: Fri Dec 03 18:43:31 1999 by bonniot $
 
 package bossa.link;
 
@@ -43,7 +43,7 @@ public class Alternative
     this.definitionClass = c;
     this.primProcedure = new PrimProcedure(method);
     
-    this.method=m.bytecodeName();
+    this.methodName=m.getFullBytecodeName();
     this.patterns=patterns;
     add();
   }
@@ -56,8 +56,13 @@ public class Alternative
     this.definitionClass = c;
     this.primProcedure = new PrimProcedure(m);
     
-    int at = s.indexOf(Pattern.AT_encoding);
-    method = s.substring(0,at);
+    int numCode = s.indexOf(Pattern.AT_encoding);
+    int at = s.indexOf(Pattern.AT_encoding,numCode+1);
+    if(at==-1)
+      Internal.error("Method "+s+" in class "+c+
+		     " has not a valid name");
+    
+    methodName = c.getName()+"$"+s.substring(0,at);
     
     this.patterns = new ArrayList();
 
@@ -143,6 +148,11 @@ public class Alternative
    */
   gnu.expr.Expression matchTest(gnu.expr.Expression[] parameters)
   {
+    if(parameters.length!=patterns.size())
+      Internal.error("Incorrect parameters "+
+		     Util.map("",", ","",parameters)+
+		     " for " + this);
+    
     gnu.expr.Expression result = QuoteExp.trueExp;
     
     for(int n=parameters.length-1;n>=0;n--)
@@ -165,6 +175,7 @@ public class Alternative
     
     while(types.hasNext())
       res = orExp(instanceOfExp(parameter,(gnu.bytecode.Type) types.next()),res);
+    
     return res;
   }
 
@@ -194,7 +205,7 @@ public class Alternative
   
   public String toString()
   {
-    return method+Util.map("(",", ",")",patterns);
+    return methodName+Util.map("(",", ",")",patterns);
   }
 
   /** The bytecode class this alternative is defined in */
@@ -202,7 +213,7 @@ public class Alternative
 
   PrimProcedure primProcedure;
   
-  String method;
+  String methodName;
   List /* of Domain */ patterns;
 
   boolean visiting;
@@ -215,17 +226,17 @@ public class Alternative
   
   private void add()
   {
-    List l = (List) alternatives.get(method);
+    List l = (List) alternatives.get(methodName);
     if(l==null)
       {
 	l = new ArrayList();
-	alternatives.put(method,l);
+	alternatives.put(methodName,l);
       }
     l.add(this);
   }
   
   static List listOfAlternative(MethodDefinition m)
   {
-    return (List) alternatives.get(m.bytecodeName());
+    return (List) alternatives.get(m.getFullBytecodeName());
   }
 }

@@ -12,7 +12,7 @@
 
 // File    : JavaTypeConstructor.java
 // Created : Thu Jul 08 11:51:09 1999 by bonniot
-//$Modified: Tue Nov 30 15:23:16 1999 by bonniot $
+//$Modified: Fri Dec 03 16:52:58 1999 by bonniot $
 
 package bossa.syntax;
 
@@ -35,17 +35,22 @@ public class JavaTypeConstructor extends TypeConstructor
    */
   static JavaTypeConstructor make(LocatedString name)
   {
-    Object o=hash.get(name);
+    Object o=hash.get(name.toString());
     if(o!=null)
       return (JavaTypeConstructor) o;
     
-    JavaTypeConstructor res=new JavaTypeConstructor(name);
-    res.javaType=gnu.bytecode.ClassType.make(name.content);
+    JavaTypeConstructor res=new JavaTypeConstructor
+      (name,gnu.bytecode.ClassType.make(name.content));
 
-    hash.put(name,res);
+    hash.put(name.toString(),res);
     return res;
   }
 
+  static JavaTypeConstructor make(String name)
+  {
+    return make(new LocatedString(name,Location.nowhere()));
+  }
+  
   /**
    * Returns a java type constructor with the given name
    * and the given java type.
@@ -58,8 +63,7 @@ public class JavaTypeConstructor extends TypeConstructor
     if(o!=null)
       return (JavaTypeConstructor) o;
     
-    JavaTypeConstructor res=new JavaTypeConstructor(new LocatedString(name,Location.nowhere()));
-    res.javaType=javaType;
+    JavaTypeConstructor res=new JavaTypeConstructor(new LocatedString(name,Location.nowhere()),javaType);
 
     hash.put(name,res);
     return res;
@@ -69,11 +73,36 @@ public class JavaTypeConstructor extends TypeConstructor
   
   private static HashMap hash = new HashMap();
   
-  private JavaTypeConstructor(LocatedString className)
+  private JavaTypeConstructor(LocatedString className, gnu.bytecode.Type javaType)
   {
     super(className);
     setVariance(new Variance(0));
     bossa.typing.Typing.introduce(this);
+
+    this.javaType = javaType;
+    
+    // Searching for java super class
+    // This is recursive !
+    if(javaType instanceof gnu.bytecode.ClassType)
+      {
+	// Forces computation of the reflectClass
+	// This make getSuperClass work properly
+	javaType.getReflectClass();
+
+	gnu.bytecode.ClassType superClass = ((gnu.bytecode.ClassType) javaType).getSuperclass();
+	if(superClass!=null)
+	  {    	
+	    JavaTypeConstructor superTC = make(superClass.getName(),superClass);
+
+	    try{
+	      bossa.typing.Typing.initialLeq(this,superTC);
+	    }
+	    catch(bossa.typing.TypingEx e){
+	      Internal.error("Invalid java super-class "+superClass+" for "+this);
+	    }
+	  }
+	
+      }
   }
 
   public TypeSymbol cloneTypeSymbol()
@@ -100,6 +129,14 @@ public class JavaTypeConstructor extends TypeConstructor
   gnu.bytecode.Type getJavaType()
   {
     return this.javaType;
+  }
+  
+  public ListIterator getJavaInstanceTypes()
+  {
+    List res = new LinkedList();
+    res.add(getJavaType());
+    
+    return res.listIterator();
   }
   
   /****************************************************************
@@ -158,7 +195,7 @@ public class JavaTypeConstructor extends TypeConstructor
       Debug.println("Registering java class "+className);
     
     JavaTypeConstructor res = JavaTypeConstructor.make(className);
-    ClassDefinition.addSpeciaTypeConstructor(res);
+    ClassDefinition.addSpecialTypeConstructor(res);
     globalTypeScope.addSymbol(res);
     
     return res;

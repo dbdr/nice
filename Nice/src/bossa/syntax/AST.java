@@ -12,7 +12,7 @@
 
 // File    : AST.java
 // Created : Thu Jul 01 11:01:56 1999 by bonniot
-//$Modified: Fri Nov 26 17:33:14 1999 by bonniot $
+//$Modified: Thu Dec 02 18:30:45 1999 by bonniot $
 
 package bossa.syntax;
 
@@ -41,12 +41,12 @@ public class AST extends Node
     doResolve();
   }
   
-  public void createContext()
+  public void createContext(bossa.modules.Module module)
   {
     ClassDefinition.createSpecialContext();
     
     for(Iterator i=definitions.iterator();i.hasNext();)
-      ((Definition) i.next()).createContext();
+      ((Definition) i.next()).createContext(module);
   }
   
   public void typechecking()

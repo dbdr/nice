@@ -12,7 +12,7 @@
 
 // File    : LocalDeclarationStmt.java
 // Created : Tue Jul 06 12:06:20 1999 by bonniot
-//$Modified: Mon Nov 08 14:23:45 1999 by bonniot $
+//$Modified: Fri Dec 03 17:49:37 1999 by bonniot $
 
 package bossa.syntax;
 
@@ -40,6 +40,8 @@ public class LocalDeclarationStmt extends Statement
     
     if(value!=null)
       this.value=expChild(value);
+
+    setLocation(left.location());
   }
 
   public Collection associatedDefinitions()
@@ -51,9 +53,24 @@ public class LocalDeclarationStmt extends Statement
    * Initial Context
    ****************************************************************/
 
-  public void createContext()
+  public void createContext(bossa.modules.Module module)
   {
-    //Nothing
+    // No really the rigid context, but it is the right time to do this.
+    // (must be done after resolving).
+    
+    declaration = new gnu.expr.Declaration(left.name.toString(),left.type.getJavaType());
+
+    if(module.bytecode!=null)
+      // We are in an interface file, module.bytecode is the compiled class
+      {
+	declaration.field = module.bytecode.getField(left.name.toString());
+	
+	if(declaration.field==null)
+	  Internal.error(this,
+			 "The compiled file is not consistant with the interface file");
+      }
+    
+    left.setDeclaration(declaration);
   }
   
   /****************************************************************
@@ -80,18 +97,32 @@ public class LocalDeclarationStmt extends Statement
 
   public void printInterface(java.io.PrintWriter s)
   {
-    s.print("variable "+left+";\n");
+    s.print("var "+left+
+	    //	    (value==null ? "" : " = "+value.toString())+
+	    ";\n");
   }
   
   /****************************************************************
    * Code generation
    ****************************************************************/
 
+  private gnu.expr.Declaration declaration;
+  
   public void compile(bossa.modules.Module module)
   {
-    Field f=module.bytecode.addField(left.name.toString(),
-				 Type.pointer_type,
-				 Access.PUBLIC|Access.STATIC);
+    if(declaration.field!=null)
+      Internal.error(this,
+		     "Field should only be set with imported modules, which should not be compiled");
+    
+    //declaration.assignField(module.compilation);
+    declaration.field = module.bytecode.addField(left.name.toString(),
+						 left.type.getJavaType());
+    declaration.field.setStaticFlag(true);
+    declaration.setSimple(false);
+    
+    if(value!=null)
+      module.addClassInitStatement
+	(new gnu.expr.SetExp(declaration,value.compile()));    
   }
 
   public gnu.expr.Expression compile()

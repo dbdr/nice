@@ -12,7 +12,7 @@
 
 // File    : InterfaceDefinition.java
 // Created : Thu Jul 01 17:00:14 1999 by bonniot
-//$Modified: Fri Nov 05 15:22:40 1999 by bonniot $
+//$Modified: Thu Dec 02 18:31:03 1999 by bonniot $
 
 package bossa.syntax;
 
@@ -87,7 +87,7 @@ public class InterfaceDefinition extends Node
    * Initial Context
    ****************************************************************/
 
-  public void createContext()
+  public void createContext(bossa.modules.Module module)
   {
     bossa.typing.Typing.assertLeq(this,extensions);
     bossa.typing.Typing.assertLeq(this,top(parameters.size()));

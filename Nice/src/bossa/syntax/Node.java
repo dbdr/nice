@@ -12,7 +12,7 @@
 
 // File    : Node.java
 // Created : Thu Jul 08 10:24:56 1999 by bonniot
-//$Modified: Fri Nov 26 17:34:37 1999 by bonniot $
+//$Modified: Wed Dec 01 14:49:45 1999 by bonniot $
 
 package bossa.syntax;
 
@@ -57,7 +57,7 @@ abstract public class Node
   
   void removeChild(Node n)
   {
-    Internal.error(!children.contains(n),"Not a child");
+    Internal.error(!children.contains(n),n+" is not a child of "+this);
     children.remove(n);
   }
   

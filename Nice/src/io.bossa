@@ -1,0 +1,46 @@
+/**************************************************************************/
+/*                           B O S S A                                    */
+/*        A simple imperative object-oriented research language           */
+/*                   (c)  Daniel Bonniot 1999                             */
+/*                                                                        */
+/*  This program is free software; you can redistribute it and/or modify  */
+/*  it under the terms of the GNU General Public License as published by  */
+/*  the Free Software Foundation; either version 2 of the License, or     */
+/*  (at your option) any later version.                                   */
+/*                                                                        */
+/**************************************************************************/
+
+// File    : io.bossa
+// Created : Mon Nov 08 19:46:09 1999 by bonniot
+//$Modified: Fri Dec 03 17:41:05 1999 by bonniot $
+
+import prelude;
+
+native void native_println(java.io.PrintStream,java.lang.String) =
+  void java.io.PrintStream.println(java.lang.String);
+
+native java.io.PrintStream stdout() = java.lang.System.out;
+native java.io.PrintStream stderr() = java.lang.System.err;
+
+void println<Any T>(java.io.PrintStream, T);
+println(ps,object)    = native_println(ps,toString(object));
+println(ps,str@java.lang.String)= native_println(ps,str);
+
+void println<Any T>(T);
+println(object)
+{
+  println(stdout(),toString(object));
+}
+
+println(s@java.lang.String)
+{
+  println(stdout(),s);
+}
+
+main(args)
+{
+  java.lang.String helloWorld = "Hello, world !";
+  println("toto");
+  println(stdout(),helloWorld);
+  println(stdout(),args);
+}

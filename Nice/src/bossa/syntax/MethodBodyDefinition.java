@@ -12,7 +12,7 @@
 
 // File    : MethodBodyDefinition.java
 // Created : Thu Jul 01 18:12:46 1999 by bonniot
-//$Modified: Thu Nov 25 16:10:50 1999 by bonniot $
+//$Modified: Fri Dec 03 18:28:48 1999 by bonniot $
 
 package bossa.syntax;
 
@@ -114,9 +114,9 @@ public class MethodBodyDefinition extends Node
 	    Typing.enter("Trying definition "+m+" for method body "+name);
 	    Typing.introduce(m.type.getTypeParameters());
 	    m.type.getConstraint().assert();
-	    Typing.implies();
 	    Typing.in(Pattern.getPolytype(formals),
 		      Domain.fromMonotypes(m.getType().domain()));
+	    Typing.implies();
 	    Typing.leave();
 	  }
 	  catch(TypingEx e){
@@ -178,7 +178,7 @@ public class MethodBodyDefinition extends Node
    * Initial Context
    ****************************************************************/
 
-  public void createContext()
+  public void createContext(bossa.modules.Module module)
   {
     //Nothing
   }
@@ -265,7 +265,7 @@ public class MethodBodyDefinition extends Node
     gnu.expr.LambdaExp lexp = new gnu.expr.LambdaExp(block);
     
     lexp.primMethod=module.bytecode.addMethod
-      (name.toString()+Pattern.bytecodeRepresentation(formals),
+      (definition.getBytecodeName()+Pattern.bytecodeRepresentation(formals),
        definition.javaArgTypes(),definition.javaReturnType(),
        Access.PUBLIC|Access.STATIC|Access.FINAL);
 
@@ -281,27 +281,30 @@ public class MethodBodyDefinition extends Node
 	MonoSymbol param = (MonoSymbol) p.next();
 	Monotype paramType = (Monotype) t.next();
 	
-	param.decl=lexp.addDeclaration(param.name.toString());
-	param.decl.setParameter(true);
-	param.decl.setType(paramType.getJavaType());
+	gnu.expr.Declaration d = lexp.addDeclaration(param.name.toString());
+	d.setParameter(true);
+	d.setType(paramType.getJavaType());
+	param.setDeclaration(d);
       }
 
     block.setBody(body.compile());
 
-    compileMethod(lexp,module.bytecode,module.name);
+    lexp.compileAsMethod(module.compilation);
 
     //Register this alternative for the link test
     new bossa.link.Alternative(this.definition,Pattern.getDomain(this.formals),module.bytecode,lexp.primMethod);
   }
 
-  public static void compileMethod(gnu.expr.LambdaExp lexp, ClassType inClass, String name)
-  {
-    gnu.expr.Compilation comp = new gnu.expr.Compilation
-      (lexp.primMethod,inClass,name,
-       name,"prefix??",false);
+  //  public static void compileMethod(gnu.expr.LambdaExp lexp, ClassType inClass, String name)
+//    {
+//      gnu.expr.Compilation comp = new gnu.expr.Compilation
+//        (inClass,name,
+//         name,"prefix??",false);
     
-    lexp.compileAsMethod(comp);
-  }
+//      lexp.compileAsMethod(comp);
+
+//      comp.compileClassInit();
+//    }
   
   private static gnu.bytecode.Method mainAlternative=null;
   
@@ -339,7 +342,7 @@ public class MethodBodyDefinition extends Node
        "([Ljava.lang.String;)V",
        Access.PUBLIC | Access.STATIC);
 
-    compileMethod(lexp, module.bytecode, module.name);
+    lexp.compileAsMethod(module.compilation);
   }
 
   /****************************************************************

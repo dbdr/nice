@@ -12,7 +12,7 @@
 
 // File    : ClassDefinition.java
 // Created : Thu Jul 01 11:25:14 1999 by bonniot
-//$Modified: Mon Nov 29 15:45:52 1999 by bonniot $
+//$Modified: Thu Dec 02 18:30:55 1999 by bonniot $
 
 package bossa.syntax;
 
@@ -122,10 +122,7 @@ public class ClassDefinition extends Node
       {
 	Field f=(Field)i.next();
 	if(f.isLocal==local)
-	  {
-	    result.add(f);
-	    addChild(f.sym);
-	  }
+	  result.add(f);
       }
     return result;
   }
@@ -193,7 +190,7 @@ public class ClassDefinition extends Node
    * Initial Context
    ****************************************************************/
 
-  public void createContext()
+  public void createContext(bossa.modules.Module module)
   {
     try{
       Typing.initialLeq(tc,extensions);
@@ -216,7 +213,9 @@ public class ClassDefinition extends Node
       for(Iterator i=specialTypeConstructors.iterator();i.hasNext();)
 	{
 	  TypeConstructor tc = (TypeConstructor)i.next();
-	  Typing.introduce(tc);
+	  // Introduction is supposed to be done before
+	  // This allows for initialLeqs during construction (see JavaTypeConstructor)
+	  //Typing.introduce(tc);
 	  Typing.assertImp(tc,InterfaceDefinition.top(0),true);
 	}
     }
@@ -229,10 +228,10 @@ public class ClassDefinition extends Node
    * Registers a type constructor that was not defined by a class.
    *
    * This is used to add special type constructors
-   * -- like <code>JavaTypeConstructor</code> --
+   * -- like {@link bossa.syntax.JavaTypeConstructor JavaTypeConstructor} --
    * in the initial context.
    */
-  static void addSpeciaTypeConstructor(TypeConstructor tc)
+  static void addSpecialTypeConstructor(TypeConstructor tc)
   {
     specialTypeConstructors.add(tc);
   }

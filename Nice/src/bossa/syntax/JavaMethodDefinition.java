@@ -12,7 +12,7 @@
 
 // File    : JavaMethodDefinition.java
 // Created : Tue Nov 09 11:49:47 1999 by bonniot
-//$Modified: Mon Nov 29 14:46:01 1999 by bonniot $
+//$Modified: Thu Dec 02 14:59:23 1999 by bonniot $
 
 package bossa.syntax;
 
@@ -45,14 +45,16 @@ public class JavaMethodDefinition extends MethodDefinition
 			      LocatedString name, 
 			      Constraint constraint,
 			      Monotype returnType,
-			      List parameters,
-			      boolean isStatic
+			      List parameters
 			      )
   {
     super(name,constraint,returnType,parameters);
     this.className=className;
     this.methodName=methodName;
     this.javaTypes=javaTypes;
+
+    boolean isStatic = java.lang.reflect.Modifier.isStatic
+      (findReflectMethod(className,methodName,javaTypes).getModifiers());
     
     flags=0;
     if(isStatic)
@@ -71,6 +73,46 @@ public class JavaMethodDefinition extends MethodDefinition
 	       "Native method "+this.name+" has not the same number of parameters in Java and Bossa !");
   }
 
+  // Class.forName doesn't report errors nicely, I do it myself !
+  private Class getClass(String name)
+  {
+    try{
+      if(name.equals("void"))
+	return Void.TYPE;
+      else if(name.equals("int"))
+	return Integer.TYPE;
+      else if(name.equals("boolean"))
+	return Boolean.TYPE;
+      else
+	return Class.forName(name);
+    }
+    catch(ClassNotFoundException e){
+      User.error(this,
+		 "Class \""+name+"\" does not exists");
+      return null;
+    }
+  }
+  
+  private java.lang.reflect.Method
+    findReflectMethod(String className, String methodName, List javaTypes)
+  {
+    try
+      {
+	Class[] classes = new Class[javaTypes.size()-1];
+	for(int i=1;i<javaTypes.size();i++)
+	  classes[i-1]=getClass((String) javaTypes.get(i));
+	
+	return getClass(className).
+	  getDeclaredMethod(methodName,classes);
+      }
+    catch(NoSuchMethodException e){
+      User.error(this,
+		 "Method "+className+"."+methodName+" does not exists");
+    }
+    
+    return null;
+  }
+  
   /** The java class this method is defined in */
   String className;
 
@@ -92,9 +134,13 @@ public class JavaMethodDefinition extends MethodDefinition
   {
     // FIXME
     if(s.equals("void"))
-	return gnu.bytecode.Type.void_type;
-      else
-	return ClassType.make(s);
+      return gnu.bytecode.Type.void_type;
+    else if(s.equals("int"))
+      return gnu.bytecode.Type.int_type;
+    else if(s.equals("boolean"))
+      return gnu.bytecode.Type.boolean_type;
+    else
+      return ClassType.make(s);
   }
   
   protected gnu.bytecode.Type returnJavaType() 
@@ -102,7 +148,7 @@ public class JavaMethodDefinition extends MethodDefinition
 
   protected gnu.bytecode.Type[] argumentsJavaTypes()
   {
-    gnu.bytecode.Type[] res=new ClassType[javaArity];
+    gnu.bytecode.Type[] res=new gnu.bytecode.Type[javaArity];
     for(int i=0;i<javaArity;i++)
       res[i]=type((String)javaTypes.get(i+1));
     

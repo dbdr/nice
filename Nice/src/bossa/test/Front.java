@@ -12,7 +12,7 @@
 
 // File    : Front.java
 // Created : Thu Jul 01 15:11:18 1999 by bonniot
-//$Modified: Mon Nov 29 12:30:41 1999 by bonniot $
+//$Modified: Fri Dec 03 19:29:39 1999 by bonniot $
 
 package bossa.test;
 
@@ -38,13 +38,12 @@ public class Front
       {
 	System.out.println("Usage: bossa file.bossa");
 	//System.exit(0);
-	file="mi.bossa";
+	file="io.bossa";
       }
     else file=args[0];
     
     try{
-      bossa.modules.Module.compile(file);
-      System.out.println("\nThe program is well typed");
+      bossa.modules.Module.compile(new bossa.syntax.LocatedString(file,bossa.util.Location.nowhere()));
     }
     catch(Exception e){
       System.out.println("Uncaught exception :");

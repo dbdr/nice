@@ -12,7 +12,7 @@
 
 // File    : Module.java
 // Created : Wed Oct 13 16:09:47 1999 by bonniot
-//$Modified: Fri Nov 26 16:37:08 1999 by bonniot $
+//$Modified: Fri Dec 03 19:04:22 1999 by bonniot $
 
 package bossa.modules;
 
@@ -45,7 +45,7 @@ public class Module
     this.definitions=new AST(definitions);
   }
 
-  public static void compile(String file) throws IOException
+  public static void compile(LocatedString file) throws IOException
   {
     Module module=Loader.open(file);
     module.compile();
@@ -86,37 +86,49 @@ public class Module
     if(dbg) Debug.println("Loading "+this);
     loadImports();
     definitions.load();
-    definitions.createContext();
+    definitions.createContext(this);
   }
   
   private void loadImports()
   {
     for(Iterator i=imports.iterator();i.hasNext();) 
       {
-	String name = ((LocatedString)i.next()).toString();
-	
-	Module m=Loader.open(name+interfaceExt);
-	m.load();
-	
+	LocatedString name = (LocatedString)i.next();
+	LocatedString itfName = name.cloneLS();
+	itfName.append(interfaceExt);
+	String bytecodeName = name.toString()+".class";	
+
 	// Get the alternatives from the bytecode file
 	try{
-	  InputStream file = new FileInputStream(name+".class");
-	  gnu.bytecode.ClassType c = gnu.bytecode.ClassFileInput.readClassType(file);
-	  
-	  for(Method method=c.getMethods();method!=null;method=method.getNext())
+	  InputStream file = new FileInputStream(bytecodeName);
+
+	  Module m=Loader.open(itfName);
+	  m.bytecode = gnu.bytecode.ClassFileInput.readClassType(file);	  
+
+	  for(Method method=m.bytecode.getMethods();
+	      method!=null;
+	      method=method.getNext())
 	    {
 	      String methodName = method.getName();
 
-	      // "main" is not a real alternative
-	      if(methodName.equals("main")
-		 || methodName.startsWith("main$"))
+	      if(
+		 // "main" is not a real alternative
+		 methodName.equals("main")
+		 || methodName.startsWith("main$")
+		 // $get and $set methods
+		 || methodName.startsWith("$")
+		 // Class initialization
+		 || methodName.equals("<clinit>")
+		 )
 		continue;
 
-	      new bossa.link.Alternative(methodName,c,method);
+	      new bossa.link.Alternative(methodName,m.bytecode,method);
 	    }
+
+	  m.load();
 	}
 	catch(IOException e){
-	  User.error("Module "+name+" is not compiled");
+	  User.error("Compilation of module "+name+" failed");
 	}
       }
   }
@@ -145,13 +157,16 @@ public class Module
   }
   
   public gnu.bytecode.ClassType bytecode;
+  public gnu.expr.Compilation compilation;
 
   public static final gnu.bytecode.ClassType dispatchClass;
+  public static final gnu.expr.Compilation dispatchComp;
   static
   {
     dispatchClass = new gnu.bytecode.ClassType("dispatchClass");
     dispatchClass.setSuper(Type.pointer_type);
     dispatchClass.setModifiers(Access.PUBLIC|Access.FINAL);
+    dispatchComp = new gnu.expr.Compilation(dispatchClass,"dispatchClass","dispatchClass","prefix",false);
   }
   
   /**
@@ -159,31 +174,36 @@ public class Module
    */
   private void generateCode()
   {
-    bytecode=ClassType.make(name);
+    bytecode = ClassType.make(name);
     bytecode.setSuper("java.lang.Object");
     bytecode.setModifiers(Access.FINAL);
+
+    compilation = new gnu.expr.Compilation(bytecode,name,name,"prefix",false);
+    
     definitions.compile(this);
+    compilation.compileClassInit(initStatements);
+    
     addClass(bytecode);
   }
 
-  public gnu.expr.ModuleExp moduleExp;
+  //public gnu.expr.ModuleExp moduleExp;
   
   /**
    * Creates bytecode for the alternatives defined in the module.
    */
-  private void generateCode2()
-  {
-    moduleExp = new gnu.expr.ModuleExp();
-    moduleExp.setFile(name+sourceExt);
-    moduleExp.mustCompile = true;
-    definitions.compile(this);
-    try{
-      moduleExp.compileToArchive(name+".zip");
-    }
-    catch(IOException e){
-      User.error("Could not write code for "+this);
-    }    
-  }
+//    private void generateCode2()
+//    {
+//      moduleExp = new gnu.expr.ModuleExp();
+//      moduleExp.setFile(name+sourceExt);
+//      moduleExp.mustCompile = true;
+//      definitions.compile(this);
+//      try{
+//        moduleExp.compileToArchive(name+".zip");
+//      }
+//      catch(IOException e){
+//        User.error("Could not write code for "+this);
+//      }    
+//    }
 
   public void addClass(ClassType c)
   {
@@ -199,9 +219,38 @@ public class Module
   public gnu.bytecode.Method addDispatchMethod(MethodDefinition def)
   {
     return dispatchClass.addMethod
-      (def.bytecodeName(),
+      (def.getFullBytecodeName(),
        Access.PUBLIC|Access.STATIC|Access.FINAL,
        def.javaArgTypes(),def.javaReturnType());
+  }
+
+  public String bytecodeName()
+  {
+    return name.toString();
+  }
+  
+  /****************************************************************
+   * Mangling
+   ****************************************************************/
+
+  private TreeSet takenNames = new TreeSet();
+  
+  public String mangleName(String str)
+  {
+    int i=0;
+    String res = str+"$0";
+    while(takenNames.contains(res))
+      res = str + "$" + (++i);
+  
+    takenNames.add(res);
+    return res;
+  }
+  
+  private List initStatements = new LinkedList();
+  
+  public void addClassInitStatement(gnu.expr.Expression exp)
+  {
+    initStatements.add(exp);
   }
   
   /****************************************************************

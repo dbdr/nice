@@ -12,7 +12,7 @@
 
 // File    : parser.jj
 // Created : Thu Jul 01 10:27:05 1999 by bonniot
-//$Modified: Thu Nov 25 18:26:10 1999 by bonniot $
+//$Modified: Fri Dec 03 19:03:49 1999 by bonniot $
 // Description : Parseur JavaCC pour Bossa
 //   Tokens based on the Jazz parser
 
@@ -156,7 +156,7 @@ TOKEN: /* Operators */
 | < MULT:    "*"   >
 | < SLASH:   "/"   >
 | < NEQ:     "!="  >
-| < DIV:     "div" >
+//| < DIV:     "div" >
 | < MOD:     "%"   >
 | < LNOT:    "!"   >
 | < BAND:    "&"   >
@@ -180,7 +180,6 @@ TOKEN: /* Keywords */
   < CLASS:      "class"      >
 | < INTERFACE:  "interface"  >
 | < IMPLEMENTS: "implements" >
-| < ABSTRACTS:  "abstracts"  >
 | < DOMAIN:     "domain"     >
 | < AT:         "@"          >
 | < EXACTLY_AT: "#"          >
@@ -223,7 +222,7 @@ TOKEN: /* Keywords */
 | < ANY_:	"Any"        >
 // Statements
 | < RETURN:     "return"     >
-| < VARIABLE:   "variable"   >
+| < VARIABLE:   "var"   >
 
 // reserved for future use
 | < PRIVATE:    "private"    >
@@ -412,7 +411,7 @@ TypeConstructor typeConstructor():
   LocatedString name;
 }
 {
-  name=string()
+  name=doted_string()
   { return new TypeConstructor(name); }
 }
 
@@ -647,7 +646,7 @@ Monotype monotype():
   (
   res=funmonotype()
 |
-  LOOKAHEAD(2)
+  LOOKAHEAD(monotypeConstructor())
   res=monotypeConstructor()
 | 
   res=monotypeVar() 
@@ -785,7 +784,7 @@ ClassDefinition classDefinition():
     parameters=monotypeVars() 
 
   ( "implements" l=interfaces() { imp.addAll(l); } 
-  | "abstracts"  l=interfaces() { abs.addAll(l); }
+  | "final" "implements"  l=interfaces() { abs.addAll(l); }
   | l=extensions()      { ext.addAll(l); }
   )*
 
@@ -886,13 +885,11 @@ MethodDefinition nativeMethodDefinition():
     Constraint cst;
     MethodDefinition res;
     String className=null,methodName=null; // for native java methods
-    boolean isStatic=false;
     LocatedString method,s;
     List javaTypes=null;
 }
 {
   "native" 
-    [ "static" { isStatic=true; } ]
   returnType=monotype()
     name=string()
     cst=constraint()
@@ -928,7 +925,7 @@ MethodDefinition nativeMethodDefinition():
     className=method.toString().substring(0,dot);
 
     if(javaTypes!=null)
-      return new JavaMethodDefinition(className,methodName,javaTypes,name,cst,returnType,parameters,isStatic);
+      return new JavaMethodDefinition(className,methodName,javaTypes,name,cst,returnType,parameters);
     else
       return new StaticFieldAccess(className,methodName,name,cst,returnType,parameters);
   }
@@ -941,7 +938,7 @@ Definition globalVariable():
   Expression value=null;
 }
 {
-  "variable"
+  "var"
   t=monotype()
   name=string()
   [ "=" value=expression() ]
@@ -1176,11 +1173,20 @@ Expression expression():
      t="[" e=expression() "]"
      { res=CallExp.create(symb("get",t),res,e); }
     |
+     t="^" e=expression()
+     { res=CallExp.create(symb("pow",t),res,e); }
+    |
      t="+" e=expression()
      { res=CallExp.create(symb("add",t),res,e); }
     |
      t="-" e=expression()
      { res=CallExp.create(symb("sub",t),res,e); }
+    |
+     t="*" e=expression()
+     { res=CallExp.create(symb("mul",t),res,e); }
+    |
+     t="/" e=expression()
+     { res=CallExp.create(symb("div",t),res,e); }
     |
      t="&&" e=expression()
      { res=CallExp.create(symb("and",t),res,e); }

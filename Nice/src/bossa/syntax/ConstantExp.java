@@ -12,13 +12,17 @@
 
 // File    : ConstantExp.java
 // Created : Thu Jul 08 15:36:40 1999 by bonniot
-//$Modified: Tue Nov 09 17:50:15 1999 by bonniot $
-// Description : Abstract class for values of basic types
+//$Modified: Thu Dec 02 12:01:14 1999 by bonniot $
 
 package bossa.syntax;
 
 import bossa.util.*;
 
+/**
+ * Abstract class for constant values of basic types.
+ *
+ * Numeric types come from {@link gnu.math gnu.math}.
+ */
 abstract public class ConstantExp extends Expression
 {
   void resolve()
@@ -26,21 +30,20 @@ abstract public class ConstantExp extends Expression
     TypeSymbol s=typeScope.lookup(new LocatedString(className,Location.nowhere()));
     
     if(s==null)
-      s=JavaTypeConstructor.make(new LocatedString(className,Location.nowhere()));
+      Internal.error("Base class "+className+
+		     " was not found in the standard library");
+
+    if(!(s instanceof TypeConstructor))
+      Internal.error("Base class "+className+
+		     " is not a class !");
     
-    Internal.error(s==null,
-		   "Base class "+className+
-		   " was not found in the standard library");
-    Internal.error(!(s instanceof TypeConstructor),
-		   "Base class "+className+
-		   " is not a class !");
     TypeConstructor tc=(TypeConstructor) s;
     type=new Polytype(new MonotypeConstructor(tc,null,null));
   }
 
   void computeType()
   {
-    //Already done in constructor
+    //Already done in resolve()
   }
 
   /****************************************************************
@@ -52,7 +55,12 @@ abstract public class ConstantExp extends Expression
     return new gnu.expr.QuoteExp(value);
   }
   
-  String className="[not defined yet]";
-
+  protected String className = "undefined class name";
+  
   protected Object value;
+
+  public String toString()
+  {
+    return value.toString();
+  }
 }

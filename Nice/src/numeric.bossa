@@ -1,0 +1,55 @@
+/**************************************************************************/
+/*                           B O S S A                                    */
+/*        A simple imperative object-oriented research language           */
+/*                   (c)  Daniel Bonniot 1999                             */
+/*                                                                        */
+/*  This program is free software; you can redistribute it and/or modify  */
+/*  it under the terms of the GNU General Public License as published by  */
+/*  the Free Software Foundation; either version 2 of the License, or     */
+/*  (at your option) any later version.                                   */
+/*                                                                        */
+/**************************************************************************/
+
+// File    : numeric.bossa
+// Created : Wed Dec 01 15:44:03 1999 by bonniot
+//$Modified: Fri Dec 03 19:31:43 1999 by bonniot $
+
+/**
+ * Numerical hierarchy.
+ * 
+ * Wrapper for {@link gnu.math <code>gnu.math</code>}.
+ *
+ * @author bonniot
+ */
+
+import prelude;
+import io;
+
+native gnu.math.Numeric add(gnu.math.Numeric, gnu.math.Numeric) = gnu.math.Numeric gnu.math.Numeric.add(java.lang.Object);
+native gnu.math.Numeric mul(gnu.math.Numeric, gnu.math.Numeric) = gnu.math.Numeric gnu.math.Numeric.mul(java.lang.Object);
+native gnu.math.Numeric div(gnu.math.Numeric, gnu.math.Numeric) = gnu.math.Numeric gnu.math.Numeric.div(java.lang.Object);
+native gnu.math.Numeric pow(gnu.math.Numeric, gnu.math.IntNum)  = gnu.math.Numeric gnu.math.Numeric.power(gnu.math.IntNum);
+
+// java.lang.Integer -> gnu.math.IntNum
+native void set(gnu.math.IntNum, java.lang.Integer) = void gnu.math.IntNum.set(int);
+
+gnu.math.IntNum num(java.lang.Integer);
+num(i)
+{
+  gnu.math.IntNum res = new gnu.math.IntNum();
+  set(res,i);
+  return res;
+}
+
+main(args)
+{
+  traceInstructions(false);
+  gnu.math.Numeric x = 2^30;
+  x = x^300;
+  println(stderr(),x/x);
+  gnu.math.Numeric y = x+1;
+  println(x/y);
+  println(true);
+  x=21*2;
+  exit(x);
+}

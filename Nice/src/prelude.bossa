@@ -1,0 +1,44 @@
+/**************************************************************************/
+/*                           B O S S A                                    */
+/*        A simple imperative object-oriented research language           */
+/*                   (c)  Daniel Bonniot 1999                             */
+/*                                                                        */
+/*  This program is free software; you can redistribute it and/or modify  */
+/*  it under the terms of the GNU General Public License as published by  */
+/*  the Free Software Foundation; either version 2 of the License, or     */
+/*  (at your option) any later version.                                   */
+/*                                                                        */
+/**************************************************************************/
+
+// File    : prelude.bossa
+// Created : Thu Dec 02 11:42:48 1999 by bonniot
+//$Modified: Fri Dec 03 19:29:06 1999 by bonniot $
+
+/**
+ * Standard prelude file.
+ *
+ * Should be imported automatically by each bossa source.
+ * 
+ * @author bonniot
+ */
+
+//import io;
+//import numeric;
+
+native java.lang.Boolean TRUE() = java.lang.Boolean.TRUE;
+native java.lang.Boolean FALSE() = java.lang.Boolean.FALSE;
+var java.lang.Boolean true  = TRUE();
+var java.lang.Boolean false = FALSE();
+
+native java.lang.String toString<Any T>(T) =
+  java.lang.String java.lang.String.valueOf(java.lang.Object);
+
+native void exit(java.lang.Number) = void java.lang.System.exit(int);
+native void traceInstructions(java.lang.Runtime,java.lang.Boolean) = void java.lang.Runtime.traceInstructions(boolean);
+native java.lang.Runtime getRuntime() = java.lang.Runtime java.lang.Runtime.getRuntime();
+
+void traceInstructions(java.lang.Boolean);
+traceInstructions(on) =
+  traceInstructions(getRuntime(),on);
+
+void main(java.lang.String);

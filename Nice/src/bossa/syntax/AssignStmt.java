@@ -12,7 +12,7 @@
 
 // File    : AssignStmt.java
 // Created : Mon Jul 05 15:49:27 1999 by bonniot
-//$Modified: Mon Nov 29 20:10:35 1999 by bonniot $
+//$Modified: Wed Dec 01 16:10:40 1999 by bonniot $
 
 package bossa.syntax;
 
@@ -26,7 +26,7 @@ import bossa.typing.*;
 public class AssignStmt extends Statement
 {
   public AssignStmt(Expression to,
-			 Expression value) 
+		    Expression value)
   {
     this.to=expChild(to);
     this.value=expChild(value);

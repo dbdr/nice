@@ -12,7 +12,7 @@
 
 // File    : VarSymbol.java
 // Created : Wed Jul 07 16:56:06 1999 by bonniot
-//$Modified: Mon Nov 15 12:39:15 1999 by bonniot $
+//$Modified: Wed Dec 01 17:36:52 1999 by bonniot $
 
 package bossa.syntax;
 
@@ -66,5 +66,22 @@ abstract class VarSymbol extends Node implements Located
   }
   
   LocatedString name;
-  gnu.expr.Declaration decl=null;
+
+  /****************************************************************
+   * Code generation
+   ****************************************************************/
+
+  void setDeclaration(gnu.expr.Declaration declaration)
+  {
+    this.decl = declaration;
+    this.decl.setLine(name.location().getLine());
+    this.decl.setCanRead(true);
+  }
+  
+  gnu.expr.Declaration getDeclaration()
+  {
+    return decl;
+  }
+  
+  private gnu.expr.Declaration decl=null;
 }

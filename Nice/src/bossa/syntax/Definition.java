@@ -12,7 +12,7 @@
 
 // File    : Definition.java
 // Created : Thu Jul 01 11:17:28 1999 by bonniot
-//$Modified: Fri Nov 05 15:26:09 1999 by bonniot $
+//$Modified: Thu Dec 02 18:30:32 1999 by bonniot $
 
 package bossa.syntax;
 
@@ -40,7 +40,7 @@ public interface Definition
   /**
    * Creates the initial rigid context.
    */
-  void createContext();
+  void createContext(bossa.modules.Module module);
   
   /**
    * Write the exported interface of the definition

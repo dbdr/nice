@@ -12,7 +12,7 @@
 
 // File    : LocatedString.java
 // Created : Fri Jul 09 19:09:47 1999 by bonniot
-//$Modified: Mon Nov 08 22:45:05 1999 by bonniot $
+//$Modified: Thu Dec 02 11:55:22 1999 by bonniot $
 // Description : A string + location information
 
 package bossa.syntax;
@@ -67,6 +67,11 @@ public class LocatedString
     return content.hashCode();
   }
 
+  public LocatedString cloneLS()
+  {
+    return new LocatedString(new String(content),location);
+  }
+  
   public String content;
   Location location;
 }

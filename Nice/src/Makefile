@@ -54,7 +54,7 @@ All: parser
 ## Documentation
 
 doc:
-	${JAVADOC} -windowtitle "Bossa" -doctitle "The Bossa interpreter source" -d ${TOP}/doc -private bossa.syntax bossa.util bossa.typing bossa.engine
+	${JAVADOC} -windowtitle "Bossa" -doctitle "The Bossa interpreter source" -d ${TOP}/doc -private bossa.syntax bossa.util bossa.typing bossa.engine  gnu.bytecode gnu.expr gnu.math gnu.mapping
 
 tags:
 	cd ${TOP}

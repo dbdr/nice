@@ -12,7 +12,7 @@
 
 // File    : Typing.java
 // Created : Tue Jul 20 11:57:17 1999 by bonniot
-//$Modified: Tue Nov 16 19:23:18 1999 by bonniot $
+//$Modified: Fri Dec 03 16:43:15 1999 by bonniot $
 
 package bossa.typing;
 
@@ -73,8 +73,6 @@ abstract public class Typing
 
   static public void introduce(Element e)
   {
-    if(dbg) Debug.println("Typing.introduce "+e);
-    
     //TODO: this is DIRTY !
     if(e instanceof MonotypeVar)
       e.setKind(null);
@@ -233,6 +231,9 @@ abstract public class Typing
   public static void initialLeq(TypeConstructor t1, TypeConstructor t2)
     throws TypingEx
   {
+    if(dbg)
+      Debug.println("Initial leq: "+t1+" < "+t2);
+    
     try{
       Engine.leq(t1,t2,true);
     }
@@ -410,18 +411,32 @@ abstract public class Typing
   {
     // Possible optimization: the successive values of minFloating 
     // for which getKind==null are always the same, compute once.
-    while(minFloating<tags.length && tags[minFloating].getKind()!=null)
+    while(minFloating<tags.length 
+	  && tags[minFloating].getKind()!=null
+	  && tags[minFloating].getKind()!=Engine.variablesConstraint)
       minFloating++;
 
     if(minFloating<tags.length)
-      for(Iterator k = Engine.listConstraints();
-	  k.hasNext();)
-	{
-	  Engine.Constraint c = (Engine.Constraint) k.next();
-	  if(c.hasConstants())
-	    Engine.forceKind(tags[minFloating],c);
-	  setFloatingKinds(tags,minFloating+1,res);
-	}
+      {
+	for(Iterator cs = Engine.listConstraints();
+	    cs.hasNext();)
+	  {
+	    Engine.Constraint c = (Engine.Constraint) cs.next();
+	  
+	    if(c.hasConstants())
+	      {
+		if(Debug.linkTests)
+		  Debug.println("Choosing kind "+c+" for "+tags[minFloating]);
+		
+		if(tags[minFloating] instanceof MonotypeVar)
+		  Engine.forceKind(tags[minFloating],c.associatedKind);
+		else
+		  Engine.forceKind(tags[minFloating],c);
+		setFloatingKinds(tags,minFloating+1,res);
+	    }
+	  }
+	tags[minFloating].setKind(null);
+      }
     else
       res.addAll(enumerateTags(tags));
   }
@@ -447,6 +462,9 @@ abstract public class Typing
 	  obs = (bossa.engine.BitVector) observers.get(idx);
 	
 	TypeConstructor constTC = tags[i].getTC();
+	if(constTC==null)
+	  Internal.error(tags[i].getKind()+" is not a valid kind in enumerate");
+	
 	TypeConstructor varTC = new TypeConstructor(new LocatedString("enum"+i,Location.nowhere()),constTC.variance);
 	varTC.enumerateTagIndex=i;
 	introduce(varTC);

@@ -12,7 +12,7 @@
 
 // File    : OverloadedSymbolExp.java
 // Created : Thu Jul 08 12:20:59 1999 by bonniot
-//$Modified: Mon Nov 29 20:04:31 1999 by bonniot $
+//$Modified: Thu Dec 02 14:39:01 1999 by bonniot $
 
 package bossa.syntax;
 
@@ -87,6 +87,12 @@ public class OverloadedSymbolExp extends Expression
     
     //addJavaFieldAccess(ident,parameters,symbols);
     
+    final int arity = parameters.size();
+
+    // We remember if some method was discarded
+    // in order to enhance the error message
+    boolean removedSomething = false;
+    
     for(Iterator i=symbols.iterator();i.hasNext();)
       {
 	Object s=i.next();
@@ -94,12 +100,17 @@ public class OverloadedSymbolExp extends Expression
 	if(!(s instanceof MethodDefinition))
 	  { i.remove(); continue; }
 
-	if(((MethodDefinition)s).getArity()!=parameters.size())
-	  { i.remove(); continue; }
+	if(((MethodDefinition)s).getArity()!=arity)
+	  { i.remove(); removedSomething=true; continue; }
       }
 
-    User.error(symbols.size()==0,this,
-	       "No method has name "+ident);
+    if(symbols.size()==0)
+      if(removedSomething)
+	User.error(this,
+		   "No method of arity "+arity+" has name "+ident);
+      else
+	User.error(this,
+		   "No method has name "+ident);
 
     if(symbols.size()>=2)
       {

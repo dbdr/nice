@@ -12,7 +12,7 @@
 
 // File    : Block.java
 // Created : Wed Jul 07 17:42:15 1999 by bonniot
-//$Modified: Wed Nov 24 19:02:53 1999 by bonniot $
+//$Modified: Wed Dec 01 17:29:45 1999 by bonniot $
 // Description : A block : a list of statements with local variables
 
 package bossa.syntax;
@@ -118,7 +118,7 @@ public class Block extends Statement
 	  AssignStmt.checkAssignment(local.left.getType(),local.value);
 	}
 	catch(bossa.typing.TypingEx t){
-	  User.error(this,"Typing error : "+local.left+
+	  User.error(local.left,"Typing error : "+local.left+
 		     " cannot be assigned value "+local.value);
     }
 
@@ -160,10 +160,8 @@ public class Block extends Statement
 	  eVal[n]=new gnu.expr.QuoteExp(null);
 	else
 	  eVal[n]=local.value.compile();
-	local.left.decl=res.addDeclaration(local.left.name.toString(),
-					   local.left.type.getJavaType());
-	local.left.decl.setCanRead(true);
-	
+	local.left.setDeclaration(res.addDeclaration(local.left.name.toString(),
+						     local.left.type.getJavaType()));
       }
     
     res.setBody(new gnu.expr.BeginExp(Statement.compile(statements)));

@@ -12,7 +12,7 @@
 
 // File    : Dispatch.java
 // Created : Mon Nov 15 10:36:41 1999 by bonniot
-//$Modified: Tue Nov 30 15:30:10 1999 by bonniot $
+//$Modified: Fri Dec 03 18:22:06 1999 by bonniot $
 
 package bossa.link;
 
@@ -48,7 +48,7 @@ public class Dispatch
       test((MethodDefinition)i.next(), module);
   }
   
-  private static void test(MethodDefinition m,bossa.modules.Module module)
+  private static void test(MethodDefinition m, bossa.modules.Module module)
   {
     if(m instanceof JavaMethodDefinition
        || m instanceof StaticFieldAccess
@@ -78,6 +78,7 @@ public class Dispatch
       }
     
     Domain domain = m.getType().getDomain();
+    
     List multitags = bossa.typing.Typing.enumerate(domain);
     
     for(Iterator i=multitags.iterator();
@@ -89,7 +90,7 @@ public class Dispatch
       }
 
     if(Debug.codeGeneration)
-      Debug.println("Generating dispatch function for "+m);
+      Debug.print("Generating dispatch function for "+m);
     
     compile(m,sortedAlternatives,module);
   }
@@ -169,12 +170,14 @@ public class Dispatch
 	    first = a;
 	  else
 	    if(!Alternative.leq(first,a))
-	      User.error("Ambiguity for method "+method+
+	      User.error(method,
+			 "Ambiguity for method "+method+
 			 "For parameters of type "+Util.map("(",", ",")",tags)+
 			 "\neither "+first+" or "+a+" match");
       }
     if(first==null)
-      User.error("Method "+method+" is not exhaustive:\n"+
+      User.error(method,
+		 "Method "+method+" is not exhaustive:\n"+
 		 "no alternative matches "+Util.map("(",", ",")",tags));
   }
 
@@ -199,7 +202,7 @@ public class Dispatch
 
     for(int n=0; n<types.length; n++)
       {
-	Declaration param = lexp.addDeclaration("parameter_"+n,types[n]);
+	gnu.expr.Declaration param = lexp.addDeclaration("parameter_"+n,types[n]);
 	param.setParameter(true);
 	params[n]=new ReferenceExp(param);
       }
@@ -216,7 +219,7 @@ public class Dispatch
 
     lexp.primMethod = module.addDispatchMethod(m);
     
-    MethodBodyDefinition.compileMethod(lexp,module.dispatchClass,"??");
+    lexp.compileAsMethod(module.dispatchComp);
   }
   
   private static gnu.expr.Expression compileFieldAccess(FieldAccessMethod method, gnu.expr.Expression value)
@@ -268,7 +271,6 @@ public class Dispatch
   
   private static gnu.expr.Expression dispatch(Iterator sortedAlternatives, boolean voidReturn, final BlockExp block, gnu.expr.Expression[] params)
   {
-
     if(!sortedAlternatives.hasNext())
       {
 	gnu.expr.Expression[] exn = new gnu.expr.Expression[1];

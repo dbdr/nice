@@ -12,7 +12,7 @@
 
 // File    : User.java
 // Created : Wed Jul 07 18:20:58 1999 by bonniot
-//$Modified: Fri Nov 05 15:41:57 1999 by bonniot $
+//$Modified: Wed Dec 01 16:15:54 1999 by bonniot $
 
 package bossa.util;
 
@@ -35,14 +35,18 @@ public class User
   public static void error(Located responsible, String message, String dbgMsg)
   {
     if(Debug.errorMsg)
-      error(responsible.location()+message+dbgMsg);
+      error(responsible,message+dbgMsg);
     else
-      error(responsible.location()+message);
+      error(responsible,message);
   }
 
   public static void error(Located responsible, String message)
   {
-    error(responsible.location()+message);
+    Location loc = responsible.location();
+    if(loc==null)
+      error(message);
+    else
+      error(responsible.location()+message);
   }
 
   public static void error(boolean condition, String message)

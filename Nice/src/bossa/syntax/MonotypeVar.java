@@ -12,7 +12,7 @@
 
 // File    : MonotypeVar.java
 // Created : Fri Jul 23 15:36:39 1999 by bonniot
-//$Modified: Tue Nov 16 19:31:57 1999 by bonniot $
+//$Modified: Wed Dec 01 16:07:46 1999 by bonniot $
 
 package bossa.syntax;
 
@@ -112,14 +112,7 @@ public class MonotypeVar extends Monotype
     
     TypeSymbol s=ts.lookup(this.name);
     if(s==null)
-      {
-	JavaTypeConstructor tc = JavaTypeConstructor.lookup(this.name);
-	
-	if(tc!=null)
-	  return new MonotypeConstructor(tc, null, name.location());
-
-	User.error(this,this.name+" is not defined"," in "+ts);
-      }
+      User.error(this,this.name+" is not defined"," in "+ts);
 
     if(s instanceof Monotype)
       return (Monotype) s;
@@ -127,8 +120,8 @@ public class MonotypeVar extends Monotype
     // In this case, it was indeed a type constructor
     // applied to no type parameters
     if(s instanceof TypeConstructor)
-      return new MonotypeConstructor((TypeConstructor) s, null, 
-				     name.location());
+      return new MonotypeConstructor
+	((TypeConstructor) s, null,name.location());
 
     Internal.error(this,this.name+" is not well kinded :"+s.getClass());
     return null;

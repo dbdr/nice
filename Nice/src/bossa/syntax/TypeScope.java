@@ -12,7 +12,7 @@
 
 // File    : TypeScope.java
 // Created : Fri Jul 09 11:29:17 1999 by bonniot
-//$Modified: Wed Aug 18 18:24:54 1999 by bonniot $
+//$Modified: Wed Dec 01 16:08:25 1999 by bonniot $
 
 package bossa.syntax;
 
@@ -60,8 +60,14 @@ class TypeScope
     TypeSymbol res;
     if(map.containsKey(name))
       return (TypeSymbol)map.get(name);
+
     if(outer!=null)
       return outer.lookup(name);
+
+    JavaTypeConstructor tc = JavaTypeConstructor.lookup(name);
+    if(tc!=null)
+      return tc;
+    
     return null;
   }
 

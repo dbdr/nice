@@ -12,7 +12,7 @@
 
 // File    : FloatConstantExp.java
 // Created : Mon Jul 05 18:04:30 1999 by bonniot
-//$Modified: Fri Nov 05 16:54:23 1999 by bonniot $
+//$Modified: Wed Dec 01 20:22:25 1999 by bonniot $
 // Description : a Float constant
 
 package bossa.syntax;
@@ -21,14 +21,19 @@ import bossa.util.*;
 
 public class FloatConstantExp extends ConstantExp
 {
-  public FloatConstantExp(double value)
+  static boolean initialized = false;
+  
   {
-    className="Float";
-    this.value=new Double(value);
+    className = "gnu.math.DFloNum";
+    if(!initialized)
+      {
+	JavaTypeConstructor.make(className);
+	initialized=true;
+      }
   }
 
-  public String toString()
+  public FloatConstantExp(double value)
   {
-    return ((Double)value).toString();
+    this.value = new gnu.math.DFloNum(value);
   }
 }

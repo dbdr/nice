@@ -12,7 +12,7 @@
 
 // File    : Domain.java
 // Created : Sat Jul 24 19:10:04 1999 by bonniot
-//$Modified: Thu Nov 25 15:00:57 1999 by bonniot $
+//$Modified: Thu Dec 02 19:55:08 1999 by bonniot $
 
 package bossa.syntax;
 
@@ -47,7 +47,8 @@ public class Domain
 
   public Monotype[] getTuple()
   {
-    Internal.error(monotypes==null,"Null monotypes");
+    if(monotypes==null)
+      Internal.error("Null monotypes");
     
     Object[] source = monotypes.toArray();
     Monotype[] res = new Monotype[source.length];
@@ -58,7 +59,8 @@ public class Domain
 
   public Monotype getMonotype()
   {
-    Internal.error(monotype==null,"Null monotype");
+    if(monotype==null)
+      Internal.error("Null monotype");
     
     return monotype;
   }
@@ -114,7 +116,10 @@ public class Domain
 
   public String toString()
   {
-    return "Ex "+constraint+" "+monotype;
+    if(monotypes!=null)
+      return "Ex "+constraint+" "+Util.map("(",",",")",monotypes);
+    else
+      return "Ex "+constraint+" "+monotype;
   }
 
   static List fromMonotypes(Collection monotypes)

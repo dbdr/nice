@@ -12,7 +12,7 @@
 
 // File    : MethodDefinition.java
 // Created : Thu Jul 01 18:12:46 1999 by bonniot
-//$Modified: Mon Nov 29 20:28:23 1999 by bonniot $
+//$Modified: Fri Dec 03 18:23:21 1999 by bonniot $
 
 package bossa.syntax;
 
@@ -114,9 +114,10 @@ public class MethodDefinition extends PolySymbol implements Definition
    * Initial Context
    ****************************************************************/
 
-  public void createContext()
+  public void createContext(bossa.modules.Module module)
   {
     //Nothing
+    setModule(module);
   }
   
   /****************************************************************
@@ -128,12 +129,7 @@ public class MethodDefinition extends PolySymbol implements Definition
   protected gnu.mapping.Procedure computeDispatchMethod()
   {
     return new gnu.expr.PrimProcedure
-      (
-       bossa.modules.Module.dispatchClass.addMethod
-       (bytecodeName(),
-	javaArgTypes(),javaReturnType(),
-	Access.PUBLIC|Access.STATIC|Access.FINAL)
-       );
+      (module.addDispatchMethod(this));
   }
   
   public final gnu.mapping.Procedure getDispatchMethod() 
@@ -176,11 +172,6 @@ public class MethodDefinition extends PolySymbol implements Definition
    * Printing
    ************************************************************/
 
-  public String bytecodeName()
-  {
-    return name.toString();
-  }
-  
   public String toString()
   {
     return
@@ -202,4 +193,28 @@ public class MethodDefinition extends PolySymbol implements Definition
    * true if this method represent the access to the field of an object.
    */
   public boolean isFieldAccess() { return false; }
+
+  /****************************************************************
+   * Module and unique name
+   ****************************************************************/
+  
+  bossa.modules.Module module;
+  
+  private void setModule(bossa.modules.Module module)
+  {
+    this.module = module;
+    bytecodeName = module.mangleName(name.toString());
+  }
+
+  public String getBytecodeName()
+  {
+    return bytecodeName;
+  }
+  
+  public String getFullBytecodeName()
+  {
+    return module.name+"$"+bytecodeName;
+  }
+  
+  private String bytecodeName;
 }

@@ -12,7 +12,7 @@
 
 // File    : Engine.java
 // Created : Tue Jul 27 15:34:53 1999 by bonniot
-//$Modified: Tue Nov 16 18:59:31 1999 by bonniot $
+//$Modified: Fri Dec 03 16:32:44 1999 by bonniot $
 
 package bossa.engine;
 
@@ -366,24 +366,6 @@ public abstract class Engine
     frozenLeqs.clear();
   }
   
-  /** The elements that have not yet been added to a Kind  */
-  private static final BackableList floating=new BackableList();
-  
-  /** The constraint of monotype variables */
-  private static final Engine.Constraint variablesConstraint=new Engine.Constraint("type variables");
-  
-  /** The list of Constraints */
-  private static final ArrayList constraints;
-  static
-  {
-    constraints=new ArrayList(10);
-    constraints.add(variablesConstraint);
-  }
-  public static Iterator listConstraints()
-  {
-    return constraints.iterator();
-  }
-  
   /** Maps a Kind to its lowlevel constraint */
   private static final HashMap kindsMap=new HashMap();
   
@@ -409,6 +391,29 @@ public abstract class Engine
     constraints.add(res);
     kindsMap.put(kind,res);
     return res;
+  }
+  
+  /** The elements that have not yet been added to a Kind  */
+  private static final BackableList floating=new BackableList();
+  
+  /** The constraint of monotype variables */
+  public static final Engine.Constraint variablesConstraint;
+  static
+  {
+    variablesConstraint = new Engine.Constraint("type variables",true);
+    kindsMap.put(variablesConstraint,variablesConstraint);
+  }  
+  
+  /** The list of Constraints */
+  private static final ArrayList constraints;
+  static
+  {
+    constraints=new ArrayList(10);
+    constraints.add(variablesConstraint);
+  }
+  public static Iterator listConstraints()
+  {
+    return constraints.iterator();
   }
   
   /****************************************************************
@@ -443,12 +448,20 @@ public abstract class Engine
     }
     private String name;
 
+    Constraint(String name, boolean variables)
+    {
+      this(name);
+      this.variables=variables;
+    }
+
+    private boolean variables = false;
+    
     /**
      * Returns true iff there is a concrete #class in this constraint.
      */
     public boolean hasConstants()
     {
-      return true;
+      return !variables;
     }
     
     final K0 k0 = new K0(K0.BACKTRACK_UNLIMITED,new Callbacks());

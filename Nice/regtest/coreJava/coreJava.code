@@ -126,6 +126,15 @@
   t[1] = 2;
   for (int i = 0; i<t.length; i++)
     p("" + t[i]);
+
+  // Printing
+
+  System.out.println("println");
+  System.out.print("print");
+  System.out.println();
+  System.out.print(1);
+  System.out.print('c');
+  System.out.println(true);
   
   //   EXCEPTIONS
 

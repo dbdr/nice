@@ -13,8 +13,11 @@ nonnull(x) {}
 <T> ?T f(?T s = null, !T?->!T i = null) = s;
 
 /// PASS
-  javax.swing.JFrame f = new javax.swing.JFrame().init();
   /// Toplevel
+void foo()
+{
+  javax.swing.JFrame f = new javax.swing.JFrame().init();
+}
 
 <java.awt.Component T> T init
   (T this,

@@ -1,4 +1,6 @@
-public final class ObjectArray extends Array
+package nice.lang;
+
+public final class ObjectArray extends AbstractArray
 {
   ObjectArray(Object[] value)
   {

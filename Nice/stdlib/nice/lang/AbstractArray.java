@@ -1,4 +1,6 @@
-public abstract class Array implements nice.lang.Sequence
+package nice.lang;
+
+public abstract class AbstractArray implements nice.lang.Sequence
 {
   public abstract int getLength();
   public abstract Object get(int index);

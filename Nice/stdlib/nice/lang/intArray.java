@@ -1,6 +1,8 @@
+package nice.lang;
+
 import gnu.math.IntNum;
 
-public final class intArray extends Array
+public final class intArray extends AbstractArray
 {
   public intArray(int[] value)
   {

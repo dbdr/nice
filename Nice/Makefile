@@ -1,24 +1,22 @@
 
 TOP=${HOME}/Nice
-TOPCLASSES=${TOP}/classes
 
-JAVAC=javac -classpath ${TOPCLASSES}:${TOP}/src:${TOP}/stdlib -sourcepath ${TOP}/src -O -g
+JAVAC=javac -classpath ${TOP}/classes:${TOP}/src:${TOP}/stdlib -sourcepath ${TOP}/src -d ${TOP}/classes -O -g
 JAVACC=java -classpath ${HOME}/lib/java/JavaCC/JavaCC.zip COM.sun.labs.javacc.Main
 JAVADOC=javadoc -linkoffline file:///C%7C/Apps/jdk1.2.1/docs/api file:///usr/opt/java122/docs/api
 
 recompile:
 	cd src;\
-	${JAVAC} -d ${TOP}/classes bossa/syntax/*.java bossa/modules/*.java bossa/parser/*.java nice/tools/*.java bossa/test/Front.java mlsub/*/*.java ../stdlib/*.java
+	${JAVAC} bossa/syntax/*.java bossa/modules/*.java bossa/parser/*.java nice/tools/*.java bossa/test/Front.java mlsub/*/*.java ../stdlib/nice/lang/*.java
 
 recompileGNU:
-	cd src;\
-	${JAVAC} -d ${TOP}/classes gnu/*/*.java gnu/*/*/*.java kawa/*/*.java
+	cd src; ${JAVAC} gnu/*/*.java gnu/*/*/*.java kawa/*/*.java
 
 parser:
 	cd src/bossa/parser; ${JAVACC} Parser.jj
 
 clean:
-	rm -rf ${TOPCLASSES}/*
+	rm -rf ${TOP}/classes/*
 
 scratch: clean parser recompile
 
@@ -40,8 +38,7 @@ tags:
 jar:
 	cp src/nice/tools/compiler.jar lib/nice/Nice.jar
 	jar umf src/mainClass lib/nice/Nice.jar -C classes nice -C classes mlsub -C classes bossa -C classes gnu -C classes kawa
-	cd stdlib; jar uf ../lib/nice/Nice.jar nice/*/*.nice*; cd ..
-	cd classes; jar uf ../lib/nice/Nice.jar *.class; cd ..
+	cd stdlib; jar uf ../lib/nice/Nice.jar nice/*/*.nice*
 
 dist: jar
 	tar cf lib/nice/Nice.tar bin/nicer bin/nicec lib/nice/Nice.jar lib/emacs/nice-mode.el

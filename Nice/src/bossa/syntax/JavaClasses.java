@@ -12,7 +12,7 @@
 
 // File    : JavaClasses.java
 // Created : Thu Jul 08 11:51:09 1999 by bonniot
-//$Modified: Fri Jul 28 21:29:11 2000 by Daniel Bonniot $
+//$Modified: Mon Aug 07 14:37:47 2000 by Daniel Bonniot $
 
 package bossa.syntax;
 
@@ -163,12 +163,6 @@ public final class JavaClasses
 	      }
 	    }
       }
-    try{
-      bossa.syntax.Node.getGlobalTypeScope().addSymbol(res);
-    }
-    catch(TypeScope.DuplicateName e){
-      User.error(e);
-    }
     
     if(javaType instanceof ClassType)
       fetchMethods(res, (ClassType) javaType);

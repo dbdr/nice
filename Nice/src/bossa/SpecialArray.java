@@ -38,8 +38,8 @@ public final class SpecialArray extends gnu.bytecode.ArrayType
     if(elements == Type.pointer_type)
       specialObjectArray = this;
     
-    className = prefix+"Array";
-    setSignature("["+elements.getSignature());
+    className = "nice.lang." + prefix + "Array";
+    setSignature("[" + elements.getSignature());
 
     classType = ClassType.make(className);
     
@@ -50,7 +50,7 @@ public final class SpecialArray extends gnu.bytecode.ArrayType
     Type.registerTypeForClass(java.lang.reflect.Array.newInstance
 			      (elements.getReflectClass(), 0).getClass(), 
 			      this);
-    Type.registerTypeForName("["+elements.getSignature(), this);
+    Type.registerTypeForName("[" + elements.getSignature(), this);
     
     makeMethod = classType.getDeclaredMethod("make", 1);
     
@@ -105,8 +105,9 @@ public final class SpecialArray extends gnu.bytecode.ArrayType
    ****************************************************************/
 
   private ClassType classType;
-  public static ClassType objectArrayType = ClassType.make("ObjectArray");
-  public static ClassType arrayType = ClassType.make("Array");
+  public static ClassType objectArrayType = ClassType.make("nice.lang.ObjectArray");
+  public static ClassType arrayType = ClassType.make("nice.lang.AbstractArray");
+
   private static SpecialArray specialObjectArray;
   public static SpecialArray specialObjectArray()
   {

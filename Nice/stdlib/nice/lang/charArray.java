@@ -1,6 +1,8 @@
+package nice.lang;
+
 import gnu.text.Char;
 
-public final class charArray extends Array
+public final class charArray extends AbstractArray
 {
   public charArray(char[] value)
   {

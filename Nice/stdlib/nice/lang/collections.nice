@@ -63,16 +63,16 @@ interface List<T>
 class Array<T> 
   implements Sequence
   finally implements Collection 
-  = native Array;
+  = native AbstractArray;
 
 // Wrappers
 <Any T> Array<T> newArray(int) = native Object[] ObjectArray.newInstance(int);
 <Any T> Array<T> newArray(int,T) = native Object[] ObjectArray.newInstance(int,Object);
 
 <Any T> Array<T> resize(Array<T>, int) = native Object[] ObjectArray.resizeArray(Object[], int);
-<Any T> T array_get(Array<T>, int) = native Object Array.get(int);
-<Any T> void array_set(Array<T>, int, T) = native void Array.set(int,Object);
-<Any T> int native_length(Array<T>) = native int Array.getLength();
+<Any T> T array_get(Array<T>, int) = native Object AbstractArray.get(int);
+<Any T> void array_set(Array<T>, int, T) = native void AbstractArray.set(int,Object);
+<Any T> int native_length(Array<T>) = native int AbstractArray.getLength();
 
 
 get(a@Array, n) = array_get(a,n);

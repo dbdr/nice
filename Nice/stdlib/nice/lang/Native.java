@@ -1,3 +1,4 @@
+package nice.lang;
 
 import gnu.text.Char;
 

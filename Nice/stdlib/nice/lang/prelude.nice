@@ -12,7 +12,7 @@
 
 // File    : prelude.nice
 // Created : Thu Dec 02 11:42:48 1999 by bonniot
-//$Modified: Tue Jul 25 12:45:19 2000 by Daniel Bonniot $
+//$Modified: Mon Aug 07 14:42:35 2000 by Daniel Bonniot $
 
 /**
  * Standard prelude file.
@@ -46,7 +46,7 @@ class char extends int = native;
  ****************************************************************/
 
 <Any T> boolean `==`(T,T) = 
-  native boolean Native.pointerEquality(Object,Object);
+  native boolean nice.lang.Native.pointerEquality(Object,Object);
 <Any T> boolean equals(T,T) = 
   native boolean Object.equals(Object);
 

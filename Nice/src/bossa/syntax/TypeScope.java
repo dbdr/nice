@@ -12,7 +12,7 @@
 
 // File    : TypeScope.java
 // Created : Fri Jul 09 11:29:17 1999 by bonniot
-//$Modified: Thu Jun 22 21:07:41 2000 by Daniel Bonniot $
+//$Modified: Mon Aug 07 14:42:02 2000 by Daniel Bonniot $
 
 package bossa.syntax;
 
@@ -108,26 +108,38 @@ public class TypeScope
     else
       // This is the global type scope
       {
+	boolean notFullyQualified = name.indexOf('.') == -1;
+	
+	// Try first to find the symbol in Nice definitions
+	if (notFullyQualified)
+	  if (module != null)
+	    for (Iterator i = module.listImplicitPackages(); i.hasNext();)
+	      {
+		String pkg = ((LocatedString) i.next()).toString();
+		String fullName = pkg + "." + name;
+		
+		if (map.containsKey(fullName))
+		  return (TypeSymbol) map.get(fullName);
+	      }
+	  else
+	    Internal.warning("null module in TypeScope");
+
+	// Now try as a java class
 	TypeConstructor tc = JavaClasses.lookup(name);
 	    
-	if(tc!=null)
+	if (tc != null)
 	  return tc;
 	    
-	if(module!=null)
-	  for(Iterator i = module.listImplicitPackages(); i.hasNext();)
+	if (notFullyQualified && (module != null))
+	  for (Iterator i = module.listImplicitPackages(); i.hasNext();)
 	    {
 	      String pkg = ((LocatedString) i.next()).toString();
-	      String fullName = pkg+"."+name;
+	      String fullName = pkg + "." + name;
 
-	      if(map.containsKey(fullName))
-		return (TypeSymbol)map.get(fullName);
-	      
 	      tc = JavaClasses.lookup(fullName);
 	      if(tc!=null)
 		return tc;
 	    }
-	else
-	  Internal.warning("null module in TypeScope");
       }
     
     return null;

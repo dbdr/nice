@@ -332,12 +332,12 @@ public final class Polytype
       " (Ill-formed type)";
     }
 
-    return Constraint.toString(constraint) + monotype.toString();
+    return Constraint.toString(constraint) + String.valueOf(monotype);
   }
 
   public String toStringNoSimplify()
   {
-    return Constraint.toString(constraint) + monotype.toString();
+    return Constraint.toString(constraint) + String.valueOf(monotype);
   }
 
   private Constraint constraint;

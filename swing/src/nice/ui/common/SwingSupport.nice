@@ -1,0 +1,103 @@
+package nice.ui.common;
+
+
+/**
+ * static HashMaps to store references to the added listeners
+ * used for classes that don't allow the getXxxListener operation
+ * this is done to provide that support nevertheless
+ */
+var Map<Object,?java.util.List<NChangeListener>> changeListeners = new HashMap();
+var Map<Object,?java.util.List<NCellEditorListener>> cellEditorListeners = new HashMap();
+var Map<Object,?java.util.List<NTableModelListener>> tableModelListeners = new HashMap();
+var Map<Object,?java.util.List<NTableColumnModelListener>> tableColumnModelListeners = new HashMap();
+var Map<Object,?java.util.List<NUndoableEditListener>> undoableEditListeners = new HashMap();
+
+
+/**
+ * abstract interfaces to qualify over classes being able to handle events as NiceListenerHandler
+ */
+
+abstract interface AncestorListenerHandler extends NiceListenerHandler {}
+abstract interface CaretListenerHandler extends NiceListenerHandler {}
+abstract interface CellEditorListenerHandler extends NiceListenerHandler {}
+abstract interface ChangeListenerHandler extends NiceListenerHandler {}
+abstract interface DocumentListenerHandler extends NiceListenerHandler {}
+abstract interface HyperlinkListenerHandler extends NiceListenerHandler {}
+abstract interface InternalFrameListenerHandler extends NiceListenerHandler {}
+abstract interface ListDataListenerHandler extends NiceListenerHandler {}
+abstract interface ListSelectionListenerHandler extends NiceListenerHandler {}
+abstract interface MenuDragMouseListenerHandler extends NiceListenerHandler {}
+abstract interface MenuKeyListenerHandler extends NiceListenerHandler {}
+abstract interface MenuListenerHandler extends NiceListenerHandler {}
+abstract interface PopupMenuListenerHandler extends NiceListenerHandler {}
+abstract interface TableColumnModelListenerHandler extends NiceListenerHandler {}
+abstract interface TableModelListenerHandler extends NiceListenerHandler {}
+abstract interface TreeExpansionListenerHandler extends NiceListenerHandler {}
+abstract interface TreeWillExpandListenerHandler extends NiceListenerHandler {}
+abstract interface TreeModelListenerHandler extends NiceListenerHandler {}
+abstract interface TreeSelectionListenerHandler extends NiceListenerHandler {}
+abstract interface UndoableEditListenerHandler extends NiceListenerHandler {}
+
+
+
+/**
+ * existing java classes implement the defined abstract interfaces
+ */
+
+class javax.swing.JComboBox implements ItemListenerHandler;
+class javax.swing.JComponent implements VetoableChangeListenerHandler;
+class javax.swing.AbstractAction implements PropertyChangeListenerHandler;
+class javax.swing.AbstractButton implements ActionListenerHandler;
+class javax.swing.AbstractButton implements ItemListenerHandler;
+class javax.swing.DefaultButtonModel implements ActionListenerHandler;
+class javax.swing.JComboBox implements ActionListenerHandler;
+class javax.swing.JFileChooser implements ActionListenerHandler;
+class javax.swing.JTextField implements ActionListenerHandler;
+class javax.swing.Timer implements ActionListenerHandler;
+class javax.swing.AbstractButton implements ChangeListenerHandler;
+class javax.swing.AbstractCellEditor implements CellEditorListenerHandler;
+class javax.swing.DefaultBoundedRangeModel implements ChangeListenerHandler;
+class javax.swing.DefaultButtonModel implements ActionListenerHandler;
+class javax.swing.DefaultButtonModel implements ChangeListenerHandler;
+class javax.swing.DefaultButtonModel implements ItemListenerHandler;
+class javax.swing.DefaultSingleSelectionModel implements ChangeListenerHandler;
+class javax.swing.JProgressBar implements ChangeListenerHandler;
+class javax.swing.JSlider implements ChangeListenerHandler;
+class javax.swing.JTabbedPane implements ChangeListenerHandler;
+class javax.swing.JViewport implements ChangeListenerHandler;
+class javax.swing.MenuSelectionManager implements ChangeListenerHandler;
+class javax.swing.AbstractButton implements ItemListenerHandler;
+class javax.swing.DefaultButtonModel implements ItemListenerHandler;
+class javax.swing.AbstractListModel implements ListDataListenerHandler;
+class javax.swing.DefaultListSelectionModel implements ListSelectionListenerHandler;
+class javax.swing.JList implements ListSelectionListenerHandler;
+class javax.swing.JComponent implements AncestorListenerHandler;
+class javax.swing.JEditorPane implements HyperlinkListenerHandler;
+class javax.swing.JInternalFrame implements InternalFrameListenerHandler;
+class javax.swing.JMenu implements MenuListenerHandler;
+class javax.swing.JMenuItem implements MenuDragMouseListenerHandler;
+class javax.swing.JMenuItem implements MenuKeyListenerHandler;
+class javax.swing.JPopupMenu implements PopupMenuListenerHandler;
+class javax.swing.JTree implements TreeExpansionListenerHandler;
+class javax.swing.JTree implements TreeWillExpandListenerHandler;
+class javax.swing.JTree implements TreeSelectionListenerHandler;
+class javax.swing.JScrollBar implements AdjustmentListenerHandler;
+class javax.swing.undo.UndoableEditSupport implements UndoableEditListenerHandler;
+class javax.swing.text.AbstractDocument implements UndoableEditListenerHandler;
+class javax.swing.table.TableColumn implements PropertyChangeListenerHandler;
+class javax.swing.table.TableColumnModel implements TableColumnModelListenerHandler;
+class javax.swing.table.TableModel implements TableModelListenerHandler;
+class javax.swing.tree.DefaultTreeSelectionModel implements PropertyChangeListenerHandler;
+class javax.swing.tree.DefaultTreeSelectionModel implements TreeSelectionListenerHandler;
+class javax.swing.tree.DefaultTreeModel implements TreeModelListenerHandler;
+class javax.swing.text.JTextComponent implements CaretListenerHandler;
+class javax.swing.colorchooser.DefaultColorSelectionModel implements ChangeListenerHandler;
+class javax.swing.text.DefaultCaret implements ChangeListenerHandler;
+class javax.swing.text.AbstractDocument implements DocumentListenerHandler;
+
+//class javax.swing.UIManager implements PropertyChangeListenerHandler;
+//class javax.swing.UIDefaults implements PropertyChangeListenerHandler;
+
+//JDK1.4  class javax.swing.JComboBox implements PopupMenuListenerHandler;
+//JDK1.4  class javax.swing.JSpinner implements ChangeListenerHandler;
+//JDK1.4  class javax.swing.AbstractSpinnerModel implements ChangeListenerHandler;

@@ -12,7 +12,7 @@
 
 // File    : TypeConstructorLeqCst.java
 // Created : Sat Jul 24 12:02:15 1999 by bonniot
-//$Modified: Mon Jul 26 15:49:17 1999 by bonniot $
+//$Modified: Wed Jul 28 11:03:09 1999 by bonniot $
 
 package bossa.syntax;
 
@@ -47,6 +47,7 @@ public class TypeConstructorLeqCst extends AtomicConstraint
    ****************************************************************/
 
   void assert()
+    throws bossa.typing.TypingEx
   {
     bossa.typing.Typing.leq(t1,t2);
   }

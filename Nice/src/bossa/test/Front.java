@@ -12,7 +12,7 @@
 
 // File    : Front.java
 // Created : Thu Jul 01 15:11:18 1999 by bonniot
-//$Modified: Tue Jul 27 17:24:54 1999 by bonniot $
+//$Modified: Wed Jul 28 22:11:42 1999 by bonniot $
 // Description : Front-end test
 
 package bossa.test;
@@ -34,6 +34,8 @@ public class Front
    */
   public static void main(String[] args) throws Exception
   {
+    System.out.println("Welcome to Bossa");
+      
     try{
       bossa.util.Location.currentFile="stdlib.bossa";
       Reader r = new FileReader("stdlib.bossa");
@@ -53,8 +55,6 @@ public class Front
       p.ReInit(r);
       defs.addAll(p.definitions());
 
-      System.out.println("Let's see what you have done");
-      
       AST ast=new AST(defs);
       //System.out.print(ast);
     }

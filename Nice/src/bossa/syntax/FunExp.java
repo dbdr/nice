@@ -12,7 +12,7 @@
 
 // File    : FunExp.java
 // Created : Mon Jul 12 15:09:50 1999 by bonniot
-//$Modified: Tue Jul 27 10:20:26 1999 by bonniot $
+//$Modified: Wed Jul 28 20:17:00 1999 by bonniot $
 // Description : A functional expression
 
 package bossa.syntax;
@@ -34,6 +34,7 @@ public class FunExp extends Expression
   Expression resolve(VarScope s,TypeScope ts)
   {
     ts=TypeScope.makeScope(ts,constraint.binders);
+    constraint.resolve(ts);
     Node.buildScope(s,ts,formals);
     VarSymbol.resolveScope(formals);
     try{
@@ -49,6 +50,13 @@ public class FunExp extends Expression
 
   Type getType()
   {
+    try{
+      constraint.assert();
+    }
+    catch(bossa.typing.TypingEx e){
+      User.error(this,"functional expression is ill-typed");
+    }
+    
     Type returnType=body.getType();
     
     User.error(returnType==null,"The last statement of "+this+

@@ -12,7 +12,7 @@
 
 // File    : MethodBodyDefinition.java
 // Created : Thu Jul 01 18:12:46 1999 by bonniot
-//$Modified: Tue Jul 27 16:55:47 1999 by bonniot $
+//$Modified: Wed Jul 28 20:27:13 1999 by bonniot $
 // Description : Abstract syntax for a method body
 
 package bossa.syntax;
@@ -105,7 +105,7 @@ public class MethodBodyDefinition extends Node
     }
 
     buildScope(definition.scope,definition.typeScope,parameters);
-    body.buildScope(this.scope,this.typeScope);
+    body.buildScope(this.scope,definition.typeScope);
   }
 
   void resolveScope()
@@ -125,8 +125,12 @@ public class MethodBodyDefinition extends Node
 
     try{
       definition.type.getConstraint().assert();
+
+      Collection monotypes=MonoSymbol.getMonotype(parameters);
+      Typing.introduce(monotypes);
+      
       Typing.leqMono
-	(MonoSymbol.getMonotype(parameters),
+	(monotypes,
 	 definition.type.domain());
       
       Typing.in

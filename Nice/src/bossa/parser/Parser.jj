@@ -12,7 +12,7 @@
 
 // File    : parser.jj
 // Created : Thu Jul 01 10:27:05 1999 by bonniot
-//$Modified: Tue Jul 27 12:52:27 1999 by bonniot $
+//$Modified: Tue Jul 27 18:40:28 1999 by bonniot $
 // Description : Parseur JavaCC pour Bossa
 //   Tokens based on the Jazz parser
 
@@ -774,7 +774,12 @@ ClassDefinition classDefinition():
     ( implementations(res) | abstractions(res) | extensions(res) )*
     "{"
     ( 
-      (LOOKAHEAD(field(res)) field(res) | methodDecl(res))
+      (
+       //LOOKAHEAD(field(res)) 
+        field(res)
+	//| 
+        //methodDecl(res)
+      )
     )*
     "}"
     { return res; }

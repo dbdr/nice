@@ -12,7 +12,7 @@
 
 // File    : Monotype.java
 // Created : Thu Jul 01 19:28:28 1999 by bonniot
-//$Modified: Tue Jul 27 11:08:12 1999 by bonniot $
+//$Modified: Wed Jul 28 21:40:28 1999 by bonniot $
 // Description : Abstract syntactic type, without constraint
 
 package bossa.syntax;
@@ -21,7 +21,7 @@ import java.util.*;
 import bossa.util.*;
 
 abstract public class Monotype
-  implements Located
+  implements Located, bossa.engine.Element
 {
   abstract Monotype cloneType();
 
@@ -43,7 +43,8 @@ abstract public class Monotype
    */
   static MonotypeVar fresh(LocatedString associatedVariable,Monotype m)
   {
-    return new MonotypeVar(associatedVariable,true);
+    MonotypeVar res=new MonotypeVar(associatedVariable,true);
+    return res;
   }
   
   static MonotypeVar fresh(LocatedString associatedVariable)
@@ -103,19 +104,13 @@ abstract public class Monotype
     return null;
   }
 
-  public Monotype functionalCast(int arity)
-    throws bossa.typing.TypingEx
-  {
-    return this;
-  }
-  
-  public TypeConstructor decomposeTC(Variance v)
+  TypeConstructor getTC()
   {
     User.error("decomposeTC should not be called in class "+getClass());
     return null;
   }
   
-  public TypeParameters decomposeTP(Variance v)
+  TypeParameters getTP()
   {
     User.error("decomposeTP should not be called in class "+getClass());
     return null;

@@ -12,7 +12,7 @@
 
 // File    : Type.java
 // Created : Mon Jul 19 17:45:27 1999 by bonniot
-//$Modified: Thu Jul 22 19:27:31 1999 by bonniot $
+//$Modified: Wed Jul 28 22:53:26 1999 by bonniot $
 // Description : Any type. 
 //   Can either be a Polytype or a PolytypeConstructor
 
@@ -45,7 +45,24 @@ public abstract class Type
   public abstract Constraint getConstraint();
   public abstract Monotype   getMonotype();
 
-
+  static Collection getConstraint(Collection c)
+  {
+    Collection res=new ArrayList(c.size());
+    for(Iterator i=c.iterator();
+	i.hasNext();)
+      res.add(((Type)i.next()).getConstraint());
+    return res;
+  }
+  
+  static Collection getMonotype(Collection c)
+  {
+    Collection res=new ArrayList(c.size());
+    for(Iterator i=c.iterator();
+	i.hasNext();)
+      res.add(((Type)i.next()).getMonotype());
+    return res;
+  }
+  
   VarScope memberScope()
   {
     return null;

@@ -12,7 +12,7 @@
 
 // File    : Pattern.java
 // Created : Mon Jul 05 14:36:52 1999 by bonniot
-//$Modified: Sat Jul 24 19:16:15 1999 by bonniot $
+//$Modified: Wed Jul 28 21:40:26 1999 by bonniot $
 // Description : Syntactic pattern for method bodies declaration
 
 package bossa.syntax;
@@ -39,7 +39,8 @@ public class Pattern
       return Domain.bottom();
         
     return new Domain(Constraint.True(), 
-		      new MonotypeConstructor(typeConstructor,null));
+		      new MonotypeConstructor(typeConstructor,
+					      new TypeParameters(typeConstructor.name,typeConstructor.variance)));
   }
   
   static Collection getDomain(Collection patterns)

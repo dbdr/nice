@@ -12,12 +12,13 @@
 
 // File    : MonotypeVar.java
 // Created : Fri Jul 23 15:36:39 1999 by bonniot
-//$Modified: Tue Jul 27 16:38:43 1999 by bonniot $
+//$Modified: Wed Jul 28 22:16:40 1999 by bonniot $
 
 package bossa.syntax;
 
 import java.util.*;
 import bossa.util.*;
+import bossa.engine.*;
 
 /**
  * A monotype variable.
@@ -26,7 +27,7 @@ import bossa.util.*;
  */
 
 public class MonotypeVar extends Monotype
-  implements TypeSymbol
+  implements TypeSymbol, bossa.engine.Element
 {
   public MonotypeVar(LocatedString name)
   {
@@ -50,25 +51,9 @@ public class MonotypeVar extends Monotype
   }
 
   /****************************************************************
-   * Functional type
+   * Functional Types
    ****************************************************************/
 
-  public Monotype functionalCast(int arity)
-    throws bossa.typing.TypingEx
-  {
-    if(equivalentCodomain==null)
-      {
-	equivalentCodomain=Monotype.fresh(new LocatedString(name.content+"0",name.location()));
-	equivalentDomain=Monotype.freshs(arity,name);
-
-	functionalType=new FunType(equivalentDomain,equivalentCodomain);
-	
-	//bossa.typing.Typing.leq(this,functionalType);
-	//bossa.typing.Typing.leq(functionalType,this);
-      }
-    return functionalType;
-  }
-  
   public Monotype codomain()
   {
     return equivalentCodomain;
@@ -79,21 +64,29 @@ public class MonotypeVar extends Monotype
     return equivalentDomain;
   }
   
-  public TypeConstructor decomposeTC(Variance v)
+  /****************************************************************
+   * Kinding
+   ****************************************************************/
+
+  private void functionalCast(int arity)
   {
-    if(equivalentTC==null)
-      {
-	equivalentTC=new TypeConstructor(this,v);
-	bossa.typing.Typing.introduce(equivalentTC);
-      }
+    Internal.error(equivalentCodomain!=null,"equivalentCodomain!=null in MonotypeVar");
     
+    equivalentCodomain=Monotype.fresh(new LocatedString(name.content+"0",name.location()));
+    equivalentDomain=Monotype.freshs(arity,name);
+
+//      functionalType=new FunType(equivalentDomain,equivalentCodomain);
+	
+//      return functionalType;
+  }
+  
+  TypeConstructor getTC()
+  {
     return equivalentTC;
   }
   
-  public TypeParameters decomposeTP(Variance v)
+  TypeParameters getTP()
   {
-    if(equivalentTP==null)
-      equivalentTP=new TypeParameters(this,v);
     return equivalentTP;
   }
   
@@ -148,10 +141,50 @@ public class MonotypeVar extends Monotype
   }
 
   LocatedString name;
+
+  /****************************************************************
+   * low-level interface
+   ****************************************************************/
+
+  private int id=-1;
+  
+  public int getId() 		{ return id; }
+  
+  public void setId(int value) 	{ id=value; }
+  
+  Kind kind;
+  
+  public Kind getKind() 	{ return kind; }
+  
+  public void setKind(Kind value)
+  {
+    // it is ok to reset kind to null
+    Internal.error(kind!=null && value!=null,"Variance already set in MonotypeVar");
+    
+    kind=value;
+
+    if(value==null)
+      return;
+    
+    if(value instanceof FunTypeKind)
+      functionalCast(((FunTypeKind)value).domainArity);
+    else if(value instanceof Variance)
+      {
+	Variance v=(Variance) value;
+	
+	equivalentTC=new TypeConstructor(this,v);
+	bossa.typing.Typing.introduce(equivalentTC);
+	equivalentTP=new TypeParameters(this.name,v);
+      }
+    // in other cases (kind of the monotype variables)
+    // nothing to do
+  }
+  
   /**
    * If true,  this is really a variable monotype
    * If false, this must be found in scope
    */
+
   private boolean soft;
 
   /** When this variable is comparable to a functional type */

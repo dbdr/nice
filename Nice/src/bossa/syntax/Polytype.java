@@ -12,7 +12,7 @@
 
 // File    : Polytype.java
 // Created : Tue Jul 13 12:51:38 1999 by bonniot
-//$Modified: Mon Jul 26 17:23:41 1999 by bonniot $
+//$Modified: Wed Jul 28 21:01:22 1999 by bonniot $
 
 package bossa.syntax;
 
@@ -44,6 +44,14 @@ public class Polytype extends Type
     return new Polytype
       (new Constraint(alpha,null),
        alpha);
+  }
+
+  static Polytype voidType(TypeScope typeScope)
+  {
+    Monotype m=new MonotypeConstructor(new TypeConstructor(new LocatedString("void",Location.nowhere())),null);
+    m.resolve(typeScope);
+    
+    return new Polytype(m);
   }
   
   static Collection fromMonotypes(Collection monotypes)
@@ -98,13 +106,14 @@ public class Polytype extends Type
 
   void buildScope(TypeScope ts)
   {
-    typeScope=TypeScope.makeScope(ts,constraint.binders);
+    typeScope=ts;
   }
 
   void resolve()
   {
-    constraint.resolve(typeScope);
-    monotype=monotype.resolve(typeScope);
+    TypeScope ts=TypeScope.makeScope(this.typeScope,constraint.binders);
+    constraint.resolve(ts);
+    monotype=monotype.resolve(ts);
   }
 
   VarScope memberScope()

@@ -12,7 +12,7 @@
 
 // File    : TypeParameters.java
 // Created : Mon Jul 12 17:51:12 1999 by bonniot
-//$Modified: Tue Jul 27 11:20:04 1999 by bonniot $
+//$Modified: Wed Jul 28 21:39:14 1999 by bonniot $
 
 package bossa.syntax;
 
@@ -36,9 +36,9 @@ public class TypeParameters
     this.content=typeParameters;
   }
 
-  TypeParameters(MonotypeVar m, Variance v)
+  TypeParameters(LocatedString s, Variance v)
   {
-    this.content=Monotype.freshs(v.size,m.name);
+    this.content=Monotype.freshs(v.size,s);
   }
   
   static TypeParameters fromSymbols(Collection symbols)

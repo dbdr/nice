@@ -12,12 +12,13 @@
 
 // File    : FunType.java
 // Created : Fri Jul 02 17:41:24 1999 by bonniot
-//$Modified: Mon Jul 26 17:51:57 1999 by bonniot $
+//$Modified: Wed Jul 28 17:56:08 1999 by bonniot $
 
 package bossa.syntax;
 
 import java.util.*;
 import bossa.util.*;
+import bossa.engine.*;
 
 /**
  * Functional type
@@ -28,6 +29,7 @@ public class FunType extends Monotype
   {
     this.in=in;
     this.out=out;
+    this.kind=new FunTypeKind(in.size());
   }
 
   Monotype cloneType()
@@ -63,6 +65,25 @@ public class FunType extends Monotype
     return new FunType(Monotype.substitute(map,in),out.substitute(map));
   }
 
+  /****************************************************************
+   * Kinding
+   ****************************************************************/
+
+  private int id;
+  
+  public int getId() 		{ return id; }
+  
+  public void setId(int value) 	{ id=value; }
+
+  FunTypeKind kind;
+  
+  public Kind getKind() 	{ return kind; }
+  
+  public void setKind(Kind value)
+  {
+    Internal.error("Kind set in FunType");
+  }
+  
   /****************************************************************
    * Printing
    ****************************************************************/

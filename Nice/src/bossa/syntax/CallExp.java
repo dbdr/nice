@@ -12,7 +12,7 @@
 
 // File    : CallExp.java
 // Created : Mon Jul 05 16:27:27 1999 by bonniot
-//$Modified: Tue Jul 27 17:16:46 1999 by bonniot $
+//$Modified: Thu Jul 29 00:32:38 1999 by bonniot $
 
 package bossa.syntax;
 
@@ -46,44 +46,51 @@ public class CallExp extends Expression
 
   Type getType()
   {
-    Type t=fun.getType();
-    Collection dom=t.domain();
-    Monotype codom=t.codomain();
+    Type funt=fun.getType();
+    Collection parametersTypes=null;
+
+    Collection dom=funt.domain();
+    Monotype codom=funt.codomain();
     
     User.error(dom==null || codom==null,
 	       this,fun+" is not a function");
     
-    User.error(!(t instanceof Polytype),this,
+    User.error(!(funt instanceof Polytype),this,
 	       "You have to specify the type parameters for function "+
 	       fun);
 
-    Typing.enter(t.getTypeParameters(),this.fun+"");
+    Typing.enter(funt.getTypeParameters(),"call :"+this.fun);
 
 
     try{
       Typing.implies();
       
-      t.getConstraint().assert();
-      Collection types=Expression.getPolytype(parameters);
-      User.error(types==null,this,
+      try{ funt.getConstraint().assert(); }
+      catch(TypingEx e) { User.error(this,"The conditions ofr using this function are not fullfiled"); }
+
+      parametersTypes=Expression.getPolytype(parameters);
+      User.error(parametersTypes==null,this,
 		 "Arguments of functions must not be imperative-parametric");
       
-      Typing.in(types,
-		Domain.fromMonotypes(t.domain()));
+      Typing.in(parametersTypes,
+		Domain.fromMonotypes(funt.domain()));
+
+      Typing.leave();
+
     }
     catch(BadSizeEx e){
       User.error(this,e.expected+" parameters expected "+
 		 ", not "+e.actual);
     }
     catch(TypingEx e){
-      User.error(this,e.getMessage());
+      User.error(this,"The parameters are not within the domain of the function");
     }
     
-    Typing.leave();
-
-    Monotype res=t.codomain();
-    User.error(res==null,this,fun+" is not a function");
-    return new Polytype(res);
+    Constraint cst=funt.getConstraint().and(Type.getConstraint(parametersTypes));
+    cst.and(MonotypeLeqCst.constraint(Type.getMonotype(parametersTypes),dom));
+    
+    Polytype res = new Polytype(cst,codom);
+    return res;
   }
 
   public String toString()

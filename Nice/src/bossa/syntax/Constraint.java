@@ -12,7 +12,7 @@
 
 // File    : Constraint.java
 // Created : Fri Jul 02 17:51:35 1999 by bonniot
-//$Modified: Tue Jul 27 10:29:24 1999 by bonniot $
+//$Modified: Wed Jul 28 23:00:26 1999 by bonniot $
 
 package bossa.syntax;
 
@@ -87,6 +87,20 @@ public class Constraint
     return res;
   }
 
+  Constraint and(Collection c)
+  {
+    for(Iterator i=c.iterator();
+	i.hasNext();)
+      and((Constraint) i.next());
+    return this;
+  }
+
+  void and(Constraint c)
+  {
+    this.binders.addAll(c.binders);
+    this.atomics.addAll(c.atomics);
+  }
+  
   /****************************************************************
    * Scoping
    ****************************************************************/
@@ -110,6 +124,7 @@ public class Constraint
   public void assert()
     throws bossa.typing.TypingEx
   {
+    bossa.typing.Typing.introduce(binders);
     AtomicConstraint.assert(atomics);
   }
   

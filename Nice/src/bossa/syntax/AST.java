@@ -12,7 +12,7 @@
 
 // File    : AST.java
 // Created : Thu Jul 01 11:01:56 1999 by bonniot
-//$Modified: Tue Jul 27 11:58:02 1999 by bonniot $
+//$Modified: Wed Jul 28 20:14:01 1999 by bonniot $
 
 package bossa.syntax;
 
@@ -41,7 +41,9 @@ public class AST extends Node
     this.typeScope=TypeScope.makeScope(null,findSymbols(defs,true));
     buildScope();
     linkMethodBodiesToDefinitions();
+    Debug.println("Scoping");
     resolveScope();
+    Debug.println("Typechecking");
     typecheck();
   }
 

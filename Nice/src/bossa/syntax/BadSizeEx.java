@@ -12,17 +12,19 @@
 
 // File    : BadSizeEx.java
 // Created : Wed Jul 21 17:23:36 1999 by bonniot
-//$Modified: Wed Jul 21 17:25:01 1999 by bonniot $
+//$Modified: Wed Jul 28 21:29:12 1999 by bonniot $
 // Description : Thrown when to lists do not have the same size
 
 package bossa.syntax;
 
 import bossa.util.*;
 
-public class BadSizeEx extends Exception
+public class BadSizeEx extends bossa.engine.Unsatisfiable
 {
   public BadSizeEx(int expected, int actual)
   {
+    super(expected+" expected, "+actual+" actual");
+    
     this.expected=expected;
     this.actual=actual;
   }

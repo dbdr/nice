@@ -12,7 +12,7 @@
 
 // File    : Block.java
 // Created : Wed Jul 07 17:42:15 1999 by bonniot
-//$Modified: Tue Jul 27 10:20:37 1999 by bonniot $
+//$Modified: Wed Jul 28 18:37:34 1999 by bonniot $
 // Description : A block : a list of statements with local variables
 
 package bossa.syntax;
@@ -70,11 +70,13 @@ public class Block extends Statement
 
   Type getType()
   {
-    Object o=statements.get(statements.size()-1);
-    if(o instanceof ReturnStmt)
-      return ((ReturnStmt)o).value.getType();
-    else
-      return null;
+    if(statements.size()>0)
+      {
+	Object o=statements.get(statements.size()-1);
+	if(o instanceof ReturnStmt)
+	  return ((ReturnStmt)o).value.getType();
+      }
+    return Polytype.voidType(typeScope);
   }
 
   void typecheck()

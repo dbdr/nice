@@ -12,16 +12,17 @@
 
 // File    : TypeConstructor.java
 // Created : Thu Jul 08 11:51:09 1999 by bonniot
-//$Modified: Tue Jul 27 15:39:54 1999 by bonniot $
+//$Modified: Wed Jul 28 22:14:29 1999 by bonniot $
 // Description : A class. It "needs" type parameters to become a Monotype
 
 package bossa.syntax;
 
 import java.util.*;
 import bossa.util.*;
+import bossa.engine.*;
 
 public class TypeConstructor
-  implements Located, TypeSymbol
+  implements Located, TypeSymbol, bossa.engine.Element
 {
   /**
    * Constructs a new type constructor from a well known class
@@ -32,7 +33,7 @@ public class TypeConstructor
   {
     this.definition=d;
     this.name=d.name;
-    this.variance=new Variance(d.typeParameters.size());
+    setVariance(new Variance(d.typeParameters.size()));
     this.id=-1;
   }
 
@@ -47,7 +48,7 @@ public class TypeConstructor
   {
     this.name=className;
     this.definition=null;
-    this.variance=new Variance(-1);
+    variance=null;
     this.id=-1;
   }
 
@@ -60,9 +61,18 @@ public class TypeConstructor
   TypeConstructor(MonotypeVar source, Variance v)
   {
     this.name=source.name;
-    this.variance=variance;
+    Internal.error(v==null,name+" : null Variance");
+    
+    setVariance(v);
     this.definition=null;
-    this.id=-1;
+  }
+
+  private void setVariance(Variance v)
+  {
+    this.variance=v;
+    Internal.error(kind!=null,"Kind should be null in TC");
+    
+    this.kind=new TypeConstructorKind(v);
   }
   
   static Collection toLocatedString(Collection c)
@@ -89,6 +99,8 @@ public class TypeConstructor
   Type instantiate(TypeParameters tp)
     throws BadSizeEx
   {
+    Internal.error(variance==null,"Null variance in TypeConstructor");
+    
     if(variance.size!=tp.size())
       throw new BadSizeEx(variance.size,tp.size());
     return new Polytype(new MonotypeConstructor(this,tp));
@@ -156,11 +168,32 @@ public class TypeConstructor
   }
 
   /****************************************************************
+   * Kinding
+   ****************************************************************/
+
+  private int id=-1;
+  
+  public int getId() 		{ return id; }
+  
+  public void setId(int value) 	{ id=value; }
+  
+  private Kind kind;
+  
+  public Kind getKind() 	{ return kind; }
+  
+  public void setKind(Kind value)
+  {
+    Internal.warning("Variance set in TC by engine for "+name);
+    Internal.error(variance!=null,"Variance already set in TypeConstructor");
+    
+    variance=(Variance)value;
+  }
+  
+  /****************************************************************
    * Fields
    ****************************************************************/
 
   ClassDefinition definition;
   LocatedString name;
   public Variance variance;
-  public int id; // for the low level checker;
 }

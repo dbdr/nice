@@ -12,7 +12,7 @@
 
 // File    : Location.java
 // Created : Tue Jul 13 11:55:08 1999 by bonniot
-//$Modified: Thu Jul 22 19:44:52 1999 by bonniot $
+//$Modified: Thu Jul 29 00:26:10 1999 by bonniot $
 
 package bossa.util;
 
@@ -41,9 +41,9 @@ public class Location
     this.startLine=startLine;
     // substracts 1 since JavaCC has 1 as first column,
     // and Emacs has 0 !!
-    this.startColumn=startColumn-1;
+    this.startColumn=startColumn;
     this.endLine=endLine;
-    this.endColumn=endColumn-1;
+    this.endColumn=endColumn;
   }
 
   public Location(
@@ -73,9 +73,9 @@ public class Location
     else
       res="";
 
-    if(startLine==-2)
+    if(startLine<0)
       return res;
-    return res+"line "+startLine+", column "+startColumn+": ";
+    return res+"line "+startLine+", column "+(startColumn-1)+": ";
   }
 
   public Location englobe(Location loc)

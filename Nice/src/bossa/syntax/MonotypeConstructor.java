@@ -12,16 +12,16 @@
 
 // File    : MonotypeConstructor.java
 // Created : Thu Jul 22 09:15:17 1999 by bonniot
-//$Modified: Tue Jul 27 11:07:50 1999 by bonniot $
+//$Modified: Wed Jul 28 17:30:33 1999 by bonniot $
 // Description : A monotype, build by application of
 //   a type constructor to type parameters
 
 package bossa.syntax;
 
+import java.util.*;
+
 import bossa.util.*;
-import bossa.syntax.TypeScope;
-import bossa.syntax.Monotype;
-import java.util.*;;
+import bossa.engine.*;
 
 public class MonotypeConstructor extends Monotype
 {
@@ -64,14 +64,31 @@ public class MonotypeConstructor extends Monotype
        new TypeParameters(Monotype.substitute(map,parameters.content)));
   }
 
-  public TypeConstructor decomposeTC(Variance v)
+  TypeConstructor getTC()
   {
     return tc;
   }
   
-  public TypeParameters decomposeTP(Variance v)
+  TypeParameters getTP()
   {
     return parameters;
+  }
+  
+  /****************************************************************
+   * Kinding
+   ****************************************************************/
+
+  private int id;
+  
+  public int getId() 		{ return id; }
+  
+  public void setId(int value) 	{ id=value; }
+  
+  public Kind getKind() 	{ return tc.variance; }
+  
+  public void setKind(Kind value)
+  {
+    Internal.error("Variance set in MonotypeConstructor");
   }
   
   /****************************************************************

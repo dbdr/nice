@@ -12,7 +12,7 @@
 
 // File    : Typing.java
 // Created : Tue Jul 20 11:57:17 1999 by bonniot
-//$Modified: Tue Jul 27 18:06:15 1999 by bonniot $
+//$Modified: Thu Jul 29 00:28:15 1999 by bonniot $
 
 package bossa.typing;
 
@@ -22,6 +22,7 @@ import bossa.util.*;
 import bossa.syntax.*;
 
 import bossa.engine.Engine;
+import bossa.engine.Element;
 import bossa.engine.Unsatisfiable;
 
 /**
@@ -32,6 +33,26 @@ abstract public class Typing
   /****************************************************************
    * Typing contexts
    ****************************************************************/
+
+  /**
+   * Enters a new typing context
+   *
+   */
+  public static void enter()
+  {
+    enter(null);
+  }
+
+  /**
+   * Enters a new typing context
+   *
+   * @param message A debug message to know where we are
+   */
+  public static void enter(String message)
+  {
+    if(message!=null) Debug.println("## Typechecking "+message);
+    Engine.enter();
+  }
 
   /**
    * Enters a new typing context
@@ -50,19 +71,25 @@ abstract public class Typing
     introduce(symbols);
   }
 
-  static public void introduce(TypeConstructor tc)
+  static public void introduce(Element e)
   {
-    tc.id=Engine.newTC();
+    //TODO: this is DIRTY !
+    if(e instanceof MonotypeVar)
+      e.setKind(null);
+    
+    Engine.register(e);
   }
   
-  static public void introduce(Collection symbols)
+  static public void introduce(Collection elements)
   {
-    Iterator i=symbols.iterator();
+    Iterator i=elements.iterator();
     while(i.hasNext())
       {
-	TypeSymbol s=(TypeSymbol)i.next();
-	if(s instanceof TypeConstructor)
-	  introduce((TypeConstructor) s);
+	Object o=i.next();
+	if(o instanceof Element)
+	  introduce((Element) o);
+	else
+	  Internal.warning("introducing "+o.getClass());
       }
   }
   
@@ -73,12 +100,11 @@ abstract public class Typing
   public static void leave()
     throws TypingEx
   {
-    Debug.println("\n## Leaving typing context");
     try{
       Engine.leave();
     }
     catch(Unsatisfiable e){
-      throw new TypingEx("Unsatisfiable");
+      throw new TypingEx("Unsatisfiable 1:"+e.getMessage());
     }
     
   }
@@ -86,12 +112,11 @@ abstract public class Typing
   public static void implies()
     throws TypingEx
   {
-    Debug.println("IMPLIES");
     try{
       Engine.implies();
     }
     catch(Unsatisfiable e){
-      throw new TypingEx("Not satisfiable");
+      throw new TypingEx("Not satisfiable "+e.getMessage());
     }
     
   }
@@ -158,18 +183,29 @@ abstract public class Typing
   public static void leq(Polytype t1, Polytype t2) 
     throws TypingEx
   {
-    enter(t1.constraint.binders,"#");
-    t1.constraint.assert();
-    implies();
+    if(dbg) Debug.println("Polytype leq: "+t1+" <: "+t2);
+    
+    if(dbg)
+      enter("#");
+    else
+      enter();
+    
     t2.constraint.assert();
+
+    if(dbg) Debug.println("IMPLIES");
+    implies();
+    
+    t1.constraint.assert();
     leq(t1.monotype,t2.monotype);
+
+    if(dbg) Debug.println("LEAVE");
     leave();
   }
 
   public static void leq(PolytypeConstructor t1, PolytypeConstructor t2) 
     throws TypingEx
   {
-    Debug.println(t1+" <: "+t2);
+    Debug.println("!!!!PC "+t1+" <: "+t2);
   }
 
   /****************************************************************
@@ -179,51 +215,60 @@ abstract public class Typing
   public static void leq(Monotype m1, Monotype m2)
     throws TypingEx
   {
-    Collection dom1,dom2;
+    try{
+      Engine.leq(m1,m2);
+    }
+    catch(Unsatisfiable e){
+      if(dbg) e.printStackTrace();
+      throw new TypingEx(e.getMessage());
+    }
     
-    if((dom1=m1.domain())!=null)
-      {
-	m2=m2.functionalCast(dom1.size());
-	dom2=m2.domain();
-	if(dom2==null)
-	  throw new KindingEx(m1,m2);
-	leqMono(dom2,dom1);
-	leq(m1.codomain(),m2.codomain());
-      }
-    else
-    if((dom2=m2.domain())!=null)
-      {
-	m1=m1.functionalCast(dom2.size());
-	if((dom1=m1.domain())==null)
-	  throw new KindingEx(m1,m2);
-	leqMono(dom2,dom1);
-	leq(m1.codomain(),m2.codomain());
-      }
-    else
-      {
-	if(m1 instanceof MonotypeVar && m2 instanceof MonotypeVar)
-	  Debug.println(m1+" <: "+m2);
-	else
-	  {
-	    Variance v=null;
-	    if(m1 instanceof MonotypeConstructor)
-	      v=((MonotypeConstructor)m1).tc.variance;
-	    else if(m2 instanceof MonotypeConstructor)
-	      v=((MonotypeConstructor)m2).tc.variance;
-	    else
-	      Internal.error("No TypeConstructor in Typing.leq");
+    
+//      Collection dom1,dom2;
+    
+//      if((dom1=m1.domain())!=null)
+//        {
+//  	m2=m2.functionalCast(dom1.size());
+//  	dom2=m2.domain();
+//  	if(dom2==null)
+//  	  throw new KindingEx(m1,m2);
+//  	leqMono(dom2,dom1);
+//  	leq(m1.codomain(),m2.codomain());
+//        }
+//      else
+//      if((dom2=m2.domain())!=null)
+//        {
+//  	m1=m1.functionalCast(dom2.size());
+//  	if((dom1=m1.domain())==null)
+//  	  throw new KindingEx(m1,m2);
+//  	leqMono(dom2,dom1);
+//  	leq(m1.codomain(),m2.codomain());
+//        }
+//      else
+//        {
+//  	if(m1 instanceof MonotypeVar && m2 instanceof MonotypeVar)
+//  	  Debug.println(m1+" <: "+m2);
+//  	else
+//  	  {
+//  	    Variance v=null;
+//  	    if(m1 instanceof MonotypeConstructor)
+//  	      v=((MonotypeConstructor)m1).tc.variance;
+//  	    else if(m2 instanceof MonotypeConstructor)
+//  	      v=((MonotypeConstructor)m2).tc.variance;
+//  	    else
+//  	      Internal.error("No TypeConstructor in Typing.leq");
 	    
-	    TypeConstructor tc1=m1.decomposeTC(v);
-	    TypeConstructor tc2=m2.decomposeTC(v);
-	    leq(tc1,tc2);
-	    try{
-	      v.assertLeq(m1.decomposeTP(v),m2.decomposeTP(v));
-	    }
-	    catch(BadSizeEx e){
-	      throw new TypingEx(m1+" and "+m2+" cannot be compared");
-	    }
-	  }
-      }
+//  	    TypeConstructor tc1=m1.decomposeTC(v);
+//  	    TypeConstructor tc2=m2.decomposeTC(v);
+//  	    leq(tc1,tc2);
+//  	    try{
+//  	      v.assertLeq(m1.decomposeTP(v),m2.decomposeTP(v));
+//  	    }
+//  	    catch(BadSizeEx e){
+//  	      throw new TypingEx(m1+" and "+m2+" cannot be compared");
+//  	    }
+//  	  }
+//        }
   }
   
   /****************************************************************
@@ -233,12 +278,11 @@ abstract public class Typing
   public static void leq(TypeConstructor t1, TypeConstructor t2)
     throws TypingEx
   {
-    Debug.println(t1+" < "+t2);
     try{
-      Engine.leq(t1.id,t2.id);      
+      Engine.leq(t1,t2);
     }
     catch(Unsatisfiable e){
-      throw new TypingEx("Not satisfiable");
+      throw new TypingEx("Not satisfiable 4:"+e.getMessage());
     }
   }
   
@@ -249,11 +293,6 @@ abstract public class Typing
   public static void in(Polytype type, Domain domain)
     throws TypingEx
   {
-    Debug.println(type+" in "+domain);
-    
-    introduce(type.constraint.binders);
-    introduce(domain.constraint.binders);
-    
     type.constraint.assert();
     domain.constraint.assert();
     leq(type.monotype,domain.monotype);
@@ -322,6 +361,6 @@ abstract public class Typing
 	abs(t,(Interface)i.next());
       }
   }
-  
 
+  static boolean dbg = false;
 }

@@ -5,7 +5,7 @@ package nice.lang;
    Make them elements of the collection hierarchy.
 */
 
-class Array<T> // T[] is equivalent notation for Array<T>
+class Array<T> // T[] is an equivalent notation for Array<T>
   implements Sequence
   finally implements Collection 
   = native rawArray;

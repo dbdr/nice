@@ -198,8 +198,6 @@ abstract public class Node
    * (for forward scoping)
    */
   Scopes buildScope(VarScope outer, TypeScope typeOuter)
-  // Default behaviour, must be overriden in nodes
-  // that really define a new scope
   {
     if(scope!=null)
       scope = null;

@@ -443,9 +443,6 @@ public final class Types
 
     Class c = null;
 
-    if (classLoader == null)
-      setClasspath(null);
-    
     try{ c = classLoader.loadClass(className); }
     catch(ClassNotFoundException e)
       // when the class does not exist

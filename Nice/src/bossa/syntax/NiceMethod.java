@@ -96,8 +96,8 @@ public class NiceMethod extends UserOperator
 	TypeConstructor alikeTC = 
 	  new TypeConstructor("Alike", c.variance, false, false);
 	
-	constraint.addBinder(alikeTC);
-	// added in front. Important for rebinding in method alternatives
+	// Add in front. Important for rebinding in method alternatives
+	constraint.addFirstBinder(alikeTC);
 	
 	mlsub.typing.AtomicConstraint atom;
 	if (itf != null)

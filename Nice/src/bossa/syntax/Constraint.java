@@ -208,6 +208,19 @@ public class Constraint extends Node
    ****************************************************************/
 
   /**
+     Add the binder to the front of the list of binders.
+  */
+  void addFirstBinder(TypeSymbol s)
+  {
+    // avoid the modification of the shared empty list
+    if (binders == noBinders)
+      binders = new ArrayList(4);
+
+    binders.add(0, s);
+    addTypeSymbol(s);
+  }
+
+  /**
      Add the binder if it is not already there.
   */
   void addBinder(TypeSymbol s)
@@ -218,7 +231,7 @@ public class Constraint extends Node
 
     if(!binders.contains(s))
       {
-	binders.add(0, s); // MethodDefinition assumes it is added first. 
+	binders.add(s);
 	addTypeSymbol(s);
       }
   }

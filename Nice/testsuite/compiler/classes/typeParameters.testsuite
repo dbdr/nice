@@ -188,3 +188,28 @@ add(a@A, b@C) = super;
     do_something(x);
     return super;
   }
+
+/// PASS
+ /// Toplevel
+interface Bar<V,W> {
+    void foobar(V k);
+}
+
+class Foo<V,W> implements Bar<V,W> {
+    <V,W> foobar(k) {
+      V i = k;
+    }
+}
+
+/// PASS
+ /// Toplevel
+class A<T>
+{
+  alike<T> foo();
+
+  <Alike,T> foo() 
+  {
+    Alike<T> res = this;
+    return res;
+  }
+}

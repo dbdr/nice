@@ -14,6 +14,7 @@ comp(c1, c2)
 void test_comparable();
 test_comparable()
 {
+  println("### Testing Comparable ###");
   comp(1, 2);
   comp(1.2, 3.14);
   comp(0, 2.0);

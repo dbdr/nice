@@ -7,6 +7,7 @@ class MyEx extends Exception {}
 void test_exceptions();
 test_exceptions()
 {
+  println("\n### Testing exceptions ###");
   String s = null;
   try{
     try{

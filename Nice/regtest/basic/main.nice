@@ -91,13 +91,6 @@ main(args)
 {
   test_discards();
   test_captures();
-
-  // Arrays
-
-  Vector<String> v = makeVector(1);
-  String[] elements = v.elements;
-  v.elements.size();
-
   test_tuples();
   test_numeric();
   test_arrays();
@@ -110,4 +103,5 @@ main(args)
   test_native();
   test_exceptions();
   test_higher_order();
+  test_localFunctions();
 }

@@ -20,6 +20,7 @@ kf(x@KD) = new KD();
 
 void test_kinds()
 {
+  println("### Testing kinds ###");
   KA a = kf(new KA());
   a = kf(new KB());
   KC c = kf(new KC());

@@ -3,6 +3,8 @@
 void test_tuples();
 test_tuples()
 {
+  println("\n### Testing tuples ###\n");
+
   <String, String> cs = ("world!", "Hello, ");
   String s1;
   String s2;

@@ -16,6 +16,8 @@ import java.io.*;
 void test_native();
 test_native()
 {
+  println("\n### Testing native methods and classes ###\n");
+
   File f = nop(new File("titi"));
   java.net.ServerSocket s = new java.net.ServerSocket(1235);
   java.lang.Runtime.getRuntime();

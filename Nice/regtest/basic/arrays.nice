@@ -3,6 +3,7 @@ package regtest.basic;
 // native arrays
 // Array<T> and T[] are synonyms
 
+
 <Any T> void p(Array<T>);
 p(a)
 {
@@ -146,6 +147,11 @@ test_collection_arrays(a)
 
 void test_polymorphism()
 {
+  // polymorphic array field
+  Vector<String> v = makeVector(1);
+  String[] elements = v.elements;
+  v.elements.size();
+
   // Test that different array creation code is generated
   // according to the context
   byte[] b   = [ 14, 17 ];

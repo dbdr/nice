@@ -450,9 +450,11 @@ public class MethodBodyDefinition extends Definition
     Type[] res = new Type[parameters.length];
 
     for(int n = 0; n < parameters.length; n++)
-      res[n] = formals[n].atNull() 
-	? Types.javaType(PrimitiveType.nullTC)
-	: Types.javaType(parameters[n].getMonotype());
+      res[n] = formals[n].atNull() ? 
+	Types.javaType(PrimitiveType.nullTC) :
+	formals[n].tc == bossa.syntax.PrimitiveType.arrayTC ?
+	nice.tools.code.SpecialArray.unknownTypeArray() :
+	Types.javaType(parameters[n].getMonotype());
 
     return res;
   }

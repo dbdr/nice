@@ -1,0 +1,10 @@
+/// PASS
+  assert map(["A"], String s => s+s)[0].equals("AA");
+
+/// PASS
+  len([ "" ]);
+  /// Toplevel
+<T, Collection C> C<T> len(C<T>);
+len(c@Collection) = c;
+len(c@Array) { int i = c.length; return c; }
+

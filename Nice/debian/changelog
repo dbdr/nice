@@ -10,7 +10,7 @@ nice (0.9.3) unstable; urgency=low
     'x = arr[y] = z;', error messages of integer dispatch, reachability of
     labeled breaks, ...)
 
- --
+ -- Daniel Bonniot <bonniot@users.sourceforge.net>  Sat, 18 Oct 2003 12:01:50 +0200
 
 nice (0.9.2) unstable; urgency=low
 

@@ -199,6 +199,9 @@
            &nbsp;<span class="small">o</span><xsl:text> </xsl:text>
            <a class="nav" href="http://sourceforge.net/cvs/?group_id=12788">CVS</a>
            <br />
+           &nbsp;<span class="small">o</span><xsl:text> </xsl:text>
+           <a class="nav" href="http://nice.sourceforge.net/cgi-bin/twiki/view/Doc/GetInvolved">Contribute!</a>
+           <br />
           </td>
          </tr>
         </table>

@@ -47,7 +47,6 @@ class SourceMap extends Attribute
 
     try {
       String value = buffer.toString() + lines.toString() + trailer;
-      System.out.println(value);
       return value.getBytes("UTF-8");
     }
     catch (java.io.UnsupportedEncodingException e) {
@@ -83,7 +82,6 @@ class SourceMap extends Attribute
   */
   int translate(String file, int line)
   {
-    System.out.println(file + ":: " + line);
     if (! file.equals(currentFile) || line < firstLine)
       {
         writeCurrent();

@@ -1,4 +1,6 @@
-  // Tuples
+package regtest.basic;
+
+// Tuples
 
 void test_tuples();
 test_tuples()
@@ -21,4 +23,17 @@ test_tuples()
   <int, long> t1;
   <long, long> t2;
   t2 = t1;
+
+  // Different array types must be generated depending on the context
+  // This is similar to literal arrays
+  (byte b1, byte b2) = (1, 2);
+  (int x, int y) = (1,2);
+  (b1, y) = (1, 2);
+  (x, b2) = (1, 2);
+  (x, String s) = (1, "Heterogenous tuple");
+
+  (x, y) = (3,4);
+  (int z, y) = (y,x);
+
+  println("x,y,z = " + x + y + z);
 }

@@ -41,13 +41,13 @@ public class SymbolExp extends Expression
     return symbol.isAssignable();
   }
 
-  FieldAccessMethod getFieldAccessMethod()
+  FieldAccess getFieldAccessMethod()
   {
     if(symbol instanceof MethodDeclaration.Symbol)
       {
 	MethodDeclaration.Symbol s = (MethodDeclaration.Symbol) symbol;
-	if(s.definition instanceof FieldAccessMethod)
-	  return (FieldAccessMethod)s.definition;
+	if(s.definition instanceof FieldAccess)
+	  return (FieldAccess)s.definition;
       }
     return null;
   }

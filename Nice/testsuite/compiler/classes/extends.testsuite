@@ -2,3 +2,12 @@
   /// Toplevel
   class A<T> { T x;}
   class B<T,U> extends A<T> { U y; }
+
+/// FAIL
+  /// Toplevel
+  final class A {}
+  class B extends /*/// FAIL HERE */ A {}
+
+/// FAIL
+  /// Toplevel
+  class A extends /*/// FAIL HERE */ java.lang.String {}

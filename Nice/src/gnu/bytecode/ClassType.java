@@ -169,6 +169,9 @@ public class ClassType extends ObjectType implements AttrContainer {
     interfaces[oldCount] = newInterface;
   }
 
+  public final boolean isFinal()
+  { return (getModifiers() & Access.FINAL) != 0; }
+
   public final boolean isInterface()
   { return (getModifiers() & Access.INTERFACE) != 0; }
 

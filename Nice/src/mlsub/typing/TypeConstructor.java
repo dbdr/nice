@@ -57,6 +57,10 @@ public class TypeConstructor
     this(null, v, false, false);
   }
   
+  private boolean isMinimal;
+
+  public void setMinimal() { isMinimal = true; }
+  public boolean isMinimal() { return isMinimal; }
 
   public TypeSymbol cloneTypeSymbol()
   {

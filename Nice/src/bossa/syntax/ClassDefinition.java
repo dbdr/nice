@@ -196,6 +196,8 @@ abstract public class ClassDefinition extends MethodContainer
       this.abstractions = abstractions;
 
       this.createTC();
+      if (isFinal)
+	tc.setMinimal();
     }
 
     public boolean isConcrete()
@@ -231,6 +233,10 @@ abstract public class ClassDefinition extends MethodContainer
       if (superClassIdent != null)
 	{
 	  superClass = superClassIdent.resolveToTC(typeScope);
+
+	  if (superClass.isMinimal())
+	    User.error(superClassIdent,
+		       superClass + " is a final class. It cannot be extended");
 	  superClassIdent = null;
 
 	  ClassDefinition def = ClassDefinition.get(superClass);
@@ -297,7 +303,7 @@ abstract public class ClassDefinition extends MethodContainer
 	  {
 	    Typing.assertImp(tc, abs, true);
 	    Typing.assertAbs(tc, abs);
-	  }      
+	  }
       }
       catch(TypingEx e){
 	User.error(name, "Error in class " + name + " : " + e.getMessage());

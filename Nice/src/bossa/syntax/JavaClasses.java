@@ -131,7 +131,12 @@ public final class JavaClasses
     // Recursive search for java super-classes
     if(javaType instanceof ClassType)
       {
-	ClassType superClass =  ((ClassType) javaType).getSuperclass();
+	ClassType classType = (ClassType) javaType;
+
+	if (classType.isFinal())
+	  res.setMinimal();
+
+	ClassType superClass =  classType.getSuperclass();
 	if(superClass!=null && !(excluded(blackListClass, superClass)))
 	  {
 	    TypeConstructor superTC = make(compilation, superClass.getName(), superClass);
@@ -146,11 +151,11 @@ public final class JavaClasses
 
 	ClassType[] itfs = null;
 	try{
-	  itfs = ((ClassType) javaType).getInterfaces();
+	  itfs = classType.getInterfaces();
 	}
 	catch(NoClassDefFoundError ex){
 	  User.warning("Interface " + ex.getMessage() + 
-		       " implemented by " + javaType.getName() + 
+		       " implemented by " + classType.getName() + 
 		       " was not found in classpath");
 	}
 	if(itfs!=null)
@@ -176,10 +181,14 @@ public final class JavaClasses
     javaTypeConstructors.add(res);
 
     return res;
-    
   }
 
-  private static List javaTypeConstructors = new ArrayList(100);
+  public static void reset()
+  {
+    javaTypeConstructors = new ArrayList(100);
+  }
+
+  private static List javaTypeConstructors;
 
   /**
       Remembers native methods and fields explicitly bound with a new type.
@@ -339,6 +348,9 @@ public final class JavaClasses
 	  catch(mlsub.typing.lowlevel.Unsatisfiable e){
 	    User.error("Java class " + tc + " is not well kinded");
 	  }
+
+	if (tc.isMinimal())
+	  Typing.assertMinimal(tc);
       }
   }
   

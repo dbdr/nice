@@ -1,0 +1,5 @@
+/// PASS
+  /// COMMENT Check that native final classes are really considered final.
+  /// Toplevel
+  <String T> T m(T);
+  m(s@String) = "";

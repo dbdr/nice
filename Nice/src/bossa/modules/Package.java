@@ -275,6 +275,7 @@ public class Package implements mlsub.compilation.Module, Located, bossa.syntax.
     bossa.link.Dispatch.reset();
     ClassDefinition.reset();
     TypeConstructors.reset();
+    JavaClasses.reset();
   }
 
   public void freezeGlobalContext()

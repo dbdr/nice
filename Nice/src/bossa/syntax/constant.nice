@@ -181,6 +181,11 @@ private long parseInteger(String rep)
       index += 2;
       radix = 16;
     }
+  else if (rep.startsWith("0b", index) || rep.startsWith("0B", index)) 
+    {
+      index += 2;
+      radix = 2;
+    }
   else if (rep.startsWith("#", index)) 
     {
       index++;

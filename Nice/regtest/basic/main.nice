@@ -8,6 +8,13 @@ class A
 <Any I> I id(I);
 id(x) = x;
 
+void test_higher_order();
+test_higher_order()
+{
+  // Presently fails
+  //id (x); // x is A's field method, of type A->int
+}
+
 void bidon();
 bidon()
 {

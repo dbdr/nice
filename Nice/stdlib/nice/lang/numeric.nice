@@ -80,10 +80,10 @@ int `+`(int) = inline nice.lang.inline.Nop();
 
 
 // unary negation
-double `-`(double) = inline nice.lang.inline.NumOp("dNeg");
-float `-`(float) = inline nice.lang.inline.NumOp("fNeg");
-long `-`(long) = inline nice.lang.inline.NumOp("lNeg");
-int `-`(int) = inline nice.lang.inline.NumOp("iNeg");
+double `-`(double) = inline nice.lang.inline.UnaryNumOp("dNeg");
+float `-`(float) = inline nice.lang.inline.UnaryNumOp("fNeg");
+long `-`(long) = inline nice.lang.inline.UnaryNumOp("lNeg");
+int `-`(int) = inline nice.lang.inline.UnaryNumOp("iNeg");
 
 // multiplication
 double `*`(double, double) = inline nice.lang.inline.NumOp("dMul");
@@ -126,8 +126,8 @@ int  `>>>`(int , int) = inline nice.lang.inline.NumOp("iuShr");
 long `>>>`(long, int) = inline nice.lang.inline.NumOp("luShr");
 
 // bitwise operators
-int  `~`(int  x) = inline nice.lang.inline.NumOp("iComp");
-long `~`(long x) = inline nice.lang.inline.NumOp("lComp");
+int  `~`(int  x) = inline nice.lang.inline.UnaryNumOp("iComp");
+long `~`(long x) = inline nice.lang.inline.UnaryNumOp("lComp");
 
 int `&`(int, int) = inline nice.lang.inline.NumOp("iAnd");
 int `|`(int, int) = inline nice.lang.inline.NumOp("iIOr");

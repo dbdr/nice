@@ -141,25 +141,6 @@ filter<C,T>(l@Cons, test)
 }
 
 /****************************************************************
- * Wrappers for java.util.Collection
- ****************************************************************/
-
-// unsafe !
-/*
-<Any T> T next(java.util.Iterator) = 
-  native Object java.util.Iterator.next();
-<Any T> List<T> list(java.util.List);
-list<T>(l)
-{
-  Vector<T> res = makeVector(l.size());
-
-  for(java.util.Iterator i = l.iterator(); i.hasNext();)
-    res.add(i.next());
-
-  return res;
-}
-*/
-/****************************************************************
  * LinkedList
  ****************************************************************/
 
@@ -175,8 +156,9 @@ final class JavaList<T> implements List<T>
 }
 
 /** The returned iterator is always non-null */
-java.util.Iterator iterator(java.util.List) =
-  native java.util.Iterator java.util.List.iterator();
+java.util.Iterator iterator(java.util.Collection) =
+  native java.util.Iterator java.util.Collection.iterator();
+
 
 map<C, T, U> (l@JavaList, f)
 {
@@ -365,7 +347,7 @@ toString(s@Sequence)
   return res;
 }
 
-  
+
 /****************************************************************
  * Map
  ****************************************************************/
@@ -400,3 +382,18 @@ class WeakHashtable<Key,Element> implements Map<Key, Element> =
   native Object java.util.Map.put(Object, Object);
 <Any Key, Any Element> ?Element put(Map<Key, ?Element>, Key, ?Element) = 
   native Object java.util.Map.put(Object, Object);
+
+<Any Key, Any Element> boolean containsKey(Map<Key, Element>, Key) = 
+  native boolean java.util.Map.containsKey(Object);
+
+<Any Key, Any Element> int size(Map<Key, Element>) = 
+  native int java.util.Map.size();
+
+<Any Key, Any Element> java.util.Set keySet(Map<Key, Element>) = 
+  native java.util.Set java.util.Map.keySet();
+
+<Any Key, Any Element> void forKeys(Map<Key, Element> map, Key->void it) {
+  for (java.util.Iterator i = map.keySet().iterator(); i.hasNext(); ) {
+    it(cast(i.next()));
+  }
+}

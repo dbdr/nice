@@ -12,7 +12,7 @@
 
 // File    : Front.java
 // Created : Thu Jul 01 15:11:18 1999 by bonniot
-//$Modified: Fri Aug 13 15:48:58 1999 by bonniot $
+//$Modified: Tue Aug 17 17:37:48 1999 by bonniot $
 
 package bossa.test;
 
@@ -33,7 +33,7 @@ public class Front
    */
   public static void main(String[] args) throws Exception
   {
-    Collection defs=Loader.open("stdlib.bossa");
+    List defs=Loader.open("stdlib.bossa");
     
     String file;
     if(args.length==0)

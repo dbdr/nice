@@ -12,7 +12,7 @@
 
 // File    : NewExp.java
 // Created : Thu Jul 08 17:15:15 1999 by bonniot
-//$Modified: Fri Aug 13 15:00:53 1999 by bonniot $
+//$Modified: Wed Aug 18 15:40:10 1999 by bonniot $
 // Description : Allocation of a new object
 
 package bossa.syntax;
@@ -25,14 +25,12 @@ public class NewExp extends Expression
   {
     this.type=type;
   }
-  
-  Expression resolve(VarScope s, TypeScope ts)
+
+  void resolve()
   {
-    type=type.resolve(ts);
+    type=type.resolve(typeScope);
     User.error(!type.isImperative(),
   	       this,"Type parameters in \"New\" expressions must be imperative");
-    
-    return this;
   }
   
   Type getType()

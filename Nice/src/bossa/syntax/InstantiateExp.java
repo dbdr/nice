@@ -12,7 +12,7 @@
 
 // File    : InstantiateExp.java
 // Created : Mon Jul 12 17:48:04 1999 by bonniot
-//$Modified: Thu Jul 29 11:11:48 1999 by bonniot $
+//$Modified: Thu Aug 19 13:13:29 1999 by bonniot $
 // Description : instantiation of type parameters
 
 package bossa.syntax;
@@ -26,13 +26,13 @@ public class InstantiateExp extends Expression
     this.exp=exp;
     this.typeParameters=tp;
     loc=exp.location().englobe(tp.content);
+    addChild(exp);
   }
 
-  Expression resolve(VarScope s, TypeScope ts)
+  void resolve()
   {
-    exp=exp.resolve(s,ts);
-    typeParameters=typeParameters.resolve(ts);
-    return this;
+    exp=exp.resolveExp();
+    typeParameters=typeParameters.resolve(this.typeScope);
   }
 
   Type getType()

@@ -12,7 +12,7 @@
 
 // File    : Polytype.java
 // Created : Tue Jul 13 12:51:38 1999 by bonniot
-//$Modified: Fri Aug 13 12:04:01 1999 by bonniot $
+//$Modified: Thu Aug 19 14:39:38 1999 by bonniot $
 
 package bossa.syntax;
 
@@ -28,6 +28,7 @@ public class Polytype extends Type
   {
     this.constraint=cst;
     this.monotype=monotype;
+    addChild(cst);
   }
 
   /** Constructs a Polytype with the "True" constraint */
@@ -104,28 +105,21 @@ public class Polytype extends Type
    * Scoping
    *******************************************************************/
 
-  void buildScope(TypeScope ts)
-  {
-    typeScope=ts;
-  }
-
   void resolve()
   {
-    TypeScope ts=TypeScope.makeScope(this.typeScope,constraint.binders);
-    constraint.resolve(ts);
-    monotype=monotype.resolve(ts);
+    monotype=monotype.resolve(typeScope);
   }
-
-  VarScope memberScope()
-  {
-    return monotype.memberScope();
-  }
-
+  
   Polytype substitute(Map map)
   {
     return new Polytype(constraint.substitute(map),monotype.substitute(map));
   }
 
+  void typecheck()
+  {
+    monotype.typecheck();
+  }
+  
   /************************************************************
    * Printing
    ************************************************************/

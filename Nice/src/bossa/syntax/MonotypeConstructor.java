@@ -12,7 +12,7 @@
 
 // File    : MonotypeConstructor.java
 // Created : Thu Jul 22 09:15:17 1999 by bonniot
-//$Modified: Fri Aug 13 12:10:23 1999 by bonniot $
+//$Modified: Thu Aug 19 14:47:04 1999 by bonniot $
 // Description : A monotype, build by application of
 //   a type constructor to type parameters
 
@@ -56,12 +56,6 @@ public class MonotypeConstructor extends Monotype
   {
     tc=tc.resolve(typeScope);
     parameters=parameters.resolve(typeScope);
-
-    // Check the monotype is well-formed,
-    // ie all the parameters in imperative positions are imperative
-    User.error(!tc.variance.wellFormed(parameters),
-	       this,"Type parameters must be imperative");
-
     return this;
   }
   
@@ -83,6 +77,16 @@ public class MonotypeConstructor extends Monotype
     return parameters;
   }
   
+  void typecheck()
+  {
+    User.error(tc.variance.size!=parameters.size(),this,
+	       tc.variance.size+" type parameters expected");
+    // Check the monotype is well-formed,
+    // ie all the parameters in imperative positions are imperative
+    User.error(!tc.variance.wellFormed(parameters),
+	       this,"Type parameters must be imperative ("+parameters+")");    
+  }
+  
   /****************************************************************
    * Imperative type variables
    ****************************************************************/
@@ -101,16 +105,13 @@ public class MonotypeConstructor extends Monotype
    ****************************************************************/
 
   private int id;
-  
   public int getId() 		{ return id; }
-  
   public void setId(int value) 	{ id=value; }
   
   public Kind getKind() 	{ return tc.variance; }
-  
   public void setKind(Kind value)
   {
-    Internal.error("Variance set in MonotypeConstructor");
+    Internal.error("Variance set in MonotypeConstructor "+this);
   }
   
   /****************************************************************

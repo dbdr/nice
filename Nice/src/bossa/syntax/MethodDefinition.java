@@ -12,7 +12,7 @@
 
 // File    : MethodDefinition.java
 // Created : Thu Jul 01 18:12:46 1999 by bonniot
-//$Modified: Tue Jul 27 10:16:53 1999 by bonniot $
+//$Modified: Thu Aug 19 13:43:49 1999 by bonniot $
 // Description : Abstract syntax for a global method declaration
 
 package bossa.syntax;
@@ -32,7 +32,7 @@ public class MethodDefinition extends PolySymbol implements Definition
   {
     // hack, super must be the first call
     super(name,null);
-
+    
     Collection params=new ArrayList();
     // if it is a class method, there is an implicit "this" argument
     //TODO    if(c!=null)
@@ -42,6 +42,7 @@ public class MethodDefinition extends PolySymbol implements Definition
     this.type=Type.newType(typeParameters,
 			   new Polytype(constraint,
 					new FunType(params,returnType)));
+    addChild(type);
 
     this.memberOf=c;
   }
@@ -66,32 +67,6 @@ public class MethodDefinition extends PolySymbol implements Definition
   boolean isAssignable()
   {
     return false;
-  }
-
-  /****************************************************************
-   * Scoping
-   ****************************************************************/
-
-  void buildScope(VarScope outer, TypeScope ts)
-  {
-    scope=outer;
-
-    this.type.buildScope(ts);
-    typeScope=type.typeScope;
-  }
-
-  void resolveScope()
-  {
-    type.resolve();
-  }
-
-  /****************************************************************
-   * Type checking
-   ****************************************************************/
-
-  void typecheck()
-  {
-    //Nothing
   }
 
   /************************************************************

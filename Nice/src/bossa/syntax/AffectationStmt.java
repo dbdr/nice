@@ -12,7 +12,7 @@
 
 // File    : AffectationStmt.java
 // Created : Mon Jul 05 15:49:27 1999 by bonniot
-//$Modified: Thu Jul 29 11:49:36 1999 by bonniot $
+//$Modified: Wed Aug 18 16:08:08 1999 by bonniot $
 // Description : Affectation
 
 package bossa.syntax;
@@ -29,23 +29,19 @@ public class AffectationStmt extends Statement
     if(!(to instanceof FieldExp) && !(to instanceof IdentExp))
       throw new ParseException("Affectation should be done to a field");
 
-    this.to=to;
-    this.value=value;
+    this.to=new ExpressionRef(to);
+    this.value=new ExpressionRef(value);
+    addChild(this.to);
+    addChild(this.value);
   }
 
-  void resolveScope()
-  {
-    to=to.resolve(scope,typeScope);
-    User.error(!to.isAssignable(),to+" cannot be assigned a value");
-    value=value.resolve(scope,typeScope);
-  }
-  
   /****************************************************************
    * Type cheking
    ****************************************************************/
   
   void typecheck()
   {
+    User.error(!to.isAssignable(),to+" cannot be assigned a value");
     try{
       Typing.leq(value.getType(),to.getType());
     }

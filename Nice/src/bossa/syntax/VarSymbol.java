@@ -12,7 +12,7 @@
 
 // File    : VarSymbol.java
 // Created : Wed Jul 07 16:56:06 1999 by bonniot
-//$Modified: Fri Jul 23 13:13:58 1999 by bonniot $
+//$Modified: Thu Aug 19 13:27:35 1999 by bonniot $
 // Description : A variable (local, field, parameter)
 
 package bossa.syntax;
@@ -24,7 +24,9 @@ abstract class VarSymbol extends Node
 {
   public VarSymbol(LocatedString name)
   {
+    super(Node.global);
     this.name=name;
+    addSymbol(this);
   }
 
   public boolean hasName(LocatedString i)
@@ -54,13 +56,6 @@ abstract class VarSymbol extends Node
       res.add(((VarSymbol)i.next()).getType());
 
     return res;
-  }
-
-  static void resolveScope(Collection c)
-  {
-    Iterator i=c.iterator();
-    while(i.hasNext())
-      ((VarSymbol)i.next()).resolveScope();
   }
 
   LocatedString name;

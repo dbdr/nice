@@ -12,7 +12,7 @@
 
 // File    : TypeConstructor.java
 // Created : Thu Jul 08 11:51:09 1999 by bonniot
-//$Modified: Fri Aug 13 14:47:16 1999 by bonniot $
+//$Modified: Thu Aug 19 13:24:49 1999 by bonniot $
 
 package bossa.syntax;
 
@@ -116,27 +116,26 @@ public class TypeConstructor
 
   TypeConstructor resolve(TypeScope typeScope)
   {
-    //    if(definition==null)
+    if(definition==null)
       {
 	TypeSymbol s=typeScope.lookup(name);
 	if(s==null)
-	  User.error(name,"Class "+name+" is not defined");
+	  User.error(name,"Class "+name+" is not defined"); 
+	
 	if(s instanceof TypeConstructor)
 	  return (TypeConstructor)s;
 	else
-	  {
-	    //	    throw new Error();
-	    Internal.error(name,"type constructor is not a type symbol but a "
-	       +s.getClass()); 
-	       return null;
-	  }
+	  Internal.error(name,"type constructor is not a type symbol but a "
+			 +s.getClass()); 
+	return null;
       }
+    return this;
   }
 
   /** iterates resolve on the collection of TypeConstructor */
-  static Collection resolve(TypeScope typeScope, Collection c)
+  static List resolve(TypeScope typeScope, List c)
   {
-    Collection res=new ArrayList(c.size());
+    List res=new ArrayList(c.size());
     Iterator i=c.iterator();
     while(i.hasNext())
       res.add(((TypeConstructor)i.next()).resolve(typeScope));

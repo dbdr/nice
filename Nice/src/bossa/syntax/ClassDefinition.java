@@ -12,7 +12,7 @@
 
 // File    : ClassDefinition.java
 // Created : Thu Jul 01 11:25:14 1999 by bonniot
-//$Modified: Fri Aug 13 12:01:36 1999 by bonniot $
+//$Modified: Thu Aug 19 13:39:02 1999 by bonniot $
 // Description : Abstract syntax for a class definition
 
 package bossa.syntax;
@@ -24,8 +24,10 @@ import bossa.typing.*;
 public class ClassDefinition extends Node
   implements Definition
 {
-  public ClassDefinition(LocatedString name, Collection typeParameters)
+  public ClassDefinition(LocatedString name, List typeParameters)
   {
+    super(Node.global);
+    
     this.name=name;
     if(typeParameters==null)
       this.typeParameters=new ArrayList(0);
@@ -37,6 +39,12 @@ public class ClassDefinition extends Node
     methods=new ArrayList();
     fields=new ArrayList();
     this.tc=new TypeConstructor(this);
+
+    addTypeSymbol(this.tc);
+    addChildren(methods);
+    addChildren(fields);
+    addChildren(implementations);
+    addChildren(abstractions);
   }
   
   Constraint getConstraint()
@@ -59,37 +67,12 @@ public class ClassDefinition extends Node
 		     name.location())));
   }
 
-  void buildScope(VarScope scope, TypeScope ts)
-  {
-    this.scope=scope;
-    this.typeScope=TypeScope.makeScope(ts,typeParameters);
-    buildScope(this.scope,this.typeScope,fields);
-    buildScope(this.scope,this.typeScope,methods);
-  }
-
-  void resolveScope()
+  void resolve()
   {
     extensions=TypeConstructor.resolve(typeScope,extensions);
-    Interface.resolve(typeScope,implementations);
-    Interface.resolve(typeScope,abstractions);
-    resolveScope(fields);
   }
 
-  VarScope memberScope()
-  {
-    VarScope res=null;
-
-    try{
-      res=VarScope.makeScope(null,fields);
-    }
-    catch(DuplicateIdentEx e){
-      User.error(this.name,"Identifier "+e.ident+" defined twice in this class");
-    }
-
-    return res;
-  }
-
-  public void typecheck()
+  void typecheck()
   {
     try{
       Typing.introduce(tc);
@@ -150,10 +133,10 @@ public class ClassDefinition extends Node
 
   LocatedString name;
   TypeConstructor tc;
-  Collection /* of TypeSymbol */ typeParameters;
-  private Collection /* of TypeConstructor */ extensions;
-  private Collection /* of TypeConstructor */ implementations;
-  private Collection /* of TypeConstructor */ abstractions;
-  private Collection /* of VarSymbol */ fields;
-  private Collection methods;
+  List /* of TypeSymbol */ typeParameters;
+  private List /* of TypeConstructor */ extensions;
+  private List /* of TypeConstructor */ implementations;
+  private List /* of TypeConstructor */ abstractions;
+  private List /* of VarSymbol */ fields;
+  private List methods;
 }

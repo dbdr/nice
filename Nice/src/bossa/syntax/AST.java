@@ -12,7 +12,7 @@
 
 // File    : AST.java
 // Created : Thu Jul 01 11:01:56 1999 by bonniot
-//$Modified: Wed Jul 28 20:14:01 1999 by bonniot $
+//$Modified: Thu Aug 19 14:27:19 1999 by bonniot $
 
 package bossa.syntax;
 
@@ -27,60 +27,23 @@ import bossa.util.*;
  */
 public class AST extends Node
 {
-  public AST(Collection defs)
+  public AST(List defs)
   {
+    super(defs,Node.global);
+    
     this.definitions=defs;
     
-    try{
-      this.scope=VarScope.makeScope(null,findSymbols(defs,false));
-    }
-    catch(DuplicateIdentEx e){
-      User.error(e.ident,"Identifier "+e.ident+" defined twice at toplevel");
-    }
+    Debug.println("Scoping (build  )");
+    buildScope(null,null);
 
-    this.typeScope=TypeScope.makeScope(null,findSymbols(defs,true));
-    buildScope();
-    linkMethodBodiesToDefinitions();
-    Debug.println("Scoping");
-    resolveScope();
+    Debug.println("Scoping (resolve)");
+    doResolve();
+
     Debug.println("Typechecking");
-    typecheck();
+    doTypecheck();
   }
 
-  private void buildScope()
-  {
-    Iterator i=definitions.iterator();
-    while(i.hasNext())
-      {
-	Object d=i.next();
-	if(d instanceof Node && ! (d instanceof MethodBodyDefinition))
-	  ((Node)d).buildScope(scope,typeScope);
-      }
-  }
-
-  private void linkMethodBodiesToDefinitions()
-  {
-    Iterator i=definitions.iterator();
-    while(i.hasNext())
-      {
-	Object d=i.next();
-	if(d instanceof MethodBodyDefinition)
-	  {
-	    MethodBodyDefinition m=(MethodBodyDefinition)d;
-	    m.setDefinitionAndBuildScope
-	      ((MethodDefinition)scope.lookup(m.name),scope,typeScope);
-	  }
-      }						  
-  }
-
-  void resolveScope()
-  {
-    Iterator i=definitions.iterator();
-    while(i.hasNext())
-      ((Node)i.next()).resolveScope();
-  }
-
-  private Collection findSymbols(Collection defs, boolean types)
+  private static Collection findSymbols(Collection defs, boolean types)
   {
     Collection res=new ArrayList();
     Iterator i=defs.iterator();
@@ -103,11 +66,6 @@ public class AST extends Node
    * Type checking
    ****************************************************************/
 
-  void typecheck()
-  {
-    typecheck(definitions);
-  }
-
   public String toString()
   {
     String res="";
@@ -118,6 +76,6 @@ public class AST extends Node
     return res;
   }
 
-  private Collection /* of Definition */ definitions;
+  private List /* of Definition */ definitions;
 }
 

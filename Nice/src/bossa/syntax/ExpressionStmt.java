@@ -12,7 +12,7 @@
 
 // File    : ExpressionStmt.java
 // Created : Mon Jul 05 17:23:36 1999 by bonniot
-//$Modified: Tue Jul 20 12:32:40 1999 by bonniot $
+//$Modified: Thu Aug 19 13:39:59 1999 by bonniot $
 // Description : Compute an expression an forget the value
 
 package bossa.syntax;
@@ -24,19 +24,7 @@ public class ExpressionStmt extends Statement
   public ExpressionStmt(Expression exp)
   {
     this.exp=exp;
-  }
-
-  void resolveScope()
-  {
-    exp=exp.resolve(scope,typeScope);
-  }
-
-  /****************************************************************
-   * Type checking
-   ****************************************************************/
-
-  void typecheck()
-  {
+    addChild(exp);
   }
 
   /****************************************************************

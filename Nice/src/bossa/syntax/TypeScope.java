@@ -12,7 +12,7 @@
 
 // File    : TypeScope.java
 // Created : Fri Jul 09 11:29:17 1999 by bonniot
-//$Modified: Thu Jul 29 10:46:01 1999 by bonniot $
+//$Modified: Wed Aug 18 18:24:54 1999 by bonniot $
 
 package bossa.syntax;
 
@@ -23,90 +23,57 @@ import bossa.util.*;
  * A Scope level for types.
  * Is extended in each node that defined a new scope level.
  */
-abstract class TypeScope
+class TypeScope
 {
   public TypeScope(TypeScope outer)
   {
     this.outer=outer;
+    this.map=new HashMap();
   }
 
-  /** has to be defined in each extension */
-  protected abstract TypeSymbol has(LocatedString name);
+  void addSymbol(TypeSymbol s)
+  {
+    map.put(s.getName(),s);
+  }
+  
+  void addSymbols(Collection c)
+  {
+    Iterator i=c.iterator();
+    while(i.hasNext())
+      addSymbol((TypeSymbol)i.next());
+  }
 
+  void addMapping(LocatedString name, TypeSymbol s)
+  {
+    map.put(name,s);
+  }
+
+  void addMappings(Collection names, Collection symbols)
+  {
+    for(Iterator in=names.iterator(),is=symbols.iterator();
+	in.hasNext();)
+      addMapping((LocatedString)in.next(),(TypeSymbol)is.next());
+  }
+  
   public TypeSymbol lookup(LocatedString name)
   {
-    TypeSymbol res=has(name);
-    if(res!=null)
-      return res;
+    TypeSymbol res;
+    if(map.containsKey(name))
+      return (TypeSymbol)map.get(name);
     if(outer!=null)
       return outer.lookup(name);
     return null;
   }
 
-  /**
-   * Creates a scope which defines
-   * the provided TypeSymbols
-   *
-   * @param outer the outer scope
-   * @param locals collection of TypeSymbols
-   * @return the new Scope
-   * @exception NOT DuplicateIdentEx if the same identifer occurs twice
-   */
-  static TypeScope makeScope(TypeScope outer, 
-			     final Collection /* of TypeSymbol */ locals)
+  /****************************************************************
+   * Debugging
+   ****************************************************************/
+
+  public String toString()
   {
-    Iterator ii=locals.iterator();
-    while(ii.hasNext())
-      {
-	TypeSymbol s=(TypeSymbol)ii.next();
-      }
-
-    TypeScope res=new TypeScope(outer)
-    {
-      public TypeSymbol has(LocatedString id)
-      {
-	Iterator i=locals.iterator();
-	while(i.hasNext())
-	{
-	  TypeSymbol s=(TypeSymbol)i.next();
-	  if(s.hasName(id))
-	  return s;
-	}
-	return null;
-      }
-    };
-
-    return res;
+    return map.toString()+";;\n"+outer;
   }
-
-  /** returns a new TypeScope that maps vars to values */
-  static TypeScope makeScope(TypeScope outer, 
-			     final Collection /* of LocatedString */ vars,
-			     final Collection /* of TypeSymbol*/ values)
-    throws BadSizeEx
-  {
-    if(vars.size()!=values.size())
-      throw new BadSizeEx(values.size(),vars.size());
-
-    TypeScope res=new TypeScope(outer)
-    {
-      public TypeSymbol has(LocatedString id)
-      {
-	Iterator ivar=vars.iterator();
-	Iterator ival=values.iterator();
-	while(ivar.hasNext())
-	{
-	  LocatedString s=(LocatedString)ivar.next();
-	  TypeSymbol v=(TypeSymbol)ival.next();
-	  if(s.equals(id))
-            return v;
-	}
-	return null;
-      }
-    };
-
-    return res;
-  }
-
+  
   private TypeScope outer;
+  private Map map;
 }

@@ -12,7 +12,7 @@
 
 // File    : ConstantExp.java
 // Created : Thu Jul 08 15:36:40 1999 by bonniot
-//$Modified: Fri Aug 13 12:05:35 1999 by bonniot $
+//$Modified: Thu Aug 19 13:09:34 1999 by bonniot $
 // Description : Abstract class for values of basic types
 
 package bossa.syntax;
@@ -21,9 +21,9 @@ import bossa.util.*;
 
 abstract public class ConstantExp extends Expression
 {
-  Expression resolve(VarScope scope, TypeScope ts)
+  void resolve()
   {
-    TypeSymbol s=ts.lookup(new LocatedString(className,Location.nowhere()));
+    TypeSymbol s=typeScope.lookup(new LocatedString(className,Location.nowhere()));
 
     Internal.error(s==null,
 		   "Base class "+className+
@@ -34,9 +34,6 @@ abstract public class ConstantExp extends Expression
 
     type=new Polytype(new MonotypeConstructor(((TypeConstructor) s),null,
 					      null));
-    
-    // Nothing to do, its already a value
-    return this;
   }
 
   Type getType()

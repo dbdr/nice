@@ -12,43 +12,160 @@
 
 // File    : Node.java
 // Created : Thu Jul 08 10:24:56 1999 by bonniot
-//$Modified: Fri Jul 30 19:16:34 1999 by bonniot $
-// Description : Basic component of the syntax tree
-//   Defines its local scope 
+//$Modified: Thu Aug 19 14:29:01 1999 by bonniot $
 
 package bossa.syntax;
 
 import java.util.*;
 import bossa.util.*;
 
+/**
+ * Basic component of the syntax tree.
+ * Defines its local scope.
+ */
 abstract class Node
 {
-  /** Sets up the scope, once the outer scope is given */
-  void buildScope(VarScope outer, TypeScope typeOuter)
+  static final int forward = 0;
+  static final int global  = 1;
+  static final int down    = 2;
+  static final int none    = 3;
+  
+  Node(int propagate)
+  {
+    this(null,propagate);
+  }
+  
+  Node(List /* of Node */ children, 
+       int propagate)
+  {
+    this.propagate=propagate;
+    this.children=new ArrayList();
+    this.varSymbols=new ArrayList();
+    this.typeSymbols=new ArrayList();
+    typeMapsNames=new ArrayList();
+    typeMapsSymbols=new ArrayList();
+
+    addChildren(children);
+  }
+
+  void addChild(Node n)
+  {
+    Internal.error(n==null,"null child in Node.addChild");
+    children.add(n);
+  }
+  
+  void addChildren(List c)
+  {
+    if(c==null) return;
+    for(Iterator i=c.iterator();
+	i.hasNext();)
+      addChild((Node) i.next());
+  }
+    
+  void addSymbol(VarSymbol s)
+  {
+    varSymbols.add(s);
+  }
+  
+  void addSymbols(Collection c)
+  {
+    if(c!=null)
+      varSymbols.addAll(c);
+  }
+  
+  void addTypeSymbol(TypeSymbol s)
+  {
+    typeSymbols.add(s);
+  }
+  
+  void addTypeSymbols(Collection c)
+  {
+    if(c!=null)
+      typeSymbols.addAll(c);
+  }
+  
+  void addTypeMaps(Collection names, Collection symbols)
+    throws BadSizeEx
+  {
+    if(names.size()!=symbols.size()) throw new BadSizeEx(symbols.size(),names.size());
+    typeMapsNames.addAll(names);
+    typeMapsSymbols.addAll(symbols);
+  }
+  
+  /** Sets up the scope, once the outer scope is given 
+   * return the scope to pass to the following brothers 
+   * (for forward scoping)
+   */
+  VarScope buildScope(VarScope outer, TypeScope typeOuter)
   // Default behaviour, must be overriden in nodes
   // that really define a new scope
   {
-    Internal.warning(this.scope!=null,"Scope set twice for "+this);
-    this.scope=outer;
-    this.typeScope=typeOuter;
-  }
+    Internal.error(this.scope!=null,"Scope set twice for "+this);
 
-  /** iterates on the collection of nodes */
-  static void buildScope(VarScope outer, TypeScope typeOuter, Collection c)
-  {
-    Iterator i=c.iterator();
+    VarScope res=null;
+    switch(propagate)
+      {
+      case down: 
+	this.scope=new VarScope(outer,varSymbols);
+	this.typeScope=new TypeScope(typeOuter);
+	res=outer;
+	break;
+
+      case global:
+	if(outer==null)
+	  outer=new VarScope(null);
+	outer.addSymbols(varSymbols);
+	this.scope=outer;
+	if(typeOuter==null)
+	  typeOuter=new TypeScope(null);
+	this.typeScope=typeOuter;
+	res=outer;
+	break;
+	
+      case forward:
+	this.scope=new VarScope(outer,varSymbols);
+	this.typeScope=new TypeScope(typeOuter);
+	res=this.scope;
+	break;
+
+      case none:
+	res=null;
+	break;
+	
+      default:
+	Internal.error("Invalid case in Node.buildScope");
+      }
+
+    this.typeScope.addSymbols(typeSymbols);
+    this.typeScope.addMappings(typeMapsNames,typeMapsSymbols);
+
+    VarScope currentScope=this.scope;
+    Iterator i=children.iterator();
     while(i.hasNext())
-      ((Node)i.next()).buildScope(outer,typeOuter);
+      {
+	Object d=i.next();
+	if(d!=null)
+	  currentScope=((Node)d).buildScope(currentScope,typeScope);
+      }
+
+    return res;
   }
+  
+  /****************************************************************
+   * Scoping resolution
+   ****************************************************************/
 
   /** uses the scope to replace identifiers with their meaning */
-  abstract void resolveScope();
-
-  static void resolveScope(Collection c)
+  void resolve()
   {
-    Iterator i=c.iterator();
+  }
+
+  void doResolve()
+  {
+    resolve();
+    Iterator i=children.iterator();
     while(i.hasNext())
-      ((Node)i.next()).resolveScope();
+      ((Node)i.next()).doResolve();
   }
 
   VarScope getScope()
@@ -65,15 +182,21 @@ abstract class Node
    * Type checking
    ****************************************************************/
 
-  abstract void typecheck();
+  /** override this when typechecking is needed */
+  void typecheck() { }
 
-  void typecheck(Collection nodes)
+  void doTypecheck()
   {
-    Iterator i=nodes.iterator();
+    typecheck();
+    Iterator i=children.iterator();
     while(i.hasNext())
-      ((Node)i.next()).typecheck();
+      ((Node)i.next()).doTypecheck();
   }
 
-  VarScope scope;
-  TypeScope typeScope;
+  protected VarScope scope;
+  protected TypeScope typeScope;
+
+  private List children, varSymbols, typeSymbols;
+  private int propagate;  
+  private List typeMapsSymbols,typeMapsNames;
 }

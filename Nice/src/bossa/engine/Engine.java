@@ -12,7 +12,7 @@
 
 // File    : Engine.java
 // Created : Tue Jul 27 15:34:53 1999 by bonniot
-//$Modified: Fri Aug 13 15:07:20 1999 by bonniot $
+//$Modified: Wed Aug 18 18:57:54 1999 by bonniot $
 
 package bossa.engine;
 
@@ -294,22 +294,22 @@ public abstract class Engine
     public final void leq(Element e1, Element e2)
       throws Unsatisfiable
     {
+      if(dbg) Debug.println(e1+" <: "+e2+" ("+e1.getId()+" <: "+e2.getId()+")");
       leq(e1.getId(),e2.getId());
     }
     
     public final void register(Element e)
     {
       e.setId(extend());
+      if(dbg) Debug.println(e+" has id "+e.getId());
     }
     
     protected void indexMerged(int src, int dest) {
       if(dbg) Debug.println(this+" merged "+src+" and "+dest);
     }
     protected void indexMoved(int src, int dest) {
-      
     }
     protected void indexDiscarded(int index) {
-      
     }
   }
 

@@ -12,7 +12,7 @@
 
 // File    : ReturnStmt.java
 // Created : Mon Jul 05 17:21:40 1999 by bonniot
-//$Modified: Tue Jul 20 12:34:40 1999 by bonniot $
+//$Modified: Thu Aug 19 13:45:34 1999 by bonniot $
 // Description : return in a function or method
 
 package bossa.syntax;
@@ -23,20 +23,8 @@ public class ReturnStmt extends Statement
 {
   public ReturnStmt(Expression value)
   {
-    this.value=value;
-  }
-
-  void resolveScope()
-  {
-    value=value.resolve(scope,typeScope);
-  }
-
-  /****************************************************************
-   * Type checking
-   ****************************************************************/
-
-  void typecheck()
-  {
+    this.value=new ExpressionRef(value);
+    addChild(this.value);
   }
 
   /****************************************************************

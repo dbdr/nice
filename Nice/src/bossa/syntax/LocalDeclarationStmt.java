@@ -12,7 +12,7 @@
 
 // File    : LocalDeclarationStmt.java
 // Created : Tue Jul 06 12:06:20 1999 by bonniot
-//$Modified: Thu Jul 29 11:09:04 1999 by bonniot $
+//$Modified: Thu Aug 19 14:37:06 1999 by bonniot $
 // Description : Declaration of a local variable
 //   with optional initial value
 
@@ -25,18 +25,15 @@ public class LocalDeclarationStmt extends Statement
 {
   public LocalDeclarationStmt(LocatedString name, Type type, Expression value)
   {
-    this.name=name;
+    this.left=new PolySymbol(name,type);
+    addSymbol(left);
     this.type=type;
-    this.value=value;
-  }
+    addChild(type);
 
-  void resolveScope()
-  {
-    type.buildScope(typeScope);
-    type.resolve();
-    left=scope.lookup(name);
-    if(value!=null)
-      value=value.resolve(scope,typeScope);
+    if(value!=null){
+      this.value=new ExpressionRef(value);
+      addChild(this.value);
+    }
   }
 
   /****************************************************************
@@ -45,13 +42,12 @@ public class LocalDeclarationStmt extends Statement
   
   void typecheck()
   {
-    if(value!=null){
-      try{
-	Typing.leq(value.getType(),left.getType());
-      }
-      catch(TypingEx e){
-	User.error(this,"Typing error : "+name+" cannot be assigned value "+value);
-      }
+    if(value==null) return;
+    try{
+      Typing.leq(value.getType(),left.getType());
+    }
+    catch(TypingEx e){
+      User.error(this,"Typing error : "+left+" cannot be assigned value "+value+" : "+e);
     }
   }
 
@@ -61,13 +57,12 @@ public class LocalDeclarationStmt extends Statement
 
   public String toString()
   {
-    return type+" "+name+
+    return type+" "+left+
       (value==null?"":" = "+value);
   }
 
-  protected LocatedString name;
   protected Type type;
-  protected Expression value;
+  protected ExpressionRef value=null;
   // "name" after scoping
   VarSymbol left;
 }

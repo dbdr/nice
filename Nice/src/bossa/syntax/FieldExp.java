@@ -12,7 +12,7 @@
 
 // File    : FieldExp.java
 // Created : Mon Jul 05 17:29:46 1999 by bonniot
-//$Modified: Fri Jul 23 12:52:59 1999 by bonniot $
+//$Modified: Thu Aug 19 13:11:39 1999 by bonniot $
 // Description : Access to the field of an expression
 //   the field may be the name of a method
 //   since it can be considered as a field holding a closure
@@ -29,12 +29,13 @@ public class FieldExp extends Expression
     this.field=field;
   }
   
-  Expression resolve(VarScope scope, TypeScope ts)
+  Expression resolveExp()
   {
-    prefix=prefix.resolve(scope,ts);
-    access=prefix.memberScope().lookup(field);
-    // If we reach this point, prefix should be a class
-    User.error(access==null,"Field \""+field+"\" not found in class "+prefix.getType().toString/*Base*/());
+    //TODO
+//      prefix=prefix.resolveExp();
+//      access=prefix.memberScope().lookupOne(field);
+//      // If we reach this point, prefix should be a class
+//      User.error(access==null,"Field \""+field+"\" not found in class "+prefix.getType().toString/*Base*/());
     return this;
   }
 

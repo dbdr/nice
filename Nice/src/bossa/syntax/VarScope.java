@@ -12,48 +12,81 @@
 
 // File    : VarScope.java
 // Created : Fri Jul 09 11:28:11 1999 by bonniot
-//$Modified: Fri Jul 23 13:15:41 1999 by bonniot $
-// Description : a Scope level for variables.
-//   Is extended in each node that defined a new scope level
-
+//$Modified: Wed Aug 18 16:03:49 1999 by bonniot $
 
 package bossa.syntax;
 
 import java.util.*;
 import bossa.util.*;
 
-abstract class VarScope
+/**
+ * A Scope level for variables.
+ * Is extended in each node that defined a new scope level.
+ */
+class VarScope
 {
   public VarScope(VarScope outer)
   {
     this.outer=outer;
+    this.defs=new HashMultiTable();
+  }
+  
+  public VarScope(VarScope outer, Collection /* of VarSymbol */ defs)
+  {
+    this(outer);
+    addSymbols(defs);
   }
 
+  void addSymbol(VarSymbol s)
+  {
+    this.defs.put(s.name,s);
+  }
+  
   /**
-   * Has to be defined in each extension.
+   * Adds a collection of VarSymbols
    *
-   * @param i the identifier to lookup
-   * @return the symbol if it was found, null otherwise
    */
-  protected abstract VarSymbol has(LocatedString i);
-
+  void addSymbols(Collection c)
+  {
+    Iterator i=c.iterator();
+    while(i.hasNext())
+      {
+	VarSymbol s=(VarSymbol)i.next();
+	addSymbol(s);
+      }
+  }
+  
   /**
    * The lookup method to call when you need to get a VarSymbol
    * from its name
    *
    * @param i the identifier to lookup
-   * @return the symbol if it was found, null otherwise
+   * @return the symbols if it was found, null otherwise
    */
-  public VarSymbol lookup(LocatedString i)
+  public Iterator lookup(LocatedString i)
   {
-    VarSymbol res=has(i);
-    if(res!=null)
+    // The semantics is here that when a symbol is defined at one level,
+    // it hides all definitions at higher levels.
+    // This may be changed
+
+    Iterator res=defs.getAll(i);
+    if(res!=null && res.hasNext())
       return res;
     if(outer!=null)
       return outer.lookup(i);
     return null;
   }
 
+  public VarSymbol lookupOne(LocatedString s)
+  {
+    Iterator i=lookup(s);
+    if(i==null || !(i.hasNext()))
+      return null;
+    VarSymbol res=(VarSymbol)i.next();
+    User.error(i.hasNext(),s+"'s usage is ambiguous");
+    return res;
+  }
+  
   /**
    * Verifies that a collection of VarSymbol
    * does not contains twice the same identifier
@@ -76,37 +109,15 @@ abstract class VarScope
       }
   }
 
-  /**
-   * Creates a scope which defines
-   * the provided VarSymbols
-   *
-   * @param outer the outer scope
-   * @param locals collection of VarSymbols
-   * @return the new Scope
-   * @exception DuplicateIdentEx if the same identifer occurs twice
-   */
-  static VarScope makeScope(VarScope outer, 
-			    final Collection /* of VarSymbol */ locals)
-    throws DuplicateIdentEx
+  /****************************************************************
+   * Debugging
+   ****************************************************************/
+  
+  public String toString()
   {
-    checkDuplicates(locals);
-    VarScope res=new VarScope(outer)
-      {
-	public VarSymbol has(LocatedString id)
-	  {
-	    Iterator i=locals.iterator();
-	    while(i.hasNext())
-	      {
-		VarSymbol s=(VarSymbol)i.next();
-		if(s.hasName(id))
-		  return s;
-	      }
-	    return null;
-	  }
-      };
-
-    return res;
+    return defs+";;\n"+outer;
   }
-
+  
   private VarScope outer;
+  private HashMultiTable defs;
 }

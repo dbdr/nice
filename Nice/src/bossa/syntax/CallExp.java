@@ -12,7 +12,7 @@
 
 // File    : CallExp.java
 // Created : Mon Jul 05 16:27:27 1999 by bonniot
-//$Modified: Thu Jul 29 12:21:19 1999 by bonniot $
+//$Modified: Thu Aug 19 13:07:47 1999 by bonniot $
 
 package bossa.syntax;
 
@@ -31,17 +31,18 @@ public class CallExp extends Expression
    * @param parameters a collection of Expressions
    */
   public CallExp(Expression fun, 
-		 Collection parameters)
+		 List parameters)
   {
-    this.fun=fun;
+    this.fun=new ExpressionRef(fun);
     this.parameters=parameters;
+    addChild(this.fun);
+    addChildren(this.parameters);
   }
 
-  Expression resolve(VarScope scope, TypeScope ts)
+  void resolve()
   {
-    fun=fun.resolve(scope,ts);
-    parameters=resolve(scope,ts,parameters);
-    return this;
+    fun=fun.resolveExp();
+    parameters=Expression.resolveExp(parameters);
   }
 
   Type getType()
@@ -60,7 +61,6 @@ public class CallExp extends Expression
 	       fun);
 
     Typing.enter(funt.getTypeParameters(),"call "+this.fun);
-
 
     try{
       Typing.implies();
@@ -108,5 +108,5 @@ public class CallExp extends Expression
   }
 
   protected Expression fun;
-  protected Collection /* of Expression */ parameters;
+  protected List /* of Expression */ parameters;
 }

@@ -12,7 +12,7 @@
 
 // File    : MonoSymbol.java
 // Created : Fri Jul 16 17:10:53 1999 by bonniot
-//$Modified: Tue Jul 27 10:16:24 1999 by bonniot $
+//$Modified: Thu Aug 19 13:44:00 1999 by bonniot $
 
 package bossa.syntax;
 
@@ -71,18 +71,9 @@ public class MonoSymbol extends VarSymbol
    * Scoping
    ****************************************************************/
 
-  void resolveScope()
+  void resolve()
   {
     type=type.resolve(typeScope);
-  }
-
-  /****************************************************************
-   * Type checking
-   ****************************************************************/
-
-  void typecheck()
-  {
-    //Nothing
   }
 
   /****************************************************************

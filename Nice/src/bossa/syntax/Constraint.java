@@ -12,7 +12,7 @@
 
 // File    : Constraint.java
 // Created : Fri Jul 02 17:51:35 1999 by bonniot
-//$Modified: Fri Aug 13 14:56:25 1999 by bonniot $
+//$Modified: Thu Aug 19 13:39:35 1999 by bonniot $
 
 package bossa.syntax;
 
@@ -24,7 +24,7 @@ import bossa.util.*;
  *
  * @see AtomicConstraint
  */
-public class Constraint
+public class Constraint extends Node
 {
   /**
    * Creates the constraint \forall binders . atomics
@@ -32,27 +32,35 @@ public class Constraint
    * @param binders a collection of TypeSymbols
    * @param atomics a collection of AtomicConstraints
    */
-  public Constraint(Collection binders, Collection atomics)
+  public Constraint(List binders, List atomics)
+  {
+    super(Node.global);
+    construct(binders,atomics);
+  }
+  
+  Constraint(MonotypeVar binder, List atomics)
+  {
+    super(Node.global);
+    List binders=new ArrayList(1);
+    binders.add(binder);
+    construct(binders,atomics);
+  }
+      
+  private void construct(List binders, List atomics)
   {
     if(binders==null)
       binders=new ArrayList(0);
+    else
+      addTypeSymbols(binders);
     this.binders=binders;
-
+    
     if(atomics==null)
       atomics=new ArrayList(0);
+    else
+      addChildren(atomics);
     this.atomics=atomics;
   }
 
-  Constraint(MonotypeVar binder, Collection atomics)
-  {
-    this.binders=new ArrayList(1);
-    binders.add(binder);
-
-    if(atomics==null)
-      atomics=new ArrayList(0);
-    this.atomics=atomics;
-  }
-      
   /**
    * Nickname for True()
    *
@@ -75,8 +83,8 @@ public class Constraint
 
   Constraint cloneConstraint()
   {
-    return new Constraint((Collection)((ArrayList)binders).clone(),
-			  (Collection)((ArrayList)atomics).clone());
+    return new Constraint((List)((ArrayList)binders).clone(),
+			  (List)((ArrayList)atomics).clone());
   }
 
   public static Constraint and(Constraint c1, Constraint c2)
@@ -105,11 +113,11 @@ public class Constraint
    * Scoping
    ****************************************************************/
 
-  void resolve(TypeScope scope)
+  void resolve()
   {
-    atomics=AtomicConstraint.resolve(scope,atomics);
+    atomics=AtomicConstraint.resolve(typeScope,atomics);
   }
-
+  
   Constraint substitute(Map map)
   {
     //TODO:check binders do not conflict with keys in map,
@@ -127,7 +135,7 @@ public class Constraint
     bossa.typing.Typing.introduce(binders);
     AtomicConstraint.assert(atomics);
   }
-  
+
   /****************************************************************
    * Printing
    ****************************************************************/
@@ -165,6 +173,6 @@ public class Constraint
       }
   }
   
-  public Collection /* of TypeSymbol */ binders;
-  Collection /* of AtomicConstraint */ atomics;
+  public List /* of TypeSymbol */ binders;
+  List /* of AtomicConstraint */ atomics;
 }

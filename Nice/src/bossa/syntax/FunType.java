@@ -12,7 +12,7 @@
 
 // File    : FunType.java
 // Created : Fri Jul 02 17:41:24 1999 by bonniot
-//$Modified: Fri Jul 30 16:08:00 1999 by bonniot $
+//$Modified: Wed Aug 18 13:39:09 1999 by bonniot $
 
 package bossa.syntax;
 
@@ -56,7 +56,7 @@ public class FunType extends Monotype
 
   Monotype resolve(TypeScope typeScope)
   {
-    in=resolve(typeScope,in);
+    in=Monotype.resolve(typeScope,in);
     out=out.resolve(typeScope);
     return this;
   }

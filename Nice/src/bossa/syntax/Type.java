@@ -12,7 +12,7 @@
 
 // File    : Type.java
 // Created : Mon Jul 19 17:45:27 1999 by bonniot
-//$Modified: Wed Jul 28 22:53:26 1999 by bonniot $
+//$Modified: Wed Aug 18 18:28:47 1999 by bonniot $
 // Description : Any type. 
 //   Can either be a Polytype or a PolytypeConstructor
 
@@ -21,8 +21,13 @@ package bossa.syntax;
 import java.util.*;
 import bossa.util.*;
 
-public abstract class Type
+public abstract class Type extends Node
 {
+  Type()
+  {
+    super(Node.down);
+  }
+  
   /**
    * Constructs a type of the correct kind
    *
@@ -63,27 +68,12 @@ public abstract class Type
     return res;
   }
   
-  VarScope memberScope()
-  {
-    return null;
-  }
-
   /** overrided in PolytypeConstructor */
   Polytype instantiate(TypeParameters typeParameters) 
     throws BadSizeEx
   {
     return null;
   }
-
-  /*******************************************************************
-   * Scoping
-   *******************************************************************/
-
-  TypeScope typeScope;
-
-  abstract void buildScope(TypeScope ts);
-
-  abstract void resolve();
 
   /****************************************************************
    * Functional types

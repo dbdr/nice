@@ -12,7 +12,7 @@
 
 // File    : TypeParameters.java
 // Created : Mon Jul 12 17:51:12 1999 by bonniot
-//$Modified: Fri Aug 13 12:05:38 1999 by bonniot $
+//$Modified: Thu Aug 19 13:27:02 1999 by bonniot $
 
 package bossa.syntax;
 

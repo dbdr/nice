@@ -39,7 +39,7 @@ ${TOP}/parser/Parser.java: ${TOP}/parser/Parser.jj
 
 clean:
 	rm -f ${ALL_CLASS}
-	rm -f ${TOP}/parser/*.java ${TOP}/parser/*.class
+	rm -f ${TOP}/parser/*.class
 
 All: parser
 	${JAVAC} bossa/syntax/*.java bossa/typing/*.java bossa/test/*.java
@@ -54,3 +54,7 @@ All: parser
 
 doc:
 	${JAVADOC} -windowtitle "Bossa" -doctitle "The Bossa interpreter source" -d ${TOP}/../../doc -private bossa.syntax bossa.util bossa.typing bossa.engine
+
+tags:
+	cd ${TOP}
+	jtags

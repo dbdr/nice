@@ -12,7 +12,7 @@
 
 // File    : Expression.java
 // Created : Mon Jul 05 16:25:02 1999 by bonniot
-//$Modified: Tue Jul 27 17:14:37 1999 by bonniot $
+//$Modified: Thu Aug 19 14:33:34 1999 by bonniot $
 // Description : 
 
 package bossa.syntax;
@@ -20,19 +20,35 @@ package bossa.syntax;
 import java.util.*;
 import bossa.util.*;
 
-public abstract class Expression implements Located
+public abstract class Expression extends Node 
+  implements Located
 {
-  /** return an equivalent expression with scoping resolved */
-  abstract Expression resolve(VarScope vs, TypeScope ts);
+  Expression()
+  {
+    super(Node.down);
+  }
+  
+  /** 
+   * Returns an equivalent expression with scoping resolved 
+   * Expressions that resolve to a new expressions should
+   * override this method.
+   * Others (that resolve by side effects) 
+   * should override Node.resolve().
+   */
+  Expression resolveExp()
+  {
+    doResolve();
+    return this;
+  }
 
-  /** iterates resolve on the collection of Expression */
-  static Collection resolve(VarScope s, TypeScope t, Collection c)
+  /** iterates resolveExp on the collection of Expression */
+  static List resolveExp(Collection c)
   //TODO: imperative version ?
   {
-    Collection res=new ArrayList();
+    List res=new ArrayList();
     Iterator i=c.iterator();
     while(i.hasNext())
-      res.add(((Expression)i.next()).resolve(s,t));
+      res.add(((Expression)i.next()).resolveExp());
     return res;
   }
 
@@ -83,15 +99,6 @@ public abstract class Expression implements Located
 	res.add(t);
       }
 
-    return res;
-  }
-
-  /** return the scope in which fields may be found */
-  VarScope memberScope()
-  {
-    Type t=getType();
-    VarScope res=t.memberScope();
-    User.error(res==null,this+" is not a class, it has type "+t);
     return res;
   }
 

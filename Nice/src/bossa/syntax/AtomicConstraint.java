@@ -12,7 +12,7 @@
 
 // File    : AtomicConstraint.java
 // Created : Mon Jul 19 16:40:18 1999 by bonniot
-//$Modified: Tue Jul 27 10:23:00 1999 by bonniot $
+//$Modified: Thu Aug 19 13:38:25 1999 by bonniot $
 
 package bossa.syntax;
 
@@ -24,8 +24,13 @@ import java.util.*;
  *
  * @see Constraint
  */
-public abstract class AtomicConstraint
+public abstract class AtomicConstraint extends Node
 {
+  AtomicConstraint()
+  {
+    super(Node.down);
+  }
+  
   abstract AtomicConstraint substitute(Map map);
 
   /****************************************************************
@@ -34,9 +39,9 @@ public abstract class AtomicConstraint
 
   abstract AtomicConstraint resolve(TypeScope scope);
 
-  static Collection resolve(TypeScope scope, Collection c)
+  static List resolve(TypeScope scope, Collection c)
   {
-    Collection res=new ArrayList(c.size());
+    List res=new ArrayList(c.size());
     Iterator i=c.iterator();
 
     while(i.hasNext())
@@ -45,9 +50,9 @@ public abstract class AtomicConstraint
     return res;
   }
 
-  static Collection substitute(Map map, Collection c)
+  static List substitute(Map map, Collection c)
   {
-    Collection res=new ArrayList(c.size());
+    List res=new ArrayList(c.size());
     Iterator i=c.iterator();
 
     while(i.hasNext())
@@ -77,5 +82,5 @@ public abstract class AtomicConstraint
     for(Iterator i=atomics.iterator();i.hasNext();)
       ((AtomicConstraint) i.next()).assert();
   }
-  
+
 }

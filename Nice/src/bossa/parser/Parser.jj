@@ -12,7 +12,7 @@
 
 // File    : parser.jj
 // Created : Thu Jul 01 10:27:05 1999 by bonniot
-//$Modified: Fri Aug 13 14:18:12 1999 by bonniot $
+//$Modified: Wed Aug 18 13:29:19 1999 by bonniot $
 // Description : Parseur JavaCC pour Bossa
 //   Tokens based on the Jazz parser
 
@@ -377,9 +377,9 @@ Interface itf():
   }
 }
 
-Collection typeConstructors():
+List typeConstructors():
 {
-  Collection res=new ArrayList();
+  List res=new ArrayList();
   TypeConstructor t;
 }
 {
@@ -413,9 +413,9 @@ MonoSymbol monoSymbol():
   { return new MonoSymbol(name,type,null); }
 }
 
-Collection monoSymbols():
+List monoSymbols():
 {
-  Collection res=new ArrayList();
+  List res=new ArrayList();
   MonoSymbol name;
 }
 {
@@ -450,9 +450,9 @@ TypeSymbol binder(Collection atomics):
    }
 }
 
-Collection binders(Collection atomics):
+List binders(Collection atomics):
 {
-    Collection res=new ArrayList();
+    List res=new ArrayList();
     TypeSymbol t;
 }
 {
@@ -488,9 +488,9 @@ AtomicConstraint atomicConstraint():
   { return res; }
 }
 
-Collection atomics(Collection init):
+List atomics(List init):
 {
-  Collection res=init;
+  List res=init;
   AtomicConstraint k;
 }
 {
@@ -502,8 +502,8 @@ Collection atomics(Collection init):
 Constraint constraint():
 {
   Constraint res;
-  Collection b=null;
-  Collection atoms=new ArrayList();
+  List b=null;
+  List atoms=new ArrayList();
 }
 {
   (
@@ -537,9 +537,9 @@ MonotypeVar monotypeVar(boolean imperative):
   { return new MonotypeVar(name,imperative); }
 }
 
-Collection monotypeVars(boolean imperative):
+List monotypeVars(boolean imperative):
 {
-    Collection res=new ArrayList(0);
+    List res=new ArrayList(0);
     MonotypeVar var;
 }
 {
@@ -730,7 +730,7 @@ ClassDefinition classDefinition():
 {
     ClassDefinition res;
     LocatedString name;
-    Collection parameters;
+    List parameters;
 }
 {
   "class"
@@ -839,9 +839,9 @@ Definition definition():
   { return res; }
 }
 
-Collection definitions():
+List definitions():
 {
-    Collection defs=new ArrayList();
+    List defs=new ArrayList();
     Definition d;
 }
 {
@@ -905,7 +905,7 @@ NewExp newExp():
 
 CallExp callExp(Expression prefix):
 {
-  Collection parameters;
+  List parameters;
 }
 {
   "("
@@ -935,8 +935,8 @@ Expression computedExp(Expression prefix):
 
 FunExp funExp():
 {
-  Collection formals;
-  Collection tp;
+  List formals;
+  List tp;
   Constraint cst;
   List body;
 }
@@ -974,9 +974,9 @@ Expression expression():
   }
 }
 
-Collection expressions():
+List expressions():
 {
-  Collection res=new ArrayList();
+  List res=new ArrayList();
   Expression e;
 }
 {

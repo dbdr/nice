@@ -12,7 +12,7 @@
 
 // File    : MethodBodyDefinition.java
 // Created : Thu Jul 01 18:12:46 1999 by bonniot
-//$Modified: Fri Aug 13 14:08:47 1999 by bonniot $
+//$Modified: Thu Aug 19 13:43:21 1999 by bonniot $
 // Description : Abstract syntax for a method body
 
 package bossa.syntax;
@@ -29,32 +29,15 @@ public class MethodBodyDefinition extends Node
 			      Collection binders,
 			      List formals, List body)
   {
+    super(Node.down);
     this.name=name;
     this.typeParameters=typeParameters;
     this.binders=binders; 
     this.formals=formals;
     this.body=new Block(body);
     this.definition=null;
-  }
-
-  void setDefinitionAndBuildScope(MethodDefinition d,VarScope scope,
-				  TypeScope typeScope)
-  {
-    User.error(d==null,this,"Method \""+name+"\" has not been declared");
-    this.definition=d;
-
-    // if the method is not a class member,
-    // the "this" formal is useless
-    if(!d.isMember())
-      {
-	User.error(!((Pattern)formals.get(0)).thisAtNothing(),
-		   this,
-		   "Method \""+name+"\" is a global method"+
-		   ", it cannot have a main pattern");
-	formals.remove(0);
-      }
-
-    buildScope(scope,typeScope);
+    
+    addChild(this.body);
   }
 
   private Collection buildSymbols(Collection names, Collection types)
@@ -82,24 +65,36 @@ public class MethodBodyDefinition extends Node
     return res;
   }
   
-  void buildScope(VarScope outer, TypeScope typeOuter)
+  private void setDefinition(MethodDefinition d)
   {
-    parameters=buildSymbols(this.formals,definition.type.domain());
-    try
+    User.error(d==null,this,"Method \""+name+"\" has not been declared");
+    this.definition=d;
+
+    // if the method is not a class member,
+    // the "this" formal is useless
+    if(!d.isMember())
       {
-	this.scope=VarScope.makeScope(outer,this.parameters);
-      }
-    catch(DuplicateIdentEx e)
-      {
-	User.error(this.name,"Identifier "+e.ident+
-		   " was defined twice in the body of this method");
+	User.error(!((Pattern)formals.get(0)).thisAtNothing(),
+		   this,
+		   "Method \""+name+"\" is a global method"+
+		   ", it cannot have a main pattern");
+	formals.remove(0);
       }
 
+    parameters=buildSymbols(this.formals,definition.type.domain());
+    addSymbols(parameters);
+  }
+
+  VarScope buildScope(VarScope outer, TypeScope typeOuter)
+  {
+    setDefinition((MethodDefinition)outer.lookupOne(name));
+
+    addTypeSymbols(definition.type.getConstraint().binders);
+    
     // Get imperative type parameters
     try{
-      this.typeScope=TypeScope.makeScope
-	(typeOuter,
-	 TypeConstructor.toLocatedString(this.typeParameters),
+      addTypeMaps
+	(TypeConstructor.toLocatedString(this.typeParameters),
 	 definition.type.getTypeParameters());
     }
     catch(BadSizeEx e){
@@ -110,9 +105,8 @@ public class MethodBodyDefinition extends Node
     // Get functional type parameters
     if(binders!=null)
     try{
-      this.typeScope=TypeScope.makeScope
-	(this.typeScope,
-	 binders,
+      addTypeMaps
+	(binders,
 	 definition.type.getConstraint().binders);
     }
     catch(BadSizeEx e){
@@ -120,15 +114,14 @@ public class MethodBodyDefinition extends Node
 		 " functional type parameters");
     }
 
-    Node.buildScope(definition.scope,this.typeScope,parameters);
-    body.buildScope(this.scope,this.typeScope);
+    VarScope res=super.buildScope(definition.scope,definition.typeScope);
+
+    return res;
   }
 
-  void resolveScope()
+  void resolve()
   {
     Pattern.resolve(typeScope,formals);
-    resolveScope(parameters);
-    body.resolveScope();
   }
 
   /****************************************************************
@@ -166,7 +159,7 @@ public class MethodBodyDefinition extends Node
       User.error(name,"Typing error in method body "+name+e);
     }
 
-    body.typecheck();
+    // Used to call body.typecheck() here. Now it is done as it is a child
     try{
       Type t=body.getType();
       if(t==null)

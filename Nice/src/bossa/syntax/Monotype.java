@@ -12,7 +12,7 @@
 
 // File    : Monotype.java
 // Created : Thu Jul 01 19:28:28 1999 by bonniot
-//$Modified: Fri Aug 13 15:20:37 1999 by bonniot $
+//$Modified: Thu Aug 19 14:40:04 1999 by bonniot $
 // Description : Abstract syntactic type, without constraint
 
 package bossa.syntax;
@@ -64,9 +64,9 @@ abstract public class Monotype
    * Scoping
    **************************************************************/
   
-  abstract Monotype resolve(TypeScope typeScope);
+  abstract Monotype resolve(TypeScope ts);
 
-  /** iterates resolve on the collection of Monotype */
+  /** iterates resolve() on the collection of Monotype */
   static Collection resolve(TypeScope s, Collection c)
   //TODO: imperative version ?
   {
@@ -81,13 +81,11 @@ abstract public class Monotype
       }
     return res;
   }
-
-  /** return the scope in which fields may be found */
-  VarScope memberScope()
+  
+  void typecheck()
   {
-    return null;
   }
-
+  
   /****************************************************************
    * Imperative type variables
    ****************************************************************/

@@ -12,7 +12,7 @@
 
 // File    : PolytypeConstructor.java
 // Created : Mon Jul 19 17:47:49 1999 by bonniot
-//$Modified: Thu Jul 29 12:19:11 1999 by bonniot $
+//$Modified: Thu Aug 19 13:45:21 1999 by bonniot $
 // Description : A type that takes TypeParameters 
 //  and that returns a Polytype
 
@@ -27,6 +27,8 @@ public class PolytypeConstructor extends Type
   {
     this.parameters=parameters;
     this.polytype=polytype;
+    addTypeSymbols(parameters);
+    addChild(polytype);
   }
 
   //Acces methods
@@ -51,7 +53,6 @@ public class PolytypeConstructor extends Type
     if(parameters.size()!=typeParameters.size())
       throw new BadSizeEx(parameters.size(),typeParameters.size());
 
-    //Debug.println(this+" :: "+typeParameters);
     Polytype res;
 
     Map map=new HashMap();
@@ -65,24 +66,12 @@ public class PolytypeConstructor extends Type
 
     res=polytype.substitute(map);
 
-    //    Debug.println("->"+res);
     return res;
   }
 
   /*******************************************************************
    * Scoping
    *******************************************************************/
-
-  void buildScope(TypeScope ts)
-  {
-    typeScope=TypeScope.makeScope(ts,parameters);
-    polytype.buildScope(typeScope);
-  }
-
-  void resolve()
-  {
-    polytype.resolve();
-  }
 
   Collection /* of Monotype */ domain()
   {

@@ -12,7 +12,7 @@
 
 // File    : MonotypeVar.java
 // Created : Fri Jul 23 15:36:39 1999 by bonniot
-//$Modified: Fri Aug 13 15:16:24 1999 by bonniot $
+//$Modified: Thu Aug 19 13:19:19 1999 by bonniot $
 
 package bossa.syntax;
 
@@ -113,12 +113,12 @@ public class MonotypeVar extends Monotype
       return this;
     
     TypeSymbol s=ts.lookup(this.name);
-    User.error(s==null,this,this.name+" is not defined");
+    User.error(s==null,this,this.name+" is not defined in "+ts);
 
     if(s instanceof Monotype)
       return (Monotype) s;
 
-    // In this case, it was indeed a type constructor,
+    // In this case, it was indeed a type constructor
     // applied to no type parameters
     if(s instanceof TypeConstructor)
       return new MonotypeConstructor((TypeConstructor) s, null, 
@@ -146,7 +146,10 @@ public class MonotypeVar extends Monotype
 
   public String toString()
   {
-    return "\""+name+"\"";
+    if(soft)
+      return name.toString();
+    else
+      return "\""+name+"\"";
   }
 
   public LocatedString getName()
@@ -224,7 +227,6 @@ public class MonotypeVar extends Monotype
    * If true,  this is really a variable monotype
    * If false, this must be found in scope
    */
-
   private boolean soft;
 
   private boolean imperative;

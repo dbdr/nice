@@ -12,7 +12,7 @@
 
 // File    : FunExp.java
 // Created : Mon Jul 12 15:09:50 1999 by bonniot
-//$Modified: Wed Jul 28 20:17:00 1999 by bonniot $
+//$Modified: Tue Aug 17 17:38:09 1999 by bonniot $
 // Description : A functional expression
 
 package bossa.syntax;
@@ -23,29 +23,16 @@ import bossa.util.*;
 public class FunExp extends Expression
 {
   public FunExp(Collection typeParameters, 
-		Constraint cst, Collection formals, List body)
+		Constraint cst, List formals, List body)
   {
     this.typeParameters=typeParameters;
     this.formals=formals;
     this.constraint=cst;
     this.body=new Block(body);
-  }
 
-  Expression resolve(VarScope s,TypeScope ts)
-  {
-    ts=TypeScope.makeScope(ts,constraint.binders);
-    constraint.resolve(ts);
-    Node.buildScope(s,ts,formals);
-    VarSymbol.resolveScope(formals);
-    try{
-      body.buildScope(VarScope.makeScope(s,formals),ts);
-    }
-    catch(DuplicateIdentEx e){
-      User.error(this,e.ident+" was defined twice in function");
-    }
-    
-    body.resolveScope();
-    return this;
+    addChild(constraint);
+    addChildren(formals);
+    addChild(this.body);
   }
 
   Type getType()

@@ -12,7 +12,7 @@
 
 // File    : InterfaceDefinition.java
 // Created : Thu Jul 01 17:00:14 1999 by bonniot
-//$Modified: Tue Jul 27 12:39:23 1999 by bonniot $
+//$Modified: Thu Aug 19 13:40:13 1999 by bonniot $
 
 package bossa.syntax;
 
@@ -27,50 +27,14 @@ public class InterfaceDefinition extends Node
 {
   public InterfaceDefinition(LocatedString name, Collection typeParameters)
   {
+    super(Node.global);
     this.name=name;
     this.parameters=typeParameters;
-    
-    //    this.type=new ItfType(this); // we have to do this 
-                                 // since this cannot be used 
-                                 // in the above line
   }
 
   public boolean hasName(LocatedString s)
   {
     return name.equals(s);
-  }
-
-  /****************************************************************
-   * 
-   ****************************************************************/
-
-  TypeSymbol resolve(TypeScope scope)
-  {
-    return this;
-  }
-
-  static Collection resolve(TypeScope typeScope, Collection c)
-  {
-    Collection res=new ArrayList(c.size());
-    Iterator i=c.iterator();
-    while(i.hasNext())
-      res.add(((TypeConstructor)i.next()).resolve(typeScope));
-
-    return res;
-  }
-
-void resolveScope()
-  {
-    
-  }
-
-  VarScope memberScope()
-  {
-    return null;
-  }
-
-  void typecheck()
-  {
   }
 
   /****************************************************************

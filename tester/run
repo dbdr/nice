@@ -1,0 +1,62 @@
+#! /bin/sh
+
+# Automatic Tester
+
+# Stop on errors
+set -e
+
+# Set up variables, that can be overriden in the setup file.
+machine="`hostname -f`"
+system="`uname -a`"
+user="$USER"
+
+if [ -r setup ]; then
+    . setup
+fi
+
+rm -rf builds
+mkdir -p builds
+cd builds
+
+# We run the whole set of tests once per configuration.
+# This means that the test scripts must first clean up the tree, 
+# to really rebuild the application.
+
+for conffile in ../config.*; do
+    name="`expr match $conffile '../config\.\(.*\)'`"
+    . $conffile
+
+    config=$machine:$name
+
+    # Redirect output
+    exec > $config.log
+    exec 2>&1
+
+    . ../Project 
+    if [ $? -eq 0 ]; then
+	echo "Bootstrap SUCCESS"  > $config.res
+    else
+	echo "Bootstrap FAILURE"  > $config.res
+    fi
+
+
+    for test in ../*.test; do
+	testname="`expr match $test '../\(.*\)\.test'`"
+	echo ""
+	echo "======================"
+	echo "Running $testname"
+	echo "======================"
+	echo ""
+	if $test; then
+	    echo "$testname OK"  >> $config.res
+	else
+	    echo "$testname FAILURE"  >> $config.res
+	fi
+    done
+done
+
+echo "Admin: $user@users.sourceforge.net" > $machine.id
+echo "System: $system"  >> $machine.id
+
+# Send the results to the Test Central
+scp -p ./*.id ./*.res ./*.log $user@shell.sourceforge.net:/home/groups/n/ni/nice/test-central/results

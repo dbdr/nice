@@ -1,0 +1,8 @@
+#! /bin/sh
+
+if [ ! -r swing ]; then
+  cvs -d:pserver:anonymous@cvs.sourceforge.net:/cvsroot/nice export -rHEAD swing
+fi
+cd swing
+
+CLASSPATH=${NICE_JAR} ant clean-all compile-common

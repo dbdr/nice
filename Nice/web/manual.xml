@@ -137,31 +137,33 @@ class Car
 void test()
 {
   Car renault5 = new Car(brand: "Renault", model: "Cinq");
-  Car jeep = new Car("Jeep", "Some jeep", numberOfDrivingWheels: 4);
+  Car jeep = new Car(brand: "Jeep", model: "Some jeep", numberOfDrivingWheels: 4);
 }</programlisting>
       </example>
       
       <para>
-	Note that it is possible to omit the names of the fields when
-	calling the constructor. They are then take in the syntactic order
-	of their definition, starting from the super-classes.
-	This makes the call to the constructor similar to Java.
-	However it is advised to use the names of the fields for two reasons:
-	it is a good documentation of the code, and it prevents
-	problems from happening if the order of the fields is changed
-	in the definition of the class
+	It is required to include the names of the fields in the call
+	to the constructor. 
+	This is important for two reasons.
+	First, it is easy to understand what the arguments represent, without looking at the
+	class definition.
+	Second, it does not require some arbitrary ordering of the fields
 	<footnote>
 	  <para>
-	    This problem happens in Java when the order of the parameters 
-	    of a constructor is changed.
-	    If the exchanged parameters have incompatible types, 
+	    A problem happens in Java when the order of the parameters 
+	    of a constructor should be changed.
+	    This requires modifying all the call sites, which is at best tedious
+	    and error-prone, at worse impossible (when writing a library used by others).
+	    When the order is changed and some caller are not modified,
+	    the following happens:
+	    if the exchanged parameters have incompatible types, 
 	    the compilation of the caller will fail; 
 	    otherwise the code might even compile and produce
 	    wrong results at runtime. 
-	    There is no simple way to prevent this in Java.
+	    There is no simple way to solve this issue in Java.
 	    Using names in the call to the constructor in Nice is the solution.
 	  </para>
-	</footnote>. When the names of the fields are used, they can be given
+	</footnote>. Because the names of the fields are used, they can be given
 	in any order.
       </para>
 

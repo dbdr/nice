@@ -27,7 +27,7 @@ import java.io.*;
 import java.util.*;
 
 import bossa.util.*;
-import bossa.syntax.*;   
+import bossa.syntax.*;
 
 import mlsub.typing.TypeSymbol;
 import mlsub.typing.TypeConstructor;

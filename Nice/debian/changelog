@@ -1,5 +1,7 @@
 nice (0.9.3) unstable; urgency=low
 
+  * Added multi line string literals. String that start and end with """
+    may take multiple lines and will include the linebreaks.
   * Existing interfaces can (like classes) implement abstract interfaces:
       interface packagename.SomeInterface implements AbstractInterface;
 

@@ -35,6 +35,12 @@ compiler:
 parser:
 	cd src/bossa/parser; ${JAVACC} Parser.jj
 
+# Part of the standard library implemented in Java
+# Since these are not required by the compiler source,
+# they don't get recompiled automatically by dependence analysis
+native:
+	${JAVAC} stdlib/nice/*/*.java src/nice/tools/code/*.java
+
 clean:
 	rm -rf ${TOP}/classes/*
 

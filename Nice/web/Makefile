@@ -35,7 +35,7 @@ manual.pdf manual.ps: manual.xml
 	xmlto $(shell expr match $@ 'manual\.\(.*\)') manual.xml
 
 %.html: %.xml new.xsl
-	$(PROC) new.xsl $*.xml > $@
+	if ! $(PROC) new.xsl $*.xml > $@; then rm $@; fi
 
 # Old style
 safety.html: manual.xsl safety.xml

@@ -1,0 +1,290 @@
+/**************************************************************************/
+/*                                N I C E                                 */
+/*             A high-level object-oriented research language             */
+/*                        (c) Daniel Bonniot 2004                         */
+/*                                                                        */
+/*  This program is free software; you can redistribute it and/or modify  */
+/*  it under the terms of the GNU General Public License as published by  */
+/*  the Free Software Foundation; either version 2 of the License, or     */
+/*  (at your option) any later version.                                   */
+/*                                                                        */
+/**************************************************************************/
+
+package nice.tools.util;
+
+/**
+   Support for source information in compiled classes.
+
+   @author Daniel Bonniot (bonniot@users.sourceforge.net)
+ */
+
+import java.io.*;
+
+public void printStackTraceWithSourceInfo(Throwable t) = 
+  printStackTraceWithSourceInfo(t, java.lang.System.err);
+
+public void printStackTraceWithSourceInfo(Throwable t, PrintStream s) =
+  printStackTraceWithSourceInfo(t, new PrintWriter(s));
+
+public void printStackTraceWithSourceInfo(Throwable t, PrintWriter w)
+{
+  w.println("Exception in thread \"" Thread.currentThread().getName "\" " t);
+  try {
+    let elements = t.getStackTrace();
+    elements.foreach(StackTraceElement e => {
+      (?String file, int line) = 
+        getSourceLocation(e.getClassName(), e.getLineNumber())
+        || (e.getFileName(), e.getLineNumber());
+      let location =
+        file == null ? (e.isNativeMethod ? "Native Method" : "Unknown Source")
+      : line < 0 ? file
+      : (file + ":" + line);
+      w.println("\tat " e.getClassName "." e.getMethodName "(" location ")");
+    });
+  } catch (NoSuchMethodError e) {
+    // Fallback in case method Throwable.getStackTrace() is not available.
+    t.printStackTrace(w);
+    w.println("""
+Warning: the above stack trace has wrong line numbers for Nice methods.
+Use a JVM version 1.4 or later to get the correct line numbers.""");
+  }
+}
+
+let byte CLASS = 7;
+let byte FIELDREF = 9;
+let byte METHODREF = 10;
+let byte INTERFACE_METHODREF = 11;
+let byte STRING = 8;
+let byte INTEGER = 3;
+let byte FLOAT = 4;
+let byte LONG = 5;
+let byte DOUBLE = 6;
+let byte NAME_AND_TYPE = 12;
+let byte UTF8 = 1;
+
+/* Return the index of SourceDebugExtension, or null if it does not appear. */
+private ?int readConstantPool(DataInputStream dstr)
+{
+  var ?int result = null;
+
+  let count = dstr.readUnsignedShort() - 1;
+  for (int i = 1;  i <= count;  i++)
+    {
+      byte tag = dstr.readByte();
+      if (tag == UTF8) {
+	let value = dstr.readUTF();
+	if (value.equals("SourceDebugExtension"))
+	  result = i;
+      }	else if (tag == LONG || tag == DOUBLE) {
+	dstr.readLong();
+	i++;
+      }
+      else if (tag == CLASS || tag == STRING)
+	dstr.readUnsignedShort();
+      else
+	// In all other cases, 4 bytes need to be read.
+	dstr.readInt();
+    }
+  return result;
+}
+
+/** Fetch the SourceDebugExtension attribute from a compiled class. */
+?String sourceDebugExtension(String className)
+{
+  let resourceName = className.replace('.', '/') + ".class";
+  let stream = new DataInputStream
+    (java.lang.ClassLoader.getSystemResourceAsStream(resourceName));
+
+  stream.skipBytes(8);
+  let sourceDebugExtensionIndex = readConstantPool(stream);
+  if (sourceDebugExtensionIndex == null)
+    return null;
+
+  // Class info
+  stream.skipBytes(6);
+
+  let interfaces_count = stream.readUnsignedShort();
+  stream.skipBytes(2 * interfaces_count);
+
+  let fields_count = stream.readUnsignedShort();
+  for (int i = 0; i < fields_count; i++) {
+    stream.skipBytes(6);
+    let attributes_count = stream.readUnsignedShort();
+    for (int j = 0; j < attributes_count; j++) {
+      stream.skipBytes(2);
+      let attribute_length = stream.readInt();
+      stream.skipBytes(attribute_length);
+    }
+  }
+
+  let methods_count = stream.readUnsignedShort();
+  for (int i = 0; i < methods_count; i++) {
+    stream.skipBytes(6);
+    let attributes_count = stream.readUnsignedShort();
+    for (int j = 0; j < attributes_count; j++) {
+      stream.skipBytes(2);
+      let attribute_length = stream.readInt();
+      stream.skipBytes(attribute_length);
+    }
+  }
+
+  let attributes_count = stream.readUnsignedShort();
+  for (int j = 0; j < attributes_count; j++) {
+    let index = stream.readUnsignedShort();
+    if (index == sourceDebugExtensionIndex)
+      {
+	let length = stream.readInt();
+	let value = new byte[length];
+	stream.readFully(value);
+	return new String(value, "UTF-8");
+
+	// Skip the two higher-order bytes. Problematic for large source maps?
+	//let dummy = stream.readUnsignedShort();
+	//return stream.readUTF();
+      }
+
+    let attribute_length = stream.readInt();
+    stream.skipBytes(attribute_length);
+  }
+
+  return null;
+}
+
+private (int,int,int,int,int) parseLine(String line, int defaultId)
+{
+/* Format:
+  InputStartLine #LineFileID ,RepeatCount :OutputStartLine ,OutputLineIncrement
+*/
+  let tokenizer = new StringTokenizer(line, "#,: ");
+  int start = Integer.parseInt(tokenizer.nextToken());
+
+  int id, repeat, outStart, outInc;
+
+  int pos = line.indexOf('#');
+
+  if (pos == -1)
+    id = defaultId;
+  else
+    {
+      int end = line.indexOf(':');
+      int end2 = line.indexOf(',');
+      if (end2 != -1)
+	end = end2;
+      id = Integer.parseInt(line.substring(pos + 1, end));
+    }
+
+  pos = line.indexOf(',');
+  if (pos == -1)
+    repeat = 1;
+  else
+    {
+      int end = line.indexOf(':');
+      repeat = Integer.parseInt(line.substring(pos + 1, end));
+    }
+
+  pos = line.indexOf(':');
+  int end = line.indexOf(',', pos);
+  if (end != -1)
+    {
+      outStart = Integer.parseInt(line.substring(pos + 1, end));
+      outInc = Integer.parseInt(line.substring(end + 1));
+    }
+  else
+    {
+      outStart = Integer.parseInt(line.substring(pos + 1));
+      outInc = 1;
+    }      
+
+  return (start, id, repeat, outStart, outInc);
+}
+
+?(String,int) getSourceLocation(String className, int lineNumber)
+{
+  let map = sourceDebugExtension(className);
+  if (map == null)
+    return null;
+
+  var resultLine = 0;
+  var resultId = 1;
+
+  let r = new BufferedReader(new StringReader(map));
+  if (! (r.readLine().equals("SMAP")))
+    return null;
+
+  r.readLine();
+
+  let defaultStratum = r.readLine();
+
+  while (! (r.readLine().equals("*S " defaultStratum)))
+    // Not the stratum we want, skip.
+    {}
+
+  List<?String> files = new ArrayList();
+
+  var section = r.readLine();
+  do {
+    if (section.equals("*F"))
+      {
+	for (;;) {
+	  section = r.readLine();
+	  if (section == null || section.startsWith("*"))
+	    break;
+
+	  let tokenizer = new StringTokenizer(section);
+	  var token = tokenizer.nextToken();
+	  if (token.equals("+"))
+	    {
+	      let index = Integer.parseInt(tokenizer.nextToken());
+	      let file = tokenizer.nextToken();
+	      r.readLine();
+	      while (files.size() < index)
+		files.add(null);
+	      if (files.size() == index)
+		files.add(file);
+	      else
+		files.set(index, file);
+	    }
+	  else
+	    {
+	      let index = Integer.parseInt(token);
+	      let file = tokenizer.nextToken();
+	      while (files.size() < index)
+		files.add(null);
+	      if (files.size() == index)
+		files.add(file);
+	    else
+	      files.set(index, file);
+	    }
+	}
+      }
+    else if (section.equals("*L"))
+      for (;;)
+	{
+	  var id = 1;
+	  section = r.readLine();
+	  if (section == null || section.startsWith("*"))
+	    break;
+
+	  (int start, id, int repeat, int outStart, int outInc) = 
+	    parseLine(section, id);
+
+	  if (lineNumber >= outStart && lineNumber <= outStart + repeat * outInc)
+	    {
+	      // Found it!
+	      resultLine = start + (lineNumber - outStart)/outInc;
+	      resultId = id;
+
+	      if (files.get(id) != null)
+		return (notNull(files.get(id)), resultLine);
+	    }
+	}
+    else if (section.equals("*E") || section.equals("*S"))
+      // We get to the end, or to a different stratum which we don't care about
+      break;
+    else
+      // Skip until we find something interesting
+      section = r.readLine();
+  } while (true);
+
+  return (notNull(files.get(resultId)), resultLine);
+}

@@ -20,6 +20,7 @@ package nice.tools.compiler;
  */
 
 import bossa.modules;
+import nice.tools.util;
 
 void compile(Compilation compilation, String mainPackage,
 	     ?String nativeProgram = null, ?String nativeCompiler = null,
@@ -61,7 +62,8 @@ void compile(Compilation compilation, String mainPackage,
   if (uncaughtException != null)
     {
       let stackTrace = new java.io.StringWriter(500);
-      uncaughtException.printStackTrace(new java.io.PrintWriter(stackTrace));
+      uncaughtException.printStackTraceWithSourceInfo
+        (new java.io.PrintWriter(stackTrace));
 
       compilation.listener.bug
       (/*stackTrace:*/ stackTrace.toString(),

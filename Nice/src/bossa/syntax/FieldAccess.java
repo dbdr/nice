@@ -59,7 +59,7 @@ abstract class FieldAccess extends MethodDeclaration
 
   protected Field field;
   
-  public Field field()
+  protected Field field()
   {
     return field;
   }

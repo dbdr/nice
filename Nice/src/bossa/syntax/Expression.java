@@ -45,13 +45,13 @@ public abstract class Expression extends Node
    */
   final boolean isFieldAccess()
   {
-    return getAssignable() != null;
+    return getFieldAccessMethod() != null;
   }
 
   /**
    * @return the FieldAccessMethod behind this expression, or null
    */
-  Assignable getAssignable()
+  FieldAccess getFieldAccessMethod()
   {
     return null;
   }  

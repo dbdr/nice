@@ -751,8 +751,11 @@ public class Package implements mlsub.compilation.Module, Located, bossa.syntax.
       if (m.getName().equals(name)
 	  // in rare cases, the method name might have been made unique
 	  // in the bytecode by appending "$..."
+          // but names appended with "$$..." may not be matched because
+          // that are escape characters
 	  || m.getName().startsWith(name) 
-	  && m.getName().charAt(name.length()) == '$')
+	  && m.getName().charAt(name.length()) == '$'
+          && m.getName().charAt(name.length()+1) != '$')
 	{
 	  MiscAttr attr = (MiscAttr) Attribute.get(m, attribute);
 	  if (attr != null && new String(attr.data).equals(value))

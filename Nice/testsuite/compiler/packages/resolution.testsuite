@@ -66,3 +66,12 @@
   /// package a import b
   /// Toplevel
   void fooA() {}
+
+/// PASS
+  /// package a
+  /// Toplevel
+  class X {}
+  boolean `<`(X a, X b) = true;
+  boolean `<=`(X a, X b) = false;
+  /// package b import a
+  assert new X() < new X();

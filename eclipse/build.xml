@@ -24,7 +24,10 @@
   <property file="${build.properties}"/>
 
   <property name="main.package" value="nice.eclipse.core"/>
-  <property name="plugin.jar.name" value="niceplugin.jar"/>
+  <property name="plugin.jar" value="niceplugin.jar"/>
+  <property name="ant.taskdefs.jar" value="ant_taskdefs.jar"/>
+  <property name="nice.jar" value="nice.jar"/>
+
 
   <property name="src.dir" value="src"/>
   
@@ -33,12 +36,10 @@
   <property name="dist.dir" value="dist"/>
 
   <property name="plugin.id" value="net.sf.nice"/>
-  <property name="plugin.version" value="0.1.6"/>
+  <property name="plugin.version" value="0.1.7"/>
   <property name="plugin.id.version" value="${plugin.id}_${plugin.version}"/>
   <property name="plugin.dir" value="${build.dir}/${plugin.id.version}"/>
   <property name="plugin.manifest.name" value="plugin.xml"/>
-
-
 
 
 
@@ -124,7 +125,7 @@
     <nicec package="${main.package}"
       sourcepath="${src.dir}"
       destination="${build.dir}"
-      jar="${build.dir}/${plugin.jar.name}">
+      jar="${build.dir}/${plugin.jar}">
       <classpath>
         <pathelement location="${eclipse.home}/plugins/org.eclipse.core.resources_${eclipse.version}/resources.jar"/>
         <pathelement location="${eclipse.home}/plugins/org.eclipse.ui_${eclipse.version}/ui.jar"/>
@@ -143,7 +144,7 @@
       </classpath>
     </nicec>
     
-    <jar destfile="${build.dir}/${plugin.jar.name}"
+    <jar destfile="${build.dir}/${plugin.jar}"
       basedir="${src.dir}"
       update="yes"
       includes="nice/eclipse/util/Resources.properties"/>
@@ -152,21 +153,36 @@
 
 
 
+  <target name="split-ant-taskdefs">
+    <property name="tmp.dir" value="${build.dir}/tmp"/>
+    <mkdir dir="${tmp.dir}"/>
+    <property name="runtime.tmp.dir" value="${tmp.dir}/runtime"/>
+    <property name="taskdefs.tmp.dir" value="${tmp.dir}/taskdefs"/>
+    <mkdir dir="${runtime.tmp.dir}"/>
+    
+    
+    <unjar src="${nice.runtime}" dest="${runtime.tmp.dir}"/>
+    <property name="nicec.taskdef.path" value="nice/tools/ant"/>
+    
+    <jar destfile="${build.dir}/${ant.taskdefs.jar}" basedir="${runtime.tmp.dir}" includes="${nicec.taskdef.path}/Nicec.class"/>
+    <delete file="${runtime.tmp.dir}/${nicec.taskdef.path}/Nicec.class"/>
+    <jar destfile="${build.dir}/${nice.jar}" basedir="${runtime.tmp.dir}" includes="*/**" manifest="${runtime.tmp.dir}/META-INF/MANIFEST.MF"/>
+    <delete dir="${runtime.tmp.dir}"/>
+  </target>
 
 
 
 
-
-  <target name="dist" depends="compile">
+  <target name="dist" depends="compile,split-ant-taskdefs">
     <mkdir dir="${plugin.dir}"/>
-    <move file="${build.dir}/${plugin.jar.name}" todir="${plugin.dir}"/>
+    <move file="${build.dir}/${plugin.jar}" todir="${plugin.dir}"/>
     <copy file="${src.dir}/${plugin.manifest.name}" todir="${plugin.dir}"/>
     <replace file="${plugin.dir}/${plugin.manifest.name}" token="0.0.0" value="${plugin.version}"/>
     
     <property name="plugin.lib.dir" value="${plugin.dir}/lib"/>
     <mkdir dir="${plugin.lib.dir}"/>
-    <copy file="${nice.runtime}" tofile="${plugin.lib.dir}/nice.jar"/>
-
+    <move file="${build.dir}/${ant.taskdefs.jar}" todir="${plugin.lib.dir}"/>
+    <move file="${build.dir}/${nice.jar}" todir="${plugin.lib.dir}"/>
 
     <property name="plugin.tar" value="${dist.dir}/${plugin.id.version}.tar"/>
     <tar destfile="${plugin.tar}" basedir="${build.dir}" includes="${plugin.id.version}/**"/>
@@ -189,6 +205,5 @@
 
 
 </project>
-
 
 

@@ -176,4 +176,13 @@
 	</extension>  --> 
 
 
+	<!-- =================================================================================== -->
+	<!-- Extension: Nicec Ant Adapter                                                        -->
+	<!-- =================================================================================== -->
+	<extension 
+		point="org.eclipse.ant.core.extraClasspathEntries">
+		<extraClasspathEntry library="lib/ant_taskdefs.jar"/>
+	</extension> 
+
+
 </plugin>

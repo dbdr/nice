@@ -193,15 +193,21 @@ equals(x@I,y@I) = true;
 /// PASS
   Collection<String> b = new Bar();
   /// Toplevel
-class Bar<T> extends ArrayList<T>
+class Bar<T> extends AbstractList<T>
 {
   isEmpty() = false;
+
+  size() = 0;
+  get(i) = cast(null);
 }
 
-/// PASS bug
+/// PASS
   Collection<String> b = new Bar();
   /// Toplevel
-class Bar<T> extends ArrayList<T>
+class Bar<T> extends AbstractList<T>
 {
   removeAll(other@Bar) = false;
+
+  size() = 0;
+  get(i) = cast(null);
 }

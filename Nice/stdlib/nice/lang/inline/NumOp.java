@@ -12,7 +12,7 @@
 
 package nice.lang.inline;
 
-import gnu.mapping.Procedure2;
+import gnu.mapping.ProcedureN;
 import gnu.expr.*;
 import gnu.bytecode.*;
 
@@ -23,7 +23,7 @@ import gnu.bytecode.*;
    @author Daniel Bonniot
 */
 public class NumOp 
-extends Procedure2 implements Inlineable
+extends ProcedureN implements Inlineable
 {
   private final static int
     error=  0,
@@ -38,7 +38,8 @@ extends Procedure2 implements Inlineable
     XOr  =  9,
     Shl  = 10, // left shift (<<)
     Shr  = 11, // right shift (>>)
-    uShr = 12; // unsigned right shift (>>>)
+    uShr = 12, // unsigned right shift (>>>)
+    Comp = 13; // bitwise complement (~)
   
   
   public static NumOp create(String param)
@@ -63,6 +64,7 @@ extends Procedure2 implements Inlineable
     else if ("Shl".equals(param)) kind = Shl;
     else if ("Shr".equals(param)) kind = Shr;
     else if ("uShr".equals(param))kind = uShr;
+    else if ("Comp".equals(param))kind = Comp;
     else
       bossa.util.User.error("Unknown inlined numeric operator " + param);
     return new NumOp (kind, type);
@@ -82,15 +84,20 @@ extends Procedure2 implements Inlineable
     Expression[] args = exp.getArgs();
     CodeAttr code = comp.getCode();
     Target stack = new StackTarget(type);
+    args[0].compile(comp, stack);
     
     if (kind == Neg)
       {
-	args[0].compile(comp, stack);
 	code.emitNeg();
+      }
+    else if (kind == Comp) // Bitwise complement
+      {
+	// ~x == (x xor -1)
+	code.emitPushInt(-1);
+	code.emitXOr();
       }
     else if (kind >= Shl && kind <= uShr)
       {
-	args[0].compile(comp, stack);
 	args[1].compile(comp, new StackTarget(Type.long_type));
 
 	switch(kind){
@@ -101,7 +108,6 @@ extends Procedure2 implements Inlineable
       }
     else
       {
-	args[0].compile(comp, stack);
 	args[1].compile(comp, stack);
 	
 	switch(kind){
@@ -126,7 +132,7 @@ extends Procedure2 implements Inlineable
 
   // Interpretation
 
-  public Object apply2 (Object arg1, Object arg2)
+  public Object applyN (Object[] args)
   {
     throw new Error("Not implemented");
   }

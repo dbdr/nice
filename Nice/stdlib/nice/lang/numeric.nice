@@ -115,6 +115,9 @@ int  `>>>`(int , long) = inline nice.lang.inline.NumOp("iuShr");
 long `>>>`(long, long) = inline nice.lang.inline.NumOp("luShr");
 
 // bitwise operators
+int  `~`(int  x) = inline nice.lang.inline.NumOp("iComp");
+long `~`(long x) = inline nice.lang.inline.NumOp("lComp");
+
 int `&`(int, int) = inline nice.lang.inline.NumOp("iAnd");
 int `|`(int, int) = inline nice.lang.inline.NumOp("iIOr");
 int `^`(int, int) = inline nice.lang.inline.NumOp("iXOr");

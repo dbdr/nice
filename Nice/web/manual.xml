@@ -44,6 +44,14 @@
 	</para>
       </blockquote>
 
+      <blockquote>
+	<attribution>Alfred North Whitehead</attribution>
+	<para>
+	  The art of progress is to preserve order amid change 
+	  and to preserve change amid order.
+	</para>
+      </blockquote>
+
       The Nice programming language is a new object-oriented programming 
       language based on Java. 
       It incorporates features from functional programming, 
@@ -1039,44 +1047,55 @@ String concat2(Collection<String> strings)
     <section id="operators"><title>Operators</title>
       <para>
         Nice supports a wide range of operators which will be familiar to 
-        most programmers. The table below lists the operators and their
-	precedence levels.
+        most programmers. The table below lists the operators, ordered from 
+	highest precedence to lowest precedence.
       </para>
-      <table>
+      <table><title>Operators</title>
+        <tgroup cols='3'>
+
+	<thead>
+	  <row>
+	    <entry>Operator</entry>
+	    <entry>Kind</entry>
+	    <entry>Associativity</entry>
+	  </row>
+	</thead>
+
         <tbody>
+
  <!-- Lifted from http://nice.sourceforge.net/cgi-bin/twiki/view/Doc/NiceExpressions -->
-<row><entry>  <verbatim> () </verbatim>  </entry><entry align="right">   grouping  </entry><entry>  none  </entry></row>
-<row><entry>  <verbatim> [], . </verbatim>  </entry><entry>  postfix  </entry><entry>  left  </entry></row>
+<row><entry>  <literal> () </literal>  </entry><entry>   grouping  </entry><entry>  none  </entry></row>
+<row><entry>  <literal> [], . </literal>  </entry><entry>  postfix  </entry><entry>  left  </entry></row>
 
-<row><entry>  <verbatim> new </verbatim>  </entry><entry>  prefix  </entry><entry>  right </entry></row>
-<row><entry>  <verbatim> ++, -- </verbatim>  </entry><entry>  postfix  </entry><entry>  left  </entry></row>
+<row><entry>  <literal> new </literal>  </entry><entry>  prefix  </entry><entry>  right </entry></row>
+<row><entry>  <literal> ++, -- </literal>  </entry><entry>  postfix  </entry><entry>  left  </entry></row>
 
-<row><entry>  <verbatim> +, -, ++, --, ~, ! </verbatim>  </entry><entry>  prefix  </entry><entry>  right  </entry></row>
-<row><entry>  <verbatim> ** </verbatim>  </entry><entry>  binary  </entry><entry>  right  </entry></row>
+<row><entry>  <literal> +, -, ++, --, ~, ! </literal>  </entry><entry>  prefix  </entry><entry>  right  </entry></row>
+<row><entry>  <literal> ** </literal>  </entry><entry>  binary  </entry><entry>  right  </entry></row>
 
-<row><entry>  <verbatim> *, /, % </verbatim>  </entry><entry>  binary  </entry><entry>  left  </entry></row>
-<row><entry>  <verbatim> +, - </verbatim>  </entry><entry>  binary  </entry><entry>  left  </entry></row>
+<row><entry>  <literal> *, /, % </literal>  </entry><entry>  binary  </entry><entry>  left  </entry></row>
+<row><entry>  <literal> +, - </literal>  </entry><entry>  binary  </entry><entry>  left  </entry></row>
 
-<row><entry>  <verbatim> &lt;&lt;, &gt;&gt;, &gt;&gt;&gt; </verbatim>  </entry><entry>  binary  </entry><entry>  left  </entry></row>
-<row><entry>  <verbatim> .. </verbatim>  </entry><entry>  binary  </entry><entry>  left  </entry></row>
+<row><entry>  <literal> &lt;&lt;, &gt;&gt;, &gt;&gt;&gt; </literal>  </entry><entry>  binary  </entry><entry>  left  </entry></row>
+<row><entry>  <literal> .. </literal>  </entry><entry>  binary  </entry><entry>  left  </entry></row>
 
-<row><entry>  <verbatim>  &lt;, &lt;=, &gt;, &gt;= </verbatim>  </entry><entry>  binary  </entry><entry>  both  </entry></row>
-<row><entry>  <verbatim> instanceof </verbatim>  </entry><entry>  binary  </entry><entry>  left  </entry></row>
+<row><entry>  <literal>  &lt;, &lt;=, &gt;, &gt;= </literal>  </entry><entry>  binary  </entry><entry>  both  </entry></row>
+<row><entry>  <literal> instanceof </literal>  </entry><entry>  binary  </entry><entry>  left  </entry></row>
 
-<row><entry>  <verbatim> <code>=, !</code> </verbatim>  </entry><entry>  binary  </entry><entry>  left  </entry></row>
-<row><entry>  <verbatim> &amp; </verbatim>  </entry><entry>  binary  </entry><entry>  left  </entry></row>
+<row><entry>  <literal> =, ! </literal>  </entry><entry>  binary  </entry><entry>  left  </entry></row>
+<row><entry>  <literal> &amp; </literal>  </entry><entry>  binary  </entry><entry>  left  </entry></row>
 
-<row><entry>  <verbatim> ^ </verbatim>  </entry><entry>  binary  </entry><entry>  left  </entry></row>
-<row><entry>  _  </entry><entry>  binary  </entry><entry>  left  </entry></row>
-<row><entry>  <verbatim> &amp;&amp; </verbatim>  </entry><entry>  binary  </entry><entry>  left  </entry></row>
+<row><entry>  <literal> ^ </literal>  </entry><entry>  binary  </entry><entry>  left  </entry></row>
+<row><entry>  <literal> | </literal>  </entry><entry>  binary  </entry><entry>  left  </entry></row>
+<row><entry>  <literal> &amp;&amp; </literal>  </entry><entry>  binary  </entry><entry>  left  </entry></row>
 
-<row><entry>  <verbatim> __ </verbatim>  </entry><entry>  binary  </entry><entry>  left  </entry></row>
-<row><entry>  <verbatim> ?: </verbatim>  </entry><entry>  ternary  </entry><entry>  right  </entry></row>
+<row><entry>  <literal> || </literal>  </entry><entry>  binary  </entry><entry>  left  </entry></row>
+<row><entry>  <literal> ?: </literal>  </entry><entry>  ternary  </entry><entry>  right  </entry></row>
 
-<row><entry>  <verbatim> =&gt; </verbatim>  </entry><entry>  binary  </entry><entry>  right  </entry></row>
-<row><entry>  <verbatim> *=, /=, %=, +=, -=, &amp;=, ^=, _=, &lt;&lt;=, &gt;&gt;=, &gt;&gt;&gt;=, = </verbatim>  </entry><entry>  binary  </entry><entry>  right  </entry></row>
+<row><entry>  <literal> =&gt; </literal>  </entry><entry>  binary  </entry><entry>  right  </entry></row>
+<row><entry>  <literal> *=, /=, %=, +=, -=, &amp;=, ^=, _=, &lt;&lt;=, &gt;&gt;=, &gt;&gt;&gt;=, = </literal>  </entry><entry>  binary  </entry><entry>  right  </entry></row>
         </tbody>
-
+	</tgroup>
       </table>
     </section>
 

@@ -9,3 +9,8 @@
   /// Toplevel
 class NBeanContextServicesListener 
   implements java.beans.beancontext.BeanContextServicesListener {}
+
+/// FAIL
+  /// Toplevel
+// java.util.Map is already retyped, with two type parameters
+interface MyMutableArray<Element> = native java.util.Map;

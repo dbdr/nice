@@ -41,6 +41,10 @@ int overload1(int, int) = 2;
 int overload2(int, int) = 2;
 int overload2(int) = 1;
 
+// Create two functions that have the same name and bytecode type
+byte clash(Sequence<byte> l) = l[0];
+boolean clash(Sequence<boolean> l) = l[0];
+
 class Multi
 {
   alike polymorphic1() = this;

@@ -688,8 +688,7 @@ public class NiceClass extends ClassDefinition.ClassImplementation
       }
 
     List res = new ArrayList(constructors.size());
-    int n = 0;
-    for (Iterator i = constructors.iterator(); i.hasNext(); n++)
+    for (Iterator i = constructors.iterator(); i.hasNext();)
       {
 	MethodDeclaration.Symbol m = (MethodDeclaration.Symbol) i.next();
 	List params = new ArrayList(10);

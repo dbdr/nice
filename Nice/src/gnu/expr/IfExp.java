@@ -93,12 +93,12 @@ public class IfExp extends Expression
       ctarget.trueBranchComesFirst = false;
     test.compile(comp, ctarget);
     code.emitIfThen();
-    if (! trueInherited /* && trueLabel.hasFixups()*/)
+    if (! trueInherited && trueLabel.hasFixups())
       {
 	trueLabel.define(code);
 	then_clause.compileWithPosition(comp, target);
       }
-    if (! falseInherited /* && falseLabel.hasFixups()*/)
+    if (! falseInherited && falseLabel.hasFixups())
       {
 	code.emitElse();
 	falseLabel.define(code);

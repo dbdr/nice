@@ -18,7 +18,7 @@
 
 <project default="dist" basedir=".">
 
-  <property name="plugin.version" value="0.1.10"/>
+  <property name="plugin.version" value="0.1.11"/>
 
 
   <property name="build.properties" value="nice_plugin_build.properties"/>

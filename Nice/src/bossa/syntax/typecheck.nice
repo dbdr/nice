@@ -121,7 +121,7 @@ typecheck(e@CallExp)
 
 typecheck(e@FunExp)
 {
-  Function saved = notNull(Node.getCurrentFunction());
+  ?Function saved = Node.getCurrentFunction();
   Node.setCurrentFunction(e);
   typecheck(e.body);
   Node.setCurrentFunction(saved);

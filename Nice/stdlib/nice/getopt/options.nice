@@ -49,6 +49,7 @@ abstract class Option
   char shortName;
   String longName;
   String purpose;
+  char optval = '\0'; 
 
   boolean visible;
 }

@@ -8,8 +8,12 @@ set -e
 if [ "$1" != "updated" ]; then
     # We first update the tester code, then start a new copy of this file
     # (since it might have been updated).
-    cvs update
-    exec "$0" updated
+    if cvs update; then
+	exec "$0" updated
+    else
+	echo "Update of the tester code failed. Exiting."
+	exit 1
+    fi
 fi
 
 # Set up variables, that can be overriden in the setup file.
@@ -35,6 +39,8 @@ cd builds
 export NICEC=${PWD}/Nice/bin/nicec
 export NICE_JAR=${PWD}/Nice/share/java/nice.jar
 
+ORIGINAL_PATH="$PATH"
+
 # We run the whole set of tests once per configuration.
 # This means that the test scripts must first clean up the tree, 
 # to really rebuild the application.
@@ -42,6 +48,8 @@ export NICE_JAR=${PWD}/Nice/share/java/nice.jar
 for conffile in ../config.*; do
     name="`expr match $conffile '../config\.\(.*\)'`"
     . $conffile
+
+    PATH="$JAVA_HOME/bin:$ORIGINAL_PATH"
 
     config=$machine:$name
 

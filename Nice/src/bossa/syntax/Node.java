@@ -94,6 +94,8 @@ abstract public class Node
    */
   List addChildren(List c)
   {
+    // OPTIM: do not allocate each time, but beware sharing an empty list
+    //        as some client might modify it.
     if(c==null) return new LinkedList();
     for(Iterator i = c.iterator(); i.hasNext();)
       addChild((Node) i.next());

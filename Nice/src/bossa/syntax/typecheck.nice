@@ -686,7 +686,7 @@ typecheck(decl@Block.LocalVariable)
   MonoSymbol target = notNull(decl.left());
 
   if (! target.used)
-    bossa.util.User.warning(decl, " Unused local variable "  + target.name);
+    bossa.util.User.warning(decl, "Unused local variable "  + target.name);
 
   ?Expression value = decl.value;
   if (value == null)

@@ -210,8 +210,8 @@ public class NiceClass extends ClassDefinition.ClassImplementation
    * Type checking
    ****************************************************************/
 
-  void typecheck() 
-  { 
+  void typecheck()
+  {
     try {
       for (int i = 0; i < fields.length; i++)
 	fields[i].typecheck(this);

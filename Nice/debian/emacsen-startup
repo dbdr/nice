@@ -16,5 +16,5 @@
 			      "/site-lisp/nice") load-path))
 
 
-(setq auto-mode-alist (cons '("\\.nice$" . nice-mode) auto-mode-alist))
+(setq auto-mode-alist (cons '("\\.nicei?$" . nice-mode) auto-mode-alist))
 (autoload 'nice-mode "nice-mode" "Major mode for editing Nice code." t)

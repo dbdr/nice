@@ -12,7 +12,7 @@
 
 // File    : parser.jj
 // Created : Thu Jul 01 10:27:05 1999 by bonniot
-//$Modified: Mon Oct 02 13:41:39 2000 by Daniel Bonniot $
+//$Modified: Tue Oct 03 16:02:21 2000 by Daniel Bonniot $
 // Description : Parseur JavaCC pour Nice
 //   Tokens based on the Jazz parser
 
@@ -141,7 +141,7 @@ TOKEN: /* Operators */
 | < GT:      ">"   >
 | < LAND:    "&&"  >
 | < LOR:     "||"  >
-| < LSHIFT:  "<<"  >
+//| < LSHIFT:  "<<"  >
 // RSHIFT is not a token: operator >> is made of two consecutive tokens ">"
 }
 

@@ -103,3 +103,13 @@ double `-`(double, double) = inline nice.tools.code.NumericalOperators("dSub");
 float `-`(float, float) = inline nice.tools.code.NumericalOperators("fSub");
 long `-`(long, long) = inline nice.tools.code.NumericalOperators("jSub");
 int `-`(int, int) = inline nice.tools.code.NumericalOperators("iSub");
+
+// shift
+int  `<<`(int , long) = inline nice.tools.code.NumericalOperators("iShl");
+long `<<`(long, long) = inline nice.tools.code.NumericalOperators("jShl");
+
+int  `>>`(int , long) = inline nice.tools.code.NumericalOperators("iShr");
+long `>>`(long, long) = inline nice.tools.code.NumericalOperators("jShr");
+
+int  `>>>`(int , long) = inline nice.tools.code.NumericalOperators("iuShr");
+long `>>>`(long, long) = inline nice.tools.code.NumericalOperators("juShr");

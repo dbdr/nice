@@ -31,7 +31,10 @@ public class NumericalOperators extends Procedure2 implements Inlineable
     Mul = 3,
     Div = 4,
     Rem = 5, // remainder (modulus)
-    Neg = 6; // negation (unary -)
+    Neg = 6, // negation (unary -)
+    Shl = 7, // left shift (<<)
+    Shr = 8, // right shift (>>)
+    uShr= 9; // unsigned right shift (>>>)
   
 
   public static NumericalOperators create(String param)
@@ -65,6 +68,12 @@ public class NumericalOperators extends Procedure2 implements Inlineable
       kind = Rem;
     else if ("Neg".equals(param))
       kind = Neg;
+    else if ("Shl".equals(param))
+      kind = Shl;
+    else if ("Shr".equals(param))
+      kind = Shr;
+    else if ("uShr".equals(param))
+      kind = uShr;
     else
       bossa.util.User.error("Unknown inlined numeric operator " + param);
     return new NumericalOperators(kind, type);
@@ -89,6 +98,17 @@ public class NumericalOperators extends Procedure2 implements Inlineable
       {
 	args[0].compile(comp, stack);
 	code.emitNeg();
+      }
+    else if (kind >= Shl && kind <= uShr)
+      {
+	args[0].compile(comp, stack);
+	args[1].compile(comp, new StackTarget(Type.long_type));
+
+	switch(kind){
+	case Shl: code.emitShl(); break;
+	case Shr: code.emitShr(); break;
+	case uShr: code.emitUshr(); break;
+	}
       }
     else
       {

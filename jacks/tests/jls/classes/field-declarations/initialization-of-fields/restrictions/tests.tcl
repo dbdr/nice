@@ -52,6 +52,30 @@ tcltest::test 8.3.2.3-illegal-forward-instance-6 { Simple usage before
     }
 } FAIL
 
+tcltest::test 8.3.2.3-illegal-forward-instance-7 { Reading a variable is not
+        legal before declaration, even if it was assigned before declaration } {
+    empty_class T8323ifi7 {
+        int i = (i = 1) + i;
+    }
+} FAIL
+
+tcltest::test 8.3.2.3-illegal-forward-instance-8 { Reading a variable is not
+        legal before declaration, even if it was assigned before declaration } {
+    empty_class T8323ifi8 {
+        int j = i = 1;
+        int i = i;
+    }
+} FAIL
+
+tcltest::test 8.3.2.3-illegal-forward-instance-9 { Reading a variable is not
+        legal before declaration, even if it was assigned before declaration } {
+    empty_class T8323ifi9 {
+	int j = i = 1;
+	int k = i;
+	int i;
+    }
+} FAIL
+
 tcltest::test 8.3.2.3-legal-forward-instance-1 { Simple usage before
         declaration legal if 1. not in initializer; 2. simple assignment;
         or 3. not in declaring class } {
@@ -158,18 +182,12 @@ tcltest::test 8.3.2.3-legal-forward-instance-11 { Simple usage before
     }
 } PASS
 
-tcltest::test 8.3.2.3-legal-forward-instance-12 { In a variable's initializer,
-        use is legal if it is definitely assigned } {
+tcltest::test 8.3.2.3-legal-forward-instance-12 { Simple usage before
+        declaration legal if 1. not in initializer; 2. simple assignment;
+        or 3. not in declaring class } {
     empty_class T83231fi12 {
-        int i = (i = 1) + i; // definitely assigned before use
-    }
-} PASS
-
-tcltest::test 8.3.2.3-legal-forward-instance-13 { In a variable's initializer,
-        use is legal if it is definitely assigned } {
-    empty_class T83231fi13 {
         int j = i = 1;
-        int i = i; // definitely assigned before use
+        final int i;
     }
 } PASS
 
@@ -225,6 +243,46 @@ tcltest::test 8.3.2.3-illegal-forward-static-6 { Simple usage before
         static { j++; }
         static int j = 1;
     }
+} FAIL
+
+
+tcltest::test 8.3.2.3-illegal-forward-static-7 { Reading a variable is not
+        legal before declaration, even if it was assigned before declaration } {
+    empty_class T8323ifs7 {
+        static int i = (i = 1) + i;
+    }
+} FAIL
+
+tcltest::test 8.3.2.3-illegal-forward-static-8 { Reading a variable is not
+        legal before declaration, even if it was assigned before declaration } {
+    empty_class T8323ifs8 {
+        static int j = i = 1;
+        static int i = i;
+    }
+} FAIL
+
+tcltest::test 8.3.2.3-illegal-forward-static-9 { Reading a variable is not
+        legal before declaration, even if it was assigned before declaration } {
+    empty_class T8323ifs9 {
+	static int j = i = 1;
+	static int k = i;
+	static int i;
+    }
+} FAIL
+
+tcltest::test 8.3.2.3-illegal-forward-static-10 { Reading a variable is not
+        legal before declaration, even though other classes may trigger
+        out-of-order reads } {
+    compile [saveas T8323ifs10a.java {
+class T8323ifs10a {
+    int k = T8323ifs10b.i;
+}
+    }] [saveas T8323ifs10b.java {
+class T8323ifs10b {
+    static final int i = j;
+    static int j;
+}
+    }]
 } FAIL
 
 tcltest::test 8.3.2.3-legal-forward-static-1 { Simple usage before
@@ -300,18 +358,12 @@ tcltest::test 8.3.2.3-legal-forward-static-8 { Simple usage before
     }
 } PASS
 
-tcltest::test 8.3.2.3-legal-forward-static-9 { In a variable's initializer,
-        use is legal if it is definitely assigned } {
+tcltest::test 8.3.2.3-legal-forward-static-9 { Simple usage before
+        declaration legal if 1. not in initializer; 2. simple assignment;
+        or 3. not in declaring class } {
     empty_class T83231fs9 {
-        static int i = (i = 1) + i; // definitely assigned before use
-    }
-} PASS
-
-tcltest::test 8.3.2.3-legal-forward-static-10 { In a variable's initializer,
-        use is legal if it is definitely assigned } {
-    empty_class T83231fs10 {
-        static int j = i = 1;
-        static int i = i; // definitely assigned before use
+	static int j = i = 1;
+	static final int i;
     }
 } PASS
 

@@ -615,3 +615,16 @@ tcltest::test 5.2-array-error-3 { Assignment conversion cannot
     }
 } FAIL
 
+tcltest::test 5.2-array-error-4 { Assignment conversion cannot
+        assign a array with a different primitive base type} {
+    empty_main T52ae4 {
+        int[] i = new short[0];
+    }
+} FAIL
+
+tcltest::test 5.2-array-error-5 { Assignment conversion cannot
+        assign a array with a primitive base type to an object array} {
+    empty_main T52ae5 {
+        Object[] i = new int[0];
+    }
+} FAIL

@@ -72,6 +72,27 @@ tcltest::test 9.3-modifier-16 { Stress test } {
     }
 } FAIL
 
+tcltest::test 9.3-modifier-17 { static public is legal, though redundant and
+        not in the preferred order } {
+    ok_pass_or_warn [empty_class T93m17 {
+	interface I { static public int i = 1; }
+    }]
+} OK
+
+tcltest::test 9.3-modifier-18 { final public is legal, though redundant and
+        not in the preferred order } {
+    ok_pass_or_warn [empty_class T93m18 {
+	interface I { final public int i = 1; }
+    }]
+} OK
+
+tcltest::test 9.3-modifier-19 { final static is legal, though redundant and
+        not in the preferred order } {
+    ok_pass_or_warn [empty_class T93m19 {
+	interface I { final static int i = 1; }
+    }]
+} OK
+
 tcltest::test 9.3-conflict-1 { An interface may not declare the same field
         twice } {
     empty_class T93c1 "interface I { int i = 1; int i = 2; }"

@@ -183,6 +183,19 @@ tcltest::test 15.18.1-double-13 { conversion of double to String prints the
             {"" + 1e-322 == "9.9E-323"}
 } PASS
 
+tcltest::test 15.18.1-boolean-1 { conversion of boolean to String } {
+    constant_expression T15181b1 \
+            {"" + true == "true"} \
+            {"" + false == "false"}
+} PASS
+
+tcltest::test 15.18.1-boolean-2 { conversion of boolean to String } {
+    empty_main T15181b2 {
+        String s1 = "" + true;
+        String s2 = "" + false;
+    }
+} PASS
+
 tcltest::test 15.18.1-valid-1 { String + null type is valid } {
     empty_main T15181v1 {
         boolean b = true;
@@ -190,6 +203,69 @@ tcltest::test 15.18.1-valid-1 { String + null type is valid } {
     }
 } PASS
 
+tcltest::test 15.18.1-valid-2 { String + primitive is valid } {
+    empty_main T15181v2 {
+        boolean b = true;
+        String s1 = "" + b;
+        String s2 = b + "";
+    }
+} PASS
+
+tcltest::test 15.18.1-valid-3 { String + primitive is valid } {
+    empty_main T15181v3 {
+        byte b = 1;
+        String s1 = "" + b;
+        String s2 = b + "";
+    }
+} PASS
+
+tcltest::test 15.18.1-valid-4 { String + primitive is valid } {
+    empty_main T15181v4 {
+        short s = 1;
+        String s1 = "" + s;
+        String s2 = s + "";
+    }
+} PASS
+
+tcltest::test 15.18.1-valid-5 { String + primitive is valid } {
+    empty_main T15181v5 {
+        char c = 1;
+        String s1 = "" + c;
+        String s2 = c + "";
+    }
+} PASS
+
+tcltest::test 15.18.1-valid-6 { String + primitive is valid } {
+    empty_main T15181v6 {
+        int i = 1;
+        String s1 = "" + i;
+        String s2 = i + "";
+    }
+} PASS
+
+tcltest::test 15.18.1-valid-7 { String + primitive is valid } {
+    empty_main T15181v7 {
+        long l = 1;
+        String s1 = "" + l;
+        String s2 = l + "";
+    }
+} PASS
+
+tcltest::test 15.18.1-valid-8 { String + primitive is valid } {
+    empty_main T15181v8 {
+        float f = 1;
+        String s1 = "" + f;
+        String s2 = f + "";
+    }
+} PASS
+
+tcltest::test 15.18.1-valid-9 { String + primitive is valid } {
+    empty_main T15181v9 {
+        double d = 1;
+        String s1 = "" + d;
+        String s2 = d + "";
+    }
+} PASS
 
 tcltest::test 15.18.1-non-const-1 { runtime concatenation } {
     empty_main T15181nc1 {
@@ -257,3 +333,10 @@ tcltest::test 15.18.1-non-const-9 { concatenation of empty string } {
     }
 } PASS
 
+tcltest::test 15.18.1-non-const-10 { jikes had an optimization of string appends
+        which resulted in an assertion failure. Bug id 2919. } {
+    empty_class T15181nc10 {
+	private final static String s = val() + 'a' + "bcde";
+	static String val () { return null; }
+    }
+} PASS

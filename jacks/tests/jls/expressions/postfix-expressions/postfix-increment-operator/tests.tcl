@@ -34,6 +34,11 @@ tcltest::test 15.14.1-argument-9 { Postfix++ cannot operate on final variable } 
     empty_class T15141a9 {final int i = 1, j = i++;}
 } FAIL
 
+tcltest::test 15.14.1-argument-10 { Postfix++ must operate on a numeric
+        variable, parenthesis may now surround variables } {
+    ok_pass_or_warn [empty_class T15141a10 {int i = 1, j = (i)++;} ]
+} OK
+
 
 tcltest::test 15.14.1-type-1 { Postfix++ operates on all numeric types } {
     empty_class T15141t1 {byte b = 1, b2 = b++;}
@@ -65,11 +70,40 @@ tcltest::test 15.14.1-type-7 { Postfix++ operates on all numeric types } {
 
 
 tcltest::test 15.14.1-result-1 { Postfix++ results in a value, not a variable } {
-    empty_class T15141r1 {
-void foo() {
-    int i = 1;
-    i++ = 2;
-}   }
+    empty_main T15141r1 {
+        int i = 1;
+        i++ = 2;
+    }
 } FAIL
 
+tcltest::test 15.14.1-result-2 { Postfix++ results in a value, not a variable } {
+    empty_main T15141r2 {
+        int i = 1;
+        (i++)++;
+    }
+} FAIL
+
+tcltest::test 15.14.1-final-1 { Postfix++ cannot be applied to a final } {
+    empty_class T15141f1 {
+	final int i;
+	int j = i++;
+    }
+} FAIL
+
+tcltest::test 15.14.1-final-2 { Postfix++ cannot be applied to a final } {
+    empty_main T15141f2 {
+	final int i;
+	if (false)
+	    i++;
+    }
+} FAIL
+
+tcltest::test 15.14.1-final-3 { Postfix++ cannot be applied to a final } {
+    empty_class T15141f3 {
+	void m(final int i) {
+	    if (false)
+	        i++;
+	}
+    }
+} FAIL
 

@@ -46,6 +46,32 @@ class T15262s4 {
     }]
 } FAIL
 
+tcltest::test 15.26.2-string-5 { test String += when right side is not String,
+        jikes bug 3066 } {
+    empty_main T15262s5 {
+	String s = "";
+	s += true;
+	s += 1;
+	s += '1';
+	s += 1L;
+	s += 1.0f;
+	s += 1.0;
+    }
+} PASS
+
+tcltest::test 15.26.2-string-6 { test String += when right side is not String,
+        jikes bug 3066 } {
+    empty_main T15262s5 {
+	String s = "";
+	s += true + s;
+	s += 1 + s;
+	s += '1' + s;
+	s += 1L + s;
+	s += 1.0f + s;
+	s += 1.0 + s;
+    }
+} PASS
+
 # Test *=
 tcltest::test 15.26.2-mult-1 { test legal identity *= assignments } {
     empty_main T15262mult1 {
@@ -138,12 +164,12 @@ tcltest::test 15.26.2-mult-11 { test illegal *= assignments: non-variable } {
 } FAIL
 
 tcltest::test 15.26.2-mult-12 { test illegal *= assignments: parenthesized
-        expressions are not variables } {
-    empty_main T15262mult12 {
+        expressions can now be variables } {
+    ok_pass_or_warn [empty_main T15262mult12 {
 	int i = 1;
 	(i) *= 1;
-    }
-} FAIL
+    }]
+} OK
 
 tcltest::test 15.26.2-mult-13 { test widening *= assignments } {
     empty_main T15262mult13 {
@@ -303,12 +329,12 @@ tcltest::test 15.26.2-div-11 { test illegal /= assignments: non-variable } {
 } FAIL
 
 tcltest::test 15.26.2-div-12 { test illegal /= assignments: parenthesized
-        expressions are not variables } {
-    empty_main T15262div12 {
+        expressions can now be variables } {
+    ok_pass_or_warn [empty_main T15262div12 {
 	int i = 1;
 	(i) /= 1;
-    }
-} FAIL
+    }]
+} OK
 
 tcltest::test 15.26.2-div-13 { test widening /= assignments } {
     empty_main T15262div13 {
@@ -524,12 +550,12 @@ tcltest::test 15.26.2-mod-11 { test illegal %= assignments: non-variable } {
 } FAIL
 
 tcltest::test 15.26.2-mod-12 { test illegal %= assignments: parenthesized
-        expressions are not variables } {
-    empty_main T15262mod12 {
+        expressions can now be variables } {
+    ok_pass_or_warn [empty_main T15262mod12 {
 	int i = 1;
 	(i) %= 1;
-    }
-} FAIL
+    }]
+} OK
 
 tcltest::test 15.26.2-mod-13 { test widening %= assignments } {
     empty_main T15262mod13 {
@@ -746,12 +772,12 @@ tcltest::test 15.26.2-add-11 { test illegal += assignments: non-variable } {
 } FAIL
 
 tcltest::test 15.26.2-add-12 { test illegal += assignments: parenthesized
-        expressions are not variables } {
-    empty_main T15262add12 {
+        expressions can now be variables } {
+    ok_pass_or_warn [empty_main T15262add12 {
 	int i = 1;
 	(i) += 1;
-    }
-} FAIL
+    }]
+} OK
 
 tcltest::test 15.26.2-add-13 { test widening += assignments } {
     empty_main T15262add13 {
@@ -911,12 +937,12 @@ tcltest::test 15.26.2-sub-11 { test illegal -= assignments: non-variable } {
 } FAIL
 
 tcltest::test 15.26.2-sub-12 { test illegal -= assignments: parenthesized
-        expressions are not variables } {
-    empty_main T15262sub12 {
+        expressions can now be variables } {
+    ok_pass_or_warn [empty_main T15262sub12 {
 	int i = 1;
 	(i) -= 1;
-    }
-} FAIL
+    }]
+} OK
 
 tcltest::test 15.26.2-sub-13 { test widening -= assignments } {
     empty_main T15262sub13 {
@@ -1072,12 +1098,12 @@ tcltest::test 15.26.2-left-shift-11 { test illegal <<= assignments: non-variable
 } FAIL
 
 tcltest::test 15.26.2-left-shift-12 { test illegal <<= assignments: parenthesized
-        expressions are not variables } {
-    empty_main T15262ls12 {
+        expressions can now be variables } {
+    ok_pass_or_warn [empty_main T15262ls12 {
 	int i = 1;
 	(i) <<= 1;
-    }
-} FAIL
+    }]
+} OK
 
 tcltest::test 15.26.2-left-shift-13 { test widening <<= assignments } {
     empty_main T15262ls13 {
@@ -1235,12 +1261,12 @@ tcltest::test 15.26.2-signed-right-shift-11 { test illegal >>= assignments: non-
 } FAIL
 
 tcltest::test 15.26.2-signed-right-shift-12 { test illegal >>= assignments: parenthesized
-        expressions are not variables } {
-    empty_main T15262srs12 {
+        expressions can now be variables } {
+    ok_pass_or_warn [empty_main T15262srs12 {
 	int i = 1;
 	(i) >>= 1;
-    }
-} FAIL
+    }]
+} OK
 
 tcltest::test 15.26.2-signed-right-shift-13 { test widening >>= assignments } {
     empty_main T15262srs13 {
@@ -1398,12 +1424,12 @@ tcltest::test 15.26.2-unsigned-right-shift-11 { test illegal >>>= assignments: n
 } FAIL
 
 tcltest::test 15.26.2-unsigned-right-shift-12 { test illegal >>>= assignments: parenthesized
-        expressions are not variables } {
-    empty_main T15262urs12 {
+        expressions can now be variables } {
+    ok_pass_or_warn [empty_main T15262urs12 {
 	int i = 1;
 	(i) >>>= 1;
-    }
-} FAIL
+    }]
+} OK
 
 tcltest::test 15.26.2-unsigned-right-shift-13 { test widening >>>= assignments } {
     empty_main T15262urs13 {
@@ -1563,12 +1589,12 @@ tcltest::test 15.26.2-and-11 { test illegal &= assignments: non-variable } {
 } FAIL
 
 tcltest::test 15.26.2-and-12 { test illegal &= assignments: parenthesized
-        expressions are not variables } {
-    empty_main T15262and12 {
+        expressions can now be variables } {
+    ok_pass_or_warn [empty_main T15262and12 {
 	int i = 1;
 	(i) &= 1;
-    }
-} FAIL
+    }]
+} OK
 
 tcltest::test 15.26.2-and-13 { test widening &= assignments } {
     empty_main T15262and13 {
@@ -1728,12 +1754,12 @@ tcltest::test 15.26.2-xor-11 { test illegal ^= assignments: non-variable } {
 } FAIL
 
 tcltest::test 15.26.2-xor-12 { test illegal ^= assignments: parenthesized
-        expressions are not variables } {
-    empty_main T15262xor12 {
+        expressions can now be variables } {
+    ok_pass_or_warn [empty_main T15262xor12 {
 	int i = 1;
 	(i) ^= 1;
-    }
-} FAIL
+    }]
+} OK
 
 tcltest::test 15.26.2-xor-13 { test widening ^= assignments } {
     empty_main T15262xor13 {
@@ -1893,12 +1919,12 @@ tcltest::test 15.26.2-or-11 { test illegal |= assignments: non-variable } {
 } FAIL
 
 tcltest::test 15.26.2-or-12 { test illegal |= assignments: parenthesized
-        expressions are not variables } {
-    empty_main T15262or12 {
+        expressions can now be variables } {
+    ok_pass_or_warn [empty_main T15262or12 {
 	int i = 1;
 	(i) |= 1;
-    }
-} FAIL
+    }]
+} OK
 
 tcltest::test 15.26.2-or-13 { test widening |= assignments } {
     empty_main T15262or13 {
@@ -1968,3 +1994,204 @@ tcltest::test 15.26.2-or-18 { test illegal |= assignments: double variable } {
     }
 } FAIL
 
+tcltest::test 15.26.2-variable-1 { the left-hand side must be a variable } {
+    empty_main T15262var1 {
+        int.class += "oops";
+    }
+} FAIL
+
+tcltest::test 15.26.2-variable-2 { the left-hand side must be a variable } {
+    empty_main T15262var2 {
+        (int.class) += "oops";
+    }
+} FAIL
+
+tcltest::test 15.26.2-variable-3 { the left-hand side must be a variable } {
+    empty_main T15262var3 {
+        this += "oops";
+    }
+} FAIL
+
+tcltest::test 15.26.2-variable-4 { the left-hand side must be a variable } {
+    empty_main T15262var4 {
+        (this) += "oops";
+    }
+} FAIL
+
+tcltest::test 15.26.2-variable-5 { the left-hand side must be a variable } {
+    empty_main T15262var5 {
+        new String() += "oops";
+    }
+} FAIL
+
+tcltest::test 15.26.2-variable-6 { the left-hand side must be a variable } {
+    empty_main T15262var6 {
+        (new String()) += "oops";
+    }
+} FAIL
+
+tcltest::test 15.26.2-variable-7 { the left-hand side must be a variable } {
+    empty_main T15262var7 {
+        java.lang.String += "oops";
+    }
+} FAIL
+
+
+tcltest::test 15.26.2-variable-8 { the left-hand side must be a variable } {
+    empty_main T15262var8 {
+        (java.lang.String) += "oops";
+    }
+} FAIL
+
+tcltest::test 15.26.2-variable-9 { the left-hand side must be a variable } {
+    empty_class T15262var9 {
+        void bar() {}
+        void foo() {
+            bar() += "oops";
+        }
+    }
+} FAIL
+
+tcltest::test 15.26.2-variable-10 { the left-hand side must be a variable } {
+    empty_class T15262var10 {
+        void bar() {}
+        void foo() {
+            (bar()) += "oops";
+        }
+    }
+} FAIL
+
+tcltest::test 15.26.2-variable-11 { the left-hand side must be a variable } {
+    empty_class T15262var11 {
+        String bar() { return ""; }
+        void foo() {
+            bar() += "oops";
+        }
+    }
+} FAIL
+
+tcltest::test 15.26.2-variable-12 { the left-hand side must be a variable } {
+    empty_class T15262var12 {
+        String bar() { return ""; }
+        void foo() {
+            (bar()) += "oops";
+        }
+    }
+} FAIL
+
+tcltest::test 15.26.2-variable-13 { the left-hand side must be a variable } {
+    empty_main T15262var13 {
+        int i = 1;
+        i++ += 1;
+    }
+} FAIL
+
+tcltest::test 15.26.2-variable-14 { the left-hand side must be a variable } {
+    empty_main T15262var14 {
+        int i = 1;
+        (i++) += 1;
+    }
+} FAIL
+
+tcltest::test 15.26.2-variable-15 { the left-hand side must be a variable } {
+    empty_main T15262var15 {
+        int i = 1;
+        --i += 1;
+    }
+} FAIL
+
+tcltest::test 15.26.2-variable-16 { the left-hand side must be a variable } {
+    empty_main T15262var16 {
+        intn i = 1;
+        (--i) += 1;
+    }
+} FAIL
+
+tcltest::test 15.26.2-variable-17 { the left-hand side must be a variable } {
+    empty_main T15262var17 {
+        "" instanceof String += "oops";
+    }
+} FAIL
+
+tcltest::test 15.26.2-variable-18 { the left-hand side must be a variable } {
+    empty_main T15262var18 {
+        ("" instanceof String) += "oops";
+    }
+} FAIL
+
+tcltest::test 15.26.2-variable-19 { the left-hand side must be a variable } {
+    empty_main T15262var19 {
+        int i = 1;
+        i + i += 1;
+    }
+} FAIL
+
+tcltest::test 15.26.2-variable-20 { the left-hand side must be a variable } {
+    empty_main T15262var20 {
+        int i = 1;
+        (i + i) += 1;
+    }
+} FAIL
+
+tcltest::test 15.26.2-variable-21 { the left-hand side must be a variable } {
+    empty_main T15262var21 {
+        int i = 1;
+        (i += 1) += 1;
+    }
+} FAIL
+
+tcltest::test 15.26.2-variable-22 { the left-hand side must be a variable } {
+    empty_main T15262var22 {
+        1 += 1;
+    }
+} FAIL
+
+tcltest::test 15.26.2-variable-23 { the left-hand side must be a variable } {
+    empty_main T15262var23 {
+        (1) += 1;
+    }
+} FAIL
+
+tcltest::test 15.26.2-variable-24 { the left-hand side must be a variable } {
+    empty_main T15262var24 {
+        null += "oops";
+    }
+} FAIL
+
+tcltest::test 15.26.2-variable-25 { the left-hand side must be a variable } {
+    empty_main T15262var25 {
+        (null) += "oops";
+    }
+} FAIL
+
+tcltest::test 15.26.2-variable-26 { the left-hand side must be a variable } {
+    empty_main T15262var26 {
+        true += "oops";
+    }
+} FAIL
+
+tcltest::test 15.26.2-variable-27 { the left-hand side must be a variable } {
+    empty_main T15262var27 {
+        (true) += "oops";
+    }
+} FAIL
+
+tcltest::test 15.26.2-variable-28 { the left-hand side must be a variable } {
+    empty_main T15262var28 {
+        "" += "oops";
+    }
+} FAIL
+
+tcltest::test 15.26.2-variable-29 { the left-hand side must be a variable } {
+    empty_main T15262var29 {
+        ("") += "oops";
+    }
+} FAIL
+
+tcltest::test 15.26.2-associative-1 { assignment is right-associative } {
+    empty_main T15262assoc1 {
+        int i = 1;
+        i += i += 1;
+        i += (i += 1);
+    }
+} PASS

@@ -39,9 +39,9 @@ tcltest::test 9.2-implicit-5 { An interface may redeclare a non-final method
     empty_class T92i5 "interface I { String toString() throws Error; }"
 } PASS
 
-# These next few tests are debatable, since the JLS claims interfaces do
-# not have the protected methods clone() or finalize(), but the JVMS
-# implements interfaces as true subtypes of Object.
+# These next few tests are somewhat debatable going by the JLS alone, since
+# the JVMS implements interfaces as true subtypes of Object. But Sun has
+# issued further clarifications, see jikes bug 2878 for details.
 tcltest::test 9.2-implicit-6 { Interfaces do not implicitly have any protected
         methods from Object. Javac compiles this, but the resulting class
         causes a VerifyError, so it should not have compiled. } {
@@ -82,22 +82,112 @@ interface T92i7 extends Cloneable {
 } FAIL
 
 tcltest::test 9.2-implicit-8 { Interfaces do not implicitly have any protected
-        methods from Object. Yet, allowing a conflicting return type or
-        throws clause would make an interface non-instantiable } {
-    empty_class T92i8 "interface I { int clone(); }"
-} FAIL
+        methods from Object. Thus, this declaration is legal (although the
+        interface is unimplementable) - see Jikes bug 2878 } {
+    ok_pass_or_warn [empty_class T92i8 "interface I { int clone(); }"]
+} OK
 
 tcltest::test 9.2-implicit-9 { Interfaces do not implicitly have any protected
-        methods from Object. Yet, allowing a conflicting return type or
-        throws clause would make an interface non-instantiable } {
-    empty_class T92i9 {
+        methods from Object. Thus, this declaration is legal - see Jikes
+        bug 2878 } {
+    ok_pass_or_warn [empty_class T92i9 {
         interface I { Object clone() throws java.io.IOException; }
+    }]
+} OK
+
+tcltest::test 9.2-implicit-10 { Interfaces do not implicitly have any protected
+        methods from Object. Thus, this declaration is legal (although the
+        interface is unimplementable) - see Jikes bug 2878 } {
+    ok_pass_or_warn [empty_class T92i10 "interface I { int finalize(); }"]
+} OK
+
+tcltest::test 9.2-implicit-11 { Proof that the interfaces of tests 8 and 10
+        are unimplementable, although the interface itself is legal - see
+        Jikes bug 2878} {
+    empty_class T92i11 {
+        interface I { int clone(); }
+        abstract class C implements I {}
     }
 } FAIL
 
-tcltest::test 9.2-implicit-10 { Interfaces do not implicitly have any protected
-        methods from Object. Yet, allowing a conflicting return type or
-        throws clause would make an interface non-instantiable } {
-    empty_class T92i10 "interface I { int finalize(); }"
+tcltest::test 9.2-implicit-12 { Proof that the interfaces of tests 8 and 10
+        are unimplementable, although the interface itself is legal - see
+        Jikes bug 2878} {
+    empty_class T92i12 {
+        interface I { int finalize(); }
+        abstract class C implements I {}
+    }
 } FAIL
 
+tcltest::test 9.2-implicit-13 { Although an interface may extend the throws
+        clause for clone(), implementing classes can only throw the common
+        subset of checked exceptions as compared to Object.clone } {
+    ok_pass_or_warn [empty_class T92i13 {
+        interface I { Object clone() throws java.io.IOException; }
+        class C implements I {
+            public Object clone() { return null; }
+        }
+    }]
+} OK
+
+tcltest::test 9.2-implicit-14 { Although an interface may extend the throws
+        clause for clone(), implementing classes can only throw the common
+        subset of checked exceptions as compared to Object.clone } {
+    empty_class T92i14 {
+        interface I { Object clone() throws java.io.IOException; }
+        class C implements I {
+            public Object clone() throws CloneNotSupportedException
+            { return null; }
+        }
+    }
+} FAIL
+
+tcltest::test 9.2-implicit-15 { Although an interface may extend the throws
+        clause for clone(), implementing classes can only throw the common
+        subset of checked exceptions as compared to Object.clone } {
+    empty_class T92i15 {
+        interface I { Object clone() throws java.io.IOException; }
+        class C implements I {
+            public Object clone() throws java.io.IOException
+            { return null; }
+        }
+    }
+} FAIL
+
+tcltest::test 9.2-implicit-16 { Although an interface may extend the throws
+        clause for clone(), implementing classes can only throw the common
+        subset of checked exceptions as compared to Object.clone } {
+    ok_pass_or_warn [empty_class T92i16 {
+        interface I { Object clone() throws java.io.IOException; }
+        abstract class C implements I {
+            public abstract Object clone();
+        }
+        void m(C c) {
+            c.clone(); // cannot throw a checked exception
+        }
+    }]
+} OK
+
+tcltest::test 9.2-implicit-17 { The version of clone() inherited from Object
+        does not satisfy clone() specified in an interface } {
+    empty_class T92i17 {
+        interface I { Object clone() throws java.io.IOException; }
+        abstract class C implements I {}
+    }
+} FAIL
+
+tcltest::test 9.2-implicit-18 { The version of clone() inherited from Object
+        does not satisfy clone() specified in an interface } {
+    empty_class T92i18 {
+        interface I { Object clone() throws CloneNotSupportedException; }
+        abstract class C implements I {}
+    }
+} FAIL
+
+tcltest::test 9.2-implicit-19 { The version of finalize() inherited from Object
+        does not satisfy finalize() specified in an interface } {
+    empty_class T92i19 {
+        interface I { void finalize() throws Throwable; }
+        abstract class C implements I {}
+    }
+} FAIL

@@ -32,6 +32,7 @@ tcltest::test 8.1.4-superinterface-1 { A superinterface must be accessible } {
 
 tcltest::test 8.1.4-superinterface-2 { A superinterface must be accessible } {
     compile [saveas p1/T814s2a.java {
+package p1;
 interface T814s2a {}
 }] [saveas T814s2b.java {
 class T814s2b implements p1.T814s2a {}
@@ -45,6 +46,46 @@ class T814s3a {}
 class T814s3b implements T814s3a {}
 }]
 } FAIL
+
+tcltest::test 8.1.4-superinterface-4 { A superinterface must be accessible } {
+    compile [saveas p1/T814s4a.java {
+package p1;
+public class T814s4a {
+    protected interface Inner {}
+}
+}] [saveas T814s4b.java {
+class T814s4b implements p1.T814s4a.Inner {}
+}]
+} FAIL
+
+tcltest::test 8.1.4-superinterface-5 { A superinterface must be accessible } {
+    compile [saveas T814s5a.java {
+class T814s5a {
+    private interface Inner {}
+}
+class T814s5b implements T814s5a.Inner {}
+}]
+} FAIL
+
+tcltest::test 8.1.4-superinterface-6 { A superinterface must be accessible } {
+    compile [saveas p1/T814s6a.java {
+package p1;
+public class T814s6a {
+    protected interface Inner {}
+}
+    }] [saveas T814s6b.java {
+class T814s6b extends p1.T814s6a {
+    class Sub implements Inner {}
+}
+    }]
+} PASS
+
+tcltest::test 8.1.4-superinterface-7 { A superinterface must be accessible } {
+    empty_class T814s7 {
+	private interface One {}
+	class Two implements One {}
+    }
+} PASS
 
 tcltest::test 8.1.4-duplicate-1 { A class may not have duplicate
         superinterfaces } {
@@ -75,7 +116,7 @@ tcltest::test 8.1.4-duplicate-4 { A class may not have duplicate
 class T814d4a {
     interface I {}
 }
-class T814d4b extends T814d3a {}
+class T814d4b extends T814d4a {}
 class T814d4c implements T814d4a.I, T814d4b.I {}
 }]
 } FAIL

@@ -34,6 +34,11 @@ tcltest::test 15.15.2-argument-9 { --Prefix cannot operate on final variable } {
     empty_class T15152a9 {final int i = 1, j = --i;}
 } FAIL
 
+tcltest::test 15.15.2-argument-10 { --Prefix must operate on a numeric
+        variable, parenthesis may now surround variables } {
+    ok_pass_or_warn [empty_class T15152a10 {int i = 1, j = --(i);}]
+} OK
+
 
 tcltest::test 15.15.2-type-1 { --Prefix operates on all numeric types } {
     empty_class T15152t1 {byte b = 1, b2 = --b;}
@@ -66,10 +71,39 @@ tcltest::test 15.15.2-type-7 { --Prefix operates on all numeric types } {
 
 tcltest::test 15.15.2-result-1 { --Prefix results in a value, not a variable } {
     empty_class T15152r1 {
-void foo() {
-    int i = 1;
-    --i = 2;
-}   }
+        int i = 1;
+        --i = 2;
+    }
 } FAIL
 
+tcltest::test 15.15.2-result-2 { --Prefix results in a value, not a variable } {
+    empty_main T15152r2 {
+        int i = 1;
+        --(--i);
+    }
+} FAIL
+
+tcltest::test 15.15.2-final-1 { --Prefix cannot be applied to a final } {
+    empty_class T15152f1 {
+	final int i;
+	int j = --i;
+    }
+} FAIL
+
+tcltest::test 15.15.2-final-2 { --Prefix cannot be applied to a final } {
+    empty_main T15152f2 {
+	final int i;
+	if (false)
+	    --i;
+    }
+} FAIL
+
+tcltest::test 15.15.2-final-3 { --Prefix cannot be applied to a final } {
+    empty_class T15152f3 {
+	void m(final int i) {
+	    if (false)
+	        --i;
+	}
+    }
+} FAIL
 

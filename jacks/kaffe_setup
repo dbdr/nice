@@ -15,3 +15,5 @@ set JAVA_FLAGS ""
 # Activate kaffe only test cases
 set tcltest::testConstraints(kaffe) 1
 
+# Comment this to skip the time-consuming JVM limitation tests
+set tcltest::testConstraints(jvm) 1

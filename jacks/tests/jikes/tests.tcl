@@ -16,17 +16,7 @@ public class BrokenDependency {
     compile -d . +M BrokenDependency.java
 } FAIL
 
-tcltest::test jikes-2 { warn on try block that may  not be reached } {jikes} {
-    compile [saveas T1.java {
-class T1 {
-  void foo() {
-    try {
-      int i = 0;
-    } catch (Exception e) {}
-  }
-}
-    }]
-} WARN
+# test jikes-2 removed because of clarification to JLS
 
 tcltest::test jikes-3 { jikes should fail but not core dump on illegal
         import from anonymous package } {jikes} {

@@ -8,7 +8,7 @@ tcltest::test 14.14-plain-1 { plain break must occur in a loop
 tcltest::test 14.14-plain-2 { plain break must occur in a loop
         statement or switch } {
     empty_main T1414p2 {
-        for (int i=0; i<10; i++)
+        for (int i=0; i<10; ++i)
             break;
     }
 } PASS
@@ -17,7 +17,7 @@ tcltest::test 14.14-plain-3 { plain break must occur in a loop
         statement or switch } {
     empty_main T1414p3 {
         int i=0;
-        while (i++<10)
+        while (++i<10)
             break;
     }
 } PASS
@@ -27,14 +27,14 @@ tcltest::test 14.14-plain-4 { plain break must occur in a loop
     empty_main T1414p4 {
         int i=0;
         do break;
-        while (i++<10);
+        while (++i<10);
     }
 } PASS
 
 tcltest::test 14.14-plain-5 { plain break must occur in a loop
         statement or switch } {
     empty_main T1414p5 {
-        for (int i=0; i<10; i++) {
+        for (int i=0; i<10; ++i) {
             break;
         }
     }
@@ -44,7 +44,7 @@ tcltest::test 14.14-plain-6 { plain break must occur in a loop
         statement or switch } {
     empty_main T1414p6 {
         int i=0;
-        while (i++<10) {
+        while (++i<10) {
             break;
         }
     }
@@ -56,7 +56,7 @@ tcltest::test 14.14-plain-7 { plain break must occur in a loop
         int i=0;
         do {
             break;
-        } while (i++<10);
+        } while (++i<10);
     }
 } PASS
 
@@ -110,7 +110,7 @@ tcltest::test 14.14-label-1 { A label may be
         targeted by break } {
     empty_main T1414l1 {
         a: {
-            for (int i=0; i<10; i++)
+            for (int i=0; i<10; ++i)
                 break a;
         }
     }
@@ -119,7 +119,7 @@ tcltest::test 14.14-label-1 { A label may be
 tcltest::test 14.14-label-2 { A label may be
         targeted by break } {
     empty_main T1414l2 {
-        a: b: for (int i=0; i<10; i++)
+        a: b: for (int i=0; i<10; ++i)
             break a;
     }
 } PASS
@@ -141,7 +141,7 @@ tcltest::test 14.14-label-4 { labeled break must
 tcltest::test 14.14-label-5 { labeled break must
         occur in that label } {
     empty_main T1414l5 {
-        a: for (int i=0; i<10; i++)
+        a: for (int i=0; i<10; ++i)
             break a;
     }
 } PASS
@@ -150,7 +150,7 @@ tcltest::test 14.14-label-6 { labeled break must
         occur in that label } {
     empty_main T1414l6 {
         int i=0;
-        a: while (i++<10)
+        a: while (++i<10)
             break a;
     }
 } PASS
@@ -160,14 +160,14 @@ tcltest::test 14.14-label-7 { labeled break must
     empty_main T1414l7 {
         int i=0;
         a: do break a;
-        while (i++<10);
+        while (++i<10);
     }
 } PASS
 
 tcltest::test 14.14-label-8 { labeled break must
         occur in that label } {
     empty_main T1414l8 {
-        a: for (int i=0; i<10; i++) {
+        a: for (int i=0; i<10; ++i) {
             break a;
         }
     }
@@ -177,7 +177,7 @@ tcltest::test 14.14-label-9 { labeled break must
         occur in that label } {
     empty_main T1414l9 {
         int i=0;
-        a: while (i++<10) {
+        a: while (++i<10) {
             break a;
         }
     }
@@ -189,7 +189,7 @@ tcltest::test 14.14-label-10 { labeled break must
         int i=0;
         a: do {
             break a;
-        } while (i++<10);
+        } while (++i<10);
     }
 } PASS
 

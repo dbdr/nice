@@ -242,9 +242,10 @@ tcltest::test 15.17.3-int-2 { (a/b)*b+(a%b) == a } {
             {(-5 / -3) * -3 + (-5 % -3) == -5}
 } PASS
 
-tcltest::test 15.17.3-int-3 { Compile-time error to divide by constant 0 } {
-    empty_class T15173i3 {int i = 1 / 0;}
-} FAIL
+tcltest::test 15.17.3-int-3 { Not a compile-time error to divide by
+        constant integer 0 } {
+    ok_pass_or_warn [empty_class T15173i3 {int i = 1 / 0;}]
+} OK
 
 tcltest::test 15.17.3-int-4 { MIN_INT % -1 == 0 } {
     constant_expression T15173i4 {0x80000000 % -1 == 0}
@@ -268,9 +269,10 @@ tcltest::test 15.17.3-long-2 { (a/b)*b+(a%b) == a } {
         {(-5L / -3L) * -3L + (-5L % -3L) == -5L}
 } PASS
 
-tcltest::test 15.17.3-long-3 { Compile-time error to divide by constant 0 } {
-    empty_class T15173l3 {long l = 1L % 0L;}
-} FAIL
+tcltest::test 15.17.3-long-3 { Not a compile-time error to divide by
+        constant integer 0 } {
+    ok_pass_or_warn [empty_class T15173l3 {long l = 1L % 0L;}]
+} OK
 
 tcltest::test 15.17.3-long-4 { MIN_LONG % -1 == 0 } {
     constant_expression T15173l4 {0x8000000000000000L % -1L == 0L}

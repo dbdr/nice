@@ -277,7 +277,7 @@ class T8851aesia5_super {
 
 
 
-# inaccessable super class constructors
+# inaccessible super class constructors
 
 tcltest::test 8.8.5.1-inaccessible-implicit-super-invocation-1 {
         A private constructor is not accessible in a subclass } {
@@ -348,8 +348,70 @@ class T8851iesia2 extends T8851iesia2_super {
 
 # The batch of tests below are explicitly mentioned in 8.8.5.1
 
+tcltest::test 8.8.5.1-example-1 { Example of qualified superconstructor } {
+    empty_class T8851e1 {
+	static class Outer {
+	    class Inner {}
+	}
+	static class ChildOfInner extends Outer.Inner {
+	    ChildOfInner() {
+		(new Outer()).super();
+	    }
+	}
+    }
+} PASS
 
+tcltest::test 8.8.5.1-example-2 { Example of error accessing instance field } {
+    empty_class T8851e2 {
+	static class Point {
+	    int x, y;
+	    Point(int x, int y) {
+		this.x = x;
+		this.y = y;
+	    }
+	}
+	static class ColoredPoint extends Point {
+	    int color;
+	    ColoredPoint(int x, int y) {
+		this(x, y, color);
+	    }
+	}
+    }
+} FAIL
 
+tcltest::test 8.8.5.1-example-3 { Example of error accessing instance field
+        when anonymous class is in explicit constructor invocation } {
+    empty_class T8851e3 {
+	static class Top {
+	    int x;
+	    class Dummy {
+		Dummy(Object o) {}
+	    }
+	    class Inside extends Dummy {
+		Inside() {
+		    super(new Object() { int r = x; }); // error
+		}
+	    }
+	}
+    }
+} FAIL
+
+tcltest::test 8.8.5.1-example-4 { Example of legal access of parameter
+        when anonymous class is in explicit constructor invocation } {
+    empty_class T8851e4 {
+	static class Top {
+	    int x;
+	    class Dummy {
+		Dummy(Object o) {}
+	    }
+	    class Inside extends Dummy {
+		Inside(final int y) {
+		    super(new Object() { int r = y; }); // correct
+		}
+	    }
+	}
+    }
+} PASS
 
 # FIXME: Add tests for Superclass constructor invocations
 
@@ -528,4 +590,148 @@ tcltest::test 8.8.5.1-qualified-10 { Qualified explicit constructors are
             Two(int i) {}
         }
     }
+} PASS
+
+tcltest::test 8.8.5.1-qualified-11 { Explicit constructors may reference
+        qualified this or super which names an enclosing class } {
+    empty_class T8851q11 {
+        class A {}
+        class B extends A {
+            B() {
+                T8851q11.this.super();
+            }
+        }
+    }
+} PASS
+
+tcltest::test 8.8.5.1-qualified-12 { Explicit constructors may reference
+        qualified this or super which names an enclosing class } {
+    empty_class T8851q12 {
+        class Super {
+            Middle m;
+        }
+        class Middle extends Super {
+            class A {}
+            class B extends A {
+                B() {
+                    Middle.super.m.super();
+                }
+            }
+        }
+    }
+} PASS
+
+tcltest::test 8.8.5.1-qualified-13 { Explicit constructors may reference
+        qualified this or super which names an enclosing class } {
+    empty_class T8851q13 {
+        T8851q13(Object o) {}
+        class Middle extends T8851q13 {
+            Middle(int i) {
+                super(null);
+            }
+            Middle() {
+                // Here, the innermost instance of T8851q13 to enclose
+		// new Middle is this
+                super(new Middle(1).new Inner() {});
+            }
+            class Inner {}
+        }
+    }
+} FAIL
+
+tcltest::test 8.8.5.1-qualified-14 { Explicit constructors may reference
+        qualified this or super which names an enclosing class } {
+    empty_class T8851q14 {
+        T8851q14(Object o) {}
+        class Middle extends T8851q14 {
+            Middle(int i) {
+                super(null);
+            }
+            Middle() {
+                // Here, new Middle is a member of Middle
+                super(T8851q14.this.new Middle(1).new Inner() {});
+            }
+            class Inner {}
+        }
+    }
+} PASS
+
+tcltest::test 8.8.5.1-qualified-15 { Explicit constructors may reference
+        qualified this or super which names an enclosing class } {
+    empty_class T8851q15 {
+        T8851q15(Object o) {}
+        private class Middle extends T8851q15 {
+            Middle(int i) {
+                super(null);
+            }
+            Middle() {
+                // Here, the innermost instance of T8851q15 to enclose
+		// new Middle is this
+                super(new Middle(1).new Inner() {});
+            }
+            class Inner {}
+        }
+    }
+} FAIL
+
+tcltest::test 8.8.5.1-qualified-16 { Explicit constructors may reference
+        qualified this or super which names an enclosing class } {
+    empty_class T8851q16 {
+        T8851q16(Object o) {}
+        private class Middle extends T8851q16 {
+            Middle(int i) {
+                super(null);
+            }
+            Middle() {
+                // Here, new Middle is a member of T8851q16, since it was
+		// private and not inherited as a member of Middle
+                super(T8851q16.this.new Middle(1).new Inner() {});
+            }
+            class Inner {}
+        }
+    }
+} PASS
+
+tcltest::test 8.8.5.1-qualified-17 { Explicit constructors may reference
+        qualified this or super which names an enclosing class } {
+    compile [saveas T8851q17.java {
+class T8851q17 {
+    T8851q17(Object o) {}
+}
+class T8851q17a {
+    class Middle extends T8851q17 {
+	Middle(int i) {
+	    super(null);
+	}
+	Middle() {
+	    // Here, the innermost instance of T8851q17a to enclose
+	    // new Middle is T8851q17a.this
+	    super(new Middle(1).new Inner() {});
+	}
+	class Inner {}
+    }
+}
+    }]
+} PASS
+
+tcltest::test 8.8.5.1-qualified-18 { Explicit constructors may reference
+        qualified this or super which names an enclosing class } {
+    compile [saveas T8851q18.java {
+class T8851q18 {
+    T8851q18(Object o) {}
+}
+class T8851q18a {
+    class Middle extends T8851q18 {
+	Middle(int i) {
+	    super(null);
+	}
+	Middle() {
+	    // Here, the innermost instance of T8851q18a to enclose
+	    // new Middle is T8851q18a.this
+	    super(T8851q18a.this.new Middle(1).new Inner() {});
+	}
+	class Inner {}
+    }
+}
+    }]
 } PASS

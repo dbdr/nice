@@ -252,9 +252,10 @@ tcltest::test 15.17.2-int-2 { MIN_INT / -1 overflows } {
     constant_expression T15172i2 {0x80000000 / -1 == 0x80000000}
 } PASS
 
-tcltest::test 15.17.2-int-3 { Compile-time error to divide by constant 0 } {
-    empty_class T15172i3 {int i = 1 / 0;}
-} FAIL
+tcltest::test 15.17.2-int-3 { Not a compile-time error to divide by
+        constant integer 0 } {
+    ok_pass_or_warn [empty_class T15172i3 {int i = 1 / 0;}]
+} OK
 
 tcltest::test 15.17.2-long-1 { integer division rounds to 0 } {
     constant_expression T15172l1 \
@@ -268,7 +269,8 @@ tcltest::test 15.17.2-long-2 { MIN_LONG / -1 overflows } {
     constant_expression T15172l2 {0x8000000000000000L / -1L == 0x8000000000000000L}
 } PASS
 
-tcltest::test 15.17.2-long-3 { Compile-time error to divide by constant 0 } {
-    empty_class T15172l3 {long l = 1L / 0L;}
-} FAIL
+tcltest::test 15.17.2-long-3 { Not a compile-time error to divide by
+        constant integer 0 } {
+    ok_pass_or_warn [empty_class T15172l3 {long l = 1L / 0L;}]
+} OK
 

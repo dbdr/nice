@@ -1171,6 +1171,24 @@ tcltest::test 14.20-do-33 { The continue is interrupted by the try-finally } {
     }
 } FAIL
 
+tcltest::test 14.20-do-34 { A do statement can complete normally if:
+        The do statement contains a reachable labeled continue statement
+        for the do, with condition not constant true } {
+    empty_main T1420do34 {
+	a: do try {
+	    throw new Exception();
+	} catch (Exception e) {
+	} finally {
+	    continue a;
+	} while (false);
+	a: do try {
+	} finally {
+	    continue a;
+	} while (false);
+        int i = 1;
+    }
+} PASS
+
 # for statement
 tcltest::test 14.20-for-1 { A for statement can complete normally if:
         The condition statement exists and is non-constant } {
@@ -2500,3 +2518,12 @@ tcltest::test 14.20-if-8 { if-then-else can complete normally iff
         { int x=3; }
     }
 } FAIL
+
+# While this test is not specified, it makes sense given current compiler
+# behavior. Further clarification from Sun would be nice.
+tcltest::test 14.20-for-update-1 { A statement in the for update is reachable,
+        even when it is not executed (this is underspecified in the JLS) } {
+    empty_main T1420fu1 {
+        for (int i = 0; ; i++) break;
+    }
+} PASS

@@ -86,6 +86,21 @@ class T6562t6d {
 }]
 } PASS
 
+tcltest::test 6.5.6.2-type-7 { A qualified expression name which is qualified
+        by a type name must name a single accessible field of that type, which
+        must be static - this tests jikes bug 3044 } {
+    compile [saveas T6562t7a.java {
+interface T6562t7a {
+    int i = T6562t7b.i;
+}
+    }] [saveas T6562t7b.java {
+class T6562t7b {
+    final static int i;
+    static { i = 1; }
+}
+    }]
+} PASS
+
 tcltest::test 6.5.6.2-expression-1 { A qualified expression name which is
         qualified by an expression name must name a single accessible field
         of the type of the qualifier, which must be a reference } {

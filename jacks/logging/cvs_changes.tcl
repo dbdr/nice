@@ -163,6 +163,14 @@ proc get_results_from_diff { diff_data } {
 	    set diff_date "$year-$month-$date"
 	}
 
+        # Newer versions of diff have a new date format
+        if {! [info exists diff_date]} {
+            set diff_date_pat {^\+\+\+.*[ |\t]([0-9]+)[ |\t]([a-zA-Z]+)[ |\t]([0-9]+).+$}
+            if {[regexp $diff_date_pat $line whole date month year]} {
+                set diff_date "$year-$month-$date"
+            }
+        }
+
 	if {[string first @@ $line] == 0} {
 	    incr i
 	    break

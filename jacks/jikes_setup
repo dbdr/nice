@@ -25,6 +25,8 @@ set JAVA ${JAVA_HOME}/jre/bin/java
 
 set JAVA_FLAGS ""
 
+set GDB gdb
+
 # This activates encoding support.
 set JAVAC_ENCODING_FLAG "-encoding "
 set tcltest::testConstraints(encoding) 1
@@ -34,3 +36,6 @@ set tcltest::testConstraints(jikes) 1
 
 # Uncomment this to test the assert statement
 #set tcltest::testConstraints(assert) 1
+
+# Comment this to skip the time-consuming JVM limitation tests
+set tcltest::testConstraints(jvm) 1

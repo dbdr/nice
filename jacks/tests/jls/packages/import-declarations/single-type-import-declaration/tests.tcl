@@ -49,7 +49,7 @@ public class T751c1a {
 package p1;
 public class T751c1b extends T751c1a {}
 }] [saveas T751c1c.java {
-import p1.T751c1b.Inner;
+import p1.T751c1b.Inner; // not canonical
 class T751c1c extends Inner {}
 }]
 } FAIL
@@ -66,8 +66,24 @@ public class T751c2 extends T751c2a {}
 }]
 } PASS
 
-tcltest::test 7.5.1-accessible-1 { A single-type import must name a public
-        type unless the type exists in the same package } {
+tcltest::test 7.5.1-canonical-3 { Imports use the canonical name, hence local
+        and anonymous classes (which do not have a canonical name) cannot
+        be imported } {
+    compile [saveas p1/T751c3a.java {
+package p1;
+public class T751c3a {
+    static Object o = new Object() {};
+}
+}] [saveas T751c3b.java {
+    // Compilers are not required to use T751c3a$1 as the anonymous class
+    // name, but it is a common choice
+import p1.T751c3a$1;
+class T751c3b {}
+}]
+} FAIL
+
+tcltest::test 7.5.1-accessible-1 { A single-type import must name an
+        accessible type } {
     compile [saveas p1/T751a1a.java {
 package p1;
 class T751a1a {
@@ -80,16 +96,53 @@ class T751a1b implements Inner {}
 }]
 } PASS
 
-tcltest::test 7.5.1-accessible-2 { A single-type import must name a public
-        type unless the type exists in the same package } {
+tcltest::test 7.5.1-accessible-2 { A single-type import must name an
+        accessible type } {
     compile [saveas p1/T751a2a.java {
 package p1;
-class T751a2a {
+public class T751a2a {
     private interface Inner {}
 }
 }] [saveas T751a2b.java {
 import p1.T751a2a.Inner;
 class T751a2b implements Inner {}
+}]
+} FAIL
+
+tcltest::test 7.5.1-accessible-3 { A single-type import must name an
+        accessible type } {
+    compile [saveas p1/T751a3a.java {
+package p1;
+class T751a3a {
+    public interface Inner {}
+}
+}] [saveas T751a3b.java {
+import p1.T751a3a.Inner; // Inner is public, but T751a3a is not accessible
+class T751a3b implements Inner {}
+}]
+} FAIL
+
+tcltest::test 7.5.1-accessible-4 { A single-type import must name an
+        accessible type } {
+    compile [saveas p1/T751a4a.java {
+package p1;
+import p1.T751a4a.Inner; // not accessible outside class body
+class T751a4a {
+    private class Inner {}
+}
+}]
+} FAIL
+
+tcltest::test 7.5.1-accessible-5 { A single-type import must name an
+        accessible type } {
+    compile [saveas p1/T751a5a.java {
+package p1;
+public class T751a5a {
+    protected class Inner {}
+}
+}] [saveas T751a5b.java {
+import p1.T751a5a.Inner; // not accessible outside body of subclass
+class T751a5b extends p1.T751a5a {}
 }]
 } FAIL
 
@@ -172,8 +225,8 @@ public class T751d4a {}
 
 tcltest::test 7.5.1-subpackage-1 { Single-type import cannot import
         subpackages } {
-    compile [saveas T751s1 {
+    compile [saveas T751sub1.java {
 import java.util;
-class T751s1 extends util.Random {}
+class T751sub1 extends util.Random {}
 }]
 } FAIL

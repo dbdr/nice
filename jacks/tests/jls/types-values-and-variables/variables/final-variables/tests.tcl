@@ -251,3 +251,13 @@ tcltest::test 4.5.4-parameter-2 { final parameter may not be assigned } {
         }
     }
 } FAIL
+
+tcltest::test 4.5.4-parameter-3 { final parameter may not be assigned } {
+    empty_class T454p3 {
+        void foo(final int i) {
+            new Object() {
+                int j = i = 0;
+            };
+        }
+    }
+} FAIL

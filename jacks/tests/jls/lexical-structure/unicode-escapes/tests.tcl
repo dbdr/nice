@@ -16,6 +16,26 @@ tcltest::test 3.3-invalid-3 { An even number of \ never form a
     compile [saveas T33i3.java {class T33i3 {}/* \\u002a/}]
 } FAIL
 
+tcltest::test 3.3-invalid-4 { Unicode escapes begin with 'u' only } {
+    compile [saveas T33i4.java {class T33i4{ char c = '\Uabcd'; }}]
+} FAIL
+
+tcltest::test 3.3-invalid-5 { Test unicode escape cut short by file end } {
+    compile [saveas T33i5.java {class T33i5{} \u}]
+} FAIL
+
+tcltest::test 3.3-invalid-6 { Test unicode escape cut short by file end } {
+    compile [saveas T33i6.java {class T33i6{} \uuuua}]
+} FAIL
+
+tcltest::test 3.3-invalid-7 { Test unicode escape cut short by file end } {
+    compile [saveas T33i7.java {class T33i7{} \u0a}]
+} FAIL
+
+tcltest::test 3.3-invalid-8 { Test unicode escape cut short by file end } {
+    compile [saveas T33i8.java {class T33i8{} \u00a}]
+} FAIL
+
 # Valid unicode escapes
 
 tcltest::test 3.3-valid-1 { Multiple u's are allowed in unicode escapes } {
@@ -78,4 +98,8 @@ class T33v4 \{
     append class "        \}\n    \}\n\}\n"
 
     compile [saveas T33v4.java $class]
+} PASS
+
+tcltest::test 3.3-valid-5 { Unicode \u005c ('\') does not suppress next \ } {
+    constant_expression T33v5 {'\u005c\u0030' == 0}
 } PASS

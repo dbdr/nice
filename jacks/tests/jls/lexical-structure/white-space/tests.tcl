@@ -40,6 +40,30 @@ tcltest::test 3.6-invalid-9 { Sub (Ctrl-Z) '\u001a' is not whitespace } {
     whitespace T36i9 {\u001a}
 } FAIL
 
+tcltest::test 3.6-invalid-10 { Ascii separators '\u001c'-'\u001f' are not
+        whitespace } {
+    whitespace T36i10 {\u001c}
+} FAIL
+
+tcltest::test 3.6-invalid-11 { Unicode whitespace is not always Java
+        whitespace } {
+    whitespace T36i11 {\u00a1}
+} FAIL
+
+tcltest::test 3.6-invalid-12 { Unicode whitespace is not always Java
+        whitespace } {
+    whitespace T36i12 {\u2008}
+} FAIL
+
+tcltest::test 3.6-invalid-13 { Unicode line separators are not whitespace } {
+    whitespace T36i13 {\u2028}
+} FAIL
+
+tcltest::test 3.6-invalid-14 { Unicode paragraph separators are not
+        whitespace } {
+    whitespace T36i14 {\u2029}
+} FAIL
+
 # valid whitespace
 
 tcltest::test 3.6-valid-1 { Linefeed (Ctrl-J) '\n' is whitespace } {

@@ -3,8 +3,9 @@
 ### If you are running under UNIX, make sure
 ### the next two commands are uncommented.
 
-# Make sure that we always get core dumps \
-ulimit -c 1000
+# Make sure that we always get core dumps. This does not work
+# if the external environment has ulimit -H -c 0, but that is rare. \
+ulimit -S -c unlimited
 
 # exec the tcl shell from the PATH \
 exec tclsh8.3 "$0" ${1+"$@"}

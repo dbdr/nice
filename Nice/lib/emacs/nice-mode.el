@@ -22,7 +22,7 @@
 (require 'compile)
 
 (defvar nice-program (if (eq window-system 'w32) "nicec.bat" "nicec")
-  "Nice compiler name.")
+  "*Nice compiler name.")
 
 (defvar nice-xprogram nil
   "Nice compiler name plus arguments.")
@@ -195,7 +195,7 @@
    (list type 1 'nice-type-face)
    
    ;; Keywords
-   '("\\<\\(fun\\|static\\|final\\|extends\\|implements\\|abstract\\|public\\|var\\|class\\|interface\\|new\\|else\\|native\\|inline\\|import\\|require\\|package\\|alike\\|Any\\|return\\|try\\|catch\\|finally\\|throw\\)\\>\\|@"
+   '("\\<\\(fun\\|static\\|final\\|extends\\|implements\\|abstract\\|public\\|var\\|class\\|interface\\|new\\|else\\|native\\|inline\\|import\\|require\\|package\\|alike\\|Any\\|return\\|try\\|catch\\|finally\\|throw\\|instanceof\\)\\>\\|@"
      0 nice-keyword-face)
    
    ;; for/if/assert followed by '('
@@ -358,7 +358,6 @@ Mode for editing/compiling Nice programs.
   C-c C-p                 nice-display-package
   C-c C-c                 nice-comment-region-or-line
   C-c C-u                 nice-uncomment-region-or-line
-  C-c p                   nice-toggle-pretty-print
   C-c r                   nice-toggle-recompile
   C-c R                   nice-toggle-recompile-all
   C-c e                   nice-toggle-experimental

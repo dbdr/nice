@@ -40,7 +40,7 @@ localVariable(SymbolExp e)
     return null;
 
   //don't allow nullness inference on global variables.
-  if (sym instanceof GlobalVarDeclaration.GlobalVarSymbol && sym.isAssignable())
+  if (sym instanceof GlobalVarSymbol && sym.isAssignable())
     return null;
 
   // no type inference on captured variables
@@ -233,6 +233,8 @@ mlsub.typing.TypeSymbol[?] getBinders(MethodContainer) = native mlsub.typing.Typ
 ?Expression value(FormalParameters.Parameter) = native Expression FormalParameters.Parameter.value();
 ?LinkedList<MethodDeclaration.Symbol> getConstructors(TypeConstructor) = native LinkedList TypeConstructors.getConstructors(TypeConstructor);
 ?gnu.bytecode.Attribute get(gnu.bytecode.AttrContainer, String) = native gnu.bytecode.Attribute gnu.bytecode.Attribute.get(gnu.bytecode.AttrContainer, String);
+void printInterface(Definition, java.io.PrintWriter) = native void Definition.printInterface(java.io.PrintWriter);
+?gnu.expr.Declaration getDeclaration(VarSymbol) = native gnu.expr.Declaration VarSymbol.getDeclaration();
 
 // Retypings needed since java types are not strict.
 mlsub.typing.Polytype boolPolytype() = native PrimitiveType.boolPolytype;

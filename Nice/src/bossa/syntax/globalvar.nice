@@ -1,0 +1,104 @@
+/**************************************************************************/
+/*                                N I C E                                 */
+/*             A high-level object-oriented research language             */
+/*                        (c) Daniel Bonniot 2004                         */
+/*                                                                        */
+/*  This program is free software; you can redistribute it and/or modify  */
+/*  it under the terms of the GNU General Public License as published by  */
+/*  the Free Software Foundation; either version 2 of the License, or     */
+/*  (at your option) any later version.                                   */
+/*                                                                        */
+/**************************************************************************/
+
+package bossa.syntax;
+
+import bossa.util.*;
+
+/**
+   Declaration of a global variable
+
+*/
+public class GlobalVarDeclaration extends Definition
+{
+  GlobalVarSymbol left;
+  Expression value;
+  boolean constant;
+
+  isGlobalVarDeclaration() = true;
+
+  resolve()
+  {
+    value = analyse(value, notNull(scope), notNull(typeScope));
+  }
+  
+  typecheck()
+  {
+    try{
+      value = value.resolveOverloading(left.getType());
+      typecheck(value);
+      Typing.leq(value.getType(),left.getType());
+    }
+    catch(TypingEx e){
+      User.error(this,"Typing error : "+left+" cannot be assigned value "+value+
+		 " of type "+value.getType()+" : \n"+
+		 e);
+    }
+  }
+
+  printInterface(s)
+  {
+    s.print((constant? "let ": "var ") +left +" = " +value.toString() +";\n");
+  }
+
+  compile()
+  {
+    left.getDeclaration();
+  }
+
+  ?gnu.expr.Expression compileValue() = value.compile();
+
+  toString() = left + " = " + value;
+}
+
+class GlobalVarSymbol extends MonoSymbol 
+{
+  GlobalVarDeclaration definition;
+     
+  isAssignable() = ! definition.constant;
+
+  getDeclaration()
+  {
+    ?gnu.expr.Declaration res = super;
+    if (res == null)
+      {
+        res = new gnu.expr.Declaration
+            (name.toString(), nice.tools.code.Types.javaType(type));
+        this.setDeclaration(res);
+
+        if (! definition.inInterfaceFile())
+          {
+            // Compute the value first, which might use another global value,
+            // which will then be properly initialized before use.
+            notNull(res).noteValue(definition.compileValue());
+          }
+
+        definition.module.addGlobalVar(res, definition.constant);
+      }
+
+    return res;
+  }
+    
+  Expression getValue() = definition.value;
+
+  getDefinition() = definition;
+}
+
+public GlobalVarDeclaration createGlobalVarDeclaration(LocatedString name,
+		Monotype type, Expression value, boolean constant)
+{
+    let res = new GlobalVarDeclaration(name, Node.global, left: cast(null),
+			value: value, constant: constant);
+    res.left = new GlobalVarSymbol(name, type, definition: res);
+    res.addChild(res.left);
+    return res;
+}

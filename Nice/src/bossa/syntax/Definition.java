@@ -77,6 +77,11 @@ public abstract class Definition extends Node implements bossa.util.Located
     return module.compilation();
   }
 
+  boolean isGlobalVarDeclaration()
+  {
+    return false;
+  }
+
   /****************************************************************
    * Name and location of the definition
    ****************************************************************/

@@ -466,7 +466,7 @@ toString(IntComparePattern p) = (p.name!=null? notNull(p.name).toString() : "") 
 private ?VarSymbol findRefSymbol(LocatedString refName)
 {
   for (sym : Node.getGlobalScope().lookup(refName))
-    if (sym instanceof GlobalVarDeclaration.GlobalVarSymbol ||
+    if (sym instanceof GlobalVarSymbol ||
 	sym instanceof EnumDefinition.EnumSymbol )
       return sym;
 
@@ -483,9 +483,9 @@ resolveGlobalConstants(IntComparePattern pattern)
   if (pattern.refName != null)
     {
       let symbol = findRefSymbol(notNull(pattern.refName));
-      if (symbol instanceof GlobalVarDeclaration.GlobalVarSymbol)
+      if (symbol instanceof GlobalVarSymbol)
 	{
-	  if (symbol.getValue() instanceof ConstantExp && symbol.constant)
+	  if (symbol.getValue() instanceof ConstantExp && !symbol.isAssignable())
 	    {
 	      ConstantExp val = cast(symbol.getValue());
 	      if (Typing.testRigidLeq(val.tc, PrimitiveType.longTC))
@@ -514,12 +514,12 @@ resolveGlobalConstants(VariablePattern pattern)
 				notNull(pattern.name).toString(), pattern.location));
     }
 
-  if (! (symbol instanceof GlobalVarDeclaration.GlobalVarSymbol))
+  if (! (symbol instanceof GlobalVarSymbol))
     return pattern;
 
   if (symbol.getValue() instanceof ConstantExp)
     {
-      if (!symbol.constant)
+      if (symbol.isAssignable())
         User.error(pattern.name, "" + pattern.name + " is not constant");
 
       ConstantExp val = cast(symbol.getValue());

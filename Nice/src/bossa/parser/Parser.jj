@@ -1506,7 +1506,7 @@ Definition globalVariable():
     value=SideEffectFreeExpression()
   )
   ";"
-  { return new GlobalVarDeclaration(name,t,value,constant); }
+  { return bossa.syntax.dispatch.createGlobalVarDeclaration(name,t,value,constant); }
 }
 
 Contract contract() :

@@ -52,7 +52,7 @@ public class AST extends Node
 
     for(Iterator i = children.iterator(); i.hasNext();)
       {
-	Object node = i.next();
+	Definition node = (Definition)i.next();
 	if (node instanceof ClassDefinition)
 	  classes.add(node);
         else if (node instanceof CustomConstructor)
@@ -66,7 +66,7 @@ public class AST extends Node
           methodImplementations.add(node);
         else if (node instanceof EnumDefinition)
           classes.add(((EnumDefinition)node).classDef);
-        else if (node instanceof GlobalVarDeclaration)
+        else if (node.isGlobalVarDeclaration())
           globals.add(node);
         else if (node instanceof DefaultMethodImplementation)
           methods.add(((DefaultMethodImplementation) node).getDeclaration());
@@ -78,8 +78,8 @@ public class AST extends Node
     this.methods = (MethodDeclaration[]) 
       methods.toArray(new MethodDeclaration[methods.size()]);
 
-    this.globals = (GlobalVarDeclaration[])
-      globals.toArray(new GlobalVarDeclaration[globals.size()]);
+    this.globals = (Definition[])
+      globals.toArray(new Definition[globals.size()]);
 
     this.customConstructors = (CustomConstructor[])
       customConstructors.toArray(new CustomConstructor[customConstructors.size()]);
@@ -233,7 +233,7 @@ public class AST extends Node
   private ClassDefinition[] classes;
   private MethodDeclaration[] methods;
   private MethodBodyDefinition[] methodImplementations;
-  private GlobalVarDeclaration[] globals;
+  private Definition[] globals;
   private CustomConstructor[] customConstructors;
 }
 

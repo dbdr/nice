@@ -297,7 +297,7 @@ public class OverloadedSymbolExp extends Expression
       return res;
 
     List<VarSymbol> globalvars = symbols.filter(VarSymbol sym =>
-			sym instanceof GlobalVarDeclaration.GlobalVarSymbol);
+			sym instanceof GlobalVarSymbol);
 
     // If there are global variables, give them the priority
     // (but not when there are *only* global variables, or it would loop).

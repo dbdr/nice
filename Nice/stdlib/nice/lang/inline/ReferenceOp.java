@@ -183,7 +183,7 @@ public class ReferenceOp extends Procedure2 implements Branchable, bossa.syntax.
 
  
     if (exp != null && nice.tools.code.Types.isSure(exp.getType().getMonotype()))
-      bossa.util.User.warning(exp, "Warning: comparing a non-null value with null");
+      bossa.util.User.warning(exp, "Comparing a non-null value with null");
   }
 
   // Interpretation

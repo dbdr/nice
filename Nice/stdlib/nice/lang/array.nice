@@ -76,9 +76,6 @@ filter<C, T>(a@Array, test)
 
   T[] res = new T[l];
 
-  fun(T)() mafun = fun(T elem) =>
-  { if(test(elem)) res.set(found++, elem); } ;
-
   a.iter(fun(T elem) =>
 	{ if(test(elem)) res.set(found++, elem); } );
 

@@ -143,4 +143,5 @@ public class FunExp extends Expression implements Function
   bossa.syntax.Constraint constraint;
   Constraint cst;
   Statement body;
+  boolean mightEscape = true;
 }

@@ -311,3 +311,11 @@ void f() {
       f();
     assert x.life == 42;
   }
+
+/// PASS
+  // We know that foreach does not let its arguments escape.
+  A x = new A();
+  if (x instanceof B)
+    new LinkedList().foreach(A arg => {
+      assert x.life == 42;
+    });

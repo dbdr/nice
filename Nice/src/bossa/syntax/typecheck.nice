@@ -224,7 +224,7 @@ typecheck(e@FunExp)
   ?Function saved = Node.getCurrentFunction();
   Node.setCurrentFunction(e);
 
-  let needExit = enterClosure();
+  let needExit = e.mightEscape && enterClosure();
   try {
     typecheck(e.body);
   }

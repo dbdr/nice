@@ -406,7 +406,9 @@ analyse(e@FunExp, info@Info, noEscape)
   try {
     info.beginInner();
     info.begin();
-    if (! noEscape)
+    if (noEscape)
+      e.mightEscape = false;
+    else
       info.anonFunDepth = info.depth;
 
     if (e.constraint != Constraint.True && e.constraint != null)

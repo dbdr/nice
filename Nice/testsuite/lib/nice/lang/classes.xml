@@ -1,0 +1,158 @@
+<?xml version="1.0"?>
+
+<project name="Ant" default="testsuite" basedir=".">
+
+
+	<taskdef name="testnice" classname="nice.tools.ant.TestNice"/>
+	
+	<target name="testsuite">
+
+		<testnice>
+			<source package="regtest.basic" file="testcase.nice">
+			<![CDATA[
+
+
+
+
+String pToString(?Point);
+
+class Point 
+{
+  int x; int y;
+
+  pToString() = "(x=" + this.x + ", y=" + this.y + ")";
+
+  int twoArgs(int x, int y);
+  twoArgs(x, y) = 0;
+
+  // override a native method
+  toString() = "Point";
+
+  Point sum(alike);
+  sum(other@Point) = new Point(x: this.x + other.x, y: this.y + other.y);
+}
+
+// check that a constructor is also available from functions
+// which are resolved earlier than methods
+// and even if the function appears before the class to be constructed
+void test_new()
+{
+  Point p = new ColoredPoint(x:0,y:0,c:0);
+}
+
+class ColoredPoint extends Point
+{
+  int c;
+  pToString() = "(x=" + this.x + ", y=" + this.y + ", c=" + this.c + ")";
+
+  // override a native method
+  toString() = "Colored Point: color=" + this.c;
+
+  sum(other@ColoredPoint) = new ColoredPoint
+    (x: this.x + other.x, y: this.y + other.y, c: (this.c + other.c) / 2);
+}
+
+/*
+  A second, unrelated pToString is defined
+  to test overloading resolution of method bodies with additional patterns
+*/
+String pToString(?String);
+pToString(s@null(String)) = "Null string";
+pToString(s@String) = "String";
+
+<Any T> boolean isNull(T);
+isNull(x) = false;
+isNull(@null) = true;
+
+pToString(@null(Point)) = "Origin";
+
+boolean isSimplePoint(Point);
+isSimplePoint(#Point) = true;  // takes precedence on point
+isSimplePoint(@Point) = false; // matches all non-null point
+
+void test_classes();
+test_classes()
+{
+  println ("### Testing classes");
+  println(pToString(new Point(x:0, y:0)));
+  println(pToString(new ColoredPoint(x:0,y:0,c:0)));
+  ?Point p = null;
+  println(pToString(p));
+
+  ?String s = null;
+  println(pToString("titi") + ", " + pToString(s));
+
+  println(isSimplePoint(new Point(x:0,y:0)));
+  println(isSimplePoint(new ColoredPoint(x:0,y:0,c:0)));
+
+  println(new Point(x:0,y:0).toString());
+  println(new ColoredPoint(x:0,y:0,c:0).toString());
+  Point p = new ColoredPoint(x:0,y:0,c:0);
+  println(p.toString());
+
+  new TestFieldInitializers();
+}
+
+class TestFieldInitializers
+{
+  ?String[] s = new String[0];
+}
+
+// Local Variables:
+// nice-xprogram: "$HOME/Nice/bin/nicec -e -r -d \"$HOME/Nice/classes\" --classpath=\"$HOME/Nice:$HOME/Nice/classes\""
+// End:
+
+
+
+
+boolean test3() {
+  ?Point p = null;
+  return "Origin".equals(pToString(p));
+}
+
+boolean test4() {
+  ?String s = null;
+  return "String, Null string".equals(pToString("titi") + ", " + pToString(s));
+}
+
+boolean test9() {
+  Point p = new ColoredPoint(x:0,y:0,c:0);
+  return "Colored Point: color=0".equals(p.toString());
+}
+
+
+
+
+			]]>
+			</source>
+			
+			
+			
+			<test name="classes">
+				regtest.basic.fun.test_classes();
+			</test>
+				
+			<asserttrue>"(x=0, y=0)".equals(fun.pToString(new Point(0, 0)))</asserttrue>
+				
+			<asserttrue>"(x=0, y=0, c=0)".equals(fun.pToString(new ColoredPoint(0,0,0)))</asserttrue>
+				
+			<asserttrue>fun.test3()</asserttrue>
+		
+			<asserttrue>fun.test4()</asserttrue>
+				
+			<asserttrue>fun.isSimplePoint(new Point(0,0))</asserttrue>
+				
+			<asserttrue>! fun.isSimplePoint(new ColoredPoint(0,0,0))</asserttrue>
+				
+			<asserttrue>"Point".equals(new Point(0,0).toString())</asserttrue>
+				
+			<asserttrue>"Colored Point: color=0".equals(new ColoredPoint(0,0,0).toString())</asserttrue>
+				
+			<asserttrue>fun.test9()</asserttrue>
+		
+		</testnice>
+
+	</target>
+
+
+</project>

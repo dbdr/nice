@@ -1,0 +1,52 @@
+<?xml version="1.0"?>
+
+<project name="Ant" default="testsuite" basedir=".">
+
+
+	<taskdef name="testnice" classname="nice.tools.ant.TestNice"/>
+	
+	<target name="testsuite">
+
+		<testnice>
+			<source package="regtest.basic" file="testcase.nice">
+			<![CDATA[
+
+
+
+
+
+boolean testFinalInt() {
+	final int x = 1;
+	return x == 1;
+}
+
+boolean testConstLong() {
+	final int x = 1;
+	const long y = x + 1;
+	return y == 2;
+}
+
+boolean testConstBool() {
+  final int x = 1;
+  const long y = x + 1;
+  const z = (y == x);
+	return z == false;
+}
+
+
+
+			]]>
+			</source>
+			
+			
+			
+			<asserttrue>fun.testConstLong()</asserttrue>
+			<asserttrue>fun.testFinalInt()</asserttrue>
+			<asserttrue>fun.testConstBool()</asserttrue>
+		
+		</testnice>
+
+	</target>
+
+
+</project>

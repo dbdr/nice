@@ -1,0 +1,37 @@
+<?xml version="1.0"?>
+
+<project name="Ant" default="testsuite" basedir=".">
+
+
+	<taskdef name="testnice" classname="nice.tools.ant.TestNice"/>
+	
+	<target name="testsuite">
+
+		<testnice>
+			<source package="test" file="testcase.nice">
+				int test_localFunctions(int pts=1)
+				{
+					int doubleIt(int x) = 2*x;
+					
+					int getPoints() = doubleIt(pts);
+					
+					return getPoints();
+				}
+			</source>
+			
+			
+			
+			<test name="localFunctions">
+				//	what is wrong with the following?
+				//assertTrue(2 == test.fun.test_localFunctions());
+				
+				assertTrue(2 == test.fun.test_localFunctions(1));
+				assertTrue(24 == test.fun.test_localFunctions(12));
+			</test>
+		
+		</testnice>
+
+	</target>
+
+
+</project>

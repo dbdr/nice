@@ -36,13 +36,16 @@ compileComponent(modules, doLink)
   if (modules.size() >= 1)
     modules.get(0).freezeGlobalContext();
 
-  modules.iter(fun(Module m) => m.compile());
+  try {
+    modules.iter(fun(Module m) => m.compile());
 
-  if (doLink)
-    modules.iter(fun(Module m) => m.link());
-
-  if (modules.size() >= 1)
-    modules.get(0).unfreezeGlobalContext();
+    if (doLink)
+      modules.iter(fun(Module m) => m.link());
+  }
+  finally {
+    if (modules.size() >= 1)
+      modules.get(0).unfreezeGlobalContext();
+  }
 }
 
 void make(mlsub.compilation.Compilation);

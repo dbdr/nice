@@ -195,7 +195,7 @@
    (list type 1 'nice-type-face)
    
    ;; Keywords
-   '("\\<\\(fun\\|static\\|final\\|transient\\|volatile\\|const\\|extends\\|implements\\|abstract\\|public\\|private\\|var\\|class\\|interface\\|new\\|else\\|native\\|inline\\|import\\|package\\|alike\\|Any\\|return\\|break\\|continue\\|super\\|try\\|catch\\|finally\\|throw\\|instanceof\\|requires\\|ensures\\|assert\\|do\\)\\>\\|@\\|=>"
+   '("\\<\\(fun\\|static\\|final\\|transient\\|volatile\\|const\\|let\\|extends\\|implements\\|abstract\\|public\\|private\\|var\\|class\\|interface\\|new\\|else\\|native\\|inline\\|import\\|package\\|alike\\|Any\\|return\\|break\\|continue\\|super\\|try\\|catch\\|finally\\|throw\\|instanceof\\|requires\\|ensures\\|assert\\|do\\)\\>\\|@\\|=>"
      0 nice-keyword-face)
    
    ;; for/if/assert followed by '('

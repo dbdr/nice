@@ -15,7 +15,7 @@ package bossa.syntax;
 import bossa.util.*;
 
 /**
-   Compute an expression an forget the value.
+   Compute an expression and forget the value.
 
    @version $Date$
    @author Daniel Bonniot (d.bonniot@mail.dotcom.fr)

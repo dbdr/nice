@@ -54,7 +54,7 @@ interface Sequence<T>
 
 iter(l@Sequence, f)
 {
-  for(int i=0; i<l.size; i=i+1)
+  for(int i=0; i<l.size; i++)
     f(l.get(i));
 }
 
@@ -124,8 +124,7 @@ size(l@Cons) = 1+size(l.tail);
 get(l@Cons, n) = n == 0 ? head(l) : get(l.tail, n-1);
 get<T>(l@Nil, n)
 {
-  if (true) throw new IndexOutOfBoundsException("Valid indexes: 0 .. " + (l.size - 1));
-  return l.get(n);
+  throw new IndexOutOfBoundsException("Valid indexes: 0 .. " + (l.size - 1));
 }
 
 set(l@Cons, n, elem)
@@ -264,7 +263,7 @@ map<C,T,U>(v@Vector, f)
 {
   Vector<U> res = makeVector(v.length);
 
-  for(int i=0; i<v.length; i=i+1)
+  for(int i=0; i<v.length; i++)
     res.elements.set(i, f( v.get(i) ));
 
   return res;
@@ -306,8 +305,16 @@ filter<C,T>(v@Vector, test)
     if (test(s.get(i)))
       return s.get(i);
 
-  if (true) throw new java.util.NoSuchElementException();
-  return s.get(0);
+  throw new java.util.NoSuchElementException();
+}
+
+<Any T> T findLast (Sequence<T> s, fun(T)(boolean) test)
+{
+  for (int i = s.size(); --i >= 0;)
+    if (test(s[i]))
+      return s[i];
+
+  throw new java.util.NoSuchElementException();
 }
 
 <Any T> ?T find (Sequence<!T> s, fun(!T)(boolean) test)
@@ -322,7 +329,7 @@ filter<C,T>(v@Vector, test)
 boolean or(Sequence<boolean>);
 or(s)
 {
-  for(int i=0; i<s.size(); i=i+1)
+  for(int i=0; i<s.size(); i++)
     if(s.get(i))
       return true;
 
@@ -334,7 +341,7 @@ max(s)
 {
   long res=0;
 
-  for(int i=0; i<s.size(); i=i+1)
+  for(int i=0; i<s.size(); i++)
     if(s.get(i)>res)
       res=s.get(i);
 

@@ -174,6 +174,9 @@ public class Method implements AttrContainer {
     */
   void prepareCode(int max_size)
   {
+    if (isAbstract())
+      throw new Error("generating code for an abstract method: " + toString());
+
     if (code == null)
       code = new CodeAttr(this);
     code.reserve(max_size);

@@ -1,9 +1,9 @@
-/// FAIL bug
+/// FAIL
   while (false) { 
     /*/// FAIL HERE */ ; // Unreachable
   }
 
-/// FAIL bug
+/// FAIL
   while (true) ;
   /*/// FAIL HERE */ ; // Unreachable
 
@@ -11,7 +11,7 @@
   while (true) break;
   ; // Reachable
 
-/// FAIL bug
+/// FAIL
   for (;false;) { 
     /*/// FAIL HERE */ ; // Unreachable
   }

@@ -132,8 +132,9 @@ public class Field extends Location implements AttrContainer {
     CpoolEntry entry;
     switch (sig1)
       {
-      case 'C':
       case 'Z':
+        entry = cpool.addInt(((Boolean) value).booleanValue() ? 1 : 0); break;
+      case 'C':
       case 'B':
       case 'S':
       case 'I':

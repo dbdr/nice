@@ -12,11 +12,6 @@ boolean `==`(boolean, boolean) = inline nice.lang.inline.BoolOp("==");
 //for booleans is '!=' equal to '^'
 boolean `!=`(boolean, boolean) = inline nice.lang.inline.BoolOp("^");
 
-boolean TRUE() = native Boolean.TRUE;
-boolean FALSE() = native Boolean.FALSE;
-var boolean true  = TRUE();
-var boolean false = FALSE();
-
 /**
   Booleans form a boolean algebra.
 */

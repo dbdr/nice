@@ -4,6 +4,9 @@ nice (0.9.0) unstable; urgency=low
   * Archives (generated with the -a option) can now be used to distribute
     Nice libraries.
   * Interfaces can now implement (finally or not) abstract interfaces.
+  * 'true' and 'false' are now keywords, and better code is generated for them.
+    The termination properties of loops with literal boolean values are now 
+    recognized, as in Java.
 
  --
 

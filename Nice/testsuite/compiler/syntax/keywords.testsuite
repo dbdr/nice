@@ -1,0 +1,5 @@
+/// FAIL
+  let /* /// FAIL HERE */ true = false;
+  // If the above was allowed, life would be different:
+  while (true) {}
+  println("Eternity is over now!");

@@ -250,4 +250,28 @@ public class ConstantExp extends Expression
   {
     return new TypeConstantExp(representation);
   }
+
+  /****************************************************************
+   * Booleans
+   ****************************************************************/
+
+  public static ConstantExp makeBoolean(boolean value, Location location)
+  {
+    if (value)
+      return new ConstantExp(PrimitiveType.boolTC, Boolean.TRUE, 
+                             "true", location);
+    else
+      return new ConstantExp(PrimitiveType.boolTC, Boolean.FALSE, 
+                             "false", location);
+  }
+
+  boolean isFalse()
+  {
+    return value == Boolean.FALSE;
+  }
+
+  boolean isTrue()
+  {
+    return value == Boolean.TRUE;
+  }
 }

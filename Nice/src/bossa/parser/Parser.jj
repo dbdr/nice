@@ -47,13 +47,6 @@ class Parser
   {
     return symb(t.image,t);
   }
-/*
-  private static final Expression trueExp = 
-    new IdentExp(new LocatedString("true", Location.nowhere()));
-
-  private static final Expression falseExp = 
-    new IdentExp(new LocatedString("false", Location.nowhere()));
-*/
   static List globalDefinitions;
 }
 PARSER_END(Parser)
@@ -174,8 +167,8 @@ TOKEN: /* Keywords */
 | < ELSE:       "else"       	>
 | < WHILE:      "while"      	>
 | < DO:		"do"		>
-//| < TRUE:       "true"       	>
-//| < FALSE:      "false"      	>
+| < TRUE:       "true"       	>
+| < FALSE:      "false"      	>
 | < FUN:        "fun"        	> /* Nice specific */
 | < ALIKE:      "alike"      	> /* Nice specific */
 //| < THIS:       "this"       	>
@@ -1533,6 +1526,15 @@ void readDefinitions(List definitions):
 /*                          Expressions                                */
 /***********************************************************************/
 
+Expression booleanConstantExp():
+{
+  Token t;
+}
+{
+  t = "true"  { return ConstantExp.makeBoolean(true,  new Location(t)); }
+| t = "false" { return ConstantExp.makeBoolean(false, new Location(t)); }
+}
+
 Expression intConstantExp():
 {
   LocatedString representation;
@@ -2197,6 +2199,7 @@ Expression Literal() :
 {
   (
   "null" { res = NullExp.instance; }
+| res=booleanConstantExp()
 | res=intConstantExp() 
 | res=floatConstantExp()
 | res=charConstantExp()

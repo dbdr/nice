@@ -103,8 +103,8 @@ setDate:
 test:
 	cd regtest; JAVA="${java}" /usr/bin/time ./regtest
 
-check: 
-	/usr/bin/time ${java} -classpath "classes" nice.tools.testsuite.TestNice testsuite
+check:
+	/usr/bin/time ${java} -Xms64M -classpath "classes" nice.tools.testsuite.TestNice testsuite
 
 check_lib:
 	/usr/bin/time ${java} -Dassertions=true -classpath "classes" nice.tools.testsuite.TestNice testsuite/lib

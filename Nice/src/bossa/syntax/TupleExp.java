@@ -15,6 +15,8 @@ package bossa.syntax;
 import bossa.util.*;
 import java.util.*;
 
+import mlsub.typing.Monotype;
+import mlsub.typing.MonotypeConstructor;
 import mlsub.typing.TupleType;
 import mlsub.typing.Polytype;
 import mlsub.typing.Constraint;
@@ -23,6 +25,8 @@ import gnu.bytecode.Type;
 import gnu.bytecode.ArrayType;
 import gnu.expr.*;
 import gnu.expr.Expression;
+
+import nice.tools.code.Types;
 
 /**
    Creation of a tuple.
@@ -51,23 +55,53 @@ public class TupleExp extends bossa.syntax.Expression
     return true;
   }
   
+  /**
+     Adjust the array type according to the context.
+
+     This is usefull because arrays are non-variant.
+     For instance, different code must be generated 
+     for [ 1, 2 ] in the contexts:
+     int[] i = [ 1, 2 ]
+     and 
+     byte[] b = [ 1, 2 ]
+  */
+  bossa.syntax.Expression resolveOverloading(Polytype expectedType)
+  {
+    // This can only help
+    expectedType.simplify();
+
+    Monotype m = expectedType.getMonotype();
+    // get rid of the nullness part
+    m = ((MonotypeConstructor) m).getTP()[0];
+
+    // Get the expected component types
+    if (m instanceof TupleType)
+      expectedComponents = ((TupleType) m).getComponents();
+
+    return this;
+  }
+
+  private Monotype[] expectedComponents;
+
   void computeType()
   {
     Polytype[] types = bossa.syntax.Expression.getType(expressions);
     // should create a new <tt>and</tt> method without the last dummy parameters
     Constraint cst = Constraint.and(Polytype.getConstraint(types), 
 				    null, null);
-    TupleType tupleType = new TupleType(Polytype.getMonotype(types));
-    nice.tools.code.Types.setBytecodeType(tupleType.getComponents());
-    this.componentType = nice.tools.code.Types.componentType(tupleType);
-    
-    type = new Polytype(cst, Monotype.sure(tupleType));
+    Monotype[] components = Polytype.getMonotype(types);
+    TupleType tupleType = new TupleType(components);
+    Types.setBytecodeType(components);
+    this.componentType = Types.lowestCommonSupertype
+      (expectedComponents != null ? expectedComponents : components);
+
+    type = new Polytype(cst, bossa.syntax.Monotype.sure(tupleType));
   }
 
   private Type componentType;
   
   /****************************************************************
-   * Code genaration
+   * Code generation
    ****************************************************************/
 
   protected gnu.expr.Expression compile()

@@ -198,14 +198,18 @@ public final class Types
   /** Returns the common bytecode type used for elements of this tuple. */
   public static Type componentType(TupleType t)
   {
-    return lowestCommonSuperType(javaType(t.getComponents()));
-  }
+    return lowestCommonSupertype(t.getComponents());
+ }
   
-  private static Type lowestCommonSuperType(Type[] types)
+  /**
+     @return the most precise bytecode type able to store values of the given
+       Nice types
+  */
+  public static Type lowestCommonSupertype(Monotype[] types)
   {
-    Type res = types[0];
+    Type res = javaType(types[0]);
     for (int i = 1; res!=null && i<types.length; i++)
-      res = Type.lowestCommonSuperType(res, types[i]);
+      res = Type.lowestCommonSuperType(res, javaType(types[i]));
     
     if (res == null)
       return Type.pointer_type;

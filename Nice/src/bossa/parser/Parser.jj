@@ -66,12 +66,13 @@ PARSER_END(Parser)
 SKIP : { " " | "\t" | "\n" | "\r" | "\f" }
 
 /* COMMENTS */
+TOKEN_MGR_DECLS : { static int nestingLevel = 0; }
 
 MORE :
 {
   <"/**" ~["/"]> { input_stream.backup(1); } : IN_FORMAL_COMMENT
 |
-  "/*" : IN_MULTI_LINE_COMMENT
+  "/*" {nestingLevel++; }: IN_MULTI_LINE_COMMENT
 }
 
 SPECIAL_TOKEN : 
@@ -84,9 +85,15 @@ SPECIAL_TOKEN :
 }
 
 <IN_MULTI_LINE_COMMENT>
-SPECIAL_TOKEN :
+MORE :
 {
-  <MULTI_LINE_COMMENT: "*/" > : DEFAULT
+  "/*" {nestingLevel++; }: IN_MULTI_LINE_COMMENT
+}
+
+<IN_MULTI_LINE_COMMENT>
+SKIP :
+{
+ "*/" { if (--nestingLevel == 0) SwitchTo(DEFAULT); } 
 }
 
 <IN_FORMAL_COMMENT,IN_MULTI_LINE_COMMENT>

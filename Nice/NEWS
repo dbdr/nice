@@ -26,6 +26,7 @@ nice (0.9.5)
     plugin, ant, testsuite, ...).
   * Unused local variables will give a warning.
   * A ';' is not a valid statement anymore.
+  * Nested multi-line comments are allowed.
   * Bug fixes (accessing static fields of an superclass or interface, 
     compilation of polymorphic tuples, captured 'this' in initializer, 
     duplication of constructors in bytecode, disappearing contracts during 

@@ -24,5 +24,51 @@ public final class NiceUtils
      return nice.tools.code.Inline.inline(proc, arg1, arg2);
   }
 
+  static ClassLoader inlineLoader;
+
+  static
+  {
+    String inlinedMethodsRepository = System.getProperty("nice.inlined");
+    if (inlinedMethodsRepository != null)
+      {
+        inlineLoader = new nice.tools.util.DirectoryClassLoader
+          (new java.io.File[]{ new java.io.File(inlinedMethodsRepository) },
+           null)
+          {
+            protected Class loadClass(String name, boolean resolve)
+              throws ClassNotFoundException
+            {
+              /* Change the default behviour, which is to look up the 
+                 parent classloader first. Instead, look it up after this one,
+                 so that the inlined methods are found here, but the
+                 interfaces they implement are found in the system classloader,
+                 so that the casts for using them succeed.
+              */
+              Class res = findLoadedClass(name);
+
+              if (res == null)
+                try {
+                  res = this.findClass(name);
+                } 
+                catch (ClassNotFoundException ex) {}
+
+              if (res == null)
+                {
+                  ClassLoader parent = getParent();
+                  // A JVM may represent the system classloader by null.
+                  if (parent == null)
+                    parent = ClassLoader.getSystemClassLoader();
+                  res = parent.loadClass(name);
+                }
+
+              if (resolve && res != null)
+                resolveClass(res);
+
+              return res;
+            }
+          };
+      }
+  }
+
 }
 

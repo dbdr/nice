@@ -1,0 +1,131 @@
+/**************************************************************************/
+/*                             N I C E                                    */
+/*        A simple imperative object-oriented research language           */
+/*                   (c)  Daniel Bonniot 2004                             */
+/*                                                                        */
+/*  This program is free software; you can redistribute it and/or modify  */
+/*  it under the terms of the GNU General Public License as published by  */
+/*  the Free Software Foundation; either version 2 of the License, or     */
+/*  (at your option) any later version.                                   */
+/*                                                                        */
+/**************************************************************************/
+
+package bossa.syntax;
+
+import bossa.util.*;
+
+/**
+   A method that is compiled by inlining code.
+
+   The inlining class can be defined by the user.
+   It keeps the core compiler small, while having very good efficiency.
+
+   It has to be a subclass of <code>gnu.mapping.Procedure</code>, 
+   and should implement interface <code>gnu.expr.Inlineable</code>
+   to be actually inlined.
+   
+*/
+public class InlinedMethod extends MethodDeclaration
+{
+  private LocatedString inlineProcedure;
+  private ?String parameter;
+  private ?gnu.mapping.Procedure procedure = null;
+
+  typecheck()
+  {
+    super;
+    this.getProcedure();
+  }
+
+  private gnu.mapping.Procedure getProcedure()
+  {
+    if (this.procedure != null)
+      // Already done.
+      return notNull(this.procedure);
+
+    ?Class refClass = null;
+    try{
+      refClass = this.findClass(inlineProcedure.toString());
+    }
+    catch(ClassNotFoundException e){
+      User.error(inlineProcedure, 
+		 "Inlined method " + inlineProcedure + " was not found");
+    }
+
+    ?java.lang.reflect.Method m = null;
+
+    try{
+      m = notNull(refClass).getMethod("create", [String.class]);
+      if (! java.lang.reflect.Modifier.isStatic(notNull(m).getModifiers()))
+	throw new NoSuchMethodException();
+    }
+    catch(NoSuchMethodException e){
+      User.error(inlineProcedure,
+		 "Inlined method " + inlineProcedure +
+		 " has no static create(String)");
+    }
+
+    ?Object o = null;
+    try{
+      o = notNull(m).invoke(null, [cast(parameter)]);
+    }
+    catch(java.lang.reflect.InvocationTargetException e){
+      Throwable realEx = e.getTargetException();
+      User.error(inlineProcedure,
+		 "Inlined method " + inlineProcedure +
+		 ": " + realEx);
+    }
+    catch(IllegalAccessException e){
+      User.error(inlineProcedure,
+		 "Inlined method " + inlineProcedure +
+		 ": could not call create method",
+		 e.getMessage());
+    }
+    
+    if (!(o instanceof gnu.mapping.Procedure))
+      User.error(inlineProcedure,
+		 "Inlined method " + inlineProcedure + 
+		 " should be a subclass of gnu.mapping.Procedure");
+
+    if (!(o instanceof gnu.expr.Inlineable))
+      User.warning(inlineProcedure,
+		   "Inlined method " + inlineProcedure + 
+		   " cannot be inlined, but will be called anyway");
+
+    this.procedure = cast(o);
+    return notNull(this.procedure);
+  }
+
+  private Class findClass(String name)
+  {
+    if (NiceUtils.inlineLoader == null)
+      return Class.forName(name);
+    else
+      return notNull(NiceUtils.inlineLoader).loadClass(name);
+  }
+
+  computeCode()
+  {
+    return new gnu.expr.QuoteExp(this.getProcedure());
+  }
+
+  getCode() 
+  {
+    return nice.tools.code.Gen.wrapInLambda(this.getProcedure());
+  }
+
+  checkSpecialRequirements(arguments)
+  {
+    let proc = this.getProcedure();
+    if (proc instanceof bossa.syntax.Macro)
+      proc.checkSpecialRequirements(arguments);
+  }
+
+   printInterface(s)
+  {
+    s.print(this.toString() +
+	    " = inline " + 
+	    inlineProcedure + 
+	    (parameter!=null ? "(\""+parameter+"\");\n" : ";\n"));
+  }
+}

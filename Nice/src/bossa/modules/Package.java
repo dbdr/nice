@@ -555,7 +555,7 @@ public class Package implements mlsub.compilation.Module, Located, bossa.syntax.
     thisPkg.addClass(classe);
   }
 
-  public gnu.expr.Declaration addGlobalVar(String name, Type type)
+  public gnu.expr.Declaration addGlobalVar(String name, Type type, boolean constant)
   {
     gnu.expr.Declaration declaration = new gnu.expr.Declaration(name, type);
 
@@ -572,6 +572,8 @@ public class Package implements mlsub.compilation.Module, Located, bossa.syntax.
     else
       {
 	getImplementationClass().addDeclaration(declaration);
+        if (constant) declaration.setFlag(Declaration.IS_CONSTANT);
+
 	declaration.setFlag(Declaration.STATIC_SPECIFIED|Declaration.TYPE_SPECIFIED);
       }
     

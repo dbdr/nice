@@ -1417,14 +1417,16 @@ Definition globalVariable():
   LocatedString name;
   Monotype t;
   Expression value=null;
+  boolean constant;
 }
 {
-  "var"
-  t=monotype()
-  name=ident()
-  [ "=" value=Expression() ]
+  ( "var" {constant = false;} 
+    t=monotype() name=ident() [ "=" value=Expression() ]
+  | "let" {constant = true;}
+    t=monotype() name=ident() "=" value=SideEffectFreeExpression() 
+  )
   ";"
-  { return new GlobalVarDeclaration(name,t,value); }
+  { return new GlobalVarDeclaration(name,t,value,constant); }
 }
 
 Contract contract() :

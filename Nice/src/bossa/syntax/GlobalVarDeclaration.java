@@ -29,31 +29,49 @@ import java.util.*;
 */
 public class GlobalVarDeclaration extends Definition
 {
-  public GlobalVarDeclaration(LocatedString name, Monotype type, Expression value)
+  public GlobalVarDeclaration(LocatedString name, Monotype type, Expression value, boolean constant)
   {
     super(name, Node.global);
     
-    this.left = new MonoSymbol(name,type)
-      {
-	Declaration getDeclaration()
-	{
-	  Declaration res = super.getDeclaration();
-	  
-	  if (res == null)
-	    {
-	      res = module.addGlobalVar
-		(left.name.toString(), 
-		 nice.tools.code.Types.javaType(left.type));
-	      setDeclaration(res);
-	    }
+    this.left = new GlobalVarSymbol(name,type,constant);
+    this.constant = constant;
 
-	  return res;
-	}
-      };
     addChild(left);
     
     if (value != null)
       this.value = value;
+  }
+
+  class GlobalVarSymbol extends MonoSymbol 
+  {
+    GlobalVarSymbol(LocatedString name, Monotype type, boolean con)
+    {
+      super(name,type);
+      constant = con;
+    }
+      
+    boolean constant;
+
+    boolean isAssignable()
+    {
+      return !constant;
+    }
+
+    Declaration getDeclaration()
+    {
+      Declaration res = super.getDeclaration();
+      
+      if (res == null)
+        {
+          res = module.addGlobalVar
+    			(left.name.toString(),
+		    	 nice.tools.code.Types.javaType(left.type),
+			 constant);
+          setDeclaration(res);
+        }
+    
+      return res;
+    }
   }
 
   public Collection associatedDefinitions()
@@ -93,9 +111,10 @@ public class GlobalVarDeclaration extends Definition
 
   public void printInterface(java.io.PrintWriter s)
   {
-    s.print("var "+left+
-	    //	    (value==null ? "" : " = "+value.toString())+
-	    ";\n");
+    if (constant) 
+      s.print( "let " + left + " = " +value.toString() + ";\n");
+    else	
+      s.print( "var " + left + ";\n");
   }
   
   /****************************************************************
@@ -105,6 +124,7 @@ public class GlobalVarDeclaration extends Definition
   public void compile()
   {
     gnu.expr.Declaration declaration = left.getDeclaration();
+    if (constant) declaration.setFlag(Declaration.IS_CONSTANT);
 
     if (value == null)
       declaration.noteValue(null);
@@ -124,4 +144,5 @@ public class GlobalVarDeclaration extends Definition
   protected Expression value=null;
   // "name" after scoping
   MonoSymbol left;
+  boolean constant;
 }

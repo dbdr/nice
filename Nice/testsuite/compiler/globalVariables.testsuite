@@ -74,3 +74,33 @@ var Map<String,String> classMap = (()=> {
   var String f = "";
   var int f = 0;
   var String v = f;
+
+
+/// PASS
+  assert(x==0);
+  /// TOPLEVEL
+  let int x = 0;
+
+/// FAIL
+  s = "";
+  /// TOPLEVEL
+  let String s = "abc";
+
+/// PASS
+  String t = s;
+  /// TOPLEVEL
+  let String s = "abc";
+
+/// PASS
+  /// package a 
+  /// TOPLEVEL
+  let int x = 1;
+  /// package b import a
+  assert(x == 1);
+
+/// FAIL
+  /// package a 
+  /// TOPLEVEL
+  let int x = 0;
+  /// package b import a
+  x = 1;

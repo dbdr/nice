@@ -2676,7 +2676,7 @@ finished 5.2-reference-widening-1
 RESULT 5.2-reference-widening-1 FAILED
 started 5.2-reference-widening-2
 finished 5.2-reference-widening-2
-RESULT 5.2-reference-widening-2 PASSED
+RESULT 5.2-reference-widening-2 FAILED
 started 5.2-reference-error-1
 finished 5.2-reference-error-1
 RESULT 5.2-reference-error-1 PASSED
@@ -2694,7 +2694,7 @@ finished 5.2-interface-widening-1
 RESULT 5.2-interface-widening-1 FAILED
 started 5.2-interface-widening-2
 finished 5.2-interface-widening-2
-RESULT 5.2-interface-widening-2 PASSED
+RESULT 5.2-interface-widening-2 FAILED
 started 5.2-interface-error-1
 finished 5.2-interface-error-1
 RESULT 5.2-interface-error-1 PASSED
@@ -2712,7 +2712,7 @@ finished 5.2-array-widening-1
 RESULT 5.2-array-widening-1 FAILED
 started 5.2-array-widening-2
 finished 5.2-array-widening-2
-RESULT 5.2-array-widening-2 PASSED
+RESULT 5.2-array-widening-2 FAILED
 started 5.2-array-error-1
 finished 5.2-array-error-1
 RESULT 5.2-array-error-1 PASSED
@@ -3372,7 +3372,7 @@ finished 16.1.7-simple-definite-assignment-pass-3
 RESULT 16.1.7-simple-definite-assignment-pass-3 FAILED
 started 16.1.7-simple-definite-assignment-pass-4
 finished 16.1.7-simple-definite-assignment-pass-4
-RESULT 16.1.7-simple-definite-assignment-pass-4 PASSED
+RESULT 16.1.7-simple-definite-assignment-pass-4 FAILED
 started 16.1.7-simple-definite-assignment-pass-5
 finished 16.1.7-simple-definite-assignment-pass-5
 RESULT 16.1.7-simple-definite-assignment-pass-5 PASSED
@@ -3399,7 +3399,7 @@ finished 16.1.7-compound-definite-assignment-pass-3
 RESULT 16.1.7-compound-definite-assignment-pass-3 FAILED
 started 16.1.7-compound-definite-assignment-pass-4
 finished 16.1.7-compound-definite-assignment-pass-4
-RESULT 16.1.7-compound-definite-assignment-pass-4 PASSED
+RESULT 16.1.7-compound-definite-assignment-pass-4 FAILED
 started 16.1.7-compound-definite-assignment-pass-5
 finished 16.1.7-compound-definite-assignment-pass-5
 RESULT 16.1.7-compound-definite-assignment-pass-5 PASSED
@@ -5196,7 +5196,7 @@ finished 15.25-operand-type-1
 RESULT 15.25-operand-type-1 PASSED
 started 15.25-operand-type-2
 finished 15.25-operand-type-2
-RESULT 15.25-operand-type-2 PASSED
+RESULT 15.25-operand-type-2 FAILED
 started 15.25-operand-type-3
 finished 15.25-operand-type-3
 RESULT 15.25-operand-type-3 FAILED
@@ -8487,7 +8487,7 @@ finished 6.5.6.2-expression-8
 RESULT 6.5.6.2-expression-8 FAILED
 started 6.5.6.1-local-1
 finished 6.5.6.1-local-1
-RESULT 6.5.6.1-local-1 PASSED
+RESULT 6.5.6.1-local-1 FAILED
 started 6.5.6.1-local-2
 finished 6.5.6.1-local-2
 RESULT 6.5.6.1-local-2 FAILED
@@ -8625,7 +8625,7 @@ finished 6.5.2-simple-4
 RESULT 6.5.2-simple-4 PASSED
 started 6.5.2-simple-5
 finished 6.5.2-simple-5
-RESULT 6.5.2-simple-5 FAILED
+RESULT 6.5.2-simple-5 PASSED
 started 6.5.2-simple-6
 finished 6.5.2-simple-6
 RESULT 6.5.2-simple-6 PASSED
@@ -8682,7 +8682,7 @@ finished 6.5.1-type-4
 RESULT 6.5.1-type-4 PASSED
 started 6.5.1-type-5
 finished 6.5.1-type-5
-RESULT 6.5.1-type-5 PASSED
+RESULT 6.5.1-type-5 FAILED
 started 6.5.1-type-6
 finished 6.5.1-type-6
 RESULT 6.5.1-type-6 PASSED
@@ -9329,6 +9329,6 @@ started 3.10.5-runtime-2
 finished 3.10.5-runtime-2
 RESULT 3.10.5-runtime-2 FAILED
 Total 3235
-Passed 1655
+Passed 1648
 Skipped 125
-Failed 1455
+Failed 1462

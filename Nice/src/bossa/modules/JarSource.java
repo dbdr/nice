@@ -34,25 +34,29 @@ class JarSource extends PackageSource
     String pkgName = pkg.name.toString().replace('.', '/');
 
     JarEntry itfEntry = jar.getJarEntry(pkgName + "/package.nicei");
+    if (itfEntry == null)
+      return null;
+    
+    JarEntry bytecodeEntry = jar.getJarEntry(pkgName + "/package.class");
+    if (bytecodeEntry == null)
+      return null;
+    
+    JarEntry dispatchEntry = jar.getJarEntry(pkgName + "/dispatch.class");
+    if (dispatchEntry == null)
+      return null;
 
-    if (itfEntry != null)
-      {
-	JarEntry bytecodeEntry = jar.getJarEntry(pkgName + "/package.class");
-	if (bytecodeEntry != null)
-	  return new JarSource(pkg, jar, itfEntry, bytecodeEntry);	
-      }
-
-    return null;
+    return new JarSource(pkg, jar, itfEntry, bytecodeEntry, dispatchEntry);
   }
   
   JarSource(Package pkg, JarFile jar, 
-	    JarEntry itfEntry, JarEntry bytecodeEntry)
+	    JarEntry itfEntry, JarEntry bytecodeEntry, JarEntry dispatchEntry)
   {
     this.pkg = pkg;
     this.jar = jar;
 
     this.itfEntry = itfEntry;
     this.bytecodeEntry = bytecodeEntry;
+    this.dispatchEntry = dispatchEntry;
   }
 
   Unit[] getDefinitions(boolean forceReload)
@@ -65,6 +69,8 @@ class JarSource extends PackageSource
 
       bytecode = gnu.bytecode.ClassFileInput.readClassType
 	(jar.getInputStream(bytecodeEntry));
+      dispatch = gnu.bytecode.ClassFileInput.readClassType
+	(jar.getInputStream(dispatchEntry));
     }
     catch(IOException e){
       User.error(pkg.name,
@@ -103,5 +109,5 @@ class JarSource extends PackageSource
   private Package pkg;
   private JarFile jar;
 
-  private JarEntry itfEntry, bytecodeEntry;
+  private JarEntry itfEntry, bytecodeEntry, dispatchEntry;
 }

@@ -20,7 +20,7 @@ import bossa.util.*;
 
 import mlsub.typing.*;
 
-import bossa.syntax.MethodDeclaration;
+import bossa.syntax.NiceMethod;
 import bossa.syntax.Pattern;
 import bossa.syntax.LocatedString;
 import bossa.syntax.Node;
@@ -45,7 +45,7 @@ public class Alternative
   /**
    * When read from a source file.
    */
-  public Alternative(MethodDeclaration m, TypeConstructor[] patterns, 
+  public Alternative(NiceMethod m, TypeConstructor[] patterns, 
 		     ClassType c, Method method)
   {
     this.definitionClass = c;
@@ -81,10 +81,7 @@ public class Alternative
     
     methodName = new String(attr.data);
     
-    /*methodName = c.getName().substring(0,c.getName().length()-".package".length()).replace('.','$')
-      +"$"+s.substring(0,at);*/
-    
-    //Debug.println("name=" + methodName);
+    //System.out.println("Read " + methodName + " : " + s);
     
     ArrayList patterns = new ArrayList(5);
 
@@ -280,7 +277,7 @@ public class Alternative
     l.add(this);
   }
   
-  static List listOfAlternative(MethodDeclaration m)
+  static List listOfAlternative(NiceMethod m)
   {
     return (List) alternatives.get(m.getFullName());
   }

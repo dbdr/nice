@@ -19,6 +19,8 @@ package bossa.modules;
 import bossa.util.*;
 import java.io.*;
 
+import gnu.bytecode.ClassType;
+
 /**
  * A package located in a directory.
  * 
@@ -119,6 +121,20 @@ class DirectorySource extends PackageSource
     return res;
   }
 
+  private ClassType readClass(String name)
+  {
+    InputStream s = getFileStream(name);
+    if (s == null)
+      return null;
+    
+    ClassType res = null;    
+    try{ res = gnu.bytecode.ClassFileInput.readClassType(s); }
+    catch(LinkageError e){}
+    catch(IOException e){}
+    
+    return res;
+  }
+  
   private File getInterface()
   {
     File itf = new File(directory, "package.nicei");
@@ -126,27 +142,13 @@ class DirectorySource extends PackageSource
     if (!itf.exists())
       return null;
     
-    InputStream s = getBytecodeStream();
-    if (s == null)
-      {
-	User.warning("Bytecode for " + this.getName() + 
-		     " was not found, altough its interface exists.\n"+
-		     "Ignoring and recompiling");
-	return null;
-      }
-    
-    try{ bytecode = gnu.bytecode.ClassFileInput.readClassType(s); }
-    catch(LinkageError e){}
-    catch(IOException e){}
+    bytecode = readClass("package.class");
+    dispatch = readClass("dispatch.class");
 
-    if (bytecode != null)
-      return itf;
-    
-    User.warning("Bytecode for " + this + 
-		 " is not correct, altough its interface exists.\n"+
-		 "Ignoring and recompiling");
-    
-    return null;
+    if (bytecode == null || dispatch == null)
+      return null;
+
+    return itf;
   }
 
   private BufferedReader read(File f)
@@ -163,13 +165,18 @@ class DirectorySource extends PackageSource
   
   InputStream getBytecodeStream()
   {
-    File f = new File(directory, "package.class");
+    return getFileStream("package.class");
+  }
+  
+  private InputStream getFileStream(String name)
+  {
+    File f = new File(directory, name);
 
-    try{
-      if (f != null)
+    if (f != null)
+      try{
 	return new FileInputStream(f);
-    }
-    catch(FileNotFoundException e){}
+      }
+      catch(FileNotFoundException e){}
 
     return null;
   } 

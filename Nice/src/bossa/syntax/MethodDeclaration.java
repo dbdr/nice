@@ -92,27 +92,6 @@ abstract public class MethodDeclaration extends Definition
       (cst, new mlsub.typing.FunType(parameters, returnType));
   }
 
-  private void register()
-  {
-    /* 
-       This must not be done in constructor:
-       in case both the interface file and the source files are read, 
-       both should not be mangled and registered.
-    */
-    boolean isConstructor = name.toString().equals("<init>");
-    
-    // do not generate mangled names for methods
-    // that are not defined in a bossa file 
-    // (e.g. native methods automatically imported).
-    if(module != null && !isConstructor)
-      bytecodeName = module.mangleName(name.toString());  
-    else
-      bytecodeName = name.toString();
-
-    if(!isConstructor)
-      bossa.link.Dispatch.register(this);
-  }
-
   /****************************************************************
    * Initial Context
    ****************************************************************/
@@ -120,7 +99,7 @@ abstract public class MethodDeclaration extends Definition
   public void createContext()
   {
   }
-  
+
   /****************************************************************
    * Typechecking
    ****************************************************************/
@@ -134,8 +113,6 @@ abstract public class MethodDeclaration extends Definition
   
   void typecheck()
   {
-    register();
-
     // what we do here is equivalent to getType().checkWellFormedness();
     // except we also want to find the bytecode types when
     // the constraint is asserted
@@ -256,7 +233,6 @@ abstract public class MethodDeclaration extends Definition
       ;
   }
   
-  protected MethodContainer memberOf;
   protected int arity;
   private FormalParameters parameters;
   
@@ -283,26 +259,11 @@ abstract public class MethodDeclaration extends Definition
     return arity == 1 && "main".equals(name.content);
   }
   
-  /****************************************************************
-   * Module and unique name
-   ****************************************************************/
-  
-  public String getBytecodeName()
-  {
-    return bytecodeName;
-  }
-  
-  public String getFullName()
-  {
-    return module.getName().replace('.','$')+'$'+bytecodeName;
-  }
-
   public final mlsub.typing.Polytype getType()
   {
     return symbol.getType();
   }
   
-  String bytecodeName;
   MethodDeclaration.Symbol symbol;
 
   class Symbol extends PolySymbol

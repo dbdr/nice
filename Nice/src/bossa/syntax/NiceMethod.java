@@ -119,10 +119,7 @@ public class NiceMethod extends MethodDeclaration
     
     parameters.addThis(Monotype.create(thisType));
     
-    NiceMethod res = new NiceMethod(name, constraint, returnType, parameters);
-    res.memberOf = c;
-    
-    return res;
+    return new NiceMethod(name, constraint, returnType, parameters);
   }
 
   public NiceMethod(LocatedString name, 
@@ -132,6 +129,36 @@ public class NiceMethod extends MethodDeclaration
     super(name, constraint, returnType, parameters);
   }
 
+  /****************************************************************
+   * Initial Context
+   ****************************************************************/
+
+  private void register()
+  {
+    /* 
+       This must not be done in constructor:
+       in case both the interface file and the source files are read, 
+       both should not be mangled and registered.
+    */
+    boolean isConstructor = name.toString().equals("<init>");
+    
+    // do not generate mangled names for methods
+    // that are not defined in a bossa file 
+    // (e.g. native methods automatically imported).
+    if(module != null && !isConstructor)
+      bytecodeName = module.mangleName(name.toString());  
+    else
+      bytecodeName = name.toString();
+
+    if(!isConstructor)
+      bossa.link.Dispatch.register(this);
+  }
+
+  public void createContext()
+  {
+    register();
+  }
+  
   /****************************************************************
    * Typechecking
    ****************************************************************/
@@ -148,6 +175,18 @@ public class NiceMethod extends MethodDeclaration
   /****************************************************************
    * Code generation
    ****************************************************************/
+
+  String bytecodeName;
+
+  public String getBytecodeName()
+  {
+    return bytecodeName;
+  }
+  
+  public String getFullName()
+  {
+    return module.getName().replace('.','$')+'$'+bytecodeName;
+  }
 
   protected gnu.mapping.Procedure computeDispatchMethod()
   {

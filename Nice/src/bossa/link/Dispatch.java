@@ -41,7 +41,7 @@ public final class Dispatch
   // Non instantiable
   private Dispatch() { }
 
-  public static void register(MethodDeclaration m)
+  public static void register(NiceMethod m)
   {
     methods.add(m);
   }
@@ -50,16 +50,12 @@ public final class Dispatch
 
   public static void test(bossa.modules.Package module)
   {
-    for(Iterator i = methods.iterator();
-	i.hasNext();)
-      test((MethodDeclaration) i.next(), module);
+    for(Iterator i = methods.iterator(); i.hasNext();)
+      test((NiceMethod) i.next(), module);
   }
   
-  private static void test(MethodDeclaration m, bossa.modules.Package module)
+  private static void test(NiceMethod m, bossa.modules.Package module)
   {
-    if(!(m instanceof NiceMethod))
-      return;
-    
     // main does not have to be implemented if the module is not runnable
     if (m.isMain() && !module.isRunnable())
       return;
@@ -159,7 +155,7 @@ public final class Dispatch
     sortedAlternatives.push(a);
   }
 
-  private static void test(MethodDeclaration method,
+  private static void test(NiceMethod method,
 			   final Stack sortedAlternatives)
   {
     if(Debug.linkTests)
@@ -203,7 +199,7 @@ public final class Dispatch
      
      @return true if the test failed
    */
-  private static boolean test(MethodDeclaration method, 
+  private static boolean test(NiceMethod method, 
 			      TypeConstructor[] tags, 
 			      final Stack sortedAlternatives)
   {
@@ -237,7 +233,7 @@ public final class Dispatch
       {
 	failed = true;
 	if(sortedAlternatives.size()==0)
-	  User.warning
+	  User.error
 	    (method, "Method " + method + " is declared but never defined");
 	else
 	  User.warning(method,
@@ -251,7 +247,7 @@ public final class Dispatch
    * Compilation
    ****************************************************************/
 
-  private static void compile(MethodDeclaration m, 
+  private static void compile(NiceMethod m, 
 			      Stack sortedAlternatives, 
 			      bossa.modules.Package module)
   {

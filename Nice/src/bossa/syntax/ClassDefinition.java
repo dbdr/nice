@@ -262,9 +262,6 @@ abstract public class ClassDefinition extends Definition
     catch(TypingEx e){
       User.error(name,"Error in class "+name+" : "+e.getMessage());
     }
-
-    //if(associatedInterface!=null)
-    //associatedInterface.createContext();
   }
 
   /****************************************************************

@@ -90,6 +90,14 @@ public class AbstractInterface extends Definition
 		   " because they don't have the same number or kind of " +
 		   " type parameters");
       }
+
+    if (children != null)
+      for(Iterator i = children.iterator(); i.hasNext(); )
+	{
+	  Object o = i.next();
+	  if (o instanceof Definition)
+	    ((Definition) o).createContext();
+	}
   }
    
   /****************************************************************

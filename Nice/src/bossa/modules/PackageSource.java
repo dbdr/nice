@@ -45,6 +45,7 @@ abstract class PackageSource
   boolean sourcesRead;
   
   gnu.bytecode.ClassType bytecode;
+  gnu.bytecode.ClassType dispatch;
 
   /** @return the directory in which to place generated files 
       of this package. 

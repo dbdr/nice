@@ -34,30 +34,6 @@ import bossa.util.Location;
  */
 public class Package implements mlsub.compilation.Module, Located, bossa.syntax.Module
 {
-  public long lastModification()
-  {
-    return source.lastModification;
-  }
-  
-  public void lastModifiedRequirement(long date)
-  {
-    // If we've already loaded the source
-    // or none of our imports changed since last time we compiled,
-    // there is nothing to do
-    if (source.sourcesRead || date <= source.lastCompilation)
-      return;
-    
-    if (source instanceof JarSource)
-      User.error(this, name + " should be recompiled, but it was loaded from an archive file");
-    
-    if (Debug.modules)
-      Debug.println
-      (this + " was compiled " + new java.util.Date(lastModification()) + 
-       "\nA required package changed " + new java.util.Date(date) );
-
-    read(true);
-  }
-  
   /****************************************************************
    * Loading
    ****************************************************************/
@@ -128,7 +104,6 @@ public class Package implements mlsub.compilation.Module, Located, bossa.syntax.
     opens.addAll(imports);
 
     computeImportedPackages();
-    initDispatch();
   }
 
   private void read(boolean forceReload)
@@ -156,6 +131,30 @@ public class Package implements mlsub.compilation.Module, Located, bossa.syntax.
       isRunnable(alternativesHaveMain());
     
     Definition.currentModule = oldModule;
+  }
+  
+  public long lastModification()
+  {
+    return source.lastModification;
+  }
+  
+  public void lastModifiedRequirement(long date)
+  {
+    // If we've already loaded the source
+    // or none of our imports changed since last time we compiled,
+    // there is nothing to do
+    if (source.sourcesRead || date <= source.lastCompilation)
+      return;
+    
+    if (source instanceof JarSource)
+      User.error(this, name + " should be recompiled, but it was loaded from an archive file");
+    
+    if (Debug.modules)
+      Debug.println
+      (this + " was compiled " + new java.util.Date(lastModification()) + 
+       "\nA required package changed " + new java.util.Date(date) );
+
+    read(true);
   }
   
   private void sourcesRead()
@@ -439,33 +438,44 @@ public class Package implements mlsub.compilation.Module, Located, bossa.syntax.
   private gnu.expr.Compilation comp;
   public  gnu.expr.Compilation getCompilation() { return comp; }
   
-  private boolean isRoot;
-  
-  private static LinkedList dispatchClasses = new LinkedList();
-  public /*static final*/ ClassType dispatchClass;
-  public /*static final*/ gnu.expr.Compilation dispatchComp;
   static
   {
     nice.tools.code.NiceInterpreter.init();
   }
+
+  private static LinkedList dispatchClasses = new LinkedList();
+
+  private ClassType dispatchClass;
+  private gnu.expr.Compilation dispatchComp;
+
   private void initDispatch()
   {
-    ClassType ct = null;
-    gnu.expr.Compilation comp = null;
-    try{
-      String name = this.name.toString();
-      ct = new ClassType(name+".dispatch");
-      ct.setSuper(Type.pointer_type);
-      ct.setModifiers(Access.PUBLIC|Access.FINAL);
-      comp = new gnu.expr.Compilation(ct, name, name, "prefix", false);
-    }
-    catch(ExceptionInInitializerError e){
-      Internal.error("Error initializing Package class:\n"+
-		     e.getException());
-    }
-    dispatchClass = ct;
-    dispatchComp = comp;
-
+    /*
+      If no recompilation is done,
+      it is best to reuse the previous dispatch class
+      (and possibly save it elsewhere):
+      - We get the most precise bytecode type for methods,
+        as computed during the initial compilation.
+        This would not be the case if we recomputed it,
+	as the precise types are found during typechecking.
+      - it is probably faster, as we don't recreate the ClassType internals
+     */
+    if (!sourcesRead)
+      {
+	if (source.dispatch == null)
+	  Internal.error(this, "Dispatch class is needed");
+	dispatchClass = source.dispatch;
+      }
+    else
+      {
+	String name = this.name.toString();
+	dispatchClass = new ClassType(name+".dispatch");
+	dispatchClass.setSuper(Type.pointer_type);
+	dispatchClass.setModifiers(Access.PUBLIC|Access.FINAL);
+	dispatchComp = 
+	  new gnu.expr.Compilation(dispatchClass, name, name, "prefix", false);
+      }
+    
     dispatchClasses.add(dispatchClass);
   }
   
@@ -540,6 +550,8 @@ public class Package implements mlsub.compilation.Module, Located, bossa.syntax.
    */
   private void generateCode()
   {
+    initDispatch();
+    
     if (!sourcesRead)
       {
 	ast.compile();
@@ -654,8 +666,31 @@ public class Package implements mlsub.compilation.Module, Located, bossa.syntax.
     }
   }
 
-  public gnu.bytecode.Method addDispatchMethod(MethodDeclaration def)
+  /**
+     @return the bytecode method with this (unique) name
+     if the package has not been recompiled.
+  */
+  private Method getDispatchMethod(String methodName)
   {
+    if (sourcesRead || source.dispatch == null) 
+      return null;
+
+    methodName = nice.tools.code.Strings.escape(methodName);
+    
+    for (Method m = source.dispatch.getDeclaredMethods();
+	 m != null; m = m.getNext())
+      if (m.getName().equals(methodName))
+	return m;
+
+    return null;
+  }
+  
+  public gnu.bytecode.Method addDispatchMethod(NiceMethod def)
+  {
+    Method res = getDispatchMethod(def.getBytecodeName());
+    if (res != null)
+      return res;
+    
     return dispatchClass.addMethod
       (nice.tools.code.Strings.escape(def.getBytecodeName()),
        Access.PUBLIC|Access.STATIC|Access.FINAL,
@@ -801,6 +836,9 @@ public class Package implements mlsub.compilation.Module, Located, bossa.syntax.
   }
   
   public LocatedString name;
+  
+  /** True if this package was specified on the command line. */
+  private boolean isRoot;
   
   private AST ast;
 

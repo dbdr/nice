@@ -103,7 +103,7 @@ public class MethodBodyDefinition extends Definition
     return res;
   }
   
-  private void setDeclaration(MethodDeclaration d)
+  private void setDeclaration(NiceMethod d)
   {
     if (d == null)
       User.error(this, "Method " + name + " is not declared");
@@ -221,7 +221,7 @@ public class MethodBodyDefinition extends Definition
 		 name + " was declared at " + def.location()
 		 );
     
-    setDeclaration(def);
+    setDeclaration((NiceMethod) def);
 
     // Get type parameters
     if (binders != null)
@@ -389,7 +389,6 @@ public class MethodBodyDefinition extends Definition
   
   private Type[] javaArgTypes()
   {
-      //Type[] defTypes = definition.javaArgTypes();
     Type[] res = new Type[parameters.size()];
 
     Iterator p;
@@ -501,7 +500,7 @@ public class MethodBodyDefinition extends Definition
     return name + "(" + Util.map("", ", ", "", formals) + ")";
   }
 
-  /*private*/ MethodDeclaration definition;
+  private NiceMethod definition;
   protected Collection /* of FieldSymbol */  parameters;
   protected List       /* of Patterns */   formals;
   Collection /* of LocatedString */ binders; // Null if type parameters are not bound

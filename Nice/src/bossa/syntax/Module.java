@@ -35,7 +35,7 @@ public interface Module extends mlsub.compilation.Module
   abstract boolean generatingBytecode();
   abstract ClassType getOutputBytecode();
   abstract ClassType getReadBytecode();
-  abstract Method addDispatchMethod(MethodDeclaration def);
+  abstract Method addDispatchMethod(NiceMethod def);
   abstract Method getMainAlternative();
   void setMainAlternative(Method main);
   abstract void compileMethod(gnu.expr.LambdaExp meth);

@@ -41,9 +41,9 @@ deb $(DEB):
 
 .PHONY: tar
 tar ${TARFILE}: $(DEB)
-	${clean-tmp}
-	cd $(BUILDROOT) && $(MAKE) install PREFIX=${CURDIR}/tmp
-	cd tmp && tar -czf ../${TARFILE} . --owner=0 --group=0
+	${clean-tmp} && mkdir tmp/$(BUILDROOT)
+	cd $(BUILDROOT) && $(MAKE) install PREFIX=${CURDIR}/tmp/$(BUILDROOT)
+	cd tmp && tar -czf ../${TARFILE} $(BUILDROOT) --owner=0 --group=0
 
 .PHONY: rpm
 rpm ${RPMDIR}/${RPMFILE}: ${TARFILE}

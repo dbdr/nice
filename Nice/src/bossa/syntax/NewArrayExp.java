@@ -90,31 +90,6 @@ public class NewArrayExp extends Expression
           monotype = Types.rawType(res.equivalent());
         else
           monotype = res;
-            /*
-            TypeConstructor tc = new TypeConstructor("nullness", PrimitiveType.maybeTC.variance, false, false);
-            MonotypeVar raw = new MonotypeVar(res.getName()+"raw");
-            MonotypeConstructor eq = MonotypeConstructor.apply(tc, raw);
-            TypeSymbol[] vars;
-            if (nullVars == null)
-              vars = new TypeSymbol[]{tc, raw};
-            else
-              {
-                vars = new TypeSymbol[nullVars.length + 2];
-                System.arraycopy(nullVars, 0, vars, 2, nullVars.length);
-                vars[0] = tc;
-                vars[1] = raw;
-              }
-            cst = new Constraint(vars, new AtomicConstraint[]{
-              new TypeConstructorLeqCst(tc, PrimitiveType.maybeTC),
-              new MonotypeLeqCst(eq, res),
-              new MonotypeLeqCst(res, eq)});
-
-            if (nullVars != null)
-              monotype = MonotypeConstructor.apply(nullVars[nullVars.length - 1],
-                                                   raw);
-            else
-              monotype = bossa.syntax.Monotype.maybe(raw);
-            */
       }
     else if (resolvedType == mlsub.typing.TopMonotype.instance)
       {

@@ -166,8 +166,15 @@ public class TestSuite {
 	private TestCase createTestCase(String line) throws TestSuiteException {
 		String type = line.substring(TestNice.KEYWORD_SIGN.length()).trim();
 
+		boolean skip = false;
+		if (type.endsWith(" skip"))
+      {
+        skip = true;
+				type = type.substring(0, type.length() - "skip".length()).trim();
+      }
+
 		boolean isKnownBug = false;
-		if (type.endsWith("bug"))
+		if (type.endsWith(" bug"))
 			{
 				isKnownBug = true;
 				type = type.substring(0, type.length() - "bug".length()).trim();
@@ -181,6 +188,7 @@ public class TestSuite {
 		else
 			throw new TestSuiteException("Unknown testcase type: " + type);
 
+		res.skip = skip;
 		res.isKnownBug = isKnownBug;
 		return res;
 	}
@@ -197,7 +205,13 @@ public class TestSuite {
 		for(Iterator iter = _testCases.iterator(); iter.hasNext(); ) {
 			TestNice.cleanupTempFolder();
 			TestCase testCase = (TestCase)iter.next();
-			testCase.writeFiles();
+
+      if (testCase.skip) {
+        testCase.fail();
+        continue;
+      }
+
+      testCase.writeFiles();
 			testCase.performTest();
 		}
 	}

@@ -47,13 +47,13 @@ class Parser
   {
     return symb(t.image,t);
   }
-
+/*
   private static final Expression trueExp = 
     new IdentExp(new LocatedString("true", Location.nowhere()));
 
   private static final Expression falseExp = 
     new IdentExp(new LocatedString("false", Location.nowhere()));
-
+*/
   static List globalDefinitions;
 }
 PARSER_END(Parser)
@@ -110,8 +110,8 @@ TOKEN: /* Separators, Delimiters */
 | < RBRK:       "]"   >
 | < LBRACE:     "{"   >
 | < RBRACE:     "}"   >
-| < LPRAGMA:    "<*"  >
-| < RPRAGMA:    "*>"  >
+// | < LPRAGMA:    "<*"  >
+// | < RPRAGMA:    "*>"  >
 | < DOT:        "."   >
 | < COLON:      ":"   >
 | < COMMA:      ","   >
@@ -127,7 +127,7 @@ TOKEN: /* Operators */
   < EQ:      "="   >
 | < PLUS:    "+"   >
 | < MINUS:   "-"   >
-| < POWER:   "**"  >
+// | < POWER:   "**"  >
 | < MULT:    "*"   >
 | < SLASH:   "/"   >
 | < NEQ:     "!="  >
@@ -857,6 +857,7 @@ List namedMonotypes():
   { return res; }
 }
 
+/* 
 TypeParameters typeParameters():
 {
   List res=new ArrayList();
@@ -869,7 +870,7 @@ TypeParameters typeParameters():
   ">" )
   { return new TypeParameters(res); }
 }
-
+*/
 /***********************************************************************/
 /*                          Classes                                    */
 /***********************************************************************/
@@ -1965,7 +1966,7 @@ Expression UnaryExpression() :
 { Expression res; Token t=null; }
 {
   (
-  ( t="+" | t="-" ) res=UnaryExpression() 
+  ( t="+" | t="-" ) res=PrimaryExpression() 
     { res=CallExp.create(symb(t),res); }
 |
   res=PreIncrementExpression()
@@ -1994,7 +1995,7 @@ Expression PreDecrementExpression() :
 Expression UnaryExpressionNotPlusMinus() :
 { Expression res; Token t; }
 {
-  ( t="~" | t="!" ) res=UnaryExpression()
+  ( t="~" | t="!" ) res=PrimaryExpression()
   { return CallExp.create(symb(t),res); }
 
 /*
@@ -2662,8 +2663,8 @@ Statement ShortAssertStatement() :
 }
 {
   t = "assert"
-  condition = Expression()
-  ( ":" message = Expression() 
+  condition = SideEffectFreeExpression()
+  ( ":" message = SideEffectFreeExpression() 
     { call = CallExp.create(symb(t), condition, message); }
   |
     { call = CallExp.create(symb(t), condition); }

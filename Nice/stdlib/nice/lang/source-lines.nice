@@ -88,8 +88,11 @@ private ?int readConstantPool__(DataInputStream dstr)
 ?String sourceDebugExtension__(String className)
 {
   let resourceName = className.replace('.', '/') + ".class";
-  let stream = new DataInputStream
-    (java.lang.ClassLoader.getSystemResourceAsStream(resourceName));
+  let ?InputStream inputStream = java.lang.ClassLoader.getSystemResourceAsStream(resourceName);
+  if (inputStream == null)
+    return null;
+
+  let stream = new DataInputStream(inputStream);
 
   stream.skipBytes(8);
   let sourceDebugExtensionIndex = readConstantPool__(stream);

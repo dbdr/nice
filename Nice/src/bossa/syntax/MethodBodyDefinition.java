@@ -60,9 +60,6 @@ public class MethodBodyDefinition extends Definition
     this.formals = makeFormals(formals, container);
     this.body = body;
     this.declaration = null;
-    
-    if (name.content.equals("main") && formals.size() == 1)
-      module.isRunnable(true);
   }
 
   private static Pattern[] makeFormals(List formals, NiceClass container)
@@ -366,7 +363,7 @@ public class MethodBodyDefinition extends Definition
       try{
 	Pattern.in(monotypes, formals);
 
-	nice.tools.code.Types.setBytecodeType(monotypes);
+	Types.setBytecodeType(monotypes);
 
 	Typing.implies();
       }
@@ -445,7 +442,9 @@ public class MethodBodyDefinition extends Definition
     Type[] res = new Type[parameters.length];
 
     for(int n = 0; n < parameters.length; n++)
-      res[n] = nice.tools.code.Types.javaType(parameters[n].getMonotype());
+      res[n] = formals[n].atNull() 
+	? Types.javaType(ConstantExp.nullTC)
+	: Types.javaType(parameters[n].getMonotype());
 
     return res;
   }
@@ -463,10 +462,7 @@ public class MethodBodyDefinition extends Definition
 
   private void compile (NiceMethod definition)
   {
-    String bytecodeName = definition.getBytecodeName() + 
-      Pattern.bytecodeRepresentation(formals);
-
-    gnu.expr.LambdaExp lexp = createMethod(bytecodeName);
+    gnu.expr.LambdaExp lexp = createMethod(name.toString());
     gnu.expr.ReferenceExp ref = Gen.referenceTo(lexp);
     module.addMethod(lexp, true);
 
@@ -475,9 +471,6 @@ public class MethodBodyDefinition extends Definition
     lexp.addBytecodeAttribute
       (new MiscAttr("patterns", 
 		    Pattern.bytecodeRepresentation(formals).getBytes()));
-
-    if(name.content.equals("main") && formals.length == 1)
-      module.setMainAlternative(ref);
 
     // Register this alternative for the link test
     new bossa.link.Alternative(definition, this.formals, ref);
@@ -510,37 +503,6 @@ public class MethodBodyDefinition extends Definition
     Gen.setMethodBody(lexp, body.generateCode());
 
     return lexp;
-  }
-
-  /****************************************************************
-   * Main method
-   ****************************************************************/
-
-  public static void compileMain(Module module, 
-				 gnu.expr.ReferenceExp mainAlternative)
-  {
-    if(Debug.codeGeneration)
-      Debug.println("Compiling MAIN method");
-    
-    MonoSymbol args = new MonoSymbol
-      (new LocatedString("args", Location.nowhere()), 
-       (bossa.syntax.Monotype) null);
-    
-    gnu.expr.LambdaExp lexp = Gen.createMethod
-      ("main", 
-       new Type[]{ gnu.bytecode.ArrayType.make(Type.string_type) },
-       Type.void_type, 
-       new MonoSymbol[]{ args });
-
-    // Call arguments
-    gnu.expr.Expression[] eVal = new gnu.expr.Expression[]{ args.compile() };
-    Gen.setMethodBody(lexp, new gnu.expr.ApplyExp(mainAlternative, eVal));
-
-    module.addMethod(lexp, true);
-
-    // fake reference, just to force main to be public.
-    // Ah! the magic of the internals of Kawa...
-    nice.tools.code.Gen.referenceTo(lexp);
   }
 
   /****************************************************************

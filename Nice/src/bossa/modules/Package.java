@@ -130,11 +130,6 @@ public class Package implements mlsub.compilation.Module, Located, bossa.syntax.
       opens.add(((LocatedString) i.next()).toString());
     this.opens = (String[]) opens.toArray(new String[opens.size()]);
 
-    // if we are root, and read the AST from an interface file, 
-    // we don't know yet if we are runnable
-    if (isRoot && !compiling())
-      isRunnable(alternativesHaveMain());
-    
     Definition.currentModule = oldModule;
   }
   
@@ -194,17 +189,6 @@ public class Package implements mlsub.compilation.Module, Located, bossa.syntax.
       bossa.link.Alternative.read(source.getBytecode(), method);
   }
   
-  private boolean alternativesHaveMain()
-  {
-    for(Method method = source.getBytecode().getMethods();
-	method != null;
-	method = method.getNext())
-      if (method.getName().equals("main"))
-	return true;
-    
-    return false;
-  }
-
   /****************************************************************
    * Package dependencies
    ****************************************************************/
@@ -651,9 +635,6 @@ public class Package implements mlsub.compilation.Module, Located, bossa.syntax.
     implementationClass = createClassExp(name + ".package");
 
     ast.compile();
-    
-    if (isRunnable()) 
-      MethodBodyDefinition.compileMain(this, mainAlternative);
   }
 
   public ClassType createClass(String name)
@@ -817,27 +798,6 @@ public class Package implements mlsub.compilation.Module, Located, bossa.syntax.
   
   /** The compilation that is in process. */
   Compilation compilation;
-  
-  /** Whether this package has a "main" method */
-  private boolean isRunnable;
-  public boolean isRunnable()
-  {
-    return isRunnable;
-  }
-  public void isRunnable(boolean isRunnable)
-  {
-    this.isRunnable = isRunnable;
-  }
-
-  private ReferenceExp mainAlternative = null;
-  public void setMainAlternative(ReferenceExp main)
-  {
-    mainAlternative = main;
-  }
-  public ReferenceExp getMainAlternative()
-  {
-    return mainAlternative;
-  }
   
   /** 
       @return true if this package was loaded from an interface file,

@@ -115,8 +115,11 @@ abstract public class ClassDefinition extends MethodContainer
 	  { return "?" + parameters[0].toString(); }
 	};
     else if (name.equals("nice.lang.Null"))
-      tc = new mlsub.typing.TypeConstructor
-	("null", variance, isConcrete(), true);
+      {
+	tc = new mlsub.typing.TypeConstructor
+	  ("null", variance, isConcrete(), true);
+	ConstantExp.registerPrimType(name.toString(),tc);
+      }
     else
       tc = new mlsub.typing.TypeConstructor
 	(name.toString(), variance, isConcrete(), true);

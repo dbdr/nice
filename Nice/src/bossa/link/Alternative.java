@@ -61,24 +61,12 @@ public class Alternative
     {
       String methodName = nice.tools.code.Strings.unescape(method.getName());
 
-      if (
-	  // main is not an alternative
-	  methodName.equals("main")
-
-	  // Class initialization
-	  || methodName.equals("<clinit>")
-
-	  // Instance initialization
-	  || methodName.equals("<init>")
-	  )
-	return;
-
       MiscAttr attr = (MiscAttr) Attribute.get(method, "definition");
       if (attr == null)
-	// this must be a toplevel function
+	// this must be a toplevel function, a constructor, ...
 	return;
-      else
-	new Alternative(c, method, attr);
+
+      new Alternative(c, method, attr);
     }
 
   private Alternative(ClassType c, Method method, MiscAttr attr)

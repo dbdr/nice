@@ -27,9 +27,6 @@ public interface Module extends mlsub.compilation.Module
 
   String mangleName(String name);
 
-  boolean isRunnable();
-  void isRunnable(boolean isRunnable);
-
   /****************************************************************
    * Code generation
    ****************************************************************/
@@ -40,6 +37,4 @@ public interface Module extends mlsub.compilation.Module
   gnu.expr.Expression lookupPackageMethod(String methodName);
   void addMethod(gnu.expr.LambdaExp method, boolean packageMethod);
   void addImplementationClass(gnu.bytecode.ClassType classe);
-
-  void setMainAlternative(gnu.expr.ReferenceExp main);
 }

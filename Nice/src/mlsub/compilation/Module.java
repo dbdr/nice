@@ -60,9 +60,6 @@ public interface Module
   /** The date of the last modification of this module. */
   long lastModification();
 
-  /** True if this modules asks for link tests. */
-  boolean isRunnable();
-  
   // should be "static"
   void freezeGlobalContext();
   void unfreezeGlobalContext();

@@ -161,7 +161,6 @@ src/bossa/parser/Parser.java: src/bossa/parser/Parser.jj
 		${java} javacc Parser.jj
 
 bootstrap: parser
-	cd src/gnu/lists && ./withCollections
 	mkdir -p classes classes-inline
 	-cd src/bossa/syntax && mv -f dispatch.java.bootstrap dispatch.java
 	${JAVAC} \

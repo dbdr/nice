@@ -27,7 +27,10 @@ identString(e@SymbolExp) = e.getName();
 boolean isCallTo(CallExp e, String name) 
 {
   ?LocatedString f = identString(e.function);
-  return f != null && f.toString().equals(name);
+  if (f == null)
+    return false;
+  else
+    return f.toString().equals(name);
 }
 
 boolean isNullExp(Expression);

@@ -9,15 +9,24 @@ public class ProcInitializer extends Initializer
   {
     field = lexp.allocFieldFor(comp);
     proc = lexp;
-    if ((field.getModifiers() & Access.STATIC) != 0)
+    LambdaExp heapLambda = LambdaExp.getHeapLambda(lexp.outer);
+    if (heapLambda instanceof ModuleExp && comp.instanceField != null)
       {
 	next = comp.clinitChain;
 	comp.clinitChain = this;
       }
     else
       {
-	next = comp.initChain;
-	comp.initChain = this;
+	if (heapLambda instanceof ClassExp)
+	  {
+	    next = heapLambda.clinitChain;
+	    heapLambda.clinitChain = this;
+	  }
+	else
+	  {
+	    next = heapLambda.initChain;
+	    heapLambda.initChain = this;
+	  }
       }
   }
 
@@ -30,7 +39,7 @@ public class ProcInitializer extends Initializer
     code.emitDup(1);
 
     if (comp.method.getStaticFlag())
-      code.emitGetStatic(comp.instanceField);
+      code.emitGetStatic(comp.topLambda.getInstanceField());
     else
       code.emitPushThis();
     code.emitPushInt(proc.getSelectorValue(comp));
@@ -63,7 +72,11 @@ public class ProcInitializer extends Initializer
 		Object val = proc.properties[i+1];
 		code.emitDup(1);
 		comp.compileConstant(key);
-		((Expression) val).compile(comp, Target.pushObject);
+                Target target = Target.pushObject;
+                if (val instanceof Expression)
+                  ((Expression) val).compile(comp, target);
+                else
+                  comp.compileConstant(val, target);
 		Method m = comp.typeProcedure.getDeclaredMethod("setProperty",
 								2);
 		code.emitInvokeVirtual(m);

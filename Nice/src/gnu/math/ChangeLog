@@ -1,3 +1,27 @@
+2001-08-16  Per Bothner  <per@bothner.com>
+
+	* IntNum.java (setShiftRight):  Avoid undefined shift by 32.
+	Fixes bug found by Hans Boehm Hans <hans_boehm@hp.com> for libgcj.
+
+2001-04-22  Per Bothner  <per@bothner.com>
+
+	* IntNum.java (add, sub):  New static convenience methods.
+
+	* IntFraction.java (doubleValue):  If denominator is zero,
+	return infinity or NaN.
+
+2001-04-09  Per Bothner  <per@bothner.com>
+
+	* Makefile.am (CLEANFILES):  Remove redundant macro.
+
+2001-02-26  Per Bothner  <per@bothner.com>
+
+	* IntNum.java:  Minor style tweaks.
+
+2000-09-21  Per Bothner  <per@bothner.com>
+
+	* IntNum.java (divide):  Zero-extend results if high-order bit set.
+
 2000-06-09  Per Bothner  <per@bothner.com>
 
 	* NamedUnit.java:  New class, extends Unit.

@@ -1,8 +1,9 @@
 package gnu.expr;
-import gnu.mapping.Printable;
+import gnu.mapping.*;
 import java.io.*;
+import gnu.lists.*;
 
-public class Keyword extends Object implements Printable, Externalizable
+public class Keyword extends CpsProcedure implements Printable, Externalizable
 {
   // Does not include final ':'.
   private String name;
@@ -122,6 +123,36 @@ public class Keyword extends Object implements Printable, Externalizable
   public Object readResolve() throws ObjectStreamException
   {
     return make(name);
+  }
+
+  public void apply (CallContext ctx)
+  {
+    Consumer out = ctx.consumer;
+    String tag = getName();
+    int nargs = ctx.count;
+    out.beginGroup(tag, this);
+    for (int i = 0;  i < nargs;  i++)
+      {
+	Object arg = ctx.getArgAsObject(i);
+	if (arg instanceof Keyword && i + 1 < nargs)
+	  {
+	    Keyword attr = (Keyword) arg;
+	    arg = ctx.getArgAsObject(++i);
+	    out.beginAttribute(attr.getName(), attr);
+	    out.writeObject(arg);
+	    out.endAttribute();
+	  }
+	else
+	  {
+	    /*
+	    if (arg instanceof Consumable)
+	      ((Consumable) arg).consume(out);
+	    else
+	    */
+	      out.writeObject(arg);
+	  }
+      }
+    out.endGroup(tag);
   }
 
 }

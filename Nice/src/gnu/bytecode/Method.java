@@ -104,6 +104,11 @@ public class Method implements AttrContainer {
     return (access_flags & Access.STATIC) != 0;
   }
 
+  public final boolean isAbstract()
+  {
+    return (access_flags & Access.ABSTRACT) != 0;
+  }
+
   public int getModifiers ()
   {
     return access_flags;
@@ -153,12 +158,7 @@ public class Method implements AttrContainer {
   public void init_param_slots ()
   {
     initCode ();
-    if ((access_flags & Access.STATIC) == 0)
-      code.addLocal(classfile).setParameter(true);
-    int arg_count = arg_types.length;
-    for (int i = 0;  i < arg_count;  i++) {
-      code.addLocal(arg_types[i]).setParameter (true);
-    }
+    code.addParamLocals();
   }
 
   void kill_local (Variable var) { var.freeLocal(code); }
@@ -234,7 +234,8 @@ public class Method implements AttrContainer {
     
     if (code == null)
       throw new Error("Method "+this+" has no code");
-    
+      //return;
+
     dstr.writeShort (access_flags);
     dstr.writeShort (name_index);
     dstr.writeShort (signature_index);
@@ -294,7 +295,7 @@ public class Method implements AttrContainer {
     setSignature(sigConstant.string);
   }
 
-  void assign_constants ()
+  void assignConstants ()
   {
     ConstantPool constants = getConstants();
     if (name_index == 0 && name != null)
@@ -320,6 +321,7 @@ public class Method implements AttrContainer {
   {
     return name;
   }
+
   public final void setName(String name)
   {
     this.name = name;

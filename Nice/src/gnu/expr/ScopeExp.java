@@ -22,6 +22,50 @@ public abstract class ScopeExp extends Expression
     else
       last.next = decl;
     last = decl;
+    decl.context = this;
+  }
+
+  /** Add a Declaration at a specified position.
+   */
+  public void add (Declaration prev, Declaration decl)
+  {
+    if (prev == null)
+      { // Put first
+        decl.next = decls;
+        decls = decl;
+      }
+    else
+      {
+        decl.next = prev.next;
+        prev.next = decl;
+      }
+    if (last == prev)
+      last = decl;
+    decl.context = this;
+  }
+
+  public void remove (Declaration decl)
+  {
+    Declaration prev = null;
+    for (Declaration cur = firstDecl(); cur != null; cur = cur.nextDecl())
+      {
+	if (cur == decl)
+	  {
+	    remove(prev, decl);
+	    return;
+	  }
+	prev = decl;
+      }
+  }
+
+  public void remove (Declaration prev, Declaration decl)
+  {
+    if (prev == null)
+      decls = decl.next;
+    else
+      prev.next = decl.next;
+    if (last == decl)
+      last = prev;
   }
 
   public ScopeExp () { scope = new Scope (); }
@@ -41,6 +85,18 @@ public abstract class ScopeExp extends Expression
       }
   }
 
+  public ModuleExp currentModule ()
+  {
+    ScopeExp exp = this;
+    for (;; exp = exp.outer)
+      {
+	if (exp == null)
+	  return null;
+	if (exp instanceof ModuleExp)
+	  return (ModuleExp) exp;
+      }
+  }
+
   /**
    * Find a Declaration by name.
    * @param sym the (interned) name of the Declaration sought
@@ -52,6 +108,18 @@ public abstract class ScopeExp extends Expression
          decl != null;  decl = decl.nextDecl())
       {
 	if (decl.name == sym)
+	  return decl;
+      }
+    return null;
+  }
+
+  public Declaration lookup (String sym, Interpreter interp, int namespace)
+  {
+    for (Declaration decl = firstDecl();
+         decl != null;  decl = decl.nextDecl())
+      {
+	if (decl.name == sym
+	    && (interp.getNamespaceOf(decl) & namespace) != 0)
 	  return decl;
       }
     return null;
@@ -77,6 +145,8 @@ public abstract class ScopeExp extends Expression
       decl = addDeclaration(name);
     else if (decl.getFlag(Declaration.NOT_DEFINING))
       decl.setFlag(false, Declaration.NOT_DEFINING);
+    else if (decl.getFlag(Declaration.IS_UNKNOWN))
+      decl.setFlag(false, Declaration.IS_UNKNOWN);
     else
       {
 	StringBuffer sbuf = new StringBuffer(200);
@@ -140,8 +210,7 @@ public abstract class ScopeExp extends Expression
    */
   public final void addDeclaration (Declaration decl)
   {
-    add(decl);
-    decl.context = this;
+    add(decl);  // FIXME just use add
   }
 
   public int countDecls ()
@@ -152,5 +221,8 @@ public abstract class ScopeExp extends Expression
     return n;
   }
 
-  Object walk (ExpWalker walker) { return walker.walkScopeExp(this); }
+  protected Expression walk (ExpWalker walker)
+  {
+    return walker.walkScopeExp(this);
+  }
 }

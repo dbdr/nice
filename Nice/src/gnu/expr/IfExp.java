@@ -1,3 +1,6 @@
+// Copyright (c) 2001  Per M.A. Bothner.
+// This is free software;  for terms and warranty disclaimer see ./COPYING.
+
 package gnu.expr;
 import gnu.bytecode.*;
 import gnu.mapping.*;
@@ -23,7 +26,7 @@ public class IfExp extends Expression
     return Interpreter.defaultInterpreter; // FIXME
   }
 
-  public Object eval (Environment env)
+  public Object eval (Environment env) throws Throwable
   {
     Interpreter interpreter = getInterpreter();
     if (interpreter.isTrue((test.eval (env))))
@@ -32,6 +35,15 @@ public class IfExp extends Expression
       return else_clause.eval (env);
     else
       return interpreter.noValue();
+  }
+
+  public void eval (Environment env, CallContext ctx) throws Throwable
+  {
+    Interpreter interpreter = getInterpreter();
+    if (interpreter.isTrue((test.eval (env))))
+      then_clause.eval (env, ctx);
+    else if (else_clause != null)
+      else_clause.eval(env, ctx);
   }
 
   public void compile (Compilation comp, Target target)
@@ -93,12 +105,12 @@ public class IfExp extends Expression
       ctarget.trueBranchComesFirst = false;
     test.compile(comp, ctarget);
     code.emitIfThen();
-    if (! trueInherited && trueLabel.hasFixups())
+    if (! trueInherited /* && trueLabel.hasFixups()*/)
       {
 	trueLabel.define(code);
 	then_clause.compileWithPosition(comp, target);
       }
-    if (! falseInherited && falseLabel.hasFixups())
+    if (! falseInherited /* && falseLabel.hasFixups()*/)
       {
 	code.emitElse();
 	falseLabel.define(code);
@@ -110,22 +122,6 @@ public class IfExp extends Expression
     else
       code.setUnreachable();
     code.emitFi();
-  }
-
-  Object walk (ExpWalker walker) { return walker.walkIfExp(this); }
-
-  public void print (java.io.PrintWriter ps)
-  {
-    ps.print("(#%if ");
-    test.print (ps);
-    ps.print(" ");
-    then_clause.print (ps);
-    if (else_clause != null)
-      {
-	ps.print(" ");
-	else_clause.print (ps);
-      }
-    ps.print(")");
   }
 
   public Type getType()
@@ -143,8 +139,6 @@ public class IfExp extends Expression
 
     if(res==null)
       {
-	System.out.println(thenType+" "+thenType.getClass()+" != "+
-			   Type.void_type+" "+Type.void_type.getClass());
 	throw new Error("Incompatible types in "+this+
 			": "+thenType+" and "+elseType);
       }
@@ -152,9 +146,32 @@ public class IfExp extends Expression
     return res;
   }
 
-  public String toString()
+  protected Expression walk (ExpWalker walker)
   {
-    return "`if' expression located in file "+getFile()+
-      " line "+getLine();
+    return walker.walkIfExp(this);
+  }
+
+  protected void walkChildren(ExpWalker walker)
+  {
+    test = test.walk(walker);
+    if (walker.exitValue == null)
+      then_clause = then_clause.walk(walker);
+    if (walker.exitValue == null)
+     else_clause = else_clause.walk(walker);
+  }
+
+  public void print (OutPort out)
+  {
+    out.startLogicalBlock("(If ", false, ")");
+    out.setIndentation(-2, false);
+    test.print(out);
+    out.writeSpaceLinear();
+    then_clause.print (out);
+    if (else_clause != null)
+      {
+	out.writeSpaceLinear();
+	else_clause.print (out);
+      }
+    out.endLogicalBlock(")");
   }
 }

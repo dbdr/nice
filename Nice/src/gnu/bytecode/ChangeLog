@@ -1,4 +1,62 @@
-2001-06-21  Daniel Bonniot  <d.bonniot@mail.dotcom.fr>
+2001-10-23  Per Bothner  <per@bothner.com>
+
+	* CodeAttr.java (emitJsr):  New method.
+
+2001-09-20  Per Bothner  <per@bothner.com>
+
+	* PrimType.java (compare):  All types are subtypes of Object.
+
+2001-09-14  Per Bothner  <per@bothner.com>
+
+	* ObjectType.java (promote):  Convert nullType to pointer_type;
+	(getImplementationType):  Likewise.
+
+2001-09-12  Per Bothner  <per@bothner.com>
+
+	* Type.java (neverReturnsType):  Use different constructor, to
+	avoid it being registered in place of void_type.
+
+2001-08-23  Per Bothner  <per@bothner.com>
+
+	* Access.java (SUPER):  New constant.
+
+	* CodeAttr.java (emitInvoke):  Was testing isInterface on wrong class.
+
+	* CodeAttr.java (emitElse):  Fix bug (null pointer access)
+	reported by Felix S Klock II <pnkfelix@MIT.EDU>.
+
+	* Type.java (signatureToPrimitive):  Change return type.
+
+	* Type.java (getImplementationType):  New method.
+
+2001-08-15  Per Bothner  <per@bothner.com>
+
+	* ClassType.java (getSuperclass):  Don't call getReflectClass of
+	this is an interface or is Object.
+
+	* ClassType.java (setInterface):  New method.
+
+	* ClassType.java (getMethods(Filter,int)):  New method overloads.
+	(countMethods):  New method.
+	
+	* Method.java (isAbstract):  New method.
+
+2001-08-07  Brian Jones <cbj@gnu.org>
+
+	* LineNumbersAttr.java (getLineCount, getLineNumberTable): New methods.
+
+2001-07-16  Per Bothner  <per@bothner.com>
+
+	* PrimType.java (booleanValue):  Make static.
+
+	* Scope.java (find_var):  Renamed to ...
+	(getvariable): ... new name.
+	* CodeAttr.java (getArg):  Update accordingly.
+	(getCurrentScope):  New method.
+
+	* CodeAttr.java (getCurrentScope):  New method.
+
+2001-06-21  Daniel Bonniot  <Daniel.Bonniot@inria.fr>
 
 	* PrimType.java (coerceFromObject): Coerces characters to int and long
 	(intValue, longValue): New methods
@@ -6,11 +64,75 @@
 	(emitCoerceToObject): New Method
 	* Type.java (character_type, charValue_method): New fields
 
-2000-08-23  Daniel Bonniot <d.bonniot@mail.dotcom.fr>
+2001-04-23  Per Bothner  <per@bothner.com>
 
-        * CodeAttr.java (emitDup, emitDupX):  New methods.
+	* CodeFragment.java (linenumbers):  New field.
+	(emit):  Also emit linenumbers.
+	* CodeAttr.java (endFragment):  Save linenumbers in fragment.
 
-2000-06-20  Daniel Bonniot  <d.bonniot@mail.dotcom.fr>
+2001-04-07  Thomas Kirk  <tk@research.att.com>
+
+	* ZipLoader.java (loadAllClasses):  New method to force load
+	of all classes from the zip archive, close archive.
+	(close):  New Method to prevent leaking open ZipFiles when 
+	archive is not completely read.
+	(loadClass):  Reopen the zip file if it has been closed prematurely.
+
+	* ZipLoader.java (zipname):  New field to hold name of zipfile
+	in case it must be reopened.
+
+2001-03-29  Per Bothner  <per@bothner.com>
+
+	* CodeAttr.java (emitTryStart):  If the stack needs to be saved,
+	do so before setting the TryState's start_pc.
+	Fixes bug reported by Bob Bane <bane@gst.com>.
+
+2001-03-08  Per Bothner  <per@bothner.com>
+
+	* ClassType.java (getSuperclass):  Call getReflectClass if needed.
+
+	* ClassType.java (implementsInterface):  New method.
+	(compare):  Use implementsInterface to compare interfaces.
+
+2001-02-26  Per Bothner  <per@bothner.com>
+
+	* ClassType.java (doFixups):  Move method fixups to Method, CodeAttr.
+	* CodeAttr.java (assignConstants):  Handle CodeFragments, labels here.
+	* Method.java (assign_constants):  REname to assignConstants.
+
+2000-11-21  Brian R. Lewis <brlewis@users.sourceforge.net>
+
+	* ArrayClassLoader.java:  Handle custom classloader by using
+	Class.forName() instead of findSystemClass().
+	* ZipLoader.java:  Likewise.
+
+2000-10-09  Per Bothner  <per@bothner.com>
+
+	* ObjectType.java (setExisting):  New method.
+	* Type.java (getType):  Don't try to load reflectClass yet.
+
+	* ObjectType.java (getInternalName):  New method.
+	(getNameOrSignature):  Removed, replaced by getInternalName.
+	(getReflectClass):  Update to use getInternalName.
+	* ArrayType.java (getInternalName):  New method, replaces ...
+	(getNameOrSignature):  Removed, replaced by getInternalName.
+	* ConstantPool.java (addClass):  Update to use getInternalName.
+
+	* ObjectType.java (coerceFromObject):  Minor optimization.
+
+2000-08-23  Daniel Bonniot <Daniel.Bonniot@inria.fr>
+
+	* CodeAttr.java (emitDup, emitDupX):  New methods.
+
+2000-08-16  Per Bothner  <per@bothner.com>
+
+	* CodeAttr.java (addParamLocals):  New method.
+	* Method.java (init_param_slots):  Use CodeAttr's new addParamLocals.
+
+	* Type.java (make):  If an existing type has same name but different
+	reflectClass (i.e. different ClassLoader), treat it as different type.
+
+2000-06-20  Daniel Bonniot  <Daniel.Bonniot@inria.fr>
 
 	* PrimType.java (<init>(PrimType)):  Ensured that 
 	Type.registerTypeForClass is called.
@@ -91,7 +213,7 @@
 	* Type.java (neverReturnsType):  New static final Type.
 	(lowestCommonSuperType):  Handle neverReturnsType.
 
-2000-03-02  Daniel Bonniot  <d.bonniot@mail.dotcom.fr>
+2000-03-02  Daniel Bonniot  <Daniel.Bonniot@inria.fr>
 
 	* CodeAttr.java (words):  New private method.
 	(emitInvokeMethod):  Use new words method.
@@ -103,7 +225,7 @@
 	Various tweaks for better javadoc processing.
 	* overview.html:  Renamed to package.html.
 
-2000-02-25  Daniel Bonniot  <d.bonniot@mail.dotcom.fr>
+2000-02-25  Daniel Bonniot  <Daniel.Bonniot@inria.fr>
 
 	* ClassType.java (getInterfaces):  Fix thinko.
 
@@ -131,7 +253,7 @@
 	that doesn't set end_label (which may be unneeded).
 	(emitElse, emitFi):  Only set end_label if defined.
 
-2000-01-19  Daniel Bonniot  <d.bonniot@mail.dotcom.fr>
+2000-01-19  Daniel Bonniot  <Daniel.Bonniot@inria.fr>
 
         * CodeAttr.java (emitConvert):  Ensured that conversion from a
         primitive type to itself always succeeds, and that no code is

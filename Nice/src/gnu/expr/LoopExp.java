@@ -24,15 +24,6 @@ public class LoopExp extends Expression
     
   private Expression whileExp, loopBody, beforeNextIteration;
     
-  Object walk(ExpWalker w)
-  {
-    whileExp.walk(w);
-    if (loopBody != null)
-      loopBody.walk(w);
-    beforeNextIteration.walk(w);
-    return this;
-  }
-  
   public void compile(Compilation comp, Target target)
   {
     CodeAttr code = comp.getCode();
@@ -41,7 +32,7 @@ public class LoopExp extends Expression
       The test is placed at the end of the loop.
       This leads to N+1 gotos for N iterations.
       
-      A test at the begining would lead to 2*N+1 gotos.
+      A test at the begining would lead to 2xN+1 gotos.
     */
     Label start = new Label(code);
     Label test  = new Label(code);
@@ -89,16 +80,30 @@ public class LoopExp extends Expression
   {
     return Type.void_type;
   }
-
-  public void print(java.io.PrintWriter pw)
+  
+  protected Expression walk(ExpWalker w)
   {
-    pw.print("(#%loop (");
-    whileExp.print(pw);
-    pw.print(", ");
+    whileExp.walk(w);
     if (loopBody != null)
-      loopBody.print(pw);
-    pw.print(", ");
-    beforeNextIteration.print(pw);
-    pw.print(")");
+      loopBody.walk(w);
+    beforeNextIteration.walk(w);
+    return this;
+  }
+  
+  public void print(gnu.mapping.OutPort out)
+  {
+    out.startLogicalBlock("(Loop", ")", 2);
+    if (whileExp != null)
+     whileExp.print(out);
+    out.writeSpaceLinear();
+    if (loopBody != null)
+      loopBody.print(out);
+    if (beforeNextIteration != null)
+      {
+	out.writeSpaceLinear();
+        out.print("next ");
+        beforeNextIteration.print(out);
+      }
+    out.endLogicalBlock(")");
   }
 }

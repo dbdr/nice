@@ -13,9 +13,9 @@ public abstract class CallFrame extends CpsProcedure implements Cloneable
 
   public int numArgs() { return numArgs; }
 
-  public void apply (CallStack stack)
+  public void apply (CallContext stack)
   {
-    Object[] args = stack.args;
+    Object[] args = stack.values;
     Procedure.checkArgCount(this, args.length);
     try
       {
@@ -33,5 +33,5 @@ public abstract class CallFrame extends CpsProcedure implements Cloneable
       }
   }
 
-  public abstract void step (CallStack stack);
+  public abstract void step (CallContext stack);
 }

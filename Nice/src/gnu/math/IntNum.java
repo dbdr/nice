@@ -362,6 +362,18 @@ public class IntNum extends RatNum implements Externalizable
   }
 
   /** Add two IntNums, yielding their sum as another IntNum. */
+  public static IntNum add (IntNum x, IntNum y)
+  {
+    return add(x, y, 1);
+  }
+
+  /** Subtract two IntNums, yielding their sum as another IntNum. */
+  public static IntNum sub (IntNum x, IntNum y)
+  {
+    return add(x, y, -1);
+  }
+
+  /** Add two IntNums, yielding their sum as another IntNum. */
   public static IntNum add (IntNum x, IntNum y, int k)
   {
     if (x.words == null && y.words == null)
@@ -654,15 +666,20 @@ public class IntNum extends RatNum implements Externalizable
 	  xwords[xlen++] = 0;
 	MPN.divide (xwords, xlen, ywords, ylen);
 	rlen = ylen;
-	if (remainder != null || rounding_mode != TRUNCATE)
-	  MPN.rshift0 (ywords, xwords, 0, rlen, nshift);
+        MPN.rshift0 (ywords, xwords, 0, rlen, nshift);
 
-	qlen = xlen+1-ylen;
+	qlen = xlen + 1 - ylen;
 	if (quotient != null)
 	  {
 	    for (int i = 0;  i < qlen;  i++)
 	      xwords[i] = xwords[i+ylen];
 	  }
+      }
+
+    if (ywords[rlen-1] < 0)
+      {
+        ywords[rlen] = 0;
+        rlen++;
       }
 
     // Now the quotient is in xwords, and the remainder is in ywords.
@@ -695,6 +712,11 @@ public class IntNum extends RatNum implements Externalizable
       }
     if (quotient != null)
       {
+        if (xwords[qlen-1] < 0)
+          {
+            xwords[qlen] = 0;
+            qlen++;
+          }
 	quotient.set (xwords, qlen);
 	if (qNegative)
 	  {
@@ -986,7 +1008,7 @@ public class IntNum extends RatNum implements Externalizable
 	    MPN.rshift0 (words, x.words, word_count, d_len, count);
 	    ival = d_len;
 	    if (neg)
-	      words[ival-1] |= -1 << (32 - count);
+	      words[d_len-1] |= -2 << (31 - count);
 	  }
       }
   }

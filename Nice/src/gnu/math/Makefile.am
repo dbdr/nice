@@ -2,11 +2,9 @@
 
 AUTOMAKE_OPTIONS = foreign
 
-SUFFIXES = .java .class
+@Make_rules@
 
-javadir=$(datadir)/java/$(subdir)
-
-java_JAVA=\
+java_sources = \
   Numeric.java \
   Quantity.java DQuantity.java CQuantity.java \
   Complex.java CComplex.java DComplex.java \
@@ -21,3 +19,8 @@ java_JAVA=\
   ExponentialFormat.java
 
 EXTRA_DIST = package.html
+
+PACKAGE_FNAME = gnu-math
+GCJ_INPUTS =  $(java_Java)
+
+all: Makefile java-classes.stamp $(@GCJ_COMPILED_SELECTED@)

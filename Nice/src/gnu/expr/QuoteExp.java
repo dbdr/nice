@@ -40,12 +40,25 @@ public class QuoteExp extends Expression
     comp.compileConstant(value, target);
   }
  
-  Object walk (ExpWalker walker) { return walker.walkQuoteExp(this); }
-
-  public void print (java.io.PrintWriter ps)
+  protected Expression walk (ExpWalker walker)
   {
-    ps.print("(#%quote ");
-    SFormat.print (value, ps);
-    ps.print(")");
+    return walker.walkQuoteExp(this);
+  }
+
+  public void print (OutPort out)
+  {
+    out.startLogicalBlock("(Quote", ")", 2);
+    out.writeSpaceLinear();
+    gnu.lists.FormatToConsumer saveFormat = out.objectFormat;
+    try
+      {
+	out.objectFormat = Interpreter.getInterpreter().getFormat(true);
+	out.print(value);
+      }
+    finally
+      {
+	out.objectFormat = saveFormat;
+      }
+    out.endLogicalBlock(")");
   }
 }

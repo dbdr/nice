@@ -1,7 +1,16 @@
 ## Process this with automake to create Makefile.in
 
 AUTOMAKE_OPTIONS = foreign
-SUBDIRS = bytecode math text mapping expr kawa ecmascript jemacs
+
+SUBDIRS = bytecode math lists $(XML_SUBDIR) text mapping expr \
+	kawa commonlisp ecmascript $(XQUERY_SUBDIR) $(SWING_SUBDIRS)
+if ENABLE_XML
+XML_SUBDIR = xml
+XQUERY_SUBDIR = xquery
+endif
+if WITH_SWING
+SWING_SUBDIRS = jemacs
+endif
 EXTRA_DIST = PACKAGES
 
 HTML_HOME = $$HOME/public_html

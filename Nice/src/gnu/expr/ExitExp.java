@@ -3,6 +3,7 @@
 
 package gnu.expr;
 import gnu.bytecode.*;
+import gnu.mapping.OutPort;
 
 /**
  * Expression to exit a lexically surrounding block.
@@ -34,21 +35,29 @@ public class ExitExp extends Expression
     code.emitGoto(block.exitLabel);
   }
 
-  Object walk (ExpWalker walker) { return walker.walkExitExp(this); }
-
-  public void print (java.io.PrintWriter ps)
+  protected Expression walk (ExpWalker walker)
   {
-    ps.print("(#%exit ");
+    return walker.walkExitExp(this);
+  }
+
+  protected void walkChildren (ExpWalker walker)
+  {
+    result = result.walk(walker);
+  }
+
+  public void print (OutPort out)
+  {
+    out.startLogicalBlock("(Exit", false, ")");
     if (block == null || block.label == null)
-      ps.print("<unknown>");
+      out.print("<unknown>");
     else
-      ps.print(block.label.getName());
+      out.print(block.label.getName());
     if (result != null)
       {
-	ps.print(' ');
-	result.print(ps);
+	out.writeSpaceLinear();
+	result.print(out);
       }
-    ps.print(')');
+    out.endLogicalBlock(")");
   }
 
   public Type getType()

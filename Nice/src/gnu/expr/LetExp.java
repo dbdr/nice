@@ -1,5 +1,6 @@
 package gnu.expr;
 import gnu.bytecode.*;
+import gnu.mapping.OutPort;
 
 /**
  * Class used to implement "let" syntax (and variants) for Scheme.
@@ -78,35 +79,48 @@ public class LetExp extends ScopeExp
     return body.getType();
   }
 
-  Object walk (ExpWalker walker) { return walker.walkLetExp(this); }
-
-  public void print (java.io.PrintWriter ps)
+  protected Expression walk (ExpWalker walker)
   {
-    ps.print("(#%let (");
+    return walker.walkLetExp(this);
+  }
+
+  protected void walkChildren(ExpWalker walker)
+  {
+    inits = walker.walkExps(inits);
+    if (walker.exitValue == null)
+      body = (Expression) body.walk(walker);
+  }
+
+  public void print (OutPort out)
+  {
+    out.startLogicalBlock("(Let", ")", 2);
+    out.writeSpaceFill();
+    out.startLogicalBlock("(", false, ")");
     Declaration decl = firstDecl();
     int i = 0;
     
     for (; decl != null;  decl = decl.nextDecl())
       {
 	if (i > 0)
-	  ps.print(" ");
-	ps.print("(");
-	ps.print(decl.getName());
-	ps.print(" ");
+	  out.writeSpaceLinear();
+	out.print('(');
+	out.print(decl.getName());
+	out.writeSpaceFill();
 	//if (decl.isArtificial ())
-        //ps.print ("<artificial>");
+        //out.print ("<artificial>");
 	//else
 	  {
 	    if (inits[i] == null)
-	      ps.print ("<null>");
+	      out.print("<null>");
 	    else
-	      inits[i].print (ps);
+	      inits[i].print(out);
 	    i++;
 	  }
-	ps.print(")");
+	out.print(')');
       }
-    ps.print(") ");
-    body.print (ps);
-    ps.print(")");
+    out.endLogicalBlock(")");
+    out.writeSpaceLinear();
+    body.print (out);
+    out.endLogicalBlock(")");
   }
 }

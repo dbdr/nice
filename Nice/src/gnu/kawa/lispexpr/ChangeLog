@@ -1,3 +1,117 @@
+2001-10-19  Per Bothner  <per@bothner.com>
+
+	* ReaderDispatchMacro.java (read):  Since apply3 now throws Throwable,
+	we must catch it.
+	* ReaderMacro.java (read)  Likewise, for apply2 call.
+
+2001-09-21  Per Bothner  <per@bothner.com>
+
+	* LangPrimType.java (compare):  Any type can be converted to
+	boolean and vice versa, so return 0.
+
+2001-08-23  Per Bothner  <per@bothner.com>
+
+	* LangPrimType.java (implementationType):  New field.
+	(<init>):  Set implementationType.
+	(getImplementationType):  New method.
+
+2001-08-16  Per Bothner  <per@bothner.com>
+
+	Handle Guile-style keyword syntax '#:KEYWORD'.
+	* ReaderDispatchMisc.java (read):  On ':', read a keyword.
+	* ReaderDispatch.java (getInitial):  Register ':' dispatch syntax.
+
+2001-07-18  Per Bothner  <per@bothner.com>
+
+	* LispInterpreter.java:  If --applet was specified on command line,
+	note that supertype was specified,
+
+2001-07-17  Per Bothner  <per@bothner.com>
+
+	* LispInterpreter.java:  New class, extends Interpreter.
+	* Makefile.am (java_sourceses):  Added LispInterpreter.java.
+
+2001-06-17  Per Bothner  <per@bothner.com>
+
+	* ReaderParens.java (readList):  Fix handling of bad syntax.
+
+2001-06-05  Per Bothner  <per@bothner.com>
+
+	* ReaderParens.java (readList):  After seeing '.' that starts a token,
+	set ch to '.'.  Fixes bug report of Thomas Kirk <tk@research.att.com>.
+
+2001-06-03  Per Bothner  <per@bothner.com>
+
+	* ReaderDispatch.java (read):  Better error message.
+
+2001-05-16  Per Bothner  <per@bothner.com>
+
+	* LangPrimType.java (compare):  New method, handles <boolean>.
+	Fixes bug reported 05-11 by Allan Erskine <a.erskine@cs.ucl.ac.uk>.
+
+	* LangPrimType.java:  New class, renamed from kawa.lang.SpecialType.
+	* Makefile.am (java_sources):  Update accordingly.
+
+2001-05-09  Per Bothner  <per@bothner.com>
+
+	* LispReader.java (readValues):  Add missing read().
+
+2001-04-26  Per Bothner  <per@bothner.com>
+
+	* ReaderParens.java (readList):  Re-order tests so that the case
+	that there is no closing delimiter (ch==-1).  Fixes Scheme.eval.
+
+	* LispReader.java (makePair):  Don't used to-be-removed
+	PairWithPosition constructor; use static make method instead.
+
+2001-04-24  Per Bothner  <per@bothner.com>
+
+	* LispReader.java (parseNumber):  Use new Convert.parseDouble.
+
+2001-04-23  Per Bothner  <per@bothner.com>
+
+	* LispReader.java (parseNumber):  Set decimal_point correct.
+	If no digits before decimal_point adjust digits_start to include point.
+
+	* LispReader.java (makeSymbol):  New method.
+	(returnSymbol):  Call makeSymbol.
+
+	* LispReader.java (makeNil, makePair, setCdr):  Add implementations.
+	* ScmRead.java (makeNil, makePair, setCdr):  Remove implementations.
+
+	* LispReader.java (isDelimiter):  Remove - not used.
+	* ScmRead.java (numError):  Likewise.
+
+	* ReaderDispatch.java (kind):  New field.
+	(getKind):  Return kind instead of hardwired value.
+	Change constructors to set kind.
+	* ReaderMacro.java:  New class, extends ReaderMisc.
+	* ReaderDispatchMacro.java:  New class, extends ReaderMisc.
+	* Makefile.am:  Update for new classes.
+
+2001-04-22  Per Bothner  <per@bothner.com>
+
+	* LispReader.java:  Complete re-write, having the reader be
+	table-driven in the manner of Common Lisp readtables.
+	* ScmRead.java:  Likewise.
+	* ReadTable.java:  New class, extends gnu.kawa.util.RangeTable.
+	* ReadTableEntry.java:  New class.
+	* ReaderDispatch.java:  New class, extends ReadTableEntry.
+	* ReaderDispatchMisc.java:  New class, extends ReadTableEntry.
+	* ReaderIgnoreRestOfLine.java:  New class, extends ReadTableEntry.
+	* ReaderMisc.java:  New class, extends ReadTableEntry.
+	* ReaderParens.java:  New class, extends ReadTableEntry.
+	* ReaderQuote.java:  New class, extends ReadTableEntry.
+	* ReaderString.java:  New class, extends ReadTableEntry.
+	* ReaderVector.java:  New class, extends ReadTableEntry.
+	* Makefile.am:  Update for new classes.
+	* COPYING:  New file.
+
+2001-03-08  Per Bothner  <per@bothner.com>
+
+	* ScmRead.java:  Various fixes to use new gnu.lists package,
+	and name change UniformVector -> SimpleVector.
+
 2000-06-17  Per Bothner  <per@bothner.com>
 
 	* ScmRead.java (readString):  Avoid some code duplication.

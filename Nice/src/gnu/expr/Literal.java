@@ -59,13 +59,13 @@ public class Literal
       }
     else
       flags |= Access.PUBLIC;
-    assign(comp.mainClass.addField (name, type, flags), comp);
+    assign(comp.curClass.addField (name, type, flags), comp);
   }
 
   void assign (Field field, Compilation comp)
   {
-    next = comp.literalsChain;
-    comp.literalsChain = this;
+    next = comp.topLambda.literalsChain;
+    comp.topLambda.literalsChain = this;
     this.field = field;
   }
 

@@ -1,4 +1,4 @@
-// Copyright (c) 1999  Per M.A. Bothner.
+// Copyright (c) 1999, 2000  Per M.A. Bothner.
 // This is free software;  for terms and warranty disclaimer see ./COPYING.
 
 package gnu.expr;
@@ -30,13 +30,7 @@ public class PrimProcedure extends MethodProc implements gnu.expr.Inlineable
   /** Return true iff the last parameter is a "rest" argument. */
   public boolean takesVarArgs()
   {
-    return method.getName().endsWith("$V");
-  }
-
-  /** Return a buffer that can contain decoded (matched) arguments. */
-  public Object getVarBuffer()
-  {
-    return new Object[minArgs() + (takesVarArgs() ? 1 : 0)];
+    return method != null && method.getName().endsWith("$V");
   }
 
   public int numArgs()
@@ -47,24 +41,40 @@ public class PrimProcedure extends MethodProc implements gnu.expr.Inlineable
     return takesVarArgs() ? (num - 1) + (-1 << 12) : num + (num << 12);
   }
 
-  public RuntimeException match (Object vars, Object[] args)
+  public int match (CallContext ctx, Object[] args)
   {
-    int nargs = args.length;
-    Object[] rargs = (Object[]) vars;
-    boolean takesVarArgs = takesVarArgs();
-    int fixArgs = takesVarArgs ? rargs.length - 1 : rargs.length;
+    ctx.setArgsN(args);
 
-    if (takesVarArgs ? nargs < fixArgs: nargs != rargs.length)
-      return new WrongArguments(this, nargs);
+    int nargs = ctx.count;
+    boolean takesVarArgs = takesVarArgs();
+    int mlength = minArgs() + (takesVarArgs ? 1 : 0);
+    int fixArgs = takesVarArgs ? mlength - 1 : mlength;
+
+    if (takesVarArgs)
+      {
+        if (nargs < fixArgs)
+          return NO_MATCH_TOO_FEW_ARGS|fixArgs;
+      }
+    else
+      {
+        if (nargs != mlength)
+          if (nargs < mlength)
+            return NO_MATCH_TOO_FEW_ARGS|fixArgs;
+          else
+            return NO_MATCH_TOO_MANY_ARGS|fixArgs;
+      }
     int arg_count = argTypes.length;
     Type elementType = null;
     Object[] restArray = null;
+    int this_count = getStaticFlag() ? 0 : 1;
+    Object[] rargs = new Object[mlength - this_count];
+    Object thisValue;
     if (takesVarArgs)
       {
 	Type restType = argTypes[arg_count-1];
 	if (restType == Compilation.scmListType)
-	  {
-	    rargs[rargs.length-1] = gnu.kawa.util.LList.makeList(args, fixArgs);
+	  { // FIXME
+	    rargs[rargs.length-1] = gnu.lists.LList.makeList(args, fixArgs);
 	    nargs = fixArgs;
 	  }
 	else
@@ -77,33 +87,35 @@ public class PrimProcedure extends MethodProc implements gnu.expr.Inlineable
 	    rargs[rargs.length-1] = restArray;
 	  }
       }
-    int this_count = getStaticFlag() ? 0 : 1;
     if (this_count != 0)
-      rargs[0] = method.getDeclaringClass().coerceFromObject(args[0]);
+      thisValue = method.getDeclaringClass().coerceFromObject(ctx.getArgAsObject(0));
+    else
+      thisValue = null;
     for (int i = this_count;  i < nargs; i++)
       {
         try
           {
-            Object arg = args[i];
+            Object arg = ctx.getArgAsObject(i);
             Type type = i < fixArgs ? argTypes[i-this_count] : elementType;
             if (type != Type.pointer_type)
               arg = type.coerceFromObject(arg);
             if (i < fixArgs)
-              rargs[i] = arg;
+              rargs[i-this_count] = arg;
             else
               restArray[i - fixArgs] = arg;
           }
         catch (ClassCastException ex)
           {
-            return new WrongType(this, i, ex);
+            return NO_MATCH_BAD_TYPE|i;
           }
       }
-    return null;
+    ctx.value1 = thisValue;
+    ctx.value2 = rargs;
+    return 0;
   }
 
-  public Object applyV (Object vars)
+  public Object applyV (CallContext ctx) throws Throwable
   {
-    Object[] rargs = (Object[]) vars;
     int arg_count = argTypes.length;
     boolean is_constructor = op_code == 183;
     boolean is_static = getStaticFlag();
@@ -121,35 +133,20 @@ public class PrimProcedure extends MethodProc implements gnu.expr.Inlineable
 	    else
 	      member = clas.getMethod(method.getName(), paramTypes);
 	  }
+        Object[] rargs = (Object[]) ctx.value2;
 	if (is_constructor)
 	  return ((java.lang.reflect.Constructor) member).newInstance(rargs);
 	else
 	  {
 	    java.lang.reflect.Method meth = (java.lang.reflect.Method) member;
-	    Object result;
-	    if (method.getStaticFlag())
-	      result = meth.invoke(null, rargs);
-	    else
-              {
-                Object[] pargs = new Object[arg_count];
-                System.arraycopy(rargs, 1, pargs, 0, arg_count);
-                result = meth.invoke(rargs[0], pargs);
-              }
+	    Object result = meth.invoke(ctx.value1, rargs);
             return retType.coerceToObject(result);
 	  }
       }
     catch (java.lang.reflect.InvocationTargetException ex)
       {
 	Throwable th = ex.getTargetException();
-	if (th instanceof RuntimeException)
-	  throw (RuntimeException) th;
-	if (th instanceof Error)
-	  throw (Error) th;
-	throw new RuntimeException(th.toString());
-      }
-    catch (Exception ex)
-      {
-	throw new RuntimeException("apply not implemented for PrimProcedure "+this+" - "+ ex);
+	throw th;
       }
   }
 
@@ -158,12 +155,21 @@ public class PrimProcedure extends MethodProc implements gnu.expr.Inlineable
 		       Interpreter interpreter)
   {
     Type[] parameterTypes = new Type[parameterClasses.length];
+    Type[] implParameterTypes = new Type[parameterClasses.length];
     for (int i = parameterClasses.length;  --i >= 0; )
-      parameterTypes[i] = interpreter.getTypeFor(parameterClasses[i]);
+      {
+	Type ptype = interpreter.getTypeFor(parameterClasses[i]);
+	parameterTypes[i] = ptype;
+	implParameterTypes[i] = ptype.getImplementationType();
+      }
     Type returnType = interpreter.getTypeFor(method.getReturnType());
+    Type implReturnType = returnType.getImplementationType();
     ClassType thisType = (ClassType) interpreter.getTypeFor(thisClass);
-    init(thisType.addMethod(method.getName(), method.getModifiers(),
-			    parameterTypes, returnType));
+    Method meth = thisType.addMethod(method.getName(), method.getModifiers(),
+				     implParameterTypes, implReturnType);
+    init(meth);
+    argTypes = parameterTypes;
+    retType = op_code == 183 ? meth.getDeclaringClass() : returnType;
   }
 
   public PrimProcedure(java.lang.reflect.Method method,
@@ -243,6 +249,15 @@ public class PrimProcedure extends MethodProc implements gnu.expr.Inlineable
     this.argTypes= argTypes;
   }
 
+  public static PrimProcedure makeBuiltinBinary(int opcode, Type type)
+  {
+    // FIXME - should cache!
+    Type[] args = new Type[2];
+    args[0] = type;
+    args[1] = type;
+    return new PrimProcedure(opcode, type, args);
+  }
+
   public PrimProcedure(int op_code, ClassType classtype, String name,
 		       Type retType, Type[] argTypes)
   {
@@ -285,7 +300,8 @@ public class PrimProcedure extends MethodProc implements gnu.expr.Inlineable
    * @param args arguments to evaluate and push.
    * @param thisType If we are calling a non-static function,
    *   then args[0] is the receiver and thisType is its expected class.
-   *   If thisType==Type.void_type, ignore argType[0].
+   *   If thisType==Type.void_type, ignore argTypes[0].  (It is used to to
+   *   pass a link to a closure environment, which was pushed by our caller.)
    *   If this_type==null, no special handling of args[0] or argTypes[0].
    */
   public static void compileArgs(Expression[] args,
@@ -301,6 +317,7 @@ public class PrimProcedure extends MethodProc implements gnu.expr.Inlineable
     boolean is_static = thisType == null || skipArg != 0;
     int fix_arg_count = variable ? arg_count - (is_static ? 1 : 2)
       : args.length;
+    Declaration argDecl = source == null ? null : source.firstDecl();
     for (int i = 0; ; ++i)
       {
         if (variable && i == fix_arg_count)
@@ -309,7 +326,7 @@ public class PrimProcedure extends MethodProc implements gnu.expr.Inlineable
 	    /*
 	    if (arg_type == Compilation.scmListType)
 	      {
-		kawa.standard.list_v.compile(args, i, comp);
+		gnu.kawa.functions.MakeList.compile(args, i, comp);
 		break;
 	      }
 	    */
@@ -325,15 +342,18 @@ public class PrimProcedure extends MethodProc implements gnu.expr.Inlineable
             code.emitPushInt(i - fix_arg_count);
           }
         else
-          arg_type = is_static ? argTypes[i + skipArg]
+          arg_type = argDecl != null && (is_static || i > 0) ? argDecl.getType()
+	    : is_static ? argTypes[i + skipArg]
             : i==0 ? thisType
             : argTypes[i-1];
-	args[i].compile(comp,
-                        source == null
-                        ? CheckedTarget.getInstance(arg_type, name, i)
-                        : CheckedTarget.getInstance(arg_type, source, i));
+	Target target =
+	  source == null ? CheckedTarget.getInstance(arg_type, name, i)
+	  : CheckedTarget.getInstance(arg_type, source, i);
+	args[i].compileNotePosition(comp, target);
         if (i >= fix_arg_count)
           code.emitArrayStore(arg_type);
+	if (argDecl != null && (is_static || i > 0))
+	  argDecl = argDecl.nextDecl();
       }
   }
 
@@ -366,7 +386,6 @@ public class PrimProcedure extends MethodProc implements gnu.expr.Inlineable
       code.emitPrimop (opcode(), args.length, retType);
     else
       code.emitInvokeMethod(method, opcode());
-
     target.compileFromStack(comp, retType);
   }
 
@@ -388,7 +407,6 @@ public class PrimProcedure extends MethodProc implements gnu.expr.Inlineable
 	Declaration decl = lambda.addDeclaration("param__"+i,
 						 getParameterType(i));
 	
-	decl.setParameter(true);
 	args[i] = new ReferenceExp(decl);
       }
     
@@ -429,19 +447,40 @@ public class PrimProcedure extends MethodProc implements gnu.expr.Inlineable
 					    Expression[] args,
 					    Interpreter interpreter)
   {
+    Class pclass = getProcedureClass(pproc);
+    if (pclass == null)
+      return null;
+    return getMethodFor(pclass, pproc.getName(), decl, args, interpreter);
+  }
+
+  public static Class getProcedureClass (Object pproc)
+  {
     Class procClass;
     if (pproc instanceof gnu.expr.ModuleMethod)
       procClass = ((ModuleMethod) pproc).module.getClass();
     else
       procClass = pproc.getClass();
-    if (procClass.getClassLoader() != systemClassLoader)
-      return null;
+    try
+      {
+	if (procClass.getClassLoader() == systemClassLoader)
+	  return procClass;
+      }
+    catch (SecurityException ex)
+      {
+      }
+    return null;
+  }
+
+  /** Get PrimProcedure for matching method in given class. */
+  public static PrimProcedure
+  getMethodFor (Class procClass, String name, Declaration decl,
+                Expression[] args, Interpreter interpreter)
+  {
     try
       {
         java.lang.reflect.Method[] meths = procClass.getDeclaredMethods();
         java.lang.reflect.Method best = null;
         Class[] bestTypes = null;
-        String name = pproc.getName();
         if (name == null)
           return null;
         String mangledName

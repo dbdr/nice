@@ -1,3 +1,98 @@
+2001-07-17  Per Bothner  <per@bothner.com>
+
+	* AbstractFormat.java:  New class, implements FormatToConsumer.
+	* Makefile.am:  Update accordingly.
+
+2001-06-03  Per Bothner  <per@bothner.com>
+
+	* RangeTable.java (remove):  New methods.
+
+2001-04-22  Per Bothner  <per@bothner.com>
+
+	* RangeTable.java:  New class.
+	* Makefile.am:  Update accordingly.
+
+2001-03-29  Per Bothner  <per@bothner.com>
+
+	* Position.java:  Removed - subsumed by gnu.lists.SeqPosition.
+
+2001-03-08  Per Bothner  <per@bothner.com>
+
+	* AbstractString.java:  Replaced by gnu.lists.CharSequence.
+	* CharBuffer.java:  Moved to gnu.lists.
+	* ConstantString.java:  Removed for now.
+	* Consumable.java:  Moved to gnu.lists.
+	* Consumer.java:  Moved to gnu.lists.
+	* F32Vector.java:  Moved to gnu.lists.
+	* F64Vector.java:  Moved to gnu.lists.
+	* FString.java:  Moved to gnu.lists.
+	* FVector.java:  Moved to gnu.lists.
+	* LList.java:  Moved to gnu.lists.
+	* Pair.java:  Moved to gnu.lists.
+	* PairWithPosition.java:  Moved to gnu.lists.
+	* S16Vector.java:  Moved to gnu.lists.
+	* S32Vector.java:  Moved to gnu.lists.
+	* S64Vector.java:  Moved to gnu.lists.
+	* S8Vector.java:  Moved to gnu.lists.
+	* Sequence.java:  Moved to gnu.lists and made to an interface, with
+	method implementation moved to AbstractSequence.
+	* SubString.java:  Removed, for now.
+	* TreeList.java:  Moved to gnu.lists.
+	* U16Vector.java:  Moved to gnu.lists.
+	* U32Vector.java:  Moved to gnu.lists.
+	* U64Vector.java:  Moved to gnu.lists.
+	* U8Vector.java:  Moved to gnu.lists.
+	* UniformVector.java:  Replaced by gnu.lists.SimpleVector.
+	* Makefile.am:  Update accordingly.
+	* ConsumeProc.java:  Now need to import gnu.lists.
+
+2001-02-16  Per Bothner  <per@bothner.com>
+
+	* TreeList.java:  New class.
+	* ConsumeProc.java (applyN):  Use a TreeList instead of Collector.
+	* Collector.java:  Removed.
+	* gnu/kawa/util/Consumer.java (beginGroup):  Add new typeName argument.
+	(beginAttributes):  Liekwise.
+	(endGroup):  Make argument be a type-name String.
+	(endAttribute):  Removed method.
+	(endAttributes):  New method.
+	(writeChars(AbstractString)):  Removed.
+	* Makefile.am (java_JAVA):  Update accordingly.
+
+2000-12-13  Per Bothner  <per@bothner.com>
+
+	* LList.java (reverseInPlace):  New static method.
+
+2000-08-17  Per Bothner  <per@bothner.com>
+
+	* AbstractString.java (open, deleteRange):  New methods.
+	* CharBuffer.java (deleteRange):  New method.
+
+	* FVector.java (length):  New field.  Supports variable-length.
+	(add(Object)):  New method.  (Compatible with java.util.List.)
+	
+	* ConstantString.java:  New class, extends AbstractString.
+
+	* Consumer.java:  New interface.
+	* Consumable.java:  New interface.
+	* Collector.java:  New class.
+	* ConsumeProc.java:  New class.
+	* Makefile.am (java_JAVA):  Update for new classes.
+
+2000-06-24  Per Bothner  <per@bothner.com>
+
+	* AbstractString.java:  Implement gnu.mapping.Printable.
+	(print):  New method, code copied from FString.
+	(getChars, substring, toString, subString):  New methods.
+	* CharBuffer.java (getChars):  New method.
+	* FString.java (getChars, toCharArray):  Moved.
+	(print):  Use super.print.
+	* SubString.java (getChars, substring, subString):  New method.
+	(charAt, setCharAt, createPosition):  Add start	offset,
+	don't subtract it!
+
+	* Position.java (data, position):  Make protected.
+
 2000-06-19  Per Bothner  <per@bothner.com>
 
 	* Char.java:  Moved to gnu.text.

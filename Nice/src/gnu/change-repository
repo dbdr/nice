@@ -1,0 +1,73 @@
+#! /bin/sh
+
+prog=`basename $0`
+
+doc ()
+{
+  echo "Double repository is not installed in this directory."
+  echo "You should put in under CVS control, "
+  echo "and rename a CVS subdirectory into CVS-upstream."
+}
+
+usage ()
+{
+  echo "Usage:"
+  echo -e "$prog upstream\n\tPrepare for CVS operations with the upstream source"
+  echo
+  echo -e "$prog custom\n\tPrepare for CVS operations with the custom repository"
+  exit 1
+}
+
+die ()
+{
+  echo "$prog: $1"
+  exit 1
+}
+
+info ()
+{
+  echo "$1"
+}
+
+[ -r CVS ] || die "This directory is not under CVS"
+
+if [ -r CVS-upstream ]; then
+	info "Currently in custom mode"
+elif [ -r CVS-custom ]; then
+	info "Currently in upstream mode"
+else
+	doc
+	die "Exiting"
+fi
+
+[ $# = 1 ] || usage
+
+case $1 in
+  upstream)
+	[ -r CVS-upstream ] || die "Not in custom mode"
+	for cvsdir in `find . -type d -name 'CVS'`; do
+	  dir=`dirname "$cvsdir"`
+	  echo $dir
+	  mv -i ${dir}/CVS ${dir}/CVS-custom && mv -i ${dir}/CVS-upstream ${dir}/CVS
+	done
+	;;
+  custom)
+	[ -r CVS-custom ] || die "Not in upstream mode"
+	for cvsdir in `find . -type d -name 'CVS'`; do
+	  dir=`dirname "$cvsdir"`
+	  echo $dir
+	  mv -i ${dir}/CVS ${dir}/CVS-upstream && mv -i ${dir}/CVS-custom ${dir}/CVS
+	done
+	;;
+  *)
+	usage
+	;;
+esac
+
+exit
+
+	find . -type d -name 'CVS' \
+	-exec sh -c 'dir=`dirname "$0"` && mv -i ${dir}/CVS ${dir}/CVS-custom && mv -i ${dir}/CVS-upstream ${dir}/CVS' {} \;	
+
+	find . -type d -name 'CVS' \
+	-exec sh -c 'dir=`dirname "$0"` && mv -i ${dir}/CVS ${dir}/CVS-upstream && mv -i ${dir}/CVS-custom ${dir}/CVS' {} \;	

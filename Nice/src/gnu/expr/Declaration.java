@@ -1,5 +1,6 @@
 package gnu.expr;
 import gnu.bytecode.*;
+import gnu.mapping.Named;
 
 /**
  * The static information associated with a local variable binding.
@@ -13,9 +14,8 @@ import gnu.bytecode.*;
  * If a local variable is captured by an inner lambda, the
  * variable is stored in a field of the LambdaExp's heapFrame variable.
  * (The latter declaration has isSimple and isArtificial true.)
- * The heapFrame reference is an instance of the LambdaExp's heapFrameLambda;
- * the Declaration's field specifies the Field used.
- * <p>
+ * The Declaration's field specifies the Field used.
+ *
  * If a function takes a fixed number of parameters, at most four,
  * then the arguments are passed in Java registers 1..4.
  * If a parameter is not captured by an inner lambda, the parameter
@@ -74,18 +74,14 @@ public class Declaration
     if (var != null) var.setSimple(b);
   }
 
-  public final void setParameter(boolean b)
-  {
-    if (var != null) var.setParameter(b);
-  }
-  
   /** Return the ScopeExp that contains (declares) this Declaration. */
   public final ScopeExp getContext() { return context; }
 
   /** Used to link Declarations in a LambdaExp's capturedVars list. */
   Declaration nextCapturedVar;
 
-  /** If non-null, field is relative to base. */
+  /** If non-null, field is relative to base.
+   * If IS_FLUID, base points to IS_UNKNOWN Binding. */
   public Declaration base;
 
   public Field field;
@@ -102,6 +98,15 @@ public class Declaration
   public void load (Compilation comp)
   {
     gnu.bytecode.CodeAttr code = comp.getCode();
+    if (field == null && getFlag(STATIC_SPECIFIED) && value instanceof LambdaExp)
+      {
+	LambdaExp lambda = (LambdaExp) value;
+	lambda.flags |= LambdaExp.NO_FIELD;
+	lambda.compileAsMethod(comp);
+	comp.topLambda.applyMethods.addElement(lambda);
+	makeField(comp, value);
+      }
+
     if (field != null)
       {
         if (! field.getStaticFlag())
@@ -113,7 +118,26 @@ public class Declaration
           code.emitGetStatic(field);
       }
     else
-      code.emitLoad(getVariable());
+      {
+	Variable var = getVariable();
+	if (context instanceof ClassExp && var == null && ! getFlag(PROCEDURE))
+	  {
+	    ClassExp cl = (ClassExp) context;
+	    if (cl.isMakingClassPair())
+	      {
+		String getName = ClassExp.slotToMethodName("get", getName());
+		Method getter = cl.type.getDeclaredMethod(getName, 0);
+		cl.loadHeapFrame(comp);
+		code.emitInvoke(getter);
+		return;
+	      }
+	  }
+	if (var == null)
+	  {
+	    var = allocateVariable(code);
+	  }
+	code.emitLoad(var);
+      }
   }
 
   /* Compile code to store a value (which must already be on the
@@ -140,6 +164,14 @@ public class Declaration
 
   public final Expression getValue() { return value; }
 
+  /** If getValue() is a constant, return the constant value, otherwise null. */
+  public final Object getConstantValue()
+  {
+    if (! (value instanceof QuoteExp))
+      return null;
+    return ((QuoteExp) value).getValue();
+  }
+
   static final int INDIRECT_BINDING = 1;
   static final int CAN_READ = 2;
   static final int CAN_CALL = 4;
@@ -156,6 +188,9 @@ public class Declaration
   public static final int NONSTATIC_SPECIFIED = 0x1000;
   public static final int TYPE_SPECIFIED = 0x2000;
   public static final int IS_CONSTANT = 0x4000;
+  public static final int IS_SYNTAX = 0x8000;
+  public static final int IS_UNKNOWN = 0x10000;
+  public static final int PRIVATE_SPECIFIED = 0x20000;
 
   protected int flags = IS_SIMPLE;
 
@@ -229,10 +264,18 @@ public class Declaration
 
   public final boolean getCanWrite()
   { return (flags & CAN_WRITE) != 0; }
+
   public final void setCanWrite(boolean written)
   {
     if (written) flags |= CAN_WRITE;
     else flags &= ~CAN_WRITE;
+  }
+
+  public final void setCanWrite()
+  {
+    flags |= CAN_WRITE;
+    if (base != null)
+      base.setCanRead();
   }
 
   public void setName(String name)
@@ -245,6 +288,8 @@ public class Declaration
   public boolean ignorable()
   {
     if (getCanRead() || isPublic())
+      return false;
+    if (getCanWrite() && getFlag(IS_UNKNOWN))
       return false;
     if (! getCanCall())
       return true;
@@ -266,9 +311,10 @@ public class Declaration
   }
 
   public boolean isStatic()
-  { // This will soon be wrong.  FIXME.  Probably use isPublic instead.
-    return (context instanceof ModuleExp || context == null)
-      && ! isPrivate();
+  {
+    return (getFlag(STATIC_SPECIFIED)
+	    || (context instanceof ModuleExp
+		&& ((ModuleExp) context).isStatic()));
   }
 
   public final boolean isLexical()
@@ -292,7 +338,7 @@ public class Declaration
     else if (this.value != value)
       {
 	if (this.value instanceof LambdaExp) 
-          ((LambdaExp) this.value).nameDecl = null; 
+	  ((LambdaExp) this.value).nameDecl = null;
 	this.value = null;
       }
   }
@@ -312,6 +358,14 @@ public class Declaration
     setType(type);
   }
 
+  public Declaration (String name, Field field)
+  {
+    this.name = name;
+    setType(field.getType());
+    this.field = field;
+    setSimple(false);
+  }
+
   Method makeBindingMethod = null;
 
   /** Create a Binding object, given that isIndirectBinding().
@@ -323,13 +377,13 @@ public class Declaration
     code.emitPushString(getName());
     if (makeBindingMethod == null)
       {
-	ClassType typeBinding = ClassType.make("gnu.mapping.Binding");
 	Type[] args = new Type[2];
 	args[0] = Type.pointer_type;
 	args[1] = Type.string_type;
 	makeBindingMethod
-	  = typeBinding.addMethod("make", args, typeBinding,
-				  Access.PUBLIC|Access.STATIC);
+	  = Compilation.typeBinding.addMethod("make", args,
+					      Compilation.typeBinding,
+					      Access.PUBLIC|Access.STATIC);
       }
     code.emitInvokeStatic(makeBindingMethod);
   }
@@ -421,7 +475,10 @@ public class Declaration
 	Expression declValue = decl.getValue();
 	if (! (declValue instanceof ReferenceExp))
 	  break;
-	decl = ((ReferenceExp) declValue).binding;
+	ReferenceExp rexp = (ReferenceExp) declValue;
+	if (rexp.binding == null)
+	  break;
+	decl = rexp.binding;
       }
     return decl;
   }
@@ -429,7 +486,10 @@ public class Declaration
   public void makeField(Compilation comp, Expression value)
   {
     setSimple(false);
-    String fname = Compilation.mangleName(getName());
+    String fname = getName();
+    if (getFlag(IS_UNKNOWN))
+      fname = "id$" + fname;
+    fname = Compilation.mangleNameIfNeeded(fname);
     int fflags = 0;
     boolean isConstant = getFlag(IS_CONSTANT);
     boolean typeSpecified = getFlag(TYPE_SPECIFIED);
@@ -442,16 +502,27 @@ public class Declaration
     if (getFlag(STATIC_SPECIFIED)
 	|| (isConstant && value instanceof QuoteExp))
       fflags |= Access.STATIC;
-    Type ftype;
-    if (isIndirectBinding())
+    if (getFlag(IS_UNKNOWN))
       {
-	ftype = comp.getInterpreter().hasSeparateFunctionNamespace()
-	  ? Compilation.typeBinding2 : Compilation.typeBinding;
+	// This is a kludge.  We really should set STATIC only of the module
+	// is static, in which case it should be safe to make it always FINAL.
+	// But for now we don't support non-static UNKNOWNs.  FIXME.
+	fflags |= Access.STATIC;
+	if (! (context instanceof ModuleExp
+	       && ((ModuleExp) context).isStatic()))
+	  fflags &= ~Access.FINAL;
       }
-    else
-      ftype = value == null || typeSpecified ? getType()
-	: value.getType();
-    field = comp.mainClass.addField (fname, ftype, fflags);
+    Type ftype = (isIndirectBinding() ? Compilation.typeBinding
+		  : value == null || typeSpecified ? getType()
+		  : value.getType());
+    
+    field = comp.topClass.addField (fname, ftype, fflags);
+    setFieldValue(comp);
+  }
+
+  void setFieldValue(Compilation comp)
+  {
+    Type ftype = field.getType();
     if (value instanceof QuoteExp)
       {
 	Object val = ((QuoteExp) value).getValue();
@@ -466,21 +537,55 @@ public class Declaration
 	&& (ftype instanceof PrimType
 	    || "java.lang.String".equals(ftype.getName())))
       {
-	field.setConstantValue(((QuoteExp) value).getValue(), comp.mainClass);
+	field.setConstantValue(((QuoteExp) value).getValue(), 
+			       field.getDeclaringClass());
       }
-    else if (isIndirectBinding() || value != null)
+    else if ((isIndirectBinding() || value != null)
+	     && ! getFlag(IS_UNKNOWN))
       {
 	BindingInitializer init = new BindingInitializer(this, field, value);
-	if ((fflags & Access.STATIC) != 0)
+	if (field.getStaticFlag())
 	  {
-	    init.next = comp.clinitChain;
-	    comp.clinitChain = init;
+	    init.next = comp.topLambda.clinitChain;
+	    comp.topLambda.clinitChain = init;
 	  }
 	else
 	  {
-	    init.next = comp.initChain;
-	    comp.initChain = init;
+	    init.next = comp.mainLambda.initChain; // FIXME why mainLambda?
+	    comp.mainLambda.initChain = init;
 	  }
       }
+  }
+
+  public static Declaration getDeclaration(Named proc)
+  {
+    return getDeclaration(proc, proc.getName());
+  }
+
+  public static Declaration getDeclaration(Object proc, String name)
+  {
+    if (name != null)
+      {
+        Class procClass = PrimProcedure.getProcedureClass(proc);
+        if (procClass != null)
+          {
+            ClassType procType = (ClassType) Type.make(procClass);
+            String fname = Compilation.mangleName(name);
+            gnu.bytecode.Field procField = procType.getDeclaredField(fname);
+            if (procField != null)
+              {
+                int fflags = procField.getModifiers();
+                if ((fflags & Access.STATIC) != 0)
+                  {
+                    Declaration decl = new Declaration(name, procField);
+                    decl.noteValue(new QuoteExp(proc));
+                    if ((fflags & Access.FINAL) != 0)
+                      decl.setFlag(Declaration.IS_CONSTANT);
+                    return decl;
+                  }
+              }
+          }
+      }
+    return null;
   }
 }

@@ -1,20 +1,19 @@
 package gnu.mapping;
 import java.io.*;
+import gnu.lists.*;
 
 /** Encapsulate multiple values in a single object.
  * In Scheme and Lisp mainly used to return multiple values from a function.
  */
 
-public class Values implements Printable, Externalizable
+public class Values extends TreeList implements Printable, Externalizable
 {
   public static final Object[] noArgs = new Object[0];
-  private Object[] vals;
 
   public static final Values empty = new Values(noArgs);
 
   public Values ()
   {
-    vals = noArgs;
   }
 
   /** Constructor.
@@ -22,18 +21,25 @@ public class Values implements Printable, Externalizable
    */
   public Values (Object[] values)
   {
-    vals = values;
+    for (int i = 0;  i < values.length;  i++)
+      writeObject(values[i]);
   }
 
   /** Get the values encapsulated. */
+  // Used by CallContext.writeValue, call_with_values.apply(CallContext) FIXME
   public Object[] getValues ()
   {
-    return vals;
+    return isEmpty() ? noArgs : toArray();
   }
 
   public static Object values$V(Object[] vals)
   {
     return make(vals);
+  }
+
+  public static Object make ()
+  {
+    return new Values();
   }
 
   public static Object make (Object[] vals)
@@ -46,10 +52,51 @@ public class Values implements Printable, Externalizable
       return new Values(vals);    
   }
 
-  /** Apply a Procedure with these values as the arguments. */
-  public Object call_with (Procedure proc)
+  public static Object make (Sequence seq)
   {
-    return proc.applyN (vals);
+    int count = seq.size();
+    if (count == 0)
+      return empty;
+    if (count == 1)
+      return seq.get(0);
+    Values vals = new Values();
+    java.util.Enumeration it = seq.elements();
+    while (it.hasMoreElements())
+      vals.writeObject(it.nextElement());
+    return vals;
+  }
+
+  public static Object make (TreeList list)
+  {
+    return make(list, 0, list.data.length);
+  }
+
+  public static Object make (TreeList list, int startPosition, int endPosition)
+  {
+    int size = list.size();
+    if (size == 0)
+      return empty;
+    if (size == 1)
+      return list.getNext(startPosition, null);
+    Values vals = new Values();
+    list.consumeRange(startPosition, endPosition, vals);
+    return vals;
+  }
+
+  /** Apply a Procedure with these values as the arguments. */
+  public Object call_with (Procedure proc) throws Throwable
+  {
+    return proc.applyN (toArray());
+  }
+
+  public boolean equals (Object obj)
+  {
+    if (obj instanceof Values)
+      return super.equals(obj);
+    if (size() != 0)
+      return false;
+    Object x = getNext(0, null);
+    return x != null && x.equals(obj);
   }
 
   public void print(java.io.PrintWriter ps)
@@ -59,6 +106,7 @@ public class Values implements Printable, Externalizable
 	ps.print("#!void");
 	return;
       }
+    Object[] vals = toArray();  // FIXME!
     int size = vals.length;
     ps.print("#<values");
     for (int i = 0; i < size; i++)
@@ -75,6 +123,7 @@ public class Values implements Printable, Externalizable
    */
   public void writeExternal(ObjectOutput out) throws IOException
   {
+    Object[] vals = toArray();  // FIXME
     int len = vals.length;
     out.writeInt(len);
     for (int i = 0;  i < len;  i++)
@@ -85,15 +134,13 @@ public class Values implements Printable, Externalizable
     throws IOException, ClassNotFoundException
   {
     int len = in.readInt();
-    Object[] data = len == 0 ? noArgs : new Object[len];
     for (int i = 0;  i < len;  i++)
-      data[i] = in.readObject();
-    this.vals = data;
+      writeObject(in.readObject());
   }
 
   public Object readResolve() throws ObjectStreamException
   {
-    return vals.length == 0 ? empty : this;
+    return isEmpty() ? empty : this;
   }
 
 }

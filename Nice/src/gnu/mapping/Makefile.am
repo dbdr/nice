@@ -2,19 +2,18 @@
 
 AUTOMAKE_OPTIONS = foreign
 
-SUFFIXES = .java .class
+@Make_rules@
 
-javadir=$(datadir)/java/$(subdir)
-
-java_JAVA=\
+java_sources=\
   AliasConstraint.java \
   ApplyMethodContainer.java ApplyMethodProc.java \
   Binding.java \
-  Binding2.java \
   BindingEnumeration.java \
   Constraint.java UnboundConstraint.java TrivialConstraint.java \
+  ConstantConstraint.java \
   IndirectConstraint.java \
-  CallFrame.java CallStack.java CpsProcedure.java \
+  CallFrame.java CallContext.java CpsProcedure.java \
+  CpsMethodContainer.java CpsMethodProc.java \
   Environment.java \
   FluidBinding.java \
   FluidConstraint.java \
@@ -44,12 +43,17 @@ java_JAVA=\
   Setter.java \
   Setter0.java \
   Setter1.java \
-  SysInPort.java \
   TtyInPort.java \
   UnboundSymbol.java \
   Values.java \
+  ValueStack.java \
   WrappedException.java \
   WrongArguments.java \
   WrongType.java
 
 EXTRA_DIST = package.html
+
+PACKAGE_FNAME = gnu-mapping
+GCJ_INPUTS =  $(java_Java)
+
+all: Makefile java-classes.stamp $(@GCJ_COMPILED_SELECTED@)

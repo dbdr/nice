@@ -1,17 +1,51 @@
 package gnu.mapping;
 
-/** This is a constraint used to catch unboud variables. */
+/** This is a constraint used to catch unbound variables. */
 
 public class UnboundConstraint extends Constraint
 {
   Environment environment;
+
+  static UnboundConstraint instance;
+
+  public static UnboundConstraint getInstance(Environment environment)
+  {
+    UnboundConstraint result;
+    if (environment != null)
+      {
+	result = environment.unboundConstraint;
+	if (result == null)
+	  {
+	    result = new UnboundConstraint(environment);
+	    environment.unboundConstraint = result;
+	  }
+      }
+    else
+      {
+	result = instance;
+	if (result == null)
+	  {
+	    result = new UnboundConstraint(null);
+	    instance = result;
+	  }
+      }
+    return result;
+  }
+
+  public static UnboundConstraint getInstance(Binding binding)
+  {
+    Constraint constraint = binding.constraint;
+    if (constraint instanceof UnboundConstraint)
+      return (UnboundConstraint) binding.constraint;
+    return getInstance(constraint.getEnvironment(binding));
+  }
 
   public UnboundConstraint (Environment environment)
   {
     this.environment = environment;
   }
 
-  public Object get (Binding binding)
+  public Object get (Binding binding, Object defaultValue)
   {
     // Before reporting an error, check parent environment.
     Object value = binding.value;
@@ -20,7 +54,7 @@ public class UnboundConstraint extends Constraint
       binding.value = value = environment.previous.lookup(binding.getName());
     if (value != null)
       return ((Binding) value).get();
-    throw new UnboundSymbol(binding.getName());
+    return defaultValue;
   }
 
   public boolean isBound (Binding binding)
@@ -30,12 +64,15 @@ public class UnboundConstraint extends Constraint
 
   public void set (Binding binding, Object value)
   {
+    Environment env = getEnvironment(binding);
+    if (env != null && env.locked)
+      throw new IllegalStateException("attempt to modify variable: "
+				      + binding.getName()
+				      + " locked environment");
     synchronized (binding)
       {
 	if (binding.constraint == this)
-	  binding.setConstraint(environment == null
-				? Binding.trivialConstraint
-				: environment.trivialConstraint);
+	  binding.setConstraint(TrivialConstraint.getInstance(env));
 	binding.constraint.set(binding, value);
       }
   }

@@ -6,7 +6,15 @@ package gnu.mapping;
 
 public abstract class Constraint
 {
-  public abstract Object get (Binding binding);
+  public abstract Object get (Binding binding, Object defaultValue);
+
+  public final Object get (Binding binding)
+  {
+    Object value = get(binding, Binding.UNBOUND);
+    if (value == Binding.UNBOUND)
+      throw new UnboundSymbol(binding.getName());
+    return value;
+  }
 
   public abstract void set (Binding binding, Object value);
 
@@ -54,5 +62,23 @@ public abstract class Constraint
                                             Constraint constraint)
   {
     binding.constraint = constraint;
+  }
+
+  /** Get value of "function binding" of a Binding.
+   * Some languages (including Common Lisp and Emacs Lisp) associate both
+   * a value binding and a function binding with a symbol.
+   * @return the function value, or Binding.UNBOUND if no function binding.
+   */
+  public Object getFunctionValue(Binding binding)
+  {
+    return binding.getProperty(Binding.FUNCTION, Binding.UNBOUND);
+  }
+
+  public void setFunctionValue(Binding binding, Object value)
+  {
+    if (value == Binding.UNBOUND)
+      binding.removeProperty(Binding.FUNCTION);
+    else
+      binding.setProperty(Binding.FUNCTION, value);
   }
 }

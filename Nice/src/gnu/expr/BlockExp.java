@@ -3,6 +3,7 @@
 
 package gnu.expr;
 import gnu.bytecode.*;
+import gnu.mapping.OutPort;
 
 /**
  * Class used to implement a block that can be exited.
@@ -78,21 +79,36 @@ public class BlockExp extends Expression
       target.compileFromStack(comp, subTarget.getType());
   }
 
-  Object walk (ExpWalker walker) { return walker.walkBlockExp(this); }
-
-  public void print (java.io.PrintWriter ps)
+  protected Expression walk (ExpWalker walker)
   {
-    ps.print("(#%block ");
+    return walker.walkBlockExp(this);
+  }
+
+  protected void walkChildren (ExpWalker walker)
+  {
+    if (body != null)
+      body = body.walk(walker);
+    if (walker.exitValue == null && exitBody != null)
+      exitBody = exitBody.walk(walker);
+  }
+
+  public void print (OutPort out)
+  {
+    out.startLogicalBlock("(Block", ")", 2);
     if (label != null)
-      ps.print(label.getName());
-    ps.print(' ');
-    body.print(ps);
+     out.print(label.getName());
+    out.writeSpaceLinear();
+    if (body == null)
+      out.print("<null body>");
+    else
+      body.print(out);
     if (exitBody != null)
       {
-        ps.print(" else ");
-        exitBody.print(ps);
+	out.writeSpaceLinear();
+        out.print("else ");
+        exitBody.print(out);
       }
-    ps.print(')');
+    out.endLogicalBlock(")");
   }
 
   public Type getType()

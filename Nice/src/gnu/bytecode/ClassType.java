@@ -1,8 +1,9 @@
-// Copyright (c) 1997, 1998, 1999  Per M.A. Bothner.
+// Copyright (c) 1997, 1998, 1999, 2001  Per M.A. Bothner.
 // This is free software;  for terms and warranty disclaimer see ./COPYING.
 
 package gnu.bytecode;
 import java.io.*;
+import java.util.Vector;
 
 public class ClassType extends ObjectType implements AttrContainer {
   public static final int minor_version = 3;
@@ -105,13 +106,12 @@ public class ClassType extends ObjectType implements AttrContainer {
 
   public ClassType getSuperclass ()
   {
-    if (superClass == null && reflectClass != null)
+    if (superClass == null
+	&& ! isInterface()
+	&& ! ("java.lang.Object".equals(getName()))
+ 	&& getReflectClass() != null)
       {
-        Class superReflectClass = reflectClass.getSuperclass();
-        // Neither Object nor interfaces have a superclass.
-        // I.e. equivalent to if(this!=Type.pointer_type && !isInterface()).
-        if (superReflectClass != null)
-          superClass = (ClassType) make(superReflectClass);
+	superClass = (ClassType) make(reflectClass.getSuperclass());
       }
     return superClass;
   }
@@ -160,6 +160,12 @@ public class ClassType extends ObjectType implements AttrContainer {
 
   public final boolean isInterface()
   { return (getModifiers() & Access.INTERFACE) != 0; }
+
+  public final void setInterface(boolean val)
+  {
+    if (val) access_flags |= Access.INTERFACE;
+    else access_flags &= ~Access.INTERFACE;
+  }
 
   public ClassType () { }
 
@@ -298,7 +304,7 @@ public class ClassType extends ObjectType implements AttrContainer {
   {
     return methods;
   }
- 
+
   public final int getMethodCount() {
     return methods_count;
   }
@@ -380,8 +386,49 @@ public class ClassType extends ObjectType implements AttrContainer {
     return methods;
   }
 
-  /** Get methods matching the given filter. */
+  /** Count methods matching a given filter.
+   * @param filter to select methods to return
+   * @param searchSupers 0 if only current class should be searched,
+   *   1 if superclasses should also be searched,
+   *   2 if super-interfaces should also be search
+   * @return number of methods that match
+   */
+  public final int countMethods (Filter filter, int searchSupers)
+  {
+    return getMethods(filter, searchSupers, null, 0);
+  }
+
   public Method[] getMethods (Filter filter, boolean searchSupers)
+  {
+    return getMethods(filter, searchSupers ? 1 : 0);
+  }
+
+  /** Get methods matching a given filter.
+   * @param filter to select methods to return
+   * @param searchSupers 0 if only current class should be searched,
+   *   1 if superclasses should also be searched,
+   *   2 if super-interfaces should also be search
+   * @return a fresh array containing the methods satisfying the filter
+   */
+  public Method[] getMethods (Filter filter, int searchSupers)
+  {
+    int count = getMethods(filter, searchSupers, null, 0);
+    Method[] result = new Method[count];
+    getMethods(filter, searchSupers, result, 0);
+    return result;
+  }
+
+  /** Helper to get methods satisfying a filtering predicate.
+   * @param filter to select methods to return
+   * @param searchSupers 0 if only current class should be searched,
+   *   1 if superclasses should also be searched,
+   *   2 if super-interfaces should also be search
+   * @param result array to place selected methods in
+   * @param offset start of where in result to place result
+   * @return number of methods placed in result array
+   */
+  public int getMethods (Filter filter, int searchSupers,
+			 Method[] result, int offset)
   {
     int count = 0;
     for (ClassType ctype = this;  ctype != null;
@@ -390,23 +437,25 @@ public class ClassType extends ObjectType implements AttrContainer {
       for (Method meth = ctype.getDeclaredMethods();
 	   meth != null;  meth = meth.getNext())
 	if (filter.select(meth))
-	  count++;
-      if (! searchSupers)
+	  {
+	    if (result != null)
+	      result[offset + count] = meth;
+	    count++;
+	  }
+      if (searchSupers == 0)
 	break;
     }
-    Method[] methods = new Method[count];
-    count = 0;
-    for (ClassType ctype = this;  ctype != null;
-	 ctype = ctype.getSuperclass())
-    {
-      for (Method meth = ctype.getDeclaredMethods();
-	   meth != null;  meth = meth.getNext())
-	if (filter.select(meth))
-	  methods[count++] = meth;
-      if (! searchSupers)
-	break;
-    }
-    return methods;
+    if (searchSupers > 1)
+      {
+	ClassType[] interfaces = getInterfaces();
+	if (interfaces != null)
+	  {
+	    for (int i = 0;  i < interfaces.length;  i++)
+	      count += interfaces[i].getMethods(filter, searchSupers,
+						result, offset+count);
+	  }
+      }
+    return count;
   }
 
   public Method getDeclaredMethod(String name, Type[] arg_types)
@@ -606,21 +655,8 @@ public class ClassType extends ObjectType implements AttrContainer {
     for (Field field = fields; field != null; field = field.next) {
       field.assign_constants (this);
     }
-    for (Method method = methods; method != null; method = method.next) {
-      CodeAttr code = method.code;
-      if (code == null)
-        continue;
-      for (;;)
-        {
-          CodeFragment frag = code.fragments;
-          if (frag == null)
-            break;
-          code.fragments = frag.next;
-          frag.emit(code);
-        }
-      method.assign_constants ();
-      method.code.finalize_labels ();
-    }
+    for (Method method = methods; method != null; method = method.next)
+      method.assignConstants();
     Attribute.assignConstants(this, this);
   }
 
@@ -658,6 +694,10 @@ public class ClassType extends ObjectType implements AttrContainer {
     dstr.writeShort (fields_count);
     for (Field field = fields;  field != null;  field = field.next)
       field.write (dstr, this);
+
+    // Hack to generate a valid class even if some methods have no bytecode
+    //for (Method method = methods;  method != null;  method = method.next)
+    //if (method.getCode() == null) --methods_count;
 
     dstr.writeShort (methods_count);
 
@@ -736,6 +776,7 @@ public class ClassType extends ObjectType implements AttrContainer {
     return buffer;
   }
 
+  /* Daniel Bonniot
   public final boolean isSubclass(ClassType other)
   {
     ClassType baseClass = this;
@@ -748,7 +789,29 @@ public class ClassType extends ObjectType implements AttrContainer {
     return false;
   }
 
-  public final boolean doesImplement(ClassType other)
+  */
+
+  /** True if this class/interface implements the interface iface. */
+  public final boolean implementsInterface(ClassType iface)
+  {
+    if (this == iface)
+      return true;
+    ClassType baseClass = this.getSuperclass();
+    if (baseClass != null && baseClass.implementsInterface(iface))
+      return true;
+    ClassType[] interfaces = getInterfaces();
+    if (interfaces != null)
+      {
+	for (int i = interfaces.length;  --i >= 0; )
+	  {
+	    if (interfaces[i].implementsInterface(iface))
+	      return true;
+	  }
+      }
+    return false;
+  }
+
+  public final boolean isSubclass(ClassType other)
   {
     if (this == other)
       return true;
@@ -760,7 +823,7 @@ public class ClassType extends ObjectType implements AttrContainer {
 	
 	if(itfs!=null)
 	  for(int i=0; i<itfs.length; i++)
-	    if(itfs[i].doesImplement(other))
+	    if(itfs[i].implementsInterface(other))
 	      return true;
 
         baseClass = baseClass.getSuperclass();
@@ -784,8 +847,18 @@ public class ClassType extends ObjectType implements AttrContainer {
     if (name != null && name.equals(other.getName()))
       return 0;
     ClassType cother = (ClassType) other;
-    if (this.isInterface() || cother.isInterface())
-      return -2;
+    if (this.isInterface())
+      {
+	if (cother.implementsInterface(this))
+	  return 1;
+	return -2;
+      }
+    if (cother.isInterface())
+      {
+	if (this.implementsInterface(cother))
+	  return -1;
+	return -2;
+      }
     if (isSubclass(cother))
       return -1;
     if (cother.isSubclass(this))

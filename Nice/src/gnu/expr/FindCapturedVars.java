@@ -1,13 +1,14 @@
 package gnu.expr;
+import java.util.Hashtable;
 
-public class FindCapturedVars extends ExpFullWalker
+public class FindCapturedVars extends ExpWalker
 {
   public static void findCapturedVars (Expression exp)
   {
     exp.walk(new FindCapturedVars());
   }
 
-  public Object walkApplyExp (ApplyExp exp)
+  protected Expression walkApplyExp (ApplyExp exp)
   {
     boolean skipFunc = false;
     // If the func is bound to a module-level known function, and it
@@ -29,7 +30,12 @@ public class FindCapturedVars extends ExpFullWalker
 	    if (value instanceof LambdaExp)
 	      {
 		LambdaExp lexp = (LambdaExp) value;
-		if (! lexp.getNeedsClosureEnv())
+		LambdaExp cur = getCurrentLambda();
+		if (! lexp.getNeedsClosureEnv()
+		    // However, if --full-tailcalls was specified and this
+		    // is a call to the current function, we will
+		    // need a static link, for now.  FIXME.
+		    && ! (lexp == cur && Compilation.usingTailCalls))
 		  skipFunc = true;
 	      }
 	  }
@@ -65,9 +71,68 @@ public class FindCapturedVars extends ExpFullWalker
       }
   }
 
-  public Object walkLetExp (LetExp exp)
+  protected Expression walkModuleExp (ModuleExp exp)
   {
-    if (exp.body instanceof BeginExp && ! (exp instanceof FluidLetExp))
+    ModuleExp saveModule = currentModule;
+    Hashtable saveDecls = unknownDecls;
+    currentModule = exp;
+    unknownDecls = null;
+    try
+      {
+	return walkLambdaExp(exp);
+      }
+    finally
+      {
+	if (unknownDecls != null)
+	  {
+	    int count = unknownDecls.size();
+	    java.util.Enumeration e = unknownDecls.keys();
+	    int i = 0;
+	    Expression[] init = new Expression[1];
+	    LetExp let = new LetExp(init);
+	    Declaration env =
+	      let.addDeclaration("env$",
+				 Compilation.typeEnvironment);
+	    init[0] = new ApplyExp(Compilation.getCurrentEnvironmentMethod,
+				   Expression.noExpressions);
+	    env.setCanRead(true);
+	    env.noteValue(init[0]);
+	    Expression[] exps = new Expression[count+1];
+	    for (;  e.hasMoreElements();  i++)
+	      {
+		String id = (String) e.nextElement();
+		Declaration decl = (Declaration) unknownDecls.get(id);
+		Expression[] args = new Expression[2];
+		args[0] = new ReferenceExp(env);
+		args[1] = new QuoteExp(id);
+		SetExp set = new SetExp(decl, 
+					new ApplyExp(Compilation.getBindingEnvironmentMethod, args));
+		set.setDefining(true);
+		exps[i] = set;
+	      }
+	    exps[i] = currentModule.body;
+	    let.setBody(new BeginExp(exps));
+	    currentModule.body = let;
+	  }
+	currentModule = saveModule;
+	unknownDecls = saveDecls;
+      }
+  }
+
+  protected Expression walkFluidLetExp (FluidLetExp exp)
+  {
+    for (Declaration decl = exp.firstDecl(); decl != null; decl = decl.nextDecl())
+      {
+	Declaration bind = allocUnboundDecl(decl.getName());
+	capture(bind);
+	decl.base = bind;
+      }
+    return super.walkLetExp(exp);
+  }
+
+  protected Expression walkLetExp (LetExp exp)
+  {
+    if (exp.body instanceof BeginExp)
       {
 	// Optimize "letrec"-like forms.
 	// If init[i] is the magic QuoteExp.nullExp, and the real value
@@ -75,8 +140,9 @@ public class FindCapturedVars extends ExpFullWalker
 	// order-dependencies, and it is safe to transform it to a regular let.
 	Expression[] inits = exp.inits;
 	int len = inits.length;
-	Expression[] exps = ((BeginExp) exp.body).exps;
-	if (exps.length > len)
+        BeginExp bexp = (BeginExp) exp.body;
+	Expression[] exps = bexp.exps;
+	if (bexp.length > len)
 	  {
 	    int i = 0;
 	    Declaration decl = exp.firstDecl();
@@ -104,12 +170,18 @@ public class FindCapturedVars extends ExpFullWalker
   {
     if (! (decl.getCanRead() || decl.getCanCall()))
       return;
+
+    if (decl.getFlag(Declaration.IS_UNKNOWN))
+      return; // FIXME - for now, as long as unknows are static
+    if (decl.field != null && decl.field.getStaticFlag())
+      return;
+    if (decl.getFlag(Declaration.IS_CONSTANT)
+	&& decl.getValue() instanceof QuoteExp)
+      return;
+
     LambdaExp curLambda = getCurrentLambda ();
     LambdaExp declLambda = decl.getContext().currentLambda ();
-    
-    if(declLambda instanceof ModuleExp)
-      return;
-    
+
     // If curLambda is inlined, the function that actually needs a closure
     // is its caller.  We get its caller using returnContinuation.context.
     // A complication is that we can have a chain of functions that
@@ -145,8 +217,14 @@ public class FindCapturedVars extends ExpFullWalker
         curLambda = curReturn.context;
         chain = chain.nextSibling;
       }
-    if (curLambda == declLambda)
-      return;
+    if (Compilation.usingCPStyle())
+      {
+	if (curLambda instanceof ModuleExp)
+	  return;
+      }
+    else
+      if (curLambda == declLambda)
+	return;
 
     // The logic here is similar to that of decl.ignorable():
     Expression value = decl.getValue();
@@ -160,7 +238,7 @@ public class FindCapturedVars extends ExpFullWalker
           return;
         if (declValue.isHandlingTailCalls())
           declValue = null;
-        else if (declValue == curLambda && ! decl.getCanRead())
+	else if (declValue == curLambda && ! decl.getCanRead())
           return;
       }
     if (decl.getFlag(Declaration.STATIC_SPECIFIED))
@@ -170,7 +248,7 @@ public class FindCapturedVars extends ExpFullWalker
 	LambdaExp heapLambda = curLambda;
 	heapLambda.setImportsLexVars();
 	LambdaExp parent = heapLambda.outerLambda();
-	for (LambdaExp outer = parent;  outer != declLambda; )
+	for (LambdaExp outer = parent;  outer != declLambda && outer != null; )
 	  {
 	    heapLambda = outer;
 	    if (! decl.getCanRead() && declValue == outer)
@@ -185,28 +263,10 @@ public class FindCapturedVars extends ExpFullWalker
 	  }
 	if (decl.isSimple())
 	  {	
-	    if (declLambda instanceof ModuleExp)
+	    if (declLambda.capturedVars == null
+		&& ! (declLambda instanceof ModuleExp
+		      || declLambda instanceof ClassExp))
 	      {
-		declLambda.heapFrameLambda = declLambda;
-	      }
-	    else if (declLambda.capturedVars == null)
-	      {
-		if (heapLambda.isClassGenerated())
-		  declLambda.heapFrameLambda = heapLambda;
-		else
-		  {
-		    for (LambdaExp child = declLambda.firstChild; ;
-			 child = child.nextSibling)
-		      {
-			if (child == null)
-			  break;
-			if (child.isClassGenerated())
-			  {
-			    declLambda.heapFrameLambda = child;
-			    break;
-			  }
-		      }
-		  }
 		declLambda.heapFrame = new gnu.bytecode.Variable("heapFrame");
 		declLambda.heapFrame.setArtificial(true);
 	      }
@@ -220,30 +280,68 @@ public class FindCapturedVars extends ExpFullWalker
       }
   }
 
-  public Object walkReferenceExp (ReferenceExp exp)
+  Hashtable unknownDecls = null;
+  ModuleExp currentModule = null;
+
+  Declaration allocUnboundDecl(String name)
   {
-    Declaration decl = Declaration.followAliases(exp.getBinding());
-    if (decl != null)
-      capture(decl);
+    Declaration decl;
+    if (unknownDecls == null)
+      {
+	unknownDecls = new Hashtable(100);
+	decl = null;
+      }
+    else
+      decl = (Declaration) unknownDecls.get(name);
+    if (decl == null)
+      {
+	decl = currentModule.addDeclaration(name);
+	decl.setSimple(false);
+	decl.setPrivate(true);
+	if (currentModule.isStatic())
+	  decl.setFlag(Declaration.STATIC_SPECIFIED);
+	decl.setCanRead(true);
+	decl.setFlag(Declaration.IS_UNKNOWN);
+	decl.setIndirectBinding(true);
+	unknownDecls.put(name, decl);
+      }
+    return decl;
+  }
+
+  protected Expression walkReferenceExp (ReferenceExp exp)
+  {
+    Declaration decl = exp.getBinding();
+    if (decl == null)
+      {
+	decl = allocUnboundDecl(exp.getName());
+	exp.setBinding(decl);
+      }
+    else // FIXME remove else when IS_UNKNOWN decls are non-static
+    capture(Declaration.followAliases(decl));
     return exp;
   }
 
-  public Object walkThisExp (ThisExp exp)
+  protected Expression walkThisExp (ThisExp exp)
   {
     // FIXME - not really right, but works in simple cases.
     getCurrentLambda ().setImportsLexVars();
     return exp;
   }
 
-  public Object walkSetExp (SetExp exp)
+  protected Expression walkSetExp (SetExp exp)
   {
-    Declaration decl = Declaration.followAliases(exp.binding);
-    if (decl != null)
-      capture(decl);
+    Declaration decl = exp.binding;
+    if (decl == null)
+      {
+	decl = allocUnboundDecl(exp.getName());
+	exp.binding = decl;
+      }
+    else // FIXME remove else when IS_UNKNOWN decls are non-static
+    capture(Declaration.followAliases(decl));
     return super.walkSetExp(exp);
   }
 
-  public Object walkIncrementExp (IncrementExp exp)
+  public Expression walkIncrementExp (IncrementExp exp)
   {
     Declaration decl = Declaration.followAliases(exp.decl);
     if (decl != null)

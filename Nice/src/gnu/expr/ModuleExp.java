@@ -18,35 +18,175 @@ public class ModuleExp extends LambdaExp
    * This can be a let scope, or primitive procedure. */
   public boolean mustCompile;
 
+  public static boolean debugPrintExpr = false;
+
   public static final int EXPORT_SPECIFIED = LambdaExp.NEXT_AVAIL_FLAG;
   public static final int STATIC_SPECIFIED = EXPORT_SPECIFIED << 1;
   public static final int NONSTATIC_SPECIFIED = STATIC_SPECIFIED << 1;
   public static final int SUPERTYPE_SPECIFIED = NONSTATIC_SPECIFIED << 1;
 
+  public String getJavaName ()
+  {
+    return name == null ? "lambda" : Compilation.mangleName (name);
+  }
+
   public ModuleExp ()
   {
   }
 
-  public void addMethod(LambdaExp method)
+  public Object eval (Environment env) throws Throwable
   {
-    method.outer = this;
+    //if (thisValue != null)
+    /// return thisValue;
+    try
+      {
+        Class clas = evalToClass();
+	Object inst = clas.newInstance ();
 
-    method.nextSibling = firstChild;
-    firstChild = method;
+	Procedure proc = (Procedure) inst;
+	if (proc.getName() == null)
+	  proc.setName (this.name);
+        //thisValue = proc;
+	return inst;
+      }
+    catch (InstantiationException ex)
+      {
+	throw new RuntimeException("class not instantiable: in lambda eval");
+      }
+    catch (IllegalAccessException ex)
+      {
+	throw new RuntimeException("class illegal access: in lambda eval");
+      }
   }
-      
-  public final Object evalModule (Environment env)
+
+  /** Used to control which .zip file dumps are generated. */
+  public static String dumpZipPrefix;
+  public static int dumpZipCounter;
+
+  ///** A cache if this has already been evaluated. */
+  //Procedure thisValue;
+
+  public Class evalToClass ()
+  {
+    try
+      {
+	String class_name = getJavaName ();
+
+	Compilation comp = new Compilation (this, class_name, null, true);
+
+	byte[][] classes = new byte[comp.numClasses][];
+	String[] classNames = new String[comp.numClasses];
+	for (int iClass = 0;  iClass < comp.numClasses;  iClass++)
+	  {
+	    ClassType clas = comp.classes[iClass];
+	    classNames[iClass] = clas.getName ();
+	    classes[iClass] = clas.writeToArray ();
+	  }
+	if (dumpZipPrefix != null)
+	  {
+	    StringBuffer zipname = new StringBuffer(dumpZipPrefix);
+	    if (dumpZipCounter >= 0)
+	      zipname.append(++dumpZipCounter);
+	    zipname.append(".zip");
+	    java.io.FileOutputStream zfout
+	      = new java.io.FileOutputStream(zipname.toString());
+	    java.util.zip.ZipOutputStream zout
+	      = new java.util.zip.ZipOutputStream(zfout);
+	    for (int iClass = 0;  iClass < comp.numClasses;  iClass++)
+	      {
+		String clname
+		  = classNames[iClass].replace ('.', '/') + ".class";
+		java.util.zip.ZipEntry zent
+		  = new java.util.zip.ZipEntry (clname);
+		zent.setSize(classes[iClass].length);
+		java.util.zip.CRC32 crc = new java.util.zip.CRC32();
+		crc.update(classes[iClass]);
+		zent.setCrc(crc.getValue());
+		zent.setMethod(java.util.zip.ZipEntry.STORED);
+		zout.putNextEntry(zent);
+		zout.write(classes[iClass]);
+	      }
+	    zout.close ();
+	  }
+
+	/* DEBUGGING:
+	for (int iClass = 0;  iClass < comp.numClasses;  iClass++)
+	  ClassTypeWriter.print(comp.classes[iClass], System.out, 0);
+	*/
+
+	ArrayClassLoader loader = new ArrayClassLoader (classNames, classes);
+	Class clas = loader.loadClass (class_name, true);
+	/* Pass literal values to the compiled code. */
+	for (Literal init = comp.literalsChain;  init != null;
+	     init = init.next)
+	  {
+	    /* DEBUGGING:
+	    OutPort out = OutPort.errDefault();
+	    out.print("init["+init.index+"]=");
+	    SFormat.print(init.value, out);
+	    out.println();
+	    */
+	    try
+	      {
+		clas.getDeclaredField(init.field.getName())
+		  .set(null, init.value);
+	      }
+	    catch (java.lang.NoSuchFieldException ex)
+	      {
+		throw new Error("internal error - "+ex);
+	      }
+	  }
+        return clas;
+      }
+    catch (java.io.IOException ex)
+      {
+	ex.printStackTrace(OutPort.errDefault());
+	throw new RuntimeException ("I/O error in lambda eval: "+ex);
+      }
+    catch (ClassNotFoundException ex)
+      {
+	throw new RuntimeException("class not found in lambda eval");
+      }
+    catch (IllegalAccessException ex)
+      {
+	throw new RuntimeException("class illegal access: in lambda eval");
+      }
+  }
+
+  public final Object evalModule (Environment env) throws Throwable
+  {
+    CallContext ctx = new CallContext();
+    ctx.values = Values.noArgs;
+    evalModule(env, ctx);
+    return Values.make((gnu.lists.TreeList) ctx.vstack);
+  }
+
+  public final void evalModule (Environment env, CallContext ctx) throws Throwable
   {
     Environment orig_env = Environment.getCurrent();
     try
       {
 	if (env != orig_env)
 	  Environment.setCurrent(env);
+
+	if (debugPrintExpr)
+	  {
+	    OutPort dout = OutPort.outDefault();
+	    dout.println ("[Evaluating module \""+getName()+"\" mustCompile="+mustCompile+':');
+	    this.print(dout);
+	    dout.println(']');
+	    dout.flush();
+	  }
+
 	if (! mustCompile) // optimization - don't generate unneeded Class.
-	  return body.eval (env);
-	ModuleBody mod = (ModuleBody) eval (env);
-	gnu.kawa.reflect.ClassMemberConstraint.defineAll(mod, env);
-	return mod.run();
+	  body.eval (env, ctx);
+	else
+	  {
+	    ModuleBody mod = (ModuleBody) eval (env);
+	    gnu.kawa.reflect.ClassMemberConstraint.defineAll(mod, env);
+	    ctx.proc = mod;
+	  }
+	ctx.runUntilDone();
       }
     finally
       {
@@ -71,21 +211,21 @@ public class ModuleExp extends LambdaExp
 		&& ! getFlag(NONSTATIC_SPECIFIED)));
   }
 
-  public void allocFields (Compilation comp)
+  void allocFields (Compilation comp)
   {
     for (Declaration decl = firstDecl();
          decl != null;  decl = decl.nextDecl())
       {
-	if (decl.isSimple() && ! decl.isPublic())
+	if ((decl.isSimple() && ! decl.isPublic()) || decl.field != null)
 	  continue;
-	/*
-	if (decl instanceof kawa.lang.Macro
-	    && ((kawa.lang.Macro) decl).expander instanceof LambdaExp
+	/* NICE: remove spurious dependancy
+	if (decl.getFlag(Declaration.IS_SYNTAX)
+	    && ((kawa.lang.Macro) decl.getConstantValue()).expander instanceof LambdaExp
 	    && ! decl.isPrivate())
 	  continue;  // Handled in SetExp.
 	*/
 	Expression value = decl.getValue();
-	if (value instanceof LambdaExp)
+	if (value instanceof LambdaExp && ! (value instanceof ClassExp))
 	  {
 	    ((LambdaExp) value).allocFieldFor(comp);
 	  }
@@ -104,8 +244,8 @@ public class ModuleExp extends LambdaExp
   {
     if (directory == null || directory.length() == 0)
       directory = "";
-    else if (directory.charAt(directory.length() - 1) != '/')
-      directory = directory + '/';
+    else if (directory.charAt(directory.length() - 1) != File.separatorChar)
+      directory = directory + File.separatorChar;
     String name = getName();
     if (name != null)
       {
@@ -117,6 +257,25 @@ public class ModuleExp extends LambdaExp
 	      prefix = name.substring(0, index+1);
 	  }
       }
+
+    if (debugPrintExpr)
+      {
+	OutPort dout = OutPort.outDefault();
+	dout.println("[Compiling module-name:" + getName()
+		      + " top:" + topname + " prefix=" + prefix + " :");
+	this.print(dout);
+	dout.println(']');
+	dout.flush();
+      }
+
+    /* DEBUGGING:
+    OutPort perr = OutPort.errDefault();
+    perr.println ("[Expression to compile topname:"+topname+" prefix:"+prefix);
+    this.print (perr);
+    perr.println();
+    perr.flush();
+    */
+
     Compilation comp = new Compilation(this, topname, prefix, false);
     for (int iClass = 0;  iClass < comp.numClasses;  iClass++)
       {
@@ -180,29 +339,35 @@ public class ModuleExp extends LambdaExp
     zout.close ();
   }
 
-  Object walk (ExpWalker walker) { return walker.walkModuleExp(this); }
-
-  public void print (java.io.PrintWriter ps)
+  protected Expression walk (ExpWalker walker)
   {
-    ps.print("(#%module/");
+    return walker.walkModuleExp(this);
+  }
+
+  public void print (OutPort out)
+  {
+    out.startLogicalBlock("(Module/", ")", 2);
     if (name != null)
       {
-	ps.print(name);
-	ps.print('/');
+	out.print(name);
+	out.print('/');
       }
-    ps.print(id);
-    ps.println("/ (");
+    out.print(id);
+    out.print('/');
+    out.writeSpaceFill();
+    out.startLogicalBlock("(", false, ")");
     for (Declaration decl = firstDecl();
          decl != null;  decl = decl.nextDecl())
       {
-	ps.print("  ");
-	ps.println(decl);
+	out.print(decl);
+	out.writeSpaceFill();
       }
-    ps.print(") ");
+    out.endLogicalBlock(")");
+    out.writeSpaceLinear();
     if (body == null)
-      ps.print("<null body>");
+      out.print("<null body>");
     else
-      body.print (ps);
-    ps.print(")");
+      body.print (out);
+    out.endLogicalBlock(")");
   }
 }

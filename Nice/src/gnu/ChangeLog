@@ -1,3 +1,48 @@
+2001-10-17  Per Bothner  <per@bothner.com>
+
+	* kawa/Makefile.am:  Make kawa/xml, assuming --with-xml.
+
+	* Makefile.am (SUBDIRS):  Make xml subdir earlier.
+
+2001-07-18  Per Bothner  <per@bothner.com>
+
+	* gnu/xquery:  New directory.
+	* gnu/xquery/lang:  Likewise.
+	* gnu/xquery/util:  Likewise.
+	* gnu/xquery/testsuite:  Likewise.
+	* Makefile.am:  Buld xquery, but only if --enable-xml.
+
+2001-06-17  Per Bothner  <per@bothner.com>
+
+	* Makefile.am (SUBDIRS):  Use automake conditionals for swing.
+	Always do commonlisp.
+
+2001-06-09  Per Bothner  <per@bothner.com>
+
+	* Makefile.am (SUBDIRS):  Use automake conditionals for xml.
+
+2001-04-09  Per Bothner  <per@bothner.com>
+
+	* kawa/xml:  Sub-directory moved/renamed to ...
+	* xml:  ... new sub-direvtyory/package.
+	* Makefile.am (SUBDIRS):  Add xml, though only if --enable-xml.
+	* kawa/Makefile.am (SUBDIRS):  Removed xml entry.
+
+2001-03-08  Per Bothner  <per@bothner.com>
+
+	* Makefile.am (SUBDIRS):  Only select commonlisp if Swing is used.
+	(This is needed because of broken dependency on jemacs.)
+
+2000-10-12  Per Bothner  <per@bothner.com>
+
+	* kawa/functions:  New package.
+	* kawa/Makefile.am (SUBDIRS):  Add functions.
+
+2000-06-25  Per Bothner  <per@bothner.com>
+
+	* commonlisp:  New package.
+	* Makefile.am (SUBDIRS):  Add commonlisp.
+
 2000-05-28  Per Bothner  <per@bothner.com>
 
 	* kawa/lispexpr:  New package gnu.kawa.lispexpr.

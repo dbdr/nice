@@ -11,6 +11,7 @@ public abstract class Procedure implements Named, Printable
   private Object[] properties;
 
   private static final String nameKey = "name";
+  private static final String setterKey = "setter";
 
   public String getName()
   {
@@ -37,23 +38,23 @@ public abstract class Procedure implements Named, Printable
     setName(n);
   }
 
-  public abstract Object applyN (Object[] args);
+  public abstract Object applyN (Object[] args) throws Throwable;
 
-  public abstract Object apply0 ();
+  public abstract Object apply0 () throws Throwable;
 
-  public final void apply()
+  public final void apply() throws Throwable
   {
     apply0();
   }
 
-  public abstract Object apply1 (Object arg1);
+  public abstract Object apply1 (Object arg1) throws Throwable;
 
-  public abstract Object apply2 (Object arg1,Object arg2);
+  public abstract Object apply2 (Object arg1,Object arg2) throws Throwable;
 
-  public abstract Object apply3 (Object arg1, Object arg2, Object arg3);
+  public abstract Object apply3 (Object arg1, Object arg2, Object arg3) throws Throwable;
 
   public abstract Object apply4(Object arg1,Object arg2,
-				Object arg3,Object arg4);
+				Object arg3,Object arg4) throws Throwable;
 
   /** Minimum number of arguments required. */
   public final int minArgs() { return numArgs() & 0xFFF; }
@@ -86,26 +87,62 @@ public abstract class Procedure implements Named, Printable
   public int numArgs() { return 0xfffff000; }
 
   /* CPS: ??
-  public void apply1(Object arg, CallStack stack, CallFrame rlink, int rpc)
+  public void apply1(Object arg, CallContext stack, CallFrame rlink, int rpc)
   {
     context.value = apply1(arg);
     context.frame = rlink;
     context.pc = rpc;
   }
   */
-  /** Call this Procedure using the explicit-CallStack-convention.
+
+  /** Call this Procedure using the explicit-CallContext-convention.
    * The input arguments are (by default) in stack.args;
    * the result is (by default) left in stack.value. */
 
-  public void apply (CallStack stack)
+  public void apply (CallContext ctx) throws Throwable
   {
-    stack.value = applyN(stack.args);
+    Object result;
+    int count = ctx.count;
+    if (ctx.where == 0)
+      result = applyN(ctx.values);
+    else
+      {
+	switch (count)
+	  {
+	  case 0:
+	    result = apply0();
+	    break;
+	  case 1:
+	    result = apply1(ctx.getArgAsObject(0));
+	    break;
+	  case 2:
+	    result = apply2(ctx.getArgAsObject(0), ctx.getArgAsObject(1));
+	    break;
+	  case 3:
+	    result = apply3(ctx.getArgAsObject(0), ctx.getArgAsObject(1),
+			    ctx.getArgAsObject(2));
+	    break;
+	  case 4:
+	    result = apply4(ctx.getArgAsObject(0), ctx.getArgAsObject(1),
+			    ctx.getArgAsObject(2), ctx.getArgAsObject(3));
+	    break;
+	  default:
+	    result = applyN(ctx.getArgs());
+	    break;
+	  }
+      }
+    ctx.writeValue(result);
   }
 
   public Procedure getSetter()
   {
     if (! (this instanceof HasSetter))
-      throw new RuntimeException("procedure '"+getName()+ "' has no setter");
+      {
+	Object setter = getProperty(setterKey, null);
+	if (setter instanceof Procedure)
+	  return (Procedure) setter;
+	throw new RuntimeException("procedure '"+getName()+ "' has no setter");
+      }
     int num_args = numArgs();
     if (num_args == 0x0000)
       return new Setter0(this);
@@ -115,17 +152,17 @@ public abstract class Procedure implements Named, Printable
   }
 
   /** If HasSetter, the Procedure is called in the LHS of an assignment. */
-  public void set0(Object result)
+  public void set0(Object result) throws Throwable
   {
     getSetter().apply1(result);
   }
 
-  public void set1(Object result, Object arg1)
+  public void set1(Object arg1, Object value) throws Throwable
   {
-    getSetter().apply2(result, arg1);
+    getSetter().apply2(arg1, value);
   }
 
-  public void setN (Object[] args)
+  public void setN (Object[] args) throws Throwable
   {
     getSetter().applyN(args);
   }
@@ -135,9 +172,8 @@ public abstract class Procedure implements Named, Printable
     ps.print ("#<procedure ");
     String n = getName();
     if (n == null)
-      ps.print ("<unnamed>");
-    else
-      ps.print (n);
+      n = getClass().getName();
+    ps.print (n);
     ps.print ('>');
   }
 
@@ -201,5 +237,24 @@ public abstract class Procedure implements Named, Printable
     props[avail] = key;
     props[avail+1] = value;
     return properties;
+  }
+
+  public Object removeProperty(Object key)
+  {
+    Object[] props = properties;
+    if (props == null)
+      return null;
+    for (int i = props.length;  (i -= 2) >= 0; )
+      {
+	Object k = props[i];
+	if (k == key)
+	  {
+	    Object old = props[i + 1];
+	    props[i] = null;
+	    props[i + 1] = null;
+	    return old;
+	  }
+      }
+    return null;
   }
 }

@@ -16,11 +16,6 @@ public class ThrowExp extends Expression
     this.exception = exception;
   }
 
-  Object walk(ExpWalker w)
-  {
-    return w.walkThrowExp(this);
-  }
-  
   public void compile (Compilation comp, Target target)
   {
     CodeAttr code = comp.getCode();
@@ -28,17 +23,25 @@ public class ThrowExp extends Expression
     code.emitThrow();
   }
 
-  public void print(java.io.PrintWriter pw)
-  {
-    pw.print("(%throw ");
-    exception.print(pw);
-    pw.print(")");
-  }
-  
   public final Type getType()
   {
     return Type.void_type;
   }
 
   Expression exception;
+
+  protected Expression walk(ExpWalker w)
+  {
+    return w.walkThrowExp(this);
+  }
+  
+  public void print(gnu.mapping.OutPort out)
+  {
+    out.startLogicalBlock("(Throw", ")", 2);
+    if (exception == null)
+      out.print("<null exception>");
+    else
+      exception.print(out);
+    out.endLogicalBlock(")");
+  }
 }

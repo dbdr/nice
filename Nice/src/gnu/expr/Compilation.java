@@ -1,4 +1,4 @@
-// Copyright (c) 1999  Per M.A. Bothner.
+// Copyright (c) 1999, 2000, 2001  Per M.A. Bothner.
 // This is free software;  for terms and warranty disclaimer see ./COPYING.
 
 package gnu.expr;
@@ -9,8 +9,6 @@ import java.io.*;
 
 public class Compilation
 {
-  /** Set of visible top-level LambdaExps that need apply methods. */
-  Vector applyMethods = new Vector();
   /** Used by LambdaExp.getSelectorValue if need to allocate new selector. */
   int maxSelectorValue;
 
@@ -18,6 +16,7 @@ public class Compilation
   public ClassType mainClass;
 
   public LambdaExp curLambda;
+  public ModuleExp mainLambda;
   public Variable thisDecl;
 
   /** Contains "$instance" if the module is static; otherwise null. */
@@ -27,6 +26,9 @@ public class Compilation
    * Do this even if it makes things a little slower. */
   public static boolean fewerClasses;
 
+  /** If true, print out final expressions after optimizations etc. */
+  public static boolean debugPrintFinalExpr;
+
   public static boolean usingCPStyle;
   public static boolean usingTailCalls = false;
 
@@ -34,8 +36,8 @@ public class Compilation
    * If moduleStatic < 0, (module-static #f) is implied by default. */
   public static int moduleStatic = 0;
 
-  public ClassType[] classes;
-  public int numClasses;
+  ClassType[] classes;
+  int numClasses;
 
   /** True if the compiled result will be immediately loaded. */ 
   boolean immediate;
@@ -52,7 +54,7 @@ public class Compilation
   SwitchState fswitch;
 
   Field fswitchIndex;
-  /** The actual parameter of the current CallFrame.step(CallStack) method. */
+  /** The actual parameter of the current CallFrame.step(CallContext) method. */
   Variable callStackContext;
 
   // Various standard classes
@@ -64,16 +66,18 @@ public class Compilation
   static public ClassType javaStringType = typeString;
   static public ClassType scmSymbolType = typeString;
   static public ClassType scmKeywordType = ClassType.make("gnu.expr.Keyword");
-  static public ClassType scmSequenceType = ClassType.make("gnu.kawa.util.Sequence");
+  static public ClassType scmSequenceType = ClassType.make("gnu.lists.Sequence");
   static public ClassType javaIntegerType = ClassType.make("java.lang.Integer");
-  static public ClassType scmListType = ClassType.make("gnu.kawa.util.LList");
-  static public ClassType typePair = ClassType.make("gnu.kawa.util.Pair");
+  static public ClassType scmListType = ClassType.make("gnu.lists.LList");
+  static public ClassType typePair = ClassType.make("gnu.lists.Pair");
   static public ClassType scmPairType = typePair;
   static public ClassType scmUndefinedType = ClassType.make("gnu.expr.Undefined");
   public static final ArrayType objArrayType = ArrayType.make(typeObject);
   public static final ArrayType symbolArrayType= ArrayType.make(scmSymbolType);
   static public ClassType scmNamedType = ClassType.make("gnu.mapping.Named");
   static public ClassType typeRunnable = ClassType.make("java.lang.Runnable");
+  static public ClassType typeObjectType = ClassType.make("gnu.bytecode.ObjectType");
+  static public ClassType typeClassType = ClassType.make("gnu.bytecode.ClassType", typeObjectType);
   static public ClassType typeProcedure
     = ClassType.make("gnu.mapping.Procedure");
   static public ClassType typeInterpreter
@@ -86,10 +90,6 @@ public class Compilation
     = ClassType.make("gnu.mapping.Location");
   static public ClassType typeBinding
     = ClassType.make("gnu.mapping.Binding", typeLocation);
-  static public ClassType typeBinding2
-    = ClassType.make("gnu.mapping.Binding2", typeBinding);
-  static final Field functionValueBinding2Field
-    = typeBinding2.addField ("functionValue", Type.pointer_type,Access.PUBLIC);
   static public final Method getLocationMethod
     = typeLocation.addMethod("get", Type.typeArray0,
 			    Type.pointer_type, Access.PUBLIC);
@@ -111,6 +111,9 @@ public class Compilation
   static final Field emptyConstant
     = scmListType.addField ("Empty", scmListType,
 			    Access.PUBLIC|Access.STATIC);
+  static final Field eofConstant
+    = scmSequenceType.addField ("eofValue", typeObject,
+				Access.PUBLIC|Access.STATIC);
   static final Method setNameMethod
     = typeProcedure.getDeclaredMethod("setName", 1);
   static Method initIntegerMethod;
@@ -127,8 +130,6 @@ public class Compilation
   static public final Method getBindingEnvironmentMethod
     = typeEnvironment.addMethod("getBinding", string1Arg,
 				typeBinding, Access.PUBLIC);
-  public static final Method getBinding2Method
-    = typeBinding2.getDeclaredMethod("getBinding2", 2);
 
   static {
     Type[] makeListArgs = { objArrayType, Type.int_type };
@@ -216,6 +217,7 @@ public class Compilation
   public static ClassType typeModuleBody
     = ClassType.make("gnu.expr.ModuleBody", typeProcedure0);
   public static ClassType typeApplet = ClassType.make("java.applet.Applet");
+  public static ClassType typeServlet = ClassType.make("gnu.kawa.servlet.KawaServlet");
 
   public static ClassType typeModuleMethod
   = ClassType.make("gnu.expr.ModuleMethod", typeProcedureN);
@@ -225,35 +227,39 @@ public class Compilation
   = ClassType.make("gnu.mapping.ApplyMethodContainer");
 
   /* Classes, fields, and methods used wgen usingCPStyle". */
-  public static ClassType typeCallStack
-    = ClassType.make("gnu.mapping.CallStack");
-  public static Method popCallStackMethod
-    = typeCallStack.addMethod("pop", apply0args, Type.void_type,
+  public static ClassType typeCallContext
+    = ClassType.make("gnu.mapping.CallContext");
+  public static final ClassType typeConsumer
+  = ClassType.make("gnu.lists.Consumer");
+  public static Method popCallContextMethod
+    = typeCallContext.addMethod("pop", apply0args, Type.void_type,
 			      Access.PUBLIC);
   public static ClassType typeValues
     = ClassType.make("gnu.mapping.Values");
   public static Field noArgsField
     = typeValues.addField("noArgs", objArrayType,
 				Access.PUBLIC|Access.STATIC);
-  public static Field valueCallStackField
-    = typeCallStack.addField("value", Type.pointer_type, Access.PUBLIC);
-  public static Field pcCallStackField
-    = typeCallStack.addField("pc", Type.int_type, Access.PROTECTED);
+  public static Field pcCallContextField
+    = typeCallContext.addField("pc", Type.int_type, Access.PROTECTED);
   public static ClassType typeCpsProcedure
     = ClassType.make("gnu.mapping.CpsProcedure");
   public static ClassType typeCallFrame
     = ClassType.make("gnu.mapping.CallFrame");
+  public static ClassType typeCpsMethodProc
+  = ClassType.make("gnu.mapping.CpsMethodProc", typeCpsProcedure);
+  public static ClassType typeCpsMethodContainer
+  = ClassType.make("gnu.mapping.CpsMethodContainer");
   public static Field numArgsCallFrameField
     = typeCallFrame.addField("numArgs", Type.int_type, Access.PROTECTED);
-  public static Field argsCallStackField
-    = typeCallStack.addField("args", objArrayType, Access.PROTECTED);
-  public static Field procCallStackField
-    = typeCallStack.addField("proc", typeProcedure, Access.PROTECTED);
+  public static Field argsCallContextField
+    = typeCallContext.addField("values", objArrayType, Access.PROTECTED);
+  public static Field procCallContextField
+    = typeCallContext.addField("proc", typeProcedure, Access.PROTECTED);
   public static Field callerCallFrameField
     = typeCallFrame.addField("caller", typeCallFrame, Access.PROTECTED);
   public static Field saved_pcCallFrameField
     = typeCallFrame.addField("saved_pc", Type.int_type, Access.PROTECTED);
-  private static Type[] applyCpsArgs = { typeCallStack};
+  private static Type[] applyCpsArgs = { typeCallContext};
   public static Method applyCpsMethod
     = typeProcedure.addMethod("apply", applyCpsArgs, Type.void_type,
 				 Access.PUBLIC);
@@ -264,9 +270,6 @@ public class Compilation
 
   Hashtable literalTable;
   int literalsCount;
-
-  /** Rembembers stuff to do in <init> of main class. */
-  Initializer initChain;
 
   /** Rembembers stuff to do in <clinit> of main class. */
   Initializer clinitChain;
@@ -284,16 +287,24 @@ public class Compilation
   /** True if we should generate an Applet. */
   public boolean generateApplet = generateAppletDefault;
 
+  public static boolean generateServletDefault = false;
+  /** True if we should generate an Servlet. */
+  public boolean generateServlet = generateServletDefault;
+
   public static final ClassType getMethodProcType(ClassType modClass)
   {
-    return modClass.getSuperclass().isSubtype(typeProcedure) ? typeModuleMethod
+    return usingTailCalls ? typeCpsMethodProc
+      : true || modClass.getSuperclass().isSubtype(typeProcedure) ? typeModuleMethod
       : typeApplyMethodProc;
   }
 
   public final ClassType getModuleSuperType(ModuleExp module)
   {
     ClassType sup = module.getSuperType();
-    return sup != null ? sup : generateApplet ? typeApplet : typeModuleBody;
+    return (sup != null ? sup
+	    : generateApplet ? typeApplet
+	    : generateServlet ? typeServlet
+	    : typeModuleBody);
   }
 
   public Interpreter getInterpreter()
@@ -306,15 +317,7 @@ public class Compilation
     if (value == null)
       return Literal.nullLiteral;
     Literal literal = (Literal) literalTable.get (value);
-    if (literal != null)
-      {
-	// This value is used multiple times (perhaps recursively),
-	// so do allocate a LitN Field for it.
-	// However, String literals are shared in the constant pool instead.
-	if (literal.field == null && ! (literal.value instanceof String))
-	  literal.assign (this);
-      }
-    else
+    if (literal == null)
       {
 	if (value instanceof Boolean)
 	  {
@@ -325,8 +328,10 @@ public class Compilation
 	  }
 	else if (value == Values.empty)
 	  literal = new Literal (value, voidConstant, this);
-	else if (value == gnu.kawa.util.LList.Empty)
+	else if (value == gnu.lists.LList.Empty)
 	  literal = new Literal (value, emptyConstant, this);
+	else if (value == gnu.lists.Sequence.eofValue)
+	  literal = new Literal (value, eofConstant, this);
 	else if (value instanceof Undefined)
 	  literal = new Literal (value, undefinedConstant, this);
 	else if (immediate)
@@ -363,6 +368,12 @@ public class Compilation
   {
     if (target instanceof IgnoreTarget)
       return;
+    if (target instanceof ConsumerTarget)
+      {
+	if (value == Values.empty)
+	  return;
+	// else FIXME
+      }
     if (target instanceof ConditionalTarget)
       {
 	ConditionalTarget ctarg = (ConditionalTarget) target;
@@ -428,7 +439,6 @@ public class Compilation
         try
           {
             value = type.coerceFromObject(value);
-	    
           }
         catch (Exception ex)
           {
@@ -443,9 +453,18 @@ public class Compilation
                             : Type.make(value.getClass()));
   }
 
-  private void dumpInitializers (Initializer inits)
+  void dumpInitializers (Initializer inits, Method initMethod)
   {
-    for (Initializer init = inits;  init != null;  init = init.next)
+    Method save = method;
+    method = initMethod;
+    dumpInitializers(inits);
+    method = save;
+  }
+
+  void dumpInitializers (Initializer inits)
+  {
+    for (Initializer init = Initializer.reverse(inits);
+         init != null;  init = init.next)
       init.emit(this);
   }
 
@@ -465,9 +484,33 @@ public class Compilation
   /** If non-null: a prefix for generateClassName to prepend to names. */
   public String classPrefix;
 
-  /** Convert a string to a safe Java identifier.
-   * This mapping is not invertible. */
   public static String mangleName (String name)
+  {
+    return mangleName(name, false);
+  }
+
+  public static String mangleNameIfNeeded (String name)
+  {
+    if (isValidJavaName(name))
+      return name;
+    else
+      return mangleName(name, true);
+  }
+
+  public static boolean isValidJavaName(String name)
+  {
+    int len = name.length();
+    if (len == 0 || ! Character.isJavaIdentifierStart(name.charAt(0)))
+      return false;
+    for (int i = len;  --i > 0; )
+      if (! Character.isJavaIdentifierPart(name.charAt(i)))
+	return false;
+    return true;
+  }
+
+  /** Convert a string to a safe Java identifier.
+   * @param reversible if we should use an invertible mapping. */
+  public static String mangleName (String name, boolean reversible)
   {
     int len = name.length ();
     StringBuffer mangled = new StringBuffer (len);
@@ -486,22 +529,29 @@ public class Compilation
 	      mangled.append("$N");
 	    mangled.append(ch);
 	  }
-	else if (Character.isLetter(ch) || ch == '_' || ch == '$')
+	else if (Character.isLetter(ch) || ch == '_')
 	  mangled.append(ch);
+	else if (ch == '$')
+	  mangled.append(reversible ? "$$" : "$");
 	else
 	  {
 	    switch (ch)
 	      {
 	      case '+':  mangled.append("$Pl");  break;
 	      case '-':
-		char next = i + 1 < len ? name.charAt(i+1) : '\0';
-		if (next == '>')
-		  {
-		    mangled.append("$To$");
-		    i++;
-		  }
-		else if (! Character.isLowerCase(next))
+		if (reversible)
 		  mangled.append("$Mn");
+		else
+		  {
+		    char next = i + 1 < len ? name.charAt(i+1) : '\0';
+		    if (next == '>')
+		      {
+			mangled.append("$To$");
+			i++;
+		      }
+		    else if (! Character.isLowerCase(next))
+		      mangled.append("$Mn");
+		  }
 		break;
 	      case '*':  mangled.append("$St");  break;
 	      case '/':  mangled.append("$Sl");  break;
@@ -525,7 +575,8 @@ public class Compilation
 	      case '#':  mangled.append("$Nm");  break;
 	      case '?':
 		char first = mangled.length() > 0 ? mangled.charAt(0) : '\0';
-		if (i + 1 == len && Character.isLowerCase(first))
+		if (! reversible
+		    && i + 1 == len && Character.isLowerCase(first))
 		  {
 		    mangled.setCharAt(0, Character.toTitleCase(first));
 		    mangled.insert(0, "is");
@@ -545,7 +596,8 @@ public class Compilation
 		mangled.append(Character.forDigit ((ch >>  4) & 15, 16));
 		mangled.append(Character.forDigit ((ch      ) & 15, 16));
 	      }
-	    upcaseNext = true;
+	    if (! reversible)
+	      upcaseNext = true;
 	  }
       }
     String mname = mangled.toString ();
@@ -557,36 +609,113 @@ public class Compilation
    */
   public static char demangle2(char char1, char char2)
   {
-    switch (char1)
+    switch (char1 << 16 | char2)
       {
-      case 'E':
-	switch (char2)
-	  {
-	  case 'x':  return '!';
-	  }
-	break;
-      case 'M':
-	switch (char2)
-	  {
-	  case 'c':  return '%';
-	  case 'n':  return '-';
-	  }
-	break;
-      case 'P':
-	switch (char2)
-	  {
-	  case 'l':  return '+';
-	  }
-	break;
-      case 'S':
-	switch (char2)
-	  {
-	  case 'l':  return '/';
-	  case 't':  return '*';
-	  }
-	break;
+      case 'A' << 16 | 'm':  return '&';
+      case 'A' << 16 | 't':  return '@';
+      case 'C' << 16 | 'l':  return ':';
+      case 'C' << 16 | 'm':  return ',';
+      case 'D' << 16 | 'q':  return '\"';
+      case 'D' << 16 | 't':  return '.';
+      case 'E' << 16 | 'q':  return '=';
+      case 'E' << 16 | 'x':  return '!';
+      case 'G' << 16 | 'r':  return '>';
+      case 'L' << 16 | 'B':  return '[';
+      case 'L' << 16 | 'C':  return '{';
+      case 'L' << 16 | 'P':  return '(';
+      case 'L' << 16 | 's':  return '<';
+      case 'M' << 16 | 'c':  return '%';
+      case 'M' << 16 | 'n':  return '-';
+      case 'N' << 16 | 'm':  return '#';
+      case 'P' << 16 | 'c':  return '%';
+      case 'P' << 16 | 'l':  return '+';
+      case 'Q' << 16 | 'u':  return '?';
+      case 'R' << 16 | 'B':  return ']';
+      case 'R' << 16 | 'C':  return '}';
+      case 'R' << 16 | 'P':  return ')';
+      case 'S' << 16 | 'C':  return ';';
+      case 'S' << 16 | 'l':  return '/';
+      case 'S' << 16 | 'q':  return '\\';
+      case 'S' << 16 | 't':  return '*';
+      case 'T' << 16 | 'l':  return '~';
+      case 'U' << 16 | 'p':  return '^';
+      case 'V' << 16 | 'B':  return '|';
       }
     return (char) (-1);
+  }
+
+  public static String demangleName(String name)
+  {
+    return demangleName(name, false);
+  }
+
+  public static String demangleName(String name, boolean reversible)
+  {
+    StringBuffer sbuf = new StringBuffer();
+    int len = name.length();
+    boolean mangled = false;
+    boolean predicate = false;
+    boolean downCaseNext = false;
+    for (int i = 0;  i < len;  i++)
+      {
+	char ch = name.charAt(i);
+	if (downCaseNext && ! reversible)
+	  {
+	    ch = Character.toLowerCase(ch);
+	    downCaseNext = false;
+	  }
+	char d;
+	if (!reversible
+	    && ch == 'i' && i == 0 && len > 2 && name.charAt(i+1) == 's'
+	    && ! Character.isLowerCase(d = name.charAt(i+2)))
+	  {
+	    mangled = true;
+	    predicate = true;
+	    i++;
+	    if (Character.isUpperCase(d) || Character.isTitleCase(d))
+	      {
+		sbuf.append(Character.toLowerCase(d));
+		i++;
+		continue;
+	      }
+	    continue;
+	  }
+	else if (ch == '$' && i + 2 < len)
+	  {
+	    char c1 = name.charAt(i+1);
+	    char c2 = name.charAt(i+2);
+	    d = Compilation.demangle2(c1, c2);
+	    if (d != (char)(-1))
+	      {
+		sbuf.append(d);
+		i += 2;
+		mangled = true;
+		downCaseNext = true;
+		continue;
+	      }
+	    else if (c1 == 'T' && c2 == 'o' && i + 3 < len
+		     && name.charAt(i+3) == '$')
+	      {
+		sbuf.append("->");
+		i += 3;
+		mangled = true;
+		downCaseNext = true;
+		continue;
+	      }
+	  }
+	else if (! reversible && i > 1
+		 && (Character.isUpperCase(ch) || Character.isTitleCase(ch))
+		 && (Character.isLowerCase(name.charAt(i-1))))
+	  {
+	    sbuf.append('-');
+	    mangled = true;
+	    ch = Character.toLowerCase(ch);
+	  }
+	sbuf.append(ch);
+      }
+    if (predicate)
+      sbuf.append('?');
+    return mangled ? sbuf.toString() : name;
   }
 
   /** Generate an unused class name.
@@ -595,11 +724,27 @@ public class Compilation
    */
   public String generateClassName (String hint)
   {
-    hint = mangleName (hint);
+    hint = mangleName(hint, true);
     if (mainClass != null)
       hint = mainClass.getName() + '$' + hint;
     else if (classPrefix != null)
       hint = classPrefix + hint;
+    if (findNamedClass (hint) == null)
+      return hint;
+    for (int i = 0;  ; i++)
+      {
+	String new_hint = hint + i;
+	if (findNamedClass (new_hint) == null)
+	  return new_hint;
+      }
+  }
+
+  /** Generate an unused name.
+   * @param hint the requested name (or prefix)
+   * @return a unique class name.
+   */
+  public String generateUniqueName (String hint)
+  {
     if (findNamedClass (hint) == null)
       return hint;
     for (int i = 0;  ; i++)
@@ -618,39 +763,47 @@ public class Compilation
    * @param prefix prefix to pre-pend to the names of other (non-top) classes
    * @param immediate true if the classes will be immediately loaded
    */
-  public Compilation (LambdaExp lexp, String classname, String prefix,
+  public Compilation (ModuleExp lexp, String classname, String prefix,
 		      boolean immediate)
   {
     source_filename = lexp.filename;
     classPrefix = prefix;
     this.immediate = immediate;
-    
+    mainClass = new ClassType(classname);
+    mainLambda = lexp;
+
     // Do various code re-writes and optimization.
-    ChainLambdas.chainLambdas(lexp, this);
     PushApply.pushApply(lexp);
+    InlineCalls.inlineCalls(lexp);
+    ChainLambdas.chainLambdas(lexp, this);
     FindTailCalls.findTailCalls(lexp);
     lexp.setCanRead(true);
-    if (! usingCPStyle)
-      FindCapturedVars.findCapturedVars(lexp);
+    FindCapturedVars.findCapturedVars(lexp);
 
-    mainClass = allocClass (lexp, classname);
+    if (debugPrintFinalExpr)
+      {
+	OutPort dout = OutPort.outDefault();
+	dout.println ("[Compiling final "+lexp.getName()+" class="+classname+':');
+	lexp.print(dout);
+	dout.println(']');
+	dout.flush();
+      }
+
+    mainClass = addClass(lexp, mainClass);
     literalTable = new Hashtable (100);
-    addClass (lexp);
+    try
+      {
+	addClass (lexp);
+      }
+    catch (RuntimeException ex)
+      {
+	// Try to produce a localized error message.
+	error('f', "Internal compiler exception: "+ex);
+	throw ex;
+      }
   }
 
-  public Compilation (ClassType mainClass,
-		      String filename, String classname, String prefix,
-		      boolean immediate)
-  {
-    this.method = null;
-    
-    this.mainClass = this.curClass = mainClass;
-    source_filename = filename;
-    classPrefix = prefix;
-    this.immediate = immediate;
-    literalTable = new Hashtable (100);
-  }
-
+  /*
   public void addClass (ClassType new_class)
   {
     if (source_filename != null)
@@ -664,56 +817,70 @@ public class Compilation
 	classes = new_classes;
       }
     classes[numClasses++] = new_class;
-    new_class.access_flags = Access.PUBLIC;
+    new_class.access_flags |= Access.PUBLIC|Access.SUPER;
   }
+  */
 
-  ClassType allocClass (LambdaExp lexp)
+  ClassType allocClass (ModuleExp module)
   {
-    String name = lexp.getJavaName();
+    String name = module.getJavaName();
     name = generateClassName(name);
-    return allocClass(lexp, name);
+    return addClass(module, new ClassType(name));
   }
 
-  ClassType allocClass (LambdaExp lexp, String name)
+  ClassType addClass (LambdaExp lexp, ClassType type)
   {
-    ClassType type;
-    if (lexp instanceof ObjectExp)
+    ClassType superType;
+    if (lexp.isModuleBody ())
       {
-	type = lexp.getCompiledClassType(this);
+        ModuleExp module = (ModuleExp) lexp;
+        superType = getModuleSuperType(module);
+        ClassType[] interfaces = module.getInterfaces();
+        if (interfaces != null)
+          type.setInterfaces(interfaces);
       }
     else
-      {
-	type = new ClassType(name);
-	ClassType superType;
-	if (lexp.isModuleBody ())
-	  {
-	    ModuleExp module = (ModuleExp) lexp;
-	    superType = getModuleSuperType(module);
-	    ClassType[] interfaces = module.getInterfaces();
-	    if (interfaces != null)
-	      type.setInterfaces(interfaces);
-	  }
-	else
-	  superType = (usingCPStyle ? typeCallFrame
-		       : lexp.isHandlingTailCalls() ? typeCpsProcedure
-		       : (lexp.min_args != lexp.max_args || lexp.min_args > 4)
-		       ? typeProcedureN
-		       : typeProcedureArray[lexp.min_args]);
-	type.setSuper (superType);
+      superType = (usingCPStyle ? typeCallFrame
+                   : lexp.isHandlingTailCalls() ? typeCpsProcedure
+                   : (lexp.min_args != lexp.max_args || lexp.min_args > 4)
+                   ? typeProcedureN
+                   : typeProcedureArray[lexp.min_args]);
+    type.setSuper (superType);
 
-	lexp.type = type;
-	addClass(type);
-      }
+    lexp.type = type;
+    addClass(type);
     return type;
   }
 
-  public final Method generateConstructor (ClassType clas, LambdaExp lexp)
+  public final Method getConstructor (LambdaExp lexp)
+  {
+    return getConstructor(lexp.getHeapFrameType(), lexp);
+  }
+
+  public static final Method getConstructor (ClassType clas, LambdaExp lexp)
+  {
+    Type[] args;
+    if (lexp instanceof ClassExp && lexp.staticLinkField != null)
+      {
+	args = new Type[1];
+	args[0] = lexp.staticLinkField.getType();
+      }
+    else
+      args = apply0args;
+    return clas.addMethod("<init>", Access.PUBLIC, args, Type.void_type);
+  }
+
+  public final void generateConstructor (LambdaExp lexp)
+  {
+    generateConstructor (lexp.getHeapFrameType(), lexp);
+  }
+
+  public final void generateConstructor (ClassType clas, LambdaExp lexp)
   {
     Method save_method = method;
     ClassType save_class = curClass;
     curClass = clas;
-    Method constructor_method = clas.addMethod("<init>", Access.PUBLIC,
-					       apply0args, Type.void_type);
+    Method constructor_method = getConstructor(clas, lexp);
     clas.constructor = constructor_method;
 
     Method superConstructor
@@ -725,79 +892,55 @@ public class Compilation
     code.emitPushThis();
     code.emitInvokeSpecial(superConstructor);
 
-    if (curClass == mainClass)
+    if (lexp instanceof ClassExp && lexp.staticLinkField != null)
       {
-	Initializer init;
-	while ((init = initChain) != null)
+	code.emitPushThis();
+	code.emitLoad(code.getCurrentScope().getVariable(1));
+	code.emitPutField(lexp.staticLinkField);
+      }
+
+    Initializer init;
+    lexp.initChain = Initializer.reverse(lexp.initChain);
+    while ((init = lexp.initChain) != null)
+      {
+	lexp.initChain = init.next;
+	init.emit(this);
+      }
+
+    if (lexp instanceof ClassExp)
+      {
+	ClassExp cexp = (ClassExp) lexp;
+	LambdaExp initMethod = cexp.initMethod;
+	if (initMethod != null)
 	  {
-	    initChain = init.next;
-	    init.emit(this);
+	    code.emitPushThis();
+	    code.emitInvoke(initMethod.getMainMethod());
 	  }
-      }
-
-    // If immediate, we cannot set the function name in the constructor,
-    // since setLiterals has not been called yet (except for nested functions).
-    if (lexp != null && lexp.name != null && !immediate)
-      {
-	constructor_method.compile_push_this ();
-	compileConstant (lexp.name);
-	code.emitInvokeVirtual(setNameMethod);
-      }
-
-    if (curClass == mainClass) // lexp.isModuleBody())
-      {
-	// If a statisModule, then this does nothing, because its too
-	// early.  Instead, the bindings get emitted in <clinit> later.
-	initBindingFields();
       }
 
     code.emitReturn();
     method = save_method;
     curClass = save_class;
-    return constructor_method;
-  }
-
-  void initBindingFields()
-  {
-    CodeAttr code = getCode();
-    int numGlobals = bindingFields.size();
-    if (numGlobals > 0)
-      {
-	code.emitInvokeStatic(getCurrentEnvironmentMethod);
-	java.util.Enumeration e = bindingFields.keys();
-	while (e.hasMoreElements())
-	  {
-	    String id = (String) e.nextElement();
-	    Field fld = (Field) bindingFields.get(id);
-	    if (--numGlobals > 0)
-	      code.emitDup(1);
-	    code.emitPushString(id);
-	    if (getInterpreter().hasSeparateFunctionNamespace())
-	      code.emitInvokeStatic(getBinding2Method);
-	    else
-	      code.emitInvokeVirtual(getBindingEnvironmentMethod);
-	    code.emitPutStatic(fld);
-	  }
-      }
   }
 
   /** Generate ModuleBody's apply0 .. applyN methods.
    * Use the applyMethods vector, which contains methods that implement
    * the (public, readable) methods of the current module. */
-  public void generateApplyMethods()
+  public void generateApplyMethods(LambdaExp lexp)
   {
-    int numApplyMethods = applyMethods.size();
+    int numApplyMethods = lexp.applyMethods.size();
     if (numApplyMethods == 0)
       return;
     boolean generateApplyMethodContainer
       = ! (curClass.getSuperclass().isSubtype(typeProcedure));
-    ClassType procType
-      = generateApplyMethodContainer ? typeApplyMethodProc : typeModuleMethod;
-    if (generateApplyMethodContainer)
+    ClassType procType = getMethodProcType(curClass);
+    if (Compilation.usingTailCalls)
+      curClass.addInterface(typeCpsMethodContainer);
+    else if (generateApplyMethodContainer)
       curClass.addInterface(typeApplyMethodContainer);
     Method save_method = method;
     CodeAttr code = null;
-    for (int i = 0;  i < 6; i++)
+    for (int i = Compilation.usingTailCalls ? 5 : 0;  i < 6; i++)
       {
 	// If i < 5, generate the method named ("apply"+i);
 	// else generate "applyN".
@@ -808,12 +951,13 @@ public class Compilation
 
 	for (int j = numApplyMethods;  --j >= 0; )
 	  {
-	    LambdaExp source = (LambdaExp) applyMethods.elementAt(j);
+	    LambdaExp source = (LambdaExp) lexp.applyMethods.elementAt(j);
 	    // Select the subset of source.primMethods[*] that are suitable
 	    // for the current apply method.
 	    Method[] primMethods = source.primMethods;
 	    int numMethods = primMethods.length;
 	    boolean varArgs = source.max_args < 0
+	      || Compilation.usingTailCalls
 	      || source.max_args >= source.min_args + numMethods;
 	    int methodIndex;
 	    boolean skipThisProc = false;
@@ -845,6 +989,12 @@ public class Compilation
 		    for (int k = i;  k > 0;  k--)
 		      applyArgs[k] = typeObject;
 		  }
+		else if (Compilation.usingTailCalls)
+		  {
+		    mname = "apply";
+		    applyArgs = new Type[2];
+		    applyArgs[1] = typeCallContext;
+		  }
 		else
 		  {
 		    mname = "applyN";
@@ -853,7 +1003,7 @@ public class Compilation
 		  }
 		applyArgs[0] = procType;
 		method = curClass.addMethod (mname, applyArgs,
-					     Type.pointer_type,
+					     Compilation.usingTailCalls ? (Type) Type.void_type : (Type) Type.pointer_type,
 					     Access.PUBLIC);
 		method.init_param_slots();
 		code = getCode();
@@ -893,6 +1043,7 @@ public class Compilation
 	    if (needsThis > 0)
 	      code.emitPushThis();
 
+	    Declaration var = source.firstDecl();
 	    for (int k = 0; k < singleArgs;  k++)
 	      {
 		if (counter != null && k >= source.min_args)
@@ -914,10 +1065,11 @@ public class Compilation
 		  }
 		else // apply'i method
 		  code.emitLoad(code.getArg(k + 2));
-		Type ptype = primArgTypes[k];
+		Type ptype = var.getType();
 		if (ptype != Type.pointer_type)
 		  CheckedTarget.emitCheckedCoerce(this, source,
 						  k, ptype);
+		var = var.nextDecl();
 	      }
 
 	    if (varArgs)
@@ -976,47 +1128,65 @@ public class Compilation
 			code.popScope();	
 		      }
 		  }
-		else if ("gnu.kawa.util.LList".equals
+		else if ("gnu.lists.LList".equals
 			 (lastArgType.getName()))
 		  {	
 		    code.emitLoad(code.getArg(2)); // load args array.
 		    code.emitPushInt(singleArgs);
 		    code.emitInvokeStatic(Compilation.makeListMethod);
 		  }
+		else if (lastArgType == typeCallContext)
+		  code.emitLoad(code.getArg(2));
 		else
-		  throw new RuntimeException("unsupported #!rest type");
+		  throw new RuntimeException("unsupported #!rest type:"+lastArgType);
               }
 
 	    code.emitInvoke(primMethod);
 	    while (--pendingIfEnds >= 0)
 	      code.emitFi();
-	    Target.pushObject.compileFromStack(this,
-					       primMethod.getReturnType());
+	    if (! usingTailCalls)
+	      Target.pushObject.compileFromStack(this,
+						 source.getReturnType());
 	    code.emitReturn();
           }
-	if (needThisApply)
+	if (false && needThisApply)
 	  {
 	    aswitch.addDefault(code);
-	    int nargs = i > 4 ? 2 : i + 1;
-	      nargs++;
-	    for (int k = generateApplyMethodContainer ? 1 : 0;
-		 k < nargs;  k++)
-	      code.emitLoad(code.getArg(k));
-	    if (generateApplyMethodContainer)
+	    if (usingTailCalls)
 	      {
-		mname = mname + "Default";
-		Method defMethod
-		  = typeApplyMethodProc.getDeclaredMethod(mname, applyArgs);
-		code.emitInvokeStatic(defMethod);
+		code.emitLoad(code.getArg(1));
+		Method errMethod
+		  = typeCpsMethodProc.getDeclaredMethod("applyError", 0);
+		code.emitInvokeVirtual(errMethod);
 	      }
 	    else
 	      {
-		code.emitInvokeSpecial(curClass.getSuperclass().getDeclaredMethod(mname, applyArgs));
+		int nargs = i > 4 ? 2 : i + 1;
+		nargs++;
+		for (int k = generateApplyMethodContainer ? 1 : 0;
+		     k < nargs;  k++)
+		  code.emitLoad(code.getArg(k));
+		if (generateApplyMethodContainer)
+		  {
+		    mname = mname + "Default";
+		    Method defMethod
+		      = typeApplyMethodProc.getDeclaredMethod(mname, applyArgs);
+		    code.emitInvokeStatic(defMethod);
+		  }
+		else
+		  {
+		    code.emitInvokeSpecial(curClass.getSuperclass().getDeclaredMethod(mname, applyArgs));
+		  }
 	      }
 	    code.emitReturn();
 	    aswitch.finish(code);
 	  }
+	else if (needThisApply)
+	  {
+	    aswitch.finish(code);
+	  }
       }
+    lexp.applyMethods = null;
     method = save_method;
   }
 
@@ -1028,7 +1198,7 @@ public class Compilation
 
     CodeAttr code = getCode();
 
-    if (generateMain || generateApplet)
+    if (generateMain || generateApplet || generateServlet)
       {
 	ClassType interpreterType
 	  = (ClassType) Type.make(getInterpreter().getClass());
@@ -1040,36 +1210,33 @@ public class Compilation
     return method;
   }
 
-  /** Compiles a function to a class. */
-  public final ClassType addClass (LambdaExp lexp)
+  /** Compiles a module to a class. */
+  public final ClassType addClass (ModuleExp module)
   {
     String name;
-    ClassType new_class = lexp.type;
+    ClassType new_class = module.type;
     if (new_class == typeProcedure)
-      {
-	new_class = allocClass(lexp);
-	lexp.type = new_class;
-      }
-    
+      new_class = allocClass(module);
     curClass = new_class;
 
-    String filename = lexp.getFile();
+    String filename = module.getFile();
+    module.type = new_class;
     if (filename != null)
       new_class.setSourceFile (filename);
 
     int arg_count;
     char arg_letter;
     LambdaExp saveLambda = curLambda;
-    curLambda = lexp;
+    curLambda = module;
     Type[] arg_types;
-    if (lexp.isHandlingTailCalls())
+    if (module.isHandlingTailCalls() || usingCPStyle())
       {
 	arg_count = 1;
 	arg_letter = '?';
 	arg_types = new Type[1];
-	arg_types[0] = typeCallStack;
+	arg_types[0] = typeCallContext;
       }
-    else if (lexp.min_args != lexp.max_args || lexp.min_args > 4
+    else if (module.min_args != module.max_args || module.min_args > 4
 	|| (fewerClasses && curClass == mainClass))
       {
 	arg_count = 1;
@@ -1079,7 +1246,7 @@ public class Compilation
       }
     else
       {
-	arg_count = lexp.min_args;
+	arg_count = module.min_args;
 	arg_letter = Character.forDigit (arg_count, 10);
 	arg_types = new Type[arg_count];
 	for (int i = arg_count;  --i >= 0; )
@@ -1093,62 +1260,47 @@ public class Compilation
 				    Access.PUBLIC);
 	method.init_param_slots ();
 	code = getCode();
-	code.emitPushInt(lexp.min_args | (lexp.max_args << 12));
+	code.emitPushInt(module.min_args | (module.max_args << 12));
 	code.emitReturn();
       }
 
-    Expression body = lexp.body;
-    Variable heapFrame = lexp.heapFrame;
+    Expression body = module.body;
+    Variable heapFrame = module.heapFrame;
 
     Method apply_method;
     boolean staticModule = false;
     Label classInitLabel = null;
     Label classBodyLabel = null;
-    if (lexp.isModuleBody())
+    
+    if (usingCPStyle())
       {
-	if (((ModuleExp) lexp).isStatic())
-	  {
-	    staticModule = true;
-	    generateConstructor (curClass, lexp);
-	    instanceField = curClass.addField("$instance", curClass,
-					     Access.STATIC|Access.FINAL);
-	    apply_method = startClassInit();
-	    code = getCode();
-	    code.emitNew(curClass);
-	    code.emitDup(curClass);
-	    code.emitInvokeSpecial(curClass.constructor);
-	    code.emitPutStatic(instanceField);
-
-	    classInitLabel = new Label(code);
-	    classBodyLabel = new Label(code);
-	    code.emitGoto(classInitLabel);
-	    classBodyLabel.define(code);
-	  }
-	else
-	  {
-	    Type rtype = Type.pointer_type;
-	    if (curClass.getSuperclass() != typeModuleBody)
-	      {
-		curClass.addInterface(typeRunnable);
-		rtype = Type.void_type;
-	      }
-	    apply_method
-	      = curClass.addMethod ("run", arg_types, rtype, 
-				    Access.PUBLIC|Access.FINAL);
-	  }
+        apply_method
+          = curClass.addMethod ("step", arg_types, Type.void_type, 
+                                Access.PUBLIC|Access.FINAL);
       }
-    else if (lexp.isHandlingTailCalls())
-      apply_method
-	= curClass.addMethod ("apply", arg_types, Type.void_type,
-			      Access.PUBLIC|Access.FINAL);
+    else if (module.isHandlingTailCalls())
+      {
+	apply_method
+	  = curClass.addMethod ("apply", arg_types, Type.void_type,
+				Access.PUBLIC|Access.FINAL);
+      }
     else
       {
-	String apply_name = "apply"+arg_letter;
-	apply_method
-	  = curClass.addMethod (apply_name, arg_types, 
-				Type.pointer_type,
-				//lexp.getReturnType(),
-				Access.PUBLIC|Access.FINAL);
+	staticModule = true;
+	generateConstructor (module);
+	instanceField = curClass.addField("$instance", curClass,
+					  Access.STATIC|Access.FINAL);
+	apply_method = startClassInit();
+	code = getCode();
+	code.emitNew(curClass);
+	code.emitDup(curClass);
+	code.emitInvokeSpecial(curClass.constructor);
+	code.emitPutStatic(instanceField);
+
+	classInitLabel = new Label(code);
+	classBodyLabel = new Label(code);
+	code.emitGoto(classInitLabel);
+	classBodyLabel.define(code);
       }
     method = apply_method;
 
@@ -1158,24 +1310,23 @@ public class Compilation
     // Below, we assign the value to the slot.
     method.initCode();
     code = getCode();
+    // if (usingCPStyle())   code.addParamLocals();
 
-    thisDecl = method.getStaticFlag() ? null : lexp.declareThis(new_class);
-    Variable var = thisDecl;
-    if (lexp instanceof ModuleExp)
-      lexp.heapFrame = lexp.thisVariable;
+    thisDecl = method.getStaticFlag() ? null : module.declareThis(new_class);
+    module.heapFrame = module.thisVariable;
     if (! (fewerClasses && curClass == mainClass))
-      lexp.allocChildClasses(this);
+      module.allocChildClasses(this);
 
-    if (lexp.isHandlingTailCalls())
+    if (module.isHandlingTailCalls() || usingCPStyle())
       {
-	callStackContext = new Variable ("stack", typeCallStack);
-	Scope scope = lexp.scope;
+	callStackContext = new Variable ("$ctx", typeCallContext);
+	Scope scope = module.scope;
 	scope.addVariableAfter(thisDecl, callStackContext);
 	callStackContext.setParameter(true);
 	callStackContext.setArtificial(true);
       }
 
-    int line = lexp.getLine();
+    int line = module.getLine();
     if (line > 0)
       code.putLineNumber(line);
 
@@ -1194,14 +1345,19 @@ public class Compilation
       }
     */
 
-    lexp.allocParameters(this);
-    lexp.enterFunction(this);
+    module.allocParameters(this);
+    module.enterFunction(this);
+    if (usingCPStyle())
+      {
+	//code.emitLoad(code.getArg(1));
+	code.emitLoad(callStackContext);
+        code.emitGetField(pcCallContextField);
+        fswitch = new SwitchState(code);
+      }
 
     try
       {
-        body.compileWithPosition(this,
-                                 lexp.isModuleBody () ? Target.pushObject
-                                 : Target.returnObject);
+	module.compileBody(this);
       }
     catch (Exception ex)
       {
@@ -1209,31 +1365,25 @@ public class Compilation
         ex.printStackTrace(System.err);
         System.exit(-1);
       }
-
-    if (staticModule)
-      code.emitReturn();
-    else
-      lexp.compileEnd(this);
+    module.compileEnd(this);
 
     if (Compilation.fewerClasses) // FIXME
       method.popScope(); // Undoes pushScope in method.initCode.
 
-    lexp.heapFrame = heapFrame;  // Restore heapFrame.
-    lexp.compileChildMethods(this);
+    module.heapFrame = heapFrame;  // Restore heapFrame.
+    module.compileChildMethods(this);
     if (usingCPStyle() || (fewerClasses && curClass == mainClass))
       {
 	code = getCode();
 	fswitch.finish(code);
       }
 
-    if (lexp.isModuleBody ())
-      generateApplyMethods();
+    if (Compilation.usingTailCalls && ! staticModule)
+      generateConstructor(module);
 
-    if (! staticModule)
-      generateConstructor (curClass, lexp);
-
-    if (curClass == mainClass && ! immediate
-	&& (staticModule || clinitChain != null || literalsChain != null))
+    if (curClass == mainClass // && ! immediate
+	&& (staticModule || clinitChain != null || literalsChain != null
+	    || generateMain || generateApplet || generateServlet))
       {
 	Method save_method = method;
 
@@ -1264,10 +1414,7 @@ public class Compilation
 	  Literal.emit(this);
 
 	if (staticModule)
-	  {
-	    initBindingFields();
-	    code.emitGoto(classBodyLabel);
-	  }
+	  code.emitGoto(classBodyLabel);
 	else
 	  code.emitReturn();
 	method = save_method;
@@ -1275,7 +1422,7 @@ public class Compilation
 
     curLambda = saveLambda;
 
-    if (generateMain && lexp.isModuleBody () && curClass == mainClass)
+    if (generateMain && curClass == mainClass)
       {
 	Type[] args = { new ArrayType(javaStringType) };
 	method = curClass.addMethod("main", Access.PUBLIC|Access.STATIC,
@@ -1297,31 +1444,6 @@ public class Compilation
     return new_class;
   }
 
-  public void compileClassInit(java.util.List initExps)
-  {
-    // <clinit> is not mandatory in a class file
-    // it is only usefull if there is code to execute at class initialisation
-    if ((initExps == null || initExps.size() == 0)
-	&& clinitChain == null
-	&& literalsChain == null
-	)
-      return;
-    
-    Method save_method = method;
-    method = mainClass.addMethod ("<clinit>", apply0args, Type.void_type,
-				  Access.PUBLIC|Access.STATIC);
-    method.initCode();
-    method.init_param_slots ();
-    dumpInitializers(clinitChain);
-    Literal.emit(this);
-    
-    for(int i=0;i<initExps.size();i++)
-      ((Expression) initExps.get(i)).compile(this, Target.Ignore);
-    
-    method.getCode().emitReturn();
-    method = save_method;
-  }
-  
   public static boolean usingCPStyle() { return usingCPStyle; }
   public static boolean usingTailCalls() { return usingTailCalls; }
 
@@ -1337,22 +1459,6 @@ public class Compilation
   public void freeLocalField (Field field)
   {
     // FIXME
-  }
-
-  Hashtable bindingFields = new Hashtable(100);
-
-  /** Allocate a static Binding field used to access globals bindings. */
-  public Field getBindingField (String name)
-  {
-    Object fld = bindingFields.get(name);
-    if (fld != null)
-      return (Field) fld;
-    String fieldName = "id"+bindingFields.size()+"$"+mangleName(name);
-    Type ftype = getInterpreter().hasSeparateFunctionNamespace()
-      ? typeBinding2 : typeBinding;
-    Field field = mainClass.addField(fieldName, ftype, Access.STATIC);
-    bindingFields.put(name, field);
-    return field;
   }
 
   String filename;
@@ -1372,5 +1478,95 @@ public class Compilation
   {
     // FIXME - use SourceMessages framework!
     System.err.println(err);
+  }
+
+  /****************************************************************
+   * Compilation of Packages
+   ****************************************************************/
+
+  public Compilation ()
+  {
+    this.immediate = false;
+  }
+
+  Package currentPackage;
+
+  public void compile (Package root)
+  {
+    for (Package pkg = root; pkg != null; pkg = pkg.next)
+      allocate(pkg);
+
+    for (Package pkg = root; pkg != null; pkg = pkg.next)
+      generate(pkg);
+  }
+
+  public void allocate (Package pkg)
+  {
+    currentPackage = pkg;
+
+    classPrefix = pkg.name == null ? "" : pkg.name + ".";
+
+    // Do various code re-writes and optimization.
+    //PushApply.pushApply(pkg);
+    //InlineCalls.inlineCalls(pkg);
+    ChainLambdas.chainLambdas(pkg, this);
+    FindTailCalls.findTailCalls(pkg);
+    FindCapturedVars.findCapturedVars(pkg);
+
+    for (LambdaExp c = pkg.firstClass; c != null; c = c.nextSibling)
+      c.allocChildClasses(this);
+  }
+
+  /** Create a new Compilation environment.
+   * @param pkg the package to compile
+   */
+  public void generate (Package pkg)
+  {
+    currentPackage = pkg;
+
+    source_filename = pkg.directory.getPath();
+    classPrefix = pkg.name + ".";
+
+    try
+      {
+	compileAll(pkg);
+      }
+    catch (RuntimeException ex)
+      {
+	// Try to produce a localized error message.
+	error('f', "Internal compiler exception: "+ex);
+	throw ex;
+      }
+  }
+
+  /** Compiles a module to a class. */
+  private final void compileAll(Package pkg)
+  {
+    for (LambdaExp c = pkg.firstClass; c != null; c = c.nextSibling)
+      {
+	literalTable = new Hashtable (100);
+	topLambda = c;
+	topClass = (ClassType) c.getType();
+	c.compileChildMethods(this);
+      }
+
+    for (LambdaExp c = pkg.firstClass; c != null; c = c.nextSibling)
+      {
+	topLambda = c;
+	topClass = (ClassType) c.getType();
+	c.generateClassInit(this);
+	
+	curClass = topClass;
+	generateApplyMethods(c);
+      }
+  }
+
+  LambdaExp topLambda;
+  ClassType topClass;
+
+  public void addClass (ClassType new_class)
+  {
+    currentPackage.addClass(new_class);
+    new_class.access_flags |= Access.PUBLIC|Access.SUPER;
   }
 }

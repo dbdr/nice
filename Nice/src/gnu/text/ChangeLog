@@ -1,3 +1,58 @@
+2001-10-02  Per Bothner  <per@bothner.com>
+
+	* PrettyWriter.java (isPrettyPrinting):  Set in constructors only.
+
+2001-08-23  Per Bothner  <per@bothner.com>
+
+	* PrettyWriter.java (setIndentation):  Fix handling of 'prefix' local
+	cache for 'prefix' field.
+	Fixes bug reported by Felix S Klock II <pnkfelix@MIT.EDU>.
+
+2001-08-16  Per Bothner  <per@bothner.com>
+
+	* SourceMessages.java (printAll):  Make public.
+
+	* SourceMessages.java (clear): New method.
+	* SyntaxException.java (clear): New method.
+
+2001-07-17  Per Bothner  <per@bothner.com>
+
+	* EnglishIntegerFormat.java:  For now disable FormatToConsumer support.
+
+2001-07-06  Thomas Kirk  <tk@research.att.com>
+
+	* PrettyWriter.java(ensureSpaceInBuffer): Don't call
+	outputPartialLine when isPrettyPrinting is false (e.g. when
+	printing to a CharArrayOutPort).	
+
+2001-06-03  Per Bothner  <per@bothner.com>
+
+	* PrettyWriter.java: New class, extends Writer.
+
+	* WriterManager.java:  New class.
+	* Makefile.am (java_sources):  Add new classes.
+
+	* EnglishIntegerFormat.java:  Experimental FormatConsumer support.
+
+2001-04-22  Per Bothner  <per@bothner.com>
+
+	* Char.java (nameToChar):  Try looking for named char, ignoring case.
+	If we see C-X (for any X), return the corresponding control character.
+
+	* Lexer.java (getName, getLineNumber, getColumnNumber):  New methods.
+
+	* Lexer.java (tokenBuffer, tokenBufferLength):  New public fields.
+	(tokenBufferAppend):  New method.
+
+2000-08-16  Per Bothner  <per@bothner.com>
+
+	* ReportFormat.java (getParam):  If no args passed return defaultValue.
+
+	* ReportFormat.java (format(Object,int,Writer,FieldPosition)):  New
+	method overloading - a convenience method.
+	* IntegerFormat.java (format):  New overload.  The perpose is to allow
+	format to be called with a single argument, and not require an array.
+
 2000-06-20  Daniel Bonniot  <d.bonniot@mail.dotcom.fr>
 
 	* Char.java (make(char)):  New method.

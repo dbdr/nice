@@ -57,39 +57,58 @@ POST_INSTALL = :
 NORMAL_UNINSTALL = :
 PRE_UNINSTALL = :
 POST_UNINSTALL = :
+host_alias = @host_alias@
+host_triplet = @host@
+AR = @AR@
+AS = @AS@
 AWT_SELECTED = @AWT_SELECTED@
 CC = @CC@
 CFLAGS = @CFLAGS@
+CXX = @CXX@
+CXXCPP = @CXXCPP@
+DLLTOOL = @DLLTOOL@
 EXEEXT = @EXEEXT@
+GCJ = @GCJ@
+GCJFLAGS = @GCJFLAGS@
+GCJ_COMPILED_SELECTED = @GCJ_COMPILED_SELECTED@
+GCJ_SELECTED = @GCJ_SELECTED@
 JAVA = @JAVA@
 JAVAC = @JAVAC@
+JAVA_COLLECTIONS_SELECTED = @JAVA_COLLECTIONS_SELECTED@
 JEMACS_VERSION = @JEMACS_VERSION@
+LIBGCJ_CFLAGS = @LIBGCJ_CFLAGS@
+LIBGCJ_CXXFLAGS = @LIBGCJ_CXXFLAGS@
+LIBGCJ_JAVAFLAGS = @LIBGCJ_JAVAFLAGS@
+LIBTOOL = @LIBTOOL@
+LN_S = @LN_S@
 MAINT = @MAINT@
 MAKEINFO = @MAKEINFO@
+OBJDUMP = @OBJDUMP@
+OBJEXT = @OBJEXT@
 PACKAGE = @PACKAGE@
+RANLIB = @RANLIB@
 SHELL = @SHELL@
+STRIP = @STRIP@
 SWING_SELECTED = @SWING_SELECTED@
 TOP_BUILDDIR = @TOP_BUILDDIR@
 VERSION = @VERSION@
+XML_SELECTED = @XML_SELECTED@
 extra_java = @extra_java@
 kawa_bin = @kawa_bin@
+libgcj_basedir = @libgcj_basedir@
 
 AUTOMAKE_OPTIONS = foreign
 
-SUFFIXES = .java .class
-
-javadir = $(datadir)/java/$(subdir)
-
-java_JAVA =    ApplyExp.java   BeginExp.java   BindingInitializer.java   BlockExp.java   CatchClause.java   ChainLambdas.java   CheckedTarget.java   ClassExp.java   Compilation.java   ConditionalTarget.java   Declaration.java   ErrorExp.java   ExitExp.java   Expression.java   ExpFullWalker.java   ExpWalker.java   FindCapturedVars.java   FindTailCalls.java   FluidLetExp.java   GenericProc.java   IfExp.java   IgnoreTarget.java   Initializer.java   Inlineable.java   Interpreter.java   Keyword.java   LambdaExp.java   LetExp.java   Literal.java   LitTable.java   ModuleBody.java   ModuleMethod.java   ModuleExp.java   ObjectExp.java   QuoteExp.java   Parser.java   PrimProcedure.java   ProcInitializer.java   PushApply.java   ReferenceExp.java   ScopeExp.java   SetApplyExp.java   SetExp.java   Special.java   StackTarget.java   Symbol.java   SynchronizedExp.java   TailTarget.java   Target.java   ThisExp.java   TryExp.java   Undefined.java
+java_sources =    ApplyExp.java   BeginExp.java   BindingInitializer.java   BlockExp.java   CanInline.java   CatchClause.java   ChainLambdas.java   CheckedTarget.java   ClassExp.java   ClassInitializer.java   Compilation.java   ConditionalTarget.java   ConsumerTarget.java   Declaration.java   ErrorExp.java   ExitExp.java   Expression.java   ExpWalker.java   FindCapturedVars.java   FindTailCalls.java   FluidLetExp.java   GenericProc.java   IfExp.java   IgnoreTarget.java   Initializer.java   Inlineable.java   InlineCalls.java   Interpreter.java   KawaConvert.java   Keyword.java   LambdaExp.java   LetExp.java   Literal.java   LitTable.java   ModuleBody.java   ModuleMethod.java   ModuleExp.java   PairClassType.java   ObjectExp.java   QuoteExp.java   Parser.java   PrimProcedure.java   ProcInitializer.java   PushApply.java   ReferenceExp.java   ScopeExp.java   SeriesTarget.java   SetExp.java   Special.java   StackTarget.java   Symbol.java   SynchronizedExp.java   Target.java   ThisExp.java   TryExp.java   Undefined.java
 
 
 EXTRA_DIST = package.html
+
+PACKAGE_FNAME = gnu-expr
+GCJ_INPUTS = $(java_Java)
 mkinstalldirs = $(SHELL) $(top_srcdir)/mkinstalldirs
 CONFIG_CLEAN_FILES = 
-JAVACFLAGS = 
-CLASSPATH_ENV = CLASSPATH=$(JAVAROOT):$(srcdir)/$(JAVAROOT):$$CLASSPATH
-JAVAROOT = $(top_builddir)
-DIST_COMMON =  $(java_JAVA) COPYING ChangeLog Makefile.am Makefile.in
+DIST_COMMON =  COPYING ChangeLog Makefile.am Makefile.in
 
 
 DISTFILES = $(DIST_COMMON) $(SOURCES) $(HEADERS) $(TEXINFOS) $(EXTRA_DIST)
@@ -98,7 +117,6 @@ TAR = gtar
 GZIP_ENV = --best
 all: all-redirect
 .SUFFIXES:
-.SUFFIXES: .class .java
 $(srcdir)/Makefile.in: @MAINTAINER_MODE_TRUE@ Makefile.am $(top_srcdir)/configure.in $(ACLOCAL_M4) 
 	cd $(top_srcdir) && $(AUTOMAKE) --cygnus gnu/expr/Makefile
 
@@ -106,32 +124,6 @@ Makefile: $(srcdir)/Makefile.in  $(top_builddir)/config.status
 	cd $(top_builddir) \
 	  && CONFIG_FILES=$(subdir)/$@ CONFIG_HEADERS= $(SHELL) ./config.status
 
-
-mostlyclean-javaJAVA:
-
-clean-javaJAVA:
-	-rm *.class classjava.stamp
-
-distclean-javaJAVA:
-
-maintainer-clean-javaJAVA:
-
-install-javaJAVA: classjava.stamp
-	@$(NORMAL_INSTALL)
-	$(mkinstalldirs) $(DESTDIR)$(javadir)
-	for p in *.class; do \
-	  echo " $(INSTALL_DATA) $$p $(DESTDIR)$(javadir)/$$p"; \
-	  $(INSTALL_DATA) $$p $(DESTDIR)$(javadir)/$$p; \
-	done
-
-uninstall-javaJAVA:
-	@$(NORMAL_UNINSTALL)
-	for p in *.class; do \
-	  rm -f $(DESTDIR)$(javadir)/$$p; \
-	done
-classjava.stamp: $(java_JAVA)
-	$(CLASSPATH_ENV) $(JAVAC) -d $(JAVAROOT) $(JAVACFLAGS) $?
-	echo timestamp > classjava.stamp
 tags: TAGS
 TAGS:
 
@@ -164,20 +156,19 @@ install-info: install-info-am
 install-exec-am:
 install-exec: install-exec-am
 
-install-data-am: install-javaJAVA
+install-data-am:
 install-data: install-data-am
 
 install-am: all-am
 	@$(MAKE) $(AM_MAKEFLAGS) install-exec-am install-data-am
 install: install-am
-uninstall-am: uninstall-javaJAVA
+uninstall-am:
 uninstall: uninstall-am
-all-am: Makefile classjava.stamp
+all-am: Makefile
 all-redirect: all-am
 install-strip:
 	$(MAKE) $(AM_MAKEFLAGS) AM_INSTALL_PROGRAM_FLAGS=-s install
 installdirs:
-	$(mkinstalldirs)  $(DESTDIR)$(javadir)
 
 
 mostlyclean-generic:
@@ -189,34 +180,36 @@ distclean-generic:
 	-rm -f config.cache config.log stamp-h stamp-h[0-9]*
 
 maintainer-clean-generic:
-mostlyclean-am:  mostlyclean-javaJAVA mostlyclean-generic
+mostlyclean-am:  mostlyclean-generic
 
 mostlyclean: mostlyclean-am
 
-clean-am:  clean-javaJAVA clean-generic mostlyclean-am
+clean-am:  clean-generic mostlyclean-am
 
 clean: clean-am
 
-distclean-am:  distclean-javaJAVA distclean-generic clean-am
+distclean-am:  distclean-generic clean-am
+	-rm -f libtool
 
 distclean: distclean-am
 
-maintainer-clean-am:  maintainer-clean-javaJAVA maintainer-clean-generic \
-		distclean-am
+maintainer-clean-am:  maintainer-clean-generic distclean-am
 	@echo "This command is intended for maintainers to use;"
 	@echo "it deletes files that may require special tools to rebuild."
 
 maintainer-clean: maintainer-clean-am
 
-.PHONY: mostlyclean-javaJAVA distclean-javaJAVA clean-javaJAVA \
-maintainer-clean-javaJAVA uninstall-javaJAVA install-javaJAVA tags \
-distdir info-am info dvi-am dvi check check-am installcheck-am \
-installcheck install-info-am install-info install-exec-am install-exec \
-install-data-am install-data install-am install uninstall-am uninstall \
-all-redirect all-am all installdirs mostlyclean-generic \
-distclean-generic clean-generic maintainer-clean-generic clean \
-mostlyclean distclean maintainer-clean
+.PHONY: tags distdir info-am info dvi-am dvi check check-am \
+installcheck-am installcheck install-info-am install-info \
+install-exec-am install-exec install-data-am install-data install-am \
+install uninstall-am uninstall all-redirect all-am all installdirs \
+mostlyclean-generic distclean-generic clean-generic \
+maintainer-clean-generic clean mostlyclean distclean maintainer-clean
 
+
+@Make_rules@
+
+all:  Makefile java-classes.stamp $(@GCJ_COMPILED_SELECTED@)
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.

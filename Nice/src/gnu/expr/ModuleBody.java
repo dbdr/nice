@@ -1,5 +1,6 @@
 package gnu.expr;
 import gnu.mapping.*;
+import gnu.lists.*;
 
 /**
  * Abstract class for the dummy top-level function of a module.
@@ -9,25 +10,77 @@ import gnu.mapping.*;
  * faster virtual method calls instead of slower interface calls).
  */
 
-public abstract class ModuleBody extends Procedure0
+public abstract class ModuleBody extends CpsProcedure implements Runnable
 {
-  public Object apply0 ()
+  public void apply (CallContext stack)
   {
-    return run();
   }
 
-  // Should return void.  FIXME
-  // The problem is eval needs to return a result.
-  public Object run ()
+  public void run ()
   {
-    return Values.empty;
+    run (new VoidConsumer());
   }
+
+  public void run(Consumer out)
+  {
+    CallContext ctx = new CallContext();
+    ctx.consumer = out;
+    ctx.values = Values.noArgs;
+    ctx.proc = this;
+    ctx.run();
+  }
+
+  public Object apply0 () throws Throwable
+  {
+    CallContext ctx = new CallContext();
+    ctx.values = Values.noArgs;
+    ctx.proc = this;
+    return applyV(ctx);
+  }
+
+  private static boolean mainPrintValues;
+
+  /** True if runAsMain should print values (in top-level expressions). */
+  public static boolean getMainPrintValues()
+  {
+    return mainPrintValues;
+  }
+
+  public static void setMainPrintValues(boolean value)
+  {
+    mainPrintValues = value;
+  }
+
 
   /** This is invoked by main when ModuleBody is compiled with --main. */
   public final void runAsMain (String[] args)
   {
+    //NICE: removes spurious dependancy
     //kawa.repl.setArgs(args, 0);
-    apply0();
+    gnu.text.WriterManager.instance.registerShutdownHook();
+    try
+      {
+	CallContext ctx = new CallContext();
+	ctx.values = Values.noArgs;
+	ctx.proc = this;
+	if (getMainPrintValues())
+	  {
+	    OutPort out = OutPort.outDefault();
+	    ctx.consumer = Interpreter.getInterpreter().getOutputConsumer(out);
+	    ctx.run();
+	    out.freshLine();
+	  }
+	else
+	  {
+	    ctx.consumer = new VoidConsumer();
+	    ctx.run();
+	  }
+      }
+    finally
+      {
+	// Redundant if registerShutdownHook succeeded (e.g on JDK 1.3).
+	gnu.mapping.OutPort.runCleanups();
+      }
   }
 
   /**

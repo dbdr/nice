@@ -2,6 +2,8 @@ package gnu.expr;
 import gnu.mapping.*;
 import gnu.bytecode.CodeAttr;
 import gnu.bytecode.Type;
+import gnu.lists.*;
+import gnu.text.Lexer;
 
 /**
  * Contains various language-dependent methods.
@@ -38,12 +40,20 @@ public abstract class Interpreter
 
   static String[][] languages =
   {
-    { "scheme", ".scm", "kawa.standard.Scheme" },
+    { "scheme", ".scm", ".sc", "kawa.standard.Scheme" },
     { "emacs", "elisp", "emacs-lisp", ".el", "gnu.jemacs.lang.ELisp" },
+    { "xquery", ".xql", "gnu.xquery.lang.XQuery" },
     { "commonlisp", "common-lisp", "clisp", "lisp",
       ".lisp", ".lsp", ".cl",
       "gnu.commonlisp.lang.CommonLisp" }
   };
+
+  /** Get a list of all available languages */
+
+  public static String[][] getLanguages()
+  {
+    return languages;
+  }
 
   /** Look for an interpreter for a language with the given name or extension.
    * If name is null, look for the first language available. */
@@ -65,7 +75,7 @@ public abstract class Interpreter
 		  }
 		catch (ClassNotFoundException ex)
 		  {
-		    // In the future, we may support langauges names that
+		    // In the future, we may support languages names that
 		    // can be implemented by more than one Interpreter,
 		    // so don't give up yet.
 		    break;
@@ -75,6 +85,11 @@ public abstract class Interpreter
 	  }
       }
     return null;
+  }
+
+  protected Interpreter ()
+  {
+    gnu.lists.Convert.setInstance(KawaConvert.getInstance());
   }
 
   public static Interpreter getInstance (String langName, Class langClass)
@@ -135,7 +150,42 @@ public abstract class Interpreter
 
   public abstract Object read (InPort in)
     throws java.io.IOException, gnu.text.SyntaxException;
-  public abstract void print (Object obj, OutPort out);
+
+  public void print (Object obj, OutPort out)
+  {
+    print(obj, out, false);
+  }
+
+  public void print (Object value, OutPort out, boolean readable)
+  {
+    if (value == Values.empty)
+      return;
+    FormatToConsumer saveFormat = out.objectFormat;
+    try
+      {
+	out.objectFormat = getFormat(readable);
+	if (value instanceof Values)
+	  {
+	    Object[] values = ((Values) value).getValues();
+	    for (int i = 0;  i < values.length;  i++)
+	      out.println(values[i]);
+	  }
+	else
+	  out.println(value);
+      }
+    finally
+      {
+	out.objectFormat = saveFormat;
+      }
+  }
+
+  public abstract FormatToConsumer getFormat(boolean readable);
+
+  public Consumer getOutputConsumer(OutPort out)
+  {
+    out.objectFormat = getFormat(false);
+    return out;
+  }
 
   public Environment getNewEnvironment ()
   {
@@ -144,7 +194,12 @@ public abstract class Interpreter
 
   public abstract String getName();
 
-  public abstract gnu.text.Lexer getLexer(InPort inp, gnu.text.SourceMessages messages);
+  public abstract Lexer getLexer(InPort inp, gnu.text.SourceMessages messages);
+
+  public abstract ModuleExp parse(Environment env, Lexer lexer)
+    throws java.io.IOException, gnu.text.SyntaxException;
+
+  public abstract ModuleExp parseFile (InPort port, gnu.text.SourceMessages messages);
 
   public abstract Type getTypeFor(Class clas);
 
@@ -177,9 +232,9 @@ public abstract class Interpreter
       {
         if (spec instanceof Class)
           return getTypeFor((Class) spec);
-        if (spec instanceof String)
-          return getTypeFor((String) spec);
-        if (spec instanceof gnu.kawa.util.AbstractString)
+        if (spec instanceof String || spec instanceof Binding)
+          return getTypeFor(spec.toString());
+        if (spec instanceof CharSeq)
           return gnu.bytecode.ClassType.make(spec.toString());
       }
     return (Type) spec;
@@ -202,15 +257,33 @@ public abstract class Interpreter
       {
         ReferenceExp rexp = (ReferenceExp) exp;
         Declaration decl = rexp.getBinding();
-        if (decl != null)
+        if (decl != null && ! decl.getFlag(Declaration.IS_UNKNOWN))
           return getTypeFor(decl.getValue());
         String name = rexp.getName();
+	Object val = Environment.getCurrent().get(name);
+	if (val instanceof Type)
+	  return (Type) val;
         int len = name.length();
         if (len > 2 && name.charAt(0) == '<'
             && name.charAt(len-1) == '>')
           return getTypeFor(name.substring(1, len-1));
       }
+    else if (exp instanceof ClassExp)
+      {
+	return ((ClassExp) exp).getType();
+      }
     return null;
+  }
+
+  public static final int VALUE_NAMESPACE = 1<<0;
+  public static final int FUNCTION_NAMESPACE = 1<<1;
+
+  /** Return the namespace (e.g value or function) of a Declaration.
+   * Return a bitmask of all the namespces "covered" by the Declaration.
+   */
+  public int getNamespaceOf(Declaration decl)
+  {
+    return VALUE_NAMESPACE;
   }
 
   public void emitPushBoolean(boolean value, CodeAttr code)
@@ -245,6 +318,12 @@ public abstract class Interpreter
   public Object coerceToObject(int val)
   {
     return gnu.math.IntNum.make(val);
+  }
+
+  public Procedure getPrompter()
+  {
+    Binding pr = Environment.getCurrentBinding("default-prompter");
+    return pr == null ? null : pr.getProcedure();
   }
 
   // The compiler finds registerEnvironment by using reflection.

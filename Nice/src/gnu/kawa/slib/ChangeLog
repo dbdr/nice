@@ -1,3 +1,54 @@
+2001-10-19  Per Bothner  <per@bothner.com>
+
+	* printf.scm:  Merge new version from Slib.
+
+2001-07-18  Per Bothner  <per@bothner.com>
+
+	* XML.scm (print-as-xml):  Removed - now "builtin".
+
+2001-06-17  Per Bothner  <per@bothner.com>
+
+	* Makefile.am (all):  Re-arrange dependencies so kawa1 is built.
+
+2001-05-09  Per Bothner  <per@bothner.com>
+
+	* Makefile.am:  Various fixes for better gcj support.
+
+2001-04-23  Per Bothner  <per@bothner.com>
+
+	* readtable.scm:  New module.
+	* Makefile.am (java_SCM):  Add readtble.scm.
+
+2001-04-22  Per Bothner  <per@bothner.com>
+
+	* XML.scm:  Update gnu.kawa.xml -> gnu.xml.
+
+2001-04-09  Per Bothner  <per@bothner.com>
+
+	* Makefile.am (CLEANFILES):  Removed redundant macro.
+
+2001-03-22  Per Bothner  <per@bothner.com>
+
+	* Makefile.am (ENABLE_GCJ_COMPILED):  Remove scm-classes.stamp
+	(already required by all) as it requires kawa1 too early.
+
+2001-03-08  Per Bothner  <per@bothner.com>
+
+	* XML.java (print-as-xml):  Update Consumable package to gnu.lists
+
+2001-02-28  Per Bothner  <per@bothner.com>
+
+	* SLib.java:  Removed; functionality moved to kawa.standard.require.
+
+	* printf.scm: (require 'generic-write) moved to top-level.  This is
+	a work-around for some bugs in require.
+
+2001-02-16  Per Bothner  <per@bothner.com>
+
+	* XML.scm:  New module.
+	* SLib.java (<clinit>):  New module tag 'xml.
+	* Makefile.am:  Update to (conditionally) compile XML.scm.
+
 2000-03-22  Per Bothner  <per@bothner.com>
 
 	* Makefile.am (javadir):  New definition, needed for make install.

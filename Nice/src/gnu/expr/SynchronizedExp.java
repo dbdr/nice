@@ -13,7 +13,7 @@ public class SynchronizedExp extends Expression
     this.body = body;
   }
 
-  public Object eval (Environment env)
+  public Object eval (Environment env) throws Throwable
   {
     Object value = object.eval(env);
     synchronized (value)
@@ -32,8 +32,10 @@ public class SynchronizedExp extends Expression
     code.emitStore(objvar); 
     code.emitMonitorEnter();
     code.emitTryStart(false,
-		      target instanceof IgnoreTarget ? null
+		      (target instanceof IgnoreTarget
+		       || target instanceof ConsumerTarget) ? null
 		      : target.getType());
+
     body.compileWithPosition(comp, target); 
     code.emitLoad(objvar);
     code.emitMonitorExit();
@@ -47,11 +49,21 @@ public class SynchronizedExp extends Expression
     code.popScope();
  }
 
-  Object walk (ExpWalker walker) { return walker.walkSynchronizedExp(this); }
-
-  public void print (java.io.PrintWriter ps)
+  protected Expression walk (ExpWalker walker)
   {
-    ps.print("(#%synchronized ");
+    return walker.walkSynchronizedExp(this);
+  }
+
+  protected void walkChildren(ExpWalker walker)
+  {
+    object = object.walk(walker);
+    if (walker.exitValue == null)
+      body = body.walk(walker);
+  }
+
+  public void print (OutPort ps)
+  {
+    ps.print("(Synchronized ");
     object.print(ps);
     ps.print(" ");
     body.print(ps);

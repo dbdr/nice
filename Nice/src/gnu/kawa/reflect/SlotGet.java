@@ -2,7 +2,8 @@ package gnu.kawa.reflect;
 import gnu.mapping.*;
 import gnu.expr.*;
 import gnu.bytecode.*;
-import gnu.kawa.util.FString;
+import gnu.lists.FString;
+import gnu.kawa.lispexpr.LangPrimType;
 
 public class SlotGet extends Procedure2 implements HasSetter, Inlineable
 {
@@ -11,13 +12,22 @@ public class SlotGet extends Procedure2 implements HasSetter, Inlineable
   /** True if this is a "static-field" operation. */
   boolean isStatic;
 
-  public static SlotGet field = new SlotGet("field", false);
-  public static SlotGet staticField = new SlotGet("static-field", true);
+  Procedure setter;
+  public static SlotGet field = new SlotGet("field", false, SlotSet.setField$Ex);
+  public static SlotGet staticField
+  = new SlotGet("static-field", true, SlotSet.setStaticField$Ex);
 
   public SlotGet(String name, boolean isStatic)
   {
     super(name);
     this.isStatic = isStatic;
+  }
+
+  public SlotGet(String name, boolean isStatic, Procedure setter)
+  {
+    super(name);
+    this.isStatic = isStatic;
+    this.setter = setter;
   }
 
   public static Object field(Object obj, String fname)
@@ -35,7 +45,7 @@ public class SlotGet extends Procedure2 implements HasSetter, Inlineable
     if (! (name instanceof String) && ! (name instanceof FString))
       throw WrongType.make(null, this, 1);
     Interpreter interpreter = Interpreter.defaultInterpreter; // FIXME
-    String fname = gnu.expr.Compilation.mangleName(name.toString());
+    String fname = gnu.expr.Compilation.mangleNameIfNeeded(name.toString());
     Class clas = isStatic ? coerceToClass(obj) : obj.getClass();
     if (clas.isArray() && "length".equals(fname))
       {
@@ -61,7 +71,12 @@ public class SlotGet extends Procedure2 implements HasSetter, Inlineable
         try
           {
             Object result = field.get(obj);
-            result = interpreter.coerceToObject(field.getType(), result);
+	    if (result instanceof Binding
+		&& ((field.getModifiers() & java.lang.reflect.Modifier.FINAL)
+		    != 0))
+	      result = ((Binding) result).get();
+	    else
+	      result = interpreter.coerceToObject(field.getType(), result);
             return result;
           }
         catch (IllegalAccessException ex)
@@ -74,13 +89,9 @@ public class SlotGet extends Procedure2 implements HasSetter, Inlineable
       }
 
     // Try looking for a method "getFname" instead:
-    StringBuffer getname = new StringBuffer(fname.length()+3);
-    getname.append("get");
-    getname.append(Character.toTitleCase(fname.charAt(0)));
-    getname.append(fname.substring(1));
+    String mname = ClassExp.slotToMethodName("get", fname);
     try
       {
-        String mname = getname.toString();
         java.lang.reflect.Method getmethod
           = clas.getMethod(mname, noClasses);
         if (isStatic
@@ -131,12 +142,12 @@ public class SlotGet extends Procedure2 implements HasSetter, Inlineable
     set2(args[0], args[1], args[2]);
   }
 
-  public void set2 (Object value, Object obj, Object name)
+  public void set2 (Object obj, Object name, Object value)
   {
-    SlotSet.apply(obj, (String) name, value);
+    SlotSet.apply(isStatic, obj, (String) name, value);
   }
 
-  Object getField(Type type, String name)
+  static Object getField(Type type, String name)
   {
     if (type instanceof ClassType && name != null)
       {
@@ -146,12 +157,8 @@ public class SlotGet extends Procedure2 implements HasSetter, Inlineable
           return field;
 
         // Try looking for a method "getFname" instead:
-        StringBuffer getname = new StringBuffer(name.length()+3);
-        getname.append("get");
-        getname.append(Character.toTitleCase(name.charAt(0)));
-        getname.append(name.substring(1));
-        gnu.bytecode.Method method = clas.getMethod(getname.toString(),
-                                                    Type.typeArray0);
+        String getname = ClassExp.slotToMethodName("get", name);
+        gnu.bytecode.Method method = clas.getMethod(getname, Type.typeArray0);
         return method;
       }
     return null;
@@ -170,18 +177,21 @@ public class SlotGet extends Procedure2 implements HasSetter, Inlineable
       }
     Expression arg0 = args[0];
     Expression arg1 = args[1];
-    Type type = isStatic ? kawa.standard.Scheme.exp2Type(arg0)
-      : arg0.getType();
+    Type type = /* NICE: remove dependancy
+		   isStatic ? kawa.standard.Scheme.exp2Type(arg0)
+		   : */ 
+      arg0.getType();
     String name = ClassMethods.checkName(arg1);
     CodeAttr code = comp.getCode();
     if (type instanceof ClassType && name != null)
       {
-        ClassType ctype = (ClassType) type;
+	ClassType ctype = (ClassType) type;
         Object part = getField(ctype, name);
         if (part instanceof gnu.bytecode.Field)
           {
             gnu.bytecode.Field field = (gnu.bytecode.Field) part;
-            boolean isStaticField = field.getStaticFlag();
+            int modifiers = field.getModifiers();
+            boolean isStaticField = (modifiers & Access.STATIC) != 0;
             if (isStatic && ! isStaticField)
               comp.error('e', ("cannot access non-static field `" + name
                                + "' using `" + getName() + '\''));
@@ -189,10 +199,47 @@ public class SlotGet extends Procedure2 implements HasSetter, Inlineable
                             isStaticField ? Target.Ignore
                             : Target.pushValue(ctype));
             if (isStaticField)
-              code.emitGetStatic(field); 
+              {
+                boolean inlined = false;
+                /*
+                FIXME This isn't quite safe.  We should only "inline"
+                the value if the field whose initializer is a constant
+                expression (JLS 2nd ed 15.28).  We cannot determine this
+                using reflection instead we have to parse the .class file.
+
+                Type ftype = field.getType();
+                if ((modifiers & Access.FINAL) != 0
+                    && ftype instanceof PrimType)
+                  {
+                    // We inline int final fields.
+                    // Other kinds of final fields are less obviously a win.
+                    char sig = ftype.getSignature().charAt(0);
+                    if (sig != 'F' && sig != 'D' && sig != 'J')
+                      {
+                        try
+                          {
+                            java.lang.reflect.Field rfield
+                              = field.getReflectField();
+                            int val = rfield.getInt(null);
+                            code.emitPushInt(val);
+                            inlined = true;
+                          }
+                        catch (Exception ex)
+                          {
+                          }
+                      }
+                  }
+                */
+                if (! inlined)
+                  code.emitGetStatic(field); 
+              }
             else
               code.emitGetField(field);
-	    target.compileFromStack(comp, field.getType());
+	    Type ftype = field.getType();
+	    if ("gnu.mapping.Binding".equals(ftype.getName())
+		&& (modifiers & Access.FINAL) != 0)
+	      code.emitInvokeVirtual(Compilation.getLocationMethod);
+	    target.compileFromStack(comp, ftype);
             return;
           }
         if (part instanceof gnu.bytecode.Method)
@@ -221,7 +268,7 @@ public class SlotGet extends Procedure2 implements HasSetter, Inlineable
       {
 	args[0].compile(comp, Target.pushValue(type));
 	code.emitArrayLength();
-	target.compileFromStack(comp, kawa.standard.Scheme.intType);  // FIXME
+	target.compileFromStack(comp, LangPrimType.intType);  // FIXME
 	return;
       }
     ApplyExp.compile(exp, comp, target);
@@ -234,8 +281,10 @@ public class SlotGet extends Procedure2 implements HasSetter, Inlineable
       {
         Expression arg0 = args[0];
         Expression arg1 = args[1];
-        Type type = isStatic ? kawa.standard.Scheme.exp2Type(arg0)
-          : arg0.getType();
+	Type type = /* NICE: remove dependancy
+		       isStatic ? kawa.standard.Scheme.exp2Type(arg0)
+		       : */ 
+	  arg0.getType();
         String name = ClassMethods.checkName(arg1);
         if (type instanceof ClassType && name != null)
           {
@@ -248,8 +297,13 @@ public class SlotGet extends Procedure2 implements HasSetter, Inlineable
           }
 	else if (type instanceof ArrayType && "length".equals(name)
 		 && ! isStatic)
-	  return kawa.standard.Scheme.intType;  // FIXME
+	  return gnu.kawa.lispexpr.LangPrimType.intType;  // FIXME
       }
     return Type.pointer_type;
+  }
+
+  public Procedure getSetter()
+  {
+    return setter == null ? super.getSetter() : setter;
   }
 }

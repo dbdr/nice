@@ -2,34 +2,14 @@
 
 AUTOMAKE_OPTIONS = foreign
 
-SUFFIXES = .java .class
+@Make_rules@
 
-javadir=$(datadir)/java/$(subdir)
+java_sources = \
+  ConsumeProc.java \
+  AbstractFormat.java \
+  RangeTable.java
 
-java_JAVA=\
-  AbstractString.java \
-  CharBuffer.java \
-  F32Vector.java \
-  F64Vector.java \
-  FString.java \
-  FVector.java \
-  LList.java \
-  Pair.java \
-  PairWithPosition.java \
-  Position.java \
-  S8Vector.java \
-  S16Vector.java \
-  S32Vector.java \
-  S64Vector.java \
-  Sequence.java \
-  SubString.java \
-  U8Vector.java \
-  U16Vector.java \
-  U32Vector.java \
-  U64Vector.java \
-  UniformVector.java
+PACKAGE_FNAME = gnu-kawa-util
+GCJ_INPUTS =  $(java_Java)
 
-KAWA = $(JAVA) kawa.repl
-
-all: Makefile classjava.stamp
-
+all: Makefile java-classes.stamp $(@GCJ_COMPILED_SELECTED@)

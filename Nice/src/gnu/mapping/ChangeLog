@@ -1,3 +1,218 @@
+2001-10-19  Per Bothner  <per@bothner.com>
+
+	* Constraint.java, AliasConstraint.java, ConstantConstraint.java,
+	FluidConstraint.java, IndirectConstraint.java, TrivialConstraint.java,
+	UnboundConstraint.java, Binding.java (get):   Now takes extra
+	defaultValue argument.
+	* NameMap.java (getChecked):  Make final, not abstract,
+	(get(String,Object)):  New abstract method.
+	* Environment.java (get):   New method takes defaultValue argument.
+	(isBound):  Make final.
+	(getChecked):  Moved to NameMap and made final
+
+	* Procedure.java, Procedure0.java, Procedure0or1.java, Procedure1.java,
+	Procedure1or2.java, Procedure2.java, Procedure3.java, Procedure4.java,
+	ProcedureN.java, CpsProcedure.java, MethodProc.java, Setter.java,
+	Setter0.java, Setter1.java (apply* methods, set* methods):
+	Now specify throws Throwable.
+	* Values.java (call_with):  Likewise.
+	* Future.java, ProcLocation.java, TtyInPort.java:  Catch Throwable.
+	* IndirectConstraint.java (get. set):  Catch and wrap Throwable.
+	* CallContext.java (runUntilDone):  New method, throw Throwable.
+	(run):  Use runUntilDone.  Catch Throwable.
+	* CpsProcedure.java (applyV):  Use new CallContext.runUntilDone method.
+
+2001-10-11  Per Bothner  <per@bothner.com>
+
+	* CallContext.java:  Remove 'final' attribute.
+
+	* WrappedException.java (exception field):  Change type to Throwable.
+	(<init>, getException):  Change to take/return Throwable.
+	(getCause):  New method, as in JDK1.4.
+	* WrongType.java (getMessage):  Use new getCause, update type.
+
+2001-10-05  Per Bothner  <per@bothner.com>
+
+	* SFormat.java:  Update for CharSequence -> CharSeq renaming.
+
+	* OutPort.java (print(Object)):  Print null as "null".
+
+2001-09-21  Per Bothner  <per@bothner.com>
+
+	* SysInPort.java:  Removed.  Seems to do more harm than good.
+	Specifically, interferes with echoing on Windows platform.
+	* Makefile.am (java_sources):  Removed.
+	* InPort.java (systemInPort):  Use a TtyInPort instead of a SysInPort.
+
+	* Procedure.java (toString):  If no name, use class name instead.
+
+2001-09-13  Per Bothner  <per@bothner.com>
+
+	* CpsMethodContainer.java (apply):  Change return type to void.
+	* CpsMethodProc.java (applyError):  New helper method.
+
+2001-08-15  Per Bothner  <per@bothner.com>
+
+	* OutPort.java (print(String)):  Handle null string.
+
+	* WrongArguments.java (checkArgCount):  If procedures's getName() is
+	null, using procedure's class's name instead.
+
+2001-07-16  Per Bothner  <per@bothner.com>
+
+	* CallContext.java (next):  New field.
+	(getNextArg, lastArg):  New methods.
+	(setArgs, setArgsN):  Initialize next to 0.
+
+	* OutPort.java (beginGroup, endGroup):  If objectFormat is non-null,
+	re-direct to its methods.
+	* OutPort (endAttribute):  Removed method (no longer in Consumer).
+	(endAttribute):  New method (to implement Consumer).
+
+	* Values.java: Now extends TreeList, used to store the Values.
+	(equals):  Only succeed if other Obejct is instanceof Values.
+
+2001-06-19  Per Bothner  <per@bothner.com>
+
+	* Binding.java (isBound):  Remove debugging junk.
+
+	* Binding.java (make):  Use name when creating new Binding.
+
+2001-06-17  Per Bothner  <per@bothner.com>
+
+	* Binding.java:  Implement Externalizeable.
+	(readExternal, writeExternal, readResolve):  New methods.
+	(getProcedure):  New kludge to Lisp2 bindings.
+	(defineValue, defineConstant. getFunctionValue, hasFunctionValue,
+	setFunctionValue, removeFunctionValue, getEnvironment):  New methods.
+	(toString):  Return name - needed since Lisp symbol is a Binding.
+	(make):  New method.
+	(trivialConstraint):  Removed field.
+	* Constraint.java (setFunctionValue):  New method.
+	* Binding2.java:  Removed class.
+	* Makefile.am (java_JAVA):  Updated.
+
+	* Binding.java (equals):  Replace by identity.
+	* ConstantConstraint.java:  New class; extends Constraint.
+	* Environment.java  (constantConstraint):  New field.
+
+	* Environment.java (locked):  New field
+	(isLocked, setLocked):  New methods.
+	(getBinding):  Don't add new binding if locked (but try parent).
+	(remove):  Throw exception if locked.
+	* TrivialConstraint.java (getInstance):  New static methods.
+	* UnboundConstraint.java (getInstance):  New static methods.
+        (set):  Throw exception if environment is locked.
+
+	* Procedure.java (removeProperty):  New method.
+
+2001-06-03  Per Bothner  <per@bothner.com>
+
+	* CpsProcedure.java (applyN):  Use checkArgCount method.
+
+	* OutPort.java:  Major changes.
+	(class BufferedPort):  removed, replaced by gnu.text.PrettyWriter.
+	(startLogicalBlock, endLogicalBlock, writeBreak, writeSpaceLinear,
+	writeBreakLinear, writeSpaceFill, writeBreakFill, setIndentation):
+	Wrappers for PrettyWriter's features.
+	(class Break):  Removed.
+	(objectFormat):  Change type to FormatToConsumer.
+	(print(Object)):  Use objectFormat appropriately.
+
+	* OutPort.java (freshLine):  New method.
+	* TtyInPort.java (lineStart):  Call freshLine, and clearBuffer.
+
+	* CharArrayOutPort.java:  Tweaks because of use of PrettyWriter.
+
+2001-05-16  Per Bothner  <per@bothner.com>
+
+	* CpsProcedure.java (applyN, match):  Use CallContext's setArgsN.
+
+	* Values.java (make(TreeList,int,int)):  Change count variable
+	to be one less, and fix some off-by-one errors.
+
+	* Values.java (make(TreeList,int,int)):  Shift argument to getNext
+	to convert index to ipos.
+
+2001-05-08  Per Bothner  <per@bothner.com>
+
+	Change full-tailcalls calling convention so result is Consumer.
+	* Values.java (make(Sequence), make(TreeList)):  New static methods.
+	* ValueStack.java:  New class, extends TreeList.
+	* Makefile.am (java_sources):  Update accordingly.
+	* CallContext.java (value):  Removed field.
+	(vstack, consumer):  New fields.
+	(writeValue):  New method.
+	* Procedure.java (apply(CallContext):  Use new writeValue method.
+	* CpsProcedure.java (applyN):  Use applyV method.
+	(applyV):  Get result from context's vstack.
+
+2001-04-07  Otto, Marcus <Otto_Marcus@ph-ludwigsburg.de>
+
+	* CpsProcedure.java (applyN):  Check argument count.
+
+2001-03-08  Per Bothner  <per@bothner.com>
+
+	* OutPort.java: Implement gnu.lists.Consumer.
+
+	* SFormat.java (printReadable):  New helper function.
+	(print):  Compensate since gnu.lsist classes no longer
+	implement Printable.
+
+2001-02-27  Per Bothner  <per@bothner.com>
+
+	* CpsMethodContainer.java:  New interface.
+	* CpsMethodProc.java:    New class, extends CpsProcedure.
+	* Makefile.am:  Update accordingly.
+
+2000-12-09  Per Bothner  <per@bothner.com>
+
+	* Binding.java (UNBOUND):  New static field - a special value.
+	(getFunctionValue):  Just call Constraint's getFunctionValue.
+	* Constraint.java (getFunctionValue):  New method.
+	* AliasConstraint.java (getFunctionValue):  New method.
+
+2000-10-12  Per Bothner  <per@bothner.com>
+
+	* CallContext.java (args):  Removed field - use valueX instead.
+	(getArgs):  New method.
+	* CallFrame.java (apply):  Use values field of CallContext, not args.
+	* CpsProcedure.java (match, applyN):  Likewise.
+
+	Various fixes for SRFI-17 compatibility (which has rhs value as
+	last value, not first value to setter procedure).
+	* HasSetter.java:  Update comments to match new conventions.
+	* Procedure.java (setterKey):  New static field.
+	(getSetter):  Look for "setter" property.
+	(set1):  Rename args to match new convention.
+	* Setter1.java (apply2):  Likewise.
+	* NameMap.java (set1):  Switch args to match new convention.
+	* ProcLocation.java (set):  Switch to match new setter convention.
+
+	* Procedure.java (apply(CallContext)):  Optimize - avoid applyN.
+
+
+2000-08-17  Per Bothner  <per@bothner.com>
+
+	* CallStack.java:  Renamed to ...
+	* CallContext.java:  Renamed from CallStack.java.
+	(value1, value2, value3, value4, values, ivalue1, ivalue2): New fields.
+	(count, where):  New fields.
+	(getArgAsObject, setArgs, setArgsN):  New methods.
+	* Makefile.am, Procedure.java, CallFrame.java:  Update accordingly.
+	* MethodProc.java (applyV):  Takes CallContext, not Object.
+	(getVarBuffer):  Removed - calls replaced by 'new CallContext()'.
+	(match):  Return an int return code, not RuntimeException.
+	(NO_MATCH, NO_MATCH_TOO_FEW_ARGS, NO_MATCH_TOO_MANY_ARGS,
+	NO_MATCH_AMBIGUOUS, NO_MATCH_BAD_TYPE):  New match return codes.
+	(matchFailAsException):  Convert int return code to RuntimeException.
+	* CpsProcedure.java:  Update to match MethodProc changes.
+	(getVarBuffer):  Removed method.
+	
+	* OutPort.java (numberFormat, objectFormat):  New fields.
+	(print(primitive-type)):  If numberFormat is non-null, use it.
+	(print(Object)):  If objectFormat is non-null, use it.
+
 2000-06-17  Per Bothner  <per@bothner.com>
 
 	* MethodProc.java:  Moved from gnu.expr.

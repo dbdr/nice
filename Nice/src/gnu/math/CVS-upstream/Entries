@@ -1,0 +1,27 @@
+/Unit.java/1.12/Sun Jun 11 01:55:01 2000//
+/BaseUnit.java/1.4/Thu Sep  7 17:55:33 2000//
+/BitOps.java/1.5/Thu Sep  7 17:55:33 2000//
+/CComplex.java/1.4/Thu Sep  7 17:55:33 2000//
+/COPYING/1.3/Thu Sep  7 17:55:33 2000//
+/CQuantity.java/1.4/Thu Sep  7 17:55:33 2000//
+/Complex.java/1.9/Thu Sep  7 17:55:33 2000//
+/DComplex.java/1.8/Thu Sep  7 17:55:33 2000//
+/DFloNum.java/1.23/Thu Sep  7 17:55:34 2000//
+/DQuantity.java/1.6/Thu Sep  7 17:55:34 2000//
+/Dimensions.java/1.5/Thu Sep  7 17:55:34 2000//
+/ExponentialFormat.java/1.1/Thu Sep  7 17:55:34 2000//
+/FixedRealFormat.java/1.2/Thu Sep  7 17:55:34 2000//
+/MulUnit.java/1.5/Thu Sep  7 17:55:35 2000//
+/NamedUnit.java/1.1/Thu Sep  7 17:55:36 2000//
+/Numeric.java/1.10/Thu Sep  7 17:55:35 2000//
+/Quantity.java/1.8/Thu Sep  7 17:55:35 2000//
+/RatNum.java/1.11/Thu Sep  7 17:55:35 2000//
+/RealNum.java/1.13/Thu Sep  7 17:55:35 2000//
+/package.html/1.2/Thu Sep  7 17:55:36 2000//
+/ChangeLog/1.59/Wed Sep 26 10:22:43 2001//
+/IntFraction.java/1.14/Wed Sep 26 10:22:43 2001//
+/IntNum.java/1.41/Wed Sep 26 10:22:43 2001//
+/MPN.java/1.12/Wed Sep 26 10:22:43 2001//
+/Makefile.am/1.20/Wed Sep 26 10:22:43 2001//
+/Makefile.in/1.40/Wed Sep 26 10:22:43 2001//
+D

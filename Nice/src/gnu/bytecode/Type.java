@@ -15,6 +15,18 @@ public abstract class Type {
 
   Type () { }
 
+  /** The type used to implement types not natively understood by the JVM.
+
+   * Usually, the identity function.  However, a language might handle
+   * union types or template types or type expression scalculated at
+   * run time.  In that case return the type used at the JVM level,
+   * and known at compile time.
+   */
+  public Type getImplementationType()
+  {
+    return this;
+  }
+
   // Maps java.lang.Class to corresponding Type.
   private static java.util.Hashtable mapClassToType;
 
@@ -57,14 +69,7 @@ public abstract class Type {
 	else
 	  {
 	    ClassType cl = new ClassType(name);
-	    try
-	      {
-		cl.reflectClass = Class.forName(name);
-		cl.flags |= ClassType.EXISTING_CLASS;
-	      }
-	    catch (java.lang.ClassNotFoundException ex)
-	      {
-	      }
+            cl.flags |= ClassType.EXISTING_CLASS;
 	    type = cl;
 	  }
 	mapNameToType.put(name, type);
@@ -124,7 +129,9 @@ public abstract class Type {
       {
 	String name = reflectClass.getName();
 	type = lookupType(name);
-	if (type == null)
+	if (type == null
+            || (type.reflectClass != reflectClass
+                && type.reflectClass != null))
 	  {
 	    ClassType cl = new ClassType(name);
 	    cl.flags |= ClassType.EXISTING_CLASS;
@@ -157,7 +164,7 @@ public abstract class Type {
 
   /** Returns the primitive type corresponding to a signature character.
    * @return a primitive type, or null if there is no such type. */
-  public static Type signatureToPrimitive(char sig)
+  public static PrimType signatureToPrimitive(char sig)
   {
     switch(sig)
       {
@@ -321,7 +328,7 @@ public abstract class Type {
 	ClassType he = (ClassType) other;
 	
 	if(he.isInterface())
-	  return me.doesImplement(he);
+	  return me.implementsInterface(he);
 	else
 	  return me.isSubclass(he);
       }
@@ -428,7 +435,7 @@ public abstract class Type {
     return obj;
   }
 
-  /** Compile code to convert an object (on the stack) to this Type. */
+  /** Compile code to convert a object of this type on the stack to Object. */
   public void emitCoerceToObject (CodeAttr code)
   {
   }
@@ -465,8 +472,8 @@ public abstract class Type {
     = new PrimType ("char", "C", 2, java.lang.Character.TYPE);
   // place never-returns first, so that void is registered for Void.TYPE
   /** The "return type" of an expression that never returns, e.g. a throw. */
-  public static final PrimType neverReturnsType
-    = new PrimType ("(never-returns)", "V", 0, java.lang.Void.TYPE);
+  public static final PrimType neverReturnsType = 
+    new PrimType ("(never-returns)", "V", 0, java.lang.Void.TYPE);
   public static final PrimType void_type
     = new PrimType ("void", "V", 0, java.lang.Void.TYPE);
 
@@ -474,8 +481,12 @@ public abstract class Type {
   /** The magic type of null. */
   public static final ObjectType nullType = new ObjectType("(type of null)");
 
-  static public ClassType pointer_type = ClassType.make("java.lang.Object");
+  /* The String type. but coercion is handled by toString. */
+  //static public ClassType string_type = new ClassType("java.lang.String");
+  //  static { string_type.flags |= ClassType.EXISTING_CLASS; }
   static public ClassType string_type = ClassType.make("java.lang.String");
+
+  static public ClassType pointer_type = ClassType.make("java.lang.Object");
   static public ClassType boolean_ctype = ClassType.make("java.lang.Boolean");
   static public ClassType throwable_type = ClassType.make("java.lang.Throwable");
 

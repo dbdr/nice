@@ -26,7 +26,7 @@ public abstract class ReportFormat extends Format
 
   /** Format an array of arguments, and write out the result.
    * @param dst where to write the result
-   * @param args the objets to be formatted
+   * @param args the objects to be formatted
    * @param start the index (in args) of the argument to start with
    * @return an integer result(resultCode, nextArg), where
    * nextArg is the index following the last argument processed, and
@@ -35,6 +35,18 @@ public abstract class ReportFormat extends Format
   public abstract int format(Object[] args, int start,
 			     Writer dst, FieldPosition fpos)
     throws java.io.IOException;
+
+  public int format(Object arg, int start, Writer dst, FieldPosition fpos)
+    throws java.io.IOException
+  {
+    if (arg instanceof Object[])
+      return format((Object[]) arg, start, dst, fpos);
+    else
+      {
+        Object[] args = { arg };
+        return format(args, start, dst, fpos);
+      }
+  }
 
   public StringBuffer format(Object obj, StringBuffer sbuf, FieldPosition fpos)
   {
@@ -137,7 +149,7 @@ public abstract class ReportFormat extends Format
     if (param == PARAM_FROM_COUNT)
       return args.length - start;
     if (param == PARAM_FROM_LIST)
-      return getParam(args[start], defaultValue);
+      return args == null ? defaultValue : getParam(args[start], defaultValue);
     if (param == PARAM_UNSPECIFIED)
       return defaultValue;
     // Need to mask off flags etc?

@@ -1,4 +1,4 @@
-// Copyright (c) 1997, 1998, 1999  Per M.A. Bothner.
+// Copyright (c) 1997, 1998, 1999, 2001  Per M.A. Bothner.
 // This is free software;  for terms and warranty disclaimer see ./COPYING.
 
 package gnu.bytecode;
@@ -388,6 +388,11 @@ public class CodeAttr extends Attribute implements AttrContainer
     return scope;
   }
 
+  public Scope getCurrentScope()
+  {
+    return locals.current_scope;
+  }
+
   public Scope popScope () {
     Scope scope = locals.current_scope;
     locals.current_scope = scope.parent;
@@ -402,7 +407,7 @@ public class CodeAttr extends Attribute implements AttrContainer
   /** Get the index'th parameter. */
   public Variable getArg (int index)
   {
-    return locals.parameter_scope.find_var (index);
+    return locals.parameter_scope.getVariable(index);
   }
 
   /**
@@ -1022,7 +1027,7 @@ public class CodeAttr extends Attribute implements AttrContainer
     int opcode;
     if ((method.access_flags & Access.STATIC) != 0)
       opcode = 184;   // invokestatic
-    else if (getMethod().classfile.isInterface())
+    else if (method.classfile.isInterface())
       opcode = 185;   // invokeinterface
     else
       opcode = 182;   // invokevirtual
@@ -1095,6 +1100,11 @@ public class CodeAttr extends Attribute implements AttrContainer
   {
     emitGoto(label, 167);
     setUnreachable();
+  }
+
+  public final void emitJsr (Label label)
+  {
+    emitGoto(label, 168);
   }
 
   public final void emitGotoIfEq (Label label, boolean invert)
@@ -1359,7 +1369,7 @@ public class CodeAttr extends Attribute implements AttrContainer
       {
 	int growth = SP-if_stack.start_stack_size;
 	if_stack.stack_growth = growth;
-	if (growth >= 0)
+	if (growth > 0)
 	  {
 	    if_stack.then_stacked_types = new Type[growth];
 	    System.arraycopy (stack_types, if_stack.start_stack_size,
@@ -1593,7 +1603,22 @@ public class CodeAttr extends Attribute implements AttrContainer
 
   public void emitTryStart(boolean has_finally, Type result_type)
   {
+    Variable[] savedStack;
+    if (SP > 0)
+      {
+	savedStack = new Variable[SP];
+	int i = 0;
+	while (SP > 0)
+	  {
+	    Variable var = addLocal(topType());
+	    emitStore(var);
+	    savedStack[i++] = var;
+	  }
+      }
+    else
+      savedStack = null;
     TryState try_state = new TryState(this);
+    try_state.savedStack = savedStack;
     if (result_type != null && result_type.size == 0) // void
       result_type = null;
     if (result_type != null || SP > 0)
@@ -1601,17 +1626,6 @@ public class CodeAttr extends Attribute implements AttrContainer
 	pushScope();
 	if (result_type != null)
 	  try_state.saved_result = addLocal(result_type);
-      }
-    if (SP > 0)
-      {
-	try_state.savedStack = new Variable[SP];
-	int i = 0;
-	while (SP > 0)
-	  {
-	    Variable var = addLocal(topType());
-	    emitStore(var);
-	    try_state.savedStack[i++] = var;
-	  }
       }
     if (has_finally)
       try_state.finally_subr = new Label(this);
@@ -1804,9 +1818,18 @@ public class CodeAttr extends Attribute implements AttrContainer
   public void assignConstants (ClassType cl)
   {
     super.assignConstants(cl);
+    for (;;)
+      {
+	CodeFragment frag = fragments;
+	if (frag == null)
+	  break;
+	fragments = frag.next;
+	frag.emit(this);
+      }
     if (locals != null && locals.container == null && ! locals.isEmpty())
       locals.addToFrontOf(this);
     Attribute.assignConstants(this, cl);
+    finalize_labels();
   }
 
   public final int getLength()
@@ -2236,5 +2259,26 @@ public class CodeAttr extends Attribute implements AttrContainer
     System.arraycopy(code, startPC, frag.insns, 0, frag.length);
     PC = startPC;
     unreachable_here = frag.unreachable_save;
+
+    if (lines != null)
+      {
+	int l = 2 * lines.linenumber_count;
+	int j = l;
+	short[] linenumbers = lines.linenumber_table;
+	while (j > 0 && linenumbers[j - 2] >= startPC)
+	  j -= 2;
+	l -= j;
+	if (l > 0)
+	  {
+	    short[] fraglines = new short[l];
+	    for (int i = 0;  i < l;  i += 2)
+	      {
+		fraglines[i] = (short) ((linenumbers[j+i] & 0xffff) - startPC);
+		fraglines[i+1] = linenumbers[j+i+1];
+	      }
+	    frag.linenumbers = fraglines;
+	    lines.linenumber_count = j >> 1;
+	  }
+      }
   }
 }

@@ -2,7 +2,7 @@ package gnu.kawa.reflect;
 import gnu.mapping.*;
 import gnu.expr.*;
 import gnu.bytecode.*;
-import gnu.kawa.util.FString;
+import gnu.lists.FString;
 
 public class Invoke extends ProcedureN implements Inlineable
 {
@@ -11,9 +11,9 @@ public class Invoke extends ProcedureN implements Inlineable
 
   Interpreter interpreter;
 
-  public static Invoke invoke = new Invoke("invoke", 'V');
-  public static Invoke invokeStatic = new Invoke("invoke-static", 'S');
-  public static Invoke make = new Invoke("make", 'N');
+  public static final Invoke invoke = new Invoke("invoke", 'V');
+  public static final Invoke invokeStatic = new Invoke("invoke-static", 'S');
+  public static final Invoke make = new Invoke("make", 'N');
 
   public Invoke(String name, char kind)
   {
@@ -29,27 +29,28 @@ public class Invoke extends ProcedureN implements Inlineable
     this.interpreter = interpreter;
   }
 
-  public static Object invoke$V(Object[] args)
+  public static Object invoke$V(Object[] args) throws Throwable
   {
     return applyN(invoke, args);
   }
 
-  public static Object invokeStatic$V(Object[] args)
+  public static Object invokeStatic$V(Object[] args) throws Throwable
   {
     return applyN(invokeStatic, args);
   }
 
-  public static Object make$V(Object[] args)
+  public static Object make$V(Object[] args) throws Throwable
   {
     return applyN(make, args);
   }
 
-  public Object applyN (Object[] args)
+  public Object applyN (Object[] args) throws Throwable
   {
     return applyN(this, args);
   }
 
   protected static Object applyN (Invoke thisProc, Object[] args)
+    throws Throwable
   {
     int nargs = args.length;
     Procedure.checkArgCount(thisProc, nargs);
@@ -65,17 +66,28 @@ public class Invoke extends ProcedureN implements Inlineable
           arg0 = Type.make((Class) arg0);
         if (arg0 instanceof ClassType)
           dtype = (ClassType) arg0;
-        else if (arg0 instanceof String || arg0 instanceof FString)
+        else if (arg0 instanceof String || arg0 instanceof FString
+		 || arg0 instanceof Binding)
           dtype = ClassType.make(arg0.toString());
         else
           throw new WrongType(thisProc, 0, null);
       }
+    Object staticLink = null;
     if (kind == 'N')
-      mname = "<init>";
+      {
+	mname = "<init>";
+	if (dtype instanceof PairClassType)
+	  {
+	    PairClassType ptype = (PairClassType) dtype;
+	    dtype = ptype.instanceType;
+	    staticLink = ptype.getStaticLink();
+	  }
+      }
     else
       {
         Object arg1 = args[1];
-        if (arg1 instanceof String || arg1 instanceof FString)
+        if (arg1 instanceof String || arg1 instanceof FString
+	    || arg1 instanceof Binding)
           mname = arg1.toString();
         else
           throw new WrongType(thisProc, 1, null);
@@ -88,18 +100,21 @@ public class Invoke extends ProcedureN implements Inlineable
     if (proc == null)
       throw new RuntimeException(thisProc.getName() + ": no method named `"
                                  + mname + "' in class " + dtype.getName());
-    Object[] margs = new Object[nargs-(kind == 'S' ? 2 : 1)];
+    Object[] margs
+      = new Object[nargs-(kind == 'S' ? 2 : staticLink != null ? 0 : 1)];
     int i = 0;
     if (kind == 'V')
       margs[i++] = args[0];
+    else if (staticLink != null)
+      margs[i++] = staticLink;
     System.arraycopy(args, kind == 'N' ? 1 : 2, margs, i,
                      nargs - (kind == 'N' ? 1 : 2));
     if (kind == 'N')
       {
-        Object vars = proc.getVarBuffer();
-        RuntimeException ex = proc.match(vars, margs);
+        CallContext vars = new CallContext();
+        int err = proc.match(vars, margs);
         int len = nargs - 1;
-        if (ex == null)
+        if (err == 0)
           return proc.applyV(vars);
         else if ((len & 1) == 0)
           {
@@ -107,19 +122,29 @@ public class Invoke extends ProcedureN implements Inlineable
             for (i = 0;  i < len;  i += 2)
               {
                 if (! (margs[i] instanceof Keyword))
-                  throw ex;
+                  throw MethodProc.matchFailAsException(err, thisProc, args);
               }
 
-            Object result = proc.apply0();
-            for (i = 0;  i < len;  i += 2)
+            Object result;
+	    if (staticLink == null)
+	      {
+		result = proc.apply0();
+		i = 0;
+	      }
+	    else
+	      {
+		result = proc.apply1(staticLink);
+		i = 1;
+	      }
+            for (;  i < len;  i += 2)
               {
                 Keyword key = (Keyword) margs[i];
                 Object arg = margs[i+1];
-                SlotSet.apply(result, key.getName(), arg);
+                SlotSet.apply(false, result, key.getName(), arg);
               }
             return result;
           }
-        throw ex;
+        throw MethodProc.matchFailAsException(err, thisProc, args);
       }
     return proc.applyN(margs);
   }
@@ -194,7 +219,15 @@ public class Invoke extends ProcedureN implements Inlineable
         int okCount, maybeCount;
         synchronized (this)
           {
-            methods = getMethods(type, name, args, kind == 'S' ? 2 : 1);
+            try
+              {
+                methods = getMethods(type, name, args, kind == 'S' ? 2 : 1);
+              }
+            catch (Exception ex)
+              {
+                comp.error('w', "unknown class: " + type.getName());
+                methods = null;
+              }
             okCount = cacheDefinitelyApplicableMethodCount;
             maybeCount = cachePossiblyApplicableMethodCount;
           }
@@ -262,18 +295,24 @@ public class Invoke extends ProcedureN implements Inlineable
               {
                 index = MethodProc.mostSpecific(methods, okCount);
                 if (index < 0)
-		  {
-		    for (int i = 0;  i < okCount; i++)
-		      System.err.println("ok: "+methods[i]);
                   comp.error('w',
                              "more than one definitelty applicable method `"
-                             +name+"' in "+type.getName()+" ok:"+okCount);
-		  }
+                             +name+"' in "+type.getName());
               }
+	    else if (okCount == 0)
+	      {
+		comp.error('w',
+			   "no definitely applicable method `"
+			   +name+"' in "+type.getName());
+	      }
             else
-              comp.error('w',
-                         "more than one possibly applicable method `"
-                         +name+"' in "+type.getName());
+	      {
+		comp.error('w',
+			   "more than one possibly applicable method `"
+			   +name+"' in "+type.getName());
+		for (int i = 0;  i < okCount; )
+		  comp.error('w', "candidate: " + methods[i]);
+	      }
             if (index >= 0)
               {
                 Expression[] margs
@@ -300,8 +339,10 @@ public class Invoke extends ProcedureN implements Inlineable
         Expression arg0 = args[0];
         Type type = (kind == 'V' ? arg0.getType()
                      : interpreter.getTypeFor(arg0));
+	if (type instanceof PairClassType)
+	  return ((PairClassType) type).instanceType;
         if (type instanceof ClassType)
-          return (ClassType) type;
+	  return (ClassType) type;
       }
     return null;
   }
@@ -330,7 +371,8 @@ public class Invoke extends ProcedureN implements Inlineable
                  && args[1] instanceof QuoteExp)
           name = ((QuoteExp) args[1]).getValue();
         if (type instanceof ClassType
-            && (name instanceof FString || name instanceof String))
+            && (name instanceof FString || name instanceof String
+		|| name instanceof Binding))
           {
             PrimProcedure[] methods = getMethods((ClassType) type,
                                                  name.toString(), args,

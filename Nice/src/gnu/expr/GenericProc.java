@@ -39,39 +39,40 @@ public class GenericProc extends MethodProc
       maxArgs = n;
   }
 
-  public Object applyN(Object[] args)
+  public Object applyN(Object[] args) throws Throwable
   {
     checkArgCount(this, args.length);
     MethodProc best = null;
-    Object bestVars = null;
+    CallContext bestVars = null;
+    CallContext vars = null;
     for (int i = count;  --i >= 0; )
       {
         MethodProc method = methods[i];
-        Object vars = method.getVarBuffer();
-        if (method.match(vars, args) == null)
+        if (vars == null)
+          vars = new CallContext();
+        if (method.match(vars, args) == 0)
           {
             if (best == null)
               {
                 best = method;
                 bestVars = vars;
+                vars = null;
               }
             else
               {
                 best = MethodProc.mostSpecific(best, method);
                 if (best == method)
-                  bestVars = vars;
+                  {
+                    bestVars = vars;
+                    vars = null;
+                  }
               }
+            
           }
       }
     if (best == null)
       throw new WrongType(this, WrongType.ARG_UNKNOWN, null);
     return best.applyV(bestVars);
-  }
-
-  public Object getVarBuffer()
-  {
-    // First element points to selected method, second to that method's args.
-    return new Object[2];
   }
 
   public int isApplicable(Type[] args)
@@ -89,30 +90,29 @@ public class GenericProc extends MethodProc
     return best;
   }
 
-  public RuntimeException match (Object vars, Object[] args)
+  public int match (CallContext ctx, Object[] args)
   {
-    RuntimeException ex = null;
+    int code = 0;
+    CallContext mvars = new CallContext();
     for (int i = count;  --i >= 0; )
       {
         MethodProc method = methods[i];
-        Object mvars = method.getVarBuffer();
-        ex = method.match(mvars, args);
-        if (ex == null)
+        code = method.match(mvars, args);
+        if (code == 0)
           {
-            ((Object[]) vars)[0] = method;
-            ((Object[]) vars)[1] = mvars;
-            return null;
+            ctx.value1 = method;
+            ctx.value2 = mvars;
+            return 0;
           }
       }
     if (count == 1)
-      return ex;
-    return new WrongType(this, WrongType.ARG_UNKNOWN, null);
+      return code;
+    return NO_MATCH;
   }
 
-  public Object applyV(Object vars)
+  public Object applyV(CallContext ctx) throws Throwable
   {
-    Object[] arr = (Object[]) vars;
-    return ((MethodProc) arr[0]).applyV(arr[1]);
+    return ((MethodProc) ctx.value1).applyV((CallContext) ctx.value2);
   }
 
   /** Create a GenericProc from one or more methods, plus properties. */

@@ -72,7 +72,7 @@ public class PrimType extends Type {
 
   /** Coerce value to a boolean.
    * Only defined if getSignature() is "Z". */
-  public boolean booleanValue (Object value)
+  public static boolean booleanValue (Object value)
   {
     return ! (value instanceof Boolean) || ((Boolean) value).booleanValue();
   }
@@ -281,6 +281,8 @@ public class PrimType extends Type {
           return -1;
         break;
       }
+    if (otherName.equals("java.lang.Object"))
+      return -1;
     return -2;
   }
 }

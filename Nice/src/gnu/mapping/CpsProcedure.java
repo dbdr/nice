@@ -1,4 +1,5 @@
 package gnu.mapping;
+import gnu.lists.*;
 
 public abstract class CpsProcedure extends MethodProc
 {
@@ -11,40 +12,54 @@ public abstract class CpsProcedure extends MethodProc
   {
   }
 
-  public abstract void apply (CallStack stack);
+  public abstract void apply (CallContext stack) throws Throwable;
 
-  public Object applyN (Object[] args)
+  public Object applyN (Object[] args) throws Throwable
   {
-    CallStack stack = new CallStack();
-    stack.args = args;
+    int count = args.length;
+    checkArgCount(this, count);
+    CallContext stack = new CallContext();
+    stack.setArgsN(args);
     stack.proc = this;
-    stack.run();
-    return stack.value;
-  }
-
-  public Object getVarBuffer()
-  {
-    return new CallStack();
+    return applyV(stack);
   }
 
   // FIXME - only checks argument length.
-  public RuntimeException match (Object vars, Object[] args)
+  public int match (CallContext ctx, Object[] args)
   {
-    CallStack stack = (CallStack) vars;
     int argCount = args.length;
     int num = numArgs();
-    if (argCount < (num & 0xFFF)
-	|| (num >= 0 && argCount > (num >> 12)))
-      return new WrongArguments(this, argCount);
-    stack.args = args;
-    stack.proc = this;
-    return null;
+    int min = num & 0xFFF;
+    if (argCount < min)
+      return NO_MATCH_TOO_FEW_ARGS|min;
+    if (num >= 0)
+      {
+        int max = num >> 12;
+        if (argCount > max)
+          return NO_MATCH_TOO_MANY_ARGS|max;
+      }
+    ctx.setArgsN(args);
+    ctx.proc = this;
+    return 0;
   }
 
-  public Object applyV(Object vars)
+  public Object applyV(CallContext ctx) throws Throwable
   {
-    CallStack stack = (CallStack) vars;
-    stack.run();
-    return stack.value;
+    Consumer consumerSave = ctx.consumer;
+    ValueStack vstack = ctx.vstack;
+    ctx.consumer = vstack;
+    int dindexSave = vstack.gapStart;
+    int oindexSave = vstack.oindex;
+    try
+      {
+	ctx.runUntilDone();
+	return Values.make(vstack, dindexSave, vstack.gapStart);
+      }
+    finally
+      {
+	ctx.consumer = consumerSave;
+	vstack.gapStart = dindexSave;
+	vstack.oindex = oindexSave;
+      }
   }
 }

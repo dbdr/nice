@@ -12,13 +12,16 @@ import gnu.mapping.*;
 
 public class ReferenceExp extends Expression
 {
-  String symbol;
+  Object symbol;
   Declaration binding;
-  public String string_name () { return symbol; }
+  public String string_name () { return symbol.toString(); }
 
-  public final String getName() { return symbol; }
+  public final String getName() { return symbol.toString(); }
+  public final Object getSymbol() { return symbol; }
   /** If non-null, the local Declaration this refers to. */
   public final Declaration getBinding() { return binding; }
+
+  public final void setBinding(Declaration decl) { binding = decl; }
 
   static int counter;
   /** Unique id number, to ease print-outs and debugging. */
@@ -51,12 +54,12 @@ public class ReferenceExp extends Expression
     setFlag(setting, PROCEDURE_NAME);
   }
 
-  public ReferenceExp (String symbol)
+  public ReferenceExp (Object symbol)
   {
     this.symbol = symbol;
   }
 
-  public ReferenceExp (String symbol, Declaration binding)
+  public ReferenceExp (Object symbol, Declaration binding)
   {
     this.symbol = symbol;
     this.binding = binding;
@@ -70,18 +73,34 @@ public class ReferenceExp extends Expression
 
   public Object eval (Environment env)
   {
-    if (binding != null
-        && ! (binding.context instanceof ModuleExp && ! binding.isPrivate()))
-      throw new Error("internal error: ReferenceExp.eval on lexical binding");
+    if (binding != null)
+      {
+        if (binding.field != null && binding.field.getStaticFlag())
+          {
+            try
+              {
+                Object value = binding.field.getReflectField().get(null);
+                if (! (value instanceof Binding))
+                  return value;
+                // otherwise not implemented!
+              }
+            catch (Exception ex)
+              {
+              }
+          }
+        if ( ! (binding.context instanceof ModuleExp && ! binding.isPrivate()))
+          throw new Error("internal error: ReferenceExp.eval on lexical binding");
+      }
     if (getDontDereference())
-      return env.getBinding(symbol);
+      return symbol instanceof Binding ? symbol : env.getBinding(symbol.toString());
     else if (getFlag(PREFER_BINDING2))
       {
-	Binding bind = Binding2.getBinding2(env, symbol);
-	return isProcedureName() ? bind.getProcedure() : bind.get();
+	Binding bind = symbol instanceof Binding ? (Binding) symbol
+	  : env.getBinding(symbol.toString());
+	return isProcedureName() ? bind.getFunctionValue() : bind.get();
       }
     else
-      return env.getChecked(symbol);
+      return env.getChecked(symbol.toString());
   }
 
   public void compile (Compilation comp, Target target)
@@ -90,55 +109,36 @@ public class ReferenceExp extends Expression
       return;
     CodeAttr code = comp.getCode();
     Declaration decl = Declaration.followAliases(binding);
-    if (decl != null)
+    decl.load(comp);
+    if (decl.isIndirectBinding() && ! getDontDereference())
       {
-	decl.load(comp);
-	if (decl.isIndirectBinding() && ! getDontDereference())
-	  {
-	    code.emitInvokeVirtual (Compilation.getLocationMethod);
-	  }
-	else if (decl.isFluid())
-	  code.emitGetField(FluidLetExp.valueField);
-      }
-    else
-      {
-	Field field = comp.getBindingField(symbol);
-	if (field.getStaticFlag())
-	  code.emitGetStatic(field);
-	else
-	  {
-	    LambdaExp lexp = comp.curLambda;
-	    while (! (lexp instanceof ModuleExp))
-	      lexp = lexp.outerLambda();
-	    lexp.loadHeapFrame(comp);
-	    code.emitGetField(field);
-	  }
-	if (getDontDereference())
-	  { }
-	else if (! isProcedureName())
+	if (! isProcedureName())
 	  code.emitInvokeVirtual(Compilation.getLocationMethod);
-	else //if (! comp.getInterpreter().hasSeparateFunctionNamespace())
-	  code.emitInvokeVirtual(Compilation.getProcedureBindingMethod);
-	/*
+	// else if (comp.getInterpreter().hasSeparateFunctionNamespace())
+	//   code.emitGetField(Compilation.functionValueBinding2Field);
 	else
-	  code.emitGetField(Compilation.functionValueBinding2Field);
-	*/
+	  code.emitInvokeVirtual(Compilation.getProcedureBindingMethod);
       }
+    else if (decl.isFluid() && decl.field == null)
+      code.emitGetField(FluidLetExp.valueField);
     target.compileFromStack(comp, getType());
   }
 
-  Object walk (ExpWalker walker) { return walker.walkReferenceExp(this); }
-
-  public void print (java.io.PrintWriter ps)
+  protected Expression walk (ExpWalker walker)
   {
-    ps.print("(#%ref/");
+    return walker.walkReferenceExp(this);
+  }
+
+  public void print (OutPort ps)
+  {
+    ps.print("(Ref/");
     ps.print(id);
     ps.print("/ ");
     SFormat.print (symbol, ps);
     ps.print(")");
   }
 
-  public final gnu.bytecode.Type getType()
+  public gnu.bytecode.Type getType()
   {
     return (binding == null || binding.isFluid()) ? Type.pointer_type
       : getDontDereference() ? Compilation.typeLocation

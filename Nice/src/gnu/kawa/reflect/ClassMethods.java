@@ -3,7 +3,7 @@ import gnu.bytecode.*;
 import gnu.bytecode.ClassType;
 import gnu.mapping.*;
 import gnu.expr.*;
-import gnu.kawa.util.FString;
+import gnu.lists.FString;
 import java.util.Vector;
 
 public class ClassMethods extends ProcedureN
@@ -26,11 +26,13 @@ public class ClassMethods extends ProcedureN
       arg0 = Type.make((Class) arg0);
     if (arg0 instanceof ClassType)
       dtype = (ClassType) arg0;
-    else if (arg0 instanceof String || arg0 instanceof FString)
+    else if (arg0 instanceof String || arg0 instanceof FString
+	     || arg0 instanceof Binding)
       dtype = ClassType.make(arg0.toString());
     else
       throw new WrongType(thisProc, 0, null);
-    if (arg1 instanceof String || arg1 instanceof FString)
+    if (arg1 instanceof String || arg1 instanceof FString
+	|| arg1 instanceof Binding)
       mname = arg1.toString();
     else
       throw new WrongType(thisProc, 1, null);
@@ -104,7 +106,7 @@ public class ClassMethods extends ProcedureN
    * those possibly applicable next (argtype overlaps parameter types);
    * and ending with those definitely not applicable (some argtype does
    * overlap its parameter type).
-   * @return ((number of definitely applicabable methods) << 32
+   * @return ((number of definitely applicable methods) << 32
    *          + (number of possibly applicable methods.
    */
   public static long selectApplicable(PrimProcedure[] methods,
@@ -153,7 +155,7 @@ public class ClassMethods extends ProcedureN
     PrimProcedure pproc = null;
     for (int i = 0;  i < methods.length;  i++)
       {
-        PrimProcedure cur = methods[i];;
+        PrimProcedure cur = methods[i];
         if (atypes != null)
           {
             int applicable = cur.isApplicable(atypes);
@@ -192,8 +194,9 @@ public class ClassMethods extends ProcedureN
     if (exp instanceof QuoteExp)
       {
         Object name = ((QuoteExp) exp).getValue();
-        if (name instanceof FString || name instanceof String)
-          return Compilation.mangleName(name.toString());
+        if (name instanceof FString || name instanceof String
+	    || name instanceof Binding)
+          return Compilation.mangleNameIfNeeded(name.toString());
       }
     return null;
   }

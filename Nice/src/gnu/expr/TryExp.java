@@ -27,7 +27,7 @@ public class TryExp extends Expression
     this.finally_clause = finally_clause;
   }
 
-  public Object eval (Environment env)
+  public Object eval (Environment env) throws Throwable
   {
     if (catch_clauses != null)
       throw new RuntimeException("internal error - TryExp.eval called");
@@ -75,11 +75,28 @@ public class TryExp extends Expression
       target.compileFromStack(comp, result_type);
   }
 
-  Object walk (ExpWalker walker) { return walker.walkTryExp(this); }
-
-  public void print (java.io.PrintWriter ps)
+  protected Expression walk (ExpWalker walker)
   {
-    ps.print("(%try ");
+    return walker.walkTryExp(this);
+  }
+
+  protected void walkChildren(ExpWalker walker)
+  {
+    try_clause = try_clause.walk(walker);
+    CatchClause catch_clause = catch_clauses;
+    while (walker.exitValue == null && catch_clause != null)
+      {
+	catch_clause.body = catch_clause.body.walk(walker);
+	catch_clause = catch_clause.getNext();
+      }
+
+    if (walker.exitValue == null && finally_clause != null)
+      finally_clause = finally_clause.walk(walker);
+  }
+
+  public void print (OutPort ps)
+  {
+    ps.print("(Try ");
     try_clause.print(ps);
     CatchClause catch_clause = catch_clauses;
     for (; catch_clause != null;  catch_clause = catch_clause.getNext())

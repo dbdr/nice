@@ -96,3 +96,10 @@ PrintStream stderr () = native System.err;
   native int java.util.List.indexOf(Object);
 <E> int lastIndexOf(java.util.List<E>, E) =
   native int java.util.List.lastIndexOf(Object);
+
+/* For List<int> there is an ambiguity between 
+     remove(int) and remove(T) (since T=int).
+   Therefore we rename remove(int) into removeAt(int).
+*/
+<T> T removeAt(java.util.List<T>, int) = 
+  native Object java.util.List.remove(int);

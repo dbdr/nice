@@ -1,5 +1,9 @@
 nice (0.7.6) unstable; urgency=low
 
+  * Fixed several issues with generic collections.
+    In particular, for List<int> there was an ambiguity between 
+      remove(int) and remove(T) (since T=int).
+    Therefore we renamed remove(int) into removeAt(int).
   * Bugfixes (using anonymous functions while overriding native methods).
 
  --

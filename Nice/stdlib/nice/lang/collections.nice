@@ -244,3 +244,11 @@ toString(s@List)
   native Object java.util.Map.put(Object, Object);
 <Any Key, Any Element> ?Element put(Map<Key, ?Element>, Key, ?Element) = 
   native Object java.util.Map.put(Object, Object);
+
+
+<Any Key, Any Element> boolean containsKey(Map<Key, !Element>, Key) = 
+  native boolean java.util.Map.containsKey(Object);
+// This function does not overlap with the previous because Map
+// is non-variant (it would be unsafe to have Map covariant on Element).
+<Any Key, Any Element> boolean containsKey(Map<Key, ?Element>, Key) = 
+  native boolean java.util.Map.containsKey(Object);

@@ -66,6 +66,15 @@ Mandrake Linux (rpm)</link>
 <link linkend="other">Other</link>
 
 </para></listitem>
+<listitem><para>
+
+<inlinemediaobject><imageobject>
+<imagedata fileref="images/dev-32.png"/>
+</imageobject></inlinemediaobject>
+
+<link linkend="source">Source distribution</link>
+
+</para></listitem>
 </itemizedlist>
 
 </para>
@@ -151,6 +160,15 @@ Howevever &nice; can be used on any system that works with &java;.
 If you are in this situation, please 
 <ulink url="mailto:bonniot@users.sourceforge.net">contact me</ulink>
 to share your experience and augment the documentation.
+</para>
+</section>
+
+<section id="source"><title>Source distribution</title>
+<para>
+it is also possible to 
+<ulink url="Nice-source.tar.gz">download the source code</ulink> of Nice,
+together with a bootstrap compiler. 
+Compilation is done by simply typing <literal>make</literal>.
 </para>
 </section>
 

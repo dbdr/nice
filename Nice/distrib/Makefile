@@ -22,6 +22,7 @@ RPMDIR  = ${CURDIR}/tmp/noarch
 RPMFILE = Nice-${VERSION}-1.noarch.rpm
 
 CVSROOT=:pserver:anonymous@cvs.nice.sourceforge.net:/cvsroot/nice 
+DOWNLOADROOT = http://prdownloads.sourceforge.net/nice
 
 clean-tmp = rm -rf tmp && mkdir tmp
 
@@ -81,9 +82,10 @@ send: ${TARFILE} ${ZIPFILE} ${RPMDIR}/${RPMFILE}
 	)\
         | ftp -n upload.sourceforge.net
 	echo -e "Redirect /Wiki http://nice.sourceforge.net/cgi-bin/twiki/view" \
-  "\nRedirect /Nice.tar http://prdownloads.sourceforge.net/nice/${TARFILE}" \
-  "\nRedirect /Nice.zip http://prdownloads.sourceforge.net/nice/${ZIPFILE}" \
-  "\nRedirect /nice.deb http://prdownloads.sourceforge.net/nice/${DEB}" \
-  "\nRedirect /nice.rpm http://prdownloads.sourceforge.net/nice/${RPMFILE}" \
+  "\nRedirect /Nice.tar $(DOWNLOADROOT)/${TARFILE}" \
+  "\nRedirect /Nice-source.tar.gz $(DOWNLOADROOT)/${SOURCEFILE}" \
+  "\nRedirect /Nice.zip $(DOWNLOADROOT)/${ZIPFILE}" \
+  "\nRedirect /nice.deb $(DOWNLOADROOT)/${DEB}" \
+  "\nRedirect /nice.rpm $(DOWNLOADROOT)/${RPMFILE}" \
   > ../web/.htaccess
 

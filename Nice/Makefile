@@ -51,7 +51,7 @@ archiveOld: src/nice/tools/compiler.jar
 	jar umf src/mainClass share/java/nice.jar -C classes java -C classes nice -C classes mlsub -C classes bossa -C classes gnu -C classes.old bossa -C classes.old mlsub -C classes.old nice
 	if [ -r classes/lang/package.nicei ]; then cd classes; jar uf ../share/java/nice.jar nice/*/package.nicei; fi
 
-archive2 archive3 share/java/nice.jar: src/nice/tools/compiler.jar
+archive archive2 archive3 share/java/nice.jar: src/nice/tools/compiler.jar
 	mkdir -p share/java
 	cp src/nice/tools/compiler.jar share/java/nice.jar
 	jar umf src/mainClass share/java/nice.jar -C classes java -C classes nice -C classes mlsub -C classes bossa -C classes gnu

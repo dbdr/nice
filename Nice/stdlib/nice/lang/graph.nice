@@ -16,7 +16,7 @@ stronglyConnectedComponents<T>(start, successors)
 {
   Ref<int> id = new Ref();
   id.value=0;
-  Stack<T> stack = new Stack();
+  Stack<T> stack = new Vector();
   Map<T,int> mark = hashtable();
 
   List<List<T>> res = makeVector(5);

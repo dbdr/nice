@@ -8,11 +8,14 @@ package nice.lang;
 interface Collection<T>
 {
   int size();
+  boolean empty();
   void iter(fun(T)());
 
   alike<T> filter(fun(T)(boolean));
   <Any U> alike<U> map( fun(T)(U) );
 }
+
+empty(c@Collection) = c.size() == 0;
 
 /**
    Equivalent definitions outside the interface:
@@ -30,6 +33,14 @@ interface Container<T>
   void add(T);
 }
 
+interface Stack<T> extends Container<T>
+{
+  T pop();
+  T top();
+  void push(T);
+}
+
+add(s@Stack, elem) = s.push(elem);
 
 /** An ordered Collection */
 interface Sequence<T> 
@@ -64,10 +75,16 @@ val fold_right : f:('a -> 'b -> 'b) -> 'a list -> init:'b -> 'b
     List.fold_right f [a1; ...; an] b is f a1 (f a2 (... (f an b) ...)). Not tail-recursive. 
 */
 /** A growable ordered Collection. */
-interface List<T> extends Sequence<T>, Container<T>
+interface List<T> extends Sequence<T>, Container<T>, Stack<T>
 {
   T remove(int index);
 }
+
+// List based stacks
+
+push(l@List, elem) = l.add(elem);
+pop(l@List) = l.remove(l.size() - 1);
+top(l@List) = l.get(l.size() - 1);
 
 //  filter<C,T>[<L>](l@List : L<T>, test)
 //  {
@@ -272,22 +289,6 @@ filter<C,T>(v@Vector, test)
 
   return res;
 }
-
-/****************************************************************
- * Stack
- ****************************************************************/
-
-class Stack<T> extends Vector<T>
-{
-  boolean empty();
-  T pop();
-  void push(T);
-}
-
-empty(s) = s.size == 0;
-
-pop<T>(s) = s.remove(s.size()-1);
-push(stack, element) = stack.add(element);
 
 /****************************************************************
  * Standard operations

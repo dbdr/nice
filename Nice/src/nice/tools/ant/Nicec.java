@@ -326,25 +326,25 @@ public class Nicec extends Task {
 		log("runtime: " + getRuntime(), Project.MSG_VERBOSE);
 
 		int retval = nice.tools.compiler.fun.compile
-		  (pack,
-		   sourcepath,
-		   destination,
-		   classpath,
-		   jar,
-		   output,
-		   recompile,
-		   recompile_all,
-		   compile,
-		   exclude_runtime,
-		   runtime,
-		   native_compiler,
-		   help,
-		   editor,
-		   man,
-		   version,
-		   usage,
-		   memory);
-		
+			(pack,
+			sourcepath,
+			destination,
+			classpath,
+			jar,
+			output,
+			recompile,
+			recompile_all,
+			compile,
+			exclude_runtime,
+			runtime,
+			native_compiler,
+			help,
+			editor,
+			man,
+			version,
+			usage,
+			memory);
+
 		switch (retval) {
 			case OutputMessages.ERROR:
 				throw new BuildException(ERROR_MSG, location);

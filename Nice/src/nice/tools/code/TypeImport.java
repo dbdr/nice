@@ -130,10 +130,10 @@ public class TypeImport
 	}
     return null;
   }
-  
-  static HashMap stringToReflectClass;
-  
-  /** 
+
+  static HashMap stringToReflectClass = new HashMap();
+
+  /**
       Searches a native class given by its fully qualified name
       in the user classpath.
       

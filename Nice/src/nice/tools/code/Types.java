@@ -643,7 +643,6 @@ public final class Types
   public static void reset()
   {
     tcToGBType = new HashMap();
-    TypeImport.stringToReflectClass = new HashMap();
     Import.reset();
   }
 }

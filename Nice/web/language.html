@@ -185,7 +185,7 @@ all classes do not have the same number of type parameters.
 any type. For instance the <tt>equals</tt> method is declared in Nice:
 <br>
 <PRE>
-&lt;<FONT COLOR="#b7860b">Any T</FONT>&gt; <FONT COLOR="#b7860b">boolean</FONT> <FONT COLOR="#cd0000">equals</FONT>(<FONT COLOR="#b7860b">T</FONT>, <FONT COLOR="#b7860b">T</FONT>); 
+&lt;<FONT COLOR="#b7860b">T</FONT>&gt; <FONT COLOR="#b7860b">boolean</FONT> <FONT COLOR="#cd0000">equals</FONT>(<FONT COLOR="#b7860b">T</FONT>, <FONT COLOR="#b7860b">T</FONT>); 
 </PRE>
 <p>
 One can read this as 
@@ -203,7 +203,7 @@ while it is very likely a bug to compare a collection of strings to a string.
 <p>Note that it is also possible to define a function that takes two unrelated
 and unconstrained types. So it would be possible to define <tt>equals</tt> 
 to have the same typing behaviour it has in Java:
-<br><PRE>&lt;<FONT COLOR="#b7860b">Any T</FONT>, <FONT COLOR="#b7860b">Any U</FONT>&gt; <FONT COLOR="#b7860b">boolean</FONT> <FONT COLOR="#cd0000">equals</FONT>(<FONT COLOR="#b7860b">T</FONT>, <FONT COLOR="#b7860b">U</FONT>);</PRE>
+<br><PRE>&lt;<FONT COLOR="#b7860b">T</FONT>, <FONT COLOR="#b7860b">U</FONT>&gt; <FONT COLOR="#b7860b">boolean</FONT> <FONT COLOR="#cd0000">equals</FONT>(<FONT COLOR="#b7860b">T</FONT>, <FONT COLOR="#b7860b">U</FONT>);</PRE>
 
 <h2>Precise types</h2>
 
@@ -323,7 +323,7 @@ void main(String[] args)
 
 <td>
 <blockquote>
-<pre>&lt;<font color="#B7860B">Any</font> T> T <font color="#CD0000">clone</font>(T);
+<pre>&lt;T> T <font color="#CD0000">clone</font>(T);
 
 <font color="#CD0000">void main</font>(String[] args)
 {

@@ -420,7 +420,7 @@ public void readImportedAlternative(gnu.bytecode.ClassType c, gnu.bytecode.Metho
     alt.add(nice.tools.util.System.split
               (fullName, MethodDeclaration.methodListSeparator));
   }
-  catch(Pattern.Unknown ex) {
+  catch(UnknownPattern ex) {
     // This can happen if the class exists only in a later version
     // of the JDK. We just ignore this alternative.
   }

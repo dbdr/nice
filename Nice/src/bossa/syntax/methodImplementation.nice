@@ -188,7 +188,7 @@ public abstract class MethodImplementation extends Definition
       (new gnu.bytecode.MiscAttr("definition", notNull(declaration).getAllFullNames().getBytes()));
     notNull(compiledMethod).addBytecodeAttribute
       (new gnu.bytecode.MiscAttr("patterns", 
-		    Pattern.bytecodeRepresentation(formals).getBytes()));
+		    bytecodeRepresentation(formals).getBytes()));
   }
 
   TypeConstructor firstArgument();

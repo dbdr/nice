@@ -59,21 +59,6 @@ public class dispatch
   public static gnu.bytecode.Method getImplementationAbove(MethodDeclaration decl, gnu.bytecode.ClassType firstArg)
   { return null; }
 
-  static Pattern resolveGlobalConstants(Pattern pattern)
-  { return null; }
-
-  public static Pattern readPattern(String rep, int[] pos)
-  { return null; }
-
-  public static Pattern createPattern(LocatedString name, mlsub.typing.TypeConstructor tc, boolean sure)
-  { return null; }
-
-  public static boolean leq(Pattern a, Pattern b)
-  { return false; }
-
-  public static boolean disjoint(Pattern a, Pattern b)
-  { return false; }
-  
   static Expression analyse(Expression e, VarScope v, TypeScope t) 
   { return null; }
 

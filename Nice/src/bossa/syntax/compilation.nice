@@ -140,9 +140,8 @@ public void compileJavaMethod(JavaMethod m, Stack<Alternative> sortedAlternative
 
 private NiceClass declaringClass(JavaMethod m, Alternative alt)
 {
-  mlsub.typing.TypeConstructor firstArgument = alt.getPatterns()[0].getTC();
-  let def = getTypeDefinition(firstArgument);
-
+  ?mlsub.typing.TypeConstructor firstArgument = alt.getPatterns()[0].getTC();
+  let def = firstArgument==null ? null : getTypeDefinition(firstArgument);
 
   if (def != null && def.getImplementation() instanceof NiceClass)
     return cast(def.getImplementation());

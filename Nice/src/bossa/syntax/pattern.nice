@@ -14,42 +14,270 @@ package bossa.syntax;
 
 import bossa.util.*;
 
+/**
+   Represents the information about one argument of a method body.
+   
+   @see MethodBodyDefinition
+*/
+public abstract class Pattern implements Located
+{
+  ?LocatedString name = null;
+  ?TypeIdent typeConstructor= null;
+  private ?TypeIdent additional = null;
+  ?mlsub.typing.TypeConstructor tc = null;
+  ?mlsub.typing.TypeConstructor tc2 = null;
+  ?mlsub.typing.Interface itf2 = null;
+
+  // The class constraint verified by this pattern.
+  private ?mlsub.typing.Constraint constraint = null;
+  // The type of the class matched, if it is constrained.
+  private ?mlsub.typing.Monotype patternType = null;
+
+  private Location loc;
+
+  public ?mlsub.typing.TypeConstructor getTC() = tc;
+
+  ?mlsub.typing.TypeConstructor getRuntimeTC() = null;
+
+  void resolveTC(TypeScope scope)
+  {
+    if (typeConstructor != null)
+      {
+        TypeSymbol sym = notNull(typeConstructor).resolveToTypeSymbol(scope);
+
+        if (sym instanceof mlsub.typing.TypeConstructor)
+          tc = sym;
+        else
+          throw User.error(this, notNull(typeConstructor) + 
+                           " is not a declared class or interface");
+
+        if (this.exactlyAtType() && !instantiableTC(notNull(tc)))
+          User.error
+	    (notNull(typeConstructor).location(), 
+	     "Pattern #" + notNull(typeConstructor) +
+	     " cannot be matched because interfaces and abstract classes do not have direct instances.");
+
+	typeConstructor = null;
+      }
+    if (additional != null)
+      {
+        TypeSymbol sym = notNull(additional).resolveToTypeSymbol(scope);
+
+        if (sym instanceof mlsub.typing.TypeConstructor)
+          tc2 = sym;
+        else if (sym instanceof mlsub.typing.Interface)
+          itf2 = sym;
+        else
+          User.error(additional,
+                     notNull(additional) + " should be a class or an interface");
+
+	additional = null;
+      }
+
+    // Class constraints
+    if (tc == null)
+      return;
+
+    let def = getTypeDefinition(notNull(tc));
+    if (def == null)
+      return;
+
+    let classType = def.getConstrainedType();
+    if (classType != null)
+      {
+        constraint = classType.getConstraint();
+        patternType = classType.getMonotype();
+      }
+  }
+
+  /**
+     Asserts that m is below this pattern.
+   */
+  private void leq(mlsub.typing.Monotype m)
+  {
+    nice.tools.typing.Types.setMarkedKind(m);
+    m = m.equivalent();
+    if (!(m instanceof mlsub.typing.MonotypeConstructor))
+      throw Internal.error("Nullness check");
+    
+    mlsub.typing.MonotypeConstructor mc = m;
+
+    if (this.atNull())
+      mlsub.typing.Typing.leq(nice.tools.typing.PrimitiveType.maybeTC, mc.getTC());
+
+    if (tc == null)
+      return;
+
+    // the argument is not null
+    mlsub.typing.Typing.leq(mc.getTC(), nice.tools.typing.PrimitiveType.sureTC);
+    mlsub.typing.Monotype type = nice.tools.typing.Types.rawType(mc);
+
+    if (constraint != null)
+      {
+	notNull(constraint).enter();
+	mlsub.typing.Typing.leq(type, patternType);
+	if (this.exactlyAtType())
+	  {
+	    mlsub.typing.Typing.leq(patternType, type);
+	    mlsub.typing.MonotypeConstructor inner = cast(type.equivalent());
+	    inner.getTC().setMinimal();
+	  }
+      }
+    else
+      {
+	mlsub.typing.Typing.leq(type, tc);
+	if (this.exactlyAtType())
+	  {
+	    mlsub.typing.Typing.leq(tc, type);
+	    mlsub.typing.MonotypeConstructor inner = cast(type.equivalent());
+	    inner.getTC().setMinimal();
+	  }
+      }
+  }
+
+  void inDomain(mlsub.typing.Monotype type)
+  {
+    nice.tools.typing.Types.setMarkedKind(type);
+
+    if (this.atNull())
+      mlsub.typing.Typing.leq(nice.tools.typing.PrimitiveType.maybeTC, type.head());
+
+    mlsub.typing.Monotype rawType = nice.tools.typing.Types.rawType(type);
+
+    if (constraint != null)
+      {
+	notNull(constraint).enter();
+	mlsub.typing.Typing.leq(patternType, rawType);
+      }
+    else
+      {
+	mlsub.typing.Typing.leq(tc, rawType);
+      }
+
+    if (tc2 != null)
+      mlsub.typing.Typing.leq(tc2, rawType);
+    else if (itf2 != null)
+      mlsub.typing.Typing.assertImp(rawType.head(), itf2, false);
+  }
+
+  public boolean matches(mlsub.typing.TypeConstructor tag);
+
+  public boolean matchesValue(ConstantExp val);
+
+  public Pattern setDomainEq(boolean equal) 
+  {
+    return this;
+  }     
+
+  public void setDomainTC(?mlsub.typing.TypeConstructor domaintc)  {}
+
+  public void addValues(List<ConstantExp> values) {}
+
+  public ?LocatedString getName() = name;
+
+  location() = loc;
+
+  /**
+   * Returns a string used to recognize this pattern in the bytecode.
+   * for the different patterns the following signatures are used:
+   *   any 		: `@_`
+   *   null 		: `@NULL`
+   *   type 		: `@` + type   where `.` in type are replaced by `$`
+   *   exactly at type  : `#` + type   idem
+   *   integer literal	: `@-` / `@+` + int_literal 
+   *   char literal	: `@'c'`   where c is an unescaped char
+   *   string literal	: `@"string"` where string is an escaped string
+   *   reference        : `@` + globalconstantname
+   *   int comparison   : `@>` / `@>=` / `@<` / `@<=` + int_literal
+   *
+   * This is usefull to distinguish alternatives of a method.
+   */
+  public String bytecodeRepresentation();
+ 
+  /**
+     Returns code that tests if the parameter is matched.
+
+     @param dispatchMade indicates that dispatch has already occured. It is
+       still necessary to check for exact matching if applicable.
+  */
+  public gnu.expr.Expression matchTest(gnu.expr.Expression parameter, boolean dispatchMade);
+
+  public boolean atAny() = false;
+  public boolean atNull() = false;
+  boolean exactlyAtType() = false; 
+  public boolean atValue() = false;
+  public boolean atTypeMatchingValue() = false;
+}
+
+void resolvePatterns(TypeScope tscope, VarScope vscope, Pattern[] patterns)
+{
+  for (int i = 0; i < patterns.length; i++)
+    patterns[i].resolveTC(tscope);
+}
+ 
+void resolvePatternValues(Pattern[] patterns)
+{
+  for (int i = 0; i < patterns.length; i++)
+    patterns[i] = resolveGlobalConstants(patterns[i]);
+}
+ 
+/**
+   Assert that the monotypes belong the the patterns.
+ */
+void inPattern(mlsub.typing.Monotype[] monotypes, Pattern[] patterns)
+{
+  for (int i = 0; i < monotypes.length; i++)
+    patterns[i].leq(monotypes[i]);
+}
+  
+
+public String bytecodeRepresentation(Pattern[] patterns)
+{
+  StringBuffer res = new StringBuffer();
+  for (int i = 0; i < patterns.length; i++)
+    res.append(patterns[i].bytecodeRepresentation());
+
+  return res.toString();
+}
+
+public class UnknownPattern extends RuntimeException {} 
+
 public Pattern createPattern(LocatedString name)
 {
-  return new VariablePattern(name, name.location);
+  return new VariablePattern(name: name, loc: notNull(name.location()));
 }
 
 public Pattern createPattern(LocatedString name, TypeIdent ti)
 {
   if (ti.toString().equals("Object"))
-    return new NotNullPattern(name, nice.tools.typing.PrimitiveType.sureTC, name.location);
+    return new NotNullPattern(name: name, tc: nice.tools.typing.PrimitiveType.sureTC, loc: notNull(name.location));
 
-  return new TypePattern(name, ti, null, name.location(), exactlyAt: false);
+  return new TypePattern(name: name, typeConstructor: ti, loc: notNull(name.location()), exactlyAt: false);
 }
 
 //for use in MethodImplementation
 public Pattern createPattern(?LocatedString name, ?mlsub.typing.TypeConstructor tc, boolean sure)
 { // TODO: don't generate NotNullPatterns if the overriden domain is sure.
-  let loc = (name != null) ? name.location() : Location.nowhere();
+  let loc = (name != null) ? notNull(name.location()) : Location.nowhere();
 
   if (nice.tools.typing.Types.isPrimitive(tc))
     tc = null;
 
   if (sure && tc == null)
-    return new NotNullPattern(name, nice.tools.typing.PrimitiveType.sureTC, loc);
+    return new NotNullPattern(name: name, tc: nice.tools.typing.PrimitiveType.sureTC, loc: loc);
 
   if (tc == null)
-    return new VariablePattern(name, loc);
+    return new VariablePattern(name: name, loc: loc);
 
-  return new TypePattern(name, tc, loc, exactlyAt: false);
+  return new TypePattern(name: name, tc: tc, loc: loc, exactlyAt: false);
 }
 
 public Pattern createPattern(TypeIdent ti, ?LocatedString name, boolean exactly, ?TypeIdent additional, ?mlsub.typing.TypeConstructor runtimeTC)
 {
   if (ti.toString().equals("Object"))
-    return new NotNullPattern(name, nice.tools.typing.PrimitiveType.sureTC, ti.location);
+    return new NotNullPattern(name: name, tc: nice.tools.typing.PrimitiveType.sureTC, loc: ti.location);
 
-  return new TypePattern(name, ti, additional, ti.location(), exactlyAt: exactly, runtimeTC: runtimeTC);
+  return new TypePattern(name: name, typeConstructor: ti, additional: additional, loc: ti.location(), exactlyAt: exactly, runtimeTC: runtimeTC);
 }
 
 public Pattern createPattern(ConstantExp value)
@@ -60,19 +288,19 @@ public Pattern createPattern(ConstantExp value)
 public Pattern createPattern(ConstantExp value, ?TypeIdent additional)
 {
   if (value instanceof NullExp)
-    return new NullPattern(value.tc, additional, value.location());
+    return new NullPattern(tc: value.tc, additional: additional, loc: value.location());
 
   if (value instanceof StringConstantExp)
-    return new StringPattern(null, new TypeIdent(name: new LocatedString("java.lang.String", value.location())),
-				additional, value.location(), atValue: value);
+    return new StringPattern(typeConstructor: new TypeIdent(name: new LocatedString("java.lang.String", value.location())),
+				additional: additional, loc: value.location(), atValue: value);
 
   if (value.tc == nice.tools.typing.PrimitiveType.boolTC)
-    return new BoolPattern(value.tc, additional, value.location(), atValue: value);
+    return new BoolPattern(tc: value.tc, additional: additional, loc: value.location(), atValue: value);
 
   if (value.tc == nice.tools.typing.PrimitiveType.charTC)
-    return new CharPattern(value.tc, additional, value.location(), atValue: value);
+    return new CharPattern(tc: value.tc, additional: additional, loc: value.location(), atValue: value);
 
-  return new IntPattern(value.tc, additional, value.location(), atValue: value);
+  return new IntPattern(tc: value.tc, additional: additional, loc: value.location(), atValue: value);
 }
 
 public Pattern createPattern(String kind, ?LocatedString name, ?ConstantExp value, ?LocatedString refName, bossa.util.Location loc)
@@ -88,12 +316,12 @@ public Pattern createPattern(String kind, ?LocatedString name, ?ConstantExp valu
     k = CK_GE;
 
   let tc = (value != null) ?  value.tc : null;
-  return new IntComparePattern(name, tc, loc, atValue: cast(value), kind: k, refName: refName);
+  return new IntComparePattern(name: name, tc: tc, loc: loc, atValue: cast(value), kind: k, refName: refName);
 }
 
 Pattern createPattern(mlsub.typing.TypeConstructor tc)
 {
-  return new TypePattern(null, tc, null, exactlyAt: false);
+  return new TypePattern(tc: tc, loc: Location.nowhere(), exactlyAt: false);
 }
 
 public class VariablePattern extends Pattern
@@ -121,7 +349,7 @@ public class TypePattern extends Pattern
   {
     // only set it to atAny if it's a @type pattern
     if (equal && !exactlyAt)
-      return new VariablePattern(name, this.location);
+      return new VariablePattern(name: name, loc: this.location);
 
     // don't allow integer primitive types in @type and #type patterns
     if (!equal && Typing.testRigidLeq(tc, nice.tools.typing.PrimitiveType.longTC))
@@ -508,9 +736,9 @@ resolveGlobalConstants(VariablePattern pattern)
   if (symbol instanceof EnumSymbol)
     {
       NewExp val = cast(symbol.getValue());
-      return new EnumPattern(pattern.name, val.tc, pattern.location, atValue:
+      return new EnumPattern(name: pattern.name, tc: val.tc, loc: pattern.location(), atValue:
 		new ConstantExp(null, pattern.tc, symbol,
-				notNull(pattern.name).toString(), pattern.location));
+				notNull(pattern.name).toString(), pattern.location()));
     }
 
   if (! (symbol instanceof GlobalVarSymbol))
@@ -531,9 +759,9 @@ resolveGlobalConstants(VariablePattern pattern)
   else if (symbol.getValue() instanceof NewExp)
     {
        NewExp val = cast(symbol.getValue());
-      return new ReferencePattern(pattern.name, val.tc, pattern.location, atValue:
+      return new ReferencePattern(name: pattern.name, tc: val.tc, loc: pattern.location(), atValue:
 		new ConstantExp(null, pattern.tc, symbol,
-				notNull(pattern.name).toString(), pattern.location));
+				notNull(pattern.name).toString(), pattern.location()));
     }
   else
     User.error(pattern.name, "The value of " + pattern.name + " can't be used as pattern");
@@ -618,14 +846,14 @@ public ?Pattern readPattern(String rep, int[]/*ref*/ pos)
         }
 
       if (name[0] == '=')
-        return resolveGlobalConstants(new VariablePattern(new LocatedString(name.substring(1)), loc));
+        return resolveGlobalConstants(new VariablePattern(name: new LocatedString(name.substring(1)), loc: loc));
     }
 
   if (name.equals("_"))
     return createPattern(new LocatedString("_"));
 
   if (name.equals("NONNULL"))
-    return new NotNullPattern(null, nice.tools.typing.PrimitiveType.sureTC, loc);
+    return new NotNullPattern(tc: nice.tools.typing.PrimitiveType.sureTC, loc: loc);
 
   if (name.equals("NULL"))
     return createPattern(createNullExp(loc));
@@ -638,8 +866,8 @@ public ?Pattern readPattern(String rep, int[]/*ref*/ pos)
   if (sym == null)
     // This can happen if the class exists only in a later version
     // of the JDK.
-    throw new Pattern.Unknown();
+    throw new UnknownPattern();
 
   let mlsub.typing.TypeConstructor tc = cast(sym);
-  return new TypePattern(null, tc, Location.nowhere(), exactlyAt:exact);
+  return new TypePattern(tc: tc, loc: Location.nowhere(), exactlyAt: exact);
 }

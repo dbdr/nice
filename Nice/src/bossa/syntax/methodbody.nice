@@ -70,8 +70,8 @@ public class MethodBodyDefinition extends MethodImplementation
     if (symbols.isEmpty())
       return null;
 
-    ?mlsub.typing.TypeConstructor[] additionalTags = cast(Pattern.getAdditionalTC(formals));
-    boolean hasAdditionalTags = additionalTags.any( ? TypeConstructor tc => tc != null);
+    ?mlsub.typing.TypeConstructor[] additionalTags = formals.mapToArray(Pattern p => p.tc2);
+    boolean hasAdditionalTags = additionalTags.any(?TypeConstructor tc => tc != null);
 
     // Try to remember what caused the error when no symbol could be found.
     let errorList = new ErrorList();
@@ -250,14 +250,14 @@ public class MethodBodyDefinition extends MethodImplementation
   {
     //Resolution of the body is delayed to enable overloading
 
-    Pattern.resolve(notNull(typeScope), Node.getGlobalScope(), formals);
+    resolvePatterns(notNull(typeScope), Node.getGlobalScope(), formals);
 
     symbols = notNull(scope).lookup(name);
   }
 
   void lateBuildScope()
   {
-    Pattern.resolveValues(formals);
+    resolvePatternValues(formals);
 
     let s = this.findSymbol(notNull(symbols));
     symbols = null;
@@ -383,7 +383,7 @@ public class MethodBodyDefinition extends MethodImplementation
 
 	// The arguments are specialized by the patterns
 	try {
-	  Pattern.in(monotypes, formals);
+	  monotypes.inPattern(formals);
 	} catch(TypingEx e){
 	  throw User.error(name,"The patterns are not correct", e);
 	}

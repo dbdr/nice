@@ -485,7 +485,8 @@ public class ClassType extends ObjectType implements AttrContainer {
   public void addMethods()
   {
     if ((flags & ADD_METHODS_DONE) == 0)
-      addMethods(getReflectClass());
+      if (getReflectClass() != null)
+	addMethods(getReflectClass());
   }
   
   /** Use reflection to add all the declared methods of this class.

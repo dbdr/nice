@@ -62,7 +62,7 @@
     <dependency>
       <groupId>nice</groupId>
       <artifactId>nice-swing</artifactId>
-      <version>SNAPSHOT</version>
+      <version>TEST</version>
       <url>http://nice.sf.net/maven</url>
       <properties>
         <classloader>root</classloader>

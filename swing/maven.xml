@@ -1,17 +1,24 @@
 <project
   default="all"
+  xmlns:ant="jelly:ant"
   xmlns:j="jelly:core"
   xmlns:u="jelly:util">
 
   <goal name="all">
 
-    <attainGoal name="jar:install-snapshot" />
+    <attainGoal name="jar:snapshot" />
 
-<!--
-    <j:set var="maven.jar.override" value="on" />
-    <j:set var="maven.jar.${pom.id}" 
-      value="${maven.build.dir}/${maven.final.name}.jar" />
--->
+    <!--
+      The snapshot will be overwritten when satisfying the dependencies
+      of the subprojects. So we copy it, and use an override in 
+      build.properties to make the subprojects use the new version.
+      This is a workaround for 
+        http://jira.codehaus.org/browse/MPMULTIPROJECT-11
+    -->
+    <ant:copy 
+      file="target/${maven.final.name}.jar"
+      toFile="target/nice-swing-TEST.jar" />
+
     <j:set var="goal" value="nice" />
     <attainGoal name="multiproject:goal" />
 

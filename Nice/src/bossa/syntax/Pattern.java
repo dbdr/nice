@@ -67,23 +67,29 @@ public class Pattern implements Located
     this.exactlyAt = exactlyAt;
     this.location = location;
 
-    if (tc != null) 
+    if(tc == null && atValue == null && name != null)
+      {
+	String ident = name.toString();
+	if (ident.equals("true") || ident.equals("false"))
+	  {
+            this.atValue = new IdentExp(name);
+	    this.name = null;
+	    this.typeConstructor = 
+                     new TypeIdent(new LocatedString("boolean",location));
+          }
+      }
+    else if (tc != null) 
       {
 	String ident = tc.getName().toString();
-	if (ident.equals("true"))
+	if (ident.equals("true") || ident.equals("false"))
 	  {
 	    this.atValue = new IdentExp(tc.getName());
 	    this.typeConstructor = 
                      new TypeIdent(new LocatedString("boolean",location));
           }
-	else if (ident.equals("false"))
-	  {
-	    this.atValue = new IdentExp(tc.getName());
-	    this.typeConstructor = 
-                     new TypeIdent(new LocatedString("boolean",location));
-	  }
       }
-    else if (atValue != null && atValue instanceof ConstantExp)
+
+    if (atValue != null && atValue instanceof ConstantExp)
       {
 	this.atIntValue = true;
 	String typeName = "";

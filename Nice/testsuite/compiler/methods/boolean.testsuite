@@ -15,28 +15,28 @@ not(b@boolean) = !b;
   /// Toplevel
 boolean and(boolean, boolean);
 and(@boolean, @boolean) = false;
-and(@true, @true) = true;
+and(true, true) = true;
 
 /// PASS
   /// Toplevel
 boolean xor(boolean, boolean);
-xor(@true, @true) = false;
-xor(@true, @false) = true;
-xor(@false, @true) = true;
-xor(@false, @false) = false;
+xor(true, true) = false;
+xor(true, false) = true;
+xor(false, true) = true;
+xor(false, false) = false;
 
 /// FAIL
   /// Toplevel
 boolean or(boolean, boolean);
 // Ambiguity for the case (@true, @true)
 or(@true, @boolean) = true;
-or(@boolean, @true) = true;
-or(@false, @false) = false;
+or(boolean, true) = true;
+or(false, false) = false;
 
 /// FAIL
   /// Toplevel
 boolean nor(boolean, boolean);
-nor(@true, @true) = false;
-nor(@true, @false) = false;
-//nor(@false, @true) = false; // This case is missing.
-nor(@false, @false) = true;
+nor(true, true) = false;
+nor(true, false) = false;
+//nor(false, true) = false; // This case is missing.
+nor(false, false) = true;

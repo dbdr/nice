@@ -14,11 +14,18 @@
 
   <shortDescription>Extension of the Swing toolkit to make use of Nice advanced features</shortDescription>
 
-  <description>
+  <description><![CDATA[
+    <p>
     This library allows you to write a Swing user interface in Nice programs.
     It allows a more elegant programming style than Swing programs written in
     Java by using Nice's features like anonymous functions and named 
     and optional method parameters.
+    </p><p>
+    See the 
+    <a href="http://nice.sourceforge.net/cgi-bin/twiki/view/Doc/NiceSwing">
+    documentation</a> of the library.
+    </p>
+    ]]>
   </description>
 
   <url>http://nice.sourceforge.net/cgi-bin/twiki/view/Doc/NiceSwing</url>

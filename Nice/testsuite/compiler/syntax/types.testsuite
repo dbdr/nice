@@ -8,7 +8,10 @@
   void f(int->int->int x) { x(0)(0); }
 
 /// FAIL
-  void f((int->int)->int x) { x(0)(0); }
+  void f((int->int)->int x) 
+  { 
+    /* /// FAIL HERE */ x(0)(0); 
+  }
 
 /// PASS
   int[?] a = null;

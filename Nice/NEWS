@@ -1,6 +1,20 @@
 nice (0.9.11)
 
-  * 
+  * maybeNull, a counterpart to the notNull, might be used from now on
+    to test variables returned from Java libraries without retyping:
+      let prng = SecureRandom.getInstance("ARCFOUR");
+      // Test if a bad implementation has returned null instead of exception.
+      if(maybeNull(prng) == null) workaround();
+  * Nullness analysis of assignments (RFE 681385) is partially implemented.
+    It is now possible to write:
+      class Foo {}
+      var ?Foo FOO_INSTANCE = null;
+      Foo getFooInstance(){
+        var instance = FOO_INSTANCE; if( null != instance ) return instance;
+        instance = new Foo(); FOO_INSTANCE = instance; return instance;
+      }
+    becouse Nice will detect that "instance" is of a "sure type"
+    after the "instance = new Foo();" assignment.
 
  --
 

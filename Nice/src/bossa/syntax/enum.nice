@@ -30,7 +30,6 @@ public class EnumDefinition extends Definition
   void addElement(EnumSymbol sym)
   {
     symbols.add(sym);
-    bossa.util.Debug.println("adding: "+sym);
     this.addChild(sym);
   }
 
@@ -85,7 +84,6 @@ public EnumDefinition createEnumDefinition(LocatedString name, List<LocatedStrin
 	null, new LinkedList(), createReturnStmt(createLiteralArrayExp(
 	elements.map(LocatedString elem => new IdentExp(elem))), true)));
 
-  bossa.util.Debug.println("name: "+shortName);
   //generate the prettyprint string
   String repr = "enum " + shortName;
   if (! fields.isEmpty())

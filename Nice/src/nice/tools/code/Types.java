@@ -14,6 +14,7 @@ package nice.tools.code;
 
 import bossa.util.*;
 import mlsub.typing.*;
+import bossa.util.Debug;
 import bossa.syntax.PrimitiveType;
 
 import gnu.bytecode.*;
@@ -485,7 +486,7 @@ public final class Types
       // can occur on case-insensitive file-systems (e.g. FAT)
       { }
 
-    if (c != null && bossa.util.Debug.javaTypes)
+    if (c != null && Debug.javaTypes)
       Debug.println("Loaded " + className + " from " + 
 		    classLoader.getResource(className.replace('.','/') + ".class"));
 

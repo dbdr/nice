@@ -37,8 +37,7 @@ public class NullExp extends Expression
 
   void computeType()
   {
-    //this.type = mlsub.typing.Polytype.bottom();
-    MonotypeVar alpha = new MonotypeVar();
+    MonotypeVar alpha = new MonotypeVar("any");
     this.type = new Polytype(new Constraint(new TypeSymbol[]{alpha}, null), 
 			     bossa.syntax.Monotype.maybe(alpha));
   }

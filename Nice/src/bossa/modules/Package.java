@@ -418,70 +418,67 @@ public class Package implements mlsub.compilation.Module, Located, bossa.syntax.
    * Archive
    ****************************************************************/
 
-  private static JarOutputStream jar;
-  private static File jarDestFile;
-  
-  void writeArchive()
+  private void writeArchive()
   {
     if (compilation.output == null)
       return;
 
+    File jarFile = createJarFile();
+
     try{
-      createJar();
-      addToArchive();
-      closeJar();
+      JarOutputStream jarStream = createJarStream(jarFile);
+      addToArchive(jarStream);
+      closeJar(jarStream);
+      jarFile = null;
     }
     finally{
-      if (jarDestFile != null)
+      if (jarFile != null)
 	// The jar file was not completed
 	// it must be corrupt, so it's cleaner to delete it
-	{
-	  jarDestFile.delete();
-	  jarDestFile = null;
-	}
+	jarFile.delete();
     }
   }
   
-  void createJar()
+  private File createJarFile()
   {
-    if (jar != null)
-      Internal.error(this + " can't create a jar file again");
-    
     if (!compilation.output.endsWith(".jar"))
       compilation.output = compilation.output + ".jar";
     
-    try{
-      jarDestFile = new File(compilation.output);
-      // Create the directory if necessary
-      jarDestFile.getParentFile().mkdirs();
+    File jarFile = new File(compilation.output);
+    // Create the directory if necessary
+    jarFile.getParentFile().mkdirs();
 
+    return jarFile;
+  }
+
+  private JarOutputStream createJarStream(File jarFile)
+  {
+    try{
       Manifest manifest = new Manifest();
       manifest.getMainAttributes().put(Attributes.Name.MANIFEST_VERSION,"1.0");
       manifest.getMainAttributes().put(Attributes.Name.MAIN_CLASS, 
                                        this.name + ".package");
-     
-      jar = new JarOutputStream(new FileOutputStream(jarDestFile), manifest);
+      return new JarOutputStream(new FileOutputStream(jarFile), manifest);
+    }
+    catch(IOException e){
+      User.error(this.name, "Error during creation of executable file: " + e);
+      return null;
+    }    
+  }
+
+  private void closeJar(JarOutputStream jar)
+  {
+    try{
+      jar.close();
     }
     catch(IOException e){
       User.error(this.name, "Error during creation of executable file: " + e);
     }
   }
-  
-  private void closeJar()
-  {
-    try{
-      jar.close();
-      jar = null;
-      jarDestFile = null;
-    }
-    catch(IOException e){
-      User.error(this.name, "Error during creation of executable file: "+e);
-    }
-  }
 
   private boolean addedToArchive;
 
-  private void addToArchive()
+  private void addToArchive(JarOutputStream jarStream)
   {
     if (addedToArchive)
       return;
@@ -497,8 +494,8 @@ public class Package implements mlsub.compilation.Module, Located, bossa.syntax.
       for (int i = 0; i < classes.length; i++)
 	{
 	  Content.Stream s = classes[i];
-	  jar.putNextEntry(new JarEntry(packagePrefix + s.name));
-	  copyStreams(s.stream, jar);
+	  jarStream.putNextEntry(new JarEntry(packagePrefix + s.name));
+	  copyStreams(s.stream, jarStream);
 	}
     }
     catch(IOException e){
@@ -506,7 +503,7 @@ public class Package implements mlsub.compilation.Module, Located, bossa.syntax.
     }
 
     for (Iterator i = getImports().iterator(); i.hasNext();)
-      ((Package) i.next()).addToArchive();
+      ((Package) i.next()).addToArchive(jarStream);
   }
 
   private static void copyStreams(InputStream in, OutputStream out)

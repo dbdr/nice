@@ -33,9 +33,20 @@ public class TestSuite {
 	private final String KEYWORD_GLOBAL = "global";
 
 
-
+	/**
+		The testsuite file on the disc
+	*/
 	private File _file;
 	private List _testCases = new ArrayList();
+	
+	/**
+	 * Nice source file that contains the gathered global sources.
+	 * These sources are available for all testcases.
+	 * 
+	 */
+	private GlobalSourceFile _globalSource = new GlobalSourceFile();
+
+
 
 	/**
 		Constructor. Reads the testcases and performs the tests in the testsuite.
@@ -72,7 +83,7 @@ public class TestSuite {
 				}
 				
 				if (isGlobalSource) {
-					TestNice.getGlobalSource().consumeLine(line);
+					getGlobalSource().consumeLine(line);
 					continue;
 				}
 				
@@ -106,9 +117,9 @@ public class TestSuite {
 		//System.out.println("testcase type: " + type);
 		
 		if (TESTCASE_TYPE_PASS.equalsIgnoreCase(type))
-			return new PassTestCase();
+			return new PassTestCase(this);
 		else if (TESTCASE_TYPE_FAIL.equalsIgnoreCase(type))
-			return new FailTestCase();
+			return new FailTestCase(this);
 		throw new TestSuiteException("Unknown testcase type: " + type);
 	}
 
@@ -133,6 +144,19 @@ public class TestSuite {
 	public File getFile() {
 		return _file;
 	}
+
+	/**
+	 * Returns the global source file.
+	 * 
+	 */
+	GlobalSourceFile getGlobalSource() {
+		return _globalSource;
+	}
+
+
+
+
+
 
 }
 

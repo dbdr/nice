@@ -194,11 +194,14 @@ public class NiceSourceFile {
 	}
 	
 	/**
-	 * Writes the nice source file.
+	 * Writes the nice source file to disc if it is not empty.
 	 * 
 	 * @exception	TestSuiteException	TODO
 	 */
 	public void write() throws TestSuiteException {
+		if (isEmpty())
+			return;
+			
 		File packageFolder = new File(TestNice.getTempFolder(), _package.replace('.', File.separatorChar));
 		if (! packageFolder.exists()  &&  ! packageFolder.mkdirs())
 			throw new TestSuiteException("could not create folder: " + packageFolder);

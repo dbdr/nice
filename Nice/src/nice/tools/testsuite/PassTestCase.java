@@ -9,11 +9,24 @@ package nice.tools.testsuite;
  */
 public class PassTestCase extends TestCase {
 
+
 	/**
-		Performs the test for this testcase.
-		Compilation and the execution of the main() method
-		should be successfully.
-	*/
+	 * Constructor.
+	 * 
+	 * @param	suite	The testsuite this testcase belongs to
+	 */
+	public PassTestCase(TestSuite suite) {
+		super(suite);
+	}
+
+
+	/**
+	 * Performs the test for this testcase.
+	 * Compilation and the execution of the main() method
+	 * should be successfully.
+	 * 
+	 * @exception	TestSuiteException	TODO
+	 */
 	public void performTest() throws TestSuiteException {
 		super.performTest();
 		try {

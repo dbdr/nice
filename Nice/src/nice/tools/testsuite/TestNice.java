@@ -85,13 +85,6 @@ public class TestNice {
 	private static int _fileCounter = 0;
 
 	/**
-	 * Nice source file that contains the gathered global sources.
-	 These sources are available for all testcases.
-	 * 
-	 */
-	private static GlobalSourceFile _globalSource = new GlobalSourceFile();
-
-	/**
 	 * Number of successful testcases.
 	 * 
 	 */
@@ -288,15 +281,6 @@ public class TestNice {
 		return _tempFolder;
 	}
 	
-
-
-	/**
-	 * Returns the global source file.
-	 * 
-	 */
-	static GlobalSourceFile getGlobalSource() {
-		return _globalSource;
-	}
 
 
 

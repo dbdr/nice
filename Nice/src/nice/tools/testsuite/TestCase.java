@@ -45,7 +45,7 @@ public class TestCase {
 		
 
 
-
+	private TestSuite _testSuite;
 	private List _niceSourceFiles = new ArrayList();
 	private NiceSourceFile _currentSourceFile;
 	private Set _dontCompilePackages = new HashSet();
@@ -55,7 +55,8 @@ public class TestCase {
 	/**
 		Constructor.
 	*/
-	public TestCase() {
+	public TestCase(TestSuite suite) {
+		_testSuite = suite;
 		createNewSourceFile();
 	}
 	
@@ -121,7 +122,7 @@ public class TestCase {
 			sourceFile.write();
 		}
 		
-		TestNice.getGlobalSource().write();
+		_testSuite.getGlobalSource().write();
 	}
 	
 	/**
@@ -176,10 +177,6 @@ public class TestCase {
 					case OutputMessages.WARNING:
 						showMessages = true;
 						break;
-					/*case OutputMessages.OK:
-						System.out.println(OK_MSG);
-						break;
-						*/
 					}
 				}
 			}
@@ -287,11 +284,11 @@ public class TestCase {
 		contentWriter = new StringWriter();
 		writer = new BufferedWriter(contentWriter);
 		try {
-			TestNice.getGlobalSource().write(writer);
+			_testSuite.getGlobalSource().write(writer);
 			contentWriter.close();
 			writer.close();
 		} catch(IOException e) {e.printStackTrace();}
-		TestNice.getOutput().log("file " + TestNice.getGlobalSource().getPackage() + "." + TestNice.getGlobalSource().getFileName(),
+		TestNice.getOutput().log("file " + _testSuite.getGlobalSource().getPackage() + "." + _testSuite.getGlobalSource().getFileName(),
 					contentWriter.toString());
 		TestNice.getOutput().log("");
 		
@@ -304,7 +301,7 @@ public class TestCase {
 	
 	/**
 	 * Determines the location of the nice runtime.
-	 * 
+	 * This method is also used by Nicec
 	 */
 	private String getRuntime() {
 		//	when Nicec is in the nice.jar, then we should use

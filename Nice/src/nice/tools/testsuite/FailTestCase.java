@@ -11,6 +11,16 @@ package nice.tools.testsuite;
 public class FailTestCase extends TestCase {
 
 	/**
+	 * Constructor.
+	 * 
+	 * @param	suite	The testsuite this testcase belongs to
+	 */
+	public FailTestCase(TestSuite suite) {
+		super(suite);
+	}
+
+
+	/**
 		Performs the test for this testcase.
 		Compilation should fail, otherwise throw exception.
 	*/

@@ -275,7 +275,7 @@ public final class Dispatch
       {
 	if (firstArg != null)
 	  {
-	    gnu.bytecode.Method superImplementation = SuperExp.getImplementationAbove
+	    gnu.bytecode.Method superImplementation = bossa.syntax.dispatch.getImplementationAbove
 	      ((JavaMethod) method, firstArg);
 	    if (superImplementation != null &&
 		superImplementation.isAbstract() == false)

@@ -162,6 +162,7 @@ Block Block(List<Statement>) = native new bossa.syntax.Block(List);
 String explainNoMatch(Arguments, List<VarSymbol>) = native String Arguments.explainNoMatch(List);
 Map<VarSymbol,mlsub.typing.Polytype> types(Arguments) = native Arguments.types;
 <T> String map(String, String, String, T[]) = native String bossa.util.Util.map(String, String, String, Object[]);
+Stack<bossa.link.Alternative> sortedAlternatives(MethodDeclaration) = native Stack bossa.link.Alternative.sortedAlternatives(MethodDeclaration);
 // Retypings needed since java types are not strict.
 
 Block newBlock(?Statement[] statements) = native new Block(Statement[]);

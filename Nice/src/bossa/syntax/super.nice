@@ -1,0 +1,192 @@
+/**************************************************************************/
+/*                                N I C E                                 */
+/*             A high-level object-oriented research language             */
+/*                        (c) Daniel Bonniot 2004                         */
+/*                                                                        */
+/*  This program is free software; you can redistribute it and/or modify  */
+/*  it under the terms of the GNU General Public License as published by  */
+/*  the Free Software Foundation; either version 2 of the License, or     */
+/*  (at your option) any later version.                                   */
+/*                                                                        */
+/**************************************************************************/
+
+package bossa.syntax;
+
+import bossa.link.*;
+import bossa.util.*;
+
+/**
+   A call to the next most specific implementation of a method.   
+*/
+
+public class SuperExp extends Expression
+{
+
+  ?List<TypeIdent> types;
+
+  ?List<TypeConstructor> tc = null;
+  ?MethodBodyDefinition currentMethod = null;
+  ?Alternative superAlternative = null;
+  ?gnu.bytecode.Method superMethod = null;
+
+  void setCurrentMethod(MethodBodyDefinition m)
+  {
+    currentMethod = m;
+
+   let decl = notNull(currentMethod).getDeclaration();
+    if (tc != null && notNull(tc).size() != decl.getArity())
+      User.error(this, "Number of types doesn't match the number of arguments");
+      
+    superAlternative = this.getSuperAlt(decl);
+  }
+
+  private ?Alternative getSuperAlt(MethodDeclaration decl)
+  {
+    ?Alternative superAlt = null;
+    Alternative current = notNull(currentMethod).getAlternative();
+
+    let ?Alternative minimumAlt;
+    if (tc == null)
+      minimumAlt = null;
+    else
+      minimumAlt = new Alternative("", notNull(tc).map(TypeConstructor tc => new Pattern(tc, false)).toArray());
+
+    // Look for the first alternative more general than the current one.
+    for (alt : Alternative.sortedAlternatives(decl))
+      {
+	if (alt == current) 
+	  continue;
+        
+        if (minimumAlt != null)
+	  if (! Alternative.leq(alt, minimumAlt))
+	    continue;
+
+	if (Alternative.leq(current, alt))
+	  if (superAlt == null || Alternative.leq(alt, superAlt))
+	    superAlt = alt;
+	  else if (Alternative.leq(superAlt, alt))
+	    {} // superAlt is a more direct parent than alt, so ignore alt.
+	  else
+	    {
+	      String message = "This call to super is ambiguous. " + 
+		"Possible parents are:\n" + superAlt + "\nand\n" + alt;
+	      throw User.error(this, message);
+	    }
+      }
+
+    if (superAlt != null)
+      return superAlt;
+
+    if (decl instanceof JavaMethod)
+      {
+	this.getSuper(decl);
+	return null;
+      }
+    else
+      throw User.error(this, "There is no super implementation to call");
+  }
+
+  private void getSuper(JavaMethod decl)
+  {
+    gnu.bytecode.Type firstArg = nice.tools.code.Types.get(notNull(currentMethod).firstArgument());
+
+    if (! (firstArg instanceof gnu.bytecode.ClassType))
+      throw User.error(this, "The first argument of this method is not a class");
+
+    superMethod = getImplementationAbove(decl, firstArg);
+
+    if (superMethod == null)
+      throw User.error(this, "There is no super implementation to call");
+
+    return;
+  }
+
+  void resolveTC(TypeScope scope)
+  {
+    if (types != null)
+      tc = notNull(types).map(TypeIdent ti => ti.resolveToTC(scope));
+  }
+
+  computeType()
+  {
+    mlsub.typing.Polytype type = notNull(currentMethod).getDeclaration().getType();
+    mlsub.typing.FunType monotype;
+    mlsub.typing.Constraint constraint;
+    if (! type.isMonomorphic())
+      {
+	// The type of super is computed by restricting the method type
+	// to the patterns of the super implementation.
+
+	type = type.cloneType();
+	monotype = cast(type.getMonotype());
+        mlsub.typing.Monotype[] m = monotype.domain();
+        List<mlsub.typing.AtomicConstraint> newAtoms = new ArrayList();
+        mlsub.typing.AtomicConstraint[?] oldAtoms = type.getConstraint().atoms();
+       
+        if (oldAtoms != null)
+	  newAtoms.addAll(oldAtoms);
+
+	if (superAlternative != null)
+          {
+            let p = notNull(superAlternative).getPatterns();
+            for (int i = 0; i < p.length; i++)
+              if (p[i].tc != null)
+                newAtoms.add(new TypeConstructorLeqMonotypeCst(p[i].tc, m[i]));
+          }
+	else
+	  {
+	    ?TypeConstructor superTC = null;
+            try {
+              superTC = nice.tools.code.Types.typeConstructor(notNull(superMethod).getDeclaringClass());
+            }
+            catch(nice.tools.code.Types.NotIntroducedClassException ex ) {}
+
+	    if (superTC != null)
+              newAtoms.add(new TypeConstructorLeqMonotypeCst(superTC, m[0]));
+            else
+              // Our safe bet is to assert that the argument is Object.
+              newAtoms.add(new mlsub.typing.MonotypeLeqCst(bossa.syntax.Monotype.sure(mlsub.typing.TopMonotype.instance), m[0]));
+	  }
+
+        constraint = new mlsub.typing.Constraint(type.getConstraint().binders(), 
+			new mlsub.typing.AtomicConstraint[newAtoms.size()].fillWith(newAtoms));
+
+      }
+    else
+      {
+	monotype = cast(type.getMonotype());
+	constraint = mlsub.typing.Constraint.True;
+      }
+    this.type = new mlsub.typing.Polytype(constraint, monotype.codomain());
+  }
+  
+  compile()
+  {
+    gnu.expr.Expression code;
+    if (superAlternative != null)
+      code = notNull(superAlternative).methodExp();
+    else
+      // It does not matter which method is called (the super method or
+      // the base method), a call to super is emited.
+      {
+        let NiceClass nc = cast(ClassDefinition.get(notNull(currentMethod).firstArgument()).implementation);
+        code = nc.callSuperMethod(notNull(superMethod));
+      }
+
+    return new gnu.expr.ApplyExp(code,notNull(currentMethod).compiledArguments());
+  }
+  
+  toString() = "super" + (types == null ? "" : Util.map("(", ", ", ")", toArray(notNull(types))));
+
+}
+
+public ?gnu.bytecode.Method getImplementationAbove(JavaMethod decl, gnu.bytecode.ClassType firstArg)
+{
+  let thisMethod = decl.reflectMethod;
+  let superClass = firstArg.getSuperclass();
+  if (superClass == null)
+    return null;
+    
+  return superClass.getMethod(notNull(thisMethod).getName(), 
+				notNull(thisMethod).getParameterTypes(), true);
+  }

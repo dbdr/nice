@@ -38,7 +38,7 @@ import java.util.*;
  * @author bonniot
  */
 
-public abstract class Alternative implements Located
+public class Alternative implements Located
 {
   /**
      The full name uniquely identifies the method by including the 
@@ -127,7 +127,11 @@ public abstract class Alternative implements Located
   /**
    * @return the expression that represents the method body.
    */
-  public abstract Expression methodExp();
+  public Expression methodExp()
+  {
+    Internal.error("methodExp called in " + getClass());
+    return null;
+  }
 
   /**
      @return the expression that tests if this alternative matches
@@ -164,6 +168,8 @@ public abstract class Alternative implements Located
   Pattern[] patterns;
 
   public Pattern[] getPatterns() { return patterns; }
+
+  public bossa.util.Location location() { return bossa.util.Location.nowhere(); }
 
   /****************************************************************
    * Regrouping alternatives per method

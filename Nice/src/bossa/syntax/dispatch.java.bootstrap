@@ -27,6 +27,9 @@ public class dispatch
   static Expression createOverloadedSymbolExp(List l, LocatedString s)
   { return null; }
 
+  public static gnu.bytecode.Method getImplementationAbove(JavaMethod decl, gnu.bytecode.ClassType firstArg)
+  { return null; }
+
   static List removeNonMinimal(List l)
   { return null; }
 

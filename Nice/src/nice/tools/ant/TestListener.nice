@@ -12,7 +12,7 @@
 
 package nice.tools.ant;
 
-import nice.tools.unit;
+import nice.tools.unit.console;
 
 import org.apache.tools.ant.*;
 

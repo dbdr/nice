@@ -112,7 +112,7 @@
         <table border="0" cellpadding="3" cellspacing="1" width="100%">
          <tr>
           <td bgcolor="#cccccc"><img width="48" height="48" align="middle" src="images/floppy-48.png" alt="."/>
-           &nbsp;<span class="title"><a href="install.html">Download</a></span>
+           &nbsp;<span class="title"><a class="nav" href="install.html">Download</a></span>
           </td>
          </tr>
         </table>
@@ -218,7 +218,7 @@
         <table border="0" cellpadding="3" cellspacing="1" width="100%">
          <tr>
           <td bgcolor="#cccccc"><img width="48" height="48" align="middle" src="images/academic-48.png" alt="."/>
-           &nbsp;<span class="title"><a href="research.html">Academic Research</a></span>
+           &nbsp;<span class="title"><a class="nav" href="research.html">Academic Research</a></span>
           </td>
          </tr>
         </table>
@@ -276,7 +276,7 @@
     <td align="center" colspan="2">
      <!-- footer -->
        <span class="footer">
-        <a href="mailto:Daniel.Bonniot@inria.fr">Daniel Bonniot</a>
+        <a class="nav" href="mailto:Daniel.Bonniot@inria.fr">Daniel Bonniot</a>
 
        </span>
      <!-- end footer -->

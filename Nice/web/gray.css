@@ -95,7 +95,7 @@ h3.title
 }
 
 a {
-	color: black;
+	color: #ff0033;
 	font-weight: bold;
 	text-decoration: none;
 }
@@ -105,7 +105,12 @@ a:link {
 }
 
 a:visited {
+	color: #cc0022;
 	text-decoration: none;
+}
+
+a:visited.nav {
+	color: black;
 }
 
 a:active {
@@ -113,6 +118,5 @@ a:active {
 }
 
 a:hover {
-	color: #ff0033;
 	text-decoration: underline;
 }

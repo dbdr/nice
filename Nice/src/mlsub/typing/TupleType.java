@@ -90,7 +90,7 @@ public class TupleType extends Monotype
 
   Monotype canonify()
   {
-    Monotype.canonify(types);
+    types = Monotype.canonify(types);
     return this;
   }
 }

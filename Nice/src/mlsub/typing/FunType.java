@@ -126,7 +126,7 @@ public final class FunType extends Monotype
   Monotype canonify()
   {
     out = out.canonify();
-    Monotype.canonify(in);
+    in = Monotype.canonify(in);
     return this;
   }
 }

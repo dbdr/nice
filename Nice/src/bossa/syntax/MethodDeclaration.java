@@ -185,7 +185,22 @@ public abstract class MethodDeclaration extends Definition
   void innerTypecheck() throws TypingEx
   {
   }
-  
+
+  /** Whether typechecking is currently happening in the global context */
+  static boolean inGlobalContext = false;
+
+  /** Make sure that we are in a local context, which will be discarded 
+      when typechecking this method is over.
+  */
+  static void enterLocalContext()
+  {
+    if (! inGlobalContext)
+      return;
+
+    Typing.enter();
+    inGlobalContext = false;
+  }
+
   void typecheck()
   {
     if (isIgnored())
@@ -198,24 +213,16 @@ public abstract class MethodDeclaration extends Definition
     // see getType().checkWellFormedness
 
     Polytype type = getType();
-    
-    if (!Constraint.hasBinders(type.getConstraint()))
-      {
-	try{
-	  innerTypecheck();
-	}
-	catch(TypingEx e){
-	  User.error(this, "Type error in method " + symbol.name);
-	}
-	return;
-      }
-    
+
     UserError error = null;
     try{
-      Typing.enter();
+      if (Constraint.hasBinders(type.getConstraint()))
+        Typing.enter();
+      else
+        inGlobalContext = true;
     
       try{
-	type.getConstraint().enter();
+	Constraint.enter(type.getConstraint());
 
         try {
           innerTypecheck();
@@ -224,15 +231,21 @@ public abstract class MethodDeclaration extends Definition
         }
       }
       finally{
-	Typing.leave();
+	if (! inGlobalContext)
+          Typing.leave();
+        else
+          inGlobalContext = false;
       }
     }
     catch(TypingEx e){
       // If we got an earlier error, it's preferable to report that one.
       if (error == null)
-        User.error(this,
-                   "The type of method " + symbol.name +
-                   " is not well formed: " + type + "\n" + e);
+        if (Constraint.hasBinders(type.getConstraint()))
+          User.error(this,
+                     "The type of method " + symbol.name +
+                     " is not well formed: " + type + "\n" + e);
+        else
+          User.error(this, "Type error in method " + symbol.name);          
     }
     if (error != null)
       throw error;

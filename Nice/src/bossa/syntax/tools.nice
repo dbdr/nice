@@ -74,6 +74,11 @@ mlsub.typing.Monotype ensureMonomorphic(mlsub.typing.Polytype type,
     {
       // If the type is polymorphic, we treat the type variables as soft:
       // we enter them in the context, so they are not generalized.
+
+      // Make sure we are in a local typing context, so the new type variables
+      // are discarded when the typechecking of the current method is over.
+      MethodDeclaration.enterLocalContext();
+
       type.getConstraint.enter(true);
     }
 

@@ -70,7 +70,10 @@ public class Access {
       return true;
 
     // PROTECTED
-    return (mod & PROTECTED) != 0 &&
+    /* TODO: For now, we consider all default access as also protected. Being 
+       more precise needs an implementation of the visibility system in Nice.
+    */
+    return //(mod & PROTECTED) != 0 &&
       c.isSubclass(target) && receiver.isSubtype(c);
   }
 }

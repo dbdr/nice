@@ -1,0 +1,8 @@
+package regtest.java;
+
+void testAccess()
+{
+  // TODO: This should call the access(Object) method, access(String)
+  // is not visible.
+  //new regtest.java.J.J().access("");
+}

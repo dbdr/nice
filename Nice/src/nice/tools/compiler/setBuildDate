@@ -1,10 +1,12 @@
 #! /bin/sh
 
-if [ -z "$2" ]; then
+if [ -z "$3" ]; then
   version="$1"
 else
-  version="$1 $2"
+  version="$1 $3"
 fi
+
+javaVersion="$2"
 
 date="`date -u +'%Y.%m.%d, %T %Z'`"
 
@@ -12,6 +14,8 @@ echo > dateBuild.nice
 echo "package nice.tools.compiler;" >> dateBuild.nice
 echo "let String versionNumber = \"$version\";" >> dateBuild.nice
 echo "let String buildDate = \"$date\";" >> dateBuild.nice
+echo "let String javaVersion = \"$javaVersion\";" >> dateBuild.nice
+
 
 echo "Main-Class: nice.tools.compiler.console.fun
 Implementation-Title: Nice Compiler

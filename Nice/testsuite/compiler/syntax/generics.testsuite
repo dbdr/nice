@@ -1,0 +1,13 @@
+/// PASS
+  /// Toplevel
+  <T, U | T extends U> U foo(T x) = x;
+
+/// PASS
+  foo(["abc"]);
+  /// Toplevel
+  <T extends Collection> void foo(T<String> x) {}
+
+/// PASS bug
+  foo(["abc"]);
+  /// Toplevel
+  <T extends Collection<String>> void foo(T x) {}

@@ -365,7 +365,11 @@ public class MethodBodyDefinition extends Definition
       }
 
       Node.currentFunction = this;
-      bossa.syntax.dispatch.typecheck$0(body);
+      try{
+	bossa.syntax.dispatch.typecheck$0(body);
+      } catch(UserError ex){
+	nice.tools.compiler.OutputMessages.error(ex.getMessage());
+      }
     }
     finally{
       Node.currentFunction = null;

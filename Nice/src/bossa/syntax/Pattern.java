@@ -111,6 +111,11 @@ public class Pattern implements Located
     return res;
   }
 
+  public final TypeConstructor getTC()
+  {
+    return tc;
+  }
+
   final TypeConstructor getRuntimeTC()
   {
     return runtimeTC;
@@ -820,8 +825,8 @@ public class Pattern implements Located
    ****************************************************************/
   
   LocatedString name,refName;
-  TypeIdent typeConstructor, additional;
-  public TypeConstructor tc;
+  private TypeIdent typeConstructor, additional;
+  TypeConstructor tc;
   TypeConstructor tc2;
   private TypeConstructor runtimeTC;
 

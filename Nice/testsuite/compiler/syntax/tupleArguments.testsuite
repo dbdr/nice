@@ -6,11 +6,13 @@
     println("letter: "+letter+" number: "+number) );
   
 /// PASS
-  let ((String, String))->() foo = ((String s, String t))=> println(s+t);
-  foo(("sdjfl","sdfjl"));
+  let ((String, String))->String foo = ((String s, String t))=> s+t;
+  assert foo(("ab","cd")).equals("abcd");
 
 /// PASS
   ((String, int))->(String, int) foo = ((String s, int i) tuple)=> tuple;
+  (String, int) tuple = ("abc", 5);
+  assert tuple==foo(tuple);
 
 /// PASS bug
   /// Toplevel
@@ -19,24 +21,40 @@
   };
 
 /// PASS
+  assert foo((100,1))==101;
   /// Toplevel
-  int foo((int i, char c)) = i + int(c);
+  int foo((int i, short s)) = i + s;
 
 /// PASS
+  foo(("zyx","ksjdf"));
   /// Toplevel
   void foo((String s, String t) tuple) {
-    print(s+t);
     (String x, String y) = tuple;
+    assert x.equals(s);
+    assert y.equals(t);
   }
 
 /// PASS  
+  (String s, String t) = foo();
+  assert s.equals("abc");
+  assert t.equals("xyz");
   /// Toplevel
-  void foo((String s, String t) tuple = ("abc", "xyz")) {}
+  (String, String) foo((String s, String t) tuple = ("abc", "xyz")) = tuple;
 
-/// PASS  
+/// PASS bug
+  assert foo(("abc",('x',3)))==3;
   /// Toplevel
-  void foo((String s,(char c, int i))) {}
+  int foo((String s,(char c, int i))) = i;
 
-/// PASS  
+/// PASS
+  // this one is not a bug, compare with previous
+  char c = 'x';
+  int i = 3;
+  assert foo(("abc",(c,i)))==3;
   /// Toplevel
-  void foo(((char c, int i),String s)) {}
+  int foo((String s,(char c, int i))) = i;
+
+/// PASS bug
+  assert foo((('y',7),"xyz"))==7;
+  /// Toplevel
+  int foo(((char c, int i),String s)) = i;

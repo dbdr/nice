@@ -1,3 +1,14 @@
+nice (0.9.9)
+
+  * Assertions about the type of variables are used by the typechecker, so that
+    casts are not necessary. For instance:
+      Object o = ...;
+      // We happen to know by design than the object must be a string
+      assert o instanceof String;
+      // Here o can be used as a string without cast
+
+ --
+
 nice (0.9.8)
 
   * Nice methods are now compiled inside classes whenever possible. This does

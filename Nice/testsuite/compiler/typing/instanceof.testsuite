@@ -330,3 +330,28 @@ void f() {
       throw new ClassCastException(obj.getClass().getName());
   }
 
+/// PASS
+  Object o = foo();
+  assert o instanceof String;
+  String s = o;
+  /// Toplevel
+  Object foo() = "";
+
+/// FAIL
+  Object o = foo();
+  assert o instanceof String;
+  o = 42;
+  String /*/// FAIL HERE*/ s = o;
+  /// Toplevel
+  Object foo() = "";
+
+
+/// FAIL
+  Object o = foo();
+  if (o == "")
+    {
+      assert o instanceof String;
+    }
+  String /*/// FAIL HERE*/ s = o;
+  /// Toplevel
+  Object foo() = "";

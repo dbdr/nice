@@ -200,6 +200,16 @@ typecheck(e@CallExp)
   else
     e.arguments.typecheckArgs();
 
+  if (e.isCallTo("assert") && 1 <= e.arguments.size() <= 2)
+    {
+      ?List<(MonoSymbol, mlsub.typing.Monotype)> instanceofIfSucceeds =
+	first_(instanceofInfo(e.arguments.getExp(0)));
+
+      if (instanceofIfSucceeds != null)
+	instanceofIfSucceeds.foreach(((MonoSymbol variable, mlsub.typing.Monotype type)) =>
+	  setVarType(variable, now: type, out: variable.type));
+    }
+
   // forces computation of the type if not done.
   mlsub.typing.Polytype t = e.getType();
 
@@ -1014,5 +1024,5 @@ void checkNotNull(mlsub.typing.Polytype type)
 }
 
 // Local Variables:
-// nice-xprogram: "$HOME/Nice/bin/nicec -d ../classes"
+// nice-xprogram: "../bin/nicec -d ../classes"
 // End:

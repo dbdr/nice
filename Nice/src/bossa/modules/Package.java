@@ -419,7 +419,8 @@ public class Package implements mlsub.compilation.Module, Located, bossa.syntax.
 	JarOutputStream jarStream = createJarStream(jarFile);
 	if (! compilation.excludeRuntime)
 	  writeRuntime(jarStream);
-	this.addToArchive(jarStream);
+	// The link was performed iff this package (root) was recompiled.
+	this.addToArchive(jarStream, compiling());
 	jarStream.close();
       }
     catch(Exception e)
@@ -495,7 +496,7 @@ public class Package implements mlsub.compilation.Module, Located, bossa.syntax.
 
   private boolean addedToArchive;
 
-  private void addToArchive(JarOutputStream jarStream)
+  private void addToArchive(JarOutputStream jarStream, boolean linkPerformed)
   throws IOException
   {
     if (addedToArchive)
@@ -506,13 +507,13 @@ public class Package implements mlsub.compilation.Module, Located, bossa.syntax.
       Debug.println(this + ": writing to archive");
 
     String packagePrefix = getName().replace('.', '/') + "/";
-    Content.Stream[] classes = source.getClasses();
-      
+    Content.Stream[] classes = source.getClasses(linkPerformed);
+
     for (int i = 0; i < classes.length; i++)
       addEntry(packagePrefix + classes[i].name, classes[i].stream, jarStream);
 
     for (Iterator i = getImports().iterator(); i.hasNext();)
-      ((Package) i.next()).addToArchive(jarStream);
+      ((Package) i.next()).addToArchive(jarStream, linkPerformed);
   }
 
   private static void addEntry(String name, InputStream data, 

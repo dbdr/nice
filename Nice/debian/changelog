@@ -12,7 +12,8 @@ nice (0.5) unstable; urgency=low
   * Make the compiler compatible with JDK 1.4
   * Fixed bug on MS-Windows with archive creation because of the 
     case-insensivity of the file system.
-  
+  * Fixed creation of archive from up-to-date packages stored in jar.
+
  --
 
 nice (0.0.020405) unstable; urgency=low

@@ -96,7 +96,7 @@ class JarCompiledContent extends CompiledContent
     }
   }
 
-  Content.Stream[] getClasses()
+  Content.Stream[] getClasses(boolean wantDispatch)
   {
     java.util.List res = new java.util.LinkedList();
     String pkgPrefix = pkg.getName().replace('.', '/') + "/";
@@ -111,7 +111,7 @@ class JarCompiledContent extends CompiledContent
 	    && fullname.endsWith(".class"))
 	  {
 	    String name = fullname.substring(pkgPrefix.length());
-	    if (!name.equals("dispatch.class"))
+	    if (wantDispatch || !name.equals("dispatch.class"))
 	      try{
 		res.add(new Content.Stream(jar.getInputStream(e), name));
 	      }
@@ -122,7 +122,10 @@ class JarCompiledContent extends CompiledContent
 	  }
       }
 
-    return (Content.Stream[]) res.toArray(new Content.Stream[res.size() + 1]);
+    int len = res.size();
+    if (! wantDispatch)
+      len++;
+    return (Content.Stream[]) res.toArray(new Content.Stream[len]);
   }
   
   InputStream getBytecodeStream()

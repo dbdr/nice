@@ -105,9 +105,9 @@ class DirectoryCompiledContent extends CompiledContent
     }
   }
   
-  Content.Stream[] getClasses()
+  Content.Stream[] getClasses(boolean wantDispatch)
   {
-    return getClasses(directory, false);
+    return getClasses(directory, wantDispatch);
   }
   
   static Content.Stream[] getClasses(File directory, 

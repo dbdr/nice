@@ -324,7 +324,7 @@ public class CallExp extends Expression
             gnu.expr.Expression[] eVal = new gnu.expr.Expression[1];
             gnu.expr.LetExp letExp = new gnu.expr.LetExp(eVal);
             eVal[0] = localVars[i].variable.compile(letExp);
-            if (i == 0)
+            if (i == localVars.length-1)
               {
 		firstLetExp = letExp;
               }

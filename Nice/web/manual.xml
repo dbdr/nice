@@ -267,7 +267,7 @@ copy(from: f1, to: f2, bufferSize: 4000);</programlisting>
   </chapter>
 
   <chapter><title>Statements</title>
-    <section><title>Local functions</title>
+    <section id="localFunctions"><title>Local functions</title>
       <para>
 	Local functions are similar to toplevel functions, 
         except that they are defined inside another function or method,
@@ -319,6 +319,24 @@ Window createMyWindow()
 	This section lists advanced features related to the use of Java code
 	in Nice.
       </para>
+
+      <section id="importJava"><title>Importing packages</title>
+	<para>
+	  When Java classes of some package are used frequently,
+	  it is possible to make the package part of their name implicit.
+	  For instance, after a declaration
+	  <literal>import java.io.*;</literal> it is possible
+	  to refer to class <literal>java.io.File</literal>
+	  with the short name <literal>File</literal>.
+	</para>
+
+	<para>
+	  Classes defined in the current package always have priority
+	  over imported packages. If a short name is used that refers
+	  to two classes from imported packages, the compiler
+	  will report an ambiguity, and the fully qualified name must be used.
+	</para>
+      </section>
 
       <section id="optionTypesJava"><title>Option types</title>
 	<para>

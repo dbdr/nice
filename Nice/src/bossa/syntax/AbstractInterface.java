@@ -118,7 +118,14 @@ public class AbstractInterface extends MethodContainer
 
   public void compile()
   {
-    // Nothing
+    // Compile children methods and functions.
+    if (children != null)
+      for(Iterator i = children.iterator(); i.hasNext(); )
+	{
+	  Object o = i.next();
+	  if (o instanceof Definition)
+	    ((Definition) o).compile();
+	}
   }
 
   /****************************************************************

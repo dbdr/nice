@@ -1,7 +1,9 @@
 
 package regtest.basic;
 
-abstract interface I {}
+abstract interface I {
+  alike kf2(alike x) = x;
+}
 
 class KA implements I {}
 class KB extends KA {}
@@ -28,4 +30,6 @@ void test_kinds()
   a = kf(new KB());
   KC c = kf(new KC());
   KD d = kf(new KD());
+
+  a = kf2(a, d);
 }

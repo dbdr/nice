@@ -1,6 +1,10 @@
 nice (0.7.7) unstable; urgency=low
 
-  * The '@' in '@null' patterns is deprecated, '@' should be omitted.
+  * Methods taking a boolean parameter can now dispatch on the cases
+    'true' and 'false':
+      boolean not(boolean);
+      not(true) = false;
+      not(false) = true;
   * Method can also dispatch on integer and character literals, but there is
     always a default case required. An example:
       long fac(long n);
@@ -11,11 +15,7 @@ nice (0.7.7) unstable; urgency=low
       fib(1) = 1;
       fib(2) = 1;
       fib(n) = fib(n-2) + fib(n-1);
-  * Methods taking a boolean parameter can now dispatch on the cases
-    'true' and 'false':
-      boolean not(boolean);
-      not(true) = false;
-      not(false) = true;
+  * The '@' in '@null' patterns is deprecated, '@' should be omitted.
   * The 'fun' keyword is deprecated now, you can leave it away.
   * New policy for typing calls to Java methods. By default, the typing
     is more convenient, considering arguments as possibly null, and 

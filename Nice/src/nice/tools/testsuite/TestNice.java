@@ -142,6 +142,14 @@ public class TestNice {
 
 
 	/**
+		 A JVM with which to run generated code (in a separate process).
+		 Useful for testing alternative JVMs like Kaffe without using them for
+		 running the testengine and the compilation itself.
+	*/
+	private static String _jvm = null;
+
+
+	/**
 	 * TODO
 	 * 
 	 */
@@ -272,6 +280,8 @@ public class TestNice {
 					setOutput(args[i++]);
 				else if ("-gcc".equalsIgnoreCase(s))
 					setGcc(args[i++]);
+				else if ("-jvm".equalsIgnoreCase(s))
+					setJvm(args[i++]);
 				else if ("-comment".equalsIgnoreCase(s))
 					_writeComments = true;
 				else if ("-runtime".equalsIgnoreCase(s))
@@ -316,6 +326,10 @@ public class TestNice {
 			_runtime = "share/java/nice.jar";
 	}
 
+
+	private static void setJvm(String jvm) {
+		_jvm = jvm;
+	}
 
 
 	/**
@@ -538,6 +552,11 @@ public class TestNice {
 
 	static String getGcc() {
 		return _gcc;
+	}
+
+
+	static String getJVM() {
+		return _jvm;
 	}
 
 

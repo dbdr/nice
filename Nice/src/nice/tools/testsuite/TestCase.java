@@ -369,6 +369,21 @@ public abstract class TestCase {
 		}
 	}
 
+	public void runJVM(String jvm, String main) throws TestSuiteException {
+		try {
+			Process p = Runtime.getRuntime().exec(jvm + " -classpath classes:" + TestNice.getTempFolder() + " " + main);
+			CharArrayWriter out = new CharArrayWriter();
+			int exitValue = nice.tools.compiler.dispatch.waitFor(p, out);
+			// Print the output of the execution.
+			System.out.println(out.toString());
+			if (exitValue != 0)
+				throw new TestSuiteException("Exit code: " + exitValue);
+		}
+		catch(IOException e) {
+			throw new TestSuiteException(e.getMessage());
+		}
+	}
+
 	/**
 	 * Runs the main method of the testcase. Only if main method exists and
 	 * the package was compiled.
@@ -396,6 +411,12 @@ public abstract class TestCase {
 				if (sourceFile.hasMainMethod()
 					&&  ! _dontCompilePackages.contains(sourceFile.getPackage()))
 				{
+					if (TestNice.getJVM() != null)
+						{
+							runJVM(TestNice.getJVM(), sourceFile.getPackage() + ".fun");
+							continue;
+						}
+
 					ClassLoader loader = TestNice.getClassLoader();
 					try {
 						Class c = Class.forName

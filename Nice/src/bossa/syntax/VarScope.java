@@ -57,18 +57,6 @@ public class VarScope
       }
   }
   
-  /**
-     Adds a collection of VarSymbols
-   */
-  void addSymbols(/*VarSymbol*/Symbol[] s)
-  {
-    if (s == null) return;
-
-    for(int i = 0; i < s.length; i++)
-      if (s[i].name != null)	
-	addSymbol(s[i]);
-  }
-  
   void removeSymbol(/*VarSymbol*/Symbol sym)
   {
     defs.remove(sym.name, sym);

@@ -151,18 +151,6 @@ public class Gen
   }
 
   /**
-     @return an expression that references the lambda expression.
-  */
-  public static ReferenceExp referenceTo(LambdaExp lambda)
-  {
-    Declaration decl = new Declaration(lambda.getName());
-    decl.noteValue(lambda);
-    decl.setFlag(Declaration.IS_CONSTANT|Declaration.STATIC_SPECIFIED);
-    decl.setProcedureDecl(true);
-    return new ReferenceExp(decl);
-  }
-
-  /**
      @return the lambda expression referenced.
   */
   public static LambdaExp dereference(Expression ref)

@@ -34,7 +34,6 @@ void compile(Compilation compilation, String mainPackage,
 
     if (compilation.runtimeFile == null)
       compilation.runtimeFile = getNiceRuntime();
-    nice.tools.code.TypeImport.setRuntime(compilation.runtimeFile);
     compilation.setMainPackage(mainPackage);
 
     make(compilation);

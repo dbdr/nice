@@ -126,28 +126,6 @@ public final class Types
       setBytecodeType(ms[i]);
   }
 
-  public static void setBytecodeType(Polytype t)
-  {
-    Constraint cst = t.getConstraint();
-    if (Constraint.hasBinders(cst))
-      {
-	Typing.enter();
-	try{
-	  Constraint.enter(cst);
-	  setBytecodeType(t.getMonotype());
-	}
-	catch(TypingEx e) {}
-	finally{
-	  try{
-	    Typing.leave();
-	  }
-	  catch(TypingEx e) {}
-	}
-      }
-    else
-      setBytecodeType(t.getMonotype());
-  }
-
   /****************************************************************
    * Mapping monotypes to java types
    ****************************************************************/
@@ -541,40 +519,6 @@ public final class Types
       ("Equivalent type for " + t + " is not defined yet");
     return null;
   }
-  
-  /****************************************************************
-   * Default values
-   ****************************************************************/
-
-  public static Expression defaultValue(Monotype m)
-  {
-    if (!(m instanceof MonotypeConstructor))
-      return QuoteExp.nullExp;
-    
-    TypeConstructor tc = nice.tools.typing.Types.rawType(m).head();
-
-    if (tc == null)
-      return QuoteExp.nullExp;
-
-    if(tc == PrimitiveType.intTC ||
-       tc == PrimitiveType.byteTC ||
-       tc == PrimitiveType.shortTC ||
-       tc == PrimitiveType.longTC)
-      return zeroInt;
-    if(tc == PrimitiveType.floatTC ||
-       tc == PrimitiveType.doubleTC)
-      return zeroFloat;
-    if(tc == PrimitiveType.boolTC)
-      return QuoteExp.falseExp;
-    if(tc == PrimitiveType.charTC)
-      return zeroChar;
-    
-    return QuoteExp.nullExp;
-  }
-
-  private static Expression zeroInt = new QuoteExp(new Integer(0));
-  private static Expression zeroFloat = new QuoteExp(new Float(0.0));
-  private static Expression zeroChar = new QuoteExp(new Character((char) 0));
 
   /****************************************************************
    * Reset the state for a new compilation.

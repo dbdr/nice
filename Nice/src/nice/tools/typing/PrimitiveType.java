@@ -165,16 +165,4 @@ public final class PrimitiveType
   public static TypeConstructor classTC;
   public static TypeConstructor collectionTC;
   public static TypeConstructor throwableTC;
-
-  private static Polytype throwableType;
-  public static Polytype throwableType()
-  {
-    if (throwableType == null)
-      {
-	throwableType = new Polytype
-	  (Constraint.True, 
-	   Types.sureMonotype(new MonotypeConstructor(throwableTC, null)));
-      }
-    return throwableType;
-  }
 }

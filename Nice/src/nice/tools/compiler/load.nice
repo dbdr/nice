@@ -28,7 +28,6 @@ List<bossa.modules.Package> load(Compilation compilation, String mainPackage)
 
     if (compilation.runtimeFile == null)
       compilation.runtimeFile = getNiceRuntime();
-    nice.tools.code.TypeImport.setRuntime(compilation.runtimeFile);
     compilation.setMainPackage(mainPackage);
 
     // We know that the Modules are in fact Packages

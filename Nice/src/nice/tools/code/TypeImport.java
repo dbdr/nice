@@ -30,15 +30,6 @@ import java.net.URL;
 
 public class TypeImport
 {
-  public static void setRuntime(String file)
-  {
-    runtime = file;
-  }
-
-  private static String runtime;
-
-  public static String getRuntime() { return runtime; }
-
   public static Type lookup(bossa.syntax.LocatedString className)
   {
     return lookup(className.toString(), className.location());
@@ -112,24 +103,6 @@ public class TypeImport
   /****************************************************************
    * On the fly lookup of java types
    ****************************************************************/
-
-  /** Search className in opened packages too */
-  static java.lang.Class lookupJavaClass(String className)
-  {
-    Class res = lookupQualifiedJavaClass(className);
-
-    if (res != null)
-      return res;
-    
-    String[] pkgs = bossa.syntax.Node.getGlobalTypeScopeModule().listImplicitPackages();
-    for (int i = 0; i < pkgs.length; i++)
-	{
-	  res = lookupQualifiedJavaClass(pkgs[i] + "." + className);
-	  if(res != null)
-	    return res;
-	}
-    return null;
-  }
 
   static HashMap stringToReflectClass = new HashMap();
 

@@ -551,7 +551,7 @@ analyse(e@TypeConstantExp, info)
     (name.toString(), name.location());
   
   if (type == null)
-    throw unknownIdent(name);
+    throw new bossa.util.UserError(name, "Class " + name + " is not declared");
 
   e.value = object(type);
 

@@ -30,7 +30,7 @@ import bossa.util.*;
 
 public final class ClassExp extends Expression
 {
-  ClassExp(gnu.bytecode.ClassType javaClass)
+  private ClassExp(gnu.bytecode.ClassType javaClass)
   {
     this.javaClass = javaClass;
   }
@@ -92,7 +92,7 @@ public final class ClassExp extends Expression
 
   public String toString()
   {
-    return "Constant class "+javaClass.getName();
+    return "Constant class " + javaClass.getName();
   }
 
   gnu.bytecode.ClassType staticClass()

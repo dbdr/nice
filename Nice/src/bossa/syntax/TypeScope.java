@@ -12,7 +12,7 @@
 
 // File    : TypeScope.java
 // Created : Fri Jul 09 11:29:17 1999 by bonniot
-//$Modified: Fri Sep 22 14:31:12 2000 by Daniel Bonniot $
+//$Modified: Mon Oct 02 16:55:44 2000 by Daniel Bonniot $
 
 package bossa.syntax;
 
@@ -126,7 +126,7 @@ public class TypeScope
 
 	// Now try as a java class
 	TypeConstructor tc = JavaClasses.lookup(name);
-	    
+	
 	if (tc != null)
 	  return tc;
 	    

@@ -12,7 +12,7 @@
 
 // File    : Expression.java
 // Created : Mon Jul 05 16:25:02 1999 by bonniot
-//$Modified: Mon Aug 28 15:18:53 2000 by Daniel Bonniot $
+//$Modified: Mon Oct 02 17:04:56 2000 by Daniel Bonniot $
 // Description : 
 
 package bossa.syntax;
@@ -30,12 +30,10 @@ public abstract class Expression extends Node
     super(Node.down);
   }
 
-  /** 
-   * Returns an equivalent expression with scoping resolved 
-   * Expressions that resolve to a new expressions should
-   * override this method.
-   * Others (that resolve by side effects) 
-   * should override Node.resolve().
+  /**
+     Returns an equivalent expression with scoping resolved.
+     Expressions that resolve to a new expression should override this method.
+     Others (that resolve by side effects) should override Node.resolve().
    */
   Expression resolveExp()
   {

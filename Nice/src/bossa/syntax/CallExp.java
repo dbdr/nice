@@ -12,7 +12,7 @@
 
 // File    : CallExp.java
 // Created : Mon Jul 05 16:27:27 1999 by bonniot
-//$Modified: Wed Sep 20 12:33:08 2000 by Daniel Bonniot $
+//$Modified: Mon Oct 02 17:09:52 2000 by Daniel Bonniot $
 
 package bossa.syntax;
 
@@ -77,6 +77,21 @@ public class CallExp extends Expression
     return res;
   }
   
+  void findJavaClasses()
+  {
+    if (infix)
+      {
+	Expression e = ((ExpressionRef) parameters.get(0)).content();
+	// force the finding of class prefixes to methods
+	// so that java classes are discovered early and put in global context
+	if(e instanceof IdentExp)
+	  {
+	    ((IdentExp) e).enableClassExp = true;
+	    e.resolveExp();
+	  }
+      }
+  }
+  
   void resolve()
   {
     // in infix applications, the symbol is either a
@@ -85,13 +100,9 @@ public class CallExp extends Expression
     if(infix)
       {
 	Expression e = fun.content();
-	e.scope = Node.getGlobalScope();
+	 e.scope = Node.getGlobalScope();
 	if(e instanceof IdentExp)
 	  ((IdentExp) e).ignoreInexistant = true;
-	
-	e = ((ExpressionRef) parameters.get(0)).content();
-	if(e instanceof IdentExp)
-	  ((IdentExp) e).enableClassExp = true;
       }
   }
   
@@ -302,6 +313,8 @@ public class CallExp extends Expression
 		    JavaMethod.addFetchedMethod(method);
 		  if(md!=null)
 		    possibilities.add(md.symbol);
+		  else
+		    Debug.println(method + " ignored");
 		}
 
 	    // search a field

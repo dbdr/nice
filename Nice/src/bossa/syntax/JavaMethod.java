@@ -22,6 +22,7 @@ import gnu.expr.*;
 
 import bossa.util.Location;
 import mlsub.typing.TypeConstructor;
+import nice.tools.code.Types;
 
 import java.util.*;
 
@@ -86,43 +87,42 @@ public class JavaMethod extends MethodDeclaration
 
   private static JavaMethod make(Method m, boolean constructor)
   {
-    try
-      {
-	JavaMethod res;
+    try {
+      JavaMethod res;
 
-	Type[] paramTypes = m.getParameterTypes();
-	mlsub.typing.Monotype[] params;
-	int n = 0; // index in params
+      Type[] paramTypes = m.getParameterTypes();
+      mlsub.typing.Monotype[] params;
+      int n = 0; // index in params
 	
-	if(m.getStaticFlag() || constructor)
-	  params = new mlsub.typing.Monotype[paramTypes.length];
-	else
-	  {
-	    params = new mlsub.typing.Monotype[paramTypes.length + 1];
-	    params[n++] = nice.tools.code.Types.getMonotype(m.getDeclaringClass());
-	  }
+      if(m.getStaticFlag() || constructor)
+	params = new mlsub.typing.Monotype[paramTypes.length];
+      else
+	{
+	  params = new mlsub.typing.Monotype[paramTypes.length + 1];
+	  params[n++] = Types.getMonotype(m.getDeclaringClass());
+	}
     
-	for(int i = 0; i<paramTypes.length; i++)
-	  params[n++] = nice.tools.code.Types.getMonotype(paramTypes[i]);
+      for(int i = 0; i<paramTypes.length; i++)
+	params[n++] = Types.getMonotype(paramTypes[i]);
     
-	mlsub.typing.Monotype retType;
-	if(constructor)
-	  retType = nice.tools.code.Types.getMonotype(m.getDeclaringClass());
-	else
-	  retType = nice.tools.code.Types.getMonotype(m.getReturnType());
+      mlsub.typing.Monotype retType;
+      if(constructor)
+	retType = Types.getMonotype(m.getDeclaringClass());
+      else
+	retType = Types.getMonotype(m.getReturnType());
     
-	res = new JavaMethod(null, m.getName(), null,
-			     new LocatedString(m.getName(),Location.nowhere()),
-			     null, retType, params);
-	res.reflectMethod = m;
-	return res;
-      }
-    catch(nice.tools.code.Types.ParametricClassException e){
+      res = new JavaMethod(null, m.getName(), null,
+			   new LocatedString(m.getName(),Location.nowhere()),
+			   null, retType, params);
+      res.reflectMethod = m;
+      return res;
+    }
+    catch(Types.ParametricClassException e){
       // The fetched method involves parametric java classes.
       // Ignore.
       return null;
     }
-    catch(nice.tools.code.Types.NotIntroducedClassException e){
+    catch(Types.NotIntroducedClassException e){
       // The fetched method involves invalid types.
       // Ignore.
       return null;
@@ -138,11 +138,11 @@ public class JavaMethod extends MethodDeclaration
   private static Map declaredMethods = new HashMap();
   
   /**
-   * Creates a bossa method for the fiven native method
-   * and puts it in global scope.
-   *
-   * @param m the native method.
-   * @return the created JavaMethod.
+     Creates a bossa method for the fiven native method 
+     and puts it in global scope.
+     
+     @param m the native method.
+     @return the created JavaMethod.
    */
   public static JavaMethod addFetchedMethod(Method m)
   {
@@ -190,7 +190,7 @@ public class JavaMethod extends MethodDeclaration
   
   private gnu.bytecode.Type type(LocatedString s)
   {
-    Type res = nice.tools.code.Types.type(s.toString());
+    Type res = Types.type(s.toString());
     if(res == null)
       User.error(s, "Unknown java class "+s);
     return res;
@@ -231,7 +231,7 @@ public class JavaMethod extends MethodDeclaration
     if(reflectMethod != null)
       return;
     
-    Type holder = nice.tools.code.Types.type(className.toString());
+    Type holder = Types.type(className.toString());
     if(holder == null)
       User.error(this,
 		 "Class " + className + " was not found");

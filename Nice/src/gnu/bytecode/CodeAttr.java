@@ -828,9 +828,8 @@ public class CodeAttr extends Attribute implements AttrContainer
   /** Unary numerical negation (-). */
   public final void emitNeg ()
   {
-    reserve(1);
     Type type = popType().promote();
-    put1 (116 + adjustTypedOp(type));
+    emitTypedOp(116, type);
     pushType (type);
   }
   

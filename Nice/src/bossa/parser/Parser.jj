@@ -12,7 +12,7 @@
 
 // File    : parser.jj
 // Created : Thu Jul 01 10:27:05 1999 by bonniot
-//$Modified: Thu Sep 21 17:41:10 2000 by Daniel Bonniot $
+//$Modified: Mon Oct 02 13:41:39 2000 by Daniel Bonniot $
 // Description : Parseur JavaCC pour Nice
 //   Tokens based on the Jazz parser
 
@@ -153,7 +153,7 @@ TOKEN: /* Keywords */
 | < DOMAIN:     "domain"     	>
 | < AT:         "@"          	>
 | < EXACTLY_AT: "#"          	>
-| < ASSERT:     "assert"     	>
+//| < ASSERT:     "assert"     	>
 | < INPUT:      "input"      	>
 | < OUTPUT:     "output"     	>
 | < FOR:        "for"        	>

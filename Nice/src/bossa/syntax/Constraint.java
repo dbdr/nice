@@ -94,7 +94,7 @@ public class Constraint extends Node
 	int n = 0;
 	for(java.util.Iterator i = binders.iterator(); i.hasNext();)
 	  newBinders[n++] = (TypeSymbol) i.next();
-      }    
+      }
 
     return mlsub.typing.Constraint.create
       (newBinders, AtomicConstraint.resolve(typeScope, atomics));

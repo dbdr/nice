@@ -41,6 +41,13 @@ public class FunExp extends Expression implements Function
     this.body = body;
   }
 
+  FunExp(bossa.syntax.Constraint cst, MonoSymbol[] formals, Statement body)
+  {
+    this.formals = formals;
+    this.constraint = cst;
+    this.body = body;
+  }
+
   void computeType()
   {
     if(body instanceof ReturnStmt)
@@ -93,13 +100,13 @@ public class FunExp extends Expression implements Function
     blockExp = new gnu.expr.BlockExp
       (nice.tools.code.Types.javaType(getType()));
 
-    res.min_args = res.max_args = formals.length;
+    res.min_args = res.max_args = formals == null ? 0 : formals.length;
     
     res.setCanRead(true);
     res.outer = Statement.currentScopeExp;
     Statement.currentScopeExp = res;       // push
     
-    for(int i = 0; i < formals.length; i++)
+    for(int i = 0; i < res.min_args; i++)
       {
 	MonoSymbol s = formals[i];
 	

@@ -77,8 +77,8 @@ class Info
   /* bit 0: point not reachable 
   */
   int flags; 
-  boolean getUnreachable(); getUnreachable() = (this.flags & 1) != 0;
-  void setUnreachable(); setUnreachable() { this.flags |= 1; }
+  boolean getUnreachable() = (this.flags & 1) != 0;
+  void setUnreachable() { this.flags |= 1; }
 
   Stack<int> flagsStack;
 
@@ -90,21 +90,18 @@ class Info
       this.flags = 0;
   }
 
-  void endInner();
-  endInner()
+  void endInner()
   {
     this.flags = this.flagsStack.pop();
   }
 
-  void beginCases();
-  beginCases()
+  void beginCases()
   {
     this.flagsStack.push(this.flags);
     this.flagsStack.push(-1);
   }
   
-  void otherCase();
-  otherCase()
+  void otherCase()
   {
     int prevResult = this.flagsStack.pop();
     int outer = this.flagsStack.top();
@@ -112,8 +109,7 @@ class Info
     this.flags = outer;
   }
 
-  void endCases();
-  endCases()
+  void endCases()
   {
     this.flags &= this.flagsStack.pop();
     this.flagsStack.pop();
@@ -123,28 +119,24 @@ class Info
   // Shall probably go away sometime (at least the TypeMaper)
   TypeMap typeMap;
 
-  void begin();
-  begin()
+  void begin()
   {
     this.vars.begin();
     this.typeVars.begin();
   }
 
-  void end();
-  end()
+  void end()
   {
     this.vars.end();
     this.typeVars.end();
   }
 
-  VarSymbol lookup(String);
-  lookup(name) = this.vars[name];
+  VarSymbol lookup(String name) = this.vars[name];
 
-  JavaList<VarSymbol> globalLookup(LocatedString);
-  globalLookup(name) = javaList(this.globalVarScope.lookup(name));
+  JavaList<VarSymbol> globalLookup(LocatedString name) = 
+    javaList(this.globalVarScope.lookup(name));
 
-  TypeSymbol lookupType(LocatedString);
-  lookupType(name)
+  TypeSymbol lookupType(LocatedString name)
   {
     TypeSymbol res = this.typeVars[name.toString()];
     if (res != null)
@@ -153,18 +145,23 @@ class Info
       return this.globalTypeScope.lookup(name);
   }
 
-  void addVar(MonoSymbol);
-  addVar(symbol)
+  void addVar(PolySymbol symbol)
   {
     symbol.type = symbol.syntacticType.resolve(this.typeMap);
     this.vars[symbol.name.toString()] = symbol;
   }
 
-  void addVars(Sequence<MonoSymbol>);
-  addVars(symbols) = symbols.iter(fun(MonoSymbol s)=>this.addVar(s));
+  void addVar(MonoSymbol symbol)
+  {
+    symbol.type = symbol.syntacticType.resolve(this.typeMap);
+    this.vars[symbol.name.toString()] = symbol;
+  }
+
+  void addVars(Sequence<MonoSymbol> symbols) = 
+    symbols.iter(fun(MonoSymbol s)=>this.addVar(s));
   
-  void addTypeVars(Sequence<TypeSymbol>);
-  addTypeVars(symbols) = symbols.iter(fun(TypeSymbol s)=>this.typeVars[s.toString()]=s);
+  void addTypeVars(Sequence<TypeSymbol> symbols) = 
+    symbols.iter(fun(TypeSymbol s)=>this.typeVars[s.toString()]=s);
 }
 
 void setInitialized(Expression, Info);
@@ -281,7 +278,8 @@ analyse(e@FunExp, info)
     }
   e.constraint = null;
 
-  addVars(info, e.formals);
+  if (e.formals != null)
+    addVars(info, e.formals);
 
   analyse(e.body, info);
   if (!info.getUnreachable() 
@@ -407,14 +405,25 @@ analyse(e@TupleExp, info)
 analyse(s@Statement, info) {}
 analyse(s@null(Statement), info) {}
 
+//void analyseL(Block$LocalDeclaration, Info);
+analyse(decl@Block$LocalVariable, info)
+{
+  if (decl.value != null)
+    decl.value = analyse(decl.value, info);
+  info.addVar(decl.left);
+}
+
+analyse(decl@Block$LocalFunction, info)
+{
+  if (decl.value != null)
+    decl.value = analyse(decl.value, info);
+  info.addVar(decl.left);
+}
+
 analyse(b@Block, info)
 {
   info.begin();
-  javaList(b.locals).iter(fun(Block$LocalDeclaration l)=>{
-    if (l.value != null)
-      l.value = analyse(l.value, info);
-    info.addVar(l.left);
-  });
+  javaList(b.locals).iter(fun(Block$LocalDeclaration l) => analyse(l, info));
   b.statements.iter(fun(Statement s)=>{
     if (info.getUnreachable())
       bossa.util.User.error(s, "Statement is never executed");

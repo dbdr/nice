@@ -1950,7 +1950,7 @@ Statement BlockStatement() :
 {
   (
   LOOKAHEAD([ "final" ] monotype() <IDENT>)
-  res=LocalVariableDeclaration() ";"
+  res=LocalDeclaration() 
 |
   res=Statement()
 /*
@@ -1961,17 +1961,24 @@ Statement BlockStatement() :
   { return res; }
 }
 
-Statement LocalVariableDeclaration() :
+Statement LocalDeclaration() :
 {
   Monotype t;
   LocatedString id;
+  FormalParameters parameters;
+  Statement body;
   Expression e=null;
 }
 {
   t=monotype()
   id=ident()
-  [ "=" e=Expression() ]
-  { return new Block.LocalDeclaration(id,t,e); }
+  (
+    "(" parameters = formalParameters(false) ")" body = code() 
+    { return Block.LocalFunction.make(id, t, parameters, body); }
+  | 
+    [ "=" e=Expression() ] ";" 
+    { return new Block.LocalVariable(id,t,e); }
+  )
 }
 
 Statement EmptyStatement() :
@@ -2071,7 +2078,7 @@ Statement DoStatement() :
 Statement ForStatement() :
 { Statement init=null,update=null,body,loop; Expression cond=null; }
 {
-  "for" "(" [ init=ForInit() ] ";" 
+  "for" "(" ( init=ForInit() | ";" )
     [ cond=Expression() ] ";" [ update=StatementExpressionList() ] ")" 
     body=Statement()
   { 
@@ -2091,9 +2098,9 @@ Statement ForInit() :
 {
   (
   LOOKAHEAD( [ "final" ] monotype() <IDENT> )
-  res=LocalVariableDeclaration()
+  res=LocalDeclaration()
 |
-  res=StatementExpressionList()
+  res=StatementExpressionList() ";"
   )
   { return res; }
 }

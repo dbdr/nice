@@ -32,9 +32,7 @@ public final class FunType extends Monotype
 
   public FunType(Monotype[] in, Monotype out)
   {
-    this.in = (in == null ? Monotype.zeroMonotypes : in);
-    this.out = out;
-    this.kind = FunTypeKind.get(this.in.length);
+    this(FunTypeKind.get(in == null ? 0 : in.length), in, out);
   }
   
   /** 

@@ -101,5 +101,5 @@ public class PolySymbol extends VarSymbol
   }
 
   protected Polytype type;
-  private bossa.syntax.Polytype syntacticType;
+  bossa.syntax.Polytype syntacticType;
 }

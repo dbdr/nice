@@ -194,12 +194,12 @@ typecheck(b@Block)
   b.statements.iter(fun(Statement s)=> typecheck(s));
 }
 
-typecheck(decl@Block$LocalDeclaration)
+typecheck(decl@Block$LocalVariable)
 {
   if (decl.value == null)
     return;
 
-  MonoSymbol target = decl.left;
+  MonoSymbol target = decl.getLeft();
 
   try{
     decl.value = checkAssignment(target.getType(), decl.value);
@@ -207,6 +207,21 @@ typecheck(decl@Block$LocalDeclaration)
   catch(TypingEx t){
     throw assignmentError(target, target.name.toString(), 
 			  target.getMonotype().toString(), decl.value);
+  }
+}
+
+typecheck(decl@Block$LocalFunction)
+{
+  typecheck(decl.value);
+  try{
+    Typing.leq(decl.inferredReturnType(), decl.declaredReturnType());
+  }
+  catch(TypingEx t){
+    throw new bossa.util.UserError
+      (decl, 
+       "Incorrect return type:\n" +
+       "Found   : " + decl.inferredReturnType() +
+       "Expected: " + decl.declaredReturnType());
   }
 }
 

@@ -269,11 +269,12 @@ abstract public class MethodDeclaration extends Definition
   
   MethodDeclaration.Symbol symbol;
 
-  class Symbol extends PolySymbol
+  class Symbol extends FunSymbol
   {
     Symbol(LocatedString name, Polytype type)
     {
-      super(name, type);
+      super(name, type, 
+	    MethodDeclaration.this.formalParameters(), MethodDeclaration.this.arity);
     }
 
     MethodDeclaration getDefinition()
@@ -281,30 +282,6 @@ abstract public class MethodDeclaration extends Definition
       return MethodDeclaration.this;
     }
     
-    /****************************************************************
-     * Overloading resolution
-     ****************************************************************/
-    
-    /**
-       @return
-       0 : doesn't match
-       1 : wasn't even a function
-       2 : matches
-    */
-    int match(Arguments arguments)
-    {
-      if (MethodDeclaration.this.formalParameters() == null)
-	// true for constructors, for instance. case might be removed
-	if (!arguments.plainApplication(MethodDeclaration.this.getArity()))
-	  return 0;
-	else
-	  return 2;
-      else if (!MethodDeclaration.this.formalParameters().match(arguments))
-	return 0;
-      else
-	return 2;
-    }
-
     public String toString()
     {
       return MethodDeclaration.this.toString();

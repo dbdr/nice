@@ -64,9 +64,28 @@ public class MonoSymbol extends VarSymbol
    */
   static mlsub.typing.Monotype[] getMonotype(MonoSymbol[] symbols)
   {
+    if (symbols == null) return null;
+
     mlsub.typing.Monotype[] res = new mlsub.typing.Monotype[symbols.length];
     for(int i = 0; i < symbols.length; i++)
       res[i] = symbols[i].getMonotype();
+    return res;
+  }
+
+  /**
+     Maps getMonotype over an array of MonoSymbols.
+
+     @param symbols the array of MonoSymbols
+     @return the array of their syntactic Monotypes
+   */
+  static Monotype[] getSyntacticMonotype(MonoSymbol[] symbols)
+  {
+    if (symbols == null)
+      return Monotype.array0;
+
+    Monotype[] res = new Monotype[symbols.length];
+    for(int i = 0; i < symbols.length; i++)
+      res[i] = symbols[i].syntacticType;
     return res;
   }
 

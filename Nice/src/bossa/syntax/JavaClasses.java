@@ -202,14 +202,13 @@ public final class JavaClasses
     
     for (Field f = classType.getFields(); f != null; f = f.getNext())
       JavaMethod.addFetchedMethod(f);
-
   addingFetchedMethod:
     for(Method m = classType.getMethods(); m!=null; m = m.getNext())
       {
 	if(m.isConstructor())
 	  JavaMethod.addFetchedConstructor(m, tc);
 	else
-	  {  
+	  {
 	    // skips m if it was just overriden in classType
 	    // but declared in a superclass or superinterface.
 	    ClassType superClass = classType.getSuperclass();

@@ -15,8 +15,6 @@ package bossa.syntax;
 import java.util.*;
 import bossa.util.*;
 
-import mlsub.typing.Polytype;
-
 /**
    A block : a list of statements with local variables.
 
@@ -30,14 +28,15 @@ public class Block extends Statement
     this.statements = cutInBlocks(statements);
   }
 
-  public static class LocalDeclaration extends Statement
+  static abstract class LocalDeclaration extends Statement
   {
-    public LocalDeclaration(LocatedString name, Monotype type, Expression value)
+    public LocalDeclaration(Expression value)
     {
-      this.left = new MonoSymbol(name,type);
       this.value = value;
     }
-    
+
+    abstract gnu.expr.Expression compile(gnu.expr.LetExp let);
+
     public gnu.expr.Expression generateCode()
     {
       Internal.error("Should not be called");
@@ -45,7 +44,93 @@ public class Block extends Statement
     }
     
     protected Expression value = null;
+  }
+
+  public static class LocalVariable extends LocalDeclaration
+  {
+    public LocalVariable(LocatedString name, Monotype type, Expression value)
+    {
+      super(value);
+      this.left = new MonoSymbol(name,type);
+    }
+    
+    gnu.expr.Expression compile(gnu.expr.LetExp let)
+    {
+      gnu.expr.Declaration decl = 
+	let.addDeclaration(left.name.toString(),
+			   nice.tools.code.Types.javaType(left.type));
+      decl.noteValue(null);
+      left.setDeclaration(decl);
+
+      if (value == null)
+	return nice.tools.code.Types.defaultValue(left.type);
+      else
+	return value.generateCode();
+    }
+
+    public Location location()
+    {
+      return left.name.location();
+    }
+
+    MonoSymbol getLeft() { return left; }
+
     MonoSymbol left;
+  }
+
+  public static class LocalFunction extends LocalDeclaration
+  {
+    public static LocalFunction make
+      (LocatedString name, Monotype returnType, 
+       FormalParameters parameters, Statement body)
+    {
+      Expression value;
+      value = new FunExp(Constraint.True, parameters.getMonoSymbols(), body);
+
+      Monotype type = new FunType
+	(MonoSymbol.getSyntacticMonotype(parameters.getMonoSymbols()), 
+	 returnType);
+      FunSymbol symbol = new FunSymbol(name, 
+				       new Polytype(Constraint.True, type), 
+				       parameters, parameters.size);
+      return new LocalFunction(symbol, value);
+    }
+
+    private LocalFunction(FunSymbol symbol, Expression value)
+    {
+      super(value);
+      this.left = symbol;
+    }
+    
+    mlsub.typing.Polytype inferredReturnType()
+    {
+      return ((FunExp) value).inferredReturnType();
+    }
+
+    mlsub.typing.Monotype declaredReturnType()
+    {
+      return left.getType().codomain();
+    }
+
+    gnu.expr.Expression compile(gnu.expr.LetExp let)
+    {
+      gnu.expr.Declaration decl = 
+	let.addDeclaration(left.name.toString(),
+			   nice.tools.code.Types.javaType(left.type));
+      decl.noteValue(null);
+      left.setDeclaration(decl);
+
+      return value.generateCode();
+    }
+
+    public Location location()
+    {
+      return left.name.location();
+    }
+
+    FunSymbol getLeft() { return left; }
+
+    FunSymbol left;
   }
 
   ArrayList /* of LocalDeclaration */ locals = new ArrayList();
@@ -97,7 +182,7 @@ public class Block extends Statement
 	if (s instanceof LocalDeclaration)
 	  {
 	    // Removes all the statements already in res, 
-	    // keeps this LocalDeclarationStmt.
+	    // keeps this LocalDeclStmt.
 	    res.add(new Block(statements.subList(i.previousIndex(),statements.size())));
 	    break;
 	  }
@@ -115,7 +200,7 @@ public class Block extends Statement
    * Type checking
    ****************************************************************/
   
-  Polytype getType()
+  mlsub.typing.Polytype getType()
   {
     if (statements.length > 0)
       {
@@ -175,18 +260,10 @@ public class Block extends Statement
     res.outer = Statement.currentScopeExp;
     Statement.currentScopeExp = res;
     
-    if (local.value == null)
-      eVal[0] = nice.tools.code.Types.defaultValue(local.left.type);
-    else
-      eVal[0] = local.value.generateCode();
-    gnu.expr.Declaration decl = 
-      res.addDeclaration(local.left.name.toString(),
-			 nice.tools.code.Types.javaType(local.left.type));
-    decl.noteValue(null);
-    local.left.setDeclaration(decl);
+    eVal[0] = local.compile(res);
     
     res.setBody(addLocals(vars,body));
-    res.setLine(local.left.name.location().getLine());
+    res.setLine(local.location().getLine());
     
     return res;
   }

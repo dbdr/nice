@@ -75,7 +75,14 @@ public class Polytype extends Node
   {
     return new mlsub.typing.Polytype(constraint.resolveToLowlevel(),
 				     monotype.resolve(typeScope));
-  }  
+  }
+
+  mlsub.typing.Polytype resolve(TypeMap s)
+  {
+    // this does probably not work if constraint is non-trivial
+    return new mlsub.typing.Polytype(constraint.resolveToLowlevel(),
+				     monotype.resolve(s));
+  }
 
   /************************************************************
    * Printing

@@ -79,7 +79,7 @@ class Info
   int flags; 
   boolean getUnreachable() = (this.flags & 1) != 0;
   void setUnreachable() { this.flags |=  1; }
-  void setReachable()   { this.flags &= (-1)-1; }
+  void setReachable()   { this.flags &= ~1; }
 
   Stack<int> flagsStack;
 

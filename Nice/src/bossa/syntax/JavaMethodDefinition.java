@@ -12,7 +12,7 @@
 
 // File    : JavaMethodDefinition.java
 // Created : Tue Nov 09 11:49:47 1999 by bonniot
-//$Modified: Thu Dec 02 14:59:23 1999 by bonniot $
+//$Modified: Sat Dec 04 12:45:54 1999 by bonniot $
 
 package bossa.syntax;
 
@@ -68,9 +68,10 @@ public class JavaMethodDefinition extends MethodDefinition
     if(className==null)
       MethodDefinition.addMethod(this);
 
-    User.error(javaTypes!=null && javaTypes.size()-1!=javaArity,
-	       this.name,
-	       "Native method "+this.name+" has not the same number of parameters in Java and Bossa !");
+    if(javaTypes!=null && javaTypes.size()-1!=javaArity)
+      User.error(this.name,
+		 "Native method "+this.name+
+		 " has not the same number of parameters in Java and Bossa !");
   }
 
   // Class.forName doesn't report errors nicely, I do it myself !

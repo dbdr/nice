@@ -12,7 +12,7 @@
 
 // File    : TypeScope.java
 // Created : Fri Jul 09 11:29:17 1999 by bonniot
-//$Modified: Wed Dec 01 16:08:25 1999 by bonniot $
+//$Modified: Sat Dec 04 11:14:25 1999 by bonniot $
 
 package bossa.syntax;
 
@@ -79,6 +79,8 @@ class TypeScope
   {
     return map.toString()+";;\n"+outer;
   }
+
+  public bossa.modules.Module module; //non-null only in the global type scope
   
   private TypeScope outer;
   private Map map;

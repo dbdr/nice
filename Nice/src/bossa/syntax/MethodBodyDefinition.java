@@ -12,7 +12,7 @@
 
 // File    : MethodBodyDefinition.java
 // Created : Thu Jul 01 18:12:46 1999 by bonniot
-//$Modified: Fri Dec 03 18:28:48 1999 by bonniot $
+//$Modified: Sat Dec 04 12:48:00 1999 by bonniot $
 
 package bossa.syntax;
 
@@ -72,17 +72,20 @@ public class MethodBodyDefinition extends Node
   
   private void setDefinition(MethodDefinition d)
   {
-    User.error(d==null,this,"Method \""+name+"\" has not been declared");
+    if(d==null)
+      User.error(this,"Method \""+name+"\" has not been declared");
+
     this.definition=d;
     
     // if the method is not a class member,
     // the "this" formal is useless
     if(!d.isMember())
       {
-	User.error(!((Pattern)formals.get(0)).thisAtNothing(),
-		   this,
-		   "Method \""+name+"\" is a global method"+
-		   ", it cannot have a main pattern");
+	if(!((Pattern)formals.get(0)).thisAtNothing())
+	  User.error(this,
+		     "Method \""+name+"\" is a global method"+
+		     ", it cannot have a main pattern");
+
 	formals.remove(0);
       }
     
@@ -129,8 +132,11 @@ public class MethodBodyDefinition extends Node
 	}
     }
     if(symbols.size()==1) return (VarSymbol)symbols.iterator().next();
-    User.error(symbols.size()==0,this,
-	       "No definition of \""+name+"\" is compatible with the patterns");
+
+    if(symbols.size()==0)
+      User.error(this,
+		 "No definition of \""+name+"\" is compatible with the patterns");
+
     User.error(this,"There is an ambiguity about which version of the overloaded method \""+
 	       name+"\" this alternative belongs to.\n"+
 	       "Try to use more patterns.");
@@ -155,8 +161,12 @@ public class MethodBodyDefinition extends Node
     Pattern.resolve(typeScope,formals);
     VarSymbol s=findSymbol(outer);
 
-    User.error(s==null,this,name+" is not defined");
-    User.error(!(s instanceof MethodDefinition),this,name+" is not a method");
+    if(s==null)
+      User.error(this,name+" is not defined");
+    
+    if(!(s instanceof MethodDefinition))
+      User.error(this,name+" is not a method");
+
     setDefinition((MethodDefinition)s);
 
     // Get type parameters
@@ -178,7 +188,7 @@ public class MethodBodyDefinition extends Node
    * Initial Context
    ****************************************************************/
 
-  public void createContext(bossa.modules.Module module)
+  public void createContext()
   {
     //Nothing
   }
@@ -255,7 +265,7 @@ public class MethodBodyDefinition extends Node
    * Code generation
    ****************************************************************/
 
-  public void compile(bossa.modules.Module module)
+  public void compile()
   {
     if(Debug.codeGeneration)
       Debug.println("Compiling "+name);
@@ -287,7 +297,7 @@ public class MethodBodyDefinition extends Node
 	param.setDeclaration(d);
       }
 
-    block.setBody(body.compile());
+    block.setBody(body.generateCode());
 
     lexp.compileAsMethod(module.compilation);
 
@@ -343,6 +353,17 @@ public class MethodBodyDefinition extends Node
        Access.PUBLIC | Access.STATIC);
 
     lexp.compileAsMethod(module.compilation);
+  }
+
+  /****************************************************************
+   * Module
+   ****************************************************************/
+  
+  private bossa.modules.Module module;
+  
+  public void setModule(bossa.modules.Module module)
+  {
+    this.module = module;
   }
 
   /****************************************************************

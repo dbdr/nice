@@ -12,7 +12,7 @@
 
 // File    : Definition.java
 // Created : Thu Jul 01 11:17:28 1999 by bonniot
-//$Modified: Thu Dec 02 18:30:32 1999 by bonniot $
+//$Modified: Sat Dec 04 12:01:19 1999 by bonniot $
 
 package bossa.syntax;
 
@@ -40,7 +40,7 @@ public interface Definition
   /**
    * Creates the initial rigid context.
    */
-  void createContext(bossa.modules.Module module);
+  void createContext();
   
   /**
    * Write the exported interface of the definition
@@ -52,9 +52,11 @@ public interface Definition
 
   /**
    * Generates bytecode for this definition.
-   *
-   * @param moduleClass the class for static elements
-   of the module (alternatives, toplevel variables, ...).
    */
-  void compile(bossa.modules.Module module);
+  void compile();
+  
+  /**
+   * Set the module this definition appears in.
+   */
+  void setModule(bossa.modules.Module module);
 }

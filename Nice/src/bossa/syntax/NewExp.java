@@ -12,7 +12,7 @@
 
 // File    : NewExp.java
 // Created : Thu Jul 08 17:15:15 1999 by bonniot
-//$Modified: Mon Nov 15 20:01:47 1999 by bonniot $
+//$Modified: Sat Dec 04 14:10:50 1999 by bonniot $
 // Description : Allocation of a new object
 
 package bossa.syntax;
@@ -40,8 +40,9 @@ public class NewExp extends Expression
 
   void typecheck()
   {
-    User.error(!tc.instantiable(),this,
-	       tc+" is abstract, it can't be instantiated");
+    if(!tc.instantiable())
+      User.error(this,
+		 tc+" is abstract, it can't be instantiated");
   }
   
   /****************************************************************
@@ -50,8 +51,14 @@ public class NewExp extends Expression
 
   public gnu.expr.Expression compile()
   {
-    return new gnu.expr.NewExp
-      (new gnu.bytecode.ClassType(tc.name.toString()));
+    gnu.bytecode.ClassType ct = new gnu.bytecode.ClassType(tc.name.toString());
+    
+    //return new gnu.expr.NewExp(ct);
+
+    return new gnu.expr.ApplyExp
+      (new gnu.expr.QuoteExp(new gnu.expr.PrimProcedure
+			     (ct,new gnu.bytecode.Type[0])),
+       new gnu.expr.Expression[0]);
   }
   
   /****************************************************************

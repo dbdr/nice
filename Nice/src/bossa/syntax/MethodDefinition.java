@@ -12,7 +12,7 @@
 
 // File    : MethodDefinition.java
 // Created : Thu Jul 01 18:12:46 1999 by bonniot
-//$Modified: Fri Dec 03 18:23:21 1999 by bonniot $
+//$Modified: Sat Dec 04 12:10:46 1999 by bonniot $
 
 package bossa.syntax;
 
@@ -107,17 +107,16 @@ public class MethodDefinition extends PolySymbol implements Definition
   static void compileMethods(bossa.modules.Module module)
   {
     for(Iterator i=methods.iterator();i.hasNext();)
-      ((MethodDefinition)i.next()).compile(module);
+      ((MethodDefinition)i.next()).compile();
   }
   
   /****************************************************************
    * Initial Context
    ****************************************************************/
 
-  public void createContext(bossa.modules.Module module)
+  public void createContext()
   {
     //Nothing
-    setModule(module);
   }
   
   /****************************************************************
@@ -155,7 +154,7 @@ public class MethodDefinition extends PolySymbol implements Definition
     return res;
   }
   
-  public void compile(bossa.modules.Module module)
+  public void compile()
   {
   }
 
@@ -200,7 +199,7 @@ public class MethodDefinition extends PolySymbol implements Definition
   
   bossa.modules.Module module;
   
-  private void setModule(bossa.modules.Module module)
+  public void setModule(bossa.modules.Module module)
   {
     this.module = module;
     bytecodeName = module.mangleName(name.toString());

@@ -12,7 +12,7 @@
 
 // File    : MonotypeConstructor.java
 // Created : Thu Jul 22 09:15:17 1999 by bonniot
-//$Modified: Thu Nov 25 15:17:44 1999 by bonniot $
+//$Modified: Sat Dec 04 14:07:27 1999 by bonniot $
 
 package bossa.syntax;
 
@@ -87,8 +87,9 @@ public class MonotypeConstructor extends Monotype
   
   void typecheck()
   {
-    User.error(tc.variance.size!=parameters.size(),this,
-	       tc.variance.size+" type parameters expected for "+tc);
+    if(tc.variance.size!=parameters.size())
+      User.error(this,
+		 tc.variance.size+" type parameters expected for "+tc);
   }
   
   /****************************************************************

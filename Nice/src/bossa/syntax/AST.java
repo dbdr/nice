@@ -12,7 +12,7 @@
 
 // File    : AST.java
 // Created : Thu Jul 01 11:01:56 1999 by bonniot
-//$Modified: Thu Dec 02 18:30:45 1999 by bonniot $
+//$Modified: Sat Dec 04 12:09:14 1999 by bonniot $
 
 package bossa.syntax;
 
@@ -28,25 +28,30 @@ import java.util.*;
  */
 public class AST extends Node
 {
-  public AST(List defs)
+  public AST(bossa.modules.Module module, List defs)
   {
     super(defs,Node.global);
     
+    this.module=module;
     this.definitions=defs;
+
+    for(Iterator i = defs.iterator();
+	i.hasNext();)
+      ((Definition) i.next()).setModule(module);
   }
   
   public void load()
   {
-    buildScope();
+    buildScope(module);
     doResolve();
   }
   
-  public void createContext(bossa.modules.Module module)
+  public void createContext()
   {
     ClassDefinition.createSpecialContext();
     
     for(Iterator i=definitions.iterator();i.hasNext();)
-      ((Definition) i.next()).createContext(module);
+      ((Definition) i.next()).createContext();
   }
   
   public void typechecking()
@@ -60,13 +65,13 @@ public class AST extends Node
       ((Definition)i.next()).printInterface(s);
   }
 
-  public void compile(bossa.modules.Module module)
+  public void compile()
   {
     // compile all the field accesses that have been generated
     MethodDefinition.compileMethods(module);
     
     for(Iterator i=definitions.iterator();i.hasNext();)
-      ((Definition)i.next()).compile(module);
+      ((Definition)i.next()).compile();
 
     MethodBodyDefinition.compileMain(module);
   }
@@ -76,6 +81,7 @@ public class AST extends Node
     return Util.map(definitions);
   }
 
+  private bossa.modules.Module module;
   private List /* of Definition */ definitions;
 }
 

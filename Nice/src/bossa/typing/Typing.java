@@ -12,7 +12,7 @@
 
 // File    : Typing.java
 // Created : Tue Jul 20 11:57:17 1999 by bonniot
-//$Modified: Fri Dec 03 16:43:15 1999 by bonniot $
+//$Modified: Sat Dec 04 14:16:05 1999 by bonniot $
 
 package bossa.typing;
 
@@ -302,7 +302,8 @@ abstract public class Typing
   public static void assertLeq(InterfaceDefinition i, InterfaceDefinition j)
   {
     if(dbg) Debug.println(i+" < "+j);
-    User.error(!(i.variance.equals(j.variance)),i+" and "+j+" are not comparable");
+    if(!(i.variance.equals(j.variance)))
+      User.error(i+" and "+j+" are not comparable");
     i.variance.subInterface(i.itf,j.itf);
   }
   
@@ -433,9 +434,9 @@ abstract public class Typing
 		else
 		  Engine.forceKind(tags[minFloating],c);
 		setFloatingKinds(tags,minFloating+1,res);
+		tags[minFloating].setKind(null);
 	    }
 	  }
-	tags[minFloating].setKind(null);
       }
     else
       res.addAll(enumerateTags(tags));

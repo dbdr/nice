@@ -12,7 +12,7 @@
 
 // File    : OverloadedSymbolExp.java
 // Created : Thu Jul 08 12:20:59 1999 by bonniot
-//$Modified: Thu Dec 02 14:39:01 1999 by bonniot $
+//$Modified: Sat Dec 04 14:10:45 1999 by bonniot $
 
 package bossa.syntax;
 
@@ -129,8 +129,9 @@ public class OverloadedSymbolExp extends Expression
     if(symbols.size()==1)
       return uniqueExpression();
 
-    User.error(symbols.size()==0,this,
-	       "No alternative matches the parameters while resolving overloading for "+ident);
+    if(symbols.size()==0)
+      User.error(this,
+		 "No alternative matches the parameters while resolving overloading for "+ident);
 
     //There is ambiguity
     User.error(this,"Ambiguity for symbol "+ident+". Possibilities are :\n"+

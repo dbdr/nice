@@ -12,7 +12,7 @@
 
 // File    : JavaTypeConstructor.java
 // Created : Thu Jul 08 11:51:09 1999 by bonniot
-//$Modified: Fri Dec 03 16:52:58 1999 by bonniot $
+//$Modified: Sat Dec 04 11:23:30 1999 by bonniot $
 
 package bossa.syntax;
 
@@ -184,19 +184,34 @@ public class JavaTypeConstructor extends TypeConstructor
   static JavaTypeConstructor lookup(LocatedString className)
   {
     Class c=null;
-    try{
-      c=Class.forName(className.content);
-    }
-    catch(ClassNotFoundException e){
+    String pkg = null;    
+    
+    try{ c=Class.forName(className.content); }
+    catch(ClassNotFoundException e){ }
+
+    if(c==null)
+      for(Iterator i = globalTypeScope.module.listImplicitPackages();
+	  i.hasNext();)
+	{
+	  pkg = (String) i.next();
+	  
+	  try{ c=Class.forName(pkg+"."+className.content); break; }
+	  catch(ClassNotFoundException e){ }
+	}
+    
+    if(c==null)
       return null;
-    }
 
     if(Debug.javaTypes)
       Debug.println("Registering java class "+className);
     
-    JavaTypeConstructor res = JavaTypeConstructor.make(className);
+    JavaTypeConstructor res = JavaTypeConstructor.make(c.getName());
     ClassDefinition.addSpecialTypeConstructor(res);
     globalTypeScope.addSymbol(res);
+    
+    // Remembers the short name as an alias
+    if(pkg!=null)
+      globalTypeScope.addMapping(className,res);
     
     return res;
   }

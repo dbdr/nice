@@ -12,19 +12,21 @@
 
 // File    : io.bossa
 // Created : Mon Nov 08 19:46:09 1999 by bonniot
-//$Modified: Fri Dec 03 17:41:05 1999 by bonniot $
+//$Modified: Sat Dec 04 11:32:40 1999 by bonniot $
 
 import prelude;
 
-native void native_println(java.io.PrintStream,java.lang.String) =
+import java.io.*;
+
+native void native_println(PrintStream,String) =
   void java.io.PrintStream.println(java.lang.String);
 
-native java.io.PrintStream stdout() = java.lang.System.out;
-native java.io.PrintStream stderr() = java.lang.System.err;
+native PrintStream stdout() = java.lang.System.out;
+native PrintStream stderr() = java.lang.System.err;
 
-void println<Any T>(java.io.PrintStream, T);
+void println<Any T>(PrintStream, T);
 println(ps,object)    = native_println(ps,toString(object));
-println(ps,str@java.lang.String)= native_println(ps,str);
+println(ps,str@String)= native_println(ps,str);
 
 void println<Any T>(T);
 println(object)
@@ -32,15 +34,14 @@ println(object)
   println(stdout(),toString(object));
 }
 
-println(s@java.lang.String)
+println(s@String)
 {
   println(stdout(),s);
 }
 
 main(args)
 {
-  java.lang.String helloWorld = "Hello, world !";
-  println("toto");
-  println(stdout(),helloWorld);
-  println(stdout(),args);
+  String helloWorld = "Hello, world !";
+  println(helloWorld);
+  println(args);
 }

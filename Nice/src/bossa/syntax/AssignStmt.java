@@ -12,7 +12,7 @@
 
 // File    : AssignStmt.java
 // Created : Mon Jul 05 15:49:27 1999 by bonniot
-//$Modified: Wed Dec 01 16:10:40 1999 by bonniot $
+//$Modified: Sat Dec 04 14:17:36 1999 by bonniot $
 
 package bossa.syntax;
 
@@ -46,7 +46,10 @@ public class AssignStmt extends Statement
   void typecheck()
   {
     to=to.noOverloading();
-    User.error(!to.isAssignable(),to+" cannot be assigned a value");
+
+    if(!to.isAssignable())
+      User.error(this,to+" cannot be assigned a value");
+
     try{
       checkAssignment(to.getType(),value);
     }
@@ -60,17 +63,9 @@ public class AssignStmt extends Statement
    * Code generation
    ****************************************************************/
 
-  public gnu.expr.Expression compile()
+  public gnu.expr.Expression generateCode()
   {
     return to.compileAssign(value);
-    
-//      gnu.expr.Declaration decl=to.declaration();
-    
-//      if(decl!=null)
-//        return new gnu.expr.SetExp(decl,value.compile());
-	
-//      Internal.warning(this,"Assignment to "+to.getClass());
-//      return new gnu.expr.SetExp(to.toString(),value.compile());
   }
   
   /****************************************************************

@@ -12,7 +12,7 @@
 
 // File    : FunExp.java
 // Created : Mon Jul 12 15:09:50 1999 by bonniot
-//$Modified: Fri Nov 05 17:30:14 1999 by bonniot $
+//$Modified: Sat Dec 04 14:14:59 1999 by bonniot $
 // Description : A functional expression
 
 package bossa.syntax;
@@ -43,8 +43,9 @@ public class FunExp extends Expression
     
     Polytype returnType=body.getType();
     
-    User.error(returnType==null,"The last statement of "+this+
-	       "must be a return statement");
+    if(returnType==null)
+      User.error(this,"The last statement of "+this+
+		 "must be a return statement");
  
     type=new Polytype(Constraint.and(constraint,returnType.getConstraint()),
 		      new FunType(MonoSymbol.getMonotype(formals),
@@ -57,7 +58,7 @@ public class FunExp extends Expression
 
   public gnu.expr.Expression compile()
   {
-    return new gnu.expr.LambdaExp(body.compile());
+    return new gnu.expr.LambdaExp(body.generateCode());
   }
   
   /****************************************************************

@@ -12,7 +12,7 @@
 
 // File    : Node.java
 // Created : Thu Jul 08 10:24:56 1999 by bonniot
-//$Modified: Wed Dec 01 14:49:45 1999 by bonniot $
+//$Modified: Sat Dec 04 12:18:10 1999 by bonniot $
 
 package bossa.syntax;
 
@@ -143,8 +143,10 @@ abstract public class Node
     return globalTypeScope;
   }
   
-  void buildScope()
+  void buildScope(bossa.modules.Module module)
   {
+    globalTypeScope.module = module;
+    
     buildScope(globalScope,globalTypeScope);
   }
   
@@ -288,7 +290,8 @@ abstract public class Node
   protected VarScope scope;
   protected TypeScope typeScope;
 
-  private List children, varSymbols, typeSymbols;
+  protected List children;
+  private List varSymbols, typeSymbols;
   int propagate;  
   private List typeMapsSymbols,typeMapsNames;
 }

@@ -12,7 +12,7 @@
 
 // File    : Statement.java
 // Created : Mon Jul 05 15:48:25 1999 by bonniot
-//$Modified: Fri Nov 05 18:40:47 1999 by bonniot $
+//$Modified: Sat Dec 04 12:06:48 1999 by bonniot $
 
 package bossa.syntax;
 
@@ -40,7 +40,7 @@ public abstract class Statement extends Node
    * Code generation
    ****************************************************************/
 
-  abstract gnu.expr.Expression compile();
+  abstract gnu.expr.Expression generateCode();
 
   static gnu.expr.Expression[] compile(List statements)
   {
@@ -48,7 +48,7 @@ public abstract class Statement extends Node
     int n=0;
     for(Iterator i=statements.iterator();
 	i.hasNext();n++)
-      res[n]=((Statement)i.next()).compile();
+      res[n]=((Statement)i.next()).generateCode();
     return res;
   }
 

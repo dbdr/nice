@@ -12,7 +12,7 @@
 
 // File    : TypeConstructor.java
 // Created : Thu Jul 08 11:51:09 1999 by bonniot
-//$Modified: Mon Nov 29 12:26:37 1999 by bonniot $
+//$Modified: Sat Dec 04 14:09:42 1999 by bonniot $
 
 package bossa.syntax;
 
@@ -82,7 +82,8 @@ public class TypeConstructor
   {
     if(variance!=null)
       {
-	User.error(!(variance.equals(v)),this,"Incorrect variance for "+this);
+	if(!(variance.equals(v)))
+	  User.error(this,"Incorrect variance for "+this);
 	return;
       }
     this.variance=v;
@@ -166,7 +167,8 @@ public class TypeConstructor
     if(definition==null)
       {
 	TypeSymbol s=typeScope.lookup(name);
-	User.error(s==null,this,"Class "+name+" is not defined"," in "+typeScope);
+	if(s==null)
+	  User.error(this,"Class "+name+" is not defined"," in "+typeScope);
 	
 	if(s instanceof TypeConstructor)
 	  return (TypeConstructor)s;
@@ -182,13 +184,10 @@ public class TypeConstructor
   {
     if(definition==null)
       {
-	// Should not be usefull anymore
-	/*
-	  if(name.content.startsWith("Top"))
-	  return InterfaceDefinition.top(Integer.parseInt(name.content.substring(3)));
-	*/
 	TypeSymbol s=typeScope.lookup(name);
-	User.error(s==null,this,"Class or interface "+name+" is not defined");
+	if(s==null)
+	  User.error(this,"Class or interface "+name+" is not defined");
+
 	return s;
       }
     return this;

@@ -12,7 +12,7 @@
 
 // File    : Engine.java
 // Created : Tue Jul 27 15:34:53 1999 by bonniot
-//$Modified: Fri Dec 03 16:32:44 1999 by bonniot $
+//$Modified: Sat Dec 04 12:38:23 1999 by bonniot $
 
 package bossa.engine;
 
@@ -371,6 +371,9 @@ public abstract class Engine
   
   public static Engine.Constraint getConstraint(Kind kind)
   {
+    if(kind instanceof Engine.Constraint)
+      return (Engine.Constraint) kind;
+    
     Engine.Constraint res=(Engine.Constraint) kindsMap.get(kind);
     if(res!=null)
       return res;
@@ -401,7 +404,7 @@ public abstract class Engine
   static
   {
     variablesConstraint = new Engine.Constraint("type variables",true);
-    kindsMap.put(variablesConstraint,variablesConstraint);
+    //kindsMap.put(variablesConstraint,variablesConstraint);
   }  
   
   /** The list of Constraints */

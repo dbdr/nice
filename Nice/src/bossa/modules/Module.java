@@ -12,7 +12,7 @@
 
 // File    : Module.java
 // Created : Wed Oct 13 16:09:47 1999 by bonniot
-//$Modified: Fri Dec 03 19:04:22 1999 by bonniot $
+//$Modified: Sat Dec 04 11:57:40 1999 by bonniot $
 
 package bossa.modules;
 
@@ -42,7 +42,7 @@ public class Module
       User.error("Invalid file name: "+name);
     this.name=name.substring(0,name.lastIndexOf("."));
     this.imports=imports;
-    this.definitions=new AST(definitions);
+    this.definitions=new AST(this,definitions);
   }
 
   public static void compile(LocatedString file) throws IOException
@@ -86,7 +86,7 @@ public class Module
     if(dbg) Debug.println("Loading "+this);
     loadImports();
     definitions.load();
-    definitions.createContext(this);
+    definitions.createContext();
   }
   
   private void loadImports()
@@ -94,6 +94,13 @@ public class Module
     for(Iterator i=imports.iterator();i.hasNext();) 
       {
 	LocatedString name = (LocatedString)i.next();
+	
+	if(name.toString().endsWith(".*"))
+	  {
+	    addImplicitPackageOpen(name.toString().substring(0,name.toString().length()-2));
+	    continue;
+	  }
+	
 	LocatedString itfName = name.cloneLS();
 	itfName.append(interfaceExt);
 	String bytecodeName = name.toString()+".class";	
@@ -180,7 +187,7 @@ public class Module
 
     compilation = new gnu.expr.Compilation(bytecode,name,name,"prefix",false);
     
-    definitions.compile(this);
+    definitions.compile();
     compilation.compileClassInit(initStatements);
     
     addClass(bytecode);
@@ -230,6 +237,25 @@ public class Module
   }
   
   /****************************************************************
+   * Packages
+   ****************************************************************/
+
+  private void addImplicitPackageOpen(String pkg)
+  {
+    openedPackages.add(pkg);
+  }
+  
+  private List openedPackages = new LinkedList();
+  {
+    openedPackages.add("java.lang");
+  }
+  
+  public ListIterator listImplicitPackages()
+  {
+    return openedPackages.listIterator();
+  }
+  
+  /****************************************************************
    * Mangling
    ****************************************************************/
 
@@ -247,7 +273,7 @@ public class Module
   }
   
   private List initStatements = new LinkedList();
-  
+    
   public void addClassInitStatement(gnu.expr.Expression exp)
   {
     initStatements.add(exp);

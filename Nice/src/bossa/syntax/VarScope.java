@@ -12,7 +12,7 @@
 
 // File    : VarScope.java
 // Created : Fri Jul 09 11:28:11 1999 by bonniot
-//$Modified: Wed Oct 13 17:45:06 1999 by bonniot $
+//$Modified: Sat Dec 04 14:10:13 1999 by bonniot $
 
 package bossa.syntax;
 
@@ -78,7 +78,8 @@ class VarScope
     Collection i=lookup(s);
     if(i==null || i.size()==0)
       return null;
-    User.error(i.size()>1,s,s+"'s usage is ambiguous");
+    if(i.size()>1)
+      User.error(s,s+"'s usage is ambiguous");
     return (VarSymbol)i.iterator().next();
   }
 

@@ -12,7 +12,7 @@
 
 // File    : Monotype.java
 // Created : Thu Jul 01 19:28:28 1999 by bonniot
-//$Modified: Mon Nov 29 11:52:39 1999 by bonniot $
+//$Modified: Sat Dec 04 14:17:38 1999 by bonniot $
 // Description : Abstract syntactic type, without constraint
 
 package bossa.syntax;
@@ -91,7 +91,10 @@ abstract public class Monotype
       { 
 	Monotype old=(Monotype)i.next();
 	Monotype nou=old.resolve(s);
-	User.error(nou==null,old+" : Monotype not defined");
+
+	if(nou==null)
+	  User.error(old,old+" : Monotype not defined");
+
 	res.add(nou);
       }
     return res;

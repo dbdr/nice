@@ -12,7 +12,7 @@
 
 // File    : ClassDefinition.java
 // Created : Thu Jul 01 11:25:14 1999 by bonniot
-//$Modified: Thu Dec 02 18:30:55 1999 by bonniot $
+//$Modified: Sat Dec 04 12:19:33 1999 by bonniot $
 
 package bossa.syntax;
 
@@ -190,7 +190,7 @@ public class ClassDefinition extends Node
    * Initial Context
    ****************************************************************/
 
-  public void createContext(bossa.modules.Module module)
+  public void createContext()
   {
     try{
       Typing.initialLeq(tc,extensions);
@@ -392,7 +392,7 @@ public class ClassDefinition extends Node
    * Code generation
    ****************************************************************/
 
-  public void compile(bossa.modules.Module module)
+  public void compile()
   {
     if(!isSharp)
       return;
@@ -449,6 +449,24 @@ public class ClassDefinition extends Node
       }
   }
   
+  /****************************************************************
+   * Module
+   ****************************************************************/
+  
+  private bossa.modules.Module module;
+  
+  public void setModule(bossa.modules.Module module)
+  {
+    this.module = module;
+    for(Iterator i = children.iterator();
+	i.hasNext();)
+      {
+	Object child = i.next();
+	if(child instanceof Definition)
+	  ((Definition) child).setModule(module);
+      }
+  }
+
   /****************************************************************
    * Printing
    ****************************************************************/

@@ -12,7 +12,7 @@
 
 // File    : Block.java
 // Created : Wed Jul 07 17:42:15 1999 by bonniot
-//$Modified: Wed Dec 01 17:29:45 1999 by bonniot $
+//$Modified: Sat Dec 04 12:09:20 1999 by bonniot $
 // Description : A block : a list of statements with local variables
 
 package bossa.syntax;
@@ -143,7 +143,7 @@ public class Block extends Statement
    * Code generation
    ****************************************************************/
 
-  public gnu.expr.Expression compile()
+  public gnu.expr.Expression generateCode()
   {
     if(statements.size()==0)
       return new gnu.expr.QuoteExp(null);

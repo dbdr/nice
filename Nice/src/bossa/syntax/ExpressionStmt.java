@@ -12,7 +12,7 @@
 
 // File    : ExpressionStmt.java
 // Created : Mon Jul 05 17:23:36 1999 by bonniot
-//$Modified: Tue Nov 30 17:04:48 1999 by bonniot $
+//$Modified: Sat Dec 04 12:09:18 1999 by bonniot $
 // Description : Compute an expression an forget the value
 
 package bossa.syntax;
@@ -47,7 +47,7 @@ public class ExpressionStmt extends Statement
    * Code generation
    ****************************************************************/
 
-  public gnu.expr.Expression compile()
+  public gnu.expr.Expression generateCode()
   {
     return exp.compile();
   }

@@ -12,26 +12,21 @@
 
 // File    : User.java
 // Created : Wed Jul 07 18:20:58 1999 by bonniot
-//$Modified: Wed Dec 01 16:15:54 1999 by bonniot $
+//$Modified: Sat Dec 04 14:14:36 1999 by bonniot $
 
 package bossa.util;
 
 /**
  * Messages for the user.
+ *
+ * When the error or warning is conditional, 
+ * put it inside a 'if'.
+ * This is better than passing a boolean to error(), 
+ * since the latter, forcing evaluation of the string,
+ * would slow down compilation.
  */
 public class User
 {
-  public static void error(boolean condition, Located responsible, String message, String dbgMsg)
-  {
-    if(condition)
-      error(responsible,message,dbgMsg);
-  }
-
-  public static void error(boolean condition, Located responsible, String message)
-  {
-    error(condition,responsible,message,"");
-  }
-  
   public static void error(Located responsible, String message, String dbgMsg)
   {
     if(Debug.errorMsg)
@@ -49,12 +44,6 @@ public class User
       error(responsible.location()+message);
   }
 
-  public static void error(boolean condition, String message)
-  {
-    if(condition)
-      error(message);
-  }
-
   public static void error(String message)
   {
     System.out.println(message);
@@ -70,11 +59,4 @@ public class User
   {
     System.out.println("[Warning] "+message);
   }
-
-  public static void warning(boolean condition, String message)
-  {
-    if(condition)
-      warning(message);
-  }
-
 }

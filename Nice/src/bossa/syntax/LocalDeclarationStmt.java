@@ -12,7 +12,7 @@
 
 // File    : LocalDeclarationStmt.java
 // Created : Tue Jul 06 12:06:20 1999 by bonniot
-//$Modified: Fri Dec 03 17:49:37 1999 by bonniot $
+//$Modified: Sat Dec 04 12:08:47 1999 by bonniot $
 
 package bossa.syntax;
 
@@ -53,7 +53,7 @@ public class LocalDeclarationStmt extends Statement
    * Initial Context
    ****************************************************************/
 
-  public void createContext(bossa.modules.Module module)
+  public void createContext()
   {
     // No really the rigid context, but it is the right time to do this.
     // (must be done after resolving).
@@ -108,7 +108,7 @@ public class LocalDeclarationStmt extends Statement
 
   private gnu.expr.Declaration declaration;
   
-  public void compile(bossa.modules.Module module)
+  public void compile()
   {
     if(declaration.field!=null)
       Internal.error(this,
@@ -125,12 +125,22 @@ public class LocalDeclarationStmt extends Statement
 	(new gnu.expr.SetExp(declaration,value.compile()));    
   }
 
-  public gnu.expr.Expression compile()
+  public gnu.expr.Expression generateCode()
   {
-    Internal.error("compile local");
+    Internal.error(this,"generateCode in "+this.getClass());
     return null;  
-  }
+  }  
+
+  /****************************************************************
+   * Module
+   ****************************************************************/
   
+  private bossa.modules.Module module;
+  
+  public void setModule(bossa.modules.Module module)
+  {
+    this.module = module;
+  }
 
   /****************************************************************
    * Printing

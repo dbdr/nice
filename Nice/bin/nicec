@@ -2,41 +2,13 @@
 
 ### The Nice compiler
 ###
-### Copyright 2000 Daniel Bonniot
+### Copyright 2003 Daniel Bonniot
 
-JAVA=${JAVA-java}
-
-usage_nicer()
-{
-  echo "usage: nicer path/to/file.jar"
-  exit 1
-}
-
-## Parsing command line arguments
-
-read_java_arg()
-{
-    if [ "x$1" = "x-g" ]; then
-      JAVA="java_g -Djava.compiler=NONE"
-    else
-      JAVA="${JAVA} $1"
-    fi
-}
-
-## Testing if nice is properly installed
-
-test_installation()
-{
-    if [ ! -r ${NICE} ]; then
-	echo "Nice was not found in ${NICE}"
-	echo "Please move the nice.jar file there"
-	echo "or set the NICE environment variable to the location of the nice.jar file"
-	exit 1
-    fi
-}
+### The Java Virtual Machine can be specified in the JAVA environment variable.
+### Arguments prefixed by -J will be passed to the JVM.
 
 
-## Locating nice home
+## Locating Nice home
 
 find_home()
 {
@@ -60,16 +32,18 @@ find_home()
   fi
 }
 
-## Main part
+## Parsing special command line arguments
 
+java=${JAVA-java}
 scriptName="$0"
-progname=`basename $0`
 experimental=false
 
 while true; do 
   case "x$1" in
-    x-J*) read_java_arg "`expr substr "$1" 3 1000`";;
-    x-e)  experimental=true ;;
+    x-J*) 
+	  java="${java} `expr substr \"$1\" 3 1000`";;
+    x-e)  
+	  experimental=true ;;
     *) break;;
     esac
   shift
@@ -80,52 +54,28 @@ if [ -z "$NICEC_JAR" ]; then
   NICEC_JAR=${APPHOME}/share/java/nice.jar
 fi
 
-case $progname in
-  nicec) 
-    # Having a trailing ":" at the end of CLASSPATH seems to act as ":." on some platforms.
-    # We don't want that by default (if CLASSPATH is empty).
-    if [ -z "${CLASSPATH}" ]; then
-	CLASSPATH=${NICEC_JAR}
-    else
-	CLASSPATH=${NICEC_JAR}:${CLASSPATH}
-    fi
-    if [ $experimental = true ]; then
-	CLASSPATH=${APPHOME}/classes:${APPHOME}/classes.old:${CLASSPATH}
-    fi
-    export CLASSPATH
+# Having a trailing ":" at the end of CLASSPATH seems to act as ":." on some platforms.
+# We don't want that by default (if CLASSPATH is empty).
+if [ -z "${CLASSPATH}" ]; then
+    CLASSPATH=${NICEC_JAR}
+else
+    CLASSPATH=${NICEC_JAR}:${CLASSPATH}
+fi
 
-    system_args="--runtime=${NICEC_JAR}"
+if [ $experimental = true ]; then
+    CLASSPATH=${APPHOME}/classes:${APPHOME}/classes.old:${CLASSPATH}
+fi
 
-    gcj="`which gcj 2>/dev/null`"
-    # Check the string found is really a file
-    # This is a work-around for a bug in OS X: 
-    #   which gcj returns 0 (success) and prints "no gcj in $PATH"
-    if [ -f "$gcj" ]; then
-        system_args="${system_args} --native-compiler=${gcj}"
-    fi
+export CLASSPATH
 
-    exec ${JAVA} nice.tools.compiler.fun ${system_args} "$@"
-  ;;
-  nicer) 
-    jar=$1
-    if [ -z "$jar" ]; then
-      usage_nicer
-    elif [ ! -f "$jar" ]; then
-      if [ -f "${jar}.jar" ]; then
-        jar="${jar}.jar"
-      else
-        echo "$jar does not exist"
-        usage_nicer
-      fi
-    fi
-    shift
+system_args="--runtime=${NICEC_JAR}"
 
-    CLASSPATH=$jar:${NICEC}:$CLASSPATH
-    export CLASSPATH
-    exec ${JAVA} nice.tools.runJar ${jar} "$@"
-  ;;
-  *)
-    echo "unknow nice command: ${progname}"
-    exit 1
-  ;;
-esac
+gcj="`which gcj 2>/dev/null`"
+# Check the string found is really a file
+# This is a work-around for a bug in OS X: 
+#   which gcj returns 0 (success) and prints "no gcj in $PATH"
+if [ -f "$gcj" ]; then
+    system_args="${system_args} --native-compiler=${gcj}"
+fi
+
+exec ${java} nice.tools.compiler.fun ${system_args} "$@"

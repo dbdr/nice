@@ -23,6 +23,11 @@ import java.io.*;
 class HTMLWriter {
   //mainPackage = mainPackage.deleteAtEnd("/").replace('/', ".");
   
+  /**
+   * Default implementation - does nothing
+   * @param d a definition to document
+   * @param packageName the name of the package this definition is in.
+   */
   void write(Definition d, String packageName) {
   }
 
@@ -46,7 +51,7 @@ class HTMLWriter {
     
     writer.write(getHeader(c.getName().toString()));
 
-    writer.write("<h1>Class " + c.getName() + "</h1>");
+    writer.write("<h1>Class " + c.getName() + "</h1>\n");
 
     //Print hierarchy
     ArrayList<ClassDefinition.Class> list = new ArrayList();
@@ -69,19 +74,28 @@ class HTMLWriter {
         spaces = spaces + ' ';
       hierarchy = list.get(i).getName() + "\n" + spaces + "|\n" + spaces + "+--" + hierarchy;
     }
-    writer.write("<pre>");
+    writer.write("<pre>\n");
     writer.write(hierarchy);
-    writer.write("</pre>");
+    writer.write("</pre>\n");
 
     //Implemented interfaces
     ClassDefinition.Interface[?] interfaces = c.getImplementedInterfaces();
-    if(interfaces != null) {
-      writer.write("<b>Implemented interfaces:</b>");
-      writer.write("<ul>");
+    if(interfaces != null && interfaces.length > 0) {
+      writer.write("<b>Implemented interfaces:</b>\n");
+      writer.write("<ul>\n");
       interfaces.foreach(ClassDefinition.Interface i => 
-  		         writer.write("<li>" + i.getName() + "</li>"));
-      writer.write("</ul>");
+  		         writer.write("<li>" + i.getName() + "</li>\n"));
+      writer.write("</ul>\n");
     }
+    
+    writer.write("<p>\n");
+    String comments;
+    if(c.docString() != null)
+        comments = notNull(c.docString());
+    else
+        comments = "null";
+    writer.write(comments + "\n");
+    writer.write("</p>\n");
 
     writer.write(getFooter());
     writer.close();
@@ -101,13 +115,18 @@ class HTMLWriter {
     
     writer.write(getHeader(gv.getName().toString()));
   
-    writer.write("<h1>Global Variable " + gv.getName() + "</h1>");
+    writer.write("<h1>Global Variable " + gv.getName() + "</h1>\n");
   
     writer.write(htmlSafe(gv.toString()));
   
-    writer.write("<p>");
-    writer.write("");
-    writer.write("</p>");
+    writer.write("<p>\n");
+    String comments;
+    if(gv.docString() != null)
+        comments = notNull(gv.docString());
+    else
+        comments = "null";
+    writer.write(comments + "\n");
+    writer.write("</p>\n");
  
     writer.write(getFooter());
     writer.close();
@@ -117,7 +136,7 @@ class HTMLWriter {
     //Handle methods
     
     //Initialise a FileWriter
-    File dir = new File(outdir, packageName.replace('.',java.io.File.separator));
+    File dir = new File(outdir, packageName.replace('.', java.io.File.separator));
     if(!dir.exists() && !dir.mkdirs()) {
         System.err.println("Error creating directory structure");
     }
@@ -127,12 +146,18 @@ class HTMLWriter {
     
     writer.write(getHeader(m.getName().toString()));
   
-    writer.write("<h1>Method " + m.getName() + "</h1>");
+    writer.write("<h1>Method " + m.getName() + "</h1>\n");
   
     writer.write(htmlSafe(m.toString()));
   
+    writer.write("<p>\n");
     writer.write("<p>");
-    writer.write("nicedoc comments would go here...");
+    String comments;
+    if(m.docString() != null)
+        comments = notNull(m.docString());
+    else
+        comments = "null";
+    writer.write(comments + "\n");
     writer.write("</p>");
  
     writer.write(getFooter());

@@ -12,7 +12,7 @@
 
 // File    : Polytype.java
 // Created : Tue Jul 13 12:51:38 1999 by bonniot
-//$Modified: Sat Mar 11 16:00:20 2000 by Daniel Bonniot $
+//$Modified: Wed Apr 05 14:50:53 2000 by Daniel Bonniot $
 
 package bossa.syntax;
 
@@ -98,12 +98,6 @@ public class Polytype extends Node
     return new Polytype(new Constraint(newBinders,AtomicConstraint.substitute(map,constraint.atomics)),monotype.substitute(map));
   }
   
-  //Acces methods
-  public List getTypeParameters()
-  {
-    return new ArrayList(0);
-  }
-
   public Constraint getConstraint()
   {
     return constraint;

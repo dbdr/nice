@@ -12,7 +12,7 @@
 
 // File    : StaticFieldAccess.java
 // Created : Thu Jul 01 18:12:46 1999 by bonniot
-//$Modified: Wed Mar 29 16:57:46 2000 by Daniel Bonniot $
+//$Modified: Wed Apr 05 14:51:06 2000 by Daniel Bonniot $
 
 package bossa.syntax;
 
@@ -137,7 +137,6 @@ public class StaticFieldAccess extends MethodDefinition
       + getType().codomain().toString()
       + " "
       + symbol.name
-      + Util.map("<",", ",">",getType().getTypeParameters())
       + "("
       + Util.map("",", ","",getType().domain())
       + ") = native "

@@ -150,11 +150,17 @@ final public class BitMatrix implements Cloneable {
       BitVector row = rows[i];
       if (row != null) {
         int ncols = row.size();
-        for (int j = 0; j < ncols; j++) {
-          if (row.get(j)) {
-            m.set(j, i);
-          }
+	for (int j = row.getLowestSetBit();
+	     j>=0;
+	     j = row.getLowestSetBit(j+1))
+	  m.set(j, i);
+        /*
+	for (int j = 0; j < ncols; j++) {
+	  if (row.get(j)) {
+	    m.set(j, i);
+	  }
         }
+	*/
       }
     }
     return m;

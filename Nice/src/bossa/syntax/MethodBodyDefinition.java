@@ -12,7 +12,7 @@
 
 // File    : MethodBodyDefinition.java
 // Created : Thu Jul 01 18:12:46 1999 by bonniot
-//$Modified: Mon Mar 13 17:42:08 2000 by Daniel Bonniot $
+//$Modified: Wed Apr 05 14:50:00 2000 by Daniel Bonniot $
 
 package bossa.syntax;
 
@@ -147,7 +147,6 @@ public class MethodBodyDefinition extends Definition
 	  try{
 	    int level=Typing.enter("Trying definition "+m+" for method body "+name);
 	    try{
-	      Typing.introduce(m.symbol.type.getTypeParameters());
 	      m.symbol.type.getConstraint().assert();
 	      Typing.in(Pattern.getPolytype(formals),
 		      Domain.fromMonotypes(m.getType().domain()));
@@ -274,8 +273,7 @@ public class MethodBodyDefinition extends Definition
   {
     lateBuildScope();
 
-    Typing.enter(definition.getType().getTypeParameters(),
-		 "method body of "+name);
+    Typing.enter("method body of "+name);
     
     try{
       try { definition.getType().getConstraint().assert(); }

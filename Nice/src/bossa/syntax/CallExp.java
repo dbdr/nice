@@ -12,7 +12,7 @@
 
 // File    : CallExp.java
 // Created : Mon Jul 05 16:27:27 1999 by bonniot
-//$Modified: Tue Apr 04 16:10:01 2000 by Daniel Bonniot $
+//$Modified: Wed Apr 05 15:01:55 2000 by Daniel Bonniot $
 
 package bossa.syntax;
 
@@ -55,31 +55,27 @@ public class CallExp extends Expression
   }
   
   static Polytype wellTyped(Expression fun,
-			   List /* of Polytype */ parameters)
+			    List /* of Polytype */ parameters)
   {
     try{
-      Polytype t = getType(fun,parameters);
+      Polytype t = getType(fun.getType(),parameters);
       return t;
     }
-    catch(ReportErrorEx e){
-      return null;
-    }
-    catch(TypingEx e){
-      return null;
-    }
-    catch(BadSizeEx e){
-      return null;
-    }
+    catch(ReportErrorEx e){}
+    catch(TypingEx e){}
+    catch(BadSizeEx e){}
+
+    return null;
   }
   
   static Polytype getTypeAndReportErrors(Location loc,
-				     Expression fun,
-				     List /* of Expression */ parameters)
+					 Expression fun,
+					 List /* of Expression */ parameters)
   {
     List paramTypes = Expression.getType(parameters);
     
     try{
-      return getType(fun,paramTypes);
+      return getType(fun.getType(),paramTypes);
     }
     catch(BadSizeEx e){
       User.error(loc,e.expected+" parameters expected, "+
@@ -121,24 +117,20 @@ public class CallExp extends Expression
     ReportErrorEx(String msg) { super(msg); }
   }
   
-  private static Polytype getType(Expression fun,
+  private static Polytype getType(Polytype funt,
 				  List /* of Polytype */ parameters)
     throws TypingEx,BadSizeEx,ReportErrorEx
   {
-    Polytype funt=fun.getType();
-
     Collection dom=funt.domain();
     Monotype codom=funt.codomain();
 
     if(dom==null || codom==null)
-      throw new ReportErrorEx(fun+" is not a function");
+      throw new ReportErrorEx("Not a function");
 
-    Typing.enter(funt.getTypeParameters(),"call "+fun);
+    Typing.enter("call ?");
     
     try
       {
-	Typing.implies();
-
 	try{ funt.getConstraint().assert(); }
 	catch(TypingEx e) { 
 	  throw new ReportErrorEx

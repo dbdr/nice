@@ -83,7 +83,7 @@ public class BitVector implements Cloneable, java.io.Serializable {
    * Clears a bit.
    * @param bit the bit to be cleared
    */
-  public void clear(int bit) {
+  final public void clear(int bit) {
     if (bit < 0) {
       throw new IndexOutOfBoundsException(Integer.toString(bit));
     }
@@ -95,17 +95,15 @@ public class BitVector implements Cloneable, java.io.Serializable {
    * Gets a bit.
    * @param bit the bit to be gotten
    */
-  public boolean get(int bit) {
+  final public boolean get(int bit) {
     if (bit < 0) {
       throw new IndexOutOfBoundsException(Integer.toString(bit));
     }
-    boolean result = false;
     int n = subscript(bit);     /* always positive */
     
-    if (n < bits.length) {
-      result = ((bits[n] & (1L << (bit & MASK))) != 0L);
-    }
-    return result;
+    if (n < bits.length)
+      return (bits[n] & (1L << (bit & MASK))) != 0L;
+    return false;
   }
 
   /**
@@ -355,7 +353,7 @@ public class BitVector implements Cloneable, java.io.Serializable {
   /**
    * Clones the BitVector.
    */
-  public Object clone() {
+  final public Object clone() {
     BitVector result = null;
     try {
       result = (BitVector) super.clone();
@@ -488,7 +486,7 @@ public class BitVector implements Cloneable, java.io.Serializable {
     int n = bits.length;
     int i = subscript(pos);
     if (i >= n) {
-      return -1;
+      return UNDEFINED_INDEX; // was -1, Alex's bug?
     } else {
       long chunk = bits[i] & ((~0L) << (pos & MASK));
       while (true) {
@@ -703,6 +701,14 @@ public class BitVector implements Cloneable, java.io.Serializable {
    * union of all M.getRow(i) such that v.get(i) is true.
    **/
   final public void addProduct(BitMatrix M, BitVector v) {
+    int n = M.size();
+    
+    for(int i = v.getLowestSetBit(); 
+	i >= 0;
+	i = v.getLowestSetBit(i+1))
+      or(M.getRow(i));
+  }
+  final public void slowaddProduct(BitMatrix M, BitVector v) {
     int n = M.size();
     for (int i = 0; i < n; i++) {
       if (v.get(i)) {

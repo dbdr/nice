@@ -12,7 +12,7 @@
 
 // File    : Dispatch.java
 // Created : Mon Nov 15 10:36:41 1999 by bonniot
-//$Modified: Wed Feb 23 17:36:52 2000 by Daniel Bonniot $
+//$Modified: Wed Apr 05 16:14:28 2000 by Daniel Bonniot $
 
 package bossa.link;
 
@@ -158,8 +158,8 @@ public class Dispatch
    */
   private static void test(MethodDefinition method, TypeConstructor[] tags, final Stack sortedAlternatives)
   {
-    if(Debug.linkTests)
-      Debug.println(Util.map("Multitag: ",", ","",tags));
+    //if(Debug.linkTests)
+    //Debug.println(Util.map("Multitag: ",", ","",tags));
 
     // Tests that a match exists, and that the first match is a "best-match"
 

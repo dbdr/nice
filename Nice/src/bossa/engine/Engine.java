@@ -12,7 +12,7 @@
 
 // File    : Engine.java
 // Created : Tue Jul 27 15:34:53 1999 by bonniot
-//$Modified: Mon Apr 03 16:30:57 2000 by Daniel Bonniot $
+//$Modified: Wed Apr 05 16:42:43 2000 by Daniel Bonniot $
 
 package bossa.engine;
 
@@ -108,7 +108,7 @@ public abstract class Engine
     }
   }
   
-  static void backtrack()
+  public static void backtrack()
   {
     for(Iterator i=constraints.iterator();
 	i.hasNext();)

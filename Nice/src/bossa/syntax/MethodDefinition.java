@@ -12,7 +12,7 @@
 
 // File    : MethodDefinition.java
 // Created : Thu Jul 01 18:12:46 1999 by bonniot
-//$Modified: Fri Mar 31 19:16:18 2000 by Daniel Bonniot $
+//$Modified: Wed Apr 05 14:50:37 2000 by Daniel Bonniot $
 
 package bossa.syntax;
 
@@ -231,7 +231,6 @@ public class MethodDefinition extends Definition
 	    + String.valueOf(getType().codomain())
 	    + " "
 	    + symbol.name.toQuotedString()
-	    + Util.map("<",", ",">",getType().getTypeParameters())
 	    + "("
 	    + Util.map("",", ","",getType().domain())
 	    + ");\n");
@@ -248,7 +247,6 @@ public class MethodDefinition extends Definition
       + String.valueOf(getType().codomain())
       + " "
       + symbol.name.toQuotedString()
-      + Util.map("<",", ",">",getType().getTypeParameters())
       + "("
       + Util.map("",", ","",getType().domain())
       + ")"

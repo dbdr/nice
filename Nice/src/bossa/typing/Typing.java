@@ -12,7 +12,7 @@
 
 // File    : Typing.java
 // Created : Tue Jul 20 11:57:17 1999 by bonniot
-//$Modified: Mon Apr 03 17:01:29 2000 by Daniel Bonniot $
+//$Modified: Wed Apr 05 16:53:59 2000 by Daniel Bonniot $
 
 package bossa.typing;
 
@@ -42,7 +42,8 @@ abstract public class Typing
    */
   public static int enter()
   {
-    return enter("");
+    Engine.enter();
+    return level++;
   }
 
   // used to verify that enter abd leaves match
@@ -56,16 +57,14 @@ abstract public class Typing
   public static int enter(String message)
   {
     if(message!=null && dbg) Debug.println("## Typechecking "+message);
-    Engine.enter();
-    return level++;
+    return enter();
   }
 
   /**
-   * Enters a new typing context
+   * Enters a new typing context.
    *
    * @param symbols a collection of TypeSymbols,
-   *   which represent the new symbols of the context
-   * @param context the constraint to ass to the current context
+   *   which represent the new symbols of the context.
    */
   public static int enter(Collection symbols, String message)
   {
@@ -244,8 +243,7 @@ abstract public class Typing
   public static void initialLeq(TypeConstructor t1, TypeConstructor t2)
     throws TypingEx
   {
-    if(dbg)
-      Debug.println("Initial leq: "+t1+" < "+t2);
+    if(dbg) Debug.println("Initial leq: "+t1+" < "+t2);
     
     try{
       Engine.leq(t1,t2,true);
@@ -333,6 +331,7 @@ abstract public class Typing
     throws TypingEx
   {
     if(dbg) Debug.println(t+" imp "+i);
+
     try{
       Engine.setKind(t,i.variance.getConstraint());
     }
@@ -432,10 +431,7 @@ abstract public class Typing
 	}
       }
     catch(TypingEx e){
-      // backtrack has already been done in Engine,
-      // but a call to leave will also be done here...
-      // hacky
-      Engine.enter();
+      // There used to be a Engine.enter() here
 
       // There is no solution
       return new LinkedList();
@@ -447,7 +443,10 @@ abstract public class Typing
     return res;
   }
   
-  private static final void setFloatingKinds(Monotype[] tags, int minFloating, List res) throws Unsatisfiable
+  private static final void setFloatingKinds(Monotype[] tags, 
+					     int minFloating, 
+					     List res) 
+    throws Unsatisfiable
   {
     // Possible optimization: the successive values of minFloating 
     // for which getKind==null are always the same, compute once.
@@ -484,75 +483,83 @@ abstract public class Typing
   private static List enumerateTags(Monotype[] tags)
   {
     List tuples = new ArrayList(); /* of List of TypeConstructor */
-    List kinds = new ArrayList(tags.length); // euristic: at most one kind per tag
+    List kinds = new ArrayList(tags.length); /* euristic: 
+						at most one kind per tag */
     List observers = new ArrayList(tags.length); // idem
 
-    for(int i=0;i<tags.length;i++)
-      {
-	Engine.Constraint k = Engine.getConstraint(tags[i].getKind());
-	bossa.engine.BitVector obs;
+    Engine.enter();
+    try{
+      
+      for(int i=0;i<tags.length;i++)
+	{
+	  Engine.Constraint k = Engine.getConstraint(tags[i].getKind());
+	  bossa.engine.BitVector obs;
 	
-	int idx=kinds.indexOf(k);
-	if(idx<0)
-	  {
-	    kinds.add(k);
-	    observers.add(obs=new bossa.engine.BitVector());
-	  }
-	else
-	  obs = (bossa.engine.BitVector) observers.get(idx);
+	  int idx=kinds.indexOf(k);
+	  if(idx<0)
+	    {
+	      kinds.add(k);
+	      observers.add(obs=new bossa.engine.BitVector());
+	    }
+	  else
+	    obs = (bossa.engine.BitVector) observers.get(idx);
 	
-	if(tags[i].getKind() instanceof FunTypeKind)
-	  {
-	    continue;
-	  }
+	  if(tags[i].getKind() instanceof FunTypeKind)
+	    {
+	      continue;
+	    }
 
-	TypeConstructor constTC = tags[i].getTC();
-	if(constTC==null)
-	  Internal.error(tags[i].getKind()+
-			 " is not a valid kind in enumerate");
+	  TypeConstructor constTC = tags[i].getTC();
+	  if(constTC==null)
+	    Internal.error(tags[i].getKind()+
+			   " is not a valid kind in enumerate");
 	
-	TypeConstructor varTC = new TypeConstructor(new LocatedString("enum"+i,Location.nowhere()),constTC.variance);
+	  TypeConstructor varTC = 
+	    new TypeConstructor(new LocatedString("enum"+i,Location.nowhere()),
+				constTC.variance);
       	
-	varTC.enumerateTagIndex=i;
-	introduce(varTC);
-	obs.set(varTC.getId());
-	try{
-	  k.leq(varTC,constTC);
-	  k.reduceDomainToConcrete(varTC);
+	  varTC.enumerateTagIndex=i;
+	  introduce(varTC);
+	  obs.set(varTC.getId());
+	  try{
+	    k.leq(varTC,constTC);
+	    k.reduceDomainToConcrete(varTC);
+	  }
+	  catch(Unsatisfiable e){
+	    // tuples is empty here
+	    return tuples;
+	  }
 	}
-	catch(Unsatisfiable e){
-	  //Internal.error("Typing.enumerate");
-
-	  // backtrack has already been done in Engine,
-	  // but a call to leave will also be done here...
-	  // hacky!
-	  Engine.enter();
-	  // tuples is empty here
-	  return tuples;
-	}
-      }
     
-    tuples.add(new TypeConstructor[tags.length]);
+      tuples.add(new TypeConstructor[tags.length]);
     
-    Object[] a = kinds.toArray();
-    Engine.Constraint[] pKinds = new Engine.Constraint[a.length];
-    System.arraycopy(a,0,pKinds,0,a.length);
+      Object[] a = kinds.toArray();
+      Engine.Constraint[] pKinds = new Engine.Constraint[a.length];
+      System.arraycopy(a,0,pKinds,0,a.length);
     
-    a = observers.toArray();
-    bossa.engine.BitVector[] pObs = new bossa.engine.BitVector[a.length];
-    System.arraycopy(a,0,pObs,0,a.length);
+      a = observers.toArray();
+      bossa.engine.BitVector[] pObs = new bossa.engine.BitVector[a.length];
+      System.arraycopy(a,0,pObs,0,a.length);
     
-    enumerateInConstraints(pKinds,pObs,tuples,tags.length);
+      enumerateInConstraints(pKinds,pObs,tuples,tags.length);
+    
+    }
+    finally{
+      Engine.backtrack();
+    }
     
     return tuples;
   }
   
-  private static void enumerateInConstraints(Engine.Constraint[] kinds,
-					     bossa.engine.BitVector[] observers,
-					     final List tuples,
-					     int width)
+  private static void enumerateInConstraints
+    (Engine.Constraint[] kinds,
+     bossa.engine.BitVector[] observers,
+     final List tuples,
+     int width)
   {
-    final boolean[] first=new boolean[1]; // using boolean[1] is a trick to access it from the closure
+    final boolean[] first=new boolean[1]; /* using final boolean[] 
+					     is a trick to access it 
+					     from the closure */
     for(int act=0;act<kinds.length;act++)
       {
 	first[0]=true;

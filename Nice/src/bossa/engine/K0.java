@@ -1255,7 +1255,7 @@ public final class K0 {
     Leq.closure();
     computeArrows(Leq);
     saturateAbs(Leq);
-    condense(Leq); // seems faster for the moment
+    //condense(Leq);
   }
 
 

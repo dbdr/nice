@@ -293,8 +293,7 @@ public final class Variance
     if (monotypes == null) return;
     
     for (int i = 0; i<monotypes.length; i++)
-      // XXX incorrect: *variance
-      monotypes[i].tag(signs[i]);
+      monotypes[i].tag(variance * signs[i]);
   }  
 }
 

@@ -34,7 +34,7 @@ abstract public class Node
   {
     this.propagate = propagate;
   }
-  
+
   Node(List /* of Node */ children, 
        int propagate)
   {
@@ -50,15 +50,6 @@ abstract public class Node
 
     if (children == null) children=new ArrayList();
     children.add(n);
-  }
-  
-  void addFirstChild(Node n)
-  {
-    if (n==null)
-      Internal.error("null child in Node.addChild for node "+this);
-
-    if (children == null) children=new ArrayList();
-    children.add(0, n);
   }
   
   final Node child(Node n)
@@ -85,9 +76,9 @@ abstract public class Node
    */
   List addChildren(List c)
   {
-    // OPTIM: do not allocate each time, but beware sharing an empty list
-    //        as some client might modify it.
-    if(c==null) return new LinkedList();
+    if (c == null)
+      return Collections.EMPTY_LIST;
+
     for(Iterator i = c.iterator(); i.hasNext();)
       addChild((Node) i.next());
 
@@ -173,6 +164,9 @@ abstract public class Node
     switch(propagate)
       {
       case none:
+        this.scope = outer;
+        this.typeScope = typeOuter;
+        break;
       case down: 
 	this.scope = new VarScope(outer,varSymbols);
 	this.typeScope = new TypeScope(typeOuter);

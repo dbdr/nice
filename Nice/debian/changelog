@@ -6,6 +6,8 @@ nice (0.0.020200) unstable; urgency=low
   	(int x, int y) = f(0);
   * Allow overriding of native java methods. It is now possible to 
     define a subclass of a java class or interface and override the methods.
+  * Changed compilation scheme for method alternatives. This results in 
+    shorter class files and more intuitive stack traces.
 
  --
 

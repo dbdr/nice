@@ -12,13 +12,13 @@ p(a)
   println("");
 }
 
-<Any T> Array<T> reverse(Array<T>);
+<Any T> Array<T> rev(Array<T>);
 /* this is an interesting case to keep: 
    dispatch on Array for a method that only accepts (polymorphic) arrays.
    The difficulty here is that the bytecode type for the argument is Object,
    while it would be rawArray if the domain of the method was bigger.
 */
-<T> reverse(a@Array)
+<T> rev(a@Array)
 {
   T[] res = fill(new T[a.length], int i => a[a.length - i - 1]);
   return res;
@@ -31,7 +31,7 @@ test_arrays()
 
   int[] a = test_native_arrays();
   p(a);
-  p(reverse(a));
+  p(rev(a));
   test_collection_arrays(a);
   test_polymorphism();
 
@@ -93,7 +93,7 @@ test_collection_arrays(a)
   println(a.size());
   int[] b = map(a, int i => i+4);
   p(b);
-  p(filter(reverse(b), int i=> i>6));
+  p(filter(rev(b), int i=> i>6));
 
   long[] ls = map(a, id);
   ls[0] = Long.MAX_VALUE;

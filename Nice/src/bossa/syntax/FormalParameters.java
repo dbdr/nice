@@ -42,7 +42,14 @@ public class FormalParameters extends Node
     {
       return type.toString();
     }
+
+    LocatedString getName() { return null; }
   }
+
+  /**
+     A named parameter. 
+     It can thus be used out-of-order at the call site.
+  */
   public static class NamedParameter extends Parameter
   {
     public NamedParameter(Monotype type, LocatedString name)
@@ -56,7 +63,14 @@ public class FormalParameters extends Node
     {
       return type + " " + name;
     }
+
+    LocatedString getName() { return name; }
   }
+
+  /**
+     A named parameter with a default value.
+     It can thus be omitted at the call site.
+  */
   public static class OptionalParameter extends NamedParameter
   {
     public OptionalParameter
@@ -92,21 +106,24 @@ public class FormalParameters extends Node
     }
   }
   
+  /****************************************************************
+   * Main class
+   ****************************************************************/
+
   public FormalParameters(java.util.List parameters)
   {
     super(Node.down);
-    if (parameters != null)
-      {
-	this.parameters = 
-	  (Parameter[]) parameters.toArray(new Parameter[parameters.size()]);
-	this.size = this.parameters.length;
 
-	for (int i = 0; i<size; i++)
-	  if (this.parameters[i] != null)
-	    addChild(this.parameters[i]);
-      }
-    else
-      this.size = 0;
+    if (parameters == null)
+      return;
+
+    this.parameters = 
+      (Parameter[]) parameters.toArray(new Parameter[parameters.size()]);
+    this.size = this.parameters.length;
+    
+    for (int i = 0; i < size; i++)
+      if (this.parameters[i] != null)
+	addChild(this.parameters[i]);
   }
 
   void addThis(Monotype type)
@@ -114,10 +131,22 @@ public class FormalParameters extends Node
     if (parameters[0] != null)
       Internal.error("No room for \"this\"");
     
-    parameters[0] = new Parameter(type);
+    parameters[0] = new NamedParameter(type, thisName);
     addChild(parameters[0]);
   }
   
+  private LocatedString thisName = 
+    new LocatedString("this", Location.nowhere());
+
+  /**
+     @return the name of the <code>rank</code>th parameter,
+             or null if it is an anonymous parameter.
+  */
+  public LocatedString getName(int rank)
+  {
+    return parameters[rank].getName();
+  }
+
   /****************************************************************
    * Walk methods, used in NiceMethod.create
    ****************************************************************/
@@ -146,6 +175,16 @@ public class FormalParameters extends Node
     java.util.List res = new java.util.ArrayList(size);
     for (int i = 0; i < size; i++)
       res.add(parameters[i].type);
+    return res;
+  }
+
+  MonoSymbol[] getMonoSymbols()
+  {
+    if (parameters == null) return null;
+    
+    MonoSymbol[] res = new MonoSymbol[size];
+    for (int i = 0; i < size; i++)
+      res[i] = new MonoSymbol(parameters[i].getName(), parameters[i].type);
     return res;
   }
 

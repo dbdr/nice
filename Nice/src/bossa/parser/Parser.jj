@@ -829,20 +829,22 @@ FormalParameters formalParameters(boolean leaveRoomForThis):
   { return new FormalParameters(params); }
 }
 
-NiceMethod internalMethodDeclaration(MethodContainer c):
+MethodDeclaration internalMethodOrFunction(MethodContainer c):
 {
   LocatedString name;
   FormalParameters parameters;
   Constraint cst;
   Monotype returnType;
+  Statement body = null;
 }
 {
   cst=constraint()
   returnType=monotype()
   name=methodName()
   "(" parameters = formalParameters(true) ")"
-  ";"
-  { return NiceMethod.create(c, name, cst, returnType, parameters); }
+  ( ";" | body = code() )
+  
+  { return NiceMethod.create(c, name, cst, returnType, parameters, body); }
 }
 
 List extensions():
@@ -944,11 +946,12 @@ ClassDefinition classDefinition():
 	{ globalDefinitions.add(mb); }
       |
         { MethodDeclaration m; }
-        m = internalMethodDeclaration(res)
+        m = internalMethodOrFunction(res)
         { 
           if (methods == null)
             methods = new ArrayList(5);
-          methods.add(m); 
+          methods.add(m);
+	  //globalDefinitions.add(m);
         }
       )
    )* 
@@ -988,9 +991,9 @@ AbstractInterface interfaceDefinition():
   { res = new AbstractInterface(name,parameters,typeParametersVariances,
 				extensions); }
     (
-      { NiceMethod m; }
+      { MethodDeclaration m; }
       [ "public" | "private" ]
-      m = internalMethodDeclaration(res)
+      m = internalMethodOrFunction(res)
       { res.addMethod(m); }
     )*
   "}"
@@ -1034,6 +1037,26 @@ void methodBodyDefinitionLookahead():
   methodName() [ "<" strings() ">" ] "("
 }
 
+Statement code():
+{
+  Statement code;
+}
+{
+  ( 
+    // A true body
+    code=Block()
+  |
+    // An expression
+    { Expression exp; }
+    "=" exp=Expression() ";"
+    { 
+      code = new ReturnStmt(exp);
+      code.setLocation(exp.location());
+    }
+  )
+  { return code; }
+}
+
 MethodBodyDefinition methodBodyDefinition(NiceClass container):
 {
     LocatedString name;
@@ -1041,7 +1064,7 @@ MethodBodyDefinition methodBodyDefinition(NiceClass container):
     Collection binders=null;
     //List newTypeVars=null;
     LinkedList parameters=new LinkedList();
-    Statement code;
+    Statement body;
     Expression exp;
 }
 {
@@ -1057,20 +1080,10 @@ MethodBodyDefinition methodBodyDefinition(NiceClass container):
 	( "," p=pattern() { parameters.add(p); } )*
     )?
     ")"
-    ( 
-      // A true body
-      code=Block()
-    |
-      // An expression
-      "=" exp=Expression() ";"
-      { 
-	code = new ReturnStmt(exp);
-	code.setLocation(exp.location());
-      }
-    )
+    body = code()
     { return new MethodBodyDefinition(container,name,binders,
 				      //newTypeVars,
-				      parameters,code); }
+				      parameters,body); }
 }
 
 MethodDeclaration methodDeclaration():
@@ -1091,6 +1104,10 @@ MethodDeclaration methodDeclaration():
       // Nice method
       ";"
       { res = new NiceMethod(name,cst,returnType,parameters); }
+    | LOOKAHEAD(2)
+      { Statement body; }
+      body = code()
+      { res = new ToplevelFunction(name, cst, returnType, parameters, body);}
     |
       "=" 
       (

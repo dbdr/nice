@@ -50,7 +50,7 @@ public class AbstractInterface extends Definition
     return null;
   }
 
-  public void addMethod(NiceMethod m)
+  public void addMethod(MethodDeclaration m)
   {
     addChild(m);
   }

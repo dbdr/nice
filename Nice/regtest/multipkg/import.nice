@@ -3,6 +3,7 @@ package regtest.multipkg;
 /*
   This file test usage of methods defined in another package.
   We use methods from regtest.basic, which must have been compiled earlier
+  and should be recompiled together with regtest.multipkg
   (this is done by the regtest script).
 */
 
@@ -18,4 +19,8 @@ test_import()
   println(0);
   println(isNull(0));
   println(isNull(null));
+
+  println("0=" + getZero());
+
+  println("1=" + overload1(1) + ", 1=" + overload2(1));
 }

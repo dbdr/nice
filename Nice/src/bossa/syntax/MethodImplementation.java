@@ -95,20 +95,18 @@ public abstract class MethodImplementation extends Definition
     scope.addSymbols(res);
     parameters = res;
   }
-  
+
   /** Where no patterns are present, add those corresponding to the method
       declaration.
   */
   void addPatterns()
   {
     Monotype[] parameters = Types.parameters(declaration.getType());
-    for (int i = 0; i < formals.length; i++)      
+    for (int i = 0; i < formals.length; i++)
       if (formals[i].tc == null)
         formals[i] = bossa.syntax.dispatch.createPattern(formals[i].name,
 		Types.concreteConstructor(parameters[i]),
 		Types.isSure(parameters[i]));
-			
-  
   }
 
   void resolveBody()

@@ -5,7 +5,7 @@ package regtest.basic;
 */
 
 int o1(int x, int, int z = 20, int t = 0);
-o1(a, x, z, t) = a + x + 2*z;
+o1(a, x, z, t) = a + 2*x + 3*z;
 
 int o1(int, int x, int y = 10);
 o1(a, x, y) = a + x + y/2;
@@ -20,9 +20,9 @@ void test_optional();
 test_optional()
 {
   println("### Testing named and optional parameters ###\n");
-  println(o1(3,x:2));
+  println(o1(3,x:2,t:0));
 
   oP(1, 2, 3, 4, 5);
   oP(d:1, b:2, 3, 4, 5);
-  oP(1, 2, d:3, e:4);
+  oP(1, 2, b:3, d:3, e:4);
 }

@@ -125,24 +125,35 @@ public class FormalParameters
    * Resolving overloading
    ****************************************************************/
 
+  /**
+     Check if arguments match the formal parameters.
+
+     If succesfull, append to <code>args</code>'s applicationExpressions
+     the computed array of expressions, that denote the call,
+     including the default values of the optional parameters not passed.
+  */
   boolean match(Arguments args)
   {
     int[] map = new int[size];
-    
+
+    // first pass, fill holes with names given at the call site
+    for (int i = 0; i< args.size(); i++)
+      {
+	Arguments.Argument a = args.get(i);
+	if (a.name != null)
+	  if (fill(map, a.name.toString(), i))
+	    return false;
+      }
+
+    // second pass, fill with the positional parameters
     for (int i = 0; i< args.size(); i++)
       {
 	Arguments.Argument a = args.get(i);
 	if (a.name == null)
-	  {
-	    if (fill(map, i))
-	      return false;
-	  }
-	else
-	  {
-	    if (fill(map, a.name.toString(), i))
-	      return false;
-	  }
+	  if (fill(map, i))
+	    return false;
       }
+
     // check that each parameter is either supplied or optional
     // stores the invocation expressions
     Expression[] exps = new Expression[size];

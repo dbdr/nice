@@ -302,18 +302,22 @@ public class MethodBodyDefinition extends MethodImplementation
 
     // Get type parameters
     if (binders != null)
-    try{
-      typeScope.addMappingsLS
-	(binders,
-	 declaration.getType().getConstraint().binders());
-    }
-    catch(mlsub.typing.BadSizeEx e){
-      User.error(name, "Method " + name + 
-		 " expects " + e.expected + " type parameters");
-    }
-    catch(TypeScope.DuplicateName e) {
-      User.error(this, e);
-    }
+      {
+        Constraint cst = declaration.getType().getConstraint();
+        if (! Constraint.hasBinders(cst))
+          User.error(name, "Method " + name + " has no type parameters");
+
+        try{
+          typeScope.addMappingsLS(binders, cst.binders());
+        }
+        catch(mlsub.typing.BadSizeEx e){
+          User.error(name, "Method " + name + 
+                     " expects " + e.expected + " type parameters");
+        }
+        catch(TypeScope.DuplicateName e) {
+          User.error(this, e);
+        }
+      }
 
     try{
       for(int n = 0; n < formals.length; n++)

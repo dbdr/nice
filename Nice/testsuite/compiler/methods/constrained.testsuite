@@ -73,3 +73,17 @@
   void foo(I<B>);                                   
   /*/// FAIL HERE */ foo(@X){} 
   //@X is not in the domain of foo 
+
+/// FAIL
+  /// Toplevel
+class A
+{
+  void f();
+  f() {}
+}
+
+class B extends A
+{
+  // Use type parameter that does not exist in the declaration
+  <U> f() {}
+}

@@ -533,8 +533,8 @@ numberOfWheels(mc@Motorcycle) = 2;
       </para>
       <para>
         <literal>
-	<replaceable>method-name</replaceable>
 	&LT;<replaceable>type-parameters</replaceable>&GT;
+	<replaceable>method-name</replaceable>
         (<optional><replaceable>arguments</replaceable></optional>)
 	&LBRACE; body &RBRACE;
         </literal>
@@ -547,7 +547,7 @@ numberOfWheels(mc@Motorcycle) = 2;
 <T> T lastItem(Collection<T> coll);
 
 
-/* This version won't compile because the T type isn't in scope:
+/* This version is incorrect because the type parameter T is not in scope:
 
 lastItem(coll)
 {
@@ -556,17 +556,8 @@ lastItem(coll)
 }
 */
 
-/* This one won't compile because Iterator needs a type argument:
-
-lastItem(coll)
-{
-  Iterator it = coll.iterator();
-  //...
-}
-*/
-
 // This one will work correctly:
-lastItem<T>(coll)
+<T> lastItem(coll)
 {
   Iterator<T> = coll.iterator();
   //...

@@ -39,3 +39,11 @@
   foo(s1, "xyz") {}
   foo("abc", "xyz") {}
   foo(null ,null) {}
+
+/// PASS
+  /// Toplevel
+class String {}
+
+void foos(java.lang.String);
+foos(x) {}
+foos("abc") {}

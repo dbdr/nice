@@ -66,7 +66,7 @@ public class Pattern implements Located
       {
 	if (atValue instanceof StringConstantExp)
 	  this.typeConstructor = new TypeIdent(
-		new LocatedString("String" ,atValue.location()));
+		new LocatedString("java.lang.String", atValue.location()));
 	else
 	  this.tc = atValue.tc;
       }

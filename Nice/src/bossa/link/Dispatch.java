@@ -95,12 +95,12 @@ public final class Dispatch
   }
 
   /**
-   * Computes a topological sorting of the list of alternatives.
-   *
-   * Uses a postfix travsersal of the graph.
-   *
-   * pre: alternatives are marked unvisited.
-   */
+     Computes a topological sorting of the list of alternatives.
+     
+     Uses a postfix travsersal of the graph.
+     
+     pre: alternatives are marked unvisited.
+  */
   private static Stack sort(final List alternatives)
   {
     Stack sortedAlternatives = new Stack();
@@ -233,7 +233,8 @@ public final class Dispatch
     BlockExp block = new BlockExp(m.javaReturnType());
     LambdaExp lexp = new LambdaExp(block);
     
-    // parameters of the alternative function are the same in each case, so we compute them just once
+    // parameters of the alternative function are the same in each case, 
+    // so we compute them just once
     gnu.bytecode.Type[] types = m.javaArgTypes();
     Expression[] params = new Expression[types.length];
     lexp.min_args = lexp.max_args = types.length;
@@ -249,7 +250,7 @@ public final class Dispatch
 			   m.javaReturnType().isVoid(),
 			   block,
 			   params));
-
+    
     lexp.setPrimMethod(m.getDispatchPrimMethod());
     
     module.compileDispatchMethod(lexp);
@@ -261,7 +262,12 @@ public final class Dispatch
 				     Expression[] params)
   {
     if(!sortedAlternatives.hasNext())
-      return new ThrowExp(new QuoteExp(new Error("Message not understood")));
+      if (voidReturn)
+	return new ThrowExp(new QuoteExp(new Error("Message not understood")));
+      else
+	return new BeginExp
+	  (new ThrowExp(new QuoteExp(new Error("Message not understood"))),
+	   QuoteExp.nullExp);
     
     Alternative a = (Alternative) sortedAlternatives.next();
     Expression matchTest = a.matchTest(params);
@@ -277,6 +283,6 @@ public final class Dispatch
     if(optimize && !sortedAlternatives.hasNext())
       return matchCase;
     else
-      return new gnu.expr.IfExp(matchTest,matchCase,dispatch(sortedAlternatives,voidReturn,block,params));
+      return new gnu.expr.IfExp(matchTest, matchCase, dispatch(sortedAlternatives,voidReturn,block,params));
   }
 }

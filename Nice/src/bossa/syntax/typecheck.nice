@@ -253,8 +253,6 @@ typecheck(e@IdentExp)
 nullnessInfo(test) = (null, null);
 nullnessInfo(test@CallExp)
 {
-  (?List<MonoSymbol>, ?List<MonoSymbol>) res;
-
   if (test.isCallTo("||"))
     {
       ?List<MonoSymbol> notNullIfFalse0 = 

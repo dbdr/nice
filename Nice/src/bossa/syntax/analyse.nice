@@ -392,7 +392,7 @@ Expression analyseQualifiedCall(CallExp e, Info info)
   e.function = newOverloadedSymbolExp(possibilities, funName);
 
   return e;
-}      
+}
 
 ?Expression analyse(Expression e, Info info, boolean noEscape) =
   analyse(e, info);

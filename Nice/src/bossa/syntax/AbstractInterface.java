@@ -105,7 +105,7 @@ public class AbstractInterface extends Definition
             +name
             +Util.map("<",", ",">",parameters)
             +Util.map(" extends ",", ","",extensions)
-            +";\n");
+            +"{}\n");
   }
   
   /****************************************************************

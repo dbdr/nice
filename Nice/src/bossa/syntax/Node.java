@@ -12,7 +12,7 @@
 
 // File    : Node.java
 // Created : Thu Jul 08 10:24:56 1999 by bonniot
-//$Modified: Wed Nov 10 13:48:19 1999 by bonniot $
+//$Modified: Tue Nov 16 19:32:57 1999 by bonniot $
 
 package bossa.syntax;
 
@@ -138,7 +138,10 @@ abstract public class Node
     globalTypeScope = new TypeScope(null);
     JavaTypeConstructor.addJavaTypes(globalTypeScope);
   }
-  
+  public static TypeScope getGlobalTypeScope()
+  {
+    return globalTypeScope;
+  }
   
   void buildScope()
   {

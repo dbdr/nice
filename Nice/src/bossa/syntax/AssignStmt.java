@@ -10,9 +10,9 @@
 /*                                                                        */
 /**************************************************************************/
 
-// File    : AffectationStmt.java
+// File    : AssignStmt.java
 // Created : Mon Jul 05 15:49:27 1999 by bonniot
-//$Modified: Tue Nov 09 17:55:03 1999 by bonniot $
+//$Modified: Mon Nov 15 16:24:39 1999 by bonniot $
 
 package bossa.syntax;
 
@@ -23,9 +23,9 @@ import bossa.typing.*;
 /**
  * Assignment.
  */
-public class AffectationStmt extends Statement
+public class AssignStmt extends Statement
 {
-  public AffectationStmt(Expression to,
+  public AssignStmt(Expression to,
 			 Expression value) 
   {
     this.to=expChild(to);

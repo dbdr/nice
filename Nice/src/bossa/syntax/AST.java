@@ -12,7 +12,7 @@
 
 // File    : AST.java
 // Created : Thu Jul 01 11:01:56 1999 by bonniot
-//$Modified: Wed Nov 10 15:12:42 1999 by bonniot $
+//$Modified: Mon Nov 15 13:03:47 1999 by bonniot $
 
 package bossa.syntax;
 

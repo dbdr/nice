@@ -10,30 +10,24 @@
 /*                                                                        */
 /**************************************************************************/
 
-// File    : Element.java
-// Created : Wed Jul 28 10:42:50 1999 by bonniot
-//$Modified: Mon Nov 15 19:48:56 1999 by bonniot $
+// File    : Printable.java
+// Created : Wed Oct 13 14:52:35 1999 by bonniot
+//$Modified: Wed Oct 13 14:54:09 1999 by bonniot $
 
-package bossa.engine;
+package bossa.util;
 
 import bossa.util.*;
 
-/** Something that can be constrained in this engine
- * 
+/**
+ * Interface of classes with a parametrized toString function.
  * 
  * @author bonniot
  */
 
-public interface Element
+public interface Printable
 {
-  int getId();
-  void setId(int value);
+  /** toString parameters  */
+  static final int inConstraint=0;
   
-  Kind getKind();
-  void setKind(Kind value);
-
-  /**
-   * Returns true if this element can exist at runtime.
-   */
-  boolean isConcrete();
+  public String toString(int param);
 }

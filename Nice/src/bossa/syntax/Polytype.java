@@ -12,7 +12,7 @@
 
 // File    : Polytype.java
 // Created : Tue Jul 13 12:51:38 1999 by bonniot
-//$Modified: Wed Nov 10 16:49:52 1999 by bonniot $
+//$Modified: Mon Nov 15 15:28:00 1999 by bonniot $
 
 package bossa.syntax;
 
@@ -117,6 +117,21 @@ public class Polytype extends Node
     return monotype;
   }
 
+  /**
+   * Returns the domain of a functional polytype.
+   *
+   * @return a 'tuple' Domain
+   */
+  public Domain getDomain()
+  {
+    List domains = monotype.domain();
+
+    if(domains==null)
+      Internal.error("getDomain on non functional polytype "+this);
+    
+    return new Domain(constraint,domains);
+  }
+  
   /****************************************************************
    * Functional types
    ****************************************************************/

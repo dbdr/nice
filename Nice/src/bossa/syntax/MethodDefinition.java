@@ -12,7 +12,7 @@
 
 // File    : MethodDefinition.java
 // Created : Thu Jul 01 18:12:46 1999 by bonniot
-//$Modified: Wed Nov 10 16:47:27 1999 by bonniot $
+//$Modified: Mon Nov 15 19:12:56 1999 by bonniot $
 
 package bossa.syntax;
 
@@ -59,6 +59,8 @@ public class MethodDefinition extends PolySymbol implements Definition
     addChild(type);
 
     this.memberOf=c;
+
+    bossa.link.Dispatch.register(this);
   }
 
   /** the Method is global */
@@ -175,6 +177,11 @@ public class MethodDefinition extends PolySymbol implements Definition
    * Printing
    ************************************************************/
 
+  public String bytecodeName()
+  {
+    return name.toString();
+  }
+  
   public String toString()
   {
     return

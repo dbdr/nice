@@ -12,7 +12,7 @@
 
 // File    : stdlib.bossa
 // Created : Thu Jul 08 16:20:19 1999 by bonniot
-//$Modified: Wed Nov 10 17:06:40 1999 by bonniot $
+//$Modified: Tue Nov 16 20:34:23 1999 by bonniot $
 // Description : Prolog file, included before all bossa file
 
 //variable <Any T> T null;
@@ -46,7 +46,7 @@ or(b1,b2)             = new True();
 // is rewritten *by the parser* into abstract syntax for 
 // "_if(cond,fun()=>{return t;},fun()=>{return e;})"
 
-T _if <Any T> (Boolean,fun()(T),fun()(T));
+// T _if <Any T> (Boolean,fun()(T),fun()(T));
 
 // _if(cond@True,t,e) = t();
 
@@ -75,10 +75,10 @@ interface Comparable;
 // Numeric
 interface Num extends Comparable;
 N add <Num N> (N,N);
-T sub <Num T> (T,T);
+//T sub <Num T> (T,T);
 
 interface Ordinal;
-T succ <Ordinal T> (T);
+//T succ <Ordinal T> (T);
 
 class Float implements Num {}
 class Integer extends Float 
@@ -86,13 +86,17 @@ class Integer extends Float
   abstracts Ordinal 
 {}
 
-//  add(x@Integer,y@Integer)
-//  { return new Integer(); }
+//add(x@Integer,y@Integer)
+//{ return new Integer(); }
 
-//  add(x#Float,y#Float)
-//  { return new Integer(); }
+add(x#Float,y#Float) = x;
 
-//  succ(x@Integer) = x+1;
+add(x@Float,y@Integer) = x;
+
+add(x@Integer,y@Float)
+{ return new Integer(); }
+
+//succ(x@Integer) = x+1;
 
 //  Boolean lt(Integer, Integer); // strict (<)
 //  Boolean leq(Integer, Integer);// non-strict (<=)
@@ -109,13 +113,13 @@ class Integer extends Float
 // Builtin class Array
 class Array<T>{}
 
-T get<Any T>(Array<T>, Integer);
+//  T get<Any T>(Array<T>, Integer);
 
-void set<Any T>(Array<T>, Integer, T);
+//  void set<Any T>(Array<T>, Integer, T);
 
-Integer capacity<Any T>(Array<T>);
+//  Integer capacity<Any T>(Array<T>);
 
-void resize<Any R>(Array<R>, Integer);
+//  void resize<Any R>(Array<R>, Integer);
 
 //  // List
 //  interface Container<T>;

@@ -12,7 +12,7 @@
 
 // File    : Loader.java
 // Created : Thu Jul 29 09:43:50 1999 by bonniot
-//$Modified: Thu Nov 04 15:16:05 1999 by bonniot $
+//$Modified: Tue Nov 16 19:42:21 1999 by bonniot $
 
 package bossa.parser;
 
@@ -32,7 +32,7 @@ public abstract class Loader
 {
   public static Module open(String filename)
   {
-    if(Debug.modules) Debug.println("Parsing "+filename+" ...");
+    if(Debug.passes) Debug.println("Parsing "+filename+" ...");
     Location.currentFile=filename;
 
     Reader r=null;

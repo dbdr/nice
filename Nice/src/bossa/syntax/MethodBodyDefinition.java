@@ -12,7 +12,7 @@
 
 // File    : MethodBodyDefinition.java
 // Created : Thu Jul 01 18:12:46 1999 by bonniot
-//$Modified: Wed Nov 10 18:52:01 1999 by bonniot $
+//$Modified: Tue Nov 16 17:32:06 1999 by bonniot $
 
 package bossa.syntax;
 
@@ -87,6 +87,9 @@ public class MethodBodyDefinition extends Node
     
     parameters=buildSymbols(this.formals,definition.type.domain());
     addSymbols(parameters);
+
+    //Register this alternative for the link test
+    new bossa.link.Alternative(this.definition,Pattern.getDomain(this.formals));
   }
 
   /**
@@ -297,6 +300,11 @@ public class MethodBodyDefinition extends Node
   }
 
   private static gnu.bytecode.Method mainAlternative=null;
+  
+  public static boolean hasMain()
+  {
+    return mainAlternative!=null;
+  }
   
   static void compileMain(bossa.modules.Module module)
   {

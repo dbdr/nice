@@ -1206,7 +1206,7 @@ public final class K0 {
 
   // XXX: spec ??
   public void enumerate(BitVector observers,
-                            LowlevelSolutionHandler handler) {
+			LowlevelSolutionHandler handler) {
     S.assert(S.a&& hasBeenInitialized);
     try {
       prepareConstraint();

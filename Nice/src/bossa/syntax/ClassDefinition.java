@@ -12,7 +12,7 @@
 
 // File    : ClassDefinition.java
 // Created : Thu Jul 01 11:25:14 1999 by bonniot
-//$Modified: Wed Nov 10 17:18:45 1999 by bonniot $
+//$Modified: Mon Nov 15 20:04:18 1999 by bonniot $
 
 package bossa.syntax;
 
@@ -315,5 +315,5 @@ public class ClassDefinition extends Node
   private List methods;
   private boolean isFinal;
   boolean isAbstract;
-  private boolean isSharp; // This class is a #A (not directly visible to the user)
+  boolean isSharp; // This class is a #A (not directly visible to the user)
 }

@@ -12,7 +12,7 @@
 
 // File    : MonotypeVar.java
 // Created : Fri Jul 23 15:36:39 1999 by bonniot
-//$Modified: Wed Nov 10 16:08:40 1999 by bonniot $
+//$Modified: Tue Nov 16 19:31:57 1999 by bonniot $
 
 package bossa.syntax;
 
@@ -29,7 +29,7 @@ import bossa.engine.*;
  */
 
 public class MonotypeVar extends Monotype
-  implements TypeSymbol, bossa.engine.Element, Printable
+  implements TypeSymbol, /* bossa.engine.Element, */ Printable
 {
   public MonotypeVar(LocatedString name)
   {
@@ -105,7 +105,7 @@ public class MonotypeVar extends Monotype
    * Scoping
    ****************************************************************/
 
-  Monotype resolve(TypeScope ts)
+  public Monotype resolve(TypeScope ts)
   {
     if(soft)
       return this;
@@ -222,7 +222,7 @@ public class MonotypeVar extends Monotype
 	  {
 	    Variance v=(Variance) value;
 	
-	    equivalentTC=new TypeConstructor(this,v);
+	    equivalentTC=new TypeConstructor(this.name,v);
 	    Typing.introduce(equivalentTC);
 	    equivalentTP=new TypeParameters(this.name,v);
 	    Typing.introduce(equivalentTP.content);

@@ -12,7 +12,7 @@
 
 // File    : Engine.java
 // Created : Tue Jul 27 15:34:53 1999 by bonniot
-//$Modified: Thu Nov 04 15:25:08 1999 by bonniot $
+//$Modified: Tue Nov 16 18:59:31 1999 by bonniot $
 
 package bossa.engine;
 
@@ -290,6 +290,51 @@ public abstract class Engine
       }
   }
   
+  /** 
+   * Doesn't check kinding. 
+   * Used in Typing.enumerate 
+   */
+  public static void forceKind(Element element, Kind k)
+    throws Unsatisfiable
+  {
+    Stack s=new Stack();
+
+    s.push(element);
+    while(!s.empty())
+      {
+	Element e=(Element)s.pop();
+	
+	e.setKind(k);
+	k.register(e);
+	
+	floating.remove(e);
+
+	// Propagates the kind to all comparable elements
+	for(Iterator i=frozenLeqs.iterator();
+	    i.hasNext();)
+	  {
+	    Leq leq=(Leq)i.next();
+	    if(leq.e1==e)
+	      if(leq.e2.getKind()==null)
+		s.push(leq.e2);
+	      else
+		{
+		  i.remove();
+		  k.leq(leq.e1,leq.e2);
+		}
+	    else if(leq.e2==e)
+	      if(leq.e1.getKind()==null)
+		s.push(leq.e1);
+	      else
+		{
+		  i.remove();
+		  k.leq(leq.e1,leq.e2);
+		}
+	  }
+	frozenLeqs.endOfIteration();
+      }
+  }
+  
   /**
    * Enter all the 'floating' elements into the variablesConstraint
    * and add their frozen constraints
@@ -333,6 +378,10 @@ public abstract class Engine
   {
     constraints=new ArrayList(10);
     constraints.add(variablesConstraint);
+  }
+  public static Iterator listConstraints()
+  {
+    return constraints.iterator();
   }
   
   /** Maps a Kind to its lowlevel constraint */
@@ -380,7 +429,7 @@ public abstract class Engine
   
   private static boolean initialContext=true;
   
-  public static class Constraint
+  final public static class Constraint
     implements Kind
   {
     static
@@ -393,10 +442,19 @@ public abstract class Engine
       this.name=name;  
     }
     private String name;
+
+    /**
+     * Returns true iff there is a concrete #class in this constraint.
+     */
+    public boolean hasConstants()
+    {
+      return true;
+    }
     
-    final K0 k0=new K0(K0.BACKTRACK_UNLIMITED,new Callbacks());
+    final K0 k0 = new K0(K0.BACKTRACK_UNLIMITED,new Callbacks());
     
     private Vector elements=new Vector(10); // ArrayList would be better, but has no setSize method
+    private BitVector concreteElements = new BitVector();
     
     public final void register(Element e)
     {
@@ -406,10 +464,14 @@ public abstract class Engine
 	elements.setSize(id+1);
       elements.set(id,e);
       
+      if(e.isConcrete())
+	concreteElements.set(id);
+      
       if(dbg) Debug.println(e+" has id "+e.getId());
     }    
   
-    private Element getElement(int index)
+    // public for Typing.enumerate...
+    public Element getElement(int index)
     {
       return (Element)elements.get(index);
     }
@@ -534,6 +596,24 @@ public abstract class Engine
     public void indexImplements(int x, int iid) throws Unsatisfiable
     {
       k0.indexImplements(x,iid);
+    }
+
+    public void enumerate(BitVector observers,
+			  LowlevelSolutionHandler handler)
+    {
+      k0.enumerate(observers,handler);
+    }
+
+    public void reduceDomainToConcrete(Element e) throws Unsatisfiable
+    {
+      k0.reduceDomain(e.getId(),false,concreteElements);
+    }
+
+    /**
+     * Assume e1 and e2 are rigid
+     **/
+    public boolean isLeq(Element e1, Element e2) {
+      return k0.isLeq(e1.getId(),e2.getId());
     }
   }
   

@@ -12,7 +12,7 @@
 
 // File    : Domain.java
 // Created : Sat Jul 24 19:10:04 1999 by bonniot
-//$Modified: Tue Jul 27 17:20:21 1999 by bonniot $
+//$Modified: Tue Nov 16 20:00:50 1999 by bonniot $
 
 package bossa.syntax;
 
@@ -31,8 +31,34 @@ public class Domain
   {
     this.constraint=constraint;
     this.monotype=monotype;
+    this.monotypes=null;
   }
 
+  /**
+   * Constructs a 'tuple' Domain.
+   *
+   */
+  public Domain(Constraint constraint, List /* of Monotype */ monotypes)
+  {
+    this.constraint=constraint;
+    this.monotype=null;
+    this.monotypes=monotypes;
+  }
+
+  public Monotype[] getTuple()
+  {
+    Internal.error(monotypes==null,"Null monotypes");
+    
+    Object[] source = monotypes.toArray();
+    Monotype[] res = new Monotype[source.length];
+    System.arraycopy(source,0,res,0,source.length);
+    
+    return res;
+  }
+
+  // TODO: make better
+  public final static Domain bot = null;
+  
   static Domain bottom()
   {
     MonotypeVar alpha=Monotype.fresh(new LocatedString("alpha",
@@ -43,14 +69,50 @@ public class Domain
        alpha);
   }
   
+  /**
+   * Returns true iff a <= b.
+   *
+   * Only looks at the head, valid for link tests only.
+   */
+  public static boolean leq(Domain a, Domain b)
+  {
+    if(b==null) // Ex \alpha . \alpha
+      return true;
+    else if(a==null)
+      return false;
+    
+    TypeConstructor ta = a.monotype.getTC();
+    TypeConstructor tb = b.monotype.getTC();
+
+    if(ta==null)
+      Internal.error("Null tycon: "+a.toString()+" "+a.getClass());
+    if(tb==null)
+      Internal.error("Null tycon: "+b.toString()+" "+b.getClass());
+    
+    return bossa.typing.Typing.testRigidLeq(ta,tb);
+  }
+  
+  /**
+   * Returns true iff tycon tc \in domain d.
+   */
+  public static boolean in(TypeConstructor tc, Domain d)
+  {
+    if(d==Domain.bot)
+      return true;
+    
+    TypeConstructor t = d.monotype.getTC();
+
+    return bossa.typing.Typing.testRigidLeq(tc,t);
+  }
+
   public String toString()
   {
     return "Ex "+constraint+" "+monotype;
   }
 
-  static Collection fromMonotypes(Collection monotypes)
+  static List fromMonotypes(Collection monotypes)
   {
-    Collection res=new ArrayList(monotypes.size());
+    List res=new ArrayList(monotypes.size());
     for(Iterator i=monotypes.iterator();
 	i.hasNext();)
       res.add(new Domain(Constraint.True(),(Monotype)i.next()));
@@ -59,4 +121,5 @@ public class Domain
   
   public Constraint constraint;
   public Monotype monotype;
+  List /* of Monotype */ monotypes; // Used when the domain is a tuple
 }

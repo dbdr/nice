@@ -12,7 +12,7 @@
 
 // File    : Monotype.java
 // Created : Thu Jul 01 19:28:28 1999 by bonniot
-//$Modified: Wed Nov 10 16:34:26 1999 by bonniot $
+//$Modified: Tue Nov 16 19:31:10 1999 by bonniot $
 // Description : Abstract syntactic type, without constraint
 
 package bossa.syntax;
@@ -67,12 +67,19 @@ abstract public class Monotype
   {
     return gnu.bytecode.Type.pointer_type;
   }
+
+  final public boolean isConcrete()
+  {
+    // No Monotype lives at runtime.
+    return false;
+  }
   
   /**************************************************************
    * Scoping
    **************************************************************/
   
-  abstract Monotype resolve(TypeScope ts);
+  // public since it is called from bossa.dispatch
+  public abstract Monotype resolve(TypeScope ts);
 
   /** iterates resolve() on the collection of Monotype */
   static List resolve(TypeScope s, Collection c)

@@ -12,7 +12,7 @@
 
 // File    : TypeConstructor.java
 // Created : Thu Jul 08 11:51:09 1999 by bonniot
-//$Modified: Wed Nov 10 16:47:42 1999 by bonniot $
+//$Modified: Mon Nov 15 20:02:56 1999 by bonniot $
 
 package bossa.syntax;
 
@@ -61,12 +61,12 @@ public class TypeConstructor
   /**
    * Constructs a fresh TypeConstructor.
    *
-   * @param source a MonotypeVariable which shall deconstruct to this type constructor
+   * @param hint a base for the new name
    * @param v the variance of this type constructor
    */
-  TypeConstructor(MonotypeVar source, Variance v)
+  public TypeConstructor(LocatedString hint, Variance v)
   {
-    this.name=new LocatedString(source.name.content+"'",source.name.location());
+    this.name=new LocatedString(hint.content+"'",hint.location());
 
     Internal.error(v==null,name+" : null Variance");
     
@@ -133,13 +133,6 @@ public class TypeConstructor
     return new Polytype(new MonotypeConstructor(this,tp,this.location()));
   }
 
-  boolean instantiable()
-  {
-    Internal.error(definition==null,
-		   "Null definition TypeConstructor.instatiable");
-    return !definition.isAbstract;
-  }
-  
   gnu.bytecode.Type getJavaType()
   {
     return gnu.bytecode.ClassType.make(name.content);
@@ -227,6 +220,13 @@ public class TypeConstructor
     return name;
   }
 
+  boolean instantiable()
+  {
+    Internal.error(definition==null,"Null definition");
+    
+    return !definition.isAbstract;
+  }
+  
   /****************************************************************
    * Kinding
    ****************************************************************/
@@ -248,9 +248,16 @@ public class TypeConstructor
     kind=value;
   }
   
+  public boolean isConcrete()
+  {
+    return definition!=null && definition.isSharp;
+  }
+
   /****************************************************************
    * Fields
    ****************************************************************/
+
+  public int enumerateTagIndex=-1; // used in Typing.enumerate. ugly ! Subclass
 
   ClassDefinition definition;
   public LocatedString name;

@@ -12,7 +12,7 @@
 
 // File    : parser.jj
 // Created : Thu Jul 01 10:27:05 1999 by bonniot
-//$Modified: Wed Nov 10 16:13:02 1999 by bonniot $
+//$Modified: Mon Nov 15 16:25:18 1999 by bonniot $
 // Description : Parseur JavaCC pour Bossa
 //   Tokens based on the Jazz parser
 
@@ -1211,14 +1211,14 @@ List expressions():
 /*                          Statements                                 */
 /***********************************************************************/
 
-AffectationStmt affectation(Expression left):
+AssignStmt affectation(Expression left):
 {
   Expression right;
 }
 {
   "="
   right=expression()
-  { return new AffectationStmt(left,right); }
+  { return new AssignStmt(left,right); }
 }
 
 Block.LocalDeclaration localDeclaration():

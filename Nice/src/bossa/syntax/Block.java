@@ -12,7 +12,7 @@
 
 // File    : Block.java
 // Created : Wed Jul 07 17:42:15 1999 by bonniot
-//$Modified: Wed Nov 10 15:37:05 1999 by bonniot $
+//$Modified: Mon Nov 15 16:25:41 1999 by bonniot $
 // Description : A block : a list of statements with local variables
 
 package bossa.syntax;
@@ -115,7 +115,7 @@ public class Block extends Statement
 	if(local.value==null)
 	  continue;
 	try{
-	  AffectationStmt.checkAssignment(local.left.getType(),local.value);
+	  AssignStmt.checkAssignment(local.left.getType(),local.value);
 	}
 	catch(bossa.typing.TypingEx t){
 	  User.error(this,"Typing error : "+local.left+

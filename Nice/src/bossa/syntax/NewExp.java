@@ -12,7 +12,7 @@
 
 // File    : NewExp.java
 // Created : Thu Jul 08 17:15:15 1999 by bonniot
-//$Modified: Fri Nov 05 18:23:06 1999 by bonniot $
+//$Modified: Mon Nov 15 20:01:47 1999 by bonniot $
 // Description : Allocation of a new object
 
 package bossa.syntax;

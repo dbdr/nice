@@ -12,7 +12,7 @@
 
 // File    : Pattern.java
 // Created : Mon Jul 05 14:36:52 1999 by bonniot
-//$Modified: Mon Nov 08 18:57:05 1999 by bonniot $
+//$Modified: Tue Nov 16 19:14:37 1999 by bonniot $
 // Description : Syntactic pattern for method bodies declaration
 
 package bossa.syntax;
@@ -36,7 +36,7 @@ public class Pattern
   Domain getDomain()
   {
     if(typeConstructor==null)
-      return Domain.bottom();
+      return Domain.bot;
     
     TypeParameters tp=new TypeParameters(typeConstructor.name,typeConstructor.variance);
     
@@ -46,6 +46,20 @@ public class Pattern
 					      typeConstructor.location()));
   }
   
+  /**
+   * Iterates getDomain on a collection of Pattern.
+   */
+  static List getDomain(Collection patterns)
+  {
+    Iterator i=patterns.iterator();
+    List res=new ArrayList(patterns.size());
+
+    while(i.hasNext())
+      res.add(((Pattern)i.next()).getDomain());
+
+    return res;
+  }
+  
   Polytype getPolytype()
   {
     if(typeConstructor==null)
@@ -53,9 +67,8 @@ public class Pattern
     
     TypeParameters tp=new TypeParameters
       (typeConstructor.name,typeConstructor.variance);
-    bossa.typing.Typing.introduce(tp.content);
     
-    return new Polytype(Constraint.True(), 
+    return new Polytype(new Constraint(tp.content,null),
 			new MonotypeConstructor(typeConstructor,
 						tp,
 						typeConstructor.location()));
@@ -75,20 +88,6 @@ public class Pattern
 	if(!p.thisAtNothing())
 	  res.add(p.getPolytype());
       }
-    return res;
-  }
-  
-  /**
-   * Iterates getDomain on a collection of Pattern.
-   */
-  static Collection getDomain(Collection patterns)
-  {
-    Iterator i=patterns.iterator();
-    Collection res=new ArrayList(patterns.size());
-
-    while(i.hasNext())
-      res.add(((Pattern)i.next()).getDomain());
-
     return res;
   }
   

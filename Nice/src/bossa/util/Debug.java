@@ -12,7 +12,7 @@
 
 // File    : Debug.java
 // Created : Thu Jul 22 15:37:02 1999 by bonniot
-//$Modified: Wed Nov 10 14:38:50 1999 by bonniot $
+//$Modified: Tue Nov 16 19:39:39 1999 by bonniot $
 
 package bossa.util;
 
@@ -31,6 +31,11 @@ public abstract class Debug
   public static void println(String msg)
   {
     System.out.println(msg);
+  }
+
+  public static void print(String msg)
+  {
+    System.out.print(msg);
   }
 
   final public static Properties props;
@@ -70,5 +75,8 @@ public abstract class Debug
     overloading 	= getBoolean(false,"debug.overloading"),
     errorMsg		= getBoolean(false,"debug.errorMsg"),
     codeGeneration 	= getBoolean(false,"debug.codeGeneration"),
-    javaTypes		= getBoolean(false,"debug.javaTypes");
+    javaTypes		= getBoolean(false,"debug.javaTypes"),
+    linkTests           = getBoolean(false,"debug.linkTests"),
+    passes		= getBoolean(false,"debug.passes");
+  
 }

@@ -21,8 +21,10 @@ public class GlobalVarScope extends VarScope
 {
   private Scope<VarSymbol> impl = new Scope(name: "", parent: null);
 
-  addSymbol(VarSymbol sym) =
-    impl.add(sym.getName().toString(), sym, visibility: general);
+  addSymbol(VarSymbol sym) = this.addSymbol(sym, general);
+
+  addSymbol(VarSymbol sym, Visibility vis) =
+    impl.add(sym.getName().toString(), sym, vis);
 
   removeSymbol(VarSymbol sym) = impl.remove(sym.getName().toString(), sym);
 

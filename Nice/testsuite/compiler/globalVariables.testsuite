@@ -60,13 +60,13 @@ var Map<String,String> classMap = (()=> {
   var int x = 0;
 
 /// PASS
-  /// package a 
+  /// package a
   /// TOPLEVEL
-  var int x = 0;
+  public var int x = 0;
   int getAX() = x;
   /// package b import a
   /* Modifying a global var from a different package. */
-  x = 1; 
+  x = 1;
   assert(getAX() == 1);
 
 /// PASS
@@ -92,16 +92,16 @@ var Map<String,String> classMap = (()=> {
   let String s = "abc";
 
 /// PASS
-  /// package a 
+  /// package a
   /// TOPLEVEL
-  let int x = 1;
+  public let int x = 1;
   /// package b import a
   assert(x == 1);
 
 /// FAIL
-  /// package a 
+  /// package a
   /// TOPLEVEL
-  let int x = 0;
+  public let int x = 0;
   /// package b import a
   x = 1;
 

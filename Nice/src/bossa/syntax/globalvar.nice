@@ -23,9 +23,13 @@ public class GlobalVarDeclaration extends Definition
   GlobalVarSymbol left;
   Expression value;
   boolean constant;
+  Visibility visibility;
 
   resolve()
   {
+    left.typeScope = this.compilation.globalTypeScope;
+    left.resolve();
+
     value = analyse(value, notNull(scope), notNull(typeScope));
   }
   
@@ -43,9 +47,14 @@ public class GlobalVarDeclaration extends Definition
     }
   }
 
+  String modifier(Visibility);
+  modifier(intimate) = "private ";
+  modifier(familial) = "";
+  modifier(general) = "public ";
+
   printInterface(s)
   {
-    s.print((constant? "let ": "var ") +left +" = " +value.toString() +";\n");
+    s.print(this.modifier(visibility) + (constant? "let ": "var ") +left +" = " +value.toString() +";\n");
   }
 
   compile()
@@ -61,7 +70,7 @@ public class GlobalVarDeclaration extends Definition
 class GlobalVarSymbol extends MonoSymbol 
 {
   GlobalVarDeclaration definition;
-     
+
   isAssignable() = ! definition.constant;
 
   getDeclaration()
@@ -91,12 +100,14 @@ class GlobalVarSymbol extends MonoSymbol
   getDefinition() = definition;
 }
 
-public GlobalVarDeclaration createGlobalVarDeclaration(LocatedString name,
-		Monotype type, Expression value, boolean constant)
+public GlobalVarDeclaration createGlobalVarDeclaration
+  (LocatedString name,
+   Monotype type, Expression value, boolean constant, Visibility vis)
 {
-    let res = new GlobalVarDeclaration(name, Node.global, left: cast(null),
-			value: value, constant: constant);
+    let res = new GlobalVarDeclaration
+      (name, Node.global, left: cast(null), value: value, constant: constant,
+       visibility: vis);
     res.left = new GlobalVarSymbol(name, syntacticType: type, definition: res);
-    res.addChild(res.left);
+    res.module.scope.addSymbol(res.left, vis);
     return res;
 }

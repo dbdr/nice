@@ -25,6 +25,11 @@ public abstract class VarScope
 {
   abstract void addSymbol(/*VarSymbol*/Symbol s);
 
+  void addSymbol(/*VarSymbol*/Symbol s, nice.tools.visibility.Visibility v)
+  {
+    this.addSymbol(s);
+  }
+
   /**
      Adds a collection of VarSymbols
    */

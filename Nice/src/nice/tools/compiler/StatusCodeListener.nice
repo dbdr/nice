@@ -22,10 +22,10 @@ package nice.tools.compiler;
    @author Daniel Bonniot (bonniot@users.sf.net)
  */
 
-let int OK      = 0; // Normal exit (compilation sucessful, version message)
-let int BUG     = 1; // Abnormal termination (bug in the compiler)
-let int ERROR   = 2; // Error reported (file missing, type error, ...)
-let int WARNING = 3; // Warning reported
+public let int OK      = 0; // Normal exit (compilation sucessful, version message)
+public let int BUG     = 1; // Abnormal termination (bug in the compiler)
+public let int ERROR   = 2; // Error reported (file missing, type error, ...)
+public let int WARNING = 3; // Warning reported
 
 abstract class StatusCodeListener implements bossa.modules.CompilationListener
 {

@@ -1,6 +1,6 @@
 /// Global
 ?String maybeString() = null;
-let ()->?String maybeStringGenerator = (int x => ()=> x++ > 10 ? "abc" : null)(0); 
+public let ()->?String maybeStringGenerator = (int x => ()=> x++ > 10 ? "abc" : null)(0);
 void maybeThrow() = throw new Exception();
 boolean maybeTrue() = true;
 class A {}

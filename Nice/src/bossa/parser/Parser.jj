@@ -31,6 +31,7 @@ import java.util.*;
 
 import bossa.util.*;
 import bossa.syntax.*;
+import nice.tools.visibility.Visibility;
 
 import mlsub.typing.TypeSymbol;
 import mlsub.typing.TypeConstructor;
@@ -1518,7 +1519,7 @@ MethodDeclaration nativeMethodDeclaration(LocatedString name,
   }
 }
 
-Definition globalVariable():
+Definition globalVariable(Visibility vis):
 {
   LocatedString name;
   Monotype t;
@@ -1535,7 +1536,7 @@ Definition globalVariable():
     value=SideEffectFreeExpression()
   )
   ";"
-  { return bossa.syntax.dispatch.createGlobalVarDeclaration(name,t,value,constant); }
+  { return bossa.syntax.dispatch.createGlobalVarDeclaration(name,t,value,constant, vis); }
 }
 
 Contract contract() :
@@ -1572,7 +1573,7 @@ void contractElement(Contract contract, boolean precond) :
 
 
 Definition definition(List definitions, boolean storeDocString):
-{ Definition res; }
+{ Definition res; boolean pub = false, priv = false; }
 {
   (
     LOOKAHEAD( ("class" | "interface") fullyQualifiedName() )
@@ -1581,9 +1582,10 @@ Definition definition(List definitions, boolean storeDocString):
     LOOKAHEAD( methodBodyDefinitionLookahead() )
     res=methodBodyDefinition(null)
   |
-    [ "public" | "private" ]
+    [ "public" { pub = true; } | "private"  { priv = true; } ]
+    { Visibility vis = dispatch.visibility(pub, priv); }
     (
-      res=globalVariable()
+      res=globalVariable(vis)
     | res=enumDefinition(definitions)
     | "override" { Constraint cst; } cst = constraint()
       res=methodDeclaration(cst, true)

@@ -38,28 +38,28 @@
 /// PASS
   /// package a
   /// toplevel
-  var int[?] a = null;
+  public var int[?] a = null;
   /// package b import a
   a = null;
 
 /// PASS
   /// package a
   /// toplevel
-  var (int,int) tuple = (1,2);
+  public var (int,int) tuple = (1,2);
   /// package b import a
   (int x, int y) = tuple;
 
 /// PASS
   /// package a
   /// toplevel
-  var (int,int)->int f = (int x, int y)=> x+y;
+  public var (int,int)->int f = (int x, int y)=> x+y;
   /// package b import a
   f(0,1);
 
 /// PASS
   /// package a
   /// toplevel
-  var ((int,int))->int f = ((int,int) tuple)=> 0;
+  public var ((int,int))->int f = ((int,int) tuple)=> 0;
   /// package b import a
   f((65536,1));
 

@@ -95,8 +95,8 @@
 /// PASS
   /// package a
   /// toplevel
-    let String s = "abc\n";
-    let String t = """abc
+    public let String s = "abc\n";
+    public let String t = """abc
 def""";
 
   /// package b import a

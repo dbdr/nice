@@ -10,41 +10,15 @@
 /*                                                                        */
 /**************************************************************************/
 
-package nice.tools.visibility;
+package bossa.syntax;
+
+import nice.tools.visibility;
 
 /**
-   Flat lookup mode.
-
-   In this mode, symbols in the current scope do not shadow <i>visibile</i>
-   symbols in imported scopes.
+   Utilities to manipulate visibilities.
 
    @author Daniel Bonniot (bonniot@users.sf.net)
  */
 
-<Sym> List<Sym> getFlat(Scope<Sym> this, String key)
-{
-  List<Sym> res = new LinkedList();
-
-  ?Scope<Sym> s = this;
-  while (s != null)
-    {
-      ?List<Sym> temp = s.map[key];
-      if (temp != null)
-	res.addAll(temp);
-
-      temp = s.publicMap[key];
-      if (temp != null)
-	res.addAll(temp);
-
-      for (o : s.opens)
-	{
-	  temp = o.publicMap[key];
-	  if (temp != null)
-	    res.addAll(temp);
-	}
-
-      s = s.parent;
-    }
-
-  return res;
-}
+Visibility visibility(boolean pub, boolean priv) =
+  pub ? general : priv ? intimate: familial;

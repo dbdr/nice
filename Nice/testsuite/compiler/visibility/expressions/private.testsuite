@@ -1,0 +1,19 @@
+/// FAIL bug
+  /// package a
+  /// Toplevel
+class A
+{
+  private String hidden = "secret";
+}
+  /// package b import a
+  println("Got it: " + thief(new A()));
+  /// Toplevel
+String thief(A a) = /*///FAIL HERE*/ a.hidden;
+
+
+/// FAIL
+  /// package a
+  /// Toplevel
+private let String hidden = "secret";
+  /// package b import a
+  String s = /*///FAIL HERE*/ hidden;

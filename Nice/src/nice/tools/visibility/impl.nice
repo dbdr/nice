@@ -24,9 +24,10 @@ private <Sym> ?List<Sym> maybeGet(?Scope<Sym> s, String key) =
 add(Scope this, key, value, visibility) = map.add(key, value);
 add(Scope this, key, value, familial)
 {
-  super;
   if (parent != null)
-    notNull(parent).add(key, value, intimate);
+    notNull(parent).add(key, value, familial);
+  else
+    super;
 }
 add(Scope this, key, value, general)
 {
@@ -34,12 +35,7 @@ add(Scope this, key, value, general)
   if (parent != null)
     notNull(parent).add(key, value, general);
   else
-    {
-      // General implies familial
-      this.add(key, value, familial);
-
-      publicMap.add(key, value);
-    }
+    publicMap.add(key, value);
 }
 
 remove(Scope this, key, value)

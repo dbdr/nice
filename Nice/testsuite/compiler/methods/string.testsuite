@@ -88,7 +88,7 @@ foos("abc") {}
 /// PASS
   /// package a
   /// Toplevel
-    let String test = "\b\t\n\f\r\"\'\\\035abc1\77xyz\44";
+    public let String test = "\b\t\n\f\r\"\'\\\035abc1\77xyz\44";
     boolean foo(String x) = false;
     foo("\b\t\n\f\r\"\'\\\035abc1\77xyz\44") = true;
   /// package b import a

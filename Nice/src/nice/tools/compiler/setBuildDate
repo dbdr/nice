@@ -12,9 +12,9 @@ date="`date -u +'%Y.%m.%d, %T %Z'`"
 
 echo > dateBuild.nice
 echo "package nice.tools.compiler;" >> dateBuild.nice
-echo "let String versionNumber = \"$version\";" >> dateBuild.nice
-echo "let String buildDate = \"$date\";" >> dateBuild.nice
-echo "let String javaVersion = \"$javaVersion\";" >> dateBuild.nice
+echo "public let String versionNumber = \"$version\";" >> dateBuild.nice
+echo "public let String buildDate = \"$date\";" >> dateBuild.nice
+echo "public let String javaVersion = \"$javaVersion\";" >> dateBuild.nice
 
 
 echo "Main-Class: nice.tools.compiler.console.fun

@@ -58,7 +58,7 @@
   /// package a
   /// Toplevel
   class A {}
-  let A xxx = new A();
+  public let A xxx = new A();
   let A yyy = new A();
   boolean foo(A);
   foo(a) = false;
@@ -80,9 +80,9 @@
   /// package a
   /// Toplevel
   class Color {}
-  let Color red = new Color();
-  let Color blue = new Color();
-  let Color green = new Color();
+  public let Color red = new Color();
+  public let Color blue = new Color();
+  public let Color green = new Color();
   String name(Color);
   name(Color color) = "unknown color";
   name(red) = "red";

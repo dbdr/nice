@@ -1,7 +1,7 @@
 /**************************************************************************/
-/*                           B O S S A                                    */
-/*        A simple imperative object-oriented research language           */
-/*                   (c)  Daniel Bonniot 1999                             */
+/*                                N I C E                                 */
+/*             A high-level object-oriented research language             */
+/*                        (c) Daniel Bonniot 2000                         */
 /*                                                                        */
 /*  This program is free software; you can redistribute it and/or modify  */
 /*  it under the terms of the GNU General Public License as published by  */
@@ -9,9 +9,6 @@
 /*  (at your option) any later version.                                   */
 /*                                                                        */
 /**************************************************************************/
-
-// File    : Package.java
-// Created : Wed Oct 13 16:09:47 1999 by bonniot
 
 package bossa.modules;
 
@@ -30,7 +27,7 @@ import bossa.util.Location;
    A Nice package.
    
    @version $Date$
-   @author bonniot
+   @author Daniel Bonniot (d.bonniot@mail.dotcom.fr)
  */
 public class Package implements mlsub.compilation.Module, Located, bossa.syntax.Module
 {
@@ -712,6 +709,15 @@ public class Package implements mlsub.compilation.Module, Located, bossa.syntax.
       (nice.tools.code.Strings.escape(def.getBytecodeName()),
        Access.PUBLIC|Access.STATIC|Access.FINAL,
        def.javaArgTypes(),def.javaReturnType());
+  }
+
+  public gnu.bytecode.Method addPackageMethod
+    (String name, Type[] argTypes, Type retType)
+  {
+    return getOutputBytecode().addMethod
+      (nice.tools.code.Strings.escape(name),
+       argTypes, retType,
+       Access.PUBLIC|Access.STATIC|Access.FINAL);
   }
 
   public String bytecodeName()

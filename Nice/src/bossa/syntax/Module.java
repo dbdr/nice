@@ -15,6 +15,7 @@ package bossa.syntax;
 import java.util.Iterator;
 import gnu.bytecode.ClassType;
 import gnu.bytecode.Method;
+import gnu.bytecode.Type;
 
 /**
    A Nice module.
@@ -25,22 +26,23 @@ import gnu.bytecode.Method;
 
 public interface Module extends mlsub.compilation.Module
 {
-  abstract String[] listImplicitPackages();
+  String[] listImplicitPackages();
 
-  abstract String mangleName(String name);
+  String mangleName(String name);
 
   boolean isRunnable();
   void isRunnable(boolean isRunnable);
 
-  abstract boolean generatingBytecode();
-  abstract ClassType getOutputBytecode();
-  abstract ClassType getReadBytecode();
-  abstract Method addDispatchMethod(NiceMethod def);
-  abstract Method getMainAlternative();
+  boolean generatingBytecode();
+  ClassType getOutputBytecode();
+  ClassType getReadBytecode();
+  Method addDispatchMethod(NiceMethod def);
+  Method addPackageMethod(String name, Type[] argTypes, Type retType);
+  Method getMainAlternative();
   void setMainAlternative(Method main);
-  abstract void compileMethod(gnu.expr.LambdaExp meth);
-  abstract void addClassInitStatement(gnu.expr.Expression exp);
-  abstract ClassType createClass(String name);
-  abstract void addClass(ClassType c);
+  void compileMethod(gnu.expr.LambdaExp meth);
+  void addClassInitStatement(gnu.expr.Expression exp);
+  ClassType createClass(String name);
+  void addClass(ClassType c);
   gnu.expr.ScopeExp getPackageScopeExp();
 }

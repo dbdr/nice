@@ -1210,7 +1210,7 @@ Pattern anonymousPattern(LocatedString name):
 }
 {
   (
-    t="@" ( val=Literal() | tc=typeIdent() )
+    t="@" ( val=patternLiteral() | tc=typeIdent() )
   | 
     t="#" tc=typeIdent() { exactlyAt = true; }
   )
@@ -1747,7 +1747,7 @@ Expression Expression() :
 {
   { first=getToken(1); }
 
-  ( 
+  ( //TODO: simplify next lookahead after removal of the 'fun' keyword.
     LOOKAHEAD(funExp()) e1=funExp() 
   | LOOKAHEAD(monoSymbol() "=>") e1=simpleVarFunExp() 
   | e1=ClassicExpression() 
@@ -2120,6 +2120,25 @@ Expression Literal() :
 			 new Location(t)));
     }
 | res=stringConstantExp()
+  )
+{ return res; }
+}
+
+Expression patternLiteral() :
+//restricted literal for use in dispatch patterns
+{
+  Expression res;
+  Token t;
+}
+{
+  (
+  "null" { res = NullExp.instance; }
+| res=intConstantExp() 
+| t=<CHARACTER_LITERAL> 
+    { res=ConstantExp.makeChar
+      (new LocatedString(t.image.substring(1,t.image.length()-1),
+			 new Location(t)));
+    }
   )
 { return res; }
 }

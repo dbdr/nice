@@ -72,14 +72,6 @@ public abstract class Statement
     return res;
   }
 
-  static gnu.expr.Expression sequence(gnu.expr.Expression e1, gnu.expr.Expression e2)
-  {
-    gnu.expr.Expression[] array=new gnu.expr.Expression[2];
-    array[0]=e1;
-    array[1]=e2;
-    return new gnu.expr.BeginExp(array);
-  }
-  
   /****************************************************************
    * Location
    ****************************************************************/

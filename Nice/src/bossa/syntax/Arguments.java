@@ -272,7 +272,6 @@ public class Arguments
           continue;
         if (param instanceof FormalParameters.NamedParameter) 
           {
-            FormalParameters.NamedParameter namedParam = (FormalParameters.NamedParameter)param;
             for (int i = 0; i < arguments.length; i++)
               if (arguments[i].name != null)
                 { 

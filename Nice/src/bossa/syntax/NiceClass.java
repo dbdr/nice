@@ -596,7 +596,6 @@ public class NiceClass extends ClassDefinition.ClassImplementation
     mlsub.typing.TypeSymbol[] binders = other.definition.getBinders();
     mlsub.typing.TypeSymbol[] ourBinders = definition.getBinders();
     TypeScope scope = Node.getGlobalTypeScope();
-    Map map = null;
     if (binders != null)
       {
 	scope = new TypeScope(scope);
@@ -671,7 +670,6 @@ public class NiceClass extends ClassDefinition.ClassImplementation
   */
   private void checkFields (FormalParameters.Parameter[] allFields)
   {
-    int len = allFields.length;
     for (int f = 0; f < fields.length; f++)
       fields[f].checkNoDuplicate(allFields, f);
 

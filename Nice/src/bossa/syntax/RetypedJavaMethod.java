@@ -57,7 +57,6 @@ public class RetypedJavaMethod extends JavaMethod
     this.className = className;
     this.methodName = methodName;
     this.javaTypes = javaTypes;
-    this.syntacticReturnType = returnType.toString();
   }
 
   void buildScope(VarScope outer, TypeScope typeOuter)
@@ -273,16 +272,6 @@ public class RetypedJavaMethod extends JavaMethod
       }
     return res + ")";
   }
-
-  public String getSyntacticReturnType()
-  {
-    if (ignoredRetyping)
-      return syntacticReturnType;
-
-    return super.getSyntacticReturnType();
-  }
-
-  String syntacticReturnType;
 
   boolean ignoredRetyping;
 

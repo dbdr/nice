@@ -120,11 +120,6 @@ public abstract class MethodDeclaration extends Definition
     return type.codomain();
   }
   
-  public String getSyntacticReturnType()
-  {
-    return String.valueOf(getReturnType());
-  }
-
   boolean isIgnored()
   {
     return false;
@@ -250,7 +245,7 @@ public abstract class MethodDeclaration extends Definition
     return
       (syntacticConstraint != null ? syntacticConstraint
        : Constraint.toString(getType().getConstraint()))
-      + getSyntacticReturnType()
+      + String.valueOf(getReturnType())
       + " "
       + getName().toQuotedString()
       + "("

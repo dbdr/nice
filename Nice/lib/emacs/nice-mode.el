@@ -71,7 +71,14 @@
   (package "\\<\\w+\\>\\(\\.\\<\\w+\\>\\)*")
   (opt-package-prefix (concat "\\(" package "\\.\\)?"))
 
-  (type (concat opt-package-prefix "\\<\\w+\\>\\(<\\w+>\\)?")) ;; eg. nice.lang.List<String>
+  (class-type "\\<_?[A-Z][a-zA-Z][a-zA-Z_'0-9]*\\>")
+  (prim-type "\\<\\(void\\|double\\|float\\|long\\|int\\|char\\|short\\|byte\\|boolean\\)\\>")
+  (type-parameters-opt 
+   ;"\\(<\\(\\s-\\|\\w\\|,\\)+>\\s-*\\)?" ; stack-overflows!
+   "\\s-*\\(<\\w+>\\)?\\s-*"
+  )
+
+  (type (concat "\\(" opt-package-prefix "\\(" prim-type "\\|" class-type type-parameters-opt "\\)\\)")) ;; eg. nice.lang.List<String>
 
   (ident "\\(\\<\\w+\\>\\)")
   (spaces "\\s-*") ;; should be the same as spaces-or-comment, but this would be too expensive
@@ -136,7 +143,7 @@
       "\\(\\<\\(static\\|public\\|private\\|final\\|native\\)\\>\\s-+\\)*" ;; visibility
       "\\(<\\(\\w\\|\\s-\\|,\\)*>\\)?" ;; type quantification
       spaces type ;; return type
-      spaces "\\(\\<\\w+\\>\\.\\)?" ;; package prefix
+      spaces opt-package-prefix
       "\\(\\)" ;; what we are looking for!
       ident ;; method name
       spaces "\\(<\\(\\w\\|\\s-\\|,\\)*>\\)?" ;; rebinders
@@ -150,7 +157,7 @@
      (concat
       "^" spaces-or-comment
       "\\(\\)" ;; MARKER
-      ident spaces
+      ident type-parameters-opt
       "([^\)]*)" spaces "\\(\n" spaces "\\)?"
       "[={]" 
       )
@@ -163,7 +170,7 @@
      "\\(\\<\\(static\\|private\\|public\\|local\\)\\>\\s-+\\)*" ;; visibility
      type spaces
      "\\(\\)" ;; what we are looking for!
-     "\\<\\(\\w+\\)\\>" ;; field name
+     ident ;; field name
      spaces "[=;]"
      )
     'nice-declaration-face)
@@ -186,9 +193,7 @@
    '("\\<\\(true\\|false\\|this\\|null\\|[A-Z][A-Z_]+\\|0\\|[1-9][0-9]*\\|0[xX][0-9a-fA-F]+\\|0[0-7]+\\)\\>"
      1 nice-constant-face)
    
-   ;; Classes (begin with a capital, or prim types)
-   '("[^\\.]\\<\\(_?[A-Z][a-zA-Z][a-zA-Z_'0-9]*\\|void\\|double\\|float\\|long\\|int\\|char\\|short\\|byte\\|boolean\\)\\>"
-     1 nice-type-face)
+   (list type 1 'nice-type-face)
    
    ;; Keywords
    '("\\<\\(fun\\|static\\|final\\|extends\\|implements\\|abstract\\|public\\|var\\|class\\|interface\\|new\\|else\\|native\\|inline\\|import\\|require\\|package\\|alike\\|Any\\|return\\|try\\|catch\\|finally\\|throw\\)\\>\\|@"
@@ -532,8 +537,9 @@ Mode for editing/compiling Nice programs.
 
 (defun nice-compilation-exit (process-status exit-status exit-message)
   (cond 
-    ((eq exit-status 0) (let ((win (get-buffer-window nice-compile-buffer)))
-	   (if win (delete-window win)))
+    ((eq exit-status 0) 
+     (let ((win (get-buffer-window nice-compile-buffer)))
+       (if win (delete-window win)))
      '("successful" . "OK"))
     ((eq exit-status 1) '("Compiler bug" . "Bug"))
     ((eq exit-status 2) (save-excursion (next-error) '("error" . "error")))

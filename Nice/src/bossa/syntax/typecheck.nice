@@ -483,7 +483,9 @@ typecheck(s@ExpressionStmt)
 
 typecheck(l@LoopStmt)
 {
-  typecheck(l.whileExp);
+  l.whileExp = checkAssignment(notNull(PrimitiveType.boolPolytype), 
+			       notNull(l.whileExp));
+  //typecheck(l.whileExp);
 
   enterIf();
 

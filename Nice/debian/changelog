@@ -13,7 +13,8 @@ nice (0.7.7) unstable; urgency=low
     It's now also possible to refer to static methods as anonymous functions:
       String[] s = integerArray.map(Integer.toHexString);
   * Faster compilation for large projects with many classes.
-  * Bugfixes (anonymous functions inside functionals with constracts).
+  * Bugfixes (anonymous functions inside functionals with constracts,
+    typechecking loop tests, ...).
 
  --
 

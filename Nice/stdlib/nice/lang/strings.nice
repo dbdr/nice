@@ -20,7 +20,9 @@ package nice.lang;
  * Strings
  ****************************************************************/
 
-<Any R> String `+`(String s, R o) = s.concat(String.valueOf(o));
+<T> String `+`(String s, T o) = s.concat(String.valueOf(o));
+<!T> String `+`(T o, String s) = o.toString().concat(s);
+String `+`(String s1, String s2) = s1.concat(s2);
 
 int indexOf(String, char)          = native int String.indexOf(int);
 int indexOf(String, char, int)     = native int String.indexOf(int, int);

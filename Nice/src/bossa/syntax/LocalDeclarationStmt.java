@@ -12,7 +12,7 @@
 
 // File    : LocalDeclarationStmt.java
 // Created : Tue Jul 06 12:06:20 1999 by bonniot
-//$Modified: Fri Jul 23 11:59:43 1999 by bonniot $
+//$Modified: Mon Jul 26 14:32:22 1999 by bonniot $
 // Description : Declaration of a local variable
 //   with optional initial value
 

@@ -12,7 +12,7 @@
 
 // File    : MethodDefinition.java
 // Created : Thu Jul 01 18:12:46 1999 by bonniot
-//$Modified: Sat Jul 24 14:38:32 1999 by bonniot $
+//$Modified: Tue Jul 27 10:16:53 1999 by bonniot $
 // Description : Abstract syntax for a global method declaration
 
 package bossa.syntax;
@@ -20,7 +20,7 @@ package bossa.syntax;
 import java.util.*;
 import bossa.util.*;
 
-public class MethodDefinition extends LocalSymb implements Definition
+public class MethodDefinition extends PolySymbol implements Definition
 {
   /** the Method is a class member */
   public MethodDefinition(ClassDefinition c,

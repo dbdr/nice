@@ -12,7 +12,7 @@
 
 // File    : Polytype.java
 // Created : Tue Jul 13 12:51:38 1999 by bonniot
-//$Modified: Sat Jul 24 19:18:01 1999 by bonniot $
+//$Modified: Mon Jul 26 17:23:41 1999 by bonniot $
 
 package bossa.syntax;
 
@@ -44,6 +44,15 @@ public class Polytype extends Type
     return new Polytype
       (new Constraint(alpha,null),
        alpha);
+  }
+  
+  static Collection fromMonotypes(Collection monotypes)
+  {
+    Collection res=new ArrayList(monotypes.size());
+    for(Iterator i=monotypes.iterator();
+	i.hasNext();)
+      res.add(new Polytype(Constraint.True(),(Monotype)i.next()));
+    return res;
   }
   
   Polytype clonePolytype()
@@ -117,6 +126,6 @@ public class Polytype extends Type
     return constraint+" "+monotype.toStringExtern();
   }
 
-  Constraint constraint;
-  Monotype monotype;
+  public Constraint constraint;
+  public Monotype monotype;
 }

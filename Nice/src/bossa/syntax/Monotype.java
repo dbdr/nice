@@ -12,7 +12,7 @@
 
 // File    : Monotype.java
 // Created : Thu Jul 01 19:28:28 1999 by bonniot
-//$Modified: Sat Jul 24 18:01:14 1999 by bonniot $
+//$Modified: Tue Jul 27 11:08:12 1999 by bonniot $
 // Description : Abstract syntactic type, without constraint
 
 package bossa.syntax;
@@ -41,10 +41,22 @@ abstract public class Monotype
    * @param m a monotype the new one should be comparable to
    * @return the fresh monotype
    */
-  static MonotypeVar fresh(LocatedString associatedVariable,
-			Monotype m)
+  static MonotypeVar fresh(LocatedString associatedVariable,Monotype m)
   {
     return new MonotypeVar(associatedVariable,true);
+  }
+  
+  static MonotypeVar fresh(LocatedString associatedVariable)
+  {
+    return fresh(associatedVariable,null);
+  }
+  
+  static Collection freshs(int arity, LocatedString associatedVariable)
+  {
+    Collection res=new ArrayList(arity);
+    for(int i=1;i<=arity;i++)
+      res.add(fresh(new LocatedString(associatedVariable.content+arity,associatedVariable.location())));
+    return res;
   }
   
   /**************************************************************
@@ -75,18 +87,40 @@ abstract public class Monotype
     return null;
   }
 
-  /** the list of input types if this type is functional */
-  Collection domain()
+  /****************************************************************
+   * Functional types
+   ****************************************************************/
+
+  /** the list of input Monotypes if this type is functional */
+  public Collection domain()
   {
     return null;
   }
 
   /** the return type if this type is functional */
-  Monotype codomain()
+  public Monotype codomain()
   {
     return null;
   }
 
+  public Monotype functionalCast(int arity)
+    throws bossa.typing.TypingEx
+  {
+    return this;
+  }
+  
+  public TypeConstructor decomposeTC(Variance v)
+  {
+    User.error("decomposeTC should not be called in class "+getClass());
+    return null;
+  }
+  
+  public TypeParameters decomposeTP(Variance v)
+  {
+    User.error("decomposeTP should not be called in class "+getClass());
+    return null;
+  }
+  
   abstract Monotype substitute(Map map);
 
   static Collection substitute(Map map, Collection c)

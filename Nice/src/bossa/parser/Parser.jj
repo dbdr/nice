@@ -12,7 +12,7 @@
 
 // File    : parser.jj
 // Created : Thu Jul 01 10:27:05 1999 by bonniot
-//$Modified: Sat Jul 24 15:02:57 1999 by bonniot $
+//$Modified: Tue Jul 27 12:52:27 1999 by bonniot $
 // Description : Parseur JavaCC pour Bossa
 //   Tokens based on the Jazz parser
 
@@ -191,6 +191,7 @@ TOKEN: /* Keywords */
 | < AS:         "as"         >
 | < VAR:        "var"        >
 
+| < ANY_:	"Any"        >
 // Statements
 | < RETURN:     "return"     >
 
@@ -378,6 +379,17 @@ TypeConstructor typeConstructor():
   { return new TypeConstructor(name); }
 }
 
+Interface itf():
+{
+  LocatedString name;
+}
+{
+  name=string()
+  {
+    return new Interface(name);
+  }
+}
+
 Collection typeConstructors():
 {
   Collection res=new ArrayList();
@@ -430,7 +442,7 @@ Collection typeSymbols():
 }
 */
 
-FieldSymb fieldSymb():
+MonoSymbol monoSymbol():
 {
   LocatedString name;
   Monotype type;
@@ -438,18 +450,18 @@ FieldSymb fieldSymb():
 {
   type=monotype()
   name=string()
-  { return new FieldSymb(name,type,null); }
+  { return new MonoSymbol(name,type,null); }
 }
 
 Collection monoSymbols():
 {
   Collection res=new ArrayList();
-  FieldSymb name;
+  MonoSymbol name;
 }
 {
   (
-    name=fieldSymb() { res.add(name); }
-    ( "," name=fieldSymb() { res.add(name); } )*
+    name=monoSymbol() { res.add(name); }
+    ( "," name=monoSymbol() { res.add(name); } )*
   )?
   { return res; }
 }
@@ -458,17 +470,23 @@ Collection monoSymbols():
 /*                          Constraints                                */
 /***********************************************************************/
 
-TypeIdent binder(Collection atomics):
+TypeSymbol binder(Collection atomics):
 {
-  TypeIdent first,second=null;
+  TypeConstructor first,second=null;
+  MonotypeVar id;
 }
 {
-   first=typeIdent() [ second=typeIdent() ]
-   { 
-     if(second==null)
-       return first;
-     atomics.add(new LeqCst(second,first)); 
-     return second; 
+  "Any" id=monotypeVar()
+  { return id;
+  }
+|
+  first=typeConstructor() 
+  second=typeConstructor()
+  { 
+    if(second==null)
+      return first;
+    atomics.add(new TypeConstructorLeqCst(second,first)); 
+    return second; 
    }
 }
 
@@ -485,16 +503,28 @@ Collection binders(Collection atomics):
 
 AtomicConstraint atomicConstraint():
 {
+  Monotype m1,m2;  
   TypeIdent t1,t2;
   AtomicConstraint res;
 }
 {
   (
-  t1=typeIdent()
-  "<:"
-  t2=typeIdent()
+   m1=monotype()
+   "<:"
+   m2=monotype()
+   {
+     res=new MonotypeLeqCst(m1,m2);
+   }
+  )
+    /*
+|
+  (
+   t1=typeIdent()
+   "<:"
+   t2=typeIdent()
   { res=new LeqCst(t1,t2); }
   )
+    */
   { return res; }
 }
 
@@ -712,22 +742,22 @@ void extensions(ClassDefinition c):
 
 void implementations(ClassDefinition c):
 {
-    TypeConstructor name;
+    Interface name;
 }
 {
     "implements"
-    name=typeConstructor() { c.addImplementation(name); }
-    ( "," name=typeConstructor() { c.addImplementation(name); } )*
+    name=itf() { c.addImplementation(name); }
+    ( "," name=itf() { c.addImplementation(name); } )*
 }
 
 void abstractions(ClassDefinition c):
 {
-    TypeConstructor name;
+    Interface name;
 }
 {
     "abstracts"
-    name=typeConstructor() { c.addAbstraction(name); }
-    ( "," name=typeConstructor() { c.addAbstraction(name); } )*
+    name=itf() { c.addAbstraction(name); }
+    ( "," name=itf() { c.addAbstraction(name); } )*
 }
 
 ClassDefinition classDefinition():
@@ -737,7 +767,7 @@ ClassDefinition classDefinition():
     Collection parameters;
 }
 {
-    "class"
+  "class"
     name=string() 
     parameters=monotypeVars() 
     { res=new ClassDefinition(name,parameters); }
@@ -752,11 +782,15 @@ ClassDefinition classDefinition():
 
 InterfaceDefinition interfaceDefinition():
 {
-    LocatedString name;
+  LocatedString name;
+  Collection parameters;
 }
 {
-    "interface" name=string() ";"
-    { return new InterfaceDefinition(name); }
+  "interface"
+  name=string()
+  parameters=monotypeVars()
+  ";"
+  { return new InterfaceDefinition(name,parameters); }
 }
 
 Pattern pattern(LocatedString name):

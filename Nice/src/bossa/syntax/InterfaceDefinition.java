@@ -12,19 +12,24 @@
 
 // File    : InterfaceDefinition.java
 // Created : Thu Jul 01 17:00:14 1999 by bonniot
-//$Modified: Sat Jul 24 13:36:26 1999 by bonniot $
-// Description : Abstract syntax for a class definition
+//$Modified: Tue Jul 27 12:39:23 1999 by bonniot $
 
 package bossa.syntax;
 
+import java.util.*;
 import bossa.util.*;
 
-public class InterfaceDefinition extends Node//TypeSymbol 
+/** Abstract syntax for an interface definition
+ *
+ */
+public class InterfaceDefinition extends Node
   implements Definition,TypeSymbol
 {
-  public InterfaceDefinition(LocatedString name)
+  public InterfaceDefinition(LocatedString name, Collection typeParameters)
   {
     this.name=name;
+    this.parameters=typeParameters;
+    
     //    this.type=new ItfType(this); // we have to do this 
                                  // since this cannot be used 
                                  // in the above line
@@ -39,12 +44,22 @@ public class InterfaceDefinition extends Node//TypeSymbol
    * 
    ****************************************************************/
 
-  public TypeSymbol resolve(TypeScope scope)
+  TypeSymbol resolve(TypeScope scope)
   {
     return this;
   }
 
-  void resolveScope()
+  static Collection resolve(TypeScope typeScope, Collection c)
+  {
+    Collection res=new ArrayList(c.size());
+    Iterator i=c.iterator();
+    while(i.hasNext())
+      res.add(((TypeConstructor)i.next()).resolve(typeScope));
+
+    return res;
+  }
+
+void resolveScope()
   {
     
   }
@@ -80,4 +95,5 @@ public class InterfaceDefinition extends Node//TypeSymbol
   }
 
   LocatedString name;
+  Collection /* of TypeSymbol */ parameters;
 }

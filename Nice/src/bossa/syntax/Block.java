@@ -12,7 +12,7 @@
 
 // File    : Block.java
 // Created : Wed Jul 07 17:42:15 1999 by bonniot
-//$Modified: Fri Jul 23 11:59:28 1999 by bonniot $
+//$Modified: Tue Jul 27 10:20:37 1999 by bonniot $
 // Description : A block : a list of statements with local variables
 
 package bossa.syntax;
@@ -53,7 +53,7 @@ public class Block extends Statement
 	if(s instanceof LocalDeclarationStmt)
 	  { 
 	    LocalDeclarationStmt decl=(LocalDeclarationStmt)s;
-	    res.add(new LocalSymb(decl.name,decl.type));
+	    res.add(new PolySymbol(decl.name,decl.type));
 	  }
       }
     return res;

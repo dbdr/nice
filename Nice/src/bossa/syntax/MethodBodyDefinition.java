@@ -12,7 +12,7 @@
 
 // File    : MethodBodyDefinition.java
 // Created : Thu Jul 01 18:12:46 1999 by bonniot
-//$Modified: Sat Jul 24 19:15:58 1999 by bonniot $
+//$Modified: Tue Jul 27 13:20:59 1999 by bonniot $
 // Description : Abstract syntax for a method body
 
 package bossa.syntax;
@@ -71,8 +71,8 @@ public class MethodBodyDefinition extends Node
 	Pattern p=(Pattern)n.next();
 	Monotype domt=(Monotype)t.next();
 	
-	res.add(new LocalSymb(p.name,
-			      new Polytype(Monotype.fresh(p.name,domt))));
+	res.add(new MonoSymbol(p.name,
+			      Monotype.fresh(p.name,domt),null));
       }
     User.error(t.hasNext(),
 	       "Method body "+this.name+" has not enough parameters");
@@ -121,9 +121,14 @@ public class MethodBodyDefinition extends Node
 
   void typecheck()
   {
-    Typing.enter(definition.type,"Method body "+name);
+    Typing.enter(definition.type.getTypeParameters(),"method body of "+name);
 
     try{
+      definition.type.getConstraint().assert();
+      Typing.leqMono
+	(MonoSymbol.getMonotype(parameters),
+	 definition.type.domain());
+      
       Typing.in
 	(VarSymbol.getType(parameters),
 	 Pattern.getDomain(formals));
@@ -173,7 +178,7 @@ public class MethodBodyDefinition extends Node
 
   private MethodDefinition definition;
   protected LocatedString name;
-  protected Collection /* of VarSymbol */  parameters;
+  protected Collection /* of FieldSymbol */  parameters;
   protected List       /* of Patterns */   formals;
   protected Collection /* of TypeConstructor */ typeParameters;
   private Block body;

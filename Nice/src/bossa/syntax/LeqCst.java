@@ -12,7 +12,7 @@
 
 // File    : LeqCst.java
 // Created : Mon Jul 19 16:42:14 1999 by bonniot
-//$Modified: Sat Jul 24 14:13:17 1999 by bonniot $
+//$Modified: Mon Jul 26 15:08:00 1999 by bonniot $
 // Description : Inequality between type constructors
 
 package bossa.syntax;
@@ -54,7 +54,9 @@ public class LeqCst extends AtomicConstraint
     else if(s1 instanceof Monotype && s2 instanceof Monotype)
       return new MonotypeLeqCst((Monotype) s1,
 				(Monotype) s2);
-    User.error(t1,"Constraint is not well kinded");
+
+
+    User.error(t1,"Constraint "+this+" is not well kinded");
     return null;
   }
 

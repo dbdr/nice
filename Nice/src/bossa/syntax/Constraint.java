@@ -12,7 +12,7 @@
 
 // File    : Constraint.java
 // Created : Fri Jul 02 17:51:35 1999 by bonniot
-//$Modified: Sat Jul 24 17:58:41 1999 by bonniot $
+//$Modified: Tue Jul 27 10:29:24 1999 by bonniot $
 
 package bossa.syntax;
 
@@ -104,6 +104,16 @@ public class Constraint
   }
 
   /****************************************************************
+   * Typechecking
+   ****************************************************************/
+
+  public void assert()
+    throws bossa.typing.TypingEx
+  {
+    AtomicConstraint.assert(atomics);
+  }
+  
+  /****************************************************************
    * Printing
    ****************************************************************/
 
@@ -119,6 +129,6 @@ public class Constraint
 	+ Util.map("",", ","}",atomics);
   }
 
-  Collection /* of TypeSymbol */ binders;
+  public Collection /* of TypeSymbol */ binders;
   Collection /* of AtomicConstraint */ atomics;
 }

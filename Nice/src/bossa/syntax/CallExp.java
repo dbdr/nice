@@ -12,7 +12,7 @@
 
 // File    : CallExp.java
 // Created : Mon Jul 05 16:27:27 1999 by bonniot
-//$Modified: Sat Jul 24 19:19:55 1999 by bonniot $
+//$Modified: Tue Jul 27 12:40:58 1999 by bonniot $
 
 package bossa.syntax;
 
@@ -47,13 +47,22 @@ public class CallExp extends Expression
   Type getType()
   {
     Type t=fun.getType();
-
+    Collection dom=t.domain();
+    Monotype codom=t.codomain();
+    
+    User.error(dom==null || codom==null,
+	       this,fun+" is not a function");
+    
     User.error(!(t instanceof Polytype),this,
 	       "You have to specify the type parameters for function "+
 	       fun);
 
-    Typing.enter(t,this.fun+"");
+    Typing.enter(t.getTypeParameters(),this.fun+"");
+
+    Typing.implies();
+
     try{
+      t.getConstraint().assert();
       Typing.in(Expression.getType(parameters),
 		Domain.fromMonotypes(t.domain()));
     }

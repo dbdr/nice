@@ -10,55 +10,64 @@
 /*                                                                        */
 /**************************************************************************/
 
-// File    : TypeConstructorLeqCst.java
-// Created : Sat Jul 24 12:02:15 1999 by bonniot
-//$Modified: Mon Jul 26 15:49:17 1999 by bonniot $
+// File    : PolySymbol.java
+// Created : Fri Jul 16 17:03:51 1999 by bonniot
+//$Modified: Tue Jul 27 10:14:36 1999 by bonniot $
+// Description : A local variable
 
 package bossa.syntax;
 
 import bossa.util.*;
 
-/**
- * Inequality between TypeConstructors
- * 
- * @author bonniot
+/** A variable symbol which has a polytype (eg a local variable)
+ *
+ * @see MonoSymbol
  */
-
-public class TypeConstructorLeqCst extends AtomicConstraint
+public class PolySymbol extends VarSymbol
 {
-  public TypeConstructorLeqCst(TypeConstructor t1, TypeConstructor t2)
+  public PolySymbol(LocatedString name, Type type)
   {
-    this.t1=t1;
-    this.t2=t2;
+    super(name);
+    this.type=type;
   }
 
-  AtomicConstraint substitute(java.util.Map m)
+  public Type getType()
   {
-    return this;
-  }
-
-  AtomicConstraint resolve(TypeScope ts)
-  {
-    return this;
+    return type;
   }
 
   /****************************************************************
-   * Typechecking
+   * Scoping
    ****************************************************************/
 
-  void assert()
+  void buildScope(VarScope scope, TypeScope ts)
   {
-    bossa.typing.Typing.leq(t1,t2);
+    super.buildScope(scope,ts);
+    type.buildScope(this.typeScope);
   }
-  
+
+  void resolveScope()
+  {
+    type.resolve();
+  }
+
+  /****************************************************************
+   * Type checking
+   ****************************************************************/
+
+  void typecheck()
+  {
+    //Nothing
+  }
+
   /****************************************************************
    * Printing
    ****************************************************************/
 
   public String toString()
   {
-    return t1+" <: "+t2;
+    return type+" "+name;
   }
 
-  TypeConstructor t1,t2;
+  Type type;
 }

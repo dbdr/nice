@@ -12,10 +12,11 @@
 
 // File    : MonotypeVar.java
 // Created : Fri Jul 23 15:36:39 1999 by bonniot
-//$Modified: Sat Jul 24 17:15:16 1999 by bonniot $
+//$Modified: Tue Jul 27 11:16:48 1999 by bonniot $
 
 package bossa.syntax;
 
+import java.util.*;
 import bossa.util.*;
 
 /**
@@ -48,6 +49,50 @@ public class MonotypeVar extends Monotype
     return name.equals(s);
   }
 
+  /****************************************************************
+   * Functional type
+   ****************************************************************/
+
+  public Monotype functionalCast(int arity)
+    throws bossa.typing.TypingEx
+  {
+    if(equivalentCodomain==null)
+      {
+	equivalentCodomain=Monotype.fresh(new LocatedString(name.content+"0",name.location()));
+	equivalentDomain=Monotype.freshs(arity,name);
+
+	functionalType=new FunType(equivalentDomain,equivalentCodomain);
+	
+	//bossa.typing.Typing.leq(this,functionalType);
+	//bossa.typing.Typing.leq(functionalType,this);
+      }
+    return functionalType;
+  }
+  
+  public Monotype codomain()
+  {
+    return equivalentCodomain;
+  }
+  
+  public Collection domain()
+  {
+    return equivalentDomain;
+  }
+  
+  public TypeConstructor decomposeTC(Variance v)
+  {
+    if(equivalentTC==null)
+      equivalentTC=new TypeConstructor(this,v);
+    return equivalentTC;
+  }
+  
+  public TypeParameters decomposeTP(Variance v)
+  {
+    if(equivalentTP==null)
+      equivalentTP=new TypeParameters(this,v);
+    return equivalentTP;
+  }
+  
   /****************************************************************
    * Scoping
    ****************************************************************/
@@ -103,5 +148,13 @@ public class MonotypeVar extends Monotype
    * If true,  this is really a variable monotype
    * If false, this must be found in scope
    */
-  boolean soft;
+  private boolean soft;
+
+  /** When this variable is comparable to a functional type */
+  private Monotype equivalentCodomain;
+  private Collection equivalentDomain;
+  private Monotype functionalType;
+
+  private TypeConstructor equivalentTC;
+  private TypeParameters equivalentTP;
 }

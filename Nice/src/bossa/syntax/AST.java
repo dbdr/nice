@@ -12,7 +12,7 @@
 
 // File    : AST.java
 // Created : Thu Jul 01 11:01:56 1999 by bonniot
-//$Modified: Fri Jul 23 17:18:55 1999 by bonniot $
+//$Modified: Tue Jul 27 11:58:02 1999 by bonniot $
 
 package bossa.syntax;
 
@@ -87,6 +87,8 @@ public class AST extends Node
 	Object d=i.next();
 	if(types && d instanceof ClassDefinition)
 	  res.add(((ClassDefinition)d).tc);
+	else if(types && d instanceof TypeSymbol)
+	  res.add((TypeSymbol)d);
 	else if(!types && d instanceof VarSymbol)
 	  res.add(d);
 	if(!types && d instanceof ClassDefinition)

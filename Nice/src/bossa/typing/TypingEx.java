@@ -12,7 +12,7 @@
 
 // File    : TypingEx.java
 // Created : Tue Jul 20 12:06:53 1999 by bonniot
-//$Modified: Thu Jul 22 19:34:53 1999 by bonniot $
+//$Modified: Tue Jul 27 11:06:10 1999 by bonniot $
 // Description : Generic type exception
 
 package bossa.typing;
@@ -20,7 +20,7 @@ package bossa.typing;
 import bossa.util.*;
 import bossa.syntax.*;
 
-abstract public class TypingEx extends Exception
+public class TypingEx extends Exception
 {
   TypingEx(String msg)
   {

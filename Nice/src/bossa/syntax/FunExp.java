@@ -12,7 +12,7 @@
 
 // File    : FunExp.java
 // Created : Mon Jul 12 15:09:50 1999 by bonniot
-//$Modified: Wed Jul 21 15:35:13 1999 by bonniot $
+//$Modified: Tue Jul 27 10:20:26 1999 by bonniot $
 // Description : A functional expression
 
 package bossa.syntax;
@@ -33,9 +33,16 @@ public class FunExp extends Expression
 
   Expression resolve(VarScope s,TypeScope ts)
   {
+    ts=TypeScope.makeScope(ts,constraint.binders);
     Node.buildScope(s,ts,formals);
     VarSymbol.resolveScope(formals);
-    body.buildScope(s,ts);
+    try{
+      body.buildScope(VarScope.makeScope(s,formals),ts);
+    }
+    catch(DuplicateIdentEx e){
+      User.error(this,e.ident+" was defined twice in function");
+    }
+    
     body.resolveScope();
     return this;
   }
@@ -56,7 +63,7 @@ public class FunExp extends Expression
     return Type.newType
       (tp,
        new Polytype(Constraint.and(constraint,returnType.getConstraint()),
-		    new FunType(VarSymbol.getType(formals),
+		    new FunType(MonoSymbol.getMonotype(formals),
 				returnType.getMonotype())));
   }
   
@@ -76,7 +83,7 @@ public class FunExp extends Expression
   }
   
   Collection /* of TypeSymbol*/ typeParameters;
-  Collection /* of VarSymbol */ formals;
+  Collection /* of FieldSymbol */ formals;
   Constraint constraint;
   Block body;
 }

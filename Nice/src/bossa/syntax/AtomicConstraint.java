@@ -12,7 +12,7 @@
 
 // File    : AtomicConstraint.java
 // Created : Mon Jul 19 16:40:18 1999 by bonniot
-//$Modified: Sat Jul 24 12:09:42 1999 by bonniot $
+//$Modified: Tue Jul 27 10:23:00 1999 by bonniot $
 
 package bossa.syntax;
 
@@ -55,4 +55,27 @@ public abstract class AtomicConstraint
 
     return res;
   }
+
+  /****************************************************************
+   * Typechecking
+   ****************************************************************/
+
+  /**
+   * Enter the constraint into the typing context
+   *
+   */
+  abstract void assert() throws bossa.typing.TypingEx;
+  
+  /**
+   * Iterates assert
+   *
+   * @param atomics a collection of AtomicConstraints
+   */
+  static void assert(Collection atomics)
+    throws bossa.typing.TypingEx
+  {
+    for(Iterator i=atomics.iterator();i.hasNext();)
+      ((AtomicConstraint) i.next()).assert();
+  }
+  
 }

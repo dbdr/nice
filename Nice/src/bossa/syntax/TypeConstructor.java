@@ -12,7 +12,7 @@
 
 // File    : TypeConstructor.java
 // Created : Thu Jul 08 11:51:09 1999 by bonniot
-//$Modified: Sat Jul 24 14:23:41 1999 by bonniot $
+//$Modified: Tue Jul 27 11:18:09 1999 by bonniot $
 // Description : A class. It "needs" type parameters to become a Monotype
 
 package bossa.syntax;
@@ -49,6 +49,19 @@ public class TypeConstructor
     this.variance=new Variance(-1);
   }
 
+  /**
+   * Constructs a fresh TypeConstructor
+   *
+   * @param source a MonotypeVariable which shall deconstruct to this type constructor
+   * @param v the variance of this type constructor
+   */
+  TypeConstructor(MonotypeVar source, Variance v)
+  {
+    this.name=source.name;
+    this.variance=variance;
+    this.definition=null;
+  }
+  
   static Collection toLocatedString(Collection c)
   {
     Collection res=new ArrayList(c.size());
@@ -82,7 +95,7 @@ public class TypeConstructor
    * Scoping
    ****************************************************************/
 
-  public TypeConstructor resolve(TypeScope typeScope)
+  TypeConstructor resolve(TypeScope typeScope)
   {
     //    if(definition==null)
       {
@@ -145,5 +158,5 @@ public class TypeConstructor
 
   ClassDefinition definition;
   LocatedString name;
-  Variance variance;
+  public Variance variance;
 }

@@ -12,7 +12,7 @@
 
 // File    : KindingEx.java
 // Created : Thu Jul 22 19:33:34 1999 by bonniot
-//$Modified: Thu Jul 22 19:35:24 1999 by bonniot $
+//$Modified: Mon Jul 26 17:40:34 1999 by bonniot $
 
 package bossa.typing;
 
@@ -29,6 +29,12 @@ import bossa.syntax.*;
 class KindingEx extends TypingEx
 {
   KindingEx(Type t1, Type t2)
+  {
+    super(t1+" and "+t2+" do not have the same kind : "+
+	  t1.getClass()+" and "+t2.getClass());
+  }
+
+  KindingEx(Monotype t1, Monotype t2)
   {
     super(t1+" and "+t2+" do not have the same kind : "+
 	  t1.getClass()+" and "+t2.getClass());

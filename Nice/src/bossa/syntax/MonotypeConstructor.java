@@ -12,7 +12,7 @@
 
 // File    : MonotypeConstructor.java
 // Created : Thu Jul 22 09:15:17 1999 by bonniot
-//$Modified: Sat Jul 24 14:52:20 1999 by bonniot $
+//$Modified: Tue Jul 27 11:07:50 1999 by bonniot $
 // Description : A monotype, build by application of
 //   a type constructor to type parameters
 
@@ -50,7 +50,7 @@ public class MonotypeConstructor extends Monotype
    * Scoping
    ****************************************************************/
 
-  public Monotype resolve(TypeScope typeScope) 
+  Monotype resolve(TypeScope typeScope) 
   {
     tc=tc.resolve(typeScope);
     parameters=parameters.resolve(typeScope);
@@ -64,6 +64,16 @@ public class MonotypeConstructor extends Monotype
        new TypeParameters(Monotype.substitute(map,parameters.content)));
   }
 
+  public TypeConstructor decomposeTC(Variance v)
+  {
+    return tc;
+  }
+  
+  public TypeParameters decomposeTP(Variance v)
+  {
+    return parameters;
+  }
+  
   /****************************************************************
    * Printing
    ****************************************************************/
@@ -78,6 +88,6 @@ public class MonotypeConstructor extends Monotype
     return ""+tc+parameters;
   }
 
-  TypeConstructor tc;
+  public TypeConstructor tc;
   TypeParameters parameters;
 }

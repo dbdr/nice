@@ -12,15 +12,16 @@
 
 // File    : ClassDefinition.java
 // Created : Thu Jul 01 11:25:14 1999 by bonniot
-//$Modified: Fri Jul 23 17:42:07 1999 by bonniot $
+//$Modified: Tue Jul 27 13:16:47 1999 by bonniot $
 // Description : Abstract syntax for a class definition
 
 package bossa.syntax;
 
 import java.util.*;
 import bossa.util.*;
+import bossa.typing.*;
 
-public class ClassDefinition extends Node //extends TypeSymbol 
+public class ClassDefinition extends Node
   implements Definition
 {
   public ClassDefinition(LocatedString name, Collection typeParameters)
@@ -68,8 +69,8 @@ public class ClassDefinition extends Node //extends TypeSymbol
   void resolveScope()
   {
     extensions=TypeConstructor.resolve(typeScope,extensions);
-    implementations=TypeConstructor.resolve(typeScope,implementations);
-    abstractions=TypeConstructor.resolve(typeScope,abstractions);
+    Interface.resolve(typeScope,implementations);
+    Interface.resolve(typeScope,abstractions);
     resolveScope(fields);
   }
 
@@ -89,6 +90,14 @@ public class ClassDefinition extends Node //extends TypeSymbol
 
   public void typecheck()
   {
+    try{
+      Typing.leq(tc,extensions);
+      Typing.imp(tc,implementations);
+      Typing.abs(tc,abstractions);
+    }
+    catch(TypingEx e){
+      User.error(name,"Error in class "+name+" :"+e.getMessage());
+    }
   }
 
   public void addExtension(TypeConstructor name)
@@ -96,19 +105,19 @@ public class ClassDefinition extends Node //extends TypeSymbol
     extensions.add(name);
   }
 
-  public void addImplementation(TypeConstructor name)
+  public void addImplementation(Interface name)
   {
     implementations.add(name);
   }
 
-  public void addAbstraction(TypeConstructor name)
+  public void addAbstraction(Interface name)
   {
     abstractions.add(name);
   }
 
   public void addField(LocatedString name, Monotype type)
   {
-    fields.add(new FieldSymb(name,type,this));
+    fields.add(new MonoSymbol(name,type,this));
   }
 
   public void addMethod(MethodDefinition m)

@@ -238,9 +238,9 @@ class NiceComparator<-T> implements java.util.Comparator<T>
 /** Find the first element that passes the given test.
     @throw java.util.NoSuchElementException if there is no such element.
 */
-<T> T find (List<T> list, T->boolean test)
+<T> T find (Collection<T> collection, T->boolean test)
 {
-  for (T elem : list)
+  for (T elem : collection)
     if (test(elem))
       return elem;
 
@@ -262,9 +262,9 @@ class NiceComparator<-T> implements java.util.Comparator<T>
 /** Find the first element that passes the given test.
     Returns <code>null</code> if there is no such element.
 */
-<T> ?T search (java.util.List<!T> list, !T->boolean test)
+<T> ?T search (java.util.Collection<!T> collection, !T->boolean test)
 {
-  for (!T elem : list)
+  for (!T elem : collection)
     if (test(elem))
       return elem;
 

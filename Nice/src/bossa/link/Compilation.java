@@ -112,7 +112,10 @@ public final class Compilation
     res.setCatchClauses(c);
 
     gnu.bytecode.Method print = ClassType.make("nice.lang.dispatch").
-      getDeclaredMethod("printStackTraceWithSourceInfo", 1);
+      addMethod("printStackTraceWithSourceInfo", 
+                Access.PUBLIC | Access.STATIC,
+                new Type[]{ Type.throwable_type },
+                Type.void_type);
 
     c.setBody
       (new ApplyExp

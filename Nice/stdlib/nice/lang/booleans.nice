@@ -31,10 +31,10 @@ boolean `=>`(boolean a, boolean b) = !a | b;
   Booleans form a boolean algebra.
 */
 
-`!`(b@boolean) = b ? false : true;
-`&`(b1@boolean,b2@boolean) = b1 ? b2 : false;
-`|`(b1@boolean,b2@boolean) = b1 ? true : b2;
-`^`(b1@boolean,b2@boolean) = b1 ? !b2 : b2;
+`!`(boolean b) = b ? false : true;
+`&`(boolean b1, boolean b2) = b1 ? b2 : false;
+`|`(boolean b1, boolean b2) = b1 ? true : b2;
+`^`(boolean b1, boolean b2) = b1 ? !b2 : b2;
 
 // same methods, but overloaded for better efficiency (no dispatch and no boxing).
 boolean `!`(boolean) = inline nice.lang.inline.BoolNotOp();
@@ -45,4 +45,4 @@ boolean `^`(boolean, boolean) = inline nice.lang.inline.BoolOp("^");
 boolean `&&`(boolean, boolean) = inline nice.lang.inline.ShortCircuitOp("&&");
 boolean `||`(boolean, boolean) = inline nice.lang.inline.ShortCircuitOp("||");
 
-`<`(b1@boolean, b2@boolean) = b2 || !b1;
+`<`(boolean b1 ,boolean b2) = b2 || !b1;

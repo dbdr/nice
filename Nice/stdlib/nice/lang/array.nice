@@ -88,9 +88,9 @@ override <T> T[] slice(T[] array, int from = 0, int to = array.length - 1) =
 
 // Define collection methods
 
-<C,T,U> map(a@Array, func) = fill(new U[a.length], int i => func(a[i]));
+<C,T,U> map(Array a, func) = fill(new U[a.length], int i => func(a[i]));
 
-<C,T,U> filter(a@Array, test)
+<C,T,U> filter(Array a, test)
 {
   int l = a.length;
   int found = 0;

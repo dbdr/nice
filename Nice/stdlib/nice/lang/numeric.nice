@@ -219,7 +219,7 @@ long   abs(long  ) = native long   Math.abs(long  );
 int    abs(int   ) = native int    Math.abs(int   );
 
 // Comparable interface
-`<`(n1@Number, n2@Number) = n1.doubleValue() < n2.doubleValue();
+`<`(Number n1, Number n2) = n1.doubleValue() < n2.doubleValue();
 
 // exponential functions
 long `**`(long x, long e) 

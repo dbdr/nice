@@ -128,7 +128,7 @@ U foldRight(List<T> list, (T, U)->U func, U init, int from)
  * Implementations
  ****************************************************************/
 
-<T> foreach(collection@java.util.Collection, action)
+<T> foreach(java.util.Collection collection, action)
 {
   for (T elem : collection)
     action(elem);
@@ -161,15 +161,15 @@ similarEmptyCollection(c)
   return cast(new ArrayList(c.size()));
 }
 
-similarEmptyCollection(c#ArrayList) = new ArrayList(c.size());
+similarEmptyCollection(#ArrayList c) = new ArrayList(c.size());
 
-similarEmptyCollection(c#LinkedList) = new LinkedList();
+similarEmptyCollection(#LinkedList c) = new LinkedList();
 
-similarEmptyCollection(c#Vector) = new Vector(c.size());
+similarEmptyCollection(#Vector c) = new Vector(c.size());
 
-similarEmptyCollection(c#Stack) = new Stack();
+similarEmptyCollection(#Stack c) = new Stack();
 
-similarEmptyCollection(c#HashSet) = new HashSet(c.size());
+similarEmptyCollection(#HashSet c) = new HashSet(c.size());
 
 /****************************************************************
  * Sort

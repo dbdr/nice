@@ -46,4 +46,4 @@ BigInteger `~`(BigInteger) = native BigInteger BigInteger.not();
    Only `<` is implemented here, because the others have generic 
    implementations that use < and boolean negation.
 */
-`<`(x@BigInteger, y@BigInteger) = x.compareTo(y) < 0;
+`<`(BigInteger x, BigInteger y) = x.compareTo(y) < 0;

@@ -8,16 +8,16 @@ List<String> parse(String, Array<String>, Array<Option>);
 String printOptions(Array<Option>);
 
 int optType(Option);
-optType(o@NoParamOption) = NO_ARGUMENT;
-optType(o@ParamOption) = REQUIRED_ARGUMENT;
-optType(o@OptionalParamOption) = OPTIONAL_ARGUMENT;
+optType(NoParamOption o) = NO_ARGUMENT;
+optType(ParamOption o) = REQUIRED_ARGUMENT;
+optType(OptionalParamOption o) = OPTIONAL_ARGUMENT;
 
 String optSuffix(Option);
-optSuffix(o@NoParamOption) = "";
-optSuffix(o@ParamOption) = ":";
-optSuffix(o@OptionalParamOption) = "::";
+optSuffix(NoParamOption o) = "";
+optSuffix(ParamOption o) = ":";
+optSuffix(OptionalParamOption o) = "::";
 
-parse(progName@String, args, options)
+parse(String progName, args, options)
 {
   List<LongOpt> longOptions = new ArrayList(options.length);
   String shortOptions = "";
@@ -67,9 +67,9 @@ parse(progName@String, args, options)
 }
 
 void doAction(Option, Getopt);
-doAction(o@NoParamOption,g) = action(o)();
-doAction(o@ParamOption,g) = actionParam(o)(notNull(g.getOptarg()));
-doAction(o@OptionalParamOption,g)
+doAction(NoParamOption o, g) = action(o)();
+doAction(ParamOption o, g) = actionParam(o)(notNull(g.getOptarg()));
+doAction(OptionalParamOption o, g)
 {
 
   ?String arg = g.getOptarg();
@@ -118,9 +118,9 @@ String printOption(Option opt)
 }
 
 String paramString(Option);
-paramString(@NoParamOption) = "";
-paramString(o@ParamOption) = " " + o.optionHint.toUpperCase();
-paramString(o@OptionalParamOption) = "[=" + o.optionHint.toUpperCase() + "]";
+paramString(NoParamOption o) = "";
+paramString(ParamOption o) = " " + o.optionHint.toUpperCase();
+paramString(OptionalParamOption o) = "[=" + o.optionHint.toUpperCase() + "]";
 
 String pad(String s, int len, char c)
 {

@@ -1,8 +1,6 @@
+/// COMMENT Test typing related to nullness markers.
 /// PASS
   /// toplevel
-/**
-   Test typing related to nullness markers.
- */
 <Any T> void nonnull(!T);
 
 nonnull(x@String) {}

@@ -1,0 +1,30 @@
+package nice.lang;
+
+// Operators to manipulate java.math.BigInteger.
+
+import java.math.*;
+
+BigInteger `-`(BigInteger) = native BigInteger BigInteger.negate();
+
+BigInteger `+`(BigInteger, BigInteger) = native BigInteger BigInteger.add(BigInteger);
+BigInteger `-`(BigInteger, BigInteger) = native BigInteger BigInteger.subtract(BigInteger);
+BigInteger `*`(BigInteger, BigInteger) = native BigInteger BigInteger.multiply(BigInteger);
+BigInteger `/`(BigInteger, BigInteger) = native BigInteger BigInteger.divide(BigInteger);
+BigInteger `%`(BigInteger, BigInteger) = native BigInteger BigInteger.remainder(BigInteger);
+
+BigInteger `<<`(BigInteger, int) = native BigInteger BigInteger.shiftLeft(int);
+BigInteger `>>`(BigInteger, int) = native BigInteger BigInteger.shiftRight(int);
+
+BigInteger `&`(BigInteger, BigInteger) = native BigInteger BigInteger.and(BigInteger);
+BigInteger `|`(BigInteger, BigInteger) = native BigInteger BigInteger.or(BigInteger);
+//BigInteger `^`(BigInteger, BigInteger) = native BigInteger BigInteger.xor(BigInteger);
+
+BigInteger `~`(BigInteger) = native BigInteger BigInteger.not();
+
+/* 
+   Implement the Comparable interface.
+   The four comparison operators (<, >, <=, and >=) can be used on BigIntegers.
+   Only `<` is implemented here, because the others have generic 
+   implementations that use < and boolean negation.
+*/
+`<`(x@BigInteger, y@BigInteger) = x.compareTo(y) < 0;

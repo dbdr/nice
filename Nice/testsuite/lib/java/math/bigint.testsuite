@@ -1,0 +1,16 @@
+/// PASS
+  BigInteger maxlong = BigInteger.valueOf(Long.MAX_VALUE);
+  BigInteger two = BigInteger.valueOf(2);
+  BigInteger three = BigInteger.valueOf(3);
+
+  BigInteger i = maxlong * three + maxlong;
+
+  assert i > maxlong;
+  assert ! (i <= maxlong);
+
+  assert maxlong < i;
+  assert ! (maxlong >= i);
+
+  assert (i / two).equals(two * maxlong);
+  /// Toplevel
+  import java.math.*;

@@ -12,7 +12,7 @@
 
 // File    : Pattern.java
 // Created : Mon Jul 05 14:36:52 1999 by bonniot
-//$Modified: Tue Jan 25 18:27:46 2000 by Daniel Bonniot $
+//$Modified: Fri Jan 28 17:01:41 2000 by Daniel Bonniot $
 // Description : Syntactic pattern for method bodies declaration
 
 package bossa.syntax;
@@ -44,6 +44,11 @@ public class Pattern
     this.type=type;
   }
 
+  final TypeConstructor getTC()
+  {
+    return typeConstructor;
+  }
+  
   final Monotype getType()
   {
     return type;

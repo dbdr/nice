@@ -12,7 +12,7 @@
 
 // File    : Module.java
 // Created : Wed Oct 13 16:09:47 1999 by bonniot
-//$Modified: Thu Jan 20 11:28:12 2000 by bonniot $
+//$Modified: Tue Feb 01 18:34:10 2000 by Daniel Bonniot $
 
 package bossa.modules;
 
@@ -378,7 +378,7 @@ public class Module
   }
   
   public String name;
-  private List /* of LocatedString */ imports;
+  List /* of LocatedString */ imports;
   private AST definitions;
 
   private boolean dbg = Debug.modules;

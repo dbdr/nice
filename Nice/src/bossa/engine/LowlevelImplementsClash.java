@@ -11,6 +11,7 @@ public class LowlevelImplementsClash extends LowlevelUnsatisfiable {
   private int a;
   private int i;
   LowlevelImplementsClash(int a, int i) {
+    super(a+" : "+i);
     this.a = a;
     this.i = i;
   }

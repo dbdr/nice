@@ -12,7 +12,7 @@
 
 // File    : MethodBodyDefinition.java
 // Created : Thu Jul 01 18:12:46 1999 by bonniot
-//$Modified: Fri Jan 28 18:24:17 2000 by Daniel Bonniot $
+//$Modified: Fri Jan 28 18:39:52 2000 by Daniel Bonniot $
 
 package bossa.syntax;
 
@@ -251,8 +251,6 @@ public class MethodBodyDefinition extends Node
     lateBuildScope(this.scope,this.typeScope);
     super.doResolve();
     
-    enteredBindingContext = false;
-    
     Typing.enter(definition.type.getTypeParameters(),
 		 "method body of "+name);
     
@@ -286,50 +284,29 @@ public class MethodBodyDefinition extends Node
       //"Binding-constraint for "+name);
       
       for(Iterator f=formals.iterator(), 
-	    p=parameters.iterator(),
-	    d=definition.type.domain().iterator();
+	    p=parameters.iterator();
 	  f.hasNext();)
 	{
 	  Pattern pat = (Pattern)f.next();
 	  MonoSymbol sym = (MonoSymbol) p.next();
-	  Monotype def = (Monotype) d.next();
 	  
 	  Monotype type = pat.getType();
 	  if(type==null)
 	    continue;
 	  
-	  //if(newTypeVars==null)
-	  //User.error(pat.name,
-	  //       "\":\" constraints are not allowed when no local type variable has been introduced (with \"[ ]\")");
-	  if(!enteredBindingContext)
-	    {
-	      Typing.enter("Type binders");
-	      enteredBindingContext=true;
-	    }
-	  
-	  type.setKind(sym.getMonotype().getKind());
-
 	  try{
 	    if(type instanceof MonotypeConstructor)
 	      {
 		TypeConstructor 
 		  tc = ((MonotypeConstructor) type).getTC(),
-		  patTC = pat.getTC();
+		  formalTC = sym.getMonotype().getTC();
 		
-		Typing.introduce(tc);
-		
-		InterfaceDefinition i = patTC.getDefinition().getAssociatedInterface();
-		if(i!=null)
-		  Typing.assertImp(tc, i, false);
-		else
-		  Typing.leq(tc,patTC);
+		tc.setId(formalTC.getId());
 	      }
 	    else
 	      Internal.error("Not implemented ?");
 	  
-	    //Typing.leq(type, sym.getMonotype());
-	    Typing.leq(sym.getMonotype(), type);
-	    //Typing.leq(type, def); // not sound !!!
+	    Typing.eq(type, sym.getMonotype());
 	  }
 	  catch(TypingEx e){
 	    User.error(pat.name, 
@@ -338,9 +315,6 @@ public class MethodBodyDefinition extends Node
 		       ": "+e);
 	  }       
 	}
-      if(enteredBindingContext)
-	Typing.implies();
-
       // end of New Constraint
     }
     catch(BadSizeEx e){
@@ -351,8 +325,6 @@ public class MethodBodyDefinition extends Node
     }
   }
 
-  private boolean enteredBindingContext;
-  
   void endTypecheck()
   {
     Polytype t=body.getType();
@@ -361,8 +333,6 @@ public class MethodBodyDefinition extends Node
 	User.error(this,"Last statement of body should be \"return\"");
       Typing.leq(t,new Polytype(definition.type.codomain()));
       Typing.leave();
-      if(enteredBindingContext)
-	Typing.leave();
     }
     catch(TypingEx e){
       User.error(this,"Return type "+t+" is not correct"," :"+e);

@@ -12,7 +12,7 @@
 
 // File    : Typing.java
 // Created : Tue Jul 20 11:57:17 1999 by bonniot
-//$Modified: Thu Jan 27 17:52:04 2000 by Daniel Bonniot $
+//$Modified: Fri Jan 28 17:10:35 2000 by Daniel Bonniot $
 
 package bossa.typing;
 
@@ -265,6 +265,7 @@ abstract public class Typing
   public static void leq(TypeConstructor t1, TypeConstructor t2)
     throws TypingEx
   {
+    if(dbg) Debug.println("TC leq :"+t1+" < "+t2);
     try{
       Engine.leq(t1,t2,false);
     }
@@ -333,7 +334,8 @@ abstract public class Typing
       assertLeq(itf,((Interface)i.next()).definition);
   }
   
-  public static void assertImp(TypeConstructor t, InterfaceDefinition i, boolean initial)
+  public static void assertImp(TypeConstructor t, InterfaceDefinition i, 
+			       boolean initial)
     throws TypingEx
   {
     if(dbg) Debug.println(t+" imp "+i);

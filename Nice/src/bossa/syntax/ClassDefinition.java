@@ -12,7 +12,7 @@
 
 // File    : ClassDefinition.java
 // Created : Thu Jul 01 11:25:14 1999 by bonniot
-//$Modified: Thu Jan 27 20:41:19 2000 by Daniel Bonniot $
+//$Modified: Mon Jan 31 15:44:30 2000 by Daniel Bonniot $
 
 package bossa.syntax;
 
@@ -56,6 +56,19 @@ public class ClassDefinition extends Node
 
     if(isInterface)
       isAbstract=true;
+    
+    // Testing well formedness
+    if(isInterface)
+      {
+	if(isFinal)
+	  User.error(name,
+		     "Interfaces can't be final");
+	
+	if(implementations!=null && implementations.size()>0 ||
+	   abstractions!=null && abstractions.size()>0)
+	  User.error(name,
+		     "Interfaces can't implement anything");
+      }
     
     this.name=name;
     this.isFinal=isFinal;
@@ -225,6 +238,18 @@ public class ClassDefinition extends Node
   void resolve()
   {
     extensions=TypeConstructor.resolve(typeScope,extensions);
+
+    // A class cannot extend an interface
+    if(!isInterface)
+      for(Iterator e = extensions.iterator(); e.hasNext();)
+	{
+	  TypeConstructor tc = (TypeConstructor) e.next();
+	  if(tc.getDefinition().getAssociatedInterface()!=null)
+	    User.error(name,
+		       tc+" is an interface, so "+name+
+		       " may only implement it");
+	}
+
     createAssociatedInterface();
   }
 
@@ -245,6 +270,8 @@ public class ClassDefinition extends Node
       }
       
       Typing.assertImp(tc,implementations,true);
+      if(associatedInterface!=null)
+	Typing.assertImp(tc, associatedInterface, true);
       Typing.assertImp(tc,abstractions,true);
       Typing.assertAbs(tc,abstractions);
       if(isFinal)
@@ -270,8 +297,8 @@ public class ClassDefinition extends Node
     s.print
       (
          (isFinal ? "final " : "")
-       + (isAbstract ? "abstract " : "")
-       + "class "
+       + (isInterface ? "interface " : 
+	  (isAbstract ? "abstract " : "") + "class ")
        + name.toString()
        + Util.map("<",", ",">",typeParameters)
        + Util.map(" extends ",", ","",extensions)
@@ -535,8 +562,6 @@ public class ClassDefinition extends Node
       (name, typeParameters, ext, this);
     
     addChild(associatedInterface);
-
-    implementations.add(new Interface(associatedInterface));
   }
   
   /****************************************************************

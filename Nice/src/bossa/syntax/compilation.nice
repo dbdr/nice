@@ -83,14 +83,21 @@ private gnu.expr.Expression beautifyUncaughtExceptions(gnu.expr.Expression body)
   gnu.expr.CatchClause c = new gnu.expr.CatchClause("uncaughtException", gnu.bytecode.Type.throwable_type);
   res.setCatchClauses(c);
 
-  gnu.bytecode.Method print = gnu.bytecode.ClassType.make("nice.lang.dispatch").
-      addMethod("printStackTraceWithSourceInfo", 
+  let print = gnu.bytecode.ClassType.make("nice.lang.dispatch").
+      addMethod("printStackTraceWithSourceInfo",
                 gnu.bytecode.Access.PUBLIC | gnu.bytecode.Access.STATIC,
                 [cast(gnu.bytecode.Type.throwable_type)],
                 gnu.bytecode.Type.void_type);
 
-  c.setBody(new gnu.expr.ApplyExp(new gnu.expr.PrimProcedure(print),
-        [new gnu.expr.ReferenceExp(c.getDeclaration())]));
+  let exit = gnu.bytecode.ClassType.make("java.lang.System").
+    getDeclaredMethod("exit", 1);
+
+  c.setBody(new gnu.expr.BeginExp
+    ([new gnu.expr.ApplyExp(print,
+        [new gnu.expr.ReferenceExp(c.getDeclaration())]),
+      new gnu.expr.ApplyExp(exit,
+        [new gnu.expr.QuoteExp(new Integer(1))])
+     ]));
 
   return res;
 }

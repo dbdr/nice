@@ -9,3 +9,23 @@
   List<int> l = new LinkedList();
   s = "l has length " l.size;
   assert s.equals("l has length 0");
+
+/// PASS
+  assert """abc
+  def\nghi
+  xyz""".equals("abc\n  def\nghi\n  xyz");
+
+/// PASS
+  String x = """ " """;
+  assert x.equals(" \" ");
+
+/// PASS
+  boolean ok = false;
+  String s1 = """
+1
+""";
+  ok = true;
+  String s2 = """
+2
+""";
+  assert ok;

@@ -33,13 +33,7 @@ public abstract class Loader
   {
     chrono.start();
     try {
-      if(parser==null)
-	parser = new Parser(r);
-      else
-	parser.ReInit(r);
-
-      // set to 0 (required when recovered from error)
-      ParserTokenManager.nestingLevel = 0;
+      Parser parser = new Parser(r);
 
       try{
 	return parser.readImports(imports, opens);
@@ -62,14 +56,7 @@ public abstract class Loader
   {
     chrono.start();
     try {
-      if(parser==null)
-	parser = new Parser(r);
-      else
-	parser.ReInit(r);
-
-      // set to 0 (required when recovered from error)
-      ParserTokenManager.nestingLevel = 0;
-  
+      Parser parser = new Parser(r);
       boolean storeDocStrings = false;
 
       try{
@@ -118,5 +105,4 @@ public abstract class Loader
     return parser;
   }
 
-  static Parser parser = null;
 }

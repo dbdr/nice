@@ -350,11 +350,20 @@ public final class JavaClasses
   {
     Method res = null;
 
-    // skips m if it was just overriden in classType
-    // but declared in a superclass or superinterface.
+    /* Skips m if it was just overriden in classType
+       but declared in a superclass or superinterface.
+    */
     ClassType superClass = classType.getSuperclass();
-    if (superClass != null)
-      res = alreadyHasMethod(superClass,m);
+
+    /* If the super class is null, the current class is an interface.
+       We consider that interfaces do not declare new methods if they also
+       belong to Object.
+       For instance, java.lang.CharSequence in JDK 1.4 declares toString.
+    */
+    if (superClass == null)
+      superClass = Type.pointer_type;
+
+    res = alreadyHasMethod(superClass,m);
     if (res != null)
       return res;
 
@@ -368,8 +377,7 @@ public final class JavaClasses
 	}
 
     return null;
-  }	
-
+  }
 
   private static void addSymbol(Object key, MethodDeclaration def)
   {

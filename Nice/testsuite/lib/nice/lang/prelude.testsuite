@@ -1,0 +1,2 @@
+/// PASS
+  assert [ 1 ].map(toString)[0].equals("1");

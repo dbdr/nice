@@ -12,7 +12,7 @@
 
 // File    : Typing.java
 // Created : Tue Jul 20 11:57:17 1999 by bonniot
-//$Modified: Tue Feb 22 14:54:22 2000 by Daniel Bonniot $
+//$Modified: Fri Feb 25 20:05:20 2000 by Daniel Bonniot $
 
 package bossa.typing;
 
@@ -35,8 +35,10 @@ abstract public class Typing
    ****************************************************************/
 
   /**
-   * Enters a new typing context
+   * Enters a new typing context.
    *
+   * If an enter() completed successfully,
+   * a matching leave() MUST be issued some time later by the caller.
    */
   public static int enter()
   {
@@ -133,20 +135,6 @@ abstract public class Typing
     
   }
 
-  private static void unsatisfiable(TypingEx e) throws TypingEx
-  {
-    if(Engine.isInRigidContext())
-      Engine.backtrack();
-    throw e;
-  }
-  
-  private static void unsatisfiable(BadSizeEx e) throws BadSizeEx
-  {
-    if(Engine.isInRigidContext())
-      Engine.backtrack();
-    throw e;
-  }
-  
   /****************************************************************
    * Assertions
    ****************************************************************/
@@ -209,15 +197,18 @@ abstract public class Typing
     int l;
     if(dbg) l=enter("#"); else l=enter();
     
-    t2.getConstraint().assert();
+    try{
+      t2.getConstraint().assert();
 
-    implies();
+      implies();
     
-    t1.getConstraint().assert();
-    leq(t1.getMonotype(),t2.getMonotype());
-
-    if(leave()!=l)
-      Internal.error("Unmatched enters and leaves");
+      t1.getConstraint().assert();
+      leq(t1.getMonotype(),t2.getMonotype());
+    }
+    finally{
+      if(leave()!=l)
+	Internal.error("Unmatched enters and leaves");
+    }
   }
 
   /****************************************************************
@@ -308,7 +299,7 @@ abstract public class Typing
     int expected=domains.size();
     int actual=types.size();
     if(expected!=actual)
-      unsatisfiable(new BadSizeEx(expected, actual));
+      throw new BadSizeEx(expected, actual);
 
     Iterator t=types.iterator();
     Iterator d=domains.iterator();
@@ -343,10 +334,10 @@ abstract public class Typing
       Engine.setKind(t,i.variance.getConstraint());
     }
     catch(Unsatisfiable e){
-      unsatisfiable(new TypingEx
-		    (t+" cannot implement "+i
-		     +":\n"+t+" has variance "+t.getKind()+", "
-		     +i+" has variance "+i.variance.getConstraint()));
+      throw new TypingEx
+	(t+" cannot implement "+i
+	 +":\n"+t+" has variance "+t.getKind()+", "
+	 +i+" has variance "+i.variance.getConstraint());
     }
 
     try{
@@ -359,7 +350,7 @@ abstract public class Typing
 	Engine.leq(t, ((AssociatedInterface) i).getAssociatedClass(), initial);
     }
     catch(Unsatisfiable e){
-      unsatisfiable(new TypingEx(e.getMessage()));
+      throw new TypingEx(e.getMessage());
     }
   }
   
@@ -427,10 +418,15 @@ abstract public class Typing
     try
       {
 	int l=enter();
-	domain.constraint.assert();
-	setFloatingKinds(tags,0,res);
-	if(leave()!=l)
-	  Internal.error("Unmatched enter and leaves");
+
+	try{
+	  domain.constraint.assert();
+	  setFloatingKinds(tags,0,res);
+	}
+	finally{
+	  if(leave()!=l)
+	    Internal.error("Unmatched enter and leaves");
+	}
       }
     catch(TypingEx e){
       // backtrack has already been done in Engine,

@@ -12,7 +12,7 @@
 
 // File    : Front.java
 // Created : Thu Jul 01 15:11:18 1999 by bonniot
-//$Modified: Thu Feb 24 11:39:16 2000 by Daniel Bonniot $
+//$Modified: Fri Feb 25 14:00:11 2000 by Daniel Bonniot $
 
 package bossa.test;
 
@@ -59,7 +59,9 @@ public class Front
 
   private static void compile(String file)
   {
-    bossa.modules.Package p = (Package) Package.make(file,true);
+    bossa.modules.Package p;
+    p = Package.make("bossa.lang",false);
+    p = Package.make(file,true);
     
     List req = p.getRequirements();
     for(Iterator i = req.iterator(); i.hasNext();)

@@ -12,7 +12,7 @@
 
 // File    : parser.jj
 // Created : Thu Jul 01 10:27:05 1999 by bonniot
-//$Modified: Wed Feb 23 19:29:59 2000 by Daniel Bonniot $
+//$Modified: Tue Feb 29 20:52:56 2000 by Daniel Bonniot $
 // Description : Parseur JavaCC pour Bossa
 //   Tokens based on the Jazz parser
 
@@ -33,37 +33,13 @@ import bossa.syntax.*;
 
 class Parser
 {
-  /** 
-   * Returns a function with no parameters that returns the expression.
-   * if exp is 'null', this functions returns void.
-   */
-  private static FunExp lazyExp(Expression exp)
-  {
-    List statements=new ArrayList(1);
-    if(exp!=null)
-      statements.add(new ReturnStmt(exp));
-    return new FunExp(Constraint.True,
-		      new ArrayList(0),
-		      statements);
-  }
-
-  private static FunExp lazyStmt(Statement statement)
-  {
-    if(statement==null)
-      return lazyExp(null);
-    if(statement instanceof ExpressionStmt)
-      return lazyExp(((ExpressionStmt)statement).exp);
-
-    List statements=new ArrayList(1);
-    statements.add(statement);
-    return new FunExp(Constraint.True,
-		      new ArrayList(0),
-		      statements);
-  }
-
   private static IdentExp symb(String name, Token t)
   {
     return new IdentExp(new LocatedString(name,new Location(t)));
+  }
+  private static IdentExp symb(Token t)
+  {
+    return symb(t.image,t);
   }
 }
 PARSER_END(Parser)
@@ -182,6 +158,7 @@ TOKEN: /* Keywords */
 | < ELSE:       "else"       	>
 | < ENDIF:      "endif"      	>
 | < WHILE:      "while"      	>
+| < DO:		"do"		>
 //| < TRUE:       "true"       	>
 //| < FALSE:      "false"      	>
 | < FORMAT:     "format"     	>
@@ -362,7 +339,7 @@ String rawString():
   { return t.image.substring(1, t.image.length() - 1); }
 }
 
-LocatedString string():
+LocatedString ident():
 {
   Token t;
 }
@@ -383,7 +360,7 @@ LocatedString methodName():
 			     new Location(name),
 			     true); }
   |
-   res = string()
+   res = ident()
   )
   { return res; }
 }
@@ -416,17 +393,17 @@ Collection strings():
   LocatedString s;
 }
 {
-  s=string() { res.add(s); }
-  ( "," s=string() { res.add(s); } )*
+  s=ident() { res.add(s); }
+  ( "," s=ident() { res.add(s); } )*
   { return res; }
 }
 
-int integer():
+LocatedString number():
 {
   Token t;
 }
 {
-  t = <LINT> { return Integer.parseInt(t.image); }
+  t = <LINT> { return new LocatedString(t.image, new Location(t)); }
 }
 
 double floating():
@@ -481,7 +458,7 @@ TypeIdent typeIdent():
   LocatedString name;
 }
 {
-  name=string()
+  name=ident()
   { return new TypeIdent(name);
   }
 }
@@ -493,7 +470,7 @@ MonoSymbol monoSymbol():
 }
 {
   type=monotype()
-  name=string()
+  name=ident()
   { return new MonoSymbol(name,type,null); }
 }
 
@@ -754,7 +731,7 @@ MethodDefinition classMethodDefinition(ClassDefinition c):
 }
 {
   returnType=monotype()
-  name=string()
+  name=ident()
   cst=constraint()
   "("
   parameters=monotypes()
@@ -820,7 +797,7 @@ ClassDefinition classDefinition():
 |
   "interface" { isInterface=true; }
 )
-  name=string() 
+  name=ident() 
   parameters=monotypeVars() 
 
   ( "implements" l=interfaces() { imp.addAll(l); } 
@@ -837,15 +814,16 @@ ClassDefinition classDefinition():
       false,parameters,
       ext,imp,abs,fields,methods);
    }
-  |
-   { LocatedString javaName; }
-   "=" "native" javaName=doted_string() ";"
+  | 
+   "=" "native"
+   { LocatedString javaName=null; }
+   [ javaName=doted_string() ] ";"
    {
      res = new JavaClass
-     (name,
-      isFinal,isAbstract,isInterface,
-      parameters,
-      ext,imp,abs,javaName);
+       (name,
+	isFinal,isAbstract,isInterface,
+	parameters,
+	ext,imp,abs,javaName);
    }
   ) 
   { 
@@ -861,7 +839,7 @@ InterfaceDefinition interfaceDefinition():
 }
 {
   "abstract" "interface"
-  name=string()
+  name=ident()
   parameters=monotypeVars()
   [ "extends" extensions=interfaces() ]
   ";"
@@ -893,7 +871,7 @@ MethodBodyDefinition methodBodyDefinition():
     Collection binders=null;
     List newTypeVars=null;
     List parameters=new ArrayList();
-    List code;
+    Statement code;
     Expression exp;
 }
 {
@@ -905,21 +883,19 @@ MethodBodyDefinition methodBodyDefinition():
     { parameters.add(p); }
     "("
     ( 
-	i=string() p=pattern(i) { parameters.add(p); }
-	( "," i=string() p=pattern(i) { parameters.add(p); } )*
+	i=ident() p=pattern(i) { parameters.add(p); }
+	( "," i=ident() p=pattern(i) { parameters.add(p); } )*
     )?
     ")"
     ( 
       // A true body
-      "{" code=statements() "}"
+      code=Block()
     |
       // An expression
-      "=" exp=expression() ";"
+      "=" exp=Expression() ";"
       { 
-	code=new ArrayList(1);
-	ReturnStmt ret = new ReturnStmt(exp);
-	ret.setLocation(exp.location());
-	code.add(ret);
+	code = new ReturnStmt(exp);
+	code.setLocation(exp.location());
       }
     )
     { return new MethodBodyDefinition(name,binders,
@@ -1008,8 +984,8 @@ Definition globalVariable():
 {
   "var"
   t=monotype()
-  name=string()
-  [ "=" value=expression() ]
+  name=ident()
+  [ "=" value=Expression() ]
   ";"
   { return new GlobalVarDeclaration(name,t,value); }
 }
@@ -1050,13 +1026,13 @@ void readDefinitions(List definitions):
 /*                          Expressions                                */
 /***********************************************************************/
 
-IntConstantExp intConstantExp():
+Expression intConstantExp():
 {
-  int i;
+  LocatedString representation;
 }
 {
-  i=integer()
-  { return new IntConstantExp(i); }
+  representation=number()
+  { return ConstantExp.makeNumber(representation); }
 }
 
 FloatConstantExp floatConstantExp():
@@ -1088,36 +1064,13 @@ Expression constantExp():
 | res=intConstantExp() 
 | res=floatConstantExp()
 | t=<CHARACTER_LITERAL> 
-    { res=new CharConstant
+    { res=ConstantExp.makeChar
       (new LocatedString(t.image.substring(1,t.image.length()-1),
-			 new Location(t))); 
+			 new Location(t)));
     }
 | res=stringConstantExp()
   )
 { return res; }
-}
-
-Expression ifExp():
-{
-  Token iftoken;
-  Expression condition;
-  Expression t,e=null;
-}
-{
-  iftoken="if"
-  "("
-  condition=expression()
-  ")"
-  //t=statementInIf()
-  t=subExpression()
-  [ "else" 
-    //e=statementInIf() 
-    e=subExpression()
-    "endif" 
-  ]
-  {
-    return new IfExp(condition,t,e);
-  }
 }
 
 IdentExp identExp():
@@ -1125,7 +1078,7 @@ IdentExp identExp():
   LocatedString i;
 }
 {
-  i=string()
+  i=ident()
   { return new IdentExp(i); }
 }
 
@@ -1140,45 +1093,11 @@ NewExp newExp():
   { return new NewExp(t); }
 }
 
-CallExp callExp(Expression prefix):
-{
-  List parameters;
-}
-{
-  "("
-  parameters=expressions()
-  ")"
-  { return new CallExp(prefix,parameters); }
-}
-
-Expression computedExp(Expression prefix):
-{
-  Expression res=prefix;
-  List parameters;
-  LocatedString name;
-}
-{
-  (
-    { parameters=null; }
-    "." name=string()
-    [ "(" parameters=expressions() ")" ]
-    { 
-      if(parameters==null)
-        parameters=new ArrayList(1);
-      parameters.add(0,res);
-      res = new CallExp(new IdentExp(name),parameters); 
-    }
-  |
-    res=callExp(res)
-  )*
-  { return res; }
-}
-
 FunExp funExp():
 {
   List formals;
   Constraint cst;
-  List body;
+  Statement body;
   Expression exp;
 }
 {
@@ -1187,333 +1106,14 @@ FunExp funExp():
   "(" formals=monoSymbols() ")"
   "=>"
   (
-    "{" body=statements() "}"
+    body=Block()
   |
-    exp=expression()
+    exp=Expression()
     { 
-      body=new ArrayList(1);
-      body.add(new ReturnStmt(exp));
+      body=new ReturnStmt(exp);
     }
   )
   { return new FunExp(cst,formals,body); }
-}
-
-Expression expression1():
-{
-  Expression res;
-  IdentExp e;
-  Token first,last;
-}
-{
-  { first=getToken(1); }
-
-(
-"(" res=expression() ")"
-|
-  res=constantExp()
-| 
-  res=ifExp()
-|
-  res=newExp()
-|
-  res=funExp()
-| 
-  e=identExp() res=computedExp(e)
-  )
-  { 
-    last=getToken(0); 
-    res.setLocation(new Location(first).englobe(new Location(last)));
-    return res; 
-  }
-}
-
-Expression expression():
-{
-  Expression res,e;
-  Token t,first,last;
-}
-{
-  { first=getToken(1); }
-  res=expression1() 
-    [ (
-       t="=" e=expression()
-       { res=new AssignExp(res,e); }
-      |
-       t="==" e=expression() 
-       { res=CallExp.create(symb("==",t),res,e); }
-      |
-       t="!=" e=expression() 
-       { res=CallExp.create(symb("!=",t),res,e); }
-      |
-       t="<" e=expression()
-       { res=CallExp.create(symb("<",t),res,e); }
-      |
-       t=">" e=expression()
-       { res=CallExp.create(symb(">",t),res,e); }
-      |
-       t="<=" e=expression()
-       { res=CallExp.create(symb("<=",t),res,e); }
-      |
-       t=">=" e=expression()
-       { res=CallExp.create(symb(">=",t),res,e); }
-      |
-       t="[" e=expression() "]"
-       { res=CallExp.create(symb("get",t),res,e); }
-      |
-       t="^" e=expression()
-       { res=CallExp.create(symb("^",t),res,e); }
-      |
-       t="+" e=expression()
-       { res=CallExp.create(symb("+",t),res,e); }
-      |
-       t="-" e=expression()
-       { res=CallExp.create(symb("-",t),res,e); }
-      |
-       t="*" e=expression()
-       { res=CallExp.create(symb("*",t),res,e); }
-      |
-       t="/" e=expression()
-       { res=CallExp.create(symb("/",t),res,e); }
-      |
-       t="&&" e=expression()
-       { res=CallExp.create(symb("&&",t),res,e); }
-      |
-       t="||" e=expression()
-       { res=CallExp.create(symb("||",t),res,e); }
-      |
-       t="&" e=expression()
-       { res=CallExp.create(symb("&",t),res,e); }
-      |
-       t="|" e=expression()
-       { res=CallExp.create(symb("|",t),res,e); }
-      )
-    { 
-      last=getToken(0);
-      res.setLocation(new Location(first).englobe(new Location(last)));
-    }
-    ]
-  { return res; }
-}
-
-List expressions():
-{
-  List res=new ArrayList();
-  Expression e;
-}
-{
-  ( e=expression() { res.add(e); }
-    ( "," e=expression() { res.add(e); } )*
-  )?
-  { return res; }
-}
-
-/***********************************************************************/
-/*                          Statements                                 */
-/***********************************************************************/
-
-//  AssignStmt assignment(Expression left):
-//  {
-//    Expression right;
-//  }
-//  {
-//    "="
-//    right=expression()
-//    { return new AssignStmt(left,right); }
-//  }
-
-Block.LocalDeclaration localDeclaration():
-{
-  Monotype t;
-  LocatedString id;
-  Expression e=null;
-}
-{
-  t=monotype()
-  id=string()
-  [ "=" e=expression() ]
-  { return new Block.LocalDeclaration(id,t,e); }
-}
-
-Statement statementInIf():
-{
-  Statement res;
-  Expression e=null;
-  Token first,last;
-}
-{
-  { first=getToken(1); }
-(
-  "return" [ e=expression() ]
-  { 
-    if(e==null)
-      res=new ReturnStmt(new VoidConstantExp());
-    else
-      res=new ReturnStmt(e); 
-  }
-| 
-  (
-   // Common prefix
-   e=expression()
-   //(
-   // res=affectation(e)
-   //|
-    { res=new ExpressionStmt(e); }
-   //)
-  )
-)
-  { last=getToken(0);
-    res.setLocation(new Location(first).englobe(new Location(last)));
-    return res; }
-}
-
-Expression subExpression():
-{
-  Expression res;
-}
-{
- (
-  "{"
-  { List stmts; }
-  stmts=statements()
-  "}"
-  { res = new StatementExp(new Block(stmts)); }
- | 
-  // Empty body
-  ";"
-  { res = new VoidConstantExp(); }
- |
-  res=expression()
- )
- { return res; }
-}
-
-List loopBody():
-{
-  List res;
-  Object stmt;
-}
-{
- (
-  "{"
-  res=statements()
-  "}"
- | 
-  // Empty body
-  ";"
-  { res = new LinkedList(); }
- |
-  stmt=statement()
-  { res = new LinkedList();
-    res.add(stmt);
-  }
- )
-   { return res; }
-}
-
-Statement whileStmt():
-{
-  Token whiletoken;
-  Expression test;
-  List statements;
-}
-{
-  whiletoken="while" "(" test=expression() ")"
-  statements = loopBody()
-  { 
-    return new LoopStmt(test,statements);
-  }
-}
-
-Statement forStmt():
-{
-  Token token;
-  Expression test;
-  List initStmts = new LinkedList();
-  List iterStmts = new LinkedList();
-  Object stmt;
-  List stmts;
-}
-{
-  token="for" 
-    "(" 
-    [ 
-     stmt=statementWithoutSemicolon() { initStmts.add(stmt); }
-     ( "," stmt=statementWithoutSemicolon()  { initStmts.add(stmt); } )* 
-    ]
-    ";"
-    test=expression() 
-    ";"
-    [ 
-     stmt=statementWithoutSemicolon() { iterStmts.add(stmt); }
-     ( "," stmt=statementWithoutSemicolon()  { iterStmts.add(stmt); } )* 
-    ]
-    ")"
-  stmts=loopBody()
-  { 
-    initStmts.add(new LoopStmt(test,stmts,iterStmts));
-    return new Block(initStmts);
-  }
-}
-
-Object statement():
-{
-  Object res;
-}
-{
-  res=statementWithoutSemicolon() 
-  (
-   LOOKAHEAD({res instanceof bossa.syntax.Block
-	      || res instanceof bossa.syntax.LoopStmt})
-   {}
-  |
-   ";"
-  )
-  { return res; }
-}
-
-Object statementWithoutSemicolon():
-{
-  Object res;
-  Expression e=null;
-  Token first,last;
-}
-{
-  { first=getToken(1); }
-(
- "return" [ e=expression() ]
- { 
-   if(e==null)
-     res=new ReturnStmt(new VoidConstantExp());
-   else
-     res=new ReturnStmt(e); 
- }
-|
-  res=whileStmt()
-|
-  res=forStmt()
-|  
-  LOOKAHEAD(monotype() string())
-  res=localDeclaration()
-| 
-  e=expression()
-  { res=new ExpressionStmt(e); }
-)
-
-  { 
-    last=getToken(0);
-
-    if(res instanceof Statement) ((Statement)res).setLocation(new Location(first).englobe(new Location(last)));
-    return res; }
-}
-
-List statements():
-{
-  List res=new ArrayList();
-  Object s;
-}
-{
-  ( s=statement() { res.add(s); } )*
-  { return res; }
 }
 
 /****************************************************************
@@ -1552,3 +1152,680 @@ void module(List definitions,
     readDefinitions(definitions);
   }
 }
+
+/****************************************************************
+ * JAVA statements and expressions
+ ****************************************************************/
+
+// Respects Java 1.1 syntax (comes from Java1.1.jj file)
+
+/*
+ * Expression syntax follows.
+ */
+
+Expression Expression() :
+/*
+ * This expansion has been written this way instead of:
+ *   Assignment() | ConditionalExpression()
+ * for performance reasons.
+ * However, it is a weakening of the grammar for it allows the LHS of
+ * assignments to be any conditional expression whereas it can only be
+ * a primary expression.  Consider adding a semantic predicate to work
+ * around this.
+ */
+{ Expression e1,e2; Token op; Token first,last; }
+{
+  { first=getToken(1); }
+
+  e1=ConditionalExpression()
+  [ 
+    op=AssignmentOperator() 
+    e2=Expression()
+    {
+      if(op.image.length()!=1)
+        e2=CallExp.create(symb(op.image.substring(1),op),e1,e2);
+
+      e1=new AssignExp(e1,e2);
+    }
+  ]
+  { 
+    last=getToken(0);
+    e1.setLocation(new Location(first).englobe(new Location(last)));
+    return e1; 
+  }
+}
+
+Token AssignmentOperator() :
+{ Token res; }
+{
+  (
+    res = "="
+  |
+    res= < assignmentOperator : 
+      "*=" | "/=" | "%=" | "+=" | "-=" | 
+      "<<=" | ">>=" | ">>>=" | "&=" | "^=" | "|=" 
+      >
+  )
+  { return res; }
+}
+
+Expression ConditionalExpression() :
+{ Expression res,e1,e2; }
+{
+  res=ConditionalOrExpression() 
+    [ "?" e1=Expression() ":" e2=ConditionalExpression() 
+      { res=new IfExp(res,e1,e2); }
+    ]
+  { return res; }
+}
+
+Expression ConditionalOrExpression() :
+{ Expression e1,e2; Token t; }
+{
+  e1=ConditionalAndExpression() 
+    ( t="||" e2=ConditionalAndExpression() 
+      { e1=CallExp.create(symb(t),e1,e2); } )*
+  { return e1; }
+}
+
+Expression ConditionalAndExpression() :
+{ Expression e1,e2; Token t; }
+{
+  e1=InclusiveOrExpression() 
+    ( t="&&" e2=InclusiveOrExpression() 
+      { e1=CallExp.create(symb(t),e1,e2); } )*
+  { return e1; }
+}
+
+Expression InclusiveOrExpression() :
+{ Expression e1,e2; Token t; }
+{
+  e1=ExclusiveOrExpression() 
+    ( t="|" e2=ExclusiveOrExpression() 
+      { e1=CallExp.create(symb(t),e1,e2); } )*
+  { return e1; }
+}
+
+Expression ExclusiveOrExpression() :
+{ Expression e1,e2; Token t; }
+{
+  e1=AndExpression() 
+    ( t="^" e2=AndExpression() 
+      { e1=CallExp.create(symb(t),e1,e2); } )*
+  { return e1; }
+}
+
+Expression AndExpression() :
+{ Expression e1,e2; Token t; }
+{
+  e1=EqualityExpression() 
+    ( t="&" e2=EqualityExpression() 
+      { e1=CallExp.create(symb(t),e1,e2); } )*
+  { return e1; }
+}
+
+Expression EqualityExpression() :
+{ Expression e1,e2; Token t; }
+{
+  e1=InstanceOfExpression() 
+    ( ( t="==" | t="!=" ) e2=InstanceOfExpression() 
+      { e1=CallExp.create(symb(t),e1,e2); }
+      )*
+  { return e1; }
+}
+
+Expression InstanceOfExpression() :
+{ Expression res; }
+{
+  res=RelationalExpression() //[ "instanceof" Type() ]
+  { return res; }
+}
+
+Expression RelationalExpression() :
+{ Expression e1,e2; Token t; }
+{
+  e1=ShiftExpression() 
+    ( (t="<"|t=">"|t="<="|t=">=") e2=ShiftExpression() 
+      { e1=CallExp.create(symb(t),e1,e2); }
+      )*
+  { return e1; }
+}
+
+Expression ShiftExpression() :
+{ Expression e1,e2; Token t,t1=null,t2=null; boolean left=false; }
+{
+  e1=AdditiveExpression() 
+    ( 
+     ( t="<" { left=true; } [ t1="<" ] 
+     | t=">" [ t1=">" [ t2=">" ]] 
+     )
+     e2=AdditiveExpression() 
+     { 
+       String func;
+       if(left)
+         func = t1==null ? "<" : "<<";
+       else
+         func = t1==null ? ">" : t2==null ? ">>" : ">>>";
+       e1=CallExp.create(symb(func,t),e1,e2); }
+      )*
+  { return e1; }
+}
+
+Expression AdditiveExpression() :
+{ Expression e1,e2; Token t; }
+{
+  e1=MultiplicativeExpression() 
+    ( ( t="+" | t="-" ) e2=MultiplicativeExpression() 
+      { e1=CallExp.create(symb(t),e1,e2); }
+      )*
+  { return e1; }
+}
+
+Expression MultiplicativeExpression() :
+{ Expression e1,e2; Token t; }
+{
+  e1=UnaryExpression() 
+    ( (t="*"|t="/"|t="%") e2=UnaryExpression() 
+      { e1=CallExp.create(symb(t),e1,e2); }
+    )*
+  { return e1; }
+}
+
+Expression UnaryExpression() :
+{ Expression res; Token t=null; }
+{
+  (
+  ( "+" | t="-" ) res=UnaryExpression() 
+    { if(t!=null) res=CallExp.create(symb(t),res); }
+|
+  res=PreIncrementExpression()
+|
+  res=PreDecrementExpression()
+|
+  res=UnaryExpressionNotPlusMinus()
+  )
+  { return res; }
+}
+
+Expression PreIncrementExpression() :
+{ Expression res; Token t; }
+{
+  t="++" res=PrimaryExpression()
+  { return new AssignExp(res,CallExp.create(symb("+",t),res,ConstantExp.makeNumber(1))); }
+}
+
+Expression PreDecrementExpression() :
+{ Expression res; Token t; }
+{
+  t="--" res=PrimaryExpression()
+  { return new AssignExp(res,CallExp.create(symb("-",t),res,ConstantExp.makeNumber(1))); }
+}
+
+Expression UnaryExpressionNotPlusMinus() :
+{ Expression res; Token t; }
+{
+  ( t="~" | t="!" ) res=UnaryExpression()
+  { return CallExp.create(symb(t),res); }
+
+/*
+|
+  LOOKAHEAD( CastLookahead() )
+  CastExpression()
+*/
+
+|
+  res=PostfixExpression()
+  { return res; }
+}
+
+/*
+// This production is to determine lookahead only.  The LOOKAHEAD specifications
+// below are not used, but they are there just to indicate that we know about
+// this.
+Expression CastLookahead() :
+{ Expression res; }
+{
+  LOOKAHEAD(2)
+  "(" PrimitiveType()
+|
+  LOOKAHEAD("(" Name() "[")
+  "(" Name() "[" "]"
+|
+  "(" Name() ")" ( "~" | "!" | "(" | <IDENTIFIER> | "this" | "super" | "new" | Literal() )
+}
+*/
+
+Expression PostfixExpression() :
+{ Expression res; Token t; }
+{
+  res=PrimaryExpression() /* [ "++" | "--" ] */
+  { return res; }
+}
+
+/*
+Expression CastExpression() :
+{ Expression res; }
+{
+  LOOKAHEAD("(" PrimitiveType())
+  "(" Type() ")" UnaryExpression()
+|
+  LOOKAHEAD("(" Name())
+  "(" Type() ")" UnaryExpressionNotPlusMinus()
+}
+*/
+
+Expression PrimaryExpression() :
+{ Expression res; }
+{
+  res=PrimaryPrefix() 
+    ( LOOKAHEAD(2) res=PrimarySuffix(res) )*
+  { return res; }
+}
+
+Expression PrimaryPrefix() :
+{ Expression res; }
+{
+(
+  res=Literal()
+
+/*
+|
+  "this"
+|
+  "super" "." <IDENTIFIER>
+*/
+
+|
+  "(" res=Expression() ")"
+|
+  //AllocationExpression()
+  res=newExp()
+|
+  // Bossa specific
+  res=funExp()
+
+/* What's that ?
+|
+  LOOKAHEAD( ResultType() "." "class" )
+  ResultType() "." "class"
+*/
+
+|
+  //Name()
+  res=identExp()
+)
+  { return res; }
+}
+
+Expression PrimarySuffix(Expression start) :
+{ Expression res; }
+{
+
+/*
+  LOOKAHEAD(2)
+  "." "this"
+|
+  LOOKAHEAD(2)
+  "." AllocationExpression()
+|
+*/
+
+  { Token t; }
+  t="[" res=Expression() "]"
+  { return CallExp.create(symb("get",t),start,res); }
+
+|
+  { List parameters=null; }
+  "." res=identExp()
+  [ "(" parameters=Arguments() ")" ]
+  { 
+    if(parameters==null)
+      parameters=new ArrayList(1);
+    parameters.add(0,start);
+    return new CallExp(res,parameters); 
+  }
+
+|
+  { List args; }
+  "(" args=Arguments() ")"
+  { return new CallExp(start,args); }
+}
+
+Expression Literal() :
+{
+  Expression res;
+  Token t;
+}
+{
+  (
+  "null" { res=new NullExp(); }
+| res=intConstantExp() 
+| res=floatConstantExp()
+| t=<CHARACTER_LITERAL> 
+    { res=ConstantExp.makeChar
+      (new LocatedString(t.image.substring(1,t.image.length()-1),
+			 new Location(t)));
+    }
+| res=stringConstantExp()
+  )
+{ return res; }
+}
+
+List Arguments():
+{
+  List res=new ArrayList();
+  Expression e;
+}
+{
+  ( e=Expression() { res.add(e); }
+    ( "," e=Expression() { res.add(e); } )*
+  )?
+  { return res; }
+}
+
+/*
+void AllocationExpression() :
+{}
+{
+  LOOKAHEAD(2)
+  "new" PrimitiveType() ArrayDimsAndInits()
+|
+  "new" Name()
+    (
+      ArrayDimsAndInits()
+    |
+      Arguments() [ ClassBody() ]
+    )
+}
+*/
+
+/*
+ * The second LOOKAHEAD specification below is to parse to PrimarySuffix
+ * if there is an expression between the "[...]".
+ */
+/*
+void ArrayDimsAndInits() :
+{}
+{
+  LOOKAHEAD(2)
+  ( LOOKAHEAD(2) "[" Expression() "]" )+ ( LOOKAHEAD(2) "[" "]" )*
+|
+  ( "[" "]" )+ ArrayInitializer()
+}
+*/
+
+
+
+
+/*
+ * Statement syntax follows.
+ */
+
+Statement Statement() :
+{ Statement res; }
+{
+  (
+  LOOKAHEAD(2)
+  res=LabeledStatement()
+|
+  res=Block()
+|
+  res=EmptyStatement()
+|
+  res=StatementExpression() ";"
+
+/*
+|
+  res=SwitchStatement()
+*/
+
+|
+  res=IfStatement()
+|
+  res=WhileStatement()
+|
+  res=DoStatement()
+|
+  res=ForStatement()
+
+/*
+|
+  res=BreakStatement()
+|
+  res=ContinueStatement()
+*/
+
+|
+  res=ReturnStatement()
+
+/*
+|
+  res=ThrowStatement()
+|
+  res=SynchronizedStatement()
+|
+  res=TryStatement()
+*/
+  )
+  { return res; }
+}
+
+Statement LabeledStatement() :
+{ Statement res; }
+{
+  <IDENT> ":" res=Statement()
+  { return res; }
+}
+
+Statement Block() :
+{ Statement s; List statements; }
+{
+  "{" 
+  { statements = new LinkedList(); }
+  ( s=BlockStatement() { statements.add(s); } )* 
+  "}"
+  { return new Block(statements); }
+}
+
+Statement BlockStatement() :
+{ Statement res; }
+{
+  (
+  LOOKAHEAD([ "final" ] monotype() <IDENT>)
+  res=LocalVariableDeclaration() ";"
+|
+  res=Statement()
+/*
+|
+  UnmodifiedClassDeclaration()
+*/
+  )
+  { return res; }
+}
+
+Statement LocalVariableDeclaration() :
+{
+  Monotype t;
+  LocatedString id;
+  Expression e=null;
+}
+{
+  t=monotype()
+  id=ident()
+  [ "=" e=Expression() ]
+  { return new Block.LocalDeclaration(id,t,e); }
+}
+
+Statement EmptyStatement() :
+{}
+{
+  ";" { return null; }
+}
+
+Statement StatementExpression() :
+/*
+ * The last expansion of this production accepts more than the legal
+ * Java expansions for StatementExpression.  This expansion does not
+ * use PostfixExpression for performance reasons.
+ */
+{ Expression e1; }
+{
+  (
+  e1=PreIncrementExpression()
+|
+  e1=PreDecrementExpression()
+|
+  e1=PrimaryExpression()
+  [
+/*
+    "++"
+  |
+    "--"
+  |
+*/
+    { Token op; Expression e2; }
+    op=AssignmentOperator() 
+    e2=Expression()
+    {
+      if(op.image.length()!=1)
+        e2=CallExp.create(symb(op.image.substring(1),op),e1,e2);
+
+      e1=new AssignExp(e1,e2);
+    }
+  ]
+  )
+  { return new ExpressionStmt(e1); }
+}
+
+/*
+Statement SwitchStatement() :
+{ Statement res; }
+{
+  "switch" "(" Expression() ")" "{"
+    ( SwitchLabel() ( BlockStatement() )* )*
+  "}"
+}
+
+void SwitchLabel() :
+{
+  "case" Expression() ":"
+|
+  "default" ":"
+}
+*/
+
+Statement IfStatement() :
+/*
+ * The disambiguating algorithm of JavaCC automatically binds dangling
+ * else's to the innermost if statement.  The LOOKAHEAD specification
+ * is to tell JavaCC that we know what we are doing.
+ */
+{ Statement s1,s2=null; Expression cond; }
+{
+  "if" "(" cond=Expression() ")" 
+    s1=Statement() [ LOOKAHEAD(1) "else" s2=Statement() ]
+  { return new ExpressionStmt
+    (new IfExp(cond,new StatementExp(s1),
+	       (s2==null ? null : new StatementExp(s2)))); }
+}
+
+Statement WhileStatement() :
+{ Expression cond; Statement body; }
+{
+  "while" "(" cond=Expression() ")" body=Statement()
+  { return new LoopStmt(cond,body,false); }
+}
+
+Statement DoStatement() :
+{ Expression cond; Statement body; }
+{
+  "do" body=Statement() "while" "(" cond=Expression() ")" ";"
+  { return new LoopStmt(cond,body,true); }
+}
+
+Statement ForStatement() :
+{ Statement init=null,update=null,body,loop; Expression cond=null; }
+{
+  "for" "(" [ init=ForInit() ] ";" 
+    [ cond=Expression() ] ";" [ update=StatementExpressionList() ] ")" 
+    body=Statement()
+  { 
+    loop=new LoopStmt(cond,body,update,false);
+    if(init==null)
+      return loop;
+
+    List l = new LinkedList();
+    l.add(init);
+    l.add(loop);
+    return new Block(l);
+  }
+}
+
+Statement ForInit() :
+{ Statement res; }
+{
+  (
+  LOOKAHEAD( [ "final" ] monotype() <IDENT> )
+  res=LocalVariableDeclaration()
+|
+  res=StatementExpressionList()
+  )
+  { return res; }
+}
+
+Statement StatementExpressionList() :
+{ Statement s; List statements=new LinkedList(); }
+{
+  s=StatementExpression() { statements.add(s); }
+  ( "," StatementExpression() { statements.add(s); }
+  )*
+  { return new Block(statements); }
+}
+
+/*
+Statement BreakStatement() :
+{ Statement res; }
+{
+  "break" [ <IDENTIFIER> ] ";"
+}
+
+Statement ContinueStatement() :
+{ Statement res; }
+{
+  "continue" [ <IDENTIFIER> ] ";"
+}
+*/
+
+Statement ReturnStatement() :
+{ Expression val=null; }
+{
+  "return" [ val=Expression() ] ";"
+  { return new ReturnStmt(val); }
+}
+
+/*
+Statement ThrowStatement() :
+{ Statement res; }
+{
+  "throw" Expression() ";"
+}
+
+Statement SynchronizedStatement() :
+{ Statement res; }
+{
+  "synchronized" "(" Expression() ")" Block()
+}
+
+Statement TryStatement() :
+/*
+ * Semantic check required here to make sure that at least one
+ * finally/catch is present.
+ */
+/*
+{ Statement res; }
+{
+  "try" Block()
+  ( "catch" "(" FormalParameter() ")" Block() )*
+  [ "finally" Block() ]
+}
+*/

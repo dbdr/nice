@@ -12,7 +12,7 @@
 
 // File    : JavaClass.java
 // Created : Wed Feb 02 16:20:12 2000 by Daniel Bonniot
-//$Modified: Thu Feb 17 21:36:05 2000 by Daniel Bonniot $
+//$Modified: Fri Feb 25 15:32:51 2000 by Daniel Bonniot $
 
 package bossa.syntax;
 
@@ -45,7 +45,7 @@ public class JavaClass extends ClassDefinition
    * @param abstractions a list of Interfaces
    * @param javaName the name of the corresponding java class.
    it must be fully qualified, or the package must have been imported.
-   */
+  */
   public JavaClass(LocatedString name, 
 		   boolean isFinal, boolean isAbstract, 
 		   boolean isInterface,
@@ -57,19 +57,26 @@ public class JavaClass extends ClassDefinition
 	  typeParameters, extensions, implementations, abstractions);
     this.javaName = javaName;
 
-    JavaTypeConstructor.registerTypeConstructorForJavaClass
-      (this.tc, javaName.toString());
-  }
-
-  public boolean isConcrete()
-  {
-    return true;
+    if(javaName == null) // primitive type
+      {
+	isPrimitive = true;
+	javaType = ConstantExp.registerPrimType(name.toString(), tc);
+	if(javaType == null)
+	  User.error(this,
+		     name+" is not a known primitive type");
+      }
+    else
+      JavaTypeConstructor.registerTypeConstructorForJavaClass
+	(this.tc, javaName.toString());
   }
 
   void resolve()
   {
     super.resolve();
 
+    if(isPrimitive)
+      return;
+    
     if(javaName.toString().equals("_Array"))
       javaType = new bossa.SpecialArray(gnu.bytecode.Type.pointer_type);
     else
@@ -84,7 +91,14 @@ public class JavaClass extends ClassDefinition
 	javaType = (gnu.bytecode.ClassType) gnu.bytecode.Type.make(refClass);
       }
   }
+
+  private boolean isPrimitive;
   
+  public boolean isConcrete()
+  {
+    return !isPrimitive; // primitive type don't have "new"
+  }
+
   private gnu.bytecode.Type javaType;
   
   gnu.bytecode.Type javaClass()
@@ -105,8 +119,9 @@ public class JavaClass extends ClassDefinition
   public void printInterface(java.io.PrintWriter s)
   {
     super.printInterface(s);
-    s.print(" = native "+javaName+";\n");
+    s.print(" = native "+(javaName == null ? "" : javaName.toString())+";\n");
   }
   
+  /** Is null if this class represents a primitive type. */
   private LocatedString javaName;
 }

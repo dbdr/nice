@@ -12,7 +12,7 @@
 
 // File    : JavaTypeConstructor.java
 // Created : Thu Jul 08 11:51:09 1999 by bonniot
-//$Modified: Thu Feb 24 12:18:56 2000 by Daniel Bonniot $
+//$Modified: Fri Feb 25 16:48:50 2000 by Daniel Bonniot $
 
 package bossa.syntax;
 
@@ -79,13 +79,12 @@ public class JavaTypeConstructor extends TypeConstructor
   }
   
   private gnu.bytecode.Type javaType;
-  private boolean isPrimitive;
   
   private static HashMap hash = new HashMap();
 
   private static final gnu.bytecode.Type[] blackListClass =
     new gnu.bytecode.Type[] {
-      gnu.bytecode.Type.pointer_type,
+      gnu.bytecode.ClassType.make("java.lang.Object"),
       gnu.bytecode.ClassType.make("java.lang.Throwable")
     }
   ;
@@ -179,27 +178,22 @@ public class JavaTypeConstructor extends TypeConstructor
   public void setKind(Kind k)
   {
     super.setKind(k);
-    try{
-      //bossa.typing.initialLeq(this, object(this.variance.size));
-      bossa.typing.Typing.assertImp
-	(this,
-	 InterfaceDefinition.top(this.variance.size),
-	 true);
-      if(isPrimitive)
-	try{
-	  if(this.variance.size!=0)
-	    Internal.warning(this, "Primitive type "+name+
-			     " with arity "+this.variance.size);
-	  Typing.assertAbs(this, InterfaceDefinition.top(this.variance.size));
-	}
-	catch(TypingEx e){
-	  Internal.warning
-	    (this, "Could not make primitive type "+name+" final");
-	}
-    }
-    catch(bossa.typing.TypingEx e){
-      Internal.error("Impossible");
-    }
+    if(this.variance == null)
+      Internal.warning(this,
+		       this+" was not given an arity");
+    else
+      try{
+	//bossa.typing.initialLeq(this, object(this.variance.size));
+	
+	bossa.typing.Typing.assertImp
+	  (this,
+	   InterfaceDefinition.top(this.variance.size),
+	   true);
+      }
+      catch(bossa.typing.TypingEx e){
+	Internal.error("Impossible");
+      }
+
   }
       
   Polytype getType()
@@ -260,47 +254,6 @@ public class JavaTypeConstructor extends TypeConstructor
    ****************************************************************/
 
   /****************************************************************
-   * Global Scope
-   ****************************************************************/
-
-  private static void makePrimType(String name, Type javaType)
-  {
-    JavaTypeConstructor jtc = (JavaTypeConstructor) JavaTypeConstructor.make
-      (new LocatedString(name,new Location("Base type",true)),javaType);
-    jtc.isPrimitive = true;
-    
-    globalTypeScope.addSymbol(jtc);
-    globalTypeScope.addMapping("#"+name, jtc);
-  }
-      
-  static void addJavaTypes(TypeScope globalTypeScope)
-  // Called by Node
-  {
-    // We need to remember it in order to add new java classes on the fly (see "lookup" below)
-    JavaTypeConstructor.globalTypeScope = globalTypeScope;
-
-    TypeConstructor voidTC = JavaTypeConstructor.make
-      (new LocatedString("void",new Location("Base type",true)),
-       bossa.SpecialTypes.voidType);
-
-    JavaTypeConstructor.voidType = 
-      new MonotypeConstructor(voidTC,null, voidTC.name.location());
-    globalTypeScope.addSymbol(voidTC);
-
-    makePrimType("boolean",bossa.SpecialTypes.booleanType);
-    makePrimType("char",bossa.SpecialTypes.charType);
-
-    globalTypeScope.addMapping
-      ("int", JavaTypeConstructor.lookup("gnu.math.IntNum"));
-    globalTypeScope.addMapping
-      ("long", JavaTypeConstructor.lookup("gnu.math.IntNum"));
-  }
-
-  public static Monotype voidType;
-  
-  private static TypeScope globalTypeScope;
-  
-  /****************************************************************
    * List of TCs for java.lang.Object: one per variance.
    ****************************************************************/
 
@@ -339,8 +292,8 @@ public class JavaTypeConstructor extends TypeConstructor
     if(c!=null)
       return c;
     
-    if(globalTypeScope.module!=null)
-      for(Iterator i = globalTypeScope.module.listImplicitPackages();
+    if(Node.getGlobalTypeScope().module!=null)
+      for(Iterator i = Node.getGlobalTypeScope().module.listImplicitPackages();
 	  i.hasNext();)
 	{
 	  String pkg = ((LocatedString) i.next()).toString();
@@ -364,7 +317,7 @@ public class JavaTypeConstructor extends TypeConstructor
     
     TypeConstructor res = JavaTypeConstructor.make
       (c.getName(),gnu.bytecode.Type.make(c));
-    globalTypeScope.addSymbol(res);
+    Node.getGlobalTypeScope().addSymbol(res);
     
     // Remembers the short name as an alias
     if(!(className.equals(c.getName())))
@@ -372,7 +325,7 @@ public class JavaTypeConstructor extends TypeConstructor
 	if(Debug.javaTypes)
 	  Debug.println("Registering alias "+className);
 
-	globalTypeScope.addMapping(className,res);
+	Node.getGlobalTypeScope().addMapping(className,res);
       }
     
     return res;

@@ -12,7 +12,7 @@
 
 // File    : CallExp.java
 // Created : Mon Jul 05 16:27:27 1999 by bonniot
-//$Modified: Fri Feb 18 13:01:35 2000 by Daniel Bonniot $
+//$Modified: Tue Feb 29 17:53:35 2000 by Daniel Bonniot $
 
 package bossa.syntax;
 
@@ -38,7 +38,15 @@ public class CallExp extends Expression
   }
 
   public static CallExp create(Expression fun, 
-			Expression param1, Expression param2)
+			       Expression param1)
+  {
+    List params=new ArrayList(1);
+    params.add(param1);
+    return new CallExp(fun,params);
+  }
+  
+  public static CallExp create(Expression fun, 
+			       Expression param1, Expression param2)
   {
     List params=new ArrayList(2);
     params.add(param1);
@@ -128,24 +136,29 @@ public class CallExp extends Expression
 
     Typing.enter(funt.getTypeParameters(),"call "+fun);
     
-    Typing.implies();
-
-    try{ funt.getConstraint().assert(); }
-    catch(TypingEx e) { 
-      throw new ReportErrorEx("The conditions for using this function are not fullfiled");
-    }    
-    
-    if(Typing.dbg)
+    try
       {
-	Debug.println("Parameters:\n"+
-		      Util.map("",", ","\n",parameters));
-      }
+	Typing.implies();
+
+	try{ funt.getConstraint().assert(); }
+	catch(TypingEx e) { 
+	  throw new ReportErrorEx
+	    ("The conditions for using this function are not fullfiled");
+	}
     
-    Typing.in(parameters,
-	      Domain.fromMonotypes(funt.domain()));
-
-    Typing.leave();
-
+	if(Typing.dbg)
+	  {
+	    Debug.println("Parameters:\n"+
+			  Util.map("",", ","\n",parameters));
+	  }
+    
+	Typing.in(parameters,
+		  Domain.fromMonotypes(funt.domain()));
+      }
+    finally{
+      Typing.leave();
+    }
+    
     //computes the resulting type
     Constraint cst=funt.getConstraint().and(Polytype.getConstraint(parameters));
     cst.and(MonotypeLeqCst.constraint(Polytype.getMonotype(parameters),dom));

@@ -12,7 +12,7 @@
 
 // File    : MethodBodyDefinition.java
 // Created : Thu Jul 01 18:12:46 1999 by bonniot
-//$Modified: Thu Feb 24 12:06:07 2000 by Daniel Bonniot $
+//$Modified: Wed Mar 01 20:47:38 2000 by Daniel Bonniot $
 
 package bossa.syntax;
 
@@ -38,12 +38,13 @@ public class MethodBodyDefinition extends Definition
    * @param newTypeVars list of TypeSymbol
    * @param newConstraint list of AtomicConstraint
    * @param formals list of Pattern
-   * @param body list of Statement
+   * @param body s statement representing the body of the method.
    */
   public MethodBodyDefinition(LocatedString name, 
 			      Collection binders,
 			      List newTypeVars,
-			      List formals, List body)
+			      List formals, 
+			      Statement body)
   {
     super(name,Node.down);
 
@@ -52,7 +53,7 @@ public class MethodBodyDefinition extends Definition
     this.newTypeVars=newTypeVars;
 
     this.formals=formals;
-    this.body=new Block(body);
+    this.body=body;
     this.definition=null;
     
     addChild(this.body);
@@ -138,13 +139,17 @@ public class MethodBodyDefinition extends Definition
 	  MethodDefinition m=(MethodDefinition)((MethodDefinition.Symbol)s).definition;
 	  try{
 	    int level=Typing.enter("Trying definition "+m+" for method body "+name);
-	    Typing.introduce(m.symbol.type.getTypeParameters());
-	    m.symbol.type.getConstraint().assert();
-	    Typing.in(Pattern.getPolytype(formals),
+	    try{
+	      Typing.introduce(m.symbol.type.getTypeParameters());
+	      m.symbol.type.getConstraint().assert();
+	      Typing.in(Pattern.getPolytype(formals),
 		      Domain.fromMonotypes(m.getType().domain()));
-	    Typing.implies();
-	    if(Typing.leave()!=level)
-	      Internal.error("Enter/Leave error");
+	      Typing.implies();
+	    }
+	    finally{
+	      if(Typing.leave()!=level)
+		Internal.error("Enter/Leave error");
+	    }
 	  }
 	  catch(TypingEx e){
 	    if(Debug.typing) Debug.println("Not the right choice :"+e);
@@ -163,7 +168,9 @@ public class MethodBodyDefinition extends Definition
 
     User.error(this,"There is an ambiguity about which version of the overloaded method \""+
 	       name+"\" this alternative belongs to.\n"+
-	       "Try to use more patterns.");
+	       "Try to use more patterns.\n\n"+
+	       "Methods considered:\n"+
+	       Util.map("","\n","",symbols));
     return null;
   }
   
@@ -335,7 +342,7 @@ public class MethodBodyDefinition extends Definition
     }
     catch(TypingEx e){
       User.error(this,
-		 "?? Type error in method "+name,
+		 "Type error in method "+name,
 		 " :"+e);
     }
   }
@@ -394,8 +401,6 @@ public class MethodBodyDefinition extends Definition
 
     blockExp.setBody(body.generateCode());
 
-    gnu.expr.FindCapturedVars.findCapturedVars(lexp);
-    
     module.compileMethod(lexp);
 
     //Register this alternative for the link test
@@ -456,7 +461,7 @@ public class MethodBodyDefinition extends Definition
   protected Collection /* of FieldSymbol */  parameters;
   protected List       /* of Patterns */   formals;
   Collection /* of LocatedString */ binders; // Null if type parameters are not bound
-  private Block body;
+  private Statement body;
 
   private List /* of TypeSymbol */  newTypeVars;
 }

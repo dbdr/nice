@@ -12,7 +12,7 @@
 
 // File    : Node.java
 // Created : Thu Jul 08 10:24:56 1999 by bonniot
-//$Modified: Tue Feb 22 16:17:53 2000 by Daniel Bonniot $
+//$Modified: Tue Feb 29 20:29:16 2000 by Daniel Bonniot $
 
 package bossa.syntax;
 
@@ -49,10 +49,31 @@ abstract public class Node
     addChildren(children);
   }
 
+  /** child(n) is prefered now */
   void addChild(Node n)
   {
-    Internal.error(n==null,"null child in Node.addChild");
+    if(n==null)
+      Internal.error("null child in Node.addChild for node "+this);
+
     children.add(n);
+  }
+  
+  final Node child(Node n)
+  {
+    if(n==null)
+      return null;
+
+    children.add(n);
+    return n;
+  }
+  
+  final Statement child(Statement n)
+  {
+    if(n==null)
+      return null;
+
+    children.add(n);
+    return n;
   }
   
   void removeChild(Node n)
@@ -140,9 +161,8 @@ abstract public class Node
   static
   {
     globalTypeScope = new TypeScope(null);
-    JavaTypeConstructor.addJavaTypes(globalTypeScope);
   }
-  public static TypeScope getGlobalTypeScope()
+  public static final TypeScope getGlobalTypeScope()
   {
     return globalTypeScope;
   }
@@ -330,6 +350,9 @@ abstract public class Node
    */
   ExpressionRef expChild(Expression value)
   {
+    if(value==null)
+      return null;
+    
     ExpressionRef res=new ExpressionRef(value);
     addChild(res);
     return res;

@@ -12,7 +12,7 @@
 
 // File    : Block.java
 // Created : Wed Jul 07 17:42:15 1999 by bonniot
-//$Modified: Thu Feb 17 19:54:51 2000 by Daniel Bonniot $
+//$Modified: Thu Mar 02 14:55:53 2000 by Daniel Bonniot $
 // Description : A block : a list of statements with local variables
 
 package bossa.syntax;
@@ -29,7 +29,7 @@ public class Block extends Statement
     addChildren(locals);
   }
 
-  public static class LocalDeclaration extends Node
+  public static class LocalDeclaration extends Statement
   {
     public LocalDeclaration(LocatedString name, Monotype type, Expression value)
     {
@@ -41,6 +41,12 @@ public class Block extends Statement
 	this.value=expChild(value);
     }
 
+    public gnu.expr.Expression generateCode()
+    {
+      Internal.error("Should not be called");
+      return null;
+    }
+    
     protected ExpressionRef value=null;
     MonoSymbol left;
   }
@@ -65,6 +71,10 @@ public class Block extends Statement
     while(i.hasNext())
       {
 	Object s=i.next();
+	
+	if(s==null) // emptyStatement
+	  continue;
+	
 	if(s instanceof LocalDeclaration)
 	  {
 	    LocalDeclaration decl = (LocalDeclaration) s;
@@ -86,6 +96,10 @@ public class Block extends Statement
     while(i.hasNext())
       {
 	Object s=i.next();
+	
+	if(s==null) // emptyStatement
+	  continue;
+	
 	if(s instanceof LocalDeclaration)
 	  {
 	    // Removes all the statements already in res, 
@@ -93,9 +107,10 @@ public class Block extends Statement
 	    res.add(new Block(statements.subList(i.previousIndex(),statements.size())));
 	    break;
 	  }
-	else 
-	  res.add(s);
+	
+	res.add(s);
       }
+
     // idem
     res.trimToSize();
     
@@ -202,9 +217,10 @@ public class Block extends Statement
       eVal[0]=gnu.expr.QuoteExp.nullExp;
     else
       eVal[0]=local.value.generateCode();
-    local.left.setDeclaration(res.addDeclaration(local.left.name.toString(),
-						 local.left.type.getJavaType()));
-
+    local.left.setDeclaration
+      (res.addDeclaration(local.left.name.toString(),
+			  local.left.type.getJavaType()));
+    
     res.setBody(addLocals(vars,body));
     res.setLine(local.left.name.location().getLine());
     

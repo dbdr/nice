@@ -10,42 +10,30 @@
 /*                                                                        */
 /**************************************************************************/
 
-// File    : SpecialTypes.java
-// Created : Mon Jan 17 14:19:30 2000 by bonniot
-//$Modified: Fri Feb 25 16:13:03 2000 by Daniel Bonniot $
+// File    : Compilation.bossa
+// Created : Wed Mar 01 17:01:48 2000 by Daniel Bonniot
+//$Modified: Wed Mar 01 18:01:56 2000 by Daniel Bonniot $
 
-package bossa;
-
-import bossa.util.*;
-import gnu.bytecode.*;
-
-import kawa.standard.Scheme;
+package mlsub.compilation;
 
 /**
- * Used to store types with automatic conversion.
+ * Stores information about a mlsub compilation.
+ *
+ * Information includes:
+ *   - whether to perform link tests
+ *   - 
  * 
- * @author bonniot
+ * Only information needed to perform the steps
+ * of compilation should go here.
+ * Other language specific options should go in a 
+ * subclass.
+ *
+ * @author Daniel Bonniot
  */
 
-public class SpecialTypes
+class Compilation
 {
-  static public final Type intType, longType, charType, booleanType, voidType, arrayType;
+  boolean doLink;
 
-  static 
-  {
-    intType = Scheme.intType;
-    longType = Scheme.longType;
-    charType = Scheme.charType;
-    booleanType = Scheme.booleanType;
-    voidType = gnu.bytecode.Type.void_type;
-
-    arrayType = new SpecialArray(Type.pointer_type);
-
-    Type.flushTypeChanges();
-  }
-
-  static public Type makeArrayType(Type elements)
-  {
-    return new SpecialArray(elements);
-  }
+  Module root;
 }

@@ -12,7 +12,7 @@
 
 // File    : VarSymbol.java
 // Created : Wed Jul 07 16:56:06 1999 by bonniot
-//$Modified: Mon Jan 03 19:29:31 2000 by bonniot $
+//$Modified: Thu Mar 02 15:27:10 2000 by Daniel Bonniot $
 
 package bossa.syntax;
 
@@ -77,6 +77,8 @@ abstract class VarSymbol extends Node implements Located
     this.decl.setLine(name.location().getLine());
     this.decl.setCanRead(true);
     this.decl.setCanWrite(true);
+    if(declaration.getContext()==null)
+      Internal.error(this+" has no englobing context");
   }
   
   gnu.expr.Declaration getDeclaration()
@@ -84,5 +86,5 @@ abstract class VarSymbol extends Node implements Located
     return decl;
   }
   
-  private gnu.expr.Declaration decl=null;
+  private gnu.expr.Declaration decl = null;
 }

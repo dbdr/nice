@@ -1,0 +1,93 @@
+/**************************************************************************/
+/*                           B O S S A                                    */
+/*        A simple imperative object-oriented research language           */
+/*                   (c)  Daniel Bonniot 1999                             */
+/*                                                                        */
+/*  This program is free software; you can redistribute it and/or modify  */
+/*  it under the terms of the GNU General Public License as published by  */
+/*  the Free Software Foundation; either version 2 of the License, or     */
+/*  (at your option) any later version.                                   */
+/*                                                                        */
+/**************************************************************************/
+
+// File    : compiler.bossa
+// Created : Sat Feb 19 16:21:04 2000 by Daniel Bonniot
+//$Modified: Wed Mar 01 18:06:05 2000 by Daniel Bonniot $
+
+package bossa.tools;
+
+/**
+ * Bossa compiler main file.
+ * 
+ * @author Daniel Bonniot
+ */
+
+import bossa.lang;
+import mlsub.compilation;
+import bossa.opt;
+
+main(args)
+{
+  boolean recompileCommandLine = false;
+  boolean recompileAll = false;
+  boolean ddoLink=true;
+  List<Option> opts = makeVector(10);
+
+  opts.add(option('h',"help","print help message and exit",
+		  fun()=>
+                  {
+		    println(printOptions(opts));
+		    exit(1);
+		  }));
+  opts.add(option('r',"recompile",
+		  "forces recompilation of packages given on the command line",
+		  "no/command-line/all",
+  		  fun()=>{recompileCommandLine=true;},
+  		  fun(String arg)=>{
+		    if("all".equals(arg))
+		      recompileAll=true;
+		    else if("command-line".equals(arg))
+		      recompileCommandLine=true;
+		    else if("none".equals(arg))
+		      {
+		        recompileCommandLine=false;
+		        recompileAll=false;
+		      }
+		    }));
+
+  opts.add(option('c',"compile",
+		  "just compile packages, do not link them",
+  		  fun()=>{ddoLink=false;}));
+
+  opts.add(option('?',"usage",
+		  "print usage information and exit",
+		  fun()=>usage()));
+
+  Sequence<String> rest = parse("bossac", args, opts);
+  if((rest.size()<1) | (rest.size()>1))
+    {
+      usage();
+    };
+  String packageName = rest.get(0);
+
+  println("Bossa compiler");
+
+  if(!(packageName.equals("bossa.lang")))
+    readPackage("bossa.lang", false);
+
+  mlsub.compilation.Module rootModule = 
+    readPackage(packageName,recompileCommandLine);
+
+  make(rootModule /*, recompileAll, doLink*/);
+}
+
+bossa.modules.Package readPackage(String, boolean) =
+  native bossa.modules.Package bossa.modules.Package.make(String, boolean);
+
+void usage();
+usage()
+{
+  println("Usage: bossac <package name>");
+  println("Type \"bossac --help\" for a list of options");
+  exit(-1);
+}

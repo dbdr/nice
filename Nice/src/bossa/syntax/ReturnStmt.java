@@ -12,7 +12,7 @@
 
 // File    : ReturnStmt.java
 // Created : Mon Jul 05 17:21:40 1999 by bonniot
-//$Modified: Wed Feb 23 19:30:19 2000 by Daniel Bonniot $
+//$Modified: Tue Feb 29 19:22:39 2000 by Daniel Bonniot $
 // Description : return in a function or method
 
 package bossa.syntax;
@@ -27,6 +27,11 @@ public class ReturnStmt extends Statement
     this.value=expChild(value);
   }
 
+  Polytype returnType()
+  {
+    return value.getType();
+  }
+  
   void typecheck()
   {
     includingFunction = Node.currentFunction;
@@ -35,14 +40,12 @@ public class ReturnStmt extends Statement
     if(declaredRetType==null)
       return;
     
-    Polytype retType=value.getType();
-    
     try{
-      Typing.leq(retType,new Polytype(declaredRetType));
+      Typing.leq(returnType(),new Polytype(declaredRetType));
     }
     catch(TypingEx e){
       User.error(this,
-		 "Return type "+retType+" is not correct",
+		 "Return type "+returnType()+" is not correct",
 		 " :"+e);
     }
   }

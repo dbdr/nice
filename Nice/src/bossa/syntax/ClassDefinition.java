@@ -12,7 +12,7 @@
 
 // File    : ClassDefinition.java
 // Created : Thu Jul 01 11:25:14 1999 by bonniot
-//$Modified: Mon Feb 21 10:50:52 2000 by Daniel Bonniot $
+//$Modified: Fri Feb 25 15:32:47 2000 by Daniel Bonniot $
 
 package bossa.syntax;
 
@@ -140,7 +140,8 @@ abstract public class ClassDefinition extends Definition
       for(Iterator e = extensions.iterator(); e.hasNext();)
 	{
 	  TypeConstructor tc = (TypeConstructor) e.next();
-	  if(tc.getDefinition().getAssociatedInterface()!=null)
+	  if(tc.getDefinition() !=null &&
+	     tc.getDefinition().getAssociatedInterface()!=null)
 	    User.error(name,
 		       tc+" is an interface, so "+name+
 		       " may only implement it");
@@ -169,6 +170,12 @@ abstract public class ClassDefinition extends Definition
       if(associatedInterface!=null)
 	Typing.assertImp(tc, associatedInterface, true);
       Typing.assertImp(tc,abstractions,true);
+
+      if(implementsTop)
+	Typing.assertImp(tc,
+			 InterfaceDefinition.top(typeParameters.size()),
+			 true);
+
       Typing.assertAbs(tc,abstractions);
       if(isFinal)
 	Typing.assertAbs(tc,InterfaceDefinition.top(typeParameters.size()));
@@ -368,5 +375,6 @@ abstract public class ClassDefinition extends Definition
     /* of Interface */ implementations,
     /* of Interface */ abstractions;
   protected boolean isFinal, isInterface;
+  protected boolean implementsTop = true;
   boolean isAbstract;
 }

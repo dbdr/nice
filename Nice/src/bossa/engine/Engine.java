@@ -12,7 +12,7 @@
 
 // File    : Engine.java
 // Created : Tue Jul 27 15:34:53 1999 by bonniot
-//$Modified: Thu Feb 24 12:41:53 2000 by Daniel Bonniot $
+//$Modified: Fri Feb 25 20:11:49 2000 by Daniel Bonniot $
 
 package bossa.engine;
 
@@ -35,7 +35,9 @@ public abstract class Engine
   }
   
   /**
-   * Enters a new typing context
+   * Enters a new typing context.
+   * If an enter() completed successfully,
+   * a matching leave() MUST be issued some time later by the caller.
    */
   public static void enter()
   {
@@ -81,28 +83,32 @@ public abstract class Engine
   public static void leave()
     throws Unsatisfiable
   {
-    assertFrozens();
+    try{
+      assertFrozens();
 
-    if(dbg) Debug.println("Leave");
-      
-    for(Iterator i=constraints.iterator();
-	i.hasNext();)
-      { 
-	Engine.Constraint k=(Engine.Constraint)i.next();
-	try{
-	  if(dbg) Debug.println("** Satisfying "+k);
+      if(dbg) Debug.println("Leave");
+
+      for(Iterator i=constraints.iterator();
+	  i.hasNext();)
+	{ 
+	  Engine.Constraint k=(Engine.Constraint)i.next();
+	  try{
+	    if(dbg) Debug.println("** Satisfying "+k);
 	  
-	  k.satisfy();
+	    k.satisfy();
+	  }
+	  catch(Unsatisfiable e){
+	    if(dbg) Debug.println("** In "+k);
+	    throw e;
+	  }
 	}
-	catch(Unsatisfiable e){
-	  if(dbg) Debug.println("** In "+k);
-	  throw e;
-	}
-      }
-    backtrack();
+    }
+    finally{
+      backtrack();
+    }
   }
   
-  public static void backtrack()
+  static void backtrack()
   {
     for(Iterator i=constraints.iterator();
 	i.hasNext();)
@@ -163,8 +169,9 @@ public abstract class Engine
 	      if(dbg) 
 		Debug.println("Bad kinding discovered by Engine : "+
 			      k1+" != "+k2+
-			      " for elements "+e1+" and "+e2);
-	      throw new LowlevelUnsatisfiable("Bad Kinding for "+e1+ " and "+e2);
+			      "\nfor elements "+e1+" and "+e2);
+	      throw new LowlevelUnsatisfiable("Bad Kinding for "+
+					      e1+ " and "+e2);
 	    }
 	}
       else
@@ -580,20 +587,10 @@ public abstract class Engine
       throws Unsatisfiable
     {
       if(dbg) Debug.println(e1+" <: "+e2+" ("+e1.getId()+" <: "+e2.getId()+")");
-      try{ 
-	if(initial)
-	  k0.initialLeq(e1.getId(),e2.getId());
-	else
-	  k0.leq(e1.getId(),e2.getId()); 
-      }
-      catch(Unsatisfiable e){
-	// We call backtrack here to go the good state
-	// since the leave() method will not be called
-	// (or the call to backtrack() in leave will not occur
-	// if we are in leave now)
-	Engine.backtrack();
-	throw e;
-      }
+      if(initial)
+	k0.initialLeq(e1.getId(),e2.getId());
+      else
+	k0.leq(e1.getId(),e2.getId()); 
     }
 
     void mark()

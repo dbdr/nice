@@ -12,7 +12,7 @@
 
 // File    : ConstantExp.java
 // Created : Thu Jul 08 15:36:40 1999 by bonniot
-//$Modified: Sat Dec 04 16:11:22 1999 by bonniot $
+//$Modified: Tue Feb 29 21:36:19 2000 by Daniel Bonniot $
 
 package bossa.syntax;
 
@@ -23,10 +23,26 @@ import bossa.util.*;
  *
  * Numeric types come from {@link gnu.math gnu.math}.
  */
-abstract public class ConstantExp extends Expression
+public class ConstantExp extends Expression
 {
+  ConstantExp()
+  {
+  }
+  
+  ConstantExp(TypeConstructor tc, Object value, String representation,
+	      Location location)
+  {
+    this.type = new Polytype(new MonotypeConstructor(tc,null,null));
+    this.value = value;
+    this.representation = representation;
+    setLocation(location);
+  }
+  
   void resolve()
   {
+    if(type!=null)
+      return;
+    
     TypeSymbol s=typeScope.lookup(className);
     
     if(s==null)
@@ -52,15 +68,92 @@ abstract public class ConstantExp extends Expression
 
   public gnu.expr.Expression compile()
   {
+    if(value == null)
+      Internal.warning(this+"["+this.getClass()+" has no value");
+    
     return new gnu.expr.QuoteExp(value);
   }
   
   protected String className = "undefined class name";
   
   protected Object value;
-
+  private String representation;
+  
   public String toString()
   {
-    return value.toString();
+    return representation;
   }
+
+  /****************************************************************
+   * Creating constant expressions for the parser
+   ****************************************************************/
+
+  public static Expression makeChar(LocatedString value)
+  {
+    if(value.toString().length()!=1)
+      User.error(value, "Invalid character constant: "+value);
+
+    char c = value.toString().charAt(0);
+    return new ConstantExp(primChar, gnu.kawa.util.Char.make(c), "'"+c+"'",
+			   value.location());
+  }
+
+  public static Expression makeNumber(int value)
+  {
+    return new ConstantExp(primInt, gnu.math.IntNum.make(value), value+"",
+			   Location.nowhere());
+  }
+  
+  public static Expression makeNumber(LocatedString representation)
+  {
+    String rep = representation.toString();
+
+    // Does it fit in an int ?
+    try{
+      int i = Integer.decode(rep).intValue();
+      return new ConstantExp(primInt, gnu.math.IntNum.make(i), i+"",
+			     representation.location());
+    }
+    catch(NumberFormatException e){
+    }
+
+    User.error(representation,
+	       rep+" is not a valid number");
+    return null;
+  }
+  
+  static gnu.bytecode.Type registerPrimType(String name, TypeConstructor tc)
+  {
+    if(name.equals("bossa.lang.char"))
+      {
+	primChar = tc;
+	return bossa.SpecialTypes.charType;
+      }
+    
+    if(name.equals("bossa.lang.int"))
+      {
+	primInt = tc;
+	return 
+	  bossa.SpecialTypes.intType;
+	//gnu.bytecode.ClassType.make("gnu.math.IntNum");
+      }
+    
+    if(name.equals("bossa.lang.boolean"))
+      {
+	primBool = tc;
+	boolType = new MonotypeConstructor(primBool, null, tc.location());
+	return bossa.SpecialTypes.booleanType;
+      }
+    
+    if(name.equals("bossa.lang.void"))
+      {
+	voidType = new MonotypeConstructor(tc, null, tc.location());
+	return bossa.SpecialTypes.voidType;
+      }
+    
+    return null;
+  }
+      
+  static TypeConstructor primChar, primInt, primBool;
+  static Monotype voidType, boolType;
 }

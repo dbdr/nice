@@ -12,7 +12,7 @@
 
 // File    : BossaClass.java
 // Created : Thu Jul 01 11:25:14 1999 by bonniot
-//$Modified: Tue Feb 22 16:13:49 2000 by Daniel Bonniot $
+//$Modified: Fri Feb 25 13:27:34 2000 by Daniel Bonniot $
 
 package bossa.syntax;
 
@@ -56,6 +56,7 @@ public class BossaClass extends ClassDefinition
 
     this.simpleName = name;    
     this.isSharp=isSharp;
+    this.implementsTop = !isSharp;
     
     this.fields=keepFields(fields,isSharp);
 
@@ -190,14 +191,6 @@ public class BossaClass extends ClassDefinition
   public void createContext()
   {
     super.createContext();
-
-    try{
-      if(!isSharp)
-	Typing.assertImp(tc,InterfaceDefinition.top(typeParameters.size()),true);
-    }
-    catch(TypingEx e){
-      User.error(name,"Error in class "+name+" : "+e.getMessage());
-    }
 
     // This is done here for convenience only
     if(classType!=null)

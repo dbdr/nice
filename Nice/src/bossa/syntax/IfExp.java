@@ -12,7 +12,7 @@
 
 // File    : IfExp.java
 // Created : Mon Dec 06 12:01:51 1999 by bonniot
-//$Modified: Mon Jan 24 19:22:36 2000 by Daniel Bonniot $
+//$Modified: Tue Feb 29 22:04:17 2000 by Daniel Bonniot $
 
 package bossa.syntax;
 
@@ -45,17 +45,38 @@ public class IfExp extends Expression
   {
     this.type = Polytype.union(thenExp.getType(),elseExp.getType());
   }
-  
+
+  void typecheck()
+  {
+    condition.resolveOverloading(new Polytype(ConstantExp.boolType));
+  }
+
   /****************************************************************
    * Code generation
    ****************************************************************/
 
   public gnu.expr.Expression compile()
   {
-    condition.noOverloading();
+    gnu.expr.Expression thenCode, elseCode;
+    thenCode = thenExp.generateCode();
+    elseCode = elseExp.generateCode();
+    
+    if(elseCode.getType()==bossa.SpecialTypes.voidType)
+      thenCode = voidify(thenCode);
+    else if(thenCode.getType()==bossa.SpecialTypes.voidType)
+      elseCode = voidify(elseCode);
+    
     return new gnu.expr.IfExp(condition.generateCode(),
-			      thenExp.generateCode(),
-			      elseExp.generateCode());
+			      thenCode,
+			      elseCode);
+  }
+  
+  private static gnu.expr.Expression voidify(gnu.expr.Expression e)
+  {
+    if(e.getType()==bossa.SpecialTypes.voidType)
+      return e;
+    
+    return new gnu.expr.BeginExp(e, gnu.expr.QuoteExp.voidExp);
   }
   
   /****************************************************************

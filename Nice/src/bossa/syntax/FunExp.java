@@ -12,7 +12,7 @@
 
 // File    : FunExp.java
 // Created : Mon Jul 12 15:09:50 1999 by bonniot
-//$Modified: Thu Feb 24 13:06:15 2000 by Daniel Bonniot $
+//$Modified: Tue Feb 29 19:24:46 2000 by Daniel Bonniot $
 // Description : A functional expression
 
 package bossa.syntax;
@@ -22,11 +22,11 @@ import bossa.util.*;
 
 public class FunExp extends Expression implements Function
 {
-  public FunExp(Constraint cst, List formals, List body)
+  public FunExp(Constraint cst, List formals, Statement body)
   {
     this.formals=addChildren(formals);
     this.constraint=cst;
-    this.body=new Block(body);
+    this.body = body;
 
     addChild(constraint);
     addChild(this.body);
@@ -41,12 +41,25 @@ public class FunExp extends Expression implements Function
       User.error(this,"functional expression is ill-typed");
     }
     
-    Polytype returnType=body.getType();
+    Polytype returnType;
+
+    if(body instanceof ReturnStmt)
+      returnType = ((ReturnStmt) body).returnType();
+    else if(body instanceof Block)
+      {
+	returnType = ((Block) body).getType();
+	if(returnType==null)
+	  User.error(this,
+		     "Not implemented: the last statement of "+this+
+		     "must be a return statement");
+      }
+    else
+      {
+	Internal.error(this,
+		       "Body of lambda expression is not of known form");
+	returnType=null;
+      }
     
-    if(returnType==null)
-      User.error(this,"The last statement of "+this+
-		 "must be a return statement");
- 
     type=new Polytype(Constraint.and(constraint,returnType.getConstraint()),
 		      new FunType(MonoSymbol.getMonotype(formals),
 				  returnType.getMonotype()));
@@ -127,5 +140,5 @@ public class FunExp extends Expression implements Function
   
   Collection /* of MonoSymbol */ formals;
   Constraint constraint;
-  Block body;
+  Statement body;
 }

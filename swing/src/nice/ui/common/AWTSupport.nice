@@ -1,0 +1,102 @@
+package nice.ui.common;
+
+
+
+/**
+ * marker interfaces to specify a MappableListener
+ */
+interface MappableAWTEventListener extends MappableListener {} 
+
+
+/**
+ * marker interfaces to specify a ListenerKey 
+ */  
+abstract interface AWTEventKey extends ListenerKey {}
+
+
+
+
+/**
+ * static HashMaps to store references to the added listeners
+ * used for classes that don't allow the getXxxListener operation
+ * this is done to provide that support nevertheless
+ */
+var Map<Object,?java.util.List<NDragSourceListener>> dragSourceListeners = new HashMap();
+var Map<Object,?java.util.List<NDragGestureListener>> dragGestureListeners = new HashMap();
+var Map<Object,?java.util.List<NDropTargetListener>> dropTargetListeners = new HashMap();
+
+var Map<(Object,long),?java.util.List<NAWTEventListener>> mappableAWTEventListeners = new HashMap();
+
+
+
+/**
+ * abstract interfaces to qualify over classes being able to handle events as nice.ui.awt.NiceListenerHandler
+ */
+abstract interface ActionListenerHandler extends NiceListenerHandler {}
+abstract interface ItemListenerHandler extends NiceListenerHandler {}
+abstract interface TextListenerHandler extends NiceListenerHandler {}
+abstract interface AdjustmentListenerHandler extends NiceListenerHandler {}
+abstract interface ContainerListenerHandler extends NiceListenerHandler {}
+abstract interface WindowListenerHandler extends NiceListenerHandler {}
+abstract interface ComponentListenerHandler extends NiceListenerHandler {}
+abstract interface FocusListenerHandler extends NiceListenerHandler {}
+abstract interface HierarchyListenerHandler extends NiceListenerHandler {}
+abstract interface HierarchyBoundsListenerHandler extends NiceListenerHandler {}
+abstract interface InputMethodListenerHandler extends NiceListenerHandler {}
+abstract interface KeyListenerHandler extends NiceListenerHandler {}
+abstract interface MouseListenerHandler extends NiceListenerHandler {}
+abstract interface MouseMotionListenerHandler extends NiceListenerHandler {}
+abstract interface DragGestureListenerHandler extends NiceListenerHandler {}
+abstract interface DragSourceListenerHandler extends NiceListenerHandler {}
+abstract interface DropTargetListenerHandler extends NiceListenerHandler {}
+//JDK1.4  abstract interface DragSourceMotionListenerHandler extends NiceListenerHandler {}
+//JDK1.4  abstract interface MappableAWTEventListenerHandler extends MappableListenerHandler {}
+//JDK1.4  abstract interface MouseWheelListenerHandler extends NiceListenerHandler {}
+//JDK1.4  abstract interface WindowFocusListenerHandler extends NiceListenerHandler {}
+//JDK1.4  abstract interface WindowStateListenerHandler extends NiceListenerHandler {}
+
+
+/**
+ * existing java classes implement the defined abstract interfaces
+ */
+
+class nice.lang.long implements AWTEventKey;
+
+class java.awt.Component implements PropertyChangeListenerHandler;
+class java.awt.Component implements MappablePropertyChangeListenerHandler;
+class java.awt.Component implements ComponentListenerHandler;
+class java.awt.Component implements FocusListenerHandler;
+class java.awt.Component implements HierarchyListenerHandler;
+class java.awt.Component implements HierarchyBoundsListenerHandler;
+class java.awt.Component implements InputMethodListenerHandler;
+class java.awt.Component implements KeyListenerHandler;
+class java.awt.Component implements MouseListenerHandler;
+class java.awt.Component implements MouseMotionListenerHandler;
+class java.awt.Button implements ActionListenerHandler;
+class java.awt.List implements ActionListenerHandler;
+class java.awt.MenuItem implements ActionListenerHandler;
+class java.awt.TextField implements ActionListenerHandler;
+class java.awt.Checkbox implements ItemListenerHandler;
+class java.awt.CheckboxMenuItem implements ItemListenerHandler;
+class java.awt.Choice implements ItemListenerHandler;
+class java.awt.List implements ItemListenerHandler;
+class java.awt.TextComponent implements TextListenerHandler;
+class java.awt.Scrollbar implements AdjustmentListenerHandler;
+class java.awt.Container implements ContainerListenerHandler;
+class java.awt.Window implements WindowListenerHandler;
+class java.awt.dnd.DragGestureRecognizer implements DragGestureListenerHandler;
+class java.awt.dnd.DropTarget implements DropTargetListenerHandler;
+class java.awt.dnd.DragSourceContext implements DragSourceListenerHandler;
+//JDK1.4  class java.awt.dnd.DragSource implements DragSourceListenerHandler;
+//JDK1.4  class java.awt.dnd.DragSource implements DragSourceMotionListenerHandler;
+//JDK1.4  class java.awt.Component implements MouseMotionListenerHandler;
+//JDK1.4  class java.awt.Component implements MouseWheelListenerHandler;
+//JDK1.4  class java.awt.ScrollPaneAdjustable implements AdjustmentListenerHandler;
+//JDK1.4  class java.awt.Window implements WindowFocusListenerHandler;
+//JDK1.4  class java.awt.Window implements WindowStateListenerHandler;
+//JDK1.4  class java.awt.Toolkit implements MappableAWTEventListenerHandler;
+//JDK1.4  class java.awt.Toolkit implements MappablePropertyChangeListenerHandler;
+//JDK1.4  class java.awt.KeyboardFocusManager implements PropertyChangeListenerHandler;
+//JDK1.4  class java.awt.KeyboardFocusManager implements MappablePropertyChangeListenerHandler;
+//JDK1.4  class java.awt.KeyboardFocusManager implements VetoableChangeListenerHandler;
+//JDK1.4  class java.awt.KeyboardFocusManager implements MappableVetoableChangeListenerHandler;

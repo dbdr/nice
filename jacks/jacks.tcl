@@ -80,6 +80,12 @@ proc subdirectories { } {
 # to the list of tempory files for a directory.
 
 proc saveas { file data } {
+    global requested_compiler
+
+    if { $requested_compiler == "nicec" } {
+	set file [join [split $file .] /]/main.nice
+    }
+
     set dir [file dirname $file]
 
     # Don't create/delete the cur dir on a filename file "Foo.java"!
@@ -120,7 +126,11 @@ proc compile { args } {
         if {[file exists $file]} {
             set arg [file nativename $arg]
         }
-        lappend native_args $arg
+	if { $requested_compiler == "nicec" } {
+	    set dir [file dirname $arg]
+	    set arg [join [split $dir /] .]
+	}
+	lappend native_args $arg
     }
 
     # Run the compiler and return the results

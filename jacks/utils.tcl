@@ -110,14 +110,30 @@ class $class \{
 # empty_main example1 {example1() {}} -> FAIL
 # empty_main example2 {new example2() {}} -> PASS
 
-proc empty_main { class data } {
-    set class_data "
+proc empty_main { class data args } {
+    global requested_compiler
+    
+    if { $requested_compiler == "nicec" } {
+
+	set class_data "
+main(args) \{
+        $data
+    \}
+\n" 
+    } else {
+
+	set class_data "
 public class $class \{
     public static void main(String\[\] args) \{
         $data
     \}
-\}\n"
-
-    compile [saveas $class.java $class_data]
+\}\n" 
+    }
+    set i [llength $args]
+    if { $i > 0 } {
+	compile_and_run [saveas $class.java $class_data]
+    } else {
+	compile [saveas $class.java $class_data]
+    }
 }
 

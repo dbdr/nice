@@ -1,0 +1,25 @@
+# Set the paths for your tools in this file
+
+set NICE_HOME /home/daniel/Nice
+
+set JAVA_CLASSPATH ""
+
+set JAVAC ${NICE_HOME}/bin/nicec
+
+set JAVAC_FLAGS ""
+# To test the assert statement, use this setup
+#set JAVAC_FLAGS "-source 1.4"
+
+set JAVA /usr/bin/java
+
+set JAVA_FLAGS ""
+
+# This activates encoding support.
+#set JAVAC_ENCODING_FLAG "-encoding "
+#set tcltest::testConstraints(encoding) 1
+
+# Activate javac only test cases
+#set tcltest::testConstraints(javac) 1
+
+# Uncomment this to test the assert statement
+#set tcltest::testConstraints(assert) 1

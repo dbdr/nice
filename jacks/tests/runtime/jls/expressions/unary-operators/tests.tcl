@@ -1,15 +1,11 @@
 tcltest::test 15.15-runtime-1 { Prefix ops have higher precedence than
         multiplicative } {runtime} {
-    compile_and_run [saveas T15151.java {
-class T15151 {
-    public static void main(String[] args) {
-        int a = 1, b = 1;
+    empty_main T15151 {
+        int a = 1; int b = 1;
         System.out.print((++a*a == 4) + " ");
         System.out.print(((++b)*b == 4) + " ");
         System.out.print(a == b);
-    }
-}
-    }]
+    } true
 } {true true true}
 
 tcltest::test 15.15-runtime-2 { Prefix ops have higher precedence

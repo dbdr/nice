@@ -386,10 +386,12 @@ public class Pattern implements Located
   public String toString()
   {
     if (atNull())
-      return "@null";
+      return "null";
     if (atAny())
       return "@_";
-    if (atBool() || atIntValue)
+    if (atBool())
+      return atValue.toString();
+    if (atIntValue)
       return "@" + atValue.toString();
     StringBuffer res = new StringBuffer();
     if (name != null)

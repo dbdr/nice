@@ -135,7 +135,7 @@ public class FunExp extends Expression implements Function
     return 
       (constraint == null ? 
        mlsub.typing.Constraint.toString(cst) : constraint.toString())
-      + "fun ("
+      + "("
       + Util.map("",", ","",formals)
       + ") => "
       + (body instanceof ReturnStmt ? 

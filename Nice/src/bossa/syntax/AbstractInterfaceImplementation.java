@@ -29,15 +29,18 @@ public class AbstractInterfaceImplementation extends Definition
   final LocatedString className;
   final LocatedString interfaceName;
   final boolean _finally;
+  final boolean _interface;
 
   public AbstractInterfaceImplementation
-    (LocatedString className, LocatedString interfaceName, boolean _finally)
+    (LocatedString className, LocatedString interfaceName, boolean _finally,
+		boolean _interface)
   {
     super(className, Node.none);
 
     this.className = className;
     this.interfaceName = interfaceName;
     this._finally = _finally;
+    this._interface = _interface;
   }
 
   TypeConstructor classTC;
@@ -46,6 +49,16 @@ public class AbstractInterfaceImplementation extends Definition
   public void resolve()
   {
     classTC = new TypeIdent(className).resolveToTC(typeScope);
+
+    if (TypeConstructors.isInterface(classTC))
+      {
+        if (!_interface) User.error(this, ""+classTC+" is not an class");
+      }
+    else
+      {
+        if (_interface) User.error(this, ""+classTC+" is not an interface");
+      }
+
     TypeIdent ident = new TypeIdent
       (new LocatedString(module.getName() + '.' + interfaceName.content, 
 			 interfaceName.location()));
@@ -70,7 +83,11 @@ public class AbstractInterfaceImplementation extends Definition
 
   public void printInterface(java.io.PrintWriter w)
   {
-    w.print("class ");
+    if (_interface)
+      w.print("interface ");
+    else 
+      w.print("class ");
+
     w.print(classTC);
     w.print(" implements ");
     w.print(interfaceName);

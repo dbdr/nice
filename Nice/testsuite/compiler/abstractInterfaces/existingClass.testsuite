@@ -59,3 +59,18 @@
   }
   class java.io.File implements I;
   f(f@java.io.File) = new java.io.File("foo");
+
+/// PASS
+  /// Toplevel
+  abstract interface AI {}
+  interface java.io.FileFilter implements AI;
+
+/// FAIL
+  /// Toplevel
+  abstract interface AI {}
+  class java.io.FileFilter implements AI;
+
+/// FAIL
+  /// Toplevel
+  abstract interface AI {}
+  interface java.lang.Object implements AI;

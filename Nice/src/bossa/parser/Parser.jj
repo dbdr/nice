@@ -1064,12 +1064,16 @@ AbstractInterfaceImplementation abstractInterfaceImplementation():
 {
   LocatedString className, interfaceName;
   boolean _finally = false;
+  boolean _interface = false;
 }
 {
-  "class" className=fullyQualifiedName()
+  ( "class" | "interface" {_interface = true;} )
+  className=fullyQualifiedName()
   [ "finally" { _finally = true; } ]
   "implements" interfaceName=ident() ";"
-  { return new AbstractInterfaceImplementation(className, interfaceName, _finally); }
+  { return new AbstractInterfaceImplementation(className, interfaceName,
+		_finally, _interface);
+  }
 }
 
 
@@ -1422,7 +1426,7 @@ Definition definition(List definitions):
     LOOKAHEAD ( "abstract" "interface" )
     res=interfaceDefinition()
   |
-    LOOKAHEAD( "class" fullyQualifiedName() )
+    LOOKAHEAD( ("class" | "interface") fullyQualifiedName() )
     res=abstractInterfaceImplementation()
   | 
     LOOKAHEAD( methodBodyDefinitionLookahead() )

@@ -1,0 +1,127 @@
+#!/usr/bin/ksh
+
+JAVA=${JAVA-java}
+
+usage_nicer()
+{
+  echo "usage: nicer path/to/file.jar"
+  exit 1
+}
+
+## Parsing command line arguments
+
+read_java_arg()
+{
+    if [ "x$1" = "x-g" ]; then
+      JAVA="java_g -Djava.compiler=NONE"
+    else
+      JAVA="${JAVA} $1"
+    fi
+}
+
+## Testing if nice is properly installed
+
+test_installation()
+{
+    if [ ! -r ${NICE} ]; then
+	echo "Nice was not found in ${NICE}"
+	echo "Please move the Nice.jar there"
+	echo "or set the NICE environment variable to the location of the Nice.jar file"
+	exit 1
+    fi
+}
+
+
+## Try to find utils
+
+if [ -f /bin/basename ]; then
+  basename=/bin/basename
+else
+  basename=/usr/bin/basename
+fi
+
+if [ -f /bin/ls ]; then
+  ls=/bin/ls
+else
+  ls=/usr/bin/ls
+fi
+
+## Locating nice home
+
+find_home()
+{
+PRG=`whence $0`
+# Resolve symlinks.
+while [ -h "$PRG" ]; do
+    lsResult=`$ls -ld "$PRG"`
+# d'apres /usr/bin/expr sous linux, ^ est implicite au debut de la deuxieme chaine et il ne faut pas le mettre
+    link=`/usr/bin/expr "$lsResult" : '.*-> \(.*\)$'`
+    if /usr/bin/expr "$link" : '/.*' > /dev/null; then
+        prg="$link"
+    else
+        prg="`/usr/bin/dirname $PRG`/$link"
+    fi
+    PRG=`whence "$prg"` > /dev/null 2>&1
+done
+APPHOME=`/usr/bin/expr "$PRG" : '\(.*\)/bin'`
+if [ -z ${APPHOME} ]; 
+then APPHOME=`/usr/bin/dirname "$PRG"`/..
+fi
+}
+
+## Main part
+
+scriptName="$0"
+progname=`$basename $0`
+doTest=true
+
+while true; do 
+  case "x$1" in
+    x-J*) read_java_arg "`expr substr "$1" 3 1000`";;
+    x-e) 
+	cp ${HOME}/Nice/src/nice/tools/compiler.jar ${HOME}/Nice/src/nice/tools/.compiler.jar
+	NICE=${NICE_DEVEL-${HOME}/Nice/src/nice/tools/.compiler.jar:${HOME}/Nice/classes:${HOME}/Nice/lib:${HOME}/Nice/src:}
+	doTest=false;;
+    x-eold)
+	JARNAME=Nice0.jar;;
+    *) break;;
+    esac
+  shift
+  done
+
+if [ $doTest = true ]; then 
+  if [ -z "${NICE}" ]; then
+    find_home "$scriptName"
+    NICE=${APPHOME}/lib/nice/${JARNAME-Nice.jar}
+  fi
+  test_installation 
+fi
+
+case $progname in
+  nicec) 
+    ${JAVA} -classpath ${NICE}:$CLASSPATH \
+	-Dnice.package.path=${NICE}:. nice.tools.compiler.package "$@"
+  ;;
+  nicer) 
+    jar=$1
+    if [ -z "$jar" ]; then
+      usage_nicer
+    elif [ ! -f "$jar" ]; then
+      if [ -f "${jar}.jar" ]; then
+        jar="${jar}.jar"
+      else
+        echo "$jar does not exist"
+        usage_nicer
+      fi
+    fi
+    shift
+
+    CLASSPATH=$jar:${NICE}:$CLASSPATH
+    export CLASSPATH
+    ${JAVA} nice.tools.runJar ${jar} "$@"
+  ;;
+  *)
+    echo "unknow nice command: ${progname}"
+    exit 1
+  ;;
+esac

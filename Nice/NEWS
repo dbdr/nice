@@ -10,6 +10,16 @@ nice (0.9.10)
         override x = 5;
       }
     It's possible for final fields too.
+  * Imported methods can be generalized. That is, it is possible to
+    define a new method which is more general than an existing one,
+    and the existing method will be recognized as a special case of the
+    general one. For instance, consider:
+
+      abstract interface Addable<T> { void add(T item); }
+      interface java.util.Collection implements Addable;
+
+    Method java.util.Collection.add() is recognized as implementing
+    the new add method, which makes Collection a valid Addable class.
   * Bug fixes (disallowed redefinition of parameters, execution order of
     initializers in super classes, ... )
 

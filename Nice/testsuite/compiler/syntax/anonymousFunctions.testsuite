@@ -39,3 +39,5 @@
   void bar(int i) = if (i > 0) foo();
   void foobar(boolean b) = assert b;
 
+/// PASS bug
+  String s = (<String T>(T x)=>x)("ABC");

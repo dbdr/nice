@@ -451,6 +451,8 @@ Expression analyseIdent(IdentExp e, Info info, boolean assigned)
 	    {
 	      if (sym instanceof MonoSymbol)
 		{
+		  sym.used = true;
+
 		  if (assigned && sym.depth < info.anonFunDepth)
 		    sym.captured = true;
 

@@ -686,11 +686,14 @@ typecheck(b@Block)
 
 typecheck(decl@Block.LocalVariable)
 {
+  MonoSymbol target = notNull(decl.left());
+
+  if (! target.used)
+    bossa.util.User.warning(decl, " Unused local variable "  + target.name);
+
   ?Expression value = decl.value;
   if (value == null)
     return;
-
-  MonoSymbol target = notNull(decl.left());
 
   ?mlsub.typing.Monotype type = target.getMonotype();
   if (type == null)
@@ -726,6 +729,9 @@ typecheck(decl@Block.LocalVariable)
 
 typecheck(decl@Block.LocalConstant)
 {
+  if (! notNull(decl.left).used)
+    bossa.util.User.warning(decl, " Unused local variable "  + notNull(decl.left).name);
+
   typecheck(decl.value);
   decl.value = notNull(decl.value).noOverloading();
   mlsub.typing.Polytype type = notNull(decl.value).getType();

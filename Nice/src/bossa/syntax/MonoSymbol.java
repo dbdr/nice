@@ -163,6 +163,8 @@ public class MonoSymbol extends VarSymbol
   /** The depth of nested block at which this variable is defined. */
   int depth;
 
+  boolean used = false;
+
   Monotype syntacticType;
   mlsub.typing.Monotype type;
 }

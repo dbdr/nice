@@ -69,37 +69,6 @@ public class S {
   final public static boolean debugBinders = getBoolean(false, "debug.binders");
   final public static boolean debugNullTypeArgs = getBoolean(false, "debug.nullTypeArgs");
   final public static boolean debugModule = getBoolean(false, "debug.module");
-  final public static boolean debugTower = getBoolean(false, "debug.tower");
-
-  /**
-   * debugHpj created by Gilles Malfreyt 1999/05/05 to find why we have
-   * a difference in execution on "Tests\overloading\t4.jzz"
-   * between (1) the one interpreted with "java"
-   *     and (2) the one compiled with "hpj"
-   * i.e.
-   * between (1) java fr.ensmp.cma.jazz.Main -I ../../Src/lib -v t4.jzz
-   *     and (2) ../../hpj/jazz -I ../../Src/lib -v t4.jzz
-   * (1) says: "t4.jzz":11.14-11.14: ambiguous member access: may refer to C2.x or C1.x
-   * (2) says: "t4.jzz":11.14-11.14: ambiguous member access: may refer to C1.x or C2.x
-   * Finally, we think it may have been a problem of "ClassPath" during
-   * compilation ("sj") .java->.class or during compilation ("hpj") .class->.exe.
-   * Maybe a sensibility to the order for "HashTable" ?
-   * Nevertheless, after return to the original ClassPath, the bug didn't
-   * reproduced, so what ?...
-   */
-  final public static boolean debugHpj = getBoolean(false, "debug.hpj");
-  
-  /**
-   * Created by Gilles Malfreyt, 1999/05/05.
-   * Used to understand the functioning of "MethInfo".
-   */
-  final public static boolean debugGilMethInfo = getBoolean(false, "debug.gil.methInfo");
-
-  /**
-   * Created by Gilles Malfreyt, 1999/05/17.
-   * A bug in an error message in ProgramParser.parseModule.
-   */
-  final public static boolean debugGilParseModule = getBoolean(false, "debug.gil.parseModule");
   
   final public static PrintWriter dbg = new PrintWriter(System.err, true);
 

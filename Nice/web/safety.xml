@@ -277,7 +277,7 @@ class Person
   String name;
   int age;
 
-  boolean equals(that@Person)
+  boolean equals(Person that)
   {
     return 
        this.name.equals(that.name)
@@ -328,8 +328,8 @@ null if the argument is not a container:
 <programlisting lang="nice">
 private ?List&lt;Component> children(Component);
 
-children(c@Component) = null;
-children(c@ContainerComponent) = c.getChildren();
+children(Component c) = null;
+children(ContainerComponent c) = c.getChildren();
 </programlisting>
 </para>
 

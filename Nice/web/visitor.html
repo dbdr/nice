@@ -159,12 +159,12 @@ shorter and natural, and it solves all the problems above.
 
 <FONT COLOR="#b7860b">void</FONT> <FONT COLOR="#cd0000">prettyPrint</FONT>(<FONT COLOR="#b7860b">Expression </FONT>e); 
 
-<FONT COLOR="#cd0000">prettyPrint</FONT>(e<FONT COLOR="#0000ee">@</FONT><FONT COLOR="#b7860b">IntExp</FONT>) 
+<FONT COLOR="#cd0000">prettyPrint</FONT>(<FONT COLOR="#b7860b">IntExp</FONT> e) 
 { 
   <FONT COLOR="#b7860b">System</FONT>.out.print(e.value); 
 } 
 
-<FONT COLOR="#cd0000">prettyPrint</FONT>(e<FONT COLOR="#0000ee">@</FONT><FONT COLOR="#b7860b">AddExp</FONT>) 
+<FONT COLOR="#cd0000">prettyPrint</FONT>(<FONT COLOR="#b7860b">AddExp</FONT> e) 
 { 
   prettyPrint(e.e1); 
   <FONT COLOR="#b7860b">System</FONT>.out.print(<FONT COLOR="#a020f0">&quot; + &quot;</FONT>); 

@@ -52,12 +52,11 @@ public abstract class Loader
     }
   }
 
-  public static void open(Reader r, List definitions)
+  public static void open(Reader r, List definitions, boolean storeDocStrings)
   {
     chrono.start();
     try {
       Parser parser = new Parser(r);
-      boolean storeDocStrings = false;
 
       try{
 	parser.module(definitions, storeDocStrings);

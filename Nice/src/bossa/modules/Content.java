@@ -73,13 +73,13 @@ class Content
     return imports;
   }
 
-  void getDefinitions(List definitions, boolean shouldReload)
+  void getDefinitions(List definitions, boolean shouldReload, boolean storeDocStrings)
   {
     Content.Unit[] readers = getReaders(shouldReload);
 
     for(int i = 0; i<readers.length; i++)
       try{
-        read(readers[i], definitions);
+        read(readers[i], definitions, storeDocStrings);
       }
       catch(UserError ex){
         pkg.compilation.error(ex);
@@ -100,10 +100,10 @@ class Content
 		 ", but it was found in package " + pkg.name);
   }
   
-  private void read(Content.Unit unit, List definitions)
+  private void read(Content.Unit unit, List definitions, boolean storeDocStrings)
   {
     bossa.util.Location.setCurrentFile(unit.file);
-    bossa.parser.Loader.open(unit.reader, definitions);
+    bossa.parser.Loader.open(unit.reader, definitions, storeDocStrings);
   }
   
   /**

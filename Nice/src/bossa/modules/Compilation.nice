@@ -45,6 +45,8 @@ class Compilation extends CompilationInterface
    */
   boolean strictJavaTypes = false;
 
+  boolean storeDocStrings = false;
+
   /** Location of the nice.jar file. */
   ?String runtimeFile = null;
 

@@ -30,6 +30,7 @@ public abstract class Compilation extends CompilationInterface
   public String output;
   public boolean excludeRuntime;
   public boolean strictJavaTypes;
+  public boolean storeDocStrings;
 
   public Locator locator;
 

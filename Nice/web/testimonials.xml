@@ -12,7 +12,7 @@ Users commenting on their experience with the Nice programming language.
 
 <blockquote>
 <title>Nice is sweet!</title>
-<attribution><ulink url="http://foundries.sourceforge.net/java/index.pl&quest;node_id=46454&amp;lastnode_id=43881">SourceForge discussion</ulink></attribution>
+<attribution><ulink url="http://java.foundries.sourceforge.net/comments.pl&quest;sid=2374&amp;op=&amp;threshold=0&amp;commentsort=0&amp;mode=thread&amp;tid=6&amp;cid=2991">SourceForge discussion</ulink>, February 2002</attribution>
 <para>
 My experience thus far with Nice is very positive. 
 The language design is very elegant. 
@@ -23,8 +23,23 @@ Kudos.
 </para>
 </blockquote>
 
+<blockquote>
+<title>Nice looks great!</title>
+<attribution>Private message, March 2002</attribution>
 <para>
-Note to Nice users: you are welcome to send your impressions on the language.
+I am really excited by Nice.
+
+It seems to offer many advantages over straight Java.
+
+I wish Javasoft was more open to enhancing the language.  
+Your stuff looks like a very nice, usable, and functional super-set.
+</para>
+</blockquote>
+
+<para>
+Note to Nice users: you are welcome to 
+<ulink url="mailto:bonniot@users.sourceforge.net">send your impressions</ulink>
+on the language.
 You can also describe the projects you use Nice for, and they will be listed
 on this site.
 </para>

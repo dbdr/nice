@@ -12,7 +12,7 @@
 
 // File    : Typing.java
 // Created : Tue Jul 20 11:57:17 1999 by bonniot
-//$Modified: Tue Sep 05 19:14:40 2000 by Daniel Bonniot $
+//$Modified: Thu Sep 21 16:50:48 2000 by Daniel Bonniot $
 
 package mlsub.typing;
 
@@ -441,11 +441,11 @@ public final class Typing
     i.variance.subInterface(i.itf,j.itf);
   }
   
-  public static void assertLeq(Interface itf, Collection c)
+  public static void assertLeq(Interface itf, Interface[] is)
   throws KindingEx
   {
-    for(Iterator i = c.iterator();i.hasNext();)
-      assertLeq(itf,((Interface)i.next()));
+    for (int i = is.length; --i >= 0;)
+      assertLeq(itf, is[i]);
   }
   
   public static void assertImp(TypeConstructor t, Interface i, 

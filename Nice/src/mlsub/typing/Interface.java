@@ -12,7 +12,7 @@
 
 // File    : Interface.java
 // Created : Fri Jun 02 17:26:52 2000 by Daniel Bonniot
-//$Modified: Wed Aug 02 16:01:05 2000 by Daniel Bonniot $
+//$Modified: Thu Sep 21 17:47:38 2000 by Daniel Bonniot $
 
 package mlsub.typing;
 
@@ -49,6 +49,15 @@ public final class Interface implements TypeSymbol
     this.associatedTC = associatedTC;
   }
 
+  /**
+     @param name the name of the interface
+  */
+  public Interface(Variance variance, String name)
+  {
+    this(variance);
+    this.name = name;
+  }
+  
   public TypeSymbol cloneTypeSymbol()
   {
     return new Interface(variance, associatedTC);

@@ -12,7 +12,7 @@
 
 // File    : parser.jj
 // Created : Thu Jul 01 10:27:05 1999 by bonniot
-//$Modified: Wed Sep 20 17:47:58 2000 by Daniel Bonniot $
+//$Modified: Thu Sep 21 17:41:10 2000 by Daniel Bonniot $
 // Description : Parseur JavaCC pour Nice
 //   Tokens based on the Jazz parser
 
@@ -762,7 +762,7 @@ TypeParameters typeParameters():
 /*                          Classes                                    */
 /***********************************************************************/
 
-MethodDeclaration classMethodDeclaration(NiceClass c):
+NiceMethod internalMethodDeclaration(MethodContainer c):
 {
   LocatedString name;
   List parameters;
@@ -868,13 +868,14 @@ ClassDefinition classDefinition():
       isFinal,isAbstract,isInterface,
       false,parameters,typeParametersVariances,
       ext,imp,abs);
-   }   
+   }
+   // internal fields and methods
    (
       LOOKAHEAD( [ "final" | "local" ] monoSymbol() ";" )
       getField(fields)
     |
       [ "public" | "private" ]
-      m=classMethodDeclaration((NiceClass) res)
+      m = internalMethodDeclaration(res)
       { methods.add(m); }
    )* 
    "}"
@@ -898,24 +899,32 @@ ClassDefinition classDefinition():
   }
 }
 
-/*
-InterfaceDefinition interfaceDefinition():
+AbstractInterface interfaceDefinition():
 {
   LocatedString name;
-  Collection parameters;
+  List parameters;
   List extensions=null;
   List typeParametersVariances = new ArrayList(0);
+  AbstractInterface res;
 }
 {
   "abstract" "interface"
   name=ident()
   parameters=monotypeVars(typeParametersVariances)
   [ "extends" extensions=interfaces() ]
-  ";"
-  { return new InterfaceDefinition(name,parameters,typeParametersVariances,
-				   extensions,true); }
+  "{"
+  { res = new AbstractInterface(name,parameters,typeParametersVariances,
+				extensions); }
+    (
+      { NiceMethod m; }
+      [ "public" | "private" ]
+      m = internalMethodDeclaration(res)
+      { res.addMethod(m); }
+    )*
+  "}"
+  { return res; }
 }
-*/
+
 Pattern pattern(LocatedString name):
 {
     TypeIdent tc=null;
@@ -1097,11 +1106,9 @@ Definition definition():
 }
 {
   (
-/*
     LOOKAHEAD ( "abstract" "interface" )
     res=interfaceDefinition()
   | 
-*/
     res=classDefinition()
   | 
     res=globalVariable()

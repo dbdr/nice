@@ -12,7 +12,7 @@
 
 // File    : Variance.java
 // Created : Fri Jul 23 12:15:46 1999 by bonniot
-//$Modified: Wed Sep 20 18:17:43 2000 by Daniel Bonniot $
+//$Modified: Thu Sep 21 16:34:37 2000 by Daniel Bonniot $
 
 package mlsub.typing;
 
@@ -151,27 +151,27 @@ public final class Variance
    * Interfaces
    ****************************************************************/
 
-  public int newInterface()
+  int newInterface()
   {
     return getConstraint().newInterface();
   }
 
-  public void subInterface(int i1, int i2)
+  void subInterface(int i1, int i2)
   {
     getConstraint().subInterface(i1,i2);
   }
   
-  public void initialImplements(int x, int iid)
+  void initialImplements(int x, int iid)
   {
     getConstraint().initialImplements(x,iid);
   }
   
-  public void initialAbstracts(int x, int iid)
+  void initialAbstracts(int x, int iid)
   {
     getConstraint().initialAbstracts(x,iid);
   }
   
-  public void indexImplements(int x, int iid) throws Unsatisfiable
+  void indexImplements(int x, int iid) throws Unsatisfiable
   {
     getConstraint().indexImplements(x,iid);
   }

@@ -12,7 +12,7 @@
 
 // File    : ClassDefinition.java
 // Created : Thu Jul 01 11:25:14 1999 by bonniot
-//$Modified: Wed Sep 20 18:37:17 2000 by Daniel Bonniot $
+//$Modified: Thu Sep 21 17:36:51 2000 by Daniel Bonniot $
 
 package bossa.syntax;
 
@@ -26,6 +26,7 @@ import java.util.*;
  * Abstract syntax for a class definition.
  */
 abstract public class ClassDefinition extends Definition
+  implements MethodContainer
 {
   /**
    * Creates a class definition.
@@ -118,7 +119,7 @@ abstract public class ClassDefinition extends Definition
     return variance;
   }
 
-  private Variance makeVariance(List typeParametersVariances)
+  static Variance makeVariance(List typeParametersVariances)
   {
     int[] variances = new int[typeParametersVariances.size()];
     for (int i = typeParametersVariances.size(); --i >= 0;)
@@ -151,22 +152,33 @@ abstract public class ClassDefinition extends Definition
     return typeParameters;
   }
 
-  /** create type parameters with the same names as in the class */
-  mlsub.typing.MonotypeVar[] createSameTypeParameters()
+  /** Create type parameters with the same names as in the class. */
+  public mlsub.typing.MonotypeVar[] createSameTypeParameters()
   {
-    mlsub.typing.MonotypeVar[] thisTypeParams;
-    if(tc.arity()>0)
-      {
-	thisTypeParams = new mlsub.typing.MonotypeVar[tc.arity()];
-	List tp = getTypeParameters();
-	for(int i=0; i<thisTypeParams.length; i++)
-	  thisTypeParams[i] = new MonotypeVar(tp.get(i).toString());
-      }
-    else
-      thisTypeParams = null;
+    return createSameTypeParameters(this.typeParameters);
+  }
+  
+  public static mlsub.typing.MonotypeVar[] createSameTypeParameters
+    (List typeParameters)
+  {
+    if (typeParameters == null || typeParameters.size() == 0)
+      return null;
+    
+    mlsub.typing.MonotypeVar[] thisTypeParams = 
+      new mlsub.typing.MonotypeVar[typeParameters.size()];
+    for(int i=0; i<thisTypeParams.length; i++)
+      thisTypeParams[i] = new MonotypeVar(typeParameters.get(i).toString());
     return thisTypeParams;
   }
 
+  public mlsub.typing.TypeSymbol getTypeSymbol()
+  {
+    if (associatedInterface != null)
+      return associatedInterface;
+    else
+      return tc;
+  }
+  
   protected mlsub.typing.Monotype lowlevelMonotype()
   {
     return new mlsub.typing.MonotypeConstructor

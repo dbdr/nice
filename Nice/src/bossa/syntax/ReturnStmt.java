@@ -12,7 +12,7 @@
 
 // File    : ReturnStmt.java
 // Created : Mon Jul 05 17:21:40 1999 by bonniot
-//$Modified: Fri Jun 16 12:21:08 2000 by Daniel Bonniot $
+//$Modified: Thu Sep 21 17:59:03 2000 by Daniel Bonniot $
 // Description : return in a function or method
 
 package bossa.syntax;
@@ -52,7 +52,7 @@ public class ReturnStmt extends Statement
     }
     catch(TypingEx e){
       User.error(this,
-		 "Return type "+returnType()+" is not correct",
+		 "return type "+returnType()+" is not correct",
 		 ": "+e);
     }
   }

@@ -33,7 +33,7 @@ import bossa.util.Debug;
 public class NiceMethod extends MethodDeclaration
 {
   /**
-   * The method is a class member.
+   * The method is a class or interface member.
    *
    * @param c the class this method belongs to.
    * @param name the name of the method
@@ -43,23 +43,23 @@ public class NiceMethod extends MethodDeclaration
    * @param parameters the MonoTypes of the parameters
    */
   public static NiceMethod create
-    (ClassDefinition c,
+    (MethodContainer c,
      LocatedString name, 
      Constraint constraint,
      Monotype returnType,
      List parameters)
   {
-    //it is a class method, there is an implicit "this" argument
+    // it is a class method, there is an implicit "this" argument
 
     boolean hasAlike = returnType.containsAlike() 
       || Monotype.containsAlike(parameters);
     
-    // create type parameters with the same names as in the class
-    mlsub.typing.MonotypeVar[] thisTypeParams =
-      c.createSameTypeParameters();
+    mlsub.typing.MonotypeVar[] thisTypeParams = c.createSameTypeParameters();
     
     int thisTypeParamsLen = (thisTypeParams == null ? 0 
 			     : thisTypeParams.length);
+
+    TypeSymbol container = c.getTypeSymbol();
     
     // if the constraint is True
     // we must create a new one, otherwise we would
@@ -72,7 +72,7 @@ public class NiceMethod extends MethodDeclaration
     constraint.addBinders(thisTypeParams);
 	
     mlsub.typing.Monotype thisType;
-    if(hasAlike)
+    if(hasAlike || container instanceof Interface)
       {
 	TypeConstructor alikeTC = 
 	  new TypeConstructor("Alike", c.variance(), false, false);
@@ -81,23 +81,28 @@ public class NiceMethod extends MethodDeclaration
 	// added in front. Important for rebinding in method alternatives
 	
 	mlsub.typing.AtomicConstraint atom;
-	if(c.getAssociatedInterface()!=null)
+	if(container instanceof Interface)
 	  atom = new mlsub.typing.ImplementsCst
-	    (alikeTC, c.getAssociatedInterface());
+	    (alikeTC, (Interface) container);
 	else
-	  atom = new mlsub.typing.TypeConstructorLeqCst(alikeTC, c.tc);
+	  atom = new mlsub.typing.TypeConstructorLeqCst
+	    (alikeTC, (TypeConstructor) container);
 	constraint.addAtom(AtomicConstraint.create(atom));
 	
 	thisType = new mlsub.typing.MonotypeConstructor(alikeTC, thisTypeParams);
 	
-	Map map = new HashMap();
-	map.put(Alike.id, alikeTC);
-	returnType = returnType.substitute(map);
-	parameters = Monotype.substitute(map, parameters);
+	if (hasAlike)
+	  {
+	    Map map = new HashMap();
+	    map.put(Alike.id, alikeTC);
+	    returnType = returnType.substitute(map);
+	    parameters = Monotype.substitute(map, parameters);
+	  }
       }
     else
       thisType = 
-	new mlsub.typing.MonotypeConstructor(c.tc, thisTypeParams);
+	new mlsub.typing.MonotypeConstructor((TypeConstructor) container, 
+					     thisTypeParams);
     
     parameters.add(0, Monotype.create(thisType));
     
@@ -108,8 +113,7 @@ public class NiceMethod extends MethodDeclaration
   }
 
   public NiceMethod(LocatedString name, 
-		    Constraint constraint,
-		    Monotype returnType,
+		    Constraint constraint, Monotype returnType, 
 		    List parameters)
   {
     super(name, constraint, returnType, parameters);

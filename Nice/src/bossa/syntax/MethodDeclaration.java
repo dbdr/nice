@@ -239,7 +239,7 @@ abstract public class MethodDeclaration extends Definition
       ;
   }
 
-  protected ClassDefinition memberOf;
+  protected MethodContainer memberOf;
   protected int arity;
 
   public int getArity()

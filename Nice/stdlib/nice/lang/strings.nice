@@ -38,12 +38,4 @@ String replace(String source, char c, String with)
   return res.append(tab, pos, tab.length - pos).toString();
 }
 
-/****************************************************************
- * Java methods
- ****************************************************************/
-
-/** The returned string is always non-null */
-String concat(String, String) = native String String.concat(String);
-StringBuffer append(StringBuffer, ?String) 
-= native StringBuffer StringBuffer.append(String);
-char[] toCharArray(String) = native char[] String.toCharArray();
+char get(String s, int index) = native char String.charAt(int);

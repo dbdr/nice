@@ -1,48 +1,35 @@
 package nice.lang;
 
-//the interface used in for in
-public interface ForInIterator<E> {
-	boolean next();
-	E current();
-}
+//Methods that returns a Iterator interface.
+//If a "for in" is wanted for another class then they could be added easily.
 
-//Methods that returns a ForInIterator interface for iteration over a particular class.
-//If a "for in" is wanted for another class is could easily be added.
+<E> Iterator<E> forIterator(Collection<E> c) = c.iterator();
+<E> Iterator<E> forIterator(E[] arr) = new ArrayForIterator(arr: arr);
+Iterator<char> forIterator(String s) = new StringForIterator(str: s);
+Iterator<char> forIterator(StringBuffer sb) = new StringBufferForIterator(strb: sb);
 
-<E> ForInIterator<E> forInIterator(Collection<E> c) = new CollectionForInIter(iter: c.iterator());
-<E> ForInIterator<E> forInIterator(E[] arr) = new ArrayForInIter(arr: arr);
-ForInIterator<char> forInIterator(String s) = new StringForInIter(str: s);
-ForInIterator<char> forInIterator(StringBuffer sb) = new StringBufferForInIter(strb: sb);
+//The implementations of additional Iterators
 
-//temporaly left out because of retyping
-//<K, V> Set<K> keySet(Map<K,V>) = native Set Map.keySet();
-//<K,V> ForInIterator<K> forInIterator(Map<K ,V> m) = new CollectionForInIter(iter: m.keySet().iterator());
-
-//The implementations of specific ForInIterators
-
-private class CollectionForInIter<E> implements ForInIterator<E>{
-  Iterator<E> iter;
-  next() = iter.hasNext();
-  current() = iter.next();
-}
-
-private class ArrayForInIter<E> implements ForInIterator<E>{
+private class ArrayForIterator<E> implements Iterator<E> {
   E[] arr;
-  int pos = -1;
-  next() = ++pos<arr.length;
-  current() = arr[pos];
+  int pos = 0;
+  hasNext() = pos < arr.length;
+  next() = arr[pos++];
+  remove() { throw new UnsupportedOperationException(); }
 }
 
-private class StringForInIter<E | E <: char, char <: E> implements ForInIterator<E>{
+private class StringForIterator<E | E <: char, char <: E> implements Iterator<E> {
   String str;
-  int pos = -1;
-  next() = ++pos<str.length();
-  current() = str.charAt(pos);
+  int pos = 0;
+  hasNext() = pos < str.length();
+  next() = str.charAt(pos++);
+  remove() { throw new UnsupportedOperationException(); }
 }
 
-private class StringBufferForInIter<E | E <: char, char <: E> implements ForInIterator<E>{
+private class StringBufferForIterator<E | E <: char, char <: E> implements Iterator<E> {
   StringBuffer strb;
-  int pos = -1;
-  next() = ++pos<strb.length();
-  current() = strb.charAt(pos);
+  int pos = 0;
+  hasNext() = pos < strb.length();
+  next() = strb.charAt(pos++);
+  remove() { throw new UnsupportedOperationException(); }
 }

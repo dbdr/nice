@@ -50,15 +50,15 @@ public class LoopStmt extends Statement
 
     List tparams = new ArrayList(1);
     tparams.add(vartype);	
-    itertype = new MonotypeConstructor(new TypeIdent(new LocatedString("ForInIterator", loc)),
+    itertype = new MonotypeConstructor(new TypeIdent(new LocatedString("Iterator", loc)),
 			new TypeParameters(tparams), loc);
     itertype.nullness = Monotype.sure;
-    getiter = CallExp.create(new IdentExp(new LocatedString("forInIterator", loc)), container); 
+    getiter = CallExp.create(new IdentExp(new LocatedString("forIterator", loc)), container); 
     iter = new LocatedString("for_in_iter", loc);
     init = new Block.LocalVariable(iter, itertype, true, getiter);
     iterexp = new IdentExp(iter);
-    cond = CallExp.create(new IdentExp(new LocatedString("next", loc)), iterexp);
-    getvar = CallExp.create(new IdentExp(new LocatedString("current", loc)), iterexp);
+    cond = CallExp.create(new IdentExp(new LocatedString("hasNext", loc)), iterexp);
+    getvar = CallExp.create(new IdentExp(new LocatedString("next", loc)), iterexp);
     assign = new Block.LocalVariable(var, vartype, false, getvar);
     List loopbody = new LinkedList();
     loopbody.add(assign);

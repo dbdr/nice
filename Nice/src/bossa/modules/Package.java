@@ -577,7 +577,7 @@ public class Package implements mlsub.compilation.Module, Located
     // add individual classes
     String[] classes = 
     {
-      "gnu/mapping/Procedure.class", "gnu/mapping/Procedure0.class", "gnu/mapping/Procedure1.class", "gnu/mapping/Procedure2.class", "gnu/mapping/Procedure3.class", "gnu/mapping/ProcedureN.class", "gnu/mapping/Named.class", "gnu/mapping/Printable.class", "gnu/mapping/WrongArguments.class", "gnu/mapping/WrongType.class", "gnu/mapping/WrappedException.class", 
+      "gnu/mapping/Procedure.class", "gnu/mapping/Procedure0.class", "gnu/mapping/Procedure1.class", "gnu/mapping/Procedure2.class", "gnu/mapping/Procedure3.class", "gnu/mapping/ProcedureN.class", "gnu/mapping/Named.class", "gnu/mapping/Printable.class", "gnu/mapping/WrongArguments.class",
       "gnu/expr/ModuleBody.class", "gnu/expr/ModuleMethod.class"
     };
 

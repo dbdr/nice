@@ -56,8 +56,7 @@ implements Inlineable
     if (target instanceof StackTarget)
       {
 	oldTarget = target;
-	target = new CheckedTarget(type, "nice.tools.code.EnsureTypeProc", 
-				   gnu.mapping.WrongType.ARG_DESCRIPTION);
+	target = StackTarget.getInstance(type);
       }
     
     exp.getArgs()[0].compile(comp, target);

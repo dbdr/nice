@@ -1113,8 +1113,7 @@ public class Compilation
 		  code.emitLoad(code.getArg(k + argumentStart));
 		Type ptype = var.getType();
 		if (ptype != Type.pointer_type)
-		  CheckedTarget.emitCheckedCoerce(this, source,
-						  k, ptype);
+                  StackTarget.convert(this, Type.pointer_type, ptype);
 		var = var.nextDecl();
 	      }
 

@@ -27,7 +27,7 @@ void typecheck(?Expression);
  * Expressions
  ****************************************************************/
 
-typecheck(@null(Expression)) {}
+typecheck(null(Expression)) {}
 
 typecheck(e@AssignExp)
 {
@@ -515,7 +515,7 @@ typecheck(e@SymbolExp) {}
  * Statements
  ****************************************************************/
 
-typecheck(@null(Statement)) {}
+typecheck(null(Statement)) {}
 
 typecheck(b@Block)
 {

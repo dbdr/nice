@@ -205,7 +205,7 @@ void analyse(?Statement, Info);
  ****************************************************************/
 
 analyse(e@Expression, i) = e;
-analyse(@null(Expression), info) = null;
+analyse(null(Expression), info) = null;
 
 void setInitialized (Block.LocalVariable.Symbol v, Info info)
 {
@@ -529,7 +529,7 @@ analyse(e@TupleExp, info)
  ****************************************************************/
 
 analyse(s@Statement, info) {}
-analyse(s@null(Statement), info) {}
+analyse(null(Statement), info) {}
 
 analyse(decl@Block.LocalVariable, info)
 {

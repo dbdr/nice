@@ -24,3 +24,10 @@
 #DEFAULT (echo ""; id; echo %s; date; cat) >> $CVSROOT/CVSROOT/commitlog
 # or
 #DEFAULT (echo ""; id; echo %{sVv}; date; cat) >> $CVSROOT/CVSROOT/commitlog
+
+
+## Send CVSROOT changes to Daniel.
+CVSROOT /cvsroot/sitedocs/CVSROOT/cvstools/syncmail %{sVv} bonniot@users.sourceforge.net
+
+## Send other changes to the nice-commit mailing list.
+DEFAULT /cvsroot/sitedocs/CVSROOT/cvstools/syncmail %{sVv} nice-commit@lists.sourceforge.net

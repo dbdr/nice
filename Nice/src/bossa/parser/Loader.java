@@ -74,6 +74,12 @@ public abstract class Loader
 	else
 	  User.error(e.getMessage());
       }
+      catch(TokenMgrError e) {
+	String message = e.getMessage();
+	if (message.indexOf("<EOF>") != -1)
+	  message = "Unexpected end of file";
+	User.error(Location.nowhere(), message);
+      }
     }
     finally {
       chrono.stop();

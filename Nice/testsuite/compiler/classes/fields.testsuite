@@ -126,3 +126,21 @@ int f(A a) = a.x++;
   /// Toplevel
   import javax.swing.*;
   let int x = JFrame.EXIT_ON_CLOSE;
+
+/// PASS
+  Polynomial<Complex<Object>> p = new Polynomial(e: []);
+  /// TOPLEVEL
+abstract interface Ring<T> {
+   void zero();
+}
+
+class Complex<T> implements Ring<T> {
+  zero() {}
+}
+
+<Ring R, RR, T | R<RR> <: T <: R<RR>> 
+class Polynomial<T> implements Ring {
+   T[] e;
+
+   zero(){}
+}

@@ -320,6 +320,12 @@ public class SpecialArray extends gnu.bytecode.ArrayType
   
   public boolean isAssignableTo (Type other)
   {
+    if (this == other)
+      return true;
+
+    if (unknown)
+      return other == objectType;
+
     return
       other == objectType || 
       other instanceof ArrayType &&

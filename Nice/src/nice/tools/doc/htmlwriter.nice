@@ -78,15 +78,15 @@ class HTMLWriter {
      *         |
      *         +--Class
      */
-    String hierarchy = c.getName().toString();
+    String hierarchy = htmlEncode(c.getName());
     for(int i = 0; i < list.size(); i++) {
       String spaces = "";
       for(int j = 0; j < (list.size()-i)*6-3; j++)
         spaces = spaces + ' ';
-      hierarchy = list.get(i).getName() + "\n" + spaces + "|\n" + spaces + "+--" + hierarchy;
+      hierarchy = htmlEncode(list.get(i).getName()) + "\n" + spaces + "|\n" + spaces + "+--" + hierarchy;
     }
     writer.write("<pre>\n");
-    writer.write(htmlEncode(hierarchy));
+    writer.write(hierarchy);
     writer.write("</pre>\n");
 
     //Implemented interfaces

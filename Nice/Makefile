@@ -94,6 +94,9 @@ install: share/java/nice.jar
 test:
 	cd regtest; /usr/bin/time ./regtest
 
+check:
+	java -classpath "classes" nice.tools.testsuite.TestNice testsuite
+
 gcj:
 	gcj --main=nice.tools.compiler.package -o bin/nicec.bin -Dnice.systemJar="../share/java/nice.jar" -Dnice.runtime="../share/java/nice.jar" share/java/nice.jar
 
@@ -163,6 +166,12 @@ ant:
 	@echo "Building the Ant task definition..."
 	@${javac} -classpath "/usr/share/java/ant.jar:./external/ant.jar:./classes" -d classes src/nice/tools/ant/Nicec.java ||\
 	echo "Compilation of the Ant task definition failed.\nAnt should be in the classpath, or linked to by ./external/ant.jar"
+
+testengine:
+	@echo "Building the testsuite engine..."
+	@${JAVAC} src/nice/tools/testsuite/TestNice.java ||\
+	echo "Compilation of the testsuite engine failed."
+
 
 #****************************************************************
 #    Recompilations

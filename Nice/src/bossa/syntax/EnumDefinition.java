@@ -1,7 +1,7 @@
 /**************************************************************************/
 /*                                N I C E                                 */
 /*             A high-level object-oriented research language             */
-/*                        (c) Daniel Bonniot 2003                         */
+/*                        (c) Daniel Bonniot 2004                         */
 /*                                                                        */
 /*  This program is free software; you can redistribute it and/or modify  */
 /*  it under the terms of the GNU General Public License as published by  */
@@ -35,22 +35,16 @@ public class EnumDefinition extends Definition
 	(name,true,false, null, new ArrayList(0),
 	new MonotypeConstructor(new TypeIdent(new LocatedString("nice.lang.Enum",name.location())), null, this.location()),
 	interfaces,null);
-    NiceClass impl = new NiceClass(classDef);
+    NiceClass impl = dispatch.createNiceClass(classDef);
     int fieldsCount = fields.size();
     if (fieldsCount > 0)
       {
         List newFields = new ArrayList(fieldsCount);
         for (Iterator it = fields.iterator(); it.hasNext(); )
-           newFields.add(impl.makeField((MonoSymbol)it.next(), null, true, 
-		false, false, null));
+           impl.addField((MonoSymbol)it.next(), null, true, 
+		false, false, null);
 
-        impl.setFields(newFields);
       }
-    else    
-      impl.setFields(null);
-
-    impl.setOverrides(null);
-    impl.setValueOverrides(null);
 
     if (! inInterfaceFile())
       {

@@ -81,7 +81,7 @@ abstract class Constructor extends MethodDeclaration
     if (! isDefault)
       return super.explainWhyMatchFails(arguments);
 
-    String name = classe.getName();
+    String name = classe.getName().toString();
 
     StringBuffer res = new StringBuffer();
     res.append("Class ").append(name);
@@ -142,7 +142,7 @@ abstract class Constructor extends MethodDeclaration
 
   private String syntaxExample()
   {
-    String name = classe.getName();
+    String name = classe.getName().toString();
     StringBuffer res = new StringBuffer();
     res.append("Use the following syntax:\n")
       .append("  new ").append(name).append("(");

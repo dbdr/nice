@@ -175,7 +175,7 @@ void resolveCCThis(Statement stmt, Located thisLoc, NiceClass classe)
     missingThisError();
 
   Location loc = ident.location();
-  call.function = createOverloadedSymbolExp(classe.getConstructorCallSymbols(),
+  call.function = createOverloadedSymbolExp(new ArrayList(cast(classe).getConstructorCallSymbols()),
 					FormalParameters.thisName);
   notNull(call.function).setLocation(loc);
 }
@@ -207,7 +207,6 @@ Map<VarSymbol,mlsub.typing.Polytype> types(Arguments) = native Arguments.types;
 <T> String map(String, String, String, T[]) = native String bossa.util.Util.map(String, String, String, Object[]);
 <T> String map(String, String, String, Collection<T>) = native String bossa.util.Util.map(String, String, String, Collection);
 Stack<bossa.link.Alternative> sortedAlternatives(MethodDeclaration) = native Stack bossa.link.Alternative.sortedAlternatives(MethodDeclaration);
-List<VarSymbol> getConstructorCallSymbols(NiceClass) = native List NiceClass.getConstructorCallSymbols();
 LinkedList<VarSymbol> getConstructors(mlsub.typing.TypeConstructor) = native LinkedList TypeConstructors.getConstructors(mlsub.typing.TypeConstructor);
 List<VarSymbol> symbols(EnumDefinition) = native EnumDefinition.symbols;
 void addValues(Pattern, List<ConstantExp>) = native void Pattern.addValues(List);
@@ -227,8 +226,24 @@ mlsub.typing.Monotype[?] Types_parameters(mlsub.typing.Polytype) = native mlsub.
 int[?] getUsedArguments(Arguments, VarSymbol) = native int[] Arguments.getUsedArguments(VarSymbol);
 ?mlsub.typing.Constraint getConstraint(mlsub.typing.Polytype) = native mlsub.typing.Constraint mlsub.typing.Polytype.getConstraint();
 MonoSymbol[?] getMonoSymbols(FormalParameters) = native MonoSymbol[] FormalParameters.getMonoSymbols();
-// Retypings needed since java types are not strict.
+mlsub.typing.AtomicConstraint[?] AtomicConstraint_substitute(java.util.Map<mlsub.typing.TypeSymbol,mlsub.typing.TypeSymbol>, AtomicConstraint[?]) = native mlsub.typing.AtomicConstraint[] mlsub.typing.AtomicConstraint.substitute(java.util.Map, mlsub.typing.AtomicConstraint[]);
+NiceClass classe(Constructor) = native Constructor.classe;
+FormalParameters parameters(MethodDeclaration) = native MethodDeclaration.parameters;
+?gnu.expr.Expression getInitializer(NiceClass) = native gnu.expr.Expression NiceClass.getInitializer();
+void addConstructorCallSymbol(NiceClass, MethodDeclaration.Symbol) = native void NiceClass.addConstructorCallSymbol(MethodDeclaration.Symbol);
+gnu.expr.Expression callSuperMethod(NiceClass, gnu.bytecode.Method) = native gnu.expr.Expression NiceClass.callSuperMethod(gnu.bytecode.Method);
+Module module(Definition) = native Definition.module;
+?Definition importMethod(NiceClass, gnu.bytecode.Method) = native Definition NiceClass.importMethod(gnu.bytecode.Method);
+boolean equals(LocatedString, LocatedString) = native boolean LocatedString.equals(LocatedString);
+?mlsub.typing.TypeConstructor getSuperClass(ClassDefinition) = native mlsub.typing.TypeConstructor ClassDefinition.getSuperClass();
+List<mlsub.typing.Interface> interfaces(ClassDefinition) = native ClassDefinition.interfaces;
+List<FormalParameters.Parameter> getParameters(FormalParameters, TypeScope) = native List FormalParameters.getParameters(TypeScope);
+mlsub.typing.AtomicConstraint[?] resolvedConstraints(MethodContainer) = native MethodContainer.resolvedConstraints;
+mlsub.typing.TypeSymbol[?] getBinders(MethodContainer) = native mlsub.typing.TypeSymbol[] MethodContainer.getBinders();
+?Expression value(FormalParameters.Parameter) = native Expression FormalParameters.Parameter.value();
+?LinkedList<MethodDeclaration.Symbol> getConstructors(TypeConstructor) = native LinkedList TypeConstructors.getConstructors(TypeConstructor);
 
+// Retypings needed since java types are not strict.
 mlsub.typing.Polytype boolPolytype() = native PrimitiveType.boolPolytype;
 mlsub.typing.Polytype longPolytype() = native PrimitiveType.longPolytype;
 mlsub.typing.Polytype voidPolytype() = native PrimitiveType.voidPolytype;

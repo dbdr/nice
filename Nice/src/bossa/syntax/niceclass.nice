@@ -1,0 +1,710 @@
+/**************************************************************************/
+/*                                N I C E                                 */
+/*             A high-level object-oriented research language             */
+/*                        (c) Daniel Bonniot 2004                         */
+/*                                                                        */
+/*  This program is free software; you can redistribute it and/or modify  */
+/*  it under the terms of the GNU General Public License as published by  */
+/*  the Free Software Foundation; either version 2 of the License, or     */
+/*  (at your option) any later version.                                   */
+/*                                                                        */
+/**************************************************************************/
+
+package bossa.syntax;
+
+import bossa.util.*;
+
+/**
+   Concrete Nice Class definition.
+
+ */
+public class CNiceClass extends NiceClass
+{
+  ClassDefinition definition;
+
+  private List<NewField> fields = new ArrayList();
+  private List<OverridenField> overrides = new ArrayList();
+  private List<ValueOverride> valueOverrides = new ArrayList();
+  private List<Statement> initializers = new ArrayList();
+  private ?Long serialVersionUIDValue = null;
+
+  private ?MonoSymbol thisSymbol = null;
+  private ?gnu.expr.Expression thisExp = null;
+
+  /** List of symbols for calling constructors of this class. */
+  private List<MethodDeclaration.Symbol> constructors = new ArrayList();
+  private Constructor[?] constructorMethod = null;
+
+  // Used to resolve fields, and constructor constraint.
+  private ?TypeScope localScope = null;
+  /**
+     Reference to the method performing instance initialization for this class.
+  */
+  private ?gnu.expr.Expression initializerMethod = null;
+
+  gnu.expr.ClassExp classe = cast(null);
+  {
+    /* 
+       We always generate a new ClassExp object, even for classes from
+       already compiled packages. The reason is that we might need to
+       add methods for the multiple dispatch of java methods in the class 
+       (and maybe for adding fields, or optimizing the dispatch of Nice
+       methods in the future).
+       However, the ClassExp object refers to the existing ClassType object,
+       and only adds or modifies features when needed.
+    */
+    classe = notNull(definition.module).getClassExp(this);
+
+  }
+
+  getName() = definition.getName();
+
+  getDefinition() = definition;
+
+  getTypeParameters() = definition.getTypeParameters();
+
+  addField(sym, value, isFinal, isTransient, isVolatile, docString)
+  {
+    if (this.isInterface())
+      bossa.util.User.error(sym, "An interface cannot have a field.");
+
+    if (isFinal && notNull(sym).getName().toString().equals("serialVersionUID"))
+      {
+	if (value instanceof ConstantExp && value.value instanceof Long)
+          serialVersionUIDValue = cast(value.value);
+	else
+	  bossa.util.User.error(sym, "the value of an serialVersionUID should a constant of type long");
+
+        return;
+       }
+
+    if (isFinal && isVolatile)
+      throw bossa.util.User.error(sym, "A field cannot be final and volatile");
+
+    fields.add(new NewField(declaringClass: this, sym: notNull(sym), value: value,
+	isFinal_: isFinal, isVolatile: isVolatile, isTransient: isTransient,
+	docString: docString));
+  }
+
+  public void addOverride(MonoSymbol sym, ?Expression value)
+  {
+    if (this.isInterface())
+      bossa.util.User.error(sym, "An interface cannot have a field.");
+
+    overrides.add(new OverridenField(declaringClass: this, sym: sym, value: value));
+  }
+
+  public void addValueOverride(LocatedString fname, Expression value)
+  {
+    if (this.isInterface())
+      bossa.util.User.error(fname, "An interface cannot have a field.");
+
+    valueOverrides.add(new ValueOverride(declaringClass: this, name: fname, value: value));
+  }
+
+  isInterface() = definition instanceof ClassDefinition.Interface;
+  
+  ?CNiceClass getParent()
+  {
+    return cast(NiceClass.get(definition.getSuperClass()));
+  }
+
+  addConstructorCallSymbol(sym)
+  {
+    constructors.add(sym);
+  }
+
+  List<MethodDeclaration.Symbol> getConstructorCallSymbols() = new LinkedList(constructors);
+
+  resolveClass()
+  {
+    classe.supers = cast(this.computeSupers());
+    localScope = definition.getLocalScope();
+    definition.setJavaType(classe.getType());
+    this.resolveFields();
+    this.resolveIntitializers();
+    this.createDefaultConstructors();
+    this.addPublicCloneMethod();
+  }
+
+  private void resolveFields()
+  {
+    for (field : fields)
+      field.resolve(notNull(definition.scope), notNull(localScope));
+
+    for (o : overrides)
+      o.resolve(notNull(definition.scope), notNull(localScope));
+
+    for (valueOverride : valueOverrides)
+      valueOverride.resolve(notNull(definition.scope), notNull(localScope));
+  }
+
+  private ?gnu.expr.Declaration getOverridenField
+    (OverridenField field, boolean checkValue)
+  {
+    let name = field.getName();
+
+    for (original : fields)
+      if (original.hasName(name))
+        {
+          if (! original.isFinal())
+            bossa.util.User.error(name, "The original field in class " + this +
+                       " is not final, so its type cannot be overriden");
+
+          checkValue = field.checkOverride(original, checkValue);
+
+          return original.method.fieldDecl;
+        }
+
+    for (original : overrides)
+      if (original.hasName(name))
+        checkValue = field.checkOverride(original, checkValue);
+
+    if (checkValue)
+      for (original : valueOverrides)
+        if (original.hasName(name))
+          {
+            field.checkOverride(original);
+            checkValue = false;
+            break;
+          }
+
+    let parent = this.getParent();
+    if (parent != null)
+      return parent.getOverridenField(field, checkValue);
+    else
+      return null;
+  }
+
+  private boolean checkValueOverride(LocatedString name, Expression value)
+  {
+    ?NiceField original = null;
+
+    for (field : fields)
+      if (field.hasName(name))
+        original = field;
+
+    for (or : overrides)
+      if (or.hasName(name))
+        original = or;
+
+    if (original != null)
+      {
+        this.enterTypingContext();
+
+	let declaredType = original.sym.getType();
+        value = value.resolveOverloading(declaredType);
+	typecheck(value);
+
+	try {
+	  Typing.leq(value.getType(), declaredType);
+	}
+	catch (mlsub.typing.TypingEx ex) {
+	  bossa.util.User.error(name, "Value does not fit in the overriden field of type " + declaredType);
+	}
+
+        return true;
+      }
+
+    let parent = this.getParent();
+    if (parent != null)
+      return parent.checkValueOverride(name, value);
+    else
+      return false;
+   }
+
+  /****************************************************************
+   * Initializers
+   ****************************************************************/
+
+  public void addInitializer(Statement init)
+  {
+    initializers.add(init);
+  }
+
+  private void resolveIntitializers()
+  {
+    if (initializers.isEmpty())
+      return;
+
+    VarScope scope = notNull(definition.scope);
+    mlsub.typing.Monotype thisType =
+      Monotype.sure(new mlsub.typing.MonotypeConstructor(definition.tc,
+			definition.getTypeParameters()));
+    thisSymbol = new ThisSymbol(FormalParameters.thisName, thisType, declaringClass: this);
+
+    Node.thisExp = new SymbolExp(thisSymbol, definition.location());
+    scope.addSymbol(thisSymbol);
+
+    for (int i = 0; i < initializers.size(); i++)
+      initializers[i] = analyse(initializers[i], notNull(definition.scope), notNull(localScope), false);
+
+    Node.thisExp = null;
+    scope.removeSymbol(thisSymbol);
+  }
+
+  getInitializer()
+  {
+    if (initializerMethod != null)
+      return notNull(initializerMethod);
+
+    ?gnu.expr.Expression parentInitializer = null;
+    let parent = this.getParent();
+    if (parent != null)
+      {
+        parentInitializer = parent.getInitializer();
+      }
+
+    if (initializers.size() == 0 && parentInitializer == null)
+      return null;
+
+    gnu.expr.Expression[] params = cast(new gnu.expr.Expression[1]);
+    let lambda = nice.tools.code.Gen.createMemberMethod("$init", classe.getType(), null,
+			gnu.bytecode.Type.void_type, params);
+    thisExp = params[0];
+
+    List<gnu.expr.Expression> body = new ArrayList();
+    if (parentInitializer != null)
+      body.add(nice.tools.code.Gen.superCall(parentInitializer, [notNull(thisExp)]));
+
+    for (init : initializers)
+      body.add(init.generateCode());
+
+    nice.tools.code.Gen.setMethodBody(lambda, new gnu.expr.BeginExp(body.toArray()));
+    initializerMethod = this.addJavaMethod(lambda);
+
+    return initializerMethod;
+  }
+
+  /****************************************************************
+   * Type checking
+   ****************************************************************/
+
+  typecheck()
+  {
+    try {
+      for (field : fields)
+	field.typecheck();
+
+      for (or : overrides)
+	or.typecheck();
+
+      for (valueOverride : valueOverrides)
+        valueOverride.typecheck();
+
+      if (! initializers.isEmpty())
+        {
+          this.enterTypingContext();
+          Node.thisExp = new SymbolExp(thisSymbol, definition.location());
+          for (init : initializers)
+            typecheck(init);
+        }
+    }
+    finally {
+      if (entered) {
+	entered = false;
+
+        Node.thisExp = null;
+	try {
+	  mlsub.typing.Typing.leave();
+	}
+	catch(TypingEx ex) {
+	  User.error(this.definition, "Type error in field declarations");
+	}
+      }
+    }
+  }
+
+  private boolean entered = false;
+
+  private void enterTypingContext()
+  {
+    if (entered || definition.classConstraint == null)
+      return;
+
+    mlsub.typing.Typing.enter();
+    entered = true;
+    mlsub.typing.lowlevel.Element[] typeParameters = cast(notNull(definition.classConstraint).typeParameters);
+    mlsub.typing.Typing.introduce(typeParameters);
+    try {
+      mlsub.typing.Typing.implies();
+    }
+    catch(mlsub.typing.TypingEx ex) {
+      bossa.util.Internal.error(ex);
+    }
+  }
+
+  printInterface(s)
+  {
+    notNull(s).print(" {\n"
+       + Util.map("", ";\n", ";\n", fields)
+       + Util.map("", ";\n", ";\n", overrides)
+       + ((serialVersionUIDValue == null) ? "" :
+           ("final long serialVersionUID = " + serialVersionUIDValue + "L;\n"))
+       + "}\n\n"
+       );
+  }
+
+  private void addPublicCloneMethod()
+  {
+    if (! definition.implementsJavaInterface("java.lang.Cloneable"))
+      return;
+
+    gnu.expr.Expression[] params = cast(new gnu.expr.Expression[1]);
+    let lambda = this.createJavaMethod("clone", cloneMethod, params);
+    nice.tools.code.Gen.setMethodBody
+      (lambda, new gnu.expr.ApplyExp(nice.tools.code.Gen.superCaller(cloneMethod), params));
+    this.addJavaMethod(lambda);
+  }
+
+  createClassExp()
+  {
+    gnu.expr.ClassExp res = new gnu.expr.ClassExp();
+    res.setName(this.getName().toString());
+    definition.location().write(res);
+    res.setSimple(true);
+    res.setAccessFlags(definition.getBytecodeFlags());
+    definition.module.addUserClass(res);
+    return res;
+  }
+
+  getClassExp() = classe;
+
+  /**
+     Collect in 'constraints' the constraints set by each class
+     on the type parameters.
+  */
+  private List<(?MethodDeclaration, List<FormalParameters.Parameter>)>
+	getNativeConstructorParameters(TypeConstructor tc)
+  {
+    let constructors = TypeConstructors.getConstructors(tc);
+    if (constructors == null)
+      {
+        // null stands for the Object() constructor
+        return new ArrayList([(null, new ArrayList())]);
+      }
+
+    List<(?MethodDeclaration, List<FormalParameters.Parameter>)> res = 
+		new ArrayList(constructors.size());
+
+    for (msym : constructors)
+      {
+	let m = msym.getMethodDeclaration();
+
+        // Only consider parent methods for which a call from this class
+        // is legal.
+        if (m instanceof JavaMethod)
+          {
+            let thisClass = classe.getClassType();
+            if (! gnu.bytecode.Access.legal(thisClass, m.reflectMethod, thisClass))
+              continue;
+          }
+
+	List<FormalParameters.Parameter> params = new ArrayList();
+	for (arg : m.getArgTypes())
+	  params.add(new FormalParameters.Parameter(Monotype.create(arg)));
+
+        res.add((m, params));
+      }
+
+    return res;
+  }
+
+  private List<(?MethodDeclaration, List<FormalParameters.Parameter>)>
+ 	getParentConstructorParameters(mlsub.typing.Monotype[?] typeParameters,
+		?List<mlsub.typing.AtomicConstraint> constraints)
+  {
+    TypeScope scope = Node.getGlobalTypeScope();
+    ?Map<TypeSymbol,TypeSymbol> map = null;
+
+    if (typeParameters != null)
+      {
+        // Constructs a type scope that maps the type parameters of this
+        // class to the corresponding symbol in the constructor.
+	scope = new TypeScope(scope);
+        map = new HashMap();
+        let ourTypeParameters = definition.getTypeParameters();
+	for (int i = 0; i < ourTypeParameters.length; i++)
+	  try {
+            TypeSymbol ourSym = asTypeSymbol(ourTypeParameters[i]);
+            TypeSymbol sym = asTypeSymbol(typeParameters[i]);
+            scope.addMapping(ourSym.toString(), sym);
+            notNull(map).put(ourSym, sym);
+	  } catch(TypeScope.DuplicateName e) {}
+      }
+
+    List<(?MethodDeclaration, List<FormalParameters.Parameter>)> res = new ArrayList();
+    for (msym : constructors)
+      {
+        let decl = msym.getMethodDeclaration();
+        res.add((decl, decl.formalParameters().getParameters(scope)));
+      }
+
+    if (definition.classConstraint != null)
+      {
+	let newAtoms = mlsub.typing.AtomicConstraint.substitute(notNull(map),
+		cast(definition.resolvedConstraints));
+
+	if (newAtoms != null)
+	  notNull(constraints).addAll(newAtoms);
+      }
+
+    return res;
+  }
+
+  private List<(?MethodDeclaration, List<FormalParameters.Parameter>)> 
+		getConstructorParameters(?List<mlsub.typing.AtomicConstraint> constraints, 
+		mlsub.typing.Monotype[] typeParameters)
+  {
+    let supTC = definition.getSuperClass();
+
+    let ?NiceClass sup = (supTC == null) ? null : NiceClass.get(supTC);
+    List<(?MethodDeclaration, List<FormalParameters.Parameter>)> res;
+    if (sup == null)
+      res = this.getNativeConstructorParameters(cast(supTC));
+    else
+      res = cast(sup).getParentConstructorParameters(typeParameters, constraints);
+
+    /**
+       This must be done in a given class for every subclass, since they
+       have different type parameters.
+    */
+    if ((! overrides.isEmpty()) || (! valueOverrides.isEmpty()))
+      for (cparams : res)
+        {
+          (?MethodDeclaration m, List<FormalParameters.Parameter> params) = cparams;
+
+          for (or : overrides)
+            or.updateConstructorParameter(params);
+
+          for (valueOverride : valueOverrides)
+            valueOverride.updateConstructorParameter(params);
+         }
+
+    if (! fields.isEmpty())
+      for (cparams : res)
+        {
+          (?MethodDeclaration m, List<FormalParameters.Parameter> params) = cparams;
+          for (field : fields)
+            params.add(field.asParameter());
+         }
+
+    if (definition.resolvedConstraints != null)
+      notNull(constraints).addAll(notNull(definition.resolvedConstraints));
+
+    return res;
+  }
+
+  /**
+     This must be done only once per class.
+  */
+  private void checkFields(List<FormalParameters.Parameter> allFields)
+  {
+    for (int f = 0; f < fields.size(); f++)
+      fields[f].checkNoDuplicate(allFields, f);
+
+    List<LocatedString> names = overrides.map(OverridenField o => o.sym.getName());
+    names.addAll(valueOverrides.map(ValueOverride o => o.name()));
+    for (int i = 0; i < names.size(); i++)
+      for (int k = i+1; k < names.size(); k++)
+        if (names[i].equals(names[k]))
+          User.error(names[k],
+             "A field override of the same field exists in this class");
+  }
+
+  private void createDefaultConstructors()
+  {
+    if (definition.inInterfaceFile())
+      // The constructors are loaded from the compiled package.
+      return;
+
+    if (this.isInterface())
+      return;
+
+    ?List<mlsub.typing.AtomicConstraint> constraints;
+    let binders = definition.getBinders();
+    if (binders == null)
+      constraints = null;
+    else 
+      constraints = new LinkedList();
+
+    mlsub.typing.Monotype[] typeParameters = definition.getTypeParameters();
+
+    List<(?MethodDeclaration, List<FormalParameters.Parameter>)> allConstructorParams = 
+      this.getConstructorParameters(constraints, typeParameters);
+
+    mlsub.typing.Constraint cst;
+    if (binders != null)
+      cst = new mlsub.typing.Constraint(binders, constraints == null ? null : constraints.toArray());
+    else
+      cst = mlsub.typing.Constraint.True;
+
+    constructorMethod = cast(new Constructor[allConstructorParams.size()]);
+    for (int i = 0; i < allConstructorParams.size(); i++)
+      {
+        (?MethodDeclaration parent, List<FormalParameters.Parameter> params) = allConstructorParams[i];
+
+        // Check only once.
+        if (i == 0)
+          this.checkFields(params);
+
+	FormalParameters values = new FormalParameters(params.toArray());
+
+	notNull(constructorMethod)[i] = new DefaultConstructor
+	  (this, true, definition.location(), values, cst,
+	   Monotype.resolve(definition.getLocalScope(), values.types()),
+	   Monotype.sure(new mlsub.typing.MonotypeConstructor(definition.tc, definition.getTypeParameters())),
+           fields: fields, parent: parent);
+	TypeConstructors.addConstructor(definition.tc, notNull(constructorMethod)[i]);
+      }
+  }
+
+  precompile()
+  {
+    // We have to do this after resolution, so that bytecode types are known, 
+    // but before compilation.
+    for (field : fields)
+      field.createField();
+  }
+
+  compile()
+  {
+    this.recompile();
+    this.createSerialUIDField();
+  }
+
+  /**
+     Called instead of compile if the package is up-to-date.
+  */
+  recompile()
+  {
+    // This needs to be done even if we don't recompile, 
+    // since classes are always regenerated.
+    if (constructorMethod != null)
+      for (int i = 0; i < notNull(constructorMethod).length; i++)
+	notNull(constructorMethod)[i].getCode();
+
+    // Take into account external interface implementations, which 
+    // can add new interfaces to implement in the bytecode.
+    classe.supers = cast(this.computeSupers());
+    classe.recomputeInterfaces();
+  }
+
+  private gnu.expr.Expression[?] computeSupers()
+  {
+    List<gnu.expr.Expression> res = new ArrayList();
+
+    let superClass = definition.getSuperClass();
+    if (superClass != null)
+      res.add(typeExpression(superClass));
+
+    for (intf : definition.interfaces)
+      {
+	let ?mlsub.typing.TypeConstructor assocTC = intf.associatedTC();
+	if (assocTC != null)
+	  res.add(typeExpression(assocTC));
+      }
+      
+    if (definition.javaInterfaces != null)
+      for (itf : notNull(definition.javaInterfaces))
+	res.add(typeExpression(notNull(itf)));
+
+    if (res.isEmpty())
+      return null;
+
+    return res.toArray();
+  }
+
+  /** This native method is redefined for this Nice class. */
+  addJavaMethod(method) = classe.addMethod(method);
+
+  private gnu.expr.LambdaExp createJavaMethod(String name, 
+					     gnu.bytecode.Method likeMethod,
+					     gnu.expr.Expression[] params)
+  {
+    return nice.tools.code.Gen.createMemberMethod(name, 
+	this.getClassExp().getType(), likeMethod.getParameterTypes(),
+	likeMethod.getReturnType(), params);
+  }
+
+  /**
+     Returns an expression to call a super method from outside a class method.
+
+     This is needed because the JVM restricts call to a specific implementation
+     to occur inside a method of the same class. So this generates a stub class
+     method that calls the desired super method, and return a reference to this
+     stub.
+  */
+  callSuperMethod(superMethod)
+  {
+    gnu.expr.Expression[] params = cast(new gnu.expr.Expression
+			[superMethod.getParameterTypes().length + 1]);
+    let lambda = this.createJavaMethod("$super$" + superMethod.getName(),
+			superMethod, params);
+    nice.tools.code.Gen.setMethodBody(lambda, new gnu.expr.ApplyExp(new gnu.expr.QuoteExp(
+		gnu.expr.PrimProcedure.specialCall(superMethod)), params));
+ 
+    return this.addJavaMethod(lambda);
+  }
+
+  void createSerialUIDField()
+  {
+    if (serialVersionUIDValue == null)
+      return;
+
+    let fieldDecl = classe.addDeclaration("serialVersionUID", nice.tools.code.SpecialTypes.longType);
+    fieldDecl.setSimple(false);
+    fieldDecl.setCanRead(true);
+    fieldDecl.setFlag(gnu.expr.Declaration.IS_CONSTANT);
+    fieldDecl.setSpecifiedPrivate(true);
+    fieldDecl.setFlag(gnu.expr.Declaration.STATIC_SPECIFIED);
+    fieldDecl.setFlag(gnu.expr.Declaration.TYPE_SPECIFIED);
+    fieldDecl.noteValue(new gnu.expr.QuoteExp(serialVersionUIDValue, nice.tools.code.SpecialTypes.longType));
+  }
+
+  importMethod(gnu.bytecode.Method method)
+  {
+    if (method.isConstructor())
+      return ImportedConstructor.load(this, method);
+
+    if (method.getArity() == 0 && method.getName().equals("$init"))
+      initializerMethod = nice.tools.code.Gen.superCaller(method);
+
+    return null;
+  }
+
+  toString() = definition.toString();
+}
+
+let gnu.bytecode.Method cloneMethod = 
+	notNull(gnu.bytecode.Type.pointer_type).getDeclaredMethod("clone", 0);
+
+class ThisSymbol extends MonoSymbol
+{
+  compile() = notNull(declaringClass.thisExp);
+  
+  final CNiceClass declaringClass;
+}
+
+NiceClass createNiceClass(ClassDefinition cdef) = new CNiceClass(definition: cdef);
+
+private TypeSymbol asTypeSymbol(mlsub.typing.Monotype type)
+{
+  if (type instanceof TypeSymbol)
+    return type;
+    
+  assert (type instanceof mlsub.typing.MonotypeConstructor);
+  return type.getTC();
+}
+
+private gnu.expr.Expression typeExpression(TypeConstructor tc)
+{
+  let c = ClassDefinition.get(tc);
+  if (c != null && c.implementation instanceof NiceClass)
+    {
+      CNiceClass nc = cast(c.implementation);
+      return nc.classe;
+    }
+  else
+    return new gnu.expr.QuoteExp(nice.tools.code.Types.javaType(tc));
+}

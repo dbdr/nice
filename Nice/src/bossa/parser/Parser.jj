@@ -965,7 +965,7 @@ void fieldLookahead():
   ( "=" | ";" )
 }
 
-List getField(NiceClass c, List fields, List overrides, boolean storeDocString):
+void getField(CNiceClass c, boolean storeDocString):
 {
   MonoSymbol field;
   boolean isFinal=false, isTransient = false, isVolatile = false;
@@ -997,11 +997,9 @@ List getField(NiceClass c, List fields, List overrides, boolean storeDocString):
   ";" 
   { 
     if (isOverride)
-      overrides.add(c.makeOverride(field, value));
+      c.addOverride(field, value);
     else
-      fields.add(c.makeField(field, value, isFinal, isTransient, isVolatile, docString));
-
-    return overrides;
+      c.addField(field, value, isFinal, isTransient, isVolatile, docString);
   }
 }
 
@@ -1050,24 +1048,21 @@ ClassDefinition classDefinition(Constraint cst, List definitions, boolean storeD
 )
   ( 
    "{"
-   { NiceClass impl = new NiceClass(res); }
+   { CNiceClass impl = new CNiceClass(res); List methods = new ArrayList();}
    // internal fields and methods
-   { List fields = new LinkedList(), overrides = new LinkedList(),
-          methods = new ArrayList(5), initializers = new LinkedList(),
-          valueOverrides = new LinkedList(); }
    (
       // Initializer
       { Statement init; }
       init = Block()
-      { initializers.add(init); }
+      { impl.addInitializer(init); }
     |
       LOOKAHEAD ( "override" ident() "=" )
       { LocatedString fname; Expression value;}
       "override" fname=ident() "=" value=Expression() ";"
-      { valueOverrides.add(impl.makeValueOverride(fname, value)); }
+      { impl.addValueOverride(fname, value); }
     |
       LOOKAHEAD( fieldLookahead() )
-      overrides = getField(impl, fields, overrides, storeDocString)
+      getField(impl, storeDocString)
     | { Definition m; Token t = getToken(1); boolean isOverride = false; }
       [ "public" | "private" ]
       [ "override" { isOverride = true; } ]
@@ -1085,10 +1080,6 @@ ClassDefinition classDefinition(Constraint cst, List definitions, boolean storeD
    )* 
    "}"
    {
-     impl.setFields(fields);
-     impl.setOverrides(overrides);
-     impl.setValueOverrides(valueOverrides);
-     impl.setInitializers(initializers);
      res.setImplementation(impl);
      definitions.addAll(methods);
    }

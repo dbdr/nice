@@ -12,6 +12,9 @@ import java.util.List;
 
 public class dispatch
 {
+  public static NiceClass createNiceClass(ClassDefinition cdef)
+  {return null;}
+
   public static Statement createReturnStmt(Expression value, boolean fake)
   { return null; }
 

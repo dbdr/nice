@@ -19,5 +19,10 @@ public final class NiceUtils
      return nice.tools.code.Inline.inline(proc, arg1);
   }
 
+  public static gnu.expr.Expression doInline(gnu.mapping.Procedure2 proc, gnu.expr.Expression arg1, gnu.expr.Expression arg2)
+  {
+     return nice.tools.code.Inline.inline(proc, arg1, arg2);
+  }
+
 }
 

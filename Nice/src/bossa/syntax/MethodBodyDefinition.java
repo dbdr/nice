@@ -75,7 +75,7 @@ public class MethodBodyDefinition extends MethodImplementation
 
     Pattern[] res = new Pattern[formals.size() + 1];
     res[0] = bossa.syntax.dispatch.createPattern(new LocatedString("this", loc), 
-			 new TypeIdent(container.definition.getName()));
+			 new TypeIdent(container.getName()));
     int n = 1;
     for(Iterator f = formals.iterator(); f.hasNext(); n++)
       res[n] = (Pattern) f.next();

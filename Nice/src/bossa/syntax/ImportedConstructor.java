@@ -46,15 +46,15 @@ public class ImportedConstructor extends Constructor
   {
     super(def,
           Attribute.get(method, "default") != null,
-          def.definition.location(),
+          def.getDefinition().location(),
           FormalParameters.readBytecodeAttribute
             (attr, JavaClasses.compilation.parser),
-          def.definition.classConstraint == null ?
-          null : def.definition.classConstraint.shallowClone(),
-          returnType(def.definition));
+          def.getDefinition().classConstraint == null ?
+          null : def.getDefinition().classConstraint.shallowClone(),
+          returnType(def.getDefinition()));
 
     this.method = method;
-    TypeConstructors.addConstructor(classe.definition.tc, this);
+    TypeConstructors.addConstructor(classe.getDefinition().tc, this);
   }
 
   private static Monotype returnType(ClassDefinition def)

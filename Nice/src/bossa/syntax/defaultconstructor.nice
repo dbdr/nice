@@ -1,0 +1,184 @@
+/**************************************************************************/
+/*                                N I C E                                 */
+/*             A high-level object-oriented research language             */
+/*                        (c) Daniel Bonniot 2004                         */
+/*                                                                        */
+/*  This program is free software; you can redistribute it and/or modify  */
+/*  it under the terms of the GNU General Public License as published by  */
+/*  the Free Software Foundation; either version 2 of the License, or     */
+/*  (at your option) any later version.                                   */
+/*                                                                        */
+/**************************************************************************/
+
+package bossa.syntax;
+
+import bossa.util.*;
+
+/**
+   A constructor automatically generated from the list of field of the class
+   whose instances it constructs.
+
+ */
+
+class DefaultConstructor extends Constructor
+{
+  {
+    this.addConstructorCallSymbol();
+  }
+
+  List<NewField> fields;
+  ?MethodDeclaration parent;
+
+  /** Call the constructor, with all the arguments. */
+  private ?gnu.expr.Expression initialize = null;
+  /** Call the constructor, with all the arguments, with an implicit this argument. */
+  private ?gnu.expr.Expression initializeFromConstructor = null;
+  /** Call the constructor, with only non-default arguments. */
+  private ?gnu.expr.Expression initializeOmitDefaults = null;
+  /** Instantiate the class, calling the constructor with all the arguments. */
+  private ?gnu.expr.Expression instantiate = null;
+
+  getInitializationCode(implicitThis)
+  {
+    this.getCode();
+    return notNull(initializeFromConstructor);
+  }
+
+  getConstructorInvocation(omitDefaults)
+  {
+    this.getCode();
+    return
+      // lambdaOmitDefaults is null if the two versions are identical
+      omitDefaults && initializeOmitDefaults != null
+      ? notNull(initializeOmitDefaults) : notNull(initialize);
+  }
+
+  computeCode()
+  {
+    this.createBytecode(true);
+    this.createBytecode(false);
+    return notNull(instantiate);
+  }
+
+  /**
+     @param omitDefaults if true, do not take the value of fields with
+            default values as parameters, but use that default instead.
+  */
+  private void createBytecode(boolean omitDefaults)
+  {
+    gnu.bytecode.ClassType thisType = cast(this.javaReturnType());
+    let thisDecl = new gnu.expr.Declaration("this");
+    thisDecl.setType(thisType);
+    let thisExp = new gnu.expr.ThisExp(thisDecl);
+
+    let fullArgs = notNull(parameters.getMonoSymbols());
+    let fullArgTypes = this.javaArgTypes();
+
+    List<MonoSymbol> args = new LinkedList();
+    List<gnu.bytecode.Type> argTypes = new LinkedList();
+
+    for (int i = 0; i < parameters.size; i++)
+      {
+        if (omitDefaults && parameters.hasDefaultValue(i))
+          continue;
+
+        args.add(fullArgs[i]);
+        argTypes.add(fullArgTypes[i]);
+      }
+
+    // Do not create a second constructor omiting defaults if there is
+    // no default to omit!
+    if (omitDefaults && args.size() == fullArgs.length)
+      return;
+
+    gnu.bytecode.Type[] argTypesArray = argTypes.toArray();
+    MonoSymbol[] argsArray = args.toArray();
+
+    if (classe.getDefinition().inInterfaceFile())
+      throw new Error("Constructors are loaded from the compiled package");
+
+    let lambda = nice.tools.code.Gen.createConstructor
+      (thisDecl, argTypesArray, argsArray);
+    lambda.setSuperCall(this.callSuper(thisExp, fullArgs, omitDefaults));
+
+    nice.tools.code.Gen.setMethodBody(lambda, this.body(thisExp, fullArgs, omitDefaults));
+    classe.getClassExp().addMethod(lambda);
+
+    // Add attributes useful for the nice compiler. These are not needed
+    // for the version omitting defaults, since that one is only there for
+    // Java users' sake.
+    if (! omitDefaults)
+      {
+        lambda.addBytecodeAttribute(parameters.asBytecodeAttribute());
+        lambda.addBytecodeAttribute(new gnu.bytecode.MiscAttr("default"));
+      }
+
+    if (omitDefaults)
+      {
+        initializeOmitDefaults = new gnu.expr.QuoteExp(new gnu.expr.InitializeProc(lambda));
+      }
+    else
+      {
+        initialize = new gnu.expr.QuoteExp(new gnu.expr.InitializeProc(lambda));
+        initializeFromConstructor = new gnu.expr.QuoteExp(new gnu.expr.InitializeProc(lambda, true));
+        instantiate = new gnu.expr.QuoteExp(new gnu.expr.InstantiateProc(lambda));
+      }
+  }
+
+  private gnu.expr.Expression callSuper(gnu.expr.Expression thisExp, MonoSymbol[] args,
+                               boolean omitDefaults)
+  {
+    int len = args.length - fields.size();
+    List<gnu.expr.Expression> superArgs = new LinkedList();
+    superArgs.add(thisExp);
+    for (int i = 0; i < len; i++)
+      {
+        if (! (omitDefaults && parameters.hasDefaultValue(i)))
+          superArgs.add(args[i].compile());
+      }
+
+    // A null parent means no parent class: call the Object constructor.
+    let superExp = parent == null ?
+	objectConstructor : notNull(parent).getConstructorInvocation(omitDefaults);
+
+    return new gnu.expr.ApplyExp(superExp, superArgs.toArray());
+  }
+
+  private gnu.expr.Expression body(gnu.expr.Expression thisExp,
+                          MonoSymbol[] fullArgs, boolean omitDefaults)
+  {
+    List<gnu.expr.Expression> body = new ArrayList();
+    let superArgs = fullArgs.length - fields.size();
+
+    for (int i = 0; i < fields.size(); i++)
+      {
+        let value = fields[i].value;
+
+        gnu.expr.Expression fieldValue;
+        if (!omitDefaults || value == null)
+          // Use the provided parameter.
+          fieldValue = fullArgs[superArgs + i].compile();
+        else
+          // Use the default value.
+          fieldValue = value.compile();
+
+        body.add(fields[i].method.compileAssign(thisExp, fieldValue));
+      }
+
+    let initializer = classe.getInitializer();
+    if (initializer != null)
+      body.add(new gnu.expr.IfExp(
+	nice.tools.code.Gen.isOfClass(thisExp, classe.getClassExp().getType(), false),
+        new gnu.expr.ApplyExp(initializer, [thisExp]),
+        gnu.expr.QuoteExp.voidExp));
+
+    if (body.isEmpty())
+      return gnu.expr.QuoteExp.voidExp;
+
+    return new gnu.expr.BeginExp(body.toArray());
+  }
+}
+
+let gnu.expr.Expression objectConstructor = new gnu.expr.QuoteExp
+	(new gnu.expr.InitializeProc(
+	notNull(gnu.bytecode.Type.pointer_type).getDeclaredMethod("<init>", 0)));

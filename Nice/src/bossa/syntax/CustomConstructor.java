@@ -157,7 +157,7 @@ public class CustomConstructor extends UserOperator
     mlsub.typing.Constraint cst = getType().getConstraint();
     if (mlsub.typing.Constraint.hasBinders(cst))
       parameters.substitute
-        (map(cst.binders(), classe.definition.getTypeParameters()));
+        (map(cst.binders(), classe.getTypeParameters()));
 
     lambda.addBytecodeAttribute(parameters.asBytecodeAttribute());
     initializationCode =

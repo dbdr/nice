@@ -59,7 +59,7 @@ public class NewExp extends CallExp
     if (definition != null)
       definition.resolve();
     
-    ?LinkedList<VarSymbol> constructors = TypeConstructors.getConstructors(tc);
+    ?LinkedList<MethodDeclaration.Symbol> constructors = TypeConstructors.getConstructors(tc);
     if (constructors == null)
       {
 	if (tc.arity() > 0)
@@ -72,9 +72,7 @@ public class NewExp extends CallExp
 
     // the list of constructors must be cloned, as
     // OverloadedSymbolExp removes elements from it
-    constructors = constructors.clone();
-
-    function = createOverloadedSymbolExp(notNull(constructors), new LocatedString("new " + tc, this.location()));
+    function = createOverloadedSymbolExp(new LinkedList(notNull(constructors)), new LocatedString("new " + tc, this.location()));
   }
   
   private void setObject()

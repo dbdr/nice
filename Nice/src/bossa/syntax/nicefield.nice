@@ -1,0 +1,300 @@
+/**************************************************************************/
+/*                                N I C E                                 */
+/*             A high-level object-oriented research language             */
+/*                        (c) Daniel Bonniot 2004                         */
+/*                                                                        */
+/*  This program is free software; you can redistribute it and/or modify  */
+/*  it under the terms of the GNU General Public License as published by  */
+/*  the Free Software Foundation; either version 2 of the License, or     */
+/*  (at your option) any later version.                                   */
+/*                                                                        */
+/**************************************************************************/
+
+/**
+   A field or field override in a Nice class.
+   
+ */
+abstract class NiceField
+{
+  CNiceClass declaringClass;
+  MonoSymbol sym;
+  ?Expression value;
+  NiceFieldAccess method = cast(null);
+  {
+    sym.propagate = Node.none;
+    method = createNiceFieldAccess(this);
+    declaringClass.definition.addChild(method);
+  }
+
+  ClassDefinition getClassDefinition() = declaringClass.definition;
+
+  LocatedString getName() = sym.getName();
+
+  boolean hasName(LocatedString name) = sym.hasName(name);
+
+  boolean isFinal();
+
+  void resolve(VarScope scope, TypeScope typeScope)
+  {
+    sym.type = notNull(sym.syntacticType).resolve(typeScope);
+
+    if (nice.tools.typing.Types.isVoid(sym.type))
+      bossa.util.User.error(sym, "A field cannot have void type");
+
+    value = dispatch.analyse(value, scope, typeScope);
+  }
+
+  FormalParameters.Parameter asParameter()
+  {
+    Monotype type = notNull(sym.syntacticType);
+    if (value == null)
+      return new FormalParameters.NamedParameter(type, sym.getName(), true);
+    else
+      return new FormalParameters.OptionalParameter (type, sym.getName(), true, value);
+  }
+
+  void typecheck()
+  {
+    if (value != null)
+      {
+	declaringClass.enterTypingContext();
+
+	mlsub.typing.Polytype declaredType = sym.getType();
+	value = notNull(value).resolveOverloading(declaredType);
+	dispatch.typecheck(notNull(value));
+
+	try {
+	  Typing.leq(notNull(value).getType(), declaredType);
+	}
+	catch (mlsub.typing.TypingEx ex) {
+	  throw assignmentError(notNull(value), sym.getName().toString(),
+		sym.getType().toString(), notNull(value));
+	}
+      }
+  }
+
+  toString() = sym + (value == null ? "" : " = " + value);
+}
+
+final class NewField extends NiceField
+{
+  boolean isFinal_;
+  boolean isTransient;
+  boolean isVolatile;
+  public ?String docString;
+
+  isFinal() = isFinal_; 
+
+  void createField()
+  {
+    let decl = declaringClass.classe.addField
+	(sym.name.toString(), nice.tools.code.Types.javaType(sym.type));
+    method.fieldDecl = decl;
+    decl.setFlag(isFinal_,     gnu.expr.Declaration.IS_CONSTANT);
+    decl.setFlag(isTransient, gnu.expr.Declaration.TRANSIENT);
+    decl.setFlag(isVolatile , gnu.expr.Declaration.VOLATILE);
+
+    if (! declaringClass.definition.inInterfaceFile())
+      {
+        String fname = sym.getName().toString();
+        String suffix = Character.toUpperCase(fname.charAt(0)) + fname.substring(1);
+        this.createGetter(suffix);
+        if (!isFinal_)
+          this.createSetter(suffix);
+      }
+  }
+
+  void createGetter(String nameSuffix)
+  { 
+    gnu.expr.Expression[] params = cast(new gnu.expr.Expression[1]);
+    let getter = nice.tools.code.Gen.createMemberMethod("get"+nameSuffix,
+		declaringClass.classe.getType(), null,
+		notNull(method.fieldDecl).getType(), params);
+    nice.tools.code.Gen.setMethodBody(getter, NiceUtils.doInline(new nice.tools.code.GetFieldProc(method.fieldDecl), params[0]));
+    declaringClass.classe.addMethod(getter);
+  }
+
+  void createSetter(String nameSuffix)
+  {
+    gnu.expr.Expression[] params = cast(new gnu.expr.Expression[2]);
+    gnu.bytecode.Type[] argTypes = [notNull(method.fieldDecl).getType()];
+    let setter = nice.tools.code.Gen.createMemberMethod("set"+nameSuffix, declaringClass.classe.getType(),
+		argTypes, notNull(method.fieldDecl).getType(), params);
+    nice.tools.code.Gen.setMethodBody(setter, NiceUtils.doInline(new nice.tools.code.SetFieldProc(method.fieldDecl), params[0], params[1]));
+    declaringClass.classe.addMethod(setter);
+  }
+
+  void checkNoDuplicate(List<FormalParameters.Parameter> fields, 
+                          int rankInThisClass)
+  {
+    /*
+       We check that there is no duplicate in all the inherited fields,
+       but also in the fields of this class stricly before this one.
+    */
+    int max = fields.size() - declaringClass.fields.size() + rankInThisClass;
+    String name = sym.getName().toString();
+    for (int i = 0; i < max; i++)
+      if (fields[i].match(name))
+        bossa.util.User.error(sym, 
+			(max - i >= declaringClass.fields.size())
+                        ? "A field with the same name exists in a super-class"
+                        : "A field with the same name exists in this class");
+  }
+
+  toString()= (isFinal_ ? "final " : "") +  super;
+
+}
+
+final class OverridenField extends NiceField
+{
+
+  isFinal() = true;
+
+  /**
+     Update the type and default values for the constructor, according
+     to this overriding.
+  */
+  void updateConstructorParameter(List<FormalParameters.Parameter> inherited)
+  {
+      String name = sym.getName().toString();
+      Monotype type = notNull(sym.syntacticType);
+
+      for (int i = 0; i < inherited.size(); i++)
+        {
+          let param = inherited[i];
+          if (param.match(name))
+            {
+              if (value != null)
+                inherited[i] = new FormalParameters.OptionalParameter(type,
+				sym.getName(), true, value, 
+                             	param.value() == null || param.isOverriden());
+              else
+                param.resetType(type);
+            }
+        }
+  } 
+
+  typecheck()
+  {
+    ?gnu.expr.Declaration decl = null;
+
+    let parent = declaringClass.getParent();
+    if (parent != null)
+      decl = parent.getOverridenField(this, value == null);
+
+    if (decl == null)
+      throw bossa.util.User.error(sym, "No field with this name exists in a super-class");
+
+    method.fieldDecl = decl;
+
+    super;
+  }
+
+  /**
+     @param checkValue
+       Whether to check that the original field's value, if it exists,
+       must be checked against the overriden type.
+     @return the checkValue to be used for other versions of this field
+       higher up in the hierarchy.
+  */
+  boolean checkOverride(NiceField original, boolean checkValue)
+  {
+    declaringClass.enterTypingContext();
+
+    mlsub.typing.Monotype originalType = notNull(original.sym.syntacticType).resolve
+        (original.declaringClass.translationScope(declaringClass));
+
+    try {
+      Typing.leq(this.sym.type, originalType);
+    }
+    catch (TypingEx ex) {
+      User.error(this.sym, 
+                   "The new type must be a subtype of the original type declared in " + original.declaringClass + ".\n" +
+                   "Original type: " + originalType);
+    }
+
+    if (checkValue && original.value != null)
+      {
+        this.checkValue(notNull(original.value), original.declaringClass);
+        return false;
+      }
+
+    return checkValue;
+  }
+
+  void checkOverride(ValueOverride original)
+  {
+    this.checkValue(original.value, original.declaringClass);
+  }
+
+  private void checkValue(Expression value, NiceClass location)
+  {
+    try {
+      Typing.leq(value.getType(), this.sym.getType());
+    }
+    catch (mlsub.typing.TypingEx ex) {
+      User.error(sym, "The default value declared in " + location +
+                   "\nis not compatible with the overriden type");
+    }
+  }
+
+  toString() = "override " + super;
+}
+
+public final class ValueOverride
+{
+  CNiceClass declaringClass;
+  LocatedString name;
+  Expression value;
+
+  boolean hasName(LocatedString name) = this.name.equals(name);
+
+  void updateConstructorParameter(List<FormalParameters.Parameter> inherited)
+  {
+    for (int i = 0; i < inherited.size(); i++)
+      {
+        let param = inherited[i];
+        if (param.match(name.toString()))
+          inherited[i] = new FormalParameters.OptionalParameter(param.type,
+		name, true, value, param.value() == null || param.isOverriden());
+      }
+  }
+
+  void resolve(VarScope scope, TypeScope typeScope)
+  {
+    value = analyse(value, scope, typeScope);
+  }
+
+  void typecheck()
+  {
+    boolean exists = false;
+
+    let parent = declaringClass.getParent();
+    if (parent != null)
+      exists = parent.checkValueOverride(name, value);
+
+    if (! exists)
+      throw bossa.util.User.error(name, "No field with this name exists in a super-class");
+  }
+}
+
+/**
+    @return the scope that maps the type parameters of the other class
+      to the corresponding symbol in the constructor of this class.
+*/
+private TypeScope translationScope(CNiceClass this, CNiceClass other)
+{
+  let binders = other.definition.getBinders();
+  let ourBinders = this.definition.getBinders();
+  TypeScope scope = Node.getGlobalTypeScope();
+  if (binders != null)
+    {
+      scope = new TypeScope(scope);
+      for (int i = 0; i < binders.length; i++)
+	try {
+	  scope.addMapping(notNull(ourBinders)[i].toString(), binders[i]);
+	} catch(TypeScope.DuplicateName e) {}
+    }
+
+  return scope;
+}

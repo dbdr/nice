@@ -91,6 +91,12 @@ public class CallExp extends Expression
     return res;
   }
   
+  public void addBlockArgument(Statement block, LocatedString name)
+  {
+    arguments.add(new FunExp(bossa.syntax.Constraint.True, new LinkedList(),
+		block), name);
+  } 
+
   /****************************************************************
    * Type checking
    ****************************************************************/

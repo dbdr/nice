@@ -69,11 +69,11 @@ public class Arguments
     arguments[0] = new Argument(value, null);
   }
 
-  void add(Expression arg)
+  void add(Expression arg, LocatedString name)
   {
     Argument[] newArgs = new Argument[arguments.length + 1];
     System.arraycopy(arguments, 0, newArgs, 0, arguments.length);
-    newArgs[arguments.length] = new Argument(arg);
+    newArgs[arguments.length] = new Argument(arg, name);
     arguments = newArgs;
   }
 

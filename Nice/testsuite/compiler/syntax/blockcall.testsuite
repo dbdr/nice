@@ -1,0 +1,14 @@
+/// PASS
+  int i = 0;
+  loop(5) { i += 1; }
+  assert i==5;
+  /// Toplevel
+  void loop(int n, ()->void block)
+  {
+    for(; n>0; n--)
+      block();
+  }
+
+/// FAIL
+  int x;
+  /* ///FAIL HERE */(x = 0) { print("abc"); }

@@ -1743,7 +1743,7 @@ Statement ShortStatement() :
 }
 {
 (  res = RootShortStatement()
-|  res = StatementExpression()
+|  res = ShortStatementExpression()
 )
   { return res; }
 }
@@ -2267,7 +2267,7 @@ Statement Statement() :
   LOOKAHEAD(2)
   res=LabeledStatement()
 | res=Block()
-| res=StatementExpression() ";"
+| res=RealStatementExpression()
 | res=IfStatement()
 | res=WhileStatement()
 | res=DoStatement()
@@ -2470,19 +2470,62 @@ void LocalTupleExpContent() : { }
 )* 
 }
 
-Statement StatementExpression() :
-/*
- * The last expansion of this production accepts more than the legal
- * Java expansions for StatementExpression.  This expansion does not
- * use PostfixExpression for performance reasons.
- */
-{ Expression e1; Token first, last; }
+Statement RealStatementExpression() :
+{ Expression e1; Token first, last; Statement block; }
+{
+  { first = getToken(1); }
+(
+  e1=Pre_crementExpression() ";"
+|
+  e1=PrimaryExpression()
+  ( 
+    block=Block()
+    { if ( e1 instanceof CallExp && ! (e1 instanceof NewExp) )
+        ((CallExp)e1).addBlockArgument(block, null);
+      else
+        throw bossa.util.User.error(e1,"Block arguments can only be added to normal function calls");
+    }
+  |
+    e1=PostfixStatementExpression(e1, first) ";"
+  )
+)
+  {
+    last = getToken(0);
+    e1.setLocation(Location.make(first, last));
+    return new ExpressionStmt(e1); 
+  }
+}
+
+Statement ShortStatementExpression() :
+{ Expression e1; Token first, last; Statement block; }
 {
   { first = getToken(1); }
 (
   e1=Pre_crementExpression()
 |
   e1=PrimaryExpression()
+  ( 
+    block=Block() 
+    { if ( e1 instanceof CallExp && ! (e1 instanceof NewExp) )
+        ((CallExp)e1).addBlockArgument(block, null);
+      else
+        throw bossa.util.User.error(e1,"Block arguments can only be added to normal function calls");
+    }
+  |
+    e1=PostfixStatementExpression(e1, first)
+  )
+)
+  {
+    last = getToken(0);
+    e1.setLocation(Location.make(first, last));
+    return new ExpressionStmt(e1); 
+  }
+
+}
+
+Expression PostfixStatementExpression(Expression e1, Token first) :
+{}
+{
   [
     "++" { e1=new IncrementExp(e1, false, true); }
   |
@@ -2496,16 +2539,11 @@ Statement StatementExpression() :
     {
       if(op.image.length()!=1)
         e2=CallExp.create(symb(op.image.substring(0, 1),op),e1,e2);
-
+  
       e1=AssignExp.create(e1,e2);
     }
   ]
-)
-  {
-    last = getToken(0);
-    e1.setLocation(Location.make(first, last));
-    return new ExpressionStmt(e1); 
-  }
+  { return e1; }
 }
 
 Statement IfStatement() :
@@ -2572,7 +2610,7 @@ Statement ForStatement() :
   | (
       LOOKAHEAD( "var" | "let" | monotype() <IDENT>) 
       init=LocalDeclarationList() 
-    | statexp=StatementExpression() ";" {init.add(statexp);}
+    | statexp=ShortStatementExpression() ";" {init.add(statexp);}
     | ";"
     )
     [ cond=Expression() ] ";" [ update=StatementExpressionList() ] ")" 
@@ -2613,8 +2651,8 @@ List LocalDeclarationList() :
 Statement StatementExpressionList() :
 { Statement s; List statements=new LinkedList(); }
 {
-  s=StatementExpression() { statements.add(s); }
-  ( "," s=StatementExpression() { statements.add(s); }
+  s=ShortStatementExpression() { statements.add(s); }
+  ( "," s=ShortStatementExpression() { statements.add(s); }
   )*
   { return new Block(statements); }
 }

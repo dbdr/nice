@@ -80,7 +80,14 @@ class Content
     Content.Unit[] readers = getReaders(shouldReload);
 
     for(int i = 0; i<readers.length; i++)
-      read(readers[i], definitions);
+      try{
+        read(readers[i], definitions);
+      }
+      catch(UserError ex){
+        pkg.compilation.error(ex);
+      }
+
+    pkg.compilation.exitIfErrors();
     
     return expand(definitions);
   }

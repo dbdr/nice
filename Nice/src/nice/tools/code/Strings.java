@@ -10,35 +10,29 @@
 /*                                                                        */
 /**************************************************************************/
 
-// File    : Bytecode.java
+// File    : Strings.java
 // Created : Fri Dec 10 19:03:56 1999 by bonniot
-//$Modified: Thu May 04 16:20:25 2000 by Daniel Bonniot $
+//$Modified: Mon Aug 07 15:42:05 2000 by Daniel Bonniot $
 
-package bossa;
+package nice.tools.code;
 
 import bossa.util.*;
 
 /**
- * Usefull function for bytecode generation.
- * 
- * @author bonniot
+   String escaping.
+   
+   @author bonniot
  */
 
-public abstract class Bytecode
+public abstract class Strings
 {
-  static
-  {
-    //System.out.println(Character.isJavaIdentifierStart(firstEscapeChar));
-    //System.out.println(Character.isJavaIdentifierPart(escapeChar));  
-  }
-  
   /**
-     Encode une chaine pour en faire un identificateur Java valide.
+     Encodes a string to make it a valid java identifier.
 
-     Tout character offendant est remplacé par '$$' suivi de son
-     (uni)code en Hexadecimal.
+     Any offending character is replaced by '$$' followed by its
+     (uni)code in Hexadecimal.
   */
-  public static String escapeString(String s)
+  public static String escape(String s)
   {
     if(s==null || s.length()==0)
       return null;
@@ -77,7 +71,7 @@ public abstract class Bytecode
     sb.append(num);
   }
   
-  public static String unescapeString(String s)
+  public static String unescape(String s)
   {
     if(s==null)
       return null;

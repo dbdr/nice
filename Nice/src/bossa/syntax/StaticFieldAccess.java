@@ -12,7 +12,7 @@
 
 // File    : StaticFieldAccess.java
 // Created : Thu Jul 01 18:12:46 1999 by bonniot
-//$Modified: Thu Aug 03 14:21:27 2000 by Daniel Bonniot $
+//$Modified: Mon Aug 07 15:31:40 2000 by Daniel Bonniot $
 
 package bossa.syntax;
 
@@ -62,7 +62,7 @@ public class StaticFieldAccess extends MethodDefinition
       if(!f.getStaticFlag())
 	{
 	  params = new mlsub.typing.Monotype[]
-	  { bossa.CodeGen.getMonotype(f.getDeclaringClass()) };
+	  { nice.tools.code.Types.getMonotype(f.getDeclaringClass()) };
 	}
       else
 	params = null;
@@ -74,7 +74,7 @@ public class StaticFieldAccess extends MethodDefinition
 	 new LocatedString(f.getName(),
 			   Location.nowhere()),
 	 null,
-	 bossa.CodeGen.getMonotype(f.getType()), 
+	 nice.tools.code.Types.getMonotype(f.getType()), 
 	 params);
       try{
 	res.field = f.getReflectField();
@@ -85,10 +85,10 @@ public class StaticFieldAccess extends MethodDefinition
     
       return res;
     }
-    catch(bossa.CodeGen.ParametricClassException e){
+    catch(nice.tools.code.Types.ParametricClassException e){
       return null;
     }
-    catch(bossa.CodeGen.NotIntroducedClassException e){
+    catch(nice.tools.code.Types.NotIntroducedClassException e){
       return null;
     }
   }
@@ -116,7 +116,7 @@ public class StaticFieldAccess extends MethodDefinition
 
   java.lang.reflect.Field getField(LocatedString javaClass, String name)
   {
-    Class c = bossa.CodeGen.lookupJavaClass(javaClass.toString());
+    Class c = nice.tools.code.Types.lookupJavaClass(javaClass.toString());
 
     if(c==null)
       User.error(javaClass,"Class "+javaClass+" not found");

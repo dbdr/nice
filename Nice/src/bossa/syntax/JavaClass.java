@@ -12,7 +12,7 @@
 
 // File    : JavaClass.java
 // Created : Wed Feb 02 16:20:12 2000 by Daniel Bonniot
-//$Modified: Mon Jun 19 17:50:43 2000 by Daniel Bonniot $
+//$Modified: Mon Aug 07 15:30:15 2000 by Daniel Bonniot $
 
 package bossa.syntax;
 
@@ -62,8 +62,8 @@ public class JavaClass extends ClassDefinition
     if(name.toString().equals("nice.lang.Array"))
       {
 	ConstantExp.arrayTC = this.tc;
-	javaType = bossa.SpecialArray.arrayType;
-	bossa.CodeGen.set(tc, javaType);
+	javaType = nice.tools.code.SpecialArray.arrayType;
+	nice.tools.code.Types.set(tc, javaType);
       }
     
     if(javaName == null) // primitive type
@@ -74,7 +74,7 @@ public class JavaClass extends ClassDefinition
 	  User.error(this,
 		     name+" is not a known primitive type");
       
-	bossa.CodeGen.set(tc, javaType);
+	nice.tools.code.Types.set(tc, javaType);
       }
     else
       {
@@ -98,14 +98,14 @@ public class JavaClass extends ClassDefinition
     if (javaType == null)
       {
 	java.lang.Class refClass 
-	  = bossa.CodeGen.lookupJavaClass(javaName.toString());
+	  = nice.tools.code.Types.lookupJavaClass(javaName.toString());
     
 	if(refClass==null)
 	  User.error(javaName,
 		     javaName+" was not found");
     
 	javaType = (gnu.bytecode.ClassType) gnu.bytecode.Type.make(refClass);
-	bossa.CodeGen.set(tc, javaType);
+	nice.tools.code.Types.set(tc, javaType);
       }
   }
 

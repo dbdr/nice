@@ -12,7 +12,7 @@
 
 // File    : MethodDefinition.java
 // Created : Thu Jul 01 18:12:46 1999 by bonniot
-//$Modified: Wed Jul 26 14:34:24 2000 by Daniel Bonniot $
+//$Modified: Mon Aug 07 15:31:47 2000 by Daniel Bonniot $
 
 package bossa.syntax;
 
@@ -263,12 +263,12 @@ public class MethodDefinition extends Definition
   
   public gnu.bytecode.Type javaReturnType()
   {
-    return bossa.CodeGen.javaType(getType().codomain());
+    return nice.tools.code.Types.javaType(getType().codomain());
   }
   
   public gnu.bytecode.Type[] javaArgTypes()
   {
-    return bossa.CodeGen.javaType(getType().domain());
+    return nice.tools.code.Types.javaType(getType().domain());
   }
   
   public void compile()

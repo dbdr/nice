@@ -12,7 +12,7 @@
 
 // File    : Block.java
 // Created : Wed Jul 07 17:42:15 1999 by bonniot
-//$Modified: Fri Jun 09 17:34:10 2000 by Daniel Bonniot $
+//$Modified: Mon Aug 07 15:26:56 2000 by Daniel Bonniot $
 // Description : A block : a list of statements with local variables
 
 package bossa.syntax;
@@ -225,12 +225,12 @@ public class Block extends Statement
     Statement.currentScopeExp = res;
     
     if(local.value==null)
-      eVal[0] = bossa.CodeGen.defaultValue(local.left.type);
+      eVal[0] = nice.tools.code.Types.defaultValue(local.left.type);
     else
       eVal[0] = local.value.generateCode();
     gnu.expr.Declaration decl = 
       res.addDeclaration(local.left.name.toString(),
-			 bossa.CodeGen.javaType(local.left.type));
+			 nice.tools.code.Types.javaType(local.left.type));
     decl.noteValue(null);
     local.left.setDeclaration(decl);
     

@@ -12,7 +12,7 @@
 
 // File    : JavaClasses.java
 // Created : Thu Jul 08 11:51:09 1999 by bonniot
-//$Modified: Mon Aug 07 14:37:47 2000 by Daniel Bonniot $
+//$Modified: Mon Aug 07 15:31:50 2000 by Daniel Bonniot $
 
 package bossa.syntax;
 
@@ -113,7 +113,7 @@ public final class JavaClasses
 					      instantiable(javaType), true);
     hash.put(className, res);
 
-    bossa.CodeGen.set(res, javaType);
+    nice.tools.code.Types.set(res, javaType);
     
     if(bossa.modules.Package.contextFrozen())
       // We should not add new classes at this point.
@@ -276,7 +276,7 @@ public final class JavaClasses
     if(hash.containsKey(className))
       return (TypeConstructor) hash.get(className);
     
-    Class c = bossa.CodeGen.lookupJavaClass0(className);    
+    Class c = nice.tools.code.Types.lookupJavaClass0(className);    
     
     if(c==null)
       {

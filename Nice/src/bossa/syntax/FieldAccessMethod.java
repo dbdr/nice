@@ -12,7 +12,7 @@
 
 // File    : FieldAccessMethod.java
 // Created : Thu Jul 01 18:12:46 1999 by bonniot
-//$Modified: Tue Jul 25 18:30:01 2000 by Daniel Bonniot $
+//$Modified: Mon Aug 07 15:31:52 2000 by Daniel Bonniot $
 
 package bossa.syntax;
 
@@ -86,7 +86,7 @@ public class FieldAccessMethod extends MethodDefinition
   {
     if (field == null)
       {
-	ClassType owner = (ClassType) bossa.CodeGen.javaType(classTC);
+	ClassType owner = (ClassType) nice.tools.code.Types.javaType(classTC);
 	field = owner.getDeclaredField(fieldName);
 	if (field == null)
 	  field = owner.addField(fieldName, fieldType(), Access.PUBLIC);
@@ -97,7 +97,8 @@ public class FieldAccessMethod extends MethodDefinition
   gnu.expr.Expression compileAccess(Expression parameter)
   {
     gnu.expr.Expression res = Inline.inline1
-      (new kawa.lang.GetFieldProc((ClassType) bossa.CodeGen.javaType(classTC),
+      (new kawa.lang.GetFieldProc((ClassType) 
+				  nice.tools.code.Types.javaType(classTC),
 				  fieldName, 
 				  fieldType(), 
 				  Access.PUBLIC),

@@ -10,11 +10,11 @@
 /*                                                                        */
 /**************************************************************************/
 
-// File    : CodeGen.java
+// File    : Types.java
 // Created : Mon Jun 05 11:28:10 2000 by Daniel Bonniot
-//$Modified: Wed Aug 02 19:36:51 2000 by Daniel Bonniot $
+//$Modified: Mon Aug 07 15:37:41 2000 by Daniel Bonniot $
 
-package bossa;
+package nice.tools.code;
 
 import bossa.util.*;
 import mlsub.typing.*;
@@ -26,12 +26,12 @@ import gnu.expr.*;
 import java.util.*;
 
 /**
- * Code generation tools.
- * 
- * @author Daniel Bonniot
+   Conversion between Nice and bytecode types.
+   
+   @author Daniel Bonniot
  */
 
-public final class CodeGen
+public final class Types
 {
   /****************************************************************
    * Mapping TCs to gnu.bytecode.Types
@@ -169,7 +169,7 @@ public final class CodeGen
     
     TypeSymbol ts = bossa.syntax.Node.getGlobalTypeScope().lookup(name);
     if(ts==null)
-      Internal.error(name+" is not known");
+      Internal.error(name + " is not known");
 
     if(ts instanceof TypeConstructor)
       {
@@ -208,13 +208,13 @@ public final class CodeGen
 	if(res==null)
 	  return null;
 	else
-	  return bossa.SpecialArray.create(res);
+	  return SpecialArray.create(res);
       }
     
-    if(s.equals("void")) 	return bossa.SpecialTypes.voidType;
-    if(s.equals("int"))  	return bossa.SpecialTypes.intType;
-    if(s.equals("long")) 	return bossa.SpecialTypes.longType;
-    if(s.equals("boolean")) 	return bossa.SpecialTypes.booleanType;
+    if(s.equals("void")) 	return SpecialTypes.voidType;
+    if(s.equals("int"))  	return SpecialTypes.intType;
+    if(s.equals("long")) 	return SpecialTypes.longType;
+    if(s.equals("boolean")) 	return SpecialTypes.booleanType;
     
     Class clas = lookupJavaClass(s);
     if (clas == null)

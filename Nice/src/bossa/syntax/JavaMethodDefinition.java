@@ -12,7 +12,7 @@
 
 // File    : JavaMethodDefinition.java
 // Created : Tue Nov 09 11:49:47 1999 by bonniot
-//$Modified: Wed Aug 02 18:25:21 2000 by Daniel Bonniot $
+//$Modified: Mon Aug 07 15:34:56 2000 by Daniel Bonniot $
 
 package bossa.syntax;
 
@@ -95,17 +95,17 @@ public class JavaMethodDefinition extends MethodDefinition
 	else
 	  {
 	    params = new mlsub.typing.Monotype[paramTypes.length + 1];
-	    params[n++] = bossa.CodeGen.getMonotype(m.getDeclaringClass());
+	    params[n++] = nice.tools.code.Types.getMonotype(m.getDeclaringClass());
 	  }
     
 	for(int i = 0; i<paramTypes.length; i++)
-	  params[n++] = bossa.CodeGen.getMonotype(paramTypes[i]);
+	  params[n++] = nice.tools.code.Types.getMonotype(paramTypes[i]);
     
 	mlsub.typing.Monotype retType;
 	if(constructor)
-	  retType = bossa.CodeGen.getMonotype(m.getDeclaringClass());
+	  retType = nice.tools.code.Types.getMonotype(m.getDeclaringClass());
 	else
-	  retType = bossa.CodeGen.getMonotype(m.getReturnType());
+	  retType = nice.tools.code.Types.getMonotype(m.getReturnType());
     
 	res = new JavaMethodDefinition(null, m.getName(), null,
 				       new LocatedString(m.getName(), 
@@ -115,12 +115,12 @@ public class JavaMethodDefinition extends MethodDefinition
 	res.reflectMethod = m;
 	return res;
       }
-    catch(bossa.CodeGen.ParametricClassException e){
+    catch(nice.tools.code.Types.ParametricClassException e){
       // The fetched method involves parametric java classes.
       // Ignore.
       return null;
     }
-    catch(bossa.CodeGen.NotIntroducedClassException e){
+    catch(nice.tools.code.Types.NotIntroducedClassException e){
       // The fetched method involves invalid types.
       // Ignore.
       return null;
@@ -188,7 +188,7 @@ public class JavaMethodDefinition extends MethodDefinition
   
   private gnu.bytecode.Type type(LocatedString s)
   {
-    Type res = bossa.CodeGen.type(s.toString());
+    Type res = nice.tools.code.Types.type(s.toString());
     if(res == null)
       User.error(s, "Unknown java class "+s);
     return res;
@@ -231,7 +231,7 @@ public class JavaMethodDefinition extends MethodDefinition
     if(reflectMethod != null)
       return;
     
-    Type holder = bossa.CodeGen.type(className.toString());
+    Type holder = nice.tools.code.Types.type(className.toString());
     if(holder == null)
       User.error(this,
 		 "Class " + className + " was not found");
@@ -239,7 +239,7 @@ public class JavaMethodDefinition extends MethodDefinition
     if(!(holder instanceof ClassType))
       {
 	if (className.toString().equals("ObjectArray"))
-	  holder = bossa.SpecialArray.objectArrayType;
+	  holder = nice.tools.code.SpecialArray.objectArrayType;
 	else
 	  User.error(this, className + " is a primitive type");
       }

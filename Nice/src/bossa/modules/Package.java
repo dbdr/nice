@@ -12,7 +12,7 @@
 
 // File    : Package.java
 // Created : Wed Oct 13 16:09:47 1999 by bonniot
-//$Modified: Tue Aug 01 19:01:35 2000 by Daniel Bonniot $
+//$Modified: Mon Aug 07 15:38:52 2000 by Daniel Bonniot $
 
 package bossa.modules;
 
@@ -211,7 +211,7 @@ public class Package implements mlsub.compilation.Module, Located
 	method != null;
 	method = method.getNext())
       {
-	String methodName = bossa.Bytecode.unescapeString(method.getName());
+	String methodName = nice.tools.code.Strings.unescape(method.getName());
 
 	if (
 	    // main is not an alternative
@@ -443,7 +443,7 @@ public class Package implements mlsub.compilation.Module, Located
     pkg.body = QuoteExp.voidExp;
 
     try{
-      bossa.SpecialTypes.init();
+      nice.tools.code.SpecialTypes.init();
     }
     catch(ExceptionInInitializerError e){
       e.getException().printStackTrace();
@@ -588,7 +588,7 @@ public class Package implements mlsub.compilation.Module, Located
   public gnu.bytecode.Method addDispatchMethod(MethodDefinition def)
   {
     return dispatchClass.addMethod
-      (bossa.Bytecode.escapeString(def.getFullName()),
+      (nice.tools.code.Strings.escape(def.getFullName()),
        Access.PUBLIC|Access.STATIC|Access.FINAL,
        def.javaArgTypes(),def.javaReturnType());
   }

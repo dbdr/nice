@@ -12,7 +12,7 @@
 
 // File    : TryExp.java
 // Created : Thu May 25 12:34:19 2000 by Daniel Bonniot
-//$Modified: Thu Jun 08 17:13:43 2000 by Daniel Bonniot $
+//$Modified: Mon Aug 07 15:31:39 2000 by Daniel Bonniot $
 
 package bossa.syntax;
 
@@ -121,7 +121,7 @@ public class TryStmt extends Statement
 
       CatchClause res = new CatchClause
 	(var.toString(), 
-	 (gnu.bytecode.ClassType) bossa.CodeGen.javaType(t));
+	 (gnu.bytecode.ClassType) nice.tools.code.Types.javaType(t));
       res.outer = Statement.currentScopeExp;
       
       exnVar.setDeclaration(res.getDeclaration());

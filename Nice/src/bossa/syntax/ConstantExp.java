@@ -12,13 +12,15 @@
 
 // File    : ConstantExp.java
 // Created : Thu Jul 08 15:36:40 1999 by bonniot
-//$Modified: Fri Jul 28 15:59:49 2000 by Daniel Bonniot $
+//$Modified: Mon Aug 07 15:35:36 2000 by Daniel Bonniot $
 
 package bossa.syntax;
 
 import mlsub.typing.TypeConstructor;
 import mlsub.typing.TypeSymbol;
 import mlsub.typing.MonotypeConstructor;
+
+import nice.tools.code.SpecialTypes;
 
 import bossa.util.*;
 
@@ -188,14 +190,14 @@ public class ConstantExp extends Expression
       {
 	primChar = tc;
 	charType = new MonotypeConstructor(tc, null);
-	return bossa.SpecialTypes.charType;
+	return SpecialTypes.charType;
       }
     
     if(name.equals("nice.lang.byte"))
       {
 	primByte = tc;
 	byteType = new MonotypeConstructor(tc, null);
-	return bossa.SpecialTypes.byteType;
+	return SpecialTypes.byteType;
       }
     
     if(name.equals("nice.lang.int"))
@@ -203,7 +205,7 @@ public class ConstantExp extends Expression
 	primInt = tc;
 	intType = new MonotypeConstructor(tc, null);
 	return 
-	  bossa.SpecialTypes.intType;
+	  SpecialTypes.intType;
       }
     
     if(name.equals("nice.lang.long"))
@@ -211,7 +213,7 @@ public class ConstantExp extends Expression
 	primLong = tc;
 	longType = new MonotypeConstructor(tc, null);
 	return 
-	  bossa.SpecialTypes.longType;
+	  SpecialTypes.longType;
       }
     
     if(name.equals("nice.lang.boolean"))
@@ -219,28 +221,28 @@ public class ConstantExp extends Expression
 	primBool = tc;
 	boolType = new MonotypeConstructor(primBool, null);
 	boolPolytype = new mlsub.typing.Polytype(boolType);
-	return bossa.SpecialTypes.booleanType;
+	return SpecialTypes.booleanType;
       }
     
     if(name.equals("nice.lang.short"))
       {
 	primShort = tc;
 	shortType = new MonotypeConstructor(tc, null);
-	return bossa.SpecialTypes.shortType;
+	return SpecialTypes.shortType;
       }
     
     if(name.equals("nice.lang.double"))
       {
 	primDouble = tc;
 	doubleType = new MonotypeConstructor(tc, null);
-	return bossa.SpecialTypes.doubleType;
+	return SpecialTypes.doubleType;
       }
     
     if(name.equals("nice.lang.float"))
       {
 	primFloat = tc;
 	floatType = new MonotypeConstructor(tc, null);
-	return bossa.SpecialTypes.floatType;
+	return SpecialTypes.floatType;
       }
     
     if(name.equals("nice.lang.void"))
@@ -249,7 +251,7 @@ public class ConstantExp extends Expression
 	voidPolytype = new mlsub.typing.Polytype
 	  (mlsub.typing.Constraint.True, voidType);
 	synVoidType = Monotype.create(voidType);
-	return bossa.SpecialTypes.voidType;
+	return SpecialTypes.voidType;
       }
     
     return null;

@@ -12,7 +12,7 @@
 
 // File    : ClassExp.java
 // Created : Wed Mar 29 14:30:13 2000 by Daniel Bonniot
-//$Modified: Wed Jul 26 14:20:34 2000 by Daniel Bonniot $
+//$Modified: Mon Aug 07 15:31:53 2000 by Daniel Bonniot $
 
 package bossa.syntax;
 
@@ -71,7 +71,7 @@ public final class ClassExp extends Expression
 
     if(tc != null)
       {
-	gnu.bytecode.Type type = bossa.CodeGen.javaType(tc);
+	gnu.bytecode.Type type = nice.tools.code.Types.javaType(tc);
 	// type might not be a class
 	// for instance if the ident was "int"
 	if (type instanceof gnu.bytecode.ClassType)

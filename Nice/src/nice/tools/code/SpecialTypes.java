@@ -12,9 +12,9 @@
 
 // File    : SpecialTypes.java
 // Created : Mon Jan 17 14:19:30 2000 by bonniot
-//$Modified: Tue Jul 25 21:23:54 2000 by Daniel Bonniot $
+//$Modified: Mon Aug 07 15:25:03 2000 by Daniel Bonniot $
 
-package bossa;
+package nice.tools.code;
 
 import bossa.util.*;
 import gnu.bytecode.*;

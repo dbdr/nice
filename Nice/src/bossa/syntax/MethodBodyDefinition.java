@@ -12,7 +12,7 @@
 
 // File    : MethodBodyDefinition.java
 // Created : Thu Jul 01 18:12:46 1999 by bonniot
-//$Modified: Wed Aug 02 17:47:34 2000 by Daniel Bonniot $
+//$Modified: Mon Aug 07 15:40:49 2000 by Daniel Bonniot $
 
 package bossa.syntax;
 
@@ -423,8 +423,8 @@ public class MethodBodyDefinition extends Definition
     lexp.setName(name.toString());
 
     Method primMethod = module.getOutputBytecode().addMethod
-      (bossa.Bytecode.escapeString(definition.getBytecodeName() + 
-				   Pattern.bytecodeRepresentation(formals)),
+      (nice.tools.code.Strings.escape
+       (definition.getBytecodeName()+Pattern.bytecodeRepresentation(formals)),
        definition.javaArgTypes(), definition.javaReturnType(),
        Access.PUBLIC|Access.STATIC|Access.FINAL);
     new MiscAttr("definition", 
@@ -451,7 +451,7 @@ public class MethodBodyDefinition extends Definition
 	gnu.expr.Declaration d = lexp.addDeclaration(param.name.toString());
 
 	d.setParameter(true);
-	d.setType(bossa.CodeGen.javaType(paramType));
+	d.setType(nice.tools.code.Types.javaType(paramType));
 	d.noteValue(null);
 	param.setDeclaration(d);
       }

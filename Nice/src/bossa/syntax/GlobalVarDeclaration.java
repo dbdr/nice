@@ -12,7 +12,7 @@
 
 // File    : GlobalVarDeclaration.java
 // Created : Tue Jul 06 12:06:20 1999 by bonniot
-//$Modified: Tue Aug 01 17:42:13 2000 by Daniel Bonniot $
+//$Modified: Mon Aug 07 15:31:51 2000 by Daniel Bonniot $
 
 package bossa.syntax;
 
@@ -56,7 +56,7 @@ public class GlobalVarDeclaration extends Definition
 
     gnu.expr.Declaration declaration = 
       new gnu.expr.Declaration(left.name.toString(),
-			       bossa.CodeGen.javaType(left.type));
+			       nice.tools.code.Types.javaType(left.type));
 
     if(!module.generatingBytecode())
       // The code is already there
@@ -71,7 +71,7 @@ public class GlobalVarDeclaration extends Definition
       {
 	declaration.field = module.getOutputBytecode()
 	  .addField(left.name.toString(),
-		    bossa.CodeGen.javaType(left.type),
+		    nice.tools.code.Types.javaType(left.type),
 		    Access.PUBLIC|Access.STATIC);
 	declaration.setSimple(false);
 	declaration.noteValue(null);

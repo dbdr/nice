@@ -12,7 +12,7 @@
 
 // File    : IfExp.java
 // Created : Mon Dec 06 12:01:51 1999 by bonniot
-//$Modified: Tue Jun 06 15:00:11 2000 by Daniel Bonniot $
+//$Modified: Mon Aug 07 15:34:45 2000 by Daniel Bonniot $
 
 package bossa.syntax;
 
@@ -20,6 +20,7 @@ import bossa.util.*;
 
 import mlsub.typing.*;
 import mlsub.typing.Polytype;
+import nice.tools.code.SpecialTypes;
 
 /**
  * Conditional expression (and statement).
@@ -64,9 +65,9 @@ public class IfExp extends Expression
     thenCode = thenExp.generateCode();
     elseCode = elseExp.generateCode();
     
-    if(elseCode.getType()==bossa.SpecialTypes.voidType)
+    if (elseCode.getType() == SpecialTypes.voidType)
       thenCode = voidify(thenCode);
-    else if(thenCode.getType()==bossa.SpecialTypes.voidType)
+    else if (thenCode.getType() == SpecialTypes.voidType)
       elseCode = voidify(elseCode);
     
     return new gnu.expr.IfExp(condition.generateCode(),
@@ -76,7 +77,7 @@ public class IfExp extends Expression
   
   private static gnu.expr.Expression voidify(gnu.expr.Expression e)
   {
-    if(e.getType()==bossa.SpecialTypes.voidType)
+    if (e.getType().isVoid())
       return e;
     
     return new gnu.expr.BeginExp(e, gnu.expr.QuoteExp.voidExp);

@@ -1,4 +1,4 @@
-package bossa;
+package nice.tools.code;
 
 import gnu.bytecode.*;
 import gnu.math.IntNum;

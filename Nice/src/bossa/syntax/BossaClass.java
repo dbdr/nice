@@ -12,7 +12,7 @@
 
 // File    : BossaClass.java
 // Created : Thu Jul 01 11:25:14 1999 by bonniot
-//$Modified: Mon Jul 24 16:24:00 2000 by Daniel Bonniot $
+//$Modified: Mon Aug 07 15:31:55 2000 by Daniel Bonniot $
 
 package bossa.syntax;
 
@@ -80,7 +80,7 @@ public class BossaClass extends ClassDefinition
 	classType = module.createClass(simpleName.toString());
 
     if(classType != null)
-      bossa.CodeGen.set(tc, classType);
+      nice.tools.code.Types.set(tc, classType);
   }
   
   /**
@@ -104,7 +104,7 @@ public class BossaClass extends ClassDefinition
     associatedConcreteClass = c;
     concreteClasses.add(c);
     
-    bossa.CodeGen.set(this.tc, c.classType);
+    nice.tools.code.Types.set(this.tc, c.classType);
     
     Collection res = new ArrayList(1);
     res.add(c);
@@ -311,7 +311,7 @@ public class BossaClass extends ClassDefinition
 	    if(assocTC == null)
 	      continue;
 	    
-	    imp.add(bossa.CodeGen.javaType(assocTC));
+	    imp.add(nice.tools.code.Types.javaType(assocTC));
 	  }
 	itfs = (ClassType[]) imp.toArray(new ClassType[imp.size()]);
       }
@@ -328,7 +328,8 @@ public class BossaClass extends ClassDefinition
 		Internal.warning("Should not happen. size of itfs gona be wrong");
 		continue;
 	      }
-	    itfs[i] = (ClassType) bossa.CodeGen.javaType(itf.associatedTC());
+	    itfs[i] = (ClassType) 
+	      nice.tools.code.Types.javaType(itf.associatedTC());
 	  }
       }
     
@@ -400,7 +401,7 @@ public class BossaClass extends ClassDefinition
 	// The field might have been created by a FieldAccessMethod.compile*()
 	if(c.getDeclaredField(name) == null)
 	  c.addField(name,
-		     bossa.CodeGen.javaType(f.sym.type),
+		     nice.tools.code.Types.javaType(f.sym.type),
 		     Access.PUBLIC);
       }
   }

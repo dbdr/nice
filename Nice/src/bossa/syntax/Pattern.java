@@ -12,7 +12,7 @@
 
 // File    : Pattern.java
 // Created : Mon Jul 05 14:36:52 1999 by bonniot
-//$Modified: Tue Jun 13 15:36:22 2000 by Daniel Bonniot $
+//$Modified: Mon Aug 07 15:31:46 2000 by Daniel Bonniot $
 // Description : Syntactic pattern for method bodies declaration
 
 package bossa.syntax;
@@ -195,7 +195,7 @@ public class Pattern
    */
   public String bytecodeRepresentation()
   {
-    String enc = bossa.CodeGen.bytecodeRepresentation(tc);
+    String enc = nice.tools.code.Types.bytecodeRepresentation(tc);
 
     return AT_encoding+enc;
   }

@@ -69,5 +69,5 @@ public class LiteralArrayExp extends Expression
     return "[" + Util.map("", ", ", "", elements) + "]";
   }
 
-  private Expression[] elements;
+  Expression[] elements;
 }

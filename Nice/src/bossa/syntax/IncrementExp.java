@@ -24,16 +24,16 @@ import nice.tools.code.*;
 
 public class IncrementExp extends Expression
 {
-  public IncrementExp(Expression var, boolean prefix, boolean increment)
+  public IncrementExp(Expression variable, boolean prefix, boolean increment)
   {
-    this.var = expChild(var);
+    this.variable = expChild(variable);
     this.returnOld = !prefix;
     this.increment = increment;
   }
 
   void computeType()
   {
-    this.type = var.getType();
+    this.type = variable.getType();
   }
 
   /****************************************************************
@@ -42,22 +42,22 @@ public class IncrementExp extends Expression
 
   public gnu.expr.Expression compile()
   {
-    var = var.noOverloading();
-    if(!var.isAssignable())
-      User.error(this, var + " cannot be incremented");
+    variable = variable.noOverloading();
+    if(!variable.isAssignable())
+      User.error(this, variable + " cannot be incremented");
 
-    gnu.expr.Declaration decl = var.getDeclaration();
+    gnu.expr.Declaration decl = variable.getDeclaration();
     if (decl != null)
       return new gnu.expr.IncrementExp
 	(decl, (short) (increment ? 1 : -1), !returnOld);
 
-    // var is not a local variable, so it must be a field
+    // variable is not a local variable, so it must be a field
     CallExp call = null;
-    if (var instanceof CallExp)
-      call = (CallExp) var;
-    else if (var instanceof ExpressionRef)
+    if (variable instanceof CallExp)
+      call = (CallExp) variable;
+    else if (variable instanceof ExpressionRef)
       {
-	Expression e = ((ExpressionRef) var).content();
+	Expression e = ((ExpressionRef) variable).content();
 	if (e instanceof CallExp)
 	  call = (CallExp) e;
       }
@@ -66,7 +66,7 @@ public class IncrementExp extends Expression
       Internal.error(this, "\"var\" is assignable and not a local, " +
 		     "so it should be a call to a FieldAccessMethod");
 
-    FieldAccessMethod access = call.fun.getFieldAccessMethod();
+    FieldAccess access = call.function.getFieldAccessMethod();
     if (access == null)
       Internal.error(this, "\"var\" is assignable and not a local, " +
 		     "so it should be a call to a FieldAccessMethod");
@@ -83,11 +83,11 @@ public class IncrementExp extends Expression
   public String toString()
   {
     if (returnOld)
-      return var.toString() + (increment ? "++" : "--");
+      return variable.toString() + (increment ? "++" : "--");
     else
-      return (increment ? "++" : "--") + var.toString();
+      return (increment ? "++" : "--") + variable.toString();
   }
 
-  private Expression var;
+  Expression variable;
   private boolean returnOld, increment;
 }

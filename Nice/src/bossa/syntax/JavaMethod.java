@@ -135,7 +135,7 @@ public class JavaMethod extends MethodDeclaration
   private static Map declaredMethods = new HashMap();
   
   /**
-     Creates a bossa method for the fiven native method 
+     Creates a nice method for the given native method 
      and puts it in global scope.
      
      @param m the native method.
@@ -169,10 +169,12 @@ public class JavaMethod extends MethodDeclaration
     return md;
   }
 
-  public static MethodDeclaration addFetchedMethod(Field m)
+  public static MethodDeclaration addFetchedMethod(Field f)
   {
-    MethodDeclaration md = StaticFieldAccess.make(m);
-    Node.getGlobalScope().addSymbol(md.symbol);
+    MethodDeclaration md = JavaFieldAccess.make(f);
+    if (Node.getGlobalScope() != null && md != null)
+      Node.getGlobalScope().addSymbol(md.symbol);
+
     return md;
   }
 

@@ -49,6 +49,11 @@ public class Pattern
     this.type = type;
   }
 
+  public Pattern(LocatedString name, TypeIdent tc)
+  {
+    this(name, tc, null);
+  }
+
   final mlsub.typing.Monotype getType()
   {
     return t;

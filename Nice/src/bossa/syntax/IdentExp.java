@@ -106,4 +106,7 @@ public class IdentExp extends Expression
      Force production of overloaded symbol exp, even if there is just one case.
    */
   boolean alwaysOverloadedSymbol;
+
+  /** This ident is the function part of an infix call. */
+  boolean infix = false;
 }

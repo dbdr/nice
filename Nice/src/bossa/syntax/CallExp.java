@@ -33,46 +33,46 @@ import mlsub.typing.MonotypeLeqCst;
 public class CallExp extends Expression
 {
   /**
-     @param fun the function to call
+     @param function the function to call
      @param arguments the call arguments
    */
-  public CallExp(Expression fun, Arguments arguments)
+  public CallExp(Expression function, Arguments arguments)
   {
-    this.fun = expChild(fun);
+    this.function = expChild(function);
     this.arguments = arguments;
     addChild(arguments);
   }
 
   /**
-     @param fun the function to call
+     @param function the function to call
      @param arguments the call arguments
      @param infix true if the first parameter was written before the function,
      using the dot notation: x1.f(x2, x3)
    */
-  public CallExp(Expression fun, Arguments arguments, boolean infix)
+  public CallExp(Expression function, Arguments arguments, boolean infix)
   {
-    this(fun, arguments);
+    this(function, arguments);
     this.infix = infix;
   }
 
-  public static CallExp create(Expression fun, 
+  public static CallExp create(Expression function, 
 			       Expression param1)
   {
     List params = new LinkedList();
     params.add(new Arguments.Argument(param1));
-    CallExp res = new CallExp(fun, new Arguments(params));
-    res.setLocation(fun.location());
+    CallExp res = new CallExp(function, new Arguments(params));
+    res.setLocation(function.location());
     return res;
   }
   
-  public static CallExp create(Expression fun, 
+  public static CallExp create(Expression function, 
 			       Expression param1, Expression param2)
   {
     List params = new ArrayList(2);
     params.add(new Arguments.Argument(param1));
     params.add(new Arguments.Argument(param2));
-    CallExp res = new CallExp(fun, new Arguments(params));
-    res.setLocation(fun.location());
+    CallExp res = new CallExp(function, new Arguments(params));
+    res.setLocation(function.location());
     return res;
   }
   
@@ -93,7 +93,7 @@ public class CallExp extends Expression
   
   void resolve()
   {
-    Expression e = fun.content();
+    Expression e = function.content();
     if (infix)
       // in infix applications, the symbol is either a
       // class method or a field name, so it must be found in
@@ -131,16 +131,16 @@ public class CallExp extends Expression
   }
   
   static Polytype getTypeAndReportErrors(Location loc,
-					 Expression fun,
+					 Expression function,
 					 Expression[] parameters)
   {
     Polytype[] paramTypes = Expression.getType(parameters);
     
     try{
-      return getType(fun.getType(), paramTypes);
+      return getType(function.getType(), paramTypes);
     }
     catch(BadSizeEx e){
-      User.error(loc, fun.toString(Printable.detailed) + 
+      User.error(loc, function.toString(Printable.detailed) + 
 		 " expects " + e.expected + " parameters, " +
 		 "not " + e.actual);
     }
@@ -151,15 +151,14 @@ public class CallExp extends Expression
       if(Typing.dbg) 
 	Debug.println(e.getMessage());
 
-      if(fun.isFieldAccess())
+      if(function.isFieldAccess())
 	{
 	  // There must be just one parameter in a field access
-	  User.error(loc, parameters[0]+
-		     " has no field "+fun);
+	  User.error(loc, parameters[0] + " has no field " + function);
 	}
       else
 	{
-	  String end = "not within the domain of function \""+fun+"\"";
+	  String end = "not within the domain of function \"" + function +"\"";
 	  if(parameters.length >= 2)
 	    User.error(loc,"Parameters \n"+
 		       Util.map("(",", ",")",parameters) +
@@ -246,9 +245,9 @@ public class CallExp extends Expression
     PackageExp packageExp = arguments.packageExp();
     
     if (packageExp != null &&
-	(fun.content() instanceof IdentExp || 
-	 fun.content() instanceof SymbolExp))
-      return ClassExp.create(packageExp, fun.toString());
+	(function.content() instanceof IdentExp || 
+	 function.content() instanceof SymbolExp))
+      return ClassExp.create(packageExp, function.toString());
     else
       return this;
   }
@@ -265,7 +264,7 @@ public class CallExp extends Expression
     arguments.noOverloading();
     resolveStaticClassPrefix();
     
-    fun.resolveOverloading(this);
+    function.resolveOverloading(this);
   }
 
   /** Handle static functions, prefixed by the class name */
@@ -275,7 +274,7 @@ public class CallExp extends Expression
       {
 	declaringClass = arguments.staticClass();
 	
-	Expression funExp = fun.content();
+	Expression funExp = function.content();
 	    
 	if(declaringClass == null)
 	  // check that the function was found in scope
@@ -334,9 +333,9 @@ public class CallExp extends Expression
 	  User.error(this, "class " + declaringClass.getName() +
 		     " has no method or field " + funName);
 	    
-	fun = new ExpressionRef
+	function = new ExpressionRef
 	  (new OverloadedSymbolExp(possibilities, funName,
-				   fun.content().getScope()));
+				   function.content().getScope()));
       }
   }
 
@@ -349,10 +348,10 @@ public class CallExp extends Expression
   {
     resolveOverloading();
     if (type == null)
-      // fun should be a function abstraction here
+      // function should be a function abstraction here
       // no default arguments
       {
-	type = getTypeAndReportErrors(location(), fun, 
+	type = getTypeAndReportErrors(location(), function, 
 				      arguments.inOrder());
 	computedExpressions = arguments.inOrder();
       }
@@ -363,7 +362,7 @@ public class CallExp extends Expression
   boolean isAssignable()
   {
     resolveOverloading();
-    return fun.isFieldAccess();
+    return function.isFieldAccess();
   }
   
   /****************************************************************
@@ -408,27 +407,22 @@ public class CallExp extends Expression
 	}
     
     gnu.expr.Expression res;
-    if (fun.isFieldAccess())
-      {
-	if (arguments.size() != 1)
-	  Internal.error(this, "A field access should have 1 parameter");
-
-	res = fun.getFieldAccessMethod().compileAccess(arguments.getExp(0));
-      }
+    if (function.isFieldAccess())
+      res = function.getFieldAccessMethod().compileAccess(arguments);
     else
-      res = new gnu.expr.ApplyExp(fun.generateCode(), params);
+      res = new gnu.expr.ApplyExp(function.generateCode(), params);
 
     return Inline.inline(new EnsureTypeProc(Types.javaType(getType())), res);
   }
   
   gnu.expr.Expression compileAssign(gnu.expr.Expression value)
   {
-    if (!fun.isFieldAccess())
+    if (!function.isFieldAccess())
       Internal.error(this, "Assignment to a call that is not a field access");
     if (arguments.size() != 1)
       Internal.error(this, "A field access should have 1 parameter");
 
-    return fun.getFieldAccessMethod().compileAssign
+    return function.getFieldAccessMethod().compileAssign
       (arguments.getExp(0), value);
   }
 
@@ -441,17 +435,17 @@ public class CallExp extends Expression
     if(infix)
       if (declaringClass != null)
 	return declaringClass.getName() +
-	  "." + fun + arguments;
+	  "." + function + arguments;
       else
 	return
 	  arguments.getExp(0) + 
-	  "." + fun + 
+	  "." + function + 
 	  arguments.toStringInfix();
     else
-      return fun.toString() + arguments;
+      return function.toString() + arguments;
   }
 
-  protected ExpressionRef fun;
+  Expression function;
   protected Arguments arguments;
   
   /** true iff the first argument was written before the application: e.f(x) */

@@ -281,8 +281,8 @@ public class ClassType extends ObjectType implements AttrContainer {
         if (! field.getDeclaringClass().equals(clas))
           continue;
         int modifiers = field.getModifiers();
-        if ((modifiers & (Access.PUBLIC|Access.PROTECTED)) == 0)
-          continue;
+        if ((modifiers & (Access.PRIVATE)) != 0)
+	  continue;
         addField(field.getName(), Type.make(field.getType()), modifiers);
       }
     flags |= ADD_FIELDS_DONE;
@@ -511,7 +511,7 @@ public class ClassType extends ObjectType implements AttrContainer {
           continue;
 	
         int modifiers = method.getModifiers();
-        if ((modifiers & (Access.PUBLIC|Access.PROTECTED)) == 0)
+        if ((modifiers & (Access.PRIVATE)) != 0)
           continue;
 	
         Class[] paramTypes = method.getParameterTypes();
@@ -541,7 +541,7 @@ public class ClassType extends ObjectType implements AttrContainer {
         if (! method.getDeclaringClass().equals(clas))
           continue;
         int modifiers = method.getModifiers();
-        if ((modifiers & (Access.PUBLIC|Access.PROTECTED)) == 0)
+        if ((modifiers & (Access.PRIVATE)) != 0)
           continue;
         Class[] paramTypes = method.getParameterTypes();
         int j = paramTypes.length;

@@ -173,7 +173,7 @@ public class NiceClass extends ClassDefinition
 
 	MonoSymbol s = f.sym;
 	MethodDeclaration m = 
-	  new FieldAccessMethod(this, s.name, s.syntacticType, typeParameters);
+	  new NiceFieldAccess(this, s.name, s.syntacticType, typeParameters);
 
 	addChild(m);
       }
@@ -205,6 +205,10 @@ public class NiceClass extends ClassDefinition
 	Field f = (Field) i.next();
 	
 	f.sym.type = f.sym.syntacticType.resolve(localScope);
+
+	// The test to void should be more high-level than string comparison
+	if (f.sym.type.toString().equals("nice.lang.void"))
+	  User.error(f.sym, "Fields cannot have void type");
       }
   }
 
@@ -390,7 +394,7 @@ public class NiceClass extends ClassDefinition
 	
 	String name = f.sym.name.toString();
 	
-	// The field might have been created by a FieldAccessMethod.compile*()
+	// The field might have been created by a NiceFieldAccess.compile*()
 	if(c.getDeclaredField(name) == null)
 	  c.addField(name,
 		     nice.tools.code.Types.javaType(f.sym.type),

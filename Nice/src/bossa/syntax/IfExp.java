@@ -97,5 +97,5 @@ public class IfExp extends Expression
       ;
   }
 
-  private Expression condition,thenExp, elseExp;
+  Expression condition,thenExp, elseExp;
 }

@@ -149,4 +149,9 @@ public class Field extends Location implements AttrContainer {
     attr.addToFrontOf(this);
   }
 
+  public String toString()
+  {
+    return owner.getName() + "." + getSourceName();
+  }
 }
+

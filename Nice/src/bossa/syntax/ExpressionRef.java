@@ -88,7 +88,7 @@ final public class ExpressionRef extends Expression
     return content.isAssignable();
   }
 
-  FieldAccessMethod getFieldAccessMethod()
+  FieldAccess getFieldAccessMethod()
   {
     return content.getFieldAccessMethod();
   }

@@ -73,7 +73,7 @@ public abstract class Expression extends Node
   /**
    * @return the FieldAccessMethod behind this expression, or null
    */
-  FieldAccessMethod getFieldAccessMethod()
+  FieldAccess getFieldAccessMethod()
   {
     return null;
   }  
@@ -275,6 +275,12 @@ public abstract class Expression extends Node
     // default implementation
     return toString();
   }
+
+  // For ExpressionRef. Should be removed yhen ExpressionRef disappears
+  Expression content()
+  {
+    return this;
+  }  
   
   private Location location = Location.nowhere();
   protected Polytype type;

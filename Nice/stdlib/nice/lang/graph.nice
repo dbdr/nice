@@ -19,7 +19,7 @@ stronglyConnectedComponents<T>(start, successors)
   Stack<T> stack = new Stack();
   Map<T,int> mark = hashtable();
 
-  List<List<T>> res = new Vector();
+  List<List<T>> res = makeVector(5);
   visit(start,successors,id,stack,mark,res);
   
   return res;
@@ -50,7 +50,7 @@ visit<T>(node, successors, id, stack, mark, res)
 
   if(equals(min,mark.get(node)))
     {
-      Vector<T> scc = new Vector();
+      Vector<T> scc = makeVector(5);
       T element = null;
       while(element!=node)
 	{

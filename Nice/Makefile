@@ -124,7 +124,7 @@ gcj-testsuite:
 
 clean:
 	rm -f src/nice/tools/compiler/console.jar
-	-rm -rf classes classes-inline share/java src/bossa/parser/{Parse*.java,Token*.java,ASCII_*.java}
+	-rm -rf classes classes-inline share/java src/bossa/parser/{Parse*.java,Token*.java,*CharStream.java}
 	find "${TOP}" \( -name "*.class" -o -name "*.nicei" -o -name "*~" \) -exec rm {} \;
 
 

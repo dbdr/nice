@@ -658,10 +658,10 @@ Mode for editing/compiling Nice programs.
 ;; Return the root a of package given a file of the package
 (defun nice-root (file)
   (let* ((spl (split-string file "/"))
-	(pkg (split-string (nice-buffer-pkg-name)))
+	(pkg (split-string (nice-buffer-pkg-name) "[.]"))
 	(nlevels (length pkg)))
   (defun remove-n (s n)
-    (if (eq n 0) s
+    (if (= n 0) s
       (remove-n (cdr s) (- n 1))))
     (concat "/" 
 	    (mapconcat 

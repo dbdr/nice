@@ -95,3 +95,13 @@ class test2 {
   void doTest2() {}
 }
 
+/// PASS
+  /// package a
+  /// Toplevel
+class A
+{
+  boolean initialised = false;
+  { initialised = true; }
+}
+  /// package b import a
+  assert new A().initialised;

@@ -499,6 +499,7 @@ public class NiceClass extends ClassDefinition.ClassImplementation
          " {\n"
        + Util.map("", ";\n", ";\n", fields)
        + Util.map("", ";\n", ";\n", overrides)
+       + Util.map("{\n", "\n", "}\n", initializers)
        + "}\n\n"
        );
   }

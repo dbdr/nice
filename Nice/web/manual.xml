@@ -705,7 +705,7 @@ interface Buffer<Elem>
         <para>
           Contrarily to Java, Nice produces programs with assertions that can 
 	  be run on earlier JDKs. Therefore there is no problem to distribute 
-	  Nice programs using assertions anc contracts. Since java will not 
+	  Nice programs using assertions and contracts. Since java will not 
 	  know the <literal>-ea</literal> command line option, they are 
 	  disabled by default. You can enable them with 
 	  <userinput>java -Dassertions=true ...</userinput>.

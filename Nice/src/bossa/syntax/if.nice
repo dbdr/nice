@@ -51,15 +51,13 @@ public class IfExp extends Expression
   
   toString()
   {
-    return 
-      "if(" +
-      String.valueOf(condition) +
-      ")\n" +
-      String.valueOf(thenExp) +
-      "\nelse\n" +
-      String.valueOf(elseExp) +
-      "\n"
-      ;
+    if (elseExp instanceof VoidConstantExp)
+      return "if (" + condition + ")\n" + thenExp + "\n";
+
+    if (! (elseExp instanceof StatementExp))
+      return condition + " ? " + thenExp + " : " + elseExp;
+
+    return "if (" + condition + ")\n" + thenExp + "\nelse\n" + elseExp + "\n";
   }
 }
 

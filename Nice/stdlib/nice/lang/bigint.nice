@@ -12,6 +12,8 @@ BigInteger `*`(BigInteger, BigInteger) = native BigInteger BigInteger.multiply(B
 BigInteger `/`(BigInteger, BigInteger) = native BigInteger BigInteger.divide(BigInteger);
 BigInteger `%`(BigInteger, BigInteger) = native BigInteger BigInteger.remainder(BigInteger);
 
+BigInteger `**`(BigInteger, int) = native BigInteger BigInteger.pow(int);
+
 BigInteger `<<`(BigInteger, int) = native BigInteger BigInteger.shiftLeft(int);
 BigInteger `>>`(BigInteger, int) = native BigInteger BigInteger.shiftRight(int);
 

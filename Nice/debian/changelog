@@ -1,5 +1,6 @@
 nice (0.9.0) unstable; urgency=low
 
+  * Added operator ** to calculate powers of longs, doubles and BigIntegers.
   * Archives (generated with the -a option) can now be used to distribute
     Nice libraries.
   * Interfaces can now implement (finally or not) abstract interfaces.

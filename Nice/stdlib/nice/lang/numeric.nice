@@ -212,3 +212,22 @@ int    min(int   , int   ) = native int    Math.min(int   , int   );
 
 // Comparable interface
 `<`(n1@Number, n2@Number) = n1.doubleValue() < n2.doubleValue();
+
+// exponential functions
+long `**`(long x, long e) {
+  if (e < 0) throw new IllegalArgumentException();
+  if (e == 0) return 1;
+
+  long res = 1;
+  long tmp = x;
+  do {
+    if ( (e & 1L) != 0) res *= tmp;
+
+    tmp *= tmp;
+    e = e >> 1;
+  } while (e != 0);
+
+  return res;
+}    
+
+double `**`(double, double) = native double Math.pow(double, double);

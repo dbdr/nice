@@ -493,26 +493,19 @@ public class MethodBodyDefinition extends Definition
     if(Debug.codeGeneration)
       Debug.println("Compiling MAIN method");
     
-    // We should probably use Gen.createMethod here too.
-
-    gnu.expr.BlockExp block = new gnu.expr.BlockExp(Type.void_type);
-    gnu.expr.LambdaExp lexp = new gnu.expr.LambdaExp(block);
-    lexp.setName("main");
-
-    // Main arguments
-    lexp.min_args = lexp.max_args = 1;
-    lexp.setCanCall(true);
-    lexp.forceGeneration();
-
-    gnu.expr.Declaration args = lexp.addDeclaration("args");
-    args.noteValue(null);
-    args.setType(gnu.bytecode.ArrayType.make(Type.string_type));
+    MonoSymbol args = new MonoSymbol
+      (new LocatedString("args", Location.nowhere()), 
+       (bossa.syntax.Monotype) null);
+    
+    gnu.expr.LambdaExp lexp = Gen.createMethod
+      ("main", 
+       new Type[]{ gnu.bytecode.ArrayType.make(Type.string_type) },
+       Type.void_type, 
+       new MonoSymbol[]{ args });
 
     // Call arguments
-    gnu.expr.Expression[] eVal = new gnu.expr.Expression[] 
-    { new gnu.expr.ReferenceExp("args",args) };
-
-    block.setBody(new gnu.expr.ApplyExp(mainAlternative, eVal));
+    gnu.expr.Expression[] eVal = new gnu.expr.Expression[]{ args.compile() };
+    Gen.setMethodBody(lexp, new gnu.expr.ApplyExp(mainAlternative, eVal));
 
     module.addMethod(lexp, true);
 

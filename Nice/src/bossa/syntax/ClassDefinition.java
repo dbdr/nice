@@ -288,8 +288,13 @@ public abstract class ClassDefinition extends MethodContainer
 
       ClassDefinition d = getSuperClassDefinition();
       if (d != null)
-        d.resolve();
+        {
+          d.resolve();
 
+          if(d.getImplementation() instanceof PrimitiveType && ! 
+		(this.getImplementation() instanceof PrimitiveType))
+            User.error(this, "A class can't extends a primitive");
+        }
       super.resolveClass();
     }
 

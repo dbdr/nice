@@ -48,6 +48,11 @@ public class LiteralArrayProc extends gnu.mapping.ProcedureN
 
     code.emitPushInt(nbElements);
     code.emitNewArray(arrayType.getComponentType());
+
+    // Set a special type, not the legacy array type.
+    code.popType();
+    code.pushType(arrayType);
+
     
     /*
       Optimization:

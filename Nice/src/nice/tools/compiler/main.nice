@@ -81,9 +81,8 @@ main(args)
 	  "file",
 	  fun(String output) => { compilation.output = output; }),
 
-   // This will specify native compilation in the future
    option('o', "output",
-	  "Generate native executable (not supported yet)",
+	  "Generate native executable",
 	  "file",
 	  fun(String output) => { 
 	    compilation.output = output + ".jar"; 
@@ -167,6 +166,8 @@ main(args)
       exn.printStackTrace();
       System.exit(1);
     }
+
+  OutputMessages.exitIfErrors();
 
   if (nativeProgram != null)
     produceNativeProgram(mainPackage, nativeProgram);

@@ -12,7 +12,7 @@
 
 // File    : parser.jj
 // Created : Thu Jul 01 10:27:05 1999 by bonniot
-//$Modified: Mon Mar 13 17:35:42 2000 by Daniel Bonniot $
+//$Modified: Fri Apr 21 16:52:04 2000 by Daniel Bonniot $
 // Description : Parseur JavaCC pour Bossa
 //   Tokens based on the Jazz parser
 
@@ -268,6 +268,19 @@ TOKEN: /* String literals */
       )*
       "\""
   >
+|
+  < BACKQUOTEDSTRING:
+      "`"
+      (   (~["`","\\","\n","\r"])
+        | ("\\"
+            ( ["n","t","b","r","f","\\","'","\""]
+            | ["0"-"7"] ( ["0"-"7"] )?
+            | ["0"-"3"] ["0"-"7"] ["0"-"7"]
+            )
+          )
+      )*
+      "`"
+  >
 }
 
 /***********************************************************************
@@ -355,7 +368,7 @@ LocatedString methodName():
 }
 {
   (
-   name=<LSTRING>
+   name=<BACKQUOTEDSTRING>
    { res = new LocatedString(name.image.substring(1, name.image.length() - 1),
 			     new Location(name),
 			     true); }
@@ -1067,26 +1080,6 @@ StringConstantExp stringConstantExp():
   { return new StringConstantExp(s); }
 }
 
-Expression constantExp():
-{
-  Expression res;
-  Token t;
-}
-{
-  (
-  "null" { res=new NullExp(); }
-| res=intConstantExp() 
-| res=floatConstantExp()
-| t=<CHARACTER_LITERAL> 
-    { res=ConstantExp.makeChar
-      (new LocatedString(t.image.substring(1,t.image.length()-1),
-			 new Location(t)));
-    }
-| res=stringConstantExp()
-  )
-{ return res; }
-}
-
 IdentExp identExp():
 {
   LocatedString i;
@@ -1522,6 +1515,8 @@ Expression Literal() :
 			 new Location(t)));
     }
 | res=stringConstantExp()
+| t=<BACKQUOTEDSTRING> 
+    { res = symb(t.image.substring(1,t.image.length()-1),t); }
   )
 { return res; }
 }

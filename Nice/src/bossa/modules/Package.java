@@ -12,7 +12,7 @@
 
 // File    : Package.java
 // Created : Wed Oct 13 16:09:47 1999 by bonniot
-//$Modified: Fri Mar 31 20:43:27 2000 by Daniel Bonniot $
+//$Modified: Fri Apr 21 14:41:34 2000 by Daniel Bonniot $
 
 package bossa.modules;
 
@@ -24,6 +24,7 @@ import gnu.bytecode.*;
 import gnu.expr.*;
 
 import java.util.*;
+import java.util.jar.*;
 import java.io.*;
 
 import bossa.modules.Compilation;
@@ -49,6 +50,9 @@ public class Package implements mlsub.compilation.Module
     if(sourcesRead || date<=lastModified)
       return;
     
+    if(itfFromJar!=null)
+      User.error(name+" should be recompiled, but it was loaded from an archive file");
+    
     if(Debug.modules)
       Debug.println("Recompiling "+this+
 		    " because a required package changed "+
@@ -61,7 +65,7 @@ public class Package implements mlsub.compilation.Module
   }
   
   public void compile()
-  {
+  {    
     typecheck();
     generateCode();
     saveInterface();
@@ -114,7 +118,7 @@ public class Package implements mlsub.compilation.Module
     opens.add(new LocatedString("java.lang", bossa.util.Location.nowhere()));
 
     findPackageDirectory();
-    if(directory==null)
+    if(directory==null && itfFromJar==null)
       User.error(name,"Could not find package "+name);
     //Debug.println("Dir of "+this+" is "+directory.getPath());
     
@@ -126,25 +130,30 @@ public class Package implements mlsub.compilation.Module
 
   private void read(boolean forceReload)
   {
-    File[] sources = getSources();
-    File itf = getInterface();
-
-    lastModified = maxLastModified(sources);
-    
     Definition.currentModule = this;
     
     List definitions = new LinkedList();
-
-    if(!forceReload &&
-       itf!=null && lastModified <= itf.lastModified())
-      read(itf, definitions);
+    if(itfFromJar!=null)
+      bossa.parser.Loader.open(itfFromJar, name.toString(), 
+			       definitions, imports, opens);
     else
       {
-	if(sources.length==0)
-	  User.error(name, "Package "+name+" has no source file");
+	File[] sources = getSources();
+	File itf = getInterface();
+
+	lastModified = maxLastModified(sources);
+    
+	if(!forceReload &&
+	   itf!=null && lastModified <= itf.lastModified())
+	  read(itf, definitions);
+	else
+	  {
+	    if(sources.length==0)
+	      User.error(name, "Package "+name+" has no source file in "+directory);
 	
-	read(sources, definitions);
-	sourcesRead();
+	    read(sources, definitions);
+	    sourcesRead();
+	  }
       }
     
     this.ast = new AST(this, expand(definitions));
@@ -190,7 +199,14 @@ public class Package implements mlsub.compilation.Module
     if(Debug.passes)
       Debug.println("Parsing "+sourceFile);
     
-    bossa.parser.Loader.open(sourceFile, definitions, imports, opens);
+    try{
+      Reader reader = new BufferedReader(new FileReader(sourceFile));
+      bossa.parser.Loader.open(reader, sourceFile.getName(),
+			       definitions, imports, opens);
+    }
+    catch(FileNotFoundException e){
+      User.error(sourceFile.getName()+" of package "+name+" could not be found");
+    }
   }
   
   private void read(File[] sources, List definitions)
@@ -298,7 +314,45 @@ public class Package implements mlsub.compilation.Module
   public void endOfLink()
   {
     if(isRunnable())
-      addClass(dispatchClass);
+      closeJar();
+  }
+  
+  private static JarOutputStream jar;
+  
+  private void createJar()
+  {
+    String name = this.name.toString();
+    int lastDot = name.lastIndexOf('.');
+    if(lastDot!=-1)
+      name = name.substring(lastDot+1, name.length());
+    
+    try{
+      OutputStream out = new FileOutputStream(new File(directory.getParent(),
+						       name+".jar"));
+      Manifest manifest = new Manifest();
+
+      manifest.getMainAttributes().put(Attributes.Name.MANIFEST_VERSION,"1.0");
+      manifest.getMainAttributes().put(Attributes.Name.MAIN_CLASS, name+".package");
+     
+      jar = new JarOutputStream(out, manifest);
+    }
+    catch(IOException e){
+      User.error(this.name, "Error during creation of executable file: "+e);
+    }
+  }
+  
+  private void closeJar()
+  {
+    try{
+      JarEntry dispatchEntry = new JarEntry("dispatchClass.class");
+      jar.putNextEntry(dispatchEntry);
+      dispatchClass.writeToStream(jar);
+
+      jar.close();
+    }
+    catch(IOException e){
+      User.error(this.name, "Error during creation of executable file: "+e);
+    }
   }
   
   private void saveInterface()
@@ -400,13 +454,14 @@ public class Package implements mlsub.compilation.Module
     //comp = new gnu.expr.Compilation(pkg, name.toString()+"DUMMY",
     //name.toString()+".", false);
 
-    comp = new gnu.expr.Compilation(bytecode,name.toString(),name.toString(),"prefix",false);
+    comp = new gnu.expr.Compilation(bytecode,name.toString(),
+				    name.toString(),"prefix",false);
     
     ast.compile();
-
+    
     if(isRunnable()) 
       MethodBodyDefinition.compileMain(this, mainAlternative);
-
+    
     comp.compileClassInit(initStatements);
     
     addClass(bytecode);
@@ -424,9 +479,20 @@ public class Package implements mlsub.compilation.Module
   
   public void addClass(ClassType c)
   {
+    // if we did not have to recompile, no class has to be regenerated
+    if(!sourcesRead)
+      return;
+    
     try{
       c.setSourceFile(name+sourceExt);
-      c.writeToFile(new File(rootDirectory,c.getName().replace('.',File.separatorChar)+".class"));
+      String filename = c.getName().replace('.',File.separatorChar)+".class";
+      if(jar==null)
+	c.writeToFile(new File(rootDirectory, filename));
+      else
+	{
+	  jar.putNextEntry(new JarEntry(filename));
+	  c.writeToStream(jar);
+	}
     }
     catch(IOException e){
       User.error(this.name,"Could not write code for "+this,": "+e);
@@ -495,7 +561,7 @@ public class Package implements mlsub.compilation.Module
 
   private static final String sourceExt = ".bossa";
   
-  private static final String[] packageRoots;
+  private static final Object[] packageRoots;
   static 
   {
     String path = Debug.getProperty("bossa.package.path",".");
@@ -510,12 +576,23 @@ public class Package implements mlsub.compilation.Module
 	    
 	String pathComponent=path.substring(start,end);
 	if(pathComponent.length()>0)
-	  res.add(pathComponent);
-	
+	  {
+	    File f = new File(pathComponent);
+	    if(f.exists())
+	      {
+		if(pathComponent.endsWith(".jar"))
+		  try{
+		    res.add(new JarFile(f));
+		  }
+		  catch(IOException e){}
+		else
+		  res.add(f);
+	      }
+	  }
 	start=end+1;
       }
 
-    packageRoots = (String[]) res.toArray(new String[res.size()]);
+    packageRoots = res.toArray(new Object[res.size()]);
   }
   
   private InputStream openClass()
@@ -583,15 +660,32 @@ public class Package implements mlsub.compilation.Module
     String rname = name.toString().replace('.',File.separatorChar);
     
     for(int i=0; i<packageRoots.length; i++)
-      {
-	directory = new File(packageRoots[i],rname);
-	if(directory.exists())
-	  {
-	    rootDirectory=new File(packageRoots[i]);
-	    return;
-	  }
-      }
-    directory=null;
+      if(packageRoots[i] instanceof File)
+	{
+	  directory = new File((File) packageRoots[i], rname);
+	  if(directory.exists())
+	    {
+	      rootDirectory = (File) packageRoots[i];
+	      return;
+	    }
+	  else
+	    directory = null;
+	}
+      else
+	{
+	  JarFile jar = (JarFile) packageRoots[i];
+	  JarEntry ent = jar.getJarEntry(rname+"/package.bossi");
+	  if(ent!=null)
+	    try{
+	      itfFromJar = new BufferedReader
+		(new InputStreamReader(jar.getInputStream(ent)));
+	      ent = jar.getJarEntry(rname+"/package.class");
+	      bytecode = ClassFileInput.readClassType(jar.getInputStream(ent));
+	    }
+	    catch(IOException e){
+	      User.error(this.name, "Error reading archive "+jar);
+	    }
+	}
   }
   
   /****************************************************************
@@ -642,14 +736,35 @@ public class Package implements mlsub.compilation.Module
 
   /** The component of the package path this package was found in. */ 
   private File rootDirectory;
+
+  /** The interface file of the package if it was found in a jar file */
+  private Reader itfFromJar;
   
   /** The compilation that is in process. */
   private Compilation compilation;
   
+  /** Whether this package has a "main" method */
+  private boolean isRunnable;
   public boolean isRunnable()
   {
-    return mainAlternative!=null;
+    return isRunnable;
   }
+  public void isRunnable(boolean isRunnable)
+  {
+    this.isRunnable = isRunnable;
+    if(isRunnable && !compilation.skipLink)
+      createJar();
+  }
+
+  private gnu.bytecode.Method mainAlternative=null;
+  public void setMainAlternative(gnu.bytecode.Method main)
+  {
+    mainAlternative=main;
+  }
+  public gnu.bytecode.Method getMainAlternative()
+  {
+    return mainAlternative;
+  }  
   
   public boolean generatingBytecode()
   {
@@ -663,16 +778,6 @@ public class Package implements mlsub.compilation.Module
   private boolean sourcesRead;
 
   private long lastModified;
-  
-  private gnu.bytecode.Method mainAlternative=null;
-  public void setMainAlternative(gnu.bytecode.Method main)
-  {
-    mainAlternative=main;
-  }
-  public gnu.bytecode.Method getMainAlternative()
-  {
-    return mainAlternative;
-  }
   
   private boolean dbg = Debug.modules;
 }

@@ -12,7 +12,7 @@
 
 // File    : Debug.java
 // Created : Thu Jul 22 15:37:02 1999 by bonniot
-//$Modified: Mon Feb 14 15:49:23 2000 by Daniel Bonniot $
+//$Modified: Thu Apr 20 16:56:25 2000 by Daniel Bonniot $
 
 package bossa.util;
 
@@ -43,17 +43,15 @@ public abstract class Debug
   {
     props=new Properties();
     try {
-      FileInputStream in =
-        new FileInputStream(new File(System.getProperty("user.home"),
-                                     ".bossa.conf"));
+      File f = new File(System.getProperty("user.home"),
+			".bossa.conf");
+      
+      FileInputStream in = new FileInputStream(f);
       props.load(new BufferedInputStream(in));
       in.close();
-      //props.list(System.out);
     }
     catch (Exception e) {
-      println("Can't read "+
-	      System.getProperty("user.home")+
-	      "/.bossa.conf");
+      //Debug.println("Can't read "+f);
     }
   }
 
@@ -68,7 +66,11 @@ public abstract class Debug
 
   public static String getProperty(String name, String def)
   {
-    return props.getProperty(name, def);
+    String res = props.getProperty(name, null);
+    if(res==null)
+      res = System.getProperty(name, def);
+
+    return res;
   }
   
   public static final boolean 

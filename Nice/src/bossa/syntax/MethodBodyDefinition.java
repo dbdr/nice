@@ -12,7 +12,7 @@
 
 // File    : MethodBodyDefinition.java
 // Created : Thu Jul 01 18:12:46 1999 by bonniot
-//$Modified: Wed Apr 05 14:50:00 2000 by Daniel Bonniot $
+//$Modified: Fri Apr 21 16:12:15 2000 by Daniel Bonniot $
 
 package bossa.syntax;
 
@@ -57,6 +57,9 @@ public class MethodBodyDefinition extends Definition
     this.definition=null;
     
     addChild(this.body);
+
+    if(name.content.equals("main") && formals.size()==1+1) // a dummy "this" parameter
+      module.isRunnable(true);
   }
 
   public Collection associatedDefinitions()
@@ -226,12 +229,19 @@ public class MethodBodyDefinition extends Definition
     VarSymbol s=findSymbol(scope);
 
     if(s==null)
-      User.error(this,name+" is not defined");
+      User.error(this, name+" is not defined");
     
     if(!(s instanceof MethodDefinition.Symbol))
-      User.error(this,name+" is not a method");
+      User.error(this, name+" is not a method");
 
-    setDefinition((MethodDefinition) ((MethodDefinition.Symbol) s).definition);
+    MethodDefinition def = ((MethodDefinition.Symbol) s).definition;
+    
+    if(!def.getClass().getName().equals("bossa.syntax.MethodDefinition"))
+      User.error(this, name+" is not a bossa method, you can not define an alternative for it");
+    
+    //Debug.println("Def for "+this+" is "+s+" "+s.location());
+    
+    setDefinition(def);
 
     // Get type parameters
     if(binders!=null)
@@ -283,7 +293,7 @@ public class MethodBodyDefinition extends Definition
 		   ": "+e.getMessage());
       }
       
-      Collection monotypes=MonoSymbol.getMonotype(parameters);
+      Collection monotypes = MonoSymbol.getMonotype(parameters);
       Typing.introduce(monotypes);
 
       Typing.leqMono

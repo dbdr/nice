@@ -12,7 +12,7 @@
 
 // File    : Loader.java
 // Created : Thu Jul 29 09:43:50 1999 by bonniot
-//$Modified: Mon Feb 14 15:30:34 2000 by Daniel Bonniot $
+//$Modified: Fri Apr 21 14:01:44 2000 by Daniel Bonniot $
 
 package bossa.parser;
 
@@ -30,19 +30,14 @@ import bossa.util.*;
 
 public abstract class Loader
 {
-  public static void open(File file, 
+  public static void open(Reader r, 
+			  String filename, // only for locating identifiers
 			  List definitions,
 			  List imports,
 			  List importStars)
   {
-    Location.currentFile=file.getName();
+    Location.currentFile = filename;
 
-    Reader r=null;
-    try{ r=new BufferedReader(new FileReader(file)); }
-    catch(FileNotFoundException e){
-      User.error("File "+file.getName()+" not found");
-    }
-    
     if(parser==null)
       parser=new Parser(r);
     else

@@ -12,7 +12,7 @@
 
 // File    : LocatedString.java
 // Created : Fri Jul 09 19:09:47 1999 by bonniot
-//$Modified: Tue Feb 01 19:17:46 2000 by Daniel Bonniot $
+//$Modified: Tue Apr 25 12:18:11 2000 by Daniel Bonniot $
 // Description : A string + location information
 
 package bossa.syntax;
@@ -30,19 +30,19 @@ public class LocatedString
   /**
    * @param content the underlying raw string
    * @param loc the location of this string in the source
-   * @param quoted true if this string must be quoted (operators like "+")
+   * @param quoted true if this string must be quoted (operators like `+`)
    */
   public LocatedString(String content, Location loc, boolean quoted)
   {
-    this.content=content;
-    this.location=loc;
+    this.content = content;
+    this.location = loc;
     this.quoted = quoted;
   }
 
   public String toQuotedString()
   {
     if(quoted)
-      return "\""+content+"\"";
+      return "`"+content+"`";
     else
       return content;
   }

@@ -1242,7 +1242,12 @@ public class LambdaExp extends ScopeExp
 	    Method constructor = comp.getConstructor(frameType, this);
 	    code.emitInvokeSpecial(constructor);
 
-            if (staticLinkField != null)
+            // In a constructor, the closure (this) is not valid until the
+            // end, so it shouldn't be used (presumably it is not used
+            // anyway).
+            // There might be a deeper change that would make this test
+            // unnecessary.
+            if (staticLinkField != null && ! (this instanceof ConstructorExp))
               {
                 code.emitDup(heapFrame.getType());
                 code.emitLoad(closureEnv);

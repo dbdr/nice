@@ -121,11 +121,11 @@ new B(int x) {
 /// FAIL
   /// Toplevel
   class A {}
-  new /*/// FAIL HERE */A(int n) { 
+  new /*/// FAIL HERE */A(int n) {
     this(n);
   }
 
-/// PASS bug
+/// PASS
   // bug #1070579
   let x = new X(5);
   /// Toplevel
@@ -133,6 +133,6 @@ new B(int x) {
   new X(int a) {
     int n = 0;
     void foo() { n++; }
-    foo(); 
+    foo();
     this();
   }

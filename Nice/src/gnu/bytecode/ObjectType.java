@@ -59,7 +59,7 @@ public class ObjectType extends Type
 	nice.tools.code.TypeImport.lookupQualifiedJavaClass(getInternalName().replace('/', '.'));
 
     if (reflectClass == null && (flags & EXISTING_CLASS) != 0)
-      throw new RuntimeException("no such class: "+getName());
+      throw new NoClassDefFoundError(getName());
 
     return reflectClass;
   }

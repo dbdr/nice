@@ -42,7 +42,7 @@ class Documenter {
     // Example code that accesses some properties of classes:
 
     println("Class " + c.getName);
-    ClassDefinition superClass = c.getSuperClassDefinition();
+    ?ClassDefinition superClass = c.getSuperClassDefinition();
     if (superClass != null)
       println("  extends " + superClass.getName());
 

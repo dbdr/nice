@@ -39,6 +39,12 @@ public final class OutputMessages
     exitIfErrors();
   }
   
+  public static void bug(String message)
+  {
+    setStatusCode(BUG);
+    System.err.println(message);
+  }
+  
   public static void exitIfErrors()
   {
     if (statusCode == ERROR || statusCode == BUG)

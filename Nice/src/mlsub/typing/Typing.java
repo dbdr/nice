@@ -38,10 +38,19 @@ public final class Typing
    */
   public static int enter()
   {
+    return enter(false);
+  }
+
+  /**
+     @param tentative when true, we will decide upon leaving if we want to 
+       commit the changes made to existential type variables or not.
+  */
+  public static int enter(boolean tentative)
+  {
     if(dbg) 
       Debug.println("ENTER "+level);
 
-    Engine.enter();
+    Engine.enter(tentative);
     return level++;
   }
 
@@ -98,12 +107,23 @@ public final class Typing
   public static int leave()
     throws TypingEx
   {
+    return leave(false, false);
+  }
+
+  /**
+     @param tentative must match the parameter used when entering
+     @param commit if tentative is true, then commit selects whether we 
+       want to commit the changes made to existential type variables or not.
+  */
+  public static int leave(boolean tentative, boolean commit)
+    throws TypingEx
+  {
     if(dbg) 
       Debug.println("LEAVE "+(level-1));
     
     try{
       level--;
-      Engine.leave();
+      Engine.leave(tentative, commit);
     }
     catch(Unsatisfiable e){
       if(dbg) e.printStackTrace();

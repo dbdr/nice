@@ -37,14 +37,15 @@ public abstract class Engine
    * If an enter() completed successfully,
    * a matching leave() MUST be issued some time later by the caller.
    */
-  public static void enter()
+  public static void enter(boolean tentative)
   {
     if(dbg) Debug.println("Enter");
     floating.mark();
     soft.mark();
+    formerFree.mark();
 
     // Once we are in existential mode, we don't mark/backtrack.
-    if (existentialLevel > 0)
+    if (!tentative && existentialLevel > 0)
       existentialLevel++;
     else
       {
@@ -101,9 +102,15 @@ public abstract class Engine
    *
    * @exception Unsatisfiable if the constraint was not satisfiable.
    */
-  public static void leave()
+  public static void leave(boolean tentative, boolean commit)
     throws Unsatisfiable
   {
+    // 'tentative' is only meaningful when in existential mode
+    tentative &= existentialLevel > 0;
+    // We only 'commit' in tentative mode
+    commit &= tentative;
+      
+    boolean ok = false;
     try{
       assertFrozens();
 
@@ -124,30 +131,53 @@ public abstract class Engine
 	    throw e;
 	  }
 	}
+      ok = true;
     }
     finally{
-      backtrack();
+      // Even if commit is true, if an error appeared during leaving
+      // then we don't want to keep the changes.
+      backtrack(tentative, ok && commit);
     }
   }
   
-  public static void backtrack()
+  public static void backtrack(boolean tentative, boolean commit)
   {
-    if (existentialLevel <= 1)
+    floating.backtrack();
+
+    if (existentialLevel <= 1 || tentative)
       {
         for(Iterator i = constraints.iterator();
             i.hasNext();)
           { 
             Engine.Constraint k = (Engine.Constraint) i.next();
-            k.backtrack();
+            k.backtrack(commit);
           }
 
-        frozenLeqs.backtrack();
+        if (! commit)
+          frozenLeqs.backtrack();
+
+        if (tentative && !commit)
+          {
+            // These type variables used to be free. Since we don't commit, 
+            // we must set them free again!
+            try{
+              for (Iterator i = formerFree.iterator(); i.hasNext();)
+                {
+                  Element e = (Element) i.next();
+                  e.setKind(null);
+                  floating.add(e);
+                }
+            }
+            finally{
+              formerFree.endOfIteration();
+            }
+          }
       }
 
-    floating.backtrack();
     soft.backtrack();
+    formerFree.backtrack();
 
-    if (existentialLevel > 0)
+    if (!tentative && existentialLevel > 0)
       existentialLevel--;
   }
 
@@ -450,6 +480,9 @@ public abstract class Engine
 	      ("Bad Kinding for " + e + ":\nhad: " + e.getKind() +
 	       "\nnew: " + k);
 	
+        if (e.isExistential())
+          formerFree.add(e);
+
 	// assert e.getKind()==null
 	k.register(e);
 	e.setKind(k);
@@ -615,12 +648,12 @@ public abstract class Engine
 
 	  e.setKind(variablesConstraint);
 	  variablesConstraint.register(e);
+          i.remove();
 	}
     }
     finally{
       floating.endOfIteration();
     }
-    floating.clear();
     
     try {
       for(Iterator i = frozenLeqs.iterator(); i.hasNext();)
@@ -683,6 +716,9 @@ public abstract class Engine
   
   /** The elements that have not yet been rigidified. */
   private static final BackableList soft = new BackableList();
+  
+  /** The elements that have been put into a kind since the last mark. */
+  private static final BackableList formerFree = new BackableList();
   
   /** The constraint of monotype variables */
   public static Engine.Constraint variablesConstraint;
@@ -959,9 +995,9 @@ public abstract class Engine
       k0.mark();
     }
 
-    void backtrack()
+    void backtrack(boolean ignore)
     {
-      k0.backtrack();
+      k0.backtrack(ignore);
     }
 
     void startSimplify()

@@ -106,7 +106,7 @@ public class CallExp extends Expression
   static Polytype wellTyped(Polytype funt, Polytype[] parameters)
   {
     try{
-      Polytype t = getType(funt, parameters);
+      Polytype t = getType(funt, parameters, true);
       return t;
     }
     catch(ReportErrorEx e){}
@@ -123,7 +123,7 @@ public class CallExp extends Expression
     Polytype[] paramTypes = Expression.getType(parameters);
     
     try{
-      return getType(function.getType(), paramTypes);
+      return getType(function.getType(), paramTypes, false);
     }
     catch(BadSizeEx e){
       User.error(loc, function.toString(Printable.detailed) + 
@@ -166,8 +166,12 @@ public class CallExp extends Expression
     ReportErrorEx(String msg) { super(msg); }
   }
   
-  private static Polytype getType(Polytype type,
-				  Polytype[] parameters)
+  /**
+     @param tentative whether we only want to check if the call is valid
+       (as during overloading resolution).
+  */
+  private static Polytype getType(Polytype type, Polytype[] parameters,
+                                  boolean tentative)
     throws TypingEx, BadSizeEx, ReportErrorEx
   {
     Monotype m = type.getMonotype();
@@ -204,8 +208,9 @@ public class CallExp extends Expression
     Constraint cst = type.getConstraint();
     final boolean doEnter = true; //Constraint.hasBinders(cst);
     
-    if(doEnter) Typing.enter();
-    
+    if(doEnter) Typing.enter(tentative);
+
+    boolean ok = false;
     try
       {
 	try{ Constraint.enter(cst); }
@@ -223,10 +228,14 @@ public class CallExp extends Expression
 	  }
 	
 	Typing.in(parameters, dom);
+        ok = true;
       }
     finally{
       if(doEnter)
-	Typing.leave();
+        // If we are in tentative mode and the call is valid, then
+        // we make the effects last (that's only important when there are
+        // existential type variables in the context).
+	Typing.leave(tentative, tentative && ok);
     }
 
     return Polytype.apply(cst, funt, parameters);

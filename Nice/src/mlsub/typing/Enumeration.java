@@ -211,7 +211,7 @@ public class Enumeration
     // The variable TCs that will hold the solutions.
     TypeConstructor[] vars = new TypeConstructor[tags.length];
 
-    Engine.enter();
+    Engine.enter(false);
     try{
       
       for(int i = 0;i<tags.length;i++)
@@ -272,7 +272,7 @@ public class Enumeration
 	return emptyList;
     }
     finally{
-      Engine.backtrack();
+      Engine.backtrack(false, false);
     }
     
     return tuples.tags;

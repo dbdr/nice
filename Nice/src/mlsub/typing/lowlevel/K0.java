@@ -1370,11 +1370,17 @@ public final class K0 {
   }
 
   // backtrack to the situation the last time mark() has been called
-  public void backtrack() {
+  public void backtrack(boolean ignore) {
     if (backup == null)
       // This can happen for a K0 that has been created on the fly
       // at a point where (several) backups existed.
       return;
+
+    if (ignore)
+      {
+        backup = backup.previous;
+        return;
+      }
 
     S.assume(S.a&& hasBeenInitialized);
 
@@ -2132,7 +2138,7 @@ public final class K0 {
           } catch (Unsatisfiable e) {
             possibilities.clear(x0);
           } finally {
-            backtrack();
+            backtrack(false);
             backup = savedBackup;
           }
         }

@@ -122,14 +122,21 @@ foo() {
   while (!L1.isEmpty)
     L3.add( L1.removeFirst );
 
-/// PASS bug
+/// PASS
   let L1 = new LinkedList();
   L1.add(999);         
   println( L1[0] );
 
-/// PASS bug
+/// PASS
   let testmap = new HashMap();
    for(s : testmap.keySet())
      {
        String x = s + " => " + testmap[s];
      }
+
+/// PASS
+ let testmap = new HashMap();
+ for(s : ["1", "2", "3"])
+   testmap[s] = Integer.parseInt(s);
+ for(s : testmap.keySet())
+   println(s + " => " + testmap[s]);

@@ -88,7 +88,7 @@ boolean fail() { throw new Error(); }
 //  assert !(true->false);
 //  assert true->false||true;
 //  assert true->(false->true);
-  
-/// FAIL
+
+/// FAIL bug skip
   // non associative
   boolean b = true->true->true;

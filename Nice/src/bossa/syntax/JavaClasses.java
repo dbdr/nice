@@ -304,6 +304,10 @@ public final class JavaClasses
 		   "It is refered to in class " + classType.getName() +
 		   "\nYou probably need to install the corresponding package.");
     }
+    catch (ClassFormatError e) {
+      User.warning("Class " + classType.getName() + 
+		   " has an invalid bytecode format");
+    }
     
     for (Field f = classType.getFields(); f != null; f = f.getNext())
       {

@@ -28,12 +28,12 @@ class PackageExp extends Expression
 {
   PackageExp(String name)
   {
-    this.name = name;
+    this.name = new StringBuffer(name);
   }
 
-  String getName()
+  LocatedString locatedName()
   {
-    return name;
+    return new LocatedString(name.toString(), location());
   }
   
   public String toString()
@@ -62,5 +62,5 @@ class PackageExp extends Expression
     return null;
   }
   
-  private String name;
+  StringBuffer name;
 }

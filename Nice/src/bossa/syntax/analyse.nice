@@ -194,9 +194,11 @@ analyse(e@CallExp, info)
       PackageExp pkg = e.arguments.packageExp();
       if (pkg != null)
 	{
-	  String nextComponent = identString(e.function).toString();
+	  LocatedString nextComponent = identString(e.function);
+
 	  if (nextComponent == null)
-	    throw unknownIdent(new LocatedString(pkg.getName(), bossa.util.Location.nowhere()));
+	    throw unknownIdent(pkg.locatedName());
+
 	  return ClassExp.create(pkg, nextComponent);
 	}
     }

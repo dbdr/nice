@@ -49,22 +49,22 @@ public final class ClassExp extends Expression
   /**
      Creates a ClassExp, or a PackageExp.
   */
-  static Expression create(PackageExp p, String ident)
-  {
-    return create(p.getName() + "." + ident, p.location());
-  }
-  
   static Expression create(LocatedString ident)
   {
-    return create(ident.toString(), ident.location());
+    return create(null, ident);
   }
   
-  static Expression create(String ident, Location loc)
+  /**
+     @return the ClassExp or PackageExp representing [root].[name]
+  */
+  static Expression create(PackageExp root, LocatedString name)
   {
-    Expression res = null;
-
+    String fullName = name.toString();
+    if (root != null)
+      fullName = root.name.append(".").append(fullName).toString();
+    
     mlsub.typing.TypeConstructor tc = (mlsub.typing.TypeConstructor)
-      Node.getGlobalTypeScope().lookup(ident);
+      Node.getGlobalTypeScope().lookup(fullName);
 
     if(tc != null)
       {
@@ -72,15 +72,15 @@ public final class ClassExp extends Expression
 	// type might not be a class
 	// for instance if the ident was "int"
 	if (type instanceof gnu.bytecode.ClassType)
-	  res = new ClassExp((gnu.bytecode.ClassType) type);
+	  {
+	    Expression res = new ClassExp((gnu.bytecode.ClassType) type);
+	    res.setLocation(name.location());
+	    return res;
+	  }
       }
 
-    if(res == null)
-      res = new PackageExp(ident);
-
-    res.setLocation(loc);
-    
-    return res;
+    // name has been appended to root's name
+    return root;
   }
   
   /****************************************************************

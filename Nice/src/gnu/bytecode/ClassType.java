@@ -592,6 +592,14 @@ public class ClassType extends ObjectType implements AttrContainer {
 
   public Method getMethod(String name, Type[] arg_types)
   {
+    return getMethod(name, arg_types, false);
+  }
+
+  /**
+     @concrete whether only a concrete (non-interface) method is desired.
+  */
+  public Method getMethod(String name, Type[] arg_types, boolean concrete)
+  {
     ClassType cl = this;
     for (;;)
       {
@@ -599,14 +607,17 @@ public class ClassType extends ObjectType implements AttrContainer {
         if (method != null)
           return method;
 
-        ClassType[] interfaces = cl.getInterfaces();
-        if (interfaces != null)
-          for (int i = 0;  i < interfaces.length;  i++)
-            {
-              method = interfaces[i].getMethod(name, arg_types);
-              if (method != null)
-                return method;
-            }
+        if (! concrete)
+          {
+            ClassType[] interfaces = cl.getInterfaces();
+            if (interfaces != null)
+              for (int i = 0;  i < interfaces.length;  i++)
+                {
+                  method = interfaces[i].getMethod(name, arg_types);
+                  if (method != null)
+                    return method;
+                }
+          }
 
         cl = cl.getSuperclass();
         if (cl == null)

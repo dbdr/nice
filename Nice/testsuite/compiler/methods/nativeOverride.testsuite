@@ -189,3 +189,19 @@ class B extends A
 /// FAIL
 interface I{}
 equals(x@I,y@I) = true;
+
+/// PASS
+  Collection<String> b = new Bar();
+  /// Toplevel
+class Bar<T> extends AbstractList<T>
+{
+  isEmpty() = false;
+}
+
+/// PASS bug
+  Collection<String> b = new Bar();
+  /// Toplevel
+class Bar<T> extends AbstractList<T>
+{
+  removeAll(other@Bar) = false;
+}

@@ -78,6 +78,7 @@ test:
 check:
 	/usr/bin/time java -Dassertions=true -classpath "classes" nice.tools.testsuite.TestNice testsuite
 
+.PHONY: coverage
 coverage: share/java/nice.jar
 	$(MAKE) -C coverage all
 
@@ -124,7 +125,6 @@ bootstrap: parser
 	cd src/gnu/lists && ./withCollections
 	ln -sf nicec bin/nicer
 	mkdir -p classes
-	cd classes; jar xf ../external/java-getopt.jar gnu
 	cd classes; jar xf ../external/gj.jar java
 	-cd src/bossa/syntax && mv -f dispatch.java.bootstrap dispatch.java
 	${JAVAC} \

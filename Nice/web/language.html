@@ -71,24 +71,6 @@ for method <tt>display </tt>:
 </PRE>
 <br>&nbsp;
 
-<h2>The main method</h2>
-
-A particular case of method definition is the <code>main</code> method.
-The standard package <code>nice.lang</code> declares <code>main</code> 
-like this:
-<PRE>
-void main(String[] args);
-</PRE>
-You have to define in the main package of your program. 
-Here is the Hello World example:
-<PRE>
-main(args)
-{
-  System.out.println("Hello, world!");
-}
-</PRE>
-<br>&nbsp;
-
 <h2>Parametric classes</h2>
 
 Classes and interfaces can have type parameters. For example, the <tt>Collection</tt>
@@ -437,9 +419,20 @@ case their presence is optional at the call site.
 <br><tt>copy(from: f1, to: f2, bufferSize = 4000);</tt>
 <br>&nbsp;
 <br>&nbsp;</ul>
-</blockquote>
 
-<blockquote>
+<h2>The main function</h2>
+
+The main function is the start of any program.
+It is a normal function, that takes as its parameters
+the array containing the arguments of the program.
+
+<PRE>
+void main(String[] args)
+{
+  System.out.println("Hello, world!");
+}
+</PRE>
+
 <h2>Interfacing with Java</h2>
 
 It is possible to use java classes and methods from Nice programs. This

@@ -50,9 +50,8 @@ To get a list of the compiler's command line options, use:
 </para>
 
 <para>
-If your package has a <literal>main(args)</literal> method definition
-(args has type <literal>String[]</literal>),
-then it is executable. 
+If your package has a <literal>void main(String[] args)</literal> 
+function definition, then it is executable. 
 The compiler accepts the argument <literal>-a program.jar</literal>,
 and produces a Jar archive with the given name 
 that is appropriate for execution with <literal>java</literal>:

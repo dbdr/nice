@@ -1,0 +1,9 @@
+/// PASS
+  /// toplevel
+/**
+   Test typing related to nullness markers.
+ */
+<Any T> void nonnull(!T);
+
+nonnull(x@String) {}
+nonnull(x) {}

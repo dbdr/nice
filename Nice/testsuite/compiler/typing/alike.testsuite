@@ -1,0 +1,31 @@
+/// PASS
+  /// TOPLEVEL
+class A
+{
+  alike f1();
+}
+
+class B extends A
+{}
+
+f1(x@A) = x;
+
+<A T> T f2(T);
+f2(x@A) = x.f1();
+
+/// PASS
+  /// TOPLEVEL
+class C<T>
+{
+  alike<T> f4(alike<T>);
+}
+
+f4(x@C, y)
+{
+  f4(x, y);
+  return x; 
+}
+
+/// FAIL
+  /// TOPLEVEL
+alike f3(alike);

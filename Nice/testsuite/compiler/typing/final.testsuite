@@ -1,0 +1,9 @@
+/// PASS
+  /// toplevel
+class F1 {}
+final class F2 extends F1 {}
+
+<Any T> T ff(T);
+
+ff(x) = x;
+ff(x@F2) = new F2();

@@ -1,0 +1,42 @@
+/// GLOBAL
+class AInv<T> {}
+class BInv<T> extends AInv<T> {}
+
+class ACov<+T> {}
+class BCov<+T> extends ACov<T> {}
+
+class AContrav<-T> {}
+class BContrav<-T> extends AContrav<T> {}
+
+
+/// PASS
+  BInv<int> b = new BInv();
+  AInv<int> a = b;
+/// FAIL
+  BInv<long> b = new BInv();
+  AInv<int> a = b;
+/// FAIL
+  BInv<int> b = new BInv();
+  AInv<long> a = b;
+
+
+/// PASS
+  BCov<int> b = new BCov();
+  ACov<int> a = b;
+/// PASS
+  BCov<int> b = new BCov();
+  ACov<long> a = b;
+/// FAIL
+  BCov<long> b = new BCov();
+  ACov<int> a = b;
+
+
+/// PASS
+  BContrav<int> b = new BContrav();
+  AContrav<int> a = b;
+/// FAIL
+  BContrav<int> b = new BContrav();
+  AContrav<long> a = b;
+/// PASS
+  BContrav<long> b = new BContrav();
+  AContrav<int> a = b;

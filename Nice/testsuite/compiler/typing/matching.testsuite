@@ -1,0 +1,10 @@
+/// PASS
+  /// toplevel
+class M
+{
+  alike f();
+}
+
+f(x@M) = x;
+
+f(x#M) = new M();

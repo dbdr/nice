@@ -1,0 +1,11 @@
+/// FAIL
+  /// Toplevel
+abstract class A
+{
+  void methodA();
+}
+
+abstract class B
+{
+  /*/// FAIL HERE */ methodA() {}
+}

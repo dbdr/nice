@@ -57,26 +57,25 @@ public class MethodBodyDefinition extends Definition
 
     this.binders = binders; 
 
-    this.formals = makeFormals(formals, container);
+    this.formals = makeFormals(formals, container, name.location());
     this.body = body;
     this.declaration = null;
   }
 
-  private static Pattern[] makeFormals(List formals, NiceClass container)
+  private static Pattern[] makeFormals(List formals, NiceClass container,
+				       Location loc)
   {
     if (container == null)
       return (Pattern[]) formals.toArray(new Pattern[formals.size()]);
 
     Pattern[] res = new Pattern[formals.size() + 1];
-    res[0] = new Pattern(THIS, new TypeIdent(container.definition.getName()));
+    res[0] = new Pattern(new LocatedString("this", loc), 
+			 new TypeIdent(container.definition.getName()));
     int n = 1;
     for(Iterator f = formals.iterator(); f.hasNext(); n++)
       res[n] = (Pattern) f.next();
     return res;
   }
-
-  private static LocatedString THIS = 
-    new LocatedString("this", Location.nowhere());
 
   public Collection associatedDefinitions()
   {

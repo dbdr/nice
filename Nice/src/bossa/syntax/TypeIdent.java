@@ -12,7 +12,7 @@
 
 // File    : TypeIdent.java
 // Created : Sat Jul 24 14:02:08 1999 by bonniot
-//$Modified: Mon Sep 04 14:23:47 2000 by Daniel Bonniot $
+//$Modified: Wed Oct 04 15:00:15 2000 by Daniel Bonniot $
 
 package bossa.syntax;
 
@@ -123,7 +123,7 @@ public final class TypeIdent extends Monotype implements Located
 	  return def.getAssociatedInterface();
       }
     
-    User.error(this, this+" should be an interface");
+    User.error(this, res + " should be an interface");
     return null;
   }
   

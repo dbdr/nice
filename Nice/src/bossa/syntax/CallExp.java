@@ -12,7 +12,6 @@
 
 // File    : CallExp.java
 // Created : Mon Jul 05 16:27:27 1999 by bonniot
-//$Modified: Tue Oct 03 17:39:04 2000 by Daniel Bonniot $
 
 package bossa.syntax;
 
@@ -29,13 +28,16 @@ import mlsub.typing.Constraint;
 import mlsub.typing.MonotypeLeqCst;
 
 /**
- * A function call.
+   A function call.
+
+   @version $Date$
+   @author Daniel Bonniot
  */
 public class CallExp extends Expression
 {
   /**
-   * @param fun the function to call
-   * @param parameters a collection of Expressions
+     @param fun the function to call
+     @param parameters a collection of Expressions
    */
   public CallExp(Expression fun, 
 		 List parameters)

@@ -12,7 +12,6 @@
 
 // File    : JavaClass.java
 // Created : Wed Feb 02 16:20:12 2000 by Daniel Bonniot
-//$Modified: Wed Sep 20 17:36:16 2000 by Daniel Bonniot $
 
 package bossa.syntax;
 
@@ -22,12 +21,13 @@ import java.util.*;
 import mlsub.typing.*;
 
 /**
- * A class definition which reflects an existing native java class.
- *
- * This is usefull when you want to add type parameters
- * to an existing java class.
- * 
- * @author Daniel Bonniot
+   A class definition which reflects an existing native java class.
+   
+   This is usefull when you want to add type parameters
+   to an existing java class.
+   
+   @version $Date$
+   @author Daniel Bonniot
  */
 
 public class JavaClass extends ClassDefinition

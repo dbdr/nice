@@ -81,7 +81,7 @@ parse(progName, args, options)
 	o.optval = l.getVal();
 
 	if(longOptions == null)
-	  longOptions = makeVector(options.size, l);
+	  longOptions = makeVector(options.size);
 	
 	longOptions.add(l);
       }

@@ -142,23 +142,9 @@ class Vector<T>
 makeVector<T>(len)
 {
   Vector<T> res = new Vector();
-
   res.elements = new T[len]; 
 
-  res.length = 0;
   return res;
-}
-
-<Any T> Vector<T> makeVector(int, T);
-makeVector<T>(len, sample)
-{
-  return makeVector(len);
-/*
-  Vector<T> res = new Vector();
-  res.elements = newArray(len, sample);
-  res.length = 0;
-  return res;
-*/
 }
 
 size(v@Vector) = v.length;
@@ -338,4 +324,3 @@ class HashMap<Key,Element> implements Map = native java.util.HashMap;
 
 <Any Key, Any Element> Element put(Map<Key, Element>, Key, Element) = 
   native Object java.util.Map.put(Object, Object);
-

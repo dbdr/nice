@@ -131,7 +131,7 @@ public ConstantExp createIntegerConstantExp(LocatedString representation)
     else if (!isLong && !isDecimal && (-(1L << 32) ) < value < (1L << 32))
       { // handle 32 bit bin/hex literals which don't fit in a int
         if (value > 0)
-          value = (1L << 32) - value;
+          value = -((1L << 32) - value);
         else
           value = (1L << 32) + value;
 

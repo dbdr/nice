@@ -1,0 +1,8 @@
+/// PASS
+  (String name, (String a, String b)) = ("name", ("1","2"));
+  assert name == "name";
+  assert a == "1" && b == "2";
+
+/// PASS
+  // Checks that we do not confuse the first element with a nested tuple.
+  ((String, String) -> String s, int i) = ((String s1, String s2)=>s1, 0);

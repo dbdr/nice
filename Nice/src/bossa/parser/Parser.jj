@@ -2390,31 +2390,34 @@ Statement LocalConstant() :
 
 Statement LocalTupleDeclaration(List statements) :
 {
-  Monotype t = null;
-  LocatedString id;
   Expression e;
-  LinkedList variables;
 }
 {
-  "(" { variables = new LinkedList(); }
-  [ LOOKAHEAD(monotype() ident()) t=monotype() ] id=ident() 
-  { variables.add(new IdentExp(id));
-    if (t != null) {
-      statements.add(new Block.LocalVariable(id,t,false,null)); 
-      t = null;
-    }
-  }
-  ( "," [ LOOKAHEAD(monotype() ident()) t=monotype() ] id=ident() 
-  { variables.add(new IdentExp(id));
-    if (t != null) {
-      statements.add(new Block.LocalVariable(id,t,false,null)); 
-      t = null;
-    }
-  }
-  )+
+  "(" { List parts = new LinkedList(); Expression part; }
+  part = LocalTuplePart(statements) { parts.add(part); }
+  ( "," part = LocalTuplePart(statements) { parts.add(part); } )+
   ")"
   "=" e=Expression() ";" 
-  { return new ExpressionStmt(AssignExp.create(new TupleExp(variables), e)); }
+  { return new ExpressionStmt(AssignExp.create(new TupleExp(parts), e)); }
+}
+
+Expression LocalTuplePart(List statements) :
+{}
+{
+  LOOKAHEAD( "(" LocalTuplePart() "," )
+  "(" { List parts = new LinkedList(); Expression part; }
+  part = LocalTuplePart(statements) { parts.add(part); }
+  ( "," part = LocalTuplePart(statements) { parts.add(part); } )+
+  ")"
+  { return new TupleExp(parts); }
+|
+  { LocatedString id; Monotype type = null; }
+  [ LOOKAHEAD(monotype() ident()) type = monotype() ] id = ident() 
+  { 
+    if (type != null)
+      statements.add(new Block.LocalVariable(id, type, false, null)); 
+    return new IdentExp(id);
+  }
 }
 
 Statement EmptyStatement() :

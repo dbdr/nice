@@ -54,7 +54,8 @@ public class ReturnStmt extends Statement
     }
     catch(TypingEx e){
       User.error(this,
-		 "return type "+returnType()+" is not correct",
+		 "returned type is " + returnType() +
+		 "\nbut this funtion must return a " + declaredRetType,
 		 ": "+e);
     }
   }

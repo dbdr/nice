@@ -324,6 +324,12 @@ class FunSymbol extends PolySymbol
   {
     if (this.isFieldAccess())
       {
+        if (this.isStaticFieldAccess())
+          {
+            let JavaFieldAccess f = cast(this.getFieldAccessMethod());
+            return notNull(name) + " is a field of class " + f.className;
+          }
+
         if (arguments.size() == 0)
            return notNull(name) + " is not defined";
 

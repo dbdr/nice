@@ -47,7 +47,7 @@ class Binder<Sym>
 
 symbolTable() = new SymbolTable();
 
-<Sym> get(t@SymbolTable, name)
+<Sym> get(SymbolTable t, name)
 {
   ?Binder<!Sym> binder = t.symbols.get(name);
   if (binder == null)
@@ -56,7 +56,7 @@ symbolTable() = new SymbolTable();
     return binder.value;
 }
 
-<Sym> set(t@SymbolTable, name, sym)
+<Sym> set(SymbolTable t, name, sym)
 {
   Binder<Sym> binder = new Binder(value: sym, name: name, 
 				  nextBinder: t.topBinder, 
@@ -65,14 +65,14 @@ symbolTable() = new SymbolTable();
   t.symbols.put(name, binder);
 }
 
-<Sym> begin(t@SymbolTable)
+<Sym> begin(SymbolTable t)
 {
   Binder<Sym> mark = new Binder(value: cast(null), name: null, nextBinder: t.topBinder, oldBinding: t.marks);
   t.topBinder = null;
   t.marks = mark;
 }
 
-<Sym> end(t@SymbolTable)
+<Sym> end(SymbolTable t)
 {
   ?Binder<Sym> top = t.topBinder;
   while (top != null)

@@ -38,7 +38,7 @@ buildInfo(varScope, typeScope)
 		  typeMap: typeMaper(t, typeScope));
 }
 
-analyse(s@Statement, varScope, typeScope, mustReturnAValue)
+analyse(Statement s, varScope, typeScope, mustReturnAValue)
 {
   Info info = buildInfo(varScope, typeScope);
 
@@ -50,7 +50,7 @@ analyse(s@Statement, varScope, typeScope, mustReturnAValue)
   return s;
 }
 
-analyse(e@Expression, varScope, typeScope) = 
+analyse(Expression e, varScope, typeScope) = 
     analyse(e, buildInfo(varScope, typeScope));
 
 List<VarSymbol> lookup(VarScope scope, ?LocatedString i)
@@ -236,7 +236,7 @@ void analyse(?Statement, Info);
  * Expressions
  ****************************************************************/
 
-analyse(e@Expression, i) = e;
+analyse(Expression e, i) = e;
 
 void setInitialized (Block.LocalVariable.Symbol v, Info info, 
 		     bossa.util.Location loc)
@@ -255,8 +255,8 @@ void setInitialized (Block.LocalVariable.Symbol v, Info info,
 
 Expression analyseAssigned(?Expression, Info);
 analyseAssigned(e, i) = notNull(analyse(e, i));
-analyseAssigned(e@IdentExp, info) = analyseIdent(e, info, true);
-analyseAssigned(e@TupleExp, info)
+analyseAssigned(IdentExp e, info) = analyseIdent(e, info, true);
+analyseAssigned(TupleExp e, info)
 {
   Expression[] es = notNull(e.expressions);
   for (int i = 0; i < es.length; i++)
@@ -265,7 +265,7 @@ analyseAssigned(e@TupleExp, info)
   return e;
 }
 
-analyse(e@AssignExp, i)
+analyse(AssignExp e, i)
 {
   e.value = analyse(e.value, i);
   e.to = analyseAssigned(e.to, i);
@@ -286,7 +286,7 @@ void analyse(Arguments args, Info info, boolean noEscape)
 
 void markAsCallFun(Expression, boolean);
 markAsCallFun(e, infix) {}
-markAsCallFun(e@IdentExp, infix)
+markAsCallFun(IdentExp e, infix)
 {
   if (infix) e.setInfix();
   e.alwaysOverloadedSymbol = true;
@@ -294,19 +294,19 @@ markAsCallFun(e@IdentExp, infix)
 
 void markAsCallFirstArg(Expression);
 markAsCallFirstArg(e) {}
-markAsCallFirstArg(e@IdentExp)
+markAsCallFirstArg(IdentExp e)
 {
   e.enableClassExp = true;
 }
 
-analyse(e@ExpLocalVariable, info)
+analyse(ExpLocalVariable e, info)
 {
   e.initValue = analyse(e.initValue, info);
   setInitialized(notNull(notNull(e.variable).left), info, e.location());
   return e;
 }
 
-analyse(e@CallExp, info)
+analyse(CallExp e, info)
 {
   Arguments args = e.arguments;
   
@@ -417,9 +417,9 @@ Expression analyseQualifiedCall(CallExp e, Info info)
 Expression analyse(Expression e, Info info, boolean noEscape) =
   analyse(e, info);
 
-analyse(e@FunExp, info) = analyse(e, info, false);
+analyse(FunExp e, info) = analyse(e, info, false);
 
-analyse(e@FunExp, info@Info, noEscape)
+analyse(FunExp e, Info info, noEscape)
 {
   let savedDepth = info.anonFunDepth;
 
@@ -453,7 +453,7 @@ analyse(e@FunExp, info@Info, noEscape)
   }
 }
 
-analyse(e@IdentExp, info) = analyseIdent(e, info, false);
+analyse(IdentExp e, info) = analyseIdent(e, info, false);
 
 Expression analyseIdent(IdentExp e, Info info, boolean assigned)
 {
@@ -540,7 +540,7 @@ Expression analyseIdent(IdentExp e, Info info, boolean assigned)
   throw unknownIdent(notNull(e.ident));
 }
 
-analyse(e@IfExp, info)
+analyse(IfExp e, info)
 {
   e.condition = analyse(e.condition, info);
 
@@ -557,41 +557,41 @@ analyse(e@IfExp, info)
   return e;
 }
 
-analyse(e@IncrementExp, info)
+analyse(IncrementExp e, info)
 {
   e.variable = analyse(e.variable, info);
   return e;
 }
 
-analyse(e@LiteralArrayExp, info)
+analyse(LiteralArrayExp e, info)
 {
   analyseExps(cast(e.elements), info);
   return e;
 }
 
-analyse(e@NewArrayExp, info)
+analyse(NewArrayExp e, info)
 {
   e.resolveTC(info.typeMap);
   analyseExps(cast(notNull(e.knownDimensions)), info);
   return e;
 }
 
-analyse(e@NewExp, info)
+analyse(NewExp e, info)
 {
   e.arguments.analyse(info, noEscape: false);
   e.resolve(info.typeMap);
   return e;
 }
 
-analyse(e@StatementExp, info)
+analyse(StatementExp e, info)
 {
   analyse(e.statement, info);
   return e;
 }
 
-analyse(e@NullExp, i) = e;
+analyse(NullExp e, i) = e;
 
-analyse(c@ConstantExp, info)
+analyse(ConstantExp c, info)
 {
   if (c.type != null)
     return c;
@@ -612,7 +612,7 @@ analyse(c@ConstantExp, info)
   return c;
 }
 
-analyse(e@TypeConstantExp, info)
+analyse(TypeConstantExp e, info)
 {
   LocatedString name = cast(e.value);
   
@@ -633,14 +633,14 @@ analyse(e@TypeConstantExp, info)
   return e;
 }
 
-analyse(e@TupleExp, info)
+analyse(TupleExp e, info)
 {
   analyseExps(cast(notNull(e.expressions)), info);
   return e;
 }
 
 
-analyse(e@SuperExp, info)
+analyse(SuperExp e, info)
 {
   e.resolveTC(info.outerTypeScope);
   return e;
@@ -649,10 +649,10 @@ analyse(e@SuperExp, info)
  * Statements
  ****************************************************************/
 
-analyse(s@Statement, info) {}
+analyse(Statement s, info) {}
 analyse(null(Statement), info) {}
 
-analyse(decl@Block.LocalVariable, info)
+analyse(Block.LocalVariable decl, info)
 {
   if (decl.value != null)
     decl.value = analyse(decl.value, info);
@@ -665,13 +665,13 @@ analyse(decl@Block.LocalVariable, info)
     notNull(info.localsOfCurrentLoop).add(notNull(decl.left));
 }
 
-analyse(decl@Block.LocalConstant, info)
+analyse(Block.LocalConstant decl, info)
 {
   decl.value = analyse(decl.value, info);
   info.addVar(notNull(decl.left));
 }
 
-analyse(decl@Block.LocalFunction, info)
+analyse(Block.LocalFunction decl, info)
 {
   notNull(decl.parameters).resolveCalledFromAnalyse(cast(info));
 
@@ -679,7 +679,7 @@ analyse(decl@Block.LocalFunction, info)
   decl.value = analyse(decl.value, info);
 }
 
-analyse(b@Block, info)
+analyse(Block b, info)
 {
   info.begin();
   notNull(b.locals).foreach(Block.LocalDeclaration l => analyse(l, info));
@@ -702,7 +702,7 @@ void analyse(?Statement[] statements, Info info)
     }
 }
 
-analyse(s@ExpressionStmt, info)
+analyse(ExpressionStmt s, info)
 {
   s.exp = analyse(s.exp, info);
 }
@@ -711,7 +711,7 @@ analyse(s@ExpressionStmt, info)
  * Loops, Labels, Break and Continue
  ****************************************************************/
 
-analyse(l@LoopStmt, info)
+analyse(LoopStmt l, info)
 {
   // If the test comes before the body, then the body might not execute
   // at all, so we must discard its information.
@@ -753,7 +753,7 @@ analyse(l@LoopStmt, info)
     info.setUnreachable();
 }
 
-analyse(b@BreakStmt, info)
+analyse(BreakStmt b, info)
 {
   ?LoopStmt loop = info.currentLoop;
   if (loop == null)
@@ -763,7 +763,7 @@ analyse(b@BreakStmt, info)
   info.setUnreachable();
 }
 
-analyse(s@LabeledStmt, info)
+analyse(LabeledStmt s, info)
 {
   mustNotFindLabel(notNull(s.getLabel()), info);
   info.labels.push(s);
@@ -796,7 +796,7 @@ private void mustNotFindLabel(LocatedString label, Info info)
   }
 }
   
-analyse(b@BreakLabelStmt, info)
+analyse(BreakLabelStmt b, info)
 {
   LabeledStmt target = b.statement = mustFindLabel(notNull(b.label), info);
   ?LoopStmt loop = target.getLoop(); 
@@ -815,7 +815,7 @@ analyse(b@BreakLabelStmt, info)
   info.setUnreachable();
 }
 
-analyse(c@ContinueStmt, info)
+analyse(ContinueStmt c, info)
 {
   if (c.label == null)
     {
@@ -833,18 +833,18 @@ analyse(c@ContinueStmt, info)
   info.setUnreachable();
 }
 
-analyse(r@ReturnStmt, info)
+analyse(ReturnStmt r, info)
 {
   r.value = analyse(r.value, info);
   info.setUnreachable();
 }
 
-analyse(r@VoidReturnStmt, info)
+analyse(VoidReturnStmt r, info)
 {
   info.setUnreachable();
 }
 
-analyse(t@TryStmt, info)
+analyse(TryStmt t, info)
 {
   info.beginCases();
   analyse(t.body, info);
@@ -876,7 +876,7 @@ analyse(t@TryStmt, info)
     info.setUnreachable();
 }
 
-analyse(s@SynchronizedStmt, info)
+analyse(SynchronizedStmt s, info)
 {
   s.object = analyse(s.object, info);
   analyse(s.body, info);

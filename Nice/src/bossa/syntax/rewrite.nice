@@ -32,8 +32,8 @@
 package bossa.syntax;
 
 Statement rewrite(Statement);
-rewrite(s@Statement) = s;
-rewrite(s@Block)
+rewrite(Statement s) = s;
+rewrite(Block s)
 {
   s.statements = rewrite(s.statements);
   return s;
@@ -66,7 +66,7 @@ rewrite(s@Block)
 
 ?IfExp ifExp(?Statement);
 ifExp(s) = null;
-ifExp(s@ExpressionStmt)
+ifExp(ExpressionStmt s)
 {
   if (s.exp instanceof bossa.syntax.IfExp)
     return cast(s.exp);
@@ -75,8 +75,8 @@ ifExp(s@ExpressionStmt)
 }
 
 Statement makeStatement(Expression);
-makeStatement(e@Expression) = new ExpressionStmt(e);
-makeStatement(e@StatementExp) = e.statement;
+makeStatement(Expression e) = new ExpressionStmt(e);
+makeStatement(StatementExp e) = e.statement;
 
 Block makeBlock(Expression first, ?Statement[] rest)
 {

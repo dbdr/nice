@@ -29,7 +29,7 @@ void typecheck(?Expression);
 
 typecheck(null(Expression)) {}
 
-typecheck(e@AssignExp)
+typecheck(AssignExp e)
 {
   Expression to = notNull(notNull(e.to).noOverloading());
   e.to = to;
@@ -190,7 +190,7 @@ void typecheckOrArgs(Arguments args)
   }
 }
 
-typecheck(e@CallExp)
+typecheck(CallExp e)
 {
   typecheck(e.function);
   if (e.isCallTo("&&"))
@@ -229,7 +229,7 @@ typecheck(e@CallExp)
   }
 }
 
-typecheck(e@FunExp)
+typecheck(FunExp e)
 {
   ?Function saved = Node.getCurrentFunction();
   Node.setCurrentFunction(e);
@@ -246,7 +246,7 @@ typecheck(e@FunExp)
   Node.setCurrentFunction(saved);
 }
 
-typecheck(e@IdentExp)
+typecheck(IdentExp e)
 {
   throw new Error("typecheck in IdentExp");
 }
@@ -261,7 +261,7 @@ typecheck(e@IdentExp)
 */
 (?List<MonoSymbol>, ?List<MonoSymbol>) nullnessInfo(Expression test);
 nullnessInfo(test) = (null, null);
-nullnessInfo(test@CallExp)
+nullnessInfo(CallExp test)
 {
   if (test.isCallTo("||"))
     {
@@ -345,7 +345,7 @@ private <T> T second_((T t1, T t2)) = t2;
 
 (?List<(MonoSymbol, mlsub.typing.Monotype)>, ?List<(MonoSymbol, mlsub.typing.Monotype)>) instanceofInfo(Expression test);
 instanceofInfo(test) = (null, null);
-instanceofInfo(test@CallExp)
+instanceofInfo(CallExp test)
 {
   if (test.isCallTo("||"))
     {
@@ -495,7 +495,7 @@ void exitClosure()
   (levels, conditionalTypes) = closureEnvironments.pop();
 }
 
-typecheck(e@IfExp)
+typecheck(IfExp e)
 {
   Expression condition = notNull(e.condition);
   Expression thenExp = notNull(e.thenExp);
@@ -596,7 +596,7 @@ private void setVarType(MonoSymbol variable,
     pushBranchType(variable, otherBranch);
 }
 
-typecheck(e@IncrementExp)
+typecheck(IncrementExp e)
 {
   try{
     e.variable = notNull(e.variable).resolveOverloading(PrimitiveType.longPolytype);
@@ -611,12 +611,12 @@ typecheck(e@IncrementExp)
   }
 }
 
-typecheck(e@LiteralArrayExp)
+typecheck(LiteralArrayExp e)
 {
   typecheckExps(cast(e.elements));
 }
 
-typecheck(e@NewArrayExp)
+typecheck(NewArrayExp e)
 {
   Expression[] knownDimensions = notNull(e.knownDimensions);
   typecheckExps(cast(knownDimensions));
@@ -634,26 +634,26 @@ typecheck(e@NewArrayExp)
     }
 }
 
-typecheck(e@NewExp)
+typecheck(NewExp e)
 {
   e.arguments.typecheckArgs();
   // force computation of type
   e.getType();
 }
 
-typecheck(e@StatementExp)
+typecheck(StatementExp e)
 {
   e.statement = rewrite(e.statement);
 
   typecheck(e.statement);
 }
 
-typecheck(e@TupleExp)
+typecheck(TupleExp e)
 {
   typecheckExps(cast(notNull(e.expressions)));
 }
 
-typecheck(e@SuperExp)
+typecheck(SuperExp e)
 {
   if (Node.currentFunction instanceof MethodBodyDefinition)
     {
@@ -663,7 +663,7 @@ typecheck(e@SuperExp)
     throw bossa.util.User.error(e, "super can only be used in method implementations");
 }
 
-typecheck(e@ExpLocalVariable)
+typecheck(ExpLocalVariable e)
 {
   Block.LocalVariable decl = notNull(e.variable);
   MonoSymbol target = notNull(decl.left);
@@ -702,11 +702,11 @@ typecheck(e@ExpLocalVariable)
    decl.value = null;
 }
 
-typecheck(c@ConstantExp){}
-typecheck(e@NullExp) {}
-typecheck(e@OverloadedSymbolExp) {}
-typecheck(e@PackageExp) {}
-typecheck(e@SymbolExp) {}
+typecheck(ConstantExp c){}
+typecheck(NullExp e) {}
+typecheck(OverloadedSymbolExp e) {}
+typecheck(PackageExp e) {}
+typecheck(SymbolExp e) {}
 
 /****************************************************************
  * Statements
@@ -714,7 +714,7 @@ typecheck(e@SymbolExp) {}
 
 typecheck(null(Statement)) {}
 
-typecheck(b@Block)
+typecheck(Block b)
 {
   b.statements = rewrite(b.statements);
 
@@ -727,7 +727,7 @@ typecheck(b@Block)
   });
 }
 
-typecheck(decl@Block.LocalVariable)
+typecheck(Block.LocalVariable decl)
 {
   MonoSymbol target = notNull(decl.left());
 
@@ -770,7 +770,7 @@ typecheck(decl@Block.LocalVariable)
     }
 }
 
-typecheck(decl@Block.LocalConstant)
+typecheck(Block.LocalConstant decl)
 {
   if (! notNull(decl.left).used)
     bossa.util.User.warning(decl, " Unused local variable "  + notNull(decl.left).name);
@@ -786,7 +786,7 @@ typecheck(decl@Block.LocalConstant)
 
 }
 
-typecheck(decl@Block.LocalFunction)
+typecheck(Block.LocalFunction decl)
 {
   typecheck(decl.value);
   try{
@@ -800,13 +800,13 @@ typecheck(decl@Block.LocalFunction)
   }
 }
 
-typecheck(s@ExpressionStmt)
+typecheck(ExpressionStmt s)
 {
   s.exp = notNull(s.exp).noOverloading();
   typecheck(s.exp);
 }
 
-typecheck(l@LoopStmt)
+typecheck(LoopStmt l)
 {
   ?Expression whileExp = l.whileExp;
   if (whileExp != null)
@@ -847,16 +847,16 @@ typecheck(l@LoopStmt)
   }
 }
 
-typecheck(b@BreakStmt) {}
-typecheck(b@BreakLabelStmt) {}
-typecheck(c@ContinueStmt) {}
+typecheck(BreakStmt b) {}
+typecheck(BreakLabelStmt b) {}
+typecheck(ContinueStmt c) {}
 
-typecheck(s@LabeledStmt)
+typecheck(LabeledStmt s)
 {
   typecheck(s.getStatement());
 }
 
-typecheck(r@ReturnStmt)
+typecheck(ReturnStmt r)
 {
   ?Function function = Node.currentFunction;
   if (function == null)
@@ -891,7 +891,7 @@ typecheck(r@ReturnStmt)
   }
 }
 
-typecheck(r@VoidReturnStmt)
+typecheck(VoidReturnStmt r)
 {
   ?Function function = Node.currentFunction;
   if (function == null)
@@ -913,14 +913,14 @@ typecheck(r@VoidReturnStmt)
 }
 
 
-typecheck(t@TryStmt)
+typecheck(TryStmt t)
 {
   typecheck(t.body);
   t.catches.foreach(ACatch c => typecheck(c.body));
   typecheck(t.finallyBody);
 }
 
-typecheck(s@SynchronizedStmt)
+typecheck(SynchronizedStmt s)
 {
   s.object = notNull(s.object).noOverloading();
   mlsub.typing.Polytype type = notNull(s.object).getType();
@@ -966,9 +966,8 @@ void checkAssignment(mlsub.typing.Monotype left, Expression right)
   Typing.leq(right.getType(), left);
 }
 
-boolean isNullError(TypingEx ex);
-isNullError(@TypingEx) = false;
-isNullError(ex@MonotypeLeqEx)
+boolean isNullError(TypingEx ex) = false;
+isNullError(MonotypeLeqEx ex)
 {
   /*
     This is an approximation.

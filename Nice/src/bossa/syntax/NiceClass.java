@@ -102,15 +102,14 @@ public class NiceClass extends ClassDefinition
 	sym + (value == null ? "" : " = " + value);
     }
     
-    FormalParameters.Parameter asParameter()
+    FormalParameters.Parameter asParameter(TypeMap map)
     {
+      Monotype type = Monotype.create(sym.syntacticType.resolve(map));
       if (value == null)
-	return new FormalParameters.NamedParameter(sym.syntacticType, 
-						   sym.getName(), true);
+	return new FormalParameters.NamedParameter(type, sym.getName(), true);
       else
-	return new FormalParameters.OptionalParameter(sym.syntacticType, 
-						      sym.getName(), true,
-						      value);
+	return new FormalParameters.OptionalParameter
+	  (type, sym.getName(), true, value);
     }
 
     MonoSymbol sym;
@@ -221,18 +220,34 @@ public class NiceClass extends ClassDefinition
     return classe;
   }
 
-  private FormalParameters.Parameter[] getFieldsAsParameters(int nbFields)
+  private FormalParameters.Parameter[] getFieldsAsParameters
+    (int nbFields, mlsub.typing.MonotypeVar[] typeParams)
   {
     nbFields += this.fields.length;
     FormalParameters.Parameter[] res;
     ClassDefinition sup = distinguishedSuperClass();
     if (sup instanceof NiceClass)
-      res = ((NiceClass) sup).getFieldsAsParameters(nbFields);
+      res = ((NiceClass) sup).getFieldsAsParameters(nbFields, typeParams);
     else
       res = new FormalParameters.Parameter[nbFields];
 
+    if (fields.length == 0)
+      return res;
+
+    TypeScope map = Node.getGlobalTypeScope();
+    if (typeParams != null)
+      {
+	// Constructs a type scope that maps the type parameters of this
+	// class to the corresponding symbol in the constructor.
+	map = new TypeScope(map);
+	for (int i = 0; i < typeParams.length; i++)
+	  try {
+	    map.addMapping(this.typeParameters[i].getName(), typeParams[i]);
+	  } catch(TypeScope.DuplicateName e) {}
+      }
+
     for (int i = fields.length, n = res.length - nbFields + i; --i >= 0;)
-      res[--n] = fields[i].asParameter();
+      res[--n] = fields[i].asParameter(map);
 
     return res;
   }
@@ -244,10 +259,10 @@ public class NiceClass extends ClassDefinition
     if (isInterface)
       return;
 
-    FormalParameters values = new FormalParameters(getFieldsAsParameters(0));
+    mlsub.typing.MonotypeVar[] typeParams = createSameTypeParameters();
+    FormalParameters values = new FormalParameters(getFieldsAsParameters(0, typeParams));
     classe.setFieldCount(values.size);
 
-    mlsub.typing.MonotypeVar[] typeParams = createSameTypeParameters();
     constructorMethod = new MethodDeclaration
       (new LocatedString("<init>", location()),
        new Constraint(typeParams, null),

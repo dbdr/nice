@@ -266,6 +266,87 @@ copy(from: f1, to: f2, bufferSize: 4000);</programlisting>
     </section>
   </chapter>
 
+  <chapter id="contracts"><title>Assertions and contracts</title>
+    <section><title>Syntax</title>
+      <para>
+        The syntax for assertions is the same as in Java (since 1.4).
+        Assertions are statements of the following form:
+	<literal>assert &lt;boolean expression&gt; : &lt;error message&gt;</literal>.
+      </para>
+      <para>
+        Preconditions are introduced with the <literal>requires</literal>
+	keyword, and postconditions with the <literal>ensures</literal>
+	keyword. If there are several conditions in either section,
+	they must be separated by commas. 
+	For convenience, an optional trailing comma is accepted.
+      </para>
+      <para>
+        In a method returning a value, the special variable name
+	<literal>result</literal> can be used to refer to the result value
+	of the method in the postcondition. 
+	The <literal>old</literal> to refer to values before the 
+	execution of the method is not supported yet.
+      </para>
+      <para>
+	For example, we can define the contract of the add method
+	of a <literal>Buffer</literal> interface.
+	It is guaranteed that <literal>isEmpty</literal> returns true
+	if, and only if, <literal>size</literal> returns <literal>0</literal>.
+	The <literal>add</literal> method can be called only when the buffer
+	is not full. It is guarantedd to make the buffer non-empty, and
+	to increase the size by one.
+
+	<example>
+	<title>Contracts</title>
+	<programlisting lang="nice"><![CDATA[
+interface Buffer<Elem>
+{
+  int size();
+
+  boolean isFull();
+  boolean isEmpty() ensures result == (size() == 0);
+
+  void add(Elem element)
+    requires
+         ! isfull() : "not full"         // A comma here is optional
+    ensures
+         !isEmpty() : "not empty",       // Note the comma
+         size() == old(size()) + 1 : "count inc";
+}]]></programlisting>
+      </example>
+      
+      </para>
+    </section>
+
+    <section><title>Enabling assertions and contract checking</title>
+      <para>
+        By default, assertions and contracts are not used at runtime.
+	They are discarded by the just-in-time compiler, and should
+	cause no slow-down.
+	They can be turned on when starting the JVM.
+      </para>
+
+      <section><title>JDK 1.4 and later</title>
+        <para>
+	  The mechanism is the same as for Java assertions. 
+	  Checking can be enabled at runtime with java -ea ....
+	</para>
+      </section>
+
+      <section><title>JDK 1.1, 1.2 and 1.3</title>
+        <para>
+          Contrarily to Java, Nice produces programs with assertions that can 
+	  be run on earlier JDKs. Therefore there is no problem to distribute 
+	  Nice programs using assertions anc contracts. Since java will not 
+	  know the <literal>-ea</literal> command line option, they are 
+	  disabled by default. You can enable them with 
+	  <literal>java -Dassertions=true ...</literal>.
+	</para>
+      </section>
+    </section>
+
+  </chapter>
+
   <chapter><title>Statements</title>
     <section id="localFunctions"><title>Local functions</title>
       <para>

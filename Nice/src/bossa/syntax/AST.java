@@ -12,7 +12,7 @@
 
 // File    : AST.java
 // Created : Thu Jul 01 11:01:56 1999 by bonniot
-//$Modified: Thu Sep 16 13:10:35 1999 by bonniot $
+//$Modified: Wed Oct 13 16:43:08 1999 by bonniot $
 
 package bossa.syntax;
 
@@ -32,13 +32,19 @@ public class AST extends Node
     super(defs,Node.global);
     
     this.definitions=defs;
-    
+  }
+  
+  public void load()
+  {
     Debug.println("Scoping (build  )");
     buildScope();
 
     Debug.println("Scoping (resolve)");
     doResolve();
-
+  }
+  
+  public void typechecking()
+  {
     Debug.println("Typechecking");
     // Necessary because toplevel assertions can be unsatisfiable
     // in which case we should be able to backtrack
@@ -46,6 +52,12 @@ public class AST extends Node
     doTypecheck();
   }
 
+  public void printInterface(java.io.PrintWriter s)
+  {
+    for(Iterator i=definitions.iterator();i.hasNext();)
+      ((Definition)i.next()).printInterface(s);
+  }
+  
   public String toString()
   {
     return Util.map(definitions);

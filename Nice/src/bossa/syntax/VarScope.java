@@ -12,7 +12,7 @@
 
 // File    : VarScope.java
 // Created : Fri Jul 09 11:28:11 1999 by bonniot
-//$Modified: Tue Sep 21 16:45:10 1999 by bonniot $
+//$Modified: Wed Oct 13 17:45:06 1999 by bonniot $
 
 package bossa.syntax;
 
@@ -95,7 +95,7 @@ class VarScope
   public boolean overloaded(LocatedString s)
   {
     if(defs.containsKey(s))
-      return defs.elementCount(s)>1 || outer.lookup(s).size()>0;
+      return defs.elementCount(s)>1 || (outer!=null && outer.lookup(s).size()>0);
     else if(outer!=null)
       return outer.overloaded(s);
     else 

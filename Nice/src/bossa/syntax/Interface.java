@@ -12,7 +12,7 @@
 
 // File    : Interface.java
 // Created : Thu Jul 08 11:51:09 1999 by bonniot
-//$Modified: Tue Sep 21 17:53:12 1999 by bonniot $
+//$Modified: Wed Oct 13 17:57:37 1999 by bonniot $
 
 package bossa.syntax;
 
@@ -32,13 +32,13 @@ public class Interface extends Node
    */
   public Interface(LocatedString name)
   {
-    super(Node.down);
+    super(Node.global);
     this.name=name;
   }
 
   Interface(InterfaceDefinition def)
   {
-    super(Node.down);
+    super(Node.global);
     this.definition=def;
   }
   
@@ -72,7 +72,7 @@ public class Interface extends Node
 	*/
 	s=typeScope.lookup(name);
 	if(s==null)
-	  User.error(name,"Interface "+name+" is not defined");
+	  User.error(name,"Interface "+name+" is not defined"," in "+typeScope);
 	if(s instanceof InterfaceDefinition)
 	  definition=(InterfaceDefinition)s;
 	else

@@ -12,7 +12,7 @@
 
 // File    : VarSymbol.java
 // Created : Wed Jul 07 16:56:06 1999 by bonniot
-//$Modified: Thu Aug 19 13:27:35 1999 by bonniot $
+//$Modified: Wed Oct 13 18:12:25 1999 by bonniot $
 // Description : A variable (local, field, parameter)
 
 package bossa.syntax;
@@ -24,7 +24,7 @@ abstract class VarSymbol extends Node
 {
   public VarSymbol(LocatedString name)
   {
-    super(Node.global);
+    super(Node.upper);
     this.name=name;
     addSymbol(this);
   }

@@ -12,7 +12,7 @@
 
 // File    : Typing.java
 // Created : Tue Jul 20 11:57:17 1999 by bonniot
-//$Modified: Thu Sep 30 19:13:09 1999 by bonniot $
+//$Modified: Thu Oct 14 10:17:57 1999 by bonniot $
 
 package bossa.typing;
 
@@ -247,7 +247,7 @@ abstract public class Typing
       Engine.leq(m1,m2);
     }
     catch(Unsatisfiable e){
-      e.printStackTrace();
+      //e.printStackTrace();
       throw new TypingEx("Typing.leq("+m1+","+m2+") [was "+e.getMessage()+"]");
     }    
   }
@@ -346,7 +346,10 @@ abstract public class Typing
       Engine.setKind(t,i.variance.getConstraint());
     }
     catch(Unsatisfiable e){
-      unsatisfiable(new TypingEx(t+" cannot implement "+i));
+      unsatisfiable(new TypingEx
+		    (t+" cannot implement "+i
+		     +":\n"+t+" has variance "+t.getKind()+", "
+		     +i+" has variance "+i.variance.getConstraint()));
     }
 
     if(Engine.isRigid(t))
@@ -405,5 +408,5 @@ abstract public class Typing
     return i.imp(t.getId());
   }
 
-  public static final boolean dbg = true;
+  public static final boolean dbg = false;
 }

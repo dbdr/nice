@@ -12,7 +12,7 @@
 
 // File    : MethodBodyDefinition.java
 // Created : Thu Jul 01 18:12:46 1999 by bonniot
-//$Modified: Thu Sep 30 19:03:20 1999 by bonniot $
+//$Modified: Wed Oct 13 14:03:07 1999 by bonniot $
 
 package bossa.syntax;
 
@@ -245,6 +245,15 @@ public class MethodBodyDefinition extends Node
     catch(TypingEx e){
       User.error(this,"Return type is not correct"," :"+e);
     }
+  }
+  
+  /****************************************************************
+   * Module interface
+   ****************************************************************/
+
+  public void printInterface(java.io.PrintWriter s)
+  {
+    // Not exported
   }
   
   /****************************************************************

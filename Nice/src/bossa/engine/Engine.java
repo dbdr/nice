@@ -12,7 +12,7 @@
 
 // File    : Engine.java
 // Created : Tue Jul 27 15:34:53 1999 by bonniot
-//$Modified: Thu Sep 30 19:16:21 1999 by bonniot $
+//$Modified: Thu Oct 14 10:14:30 1999 by bonniot $
 
 package bossa.engine;
 
@@ -362,8 +362,13 @@ public abstract class Engine
     K()
     {
       //creates the node 0, aka \bottom_C, that implements all interfaces of this variance
-      // should it also abstract them ?
+      // should it also abstract them ? This must be equivalent...
       bottom=extend();
+    }
+    
+    public String toString()
+    {
+      return "Constraint for "+associatedKind+":\n"+super.toString();
     }
     
     /****************************************************************

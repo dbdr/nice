@@ -12,7 +12,7 @@
 
 // File    : parser.jj
 // Created : Thu Jul 01 10:27:05 1999 by bonniot
-//$Modified: Tue Sep 21 16:38:44 1999 by bonniot $
+//$Modified: Wed Oct 13 18:20:24 1999 by bonniot $
 // Description : Parseur JavaCC pour Bossa
 //   Tokens based on the Jazz parser
 
@@ -30,6 +30,7 @@ import java.util.*;
 
 import bossa.util.*;
 import bossa.syntax.*;
+import bossa.modules.Module;
 
 class Parser
 {
@@ -86,14 +87,7 @@ PARSER_END(Parser)
 
 /* WHITE SPACE */
 
-SKIP :
-{
-  " "
-| "\t"
-| "\n"
-| "\r"
-| "\f"
-}
+SKIP : { " " | "\t" | "\n" | "\r" | "\f" }
 
 /* COMMENTS */
 
@@ -891,7 +885,7 @@ Definition globalVariable():
   name=string()
   [ "=" value=expression() ]
   ";"
-  { return new LocalDeclarationStmt(name,t,value); }
+  { return new LocalDeclarationStmt(name,t,value,true); }
 }
 
 Definition definition():
@@ -1170,7 +1164,7 @@ LocalDeclarationStmt localDeclaration():
   t=type()
   id=string()
   [ "=" e=expression() ]
-  { return new LocalDeclarationStmt(id,t,e); }
+  { return new LocalDeclarationStmt(id,t,e,false); }
 }
 
 Statement statementInIf():
@@ -1272,4 +1266,32 @@ List statements():
 {
   ( s=statement() { res.add(s); } )*
   { return res; }
+}
+
+/****************************************************************
+ * Imported Packages
+ ****************************************************************/
+
+List packages():
+{
+  List res=new ArrayList();
+  LocatedString name;
+}
+{
+  (
+   "import" name=string() ";"
+   { res.add(name); }
+  )*
+  { return res; }
+}
+
+/****************************************************************
+ * Modules
+ ****************************************************************/
+
+Module module(String name):
+{
+}
+{
+  { return new Module(name,packages(),definitions()); }
 }

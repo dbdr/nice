@@ -12,7 +12,7 @@
 
 // File    : Constraint.java
 // Created : Fri Jul 02 17:51:35 1999 by bonniot
-//$Modified: Thu Sep 16 10:47:32 1999 by bonniot $
+//$Modified: Wed Oct 13 18:12:05 1999 by bonniot $
 
 package bossa.syntax;
 
@@ -34,13 +34,13 @@ public class Constraint extends Node
    */
   public Constraint(List binders, List atomics)
   {
-    super(Node.global);
+    super(Node.upper);
     construct(binders,atomics);
   }
   
   Constraint(MonotypeVar binder, List atomics)
   {
-    super(Node.global);
+    super(Node.upper);
     List binders=new ArrayList(1);
     binders.add(binder);
     construct(binders,atomics);
@@ -155,13 +155,48 @@ public class Constraint extends Node
   public String toString()
   {
     if(atomics.size()==0)
-      return Util.map("{",", ","}",binders);
+      return Util.map("{",", ","}",binders,Printable.inConstraint);
     else if(binders.size()==0)
       return Util.map("{",", ","}",atomics);
     else 
-      return 
-	Util.map("{",", ","|",binders)
-	+ Util.map("",", ","}",atomics);
+      {
+	// Put in a parsable format.
+	String res="{";
+	boolean first=true;
+	
+	Constraint c=this.shallowClone();
+	for(Iterator i=c.binders.iterator();i.hasNext();)
+	  {
+	    TypeSymbol s=(TypeSymbol)i.next();
+	    if(!(s instanceof TypeConstructor))
+	      continue;
+	    TypeConstructor tc=(TypeConstructor)s;
+	    boolean ok=false;
+	    for(Iterator j=c.atomics.iterator();j.hasNext();)
+	      {
+		AtomicConstraint a=(AtomicConstraint)j.next();
+		if(a instanceof ImplementsCst
+		   && ((ImplementsCst)a).tc==tc)
+		  {
+		    if(first)
+		      first=false;
+		    else
+		      res+=",";
+		    res+=((ImplementsCst)a).def()+" "+tc;
+		    j.remove();
+		    i.remove();
+		    ok=true;
+		    continue;
+		  }
+	      }
+	    Internal.error(!ok,tc,
+			   "Unable to print the constraint in a parsable form because of "+tc);
+	  }
+		  
+	return 
+	  res+Util.map(", ",", ","",c.binders,Printable.inConstraint)
+	  + Util.map("|",", ","",c.atomics)+"}";
+      }
   }
 
   /****************************************************************

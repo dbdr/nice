@@ -12,7 +12,7 @@
 
 // File    : LocalDeclarationStmt.java
 // Created : Tue Jul 06 12:06:20 1999 by bonniot
-//$Modified: Thu Sep 30 17:39:38 1999 by bonniot $
+//$Modified: Wed Oct 13 18:21:05 1999 by bonniot $
 
 package bossa.syntax;
 
@@ -27,8 +27,11 @@ import java.util.*;
 public class LocalDeclarationStmt extends Statement
   implements Definition
 {
-  public LocalDeclarationStmt(LocatedString name, Type type, Expression value)
+  public LocalDeclarationStmt(LocatedString name, Type type, Expression value, boolean global)
   {
+    if(global)
+      this.propagate=Node.global;
+    
     this.left=new PolySymbol(name,type);
     addSymbol(left);
     this.type=type;
@@ -61,6 +64,15 @@ public class LocalDeclarationStmt extends Statement
     }
   }
 
+  /****************************************************************
+   * Module interface
+   ****************************************************************/
+
+  public void printInterface(java.io.PrintWriter s)
+  {
+    s.print("variable "+left+";\n");
+  }
+  
   /****************************************************************
    * Printing
    ****************************************************************/

@@ -12,7 +12,7 @@
 
 // File    : Node.java
 // Created : Thu Jul 08 10:24:56 1999 by bonniot
-//$Modified: Tue Sep 21 16:20:13 1999 by bonniot $
+//$Modified: Wed Oct 13 18:17:57 1999 by bonniot $
 
 package bossa.syntax;
 
@@ -23,12 +23,13 @@ import bossa.util.*;
  * Basic component of the syntax tree.
  * Defines its local scope.
  */
-abstract class Node
+abstract public class Node
 {
   static final int forward = 0;
   static final int global  = 1;
   static final int down    = 2;
-  static final int none    = 3;
+  static final int upper   = 3;
+  static final int none    = 4;
   
   Node(int propagate)
   {
@@ -125,10 +126,17 @@ abstract class Node
     VarScope scope;
     TypeScope typeScope;
   }
+ 
+  /**
+   * Scopes shared by all modules.
+   */
+  
+  private static final VarScope globalScope=new VarScope(null);
+  private static final TypeScope globalTypeScope=new TypeScope(null);
   
   void buildScope()
   {
-    buildScope(null,null);
+    buildScope(globalScope,globalTypeScope);
   }
   
   /** Sets up the scope, once the outer scope is given 
@@ -141,8 +149,8 @@ abstract class Node
   {
     if(scope!=null)
       scope=null;
-    Internal.error(this.scope!=null,
-		   "Scope set twice for "+this);
+    if(this.scope!=null)
+      Internal.error("Scope set twice for "+this);
 
     Scopes res=null;
     switch(propagate)
@@ -154,6 +162,15 @@ abstract class Node
 	break;
 
       case global:
+	outer=globalScope;
+	outer.addSymbols(varSymbols);
+	this.scope=outer;
+	typeOuter=globalTypeScope;
+	this.typeScope=typeOuter;
+	res=new Scopes(outer,typeOuter);
+	break;
+	
+      case upper:
 	if(outer==null)
 	  outer=new VarScope(null);
 	outer.addSymbols(varSymbols);
@@ -263,6 +280,6 @@ abstract class Node
   protected TypeScope typeScope;
 
   private List children, varSymbols, typeSymbols;
-  private int propagate;  
+  int propagate;  
   private List typeMapsSymbols,typeMapsNames;
 }

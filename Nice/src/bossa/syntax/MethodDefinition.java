@@ -12,7 +12,7 @@
 
 // File    : MethodDefinition.java
 // Created : Thu Jul 01 18:12:46 1999 by bonniot
-//$Modified: Thu Sep 30 17:34:12 1999 by bonniot $
+//$Modified: Wed Oct 13 18:18:11 1999 by bonniot $
 
 package bossa.syntax;
 
@@ -43,6 +43,7 @@ public class MethodDefinition extends PolySymbol implements Definition
   {
     // hack, super must be the first call
     super(name,null);
+    this.propagate=Node.global;
     
     Collection params=new ArrayList();
     // if it is a class method, there is an implicit "this" argument
@@ -101,6 +102,15 @@ public class MethodDefinition extends PolySymbol implements Definition
   {
     removeChild(type);
     type=type.removeUnusefullTypeParameters();
+  }
+  
+  /****************************************************************
+   * Module interface
+   ****************************************************************/
+
+  public void printInterface(java.io.PrintWriter s)
+  {
+    s.print(toString());
   }
   
   /************************************************************

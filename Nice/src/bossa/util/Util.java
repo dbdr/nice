@@ -12,7 +12,7 @@
 
 // File    : Util.java
 // Created : Fri Jul 02 18:35:58 1999 by bonniot
-//$Modified: Fri Jul 23 19:38:43 1999 by bonniot $
+//$Modified: Wed Oct 13 14:52:24 1999 by bonniot $
 // Description : Usefull fonctions used everywhere
 
 package bossa.util;
@@ -41,6 +41,23 @@ public class Util
     Iterator i=c.iterator();
     while(i.hasNext()){
       res=res+i.next().toString();
+      if(i.hasNext())
+	res=res+delim;
+    }
+    return res+end;
+  }
+
+  public static String map(String init, String delim, String end, 
+			   Collection c, int param)
+  {
+    if(c==null || c.size()==0)
+      return "";
+
+    String res=init;
+
+    Iterator i=c.iterator();
+    while(i.hasNext()){
+      res=res+((Printable)i.next()).toString(param);
       if(i.hasNext())
 	res=res+delim;
     }

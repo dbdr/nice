@@ -12,7 +12,7 @@
 
 // File    : InterfaceDefinition.java
 // Created : Thu Jul 01 17:00:14 1999 by bonniot
-//$Modified: Tue Sep 21 17:54:30 1999 by bonniot $
+//$Modified: Wed Oct 13 17:42:07 1999 by bonniot $
 
 package bossa.syntax;
 
@@ -29,7 +29,7 @@ public class InterfaceDefinition extends Node
 {
   public InterfaceDefinition(LocatedString name, Collection typeParameters, List extensions)
   {
-    super(Node.forward);
+    super(Node.global);
     this.name=name;
     this.parameters=typeParameters;
     this.variance=new Variance(typeParameters.size());
@@ -140,14 +140,25 @@ public class InterfaceDefinition extends Node
   }
   
   /****************************************************************
+   * Module interface
+   ****************************************************************/
+
+  public void printInterface(java.io.PrintWriter s)
+  {
+    s.print("interface "
+	    +name
+	    +Util.map("<",", ",">",parameters)
+	    +Util.map(" extends ",", ","",extensions)
+	    +";\n");
+  }
+  
+  /****************************************************************
    * Printing
    ****************************************************************/
 
   public String toString()
   {
-    String res="interface ";
-    res=res+name;
-    return res+";\n";
+    return name.toString();
   }
 
   public LocatedString getName()

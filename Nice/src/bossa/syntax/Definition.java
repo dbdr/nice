@@ -12,7 +12,7 @@
 
 // File    : Definition.java
 // Created : Thu Jul 01 11:17:28 1999 by bonniot
-//$Modified: Fri Sep 03 11:37:33 1999 by bonniot $
+//$Modified: Wed Oct 13 14:00:18 1999 by bonniot $
 
 package bossa.syntax;
 
@@ -36,4 +36,12 @@ public interface Definition
   // it would be good to have a default implementation
   // that returns null, it would save lines
   // since only ClassDefinition has a different implementation.
+
+  /**
+   * Write the exported interface of the definition
+   * to the stream.
+   *
+   * @param s a PrintWriter
+   */
+  void printInterface(java.io.PrintWriter s);
 }

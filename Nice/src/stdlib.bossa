@@ -12,7 +12,7 @@
 
 // File    : stdlib.bossa
 // Created : Thu Jul 08 16:20:19 1999 by bonniot
-//$Modified: Thu Sep 30 17:55:26 1999 by bonniot $
+//$Modified: Wed Oct 13 15:21:42 1999 by bonniot $
 // Description : Prolog file, included before all bossa file
 
 variable {Any T} T null;

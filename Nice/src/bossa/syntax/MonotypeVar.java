@@ -12,7 +12,7 @@
 
 // File    : MonotypeVar.java
 // Created : Fri Jul 23 15:36:39 1999 by bonniot
-//$Modified: Thu Sep 16 09:42:40 1999 by bonniot $
+//$Modified: Wed Oct 13 14:54:30 1999 by bonniot $
 
 package bossa.syntax;
 
@@ -29,7 +29,7 @@ import bossa.engine.*;
  */
 
 public class MonotypeVar extends Monotype
-  implements TypeSymbol, bossa.engine.Element
+  implements TypeSymbol, bossa.engine.Element, Printable
 {
   public MonotypeVar(LocatedString name, boolean imperative)
   {
@@ -161,6 +161,14 @@ public class MonotypeVar extends Monotype
     return name.location();
   }
 
+  public String toString(int param)
+  {
+    switch(param){
+    case Printable.inConstraint: return "Any "+name;
+    default: Internal.error("toString param="+param); return null;
+    }
+  }
+  
   public String toString()
   {
     String res;
@@ -172,7 +180,7 @@ public class MonotypeVar extends Monotype
     if(User.dbg)
       return "\""+res+name+"(id="+id+","+super.toString().substring(getClass().getName().length())+")\"";
     else
-      return "\""+res+name+"\"";
+      return res+name;
   }
 
   public LocatedString getName()

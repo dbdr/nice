@@ -12,7 +12,7 @@
 
 // File    : FunType.java
 // Created : Fri Jul 02 17:41:24 1999 by bonniot
-//$Modified: Thu Aug 26 12:49:57 1999 by bonniot $
+//$Modified: Wed Oct 13 15:01:07 1999 by bonniot $
 
 package bossa.syntax;
 
@@ -121,7 +121,8 @@ public class FunType extends Monotype
 
   public String toString()
   {
-    return "("+toStringExtern()+")";
+    return "fun"+Util.map("(",", ",")",true,in)+"("+out+")";
+      //return "("+toStringExtern()+")";
   }
   
   public String toStringExtern()

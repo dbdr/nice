@@ -12,7 +12,7 @@
 
 // File    : ClassDefinition.java
 // Created : Thu Jul 01 11:25:14 1999 by bonniot
-//$Modified: Thu Sep 16 11:41:50 1999 by bonniot $
+//$Modified: Wed Oct 13 18:00:39 1999 by bonniot $
 
 package bossa.syntax;
 
@@ -33,7 +33,7 @@ public class ClassDefinition extends Node
 			 List fields,
 			 List methods)
   {
-    super(Node.forward);
+    super(Node.global);
     
     this.name=name;
     this.isFinal=isFinal;
@@ -51,7 +51,8 @@ public class ClassDefinition extends Node
     this.fields=fields;
     if(isSharp)
       // The sharp class must not declare children, 
-      // since the associated class as already done so
+      // since the associated class has already done so.
+      // Anyway, those must be null.
       {
 	this.implementations=implementations;
 	this.abstractions=abstractions;
@@ -145,9 +146,34 @@ public class ClassDefinition extends Node
 	Typing.assertImp(tc,InterfaceDefinition.top(typeParameters.size()));
     }
     catch(TypingEx e){
-      User.error(name,"Error in class "+name+" :"+e.getMessage());
+      User.error(name,"Error in class "+name+" : "+e.getMessage());
     }
   }
+
+  /****************************************************************
+   * Module Interface
+   ****************************************************************/
+
+  public void printInterface(java.io.PrintWriter s)
+  {
+    if(!isSharp)
+    s.print
+      ("class "
+       + name.toString()
+       + Util.map("<",", ",">",typeParameters)
+       + Util.map(" extends ",", ","",extensions)
+       + Util.map(" implements ",", ","",implementations)
+       + Util.map(" abstracts ",", ","",abstractions)
+       + " {\n"
+       + Util.map("",";\n",";\n",fields)
+       + Util.map(methods)
+       + "}\n\n"
+       );
+  }
+  
+  /****************************************************************
+   * Printing
+   ****************************************************************/
 
   public String toString()
   {
@@ -174,8 +200,8 @@ public class ClassDefinition extends Node
   TypeConstructor tc;
   List /* of TypeSymbol */ typeParameters;
   private List /* of TypeConstructor */ extensions;
-  private List /* of TypeConstructor */ implementations;
-  private List /* of TypeConstructor */ abstractions;
+  private List /* of Interface */ implementations;
+  private List /* of Interface */ abstractions;
   private List /* of MonoSymbol */ fields;
   private List methods;
   private boolean isFinal;

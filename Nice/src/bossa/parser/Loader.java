@@ -12,7 +12,7 @@
 
 // File    : Loader.java
 // Created : Thu Jul 29 09:43:50 1999 by bonniot
-//$Modified: Tue Aug 24 13:35:46 1999 by bonniot $
+//$Modified: Wed Oct 13 16:21:14 1999 by bonniot $
 
 package bossa.parser;
 
@@ -20,6 +20,7 @@ import java.util.*;
 import java.io.*;
 
 import bossa.util.*;
+import bossa.modules.Module;
 
 /** Static class for loading and parsing files
  * 
@@ -29,7 +30,7 @@ import bossa.util.*;
 
 public abstract class Loader
 {
-  public static List open(String filename)
+  public static Module open(String filename)
   {
     Debug.println("Parsing "+filename+"...");
     bossa.util.Location.currentFile=filename;
@@ -45,9 +46,11 @@ public abstract class Loader
     else
       parser.ReInit(r);
     
-    List res=null;
+    Module res=null;
     
-    try{ res=parser.definitions(); }
+    try{
+      res=parser.module(filename);
+    }
     catch(ParseException e){
       if(e.currentToken!=null)
 	User.error(new Location(e.currentToken.next),e.getMessage());

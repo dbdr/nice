@@ -12,7 +12,7 @@
 
 // File    : Front.java
 // Created : Thu Jul 01 15:11:18 1999 by bonniot
-//$Modified: Fri Sep 10 18:17:01 1999 by bonniot $
+//$Modified: Wed Oct 13 16:51:38 1999 by bonniot $
 
 package bossa.test;
 
@@ -33,29 +33,23 @@ public class Front
    */
   public static void main(String[] args) throws Exception
   {
-    List defs=Loader.open("stdlib.bossa");
-    
     String file;
     if(args.length==0)
       {
 	System.out.println("Usage: bossa file.bossa");
-	System.exit(0);
+	//System.exit(0);
 	//file="GJ-loophole.bossa";
-	file="fr.bossa";
+	file="vector.bossa";
       }
     else file=args[0];
     
-    if(!file.equals("stdlib.bossa"))
-      defs.addAll(Loader.open(file));
-
     try{
-      AST ast=new AST(defs);
-      //System.out.print(ast);
+      bossa.modules.Module.compile(file);
       System.out.println("\nThe program is well typed");
     }
     catch(Exception e){
       System.out.println("Uncaught exception :");
-      if(bossa.util.User.dbg)
+      if(true || bossa.util.User.dbg)
 	e.printStackTrace();
       else
 	System.out.println(e.toString());

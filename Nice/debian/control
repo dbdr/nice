@@ -14,15 +14,15 @@ Description: Extension of Java with parametric types, multi-methods, and more.
  .
  It extends Java with many advanced features:
    * parametric types: this is especially for containers (list, hast-tables)
-     and allow shorter and safer code.
+     and allows for shorter and safer code.
    * higher-order functions: functions can be manipulated as first-class
-     objects, just like in Lisp, ML. This is much lighter than Java's
-     inner classes in many situations, for instance with listenersin a GUI.
+     objects, just like in Lisp and ML. This is much lighter than Java's
+     inner classes in many situations, for instance with listeners in a GUI.
    * multi-methods: they allow methods to be defined outside
      classes. This means that new methods can be defined on classes that
      belong to a different package (even in java.*). 
      Multi-methods alse extend usual methods with the possibility to
-     dispatch on every argument, instead of only the receiver.
-     This superseeds the Visitor pattern.
+     dispatch on every argument, instead of only the receiver class.
+     This supersedes the Visitor pattern.
    * tuples: this allows in particular methods to return several values.
    * named and optional parameters to methods.

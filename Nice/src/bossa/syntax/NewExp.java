@@ -12,7 +12,7 @@
 
 // File    : NewExp.java
 // Created : Thu Jul 08 17:15:15 1999 by bonniot
-//$Modified: Mon Oct 25 15:40:01 1999 by bonniot $
+//$Modified: Thu Oct 28 11:36:57 1999 by bonniot $
 // Description : Allocation of a new object
 
 package bossa.syntax;
@@ -34,9 +34,16 @@ public class NewExp extends Expression
   void computeType()
   {  
     TypeParameters tp=new TypeParameters(tc.name,tc.variance);
-    type=new Polytype(new Constraint(tp.content,null),new MonotypeConstructor(tc,tp,tc.location()));
+    type=new Polytype(new Constraint(tp.content,null),
+		      new MonotypeConstructor(tc,tp,tc.location()));
   }
 
+  void typecheck()
+  {
+    User.error(!tc.instantiable(),this,
+	       tc+" is abstract, it can't be instantiated");
+  }
+  
   public String toString()
   {
     return "new "+tc;

@@ -12,7 +12,7 @@
 
 // File    : MonotypeVar.java
 // Created : Fri Jul 23 15:36:39 1999 by bonniot
-//$Modified: Mon Oct 25 15:01:25 1999 by bonniot $
+//$Modified: Thu Oct 28 15:29:25 1999 by bonniot $
 
 package bossa.syntax;
 
@@ -221,7 +221,7 @@ public class MonotypeVar extends Monotype
 	    if(willImplementTop){
 	      try{
 		Typing.assertImp
-		  (equivalentTC,InterfaceDefinition.top(v.size));
+		  (equivalentTC,InterfaceDefinition.top(v.size),false);
 	      }
 	      catch(TypingEx e){
 		Internal.error(this,

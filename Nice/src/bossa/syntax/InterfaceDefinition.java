@@ -12,7 +12,7 @@
 
 // File    : InterfaceDefinition.java
 // Created : Thu Jul 01 17:00:14 1999 by bonniot
-//$Modified: Wed Oct 13 17:42:07 1999 by bonniot $
+//$Modified: Fri Oct 29 12:24:19 1999 by bonniot $
 
 package bossa.syntax;
 
@@ -33,9 +33,9 @@ public class InterfaceDefinition extends Node
     this.name=name;
     this.parameters=typeParameters;
     this.variance=new Variance(typeParameters.size());
-    variance.getConstraint().addInterface(this);
     addTypeSymbol(this);
     this.extensions=addChildren(extensions);
+    itf=variance.getConstraint().newInterface();
   }
 
   public Collection associatedDefinitions()
@@ -53,9 +53,9 @@ public class InterfaceDefinition extends Node
     this.name=new LocatedString(name,Location.nowhere());
     this.parameters=null;
     this.variance=new Variance(arity);
-    variance.getConstraint().addInterface(this);
     addTypeSymbol(this);
     extensions=null;
+    itf=variance.getConstraint().newInterface();
   }
   
   static private Vector tops=new Vector();
@@ -84,59 +84,13 @@ public class InterfaceDefinition extends Node
   }
 
   /****************************************************************
-   * Typechecking
+   * Initial Context
    ****************************************************************/
 
-  void typecheck()
+  public void createContext()
   {
     bossa.typing.Typing.assertLeq(this,extensions);
     bossa.typing.Typing.assertLeq(this,top(parameters.size()));
-  }
-  
-  /****************************************************************
-   * Constraints
-   ****************************************************************/
-
-  public BitVector impv=new BitVector(),absv=new BitVector();
-  
-  public void resize(int newSize)
-  {
-    impv.truncate(newSize);
-    absv.truncate(newSize);
-    approx.setSize(newSize);
-  }
-  
-  public boolean imp(int id)
-  {
-    return impv.get(id);
-  }
-  
-  public void addImp(int id)
-  {
-    impv.set(id);
-  }
-  
-  public boolean abs(int id)
-  {
-    return absv.get(id);
-  }
-  
-  public void addAbs(int id)
-  {
-    absv.set(id);
-  }
-  
-  private Vector approx=new Vector();
-  
-  public void setApprox(int node, int value)
-  {
-    Internal.error(node>=approx.size(),"Incorrect node "+node+" in "+this);
-    approx.set(node,new Integer(value));
-  }
-  
-  public int getApprox(int node)
-  {
-    return ((Integer)approx.get(node)).intValue();
   }
   
   /****************************************************************
@@ -158,7 +112,9 @@ public class InterfaceDefinition extends Node
 
   public String toString()
   {
-    return name.toString();
+    String res=name.toString();
+    if(bossa.typing.Typing.dbg) res+="("+itf+")";
+    return res;
   }
 
   public LocatedString getName()
@@ -171,18 +127,9 @@ public class InterfaceDefinition extends Node
     return name.location();
   }
 
+  public int itf; // The associated lowlevel interface
   LocatedString name;
   Collection /* of TypeSymbol */ parameters;
   public Variance variance;
   private List /* of Interface */ extensions; // the surinterfaces
-
-  private int id;
-  public void setId(int id)
-  {
-    this.id=id;
-  }
-  public int getId()
-  {
-    return id;
-  }
 }

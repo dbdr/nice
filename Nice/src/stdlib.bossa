@@ -12,7 +12,7 @@
 
 // File    : stdlib.bossa
 // Created : Thu Jul 08 16:20:19 1999 by bonniot
-//$Modified: Mon Oct 25 19:27:10 1999 by bonniot $
+//$Modified: Thu Oct 28 11:41:34 1999 by bonniot $
 // Description : Prolog file, included before all bossa file
 
 //variable <Any T> T null;
@@ -20,7 +20,7 @@
 final class void {}
 
 // Booleans
-class Boolean {}
+abstract class Boolean {}
 class True  extends Boolean {}
 class False extends Boolean {}
 
@@ -41,7 +41,7 @@ and(b1,b2)             = true;
 
 // builtin control structures
 // "if(cond) t else e endif" 
-// is rewritten *by the parser* into asbtract syntax for 
+// is rewritten *by the parser* into abstract syntax for 
 // "_if(cond,fun()=>{return t;},fun()=>{return e;})"
 T _if <Any T> (Boolean,fun()(T),fun()(T));
 

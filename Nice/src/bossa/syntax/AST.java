@@ -12,12 +12,13 @@
 
 // File    : AST.java
 // Created : Thu Jul 01 11:01:56 1999 by bonniot
-//$Modified: Wed Oct 13 16:43:08 1999 by bonniot $
+//$Modified: Thu Oct 28 15:55:39 1999 by bonniot $
 
 package bossa.syntax;
 
-import java.util.*;
 import bossa.util.*;
+
+import java.util.*;
 
 /**
  * The Abstract Syntax Tree :
@@ -43,12 +44,17 @@ public class AST extends Node
     doResolve();
   }
   
+  public void createContext()
+  {
+    // Necessary because toplevel assertions can be unsatisfiable
+    // in which case we should be able to backtrack
+    for(Iterator i=definitions.iterator();i.hasNext();)
+      ((Definition) i.next()).createContext();
+  }
+  
   public void typechecking()
   {
     Debug.println("Typechecking");
-    // Necessary because toplevel assertions can be unsatisfiable
-    // in which case we should be able to backtrack
-    bossa.typing.Typing.enter("AST");
     doTypecheck();
   }
 

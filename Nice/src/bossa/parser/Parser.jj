@@ -12,7 +12,7 @@
 
 // File    : parser.jj
 // Created : Thu Jul 01 10:27:05 1999 by bonniot
-//$Modified: Mon Oct 25 19:08:53 1999 by bonniot $
+//$Modified: Thu Oct 28 12:35:30 1999 by bonniot $
 // Description : Parseur JavaCC pour Bossa
 //   Tokens based on the Jazz parser
 
@@ -198,18 +198,19 @@ TOKEN: /* Keywords */
 | < FORMAT:     "format"     >
 | < ERROR:      "error"      >
 | < FUN:        "fun"        >
-| < ALIKE:      "alike"      >
+//| < ALIKE:      "alike"      >
 //| < THIS:       "this"       >
 | < EXTENDS:    "extends"    >
 | < RESET:      "reset"      >
 | < ENABLE:     "enable"     >
 | < NATIVE:     "native"     >
 | < FINAL:      "final"      >
+| < ABSTRACT:   "abstract"   >
+| < LOCAL:      "local"      >
 | < PRAGMA:     "pragma"     >
-| < INSTANCEOF: "instanceof" >
+//| < INSTANCEOF: "instanceof" >
 | < DYNAMIC:    "dynamic"    >
 | < NEW:        "new"        >
-		  //| < CLONE:      "clone"      >
 | < PUBLIC:     "public"     >
 | < STATIC:     "static"     >
 | < IMPORT:     "import"     >
@@ -740,18 +741,33 @@ List interfaces():
     { return res; }
 }
 
+void getField(List fields):
+{
+  MonoSymbol field;
+  boolean isFinal=false, isLocal=false;
+}
+{
+  [ "final" { isFinal=true; } 
+  | "local" { isLocal=true; }
+  ] 
+  field=monoSymbol() ";" 
+  { fields.add(new ClassDefinition.Field(field,isFinal,isLocal)); }
+}
+
 ClassDefinition classDefinition():
 {
   LocatedString name;
   List parameters;
-  MonoSymbol field;
   List fields=new ArrayList(),methods=new ArrayList(0);
   List ext=new ArrayList(0),imp=new ArrayList(0),abs=new ArrayList(0);
   List l;
-  boolean isFinal=false;
+  boolean isFinal=false, isAbstract=false;
+  ClassDefinition res;
 }
 {
-  [ "final" { isFinal=true; } ]
+  [ "final"    { isFinal=true; } 
+  | "abstract" { isAbstract=true; }
+  ]
   "class"
     name=string() 
     parameters=monotypeVars() 
@@ -761,17 +777,13 @@ ClassDefinition classDefinition():
   | l=extensions()      { ext.addAll(l); }
   )*
 
-    "{"
-    ( 
-      (
-       //LOOKAHEAD(monoSymbol() ";") 
-       ["final"] field=monoSymbol() ";" { fields.add(field); }
-	//| 
-        //methodDecl(res)
-      )
-    )*
-      "}"
-  { return new ClassDefinition(name,isFinal,false,parameters,ext,imp,abs,fields,methods); }
+  "{" (getField(fields))* "}"
+
+  { 
+    res=new ClassDefinition(name,isFinal,isAbstract,false,parameters,
+			    ext,imp,abs,fields,methods);
+    return res; 
+  }
 }
 
 InterfaceDefinition interfaceDefinition():

@@ -12,7 +12,7 @@
 
 // File    : Definition.java
 // Created : Thu Jul 01 11:17:28 1999 by bonniot
-//$Modified: Wed Oct 13 14:00:18 1999 by bonniot $
+//$Modified: Wed Oct 27 16:20:34 1999 by bonniot $
 
 package bossa.syntax;
 
@@ -37,6 +37,11 @@ public interface Definition
   // that returns null, it would save lines
   // since only ClassDefinition has a different implementation.
 
+  /**
+   * Creates the initial rigid context.
+   */
+  void createContext();
+  
   /**
    * Write the exported interface of the definition
    * to the stream.

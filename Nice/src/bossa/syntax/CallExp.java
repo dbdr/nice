@@ -12,7 +12,7 @@
 
 // File    : CallExp.java
 // Created : Mon Jul 05 16:27:27 1999 by bonniot
-//$Modified: Mon Oct 25 13:12:15 1999 by bonniot $
+//$Modified: Thu Oct 28 12:56:35 1999 by bonniot $
 
 package bossa.syntax;
 
@@ -89,15 +89,25 @@ public class CallExp extends Expression
     }
     catch(TypingEx e){
       if(Typing.dbg) Debug.println(e.getMessage());
-      String end="not within the domain of the function \""+fun+"\"";
-      if(parameters.size()>=2)
-	Internal.error(loc,"The parameters "+
-		   Util.map("(",", ",")",parameters) +
-		   " are "+end);
+
+      if(fun.isFieldAccess())
+	{
+	  // There must be just one parameter
+	  User.error(loc,Util.map("",", ","",parameters)+
+		     " has no field "+fun);
+	}
       else
-	User.error(loc,"The parameter \""+
-		   Util.map("",", ","",parameters) +
-		   "\" is "+end);      
+	{  
+	  String end="not within the domain of the function \""+fun+"\"";
+	  if(parameters.size()>=2)
+	    Internal.error(loc,"The parameters "+
+			   Util.map("(",", ",")",parameters) +
+			   " are "+end);
+	  else
+	    User.error(loc,"The parameter \""+
+		       Util.map("",", ","",parameters) +
+		       "\" is "+end);      
+	}
     }
     return null;
   }
@@ -117,9 +127,7 @@ public class CallExp extends Expression
 
     if(dom==null || codom==null)
       throw new ReportErrorEx(fun+" is not a function");
-    if(!(funt instanceof Polytype))
-      throw new ReportErrorEx("You have to specify the type parameters for function "+fun);
-       
+
     Typing.enter(funt.getTypeParameters(),"call "+fun);
     
     Typing.implies();

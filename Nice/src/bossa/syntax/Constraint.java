@@ -12,7 +12,7 @@
 
 // File    : Constraint.java
 // Created : Fri Jul 02 17:51:35 1999 by bonniot
-//$Modified: Mon Oct 25 14:32:54 1999 by bonniot $
+//$Modified: Thu Oct 28 15:29:29 1999 by bonniot $
 
 package bossa.syntax;
 
@@ -138,7 +138,7 @@ public class Constraint extends Node
 	    TypeConstructor t=(TypeConstructor)s;
 	    if(t.variance!=null)
 	      bossa.typing.Typing.assertImp
-		(t,InterfaceDefinition.top(t.variance.size));
+		(t,InterfaceDefinition.top(t.variance.size),false);
 	    else
 	      Internal.warning(t+" has no known variance, so I can't assert it implement some Top<n> interface");
 	  }

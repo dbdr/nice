@@ -12,7 +12,7 @@
 
 // File    : MethodDefinition.java
 // Created : Thu Jul 01 18:12:46 1999 by bonniot
-//$Modified: Mon Oct 25 13:09:15 1999 by bonniot $
+//$Modified: Wed Oct 27 16:06:10 1999 by bonniot $
 
 package bossa.syntax;
 
@@ -86,6 +86,15 @@ public class MethodDefinition extends PolySymbol implements Definition
   int getArity()
   {
     return arity;
+  }
+  
+  /****************************************************************
+   * Initial Context
+   ****************************************************************/
+
+  public void createContext()
+  {
+    //Nothing
   }
   
   /****************************************************************

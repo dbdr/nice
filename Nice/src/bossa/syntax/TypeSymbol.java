@@ -12,8 +12,8 @@
 
 // File    : TypeSymbol.java
 // Created : Fri Jul 09 11:20:46 1999 by bonniot
-//$Modified: Wed Aug 25 16:01:46 1999 by bonniot $
-// Description : Used to lookup Type names
+//$Modified: Wed Oct 27 15:30:20 1999 by bonniot $
+// Description : Used to lookup type names
 //   Separed from VarSymbol since it can only appear in types 
 //   (and New expression)
 //   whereas VarSymbol can only appear in Expressions

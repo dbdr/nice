@@ -12,7 +12,7 @@
 
 // File    : Typing.java
 // Created : Tue Jul 20 11:57:17 1999 by bonniot
-//$Modified: Mon Oct 25 19:35:30 1999 by bonniot $
+//$Modified: Wed Nov 03 13:00:25 1999 by bonniot $
 
 package bossa.typing;
 
@@ -170,15 +170,22 @@ abstract public class Typing
       }
   }
   
+  public static void initialLeq(TypeConstructor t, Collection c)
+    throws TypingEx
+  {
+    Iterator i=c.iterator();
+    
+    while(i.hasNext())
+      initialLeq(t,(TypeConstructor)i.next());
+  }
+  
   public static void leq(TypeConstructor t, Collection c)
     throws TypingEx
   {
     Iterator i=c.iterator();
     
     while(i.hasNext())
-      {
-	leq(t,(TypeConstructor)i.next());
-      }
+      leq(t,(TypeConstructor)i.next());
   }
   
   /****************************************************************
@@ -223,11 +230,22 @@ abstract public class Typing
    * Type constructors
    ****************************************************************/
 
+  public static void initialLeq(TypeConstructor t1, TypeConstructor t2)
+    throws TypingEx
+  {
+    try{
+      Engine.leq(t1,t2,true);
+    }
+    catch(Unsatisfiable e){
+      throw new TypingEx("Not satisfiable 4:"+e.getMessage());
+    }
+  }
+  
   public static void leq(TypeConstructor t1, TypeConstructor t2)
     throws TypingEx
   {
     try{
-      Engine.leq(t1,t2);
+      Engine.leq(t1,t2,false);
     }
     catch(Unsatisfiable e){
       throw new TypingEx("Not satisfiable 4:"+e.getMessage());
@@ -281,7 +299,7 @@ abstract public class Typing
   {
     if(dbg) Debug.println(i+" < "+j);
     User.error(!(i.variance.equals(j.variance)),i+" and "+j+" are not comparable");
-    i.variance.getConstraint().itfLeq(i,j);
+    i.variance.getConstraint().subInterface(i.itf,j.itf);
   }
   
   public static void assertLeq(InterfaceDefinition itf, Collection c)
@@ -290,7 +308,7 @@ abstract public class Typing
       assertLeq(itf,((Interface)i.next()).definition);
   }
   
-  public static void assertImp(TypeConstructor t, InterfaceDefinition i)
+  public static void assertImp(TypeConstructor t, InterfaceDefinition i, boolean initial)
     throws TypingEx
   {
     if(dbg) Debug.println(t+" imp "+i);
@@ -304,22 +322,21 @@ abstract public class Typing
 		     +i+" has variance "+i.variance.getConstraint()));
     }
 
-    if(Engine.isRigid(t))
-      if(imp(t,i))
-	return;
-      else
-	unsatisfiable(new TypingEx(t+" doesn't implement "+i));
+    //if(Engine.isRigid(t))
+    //  if(imp(t,i))
+    //return;
+    //  else
+    //unsatisfiable(new TypingEx(t+" doesn't implement "+i));
 
     // 't' implements 'i' and all interfaces above 'i'
-    for(Iterator it=t.variance.getConstraint().itfGeqIter(i);it.hasNext();)
-      ((InterfaceDefinition)it.next()).addImp(t.getId());
-
-    // Reduce the domain of 't'
     try{
-      ((Engine.K)t.getKind()).domains.reduce(t.getId(),i.impv);
+      if(initial)
+	t.variance.getConstraint().initialImplements(t.getId(),i.itf);
+      else
+	t.variance.getConstraint().indexImplements(t.getId(),i.itf);
     }
     catch(Unsatisfiable e){
-      unsatisfiable(new TypingEx(t+" cannot implement "+i+": "+e.getMessage()));
+      unsatisfiable(new TypingEx(e.getMessage()));
     }
   }
   
@@ -332,15 +349,15 @@ abstract public class Typing
 		   "Abstraction required on a rigid type constructor : \n"+
 		   t+" required to abstract "+i);
     
-    i.addAbs(t.getId());
+    i.variance.getConstraint().initialAbstracts(t.getId(),i.itf);
   }
 
-  public static void assertImp(TypeConstructor t, Collection c)
+  public static void assertImp(TypeConstructor t, Collection c, boolean initial)
     throws TypingEx
   {
     Iterator i=c.iterator();
     while(i.hasNext())
-      assertImp(t,((Interface)i.next()).definition);
+      assertImp(t,((Interface)i.next()).definition,initial);
   }
   
   public static void assertAbs(TypeConstructor t, Collection c)
@@ -351,14 +368,5 @@ abstract public class Typing
       assertAbs(t,((Interface)i.next()).definition);
   }
 
-  /****************************************************************
-   * Interfaces computations
-   ****************************************************************/
-
-  private static boolean imp(TypeConstructor t, InterfaceDefinition i)
-  {
-    return i.imp(t.getId());
-  }
-
-  public static final boolean dbg = false;
+  public static boolean dbg = true;
 }

@@ -4,13 +4,71 @@ package bossa.engine;
 //import fr.ensmp.cma.jazz.util.*;
 //import fr.ensmp.cma.jazz.S;
 
+import java.util.Vector;
+import bossa.util.Debug;
+
 /**
  * A lowlevel constraint on integers.
- * @version $Revision$, $Date$
+ *
+ * @version $OrigRevision: 1.22 $, $OrigDate: 1999/10/28 10:56:58 $
  * @author Alexandre Frey
  **/
-abstract public class K0 implements Cloneable {
-  public K0() {
+public class K0 implements Cloneable {
+  public static abstract class Callbacks  {
+    /**
+     * Called when indexes src and dest have been merged.  Only dest remains
+     * valid: src is invalidated
+     **/
+    abstract protected void indexMerged(int src, int dest)
+      throws Unsatisfiable;
+    
+    /**
+     * Called when index src has been moved to index dest.
+     **/
+    abstract protected void indexMoved(int src, int dest);
+    
+    /**
+     * Called when simplification discards index
+     **/
+    abstract protected void indexDiscarded(int index);
+
+    /*
+     * Pretty printing
+     */
+    protected String getName() {
+      return "<k0>";
+    }
+    protected String indexToString(int x) {
+      return Integer.toString(x);
+    }
+    protected String interfaceToString(int iid) {
+      return Integer.toString(iid);
+    }
+  }
+  
+  /***********************************************************************
+   * Debugging
+   ***********************************************************************/
+  private static boolean debugK0 = false;
+  private static int IDs = 0;
+  private int ID = IDs++;
+  
+  // When a K0 is created it is in a special mode where the initial rigid
+  // context is created. In this mode, one can use methods extend, initialLeq,
+  // minimal, origin, newInterface, subInterface, and initialImplements. Then,
+  // one must call method createInitialContext()
+  //
+  // The constraint is then in normal mode, one can no more use the
+  // above-mentioned methods, but must use leq, eq, indexImplements, satisfy,
+  // enumerate, rigidify, mark, backtrack, weakMark, weakBacktrack, getSnap,
+  // startSimplify, stopSimplify, tag, simplify, isLeq,
+  // solveConstructorOverloading, solveInterfaceOverloading
+  //
+  // backtrackMode must be either BACKTRACK_ONCE or BACKTRACK_UNLIMITED
+  // see below the doc of backtrack() and mark()
+  public K0(int backtrackMode, Callbacks callbacks) {
+    this.backtrackMode = backtrackMode;
+    this.callbacks = callbacks;
     this.R = null;
     this.Rt = null;
     this.m = 0;
@@ -18,12 +76,21 @@ abstract public class K0 implements Cloneable {
     this.Ct = new BitMatrix();
     this.n = 0;
     this.minimal = new BitVector();
-    this.maximal = new BitVector();
+    this.origins = new BitVector();
     this.garbage = new BitVector();
     this.posTagged = new BitVector();
     this.negTagged = new BitVector();
-    this.virtual = new BitVector();
+    this.interfaces = new Vector();
+    if (debugK0) {
+      S.dbg.println("created K0 #" + ID);
+    }
   }
+
+  public K0(Callbacks callbacks) {
+    this(BACKTRACK_ONCE, callbacks);
+  }
+
+  private Callbacks callbacks;
   
   /**
    * Relation on the rigid indexes
@@ -39,10 +106,16 @@ abstract public class K0 implements Cloneable {
   private int m;
 
   /**
-   * Returns an index that is garanteed to be greater than any rigid index and
-   * less or equal to any non-rigid index.
+   * Number of rigid indexes in the initial rigid context
+   * (m0 <= m)
    **/
-  final public int firstNonRigid() {
+  private int m0;
+
+  /**
+   * Returns an index that is guaranteed to be greater than any rigid index
+   * and less or equal to any non-rigid index.
+   **/
+  public int firstNonRigid() {
     return m;
   }
   
@@ -50,72 +123,305 @@ abstract public class K0 implements Cloneable {
    * Returns true if x is the index of a rigid variable.
    * the index is assumed valid
    **/
-  final public boolean isRigid(int x) {
+  public boolean isRigid(int x) {
     return x < m;
   }
 
-  final public boolean hasNoSoft() {
+  public boolean hasNoSoft() {
     return n == m;
   }
   /**
    * C maintains the constraint as it is entered
    **/
-  protected BitMatrix C;
+  private BitMatrix C;
   /**
    * Transpose of C
    **/
-  protected BitMatrix Ct;
+  private BitMatrix Ct;
   /**
-   * Total number of indexes.
+   * Total number of indexes. (m <= n)
    **/
-  protected int n;
+  private int n;
 
   public int size() {
     return n;
   }
   
   /**
-   * Maintains the constraints "x is minimal"
+   * Maintains the information "x is minimal" on [0, m0[
    **/
   private BitVector minimal;
-  // assume x is valid
   public boolean isMinimal(int x) {
     return minimal.get(x);
   }
-
-  private BitVector maximal;
-  public boolean isMaximal(int x) {
-    return maximal.get(x);
+  public void minimal(int x) {
+    minimal.set(x);
   }
-
+  
+  /**
+   * Maintains the information "x is a hierarchy origin" on [0, m0[
+   **/
+  private BitVector origins;
+  public void origin(int x) {
+    origins.set(x);
+  }
+  
   // tells if an index should be collected in the next call to collect()
   private BitVector garbage;
 
-  final public boolean isValidIndex(int x) {
+  public boolean isValidIndex(int x) {
     return x >= 0 && x < n && !garbage.get(x);
   }
 
-  // tells if an index is virtual. Virtual indexes are used to code
-  // interfaces. They cannot be solutions of constraints
-  private BitVector virtual;
-  /**
-   * Assume x is a valid index
-   **/
-  final public boolean isVirtual(int x) {
-    return virtual.get(x);
+  
+  /***********************************************************************
+   * Pretty printing
+   ***********************************************************************/
+  public String getName() {
+    return callbacks.getName();
   }
-    
+  
+  private String indexToString(int index) {
+    return callbacks.indexToString(index);
+  }
+  private String interfaceToString(int iid) {
+    return callbacks.interfaceToString(iid);
+  }
+
+  public String domainsToString() {
+    StringBuffer sb = new StringBuffer();
+    for (int i = m; i < n; i++) {
+      if (isValidIndex(i)) {
+        sb.append("D(").append(indexToString(i)).append(") = ");
+        Domain d = (hasBeenInitialized ? domains.getDomain(i) : null);
+        if (d == null) {
+          sb.append(d);
+        } else {
+          sb.append("{");
+          Separator sep = new Separator(", ");
+          for (int a = 0; a < m; a++) {
+            if (d.get(a)) {
+              sb.append(sep).append(indexToString(a));
+            }
+          }
+          sb.append("}");
+        }
+        sb.append("; ");
+      }
+    }
+    return sb.toString();
+  }
+
+  private BitVector weakComponent(int x0) {
+    S.assert(S.a&& isValidIndex(x0));
+    BitVector component = new BitVector();
+    BitVector toInclude = new BitVector();
+    toInclude.set(x0);
+    while (true) {
+      int x = toInclude.getLowestSetBitNotIn(component);
+      if (x == BitVector.UNDEFINED_INDEX) {
+        break;
+      }
+      if (!garbage.get(x)) {
+        component.set(x);
+        BitVector ux = C.getRow(x);
+        if (ux != null) {
+          toInclude.or(ux);
+        }
+        BitVector lx = Ct.getRow(x);
+        if (lx != null) {
+          toInclude.or(lx);
+        }
+      }
+    }
+    return component;
+  }
+
+  private String ineqToString(int x, int y) {
+    return indexToString(x) + " <: " + indexToString(y);
+  }
+
+  private String componentToString(BitVector component) {
+    StringBuffer sb = new StringBuffer();
+    Separator sep = new Separator(", ");
+    int nvars = 0;
+    for (int x = m0; x < n; x++) {
+      if (component.get(x)) {
+        sb.append(sep).append(indexToString(x));
+        if (isRigid(x)) {
+          sb.append("*");
+        }
+        nvars++;
+      }
+    }
+    if (nvars == 0) {
+      return "";
+    }
+
+    sb.append(" | ");
+    sep.reset();
+
+    // enumerate the (x, y) where x < y and at least one of x or y is >= m0
+    for (int x = 0; x < n; x++) {
+      if (component.get(x)) {
+        for (int y = (x < m0 ? m0 : x+1); y < n; y++) {
+          if (component.get(y)) {
+            if (C.get(y, x)) {
+              sb.append(sep).append(ineqToString(y, x));
+            }
+            if (C.get(x, y)) {
+              sb.append(sep).append(ineqToString(x, y));
+            }
+          }
+        }
+      }
+    }
+
+    for (int x = m0; x < n; x++) {
+      if (component.get(x)) {
+        for (int iid = 0; iid < nInterfaces(); iid++) {
+          if (getInterface(iid).implementors.get(x)) {
+            sb.append(sep)
+              .append(indexToString(x))
+              .append(": ")
+              .append(interfaceToString(iid));
+          }
+        }
+      }
+    }
+    return sb.toString();
+  }
+  
+  public String toString() {
+    final StringBuffer sb = new StringBuffer();
+    Separator nl = new Separator("\n");
+
+    // output the constraint for the weak-component of each origin
+    BitVector printed = new BitVector(n);
+    for (int x0 = 0; x0 < m0; x0++) {
+      if (origins.get(x0) && !printed.get(x0)) {
+        BitVector component = weakComponent(x0);
+        String comp = componentToString(component);
+        if (!comp.equals("")) {
+          sb.append(nl).append(comp);
+        }
+        printed.or(component);
+      }
+    }
+    // and finally for all the other variables
+    BitVector rest = new BitVector(n);
+    rest.fill(n);
+    rest.andNot(printed);
+    String restComp = componentToString(rest);
+    if (!restComp.equals("")) {
+      sb.append(nl).append(componentToString(rest));
+    }
+    if (sb.length() != 0) {
+      sb.append("\n");
+    }
+    return sb.toString();
+  }
+
+  public String dumpInterfaces() {
+    final StringBuffer sb = new StringBuffer();
+    final Separator sep = new Separator(", ");
+    for (int iid = 0; iid < nInterfaces(); iid++) {
+      sb.append(sep).append(interfaceToString(iid));
+    }
+    sb.append(" | ");
+    sep.reset();
+    for (int iid1 = 0; iid1 < nInterfaces(); iid1++) {
+      for (int iid2 = 0; iid2 < nInterfaces(); iid2++) {
+        if (getInterface(iid2).subInterfaces.get(iid1)) {
+          sb.append(sep)
+          .append(interfaceToString(iid1))
+          .append(" < ")
+          .append(interfaceToString(iid2));
+        }
+      }
+    }
+    sb.append("\n");
+    sep.reset();
+    try{
+      implementsIter
+      (
+       new ImplementsIterator(){
+	public void iter(int x, int iid){
+	  sb.append(sep)
+	    .append(indexToString(x))
+	    .append(" : ")
+	    .append(interfaceToString(iid));
+	}
+      }
+       );
+      }
+    catch(Unsatisfiable e){}
+    try{
+      abstractsIter
+      (
+       new AbstractsIterator(){
+	public void iter(int x, int iid){
+	  sb.append(sep)
+	    .append(indexToString(x))
+	    .append(" :: ")
+	    .append(interfaceToString(iid));
+	}
+      }
+       );
+      }
+    catch(Unsatisfiable e){}
+    return sb.toString();
+  }
+
+  public String dumpRigid() {
+    StringBuffer sb = new StringBuffer();
+    Separator sep = new Separator(", ");
+    for (int x = 0; x < m; x++) {
+      if (isValidIndex(x)) {
+        sb.append(sep).append(indexToString(x));
+      }
+    }
+    sb.append(" | ");
+    sep.reset();
+    for (int x = 0; x < m; x++) {
+      for (int y = 0; y < m; y++) {
+        if (isValidIndex(x) && isValidIndex(y) && R.get(x, y)) {
+          sb.append(sep)
+          .append(indexToString(x))
+          .append(" < ")
+          .append(indexToString(y));
+        }
+      }
+    }
+    for (int iid = 0; iid < nInterfaces(); iid++) {
+      for (int x = 0; x < m; x++) {
+        if (isValidIndex(x) && getInterface(iid).rigidImplementors.get(x)) {
+          sb.append(sep)
+          .append(indexToString(x))
+          .append(": ")
+          .append(interfaceToString(iid));
+        }
+      } 
+    }
+
+    return sb.toString();
+  }
+  
+  /***********************************************************************/
   private void setSize(int n) {
+    S.assert(S.a&& n >= m);
     this.n = n;
     C.setSize(n);
     Ct.setSize(n);
-    domains.setSize(n - m);
+    if (domains != null) {
+      domains.setSize(n - m);
+    }
     garbage.truncate(n);
-    minimal.truncate(n);
-    maximal.truncate(n);
     posTagged.truncate(n);
     negTagged.truncate(n);
-    virtual.truncate(n);
+    for (int iid = 0; iid < nInterfaces(); iid++) {
+      getInterface(iid).setIndexSize(n);
+    }
   }
   
   // collect and compact indexes in [i, j[
@@ -136,6 +442,8 @@ abstract public class K0 implements Cloneable {
       i++;
     }
   }
+
+  // this operation always succeeds
   private void collect() {
     // first collect the rigid indexes (shouldn't be necessary actually but
     // let's be general !)
@@ -151,11 +459,11 @@ abstract public class K0 implements Cloneable {
   // assume src > dest && !garbage.get(src) && garbage.get(dest)
   private void indexMove(int src, int dest) {
     domainMove(src, dest);
-    minimal.bitCopy(src, dest);
-    maximal.bitCopy(src, dest);
     posTagged.bitCopy(src, dest);
     negTagged.bitCopy(src, dest);
-    virtual.bitCopy(src, dest);
+    for (int iid = 0; iid < nInterfaces(); iid++) {
+      getInterface(iid).indexMove(src, dest);
+    }
     garbage.set(src);
     garbage.clear(dest);
     C.rowMove(src, dest);
@@ -172,8 +480,8 @@ abstract public class K0 implements Cloneable {
       Rt.colMove(src, dest);
     }
     
-    // tell the subclass
-    indexMoved(src, dest);
+    // notify the user of K0
+    callbacks.indexMoved(src, dest);
   }
   
   // assume src > dest && !garbage.get(src) && !garbage.get(dest)
@@ -183,12 +491,10 @@ abstract public class K0 implements Cloneable {
     C.colMerge(src, dest);
     Ct.rowMerge(src, dest);
     Ct.colMerge(src, dest);
+    for (int iid = 0; iid < nInterfaces(); iid++) {
+      getInterface(iid).indexMerge(src, dest);
+    }
     garbage.set(src);
-    minimal.bitMerge(src, dest);
-    maximal.bitMerge(src, dest);
-    // cannot merge a virtual and a non-virtual index
-    S.assert(S.a&& ((isVirtual(src) && isVirtual(dest))
-                    || (!isVirtual(src) && !isVirtual(dest))));
     posTagged.bitMerge(src, dest);
     negTagged.bitMerge(src, dest);
     if (isRigid(src)) {
@@ -199,71 +505,178 @@ abstract public class K0 implements Cloneable {
       Rt.rowMerge(src, dest);
       Rt.colMerge(src, dest);
     }
-    // tell the subclass
-    indexMerged(src, dest);
-  }
-    
-  /**
-   * Called when indexes src and dest have been merged.
-   * Only dest remains valid: src is invalidated
-   **/
-  abstract protected void indexMerged(int src, int dest) throws Unsatisfiable;
-
-  /**
-   * Called when index src has been moved to index dest.
-   **/
-  abstract protected void indexMoved(int src, int dest);
-  
-
-  /**
-   * Called when simplification discards index
-   **/
-  abstract protected void indexDiscarded(int index);
-  
-  /**
-   * Called when the constraint is resized
-   */
-  protected void onResize(int newSize)
-  {
+    // notify the subclass
+    callbacks.indexMerged(src, dest);
   }
   
   /**
    * Add a new variable to the constraint and returns its index
    **/
-  final public int extend() {
-    try {
-      int result = extend0();
-      domains.exclude(result, virtual);
-      onResize(result+1);
-      return result;
-    } catch (LowlevelUnsatisfiable e) {
-      throw S.panic();
-    }
-  }
-  //To remove
-  //Everything with 'virtual' is a hack for old interfaces
-  final public int extendVirtual() {
-    try {
-      int result = extend0();
-      virtual.set(result);
-      domains.reduce(result, virtual);
-      return result;
-    } catch (LowlevelUnsatisfiable e) {
-      throw S.panic();
-    }
-  }
-  private int extend0() {
+  public int extend() {
     C.extend();
     Ct.extend();
     garbage.clear(n);
-    domains.extend();
+    if (hasBeenInitialized) {
+      domains.extend();
+    }
     return n++;
   }
+
+  // a vector of all the Interfaces in this domain
+  private Vector interfaces;
+  /**
+   * Returns the number of interfaces. Interfaces are garanteed to be
+   * numbered from 0 to nInterfaces()-1
+   **/
+  public int nInterfaces() {
+    return interfaces.size();
+  }
+
+  // assume 0 <= iid < nInterfaces()
+  Interface getInterface(int iid) {
+    return (Interface)interfaces.elementAt(iid);
+  }
+
+  /***********************************************************************
+   * Construction of the initial rigid context
+   ***********************************************************************/
+  private boolean hasBeenInitialized = false;
+  public boolean hasBeenInitialized() {
+    return hasBeenInitialized;
+  }
+  /**
+   * Add a new interface to the constraint and returns its ID
+   **/
+  public int newInterface() {
+    S.assert(S.a&& !hasBeenInitialized);
+    int iid = nInterfaces();
+    Interface iface = new Interface(this, iid);
+    interfaces.addElement(iface);
+    if (debugK0) {
+      S.dbg.println("newInterface in #" + ID + " -> " + iid);
+    }
+    return iid;
+  }
+
+  /**
+   * Enter the assertion that interface iid1 is a subinterface of iid2
+   * Assume if1 and if2 are >=0 and < nInterfaces()
+   **/
+  public void subInterface(int iid1, int iid2) {
+    S.assert(S.a&& !hasBeenInitialized);
+    getInterface(iid2).subInterfaces.set(iid1);
+  }
+
+  /**
+   * Enter the initial assertion that x: iid
+   **/
+  public void initialImplements(int x, int iid) {
+    S.assert(S.a&& !hasBeenInitialized);
+    getInterface(iid).implementors.set(x);
+  }
+
+  /**
+   * Enter the initial assertion that x:: iid
+   **/
+  public void initialAbstracts(int x, int iid) {
+    S.assert(S.a&& !hasBeenInitialized);
+    getInterface(iid).abstractors.set(x);
+  }
+
+  /**
+   * Enter the initial assertion that x <= y
+   **/
+  public void initialLeq(int x, int y) {
+    S.assert(S.a&& !hasBeenInitialized);
+    C.set(x, y);
+    Ct.set(y, x);
+  }
+
+  /***********************************************************************
+   * Initial rigidification
+   ***********************************************************************/
+  public void createInitialContext() {
+    S.assert(S.a&& !hasBeenInitialized, this.getName() + " is already initialized ??");
+    
+    try {
+      condense();                 // shouldn't be useful...
+    } catch (Unsatisfiable e) {
+      throw S.panic();
+    }
+    // put in R and Rt, the constraint saturated under
+    // x < y and y < z => x < z
+    R = (BitMatrix)C.clone();
+    R.closure();
+    Rt = (BitMatrix)Ct.clone();
+    Rt.closure();
+    m = n;
+    m0 = n;
+    
+    // saturate the interface subtyping under
+    // I < J and J < K => I < K
+    closeInterfaceRelation();
+    computeApprox();
+    
+    BitVector[] rigidImplementors  = closeImplements(R, Rt);
+    for (int iid = 0; iid < nInterfaces(); iid++) {
+      getInterface(iid).rigidImplementors = rigidImplementors[iid];
+    }
+
+    if(debugK0)
+      S.dbg.println("Initial Context (saturated) "+getName()+":\n"+dumpInterfaces());
+    
+    domains = new DomainVector(m, m);
+    hasBeenInitialized = true;
+  }
+
+  
+  /***********************************************************************
+   * Constraints
+   ***********************************************************************/
+  /**
+   * Enter the constraint x: iid
+   * Assume x is a valid index and iid is a valid interface id
+   **/
+  public void indexImplements(int x, int iid) throws Unsatisfiable {
+    S.assert(S.a&& hasBeenInitialized);
+    if (LowlevelUnsatisfiable.refinedReports) {
+      try {
+        indexImplements0(x, iid);
+      } catch (LowlevelUnsatisfiable e) {
+        throw refine(e);
+      }
+    } else {
+      indexImplements0(x, iid);
+    }
+  }
+
+  // this method makes no effort to report refined unsatisfiability
+  private void indexImplements0(int x, int iid) throws LowlevelUnsatisfiable {
+    if (debugK0) {
+      S.dbg.println("#" + ID + " -> " + x + ": " + iid);
+    }
+    Interface iface = getInterface(iid);
+    if (iface.implementors.get(x)) {
+      // nothing to do !
+      return;
+    }
+    iface.implementors.set(x);
+    if (isRigid(x)) {
+      if (!iface.rigidImplementors.get(x)) {
+        throw new LowlevelImplementsClash(x, iid);
+      } else {
+        return;
+      }
+    }
+    // include unit since unit implements all the interfaces
+    reduceDomain(x, true, iface.rigidImplementors);
+  }
+  
   /**
    * Enter the constraint x1 = x2
    * Assume x1 and x2 are valid indexes
    **/
-  final public void eq(int x1, int x2) throws Unsatisfiable {
+  public void eq(int x1, int x2) throws Unsatisfiable {
     leq(x1, x2);
     leq(x2, x1);
   }
@@ -273,6 +686,7 @@ abstract public class K0 implements Cloneable {
    * Assume x1 and x2 are valid indexes.
    **/
   public void leq(int x1, int x2) throws Unsatisfiable {
+    S.assert(S.a&& hasBeenInitialized, this.getName() + " is not initialized ??");
     if (LowlevelUnsatisfiable.refinedReports) {
       try {
         leq0(x1, x2);
@@ -295,41 +709,17 @@ abstract public class K0 implements Cloneable {
       eq(x1, x2);
     }
   }
-
-  /**
-   * Enter the constraint Min(x)
-   * Assume x is a valid index
-   **/
-  final public void minimal(int x) throws Unsatisfiable {
-    extremal(x, MINIMAL);
-  }
-  final public void maximal(int x) throws Unsatisfiable {
-    extremal(x, MAXIMAL);
-  }
-  final private static int MINIMAL = 0;
-  final private static int MAXIMAL = 1;
-  private void extremal(int x, int what) throws Unsatisfiable {
-    if (LowlevelUnsatisfiable.refinedReports) {
-      try {
-        extremal0(x, what);
-      } catch (LowlevelUnsatisfiable e) {
-        throw refine(e);
-      }
-    } else {
-      extremal0(x, what);
-    }
-  }
-
-  static boolean debugK0 = S.getBoolean(false, "debug.k0");
   
   // versions that does not make any effort to report precise errors
   // in case of rigid clash
   private void leq0(int x1, int x2) throws LowlevelUnsatisfiable {
     if (debugK0) {
-      S.dbg.println(x1 + " <: " + x2);
+      S.dbg.println("#" + ID + " -> " + x1 + " <: " + x2);
     }
     if (x1 == x2) { return; }
     if (C.get(x1, x2)) { return; }
+    C.set(x1, x2);
+    Ct.set(x2, x1);
     if (isRigid(x1) && isRigid(x2)) {
       if (!R.get(x1, x2)) {
         throw new LowlevelRigidClash(x1, x2);
@@ -337,109 +727,97 @@ abstract public class K0 implements Cloneable {
         return;
       }
     }
-    if (debugK0) {
-      S.dbg.println("C.set(" + x1 + ", " + x2 + ")");
-    }
-    C.set(x1, x2);
-    Ct.set(x2, x1);
     if (isRigid(x1)) {
       // !isRigid(x2)
-      domainIntersect(x2, R.getRow(x1));
+      // exclude unit since unit is not comparable to x1
+      reduceDomain(x2, false, R.getRow(x1));
+      if (origins.get(x1)) {
+        // x1 = x2
+        leq0(x2, x1);
+      }
     }
     if (isRigid(x2)) {
       // !isRigid(x1)
-      domainIntersect(x1, Rt.getRow(x2));
-    }
-    if (isMinimal(x2) && !isVirtual(x1)) {
-      extremal0(x1, MINIMAL);
-      leq0(x2, x1);
-    }
-    if (isMaximal(x1) && !isVirtual(x2)) {
-      extremal0(x2, MAXIMAL);
-      leq0(x2, x1);
-    }
-  }
-  
-
-  private void extremal0(int x, int what) throws LowlevelUnsatisfiable {
-    S.assert(S.a&& !isVirtual(x));
-    if (debugK0) {
-      S.dbg.println(x + " is extemal " + what);
-    }
-    if (   (what == MINIMAL && !(isMinimal(x)))
-        || (what == MAXIMAL && !(isMaximal(x)))) {
-      if (debugK0) {
-        S.dbg.println(x + " was not extremal before");
-      }
-      if (isRigid(x)) {
-        throw new LowlevelUnsatisfiable("");
-      } else {
-        switch(what) {
-        case MINIMAL: minimal.set(x); domains.reduce(x, minimal); break;
-        case MAXIMAL: maximal.set(x); domains.reduce(x, maximal); break;
-        default: throw S.panic();
-        }
-        // walk through all the y such that y <_what x
-        BitVector lx = (what == MINIMAL ? Ct.getRow(x) : C.getRow(x)) ;
-        if (lx != null) {
-          int y = -1;
-          while ((y = lx.getLowestSetBit(++y)) >= 0) {
-            if (!virtual.get(y)) {
-              if (debugK0) {
-                S.dbg.println(" found " + y + " << " + x);
-              }
-              extremal0(y, what);
-              // merge x and y
-              switch (what) {
-              case MINIMAL: leq0(x, y); break;
-              case MAXIMAL: leq0(y, x); break;
-              }
-            }
-          }
-        }
+      // exclude unit
+      reduceDomain(x1, false, Rt.getRow(x2));
+      if (minimal.get(x2)) {
+        // x1 = x2;
+        leq0(x2, x1);
       }
     }
   }
-  
 
-  // try to refine the exception e, in case of rigid clashes
-  // the constraint is known to be unsatisfiable at this point
+  /***********************************************************************
+   * Better error messages
+   ***********************************************************************/
+  // try to refine the exception e, in case of rigid clashes the constraint is
+  // known to be unsatisfiable at this point NB: this method is only called in
+  // case of unsatisfiability that is to be reported to the user. The
+  // important point is to get a message that is precise enough. There is no
+  // need to optimize this method.
   private LowlevelUnsatisfiable refine(LowlevelUnsatisfiable e) {
     if (K0.debugK0) {
       S.dbg.println("Trying to refine " + e);
+      S.dbg.println("The constraint is " + this.toString());
     }
-    if (e instanceof LowlevelRigidClash) {
-      // nothing to refine
+    if (e instanceof LowlevelRigidClash
+        ||
+        e instanceof LowlevelImplementsClash) {
       return e;
-    } else {
-      C.closure();
-      int[] rigidClash = C.includedIn(m, R);
-      if (rigidClash != null) {
-        return new LowlevelRigidClash(rigidClash[0], rigidClash[1]);
-      } else {
-        // try to refine even better: find if the unsatisfiability
-        // stems from attempt to put a common supertype or subtype
-        // to incompatible rigid types
-        LowlevelIncompatibleClash clash = null;
-        clash
-          = refineIncompatible(C, R,
-                               LowlevelIncompatibleClash.NO_COMMON_SUPERTYPE);
-        if (clash != null) {
-          return clash;
-        }
-        Ct.closure();
-        clash
-          = refineIncompatible(Ct, Rt,
-                               LowlevelIncompatibleClash.NO_COMMON_SUBTYPE);
-        if (clash != null) {
-          return clash;
-        }
+    }
+    // close the constraint
+    // it does no harm to modify the constraint since
+    // it will be backtracked to display the error message
+    C.closure();
+    Ct.closure();
 
-        // At this point, we failed to give a better error message
-        // than "constraint is unsatisfiable"...
-        return e;
+    BitVector[] saturatedImplementors = closeImplements(C, Ct);
+    for (int iid = 0; iid < nInterfaces(); iid++) {
+      getInterface(iid).implementors = saturatedImplementors[iid];
+    }
+
+    // then try to find a rigid clash, i.e., a constraint a < b where a is not
+    // a subtype of b in the rigid context
+    int[] rigidClash = C.includedIn(m, R);
+    if (rigidClash != null) {
+      return new LowlevelRigidClash(rigidClash[0], rigidClash[1]);
+    }
+
+    // try to refine even better: find if the unsatisfiability
+    // stems from attempt to put a common supertype or subtype
+    // to incompatible rigid types
+    LowlevelIncompatibleClash clash = null;
+    clash
+      = refineIncompatible(C, R,
+                           LowlevelIncompatibleClash.NO_COMMON_SUPERTYPE);
+    if (clash != null) {
+      return clash;
+    }
+    clash
+      = refineIncompatible(Ct, Rt,
+                           LowlevelIncompatibleClash.NO_COMMON_SUBTYPE);
+    if (clash != null) {
+      return clash;
+    }
+
+    // finally try to find an "implements" clash
+    for (int iid = 0; iid < nInterfaces(); iid++) {
+      Interface iface = getInterface(iid);
+      int x = iface.implementors.getLowestSetBitNotIn(iface.rigidImplementors);
+      if (isValidIndex(x) && isRigid(x)) {
+        // XXX: la condition est bonne ???
+        // we've found an index x such that x: iid in the constraint but not
+        // in the rigid context
+        return new LowlevelImplementsClash(x, iid);
       }
     }
+    
+    // XXX: should test violation of weakly connected components
+    // XXX: use roots as well... ??
+
+    // At this point, we failed to give a better error message
+    // than the original one
+    return e;
   }
 
   private LowlevelIncompatibleClash refineIncompatible(BitMatrix C,
@@ -447,14 +825,15 @@ abstract public class K0 implements Cloneable {
                                                        int what) {
     for (int a = 0; a < m; a++) {
       for (int b = a + 1; b < m; b++) {
-        if (R.getRow(a).getLowestSetBitAndNotIn(R.getRow(b), virtual) < 0) {
+        if (R.getRow(a).getLowestSetBitAnd(R.getRow(b))
+            == BitVector.UNDEFINED_INDEX) {
           // R(a) and R(b) do not intersect
           BitVector Ca = C.getRow(a);
           if (Ca != null) {
             BitVector Cb = C.getRow(b);
             if (Cb != null) {
-              int z = Ca.getLowestSetBitAndNotIn(Cb, virtual);
-              if (z >= 0) {
+              int z = Ca.getLowestSetBitAnd(Cb);
+              if (z != BitVector.UNDEFINED_INDEX) {
                 // here is the culprit !
                 return new LowlevelIncompatibleClash(what, a, b, z);
               }
@@ -465,19 +844,226 @@ abstract public class K0 implements Cloneable {
     }
     return null;
   }
+  
+  /***********************************************************************
+   * Domains
+   ***********************************************************************/
+  // each soft variable is associated to a domain, i.e., a subset of the rigid
+  // variables plus unit (a special rigid value that implements all the
+  // interfaces. Subtyping constraints between a soft variable and a rigid
+  // one, and "implements" constraints on a soft variable immediately affect
+  // the domain of the soft variable. If a domain becomes empty, the
+  // constraint is unsatisfiable. When method satisfy or enumerate is called,
+  // the domains already hold an initial approximation of the solutions, which
+  // is refined by iteration of the closure operators associated to the
+  // subtyping constraints between soft variables. Then, instantiation and
+  // backtracking are used to find a solution (see Satisfier)
+  private DomainVector domains = null;
+  private void domainMerge(int src, int dest) throws Unsatisfiable {
+    domains.merge(src, dest);
+  }
+  private void domainMove(int src, int dest) {
+    domains.move(src, dest);
+  }
 
+  public void reduceDomain(int x, boolean unit, BitVector set)
+  throws LowlevelUnsatisfiable {
+    S.assert(S.a&& x >= -1);
+    if (x == -1) {
+      if (!unit) {
+        throw new LowlevelUnsatisfiable();
+      }
+    } else if (x < m) {
+      // the domain must contain x itself (we assume here that the relation
+      // is condensed on the rigid variables)
+      if (!set.get(x)) {
+        throw new LowlevelUnsatisfiable();
+      }
+    } else {
+      domains.reduce(x, unit, set);
+    }
+  }
+    
   /***********************************************************************
    * Constraint preparation
    ***********************************************************************/
+  // The constraint is "prepared" by
+  // 1. saturate it under Min, Origin and Abs axioms
+  // 2. condensing equivalent nodes
+  /**
+   * Saturate the constraint C, Ct under the axiom:
+   * x <* y and Min(y) => y < x (hence x ~ y)
+   **/
+  private void collapseMinimal() throws Unsatisfiable {
+    for (int y = 0; y < m0; y++) {
+      if (minimal.get(y)) {
+        BitVector uy = R.getRow(y);
+        // breadth-first search of the lower ideal of y
+        _collapsed.clearAll();
+        _toCollapse.clearAll();
+        _toCollapse.set(y);
+        while (true) {
+          int x = _toCollapse.getLowestSetBitNotIn(_collapsed);
+          if (x == BitVector.UNDEFINED_INDEX) {
+            break;
+          }
+          _collapsed.set(x);
+          BitVector lx = Ct.getRow(x);
+          if (lx != null) {
+            _toCollapse.or(lx);
+          }
+          if (x != y && !C.get(y, x)) {
+            // set y < x
+            C.set(y, x);
+            Ct.set(x, y);
+            // exclude from D(x) all elements outside uy
+            // exclude unit as well
+            reduceDomain(x, false, uy);
+          }
+        }
+      }
+    }
+  }
+  // preallocate these bit-vectors
+  private BitVector _collapsed = new BitVector(256);
+  private BitVector _toCollapse = new BitVector(256);
+
+  /**
+   * Saturate the constraint C, Ct under axiom
+   * Origin(y) and y >* x1 <* x2 >* x3 <* ... xn => xn <= y
+   **/
+  private void saturateOrigin() throws Unsatisfiable {
+    for (int y = 0; y < m0; y++) {
+      if (origins.get(y)) {
+        BitVector ly = Rt.getRow(y);
+        // breadth-first search of the weakly connected component of y
+        _collapsed.clearAll();
+        _toCollapse.clearAll();
+        _toCollapse.set(y);
+        while (true) {
+          int x = _toCollapse.getLowestSetBitNotIn(_collapsed);
+          if (x == BitVector.UNDEFINED_INDEX) {
+            break;
+          }
+          _collapsed.set(x);
+          BitVector ux = C.getRow(x);
+          BitVector lx = Ct.getRow(x);
+          if (ux != null) {
+            _toCollapse.or(ux);
+          }
+          if (lx != null) {
+            _toCollapse.or(lx);
+          }
+          if (x != y && !C.get(x, y)) {
+            // set x < y
+            C.set(x, y);
+            Ct.set(y, x);
+            // restrict D(x) to ly
+            // exclude unit as well
+            reduceDomain(x, false, ly);
+          }
+        }
+      }
+    }
+  }
+
+  /****************************************************************
+   * Algorithms on interfaces
+   ****************************************************************/
+
+  private int findApprox(int iid, int node)
+  {
+    int res=-1;
+    boolean toCheck=false;
+    boolean absOk=false; // Set to true if some surinterface of i is abstracted at node 
+
+    Interface i=getInterface(iid);
+    for(int j=0; j<nInterfaces(); j++)
+      {
+	Interface sup=getInterface(j);
+	if(sup.subInterfaces.get(iid)
+	   && sup.abstractors.get(node))
+	  {
+	    absOk=true;
+	    break;
+	  }
+      }
+    
+    if(!absOk)
+      return -1;
+      
+    for(int walk=0; walk<n; walk++)
+      if(R.get(node,walk))
+	{
+	  if(i.implementors.get(walk))
+	    if(res==-1 || R.get(walk,res))
+	      res=walk;
+	    else
+	      toCheck=true;
+	}
+    // Optimization (the less we produce arrows, the better) :
+    // We can get rid of  a ->_i b  if  b ->_i b
+    if(res==-1 || res!=node && i.abstractors.get(res))
+      return -1;
+    if(toCheck)
+      // check that res is minimal
+      for(int walk=0;walk<n;walk++)
+	if(R.get(node,walk) && i.implementors.get(walk)
+	   && !R.get(res,walk))
+	  return -1;
+    if(debugK0) S.dbg.println("Approximation for "+iid+": "+node+" -> "+res);
+    return res;
+  }
+	
+  private void computeApprox()
+  {
+    for(int iid=0; iid<nInterfaces(); iid++)
+      {
+	Interface i=getInterface(iid);
+	int[] approx=new int[m0];
+	for(int node=0;node<m0;node++)
+	  approx[node]=findApprox(iid,node);
+	i.setApprox(approx);
+      }
+  }
+  
+  private void saturateAbs()
+    throws Unsatisfiable
+  {
+    C.closure();
+    for(int iid=0; iid<nInterfaces(); iid++)
+      {
+	Interface i=getInterface(iid);
+	int n1;
+	for(int node=0;node<m0;node++)
+	  if((n1=i.getApprox(node))!=-1)
+	    for(int p1=0;p1<n;p1++)
+	      if(i.implementors.get(p1))
+		for(int p=0;p<n;p++)
+		  if(C.get(p,p1) && C.get(p,node))
+		    if(this.isRigid(p1))
+		      if(!C.get(n1,p1))
+			throw new LowlevelUnsatisfiable("saturateAbs: there should be "+n1+" <: "+p1);
+		      else ;
+		    else 
+		      {
+			if(debugK0) 
+			  S.dbg.println("Abs rule applied : "+n1+" < "+p1);
+			C .set(n1,p1);
+			Ct.set(p1,n1);
+		      }
+      }	    
+  }
 
   /**
    * Condense the relation by merging equivalent indexes and collecting the
    * garbage nodes.
    **/
-  public void condense() throws Unsatisfiable {
-    return ;
+  private void condense() throws Unsatisfiable {
+    if(true)
+      return;
     
-    // XXX: TODO: verify safetyness when indexMerged creates new nodes
+    // XXX: TODO: verify safety when indexMerged creates new nodes
     // XXX: actually, the specification should say that indexMerged
     // XXX: cannot access to K0 (neither create new nodes, nor enter new
     // XXX: constraints) (see Undispatched.VarK.indexMerged)
@@ -489,113 +1075,113 @@ abstract public class K0 implements Cloneable {
     // 2. it allows early test of satisfiability (if C* violates assertions
     //           on rigid variables
     // 3. it is obviously correct (Tarjan algorithm is a mess to debug...)
-//      BitMatrix T = (BitMatrix)C.clone();
-//      T.closure();
+    BitMatrix T = (BitMatrix)C.clone();
+    T.closure();
 
-//      if (m > 0) {
-//        int[] rigidClash = T.includedIn(m, R);
-//        if (rigidClash != null) {
-//          throw new LowlevelRigidClash(rigidClash[0], rigidClash[1]);
-//        }
-//      }
-//      BitMatrix Tt = (BitMatrix)Ct.clone();
-//      Tt.closure();
-//      for (int i = 0; i < n; i++) {
-//        int root = T.getRow(i).getLowestSetBitAnd(Tt.getRow(i));
-//        if (root != i) {
-//          if (isRigid(root) && !isRigid(i)) {
-//            // domains of variables comparable to i is incorrect after
-//            // the merge, so recompute them
-//            for (int j = m; j < n; j++) {
-//              if (i != j && isValidIndex(j)) {
-//                if (C.get(i, j)) {
-//                  domainIntersect(j, R.getRow(root));
-//                }
-//                if (Ct.get(i, j)) {
-//                  domainIntersect(j, Rt.getRow(root));
-//                }
-//              }
-//            } 
-//          }
-//          indexMerge(i, root);
-//        }
-//      }
-//      collect();
-  }
-
-  /***********************************************************************
-   * Domains management
-   ***********************************************************************/
-  public DomainVector domains = new DomainVector(0, 0);
-  private void domainIntersect(int x, BitVector constraint)
-  throws LowlevelUnsatisfiable {
-    domains.reduce(x, constraint);
-  }
-  // merge domain src and dest, put the result in dest and discard src
-  // if the result becomes empty, it means that the constraint is
-  // unsatisfiable
-  private void domainMerge(int src, int dest) throws Unsatisfiable {
-    domains.merge(src, dest);
-  }
-  private void domainMove(int src, int dest) {
-    domains.move(src, dest);
+    if (m > 0) {
+      if (T.includedIn(m, R) != null) {
+        // T is NOT included in R on [0, m[ x [0, m[
+        throw new LowlevelUnsatisfiable();// will be refined if necessary
+      }
+    }
+    BitMatrix Tt = (BitMatrix)Ct.clone();
+    Tt.closure();
+    
+    for (int i = 0; i < n; i++) {
+      if (!garbage.get(i)) {
+        int root = T.getRow(i).getLowestSetBitAnd(Tt.getRow(i));
+        if (root != i) {
+          // we've found that root is equivalent to i
+          // we are going to merge them. However, remember that the domains
+          // of soft variables are assumed to keep track of all
+          // the direct constraints relations between soft and rigid variables
+          // and soft and interfaces.
+          //
+          // if root and i are soft, we simply have to merge their domains
+          // (take the intersection) to account for all direct constraints
+          //
+          // if root is rigid and i is soft, then all the soft variables that
+          // are comparable to i should have their domain restricted
+          //
+          // root cannot be soft if i is rigid because root < i
+          if (isRigid(root) && !isRigid(i)) {
+            for (int j = m; j < n; j++) {
+              if (i != j && isValidIndex(j)) {
+                if (C.get(i, j)) {
+                  // exclude unit since it is not comparable to root
+                  reduceDomain(j, false, R.getRow(root));
+                }
+                if (Ct.get(i, j)) {
+                  // ditto
+                  reduceDomain(j, false, Rt.getRow(root));
+                }
+              }
+            } 
+          }
+          indexMerge(i, root);
+        }
+      }
+    }
+    collect();
   }
 
-  /***********************************************************************
-   * satisfiability
-   ***********************************************************************/
-  final public void enumerate(LowlevelSolutionHandler handler)
-  throws Unsatisfiable {
+  private void prepareConstraint() throws Unsatisfiable {
+    saturateOrigin();
+    collapseMinimal();
+    saturateAbs();
     condense();
+  }
+
+
+  /***********************************************************************
+   * Satisfiability
+   ***********************************************************************/
+  // enumerate the solutions on rigid variables (constructive witness)
+  // or throw Unsatisfiable if no solution (right thing to do ???)
+  // XXX: refine Unsatisfiable ??
+  public void enumerate(LowlevelSolutionHandler handler)
+  throws Unsatisfiable {
+    S.assert(S.a&& hasBeenInitialized);
+    prepareConstraint();
     domains.trimToSize();
-    if (0 < m && m < n) {
+    if (m == 0 || m == n) {
+      // the constraint is satisfiable
+      // if m == 0, all the variables are mapped to unit
+      // if m == n, there is no variable
+      // In both cases, there is still exactly one solution.
+      handler.handle(domains);
+    } else {
+      // here goes real satisfiability
       int[] strategy = Satisfier.compileStrategy(C, Ct, m, n);
       Satisfier.enumerateSolutions(strategy, domains, C, Ct, R, Rt, m, n, handler);
     }
   }
 
-  final public void reduceDomain(int x, BitVector domain)
-  throws LowlevelUnsatisfiable {
-    if (x < m) {
-      if (!domain.get(x)) {
-        throw new LowlevelUnsatisfiable("");
-      }
-    } else {
-      domains.reduce(x, domain);
-    }
-  }
-
-  final public void enumerate(BitVector observers,
-                              LowlevelSolutionHandler handler) {
+  // XXX: spec ??
+  public void enumerate(BitVector observers,
+                            LowlevelSolutionHandler handler) {
+    S.assert(S.a&& hasBeenInitialized);
     try {
-      condense();
+      prepareConstraint();
     } catch (Unsatisfiable e) {
       // not satisfiable
       return;
     }
     domains.trimToSize();
-    if (m > 0) {
-      if (m < n) {
-        int[] strategy = Satisfier.compileStrategy(C, Ct, m, n);
-        Satisfier.enumerateSolutions(strategy, domains,
-                                       C, Ct, R, Rt, m, n,
-                                       observers, handler);
-      } else {
-        // no variables, but some constant...
-        handler.handle(domains);
-      }
+    if (m == 0 || m == n) {
+      handler.handle(domains);
+    } else {
+      int[] strategy = Satisfier.compileStrategy(C, Ct, m, n);
+      Satisfier.enumerateSolutions(strategy, domains,
+                                   C, Ct, R, Rt, m, n,
+                                   observers, handler);
     }
   }
 
-  protected void beforeSatisfy()
-    throws Unsatisfiable
-  {
-  }
-  
-  final public void satisfy() throws Unsatisfiable {
+  public void satisfy() throws Unsatisfiable {
+    S.assert(S.a&& hasBeenInitialized);
     try {
-      beforeSatisfy();
-      condense();
+      prepareConstraint();
       rawSatisfy();
     } catch (LowlevelUnsatisfiable e) {
       if (LowlevelUnsatisfiable.refinedReports) {
@@ -618,81 +1204,166 @@ abstract public class K0 implements Cloneable {
    * Rigidification
    ***********************************************************************/
   /**
-   * Rigidify the current constraint. NB: this does not satisfy the constraint.
-   * If you want to test well-formedness of nested contexts, call satisfy()
-   * before rigidify(). In particular, minimal constraints are not handled
-   * properly if the constraint is not satisfied unless you garantee that no
-   * node are below minimal nodes.
+   * Saturate the subtyping between interfaces under :
+   * I < J and J < K => I < K
+   **/
+  private void closeInterfaceRelation() {
+    // Warshall algorithm
+    for (int k = 0; k < nInterfaces(); k++) {
+      Interface K = getInterface(k);
+      for (int i = 0; i < nInterfaces(); i++) {
+        Interface I = getInterface(i);
+        if (I.subInterfaces.get(k)) {
+          // K < I
+          // for all J < K, add J < I
+          I.subInterfaces.or(K.subInterfaces);
+        }
+      }
+      // reflexivity
+      K.subInterfaces.set(k);
+    }
+  }
+
+  /**
+   * Saturate the "implements" constraint under the following axioms:
+   * x: I and I < J => x: J
+   * x < y and y: I => y: I
+   *
+   * Returns an array of BitVector rigidImplementors
+   * rigidImplementors[iid] is the set of x such that x :* iid
+   **/
+  BitVector[] closeImplements(BitMatrix R, BitMatrix Rt) {
+    BitVector[] rigidImplementors = new BitVector[nInterfaces()];
+    for (int iid = 0; iid < nInterfaces(); iid++) {
+      Interface I = getInterface(iid);
+      rigidImplementors[iid] = (BitVector)I.implementors.clone();
+      for (int x = 0; x < n; x++) {
+        if (I.implementors.get(x)) {
+          // x: iid
+          // for all y < x, add y: iid
+          rigidImplementors[iid].or(Rt.getRow(x));
+        }
+      }
+    }
+    for (int iid1 = 0; iid1 < nInterfaces(); iid1++) {
+      for (int iid2 = 0; iid2 < nInterfaces(); iid2++) {
+        if (getInterface(iid2).subInterfaces.get(iid1)) {
+          // I1 < I2
+          // for all x: I1, add x: I2
+          rigidImplementors[iid2].or(rigidImplementors[iid1]);
+        }
+      }
+    }
+    return rigidImplementors;
+  }
+  
+
+  /**
+   * Rigidify the current constraint
+   * You must have called satisfy before
    **/
   public void rigidify() {
+    S.assert(S.a&& hasBeenInitialized);
     R = (BitMatrix)C.clone();
     R.closure();
     Rt = (BitMatrix)Ct.clone();
     Rt.closure();
     m = n;
+    BitVector[] rigidImplementors  = closeImplements(R, Rt);
+    for (int iid = 0; iid < nInterfaces(); iid++) {
+      getInterface(iid).rigidImplementors = rigidImplementors[iid];
+    }
     domains = new DomainVector(m, m);
   }
 
   /***********************************************************************
    * Marking / Backtracking
    ***********************************************************************/
+  // There are two modes of backtracking: BACKTRACK_UNLIMITED and
+  // BACKTRACK_ONCE
+  //
+  // 1. BACKTRACK_ONCE: backtrack() may be called to undo all modifications
+  // made to the constraint since the last call to mark() (time t1). The
+  // constraint may then be modified and another call to backtrack still
+  // restores the constraint to the state at time t1. Or the constraint may be
+  // modified, then mark() called (at time t2). Any subsequent call to
+  // backtrack restores to t2, unless mark() is called another time. This is
+  // the default mode adapted to type inference, used by the Jazz compiler.
+  //
+  // 2. BACKTRACK_UNLIMITED: calls to mark and backtrack may be nested: a call
+  // to backtrack undoes all the modification made to this constraint since
+  // the last call to mark() in the same nested level. It is an error if there
+  // are more calls to backtrack() than to mark(). This mode is adapted to
+  // type checking and used by the Bossa compiler.
+  private int backtrackMode;
+  final public static int BACKTRACK_UNLIMITED=1;
+  final public static int BACKTRACK_ONCE=2;
+  
   private class Backup {
-    Backup savedBackup = backup;
-    BitMatrix savedC = (BitMatrix)C.clone();
-    
-    // XXX: necessary to clone ?
-    BitMatrix savedR = (R == null ? null : (BitMatrix)R.clone()); 
-    BitVector savedMinimal = (BitVector)minimal.clone();
-    BitVector savedMaximal = (BitVector)maximal.clone();
-    BitVector savedGarbage = (BitVector)garbage.clone();
-    BitVector savedVirtual = (BitVector)virtual.clone();
-    DomainVector savedDomains = (DomainVector)domains.clone();
+    // may be non-null if backtrackMode==BACKTRACK_UNLIMITED    
+    Backup previous;
+    int savedM;
+    BitMatrix savedC;
+    BitVector savedGarbage;
+    DomainVector savedDomains;
+    BitVector[] savedImplementors;
+
+    private Backup() {
+      if (K0.this.backtrackMode == K0.BACKTRACK_UNLIMITED) {
+        this.previous = K0.this.backup;
+      } else {
+        this.previous = null;
+      }
+      this.savedM = K0.this.m;
+      this.savedC = (BitMatrix)K0.this.C.clone();
+      this.savedGarbage = (BitVector)K0.this.garbage.clone();
+      this.savedDomains = (DomainVector)K0.this.domains.clone();
+      this.savedImplementors = new BitVector[K0.this.nInterfaces()];
+      for (int iid = 0; iid < savedImplementors.length; iid++) {
+        savedImplementors[iid]
+          = (BitVector)K0.this.getInterface(iid).implementors.clone();
+      }
+    }
   }
 
   private Backup backup = null;
   public void mark() {
+    S.assert(S.a&& hasBeenInitialized);
     backup = new Backup();
   }
 
+  // backtrack to the situation the last time
+  // mark() has been called
   public void backtrack() {
-    if (backup == null) {
-      this.C = new BitMatrix();
-      this.Ct = new BitMatrix();
-      this.n = 0;
-      this.R = null;
-      this.Rt = null;
-      this.m = 0;
-      this.minimal = new BitVector();
-      this.maximal = new BitVector();
-      this.garbage = new BitVector();
-      this.virtual = new BitVector();
-    } else {
-      this.C = backup.savedC;
-      this.Ct = backup.savedC.transpose();
-      this.n = backup.savedC.size();
-      if (backup.savedR == null) {
-        this.R = null;
-        this.Rt = null;
-        this.m = 0;
-      } else {
-        this.R = backup.savedR;
-        this.Rt = backup.savedR.transpose();
-        this.m = backup.savedR.size();
-      }
-      this.minimal = backup.savedMinimal;
-      this.maximal = backup.savedMaximal;
-      this.garbage = backup.savedGarbage;
-      this.domains = backup.savedDomains;
-      this.virtual = backup.savedVirtual;
-      this.backup  = backup.savedBackup; // leave this statement at the end !
+    S.assert(S.a&& hasBeenInitialized);
+    S.assert(S.a&& backup != null, "backtrack() without corresponding mark()");
+    this.m = backup.savedM;
+    this.R.setSize(m);
+    this.Rt.setSize(m);
+    this.C = backup.savedC;
+    this.Ct = backup.savedC.transpose();
+    this.n = backup.savedC.size();
+    this.garbage = backup.savedGarbage;
+    this.domains = backup.savedDomains;
+    for (int iid = 0; iid < nInterfaces(); iid++) {
+      Interface I = getInterface(iid);
+      I.rigidImplementors.truncate(m);
+      I.implementors = backup.savedImplementors[iid];
     }
-    onResize(n);
-    //mark();
-    clearTags(); //TODO:?? should I leave this ?
+    clearTags();
+    if (backtrackMode == BACKTRACK_UNLIMITED) {
+      backup = backup.previous;
+    } else {
+      backup = null;
+      mark();
+    }
+    if (debugK0) {
+      S.dbg.println("backtracked #" + ID);
+    }
   }
 
   /***********************************************************************
-   * Miscellaneous
+   * Iterate thru the constraint
    ***********************************************************************/
   public static abstract class IneqIterator {
     abstract protected void iter(int x1, int x2) throws Unsatisfiable;
@@ -721,99 +1392,37 @@ abstract public class K0 implements Cloneable {
       }
     }
   }
-        
-  
-  /***********************************************************************
-   * Pretty printing
-   ***********************************************************************/
-  protected String indexToString(int index) {
-    return Integer.toString(index);
+
+  public static abstract class ImplementsIterator {
+    abstract protected void iter(int x, int iid) throws Unsatisfiable;
+  }
+  public void implementsIter(ImplementsIterator iterator) throws Unsatisfiable {
+    for (int iid = 0; iid < nInterfaces(); iid++) {
+      BitVector implementors = getInterface(iid).implementors;
+      for (int x = implementors.getLowestSetBit();
+           x != BitVector.UNDEFINED_INDEX;
+           x = implementors.getNextBit(x)) {
+        if (!garbage.get(x)) {
+          iterator.iter(x, iid);
+        }
+      }
+    }
   }
 
-  public String domainsToString() {
-    StringBuffer sb = new StringBuffer();
-    for (int i = m; i < n; i++) {
-      if (isValidIndex(i)) {
-        sb.append("D(").append(indexToString(i)).append(") = ");
-        Domain d = domains.getDomain(i);
-        if (d == null) {
-          sb.append(d);
-        } else {
-          sb.append("{");
-          boolean needSeparator = false;
-          for (int a = 0; a < m; a++) {
-            if (d.get(a)) {
-              if (needSeparator) {
-                sb.append(", ");
-              } else {
-                needSeparator = true;
-              }
-              sb.append(indexToString(a));
-            }
-          }
-          sb.append("}");
-        }
-        sb.append("; ");
-      }
-    }
-    return sb.toString();
+  public static abstract class AbstractsIterator {
+    abstract protected void iter(int x, int iid) throws Unsatisfiable;
   }
-   
-  public String toString() {
-    final StringBuffer sb = new StringBuffer();
-    boolean needSeparator = false;
-    sb.append("{");
-    for (int i = 0; i < n; i++) {
-      if (isValidIndex(i)) {
-        if (needSeparator) {
-          sb.append(", ");
-        } else {
-          needSeparator = true;
+  public void abstractsIter(AbstractsIterator iterator) throws Unsatisfiable {
+    for (int iid = 0; iid < nInterfaces(); iid++) {
+      BitVector abstractors = getInterface(iid).abstractors;
+      for (int x = abstractors.getLowestSetBit();
+           x != BitVector.UNDEFINED_INDEX;
+           x = abstractors.getNextBit(x)) {
+        if (!garbage.get(x)) {
+          iterator.iter(x, iid);
         }
-        //        if (minimal.get(i)) {
-        //          sb.append('_');
-        //        }
-        //        if (maximal.get(i)) {
-        //          sb.append('!');
-        //        }
-        sb.append(indexToString(i));
-        if (S.debug) {
-          sb.append("{").append(i).append("}");
-        }
-        //        if (isRigid(i)) {
-        //          sb.append('*');
-        //        }
-        //        if (posTagged(i)) {
-        //          sb.append("+");
-        //        }
-        //        if (negTagged(i)) {
-        //          sb.append("-");
-        //        }
       }
     }
-    sb.append(" | ");
-    try {
-      ineqIter(new IneqIterator () {
-        boolean needSeparator = false;
-        protected void iter(int x1, int x2) {
-          if (needSeparator) {
-            sb.append("; ");
-          } else {
-            needSeparator = true;
-          }
-          if (!isVirtual(x1) && isVirtual(x2)) {
-            sb.append(indexToString(x1)).append(": ").append(indexToString(x2));
-          } else {
-            sb.append(indexToString(x1)).append(" <: ").append(indexToString(x2));
-          }
-        }
-      });
-    } catch (Unsatisfiable e) {
-      throw S.panic();
-    }
-    sb.append("}");
-    if (debugK0) { sb.append(domainsToString()); }
-    return sb.toString();
   }
 
   /***********************************************************************
@@ -826,7 +1435,9 @@ abstract public class K0 implements Cloneable {
   final public class Snap {
     BitVector quantified;
     BitMatrix snapC;
-    //    BitMatrix snapCt;
+    // for each interface iid, snapImplementors[iid] is the vector of the
+    // snapped nodes who implement iid
+    BitVector[] snapImplementors;
     int snapN;
     
     // selector selects the quantified indexes
@@ -846,8 +1457,11 @@ abstract public class K0 implements Cloneable {
         
         // the constraint has been satisfied. Hence it is in condensed
         // form, so no need to bother with garbage...
-        // XXX: should we be concerned with minimal ?
-        // XXX: and with virtual ??
+      }
+      snapImplementors = new BitVector[nInterfaces()];
+      for (int iid = 0; iid < snapImplementors.length; iid++) {
+        snapImplementors[iid]
+          = (BitVector)getInterface(iid).implementors.clone();
       }
     }
 
@@ -864,7 +1478,10 @@ abstract public class K0 implements Cloneable {
     public void quantifiedIter(IndexIterator iterator) {
       indexIter(true, iterator);
     }
+
+    
     public void ineqIter(IneqIterator iterator) throws Unsatisfiable {
+      // enumerate the i <: j where one of i or j is quantified
       for (int i = 0; i < snapN; i++) {
         if (quantified.get(i)) {
           for (int j = 0; j < snapN; j++) {
@@ -876,6 +1493,19 @@ abstract public class K0 implements Cloneable {
           for (int j = 0; j < snapN; j++) {
             if (quantified.get(j) && snapC.get(i, j)) {
               iterator.iter(i, j);
+            }
+          }
+        }
+      }
+    }
+
+    public void implementsIter(ImplementsIterator iterator )
+    throws Unsatisfiable {
+      for (int x = 0; x < snapN; x++) {
+        if (quantified.get(x)) {
+          for (int iid = 0; iid < snapImplementors.length; iid++) {
+            if (snapImplementors[iid].get(x)) {
+              iterator.iter(x, iid);
             }
           }
         }
@@ -897,36 +1527,19 @@ abstract public class K0 implements Cloneable {
               sb.append(i).append(" <: ").append(j).append("; ");
             }
           });
+        implementsIter
+          (new ImplementsIterator() {
+            protected void iter(int x, int iid) {
+              sb.append(x).append(": ").append(iid).append("; ");
+            }
+          });
       } catch (Unsatisfiable e) {
         throw S.panic();
       }
       return sb.toString();
     }
-    
-    /**
-     * Sets in free all the free (non quantified) variables of this snapped
-     * constraint.
-     **/
-    public void addFreeVariables(BitVector free) {
-      if (!quantified.isEmpty()) {
-        for (int i = 0; i < snapN; i++) {
-          BitVector row = snapC.getRow(i);
-          if (row != null) {
-            if (quantified.get(i)) {
-              free.orNotIn(row, quantified);
-            } else {
-              // test if i is in relation with some quantified variable
-              if (row.getLowestSetBitAnd(quantified) >= 0) {
-                // so it is free
-                free.set(i);
-              }
-            }
-          }
-        }
-      }   
-    }
-  }
-
+  }    
+  
   /**
    * Get a snapshot of this constraint. The quantified indexes are selected by
    * selector.
@@ -940,40 +1553,64 @@ abstract public class K0 implements Cloneable {
     }
   }
 
+  /**
+   * Snap all the constraint
+   **/
+  public Snap getSnap() {
+    return getSnap(allSelector);
+  }
+  private static IndexSelector allSelector = new IndexSelector() { 
+    protected boolean select(int index) {
+      return true;
+    }
+  };
+    
   /***********************************************************************
    * Weak marking / Backtracking (only keeps track of the sizes)
    * NB: calls to mark/backtrack and weakMark/weakBacktrack mustn't
    * be interleaved
    ***********************************************************************/
-
   // is it really useful ? we'd better do a robust optimized version of
   // mark/backtrack that is lazy to avoid unnecessary copies... 
   private int weakMarkedSize = -1;
   private int weakMarkedM = -1;
   public void weakMark() {
+    S.assert(S.a&& weakMarkedSize == -1);
     weakMarkedSize = n;
     weakMarkedM = m;
+    if (debugK0) {
+      S.dbg.println("weakMark'ed");
+    }
   }
   public void weakBacktrack() {
+    S.assert(S.a&& weakMarkedSize >= 0);
     R.setSize(weakMarkedM);
     Rt.setSize(weakMarkedM);
+    for (int iid = 0; iid < nInterfaces(); iid++) {
+      getInterface(iid).rigidImplementors.truncate(weakMarkedM);
+    }
     int nMin = weakMarkedSize;
     int nMax = n;
     setSize(weakMarkedSize);
     weakMarkedSize = -1;
     weakMarkedM = -1;
     for (int i = nMin; i < nMax; i++) {
-      indexDiscarded(i);
+      callbacks.indexDiscarded(i);
+    }
+    if (debugK0) {
+      S.dbg.println("weakBacktrack'ed");
     }
   }
 
   /***********************************************************************
-   * Constraint simplification
+   * Simplification
    ***********************************************************************/
   // XXX: should be entirely worked out...
+  // XXX: comment utiliser mark/backtrack avec recopie lazy ??
 
   // the size of the constraint when startSimplify() has been called
   public void startSimplify() {
+    S.assert(S.a&& hasBeenInitialized);
     weakMark();
 
     // necessary ?
@@ -981,6 +1618,7 @@ abstract public class K0 implements Cloneable {
     negTagged.fill(n);
   }
   public void stopSimplify() {
+    S.assert(S.a&& hasBeenInitialized);
     weakBacktrack();
   }
 
@@ -1007,10 +1645,19 @@ abstract public class K0 implements Cloneable {
     }
   }
 
+  // simplify all the variables introduced since
+  // last weakMark()
   public void simplify() {
+    if(true)
+      return;
+    
+    S.assert(S.a&& hasBeenInitialized);
     if (weakMarkedSize >= 0) {
       if (weakMarkedSize == n) {
         return;
+      }
+      if (S.debugSimpl) {
+        S.dbg.println("SIMPL: start simplification");
       }
       BitVector simplified = new BitVector(n);
       simplified.fill(n);
@@ -1021,6 +1668,7 @@ abstract public class K0 implements Cloneable {
     }
   }
   public void simplify(IndexSelector selector) {
+    S.assert(S.a&& hasBeenInitialized);
     BitVector simplified = new BitVector(n);
     boolean empty = true;
     for (int i = 0; i < n; i++) {
@@ -1046,70 +1694,93 @@ abstract public class K0 implements Cloneable {
       R.closure();
       Rt = (BitMatrix)Ct.clone();
       Rt.closure();
-      domains = new DomainVector(initN, n, n - initN);
+
+      implementors = closeImplements(R, Rt);
+      
+      Sdomains = new DomainVector(initN, n, n - initN);
       for (int i = initN; i < n; i++) {
         if (!simplified.get(i)) {
-          domains.clear(i);
+          Sdomains.clear(i);
         }
       }
     }
+    
     int initN;                  // don't simplify below this index
-    BitVector simplified;          // the vector of indexes being simplified
-      
+    BitVector simplified;       // the vector of indexes being simplified
+
+    // closed constraint
     BitMatrix R;
     BitMatrix Rt;
-    DomainVector domains;
+    BitVector[] implementors;
+
+    DomainVector Sdomains;
 
     private void computeInitialDomains() {
+      if (S.debugSimpl) {
+        S.dbg.println("SIMPL: computing initial domains");
+      }
       // 
       // Compute the initial value of D(x) for all simplified variable x
       //
       for (int x = initN; x < n; x++) {
-        Domain dx = domains.getDomain(x);
+        Domain dx = Sdomains.getDomain(x);
         if (dx != null) {
-          if (isMinimal(x)) {
-            dx.and(minimal);
-          }
-          if (isMaximal(x)) {
-            dx.and(maximal);
-          }
-          if (isVirtual(x)) {
-            dx.and(virtual);
-          } else {
-            dx.andNot(virtual);
-          }
+          // now, we know that simplified.get(x) is true
+          
+          // can't simplify rigid variable of the initial context
+          S.assert(S.a&& x >= m0);
           BitVector ux = R.getRow(x);
           if (ux != null) {
-            // XXX: Use ux.getLowestSetBit(int pos) to walk through the bit in ux
-            for (int x0 = 0; x0 < n; x0++) {
-              if (!simplified.get(x0) && ux.get(x0)) {
+            for (int x0 = ux.getLowestSetBit();
+                 x0 != BitVector.UNDEFINED_INDEX;
+                 x0 = ux.getNextBit(x0)) {
+              if (!simplified.get(x0)) {
                 // we have x <C x0
                 // sigma(x0) = x0 for all auto-solution
                 // do D(x) = D(x) \inter \Lower{x0}
                 dx.and(Rt.getRow(x0));
+                // and exclude unit since unit is not comparable to x0
+                dx.rawExcludeUnit();
               }
             }
           }
           BitVector lx = Rt.getRow(x);
           if (lx != null) {
-            for (int x0 = 0; x0 < n; x0++) {
-              if (!simplified.get(x0) && lx.get(x0)) {
+            for (int x0 = lx.getLowestSetBit();
+                 x0 != BitVector.UNDEFINED_INDEX;
+                 x0 = lx.getNextBit(x0)) {
+              if (!simplified.get(x0)) {
                 // x0 <C x
                 // do D(x) = D(x) \inter \Upper{x0}
                 dx.and(R.getRow(x0));
+                dx.rawExcludeUnit();
               }
             }
           }
+          for (int iid = 0; iid < nInterfaces(); iid++) {
+            if (implementors[iid].get(x)) {
+              // we have x: I
+              // ("implements" relation has been saturated)
+              dx.and(implementors[iid]);
+              // don't exclude unit !!
+            }
+          }
+          
           if (posTagged(x)) {
             // We must have sigma(x) <= x
             // Do D(x) = D(x) \inter \Lower{x}
             dx.and(Rt.getRow(x));
+            dx.rawExcludeUnit();
           }
           if (negTagged(x)) {
             // We must have sigma(x) >= x
             dx.and(R.getRow(x));
+            dx.rawExcludeUnit();
           }
         }
+      }
+      if (S.debugSimpl) {
+        S.dbg.println("SIMPL: initial domains are : " + domainsToString());
       }
     }
 
@@ -1124,11 +1795,11 @@ abstract public class K0 implements Cloneable {
       final RuntimeException abort = new RuntimeException();
       try {
         Satisfier.enumerateSolutions
-          (strategy, domains, C, Ct, R, Rt, initN, n,
+          (strategy, Sdomains, C, Ct, R, Rt, initN, n,
            new LowlevelSolutionHandler() {
             protected void handle() {
               for (int x = initN; x < n; x++) {
-                if (domains.getDomain(x) != null) {
+                if (Sdomains.getDomain(x) != null) {
                   solution[x - initN] = getSolutionOf(x);
                 } else {
                   solution[x - initN] = x;
@@ -1146,7 +1817,7 @@ abstract public class K0 implements Cloneable {
 
     private class Normal extends Exception {}
     /**
-     * Fills (solution, nker) with a non-surjective solution or throws Normal.
+     * Fills solution with a non-surjective solution or throws Normal.
      * Starts to exclude elements downwards from excludedA.
      *
      * @exception Normal if the constraint is in normal form
@@ -1157,14 +1828,14 @@ abstract public class K0 implements Cloneable {
       while (excludedA >= initN) {
         if (!garbage.get(excludedA) && simplified.get(excludedA)) {
           int x;
-          DomainVector savedDomains = (DomainVector)domains.clone();
+          DomainVector savedDomains = (DomainVector)Sdomains.clone();
           try {
             if (S.debugSimpl) {
               S.dbg.println("Try excluding " + excludedA);
             }
-            domains.exclude(excludedA);
+            Sdomains.exclude(excludedA);
             if (S.debugSimpl) {
-              S.dbg.println("Satisfying with " + domains.dump());
+              S.dbg.println("Satisfying with " + Sdomains.dump());
             }
             findSolution(strategy, solution);
             return excludedA;
@@ -1176,7 +1847,7 @@ abstract public class K0 implements Cloneable {
             // try another value
           }
           finally {
-            domains = savedDomains;
+            Sdomains = savedDomains;
           }
         }
         excludedA--;
@@ -1186,13 +1857,13 @@ abstract public class K0 implements Cloneable {
 
     /**
      * assume solution contains a solution of C |= C.
-     * Do one stroke of simplification.
+     * Do one stroke of simplification on x.
      **/
     private void simplifyIndex(int x, int[] solution, int[] nker) {
       if (S.debugSimpl) {
         S.dbg.println("x = " + x + "nker[x - initN] = " + nker[x - initN] + "garbage.get(x) = " + garbage.get(x));
       }
-      while (simplified.get(x) && nker[x - initN] == 0) {
+      while (x >= initN && simplified.get(x) && nker[x - initN] == 0) {
         // OK, x is not in the codomain of sigma, we can eliminate it
 
         if (S.debugSimpl) {
@@ -1200,34 +1871,50 @@ abstract public class K0 implements Cloneable {
         }
         try {
           //
-          // Propagate the constraints int (C, Ct) that go through x
+          // Propagate the constraints in (C, Ct) that go through x
           //
           // XXX: is it inconvenient that it can modify the context ?
           // XXX: normally not: it only adds consequences of the context...
-          
           for (int y = 0; y < n; y++) {
-            if (x != y && C.get(y, x)) {
-              // y < x
-              // for each x < z, add y < z
-              BitVector ux = C.getRow(x);
-              if (ux != null) {
-                // C.getRow(y) is necessarily non-null since C.get(y, x) is true
-                C.getRow(y).or(ux);
+            if (!garbage.get(y)) {
+              if (x != y && C.get(y, x)) {
+                // y < x
+                // for each x < z, add y < z
+                BitVector ux = C.getRow(x);
+                if (ux != null) {
+                  // C.getRow(y) is necessarily non-null since C.get(y, x) is
+                  // true
+                  C.getRow(y).or(ux);
+                }
               }
-            }
-            if (x != y && Ct.get(y, x)) {
-              // x < y
-              // add z < y for each z < x
-              BitVector lx = Ct.getRow(x);
-              if (lx != null) {
-                // Ct.getRow(y) is necessarily non-null because Ct.get(y, x)
-                // is true
-                Ct.getRow(y).or(lx);
+              if (x != y && Ct.get(y, x)) {
+                // x < y
+                // add z < y for each z < x
+                BitVector lx = Ct.getRow(x);
+                if (lx != null) {
+                  // Ct.getRow(y) is necessarily non-null because Ct.get(y, x)
+                  // is true
+                  Ct.getRow(y).or(lx);
+                }
               }
             }
           }
-          domains.clear(x);
-          domains.exclude(x);
+          //
+          // Propagate the "implements" constraints that go thru x
+          //
+          for (int iid = 0; iid < nInterfaces(); iid++) {
+            Interface I = getInterface(iid);
+            if (I.implementors.get(x)) {
+              // for all y < x, add y: I
+              BitVector lx = Ct.getRow(x);
+              if (lx != null) {
+                I.implementors.or(lx);
+              }
+            }
+          }
+          // should clear C Ct ?
+          Sdomains.clear(x);
+          Sdomains.exclude(x);
           simplified.clear(x);
           garbage.set(x);
           int sx = solution[x - initN];
@@ -1235,24 +1922,28 @@ abstract public class K0 implements Cloneable {
             nker[sx - initN]--;
           }
           if (posTagged(x) || negTagged(x)) {
+            // sx can't be -1 because unit is not comparable with x
+            S.assert(S.a&& sx >= 0);
             // discard x by merging with sx
             if (S.debugSimpl) {
               S.dbg.println("Merge " + x + " and " + sx);
             }
             if (simplified.get(sx)) {
               if (posTagged(x) && !posTagged(sx)) {
-                domains.reduce(sx, Rt.getRow(sx));
+                // we now have found that sx is tagged +
+                // exclude unit, not comparable to sx
+                Sdomains.reduce(sx, false, Rt.getRow(sx));
                 posTagged.set(sx);
               }
               if (negTagged(x) && !negTagged(sx)) {
-                domains.reduce(sx, R.getRow(sx));
+                Sdomains.reduce(sx, false, R.getRow(sx));
                 negTagged.set(sx);
               }
             }
-            indexMerged(x, sx);
+            callbacks.indexMerged(x, sx);
           } else {
             // just discard x
-            indexDiscarded(x);
+            callbacks.indexDiscarded(x);
           }
           // iterate sigma until its codomain is stable
           x = sx;
@@ -1283,7 +1974,6 @@ abstract public class K0 implements Cloneable {
         (negTagged(index) ? "-" : "");
     }
 
-
     private void reduce(BitMatrix C, BitMatrix R, BitMatrix Rt) {
       BitVector garbage = K0.this.garbage;
       if (S.debugSimpl) {
@@ -1301,10 +1991,10 @@ abstract public class K0 implements Cloneable {
               BitVector uj = C.getRow(j);
               if (uj != null) {
                 if (simplified.get(j)) {
+                  // delete all j < l when k <* l but not l <* k
                   uj.andNotOr(uk, lk);
                 } else {
-                  // remove all i such that k <* i strictly and i is
-                  // being simplified
+                  // same but only if l is simplified
                   uj.andNotAndOr(simplified, uk, lk);
                 }
               }
@@ -1315,15 +2005,57 @@ abstract public class K0 implements Cloneable {
       if (S.debugSimpl) {
         S.dbg.println("reduced C = " + C + ", R = " + R + ", garbage = " + garbage);
       }
-
     }
 
+    // transitive reduction of the relation x: I
+    private void reduceImplements() {
+      for (int iid = 0; iid < nInterfaces(); iid++) {
+        Interface I = getInterface(iid);
+        BitVector lI = implementors[iid]; 
+        BitVector Iimplementors = I.implementors;
+        for (int k = lI.getLowestSetBit();
+             k != BitVector.UNDEFINED_INDEX;
+             k = lI.getNextBit(k)) {
+          if (!garbage.get(k)) {
+            // k:* I
+            // for all j in simplified, delete j: I if j <* k strictly
+            Iimplementors.andNotAndOr
+              (simplified,      // leave the bits outside simplified unchanged
+               Rt.getRow(k),    // if j <* k
+               R.getRow(k));    // and !(k <* j), then delete j: I
+          }
+        }
+      }
+      for (int iid2 = 0; iid2 < nInterfaces(); iid2++) {
+        Interface I2 = getInterface(iid2);
+        BitVector I2sub = I2.subInterfaces;
+        BitVector I2implementors = I2.implementors;
+        for (int iid1 = I2sub.getLowestSetBit();
+             iid1 != BitVector.UNDEFINED_INDEX;
+             iid1 = I2sub.getNextBit(iid1)) {
+          Interface I1 = getInterface(iid1);
+          if (!I1.subInterfaces.get(iid2)) {
+            //  I1 <* I2 strictly
+            // delete all j: I2 when j:* I1 and j is simplified
+            I2implementors.andNotAnd(implementors[iid1], simplified);
+          }            
+        }
+      }
+    }
+    
     /**
-     * Performs transitive reduction.
+     * Transitive reduction.
      **/
     void reduce() {
+      if (S.debugSimpl) {
+        S.dbg.println("starting reduction: K = " + K0.this);
+      }
       reduce(C, R, Rt);
       reduce(Ct, Rt, R);
+      reduceImplements();
+      if (S.debugSimpl) {
+        S.dbg.println("finished reduction: K = " + K0.this);
+      }
     }
     
     void simplify() {
@@ -1344,7 +2076,7 @@ abstract public class K0 implements Cloneable {
 	      // It is not even tagged
 	      // eliminate it and make the constraint empty
 	      setSize(0);
-	      indexDiscarded(x);
+	      callbacks.indexDiscarded(x);
 	      return;
 	    } else {
 	      // keep it, but the constraint is now in normal form...
@@ -1359,22 +2091,23 @@ abstract public class K0 implements Cloneable {
 	  }
           if (S.debugSimpl) {
             S.dbg.println("Try to simplify " + K0.this.toString());
-            S.dbg.println("with domains " + domains.dump());
+            S.dbg.println("with domains " + Sdomains.dump());
           }
           excludedA = findNonSurjective(excludedA, strategy, solution);
           if (S.debugSimpl) {
             S.dbg.print(" sigma = {");
-            boolean needSeparator = false;
+            Separator sep = new Separator(", ");
             for (int x = initN; x < n; x++) {
-              if (domains.getDomain(x) != null) {
-                if (needSeparator) {
-                  S.dbg.print(", ");
-                } else {
-                  needSeparator = true;
-                }
+              if (Sdomains.getDomain(x) != null) {
+                S.dbg.print(sep);
                 S.dbg.print(indexToString(x));
                 S.dbg.print(" -> ");
-                S.dbg.print(indexToString(solution[x - initN]));
+                int sx = solution[x-initN];
+                if (sx == -1) {
+                  S.dbg.print("unit");
+                } else {
+                  S.dbg.print(indexToString(sx));
+                }
               }
             }
             S.dbg.println("}");
@@ -1388,36 +2121,10 @@ abstract public class K0 implements Cloneable {
     }
   }
 
-  public K0 extractRigids() {
-    K0 result = null;
-    try {
-      result = (K0)this.clone();
-    } catch (CloneNotSupportedException e) {
-      // this shouldn't happen, since we are Cloneable
-      throw new InternalError();
-    }
-    result.R = (R == null ? null : (BitMatrix)R.clone());
-    result.Rt = (Rt == null ? null : (BitMatrix)Rt.clone());
-    result.m = m;
-    
-    // XXX; necessary  to clone ?
-    result.C = (BitMatrix)C.clone();
-    result.C.setSize(m);
-    result.Ct = (BitMatrix)Ct.clone();
-    result.Ct.setSize(m);
-    result.n = m;
-    result.domains = new DomainVector(m, m);
-    result.minimal = (BitVector)minimal.clone();
-    result.maximal = (BitVector)maximal.clone();
-    result.minimal.truncate(m);
-    result.maximal.truncate(m);
-    result.garbage = (BitVector)garbage.clone();
-    result.garbage.truncate(m);
-    result.posTagged = new BitVector();
-    result.negTagged = new BitVector();
-    result.virtual = (BitVector)virtual.clone();
-    result.virtual.truncate(m);
-    return result;
+  public void deleteAllSoft() {
+    S.assert(S.a&& hasBeenInitialized);
+    setSize(m);
+    n = m;
   }
 
   /**
@@ -1430,39 +2137,75 @@ abstract public class K0 implements Cloneable {
   /***********************************************************************
    * Overloading resolution
    ***********************************************************************/
+  private final static int OVERLOADING_CONSTRUCTOR = 0;
+  private final static int OVERLOADING_INTERFACE = 1;
   /**
-   * Assume this constraint has just been satisfied
-   * possibilities contains indexes of rigid variables
-   * for each index k in possibilities, try to enter
-   * constraint x <= k and delete k from possibilities
-   * if this makes the constraint unsatisfiable
+   * Assume this constraint has just been satisfied possibilities contains
+   * indexes of rigid variables (if what == OVERLOADING_CONSTRUCTOR) or
+   * interfaces (if what == OVERLOADING_INTERFACE). For each index k in
+   * possibilities, try to enter constraint x <= k or x: k and delete k from
+   * possibilities if this makes the constraint unsatisfiable
    **/
-  public void solveOverloading(int x, BitVector possibilities) {
+  private void solveOverloading(int what, int x, BitVector possibilities) {
+    S.assert(S.a&& hasBeenInitialized, this.getName() + " has not been initialized ???");
+    S.assert(S.a&& isValidIndex(x));
     if (isRigid(x)) {
-      possibilities.and(R.getRow(x));
+      if (what == OVERLOADING_CONSTRUCTOR) {
+        // R.getRow(x) is Up(x)
+        possibilities.and(R.getRow(x));
+      } else {
+        for (int iid = possibilities.getLowestSetBit();
+             iid != BitVector.UNDEFINED_INDEX;
+             iid = possibilities.getNextBit(iid)) {
+          if (!getInterface(iid).rigidImplementors.get(x)) {
+            possibilities.clear(iid);
+          }
+        }
+      }
     } else {
-      for (int x0 = 0; x0 < m; x0++) {
-        if (possibilities.get(x0)) {
-          if (!domains.getDomain(x).intersect(Rt.getRow(x0))) {
-            possibilities.clear(x0);
-          } else {
-            Backup savedBackup = backup;
-            mark();
-            try {
+      // x is soft
+      for (int x0 = possibilities.getLowestSetBit();
+           x0 != BitVector.UNDEFINED_INDEX;
+           x0 = possibilities.getNextBit(x0)) {
+        // try simple things first
+        if (what == OVERLOADING_CONSTRUCTOR
+            &&
+            !domains.getDomain(x).intersect(Rt.getRow(x0))) {
+          possibilities.clear(x0);
+        } else if
+          (what == OVERLOADING_INTERFACE
+           &&
+           !domains.getDomain(x).containsUnit()
+           &&
+           !domains.getDomain(x)
+           .intersect(getInterface(x0).rigidImplementors)) {
+          possibilities.clear(x0);
+        } else {
+          // try to really satisfy
+          Backup savedBackup = backup;
+          mark();
+          try {
+            if (what == OVERLOADING_CONSTRUCTOR) {
               leq0(x, x0);
-              rawSatisfy();
-            } catch (Unsatisfiable e) {
-              possibilities.clear(x0);
-            } finally {
-              backtrack();
-              backup = savedBackup;
+            } else {
+              indexImplements0(x, x0);
             }
+            rawSatisfy();
+          } catch (Unsatisfiable e) {
+            possibilities.clear(x0);
+          } finally {
+            backtrack();
+            backup = savedBackup;
           }
         }
       }
     }
   }
-    
-    
+  
+  public void solveConstructorOverloading(int x, BitVector possibilities) {
+    solveOverloading(OVERLOADING_CONSTRUCTOR, x, possibilities);
+  }
+  public void solveInterfaceOverloading(int x, BitVector possibilities) {
+    solveOverloading(OVERLOADING_INTERFACE, x, possibilities);
+  }
 }
-

@@ -12,7 +12,7 @@
 
 // File    : LocalDeclarationStmt.java
 // Created : Tue Jul 06 12:06:20 1999 by bonniot
-//$Modified: Mon Oct 25 19:34:06 1999 by bonniot $
+//$Modified: Wed Oct 27 16:22:22 1999 by bonniot $
 
 package bossa.syntax;
 
@@ -43,6 +43,15 @@ public class LocalDeclarationStmt extends Statement
   public Collection associatedDefinitions()
   {
     return null;
+  }
+  
+  /****************************************************************
+   * Initial Context
+   ****************************************************************/
+
+  public void createContext()
+  {
+    //Nothing
   }
   
   /****************************************************************

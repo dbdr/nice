@@ -12,7 +12,7 @@
 
 // File    : Kind.java
 // Created : Wed Jul 28 14:53:22 1999 by bonniot
-//$Modified: Fri Aug 13 11:14:24 1999 by bonniot $
+//$Modified: Thu Oct 28 15:53:37 1999 by bonniot $
 
 package bossa.engine;
 
@@ -33,6 +33,7 @@ public interface Kind
    * @param e2 The greater element
    */
   void leq(Element e1, Element e2) throws Unsatisfiable;
+  void leq(Element e1, Element e2, boolean initial) throws Unsatisfiable;
 
   /** Introduce a new Element of this kind
    * 

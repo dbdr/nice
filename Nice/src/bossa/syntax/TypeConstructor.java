@@ -12,7 +12,7 @@
 
 // File    : TypeConstructor.java
 // Created : Thu Jul 08 11:51:09 1999 by bonniot
-//$Modified: Mon Oct 25 14:36:12 1999 by bonniot $
+//$Modified: Thu Oct 28 11:35:13 1999 by bonniot $
 
 package bossa.syntax;
 
@@ -130,6 +130,13 @@ public class TypeConstructor
     return new Polytype(new MonotypeConstructor(this,tp,this.location()));
   }
 
+  boolean instantiable()
+  {
+    Internal.error(definition==null,
+		   "Null definition TypeConstructor.instatiable");
+    return !definition.isAbstract;
+  }
+  
   /****************************************************************
    * Scoping
    ****************************************************************/

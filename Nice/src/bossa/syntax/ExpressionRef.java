@@ -12,7 +12,7 @@
 
 // File    : ExpressionRef.java
 // Created : Tue Aug 17 16:04:40 1999 by bonniot
-//$Modified: Mon Oct 25 13:04:19 1999 by bonniot $
+//$Modified: Thu Oct 28 12:54:17 1999 by bonniot $
 
 package bossa.syntax;
 

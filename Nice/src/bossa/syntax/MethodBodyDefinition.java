@@ -12,7 +12,7 @@
 
 // File    : MethodBodyDefinition.java
 // Created : Thu Jul 01 18:12:46 1999 by bonniot
-//$Modified: Mon Oct 25 14:20:33 1999 by bonniot $
+//$Modified: Fri Oct 29 14:22:37 1999 by bonniot $
 
 package bossa.syntax;
 
@@ -118,7 +118,6 @@ public class MethodBodyDefinition extends Node
 	  }
 	  catch(TypingEx e){
 	    if(Typing.dbg) Debug.println("Not the right choice :"+e);
-	    e.printStackTrace();
 	    i.remove();
 	  }
 	  catch(BadSizeEx e){
@@ -174,6 +173,15 @@ public class MethodBodyDefinition extends Node
     //return res;
   }
 
+  /****************************************************************
+   * Initial Context
+   ****************************************************************/
+
+  public void createContext()
+  {
+    //Nothing
+  }
+  
   /****************************************************************
    * Type checking
    ****************************************************************/

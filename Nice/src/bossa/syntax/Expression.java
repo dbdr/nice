@@ -12,7 +12,7 @@
 
 // File    : Expression.java
 // Created : Mon Jul 05 16:25:02 1999 by bonniot
-//$Modified: Mon Oct 25 13:04:35 1999 by bonniot $
+//$Modified: Thu Oct 28 12:54:37 1999 by bonniot $
 // Description : 
 
 package bossa.syntax;
@@ -57,6 +57,10 @@ public abstract class Expression extends Node
     return false;
   }
 
+  /**
+   * @return true iff this method codes
+   * the access to the field of a class.
+   */
   boolean isFieldAccess()
   {
     return false;
@@ -98,7 +102,7 @@ public abstract class Expression extends Node
    * Maps getType over a collection of Expressions
    *
    * @param Expressions the list of Expressions
-   * @return the list of their Types
+   * @return the list of their PolyTypes
    */
   static List getType(List expressions)
   {
@@ -112,9 +116,7 @@ public abstract class Expression extends Node
   }
 
   /**
-   * Maps getType over a collection of Expressions
-   * and checks all Types are Polytypes and not
-   * PolytypeConstructors
+   * Maps getType over a collection of Expressions.
    *
    * @param Expressions the collection of Expressions
    * @return the collection of their Polytypes, 
@@ -128,8 +130,6 @@ public abstract class Expression extends Node
     while(i.hasNext())
       {
 	Polytype t=((Expression) i.next()).getType();
-	if(!(t instanceof Polytype))
-	  return null;
 	res.add(t);
       }
 

@@ -1,0 +1,10 @@
+/// PASS
+  /// package a
+  /// TOPLEVEL
+  class A
+  {
+    int x = f();
+  }
+  int f() = 0;
+  /// package b import a
+  ;

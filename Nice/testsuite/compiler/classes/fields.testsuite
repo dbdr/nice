@@ -1,0 +1,6 @@
+/// FAIL
+  /// TOPLEVEL
+  class A
+  {
+    int x = "Type error";
+  }

@@ -39,7 +39,7 @@ public class Location implements Located
 		  int startLine, int startColumn,
 		  int endLine, int endColumn)
   {
-    this.fileName = file;
+    this.fileName = nice.tools.util.System.prettyPrintFile(file);
     this.startLine = startLine;
     this.startColumn = startColumn;
     this.endLine = endLine;

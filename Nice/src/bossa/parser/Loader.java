@@ -43,7 +43,7 @@ public abstract class Loader
       }
       catch(ParseException e){
 	if(e.currentToken!=null)
-	  User.error(new Location(e.currentToken.next), 
+	  User.error(Location.make(e.currentToken.next), 
 		     removeLocation(e.getMessage()));
 	else
 	  User.error(e.getMessage());
@@ -69,7 +69,7 @@ public abstract class Loader
       }
       catch(ParseException e){
 	if(e.currentToken!=null)
-	  User.error(new Location(e.currentToken.next), 
+	  User.error(Location.make(e.currentToken.next), 
 		     removeLocation(e.getMessage()));
 	else
 	  User.error(e.getMessage());

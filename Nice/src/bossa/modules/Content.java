@@ -101,7 +101,7 @@ class Content
   
   private void read(Content.Unit unit, List imports, Set opens)
   {
-    bossa.util.Location.setCurrentFile(unit.name);
+    bossa.util.Location.setCurrentFile(unit.file);
 
     bossa.syntax.LocatedString pkgName = 
       bossa.parser.Loader.readImports(unit.reader, imports, opens);
@@ -113,7 +113,7 @@ class Content
   
   private void read(Content.Unit unit, List definitions)
   {
-    bossa.util.Location.setCurrentFile(unit.name);
+    bossa.util.Location.setCurrentFile(unit.file);
     bossa.parser.Loader.open(unit.reader, definitions);
   }
   
@@ -248,6 +248,11 @@ class Content
 
   static protected class Unit
   {
+    protected Unit(BufferedReader reader, File file)
+    {
+      this.reader = reader;
+      this.file = file;
+    }
     protected Unit(BufferedReader reader, String name)
     {
       this.reader = reader;
@@ -255,6 +260,7 @@ class Content
     }
     BufferedReader reader;
     String name;
+    File file;
   }
   
   static protected class Stream

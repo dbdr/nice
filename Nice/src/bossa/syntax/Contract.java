@@ -55,7 +55,8 @@ public class Contract
   }
 
   void resolve(VarScope scope, TypeScope typeScope, 
-	       mlsub.typing.Monotype resultType)
+	       mlsub.typing.Monotype resultType, 
+               Location location)
   {
     preExp = new Expression[pre.size()];
     int n = 0;
@@ -63,8 +64,15 @@ public class Contract
       preExp[n++] = dispatch.analyse((Expression) i.next(),
 				     scope, typeScope);
 
+    if (post.size() == 0)
+      {
+        postExp = Expression.noExpressions;
+        return;
+      }
+
     if (! nice.tools.code.Types.isVoid(resultType))
-      result = new MonoSymbol(resultName, resultType) {
+      result = new MonoSymbol(new LocatedString("result", location), 
+                              resultType) {
 	  boolean isAssignable()
 	  { return false; }
 
@@ -86,9 +94,6 @@ public class Contract
 	scope.removeSymbol(result);
     }
   }
-
-  private static final LocatedString resultName = 
-    new LocatedString("result", Location.nowhereAtAll());
 
   private Expression[] preExp, postExp;
   private MonoSymbol result;

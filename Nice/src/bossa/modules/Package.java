@@ -40,7 +40,7 @@ public class Package implements mlsub.compilation.Module, Located, bossa.syntax.
 			     Compilation compilation,
 			     boolean isRoot)
   {
-    return make(new LocatedString(name, bossa.util.Location.nowhereAtAll()), 
+    return make(new LocatedString(name, Location.option), 
 		compilation, isRoot);
   }
   

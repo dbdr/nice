@@ -75,10 +75,7 @@ public final class ClassExp extends Expression
 	if (type instanceof gnu.bytecode.ClassType)
 	  {
 	    Expression res = new ClassExp((gnu.bytecode.ClassType) type);
-	    Location loc = name.location();
-	    if (root != null && root.location() != null)
-	      loc = root.location().englobe(loc);
-	    res.setLocation(loc);
+	    res.setLocation(root == null ? name.location() : root.location());
 	    return res;
 	  }
       }

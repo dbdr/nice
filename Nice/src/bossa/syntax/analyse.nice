@@ -196,9 +196,8 @@ class Info
   {
     ?VarSymbol old = this.vars[symbol.name.toString()];
     if (old != null)
-      throw error(symbol, "Symbol " + symbol.name + " is already defined at " +
-		"line " + old.location().getLine() +
-		", column " + old.location().getColumn());
+      throw error(symbol, "Symbol " + symbol.name + " is already defined.\n" +
+		  "Previous definition: " + old.location().toString());
   }
 }
 

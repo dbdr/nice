@@ -92,7 +92,7 @@ public class ImportedAlternative extends Alternative
     int end = fullName.lastIndexOf(':');
     LocatedString methodName = new LocatedString
       (fullName.substring(JavaMethod.fullNamePrefix.length(), end),
-       bossa.util.Location.nowhereAtAll());
+       bossa.util.Location.nowhere());
 
     List methods = bossa.syntax.Node.getGlobalScope().lookup(methodName);
     for (Iterator i = methods.iterator(); i.hasNext();)

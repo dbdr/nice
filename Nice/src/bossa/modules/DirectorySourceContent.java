@@ -66,7 +66,7 @@ class DirectorySourceContent extends SourceContent
     sourcesRead = true;
     Content.Unit[] res = new Content.Unit[sources.length];
     for(int i = 0; i<res.length; i++)
-      res[i] = new Content.Unit(read(sources[i]), sources[i].toString());
+      res[i] = new Content.Unit(read(sources[i]), sources[i]);
     
     return res;
   }

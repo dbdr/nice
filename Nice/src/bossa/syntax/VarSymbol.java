@@ -171,7 +171,8 @@ abstract class VarSymbol extends Node implements Located
   {
     this.decl = declaration;
     this.isThis = isThis;
-    if (name != null) this.decl.setLine(name.location().getLine());
+    if (name != null) 
+      name.location.write(this.decl);
     this.decl.setCanRead(true);
     this.decl.setCanWrite(true);
   }

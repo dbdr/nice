@@ -263,7 +263,7 @@ public class NiceClass extends ClassDefinition.ClassImplementation
   {
     gnu.expr.ClassExp classe = new gnu.expr.ClassExp();
     classe.setName(definition.name.toString());
-    classe.setFile(definition.location().getFile());
+    definition.location().write(classe);
     classe.setSimple(true);
     classe.setAccessFlags(definition.getBytecodeFlags());
     definition.module.addImplementationClass(classe);

@@ -71,7 +71,7 @@ abstract class UserOperator extends MethodDeclaration
 
     // The contract must be resolved after the formal parameters since they
     // can refer to them.
-    contract.resolve(scope, typeScope, getReturnType());
+    contract.resolve(scope, typeScope, getReturnType(), location());
   }
 
   private MonoSymbol[] symbols;

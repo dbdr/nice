@@ -35,8 +35,8 @@ public class UserError extends RuntimeException
 
   public UserError(gnu.expr.Expression responsible, String message)
   {
-    this(new Location(responsible.getFile(), responsible.getLine(), 
-		      responsible.getColumn()), 
+    this(Location.make(new java.io.File(responsible.getFile()), 
+                       responsible.getLine(), responsible.getColumn()), 
 	 message);
   }
 

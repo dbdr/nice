@@ -56,7 +56,7 @@ class DirectoryCompiledContent extends CompiledContent
 
   Content.Unit[] getDefinitions()
   {
-    return new Content.Unit[]{ new Content.Unit(read(itf), itf.toString()) };
+    return new Content.Unit[]{ new Content.Unit(read(itf), itf) };
   }
 
   ClassType readClass(String name)

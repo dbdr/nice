@@ -346,7 +346,7 @@ public class Block extends Statement
     eVal[0] = local.compile(res);
     
     res.setBody(addLocals(vars,body));
-    res.setLine(local.location().getLine());
+    local.location().write(res);
     
     return res;
   }

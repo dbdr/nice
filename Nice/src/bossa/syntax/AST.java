@@ -78,8 +78,6 @@ public class AST extends Node
   public void resolveScoping()
   {
     Node.setModule(module);
-    Location.setCurrentFile(module.toString());
-    Location.current = Location.nowhere();
 
     // Classes are resolved first, since code can depend on them
     for(int i = 0; i < classes.length; i++)

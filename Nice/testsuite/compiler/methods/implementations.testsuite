@@ -6,3 +6,19 @@
 
   // Try to implement a function. This should fail gracefully.
   /*/// FAIL HERE */ fA(x@A) {}
+
+/// PASS
+  /// COMMENT: This tests implementation of a method whose implicit 'this'
+  /// COMMENT: argument is a parameterized class, and the type parameter
+  /// COMMENT: does not occur explicitely in the type.
+  /// COMMENT: (This was a really "interesting" bug to find!)
+  /// Toplevel
+
+interface A<T>
+{
+  void doSomething();
+}
+
+class B<T> implements A<T> { B<T> bfield; }
+
+doSomething(b@B) { b.bfield; }

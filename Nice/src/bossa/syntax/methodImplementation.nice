@@ -38,7 +38,7 @@ public abstract class MethodImplementation extends Definition
   ?MethodDeclaration declaration = null;
   MonoSymbol[?] parameters = null;
 
-  private ?bossa.link.Alternative alternative = null;
+  private ?Alternative alternative = null;
 
   ?gnu.expr.ReferenceExp ref = null;
   ?gnu.expr.LambdaExp compiledMethod = null;
@@ -130,7 +130,7 @@ public abstract class MethodImplementation extends Definition
     alternative = createSourceAlternative(this);
   }
 
-  bossa.link.Alternative getAlternative() = notNull(alternative);
+  Alternative getAlternative() = notNull(alternative);
 
   getExpectedType() = notNull(declaration).getReturnType();
 

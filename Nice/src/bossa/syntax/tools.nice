@@ -212,7 +212,6 @@ GlobalTypeScope getGlobalTypeScope() = native GlobalTypeScope Node.getGlobalType
 Map<VarSymbol,mlsub.typing.Polytype> types(Arguments) = native Arguments.types;
 <T> String map(String, String, String, T[]) = native String bossa.util.Util.map(String, String, String, Object[]);
 <T> String map(String, String, String, ?Collection<T>) = native String bossa.util.Util.map(String, String, String, Collection);
-Stack<bossa.link.Alternative> sortedAlternatives(MethodDeclaration) = native Stack bossa.link.Alternative.sortedAlternatives(MethodDeclaration);
 void addValues(Pattern, List<ConstantExp>) = native void Pattern.addValues(List);
 ?mlsub.typing.TypeConstructor getRuntimeTC(Pattern) = native mlsub.typing.TypeConstructor Pattern.getRuntimeTC();
 boolean matchesValue(Pattern, ConstantExp) = native boolean Pattern.matchesValue(ConstantExp);

@@ -12,13 +12,9 @@
 
 package bossa.syntax;
 
-import bossa.link.*;
 import bossa.util.*;
 
 List<mlsub.typing.TypeConstructor[]> enumerate(?mlsub.typing.Constraint, mlsub.typing.lowlevel.Element[], boolean[]) = native List mlsub.typing.Enumeration.enumerate(mlsub.typing.Constraint, mlsub.typing.lowlevel.Element[], boolean[]);
-
-boolean matchesValuePart(Alternative, ?ConstantExp[], boolean[]) = native void Alternative.matchesValuePart(ConstantExp[], boolean[]);
-
 
 /**
    Methods performing the coverage and non-ambiguity test.
@@ -67,7 +63,7 @@ public void testCoverage(bossa.modules.Package module)
   
 private void testNiceMethod(NiceMethod m, bossa.modules.Package module)
 {
-  Stack<Alternative> sortedAlternatives = Alternative.sortedAlternatives(m);
+  Stack<Alternative> sortedAlternatives = sortedAlternatives(m);
 
   if (! trivialTestOK(sortedAlternatives))
     if (! shortTestOk(m, sortedAlternatives))
@@ -81,7 +77,7 @@ private void testNiceMethod(NiceMethod m, bossa.modules.Package module)
 
 private void testJavaMethod(JavaMethod m, bossa.modules.Package module)
 {
-  Stack<Alternative> sortedAlternatives = Alternative.sortedAlternatives(m);
+  Stack<Alternative> sortedAlternatives = sortedAlternatives(m);
 
   if (! trivialTestJava(m, sortedAlternatives))
     testMethod(m, sortedAlternatives, true);
@@ -139,20 +135,20 @@ private boolean shortTestOk(NiceMethod method, Stack<Alternative> alternatives)
         Alternative altA = alternatives[i];
         Alternative altB = alternatives[k];
 
-        if (Alternative.leq(altB, altA))
+        if (leq(altB, altA))
 	  User.error(method, "ambiguity because of equivalent patterns in:\n" +
 				altA.printLocated() + "\nand\n" +
 				altB.printLocated());
 
-        if (! (Alternative.leq(altA, altB) || Alternative.disjoint(altA, altB)))
+        if (! (leq(altA, altB) || disjoint(altA, altB)))
           {
-            let glb = Alternative.greatestLowerBound(altA, altB);
+            let glb = greatestLowerBound(altA, altB);
             if (glb == null)
               return false;
 
             boolean glbMatch = false;
             for (int j = i-1; j >= 0; j--)
-              if (Alternative.leq(glb, alternatives[j]))
+              if (leq(glb, alternatives[j]))
                 {
                   glbMatch = true;
                   break;
@@ -278,7 +274,7 @@ private boolean testTypes(MethodDeclaration method,
       if (a.matches(tags))
         if (first == null)
           first = a;
-        else if (!Alternative.less(first, a) && !a.containsTypeMatchingValue())
+        else if (!less(first, a) && !a.containsTypeMatchingValue())
           {
             failed = true;
             errors.add("ambiguity for parameters of type " + tagsToString(tags)+
@@ -335,7 +331,7 @@ private boolean testValues
           if (a.matchesValuePart(values, isValue))
             if (first == null)
               first = a;
-            else if (!Alternative.less(first, a))
+            else if (!less(first, a))
               {
                 failed = true;
                 errors.add("ambiguity for parameters of type/value " + tagsToString(tags, values, isValue)+

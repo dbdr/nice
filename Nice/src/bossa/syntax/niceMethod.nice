@@ -128,7 +128,7 @@ d + "\ndefined in:\n" +
                   d.addSpecializedMethod(this);
 
                 // Therefore, all its implementations also belong to this.
-                bossa.link.Alternative.addAll(d, this);
+                addAllAlternatives(d, this);
               }
 
             continue;

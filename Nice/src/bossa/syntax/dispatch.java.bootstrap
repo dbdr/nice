@@ -12,14 +12,13 @@ import java.util.List;
 
 public class dispatch
 {
+  public static void resetAlternatives() {}
+
   public static void testCoverage(bossa.modules.Package module) {}
 
   public static void resetDispatchTest() {}
 
   public static void readImportedAlternative(gnu.bytecode.ClassType c, gnu.bytecode.Method method, bossa.util.Location location) {}
-
-  public static bossa.link.Alternative createJavaAlternative(bossa.syntax.MethodDeclaration method)
-  { return null; }
 
   static TypeScope createGlobalTypeScope()
   { return null; }

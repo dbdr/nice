@@ -287,7 +287,7 @@ public class Package implements mlsub.compilation.Module, Located, bossa.syntax.
     mlsub.typing.Typing.startNewCompilation();
     nice.tools.code.Types.reset();
     nice.tools.code.SpecialTypes.init();
-    bossa.link.Alternative.reset();
+    bossa.syntax.dispatch.resetAlternatives();
     bossa.syntax.dispatch.resetDispatchTest();
     bossa.syntax.dispatch.resetTypeDefinitionMappings();
     bossa.syntax.dispatch.resetConstructorsMap();

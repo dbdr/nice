@@ -13,8 +13,6 @@
 // TODO: this class belongs in bossa.link
 package bossa.syntax;
 
-import bossa.link.*;
-
 /**
    Compilation of the dispatch functions.
 

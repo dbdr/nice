@@ -16,6 +16,293 @@ package bossa.syntax;
 import bossa.util.*;
 
 /**
+  Represents a method alternative in the link.
+ 
+  It can be build either from information in a Nice source,
+  or read from a compiled bytecode file.
+ 
+ */
+public class Alternative implements Located
+{
+  /**
+     The full name uniquely identifies the method by including the 
+     complete type.
+  */
+  String methodName;
+  public Pattern[] patterns;
+
+  /** Marks the state of this node in the graph traversal. */
+  private int mark = 0;
+
+  /**
+   * Tests the matching of tags against a method alternative.
+   */
+ public boolean matches(TypeConstructor[] tags)
+  {
+    for(int i = 0; i < patterns.length; i++)
+      if (!patterns[i].matches(tags[i]))
+	return false;
+
+    return true;
+  }
+
+  public boolean matchesTypePart(TypeConstructor[] tags, boolean[] isValue)
+  {
+    for(int i = 0; i < patterns.length; i++)
+      if (!isValue[i] && !patterns[i].matches(tags[i]))
+	return false;
+
+    return true;
+  }
+
+  public boolean matchesValuePart(?ConstantExp[] values, boolean[] isValue)
+  {
+    for(int i = 0; i < patterns.length; i++)
+      if (isValue[i] && !patterns[i].matchesValue(notNull(values[i])))
+	return false;
+
+    return true;
+  }
+
+  public boolean containsTypeMatchingValue()
+  {
+    for(int i = 0; i < patterns.length; i++)
+      if (patterns[i].atTypeMatchingValue())
+	return true;
+
+    return false;
+  }
+
+  public boolean allAtAny()
+  {
+    for (int i = 0; i<patterns.length; i++)
+      if (! patterns[i].atAny())
+	return false;
+
+    return true;
+  }
+
+  /**
+   * @return the expression that represents the method body.
+   */
+  public gnu.expr.Expression methodExp()
+  {
+    throw Internal.error("methodExp called in " + this.getClass());
+  }
+
+  /**
+     @return the expression that tests if this alternative matches
+     the tuple <code>parameters</code>.
+   */
+  public gnu.expr.Expression matchTest(gnu.expr.Expression[] parameters, boolean skipFirst)
+  {
+    if (parameters.length != patterns.length)
+      Internal.error("Incorrect parameters "+
+		     Util.map("",", ","",parameters)+
+		     " for " + this);
+
+    gnu.expr.Expression result = gnu.expr.QuoteExp.trueExp;
+
+    for (int index = 0; index < parameters.length; index++)
+      result = nice.tools.code.Gen.shortCircuitAnd
+        (result,
+         patterns[index].matchTest(parameters[index], index == 0 && skipFirst));
+
+    return result;
+  }
+
+  toString() = methodName + Util.map("(", ", ", ")", patterns);
+
+  public String printLocated() = this.toString();
+
+  public Pattern[] getPatterns() = patterns;
+
+  location() = Location.nowhere();
+
+  public void add(String fullName)
+  {
+    ?List<Alternative> l = alternativesMap.get(fullName);
+    if (l == null)
+      {
+	// XXX change to LinkedList
+	l = new ArrayList();
+	alternativesMap.put(fullName,notNull(l));
+      }
+    // Dispatch.sort(final List alternatives) assumes that new alternatives
+    // are added at the end
+    notNull(l).add(this);
+  }
+  
+  public void add(String[] fullNames)
+  {
+    for (int i = 0; i < fullNames.length; i++)
+      this.add(fullNames[i]);
+  }
+
+  Alternative addDefaultPatterns(MethodDeclaration def)
+  {
+    mlsub.typing.Monotype[?] parameters = nice.tools.typing.Types.parameters(def.getType());
+    Pattern[?] newPatterns = null;
+
+    for (int i = 0; i < patterns.length; i++)
+      if (patterns[i].getTC() == null)
+        {
+          if (newPatterns == null)
+            {
+              newPatterns = cast(new Pattern[patterns.length]);
+              System.arraycopy(patterns, 0, notNull(newPatterns), 0, i);
+            }
+          notNull(newPatterns)[i] = createPattern
+            (patterns[i].getName(),
+             nice.tools.typing.Types.concreteConstructor(notNull(parameters)[i]),
+             nice.tools.typing.Types.isSure(notNull(parameters)[i]));
+        }
+
+    if (newPatterns == null)
+      return this;
+    else
+      return new GeneralizedAlternative(methodName: methodName, patterns: newPatterns, parent: this);
+  }
+
+}
+
+// ???
+private class GeneralizedAlternative extends Alternative
+{
+  Alternative parent;
+
+  methodExp() = parent.methodExp();
+}
+
+var HashMap<String, List<Alternative>> alternativesMap = new HashMap();
+
+public void resetAlternatives()
+{
+  alternativesMap = new HashMap();
+}
+
+public void addAllAlternatives(MethodDeclaration from, MethodDeclaration to)
+{
+  String fullName = to.getFullName();
+
+  if (from.isJavaMethod())
+    createJavaAlternative(from).add(fullName);
+
+  ?List<Alternative> list = alternativesMap.get(from.getFullName());
+
+  if (list == null)
+    return;
+
+  for (a : list)
+    a.addDefaultPatterns(from).add(fullName);
+}
+
+public Stack<Alternative> sortedAlternatives(MethodDeclaration m)
+{
+  ?List<Alternative> list = alternativesMap.get(m.getFullName());
+    
+  if (list == null)
+    // It's not an error for a method to have no alternative
+    // as long as its domain is empty.
+    // this will be checked later
+    return new Stack();
+    
+  return sortAlts(list);
+}
+ 
+var int currentVisitedMark = 0;
+
+/**
+   Computes a topological sorting of the list of alternatives.
+
+   Uses a postfix travsersal of the graph.
+*/
+private Stack<Alternative> sortAlts(List<Alternative> alternatives)
+{
+  Stack<Alternative> sortedAlternatives = new Stack();
+    
+  if (alternatives.size() == 0)
+    return sortedAlternatives;
+
+  // We used a different mark for each sort.
+  // Useful since an alternative can belong to several methods because of
+  // overriding, and SuperExp also lists alternatives.
+  int visited = ++currentVisitedMark;
+
+  for (a : alternatives)
+    if (a.mark != visited)
+      visitAlt(a, alternatives, sortedAlternatives, visited);
+
+  return sortedAlternatives;
+}
+  
+private void visitAlt(Alternative a, List<Alternative> alternatives,
+     Stack<Alternative> sortedAlternatives, int visited)
+{
+  a.mark = visited;
+    
+  for (daughter : alternatives)
+    if (daughter.mark != visited && leq(daughter,a))
+      visitAlt(daughter, alternatives, sortedAlternatives, visited);
+
+  sortedAlternatives.push(a);
+}
+
+/**
+ * Returns true iff 'a' is more precise than 'b'.
+ */
+public boolean leq(Alternative a, Alternative b)
+{
+  for (int i = 0; i<a.patterns.length; i++)
+    if (! leq(a.patterns[i], b.patterns[i]))
+      return false;
+
+  return true;
+}
+
+/**
+ * Returns true iff 'a' is strictly more precise than 'b'.
+ */
+public boolean less(Alternative a, Alternative b)
+{
+  boolean strictly = false;
+
+  for (int i = 0; i < a.patterns.length; i++)
+    if (! leq(a.patterns[i], b.patterns[i]))
+      return false;
+    else if (! leq(b.patterns[i], a.patterns[i]))
+      strictly = true;
+
+  return strictly;
+}
+
+public boolean disjoint(Alternative a, Alternative b)
+{
+  for (int i = 0; i<a.patterns.length; i++)
+    if (disjoint(a.patterns[i], b.patterns[i]))
+      return true;
+
+  return false;
+}
+
+public ?Alternative greatestLowerBound(Alternative a, Alternative b)
+{
+  Pattern[] pats = cast(new Pattern[a.patterns.length]);
+  for (int i = 0; i < a.patterns.length; i++)
+    {
+      if (leq(a.patterns[i], b.patterns[i]))
+        pats[i] = a.patterns[i];
+      else if (leq(b.patterns[i], a.patterns[i]))
+        pats[i] = b.patterns[i];
+      else
+        return null;
+    }
+
+  return new Alternative(methodName: a.methodName, patterns: pats);
+}
+
+
+/**
    An alternative present in the source code.
 
  */
@@ -32,8 +319,8 @@ public class SourceAlternative extends Alternative implements Located
 
 public Alternative createSourceAlternative(MethodImplementation implementation)
 {
-  let res = new SourceAlternative(implementation.getDeclaration().getName().toString(),
-	implementation.getPatterns(), implementation: implementation);
+  let res = new SourceAlternative(methodName: implementation.getDeclaration().getName().toString(),
+	patterns: implementation.getPatterns(), implementation: implementation);
 
   res.add(implementation.getDeclaration().getFullName());
 
@@ -65,7 +352,7 @@ public Alternative createJavaAlternative(bossa.syntax.MethodDeclaration method)
 		nice.tools.typing.Types.concreteConstructor(param),
          	nice.tools.typing.Types.isSure(param)));
 
-  return new JavaAlternative(method.getName().toString(), patterns,
+  return new JavaAlternative(methodName: method.getName().toString(), patterns: patterns,
 	method: method);
 }
 
@@ -110,7 +397,7 @@ public void readImportedAlternative(gnu.bytecode.ClassType c, gnu.bytecode.Metho
   try {
     ?Pattern p;
 
-    while ((p = bossa.syntax.dispatch.readPattern(rep, at)) != null)
+    while ((p = readPattern(rep, at)) != null)
       {
         if (p.getTC() == nice.tools.typing.PrimitiveType.arrayTC)
           /* Special treatment for arrays:
@@ -126,7 +413,7 @@ public void readImportedAlternative(gnu.bytecode.ClassType c, gnu.bytecode.Metho
         patterns.add(p);
       }
 
-    let alt = new ImportedAlternative(method.getName(), patterns.toArray(),
+    let alt = new ImportedAlternative(methodName: method.getName(), patterns: patterns.toArray(),
                                 code: new gnu.expr.QuoteExp(new gnu.expr.PrimProcedure(method)),
                                 loc: location);
 

@@ -12,7 +12,6 @@
 
 package bossa.syntax;
 
-import bossa.link.*;
 import bossa.util.*;
 
 /**
@@ -49,22 +48,22 @@ public class SuperExp extends Expression
     if (tc == null)
       minimumAlt = null;
     else
-      minimumAlt = new Alternative("", notNull(tc).map(mlsub.typing.TypeConstructor tc => createPattern(tc)).toArray());
+      minimumAlt = new Alternative(methodName: "", patterns: notNull(tc).map(mlsub.typing.TypeConstructor tc => createPattern(tc)).toArray());
 
     // Look for the first alternative more general than the current one.
-    for (alt : Alternative.sortedAlternatives(decl))
+    for (alt : sortedAlternatives(decl))
       {
 	if (alt == current) 
 	  continue;
         
         if (minimumAlt != null)
-	  if (! Alternative.leq(alt, minimumAlt))
+	  if (! leq(alt, minimumAlt))
 	    continue;
 
-	if (Alternative.leq(current, alt))
-	  if (superAlt == null || Alternative.leq(alt, superAlt))
+	if (leq(current, alt))
+	  if (superAlt == null || leq(alt, superAlt))
 	    superAlt = alt;
-	  else if (Alternative.leq(superAlt, alt))
+	  else if (leq(superAlt, alt))
 	    {} // superAlt is a more direct parent than alt, so ignore alt.
 	  else
 	    {

@@ -15,6 +15,7 @@ package bossa.syntax;
 import mlsub.typing.TypeConstructor;
 import mlsub.typing.MonotypeConstructor;
 import mlsub.typing.Polytype;
+import gnu.expr.QuoteExp;
 
 import bossa.util.*;
 
@@ -47,6 +48,11 @@ public class ConstantExp extends Expression
 	 tc, value, representation, location);
   }
   
+  ConstantExp(TypeConstructor tc, String representation, Location location)
+  {
+    this(tc, null, representation, location);
+  }
+  
   boolean isZero()
   {
     return ((Number) this.value).intValue() == 0;
@@ -65,11 +71,10 @@ public class ConstantExp extends Expression
   {
     if(value == null)
       Internal.warning(this+"["+this.getClass()+" has no value");
-
     if (value instanceof VarSymbol)
       return ((VarSymbol)value).compile();
 
-    return new gnu.expr.QuoteExp(value, nice.tools.code.Types.javaType(type));
+    return new QuoteExp(value, nice.tools.code.Types.javaType(type));
   }
   
   protected LocatedString className = null;
@@ -267,22 +272,33 @@ public class ConstantExp extends Expression
 
   public static ConstantExp makeBoolean(boolean value, Location location)
   {
-    if (value)
-      return new ConstantExp(PrimitiveType.boolTC, Boolean.TRUE, 
-                             "true", location);
-    else
-      return new ConstantExp(PrimitiveType.boolTC, Boolean.FALSE, 
-                             "false", location);
+    return new ConstantExp.Boolean(value, location);
   }
 
-  boolean isFalse()
+  private static class Boolean extends ConstantExp
   {
-    return value == Boolean.FALSE;
-  }
+    Boolean(boolean value, Location location)
+    {
+      super(PrimitiveType.boolTC, value ? "true" : "false", location);
+      compiledValue = value ? QuoteExp.trueExp : QuoteExp.falseExp;
+    }
 
-  boolean isTrue()
-  {
-    return value == Boolean.TRUE;
+    boolean isFalse()
+    {
+      return compiledValue == QuoteExp.falseExp;
+    }
+
+    boolean isTrue()
+    {
+      return compiledValue == QuoteExp.trueExp;
+    }
+
+    protected gnu.expr.Expression compile()
+    {
+      return compiledValue;
+    }
+
+    private QuoteExp compiledValue;
   }
 
   long longValue()

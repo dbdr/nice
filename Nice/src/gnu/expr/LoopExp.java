@@ -95,10 +95,16 @@ public class LoopExp extends Expression
   {
     Branchable branchOp = ifExp.getBranchable();
     if (branchOp != null)
-    {
-      branchOp.compileJump(comp, ((ApplyExp)ifExp).args, to);
-      return;
-    }
+      {
+        branchOp.compileJump(comp, ((ApplyExp)ifExp).args, to);
+        return;
+      }
+
+    if (whileExp == QuoteExp.trueExp)
+      {
+        comp.getCode().emitGoto(to);
+        return;
+      }
 
     // General case
     whileExp.compile(comp, Type.boolean_type);

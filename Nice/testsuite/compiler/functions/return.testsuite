@@ -1,7 +1,20 @@
-/// PASS bug
+/// PASS
   ///Toplevel
   String f(String b) {
     while (true) {
+      try {
+	return "f2(b)";
+      } catch(Exception e) {
+	// modify and try again
+	b = "adjust(b)";
+      }
+    }
+  }
+
+/// PASS
+  ///Toplevel
+  String f(String b) {
+    for (;;) {
       try {
 	return "f2(b)";
       } catch(Exception e) {

@@ -130,7 +130,7 @@ public class LoopStmt extends Statement
     gnu.expr.Expression test, iteration, res;
 
     if (whileExp == null)
-      test = new gnu.expr.QuoteExp(Boolean.TRUE);
+      test = gnu.expr.QuoteExp.trueExp;
     else
       test = whileExp.generateCode();
     

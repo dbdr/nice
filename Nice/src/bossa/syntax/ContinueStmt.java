@@ -40,6 +40,10 @@ public class ContinueStmt extends Statement
     return loop.code.new ContinueExp();
   }
 
+  public String toString() 
+  { 
+    return "continue " + (label != null ? label.toString() : "") + ";"; }
+
   LocatedString label;
   LoopStmt loop;
 }

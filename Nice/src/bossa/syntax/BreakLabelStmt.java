@@ -35,6 +35,8 @@ public class BreakLabelStmt extends Statement
     return new gnu.expr.ExitExp(statement.block);
   }
 
+  public String toString() { return "break " + label + ";"; }
+
   LocatedString label;
   LabeledStmt statement;
 }

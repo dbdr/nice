@@ -410,7 +410,7 @@ public class Block extends Statement
   {
     return "{\n"
       + Util.map("",";\n",";\n",locals)
-      + Util.map("",";\n",";\n",statements)
+      + Util.map("","\n","\n",statements)
       + "}\n";
   }
 

@@ -70,7 +70,7 @@ public class ReturnStmt extends Statement
   
   public String toString()
   {
-    return "return" + (value!=null ? " " + value : "");
+    return "return" + (value!=null ? " " + value : "") + ";";
   }
   
   Expression value;

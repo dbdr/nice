@@ -164,9 +164,25 @@ public class LoopStmt extends Statement
   
   public String toString()
   {
-    return 
-      "for(;" + whileExp + "; " + iterationStatements+ ")\n" + 
-      (loopBody == null ? ";" : loopBody.toString());
+    if (!testFirst)
+      return "do {\n" + (loopBody == null ? " " : loopBody.toString()) +
+		"}\n while (" + whileExp + ");"; 
+
+    if (iterationStatements == null)
+      return "while (" + whileExp + ")" +
+		(loopBody == null ? ";" : loopBody.toString());
+
+    Statement[] itStatements = ((Block)iterationStatements).statements;
+    String itStats = "";
+    for(int i = 0; i<itStatements.length; i++)
+      {
+	String tmp = itStatements[i].toString();
+	itStats += tmp.substring(0, tmp.lastIndexOf(';'));
+	if (i<itStatements.length-1) itStats += ", ";
+      }
+
+    return "for(; " + whileExp + " ;" + itStats + ")\n " +
+	(loopBody == null ? "" : loopBody.toString());
   }
 
   /****************************************************************

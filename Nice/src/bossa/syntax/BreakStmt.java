@@ -33,4 +33,6 @@ public class BreakStmt extends Statement
   {
     return new gnu.expr.ExitExp(LoopStmt.currentLoopBlock);
   }
+
+  public String toString() { return "break;"; }
 }

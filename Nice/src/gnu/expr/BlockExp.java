@@ -12,21 +12,6 @@ import gnu.mapping.OutPort;
 
 public class BlockExp extends Expression
 {
-  /**
-     @param returnType the type of the returned expressions
-  */
-  public BlockExp (Type returnType)
-  {
-    this.returnType = returnType;
-  }
-  
-  public BlockExp ()
-  {
-    this (Type.pointer_type);
-  }
-  
-  private Type returnType;
-  
   Declaration label;
   Expression body;
 
@@ -86,8 +71,7 @@ public class BlockExp extends Expression
 
   protected void walkChildren (ExpWalker walker)
   {
-    if (body != null)
-      body = body.walk(walker);
+    body = body.walk(walker);
     if (walker.exitValue == null && exitBody != null)
       exitBody = exitBody.walk(walker);
   }
@@ -98,10 +82,7 @@ public class BlockExp extends Expression
     if (label != null)
      out.print(label.getName());
     out.writeSpaceLinear();
-    if (body == null)
-      out.print("<null body>");
-    else
-      body.print(out);
+    body.print(out);
     if (exitBody != null)
       {
 	out.writeSpaceLinear();
@@ -109,10 +90,5 @@ public class BlockExp extends Expression
         exitBody.print(out);
       }
     out.endLogicalBlock(")");
-  }
-
-  public Type getType()
-  {
-    return returnType;
   }
 }

@@ -82,6 +82,10 @@ class SourceMap extends Attribute
   */
   int translate(String file, int line)
   {
+    // We cannot do anything without the file name.
+    if (file == null)
+      return -1;
+
     if (! file.equals(currentFile) || line < firstLine)
       {
         writeCurrent();

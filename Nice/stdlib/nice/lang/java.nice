@@ -66,6 +66,9 @@ java.util.Properties<String,String> getProperties() =
 Enumeration<String> propertyNames(Properties<String,String>) =
   native Enumeration Properties.propertyNames();
 
+<java.lang.Comparable T> int compareTo(T,T) =
+ native int java.lang.Comparable.compareTo(Object);
+
 //               PACKAGE: java.text
 
 DateFormat getDateInstance() = native DateFormat DateFormat.getDateInstance();

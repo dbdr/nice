@@ -1,0 +1,370 @@
+<html>
+  <title>Adding a new testcase to Jacks</title>
+
+  <body bgcolor="white">
+    <h1>Adding a new testcase to Jacks</h1>
+
+    <IMG SRC="images/jacks.png" ALIGN=bottom ALT="Jacks Logo">
+
+    Adding a new test case to Jacks is an easy as staying on 17.
+
+    <br>
+    <br>
+    <br>
+
+    <H3>Compiler bugs are hard to find</H3>
+
+    Before adding a test case, one must first identify a problem.
+    That may seem obvious at first, but often clearly identifying a problem
+    in a compiler is more than half the battle. Compiler bugs
+    tend to show up while working on large bodies of
+    source code. A developer is then faced with a tough decision,
+    should he/she try to figure out what is really causing the compiler
+    error or find a work-around for the problem by changing the
+    source code?
+
+    <p>
+
+    There is no easy solution to this problem, and we don't pretend
+    to offer one. What we do offer is a very simple process that will
+    guarantee that once a problem is identified, a compiler developer
+    will be able to reproduce the problem and show that a proposed
+    fix both solves the original problem and does not cause others.
+    An automated regression testing system like Jacks gives the
+    compiler developer peace of mind in knowing that a change will
+    not break anything, and it makes the user happy because the
+    problem will get fixed and stay fixed.
+
+    <p>
+
+    The only catch is that the effectiveness of a regression testing
+    system depends on the scope and completeness of the tests. If the
+    regression system does not test everything, then you
+    can't really be sure that everything works. This is why
+    we need your help. With enough community involvement,
+    we can reach a critical mass of tests that will make
+    Java compiler development significantly easier.
+
+    <p>
+
+    <H3>How does it work?</H3>
+
+    Ok, enough of the "why", lets get down to the "how" of actually
+    adding a test case. In this example, we assume that a compiler
+    problem related to interfaces and the synchronized keyword
+    has already been identified as follows.
+
+    <br>
+    <br>
+    <br>
+
+<code>
+<pre>
+// File SynchronizedInterface.java
+
+public synchronized interface SynchronizedInterface {}
+</pre>
+</code>
+
+    <br>
+
+    When compiled with jikes, the following error is generated:
+
+<code>
+<pre>
+% jikes SynchronizedInterface.java 
+
+Found 1 semantic error compiling "SynchronizedInterface.java":
+
+     3. public synchronized interface SynchronizedInterface {}
+               <---------->
+*** Error: synchronized is not a valid interface modifier.
+</pre>
+</code>
+
+    <br>
+
+     A quick look at section 9.1.1 of the
+     <A HREF="http://java.sun.com/docs/books/jls/second_edition/html/jTOC.doc.html">JLS</A>
+     indicates that synchronized is not a legal modifier
+     in this context. If one tries to compile this same
+     class with the javac compiler supplied by Sun in JDK 1.1
+     release, the following result is generated:
+
+<code>
+<pre>
+% javac SynchronizedInterface.java
+</pre>
+</code>
+
+    <br>
+
+     The class compiled without error using Sun's javac compiler, which
+     is clearly wrong. Now that the problem can be reproduced, a regression
+     test case can be added to the Jacks test suite by following these steps:
+
+<b>
+<OL>
+<LI>Figure out what directory the test case should go in
+<LI>Write the regression test
+<LI>Run the new test in the Jacks framework
+</OL>
+</b>
+
+    <br>
+
+<h3>1. Figure out what directory the test case should go in</h3>
+
+    In the long run, the organization of Jacks test cases will
+    determine the success or failure of the project. If the
+    layout of tests is messy to the point that it takes
+    excessive time to figure out if a given feature is
+    tested, people may avoid contributing to the project.
+    Existing Jacks tests are located in the <code>jacks/tests</code>
+    subdirectory. Within that subdirectory, there are additional
+    top level directories that contain related sets of tests.
+
+    <p>
+
+    For example, the <code>jacks/tests/jls</code> top level directory
+    stores all of the compiler tests that can be mapped to
+    a JLS section. The structure of subdirectories within
+    this top level directory mimic the chapter layout of the
+    JLS. One would find that all tests related to chapter 7
+    of the JLS would be found in the subdirectory
+    <code>jacks/tests/jls/packages</code>.
+
+    <p>
+    Take a look at the <A HREF="tests.html">Test Index</A> for the most up to
+    date JLS to Jacks directory mappings.
+
+    <p>
+
+    The test case is covered by section 9.1.1 of the JLS.
+    Chapter 9 is titled "Interfaces", section 9.1 is
+    titled "Interface Declarations", and section 9.1.1 is titled
+    "Interface Modifiers", so we would expect to put our test
+    in a directory named:
+
+    <p>
+
+    <code>
+    tests/jls/interfaces/interface-declarations/interface-modifiers
+    </code>
+
+    <p>
+
+<h3>2. Write the regression test</h3>
+
+
+    Once the proper JLS section and directory for the test case
+    has been determined, the actual test case can be written.
+    Fire up a editor with the file name <code>tests.tcl</code>.
+    If a <code>tests.tcl</code> file does not exist already, don't worry,
+    just create the regression test and save it with the file name tests.tcl.
+
+    <p>
+
+    And now for the real fun, the writing of the test. The format of
+    a regression test in the tcltest framework is as follows:
+
+<code>
+<pre>
+tcltest::test NAME DESCRIPTION {
+    COMMANDS
+} EXPECTED_RESULT
+</pre>
+</code>
+
+    <p>
+
+    Don't worry if any of that looks confusing at first. It is really simple.
+    Keep in mind the Jacks convention for determining the name of a given
+    test case. This naming convention is required so that tests case
+    documentation can be generated automatically.
+    The <code>NAME</code> of the regression test should be the JLS
+    section number that corresponds to the directory where the test
+    case is located, followed by a dash and a unique test number.
+    This test falls under section 9.1.1 of the JLS and it is the
+    first test in section 9.1.1, so the <code>NAME</code> is 9.1.1-1.
+
+    <p>
+
+    The <code>DESCRIPTION</code> can be anything you want it to be. The
+    <code>DESCRIPTION</code> is just a user provided description of the
+    test, it is not actually used by the system. The only thing to note
+    is that {} characters should be used around the description string.
+
+    <p>
+
+    The <code>COMMANDS</code> section could contain any Tcl commands, but
+    most of the time you will just want to use the <code>saveas</code>,
+    <code>compile</code>, <code>empty_class</code>, and
+    <code>empty_main</code> methods supplied as part of the Jacks
+    framework.
+
+    <p>
+
+    The <code>saveas</code> command takes two arguments, the file name
+    and the data to be saved in the file, and returns the name of the
+    file that was just saved. Like so:
+<code>
+<pre>
+saveas SynchronizedInterface.java {public synchronized interface SynchronizedInterface {}}
+</pre>
+</code>
+
+    The <code>compile</code> command takes a number of command
+    line arguments and passes them to the actual java compiler.
+    The <code>compile</code> command will return 
+    <code>PASS</code>, <code>FAIL</code>, or <code>WARN</code>,
+    to indicate the exit status of the compiler.
+
+    <p>
+
+    The <code>empty_class</code> command is a convenience wrapper
+    which takes two arguments: the name of a class, and the class
+    contents. It then creates and compiles &lt;name&gt;.java with your
+    contents.  Likewise, <code>empty_main</code> takes a name of a
+    class, and the contents of the <code>main</code> method of that
+    class. For example:
+
+<code>
+<pre>
+empty_main Addition { int two = 1 + 1; }
+</pre>
+</code>
+
+    is shorthand for:
+
+<code>
+<pre>
+compile [saveas Addition.java {
+    public static void main(String[] args) {
+        int two = 1 + 1;
+    }
+}]
+</code>
+</pre>
+
+    <p>
+
+    The <code>EXPECTED_RESULT</code> is where the result one expects
+    from the <code>compile</code> command should be placed.
+
+    <p>
+
+    In our interface example, we expect the compile to fail.
+    Wrapping all of this together, one could write
+    the test case like so:
+
+    <p>
+
+<code>
+<pre>
+tcltest::test 9.1.1-1 {should generate error on synchronized interface} {
+    saveas SynchronizedInterface.java \
+        {synchronized interface SynchronizedInterface {}}
+
+    compile SynchronizedInterface.java
+} FAIL
+</pre>
+</code>
+
+
+    One could even combine the invocations of saveas and compile
+    to simplify things a bit. Remember that the saveas
+    command returns the name of the saved file, which is then passed to
+    the compile command.
+
+<code>
+<pre>
+tcltest::test 9.1.1-1 {should generate error on synchronized interface} {
+    compile [saveas SynchronizedInterface.java \
+        {synchronized interface SynchronizedInterface {}}]
+} FAIL
+</pre>
+</code>
+
+    <p>
+
+    After saving the tests.tcl file, the regression test can now
+    be run in the jacks framework.
+
+    <p>
+
+
+<h3>3. Run the new test in the Jacks framework</h3>
+
+    Once you have created the tests.tcl file, you can easily run the tests
+    using the jacks shell script, assuming you already have it on your PATH.
+    In the following example, the regression tests in the tests.tcl file
+    will be run with the javac and jikes compilers.
+
+    <p>
+
+<code>
+<pre>
+% cd tests/jls/interfaces/interface-declarations/interface-modifiers
+% jacks javac
+Testing javac
+Working directory is /usr/local/project/jacks/tests/jls/interfaces/interface-declarations/i
+nterface-modifiers
+compile = /usr/local/jdk118_v1/bin/javac  ...
+run     = /usr/local/jdk118_v1/bin/java  ...
+tests/jls/interfaces/interface-declarations/interface-modifiers
+
+==== 9.1.1-2 adding the public keyword to an interface declared
+        as public triggers a bug in the javac shipped with jdk 1.1 FAILED
+==== Contents of test case:
+
+    compile [saveas PublicSynchronizedInterface.java  "public synchronized interface Public
+SynchronizedInterface {}"]
+
+---- Result was:
+PASS
+---- Result should have been:
+FAIL
+==== 9.1.1-2 FAILED
+javac:  Total   1      Passed  0       Skipped 0       Failed  1
+</pre>
+</code>
+
+    <p>
+
+    You probably will not care about most of this output, just note that
+    the test ran and it failed with javac. Now lets run the same test
+    with the jikes compiler.
+
+    <p>
+
+<code>
+<pre>
+% jacks jikes
+Testing jikes
+Working directory is /usr/local/project/jacks/tests/jls/interfaces/interface-declarations/i
+nterface-modifiers
+CLASSPATH = /usr/local/jdk118_v1/lib/classes.zip
+compile = /home/mo/project/build/jikes/src/jikes  ...
+run     = /usr/local/jdk118_v1/bin/java  ...
+tests/jls/interfaces/interface-declarations/interface-modifiers
+jikes:  Total   1      Passed  1      Skipped 0       Failed  0
+</pre>
+</code>
+
+    <br>
+    <br>
+
+    Thats all there is to it! The test case has now been integrated into
+    the Jacks regression testing system and it has been double checked to
+    ensure that it is working as expected. Note how easy it was to
+    add the test and then run it under
+    multiple compiler environments. All that is left to do is submit
+    a patch for this new test case to the
+
+    <a href="http://www-124.ibm.com/developerworks/projects/jacks">Jacks
+    Project website</a>.
+
+    <hr>
+  </body>
+</html>

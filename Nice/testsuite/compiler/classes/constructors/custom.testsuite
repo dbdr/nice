@@ -97,3 +97,23 @@ new /*/// FAIL HERE */ FooBar(int x) = this("xyz");
   /// package b import a
   A<String> a = new A(x: 5, z: "abc");
   A<String> b = new A(str: "5", t: "abc");
+
+/// PASS
+  // bug #969777
+  let b = new B();
+  // Usage of closure inside a custom constructor
+  /// Toplevel
+class A {
+  void foo() {}
+}
+
+class B extends A {
+  void fooB() = this.foo();
+}
+
+void fst(int i) {}
+
+new B(int x) {
+  [x].foreach(fst);
+  this();
+}

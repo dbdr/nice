@@ -1607,15 +1607,21 @@ public class Compilation
 	literalTable = new Hashtable (100);
 	c.literalTable = literalTable;
 	topLambda = c;
-	topClass = (ClassType) c.getType();
+        // If the class has outer set, use that as the toplevel class.
+        if (c.outer != null)
+          topLambda = (LambdaExp) c.outer;
+	topClass = (ClassType) topLambda.getType();
 	c.compileChildMethods(this);
       }
 
     for (LambdaExp c = pkg.firstClass; c != null; c = c.nextSibling)
       {
 	topLambda = c;
+        // If the class has outer set, use that as the toplevel class.
+        if (c.outer != null)
+          topLambda = (LambdaExp) c.outer;
 	literalTable = c.literalTable;
-	topClass = (ClassType) c.getType();
+	topClass = (ClassType) topLambda.getType();
 	
 	curClass = topClass;
 	c.generateClassInit(this);

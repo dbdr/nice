@@ -199,3 +199,20 @@ class TestA
     b = f("").a;
   }
 }
+
+/// PASS
+  let b = new B();
+  // Usage of closure inside an instance initializer
+  /// Toplevel
+class A {
+  void foo() {}
+}
+
+class B extends A {
+  {
+    [0].foreach(fst);
+    this.foo();
+  }
+}
+
+void fst(int i) {}

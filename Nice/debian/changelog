@@ -1,5 +1,15 @@
 nice (0.7.7) unstable; urgency=low
 
+  * Method can also dispatch on integer and character literals, but there is
+    always a default case required. An example:
+      long fac(long n);
+      fac(@0) = 1;
+      fac(n) = n*fac(n-1);
+    The '@' before a literal is optional, so the following is allowed:
+      int fib(int n);
+      fib(1) = 1;
+      fib(2) = 1;
+      fib(n) = fib(n-2) + fib(n-1);
   * Methods taking a boolean parameter can now dispatch on the cases
     'true' and 'false':
       boolean not(boolean);
@@ -23,7 +33,8 @@ nice (0.7.7) unstable; urgency=low
   * Added the 'concat' function on arrays.
   * Faster compilation for large projects with many classes.
   * Bugfixes (anonymous functions inside functionals with constracts,
-    typechecking loop tests, ...).
+    typechecking loop tests, other fixes to reduce the difference between
+    what the parser accepts and the compiler can handle, ...).
 
  --
 

@@ -53,7 +53,8 @@ public final class SpecialArray extends gnu.bytecode.ArrayType
 
     this.unknown = unknown;
     this.primitive = prefix != null;
-    
+    this.prefix = prefix;
+
     if (unknown)
       // pretend we are java.lang.Object (for casts, method signatures...)
       setSignature("Ljava/lang/Object;");
@@ -81,20 +82,6 @@ public final class SpecialArray extends gnu.bytecode.ArrayType
 	
 	Type.registerTypeForName("[" + elements.getSignature(), this);
       }
-    
-    if (primitive)
-       {
-	 convertMethod = wrappedType.getDeclaredMethod("convert_"+prefix, 1);
-	 genericConvertMethod = wrappedType.getDeclaredMethod("gconvert_"+prefix, 1);
-       }
-    else
-      {
-	convertMethod = wrappedType.getDeclaredMethod("convert", 2);
-	genericConvertMethod = wrappedType.getDeclaredMethod("gconvert", 2);
-      }
-
-    if (convertMethod == null)
-      bossa.util.Internal.error(this + " has no array conversion method");
   }
 
   public String getInternalName()
@@ -108,6 +95,28 @@ public final class SpecialArray extends gnu.bytecode.ArrayType
   /****************************************************************
    * Conversions
    ****************************************************************/
+
+  private void callConvert(CodeAttr code)
+  {
+    if (convertMethod == null)
+      if (primitive)
+	convertMethod = wrappedType.getDeclaredMethod("convert_"+prefix, 1);
+      else
+	convertMethod = wrappedType.getDeclaredMethod("convert", 2);
+
+    code.emitInvokeStatic(convertMethod);
+  }
+
+  private void callGenericConvert(CodeAttr code)
+  {
+    if (genericConvertMethod == null)
+      if (primitive)
+	 genericConvertMethod = wrappedType.getDeclaredMethod("gconvert_"+prefix, 1);
+      else
+	genericConvertMethod = wrappedType.getDeclaredMethod("gconvert", 2);
+
+    code.emitInvokeStatic(genericConvertMethod);
+  }
 
   public void emitCoerceFrom (Type fromType, CodeAttr code)
   {
@@ -188,7 +197,7 @@ public final class SpecialArray extends gnu.bytecode.ArrayType
     if (!primitive)
       code.emitPushString
 	(((ObjectType) elements).getInternalName().replace('/', '.'));
-    code.emitInvokeStatic(convertMethod);
+    callConvert(code);
     // non primitive need the cast
     if (primitive)
       code.emitGoto(end);
@@ -221,7 +230,7 @@ public final class SpecialArray extends gnu.bytecode.ArrayType
     Type elements = to.getComponentType();
     if (elements instanceof PrimType)
       {
-	code.emitInvokeStatic(((SpecialArray) SpecialArray.create(elements)).genericConvertMethod);
+	((SpecialArray) SpecialArray.create(elements)).callGenericConvert(code);
       }
     else
       {
@@ -234,9 +243,9 @@ public final class SpecialArray extends gnu.bytecode.ArrayType
 	  (((ObjectType) elements).getInternalName().replace('/', '.'));
 
 	if (generic)
-	  code.emitInvokeStatic(unknownTypeArray.genericConvertMethod);
+	  unknownTypeArray.callGenericConvert(code);
 	else
-	  code.emitInvokeStatic(unknownTypeArray.convertMethod);
+	  unknownTypeArray.callConvert(code);
 
 	// Assert what we now guarantee.
 	code.emitCheckcast(to);
@@ -288,6 +297,7 @@ public final class SpecialArray extends gnu.bytecode.ArrayType
   private Method convertMethod;
   private Method genericConvertMethod;
   private static Method makeMethod = wrappedType.getDeclaredMethod("make", 1);
+  private String prefix;
 
   public String toString()
   {

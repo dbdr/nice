@@ -63,6 +63,14 @@ public class RetypedJavaMethod extends JavaMethod
     return false;
   }
 
+  addToScope()
+  {
+    // Put the symbol in the java scope, so it's available globally,
+    // even to packages that don't import the current one. See testcase.
+    if (! ignoredRetyping && reflectMethod != null)
+      addJavaSymbol(notNull(reflectMethod), this);
+  }
+
   doResolve()
   {
     if (ignoredRetyping)
@@ -76,14 +84,6 @@ public class RetypedJavaMethod extends JavaMethod
       }
 
     super;
-  }
-
-  addToScope()
-  {
-    // Put the symbol in the java scope, so it's available globally,
-    // even to packages that don't import the current one. See testcase.
-    if (! ignoredRetyping)
-      addJavaSymbol(notNull(reflectMethod), this);
   }
 
   isIgnored() = ignoredRetyping;

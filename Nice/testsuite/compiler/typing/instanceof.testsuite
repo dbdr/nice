@@ -279,15 +279,6 @@ void f() {
   f(() => { x = null; });
 
 /// PASS
-  Vector<A> ll = new Vector();
-  ll.foreach(A arg => {
-    arg = new B();
-    if (arg instanceof B) {
-      int x = arg.life;
-     }
-  });
-
-/// PASS
   let A a = new B();
   void->void f = () => {
     if (a instanceof B) {

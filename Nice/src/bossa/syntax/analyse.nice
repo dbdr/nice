@@ -562,8 +562,8 @@ analyse(decl@Block.LocalFunction, info)
 {
   notNull(decl.parameters).resolveCalledFromAnalyse(cast(info));
 
-  decl.value = analyse(decl.value, info);
   info.addVar(notNull(decl.left));
+  decl.value = analyse(decl.value, info);
 }
 
 analyse(b@Block, info)

@@ -3,3 +3,11 @@
 /// PASS
   void f(int x) { if (true) return; }
 
+/// PASS
+  int x = 0;
+  void f2(int i) { 
+  x++;
+  if (i>0) f2(i-1); 
+  } 
+  f2(4); 
+  assert x==5;

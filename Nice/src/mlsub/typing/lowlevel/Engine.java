@@ -20,7 +20,7 @@ import java.util.*;
 
 /**
  * Public interface to the lowlevel constraint implication checker.
- * 
+ *
  * All accesses are done through this Engine.
  *
  * @author bonniot
@@ -31,7 +31,7 @@ public abstract class Engine
   {
     LowlevelUnsatisfiable.refinedReports = false;
   }
-  
+
   /**
    * Enters a new typing context.
    * If an enter() completed successfully,
@@ -58,7 +58,7 @@ public abstract class Engine
           }
       }
   }
-  
+
   /**
    * Rigidify the current constraint.
    * This means that no further assumptions will be made on it.
@@ -74,13 +74,13 @@ public abstract class Engine
 
     for(Iterator i = constraints.iterator();
 	i.hasNext();)
-      { 
+      {
 	Engine.Constraint k = (Engine.Constraint)i.next();
 	k.satisfy();
 	k.rigidify();
       }
   }
-  
+
   /**
      Used in Polytype.simplify().
    */
@@ -91,12 +91,12 @@ public abstract class Engine
 
     for(Iterator i = constraints.iterator();
 	i.hasNext();)
-      { 
+      {
 	Engine.Constraint k = (Engine.Constraint)i.next();
 	k.satisfy();
       }
   }
-  
+
   /**
    * Returns to the state we had before the last 'enter'.
    *
@@ -109,7 +109,7 @@ public abstract class Engine
     tentative &= existentialLevel > 0;
     // We only 'commit' in tentative mode
     commit &= tentative;
-      
+
     boolean ok = false;
     try{
       assertFrozens();
@@ -118,12 +118,12 @@ public abstract class Engine
 
       for(Iterator i = constraints.iterator();
 	  i.hasNext();)
-	{ 
+	{
 	  Engine.Constraint k = (Engine.Constraint)i.next();
 	  try{
 	    if(dbg)
 	      Debug.println("** Satisfying "+k);
-	    
+
 	    k.satisfy();
 	  }
 	  catch(Unsatisfiable e){
@@ -139,7 +139,7 @@ public abstract class Engine
       backtrack(tentative, ok && commit);
     }
   }
-  
+
   public static void backtrack(boolean tentative, boolean commit)
   {
     floating.backtrack();
@@ -148,7 +148,7 @@ public abstract class Engine
       {
         for(Iterator i = constraints.iterator();
             i.hasNext();)
-          { 
+          {
             Engine.Constraint k = (Engine.Constraint) i.next();
             k.backtrack(commit);
           }
@@ -159,7 +159,7 @@ public abstract class Engine
         /*
         if (tentative && !commit)
           {
-            // These type variables used to be free. Since we don't commit, 
+            // These type variables used to be free. Since we don't commit,
             // we must set them free again!
             try{
               for (Iterator i = formerFree.iterator(); i.hasNext();)
@@ -192,7 +192,7 @@ public abstract class Engine
   {
     for(Iterator i = constraints.iterator();
 	i.hasNext();)
-      { 
+      {
 	Engine.Constraint k = (Engine.Constraint)i.next();
 	k.startSimplify();
       }
@@ -202,7 +202,7 @@ public abstract class Engine
   {
     for(Iterator i = constraints.iterator();
 	i.hasNext();)
-      { 
+      {
 	Engine.Constraint k = (Engine.Constraint)i.next();
 	k.stopSimplify();
       }
@@ -213,25 +213,25 @@ public abstract class Engine
    *
    * @param e1 the smaller elements
    * @param e2 the greater elements
-   * @exception Unsatisfiable 
+   * @exception Unsatisfiable
    */
-  public static void leq(Element[] e1, Element[] e2) 
+  public static void leq(Element[] e1, Element[] e2)
     throws Unsatisfiable
   {
     if (e1.length != e2.length)
       throw new IllegalArgumentException
 	("Bad size in Engine.leq(Element[])");
-    
+
     for(int i = e1.length-1;i>=0;i--)
       leq(e1[i], e2[i]);
   }
-      
-  public static final void leq(Element e1, Element e2) 
+
+  public static final void leq(Element e1, Element e2)
     throws Unsatisfiable
   {
     leq(e1,e2,false);
   }
-  
+
   public static void setTop(Element top)
   {
     Engine.top = top;
@@ -241,13 +241,13 @@ public abstract class Engine
 
   /**
      Asserts that elements have some ordering relation.
-     
+
      @param e1 a value of type 'Element'
      @param e2 a value of type 'Element'
      @exception Unsatisfiable if the constraint is not satisfiable.
      However this fact may also be discovered later.
    */
-  public static final void leq(Element e1, Element e2, boolean initial) 
+  public static final void leq(Element e1, Element e2, boolean initial)
     throws Unsatisfiable
   {
     if (e2 == top) return;
@@ -279,7 +279,7 @@ public abstract class Engine
                   return;
                 }
 
-	      if(dbg) 
+	      if(dbg)
 		Debug.println("Bad kinding discovered by Engine : "+
 			      k1+" != "+k2+
 			      "\nfor elements "+e1+" and "+e2);
@@ -313,11 +313,11 @@ public abstract class Engine
 	  frozenLeqs.add(new Leq(e1,e2));
 	}
   }
-  
+
   /****************************************************************
    * New nodes
    ****************************************************************/
-  
+
   /**
    * Prepare a new Element to be used.
    */
@@ -337,7 +337,7 @@ public abstract class Engine
 	floating.add(e);
       }
   }
-  
+
   private static final int FLOATING = -3;
   private static final int RIGID = -4;
 
@@ -354,7 +354,7 @@ public abstract class Engine
       throw new InternalError("null constraint in Engine.isRigid for "+e);
     return k.isRigid(e);
   }
-  
+
   /****************************************************************
    * Simplification
    ****************************************************************/
@@ -362,7 +362,7 @@ public abstract class Engine
   public static void tag(Element e, int variance)
   {
     Kind kind = e.getKind();
-    if(kind==null) 
+    if(kind==null)
       return;
       //throw new InternalError("null kind for "+e);
     Engine.Constraint k = getConstraint(kind);
@@ -379,23 +379,23 @@ public abstract class Engine
   {
     for(Iterator it = constraints.iterator();
 	it.hasNext();)
-      { 
+      {
 	final Engine.Constraint k = (Engine.Constraint) it.next();
 	k.simplify();
-	
+
 	final int soft = k.k0.weakMarkedSize();
 	final int n = k.k0.size();
 	for (int b = soft; b < n; b++)
 	  binders.add(k.getElement(b));
-	
+
 	// add 'implements' constraints
 	try{
 	  k.k0.implementsIter(new K0.ImplementsIterator(){
 	      protected void iter(int x, int iid)
 	      {
 		if (x < soft) return;
-		
-		mlsub.typing.TypeConstructor tc = 
+
+		mlsub.typing.TypeConstructor tc =
 		  (mlsub.typing.TypeConstructor) k.getElement(x);
 		atoms.add(new mlsub.typing.ImplementsCst
 		  (tc, ((mlsub.typing.Variance) tc.variance).getInterface(iid)));
@@ -413,20 +413,20 @@ public abstract class Engine
 	catch(Unsatisfiable ex) {}
       }
   }
-  
+
   private static void addIfLeq(int i1, int i2, Engine.Constraint k, List atoms)
   {
     if (k.k0.wasEntered(i1, i2))
       atoms.add(k == variablesConstraint ?
 		(mlsub.typing.AtomicConstraint)
 		new mlsub.typing.MonotypeLeqCst
-		  ((mlsub.typing.MonotypeVar) k.getElement(i1), 
+		  ((mlsub.typing.MonotypeVar) k.getElement(i1),
 		   (mlsub.typing.MonotypeVar) k.getElement(i2)) :
 		new mlsub.typing.TypeConstructorLeqCst
-		  ((mlsub.typing.TypeConstructor) k.getElement(i1), 
+		  ((mlsub.typing.TypeConstructor) k.getElement(i1),
 		   (mlsub.typing.TypeConstructor) k.getElement(i2)));
   }
-  
+
   /**
      Return the element e is equivalent to after simplification.
   */
@@ -441,7 +441,7 @@ public abstract class Engine
 
     return k.getElement(e.getId());
   }
-  
+
   /****************************************************************
    *                          Private
    ****************************************************************/
@@ -461,7 +461,7 @@ public abstract class Engine
   }
 
   private static final BackableList frozenLeqs = new BackableList();
-  
+
   public static void setKind(Element element, Kind k)
     throws Unsatisfiable
   {
@@ -481,7 +481,7 @@ public abstract class Engine
 	    throw new LowlevelUnsatisfiable
 	      ("Bad Kinding for " + e + ":\nhad: " + e.getKind() +
 	       "\nnew: " + k);
-	
+
         if (e.isExistential())
           formerFree.add(e);
 
@@ -531,10 +531,10 @@ public abstract class Engine
 	}
       }
   }
-  
-  /** 
-   * Doesn't check kinding. 
-   * Used in Typing.enumerate 
+
+  /**
+   * Doesn't check kinding.
+   * Used in Typing.enumerate
    */
   public static void forceKind(Element element, Kind k)
     throws Unsatisfiable
@@ -545,10 +545,10 @@ public abstract class Engine
     while(!s.empty())
       {
 	Element e = (Element) s.pop();
-	
+
 	e.setKind(k);
 	k.register(e);
-	
+
 	floating.remove(e);
 
 	// Propagates the kind to all comparable elements
@@ -580,7 +580,7 @@ public abstract class Engine
 	}
       }
   }
-  
+
   /**
      Enter all the 'floating' elements into the variablesConstraint
      and add their frozen constraints.
@@ -639,7 +639,7 @@ public abstract class Engine
 	  i.hasNext();)
 	{
 	  Element e = (Element) i.next();
-	  
+
 	  // useful for nullness head on monotype vars
           // we don't set existential in stone either, because they
           // might be put into a kind later on.
@@ -656,7 +656,7 @@ public abstract class Engine
     finally{
       floating.endOfIteration();
     }
-    
+
     try {
       for(Iterator i = frozenLeqs.iterator(); i.hasNext();)
 	{
@@ -677,15 +677,15 @@ public abstract class Engine
       frozenLeqs.endOfIteration();
     }
   }
-  
+
   /** Maps a Kind to its lowlevel constraint */
-  private static HashMap kindsMap; 
-  
+  private static HashMap kindsMap;
+
   public static Engine.Constraint getConstraint(Kind kind)
   {
     if(kind instanceof Engine.Constraint)
       return (Engine.Constraint) kind;
-    
+
     Engine.Constraint res = (Engine.Constraint) kindsMap.get(kind);
     if(res!=null)
       return res;
@@ -712,19 +712,19 @@ public abstract class Engine
     kindsMap.put(kind,res);
     return res;
   }
-  
+
   /** The elements that have not yet been added to a Kind  */
   private static final BackableList floating = new BackableList();
-  
+
   /** The elements that have not yet been rigidified. */
   private static final BackableList soft = new BackableList();
-  
+
   /** The elements that have been put into a kind since the last mark. */
   private static final BackableList formerFree = new BackableList();
-  
+
   /** The constraint of monotype variables */
   public static Engine.Constraint variablesConstraint;
-  
+
   /** The list of Constraints */
   private static ArrayList constraints;
 
@@ -751,24 +751,24 @@ public abstract class Engine
   {
     for(Iterator i = constraints.iterator();
 	i.hasNext();)
-      { 
+      {
 	Engine.Constraint k = (Engine.Constraint)i.next();
 	k.createInitialContext();
       }
     initialContext = false;
   }
-  
+
   public static void releaseInitialContext()
   {
     for(Iterator i = constraints.iterator();
 	i.hasNext();)
-      { 
+      {
 	Engine.Constraint k = (Engine.Constraint)i.next();
 	k.releaseInitialContext();
       }
     initialContext = true;
   }
-  
+
   private static boolean initialContext = true;
   public static boolean isInRigidContext() { return !initialContext; }
 
@@ -792,13 +792,13 @@ public abstract class Engine
     }
 
     private boolean variables = false;
-    
+
     // this is not too logical to have this...
     public mlsub.typing.Monotype freshMonotype(boolean existential)
     {
       return null;
     }
-    
+
     /**
      * Returns true iff there is a concrete #class in this constraint.
      */
@@ -806,12 +806,12 @@ public abstract class Engine
     {
       return !variables;
     }
-    
+
     final K0 k0 = new K0(K0.BACKTRACK_UNLIMITED, new Callbacks());
-    
+
     private Vector elements = new Vector(10); // ArrayList would be better, but has no setSize method
     private BitVector concreteElements = new BitVector();
-    
+
     public final void register(Element e)
     {
       int id = k0.extend();
@@ -819,24 +819,24 @@ public abstract class Engine
       if(id>=elements.size())
 	elements.setSize(id+1);
       elements.set(id,e);
-      
+
       if(e.isConcrete())
 	concreteElements.set(id);
-      
+
       if(dbg) Debug.println(e+" has id "+e.getId());
     }
-    
+
     // public for Typing.enumerate...
     public Element getElement(int index)
     {
       return (Element) elements.get(index);
     }
-    
+
     void tag(Element e, int variance)
     {
       k0.tag(e.getId(), variance);
     }
-    
+
     class Callbacks extends K0.Callbacks
     {
       protected void indexMerged(int src, int dest) {
@@ -858,7 +858,7 @@ public abstract class Engine
       protected void indexDiscarded(int index) {
 	if(dbg)
 	  Debug.println("Discarded "+indexToString(index));
-	  
+
 	getElement(index).setId(-2);
 	elements.set(index,null); // enable garbage collection
       }
@@ -880,12 +880,12 @@ public abstract class Engine
 	return "" + ((mlsub.typing.Variance) associatedKind).getInterface(iid);
       }
     }
-    
-    public Kind associatedKind; 
+
+    public Kind associatedKind;
     /* the kind of the elements of this constraint
      * This is used in TypeConstructor.setKind
      */
-  
+
     public String toString()
     {
       return "Constraint " + name + " for "+associatedKind+":\n"+k0.toString();
@@ -896,25 +896,25 @@ public abstract class Engine
       int id = e.getId();
       return id>=0 && id<k0.size();
     }
-    
+
     public final void leq(Element e1, Element e2)
       throws Unsatisfiable
     {
       leq(e1,e2,false);
     }
-    
+
     public final void leq(Element e1, Element e2, boolean initial)
       throws Unsatisfiable
     {
       if(dbg)
-	{	  
+	{
 	  Debug.println(e1+" <: "+e2+" ("+e1.getId()+" <: "+e2.getId()+")");
 	  if (e1.getId() < 0 || e1.getId() >= k0.size())
 	    {
 	      Debug.println(e1 + " has invalid index");
 	      bossa.util.Internal.printStackTrace();
 	    }
-      
+
 	  if (e2.getId() < 0 || e2.getId() >= k0.size())
 	    {
 	      Debug.println(e2 + " has invalid index");
@@ -925,7 +925,7 @@ public abstract class Engine
       if(initial)
 	k0.initialLeq(e1.getId(),e2.getId());
       else
-	k0.leq(e1.getId(),e2.getId()); 
+	k0.leq(e1.getId(),e2.getId());
     }
 
     public final void assertMinimal(Element e)
@@ -935,7 +935,7 @@ public abstract class Engine
 
       k0.minimal(e.getId());
     }
-    
+
     public final boolean isMinimal(Element e)
     {
       return k0.isMinimal(e.getId());
@@ -950,16 +950,16 @@ public abstract class Engine
     public Element lowestInstance(Element e)
     {
       //FIXME: Suboptimal: doesn't always return an instance when there is one.
-      // Maybe this should be done by enumeration of the solutions 
-      // of the constraint. 
-      
+      // Maybe this should be done by enumeration of the solutions
+      // of the constraint.
+
       final int id = e.getId();
       int res = -1;
-      
+
       for (int elem = 0; elem < k0.initialContextSize(); elem++)
 	// We use wasEntered, since id is assumed not to be rigid
 	// i and res are rigid, so we use isLeq.
-	// an alternative would be to (require) rigidify 
+	// an alternative would be to (require) rigidify
 	// (at least a closure of leq relation + other axioms)
 	// and use isLeq.
 	// Could be more precise in presence of interfaces.
@@ -997,7 +997,7 @@ public abstract class Engine
       else
 	return getElement(res);
     }
-    
+
     void mark()
     {
       k0.mark();
@@ -1017,12 +1017,12 @@ public abstract class Engine
     {
       k0.simplify();
     }
-    
+
     void stopSimplify()
     {
       k0.stopSimplify();
-    }    
-      
+    }
+
     void satisfy() throws Unsatisfiable
     {
       k0.satisfy();
@@ -1037,7 +1037,7 @@ public abstract class Engine
     {
       return k0.isRigid(e.getId());
     }
-    
+
     void createInitialContext() throws Unsatisfiable
     {
       k0.createInitialContext();
@@ -1052,22 +1052,22 @@ public abstract class Engine
     {
       return k0.newInterface();
     }
-    
+
     public void subInterface(int i1, int i2)
     {
       k0.subInterface(i1,i2);
     }
-    
+
     public void initialImplements(int x, int iid)
     {
       k0.initialImplements(x,iid);
     }
-  
+
     public void initialAbstracts(int x, int iid)
     {
       k0.initialAbstracts(x,iid);
     }
-  
+
     public void indexImplements(int x, int iid) throws Unsatisfiable
     {
       k0.indexImplements(x,iid);
@@ -1091,6 +1091,6 @@ public abstract class Engine
       return k0.isLeq(e1.getId(),e2.getId());
     }
   }
-  
+
   public static boolean dbg = bossa.util.Debug.engine;
 }

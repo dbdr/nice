@@ -8,6 +8,7 @@ nice (0.9.9)
       assert o instanceof String;
       // Here o can be used as a string without cast
 
+    The same construct can be used with '!= null' tests.
   * java.lang.Class is now parameterized by the type it represents.
     In particular, newInstance is now declared in nice.lang with
 

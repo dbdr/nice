@@ -478,9 +478,14 @@ public abstract class ClassDefinition extends MethodContainer
   public abstract mlsub.typing.TypeSymbol getTypeSymbol();
   public abstract mlsub.typing.Interface getAssociatedInterface();
   
-  protected mlsub.typing.Monotype lowlevelMonotype()
+  mlsub.typing.Monotype lowlevelMonotype()
   {
-    return new mlsub.typing.MonotypeConstructor(tc, getTypeParameters());
+    try {
+      return new mlsub.typing.MonotypeConstructor(tc, getTypeParameters());
+    }
+    catch(mlsub.typing.BadSizeEx e) {
+      return toType(tc, getTypeParameters());
+    }
   }
   
   /**

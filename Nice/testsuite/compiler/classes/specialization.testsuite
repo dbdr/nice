@@ -47,3 +47,10 @@ class C<T,V> extends A<V, String, T> {}
   assert foo["a"].equals("1");
   /// Toplevel
   class Foo extends HashMap<String, String> {}
+
+/// PASS
+  /// Toplevel
+  class A<T> {}
+  class B extends A<String> {
+    int x;
+  }

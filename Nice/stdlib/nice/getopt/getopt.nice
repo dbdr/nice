@@ -1,8 +1,6 @@
 
 package nice.getopt;
 
-import gnu.getopt.*;
-
 /** Parses the list of strings according to the options,
     and returns the non-options arguments. */
 List<String> parse(String, Array<String>, Array<Option>);
@@ -10,9 +8,9 @@ List<String> parse(String, Array<String>, Array<Option>);
 String printOptions(Array<Option>);
 
 int optType(Option);
-optType(o@NoParamOption) = LongOpt.NO_ARGUMENT();
-optType(o@ParamOption) = LongOpt.REQUIRED_ARGUMENT();
-optType(o@OptionalParamOption) = LongOpt.OPTIONAL_ARGUMENT();
+optType(o@NoParamOption) = NO_ARGUMENT;
+optType(o@ParamOption) = REQUIRED_ARGUMENT;
+optType(o@OptionalParamOption) = OPTIONAL_ARGUMENT;
 
 String optSuffix(Option);
 optSuffix(o@NoParamOption) = "";
@@ -32,11 +30,11 @@ parse(progName@String, args, options)
 	if(o.noShortName)
 	  {
 	    uniqId = uniqId+1;
-	    l = new LongOpt(o.longName,optType(o),null,uniqId);
+	    l = new LongOpt(name:o.longName, has_arg:optType(o), val:uniqId);
 	  }
 	else
-	  l = new LongOpt(o.longName,optType(o),null,o.shortName);
-
+	  l = new LongOpt(name:o.longName,has_arg:optType(o),val:o.shortName);
+        l.initLongOpt();
 	o.optval = l.getVal();
 
 	longOptions.add(l);
@@ -49,8 +47,9 @@ parse(progName@String, args, options)
   ?LongOpt[] longOpts = new LongOpt[longOptions.size];
   for (int i = 0; i < longOpts.length; i++)
     longOpts[i] = longOptions.get(i);
-  Getopt g = newGetopt(progName, args, shortOptions, longOpts);
-
+  Getopt g = new Getopt(progname: progName, argv: args, optstring: shortOptions,
+			long_options: cast(longOpts));
+  g.initGetopt();
   // Parsing loop
   int c = g.getopt();
   while (c != -1)

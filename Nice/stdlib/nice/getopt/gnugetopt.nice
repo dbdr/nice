@@ -1,0 +1,572 @@
+/**************************************************************************
+/* Getopt.java -- Java port of GNU getopt from glibc 2.0.6
+/*
+/* Copyright (c) 1987-1997 Free Software Foundation, Inc.
+/* Java Port Copyright (c) 1998 by Aaron M. Renn (arenn@urbanophile.com)
+/*
+/* This program is free software; you can redistribute it and/or modify
+/* it under the terms of the GNU Library General Public License as published 
+/* by  the Free Software Foundation; either version 2 of the License or
+/* (at your option) any later version.
+/*
+/* This program is distributed in the hope that it will be useful, but
+/* WITHOUT ANY WARRANTY; without even the implied warranty of
+/* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+/* GNU Library General Public License for more details.
+/*
+/* You should have received a copy of the GNU Library General Public License
+/* along with this program; see the file COPYING.LIB.  If not, write to 
+/* the Free Software Foundation Inc., 59 Temple Place - Suite 330, 
+/* Boston, MA  02111-1307 USA
+/**************************************************************************/
+
+package nice.getopt;
+
+import java.text.*;
+
+public class Getopt {
+
+private final int REQUIRE_ORDER = 1;
+private final int PERMUTE = 2;
+private final int RETURN_IN_ORDER = 3;
+
+private ?String optarg = null;
+private ?String nextchar = null;
+private boolean posixly_correct = System.getProperty("gnu.posixly_correct", null) != null;
+private boolean longopt_handled = false;
+private boolean endparse = false;
+private boolean opterr = true;
+private int optopt = '?';
+private int optind = 0;
+private int longind = 0;
+private int first_nonopt = 1;
+private int last_nonopt = 1;
+private const int ordering = 2;//== PERMUTE
+
+private String progname;
+private String[] argv;
+private String optstring = " ";
+private LongOpt[] long_options;
+private boolean long_only = false;
+
+//public Getopt(String progname, String[] argv, String optstring, 
+//       LongOpt[] long_options, boolean long_only)
+public void initGetopt()
+{
+
+  // Determine how to handle the ordering of options and non-options
+  if (optstring.charAt(0) == '-')
+    {
+      ordering = RETURN_IN_ORDER;
+      if (optstring.length() > 1)
+        this.optstring = optstring.substring(1);
+    }
+  else if (optstring.charAt(0) == '+')
+    {
+      ordering = REQUIRE_ORDER;
+      if (optstring.length() > 1)
+        this.optstring = optstring.substring(1);
+    }
+  else if (posixly_correct)
+    {
+      ordering = REQUIRE_ORDER;
+    }
+}
+
+
+public void setOptstring(String optstring)
+{
+  this.optstring = optstring.length() == 0 ? " " : optstring;
+}
+
+public int getOptind() = optind;
+
+public void setOptind(int optind)
+{
+  this.optind = optind;
+}
+
+public void setArgv(String[] argv)
+{
+  this.argv = argv;
+}
+
+public ?String getOptarg() = optarg;
+
+public void setOpterr(boolean opterr)
+{
+  this.opterr = opterr;
+}
+
+public int getOptopt() = optopt;
+
+public int getLongind() = longind;
+
+private void exchange(String[] argv)
+{
+  int bottom = first_nonopt;
+  int middle = last_nonopt;
+  int top = optind;
+  String tem;
+
+  while (top > middle && middle > bottom)
+    {
+      if (top - middle > middle - bottom)
+        {
+          // Bottom segment is the short one. 
+          int len = middle - bottom;
+          int i;
+
+          // Swap it with the top part of the top segment. 
+          for (i = 0; i < len; i++)
+            {
+              tem = argv[bottom + i];
+              argv[bottom + i] = argv[top - (middle - bottom) + i];
+              argv[top - (middle - bottom) + i] = tem;
+            }
+          // Exclude the moved bottom segment from further swapping. 
+          top -= len;
+        }
+      else
+        {
+          // Top segment is the short one.
+          int len = top - middle;
+          int i;
+
+          // Swap it with the bottom part of the bottom segment. 
+          for (i = 0; i < len; i++)
+            {
+              tem = argv[bottom + i];
+              argv[bottom + i] = argv[middle + i];
+              argv[middle + i] = tem;
+            }
+          // Exclude the moved top segment from further swapping. 
+          bottom += len;
+        }
+    }
+
+  // Update records for the slots the non-options now occupy. 
+
+  first_nonopt += (optind - last_nonopt);
+  last_nonopt = optind;
+}
+
+private int checkLongOption()
+{
+  ?LongOpt pfound = null;
+  int nameend;
+  boolean ambig;
+  boolean exact;
+  
+  longopt_handled = true;
+  ambig = false;
+  exact = false;
+  longind = -1;
+  nameend = (nextchar || "").indexOf("=");
+  if (nameend == -1)
+    nameend = (nextchar || "").length();
+  
+  // Test all lnog options for either exact match or abbreviated matches
+  for (int i = 0; i < long_options.length; i++)
+    {
+      if (long_options[i].getName().startsWith((nextchar || "").substring(0, nameend)))
+        {
+          if (long_options[i].getName().equals((nextchar || "").substring(0, nameend)))
+            {
+              // Exact match found
+              pfound = long_options[i];
+              longind = i;
+              exact = true;
+              break;
+            }
+          else if (pfound == null)
+            {
+              // First nonexact match found
+              pfound = long_options[i];
+              longind = i;
+            }
+          else
+            {
+              // Second or later nonexact match found
+              ambig = true;
+            }
+        }
+    } // for
+  
+  // Print out an error if the option specified was ambiguous
+  if (ambig && !exact)
+    {
+      if (opterr)
+          System.err.println(progname+": option '"+argv[optind]+ "' is ambiguous");
+
+       nextchar = "";
+       optopt = 0;
+       ++optind;
+       return('?');
+    }
+ 
+  if (pfound != null)
+    {
+      ++optind;
+ 
+      if (nameend != (nextchar || "").length())
+        {
+          if (pfound.has_arg != NO_ARGUMENT)
+            {
+              if ((nextchar || "").substring(nameend).length() > 1)
+                optarg = (nextchar || "").substring(nameend+1);
+              else
+                optarg = "";
+            }
+          else
+            {
+              if (opterr)
+                {
+                  // -- option
+                  if (argv[optind - 1].startsWith("--"))
+                    System.err.println(progname+": option '--"+pfound.name+"' doesn't allow an argument");
+                  // +option or -option
+                  else
+                    System.err.println(progname+": option '"+argv[optind-1].charAt(0).toString()+"' doesn't allow an argument");
+                 }
+   
+              nextchar = "";
+              optopt = pfound.val;
+              return('?');
+            }
+        } // if (nameend)
+      else if (pfound.has_arg == REQUIRED_ARGUMENT)
+        {
+          if (optind < argv.length)
+            {
+               optarg = argv[optind];
+               ++optind;
+            }
+          else
+            {
+              if (opterr)
+                System.err.println(progname+": option '"+argv[optind-1]+"' requires an argument");
+   
+              nextchar = "";
+              optopt = pfound.val;
+              return optstring.charAt(0) == ':' ? ':' : '?';
+            }
+        } // else if (pfound)
+   
+      nextchar = "";
+      ?StringBuffer sb = pfound.flag;
+      if (sb != null)
+        {
+          sb.setLength(0);
+          sb.append(pfound.val);
+          return(0);
+        }
+
+      return(pfound.val);
+   } // if (pfound != null)
+  
+  longopt_handled = false;
+
+  return(0);
+}
+
+public int getopt()
+{
+  optarg = null;
+
+  if (endparse == true)
+    return(-1);
+
+  if ((nextchar == null) || (nextchar.equals("")))
+    {
+      // If we have just processed some options following some non-options,
+      //  exchange them so that the options come first.
+      if (last_nonopt > optind)
+        last_nonopt = optind;
+      if (first_nonopt > optind)
+        first_nonopt = optind;
+
+      if (ordering == PERMUTE)
+        {
+          // If we have just processed some options following some non-options,
+          // exchange them so that the options come first.
+          if ((first_nonopt != last_nonopt) && (last_nonopt != optind))
+            this.exchange(argv);
+          else if (last_nonopt != optind)
+            first_nonopt = optind;
+
+          // Skip any additional non-options
+          // and extend the range of non-options previously skipped.
+          while ((optind < argv.length) && (argv[optind].equals("") ||
+            (argv[optind].charAt(0) != '-') || argv[optind].equals("-")))
+            {
+              optind++;
+            }
+          
+          last_nonopt = optind;
+        }
+
+      // The special ARGV-element `--' means premature end of options.
+      // Skip it like a null option,
+      // then exchange with previous non-options as if it were an option,
+      // then skip everything else like a non-option.
+      if ((optind != argv.length) && argv[optind].equals("--"))
+        {
+          optind++;
+
+          if ((first_nonopt != last_nonopt) && (last_nonopt != optind))
+            this.exchange(argv);
+          else if (first_nonopt == last_nonopt)
+            first_nonopt = optind;
+
+          last_nonopt = argv.length;
+          optind = argv.length;
+        }
+
+      // If we have done all the ARGV-elements, stop the scan
+      // and back over any non-options that we skipped and permuted.
+      if (optind == argv.length)
+        {
+          // Set the next-arg-index to point at the non-options
+          // that we previously skipped, so the caller will digest them.
+          if (first_nonopt != last_nonopt)
+            optind = first_nonopt;
+
+          return(-1);
+        }
+
+      // If we have come to a non-option and did not permute it,
+      // either stop the scan or describe it to the caller and pass it by.
+      if (argv[optind].equals("") || (argv[optind].charAt(0) != '-') || 
+          argv[optind].equals("-"))
+        {
+          if (ordering == REQUIRE_ORDER)
+            return(-1);
+
+            optarg = argv[optind++];
+            return(1);
+        }
+      
+      // We have found another option-ARGV-element.
+      // Skip the initial punctuation.
+      if (argv[optind].startsWith("--"))
+        nextchar = argv[optind].substring(2);
+      else
+        nextchar = argv[optind].substring(1);
+   }
+
+  // Decode the current option-ARGV-element.
+
+  /* Check whether the ARGV-element is a long option.
+
+     If long_only and the ARGV-element has the form "-f", where f is
+     a valid short option, don't consider it an abbreviated form of
+     a long option that starts with f.  Otherwise there would be no
+     way to give the -f short option.
+
+     On the other hand, if there's a long option "fubar" and
+     the ARGV-element is "-fu", do consider that an abbreviation of
+     the long option, just like "--fu", and not "-f" with arg "u".
+
+     This distinction seems to be the most useful approach.  */
+  if ((long_options != null) && (argv[optind].startsWith("--")
+      || (long_only && ((argv[optind].length()  > 2) || 
+      (optstring.indexOf(argv[optind].charAt(1)) == -1)))))
+    {
+       int c = this.checkLongOption();
+
+       if (longopt_handled)
+         return(c);
+         
+      // Can't find it as a long option.  If this is not getopt_long_only,
+      // or the option starts with '--' or is not a valid short
+      // option, then it's an error.
+      // Otherwise interpret it as a short option.
+      if (!long_only || argv[optind].startsWith("--")
+        || (optstring.indexOf((nextchar || "").charAt(0)) == -1))
+        {
+          if (opterr)
+            {
+              if (argv[optind].startsWith("--"))
+                  System.err.println(progname+": unrecognized option '--"+nextchar+"'");
+              else
+                  System.err.println(progname+": unrecognized option '--"+argv[optind].charAt(0).toString()+"'");
+            }
+
+          nextchar = "";
+          ++optind;
+          optopt = 0;
+          return('?');
+        }
+    } // if (longopts)
+
+  // Look at and handle the next short option-character */
+  int c = (nextchar || "").charAt(0); //**** Do we need to check for empty str?
+  if ((nextchar || "").length() > 1)
+    nextchar = (nextchar || "").substring(1);
+  else
+    nextchar = "";
+  
+  ?String temp = null;
+  if (optstring.indexOf(c) != -1)
+    temp = optstring.substring(optstring.indexOf(c));
+
+  if (nextchar.equals(""))
+    ++optind;
+
+  if ((temp == null) || (c == ':'))
+    {
+      if (opterr)
+        {
+          if (posixly_correct)
+            System.err.println(progname+": illegal option -- "+this.toString());
+          else
+            System.err.println(progname+": invalid option -- "+char(c).toString());
+        }
+
+      optopt = c;
+      return('?');
+    }
+
+  // Convenience. Treat POSIX -W foo same as long option --foo
+  if ((temp.charAt(0) == 'W') && (temp.length() > 1) && (temp.charAt(1) == ';'))
+    {
+      if (!nextchar.equals(""))
+        {
+          optarg = nextchar;
+        }
+      // No further cars in this argv element and no more argv elements
+      else if (optind == argv.length)
+        {
+          if (opterr)
+            System.err.println(progname+": option '"+char(c).toString()+"' doesn't allow an argument");
+
+          optopt = c;
+          return optstring.charAt(0) == ':' ? ':' : '?';
+        }
+      else
+        {
+          // We already incremented `optind' once;
+          // increment it again when taking next ARGV-elt as argument. 
+          nextchar = argv[optind];
+          optarg  = argv[optind];
+        }
+
+      c = this.checkLongOption();
+
+      if (longopt_handled)
+        return(c);
+      else
+        // Let the application handle it
+        {
+          nextchar = null;
+          ++optind;
+          return('W');
+        }
+    }
+
+  if ((temp.length() > 1) && (temp.charAt(1) == ':'))
+    {
+      if ((temp.length() > 2) && (temp.charAt(2) == ':'))
+        // This is an option that accepts and argument optionally
+        {
+          if (!nextchar.equals(""))
+            {
+               optarg = nextchar;
+               ++optind;
+            }
+          else
+            {
+              optarg = null;
+            }
+
+          nextchar = null;
+        }
+      else
+        {
+          if (!nextchar.equals(""))
+            {
+              optarg = nextchar;
+              ++optind;
+            }
+          else if (optind == argv.length)
+            {
+              if (opterr)
+                System.err.println(progname+": option requires an argument -- "+char(c).toString());
+
+              optopt = c;
+              return optstring.charAt(0) == ':' ? ':' : '?';
+            }
+          else
+            {
+              optarg = argv[optind];
+              ++optind;
+
+              // Ok, here's an obscure Posix case.  If we have o:, and
+              // we get -o -- foo, then we're supposed to skip the --,
+              // end parsing of options, and make foo an operand to -o.
+              // Only do this in Posix mode.
+              if ((posixly_correct) && optarg.equals("--"))
+                {
+                  // If end of argv, error out
+                  if (optind == argv.length)
+                    {
+                      if (opterr)
+                  	System.err.println(progname+": option requires an argument -- "+char(c).toString());
+
+                      optopt = c;
+		      return optstring.charAt(0) == ':' ? ':' : '?';
+                    }
+
+                  // Set new optarg and set to end
+                  // Don't permute as we do on -- up above since we
+                  // know we aren't in permute mode because of Posix.
+                  optarg = argv[optind];
+                  ++optind;
+                  first_nonopt = optind;
+                  last_nonopt = argv.length;
+                  endparse = true;
+                }
+            }
+
+          nextchar = null;
+        }
+    }
+
+  return(c);
+}
+
+} // Class Getopt
+
+
+var int NO_ARGUMENT = 0;
+var int REQUIRED_ARGUMENT = 1;
+var int OPTIONAL_ARGUMENT = 2;
+
+public class LongOpt
+{
+
+private String name;
+private int has_arg;
+private ?StringBuffer flag = null;
+private int val;
+
+public void initLongOpt() //throws IllegalArgumentException
+{
+  // Validate has_arg
+  if ((has_arg != NO_ARGUMENT) && (has_arg != REQUIRED_ARGUMENT) 
+     && (has_arg != OPTIONAL_ARGUMENT))
+    {
+      throw new IllegalArgumentException("Invalid value "+has_arg.toString()+" for parameter 'has_arg'");
+    }
+}
+
+public String getName() = name;
+
+public int getHasArg() =  has_arg;
+
+public ?StringBuffer getFlag() = flag;
+
+public int getVal() = val;
+
+} // Class LongOpt

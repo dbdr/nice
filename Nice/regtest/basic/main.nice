@@ -53,6 +53,13 @@ main(args)
   String s1;
   fun(String s2) => { s1 = s2; };
 
+  // modification of a variable captured in a lambda
+  int j=2;
+  println("" + j);
+  println(""+(fun()=>--j)());
+  println(""+(fun()=>j++)());
+  println(""+(fun()=>j=2*j)());
+
   // Arrays
 
   Vector<String> v = makeVector(1);

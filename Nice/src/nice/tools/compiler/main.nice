@@ -1,5 +1,5 @@
 /**************************************************************************/
-/*                           B O S S A                                    */
+/*                             N I C E                                    */
 /*        A simple imperative object-oriented research language           */
 /*                   (c)  Daniel Bonniot 1999                             */
 /*                                                                        */
@@ -10,16 +10,16 @@
 /*                                                                        */
 /**************************************************************************/
 
-// File    : compiler.nice
+// File    : main.nice
 // Created : Sat Feb 19 16:21:04 2000 by Daniel Bonniot
-//$Modified: Wed Jul 26 19:08:14 2000 by Daniel Bonniot $
+//$Modified: Thu Jul 27 14:49:14 2000 by Daniel Bonniot $
 
-package bossa.tools;
+package nice.tools.compiler;
 
 /**
-   Bossa compiler main file.
+   Nice compiler main program.
    
-   @author Daniel Bonniot
+   @author Daniel Bonniot (d.bonniot@mail.dotcom.fr)
  */
 
 import mlsub.compilation;
@@ -38,7 +38,7 @@ main(args)
   List<Option> opts = makeVector(10);
 
   opts.add(option('r', "recompile",
-		  "Force recompilation of packages given on the command line",
+		  "Force recompilation of package",
 		  "none/command-line/all",
   		  fun()=>{ recompileCL=true; },
   		  fun(String arg)=>{
@@ -78,8 +78,11 @@ main(args)
 		  fun()=>usage()));
 
   Sequence<String> rest = parse("nicec", args, opts);
-  if((rest.size()<1) | (rest.size()>1))
+  if(rest.size()<1 || rest.size()>1)
     {
+      if (rest.size()>1)
+	println("Supply only one package on the command line.\n" +
+		"nicec will automatically find depandencies.");
       usage();
     }
   String packageName = rest.get(0);

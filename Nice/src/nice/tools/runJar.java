@@ -12,7 +12,7 @@
 
 // File    : jarMainClass.java
 // Created : Thu Apr 20 14:48:25 2000 by Daniel Bonniot
-//$Modified: Tue Jun 20 15:54:32 2000 by Daniel Bonniot $
+//$Modified: Wed Jul 26 19:48:21 2000 by Daniel Bonniot $
 
 package bossa.tools;
 
@@ -80,21 +80,25 @@ public class runJar
 			       ex.getMessage().replace('/','.')+
 			       " not found"+
 			       "\nInstall the adequate package in your CLASSPATH");
+	    System.exit(1);
 	  }
 	  catch(Throwable ex){
 	    System.err.println("Uncaught exception: ");
 	    ex.printStackTrace();
+	    System.exit(1);
 	  }
 	}
       }
       catch(NoSuchMethodException e){
 	System.err.println(mainClass+" has no main method");
+	System.exit(1);
       }
       
     }
     catch(ClassNotFoundException e){
       System.err.println(jar+" indicates "+mainClass+
 			 " as its main class, but no such class was found");
+      System.exit(1);
     }
   }
 }

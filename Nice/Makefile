@@ -30,6 +30,7 @@ NICEC1=${TOP}/bin/nicec ${NICEC_ARGS}
 VERSION = ${shell dpkg-parsechangelog | sed -n 's/^Version: //p'}
 DEB = nice_${VERSION}_all.deb
 TARFILE = Nice-${VERSION}.tar
+ZIPFILE = Nice-${VERSION}-windows.zip
 CVSBUILDDIR = /tmp/cvs-build
 
 
@@ -70,6 +71,15 @@ dist ${TARFILE}: $(CVSBUILDDIR)/$(DEB)
 	cd ${TOP}/dist && tar -cf ../${TARFILE} . --owner=0 --group=0
 	rm -rf ${TOP}/dist
 
+zip ${ZIPFILE}: $(CVSBUILDDIR)/$(DEB)
+	mkdir -p /tmp/Nice
+	./bin/nicec --man | groff -mandoc -Thtml - > /tmp/Nice/nicec.html
+	ln -sf ${TOP}/bin/nicec.bat ${TOP}/share/java/nice.jar ${TOP}/web/Readme.txt /tmp/Nice
+	mkdir -p /tmp/Nice/Emacs
+	ln -sf ${TOP}/lib/emacs/*.el /tmp/Nice/Emacs
+	-rm ${ZIPFILE}
+	cd /tmp && zip -r ${TOP}/${ZIPFILE} Nice
+
 install: share/java/nice.jar
 	mkdir -p ${INSTALLDIR}/bin ${INSTALLDIR}/share/java \
                  ${MANDIR} ${LISPDIR} ${DOCDIR}
@@ -81,6 +91,9 @@ install: share/java/nice.jar
 
 test:
 	cd regtest; /usr/bin/time ./regtest
+
+gcj:
+	gcj --main=nice.tools.compiler.package -o bin/nicec.bin -Dnice.systemJar="../share/java/nice.jar" -Dnice.runtime="../share/java/nice.jar" share/java/nice.jar
 
 clean:
 	rm -f src/nice/tools/compiler.jar
@@ -99,12 +112,14 @@ status:
 
 release: release-file web
 
-release-file: ${TARFILE}
+release-file: ${TARFILE} ${ZIPFILE}
 	(echo user anonymous bonniot@users.sf.net; \
-         echo binary; echo cd incoming; echo put ${TARFILE}; \
+         echo binary; echo cd incoming; \
+         echo put ${TARFILE}; echo put ${ZIPFILE}; \
          echo lcd ${CVSBUILDDIR}; echo put ${DEB} )\
         | ftp -n upload.sourceforge.net
 	echo "Redirect /Nice.tar http://prdownloads.sourceforge.net/nice/${TARFILE}" > web/.htaccess
+	echo "Redirect /Nice.zip http://prdownloads.sourceforge.net/nice/${ZIPFILE}" >> web/.htaccess
 	echo "Redirect /nice.deb http://prdownloads.sourceforge.net/nice/${DEB}" >> web/.htaccess
 
 .PHONY: web

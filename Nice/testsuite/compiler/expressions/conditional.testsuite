@@ -4,3 +4,9 @@
   i = closed 
     ? (i >= 66 ? 0 : -1000)
     : i - i;
+
+/// FAIL
+  /// Toplevel
+  int nameX() = 0;
+  var int nameX = 1;
+  int dummy() = false ? 0 : nameX;

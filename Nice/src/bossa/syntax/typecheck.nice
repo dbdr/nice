@@ -291,6 +291,7 @@ typecheck(e@IfExp)
 	setVarType(variable, now: sureType, brothers: type);
       });
 
+    e.thenExp = thenExp = notNull(thenExp.noOverloading());
     typecheck(thenExp);
     // since the type of the variable is destructively changed,
     // it is important to compute the branch's type and to store it now.
@@ -305,6 +306,7 @@ typecheck(e@IfExp)
 	setVarType(variable, now: sureType, brothers: type);
       });
 
+    e.elseExp = elseExp = notNull(elseExp.noOverloading());
     typecheck(elseExp);
     // since the type of the variable is destructively changed,
     // it is important to compute the branch's type and to store it now.

@@ -111,6 +111,10 @@ test_collection_arrays(a)
   p(ss2);
   p(map(ss2, fun(String s) => s+s));
 
+  // using an array that is the field of an object
+  Fields f = new Fields();
+  f.strings.iter(fun(String s)=>println(s));
+
   Collection<String> c = ss;
   println(c.size());
 

@@ -24,4 +24,6 @@ class Fields
 
   static String stringS;
   String stringI;
+
+  String[] strings = new String[]{"A"};
 }

@@ -181,3 +181,16 @@ class StackImpl<T> {
 }
   /// package b import a
 {}
+
+/// PASS bug
+  int x = new B().getFoo();
+  /// Toplevel
+class A
+{
+  int getFoo() = 0;
+}
+
+class B extends A
+{
+  String foo = "";
+}

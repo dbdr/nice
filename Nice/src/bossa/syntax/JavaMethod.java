@@ -145,30 +145,32 @@ public class JavaMethod extends MethodDeclaration
    */
   public static JavaMethod addFetchedMethod(Method m)
   {
-    if(declaredMethods.get(m) != null)
-      return null;
+    JavaMethod res = (JavaMethod) declaredMethods.get(m);
+    if (res != null)
+      return res;
 
-    JavaMethod md = JavaMethod.make(m, false);
+    res = JavaMethod.make(m, false);
 
-    if(md != null)
-      Node.getGlobalScope().addSymbol(md.getSymbol());
+    if (res != null)
+      Node.getGlobalScope().addSymbol(res.getSymbol());
 
-    return md;
+    return res;
   }
 
   public static JavaMethod addFetchedConstructor
     (Method m,
      TypeConstructor declaringClass)
   {
-    if(declaredMethods.get(m) != null)
-      return null;
-    
-    JavaMethod md = JavaMethod.make(m, true);
-    
-    if(md != null)
-      TypeConstructors.addConstructor(declaringClass, md);
+    JavaMethod res = (JavaMethod) declaredMethods.get(m);
+    if (res != null)
+      return res;
 
-    return md;
+    res = JavaMethod.make(m, true);
+    
+    if (res != null)
+      TypeConstructors.addConstructor(declaringClass, res);
+
+    return res;
   }
 
   public static MethodDeclaration addFetchedMethod(Field f)
@@ -195,12 +197,11 @@ public class JavaMethod extends MethodDeclaration
 	 (method.arg_types.length + 
 	  (method.getStaticFlag() ? 0 : 1)) == arity)
 	{
-	  MethodDeclaration md = 
-	    JavaMethod.addFetchedMethod(method);
-	  if(md!=null)
+	  MethodDeclaration md = JavaMethod.addFetchedMethod(method);
+	  if (md != null)
 	    possibilities.add(md.getSymbol());
 	  else
-	    Debug.println(method + " ignored");
+	    Debug.println("Method " + method + " ignored");
 	}
 
     // search a field
@@ -316,7 +317,7 @@ public class JavaMethod extends MethodDeclaration
 		 "\nIndicated: " + javaRetType.getName() +
 		 "\nFound    : " + reflectMethod.return_type.getName());
     
-    declaredMethods.put(reflectMethod, Boolean.TRUE);
+    declaredMethods.put(reflectMethod, this);
     
     //if (reflectMethod.isConstructor())
     //.addConstructor(this);

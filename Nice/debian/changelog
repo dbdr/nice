@@ -7,6 +7,7 @@ nice (0.7.4) unstable; urgency=low
     to java.util Collections.
   * Fixed error message for calling new on an interface or Java abstract
     class, and when a class or interface (indirectly) implements itself.
+  * Removed the old syntax <T1, T2> for tuples. Use (T1, T2) instead.
   * Bugfixes (forward reference to constructor in field initializer,
     anonymous functions in field initializer).
 

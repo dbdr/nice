@@ -643,8 +643,6 @@ Constraint nonVoidConstraint():
 {
   "<"
   ( 
-    LOOKAHEAD(atomics(null)) atoms=atomics(atoms) 
-  | 
     b=binders(atoms) [ "|" atoms=atomics(atoms) ] 
   )
   ">" 
@@ -656,7 +654,7 @@ Constraint constraint():
   Constraint res;
 }
 {
-  ( LOOKAHEAD(nonVoidConstraint())
+  ( 
     res = nonVoidConstraint()
   |
     { res = Constraint.True; }
@@ -836,12 +834,6 @@ Monotype simpleMonotype():
 |
   start="alike" [ "<" p=monotypes() ">" ]
   { res=new Alike(p, new Location(start)); }
-  { res.nullness = res.absent; }
-|
-  start="<"
-  p=monotypes()
-  end=">"
-  { res = new TupleType(p, new Location(start, end)); }
   { res.nullness = res.absent; }
 |
   LOOKAHEAD(monotypeConstructor())

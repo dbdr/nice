@@ -20,7 +20,7 @@ returnLong()
   return j=j;
 }
 
-<int, int> min_max(int, int);
+(int, int) min_max(int, int);
 min_max(x,y) = x < y ? (x, y) : (y, x);
 
 void test_discards();

@@ -77,7 +77,7 @@ monoSymbol(e@SymbolExp)
 
 boolean hasConditionalType(MonoSymbol v)
 {
-  return conditionalTypes.has(<MonoSymbol, mlsub.typing.Monotype> couple => {
+  return conditionalTypes.has((MonoSymbol, mlsub.typing.Monotype) couple =>{
     (MonoSymbol other, mlsub.typing.Monotype t) = couple;
     return v == other;
   });
@@ -142,7 +142,7 @@ typecheck(e@IdentExp)
       true  if the variable if always null     when the test succeeds
       false if the variable if always non-null when the test succeeds
 */
-<?MonoSymbol, boolean> nullnessInfo(Expression test);
+(?MonoSymbol, boolean) nullnessInfo(Expression test);
 nullnessInfo(test) = (null, false);
 nullnessInfo(test@CallExp)
 {

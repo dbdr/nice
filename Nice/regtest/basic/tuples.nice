@@ -6,7 +6,7 @@ void test_tuples()
 {
   println("\n### Testing tuples ###\n");
 
-  <String, String> cs = ("world!", "Hello, ");
+  (String, String) cs = ("world!", "Hello, ");
   String s1;
   String s2;
   s1 = " toto";
@@ -19,8 +19,8 @@ void test_tuples()
   (a,b) = min_max(17, 14);
   println("" + a + " < " + b);
 
-  <int, long> t1 = (a,b);
-  <long, long> t2;
+  (int, long) t1 = (a,b);
+  (long, long) t2;
   t2 = t1;
 
   // Different array types must be generated depending on the context

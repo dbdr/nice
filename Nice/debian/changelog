@@ -1,11 +1,17 @@
-nice (0.0.020412) unstable; urgency=low
+nice (0.5) unstable; urgency=low
 
+  * Recognise the standard arrow notation for functional types
+      int->int  (int,int)->int  (int->int)->int
+    The old notation fun(int)(int) is deprecated and will be removed
+    before version 1.0
   * Make the compiler compatible with JDK 1.4
+  * All nullness errors are really errors now, not just warnings.
   * Fixes bug that considered that 
       int a = 10, b;
     initializes both a and b to 10.
-
- -- Daniel Bonniot <bonniot@users.sourceforge.net>  Fri, 12 Apr 2002 16:00:36 +0200
+  * Fixed variable initialization analysis for do-while loops.
+  
+ --
 
 nice (0.0.020405) unstable; urgency=low
 

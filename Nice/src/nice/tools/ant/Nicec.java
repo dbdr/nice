@@ -338,3 +338,10 @@ public class Nicec extends Task {
 
 
 }
+
+
+// Setting for Emacs
+// Local variables:
+// tab-width:2
+// indent-tabs-mode:t
+// End:

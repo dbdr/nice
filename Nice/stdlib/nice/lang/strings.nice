@@ -68,9 +68,8 @@ char charAt(String s, int index) = native char String.charAt(int);
  * 
  * @param str the string to split
  * @param separator the separator to split on 
- */ 
-List<String> split(String str, String separator)
-  requires separator.length() > 0 : "separator cannot be the empty string"
+ */
+List<String> split(String str, char separator)
 {
   List<String> res = new ArrayList();
   int ntx = 0;
@@ -84,7 +83,7 @@ List<String> split(String str, String separator)
 	    {
 	      res.add(str.substring(pos, ntx));
 	    }
-	  pos = ntx + separator.length;
+	  pos = ntx + 1;
 	}
       else
 	{

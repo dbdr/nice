@@ -444,7 +444,7 @@ private void registerJavaMethod(String fullName, VarScope scope)
         continue;
 
       MethodDeclaration md = notNull(sym.getMethodDeclaration());
-      if (md.getFullName().equals(fullName))
+      if (md.hasFullName(fullName))
         {
           cast(md).registerForDispatch();
           return;

@@ -243,6 +243,8 @@ public abstract class MethodDeclaration extends Definition
     return "NONE";
   }
 
+  boolean hasFullName(String name) = this.getFullName().equals(name);
+
   public boolean specializesMethods()
   {
     return false;
@@ -316,7 +318,7 @@ public abstract class MethodDeclaration extends Definition
   compile() {}
 }
 
-let char methodListSeparator = ';';
+let char methodListSeparator = '\n';
 
 /** Whether typechecking is currently happening in the global context */
 var boolean inGlobalContext = false;

@@ -30,7 +30,50 @@ public class RetypedJavaMethod extends JavaMethod
   {
     // We put this here, since we need 'module' to be computed
     // since it is used to open the imported packages.
-    this.findReflectMethod();
+    if (this.needed())
+      this.findReflectMethod();
+
+    super;
+  }
+
+  private boolean needed()
+  {
+    // We only load the method eagerly if the retyping is being compiled
+    // from source.
+    // Otherwise, we do it lazily if the method name is actually used in the
+    // program.
+    if (! this.inInterfaceFile()
+	// The nice name can differ from the original one, and both can be used
+	// to refer to this method
+	|| usedIdentifiers.contains(methodName)
+	|| usedIdentifiers.contains(this.getName().toString()))
+      return true;
+
+    if (methodName.equals("<init>"))
+      {
+	// Since the package is compiled, we know className is qualified.
+
+	let shortName = unqualifyName(className.toString());
+
+	if (usedIdentifiers.contains(className.toString())
+	    || usedIdentifiers.contains(shortName))
+	  return true;
+      }
+
+    return false;
+  }
+
+  doResolve()
+  {
+    if (ignoredRetyping)
+      return;
+
+    if (reflectMethod == null)
+      // lazy loading, we are not needed
+      {
+	this.setIgnoredRetyping(this, "This method is not used");
+	return;
+      }
 
     super;
   }
@@ -44,6 +87,8 @@ public class RetypedJavaMethod extends JavaMethod
   }
 
   isIgnored() = ignoredRetyping;
+
+  hasFullName(String name) = ! ignoredRetyping && super;
 
   private ?gnu.bytecode.Type type(LocatedString s)
   {
@@ -129,6 +174,9 @@ public class RetypedJavaMethod extends JavaMethod
         this.setIgnoredRetyping(className, "Ignored retyping because the types of the arguments don't match the declaration:\n"
 			 + reflectMethod);
       }
+
+    if (bossa.util.Debug.javaTypes)
+      bossa.util.Debug.println("Loaded retyped method " + this);
 
     // use the following, or the Type.flushTypeChanges() in SpecialTypes
     //reflectMethod.arg_types = javaArgType;
@@ -222,6 +270,15 @@ public class RetypedJavaMethod extends JavaMethod
 	  res += javaArgType[n].getName();
       }
     return res + ")";
+  }
+
+  toString()
+  {
+    // For debugging only
+    if (this.getType() == null)
+      return "retyped method "className"."methodName;
+    else
+      return super;
   }
 }
 

@@ -155,6 +155,15 @@ public class TypeMaper implements TypeMap
 void _printStackTraceWithSourceInfo(Throwable t) =
   printStackTraceWithSourceInfo(t);
 
+String unqualifyName(String qualified)
+{
+  int end = qualified.lastIndexOf('.');
+  if (end == -1)
+    return qualified;
+  else
+    return qualified.substring(end + 1);
+}
+
 /****************************************************************
  * Temporary: this should be solved when AST classes are written 
  * in Nice, with precise types for the fields.

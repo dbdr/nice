@@ -22,6 +22,10 @@ public class IdentExp extends Expression
 {
   final LocatedString ident;
 
+    {
+      registerUsedIdentifier(ident.toString());
+    }
+
   private boolean infix = false;
   /** Resolve to a ClassExp or a PackageExp if ident is not known. */
   boolean enableClassExp = false;

@@ -20,6 +20,10 @@ import bossa.util.*;
 */
 public class MethodBodyDefinition extends MethodImplementation
 {
+    {
+      registerUsedIdentifier(name.toString());
+    }
+
   ?Collection<LocatedString> binders; // Null if type parameters are not bound
 
   private ?List<VarSymbol> symbols = null;

@@ -38,6 +38,10 @@ public class JavaFieldAccess extends FieldAccess
   {
     super;
 
+    if (this.inInterfaceFile() &&
+	! usedIdentifiers.contains(this.getName().toString()))
+      return;
+
     // We put this here, since we need 'module' to be computed
     // since it is used to open the imported packages.
     // The registration must be done before resolution.
@@ -140,6 +144,9 @@ JavaFieldAccess createJavaFieldAccess(gnu.bytecode.Field field, mlsub.typing.Mon
 
 ?MethodDeclaration makeJavaFieldAccess(gnu.bytecode.Field f)
 {
+  if (! usedIdentifiers.contains(f.getName()))
+    return null;
+
   try {
     mlsub.typing.Monotype[?] params;
     if (!f.getStaticFlag())

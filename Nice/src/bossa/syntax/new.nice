@@ -22,6 +22,11 @@ public class NewExp extends CallExp
 {
   private final TypeIdent ti;
 
+    {
+      // Used to decide which constructor retypings need to be loaded.
+      registerUsedIdentifier(ti.getName().toString());
+    }
+
   /** Can be null if the class instantiated is Object. */
   ?mlsub.typing.TypeConstructor tc = null;
 

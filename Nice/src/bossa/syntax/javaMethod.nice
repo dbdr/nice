@@ -33,7 +33,9 @@ public class JavaMethod extends MethodDeclaration
   /** @return a string that uniquely represents this method */
   getFullName()
   {
-    return "JAVA:" + name + ':' + this.getType();
+    return "JAVA:" + name + ':' +
+      this.getReflectMethod().getDeclaringClass().getName() + '.' +
+      this.getReflectMethod().getSignature();
   }
 
   gnu.expr.LambdaExp getLambda() = nice.tools.code.Gen.dereference(this.getCode());
@@ -114,11 +116,24 @@ let Map<String,List<gnu.bytecode.Method>> knownMethods = new HashMap();
 
 void registerMethod(gnu.bytecode.Method m)
 {
+  if (usedIdentifiers.contains(m.getName()))
+    {
+      addJavaSymbol(m, makeJavaMethod(m, false));
+      return;
+    }
+
   ?List<gnu.bytecode.Method> methods = knownMethods.get(m.getName());
   if (methods == null)
     knownMethods.put(m.getName(), methods = new ArrayList());
 
   methods.add(m);
+}
+
+let HashSet<String> usedIdentifiers = new HashSet();
+
+void registerUsedIdentifier(String ident)
+{
+  usedIdentifiers.add(ident);
 }
 
 /** Utility function for analyse.nice */
@@ -338,6 +353,7 @@ void resetJavaClasses()
 {
   retyped.clear();
   knownMethods.clear();
+  usedIdentifiers.clear();
   javaObjectConstructor = null;
 }
 

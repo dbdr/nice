@@ -66,7 +66,7 @@ public class NewExp extends CallExp
     // OverloadedSymbolExp removes elements from it
     constructors = (LinkedList) constructors.clone();
 
-    fun = new ExpressionRef // not necessary
+    function = new ExpressionRef // not necessary
       (new OverloadedSymbolExp(constructors,
 			       new LocatedString("new " + tc, location()), 
 			       null));

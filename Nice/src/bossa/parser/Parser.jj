@@ -579,29 +579,29 @@ List binders(Collection atomics):
     { return res; }
 }
 
-AtomicConstraint atomicConstraint():
+void atomicConstraint(List list):
 {
   Monotype m1,m2;  
   TypeIdent t,i;
-  AtomicConstraint res;
 }
 {
 (  LOOKAHEAD(2)
    m1=monotype() "<:" m2=monotype()
-   { res=new MonotypeLeqCst(m1,m2); }
+   { list.add(new MonotypeLeqCst(m1,m2)); }
+   ( "<:" { m1 = m2; }
+     m2 = monotype()
+     { list.add(new MonotypeLeqCst(m1,m2)); }
+   )*
 |
    t=typeConstructorIdent() ":" i=typeIdent()
-   { res=new ImplementsCst(t,i); }
+   { list.add(new ImplementsCst(t,i)); }
 )
-  { return res; }
 }
 
 void atomics(List res):
-// if res is null, we just want lookahead
-{ AtomicConstraint k; }
+{}
 {
-  k=atomicConstraint() { res.add(k); }
-  ( "," k=atomicConstraint() { res.add(k); } ) *
+  atomicConstraint(res)  ( "," atomicConstraint(res) )*
 }
 
 Constraint constraint():

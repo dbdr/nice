@@ -112,40 +112,41 @@ public class ConstantExp extends Expression
       }
     else
       {
-	if(value.toString().length()!=1)
+	if(s.length()!=1)
 	  User.error(value, "Invalid character constant: " + value);
 
-	c = value.toString().charAt(0);
+	c = s.charAt(0);
       }
   
     return new ConstantExp(primChar, new Character(c), "'" + c + "'",
 			   value.location());
   }
 
-  private static Expression makeInt(long value, Location location)
+  private static Expression makeInt(long value, boolean isLong, 
+				    Location location)
   {
     TypeConstructor type;
     Number object;
     
-    if (value >= Byte.MIN_VALUE && value <= Byte.MAX_VALUE)
+    if (value >= Byte.MIN_VALUE && value <= Byte.MAX_VALUE && !isLong)
       {
 	type = primByte;
 	object = new Byte((byte) value);
       }
-    else if (value >= Short.MIN_VALUE && value <= Short.MAX_VALUE)
+    else if (value >= Short.MIN_VALUE && value <= Short.MAX_VALUE && !isLong)
       {
 	type = primShort;
 	object = new Short((short) value);
       }
-    else if (value >= Integer.MIN_VALUE && value <= Integer.MAX_VALUE)
+    else if (value >= Integer.MIN_VALUE && value <= Integer.MAX_VALUE && !isLong)
       {
 	type = primInt;
 	object = new Integer((int) value);
       }
     else
       {
-	User.error(location, value + " is not in the range of int values");
-	return null;
+	type = primLong;
+	object = new Long(value);
       }
     
     return new ConstantExp(type, object, value+"", location);
@@ -155,16 +156,71 @@ public class ConstantExp extends Expression
   {
     String rep = representation.toString();
 
+    int lastCharIndex = rep.length() - 1;
+    char last = rep.charAt(lastCharIndex);
+    boolean isLong = last == 'l' || last == 'L';
+    if (isLong)
+      rep = rep.substring(0, lastCharIndex);
+
     try{
-      long value = Long.decode(rep).longValue();
-      return makeInt(value, representation.location());
+      //long value = Long.decode(rep).longValue();
+      long value = parse(rep);
+      return makeInt(value, isLong, representation.location());
     }
     catch(NumberFormatException e){
+      e.printStackTrace();
       User.error(representation, rep + " is not a valid number");
       return null;
     }
   }
   
+  private static long parse(String rep) throws NumberFormatException 
+  {
+    int radix = 10;
+    int index = 0;
+    boolean negative = false;
+    long result;
+
+    // Leading minus
+    if (rep.startsWith("-")) {
+      negative = true;
+      index++;
+    }
+
+    // Radix specifier
+    if (rep.startsWith("0x", index) || rep.startsWith("0X", index)) 
+      {
+	index += 2;
+	radix = 16;
+      }
+    else if (rep.startsWith("#", index)) 
+      {
+	index++;
+	radix = 16;
+      }
+    else if (rep.startsWith("0", index) && rep.length() > 1 + index) 
+      {
+	index++;
+	radix = 8;
+      }
+
+    if (rep.startsWith("-", index))
+      throw new NumberFormatException("Negative sign in wrong position");
+
+    try {
+      result = Long.parseLong(rep.substring(index), radix);
+      if (negative) 
+	result = -result;
+    } catch (NumberFormatException e) {
+      // Handle the case Long.MIN_VALUE:
+      // the absolute value overflows, but it should be valid
+      String constant = negative ? new String("-" + rep.substring(index))
+	: rep.substring(index);
+      result = Long.parseLong(constant, radix);
+    }
+    return result;
+  }
+
   public static Expression makeDouble(double value, Location location)
   {
     return new ConstantExp(primFloat, new Double(value), value+"",

@@ -32,7 +32,7 @@ import java.util.*;
    @version $Date$
    @author Daniel Bonniot (d.bonniot@mail.dotcom.fr)
  */
-abstract class FieldAccess extends MethodDeclaration implements Assignable
+abstract class FieldAccess extends MethodDeclaration
 {
   public FieldAccess(LocatedString name, 
 		     Constraint constraint,

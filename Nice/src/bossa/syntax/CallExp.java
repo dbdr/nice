@@ -242,7 +242,7 @@ public class CallExp extends Expression
     resolveOverloading();
     return function.isFieldAccess();
   }
-  
+
   /****************************************************************
    * Typechecking
    ****************************************************************/
@@ -286,7 +286,7 @@ public class CallExp extends Expression
     
     gnu.expr.Expression res;
     if (function.isFieldAccess())
-      res = function.getAssignable().compileAccess(arguments);
+      res = function.getFieldAccessMethod().compileAccess(arguments);
     else
       res = new gnu.expr.ApplyExp(function.generateCode(), params);
 
@@ -300,7 +300,7 @@ public class CallExp extends Expression
     if (arguments.size() != 1)
       Internal.error(this, "A field access should have 1 parameter");
 
-    return function.getAssignable().compileAssign(arguments.getExp(0), value);
+    return function.getFieldAccessMethod().compileAssign(arguments.getExp(0), value);
   }
 
   /****************************************************************

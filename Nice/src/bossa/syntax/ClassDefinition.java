@@ -444,7 +444,7 @@ public abstract class ClassDefinition extends MethodContainer
     if (classConstraint != null)
       try{
 	localScope = new TypeScope(localScope);
-        mlsub.typing.TypeSymbol[] binders = classConstraint.binders;
+        mlsub.typing.TypeSymbol[] binders = getBinders();
 	//add only nonvariant type parameter so no possibly unsafe co/contra-variant fields can exist.
         for (int i = 0; i < binders.length; i++)
 	  if (variance.getVariance(i) == mlsub.typing.Variance.INVARIANT)

@@ -263,6 +263,11 @@ public class Constraint extends Node
   List getBinders() { return binders; }
   List getAtoms() { return atomics; }
 
+  TypeSymbol[] getBinderArray()
+  {
+    return (TypeSymbol[]) binders.toArray(new TypeSymbol[binders.size()]);
+  }
+
   private List /* of TypeSymbol */ binders;
   private List /* of AtomicConstraint */ atomics;
 }

@@ -1115,7 +1115,7 @@ MethodContainer.Constraint classTypeParameters(Constraint prefix, List tags):
         (Location.make(start), "Constraints on type parameters should all be specified in the prefix constraint");
 
     MonotypeVar[] b = (MonotypeVar[]) binders.toArray(new MonotypeVar[binders.size()]);
-    return new MethodContainer.Constraint(prefix, b, atoms); 
+    return MethodContainer.Constraint.make(prefix, b, atoms); 
   }
 }
 
@@ -1445,9 +1445,6 @@ Definition definition(List definitions):
 { Definition res; }
 {
   (
-    LOOKAHEAD ( "abstract" "interface" )
-    res=interfaceDefinition(Constraint.True)
-  |
     LOOKAHEAD( ("class" | "interface") fullyQualifiedName() )
     res=abstractInterfaceImplementation()
   | 
@@ -1458,7 +1455,10 @@ Definition definition(List definitions):
     ( res=globalVariable()
     | res=enumDefinition()
     | { Constraint cst; } cst = constraint()
-      (  res=classDefinition(cst, definitions)
+      ( 
+        LOOKAHEAD ( "abstract" "interface" )
+        res=interfaceDefinition(cst)
+      | res=classDefinition(cst, definitions)
       | res=methodDeclaration(cst)
       )
     )

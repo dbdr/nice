@@ -78,12 +78,13 @@ public class NiceMethod extends UserOperator
     if(constraint == Constraint.True)
       constraint = new Constraint
 	(new ArrayList(thisBindersLen + (hasAlike ? 1 : 0)),
-	 new ArrayList((hasAlike ? 1 : 0) + (thisConstraint == null ? 0 
-					     : thisConstraint.atoms.size())));
-	
+	 new ArrayList((hasAlike ? 1 : 0) + 
+                       (thisConstraint == null ? 0 : 
+                        thisConstraint.getAtoms().size())));
+
     constraint.addBinders(thisBinders);
     if (thisConstraint != null)
-      constraint.addAtoms(thisConstraint.atoms);
+      constraint.addAtoms(thisConstraint.getAtoms());
 
     mlsub.typing.Monotype thisType;
 

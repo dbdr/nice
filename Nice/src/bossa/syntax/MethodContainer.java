@@ -71,28 +71,43 @@ public abstract class MethodContainer extends Definition
    * Class type parameters
    ****************************************************************/
 
-  public static class Constraint
+  public static class Constraint extends bossa.syntax.Constraint
   {
     /**
        @param cst an additional constraint for the type parameters
                   of this class.
     */
-    public Constraint(bossa.syntax.Constraint cst, MonotypeVar[] typeParameters, List atoms)
+    public static Constraint make(bossa.syntax.Constraint cst, 
+                                  MonotypeVar[] typeParameters, List atoms)
     {
+      TypeSymbol[] binders;
+      List constraints;
+      boolean resolve;
+
       if (cst == bossa.syntax.Constraint.True || cst == null) 
         {
-          this.binders = typeParameters;
-          this.typeParameters = typeParameters;
-          this.atoms = atoms;
+          binders = typeParameters;
+          constraints = atoms;
+          resolve = false;
         }
       else
         {
-          this.syntacticConstraint = cst.toString();
-          this.atoms = cst.getAtoms();
-          this.binders = (TypeSymbol[]) cst.getBinders().
-            toArray(new TypeSymbol[cst.getBinders().size()]);
-          findBinders(typeParameters);
+          constraints = cst.getAtoms();
+          binders = cst.getBinderArray();
+          resolve = true;
         }
+
+      return new Constraint(binders, constraints, typeParameters, resolve);
+    }
+
+    private Constraint (TypeSymbol[] binders, List atoms, 
+                        MonotypeVar[] typeParameters, boolean resolve)
+    {
+      super(binders, atoms);
+      if (resolve)
+        findBinders(typeParameters);
+      else
+        this.typeParameters = typeParameters;
     }
 
     /**
@@ -110,31 +125,27 @@ public abstract class MethodContainer extends Definition
 
     private mlsub.typing.Monotype findBinder(MonotypeVar binder)
     {
-      for (int i = 0; i < binders.length; i++) 
-        if (binders[i].toString().equals(binder.getName()))
-          {
-            if (binders[i] instanceof MonotypeVar)
-              return (MonotypeVar) binders[i];
-            else
-              // The type parameter must be in fact a type constructor
-              // of variance zero.
-              return new mlsub.typing.MonotypeConstructor
-                ((TypeConstructor) binders[i], null);
-          }
+      for (java.util.Iterator i = this.getBinders().iterator(); i.hasNext(); ) 
+        {
+          TypeSymbol s = (TypeSymbol) i.next();
+          if (s.toString().equals(binder.getName()))
+            {
+              if (s instanceof MonotypeVar)
+                return (MonotypeVar) s;
+              else
+                // The type parameter must be in fact a type constructor
+                // of variance zero.
+                return new mlsub.typing.MonotypeConstructor
+                  ((TypeConstructor) s, null);
+            }
+        }
 
       // Not found. It was not introduced earlier, use it as the binder.
       return binder;
     }
 
-    /** The binders of the constraint. */
-    TypeSymbol[] binders;
-
     /** The type parameters of the class. */
     mlsub.typing.Monotype[] typeParameters;
-
-    List atoms;
-
-    String syntacticConstraint;
   }
 
   final Constraint classConstraint;
@@ -145,10 +156,10 @@ public abstract class MethodContainer extends Definition
     if (classConstraint != null)
       {
 	TypeScope scope = new TypeScope(this.typeScope);
-	try { scope.addSymbols(classConstraint.binders); }
+	try { scope.addSymbols(classConstraint.getBinders()); }
 	catch(TypeScope.DuplicateName ex) {}
 	resolvedConstraints = 
-	  AtomicConstraint.resolve(scope, classConstraint.atoms);
+	  AtomicConstraint.resolve(scope, classConstraint.getAtoms());
       }
   }
 
@@ -158,7 +169,7 @@ public abstract class MethodContainer extends Definition
     if (classConstraint == null)
       return null;
     else
-      return classConstraint.binders;
+      return classConstraint.getBinderArray();
   }
 
   /** The type parameters of the class. */
@@ -176,7 +187,7 @@ public abstract class MethodContainer extends Definition
       return mlsub.typing.Constraint.True;
     else
       return new mlsub.typing.Constraint
-	(classConstraint.binders, resolvedConstraints);
+	(classConstraint.getBinderArray(), resolvedConstraints);
   }
 
   /****************************************************************
@@ -189,11 +200,12 @@ public abstract class MethodContainer extends Definition
    */
   public void printInterface(java.io.PrintWriter s)
   {
-    // print the constraint as a prefix constraint
-    if (classConstraint == null || classConstraint.syntacticConstraint == null)
+    // Always print the constraint as a prefix constraint.
+
+    if (classConstraint == null)
       return;
 
-    s.print(classConstraint.syntacticConstraint);
+    s.print(classConstraint);
   }
 
   String printTypeParameters()
@@ -215,37 +227,10 @@ public abstract class MethodContainer extends Definition
 	    break;
 	  }
 
-	if (resolvedConstraints != null)
-	for (int i = 0; i < resolvedConstraints.length; i++)
-	  if (resolvedConstraints[i] instanceof mlsub.typing.MonotypeLeqTcCst)
-	    {
-	      mlsub.typing.MonotypeLeqTcCst cst = (mlsub.typing.MonotypeLeqTcCst) resolvedConstraints[i];
-	      if (cst.m == typeParameters[n]) {
-		res.append('!');
-		break;
-	      }
-	    }
-
 	res.append(typeParameters[n].toString());
 	if (n + 1 < typeParameters.length)
 	  res.append(", ");
       }
-
-    if (resolvedConstraints != null) {
-      boolean first = true;
-      for (int n = 0; n < resolvedConstraints.length; n++)
-	{
-	  if (resolvedConstraints[n] instanceof mlsub.typing.MonotypeLeqTcCst)
-	    break;
-	  if (first) {
-	    res.append(" | ");
-	    first = false;
-	  }
-	  res.append(resolvedConstraints[n]);
-	  if (n + 1 < resolvedConstraints.length)
-	    res.append(", ");
-	}
-    }
 
     return res.append(">").toString();
   }

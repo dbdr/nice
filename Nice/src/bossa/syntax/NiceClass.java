@@ -594,6 +594,7 @@ public class NiceClass extends ClassDefinition.ClassImplementation
   private TypeScope translationScope(NiceClass other)
   {
     mlsub.typing.TypeSymbol[] binders = other.definition.getBinders();
+    mlsub.typing.TypeSymbol[] ourBinders = definition.getBinders();
     TypeScope scope = Node.getGlobalTypeScope();
     Map map = null;
     if (binders != null)
@@ -601,7 +602,7 @@ public class NiceClass extends ClassDefinition.ClassImplementation
 	scope = new TypeScope(scope);
 	for (int i = 0; i < binders.length; i++)
 	  try {
-	    scope.addMapping(definition.classConstraint.binders[i].toString(), binders[i]);
+	    scope.addMapping(ourBinders[i].toString(), binders[i]);
 	  } catch(TypeScope.DuplicateName e) {}
       }
 
@@ -627,10 +628,11 @@ public class NiceClass extends ClassDefinition.ClassImplementation
 	// class to the corresponding symbol in the constructor.
 	scope = new TypeScope(scope);
 	map = new HashMap();
+        TypeSymbol[] ourBinders = definition.getBinders();
 	for (int i = 0; i < binders.length; i++)
 	  try {
-	    scope.addMapping(definition.classConstraint.binders[i].toString(), binders[i]);
-	    map.put(definition.classConstraint.binders[i], binders[i]);
+	    scope.addMapping(ourBinders[i].toString(), binders[i]);
+	    map.put(ourBinders[i], binders[i]);
 	  } catch(TypeScope.DuplicateName e) {}
       }
 

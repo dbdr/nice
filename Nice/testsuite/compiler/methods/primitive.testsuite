@@ -4,6 +4,11 @@ toString(/*/// FAIL HERE */ i@int) = "";
 
 /// FAIL
   ///Toplevel
+<T> void foo(!T) {}
+foo(/*/// FAIL HERE */ i@int) {}
+
+/// FAIL
+  ///Toplevel
   <T> void foo(T t);
   foo(t) {}
   foo(/*/// FAIL HERE */10) {}

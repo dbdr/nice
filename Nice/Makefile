@@ -144,8 +144,7 @@ bootstrap: parser
 	${JAVAC} \
 		stdlib/nice/lang/Native.java stdlib/nice/lang/inline/*.java \
 		src/mlsub/compilation/Module.java \
-		src/bossa/modules/Package.java src/bossa/modules/CompilationListener.java \
-		src/bossa/util/*.java \
+		src/bossa/modules/Package.java src/bossa/util/*.java \
 		src/gnu/expr/*.java src/gnu/mapping/*.java \
 		src/nice/tools/code/*.java src/mlsub/typing/*.java \
 		src/mlsub/typing/lowlevel/*.java src/bossa/syntax/dispatch.java
@@ -161,7 +160,7 @@ bootstrap: parser
 
 ant:
 	@echo "Building the Ant task definition..."
-	@${javac} -classpath "/usr/share/java/ant.jar:./external/ant.jar:./classes:./classes.old" -d classes src/nice/tools/ant/Nicec.java ||\
+	@${javac} -sourcepath src -classpath "/usr/share/java/ant.jar:./external/ant.jar:./classes:./classes.old" -d classes src/nice/tools/ant/Nicec.java ||\
 	echo "Compilation of the Ant task definition failed.\nAnt should be in the classpath, or linked to by ./external/ant.jar"
 
 testengine:

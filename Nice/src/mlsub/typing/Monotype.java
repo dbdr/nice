@@ -12,7 +12,7 @@
 
 // File    : Monotype.java
 // Created : Thu Jul 01 19:28:28 1999 by bonniot
-//$Modified: Wed Aug 02 17:39:09 2000 by Daniel Bonniot $
+//$Modified: Wed Aug 30 16:04:04 2000 by Daniel Bonniot $
 
 package mlsub.typing;
 
@@ -62,8 +62,8 @@ abstract public class Monotype implements mlsub.typing.lowlevel.Element
   /**
    * Perform type symbol substitution inside the monotype.
    *
-   * Does not need to create a new object, but must not
-   * imperatively modify the monotype.
+   * Does not need to create a new object, 
+   * but must not modify the monotype.
    *
    * @param map a map from TypeSymbols to TypeSymbols
    * @return a monotype with substitution performed
@@ -95,5 +95,40 @@ abstract public class Monotype implements mlsub.typing.lowlevel.Element
   {
     return this;
   }  
+
+  /****************************************************************
+   * Simplification
+   ****************************************************************/
+
+  /**
+     Propagate information for type simplification. 
+     Not public.
+  */
+  abstract void tag(int variance);
+
+  final static void tag(Monotype[] monotypes, int variance)
+  {
+    if (monotypes == null) return;
+    
+    for (int i=0; i<monotypes.length; i++)
+      monotypes[i].tag(variance);
+  }
+
+  /**
+     Return the monotype this one reduces to after simplification.
+  */
+  abstract Monotype canonify();
+  
+  final static Monotype[] canonify(Monotype[] monotypes)
+  {
+    if (monotypes == null) return null;
+    
+    Monotype[] res = new Monotype[monotypes.length];
+    
+    for (int i=0; i<monotypes.length; i++)
+      res[i] = monotypes[i].canonify();
+
+    return res;
+  }
 }
 

@@ -12,7 +12,7 @@
 
 // File    : TypeConstructors.java
 // Created : Mon Jun 05 14:19:36 2000 by Daniel Bonniot
-//$Modified: Tue Jun 13 15:46:27 2000 by Daniel Bonniot $
+//$Modified: Thu Aug 31 15:50:28 2000 by Daniel Bonniot $
 
 package bossa.syntax;
 
@@ -92,6 +92,9 @@ public final class TypeConstructors
    */
   static boolean constant(TypeConstructor tc)
   {
+    if(tc.isConcrete())
+      return true;
+
     ClassDefinition definition = ClassDefinition.get(tc);
     
     return definition!=null;

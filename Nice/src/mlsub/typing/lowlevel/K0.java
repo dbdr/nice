@@ -862,7 +862,7 @@ public final class K0 {
    ***********************************************************************/
   // each soft variable is associated to a domain, i.e., a subset of the rigid
   // variables plus unit (a special rigid value that implements all the
-  // interfaces. Subtyping constraints between a soft variable and a rigid
+  // interfaces). Subtyping constraints between a soft variable and a rigid
   // one, and "implements" constraints on a soft variable immediately affect
   // the domain of the soft variable. If a domain becomes empty, the
   // constraint is unsatisfiable. When method satisfy or enumerate is called,
@@ -1509,13 +1509,33 @@ public final class K0 {
   /***********************************************************************
    * Iterate thru the constraint
    ***********************************************************************/
+  public static final int 
+    ALL = 0,
+    SIMPLIFIED = 1;
+  
   public static abstract class IneqIterator {
+    public IneqIterator()
+    { this.range1 = this.range2 = ALL; }
+    public IneqIterator(int range1, int range2)
+    { this.range1 = range1; this.range2 = range2; }
+    int range1, range2;
+    
     abstract protected void iter(int x1, int x2) throws Unsatisfiable;
   }
   public void ineqIter(IneqIterator iterator) throws Unsatisfiable {
-    for (int i = 0; i < n; i++) {
+    int from1, from2, to1=n, to2=n;
+    if (iterator.range1 == SIMPLIFIED)
+      from1 = weakMarkedSize;
+    else
+      from1 = 0;
+    if (iterator.range2 == SIMPLIFIED)
+      from2 = weakMarkedSize;
+    else
+      from2 = 0;
+	
+    for (int i = from1; i < to1; i++) {
       if (!garbage.get(i)) {
-        for (int j = 0; j < n; j++) {
+        for (int j = from2; j < to2; j++) {
           if (!garbage.get(j)) {
             if (C.get(i, j)) {
               iterator.iter(i, j);
@@ -1738,14 +1758,24 @@ public final class K0 {
     setSize(weakMarkedSize);
     weakMarkedSize = -1;
     weakMarkedM = -1;
+    /*
+      Alex did that, but it is not done for real backtracks.
+      It is not convenient for simplification (and a waste of time).
+
     for (int i = nMin; i < nMax; i++) {
       callbacks.indexDiscarded(i);
     }
+    */
     if (debugK0) {
       S.dbg.println("weakBacktrack'ed");
     }
   }
 
+  int weakMarkedSize()
+  {
+    return weakMarkedSize;
+  }
+  
   /***********************************************************************
    * Simplification
    ***********************************************************************/
@@ -1792,7 +1822,7 @@ public final class K0 {
   // simplify all the variables introduced since
   // last weakMark()
   public void simplify() {
-    if(true)
+    if(false)
       return;
     
     S.assert(S.a&& hasBeenInitialized);
@@ -2005,7 +2035,7 @@ public final class K0 {
      **/
     private void simplifyIndex(int x, int[] solution, int[] nker) {
       if (S.debugSimpl) {
-        S.dbg.println("x = " + x + "nker[x - initN] = " + nker[x - initN] + "garbage.get(x) = " + garbage.get(x));
+        S.dbg.println("x = " + x + " nker[x - initN] = " + nker[x - initN] + " garbage.get(x) = " + garbage.get(x));
       }
       while (x >= initN && simplified.get(x) && nker[x - initN] == 0) {
         // OK, x is not in the codomain of sigma, we can eliminate it
@@ -2059,6 +2089,7 @@ public final class K0 {
           // should clear C Ct ?
           Sdomains.clear(x);
           Sdomains.exclude(x);
+	  domains.clear(x); // Added by Daniel
           simplified.clear(x);
           garbage.set(x);
           int sx = solution[x - initN];
@@ -2263,7 +2294,7 @@ public final class K0 {
         collect();
       }
     }
-  }
+  } // end of inner class Simplify
 
   public void deleteAllSoft() {
     S.assert(S.a&& hasBeenInitialized);

@@ -12,9 +12,13 @@
 
 // File    : Constraint.java
 // Created : Fri Jun 02 17:02:45 2000 by Daniel Bonniot
-//$Modified: Tue Aug 08 14:19:53 2000 by Daniel Bonniot $
+//$Modified: Thu Aug 31 11:14:10 2000 by Daniel Bonniot $
 
 package mlsub.typing;
+
+import mlsub.typing.lowlevel.*;
+
+import java.util.Map;
 
 /**
  * Atomic constraint.
@@ -41,7 +45,7 @@ public final class Constraint
 					AtomicConstraint[] atoms)
   {
     if(binders==null && atoms==null)
-      return null;
+      return True;
     if(binders!=null && binders.length==0)
       throw new Error("Please optimize");
     if(atoms!=null && atoms.length==0)
@@ -49,7 +53,10 @@ public final class Constraint
     
     return new Constraint(binders, atoms);
   }
-  
+
+  /**
+     Empty constraint. private use only. 
+  */
   private Constraint()
   {
   }
@@ -84,7 +91,7 @@ public final class Constraint
       natoms2   = (c2 == null ? 0 : c2.natoms);
     
     if(nbinders1==0 && nbinders2==0 && natoms1==0 && natoms2==0)
-      return null;
+      return True;
     
     Constraint res = new Constraint();
     res.nbinders = nbinders1 + nbinders2;
@@ -161,7 +168,7 @@ public final class Constraint
     for(int i=0; i<cs.length; i++)
       {
 	Constraint c = cs[i];
-	if(c==null)
+	if (c == True)
 	  continue;
 	
 	lenBinders += cs[i].nbinders;
@@ -169,7 +176,7 @@ public final class Constraint
       }
 
     if (lenAtoms==0 && lenBinders==0)
-      return null;
+      return True;
 
     Constraint res = new Constraint();
     if(lenBinders>0)
@@ -195,7 +202,7 @@ public final class Constraint
     for(int j=0; j<cs.length; j++)
       {
 	Constraint c = cs[j];
-	if(c==null)
+	if (c == True)
 	  continue;
 	
 	for(int i=0; i<c.nbinders; i++)
@@ -282,7 +289,7 @@ public final class Constraint
   
   public static String toString(Constraint c)
   {
-    if(c==null)
+    if (c == True)
       return "";
     else
       return c.toString();

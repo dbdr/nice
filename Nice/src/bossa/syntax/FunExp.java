@@ -12,7 +12,7 @@
 
 // File    : FunExp.java
 // Created : Mon Jul 12 15:09:50 1999 by bonniot
-//$Modified: Mon Aug 07 15:31:51 2000 by Daniel Bonniot $
+//$Modified: Thu Aug 31 17:39:24 2000 by Daniel Bonniot $
 // Description : A functional expression
 
 package bossa.syntax;
@@ -140,7 +140,7 @@ public class FunExp extends Expression implements Function
   public String toString()
   {
     return 
-      constraint
+      (constraint == null ? mlsub.typing.Constraint.toString(cst) : "")
       + "fun ("
       + Util.map("",", ","",formals)
       + ") => "

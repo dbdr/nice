@@ -12,7 +12,7 @@
 
 // File    : MonotypeVar.java
 // Created : Fri Jun 02 17:12:32 2000 by Daniel Bonniot
-//$Modified: Fri Aug 04 16:53:10 2000 by Daniel Bonniot $
+//$Modified: Thu Aug 31 15:32:56 2000 by Daniel Bonniot $
 
 package mlsub.typing;
 
@@ -67,8 +67,7 @@ public final class MonotypeVar extends Monotype
   
   public static MonotypeVar[] news(int n)
   {
-    if(n==0)
-      return null;
+    if (n == 0) return null;
     
     MonotypeVar[] res = new MonotypeVar[n];
     for(int i=0; i<n; i++)
@@ -185,5 +184,25 @@ public final class MonotypeVar extends Monotype
   public String superToString()
   {
     return String.valueOf(name) + " " + super.toString();
+  }
+
+  /****************************************************************
+   * Simplification
+   ****************************************************************/
+
+  void tag(int variance)
+  {
+    if (equivalent != null)
+      equivalent.tag(variance);
+    else
+      mlsub.typing.lowlevel.Engine.tag(this, variance);
+  }
+
+  Monotype canonify()
+  {
+    if (equivalent != null)
+      return equivalent.canonify();
+    else
+      return (MonotypeVar) mlsub.typing.lowlevel.Engine.canonify(this);
   }
 }

@@ -37,10 +37,12 @@ visit<T>(node, successors, id, stack, mark, res)
   int min = id.value;
   successors(node).iter(fun(T child)=>{
     int m;
-    if(mark.get(child)==null)
-      m = visit(child, successors, id, stack, mark, res);
-    else
+    try{
       m = mark.get(child);
+    }
+    catch(NullPointerException e){
+      m = visit(child, successors, id, stack, mark, res);
+    }
     
     if(m<min) 
       min=m;

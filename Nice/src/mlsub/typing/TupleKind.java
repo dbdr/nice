@@ -12,7 +12,7 @@
 
 // File    : TupleKind.java
 // Created : Wed Aug 02 15:36:53 2000 by Daniel Bonniot
-//$Modified: Wed Aug 02 18:51:49 2000 by Daniel Bonniot $
+//$Modified: Wed Aug 30 16:16:24 2000 by Daniel Bonniot $
 
 package mlsub.typing;
 
@@ -80,11 +80,6 @@ public class TupleKind implements Kind
 	throw new InternalError
 	  (e + " was expected to be a tuple type, it's a " + e.getClass());
       }
-  }
-  
-  public boolean isBase()
-  {
-    return false;
   }
   
   int arity;

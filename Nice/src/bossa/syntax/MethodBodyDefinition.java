@@ -12,7 +12,7 @@
 
 // File    : MethodBodyDefinition.java
 // Created : Thu Jul 01 18:12:46 1999 by bonniot
-//$Modified: Mon Aug 07 15:40:49 2000 by Daniel Bonniot $
+//$Modified: Thu Aug 31 16:29:22 2000 by Daniel Bonniot $
 
 package bossa.syntax;
 
@@ -91,8 +91,7 @@ public class MethodBodyDefinition extends Definition
 	Monotype domt = types[tn++];
 
 	LocatedString typeName = p.name.cloneLS();
-	typeName.prepend("typeof(");
-	typeName.append(")");
+	typeName.prepend("type of ");
 	
 	MonotypeVar type = new MonotypeVar(typeName.toString());
 	if(!p.isSharp())

@@ -12,7 +12,7 @@
 
 // File    : TypeScope.java
 // Created : Fri Jul 09 11:29:17 1999 by bonniot
-//$Modified: Mon Aug 07 14:42:02 2000 by Daniel Bonniot $
+//$Modified: Thu Aug 31 16:22:15 2000 by Daniel Bonniot $
 
 package bossa.syntax;
 
@@ -95,7 +95,7 @@ public class TypeScope
    * Used for the search of java classes, as the type symbol
    * of type binders. See MethodBodyDefinition.
    */
-  private TypeSymbol dummyTypeSymbol = new TypeConstructor((Variance) null);
+  private TypeSymbol dummyTypeSymbol = new TypeConstructor("dummy type constructor");
 
   public TypeSymbol lookup(String name)
   {
@@ -151,7 +151,8 @@ public class TypeScope
 
   public String toString()
   {
-    return map.toString()+";;\n"+outer;
+    return map.toString() + 
+      (outer != null ? ";;\n" + outer : "");
   }
 
   public bossa.modules.Package module; //non-null only in the global type scope

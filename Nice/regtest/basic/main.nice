@@ -70,7 +70,7 @@ main(args)
 
   // Arrays
 
-  Vector<String> v = makeVector(1);
+  Vector<String> v = makeVector(1, "");
   v.elements.size();
 
   // Tuples

@@ -12,7 +12,7 @@
 
 // File    : Variance.java
 // Created : Fri Jul 23 12:15:46 1999 by bonniot
-//$Modified: Fri Aug 04 14:08:57 2000 by Daniel Bonniot $
+//$Modified: Wed Aug 30 13:25:16 2000 by Daniel Bonniot $
 
 package mlsub.typing;
 
@@ -89,6 +89,10 @@ public final class Variance
   }
   
 
+  /****************************************************************
+   * Interfaces
+   ****************************************************************/
+
   public int newInterface()
   {
     return getConstraint().newInterface();
@@ -159,7 +163,7 @@ public final class Variance
 	//OK
 	return;
       else
-	throw new InternalError("Incorrect sizes"+tp2.length);
+	throw new InternalError("Incorrect sizes" + tp2.length);
     
     if(tp1.length!=size)
       throw new BadSizeEx(size,tp1.length);
@@ -198,4 +202,21 @@ public final class Variance
   }
   
   public int size;
+
+  /****************************************************************
+   * Simplification
+   ****************************************************************/
+
+  static public final int
+    COVARIANT     = +1,
+    CONTRAVARIANT = -1,
+    INVARIANT     =  0;
+
+  void tag(Monotype[] monotypes, int variance)
+  {
+    if (monotypes == null) return;
+    
+    for (int i = 0; i<monotypes.length; i++)
+      monotypes[i].tag(INVARIANT);
+  }  
 }

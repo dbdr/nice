@@ -12,7 +12,7 @@
 
 // File    : TupleType.java
 // Created : Wed Aug 02 15:21:55 2000 by Daniel Bonniot
-//$Modified: Mon Aug 07 17:14:47 2000 by Daniel Bonniot $
+//$Modified: Tue Aug 29 17:07:36 2000 by Daniel Bonniot $
 
 package mlsub.typing;
 
@@ -78,4 +78,19 @@ public class TupleType extends Monotype
   }
 
   Monotype[] types;
+
+  /****************************************************************
+   * Simplification
+   ****************************************************************/
+
+  void tag(int variance)
+  {
+    Monotype.tag(types, variance);
+  }
+
+  Monotype canonify()
+  {
+    Monotype.canonify(types);
+    return this;
+  }
 }

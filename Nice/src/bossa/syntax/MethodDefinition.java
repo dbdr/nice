@@ -12,7 +12,7 @@
 
 // File    : MethodDefinition.java
 // Created : Thu Jul 01 18:12:46 1999 by bonniot
-//$Modified: Tue Aug 08 15:58:08 2000 by Daniel Bonniot $
+//$Modified: Wed Aug 30 14:55:56 2000 by Daniel Bonniot $
 
 package bossa.syntax;
 
@@ -223,9 +223,9 @@ public class MethodDefinition extends Definition
     
       try{
 	type.getConstraint().assert(false);
-
+	
 	if (this instanceof JavaMethodDefinition)
-	  // No need to find bytecode types in that case, they are given
+	  // No need to find bytecode types in that case, they are given.
 	  /// code in 'finally' is executed after 'return' ;-)
 	  return;
     

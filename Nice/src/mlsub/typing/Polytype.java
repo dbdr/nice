@@ -12,9 +12,12 @@
 
 // File    : Domain.java
 // Created : Fri Jun 02 16:59:06 2000 by Daniel Bonniot
-//$Modified: Wed Aug 02 18:41:49 2000 by Daniel Bonniot $
+//$Modified: Thu Aug 31 18:17:47 2000 by Daniel Bonniot $
 
 package mlsub.typing;
+
+import mlsub.typing.lowlevel.Engine;
+import java.util.ArrayList;
 
 /**
  * A constrained monotype.
@@ -178,6 +181,44 @@ public final class Polytype
       throw new InternalError("getDomain on non functional polytype "+this);
     
     return new Domain(constraint, new TupleType(domains));
+  }
+  
+  /****************************************************************
+   * Simplification
+   ****************************************************************/
+
+  public void simplify()
+  {
+    if (!Constraint.hasBinders(constraint))
+      return;
+
+    ArrayList binders = new ArrayList(), atoms = new ArrayList();
+
+    Engine.startSimplify();
+    try{
+      Constraint.assert(constraint);
+      Engine.satisfy();
+      monotype.tag(Variance.COVARIANT);      
+      Engine.simplify(binders, atoms);
+    }
+    catch(mlsub.typing.lowlevel.Unsatisfiable e){
+      throw new InternalError("Simplifying ill-formed polytype");
+    }
+    catch(TypingEx e){
+      throw new InternalError("Simplifying ill-formed polytype");
+    }
+    finally{
+      Engine.stopSimplify();
+    }
+
+    monotype = monotype.canonify();
+
+    int nbinders = binders.size(), natoms = atoms.size();
+    constraint = Constraint.create
+      (nbinders == 0 ? null 
+       : (TypeSymbol[]) binders.toArray(new TypeSymbol[nbinders]),
+       natoms   == 0 ? null 
+       : (AtomicConstraint[]) atoms.toArray(new AtomicConstraint[natoms]));
   }
   
   /****************************************************************

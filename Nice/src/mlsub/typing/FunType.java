@@ -12,7 +12,7 @@
 
 // File    : FunType.java
 // Created : Thu Jul 22 09:15:17 1999 by bonniot
-//$Modified: Wed Aug 02 18:17:42 2000 by Daniel Bonniot $
+//$Modified: Tue Aug 29 17:00:16 2000 by Daniel Bonniot $
 
 package mlsub.typing;
 
@@ -100,4 +100,21 @@ public final class FunType extends Monotype
 
   private Monotype[] in;
   private Monotype out;
+
+  /****************************************************************
+   * Simplification
+   ****************************************************************/
+
+  void tag(int variance)
+  {
+    out.tag(variance);
+    Monotype.tag(in, -1 * variance);
+  }
+
+  Monotype canonify()
+  {
+    out = out.canonify();
+    Monotype.canonify(in);
+    return this;
+  }
 }

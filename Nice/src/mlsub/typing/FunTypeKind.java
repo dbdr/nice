@@ -12,7 +12,7 @@
 
 // File    : FunTypeKind.java
 // Created : Wed Jul 28 17:51:02 1999 by bonniot
-//$Modified: Wed Aug 02 18:26:24 2000 by Daniel Bonniot $
+//$Modified: Wed Aug 30 16:16:34 2000 by Daniel Bonniot $
 
 package mlsub.typing;
 
@@ -87,11 +87,6 @@ public class FunTypeKind implements Kind
 	  (e + " was expected to be a functional type, " +
 	   " it's a " + e.getClass());
       }
-  }
-  
-  public boolean isBase()
-  {
-    return false;
   }
   
   public int domainArity;

@@ -12,7 +12,7 @@
 
 // File    : TypeConstructor.java
 // Created : Thu Jul 08 11:51:09 1999 by bonniot
-//$Modified: Fri Aug 04 14:09:14 2000 by Daniel Bonniot $
+//$Modified: Thu Aug 31 16:22:28 2000 by Daniel Bonniot $
 
 package mlsub.typing;
 
@@ -166,10 +166,10 @@ public class TypeConstructor
 
   public String toString()
   {
-    if (name == null)
-      return super.toString();
-    else
+    if (name != null)
       return name;
+    else
+      return super.toString();
   }
   
   /****************************************************************

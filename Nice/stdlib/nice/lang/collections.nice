@@ -11,10 +11,10 @@ interface Collection<T>
   void iter(fun(T)());
 
   alike<T> filter(fun(T)(boolean));
-  <Any U> alike<U> map( fun(T)(U) );
+  //<Any U> alike<U> map( fun(T)(U) );
 }
 
-//<Collection C, Any T, Any U> C<U> map(C<T>, fun(T)(U));
+<Collection C, Any T, Any U1> C<U1> map(C<T>, fun(T)(U1));
 
 //<Collection C, Any T> C<T> filter(C<T>, fun(T)(boolean));
 
@@ -33,6 +33,8 @@ interface Sequence<T>
 {
   T    get(int);    // alternative syntax: a[i]
   void set(int, T); // alternative syntax: a[i]=v
+
+  <Any U> U foldLeft(fun(U, T)(U), U);
 }
 
 iter(l@Sequence, f)
@@ -41,6 +43,22 @@ iter(l@Sequence, f)
     f(l.get(i));
 }
 
+foldLeft<T, U>(l@Sequence, f, init)
+{
+  U res = init;
+  l.iter(fun(T elem) => { res = f(init, elem); });
+  return init;
+}
+
+/*
+val fold_left : f:('a -> 'b -> 'a) -> init:'a -> 'b list -> 'a
+
+    List.fold_left f a [b1; ...; bn] is f (... (f (f a b1) b2) ...) bn. 
+
+val fold_right : f:('a -> 'b -> 'b) -> 'a list -> init:'b -> 'b
+
+    List.fold_right f [a1; ...; an] b is f a1 (f a2 (... (f an b) ...)). Not tail-recursive. 
+*/
 /** A growable ordered Collection. */
 interface List<T> 
   extends Sequence<T>, Container<T>
@@ -108,7 +126,7 @@ filter<C, T>(a@Array, test)
  * Linked Lists
  ****************************************************************/
 
-abstract class LinkedList<T> 
+abstract class LinkedList<T3> 
   implements Sequence 
   //finally implements Collection
   {}
@@ -144,7 +162,7 @@ set(l@Nil,  n, elem) { /* error */ }
 
 map(l@Nil, f) = new Nil();
 
-map(l@Cons, f) = cons(f(l.head), map(l.tail, f));
+map(l@Cons, ff) = cons(ff(l.head), map(l.tail, ff));
 
 filter(l@Nil , test) = new Nil();
 filter<C,T>(l@Cons, test)
@@ -169,7 +187,10 @@ class Vector<T>
 makeVector<T>(len)
 {
   Vector<T> res = new Vector();
-  res.elements = newArray(len);
+
+  res.elements = 
+    newArray(len); 
+
   res.length = 0;
   return res;
 }
@@ -307,6 +328,24 @@ max(s)
   return res;
 }
 
+/****************************************************************
+ * Printing
+ ****************************************************************/
+
+println(p@PrintStream, s@Sequence)
+{
+  if (s.size() == 0) 
+    {
+      p.println("[]");
+      return;
+    }
+  p.print("[");
+  p.print(s.get(0));
+  for (int i=1; i<s.size(); i++)
+    p.print(", " + s.get(i));
+  p.print("]");
+}
+  
 /****************************************************************
  * Map
  ****************************************************************/

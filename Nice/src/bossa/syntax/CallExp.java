@@ -12,7 +12,7 @@
 
 // File    : CallExp.java
 // Created : Mon Jul 05 16:27:27 1999 by bonniot
-//$Modified: Tue Aug 29 12:13:07 2000 by Daniel Bonniot $
+//$Modified: Thu Aug 31 18:29:22 2000 by Daniel Bonniot $
 
 package bossa.syntax;
 
@@ -327,6 +327,8 @@ public class CallExp extends Expression
     resolveOverloading();
     if(type == null)
       type = getTypeAndReportErrors(location(), fun, parameters);
+
+    type.simplify();
   }
 
   boolean isAssignable()
@@ -343,7 +345,8 @@ public class CallExp extends Expression
   {
     // forces computation of the type if not done.
     Polytype t = getType();
-
+    
+    // Prepare the bytecode type for EnsureTypeProc
     if (t.getConstraint() != Constraint.True)
       try{
 	Typing.enter();
@@ -387,8 +390,7 @@ public class CallExp extends Expression
     else
       res = new gnu.expr.ApplyExp(fun.generateCode(), params);
 
-    return Inline.inline(new EnsureTypeProc(Types.javaType(getType())),
-			 res);
+    return Inline.inline(new EnsureTypeProc(Types.javaType(getType())), res);
   }
   
   gnu.expr.Expression compileAssign(gnu.expr.Expression value)

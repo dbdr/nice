@@ -12,7 +12,7 @@
 
 // File    : NewArrayExp.java
 // Created : Mon Aug 28 13:37:29 2000 by Daniel Bonniot
-//$Modified: Tue Aug 29 11:58:08 2000 by Daniel Bonniot $
+//$Modified: Thu Aug 31 16:29:39 2000 by Daniel Bonniot $
 
 package bossa.syntax;
 
@@ -58,12 +58,16 @@ public class NewArrayExp extends Expression
     
     tc = ti.resolveToTC(typeScope);
     ti = null;
+
+    if (!TypeConstructors.constant(tc))
+      User.error(this,
+		 tc + " should denote a known class");
   }
   
   void findJavaClasses()
   {
     super.findJavaClasses();
-    resolveTC();
+    ti.resolveToTC(typeScope);
   }
   
   void resolve()

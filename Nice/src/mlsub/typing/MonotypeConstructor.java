@@ -12,7 +12,7 @@
 
 // File    : MonotypeConstructor.java
 // Created : Thu Jul 22 09:15:17 1999 by bonniot
-//$Modified: Fri Jul 28 21:50:57 2000 by Daniel Bonniot $
+//$Modified: Tue Aug 29 17:23:23 2000 by Daniel Bonniot $
 
 package mlsub.typing;
 
@@ -124,4 +124,22 @@ public final class MonotypeConstructor extends Monotype
 
   public TypeConstructor tc;
   Monotype[] parameters;
+
+  /****************************************************************
+   * Simplification
+   ****************************************************************/
+
+  void tag(int variance)
+  {
+    Engine.tag(tc, variance);
+    tc.variance.tag(parameters, variance);
+  }
+
+  Monotype canonify()
+  {
+    tc = (TypeConstructor) Engine.canonify(tc);
+    
+    parameters = Monotype.canonify(parameters);
+    return this;
+  }
 }

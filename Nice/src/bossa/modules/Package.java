@@ -12,7 +12,7 @@
 
 // File    : Package.java
 // Created : Wed Oct 13 16:09:47 1999 by bonniot
-//$Modified: Mon Aug 28 17:18:26 2000 by Daniel Bonniot $
+//$Modified: Thu Aug 31 15:46:35 2000 by Daniel Bonniot $
 
 package bossa.modules;
 
@@ -151,6 +151,8 @@ public class Package implements mlsub.compilation.Module, Located
     BufferedReader[] readers = source.getDefinitions(forceReload);
     if(source.sourcesRead)
       sourcesRead();
+    
+    bossa.util.Location.currentFile = toString();
     
     for(int i = 0; i<readers.length; i++)
       read(readers[i], definitions);

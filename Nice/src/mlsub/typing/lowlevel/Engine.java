@@ -12,7 +12,7 @@
 
 // File    : Engine.java
 // Created : Tue Jul 27 15:34:53 1999 by bonniot
-//$Modified: Tue Aug 29 11:52:43 2000 by Daniel Bonniot $
+//$Modified: Thu Aug 31 12:13:02 2000 by Daniel Bonniot $
 
 package mlsub.typing.lowlevel;
 
@@ -74,6 +74,22 @@ public abstract class Engine
   }
   
   /**
+     Used in Polytype.simplify().
+   */
+  public static void satisfy()
+    throws Unsatisfiable
+  {
+    assertFrozens();
+
+    for(Iterator i = constraints.iterator();
+	i.hasNext();)
+      { 
+	Engine.Constraint k = (Engine.Constraint)i.next();
+	k.satisfy();
+      }
+  }
+  
+  /**
    * Returns to the state we had before the last 'enter'.
    *
    * @exception Unsatisfiable if the constraint was not satisfiable.
@@ -120,6 +136,26 @@ public abstract class Engine
       ((Element)i.next()).setKind(null);
     floating.endOfIteration();
     frozenLeqs.backtrack();
+  }
+
+  public static void startSimplify()
+  {
+    for(Iterator i = constraints.iterator();
+	i.hasNext();)
+      { 
+	Engine.Constraint k = (Engine.Constraint)i.next();
+	k.startSimplify();
+      }
+  }
+
+  public static void stopSimplify()
+  {
+    for(Iterator i = constraints.iterator();
+	i.hasNext();)
+      { 
+	Engine.Constraint k = (Engine.Constraint)i.next();
+	k.stopSimplify();
+      }
   }
 
   /**
@@ -228,6 +264,74 @@ public abstract class Engine
     if(k==null)
       throw new InternalError("null constraint in Engine.isRigid for "+e);
     return k.isRigid(e);
+  }
+  
+  /****************************************************************
+   * Simplification
+   ****************************************************************/
+
+  public static void tag(Element e, int variance)
+  {
+    Kind kind = e.getKind();
+    if(kind==null)
+      throw new InternalError("null kind for "+e);
+    Engine.Constraint k = getConstraint(kind);
+    if(k==null)
+      throw new InternalError("null constraint for "+e);
+    k.tag(e, variance);
+  }
+
+  /**
+     Return the simplified constraint.
+     Must be surrounded by startSimplify and stopSimplify.
+  */
+  public static void simplify(ArrayList binders, ArrayList atoms)
+  {
+    for(Iterator it = constraints.iterator();
+	it.hasNext();)
+      { 
+	Engine.Constraint k = (Engine.Constraint) it.next();
+	k.simplify();
+	
+	int n = k.k0.size();
+	for (int b = k.k0.weakMarkedSize(); b < n; b++)
+	  binders.add(k.getElement(b));
+	
+	for (int b = k.k0.weakMarkedSize(); b < n; b++)
+	  for (int i = 0; i < n; i++)
+	    addIfLeq(b, i, k, atoms);
+	for (int i = 0; i < k.k0.weakMarkedSize(); i++)
+	  for (int b = k.k0.weakMarkedSize(); b < n; b++)
+	    addIfLeq(i, b, k, atoms);
+      }
+  }
+  
+  private static void addIfLeq(int i1, int i2, Engine.Constraint k, List atoms)
+  {
+    if (k.k0.wasEntered(i1, i2))
+      atoms.add(k == variablesConstraint ?
+		(mlsub.typing.AtomicConstraint)
+		new mlsub.typing.MonotypeLeqCst
+		  ((mlsub.typing.MonotypeVar) k.getElement(i1), 
+		   (mlsub.typing.MonotypeVar) k.getElement(i2)) :
+		new mlsub.typing.TypeConstructorLeqCst
+		  ((mlsub.typing.TypeConstructor) k.getElement(i1), 
+		   (mlsub.typing.TypeConstructor) k.getElement(i2)));
+  }
+  
+  /**
+     Return the element e is equivalent to after simplification.
+  */
+  public static Element canonify(Element e)
+  {
+    Kind kind = e.getKind();
+    if(kind==null)
+      throw new InternalError("null kind for "+e);
+    Engine.Constraint k = getConstraint(kind);
+    if(k==null)
+      throw new InternalError("null constraint for "+e);
+
+    return k.getElement(e.getId());
   }
   
   /****************************************************************
@@ -358,9 +462,8 @@ public abstract class Engine
   }
   
   /**
-   * Enter all the 'floating' elements into the variablesConstraint
-   * and add their frozen constraints
-   *
+     Enter all the 'floating' elements into the variablesConstraint
+     and add their frozen constraints.
    */
   private static void assertFrozens()
     throws Unsatisfiable
@@ -527,12 +630,17 @@ public abstract class Engine
 	concreteElements.set(id);
       
       if(dbg) Debug.println(e+" has id "+e.getId());
-    }    
-  
+    }
+    
     // public for Typing.enumerate...
     public Element getElement(int index)
     {
       return (Element) elements.get(index);
+    }
+    
+    void tag(Element e, int variance)
+    {
+      k0.tag(e.getId(), variance);
     }
     
     class Callbacks extends K0.Callbacks
@@ -556,6 +664,7 @@ public abstract class Engine
       protected void indexDiscarded(int index) {
 	if(dbg)
 	  Debug.println("Discarded "+indexToString(index));
+	  
 	getElement(index).setId(-2);
 	elements.set(index,null); // enable garbage collection
       }
@@ -571,7 +680,7 @@ public abstract class Engine
 	else if(x==-1)
 	  return "[BOTTOM]";
 	else
-	  return getElement(x).toString();
+	  return String.valueOf(getElement(x))+ "[" + x + "]";
       }
       protected String interfaceToString(int iid) {
 	return Integer.toString(iid);
@@ -649,7 +758,22 @@ public abstract class Engine
     {
       k0.backtrack();
     }
+
+    void startSimplify()
+    {
+      k0.startSimplify();
+    }
+
+    void simplify()
+    {
+      k0.simplify();
+    }
     
+    void stopSimplify()
+    {
+      k0.stopSimplify();
+    }    
+      
     void satisfy() throws Unsatisfiable
     {
       k0.satisfy();

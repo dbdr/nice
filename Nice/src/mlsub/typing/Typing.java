@@ -12,7 +12,7 @@
 
 // File    : Typing.java
 // Created : Tue Jul 20 11:57:17 1999 by bonniot
-//$Modified: Tue Aug 08 16:39:47 2000 by Daniel Bonniot $
+//$Modified: Tue Aug 29 17:30:13 2000 by Daniel Bonniot $
 
 package mlsub.typing;
 

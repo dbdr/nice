@@ -12,7 +12,7 @@
 
 // File    : NewExp.java
 // Created : Thu Jul 08 17:15:15 1999 by bonniot
-//$Modified: Wed Jun 21 19:19:08 2000 by Daniel Bonniot $
+//$Modified: Thu Aug 31 16:32:45 2000 by Daniel Bonniot $
 
 package bossa.syntax;
 
@@ -40,12 +40,19 @@ public class NewExp extends CallExp
     
     tc = ti.resolveToTC(typeScope);
     ti = null;
+    if(!TypeConstructors.instantiable(tc))
+      if(TypeConstructors.constant(tc))
+	User.error(this,
+		   tc+" is abstract, it can't be instantiated");
+      else
+	User.error(this,
+		   tc+" is a type variable, it can't be instantiated");
   }
   
   void findJavaClasses()
   {
     super.findJavaClasses();
-    resolveTC();
+    ti.resolveToTC(typeScope);
   }
   
   void resolve()
@@ -64,18 +71,6 @@ public class NewExp extends CallExp
 						 location()), 
 			       null));
   }
-
-  void typecheck()
-  {
-    if(!TypeConstructors.instantiable(tc))
-      if(TypeConstructors.constant(tc))
-	User.error(this,
-		   tc+" is abstract, it can't be instantiated");
-      else
-	User.error(this,
-		   tc+" is a type variable, it can't be instantiated");
-    super.typecheck();
-  }  
 
   /****************************************************************
    * Printing

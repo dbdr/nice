@@ -68,8 +68,9 @@ public class NewExp extends CallExp
     if (constructors == null)
       {
 	if (tc.arity() > 0)
-	  User.error(this, "Class " + tc + " has no constructor with the correct number of " +
-		tc.arity() + " type parameters.\nA retyping is needed to use this constructor.");
+	  User.error(this, "Class " + tc + " has no constructor with " +
+                     tc.arity() + " type parameters.\n" + 
+                     "A retyping is needed to use this constructor.");
 	else
 	  User.error(this, "Class " + tc + " has no constructor");
       }

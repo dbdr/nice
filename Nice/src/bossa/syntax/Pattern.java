@@ -484,10 +484,22 @@ public class Pattern implements Located
   {
     if (atIntValue())
       {
-	if (Typing.testRigidLeq(domaintc, PrimitiveType.intTC))
-	  tc = PrimitiveType.intTC;
-        else if (Typing.testRigidLeq(domaintc, PrimitiveType.longTC))
-	  tc = PrimitiveType.longTC;
+        if (domaintc != null)
+          {
+	    if (Typing.testRigidLeq(domaintc, PrimitiveType.intTC))
+	    {
+	      tc = PrimitiveType.intTC;
+	      return;
+            }
+            else if (Typing.testRigidLeq(domaintc, PrimitiveType.longTC))
+	    {
+	      tc = PrimitiveType.longTC;
+	      return;
+            }
+            else if (Typing.testRigidLeq(domaintc, PrimitiveType.charTC))
+              return;
+          }    
+        User.error(location, "Integer value patterns are not allowed for methods where the declared parameter isn't a primitive type.");
       }
   }
 

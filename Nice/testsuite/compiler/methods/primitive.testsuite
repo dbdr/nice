@@ -1,3 +1,15 @@
 /// FAIL
   ///Toplevel
 toString(/*/// FAIL HERE */ i@int) = "";
+
+/// FAIL
+  ///Toplevel
+  <T> void foo(T t);
+  foo(t) {}
+  foo(/*/// FAIL HERE */10) {}
+
+/// FAIL
+  ///Toplevel
+  <T> void foo(T t);
+  foo(t) {}
+  foo(/*/// FAIL HERE */n<3) {}

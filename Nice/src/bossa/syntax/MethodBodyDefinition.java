@@ -429,7 +429,7 @@ public class MethodBodyDefinition extends Definition
 	for(int n = 0; n < formals.length; n++)
 	{
 	  TypeConstructor tc = Types.rawType(domain[n]).head();
-	  if (tc != null && formals[n].tc != null)
+	  if (formals[n].tc != null)
 	    formals[n].setDomainTC(tc);
         }
 

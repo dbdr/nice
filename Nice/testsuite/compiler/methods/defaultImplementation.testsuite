@@ -1,0 +1,16 @@
+/// PASS
+  A a = new A();
+  assert a.f() == 1;
+  a = new B();
+  assert a.f() == 2;
+
+  /// Toplevel
+class A
+{
+  int f() = 1;
+}
+
+class B extends A
+{
+  f() = 2;
+}

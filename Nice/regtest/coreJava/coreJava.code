@@ -17,7 +17,7 @@
   //   STRINGS
   p("Hello, world!");
   p("String " + "\t\t" + "Z\70 \12X \101 concatenation"); // escapes, octal escape
-  p("\u0041\u0042\u0043"); // unicode escapes
+  p("\u0041\u0042\u0043"); // "ABC" using unicode escapes
 
   //   CHARS
 

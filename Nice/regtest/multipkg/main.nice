@@ -3,7 +3,7 @@ package regtest.multipkg;
 import regtest.multipkg.a;
 import regtest.multipkg.b;
 
-// Test multiple imports of the same package
+// Test multiple imports of the same package and self-import
 import regtest.multipkg;
 import regtest.multipkg.a;
 import regtest.multipkg.b;

@@ -205,3 +205,14 @@ class C extends B{
 abstract class A<B> extends AbstractSet<B> { }
 
 add(a@A, b) = super;
+
+/// PASS
+  /// Toplevel
+class B {
+ Vector<A<B>> v = new Vector( 1 );
+}
+
+abstract class A<T> extends AbstractSet<T> { T x; }
+
+add(a@A, b) = false;
+add(a@A, b@B) = super;

@@ -13,7 +13,6 @@
 package bossa.syntax;
 
 import bossa.link.*;
-import bossa.util.*;
 import gnu.expr.*;
 import gnu.bytecode.*;
 import mlsub.typing.*;
@@ -24,6 +23,9 @@ import mlsub.typing.Monotype;
 import mlsub.typing.FunType;
 import mlsub.typing.Constraint;
 import mlsub.typing.AtomicConstraint;
+
+import bossa.util.*;
+import java.util.*;
 
 /**
    A call to the next most specific implementation of a metohd.   
@@ -163,18 +165,24 @@ public class SuperExp extends Expression
   private static Constraint addLeq(Constraint c, Pattern[] p, Monotype[] m)
   {
     AtomicConstraint[] oldAtoms = c.atoms();
-    AtomicConstraint[] newAtoms;
-    if (oldAtoms != null) {
-      newAtoms = new AtomicConstraint[oldAtoms.length + p.length];
-      System.arraycopy(oldAtoms, 0, newAtoms, 0, oldAtoms.length);
-    }
+
+    List newAtoms;
+    if (oldAtoms == null)
+      newAtoms = new ArrayList(p.length);
     else
-      newAtoms = new AtomicConstraint[p.length];
+      {
+        newAtoms = new ArrayList(oldAtoms.length + p.length);
+        newAtoms.addAll(Arrays.asList(oldAtoms));
+      }
 
     for (int i = 0; i < p.length; i++)
-      newAtoms[newAtoms.length - 1 - i] = new TypeConstructorLeqMonotypeCst(p[i].tc, m[i]);
+      if (p[i].tc != null)
+        newAtoms.add(new TypeConstructorLeqMonotypeCst(p[i].tc, m[i]));
 
-    return new Constraint(c.binders(), newAtoms);
+    AtomicConstraint[] atoms = (AtomicConstraint[]) 
+      newAtoms.toArray(new AtomicConstraint[newAtoms.size()]);
+
+    return new Constraint(c.binders(), atoms);
   }
 
   /****************************************************************

@@ -110,6 +110,16 @@ In addition to traditional object-oriented features, Nice offers:
 </listitem>
 </varlistentry>
 
+<varlistentry><term>Contracts and assertions</term><listitem><para>
+  Contracts can be attached to methods, to better describe their specification
+  and detect illegal uses automatically at runtime, in debug mode. 
+  Contracts and assertions can be disabled, in which case they cause
+  no slow down of the running program. Furthermore, they can be used on any 
+  version of the JVM, even prior to 1.4.
+</para>
+</listitem>
+</varlistentry>
+
 </variablelist>
 
 </para>

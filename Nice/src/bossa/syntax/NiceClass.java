@@ -805,7 +805,6 @@ public class NiceClass extends ClassDefinition.ClassImplementation
     // We have to do this after resolution, so that bytecode types are known, 
     // but before compilation.
     createFields();
-//    createSerialUIDField();
   }
 
   public void compile()

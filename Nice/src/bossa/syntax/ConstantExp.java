@@ -233,6 +233,17 @@ public class ConstantExp extends Expression
     return makeDouble(Double.parseDouble(representation.toString()), representation.location());
   }
   
+  public static Expression makeString(LocatedString representation)
+  {
+    StringConstantExp res = new StringConstantExp(representation.toString());
+    res.setLocation(representation.location());
+    return res;
+  }
+  
+  /****************************************************************
+   * Primitive Types
+   ****************************************************************/
+
   static gnu.bytecode.Type registerPrimType(String name, TypeConstructor tc)
   {
     if(name.equals("nice.lang.char"))

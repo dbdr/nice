@@ -179,7 +179,7 @@ TOKEN: /* Keywords */
 | < FUN:        "fun"        	> /* Nice specific */
 | < ALIKE:      "alike"      	> /* Nice specific */
 //| < THIS:       "this"       	>
-//| < INSTANCEOF: "instanceof" 	>
+| < INSTANCEOF: "instanceof" 	>
 | < NEW:        "new"        	>
 | < NULL:	"null"		>
 
@@ -1555,7 +1555,11 @@ Expression EqualityExpression() :
 Expression InstanceOfExpression() :
 { Expression res; }
 {
-  res=RelationalExpression() //[ "instanceof" Type() ]
+  res=RelationalExpression() 
+  [ { Token t; LocatedString type; } 
+    t="instanceof" type=doted_array_string() 
+    { return CallExp.create(symb(t), res, ConstantExp.makeString(type)); }
+  ]
   { return res; }
 }
 

@@ -63,6 +63,8 @@ java.util.Properties<String,String> getProperties() =
   native String System.getProperty(String, String);
 ?String System_setProperty(String,String) = 
  native String System.setProperty(String,String);
+Enumeration<String> propertyNames(Properties<String,String>) =
+  native Enumeration Properties.propertyNames();
 
 //               PACKAGE: java.text
 

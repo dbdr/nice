@@ -1,0 +1,48 @@
+<?xml version="1.0" standalone="no"?>
+<page>
+<title>#nice</title>
+
+<description>
+The #nice online discussion service.
+</description>
+
+<keywords>nice, irc, chat
+</keywords>
+
+<para>
+There is an online discussion channel dedicated to the Nice
+programming language, since June 15th 2003. The developers often meet
+there to discuss about the implementation, or about new features.
+Users are welcome too. So pop by and be our guests! (Most developers
+are currently from Europe, and we are there during the day or the evening).
+</para>
+
+<para>
+To participate, you will need an IRC client. Set it up to
+connect to the server <literal>irc.freenode.net</literal>. Then
+<literal>/join #nice</literal>. In some web-browsers, you can simply
+<ulink url="irc://irc.freenode.net/nice">follow this link</ulink>.
+</para>
+
+<para>
+Freenode, the server that hosts the channel, is a special IRC
+server. For instance, you can register your identity, and protect it
+by a password. For more information, see the 
+<ulink url="http://www.freenode.net">freenode website</ulink>.
+</para>
+
+<para>
+<ulink url="http://pauillac.inria.fr/~bonniot/nice@freenode/">
+Archives of the IRC conversations</ulink> are available.
+</para>
+
+<para>
+This service is provided by <ulink url="http://www.freenode.net">
+<inlinemediaobject><imageobject>
+<imagedata fileref="http://irc.wearlab.de/images/freenode_logo.jpg"
+width="237px" depth="68px" align="center" />
+</imageobject></inlinemediaobject>
+</ulink>
+</para>
+
+</page>

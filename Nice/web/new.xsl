@@ -134,12 +134,19 @@
            &nbsp;<span class="small">o</span><xsl:text> </xsl:text>
            <a class="nav" href="/cgi-bin/twiki/view/Doc/WebHome">
            Collaborative site (Wiki)</a>
+
            <br />
            &nbsp;<span class="small">o</span><xsl:text> </xsl:text>
            <a class="nav" href="http://sourceforge.net/forum/forum.php?forum_id=40268">Forums</a>
+
            <br />
            &nbsp;<span class="small">o</span><xsl:text> </xsl:text>
            <a class="nav" href="http://lists.sourceforge.net/lists/listinfo/nice-info">Mailing List</a>
+
+           <br />
+           &nbsp;<span class="small">o</span><xsl:text> </xsl:text>
+           <a class="nav" href="irc.html">
+           Online discussion</a>
 <!--
            <br />
            &nbsp;<span class="small">o</span><xsl:text> </xsl:text>
@@ -148,6 +155,7 @@
            <br />
            &nbsp;<span class="small">o</span><xsl:text>&nbsp;</xsl:text>
            <a class="nav" href="http://sourceforge.net/project/filemodule_monitor.php&quest;filemodule_id=11365">Notify&nbsp;me&nbsp;of&nbsp;new&nbsp;versions</a>
+
            <br />
            &nbsp;<span class="small">o</span><xsl:text> </xsl:text>
            <a class="nav" href="http://sourceforge.net/tracker/&quest;func=add&amp;group_id=12788&amp;atid=112788">Report a bug</a>

@@ -13,7 +13,7 @@ PROC=xsltproc --nonet
 .PHONY : clean send
 
 all: index.html research.html compilation.html testimonials.html install.html \
-     roadmap.html safety.html manual.html manual.pdf manual.ps
+     irc.html roadmap.html safety.html manual.html manual.pdf manual.ps
 
 send: all
 	scp -r *.css *.html .htaccess images *.pdf *.ps bonniot@shell.sourceforge.net:/home/groups/n/ni/nice/htdocs

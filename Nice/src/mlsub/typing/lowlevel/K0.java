@@ -51,7 +51,7 @@ public final class K0 {
   
   // When a K0 is created it is in a special mode where the initial rigid
   // context is created. In this mode, one can use methods extend, initialLeq,
-  // minimal, origin, newInterface, subInterface, and initialImplements. Then,
+  // newInterface, subInterface, and initialImplements. Then,
   // one must call method createInitialContext()
   //
   // The constraint is then in normal mode, one can no more use the
@@ -72,8 +72,6 @@ public final class K0 {
     this.C = new BitMatrix();
     this.Ct = new BitMatrix();
     this.n = 0;
-    this.minimal = new BitVector();
-    this.origins = new BitVector();
     this.garbage = new BitVector();
     this.posTagged = new BitVector();
     this.negTagged = new BitVector();
@@ -147,25 +145,6 @@ public final class K0 {
 
   public int size() {
     return n;
-  }
-  
-  /**
-   * Maintains the information "x is minimal" on [0, m0[
-   **/
-  private BitVector minimal;
-  public boolean isMinimal(int x) {
-    return minimal.get(x);
-  }
-  public void minimal(int x) {
-    minimal.set(x);
-  }
-  
-  /**
-   * Maintains the information "x is a hierarchy origin" on [0, m0[
-   **/
-  private BitVector origins;
-  public void origin(int x) {
-    origins.set(x);
   }
   
   // tells if an index should be collected in the next call to collect()
@@ -287,25 +266,11 @@ public final class K0 {
     final StringBuffer sb = new StringBuffer();
     Separator nl = new Separator("\n");
 
-    // output the constraint for the weak-component of each origin
-    BitVector printed = new BitVector(n);
-    for (int x0 = 0; x0 < m0; x0++) {
-      if (origins.get(x0) && !printed.get(x0)) {
-        BitVector component = weakComponent(x0);
-        String comp = componentToString(component);
-        if (!comp.equals("")) {
-          sb.append(nl).append(comp);
-        }
-        printed.or(component);
-      }
-    }
-    // and finally for all the other variables
     BitVector rest = new BitVector(n);
     rest.fill(n);
-    rest.andNot(printed);
     String restComp = componentToString(rest);
     if (!restComp.equals("")) {
-      sb.append(nl).append(componentToString(rest));
+      sb.append(nl).append(restComp);
     }
     if (sb.length() != 0) {
       sb.append("\n");
@@ -436,14 +401,6 @@ public final class K0 {
 
   // this operation always succeeds
   private void collect() {
-    // first collect the rigid indexes (shouldn't be necessary actually but
-    // let's be general !)
-    if (m > 0) {
-      m = collect(0, m);
-      R.setSize(m);
-      Rt.setSize(m);
-    }
-
     setSize(collect(m, n));
   }      
 
@@ -457,20 +414,9 @@ public final class K0 {
     }
     garbage.set(src);
     garbage.clear(dest);
-    C.rowMove(src, dest);
-    C.colMove(src, dest);
-    Ct.rowMove(src, dest);
-    Ct.colMove(src, dest);
+    C.indexMove(src, dest);
+    Ct.indexMove(src, dest);
 
-    if (isRigid(src)) {
-      // strange as the relation on the rigid indexes should already be
-      // condensed... but let's be general
-      R.rowMove(src, dest);
-      R.colMove(src, dest);
-      Rt.rowMove(src, dest);
-      Rt.colMove(src, dest);
-    }
-    
     // notify the user of K0
     callbacks.indexMoved(src, dest);
   }
@@ -478,24 +424,15 @@ public final class K0 {
   // assume src > dest && !garbage.get(src) && !garbage.get(dest)
   private void indexMerge(int src, int dest) throws Unsatisfiable {
     domainMerge(src, dest);
-    C.rowMerge(src, dest);
-    C.colMerge(src, dest);
-    Ct.rowMerge(src, dest);
-    Ct.colMerge(src, dest);
+    C.indexMerge(src, dest);
+    Ct.indexMerge(src, dest);
     for (int iid = 0; iid < nInterfaces(); iid++) {
       getInterface(iid).indexMerge(src, dest);
     }
     garbage.set(src);
     posTagged.bitMerge(src, dest);
     negTagged.bitMerge(src, dest);
-    if (isRigid(src)) {
-      // strange as the relation on the rigid indexes should already be
-      // condensed... but let's be general
-      R.rowMerge(src, dest);
-      R.colMerge(src, dest);
-      Rt.rowMerge(src, dest);
-      Rt.colMerge(src, dest);
-    }
+
     // notify the subclass
     callbacks.indexMerged(src, dest);
   }
@@ -513,7 +450,7 @@ public final class K0 {
     return n++;
   }
 
-  // a vector of all the Interfaces in this domain
+  // a vector of all the Interfaces in this constraint
   private Vector interfaces;
   /**
    * Returns the number of interfaces. Interfaces are garanteed to be
@@ -528,13 +465,6 @@ public final class K0 {
     return (Interface)interfaces.elementAt(iid);
   }
 
-  /***********************************************************************
-   * Construction of the initial rigid context
-   ***********************************************************************/
-  private boolean hasBeenInitialized = false;
-  public boolean hasBeenInitialized() {
-    return hasBeenInitialized;
-  }
   /**
    * Add a new interface to the constraint and returns its ID
    **/
@@ -585,6 +515,14 @@ public final class K0 {
   }
 
   /***********************************************************************
+   * Construction of the initial rigid context
+   ***********************************************************************/
+  private boolean hasBeenInitialized = false;
+  public boolean hasBeenInitialized() {
+    return hasBeenInitialized;
+  }
+
+  /***********************************************************************
    * Initial rigidification
    ***********************************************************************/
   public void createInitialContext() 
@@ -592,11 +530,6 @@ public final class K0 {
   {
     S.assert(S.a&& !hasBeenInitialized);
     
-    try {
-      condense();                 // shouldn't be useful...
-    } catch (Unsatisfiable e) {
-      throw S.panic();
-    }
     // put in R and Rt, the constraint saturated under
     // x < y and y < z => x < z
     R = (BitMatrix)C.clone();
@@ -610,7 +543,7 @@ public final class K0 {
     // I < J and J < K => I < K
     closeInterfaceRelation();
 
-    BitVector[] rigidImplementors  = closeImplements(R, Rt);
+    BitVector[] rigidImplementors = closeImplements(R, Rt);
     for (int iid = 0; iid < nInterfaces(); iid++) {
       getInterface(iid).rigidImplementors = rigidImplementors[iid];
     }
@@ -630,10 +563,10 @@ public final class K0 {
   {
     hasBeenInitialized=false;
 
-    if(m!=m0)
+    if(m != m0)
       S.dbg.println("releaseInitialContext should be called when in first rigid context");
     
-    m=m0=0;
+    m = m0 = 0;
   }
   
   /***********************************************************************
@@ -740,19 +673,19 @@ public final class K0 {
       // !isRigid(x2)
       // exclude unit since unit is not comparable to x1
       reduceDomain(x2, false, R.getRow(x1));
-      if (origins.get(x1)) {
+      /*if (origins.get(x1)) {
         // x1 = x2
         leq0(x2, x1);
-      }
+	}*/
     }
     if (isRigid(x2)) {
       // !isRigid(x1)
       // exclude unit
       reduceDomain(x1, false, Rt.getRow(x2));
-      if (minimal.get(x2)) {
+      /*if (minimal.get(x2)) {
         // x1 = x2;
         leq0(x2, x1);
-      }
+	}*/
     }
   }
 
@@ -824,9 +757,6 @@ public final class K0 {
       }
     }
     
-    // XXX: should test violation of weakly connected components
-    // XXX: use roots as well... ??
-
     // At this point, we failed to give a better error message
     // than the original one
     return e;
@@ -905,84 +835,8 @@ public final class K0 {
    * Constraint preparation
    ***********************************************************************/
   // The constraint is "prepared" by
-  // 1. saturate it under Min, Origin and Abs axioms
+  // 1. saturate it under Abs axioms
   // 2. condensing equivalent nodes
-  /**
-   * Saturate the constraint C, Ct under the axiom:
-   * x <* y and Min(y) => y < x (hence x ~ y)
-   **/
-  private void collapseMinimal() throws Unsatisfiable {
-    for (int y = 0; y < m0; y++) {
-      if (minimal.get(y)) {
-        BitVector uy = R.getRow(y);
-        // breadth-first search of the lower ideal of y
-        _collapsed.clearAll();
-        _toCollapse.clearAll();
-        _toCollapse.set(y);
-        while (true) {
-          int x = _toCollapse.getLowestSetBitNotIn(_collapsed);
-          if (x == BitVector.UNDEFINED_INDEX) {
-            break;
-          }
-          _collapsed.set(x);
-          BitVector lx = Ct.getRow(x);
-          if (lx != null) {
-            _toCollapse.or(lx);
-          }
-          if (x != y && !C.get(y, x)) {
-            // set y < x
-            C.set(y, x);
-            Ct.set(x, y);
-            // exclude from D(x) all elements outside uy
-            // exclude unit as well
-            reduceDomain(x, false, uy);
-          }
-        }
-      }
-    }
-  }
-  // preallocate these bit-vectors
-  private BitVector _collapsed = new BitVector(256);
-  private BitVector _toCollapse = new BitVector(256);
-
-  /**
-   * Saturate the constraint C, Ct under axiom
-   * Origin(y) and y >* x1 <* x2 >* x3 <* ... xn => xn <= y
-   **/
-  private void saturateOrigin() throws Unsatisfiable {
-    for (int y = 0; y < m0; y++) {
-      if (origins.get(y)) {
-        BitVector ly = Rt.getRow(y);
-        // breadth-first search of the weakly connected component of y
-        _collapsed.clearAll();
-        _toCollapse.clearAll();
-        _toCollapse.set(y);
-        while (true) {
-          int x = _toCollapse.getLowestSetBitNotIn(_collapsed);
-          if (x == BitVector.UNDEFINED_INDEX) {
-            break;
-          }
-          _collapsed.set(x);
-          BitVector ux = C.getRow(x);
-          BitVector lx = Ct.getRow(x);
-          if (ux != null) {
-            _toCollapse.or(ux);
-          }
-          if (lx != null) {
-            _toCollapse.or(lx);
-          }
-          if (x != y && !C.get(x, y)) {
-            // set x < y
-            C.set(x, y);
-            Ct.set(y, x);
-            // restrict D(x) to ly
-            // exclude unit as well
-            reduceDomain(x, false, ly);
-          }
-        }
-      }
-    }
-  }
 
   /****************************************************************
    * Algorithms on interfaces
@@ -1050,46 +904,8 @@ public final class K0 {
 	      j.setApprox(abs,approx);
 	    }
       }
-  }
-  
-  private void oldComputeInitialArrows()
-    throws LowlevelUnsatisfiable
-  {
-    for(int iid=0; iid<nInterfaces(); iid++)
-      {
-	Interface i=getInterface(iid);
-	BitVector implementors= i.implementors;
-	for(int node=0;node<m0;node++)
-	  {
-	    boolean toCheck=false;
-	    int approx=BitVector.UNDEFINED_INDEX;
-	    
-	    // finds a minimum node above 'node' that implements 'i'
-	    for (int x = implementors.getLowestSetBit();
-		 x != BitVector.UNDEFINED_INDEX;
-		 x = implementors.getNextBit(x)) 
-	      {
-		if(R.get(node,x))
-		  if(approx==BitVector.UNDEFINED_INDEX || R.get(x,approx))
-		    approx=x;
-		  else
-		    toCheck=true;
-	      }
-	    // verifies it is minimal
-	    if(toCheck)
-	      for (int x = implementors.getLowestSetBit();
-		   x != BitVector.UNDEFINED_INDEX;
-		   x = implementors.getNextBit(x)) 
-		if(R.get(node,x) && !R.get(approx,x))
-		  throw new LowlevelUnsatisfiable("Node "+approx+" and "+x+" are uncomparable and both implement "+iid+
-						  " above "+node);
-	    if(debugK0) S.dbg.println("Initial approximation for "+interfaceToString(iid)+": "+
-				      indexToString(node)+" -> "+indexToString(approx));
-	    i.setApprox(node,approx);
-	  }
-      }
-  }
-  
+  }  
+
   private void computeArrows(BitMatrix leq)
   {
     for(int iid=0; iid<nInterfaces(); iid++)
@@ -1188,9 +1004,6 @@ public final class K0 {
    * T is a closure of C
    **/
   private void condense(BitMatrix T) throws Unsatisfiable {
-    //if(true)
-    //return;
-    
     // XXX: TODO: verify safety when indexMerged creates new nodes
     // XXX: actually, the specification should say that indexMerged
     // XXX: cannot access to K0 (neither create new nodes, nor enter new
@@ -1203,8 +1016,6 @@ public final class K0 {
     // 2. it allows early test of satisfiability (if C* violates assertions
     //           on rigid variables
     // 3. it is obviously correct (Tarjan algorithm is a mess to debug...)
-    //BitMatrix T = (BitMatrix)C.clone();
-    //T.closure();
 
     if (m > 0) {
       if (T.includedIn(m, R) != null) {
@@ -1259,8 +1070,6 @@ public final class K0 {
   }
 
   private void prepareConstraint() throws Unsatisfiable {
-    saturateOrigin();
-    //collapseMinimal();
     BitMatrix leq = (BitMatrix)C.clone();
     leq.closure();
     computeArrows(leq);
@@ -1443,7 +1252,7 @@ public final class K0 {
     BitMatrix savedC;
     BitVector savedGarbage;
     DomainVector savedDomains;
-    BitVector[] savedImplementors;
+    //BitVector[] savedImplementors;
 
     private Backup() {
       if (K0.this.backtrackMode == K0.BACKTRACK_UNLIMITED) {
@@ -1819,12 +1628,8 @@ public final class K0 {
     }
   }
 
-  // simplify all the variables introduced since
-  // last weakMark()
+  // simplify all the variables introduced since last weakMark()
   public void simplify() {
-    if(false)
-      return;
-    
     S.assert(S.a&& hasBeenInitialized);
     if (weakMarkedSize >= 0) {
       if (weakMarkedSize == n) {
@@ -2073,19 +1878,7 @@ public final class K0 {
               }
             }
           }
-          //
-          // Propagate the "implements" constraints that go thru x
-          //
-//            for (int iid = 0; iid < nInterfaces(); iid++) {
-//              Interface I = getInterface(iid);
-//              if (I.implementors.get(x)) {
-//                // for all y < x, add y: I
-//                BitVector lx = Ct.getRow(x);
-//                if (lx != null) {
-//                  I.implementors.or(lx);
-//                }
-//              }
-//            }
+
           // should clear C Ct ?
           Sdomains.clear(x);
           Sdomains.exclude(x);

@@ -369,7 +369,7 @@ can be virtually any legal Java code.
 <b>No casts</b>. We claim that our powerfull type system makes it possible
 to avoid nearly every cast used in other object-oriented languages (say
 95% of them!). For the 5% remaining, it is possible to write methods that
-do the same job, except you have to explicitely write what happends if
+do the same job, except you have to explicitely write what happens if
 the "cast" fails, which is a nice property.</li>
 
 <li>
@@ -466,10 +466,17 @@ is a more sophisticated example for the <tt>java.util.Map</tt> interface:
 =</tt>
 <br><tt>&nbsp; native Object java.util.Map.get(Object);</tt>
 <br>&nbsp;
-<p>Calling Nice code from Java is also possible, but is not so straightforward
-because the generated methods get mangled names, and because of the different
-dispatch mecanism. However it works, and the source of the compiler uses this
-feature. The mechanism should eventually be made simpler.
+<p>Calling Nice code from Java is also possible.
+When calling a Nice method <tt>m</tt> declared in package
+<tt>my.package</tt>, the call in Java must be
+<tt>my.package.dispatch.m(...)</tt>. Of course the
+<tt>my.package</tt> part can be omitted if that package
+has been imported.
+Calling a Nice function is similar, replacing <tt>dispatch</tt>
+by <tt>fun</tt>.
+Nice classes can be created normally from Java using <tt>new</tt>.
+The constructor expects the initial value of all fields, given in the
+order they are defined (starting with fields from super-classes).
 <br>&nbsp;
 
 <h2>What else?</h2>

@@ -38,7 +38,7 @@ echo You can do it by modifying Autoexec.bat or in the system settings.
 goto end
 
 :gotNice
-java -classpath %NICE%\nice.jar;%CLASSPATH% nice.tools.compiler.fun --runtime=%NICE%\nice.jar %1 %2 %3 %4 %5 %6 %7 %8 %9
+java -classpath %NICE%\nice.jar;%CLASSPATH% nice.tools.compiler.console.fun --runtime=%NICE%\nice.jar %1 %2 %3 %4 %5 %6 %7 %8 %9
 
 :end
 

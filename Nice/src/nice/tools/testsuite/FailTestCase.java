@@ -42,6 +42,11 @@ public class FailTestCase extends TestCase {
 		try {
 			compilePackages();
 		} catch(TestSuiteException e) {
+      if (getFailPositions().isEmpty()) {
+        TestNice.getOutput().log("warning", "Failure position not checked");
+        warning();
+        return;
+      }
 			checkFailPositions();
 			if (getFailPositions().isEmpty())
 				pass();

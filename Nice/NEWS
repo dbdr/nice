@@ -13,6 +13,12 @@ nice (0.9.6)
   * Improved performance of arrays used as lists.
   * New methods (in package nice.functional) for working with iterators 
     and generators.
+  * Applications that stop because of an uncaught exception will now
+    print a stack trace the include correct Nice source files and line numbers.
+    Applications that need to print a stack trace can do so by using
+    printStackTraceWithSourceInfo(e) (defined in nice.lang) instead of 
+    e.printStackTrace(), and similarly for versions that specify a stream
+    or writer to print into.  
   * Fixed the file locations in the RPM package, and added automatic
     registration of the emacs mode for the SuSE Linux distribution.
   * Bug fixes (checking of local variables in a call position, make it possible

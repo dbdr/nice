@@ -68,6 +68,11 @@ public class Gen
 
   public static Expression shortCircuitAnd(Expression value1, Expression value2)
   {
+    if (value1 == QuoteExp.trueExp)
+      return value2;
+    if (value2 == QuoteExp.trueExp)
+      return value1;
+
     return Inline.inline(nice.lang.inline.ShortCircuitOp.create("&&"), value1,
 			value2);
   }

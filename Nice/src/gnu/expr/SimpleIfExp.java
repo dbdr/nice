@@ -16,6 +16,11 @@ public class SimpleIfExp extends IfExp
 
   public static Expression make(Expression i, Expression t, Expression e)
   {
+    if (i == QuoteExp.trueExp)
+      return t;
+    if (i == QuoteExp.falseExp)
+      return e;
+
     return new SimpleIfExp(i, t, e);
   }
 

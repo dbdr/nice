@@ -104,10 +104,12 @@
   */
 
   //   ARRAYS
-  /*
+  
   String[] t;
-  t = { "Hello, ", "world!" };
+  t = new String[2];
+  t[0] = "Hello, ";
+  t[1] = "world!";
   for (int i = 0; i<t.length; i++)
     p(t[i]);
-  */
+  
 }

@@ -210,6 +210,7 @@ public final class JavaClasses
   public static void reset()
   {
     retyped = new HashMap();
+    knownMethods = new HashMap();
   }
 
   /**
@@ -357,35 +358,7 @@ public final class JavaClasses
           if (retyped.get(m) != null)
             continue;
 
-          if (m.isConstructor())
-            {
-              JavaMethod res = JavaMethod.make(m, true);
-
-              if (res != null)
-                {
-                  TypeConstructors.addConstructor(tc, res);
-                  retyped.put(m, res);
-                }
-              else if(Debug.javaTypes)
-                Debug.println("Constructor " + m + " ignored");
-            }
-          else
-            {
-              /* We don't need to put static methods in the global scope.
-                 They can and must be accessed by specifying the class 
-                 explicitely, like in Java. 
-              */
-              if (m.getStaticFlag())
-                continue;
-
-              Method base = baseMethod(classType, m);
-              if (base != null)
-                continue;
-
-              if (Debug.javaTypes)
-                Debug.println("Loaded native method " + m);
-              addSymbol(m, JavaMethod.make(m, false));
-            }
+          fetch(m, tc, classType);
         }
     }
     catch(NoClassDefFoundError e){
@@ -398,6 +371,80 @@ public final class JavaClasses
       User.warning("Class " + classType.getName() + 
 		   " has an invalid bytecode format");
     }
+  }
+
+  private static void fetch(Method m, TypeConstructor tc, ClassType classType)
+  {
+    if (m.isConstructor())
+      {
+        JavaMethod res = JavaMethod.make(m, true);
+
+        if (res != null)
+          {
+            TypeConstructors.addConstructor(tc, res);
+            retyped.put(m, res);
+          }
+        else if(Debug.javaTypes)
+          Debug.println("Constructor " + m + " ignored");
+      }
+    else
+      {
+        /* We don't need to put static methods in the global scope.
+           They can and must be accessed by specifying the class 
+           explicitely, like in Java. 
+        */
+        if (m.getStaticFlag())
+          return;
+
+        Method base = baseMethod(classType, m);
+        if (base != null)
+          return;
+
+        registerMethod(m);
+      }
+  }
+
+  private static Map knownMethods;
+
+  /** Remember that we know a method of this name, so that we can load it
+      lazily, if that name is searched.
+  */
+  private static void registerMethod(Method m)
+  {
+    List methods = (List) knownMethods.get(m.getName());
+    if (methods == null)
+      {
+        methods = new ArrayList();
+        knownMethods.put(m.getName(), methods);
+      }
+    methods.add(m);
+  }
+
+  /** Called when the given name is going to be needed. */
+  static void nameRequired(String name)
+  {
+    List methods = (List) knownMethods.get(name);
+    if (methods == null)
+      return;
+    knownMethods.remove(name);
+
+    for (Iterator i = methods.iterator(); i.hasNext();)
+      {
+        Method m = (Method) i.next();
+        loadMethod(m);
+      }
+  }
+
+  /** Actually load the method. */
+  private static void loadMethod(Method m)
+  {
+    if (Debug.javaTypes)
+      Debug.println("Loaded native method " + m);
+
+    if (retyped.get(m) != null)
+      return;
+
+    addSymbol(m, JavaMethod.make(m, false));
   }
 
   private static Method baseMethod(ClassType classType, Method m)

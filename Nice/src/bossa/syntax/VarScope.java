@@ -21,7 +21,7 @@ import bossa.util.*;
    @version $Date$
    @author Daniel Bonniot (d.bonniot@mail.dotcom.fr)
 */
-public final class VarScope
+public class VarScope
 {
   public VarScope(VarScope outer)
   {

@@ -125,9 +125,8 @@ public class MethodBodyDefinition extends MethodImplementation
   /** 
       Returns the symbol of the method this declaration belongs to.
    */
-  private VarSymbol findSymbol(VarScope scope)
+  private VarSymbol findSymbol(List symbols)
   {
-    List symbols = scope.lookup(name);
     if(symbols.size() == 0) return null;
 
     TypeConstructor[] tags = Pattern.getTC(formals);
@@ -289,13 +288,18 @@ public class MethodBodyDefinition extends MethodImplementation
     //Resolution of the body is delayed to enable overloading
 
     Pattern.resolve(typeScope, getGlobalScope(), formals);
+
+    symbols = scope.lookup(name);
   }
-  
+
+  private List symbols;
+
   void lateBuildScope()
   {
     Pattern.resolveValues(formals);
 
-    VarSymbol s = findSymbol(scope);
+    VarSymbol s = findSymbol(symbols);
+    symbols = null;
 
     if(s==null)
       User.error(this, name+" is not declared");

@@ -1,0 +1,8 @@
+package regtest.java;
+
+class SubJ extends regtest.java.J.J {}
+
+jMethod(s@SubJ, o) { 
+  if (o != null)
+    o.otherMethod(); 
+}

@@ -119,18 +119,21 @@ public class MethodBodyDefinition extends MethodImplementation
     private List errors = null;
     boolean multipleErrors = false;
 
-    void add(MethodDeclaration method, UserError error)
+    void add(MethodDeclaration method, LocatedString message)
     {
       if (errors == null)
         errors = new ArrayList();
 
-      errors.add(error);
+      errors.add(message);
     }
 
     void report()
     {
       if (errors != null && errors.size() == 1)
-        throw (UserError) errors.get(0);
+        {
+          LocatedString message = (LocatedString)errors.get(0);
+          throw new UserError(message.location(), message.toString());
+        }
     }
   }
 
@@ -190,11 +193,9 @@ public class MethodBodyDefinition extends MethodImplementation
               formals[p].inDomain(domain[p]);
             }
             catch (TypingEx e) {
-              errorList.add
-                (m,
-                 new UserError(formals[p],
-                               "Pattern " + formals[p] +
-                               " is incompatible with " + domain[p]));
+              errorList.add(m, new LocatedString("Pattern " + formals[p] +
+                                " is incompatible with " + domain[p],
+				formals[p].location()));
 
               throw e;
             }
@@ -272,10 +273,9 @@ public class MethodBodyDefinition extends MethodImplementation
 	for (int i = params.hasThis() ? 1 : 0; i < formals.length; i++)
           if (formals[i].atAny() && formals[i].name != null && params.getName(i) != null &&
 		!formals[i].name.toString().equals(params.getName(i).toString())) {
-            errorList.add(m,
-                          new UserError(formals[i], "Parameter " + formals[i] +
-                                        " should be called " +
-                                        params.getName(i)));
+            errorList.add(m, new LocatedString("Parameter " + formals[i] +
+			" should be called " + params.getName(i),
+			formals[i].location()));
 	    it.remove();
 	    continue outer;
           }

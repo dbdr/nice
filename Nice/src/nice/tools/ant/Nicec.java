@@ -1,6 +1,7 @@
 package nice.tools.ant;
 
 import org.apache.tools.ant.*;
+import org.apache.tools.ant.types.*;
 import java.io.File;
 import java.util.Vector;
 import nice.tools.compiler.OutputMessages;
@@ -130,7 +131,7 @@ public class Nicec extends Task {
 
 	/**	Search path for compiled packages and libraries
 	 */
-	private String classpath;
+	private String classpath = "";
 
 	public void setClasspath(String classpath)
 	{
@@ -237,6 +238,21 @@ public class Nicec extends Task {
 
 
 
+	private Path nestedClasspath = null;
+
+    /**
+     * Creates a nested classpath element
+     */
+    public Path createClasspath() {
+    	nestedClasspath = new Path(project);
+        return nestedClasspath.createPath();
+    }
+
+
+
+
+
+
 
 
 
@@ -251,7 +267,7 @@ public class Nicec extends Task {
 	    compilation.sourcePath = sourcepath;
 	  if (destination != null)
 	    compilation.destinationDir = destination.getAbsolutePath();
-	  compilation.packagePath = classpath;
+	  compilation.packagePath = classpath + (nestedClasspath != null ? File.pathSeparator+nestedClasspath : "");
 	  compilation.output = jar;
 	  compilation.recompileCommandLine = recompile;
 	  compilation.recompileAll = recompile_all;

@@ -1,0 +1,157 @@
+/// PASS
+  /// Toplevel
+class A
+{
+  final A x;
+}
+
+class B extends A
+{
+  override B x;
+}
+
+/// FAIL
+  /// Toplevel
+class A
+{
+  A x;
+}
+
+class B extends A
+{
+  override B x;
+}
+
+/// FAIL
+  /// Toplevel
+class A
+{
+  override A x;
+}
+
+/// FAIL
+  /// Toplevel
+class A
+{
+  A x;
+}
+
+class B extends A
+{
+  override B dummy;
+}
+
+/// PASS
+  /// Toplevel
+class A
+{
+  final A x;
+}
+
+class B extends A
+{
+  override B x;
+}
+
+B goo(B b) = new B(x: b).x;
+
+/// FAIL
+  /// Toplevel
+class A
+{
+  final A x;
+}
+
+class B extends A
+{
+  override B x;
+}
+
+B goo(A a) = new B(x: a);
+
+/// FAIL
+  /// Toplevel
+class A
+{
+  final A x;
+}
+
+class B extends A
+{
+  override String x;
+}
+
+/// FAIL
+  /// Toplevel
+class A
+{
+  final A x;
+}
+
+class B extends A
+{
+  override C x;
+}
+class C extends B
+{
+  override B x;
+}
+
+/// PASS
+  /// Toplevel
+class A<T>
+{
+  final List<T> x;
+}
+
+class B<T> extends A
+{
+  override LinkedList<T> x;
+}
+
+/// FAIL
+  /// Toplevel
+class A<T>
+{
+  final List<String> x;
+}
+
+class B<T> extends A
+{
+  override List<T> x;
+}
+
+/// FAIL
+  /// Toplevel
+class A<T>
+{
+  final List<T> x;
+}
+
+class B<T> extends A
+{
+  override List<String> x;
+}
+
+/// FAIL
+  /// Toplevel
+class A 
+{
+  final List<String> names = new ArrayList();
+}
+class B extends A
+{
+  override LinkedList<String> /* /// FAIL HERE */ names;
+}
+
+/// PASS
+  LinkedList<String> l = new B().names;
+  /// Toplevel
+class A 
+{
+  final List<String> names = new ArrayList();
+}
+class B extends A
+{
+  override LinkedList<String> names = new LinkedList();
+}

@@ -64,6 +64,13 @@ public class FormalParameters extends Node
 
     LocatedString getName() { return null; }
 
+    void resetType(Monotype type)
+    {
+      this.type = type;
+      if (symbol != null)
+        symbol.syntacticType = type;
+    }
+
     Symbol getSymbol()
     {
       symbol = new Symbol(getName(), type);

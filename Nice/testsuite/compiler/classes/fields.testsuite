@@ -100,3 +100,18 @@
   class Bar {
     final Class[] classes = [Foo.class, Bar.class];
   }
+
+/// FAIL
+  /// Toplevel
+class A { int x; int x; }
+
+/// FAIL
+  /// Toplevel
+class A { int x; }
+class B extends A { int /* /// FAIL HERE */ x; }
+class C extends B {}
+
+/// FAIL
+  /// Toplevel
+class A { final int x = 1; }
+int f(A a) = a.x++;

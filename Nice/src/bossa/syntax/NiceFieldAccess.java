@@ -49,6 +49,8 @@ public class NiceFieldAccess extends FieldAccess
     return new FormalParameters(res);
   }
   
+  public boolean isFinal() { return field.isFinal(); }
+
   final NiceClass.Field field;
   
   /****************************************************************

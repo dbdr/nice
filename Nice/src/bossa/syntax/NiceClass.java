@@ -48,26 +48,35 @@ public class NiceClass extends ClassDefinition.ClassImplementation
     if (fields == null || fields.size() == 0)
       this.fields = noFields;
     else
+      this.fields = (NewField[]) fields.toArray(new NewField[fields.size()]);
+  }
+
+  public void setOverrides(List overrides) 
+  {
+    if (overrides == null || overrides.size() == 0)
+      this.overrides = noOverrides;
+    else
       {
-	this.fields = (Field[]) fields.toArray(new Field[fields.size()]);
-
-	//do not enter fields into global scope
-	for (int i = 0; i < this.fields.length; i++)
-	  this.fields[i].sym.propagate = Node.none; 
-
-	for (int i = 0; i < this.fields.length; i++)
-	  {
-	    NiceFieldAccess f = new NiceFieldAccess(this, this.fields[i]);
-	    this.fields[i].method = f;
-	    definition.addChild(f);
-	  }
+	this.overrides = (OverridenField[]) 
+          overrides.toArray(new OverridenField[overrides.size()]);
       }
   }
 
   ClassDefinition definition;
 
-  private static Field[] noFields = new Field[0];
+  private static NewField[] noFields = new NewField[0];
+  private static OverridenField[] noOverrides = new OverridenField[0];
   
+  NiceClass getParent()
+  {
+    TypeConstructor tc = definition.getSuperClass();
+    ClassDefinition sup = ClassDefinition.get(tc);
+    if (sup != null && sup.implementation instanceof NiceClass)
+      return ((NiceClass) sup.implementation);
+    else
+      return null;
+  }
+
   /****************************************************************
    * Fields
    ****************************************************************/
@@ -78,23 +87,38 @@ public class NiceClass extends ClassDefinition.ClassImplementation
   {
     if (definition instanceof ClassDefinition.Interface)
       User.error(sym, "An interface cannot have a field.");
-    return new Field(sym, value, isFinal, isTransient, isVolatile);
+
+    return new NewField(sym, value, isFinal, isTransient, isVolatile);
   }
 
-  public class Field
+  public Field makeOverride (MonoSymbol sym, Expression value)
   {
-    public Field(MonoSymbol sym, Expression value, 
-		 boolean isFinal, boolean isTransient, boolean isVolatile)
+    if (definition instanceof ClassDefinition.Interface)
+      User.error(sym, "An interface cannot have a field.");
+
+    return new OverridenField(sym, value);
+  }
+
+  abstract class Field
+  {
+    private Field(MonoSymbol sym, Expression value)
     {
       this.sym = sym;
       this.value = value;
-      this.isFinal = isFinal;
-      this.isTransient = isTransient;
-      this.isVolatile = isVolatile;
 
-      if (isFinal && isVolatile)
-	throw User.error(sym, "A field cannot be final and volatile");
+      // Do not enter fields into global scope.
+      sym.propagate = Node.none;
+
+      method = new NiceFieldAccess(NiceClass.this, this);
+      NiceClass.this.definition.addChild(method);
     }
+
+    NiceClass getDeclaringClass()
+    {
+      return NiceClass.this;
+    }
+
+    abstract boolean isFinal();
 
     void resolve(VarScope scope, TypeScope typeScope)
     {
@@ -106,19 +130,21 @@ public class NiceClass extends ClassDefinition.ClassImplementation
       value = dispatch.analyse(value, scope, typeScope);
     }
 
-    void createField()
+    FormalParameters.Parameter asParameter(TypeMap map)
     {
-      method.fieldDecl = classe.addField
-	(sym.name.toString(), Types.javaType(sym.type));
-      method.fieldDecl.setFlag(isTransient, gnu.expr.Declaration.TRANSIENT);
-      method.fieldDecl.setFlag(isVolatile , gnu.expr.Declaration.VOLATILE);
+      Monotype type = Monotype.create(sym.syntacticType.resolve(map));
+      if (value == null)
+	return new FormalParameters.NamedParameter(type, sym.getName(), true);
+      else
+	return new FormalParameters.OptionalParameter
+	  (type, sym.getName(), true, value);
     }
 
-    void typecheck(NiceClass c)
+    void typecheck()
     {
       if (value != null)
 	{
-	  c.enterTypingContext();
+	  NiceClass.this.enterTypingContext();
 
 	  mlsub.typing.Polytype declaredType = sym.getType();
 	  value = value.resolveOverloading(declaredType);
@@ -138,35 +164,162 @@ public class NiceClass extends ClassDefinition.ClassImplementation
     public String toString()
     {
       return 
-	(isFinal ? "final " : "") +
 	sym + (value == null ? "" : " = " + value);
     }
     
-    FormalParameters.Parameter asParameter(TypeMap map)
-    {
-      Monotype type = Monotype.create(sym.syntacticType.resolve(map));
-      if (value == null)
-	return new FormalParameters.NamedParameter(type, sym.getName(), true);
-      else
-	return new FormalParameters.OptionalParameter
-	  (type, sym.getName(), true, value);
-    }
-
-    NiceClass getDeclaringClass()
-    {
-      return NiceClass.this;
-    }
-
     MonoSymbol sym;
     Expression value;
-    boolean isFinal;
-    boolean isTransient;
-    boolean isVolatile;
 
     NiceFieldAccess method;
   }
-  
-  // Used to resolve fields, and constructor cosntraint.
+
+  final class NewField extends Field
+  {
+    private NewField(MonoSymbol sym, Expression value, 
+                     boolean isFinal, boolean isTransient, boolean isVolatile)
+    {
+      super(sym, value);
+      this.isFinal = isFinal;
+      this.isTransient = isTransient;
+      this.isVolatile = isVolatile;
+
+      if (isFinal && isVolatile)
+	throw User.error(sym, "A field cannot be final and volatile");
+    }
+
+    boolean isFinal() { return isFinal; }
+
+    void createField()
+    {
+      method.fieldDecl = classe.addField
+	(sym.name.toString(), Types.javaType(sym.type));
+      method.fieldDecl.setFlag(isTransient, gnu.expr.Declaration.TRANSIENT);
+      method.fieldDecl.setFlag(isVolatile , gnu.expr.Declaration.VOLATILE);
+    }
+
+    void checkNoDuplicate(FormalParameters.Parameter[] fields, 
+                          int rankInThisClass)
+    {
+      /*
+         We check that there is no duplicate in all the inherited fields,
+         but also in the fields of this class stricly before this one.
+      */
+      int max = fields.length - NiceClass.this.fields.length + rankInThisClass;
+      String name = sym.getName().toString();
+      for (int i = 0; i < max; i++)
+        {
+          if (fields[i].match(name))
+            User.error(sym, 
+                       (max - i >= NiceClass.this.fields.length)
+                       ? "A field with the same name exists in a super-class"
+                       : "A field with the same name exists in this class");
+        }
+    }
+
+    public String toString()
+    {
+      return 
+	(isFinal ? "final " : "") +
+        super.toString();
+    }
+    
+    boolean isFinal;
+    boolean isTransient;
+    boolean isVolatile;
+  }
+
+  final class OverridenField extends Field
+  {
+    private OverridenField(MonoSymbol sym, Expression value)
+    {
+      super(sym, value);
+    }
+
+    boolean isFinal() { return true; }
+
+    /**
+       Update the type and default values for the constructor, according
+       to this overriding.
+    */
+    void updateConstructorParameter
+      (FormalParameters.Parameter[] inherited, int nb, TypeScope scope)
+    {
+      String name = sym.getName().toString();
+      Monotype type = Monotype.create(sym.syntacticType.resolve(scope));
+
+      for (int i = 0; i < nb; i++)
+        if (inherited[i].match(name))
+          {
+            if (value != null)
+              inherited[i] = asParameter(scope);
+            else
+              inherited[i].resetType(type);
+          }
+    }
+
+    void typecheck()
+    {
+      gnu.expr.Declaration decl = null;
+
+      NiceClass parent = getParent();
+      if (parent != null)
+        decl = parent.getOverridenField(this, value == null);
+
+      if (decl == null)
+        throw User.error(sym, 
+                         "No field with this name exists in a super-class");
+
+      method.fieldDecl = decl;
+
+      super.typecheck();
+    }
+
+    /**
+       @param checkValue
+         Whether to check that the original field's value, if it exists,
+         must be checked against the overriden type.
+       @return the checkValue to be used for other versions of this field
+         higher up in the hierarchy.
+    */
+    boolean checkOverride(Field original, boolean checkValue)
+    {
+      NiceClass.this.enterTypingContext();
+
+      mlsub.typing.Monotype originalType = original.sym.syntacticType.resolve
+        (original.getDeclaringClass().translationScope(NiceClass.this));
+
+      try {
+        Typing.leq(this.sym.type, originalType);
+      }
+      catch (TypingEx ex) {
+        User.error(this.sym, 
+                   "The new type must be a subtype of the original type declared in " + original.getDeclaringClass() + ".\n" +
+                   "Original type: " + originalType);
+      }
+
+      if (checkValue && original.value != null)
+        {
+	  try {
+	    Typing.leq(original.value.getType(), this.sym.getType());
+	  } 
+	  catch (mlsub.typing.TypingEx ex) {
+            User.error(sym, "The default value declared in " + 
+                       original.getDeclaringClass() + 
+                       "\nis not compatible with the overriden type");
+          }
+          return false;
+        }
+
+      return checkValue;
+    }
+
+    public String toString()
+    {
+      return "override " + super.toString();
+    }
+  }
+
+  // Used to resolve fields, and constructor constraint.
   private TypeScope localScope;
 
   void resolveClass()
@@ -181,17 +334,45 @@ public class NiceClass extends ClassDefinition.ClassImplementation
 
   private void resolveFields()
   {
-    if (fields.length == 0)
-      return;
-    
     for (int i = 0; i < fields.length; i++)
       fields[i].resolve(definition.scope, localScope);
+
+    for (int i = 0; i < overrides.length; i++)
+      overrides[i].resolve(definition.scope, localScope);
   }
 
   private void createFields()
   {
     for (int i = 0; i < fields.length; i++)
       fields[i].createField();
+  }
+
+  private gnu.expr.Declaration getOverridenField
+    (OverridenField field, boolean checkValue)
+  {
+    String name = field.sym.getName().toString();
+
+    for (int i = 0; i < fields.length; i++)
+      if (fields[i].sym.getName().toString().equals(name))
+        {
+          if (! fields[i].isFinal)
+            User.error(field.sym, "The original field in class " + this + 
+                       " is not final, so its type cannot be overriden");
+
+          checkValue = field.checkOverride(fields[i], checkValue);
+
+          return fields[i].method.fieldDecl;
+        }
+  
+    for (int i = 0; i < overrides.length; i++)
+      if (overrides[i].sym.getName().toString().equals(name))
+        checkValue = field.checkOverride(overrides[i], checkValue);
+
+    NiceClass parent = getParent();
+    if (parent != null)
+      return parent.getOverridenField(field, checkValue);
+    else
+      return null;
   }
 
   /****************************************************************
@@ -258,7 +439,10 @@ public class NiceClass extends ClassDefinition.ClassImplementation
   {
     try {
       for (int i = 0; i < fields.length; i++)
-	fields[i].typecheck(this);
+	fields[i].typecheck();
+
+      for (int i = 0; i < overrides.length; i++)
+	overrides[i].typecheck();
 
       if (initializers.length != 0)
         {
@@ -381,6 +565,27 @@ public class NiceClass extends ClassDefinition.ClassImplementation
     return res;
   }
 
+  /**
+      @return the scope that maps the type parameters of the other class
+        to the corresponding symbol in the constructor of this class.
+  */
+  private TypeScope translationScope(NiceClass other)
+  {
+    mlsub.typing.MonotypeVar[] typeParams = other.definition.getTypeParameters();
+    TypeScope scope = Node.getGlobalTypeScope();
+    Map map = null;
+    if (typeParams != null)
+      {
+	scope = new TypeScope(scope);
+	for (int i = 0; i < typeParams.length; i++)
+	  try {
+	    scope.addMapping(definition.classConstraint.typeParameters[i].getName(), typeParams[i]);
+	  } catch(TypeScope.DuplicateName e) {}
+      }
+
+    return scope;
+  }
+
   private FormalParameters.Parameter[][] getFieldsAsParameters
     (int nbFields, List constraints, MonotypeVar[] typeParams)
   {
@@ -388,7 +593,8 @@ public class NiceClass extends ClassDefinition.ClassImplementation
     FormalParameters.Parameter[][] res = getFieldsAsParameters
       (definition.getSuperClass(), nbFields, constraints, typeParams);
 
-    if (fields.length == 0 && definition.classConstraint == null)
+    if (fields.length == 0 && overrides.length == 0 && 
+        definition.classConstraint == null)
       return res;
 
     TypeScope scope = Node.getGlobalTypeScope();
@@ -405,6 +611,8 @@ public class NiceClass extends ClassDefinition.ClassImplementation
 	    map.put(definition.classConstraint.typeParameters[i], typeParams[i]);
 	  } catch(TypeScope.DuplicateName e) {}
       }
+
+    updateConstructorParameters(res[0], res[0].length - nbFields, scope);
 
     for (int j = 0; j < res.length; j++)
       for (int i = fields.length, n = res[j].length - nbFields + i; --i >= 0;)
@@ -423,6 +631,27 @@ public class NiceClass extends ClassDefinition.ClassImplementation
     return res;
   }
 
+  /**
+     This must be done in a given class for every subclass, since they
+     have different type parameters.
+  */
+  private void updateConstructorParameters
+    (FormalParameters.Parameter[] inherited, int nb, TypeScope scope)
+  {
+    for (int f = 0; f < overrides.length; f++)
+      overrides[f].updateConstructorParameter(inherited, nb, scope);
+  }
+
+  /**
+     This must be done only once per class.
+  */
+  private void checkFields (FormalParameters.Parameter[] allFields)
+  {
+    int len = allFields.length;
+    for (int f = 0; f < fields.length; f++)
+      fields[f].checkNoDuplicate(allFields, f);
+  }
+
   private Constructor[] constructorMethod;
 
   private void createConstructor()
@@ -439,6 +668,8 @@ public class NiceClass extends ClassDefinition.ClassImplementation
 
     FormalParameters.Parameter[][] params = 
       getFieldsAsParameters(0, constraints, typeParams);
+
+    checkFields(params[0]);
 
     Constraint cst;
     if (typeParams != null)
@@ -607,5 +838,6 @@ public class NiceClass extends ClassDefinition.ClassImplementation
 
   public String toString() { return definition.toString(); }
 
-  private Field[] fields;
+  private NewField[] fields;
+  private OverridenField[] overrides;
 }

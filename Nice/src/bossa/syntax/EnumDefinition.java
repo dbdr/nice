@@ -35,6 +35,7 @@ public class EnumDefinition extends Definition
 	null,null);
     NiceClass impl = new NiceClass(classDef);
     impl.setFields(null);
+    impl.setOverrides(null);
     classDef.setImplementation(impl);
 
     addChild(classDef);    

@@ -40,15 +40,18 @@ public class JavaFieldAccess extends FieldAccess
     this.fieldName = fieldName;
   }
   
-  private JavaFieldAccess(LocatedString className,String fieldName,
-			  LocatedString name,
-			  mlsub.typing.Constraint cst,
-			  mlsub.typing.Monotype returnType, 
+  private JavaFieldAccess(Field field,
 			  mlsub.typing.Monotype[] parameters)
+    throws Types.ParametricClassException, Types.NotIntroducedClassException
   {
-    super(name, cst, parameters, returnType);
-    this.className = className;
-    this.fieldName = fieldName;
+    super(new LocatedString(field.getName(), Location.nowhere()), 
+          null, parameters, 
+          Types.monotype(field.getType(), /* sure: */ field.isFinal()));
+    this.field = field;
+    this.className = new LocatedString(field.getDeclaringClass().getName(),
+                                       Location.nowhere());
+    this.fieldName = field.getName();
+    this.fieldDecl = new Declaration(fieldName, field);
   }
   
   static MethodDeclaration make(Field f)
@@ -63,17 +66,7 @@ public class JavaFieldAccess extends FieldAccess
       else
 	params = null;
     
-      JavaFieldAccess res = new JavaFieldAccess
-	(new LocatedString(f.getDeclaringClass().getName(),
-			   Location.nowhere()),
-	 f.getName(),
-	 new LocatedString(f.getName(), Location.nowhere()),
-	 null,
-	 Types.monotype(f.getType(), /* sure: */ f.isFinal()), 
-	 params);
-
-      res.field = f;
-      res.fieldDecl = new Declaration(f.getName(), f);
+      JavaFieldAccess res = new JavaFieldAccess(f, params);
 
       if (Debug.javaTypes)
 	Debug.println("Loaded field " + res);
@@ -88,6 +81,8 @@ public class JavaFieldAccess extends FieldAccess
     }
   }
   
+  public boolean isFinal() { return field.isFinal(); }
+
   void buildScope(VarScope outer, TypeScope typeOuter)
   {
     super.buildScope(outer, typeOuter);

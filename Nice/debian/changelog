@@ -1,6 +1,17 @@
 nice (0.9.1) unstable; urgency=low
 
-  * A class can now initializers, which are executed each time an instance
+  * Final fields can be overriden in sub-classes, with a more precise type
+    and a different default value. In particular, this removes the need for 
+    a cast when reading the field's value from an instance of the sub-class.
+      class A 
+      {
+        final List<String> names;
+      }
+      class B extends A
+      {
+        override LinkedList<String> names;
+      }
+  * A class can now have initializers, which are executed each time an instance
     is created.
       class A 
       {

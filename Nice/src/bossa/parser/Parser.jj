@@ -148,6 +148,7 @@ TOKEN: /* Keywords */
 | < IMPLEMENTS: "implements"	>
 | < EXTENDS:    "extends"    	>
 | < ENUM:       "enum"    	>
+| < OVERRIDE:   "override"      >
 
 // Packages
 | < IMPORT:     "import"     	>
@@ -894,14 +895,18 @@ List interfaces():
   { return res; }
 }
 
-void getField(NiceClass c, List fields):
+List getField(NiceClass c, List fields, List overrides):
 {
   MonoSymbol field;
   boolean isFinal=false, isTransient = false, isVolatile = false;
+  boolean isOverride = false;
   Expression value = null;
   Token t = null;
 }
 {
+ (
+   "override" { isOverride = true; }
+ |
   ( 
     "public-read" [ "private-write" ]
   | "private-write"
@@ -911,10 +916,22 @@ void getField(NiceClass c, List fields):
   ) 
   [ "transient" { isTransient = true; } ]
   [ "volatile"  { isVolatile  = true; } ]
+ )
   field=monoSymbol() 
   [ "=" value=Expression() ]
   ";" 
-  { fields.add(c.makeField(field, value, isFinal, isTransient, isVolatile)); }
+  { 
+    if (isOverride)
+      {
+        if (overrides == null)
+          overrides = new LinkedList();
+        overrides.add(c.makeOverride(field, value));
+      }
+    else
+      fields.add(c.makeField(field, value, isFinal, isTransient, isVolatile));
+
+    return overrides;
+  }
 }
 
 ClassDefinition classDefinition(List definitions):
@@ -962,7 +979,8 @@ ClassDefinition classDefinition(List definitions):
    "{"
    { NiceClass impl = new NiceClass(res); }
    // internal fields and methods
-   { List fields = new ArrayList(), methods = null, initializers = null; }
+   { List fields = new LinkedList(), overrides = null,
+          methods = null, initializers = null; }
    (
       // Initializer
       { Statement init; }
@@ -974,7 +992,7 @@ ClassDefinition classDefinition(List definitions):
       }
     |
       LOOKAHEAD( getField(null, null) )
-      getField(impl, fields)
+      overrides = getField(impl, fields, overrides)
     |
       [ "public" | "private" ]
       (
@@ -996,6 +1014,7 @@ ClassDefinition classDefinition(List definitions):
    "}"
    {
      impl.setFields(fields);
+     impl.setOverrides(overrides);
      if (initializers != null)
        impl.setInitializers(initializers);
 

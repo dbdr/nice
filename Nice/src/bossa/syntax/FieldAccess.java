@@ -50,6 +50,8 @@ abstract class FieldAccess extends MethodDeclaration
    */
   public boolean isFieldAccess() { return true; }
 
+  public abstract boolean isFinal();
+
   /****************************************************************
    * Code generation
    ****************************************************************/

@@ -300,7 +300,7 @@ public class CallExp extends Expression
   {
     resolveOverloading();
     return function.getFieldAccessMethod();
-  }  
+  }
 
   /****************************************************************
    * Code generation
@@ -342,6 +342,10 @@ public class CallExp extends Expression
       Internal.error(this, "Assignment to a call that is not a field access");
 
     FieldAccess access = function.getFieldAccessMethod();
+
+    if (access.isFinal())
+      User.error(this, "Field " + access + " is final");
+
     switch (arguments.size())
     {
     case 0:

@@ -65,6 +65,9 @@ public class IncrementExp extends Expression
       Internal.error(this, "\"var\" is assignable and not a local, " +
 		     "so it should be a call to a FieldAccessMethod");
 
+    if (access.isFinal())
+      User.error(this, "Field " + access + " is final");
+
     return Inline.inline
       (new IncrementProc(access.fieldDecl, returnOld, increment),
        call.arguments.getExp(0).generateCode());

@@ -1,10 +1,21 @@
+
+/**************************************************************************/
+/*                                                                        */
+/*  This program is free software; you can redistribute it and/or modify  */
+/*  it under the terms of the GNU General Public License as published by  */
+/*  the Free Software Foundation; either version 2 of the License, or     */
+/*  (at your option) any later version.                                   */
+/*                                                                        */
+/**************************************************************************/
+
+
 package nice.ui.common;
 
 
 
 /**
- * DECLARATION of functions to make sure that NSwingFooListeners can only be requested 
- * from Gui Controls that are able to handle those NSwingFooListeners
+ * DECLARATION of methods to make sure that listeners defined in javax.swing.event 
+ * can only be requested from classes that are able to handle them
  */
 
 public <AncestorListenerHandler H> NAncestorListener[?] getNiceAncestorListeners(H);
@@ -29,117 +40,10 @@ public <TreeSelectionListenerHandler H> NTreeSelectionListener[?] getNiceTreeSel
 public <UndoableEditListenerHandler H> NUndoableEditListener[?] getNiceUndoableEditListeners(H);
 
 
-
 /**
- * methods to safely cast java listeners to their nice pendants
- * raises a NoNiceListenerException if this is not possible
+ * DEFINITION of methods to make sure that listeners defined in javax.swing.event 
+ * can only be requested from classes that are able to handle them
  */
-
-NAncestorListener toNiceAncestorListener(EventListener);
-toNiceAncestorListener(this) { throw new NoNiceListenerException("" + this.getClass().getName() + "is no instance of NAncestorListener", listener: this); }
-toNiceAncestorListener(this@NAncestorListener) = this;
-
-NCaretListener toNiceCaretListener(EventListener);
-toNiceCaretListener(this) { throw new NoNiceListenerException("" + this.getClass().getName() + "is no instance of NCaretListener", listener: this); }
-toNiceCaretListener(this@NCaretListener) = this;
-
-NCellEditorListener toNiceCellEditorListener(EventListener);
-toNiceCellEditorListener(this) { throw new NoNiceListenerException("" + this.getClass().getName() + "is no instance of NCellEditorListener", listener: this); }
-toNiceCellEditorListener(this@NCellEditorListener) = this;
-
-NChangeListener toNiceChangeListener(EventListener);
-toNiceChangeListener(this) { throw new NoNiceListenerException("" + this.getClass().getName() + "is no instance of NChangeListener", listener: this); }
-toNiceChangeListener(this@NChangeListener) = this;
-
-NDocumentListener toNiceDocumentListener(EventListener);
-toNiceDocumentListener(this) { throw new NoNiceListenerException("" + this.getClass().getName() + "is no instance of NDocumentListener", listener: this); }
-toNiceDocumentListener(this@NDocumentListener) = this;
-
-NHyperlinkListener toNiceHyperlinkListener(EventListener);
-toNiceHyperlinkListener(this) { throw new NoNiceListenerException("" + this.getClass().getName() + "is no instance of NHyperlinkListener", listener: this); }
-toNiceHyperlinkListener(this@NHyperlinkListener) = this;
-
-NInternalFrameListener toNiceInternalFrameListener(EventListener);
-toNiceInternalFrameListener(this) { throw new NoNiceListenerException("" + this.getClass().getName() + "is no instance of NInternalFrameListener", listener: this); }
-toNiceInternalFrameListener(this@NInternalFrameListener) = this;
-
-NListDataListener toNiceListDataListener(EventListener);
-toNiceListDataListener(this) { throw new NoNiceListenerException("" + this.getClass().getName() + "is no instance of NListDataListener", listener: this); }
-toNiceListDataListener(this@NListDataListener) = this;
-
-NListSelectionListener toNiceListSelectionListener(EventListener);
-toNiceListSelectionListener(this) { throw new NoNiceListenerException("" + this.getClass().getName() + "is no instance of NListSelectionListener", listener: this); }
-toNiceListSelectionListener(this@NListSelectionListener) = this;
-
-NMenuDragMouseListener toNiceMenuDragMouseListener(EventListener);
-toNiceMenuDragMouseListener(this) { throw new NoNiceListenerException("" + this.getClass().getName() + "is no instance of NMenuDragMouseListener", listener: this); }
-toNiceMenuDragMouseListener(this@NMenuDragMouseListener) = this;
-
-NMenuKeyListener toNiceMenuKeyListener(EventListener);
-toNiceMenuKeyListener(this) { throw new NoNiceListenerException("" + this.getClass().getName() + "is no instance of NMenuKeyListener", listener: this); }
-toNiceMenuKeyListener(this@NMenuKeyListener) = this;
-
-NMenuListener toNiceMenuListener(EventListener);
-toNiceMenuListener(this) { throw new NoNiceListenerException("" + this.getClass().getName() + "is no instance of NMenuListener", listener: this); }
-toNiceMenuListener(this@NMenuListener) = this;
-
-NPopupMenuListener toNicePopupMenuListener(EventListener);
-toNicePopupMenuListener(this) { throw new NoNiceListenerException("" + this.getClass().getName() + "is no instance of NPopupMenuListener", listener: this); }
-toNicePopupMenuListener(this@NPopupMenuListener) = this;
-
-NTableColumnModelListener toNiceTableColumnModelListener(EventListener);
-toNiceTableColumnModelListener(this) { throw new NoNiceListenerException("" + this.getClass().getName() + "is no instance of NTableColumnModelListener", listener: this); }
-toNiceTableColumnModelListener(this@NTableColumnModelListener) = this;
-
-NTableModelListener toNiceTableModelListener(EventListener);
-toNiceTableModelListener(this) { throw new NoNiceListenerException("" + this.getClass().getName() + "is no instance of NTableModelListener", listener: this); }
-toNiceTableModelListener(this@NTableModelListener) = this;
-
-NTreeExpansionListener toNiceTreeExpansionListener(EventListener);
-toNiceTreeExpansionListener(this) { throw new NoNiceListenerException("" + this.getClass().getName() + "is no instance of NTreeExpansionListener", listener: this); }
-toNiceTreeExpansionListener(this@NTreeExpansionListener) = this;
-
-NTreeWillExpandListener toNiceTreeWillExpandListener(EventListener);
-toNiceTreeWillExpandListener(this) { throw new NoNiceListenerException("" + this.getClass().getName() + "is no instance of NTreeWillExpandListener", listener: this); }
-toNiceTreeWillExpandListener(this@NTreeWillExpandListener) = this;
-
-NTreeModelListener toNiceTreeModelListener(EventListener);
-toNiceTreeModelListener(this) { throw new NoNiceListenerException("" + this.getClass().getName() + "is no instance of NTreeModelListener", listener: this); }
-toNiceTreeModelListener(this@NTreeModelListener) = this;
-
-NTreeSelectionListener toNiceTreeSelectionListener(EventListener);
-toNiceTreeSelectionListener(this) { throw new NoNiceListenerException("" + this.getClass().getName() + "is no instance of NTreeSelectionListener", listener: this); }
-toNiceTreeSelectionListener(this@NTreeSelectionListener) = this;
-
-NUndoableEditListener toNiceUndoableEditListener(EventListener);
-toNiceUndoableEditListener(this) { throw new NoNiceListenerException("" + this.getClass().getName() + "is no instance of NUndoableEditListener", listener: this); }
-toNiceUndoableEditListener(this@NUndoableEditListener) = this;
-
-
-
-
-/**
- * DEFINITION of functions to make sure that NAWTFooListeners can only be requested 
- * from Gui Controls that are able to handle those NAWTFooListeners
- */
-
-//getNiceVetoableChangeListeners(this@javax.swing.JComponent)
-//{
-//	?java.util.List<NVetoableChangeListener> result = vetoableChangeListeners.get(this.object());
-//	return (result == null) ? null : result.toArray();
-//}
-//
-//getNicePropertyChangeListeners(this@javax.swing.AbstractAction)
-//{
-//	?java.util.List<NPropertyChangeListener> result = propertyChangeListeners.get(this.object());
-//	return (result == null) ? null : result.toArray();
-//}
-//
-//getNicePropertyChangeListeners(this@javax.swing.table.TableColumn)
-//{
-//	?java.util.List<NPropertyChangeListener> result = propertyChangeListeners.get(this.object());
-//	return (result == null) ? null : result.toArray();
-//}
 
 getNiceTableModelListeners(this@javax.swing.table.TableModel)
 {
@@ -152,24 +56,6 @@ getNiceTableColumnModelListeners(this@javax.swing.table.TableColumnModel)
 	?java.util.List<NTableColumnModelListener> result = tableColumnModelListeners.get(this.object());
 	return (result == null) ? null : result.toArray();
 }
-
-//getNicePropertyChangeListeners(this@javax.swing.tree.DefaultTreeSelectionModel)
-//{
-//	?java.util.List<NPropertyChangeListener> result = propertyChangeListeners.get(this.object());
-//	return (result == null) ? null : result.toArray();
-//}
-
-//getNicePropertyChangeListeners(this@javax.swing.UIManager)
-//{
-//	?java.util.List<NPropertyChangeListener> result = propertyChangeListeners.get(this.object());
-//	return (result == null) ? null : result.toArray();
-//}
-
-//getNicePropertyChangeListeners(this@javax.swing.UIDefaults)
-//{
-//	?java.util.List<NPropertyChangeListener> result = propertyChangeListeners.get(this.object());
-//	return (result == null) ? null : result.toArray();
-//}
 
 getNiceCellEditorListeners(this@javax.swing.AbstractCellEditor)
 {

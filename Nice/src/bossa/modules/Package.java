@@ -400,6 +400,10 @@ public class Package implements mlsub.compilation.Module, Located, bossa.syntax.
     thisPkg.next = res;
     res = thisPkg;
 
+    // Allow memory to be reclaimed early.
+    thisPkg = null;
+    ast = null;
+
     for (Iterator i = getImports().iterator(); i.hasNext();)
       res = ((Package) i.next()).compilePackages(res);
 

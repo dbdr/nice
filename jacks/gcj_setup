@@ -25,3 +25,5 @@ set tcltest::testConstraints(encoding) 1
 # Activate gcj only test cases
 set tcltest::testConstraints(gcj) 1
 
+# Comment this to skip the time-consuming JVM limitation tests
+set tcltest::testConstraints(jvm) 1

@@ -57,7 +57,19 @@ tcltest::test 3.10.4-invalid-13 { \r\n is two character literals } {
 } FAIL
 
 tcltest::test 3.10.4-invalid-14 { ' must be terminated with ' } {
-    compile [saveas T3104i14.java "class T3104i14.java {char c = ';}"]
+    compile [saveas T3104i14.java "class T3104i14 {char c = 'a;}"]
+} FAIL
+
+tcltest::test 3.10.4-invalid-15 { EOF inside '' } {
+    compile [saveas T3104i15.java "class T3104i15 \{char c = '"]
+} FAIL
+
+tcltest::test 3.10.4-invalid-16 { EOF inside '' } {
+    compile [saveas T3104i16.java "class T3104i16 \{char c = 'a"]
+} FAIL
+
+tcltest::test 3.10.4-invalid-17 { EOF inside '' } {
+    compile [saveas T3104i17.java "class T3104i17 \{char c = '\\"]
 } FAIL
 
 # Valid character literals

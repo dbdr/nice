@@ -11,7 +11,7 @@ tcltest::test 3.10.5-invalid-1 { A StringCharacter cannot be " } {
 tcltest::test 3.10.5-invalid-2 { A StringCharacter cannot be " } {
     literal T3105i2 {\u0022}
 } FAIL
-
+#"
 tcltest::test 3.10.5-invalid-3 { A StringCharacter cannot be \ } {
     literal T3105i3 \\
 } FAIL
@@ -46,6 +46,14 @@ tcltest::test 3.10.5-invalid-10 { A LineTerminator is not an InputCharacter } {
 
 tcltest::test 3.10.5-invalid-11 { " must be terminated with " } {
     compile [saveas T3105i11.java {class T3105i11 {String s = ";}}]
+} FAIL
+#"
+tcltest::test 3.10.5-invalid-12 { EOF inside "" } {
+    compile [saveas T3105i12.java "class T3105i12 \{String s = \""]
+} FAIL
+
+tcltest::test 3.10.5-invalid-13 { EOF inside "" } {
+    compile [saveas T3105i13.java "class T3105i13 \{String s = \"\\"]
 } FAIL
 
 # Valid string literals

@@ -38,6 +38,41 @@ tcltest::test 3.10.7-invalid-8 { escape sequences only occur within character
     compile [saveas T3107i8.java "class T3107i8 { \\t }"]
 } FAIL
 
+tcltest::test 3.10.7-invalid-9 { octal escape sequences are limited at 0377 } {
+    sequence T3107i9 {\0000}
+} FAIL
+
+tcltest::test 3.10.7-invalid-10 { \LineTerminator is not a valid sequence } {
+    sequence T3107i10 \\\n
+} FAIL
+
+tcltest::test 3.10.7-invalid-11 { \LineTerminator is not a valid sequence } {
+    sequence T3107i11 \\\r
+} FAIL
+
+tcltest::test 3.10.7-invalid-12 { \u is not an escape sequence, since unicode
+        is already expanded } {
+    sequence T3107i12 {\u005cu0000}
+} FAIL
+
+tcltest::test 3.10.7-invalid-13 { escape sequences only occur within character
+        and string literals } {
+    compile [saveas T3107i13.java "class T3107i13 {} \\\\"]
+} FAIL
+
+tcltest::test 3.10.7-invalid-14 { escape sequences only occur within character
+        and string literals } {
+    compile [saveas T3107i14.java "class T3107i14 {} \\"]
+} FAIL
+
+tcltest::test 3.10.7-invalid-15 { \LineTerminator is not a valid sequence } {
+    empty_class T3107i15 "class T3107i15 { String s = \"\\\n\";}"
+} FAIL
+
+tcltest::test 3.10.7-invalid-16 { \LineTerminator is not a valid sequence } {
+    empty_class T3107i16 "class T3107i16 { String s = \"\\\r\";}"
+} FAIL
+
 # valid escape sequences
 
 tcltest::test 3.10.7-valid-1 { \b (Backspace, Ctrl-H, \u0008) is an escape sequence } {
@@ -143,3 +178,16 @@ class T3107v16 {
     }]
 } PASS
 
+tcltest::test 3.10.7-valid-17 { an octal sequence with the first
+        digit < 4 has at most three digits } {
+    compile [saveas T3107v17.java {
+class T3107v17 {
+    void foo(int i) {
+	switch (i) {
+	    case 0:
+	    case (("\0000" == '\u0000' + "0") ? 1 : 0):
+	}
+    }
+}
+    }]
+} PASS

@@ -26,3 +26,6 @@ set tcltest::testConstraints(javac) 1
 
 # Uncomment this to test the assert statement
 #set tcltest::testConstraints(assert) 1
+
+# Comment this to skip the time-consuming JVM limitation tests
+set tcltest::testConstraints(jvm) 1

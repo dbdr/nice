@@ -121,6 +121,9 @@ echo "System: $system"  >> $machine.id
 if [ "$GCJ" ]; then
   "$GCJ" --version | head -1 >> $machine.id
 fi
+if [ "$KAFFE_HOME" ]; then
+  echo kaffe CVS `"$KAFFE_HOME"/bin/kaffe -fullversion 2>&1|tail -1|cut -c 22-31` >> $machine.id
+fi
 
 # Send the results to the Test Central
 results_dir=/home/groups/n/ni/nice/test-central/results

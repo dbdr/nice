@@ -17,3 +17,28 @@
   assert short(l) == -32768;
   l = 128;
   assert byte(l) == -128;
+
+/// PASS
+  int i = 'A';
+  char c = char(i);
+  assert c == 'A';
+  assert char(i) == 'A';
+
+/// PASS
+  // A narrowing of int to short loses high bits:
+  assert short(0x12345678) == 0x5678;
+
+  // A int value not fitting in byte changes sign and magnitude:
+  assert byte(255) == -1;
+
+  // A float value too big to fit gives largest int value:
+  assert int(1e20f) == 2147483647;
+
+  // A NaN converted to int yields zero:
+  assert int(Float.NaN) == 0;
+	
+  // A double value too large for float yields infinity:
+  assert float(-1e100) == Float.NEGATIVE_INFINITY;
+
+  // A double value too small for float underflows to zero:
+  assert float(1e-50) == 0;

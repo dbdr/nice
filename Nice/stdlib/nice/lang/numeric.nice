@@ -24,10 +24,14 @@ package nice.lang;
 
 int MAX_INT() = native java.lang.Integer.MAX_VALUE;
 
-// Conversions
+// Narrowing primitive conversions
+float float(double d) = inline nice.lang.inline.Nop();
+
 int int(double d) = inline nice.lang.inline.Nop();
 short short(double d) = inline nice.lang.inline.Nop();
 byte byte(double d) = inline nice.lang.inline.Nop();
+char char(double d) = inline nice.lang.inline.Nop();
+
 
 // Comparison
 boolean `<`(double, double) = inline nice.lang.inline.CompOp("dLt");

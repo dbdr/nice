@@ -7,6 +7,7 @@ nice (0.7.6) unstable; urgency=low
     In particular, for List<int> there was an ambiguity between 
       remove(int) and remove(T) (since T=int).
     Therefore we renamed remove(int) into removeAt(int).
+  * Added float(_) and char(_) primitives for value conversion.
   * Parser support for public-read and private-write fields (experimental).
   * Bugfixes (using anonymous functions while overriding native methods).
 

@@ -294,7 +294,6 @@ TOKEN: /* String literals */
  * Identifiers
  ***********************************************************************/
 // identifiers are the same as in Java, except that:
-// 1. the character $ is not allowed
 // 2. the character ' is allowed
 // XXX: conform to Java
 TOKEN:
@@ -303,6 +302,7 @@ TOKEN:
 | < #IDENT_PART:       (<IDENT_START> | <IDENT_DIGIT> | "'") >
 | < #IDENT_START:
      [
+      "\u0024",
       "\u0041"-"\u005a",
       "\u005f", 
       "\u0061"-"\u007a",

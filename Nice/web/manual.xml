@@ -507,7 +507,7 @@ int getArea(Component comp)
       also</link>. Many programs are written to use certain numeric
       constants with special meanings. For instance, one might
       write a method for a vending machine:
-      <programlisting language="nice">
+      <programlisting lang="nice">
 	let int NICKEL = 5;
 	let int DIME = 10;
 	let int QUARTER = 25;
@@ -528,17 +528,17 @@ int getArea(Component comp)
       ensure that the value is acceptable, and throw an exception if
       it is not. However, there is an easier solution in Nice: the enum.
 	<programlisting>
-	  enum <type><replaceable>class-name</replaceable></type><optional>(<replaceable><type>parameter-type</type></replaceable><replaceable>parameter-name</replaceable>, ...)</optional>
+	  enum <type><replaceable>class-name</replaceable></type><optional>(<type><replaceable>parameter-type</replaceable></type> <replaceable>parameter-name</replaceable>, ...)</optional>
 	  { 
 	    <replaceable>option,...</replaceable>
 	  }
 	</programlisting>
       Enums can be simple symbols like
-      <programlisting language="nice">
+      <programlisting lang="nice">
       enum Color { Red, Orange, Yellow, Blue, Indigo, Violet }
       </programlisting> 
       or they can contain integer (or other) values:
-      <programlisting language="nice">
+      <programlisting lang="nice">
         enum VendingCoin(int value) 
 	{
 	  nickel(5), dime(10), quarter(25);
@@ -1177,7 +1177,7 @@ Window createMyWindow()
 	    of the arguments is a method of type <literal><type>void-&gt; 
 	    <replaceable>T</replaceable></type></literal>:
 	  </para>
-	  <programlisting language="nice">
+	  <programlisting lang="nice">
 	    <replaceable>method-name</replaceable>(<replaceable>argument</replaceable>, ...)
 	    {
 	      <replaceable>argument-body</replaceable>

@@ -28,7 +28,7 @@ bossa.util.UserError assignmentError(bossa.util.Located responsible,
 {
   StringBuffer msg = new StringBuffer(100);
   msg.append("Incorrect type in assignment to ").append(target);
-  msg.append("\nFound   : ").append(value.getType().toString());
+  msg.append("\nFound   : ").append(notNull(value.getType()).toString());
   msg.append("\nExpected: ").append(targetType);
   return new bossa.util.UserError(responsible, msg.toString());
 }

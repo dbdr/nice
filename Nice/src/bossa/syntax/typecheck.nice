@@ -41,9 +41,10 @@ typecheck(e@AssignExp)
     e.value = checkAssignment(notNull(to.getType()), notNull(e.value));
   }
   catch(TypingEx t){
-    if (notNullError(t, e, e.value.toString()))
+    if (notNullError(t, e, notNull(e.value).toString()))
       throw assignmentError(e, to.toString(), 
-			    to.getType().toString(), notNull(e.value));
+			    notNull(to.getType()).toString(), 
+			    notNull(e.value));
   }
 }
 
@@ -316,19 +317,20 @@ typecheck(b@Block)
 
 typecheck(decl@Block.LocalVariable)
 {
-  if (decl.value == null)
+  Expression value = decl.value;
+  if (value == null)
     return;
 
   MonoSymbol target = decl.getLeft();
 
   try{
-    decl.value = checkAssignment(notNull(target.getType()), notNull(decl.value));
+    decl.value = checkAssignment(notNull(target.getType()), value);
   }
   catch(TypingEx t){
-    if (notNullError(t, target, decl.value.toString()))
-      throw assignmentError(target, target.name.toString(), 
-			    target.getMonotype().toString(), 
-			    notNull(decl.value));
+    if (notNullError(t, target, value.toString()))
+      throw assignmentError(target, notNull(target.name).toString(), 
+			    String.valueOf(target.getMonotype), 
+			    value);
   }
 }
 
@@ -341,8 +343,8 @@ typecheck(decl@Block.LocalFunction)
   catch(TypingEx t){
     if (notNullError(t, decl, "returned value"))
       wrongReturnType(decl, 
-		      decl.inferredReturnType().toString(), 
-		      decl.declaredReturnType().toString(), t);
+		      String.valueOf(decl.inferredReturnType), 
+		      String.valueOf(decl.declaredReturnType), t);
   }
 }
 
@@ -385,8 +387,8 @@ typecheck(r@ReturnStmt)
     Typing.leq(r.returnType(), declaredRetType);
   }
   catch(TypingEx e){
-    if (notNullError(e, r, r.value.toString()))
-      wrongReturnType(r, r.returnType().toString(), 
+    if (notNullError(e, r, String.valueOf(r.value)))
+      wrongReturnType(r, notNull(r.returnType()).toString(), 
 		      declaredRetType.toString(), e);
   }
 }

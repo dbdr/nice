@@ -152,13 +152,13 @@ class Info
   void addVar(PolySymbol symbol)
   {
     symbol.type = notNull(symbol.syntacticType).resolve(this.typeMap);
-    this.vars[symbol.name.toString()] = symbol;
+    this.vars[notNull(symbol.name).toString()] = symbol;
   }
 
   void addVar(MonoSymbol symbol)
   {
     symbol.type = notNull(symbol.syntacticType).resolve(this.typeMap);
-    this.vars[symbol.name.toString()] = symbol;
+    this.vars[notNull(symbol.name).toString()] = symbol;
   }
 
   void addVars(Sequence<?MonoSymbol> symbols) = 
@@ -235,8 +235,8 @@ analyse(e@CallExp, info)
 	{
 	  ?LocatedString funName = identString(e.function);
 	  if (funName == null)
-	    bossa.util.Internal.error(e.function, 
-				      "This is not a valid class member");
+	    throw notNull(bossa.util.Internal.error
+			  (e.function, "This is not a valid class member"));
 	  
 	  java.util.List possibilities = JavaClasses.findJavaMethods
 	    (e.declaringClass, funName.toString(), args.size());
@@ -302,7 +302,7 @@ analyse(e@IdentExp, info)
 {
   if (!e.infix) // infix symbols can only come from the global scope
     {
-      ?VarSymbol s = info.lookup(e.ident.toString());
+      ?VarSymbol s = info.lookup(notNull(e.ident).toString());
       if (s != null)
 	if (!e.alwaysOverloadedSymbol)
 	  return new SymbolExp(s, e.location());

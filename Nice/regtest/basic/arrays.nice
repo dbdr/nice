@@ -9,7 +9,7 @@ p(a)
 {
   print("size = " + a.length + ", elements = ");
   for(int i = 0; i<a.length; i++)
-    print(""+ a[i] + " ");
+    print(""+ String.valueOf(a[i]) + " ");
   println("");
 }
 

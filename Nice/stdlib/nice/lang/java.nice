@@ -38,6 +38,8 @@ StringBuffer append(StringBuffer, ?String) =
   native StringBuffer StringBuffer.append(String);
 StringBuffer append(StringBuffer, char) = 
   native StringBuffer StringBuffer.append(char);
+StringBuffer append(StringBuffer, char[] str, int offset, int len) =
+  native StringBuffer StringBuffer.append(char[], int, int);
 char[] toCharArray(String) = native char[] String.toCharArray();
 
 //               PACKAGE: java.text

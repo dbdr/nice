@@ -20,8 +20,7 @@ package nice.lang;
  * Strings
  ****************************************************************/
 
-<Any R> String `+`(String,R);
-`+`(s@String,o) = s.concat(toString(o));
+<Any R> String `+`(String s, R o) = s.concat(String.valueOf(o));
 
 String replace(String source, char c, String with)
 {

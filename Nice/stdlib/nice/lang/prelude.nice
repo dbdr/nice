@@ -96,7 +96,8 @@ boolean `!=`(char, char) = native boolean Native.neq(char,char);
 <Any T> boolean eq(T,T);
 eq(o1, o2) = equals(o1, o2);
 
-<Any T> String toString(T) = native String String.valueOf(Object);
+<Any T> String toString(!T) = native String Object.toString();
+<Any T> String valueOf(T) = native String String.valueOf(Object);
 <Any T> Class getClass(T) = native Class Object.getClass();
 
 java.util.Properties<String,String> getProperties() = 

@@ -24,8 +24,11 @@ identString(e) = null;
 identString(e@IdentExp) = e.ident;
 identString(e@SymbolExp) = e.getName();
 
-boolean isCallTo(CallExp e, String name) = 
-  identString(e.function).toString().equals(name);
+boolean isCallTo(CallExp e, String name) 
+{
+  LocatedString f = identString(e.function);
+  return f != null && f.toString().equals(name);
+}
 
 boolean isNullExp(Expression);
 isNullExp(e@Expression) = false;
@@ -42,6 +45,14 @@ localVariable(e@SymbolExp)
 
 mlsub.typing.Monotype makeSure(mlsub.typing.Monotype m) = 
   bossa.syntax.Monotype.sure(nice.tools.code.Types.rawType(m));
+
+/****************************************************************
+ * Temporary: this should be solved when AST classes are written 
+ * in Nice, with precise types for the fields.
+ ****************************************************************/
+
+//LocatedString name(MonoSymbol) = native MonoSymbol.name;
+//LocatedString name(PolySymbol) = native PolySymbol.name;
 
 // Local Variables:
 // nice-xprogram: "nicec -d \"$HOME/Nice/classes\" --sourcepath=\"$HOME/Nice/src\" --classpath=\"$HOME/Nice/classes\""

@@ -39,7 +39,7 @@ public class OverloadedSymbolExp extends Expression
   
   private Expression uniqueExpression(VarSymbol sym, mlsub.typing.Polytype t)
   {
-    SymbolExp res = cast(createSymbolExp(sym, this.location()));
+    SymbolExp res = createSymbolExp(sym, this.location());
     res.type = t;
     return res;
   }
@@ -463,7 +463,7 @@ List<VarSymbol> removeNonMinimal(List<VarSymbol> symbols)
     return removed;
     
   int len = symbols.size();
-  VarSymbol[] syms = new VarSymbol[len].fillWith(symbols);
+  List<VarSymbol> syms = new ArrayList(symbols);
   boolean[] remove = new boolean[len];
     
   for(int s1 = 0; s1<len; s1++) {
@@ -530,7 +530,7 @@ private void removeNonMinimal(List<VarSymbol> symbols, Arguments arguments)
     return;
   
   int len = symbols.size();
-  VarSymbol[] syms = new VarSymbol[len].fillWith(symbols);
+  List<VarSymbol> syms = new ArrayList(symbols);
   boolean[] remove = new boolean[len];
   
   for(int s1 = 0; s1<len; s1++) {
@@ -616,10 +616,10 @@ private void removeOverlappingJavaMethods(List<VarSymbol> symbols)
     return;
   
   int len = symbols.size();
-  VarSymbol[] syms = cast(symbols.toArray(new VarSymbol[len]));
+  List<VarSymbol> syms = new ArrayList(symbols);
 
-  for (int i = 0; i < syms.length; i++)
-    for (int j = i+1; j < syms.length; j++)
+  for (int i = 0; i < len; i++)
+    for (int j = i+1; j < len; j++)
       if (overlappingJavaMethods(syms[i].getMethodDeclaration(),
                                  syms[j].getMethodDeclaration()))
         {

@@ -776,7 +776,7 @@ bytecodeRepresentation(TypePattern p)
  return (p.exactlyAt ? "#" : "@") + notNull(p.tc).toString().replace('$','.');
 }
 bytecodeRepresentation(BoolPattern p) = p.atValue.isTrue() ? "@true" : "@false";
-bytecodeRepresentation(StringPattern p) = "@\"" + p.atValue.escapedValue + "\"";
+bytecodeRepresentation(StringPattern p) = "@" + p.atValue.representation;
 bytecodeRepresentation(CharPattern p) = "@\'" + p.atValue.value + "\'";
 bytecodeRepresentation(IntPattern p) = "@" + (p.atValue.longValue() >= 0 ? "+" : "") + p.atValue;
 bytecodeRepresentation(IntComparePattern p) = "@" + p.kind.prefix + p.atValue;

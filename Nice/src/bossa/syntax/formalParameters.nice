@@ -20,20 +20,18 @@ import bossa.util.*;
  */
 public class FormalParameters extends Node
 {
-  private Parameter[] parameters;
-  int size;
+  private List<Parameter> parameters;
+
+  int size() = parameters.size();
 
   void addThis(Monotype type)
   {
-    if (parameters[0] != null)
-      Internal.error("No room for \"this\"");
-    
-    parameters[0] = new NamedParameter(type: type, name: thisName);
+    parameters.add(0, new NamedParameter(type: type, name: thisName));
   }
 
   boolean hasThis()
   {
-    return parameters.length > 0 && parameters[0].match("this");
+    return parameters.size() > 0 && parameters[0].match("this");
   }
 
   /**
@@ -52,65 +50,48 @@ public class FormalParameters extends Node
   }
 
   boolean hasDefaultValue()
-  {
-    for (int i = size; --i>=0; )
-      if (parameters[i].value() != null)
-        return true;
-
-    return false;
+  { //why different condition than in previous method???
+    return parameters.any(Parameter param => param.value != null);
   }
 
   boolean containsAlike()
   {
-    for (int i = size; --i>=0; )
-      if (parameters[i] != null && parameters[i].type.containsAlike())
-	return true;
-
-    return false;
+    return parameters.any(Parameter param => param.type.containsAlike());
   }
   
   void substitute(Map<java.lang.String, Monotype> map)
   {
-    for (int i = size; --i>=0; )
-      if (parameters[i] != null) // it is the case for "this" placeholder
-	parameters[i].type = parameters[i].type.substitute(map);
+    for (param : parameters)
+      param.substitute(map);
   }
   
   Monotype[?] types()
   {
-    if (parameters.length == 0)
+    if (parameters.isEmpty())
       return null;
-    
-    Monotype[] res = cast(new Monotype[size]);
-    for (int i = 0; i < size; i++)
-      res[i] = parameters[i].type;
-
-    return res;
+   
+    return parameters.mapToArray(Parameter param => param.type);
   }
 
   public MonoSymbol[] getMonoSymbols()
   {
-    MonoSymbol[] res = cast(new MonoSymbol[size]);
-    for (int i = 0; i < size; i++)
-      res[i] = parameters[i].getSymbol();
- 
-    return res;
+    return parameters.mapToArray(Parameter param => param.getSymbol());
   }
 
   void typecheck(mlsub.typing.Monotype[] domain)
   {
-    for (int i = 0; i<size; i++)
+    for (int i = 0; i<this.size(); i++)
       parameters[i].typecheck(domain[i]);
   }
 
   resolve()
   {
-    for (int i = 0; i<size; i++)
-      parameters[i].resolve(scope, typeScope);
+    for (param : parameters)
+      param.resolve(scope, typeScope);
 
-    for (int i = 0; i<size; i++)
-      if (parameters[i].symbol != null)
-	notNull(parameters[i].symbol).state = ACCESSIBLE;
+    for (param : parameters)
+      if (param.symbol != null)
+	notNull(param.symbol).state = ACCESSIBLE;
   }
 
   /** This is a hack to allow bossa.syntax.analyse to make the
@@ -118,8 +99,8 @@ public class FormalParameters extends Node
   */
   void resolveCalledFromAnalyse(Info info)
   {
-    for (int i = 0; i<size; i++)
-      parameters[i].resolve(info);
+    for (param : parameters)
+      param.resolve(info);
   }
 
   /**
@@ -132,7 +113,7 @@ public class FormalParameters extends Node
   // FIXME change VarSymbol to FunSymbol once converted to nice
   boolean match(Arguments args, VarSymbol symbol)
   {
-    int[] map = new int[size];
+    int[] map = new int[this.size()];
 
     // first pass, fill holes with names given at the call site
     for (int i = 0; i< args.size(); i++)
@@ -154,8 +135,8 @@ public class FormalParameters extends Node
 
     // check that each parameter is either supplied or optional
     // stores the invocation expressions
-    ?Expression[] exps = new Expression[size];
-    for (int i = 0; i < size; i++)
+    ?Expression[] exps = new Expression[this.size()];
+    for (int i = 0; i < this.size(); i++)
       if (map[i] == 0)
 	{
 	  exps[i] = parameters[i].value();
@@ -198,48 +179,30 @@ public class FormalParameters extends Node
   
   public boolean hasMatchFor(String s)
   {
-    for (int i = 0; i<size; i++)
-      if (parameters[i].match(s))
-	return true;
-
-    return false;
+    return parameters.any(Parameter param => param.match(s));
   }  
 
   toString() = Util.map("", ", ", "", parameters);
 
-  public List<Parameter> asList()
-  {
-    if (parameters.length != 0)
-      return Arrays.asList(parameters);
-   
-    return new ArrayList();
-  }
+  public List<Parameter> asList() = new ArrayList(parameters);
 
   public List<Parameter> getRequiredParameters()
   {
-    LinkedList<Parameter> res = new LinkedList();
-    for(int i = 0; i < size; i++) 
-      {
-        Parameter param = parameters[i];
-        if (!(param instanceof OptionalParameter))
-          {
-            res.add(parameters[i]);
-          }
-      }
-    return res;
+    return parameters.filter(Parameter param => 
+	!(param instanceof OptionalParameter));
   }
 
   public java.util.Stack<gnu.bytecode.Variable>[?] getParameterCopies()
   {
     java.util.Stack<gnu.bytecode.Variable>[?] res = null;
 
-    for(int i = 0; i < size; i++) 
+    for(int i = 0; i < this.size(); i++) 
       {
         Parameter param = parameters[i];
         if (notNull(param.symbol).copies != null)
           {
             if (res == null)
-              res = cast(new java.util.Stack[parameters.length]);
+              res = cast(new java.util.Stack[this.size()]);
             notNull(res)[i] = notNull(notNull(param.symbol).copies);
           }
       }
@@ -249,14 +212,12 @@ public class FormalParameters extends Node
 
   List<Parameter> getParameters(TypeScope scope)
   {
-    ArrayList<Parameter> res = new ArrayList(size);
-    for (int i = 0; i < size; i++)
+    return parameters.map(Parameter param =>
       {
-        Parameter p = parameters[i].cloneParam();
+        let p = param.cloneParam();
         p.type = new MonotypeWrapper(type: p.type.resolve(scope));
-        res.add(p);
-      }
-    return res;
+        return p;
+      });
   }
 
   gnu.bytecode.Attribute asBytecodeAttribute()
@@ -265,13 +226,9 @@ public class FormalParameters extends Node
   }
 }
 
-public FormalParameters createFormalParameters(?List<Parameter> parameters)
+public FormalParameters createFormalParameters(List<Parameter> parameters)
 {
-  if (parameters == null)
-    return new FormalParameters(Node.none, parameters: [], size: 0);
-
-  return new FormalParameters(Node.none, parameters: parameters.toArray(),
-	size: parameters.size());
+    return new FormalParameters(Node.none, parameters: parameters);
 }
 
 let LocatedString thisName = new LocatedString("this", Location.nowhere());
@@ -315,6 +272,11 @@ public class Parameter
   ?Expression value() = null;
 
   boolean isOverriden() = false;
+
+  void substitute(Map<java.lang.String, Monotype> map)
+  {
+    type = type.substitute(map);
+  }
 
   void resolve(?VarScope scope, ?TypeScope typeScope)
   {

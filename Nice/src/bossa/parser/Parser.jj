@@ -899,18 +899,17 @@ Parameter formalParameter(List statements):
 )  
 }
 
-FormalParameters formalParameters(boolean leaveRoomForThis, List statements):
+FormalParameters formalParameters(List statements):
 {
   List params = new LinkedList();
   Parameter p;
 }
 {
-  { if (leaveRoomForThis) params.add(null); }
   [
     p = formalParameter(statements) { params.add(p); }
     ( "," p = formalParameter(statements) { params.add(p); } )*
   ]
-  { return bossa.syntax.dispatch.createFormalParameters(params.isEmpty() ? null : params ); }
+  { return bossa.syntax.dispatch.createFormalParameters(params); }
 }
 
 Definition internalMethodOrFunction(MethodContainer c, boolean isOverride):
@@ -927,7 +926,7 @@ Definition internalMethodOrFunction(MethodContainer c, boolean isOverride):
   cst=constraint()
   returnType=monotype()
   name=identOrBackquoted()
-  "(" parameters = formalParameters(true, statements) ")"
+  "(" parameters = formalParameters(statements) ")"
   contract = contract()
   ( ";" | body = code() {statements.add(body);} )
   
@@ -1113,7 +1112,7 @@ CustomConstructor customConstructor(Constraint cst):
   Statement stmt;
 }
 { 
-  "new" name=ident() "(" params=formalParameters(false, statements) ")"
+  "new" name=ident() "(" params=formalParameters(statements) ")"
   ( 
     "=" exp=Expression() ";" { statements.add(bossa.syntax.dispatch.createExpressionStmt(exp)); }
   | 
@@ -1402,7 +1401,7 @@ Definition methodDeclaration(Constraint cst, boolean isOverride):
 {
     returnType=monotype()
     name=identOrBackquoted()
-    "(" parameters = formalParameters(false, statements) ")"
+    "(" parameters = formalParameters(statements) ")"
     
     ( LOOKAHEAD(2)
       "=" 
@@ -2412,8 +2411,10 @@ Statement LabeledStatement() :
     // however we want the label to target the loop so that continue works
     if (forLoop && !(res instanceof LoopStmt))
       return new LabeledStmt(label, res, (LoopStmt) ((Block) res).last());
+    else if (res instanceof LoopStmt)
+      return new LabeledStmt(label, res, (LoopStmt) res); 
     else
-      return new LabeledStmt(label, res); 
+      return new LabeledStmt(label, res, null); 
   }
 }
 
@@ -2495,7 +2496,7 @@ Statement LocalFunctionDeclaration() :
   [ "let" {constant = true;} | "var" ]
   type = monotype()
   id=ident()
-  "(" parameters=formalParameters(false, statements) ")" 
+  "(" parameters=formalParameters(statements) ")" 
   body=code() { statements.add(body); } 
   { return bossa.syntax.dispatch.createLocalFunction(id, type, parameters, body!=null?bossa.syntax.dispatch.createBlock(statements):null); }
 }

@@ -85,7 +85,7 @@ public class SymbolExp extends Expression
   toString() = symbol.getName().toQuotedString();
 }
 
-Expression createSymbolExp(VarSymbol symbol, Location loc)
+SymbolExp createSymbolExp(VarSymbol symbol, Location loc)
 {
   let res = new SymbolExp(symbol: symbol);
   res.setLocation(loc);

@@ -344,8 +344,6 @@ let LocatedString voidName = new LocatedString("void");
 */
 public class StringConstantExp extends ConstantExp
 {
-  final String escapedValue;
-
   compile()
   {
     return new gnu.expr.QuoteExp(value, nice.tools.code.Types.javaType(type));
@@ -362,7 +360,7 @@ public StringConstantExp createStringConstantExp(String value, boolean multiline
   if (multiline)
     value = escapeEOL(value);
 
-  let res = new StringConstantExp(value: unescapeLiteral(value), escapedValue: value, representation: "\""+value+"\"" , className: stringClassName);
+  let res = new StringConstantExp(value: unescapeLiteral(value), representation: "\""+value+"\"" , className: stringClassName);
   return res;
 }
 

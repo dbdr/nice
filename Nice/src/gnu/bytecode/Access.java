@@ -65,8 +65,12 @@ public class Access {
     if (m.getName().equals("clone") && receiver.isArray())
       return true;
 
+    // DEFAULT (PACKAGE) OR PROTECTED
+    if (c.getPackageName().equals(target.getPackageName()))
+      return true;
+
     // PROTECTED
-    return c.getPackageName().equals(target.getPackageName())
-      || (c.isSubclass(target) && receiver.isSubtype(c));
+    return (mod & PROTECTED) != 0 &&
+      c.isSubclass(target) && receiver.isSubtype(c);
   }
 }

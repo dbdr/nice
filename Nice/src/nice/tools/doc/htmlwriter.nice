@@ -330,7 +330,7 @@ class HTMLWriter {
         writer.write("<ul>\n");
         for(MethodDeclaration m : methods) {
             writer.write("<li><a href='" escapeFilename(getMethodFilename(m)) ".html'>" htmlEncode(m.getName()) "</a>" +
-                   ": " htmlEncode(m.getType().toString()) "</li>\n");
+                   ": " htmlEncode(String.valueOf(m.getType())) "</li>\n");
         }
         writer.write("</ul>\n");
       }
@@ -428,7 +428,7 @@ String getFooter() {
  * This method returns a file name based upon the method name and its arguments.
  */
 String getMethodFilename(MethodDeclaration md) {
-     return md.getName().toString() + md.getType().toString().hashCode();
+     return md.getName().toString() + String.valueOf(md.getType()).hashCode();
 }
 
 
@@ -502,7 +502,7 @@ String sourceCodeFiles(File file, List<Definition> definitions) {
     buffer.append("    <ul>\n");
     for(MethodDeclaration m : methods) {
       buffer.append("      <li><a href='" escapeFilename(getMethodFilename(m)) ".html'>" htmlEncode(m.getName()) "</a>" +
-               ": " htmlEncode(m.getType().toString()) "</li>\n");
+               ": " htmlEncode(String.valueOf(m.getType())) "</li>\n");
     }
     buffer.append("    </ul>\n");
     buffer.append("    </span>\n");

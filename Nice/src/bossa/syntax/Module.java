@@ -13,6 +13,8 @@
 package bossa.syntax;
 
 import java.util.ListIterator;
+import gnu.bytecode.ClassType;
+import gnu.bytecode.Method;
 
 /**
    A Nice module.
@@ -21,9 +23,24 @@ import java.util.ListIterator;
    @author Daniel Bonniot
  */
 
-public abstract class Module implements mlsub.compilation.Module
+public interface Module extends mlsub.compilation.Module
 {
-  public abstract ListIterator listImplicitPackages();
+  abstract ListIterator listImplicitPackages();
 
-  public abstract String mangleName(String name);
+  abstract String mangleName(String name);
+
+  boolean isRunnable();
+  void isRunnable(boolean isRunnable);
+
+  abstract boolean generatingBytecode();
+  abstract ClassType getOutputBytecode();
+  abstract ClassType getReadBytecode();
+  abstract Method addDispatchMethod(MethodDeclaration def);
+  abstract Method getMainAlternative();
+  void setMainAlternative(Method main);
+  abstract void compileMethod(gnu.expr.LambdaExp meth);
+  abstract void addClassInitStatement(gnu.expr.Expression exp);
+  abstract ClassType createClass(String name);
+  abstract void addClass(ClassType c);
+  gnu.expr.ScopeExp getPackageScopeExp();
 }

@@ -153,8 +153,8 @@ public class TypeScope implements TypeMap
       (outer != null ? ";;\n" + outer : "");
   }
 
-  public bossa.modules.Package module; //non-null only in the global type scope
-  
+  public Module module; //non-null only in the global type scope
+
   private TypeScope outer;
   private Map map;
 }

@@ -390,16 +390,6 @@ int min(List<int> list) requires !list.isEmpty()
  * toArray
  ****************************************************************/
 
-<T, U | T <: U> U[] toArray(Collection<T> coll)
-{
-  U[] res = cast(new U[coll.size()]);
-  int i = 0;
-  for (T elem : coll)
-    res[i++] = elem;
-
-  return res;
-}
-
 <T, U> U[] mapToArray(List<T> list, T->U func)
 {
   U[] res = cast(new U[list.size()]);

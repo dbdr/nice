@@ -170,6 +170,8 @@ PrintStream stderr () = native System.err;
 <T> void setSize(Vector<T>,int) = native void Vector.setSize(int);
 <T> void trimToSize(Vector<T>) = native void Vector.trimToSize();
 <T> void removeAllElements(Vector<T>) = native void Vector.removeAllElements();
+<T> boolean hasMoreElements(Enumeration<T>) = native boolean Enumeration.hasMoreElements();
+<T> T nextElement(Enumeration<T>) = native Object Enumeration.nextElement();
 
 <T> AbstractCollection<T> AbstractCollection() = native new AbstractCollection();
 <T> AbstractList<T> AbstractList() = native new AbstractList();
@@ -213,6 +215,7 @@ PrintStream stderr () = native System.err;
 
 interface Collection<T> = native java.util.Collection;
 interface Comparator<T> = native java.util.Comparator;
+interface Enumeration<T> = native java.util.Enumeration;
 interface List<T> extends Collection<T> = native java.util.List;
 interface Set<T> extends Collection<T> = native java.util.Set;
 interface SortedSet<T> extends Set<T> = native java.util.SortedSet;

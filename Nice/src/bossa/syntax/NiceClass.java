@@ -472,7 +472,8 @@ public class NiceClass extends ClassDefinition.ClassImplementation
 
   public void setInitializers(List inits)
   {
-    initializers = (Statement[]) inits.toArray(new Statement[inits.size()]);
+    if (inits != null)
+      initializers = (Statement[]) inits.toArray(new Statement[inits.size()]);
   }
 
   private int nbInitializers() { return initializers.length; }

@@ -72,6 +72,10 @@ public class Parser
     return Location.make(start.beginLine, start.beginColumn, end.endLine, end.endColumn);
   }
 
+  private static boolean isDocStringToken(Token t)
+  {
+    return t.specialToken != null && t.specialToken.kind == FORMAL_COMMENT;
+  }
 
 }
 PARSER_END(Parser)
@@ -850,23 +854,15 @@ Expression ParameterTuplePart(List statements, List monotypes):
 
 FormalParameters.Parameter formalParameter(List statements):
 {
-  Monotype t = null;
+  Monotype t;
   LocatedString id = null;
   Expression val = null;
 }
 {
 (
   LOOKAHEAD(monotype())
-  t = monotype() 
-  [ 
-    id = ident() 
-    [ 
-      "=" val = Expression() 
-      { return new FormalParameters.OptionalParameter(t, id, val); }
-    ]
-    { return new FormalParameters.NamedParameter(t, id); }
-  ]
-  { return new FormalParameters.Parameter(t); }
+  t=monotype() [ id=ident() [ "=" val=Expression() ]]
+  { return FormalParameters.createParameter(t, id ,val); }
 |
   { Token first,last;
   List parts = new LinkedList();
@@ -887,10 +883,8 @@ FormalParameters.Parameter formalParameter(List statements):
     statements.add(bossa.syntax.dispatch.createExpressionStmt(exp));
     t = new TupleType(types, makeLocation(first, last));
     t.nullness = Monotype.absent;
-    if (val != null)
-      return new FormalParameters.OptionalParameter(t, ident, val);
 
-    return new FormalParameters.NamedParameter(t, ident);
+    return FormalParameters.createParameter(t, ident ,val);
   }
 )  
 }
@@ -982,7 +976,7 @@ List getField(NiceClass c, List fields, List overrides, boolean storeDocString):
 }
 {
  {
-   if (storeDocString && t.specialToken != null && t.specialToken.kind == FORMAL_COMMENT)
+   if (storeDocString && isDocStringToken(t))
      docString = t.specialToken.image;
  }
  (
@@ -1003,11 +997,7 @@ List getField(NiceClass c, List fields, List overrides, boolean storeDocString):
   ";" 
   { 
     if (isOverride)
-      {
-        if (overrides == null)
-          overrides = new LinkedList();
-        overrides.add(c.makeOverride(field, value));
-      }
+      overrides.add(c.makeOverride(field, value));
     else
       fields.add(c.makeField(field, value, isFinal, isTransient, isVolatile, docString));
 
@@ -1062,17 +1052,13 @@ ClassDefinition classDefinition(Constraint cst, List definitions, boolean storeD
    "{"
    { NiceClass impl = new NiceClass(res); }
    // internal fields and methods
-   { List fields = new LinkedList(), overrides = null,
-          methods = null, initializers = null; }
+   { List fields = new LinkedList(), overrides = new LinkedList(),
+          methods = new ArrayList(5), initializers = new LinkedList(); }
    (
       // Initializer
       { Statement init; }
       init = Block()
-      { 
-        if (initializers == null)
-          initializers = new LinkedList();
-        initializers.add(init);
-      }
+      { initializers.add(init); }
     |
       LOOKAHEAD( fieldLookahead() )
       overrides = getField(impl, fields, overrides, storeDocString)
@@ -1085,13 +1071,9 @@ ClassDefinition classDefinition(Constraint cst, List definitions, boolean storeD
 	{ definitions.add(m); }
       |
         m = internalMethodOrFunction(res, isOverride)
-        { 
-          if (methods == null)
-            methods = new ArrayList(5);
-          methods.add(m);
-        }
+        { methods.add(m); }
       ) 
-      { if (storeDocString && t.specialToken != null && t.specialToken.kind == FORMAL_COMMENT)
+      { if (storeDocString && isDocStringToken(t))
           m.docString = t.specialToken.image;
       }
    )* 
@@ -1099,13 +1081,9 @@ ClassDefinition classDefinition(Constraint cst, List definitions, boolean storeD
    {
      impl.setFields(fields);
      impl.setOverrides(overrides);
-     if (initializers != null)
-       impl.setInitializers(initializers);
-
+     impl.setInitializers(initializers);
      res.setImplementation(impl);
-
-     if (methods != null)
-       definitions.addAll(methods);
+     definitions.addAll(methods);
    }
   | 
    "=" "native"
@@ -1558,19 +1536,11 @@ void contractElements(Contract contract, boolean precond) :
 }
 
 void contractElement(Contract contract, boolean precond) :
-{
-  Expression condition, name=null;
-}
+{ Expression condition, name=null; }
 {
   condition = SideEffectFreeExpression() 
   [ ":" name = SideEffectFreeExpression() ]
-  { if (precond)
-      if (name == null)	contract.addRequire(condition);
-      else contract.addRequire(condition, name);
-    else
-      if (name == null)	contract.addEnsure(condition);
-      else contract.addEnsure(condition, name);
-  }
+  { contract.addElement(condition, name, precond); }
 }
 
 
@@ -1611,7 +1581,7 @@ void readDefinitions(List definitions,boolean storeDocString):
 { { t = getToken(1); }
   ( d = definition(definitions, storeDocString)
     { 
-      if (storeDocString && t.specialToken != null && t.specialToken.kind == FORMAL_COMMENT)
+      if (storeDocString && isDocStringToken(t))
         d.docString = t.specialToken.image;
 
       definitions.add(d);
@@ -1651,8 +1621,9 @@ ConstantExp negativeIntConstantExp():
 { LocatedString representation; }
 { 
   "-" representation=integerLiteral()
-    { return ConstantExp.makeNumber(
-         new LocatedString("-"+representation.toString(), representation.location()));
+  { 
+    representation.prepend("-");
+    return ConstantExp.makeNumber(representation);
   }
 }
 
@@ -1829,9 +1800,7 @@ Statement RootShortStatement() :
 }
 
 Statement ShortStatement() :
-{
-  Statement res;
-}
+{ Statement res; }
 {
 (  res = RootShortStatement()
 |  res = ShortStatementExpression()
@@ -2104,23 +2073,25 @@ Expression RelationalExpression() :
 Expression RangeExpression() :
 { Expression e1 = null,e2 = null; Token t = null; }
 {
-   ((e1=ShiftExpression()
-	   [(t=<RANGE>) [e2=ShiftExpression()]])
-|  
-    ((t = <RANGE>) [e2 = ShiftExpression()]))
-     {
-	if (t != null)
-	{
-  		if (e1 == null)
-		  e1 = ConstantExp.makeNumber(
-			new LocatedString("0", makeLocation(t)));
-		if (e2 == null)
-		  e2 = bossa.syntax.dispatch.createNullExp(makeLocation(t));
-		e1=bossa.syntax.dispatch.createCallExp(symb(t),e1,e2); 
-	}
-     }
-      
-  { return e1; }
+  ( 
+    e1=ShiftExpression() [ t=".." [e2=ShiftExpression()]]
+  |  
+    t=".." [e2 = ShiftExpression()]
+  )
+  {
+    if (t != null)
+      {
+        if (e1 == null)
+          e1 = ConstantExp.makeNumber(new LocatedString("0", makeLocation(t)));
+
+	if (e2 == null)
+	  e2 = bossa.syntax.dispatch.createNullExp(makeLocation(t));
+
+        e1=bossa.syntax.dispatch.createCallExp(symb(t),e1,e2); 
+      }
+
+    return e1;
+  }
 }
 
 Expression ShiftExpression() :
@@ -2162,7 +2133,6 @@ Expression MultiplicativeExpression() :
     )*
   { return e1; }
 }
-
 
 Expression ExponentialExpression() :
 { Expression e1,e2; Token t; }
@@ -2252,7 +2222,6 @@ Expression PrimaryPrefix() :
   { return res; }
 }
 
-
 Expression PrimarySuffix(Expression start) :
 { 
   Expression res;
@@ -2273,13 +2242,10 @@ Expression PrimarySuffix(Expression start) :
     boolean hasBrackets = args != null;
 
     if (args == null)
-      {
-	List l = new LinkedList();
-	l.add(new Arguments.Argument(start));
-	args = new Arguments(l);
-      }
+      args = Arguments.singleArgument(start);
     else
       args.addReceiver(start);
+
     return bossa.syntax.dispatch.createCallExp(res, args, true, hasBrackets); 
   }
 |
@@ -2321,14 +2287,11 @@ Expression Literal() :
 }
 
 Expression atExpression() :
+{ Token t; }
 {
-  Token t;
-}
-{
-  (t = <AT>)
+  (t="@")
   { return bossa.syntax.dispatch.createCallExp(symb(t), Arguments.noArguments()); }
 }
-
 
 ConstantExp patternLiteral() :
 //restricted literal for use in dispatch patterns
@@ -2775,13 +2738,7 @@ Statement ForStatement() :
     )
     [ cond=Expression() ] ";" [ update=StatementExpressionList() ] ")" 
     body=Statement()
-    { 
-      loop=bossa.syntax.dispatch.createForLoop(cond,update,body);
-      List l = new LinkedList();
-      l.addAll(init);
-      l.add(loop);
-      loop = bossa.syntax.dispatch.createBlock(l);
-    }
+    { loop=bossa.syntax.dispatch.createForLoop(cond,update,body,init); }
   )
   { return loop; }
 }
@@ -2800,7 +2757,7 @@ Statement ForInStatement() :
 }
 
 List LocalDeclarationList() :
-{ Statement d; List declarations = new ArrayList(); }
+{ Statement d; List declarations = new LinkedList(); }
 {
   d=LocalDeclaration() {declarations.add(d);} 
   ( "," d=LocalDeclaration() {declarations.add(d);} )*

@@ -61,6 +61,12 @@ public class Arguments
     return new Arguments(new Argument[0]);
   }
 
+  public static Arguments singleArgument(Expression value)
+  {
+    Argument[] args = {new Argument(value)};
+    return new Arguments(args);
+  }
+
   public void addReceiver(Expression value)
   {
     if (arguments[0] != null)

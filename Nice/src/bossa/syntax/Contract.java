@@ -24,6 +24,20 @@ import java.util.*;
 
 public class Contract
 {
+  public void addElement(Expression condition, Expression name, boolean precond)
+  {
+    if (precond)
+      {
+        if (name == null) addRequire(condition);
+        else addRequire(condition, name);
+      }
+    else
+      {
+        if (name == null) addEnsure(condition);
+        else addEnsure(condition, name);
+      }
+  }
+
   public void addRequire(Expression condition)
   {
     pre.add(bossa.syntax.dispatch.createCallExp(symbol(assertName, condition), condition));

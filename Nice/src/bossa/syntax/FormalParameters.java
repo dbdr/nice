@@ -258,6 +258,18 @@ public class FormalParameters extends Node
     }
   }
 
+  public static Parameter createParameter(Monotype type, LocatedString name,
+					Expression defaultValue)
+  {
+     if (defaultValue != null)
+       return new OptionalParameter(type, name, defaultValue);
+
+     if (name != null)
+       return new NamedParameter(type, name);
+
+     return new Parameter(type);
+  }
+
   /****************************************************************
    * Main class
    ****************************************************************/

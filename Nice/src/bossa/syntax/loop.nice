@@ -109,10 +109,11 @@ public class LoopStmt extends Statement
   }
 }
 
-public LoopStmt createForLoop
-  (Expression test, Statement update, Statement body)
+public Statement createForLoop
+  (Expression test, Statement update, Statement body, List<Statement> inits)
 {
-  return new LoopStmt(whileExp:test, loopBody: body, iterationStatements: update, testFirst: true);
+  inits.add(new LoopStmt(whileExp:test, loopBody: body, iterationStatements: update, testFirst: true));
+  return createBlock(inits);
 }
 
 public LoopStmt createWhileLoop(Expression test, Statement body)

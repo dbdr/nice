@@ -18,15 +18,18 @@ Nice programming language. The goal is to help you write your first Nice
 programs. It does not describe every feature of the language, nor gives
 it a complete description of the powerfull type system.
 <br>&nbsp;
-<h2>
-Requirements</h2>
+
+<h2>Requirements</h2>
+
 For simplicity and conciseness, this tutorial presents Nice as an extension
 of the Java programming language. You should therefore be familiar with
-Java. If not, you could read about it, for example <a href="http://web2.java.sun.com/docs/books/tutorial/">Javasoft's
-tutorial</a>.
+Java. If not, you could read about it, for example 
+<a href="http://web2.java.sun.com/docs/books/tutorial/">Javasoft's tutorial
+</a>.
 <br>&nbsp;
-<h2>
-Declaring classes and methods</h2>
+
+<h2>Declaring classes and methods</h2>
+
 Classes and methods can be declared as in Java:
 <PRE>
 <FONT COLOR="#0000ee">class</FONT> <FONT COLOR="#cd0000">Person</FONT> 
@@ -47,8 +50,9 @@ is informs that this method exists. Now we have to <b>define</b> it, that
 is tell what code is to be executed, depending on the runtime type of the
 person (in this short example either <tt>Person</tt> or <tt>Worker</tt>).
 <br>&nbsp;
-<h2>
-Defining methods</h2>
+
+<h2>Defining methods</h2>
+
 Method definitions are placed outside of classes. Their order does not matter
 at all. The definitions of a single method may even occur in several files
 (this is not a flaw, it's an important feature that allows modularity).
@@ -66,8 +70,9 @@ for method <tt>display </tt>:
 } 
 </PRE>
 <br>&nbsp;
-<h2>
-Parametric classes</h2>
+
+<h2>Parametric classes</h2>
+
 Classes and interfaces can have type parameters. For example, the <tt>Collection</tt>
 interface is parametrized by the type of its elements:
 <p>
@@ -92,37 +97,39 @@ parameters.
 in Java) that is an ancestor of all classes. There could not be, since
 all classes do not have the same number of type parameters.
 <br>However, it is possible to express that a method takes arguments of
-any type. For instance the equals method is declared in Nice:
+any type. For instance the <tt>equals</tt> method is declared in Nice:
 <br>
 <PRE>
 &lt;<FONT COLOR="#b7860b">Any T</FONT>&gt; <FONT COLOR="#b7860b">boolean</FONT> <FONT COLOR="#cd0000">equals</FONT>(<FONT COLOR="#b7860b">T</FONT>, <FONT COLOR="#b7860b">T</FONT>); 
 </PRE>
-<p>One can read this as "for Any type T, the method equals takes two objects
-of type T, and returns a boolean".
+<p>
+One can read this as 
+"for Any type T, the method <tt>equals</tt> takes two objects of type T, 
+and returns a boolean".
 <p>Thanks to the usual subsumption rule, this type makes it possible to
-call equals with arguments of different type, as long as they are compatible
-(have a common super type). For instance, it's legal to use equals to compare
-expressions of type <tt>Collection&lt;int></tt> and <tt>LinkedList&lt;int></tt>,
+call <tt>equals</tt> with arguments of different type, 
+as long as they are compatible (have a common super type). 
+For instance, it's legal to use <tt>equals</tt> to compare expressions 
+of type <tt>Collection&lt;int></tt> and <tt>LinkedList&lt;int></tt>,
 while it is not with types <tt>Collection&lt;String></tt> and <tt>String</tt>.
 <p>This approach is more sensible than Java's one, where the laters would
 be allowed and would always return false (not even raising a runtime error),
 while it is very likely a bug to compare a collection of strings to a string.
 <p>Note that it is also possible to define a function that takes two unrelated
-and unconstrained types. So it would be possible to define equals to have
-the same typing behaviour it has in Java:
+and unconstrained types. So it would be possible to define <tt>equals</tt> 
+to have the same typing behaviour it has in Java:
 <br><PRE>&lt;<FONT COLOR="#b7860b">Any T</FONT>, <FONT COLOR="#b7860b">Any U</FONT>&gt; <FONT COLOR="#b7860b">boolean</FONT> <FONT COLOR="#cd0000">equals</FONT>(<FONT COLOR="#b7860b">T</FONT>, <FONT COLOR="#b7860b">U</FONT>);</PRE>
-<p>A more sensible example is the pair creation function:
-<br><PRE><FONT COLOR="#0000ee">class</FONT> <FONT COLOR="#cd0000">Pair</FONT>&lt;<FONT COLOR="#b7860b">T</FONT>, <FONT COLOR="#b7860b">U</FONT>&gt; { ... } 
-
-&lt;<FONT COLOR="#b7860b">Any T</FONT>, <FONT COLOR="#b7860b">Any U</FONT>&gt; <FONT COLOR="#b7860b">Pair</FONT>&lt;<FONT COLOR="#b7860b">T</FONT>, <FONT COLOR="#b7860b">U</FONT>&gt; pair(<FONT COLOR="#b7860b">T</FONT>, <FONT COLOR="#b7860b">U</FONT>);</PRE>
 <br>&nbsp;
-<h2>
-Multiple dispatch</h2>
+
+<h2>Multiple dispatch</h2>
+
 In Nice, the choice of the method alternative is made at run-time, based
 on <b>all</b> parameters (in java, only the first, implicit parameter is
-used to choose the alternative). Such methods are thus called <b>multi-methods</b>.
-<p>Let's take the example of the equals method, that tests if any two objects
-are equal.
+used to choose the alternative). 
+Such methods are thus called <b>multi-methods</b>.
+<p>
+Let's take the example of the <tt>equals</tt> method, 
+that tests if any two objects are equal.
 <br>&nbsp;
 <br>&nbsp;
 <center><table BORDER WIDTH="85%" BGCOLOR="#CCCCCC" >
@@ -185,25 +192,32 @@ class Person extends Object&nbsp;
 </table></center>
 
 <p>In the Nice version, the last <tt>equals</tt> alternative will be executed
-when both parameters are instance of class Person. So the type of the second
-argument is also known, and no manual instanceof and no cast are necessary
-(red parts of the java code). This job is sort of automatically done by
-the compiler for you. The code looks cleaner, is simpler to understand,
+when both parameters are instance of class <tt>Person</tt>. 
+So the type of the second argument is also known, and no manual 
+<tt>instanceof</tt> and no cast are necessary (red parts of the java code). 
+This job is sort of automatically done by the compiler for you. 
+The code looks cleaner, it is simpler to understand,
 and it is automatically guaranteed that no runtime exception will occur
 (this simple java code would not break either, but you have to think about
 it to get this confidence, and it becomes extremely difficult in large
 projects).
 <p>Another great advantage of multi-methods is that they offer an attractive
-alternative to the Visitor Pattern. <a href="visitor.html">This solution
-is presented in a full example</a>.
+alternative to the <b>Visitor Pattern</b>. 
+<a href="visitor.html">This solution is presented in a full example</a>.
 <br>&nbsp;
-<h2>
-Precise types</h2>
-Java's type system is too simple to express many usefull types. For instance,
-let's suppose we want to declare the method map on Collections. Map applies
-a function to each element of the collection, and returns a new collection
-holding the results. That is:
-<br>map(f, [e1, ..., en]) = [f(e1), ..., f(en)];
+
+<h2>Precise types</h2>
+
+Java's type system is too simple to express many usefull types. 
+For instance, let's suppose we want to declare the method <tt>filter</tt> 
+on collections. This method applies a function to each element of 
+the collection, and returns a new collection containing the elements for which
+that function returns <tt>true</tt>. 
+Futhermore, the new collection is an instance of the same class as 
+the original collection: 
+<tt>filter</tt> applied to a <tt>List</tt> return a new <tt>List</tt>,
+<tt>filter</tt> applied to a <tt>Vector</tt> return a new <tt>Vector</tt>,
+...
 <br>&nbsp;
 <br>&nbsp;
 <center><table BORDER WIDTH="85%" BGCOLOR="#CCCCCC" >
@@ -266,16 +280,18 @@ void main(String[] args)
 </tr>
 </table></center>
 
-<p>In the Nice version, the alike keyword is a type that means "the same
-type as the implicit receiver argument".
-<p>Note that there is not special treatment for the alike construct in
-the core type system. Alike is syntactic sugar for a more general concept:
+<p>In the Nice version, the <tt>alike</tt> keyword is a type that means 
+"the same type as the implicit receiver argument".
+<p>Note that there is not special treatment for the <tt>alike</tt> construct in
+the core type system. 
+<TT>alike</TT> is just syntactic sugar for a more general concept:
 polymorphic constrained types.
-<p>The clone example might be more familiar to Java users. In Java, the
-clone method, defined in class Object, has a Object return type. In fact,
-one would like to express that the clone method returns an object of the
-same type as its argument. This is possible in Nice, and it allows for
-cast-less use of clone.
+<p>
+The <tt>clone</tt> example might be more familiar to Java users. In Java, the
+<tt>clone</tt> method, defined in class Object, has a Object return type. 
+In fact, one would like to express that the <tt>clone</tt> method returns 
+an object of the same type as its argument. 
+This is possible in Nice, and it allows for cast-less use of <tt>clone</tt>.
 <br>&nbsp;
 <center><table BORDER WIDTH="85%" BGCOLOR="#CCCCCC" >
 <tr>
@@ -321,8 +337,10 @@ void main(String[] args)
 </tr>
 </table></center>
 
-<h2>
-Instructions and expressions</h2>
+<br>&nbsp;
+
+<h2>Instructions and expressions</h2>
+
 The code of a method alternative, that goes between <tt>{</tt> and <tt>}</tt>,
 can be virtually any legal Java code.
 <br>Here is a list of the differences:
@@ -402,8 +420,8 @@ case their presence is optional at the call site.
 </blockquote>
 
 <blockquote>
-<h2>
-Interfacing with Java</h2>
+<h2>Interfacing with Java</h2>
+
 It is possible to use java classes and methods from Nice programs. This
 is a great advantage, since it gives access to the gigantic and evergrowing
 set of Java libraries.
@@ -430,16 +448,18 @@ is a more sophisticated example for the <tt>java.util.Map</tt> interface:
 <br>&nbsp;
 <p>Calling Nice code from Java is also possible, but is not so straightforward
 because the generated methods get mangled names, and because of the different
-dispatch mecanism. This could be worked on if necessary.
+dispatch mecanism. However it works, and the source of the compiler uses this
+feature. The mechanism should eventually be made simpler.
 <br>&nbsp;
-<h2>
-<font color="#000000">What else?</font></h2>
+
+<h2>What else?</h2>
+
 <font color="#000000">Many features are missing in this tutorial: abstract
 interfaces, general constraints, final implementation, ...</font>
-<h2>
-<font color="#000000">General information about Nice : the <a href="index.html">Nice
-home page</a></font></h2>
-&nbsp;</blockquote>
+
+<h2>General information about Nice : 
+the <a href="index.html">Nice home page</a></h2>
+</blockquote>
 
 </body>
 </html>

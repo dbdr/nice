@@ -115,6 +115,9 @@ public class Pattern implements Located
     if (typeConstructor != null)
       {
 	tc = typeConstructor.resolveToTC(scope);
+        if (exactlyAt && TypeConstructors.isInterface(tc))
+          User.error(typeConstructor.location(), "Pattern #"+typeConstructor.toString()+
+                " can never be matched because instances of an interface don't exist.");
 	typeConstructor = null;
       }
     if (additional != null)

@@ -66,3 +66,10 @@ class First {
 paint(p@java.awt.Component, g) {
   (notNull (g)).drawString("I love java", 20, 20);
 }
+
+/// FAIL
+  /// Toplevel
+  interface I{}
+ 
+  void foo(I);
+  foo(#I){}

@@ -99,12 +99,13 @@ public class JavaFieldAccess extends FieldAccess
     }
   }
   
-  public void createContext()
+  void buildScope(VarScope outer, TypeScope typeOuter)
   {
-    super.createContext();
+    super.buildScope(outer, typeOuter);
 
     // We put this here, since we need 'module' to be computed
     // since it is used to open the imported packages.
+    // The registration must be done before resolution.
     if (field == null)
       {
 	field = getField(className,fieldName);

@@ -107,7 +107,7 @@ release-file: ${TARFILE}
 
 .PHONY: web
 web:
-	scp web/*.html web/*.css web/.htaccess bonniot@shell.sourceforge.net:/home/groups/n/ni/nice/htdocs
+	scp -r web/*.html web/*.css web/.htaccess web/images bonniot@shell.sourceforge.net:/home/groups/n/ni/nice/htdocs
 
 #****************************************************************
 #    Bootstrap

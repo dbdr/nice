@@ -55,8 +55,8 @@ String, Null string
 true
 false
 Point
-Colored Point
-Colored Point
+Colored Point: color=0
+Colored Point: color=0
 ### Testing methods
 C1
 C2

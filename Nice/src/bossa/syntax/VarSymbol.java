@@ -114,12 +114,21 @@ abstract class VarSymbol extends Node implements Located
     if (decl == null)
       Internal.error(this + " has no bytecode declaration");
     
-    return new gnu.expr.ReferenceExp(name.toString(), decl);
+    if (isThis)
+      return new gnu.expr.ThisExp(decl);
+    else
+      return new gnu.expr.ReferenceExp(name.toString(), decl);
   }
 
   public void setDeclaration(gnu.expr.Declaration declaration)
   {
+    setDeclaration(declaration, false);
+  }
+
+  public void setDeclaration(gnu.expr.Declaration declaration, boolean isThis)
+  {
     this.decl = declaration;
+    this.isThis = isThis;
     if (name != null) this.decl.setLine(name.location().getLine());
     this.decl.setCanRead(true);
     this.decl.setCanWrite(true);
@@ -131,4 +140,5 @@ abstract class VarSymbol extends Node implements Located
   }
   
   private gnu.expr.Declaration decl = null;
+  private boolean isThis;
 }

@@ -30,7 +30,7 @@ class ColoredPoint extends Point
   pToString() = "(x=" + this.x + ", y=" + this.y + ", c=" + this.c + ")";
 
   // override a native method
-  toString() = "Colored Point";
+  toString() = "Colored Point: color=" + this.c;
 }
 
 /*

@@ -1,5 +1,6 @@
 nice (0.0.020300) unstable; urgency=low
 
+  * Fixed bug that prevented using "this" in overriden native methods.
   * Better error messages for method calls with wrong number of arguments.
   * Accept methods with no implementation when their domain is empty.
   * Abstract interfaces are fully qualified just like classes and 

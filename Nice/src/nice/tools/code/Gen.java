@@ -98,12 +98,11 @@ public class Gen
   {
     bytecodeName = nice.tools.code.Strings.escape(bytecodeName);
     int arity = args == null ? 0 : args.length;
-    if (member) arity--;
 
     gnu.expr.LambdaExp lexp = new gnu.expr.LambdaExp();
     lexp.setReturnType(retType);
     lexp.setName(bytecodeName);
-    lexp.min_args = lexp.max_args = arity;
+    lexp.min_args = lexp.max_args = member ? arity - 1 : arity;
     lexp.forceGeneration();
     if (toplevel)
       lexp.setCanCall(true);
@@ -111,17 +110,22 @@ public class Gen
       lexp.setClassMethod(true);
 
     // Parameters
-    for(int n = (member ? 1 : 0); n < arity; n++)
+    for(int n = 0; n < arity; n++)
       {
+	boolean isThis = member && n == 0;
 	String parameterName = args[n].getName() == null 
 	  ? "anonymous_" + n 
 	  : args[n].getName().toString();
 
-	gnu.expr.Declaration d = lexp.addDeclaration(parameterName);
+	gnu.expr.Declaration d;
+	if (isThis)
+	  d = new Declaration(parameterName);
+	else
+	  d = lexp.addDeclaration(parameterName);
 	if (argTypes != null)
 	  d.setType(argTypes[n]);
 	d.noteValue(null);
-	args[n].setDeclaration(d);
+	args[n].setDeclaration(d, isThis);
       }
 
     return lexp;

@@ -28,7 +28,8 @@ public class ModuleMethod extends ProcedureN
     this.module = module;
     this.selector = selector;
     this.numArgs = numArgs;
-    setName(name);
+    if (name != null)
+      setName(name);
   }
 
   /** Figure out parameter types.

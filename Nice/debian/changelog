@@ -5,6 +5,9 @@ nice (0.9.3) unstable; urgency=low
     may take multiple lines and will include the linebreaks.
   * Existing interfaces can (like classes) implement abstract interfaces:
       interface packagename.SomeInterface implements AbstractInterface;
+  * Bugfixes (various pretty printing issues, type hole in instanceof inference,
+    calls to abstract methods, chained assignments with arrays like
+    'x = arr[y] = z;', error messages of integer dispatch, ...)
 
  --
 

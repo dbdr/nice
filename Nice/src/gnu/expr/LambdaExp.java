@@ -526,7 +526,10 @@ public class LambdaExp extends ScopeExp
     if (applyMethods == null)
       {
 	applyMethods = new Vector();
-	type.setSuper(Compilation.typeModuleBody);
+	if (heapFrame != null)
+	  ((ClassType) heapFrame.getType()).setSuper(Compilation.typeModuleBody);
+	else 
+	  type.setSuper(Compilation.typeModuleBody);
       }
     applyMethods.addElement(lexp);
   }
@@ -948,8 +951,6 @@ public class LambdaExp extends ScopeExp
 	    comp.addClass(frameType);
 	  }
 	heapFrame.setType(frameType);
-	if (! Compilation.usingTailCalls) // FIXME
-	  this.type = frameType;
       }
   }
 

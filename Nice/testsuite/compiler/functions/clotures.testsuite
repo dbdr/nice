@@ -1,0 +1,12 @@
+/// PASS
+  String[] a = [ "A" ];
+  a.iter(stripClass);
+  /// Toplevel
+
+void stripClass(String s) {
+  boolean b = false;
+  s.toCharArray().iter(char c => stripChar(c, b));
+}
+
+void stripChar(char c, boolean b) {
+}

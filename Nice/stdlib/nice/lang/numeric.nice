@@ -75,31 +75,31 @@ long `-`(long) = native long Native.minus(long);
 int `-`(int) = native int Native.minus(int);
 
 // multiplication
-double `*`(double, double) = native double Native.mult(double, double);
-float `*`(float, float) = native float Native.mult(float, float);
-long `*`(long, long) = native long Native.mult(long, long);
-int `*`(int, int) = native int Native.mult(int, int);
+double `*`(double, double) = inline nice.tools.code.NumericalOperators("dMul");
+float `*`(float, float) = inline nice.tools.code.NumericalOperators("fMul");
+long `*`(long, long) = inline nice.tools.code.NumericalOperators("jMul");
+int `*`(int, int) = inline nice.tools.code.NumericalOperators("iMul");
 
 // division
-double `/`(double, double) = native double Native.div(double, double);
-float `/`(float, float) = native float Native.div(float, float);
-long `/`(long, long) = native long Native.div(long, long);
-int `/`(int, int) = native int Native.div(int, int);
+double `/`(double, double) = inline nice.tools.code.NumericalOperators("dDiv");
+float `/`(float, float) = inline nice.tools.code.NumericalOperators("fDiv");
+long `/`(long, long) = inline nice.tools.code.NumericalOperators("jDiv");
+int `/`(int, int) = inline nice.tools.code.NumericalOperators("iDiv");
 
 // remainder
-double `%`(double, double) = native double Native.remainder(double, double);
-float `%`(float, float) = native float Native.remainder(float, float);
-long `%`(long, long) = native long Native.remainder(long, long);
-int `%`(int, int) = native int Native.remainder(int, int);
+double `%`(double, double) = inline nice.tools.code.NumericalOperators("dRem");
+float `%`(float, float) = inline nice.tools.code.NumericalOperators("fRem");
+long `%`(long, long) = inline nice.tools.code.NumericalOperators("jRem");
+int `%`(int, int) = inline nice.tools.code.NumericalOperators("iRem");
 
 // addition
-double `+`(double, double) = native double Native.plus(double, double);
-float `+`(float, float) = native float Native.plus(float, float);
-long `+`(long, long) = native long Native.plus(long, long);
-int `+`(int, int) = native int Native.plus(int, int);
+double `+`(double, double) = inline nice.tools.code.NumericalOperators("dAdd");
+float `+`(float, float) = inline nice.tools.code.NumericalOperators("fAdd");
+long `+`(long, long) = inline nice.tools.code.NumericalOperators("jAdd");
+int `+`(int, int) = inline nice.tools.code.NumericalOperators("iAdd");
 
 // substraction
-double `-`(double, double) = native double Native.minus(double, double);
-float `-`(float, float) = native float Native.minus(float, float);
-long `-`(long, long) = native long Native.minus(long, long);
-int `-`(int, int) = native int Native.minus(int, int);
+double `-`(double, double) = inline nice.tools.code.NumericalOperators("dSub");
+float `-`(float, float) = inline nice.tools.code.NumericalOperators("fSub");
+long `-`(long, long) = inline nice.tools.code.NumericalOperators("jSub");
+int `-`(int, int) = inline nice.tools.code.NumericalOperators("iSub");

@@ -36,14 +36,14 @@
 /// PASS
   use(new A());
   /// Toplevel
-  class A implements java.lang.Cloneable {}
+  class A implements java.lang.Runnable { run(){} }
 
-  void use(java.lang.Cloneable c) {}
+  void use(java.lang.Runnable c) {}
 
 /// PASS
   use(new A());
   /// Toplevel
-  interface I extends java.lang.Cloneable {}
-  class A implements I {}
+  interface I extends java.lang.Runnable {}
+  class A implements I { run(){} }
 
-  void use(java.lang.Cloneable c) {}
+  void use(java.lang.Runnable c) {}

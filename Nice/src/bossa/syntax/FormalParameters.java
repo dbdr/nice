@@ -315,6 +315,7 @@ public class FormalParameters extends Node
     Monotype[] res = new Monotype[size];
     for (int i = 0; i < size; i++)
       res[i] = parameters[i].type;
+
     return res;
   }
 
@@ -325,6 +326,7 @@ public class FormalParameters extends Node
     MonoSymbol[] res = new MonoSymbol[size];
     for (int i = 0; i < size; i++)
       res[i] = parameters[i].getSymbol();
+ 
     return res;
   }
 
@@ -397,6 +399,7 @@ public class FormalParameters extends Node
 	}
       else
 	exps[i] = args.getExp(map[i] - 1);
+
     args.applicationExpressions.put(symbol, exps);
     args.usedArguments.put(symbol, map);
     return true;
@@ -410,11 +413,9 @@ public class FormalParameters extends Node
     
     if (i == map.length)
       return true;
-    else
-      {
-	map[i] = num + 1;
-	return false;
-      }
+
+    map[i] = num + 1;
+    return false;
   }
   
   boolean fill(int[] map, String id, int num)
@@ -425,13 +426,20 @@ public class FormalParameters extends Node
     
     if (i == map.length)
       return true;
-    else
-      {
-	map[i] = num + 1;
-	return false;
-      }
+
+    map[i] = num + 1;
+    return false;
   }
   
+  public boolean hasMatchFor(String s)
+  {
+    for (int i = 0; i<parameters.length; i++)
+      if (parameters[i].match(s))
+	return true;
+
+    return false;
+  }  
+
   /****************************************************************
    * Misc.
    ****************************************************************/

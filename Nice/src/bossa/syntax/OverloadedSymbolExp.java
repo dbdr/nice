@@ -398,8 +398,8 @@ public class OverloadedSymbolExp extends Expression
   {
     if (symbols.size() <= 1)
       return "[" + Util.map("", "\n|", "", symbols) + "]";
-    else
-      return "\n[" + Util.map("", "\n|", "", symbols) + "]";
+
+    return "\n[" + Util.map("", "\n|", "", symbols) + "]";
   }
 
   List symbols;
@@ -422,7 +422,8 @@ public class OverloadedSymbolExp extends Expression
 	return sym.explainWhyMatchFails(arguments);
 
       default:
-	return "No method with name " + ident + arguments.explainNoMatch();
+	return "No method with name " + ident + 
+		arguments.explainNoMatch(removed);
       }
   }
 

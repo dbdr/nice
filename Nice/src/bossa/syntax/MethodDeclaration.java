@@ -243,8 +243,7 @@ abstract public class MethodDeclaration extends Definition
     {
       super(name, constraint,
 	    MethodDeclaration.this.formalParameters(), 
-	    returnType,
-	    MethodDeclaration.this.arity);
+	    returnType);
     }
 
     Symbol(LocatedString name, Polytype type)

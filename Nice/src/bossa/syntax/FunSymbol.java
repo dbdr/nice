@@ -12,19 +12,20 @@
 
 package bossa.syntax;
 
+import java.util.*;
 import nice.tools.code.Types;
 
 class FunSymbol extends PolySymbol
 {
   FunSymbol(LocatedString name, 
 	    Constraint constraint, FormalParameters parameters,
-	    Monotype returnType, int arity)
+	    Monotype returnType)
   {
     super(name, 
 	  new Polytype(constraint, 
 		       new FunType(parameters.types(), returnType)));
     this.parameters = parameters;
-    this.arity = arity;
+    this.arity = parameters.size;
   }
 
   FunSymbol(LocatedString name, 
@@ -66,15 +67,15 @@ class FunSymbol extends PolySymbol
   int match(Arguments arguments)
   {
     if (parameters == null)
+    {
       // true for constructors, for instance. case might be removed
       if (!arguments.plainApplication(arity, this))
 	return 0;
-      else
-	return 2;
+    }
     else if (!parameters.match(arguments, this))
       return 0;
-    else
-      return 2;
+
+    return 2;
   }
 
   String explainWhyMatchFails(Arguments arguments)

@@ -195,7 +195,7 @@ public class Block extends Statement
 
       FunSymbol symbol = new FunSymbol(name, 
 				       Constraint.True, parameters, 
-				       returnType, parameters.size);
+				       returnType);
       symbol.syntacticType.getMonotype().nullness = Monotype.sure;
       return new LocalFunction(symbol, value, parameters);
     }

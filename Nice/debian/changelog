@@ -1,6 +1,8 @@
 nice (0.7.8) unstable; urgency=low
 
-  * Some operators(&&, ||, ! and comparisons) generate better bytecode now.
+  * Some error messages are more usefull.
+  * All operators are inlined and some operators(&&, ||, ! and comparisons) 
+    generate better bytecode now.
   * Improved bytecode generation of pre\post-condition.
   * Implemented the enhanced for loop(similar to java 1.5 proposal).
     The loop works on arrays and collections, example:

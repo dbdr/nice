@@ -12,6 +12,7 @@
 
 package bossa.syntax;
 
+import java.util.*;
 import bossa.util.*;
 
 /**
@@ -184,9 +185,11 @@ public class Arguments
   {
     if (arguments.length != arity)
       return false;
+
     for (int i = 0; i<arguments.length; i++)
       if (arguments[i].name != null)
 	return false;
+
     applicationExpressions.put(symbol, inOrder());
     return true;
   }
@@ -220,14 +223,45 @@ public class Arguments
     return res.append(")").toString();
   }
 
-  String explainNoMatch()
+  String explainNoMatch(List /*VarSymbol*/ noMatches)
   {
+    List argnames = new LinkedList();
     for (int i = 0; i < arguments.length; i++)
       if (arguments[i].name != null)
-	return " has compatible named arguments";
+ 	argnames.add(arguments[i].name.toString());
     
+    if (!argnames.isEmpty())
+    {
+      for (Iterator i = noMatches.iterator(); i.hasNext();)     
+      {
+	Object noMatch = i.next();
+        if (noMatch instanceof FunSymbol)
+        {
+          argnames.retainAll(noMatchByName(((FunSymbol)noMatch).parameters));
+          User.warning(Util.map("", ", ", "", noMatchByName(((FunSymbol)noMatch).parameters))); 
+        }
+      }
+      if (!argnames.isEmpty())
+	return " has an argument named " + argnames.get(0);
+
+      return " has compatible named arguments";
+    }
     return " has " + arguments.length + " arguments";
   }
-  
+
+  List noMatchByName(FormalParameters parameters)
+  {
+    List res = new LinkedList();
+    for (int i = 0; i < arguments.length; i++)
+      if (arguments[i].name != null)
+      { 
+	String s = arguments[i].name.toString();
+	if (!parameters.hasMatchFor(s))
+	  res.add(s);
+      }
+
+    return res;
+  }
+ 
   Argument[] arguments;
 }

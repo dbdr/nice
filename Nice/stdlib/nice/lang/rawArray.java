@@ -395,7 +395,7 @@ public class rawArray extends java.util.AbstractList
       case 'B': return gconvert_byte(array);
       case 'S': return gconvert_short(array);
       case 'I': return gconvert_int(array);
-      case 'L': return gconvert_long(array);
+      case 'J': return gconvert_long(array);
       case 'F': return gconvert_float(array);
       case 'D': return gconvert_double(array);
       default : throw new Error("Unexpected error in array conversion");

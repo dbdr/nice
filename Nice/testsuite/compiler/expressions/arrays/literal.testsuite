@@ -18,9 +18,13 @@ class A3 extends A1 {}
   <T> T[][] single(T[] t) = [ t ];
 
 /// PASS
-  byte[][] s = single([ 0 ]);
+  byte[][] sb = single([ 0 ]);
+  short[][] ss = single([ 0 ]);
+  int[][] si = single([ 0 ]);
+  long[][] sl = single([ 0 ]);
+  float[][] sf = single([ 0 ]);
   /// Toplevel
-  <int T> T[][] single(T[] t) = [ t ];
+  <double T> T[][] single(T[] t) = [ t ];
 
 /// PASS
   int[][] array2 = [[11,12],[21,22]];

@@ -38,6 +38,8 @@ nice (0.9.11)
           return buffer.append("ZERO\n");
         ...
       }
+   * Added instanceof on option types. For instance 'x instanceof ?String'
+     is equivalent to 'x == null || x instanceof String'.
 
  --
 

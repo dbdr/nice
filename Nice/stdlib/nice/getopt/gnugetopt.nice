@@ -34,7 +34,7 @@ private final int PERMUTE = 2;
 private final int RETURN_IN_ORDER = 3;
 
 private ?String optarg = null;
-private ?String nextchar = null;
+private String nextchar = "";
 private boolean posixly_correct = System.getProperty("gnu.posixly_correct", null) != null;
 private boolean longopt_handled = false;
 private boolean endparse = false;
@@ -165,16 +165,16 @@ private char checkLongOption()
   ambig = false;
   exact = false;
   longind = -1;
-  nameend = notNull(nextchar).indexOf("=");
+  nameend = nextchar.indexOf("=");
   if (nameend == -1)
-    nameend = notNull(nextchar).length();
+    nameend = nextchar.length();
   
   // Test all lnog options for either exact match or abbreviated matches
   for (int i = 0; i < long_options.length; i++)
     {
-      if (long_options[i].getName().startsWith(notNull(nextchar).substring(0, nameend)))
+      if (long_options[i].getName().startsWith(nextchar.substring(0, nameend)))
         {
-          if (long_options[i].getName().equals(notNull(nextchar).substring(0, nameend)))
+          if (long_options[i].getName().equals(nextchar.substring(0, nameend)))
             {
               // Exact match found
               pfound = long_options[i];
@@ -212,12 +212,12 @@ private char checkLongOption()
     {
       ++optind;
  
-      if (nameend != notNull(nextchar).length())
+      if (nameend != nextchar.length())
         {
           if (pfound.has_arg != NO_ARGUMENT)
             {
-              if (notNull(nextchar).substring(nameend).length() > 1)
-                optarg = notNull(nextchar).substring(nameend+1);
+              if (nextchar.substring(nameend).length() > 1)
+                optarg = nextchar.substring(nameend+1);
               else
                 optarg = "";
             }
@@ -280,7 +280,7 @@ public char getopt()
   if (endparse == true)
     return noOptionsLeft;
 
-  if ((nextchar == null) || (nextchar.equals("")))
+  if (nextchar.equals(""))
     {
       // If we have just processed some options following some non-options,
       //  exchange them so that the options come first.
@@ -386,7 +386,7 @@ public char getopt()
       // option, then it's an error.
       // Otherwise interpret it as a short option.
       if (!long_only || argv[optind].startsWith("--")
-        || (optstring.indexOf(notNull(nextchar).charAt(0)) == -1))
+        || (optstring.indexOf(nextchar.charAt(0)) == -1))
         {
           if (opterr)
             {
@@ -404,9 +404,9 @@ public char getopt()
     } // if (longopts)
 
   // Look at and handle the next short option-character */
-  char c = notNull(nextchar).charAt(0);
-  if (notNull(nextchar).length() > 1)
-    nextchar = notNull(nextchar).substring(1);
+  char c = nextchar.charAt(0);
+  if (nextchar.length() > 1)
+    nextchar = nextchar.substring(1);
   else
     nextchar = "";
   
@@ -462,7 +462,7 @@ public char getopt()
       else
         // Let the application handle it
         {
-          nextchar = null;
+          nextchar = "";
           ++optind;
           return('W');
         }
@@ -483,7 +483,7 @@ public char getopt()
               optarg = null;
             }
 
-          nextchar = null;
+          nextchar = "";
         }
       else
         {
@@ -532,7 +532,7 @@ public char getopt()
                 }
             }
 
-          nextchar = null;
+          nextchar = "";
         }
     }
 

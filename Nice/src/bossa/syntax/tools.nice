@@ -94,6 +94,10 @@ bossa.util.UserError ensureLocated(bossa.util.UserError e,
   return e;
 }
 
+// UserError tolerates null messagess.
+bossa.util.UserError User_error(?Located responsible, ?String message) =
+  native bossa.util.UserError bossa.util.User.error(Located, String);
+
 ?(MonoSymbol, mlsub.typing.Monotype) getInstanceof(CallExp condition)
 {
   if (! condition.isCallTo("instanceof") || condition.arguments.size() != 2)

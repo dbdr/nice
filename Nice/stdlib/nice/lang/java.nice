@@ -76,6 +76,8 @@ Enumeration<String> propertyNames(Properties<String,String>) =
 // result maybe null
 
 ?Throwable getCause(Throwable) = native Throwable Throwable.getCause();
+?String getMessage(Throwable) = native String Throwable.getMessage();
+?String getLocalizedMessage(Throwable) = native String Throwable.getLocalizedMessage();
 ?java.io.InputStream getResourceAsStream(ClassLoader, String name) =
  native java.io.InputStream ClassLoader.getResourceAsStream(String);
 

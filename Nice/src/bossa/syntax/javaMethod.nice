@@ -247,7 +247,7 @@ void fetchMethods(mlsub.typing.TypeConstructor tc, gnu.bytecode.ClassType classT
       }
   }
   catch(NoClassDefFoundError e) {
-    User.warning("Class " + e.getMessage().replace('/','.') + 
+    User.warning("Class " + notNull(e.getMessage()).replace('/','.') + 
 	   " was not found.\n" + 
 	   "It is refered to in class " + classType.getName() +
 	   "\nYou probably need to install the corresponding package.");

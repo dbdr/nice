@@ -493,10 +493,15 @@ abstract public class ClassDefinition extends MethodContainer
 
     status = RESOLVING;
 
-    super.resolve();
-    resolveClass();
-
-    status = RESOLVED;
+    try 
+      {
+	super.resolve();
+	resolveClass();
+      }
+    finally
+      {
+	status = RESOLVED;
+      }
   }
 
   void resolveClass()

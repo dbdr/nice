@@ -37,3 +37,8 @@
   /// Toplevel
   class A extends B {}
   class B extends A {}
+
+/// FAIL
+  /// Toplevel
+class A extends /* /// FAIL HERE */ Undeclared {}
+class B extends A {}

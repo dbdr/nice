@@ -103,4 +103,6 @@ public abstract class Definition extends Node implements bossa.util.Located
   }
 
   LocatedString name;
+
+  public String docString;
 }

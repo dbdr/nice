@@ -70,8 +70,10 @@ public abstract class Loader
       // set to 0 (required when recovered from error)
       ParserTokenManager.nestingLevel = 0;
   
+      boolean storeDocStrings = false;
+
       try{
-	parser.module(definitions);
+	parser.module(definitions, storeDocStrings);
       }
       catch(ParseException e){
 	if(e.currentToken!=null)

@@ -100,12 +100,12 @@ public class NiceClass extends ClassDefinition.ClassImplementation
   
   public Field makeField
     (MonoSymbol sym, Expression value, 
-     boolean isFinal, boolean isTransient, boolean isVolatile)
+     boolean isFinal, boolean isTransient, boolean isVolatile, String docString)
   {
     if (definition instanceof ClassDefinition.Interface)
       User.error(sym, "An interface cannot have a field.");
 
-    return new NewField(sym, value, isFinal, isTransient, isVolatile);
+    return new NewField(sym, value, isFinal, isTransient, isVolatile, docString);
   }
 
   public Field makeOverride (MonoSymbol sym, Expression value)
@@ -188,17 +188,20 @@ public class NiceClass extends ClassDefinition.ClassImplementation
     Expression value;
 
     NiceFieldAccess method;
+
   }
 
   final class NewField extends Field
   {
     private NewField(MonoSymbol sym, Expression value, 
-                     boolean isFinal, boolean isTransient, boolean isVolatile)
+                     boolean isFinal, boolean isTransient, boolean isVolatile,
+		     String docString)
     {
       super(sym, value);
       this.isFinal = isFinal;
       this.isTransient = isTransient;
       this.isVolatile = isVolatile;
+      this.docString = docString;
 
       if (isFinal && isVolatile)
 	throw User.error(sym, "A field cannot be final and volatile");
@@ -274,6 +277,8 @@ public class NiceClass extends ClassDefinition.ClassImplementation
     boolean isFinal;
     boolean isTransient;
     boolean isVolatile;
+
+    public String docString;
   }
 
   final class OverridenField extends Field

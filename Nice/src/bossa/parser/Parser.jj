@@ -920,15 +920,20 @@ List interfaces():
   { return res; }
 }
 
-List getField(NiceClass c, List fields, List overrides):
+List getField(NiceClass c, List fields, List overrides, boolean storeDocString):
 {
   MonoSymbol field;
   boolean isFinal=false, isTransient = false, isVolatile = false;
   boolean isOverride = false;
   Expression value = null;
-  Token t = null;
+  Token t = getToken(1);
+  String docString = null;
 }
 {
+ {
+   if (storeDocString && t.specialToken != null && t.specialToken.kind == FORMAL_COMMENT)
+     docString = t.specialToken.image;
+ }
  (
    "override" { isOverride = true; }
  |
@@ -953,7 +958,7 @@ List getField(NiceClass c, List fields, List overrides):
         overrides.add(c.makeOverride(field, value));
       }
     else
-      fields.add(c.makeField(field, value, isFinal, isTransient, isVolatile));
+      fields.add(c.makeField(field, value, isFinal, isTransient, isVolatile, docString));
 
     return overrides;
   }
@@ -961,7 +966,7 @@ List getField(NiceClass c, List fields, List overrides):
 
 // The constraint prefixing the class keyword is optional
 // It is useful for complex constraints
-ClassDefinition classDefinition(Constraint cst, List definitions):
+ClassDefinition classDefinition(Constraint cst, List definitions, boolean storeDocString):
 {
   ClassDefinition res;
   LocatedString name;
@@ -1020,16 +1025,14 @@ ClassDefinition classDefinition(Constraint cst, List definitions):
       }
     |
       LOOKAHEAD( getField(null, null) )
-      overrides = getField(impl, fields, overrides)
-    |
+      overrides = getField(impl, fields, overrides, storeDocString)
+    | { Definition m; Token t = getToken(1); }
       [ "public" | "private" ]
       (
 	LOOKAHEAD( methodBodyDefinitionLookahead() )
-	{ MethodBodyDefinition mb; }
-	mb = methodBodyDefinition(impl)
-	{ globalDefinitions.add(mb); }
+	m = methodBodyDefinition(impl)
+	{ globalDefinitions.add(m); }
       |
-        { Definition m; }
         m = internalMethodOrFunction(res)
         { 
           if (methods == null)
@@ -1037,7 +1040,10 @@ ClassDefinition classDefinition(Constraint cst, List definitions):
           methods.add(m);
 	  //globalDefinitions.add(m);
         }
-      )
+      ) 
+      { if (storeDocString && t.specialToken != null && t.specialToken.kind == FORMAL_COMMENT)
+          m.docString = t.specialToken.image;
+      }
    )* 
    "}"
    {
@@ -1467,7 +1473,7 @@ void contractElement(Contract contract, boolean precond) :
 }
 
 
-Definition definition(List definitions):
+Definition definition(List definitions, boolean storeDocString):
 { Definition res; }
 {
   (
@@ -1484,7 +1490,7 @@ Definition definition(List definitions):
       ( 
         LOOKAHEAD ( "abstract" "interface" )
         res=interfaceDefinition(cst)
-      | res=classDefinition(cst, definitions)
+      | res=classDefinition(cst, definitions, storeDocString)
       | res=methodDeclaration(cst)
       )
     )
@@ -1492,13 +1498,22 @@ Definition definition(List definitions):
   { return res; }
 }
 
-void readDefinitions(List definitions):
+void readDefinitions(List definitions,boolean storeDocString):
 {
   Definition d;
   globalDefinitions = definitions;
+  Token t;
 }
-{
-  ( d = definition(definitions) { definitions.add(d); } )*
+{ { t = getToken(1); }
+  ( d = definition(definitions, storeDocString)
+    { 
+      if (storeDocString && t.specialToken != null && t.specialToken.kind == FORMAL_COMMENT)
+        d.docString = t.specialToken.image;
+
+      definitions.add(d);
+      t = getToken(1);
+    }
+  )*
   <EOF> 
 }
 
@@ -1781,11 +1796,11 @@ void readOpens():
  * Modules
  ****************************************************************/
 
-void module(List definitions):
+void module(List definitions, boolean storeDocStrings):
 {}
 {
   readOpens()
-  readDefinitions(definitions)
+  readDefinitions(definitions, storeDocStrings)
 }
 
 /****************************************************************

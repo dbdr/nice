@@ -93,6 +93,12 @@ public class Method implements AttrContainer {
     classfile = clfile;
   }
 
+  /** Return the number of arguments of this method. */
+  public int getArity()
+  {
+    return arg_types.length;
+  }
+
   public final void setStaticFlag (boolean is_static) {
     if (is_static)
       access_flags |= Access.STATIC;

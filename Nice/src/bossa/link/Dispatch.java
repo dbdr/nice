@@ -99,7 +99,7 @@ public final class Dispatch
   {
     Stack sortedAlternatives = Alternative.sortedAlternatives(m);
     
-    if (! trivialTestOK(sortedAlternatives))
+    if (! trivialTestJava(m, sortedAlternatives))
       test(m, sortedAlternatives, true);
     
     if(Debug.codeGeneration)
@@ -120,6 +120,28 @@ public final class Dispatch
       if (! a.patterns[i].atAny())
 	  return false;
     return true;
+  }
+
+  private static boolean trivialTestJava(JavaMethod m, Stack alternatives)
+  {
+    gnu.bytecode.Method reflectMethod = m.reflectMethod;
+
+    // Static methods and constructors cannot be overriden, so there is
+    // no problem.
+    if (reflectMethod.getStaticFlag() || reflectMethod.isConstructor())
+      return true;
+
+    if (! reflectMethod.isAbstract())
+      // The only risk with a non abstract method is that it might be
+      // ambiguous.
+      // We know this won't happen in two cases:
+      //   1) if there is only one argument (single
+      //      inheritance, since the root must be a class), 
+      //   2) if there are less than two implementations.
+      return m.getArity() == 1 || alternatives.size() < 2;
+
+    // This method will need testing.
+    return false;
   }
 
   private static boolean[] findUsedPositions(int len, Stack alternatives)

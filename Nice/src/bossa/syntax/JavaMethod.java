@@ -44,6 +44,7 @@ public class JavaMethod extends MethodDeclaration
     super(name, null, type);
     
     this.reflectMethod = reflectMethod;
+    registerForDispatch();
   }
 
   static JavaMethod make(Method m, boolean constructor)
@@ -83,7 +84,7 @@ public class JavaMethod extends MethodDeclaration
     return nice.tools.code.Gen.dereference(getCode());
   }
 
-  Method reflectMethod;
+  public Method reflectMethod;
 
   public gnu.bytecode.Type javaReturnType() 
   { return reflectMethod.getReturnType(); }

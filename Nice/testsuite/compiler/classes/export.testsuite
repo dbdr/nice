@@ -20,7 +20,9 @@
 /// PASS
   /// package a
   /// TOPLEVEL
-  class A implements java.lang.Comparable {}
+  class A implements java.lang.Comparable {
+    compareTo(that) = 0;
+  }
   /// package b import a
   {}
 
@@ -28,7 +30,9 @@
   /// package a
   /// TOPLEVEL
   interface I {}
-  class A implements I, java.lang.Comparable {}
+  class A implements I, java.lang.Comparable {
+    compareTo(that) = 0;
+  }
   /// package b import a
   {}
 

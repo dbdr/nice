@@ -237,6 +237,8 @@ public class RetypedJavaMethod extends JavaMethod
       User.warning(loc, message);
 
     ignoredRetyping = true;
+
+    bossa.link.Dispatch.unregister(this);
   }
  
   gnu.expr.Expression getConstructorInvocation(boolean omitDefaults)

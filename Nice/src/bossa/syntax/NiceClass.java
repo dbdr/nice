@@ -28,7 +28,7 @@ import gnu.expr.QuoteExp;
 
 /**
    Abstract syntax for a class definition.
-   
+
    @version $Date$
    @author Daniel Bonniot
  */
@@ -55,7 +55,7 @@ public class NiceClass extends ClassDefinition.ClassImplementation
         for(Iterator it = fields.iterator(); it.hasNext();)
           {
 	    Field field = (Field)it.next();
-            if (field.isFinal() && field.sym.getName().toString().equals("serialVersionUID"))
+            if (field.isFinal() && field.hasName("serialVersionUID"))
 	      {
 		it.remove();
 		if (field.value instanceof ConstantExp && ((ConstantExp)field.value).value instanceof Long)
@@ -96,7 +96,7 @@ public class NiceClass extends ClassDefinition.ClassImplementation
 
   private static NewField[] noFields = new NewField[0];
   private static OverridenField[] noOverrides = new OverridenField[0];
-  
+
   static NiceClass get(TypeConstructor tc)
   {
     ClassDefinition res = ClassDefinition.get(tc);
@@ -135,7 +135,7 @@ public class NiceClass extends ClassDefinition.ClassImplementation
   /****************************************************************
    * Fields
    ****************************************************************/
-  
+
   public Field makeField
     (MonoSymbol sym, Expression value, 
      boolean isFinal, boolean isTransient, boolean isVolatile, String docString)
@@ -183,10 +183,15 @@ public class NiceClass extends ClassDefinition.ClassImplementation
 
     abstract boolean isFinal();
 
+    boolean hasName(String name)
+    {
+      return sym.getName().toString().equals(name);
+    }
+
     void resolve(VarScope scope, TypeScope typeScope)
     {
       sym.type = sym.syntacticType.resolve(typeScope);
-      
+
       if (nice.tools.typing.Types.isVoid(sym.type))
 	User.error(sym, "A field cannot have void type");
 
@@ -216,7 +221,7 @@ public class NiceClass extends ClassDefinition.ClassImplementation
 
 	  try {
 	    Typing.leq(value.getType(), declaredType);
-	  } 
+	  }
 	  catch (mlsub.typing.TypingEx ex) {
 	    throw bossa.syntax.dispatch.assignmentError
 	      (value, sym.getName().toString(), sym.getType().toString(), value);
@@ -229,7 +234,7 @@ public class NiceClass extends ClassDefinition.ClassImplementation
       return 
 	sym + (value == null ? "" : " = " + value);
     }
-    
+
     MonoSymbol sym;
     Expression value;
 
@@ -272,7 +277,7 @@ public class NiceClass extends ClassDefinition.ClassImplementation
             createSetter(suffix);
         }
     }
- 
+
     void createGetter(String nameSuffix)
     {
       gnu.expr.Expression[] params = new gnu.expr.Expression[1];
@@ -320,7 +325,7 @@ public class NiceClass extends ClassDefinition.ClassImplementation
 	(isFinal ? "final " : "") +
         super.toString();
     }
-    
+
     boolean isFinal;
     boolean isTransient;
     boolean isVolatile;
@@ -405,10 +410,10 @@ public class NiceClass extends ClassDefinition.ClassImplementation
         {
 	  try {
 	    Typing.leq(original.value.getType(), this.sym.getType());
-	  } 
+	  }
 	  catch (mlsub.typing.TypingEx ex) {
-            User.error(sym, "The default value declared in " + 
-                       original.getDeclaringClass() + 
+            User.error(sym, "The default value declared in " +
+                       original.getDeclaringClass() +
                        "\nis not compatible with the overriden type");
           }
           return false;
@@ -423,7 +428,7 @@ public class NiceClass extends ClassDefinition.ClassImplementation
     }
   }
 
-  public final class ValueOverride 
+  public final class ValueOverride
   {
     ValueOverride(LocatedString name, Expression value)
     {
@@ -488,7 +493,7 @@ public class NiceClass extends ClassDefinition.ClassImplementation
 
     for (int i = 0; i < overrides.length; i++)
       overrides[i].resolve(definition.scope, localScope);
- 
+
     for (Iterator it = valueOverrides.iterator(); it.hasNext(); )
       ((ValueOverride)it.next()).resolve(definition.scope, localScope);
 
@@ -506,19 +511,19 @@ public class NiceClass extends ClassDefinition.ClassImplementation
     String name = field.sym.getName().toString();
 
     for (int i = 0; i < fields.length; i++)
-      if (fields[i].sym.getName().toString().equals(name))
+      if (fields[i].hasName(name))
         {
           if (! fields[i].isFinal)
-            User.error(field.sym, "The original field in class " + this + 
+            User.error(field.sym, "The original field in class " + this +
                        " is not final, so its type cannot be overriden");
 
           checkValue = field.checkOverride(fields[i], checkValue);
 
           return fields[i].method.fieldDecl;
         }
-  
+
     for (int i = 0; i < overrides.length; i++)
-      if (overrides[i].sym.getName().toString().equals(name))
+      if (overrides[i].hasName(name))
         checkValue = field.checkOverride(overrides[i], checkValue);
 
     NiceClass parent = getParent();
@@ -530,15 +535,14 @@ public class NiceClass extends ClassDefinition.ClassImplementation
 
   private boolean checkValueOverride(LocatedString name, Expression value)
   {
-   
     Field original = null;
 
     for (int i = 0; i < fields.length; i++)
-      if (fields[i].sym.getName().toString().equals(name.toString()))
+      if (fields[i].hasName(name.toString()))
         original = fields[i];
 
     for (int i = 0; i < overrides.length; i++)
-      if (overrides[i].sym.getName().toString().equals(name.toString()))
+      if (overrides[i].hasName(name.toString()))
         original = overrides[i];
 
     if (original != null)
@@ -552,11 +556,11 @@ public class NiceClass extends ClassDefinition.ClassImplementation
 
 	try {
 	  Typing.leq(value.getType(), declaredType);
-	} 
+	}
 	catch (mlsub.typing.TypingEx ex) {
 	  User.error(name, "Value does not fit in the overriden field of type " + declaredType);
 	}
-        
+
         return true;
       }
 
@@ -587,11 +591,11 @@ public class NiceClass extends ClassDefinition.ClassImplementation
       return;
 
     VarScope scope = definition.scope;
-    mlsub.typing.Monotype thisType = 
+    mlsub.typing.Monotype thisType =
       Monotype.sure
       (new mlsub.typing.MonotypeConstructor
        (definition.tc, definition.getTypeParameters()));
-    thisSymbol = 
+    thisSymbol =
       new MonoSymbol(FormalParameters.thisName, thisType)
       {
         gnu.expr.Expression compile()
@@ -701,7 +705,7 @@ public class NiceClass extends ClassDefinition.ClassImplementation
 
   private void enterTypingContext()
   {
-    if (entered || definition.classConstraint == null) 
+    if (entered || definition.classConstraint == null)
       return;
     Typing.enter();
     entered = true;
@@ -735,9 +739,10 @@ public class NiceClass extends ClassDefinition.ClassImplementation
   {
     if (serialVersionUIDValue == null)
       return "";
-    
+
     return "final long serialVersionUID = " + serialVersionUIDValue + "L;\n";
-  }  
+  }
+
   /****************************************************************
    * Code generation
    ****************************************************************/
@@ -1098,11 +1103,11 @@ public class NiceClass extends ClassDefinition.ClassImplementation
       for (int i = 0; i < interfaces.length; i++)
 	{
 	  TypeConstructor assocTC = interfaces[i].associatedTC();
-	    
+
 	  if (assocTC == null)
 	    // This interface is abstract: ignore it.
 	    continue;
-	    
+
 	  res[--len] = typeExpression(assocTC);
 	}
 
@@ -1164,7 +1169,7 @@ public class NiceClass extends ClassDefinition.ClassImplementation
   {
     if (serialVersionUIDValue == null)
       return;
-   
+
     Declaration fieldDecl = classe.addDeclaration("serialVersionUID", SpecialTypes.longType);
     fieldDecl.setSimple(false);
     fieldDecl.setCanRead(true);

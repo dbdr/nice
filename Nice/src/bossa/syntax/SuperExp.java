@@ -109,11 +109,6 @@ public class SuperExp extends Expression
 				thisMethod.getParameterTypes(), true);
   }
 
-  private boolean leq(MethodBodyDefinition a, MethodBodyDefinition b)
-  {
-    return mlsub.typing.Typing.testRigidLeq(a.firstArgument(), b.firstArgument());
-  }
-
   /****************************************************************
    * Typing
    ****************************************************************/

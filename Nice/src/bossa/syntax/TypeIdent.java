@@ -163,19 +163,6 @@ public final class TypeIdent extends Monotype implements Located
     throw User.error(this, res + " should be an interface");
   }
 
-  public static TypeConstructor[] resolveToTC(TypeMap scope, List idents)
-  {
-    if (idents==null || idents.size()==0) return null;
-    
-    TypeConstructor[] res = new TypeConstructor[idents.size()];
-
-    int n = 0;
-    for(Iterator i = idents.iterator(); i.hasNext();)
-      res[n++] = ((TypeIdent) i.next()).resolveToTC(scope);    
-
-    return res;
-  }
-  
   public static Interface[] resolveToItf(TypeMap scope, List idents)
   {
     if (idents==null || idents.size()==0) return null;

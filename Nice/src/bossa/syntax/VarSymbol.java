@@ -87,24 +87,6 @@ public abstract class VarSymbol extends Node implements Located
 
   abstract Polytype getType();
 
-  /**
-   * Maps getType over a collection of VarSymbols
-   *
-   * @param varsymbols the colleciton of Varsymbols
-   * @return the collection of their Types
-   */
-  static Polytype[] getType(Collection varsymbols)
-  {
-    Iterator i=varsymbols.iterator();
-    Polytype[] res = new Polytype[varsymbols.size()];
-
-    int n = 0;
-    while(i.hasNext())
-      res[n++] = ((VarSymbol) i.next()).getType();
-
-    return res;
-  }
-
   /****************************************************************
    * Overloading resolution
    ****************************************************************/

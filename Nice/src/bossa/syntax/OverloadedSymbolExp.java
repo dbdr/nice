@@ -55,16 +55,6 @@ public class OverloadedSymbolExp extends Expression
     setLocation(ident.location());
   }
 
-  OverloadedSymbolExp(VarSymbol[] symbols, LocatedString ident)
-  {
-    this.symbols = new ArrayList(symbols.length);
-    for (int i = 0; i < symbols.length; i++)
-      this.symbols.add(symbols[i]);
-
-    this.ident = ident;
-    setLocation(ident.location());
-  }
-
   public boolean isAssignable()
   {
     Internal.error("Overloading resolution should be done before this.");

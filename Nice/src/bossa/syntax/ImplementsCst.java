@@ -56,14 +56,5 @@ public class ImplementsCst extends AtomicConstraint
     return tc+":"+itf;
   }
 
-  /*
-  String getParentFor(TypeConstructor tc)
-  {
-    if(this.tc==tc)
-      return def().toString();
-    else
-      return null;
-  }
-  */
   TypeIdent tc, itf;
 }

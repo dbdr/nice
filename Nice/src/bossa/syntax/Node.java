@@ -71,16 +71,6 @@ abstract public class Node
     return n;
   }
   
-  final Statement child(Statement n)
-  {
-    if(n==null)
-      return null;
-
-    if (children == null) children=new ArrayList();
-    children.add(n);
-    return n;
-  }
-  
   void removeChild(Node n)
   {
     if(children == null || !children.contains(n))
@@ -89,14 +79,6 @@ abstract public class Node
     children.remove(n);
   }
   
-  void removeChildren(List c)
-  {
-    if(c==null) return;
-    for(Iterator i = c.iterator();
-	i.hasNext();)
-      removeChild((Node) i.next());
-  }
-
   /**
    * Always returns the argument (except an empty list for 'null').
    * This is just a convenience to be able to write 'this.f = addChildren(f)'.
@@ -111,28 +93,12 @@ abstract public class Node
 
     return c;
   }
-  
-  void addChildren(Node[] values)
-  {
-    for (int i = 0; i < values.length; i++)
-      addChild(values[i]);
-  }
 
   void addSymbol(VarSymbol s)
   {
     if (varSymbols == null)
       varSymbols = new ArrayList();
     varSymbols.add(s);
-  }
-  
-  void addSymbols(Collection c)
-  {
-    if(c!=null)
-      {
-	if (varSymbols == null)
-	  varSymbols = new ArrayList();
-	varSymbols.addAll(c);
-      }
   }
   
   void addTypeSymbol(TypeSymbol s)
@@ -159,22 +125,6 @@ abstract public class Node
       }
     typeMapsNames.add(name);
     typeMapsSymbols.add(symbol);
-  }
-  
-  void addTypeMaps(Collection names, Collection symbols)
-  {
-    if(names.size()!=symbols.size()) 
-      throw new Error(symbols.size()+" != "+names.size());
-    
-    if (typeMapsNames == null)
-      {
-	typeMapsNames = new ArrayList();
-	typeMapsSymbols = new ArrayList();
-      }
-
-    for(Iterator n = names.iterator();n.hasNext();)
-      typeMapsNames.add(((LocatedString) n.next()).toString());
-    typeMapsSymbols.addAll(symbols);
   }
   
   /**

@@ -93,28 +93,6 @@ public class VarScope
     return new LinkedList();
   }
 
-  /**
-   * Verifies that a collection of VarSymbol
-   * does not contains twice the same identifier
-   *
-   * @param symbols the collection of VarSymbols
-   * @exception DuplicateIdentEx if the same identifer occurs twice
-   */
-  static void checkDuplicates(Collection symbols)
-    throws DuplicateIdentEx
-  {
-    LocatedString name;
-    Collection seen = new ArrayList(symbols.size());
-    Iterator i = symbols.iterator();
-    while(i.hasNext())
-      {
-	name = ((VarSymbol)i.next()).name;
-	if(seen.contains(name))
-	  throw new DuplicateIdentEx(name);
-	seen.add(name);
-      }
-  }
-
   /****************************************************************
    * Debugging
    ****************************************************************/

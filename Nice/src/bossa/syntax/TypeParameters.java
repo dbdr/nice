@@ -40,13 +40,6 @@ public class TypeParameters
     this.content = typeParameters;
   }
 
-  TypeParameters(LocatedString s, Variance v)
-  {
-    if (v == null)
-      Internal.error(s, s + " has no variance");
-    this.content = Monotype.freshs(v.arity(), s);
-  }
-
   mlsub.typing.Monotype[] resolve(TypeMap ts)
   {
     return Monotype.resolve(ts, content);
@@ -55,11 +48,6 @@ public class TypeParameters
   public String toString()
   {
     return Util.map("<",", ",">", content);
-  }
-
-  public int size()
-  {
-    return content.length;
   }
 
   public Monotype[] content;

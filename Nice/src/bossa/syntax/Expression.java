@@ -131,20 +131,6 @@ public abstract class Expression
     return this;
   }
   
-  /**
-   * Iterates the resolveOverloading() method.
-   */
-  static List /* of Expression */ noOverloading(List expressions)
-  {
-    Iterator i=expressions.iterator();
-    List res=new ArrayList(expressions.size());
-
-    while(i.hasNext())
-      res.add( ((Expression) i.next()) .noOverloading());
-
-    return res;
-  }
-  
   /** computes the static type of the expression */
   abstract void computeType();
 
@@ -158,23 +144,6 @@ public abstract class Expression
       Debug.println(this + "(" + this.getClass() + ") has null type");
     
     return type;
-  }
-  
-  /**
-   * Maps getType over a collection of Expressions
-   *
-   * @param Expressions the list of Expressions
-   * @return the list of their PolyTypes
-   */
-  static Polytype[] getType(List expressions)
-  {    
-    Polytype[] res = new Polytype[expressions.size()];
-
-    int n = 0;
-    for(Iterator i=expressions.iterator(); i.hasNext();)
-      res[n++] = ((Expression) i.next()).getType();
-
-    return res;
   }
 
   /**
@@ -233,22 +202,6 @@ public abstract class Expression
   {
     // Default implementation.
     return generateCode();
-  }
-  
-  /**
-   * Maps {@link #generateCode()} over a list of expressions.
-   */
-  public static gnu.expr.Expression[] compile(List expressions)
-  {
-    gnu.expr.Expression[] res = new gnu.expr.Expression[expressions.size()];
-    int n = 0;
-    for(Iterator i = expressions.iterator(); i.hasNext();n++)
-      {
-	Expression exp = (Expression)i.next();
-	res[n] = exp.generateCode();
-      }
-
-    return res;
   }
   
   /**

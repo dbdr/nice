@@ -192,11 +192,6 @@ public class Arguments
     applicationExpressions.put(symbol, inOrder());
     return true;
   }
-  
-  public gnu.expr.Expression[] compile()
-  {
-    return null; //Expression.compile(arguments);
-  }
 
   public String toString()
   {

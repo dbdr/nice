@@ -675,19 +675,6 @@ public abstract class ClassDefinition extends MethodContainer
     return javaType;
   }
 
-  final ClassType javaClass()
-  {
-    return (ClassType) javaType;
-  }
-
-  static final Type javaClass(ClassDefinition c)
-  {
-    if (c == null)
-      return gnu.bytecode.Type.pointer_type;
-
-    return c.getJavaType();
-  }
-  
   /****************************************************************
    * Printing
    ****************************************************************/

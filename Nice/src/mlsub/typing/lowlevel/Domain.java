@@ -31,6 +31,16 @@ final class Domain extends BitVector {
     this.cardDown = width;
   }
 
+  /**
+   * Creates a copy of a Domain.
+   **/
+  public Domain(Domain old) {
+    super(old);
+    this.containsUnit = old.containsUnit;
+    this.cardUp = old.cardUp;
+    this.cardDown = old.cardDown;
+  }
+
   // size of this domain (possibly including unit)
   int cardinal() {
     if (containsUnit) {
@@ -223,17 +233,4 @@ final class Domain extends BitVector {
     return result;
   }
 
-  public Domain cloneDomain() {
-    Domain result = new Domain(0);
-    this.copyTo(result);
-    return result;
-  }
-
-  private void copyTo(Domain result) {
-    super.copyTo(result);
-
-    result.containsUnit = containsUnit;
-    result.cardUp = cardUp;
-    result.cardDown = cardDown;
-  }
 }

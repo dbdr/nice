@@ -97,7 +97,7 @@ final class DomainVector extends java.util.Vector {
     for (int i = 0; i < elementCount; i++) {
       Domain d = ((Domain)elementData[i]);
       if (d != null) {
-        result.elementData[i] = d.cloneDomain();
+        result.elementData[i] = new Domain(d);
       }
     }
     return result;

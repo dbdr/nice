@@ -43,7 +43,7 @@ final public class BitMatrix {
       {
         BitVector row = oldRows[i];
         if (row != null && !row.isEmpty())
-          newRows[i] = row.cloneVector();
+          newRows[i] = new BitVector(row);
       }
 
     this.rows = newRows;
@@ -303,7 +303,7 @@ final public class BitMatrix {
 			rows[index[stackpos]].or(rows[index[tempsp]]);
 			cyclicmask.set(index[tempsp]);
 		      } while (index[tempsp--] != nextbitpos);
-		      current = current.cloneVector();
+		      current = new BitVector(current);
 		      current.andNot(cyclicmask);
 		      bitpos[stackpos] = 0;
 		    }

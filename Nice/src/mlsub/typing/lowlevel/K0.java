@@ -1271,7 +1271,7 @@ public final class K0 {
     BitVector[] rigidImplementors = new BitVector[nInterfaces()];
     for (int iid = 0; iid < nInterfaces(); iid++) {
       BitVector I_impls = getInterface(iid).implementors;
-      rigidImplementors[iid] = I_impls.cloneVector();
+      rigidImplementors[iid] = new BitVector(I_impls);
       for (int x = I_impls.getLowestSetBit();
            x != BitVector.UNDEFINED_INDEX;
            x = I_impls.getNextBit(x)) {
@@ -1357,7 +1357,7 @@ public final class K0 {
       if (K0.this.m != K0.this.n)
         this.savedC = new BitMatrix(K0.this.C);
 
-      this.savedGarbage = K0.this.garbage.cloneVector();
+      this.savedGarbage = new BitVector(K0.this.garbage);
       this.savedDomains = (DomainVector)K0.this.domains.clone();
       /*
       this.savedImplementors = new BitVector[K0.this.nInterfaces()];

@@ -82,6 +82,25 @@ public class BitVector implements java.io.Serializable {
   }
 
   /**
+   * Creates a copy of a BitVector.
+   */
+  public BitVector(BitVector old) {
+    if (old.bits1 == null)
+      {
+        this.bits0 = old.bits0;
+        this.bits1 = null;
+      }
+    else
+      {
+        this.bits0 = 0L;
+	// optim: shrink to nonZeroLength()?
+	int n = old.bits1.length;
+	this.bits1 = new long[n];
+	System.arraycopy(old.bits1, 0, this.bits1, 0, n);
+      }
+  }
+
+  /**
    * Ensures that the BitVector can hold at least an nth bit.
    * This cannot leave the bits array at length 0.
    * @param    nth the 0-origin number of the bit to ensure is there.
@@ -521,29 +540,6 @@ public class BitVector implements java.io.Serializable {
     return true;
   }
 
-
-
-  /**
-   * Clones the BitVector.
-   */
-  public BitVector cloneVector() {
-    BitVector result = new BitVector();
-    this.copyTo(result);
-    return result;
-  }
-
-  public void copyTo(BitVector result) {
-    if (bits1 == null)
-      result.bits0 = bits0;
-    else
-      {
-	// optim: shrink to nonZeroLength()?
-	int n = length();
-	result.bits1 = new long[n];
-	System.arraycopy(bits1, 0, result.bits1, 0, n);
-      }
-  }
-
   /**
    * Converts the BitVector to a String.
    */
@@ -793,9 +789,12 @@ public class BitVector implements java.io.Serializable {
    * Returns true if no bit is set in this BitVector
    **/
   public boolean isEmpty() {
-    int n = length();
+    if (bits1 == null)
+      return bits0 == 0L;
+
+    int n = bits1.length;
     for (int i = 0; i < n; i++) {
-      if (getW(i) != 0L) {
+      if (bits1[i] != 0L) {
         return false;
       }
     }

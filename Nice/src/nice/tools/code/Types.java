@@ -585,9 +585,7 @@ public final class Types
 
   public static boolean isVoid(mlsub.typing.Monotype m)
   {
-    // The test to void should be more high-level than string comparison
-    String rep = m.toString();
-    return rep.equals("nice.lang.void");
+    return equivalent(m).head() == PrimitiveType.voidTC;
   }
 
   public static boolean isVoid(mlsub.typing.Polytype t)

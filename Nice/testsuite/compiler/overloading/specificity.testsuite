@@ -37,7 +37,7 @@ void h(?String s = null, A a) {}
 void h(B a, ?String s = null) {}
 
 /// FAIL
-  f(a: new B(), "");
+   /* ///FAIL HERE */ f(a: new B(), "");
 
   ///Toplevel
 void f(A a, String s) { }
@@ -73,12 +73,14 @@ void f(B a, String s, int i = 0) { }
 
 /// FAIL
   /// Toplevel
-  abstract class A {}
-  class B extends A {}
-  void foo(A);
-  void foo(A);
-  foo(B(A) x) {}
-  foo(B(B) x) {}
+  interface I1 {}
+  interface I2 {}
+  class B implements I1,I2 {}
+  void foo(I1, String);
+  void foo(I2, String);
+  void foo(I2, int);
+  foo(B(I1) x, y) {}
+  /* ///FAIL HERE */ foo(B(I2) x, y) {}
 
 /// PASS
   /// Toplevel
@@ -110,7 +112,7 @@ void f(B a, String s, int i = 0) { }
   boolean foo(B x) = true;
 
 /// FAIL
-  C->void bar = /* FAIL HERE */foo;
+  C->void bar = /* /// FAIL HERE */foo;
   /// Toplevel
   interface A {}
   interface B {}

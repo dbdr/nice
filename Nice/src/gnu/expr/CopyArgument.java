@@ -24,14 +24,14 @@ package gnu.expr;
 
 public class CopyArgument extends Expression
 {
-  public CopyArgument (Declaration argument)
+  public CopyArgument (java.util.Stack copies)
   {
-    this.argument = argument;
+    this.copies = copies;
   }
 
   public void compile(gnu.expr.Compilation comp, gnu.expr.Target target) 
   {
-    gnu.bytecode.Variable value = argument.getCopyVariable();
+    gnu.bytecode.Variable value = (gnu.bytecode.Variable) copies.peek();
     comp.getCode().emitLoad(value);
     target.compileFromStack(comp, value.getType());
   }
@@ -39,5 +39,5 @@ public class CopyArgument extends Expression
   public void print(gnu.mapping.OutPort out)
   {}
 
-  Declaration argument;
+  final java.util.Stack copies;
 }

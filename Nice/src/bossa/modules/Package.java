@@ -723,14 +723,17 @@ public class Package implements mlsub.compilation.Module, Located, bossa.syntax.
      @return an expression to call this method 
      if the package has not been recompiled.
   */
-  public gnu.expr.Expression lookupPackageMethod(String methodName, String type)
+  public gnu.expr.Expression lookupPackageMethod(ToplevelFunction fun)
   {
-    Method res = lookupClassMethod(source.getBytecode(), methodName,
-				   "type", type);
+    Method res = lookupClassMethod(source.getBytecode(), 
+                                   fun.getName().toString(),
+				   "type", fun.getType().toString());
     if (res == null) 
       return null;
 
-    return new gnu.expr.QuoteExp(new gnu.expr.PrimProcedure(res));
+    return new gnu.expr.QuoteExp
+      (new gnu.expr.PrimProcedure
+       (res, fun.formalParameters().getParameterCopies()));
   }
   
   /**
@@ -796,6 +799,7 @@ public class Package implements mlsub.compilation.Module, Located, bossa.syntax.
       }
     res = nice.tools.code.Gen.createMethod
       (name, argTypes, retType, def.getSymbols());
+    res.parameterCopies = def.formalParameters().getParameterCopies();
 
     // add unique information to disambiguate which method this represents
     res.addBytecodeAttribute

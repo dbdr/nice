@@ -183,6 +183,14 @@ public class PrimProcedure extends MethodProc implements gnu.expr.Inlineable
     init(method);
   }
 
+  public PrimProcedure(Method method, java.util.Stack[] parameterCopies)
+  {
+    init(method);
+    this.parameterCopies = parameterCopies;
+  }
+
+  private java.util.Stack[] parameterCopies;
+
   public PrimProcedure(Method method, Interpreter interpreter)
   {
     init(method);
@@ -307,6 +315,16 @@ public class PrimProcedure extends MethodProc implements gnu.expr.Inlineable
 
   public final Type[] getParameterTypes() { return argTypes; }
 
+  public static void compileArgs(Expression[] args,
+				 Type thisType, Type[] argTypes,
+				 boolean variable,
+				 String name, LambdaExp source,
+				 Compilation comp)
+ {
+   compileArgs(args, thisType, argTypes, variable, name, source, comp, 
+               source == null ? null : source.parameterCopies);
+ }
+
   /** Compile arguments and push unto stack.
    * @param args arguments to evaluate and push.
    * @param thisType If we are calling a non-static function,
@@ -319,7 +337,8 @@ public class PrimProcedure extends MethodProc implements gnu.expr.Inlineable
 				 Type thisType, Type[] argTypes,
 				 boolean variable,
 				 String name, LambdaExp source,
-				 Compilation comp)
+				 Compilation comp,
+                                 java.util.Stack[] parameterCopies)
  {
     Type arg_type = null;
     gnu.bytecode.CodeAttr code = comp.getCode();
@@ -330,7 +349,11 @@ public class PrimProcedure extends MethodProc implements gnu.expr.Inlineable
       : args.length;
     Declaration argDecl = source == null ? null : source.firstDecl();
 
-    Scope scope = code.pushScope();
+    Scope scope;
+    if (parameterCopies == null)
+      scope = null;
+    else
+      scope = code.pushScope();
 
     for (int i = 0; ; ++i)
       {
@@ -364,10 +387,13 @@ public class PrimProcedure extends MethodProc implements gnu.expr.Inlineable
 	  source == null ? CheckedTarget.getInstance(arg_type, name, i)
 	  : CheckedTarget.getInstance(arg_type, source, i);
 	args[i].compileNotePosition(comp, target);
-	if (argDecl != null && argDecl.mustCopyValue())
+	if (parameterCopies != null && parameterCopies[i] != null)
 	  {
-	    Variable value = scope.addVariable(code, target.getType(), argDecl.getName());
-	    argDecl.setCopyVariable(value);
+	    Variable value = scope.addVariable(code, target.getType(), 
+                                               argDecl != null 
+                                               ? argDecl.getName()
+                                               : "l_" + i);
+            parameterCopies[i].push(value);
 	    code.emitDup();
 	    code.emitStore(value);
 	  }
@@ -376,7 +402,16 @@ public class PrimProcedure extends MethodProc implements gnu.expr.Inlineable
 	if (argDecl != null && (is_static || i > 0))
 	  argDecl = argDecl.nextDecl();
       }
-    code.popScope();
+
+    // Restore the state of the captured parameters,
+    // so that a subsequent after a nested call use is possible.
+    if (parameterCopies != null)
+      for (int i = 0; i < arg_count; i++)
+        if (parameterCopies[i] != null)
+          parameterCopies[i].pop();
+
+    if (scope != null)
+      code.popScope();
   }
 
   public void compile (ApplyExp exp, Compilation comp, Target target)
@@ -402,7 +437,7 @@ public class PrimProcedure extends MethodProc implements gnu.expr.Inlineable
   {
     gnu.bytecode.CodeAttr code = comp.getCode();
     compileArgs(args, thisType, argTypes,
-		takesVarArgs(), getName(), source, comp);
+		takesVarArgs(), getName(), source, comp, parameterCopies);
     
     if (method == null)
       code.emitPrimop (opcode(), args.length, retType);

@@ -600,22 +600,4 @@ public class Declaration
       }
     return null;
   }
-
-  /****************************************************************
-   * Support for referencing the value of a previous argument in a call.
-   ****************************************************************/
-
-  public void mustCopyValue(boolean value)
-  {
-    mustCopyValue = true;
-  }
-
-  boolean mustCopyValue() { return mustCopyValue; }
-
-  private boolean mustCopyValue;
-
-  void setCopyVariable(Variable var) { this.copyVariable = var; }
-  Variable getCopyVariable() { return copyVariable; }
-
-  private Variable copyVariable;
 }

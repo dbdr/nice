@@ -30,6 +30,8 @@ public class LambdaExp extends ScopeExp
   public Keyword[] keywords;
   public Expression[] defaultArgs;
 
+  public java.util.Stack[] parameterCopies;
+
   static int counter;
   /** Unique id number, to ease print-outs and debugging. */
   int id = ++counter;

@@ -147,8 +147,7 @@ implements Function
 	// Then there would be no need to bother linking declaration and code.
 
 	// Just get the handle to the already compiled function.
-	gnu.expr.Expression res = module.lookupPackageMethod
-	  (name.toString(), getType().toString());
+	gnu.expr.Expression res = module.lookupPackageMethod(this);
 
 	if (res != null)
 	  return res;
@@ -159,6 +158,7 @@ implements Function
 
     LambdaExp code = Gen.createMethod
       (name.toString(), javaArgTypes(), javaReturnType(), getSymbols());
+    code.parameterCopies = parameters.getParameterCopies();
     code.addBytecodeAttribute
       (new MiscAttr("type", getType().toString().getBytes()));
 

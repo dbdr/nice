@@ -161,3 +161,23 @@ class AA {
   String str;
   int i;
 }
+
+/// PASS
+  /// package a
+  /// Toplevel
+int foo(int x = 1, int y = x + 1) = x + y;
+  /// package b import a
+assert foo(2) == 5;
+
+/// PASS
+  /// package a
+  /// Toplevel
+int foo(int x = 1, int y = x + 1);
+foo(x, y) = x + y;
+  /// package b import a
+assert foo(2) == 5;
+
+/// PASS
+  assert foo(x: 1, y: foo()) == 1;
+  /// Toplevel
+int foo(int x = 0, int y = x + 1, int z = x) = z;

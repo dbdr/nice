@@ -106,20 +106,19 @@ public class FormalParameters extends Node
       int getState () 
       { 
 	if (state == ARGUMENT_REFERENCE)
-	  captured = true;
+          // This parameter is referenced by a later one.
+          // We will need to copy its value.
+	  copies = new java.util.Stack();
 
 	return state;
       }
 
-      private boolean captured = false;
+      private java.util.Stack copies;
 
       public void setDeclaration (gnu.expr.Declaration declaration, 
 				  boolean isThis)
       {
 	super.setDeclaration(declaration, isThis);
-	
-	if (captured)
-	  getDeclaration().mustCopyValue(true);
       }
     }
 
@@ -136,7 +135,7 @@ public class FormalParameters extends Node
 
       public gnu.expr.Expression compile ()
       {
-	return new gnu.expr.CopyArgument(this.getSymbol().getDeclaration());
+	return new gnu.expr.CopyArgument(((Symbol) this.getSymbol()).copies);
       }
     }
   }
@@ -503,6 +502,24 @@ public class FormalParameters extends Node
             res.add(parameters[i]);
           }
       }
+    return res;
+  }
+
+  public java.util.Stack[] getParameterCopies()
+  {
+    java.util.Stack[] res = null;
+
+    for(int i = 0; i < size; i++) 
+      {
+        Parameter param = parameters[i];
+        if (param.symbol.copies != null)
+          {
+            if (res == null)
+              res = new java.util.Stack[parameters.length];
+            res[i] = param.symbol.copies;
+          }
+      }
+
     return res;
   }
 

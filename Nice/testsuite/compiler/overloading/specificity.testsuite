@@ -117,3 +117,12 @@ void f(B a, String s, int i = 0) { }
   class C implements A,B {}
   void foo(A x) {}
   void foo(B x) {}
+
+/// PASS bug
+  assert foo(null) == null;
+  let String s = foo("abc");
+  ///Toplevel
+  ?String foo(?String);
+  override String foo(String);
+  foo(null) = null;
+  foo(String s) = s;

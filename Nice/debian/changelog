@@ -16,11 +16,11 @@ nice (0.7.7) unstable; urgency=low
       fib(2) = 1;
       fib(n) = fib(n-2) + fib(n-1);
   * The '@' in '@null' patterns is deprecated, '@' should be omitted.
-  * The 'fun' keyword is deprecated now, you can leave it away.
+  * The 'fun' keyword for anonymous functions is deprecated. It can be omitted.
   * New policy for typing calls to Java methods. By default, the typing
     is more convenient, considering arguments as possibly null, and 
-    results as non-null. With the '-- strict' compiler option, use a stricter
-    heuristics.
+    results as non-null. The '--strict' compiler option enforces a stricter
+    heuristic.
     Additionally, arrays are always considered to have non-null component 
     types.
     Final fields are considered non-null.
@@ -32,13 +32,13 @@ nice (0.7.7) unstable; urgency=low
       String[] s = integerArray.map(Integer.toHexString);
   * Allow the ?(T->U) syntax for optional functional types as an alternative
     to T ?-> U, and void -> Type as an alternative to () -> Type.
-  * Added the 'concat' function on arrays.
+  * Added the 'concat' function on arrays, and sort function for lists.
   * Faster compilation for large projects with many classes.
   * Bugfixes (anonymous functions inside functionals with constracts,
     typechecking loop tests, other fixes to reduce the difference between
     what the parser accepts and the compiler can handle, ...).
 
- --
+ -- Daniel Bonniot <bonniot@users.sourceforge.net>  Wed,  5 Mar 2003 13:30:30 +0100
 
 nice (0.7.6) unstable; urgency=low
 

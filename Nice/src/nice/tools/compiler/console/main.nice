@@ -124,9 +124,6 @@ int compile(String[] args)
 	  String file => { nativeCompiler = file; }),
 
 
-   option(letter: 'h', "help", "Print help message and exit",
-	  () => help(prg)),
-
    option("editor", "Tell nicec that it is called by an editor.",
 	  () => { editorMode = true; }),
 

@@ -248,6 +248,13 @@ public class CallExp extends Expression
     function = function.resolveOverloading(this);
 
     function.checkSpecialRequirements(arguments.computedExpressions);
+
+    // make sure computedExpressions is valid.
+    getType();
+    // Allow expressions to know in what context they are used.
+    // Important for litteral arrays and tuples.
+    Expression.adjustToExpectedType(arguments.computedExpressions,
+                                    Types.domain(function.getType()));
   }
 
   void computeType()

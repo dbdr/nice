@@ -30,14 +30,17 @@ public class LiteralArrayProc extends gnu.mapping.ProcedureN
        The corresponding number of elements are expected as arguments 
        of the procedure.
    */
-  public LiteralArrayProc(ArrayType arrayType, int nbElements)
+  public LiteralArrayProc(ArrayType arrayType, int nbElements,
+                          boolean wrapAsCollection)
   {
     this.arrayType = arrayType;
     this.nbElements = nbElements;
+    this.wrapAsCollection = wrapAsCollection;
   }
 
   private ArrayType arrayType;
   private int nbElements;
+  private boolean wrapAsCollection;
   
   public void compile (ApplyExp exp, Compilation comp, Target target)
   {
@@ -46,12 +49,14 @@ public class LiteralArrayProc extends gnu.mapping.ProcedureN
     Expression[] args = exp.getArgs();
     CodeAttr code = comp.getCode();
 
+    Type componentType = getComponentType(args);
+
     code.emitPushInt(nbElements);
-    code.emitNewArray(arrayType.getComponentType());
+    code.emitNewArray(componentType);
 
     // Set a special type, not the legacy array type.
     code.popType();
-    code.pushType(arrayType);
+    code.pushType(SpecialTypes.array(componentType));
 
     
     /*
@@ -79,17 +84,51 @@ public class LiteralArrayProc extends gnu.mapping.ProcedureN
           else if (i == nbElements - 2)
             code.emitDup();
 
+        // Get the specific type for this rank of the array (useful for tuples)
+        Type specificType = Types.componentType(arrayType, i);
+        // Only use it if it is more specific than the expected type.
+        // For instance don't use int if we store it in an Object[] anyway.
+        if (! specificType.isAssignableTo(componentType))
+          specificType = componentType;
+
 	code.emitPushInt(i);
-	args[i].compile(comp, arrayType.elements);
-	code.emitArrayStore(arrayType.elements);
+        args[i].compile(comp, specificType);
+	code.emitArrayStore(componentType);
       }
 
-    target.compileFromStack(comp, arrayType);
+    if (wrapAsCollection)
+      SpecialArray.emitCoerceToCollection(code);
+    else
+      target.compileFromStack(comp, code.topType());
   }
-  
+
+  private Type getComponentType (Expression[] args)
+  {
+    Type type = Types.lowestUpperBound(args);
+    
+    if (type.isSubtype(arrayType.getComponentType()))
+      {
+        // We could precise that type of the array, but this is not
+        // necessary given the context, and it would even be bas for primitive
+        // types (byte[] will need conversion if int[] is expected).
+        // Just keep the original type.
+        type = arrayType.getComponentType();
+      }
+
+    if (type == Type.nullType)
+      // All we know is that this array will contain only null, and will be
+      // used generically. Let's make that Object.
+      type = Type.pointer_type;
+
+    return type;
+  }
+
   public Type getReturnType(Expression[] args)
   {
-    return arrayType;
+    if (wrapAsCollection)
+      return ClassType.make("java.util.List");
+
+    return SpecialTypes.array(getComponentType(args));
   }
 
   public Object applyN(Object[] args)

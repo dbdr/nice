@@ -40,3 +40,16 @@ class A {
 /// PASS
   /// Toplevel
 var String[][][] s = [[["A"]]];
+
+/// PASS
+  Object[][][] s = [[["A"]]];
+  s[0] = [[ new Object() ]];
+
+/// PASS
+  sizes([[1,2,3],[4,5,6]]);
+  /// TOPLEVEL
+<T> void sizes (List<List<T>> lists)
+{
+  int i;
+  lists.foreach(List<T> list => i = list.size);
+}

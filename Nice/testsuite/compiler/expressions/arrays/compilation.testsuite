@@ -85,15 +85,25 @@ void foo(Object[] oo)
   arr[1] = "pqr";
   assert x.equals("xyz") && arr[0].equals("xyz") && arr[1].equals("pqr"); 
 
-/// PASS bug
+/// PASS
   List<List<int>> x =  [[1,2,3]];
   int i = x[0][1];
 
-/// PASS bug
+/// PASS
+  let List<(List<byte>, String)> a = [([1,2,3], "Hello")];
+  (List<byte> l1, String s1) = a[0];
+
+/// PASS
   (List<int>, String) x = ([1,2,3], "abc");
   (List<int> arr, String str) = x;
 
-/// PASS bug
+/// PASS
+  List<String>[] x0 = [["A","B","C"]];
+  List<List<String>> x = x0;
+  List<String> l = x0[0];
+  String s = l[1];
+
+/// PASS
   (int[], int[]) t1 = ([1, 2], [3, 4]);
   (List<int>, List<int>) t2 = t1;
   (List<int> la, List<int> lb) = t2;
@@ -102,8 +112,8 @@ void foo(Object[] oo)
 
 /// PASS bug
   ((int[], String) , String) t1 = (([1, 2], "abc"), "xyz");
-  ((List<int>, String), String) t2 = t1;                   
-  ((List<int>, String) t3, String s1) = t2;                
-  (List<int> la, String s2) = t3;                          
-  assert la[0] == 1;                                       
-  assert la[1] == 2;                                       
+  ((List<int>, String), String) t2 = t1;
+  ((List<int>, String) t3, String s1) = t2;
+  (List<int> la, String s2) = t3;
+  assert la[0] == 1;
+  assert la[1] == 2;

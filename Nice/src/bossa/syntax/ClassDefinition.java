@@ -426,6 +426,8 @@ public abstract class ClassDefinition extends MethodContainer
 	  (name, variance, isConcrete(), true);
 	if (name.equals("nice.lang.Throwable"))
 	  PrimitiveType.throwableTC = tc;
+        else if (name.equals("nice.lang.Collection"))
+          PrimitiveType.collectionTC = tc;
       }
 
     tcToClassDef.put(tc, this);

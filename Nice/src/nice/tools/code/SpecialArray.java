@@ -263,6 +263,11 @@ public class SpecialArray extends gnu.bytecode.ArrayType
   
   public void emitCoerceToObject (CodeAttr code)
   {
+    emitCoerceToCollection(code);
+  }
+
+  public static void emitCoerceToCollection (CodeAttr code)
+  {
     code.emitInvokeStatic(makeMethod);
   }
 

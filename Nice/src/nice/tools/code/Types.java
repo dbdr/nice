@@ -259,6 +259,33 @@ public final class Types
       return res;
   }
   
+  public static Type lowestUpperBound(Expression[] exps)
+  {
+    if (exps.length == 0)
+      return Type.pointer_type;
+
+    // Start with the minimal type.
+    Type res = Type.neverReturnsType;
+
+    for (int i = 0; i < exps.length; i++)
+      {
+        res = Type.lowestCommonSuperType(res, exps[i].getType());
+
+        if (res == null)
+          return Type.pointer_type;
+      }
+
+    return res;
+  }
+
+  public static Type componentType(ArrayType type, int rank)
+  {
+    if (type instanceof TupleType)
+      return ((TupleType) type).componentTypes[rank];
+
+    return type.getComponentType();
+  }
+
   /****************************************************************
    * Converting a bytecode type (coming from reflection for instance)
    * into a Nice type.
@@ -697,6 +724,32 @@ public final class Types
   public static Monotype codomain(Polytype type)
   {
     return ((FunType) rawType(type.getMonotype())).codomain();
+  }
+
+  /** @return the <code>rank</code>th type parameter of this type, or null. */
+  public static Monotype getTypeParameter(Polytype type, int rank)
+  {
+    // This can only help
+    type.simplify();
+
+    return getTypeParameter(type.getMonotype(), rank);
+  }
+
+  /** @return the <code>rank</code>th type parameter of this type, or null. */
+  public static Monotype getTypeParameter(Monotype type, int rank)
+  {
+    // get rid of the nullness part
+    type = nice.tools.code.Types.rawType(type);
+
+    if (! (type instanceof MonotypeConstructor))
+      return null;
+
+    Monotype[] parameters = ((MonotypeConstructor) type).getTP();
+
+    if (parameters.length <= rank)
+      return null;
+    else
+      return parameters[rank];
   }
 
   /** 

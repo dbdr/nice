@@ -16,6 +16,7 @@ import java.util.*;
 import bossa.util.*;
 
 import mlsub.typing.Polytype;
+import mlsub.typing.Monotype;
 
 /**
    An expression of the Nice language.
@@ -130,7 +131,27 @@ public abstract class Expression
   {
     return this;
   }
-  
+
+  /**
+     Called with the type that this expression is expected to have.
+     This information can be used to generate better code.
+  */
+  void adjustToExpectedType(Monotype expectedType)
+  {
+    // Default: do nothing.
+  }
+
+  static void adjustToExpectedType (Expression[] expressions, Monotype[] types)
+  {    
+    // The domain of a function can be null in rare circumstances, like
+    // for a function of type <T> T
+    if (types == null)
+      return;
+
+    for (int i = 0; i < types.length; i++)
+      expressions[i].adjustToExpectedType(types[i]);
+  }
+
   /** computes the static type of the expression */
   abstract void computeType();
 

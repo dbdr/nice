@@ -369,13 +369,20 @@ public class rawArray extends java.util.AbstractList
       // convert them.
       boolean primitiveArray = 
 	componentClass.charAt(0) == '[' &&
-	componentClass.charAt(1) != 'L';
+	componentClass.charAt(1) != 'L' &&
+	componentClass.charAt(1) != '[';
+
+      boolean collection = 
+        componentClass.equals("java.util.Collection") ||
+        componentClass.equals("java.util.List");
 
       for (int i = len; --i >= 0;) {
 	Object value = Array.get(array, i);
 
 	if (primitiveArray)
 	  value = convertPrimitive(value, componentClass.substring(1));
+        else if (collection)
+          value = rawArray.make(value);
 
 	Array.set(res, i, value);
       }

@@ -20,6 +20,8 @@ import gnu.bytecode.*;
 import mlsub.typing.Monotype;
 import mlsub.typing.MonotypeConstructor;
 import mlsub.typing.Polytype;
+import mlsub.typing.TypeConstructor;
+import nice.tools.code.Types;
 
 /**
    Creates an array containing the given elements.
@@ -48,8 +50,6 @@ public class LiteralArrayExp extends Expression
     // Object[].
     if (! type.trySimplify())
       type = array(PrimitiveType.objectPolytype());
-    
-    nice.tools.code.Types.setBytecodeType(type);
   }
 
   private Polytype array(Polytype elementType)
@@ -62,18 +62,64 @@ public class LiteralArrayExp extends Expression
     return res;
   }
 
+  /**
+     Adjust the array type according to the context.
+
+     This is usefull because arrays are non-variant.
+     For instance, different code must be generated 
+     for [ 1, 2 ] in the contexts:
+     List<int[]> i = [[ 1, 2 ]]
+     and 
+     List<List<byte[]>> b = [[ 1, 2 ]]
+  */
+  bossa.syntax.Expression resolveOverloading(Polytype expectedType)
+  {
+    Monotype elementType = Types.getTypeParameter(expectedType, 0);
+
+    if (elementType != null)
+      for (int i = 0; i < elements.length; i++)
+        elements[i].adjustToExpectedType(elementType);
+
+    return this;
+  }
+
+  void adjustToExpectedType(Monotype expectedType)
+  {
+    TypeConstructor tc = Types.equivalent(expectedType).head();
+
+    // Remember that we will need to wrap the array to make it a collection.
+    // This cannot be found easily during code generation for nested arrays
+    // since the bytecode type of both List<List<T>> and List<T[]> is
+    // simply List.
+    if (tc != PrimitiveType.arrayTC &&
+        tc != null && tc.isRigid() &&
+        mlsub.typing.Typing.testRigidLeq(tc, PrimitiveType.collectionTC))
+      {
+        wrapAsCollection = true;
+      }
+
+    // Adjust nested elements.
+    Monotype elementType = Types.getTypeParameter(expectedType, 0);
+    if (elementType != null)
+      for (int i = 0; i < elements.length; i++)
+        elements[i].adjustToExpectedType(elementType);    
+  }
+
+  private boolean wrapAsCollection;
+
   /****************************************************************
    * Code generation
    ****************************************************************/
 
   public gnu.expr.Expression compile()
   {
-    Type t = nice.tools.code.Types.javaType(getType());
-    
+    gnu.expr.Expression[] args = Expression.compile(elements);
+    ArrayType t = (ArrayType) nice.tools.code.SpecialTypes.array(Types.lowestUpperBound(args));
+
     return new gnu.expr.ApplyExp
-      (new nice.tools.code.LiteralArrayProc((ArrayType) t, 
-					    elements.length),
-       Expression.compile(elements));
+      (new nice.tools.code.LiteralArrayProc
+         (t, elements.length, wrapAsCollection),
+       args);
   }
   
   public String toString()

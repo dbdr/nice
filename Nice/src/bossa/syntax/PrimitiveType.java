@@ -187,12 +187,13 @@ public class PrimitiveType extends ClassDefinition.ClassImplementation
   public static Monotype synVoidType;
 
   static TypeConstructor typeTC;
+  static TypeConstructor collectionTC;
   static TypeConstructor throwableTC;
   static TypeConstructor throwableTC()
   {
     return throwableTC;
   }
-	
+
   private static Polytype throwableType;
   static Polytype throwableType()
   {

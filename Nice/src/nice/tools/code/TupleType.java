@@ -36,13 +36,19 @@ public class TupleType extends SpecialArray
 
   public Type[] componentTypes;
 
+  public String toString()
+  {
+    return "tuple[" + getComponentType() + "](" +
+      bossa.util.Util.map("", ",", ")", componentTypes);
+  }
+
   public static gnu.expr.Expression createExp
     (Type arrayType, Type[] componentTypes,
      gnu.expr.Expression[] components)
   {
     return new gnu.expr.ApplyExp
       (new nice.tools.code.LiteralArrayProc
-       (new TupleType(arrayType, componentTypes), components.length),
+       (new TupleType(arrayType, componentTypes), components.length, false),
        components);
   }
 }

@@ -69,15 +69,25 @@ public class TupleExp extends bossa.syntax.Expression
     // This can only help
     expectedType.simplify();
 
-    Monotype m = expectedType.getMonotype();
-    // get rid of the nullness part
-    m = Types.rawType((MonotypeConstructor) m);
+    adjustToExpectedType(expectedType.getMonotype());
+
+    return this;
+  }
+
+  void adjustToExpectedType(Monotype expectedType)
+  {
+    Monotype m = Types.equivalent(expectedType);
 
     // Get the expected component types
     if (m instanceof TupleType)
-      expectedComponents = ((TupleType) m).getComponents();
+      {
+        expectedComponents = ((TupleType) m).getComponents();
 
-    return this;
+        // Do the same for the elements of the tuple, since they might be
+        // tuples themselves, literal arrays, ...
+        bossa.syntax.Expression.adjustToExpectedType
+          (expressions, expectedComponents);
+      }
   }
 
   bossa.syntax.Expression noOverloading()
@@ -121,7 +131,7 @@ public class TupleExp extends bossa.syntax.Expression
     */
     return nice.tools.code.TupleType.createExp
       (Types.lowestCommonSupertype(expectedComponents),
-       Types.javaType(components), 
+       Types.javaType(expectedComponents), 
        bossa.syntax.Expression.compile(expressions));
   }
 

@@ -9,6 +9,9 @@ nice (0.9.6)
     'loop(5, () => { doSomeThing(); });'
   * Stricter parsing of expression used as statement.
   * Improved performance of arrays used as lists.
+  * New methods (in package nice.functional) for working with iterators 
+    and generators.
+  * "using" statement, as in C#.
   * Fixed the file locations in the RPM package, and added automatic
     registration of the emacs mode for the SuSE Linux distribution.
   * Bug fixes (checking of local variables in a call position, make it possible

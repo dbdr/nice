@@ -46,6 +46,7 @@ public class FunExp extends Expression implements Function
     this.formals = formals;
     this.constraint = cst;
     this.body = body;
+    setLocation(body.location());
   }
 
   public mlsub.typing.Monotype getExpectedType()

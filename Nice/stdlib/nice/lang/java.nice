@@ -204,6 +204,14 @@ PrintStream stderr () = native System.err;
 <K,V> HashMap<K,V> HashMap(int) = native new HashMap(int);
 <K,V> HashMap<K,V> HashMap(int,float) = native new HashMap(int,float);
 <K,K0,V,V0 | K0 <: K, V0 <: V> HashMap<K,V> HashMap(Map<K0,V0>) = native new HashMap(Map);
+<K,V> IdentityHashMap<K,V> IdentityHashMap() = native new IdentityHashMap();
+<K,V> IdentityHashMap<K,V> IdentityHashMap(int) = native new IdentityHashMap(int);
+<K,K0,V,V0 | K0 <: K, V0 <: V> IdentityHashMap<K,V> IdentityHashMap(Map<K0,V0>) = native new IdentityHashMap(Map);
+<K,V> LinkedHashMap<K,V> LinkedHashMap() = native new LinkedHashMap();
+<K,V> LinkedHashMap<K,V> LinkedHashMap(int) = native new LinkedHashMap(int);
+<K,V> LinkedHashMap<K,V> LinkedHashMap(int,float) = native new LinkedHashMap(int,float);
+<K,V> LinkedHashMap<K,V> LinkedHashMap(int,float,boolean) = native new LinkedHashMap(int,float,boolean);
+<K,K0,V,V0 | K0 <: K, V0 <: V> LinkedHashMap<K,V> LinkedHashMap(Map<K0,V0>) = native new LinkedHashMap(Map);
 <K,V> Hashtable<K,V> Hashtable() = native new Hashtable();
 <K,V> Hashtable<K,V> Hashtable(int) = native new Hashtable(int);
 <K,V> Hashtable<K,V> Hashtable(int,float) = native new Hashtable(int,float);
@@ -236,8 +244,11 @@ class AbstractMap<K,V> implements Map<K,V> = native java.util.AbstractMap;
 class ArrayList<T> extends AbstractList<T> = native java.util.ArrayList;
 class Dictionary<K,V> = native java.util.Dictionary;
 class HashMap<K,V> extends AbstractMap<K,V> = native java.util.HashMap;
+class LinkedHashMap<K,V> extends AbstractMap<K,V> = native java.util.LinkedHashMap;
 class HashSet<T> extends AbstractSet<T> = native java.util.HashSet;
+class LinkedHashSet<T> extends AbstractSet<T> = native java.util.LinkedHashSet;
 class Hashtable<K,V> implements Map<K,V> = native java.util.Hashtable;
+class IdentityHashMap<K,V> extends AbstractMap<K,V> = native java.util.IdentityHashMap;
 class LinkedList<T> extends AbstractSequentialList<T> = native java.util.LinkedList;
 class Stack<T> extends Vector<T> = native java.util.Stack;
 class TreeMap<K,V> extends AbstractMap<K,V> implements SortedMap<K,V> = native java.util.TreeMap;
@@ -337,6 +348,17 @@ class WeakHashMap<K,V> extends AbstractMap<K,V> = native java.util.WeakHashMap;
   native Object Collections.max(Collection, Comparator);
 <T> void sort(List<T>, Comparator<T>) = 
   native void Collections.sort(List, Comparator);
+<T> void swap(List<T>, int, int) = native void Collections.swap(List, int, int);
+<T> void rotate(List<T>, int) = native void Collections.rotate(List, int);
+<T,U | T <: U> boolean replaceAll(List<T>, U, T) = native boolean Collections.replaceAll(List, Object, Object);
+<T,U | T <: U> int indexOfSubList(List<T>, List<U>) = native int Collections.indexOfSubList(List, List);
+<T,U | T <: U> int lastIndexOfSubList(List<T>, List<U>) = native int Collections.lastIndexOfSubList(List, List);
+
+// static collections fields
+<T> List<T> EMPTY_LIST() = native Collections.EMPTY_LIST;
+<T> Set<T> EMPTY_SET() = native Collections.EMPTY_SET;
+<K,V> Map<K,V> EMPTY_MAP() = native Collections.EMPTY_MAP;
+
 
 // these 3 have a too large type because they can't use comparable yet.
 <T> void sort(List<!T>) = native void Collections.sort(List);

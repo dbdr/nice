@@ -1,0 +1,206 @@
+package nice.ui.common.types.beans;
+
+import java.beans.*;
+import java.beans.beancontext.*;
+import java.lang.reflect.*;
+import java.net.*;
+import java.io.*;
+
+
+
+
+/**
+ * EVENT INTERFACE SECTION
+ */
+ 
+// interface PropertyChangeListener
+void propertyChange(PropertyChangeListener, PropertyChangeEvent)
+  = native void PropertyChangeListener.propertyChange(PropertyChangeEvent);
+
+// interface VetoableChangeListener
+void vetoableChange(VetoableChangeListener, PropertyChangeEvent)
+  = native void VetoableChangeListener.vetoableChange(PropertyChangeEvent);
+ 
+// interface BeanContextMembershipListener
+void childrenAdded(BeanContextMembershipListener, BeanContextMembershipEvent)
+  = native void BeanContextMembershipListener.childrenAdded(BeanContextMembershipEvent); 
+void childrenRemoved(BeanContextMembershipListener, BeanContextMembershipEvent)
+  = native void BeanContextMembershipListener.childrenRemoved(BeanContextMembershipEvent);  
+ 
+// interface BeanContextServiceRevokedListener 
+void serviceRevoked(BeanContextServiceRevokedListener, BeanContextServiceRevokedEvent)
+  = native void BeanContextServiceRevokedListener.serviceRevoked(BeanContextServiceRevokedEvent);
+
+// interface BeanContextServicesListener
+void serviceAvailable(BeanContextServicesListener, BeanContextServiceAvailableEvent)
+  = native void BeanContextServicesListener.serviceAvailable(BeanContextServiceAvailableEvent);
+
+
+
+
+
+/**
+  * give precise types to methods declared in java.beans.*
+  */
+
+/* class BeanDescriptor */
+Class getBeanClass(BeanDescriptor) = native Class BeanDescriptor.getBeanClass();
+
+/* class Beans */
+Object getInstanceOf(Object, Class) = native Object Beans.getInstanceOf(Object,Class);
+Object instantiate(ClassLoader, String) = native Object Beans.instantiate(ClassLoader, String);
+Object instantiate(ClassLoader, String, BeanContext) = native Object Beans.instantiate(ClassLoader, String, BeanContext);
+Object instantiate(ClassLoader, String, BeanContext, AppletInitializer) = native Object Beans.instantiate(ClassLoader, String, BeanContext, AppletInitializer);
+
+/* class EventSetDescriptor */
+Method getAddListenerMethod(EventSetDescriptor) = native Method EventSetDescriptor.getAddListenerMethod(); 
+//JDK1.4     Method getGetListenerMethod(EventSetDescriptor) = native Method EventSetDescriptor.getGetListenerMethod();  
+MethodDescriptor[] getListenerMethodDescriptors(EventSetDescriptor) = native MethodDescriptor[] EventSetDescriptor.getListenerMethodDescriptors();
+Method[] getListenerMethods(EventSetDescriptor) = native Method[] EventSetDescriptor.getListenerMethods(); 
+Class getListenerType(EventSetDescriptor) = native Class EventSetDescriptor.getListenerType();
+Method getRemoveListenerMethod(EventSetDescriptor) = native Method EventSetDescriptor.getRemoveListenerMethod();  
+
+/* class FeatureDescriptor */
+<Any T> Enumeration<T> attributeNames(FeatureDescriptor) = native Enumeration FeatureDescriptor.attributeNames(); 
+String getDisplayName(FeatureDescriptor) = native String FeatureDescriptor.getDisplayName(); 
+String getName(FeatureDescriptor) = native String FeatureDescriptor.getName();
+String getShortDescription(FeatureDescriptor) = native String FeatureDescriptor.getShortDescription();
+Object getValue(FeatureDescriptor, String) = native Object FeatureDescriptor.getValue(String);
+
+/* class IndexedPropertyDescriptor */
+Class getIndexedPropertyType(IndexedPropertyDescriptor) = native Class IndexedPropertyDescriptor.getIndexedPropertyType(); 
+Method getIndexedReadMethod(IndexedPropertyDescriptor) = native Method IndexedPropertyDescriptor.getIndexedReadMethod();
+Method getIndexedWriteMethod(IndexedPropertyDescriptor) = native Method IndexedPropertyDescriptor.getIndexedWriteMethod();
+
+/* class Introspector */
+/* static methods */
+String decapitalize(String) = native String Introspector.decapitalize(String);
+BeanInfo getBeanInfo(Class) = native BeanInfo Introspector.getBeanInfo(Class); 
+BeanInfo getBeanInfo(Class, Class) = native BeanInfo Introspector.getBeanInfo(Class, Class);
+BeanInfo getBeanInfo(Class, int) = native BeanInfo Introspector.getBeanInfo(Class, int);
+String[] getBeanInfoSearchPath() = native String[] Introspector.getBeanInfoSearchPath();
+
+/* class MethodDescriptor */
+Method getMethod(MethodDescriptor) = native Method MethodDescriptor.getMethod();
+ParameterDescriptor[] getParameterDescriptors(MethodDescriptor) = native ParameterDescriptor[] MethodDescriptor.getParameterDescriptors(); 
+
+/* class PropertyChangeEvent */
+Object getNewValue(PropertyChangeEvent) = native Object PropertyChangeEvent.getNewValue();
+Object getOldValue(PropertyChangeEvent) = native Object PropertyChangeEvent.getOldValue();
+Object getPropagationId(PropertyChangeEvent) = native Object PropertyChangeEvent.getPropagationId();
+String getPropertyName(PropertyChangeEvent) = native String PropertyChangeEvent.getPropertyName(); 
+
+/* class PropertyDescriptor */
+Class getPropertyEditorClass(PropertyDescriptor) = native Class PropertyDescriptor.getPropertyEditorClass();
+Class getPropertyType(PropertyDescriptor) = native Class PropertyDescriptor.getPropertyType();
+Method getReadMethod(PropertyDescriptor) = native Method PropertyDescriptor.getReadMethod();
+Method getWriteMethod(PropertyDescriptor) = native Method PropertyDescriptor.getWriteMethod();
+
+/* class PropertyEditorManager */
+String[] getEditorSearchPath() = native String[] PropertyEditorManager.getEditorSearchPath();
+
+/* class PropertyEditorSupport */
+String[?] getTags(PropertyEditorSupport) = native String[] PropertyEditorSupport.getTags();
+String getJavaInitializationString(PropertyEditorSupport) = native String PropertyEditorSupport.getJavaInitializationString();
+Object getValue(PropertyEditorSupport) = native Object PropertyEditorSupport.getValue();
+
+/* class SimpleBeanInfo */
+BeanInfo[?] getAdditionalBeanInfo(SimpleBeanInfo) = native BeanInfo[] SimpleBeanInfo.getAdditionalBeanInfo();
+PropertyDescriptor[?] getPropertyDescriptors(SimpleBeanInfo) = native PropertyDescriptor[] SimpleBeanInfo.getPropertyDescriptors();
+EventSetDescriptor[?] getEventSetDescriptors(SimpleBeanInfo) = native EventSetDescriptor[] SimpleBeanInfo.getEventSetDescriptors();
+MethodDescriptor[?] getMethodDescriptors(SimpleBeanInfo) = native MethodDescriptor[] SimpleBeanInfo.getMethodDescriptors();
+
+
+/* class Encoder */
+//JDK1.4   Object get(Encoder, Object) = native Object Encoder.get(Object);
+//JDK1.4   ExceptionListener getExceptionListener(Encoder) = native ExceptionListener Encoder.getExceptionListener();
+//JDK1.4   PersistenceDelegate getPersistenceDelegate(Encoder, Class) = native PersistenceDelegate Encoder.getPersistenceDelegate(Class);
+//JDK1.4   Object remove(Encoder, Object) = native Object Encoder.remove(Object);
+   
+/* class EventHandler */
+/* static methods */
+//JDK1.4   Object create(Class, Object, String) = native Object EventHandler.create(Class, Object, String);
+//JDK1.4   Object create(Class, Object, String, String) = native Object EventHandler.create(Class, Object, String, String);
+//JDK1.4   Object create(Class, Object, String, String, String) = native Object EventHandler.create(Class, Object, String, String, String); 
+/* nonstatic methods */
+//JDK1.4   String getAction(EventHandler) = native String EventHandler.getAction();
+//JDK1.4   String getEventPropertyName(EventHandler) = native String EventHandler.getEventPropertyName();
+//JDK1.4   String getListenerMethodName(EventHandler) = native String EventHandler.getListenerMethodName();
+//JDK1.4   Object getTarget(EventHandler) = native String EventHandler.getTarget();
+//JDK1.4   Object invoke(Object, Method, Object[]) = native Object EventHandler.invoke(Object, Method, Object[])
+  
+/* class Expression */
+//JDK1.4   Object getValue(Expression) = native Object Expression.getValue(); 
+//JDK1.4   String toString(Expression) = native String Expression.toString();
+ 
+/* class PropertyChangeListenerProxy */
+//JDK1.4   String getPropertyName(PropertyChangeListenerProxy) = native String PropertyChangeListenerProxy.getPropertyName();
+ 
+/* class PropertyChangeSupport */
+//JDK1.4   PropertyChangeListener[?] getPropertyChangeListeners(PropertyChangeSupport) = native PropertyChangeListener[] PropertyChangeSupport.getPropertyChangeListeners();
+//JDK1.4   PropertyChangeListener[?] getPropertyChangeListeners(PropertyChangeSupport, String) = native PropertyChangeListener[] PropertyChangeSupport.getPropertyChangeListeners(String);
+ 
+/* class Statement */
+//JDK1.4   Object[] getArguments(Statement) = native Object[] Statement.getArguments();
+//JDK1.4   String toString(Statement) = native String Statement.toString();
+//JDK1.4   Object getTarget(Statement) = native Object Statement.getTarget();
+//JDK1.4   String getMethodName(Statement) = native String Statement.getMethodName();
+  
+/* class VetoableChangeListenerProxy */
+//JDK1.4   String getPropertyName(VetoableChangeListenerProxy) = native String VetoableChangeListenerProxy.getPropertyName();
+   
+/* class VetoableChangeSupport */
+//JDK1.4   VetoableChangeListener[?] getVetoableChangeListeners(VetoableChangeSupport) = native VetoableChangeListener[] VetoableChangeSupport.getVetoableChangeListeners();
+//JDK1.4   VetoableChangeListener[?] getVetoableChangeListeners(VetoableChangeSupport, String) = native VetoableChangeListener[] VetoableChangeSupport.getVetoableChangeListeners(String);
+  
+/* class XMLDecoder */
+//JDK1.4   ExceptionListener getExceptionListener(XMLDecoder) = native ExceptionListener XMLDecoder.getExceptionListener();
+//JDK1.4   Object getOwner(XMLDecoder) = native Object XMLDecoder.getOwner();
+//JDK1.4   Object readObject(XMLDecoder) = native Object XMLDecoder.readObject();
+ 
+/* class XMLEncoder */
+//JDK1.4   Object getOwner(XMLEncoder) = native Object XMLEncoder.getOwner();
+
+
+
+
+/**
+  * give precise types to methods declared in java.beans.beancontext.*
+  */
+
+
+/* class BeanContextChildSupport */
+BeanContext getBeanContext(BeanContextChildSupport) = native BeanContext BeanContextChildSupport.getBeanContext();
+BeanContextChild getBeanContextChildPeer(BeanContextChildSupport) = native BeanContextChild BeanContextChildSupport.getBeanContextChildPeer(); 
+
+/* class BeanContextEvent */
+BeanContext getBeanContext(BeanContextEvent) = native BeanContext BeanContextEvent.getBeanContext();
+BeanContext getPropagatedFrom(BeanContextEvent) = native BeanContext BeanContextEvent.getPropagatedFrom();
+
+/* class BeanContextMembershipEvent */
+<Any T> Iterator<T> iterator(BeanContextMembershipEvent) = native Iterator BeanContextMembershipEvent.iterator();
+Object[] toArray(BeanContextMembershipEvent) = native Object[] BeanContextMembershipEvent.toArray();
+
+/* class BeanContextServiceAvailableEvent */
+BeanContextServices getSourceAsBeanContextServices(BeanContextServiceAvailableEvent) = native BeanContextServices BeanContextServiceAvailableEvent.getSourceAsBeanContextServices();
+Class getServiceClass(BeanContextServiceAvailableEvent) = native Class BeanContextServiceAvailableEvent.getServiceClass();
+<Any T> Iterator<T> getCurrentServiceSelectors(BeanContextServiceAvailableEvent) = native Iterator BeanContextServiceAvailableEvent.getCurrentServiceSelectors();
+
+/* class BeanContextServiceRevokedEvent */
+Class getServiceClass(BeanContextServiceRevokedEvent) = native Class BeanContextServiceRevokedEvent.getServiceClass();
+BeanContextServices getSourceAsBeanContextServices(BeanContextServiceRevokedEvent) = native BeanContextServices BeanContextServiceRevokedEvent.getSourceAsBeanContextServices();
+
+/* class BeanContextServicesSupport */
+BeanContextServices getBeanContextServicesPeer(BeanContextServicesSupport) = native BeanContextServices BeanContextServicesSupport.getBeanContextServicesPeer();
+<Any T> Iterator<T> getCurrentServiceClasses(BeanContextServicesSupport) = native Iterator BeanContextServicesSupport.getCurrentServiceClasses();
+<Any T> Iterator<T> getCurrentServiceSelectors(BeanContextServicesSupport, Class) = native Iterator BeanContextServicesSupport.getCurrentServiceSelectors(Class);
+
+/* class BeanContextSupport */
+BeanContext getBeanContextPeer(BeanContextSupport) = native BeanContext BeanContextSupport.getBeanContextPeer();
+Locale getLocale(BeanContextSupport) = native Locale BeanContextSupport.getLocale();
+URL getResource(BeanContextSupport, String, BeanContextChild) = native URL BeanContextSupport.getResource(String, BeanContextChild);
+InputStream getResourceAsStream(BeanContextSupport, String, BeanContextChild) = native InputStream BeanContextSupport.getResourceAsStream(String, BeanContextChild);
+Object instantiateChild(BeanContextSupport, String) = native Object BeanContextSupport.instantiateChild(String);
+<Any T> Iterator<T> iterator(BeanContextSupport) = native Iterator BeanContextSupport.iterator();
+Object[] toArray(BeanContextSupport) = native Object[] BeanContextSupport.toArray();
+Object[] toArray(BeanContextSupport, Object[]) = native Object[] BeanContextSupport.toArray(Object[]); 

@@ -111,8 +111,7 @@ implements Located
 	else
 	  return sure(raw);
       }
-    Internal.error("Bad nullness tag");
-    return null;
+    throw Internal.error("Bad nullness tag");
   }
 
   abstract mlsub.typing.Monotype rawResolve(TypeMap tm);

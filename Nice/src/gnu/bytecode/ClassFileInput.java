@@ -53,10 +53,24 @@ public class ClassFileInput extends DataInputStream
   public static ClassType readClassType (String name, InputStream str)
        throws IOException, ClassFormatError
   {
-    // Make sure to create a new ClassType object, so that
-    // we don't add members to an existing class.
-    ClassType ctype = new ClassType(name);
-    ClassFileInput reader = new ClassFileInput(ctype, str);
+    // Try to see if the class is already known.
+    ClassType ctype = ClassType.make(name);
+
+    /*
+      If the class existed but was empty (constants == null),
+      we use that same ClassType object. This is important since
+      two different ClassType objects for the same class would be
+      incomparable.
+      On the other hand, if the class was already read from a file,
+      we create a new ClassType object, so that we don't add members 
+      to an existing class.
+    */
+    if (ctype.constants != null)
+      ctype = new ClassType(name);
+
+    // Read the class from the file.
+    new ClassFileInput(ctype, str);
+
     return ctype;
   }
 
@@ -271,6 +285,9 @@ public class ClassFileInput extends DataInputStream
 
   public void readFields () throws IOException
   {
+    if ((ctype.flags & ctype.ADD_FIELDS_DONE) != 0)
+      return;
+    ctype.flags |= ctype.ADD_FIELDS_DONE;
     int nFields = readUnsignedShort();
     ConstantPool constants = ctype.constants;
     for (int i = 0;  i < nFields;  i++)
@@ -288,6 +305,9 @@ public class ClassFileInput extends DataInputStream
 
   public void readMethods () throws IOException
   {
+    if ((ctype.flags & ctype.ADD_METHODS_DONE) != 0)
+      return;
+    ctype.flags |= ctype.ADD_METHODS_DONE;
     int nMethods = readUnsignedShort();
     ConstantPool constants = ctype.constants;
     for (int i = 0;  i < nMethods;  i++)
@@ -300,6 +320,5 @@ public class ClassFileInput extends DataInputStream
 	meth.setSignature(descriptorIndex);
 	readAttributes(meth);
       }
-    ctype.flags |= ctype.ADD_METHODS_DONE;
   }
 }

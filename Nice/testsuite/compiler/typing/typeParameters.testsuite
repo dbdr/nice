@@ -2,3 +2,9 @@
   /// Toplevel
   class A<T> {}
   void f(/* /// FAIL HERE */ A) {}
+
+/// FAIL bug
+  /// Toplevel
+  class X<T> {}
+  <T | T <: X<T> > void f() {}
+  // should fail without causing a stack overflow.

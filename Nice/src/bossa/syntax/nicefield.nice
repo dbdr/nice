@@ -10,6 +10,10 @@
 /*                                                                        */
 /**************************************************************************/
 
+package bossa.syntax;
+
+import bossa.util.*;
+
 /**
    A field or field override in a Nice class.
    
@@ -41,7 +45,8 @@ abstract class NiceField
     if (nice.tools.typing.Types.isVoid(sym.type))
       bossa.util.User.error(sym, "A field cannot have void type");
 
-    value = dispatch.analyse(value, scope, typeScope);
+    if (value != null)
+      value = analyse(notNull(value), scope, typeScope);
   }
 
   FormalParameters.Parameter asParameter()
@@ -61,7 +66,7 @@ abstract class NiceField
 
 	mlsub.typing.Polytype declaredType = sym.getType();
 	value = notNull(value).resolveOverloading(declaredType);
-	dispatch.typecheck(notNull(value));
+	typecheck(notNull(value));
 
 	try {
 	  Typing.leq(notNull(value).getType(), declaredType);
@@ -147,7 +152,6 @@ final class NewField extends NiceField
 
 final class OverridenField extends NiceField
 {
-
   isFinal() = true;
 
   /**

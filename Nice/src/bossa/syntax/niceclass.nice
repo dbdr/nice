@@ -54,7 +54,6 @@ public class CNiceClass extends NiceClass
        and only adds or modifies features when needed.
     */
     classe = notNull(definition.module).getClassExp(this);
-
   }
 
   getName() = definition.getName();

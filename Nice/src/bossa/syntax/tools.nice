@@ -28,10 +28,7 @@ identString(OverloadedSymbolExp e) = e.ident;
 boolean isCallTo(CallExp e, String name) 
 {
   ?LocatedString f = identString(e.function);
-  if (f == null)
-    return false;
-  else
-    return f.toString().equals(name);
+  return (f != null) && f.toString().equals(name);
 }
 
 ?MonoSymbol localVariable(Expression);
@@ -39,21 +36,20 @@ localVariable(Expression e) = null;
 localVariable(SymbolExp e)
 {
   let sym = e.getSymbol();
-  if (sym instanceof bossa.syntax.MonoSymbol) {
-    //don't allow nullness inference on global variables.
-    if (sym instanceof GlobalVarDeclaration.GlobalVarSymbol &&
-		sym.isAssignable())
-      return null;
+  if (! (sym instanceof bossa.syntax.MonoSymbol))
+    return null;
 
-    // no type inference on captured variables
-    if (sym.captured)
-      return null;
+  //don't allow nullness inference on global variables.
+  if (sym instanceof GlobalVarDeclaration.GlobalVarSymbol && sym.isAssignable())
+    return null;
 
-    return sym;
-  }
-  return null;
+  // no type inference on captured variables
+  if (sym.captured)
+    return null;
+
+  return sym;
 }
-localVariable(AssignExp e) = localVariable(notNull(e.to));
+localVariable(AssignExp e) = localVariable(e.to);
 
 mlsub.typing.Monotype makeSure(mlsub.typing.Monotype m) = 
   notNull(bossa.syntax.Monotype.sure(nice.tools.typing.Types.rawType(m)));
@@ -99,8 +95,7 @@ bossa.util.UserError ensureLocated(bossa.util.UserError e,
   if (! condition.isCallTo("instanceof") || condition.arguments.size() != 2)
     return null;
 
-  ?MonoSymbol sym = localVariable(condition.arguments.getExp(0));
-
+  let sym = localVariable(condition.arguments.getExp(0));
   if (sym == null)
     return null;
 
@@ -108,20 +103,16 @@ bossa.util.UserError ensureLocated(bossa.util.UserError e,
   if (! (arg2 instanceof TypeConstantExp))
     return null;
 
-  TypeConstantExp type = cast(arg2);
-  if (type.getTC() == null)
+  ?TypeConstructor tc = arg2.getTC();
+  if (tc == null)
     return null;
 
-  TypeConstructor tc = notNull(type.getTC());
-
   if (tc == PrimitiveType.arrayTC)
-    return (sym, notNull(type.representedType));
+    return (sym, notNull(arg2.representedType));
 
-  mlsub.typing.Monotype[?] parameters;
+  mlsub.typing.Monotype[?] parameters = null;
 
-  if (tc.arity() == 0)
-    parameters = null;
-  else
+  if (tc.arity() != 0)
     {
       let originalType = nice.tools.typing.Types.rawType(sym.getMonotype());
       if (originalType instanceof mlsub.typing.MonotypeConstructor)
@@ -174,10 +165,9 @@ void resolveCCThis(Statement stmt, Located thisLoc, NiceClass classe)
   if (! ident.toString().equals("this"))
     missingThisError();
 
-  Location loc = ident.location();
   call.function = createOverloadedSymbolExp(new ArrayList(cast(classe).getConstructorCallSymbols()),
 					FormalParameters.thisName);
-  notNull(call.function).setLocation(loc);
+  call.function.setLocation(ident.location());
 }
 
 // For bootstrap

@@ -55,6 +55,9 @@ class DefaultConstructor extends Constructor
 
   computeCode()
   {
+    if (classe.getDefinition().inInterfaceFile())
+      throw new Error("Constructors are loaded from the compiled package");
+
     this.createBytecode(true);
     this.createBytecode(false);
     return notNull(instantiate);
@@ -91,11 +94,8 @@ class DefaultConstructor extends Constructor
     if (omitDefaults && args.size() == fullArgs.length)
       return;
 
-    gnu.bytecode.Type[] argTypesArray = argTypes.toArray();
-    MonoSymbol[] argsArray = args.toArray();
-
-    if (classe.getDefinition().inInterfaceFile())
-      throw new Error("Constructors are loaded from the compiled package");
+    let argTypesArray = argTypes.toArray();
+    let argsArray = args.toArray();
 
     let lambda = nice.tools.code.Gen.createConstructor
       (thisDecl, argTypesArray, argsArray);
@@ -104,24 +104,21 @@ class DefaultConstructor extends Constructor
     nice.tools.code.Gen.setMethodBody(lambda, this.body(thisExp, fullArgs, omitDefaults));
     classe.getClassExp().addMethod(lambda);
 
-    // Add attributes useful for the nice compiler. These are not needed
-    // for the version omitting defaults, since that one is only there for
-    // Java users' sake.
     if (! omitDefaults)
-      {
-        lambda.addBytecodeAttribute(parameters.asBytecodeAttribute());
-        lambda.addBytecodeAttribute(new gnu.bytecode.MiscAttr("default"));
-      }
-
-    if (omitDefaults)
-      {
-        initializeOmitDefaults = new gnu.expr.QuoteExp(new gnu.expr.InitializeProc(lambda));
-      }
-    else
       {
         initialize = new gnu.expr.QuoteExp(new gnu.expr.InitializeProc(lambda));
         initializeFromConstructor = new gnu.expr.QuoteExp(new gnu.expr.InitializeProc(lambda, true));
         instantiate = new gnu.expr.QuoteExp(new gnu.expr.InstantiateProc(lambda));
+
+        // Add attributes useful for the nice compiler. These are not needed
+        // for the version omitting defaults, since that one is only there for
+        // Java users' sake.
+        lambda.addBytecodeAttribute(parameters.asBytecodeAttribute());
+        lambda.addBytecodeAttribute(new gnu.bytecode.MiscAttr("default"));
+      }
+    else
+      {
+        initializeOmitDefaults = new gnu.expr.QuoteExp(new gnu.expr.InitializeProc(lambda));
       }
   }
 

@@ -488,14 +488,7 @@ public class TestCase {
 		//	when Nicec is in the nice.jar, then we should use
 		//	nice.tools.ant.Nicec dummy = new ...
 		nice.tools.runJar dummy = new nice.tools.runJar();
-		String resource = nice.tools.runJar.class.getName();
-
-		// Format the file name into a valid resource name.
-		if (!resource.startsWith("/")) {
-			resource = "/" + resource;
-		}
-		resource = resource.replace('.', '/');
-		resource = resource + ".class";
+		String resource = "/nice/tools/ant/Nicec.class";
 
 		// Attempt to locate the file using the class loader.
 		java.net.URL classUrl = TestNice.class.getResource(resource);

@@ -21,7 +21,7 @@
 
   //   CHARS
 
-  p("" + 'A' + '\n' + '\u0201' + '\u4567');
+  p("" + 'A' + '\n' + '\u0201' + '\u4567' + "ABC".charAt(1));
   
   // unicode in identifiers
   int é\u0123 = 12;

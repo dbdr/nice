@@ -106,7 +106,7 @@ public class NiceClass extends ClassDefinition.ClassImplementation
       if (Types.isVoid(sym.type))
 	User.error(sym, "A field cannot have void type");
 
-      this.scope = scope;
+      value = dispatch.analyse(value, scope, typeScope);
     }
 
     void createField()
@@ -117,18 +117,17 @@ public class NiceClass extends ClassDefinition.ClassImplementation
       method.fieldDecl.setFlag(isVolatile , gnu.expr.Declaration.VOLATILE);
     }
 
-    private VarScope scope;
-
     void typecheck(NiceClass c)
     {
       if (value != null)
 	{
-	  value = dispatch.analyse(value, scope, localScope);
-	  dispatch.typecheck(value);
-
 	  c.enterTypingContext();
+
 	  mlsub.typing.Polytype declaredType = sym.getType();
 	  value = value.resolveOverloading(declaredType);
+
+	  dispatch.typecheck(value);
+
 	  try {
 	    Typing.leq(value.getType(), declaredType);
 	  } 
@@ -153,7 +152,7 @@ public class NiceClass extends ClassDefinition.ClassImplementation
 	return new FormalParameters.NamedParameter(type, sym.getName(), true);
       else
 	return new FormalParameters.OptionalParameter
-	  (type, sym.getName(), true, value, scope, localScope);
+	  (type, sym.getName(), true, value);
     }
 
     MonoSymbol sym;

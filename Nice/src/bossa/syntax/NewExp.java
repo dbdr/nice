@@ -56,6 +56,11 @@ public class NewExp extends CallExp
 
     resolveTC(typeScope);
     
+    // Make sure that the constructors have been created.
+    ClassDefinition definition = ClassDefinition.get(tc);
+    if (definition != null)
+      definition.resolve();
+    
     LinkedList constructors = TypeConstructors.getConstructors(tc);
     if (constructors == null)
       User.error(this, tc + " has no constructor");

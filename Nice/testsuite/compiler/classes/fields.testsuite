@@ -51,6 +51,7 @@
   }
 
 /// PASS
+  new A();
   /// Toplevel
   class A
   {

@@ -1,0 +1,17 @@
+
+/// COMMENT Static variables from different packages should not clash.
+
+/// PASS
+  /// package a dontcompile
+  /// Toplevel
+void fun( StringBuffer buf ) = buf.append( STATIC_STRING );
+let String STATIC_STRING = "foo1";
+let String[] STATIC_ARRAY = [ "foo1", "bar1" ];
+  /// package b dontcompile
+  /// Toplevel
+void fun( StringBuffer buf ) = buf.append( STATIC_STRING );
+let String STATIC_STRING = "foo2";
+let String[] STATIC_ARRAY = [ "foo2", "bar2" ];
+  /// package c import a,b
+  /// Toplevel
+void notUsed() {}

@@ -44,7 +44,7 @@ NICEC1=JAVA="${java}" ${TOP}/bin/nicec ${NICEC_ARGS} -d "${TOP}/classes" --sourc
 all: src/nice/tools/compiler/console.jar compiler2 archive2
 
 stable:   clean bootstrap compiler1 testengine archiveOld
-complete: stable   compiler2 tools archive2
+complete: stable   compiler2 tools libs archive2
 fixpoint: complete compiler3 archive3
 world:    fixpoint check test
 
@@ -201,6 +201,10 @@ nicedoc:
 unit:
 	@echo "Building niceunit..."
 	$(NICEC1) nice.tools.unit.console
+
+libs:
+	@echo "Building libraries..."
+	$(NICEC1) nice.functional
 
 testengine:
 	@echo "Building the testsuite engine..."

@@ -41,7 +41,15 @@ public class AST extends Node
   
   public void resolveScoping()
   {
-    doResolve();
+    if (children != null)
+      for(Iterator i = children.iterator();i.hasNext();)
+	try{
+	  ((Node)i.next()).doResolve();
+	}
+	catch(UserError ex){
+	  nice.tools.compiler.OutputMessages.error(ex.getMessage());
+	}
+    nice.tools.compiler.OutputMessages.exitIfErrors();
   }
   
   public void createContext()

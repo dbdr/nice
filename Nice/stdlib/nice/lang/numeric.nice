@@ -22,6 +22,8 @@
 
 package nice.lang;
 
+int MAX_INT() = native java.lang.Integer.MAX_VALUE;
+
 // Conversions
 int int(double d) = inline nice.lang.inline.Nop();
 short short(double d) = inline nice.lang.inline.Nop();

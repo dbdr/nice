@@ -12,11 +12,11 @@ first: parser
 	cd classes; jar xf ../external/java-getopt-1.0.7.jar gnu
 	ln -sf nicec bin/nicer
 	cd src;\
-	${JAVAC} bossa/modules/Package.java gnu/bytecode/dump.java ../stdlib/nice/*/*.java
+	${JAVAC} bossa/modules/Package.java nice/tools/runJar.java gnu/bytecode/dump.java ../stdlib/nice/*/*.java
 
 recompile:
-	cd src;\
-	${JAVAC} bossa/*/*.java nice/**/*.java mlsub/*/*.java ../stdlib/nice/lang/*.java
+	cd src; ${JAVAC} bossa/modules/Package.java
+#	${JAVAC} bossa/*/*.java nice/**/*.java mlsub/*/*.java ../stdlib/nice/lang/*.java
 
 recompileGNU:
 	cd src; ${JAVAC} gnu/*/*.java gnu/*/*/*.java kawa/*/*.java
@@ -26,7 +26,7 @@ recompileSTDLIB:
 
 compiler:
 	${TOP}/src/nice/tools/compiler/setBuildDate ${TOP}/src/nice/tools/compiler
-	cd src; nicec -Rs nice.tools.compiler
+	cd src; nicec -e -Rs nice.tools.compiler
 
 parser:
 	cd src/bossa/parser; ${JAVACC} Parser.jj
@@ -52,8 +52,9 @@ tags:
 	jtags
 
 jar:
+	mkdir -p lib/nice
 	cp src/nice/tools/compiler.jar lib/nice/Nice.jar
-	jar umf src/mainClass lib/nice/Nice.jar -C classes nice -C classes mlsub -C classes bossa -C classes gnu -C classes kawa
+	jar umf src/mainClass lib/nice/Nice.jar -C classes nice -C classes mlsub -C classes bossa -C classes gnu
 	cd stdlib; jar uf ../lib/nice/Nice.jar nice/*/*.nice*
 
 dist: jar

@@ -326,6 +326,8 @@ public class MethodBodyDefinition extends Definition
 	  (monotypes,
 	   Pattern.getDomain(formals));
 
+	nice.tools.code.Types.setBytecodeType(monotypes);
+
 	Typing.implies();
       }
       catch(TypingEx e){
@@ -407,6 +409,22 @@ public class MethodBodyDefinition extends Definition
   private gnu.expr.BlockExp blockExp;
   public gnu.expr.BlockExp getBlock() { return blockExp; }
   
+  private Type[] javaArgTypes()
+  {
+      //Type[] defTypes = definition.javaArgTypes();
+    Type[] res = new Type[parameters.size()];
+
+    Iterator p;
+    int n = 0;
+    for(p = parameters.iterator(); p.hasNext(); n++)
+      {
+	MonoSymbol param = (MonoSymbol) p.next();
+	res[n] = nice.tools.code.Types.javaType(param.getMonotype());
+      }
+
+    return res;
+  }
+
   public void compile()
   {
     if(Debug.codeGeneration)
@@ -421,10 +439,12 @@ public class MethodBodyDefinition extends Definition
     Statement.currentScopeExp = lexp;
     lexp.setName(name.toString());
 
+    Type[] javaArgTypes = javaArgTypes();
+
     Method primMethod = module.getOutputBytecode().addMethod
       (nice.tools.code.Strings.escape
        (definition.getBytecodeName()+Pattern.bytecodeRepresentation(formals)),
-       definition.javaArgTypes(), definition.javaReturnType(),
+       javaArgTypes, definition.javaReturnType(),
        Access.PUBLIC|Access.STATIC|Access.FINAL);
     new MiscAttr("definition", 
 		 definition.getFullName().getBytes())
@@ -437,20 +457,16 @@ public class MethodBodyDefinition extends Definition
 
     // Parameters
     lexp.min_args = lexp.max_args = parameters.size();
+
     Iterator p;
-    Monotype[] t;
     int n = 0;
-    for(p = parameters.iterator(),
-	  t = definition.getType().domain();
-	p.hasNext();)
+    for(p = parameters.iterator(); p.hasNext(); n++)
       {
 	MonoSymbol param = (MonoSymbol) p.next();
-	Monotype paramType = t[n++];
 	
 	gnu.expr.Declaration d = lexp.addDeclaration(param.name.toString());
-
 	d.setParameter(true);
-	d.setType(nice.tools.code.Types.javaType(paramType));
+	d.setType(javaArgTypes[n]);
 	d.noteValue(null);
 	param.setDeclaration(d);
       }

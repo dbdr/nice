@@ -75,7 +75,7 @@ public class Package implements mlsub.compilation.Module, Located
   public static Package make(String name, Compilation compilation,
 			     boolean isRoot)
   {
-    return make(new LocatedString(name, bossa.util.Location.nowhere()), 
+    return make(new LocatedString(name, bossa.util.Location.nowhereAtAll()), 
 		compilation, isRoot);
   }
   
@@ -553,10 +553,19 @@ public class Package implements mlsub.compilation.Module, Located
   public ClassType createClass(String name)
   {
     // If we use new ClassType(), we may end up with two different 
-    // objects representing this class
-    ClassType res = ClassType.make(this.name + "." + name);
-    res.requireExistingClass(false);
+    // objects representing this class.
+    // However if the class exists but is invalid, we create a new one.
 
+    String className = this.name + "." + name;
+    ClassType res; 
+    try{
+      res = ClassType.make(className);
+    }
+    catch(java.lang.LinkageError e){
+      res = new ClassType(className);
+    }
+
+    res.requireExistingClass(false);
     return res;
   }
   

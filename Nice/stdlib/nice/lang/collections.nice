@@ -11,12 +11,15 @@ interface Collection<T>
   void iter(fun(T)());
 
   alike<T> filter(fun(T)(boolean));
-  //<Any U> alike<U> map( fun(T)(U) );
+  <Any U> alike<U> map( fun(T)(U) );
 }
 
-<Collection C, Any T, Any U1> C<U1> map(C<T>, fun(T)(U1));
+/**
+   Equivalent definitions outside the interface:
 
-//<Collection C, Any T> C<T> filter(C<T>, fun(T)(boolean));
+   <Collection C, Any T, Any U1> C<U1> map(C<T>, fun(T)(U1));
+   <Collection C, Any T> C<T> filter(C<T>, fun(T)(boolean));
+*/
 
 
 /** A growable Collection */

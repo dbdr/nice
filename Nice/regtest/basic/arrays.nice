@@ -59,6 +59,9 @@ test_arrays()
   p(ss2);
   p(map(ss2, fun(String s) => s+s));
 
+  Collection<String> c = ss;
+  println(c.size());
+
   // multidimentional arrays
   {
     int N = 4;

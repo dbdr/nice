@@ -17,6 +17,7 @@ size = 1, elements = 65.0
 size = 5, elements = null null e2 null e4 
 size = 2, elements = e2 e4 
 size = 2, elements = e2e2 e4e4 
+5
 0 1 2 3 
 2 3 4 5 
 4 5 6 7 

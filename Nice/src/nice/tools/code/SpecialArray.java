@@ -102,7 +102,7 @@ public final class SpecialArray extends gnu.bytecode.ArrayType
 
     // if this array type is the unknown, we just had to do the unwrapping
     if (unknown)
-      return;    
+      return;
     
     code.emitDup();
     code.emitInstanceof(this);

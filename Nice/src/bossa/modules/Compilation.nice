@@ -63,7 +63,7 @@ make(packageName@String,
   if(!(packageName.equals("nice.lang")) && !bossa.util.Debug.ignorePrelude())
     Package.make("nice.lang", res, recompileAll);
 
-  Package root = Package.make(packageName, res, true);
+  Package root = Package.make(new bossa.syntax.LocatedString(packageName, new bossa.util.Location("Command line")), res, true);
   res.root = root;
 
   if (root.isRunnable() && 

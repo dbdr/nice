@@ -180,16 +180,20 @@ public final class Compilation
     mlsub.typing.TypeConstructor firstArgument = alt.getPatterns()[0].getTC();
     ClassDefinition def = ClassDefinition.get(firstArgument);
 
-    if (def == null || ! (def.getImplementation() instanceof NiceClass))
-      throw User.error(alt, 
-		       m + " is a native method.\n" + 
-		       "It can not be overriden because the first argument" +
-		       (firstArgument == null 
-			? "" 
-			: " " + firstArgument.toString())
-		       + " is not a class defined in Nice");
 
-    return (NiceClass) def.getImplementation();
+    if (def != null && def.getImplementation() instanceof NiceClass)
+      return (NiceClass) def.getImplementation();
+
+    // Explain that this cannot be done.
+    String msg = m + " is a native method.\n";
+
+    if (firstArgument == null)
+      msg += "It cannot be implemented without dispatch on the first argument";
+    else
+      msg += "It cannot be overriden because the first argument " +
+             firstArgument + " is not a class defined in Nice";
+
+    throw User.error(alt, msg);
   }
 
   private static Expression dispatchJavaMethod

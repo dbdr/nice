@@ -11,8 +11,21 @@ nice (0.9.5) unstable; urgency=low
         class X implements java.io.Serializable {
           final long serialVersionUID = 123456789L;
         }
+  * Enums are serializable now and have a family() method that returns a list
+    of all elements in that enum.
+  * Reduced memory usage when doing multiple compilations in one jvm. 
+  * Added alternative syntax for patterns in method implementations.
+    'Type param' for 'param@Type' and '#Type param' for 'param#Type
+    example usage:
+      class Dummy {
+	int x;
+	equals(Dummy other) = this.x == other.x;
+      }
+  * Stricter typechecking of anonymous and local functions.
   * Bug fixes (accessing static fields of an superclass or interface, 
-    compilation of polymorphic tuples, ...)
+    compilation of polymorphic tuples, captured 'this' in initializer, 
+    duplication of constructors in bytecode, disappearing contracts during 
+    recompilation, ... )
 
  --
 

@@ -66,3 +66,11 @@ void foo(Object[] oo)
   String x = arr[0] = "xyz";
   arr[1] = "pqr";
   assert x.equals("xyz") && arr[0].equals("xyz") && arr[1].equals("pqr"); 
+
+/// PASS bug
+  List<List<int>> x =  [[1,2,3]];
+  int i = x[0][1];
+
+/// PASS bug
+  (List<int>, String) x = ([1,2,3], "abc");
+  (List<int> arr, String str) = x;

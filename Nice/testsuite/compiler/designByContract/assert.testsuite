@@ -3,7 +3,8 @@
 
 /// PASS
   boolean ok = true;
-  try { assert false; ok = false; }
+  boolean faux = false;
+  try { assert faux; ok = false; }
   catch(Error e) {}
   if (! ok) throw new Error();
 
@@ -12,7 +13,8 @@
 
 /// PASS
   boolean ok = true;
-  try { assert false : "Should fail"; ok = false; }
+  boolean faux = false;
+  try { assert faux : "Should fail"; ok = false; }
   catch(Error e) {}
   if (! ok) throw new Error();
 

@@ -9,27 +9,71 @@ import java.util.*;
 /**
  * Class represents a nice source file.
  * 
+ * @author	Alex Greif
+ * @version	$Id$
  */
 public class NiceSourceFile {
+	/**
+	 * TODO
+	 * 
+	 */
 	public final static int STATUS_MAIN = 0;
+	/**
+	 * TODO
+	 * 
+	 */
 	public final static int STATUS_TOPLEVEL = 1;
 
+	/**
+	 * TODO
+	 * 
+	 */
 	private int _status = STATUS_MAIN;
 
+	/**
+	 * TODO
+	 * 
+	 */
 	public static final String DEFAULT_PACKAGE = "defaultpackage";
 	
-	private String _package = DEFAULT_PACKAGE +  TestNice.getFileCounter();
+	/**
+	 * TODO
+	 * 
+	 */
+	private String _package = DEFAULT_PACKAGE + TestNice.getFileCounter();
+	/**
+	 * TODO
+	 * 
+	 */
 	private StringBuffer _mainMethodContent = new StringBuffer();
+	/**
+	 * TODO
+	 * 
+	 */
 	private StringBuffer _topLevelContent = new StringBuffer();
+	/**
+	 * TODO
+	 * 
+	 */
 	private Set _imports = new HashSet();
 	
+	/**
+	 * TODO
+	 * 
+	 */
 	private final String _className = "main";
+	/**
+	 * TODO
+	 * 
+	 */
 	private final String _fileName = _className + ".nice";
 
 
 	/**
-		Sets the status.
-	*/
+	 * Sets the status.
+	 * 
+	 * @param	status	TODO
+	 */
 	public void setStatus(int status) {
 		_status = status;
 	}
@@ -37,8 +81,9 @@ public class NiceSourceFile {
 
 	/**
 	 * Consumes a read line from the testsuite file.
-	 Sets the status if necessary.
+	 * Sets the status if necessary.
 	 * 
+	 * @param	line	TODO
 	 */
 	public void consumeLine(String line) {
 		switch(_status) {
@@ -53,23 +98,32 @@ public class NiceSourceFile {
 
 
 	/**
-		Add a line to the main methods body.
-	*/
+	 * Add a line to the main methods body.
+	 * 
+	 * @param	line	TODO
+	 */
 	public void addToMainMethod(String line) {
 		_mainMethodContent.append(line).append('\n');
 	}
 
 	/**
-		Add a line to the main methods body.
-	*/
+	 * Add a line to the main methods body.
+	 * 
+	 * @param	line	TODO
+	 */
 	public void addToTopLevel(String line) {
 		_topLevelContent.append(line).append('\n');
 	}
 
 
 	/**
-		TODO
-	*/
+	 * Consumes a keyword statement that starts with the word package.
+	 * The dontcompile keyword is handled and package imports too.
+	 * Package imports can me separated by : space colon, semicolon and the plus sign
+	 * 
+	 * @param	keywordStatement	TODO
+	 * @exception	TestSuiteException	TODO
+	 */
 	public void consumePackageKeyword(String keywordStatement) throws TestSuiteException {
 		//	get rid of the dontcompile keyword
 		int dontCompilePos = keywordStatement.indexOf(TestNice.KEYWORD_DONTCOMPILE);
@@ -107,36 +161,43 @@ public class NiceSourceFile {
 
 
 	/**
-		Sets the package, this file belongs to.
-	*/
+	 * Sets the package, this file belongs to.
+	 * 
+	 * @param	packageName	TODO
+	 */
 	public void setPackage(String packageName) {
 		_package = packageName;
 	}
 	
 	/**
-		Returns the package, this file belongs to.
-	*/
+	 * Returns the package, this file belongs to.
+	 * 
+	 */
 	public String getPackage() {
 		return _package;
 	}
 	
 	/**
-		Returns the file name.
-	*/
+	 * Returns the file name.
+	 * 
+	 */
 	public String getFileName() {
 		return _fileName;
 	}
 	
 	/**
-		Returns the class name.
-	*/
+	 * Returns the class name.
+	 * 
+	 */
 	public String getClassName() {
 		return _className;
 	}
 	
 	/**
-		Writes the nice source file.
-	*/
+	 * Writes the nice source file.
+	 * 
+	 * @exception	TestSuiteException	TODO
+	 */
 	public void write() throws TestSuiteException {
 		File packageFolder = new File(TestNice.getTempFolder(), _package.replace('.', File.separatorChar));
 		if (! packageFolder.exists()  &&  ! packageFolder.mkdirs())
@@ -169,8 +230,11 @@ public class NiceSourceFile {
 	
 	
 	/**
-		Writes the package in the nice source file.
-	*/
+	 * Writes the package in the nice source file.
+	 * 
+	 * @param	writer	TODO
+	 * @exception	IOException	TODO
+	 */
 	private void writePackage(BufferedWriter writer) throws IOException {
 		writer.write("package ");
 		writer.write(_package);
@@ -180,8 +244,11 @@ public class NiceSourceFile {
 	}
 	
 	/**
-		Writes the import statements in the nice source file.
-	*/
+	 * Writes the import statements in the nice source file.
+	 * 
+	 * @param	writer	TODO
+	 * @exception	IOException	TODO
+	 */
 	private void writeImports(BufferedWriter writer) throws IOException {
 		for (Iterator iter = _imports.iterator(); iter.hasNext();) {
 			writer.write("import ");
@@ -192,8 +259,11 @@ public class NiceSourceFile {
 	}
 	
 	/**
-		Writes the main() method in the nice source file.
-	*/
+	 * Writes the main() method in the nice source file.
+	 * 
+	 * @param	writer	TODO
+	 * @exception	IOException	TODO
+	 */
 	private void writeMainMethod(BufferedWriter writer) throws IOException {
 		if (! hasMainMethod())
 			return;
@@ -206,8 +276,11 @@ public class NiceSourceFile {
 	
 	
 	/**
-		Writes the toplevel source in the nice source file.
-	*/
+	 * Writes the toplevel source in the nice source file.
+	 * 
+	 * @param	writer	TODO
+	 * @exception	IOException	TODO
+	 */
 	private void writeTopLevel(BufferedWriter writer) throws IOException {
 		writer.write("// Top level code");writer.newLine();
 		writer.write(_topLevelContent.toString());
@@ -215,15 +288,17 @@ public class NiceSourceFile {
 	
 	
 	/**
-		Returns whether this file has sources for the main() method.
-	*/
+	 * Returns whether this file has sources for the main() method.
+	 * 
+	 */
 	public boolean hasMainMethod() {
 		return _mainMethodContent.length() != 0;
 	}
 	
 	/**
-		Return whether the source file contains code or not.
-	*/
+	 * Return whether the source file contains code or not.
+	 * 
+	 */
 	public boolean isEmpty() {
 		return (_mainMethodContent.length() == 0)
 			&&  (_topLevelContent.length() == 0);

@@ -36,13 +36,10 @@ public class TestSuite {
 	private List _testCases = new ArrayList();
 
 	/**
-		Constructor.
+		Constructor. Reads the testcases and performs the tests in the testsuite.
 	*/
 	public TestSuite(File testSuiteFile) throws TestSuiteException {
-		_testSuiteFile = testSuiteFile;
-		if (! _testSuiteFile.exists())
-			throw new TestSuiteException("TestSuite file not found. File: " + _testSuiteFile);
-			
+		_testSuiteFile = testSuiteFile;			
 		System.out.println("testsuite " + _testSuiteFile);
 		readTestCases();
 		performTests();

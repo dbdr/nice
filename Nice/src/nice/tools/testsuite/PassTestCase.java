@@ -13,8 +13,17 @@ public class PassTestCase extends TestCase {
 		should be successfully.
 	*/
 	public void performTest() throws TestSuiteException {
-		compilePackages();
-		runMain();
+		try {
+			compilePackages();
+			runMain();
+		} catch(TestSuiteException e) {
+			TestNice.increaseFailed();
+			e.printStackTrace();
+			return;
+		}
+		
+		TestNice.increaseSucceeded();
+
 	}
 
 }

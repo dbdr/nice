@@ -16,9 +16,11 @@ public class FailTestCase extends TestCase {
 		try {
 			compilePackages();
 		} catch(TestSuiteException e) {
+			TestNice.increaseSucceeded();
 			return;
 		}
 		
+		TestNice.increaseFailed();
 		throw new TestSuiteException("Compilation was expected to fail, but it succeeded.");
 	}
 

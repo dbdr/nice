@@ -98,7 +98,7 @@ extends ProcedureN implements Inlineable
       }
     else if (kind >= Shl && kind <= uShr)
       {
-	args[1].compile(comp, new StackTarget(Type.long_type));
+	args[1].compile(comp, Tools.intTarget);
 
 	switch(kind){
 	case Shl: code.emitShl(); break;

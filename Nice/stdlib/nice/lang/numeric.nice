@@ -105,14 +105,14 @@ long `-`(long, long) = inline nice.lang.inline.NumOp("lSub");
 int `-`(int, int) = inline nice.lang.inline.NumOp("iSub");
 
 // shift
-int  `<<`(int , long) = inline nice.lang.inline.NumOp("iShl");
-long `<<`(long, long) = inline nice.lang.inline.NumOp("lShl");
+int  `<<`(int , int) = inline nice.lang.inline.NumOp("iShl");
+long `<<`(long, int) = inline nice.lang.inline.NumOp("lShl");
 
-int  `>>`(int , long) = inline nice.lang.inline.NumOp("iShr");
-long `>>`(long, long) = inline nice.lang.inline.NumOp("lShr");
+int  `>>`(int , int) = inline nice.lang.inline.NumOp("iShr");
+long `>>`(long, int) = inline nice.lang.inline.NumOp("lShr");
 
-int  `>>>`(int , long) = inline nice.lang.inline.NumOp("iuShr");
-long `>>>`(long, long) = inline nice.lang.inline.NumOp("luShr");
+int  `>>>`(int , int) = inline nice.lang.inline.NumOp("iuShr");
+long `>>>`(long, int) = inline nice.lang.inline.NumOp("luShr");
 
 // bitwise operators
 int  `~`(int  x) = inline nice.lang.inline.NumOp("iComp");
@@ -125,6 +125,10 @@ int `^`(int, int) = inline nice.lang.inline.NumOp("iXOr");
 long `&`(long, long) = inline nice.lang.inline.NumOp("lAnd");
 long `|`(long, long) = inline nice.lang.inline.NumOp("lIOr");
 long `^`(long, long) = inline nice.lang.inline.NumOp("lXOr");
+
+// Accessing individual bits
+boolean get(long x, int bit) = (x & (1 << bit)) != 0;
+boolean get(int  x, int bit) = (x & (1 << bit)) != 0;
 
 // Comparable interface
 `<`(n1@Number, n2@Number) = n1.doubleValue() < n2.doubleValue();

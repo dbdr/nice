@@ -1303,15 +1303,6 @@ String getName(MyJavaClass) = native String MyJavaClass.getName();</programlisti
 
       <section><title>Calling a method</title>
 	<para>
-	  You can call a <link linkend="method">method</link> 
-	  <literal>f</literal>
-	  defined in a nice package <literal>pkg</literal> 
-	  by naming it <literal>pkg.fun.f</literal> in the Java program.
-	</para>
-      </section>
-
-      <section><title>Calling a method</title>
-	<para>
 	  You can call a <link linkend="method">method</link>
 	   <literal>m</literal>
 	  defined in a nice package <literal>pkg</literal> 

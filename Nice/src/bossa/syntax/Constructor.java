@@ -53,42 +53,104 @@ class Constructor extends MethodDeclaration
   private NiceClass.Field[] fields;
   private int index;
 
-  Expression getConstructorInvocation()
+  Expression getConstructorInvocation(boolean omitDefaults)
   {
     getCode();
+    ConstructorExp lambda = 
+      // lambdaOmitDefaults is null if the two versions are identical
+      omitDefaults && lambdaOmitDefaults != null 
+      ? lambdaOmitDefaults : this.lambda;
     return new QuoteExp(new InitializeProc(lambda));
   }
 
+  /** The constructor, with all the arguments. */
   private ConstructorExp lambda;
+
+  /** The constructor, with only non-default. */
+  private ConstructorExp lambdaOmitDefaults;
 
   protected Expression computeCode()
   {
-    MonoSymbol[] args = parameters.getMonoSymbols();
-    ClassType classType = (ClassType) javaReturnType();
-    lambda = Gen.createConstructor(classType, javaArgTypes(), args);
-    Expression[] body = new Expression[1 + fields.length];
-    Expression thisExp = new ThisExp(classType);
-    body[0] = callSuper(thisExp, args);
-
-    for (int i = fields.length, n = args.length - 1 ; --i >= 0; n--)
-      body[i + 1] = fields[i].method.compileAssign(thisExp, args[n].compile());
-
-    Gen.setMethodBody(lambda, new BeginExp(body));
-
-    classe.getClassExp().addMethod(lambda);
-    return new QuoteExp(new InstantiateProc(lambda));
+    this.lambdaOmitDefaults = createBytecode(true);
+    this.lambda = createBytecode(false);
+    return new QuoteExp(new InstantiateProc(this.lambda));
   }
 
-  private Expression callSuper(Expression thisExp, MonoSymbol[] args)
+  /**
+     @param omitDefaults if true, do not take the value of fields with
+            default values as parameters, but use that default instead.
+  */
+  private ConstructorExp createBytecode(boolean omitDefaults)
+  {
+    ClassType thisType = (ClassType) javaReturnType();
+    Expression thisExp = new ThisExp(thisType);
+
+    MonoSymbol[] fullArgs = parameters.getMonoSymbols();
+    Type[] fullArgTypes = javaArgTypes();
+
+    List args = new LinkedList();
+    List argTypes = new LinkedList();
+
+    for (int i = 0; i < parameters.size; i++)
+      {
+        if (omitDefaults && parameters.hasDefaultValue(i))
+          continue;
+
+        args.add(fullArgs[i]);
+        argTypes.add(fullArgTypes[i]);
+      }
+
+    // Do not create a second constructor omiting defaults if there is
+    // no default to omit!
+    if (omitDefaults && args.size() == fullArgs.length)
+      return null;
+
+    ConstructorExp lambda = Gen.createConstructor
+      (thisType, 
+       (Type[]) argTypes.toArray(new Type[argTypes.size()]), 
+       (MonoSymbol[]) args.toArray(new MonoSymbol[args.size()]));
+
+    Expression[] body = new Expression[1 + fields.length];
+    body[0] = callSuper(thisExp, fullArgs, omitDefaults);
+
+    final int superArgs = fullArgs.length - fields.length;
+
+    for (int i = 0; i < fields.length; i++)
+      {
+        bossa.syntax.Expression value = fields[i].value;
+
+        Expression fieldValue;
+        if (!omitDefaults || value == null)
+          // Use the provided parameter.
+          fieldValue = fullArgs[superArgs + i].compile();
+        else
+          // Use the default value.
+          fieldValue = value.compile();
+
+        body[ i + 1] = fields[i].method.compileAssign(thisExp, fieldValue);
+      }
+
+    Gen.setMethodBody(lambda, new BeginExp(body));
+    classe.getClassExp().addMethod(lambda);
+
+    return lambda;
+  }
+
+  private Expression callSuper(Expression thisExp, MonoSymbol[] args,
+                               boolean omitDefaults)
   {
     int len = args.length - fields.length;
-    Expression[] superArgs = new Expression[1 + len];
-    superArgs[0] = thisExp;
+    List/*Expression*/ superArgs = new LinkedList();
+    superArgs.add(thisExp);
     for (int i = 0; i < len; i++)
-      superArgs[i + 1] = args[i].compile();
+      {
+        if (! (omitDefaults && parameters.hasDefaultValue(i)))
+          superArgs.add(args[i].compile());
+      }
 
-    Expression superExp = classe.getSuper(index);
-    return new ApplyExp(superExp, superArgs);
+    Expression superExp = classe.getSuper(index, omitDefaults);
+    return new ApplyExp(superExp, (Expression[])
+                        superArgs.toArray(new Expression[superArgs.size()]));
   }
 
   public void printInterface(java.io.PrintWriter s)

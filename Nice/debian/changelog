@@ -44,6 +44,11 @@ nice (0.9.0) unstable; urgency=low
       name(=blue) = "blue";
       name(=green) = "green";
     The compiler knows now that the method "name" is completely covered.
+  * In the bytecode, two versions of the instance constructors are created:
+    one which lists all the fields, the other one that lists only those
+    without default value. This is useful when instantiating Nice classes
+    from Java source or by reflexion, especially if a no-arg constructor is
+    required for some reason.
   * Bugfixes (Parsing of nested tuples, global constants of type char,
     Overloading resolving of methods implementation with additional tc's, ...)
   * Improved some error messages.

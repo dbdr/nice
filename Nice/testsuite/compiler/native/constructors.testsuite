@@ -1,0 +1,57 @@
+/// PASS
+  /// package pkg
+  // We check that there is a no-arg constructor, accessible by reflexion
+  Class c = Class.forName("pkg.Nice");
+  Constructor make = c.getConstructor(null);
+
+  Nice instance = cast(make.newInstance(null));
+  assert instance.s.equals("default") && instance.i == 17;
+
+  /// Toplevel
+  import java.lang.reflect.*;
+
+  class Nice { String s = "default"; int i = 17; }
+
+/// PASS
+  new Nice(s: "");
+  /// Toplevel
+  class Nice { String s; }
+
+/// PASS
+  /// Toplevel
+  class A { String s = ""; }
+  class B extends A {}
+
+/// PASS
+  /// Toplevel
+  class A {}
+  class B extends A { String s = ""; }
+
+/// PASS
+  /// package pkg
+  /* java.lang.Thread has many constructors, including 
+     one () and one (Runnable).
+     There is therefore ambiguity in A(Runnable x) between
+       super.() + this.dummy = x
+     and
+       super.(x) + this.dummy = null
+     In this case the second interpretation must be taken.
+  */
+  
+  Class c = Class.forName("pkg.A");
+  Constructor make = c.getConstructor([Runnable.class]);
+
+  boolean ran = false;
+  Runnable r = thread(() => ran = true);
+
+  A instance = cast(make.newInstance([object(r)]));
+  instance.start();
+  try { instance.join(); }
+  catch(InterruptedException ex) {}
+  
+  assert ran;
+
+  /// Toplevel
+  import java.lang.reflect.*;
+
+  class A extends Thread { ?Runnable dummy = null; }

@@ -320,12 +320,13 @@ public class Package implements mlsub.compilation.Module, Located, bossa.syntax.
   {
     // An interface file does not have to be typecheked.
     // It is known to be type correct from previous compilation!
-    if (!compiling())
-      return;
-
-    compilation.progress(this, "typechecking");
+    // We still call ast.typechecking, but with a value telling
+    // that only bookeeping tasks are needed, and we don't advertise
+    // this pass.
+    if (compiling())
+      compilation.progress(this, "typechecking");
     
-    ast.typechecking();
+    ast.typechecking(compiling());
   }
 
   public void link()
@@ -601,6 +602,14 @@ public class Package implements mlsub.compilation.Module, Located, bossa.syntax.
   public void addImplementationClass(gnu.expr.ClassExp classe)
   {
     thisPkg.addClass(classe);
+
+    /* If a class need an outer frame (for instance if the constructor
+       defines an anonymous function), then use the dispatch class.
+       The implementation class would be inappropriate, since it is
+       not regenerated when importing a compiled package, while
+       classes and the dispatch class are. 
+    */
+    classe.outer = dispatchClass;
   }
 
   public gnu.expr.Declaration addGlobalVar(String name, Type type, boolean constant)

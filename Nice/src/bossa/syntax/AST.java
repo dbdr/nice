@@ -143,13 +143,16 @@ public class AST extends Node
       classes[i].precompile();
   }
 
-  public void typechecking()
+  public void typechecking(boolean compiling)
   {
     Node.setModule(module);
 
     // Classes are typechecked first, since code can depend on them.
-    for(int i = 0; i < classes.length; i++)
+    for (int i = 0; i < classes.length; i++)
       classes[i].typecheckClass();
+
+    if (! compiling)
+      return;
 
     doTypecheck();
   }

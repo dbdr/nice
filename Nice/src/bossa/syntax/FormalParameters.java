@@ -293,6 +293,11 @@ public class FormalParameters extends Node
     return parameters[rank].getName();
   }
 
+  boolean hasDefaultValue(int rank)
+  {
+    return parameters[rank].value() != null;
+  }
+
   /****************************************************************
    * Walk methods, used in NiceMethod.create
    ****************************************************************/

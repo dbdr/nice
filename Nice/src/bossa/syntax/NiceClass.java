@@ -397,7 +397,7 @@ public class NiceClass extends ClassDefinition.ClassImplementation
     (new gnu.expr.InitializeProc
      (gnu.bytecode.Type.pointer_type.getDeclaredMethod("<init>", 0)));
 
-  gnu.expr.Expression getSuper(int index)
+  gnu.expr.Expression getSuper(int index, boolean omitDefaults)
   {
     TypeConstructor tc = definition.getSuperClass();
     
@@ -407,7 +407,7 @@ public class NiceClass extends ClassDefinition.ClassImplementation
     ClassDefinition sup = ClassDefinition.get(tc);
     if (sup != null && sup.implementation instanceof NiceClass)
       return ((NiceClass) sup.implementation).
-	constructorMethod[index].getConstructorInvocation();
+	constructorMethod[index].getConstructorInvocation(omitDefaults);
 
     List constructors = TypeConstructors.getConstructors(tc);
     JavaConstructor m = (JavaConstructor)

@@ -76,19 +76,27 @@ test:
 	cd regtest; JAVA="${java}" /usr/bin/time ./regtest
 
 check:
-	/usr/bin/time ${java} -Dassertions=true -classpath "classes" nice.tools.testsuite.TestNice testsuite
+	if [ `${java} -h 2>&1 | grep -- -enableassertions | wc -l` = 0 ]; then\
+	  /usr/bin/time ${java} -Dassertions=true -classpath "classes" nice.tools.testsuite.TestNice testsuite; \
+	else \
+	  /usr/bin/time ${java} -enableassertions -classpath "classes" nice.tools.testsuite.TestNice testsuite; \
+	fi
 
 .PHONY: coverage
 coverage: share/java/nice.jar
 	$(MAKE) -C coverage all
 
 GCJ=gcj
-GCJJAR = /tmp/Nice-gcj.jar
+GCJTEMP = /tmp/Nice-gcj.jar
 gcj:
-	cp src/nice/tools/compiler.jar $(GCJJAR)
-	jar umf src/mainClass $(GCJJAR) -C classes nice/doc -C classes nice/getopt -C classes nice/lang -C classes nice/tools/ast -C classes nice/tools/code -C classes nice/tools/compiler -C classes nice/tools/util -C classes mlsub -C classes bossa -C classes gnu
-	$(GCJ) -c -o /tmp/getopt.o --resource gnu/getopt/MessagesBundle.properties classes/gnu/getopt/MessagesBundle.properties
-	$(GCJ) -g --main=nice.tools.compiler.fun -o bin/nicec.bin $(GCJJAR) /tmp/getopt.o
+	cp src/nice/tools/compiler.jar $(GCJTEMP)
+	jar umf src/mainClass $(GCJTEMP) -C classes nice/doc -C classes nice/getopt -C classes nice/lang -C classes nice/tools/ast -C classes nice/tools/code -C classes nice/tools/compiler -C classes nice/tools/util -C classes mlsub -C classes bossa -C classes gnu
+	$(GCJ) --main=nice.tools.compiler.fun -o bin/nicec.bin $(GCJTEMP)
+
+gcj-testsuite:
+	cp src/nice/tools/compiler.jar $(GCJTEMP)
+	jar umf src/mainClass $(GCJTEMP) -C classes nice/doc -C classes nice/getopt -C classes nice/lang -C classes nice/tools/ast -C classes nice/tools/code -C classes nice/tools/compiler -C classes nice/tools/util -C classes nice/tools/testsuite -C classes mlsub -C classes bossa -C classes gnu
+	$(GCJ) -g --main=nice.tools.testsuite.TestNice -o bin/testsuite.bin $(GCJTEMP)
 
 clean:
 	rm -f src/nice/tools/compiler.jar

@@ -357,9 +357,39 @@ public class TestNice {
 		//	collect all testsuite files and perform its tests
 		Set testSuiteFiles = new HashSet();
 		getTestSuiteFiles(file, testSuiteFiles);
-		for (Iterator iter = testSuiteFiles.iterator(); iter.hasNext();)
+
+                // sort the files on last modification time.
+                List files = new ArrayList(testSuiteFiles);
+                Collections.sort(files, fileComp);
+
+		for (Iterator iter = files.iterator(); iter.hasNext();)
 			new TestSuite((File)iter.next());
 	}
+
+	private static Comparator fileComp = new FileComparator();
+
+	private static class FileComparator implements Comparator 
+	{
+		public FileComparator(){}
+
+		public int compare(Object o1, Object o2)
+    		{
+      			File file1 = (File)o1;
+      			File file2 = (File)o2;
+                        if (file1.lastModified() < file2.lastModified())
+				return 1;
+
+                        if (file1.lastModified() > file2.lastModified())
+				return -1;
+
+			return 0;
+    		}
+
+    		public boolean equals(Object obj)
+    		{ 
+      			return false;
+    		}
+  	}
 
 
 	/**

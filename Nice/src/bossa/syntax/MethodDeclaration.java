@@ -52,13 +52,14 @@ abstract public class MethodDeclaration extends Definition
   {
     super(name, Node.global);
 
-    this.parameters = parameters;
-    
     if(returnType != null)
       // otherwise, symbol and arity are supposed to be set by someone else
       // a child class for instance
       // This should them be done through setLowlevelTypes(...)
       {
+	this.parameters = parameters;
+	addChild(parameters);
+	
 	// remember it to print the interface
 	syntacticConstraint = constraint.toString();
 	
@@ -134,7 +135,7 @@ abstract public class MethodDeclaration extends Definition
     
     if (!mlsub.typing.Constraint.hasBinders(type.getConstraint()))
       {
-	parameters.typecheck(scope, typeScope, getType().domain());
+	parameters.typecheck(getType().domain());
 	return;
       }
     
@@ -144,7 +145,7 @@ abstract public class MethodDeclaration extends Definition
       try{
 	type.getConstraint().assert(false);
 
-	parameters.typecheck(scope, typeScope, getType().domain());
+	parameters.typecheck(getType().domain());
 
 	innerTypecheck();
       }
@@ -228,7 +229,7 @@ abstract public class MethodDeclaration extends Definition
 
   public String toString()
   {
-    if(getType() == null)
+    if(symbol == null || getType() == null)
       return "method " + getName();
     
     return

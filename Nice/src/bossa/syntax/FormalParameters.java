@@ -21,21 +21,20 @@ import bossa.util.*;
    @author Daniel Bonniot
  */
 
-public class FormalParameters
+public class FormalParameters extends Node
 {
   /**
      An anonymous formal parameter.
    */
-  public static class Parameter
+  public static class Parameter extends Node
   {
-    public Parameter(Monotype type) { this.type = type; }
+    public Parameter(Monotype type) { super(Node.down); this.type = type; }
 
     Monotype type;
 
     boolean match(String id) { return false; }
 
-    void typecheck(VarScope scope, TypeScope typeScope, 
-		   mlsub.typing.Monotype domain)
+    void typecheck(mlsub.typing.Monotype domain)
     {
     }
 
@@ -62,17 +61,17 @@ public class FormalParameters
   {
     public OptionalParameter
       (Monotype type, LocatedString name, Expression defaultValue)
-    { super(type, name); this.defaultValue = defaultValue; }
+    { 
+      super(type, name); 
+      this.defaultValue = expChild(defaultValue); 
+    }
 
-    Expression defaultValue;
+    ExpressionRef defaultValue;
 
-    void typecheck(VarScope scope, TypeScope typeScope, 
-		   mlsub.typing.Monotype domain)
+    void typecheck(mlsub.typing.Monotype domain)
     {
-      defaultValue.buildScope(scope, typeScope);
-      defaultValue = defaultValue.resolveExp();
-      defaultValue = defaultValue.resolveOverloading
-	(new mlsub.typing.Polytype(domain));
+      defaultValue.noOverloading();
+      //defaultValue = defaultValue.resolveOverloading(new mlsub.typing.Polytype(domain));
 
       try {
 	mlsub.typing.Typing.leq(defaultValue.getType(), domain);
@@ -90,8 +89,10 @@ public class FormalParameters
   
   public FormalParameters(java.util.List parameters)
   {
+    super(Node.down);
     if (parameters != null)
       {
+	addChildren(parameters);
 	this.parameters = 
 	  (Parameter[]) parameters.toArray(new Parameter[parameters.size()]);
 	this.size = this.parameters.length;
@@ -139,11 +140,10 @@ public class FormalParameters
     return res;
   }
 
-  void typecheck(VarScope scope, TypeScope typeScope, 
-		 mlsub.typing.Monotype[] domain)
+  void typecheck(mlsub.typing.Monotype[] domain)
   {
     for (int i = 0; i<size; i++)
-      parameters[i].typecheck(scope, typeScope, domain[i]);
+      parameters[i].typecheck(domain[i]);
   }
     
   /****************************************************************

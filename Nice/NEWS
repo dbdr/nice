@@ -24,7 +24,11 @@ nice (0.9.5)
 	int x;
 	equals(Dummy other) = this.x == other.x;
       }
-  * Stricter typechecking of anonymous and local functions.
+  * Object is now recognized as a super-type of every type. This allows
+    easier use of Java libraries, creation of heterogeneous collections,
+    and type-safe handling of values with unknown types.
+  * Simplified some complex type in error messages.
+  * Safe dynamic type inference in presence of anonymous and local functions.
   * Reduced memory usage when repeatedly compiling in the same JVM (eclipse
     plugin, ant, testsuite, ...).
   * Unused local variables will give a warning.

@@ -2,6 +2,9 @@ nice (0.0.020300) unstable; urgency=low
 
   * Better error messages for method calls with wrong number of arguments.
   * Accept methods with no implementation when their domain is empty.
+  * Abstract interfaces are fully qualified just like classes and 
+    correctly list their super-interfaces in the package interface.
+    This really makes it possible to use them across packages.
 
  --
 

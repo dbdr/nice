@@ -20,24 +20,6 @@ import mlsub.compilation.*;
  * @author Daniel Bonniot (d.bonniot@mail.dotcom.fr)
  */
 
-/**
- * Stores information about a mlsub compilation.
- *
- * Information includes:
- *   - whether to perform link tests
- *   - ...
- * 
- * Only information needed to perform the steps
- * of compilation should go here.
- * Other language specific options should go in a 
- * subclass.
- */
-class Compilation
-{
-  boolean skipLink;
-  Module root;
-}
-
 void compileComponent(List<Module>, boolean doLink);
 compileComponent(modules, doLink)
 {

@@ -1,5 +1,10 @@
 nice (0.7.8) unstable; urgency=low
 
+  * Improved bytecode generation of pre\post-condition.
+  * Implemented the enhanced for loop(similar to java 1.5 proposal).
+    The loop works on arrays and collections, example:
+    int[] arr = [1,2,3,4,5];
+    for (int i : arr) print(i);
   * Improved handling of nullness tests, as in:
       x != null && x.dereference()
     and

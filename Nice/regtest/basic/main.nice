@@ -5,9 +5,12 @@ class A
   int x;
 }
 
-void bidon();
+long bidon();
 bidon()
-{}
+{
+  long j;
+  return j=j;
+}
 
 main(args)
 {
@@ -46,8 +49,6 @@ main(args)
     ++a.x;
   else
     bidon();
-
-  bidon(1, 2);
 
   String s1;
   fun(String s2) => { s1 = s2; };

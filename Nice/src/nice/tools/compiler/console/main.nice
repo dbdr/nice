@@ -46,7 +46,6 @@ int compile(String[] args)
   String mainPackage;
   ?String nativeProgram = null;
   ?String nativeCompiler = null;
-  ?String classpath = null;
   boolean editorMode = false;
 
   ConsoleOutput consOutput = new ConsoleOutput();

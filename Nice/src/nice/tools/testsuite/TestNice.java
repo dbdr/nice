@@ -498,24 +498,13 @@ public class TestNice {
 		 @return the classloader used to run generated code.
 	*/
 	static ClassLoader getClassLoader() {
-		ClassLoader classLoader = null;
 
-		try {
-			// This is normally where the compiled classes are in the dev tree.
-			if (_runtime == null)
-				_runtime = "classes";
+		// This is normally where the compiled classes are in the dev tree.
+		if (_runtime == null)
+			_runtime = "classes";
 
-			URL[] urls = { 
-				new URL("file://" + getTempFolder().getAbsolutePath() + "/"),
-				new URL("file://" + new File(getRuntime()).getAbsolutePath() + "/") 
-			};
-			classLoader = new java.net.URLClassLoader(urls, null);
-		}
-		catch(java.net.MalformedURLException ex) {
-			throw new Error(ex.toString());
-		}
-
-		return classLoader;
+		File[] dirs = { getTempFolder(), new File(getRuntime()) };
+		return new nice.tools.util.DirectoryClassLoader(dirs, null);
 	}
 
 	/**

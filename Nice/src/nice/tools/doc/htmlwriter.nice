@@ -1,0 +1,234 @@
+package nice.tools.doc;
+
+/**
+   
+
+   @author Francis Barber
+*/
+
+import bossa.syntax.*;
+import java.util.*;
+import java.text.*;
+import java.io.*;
+
+class HTMLWriter {
+  //mainPackage = mainPackage.deleteAtEnd("/").replace('/', ".");
+  
+  void write(Definition d, String packageName) {
+  }
+
+  write(c@ClassDefinition.Class, packageName) {
+    // Here we handle classes
+    
+    //Initialise a FileWriter
+    String path = outdir + packageName.replace('.','/') + "/"; //this generates the output directory
+    File dir = new File(path);
+    if(!dir.exists()) {
+        if(!dir.mkdirs()) {
+            System.err.println("Error creating directory structure");
+        }
+    }
+    String fileName = c.getName().toString();
+    //we only want information after the last .
+    //that is, nice.lang.Maybe -> Maybe
+    fileName = fileName.substring(fileName.lastIndexOf(".") + 1);
+    BufferedWriter writer = new BufferedWriter(new FileWriter(path + fileName + ".html"));
+    
+    writer.write(getHeader(c.getName().toString()));
+
+    writer.write("<h1>Class " + c.getName() + "</h1>");
+
+    //Print hierarchy
+    ArrayList<ClassDefinition.Class> list = new ArrayList();
+    ClassDefinition.Class superClass = c.getSuperClassDefinition();
+    while(superClass != null) {
+      list.add(superClass);
+      superClass = superClass.getSuperClassDefinition();
+    }
+    /*This creates a nice-looking String as follows:
+     *Super-Super-Class
+     *   |
+     *   +--Super-Class
+     *         |
+     *         +--Class
+     */
+    String hierarchy = c.getName().toString();
+    for(int i = 0; i < list.size(); i++) {
+      String spaces = "";
+      for(int j = 0; j < (list.size()-i)*6-3; j++)
+        spaces = spaces + ' ';
+      hierarchy = list.get(i).getName() + "\n" + spaces + "|\n" + spaces + "+--" + hierarchy;
+    }
+    writer.write("<pre>");
+    writer.write(hierarchy);
+    writer.write("</pre>");
+
+    //Implemented interfaces
+    ClassDefinition.Interface[?] interfaces = c.getImplementedInterfaces();
+    if (interfaces != null) {
+      writer.write("<b>Implemented interfaces:</b>");
+      writer.write("<ul>");
+      interfaces.foreach(ClassDefinition.Interface i => 
+  		         writer.write("<li>" + i.getName() + "</li>"));
+      writer.write("</ul>");
+    }
+
+    writer.write(getFooter());
+    writer.close();
+  }
+
+  write(m@MethodDeclaration, packageName) {
+    //Handle methods
+    
+    //Initialise a FileWriter
+    String path = outdir + packageName.replace('.','/') + "/"; //this generates the output directory
+    File dir = new File(path);
+    if(!dir.exists()) {
+        if(!dir.mkdirs()) {
+            System.err.println("Error creating directory structure");
+        }
+    }
+    String fileName = m.getName().toString();
+    //we only want information after the last .
+    //that is, nice.lang.Maybe -> Maybe
+    //System.out.println("Raw filename: " + fileName);
+    fileName = fileName.replace('/', "@slash");
+    fileName = fileName.replace('.', "@dot");
+    //println(path + fileName);
+    
+    BufferedWriter writer = new BufferedWriter(new FileWriter(path + fileName + ".html"));
+    
+    writer.write(getHeader(m.getName().toString()));
+  
+    writer.write("<h1>Method " + m.getName() + "</h1>");
+  
+    writer.write(htmlSafe(m.toString()));
+  
+    writer.write("<p>");
+    writer.write("nicedoc comments would go here...");
+    writer.write("</p>");
+    /*Below is various info that could be used in the
+     *construction of the method entry
+     */
+    //The compiler doesn't like this:  println("Syntactic return type: " + m.getSyntacticReturnType());
+    //println("Return type: " + m.getReturnType());
+    //println("Arity: " + m.getArity());
+    //println("Type: " + m.getType());
+    //println("Formal Parameters: " + m.formalParameters());
+
+    writer.write(getFooter());
+    writer.close();
+  }
+
+  write(m@DefaultMethodImplementation, packageName) {
+    this.write(m.getDeclaration(), packageName);
+  }
+
+  void write(bossa.modules.Package p) {
+    try {
+      String path = outdir + p.getName().replace('.','/') + "/"; //this generates the output directory
+      File dir = new File(path);
+      if(!dir.exists()) {
+        if(!dir.mkdirs()) {
+          System.err.println("Error creating directory structure");
+        }
+      }
+      BufferedWriter writer = new BufferedWriter(new FileWriter(path + "index.html"));
+      writer.write(getHeader("Package " + p.getName()));
+            
+      //we need to separate class and methods
+      ArrayList<ClassDefinition.Class> classes = new ArrayList();
+      ArrayList<MethodDeclaration> methods = new ArrayList();
+      for(Definition d : p.getDefinitions().definitions()) {
+        if(d instanceof ClassDefinition.Class) {
+          classes.add(d);
+        }
+        else if(d instanceof MethodDeclaration) {
+          methods.add(d);
+        }
+        else if(d instanceof DefaultMethodImplementation) {
+          methods.add(d.getDeclaration());
+        }
+        else {
+          System.err.println("Ignoring " + d);
+        }
+      }
+      
+      //Write classes
+      writer.write("<b>Classes:</b>\n");
+      writer.write("<ul>\n");
+      for(ClassDefinition.Class c : classes) {
+        String s = c.getName().toString();
+        int index = s.lastIndexOf('.');
+        if(index != s.length()-1)
+            s = s.substring(index+1);
+        writer.write("<li><a href='" + s + ".html'>" + s + "</a></li>\n");
+      }
+      writer.write("</ul>\n");
+      
+      //Write methods
+      writer.write("<b>Methods:</b>\n");
+      writer.write("<ul>\n");
+      for(MethodDeclaration m : methods) {
+          writer.write("<li><a href='" + m.getName() + ".html'>" + m.getName() + "</a></li>\n");
+      }
+      writer.write("</ul>\n");
+    
+    
+      writer.write(getFooter());
+      writer.close();
+    } catch(IOException ioe) {
+      ioe.printStackTrace();
+    }
+  }
+  
+  void write(List<bossa.modules.Package> packages) {
+    try {
+      BufferedWriter writer = new BufferedWriter(new FileWriter(outdir + "index.html"));
+      writer.write(getHeader("Packages"));
+      writer.write("<b>Packages:</b>\n");
+      writer.write("<ul>\n");
+      for(bossa.modules.Package p : packages) {
+          writer.write("<li><a href='" + p.getName().replace('.', "/") + "/index.html'>" + p.getName() + "</a></li>\n");
+      }
+      writer.write("</ul>\n");
+      writer.write(getFooter());
+      writer.close();
+    } catch(IOException ioe) {
+      ioe.printStackTrace();
+    }
+  }
+}
+
+/** Converts a String that may contain characters such as '<' to one that will display
+ * properly in html
+ */
+String htmlSafe(String s) {
+  return s.replaceAll("<", "&lt;").replaceAll(">", "&gt;");
+}
+
+/** Returns a string containing everything required up to and including the <body> tag
+ */
+String getHeader(String title) {
+  //we could also include some kind of visible header as well
+  
+  //Create a DateFormatter and set the time zone
+  DateFormat df = new SimpleDateFormat("dd/MM/yyyy 'at' HH:mm:ss z");
+  df.setTimeZone(TimeZone.getTimeZone("GMT"));
+  return
+  "<html>\n" +
+  "<head>\n" + 
+  "<!-- Generated by nicedoc on " + df.format(new Date()) + " -->\n" +
+  "\t<title>" + title + "</title>\n" +
+  "</head>\n" +
+  "<body>\n";
+}
+
+/** Returns a string containing everything after and including the </body> tag
+ */
+String getFooter() {
+  //we could also include other information here
+  return
+  "</body>\n" +
+  "</html>\n";
+}

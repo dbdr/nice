@@ -1,0 +1,96 @@
+package nice.tools.doc;
+
+/**
+   API documentation generator for Nice.
+
+   @author ?
+ */
+
+import nice.doc;
+import nice.tools.compiler;
+import nice.tools.compiler.console;
+import bossa.modules.*;
+
+//A global variable specifying the output directory
+var String outdir = "";
+
+void main(String[] args)
+{
+  String mainPackage;
+  ?String classpath = null;
+
+  ConsoleOutput consOutput = new ConsoleOutput();
+  Compilation compilation = new Compilation(listener: consOutput);
+
+  Program prg = new Program
+    (name: "nicedoc", longName: "The Nice Documentation Generator",
+     shortDescription: "Documentation Generator for the Nice programming language",
+     author: "Daniel Bonniot <bonniot@users.sourceforge.net>",
+     seeAlso: "http://nice.sourceforge.net          the Nice Home Page\n" +
+              "http://nice.sf.net/compilation.html  compilation instructions\n",
+     manualSection: "1",
+     arguments: "package", options: cast(null));
+  prg.options = 
+  [
+   option("sourcepath",
+	  "Search path for source packages\nPATH is a list of directories and .jar archives",
+	  "path",
+	  String path => { compilation.sourcePath = path; }),
+
+   option("classpath",
+	  "Search path for compiled packages and libraries\nPATH is a list of directories and .jar archives",
+	  "path",
+	  String path => { compilation.packagePath = path; }),
+   
+   option("outdir",
+       "Output files to this directory",
+       "path",
+       String path => {outdir = path; }),
+
+   option("man", "Print man page to stdout",
+	  () => man(prg)),
+
+   option("version",
+	  "Print version info and exit",
+	  () => version()),
+
+   option("usage",
+	  "Print usage information and exit",
+	  () => usage(prg))
+  ];
+
+  List<String> rest = parse(prg, args);
+  if (rest.size() != 1 || rest[0].length() == 0)
+    {
+      if (rest.size() > 1)
+	println("Supply only one package on the command line.\n" +
+		"nicec will automatically find dependancies.");
+      usage(prg, ERROR);
+    }
+  mainPackage = rest[0];
+
+  //check that outdir is either empty string or ends with a '/'
+  if(!outdir.equals("") && !outdir.endsWith("/")) {
+    outdir = outdir + "/";
+  }
+
+  /* 
+     For convenience of command-line tools (shells) with completions, 
+     we treat a directory name as the corresponding package name.
+     That is, we replace '/' (which is illegal in package names) by '.'.
+  */
+  mainPackage = mainPackage.deleteAtEnd("/").replace('/', ".");
+
+  try {
+    List<bossa.modules.Package> packages = load(compilation, mainPackage);
+
+    // Here the real work begins
+    //packages.foreach(bossa.modules.Package p => document(p.getDefinitions));
+    Documenter d = new Documenter();
+    d.document(packages);
+    packages.foreach(bossa.modules.Package p => d.document(p));
+  }
+  catch (bossa.modules.Exit e) {
+    // There was an error. Stop working.
+  }
+}

@@ -1,0 +1,73 @@
+package nice.tools.doc;
+
+/**
+   This entire class is very messy and a complete waste of time
+
+   @author Francis Barber
+*/
+
+import bossa.syntax.*;
+
+class Documenter {
+
+  HTMLWriter htmlwriter = new HTMLWriter();
+
+  void document(List<bossa.modules.Package> packages) {
+    htmlwriter.write(packages);
+  }
+  
+  void document(bossa.modules.Package p) {
+    System.err.println("Package: " + p.getName());
+    htmlwriter.write(p);
+    document(this, p.getDefinitions(), p.getName());
+  }
+
+  void document(AST ast, String packageName)
+  {
+    //ast.definitions().foreach(Definition d => document(d));
+    ast.definitions().foreach(Definition d => htmlwriter.write(d, packageName));
+  }
+
+  void document(Definition d)
+  {
+    // Default implementation.
+    // Just to see what we are not handling yet...
+    System.err.println("Ignoring " + d.getName() + 
+	    " (class: " + d.getClass().getName() + ")");
+  }
+
+  document(c@ClassDefinition.Class)
+  {
+    // Here we handle classes
+    // Example code that accesses some properties of classes:
+
+    println("Class " + c.getName);
+    ClassDefinition superClass = c.getSuperClassDefinition();
+    if (superClass != null)
+      println("  extends " + superClass.getName());
+
+    ClassDefinition.Interface[?] interfaces = c.getImplementedInterfaces();
+    if (interfaces != null)
+      interfaces.foreach(ClassDefinition.Interface i => 
+		         println("  implements " + i.getName()));
+  }
+
+  document(m@MethodDeclaration)
+  {
+    println("Method " + m.getName);
+    // Here we handle methods...
+  }
+
+  document(m@MethodImplementation)
+  {
+    // Method implementations can probably be ignored, as they do not
+    // belong to the API.
+  }
+
+  document(m@DefaultMethodImplementation)
+  {
+    // However, for a default implementation, we want to handle the corresponding
+    // declaration.
+    document(this, m.getDeclaration());
+  }
+}

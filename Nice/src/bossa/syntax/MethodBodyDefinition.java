@@ -222,6 +222,7 @@ public class MethodBodyDefinition extends Definition
 
     /* If the method are ambigious and the implementation has additional tc's
      * then try to find the most specific declaration(s) using these tc's
+     * TODO: combine this code with removeNonMinimal in OverloadedSymbolExp
      */   
     if (symbols.size() > 1 && hasAdditionalTags)
       {
@@ -237,7 +238,7 @@ public class MethodBodyDefinition extends Definition
 	      if (m1 != m2)
                 {
                   boolean remove = true;
-                  boolean equal = true;
+		  boolean additionalsEqual = true;
 		  Monotype[] dom2 = tempSymbols[m2].getDefinition().getType().domain();
 		  for (int i = 0; i < len && remove; i++)
                     {
@@ -247,19 +248,17 @@ public class MethodBodyDefinition extends Definition
 		          domainMonotypeLeq(dom1[i], dom2[i]);
 		        }
 		        catch (TypingEx e) {
-                          // may not remove if an argument without
-			  // additional tc is not equal.
-		          remove = additionalTags[i] != null;
-                          equal = false;
+                          if (additionalTags[i] != null)
+			    additionalsEqual = false;
 		        }
 		      }
 		      catch(TypingEx e) {
-		        remove = false;
-			equal = false;
+                        //ignore arguments with additional.
+		        remove = additionalTags[i] == null;
 		      }
 		    }
-                  // don't remove identical methods.
-		  removed[m1] = remove && !equal;
+                  //may not remove a method that is equal for the arguments with an additional.
+		  removed[m1] = remove && !additionalsEqual;
 	        }
 	  }
 

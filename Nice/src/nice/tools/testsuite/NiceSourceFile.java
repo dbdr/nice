@@ -58,6 +58,12 @@ public class NiceSourceFile {
 	 * 
 	 */
 	private StringBuffer _mainMethodContent = new StringBuffer();
+
+	/**
+	 * Number of lines writte for the main section.
+	 */
+
+	private int _topLevelSectionLength = 0;
 	/**
 	 * TODO
 	 * 
@@ -150,8 +156,13 @@ public class NiceSourceFile {
 	 */
 	public void addToTopLevel(String line) {
 		_topLevelContent.append(line).append('\n');
+		_topLevelSectionLength++;
 	}
 
+
+	public int getTopLevelSectionLength() {
+		return _topLevelSectionLength;
+	}
 
 	/**
 	 * Consumes a keyword statement that starts with the word package.

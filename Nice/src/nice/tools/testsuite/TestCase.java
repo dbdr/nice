@@ -219,10 +219,13 @@ public class TestCase {
 				while(Character.isWhitespace(line.charAt(columnNum)))
 					columnNum++;
 				int lineNum = _lineCounter + _currentSourceFile.getCountImports() + 2;
-				if (_currentSourceFile.getStatus() == NiceSourceFile.STATUS_MAIN)
-					lineNum += 2;
 				//System.out.println("_lineCounter: " + _lineCounter + "      _currentSourceFile.getCountImports(): " + _currentSourceFile.getCountImports());
-				_failPositions.add(new FailPosition(_currentSourceFile.getFileName(), lineNum, columnNum + 1));
+				_failPositions.add
+					(new FailPosition
+					 (_currentSourceFile.getFileName(), 
+						lineNum, columnNum + 1, 
+						_currentSourceFile,
+						_currentSourceFile.getStatus() == NiceSourceFile.STATUS_MAIN));
 			}
 		}
 	}
@@ -475,11 +478,16 @@ public class TestCase {
 		private String _fileName;
 		private int _line;
 		private int _column;
+		private NiceSourceFile _sourceFile;
+		private boolean _inMain;
 		
-		FailPosition(String fileName, int line, int column) {
+		FailPosition(String fileName, int line, int column, 
+								 NiceSourceFile sourceFile, boolean inMain) {
 			_fileName = fileName;
 			_line = line;
 			_column = column;
+			_sourceFile = sourceFile;
+			_inMain = inMain;
 		}
 		
 		protected String getFileName() {
@@ -487,7 +495,12 @@ public class TestCase {
 		}
 		
 		protected int getLine() {
-			return _line;
+			int res = _line;
+			if (_inMain)
+				// Add the number of lines of the toplevel code, 
+				// plus two lines for the main section header.
+				res += _sourceFile.getTopLevelSectionLength() + 2;
+			return res;
 		}
 		
 		protected int getColumn() {

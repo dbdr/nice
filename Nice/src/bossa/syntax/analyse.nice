@@ -395,8 +395,8 @@ Expression analyseQualifiedCall(CallExp e, Info info)
     // look for a method with that name and any arity,
     // since the method is not called but just referenced.
     {
-      List<VarSymbol> possibilities = JavaClasses.findJavaMethods
-      (e.declaringClass, funName.toString());
+      List<VarSymbol> possibilities = findJavaMethods
+	(notNull(e.declaringClass), funName.toString());
 
       if (possibilities.size() == 0)
 	throw error(e, "Class " + notNull(e.declaringClass).getName() +
@@ -417,8 +417,8 @@ Expression analyseQualifiedCall(CallExp e, Info info)
 	return createOverloadedSymbolExp(possibilities, funName);
     }
 
-  List<VarSymbol> possibilities = JavaClasses.findJavaMethods
-    (e.declaringClass, funName.toString(), arity);
+  List<VarSymbol> possibilities = findJavaMethods
+	(notNull(e.declaringClass), funName.toString(), arity);
 
   if (possibilities.size() == 0)
     throw error(e, "Class " + notNull(e.declaringClass).getName() +

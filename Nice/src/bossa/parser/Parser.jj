@@ -1470,7 +1470,7 @@ MethodDeclaration nativeMethodDeclaration(LocatedString name,
     if(isNew)
       {
 	javaTypes.add(0,method);
-	return new RetypedJavaMethod(method,"<init>",javaTypes,
+	return bossa.syntax.dispatch.createRetypedJavaMethod(method,"<init>",javaTypes,
 			             name,cst,returnType,parameters);
       }
     int dot=method.toString().lastIndexOf('.');
@@ -1482,7 +1482,7 @@ MethodDeclaration nativeMethodDeclaration(LocatedString name,
     LocatedString className=method.substring(0,dot);
     
     if(javaTypes!=null)
-      return new RetypedJavaMethod(className,methodName,javaTypes,
+      return bossa.syntax.dispatch.createRetypedJavaMethod(className,methodName,javaTypes,
 			           name,cst,returnType,parameters);
     else
       return new JavaFieldAccess(className,methodName,

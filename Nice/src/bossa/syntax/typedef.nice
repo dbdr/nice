@@ -274,7 +274,7 @@ public abstract class CTypeDefinition extends TypeDefinition
 	  
      if (ji != null)
        for (int i = 0; i < ji.length; i++)
-         if (tc.arity() == 0 || ! JavaClasses.excludedInterface(ji[i]))
+         if (tc.arity() == 0 || ! excludedInterface(ji[i]))
            try {
               Typing.initialLeq(tc, ji[i]);
            }

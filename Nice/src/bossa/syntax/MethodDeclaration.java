@@ -128,6 +128,21 @@ public abstract class MethodDeclaration extends Definition
     return false;
   }
 
+  public boolean isJavaMethod()
+  {
+    return false;
+  }
+
+  // Overriden in JavaMethod
+  public gnu.bytecode.Method getReflectMethod()
+  {
+    return null;
+  }
+
+  // Overriden in JavaMethod
+  public void registerForDispatch()
+  { }
+
   /****************************************************************
    * Typechecking
    ****************************************************************/

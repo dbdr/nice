@@ -12,7 +12,6 @@
 
 package bossa.link;
 
-import bossa.syntax.JavaMethod;
 import bossa.syntax.Pattern;
 import nice.tools.typing.Types;
 
@@ -24,14 +23,14 @@ import nice.tools.typing.Types;
 
 class JavaAlternative extends Alternative
 {
-  JavaAlternative(JavaMethod method)
+  JavaAlternative(bossa.syntax.MethodDeclaration method)
   {
     super(method.getName().toString(), patterns(method));
 
     this.method = method;
   }
 
-  JavaMethod method;
+  bossa.syntax.MethodDeclaration method;
 
   static Pattern[] patterns(bossa.syntax.MethodDeclaration method)
   {

@@ -15,7 +15,6 @@ package bossa.link;
 import bossa.syntax.Pattern;
 import bossa.syntax.LocatedString;
 import bossa.syntax.MethodDeclaration;
-import bossa.syntax.JavaMethod;
 import bossa.syntax.VarSymbol;
 import nice.tools.code.*;
 
@@ -97,12 +96,12 @@ public class ImportedAlternative extends Alternative
   */
   private static void registerJavaMethod(String fullName)
   {
-    if (! fullName.startsWith(JavaMethod.fullNamePrefix))
+    if (! fullName.startsWith("JAVA:"))
       return;
 
     int end = fullName.lastIndexOf(':');
     LocatedString methodName = new LocatedString
-      (fullName.substring(JavaMethod.fullNamePrefix.length(), end),
+      (fullName.substring("JAVA:".length(), end),
        bossa.util.Location.nowhere());
 
     List methods = bossa.syntax.Node.getGlobalScope().lookup(methodName);
@@ -114,7 +113,7 @@ public class ImportedAlternative extends Alternative
 	MethodDeclaration md = next.getMethodDeclaration();
 	if (md.getFullName().equals(fullName))
 	  {
-	    ((JavaMethod) md).registerForDispatch();
+	    md.registerForDispatch();
 	    return;
 	  }
       }

@@ -131,7 +131,7 @@ public final class Compilation
    * Java Methods
    ****************************************************************/
 
-  static void compile(JavaMethod m, 
+  static void compile(MethodDeclaration /* JavaMethod */ m,
 		      Stack sortedAlternatives, 
 		      bossa.modules.Package module)
   {
@@ -175,7 +175,7 @@ public final class Compilation
       }
   }
 
-  private static NiceClass declaringClass(JavaMethod m, Alternative alt)
+  private static NiceClass declaringClass(MethodDeclaration /* JavaMethod */ m, Alternative alt)
   {
     mlsub.typing.TypeConstructor firstArgument = alt.getPatterns()[0].getTC();
     TypeDefinition def = bossa.syntax.dispatch.getTypeDefinition(firstArgument);
@@ -201,7 +201,7 @@ public final class Compilation
      Type returnType, 
      boolean voidReturn,
      Expression[] params,
-     ClassType c, JavaMethod m)
+     ClassType c, MethodDeclaration /* JavaMethod */ m)
   {
     if (!sortedAlternatives.hasNext())
       {

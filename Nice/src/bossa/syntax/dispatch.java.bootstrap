@@ -12,6 +12,13 @@ import java.util.List;
 
 public class dispatch
 {
+  public static void loadJavaMethods(String name) {}
+  
+  public static mlsub.typing.TypeConstructor lookupJavaClass(String className, bossa.util.Location loc)
+  { return null; }
+  
+  public static void resetJavaClasses() {}
+
   static VarScope createGlobalVarScope()
   { return null; }
 
@@ -48,7 +55,7 @@ public class dispatch
   public static VarSymbol createConstructorCallSymbol(MethodDeclaration declaration, LocatedString name, mlsub.typing.Polytype type)
   { return null; }
 
-  public static gnu.bytecode.Method getImplementationAbove(JavaMethod decl, gnu.bytecode.ClassType firstArg)
+  public static gnu.bytecode.Method getImplementationAbove(MethodDeclaration decl, gnu.bytecode.ClassType firstArg)
   { return null; }
 
   static Pattern resolveGlobalConstants(Pattern pattern)

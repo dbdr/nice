@@ -1,0 +1,344 @@
+/**************************************************************************/
+/*                                N I C E                                 */
+/*             A high-level object-oriented research language             */
+/*                        (c) Daniel Bonniot 2004                         */
+/*                                                                        */
+/*  This program is free software; you can redistribute it and/or modify  */
+/*  it under the terms of the GNU General Public License as published by  */
+/*  the Free Software Foundation; either version 2 of the License, or     */
+/*  (at your option) any later version.                                   */
+/*                                                                        */
+/**************************************************************************/
+
+package bossa.syntax;
+
+import bossa.util.*;
+
+/**
+   A Native Java Method.
+
+*/
+public class JavaMethod extends MethodDeclaration
+{
+  ?gnu.bytecode.Method reflectMethod = null;
+  boolean registered = false;
+  
+  {
+    if (this.reflectMethod != null)
+      this.registerForDispatch();
+  }
+  
+  isJavaMethod() = true;
+  getReflectMethod() = notNull(reflectMethod);
+   
+  /** @return a string that uniquely represents this method */
+  getFullName()
+  {
+    return "JAVA:" + name + ':' + this.getType();
+  }
+
+  gnu.expr.LambdaExp getLambda() = nice.tools.code.Gen.dereference(this.getCode());
+ 
+  javaReturnType()
+  {
+    let reflectMethod = this.reflectMethod;
+    assert reflectMethod != null;
+    return reflectMethod.getReturnType();
+  }
+  	
+  javaArgTypes() {
+    let reflectMethod = this.reflectMethod;
+    assert reflectMethod != null;
+    return reflectMethod.getParameterTypes();
+  }
+
+  computeCode() = new gnu.expr.QuoteExp(new gnu.expr.PrimProcedure(notNull(this.reflectMethod)));
+
+  getCode() = nice.tools.code.Gen.wrapInLambda(new gnu.expr.PrimProcedure(notNull(this.reflectMethod)));
+
+  printInterface(w)
+  {
+    Internal.error("Automatic java methods should not be exported");
+  }
+
+  registerForDispatch()
+  {
+    if (this.registered)
+      return;
+
+    bossa.link.DispatchTest.register(this);
+    this.registered = true;
+  }
+}
+
+new JavaMethod( LocatedString name, mlsub.typing.Polytype type,
+                  gnu.bytecode.Method reflectMethod )
+{
+  this( name, null, type, reflectMethod : reflectMethod );
+}
+
+/**
+   A Java constructor method.
+
+ */
+class JavaConstructor extends JavaMethod
+{
+  computeCode() =  new gnu.expr.QuoteExp(new gnu.expr.InstantiateProc(notNull(this.reflectMethod)));
+
+  getConstructorInvocation(omitDefaults) =  new gnu.expr.QuoteExp(new gnu.expr.InitializeProc(this.reflectMethod));
+}
+
+?JavaMethod makeJavaMethod(gnu.bytecode.Method m, boolean constructor)
+{
+  ?mlsub.typing.Polytype type = nice.tools.code.Import.type(m);
+
+  // We could not turn the bytecode type into a Nice type.
+  if (type == null)
+    return null;
+
+  if (constructor)
+    return new JavaConstructor(
+      new LocatedString("new " + m.getDeclaringClass().getName(),
+    	                  Location.nowhere()), type, m);
+  else
+    return new JavaMethod(new LocatedString(m.getName(), Location.nowhere()),
+                          type, m);
+}
+
+/**
+ *  Remember known methods, by name.
+ */
+let Map<String,List<gnu.bytecode.Method>> knownMethods = new HashMap();
+
+void registerMethod(gnu.bytecode.Method m)
+{
+  ?List<gnu.bytecode.Method> methods = knownMethods.get(m.getName());
+  if (methods == null)
+    knownMethods.put( m.getName(), methods = new ArrayList() );
+
+  assert methods != null;
+
+  methods.add(m);
+}
+
+/** Utility function for analyse.nice */
+
+/**
+ * Returns a list of static java methods that match a given name.
+ */
+ 
+List<VarSymbol> findJavaMethods(gnu.bytecode.ClassType declaringClass, String funName) =
+    findJavaMethods(declaringClass, funName, -1);
+
+/**
+ * Returns a list of java methods that match the name and arity.
+ * If arity == -1, the arity does not matter, and the method or field must be static.
+ */
+List<VarSymbol> findJavaMethods(gnu.bytecode.ClassType declaringClass, String funName, int arity)
+{
+  List<VarSymbol> possibilities = new LinkedList();
+
+  declaringClass.addMethods();
+    
+  // search methods
+  for (?gnu.bytecode.Method method = declaringClass.getMethods();
+  	     method != null; method = method.next)
+  {
+    if (!method.getName().equals(funName))
+      continue;
+    if (arity == -1 && !method.getStaticFlag())
+      continue;
+    if (arity >= 0 && notNull(method.arg_types).length + ( method.getStaticFlag() ? 0 : 1 ) != arity )
+      continue;
+          
+    ?MethodDeclaration md = retyped.get(method);
+    if (md != null || ( md = makeJavaMethod(method, false ) ) != null )
+      possibilities.add(notNull(md).getSymbol());
+    else if( bossa.util.Debug.javaTypes )
+      bossa.util.Debug.println("Method " + method + " ignored");
+  }
+
+  // search a field
+  if (arity <= 0)
+    findStaticJavaFields(declaringClass, funName, possibilities);
+
+  return possibilities;
+}
+
+/**
+ * Search recursively in superclasses and interfaces for static java fields.
+ */
+void findStaticJavaFields 
+	(gnu.bytecode.ClassType declaringClass, String fieldName, List<VarSymbol> possibilities)
+{ 
+  declaringClass.addMethods();
+
+  ?gnu.bytecode.Field field = declaringClass.getField(fieldName);
+  if (field != null && field.getStaticFlag())
+    {
+      ?MethodDeclaration md = retyped.get(field);
+      if (md != null || (md = makeJavaFieldAccess(field)) != null)
+        {
+          assert md != null;
+
+          if (!possibilities.contains(md.getSymbol()))
+            {
+              possibilities.add(md.getSymbol());
+              return;
+            }
+        }
+      else if(bossa.util.Debug.javaTypes) 
+        bossa.util.Debug.println("Field " + field + " ignored");
+    }
+    
+  ?gnu.bytecode.ClassType superClass = declaringClass.getSuperclass();
+  if (superClass != null)
+    findStaticJavaFields(superClass, fieldName, possibilities);
+
+  gnu.bytecode.ClassType[?] interfaces = declaringClass.getInterfaces();
+  if (interfaces != null)
+    for (gnu.bytecode.ClassType itf : interfaces)
+      findStaticJavaFields(itf, fieldName, possibilities);
+}
+
+/**
+ * Loads the methods defined in the java class
+ * to make them available to the nice code.
+ */
+void fetchMethods(TypeConstructor tc, gnu.bytecode.ClassType classType)
+{
+  try {
+    classType.addMethods();
+
+    for (?gnu.bytecode.Field f = classType.getFields(); f != null; f = f.next)
+      if (retyped.get(f) == null)
+        addJavaSymbol(f, makeJavaFieldAccess(f));
+
+    for (?gnu.bytecode.Method m = classType.getMethods(); m != null; m = m.next)
+      {
+         // Ignore the method if it is explicitely retyped
+         if (retyped.get(m) != null)
+           continue;
+
+         fetchMethod(m, tc, classType);
+      }
+  }
+  catch(NoClassDefFoundError e) {
+    User.warning("Class " + e.getMessage().replace('/','.') + 
+	   " was not found.\n" + 
+	   "It is refered to in class " + classType.getName() +
+	   "\nYou probably need to install the corresponding package.");
+  }
+  catch (ClassFormatError e) {
+    User.warning("Class " + classType.getName() + 
+	   " has an invalid bytecode format");
+  }
+}
+
+void fetchMethod(gnu.bytecode.Method m, TypeConstructor tc, gnu.bytecode.ClassType classType)
+{
+  if (m.isConstructor())
+    {
+      let res = makeJavaMethod(m, true);
+      assert res != null;
+      TypeConstructors.addConstructor(tc, res);
+      retyped.put(m, res);
+    }
+  else
+    {
+      /* We don't need to put static methods in the global scope.
+         They can and must be accessed by specifying the class 
+         explicitely, like in Java. 
+       */
+      if (m.getStaticFlag())
+        return;
+
+      ?gnu.bytecode.Method base = findBaseMethod(classType, m);
+      if (base != null)
+        return;
+
+      registerMethod(m);
+    }
+}
+
+?gnu.bytecode.Method alreadyHasMethod(gnu.bytecode.ClassType c, gnu.bytecode.Method m) =
+   c.getMethod(m.getName(), m.getParameterTypes());
+
+private ?gnu.bytecode.Method findBaseMethod(gnu.bytecode.ClassType classType, gnu.bytecode.Method m)
+{
+  ?gnu.bytecode.Method res = null;
+
+  /* Skips m if it was just overriden in classType
+     but declared in a superclass or superinterface.
+  */
+  ?gnu.bytecode.ClassType superClass = classType.getSuperclass();
+
+  /* If the super class is null, the current class is an interface.
+     We consider that interfaces do not declare new methods if they also
+     belong to Object.
+     For instance, java.lang.CharSequence in JDK 1.4 declares toString.
+  */
+  if (superClass == null)
+    superClass = gnu.bytecode.Type.pointer_type;
+
+  assert superClass != null;  // Typechecker limitation
+
+  res = alreadyHasMethod(superClass,m);
+  if (res != null)
+    return res;
+
+  for (gnu.bytecode.ClassType itf : classType.getInterfaces())
+    {
+       res = alreadyHasMethod(itf,m);
+       if (res != null)
+         return res;
+    }
+
+  return null;
+}
+
+/** Called when the given name is going to be needed. */
+void loadJavaMethods(String name)
+{
+  ?List<gnu.bytecode.Method> methods = knownMethods.get(name);
+  if (methods == null)
+    return;
+  knownMethods.remove(name);
+
+  for (gnu.bytecode.Method m : methods)
+    {
+       if (bossa.util.Debug.javaTypes)
+         bossa.util.Debug.println("Loaded native method " + m);
+
+       if (retyped.get(m) != null)
+         continue;
+
+       addJavaSymbol(m, makeJavaMethod(m, false));
+    }
+}
+
+void addJavaSymbol(gnu.bytecode.AttrContainer m, ?MethodDeclaration def)
+{
+  if (def == null || Node.getGlobalScope() == null)
+    return;
+
+  Node.getGlobalScope().addSymbol(def.getSymbol());
+  retyped.put(m, def);
+}
+
+var ?JavaMethod javaObjectConstructor = null;
+
+void resetJavaClasses()
+{
+  retyped.clear();
+  knownMethods.clear();
+  javaObjectConstructor = null;
+}
+
+JavaMethod getJavaObjectConstructor()
+{
+  if (javaObjectConstructor == null)
+    javaObjectConstructor = makeJavaMethod(getDeclaredMethod(notNull(gnu.bytecode.Type.pointer_type),"<init>", 0), true);
+
+  return notNull(javaObjectConstructor);
+}

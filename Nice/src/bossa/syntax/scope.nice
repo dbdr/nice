@@ -21,7 +21,7 @@ public class GlobalVarScope extends VarScope
   lookup(i)
   {
     // If there is any method by that name waiting, load it.
-    JavaClasses.nameRequired(i.toString());
+    loadJavaMethods(i.toString());
 
     return super;
   }

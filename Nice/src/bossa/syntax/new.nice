@@ -77,7 +77,7 @@ public class NewExp extends CallExp
   
   private void setObject()
   {
-    JavaMethod method = JavaClasses.getObjectConstructor();
+    JavaMethod method = getJavaObjectConstructor();
 
     function = createSymbolExp(method.getSymbol(), ti.location());
   }

@@ -43,14 +43,12 @@ public final class DispatchTest
   // Non instantiable
   private DispatchTest() { }
 
-  public static void register(UserOperator/*NiceMethod*/ m)
+  public static void register(MethodDeclaration m)
   {
-    methods.add(m);
-  }
-  
-  public static void register(JavaMethod m)
-  {
-    javaMethods.add(m);
+    if( m.isJavaMethod() )
+      javaMethods.add(m);
+    else
+      methods.add(m);
   }
   
   public static void unregister(MethodDeclaration m)
@@ -75,7 +73,7 @@ public final class DispatchTest
 	test((UserOperator/*NiceMethod*/) i.next(), module);
 
       for (Iterator i = javaMethods.iterator(); i.hasNext();)
-	test((JavaMethod) i.next(), module);
+	test((MethodDeclaration/*JavaMethod*/) i.next(), module);
     } 
     finally {
       chrono.stop();
@@ -96,7 +94,7 @@ public final class DispatchTest
     Compilation.compile(m, sortedAlternatives, module);
   }
 
-  private static void test(JavaMethod m, bossa.modules.Package module)
+  private static void test(MethodDeclaration/*JavaMethod*/ m, bossa.modules.Package module)
   {
     Stack sortedAlternatives = Alternative.sortedAlternatives(m);
 
@@ -120,9 +118,9 @@ public final class DispatchTest
     return a.allAtAny();
   }
 
-  private static boolean trivialTestJava(JavaMethod m, Stack alternatives)
+  private static boolean trivialTestJava(MethodDeclaration m, Stack alternatives)
   {
-    gnu.bytecode.Method reflectMethod = m.reflectMethod;
+    gnu.bytecode.Method reflectMethod = m.getReflectMethod();
 
     // Static methods and constructors cannot be overriden, so there is
     // no problem.
@@ -316,7 +314,7 @@ public final class DispatchTest
 	if (firstArg != null)
 	  {
 	    gnu.bytecode.Method superImplementation = bossa.syntax.dispatch.getImplementationAbove
-	      ((JavaMethod) method, firstArg);
+	      (method, firstArg);
 	    if (superImplementation != null &&
 		superImplementation.isAbstract() == false)
 	      // It's OK, this case is covered by a Java implementation.

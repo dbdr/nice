@@ -17,7 +17,6 @@ import bossa.util.*;
 import mlsub.typing.*;
 
 import bossa.syntax.MethodDeclaration;
-import bossa.syntax.JavaMethod;
 import bossa.syntax.Pattern;
 import bossa.syntax.LocatedString;
 import bossa.syntax.Node;
@@ -241,8 +240,8 @@ public class Alternative implements Located
   {
     String fullName = to.getFullName();
 
-    if (from instanceof JavaMethod)
-      new JavaAlternative((JavaMethod) from).add(fullName);
+    if (from.isJavaMethod())
+      new JavaAlternative(from).add(fullName);
 
     List list = (List) alternatives.get(from.getFullName());
 

@@ -180,9 +180,9 @@ public class SuperExp extends Expression
 
 }
 
-public ?gnu.bytecode.Method getImplementationAbove(JavaMethod decl, gnu.bytecode.ClassType firstArg)
+public ?gnu.bytecode.Method getImplementationAbove(MethodDeclaration /* JavaMethod */ decl, gnu.bytecode.ClassType firstArg)
 {
-  let thisMethod = decl.reflectMethod;
+  let thisMethod = decl.getReflectMethod();
   let superClass = firstArg.getSuperclass();
   if (superClass == null)
     return null;

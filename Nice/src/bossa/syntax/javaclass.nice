@@ -57,7 +57,7 @@ public class JavaClass extends ClassImplementation
     if (nativeArity != -1 && nativeArity != definition.getTC().arity())
       User.error(definition, javaName + " has " + nativeArity + " type parameters");
     
-    let old = JavaClasses.setTypeConstructorForJavaClass
+    let old = setTypeConstructorForJavaClass
 		(definition.compilation(), definition.getTC(), classType);
 
     if (old != null)
@@ -71,11 +71,199 @@ public class JavaClass extends ClassImplementation
     if (ignoredRetyping)
       return;
 
-    JavaClasses.fetchMethods(definition.getTC(), cast(definition.getJavaType()));
+    fetchMethods(definition.getTC(), cast(definition.getJavaType()));
   }
 
   printInterface(s)
   {
     s.print(" = native " + javaName.toString() + ";\n");
   }
+}
+
+
+/**
+  * Returns a java type constructor with the given name
+  * and the given java type.
+  * <p>
+  * Usefull for primitive types.
+  */
+TypeConstructor makeJavaClass(bossa.modules.Compilation compilation, String name,
+                                gnu.bytecode.Type javaType)
+{
+  ?TypeConstructor tc = compilation.javaTypeConstructors.get(javaType);
+  if(tc!=null)
+    return tc;
+    
+  // we put the new JTC in the hashtable in the constructor
+  // and not after it returned, to avoid infinite loop
+  // if the code of the constructor does a lookup.
+  return createJavaType(compilation, name, javaType);
+}
+
+/**
+ * @return null, except if javaName already had an
+ * associated TypeConstructor in which case it is returned.
+ */
+?TypeConstructor setTypeConstructorForJavaClass
+    (bossa.modules.Compilation compilation, TypeConstructor tc, gnu.bytecode.Type type) =
+    	compilation.javaTypeConstructors.put(type, tc);
+
+let gnu.bytecode.Type[] blackListClass = [
+	gnu.bytecode.ClassType.make("java.lang.Object")];
+
+let gnu.bytecode.Type[] blackListInterface = [
+	gnu.bytecode.ClassType.make("java.io.Serializable"),
+        gnu.bytecode.ClassType.make("java.lang.Cloneable"),
+        gnu.bytecode.ClassType.make("java.lang.Comparable")];
+  
+boolean excludedClass(gnu.bytecode.Type[] blackList, gnu.bytecode.Type classType)
+{	
+  for (int i=0; i<blackList.length; i++)
+    if (classType==blackList[i])
+	  return true;
+  return false;
+}
+      
+boolean excludedInterface(TypeConstructor itf)
+{
+  ?gnu.bytecode.Type t = nice.tools.code.Types.get(itf);
+  if (t == null)
+    return false;
+
+  return excludedClass(blackListInterface, t);
+}
+
+TypeConstructor createJavaType(bossa.modules.Compilation compilation, String className,
+                                 gnu.bytecode.Type javaType)
+{
+  if (bossa.util.Debug.javaTypes)
+    bossa.util.Debug.println("Registering java class "+className);
+
+  // as the tc is not introduced, it should not be set instantiable
+  // (thus used at link test with an error)
+  // these late TCs should be avoided
+  boolean instantiable = !Typing.isInRigidContext() && instantiable(javaType);
+      
+  TypeConstructor res = new TypeConstructor(className, null, instantiable, true);
+
+  let old = compilation.javaTypeConstructors.put(javaType, res);
+  if (old != null)
+    User.error(old + " was already associated with the Nice class " + old);
+
+  nice.tools.code.Types.set(res, javaType);
+    
+  if(Typing.isInRigidContext())
+    // We should not add new classes at this point.
+    // It doesn't matter, as this type is not used explicitely.
+  {
+    Internal.warning(className + " added late");
+
+    setArity(res, 0);
+    return res;
+  }
+
+  Typing.introduce(res);
+    
+  // Recursive search for java super-classes
+  if (javaType instanceof gnu.bytecode.ClassType)
+    {
+      let classType = javaType;
+	
+      int arity = classType.getArity();
+      if (arity != -1)
+        setArity(res, classType.getArity());
+
+      ?gnu.bytecode.ClassType superClass = classType.getSuperclass();
+	
+      if (superClass!=null && !(excludedClass(blackListClass, superClass)))
+	{
+	  try {
+            TypeConstructor superTC = nice.tools.code.Types.typeConstructor(superClass);
+	    Typing.initialLeq(res, superTC);
+	  }
+	  catch(TypingEx e) {
+	    Internal.warning("Invalid java super-class "+superClass+" for "+className);
+	  }
+          catch(nice.tools.code.Types.NotIntroducedClassException e) {
+            Internal.warning(res + " extends " + superClass + ", which is not usable");
+          }
+	}
+
+      gnu.bytecode.ClassType[?] itfs = null;
+      try {
+        itfs = classType.getInterfaces();
+      }
+      catch(NoClassDefFoundError ex) {
+        User.warning("Interface " + ex.getMessage() + 
+	       " implemented by " + classType.getName() + 
+	       " was not found in classpath");
+      }
+	
+      if (itfs!=null)
+	for (gnu.bytecode.ClassType itf : itfs)
+	  {
+	    if (excludedClass(blackListInterface, itf))
+	      continue;
+	    
+            try {
+              TypeConstructor superTC = nice.tools.code.Types.typeConstructor(itf);
+              Typing.initialLeq(res, superTC);
+	    }
+	    catch(TypingEx e) {
+              Internal.warning(res+" cannot implement " + itf /* + ": " + e.toString()*/);
+            }
+            catch(nice.tools.code.Types.NotIntroducedClassException e) {
+              Internal.warning(res + " implements " + itf + ", which is not usable");
+            }
+	  }
+
+      // The default arity is 0.
+      if (res.getKind() == null)
+        setArity(res, 0);
+
+      if (classType.isFinal())
+	res.setMinimal();
+    }
+
+  if (javaType instanceof gnu.bytecode.ClassType)
+    fetchMethods(res, javaType);
+    
+  return res;
+}
+
+void setArity(TypeConstructor tc, int arity)
+{
+  try {
+    Variance variance = arity == 0 ? 
+	  Variance.empty() : Variance.make(new int[arity]);
+    mlsub.typing.lowlevel.Engine.setKind(tc, variance.getConstraint());
+  }
+  catch(mlsub.typing.lowlevel.Unsatisfiable ex) {
+    User.error("Java class " + tc + " cannot have arity " + arity);
+  }
+}
+
+boolean instantiable(gnu.bytecode.Type javaType)
+{
+  if (!(javaType instanceof gnu.bytecode.ClassType))
+    return false;
+
+  return (javaType.getModifiers() 
+    & (gnu.bytecode.Access.ABSTRACT|
+       gnu.bytecode.Access.INTERFACE)) == 0;
+}
+
+?TypeConstructor lookupJavaClass(String className, Location loc)
+{
+  ?gnu.bytecode.Type classType = nice.tools.code.TypeImport.lookup(className, loc);
+
+  if (classType == null)
+    return null;
+
+  bossa.modules.Compilation compilation = notNull(Node.compilation);
+  
+  if (compilation.javaTypeConstructors.containsKey(classType))
+    return compilation.javaTypeConstructors.get(classType);
+
+  return createJavaType(compilation, classType.getName(), classType);
 }

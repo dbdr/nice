@@ -101,7 +101,7 @@ public class GlobalTypeScope extends TypeScope
     if (res != null)
       return res;
 
-    return JavaClasses.lookup(name, loc);
+    return dispatch.lookupJavaClass(name, loc);
   }
 
   public Module module;

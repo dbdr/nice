@@ -1,0 +1,154 @@
+/**************************************************************************/
+/*                                N I C E                                 */
+/*             A high-level object-oriented research language             */
+/*                        (c) Daniel Bonniot 2000                         */
+/*                                                                        */
+/*  This program is free software; you can redistribute it and/or modify  */
+/*  it under the terms of the GNU General Public License as published by  */
+/*  the Free Software Foundation; either version 2 of the License, or     */
+/*  (at your option) any later version.                                   */
+/*                                                                        */
+/**************************************************************************/
+
+package bossa.syntax;
+
+/**
+   A native java field access.
+
+*/
+public class JavaFieldAccess extends FieldAccess
+{  
+  private ?gnu.bytecode.Field field = null;
+
+  /** The java class this method is defined in */
+  LocatedString className;  
+  String fieldName;
+  
+  isFinal() = notNull(this.field).isFinal(); 
+  isStatic() = notNull(this.field).isStatic();
+
+  {
+    let field = this.field;
+    
+    if (field != null)
+     this.fieldDecl = new gnu.expr.Declaration(field.getName(), field);
+  }
+
+  buildScope(outer, typeOuter)
+  {
+    super;
+
+    // We put this here, since we need 'module' to be computed
+    // since it is used to open the imported packages.
+    // The registration must be done before resolution.
+    if (this.field == null)
+      {
+        let field = this.field = this.getField(className,fieldName);
+      
+	if (field == null)
+	  User.error(this, "Field "+fieldName+" not found in class "+className);
+        else
+          {
+	    if (field.getStaticFlag())
+	      {
+	        if (arity != 0)
+	          User.error(name, name + " should have no parameters");
+	      }
+	    else
+	      {
+	        if (arity != 1)
+	          User.error(name, name + " should have exactly one parameter");
+	      }
+     
+	    registerNativeField(this, field);
+         }
+      }
+    this.fieldDecl = new gnu.expr.Declaration(fieldName, field);
+  }
+  
+  ?gnu.bytecode.Field getField(LocatedString javaClass, String name)
+  {
+    ?gnu.bytecode.ClassType c = null;
+    try { 
+      let type = nice.tools.code.Types.type(javaClass); 
+      if (type instanceof gnu.bytecode.ClassType)
+        {
+          c = type;
+          assert c != null; // Typechecker limitation      
+           // remembers the fully qualified name
+           className.content = c.getName();
+
+          for (?gnu.bytecode.Field f = c.getFields(); f != null; f = f.next )
+          if (name.equals(f.getName()))
+            return f;
+        }
+      else
+	User.error(javaClass,"Class " + javaClass + " not found");
+    }
+    catch(ClassCastException e) { 
+      User.error(javaClass, 
+		 javaClass + " is a primitive type, it has no field");
+    }
+
+    return null;
+  }
+
+
+  printInterface(s)
+  {
+    s.print(this.toString() + "\n");
+  }
+  
+  toString() =
+      super + " = native "
+      + this.className + "." + 
+        (this.field==null ? this.fieldName : notNull(this.field).getName())
+      + ";";
+}
+
+new JavaFieldAccess(LocatedString className,String fieldName,
+     LocatedString name,Constraint cst,
+     Monotype returnType, FormalParameters parameters)
+{
+  this(name, cst, parameters, returnType,
+    className : className,
+    fieldName : fieldName );
+}
+  
+new JavaFieldAccess(gnu.bytecode.Field field, mlsub.typing.Monotype[?] parameters)
+{
+  this(
+    new LocatedString(field.getName(), Location.nowhere()), 
+    null,
+    parameters, 
+    nice.tools.code.Types.monotype(field.getType(), field.isFinal()),
+    field : field,
+    className : new LocatedString(field.getDeclaringClass().getName(), Location.nowhere()),
+    fieldName : field.getName() );
+}
+
+?MethodDeclaration makeJavaFieldAccess(gnu.bytecode.Field f)
+{
+  try {
+    mlsub.typing.Monotype[?] params;
+    if (!f.getStaticFlag())
+      {
+	params = [nice.tools.code.Types.monotype(f.getDeclaringClass(), true)];
+      }
+    else
+      params = null;
+    
+    JavaFieldAccess res = new JavaFieldAccess(f, params);
+
+    if (bossa.util.Debug.javaTypes)
+      bossa.util.Debug.println("Loaded field " + res);
+      
+    return res;
+  }
+  catch(nice.tools.code.Types.ParametricClassException e) {
+    return null;
+  }
+  catch(nice.tools.code.Types.NotIntroducedClassException e){
+    return null;
+  }
+}

@@ -208,8 +208,6 @@ mlsub.typing.Monotype type(MonoSymbol) = native MonoSymbol.type;
 GlobalTypeScope getGlobalTypeScope() = native GlobalTypeScope Node.getGlobalTypeScope();
 ?gnu.bytecode.ClassType staticClass(Arguments) = native gnu.bytecode.ClassType Arguments.staticClass();
 ?gnu.bytecode.ClassType staticClass(Expression) = native gnu.bytecode.ClassType Expression.staticClass();
-List<VarSymbol> findJavaMethods(?gnu.bytecode.ClassType, String, int) = native List JavaClasses.findJavaMethods(gnu.bytecode.ClassType,java.lang.String,int);
-List<VarSymbol> findJavaMethods(?gnu.bytecode.ClassType, String) = native List JavaClasses.findJavaMethods(gnu.bytecode.ClassType,java.lang.String);
 TypeParameters TypeParameters(List<Monotype>) = native new bossa.syntax.TypeParameters(List);
 TypeParameters TypeParameters(Monotype[]) = native new bossa.syntax.TypeParameters(Monotype[]);
 ?String explainNoMatch(Arguments, List<VarSymbol>) = native String Arguments.explainNoMatch(List);
@@ -287,6 +285,7 @@ void substitute(bossa.syntax.FormalParameters, Map<java.lang.String, bossa.synta
 ?Iterator<MethodDeclaration> listSpecializedMethods(MethodDeclaration) = native Iterator MethodDeclaration.listSpecializedMethods();
 Monotype[] Monotype_toArray(?List<Monotype>) = native Monotype[] Monotype.toArray(List);
 List<VarSymbol> lookup(VarScope, LocatedString) = native List VarScope.lookup(LocatedString);
+Map<gnu.bytecode.Type,mlsub.typing.TypeConstructor> javaTypeConstructors(bossa.modules.Compilation ) = native bossa.modules.Compilation.javaTypeConstructors;
 
 // Retypings needed since java types are not strict.
 mlsub.typing.Polytype boolPolytype() = native nice.tools.typing.PrimitiveType.boolPolytype;

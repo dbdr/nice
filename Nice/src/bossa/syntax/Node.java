@@ -138,14 +138,16 @@ abstract public class Node
   {
     return globalTypeScope;
   }
-  
+
+  public static bossa.modules.Compilation compilation = null;
+
   public static void setModule(Module module)
   {
     // For multiple compilations in the same JVM:
     // If we are starting a new compilation, reset the global scopes.
-    if (JavaClasses.compilation != module.compilation())
+    if (compilation != module.compilation())
       {
-	JavaClasses.compilation = module.compilation();
+        compilation = module.compilation();
 	globalScope = dispatch.createGlobalVarScope();
 	globalTypeScope = new GlobalTypeScope();
       }

@@ -1,0 +1,285 @@
+/**************************************************************************/
+/*                                N I C E                                 */
+/*             A high-level object-oriented research language             */
+/*                        (c) Daniel Bonniot 2004                         */
+/*                                                                        */
+/*  This program is free software; you can redistribute it and/or modify  */
+/*  it under the terms of the GNU General Public License as published by  */
+/*  the Free Software Foundation; either version 2 of the License, or     */
+/*  (at your option) any later version.                                   */
+/*                                                                        */
+/**************************************************************************/
+
+package bossa.syntax;
+
+/**
+   A Java method which is explicitely given a more precise type
+   in the Nice source program.
+ */
+public class RetypedJavaMethod extends JavaMethod
+{
+  LocatedString className; 
+  String methodName;
+  List<LocatedString> javaTypes;
+
+  boolean ignoredRetyping = false;
+  private ?gnu.bytecode.Type javaRetType = null;
+  private gnu.bytecode.Type[?] javaArgType = null;
+
+  buildScope(outer, typeOuter)
+  {
+    // We put this here, since we need 'module' to be computed
+    // since it is used to open the imported packages.
+    this.findReflectMethod();
+
+    super;
+  }
+
+  isIgnored() = ignoredRetyping;
+
+  private ?gnu.bytecode.Type type(LocatedString s)
+  {
+    ?gnu.bytecode.Type res = nice.tools.code.Types.type(s);
+    if(res == null && !ignoredRetyping)
+      this.setIgnoredRetyping(s, "Ignoring retyping because java class " + s + " is not known");
+
+    return res;
+  }
+
+  javaReturnType() = notNull(javaRetType);
+  javaArgTypes() = notNull(javaArgType);
+
+  private void findReflectMethod()
+  {
+    if (this.reflectMethod != null)
+      return;
+
+    ?gnu.bytecode.Type holderType = nice.tools.code.TypeImport.lookup(className);
+    if (holderType == null)
+      {
+        this.setIgnoredRetyping(this, "Ignoring retyping because class " + 
+	 	className + " was not found");
+
+        javaArgType = cast(new Type[javaTypes.size()-1]);
+        return;
+      }
+
+    if (!(holderType instanceof gnu.bytecode.ClassType))
+      {
+        User.error(className, className + " is a primitive type");
+        return;
+      }
+
+    gnu.bytecode.ClassType holder = holderType;
+    this.className = new LocatedString(holder.getName(), className.location());
+
+    gnu.bytecode.Type[?] javaArgType = this.javaArgType =
+      cast( new gnu.bytecode.Type[javaTypes.size()-1].fill( int i =>
+        {
+	  LocatedString t = javaTypes.get(i+1);
+	  let res = this.type(t);
+
+          if (res != null) // set the fully qualified name back
+       	    javaTypes.set(i+1, new LocatedString(res.getName(), t.location()));
+
+          return res;
+        } ) );
+
+    let retTypeString = javaTypes.get(0);
+    this.javaRetType = this.type(retTypeString);
+
+    if (ignoredRetyping)
+      return;
+
+    // set the fully qualified name of the return type back
+    javaTypes.set(0, new LocatedString(notNull(this.javaRetType).getName(), 
+				       retTypeString.location()));
+
+    assert javaArgType != null;
+    this.reflectMethod = holder.getDeclaredMethod(methodName, javaArgType);    
+    if (this.reflectMethod == null)
+      {
+        try {
+          this.reflectMethod = holder.getDeclaredMethod(methodName, javaArgType.length);
+        } catch (Error e) {
+          this.setIgnoredRetyping(this, "Ignored retyping because no declaration exist with " + javaArgType.length + " arguments");
+	}
+	if (this.reflectMethod == null)
+          {
+            if (methodName.equals("<init>"))
+              this.setIgnoredRetyping(className, "Ignored retyping because class " +
+			holder.getName() + " has no constructor with " + 
+			javaArgType.length + " arguments");
+	    else
+	      this.setIgnoredRetyping(className, "Ignored retyping because no method named " +
+			methodName + " with " +	javaArgType.length + 
+			" arguments was found in class " + holder.getName());
+
+            return;
+          }
+
+        this.setIgnoredRetyping(className, "Ignored retyping because the types of the arguments don't match the declaration:\n"
+			 + reflectMethod);
+      }
+
+    // use the following, or the Type.flushTypeChanges() in SpecialTypes
+    //reflectMethod.arg_types = javaArgType;
+    //if(!methodName.equals("<init>"))
+    //reflectMethod.return_type = javaRetType;
+
+    let reflectMethod = this.reflectMethod;
+    assert reflectMethod != null;
+    if (reflectMethod.isConstructor())
+      {
+        try {
+          ?mlsub.typing.TypeConstructor tc = nice.tools.code.Types.typeConstructor(holder);
+	  if (tc != null)
+            {
+              TypeConstructors.addConstructor(tc, this);
+              registerNativeConstructor(this, reflectMethod, tc);
+            }
+	}
+	catch(nice.tools.code.Types.NotIntroducedClassException ex) {}
+      }
+    else
+      registerNativeMethod(this, reflectMethod);
+
+    int javaArity;
+
+    if (reflectMethod.getStaticFlag() || reflectMethod.isConstructor())
+      javaArity = javaTypes.size()-1;
+    else
+      javaArity = javaTypes.size();
+
+    if (javaTypes != null && javaArity != arity)
+      User.error(this,
+		 "Native method " + this.getSymbol().name + 
+		 " has not the same number of parameters " +
+		 "in Java (" + javaArity +
+		 ") and in Nice (" + arity + ")");
+  }
+
+  typedResolve()
+  {
+    if (this.ignoredRetyping)
+      return;
+
+    super;
+  }
+  
+  void setIgnoredRetyping(Located loc, String message)
+  {
+    if (!this.inInterfaceFile())
+      User.warning(loc, message);
+
+    this.ignoredRetyping = true;
+
+    bossa.link.DispatchTest.unregister(this);
+  }
+ 
+  getConstructorInvocation(omitDefaults)
+  {
+    return new gnu.expr.QuoteExp(new gnu.expr.InitializeProc(reflectMethod));
+  }
+
+  printInterface(s)
+  {
+    if (this.ignoredRetyping)
+      return;
+
+    s.print(this.toString() + " = native " +
+	    (this.methodName.equals("<init>") 
+	     ?  "new " + this.className
+	     : this.javaTypes.get(0) 
+	     + " " + this.className 
+	     + "." + this.methodName) +
+	    this.mapJavaArgTypes() + ";\n");
+  }
+  
+  private String mapJavaArgTypes()
+  {
+    let javaArgType = this.javaArgType;
+
+    if (javaArgType == null)
+      return "((NULL))";
+
+    String res = "(";
+    for (int n = 0; n<javaArgType.length; n++)
+      {
+	if (n != 0)
+	  res += ", ";
+	if (javaArgType[n] == null)
+	  res += this.javaTypes.get(n+1);
+	else
+	  res += javaArgType[n].getName();
+      }
+    return res + ")";
+  }
+}
+
+RetypedJavaMethod createRetypedJavaMethod(
+     LocatedString className,
+     String methodName,
+     List<LocatedString> javaTypes,
+     // Nice information
+     LocatedString name, 
+     Constraint constraint,
+     Monotype returnType,
+     FormalParameters parameters)
+{
+  return new RetypedJavaMethod(name, constraint, returnType, parameters,
+	className: className, methodName: methodName, javaTypes: javaTypes);
+}
+
+
+/**
+ *  Remembers native methods and fields explicitly bound with a new type.
+ *  Also store implicit method and fields (automatically fetched from the
+ *  bytecode), so that they can be discarded if an explicit retyping
+ *  is found later.
+ */
+let Map<gnu.bytecode.AttrContainer,MethodDeclaration> retyped = new HashMap();
+
+void registerNativeMethod(RetypedJavaMethod m, gnu.bytecode.Method reflectMethod)
+{
+  ?MethodDeclaration auto = retyped.put(reflectMethod, m);
+  
+  /*
+    If auto is a RetypedJavaMethod, we are explicitely declaring two
+    methods for the same native method. This is useful to give it several
+    incomparable types.
+    Otherwise, auto is an implicit java method, and we discard it
+    in favor of the new explicit one.
+  */
+  if (auto != null && ! (auto instanceof RetypedJavaMethod))
+    removeFromScope(auto);
+}
+
+void registerNativeConstructor(RetypedJavaMethod m, gnu.bytecode.Method reflectMethod,
+                                 TypeConstructor classe)
+{
+  ?MethodDeclaration auto = retyped.put(reflectMethod, m);
+  
+  /*
+    If auto is a RetypedJavaMethod, we are explicitely declaring two
+    constructors for the same native constructor. This is useful to give
+    it several incomparable types.
+    Otherwise, auto is an implicit java constructor, and we discard it
+    in favor of the new explicit one.
+  */
+  if (auto != null && ! (auto instanceof RetypedJavaMethod))
+    TypeConstructors.removeConstructor(classe, auto);
+}
+
+void registerNativeField(JavaFieldAccess f, gnu.bytecode.Field reflectField)
+{
+  ?MethodDeclaration auto = retyped.put(reflectField, f);
+  if (auto != null)
+    removeFromScope(auto);
+}
+
+private void removeFromScope(MethodDeclaration m)
+{
+  Node.getGlobalScope().removeSymbol(m.getSymbol());
+  bossa.link.DispatchTest.unregister(m);
+}

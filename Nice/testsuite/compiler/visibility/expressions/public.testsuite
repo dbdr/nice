@@ -1,0 +1,31 @@
+/// FAIL bug
+  /// package a
+  /// Toplevel
+public void fooA() {}
+
+  /// package b import a dontcompile
+  /// Toplevel
+public void fooB() {}
+
+  /// package c import a dontcompile
+  // We haven't imported b
+  /*/// FAIL HERE */ fooB();
+
+  /// package d import b,c
+  {}
+
+/// FAIL
+  /// package a
+  /// Toplevel
+public void fooA() {}
+
+  /// package b import a dontcompile
+  /// Toplevel
+public void fooB() {}
+
+  /// package c import a dontcompile
+  // We haven't imported b
+  /*/// FAIL HERE */ fooB();
+
+  /// package d import c,b
+  {}

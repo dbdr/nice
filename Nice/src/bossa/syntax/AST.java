@@ -52,21 +52,28 @@ public class AST extends Node
   
   public void typechecking()
   {
+    for(Iterator i = definitions.iterator(); i.hasNext();)
+      {
+	Object o = i.next();
+	if (o instanceof MethodBodyDefinition)
+	  ((MethodBodyDefinition) o).lateBuildScope();
+      }
+
+    module.unfreezeGlobalContext();
+    for(Iterator i = definitions.iterator(); i.hasNext();)
+      {
+	Object o = i.next();
+	if (o instanceof MethodBodyDefinition)
+	  ((MethodBodyDefinition) o).resolveBody();
+      }
+    module.freezeGlobalContext();
     doTypecheck();
   }
 
   public void printInterface(java.io.PrintWriter s)
   {
-    /*
-    for(Iterator i = definitions.iterator();i.hasNext();)
-      {
-	Object o = i.next();
-	
-	Debug.println(o.getClass() + " " + o);
-      }
-    */
-    for(Iterator i = definitions.iterator();i.hasNext();)
-      ((Definition)i.next()).printInterface(s);
+    for(Iterator i = definitions.iterator(); i.hasNext();)
+      ((Definition) i.next()).printInterface(s);
   }
 
   public void compile()

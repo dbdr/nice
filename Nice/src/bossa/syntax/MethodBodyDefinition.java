@@ -62,8 +62,6 @@ public class MethodBodyDefinition extends Definition
     this.body = body;
     this.definition = null;
     
-    addChild(this.body);
-
     if (container != null)
       formals.add(0, new Pattern(THIS, new TypeIdent(container.getName())));
 
@@ -247,9 +245,6 @@ public class MethodBodyDefinition extends Definition
   {
     //Resolution of the body is delayed to enable overloading
 
-    // we look for java classes
-    body.doFindJavaClasses();
-    
     Pattern.resolveTC(typeScope, formals);
   }
   
@@ -293,19 +288,22 @@ public class MethodBodyDefinition extends Definition
 
     // We can resolve now
     Pattern.resolveType(this.typeScope, formals);
-
-    if (!Debug.niceResolve)
-      super.doResolve();
-    else
-      try{
-	body = bossa.syntax.dispatch.analyse$0(body, scope, typeScope);
-      }
-      catch(RuntimeException e){
-	Debug.println("Nice analysis error: " + e);
-	e.printStackTrace();
-      }
   }
 
+  void resolveBody()
+  {
+    try{
+      body = bossa.syntax.dispatch.analyse$0(body, scope, typeScope);
+    }
+    catch(UnknownIdentException e){
+      User.error(e.ident, e.ident + " is not declared");
+      }
+    catch(RuntimeException e){
+      Debug.println("Nice analysis error: " + e);
+      e.printStackTrace();
+    }
+  }
+  
   /****************************************************************
    * Initial Context
    ****************************************************************/
@@ -326,8 +324,6 @@ public class MethodBodyDefinition extends Definition
 
   void typecheck()
   {
-    lateBuildScope();
-    
     Typing.enter("METHOD BODY " + this + "\n\n");
     // remeber that enter was called, to leave.
     // usefull if previous code throws an exception
@@ -406,6 +402,9 @@ public class MethodBodyDefinition extends Definition
     catch(TypingEx e) {
       User.error(name,"Typing error in method body \""+name+"\":\n"+e);
     }
+
+    Node.currentFunction = this;
+    body.doTypecheck();
   }
 
   private boolean entered = false;

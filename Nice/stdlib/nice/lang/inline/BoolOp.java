@@ -72,7 +72,7 @@ public class BoolOp extends ProcedureN implements Inlineable
     target.compileFromStack(comp, retType);
   }
 
-  private final Type retType = Type.boolean_type;
+  private static final Type retType = Type.boolean_type;
   
   public Type getReturnType (Expression[] args)
   {

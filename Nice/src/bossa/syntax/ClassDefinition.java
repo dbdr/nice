@@ -127,7 +127,7 @@ abstract public class ClassDefinition extends Definition
 	};
     else if (name.equals("nice.lang.Null"))
       tc = new mlsub.typing.TypeConstructor
-	("null", variance, isConcrete(), true)
+	("null", variance, isConcrete(), true);
     else
       tc = new mlsub.typing.TypeConstructor
 	(name.toString(), variance, isConcrete(), true);

@@ -1078,7 +1078,7 @@ public class Compilation
 
 	    int argumentStart = 2;
 
-            if (source.getImportsLexVars())
+            if (source.getNeedsClosureEnv())
 	      code.emitPushThis();
 
 	    if (source.isClassMethod())

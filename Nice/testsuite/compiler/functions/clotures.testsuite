@@ -17,7 +17,7 @@ void stripChar(char c, boolean b) {
   [1].foreach(int i => { println(l); });
 
 
-/// PASS bug
+/// PASS
   boolean b = false;
   [].foreach(int x => {
     [].foreach(int y => {

@@ -12,7 +12,7 @@ import nice.tools.compiler.console;
 import bossa.modules.*;
 
 //A global variable specifying the output directory
-var String outdir = "";
+var File outdir = new File(".");
 
 void main(String[] args)
 {
@@ -45,7 +45,7 @@ void main(String[] args)
    option("outdir",
        "Output files to this directory",
        "path",
-       String path => {outdir = path; }),
+       String path => {outdir = new File(path); }),
 
    option("man", "Print man page to stdout",
 	  () => man(prg)),
@@ -69,9 +69,11 @@ void main(String[] args)
     }
   mainPackage = rest[0];
 
-  //check that outdir is either empty string or ends with a '/'
-  if(!outdir.equals("") && !outdir.endsWith("/")) {
-    outdir = outdir + "/";
+  // Make sure the meaning of outdir is fixed.
+  outdir = outdir.getAbsoluteFile();
+
+  if (! outdir.exists() && ! outdir.mkdirs()) {
+    throw new Error("Could not create the output directory " + outdir);
   }
 
   /* 

@@ -21,8 +21,8 @@ class HTMLWriter {
     // Here we handle classes
     
     //Initialise a FileWriter
-    String path = outdir + packageName.replace('.','/') + "/"; //this generates the output directory
-    File dir = new File(path);
+    // Output directory for this class
+    File dir = new File(outdir, packageName.replace('.','/'));
     if(!dir.exists()) {
         if(!dir.mkdirs()) {
             System.err.println("Error creating directory structure");
@@ -32,7 +32,8 @@ class HTMLWriter {
     //we only want information after the last .
     //that is, nice.lang.Maybe -> Maybe
     fileName = fileName.substring(fileName.lastIndexOf(".") + 1);
-    BufferedWriter writer = new BufferedWriter(new FileWriter(path + fileName + ".html"));
+    BufferedWriter writer = new BufferedWriter
+      (new FileWriter(new File(dir, fileName + ".html")));
     
     writer.write(getHeader(c.getName().toString()));
 
@@ -81,8 +82,7 @@ class HTMLWriter {
     //Handle methods
     
     //Initialise a FileWriter
-    String path = outdir + packageName.replace('.','/') + "/"; //this generates the output directory
-    File dir = new File(path);
+    File dir = new File(outdir, packageName.replace('.','/'));
     if(!dir.exists()) {
         if(!dir.mkdirs()) {
             System.err.println("Error creating directory structure");
@@ -94,9 +94,9 @@ class HTMLWriter {
     //System.out.println("Raw filename: " + fileName);
     fileName = fileName.replace('/', "@slash");
     fileName = fileName.replace('.', "@dot");
-    //println(path + fileName);
     
-    BufferedWriter writer = new BufferedWriter(new FileWriter(path + fileName + ".html"));
+    BufferedWriter writer = new BufferedWriter
+      (new FileWriter(new File(dir, fileName + ".html")));
     
     writer.write(getHeader(m.getName().toString()));
   
@@ -126,14 +126,14 @@ class HTMLWriter {
 
   void write(bossa.modules.Package p) {
     try {
-      String path = outdir + p.getName().replace('.','/') + "/"; //this generates the output directory
-      File dir = new File(path);
+      File dir = new File(outdir, p.getName().replace('.','/'));
       if(!dir.exists()) {
         if(!dir.mkdirs()) {
           System.err.println("Error creating directory structure");
         }
       }
-      BufferedWriter writer = new BufferedWriter(new FileWriter(path + "index.html"));
+      BufferedWriter writer = new BufferedWriter
+        (new FileWriter(new File(dir, "index.html")));
       writer.write(getHeader("Package " + p.getName()));
             
       //we need to separate class and methods
@@ -184,7 +184,8 @@ class HTMLWriter {
   
   void write(List<bossa.modules.Package> packages) {
     try {
-      BufferedWriter writer = new BufferedWriter(new FileWriter(outdir + "index.html"));
+      BufferedWriter writer = new BufferedWriter
+        (new FileWriter(new File(outdir, "index.html")));
       writer.write(getHeader("Packages"));
       writer.write("<b>Packages:</b>\n");
       writer.write("<ul>\n");

@@ -44,7 +44,7 @@ final class Satisfier {
         throw sat;
       }
     }
-    Domain dx = (Domain)domains.getDomain(x).clone();
+    Domain dx = domains.getDomain(x).cloneDomain();
     for (int a = dx.getLowestSetBit();
          a >= 0;
          a = dx.getNextBit(a)) {
@@ -88,7 +88,7 @@ final class Satisfier {
       handler.handle(domains);
       throw LowlevelUnsatisfiable.instance;
     }
-    Domain dx = (Domain)domains.getDomain(x).clone();
+    Domain dx = domains.getDomain(x).cloneDomain();
     // iterate through the elements of dx
     for (int a = dx.getLowestSetBit();
          a >= 0;

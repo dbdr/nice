@@ -222,4 +222,18 @@ final class Domain extends BitVector {
     }
     return result;
   }
+
+  public Domain cloneDomain() {
+    Domain result = new Domain(0);
+    this.copyTo(result);
+    return result;
+  }
+
+  private void copyTo(Domain result) {
+    super.copyTo(result);
+
+    result.containsUnit = containsUnit;
+    result.cardUp = cardUp;
+    result.cardDown = cardDown;
+  }
 }

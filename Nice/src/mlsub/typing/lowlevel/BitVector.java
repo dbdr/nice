@@ -14,7 +14,7 @@ package mlsub.typing.lowlevel;
     most bitvectors are less than 64 elements, so using a long often avoids
     allocating the array)
  **/
-public class BitVector implements Cloneable, java.io.Serializable {
+public class BitVector implements java.io.Serializable {
   private final static int BITS_PER_UNIT = 6;
   private final static int MASK = (1<<BITS_PER_UNIT)-1;
 
@@ -525,14 +525,13 @@ public class BitVector implements Cloneable, java.io.Serializable {
   /**
    * Clones the BitVector.
    */
-  final public Object clone() {
-    BitVector result = null;
-    try {
-      result = (BitVector) super.clone();
-    } catch (CloneNotSupportedException e) {
-      throw new InternalError("this shouldn't happen, since we are Cloneable");
-    }
+  public BitVector cloneVector() {
+    BitVector result = new BitVector();
+    this.copyTo(result);
+    return result;
+  }
 
+  public void copyTo(BitVector result) {
     if (bits1 == null)
       result.bits0 = bits0;
     else
@@ -542,7 +541,6 @@ public class BitVector implements Cloneable, java.io.Serializable {
 	result.bits1 = new long[n];
 	System.arraycopy(bits1, 0, result.bits1, 0, n);
       }
-    return result;
   }
 
   /**

@@ -285,7 +285,7 @@ final public class BitMatrix implements Cloneable {
 			rows[index[stackpos]].or(rows[index[tempsp]]);
 			cyclicmask.set(index[tempsp]);
 		      } while (index[tempsp--] != nextbitpos);
-		      current = (BitVector)current.clone();
+		      current = current.cloneVector();
 		      current.andNot(cyclicmask);
 		      bitpos[stackpos] = 0;
 		    }
@@ -330,7 +330,7 @@ final public class BitMatrix implements Cloneable {
         BitVector row = v[i];
         if (row != null) {
           if (!row.isEmpty())
-	    v[i] = (BitVector) row.clone();
+	    v[i] = row.cloneVector();
           else
  	    v[i] = null;
         }

@@ -12,4 +12,6 @@ main(args)
 	  f(new B()) + " " + 
 	  f(new AA()) + " " + 
 	  f(new BB()));
+
+  test_import();  
 }

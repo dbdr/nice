@@ -4,11 +4,13 @@
 # to produce the Java and Nice versions of the test package
 
 if newer Nop.class Nop.java; then
-  echo "(skipped)"
-  exit
+  if newer Fields.class Fields.java; then
+    echo "(skipped)"
+    exit
+  fi
 fi
 
 CLASSPATH=$NICE_TOP/classes:$CLASSPATH
 export CLASSPATH
 
-javac -classpath $NICE_TOP/classes Nop.java
+javac Nop.java Fields.java

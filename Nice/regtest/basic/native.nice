@@ -2,7 +2,11 @@
 package regtest.basic;
 
 /**
-   Test use of native code, import of native classes, inlined methods
+   Tests various aspects of interfacing with Java bytecode:
+     - use of native code
+     - import of native classes
+     - inlined methods
+     - access (read and write) to (static and instance) fields
 */
 
 import java.io.*;
@@ -15,5 +19,14 @@ test_native()
   File f = nop(new File("titi"));
   java.net.ServerSocket s = new java.net.ServerSocket(1235);
   java.lang.Runtime.getRuntime();
+
+  Fields.intS = 2;
+  Fields.stringS = "Static field is: ";
+  println(Fields.stringS + Fields.intS);
+
+  Fields f = new Fields();
+  f.intI = 3;
+  f.stringI = "Instance field is: ";
+  println(f.stringI + f.intI);
 }
 

@@ -100,7 +100,8 @@ main(args)
   test_arrays();
   test_comparable();
   test_optional();
-  //test_classes();
+  test_classes();
+  test_methods();
   test_global();
   test_native();
   test_exceptions();

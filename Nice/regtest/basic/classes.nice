@@ -1,0 +1,45 @@
+
+package regtest.basic;
+
+class Point 
+{
+  int x; int y;
+
+  String pToString();
+
+  pToString() = "(x=" + this.x + ", y=" + this.y + ")";
+}
+
+class ColoredPoint extends Point
+{
+  int c;
+  pToString() = "(x=" + this.x + ", y=" + this.y + ", c=" + this.c + ")";
+}
+
+/*
+  A second, unrelated pToString is defined
+  to test overloading resolution of method bodies with additional patterns
+*/
+String pToString(String);
+pToString(s@null(String)) = "Null string";
+pToString(s@String) = "String";
+
+<Any T> boolean isNull(T);
+isNull(x) = false;
+isNull(@null) = true;
+
+pToString(@null(Point)) = "Origin";
+
+void test_classes();
+test_classes()
+{
+  println ("### Testing classes");
+  println(pToString(new Point()));
+  println(pToString(new ColoredPoint()));
+  Point p = null;
+  println(pToString(p));
+
+  String s = null;
+  println(pToString("titi") + ", " + pToString(s));
+}
+

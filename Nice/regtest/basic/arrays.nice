@@ -33,6 +33,7 @@ test_arrays()
   p(reverse(a));
   
   // using collection functions on arrays
+  println(a.size());
   int[] b = map(a, fun(int i) => i+4);
   p(b);
   p(filter(reverse(b), fun(int i)=> i>6));

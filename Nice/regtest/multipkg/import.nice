@@ -1,0 +1,20 @@
+package regtest.multipkg;
+
+/*
+  This file test usage of methods defined in another package.
+  We use methods from regtest.basic, which must have been compiled earlier
+  (this is done by the regtest script).
+*/
+
+import regtest.basic;
+
+void test_import();
+test_import()
+{
+  // tests reading of @null patterns
+  String s = null;
+  println(pToString(s));
+
+  println(isNull(0));
+  println(isNull(null));
+}

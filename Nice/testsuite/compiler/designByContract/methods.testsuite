@@ -83,3 +83,8 @@ f() {}
     foo(0, 1);
   } catch(AssertionFailed e) { ok = true; }
   assert ok;
+
+/// PASS bug
+  /// Toplevel
+  class A { ?int foo; }
+  void bar(A a) requires a.foo == null || notNull(a.foo) >= 0 {}

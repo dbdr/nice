@@ -158,3 +158,26 @@ class A {
 }
   /// package b import a
   {}
+
+
+/// PASS
+  /// Toplevel
+<T> void foo(T -> boolean f = (T e) => true);
+foo(f) {}
+
+/// PASS
+  /// Toplevel
+class StackImpl<T> {
+    private T -> boolean filter;
+}
+<T> new StackImpl(boolean v, T -> boolean f = (T e) => v) =
+  this(filter: f);
+
+/// PASS
+  /// package a
+  /// Toplevel
+class StackImpl<T> {
+    private T -> boolean filter = (T e) => true;
+}
+  /// package b import a
+{}

@@ -157,6 +157,8 @@ public class NiceMethod extends UserOperator
 
   void resolve()
   {
+    super.resolve();
+
     homonyms = Node.getGlobalScope().lookup(getName());
     homonyms.remove(getSymbol());
   }
@@ -340,19 +342,6 @@ public class NiceMethod extends UserOperator
     }
 
     DefaultMethodImplementation implementation;
-
-    void resolve()
-    {
-      super.resolve();
-
-      mlsub.typing.Constraint cst = getType().getConstraint();
-      if (mlsub.typing.Constraint.hasBinders(cst))
-        try {
-          typeScope.addSymbols(cst.binders());
-        } catch (TypeScope.DuplicateName ex) {
-          User.error(this, "Double declaration of the same type parameter");
-        }
-    }
 
     void innerTypecheck() throws TypingEx
     {

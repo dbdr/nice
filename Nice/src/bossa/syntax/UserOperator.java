@@ -13,6 +13,7 @@
 package bossa.syntax;
 
 import nice.tools.code.Types;
+import bossa.util.User;
 
 /**
    An operator whose semantics is defined by the user (i.e. not built-in).
@@ -78,6 +79,22 @@ abstract class UserOperator extends MethodDeclaration
     // The contract must be resolved after the formal parameters since they
     // can refer to them.
     contract.resolve(scope, typeScope, getReturnType(), location());
+  }
+
+  void resolve()
+  {
+    super.resolve();
+
+    // Adding the constraint in the type scope. It can be useful for
+    // the default values of the formal parameters 
+    // (e.g. an anonymous function refering to a type parameter).
+    mlsub.typing.Constraint cst = getType().getConstraint();
+    if (mlsub.typing.Constraint.hasBinders(cst))
+      try {
+        typeScope.addSymbols(cst.binders());
+      } catch (TypeScope.DuplicateName ex) {
+        User.error(this, "Double declaration of the same type parameter");
+      }
   }
 
   public String toString()

@@ -123,7 +123,7 @@ public class FormalParameters extends Node
 	super(symbol, location);
       }
 
-      boolean isAssignable () { return false; }
+      public boolean isAssignable () { return false; }
 
       public gnu.expr.Expression compile ()
       {

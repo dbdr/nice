@@ -243,6 +243,8 @@ public class CallExp extends Expression
     arguments.noOverloading();
     
     function = function.resolveOverloading(this);
+
+    function.checkSpecialRequirements(arguments.computedExpressions);
   }
 
   void computeType()
@@ -286,7 +288,7 @@ public class CallExp extends Expression
   /** The type of the function, constrained by the actual arguments. */
   private Polytype instanciatedDomain;
 
-  boolean isAssignable()
+  public boolean isAssignable()
   {
     resolveOverloading();
     return function.isFieldAccess();

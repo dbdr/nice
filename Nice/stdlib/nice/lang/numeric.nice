@@ -25,12 +25,13 @@ package nice.lang;
 int MAX_INT() = native java.lang.Integer.MAX_VALUE;
 
 // Narrowing primitive conversions
-double double(double d) = inline nice.lang.inline.Nop();
-float float(double d) = inline nice.lang.inline.Nop();
-int int(double d) = inline nice.lang.inline.Nop();
-short short(double d) = inline nice.lang.inline.Nop();
-byte byte(double d) = inline nice.lang.inline.Nop();
-char char(double d) = inline nice.lang.inline.Nop();
+double double(double) = inline nice.lang.inline.Nop();
+long   long  (double) = inline nice.lang.inline.Nop();
+float  float (double) = inline nice.lang.inline.Nop();
+int    int   (double) = inline nice.lang.inline.Nop();
+short  short (double) = inline nice.lang.inline.Nop();
+byte   byte  (double) = inline nice.lang.inline.Nop();
+char   char  (double) = inline nice.lang.inline.Nop();
 
 
 // Comparison
@@ -151,17 +152,35 @@ char `^`(char, char) = inline nice.lang.inline.NumOp("iXOr");
  * Utilities (specific to Nice)
  ****************************************************************/
 
-// Note: we should have testcases for this section.
+/**
+   Get the <code>i</code>th bit of <code>x</code>.
 
-// Upcasts
-long long(int) = inline nice.lang.inline.Nop();
+   <code>x</code> can have any numeric type. 
+   If <code>bit</code> is larger than the number of bits of 
+   <code>x</code>, this function returns <ocde>false</code>.
 
+   You can use this function with the array syntax:
+     <code>x[bit]</code>
+*/
+boolean get(long x, int bit) = inline nice.lang.inline.BitOp("get");
 
-// Accessing individual bits of a word
-boolean get(long x, int bit) = (x & (long(1) << bit)) != 0;
-boolean get(int  x, int bit) = (x & (1 << bit)) != 0;
+/**
+   Set the <code>i</code>th bit of <code>x</code> 
+     on  if <code>v</code> is <code>true</code>;
+     off if <code>v</code> is <code>false</code>.
 
-/** Returns a random positive number smaller than limit. */
+   <code>x</code> must be assignable (a variable or a field).
+
+   <code>x</code> can have any numeric type. 
+   If <code>bit</code> is larger than the number of bits of 
+   <code>x</code>, this function has no effect.
+
+   You can use this function with the array syntax:
+     <code>x[bit] = v</code>
+*/
+void set(long x, int bit, boolean v) = inline nice.lang.inline.BitOp("set");
+
+/** Returns a random number such that 0 <= random(limit) < limit. */
 int random(int limit) = int(floor(random() * limit));
 
 /****************************************************************

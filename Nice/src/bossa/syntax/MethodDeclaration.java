@@ -220,6 +220,11 @@ abstract public class MethodDeclaration extends Definition
    */
   public boolean isFieldAccess() { return false; }
 
+  void checkSpecialRequirements(Expression[] arguments)
+  {
+    // Do nothing by default.
+  }
+
   /**
      @return true if this method is the 'main' of the program
   */
@@ -259,6 +264,11 @@ abstract public class MethodDeclaration extends Definition
 	return (FieldAccess) getDefinition();
       else
 	return null;
+    }
+
+    void checkSpecialRequirements(Expression[] arguments)
+    {
+      getDefinition().checkSpecialRequirements(arguments);
     }
 
     void resolve()

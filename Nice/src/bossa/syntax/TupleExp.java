@@ -46,7 +46,7 @@ public class TupleExp extends bossa.syntax.Expression
    * Typing
    ****************************************************************/
 
-  boolean isAssignable()
+  public boolean isAssignable()
   {
     for (int i = 0; i < expressions.length; i++)
       if (! expressions[i].isAssignable())

@@ -53,6 +53,11 @@ abstract class VarSymbol extends Node implements Located
     return null;
   }
 
+  void checkSpecialRequirements(Expression[] arguments)
+  {
+    // Do nothing by default.
+  }
+
   abstract Polytype getType();
 
   /**

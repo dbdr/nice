@@ -1,0 +1,79 @@
+/// PASS
+  assert 0 <= random(3) < 3;
+
+/// PASS
+  long i = 0;
+  assert ! (i[0] || i[1] || i[63]);
+
+  i = 2;
+  assert ! i[0] && i[1] && ! i[2];
+
+
+/// COMMENT Reading bits.
+
+/// PASS
+  int[] ibits = 
+    [ 1,0,0,1,0,1,1,0,0,1,0,1,1,1,1,0,0,0,1,0,0,0,1,1,1,0,1,1,0,0,1,1 ];
+
+  int ivalue = -842761623;
+  for (int i = 0; i < ibits.length; i++)
+    assert ivalue[i] == (ibits[i] == 1);
+
+/// PASS
+  long[] lbits = 
+    [ 0,0,0,1,0,1,1,0,0,1,0,1,1,1,1,0,0,0,1,0,0,0,1,1,1,0,1,1,0,0,1,1, 
+        0,0,1,0,0,1,1,1,0,1,0,0,1,1,0,1,1,1,0,1,0,1,1,1,0,1,1,0,1,1,0,0 ];
+
+  long lvalue = 3957453393349605992;
+  for (int i = 0; i < lbits.length; i++)
+    assert lvalue[i] == (lbits[i] == 1);
+
+/// PASS bug
+  byte b = byte(-1);
+  assert b[8] == false;
+
+/// COMMENT Writing bits.
+
+/// PASS
+  int[] ibits = 
+    [ 1,0,0,1,0,1,1,0,0,1,0,1,1,1,1,0,0,0,1,0,0,0,1,1,1,0,1,1,0,0,1,1 ];
+
+  int ivalue = 0;
+  for (int i = 0; i < ibits.length; i++)
+    ivalue[i] = (ibits[i] == 1);
+
+  assert ivalue == -842761623;
+
+/// PASS
+  long[] lbits = 
+    [ 0,0,0,1,0,1,1,0,0,1,0,1,1,1,1,0,0,0,1,0,0,0,1,1,1,0,1,1,0,0,1,1, 
+        0,0,1,0,0,1,1,1,0,1,0,0,1,1,0,1,1,1,0,1,0,1,1,1,0,1,1,0,1,1,0,0 ];
+
+  long lvalue = 0;
+  for (int i = 0; i < lbits.length; i++)
+    lvalue[i] = lbits[i] == 1;
+
+  assert lvalue == 3957453393349605992;
+
+/// PASS
+  byte b = 0;
+  b[8] = true;
+  assert b == 0;
+
+/// PASS
+  long i = 0;
+  i[0] = true;
+  assert i == 1;
+
+  i[2] = true;
+  assert i == 5;
+
+  i[0] = false;
+  assert i == 4;
+
+/// FAIL
+  1[0] = false;
+
+/// FAIL
+  let int i = 1;
+  i[0] = false;

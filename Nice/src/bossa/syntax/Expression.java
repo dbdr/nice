@@ -40,7 +40,7 @@ public abstract class Expression
   public static final Expression[] noExpressions = new Expression[0];
 
   /** @return true iff this expression can be assigned a value. */
-  boolean isAssignable()
+  public boolean isAssignable()
   {
     return false;
   }
@@ -185,6 +185,11 @@ public abstract class Expression
       }
 
     return res;
+  }
+
+  void checkSpecialRequirements(Expression[] arguments)
+  {
+    // Do nothing by default.
   }
 
   /****************************************************************

@@ -30,7 +30,7 @@ public class SymbolExp extends Expression
     setLocation(loc);
   }
   
-  boolean isAssignable()
+  public boolean isAssignable()
   {
     return symbol.isAssignable();
   }
@@ -38,6 +38,11 @@ public class SymbolExp extends Expression
   FieldAccess getFieldAccessMethod()
   {
     return symbol.getFieldAccessMethod();
+  }
+
+  void checkSpecialRequirements(Expression[] arguments)
+  {
+    symbol.checkSpecialRequirements(arguments);
   }
 
   void computeType()

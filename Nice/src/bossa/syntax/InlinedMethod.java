@@ -102,12 +102,21 @@ public class InlinedMethod extends MethodDeclaration
 		   "Inlined method " + inlineProcedure + 
 		   " cannot be inlined, but will be called anyway");
 
-    return new gnu.expr.QuoteExp((gnu.mapping.Procedure) o);
+    this.procedure = (gnu.mapping.Procedure) o;
+    return new gnu.expr.QuoteExp(procedure);
   }
 
   private static Class[] string1 = new Class[]{ "".getClass() };
   private LocatedString inlineProcedure;
   private String parameter;
+  private gnu.mapping.Procedure procedure;
+
+  void checkSpecialRequirements(Expression[] arguments)
+  {
+    getCode();
+    if (procedure instanceof bossa.syntax.Macro)
+      ((Macro) procedure).checkSpecialRequirements(arguments);
+  }
 
   public void printInterface(java.io.PrintWriter s)
   {

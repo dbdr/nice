@@ -64,7 +64,7 @@ public class OverloadedSymbolExp extends Expression
     setLocation(ident.location());
   }
 
-  boolean isAssignable()
+  public boolean isAssignable()
   {
     Internal.error("Overloading resolution should be done before this.");
     return false;

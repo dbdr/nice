@@ -89,3 +89,10 @@ PrintStream stderr () = native System.err;
 // Some methods use Object, when they should use a type variable:
 <E> boolean contains(java.util.Collection<E>, E) =
   native boolean java.util.Collection.contains(Object);
+<E> boolean remove(java.util.Collection<E>, E) =
+  native boolean java.util.Collection.remove(Object);
+
+<E> int indexOf(java.util.List<E>, E) =
+  native int java.util.List.indexOf(Object);
+<E> int lastIndexOf(java.util.List<E>, E) =
+  native int java.util.List.lastIndexOf(Object);

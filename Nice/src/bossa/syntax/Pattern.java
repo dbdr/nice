@@ -103,6 +103,12 @@ public class Pattern implements Located
     this(name, null, null, null, false, NONE, null, null, name.location());
   }
 
+  static Pattern any(LocatedString name)
+  {
+    Pattern res = new Pattern(name);
+    return res;
+  }
+
   final TypeConstructor getRuntimeTC()
   {
     return runtimeTC;

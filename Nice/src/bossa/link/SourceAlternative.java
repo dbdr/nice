@@ -24,7 +24,7 @@ import bossa.syntax.*;
 
 public class SourceAlternative extends Alternative implements Located
 {
-  public SourceAlternative(MethodBodyDefinition implementation)
+  public SourceAlternative(MethodImplementation implementation)
   {
     super(implementation.getDeclaration().getName().toString(), 
 	  implementation.getDeclaration().getFullName(), 
@@ -32,7 +32,7 @@ public class SourceAlternative extends Alternative implements Located
     this.implementation = implementation;
   }
 
-  private MethodBodyDefinition implementation;
+  private MethodImplementation implementation;
 
   public Location location()
   {

@@ -1,5 +1,20 @@
 nice (0.9.2) unstable; urgency=low
 
+  * Removed the concept of function. Now everything is a method, which is more
+    flexible.
+    The syntax that used to define a function is still valid: it now
+    declares a method together with a default implementation. Exemple:
+      class A {
+        // Declares a method f, with a default implementation that returns 1.
+        int f() = 1;
+      }
+
+      class B extends A {
+        // Override f for B:
+        // When called with an argument of type B, f returns 2.
+        f() = 2;
+      }
+    The same applies for methods outside classes.
   * More dynamic type inference implemented. The type of a local variable is 
     made more precise after a succesful instanceof:
     A a = ...;

@@ -720,23 +720,6 @@ public class Package implements mlsub.compilation.Module, Located, bossa.syntax.
   }
 
   /**
-     @return an expression to call this method 
-     if the package has not been recompiled.
-  */
-  public gnu.expr.Expression lookupPackageMethod(ToplevelFunction fun)
-  {
-    Method res = lookupClassMethod(source.getBytecode(), 
-                                   fun.getName().toString(),
-				   "type", fun.getType().toString());
-    if (res == null) 
-      return null;
-
-    return new gnu.expr.QuoteExp
-      (new gnu.expr.PrimProcedure
-       (res, fun.formalParameters().getParameterCopies()));
-  }
-  
-  /**
      @return the bytecode method with this (unique) name
      if the package has not been recompiled.
   */

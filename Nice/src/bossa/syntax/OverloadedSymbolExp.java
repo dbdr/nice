@@ -298,6 +298,61 @@ public class OverloadedSymbolExp extends Expression
     return res;
   }
 
+  static void removeNonMinimal(List symbols)
+  {
+    // optimization
+    if(symbols.size()<2)
+      return;
+    
+    int len = symbols.size();
+    VarSymbol[] syms = (VarSymbol[])
+      symbols.toArray(new VarSymbol[len]);
+    boolean[] remove = new boolean[len];
+    
+    for(int s1 = 0; s1<len; s1++) {
+
+      Domain d1 = domain(syms[s1].getType());
+      
+      for(int s2 = 0; s2<len; s2++)
+	/*
+	  Look for symbols s1 and s2 such that
+	    d2 <: d1 and not d1 <: d2
+	  In that case s1 can be removed, since it is less specific than s2.
+
+	  Optimizations:
+	    Skip the diagonal.
+	    If s2 was removed, then there is s3 below s2.
+	    Therefore s1 will be removed anyway.
+	*/
+	if (s1 != s2 && !remove[s2]) {
+
+	  Domain d2 = domain(syms[s2].getType());
+
+	  try{
+	    Typing.leq(d2, d1);
+	    try {
+	      Typing.leq(d1, d2);
+	    }
+	    catch (TypingEx e) {
+	      remove[s1] = true;
+	      break;
+	    }
+	  }
+	  catch(TypingEx e){
+	  }
+	}
+    }
+
+    for(int i = 0; i<len; i++)
+      if(remove[i])
+	{
+	  if (Debug.overloading)
+	    Debug.println("Removing " + syms[i] + " since it is not minimal");
+	  
+	  symbols.remove(syms[i]);
+	}
+  }
+
   /**
    * Removes the symbols that do not have minimal domain types.
    *
@@ -369,7 +424,7 @@ public class OverloadedSymbolExp extends Expression
   private static Domain domain(Polytype t, int[] usedArguments)
   {
     // remove nullness marker
-    Monotype[] m = ((FunType) Types.rawType(t.getMonotype())).domain();
+    Monotype[] m = Types.domain(t.getMonotype());
 
     Monotype[] dom;
 
@@ -391,6 +446,14 @@ public class OverloadedSymbolExp extends Expression
       }
 
     return new Domain(t.getConstraint(), new TupleType(dom));
+  }
+
+  private static Domain domain(Polytype t)
+  {
+    // remove nullness marker
+    Monotype[] m = Types.domain(t.getMonotype());
+
+    return new Domain(t.getConstraint(), new TupleType(m));
   }
 
   void computeType()

@@ -852,7 +852,7 @@ FormalParameters formalParameters(boolean leaveRoomForThis, List statements):
   { return new FormalParameters(params.isEmpty() ? null : params ); }
 }
 
-MethodDeclaration internalMethodOrFunction(MethodContainer c):
+Definition internalMethodOrFunction(MethodContainer c):
 {
   LocatedString name;
   FormalParameters parameters;
@@ -1001,7 +1001,7 @@ ClassDefinition classDefinition(List definitions):
 	mb = methodBodyDefinition(impl)
 	{ globalDefinitions.add(mb); }
       |
-        { MethodDeclaration m; }
+        { Definition m; }
         m = internalMethodOrFunction(res)
         { 
           if (methods == null)
@@ -1051,7 +1051,7 @@ AbstractInterface interfaceDefinition():
   { res = new AbstractInterface(name,parameters,typeParametersVariances,
 				extensions); }
     (
-      { MethodDeclaration m; }
+      { Definition m; }
       [ "public" | "private" ]
       m = internalMethodOrFunction(res)
       { res.addMethod(m); }
@@ -1244,13 +1244,13 @@ MethodBodyDefinition methodBodyDefinition(NiceClass container):
 				      parameters,body); }
 }
 
-MethodDeclaration methodDeclaration():
+Definition methodDeclaration():
 {
     LocatedString name;
     Monotype returnType;
     FormalParameters parameters;
     Constraint cst;
-    MethodDeclaration res;
+    Definition res;
     List statements = new LinkedList();
 }
 {
@@ -1279,8 +1279,11 @@ MethodDeclaration methodDeclaration():
       (
         { Statement body; }
         body=code() { statements.add(body); }
-        { res = new ToplevelFunction(name, cst, returnType, parameters, 
-                                     body!=null?new Block(statements):null, contract);}
+        { res = NiceMethod.WithDefault.create
+            (name, cst, returnType, parameters, 
+             body != null ? new Block(statements) : null, 
+             contract);
+        }
       |
         // Nice method
         ";"

@@ -54,6 +54,8 @@ public class AST extends Node
           classes.add(((EnumDefinition)node).classDef);
         else if (node instanceof GlobalVarDeclaration)
           globals.add(node);
+        else if (node instanceof DefaultMethodImplementation)
+          methods.add(((DefaultMethodImplementation) node).getDeclaration());
       }
 
     this.classes = (ClassDefinition[]) 

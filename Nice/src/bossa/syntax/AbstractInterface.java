@@ -45,7 +45,7 @@ public class AbstractInterface extends MethodContainer
     return null;
   }
 
-  public void addMethod(MethodDeclaration m)
+  public void addMethod(Definition m)
   {
     addChild(m);
   }
@@ -75,8 +75,8 @@ public class AbstractInterface extends MethodContainer
       for (Iterator i = children.iterator(); i.hasNext();)
 	{
 	  Object child = i.next();
-	  if (child instanceof ToplevelFunction)
-	    ((ToplevelFunction) child).resolveBody();
+	  if (child instanceof DefaultMethodImplementation)
+            ((DefaultMethodImplementation) child).resolveBody();
 	}
   }
 

@@ -33,8 +33,7 @@ import mlsub.typing.Constraint;
    @version $Date$
    @author Daniel Bonniot (bonniot@users.sourceforge.net)
 */
-public class MethodBodyDefinition extends Definition 
-  implements Function
+public class MethodBodyDefinition extends MethodImplementation
 {
   /**
    * Create a method alternative.
@@ -53,15 +52,16 @@ public class MethodBodyDefinition extends Definition
 			      List formals, 
 			      Statement body)
   {
-    super(name, Node.down);
+    super(name, body, makeFormals(formals, container, name.location()));
 
     this.binders = binders; 
 
-    this.formals = makeFormals(formals, container, name.location());
-    this.body = body;
     this.declaration = null;
+  }
 
-    this.insideClass = container != null || 
+  boolean hasThis()
+  {
+    return
       this.formals != null &&
       this.formals.length >= 1 && 
       String.valueOf(this.formals[0].name).equals("this");
@@ -87,55 +87,9 @@ public class MethodBodyDefinition extends Definition
     return null;
   }
   
-  private MonoSymbol[] buildSymbols(Pattern[] names, Monotype[] types)
+  final TypeConstructor firstArgument()
   {
-    if(names.length != types.length)
-      switch(types.length){
-      case 0: User.error(this,"Method "+name+" has no parameters");
-      case 1: User.error(this,"Method "+name+" has 1 parameter");
-      default:User.error(this,
-			 "Method "+name+" has "+types.length+" parameters");
-      }
-    
-    MonoSymbol[] res = new MonoSymbol[names.length];
-    for(int tn = 0; tn < names.length; tn++)
-      {
-	Pattern p = names[tn];
-
-	Monotype type;
-
-        if (p.atAny())
-          {
-            // When a parameter is not dispatched on, it has the declared type
-            // of that parameter in the method declaration.
-            type = types[tn];
-          }
-        else if (p.getRuntimeTC() != null)
-	  {
-	    AtomicKind v = p.tc.variance;
-	    p.getRuntimeTC().setVariance(v);
-	    type = new mlsub.typing.MonotypeConstructor(p.getRuntimeTC(), mlsub.typing.MonotypeVar.news(v.arity()));
-	    type.setKind(v);
-
-	    type = bossa.syntax.Monotype.sure(type);
-	  }
-	else
-	  {
-	    if (p.name == null)
-	      // anonymous pattern
-	      type = new MonotypeVar(types[tn].toString()+ "(argument_" + tn+")");
-	    else
-	      type = new MonotypeVar(types[tn].toString()+ "(" + p.name + ")");
-	  }
-
-	res[tn] = new MonoSymbol(p.name, type);
-      }
-    return res;
-  }
-  
-  public MethodDeclaration getDeclaration()
-  {
-    return declaration;
+    return formals[0].tc;
   }
 
   private void setDeclaration(MethodDeclaration d)
@@ -158,8 +112,7 @@ public class MethodBodyDefinition extends Definition
     // Register this alternative for the link test
     alternative = new bossa.link.SourceAlternative(this);
 
-    parameters = buildSymbols(this.formals, declaration.getArgTypes());
-    scope.addSymbols(parameters);
+    buildSymbols();
   }
 
   /** 
@@ -272,6 +225,7 @@ public class MethodBodyDefinition extends Definition
 
       }
 
+    // Check that the non-dispatched parameter names match the declaration
     outer: for(Iterator it = symbols.iterator(); it.hasNext();) {
       MethodDeclaration m = ((MethodDeclaration.Symbol) it.next()).getMethodDeclaration();
       if( m instanceof NiceMethod) {
@@ -284,6 +238,8 @@ public class MethodBodyDefinition extends Definition
           }
       }
     }
+
+    OverloadedSymbolExp.removeNonMinimal(symbols);
 
     if(symbols.size() == 1) 
       return (VarSymbol) symbols.get(0);
@@ -320,6 +276,7 @@ public class MethodBodyDefinition extends Definition
     Types.setMarkedKind(m2);
     Typing.leq(Types.rawType(m1), Types.rawType(m2));
   }
+
   void doResolve()
   {
     //Resolution of the body is delayed to enable overloading
@@ -371,39 +328,9 @@ public class MethodBodyDefinition extends Definition
     }
   }
 
-  void resolveBody()
-  {
-    if (insideClass)
-      Node.thisExp = new SymbolExp(parameters[0], location());
-
-    try {
-      body = bossa.syntax.dispatch.analyse
-        (body, scope, typeScope, !Types.isVoid(declaration.getReturnType()));
-    } 
-    finally {
-      Node.thisExp = null;
-    }
-  }
-  
   /****************************************************************
    * Type checking
    ****************************************************************/
-
-  public mlsub.typing.Monotype getExpectedType()
-  {
-    return declaration.getReturnType();
-  }
-
-  public void checkReturnedType(mlsub.typing.Polytype returned)
-    throws Function.WrongReturnType
-  {
-    try {
-      Typing.leq(returned, declaration.getReturnType());
-    }
-    catch (mlsub.typing.TypingEx e) {
-      throw new Function.WrongReturnType(e, declaration.getReturnType());
-    }
-  }
 
   void typecheck()
   {
@@ -488,7 +415,7 @@ public class MethodBodyDefinition extends Definition
         }
 
 	Node.currentFunction = this;
-	if (insideClass)
+	if (hasThis())
 	  Node.thisExp = new SymbolExp(parameters[0], location());
 
 	bossa.syntax.dispatch.typecheck(body);
@@ -524,7 +451,7 @@ public class MethodBodyDefinition extends Definition
    * Code generation
    ****************************************************************/
 
-  private Type[] javaArgTypes()
+  protected Type[] javaArgTypes()
   {
     Type[] res = new Type[parameters.length];
 
@@ -538,55 +465,6 @@ public class MethodBodyDefinition extends Definition
     return res;
   }
 
-  gnu.expr.ReferenceExp ref;
-  gnu.expr.LambdaExp compiledMethod;
-
-  public gnu.expr.ReferenceExp getRefExp()
-  {
-    if (ref == null)
-      ref = createRef();
-
-    return ref;
-  }
-
-  public void compile()
-  {
-    if (Debug.codeGeneration)
-      Debug.println("Compiling method body " + this);
-
-    getRefExp();
-    Gen.setMethodBody(compiledMethod, body.generateCode());
-  }
-
-  private gnu.expr.ReferenceExp createRef ()
-  {
-    createMethod(name.toString(), false);
-    gnu.expr.ReferenceExp ref = module.addMethod(compiledMethod, true);
-
-    compiledMethod.addBytecodeAttribute
-      (new MiscAttr("definition", declaration.getFullName().getBytes()));
-    compiledMethod.addBytecodeAttribute
-      (new MiscAttr("patterns", 
-		    Pattern.bytecodeRepresentation(formals).getBytes()));
-
-    return ref;
-  }
-
-  final TypeConstructor firstArgument()
-  {
-    return formals[0].tc;
-  }
-
-  private void createMethod (String bytecodeName, boolean member)
-  {
-    compiledMethod = 
-      Gen.createMethod(bytecodeName, 
-		       javaArgTypes(),
-		       declaration.javaReturnType(),
-		       parameters,
-		       true, member);
-  }
-
   gnu.expr.Expression[] compiledArguments()
   {
     return VarSymbol.compile(parameters);
@@ -595,6 +473,7 @@ public class MethodBodyDefinition extends Definition
   private bossa.link.Alternative alternative;
 
   bossa.link.Alternative getAlternative() { return alternative; }
+
 
   /****************************************************************
    * Printing
@@ -605,13 +484,5 @@ public class MethodBodyDefinition extends Definition
     return name + "(" + Util.map("", ", ", "", formals) + ")";
   }
 
-  public Pattern[] getPatterns() { return formals; }
-
-  private MethodDeclaration declaration;
-  protected MonoSymbol[] parameters;
-  private Pattern[] formals;
   Collection /* of LocatedString */ binders; // Null if type parameters are not bound
-  private Statement body;
-  private boolean insideClass;
 }
-

@@ -185,3 +185,7 @@ class B extends A
   longValue() = 0;
   intValue() = 0;
 }
+
+/// FAIL
+interface I{}
+equals(x@I,y@I) = true;

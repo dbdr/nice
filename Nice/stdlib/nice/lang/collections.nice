@@ -78,18 +78,18 @@ interface List<T>
 //  }
 
 /****************************************************************
- * Linked Lists
+ * Functional Lists
  ****************************************************************/
 
-abstract class LinkedList<T> 
+abstract class FList<T> 
   implements Sequence 
   //finally implements Collection
   {}
 
-final class Nil<T>  extends LinkedList<T> {}
-final class Cons<T> extends LinkedList<T> { T head; LinkedList<T> tail; }
+final class Nil<T>  extends FList<T> {}
+final class Cons<T> extends FList<T> { T head; FList<T> tail; }
 
-<Any T> Cons<T> cons(T, LinkedList<T>);
+<Any T> Cons<T> cons(T, FList<T>);
 cons<T>(elem, t)
 {
   Cons<T> res = new Cons();
@@ -122,29 +122,66 @@ map(l@Cons, ff) = cons(ff(l.head), map(l.tail, ff));
 filter(l@Nil , test) = new Nil();
 filter<C,T>(l@Cons, test)
 {
-  LinkedList<T> res = filter(l.tail,test);
+  FList<T> res = filter(l.tail,test);
   return test(l.head) ? cons(l.head, res) : res;
 }
 
-/*
-class LinkedList<T> implements List = java.lang.LinkedList;
+/****************************************************************
+ * Wrappers for java.util.Collection
+ ****************************************************************/
+
+// unsafe !
+<Any T> T next(java.util.Iterator) = 
+  native Object java.util.Iterator.next();
+
+<Any T> List<T> list(java.util.List);
+list<T>(l)
+{
+  Vector<T> res = makeVector(l.size());
+
+  for(java.util.Iterator i = l.iterator(); i.hasNext();)
+    res.add(i.next());
+
+  return res;
+}
+
+/****************************************************************
+ * LinkedList
+ ****************************************************************/
+
+final class LinkedList<T> implements List = native java.util.LinkedList;
+<Any T> LinkedList<T> linkedList() = native new java.util.LinkedList();
+<Any T> java.util.ListIterator listIterator(LinkedList<T>) =
+  native java.util.ListIterator java.util.List.listIterator();
+<Any T> void add(LinkedList<T>, T) = native void java.util.Collection.add(Object);
 
 size(l@LinkedList) = l.size();
 
 get(l@LinkedList, n) = l.get(n);
-
 set(l@LinkedList, n, elem) = l.set(n, elem);
 
-map<T, U> (l@LinkedList, f)
+add(l@LinkedList, e) = l.add(e);
+
+map<C, T, U> (l@LinkedList, f)
 {
-  LinkedList<U> res = new LinkedList();
+  LinkedList<U> res = linkedList();
+  for(java.util.Iterator i = l.listIterator(); i.hasNext(); )
+    res.add(f(i.next()));
   return res;
 }
 
 filter<C,T>(l@LinkedList, test)
 {
+  LinkedList<T> res = linkedList();
+  for(java.util.Iterator i = l.listIterator(); i.hasNext(); )
+    {
+      T elem = i.next();
+      if (test(elem))
+	res.add(elem);
+    }
+  return res;
 }
-*/
+
 
 /****************************************************************
  * Vector
@@ -204,25 +241,6 @@ filter<C,T>(v@Vector, test)
   res.length=0;
 
   v.iter(fun(T elem) => { if(test(elem)) res.add(elem); });
-
-  return res;
-}
-
-/****************************************************************
- * Wrappers for java.util.Collection
- ****************************************************************/
-
-// unsafe !
-<Any T> T next(java.util.Iterator) = 
-  native Object java.util.Iterator.next();
-
-<Any T> List<T> list(java.util.List);
-list<T>(l)
-{
-  Vector<T> res = makeVector(l.size());
-
-  for(java.util.Iterator i = l.iterator(); i.hasNext();)
-    res.add(i.next());
 
   return res;
 }

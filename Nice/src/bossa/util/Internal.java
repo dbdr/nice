@@ -79,10 +79,7 @@ public final class Internal
   
   public static Error error(String message)
   {
-    System.out.println("[Internal error]\n" + message);
-    printStackTrace();
-    System.exit(1);
-    return null;
+    throw new InternalError(message);
   }
   
   public static Error error(Throwable e)
@@ -107,4 +104,12 @@ public final class Internal
     return null;
   }
 
+}
+
+class InternalError extends Error
+{
+  InternalError(String message)
+  {
+    super(message);
+  }
 }

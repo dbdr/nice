@@ -436,7 +436,7 @@ Expression analyseIdent(IdentExp e, Info info, boolean assigned)
 	    {
 	      if (sym instanceof MonoSymbol)
 		{
-		  if (sym.depth < info.anonFunDepth)
+		  if (assigned && sym.depth < info.anonFunDepth)
 		    sym.captured = true;
 
 		  if (sym instanceof Block.LocalVariable.Symbol)

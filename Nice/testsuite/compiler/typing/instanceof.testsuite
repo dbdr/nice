@@ -286,3 +286,11 @@ void f() {
       int x = arg.life;
      }
   });
+
+/// PASS
+  let A a = new B();
+  void->void f = () => {
+    if (a instanceof B) {
+      int x = a.life;
+    }
+  };

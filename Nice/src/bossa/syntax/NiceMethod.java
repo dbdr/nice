@@ -117,7 +117,9 @@ public class NiceMethod extends UserOperator
 	if (hasAlike)
 	  {
 	    Map map = new HashMap();
-	    map.put(Alike.id, alikeTC);
+	    map.put(dispatch.getAlikeID(), 
+		dispatch.createMonotypeConstructor(alikeTC,
+			new TypeParameters(new ArrayList()), name.location()));
 	    returnType = returnType.substitute(map);
 	    params.substitute(map);
 	  }

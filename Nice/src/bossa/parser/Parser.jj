@@ -789,7 +789,7 @@ Monotype simpleMonotype():
   res=funOrTupleMonotype()
 |
   start="alike" [ "<" p=monotypes() ">" ]
-  { res=new Alike(p, makeLocation(start)); }
+  { res=bossa.syntax.dispatch.createAlike(p, makeLocation(start)); }
   { res.nullness = res.absent; }
 |
   LOOKAHEAD(monotypeConstructor())

@@ -12,6 +12,9 @@ import java.util.List;
 
 public class dispatch
 {
+  static String getAlikeID()
+  { return null; }
+
   public static Monotype createTypeIdent(LocatedString name)
   { return null;}
 

@@ -142,3 +142,54 @@ public FunType createFunType_(bossa.syntax.Monotype[?] in, bossa.syntax.Monotype
 {
   return new FunType(in: (in != null ? in : []), out: out);
 }
+
+/**
+   The "alike" syntactic keyword in Monotypes
+
+ */
+public class Alike extends bossa.syntax.Monotype
+{
+  private Monotype[] parameters;
+  private Location loc;
+
+  // Alike should be removed as soon as types are constructed.
+  rawResolve(map)
+  {
+    throw User.error(this, "\"alike\" can only be used in class method definitions");
+  }
+
+  void typecheck()
+  {
+    Internal.error("Alike not resolved");
+  }
+
+  substitute(map)
+  {
+    let tc = map.get(alike_id);
+
+    if (tc == null)
+      return this;
+
+    assert tc instanceof MonotypeConstructor;
+    let res = createMonotypeConstructor(notNull(tc.lowlevelTC), 
+       new TypeParameters(Monotype.substitute(map, parameters)), 
+       loc);
+    res.nullness = this.nullness;
+    return res;
+  }
+
+  containsAlike() = true;
+  
+  toString() = "alike" + Util.map("<", ", ", ">", parameters);
+
+  location() = loc;
+}
+
+// common ID object
+let String alike_id = "<ALIKE>";
+String getAlikeID() = alike_id;
+
+public Monotype createAlike(List<Monotype> parameters, Location location)
+{
+  return new Alike(parameters: Monotype.toArray(parameters), loc: location);
+}

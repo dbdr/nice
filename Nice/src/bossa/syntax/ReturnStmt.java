@@ -35,7 +35,7 @@ public class ReturnStmt extends Statement
 
   Polytype returnType()
   {
-    if(value==null)
+    if (value == null)
       return ConstantExp.voidPolytype;
     else
       return value.getType();

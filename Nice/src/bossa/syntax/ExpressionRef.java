@@ -80,7 +80,7 @@ final public class ExpressionRef extends Expression
     // XXX we could remove some noOverloading here and there now
     content = content.noOverloading();
 
-    type=content.getType();
+    type = content.getType();
   }
   
   boolean isAssignable()

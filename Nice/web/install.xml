@@ -1,18 +1,19 @@
 <?xml version="1.0" standalone="no"?>
-<!DOCTYPE website PUBLIC "-//Norman Walsh//DTD Website V2.0b1//EN"
-          "http://docbook.sourceforge.net/release/website/2.0b1/website.dtd" [
+<!DOCTYPE book PUBLIC '-//OASIS//DTD DocBook XML V4.1.2//EN' 		     
+'http://www.oasis-open.org/docbook/xml/4.0/docbookx.dtd' [ 
 <!ENTITY nice "Nice">
 <!ENTITY java "Java">
 ]>
-<webpage id="install">
-<config param="footlink" value="home" altval="Home"/>
-<config param="desc" value="Installing the Nice compiler"/>
-<config param="rcsdate" value="$Date$"/>
-<head>
+<page>
 <title>Installing the &nice; compiler</title>
-<keywords>nice, compiler, install, windows, debian, linux, unix</keywords>
-</head>
 
+<description>
+Installing the Nice compiler
+</description>
+
+<keywords>nice, compiler, install, windows, debian, linux, unix</keywords>
+
+<section>
 <para>
 Select your system:
 <link linkend="deb">Debian</link>
@@ -20,23 +21,20 @@ Select your system:
 <link linkend="win">Windows</link>
 <link linkend="other">Other</link>
 </para>
+</section>
 
 <section id="deb"><title>Debian Linux</title>
-<orderedlist>
-<listitem>
-<para>download the <ulink url="nice.deb">Debian package</ulink>.</para>
-</listitem>
-
-<listitem>
-<para>install the package with <literal>dpkg -i nice_*.deb</literal>. </para>
-</listitem>
-</orderedlist>
+<para>
+Simply download the <ulink url="nice.deb">Debian package</ulink>
+and install it with <literal>dpkg -i nice_*.deb</literal>.
+</para>
 </section>
 
 <section id="unix"><title>Unix</title>
 <para>
 Download the <ulink url="Nice.tar">Nice.tar</ulink> file and 
 save it as <literal>/tmp/Nice.tar</literal>.
+</para>
 
 <variablelist>
 <varlistentry><term>System installation (if you are root)</term>
@@ -50,6 +48,7 @@ tar xf /tmp/Nice.tar
 </para>
 </listitem>
 </varlistentry>
+
 <varlistentry><term>User installation</term>
 <listitem>
 <para>
@@ -65,6 +64,7 @@ It is be a good idea to include it in your <literal>PATH</literal>.
 </varlistentry>
 </variablelist>
 
+<para>
 That's it! &nice; automatically recognizes where it is installed.
 </para>
 
@@ -79,16 +79,17 @@ Download <ulink url="Nice.tar">Nice.tar</ulink> along with
 the <ulink url="nicec.bat">nicec.bat</ulink> file contributed by Jamie McCrindle.
 Further documentation is needed.
 </para>
+
 <para>
-<ulink url="http://www.gnu.org/software/emacs/windows/">Emacs for Windows</ulink> is a good editor for Nice programs. 
+<ulink url="http://www.gnu.org/software/emacs/windows/">Emacs for Windows</ulink> is a good editor for Nice programs (and many other things!). 
 If you use it, 
 you should also <link linkend="emacs">install the &nice; mode</link>.
 </para>
 </section>
 
-<section id="other"><title>Other</title>
+<section id="other"><title>Other systems</title>
 <para>
-There are no specific instructions for other systems.
+There are no specific instructions for other operating systems.
 Howevever &nice; can be used on any system that works with &java;.
 If you are in this situation, please 
 <ulink url="mailto:bonniot@users.sourceforge.net">contact me</ulink>
@@ -96,17 +97,21 @@ to share your experience and augment the documentation.
 </para>
 </section>
 
-<section id="emacs"><title>Emacs mode</title>
+<section id="emacs"><title>Emacs mode for Nice</title>
 <para>
 There is an <ulink url="http://www.gnu.org/software/emacs/">Emacs</ulink> mode
 for &nice; which makes Emacs the editor of choice for &nice; programs!
 To enable it, place this in your <literal>.emacs</literal> file:
 <programlisting>
-;; Nice
-;; Remove the ; in the next line if you installed Nice in your home directory
+;; Nice mode
+;; If you installed Nice in your home directory,
+;; then remove the leading ; in the next line 
+
 ;(setq load-path (cons "~/share/emacs/site-lisp" load-path))
-(setq auto-mode-alist (cons '("\\.nice$" . nice-mode) auto-mode-alist))
-(autoload 'nice-mode "nice-mode" "Major mode for editing Nice programs." t)
+(setq auto-mode-alist 
+  (cons '("\\.nice$" . nice-mode) auto-mode-alist))
+(autoload 'nice-mode "nice-mode" 
+  "Major mode for editing Nice programs." t)
 </programlisting>
 
 The first line is there to ensure that the <literal>nice-mode.el</literal> file
@@ -122,4 +127,4 @@ Type <literal>C-h m</literal> for the documentation of the mode.
 </para>
 </section>
 
-</webpage>
+</page>

@@ -5,22 +5,13 @@ STYLEOPT=
 
 .PHONY : clean
 
-all: index.html research.html compilation.html testimonials.html
+all: index.html research.html compilation.html testimonials.html install.html
 
-old: safety.html install.html
+old: safety.html
 
 %.html: %.xml new.xsl
 	$(PROC) new.xsl $*.xml $(STYLEOPT) > $@
 
-include depends.tabular
-
-autolayout.xml: layout.xml
-	$(PROC) $(STYLEDIR)/autolayout.xsl $< > $@
-	make depends
-
-# for the moment don't use layout, as I'm not sure what it should look like
-%.html: %.xml $(STYLESHEET) #autolayout.xml 
+# Old style
+safety.html: %.xml $(STYLESHEET)
 	$(PROC) $(STYLESHEET) $*.xml $(STYLEOPT) > $@
-
-depends: autolayout.xml
-	$(PROC) $(STYLEDIR)/makefile-dep.xsl $< > depends.tabular

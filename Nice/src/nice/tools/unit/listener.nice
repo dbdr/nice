@@ -1,0 +1,8 @@
+package nice.tools.unit;
+
+interface TestListener
+{
+  void start(String test);
+  void end(String test);
+  void failure(String test, Throwable cause);
+}

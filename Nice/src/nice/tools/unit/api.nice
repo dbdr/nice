@@ -1,0 +1,135 @@
+package nice.tools.unit;
+
+import java.lang.reflect.*;
+
+public boolean runTests(String packageName, TestListener listener,
+			?String classpath = null)
+{
+  let classloader = classpath == null 
+    ? ClassLoader.getSystemClassLoader()
+    : classloaderFromClasspath(notNull(classpath));
+
+  nice.tools.util.JDK.setDefaultAssertionStatus(classloader, true);
+
+  var Class packageClass;
+  try {
+    packageClass = classloader.loadClass(packageName + ".fun");
+  }
+  catch(ClassNotFoundException ex) {
+    return false;
+  }
+
+  runTests(packageClass, listener);
+
+  return true;
+}
+
+public void runTests(Class packageClass, TestListener listener)
+{
+  Method[] methods = packageClass.getDeclaredMethods();
+  methods.filter(isTestMethod).foreach(Method m => runTestMethod(m, listener));
+}
+
+public boolean iterLocations
+  (String testName, Throwable t, (?String, String, int)->void handleLocation)
+{
+  let stack = nice.tools.util.JDK.getStackTrace(t);
+
+  if (stack == null)
+    return false;
+
+  for (Object stackTraceElement : stack)
+    {
+      String file = nice.tools.util.JDK.stackFileName(stackTraceElement);
+      String method = nice.tools.util.JDK.stackMethodName(stackTraceElement);
+      String className = nice.tools.util.JDK.stackClassName(stackTraceElement);
+      int lineNumber = nice.tools.util.JDK.stackLineNumber(stackTraceElement);
+      handleLocation(file, method, lineNumber);
+      // We stop when we reach the start of the test. Going deeper
+      // only shows the internals of the test engine, which are not
+      // relevant.
+      if ((className + "." + method).equals(testName))
+	return true;
+    }
+
+  return false;
+}
+
+boolean isTestMethod(Method m) = 
+  m.getName().startsWith("_test") && m.getParameterTypes().length == 0;
+
+void runTestMethod(Method m, TestListener listener)
+{
+  let name = m.getDeclaringClass().getName() + "." + m.getName();
+  
+  listener.start(name);
+  try 
+  {
+    m.invoke(null, null);
+  } 
+  catch (InvocationTargetException e) 
+  {
+    let cause = e.getTargetException();
+    listener.failure(name, cause);
+  }
+  finally 
+  {
+    listener.end(name);
+  }
+}
+
+String replaceLast(String source, char c, String by)
+{
+  let index = source.lastIndexOf(c);
+  if (index == -1) return source;
+  
+  StringBuffer res = new StringBuffer(source.length() + by.length() - 1);
+  res.append(source.substring(0, index));
+  res.append(by);
+  res.append(source.substring(index + 1));
+  
+  return res.toString();
+}
+
+ClassLoader classloaderFromClasspath(String classpath)
+{
+  LinkedList<java.net.URL> components = new LinkedList();
+    
+  int start = 0;
+  // skip starting separators
+  while (start<classpath.length() && 
+	 classpath.charAt(start) == java.io.File.pathSeparatorChar)
+    start++;
+    
+  while (start<classpath.length())
+    {
+      int end = classpath.indexOf(java.io.File.pathSeparatorChar, start);
+      if (end == -1)
+	end = classpath.length();
+      
+      String pathComponent = classpath.substring(start, end);
+      if (pathComponent.length() > 0)
+	try{
+	java.io.File f = new java.io.File(pathComponent);
+	if (f.canRead())
+	  components.add(f.getCanonicalFile().toURL());
+	else
+	  {
+	    if (!f.exists())
+	      System.err.println("Classpath component " + pathComponent + " does not exist");
+	    else
+	      System.err.println("Classpath component " + pathComponent + " is not readable");
+	  }
+      }
+      catch(java.net.MalformedURLException e){
+	System.err.println("Classpath component " + pathComponent + " is invalid");
+      }
+      catch(java.io.IOException e){
+	System.err.println("Classpath component " + pathComponent + " is invalid");
+      }
+      start = end + 1;
+    }
+
+  return new java.net.URLClassLoader(components.toArray(), 
+				     /* no parent */ null);
+}

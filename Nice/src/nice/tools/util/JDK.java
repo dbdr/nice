@@ -52,4 +52,82 @@ public class JDK
 
     return res.toString();
   }
+
+  /** Replacement for ClassLoader.setDefaultAssertionStatus(boolean) */
+  public static void setDefaultAssertionStatus
+    (java.lang.ClassLoader loader, boolean st)
+    throws java.lang.reflect.InvocationTargetException
+  {
+    try {
+      // JDK 1.4+
+      java.lang.ClassLoader.class.getDeclaredMethod
+        ("setDefaultAssertionStatus", new Class[]{ Boolean.TYPE }).
+        invoke(loader, new Object[]{ new Boolean(st) });
+    }
+    catch(NoSuchMethodException e) {
+      // Under earlier versions, Nice-generated assertions are controlled
+      // by the 'assertions' property.
+      java.lang.System.setProperty("assertions", new Boolean(st).toString());
+    }
+    catch(IllegalAccessException e) {
+      throw new Error("ClassLoader.setDefaultAssertionStatus must be public");
+    }
+  }
+
+  /** Replacement for Throwable.getStackTrace() 
+      @return null if that feature is not available.
+   */
+  public static Object[] getStackTrace(Throwable t)
+    throws java.lang.reflect.InvocationTargetException
+  {
+    try {
+      return (Object[])
+        Throwable.class.getMethod("getStackTrace", null).invoke(t, null);
+    }
+    catch (NoSuchMethodException e) {
+      return null;
+    }
+    catch(IllegalAccessException e) {
+      throw new Error("Throwable.getStackTrace must be public");
+    }
+  }
+
+  private static Object call(Object o, String method)
+    throws java.lang.reflect.InvocationTargetException
+  {
+    try {
+      return o.getClass().getDeclaredMethod(method, null).invoke(o, null);
+    }
+    catch (NoSuchMethodException e) {
+      return null;
+    }
+    catch(IllegalAccessException e) {
+      throw new Error("" + o.getClass() + "." + method + " must be public");
+    }
+  }
+
+  public static String stackFileName(Object stackTraceElement)
+    throws java.lang.reflect.InvocationTargetException
+  {
+    return (String) call(stackTraceElement, "getFileName");
+  }
+
+  public static String stackMethodName(Object stackTraceElement)
+    throws java.lang.reflect.InvocationTargetException
+  {
+    return (String) call(stackTraceElement, "getMethodName");
+  }
+
+  public static String stackClassName(Object stackTraceElement)
+    throws java.lang.reflect.InvocationTargetException
+  {
+    return (String) call(stackTraceElement, "getClassName");
+  }
+
+  public static int stackLineNumber(Object stackTraceElement)
+    throws java.lang.reflect.InvocationTargetException
+  {
+    return ((Integer) call(stackTraceElement, "getLineNumber")).intValue();
+  }
+
 }

@@ -1,0 +1,49 @@
+package nice.tools.unit.console;
+
+import nice.tools.unit;
+import nice.doc;
+
+void main(String[] args)
+{
+  Program prg = new Program
+    (name: "niceunit", longName: "The Nice unit test runner",
+     shortDescription: "Runs unit tests written in the Nice programming language",
+     author: "Daniel Bonniot <bonniot@users.sourceforge.net>",
+     seeAlso: "http://nice.sourceforge.net          the Nice Home Page\n",
+     manualSection: "1",
+     arguments: "package", options: cast(null));
+
+  ?String classpath = null;
+  prg.options = 
+  [
+   option("classpath",
+	  "Search path for compiled packages to be tested\nPATH is a list of directories and .jar archives",
+	  "path",
+	  String path => { classpath = path; })
+  ];
+
+  List<String> rest = parse(prg, args);
+
+  if (rest.size() == 0)
+    prg.usage();
+
+  rest.foreach(String pkg => {
+    if (! runTests(pkg, listener, classpath))
+      System.err.println("Package "pkg" was not found");
+  });
+}
+
+let Listener listener = new Listener();
+
+class Listener implements TestListener
+{
+  start(test) = println(test);
+  end(test) {}
+  failure(test, cause) 
+  {
+    println("Test failed:\n " + cause);
+    if (!(iterLocations(test, cause, (?String file, String method, int line) =>
+          println("Location: " + file + " method " + method + (line < 0 ? "" : " line " + line)))))
+      cause.printStackTrace();
+  }
+}

@@ -353,6 +353,8 @@ class Vector<T> extends AbstractList<T> = native java.util.Vector;
   native SortedMap Collections.synchronizedSortedMap(SortedMap);
 <T> SortedSet<T> synchronizedSortedSet(SortedSet<T>) =
   native SortedSet Collections.synchronizedSortedSet(SortedSet);
+// Return unmodifiable views of collections and maps. It is therefore safe
+// to lose precision on the type parameter.
 <T,U | T <: U> Collection<U> unmodifiableCollection(Collection<T>) = 
   native Collection Collections.unmodifiableCollection(Collection);
 <T,U | T <: U> List<U> unmodifiableList(List<T>) = 

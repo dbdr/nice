@@ -39,6 +39,7 @@
 (defvar nice-variable-stack nil)
 (defvar nice-directory nil)
 (defvar nice-process nil)
+(defvar nice-experimental-flag nil "Compile using development nice compiler")
 (defvar nice-recompile-flag nil)
 (defvar nice-recompile-all-flag nil)
 (defvar nice-static-flag 't)
@@ -290,6 +291,8 @@
     '("Toggle force-recompile-all mode" . nice-toggle-recompile-all))
   (define-key nice-mode-map [menu-bar c nice-toggle-recompile]
     '("Toggle force-recompile mode" . nice-toggle-recompile))
+  (define-key nice-mode-map [menu-bar c nice-toggle-experimental]
+    '("Toggle experimental compiler mode" . nice-toggle-experimental))
   (define-key nice-mode-map [menu-bar c nice-html-export]
     '("Generate HTML listing" . nice-html-export))
   (define-key nice-mode-map [menu-bar c nice-latex-export]
@@ -353,6 +356,7 @@ Mode for editing/compiling Nice programs.
   C-c r                   nice-toggle-recompile
   C-c R                   nice-toggle-recompile-all
   C-c s                   nice-toggle-static
+  C-c e                   nice-toggle-experimental
 
 * THE MODE IS CONTROLED BY THE FOLLOWING VARIABLES:
 
@@ -427,6 +431,7 @@ Mode for editing/compiling Nice programs.
   (local-set-key "\C-cr" 'nice-toggle-recompile)
   (local-set-key "\C-cR" 'nice-toggle-recompile-all)
   (local-set-key "\C-cs" 'nice-toggle-static)
+  (local-set-key "\C-ce" 'nice-toggle-experimental)
   (local-set-key "\C-l" 'nice-fontify-buffer)
   (local-set-key "{" 'c-electric-brace)
   (local-set-key "}" 'c-electric-brace)
@@ -498,6 +503,7 @@ Mode for editing/compiling Nice programs.
           (concat
            (if nice-xprogram nice-xprogram nice-program)
 	   " "
+           (if nice-experimental-flag "-e ")
            (if nice-recompile-flag "-r ")
            (if nice-recompile-all-flag "-R ")
            (if nice-static-flag "-s ")
@@ -627,6 +633,12 @@ Mode for editing/compiling Nice programs.
   (interactive)
   (setq nice-static-flag (not nice-static-flag))
   (message "Static compilation %s" (if nice-static-flag "on" "off")))
+
+(defun nice-toggle-experimental ()
+  "Disable/enable experimental mode."
+  (interactive)
+  (setq nice-experimental-flag (not nice-experimental-flag))
+  (message "Experimental compiler %s" (if nice-experimental-flag "on" "off")))
 
 ;; Return the package of a object (nil for global objects)
 (defun nice-object-package (object)

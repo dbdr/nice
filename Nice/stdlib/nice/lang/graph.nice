@@ -51,7 +51,8 @@ stronglyConnectedComponents<T>(start, successors)
   if(equals(min,mark.get(node)))
     {
       Vector<T> scc = makeVector(5);
-      T element;
+      // XXX: element does not need to be initialized. Remove when stable compiler allow this
+      T element = stack.top();
       do
 	{
 	  element = stack.pop();

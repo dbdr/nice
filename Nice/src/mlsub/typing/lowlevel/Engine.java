@@ -388,12 +388,14 @@ public abstract class Engine
 	  if(e.getKind()==k)
 	    continue;
 	  else
-	    throw new LowlevelUnsatisfiable("Bad Kinding for "+e);
+	    throw new LowlevelUnsatisfiable
+	      ("Bad Kinding for " + e + ":\nhad: " + e.getKind() +
+	       "\nnew: " + k);
 	
-	// e.getKind()==null
+	// assert e.getKind()==null
 	k.register(e);
 	e.setKind(k);
-	
+
 	floating.remove(e);
 
 	// Propagates the kind to all comparable elements
@@ -509,12 +511,16 @@ public abstract class Engine
     }
     floating.clear();
     
-    for(Iterator i = frozenLeqs.iterator(); i.hasNext();)
-      {
-	Leq leq = (Leq) i.next();
-	variablesConstraint.leq(leq.e1, leq.e2, initialContext);
-      }
-    frozenLeqs.endOfIteration();
+    try {
+      for(Iterator i = frozenLeqs.iterator(); i.hasNext();)
+	{
+	  Leq leq = (Leq) i.next();
+	  variablesConstraint.leq(leq.e1, leq.e2, initialContext);
+	}
+    }
+    finally {
+      frozenLeqs.endOfIteration();
+    }
     frozenLeqs.clear();
   }
   

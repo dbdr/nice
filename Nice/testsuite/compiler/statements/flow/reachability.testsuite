@@ -23,3 +23,10 @@
 /// PASS
   for (;;) break;
   ; // Reachable
+
+/// PASS bug
+  label: {
+    assert true;
+    break label;
+  }
+  assert true;

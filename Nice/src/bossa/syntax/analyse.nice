@@ -674,7 +674,7 @@ analyse(b@BreakStmt, info)
 {
   ?LoopStmt loop = info.currentLoop;
   if (loop == null)
-    throw error(b, "break must only occur inside loops");
+    throw error(b, "break without label must only occur inside loops");
 
   loop.createBlock();
   info.setUnreachable();
@@ -715,7 +715,18 @@ private void mustNotFindLabel(LocatedString label, Info info)
   
 analyse(b@BreakLabelStmt, info)
 {
-  b.statement = mustFindLabel(notNull(b.label), info);
+  LabeledStmt target = b.statement = mustFindLabel(notNull(b.label), info);
+  ?LoopStmt loop = target.getLoop(); 
+
+  if (loop != null)
+    {
+      loop.createBlock();
+    }
+  else
+    {
+      // TODO: fix reachability when not targetting a loop
+    }   
+
   info.setUnreachable();
 }
 

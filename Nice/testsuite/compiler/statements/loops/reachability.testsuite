@@ -11,7 +11,7 @@
     return -1;
   }
 
-/// PASS bug
+/// PASS
   loop: while(true)
     {
       assert true;

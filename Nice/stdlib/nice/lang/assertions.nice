@@ -29,8 +29,24 @@ void `assert`(boolean condition) =
 void `assert`(boolean condition, String message) = 
   inline nice.lang.inline.Assert();
 
+/** Always checked assertion. */
+void `!assert`(boolean condition) = 
+  inline nice.lang.inline.Assert("contract");
+
+/** Always checked assertion. */
+void `!assert`(boolean condition, String message) = 
+  inline nice.lang.inline.Assert("contract");
+
+void `?assert`(boolean condition) = 
+  inline nice.lang.inline.Assert();
+
+void `?assert`(boolean condition, String message) = 
+  inline nice.lang.inline.Assert();
+
+// Here for bootstrap compatibility.
 void `alwaysAssert`(boolean condition) = 
   inline nice.lang.inline.Assert("contract");
 
+// Here for bootstrap compatibility.
 void `alwaysAssert`(boolean condition, String message) = 
   inline nice.lang.inline.Assert("contract");

@@ -28,7 +28,7 @@ public class Contract
 
   public void addElement(Expression condition, ?Expression name, boolean precond)
   {
-    let sym =  createIdentExp(new LocatedString("alwaysAssert", condition.location()));
+    let sym = createIdentExp(new LocatedString("!assert", condition.location()));
 
     Expression call;
     String repr;

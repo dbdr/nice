@@ -210,6 +210,8 @@ TOKEN: /* Keywords */
 
 // Assertions
 | < ASSERT:     "assert"	>
+| < SUREASSERT: "!assert"	> /* Nice specific */
+| < MAYBEASSERT: "?assert"	> /* Nice specific */
 | < REQUIRE:    "requires"	>
 | < ENSURE:     "ensures"	>
 
@@ -2919,12 +2921,16 @@ Statement ShortAssertStatement() :
   Expression call;
 }
 {
-  t = "assert"
+  ( t = <ASSERT> | t = <SUREASSERT> | t = <MAYBEASSERT> )
   condition = SideEffectFreeExpression()
   ( ":" message = SideEffectFreeExpression()
     { call = bossa.syntax.dispatch.createCallExp(symb(t), condition, message); }
   |
-    { call = bossa.syntax.dispatch.createCallExp(symb(t), condition); }
+    {
+      message = bossa.syntax.dispatch.createStringConstantExp(condition.toString()
+        + " failed at " + condition.location().toString().replace('\\','/'));
+      call = bossa.syntax.dispatch.createCallExp(symb(t), condition, message);
+    }
   )
   { return bossa.syntax.dispatch.createExpressionStmt(call); }
 }

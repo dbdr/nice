@@ -68,3 +68,27 @@ foo(x) = 1;
       fun();
     }
   }
+
+/// PASS
+  // assertions have an automatic description
+  try{
+    assert 0 == 1;
+  }catch(AssertionFailed afe){
+    let message = afe.getMessage(); assert message != null;
+    assert message.indexOf( "==" ) != -1 : message;
+    assert message.indexOf( "main.nice" ) != -1 : message;
+  }
+
+/// PASS
+  // forced assertions syntax
+  try{
+    !assert 0 == 1;
+    throw new Exception( "AssertionFailed not thrown." );
+  }catch(AssertionFailed ok){}
+
+/// PASS
+  // optional assertions sytax
+  try{
+    ?assert 0 == 1;
+    throw new Exception( "AssertionFailed not thrown." );
+  }catch(AssertionFailed ok){}

@@ -50,6 +50,9 @@ analyse(s@Statement, varScope, typeScope, mustReturnAValue)
 
   try{
     analyse(s, info);
+  
+    if (mustReturnAValue && !info.getUnreachable())
+      bossa.util.User.error(s, "Missing return statement");
   }
   catch(UnknownIdentException e){
     bossa.util.User.error(e.ident, "" + e.ident + " is not declared");
@@ -57,10 +60,6 @@ analyse(s@Statement, varScope, typeScope, mustReturnAValue)
   catch(bossa.util.UserError e){
     nice.tools.compiler.OutputMessages.error(e.getMessage());
   }
-  
-  if (mustReturnAValue && !info.getUnreachable())
-    bossa.util.User.error(s, "Missing return statement");
-
   return s;
 }
 

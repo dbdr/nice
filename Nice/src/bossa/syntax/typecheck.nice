@@ -61,10 +61,19 @@ typecheck(e@AssignExp)
       catch (TypingEx newError) { t = newError; }
     }
 
-    if (notNullError(t, e, notNull(e.value).toString()))
-      throw assignmentError(e, to.toString(), 
-			    to.getType().toString(), 
-			    notNull(e.value));
+    ?FieldAccess field = to.getField();
+    String toName;
+    if (field == null)
+      toName = to.toString();
+    else
+      toName = field.getName().toString();
+
+    reportNullAssignmentError(e, t, value: notNull(e.value), 
+			      toName, 
+			      to.getType().getMonotype(), 
+			      field != null);
+    throw assignmentError(e, to.toString(), 
+			  to.getType().toString(), notNull(e.value));
   }
 }
 
@@ -561,10 +570,12 @@ typecheck(decl@Block.LocalVariable)
 	decl.value = checkAssignment(new mlsub.typing.Polytype(type), value);
       } 
       catch(TypingEx t){
-	if (notNullError(t, target, value.toString()))
-	  throw assignmentError(target, target.name.toString(), 
-				String.valueOf(target.getMonotype), 
-				value);
+	reportNullAssignmentError(decl, t, value: value, 
+				  target.name.toString(),
+				  target.getMonotype());
+	throw assignmentError(target, target.name.toString(), 
+			      String.valueOf(target.getMonotype), 
+			      value);
       }
     }
 }
@@ -690,7 +701,7 @@ typecheck(s@SynchronizedStmt)
     checkNotNull(type);
   }
   catch(TypingEx ex) {
-    throw new bossa.util.UserError(s.object, "" + s.object + " might be null");
+    bossa.util.User.error(s.object, "Synchonization must be done on a non-null object.\n" + s.object + " might be null.");
   }
 
     

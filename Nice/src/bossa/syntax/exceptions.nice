@@ -34,6 +34,30 @@ assignmentError(responsible, target, targetType, value)
   return new bossa.util.UserError(responsible, msg.toString());
 }
 
+/** Reports an error if an assignment failed because the value assigned
+    might be null.
+
+    In that case, an exception is thrown and the call does not return.
+    Otherwise, does nothing. 
+*/
+void reportNullAssignmentError(bossa.util.Located responsible,
+			   TypingEx t, Expression value, 
+			   String toName, mlsub.typing.Monotype toType, 
+			   boolean toField = false)
+{
+  if (! isNullError(t))
+    return;
+
+  bossa.util.User.error
+  (responsible, 
+   "The value " + value.toString() +
+   " cannot be assigned to " + 
+   (toField ? "field " : "") + toName + 
+   " because it might be null.\n\n" +
+   "To allow " + toName + " to contain the null value, it should be declared as:\n" + 
+   makeUnsure(toType) + " " + toName);
+}
+
 // Local Variables:
 // nice-xprogram: "nicec -d \"$HOME/Nice/classes\" --sourcepath=\"$HOME/Nice/src\" --classpath=\"$HOME/Nice/classes\""
 // End:

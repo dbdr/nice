@@ -27,3 +27,9 @@
   assert 0x1_2_3_4 == 0x1234;
   assert 0.000_012 == 0.000012;
   assert 1_000.000_1d == 1000.0001d;
+
+/// PASS
+  let a = new A(_b: 0);
+  let x = a._b;
+  /// Toplevel
+class A { int _b; }

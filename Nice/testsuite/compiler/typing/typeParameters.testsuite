@@ -1,0 +1,4 @@
+/// FAIL
+  /// Toplevel
+  class A<T> {}
+  void f(/* /// FAIL HERE */ A) {}

@@ -34,7 +34,7 @@ void generate(Compilation compilation, String mainPackage, ?File outDirectory)
   }
 
   // We want to "recompile" that is, load from source, all available
-  // packages, so that we can geenrate documentation for them.
+  // packages, so that we can generate documentation for them.
   compilation.recompileAll = true;
 
   try {

@@ -3,7 +3,7 @@ package nice.tools.doc;
 /**
    API documentation generator for Nice.
 
-   @author ?
+   @author Francis Barber
  */
 
 import nice.doc;
@@ -24,7 +24,8 @@ void main(String[] args)
   Program prg = new Program
     (name: "nicedoc", longName: "The Nice Documentation Generator",
      shortDescription: "Documentation Generator for the Nice programming language",
-     author: "Daniel Bonniot <bonniot@users.sourceforge.net>",
+     author: "Daniel Bonniot <bonniot@users.sourceforge.net>\n" +
+             "Francis Barber <fbarber@users.sourceforge.net>",
      seeAlso: "http://nice.sourceforge.net          the Nice Home Page\n" +
               "http://nice.sf.net/compilation.html  compilation instructions\n",
      manualSection: "1",
@@ -63,7 +64,7 @@ void main(String[] args)
     {
       if (rest.size() > 1)
 	println("Supply only one package on the command line.\n" +
-		"nicec will automatically find dependancies.");
+		"nicecdoc will automatically find dependancies.");
       usage(prg, ERROR);
     }
   mainPackage = rest[0];

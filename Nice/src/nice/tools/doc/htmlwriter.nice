@@ -182,10 +182,13 @@ class HTMLWriter {
     }
   }
   
+  /** This method takes a List containing all the packages that are going to be
+   * documented.  It writes a page at the root of output dir called index.html
+   * containing a list of hyperlinks to all the packages.
+   */
   void write(List<bossa.modules.Package> packages) {
     try {
-      BufferedWriter writer = new BufferedWriter
-        (new FileWriter(new File(outdir, "index.html")));
+      BufferedWriter writer = new BufferedWriter(new FileWriter(new File(outdir, "index.html")));
       writer.write(getHeader("Packages"));
       writer.write("<b>Packages:</b>\n");
       writer.write("<ul>\n");
@@ -202,12 +205,60 @@ class HTMLWriter {
 }
 
 /** Converts a String that may contain characters such as '<' to one that will display
- * properly in html
+ * properly in html.  Submitted by S. Bayer to http://www.rgagnon.com/javadetails/java-0306.html.
  */
 String htmlSafe(String s) {
-  return 
-    nice.tools.util.JDK.replaceAll
-      (nice.tools.util.JDK.replaceAll(s, "<", "&lt;"), ">", "&gt;");
+    StringBuffer sb = new StringBuffer(s.length());
+    //true if last char was blank - this is for handling non-breaking spaces
+    boolean lastWasBlankChar = false;
+
+    for (int i = 0; i < s.length(); i++) {
+        char c = s.charAt(i);
+        if (c == ' ') {
+            // blank gets extra work,
+            // this solves the problem you get if you replace all
+            // blanks with &nbsp;, if you do that you lose
+            // word breaking
+            if (lastWasBlankChar) {
+                lastWasBlankChar = false;
+                sb.append("&nbsp;");
+            }
+            else {
+                lastWasBlankChar = true;
+                sb.append(' ');
+            }
+        }
+        else {
+            lastWasBlankChar = false;
+            // HTML Special Chars
+            if (c == '"')
+                sb.append("&quot;");
+            else if (c == '&')
+                sb.append("&amp;");
+            else if (c == '<')
+                sb.append("&lt;");
+            else if (c == '>')
+                sb.append("&gt;");
+            else if (c == '\n')
+                // Handle Newline
+                sb.append("&lt;br/&gt;");
+            else {
+                //char and int or not related in nice, so we can't do a direct cast
+                //hence, we use int(c) instead of (int)c
+                int ci = 0xffff & int(c);
+                if(ci < 160)
+                    // nothing special only 7 Bit
+                    sb.append(c);
+                else {
+                    // Not 7 Bit use the unicode system
+                    sb.append("&#");
+                    sb.append(new Integer(ci).toString());
+                    sb.append(';');
+                }
+            }
+        }
+    }
+    return sb.toString();
 }
 
 /** Returns a string containing everything required up to and including the <body> tag

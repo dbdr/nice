@@ -45,6 +45,7 @@ localVariable(e@SymbolExp)
     return cast(e.getSymbol());
   return null;
 }
+localVariable(e@AssignExp) = localVariable(notNull(e.to));
 
 mlsub.typing.Monotype makeSure(mlsub.typing.Monotype m) = 
   notNull(bossa.syntax.Monotype.sure(nice.tools.code.Types.rawType(m)));

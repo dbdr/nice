@@ -955,6 +955,24 @@ List interfaces():
   { return res; }
 }
 
+void fieldLookahead():
+{}
+{
+  ( "override" 
+  |
+    ( "public-read" [ "private-write" ]
+    | "private-write"
+    | ( ("public" | "private" | {} ) 
+        [ "final" ]
+      )
+    ) 
+    [ "transient" ]
+    [ "volatile" ]
+  )
+  monoSymbol() 
+  ( "=" | ";" )
+}
+
 List getField(NiceClass c, List fields, List overrides, boolean storeDocString):
 {
   MonoSymbol field;
@@ -1059,7 +1077,7 @@ ClassDefinition classDefinition(Constraint cst, List definitions, boolean storeD
         initializers.add(init);
       }
     |
-      LOOKAHEAD( getField(null, null) )
+      LOOKAHEAD( fieldLookahead() )
       overrides = getField(impl, fields, overrides, storeDocString)
     | { Definition m; Token t = getToken(1); boolean isOverride = false; }
       [ "public" | "private" ]

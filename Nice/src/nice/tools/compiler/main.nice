@@ -40,8 +40,11 @@ import bossa.modules;
 */
 int compile(String[] args)
 {
+  nice.tools.util.Chronometer chrono = notNull(nice.tools.util.Chronometer.make("Total"));
+  chrono.start();
+
   ?Throwable uncaughtException = null;
-  boolean memInfo = false;
+  boolean memInfo = false, timeInfo = false;
   String mainPackage;
   ?String nativeProgram = null;
   ?String nativeCompiler = null;
@@ -141,7 +144,11 @@ int compile(String[] args)
 
    option("memory",
 	  "Print memory usage information after compilation",
-	  fun()=>{ memInfo = true; })
+	  fun()=>{ memInfo = true; }),
+
+   option("benchmark",
+	  "Print time usage information after compilation",
+	  fun()=>{ timeInfo = true; })
   ];
 
   Sequence<String> rest = parse(prg, args);
@@ -189,6 +196,13 @@ int compile(String[] args)
     }
 
   if (memInfo) printMemoryUsage();
+
+  if (timeInfo)
+    {
+      chrono.stop();
+      println("Time mesurements:");
+      nice.tools.util.Chronometer.printAll();
+    }
 
   return OutputMessages.getStatusCode();
 }

@@ -20,6 +20,7 @@ import java.io.*;
 
 import bossa.syntax.LocatedString;
 import bossa.util.*;
+import nice.tools.util.Chronometer;
 
 /** 
     Static class for loading and parsing files.
@@ -35,23 +36,31 @@ public abstract class Loader
 				   List imports,
 				   Collection importStars)
   {
-    if(parser==null)
-      parser = new Parser(r);
-    else
-      parser.ReInit(r);
-    
-    try{
-      return parser.module(definitions,imports,importStars);
-    }
-    catch(ParseException e){
-      if(e.currentToken!=null)
-	User.error(new Location(e.currentToken.next), 
-		   removeLocation(e.getMessage()));
+    chrono.start();
+    try {
+      if(parser==null)
+	parser = new Parser(r);
       else
-	User.error(e.getMessage());
-      return null;
+	parser.ReInit(r);
+    
+      try{
+	return parser.module(definitions,imports,importStars);
+      }
+      catch(ParseException e){
+	if(e.currentToken!=null)
+	  User.error(new Location(e.currentToken.next), 
+		     removeLocation(e.getMessage()));
+	else
+	  User.error(e.getMessage());
+	return null;
+      }
+    }
+    finally {
+      chrono.stop();
     }
   } 
+
+  private static Chronometer chrono = Chronometer.make("Parsing");
 
   /**
      Remove the "at line L, column C." in the error message,

@@ -30,6 +30,7 @@ import mlsub.typing.lowlevel.Element;
 import java.util.*;
 
 import bossa.util.Debug;
+import nice.tools.util.Chronometer;
 
 /**
    Static class performing the coverage and non-ambiguity test.
@@ -51,10 +52,18 @@ public final class Dispatch
   private static Collection methods;
   public static void reset() { methods = new ArrayList(); }
 
+  private static Chronometer chrono = Chronometer.make("Dispatch tests");
+
   public static void test(bossa.modules.Package module)
   {
-    for(Iterator i = methods.iterator(); i.hasNext();)
-      test((NiceMethod) i.next(), module);
+    chrono.start();
+    try {
+      for(Iterator i = methods.iterator(); i.hasNext();)
+	test((NiceMethod) i.next(), module);
+    } 
+    finally {
+      chrono.stop();
+    }
   }
   
   private static void test(NiceMethod m, bossa.modules.Package module)

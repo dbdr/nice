@@ -125,7 +125,11 @@ class DirectoryCompiledContent extends CompiledContent
 	{ 
 	  public boolean accept(File f)
 	  { 
-	    String name = f.getPath();
+	    String name = f.getName();
+
+            if (name.equals("package.nicei"))
+              return true;
+
 	    return name.endsWith(".class") 
 	      && (wantDispatch || dispatchFile.compareTo(f) != 0)
 	      && f.isFile();

@@ -43,8 +43,8 @@ NICEC1=JAVA="${java}" ${TOP}/bin/nicec ${NICEC_ARGS} -d "${TOP}/classes" --sourc
 
 all: src/nice/tools/compiler/console.jar compiler2 archive2
 
-stable:   clean bootstrap compiler1 ant testengine archiveOld
-complete: stable   compiler2 archive2
+stable:   clean bootstrap compiler1 testengine archiveOld
+complete: stable   compiler2 nicedoc ant archive2
 fixpoint: complete compiler3 archive3
 world:    fixpoint check test
 
@@ -190,8 +190,12 @@ bootstrap: parser
 
 ant:
 	@echo "Building the Ant task definition..."
-	@${javac} -sourcepath src -classpath "${ANT_CLASSPATH}:./classes:./classes.old" -d classes src/nice/tools/ant/Nicec.java ||\
+	@${javac} -sourcepath src -classpath "${ANT_CLASSPATH}:./classes:./classes.old" -d classes src/nice/tools/ant/*.java ||\
 	echo -e "Compilation of the Ant task definition failed.\n NICE_ANTJAR or ANT_HOME should be set, Ant should be in the CLASSPATH or at least linked to by ./external/ant.jar"
+
+nicedoc:
+	@echo "Building nicedoc..."
+	$(NICEC1) nice.tools.doc
 
 testengine:
 	@echo "Building the testsuite engine..."

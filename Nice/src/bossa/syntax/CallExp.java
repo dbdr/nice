@@ -248,8 +248,6 @@ public class CallExp extends Expression
 
   protected gnu.expr.Expression compile()
   {
-    if (computedExpressions == null)
-      System.out.println("NULL is " + this);
     gnu.expr.Expression[] params = Expression.compile(computedExpressions);
 
     // wraps the arguments that reference methods into LambdaExps

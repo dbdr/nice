@@ -8,6 +8,8 @@ import regtest.multipkg;
 import regtest.multipkg.a;
 import regtest.multipkg.b;
 
+import java.util.*;
+
 class AA extends regtest.multipkg.a.A {}
 class BB extends B {}
 
@@ -17,6 +19,15 @@ main(args)
 	  f(new B()) + " " + 
 	  f(new AA()) + " " + 
 	  f(new BB()));
+
+  // Tests constructors call with discarded result
+  // and access to symbols both with full qualified names and imported names.
+  // The order was significant in a bug (false ambiguity).
+  new regtest.multipkg.AA();
+  new AA();
+
+  new java.util.TreeSet();
+  new TreeSet();
 
   test_import();
 }

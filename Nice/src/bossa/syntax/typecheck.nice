@@ -41,6 +41,8 @@ typecheck(e@AssignExp)
     bossa.util.User.error(e, "" + to + " cannot be assigned a value");
 
   let variable = localVariable(to);
+  if (variable != null && Node.getCurrentFunction() instanceof FunExp)
+    variable.captured = true;
   
   try{
     e.value = notNull(e.value).resolveOverloading(to.getType());

@@ -206,3 +206,11 @@ void f() {
   {
     void bar() {}
   }
+
+/// FAIL
+  A a = new B();
+  void->void f = () => { a = new A(); };
+  if (a instanceof B) {
+    f();
+    B /* /// FAIL HERE */b = a;
+  }

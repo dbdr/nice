@@ -49,7 +49,11 @@ localVariable(e@SymbolExp)
 		sym.isAssignable())
       return null;
 
-    return cast(e.getSymbol());
+    // no type inference on captured varibles
+    if (sym.captured)
+      return null;
+
+    return sym;
   }
   return null;
 }
@@ -97,15 +101,10 @@ bossa.util.UserError ensureLocated(bossa.util.UserError e,
   if (! condition.isCallTo("instanceof") || condition.arguments.size() != 2)
     return null;
 
-  Expression arg1 = condition.arguments.getExp(0);
-  if (! (arg1 instanceof SymbolExp))
-    return null;
+  ?MonoSymbol sym = localVariable(condition.arguments.getExp(0));
 
-  SymbolExp symExp = cast(arg1);
-  if (! (symExp.getSymbol() instanceof MonoSymbol))
+  if (sym == null)
     return null;
-
-  MonoSymbol sym = cast(symExp.getSymbol());
 
   Expression arg2 = condition.arguments.getExp(1);
   if (! (arg2 instanceof TypeConstantExp))

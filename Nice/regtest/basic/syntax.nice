@@ -1,0 +1,9 @@
+package regtest.basic;
+
+// Some bizare syntactic constructs that should be accepted
+
+void syntaxTest()
+{
+  // While with empty body
+  while(false);
+}

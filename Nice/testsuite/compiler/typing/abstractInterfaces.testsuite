@@ -37,3 +37,14 @@ public <WindowListenerHandler HH> void addNiceWindowListener
   }
   class A implements I {}
   f(x@A) = new A();
+
+/// PASS
+  /// Toplevel
+
+  abstract interface I {
+    alike f();
+  }
+  abstract class A finally implements I {}
+  class B extends A {}
+  f(x@B) { A res = new B(); return res; }
+

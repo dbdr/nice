@@ -4,7 +4,10 @@ nice (0.9.5) unstable; urgency=low
     literals and simple expressions, which are converted into strings. For
     instance:
       println("x has value "x" and y has value "y);
-  * A custom serialVersionUID can be set for Nice classes using a final field.
+  * There is now complete support for serialization:
+    readObject, writeObject, readResolve and writeReplace methods can be
+    written and be recognized by the serialization process.
+    A custom serialVersionUID can be set for Nice classes using a final field:
         class X implements java.io.Serializable {
           final long serialVersionUID = 123456789L;
         }

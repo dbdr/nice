@@ -90,7 +90,7 @@ public class NiceMethod extends UserOperator
     if (homonyms == null)
       return;
 
-    mlsub.typing.Domain ourDomain = nice.tools.typing.Types.domain(this.getType());
+    let ourDomain = nice.tools.typing.Types.domain(this.getType());
 
     for (s : notNull(homonyms))
       {
@@ -104,7 +104,7 @@ public class NiceMethod extends UserOperator
         if (d.getArity() != this.getArity())
           continue;
 
-        mlsub.typing.Domain itsDomain = nice.tools.typing.Types.domain(s.getType());
+        let itsDomain = nice.tools.typing.Types.domain(s.getType());
 
         // Do we have a smaller domain?
         if (! (mlsub.typing.Typing.smaller(ourDomain, itsDomain, true))
@@ -117,11 +117,7 @@ public class NiceMethod extends UserOperator
                 ! nice.tools.typing.Types.typeParameterDispatch(s.getType(), this.getType()))
               {
                 if (! nice.tools.typing.Types.covariantSpecialization(s.getType(), this.getType()))
-                  User.error
-                    (returnTypeLocation!=null ? returnTypeLocation : this.location(),
-"The return type should be less precise than the return type of method\n" +
-d + "\ndefined in:\n" +
-                     d.location());
+		  this.reportReturnTypeError(shouldBeLess: true, than: d);
 
                 // d is a specialized version of this.
                 if (d instanceof NiceMethod)
@@ -146,6 +142,18 @@ d + "\ndefined in:\n" +
     homonyms = null;
   }
 
+  private UserError reportReturnTypeError
+    (boolean shouldBeLess, MethodDeclaration than)
+  {
+    let message = shouldBeLess ?
+"This return type should be less precise than the return type of method" :
+"This return type is less precise than the original return type of method";
+
+    return User.error
+      (returnTypeLocation != null ? returnTypeLocation : this.location(),
+       message + "\n" than "\ndefined in:\n" + than.location());
+  }
+
   /** Return true if the override of d by this is OK.
       Return false if the override should be ignored.
   */
@@ -154,13 +162,7 @@ d + "\ndefined in:\n" +
      mlsub.typing.Domain ourDomain, mlsub.typing.Domain itsDomain)
   {
     if (! nice.tools.typing.Types.covariantSpecialization(this.getType(), s.getType()))
-      {
-	User.error
-	(returnTypeLocation != null ? returnTypeLocation : this.location(),
-"The return type is less precise than the original return type of method\n" +
-	 d + "\ndefined in:\n" +
-	 d.location());
-      }
+      this.reportReturnTypeError(shouldBeLess: false, than: d);
 
     // Check if we are a proper specialization, or if we actually have
     // the same domain.

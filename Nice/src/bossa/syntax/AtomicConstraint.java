@@ -38,14 +38,14 @@ public abstract class AtomicConstraint extends Node
   
   static mlsub.typing.AtomicConstraint[] resolve(TypeScope scope, Collection c)
   {
-    if(c.size()==0)
+    if (c.size() == 0)
       return null;
     
     mlsub.typing.AtomicConstraint[] res = 
       new mlsub.typing.AtomicConstraint[c.size()];
 
-    int n =0;
-    for(Iterator i=c.iterator(); i.hasNext(); )
+    int n = 0;
+    for (Iterator i = c.iterator(); i.hasNext(); )
       res[n++] = ((AtomicConstraint) i.next()).resolve(scope);
 
     return res;

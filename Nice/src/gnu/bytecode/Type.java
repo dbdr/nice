@@ -27,8 +27,26 @@ public abstract class Type {
     return this;
   }
 
+  public static void free(java.util.Map t)
+  {
+    for (java.util.Iterator e = t.entrySet().iterator(); e.hasNext();)
+      {
+        java.util.Map.Entry k = (java.util.Map.Entry) e.next();
+        if (((Type) k.getValue()).collectable)
+          e.remove();
+      }
+  }
+
+  public boolean collectable;
+
+  public static void reset()
+  {
+    mapClassToType.clear();
+    free(mapNameToType);
+  }
+
   // Maps java.lang.Class to corresponding Type.
-  private static java.util.Hashtable mapClassToType;
+  private static java.util.Map mapClassToType;
 
   /** Maps Java type name (e.g. "java.lang.String[]") to corresponding Type. */
   static java.util.Hashtable mapNameToType;
@@ -112,12 +130,12 @@ public abstract class Type {
   {
     mapNameToType.put(name, type);
   }
-  
+
   /** Register that the Type for class is type. */
   public static void registerTypeForClass(Class clas, Type type)
   {
     if (mapClassToType == null)
-      mapClassToType = new java.util.Hashtable(100);
+      mapClassToType = new java.util.HashMap(100);
     mapClassToType.put(clas, type);
     type.reflectClass = clas;
   }
@@ -178,6 +196,7 @@ public abstract class Type {
       }
     type.reflectClass = reflectClass;
     registerTypeForClass(reflectClass, type);
+    type.collectable = true;
     return type;
   }
 

@@ -66,7 +66,10 @@ public class ClassFileInput extends DataInputStream
       to an existing class.
     */
     if (ctype.constants != null)
-      ctype = new ClassType(name);
+      {
+        ctype = new ClassType(name);
+        ctype.collectable = true;
+      }
 
     // Read the class from the file.
     new ClassFileInput(ctype, str);

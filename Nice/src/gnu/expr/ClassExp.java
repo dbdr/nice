@@ -257,6 +257,7 @@ public class ClassExp extends LambdaExp
 	instanceType = type = new ClassType(getName());
 	type.setSuper(superType);
       }
+    instanceType.collectable = true;
     // Access.SUPER mut be set on all non-interface classes
     if (! isInterface())
       accessFlags |= Access.SUPER;

@@ -2,7 +2,7 @@
   byte->String f = Byte.toString;
 
 /// FAIL
-  byte->String f = Byte.toString();
+  byte->String f = /* /// FAIL HERE */ Byte.toString();
 
 /// PASS
   // Static methods are not in the global scope.

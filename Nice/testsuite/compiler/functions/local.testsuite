@@ -19,4 +19,4 @@
   String f(int i) { throw new Error(); }
 
 /// FAIL
-  String f(int i) { if (false) throw new Error(); }
+  String /* /// FAIL HERE */ f(int i) { if (false) throw new Error(); }

@@ -34,11 +34,11 @@
 /// FAIL
   let int i;
   i = 0;
-  i = 1;
+  /* /// FAIL HERE */ i = 1;
 
 /// FAIL
   let int i = 0;
-  i = 1;
+  /* /// FAIL HERE */ i = 1;
 
 /// PASS
   var int i;
@@ -62,7 +62,7 @@
 
 /// FAIL
   let i = 0;
-  i = 1;
+  /* /// FAIL HERE */ i = 1;
 
 /// PASS
   var i = 0;

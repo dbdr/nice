@@ -18,7 +18,7 @@ int f(int x, int y)
 /// FAIL
   /// Toplevel
 void f(int x)
-  ensures result == result
+  ensures /* /// FAIL HERE */ result == result
 {}
 
 /// PASS

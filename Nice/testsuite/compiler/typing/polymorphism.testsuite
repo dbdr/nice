@@ -13,7 +13,7 @@ void usePolymorphicFunction () {
 /// FAIL
   /// COMMENT Currently we allow only <C T> if C is a type constructor.
   /// Toplevel
-  <T, T U> void f();
+  <T, /* /// FAIL HERE */ T U> void f();
 
 /// PASS
   /// Toplevel

@@ -20,7 +20,7 @@ f(x,y) = x;
 /// FAIL
   /// Toplevel
 void f(int x)
-  ensures result == result;
+  ensures /* /// FAIL HERE */ result == result;
 
 f(x) {}
 

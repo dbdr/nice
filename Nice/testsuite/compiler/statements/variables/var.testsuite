@@ -30,7 +30,7 @@ class B {
   ?(String, int) cache;
 
   void get() {
-    var ?boolean c = cache;
+    var ?boolean /* /// FAIL HERE */ c = cache;
   }
 }
 

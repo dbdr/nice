@@ -7,7 +7,7 @@
   int f(int x) = x;
 
 /// FAIL
-  String->String v = f;
+  String->String v = /* /// FAIL HERE */ f;
   /// Toplevel
   boolean f(boolean x) = x;
   int f(int x) = x;

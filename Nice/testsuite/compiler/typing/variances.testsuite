@@ -14,10 +14,10 @@ class BContrav<-T> extends AContrav<T> {}
   AInv<int> a = b;
 /// FAIL
   BInv<long> b = new BInv();
-  AInv<int> a = b;
+  AInv<int> /* /// FAIL HERE */ a = b;
 /// FAIL
   BInv<int> b = new BInv();
-  AInv<long> a = b;
+  AInv<long> /* /// FAIL HERE */ a = b;
 
 
 /// PASS
@@ -28,7 +28,7 @@ class BContrav<-T> extends AContrav<T> {}
   ACov<long> a = b;
 /// FAIL
   BCov<long> b = new BCov();
-  ACov<int> a = b;
+  ACov<int> /* /// FAIL HERE */ a = b;
 
 
 /// PASS
@@ -36,7 +36,7 @@ class BContrav<-T> extends AContrav<T> {}
   AContrav<int> a = b;
 /// FAIL
   BContrav<int> b = new BContrav();
-  AContrav<long> a = b;
+  AContrav<long> /* /// FAIL HERE */ a = b;
 /// PASS
   BContrav<long> b = new BContrav();
   AContrav<int> a = b;

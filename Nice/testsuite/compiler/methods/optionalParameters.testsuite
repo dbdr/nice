@@ -5,11 +5,11 @@ int test(int x, int y = x) = y;
 
 /// FAIL
   /// Toplevel
-int test(int x = x) = x;
+int test(int x = /* /// FAIL HERE */ x) = x;
 
 /// FAIL
   /// Toplevel
-int test(int x = y, int y = x) = y;
+int test(int x = /* /// FAIL HERE */ y, int y = x) = y;
 
 /// PASS
   assert test(0,0) == 2;

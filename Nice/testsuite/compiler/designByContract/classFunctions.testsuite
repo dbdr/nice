@@ -23,7 +23,7 @@ int f(int x, int y)
   /// Toplevel
 class A {
 void f(int x)
-  ensures result == result
+  ensures /* /// FAIL HERE */ result == result
 {}
 }
 

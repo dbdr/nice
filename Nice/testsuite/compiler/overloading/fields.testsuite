@@ -54,7 +54,7 @@
   }
 
 /// FAIL
-  let i = x;
+  let i = /* /// FAIL HERE */ x;
   /// Toplevel
   class A {
     int x;

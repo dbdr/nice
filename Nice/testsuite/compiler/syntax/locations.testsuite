@@ -9,6 +9,6 @@
 
 /// FAIL
   /// Toplevel
-  <Any T> void ignore(T x) {}
-  void f() = ignore([ "0" ].map(String s => println(s)));
+  <T> void ignore(T x) {}
+  void f() = /* /// FAIL HERE */ ignore([ "0" ].map(String s => println(s)));
 

@@ -21,9 +21,9 @@
 /// FAIL
   /// Toplevel
   enum Color {red, blue, green}
-  void foo(Color);
-  foo(red) = {};
-  foo(blue) = {};
+  void /* /// FAIL HERE */ foo(Color);
+  foo(red) {}
+  foo(blue) {}
 
 /// PASS
   assert foo(blue);
@@ -36,7 +36,7 @@
 
 /// FAIL
   /// Toplevel
-  enum Single { thing }
+  enum Single { thing /* /// FAIL HERE */ }
 
 /// PASS
   /// package a 

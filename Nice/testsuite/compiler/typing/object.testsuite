@@ -52,7 +52,7 @@ void foo(Object o) {
 }
 
 /// FAIL
-  Object o = null;
+  Object /* /// FAIL HERE */ o = null;
 
 /// PASS
   ?Object o = null;

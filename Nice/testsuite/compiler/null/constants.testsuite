@@ -8,7 +8,7 @@
   ?String str = "abc";
   let s = str;
   if (s == null)
-    s.trim();
+    s. /* /// FAIL HERE */ trim();
 
 /// PASS
   ?String str = "abc";
@@ -30,7 +30,7 @@
 /// FAIL
   ?String str = "abc";
   let s = str;
-  s = "xyz";
+  /* /// FAIL HERE */ s = "xyz";
 
 /// PASS
   if (str != null)
@@ -40,7 +40,7 @@
 
 /// FAIL
   if (str != null)
-    str.trim();
+    str. /* /// FAIL HERE */ trim();
   /// Toplevel
   var ?String str = null;
   

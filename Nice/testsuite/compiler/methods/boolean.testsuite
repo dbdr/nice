@@ -27,7 +27,7 @@ xor(false, false) = false;
 
 /// FAIL
   /// Toplevel
-boolean or(a, b);
+boolean /* /// FAIL HERE */ or(boolean a, boolean b);
 // Ambiguity for the case (@true, @true)
 or(true, boolean b) = true;
 or(boolean a, true) = true;
@@ -35,7 +35,7 @@ or(false, false) = false;
 
 /// FAIL
   /// Toplevel
-boolean nor(boolean, boolean);
+boolean /* /// FAIL HERE */ nor(boolean, boolean);
 nor(true, true) = false;
 nor(true, false) = false;
 //nor(false, true) = false; // This case is missing.

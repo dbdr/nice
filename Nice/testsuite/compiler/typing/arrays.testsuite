@@ -2,7 +2,7 @@
   ?String[] s = new String[1];
 
 /// FAIL
-  String[] s = new String[1];
+  String[] /* /// FAIL HERE */ s = new String[1];
 
 /// PASS
   /// Toplevel
@@ -12,7 +12,7 @@
 /// FAIL
   /// Toplevel
   // The result is optional even if R is not.
-  <R> R[] f(int size) = new R[size]; 
+  <R> R[] f(int size) = /* /// FAIL HERE */ new R[size]; 
 
 /// PASS
   /// Toplevel

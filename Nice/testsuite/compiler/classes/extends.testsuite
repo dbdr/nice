@@ -31,11 +31,11 @@
 
 /// FAIL
   /// Toplevel
-  class A extends A {}
+  class /* /// FAIL HERE */ A extends A {}
 
 /// FAIL
   /// Toplevel
-  class A extends B {}
+  class /* /// FAIL HERE */ A extends B {}
   class B extends A {}
 
 /// FAIL

@@ -325,7 +325,7 @@ public class NiceSourceFile {
 	 * 
 	 */
 	public boolean hasMainMethod() {
-		return _mainMethodContent.length() != 0;
+		return true;
 	}
 	
 	/**

@@ -19,3 +19,4 @@ java -Xms8M -classpath %NICEPATH%\nice.jar;%CLASSPATH% nice.tools.compiler.conso
 :end
 rem -- clean up a bit
 set NICEPATH=
+@echo on

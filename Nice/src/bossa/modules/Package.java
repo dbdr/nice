@@ -338,6 +338,12 @@ public class Package implements mlsub.compilation.Module, Located, bossa.syntax.
     if (dispatchClass == null)
       return res;
 
+    if (compiling())
+      // Force generation of the package class.
+      // We might not need to do that forever, but at the moment, a compiled 
+      // package is ignored when "fun.class" is missing.
+      getImplementationClass();
+
     // The implementation class is null if this package was up-to-date.
     if (implementationClass != null)
       thisPkg.addClass(implementationClass);

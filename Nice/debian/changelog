@@ -17,9 +17,9 @@ nice (0.9.2) unstable; urgency=low
   * Implemented simple range expressions. 'a..b' is an immutable list of int's
     from a to b(inclusive) where b >= a. Example usage:
       for (i : 1..10) println(i);
-  * In local variable declarations like 'var x = exp' is the type of x infered
-    to int when 'exp' is of type byte or short. This will avoid unexpected 
-    behaviour some cases.
+  * In local variable declarations like 'var x = exp', the inferred type
+    for x is int when 'exp' is of type byte or short. This will avoid 
+    unexpected behaviour in some cases.
   * Bugfixes (incrementation of byte local variables, require a default value
     for global variables, ...)
 

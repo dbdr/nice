@@ -1,9 +1,7 @@
+#! /bin/sh
 
 if [ ! -r Nice ]; then
   cvs -d:pserver:anonymous@$CVS_SOURCEFORGE:/cvsroot/nice export -rHEAD Nice
 fi
 
-cd Nice && make world && cd .. || exit 1
-
-export NICEC=${PWD}/Nice/bin/nicec
-export NICE_JAR=${PWD}/Nice/share/java/nice.jar
+cd Nice && make world

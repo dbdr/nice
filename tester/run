@@ -25,6 +25,9 @@ rm -rf builds
 mkdir -p builds
 cd builds
 
+export NICEC=${PWD}/builds/Nice/bin/nicec
+export NICE_JAR=${PWD}/builds/Nice/share/java/nice.jar
+
 # We run the whole set of tests once per configuration.
 # This means that the test scripts must first clean up the tree, 
 # to really rebuild the application.
@@ -38,9 +41,8 @@ for conffile in ../config.*; do
     # Redirect output
     exec > $config.log
     exec 2>&1
-
-    . ../Project 
-    if [ $? -eq 0 ]; then
+    
+    if ../Project; then
 	echo "Bootstrap SUCCESS"  > $config.res
     else
 	echo "Bootstrap FAILURE"  > $config.res
@@ -66,4 +68,10 @@ echo "Admin: $user@users.sourceforge.net" > $machine.id
 echo "System: $system"  >> $machine.id
 
 # Send the results to the Test Central
-scp -p ./*.id ./*.res ./*.log $user@shell.sourceforge.net:/home/groups/n/ni/nice/test-central/results
+results_dir=/home/groups/n/ni/nice/test-central/results
+if [ -r $results_dir ]; then
+  # We are on sourceforge!
+  cp ./*.id ./*.res ./*.log $results_dir
+else
+  scp -p ./*.id ./*.res ./*.log $user@shell.sourceforge.net:$results_dir
+fi

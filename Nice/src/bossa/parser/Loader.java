@@ -111,5 +111,12 @@ public abstract class Loader
       message.substring(end, message.length());
   }
   
+  public static Parser getParser(String toParse)
+  {
+    Reader r = new StringReader(toParse);
+    Parser parser = new Parser(r);
+    return parser;
+  }
+
   static Parser parser = null;
 }

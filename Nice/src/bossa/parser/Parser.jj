@@ -17,6 +17,7 @@
 options {
   JAVA_UNICODE_ESCAPE = true;
   DEBUG_LOOKAHEAD = false;
+  STATIC = false;
 }
 
 PARSER_BEGIN(Parser)
@@ -33,7 +34,7 @@ import mlsub.typing.TypeSymbol;
 import mlsub.typing.TypeConstructor;
 import mlsub.typing.MonotypeVar;
 
-class Parser
+public class Parser
 {
   private static IdentExp symb(String name, Token t, boolean quoted)
   {
@@ -1069,7 +1070,6 @@ ClassDefinition classDefinition(Constraint cst, List definitions, boolean storeD
 CustomConstructor customConstructor():
 {
   LocatedString name;
-  Block block;
   FormalParameters params;
   List statements = new LinkedList();
   Expression exp;
@@ -1083,16 +1083,9 @@ CustomConstructor customConstructor():
     "{"
     ( stmt=BlockStatement(statements) { statements.add(stmt); } )+
     "}"
-  |
-    ";"
   )
   {
-    if (statements.isEmpty()) 
-      block = null;
-    else 
-      block = new Block(statements);
-
-    return new CustomConstructor(name, params, block);
+    return CustomConstructor.make(name, params, new Block(statements));
   }
 }
 

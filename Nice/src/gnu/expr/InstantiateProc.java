@@ -26,7 +26,13 @@ public class InstantiateProc extends ProcedureN implements Inlineable
 {
   public InstantiateProc (Method constructor)
   {
+    this(constructor, 0);
+  }
+
+  public InstantiateProc (Method constructor, int dummyArgs)
+  {
     this.constructor = constructor;
+    this.dummyArgs = dummyArgs;
   }
 
   public InstantiateProc (ConstructorExp method)
@@ -36,6 +42,7 @@ public class InstantiateProc extends ProcedureN implements Inlineable
 
   private Method constructor;
   private ConstructorExp method;
+  private int dummyArgs;
 
   public void compile (ApplyExp exp, Compilation comp, Target target)
   {
@@ -55,8 +62,9 @@ public class InstantiateProc extends ProcedureN implements Inlineable
 
     // Add dummy arguments to match the bytecode constructor.
     if (method !=null)
-      for (int i = 0; i < method.dummyArgs; i++)
-        code.emitPushInt(0);
+      dummyArgs = method.dummyArgs;
+    for (int i = 0; i < dummyArgs; i++)
+      code.emitPushInt(0);
 
     code.emitInvokeSpecial(constructor);
     target.compileFromStack(comp, type);

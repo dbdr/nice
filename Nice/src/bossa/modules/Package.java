@@ -120,7 +120,9 @@ public class Package implements mlsub.compilation.Module, Located, bossa.syntax.
     
     compilation.progress(this, "parsing");
 
-    this.ast = new AST(this, source.getDefinitions(shouldReload));
+    definitions = new ArrayList();
+    source.getDefinitions(definitions, shouldReload);
+    this.ast = new AST(this, definitions);
     compilation.addNumberOfDeclarations(ast.numberOfDeclarations());
 
     if (compiling())
@@ -611,10 +613,24 @@ public class Package implements mlsub.compilation.Module, Located, bossa.syntax.
     ClassType classe = source.readClass(name);
     if (classe == null)
       Internal.error("Compiled class " + def + " was not found");
+    importMethods(def, classe);
     
     ClassExp res = new ClassExp(classe);
     addUserClass(res);
     return res;
+  }
+
+  /** Load methods compiled in a class (custom constructors for now). */
+  private void importMethods(NiceClass def, ClassType classe)
+  {
+    for(Method method = classe.getMethods();
+	method != null;
+	method = method.getNext())
+      {
+        Definition d = CustomConstructor.load(def, method);
+        if (d != null)
+          definitions.add(d);
+      }
   }
 
   public void addUserClass(gnu.expr.ClassExp classe)
@@ -852,6 +868,9 @@ public class Package implements mlsub.compilation.Module, Located, bossa.syntax.
   /** True if this package was specified on the command line. */
   private boolean isRoot;
   
+  /** The list of definitions. Used to add global definitions on the fly. */
+  private List definitions;
+
   private AST ast;
 
   /** The "source" where this package resides. */

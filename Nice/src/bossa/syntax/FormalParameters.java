@@ -527,6 +527,23 @@ public class FormalParameters extends Node
     return res;
   }
 
+  gnu.bytecode.Attribute asBytecodeAttribute()
+  {
+    return new gnu.bytecode.MiscAttr("parameters", this.toString().getBytes());
+  }
+
+  static FormalParameters readBytecodeAttribute(gnu.bytecode.MiscAttr attr)
+  {
+    String value = new String(attr.data);
+    try {
+      return 
+        bossa.parser.Loader.getParser(value).formalParameters(false, null);
+    }
+    catch (bossa.parser.ParseException ex) {
+      return null;
+    }
+  }
+
   private Parameter[] parameters;
   int size;
 }

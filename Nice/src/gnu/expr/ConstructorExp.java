@@ -86,6 +86,8 @@ public class ConstructorExp extends LambdaExp
     Method method = ctype.addMethod
       ("<init>", args, Type.void_type, Access.PUBLIC);
     primMethods = new Method[] { method };
+
+    addAttributes(method);
   }
 
   /** Number of dummy arguments added to make the signature unique. */

@@ -44,7 +44,7 @@ new Point((double angle, double distance) polarCoordinates)
 
   class ColoredPoint extends Point { String color; }
 
-/// PASS bug
+/// PASS
   /// package a
   /// Toplevel
   new Point(double xy) = this(x: xy, y : xy);
@@ -52,7 +52,7 @@ new Point((double angle, double distance) polarCoordinates)
   let p = new Point(xy: 10.11);
 
 
-/// PASS bug
+/// PASS
   /// package a
   /// Toplevel
   new Point(double angle, double distance) 
@@ -60,7 +60,7 @@ new Point((double angle, double distance) polarCoordinates)
   /// package b import a;
   let p = new Point(angle: 0, distance: 1);
 
-/// PASS bug
+/// PASS
   /// package a
   /// Toplevel
   class Point2 { double x; double y; }

@@ -73,10 +73,8 @@ class Content
     return imports;
   }
 
-  List getDefinitions(boolean shouldReload)
+  void getDefinitions(List definitions, boolean shouldReload)
   {
-    List definitions = new LinkedList();
-
     Content.Unit[] readers = getReaders(shouldReload);
 
     for(int i = 0; i<readers.length; i++)
@@ -89,10 +87,10 @@ class Content
 
     pkg.compilation.exitIfErrors();
     
-    return expand(definitions);
+    expand(definitions);
   }
 
-  private static List expand(List definitions)
+  private static void expand(List definitions)
   {
     Collection ads = new LinkedList();
     for(Iterator i = definitions.iterator(); i.hasNext();)
@@ -103,7 +101,6 @@ class Content
 	  ads.addAll(c);
       }
     definitions.addAll(ads);
-    return definitions;
   }
   
   private void read(Content.Unit unit, List imports, Set opens)

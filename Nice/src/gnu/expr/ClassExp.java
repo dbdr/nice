@@ -99,7 +99,7 @@ public class ClassExp extends LambdaExp
       {
         Method m = instanceType.getDeclaredMethod
           (method.getName(), method.getArgTypes());
-        if (m != null)
+        if (m != null && ! m.isConstructor())
           {
             m.eraseCode();
             method.declareThis(instanceType);

@@ -60,6 +60,7 @@ public class ClassExp extends LambdaExp
   {
     this();
     this.type = this.instanceType = type;
+    setName(type.getName());
   }
 
   public Declaration addField(String name, Type type)
@@ -680,8 +681,16 @@ public class ClassExp extends LambdaExp
   {
     if (assertionEnabledField == null)
       {
-	assertionEnabledField = ((ClassType) getType()).addField
-	  ("$assertionsEnabled", Type.boolean_type, 
+        ClassType classe = (ClassType) getType();
+
+        // Get the field if it already exists.
+        // This is the case for already compiled classes.
+	assertionEnabledField = classe.getField("$assertionsEnabled");
+        if (assertionEnabledField != null)
+          return assertionEnabledField;
+
+	assertionEnabledField = classe.addField
+	  ("$assertionsEnabled", Type.boolean_type,
 	   Access.STATIC | Access.FINAL);
 
 	addClassInitializer(new Initializer() {

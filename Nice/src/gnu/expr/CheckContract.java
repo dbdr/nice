@@ -39,9 +39,9 @@ public class CheckContract extends Expression
   public void compile (Compilation comp, Target target)
   {
     CodeAttr code = comp.getCode();
-    ClassExp currentClass = (ClassExp)comp.topLambda;
+    ClassExp currentClass = comp.curLambda.outerClass();
     code.preparePostcondition(currentClass.getAssertionEnabledField(), post.length>0);
-    if (pre.length > 0) 
+    if (pre.length > 0)
     {
       code.startPrecondition();
       for (int i = 0; i < pre.length; i++)
@@ -57,11 +57,11 @@ public class CheckContract extends Expression
       code.startPostcondition();
       for (int i = 0; i < post.length; i++)
         post[i].compileWithPosition(comp, Target.Ignore);
-    
+
       code.endPostcondition();
     }
     else
-      code.pushRetType();	
+      code.pushRetType();
 
   }
 

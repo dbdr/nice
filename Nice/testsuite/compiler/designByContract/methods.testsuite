@@ -93,3 +93,20 @@ f() {}
   /// Toplevel
   class A { ?int foo; }
   void bar(A a) requires a.foo == null || notNull(a.foo) >= 0 {}
+
+/// PASS
+  /// package a
+  /// Toplevel
+// Compilation of contracts in class methods with multiple packages
+public class Index
+{
+  final boolean relativeToEnd;
+
+  public void `-`()
+    requires this.relativeToEnd
+  {
+  }
+}
+
+  /// package b import a
+  {}

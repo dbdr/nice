@@ -6,6 +6,7 @@ nice (0.0.020300) unstable; urgency=low
       const s3 = "The type of constants can be omitted";
   * More compatibility with Java:
     - checks that all statements are reachable
+    - checks that local variables are assigned before use
     - classes can be declared public or private
     - ...
     More than half of the Jacks (java compiler testsuite) tests now pass!
@@ -13,6 +14,7 @@ nice (0.0.020300) unstable; urgency=low
   * Arrays of void values are forbidden. They most probably originate from
     a bug in the source program.
   * Bugfixes for some polymorphic operations on arrays.
+  * Bugfixed the bitshift operators >> and <<.
 
  --
 

@@ -23,3 +23,10 @@
   ///Toplevel
   String foo(boolean b) =
     (b ? new Integer(1) : new Long(2)).toString();
+
+/// PASS
+  /// Toplevel
+class A extends java.io.ObjectInputStream
+{
+  readBoolean() = false;
+}

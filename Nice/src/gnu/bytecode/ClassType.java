@@ -598,6 +598,16 @@ public class ClassType extends ObjectType implements AttrContainer {
         Method method = cl.getDeclaredMethod(name, arg_types);
         if (method != null)
           return method;
+
+        ClassType[] interfaces = cl.getInterfaces();
+        if (interfaces != null)
+          for (int i = 0;  i < interfaces.length;  i++)
+            {
+              method = interfaces[i].getMethod(name, arg_types);
+              if (method != null)
+                return method;
+            }
+
         cl = cl.getSuperclass();
         if (cl == null)
           return null;

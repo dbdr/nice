@@ -35,7 +35,7 @@ implements Located
 	(Monotype[]) monotypes.toArray(new Monotype[monotypes.size()]);
   }
   
-  static Monotype[] array0 = new Monotype[0];
+  static final Monotype[] array0 = new Monotype[0];
 
   /****************************************************************
    * Syntactic fresh monotype variables

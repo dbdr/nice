@@ -9,3 +9,11 @@ abstract class B
 {
   /*/// FAIL HERE */ methodA() {}
 }
+
+/// PASS
+  /// Toplevel
+class A {
+  <Any T> T local(void -> T f) {
+    return f();
+  }
+}

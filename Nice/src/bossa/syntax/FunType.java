@@ -35,7 +35,7 @@ public class FunType extends bossa.syntax.Monotype
 
   public FunType(bossa.syntax.Monotype[] in, bossa.syntax.Monotype out)
   {
-    this.in = in;
+    this.in = (in != null ? in : bossa.syntax.Monotype.array0);
     this.out = out;
   }
 

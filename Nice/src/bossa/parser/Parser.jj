@@ -2464,7 +2464,7 @@ Statement LocalDeclaration() :
   Expression e = null;
   boolean constant = false;
   Token t = null;
-  Statement res;
+  LocalValue res;
 }
 {
   (
@@ -2477,7 +2477,7 @@ Statement LocalDeclaration() :
   [ "=" e=Expression() ] 
   { res = bossa.syntax.dispatch.createLocalVariable(id,type,constant,e); }
   ( LOOKAHEAD( "," <IDENT> ( "=" | ";" | ",") ) 
-    "," id=ident() {e=null;} [ "=" e=Expression() ] { bossa.syntax.fun.addNextLocal(res,id,e); } )*
+    "," id=ident() {e=null;} [ "=" e=Expression() ] { res.addNext(id, e); } )*
 
   { return res; }
 }
@@ -2716,18 +2716,18 @@ Statement WhileStatement() :
 { Expression cond; Statement body; }
 {
   "while" "(" cond=Expression() ")" body=Statement()
-  { return bossa.syntax.dispatch.createWhileLoop(cond,body); }
+  { return new LoopStmt(cond, body, /*testfirst*/true); }
 }
 
 Statement DoStatement() :
 { Expression cond; Statement body; }
 {
   "do" body=Statement() "while" "(" cond=Expression() ")" ";"
-  { return bossa.syntax.dispatch.createDoLoop(cond,body); }
+  { return new LoopStmt(cond, body, /*testfirst*/false); }
 }
 
 Statement ForStatement() :
-{ Statement update = null;
+{ Block update = null;
   Statement loop = null, body, statexp;
   Expression cond = null;
   List init = new ArrayList();
@@ -2773,7 +2773,7 @@ List LocalDeclarationList() :
   { return declarations; }
 }
 
-Statement StatementExpressionList() :
+Block StatementExpressionList() :
 { Statement s; List statements=new LinkedList(); }
 {
   s=ShortStatementExpression() { statements.add(s); }
@@ -2793,7 +2793,7 @@ Statement ContinueStatement() :
 { Statement res; LocatedString label = null; }
 {
   "continue" [ label=ident() ] ";"
-  { return bossa.syntax.dispatch.createContinueStmt(label); }
+  { return new ContinueStmt(label); }
 }
 
 Statement ReturnStatement() :

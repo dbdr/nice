@@ -16,8 +16,6 @@
 
 package bossa.syntax;
 
-import mlsub.typing.*;
-
 // Interface
 
 void typecheck(?Statement);
@@ -54,7 +52,7 @@ typecheck(AssignExp e)
     e.value = e.value.resolveOverloading(to.getType());
     checkAssignment(to.getType(), e.value);
   }
-  catch(TypingEx t){
+  catch(mlsub.typing.TypingEx t){
     if (variable != null) {
       let originalType = getOriginalType(variable);
       if (originalType != null)
@@ -69,7 +67,7 @@ typecheck(AssignExp e)
 			      overrideOut: originalType);
 	  return;
 	}
-      catch (TypingEx newError) { t = newError; }
+      catch (mlsub.typing.TypingEx newError) { t = newError; }
     }
 
     ?FieldAccess field = to.getField();
@@ -93,7 +91,7 @@ typecheck(AssignExp e)
       if (originalType != null)
 	try {
 	  checkAssignment(originalType, e.value);
-	} catch (TypingEx t) {
+	} catch (mlsub.typing.TypingEx t) {
 	  throw assignmentError(e, to.toString(), 
 		to.getType().toString(), e.value);
 	}
@@ -232,16 +230,16 @@ typecheck(CallExp e)
   // Prepare the bytecode type for EnsureTypeProc
   if (t.getConstraint() != mlsub.typing.Constraint.True)
     try{
-      Typing.enter();
+      mlsub.typing.Typing.enter();
       try{
 	mlsub.typing.Constraint.enter(t.getConstraint());
 	nice.tools.code.Types.setBytecodeType(t.getMonotype());
       }
       finally{
-	Typing.leave();
+	mlsub.typing.Typing.leave();
       }
     }
-  catch(TypingEx te){
+  catch(mlsub.typing.TypingEx te){
   }
 }
 
@@ -620,7 +618,7 @@ typecheck(IncrementExp e)
     e.variable = e.variable.resolveOverloading(nice.tools.typing.PrimitiveType.longPolytype);
     checkAssignment(nice.tools.typing.PrimitiveType.longType, e.variable);
   }
-  catch(TypingEx t){
+  catch(mlsub.typing.TypingEx t){
     if (notNullError(t, e, String.valueOf(e.variable)))
       throw new bossa.util.UserError
       (e, 
@@ -645,7 +643,7 @@ typecheck(NewArrayExp e)
       try{
   	checkAssignment(nice.tools.typing.PrimitiveType.intType, dim);
       }
-      catch(TypingEx ex){
+      catch(mlsub.typing.TypingEx ex){
 	if (notNullError(ex, dim,
 			 dim.toString()))
 	  bossa.util.User.error(dim, "" + dim + " should be an integer");
@@ -709,7 +707,7 @@ typecheck(ExpLocalVariable e)
 	e.initValue = decl.value = value = value.resolveOverloading(polytype);
 	checkAssignment(type, value);
       } 
-      catch(TypingEx t){
+      catch(mlsub.typing.TypingEx t){
 	reportNullAssignmentError(decl, t, value: value, 
 				  target.getName.toString(),
 				  notNull(target.getMonotype()));
@@ -785,7 +783,7 @@ typecheck(LocalVariable decl)
 	decl.value = value = value.resolveOverloading(polytype);
 	checkAssignment(type, value);
       } 
-      catch(TypingEx t){
+      catch(mlsub.typing.TypingEx t){
 	reportNullAssignmentError(decl, t, value: value, 
 				  target.getName().toString(),
 				  notNull(target.getMonotype()));
@@ -816,9 +814,9 @@ typecheck(LocalFunction decl)
 {
   typecheck(decl.value);
   try{
-    Typing.leq(decl.inferredReturnType(), decl.declaredReturnType());
+    mlsub.typing.Typing.leq(decl.inferredReturnType(), decl.declaredReturnType());
   }
-  catch(TypingEx t){
+  catch(mlsub.typing.TypingEx t){
     if (notNullError(t, decl, "returned value"))
       wrongReturnType(decl, 
 		      String.valueOf(decl.inferredReturnType), 
@@ -955,10 +953,9 @@ typecheck(SynchronizedStmt s)
   try {
     checkNotNull(type);
   }
-  catch(TypingEx ex) {
+  catch(mlsub.typing.TypingEx ex) {
     bossa.util.User.error(s.object, "Synchonization must be done on a non-null object.\n" + s.object + " might be null.");
   }
-
     
   typecheck(s.body);
 }
@@ -981,26 +978,27 @@ void checkAssignment(mlsub.typing.Polytype left, Expression right)
   else
     {
       typecheck(right);
-      Typing.leq(right.getType(), left);
+      mlsub.typing.Typing.leq(right.getType(), left);
     }
 }
 
 void checkAssignment(mlsub.typing.Monotype left, Expression right)
 {
   typecheck(right);
-  Typing.leq(right.getType(), left);
+  mlsub.typing.Typing.leq(right.getType(), left);
 }
 
-boolean isNullError(TypingEx ex) = false;
-isNullError(MonotypeLeqEx ex)
+boolean isNullError(mlsub.typing.TypingEx ex) = false;
+
+isNullError(mlsub.typing.MonotypeLeqEx ex)
 {
   /*
     This is an approximation.
     An exact report of nullness errors would probably need
     to keep track of the lowlevel exception.
   */
-  ?TypeConstructor tc1 = notNull(ex.getM1()).head();
-  ?TypeConstructor tc2 = notNull(ex.getM2()).head();
+  let tc1 = notNull(ex.getM1()).head();
+  let tc2 = notNull(ex.getM2()).head();
 
   if (tc1 == tc2) return false;
 
@@ -1016,7 +1014,7 @@ isNullError(MonotypeLeqEx ex)
      the error is that value might be null.
    Returns true the error is not related to null types.
 */
-boolean notNullError(TypingEx ex, bossa.util.Located resp, ?String value) {
+boolean notNullError(mlsub.typing.TypingEx ex, bossa.util.Located resp, ?String value) {
   if (isNullError(ex))
     throw new bossa.util.UserError(resp, "" + value + " might be null");
   else
@@ -1027,7 +1025,7 @@ void checkBooleanCondition(Expression condition) {
   try {
     checkAssignment(nice.tools.typing.PrimitiveType.boolType, condition);
   }
-  catch(TypingEx t){
+  catch(mlsub.typing.TypingEx t){
     throw new bossa.util.UserError(condition, 
        "The condition must be a boolean.\n" + 
        condition + " has type " + condition.getType());
@@ -1053,16 +1051,16 @@ void wrongReturnType(bossa.util.Located responsible,
 void checkNotNull(mlsub.typing.Polytype type)
 {
   if (type.isMonomorphic())
-    Typing.leq(type.getMonotype(), nice.tools.typing.PrimitiveType.sureTC);
+    mlsub.typing.Typing.leq(type.getMonotype(), nice.tools.typing.PrimitiveType.sureTC);
   else
     try {
-    Typing.enter();
+    mlsub.typing.Typing.enter();
     notNull(type.getConstraint()).enter();
-    Typing.leq(type.getMonotype(), nice.tools.typing.PrimitiveType.sureTC);
-    Typing.implies();
+    mlsub.typing.Typing.leq(type.getMonotype(), nice.tools.typing.PrimitiveType.sureTC);
+    mlsub.typing.Typing.implies();
   }
   finally {
-    Typing.leave();
+    mlsub.typing.Typing.leave();
   }
 }
 

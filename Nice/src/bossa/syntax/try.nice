@@ -14,11 +14,9 @@ package bossa.syntax;
 
 import bossa.util.*;
 
-
 /**
    A try/catch/finally statement  
 */
-
 public class TryStmt extends Statement
 {
   final Statement body;

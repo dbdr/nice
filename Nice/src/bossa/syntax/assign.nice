@@ -43,9 +43,9 @@ public Expression createAssignExp(Expression to, Expression value)
       List<Argument> args = new ArrayList(to.arguments.arguments);
       args.add(new Argument(value: value)); 
 
-      return createCallExp(
-	createIdentExp(new LocatedString("set", to.function.location())),
-        new Arguments(arguments: args.toArray()));
+      return new CallExp(
+	function: createIdentExp(new LocatedString("set", to.function.location())),
+        arguments: new Arguments(arguments: args.toArray()));
     }  
 
   return new AssignExp(to: to, value: value);

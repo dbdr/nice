@@ -70,7 +70,7 @@ abstract class NiceField
 	typecheck(notNull(value));
 
 	try {
-	  Typing.leq(notNull(value).getType(), declaredType);
+	  mlsub.typing.Typing.leq(notNull(value).getType(), declaredType);
 	}
 	catch (mlsub.typing.TypingEx ex) {
 	  throw assignmentError(notNull(value), sym.getName().toString(),
@@ -209,9 +209,9 @@ final class OverridenField extends NiceField
         (original.declaringClass.translationScope(declaringClass));
 
     try {
-      Typing.leq(this.sym.type, originalType);
+      mlsub.typing.Typing.leq(this.sym.type, originalType);
     }
-    catch (TypingEx ex) {
+    catch (mlsub.typing.TypingEx ex) {
       User.error(this.sym, 
                    "The new type must be a subtype of the original type declared in " + original.declaringClass + ".\n" +
                    "Original type: " + originalType);
@@ -234,7 +234,7 @@ final class OverridenField extends NiceField
   private void checkValue(Expression value, NiceClass location)
   {
     try {
-      Typing.leq(value.getType(), this.sym.getType());
+      mlsub.typing.Typing.leq(value.getType(), this.sym.getType());
     }
     catch (mlsub.typing.TypingEx ex) {
       User.error(sym, "The default value declared in " + location +

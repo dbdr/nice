@@ -34,7 +34,7 @@ localVariable(Expression e) = null;
 localVariable(SymbolExp e)
 {
   let sym = e.symbol;
-  if (! (sym instanceof bossa.syntax.MonoSymbol))
+  if (! (sym instanceof MonoSymbol))
     return null;
 
   //don't allow nullness inference on global variables.
@@ -107,7 +107,7 @@ bossa.util.UserError ensureLocated(bossa.util.UserError e,
   if (! (arg2 instanceof TypeConstantExp))
     return null;
 
-  ?TypeConstructor tc = arg2.getTC();
+  ?mlsub.typing.TypeConstructor tc = arg2.getTC();
   if (tc == null)
     return null;
 
@@ -127,7 +127,7 @@ bossa.util.UserError ensureLocated(bossa.util.UserError e,
 
   try {
     return (sym, sureMonotype(new mlsub.typing.MonotypeConstructor(tc, parameters)));
-  } catch(BadSizeEx e) {
+  } catch(mlsub.typing.BadSizeEx e) {
     return null;
   }
 }
@@ -180,7 +180,7 @@ void printInterface(Definition, java.io.PrintWriter) = native void Definition.pr
 ?gnu.bytecode.Type TypeImport_lookup(LocatedString) = native gnu.bytecode.Type nice.tools.code.TypeImport.lookup(LocatedString);
 List<Node> children(Node) = native Node.children;
 LocatedString name(Definition) = native Definition.name;
-void addMappingsLS(TypeScope, Collection<LocatedString>, TypeSymbol[]) = native void TypeScope.addMappingsLS(Collection, TypeSymbol[]);
+void addMappingsLS(TypeScope, Collection<LocatedString>, mlsub.typing.TypeSymbol[]) = native void TypeScope.addMappingsLS(Collection, mlsub.typing.TypeSymbol[]);
 gnu.expr.CopyArgument CopyArgument(Stack<gnu.bytecode.Variable>) = native new gnu.expr.CopyArgument(Stack);
 AST AST(List<Definition>, int) = native new AST(List, int);
 ?mlsub.typing.TypeSymbol lookup(TypeMap, LocatedString) = native mlsub.typing.TypeSymbol TypeMap.lookup(LocatedString);
@@ -188,7 +188,7 @@ AST AST(List<Definition>, int) = native new AST(List, int);
 List<VarSymbol> lookup(VarScope, LocatedString) = native List VarScope.lookup(LocatedString);
 Map<gnu.bytecode.Type,mlsub.typing.TypeConstructor> javaTypeConstructors(bossa.modules.Compilation ) = native bossa.modules.Compilation.javaTypeConstructors;
 ?LocatedString name(Symbol) = native Symbol.name;
-?TypeConstructor associatedTC(mlsub.typing.Interface) = native TypeConstructor mlsub.typing.Interface.associatedTC();
+?mlsub.typing.TypeConstructor associatedTC(mlsub.typing.Interface) = native mlsub.typing.TypeConstructor mlsub.typing.Interface.associatedTC();
 mlsub.typing.AtomicConstraint[?] atoms(mlsub.typing.Constraint) = native mlsub.typing.AtomicConstraint[] mlsub.typing.Constraint.atoms();
 ?gnu.bytecode.Type Types_get(mlsub.typing.TypeConstructor) = native gnu.bytecode.Type nice.tools.code.Types.get(mlsub.typing.TypeConstructor);
 gnu.bytecode.ClassType Type_pointer_type() = native gnu.bytecode.Type.pointer_type;

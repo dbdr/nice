@@ -34,9 +34,9 @@ public class GlobalVarDeclaration extends Definition
     try{
       value = value.resolveOverloading(left.getType());
       typecheck(value);
-      Typing.leq(value.getType(),left.getType());
+      mlsub.typing.Typing.leq(value.getType(),left.getType());
     }
-    catch(TypingEx e){
+    catch(mlsub.typing.TypingEx e){
       User.error(this,"Typing error : "+left+" cannot be assigned value "+value+
 		 " of type "+value.getType()+" : \n"+
 		 e);

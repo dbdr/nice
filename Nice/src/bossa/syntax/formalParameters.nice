@@ -69,7 +69,7 @@ public class FormalParameters extends Node
     return false;
   }
   
-  void substitute(Map<java.lang.String, bossa.syntax.Monotype> map)
+  void substitute(Map<java.lang.String, Monotype> map)
   {
     for (int i = size; --i>=0; )
       if (parameters[i] != null) // it is the case for "this" placeholder

@@ -80,7 +80,7 @@ public abstract class Monotype implements Located
 /** iterates resolve() on the collection of Monotype */
 mlsub.typing.Monotype[?] resolveMonotypes(TypeMap s, Monotype[?] c)
 {
-  if(c == null || c.length == 0)
+  if (c == null || c.length == 0)
     return null;
     
   mlsub.typing.Monotype[] res = cast(new mlsub.typing.Monotype[c.length]);
@@ -180,7 +180,7 @@ public class MonotypeConstructor extends Monotype
     if (lowlevelTC == null)
       {
 	let newTC = notNull(this.tc).resolveToTC(tm);
-	if (! (newTC instanceof TypeConstructor))
+	if (! (newTC instanceof mlsub.typing.TypeConstructor))
 	  throw User.error(notNull(this.tc), notNull(this.tc)+" should be a type constructor");
 	lowlevelTC = newTC;
       }
@@ -266,10 +266,10 @@ public TypeParameters createTypeParameters(List<Monotype> tps)
    Functional type.
 
  */
-public class FunType extends bossa.syntax.Monotype
+public class FunType extends Monotype
 {
-  private bossa.syntax.Monotype[] in;
-  private bossa.syntax.Monotype out;
+  private Monotype[] in;
+  private Monotype out;
 
   rawResolve(tm)
   {
@@ -280,8 +280,7 @@ public class FunType extends bossa.syntax.Monotype
 
  substitute(map)
   {
-    bossa.syntax.Monotype res = new bossa.syntax.FunType
-      (in: in.mapToArray(Monotype t => t.substitute(map)), out: out.substitute(map));
+    Monotype res = new FunType(in: in.mapToArray(Monotype t => t.substitute(map)), out: out.substitute(map));
     res.nullness = this.nullness;
     return res;
   }
@@ -299,13 +298,12 @@ public class FunType extends bossa.syntax.Monotype
   toStringExtern() = "(" + Util.map("", ", ", "", in) + ")->" + out.toStringExtern();
 }
 
-public FunType createFunType(?List<bossa.syntax.Monotype> in, 
-		 bossa.syntax.Monotype out)
+public FunType createFunType(?List<Monotype> in, Monotype out)
 {
   return new FunType(in: (in != null ? in.toArray() : []), out: out);
 }
 
-public FunType createFunType_(bossa.syntax.Monotype[?] in, bossa.syntax.Monotype out)
+public FunType createFunType_(Monotype[?] in, Monotype out)
 {
   return new FunType(in: (in != null ? in : []), out: out);
 }
@@ -314,7 +312,7 @@ public FunType createFunType_(bossa.syntax.Monotype[?] in, bossa.syntax.Monotype
    The "alike" syntactic keyword in Monotypes
 
  */
-public class Alike extends bossa.syntax.Monotype
+public class Alike extends Monotype
 {
   private Monotype[] parameters;
   private Location loc;

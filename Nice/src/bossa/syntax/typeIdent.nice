@@ -88,7 +88,7 @@ public final class TypeIdent extends Monotype implements Located
     if (res instanceof mlsub.typing.Interface)
       return res;
 
-    if (res instanceof TypeConstructor)
+    if (res instanceof mlsub.typing.TypeConstructor)
       {
 	let def = getTypeDefinition(res);
 	if (def != null)

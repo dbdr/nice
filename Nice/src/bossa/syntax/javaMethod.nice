@@ -207,7 +207,7 @@ void findStaticJavaFields
  * Loads the methods defined in the java class
  * to make them available to the nice code.
  */
-void fetchMethods(TypeConstructor tc, gnu.bytecode.ClassType classType)
+void fetchMethods(mlsub.typing.TypeConstructor tc, gnu.bytecode.ClassType classType)
 {
   try {
     classType.addMethods();
@@ -237,7 +237,7 @@ void fetchMethods(TypeConstructor tc, gnu.bytecode.ClassType classType)
   }
 }
 
-void fetchMethod(gnu.bytecode.Method m, TypeConstructor tc, gnu.bytecode.ClassType classType)
+void fetchMethod(gnu.bytecode.Method m, mlsub.typing.TypeConstructor tc, gnu.bytecode.ClassType classType)
 {
   if (m.isConstructor())
     {

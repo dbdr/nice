@@ -44,9 +44,9 @@ void addConstructor(mlsub.typing.TypeConstructor tc, MethodDeclaration m)
   notNull(l).add(m.getSymbol());
 }
 
-void removeConstructor(TypeConstructor tc, MethodDeclaration m)
+void removeConstructor(mlsub.typing.TypeConstructor tc, MethodDeclaration m)
 {
-  ?LinkedList<MethodSymbol> l =  constructorsMap.get(tc);
+  ?LinkedList<MethodSymbol> l = constructorsMap.get(tc);
   if (l == null)
     return;
 
@@ -59,7 +59,7 @@ void removeConstructor(TypeConstructor tc, MethodDeclaration m)
  */
 boolean instantiableTC(mlsub.typing.TypeConstructor tc)
 {
-  if(tc.isConcrete())
+  if (tc.isConcrete())
     return true;
 
   let definition = getTypeDefinition(tc);

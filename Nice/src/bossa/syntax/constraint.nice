@@ -22,7 +22,7 @@ import bossa.util.*;
  */
 public class Constraint extends Node
 {
-  private List<TypeSymbol> binders;
+  private List<mlsub.typing.TypeSymbol> binders;
   private List<AtomicConstraint> atomics;
 
   /**
@@ -59,15 +59,15 @@ public class Constraint extends Node
     let i = c.binders.iterator();
     while (i.hasNext())
       {
-        TypeSymbol s = i.next();
-        if (!(s instanceof TypeConstructor))
+        let s = i.next();
+        if (!(s instanceof mlsub.typing.TypeConstructor))
           // Handle the ! constraint
           {
-            MonotypeVar mv = cast(s);
+            mlsub.typing.MonotypeVar mv = cast(s);
             let j = c.atomics.iterator();
             while (j.hasNext())
               {
-                AtomicConstraint atom = j.next();
+                let atom = j.next();
                 if (atom.isSureConstraintFor(mv))
                   {
                     if (first)
@@ -84,7 +84,7 @@ public class Constraint extends Node
             continue;
           }
 
-        TypeConstructor tc = s;
+       let tc = s;
         boolean ok = false;
         let j = c.atomics.iterator();
         while (j.hasNext())
@@ -116,7 +116,7 @@ public class Constraint extends Node
   /**
      Add the binder to the front of the list of binders.
   */
-  void addFirstBinder(TypeSymbol s)
+  void addFirstBinder(mlsub.typing.TypeSymbol s)
   {
     binders.add(0, s);
     this.addTypeSymbol(s);
@@ -125,7 +125,7 @@ public class Constraint extends Node
   /**
      Add the binder if it is not already there.
   */
-  void addBinder(TypeSymbol s)
+  void addBinder(mlsub.typing.TypeSymbol s)
   {
     if (!binders.contains(s))
       {
@@ -139,7 +139,7 @@ public class Constraint extends Node
    *
    * @param b a collection of TypeSymbol
    */
-  void addBinders(TypeSymbol[?] bs)
+  void addBinders(mlsub.typing.TypeSymbol[?] bs)
   {
     if (bs==null)
       return;
@@ -160,7 +160,7 @@ public class Constraint extends Node
 
   public boolean isTrivial() = binders.isEmpty() && atomics.isEmpty();
 
-  List<TypeSymbol> getBinders() = binders;
+  List<mlsub.typing.TypeSymbol> getBinders() = binders;
   List<AtomicConstraint> getAtoms() = atomics;
 }
 
@@ -170,7 +170,7 @@ public class Constraint extends Node
  * @param binders a collection of TypeSymbols
  * @param atomics a collection of AtomicConstraints
  */
-public Constraint createConstraint(?List<TypeSymbol> binders, ?List<AtomicConstraint> atomics)
+public Constraint createConstraint(?List<mlsub.typing.TypeSymbol> binders, ?List<AtomicConstraint> atomics)
 {
   if (binders == null && atomics == null)
     return trueConstraint;
@@ -300,7 +300,7 @@ public class MonotypeLeqCst extends AtomicConstraint
    Inequality between TypeConstructors.
 
 */
-public class TypeConstructorLeqCst extends bossa.syntax.AtomicConstraint
+public class TypeConstructorLeqCst extends AtomicConstraint
 {
   mlsub.typing.TypeConstructor t1;
   TypeIdent t2;
@@ -353,10 +353,9 @@ public class ImplementsCst extends AtomicConstraint
 
   resolve(scope)
   {
-    TypeConstructor stc = tc.resolveToTC(scope);
-    
-    TypeSymbol sitf = itf.resolveToTypeSymbol(scope);
-    if (! (sitf instanceof Interface))
+    let stc = tc.resolveToTC(scope);
+    let sitf = itf.resolveToTypeSymbol(scope);
+    if (! (sitf instanceof mlsub.typing.Interface))
       throw User.error(itf, itf+" should be an interface");
     
     return new mlsub.typing.ImplementsCst(stc, sitf);

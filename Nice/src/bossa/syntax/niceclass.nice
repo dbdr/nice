@@ -214,7 +214,7 @@ public class NiceClass extends ClassImplementation
 	typecheck(value);
 
 	try {
-	  Typing.leq(value.getType(), declaredType);
+	  mlsub.typing.Typing.leq(value.getType(), declaredType);
 	}
 	catch (mlsub.typing.TypingEx ex) {
 	  bossa.util.User.error(name, "Value does not fit in the overriden field of type " + declaredType);
@@ -325,7 +325,7 @@ public class NiceClass extends ClassImplementation
 	try {
 	  mlsub.typing.Typing.leave();
 	}
-	catch(TypingEx ex) {
+	catch(mlsub.typing.TypingEx ex) {
 	  User.error(this.definition, "Type error in field declarations");
 	}
       }
@@ -392,7 +392,7 @@ public class NiceClass extends ClassImplementation
      on the type parameters.
   */
   private List<(?MethodDeclaration, List<Parameter>)>
-	getNativeConstructorParameters(TypeConstructor tc)
+	getNativeConstructorParameters(mlsub.typing.TypeConstructor tc)
   {
     let constructors = getConstructors(tc);
     if (constructors == null)
@@ -432,7 +432,7 @@ public class NiceClass extends ClassImplementation
 		?List<mlsub.typing.AtomicConstraint> constraints)
   {
     TypeScope scope = Node.getGlobalTypeScope();
-    ?Map<TypeSymbol,TypeSymbol> map = null;
+    ?Map<mlsub.typing.TypeSymbol,mlsub.typing.TypeSymbol> map = null;
 
     if (typeParameters != null)
       {
@@ -443,8 +443,8 @@ public class NiceClass extends ClassImplementation
         let ourTypeParameters = notNull(definition.getTypeParameters());
 	for (int i = 0; i < ourTypeParameters.length; i++)
 	  try {
-            TypeSymbol ourSym = asTypeSymbol(ourTypeParameters[i]);
-            TypeSymbol sym = asTypeSymbol(typeParameters[i]);
+            let ourSym = asTypeSymbol(ourTypeParameters[i]);
+            let sym = asTypeSymbol(typeParameters[i]);
             scope.addMapping(ourSym.toString(), sym);
             notNull(map).put(ourSym, sym);
 	  } catch(TypeScope.DuplicateName e) {}
@@ -750,16 +750,16 @@ class ThisSymbol extends MonoSymbol
 
 NiceClass createNiceClass(TypeDefinition cdef) = new NiceClass(definition: cdef);
 
-private TypeSymbol asTypeSymbol(mlsub.typing.Monotype type)
+private mlsub.typing.TypeSymbol asTypeSymbol(mlsub.typing.Monotype type)
 {
-  if (type instanceof TypeSymbol)
+  if (type instanceof mlsub.typing.TypeSymbol)
     return type;
     
   assert (type instanceof mlsub.typing.MonotypeConstructor);
   return type.getTC();
 }
 
-private gnu.expr.Expression typeExpression(TypeConstructor tc)
+private gnu.expr.Expression typeExpression(mlsub.typing.TypeConstructor tc)
 {
   let c = getTypeDefinition(tc);
   if (c != null && c.getImplementation() instanceof NiceClass)
@@ -771,7 +771,7 @@ private gnu.expr.Expression typeExpression(TypeConstructor tc)
     return new gnu.expr.QuoteExp(nice.tools.code.Types.javaType(tc));
 }
 
-?NiceClass getNiceClass(TypeConstructor tc)
+?NiceClass getNiceClass(mlsub.typing.TypeConstructor tc)
 {
   let res = getTypeDefinition(tc);
   if (res != null && res.getImplementation() instanceof NiceClass)

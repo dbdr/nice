@@ -10,6 +10,8 @@
 /*                                                                        */
 /**************************************************************************/
 
+package bossa.syntax;
+
 /*
    Rewriting on the abstract syntax tree.
 
@@ -28,8 +30,6 @@
    This is useful for nullness-inference, when b test if a local variable
    is not null (the test is still known to be true in S3).
 */
-
-package bossa.syntax;
 
 Statement rewrite(Statement);
 rewrite(Statement s) = s;
@@ -68,7 +68,7 @@ Statement[] rewrite(Statement[] statements)
 ifExp(s) = null;
 ifExp(ExpressionStmt s)
 {
-  if (s.exp instanceof bossa.syntax.IfExp)
+  if (s.exp instanceof IfExp)
     return cast(s.exp);
   else
     return null;

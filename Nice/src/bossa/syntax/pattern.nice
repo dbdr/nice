@@ -43,7 +43,7 @@ public abstract class Pattern implements Located
   {
     if (typeConstructor != null)
       {
-        TypeSymbol sym = notNull(typeConstructor).resolveToTypeSymbol(scope);
+        let sym = notNull(typeConstructor).resolveToTypeSymbol(scope);
 
         if (sym instanceof mlsub.typing.TypeConstructor)
           tc = sym;
@@ -61,7 +61,7 @@ public abstract class Pattern implements Located
       }
     if (additional != null)
       {
-        TypeSymbol sym = notNull(additional).resolveToTypeSymbol(scope);
+        let sym = notNull(additional).resolveToTypeSymbol(scope);
 
         if (sym instanceof mlsub.typing.TypeConstructor)
           tc2 = sym;
@@ -350,7 +350,7 @@ public class TypePattern extends Pattern
       return new VariablePattern(name: name, loc: this.location);
 
     // don't allow integer primitive types in @type and #type patterns
-    if (!equal && Typing.testRigidLeq(tc, nice.tools.typing.PrimitiveType.longTC))
+    if (!equal && mlsub.typing.Typing.testRigidLeq(tc, nice.tools.typing.PrimitiveType.longTC))
       User.error(this.location, "A pattern cannot have a primitive type that is different from the declaration.");
 
     return this;
@@ -394,7 +394,7 @@ public class CharPattern extends ValuePattern
   setDomainTC(domaintc)
   {
     if (domaintc != null)
-      if ( Typing.testRigidLeq(domaintc, nice.tools.typing.PrimitiveType.charTC))
+      if (mlsub.typing.Typing.testRigidLeq(domaintc, nice.tools.typing.PrimitiveType.charTC))
         return;
     
     User.error(this.location, "Character value patterns are not allowed for methods where the declared parameter isn't a primitive type.");
@@ -409,12 +409,12 @@ public class IntPattern extends ValuePattern
   {
     if (domaintc != null)
       {
-	if (Typing.testRigidLeq(domaintc, nice.tools.typing.PrimitiveType.intTC))
+	if (mlsub.typing.Typing.testRigidLeq(domaintc, nice.tools.typing.PrimitiveType.intTC))
 	  {
 	    tc = nice.tools.typing.PrimitiveType.intTC;
 	    return;
           }
-        else if (Typing.testRigidLeq(domaintc, nice.tools.typing.PrimitiveType.longTC))
+        else if (mlsub.typing.Typing.testRigidLeq(domaintc, nice.tools.typing.PrimitiveType.longTC))
 	  {
 	    tc = nice.tools.typing.PrimitiveType.longTC;
 	    return;
@@ -555,14 +555,14 @@ leq(TypePattern this, TypePattern that)
     if (this.tc == that.tc)
       return this.exactlyAt || ! that.exactlyAt;
 
-    return Typing.testRigidLeq(this.tc, that.tc); 
+    return mlsub.typing.Typing.testRigidLeq(this.tc, that.tc); 
 }
 leq(Pattern this, Pattern that)
 {
   if (this.tc == that.tc)
     return true;
 
-  return Typing.testRigidLeq(this.tc, that.tc); 
+  return mlsub.typing.Typing.testRigidLeq(this.tc, that.tc); 
 }
 
 /**
@@ -603,8 +603,8 @@ disjoint(TypePattern this, TypePattern that)
     return this.tc != that.tc;
 
   if (isClassTC(notNull(this.tc)) && isClassTC(notNull(that.tc)))
-    return (! Typing.testRigidLeq(this.tc, that.tc)) &&
-	   (! Typing.testRigidLeq(that.tc, this.tc));
+    return (! mlsub.typing.Typing.testRigidLeq(this.tc, that.tc)) &&
+	   (! mlsub.typing.Typing.testRigidLeq(that.tc, this.tc));
 
   //TODO: check disjoints for all tc's with a <T | T <: TC_PA, T <: TC_PB> constraint
 
@@ -613,8 +613,8 @@ disjoint(TypePattern this, TypePattern that)
 disjoint(Pattern this, Pattern that)
 {
   if (isClassTC(notNull(this.tc)) && isClassTC(notNull(that.tc)))
-    return (! Typing.testRigidLeq(this.tc, that.tc)) &&
-	   (! Typing.testRigidLeq(that.tc, this.tc));
+    return (! mlsub.typing.Typing.testRigidLeq(this.tc, that.tc)) &&
+	   (! mlsub.typing.Typing.testRigidLeq(that.tc, this.tc));
 
   //TODO: check disjoints for all tc's with a <T | T <: TC_PA, T <: TC_PB> constraint
 
@@ -715,7 +715,7 @@ resolveGlobalConstants(IntComparePattern pattern)
 	  if (symbol.getValue() instanceof ConstantExp && !symbol.isAssignable())
 	    {
 	      ConstantExp val = cast(symbol.getValue());
-	      if (Typing.testRigidLeq(val.tc, nice.tools.typing.PrimitiveType.longTC))
+	      if (mlsub.typing.Typing.testRigidLeq(val.tc, nice.tools.typing.PrimitiveType.longTC))
                 return createPattern(pattern.kind.prefix, pattern.name, val, null, pattern.location);
 	    }
 	}
@@ -859,7 +859,7 @@ public ?Pattern readPattern(String rep, int[]/*ref*/ pos)
   if (name.equals("true") || name.equals("false") ) 
     return createPattern(createBooleanConstant(name.equals("true"), loc));
 
-  ?TypeSymbol sym = Node.getGlobalTypeScope().lookup(name);
+  let sym = Node.getGlobalTypeScope().lookup(name);
 
   if (sym == null)
     // This can happen if the class exists only in a later version

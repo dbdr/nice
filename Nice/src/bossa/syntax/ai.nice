@@ -77,7 +77,7 @@ public AbstractInterface createAbstractInterface(LocatedString name,
   let res = new AbstractInterface(name, Node.global, classConstraint: typeParameters,
 	 variance: makeVariance(typeParametersVariances), extensions: extensions);
 
-  res.itf = new Interface(res.variance, name.toString());
+  res.itf = new mlsub.typing.Interface(res.variance, name.toString());
   res.addTypeSymbol(res.itf);
   return res;
 }
@@ -95,8 +95,8 @@ public class AbstractInterfaceImplementation extends Definition
   final boolean _finally;
   final boolean _interface;
 
-  ?TypeConstructor classTC = null;
-  ?Interface interfaceITF = null;
+  ?mlsub.typing.TypeConstructor classTC = null;
+  ?mlsub.typing.Interface interfaceITF = null;
 
   resolve()
   {

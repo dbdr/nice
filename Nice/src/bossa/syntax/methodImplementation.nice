@@ -178,7 +178,7 @@ public abstract class MethodImplementation extends Definition
 		    bytecodeRepresentation(formals).getBytes()));
   }
 
-  TypeConstructor firstArgument();
+  mlsub.typing.TypeConstructor firstArgument();
 
   /**
      If the method implemented corresponds to readObject or writeObject,

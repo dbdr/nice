@@ -479,7 +479,7 @@ public class TypeConstantExp extends ConstantExp
     return new gnu.expr.ApplyExp(class_forName, [new gnu.expr.QuoteExp(representation)]);
   }
 
-  ?TypeConstructor getTC()
+  ?mlsub.typing.TypeConstructor getTC()
   {
     return notNull(nice.tools.typing.Types.rawType(representedType)).head();
   }

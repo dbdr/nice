@@ -117,7 +117,7 @@ public class InlinedMethod extends MethodDeclaration
   checkSpecialRequirements(arguments)
   {
     let proc = this.getProcedure();
-    if (proc instanceof bossa.syntax.Macro)
+    if (proc instanceof Macro)
       proc.checkSpecialRequirements(arguments);
   }
 

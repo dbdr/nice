@@ -130,18 +130,18 @@ public class SuperExp extends Expression
             let p = notNull(superAlternative).getPatterns();
             for (int i = 0; i < p.length; i++)
               if (p[i].tc != null)
-                newAtoms.add(new TypeConstructorLeqMonotypeCst(p[i].tc, m[i]));
+                newAtoms.add(new mlsub.typing.TypeConstructorLeqMonotypeCst(p[i].tc, m[i]));
           }
 	else
 	  {
-	    ?TypeConstructor superTC = null;
+	    ?mlsub.typing.TypeConstructor superTC = null;
             try {
               superTC = nice.tools.code.Types.typeConstructor(notNull(superMethod).getDeclaringClass());
             }
             catch(nice.tools.code.Types.NotIntroducedClassException ex ) {}
 
 	    if (superTC != null)
-              newAtoms.add(new TypeConstructorLeqMonotypeCst(superTC, m[0]));
+              newAtoms.add(new mlsub.typing.TypeConstructorLeqMonotypeCst(superTC, m[0]));
             else
               // Our safe bet is to assert that the argument is Object.
               newAtoms.add(new mlsub.typing.MonotypeLeqCst(sureMonotype(mlsub.typing.TopMonotype.instance), m[0]));

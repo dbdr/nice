@@ -24,7 +24,7 @@ public class NewArrayExp extends Expression
   final Expression[] knownDimensions;
   final int unknownDimensions;
 
-  private ?TypeSymbol resolvedType = null;
+  private ?mlsub.typing.TypeSymbol resolvedType = null;
 
 
   void resolveTC(TypeMap typeScope)
@@ -37,7 +37,7 @@ public class NewArrayExp extends Expression
     mlsub.typing.Monotype monotype;
     var cst = mlsub.typing.Constraint.True;
 
-    TypeConstructor[?] nullVars;
+    mlsub.typing.TypeConstructor[?] nullVars;
     boolean zero = knownDimensions.any(Expression e => e.isZero());
     /* 
        If one of the dimensions is zero, then all unknown dimensions and
@@ -47,8 +47,8 @@ public class NewArrayExp extends Expression
     */
     if (zero)
       {
-	nullVars = fill(new TypeConstructor[unknownDimensions + 1], int i => 
-		new TypeConstructor("n" + i, notNull(nice.tools.typing.PrimitiveType.maybeTC).variance, 
+	nullVars = fill(new mlsub.typing.TypeConstructor[unknownDimensions + 1], int i => 
+		new mlsub.typing.TypeConstructor("n" + i, notNull(nice.tools.typing.PrimitiveType.maybeTC).variance, 
 		false, false));
       }
     else
@@ -74,7 +74,7 @@ public class NewArrayExp extends Expression
     else
       {
 	if (!(resolvedType instanceof mlsub.typing.TypeConstructor))
-	  User.error(ident, ident + " should be a class");
+	  throw User.error(ident, ident + " should be a class");
 
 	let mlsub.typing.TypeConstructor resT = cast(resolvedType);
         typeVars = mlsub.typing.MonotypeVar.news(resT.arity());
@@ -130,14 +130,9 @@ public class NewArrayExp extends Expression
     type = new mlsub.typing.Polytype(cst, monotype);
   }
 
-  /****************************************************************
-   * Code generation
-   ****************************************************************/
-
   compile()
   {
     let t = nice.tools.code.Types.javaType(type);
-    
     return new gnu.expr.ApplyExp(
 		new nice.tools.code.MultiArrayNewProc(cast(t), knownDimensions.length),
 		Expression_compile(knownDimensions));
@@ -146,7 +141,6 @@ public class NewArrayExp extends Expression
   toString()
   {
     let res = new StringBuffer("new " + ident + Util.map("[", "][", "]", knownDimensions));
-
     for(int i=0; i<unknownDimensions; i++)
       res.append("[]");
     

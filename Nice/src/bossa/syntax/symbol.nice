@@ -162,7 +162,7 @@ public class MonoSymbol extends VarSymbol
   match(arguments)
   {
     let k = nice.tools.typing.Types.rawType(type).getKind();
-    if (k instanceof FunTypeKind)
+    if (k instanceof mlsub.typing.FunTypeKind)
       if (!notNull(arguments).plainApplication(k.domainArity, this))
 	return 0;
       else
@@ -174,7 +174,7 @@ public class MonoSymbol extends VarSymbol
   explainWhyMatchFails(arguments)
   {
     let k = nice.tools.typing.Types.rawType(type).getKind();
-    if (k instanceof FunTypeKind)
+    if (k instanceof mlsub.typing.FunTypeKind)
       { 
 	int arity = k.domainArity;
 	if (notNull(arguments).size() != arity)
@@ -227,7 +227,7 @@ public class PolySymbol extends VarSymbol
 {
   ?mlsub.typing.Polytype type = null;
   ?mlsub.typing.Polytype clonedType = null;
-  ?bossa.syntax.Polytype syntacticType = null;
+  ?Polytype syntacticType = null;
 
   {
     if (syntacticType!=null)
@@ -420,9 +420,9 @@ class ConstructorCallSymbol extends MethodSymbol
   {
     let decl = this.declaration;
 
-    if (decl instanceof bossa.syntax.Constructor)
+    if (decl instanceof Constructor)
       return decl.getInitializationCode(true);
-    else if (decl instanceof bossa.syntax.CustomConstructor)
+    else if (decl instanceof CustomConstructor)
       return decl.getInitializationCode(true);
 
     throw Internal.error("Declaration associated with ConstructorCallSymbol is not a constructor.");

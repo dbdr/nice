@@ -84,8 +84,8 @@ public class JavaClass extends ClassImplementation
  * @return null, except if javaName already had an
  * associated TypeConstructor in which case it is returned.
  */
-?TypeConstructor setTypeConstructorForJavaClass
-    (bossa.modules.Compilation compilation, TypeConstructor tc, gnu.bytecode.Type type) =
+?mlsub.typing.TypeConstructor setTypeConstructorForJavaClass
+    (bossa.modules.Compilation compilation, mlsub.typing.TypeConstructor tc, gnu.bytecode.Type type) =
     	compilation.javaTypeConstructors.put(type, tc);
 
 let gnu.bytecode.Type[] blackListClass = [
@@ -104,7 +104,7 @@ boolean excludedClass(gnu.bytecode.Type[] blackList, gnu.bytecode.Type classType
   return false;
 }
       
-boolean excludedInterface(TypeConstructor itf)
+boolean excludedInterface(mlsub.typing.TypeConstructor itf)
 {
   ?gnu.bytecode.Type t = nice.tools.code.Types.get(itf);
   if (t == null)
@@ -113,7 +113,7 @@ boolean excludedInterface(TypeConstructor itf)
   return excludedClass(blackListInterface, t);
 }
 
-TypeConstructor createJavaType(bossa.modules.Compilation compilation, String className,
+mlsub.typing.TypeConstructor createJavaType(bossa.modules.Compilation compilation, String className,
                                  gnu.bytecode.Type javaType)
 {
   if (bossa.util.Debug.javaTypes)
@@ -122,9 +122,9 @@ TypeConstructor createJavaType(bossa.modules.Compilation compilation, String cla
   // as the tc is not introduced, it should not be set instantiable
   // (thus used at link test with an error)
   // these late TCs should be avoided
-  boolean instantiable = !Typing.isInRigidContext() && instantiable(javaType);
+  boolean instantiable = !mlsub.typing.Typing.isInRigidContext() && instantiable(javaType);
       
-  TypeConstructor res = new TypeConstructor(className, null, instantiable, true);
+  let res = new mlsub.typing.TypeConstructor(className, null, instantiable, true);
 
   let old = compilation.javaTypeConstructors.put(javaType, res);
   if (old != null)
@@ -132,7 +132,7 @@ TypeConstructor createJavaType(bossa.modules.Compilation compilation, String cla
 
   nice.tools.code.Types.set(res, javaType);
     
-  if(Typing.isInRigidContext())
+  if(mlsub.typing.Typing.isInRigidContext())
     // We should not add new classes at this point.
     // It doesn't matter, as this type is not used explicitely.
   {
@@ -142,7 +142,7 @@ TypeConstructor createJavaType(bossa.modules.Compilation compilation, String cla
     return res;
   }
 
-  Typing.introduce(res);
+  mlsub.typing.Typing.introduce(res);
     
   // Recursive search for java super-classes
   if (javaType instanceof gnu.bytecode.ClassType)
@@ -158,10 +158,10 @@ TypeConstructor createJavaType(bossa.modules.Compilation compilation, String cla
       if (superClass!=null && !(excludedClass(blackListClass, superClass)))
 	{
 	  try {
-            TypeConstructor superTC = nice.tools.code.Types.typeConstructor(superClass);
-	    Typing.initialLeq(res, superTC);
+            let superTC = nice.tools.code.Types.typeConstructor(superClass);
+	    mlsub.typing.Typing.initialLeq(res, superTC);
 	  }
-	  catch(TypingEx e) {
+	  catch(mlsub.typing.TypingEx e) {
 	    Internal.warning("Invalid java super-class "+superClass+" for "+className);
 	  }
           catch(nice.tools.code.Types.NotIntroducedClassException e) {
@@ -186,10 +186,10 @@ TypeConstructor createJavaType(bossa.modules.Compilation compilation, String cla
 	      continue;
 	    
             try {
-              TypeConstructor superTC = nice.tools.code.Types.typeConstructor(itf);
-              Typing.initialLeq(res, superTC);
+              let superTC = nice.tools.code.Types.typeConstructor(itf);
+              mlsub.typing.Typing.initialLeq(res, superTC);
 	    }
-	    catch(TypingEx e) {
+	    catch(mlsub.typing.TypingEx e) {
               Internal.warning(res+" cannot implement " + itf /* + ": " + e.toString()*/);
             }
             catch(nice.tools.code.Types.NotIntroducedClassException e) {
@@ -211,11 +211,11 @@ TypeConstructor createJavaType(bossa.modules.Compilation compilation, String cla
   return res;
 }
 
-void setArity(TypeConstructor tc, int arity)
+void setArity(mlsub.typing.TypeConstructor tc, int arity)
 {
   try {
-    Variance variance = arity == 0 ? 
-	  Variance.empty() : Variance.make(new int[arity]);
+    let variance = arity == 0 ? 
+	  mlsub.typing.Variance.empty() : mlsub.typing.Variance.make(new int[arity]);
     mlsub.typing.lowlevel.Engine.setKind(tc, variance.getConstraint());
   }
   catch(mlsub.typing.lowlevel.Unsatisfiable ex) {
@@ -233,14 +233,14 @@ boolean instantiable(gnu.bytecode.Type javaType)
        gnu.bytecode.Access.INTERFACE)) == 0;
 }
 
-?TypeConstructor lookupJavaClass(String className, ?Location loc)
+?mlsub.typing.TypeConstructor lookupJavaClass(String className, ?Location loc)
 {
-  ?gnu.bytecode.Type classType = nice.tools.code.TypeImport.lookup(className, loc);
+  let classType = nice.tools.code.TypeImport.lookup(className, loc);
 
   if (classType == null)
     return null;
 
-  bossa.modules.Compilation compilation = notNull(Node.compilation);
+  let compilation = notNull(Node.compilation);
   
   if (compilation.javaTypeConstructors.containsKey(classType))
     return compilation.javaTypeConstructors.get(classType);

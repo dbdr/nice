@@ -269,7 +269,7 @@ void registerNativeMethod(RetypedJavaMethod m, gnu.bytecode.Method reflectMethod
 }
 
 void registerNativeConstructor(RetypedJavaMethod m, gnu.bytecode.Method reflectMethod,
-                                 TypeConstructor classe)
+                                 mlsub.typing.TypeConstructor classe)
 {
   ?MethodDeclaration auto = retyped.put(reflectMethod, m);
   

@@ -73,7 +73,7 @@ public class CallExp extends Expression
       // no default arguments
       {
 	this.setComputedType(notNull(getTypeAndReportErrors(this.location(), function, arguments.inOrder())), null);
-	arguments.computedExpressions = cast(arguments.inOrder());
+	arguments.computedExpressions = arguments.inOrder();
       }
 
   }
@@ -110,7 +110,7 @@ public class CallExp extends Expression
   isAssignable()
   {
     this.resolveOverloading();
-    let ?FieldAccess fa = function.getFieldAccessMethod();
+    let fa = function.getFieldAccessMethod();
     return fa != null && ! fa.isFinal();
   }
 
@@ -154,8 +154,9 @@ public class CallExp extends Expression
       }
 
     gnu.expr.Expression res;
-    if (function.isFieldAccess())
-      res = notNull(function.getFieldAccessMethod()).compileAccess(this.compileParams());
+    let fa = function.getFieldAccessMethod();
+    if (fa != null)
+      res = fa.compileAccess(this.compileParams());
     else
       res = new gnu.expr.ApplyExp(function.generateCodeInCallPosition(), this.compileParams());
     this.location().write(res);
@@ -171,7 +172,7 @@ public class CallExp extends Expression
 
   private gnu.expr.Expression[] compileParams()
   { 
-    bossa.syntax.Expression[] compexps = cast(arguments.computedExpressions);
+    Expression[] compexps = cast(arguments.computedExpressions);
 
     gnu.expr.Expression[] params = Expression_compile(compexps);
 
@@ -194,10 +195,9 @@ public class CallExp extends Expression
 
   compileAssign(gnu.expr.Expression value)
   {
-    if (!function.isFieldAccess())
-      Internal.error(this, "Assignment to a call that is not a field access");
-
-    FieldAccess access = notNull(function.getFieldAccessMethod());
+    let access = function.getFieldAccessMethod();
+    if (access == null)
+      throw Internal.error(this, "Assignment to a call that is not a field access");
 
     if (access.isFinal())
       Internal.error(this, "Field " + access + " is final");
@@ -208,8 +208,7 @@ public class CallExp extends Expression
     if (arguments.size() == 1)
       return access.compileAssign(arguments.getExp(0).generateCode(), value);
 
-    Internal.error(this, "A field access should have 0 or 1 parameter");
-    return cast(null);
+    throw Internal.error(this, "A field access should have 0 or 1 parameter");
   }
 
   toString()
@@ -289,7 +288,7 @@ public void addBlockArgument(Expression callexp, Statement block, LocatedString 
   try{
     return getType(function.getType(), paramTypes, false);
   }
-  catch(BadSizeEx e){
+  catch(mlsub.typing.BadSizeEx e){
     User.error(loc, function.toString(Printable.detailed) + 
 		" expects " + e.expected + " parameters, " +
  		"not " + e.actual);
@@ -297,8 +296,8 @@ public void addBlockArgument(Expression callexp, Statement block, LocatedString 
   catch(ReportErrorEx e){
     User.error(loc, e.getMessage());
   }
-  catch(TypingEx e){
-    if (Typing.dbg) 
+  catch(mlsub.typing.TypingEx e){
+    if (mlsub.typing.Typing.dbg) 
       bossa.util.Debug.println(e.getMessage());
 
     if (function.isFieldAccess())
@@ -342,7 +341,7 @@ private mlsub.typing.Polytype getType(mlsub.typing.Polytype type, mlsub.typing.P
   try{
     mlsub.typing.Typing.leq(m.head(), nice.tools.typing.PrimitiveType.sureTC);
   }
-  catch(TypingEx ex) {
+  catch(mlsub.typing.TypingEx ex) {
     throw new ReportErrorEx("This function may be null");
   }
 

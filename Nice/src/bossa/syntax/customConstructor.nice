@@ -81,7 +81,7 @@ public class CustomConstructor extends UserOperator
     this.getCode();
   }
 
-  private Map<String, Monotype> typeParamMap(TypeSymbol[] source, mlsub.typing.Monotype[] destination)
+  private Map<String, Monotype> typeParamMap(mlsub.typing.TypeSymbol[] source, mlsub.typing.Monotype[] destination)
   {
     Map<String, Monotype> res = new HashMap(source.length);
 
@@ -169,7 +169,7 @@ private Monotype getCCReturnType(LocatedString className, Constraint cst)
   if (cst == trueConstraint)
     return classe;
 
-  List<TypeSymbol> syms = cst.getBinders();
+  List<mlsub.typing.TypeSymbol> syms = cst.getBinders();
   Monotype[] params = cast(new Monotype[syms.size()]);
 
   for (int i = 0; i < syms.size(); i++)

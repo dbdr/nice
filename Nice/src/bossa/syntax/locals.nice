@@ -51,8 +51,8 @@ abstract class LocalDeclaration extends Statement
   {
     if (value == null)
       return this.getSymbol().toString();
-    else
-      return this.getSymbol().toString() + '=' + value;        
+
+    return this.getSymbol().toString() + '=' + value;        
   }
 }
 
@@ -208,21 +208,15 @@ public Statement createLocalFunction(LocatedString name, Monotype returnType, Fo
 }
 
 
-public Statement createLocalVariable(LocatedString name, ?Monotype type, boolean constant, ?Expression value)
+public LocalValue createLocalVariable(LocatedString name, ?Monotype type, boolean constant, ?Expression value)
 {
   if (type == null && value == null)
-    User.error(name,"A local variable requires a type or a default value");     
+    throw User.error(name,"A local variable requires a type or a default value");     
 
   if (constant && type == null)
     return new LocalConstant(name, value: notNull(value));
 
   return new LocalVariable(name, type, constant: constant, value: value);
-}
-
-public void addNextLocal(Statement localValue, LocatedString name, ?Expression value)
-{
-  LocalValue lv = cast(localValue);
-  lv.addNext(name, value);  
 }
 
 public class ExpLocalVariable extends Expression

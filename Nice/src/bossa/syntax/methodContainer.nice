@@ -132,7 +132,7 @@ public abstract class MethodContainer extends Definition
   return mlsub.typing.Variance.make(variances);
 }
 
-public class ClassConstraint extends bossa.syntax.Constraint
+public class ClassConstraint extends Constraint
 {
   /** The type parameters of the class. */
   mlsub.typing.Monotype[] typeParameters;
@@ -141,7 +141,7 @@ public class ClassConstraint extends bossa.syntax.Constraint
 /**
    @param cst an additional constraint for the type parameters of this class.
 */
-public ClassConstraint createClassConstraint(?bossa.syntax.Constraint cst, 
+public ClassConstraint createClassConstraint(?Constraint cst, 
                                   mlsub.typing.MonotypeVar[] typeParameters, List<AtomicConstraint> atoms,
                                   Location loc)
 {

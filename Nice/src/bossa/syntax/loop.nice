@@ -22,17 +22,13 @@ public class LoopStmt extends Statement
 {
   ?Expression whileExp;
   final Statement loopBody;
-  final ?Statement iterationStatements = null;
+  final ?Block iterationStatements = null;
   final boolean testFirst;
 
   ?gnu.expr.LoopExp code = null;
   private boolean mustCreateBlock = false;
 
   boolean isTestFirst() = testFirst;
-
-  /****************************************************************
-   * Code generation
-   ****************************************************************/
 
   void createBlock()
   {
@@ -83,10 +79,6 @@ public class LoopStmt extends Statement
     return res;
   }
   
-  /****************************************************************
-   * Printing
-   ****************************************************************/
-  
   toString()
   {
     if (!testFirst)
@@ -95,10 +87,9 @@ public class LoopStmt extends Statement
     if (iterationStatements == null)
       return "while (" + whileExp + ")" + loopBody;
 
-    Block itbl = cast(iterationStatements);
-    Statement[] itStatements = itbl.statements;
+    Statement[] itStatements = notNull(iterationStatements).statements;
     String itStats = "";
-    for(int i = 0; i<itStatements.length; i++)
+    for (int i = 0; i<itStatements.length; i++)
       {
 	String tmp = itStatements[i].toString();
 	itStats += tmp.substring(0, tmp.lastIndexOf(';'));
@@ -110,20 +101,10 @@ public class LoopStmt extends Statement
 }
 
 public Statement createForLoop
-  (Expression test, Statement update, Statement body, List<Statement> inits)
+  (Expression test, Block update, Statement body, List<Statement> inits)
 {
   inits.add(new LoopStmt(whileExp:test, loopBody: body, iterationStatements: update, testFirst: true));
   return createBlock(inits);
-}
-
-public LoopStmt createWhileLoop(Expression test, Statement body)
-{
-  return new LoopStmt(whileExp:test, loopBody: body, testFirst: true);
-}
-
-public LoopStmt createDoLoop(Expression test, Statement body)
-{
-  return new LoopStmt(whileExp: test, loopBody: body, testFirst: false);
 }
 
 public Statement createForInLoop(?Monotype vartype, LocatedString varName, Location loc, Expression container, Statement body)
@@ -131,13 +112,10 @@ public Statement createForInLoop(?Monotype vartype, LocatedString varName, Locat
   ?Monotype itertype = null;
 
   if (vartype != null)
-    {
-      List<Monotype> tparams = new ArrayList(1);
-      tparams.add(vartype);	
-      itertype = createMonotypeConstructor(new TypeIdent(name: new LocatedString("Iterator", loc)),
-	createTypeParameters(tparams), loc);
-      notNull(itertype).nullness = /*sure*/2;
-    }
+    itertype = new MonotypeConstructor(
+	tc: new TypeIdent(name: new LocatedString("Iterator", loc)),
+	parameters: new TypeParameters(content: [vartype]),
+	loc: loc, nullness: /*sure*/2);
 
   let getiter = createCallExp(createIdentExp(new LocatedString("forIterator", loc)), container); 
   let iter = new LocatedString(loc.uniqueIdentifier("for_in_iter_"), loc);
@@ -146,7 +124,7 @@ public Statement createForInLoop(?Monotype vartype, LocatedString varName, Locat
   let cond = createCallExp(createIdentExp(new LocatedString("hasNext", loc)), iterexp);
   let getvar = createCallExp(createIdentExp(new LocatedString("next", loc)), iterexp);
   let assign = new LocalVariable(varName, vartype, true, getvar);
-  let loop = createWhileLoop(cond, createBlock(new LinkedList([assign, body])));
+  let loop = new LoopStmt(whileExp: cond, loopBody: createBlock(new LinkedList([assign, body])), testFirst: true);
   return createBlock(new LinkedList([init, loop]));
 
 }

@@ -225,12 +225,12 @@ public class OverloadedSymbolExp extends Expression
 	let s = i.next();
 	s.makeClonedType();
 	try{
-	  Typing.leq(s.getClonedType(), expectedType);
+	  mlsub.typing.Typing.leq(s.getClonedType(), expectedType);
 	  if(bossa.util.Debug.overloading)
 	    bossa.util.Debug.println(s + "(" + s.location() + ") of type " +
 			  s.getClonedType() + " matches");
 	}
-	catch(TypingEx e){
+	catch(mlsub.typing.TypingEx e){
 	  removed.add(s);
 	  i.remove();
 	  s.releaseClonedType();
@@ -470,7 +470,7 @@ List<VarSymbol> removeNonMinimal(List<VarSymbol> symbols)
     
   for(int s1 = 0; s1<len; s1++) {
 
-    Domain d1 = nice.tools.typing.Types.domain(syms[s1].getType());
+    mlsub.typing.Domain d1 = nice.tools.typing.Types.domain(syms[s1].getType());
       
     for(int s2 = 0; s2<len; s2++)
       /*
@@ -485,19 +485,19 @@ List<VarSymbol> removeNonMinimal(List<VarSymbol> symbols)
       */
       if (s1 != s2 && !remove[s2]) {
 
-	Domain d2 = nice.tools.typing.Types.domain(syms[s2].getType());
+	mlsub.typing.Domain d2 = nice.tools.typing.Types.domain(syms[s2].getType());
 
 	try {
-	  Typing.leq(d2, d1);
+	  mlsub.typing.Typing.leq(d2, d1);
 	  try {
-	    Typing.leq(d1, d2);
+	    mlsub.typing.Typing.leq(d1, d2);
 	  }
-	  catch (TypingEx e) {
+	  catch (mlsub.typing.TypingEx e) {
 	    remove[s1] = true;
 	    break;
 	  }
 	}
-        catch(TypingEx e){
+        catch(mlsub.typing.TypingEx e){
 	}
       }
   }
@@ -537,7 +537,7 @@ private void removeNonMinimal(List<VarSymbol> symbols, Arguments arguments)
   
   for(int s1 = 0; s1<len; s1++) {
 
-    Domain d1 = domain(syms[s1].getClonedType(), 
+    mlsub.typing.Domain d1 = domain(syms[s1].getClonedType(), 
 		 	arguments.getUsedArguments(syms[s1]));
       
     for(int s2 = 0; s2<len; s2++)
@@ -552,20 +552,20 @@ private void removeNonMinimal(List<VarSymbol> symbols, Arguments arguments)
       */
       if (s1 != s2 && !remove[s2]) {
 
-	Domain d2 = domain(syms[s2].getClonedType(), 
+	mlsub.typing.Domain d2 = domain(syms[s2].getClonedType(), 
 			     arguments.getUsedArguments(syms[s2]));
 
 	try {
-	  Typing.leq(d2, d1);
+	  mlsub.typing.Typing.leq(d2, d1);
 	  try {
-	    Typing.leq(d1, d2);
+	    mlsub.typing.Typing.leq(d1, d2);
 	  }
-	  catch (TypingEx e) {
+	  catch (mlsub.typing.TypingEx e) {
 	    remove[s1] = true;
 	    break;
 	  }
 	}
-	catch(TypingEx e){
+	catch(mlsub.typing.TypingEx e){
 	}
       }
   }
@@ -581,7 +581,7 @@ private void removeNonMinimal(List<VarSymbol> symbols, Arguments arguments)
       }
 }
 
-private Domain domain(mlsub.typing.Polytype t, int[?] usedArguments)
+private mlsub.typing.Domain domain(mlsub.typing.Polytype t, int[?] usedArguments)
 {
   // remove nullness marker
   mlsub.typing.Monotype[] m = nice.tools.typing.Types.parameters(t.getMonotype());
@@ -601,7 +601,7 @@ private Domain domain(mlsub.typing.Polytype t, int[?] usedArguments)
           dom[usedArguments[i] - 1] = m[i];
     }
 
-  return new Domain(t.getConstraint(), cast(dom));
+  return new mlsub.typing.Domain(t.getConstraint(), cast(dom));
 }
 
 /**

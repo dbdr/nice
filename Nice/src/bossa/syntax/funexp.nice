@@ -38,9 +38,8 @@ interface Function
 */
 public class FunExp extends Expression implements Function
 {
-
   final MonoSymbol[] formals;
-  ?bossa.syntax.Constraint constraint;
+  ?Constraint constraint;
   final Statement body;
 
   ?mlsub.typing.Constraint cst = null;
@@ -48,7 +47,6 @@ public class FunExp extends Expression implements Function
 
   private boolean alwaysReturns = false;
   private ?mlsub.typing.Polytype _inferredReturnType = null;
-
 
   getExpectedType()
   {
@@ -108,10 +106,6 @@ public class FunExp extends Expression implements Function
     this.getType();
     return notNull(_inferredReturnType);
   }
-
-  /****************************************************************
-   * Code generation
-   ****************************************************************/
 
   compile()
   {

@@ -71,7 +71,7 @@ public class MethodBodyDefinition extends MethodImplementation
       return null;
 
     ?mlsub.typing.TypeConstructor[] additionalTags = formals.mapToArray(Pattern p => p.tc2);
-    boolean hasAdditionalTags = additionalTags.any(?TypeConstructor tc => tc != null);
+    boolean hasAdditionalTags = additionalTags.any(?mlsub.typing.TypeConstructor tc => tc != null);
 
     // Try to remember what caused the error when no symbol could be found.
     let errorList = new ErrorList();
@@ -114,7 +114,7 @@ public class MethodBodyDefinition extends MethodImplementation
             try {
               formals[p].inDomain(domain[p]);
             }
-            catch (TypingEx e) {
+            catch (mlsub.typing.TypingEx e) {
               errorList.add(m, new LocatedString("Pattern " + formals[p] +
                                 " is incompatible with " + domain[p],
 				formals[p].location()));
@@ -123,11 +123,11 @@ public class MethodBodyDefinition extends MethodImplementation
             }
 	}
 	finally{
-	  if (Typing.leave() != level)
+	  if (mlsub.typing.Typing.leave() != level)
 	    Internal.error("Enter/Leave error");
 	}
       }
-      catch(TypingEx e){
+      catch(mlsub.typing.TypingEx e){
 	if (bossa.util.Debug.overloading) bossa.util.Debug.println("Not the right choice :"+e);
 	i.remove();
       }
@@ -167,11 +167,11 @@ public class MethodBodyDefinition extends MethodImplementation
 		          try {
 		            this.domainMonotypeLeq(dom1[i], dom2[i]);
 		          }
-		          catch (TypingEx e) {
+		          catch (mlsub.typing.TypingEx e) {
 			    additionalsEqual = false;
 		          }
 		        }
-		        catch(TypingEx e) {
+		        catch(mlsub.typing.TypingEx e) {
 		          remove = false;
                           break;
 		        }
@@ -322,7 +322,7 @@ public class MethodBodyDefinition extends MethodImplementation
     try {
       try {
         mlsub.typing.Constraint.enter(notNull(notNull(declaration).getType()).getConstraint());
-        Typing.implies();
+        mlsub.typing.Typing.implies();
 
         mlsub.typing.Monotype[] domain = notNull(notNull(declaration).getType()).domain();
         for (int n = 0; n < formals.length; n++)
@@ -331,13 +331,13 @@ public class MethodBodyDefinition extends MethodImplementation
             if (formals[n].tc != null)
               formals[n] = formals[n].setDomainEq(tc != null &&
                                      nice.tools.typing.Types.isSure(domain[n]) && 
-                                     Typing.testLeq(tc, formals[n].tc));
+                                     mlsub.typing.Typing.testLeq(tc, formals[n].tc));
           }
       } finally {
         if (entered)
-          Typing.leave();
+          mlsub.typing.Typing.leave();
       }
-    } catch(TypingEx ex) {
+    } catch(mlsub.typing.TypingEx ex) {
       Internal.warning(ex.toString());
     }
   }
@@ -347,16 +347,16 @@ public class MethodBodyDefinition extends MethodImplementation
     boolean errorFound = false;
     int level;
     if (bossa.util.Debug.typing)
-      level = Typing.enter("METHOD BODY " + this + "\n\n");
+      level = mlsub.typing.Typing.enter("METHOD BODY " + this + "\n\n");
     else
-      level = Typing.enter();
+      level = mlsub.typing.Typing.enter();
 
     try {
       try {
 	try { 
 	  mlsub.typing.Constraint.enter(notNull(notNull(declaration).getType()).getConstraint());
 	}
-	catch(TypingEx e){
+	catch(mlsub.typing.TypingEx e){
 	  throw User.error(name,
 			   "the constraint will never be satisfied",
 			   ": "+e.getMessage());
@@ -387,7 +387,7 @@ public class MethodBodyDefinition extends MethodImplementation
 	// The arguments are specialized by the patterns
 	try {
 	  monotypes.inPattern(formals);
-	} catch(TypingEx e){
+	} catch(mlsub.typing.TypingEx e){
 	  throw User.error(name,"The patterns are not correct", e);
 	}
       
@@ -395,7 +395,7 @@ public class MethodBodyDefinition extends MethodImplementation
 	for (int i = 0; i < monotypes.length; i++)
 	  try {
 	    mlsub.typing.Typing.leq(monotypes[i], domain[i]);
-	  } catch(TypingEx e) {
+	  } catch(mlsub.typing.TypingEx e) {
 	    /*
 	       This type error originates from an inadequation between
 	       the pattern and the domain. The parameter types are just 
@@ -409,9 +409,9 @@ public class MethodBodyDefinition extends MethodImplementation
 	try {
 	  nice.tools.code.Types.setBytecodeType(monotypes);
 
-	  Typing.implies();
+	  mlsub.typing.Typing.implies();
 	}
-	catch(TypingEx e) {
+	catch(mlsub.typing.TypingEx e) {
 	  throw User.error(name, "Type error in method body \""+name+"\":\n"+e);
 	}
 
@@ -428,9 +428,9 @@ public class MethodBodyDefinition extends MethodImplementation
       Node.currentFunction = null;
       Node.thisExp = null;
       try {
-	if (Typing.leave() != level)
+	if (mlsub.typing.Typing.leave() != level)
 	  Internal.error("Unmatching enter/leave");
-      } catch(TypingEx e){
+      } catch(mlsub.typing.TypingEx e){
 	if (! errorFound)
 	  User.error(this, "Type error in method "+name, ": "+e);
       }

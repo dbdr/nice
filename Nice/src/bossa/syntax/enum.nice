@@ -148,7 +148,7 @@ class EnumSymbol extends MonoSymbol
        value = value.resolveOverloading(this.getType());
        typecheck(value);
        mlsub.typing.Typing.leq(value.getType(), this.getType());
-     } catch(TypingEx e) {
+     } catch(mlsub.typing.TypingEx e) {
         Internal.error(this,"Typing error in enum:");
      }
   }

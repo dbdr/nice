@@ -17,7 +17,6 @@
 package bossa.syntax;
 
 import nice.tools.ast;
-import mlsub.typing.*;
 
 // Interface
 
@@ -29,7 +28,7 @@ Expression analyse(Expression, VarScope, TypeScope);
 Info buildInfo(VarScope varScope, TypeScope typeScope);
 buildInfo(varScope, typeScope)
 {
-  let SymbolTable<TypeSymbol> t = new SymbolTable();
+  let SymbolTable<mlsub.typing.TypeSymbol> t = new SymbolTable();
   return new Info(vars: new SymbolTable(), typeVars: t,
 		  outerVarScope: varScope, outerTypeScope: typeScope,
 		  typeMap: new TypeMaper(inner: t, global: typeScope));
@@ -72,7 +71,7 @@ List<VarSymbol> lookup(VarScope scope, ?LocatedString i)
 class Info
 {
   SymbolTable<VarSymbol> vars;
-  SymbolTable<TypeSymbol> typeVars;
+  SymbolTable<mlsub.typing.TypeSymbol> typeVars;
 
   VarScope outerVarScope;
   TypeScope outerTypeScope;
@@ -179,9 +178,9 @@ class Info
   List<VarSymbol> globalLookup(LocatedString name) = 
     this.outerVarScope.lookup(name);
 
-  ?TypeSymbol lookupType(LocatedString name)
+  ?mlsub.typing.TypeSymbol lookupType(LocatedString name)
   {
-    ?TypeSymbol res = this.typeVars[name.toString()];
+    let res = this.typeVars[name.toString()];
     if (res != null)
       return res;
     else
@@ -222,8 +221,8 @@ class Info
   void addVars(MonoSymbol[] symbols) = 
     symbols.foreach(MonoSymbol s => this.addVar(s));
   
-  void addTypeVars(TypeSymbol[] symbols) = 
-    symbols.foreach(TypeSymbol s => this.typeVars[s.toString()] = s);
+  void addTypeVars(mlsub.typing.TypeSymbol[] symbols) = 
+    symbols.foreach(mlsub.typing.TypeSymbol s => this.typeVars[s.toString()] = s);
 
   void checkNotDefined(VarSymbol symbol)
   {
@@ -614,15 +613,14 @@ analyse(ConstantExp c, info)
   if (c.type != null)
     return c;
     
-  ?TypeSymbol s = info.lookupType(notNull(c.className));
+  let s = info.lookupType(notNull(c.className));
     
   if (s == null)
-    bossa.util.Internal.error
-      ("Base type " + c.className + " was not found in the standard library");
+    throw Internal.error("Base type " + c.className + " was not found in the standard library");
 
-  ?TypeConstructor tc = TypeConstructor.fromTypeSymbol(notNull(s));
+  let tc = mlsub.typing.TypeConstructor.fromTypeSymbol(s);
   if (tc == null)
-    bossa.util.Internal.error("Base type " + c.className + " is not valid");
+     throw Internal.error("Base type " + c.className + " is not valid");
   
   c.type = new mlsub.typing.Polytype
     (sureMonotype(new mlsub.typing.MonotypeConstructor(tc, null)));
@@ -648,14 +646,14 @@ mlsub.typing.Polytype typeRepresentationToPolytype(String name,
 	 sure ? sureMonotype(type) : maybeMonotype(type));
     }
 
-  ?TypeConstructor tc = Node.getGlobalTypeScope().globalLookup(name, loc);
+  ?mlsub.typing.TypeConstructor tc = Node.getGlobalTypeScope().globalLookup(name, loc);
 
   if (tc == null)
     {
       if (name.equals("Object") || name.equals("java.lang.Object"))
 	return nice.tools.typing.PrimitiveType.objectPolytype();
 
-      if (info.typeVars[name] instanceof MonotypeVar)
+      if (info.typeVars[name] instanceof mlsub.typing.MonotypeVar)
         throw new bossa.util.UserError(loc, "A type variable cannot be used here");
       else
         throw new bossa.util.UserError(loc, "Class "name" is not declared");

@@ -90,10 +90,6 @@ public class Block extends Statement
     return  new Statement[res.size()].fillWith(res);
   }
 
-  /****************************************************************
-   * Code generation
-   ****************************************************************/
-
   generateCode()
   {
     if (statements.length != 0)
@@ -129,10 +125,6 @@ public class Block extends Statement
     return res;
   }
   
-  /****************************************************************
-   * Printing
-   ****************************************************************/
-
   toString()
   {
     return "{\n"
@@ -143,7 +135,7 @@ public class Block extends Statement
 
 }
 
-public Statement createBlock(List<Statement> statements)
+public Block createBlock(List<Statement> statements)
 {
     let res = new Block(statements: cast(null));
     let stmts = res.cutInBlocks(statements);

@@ -17,7 +17,7 @@ import bossa.util.*;
 /**
    A tuple of types.
 */
-public class TupleType extends bossa.syntax.Monotype
+public class TupleType extends Monotype
 {
   List<Monotype> types;
   Location location;
@@ -27,7 +27,7 @@ public class TupleType extends bossa.syntax.Monotype
 
   substitute(map)
   {
-    bossa.syntax.Monotype res = new bossa.syntax.TupleType
+    Monotype res = new TupleType
       ( types : types.mapToArray(Monotype t => t.substitute(map)), location : location);
     res.nullness = this.nullness;
     return res;
@@ -43,9 +43,9 @@ public class TupleType extends bossa.syntax.Monotype
 /**
    Creation of a tuple.
 */
-public class TupleExp extends bossa.syntax.Expression
+public class TupleExp extends Expression
 {
-  final bossa.syntax.Expression[] expressions;
+  final Expression[] expressions;
   private mlsub.typing.Monotype[?] components = null;
   private mlsub.typing.Monotype[?] expectedComponents= null;
 
@@ -87,8 +87,7 @@ public class TupleExp extends bossa.syntax.Expression
 
         // Do the same for the elements of the tuple, since they might be
         // tuples themselves, literal arrays, ...
-        bossa.syntax.Expression.adjustToExpectedType
-          (expressions, expectedComponents);
+        Expression.adjustToExpectedType(expressions, expectedComponents);
       }
   }
 
@@ -102,7 +101,7 @@ public class TupleExp extends bossa.syntax.Expression
 
   computeType()
   {
-    let types = bossa.syntax.Expression.getType(expressions);
+    let types = Expression.getType(expressions);
     // should create a new <tt>and</tt> method without the last dummy parameters
     let cst = mlsub.typing.Constraint.and(mlsub.typing.Polytype.getConstraint(types), 
 				    null, null);
@@ -183,7 +182,7 @@ public class TupleExp extends bossa.syntax.Expression
   toString() = Util.map("(", ", ", ")", expressions);
 }
 
-public new TupleExp(List<bossa.syntax.Expression> expressions)
+public new TupleExp(List<Expression> expressions)
 {
   this(expressions: toArray(expressions));
 }

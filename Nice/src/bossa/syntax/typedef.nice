@@ -20,7 +20,7 @@ int getBytecodeFlags(TypeDefinition c);
 boolean implementsJavaInterface(TypeDefinition c, String name);
 ?mlsub.typing.Monotype lowlevelMonotype(TypeDefinition c);
 List<mlsub.typing.Interface> getInterfaces(TypeDefinition c);
-TypeConstructor[?] getJavaInterfaces(TypeDefinition c);
+mlsub.typing.TypeConstructor[?] getJavaInterfaces(TypeDefinition c);
 ?ClassDefinition getSuperClassDefinition(TypeDefinition c);
 int getVariance(TypeDefinition t);
 InterfaceDefinition[] getImplementedInterfaces(TypeDefinition c);
@@ -39,7 +39,7 @@ public abstract class TypeDefinition extends MethodContainer
  
 	// Interfaces
   ?List<MonotypeConstructor> implementations = new LinkedList(); 
-  TypeConstructor[?] javaInterfaces = null;
+  mlsub.typing.TypeConstructor[?] javaInterfaces = null;
   List<mlsub.typing.Interface> interfaces = new ArrayList(5);
   ?List<MonotypeConstructor> extensions = null;
   
@@ -61,7 +61,7 @@ public abstract class TypeDefinition extends MethodContainer
     if (arity == -1 || arity <= tpv.size())
       this.variance = makeVariance(tpv);
     else
-      this.variance = Variance.make(new int[arity]);
+      this.variance = mlsub.typing.Variance.make(new int[arity]);
     
     this.createTC();
     typeParametersVariances = null;
@@ -138,7 +138,7 @@ public abstract class TypeDefinition extends MethodContainer
       }
 
     tcToTypeDef.put(tc, this);
-    Typing.introduce(tc);
+    mlsub.typing.Typing.introduce(tc);
     this.addTypeSymbol(tc);
   }
 
@@ -256,8 +256,8 @@ public abstract class TypeDefinition extends MethodContainer
       for (mlsub.typing.Interface itf : interfaces)
         {
           try {
-            Typing.assertImp(tc, itf, true);
-          } catch(KindingEx e) {
+            mlsub.typing.Typing.assertImp(tc, itf, true);
+          } catch(mlsub.typing.KindingEx e) {
             User.error(name,
                    "Class " + name + " cannot implement " + e.t2 +
                    ": they do not have the same number or kind of type parameters");
@@ -266,8 +266,8 @@ public abstract class TypeDefinition extends MethodContainer
        
       if (abs != null)
         {
-          Typing.assertImp(tc, abs, true);
-          Typing.assertAbs(tc, abs);
+          mlsub.typing.Typing.assertImp(tc, abs, true);
+          mlsub.typing.Typing.assertAbs(tc, abs);
         }
 
      let ji = javaInterfaces;
@@ -276,16 +276,16 @@ public abstract class TypeDefinition extends MethodContainer
        for (int i = 0; i < ji.length; i++)
          if (tc.arity() == 0 || ! excludedInterface(ji[i]))
            try {
-              Typing.initialLeq(tc, ji[i]);
+              mlsub.typing.Typing.initialLeq(tc, ji[i]);
            }
-           catch(KindingEx e)  {
+           catch(mlsub.typing.KindingEx e)  {
                 User.error(name,
                            "Class " + name + " cannot implement " + e.t2 +
                            ": they do not have the same number or kind of type parameters");
            }
 
     }
-    catch(TypingEx e) {
+    catch(mlsub.typing.TypingEx e) {
       User.error(name, "Error in " + name + " : " + e.getMessage());
     }
   }
@@ -390,7 +390,7 @@ public abstract class TypeDefinition extends MethodContainer
 
     for (int i = 0; i < params.length; i++)
     {
-      if (params[i] instanceof MonotypeVar)
+      if (params[i] instanceof mlsub.typing.MonotypeVar)
       {
         typeParameters[i] = params[i];
         parentMap[i] = find(params[i], notNull(our).typeParameters);
@@ -398,11 +398,11 @@ public abstract class TypeDefinition extends MethodContainer
         continue;
       }
 
-      MonotypeVar mvar = new MonotypeVar("D" + i);
+      let mvar = new mlsub.typing.MonotypeVar("D" + i);
       binders.add(mvar);
       typeParameters[i] = mvar;
 
-      bossa.syntax.Monotype v = new MonotypeWrapper(type: mvar);
+      let v = new MonotypeWrapper(type: mvar);
       atoms.add(new MonotypeLeqCst(m1: new MonotypeWrapper(type: params[i]), m2: v));
       atoms.add(new MonotypeLeqCst(m1: v, m2: new MonotypeWrapper(type: params[i])));
     }
@@ -425,7 +425,7 @@ public abstract class TypeDefinition extends MethodContainer
   
   getInterfaces() = interfaces.toArray();
 
-  void addInterfaceImplementation(Interface itf)
+  void addInterfaceImplementation(mlsub.typing.Interface itf)
   {
     interfaces.add(itf);
   }
@@ -513,13 +513,13 @@ class ClassDefinition extends TypeDefinition
     try {
       if (superClass != null)
         try {
-	  Typing.initialLeq(tc, superClass);
-	} catch(KindingEx e) {
+	  mlsub.typing.Typing.initialLeq(tc, superClass);
+	} catch(mlsub.typing.KindingEx e) {
           User.error(name,
 		       "Class " + name + " cannot extend " + e.t2 +
 		       ": they do not have the same number or kind of type parameters");
 	}
-    } catch(TypingEx e) {
+    } catch(mlsub.typing.TypingEx e) {
 	  User.error(name, "Error in class " + name + " : " + e.getMessage());
     }  
 
@@ -558,8 +558,8 @@ class InterfaceDefinition extends TypeDefinition
   createContext()
   {
     try {
-  	  Typing.assertImp(tc, associatedInterface, true);
-    } catch(TypingEx e) {
+  	  mlsub.typing.Typing.assertImp(tc, associatedInterface, true);
+    } catch(mlsub.typing.TypingEx e) {
 	  User.error(name, "Error in interface " + name, e.getMessage());
     }
 
@@ -575,8 +575,8 @@ class InterfaceDefinition extends TypeDefinition
     for (mlsub.typing.Interface ai : interfaces)
       {
         try {
-          Typing.assertLeq(associatedInterface, ai);
-        } catch(KindingEx e) {
+          mlsub.typing.Typing.assertLeq(associatedInterface, ai);
+        } catch(mlsub.typing.KindingEx e) {
         User.error(this, "Cannot extend interface " +ai+
                           " which has a different variance");
         }
@@ -665,7 +665,7 @@ class SureTypeConstructor extends mlsub.typing.TypeConstructor
   { 
     if (parameters == null)
       return "";
-    if (parameters[0] instanceof MonotypeVar)
+    if (parameters[0] instanceof mlsub.typing.MonotypeVar)
       return "!" + parameters[0].toString(false, suffix);
     else
       //  return "!" + parameters[0].toString(); 
@@ -726,7 +726,7 @@ public mlsub.typing.Monotype[?] getTypeDefTypeParameters(mlsub.typing.TypeConstr
    Returns a monotype based on this tc, provided that the class
    requires no type parameter because it specializes its parent.
  */
-?mlsub.typing.Monotype getTypeWithTC(TypeConstructor tc)
+?mlsub.typing.Monotype getTypeWithTC(mlsub.typing.TypeConstructor tc)
 {
   ?TypeDefinition def = getTypeDefinition(tc);
 
@@ -755,7 +755,7 @@ public mlsub.typing.Monotype[?] getTypeDefTypeParameters(mlsub.typing.TypeConstr
    Returns a monotype based on this tc, provided that the class
    requires exactly these type parameters because it specializes its parent.
  */
-?mlsub.typing.Monotype getTypeWithTC(TypeConstructor tc, mlsub.typing.Monotype[?] sourceParams )
+?mlsub.typing.Monotype getTypeWithTC(mlsub.typing.TypeConstructor tc, mlsub.typing.Monotype[?] sourceParams )
 {
   ?TypeDefinition def = getTypeDefinition(tc);
 

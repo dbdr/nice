@@ -1,0 +1,81 @@
+package nice.ui.common;
+
+
+/**
+ * DECLARATION of methods to get nice.ui.beans.NiceListeners from nice.ui.beans.NiceListenerHandlers
+ */
+
+public <PropertyChangeListenerHandler H> NPropertyChangeListener[?] getNicePropertyChangeListeners(H);
+public <VetoableChangeListenerHandler H> NVetoableChangeListener[?] getNiceVetoableChangeListeners(H);
+public <MappablePropertyChangeListenerHandler H, PropertyChangeKey K> NPropertyChangeListener[?] getNicePropertyChangeListeners(H,K);
+public <MappableVetoableChangeListenerHandler H, PropertyChangeKey K> NVetoableChangeListener[?] getNiceVetoableChangeListeners(H,K);
+//JDK1.4  public <ExceptionListenerHandler H> NExceptionListener[?] getNiceExceptionListeners(H);
+
+
+
+/**
+ * methods to safely cast java listeners to their nice pendants
+ * raises a NoNiceListenerException if this is not possible
+ */
+
+NPropertyChangeListener toNicePropertyChangeListener(EventListener);
+toNicePropertyChangeListener(this) { throw new NoNiceListenerException("" + this.getClass().getName() + "is no instance of NPropertyChangeListener", listener: this); }
+toNicePropertyChangeListener(this@NPropertyChangeListener) = this;
+
+NVetoableChangeListener toNiceVetoableChangeListener(EventListener);
+toNiceVetoableChangeListener(this) { throw new NoNiceListenerException("" + this.getClass().getName() + "is no instance of NVetoableChangeListener", listener: this); }
+toNiceVetoableChangeListener(this@NVetoableChangeListener) = this;
+
+//JDK1.4  NExceptionListener toNiceExceptionListener(EventListener);
+//JDK1.4  toNiceExceptionListener(this) { throw new NoNiceListenerException("" + this.getClass().getName() + "is no instance of NExceptionListener", listener: this); }
+//JDK1.4  toNiceExceptionListener(this@NExceptionListener) = this;
+
+/**
+ * DEFINITION of functions to make sure that NAWTFooListeners can only be requested 
+ * from Gui Controls that are able to handle those NAWTFooListeners
+ */
+
+getNicePropertyChangeListeners(this)
+{
+	?java.util.List<NPropertyChangeListener> result = propertyChangeListeners.get(this.object());
+	return (result == null) ? null : result.toArray();
+}
+
+//getNicePropertyChangeListeners(this@PropertyChangeSupport)
+//{
+//	?java.util.List<NPropertyChangeListener> result = propertyChangeListeners.get(this.object());
+//	return (result == null) ? null : result.toArray();
+//}
+
+getNiceVetoableChangeListeners(this)
+{
+	?java.util.List<NVetoableChangeListener> result = vetoableChangeListeners.get(this.object());
+	return (result == null) ? null : result.toArray();
+}
+
+getNicePropertyChangeListeners(this,propertyName@String)
+{
+	?java.util.List<NPropertyChangeListener> result = mappablePropertyChangeListeners.get((this.object(),propertyName));
+	return (result == null) ? null : result.toArray();
+}
+
+getNiceVetoableChangeListeners(this,propertyName@String)
+{
+	?java.util.List<NVetoableChangeListener> result = mappableVetoableChangeListeners.get((this.object(),propertyName));
+	return (result == null) ? null : result.toArray();
+}
+
+//getNicePropertyChangeListeners(this@BeanContextChildSupport,propertyName@String)
+//{
+//	?java.util.List<NPropertyChangeListener> result = mappablePropertyChangeListeners.get((this.object(),propertyName));
+//	return (result == null) ? null : result.toArray();
+//}
+//
+//getNiceVetoableChangeListeners(this@BeanContextChildSupport,propertyName@String)
+//{
+//	?java.util.List<NVetoableChangeListener> result = mappableVetoableChangeListeners.get((this.object(),propertyName));
+//	return (result == null) ? null : result.toArray();
+//}
+
+//JDK1.4  getNiceExceptionListeners(this@Encoder) = cast(this.getExceptionListeners());
+//JDK1.4  getNiceExceptionListeners(this@XMLDecoder) = cast(this.getExceptionListeners());

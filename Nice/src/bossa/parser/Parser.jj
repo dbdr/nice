@@ -167,8 +167,8 @@ TOKEN: /* Keywords */
 
 // Assertions
 | < ASSERT:     "assert"     	>
-| < REQUIRE:    "require"     	>
-| < ENSURE:     "ensure"     	>
+| < REQUIRE:    "requires"     	>
+| < ENSURE:     "ensures"     	>
 
 // Expressions
 | < FOR:        "for"        	>
@@ -1406,7 +1406,7 @@ Contract contract() :
   Expression condition, name;
 }
 {
-  [ "require" 
+  [ "requires" 
     { res = new Contract(); }
 
       condition = Expression() 
@@ -1420,7 +1420,7 @@ Contract contract() :
     )*
     ";"
   ]
-  [ "ensure" { if (res == Contract.noContract) res = new Contract(); }
+  [ "ensures" { if (res == Contract.noContract) res = new Contract(); }
 
       condition = Expression() 
       ( ":" name = Expression() { res.addEnsure(condition, name); }

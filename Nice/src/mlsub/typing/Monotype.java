@@ -144,11 +144,16 @@ abstract public class Monotype implements mlsub.typing.lowlevel.Element
    ****************************************************************/
 
   /**
-     Print the monotype when it can be null.
+     Print the monotype, using context information.
   */
-  public String toStringNull()
+  public String toString(boolean isNull, String suffix)
   {
-    return "?" + toString();
+    String res = toString();
+    if (isNull)
+      res = "?" + res;
+    if (suffix != null)
+      res = res + suffix;
+    return res;
   }
 }
 

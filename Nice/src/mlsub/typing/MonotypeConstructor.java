@@ -143,9 +143,9 @@ public final class MonotypeConstructor extends Monotype
     return tc.toString(parameters);
   }
 
-  public String toStringNull()
+  public String toString(boolean isNull, String suffix)
   {
-    return tc.toStringNull(parameters);
+    return tc.toString(parameters, isNull, suffix);
   }
 
   public TypeConstructor tc;

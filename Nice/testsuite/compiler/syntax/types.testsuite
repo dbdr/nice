@@ -1,11 +1,33 @@
 /// PASS
+  (int) i = 0;
+
+/// PASS
+  /// package a
+  /// toplevel
   void f(int->int[] x) { x(0); }
+  /// package b import a
+  f(int x => [x]);
 
 /// PASS
+  /// package a
+  /// toplevel
   void f(Array<int->int> x) { x[0](0); }
+  /// package b import a
+  f([int x => x]);
 
 /// PASS
+  /// package a
+  /// toplevel
+  void f((int->int)[] x) { x[0](0); }
+  /// package b import a
+  f([int x => x]);  
+
+/// PASS
+  /// package a
+  /// toplevel
   void f(int->int->int x) { x(0)(0); }
+  /// package b import a
+  f(int x => int y => x);
 
 /// FAIL
   void f((int->int)->int x) 
@@ -14,13 +36,29 @@
   }
 
 /// PASS
-  int[?] a = null;
+  /// package a
+  /// toplevel
+  var int[?] a = null;
+  /// package b import a
+  a = null;
 
 /// PASS
-  (int,int) tuple = (1,2);
+  /// package a
+  /// toplevel
+  var (int,int) tuple = (1,2);
+  /// package b import a
+  (int x, int y) = tuple;
 
 /// PASS
-  (int,int)->int f = (int x, int y)=> x+y;
+  /// package a
+  /// toplevel
+  var (int,int)->int f = (int x, int y)=> x+y;
+  /// package b import a
+  f(0,1);
 
 /// PASS
-  ((int,int))->int f = ((int,int) tuple)=> 0;
+  /// package a
+  /// toplevel
+  var ((int,int))->int f = ((int,int) tuple)=> 0;
+  /// package b import a
+  f((65536,1));

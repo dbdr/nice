@@ -1,0 +1,6 @@
+/// PASS
+  /// package a
+  /// Toplevel
+  ?String[][?] f() = new String[1][];
+  /// package b import a
+  ?String[][?] s = f();

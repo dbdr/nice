@@ -158,15 +158,21 @@ public class TypeConstructor
   */
   public String toString(Monotype[] parameters)
   {
-    return "" + this + bossa.util.Util.map("<", ", ", ">", parameters);
+    return toString(parameters, false, null);
   }
 
   /**
      Print the monotype when it can be null.
   */
-  public String toStringNull(Monotype[] parameters)
+  public String toString(Monotype[] parameters, boolean isNull, String suffix)
   {
-    return "?" + toString(parameters);
+    String res = this.toString() + 
+      bossa.util.Util.map("<", ", ", ">", parameters);
+    if (isNull)
+      res = "?" + res;
+    if (suffix != null)
+      res = res + suffix;
+    return res;
   }
 
   /****************************************************************

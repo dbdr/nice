@@ -365,37 +365,39 @@ abstract public class ClassDefinition extends MethodContainer
 	{
 	  public String toString(mlsub.typing.Monotype[] parameters)
 	  { 
-	    String component = parameters[0].toString();
-	    if (component.indexOf("->") != -1)
-	      return "nice.lang.Array<"+ component + ">";
-	    else
-	      return component + "[]"; 
+	    return parameters[0].toString(false, "[]");
 	  }
 
-	  public String toStringNull(mlsub.typing.Monotype[] parameters)
+	  public String toString(mlsub.typing.Monotype[] parameters,
+				 boolean isNull, String suffix)
 	  {
-	    return parameters[0].toString() + "[?]";
+	    if (suffix == null)
+	      suffix = "";
+	    return parameters[0].toString(false, suffix + 
+					  (isNull ? "[?]" : "[]"));
 	  }
 	};
     else if (name.equals("nice.lang.Sure"))
       tc = new mlsub.typing.TypeConstructor
 	(name.toString(), mlsub.typing.NullnessKind.instance, isConcrete(), true)
 	{
-	  public String toString(mlsub.typing.Monotype[] parameters)
+	  public String toString(mlsub.typing.Monotype[] parameters,
+				 boolean isNull, String suffix)
 	  { 
 	    if (parameters[0] instanceof MonotypeVar)
-	      return "!" + parameters[0].toString();
+	      return "!" + parameters[0].toString(false, suffix);
 	    else
 	      //  return "!" + parameters[0].toString(); 
-	      return parameters[0].toString(); 
+	      return parameters[0].toString(false, suffix);
 	  }
 	};
     else if (name.equals("nice.lang.Maybe"))
       tc = new mlsub.typing.TypeConstructor
 	(name.toString(), mlsub.typing.NullnessKind.instance, isConcrete(), true)
 	{
-	  public String toString(mlsub.typing.Monotype[] parameters)
-	  { return parameters[0].toStringNull(); }
+	  public String toString(mlsub.typing.Monotype[] parameters,
+				 boolean isNull, String suffix)
+	  { return parameters[0].toString(true, suffix); }
 	};
     else if (name.equals("nice.lang.Null"))
       {

@@ -733,7 +733,13 @@ Monotype funOrTupleMonotype():
     return res; 
   }
   ]
-  { TupleType res = new TupleType(domain, new Location(start, end)); 
+  { 
+    if (domain != null && domain.size() == 1)
+      // (T) is T, the parenthesis helping to resolve ambiguities
+      {
+        return (Monotype) domain.get(0);
+      }
+    TupleType res = new TupleType(domain, new Location(start, end)); 
     res.nullness = res.absent;
     return res;
   }
@@ -743,7 +749,8 @@ Monotype monotype():
 { Monotype res; }
 {
 
-  res=arrayMonotype()
+  res = simpleMonotype()
+  res = arrayMonotype(res)
   
 [ LOOKAHEAD(1)
   { boolean maybe = false; }
@@ -757,17 +764,26 @@ Monotype monotype():
   { return res; }
 }
 
-Monotype arrayMonotype():
+/**
+   Parse an array type.
+   Uses a recursive call to reverse the order of arrays.
+   This is necessary since
+     T[?][]
+   is equivalent to
+     ?Array<Array<T>>
+   not
+     Array<?Array<T>>
+*/
+Monotype arrayMonotype(Monotype res):
 {
-  Monotype res;
   Token end;
 }
 {
-  res=simpleMonotype()
-
-( LOOKAHEAD(1)
+[ LOOKAHEAD(1)
   { boolean maybe = false; }
   ( end="[]" | end="[?]" { maybe = true; } )
+  // parse recursively until then end of array qualifiers
+  res = arrayMonotype(res)
   { 
     List tp = new LinkedList();
     tp.add(res);
@@ -778,7 +794,7 @@ Monotype arrayMonotype():
        loc);
     res.nullness = maybe ? res.maybe : res.sure;
   }
-)*
+]
 
   { return res; }
   
@@ -1177,16 +1193,21 @@ Pattern anonymousPattern(LocatedString name):
   Monotype type=null;
   Expression val = null;
   boolean exactlyAt = false;
+  Token t;
 }
 {
   (
-    "@" ( val=Literal() | tc=typeIdent() )
+    t="@" ( val=Literal() | tc=typeIdent() )
   | 
-    "#" tc=typeIdent() { exactlyAt = true; }
+    t="#" tc=typeIdent() { exactlyAt = true; }
   )
   [ "(" additional = typeIdent() ")" ]
   [ ":" type=monotype() ]
-  { return new Pattern(name, tc, val, exactlyAt, additional, type); }
+  { 
+    Location loc = name != null ? name.location() 
+      : tc != null ? tc.location() : new Location(t);
+    return new Pattern(name, tc, val, exactlyAt, additional, type, loc); 
+  }
 }
 
 void methodBodyDefinitionLookahead():

@@ -92,8 +92,22 @@ public final class FunType extends Monotype
   
   public String toString()
   {
-    return "(" + bossa.util.Util.map("", ", ", "", in)
-      + ")->" + out;
+    return toString(false, null);
+  }
+
+  public String toString(boolean isNull, String suffix)
+  {
+    StringBuffer res = new StringBuffer();
+    // If there is a suffix, use parenthesis to disambiguate.
+    if (suffix != null)
+      res.append('(');
+    res.append('(').append(bossa.util.Util.map("", ", ", "", in)).append(')');
+    if (isNull)
+      res.append('?');
+    res.append("->").append(out);
+    if (suffix != null)
+      res.append(')').append(suffix);
+    return res.toString();
   }
 
   private Monotype[] in;

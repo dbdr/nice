@@ -675,9 +675,9 @@ interface Buffer<Elem>
 
   void add(Elem element)
     requires
-         !isfull() : "not full"          // A comma here is optional
+         !isfull() : "buffer must not be not full"  // A comma here is optional
     ensures
-         !isEmpty() : "not empty",       // Note the comma
+         !isEmpty() : "buffer must not be empty",   // Note the comma
          size() == old(size()) + 1 : "count inc";
 }]]></programlisting>
       </example>
@@ -1259,7 +1259,7 @@ public class Main
       <section><title>Other aspects</title>
 	<para>
 	Fields of Nice classes are accessed normally from Java programs.
-	It is possible to declare a Java subclass of a Java class.
+	It is possible to declare a Java subclass of a Nice class.
 	The constructor will need to call the 
 	<link linkend="constructorFromJava">parent constructor</link>.
 	It is not possible to override a Nice multi-methods in a Java

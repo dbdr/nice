@@ -166,7 +166,7 @@ public class Pattern
       {
 	Typing.leq(t, type);
 	MonotypeConstructor inner = (MonotypeConstructor) type.equivalent();
-	Typing.assertMinimal(inner.getTC());
+	inner.getTC().setMinimal();
       }
   }
   

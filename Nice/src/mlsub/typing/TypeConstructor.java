@@ -57,10 +57,15 @@ public class TypeConstructor
     this(null, v, false, false);
   }
   
-  private boolean isMinimal;
+  public void setMinimal()
+  {
+    variance.getConstraint().assertMinimal(this);
+  }
 
-  public void setMinimal() { isMinimal = true; }
-  public boolean isMinimal() { return isMinimal; }
+  public boolean isMinimal() 
+  { 
+    return variance.getConstraint().isMinimal(this);
+  }
 
   public TypeSymbol cloneTypeSymbol()
   {

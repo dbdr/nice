@@ -300,9 +300,6 @@ abstract public class ClassDefinition extends MethodContainer
 			 ": they do not have the same number or kind of type parameters");
 	    }
 
-	if (isFinal)
-	  Typing.assertMinimal(tc);
-
 	if (impl != null)
 	  try{
 	    Typing.assertImp(tc, impl, true);

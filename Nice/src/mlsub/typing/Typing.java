@@ -327,11 +327,6 @@ public final class Typing
    * Type constructors
    ****************************************************************/
 
-  public static void assertMinimal(TypeConstructor t1)
-  {
-    t1.variance.getConstraint().assertMinimal(t1);
-  }
-
   public static void initialLeq(TypeConstructor t1, TypeConstructor t2)
     throws TypingEx
   {

@@ -112,7 +112,7 @@ public final class JavaClasses
       {
 	Internal.warning(className + " added late");
 	
-	res.setKind(Variance.empty().getConstraint());
+	setArity(res, 0);
 	return res;
       }
 
@@ -125,18 +125,7 @@ public final class JavaClasses
 
 	int arity = classType.getArity();
 	if (arity != -1)
-	  try {
-	    mlsub.typing.lowlevel.Engine.setKind
-	      (res, Variance.make(new int[classType.getArity()]).
-	       getConstraint());
-	  }
-	  catch(mlsub.typing.lowlevel.Unsatisfiable ex) {
-	    User.error("Java class " + className + " cannot have arity " +
-		       classType.getArity());
-	  }
-
-	if (classType.isFinal())
-	  res.setMinimal();
+	  setArity(res, classType.getArity());
 
 	ClassType superClass =  classType.getSuperclass();
 	if(superClass!=null && !(excluded(blackListClass, superClass)))
@@ -175,26 +164,37 @@ public final class JavaClasses
 		   /* + ": " + e.toString()*/);
 	      }
 	    }
+
+	// The default arity is 0.
+	if (res.getKind() == null)
+	  setArity(res, 0);
+
+	if (classType.isFinal())
+	  res.setMinimal();
       }
 
     if(javaType instanceof ClassType)
       fetchMethods(res, (ClassType) javaType);
     
-    javaTypeConstructors.add(res);
-
     return res;
+  }
+
+  private static void setArity(TypeConstructor tc, int arity)
+  {
+    try {
+      Variance variance = arity == 0 ? 
+	Variance.empty() : Variance.make(new int[arity]);
+      mlsub.typing.lowlevel.Engine.setKind
+	(tc, variance.getConstraint());
+    }
+    catch(mlsub.typing.lowlevel.Unsatisfiable ex) {
+      User.error("Java class " + tc + " cannot have arity " + arity);
+    }
   }
 
   public static void reset()
   {
   }
-
-  /**
-     The list is not reset between two compiles, because in case of error,
-     some TCs will need to be given a variance during the next compilation.
-     Otherwise they would be considered as type variables.
-  */
-  private static List javaTypeConstructors = new ArrayList(100);
 
   /**
       Remembers native methods and fields explicitly bound with a new type.
@@ -232,7 +232,8 @@ public final class JavaClasses
 	  if (md != null)
 	    possibilities.add(md.getSymbol());
 	  else
-	    Debug.println("Method " + method + " ignored");
+	    if(Debug.javaTypes)
+	      Debug.println("Method " + method + " ignored");
 	}
 
     // search a field
@@ -247,7 +248,8 @@ public final class JavaClasses
 	    if (md != null)
 	      possibilities.add(md.getSymbol());
 	    else
-	      Debug.println("Field " + field + " ignored");
+	      if(Debug.javaTypes)
+		Debug.println("Field " + field + " ignored");
 	  }
       }
     return possibilities;
@@ -334,31 +336,6 @@ public final class JavaClasses
     // not exact if the new method overload the old one 
     // with more precise types.
     return c.getMethod(m.getName(), m.getParameterTypes());
-  }
-  
-  /**
-     Assume that native classes have a 0 arity
-     unless it was asserted otherwise.
-  */
-  public static void createContext()
-  {
-    for(Iterator i = javaTypeConstructors.iterator(); i.hasNext();)
-      {
-	TypeConstructor tc = (TypeConstructor) i.next();
-	
-	if(tc.getKind() == null)
-	  try{
-	    mlsub.typing.lowlevel.Engine.setKind
-	      (tc, Variance.empty().getConstraint());
-	  }
-	  catch(mlsub.typing.lowlevel.Unsatisfiable e){
-	    User.error("Java class " + tc + " is not well kinded");
-	  }
-
-	if (tc.isMinimal())
-	  Typing.assertMinimal(tc);
-      }
-    javaTypeConstructors.clear();
   }
   
   static boolean instantiable(Type javaType)

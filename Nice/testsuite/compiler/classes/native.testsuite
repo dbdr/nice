@@ -3,3 +3,9 @@
   /// Toplevel
   <String T> T m(T);
   m(s@String) = "";
+
+/// PASS
+  /// COMMENT Check that class is not parameterized when its parents are not.
+  /// Toplevel
+class NBeanContextServicesListener 
+  implements java.beans.beancontext.BeanContextServicesListener {}

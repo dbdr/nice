@@ -239,7 +239,6 @@ public class Package implements mlsub.compilation.Module, Located, bossa.syntax.
   {
     contextFrozen = true;
 
-    bossa.syntax.JavaClasses.createContext();
     mlsub.typing.Typing.createInitialContext();
   }
 

@@ -776,6 +776,11 @@ public abstract class Engine
       k0.minimal(e.getId());
     }
     
+    public final boolean isMinimal(Element e)
+    {
+      return k0.isMinimal(e.getId());
+    }
+    
     public Element lowestInstance(Element e)
     {
       //FIXME: We don't really fulfill the contract.

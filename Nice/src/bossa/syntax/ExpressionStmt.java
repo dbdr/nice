@@ -45,5 +45,5 @@ public class ExpressionStmt extends Statement
     return exp.toString();
   }
 
-  public ExpressionRef exp;
+  Expression exp;
 }

@@ -76,5 +76,5 @@ public class ThrowStmt extends Statement
     return "throw " + exn;
   }
 
-  private Expression exn;
+  Expression exn;
 }

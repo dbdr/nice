@@ -81,6 +81,6 @@ public class ReturnStmt extends Statement
     return "return" + (value!=null ? " " + value : "");
   }
   
-  protected Expression value;
+  Expression value;
   private Function includingFunction;
 }

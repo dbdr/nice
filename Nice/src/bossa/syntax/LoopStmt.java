@@ -104,6 +104,6 @@ public class LoopStmt extends Statement
    * Fields
    ****************************************************************/
 
-  private Expression whileExp;
-  private Statement loopBody, iterationStatements;
+  Expression whileExp;
+  Statement loopBody, iterationStatements;
 }

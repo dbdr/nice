@@ -152,16 +152,15 @@ public class NiceDoc extends Task {
 			System.setProperty("user.dir", 
 												 project.getBaseDir().getAbsolutePath());
 
-			nice.tools.compiler.console.ConsoleOutput console = 
-				nice.tools.compiler.console.fun.consoleOutput();
-			Compilation compilation = bossa.modules.fun.createCompilation(console);
+			NicecListener listener = new NicecListener(this);
+			Compilation compilation = bossa.modules.fun.createCompilation(listener);
 			if (sourcepath != null)
 				compilation.sourcePath = sourcepath;
 			compilation.packagePath = classpath + (nestedClasspath != null ? File.pathSeparator+nestedClasspath : "");
 
 			nice.tools.doc.fun.generate(compilation, pack, destination);
 
-			int retval = console.statusCode;
+			int retval = listener.statusCode;
 
 			switch (retval) {
 			case nice.tools.compiler.fun.ERROR:

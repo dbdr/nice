@@ -28,6 +28,7 @@ nice (0.7.5) unstable; urgency=low
       String[][?] s = new String[1][];
     This accounts for the fact that s[0] == null, thus ensuring type safety.
   * Forbade @null patterns for method arguments that cannot be null.
+  * Report duplicate implementations of a method with the same patterns.
   * Bugfixes (compilation of tuples with primitive types using subtyping,
     clotures, returning a value inside try/finally or synchronized).
   * Fixed the nicec script on Max OS X, when gcj is not present.

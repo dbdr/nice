@@ -77,6 +77,22 @@ public abstract class Alternative
   }
 
   /**
+   * Returns true iff 'a' is strictly more precise than 'b'.
+   */
+  public static boolean less(Alternative a, Alternative b)
+  {
+    boolean strictly = false;
+
+    for (int i = 0; i < a.patterns.length; i++)
+      if (!a.patterns[i].leq(b.patterns[i]))
+	return false;
+      else if (!b.patterns[i].leq(a.patterns[i]))
+	strictly = true;
+
+    return strictly;
+  }
+
+  /**
    * Tests the matching of tags against a method alternative.
    */
   boolean matches(boolean used[], TypeConstructor[] tags)
@@ -121,6 +137,11 @@ public abstract class Alternative
   public String toString()
   {
     return methodName + Util.map("(", ", ", ")", patterns);
+  }
+
+  String printLocated()
+  {
+    return toString();
   }
 
   String methodName;

@@ -1,0 +1,7 @@
+/// FAIL
+  /// Toplevel
+class A {}
+void /*/// FAIL HERE */ f(A);
+
+f(x@A) {}
+f(x@A) {}

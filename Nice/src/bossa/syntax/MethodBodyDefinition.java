@@ -119,7 +119,7 @@ public class MethodBodyDefinition extends Definition
     return res;
   }
   
-  MethodDeclaration getDeclaration()
+  public MethodDeclaration getDeclaration()
   {
     return declaration;
   }
@@ -129,6 +129,8 @@ public class MethodBodyDefinition extends Definition
     if (d == null)
       User.error(this, "Method " + name + " is not declared");
     
+    this.declaration = d;
+
     // Overriding a mono-method can currently not dispatch on other args
     if (d instanceof JavaMethod)
       {
@@ -140,14 +142,7 @@ public class MethodBodyDefinition extends Definition
       }
     else if (d instanceof NiceMethod)
       // Register this alternative for the link test
-      alternative = new bossa.link.Alternative
-	(d.getName().toString(), ((NiceMethod) d).getFullName(), getPatterns())
-	{
-	  public gnu.expr.Expression methodExp()
-	  {
-	    return MethodBodyDefinition.this.getRefExp();
-	  }
-	};
+      alternative = new bossa.link.SourceAlternative(this);
     else
       User.error(this, "Implementations can only be made for methods, but " + 
 		 d.getName() + " is a function.\nIt was defined at:\n" + 
@@ -156,7 +151,6 @@ public class MethodBodyDefinition extends Definition
     if (d.isMain())
       User.warning(this, "This syntax for the main function is deprecated.\nPlease use instead the following:\n\nvoid main(String[] args)\n{\n  ...\n}");
 
-    this.declaration = d;
     parameters = buildSymbols(this.formals, declaration.getArgTypes());
     scope.addSymbols(parameters);
   }

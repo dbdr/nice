@@ -173,17 +173,18 @@ public final class Dispatch
 	i.hasNext();)
       {
 	Alternative a = (Alternative) i.next();
-	if(a.matches(used, tags))
-	  if(first==null)
+	if (a.matches(used, tags))
+	  if (first == null)
 	    first = a;
-	  else if(!Alternative.leq(first,a))
+	  else if (!Alternative.less(first, a))
 	    {
 	      failed = true;
 	      User.warning
 		(method,
 		 "Ambiguity for method "+method+
-		 "For parameters of type " + toString(used, tags)+
-		 "\nboth "+first+" and "+a+" match");
+		 "\nFor parameters of type " + toString(used, tags)+
+		 "\nboth\n" + first.printLocated() + 
+		 "\nand\n" + a.printLocated() + "\nmatch.");
 	    }
       }
     if(first==null)

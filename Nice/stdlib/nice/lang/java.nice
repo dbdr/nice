@@ -323,13 +323,48 @@ class Vector<T> extends AbstractList<T> = native java.util.Vector;
   native Object Collections.max(Collection, Comparator);
 <T,U | T <: U> T min(Collection<T>, Comparator<U>) = 
   native Object Collections.max(Collection, Comparator);
-<T> void sort(List<T>, Comparator<T>) = 
+<T, U | T <: U> void sort(List<T>, Comparator<U>) = 
   native void Collections.sort(List, Comparator);
-<T> void swap(List<T>, int, int) = native void Collections.swap(List, int, int);
-<T> void rotate(List<T>, int) = native void Collections.rotate(List, int);
-<T,U | T <: U> boolean replaceAll(List<T>, U, T) = native boolean Collections.replaceAll(List, Object, Object);
-<T,U | T <: U> int indexOfSubList(List<T>, List<U>) = native int Collections.indexOfSubList(List, List);
-<T,U | T <: U> int lastIndexOfSubList(List<T>, List<U>) = native int Collections.lastIndexOfSubList(List, List);
+<T> void swap(List<T>, int, int) =
+  native void Collections.swap(List, int, int);
+<T> void rotate(List<T>, int) =
+  native void Collections.rotate(List, int);
+<T,U | T <: U> boolean replaceAll(List<T>, U, T) =
+  native boolean Collections.replaceAll(List, Object, Object);
+<T,U | T <: U> int indexOfSubList(List<T>, List<U>) =
+  native int Collections.indexOfSubList(List, List);
+<T,U | T <: U> int lastIndexOfSubList(List<T>, List<U>) =
+  native int Collections.lastIndexOfSubList(List, List);
+<T,U,V | T <: U, T <: V> int binarySearch(List<T>, U, Comparator<V>) = 
+  native int Collections.binarySearch(List, Object, Comparator);
+<T,U | T <: U> List<U> singletonList(T) = 
+  native List Collections.singletonList(Object);
+<K,K0,V,V0 | K <: K0, V <: V0> Map<K0,V0> singletonMap(K, V) =
+  native Map Collections.singletonMap(Object, Object);
+<T,U | T <: U> Collection<U> synchronizedCollection(Collection<T>) =
+  native Collection Collections.synchronizedCollection(Collection);
+<T,U | T <: U> List<U> synchronizedList(List<T>) =
+  native List Collections.synchronizedList(List);
+<K,K0,V,V0 | K <: K0, V <: V0> Map<K0,V0> synchronizedMap(Map<K,V>) =
+  native Map Collections.synchronizedMap(Map);
+<T,U | T <: U> Set<U> synchronizedSet(Set<T>) = 
+  native Set Collections.synchronizedSet(Set);
+<K,K0,V,V0 | K <: K0, V <: V0> SortedMap<K0,V0> synchronizedSortedMap(SortedMap<K,V>) =
+  native SortedMap Collections.synchronizedSortedMap(SortedMap);
+<T,U | T <: U> SortedSet<U> synchronizedSortedSet(SortedSet<T>) =
+  native SortedSet Collections.synchronizedSortedSet(SortedSet);
+<T,U | T <: U> Collection<U> unmodifiableCollection(Collection<T>) = 
+  native Collection Collections.unmodifiableCollection(Collection);
+<T,U | T <: U> List<U> unmodifiableList(List<T>) = 
+  native List Collections.unmodifiableList(List);
+<K,K0,V,V0 | K <: K0, V <: V0> Map<K0,V0> unmodifiableMap(Map<K,V>) = 
+  native Map Collections.unmodifiableMap(Map);
+<T,U | T <: U> Set<U> unmodifiableSet(Set<T>) = native Set Collections.unmodifiableSet(Set);
+<K,K0,V,V0 | K <: K0, V <: V0> SortedMap<K0,V0> unmodifiableSortedMap(SortedMap<K,V>) = 
+  native SortedMap Collections.unmodifiableSortedMap(SortedMap);
+<T,U | T <: U> SortedSet<U> unmodifiableSortedSet(SortedSet<T>) = 
+  native SortedSet Collections.unmodifiableSortedSet(SortedSet);
+
 
 // static collections fields
 <T> List<T> EMPTY_LIST() = native Collections.EMPTY_LIST;

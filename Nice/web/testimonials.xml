@@ -1,0 +1,32 @@
+<?xml version="1.0" standalone="no"?>
+<!DOCTYPE xsl:stylesheet [ <!ENTITY nbsp "&#xA0;"> <!ENTITY quest "&#x3F;"> ]>
+<page>
+<title>Users' testimonials</title>
+
+<description>
+Users commenting on their experience with the Nice programming language.
+</description>
+
+<keywords>nice, user, feedback, comment, testimonial
+</keywords>
+
+<blockquote>
+<title>Nice is sweet!</title>
+<attribution><ulink url="http://foundries.sourceforge.net/java/index.pl&quest;node_id=46454&amp;lastnode_id=43881">SourceForge discussion</ulink></attribution>
+<para>
+My experience thus far with Nice is very positive. 
+The language design is very elegant. 
+It is so nice to have a language that has a powerful type system 
+combined with multiple dispatch. 
+It is like combining the best of ML and Dylan. 
+Kudos.
+</para>
+</blockquote>
+
+<para>
+Note to Nice users: you are welcome to send your impressions on the language.
+You can also describe the projects you use Nice for, and they will be listed
+on this site.
+</para>
+
+</page>

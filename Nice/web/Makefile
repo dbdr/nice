@@ -5,7 +5,12 @@ STYLEOPT=
 
 .PHONY : clean
 
-all: safety.html install.html
+all: index.html research.html compilation.html testimonials.html
+
+old: safety.html install.html
+
+%.html: %.xml new.xsl
+	$(PROC) new.xsl $*.xml $(STYLEOPT) > $@
 
 include depends.tabular
 

@@ -1,0 +1,140 @@
+<?xml version="1.0" standalone="no"?>
+<page>
+<title>Presentation</title>
+<description>
+Nice is an advanced progamming language that extends Java with 
+parametric types, functional programming and more!
+</description>
+<keywords>java, nice, programming language, compiler, free, object oriented, functional, multi-methods, method</keywords>
+
+<section>
+<para>
+Nice is a new object-oriented programming language based on Java.
+It incorporates features from functional programming,
+and puts into practice state-of-the-art results from academic research.
+This results in more expressivity, modularity and safety.
+</para>
+
+<variablelist>
+<varlistentry><term>Safety</term>
+<listitem>
+<para>
+  Nice detects more errors during compilation than existing 
+  object-oriented languages (null pointer accesses, 
+  casts exceptions).
+  This means that programs written in Nice never throw the infamous
+  <literal>NullPointerException</literal> nor 
+  <literal>ClassCastException</literal>.
+  This aspect is developed in more details in 
+  <ulink url="safety.html">this article</ulink>.
+</para>
+</listitem>
+</varlistentry>
+
+<varlistentry><term>Modularity</term><listitem><para>
+  In object-oriented languages, it is possible to add a new class 
+  to an existing class hierarchy. 
+  In Nice, it is also possible to add <emphasis>methods</emphasis> to 
+  existing classes without modifying their source file. 
+  This is a special case of <emphasis>multi-methods</emphasis>.
+</para>
+</listitem>
+</varlistentry>
+
+<varlistentry><term>Expressivity</term><listitem><para>
+  Many repetitive programming tasks can be
+  avoided by using Nice's advanced features. 
+  Ever got bored
+  of writing tons of loops, casts, overloaded methods with default
+  values, ... ?
+</para>
+</listitem>
+</varlistentry>
+
+</variablelist>
+
+<section><title>Advanced features</title>
+
+<para>
+In addition to traditional object-oriented features, Nice offers:
+
+<variablelist>
+<varlistentry><term>Parametric types</term><listitem><para> 
+  This is especially useful for containers 
+  (lists, hash-tables) and allows for shorter and safer code.
+</para>
+</listitem>
+</varlistentry>
+  
+
+<varlistentry><term>Anonymous functions</term><listitem><para> 
+  Functions can be created and manipulated as 
+  first-class expressions, just like in Lisp and ML. 
+  This is much lighter than Java's anonymous classes in many situations, 
+  for instance with listeners in a GUI.
+</para>
+</listitem>
+</varlistentry>
+  
+
+<varlistentry><term>Multi-methods</term><listitem><para> 
+  They allow methods to be defined outside classes.
+  This means that new methods can be defined on classes that
+  belong to a different package (even in java.*). 
+  Multi-methods alse extend usual methods with the possibility to
+  dispatch on every argument, instead of only the receiver class.
+  <ulink url="visitor.html">This article</ulink> shows why using multi-methods 
+  is preferable to applying the Visitor pattern.
+</para>
+</listitem>
+</varlistentry>
+  
+
+<varlistentry><term>Tuples</term><listitem><para> 
+  This allows in particular methods to return 
+  several values.
+</para>
+</listitem>
+</varlistentry>
+  
+
+<varlistentry><term>Optional parameters to methods</term><listitem><para>
+  Optional parameters have a default value that is used when the parameter 
+  is not present in the call. This is much simpler than in Java, where one 
+  has to write several versions of the method for each combination of 
+  parameters. 
+</para>
+</listitem>
+</varlistentry>
+
+</variablelist>
+
+</para>
+</section>
+
+
+<section><title>Integration with Java</title>
+
+<para>
+The current implementation is tightly integrated with the Java environment,
+which offers several advantages. 
+The huge amnount of Java libraries can be used directly in Nice programs. 
+Libraries can also be written in Nice and called from a Java program.
+The Nice compiler produces java bytecode, which means
+Nice programs can be executed on virtually any platform, with any Java
+Virtual Machine. Or they can be compiled to native programs with a native Java compiler.
+The compiler is itself written in Java and in Nice. 
+The compiler needs a JVM version 1.2 or higher to run.
+</para>
+</section>
+
+<section><title>Availability</title>
+
+<para>
+Nice is feely available under the GPL.
+</para>
+</section>
+
+</section>
+
+</page>

@@ -1,0 +1,76 @@
+<?xml version="1.0" standalone="no"?>
+<page>
+<title>Compilation instructions</title>
+<keywords>compilation, separate compilation, package</keywords>
+<description>How to structure Nice programs, compile and run them</description>
+
+<para>
+Nice source files are grouped by <emphasis>packages</emphasis>.
+A package is the compilation unit in Nice.
+Each package resides in a separate directory.
+I suggest you create a root directory for your nice packages:
+</para>
+
+<programlisting>mkdir ~/nice</programlisting>
+
+<para>
+Each time you begin writing a new package, just create a directory for it.
+For instance, for package <literal>my.package:</literal>
+</para>
+
+<programlisting>mkdir -p ~/nice/my/package</programlisting>
+
+<para>
+Then you place all the Nice source
+files, with <literal>.nice</literal> extension, in that directory. The names of the
+files have no importance for the compiler, but they should be meaningful
+to you of course.
+To compile your new package:
+</para>
+
+<programlisting>
+cd ~/nice
+nicec my.package
+</programlisting>
+
+<para>
+The reason why it is necessary to enter the packages directory 
+(<literal>~/nice</literal>)
+is that the default path for looking up source packages 
+is the current directory. 
+It is possible to specify it using <literal>--sourcepath</literal> option.
+The previous exemple is this equivalent to:
+<programlisting>nicec --sourcepath=~/nice my.package</programlisting>
+</para>
+
+<para>
+To get a list of the compiler's command line options, use:
+<literal>nicec --help</literal> or <literal>nicec -h</literal>
+(GNU style options are used, thanks to package <literal>nice.opt</literal>).
+</para>
+
+<para>
+If your package has a <literal>main(args)</literal> method definition
+(args has type <literal>String[]</literal>),
+then it is executable. 
+The compiler accepts the argument <literal>-a program.jar</literal>,
+and produces a Jar archive with the given name 
+that is appropriate for execution with <literal>java</literal>:
+</para>
+
+<programlisting>
+nicec -a program.jar my.package
+java -jar program.jar
+</programlisting>
+
+<para>
+The <literal>program.jar</literal> file is self-contained.
+It can be run by any simple JVM.
+</para>
+
+<para>
+All imported packages are found automatically, and recompiled if necessary.
+Nice enjoys separate compilation.
+</para>
+
+</page>

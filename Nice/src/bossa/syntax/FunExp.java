@@ -81,6 +81,8 @@ public class FunExp extends Expression implements Function
 	  ! nice.tools.code.Types.isVoid(inferredReturnType))
 	throw User.error(this, "Missing return statement");
 
+    inferredReturnType.simplify();
+
     Monotype t = new FunType(MonoSymbol.getMonotype(formals), 
 			     inferredReturnType.getMonotype());
     type = new Polytype

@@ -70,7 +70,7 @@ rpm ${RPMDIR}/${RPMFILE}: $(DEB)
 	rpmbuild --target=noarch --buildroot=${RPMTMP} -bb tmp/Nice-${VERSION}.spec
 
 
-WIN_TEXT_FILES = ${BUILDDIR}/{bin/{nicec,nicedoc}.bat,web/Readme.txt}
+WIN_TEXT_FILES = ${BUILDDIR}/{bin/{nicec,nicedoc,niceunit,niceclasspath}.bat,web/Readme.txt}
 
 .PHONY: zip
 zip ${ZIPFILE}: $(DEB)

@@ -55,9 +55,10 @@ public class JavaClass extends ClassDefinition
   {
     super(name, isFinal, isAbstract, isInterface,
 	  typeParameters, typeParametersVariances,
-	  extensions, implementations, abstractions);
-    this.javaName = javaName;
+	  extensions, implementations, abstractions, 
+	  javaName == null && name.toString().equals("Array"));
 
+    this.javaName = javaName;
     if(javaName == null) // primitive type
       {
 	isPrimitive = true;
@@ -71,11 +72,10 @@ public class JavaClass extends ClassDefinition
 	  {
 	    setJavaType(ConstantExp.registerPrimType(name.toString(), tc));
 	    if(getJavaType() == null)
-	      User.error(this,
-			 name+" is not a known primitive type");
+	      User.error(this, name+" is not a known primitive type");
 	  }
       }
-    else
+    else // wrapper for a java class
       {
 	TypeConstructor old = 
 	  JavaClasses.setTypeConstructorForJavaClass

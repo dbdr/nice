@@ -143,6 +143,23 @@ public class TypeConstructor
       return super.toString();
   }
   
+  /**
+     Create a string representing the monotype build by application
+     of this type constructor to the given parameters.
+
+     This default implementation returns "tc<p1, ..., pn>".
+
+     It should be overriden by type constructors that print differently.
+     For instance, the array tape constructor could return "p1[]".
+
+     @param parameters the type parameters
+     @return the representation of the monotype
+  */
+  public String toString(Monotype[] parameters)
+  {
+    return "" + this + bossa.util.Util.map("<", ", ", ">", parameters);
+  }
+
   /****************************************************************
    * Fields
    ****************************************************************/

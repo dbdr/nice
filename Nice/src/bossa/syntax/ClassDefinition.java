@@ -50,6 +50,22 @@ abstract public class ClassDefinition extends Definition
 			 List implementations, List abstractions
 			 )
   {
+    this(name, isFinal, isAbstract, isInterface,
+	 typeParameters, typeParametersVariances,
+	 extensions, implementations, abstractions, false);
+  }
+
+
+  ClassDefinition(LocatedString name, 
+		  boolean isFinal, boolean isAbstract, 
+		  boolean isInterface,
+		  List typeParameters,
+		  List typeParametersVariances,
+		  List extensions, 
+		  List implementations, List abstractions,
+		  boolean isArray
+		  )
+  {
     super(name, Node.upper);
 
     if(isInterface)
@@ -87,21 +103,33 @@ abstract public class ClassDefinition extends Definition
     this.variance = makeVariance(typeParametersVariances);
     
     this.extensions = extensions;
+    this.implementations = implementations;
+    this.abstractions = abstractions;
 
-    this.tc = new mlsub.typing.TypeConstructor
-      (this.name.toString(), variance, isConcrete(), true);
+    createTC(isArray);
+  }
+  
+  void createTC(boolean isArray)
+  {
+    if (isArray)
+      tc = new mlsub.typing.TypeConstructor
+	(name.toString(), variance, isConcrete(), true)
+	{
+	  public String toString(mlsub.typing.Monotype[] parameters)
+	  { return parameters[0] + "[]"; }
+	};
+    else
+      tc = new mlsub.typing.TypeConstructor
+	(name.toString(), variance, isConcrete(), true);
 
     if(isInterface)
       associatedInterface = new Interface(variance, tc);
 
     tcToClassDef.put(tc, this);
     Typing.introduce(tc);
-    addTypeSymbol(this.tc);    
-    
-    this.implementations = implementations;
-    this.abstractions = abstractions;
+    addTypeSymbol(tc);
   }
-  
+
   public Collection associatedDefinitions()
   {
     return null;

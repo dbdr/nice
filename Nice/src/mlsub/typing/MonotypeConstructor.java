@@ -119,7 +119,7 @@ public final class MonotypeConstructor extends Monotype
   
   public String toString()
   {
-    return "" + tc + bossa.util.Util.map("<", ", ", ">", parameters);
+    return tc.toString(parameters);
   }
 
   public TypeConstructor tc;

@@ -29,7 +29,7 @@ public final class Internal
       throw new Exception();
     }
     catch(Exception e){
-      e.printStackTrace();
+      nice.lang.dispatch.printStackTraceWithSourceInfo(e);
     }
   }
         

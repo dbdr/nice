@@ -6,6 +6,23 @@ package nice.tools.doc;
    @author Francis Barber
 */
 
+/*TODO
+ * 1)Make it file system independent by using java.io.File.separator instead of '/'
+ * Nice seems to reject this - 
+ *    Ambiguity for symbol File. Possibilities are :
+ *    java.io.File File(?String, String)
+ *    java.io.File File(?File, String)
+ */
+ 
+    /*Below is various info that could be used in the
+     *construction of the method entry
+     */
+    //The compiler doesn't like this:  println("Syntactic return type: " + m.getSyntacticReturnType());
+    //println("Return type: " + m.getReturnType());
+    //println("Arity: " + m.getArity());
+    //println("Type: " + m.getType());
+    //println("Formal Parameters: " + m.formalParameters());
+
 import bossa.syntax.*;
 import java.util.*;
 import java.text.*;
@@ -22,15 +39,15 @@ class HTMLWriter {
     
     //Initialise a FileWriter
     // Output directory for this class
-    File dir = new File(outdir, packageName.replace('.','/'));
-    if(!dir.exists()) {
-        if(!dir.mkdirs()) {
-            System.err.println("Error creating directory structure");
-        }
+    File dir = new File(outdir, packageName.replace('.', java.io.File.separator));
+    if(!dir.exists() && !dir.mkdirs()) {
+        System.err.println("Error creating directory structure");
     }
+    
     String fileName = c.getName().toString();
     //we only want information after the last .
     //that is, nice.lang.Maybe -> Maybe
+    //this should also work when "." is not found
     fileName = fileName.substring(fileName.lastIndexOf(".") + 1);
     BufferedWriter writer = new BufferedWriter
       (new FileWriter(new File(dir, fileName + ".html")));
@@ -41,7 +58,7 @@ class HTMLWriter {
 
     //Print hierarchy
     ArrayList<ClassDefinition.Class> list = new ArrayList();
-    ClassDefinition.Class superClass = c.getSuperClassDefinition();
+    ?ClassDefinition.Class superClass = c.getSuperClassDefinition();
     while(superClass != null) {
       list.add(superClass);
       superClass = superClass.getSuperClassDefinition();
@@ -66,7 +83,7 @@ class HTMLWriter {
 
     //Implemented interfaces
     ClassDefinition.Interface[?] interfaces = c.getImplementedInterfaces();
-    if (interfaces != null) {
+    if(interfaces != null) {
       writer.write("<b>Implemented interfaces:</b>");
       writer.write("<ul>");
       interfaces.foreach(ClassDefinition.Interface i => 
@@ -82,19 +99,20 @@ class HTMLWriter {
     //Handle methods
     
     //Initialise a FileWriter
-    File dir = new File(outdir, packageName.replace('.','/'));
+    File dir = new File(outdir, packageName.replace('.',java.io.File.separator));
     if(!dir.exists() && !dir.mkdirs()) {
         System.err.println("Error creating directory structure");
     }
-    String fileName = m.getName().toString();
+    
+    /*String fileName = m.getName().toString();
     //we only want information after the last .
     //that is, nice.lang.Maybe -> Maybe
     //System.out.println("Raw filename: " + fileName);
     fileName = fileName.replace('/', "@slash");
-    fileName = fileName.replace('.', "@dot");
+    fileName = fileName.replace('.', "@dot");*/
     
     BufferedWriter writer = new BufferedWriter
-      (new FileWriter(new File(dir, fileName + ".html")));
+      (new FileWriter(new File(dir, calculateMethodFilename(m))));
     
     writer.write(getHeader(m.getName().toString()));
   
@@ -105,15 +123,7 @@ class HTMLWriter {
     writer.write("<p>");
     writer.write("nicedoc comments would go here...");
     writer.write("</p>");
-    /*Below is various info that could be used in the
-     *construction of the method entry
-     */
-    //The compiler doesn't like this:  println("Syntactic return type: " + m.getSyntacticReturnType());
-    //println("Return type: " + m.getReturnType());
-    //println("Arity: " + m.getArity());
-    //println("Type: " + m.getType());
-    //println("Formal Parameters: " + m.formalParameters());
-
+ 
     writer.write(getFooter());
     writer.close();
   }
@@ -124,7 +134,7 @@ class HTMLWriter {
 
   void write(bossa.modules.Package p) {
     try {
-      File dir = new File(outdir, p.getName().replace('.','/'));
+      File dir = new File(outdir, p.getName().replace('.',java.io.File.separator));
       if(!dir.exists() && !dir.mkdirs()) {
           System.err.println("Error creating directory structure");
       }
@@ -166,8 +176,8 @@ class HTMLWriter {
       writer.write("<b>Methods:</b>\n");
       writer.write("<ul>\n");
       for(MethodDeclaration m : methods) {
-          writer.write("<li><a href='" + m.getName() + ".html'>" + m.getName() + "</a>" +
-                       ": " + m.getType() + "</li>\n");
+          writer.write("<li><a href='" calculateMethodFilename(m) "'>" m.getName() "</a>" +
+                       ": " m.getType() "</li>\n");
       }
       writer.write("</ul>\n");
     
@@ -269,7 +279,7 @@ String getHeader(String title) {
   return
   "<html>\n" +
   "<head>\n" + 
-  "<!-- Generated by nicedoc on " + df.format(new Date()) + " -->\n" +
+  "<!-- Generated by nicedoc on "  df.format(new Date())  " -->\n" +
   "\t<title>" + title + "</title>\n" +
   "</head>\n" +
   "<body>\n";
@@ -282,4 +292,13 @@ String getFooter() {
   return
   "</body>\n" +
   "</html>\n";
+}
+
+/** Methods can be overloaded - we can't just use the method name as a file name.
+ * This method returns a file name based upon the method name and its arguments.
+ */
+String calculateMethodFilename(MethodDeclaration md) {
+    String filename = md.getName().toString() + md.getType().toString().hashCode();
+    filename = filename.replace('/', "@slash").replace('.', "@dot");
+    return filename + ".html";
 }

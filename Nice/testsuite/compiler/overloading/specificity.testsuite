@@ -102,3 +102,21 @@ void f(B a, String s, int i = 0) { }
   void foo(B ,A);
   foo(@B(A) ,x) {}
   foo(@B(B) ,x) {}
+
+/// PASS
+  B->boolean bar = foo;
+  assert bar(new B());
+  /// Toplevel
+  class A {}
+  class B extends A {}
+  boolean foo(A x) = false;
+  boolean foo(B x) = true;
+
+/// FAIL
+  C->void bar = /* FAIL HERE */foo;
+  /// Toplevel
+  interface A {}
+  interface B {}
+  class C implements A,B {}
+  void foo(A x) {}
+  void foo(B x) {}

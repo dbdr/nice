@@ -232,6 +232,24 @@ public class OverloadedSymbolExp extends Expression
       if (res != null)
         return res;
 
+      if (Types.domain(expectedType) != null)
+        { // in case of function objects symbols find the most precise match
+	  List nonMin = removeNonMinimal(symbols);
+	  if (symbols.size() == 1)
+            {
+ 	      VarSymbol s = (VarSymbol) symbols.get(0);
+	      Polytype symType = s.getClonedType();	
+	      s.releaseClonedType();
+              symbols = nonMin;
+	      return uniqueExpression(s, symType);
+            }
+          else
+            symbols.addAll(nonMin);
+        }
+
+      if (symbols.size() != 0)
+        throw new AmbiguityError();
+
       throw User.error(this, noMatchError(removed, expectedType));
     }
     finally {
@@ -260,6 +278,9 @@ public class OverloadedSymbolExp extends Expression
 
     if (res != null)
       return res;
+
+    if (symbols.size() != 0)
+      throw new AmbiguityError();
 
     throw User.error(this, 
                      "No variable or field in this class has name " + ident);
@@ -290,9 +311,6 @@ public class OverloadedSymbolExp extends Expression
           return uniqueExpression();
       }
 
-    if (symbols.size() != 0)
-      throw new AmbiguityError();
-
     // There is no solution.
     return null;
   }
@@ -309,11 +327,12 @@ public class OverloadedSymbolExp extends Expression
     return res;
   }
 
-  static void removeNonMinimal(List symbols)
+  static List removeNonMinimal(List symbols)
   {
+    List removed = new ArrayList();
     // optimization
     if(symbols.size()<2)
-      return;
+      return removed;
     
     int len = symbols.size();
     VarSymbol[] syms = (VarSymbol[])
@@ -360,8 +379,11 @@ public class OverloadedSymbolExp extends Expression
 	  if (Debug.overloading)
 	    Debug.println("Removing " + syms[i] + " since it is not minimal");
 	  
+          removed.add(syms[i]);
 	  symbols.remove(syms[i]);
 	}
+
+    return removed;
   }
 
   /**

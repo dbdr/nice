@@ -12,7 +12,7 @@
 
 // File    : Front.java
 // Created : Thu Jul 01 15:11:18 1999 by bonniot
-//$Modified: Sat Jul 24 18:48:49 1999 by bonniot $
+//$Modified: Tue Jul 27 17:24:54 1999 by bonniot $
 // Description : Front-end test
 
 package bossa.test;
@@ -53,6 +53,8 @@ public class Front
       p.ReInit(r);
       defs.addAll(p.definitions());
 
+      System.out.println("Let's see what you have done");
+      
       AST ast=new AST(defs);
       //System.out.print(ast);
     }
@@ -61,7 +63,7 @@ public class Front
     }
     catch(Exception e){
       System.out.println("Uncaught exception :");
-      System.out.println(e);
+      //System.out.println(e);
       e.printStackTrace();
     }
   }

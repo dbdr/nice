@@ -12,13 +12,17 @@
 
 // File    : Typing.java
 // Created : Tue Jul 20 11:57:17 1999 by bonniot
-//$Modified: Tue Jul 27 13:21:24 1999 by bonniot $
+//$Modified: Tue Jul 27 18:06:15 1999 by bonniot $
 
 package bossa.typing;
 
+import java.util.*;
+
 import bossa.util.*;
 import bossa.syntax.*;
-import java.util.*;
+
+import bossa.engine.Engine;
+import bossa.engine.Unsatisfiable;
 
 /**
  * Static class for comparing types
@@ -41,20 +45,55 @@ abstract public class Typing
     Debug.println("## Typechecking "+message+
 		  Util.map(" [",", ","]",symbols)
 		  );
+    Engine.enter();
+    
+    introduce(symbols);
   }
 
+  static public void introduce(TypeConstructor tc)
+  {
+    tc.id=Engine.newTC();
+  }
+  
+  static public void introduce(Collection symbols)
+  {
+    Iterator i=symbols.iterator();
+    while(i.hasNext())
+      {
+	TypeSymbol s=(TypeSymbol)i.next();
+	if(s instanceof TypeConstructor)
+	  introduce((TypeConstructor) s);
+      }
+  }
+  
   /**
    * Leaves the last typing context
    *
    */
   public static void leave()
+    throws TypingEx
   {
     Debug.println("\n## Leaving typing context");
+    try{
+      Engine.leave();
+    }
+    catch(Unsatisfiable e){
+      throw new TypingEx("Unsatisfiable");
+    }
+    
   }
 
   public static void implies()
+    throws TypingEx
   {
     Debug.println("IMPLIES");
+    try{
+      Engine.implies();
+    }
+    catch(Unsatisfiable e){
+      throw new TypingEx("Not satisfiable");
+    }
+    
   }
   
   /****************************************************************
@@ -148,7 +187,7 @@ abstract public class Typing
 	dom2=m2.domain();
 	if(dom2==null)
 	  throw new KindingEx(m1,m2);
-	leqMono(dom1,dom2);
+	leqMono(dom2,dom1);
 	leq(m1.codomain(),m2.codomain());
       }
     else
@@ -157,7 +196,7 @@ abstract public class Typing
 	m1=m1.functionalCast(dom2.size());
 	if((dom1=m1.domain())==null)
 	  throw new KindingEx(m1,m2);
-	leqMono(dom1,dom2);
+	leqMono(dom2,dom1);
 	leq(m1.codomain(),m2.codomain());
       }
     else
@@ -192,24 +231,39 @@ abstract public class Typing
    ****************************************************************/
 
   public static void leq(TypeConstructor t1, TypeConstructor t2)
+    throws TypingEx
   {
     Debug.println(t1+" < "+t2);
+    try{
+      Engine.leq(t1.id,t2.id);      
+    }
+    catch(Unsatisfiable e){
+      throw new TypingEx("Not satisfiable");
+    }
   }
   
   /****************************************************************
    * Domains 
    ****************************************************************/
 
-  public static void in(Type type, Domain domain)
+  public static void in(Polytype type, Domain domain)
     throws TypingEx
   {
     Debug.println(type+" in "+domain);
+    
+    introduce(type.constraint.binders);
+    introduce(domain.constraint.binders);
+    
+    type.constraint.assert();
+    domain.constraint.assert();
+    leq(type.monotype,domain.monotype);
+    
   }
   
   /**
    * Checks wether types belong to domains
    *
-   * @param types a collection of Types
+   * @param types a collection of Polytypes
    * @param domains a collection of Domains
    * @exception BadSizeEx the lists have different size
    */
@@ -228,7 +282,7 @@ abstract public class Typing
     Iterator t=types.iterator();
     Iterator d=domains.iterator();
     while(t.hasNext())
-      in((Type)t.next(),(Domain)d.next());
+      in((Polytype)t.next(),(Domain)d.next());
   }
 
   /****************************************************************

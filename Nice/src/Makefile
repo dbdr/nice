@@ -50,4 +50,4 @@ All: parser
 ## Documentation
 
 doc:
-	${JAVADOC} -windowtitle "Bossa" -doctitle "The Bossa interpreter source" -d ${TOP}/../../doc -private bossa.syntax bossa.util bossa.typing
+	${JAVADOC} -windowtitle "Bossa" -doctitle "The Bossa interpreter source" -d ${TOP}/../../doc -public bossa.syntax bossa.util bossa.typing bossa.engine

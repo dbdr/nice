@@ -12,7 +12,7 @@
 
 // File    : ClassDefinition.java
 // Created : Thu Jul 01 11:25:14 1999 by bonniot
-//$Modified: Tue Jul 27 13:16:47 1999 by bonniot $
+//$Modified: Tue Jul 27 16:35:13 1999 by bonniot $
 // Description : Abstract syntax for a class definition
 
 package bossa.syntax;
@@ -91,6 +91,7 @@ public class ClassDefinition extends Node
   public void typecheck()
   {
     try{
+      Typing.introduce(tc);
       Typing.leq(tc,extensions);
       Typing.imp(tc,implementations);
       Typing.abs(tc,abstractions);

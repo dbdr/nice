@@ -12,7 +12,7 @@
 
 // File    : Expression.java
 // Created : Mon Jul 05 16:25:02 1999 by bonniot
-//$Modified: Thu Jul 22 14:52:38 1999 by bonniot $
+//$Modified: Tue Jul 27 17:14:37 1999 by bonniot $
 // Description : 
 
 package bossa.syntax;
@@ -47,7 +47,7 @@ public abstract class Expression implements Located
   /**
    * Maps getType over a collection of Expressions
    *
-   * @param Expressions the colleciton of Expressions
+   * @param Expressions the collection of Expressions
    * @return the collection of their Types
    */
   static Collection getType(Collection expressions)
@@ -57,6 +57,31 @@ public abstract class Expression implements Located
 
     while(i.hasNext())
       res.add( ((Expression) i.next()) .getType());
+
+    return res;
+  }
+
+  /**
+   * Maps getType over a collection of Expressions
+   * and checks all Types are Polytypes and not
+   * PolytypeConstructors
+   *
+   * @param Expressions the collection of Expressions
+   * @return the collection of their Polytypes, 
+   * or null if there is a PolytypeConstructor
+   */
+  static Collection getPolytype(Collection expressions)
+  {
+    Iterator i=expressions.iterator();
+    Collection res=new ArrayList(expressions.size());
+
+    while(i.hasNext())
+      {
+	Type t=((Expression) i.next()) .getType();
+	if(!(t instanceof Polytype))
+	  return null;
+	res.add(t);
+      }
 
     return res;
   }

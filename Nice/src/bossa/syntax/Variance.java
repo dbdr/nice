@@ -12,7 +12,7 @@
 
 // File    : Variance.java
 // Created : Fri Jul 23 12:15:46 1999 by bonniot
-//$Modified: Tue Jul 27 11:09:22 1999 by bonniot $
+//$Modified: Tue Jul 27 18:29:16 1999 by bonniot $
 
 package bossa.syntax;
 
@@ -48,7 +48,13 @@ public class Variance
     Iterator i1=tp1.iterator();
     Iterator i2=tp2.iterator();
     for(int i=1;i<=size;i++)
-      bossa.typing.Typing.leq((Monotype)i1.next(),(Monotype)i2.next());
+      {
+	Monotype m1=(Monotype)i1.next();
+	Monotype m2=(Monotype)i2.next();
+	//Non-variant
+	bossa.typing.Typing.leq(m1,m2);
+	bossa.typing.Typing.leq(m2,m1);
+      }
   }
   
   int size;

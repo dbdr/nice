@@ -12,7 +12,7 @@
 
 // File    : MethodBodyDefinition.java
 // Created : Thu Jul 01 18:12:46 1999 by bonniot
-//$Modified: Tue Jul 27 13:20:59 1999 by bonniot $
+//$Modified: Tue Jul 27 16:55:47 1999 by bonniot $
 // Description : Abstract syntax for a method body
 
 package bossa.syntax;
@@ -132,6 +132,9 @@ public class MethodBodyDefinition extends Node
       Typing.in
 	(VarSymbol.getType(parameters),
 	 Pattern.getDomain(formals));
+
+      Typing.implies();
+
     }
     catch(TypingEx e) {
       User.error("Typing error in method body "+name+" :"+e.getMessage());
@@ -140,19 +143,17 @@ public class MethodBodyDefinition extends Node
       Internal.error("Bad size in MethodBodyDefinition.typecheck()");
     }
     
-    Typing.implies();
-    
     body.typecheck();
     try{
       Type t=body.getType();
       if(t==null)
 	User.error(this,"Last statement of body should be \"return\"");
       Typing.leq(t,new Polytype(definition.type.codomain()));
+      Typing.leave();
     }
     catch(TypingEx e){
       User.error(this,"Bad return type: "+e.getMessage());
     }
-    Typing.leave();
   }
 
   /****************************************************************

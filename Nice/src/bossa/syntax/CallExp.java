@@ -12,7 +12,7 @@
 
 // File    : CallExp.java
 // Created : Mon Jul 05 16:27:27 1999 by bonniot
-//$Modified: Tue Jul 27 12:40:58 1999 by bonniot $
+//$Modified: Tue Jul 27 17:16:46 1999 by bonniot $
 
 package bossa.syntax;
 
@@ -59,11 +59,16 @@ public class CallExp extends Expression
 
     Typing.enter(t.getTypeParameters(),this.fun+"");
 
-    Typing.implies();
 
     try{
+      Typing.implies();
+      
       t.getConstraint().assert();
-      Typing.in(Expression.getType(parameters),
+      Collection types=Expression.getPolytype(parameters);
+      User.error(types==null,this,
+		 "Arguments of functions must not be imperative-parametric");
+      
+      Typing.in(types,
 		Domain.fromMonotypes(t.domain()));
     }
     catch(BadSizeEx e){

@@ -12,7 +12,7 @@
 
 // File    : MonotypeVar.java
 // Created : Fri Jul 23 15:36:39 1999 by bonniot
-//$Modified: Tue Jul 27 11:16:48 1999 by bonniot $
+//$Modified: Tue Jul 27 16:38:43 1999 by bonniot $
 
 package bossa.syntax;
 
@@ -82,7 +82,11 @@ public class MonotypeVar extends Monotype
   public TypeConstructor decomposeTC(Variance v)
   {
     if(equivalentTC==null)
-      equivalentTC=new TypeConstructor(this,v);
+      {
+	equivalentTC=new TypeConstructor(this,v);
+	bossa.typing.Typing.introduce(equivalentTC);
+      }
+    
     return equivalentTC;
   }
   

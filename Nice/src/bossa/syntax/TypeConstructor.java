@@ -12,7 +12,7 @@
 
 // File    : TypeConstructor.java
 // Created : Thu Jul 08 11:51:09 1999 by bonniot
-//$Modified: Tue Jul 27 11:18:09 1999 by bonniot $
+//$Modified: Tue Jul 27 15:39:54 1999 by bonniot $
 // Description : A class. It "needs" type parameters to become a Monotype
 
 package bossa.syntax;
@@ -33,6 +33,7 @@ public class TypeConstructor
     this.definition=d;
     this.name=d.name;
     this.variance=new Variance(d.typeParameters.size());
+    this.id=-1;
   }
 
   /**
@@ -47,6 +48,7 @@ public class TypeConstructor
     this.name=className;
     this.definition=null;
     this.variance=new Variance(-1);
+    this.id=-1;
   }
 
   /**
@@ -60,6 +62,7 @@ public class TypeConstructor
     this.name=source.name;
     this.variance=variance;
     this.definition=null;
+    this.id=-1;
   }
   
   static Collection toLocatedString(Collection c)
@@ -159,4 +162,5 @@ public class TypeConstructor
   ClassDefinition definition;
   LocatedString name;
   public Variance variance;
+  public int id; // for the low level checker;
 }

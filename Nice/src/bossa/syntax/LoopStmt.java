@@ -41,9 +41,9 @@ public class LoopStmt extends Statement
 		  Statement iterationStatements,
 		  boolean testAtTheEnd)
   {
-    this.whileExp = expChild(whileExp);
-    this.loopBody = child(loopBody);
-    this.iterationStatements = child(iterationStatements);
+    this.whileExp = whileExp;
+    this.loopBody = loopBody;
+    this.iterationStatements = iterationStatements;
 
     if(testAtTheEnd)
       Internal.error("\"do\" not implemented");

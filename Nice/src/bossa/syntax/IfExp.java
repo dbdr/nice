@@ -33,9 +33,9 @@ public class IfExp extends Expression
       // Then without else
       elseExp = new VoidConstantExp();
     
-    this.condition = expChild(condition);
-    this.thenExp = expChild(thenExp);
-    this.elseExp = expChild(elseExp);
+    this.condition = condition;
+    this.thenExp = thenExp;
+    this.elseExp = elseExp;
   }
 
   /****************************************************************

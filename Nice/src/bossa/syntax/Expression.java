@@ -25,14 +25,15 @@ import mlsub.typing.Polytype;
    @version $Date$
    @author Daniel Bonniot (d.bonniot@mail.dotcom.fr)
 */
-public abstract class Expression extends Node 
+public abstract class Expression
   implements Located, Printable
 {
-  Expression()
+  final static Expression[] toArray(List expressions)
   {
-    super(Node.down);
+    return 
+      (Expression[]) expressions.toArray(new Expression[expressions.size()]);
   }
-
+  
   public static final Expression[] noExpressions = new Expression[0];
 
   /** @return true iff this expression can be assigned a value. */

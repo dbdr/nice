@@ -35,11 +35,10 @@ public class FunExp extends Expression implements Function
     {
       MonoSymbol m = (MonoSymbol) formals.get(i);
       this.formals[i] = m;
-      addChild(m);
     }
     
     this.constraint = cst;
-    this.body = child(body);
+    this.body = body;
   }
 
   void computeType()

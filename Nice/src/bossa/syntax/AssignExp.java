@@ -28,8 +28,8 @@ public class AssignExp extends Expression
 {
   private AssignExp(Expression to, Expression value)
   {
-    this.to = expChild(to);
-    this.value = expChild(value);
+    this.to = to;
+    this.value = value;
   }
 
   /**

@@ -39,7 +39,7 @@ public class NewArrayExp extends Expression
 		     int unknownDimensions)
   {
     this.ti = type;
-    this.knownDimensions = expTabChildren(knownDimensions);
+    this.knownDimensions = toArray(knownDimensions);
     this.unknownDimensions = unknownDimensions;
   }
 

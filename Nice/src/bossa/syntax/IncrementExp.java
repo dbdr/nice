@@ -26,7 +26,7 @@ public class IncrementExp extends Expression
 {
   public IncrementExp(Expression variable, boolean prefix, boolean increment)
   {
-    this.variable = expChild(variable);
+    this.variable = variable;
     this.returnOld = !prefix;
     this.increment = increment;
   }

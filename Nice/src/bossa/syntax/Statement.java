@@ -22,34 +22,14 @@ import java.util.*;
    @version $Date$
    @author Daniel Bonniot (d.bonniot@mail.dotcom.fr)
 */
-public abstract class Statement extends Node
+public abstract class Statement
   implements Located
 {
-  Statement()
-  {
-    this(Node.forward);
-  }
-  
-  Statement(int propagate)
-  {
-    super(propagate);
-  }
-  
   /****************************************************************
    * Code generation
    ****************************************************************/
 
   abstract gnu.expr.Expression generateCode();
-
-  /*static gnu.expr.Expression[] compile(List statements)
-  {
-    gnu.expr.Expression[] res=new gnu.expr.Expression[statements.size()];
-    int n=0;
-    for(Iterator i=statements.iterator();
-	i.hasNext();n++)
-      res[n]=((Statement)i.next()).generateCode();
-    return res;
-    }*/
 
   static gnu.expr.Expression[] compile(Statement[] statements)
   {

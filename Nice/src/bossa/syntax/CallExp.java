@@ -38,9 +38,8 @@ public class CallExp extends Expression
    */
   public CallExp(Expression function, Arguments arguments)
   {
-    this.function = expChild(function);
+    this.function = function;
     this.arguments = arguments;
-    addChild(arguments);
   }
 
   /**

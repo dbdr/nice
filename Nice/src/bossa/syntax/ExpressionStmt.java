@@ -24,7 +24,7 @@ public class ExpressionStmt extends Statement
 {
   public ExpressionStmt(Expression exp)
   {
-    this.exp=expChild(exp);
+    this.exp = exp;
   }
   
   /****************************************************************

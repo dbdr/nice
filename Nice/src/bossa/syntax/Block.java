@@ -27,16 +27,13 @@ public class Block extends Statement
 {
   public Block(List statements)
   {
-    super(Node.down);
     this.statements = cutInBlocks(statements);
-    addChildren(this.statements);
   }
 
   public static class LocalDeclaration extends Statement
   {
     public LocalDeclaration(LocatedString name, Monotype type, Expression value)
     {
-      super(Node.forward);
       this.left = new MonoSymbol(name,type);
       this.value = value;
     }
@@ -79,9 +76,6 @@ public class Block extends Statement
 	  {
 	    LocalDeclaration decl = (LocalDeclaration) s;
 	    locals.add(decl);
-	    addChild(decl.left);
-	    if (decl.value != null)
-	      addChild(decl.value);
 	  }
 	else 
 	  {

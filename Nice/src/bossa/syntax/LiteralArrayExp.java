@@ -38,7 +38,7 @@ public class LiteralArrayExp extends Expression
 {
   public LiteralArrayExp(List /* of Expression */ elements)
   {
-    this.elements = expTabChildren(elements);
+    this.elements = toArray(elements);
   }
 
   void computeType()

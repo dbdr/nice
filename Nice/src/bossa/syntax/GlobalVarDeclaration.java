@@ -36,7 +36,7 @@ public class GlobalVarDeclaration extends Definition
     addChild(left);
     
     if(value!=null)
-      this.value=expChild(value);
+      this.value = value;
   }
 
   public Collection associatedDefinitions()

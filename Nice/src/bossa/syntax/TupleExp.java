@@ -35,7 +35,7 @@ public class TupleExp extends bossa.syntax.Expression
 {
   public TupleExp(List expressions)
   {
-    this.expressions = expTabChildren(expressions);
+    this.expressions = toArray(expressions);
   }
 
   /****************************************************************

@@ -87,12 +87,6 @@ public class Arguments extends Node
     arguments[num].value = value;
   }
 
-  void typecheck()
-  {
-    for (int i = arguments.length; --i >= 0; )
-      arguments[i].value.doTypecheck();
-  }
-  
   void noOverloading()
   {
     for (int i = arguments.length; --i>=0; )

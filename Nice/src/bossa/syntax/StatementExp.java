@@ -26,7 +26,6 @@ public class StatementExp extends Expression
   public StatementExp(Statement s)
   {
     this.statement = s;
-    addChild(this.statement);
   }
 
   public String toString()

@@ -21,7 +21,7 @@ import bossa.util.*;
    @author Daniel Bonniot (d.bonniot@mail.dotcom.fr)
 */
 public class LocatedString 
-  implements Located
+  implements Located, Comparable
 {
   public LocatedString(String content, Location loc)
   {
@@ -99,6 +99,11 @@ public class LocatedString
   public int hashCode()
   {
     return content.hashCode();
+  }
+
+  public int compareTo(Object o)
+  {
+    return content.compareTo(((LocatedString) o).content);
   }
 
   public String content;

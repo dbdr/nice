@@ -82,7 +82,7 @@ public class OverloadedSymbolExp extends Expression
   Expression resolveOverloading(CallExp callExp)
   {
     Arguments arguments = callExp.arguments;
-    // It's better to do this know. OR is oriented, children first.
+    // It's better to do this know. OR is oriented, arguments first.
     arguments.computeTypes();
     
     if (Debug.overloading) 

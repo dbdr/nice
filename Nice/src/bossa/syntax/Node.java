@@ -381,44 +381,6 @@ abstract public class Node
    * Misc
    ****************************************************************/
 
-  /**
-   * Creates a reference to an expression, 
-   * adds it as a child and returns it.
-   */
-  Expression expChild(Expression value)
-  {
-    if(value==null)
-      return null;
-    
-    addChild(value);
-    return value;
-  }
-
-  /**
-   * Creates references to expressions.
-   */
-  List expChildren(List values)
-  {
-    for(Iterator i = values.iterator(); i.hasNext();)
-      expChild((Expression) i.next());
-    
-    return values;
-  }
-
-  /*
-    Creates references to expressions.
-  */
-  Expression[] expTabChildren(List values)
-  {
-    Expression[] res = new Expression[values.size()];
-
-    int n = 0;
-    for (Iterator i = values.iterator();i.hasNext();)
-      res[n++] = expChild((Expression) i.next());
-
-    return res;
-  }
-
   protected VarScope scope;
   protected TypeScope typeScope;
 

@@ -30,7 +30,7 @@ public class ReturnStmt extends Statement
 {
   public ReturnStmt(Expression value)
   {
-    this.value = expChild(value);
+    this.value = value;
   }
 
   Polytype returnType()

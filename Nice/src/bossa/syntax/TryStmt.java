@@ -33,17 +33,17 @@ public class TryStmt extends Statement
 {
   public TryStmt(Statement body)
   {
-    this.body = child(body);
+    this.body = body;
   }
 
   public void setFinally(Statement body)
   {
-    finallyBody = child(body);
+    finallyBody = body;
   }
   
   public void addCatch(TypeIdent tc, LocatedString var, Statement body)
   {
-    catches.add(child(new Catch(tc, var, body)));
+    catches.add(new Catch(tc, var, body));
   }
   
   public gnu.expr.Expression generateCode()
@@ -78,21 +78,18 @@ public class TryStmt extends Statement
   Statement finallyBody;
   List catches = new LinkedList();
   
-  public class Catch extends Node
+  public class Catch
   {
     Catch(TypeIdent tc, LocatedString var, Statement body)
     {
-      super(Node.down);
-
       this.exnVar = new MonoSymbol
 	(var, 
 	 new MonotypeConstructor(tc, null, tc.location()));
-      this.addChild(exnVar);
       
       this.tc = tc;
       this.typeLocation = tc.location();
       this.var = var;
-      this.body = this.child(body);
+      this.body = body;
     }
 
     CatchClause clause()

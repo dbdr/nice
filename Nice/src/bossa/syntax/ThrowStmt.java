@@ -29,7 +29,7 @@ public class ThrowStmt extends Statement
 {
   public ThrowStmt(Expression e)
   {
-    this.exn = expChild(e);
+    this.exn = e;
   }
 
   public gnu.expr.Expression generateCode()

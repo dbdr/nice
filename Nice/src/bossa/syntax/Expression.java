@@ -144,6 +144,9 @@ public abstract class Expression extends Node
       {
 	computeType();
       }
+    if (type == null)
+      Debug.println(this + "(" + this.getClass() + ") has null type");
+    
     return type;
   }
   

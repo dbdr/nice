@@ -191,7 +191,6 @@ TOKEN: /* Keywords */
 | < NATIVE:     "native"     	> /* Nice specific */
 | < INLINE:     "inline"        > /* Nice specific */
 | < ABSTRACT:   "abstract"   	>
-| < LOCAL:      "local"      	> /* Nice specific */
 
 // exceptions
 | < THROW:	"throw"		>
@@ -880,22 +879,21 @@ List interfaces():
 void getField(List fields):
 {
   MonoSymbol field;
-  boolean isFinal=false, isLocal=false;
+  boolean isFinal=false;
 }
 {
   ( "final" { isFinal=true; } 
-  | "local" { isLocal=true; }
   | "public" | "private"
   )* 
   field=monoSymbol() ";" 
-  { fields.add(new NiceClass.Field(field,isFinal,isLocal)); }
+  { fields.add(new NiceClass.Field(field, isFinal)); }
 }
 
 ClassDefinition classDefinition():
 {
   LocatedString name;
   List parameters;
-  List fields=new ArrayList(),methods=new ArrayList(0);
+  List fields=new ArrayList(),methods=null;
   List ext=new ArrayList(0),imp=new ArrayList(0),abs=new ArrayList(0);
   List l;
   List typeParametersVariances = new ArrayList(0);
@@ -930,7 +928,7 @@ ClassDefinition classDefinition():
    }
    // internal fields and methods
    (
-      LOOKAHEAD( [ "final" | "local" ] monoSymbol() ";" )
+      LOOKAHEAD( [ "final" | "public" | "private" ] monoSymbol() ";" )
       getField(fields)
     |
       [ "public" | "private" ]
@@ -942,7 +940,11 @@ ClassDefinition classDefinition():
       |
         { MethodDeclaration m; }
         m = internalMethodDeclaration(res)
-        { methods.add(m); }
+        { 
+          if (methods == null)
+            methods = new ArrayList(5);
+          methods.add(m); 
+        }
       )
    )* 
    "}"

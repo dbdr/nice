@@ -64,13 +64,25 @@ public class NiceClass extends ClassDefinition
       addTypeMap("#"+name.content, this.tc);
   }
 
+  private static Field[] noFields = new Field[0];
+  
   public void setFieldsAndMethods(List fields, List methods)
   {
-    this.fields = keepFields(fields, isSharp);
+    if (fields != null && fields.size() > 0)
+      {
+	this.fields = (Field[]) fields.toArray(new Field[fields.size()]);
+
+	//do not enter fields into global scope
+	for (int i = 0; i < this.fields.length; i++)
+	  this.fields[i].sym.propagate = Node.none; 
+
+	computeMethods();
+      }
+    else
+      this.fields = noFields;
+    
     if(methods != null)
       this.methods = addChildren(methods);
-
-    computeMethods();
 
     if(this.isSharp)
       classType = module.createClass(simpleName.toString().substring(1));
@@ -101,7 +113,7 @@ public class NiceClass extends ClassDefinition
        null, null, null);
     c.superClass = new TypeConstructor[]{ this.tc };
     
-    c.setFieldsAndMethods(fields, null);
+    c.setFieldsAndMethods(null, null);
     associatedConcreteClass = c;
     concreteClasses.add(c);
     
@@ -128,55 +140,42 @@ public class NiceClass extends ClassDefinition
    * Fields
    ****************************************************************/
 
-  private List keepFields(List fields, boolean local)
-  {
-    List result = new ArrayList(fields.size());
-    for(Iterator i = fields.iterator(); i.hasNext();)
-      {
-	Field f = (Field) i.next();
-	if(f.isLocal == local)
-	  {
-	    result.add(f);
-	    f.sym.propagate = Node.none; // do not enter into global scope
-	  }
-      }
-    return result;
-  }
-  
   public static class Field
   {
-    public Field(MonoSymbol sym, boolean isFinal, boolean isLocal)
+    public Field(MonoSymbol sym, boolean isFinal)
     {
       this.sym = sym;
       this.isFinal = isFinal;
-      this.isLocal = isLocal;
     }
 
     public String toString()
     {
       return 
 	(isFinal ? "final " : "") +
-	(isLocal ? "local " : "") +
 	sym;
     }
     
     MonoSymbol sym;
     boolean isFinal;
-    boolean isLocal;
   }
   
   private void computeMethods()
   {
-    for(Iterator i = fields.iterator(); i.hasNext();)
+    for (int i = 0; i < fields.length; i++)
       {
-	Field f = (Field) i.next();
-
-	MonoSymbol s = f.sym;
-	MethodDeclaration m = 
-	  new NiceFieldAccess(this, s.name, s.syntacticType, typeParameters);
-
-	addChild(m);
+	MonoSymbol s = fields[i].sym;
+	addChild(new NiceFieldAccess
+	  (this, s.name, s.syntacticType, typeParameters));
       }
+  }
+
+  public void createContext()
+  {
+    super.createContext();
+    
+    if (methods != null)
+      for (Iterator i = methods.iterator(); i.hasNext();)
+	((MethodDeclaration) i.next()).createContext();
   }
 
   void resolve()
@@ -189,7 +188,7 @@ public class NiceClass extends ClassDefinition
     prepareClassType();
 
     //optim
-    if(fields.size()==0)
+    if (fields.length == 0)
       return;
     
     TypeScope localScope = new TypeScope(typeScope);
@@ -200,9 +199,9 @@ public class NiceClass extends ClassDefinition
       User.error(this, e);
     }
     
-    for(Iterator i = fields.iterator();	i.hasNext();)
+    for (int i = 0; i < fields.length; i++)
       {
-	Field f = (Field) i.next();
+	Field f = fields[i];
 	
 	f.sym.type = f.sym.syntacticType.resolve(localScope);
 
@@ -389,9 +388,9 @@ public class NiceClass extends ClassDefinition
   
   protected void addFields(ClassType c)
   {
-    for(Iterator i = fields.iterator(); i.hasNext();)
+    for (int i = 0; i < fields.length; i++)
       {
-	Field f = (Field) i.next();
+	Field f = fields[i];
 	
 	String name = f.sym.name.toString();
 	
@@ -407,12 +406,7 @@ public class NiceClass extends ClassDefinition
    * Misc.
    ****************************************************************/
 
-  Collection methodDefinitions()
-  {
-    return methods;
-  }
-
-  private List /* of ClassDefinition.Field */ fields;
+  private Field[] fields;
   private List methods;
   private ClassType classType;  
 

@@ -106,10 +106,19 @@ List<(?String,String)> parse(String comments) {
             //this is a new tag
             if(line.charAt(0) == '@') {
                 //find the first space - this tells us the range of the tag
+                //alternatively, there might be no space
                 int index = line.indexOf(' ');
-                String tag = line.substring(1, index); //skip the '@'
-                String comment = line.substring(index+1); //+1 because we need to skip the space
-    
+                String tag, comment;
+                if(index != -1 && index + 1 <= line.length()) {
+                    //skip the '@'
+                    tag = line.substring(1, index);
+                    //+1 because we need to skip the space
+                    comment = line.substring(index+1);
+                }
+                else {
+                    tag = line;
+                    comment = "";
+                }
                 Node n = new Node(value: (tag, comment));
                 root.insert(n);
                 lastNode = n;

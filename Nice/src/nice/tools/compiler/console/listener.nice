@@ -1,0 +1,84 @@
+/**************************************************************************/
+/*                                N I C E                                 */
+/*             A high-level object-oriented research language             */
+/*                        (c) Daniel Bonniot 2003                         */
+/*                                                                        */
+/*  This program is free software; you can redistribute it and/or modify  */
+/*  it under the terms of the GNU General Public License as published by  */
+/*  the Free Software Foundation; either version 2 of the License, or     */
+/*  (at your option) any later version.                                   */
+/*                                                                        */
+/**************************************************************************/
+
+package nice.tools.compiler.console;
+
+/**
+   Keep track of messages reported to the user.
+
+   @author Daniel Bonniot (bonniot@users.sourceforge.net)
+ */
+
+public ConsoleOutput consoleOutput() = new ConsoleOutput();
+
+let int OK      = 0; // Normal exit (compilation sucessful, version message)
+let int BUG     = 1; // Abnormal termination (bug in the compiler)
+let int ERROR   = 2; // Error reported (file missing, type error, ...)
+let int WARNING = 3; // Warning reported
+
+public final class ConsoleOutput implements CompilationListener
+{
+  public int statusCode = OK;
+
+  private void setStatusCode(int status)
+  {
+    if (worse(status, statusCode))
+      statusCode = status;
+  }
+
+  progress(packageName, phase)
+  {
+    if (packageName != null)
+      println(packageName + ": " + phase);
+    else
+      println(phase);
+  }
+
+  warning(location, message)
+  {
+    this.setStatusCode(WARNING);
+    if (location != null)
+      System.out.println("\n" + location + ":\n" + message);
+    else
+      System.out.println("\n" + message);
+  }
+  
+  error(location, message)
+  {
+    this.setStatusCode(ERROR);
+    if (location != null)
+      System.err.println("\n" + location + ":\n" + message);
+    else
+      System.err.println("\n" + message);
+  }
+  
+  /** A bug has occured inside the compiler. */
+  bug(stackTrace, url)
+  {
+    this.setStatusCode(BUG);
+    System.err.println
+      ("\nAn exception has occured in the compiler\n" +
+       "Please fill-in a bug report at the following webpage:\n" +
+       url +
+       //       "\n\nException: " + exn.toString() +
+       "\n\nStack trace:\n" + stackTrace);
+  }
+}
+  
+boolean worse(int status, int than)
+{
+  if (than == OK) return true;
+  if (than == BUG) return false;
+  if (than == ERROR) return false;
+  if (than == WARNING) return status == BUG || status == ERROR;
+  return false;
+}

@@ -17,7 +17,6 @@ import java.io.*;
 import java.util.*;
 import java.lang.reflect.*;
 
-import nice.tools.compiler.OutputMessages;
 import bossa.modules.Compilation;
 
 
@@ -295,13 +294,13 @@ public abstract class TestCase {
 				if (! _dontCompilePackages.contains(packageName)) {
 					int retval = compilePackage(packageName);
 					switch (retval) {
-					case OutputMessages.ERROR:
+					case nice.tools.compiler.console.fun.ERROR:
 						showMessages = true;
 						throw new TestSuiteException(ERROR_MSG);
-					case OutputMessages.BUG:
+					case nice.tools.compiler.console.fun.BUG:
 						showMessages = true;
 						throw new CompilerBugException(BUG_MSG);
-					case OutputMessages.WARNING:
+					case nice.tools.compiler.console.fun.WARNING:
 						showMessages = true;
 						break;
 					}
@@ -325,13 +324,16 @@ public abstract class TestCase {
 	 * @exception	TestSuiteException	TODO
 	 */
 	private int compilePackage(String packageName) throws TestSuiteException {
-	  Compilation compilation = bossa.modules.fun.createCompilation();
+    nice.tools.compiler.console.ConsoleOutput output = 
+      nice.tools.compiler.console.fun.consoleOutput();
+	  Compilation compilation = bossa.modules.fun.createCompilation(output);
 	  String tempDir = TestNice.getTempFolder().getAbsolutePath();
 	  compilation.sourcePath = tempDir;
 	  compilation.destinationDir = tempDir;
 	  compilation.runtimeFile = TestNice.getRuntime();
-	  return nice.tools.compiler.fun.compile
+	  nice.tools.compiler.fun.compile
 	    (compilation, packageName, null, null, false);
+	  return output.statusCode;
 	}
 	
 	/**

@@ -59,14 +59,9 @@ void make(mlsub.compilation.Compilation compilation)
   List<List<Module>> sccs =
     stronglyConnectedComponents
       (notNull(compilation.root), Module m => m.getRequirements());
-  try{
-    sccs.foreach(List<Module> scc => 
-      { compileComponent(compilation, scc,
-			 !compilation.skipLink); });
-  }
-  catch(bossa.util.UserError e){
-    nice.tools.compiler.OutputMessages.error(e.getMessage());
-  }
+
+  sccs.foreach(List<Module> scc => 
+	       compileComponent(compilation, scc, !compilation.skipLink));
 }
 
 List<Module> getRequirements(Module) = native List Module.getRequirements();

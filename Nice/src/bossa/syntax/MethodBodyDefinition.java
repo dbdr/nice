@@ -407,7 +407,7 @@ public class MethodBodyDefinition extends Definition
 
 	bossa.syntax.dispatch.typecheck(body);
       } catch(UserError ex){
-	nice.tools.compiler.OutputMessages.error(ex.getMessage());
+	module.compilation().error(ex);
 	errorFound = true;
       }
     }

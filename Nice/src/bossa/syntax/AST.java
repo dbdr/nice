@@ -69,7 +69,7 @@ public class AST extends Node
       n.doResolve();
     }
     catch(UserError ex){
-      nice.tools.compiler.OutputMessages.error(ex.getMessage());
+      module.compilation().error(ex);
     }
   }
 
@@ -90,7 +90,7 @@ public class AST extends Node
 	  resolve(n);
       }
 
-    nice.tools.compiler.OutputMessages.exitIfErrors();
+    module.compilation().exitIfErrors();
   }
 
   public void typedResolve()
@@ -105,7 +105,7 @@ public class AST extends Node
 	    ((MethodBodyDefinition) o).lateBuildScope();
 	  }
 	  catch(UserError ex){
-	    nice.tools.compiler.OutputMessages.error(ex.getMessage());
+            module.compilation().error(ex);
 	  }
       }
 
@@ -114,10 +114,10 @@ public class AST extends Node
         methods[i].typedResolve();
       }
       catch(UserError ex){
-        nice.tools.compiler.OutputMessages.error(ex.getMessage());
+        module.compilation().error(ex);
       }
 
-    nice.tools.compiler.OutputMessages.exitIfErrors();
+    module.compilation().exitIfErrors();
   }
 
   public void localResolve()
@@ -131,11 +131,11 @@ public class AST extends Node
 	  d.resolveBody();
 	}
 	catch(UserError ex){
-	  nice.tools.compiler.OutputMessages.error(ex.getMessage());
+          module.compilation().error(ex);
 	}
       }
 
-    nice.tools.compiler.OutputMessages.exitIfErrors();
+    module.compilation().exitIfErrors();
 
     for (int i = 0; i < classes.length; i++)
       classes[i].precompile();

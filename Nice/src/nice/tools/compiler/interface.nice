@@ -19,23 +19,23 @@ package nice.tools.compiler;
    @author Daniel Bonniot (bonniot@users.sourceforge.net)
  */
 
-int compile(Compilation compilation, String mainPackage,
-	    ?String nativeProgram = null, ?String nativeCompiler = null,
-	    boolean editorMode = false)
+import bossa.modules;
+
+void compile(Compilation compilation, String mainPackage,
+	     ?String nativeProgram = null, ?String nativeCompiler = null,
+	     boolean editorMode = false)
 {
   ?Throwable uncaughtException = null;
 
   try {
 
-    OutputMessages.start();
-
+    bossa.modules.Package.currentCompilation = compilation;
     bossa.util.Location.editorMode = editorMode;
+
     if (compilation.runtimeFile == null)
       compilation.runtimeFile = getNiceRuntime();
     nice.tools.code.TypeImport.setRuntime(compilation.runtimeFile);
     compilation.setMainPackage(mainPackage);
-
-    bossa.modules.Package.currentCompilation = compilation;
 
     make(compilation);
 
@@ -44,13 +44,12 @@ int compile(Compilation compilation, String mainPackage,
       produceNativeProgram(nativeCompiler, mainPackage, 
 			   nativeProgram, jar);
   }
-  catch(OutputMessages.Exit e) {
-    // Compilation was interrupted.
-    return e.statusCode;
+  catch(bossa.modules.Exit e) {
+    // The compilation was stopped because an error prevented going further.
   }
   catch(bossa.util.UserError e){
     bossa.util.Internal.warning("user error only caught in main"); 
-    nice.tools.compiler.OutputMessages.error(e.getMessage());
+    compilation.listener.error(e.location, notNull(e.message));
   }
   catch(ExceptionInInitializerError e){
     uncaughtException = e.getException();
@@ -61,18 +60,15 @@ int compile(Compilation compilation, String mainPackage,
 
   if (uncaughtException != null)
     {
-      Throwable exn = uncaughtException;
+      let stackTrace = new java.io.StringWriter(500);
+      uncaughtException.printStackTrace(new java.io.PrintWriter(stackTrace));
 
-      OutputMessages.bug
-      ("\nAn exception has occured in the compiler\n" +
-       "Please fill-in a bug report at the following webpage:\n" +
-       "http://sourceforge.net/tracker/?func=add&group_id=12788&atid=112788" +
-       "\n\nException: " + exn.toString() +
-       "\n\nStack trace:\n");
-      exn.printStackTrace();
+      compilation.listener.bug
+      (stackTrace: stackTrace.toString(),
+       url: 
+         "http://sourceforge.net/tracker/?func=add&group_id=12788&atid=112788"
+      );
     }
-
-  return OutputMessages.getStatusCode();
 }
 
 /**

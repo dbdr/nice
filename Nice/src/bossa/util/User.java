@@ -70,9 +70,8 @@ public final class User
     if(Debug.alwaysDumpStack)
       Internal.printStackTrace();
     
-    nice.tools.compiler.OutputMessages.warning
-      ("\n"+(responsible == null ? "" : responsible.location().toString() + ": ") +
-       "Warning:\n" + message);
+    bossa.modules.Package.currentCompilation.warning
+      (responsible == null ? null : responsible.location(), message);
   }
 
   public static void warning(String message)

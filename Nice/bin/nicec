@@ -78,4 +78,8 @@ if [ -f "$gcj" ]; then
     system_args="${system_args} --native-compiler=${gcj}"
 fi
 
-exec ${java} nice.tools.compiler.fun ${system_args} "$@"
+if [ "$nice_bootstrap" = true ]; then
+  exec ${java} nice.tools.compiler.fun ${system_args} "$@"
+fi
+
+exec ${java} nice.tools.compiler.console.fun ${system_args} "$@"

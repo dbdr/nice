@@ -4,7 +4,6 @@ import org.apache.tools.ant.*;
 import org.apache.tools.ant.types.*;
 import java.io.File;
 import java.util.Vector;
-import nice.tools.compiler.OutputMessages;
 import bossa.modules.Compilation;
 
 /**
@@ -283,7 +282,9 @@ public class Nicec extends Task {
 	public void execute() throws BuildException {
 	  log("runtime: " + runtime, Project.MSG_VERBOSE);
 
-	  Compilation compilation = bossa.modules.fun.createCompilation();
+	  nice.tools.compiler.console.ConsoleOutput console = 
+	    nice.tools.compiler.console.fun.consoleOutput();
+	  Compilation compilation = bossa.modules.fun.createCompilation(console);
 	  if (sourcepath != null)
 	    compilation.sourcePath = sourcepath;
 	  if (destination != null)
@@ -295,18 +296,19 @@ public class Nicec extends Task {
 	  compilation.skipLink = compile;
 	  compilation.excludeRuntime = exclude_runtime;
 	  compilation.runtimeFile = runtime;
-	  int retval = nice.tools.compiler.fun.compile
+	  nice.tools.compiler.fun.compile
 	    (compilation, pack, output, native_compiler, editor);
+	  int retval = console.statusCode;
 
 	  switch (retval) {
-	  case OutputMessages.ERROR:
+	  case nice.tools.compiler.console.fun.ERROR:
 	    throw new BuildException(ERROR_MSG, location);
-	  case OutputMessages.BUG:
+	  case nice.tools.compiler.console.fun.BUG:
 	    throw new BuildException(BUG_MSG, location);
-	  case OutputMessages.WARNING:
+	  case nice.tools.compiler.console.fun.WARNING:
 	    log(WARNING_MSG, Project.MSG_WARN);
 	    break;
-	  case OutputMessages.OK:
+	  case nice.tools.compiler.console.fun.OK:
 	    log(OK_MSG, Project.MSG_INFO);
 	    break;
 	  }

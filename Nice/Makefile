@@ -28,33 +28,33 @@ NICEC1=JAVA="${java}" ${TOP}/bin/nicec ${NICEC_ARGS} -d "${TOP}/classes" --sourc
 
 
 
-all: src/nice/tools/compiler.jar compiler2 archive2
+all: src/nice/tools/compiler/console.jar compiler2 archive2
 
 stable:   clean bootstrap compiler1 ant testengine archiveOld
 complete: stable   compiler2 archive2
 fixpoint: complete compiler3 archive3
 world:    fixpoint check test
 
-src/nice/tools/compiler.jar:
+src/nice/tools/compiler/console.jar:
 	$(MAKE) complete
 
 compiler1: setDate
 	${NICEC}  bossa.syntax
-	${NICEC}  -R -a src/nice/tools/compiler.jar nice.tools.compiler
+	${NICEC}  -R -a src/nice/tools/compiler/console.jar nice.tools.compiler.console
 
 compiler2 compiler3: setDate
 	${NICEC1} -R bossa.syntax
-	${NICEC1} -R -a src/nice/tools/compiler.jar nice.tools.compiler
+	${NICEC1} -R -a src/nice/tools/compiler/console.jar nice.tools.compiler.console
 
-archiveOld: src/nice/tools/compiler.jar
+archiveOld: src/nice/tools/compiler/console.jar
 	mkdir -p share/java
-	cp src/nice/tools/compiler.jar share/java/nice.jar
+	cp src/nice/tools/compiler/console.jar share/java/nice.jar
 	jar umf src/mainClass share/java/nice.jar -C classes java -C classes nice -C classes mlsub -C classes bossa -C classes gnu -C classes.old bossa -C classes.old mlsub -C classes.old nice
 	if [ -r classes/lang/package.nicei ]; then cd classes; jar uf ../share/java/nice.jar nice/*/package.nicei; fi
 
-archive archive2 archive3 share/java/nice.jar: src/nice/tools/compiler.jar
+archive archive2 archive3 share/java/nice.jar: src/nice/tools/compiler/console.jar
 	mkdir -p share/java
-	cp src/nice/tools/compiler.jar share/java/nice.jar
+	cp src/nice/tools/compiler/console.jar share/java/nice.jar
 	jar umf src/mainClass share/java/nice.jar -C classes java -C classes nice -C classes mlsub -C classes bossa -C classes gnu
 	if [ -r classes/lang/package.nicei ]; then cd classes; jar uf ../share/java/nice.jar nice/*/package.nicei; fi
 
@@ -96,17 +96,17 @@ coverage: share/java/nice.jar
 GCJ=gcj
 GCJTEMP = /tmp/Nice-gcj.jar
 gcj:
-	cp src/nice/tools/compiler.jar $(GCJTEMP)
+	cp src/nice/tools/compiler/console.jar $(GCJTEMP)
 	jar umf src/mainClass $(GCJTEMP) -C classes nice/doc -C classes nice/getopt -C classes nice/lang -C classes nice/tools/ast -C classes nice/tools/code -C classes nice/tools/compiler -C classes nice/tools/util -C classes mlsub -C classes bossa -C classes gnu
 	$(GCJ) --main=nice.tools.compiler.fun -o bin/nicec.bin $(GCJTEMP)
 
 gcj-testsuite:
-	cp src/nice/tools/compiler.jar $(GCJTEMP)
+	cp src/nice/tools/compiler/console.jar $(GCJTEMP)
 	jar umf src/mainClass $(GCJTEMP) -C classes nice/doc -C classes nice/getopt -C classes nice/lang -C classes nice/tools/ast -C classes nice/tools/code -C classes nice/tools/compiler -C classes nice/tools/util -C classes nice/tools/testsuite -C classes mlsub -C classes bossa -C classes gnu
 	$(GCJ) -g --main=nice.tools.testsuite.TestNice -o bin/testsuite.bin $(GCJTEMP)
 
 clean:
-	rm -f src/nice/tools/compiler.jar
+	rm -f src/nice/tools/compiler/console.jar
 	-rm -rf classes share/java src/bossa/parser/{Parse*.java,Token*.java,ASCII_*.java}
 	find "${TOP}" \( -name "*.class" -o -name "*.nicei" -o -name "*~" \) -exec rm {} \;
 

@@ -7,9 +7,8 @@ NICEC_JAR="external/nice-bootstrap.jar"
 if [ -r "${NICEC_JAR}" ]; then
 
   export NICEC_JAR
-  echo $NICEC_JAR
 
-  ./bin/nicec "$@"
+  nice_bootstrap=true ./bin/nicec "$@"
 
 elif NICEC="`which nicec`"; then
 

@@ -21,7 +21,7 @@ import mlsub.compilation;
    @author Daniel Bonniot (Daniel.Bonniot@inria.fr)
 **/
 
-class Compilation extends mlsub.compilation.Compilation
+class Compilation extends CompilationInterface
 {
   boolean recompileAll = false;
   boolean recompileCommandLine = false;
@@ -49,6 +49,8 @@ class Compilation extends mlsub.compilation.Compilation
   ?String runtimeFile = null;
 
   ?Locator locator = null;
+
+  CompilationListener listener;
 
   Map<String,Package> packages = new HashMap();
   Map<String,mlsub.typing.TypeConstructor> javaTypeConstructors = new HashMap();
@@ -82,6 +84,32 @@ class Compilation extends mlsub.compilation.Compilation
 
     this.root = Package.make(new bossa.syntax.LocatedString(packageName, new bossa.util.Location("Command line")), this, true);
   }
+
+  /****************************************************************
+   * Error handling
+   ****************************************************************/
+  
+  private boolean wasError = false;
+
+  error(ex)
+  {
+    wasError = true;
+    listener.error(notNull(ex).location, notNull(notNull(ex).message));
+  }
+
+  exitIfErrors()
+  {
+    if (wasError)
+      throw new Exit();
+  }
+
+  warning(location, message)
+  {
+    listener.warning(location, notNull(message));
+  }
 }
 
-Compilation createCompilation() = new Compilation();
+Compilation createCompilation(CompilationListener listener) = 
+  new Compilation(listener: listener);
+
+class Exit extends RuntimeException {}

@@ -42,15 +42,11 @@ analyse(s@Statement, varScope, typeScope, mustReturnAValue)
 {
   Info info = buildInfo(varScope, typeScope);
 
-  try{
-    analyse(s, info);
+  analyse(s, info);
     
-    if (mustReturnAValue && !info.getUnreachable())
-      throw error(s, "Missing return statement");
-  }
-  catch(bossa.util.UserError e){
-    nice.tools.compiler.OutputMessages.error(e.getMessage());
-  }
+  if (mustReturnAValue && !info.getUnreachable())
+    throw error(s, "Missing return statement");
+
   return s;
 }
 

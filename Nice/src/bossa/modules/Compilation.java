@@ -4,10 +4,15 @@ package bossa.modules;
 /**
  * Stores information about a bossa compilation.
  *
+ * This java source is only used to break a dependency cycle when 
+ * bootstrapping. The master source is in Nice files.
+ *
  * @author Daniel Bonniot
  */
 
-public class Compilation extends mlsub.compilation.Compilation
+import bossa.util.Location;
+
+public abstract class Compilation extends CompilationInterface
 {
   public boolean recompileAll;
   public boolean recompileCommandLine;

@@ -48,7 +48,11 @@ public final class Internal
       {
 	if(Debug.alwaysDumpStack)
 	  printStackTrace();
-	nice.tools.compiler.OutputMessages.warning("[Internal warning] "+message);
+        if (bossa.modules.Package.currentCompilation != null)
+          bossa.modules.Package.currentCompilation.warning
+            (null, "[Internal warning] " + message);
+        else
+          System.err.println("[Internal warning] " + message);
       }
   }
 

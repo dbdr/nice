@@ -233,7 +233,7 @@ public class Package implements mlsub.compilation.Module, Located, bossa.syntax.
   public void compile()
   {
     typecheck();
-    nice.tools.compiler.OutputMessages.exitIfErrors();
+    compilation.exitIfErrors();
     generateCode();
     saveInterface();
   }
@@ -300,7 +300,7 @@ public class Package implements mlsub.compilation.Module, Located, bossa.syntax.
     
 	finishCompilation();
     
-	nice.tools.compiler.OutputMessages.exitIfErrors();
+	compilation.exitIfErrors();
       }
 
     // Write the archive even if nothing was compiled.

@@ -179,6 +179,14 @@ similarEmptyCollection(c#HashMap.Values) = new ArrayList(c.size());
   Collections.sort(list, new NiceComparator(comparator: comparator));
 }
 
+/**
+ * Uses the default comparison methods defined in Comparable to sort
+ * the list.
+ */
+<Comparable T> void sort(List<T> list) {
+  sort(list, (T t1,T t2)=> t1 < t2 ? -1 : (t1 > t2 ? 1 : 0));
+}
+
 class NiceComparator<-T> implements java.util.Comparator<T>
 {
   final (T,T) -> int comparator;

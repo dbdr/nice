@@ -35,7 +35,7 @@ isNullExp(e@NullExp) = true;
 localVariable(e@Expression) = null;
 localVariable(e@SymbolExp)
 {
-  if (instanceof(e.getSymbol(), "bossa.syntax.MonoSymbol"))
+  if (e.getSymbol() instanceof bossa.syntax.MonoSymbol)
     return cast(e.getSymbol());
   return null;
 }

@@ -109,7 +109,7 @@ public class JavaccParser implements bossa.modules.Parser
         if (token.next != null)
           token = token.next;
 
-        throw User.error(Location.make(token.beginLine, token.beginColumn),
+        throw User.error(Parser.makeLocation(token),
                          removeLocation(e.getMessage()));
       }
     else

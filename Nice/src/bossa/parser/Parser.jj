@@ -60,7 +60,7 @@ public class Parser
     throw ex;
   }
 
-  private static Location makeLocation(Token t)
+  static Location makeLocation(Token t)
   {
     return Location.make(t.beginLine, t.beginColumn, t.endLine, t.endColumn);
   }

@@ -603,6 +603,12 @@ public class ClassType extends ObjectType implements AttrContainer {
    * @param clas should be the same as getReflectClass(). */
   public void addMethods(Class clas)
   {
+    // Set this flag BEFORE the actual addition.
+    // This prevents this method to be called indirectly for the same class
+    // while it is executed, which would result in methods being listed
+    // twice in this class.
+    flags |= ADD_METHODS_DONE;
+
     java.lang.reflect.Method[] methods;
     try
       {
@@ -662,8 +668,6 @@ public class ClassType extends ObjectType implements AttrContainer {
         meth.arg_types = args;
         meth.return_type = Type.void_type;
       }
-
-    flags |= ADD_METHODS_DONE;
   }
 
   public Method[] getMatchingMethods(String name, Type[] paramTypes, int flags)

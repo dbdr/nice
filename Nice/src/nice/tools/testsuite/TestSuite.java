@@ -118,6 +118,7 @@ public class TestSuite {
 	*/
 	private void performTests() throws TestSuiteException {
 		for(Iterator iter = _testCases.iterator(); iter.hasNext(); ) {
+			TestNice.cleanupTempFolder();
 			TestCase testCase = (TestCase)iter.next();
 			testCase.writeFiles();
 			testCase.performTest();

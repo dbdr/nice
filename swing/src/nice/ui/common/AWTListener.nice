@@ -1,0 +1,809 @@
+package nice.ui.common;
+
+/** 
+ * class that implements a java.awt.event.* interface
+ * and delegates the action to an optional anonymous function.
+ */
+class NActionListener implements ActionListener , NiceListener
+{
+  /** 
+   * A field that stores an optional anonymous function. 
+   */
+  private ActionEvent ?-> void actionPerformed = null;
+
+
+  /** 
+   * The implementation of the method actionPerformed defined in ActionListener. 
+   */
+  actionPerformed(e)
+  {
+    ActionEvent ?-> void actionPerformed = this.actionPerformed;
+    if(actionPerformed != null) actionPerformed(e);
+  }
+}
+
+
+/** 
+ * class that implements the java.awt.event.AdjustmentListener interface
+ * and delegates the action to an optional anonymous function.
+ */
+class NAdjustmentListener implements AdjustmentListener , NiceListener
+{
+  /** 
+   * A field that stores an optional anonymous function. 
+   */
+  private AdjustmentEvent ?-> void adjustmentValueChanged = null;
+
+
+  /** 
+   * The implementation of the method adjustmentValueChanged defined in AdjustmentListener. 
+   */
+   adjustmentValueChanged(e)
+   {
+     AdjustmentEvent ?-> void adjustmentValueChanged = this.adjustmentValueChanged;
+     if(adjustmentValueChanged != null) adjustmentValueChanged(e);
+   }
+}
+
+
+/** 
+ * class that implements the java.awt.event.AdjustmentListener interface
+ * and delegates the action to optional  anonymous function.
+ */
+class NAWTEventListener implements AWTEventListener , MappableAWTEventListener
+{
+  /** 
+   * A field that stores an optional anonymous function. 
+   */
+  private AWTEvent ?-> void eventDispatched = null;
+
+
+  /** 
+   * The implementation of the method eventDispatched defined in AWTEventListener. 
+   */
+   eventDispatched(e)
+   {
+     AWTEvent ?-> void eventDispatched = this.eventDispatched;
+     if(eventDispatched != null) eventDispatched(e);
+   }
+}  
+
+
+/** 
+ * class that implements the java.awt.event.ComponentListener interface
+ * and delegates the actions to optional  anonymous functions.
+ */
+class NComponentListener implements ComponentListener , NiceListener
+{
+  /** 
+   * fields that store optional anonymous functions for all required methods. 
+   */
+  private ComponentEvent ?-> void componentHidden = null;
+  private ComponentEvent ?-> void componentMoved  = null;
+  private ComponentEvent ?-> void componentResized = null;
+  private ComponentEvent ?-> void componentShown  = null;
+  
+
+  /** 
+   * The implementation of the method componentHidden defined in java.awt.event.ComponentListener. 
+   */
+   componentHidden(e)
+   {
+     ComponentEvent ?-> void componentHidden = this.componentHidden;
+     if(componentHidden != null) componentHidden(e);
+   }
+   
+  /** 
+   * The implementation of the method componentMoved defined in java.awt.event.ComponentListener. 
+   */
+   componentMoved(e)
+   {
+     ComponentEvent ?-> void componentMoved = this.componentMoved;
+     if(componentMoved != null) componentMoved(e);
+   }
+ 
+  /** 
+   * The implementation of the method componentResized defined in java.awt.event.ComponentListener. 
+   */
+   componentResized(e)
+   {
+     ComponentEvent ?-> void componentResized = this.componentResized;
+     if(componentResized != null) componentResized(e);
+   }
+   
+  /** 
+   * The implementation of the method componentShown defined in java.awt.event.ComponentListener. 
+   */
+   componentShown(e)
+   {
+     ComponentEvent ?-> void componentShown = this.componentShown;
+     if(componentShown != null) componentShown(e);
+   }
+}
+
+
+/** 
+ * class that implements the java.awt.event.ContainerListener interface
+ * and delegates the actions to optional anonymous functions.
+ */
+class NContainerListener implements ContainerListener , NiceListener
+{
+  /** 
+   * fields that store optional anonymous functions for all required methods. 
+   */
+  private ContainerEvent ?-> void componentAdded = null;
+  private ContainerEvent ?-> void componentRemoved = null;
+  
+
+  /** 
+   * The implementation of the method componentAdded defined in java.awt.event.ContainerListener. 
+   */
+   componentAdded(e)
+   {
+     ContainerEvent ?-> void componentAdded = this.componentAdded;
+     if(componentAdded != null) componentAdded(e);
+   }
+   
+  /** 
+   * The implementation of the method componentRemoved defined in java.awt.event.ContainerListener. 
+   */
+   componentRemoved(e)
+   {
+     ContainerEvent ?-> void componentRemoved = this.componentRemoved;
+     if(componentRemoved != null) componentRemoved(e);
+   }
+}
+
+
+/** 
+ * class that implements the java.awt.event.FocusListener interface
+ * and delegates the actions to optional anonymous functions.
+ */
+class NFocusListener implements FocusListener , NiceListener
+{
+  /** 
+   * fields that store optional anonymous functions for all required methods. 
+   */
+  private FocusEvent ?-> void focusGained = null;
+  private FocusEvent ?-> void focusLost = null;
+  
+
+  /** 
+   * The implementation of the method focusGained defined in java.awt.event.FocusListener. 
+   */
+   focusGained(e)
+   {
+     FocusEvent ?-> void focusGained = this.focusGained;
+     if(focusGained != null) focusGained(e);
+   }
+   
+  /** 
+   * The implementation of the method focusLost defined in java.awt.event.FocusListener. 
+   */
+   focusLost(e)
+   {
+     FocusEvent ?-> void focusLost = this.focusLost;
+     if(focusLost != null) focusLost(e);
+   }
+}
+
+
+/** 
+ * class that implements the java.awt.event.HierarchyBoundsListener interface
+ * and delegates the actions to optional anonymous functions.
+ */
+class NHierarchyBoundsListener implements HierarchyBoundsListener , NiceListener
+
+{
+  /** 
+   * fields that store optional anonymous functions for all required methods. 
+   */
+  private HierarchyEvent ?-> void hierarchyAncestorMoved = null;
+  private HierarchyEvent ?-> void hierarchyAncestorResized = null;
+  
+
+  /** 
+   * The implementation of the method ancestorMoved defined in java.awt.event.HierarchyBoundsListener
+   */
+   ancestorMoved(e)
+   {
+     HierarchyEvent ?-> void hierarchyAncestorMoved = this.hierarchyAncestorMoved;
+     if(hierarchyAncestorMoved != null) hierarchyAncestorMoved(e);
+   }
+   
+  /** 
+   * The implementation of the method ancestorResized defined in java.awt.event.HierarchyBoundsListener 
+   */
+   ancestorResized(e)
+   {
+     HierarchyEvent ?-> void hierarchyAncestorResized = this.hierarchyAncestorResized;
+     if(hierarchyAncestorResized != null) hierarchyAncestorResized(e);
+   }
+}
+
+
+/** 
+ * class that implements the java.awt.event.HierarchyListener interface
+ * and delegates the action to an optional anonymous function.
+ */
+class NHierarchyListener implements HierarchyListener , NiceListener
+
+{
+  /** 
+   * a field that stores an optional anonymous function 
+   */
+  private HierarchyEvent ?-> void hierarchyChanged = null;
+  
+
+  /** 
+   * The implementation of the method hierarchyChanged defined in java.awt.event.HierarchyListener
+   */
+   hierarchyChanged(e)
+   {
+     HierarchyEvent ?-> void hierarchyChanged = this.hierarchyChanged;
+     if(hierarchyChanged != null) hierarchyChanged(e);
+   }
+}
+
+
+/** 
+ * class that implements the java.awt.event.InputMethodListener interface
+ * and delegates the actions to optional anonymous functions.
+ */
+class NInputMethodListener implements InputMethodListener , NiceListener
+
+{
+  /** 
+   * fields that store optional anonymous functions for all required methods. 
+   */
+  private InputMethodEvent ?-> void caretPositionChanged = null;
+  private InputMethodEvent ?-> void inputMethodTextChanged = null;
+  
+
+  /** 
+   * The implementation of the method caretPositionchanged defined in java.awt.event.InputMethodListener
+   */
+   caretPositionChanged(e)
+   {
+     InputMethodEvent ?-> void caretPositionChanged = this.caretPositionChanged;
+     if(caretPositionChanged != null) caretPositionChanged(e);
+   }
+   
+  /** 
+   * The implementation of the method inputMethodTextChanged defined in java.awt.event.InputMethodListener 
+   */
+   inputMethodTextChanged(e)
+   {
+     InputMethodEvent ?-> void inputMethodTextChanged = this.inputMethodTextChanged;
+     if(inputMethodTextChanged != null) inputMethodTextChanged(e);
+   }
+}
+
+
+/** 
+ * class that implements the java.awt.event.ItemListener interface
+ * and delegates the action to an optional anonymous function.
+ */
+class NItemListener implements ItemListener , NiceListener
+
+{
+  /** 
+   * a field that stores an optional anonymous function 
+   */
+  private ItemEvent ?-> void itemStateChanged = null;
+  
+
+  /** 
+   * The implementation of the method itemStateChanged defined in java.awt.event.ItemListener
+   */
+   itemStateChanged(e)
+   {
+     ItemEvent ?-> void itemStateChanged = this.itemStateChanged;
+     if(itemStateChanged != null) itemStateChanged(e);
+   }
+}
+
+
+/** 
+ * class that implements the java.awt.event.ComponentListener interface
+ * and delegates the actions to optional anonymous functions.
+ */
+class NKeyListener implements KeyListener , NiceListener
+{
+  /** 
+   * fields that store optional anonymous functions for all required methods. 
+   */
+  private KeyEvent ?-> void keyPressed = null;
+  private KeyEvent ?-> void keyReleased = null;
+  private KeyEvent ?-> void keyTyped = null;
+  
+
+  /** 
+   * The implementation of the method keyPressed defined in java.awt.event.KeyListener. 
+   */
+   keyPressed(e)
+   {
+     KeyEvent ?-> void keyPressed = this.keyPressed;
+     if(keyPressed != null) keyPressed(e);
+   }
+   
+  /** 
+   * The implementation of the method keyReleased defined in java.awt.event.KeyListener. 
+   */
+   keyReleased(e)
+   {
+     KeyEvent ?-> void keyReleased = this.keyReleased;
+     if(keyReleased != null) keyReleased(e);
+   }
+   
+  /** 
+   * The implementation of the method keyTyped defined in java.awt.event.KeyListener. 
+   */
+   keyTyped(e)
+   {
+     KeyEvent ?-> void keyTyped = this.keyTyped;
+     if(keyTyped != null) keyTyped(e);
+   }
+}
+
+
+/** 
+ * class that implements the java.awt.event.MouseListener interface
+ * and delegates the actions to optional anonymous functions.
+ */
+class NMouseListener implements MouseListener , NiceListener
+{
+  /** 
+   * fields that store optinal anonymous functions for all required methods. 
+   */
+  private MouseEvent ?-> void mouseClicked = null;
+  private MouseEvent ?-> void mouseEntered = null;
+  private MouseEvent ?-> void mouseExited = null;
+  private MouseEvent ?-> void mousePressed = null;
+  private MouseEvent ?-> void mouseReleased = null;
+  
+
+  /** 
+   * The implementation of the method mouseClicked defined in java.awt.event.MouseListener. 
+   */
+   mouseClicked(e)
+   {
+     MouseEvent ?-> void mouseClicked = this.mouseClicked;
+     if(mouseClicked != null) mouseClicked(e);
+   }
+   
+  /** 
+   * The implementation of the method mouseEntered defined in java.awt.event.MouseListener. 
+   */
+   mouseEntered(e)
+   {
+     MouseEvent ?-> void mouseEntered = this.mouseEntered;
+     if(mouseEntered != null) mouseEntered(e);
+   }
+   
+  /** 
+   * The implementation of the method mouseExited defined in java.awt.event.MouseListener. 
+   */
+   mouseExited(e)
+   {
+     MouseEvent ?-> void mouseExited = this.mouseExited;
+     if(mouseExited != null) mouseExited(e);
+   }
+   
+  /** 
+   * The implementation of the method mousePressed defined in java.awt.event.MouseListener. 
+   */
+   mousePressed(e)
+   {
+     MouseEvent ?-> void mousePressed = this.mousePressed;
+     if(mousePressed != null) mousePressed(e);
+   }
+      
+  /** 
+   * The implementation of the method mouseReleased defined in java.awt.event.MouseListener. 
+   */
+   mouseReleased(e)
+   {
+     MouseEvent ?-> void mouseReleased = this.mouseReleased;
+     if(mouseReleased != null) mouseReleased(e);
+   }
+}
+
+
+/** 
+ * class that implements the java.awt.event.MouseMotionListener interface
+ * and delegates the actions to optional anonymous functions.
+ */
+class NMouseMotionListener implements MouseMotionListener , NiceListener
+
+{
+  /** 
+   * fields that store optional anonymous functions for all required methods. 
+   */
+  private MouseEvent ?-> void mouseDragged = null;
+  private MouseEvent ?-> void mouseMoved = null;
+  
+
+  /** 
+   * The implementation of the method mouseDragged defined in java.awt.event.MouseMotionListener
+   */
+   mouseDragged(e)
+   {
+     MouseEvent ?-> void mouseDragged = this.mouseDragged;
+     if(mouseDragged != null) mouseDragged(e);
+   }
+   
+  /** 
+   * The implementation of the method mouseMoved defined in java.awt.event.MouseMotionListener 
+   */
+   mouseMoved(e)
+   {
+     MouseEvent ?-> void mouseMoved = this.mouseMoved;
+     if(mouseMoved != null) mouseMoved(e);
+   }
+}
+
+
+/** 
+ * class that implements the java.awt.event.TextListener interface
+ * and delegates the action to an optional anonymous function.
+ */
+class NTextListener implements TextListener , NiceListener
+
+{
+  /** 
+   * a field that stores an optional anonymous function 
+   */
+  private TextEvent ?-> void textValueChanged = null;
+  
+
+  /** 
+   * The implementation of the method textValueChanged defined in java.awt.event.TextListener
+   */
+   textValueChanged(e)
+   {
+     TextEvent ?-> void textValueChanged = this.textValueChanged;
+     if(textValueChanged != null) textValueChanged(e);
+   }
+}
+
+
+/** 
+ * class that implements the java.awt.event.WindowListener interface
+ * and delegates the actions to optional anonymous functions.
+ */
+class NWindowListener implements WindowListener , NiceListener
+{
+  /** 
+   * fields that store optional anonymous functions for all required methods. 
+   */
+  private WindowEvent ?-> void windowActivated = null;
+  private WindowEvent ?-> void windowClosed = null;
+  private WindowEvent ?-> void windowClosing = null;
+  private WindowEvent ?-> void windowDeactivated = null;
+  private WindowEvent ?-> void windowDeiconified = null;
+  private WindowEvent ?-> void windowIconified = null;
+  private WindowEvent ?-> void windowOpened = null;
+  
+
+  /** 
+   * The implementation of the method windowActivated defined in java.awt.event.WindowListener. 
+   */
+   windowActivated(e) 
+   {
+     WindowEvent ?-> void windowActivated = this.windowActivated;
+     if(windowActivated != null) windowActivated(e);
+   }
+   
+  /** 
+   * The implementation of the method windowClosed defined in java.awt.event.WindowListener. 
+   */
+   windowClosed(e)
+   {
+     WindowEvent ?-> void windowClosed = this.windowClosed;
+     if(windowClosed != null) windowClosed(e);
+   }
+ 
+  /** 
+   * The implementation of the method windowClosing defined in java.awt.event.WindowListener. 
+   */
+   windowClosing(e)
+   {
+     WindowEvent ?-> void windowClosing = this.windowClosing;	
+     if(windowClosing != null) windowClosing(e);
+   }
+   
+  /** 
+   * The implementation of the method windowDeactivated defined in java.awt.event.WindowListener. 
+   */
+   windowDeactivated(e)
+   {
+     WindowEvent ?-> void windowDeactivated = this.windowDeactivated;
+     if(windowDeactivated != null) windowDeactivated(e);
+   }
+      
+  /** 
+   * The implementation of the method windowDeiconified defined in java.awt.event.WindowListener. 
+   */
+   windowDeiconified(e)
+   {
+     WindowEvent ?-> void windowDeiconified = this.windowDeiconified;
+     if(windowDeiconified != null) windowDeiconified(e);
+   }
+         
+  /** 
+   * The implementation of the method windowIconified defined in java.awt.event.WindowListener. 
+   */
+   windowIconified(e)
+   {
+     WindowEvent ?-> void windowIconified = this.windowIconified;
+     if(windowIconified != null) windowIconified(e);
+   }
+         
+  /** 
+   * The implementation of the method windowOpened defined in java.awt.event.WindowListener. 
+   */
+   windowOpened(e)
+   {
+     WindowEvent ?-> void windowOpened = this.windowOpened;
+     if(windowOpened != null) windowOpened(e);
+   }
+}
+
+
+/** 
+ * class that implements the java.awt.dnd.DragGestureListener interface
+ * and delegates the action to an optional anonymous function.
+ */
+class NDragGestureListener implements DragGestureListener , NiceListener
+
+{
+  /** 
+   * a field that stores an optional anonymous function 
+   */
+  private DragGestureEvent ?-> void dragGestureRecognized = null;
+  
+
+  /** 
+   * The implementation of the method dragGestureRecognized defined in java.awt.dnd.DragGestureListener
+   */
+   dragGestureRecognized(e)
+   {
+     DragGestureEvent ?-> void dragGestureRecognized = this.dragGestureRecognized;
+     if(dragGestureRecognized != null) dragGestureRecognized(e);
+   }
+}
+
+
+/** 
+ * class that implements the java.awt.dnd.DragSourceListener interface
+ * and delegates the action to an optional anonymous function.
+ */
+class NDragSourceListener implements DragSourceListener , NiceListener
+
+{
+  /** 
+   * a field that stores an optional anonymous function 
+   */
+  private DragSourceDropEvent ?-> void dsDragDropEnd = null;
+  private DragSourceDragEvent ?-> void dsDragEnter = null;
+  private DragSourceDragEvent ?-> void dsDragOver = null;
+  private DragSourceDragEvent ?-> void dsDropActionChanged = null;
+  private DragSourceEvent ?-> void dsDragExit = null;
+
+
+  /** 
+   * The implementation of the method dragDropEnd defined in java.dnd.event.DragSourceListener
+   */
+   dragDropEnd(e)
+   {
+     DragSourceDropEvent ?-> void dsDragDropEnd = this.dsDragDropEnd;
+     if(dsDragDropEnd != null) dsDragDropEnd(e);
+   }
+
+  /** 
+   * The implementation of the method dragEnter defined in java.awt.dnd.DragSourceListener
+   */
+   dragEnter(e)
+   {
+     DragSourceDragEvent ?-> void dsDragEnter = this.dsDragEnter;
+     if(dsDragEnter != null) dsDragEnter(e);
+   }
+
+  /** 
+   * The implementation of the method dragOver defined in java.awt.dnd.DragSourceListener
+   */
+   dragOver(e)
+   {
+     DragSourceDragEvent ?-> void dsDragOver = this.dsDragOver;
+     if(dsDragOver != null) dsDragOver(e);
+   }
+
+  /** 
+   * The implementation of the method dragActionChanged defined in java.awt.dnd.DragSourceListener
+   */
+   dropActionChanged(e)
+   {
+     DragSourceDragEvent ?-> void dsDropActionChanged = this.dsDropActionChanged;
+     if(dsDropActionChanged != null) dsDropActionChanged(e);
+   }
+
+  /** 
+   * The implementation of the method dragExit defined in java.awt.dnd.DragSourceListener
+   */
+   dragExit(e)
+   {
+     DragSourceEvent ?-> void dsDragExit = this.dsDragExit;
+     if(dsDragExit != null) dsDragExit(e);
+   }
+}
+
+
+/** 
+ * class that implements the java.awt.dnd.DropTargetListener interface
+ * and delegates the action to an optional anonymous function.
+ */
+class NDropTargetListener implements DropTargetListener , NiceListener
+
+{
+  /** 
+   * a field that stores an optional anonymous function 
+   */
+  private DropTargetDropEvent ?-> void dtDrop = null;
+  private DropTargetDragEvent ?-> void dtDragEnter = null;
+  private DropTargetDragEvent ?-> void dtDragOver = null;
+  private DropTargetDragEvent ?-> void dtDropActionChanged = null;
+  private DropTargetEvent ?-> void dtDragExit = null;
+    
+
+  /** 
+   * The implementation of the method dragDropEnd defined in java.dnd.event.DropTargetListener
+   */
+   drop(e)
+   {
+     DropTargetDropEvent ?-> void dtDrop = this.dtDrop;
+     if(dtDrop != null) dtDrop(e);
+   }
+
+  /** 
+   * The implementation of the method dragEnter defined in java.awt.dnd.DropTargetListener
+   */
+   dragEnter(e)
+   {
+     DropTargetDragEvent ?-> void dtDragEnter = this.dtDragEnter;
+     if(dtDragEnter != null) dtDragEnter(e);
+   }
+
+  /** 
+   * The implementation of the method dragOver defined in java.awt.dnd.DropTargetListener
+   */
+   dragOver(e)
+   {
+     DropTargetDragEvent ?-> void dtDragOver = this.dtDragOver;
+     if(dtDragOver != null) dtDragOver(e);
+   }
+
+  /** 
+   * The implementation of the method dragActionChanged defined in java.awt.dnd.DropTargetListener
+   */
+   dropActionChanged(e)
+   {
+     DropTargetDragEvent ?-> void dtDropActionChanged = this.dtDropActionChanged;
+     if(dtDropActionChanged != null) dtDropActionChanged(e);
+   }
+
+  /** 
+   * The implementation of the method dragExit defined in java.awt.dnd.DropTargetListener
+   */
+   dragExit(e)
+   {
+     DropTargetEvent ?-> void dtDragExit = this.dtDragExit;
+     if(dtDragExit != null) dtDragExit(e);
+   }
+}
+
+
+//JDK1.4  /** 
+//JDK1.4   * class that implements the java.awt.dnd.DragSourceMotionListener interface
+//JDK1.4   * and delegates the action to an optional anonymous function.
+//JDK1.4   */
+//JDK1.4  class NDragSourceMotionListener implements DragSourceMotionListener , NiceListener
+//JDK1.4  
+//JDK1.4  {
+//JDK1.4    /** 
+//JDK1.4     * a field that stores an optional anonymous function 
+//JDK1.4     */
+//JDK1.4    private DragSourceDragEvent ?-> void dragMouseMoved = null;
+//JDK1.4    
+//JDK1.4  
+//JDK1.4    /** 
+//JDK1.4     * The implementation of the method dragMouseMoved defined in java.awt.dnd.DragSourceMotionListener
+//JDK1.4     */
+//JDK1.4     dragMouseMoved(e)
+//JDK1.4     {
+//JDK1.4       DragSourceDragEvent ?-> void dragMouseMoved = this.dragMouseMoved;
+//JDK1.4       if(dragMouseMoved != null) dragMouseMoved(e);
+//JDK1.4     }
+//JDK1.4  }
+
+
+//JDK1.4  /** 
+//JDK1.4   * class that implements the java.awt.event.MouseWheelListener interface
+//JDK1.4   * and delegates the action to an optional anonymous function.
+//JDK1.4   */
+//JDK1.4  class NMouseWheelListener implements MouseWheelListener , NiceListener
+//JDK1.4  
+//JDK1.4  {
+//JDK1.4    /** 
+//JDK1.4     * a field that stores an optional anonymous function 
+//JDK1.4     */
+//JDK1.4    private MouseWheelEvent ?-> void mouseWheelMoved = null;
+//JDK1.4    
+//JDK1.4  
+//JDK1.4    /** 
+//JDK1.4     * The implementation of the method mouseWheelMoved defined in java.awt.event.MouseWheelListener
+//JDK1.4     */
+//JDK1.4     mouseWheelMoved(e){
+//JDK1.4     { 
+//JDK1.4       MouseWheelEvent ?-> void mouseWheelMoved = this.mouseWheelMoved;
+//JDK1.4       if(mouseWheelMoved != null) mouseWheelMoved(e);
+//JDK1.4     }
+//JDK1.4  }
+
+
+//JDK1.4  /** 
+//JDK1.4   * class that implements the java.awt.event.WindowFocusListener interface
+//JDK1.4   * and delegates the actions to optional anonymous functions.
+//JDK1.4   */
+//JDK1.4  class NWindowFocusListener implements WindowFocusListener , NiceListener
+//JDK1.4  
+//JDK1.4  {
+//JDK1.4    /** 
+//JDK1.4     * fields that store optional anonymous functions for all required methods. 
+//JDK1.4     */
+//JDK1.4    private WindowEvent ?-> void windowGainedFocus = null;
+//JDK1.4    private WindowEvent ?-> void windowLostFocus = null;
+//JDK1.4    
+//JDK1.4  
+//JDK1.4    /** 
+//JDK1.4     * The implementation of the method mouseDragged defined in java.awt.event.WindowFocusListener
+//JDK1.4     */
+//JDK1.4     windowGainedFocus(e)
+//JDK1.4     { 
+//JDK1.4       WindowEvent ?-> void windowGainedFocus = this.windowGainedFocus;
+//JDK1.4       if(windowGainedFocus != null) windowGainedFocus(e);
+//JDK1.4     }
+//JDK1.4     
+//JDK1.4    /** 
+//JDK1.4     * The implementation of the method mouseMoved defined in java.awt.event.WindowFocusListener 
+//JDK1.4     */
+//JDK1.4     windowLostFocus(e)
+//JDK1.4     {  
+//JDK1.4       WindowEvent ?-> void windowLostFocus = this.windowLostFocus;
+//JDK1.4       if(windowLostFocus != null) windowLostFocus(e);
+//JDK1.4     }
+//JDK1.4  }
+
+
+//JDK1.4  /** 
+//JDK1.4   * class that implements the java.awt.event.WindowStateListener interface
+//JDK1.4   * and delegates the action to an optional anonymous function.
+//JDK1.4   */
+//JDK1.4  class NWindowStateListener implements WindowStateListener , NiceListener
+//JDK1.4  
+//JDK1.4  {
+//JDK1.4    /** 
+//JDK1.4     * a field that stores an optional anonymous function 
+//JDK1.4     */
+//JDK1.4    private WindowEvent ?-> void windowStateChanged = null;
+//JDK1.4    
+//JDK1.4  
+//JDK1.4    /** 
+//JDK1.4     * The implementation of the method windowStateChanged defined in java.awt.event.WindowStateListener
+//JDK1.4     */
+//JDK1.4     windowStateChanged(e)
+//JDK1.4     {
+//JDK1.4       WindowEvent ?-> void windowStateChanged = this.windowStateChanged;
+//JDK1.4       if(windowStateChanged != null) windowStateChanged(e);
+//JDK1.4     }
+//JDK1.4  }

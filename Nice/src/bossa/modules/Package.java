@@ -78,51 +78,53 @@ public class Package implements mlsub.compilation.Module, Located, bossa.syntax.
     
     compilation.packages.put(name.toString(), this);
 
-    imports = new LinkedList();
-    
-    if (!name.toString().equals("nice.lang") && !Debug.ignorePrelude)
-      imports.add(new LocatedString("nice.lang", 
-				    bossa.util.Location.nowhere()));
-    
     source = compilation.locator.find(this);
     if (source == null)
       User.error(name, "Could not find package " + name);
 
-    read(compilation.recompileAll || 
-	 isRoot && compilation.recompileCommandLine, false);
-    
-    computeImportedPackages();
+    loadImports();
 
+    read(compilation.recompileAll || 
+	 isRoot && compilation.recompileCommandLine);
+    
     thisPkg = new gnu.expr.Package(getName());
+  }
+
+  private void loadImports()
+  {
+    imports = source.getImports();
+    if (!name.toString().equals("nice.lang") && !Debug.ignorePrelude)
+      imports.add(new LocatedString("nice.lang", 
+				    bossa.util.Location.nowhere()));
+    
+    List p = this.getImports();
+    for (Iterator i = p.iterator(); i.hasNext();)
+      source.someImportModified(((Package) i.next()).lastModification());
   }
 
   /**
      @param shouldReload reload if the source if available.
-     @param mustReload   fail if source is not available.
    **/
-  private void read(boolean shouldReload, boolean mustReload)
+  private void read(boolean shouldReload)
   {
     Module oldModule = Definition.currentModule;
     Definition.currentModule = this;
     
-    List definitions = new LinkedList();
-    Set opens = new TreeSet();
-    opens.add("java.lang");    
-
     if (Debug.passes)
-      Debug.println(this + ": parsing " + source);
+      Debug.println(this + ": parsing\n" + source);
 
-    Content.Unit[] readers = source.getDefinitions(shouldReload, mustReload);
+    this.ast = new AST(this, source.getDefinitions(shouldReload));
+
     if (compiling())
       // Inform compilation that at least one package is going to generate code
       compilation.recompilationNeeded = true;
-    
-    for(int i = 0; i<readers.length; i++)
-      read(readers[i], definitions, opens);
-    
-    this.ast = new AST(this, expand(definitions));
 
-    // when we import a bossa package, we also open it.
+    Definition.currentModule = oldModule;
+  }
+  
+  void setOpens(Set opens)
+  {
+    // when we import a Nice package, we also open it.
     for (Iterator i = imports.iterator(); i.hasNext();)
       opens.add(((LocatedString) i.next()).toString());
 
@@ -131,56 +133,11 @@ public class Package implements mlsub.compilation.Module, Located, bossa.syntax.
     // We must guarantee that this package is the first element of 'open'.
     this.opens[len] = this.opens[0];
     this.opens[0] = this.name.toString();
-
-    Definition.currentModule = oldModule;
   }
-  
+
   public long lastModification()
   {
     return source.lastModification;
-  }
-  
-  public void lastModifiedRequirement(long date)
-  {
-    // If we've already loaded the source
-    // or none of our imports changed since last time we compiled,
-    // there is nothing to do
-    if (compiling() || date <= source.lastCompilation)
-      return;
-    
-    if (Debug.modules && date > source.lastCompilation)
-      Debug.println
-      (this + " was compiled " + new java.util.Date(source.lastCompilation) + 
-       "\nA required package changed " + new java.util.Date(date) );
-
-    read(true, true);
-  }
-  
-  private static List expand(List definitions)
-  {
-    Collection ads = new LinkedList();
-    for(Iterator i = definitions.iterator(); i.hasNext();)
-      {
-	Definition d = (Definition) i.next();
-	Collection c = d.associatedDefinitions();
-	if (c!=null)
-	  ads.addAll(c);
-      }
-    definitions.addAll(ads);
-    return definitions;
-  }
-  
-  private void read(Content.Unit unit, List definitions, Set opens)
-  {
-    bossa.util.Location.setCurrentFile(unit.name);
-
-    LocatedString pkgName = 
-      bossa.parser.Loader.open(unit.reader,
-			       definitions, imports, opens);
-    if (pkgName!=null && !pkgName.equals(this.name))
-      User.error(pkgName,
-		 source + " declares it belongs to package " + pkgName +
-		 ", but it was found in package " + name);
   }
   
   private void readAlternatives()

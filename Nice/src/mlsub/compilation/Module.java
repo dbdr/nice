@@ -49,14 +49,6 @@ public interface Module
   /** Returns the name of this module. */
   String getName();
 
-  /** 
-      Called to inform the module that the last module it depends on
-      to be modified has been at the given date.
-
-      This may mean it should be typechecked again.
-  */
-  void lastModifiedRequirement(long date);
-  
   /** The date of the last modification of this module. */
   long lastModification();
 

@@ -1,7 +1,7 @@
 /**************************************************************************/
-/*                           B O S S A                                    */
-/*        A simple imperative object-oriented research language           */
-/*                   (c)  Daniel Bonniot 1999                             */
+/*                                N I C E                                 */
+/*             A high-level object-oriented research language             */
+/*                        (c) Daniel Bonniot 2002                         */
 /*                                                                        */
 /*  This program is free software; you can redistribute it and/or modify  */
 /*  it under the terms of the GNU General Public License as published by  */
@@ -9,9 +9,6 @@
 /*  (at your option) any later version.                                   */
 /*                                                                        */
 /**************************************************************************/
-
-// File    : Loader.java
-// Created : Thu Jul 29 09:43:50 1999 by bonniot
 
 package bossa.parser;
 
@@ -31,10 +28,7 @@ import nice.tools.util.Chronometer;
 
 public abstract class Loader
 {
-  public static LocatedString open(Reader r, 
-				   List definitions,
-				   List imports,
-				   Collection importStars)
+  public static LocatedString readImports(Reader r, List imports)
   {
     chrono.start();
     try {
@@ -42,9 +36,9 @@ public abstract class Loader
 	parser = new Parser(r);
       else
 	parser.ReInit(r);
-    
+
       try{
-	return parser.module(definitions,imports,importStars);
+	return parser.readImports(imports);
       }
       catch(ParseException e){
 	if(e.currentToken!=null)
@@ -58,7 +52,34 @@ public abstract class Loader
     finally {
       chrono.stop();
     }
-  } 
+  }
+
+  public static void open(Reader r, 
+			  List definitions,
+			  Collection importStars)
+  {
+    chrono.start();
+    try {
+      if(parser==null)
+	parser = new Parser(r);
+      else
+	parser.ReInit(r);
+    
+      try{
+	parser.module(definitions,importStars);
+      }
+      catch(ParseException e){
+	if(e.currentToken!=null)
+	  User.error(new Location(e.currentToken.next), 
+		     removeLocation(e.getMessage()));
+	else
+	  User.error(e.getMessage());
+      }
+    }
+    finally {
+      chrono.stop();
+    }
+  }
 
   private static Chronometer chrono = Chronometer.make("Parsing");
 

@@ -1572,7 +1572,7 @@ Expression arrayLiteralExp():
  * Imported Packages
  ****************************************************************/
 
-LocatedString readImports(List imports, Collection opens):
+LocatedString readImports(List imports):
 {
   LocatedString pkgName=null, name;
 }
@@ -1582,7 +1582,7 @@ LocatedString readImports(List imports, Collection opens):
   (
    "import" name=doted_string() 
 
-   ( ".*" { opens.add(name.toString()); }
+   ( ".*" /* Ignore */
    | { imports.add(name); }
    )
    ";"
@@ -1590,22 +1590,31 @@ LocatedString readImports(List imports, Collection opens):
   { return pkgName; }
 }
 
+void readOpens(Collection opens):
+{
+  LocatedString name;
+}
+{
+  [ "package" doted_string() ";" ]
+
+  (
+   "import" name=doted_string() 
+
+   [ ".*" { opens.add(name.toString()); } ]
+   ";"
+  )*
+}
+
 /****************************************************************
  * Modules
  ****************************************************************/
 
-LocatedString module(List definitions,
-		     List imports,
-	             Collection opens):
+void module(List definitions,
+	    Collection opens):
+{}
 {
-  LocatedString pkgName;
-}
-{
-  pkgName = readImports(imports, opens)
-  {
-    readDefinitions(definitions);
-    return pkgName;
-  }
+  readOpens(opens)
+  readDefinitions(definitions)
 }
 
 /****************************************************************

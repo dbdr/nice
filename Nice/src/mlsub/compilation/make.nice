@@ -27,9 +27,6 @@ void compileComponent(Compilation compilation, List<Module> modules,
   modules.iter(fun(Module m) => print(" "+m));
   println("");
 
-  modules.iter(fun(Module m) =>
-	       m.lastModifiedRequirement(max(new JavaList(impl: notNull(m.getRequirements())).map(fun(Module mi)=>mi.lastModification()))));
-
   modules.iter(fun(Module m) => m.scope());
   modules.iter(fun(Module m) => m.load());
 

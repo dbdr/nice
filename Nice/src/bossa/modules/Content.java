@@ -13,8 +13,11 @@
 package bossa.modules;
 
 import bossa.util.*;
+import java.util.*;
 import java.io.*;
 import nice.tools.util.System;
+import bossa.syntax.Definition;
+import bossa.syntax.LocatedString;
 
 /**
    An abstract package source, where source or interface files 
@@ -48,23 +51,84 @@ class Content
     return s == null ? "<empty>" : s;
   }
 
+  List getImports()
+  {
+    Content.Unit[] readers;
+    /* If the package is up to date, preferably load imports from 
+       the compiled package, since that involves touching only one file 
+       instead of possiby several. 
+    */
+    if (source != null && 
+	(compiled == null || lastModification < lastCompilation))
+      readers = source.getDefinitions();
+    else
+      readers = compiled.getDefinitions();
+
+    LinkedList imports = new LinkedList();
+    for (int i = 0; i < readers.length; i++)
+      read(readers[i], imports);
+    return imports;
+  }
+
+  List getDefinitions(boolean shouldReload)
+  {
+    List definitions = new LinkedList();
+    Set opens = new TreeSet();
+    opens.add("java.lang");    
+
+    Content.Unit[] readers = getReaders(shouldReload);
+
+    for(int i = 0; i<readers.length; i++)
+      read(readers[i], definitions, opens);
+    
+    pkg.setOpens(opens);
+    return expand(definitions);
+  }
+
+  private static List expand(List definitions)
+  {
+    Collection ads = new LinkedList();
+    for(Iterator i = definitions.iterator(); i.hasNext();)
+      {
+	Definition d = (Definition) i.next();
+	Collection c = d.associatedDefinitions();
+	if (c!=null)
+	  ads.addAll(c);
+      }
+    definitions.addAll(ads);
+    return definitions;
+  }
+  
+  private void read(Content.Unit unit, List imports)
+  {
+    bossa.util.Location.setCurrentFile(unit.name);
+
+    bossa.syntax.LocatedString pkgName = 
+      bossa.parser.Loader.readImports(unit.reader, imports);
+    if (pkgName != null && ! pkgName.equals(pkg.name))
+      User.error(pkgName,
+		 source + " declares it belongs to package " + pkgName +
+		 ", but it was found in package " + pkg.name);
+  }
+  
+  private void read(Content.Unit unit, List definitions, Set opens)
+  {
+    bossa.util.Location.setCurrentFile(unit.name);
+    bossa.parser.Loader.open(unit.reader, definitions, opens);
+  }
+  
   /**
      @param shouldReload reload if the source if available.
-     @param mustReload   fail if source is not available.
    **/
-  Content.Unit[] getDefinitions(boolean shouldReload, boolean mustReload)
+  Content.Unit[] getReaders(boolean shouldReload)
   {
-    // If we must, then we should!
-    shouldReload |= mustReload;
-
     // If no compiled version is available then reload
     shouldReload |= (compiled == null);
 
     // If the package is out-of-date, then we must recompile
     if (lastModification > lastCompilation)
       {
-	if (!shouldReload && 
-	    Debug.modules && !shouldReload && compiled != null)
+	if (Debug.modules && !shouldReload)
 	  {
 	    Debug.println(pkg + " compiled: " + System.date(lastCompilation));
 	    Debug.println(pkg + " modified: " + System.date(lastModification));
@@ -81,7 +145,7 @@ class Content
       }
 
     // We're not reloading. Did we have to?
-    if (mustReload)
+    if (lastModification > lastCompilation)
       User.error(pkg, pkg.getName() + " must be compiled, but no source code is available.\nThe source path is: " + pkg.compilation.sourcePath);
     
     if (Debug.modules)
@@ -113,8 +177,14 @@ class Content
   /** Date of the last modification of the source of this package. */
   long lastModification;
 
-  /** Date of the last succesful compileation of this package. */
+  /** Date of the last succesful compilation of this package. */
   long lastCompilation;
+
+  void someImportModified(long date)
+  {
+    if (lastModification < date)
+      lastModification = date;
+  }
 
   gnu.bytecode.ClassType getBytecode()
   {

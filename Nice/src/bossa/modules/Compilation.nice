@@ -1,0 +1,69 @@
+/**************************************************************************/
+/*                           B O S S A                                    */
+/*        A simple imperative object-oriented research language           */
+/*                   (c)  Daniel Bonniot 1999                             */
+/*                                                                        */
+/*  This program is free software; you can redistribute it and/or modify  */
+/*  it under the terms of the GNU General Public License as published by  */
+/*  the Free Software Foundation; either version 2 of the License, or     */
+/*  (at your option) any later version.                                   */
+/*                                                                        */
+/**************************************************************************/
+
+// File    : Compilation.bossa
+// Created : Wed Mar 01 17:01:48 2000 by Daniel Bonniot
+//$Modified: Mon May 15 18:02:23 2000 by Daniel Bonniot $
+
+package bossa.modules;
+
+import mlsub.compilation;
+
+/**
+ * Stores information about a bossa compilation.
+ *
+ * @author Daniel Bonniot
+ */
+
+class Compilation extends mlsub.compilation.Compilation
+{
+  boolean recompileAll;
+  boolean recompileCommandLine;
+}
+
+Compilation make(Package, boolean, boolean, boolean);
+make(root@Package, doLink, recompileCommandLine, recompileAll)
+{
+  Compilation res = new Compilation();
+
+  res.root = root;
+  res.skipLink = !doLink;
+  res.recompileCommandLine = recompileCommandLine;
+  res.recompileAll = recompileAll;
+
+  return res;
+}
+
+Compilation make(String packageName, 
+		 boolean doLink, 
+		 boolean recompileCommandLine, 
+		 boolean recompileAll);
+make(packageName@String, pdoLink, precompileCommandLine, precompileAll)
+{
+  Package rootPackage;
+
+  precompileCommandLine = precompileCommandLine | precompileAll;
+  Compilation res = make(rootPackage, pdoLink, precompileCommandLine, precompileAll);
+
+  // forces reading nice.lang first
+  if(!(packageName.equals("nice.lang")) & !ignorePrelude())
+    readPackage("nice.lang", res, precompileAll);
+
+  rootPackage = readPackage(packageName, res, precompileCommandLine);
+  res.root = rootPackage;
+  return res;
+}
+
+bossa.modules.Package readPackage(String, Compilation, boolean) =
+  native bossa.modules.Package bossa.modules.Package.make(String, Compilation, boolean);
+
+boolean ignorePrelude() = native bossa.util.Debug.ignorePrelude;

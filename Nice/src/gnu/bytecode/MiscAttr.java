@@ -21,18 +21,23 @@ public class MiscAttr extends Attribute
     this.offset = offset;
     this.length = length;
   }
-  
+
   public MiscAttr(String name, byte[] data)
   {
     this(name, data, 0, data.length);
   }
-  
-  public static Attribute synthetic()
+
+  public MiscAttr(String name)
   {
-    return new MiscAttr("Synthetic", nobytes);
+    this(name, nobytes, 0, 0);
   }
 
   private static final byte[] nobytes = new byte[0];
+
+  public static Attribute synthetic()
+  {
+    return new MiscAttr("Synthetic");
+  }
 
   public int getLength() { return length; }
 

@@ -350,7 +350,7 @@ We shall now see the alternative, which matches very closely the
 
 </listitem>
 <listitem>
-<para>safe version of <literal>instanceof</literal>  (work in progress)</para>
+<para>safe version of <literal>instanceof</literal></para>
 
 <para>
 The idea here is simply that just after an <literal>instanceof</literal> 
@@ -377,10 +377,6 @@ The compiler then checks that <function>getChildren</function>
 can be called safely.
 </para>
 
-<para>
-This feature is being worked on. It is not present in the last
-released version of the compiler.
-</para>
 </listitem>
 </orderedlist>
 

@@ -357,8 +357,7 @@ public final class Types
 	if(res==null)
 	  return null;
 	else
-          //return SpecialArray.create(res);
-	  return ArrayType.make(res);
+          return SpecialArray.create(res);
       }
     
     if(s.equals("void")) 	return SpecialTypes.voidType;

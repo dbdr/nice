@@ -197,7 +197,7 @@ public abstract class Type {
     if (c == '[')
       {
 	type = signatureToType(sig, off+1, len-1);
-	return type == null ? null : new ArrayType(type);
+	return type == null ? null : nice.tools.code.SpecialArray.create(type);
       }
     if (c == 'L' && len > 2 && sig.indexOf(';', off) == len-1+off)
       return getType(sig.substring(off+1,len-1+off).replace('/', '.'));

@@ -377,4 +377,15 @@
 /// FAIL
   ?String x = null;
   boolean b = x == null || (x = null) == "" || x.length() > 3;
-  
+
+/// FAIL bug
+?String s = "xyz";
+String t = "abc";
+int x = 0;
+if ( s != null)
+  {
+    do {
+      t = s;
+      s = null;
+    } while(x++ < 10);
+  } 

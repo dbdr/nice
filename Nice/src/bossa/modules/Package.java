@@ -561,9 +561,15 @@ public class Package implements mlsub.compilation.Module, Located, bossa.syntax.
 	      Debug.println(this + ": adding up-to-date bytecode");
 
 	    try{
-	      jar.putNextEntry(new JarEntry(getName().replace('.', '/') 
-					    + "/package.class"));
-	      copyStreams(source.getBytecodeStream(), jar);
+	      String packagePrefix = getName().replace('.', '/') + "/";
+	      PackageSource.Stream[] classes = source.getClasses();
+	      
+	      for (int i = 0; i < classes.length; i++)
+		{
+		  PackageSource.Stream s = classes[i];
+		  jar.putNextEntry(new JarEntry(packagePrefix + s.name));
+		  copyStreams(s.stream, jar);
+		}
 	    }
 	    catch(IOException e){
 	      User.error(this, "Error writing bytecode in archive", e);

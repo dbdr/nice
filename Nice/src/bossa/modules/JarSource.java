@@ -31,7 +31,7 @@ class JarSource extends PackageSource
   static JarSource create(Package pkg, JarFile jar)
   {
     // Jar and Zip files use forward slashes
-    String pkgName = pkg.name.toString().replace('.', '/');
+    String pkgName = pkg.getName().replace('.', '/');
 
     JarEntry itfEntry = jar.getJarEntry(pkgName + "/package.nicei");
     if (itfEntry == null)
@@ -80,6 +80,34 @@ class JarSource extends PackageSource
     return new Unit[]{ new Unit(res, pkg.name.toString()) };
   }
 
+  Stream[] getClasses()
+  {
+    java.util.List res = new java.util.LinkedList();
+    String pkgPrefix = pkg.getName().replace('.', '/') + "/";
+
+    java.util.Enumeration enum = jar.entries();
+    while(enum.hasMoreElements())
+      {
+	JarEntry e = (JarEntry) enum.nextElement();
+	String fullname = e.getName();
+	if (fullname.startsWith(pkgPrefix)
+	    && fullname.endsWith(".class"))
+	  {
+	    String name = fullname.substring(pkgPrefix.length());
+	    if (!name.equals("dispatch.class"))
+	      try{
+		res.add(new Stream(jar.getInputStream(e), name));
+	      }
+	      catch(IOException ex){
+		User.error(pkg.name,
+			   "Error reading archive " + getName());
+	      }
+	  }
+      }
+
+    return (Stream[]) res.toArray(new Stream[res.size()]);
+  }
+  
   InputStream getBytecodeStream()
   {
     try{

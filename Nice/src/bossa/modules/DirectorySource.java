@@ -164,9 +164,30 @@ class DirectorySource extends PackageSource
     }
   }
   
-  InputStream getBytecodeStream()
+  Stream[] getClasses()
   {
-    return getFileStream("package.class");
+    File[] classes = directory.listFiles
+      (new FileFilter()
+	{ 
+	  public boolean accept(File f)
+	  { 
+	    String name = f.getPath();
+	    return name.endsWith(".class") 
+	      && !name.endsWith("/dispatch.class")
+	      && f.isFile();
+	  }
+	}
+       );      
+
+    Stream[] res = new Stream[classes.length];
+    for (int i = 0; i < res.length; i++)
+      try{
+	res[i] = new Stream
+	  (new BufferedInputStream(new FileInputStream(classes[i])), 
+	   classes[i].getName());
+      } catch(FileNotFoundException e) {}
+
+    return res;
   }
   
   private InputStream getFileStream(String name)

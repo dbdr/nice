@@ -1,7 +1,7 @@
 /**************************************************************************/
-/*                           B O S S A                                    */
-/*        A simple imperative object-oriented research language           */
-/*                   (c)  Daniel Bonniot 1999                             */
+/*                                N I C E                                 */
+/*             A high-level object-oriented research language             */
+/*                        (c) Daniel Bonniot 2002                         */
 /*                                                                        */
 /*  This program is free software; you can redistribute it and/or modify  */
 /*  it under the terms of the GNU General Public License as published by  */
@@ -10,11 +10,9 @@
 /*                                                                        */
 /**************************************************************************/
 
-// File    : parser.jj
-// Created : Thu Jul 01 10:27:05 1999 by bonniot
-//$Modified: Mon Oct 09 17:04:56 2000 by Daniel Bonniot $
-// Description : Parseur JavaCC pour Nice
-//   Tokens based on the Jazz parser
+/**
+    JavaCC parser for Nice.
+*/
 
 options {
   JAVA_UNICODE_ESCAPE = true;
@@ -1721,8 +1719,7 @@ Expression PrimaryPrefix() :
 */
 
 |
-  // This includes the case "(" Expression() ")"
-  // which avoids lookahead
+  // This includes the case "(" Expression() ")" to avoids lookahead
   res=tupleExp()
 |
   res=arrayLiteralExp() 
@@ -1942,7 +1939,7 @@ Statement Block() :
   { first = getToken(1); }
   "{" 
   { statements = new LinkedList(); }
-  ( s=BlockStatement() { statements.add(s); } )* 
+  ( s=BlockStatement(statements) { statements.add(s); } )* 
   "}"
   { 
     last = getToken(0);
@@ -1952,12 +1949,14 @@ Statement Block() :
   }
 }
 
-Statement BlockStatement() :
+Statement BlockStatement(List statements) :
 { Statement res; }
 {
   (
   LOOKAHEAD([ "final" ] monotype() <IDENT>)
   res=LocalDeclaration() 
+|
+  res=LocalTupleDeclaration(statements)
 |
   res=Statement()
 /*
@@ -1983,9 +1982,41 @@ Statement LocalDeclaration() :
     "(" parameters = formalParameters(false) ")" body = code() 
     { return Block.LocalFunction.make(id, t, parameters, body); }
   | 
-    [ "=" e=Expression() ] ";" 
-    { return new Block.LocalVariable(id,t,e); }
+    [ "=" e=Expression() ] 
+    { Block.LocalVariable res = new Block.LocalVariable(id,t,e); }
+    ( "," id=ident() [ "=" e=Expression() ] { res.addNext(id,e); } )*
+    ";" 
+    { return res; }
   )
+}
+
+Statement LocalTupleDeclaration(List statements) :
+{
+  Monotype t = null;
+  LocatedString id;
+  Expression e;
+  LinkedList variables;
+}
+{
+  "(" { variables = new LinkedList(); }
+  [ LOOKAHEAD(monotype() ident()) t=monotype() ] id=ident() 
+  { variables.add(new IdentExp(id));
+    if (t != null) {
+      statements.add(new Block.LocalVariable(id,t,null)); 
+      t = null;
+    }
+  }
+  ( "," [ LOOKAHEAD(monotype() ident()) t=monotype() ] id=ident() 
+  { variables.add(new IdentExp(id));
+    if (t != null) {
+      statements.add(new Block.LocalVariable(id,t,null)); 
+      t = null;
+    }
+  }
+  )+
+  ")"
+  "=" e=Expression() ";" 
+  { return new ExpressionStmt(AssignExp.create(new TupleExp(variables), e)); }
 }
 
 Statement EmptyStatement() :

@@ -422,7 +422,17 @@ public class Compilation
 		      {
 			code.emitPushInt(((Character) value).charValue());
 			return;
-		      }		    
+		      }
+		    else if (sig1 == 'F')
+		      {
+			code.emitPushFloat(((Character) value).charValue());
+			return;
+		      }
+		    else if (sig1 == 'D')
+		      {
+			code.emitPushDouble(((Character) value).charValue());
+			return;
+		      }
 		  }
 		if (sig1 == 'C')
 		  {

@@ -14,11 +14,11 @@ package nice.eclipse.core.builder;
 
 
 class NiceBuilder extends IncrementalProjectBuilder {
-	
+
 	IProject currentProject = cast(null);
 	?IProgressMonitor monitor = cast(null);
 	NiceBuildNotifier notifier = cast(null);
-	
+
 	build(kind, argsMap, aMonitor) {
 		//println("NiceBuilder.build()");
 		currentProject = this.getProject();
@@ -58,6 +58,12 @@ class NiceBuilder extends IncrementalProjectBuilder {
 
 			//println("sourcePath: " + compilation.sourcePath);
 			//println("destinationDir: " + compilation.destinationDir);
+
+			// Locate the Nice runtime
+			java.net.URL runtime = plugin.find(new Path("lib/nice.jar"));
+			// Eclipse 3.0 puts plugins into OSGi bundles
+			runtime = Platform.asLocalURL(runtime);
+			compilation.runtimeFile = runtime.getFile();
 
 			nice.tools.compiler.fun.compile(
 					compilation,

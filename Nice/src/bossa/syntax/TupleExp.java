@@ -110,36 +110,10 @@ public class TupleExp extends bossa.syntax.Expression
     getType();
 
     int len = expressions.length;
-    
-    // The array is not a special array, since it has nothing to
-    // do with collections.
-    
-    Expression arrayVal = new gnu.expr.ApplyExp
-      (new nice.tools.code.MultiArrayNewProc(new ArrayType(componentType), 1),
-       new Expression[]{intExp(len)});
 
-    LetExp let = new LetExp(new Expression[]{arrayVal});
-    Declaration arrayDecl = let.addDeclaration("tuple", 
-					       ArrayType.make(componentType));
-
-    //FIXME: CanRead should be set automatically if it is true
-    arrayDecl.setCanRead(true);
-
-    Expression array = new ReferenceExp(arrayDecl);
-    
-    Expression[] stmts = new Expression[1 + len];
-    for (int i=0; i<len; i++)
-      stmts[i] = 
-	new ApplyExp(new nice.lang.inline.ArraySetOp(componentType),
-		     new Expression[]{
-		       array, intExp(i), expressions[i].generateCode()
-		     });
-    
-    stmts[len] = array;
-    
-    let.setBody(new BeginExp(stmts));
-    
-    return let;
+    return new gnu.expr.ApplyExp
+      (new nice.tools.code.LiteralArrayProc(new ArrayType(componentType), len),
+       bossa.syntax.Expression.compile(expressions));
   }
 
   gnu.expr.Expression compileAssign(gnu.expr.Expression array)
@@ -161,7 +135,7 @@ public class TupleExp extends bossa.syntax.Expression
 	Declaration tupleDecl = let.addDeclaration
 	  ("tupleRef", ArrayType.make(componentType));
 
-	//FIXME: Idem, see above
+	//FIXME: CanRead should be set automatically.
 	tupleDecl.setCanRead(true);
 	tupleExp = new ReferenceExp(tupleDecl);
       }

@@ -5,3 +5,8 @@
   (?String,?String) s = f();
   /// Toplevel
 (?String,?String) f() = (null, null);
+
+/// PASS
+  f((0,0));
+  /// Toplevel
+  void f((int, int)) {}

@@ -51,7 +51,7 @@ public class MonoSymbol extends VarSymbol
 
   resolve()
   {
-    type = notNull(syntacticType).resolve(typeScope);
+    type = notNull(syntacticType).resolve(notNull(typeScope));
     syntacticType = null;
 
     if (nice.tools.typing.Types.isVoid(type))

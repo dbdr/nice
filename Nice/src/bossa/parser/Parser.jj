@@ -821,7 +821,7 @@ Monotype simpleMonotype():
   { return res; }
 |
   ("unknown"  | "?")
-  { return new Monotype.MonotypeWrapper(mlsub.typing.UnknownMonotype.instance); }
+  { return new MonotypeWrapper(mlsub.typing.UnknownMonotype.instance); }
 }
 
 List monotypes():
@@ -872,7 +872,7 @@ Parameter formalParameter(List statements):
 (
   LOOKAHEAD(monotype())
   t=monotype() [ id=ident() [ "=" val=Expression() ]]
-  { return bossa.syntax.dispatch.createParameter(t, id ,val); }
+  { return t.createParameter(id ,val); }
 |
   { Token first,last;
   List parts = new LinkedList();
@@ -894,7 +894,7 @@ Parameter formalParameter(List statements):
     t = new TupleType(types, makeLocation(first, last));
     t.nullness = /*absent*/3;
 
-    return bossa.syntax.dispatch.createParameter(t, ident ,val);
+    return t.createParameter(ident ,val);
   }
 )  
 }
@@ -1217,7 +1217,7 @@ MonotypeVar taggedMonotypeVar(List tags, List atoms):
     if (bound != null)
       {
         bound.nullness = /*absent*/3;
-        atoms.add(new MonotypeLeqCst(new Monotype.MonotypeVarWrapper(mv), bound)); 
+        atoms.add(new MonotypeLeqCst(new MonotypeVarWrapper(mv), bound)); 
       }
 
     if (sure) atoms.add(bossa.syntax.dispatch.createSureTypeVar(mv));

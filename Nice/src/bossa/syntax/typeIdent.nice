@@ -48,9 +48,9 @@ public final class TypeIdent extends bossa.syntax.Monotype implements Located
     return res;
   }
   
-  rawResolve(scope)
+  rawResolve(tm)
   {
-    let res = this.resolveToTypeSymbol(notNull(scope));
+    let res = this.resolveToTypeSymbol(tm);
 
     if (res instanceof mlsub.typing.Monotype)
       return res;

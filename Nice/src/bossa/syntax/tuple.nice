@@ -22,8 +22,8 @@ public class TupleType extends bossa.syntax.Monotype
   List<Monotype> types;
   Location location;
 
-  rawResolve(typeMap) = new mlsub.typing.TupleType
-      (bossa.syntax.Monotype.resolve(notNull(typeMap), types.toArray()));
+  rawResolve(tm) = new mlsub.typing.TupleType
+      (resolveMonotypes(tm, types.toArray()));
 
   substitute(map)
   {

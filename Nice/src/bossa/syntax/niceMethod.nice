@@ -291,8 +291,8 @@ public Definition createMemberMethod
 	  atom = new mlsub.typing.TypeConstructorLeqCst(alikeTC, tc);
 	constraint.addAtom(new AtomicConstraintWrapper(atom: atom));
 
-	thisType = new Monotype.MonotypeWrapper
-          (sureMonotype
+	thisType = new MonotypeWrapper
+          (type: sureMonotype
            (new mlsub.typing.MonotypeConstructor
             (alikeTC, c.getTypeParameters())));
 
@@ -307,7 +307,7 @@ public Definition createMemberMethod
 	  }
       }
     else
-      thisType = new Monotype.SureMonotypeWrapper(tc, c.getTypeParameters());
+      thisType = new SureMonotypeWrapper(tc: tc, params: c.getTypeParameters());
 
     params.addThis(thisType);
 

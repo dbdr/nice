@@ -407,7 +407,7 @@ public class CNiceClass extends NiceClass
 
 	List<Parameter> params = new ArrayList();
 	for (arg : m.getArgTypes())
-	  params.add(new Parameter(type: new Monotype.MonotypeWrapper(arg)));
+	  params.add(new Parameter(type: new MonotypeWrapper(type: arg)));
 
         res.add((m, params));
       }
@@ -565,7 +565,7 @@ public class CNiceClass extends NiceClass
 	  specificCst = identifyTypeParameters(cst, parent, notNull(typeParameters));
 
         let cname = new LocatedString("<init>",definition.location());
-        let ctype = new mlsub.typing.Polytype(specificCst, new mlsub.typing.FunType(Monotype.resolve(definition.getLocalScope(), values.types()),sureMonotype(new mlsub.typing.MonotypeConstructor(definition.getTC(), definition.getTypeParameters()))));
+        let ctype = new mlsub.typing.Polytype(specificCst, new mlsub.typing.FunType(resolveMonotypes(definition.getLocalScope(), values.types()),sureMonotype(new mlsub.typing.MonotypeConstructor(definition.getTC(), definition.getTypeParameters()))));
 	notNull(constructorMethod)[i] = new DefaultConstructor
 	  (cname, Node.global, parameters: values, arity: values.size,
 	   symbol: cast(null), type: ctype,

@@ -15,6 +15,155 @@ package bossa.syntax;
 import bossa.util.*;
 
 /**
+   Syntactic monomorphic type.
+
+*/
+public abstract class Monotype implements Located
+{
+  /** Set by the parser. */
+  public byte nullness = 0;
+/*
+  public static final byte
+    none = 0,
+    maybe = 1,
+    sure = 2,
+    absent = 3;
+*/
+
+  /** @return true if "alike" appears inside this monotype. */
+  boolean containsAlike();
+
+  mlsub.typing.Monotype rawResolve(TypeMap tm);
+
+  Monotype substitute(Map<String,Monotype> map);
+  
+  public boolean isVoid() = false;
+
+  String nullnessString()
+  {
+    if (nullness == /*maybe*/1)
+      return "?";
+    else if (nullness == /*sure*/2)
+      return "!";
+    else
+      return "";
+  }
+
+  public mlsub.typing.Monotype resolve(TypeMap tm)
+  {
+    mlsub.typing.Monotype raw = this.rawResolve(tm);
+
+    if (nullness == /*none*/0)
+      return raw;
+    else if (nullness == /*maybe*/1)
+      return maybeMonotype(nice.tools.typing.Types.rawType(raw));
+    else if (nullness ==  /*sure*/2)
+      return sureMonotype(nice.tools.typing.Types.rawType(raw));
+    else if (nullness == /*absent*/3)
+      {
+	if (raw instanceof mlsub.typing.MonotypeVar)
+	  {
+	    nice.tools.typing.Types.makeMarkedType(raw);
+	    return raw;
+	  }
+	else
+	  return sureMonotype(raw);
+      }
+    else
+      throw Internal.error("Bad nullness tag");
+  }
+
+  /** called instead of toString if parenthesis are unnecessary */
+  public String toStringExtern() = this.toString(); 
+
+  /** don't print type parameters */
+  public String toStringBase() = this.toString();
+}
+
+/** iterates resolve() on the collection of Monotype */
+mlsub.typing.Monotype[?] resolveMonotypes(TypeMap s, Monotype[?] c)
+{
+  if(c == null || c.length == 0)
+    return null;
+    
+  mlsub.typing.Monotype[] res = cast(new mlsub.typing.Monotype[c.length]);
+
+  for (int n = c.length; --n >= 0;)
+    {
+      let old = c[n];
+      let nou = old.resolve(s);
+
+      if (nou == null)
+	User.error(old, old + " : Monotype not defined");
+
+      res[n] = nou;
+    }
+  return res;
+}
+ 
+/**
+  Wrapping a mlsub Monotype in a syntactic monotype
+ */
+public class MonotypeWrapper extends Monotype
+{
+  final mlsub.typing.Monotype type;
+
+  containsAlike() = false;
+    
+  rawResolve(tm) = type;
+
+  substitute(map) = this;
+
+  location() = Location.nowhere();
+
+  toString() = String.valueOf(type);
+}
+
+public final class MonotypeVarWrapper extends MonotypeWrapper
+{
+  rawResolve(tm)
+  {
+    let res = tm.lookup(type.toString());
+    if (res != null)
+      return cast(res);
+
+    return type;
+  }
+}
+
+/**
+  Wrapper for delaying resolution of constructed monotypes.
+ */
+public  final class SureMonotypeWrapper extends Monotype
+{
+  mlsub.typing.TypeConstructor tc;
+  mlsub.typing.Monotype[?] params;
+
+  containsAlike() = false;
+
+  rawResolve(tm)
+  {
+    try{
+      return sureMonotype(new mlsub.typing.MonotypeConstructor(tc, params));
+    }
+    catch(mlsub.typing.BadSizeEx e){
+      // See if this is a class with default type parameters
+      let res = getTypeWithTC(tc, params);
+      if (res != null)
+        return sureMonotype(res);
+
+      throw User.error(this, "Class " + tc + Util.has(e.expected, "type parameter", e.actual));
+    }
+  }
+
+  substitute(map) = this;
+
+  location() = Location.nowhere();
+
+  toString() = tc + ( params != null ? Util.map("<",",",">",params) : "");
+}
+
+/**
    A monotype, build by application of
    a type constructor to type parameters.
 
@@ -29,17 +178,17 @@ public class MonotypeConstructor extends Monotype
  
   Monotype cloneType() = new MonotypeConstructor(tc:tc,parameters:parameters,loc:loc);
 
-  rawResolve(typeMap)
+  rawResolve(tm)
   {
     if (lowlevelTC == null)
       {
-	let newTC = notNull(this.tc).resolveToTC(notNull(typeMap));
+	let newTC = notNull(this.tc).resolveToTC(tm);
 	if (! (newTC instanceof TypeConstructor))
 	  throw User.error(notNull(this.tc), notNull(this.tc)+" should be a type constructor");
 	lowlevelTC = newTC;
       }
 
-    mlsub.typing.Monotype[?] resolvedParams = parameters.resolve(notNull(typeMap));
+    mlsub.typing.Monotype[?] resolvedParams = parameters.resolve(tm);
 
     try{
       return new mlsub.typing.MonotypeConstructor(lowlevelTC, resolvedParams);
@@ -106,7 +255,7 @@ public class TypeParameters
 
   mlsub.typing.Monotype[?] resolve(TypeMap ts)
   {
-    return Monotype.resolve(ts, content);
+    return resolveMonotypes(ts, content);
   }
 
   toString() = Util.map("<",", ",">", content);
@@ -125,11 +274,11 @@ public class FunType extends bossa.syntax.Monotype
   private bossa.syntax.Monotype[] in;
   private bossa.syntax.Monotype out;
 
-  rawResolve(typeMap)
+  rawResolve(tm)
   {
     return new mlsub.typing.FunType
-      (bossa.syntax.Monotype.resolve(notNull(typeMap), in),
-       out.resolve(typeMap));
+      (resolveMonotypes(notNull(tm), in),
+       out.resolve(tm));
   }
 
  substitute(map)
@@ -174,7 +323,7 @@ public class Alike extends bossa.syntax.Monotype
   private Location loc;
 
   // Alike should be removed as soon as types are constructed.
-  rawResolve(map)
+  rawResolve(tm)
   {
     throw User.error(this, "\"alike\" can only be used in class method definitions");
   }

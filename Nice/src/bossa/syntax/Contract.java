@@ -26,25 +26,25 @@ public class Contract
 {
   public void addRequire(Expression condition)
   {
-    pre.add(CallExp.create(symbol(assertName, condition), condition));
+    pre.add(bossa.syntax.dispatch.createCallExp(symbol(assertName, condition), condition));
     requireRepr.append(condition).append(',');
   }
 
   public void addRequire(Expression condition, Expression name)
   {
-    pre.add(CallExp.create(symbol(assertName, condition), condition, name));
+    pre.add(bossa.syntax.dispatch.createCallExp(symbol(assertName, condition), condition, name));
     requireRepr.append(condition).append(':').append(name).append(',');
   }
 
   public void addEnsure(Expression condition)
   {
-    post.add(CallExp.create(symbol(assertName, condition), condition));
+    post.add(bossa.syntax.dispatch.createCallExp(symbol(assertName, condition), condition));
     ensureRepr.append(condition);
   }
 
   public void addEnsure(Expression condition, Expression name)
   {
-    post.add(CallExp.create(symbol(assertName, condition), condition, name));
+    post.add(bossa.syntax.dispatch.createCallExp(symbol(assertName, condition), condition, name));
     ensureRepr.append(condition).append(':').append(name).append(',');
   }
 

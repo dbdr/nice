@@ -27,6 +27,14 @@ void typecheck(?Expression);
  * Expressions
  ****************************************************************/
 
+/**
+ * Resolves overloading, taking into account the parameters 
+ * the expressions is applied to.
+ *
+ * @return the resolved expression. Doesn't return if OR is not possible.
+ */
+Expression resolveOverloading(Expression exp, CallExp callExp) = exp;
+
 typecheck(null(Expression)) {}
 
 typecheck(AssignExp e)

@@ -1949,7 +1949,7 @@ Expression Expression() :
       e2=Expression()
       {
         if(op.image.length()!=1)
-          e2=CallExp.create(symb(op.image.substring(0, 1),op),e1,e2);
+          e2=bossa.syntax.dispatch.createCallExp(symb(op.image.substring(0, 1),op),e1,e2);
   
         e1=bossa.syntax.dispatch.createAssignExp(e1,e2);
       }
@@ -2009,7 +2009,7 @@ Expression ConditionalOrExpression() :
 {
   e1=ConditionalAndExpression() 
     ( t="||" e2=ConditionalOrExpression() 
-      { e1=CallExp.create(symb(t), e1, e2); } )?
+      { e1=bossa.syntax.dispatch.createCallExp(symb(t), e1, e2); } )?
   { return e1; }
 }
 
@@ -2018,7 +2018,7 @@ Expression ConditionalAndExpression() :
 {
   e1=InclusiveOrExpression() 
     ( t="&&" e2=ConditionalAndExpression()
-      { e1=CallExp.create(symb(t), e1, e2); } )?
+      { e1=bossa.syntax.dispatch.createCallExp(symb(t), e1, e2); } )?
   { return e1; }
 }
 
@@ -2027,7 +2027,7 @@ Expression InclusiveOrExpression() :
 {
   e1=ExclusiveOrExpression() 
     ( t="|" e2=ExclusiveOrExpression() 
-      { e1=CallExp.create(symb(t),e1,e2); } )*
+      { e1=bossa.syntax.dispatch.createCallExp(symb(t),e1,e2); } )*
   { return e1; }
 }
 
@@ -2036,7 +2036,7 @@ Expression ExclusiveOrExpression() :
 {
   e1=AndExpression() 
     ( t="^" e2=AndExpression() 
-      { e1=CallExp.create(symb(t),e1,e2); } )*
+      { e1=bossa.syntax.dispatch.createCallExp(symb(t),e1,e2); } )*
   { return e1; }
 }
 
@@ -2045,7 +2045,7 @@ Expression AndExpression() :
 {
   e1=EqualityExpression() 
     ( t="&" e2=EqualityExpression() 
-      { e1=CallExp.create(symb(t),e1,e2); } )*
+      { e1=bossa.syntax.dispatch.createCallExp(symb(t),e1,e2); } )*
   { return e1; }
 }
 
@@ -2054,7 +2054,7 @@ Expression EqualityExpression() :
 {
   e1=InstanceOfExpression() 
     ( ( t="==" | t="!=" ) e2=InstanceOfExpression() 
-      { e1=CallExp.create(symb(t),e1,e2); }
+      { e1=bossa.syntax.dispatch.createCallExp(symb(t),e1,e2); }
       )*
   { return e1; }
 }
@@ -2065,7 +2065,7 @@ Expression InstanceOfExpression() :
   res=RelationalExpression()
   [ { Token t; TypeConstantExp type; }
     t="instanceof" type=typeExpression()
-    { type.isLiteral = true; return CallExp.create(symb(t), res, type); }
+    { type.isLiteral = true; return bossa.syntax.dispatch.createCallExp(symb(t), res, type); }
   ]
   { return res; }
 }
@@ -2076,10 +2076,10 @@ Expression RelationalExpression() :
   e1=RangeExpression()
   ( (t=">"|t=">="|t="<"|t="<=") e2=RangeExpression()
     {
-      if(e3 == null) e1=CallExp.create(symb(t),e1,e2);
+      if(e3 == null) e1=bossa.syntax.dispatch.createCallExp(symb(t),e1,e2);
       else
       {
-        e1=CallExp.create(symb("&&",t),e1,CallExp.create(symb(t),e3,e2));
+        e1=bossa.syntax.dispatch.createCallExp(symb("&&",t),e1,bossa.syntax.dispatch.createCallExp(symb(t),e3,e2));
         if (t.image.charAt(0) != t_prev.image.charAt(0))
 	  User.error(makeLocation(t), "All chained comparisons should be in the same direction");
       }
@@ -2095,7 +2095,7 @@ Expression RangeExpression() :
 {
   e1=ShiftExpression() 
     ( t=".." e2=ShiftExpression() 
-      { e1=CallExp.create(symb(t),e1,e2); }
+      { e1=bossa.syntax.dispatch.createCallExp(symb(t),e1,e2); }
       )*
   { return e1; }
 }
@@ -2116,7 +2116,7 @@ Expression ShiftExpression() :
          func = "<<";
        else
          func = t1==null ? ">>" : ">>>";
-       e1=CallExp.create(symb(func,t),e1,e2); }
+       e1=bossa.syntax.dispatch.createCallExp(symb(func,t),e1,e2); }
       )*
   { return e1; }
 }
@@ -2126,7 +2126,7 @@ Expression AdditiveExpression() :
 {
   e1=MultiplicativeExpression() 
     ( ( t="+" | t="-" ) e2=MultiplicativeExpression() 
-      { e1=CallExp.create(symb(t),e1,e2); }
+      { e1=bossa.syntax.dispatch.createCallExp(symb(t),e1,e2); }
       )*
   { return e1; }
 }
@@ -2136,7 +2136,7 @@ Expression MultiplicativeExpression() :
 {
   e1=ExponentialExpression() 
     ( (t="*"|t="/"|t="%") e2=ExponentialExpression() 
-      { e1=CallExp.create(symb(t),e1,e2); }
+      { e1=bossa.syntax.dispatch.createCallExp(symb(t),e1,e2); }
     )*
   { return e1; }
 }
@@ -2148,7 +2148,7 @@ Expression ExponentialExpression() :
   e1=UnaryExpression() 
     // '**' has right associativity
     [ t="**" e2=ExponentialExpression() 
-      { e1=CallExp.create(symb(t),e1,e2); }
+      { e1=bossa.syntax.dispatch.createCallExp(symb(t),e1,e2); }
     ]
   { return e1; }
 }
@@ -2158,7 +2158,7 @@ Expression UnaryExpression() :
 {
 (
   ( ( t="~" | t="!" ) res=PrimaryExpression() 
-    { res=CallExp.create(symb(t),res); }
+    { res=bossa.syntax.dispatch.createCallExp(symb(t),res); }
   |
     ( t="+" | t="-" ) res=PrimaryExpression() 
     { if (res instanceof ConstantExp && ((ConstantExp)res).isNumber())
@@ -2167,7 +2167,7 @@ Expression UnaryExpression() :
           res=((ConstantExp)res).makeNegative();
       } 
       else
-	res=CallExp.create(symb(t),res);
+	res=bossa.syntax.dispatch.createCallExp(symb(t),res);
     }
   )
 |
@@ -2238,7 +2238,7 @@ Expression PrimarySuffix(Expression start) :
 {
   { Token t; }
   t="[" res=Expression() "]"
-  { return CallExp.create(symb("get",t,false),start,res); }
+  { return bossa.syntax.dispatch.createCallExp(symb("get",t,false),start,res); }
 |
   "." res=identExp()
   [ LOOKAHEAD(1) // a.f(x) is parsed as f(a, x), not as (f(a))(x)
@@ -2254,11 +2254,11 @@ Expression PrimarySuffix(Expression start) :
       }
     else
       args.addReceiver(start);
-    return new CallExp(res, args, true, hasBrackets); 
+    return bossa.syntax.dispatch.createCallExp(res, args, true, hasBrackets); 
   }
 |
   args = arguments(false)
-  { return new CallExp(start, args); }
+  { return bossa.syntax.dispatch.createCallExp(start, args); }
 }
 
 // The expressions that can follow a string literal, to be concatenated with it
@@ -2283,9 +2283,9 @@ Expression Literal() :
 | res=charConstantExp()
 | res=stringConstantExp()
   ( {Expression e;} e=StringLiteralSuffixExpression() 
-    { res = CallExp.create(symb("+", e.location()), res, e); }
+    { res = bossa.syntax.dispatch.createCallExp(symb("+", e.location()), res, e); }
     [ e=stringConstantExp() 
-      { res = CallExp.create(symb("+", e.location()), res, e); }
+      { res = bossa.syntax.dispatch.createCallExp(symb("+", e.location()), res, e); }
     ]
   )*
 | res=multiLineStringExp()
@@ -2579,7 +2579,7 @@ void PostfixBlocks(Expression exp) :
 (
   block=Block()
   { if ( exp instanceof CallExp && ((CallExp)exp).hasBrackets && ! (exp instanceof NewExp) )
-      ((CallExp)exp).addBlockArgument(block, null);
+      bossa.syntax.dispatch.addBlockArgument(exp,block, null);
     else
       throw bossa.util.User.error(exp,"Block arguments can only be added to normal function calls");
   }
@@ -2664,7 +2664,7 @@ Expression PostfixStatementExpression(Expression e1, Token first) :
     e2=Expression()
     {
       if(op.image.length()!=1)
-        e2=CallExp.create(symb(op.image.substring(0, 1),op),e1,e2);
+        e2=bossa.syntax.dispatch.createCallExp(symb(op.image.substring(0, 1),op),e1,e2);
   
       e1=bossa.syntax.dispatch.createAssignExp(e1,e2);
     }
@@ -2809,7 +2809,7 @@ Statement ShortThrowStatement() :
 { Expression e; Token t; }
 {
   t="throw" e=Expression()
-  { return new ExpressionStmt(CallExp.create(symb(t),e)); }
+  { return new ExpressionStmt(bossa.syntax.dispatch.createCallExp(symb(t),e)); }
 }
 
 Statement TryStatement() :
@@ -2835,15 +2835,15 @@ Statement ShortAssertStatement() :
 {
   Token t;
   Expression condition, message;
-  CallExp call;
+  Expression call;
 }
 {
   t = "assert"
   condition = SideEffectFreeExpression()
   ( ":" message = SideEffectFreeExpression() 
-    { call = CallExp.create(symb(t), condition, message); }
+    { call = bossa.syntax.dispatch.createCallExp(symb(t), condition, message); }
   |
-    { call = CallExp.create(symb(t), condition); }
+    { call = bossa.syntax.dispatch.createCallExp(symb(t), condition); }
   )
   { return new ExpressionStmt(call); }
 }

@@ -1,0 +1,417 @@
+/**************************************************************************/
+/*                                N I C E                                 */
+/*             A high-level object-oriented research language             */
+/*                        (c) Daniel Bonniot 2004                         */
+/*                                                                        */
+/*  This program is free software; you can redistribute it and/or modify  */
+/*  it under the terms of the GNU General Public License as published by  */
+/*  the Free Software Foundation; either version 2 of the License, or     */
+/*  (at your option) any later version.                                   */
+/*                                                                        */
+/**************************************************************************/
+
+package bossa.syntax;
+
+import bossa.util.*;
+
+/**
+   A function call.
+
+ */
+public class CallExp extends Expression
+{
+  Expression function;
+  Arguments arguments;
+  /** true iff the first argument was written before the application: e.f(x) */
+  final boolean infix = false;
+  /** true iff this call was made using brackets (i.e. not like 'x.f'). */
+  public final boolean hasBrackets = true;
+
+  /** Class this static method is defined in, or null */
+  ?gnu.bytecode.ClassType declaringClass = null;
+
+  ExpLocalVariable[?] localVars = null;
+
+  /** The type of the function, constrained by the actual arguments. */
+  private ?mlsub.typing.Polytype instanciatedDomain = null;
+
+  private boolean overloadingResolved = false;
+
+  /****************************************************************
+   * Overloading resolution
+   ****************************************************************/
+
+  void resolveOverloading()
+  {
+    // do not resolve twice
+    if (overloadingResolved)
+      return;
+
+    overloadingResolved = true;
+    
+    arguments.noOverloading();
+    
+    function = function.resolveOverloading(this);
+
+    function.checkSpecialRequirements(cast(arguments.computedExpressions));
+
+    // make sure computedExpressions is valid.
+    this.getType();
+
+    // Allow expressions to know in what context they are used.
+    // Important for litteral arrays and tuples.
+    Expression.adjustToExpectedType(cast(arguments.computedExpressions),
+                                    nice.tools.typing.Types.parameters(function.getType()));
+  }
+
+  computeType()
+  {
+    this.resolveOverloading();
+
+    if (type == null)
+      // function should be a function abstraction here
+      // no default arguments
+      {
+	this.setComputedType(notNull(getTypeAndReportErrors(this.location(), function, arguments.inOrder())), null);
+	arguments.computedExpressions = cast(arguments.inOrder());
+      }
+
+  }
+
+  /** @param argTypes
+        The types of the formal arguments of the function, in the same
+        polymorphic instance as the computed type.
+  */
+  void setComputedType(mlsub.typing.Polytype type, mlsub.typing.Monotype[?] argTypes)
+  {
+    this.type = type;
+
+    if (! type.isMonomorphic() && argTypes != null)
+      {
+	/*
+	   We construct the instantiated version of the function type:
+	   the type of the function, constrained by the actual arguments.
+	   Then we simplify it.
+	   It is useful to constrain the arguments to have the expected
+	   bytecode types.
+	*/
+	instanciatedDomain = new mlsub.typing.Polytype(type.getConstraint(), new mlsub.typing.TupleType(argTypes));
+	instanciatedDomain = notNull(instanciatedDomain).cloneType();
+	// By default, a polytype is supposed to be simplified.
+	notNull(instanciatedDomain).setNotSimplified();
+	notNull(instanciatedDomain).simplify();
+      }
+
+    if (! type.trySimplify())
+      User.warning(this, "This call might have a type error, or this might be a bug in the compiler. \nPlease contact bonniot@users.sourceforge.net");
+
+  }
+
+  isAssignable()
+  {
+    this.resolveOverloading();
+    return function.isFieldAccess();
+  }
+
+  /**
+     @return the FieldAccess if this expression resolves to a field, 
+     which is true if it is the application a of FieldAccess to an object 
+     value. Returns null otherwise.
+   */
+  getField()
+  {
+    this.resolveOverloading();
+    return function.getFieldAccessMethod();
+  }
+
+  /****************************************************************
+   * Code generation
+   ****************************************************************/
+
+  compile()
+  {
+    ?gnu.expr.LetExp firstLetExp = null;
+    ?gnu.expr.Expression letExpRes = null;
+    if (localVars != null)
+      {
+        for(int i = notNull(localVars).length-1; i >= 0; i--)
+	  {
+            gnu.expr.Expression[] eVal = cast(new gnu.expr.Expression[1]);
+            gnu.expr.LetExp letExp = new gnu.expr.LetExp(eVal);
+            eVal[0] = notNull(notNull(localVars)[i].variable).compile(letExp);
+            if (i == notNull(localVars).length-1)
+              {
+		firstLetExp = letExp;
+              }
+            else
+              {
+                letExp.setBody(letExpRes);
+              }
+
+       	    letExpRes = letExp;
+	  }
+      }
+
+    gnu.expr.Expression res;
+    if (function.isFieldAccess())
+      res = function.getFieldAccessMethod().compileAccess(this.compileParams());
+    else
+      res = new gnu.expr.ApplyExp(function.generateCodeInCallPosition(), this.compileParams());
+    this.location().write(res);
+
+    if (firstLetExp != null)
+      {
+        firstLetExp.setBody(res);
+	res = notNull(letExpRes);
+      }
+
+    return nice.tools.code.EnsureTypeProc.ensure(res, nice.tools.code.Types.javaType(type));
+  }
+
+  private gnu.expr.Expression[] compileParams()
+  { 
+    bossa.syntax.Expression[] compexps = cast(arguments.computedExpressions);
+
+    gnu.expr.Expression[] params = Expression.compile(compexps);
+
+    // Make sure the arguments have the expected bytecode type,
+    // matching the instantiated type of the (polymorphic) function.
+    mlsub.typing.Monotype[?] domain = null;
+    if (instanciatedDomain != null)
+      {
+        mlsub.typing.TupleType mtype = cast(notNull(instanciatedDomain).getMonotype());
+        domain = mtype.getComponents();
+      }
+
+    if (domain != null)
+      for (int i = 0; i < params.length; i++)
+	params[i] = nice.tools.code.EnsureTypeProc.ensure
+	  (params[i], nice.tools.code.Types.javaType(domain[i]));
+
+    return params;
+  }
+
+  compileAssign(gnu.expr.Expression value)
+  {
+    if (!function.isFieldAccess())
+      Internal.error(this, "Assignment to a call that is not a field access");
+
+    FieldAccess access = function.getFieldAccessMethod();
+
+    if (access.isFinal())
+      User.error(this, "Field " + access + " is final");
+
+    if (arguments.size() == 0)
+      return access.compileAssign(value);
+
+    if (arguments.size() == 1)
+      return access.compileAssign(arguments.getExp(0).generateCode(), value);
+
+    Internal.error(this, "A field access should have 0 or 1 parameter");
+    return cast(null);
+  }
+
+  toString()
+  {
+    if (!infix)
+      return function.toString(Printable.parsable) + arguments;
+
+    if (declaringClass == null)
+      return arguments.getExp(0) + "." + function + arguments.toStringInfix();
+
+    if (function instanceof SymbolExp)
+      {
+        SymbolExp func = cast(function);
+	Definition def = func.getSymbol().getDefinition();
+
+	if (def instanceof RetypedJavaMethod)
+          return func.toString() + arguments;
+
+	if (def instanceof JavaFieldAccess)
+	  return notNull(declaringClass).getName() + "." + def.fieldName + arguments;
+      }
+
+    return notNull(declaringClass).getName() + "." + function + arguments;
+  }
+
+}
+
+public Expression createCallExp(Expression function, 
+	       Expression param1)
+{
+  let res = new CallExp(function:function, arguments:new Arguments([new Arguments.Argument(param1)]));
+  res.setLocation(function.location());
+  return res;
+}
+
+public Expression createCallExp(Expression function, 
+	       Expression param1, Expression param2)
+{
+  let res = new CallExp(function:function, arguments:new Arguments([new Arguments.Argument(param1), new Arguments.Argument(param2)]));
+  res.setLocation(function.location());
+  return res;
+}
+
+public Expression createCallExp(Expression function, 
+	       Expression param1, Expression param2,
+	       Expression param3)
+{
+  let res = new CallExp(function:function, arguments:new Arguments([new Arguments.Argument(param1), new Arguments.Argument(param2), new Arguments.Argument(param3)]));
+  res.setLocation(function.location());
+  return res;
+}
+
+public Expression createCallExp(Expression func, Arguments args, boolean infix, boolean hasBrackets)
+{
+  return new CallExp(function: func, arguments: args, infix: infix, hasBrackets: hasBrackets);
+}
+
+public Expression createCallExp(Expression func, Arguments args)
+{
+  return new CallExp(function: func, arguments: args);
+}
+
+public void addBlockArgument(Expression callexp, Statement block, LocatedString name)
+{
+  let CallExp exp = cast(callexp);
+  exp.arguments.add(createFunExp(bossa.syntax.Constraint.True, [], block), name);
+} 
+
+?mlsub.typing.Polytype wellTyped(mlsub.typing.Polytype funt, mlsub.typing.Polytype[] parameters)
+{
+  try{
+    return getType(funt, parameters, true);
+  }
+  catch(ReportErrorEx e){}
+  catch(mlsub.typing.TypingEx e){}
+  catch(mlsub.typing.BadSizeEx e){}
+  return null;
+}
+
+?mlsub.typing.Polytype getTypeAndReportErrors(bossa.util.Location loc,
+			 Expression function,
+			 Expression[] parameters)
+{
+  mlsub.typing.Polytype[] paramTypes = Expression.getType(parameters);
+  
+  try{
+    return getType(function.getType(), paramTypes, false);
+  }
+  catch(BadSizeEx e){
+    User.error(loc, function.toString(Printable.detailed) + 
+		" expects " + e.expected + " parameters, " +
+ 		"not " + e.actual);
+  }
+  catch(ReportErrorEx e){
+    User.error(loc, e.getMessage());
+  }
+  catch(TypingEx e){
+    if (Typing.dbg) 
+      bossa.util.Debug.println(e.getMessage());
+
+    if (function.isFieldAccess())
+      {
+        // There must be just one parameter in a field access
+        User.error(loc, parameters[0] + " has no field " + function);
+      }
+    else
+      {
+        let end = "not within the domain of function \"" + function +"\"";
+        if (parameters.length >= 2)
+          User.error(loc,"Parameters \n"+
+		Util.map("(",", ",")",parameters) +
+		"\n of types \n" +
+		Util.map("(",",\n  ",")",paramTypes) +
+		"\n are "+end);
+        else
+	  User.error(loc,"Parameter "+
+		Util.map("",", ","",parameters) +
+		" of type " +
+		Util.map("",", ","",paramTypes) +
+		" is "+end);      
+      }
+  }
+  return null;
+}
+
+ /**
+    @param tentative whether we only want to check if the call is valid
+      (as during overloading resolution).
+ */
+private mlsub.typing.Polytype getType(mlsub.typing.Polytype type, mlsub.typing.Polytype[] parameters,
+                                boolean tentative)
+{
+  mlsub.typing.Monotype m = type.getMonotype();
+
+  // Check that the function cannot be null
+  if (m.head() == null)
+    throw new ReportErrorEx("Nullness check");
+
+  try{
+    mlsub.typing.Typing.leq(m.head(), PrimitiveType.sureTC);
+  }
+  catch(TypingEx ex) {
+    throw new ReportErrorEx("This function may be null");
+  }
+
+  m = nice.tools.typing.Types.rawType(m);
+
+  // The function might not be of a functional kind.
+  // Only usefull for null?
+  // First reset the kind, that comes from a previous typing.
+  if (m.getKind() == mlsub.typing.lowlevel.Engine.variablesConstraint)
+    m.setKind(null);
+  if (m.getKind() == null)
+    m.setKind(mlsub.typing.FunTypeKind.get(parameters.length));
+
+  m = m.equivalent();
+
+  if (!(m instanceof mlsub.typing.FunType))
+    throw new ReportErrorEx("Not a function");
+
+  mlsub.typing.FunType funt = m;
+
+  let dom = funt.domain();
+
+  let ?mlsub.typing.Constraint cst = type.getConstraint();
+  let doEnter = true; //Constraint.hasBinders(cst);
+
+  
+  if (doEnter) mlsub.typing.Typing.enter(tentative);
+
+
+  boolean ok = false;
+  try
+    {
+      try{ 
+        mlsub.typing.Constraint.enter(cst);
+      }
+      catch(mlsub.typing.TypingEx e) { 
+
+        throw new ReportErrorEx("The conditions for using this function are not fullfiled");
+      }
+ 
+      if (mlsub.typing.Typing.dbg)
+        {
+          bossa.util.Debug.println("Parameters:\n" + Util.map("",", ","\n",parameters));
+          bossa.util.Debug.println("Domain:\n" + Util.map("",", ","\n",dom));
+        }
+
+      mlsub.typing.Typing.in(parameters, dom);
+
+      ok = true;
+
+    }
+  finally{
+    if(doEnter)
+      // If we are in tentative mode and the call is valid, then
+      // we make the effects last (that's only important when there are
+      // existential type variables in the context).
+      mlsub.typing.Typing.leave(tentative, tentative && ok);
+  }
+
+  return mlsub.typing.Polytype.apply(cst, funt, parameters);
+}
+
+
+class ReportErrorEx extends Exception {}

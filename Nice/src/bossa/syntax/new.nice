@@ -90,5 +90,5 @@ public class NewExp extends CallExp
 
 public Expression createNewExp(TypeIdent ti, Arguments arguments) 
 {
-  return new NewExp(null, arguments, ti: ti);
+  return new NewExp(function: cast(null), arguments: arguments, ti: ti);
 }

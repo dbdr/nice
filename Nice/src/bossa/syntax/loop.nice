@@ -140,12 +140,12 @@ public Statement createForInLoop(?Monotype vartype, LocatedString varName, Locat
       notNull(itertype).nullness = Monotype.sure;
     }
 
-  let getiter = CallExp.create(new IdentExp(new LocatedString("forIterator", loc)), container); 
+  let getiter = createCallExp(new IdentExp(new LocatedString("forIterator", loc)), container); 
   let iter = new LocatedString(loc.uniqueIdentifier("for_in_iter_"), loc);
   let init = new Block.LocalVariable(iter, itertype, true, getiter);
   let iterexp = new IdentExp(iter);
-  let cond = CallExp.create(new IdentExp(new LocatedString("hasNext", loc)), iterexp);
-  let getvar = CallExp.create(new IdentExp(new LocatedString("next", loc)), iterexp);
+  let cond = createCallExp(new IdentExp(new LocatedString("hasNext", loc)), iterexp);
+  let getvar = createCallExp(new IdentExp(new LocatedString("next", loc)), iterexp);
   let assign = new Block.LocalVariable(varName, vartype, true, getvar);
   let loop = createWhileLoop(cond, new Block(new LinkedList([assign, body])));
   return new Block(new LinkedList([init, loop]));

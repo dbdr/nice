@@ -103,17 +103,6 @@ public abstract class Expression
   }
 
   /**
-   * Resolves overloading, taking into account the parameters 
-   * the expressions is applied to.
-   *
-   * @return the resolved expression. Doesn't return if OR is not possible.
-   */
-  Expression resolveOverloading(CallExp callExp)
-  {
-    return this;
-  }
-  
-  /**
    * Resolve overloading, assuming that this expression
    * should have some Type.
    *

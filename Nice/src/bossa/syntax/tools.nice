@@ -282,7 +282,6 @@ List<Block.LocalDeclaration> locals(Block) = native Block.locals;
 ?gnu.bytecode.ClassType staticClass(Arguments) = native gnu.bytecode.ClassType Arguments.staticClass();
 List<VarSymbol> findJavaMethods(?gnu.bytecode.ClassType, String, int) = native List JavaClasses.findJavaMethods(gnu.bytecode.ClassType,java.lang.String,int);
 List<VarSymbol> findJavaMethods(?gnu.bytecode.ClassType, String) = native List JavaClasses.findJavaMethods(gnu.bytecode.ClassType,java.lang.String);
-Arguments arguments(CallExp) = native CallExp.arguments;
 TypeParameters TypeParameters(List<Monotype>) = native new bossa.syntax.TypeParameters(List);
 Block Block(List<Statement>) = native new bossa.syntax.Block(List);
 String explainNoMatch(Arguments, List<VarSymbol>) = native String Arguments.explainNoMatch(List);

@@ -39,7 +39,7 @@ public Expression createAssignExp(Expression to, Expression value)
 {
   // Rewrite "get(e, i) = v" into "set(e, i, v)"
   if (to instanceof CallExp && "get".equals(notNull(to.function).toString()))
-    return CallExp.create(
+    return createCallExp(
 	new IdentExp(new LocatedString("set", notNull(to.function).location())),
 	to.arguments.getExp(0),
 	to.arguments.getExp(1),

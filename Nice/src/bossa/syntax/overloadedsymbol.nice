@@ -127,7 +127,7 @@ public class OverloadedSymbolExp extends Expression
           this.computeArgsType(arguments.getExpressions(s),
                           s.getClonedType(), arguments.getUsedArguments(s));
 
-	?mlsub.typing.Polytype t = CallExp.wellTyped(s.getClonedType(), argsType);
+	?mlsub.typing.Polytype t = wellTyped(s.getClonedType(), argsType);
 
 	if (t == null)
 	  {
@@ -165,7 +165,7 @@ public class OverloadedSymbolExp extends Expression
       {
 	let res = symbols[0];
 	// store the formal argument types for later use together with the type
-        callExp.setComputedType(arguments.types.get(res),
+        callExp.setComputedType(notNull(arguments.types.get(res)),
                                 nice.tools.typing.Types.parameters(res.getClonedType()));
 	res.releaseClonedType();
 
@@ -327,10 +327,9 @@ public class OverloadedSymbolExp extends Expression
       {
         if (Node.thisExp != null)
           try {
-            let res = new CallExp
-              (createOverloadedSymbolExp(fieldAccesses, ident, true),
+            let res = new CallExp(function: createOverloadedSymbolExp(fieldAccesses, ident, true),
                //Arguments.noArguments());
-               new Arguments([new Arguments.Argument(Node.thisExp)]));
+               arguments: new Arguments([new Arguments.Argument(Node.thisExp)]));
 
             res.setLocation(ident.location());
             res.resolveOverloading();

@@ -56,8 +56,10 @@ public class Range<T | T <: int, int <: T>  extends OpenRange<T>
   iterator() = new RangeIterator(range: this, pos: begin.index - 1);
   listIterator() = new RangeIterator(range: this, pos: begin.index-1);
 
-  listIterator(index) = new RangeIterator(range: this, pos: begin.index + index-1);	
+  listIterator(index) = new RangeIterator(range: this, pos: begin.index + index-1);
 
+  remove(elem) = throw new UnsupportedOperationException();
+  removeAll(elems) = throw new UnsupportedOperationException();
 }
 
 public class OpenRangeIterator<T | T <: int, int <: T> implements Iterator<T> {

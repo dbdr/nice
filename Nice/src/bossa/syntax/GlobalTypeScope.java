@@ -51,7 +51,7 @@ public class GlobalTypeScope extends TypeScope
 
     boolean notFullyQualified = name.indexOf('.') == -1;
 	
-    if (notFullyQualified && (module != null))
+    if (notFullyQualified)
       {
 	/* Try first to find the symbol in Nice definitions.
 	   The first package is the current package.

@@ -14,3 +14,21 @@ class NBeanContextServicesListener
   /// Toplevel
 // java.util.Map is already retyped, with two type parameters
 interface MyMutableArray<Element> = native java.util.Map;
+
+/// COMMENT Retype two java classes, when one refers to the other.
+/// COMMENT The retyping of the second must not fail because the class was
+/// COMMENT supposed to be unparameterized.
+
+/// PASS
+  /// Toplevel
+interface CharacterIterator<T> = native java.text.CharacterIterator;
+interface CollationElementIterator<T> = native java.text.CollationElementIterator;
+
+/// PASS
+  /// Toplevel
+interface CollationElementIterator<T> = native java.text.CollationElementIterator;
+interface CharacterIterator<T> = native java.text.CharacterIterator;
+
+/// FAIL
+  /// Toplevel
+class Int = native int;

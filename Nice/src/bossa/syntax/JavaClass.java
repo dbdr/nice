@@ -16,6 +16,7 @@ import bossa.util.*;
 import java.util.*;
 
 import mlsub.typing.*;
+import gnu.bytecode.ClassType;
 
 /**
    A class definition which reflects an existing native java class.
@@ -33,18 +34,36 @@ public class JavaClass extends ClassDefinition.ClassImplementation
   {
     this.definition = definition;
     this.javaName = javaName;
+
+    lookup();
   }
 
   ClassDefinition definition;
 
-  void resolveClass()
+  /**
+     This must be called in a first pass, before bytecode types are implicitely
+     loaded, so that the retyping is tyken into account.
+  */
+  private void lookup()
   {
-    gnu.bytecode.Type classType = nice.tools.code.TypeImport.lookup(javaName);
+    ClassType classType;
+    try {
+      classType = (ClassType) nice.tools.code.TypeImport.lookup(javaName);
+    }
+    catch(ClassCastException ex) {
+      throw User.error(definition, javaName + " is a primitive type");
+    }
     
     if (classType == null)
       User.error(javaName, javaName + " was not found in classpath");
-    
 
+    
+    // Check that we don't give a wrong arity to a generic class.
+    int nativeArity = classType.getArity();
+    if (nativeArity != -1 && nativeArity != definition.tc.arity())
+      User.error(definition, javaName + " has " + nativeArity +
+		 " type parameters");
+    
     TypeConstructor old = 
       JavaClasses.setTypeConstructorForJavaClass
       (definition.compilation(), definition.tc, classType);
@@ -53,7 +72,12 @@ public class JavaClass extends ClassDefinition.ClassImplementation
       User.error(definition, javaName + 
 		 " was already associated with the Nice class " + old);
     definition.setJavaType(classType);
-    JavaClasses.fetchMethods(definition.tc, (gnu.bytecode.ClassType) classType);
+  }
+
+  void resolveClass()
+  {
+    JavaClasses.fetchMethods(definition.tc, 
+			     (gnu.bytecode.ClassType) definition.getJavaType());
   }
 
   public void printInterface(java.io.PrintWriter s)

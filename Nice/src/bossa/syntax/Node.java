@@ -184,7 +184,7 @@ abstract public class Node
     return globalTypeScope;
   }
   
-  void buildScope(Module module)
+  public static void setModule(Module module)
   {
     // For multiple compilations in the same JVM:
     // If we are starting a new compilation, reset the global scopes.
@@ -192,11 +192,15 @@ abstract public class Node
       {
 	JavaClasses.compilation = module.compilation();
 	globalScope = new VarScope(null);
-	globalTypeScope= new GlobalTypeScope();
+	globalTypeScope = new GlobalTypeScope();
       }
     globalTypeScope.module = module;
-    
-    buildScope(globalScope,globalTypeScope);
+  }
+
+  void buildScope(Module module)
+  {
+    setModule(module);
+    buildScope(globalScope, globalTypeScope);
   }
   
   /** 

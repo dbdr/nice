@@ -28,7 +28,8 @@ import nice.tools.util.Chronometer;
 
 public abstract class Loader
 {
-  public static LocatedString readImports(Reader r, List imports)
+  public static LocatedString readImports(Reader r, 
+					  List imports, Collection opens)
   {
     chrono.start();
     try {
@@ -38,7 +39,7 @@ public abstract class Loader
 	parser.ReInit(r);
 
       try{
-	return parser.readImports(imports);
+	return parser.readImports(imports, opens);
       }
       catch(ParseException e){
 	if(e.currentToken!=null)
@@ -54,9 +55,7 @@ public abstract class Loader
     }
   }
 
-  public static void open(Reader r, 
-			  List definitions,
-			  Collection importStars)
+  public static void open(Reader r, List definitions)
   {
     chrono.start();
     try {
@@ -66,7 +65,7 @@ public abstract class Loader
 	parser.ReInit(r);
     
       try{
-	parser.module(definitions,importStars);
+	parser.module(definitions);
       }
       catch(ParseException e){
 	if(e.currentToken!=null)

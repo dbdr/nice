@@ -5,3 +5,13 @@
   import java.text.*;
 
   void f(AttributedCharacterIterator.Attribute a) {}
+
+/// FAIL
+  /// COMMENT We are not importing java.text here.
+  /// Toplevel
+  void f(AttributedCharacterIterator.Attribute a) {}
+
+/// PASS
+  /// Toplevel
+  import java.text.*;
+  class AttributedCharacterIterator = native AttributedCharacterIterator;

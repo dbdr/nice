@@ -103,7 +103,9 @@ public final class JavaClasses
       
     TypeConstructor res = new TypeConstructor(className, null, 
 					      instantiable, true);
-    compilation.javaTypeConstructors.put(javaType, res);
+    Type old = (Type) compilation.javaTypeConstructors.put(javaType, res);
+    if (old != null)
+      User.error(old + " was already associated with the Nice class " + old);
 
     nice.tools.code.Types.set(res, javaType);
     

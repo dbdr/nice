@@ -341,9 +341,16 @@ public final class Types
     if (javaType instanceof ParameterizedType)
       {
 	ParameterizedType p = (ParameterizedType) javaType;
-	return new MonotypeConstructor
-	  (typeConstructor(p.main), 
-	   monotype(p.parameters, typeVariables, niceTypeVariables));
+	try {
+	  return new MonotypeConstructor
+	    (typeConstructor(p.main), 
+	     monotype(p.parameters, typeVariables, niceTypeVariables));
+	}
+	catch (BadSizeEx ex) {
+	  // This can happen, at least if a bytecode method is using
+	  // a generic class incorrectly.
+	  throw new ParametricClassException(javaType.toString());
+	}
       }
 
     if (javaType instanceof TypeVariable)

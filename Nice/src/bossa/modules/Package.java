@@ -92,11 +92,18 @@ public class Package implements mlsub.compilation.Module, Located, bossa.syntax.
 
   private void loadImports()
   {
-    imports = source.getImports();
+    Set opens = new TreeSet();
+    opens.add("java.lang");
+    opens.add("java.util");
+
+    imports = source.getImports(opens);
+
     if (!name.toString().equals("nice.lang") && !Debug.ignorePrelude)
       imports.add(new LocatedString("nice.lang", 
 				    bossa.util.Location.nowhere()));
     
+    setOpens(opens);
+
     List p = this.getImports();
     for (Iterator i = p.iterator(); i.hasNext();)
       source.someImportModified(((Package) i.next()).lastModification());
@@ -109,6 +116,7 @@ public class Package implements mlsub.compilation.Module, Located, bossa.syntax.
   {
     Module oldModule = Definition.currentModule;
     Definition.currentModule = this;
+    Node.setModule(this);
     
     if (Debug.passes)
       Debug.println(this + ": parsing\n" + source);

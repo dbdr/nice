@@ -51,7 +51,7 @@ class Content
     return s == null ? "<empty>" : s;
   }
 
-  List getImports()
+  List getImports(Set opens)
   {
     Content.Unit[] readers;
     /* 
@@ -66,24 +66,22 @@ class Content
       readers = compiled.getDefinitions();
 
     LinkedList imports = new LinkedList();
+
     for (int i = 0; i < readers.length; i++)
-      read(readers[i], imports);
+      read(readers[i], imports, opens);
+
     return imports;
   }
 
   List getDefinitions(boolean shouldReload)
   {
     List definitions = new LinkedList();
-    Set opens = new TreeSet();
-    opens.add("java.lang");
-    opens.add("java.util");
 
     Content.Unit[] readers = getReaders(shouldReload);
 
     for(int i = 0; i<readers.length; i++)
-      read(readers[i], definitions, opens);
+      read(readers[i], definitions);
     
-    pkg.setOpens(opens);
     return expand(definitions);
   }
 
@@ -101,22 +99,22 @@ class Content
     return definitions;
   }
   
-  private void read(Content.Unit unit, List imports)
+  private void read(Content.Unit unit, List imports, Set opens)
   {
     bossa.util.Location.setCurrentFile(unit.name);
 
     bossa.syntax.LocatedString pkgName = 
-      bossa.parser.Loader.readImports(unit.reader, imports);
+      bossa.parser.Loader.readImports(unit.reader, imports, opens);
     if (pkgName != null && ! pkgName.equals(pkg.name))
       User.error(pkgName,
 		 source + " declares it belongs to package " + pkgName +
 		 ", but it was found in package " + pkg.name);
   }
   
-  private void read(Content.Unit unit, List definitions, Set opens)
+  private void read(Content.Unit unit, List definitions)
   {
     bossa.util.Location.setCurrentFile(unit.name);
-    bossa.parser.Loader.open(unit.reader, definitions, opens);
+    bossa.parser.Loader.open(unit.reader, definitions);
   }
   
   /**

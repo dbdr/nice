@@ -86,6 +86,9 @@
            <br />
            &nbsp;<span class="small">o</span><xsl:text> </xsl:text>
            <a class="nav" href="manual.html">Manual</a>
+           (<a class="nav" href="manual.html">online</a>,
+            <a class="nav" href="manual.pdf">PDF</a>,
+            <a class="nav" href="manual.ps">PS</a>)
            <br />
            &nbsp;<span class="small">o</span><xsl:text> </xsl:text>
            <a class="nav" href="compilation.html">Using the compiler</a>
@@ -138,7 +141,7 @@
            <a class="nav" href="http://sourceforge.net/forum/forum.php?forum_id=40268">Forums</a>
            <br />
            &nbsp;<span class="small">o</span><xsl:text> </xsl:text>
-           <a class="nav" href="http://sourceforge.net/mail/&quest;group_id=12788">Mailing List</a>
+           <a class="nav" href="http://lists.sourceforge.net/lists/listinfo/nice-info">Mailing List</a>
 <!--
            <br />
            &nbsp;<span class="small">o</span><xsl:text> </xsl:text>

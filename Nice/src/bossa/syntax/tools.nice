@@ -141,6 +141,47 @@ bossa.util.UserError ensureLocated(bossa.util.UserError e,
   }
 }
 
+void resolveCCThis(Statement stmt, Located thisLoc, NiceClass classe)
+{
+  Block block = cast(stmt);
+
+  Statement last = block.last;
+  if (last instanceof Block)
+  {
+    resolveCCThis(last, thisLoc, classe);
+    return;
+  }
+  
+  void missingThisError()
+  {
+    User.error(thisLoc, "The last statement must be a call to 'this' constructor");
+  }
+
+  if (! (last instanceof ExpressionStmt))
+    missingThisError();
+
+  ExpressionStmt expstmt = cast(last);
+
+  if (! (expstmt.exp instanceof CallExp))
+    missingThisError();
+
+  CallExp call = cast(expstmt.exp);
+
+  if (! (call.function instanceof IdentExp))
+    missingThisError();
+
+  IdentExp ident = cast(call.function);
+
+  if (! ident.toString().equals("this"))
+    missingThisError();
+
+  Location loc = ident.location();
+  call.function = createOverloadedSymbolExp(classe.getConstructorCallSymbols(),
+					FormalParameters.thisName);
+  notNull(call.function).setLocation(loc);
+}
+
+
 // For bootstrap
 void _printStackTraceWithSourceInfo(Throwable t) =
   printStackTraceWithSourceInfo(t);
@@ -167,6 +208,8 @@ String explainNoMatch(Arguments, List<VarSymbol>) = native String Arguments.expl
 Map<VarSymbol,mlsub.typing.Polytype> types(Arguments) = native Arguments.types;
 <T> String map(String, String, String, T[]) = native String bossa.util.Util.map(String, String, String, Object[]);
 Stack<bossa.link.Alternative> sortedAlternatives(MethodDeclaration) = native Stack bossa.link.Alternative.sortedAlternatives(MethodDeclaration);
+List<VarSymbol> getConstructorCallSymbols(NiceClass) = native List NiceClass.getConstructorCallSymbols();
+
 // Retypings needed since java types are not strict.
 
 Block newBlock(?Statement[] statements) = native new Block(Statement[]);

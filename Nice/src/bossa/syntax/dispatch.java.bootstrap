@@ -33,6 +33,8 @@ public class dispatch
   static List removeNonMinimal(List l)
   { return null; }
 
+  static void resolveCCThis(Statement stmt, bossa.util.Located thisloc, NiceClass classe) {}
+
   static Statement  analyse(Statement  s, VarScope v, TypeScope t, boolean r)
   { return null; }
   

@@ -152,36 +152,9 @@ public abstract class CustomConstructor extends UserOperator
 
     void resolveBody()
     {
-      resolveThis((Block) body);
+      bossa.syntax.dispatch.resolveCCThis(body, this, classe);
       body = bossa.syntax.dispatch.analyse
         (body, thisScope, thisTypeScope, false);
-    }
-
-    private void resolveThis(Block block)
-    {
-      Statement last = block.statements[block.statements.length - 1];
-      if (last instanceof Block)
-        {
-          resolveThis((Block) last);
-          return;
-        }
-
-      try {
-        CallExp call = (CallExp) ((ExpressionStmt) last).exp;
-        IdentExp ident = (IdentExp) call.function;
-        if (! call.function.toString().equals("this"))
-          User.error(this, 
-                     "The last statement must be a call to 'this' constructor");
-
-        Location loc = ident.location();
-        call.function = bossa.syntax.dispatch.createOverloadedSymbolExp
-          (classe.getConstructorCallSymbols(), FormalParameters.thisName);
-        call.function.setLocation(loc);
-      }
-      catch(ClassCastException ex) {
-        User.error(this, 
-                   "The last statement must be a call to 'this' constructor");
-      }
     }
 
     void innerTypecheck() throws TypingEx

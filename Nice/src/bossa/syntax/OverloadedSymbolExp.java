@@ -88,8 +88,8 @@ public class OverloadedSymbolExp extends Expression
     // It's better to do this know. OR is oriented, children first.
     arguments.computeTypes();
     
-    if(Debug.overloading) 
-      Debug.println("Overloading resolution for \n" + this +
+    if (Debug.overloading) 
+      Debug.println("Overloading resolution for " + this +
 		    "\nwith parameters " + arguments);
 
     // FIRST PASS: only checks the number of parameters
@@ -351,7 +351,10 @@ public class OverloadedSymbolExp extends Expression
 
   public String toString()
   {
-    return "[" + Util.map("","\n|","",symbols) + "]";
+    if (symbols.size() <= 1)
+      return "[" + Util.map("", "\n|", "", symbols) + "]";
+    else
+      return "\n[" + Util.map("", "\n|", "", symbols) + "]";
   }
 
   List symbols;

@@ -113,6 +113,13 @@ class DirectoryCompiledContent extends CompiledContent
   static Content.Stream[] getClasses(File directory, 
 				     final boolean wantDispatch)
   {
+    /*
+      To list out the "dispatch.class" file, 
+      we use the method File.compareTo(File) since it is correct 
+      both on case-sensitive and case-insensitive platforms.
+    */
+    final File dispatchFile = 
+      wantDispatch ? null : new File(directory, "dispatch.class");
     File[] classes = directory.listFiles
       (new FileFilter()
 	{ 
@@ -120,7 +127,7 @@ class DirectoryCompiledContent extends CompiledContent
 	  { 
 	    String name = f.getPath();
 	    return name.endsWith(".class") 
-	      && (wantDispatch || !name.endsWith("/dispatch.class"))
+	      && (wantDispatch || dispatchFile.compareTo(f) != 0)
 	      && f.isFile();
 	  }
 	}

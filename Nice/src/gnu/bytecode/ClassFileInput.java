@@ -53,7 +53,9 @@ public class ClassFileInput extends DataInputStream
   public static ClassType readClassType (String name, InputStream str)
        throws IOException, ClassFormatError
   {
-    ClassType ctype = ClassType.make(name);
+    // Make sure to create a new ClassType object, so that
+    // we don't add members to an existing class.
+    ClassType ctype = new ClassType(name);
     ClassFileInput reader = new ClassFileInput(ctype, str);
     return ctype;
   }
@@ -298,5 +300,6 @@ public class ClassFileInput extends DataInputStream
 	meth.setSignature(descriptorIndex);
 	readAttributes(meth);
       }
+    ctype.flags |= ctype.ADD_METHODS_DONE;
   }
 }

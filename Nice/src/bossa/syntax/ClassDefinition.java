@@ -307,7 +307,8 @@ public abstract class ClassDefinition extends MethodContainer
 
 	if (javaInterfaces != null)
 	  for (int i = 0; i < javaInterfaces.length; i++)
-            if (! (JavaClasses.excludedInterface(javaInterfaces[i])))
+            if (tc.arity() == 0 || 
+                ! JavaClasses.excludedInterface(javaInterfaces[i]))
               try {
                 Typing.initialLeq(tc, javaInterfaces[i]);
               }

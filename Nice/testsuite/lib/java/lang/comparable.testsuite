@@ -1,0 +1,5 @@
+/// PASS
+  /// Toplevel
+class A implements java.lang.Comparable {
+  compareTo(that@A) = 0;
+}

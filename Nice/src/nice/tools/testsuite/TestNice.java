@@ -545,7 +545,14 @@ public class TestNice {
 			_runtime = "classes";
 
 		File[] dirs = { getTempFolder(), new File(getRuntime()) };
-		return new nice.tools.util.DirectoryClassLoader(dirs, null);
+		ClassLoader res = new nice.tools.util.DirectoryClassLoader(dirs, null);
+		try {
+			nice.tools.util.JDK.setDefaultAssertionStatus(res, true);
+		}
+		catch(java.lang.reflect.InvocationTargetException e) {
+			System.out.println("WARNING: could not enable assertions");
+		}
+		return res;
 	}
 
 	/**

@@ -104,18 +104,10 @@ test:
 	cd regtest; JAVA="${java}" /usr/bin/time ./regtest
 
 check: 
-	if [ `${java} -h 2>&1 | grep -- -enableassertions | wc -l` = 0 ]; then\
-	  /usr/bin/time ${java} -Dassertions=true -classpath "classes" nice.tools.testsuite.TestNice testsuite; \
-	else \
-	  /usr/bin/time ${java} -enableassertions -classpath "classes" nice.tools.testsuite.TestNice testsuite; \
-	fi
+	/usr/bin/time ${java} -classpath "classes" nice.tools.testsuite.TestNice testsuite
 
 check_lib:
-	if [ `${java} -h 2>&1 | grep -- -enableassertions | wc -l` = 0 ]; then\
-	  /usr/bin/time ${java} -Dassertions=true -classpath "classes" nice.tools.testsuite.TestNice testsuite/lib; \
-	else \
-	  /usr/bin/time ${java} -enableassertions -classpath "classes" nice.tools.testsuite.TestNice testsuite/lib; \
-	fi
+	/usr/bin/time ${java} -Dassertions=true -classpath "classes" nice.tools.testsuite.TestNice testsuite/lib
 
 .PHONY: coverage
 coverage: share/java/nice.jar

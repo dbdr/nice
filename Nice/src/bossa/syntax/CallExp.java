@@ -12,7 +12,7 @@
 
 // File    : CallExp.java
 // Created : Mon Jul 05 16:27:27 1999 by bonniot
-//$Modified: Wed Apr 05 15:01:55 2000 by Daniel Bonniot $
+//$Modified: Sat May 06 16:08:41 2000 by Daniel Bonniot $
 
 package bossa.syntax;
 
@@ -242,8 +242,18 @@ public class CallExp extends Expression
 
   public gnu.expr.Expression compile()
   {
+    // wraps the arguments that reference methods into LambdaExps
+    gnu.expr.Expression[] params = Expression.compile(parameters);
+    for(int i=0; i<params.length; i++)
+      if(params[i] instanceof gnu.expr.QuoteExp)
+	{
+	  gnu.expr.QuoteExp q = (gnu.expr.QuoteExp) params[i];
+	  if(q.getValue() instanceof gnu.expr.PrimProcedure)
+	    params[i] = ((gnu.expr.PrimProcedure) q.getValue()).wrapInLambda();
+	}
+    
     return new gnu.expr.ApplyExp(fun.generateCode(),
-				 Expression.compile(parameters));
+				 params);
   }
   
   gnu.expr.Expression compileAssign(gnu.expr.Expression value)

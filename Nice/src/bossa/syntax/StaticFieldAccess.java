@@ -12,7 +12,7 @@
 
 // File    : StaticFieldAccess.java
 // Created : Thu Jul 01 18:12:46 1999 by bonniot
-//$Modified: Wed Apr 05 14:51:06 2000 by Daniel Bonniot $
+//$Modified: Sat May 06 14:50:55 2000 by Daniel Bonniot $
 
 package bossa.syntax;
 
@@ -58,7 +58,13 @@ public class StaticFieldAccess extends MethodDefinition
 					      Location.nowhere()),
 			    Constraint.True,
 			    retType, params);
-    res.field = f.getReflectField();
+    try{
+      res.field = f.getReflectField();
+    }
+    catch(java.lang.NoSuchFieldException e){
+      User.error("Field "+f+" does not exist");
+    }
+    
     return res;
   }
   

@@ -12,7 +12,7 @@
 
 // File    : JavaMethodDefinition.java
 // Created : Tue Nov 09 11:49:47 1999 by bonniot
-//$Modified: Thu May 04 12:56:40 2000 by Daniel Bonniot $
+//$Modified: Sat May 06 15:42:15 2000 by Daniel Bonniot $
 
 package bossa.syntax;
 
@@ -65,6 +65,9 @@ public class JavaMethodDefinition extends MethodDefinition
   
   static Monotype getMonotype(Type javaType)
   {
+    if(javaType == Type.neverReturnsType)
+      return ConstantExp.voidType;
+    
     return getMonotype(javaType.getName());
   }
   

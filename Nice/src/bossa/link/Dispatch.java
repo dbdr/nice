@@ -12,7 +12,7 @@
 
 // File    : Dispatch.java
 // Created : Mon Nov 15 10:36:41 1999 by bonniot
-//$Modified: Thu May 04 16:58:59 2000 by Daniel Bonniot $
+//$Modified: Sat May 06 11:56:23 2000 by Daniel Bonniot $
 
 package bossa.link;
 
@@ -183,7 +183,7 @@ public class Dispatch
       {
 	if(sortedAlternatives.size()==0)
 	  User.error(method,
-		     "Method "+method+" has is declared but never defined");
+		     "Method "+method+" is declared but never defined");
 	else
 	  User.error(method,
 		     "Method "+method+" is not exhaustive:\n"+

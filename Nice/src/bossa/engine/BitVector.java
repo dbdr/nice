@@ -8,6 +8,8 @@ package bossa.engine;
  *
  * @version $Revision$, $Date$
  * @author Alexandre Frey
+ * @author Daniel Bonniot (replaced the underlying 
+ java.util.Vector by an array for efficiency reasons)
  **/
 public class BitVector implements Cloneable, java.io.Serializable {
   private final static int BITS_PER_UNIT = 6;

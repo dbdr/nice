@@ -12,12 +12,13 @@
 
 // File    : SymbolExpr.java
 // Created : Thu Jul 08 12:20:59 1999 by bonniot
-//$Modified: Tue Mar 14 19:59:11 2000 by Daniel Bonniot $
+//$Modified: Sat May 06 16:06:48 2000 by Daniel Bonniot $
 
 package bossa.syntax;
 
 import java.util.*;
 import bossa.util.*;
+import gnu.expr.*;
 
 /**
  * Access to a symbol
@@ -60,7 +61,7 @@ public class SymbolExp extends Expression
     // An important supposition is that two uses of a symbol
     // are two different SymbolExp objects (with a reference to the same symbol).
     // So they hold different (but equivalent) types.
-    type=symbol.getType().cloneType();
+    type = symbol.getType().cloneType();
   }
 
   /****************************************************************
@@ -70,7 +71,12 @@ public class SymbolExp extends Expression
   public gnu.expr.Expression compile()
   {
     if(symbol instanceof MethodDefinition.Symbol)
-      return new gnu.expr.QuoteExp(((MethodDefinition.Symbol)symbol).definition.getDispatchMethod());
+      {
+	gnu.mapping.Procedure proc = 
+	  ((MethodDefinition.Symbol)symbol).definition.getDispatchMethod();
+
+	return new QuoteExp(proc);
+      }
     
     gnu.expr.Declaration decl = symbol.getDeclaration();
     

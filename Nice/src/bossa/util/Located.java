@@ -12,7 +12,7 @@
 
 // File    : Located.java
 // Created : Tue Jul 20 14:50:17 1999 by bonniot
-//$Modified: Fri Jul 23 11:52:22 1999 by bonniot $
+//$Modified: Sat May 06 15:19:56 2000 by Daniel Bonniot $
 
 package bossa.util;
 
@@ -25,5 +25,8 @@ import bossa.util.*;
  */
 public interface Located
 {
+  /**
+   * @return the location of this entity.
+   */
   public Location location();
 }

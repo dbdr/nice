@@ -12,7 +12,7 @@
 
 // File    : Node.java
 // Created : Thu Jul 08 10:24:56 1999 by bonniot
-//$Modified: Thu Apr 27 19:13:55 2000 by Daniel Bonniot $
+//$Modified: Sat May 06 15:55:41 2000 by Daniel Bonniot $
 
 package bossa.syntax;
 
@@ -311,7 +311,7 @@ abstract public class Node
    ****************************************************************/
 
   // The current function should be saved in nodes that need it
-  // curing execution of their typecheck method.
+  // during execution of their typecheck method.
   static Function currentFunction;
   
   /** override this when typechecking is needed */

@@ -12,7 +12,7 @@
 
 // File    : Expression.java
 // Created : Mon Jul 05 16:25:02 1999 by bonniot
-//$Modified: Mon Apr 03 17:53:06 2000 by Daniel Bonniot $
+//$Modified: Sat May 06 15:17:53 2000 by Daniel Bonniot $
 // Description : 
 
 package bossa.syntax;
@@ -169,9 +169,7 @@ public abstract class Expression extends Node
    * Creates the bytecode expression to evaluate this Expression.
    *
    * This must be overrided in any Expression, but not called directly. 
-   * Call generateCode() instead.
-   *
-   * @see generateCode
+   * Call {@link #generateCode()} instead.
    */
   abstract protected gnu.expr.Expression compile();
   
@@ -186,6 +184,9 @@ public abstract class Expression extends Node
     return res;
   }
   
+  /**
+   * Maps {@link #compile()} over a list of expressions.
+   */
   public static gnu.expr.Expression[] compile(List expressions)
   {
     gnu.expr.Expression[] res=new gnu.expr.Expression[expressions.size()];
@@ -203,14 +204,6 @@ public abstract class Expression extends Node
   gnu.expr.Expression compileAssign(gnu.expr.Expression value)
   {
     Internal.error(this,this+" doesn't know how to be modified, it is a "+this.getClass());
-    return null;
-  }
-  
-  /**
-   * @return The declaration 
-   */
-  public Boolean declaration()
-  {
     return null;
   }
   

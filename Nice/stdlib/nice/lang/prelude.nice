@@ -12,14 +12,13 @@
 
 // File    : prelude.nice
 // Created : Thu Dec 02 11:42:48 1999 by bonniot
-//$Modified: Thu Sep 21 18:25:42 2000 by Daniel Bonniot $
 
 /**
- * Standard prelude file.
- *
- * Should be imported automatically by any bossa module.
- * 
- * @author bonniot
+   Standard prelude file.
+   Should be imported automatically by any nice module.
+
+   @version $Date$
+   @author Daniel Bonniot
  */
 
 package nice.lang;

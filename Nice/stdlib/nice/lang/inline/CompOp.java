@@ -21,7 +21,7 @@ import gnu.bytecode.*;
 
    @author Daniel Bonniot
 */
-public class CompOp extends Procedure2 implements Inlineable
+public class CompOp extends Procedure2 implements Inlineable,Branchable
 {
   private final static int
     error = 0,
@@ -107,6 +107,64 @@ public class CompOp extends Procedure2 implements Inlineable
     case Ne: code.emitGotoIfNE(to); break;
     }    
   }
+
+  /** 
+      Jump to label <code>to</code> if the comparison is false.
+  */
+  public void compileJumpNot (Compilation comp, Expression[] args, Label to)
+  {
+    CodeAttr code = comp.getCode();
+    Target stack = new StackTarget(argType);
+
+    args[0].compile(comp, stack);
+    args[1].compile(comp, stack);
+
+    switch(kind){
+    case Eq: code.emitGotoIfNE(to); break;
+    case Le: code.emitGotoIfGt(to); break;
+    case Ge: code.emitGotoIfLt(to); break;
+    case Lt: code.emitGotoIfGe(to); break;
+    case Gt: code.emitGotoIfLe(to); break;
+    case Ne: code.emitGotoIfEq(to); break;
+    }    
+  }
+
+  public void compileIf (Compilation comp, Expression[] args)
+  {
+    CodeAttr code = comp.getCode();
+    Target stack = new StackTarget(argType);
+
+    args[0].compile(comp, stack);
+    args[1].compile(comp, stack);
+
+    switch(kind){
+    case Eq: code.emitIfEq(); break;
+    case Le: code.emitIfLe(); break;
+    case Ge: code.emitIfGe(); break;
+    case Lt: code.emitIfLt(); break;
+    case Gt: code.emitIfGt(); break;
+    case Ne: code.emitIfNEq(); break;
+    }
+  }
+
+  public void compileIfNot (Compilation comp, Expression[] args)
+  {
+    CodeAttr code = comp.getCode();
+    Target stack = new StackTarget(argType);
+
+    args[0].compile(comp, stack);
+    args[1].compile(comp, stack);
+
+    switch(kind){
+    case Eq: code.emitIfNEq(); break;
+    case Le: code.emitIfGt(); break;
+    case Ge: code.emitIfLt(); break;
+    case Lt: code.emitIfGe(); break;
+    case Gt: code.emitIfLe(); break;
+    case Ne: code.emitIfEq(); break;
+    }
+  }
+
 
   private final PrimType argType;
   private final Type retType = Type.boolean_type;

@@ -96,16 +96,12 @@ public class LoopExp extends Expression
     if (ifExp instanceof ApplyExp)
       {
 	ApplyExp app = (ApplyExp) ifExp;
-	if (app.func instanceof QuoteExp)
-	  {
-	    Object proc = ((QuoteExp) app.func).getValue();
-	    if (proc instanceof nice.lang.inline.CompOp)
-	      {
-		nice.lang.inline.CompOp op = (nice.lang.inline.CompOp) proc;
-		op.compileJump(comp, app.args, to);
-		return;
-	      }
-	  }
+	Branchable branchOp = app.getBranchable();
+	if (branchOp != null)
+	{
+	  branchOp.compileJump(comp, app.args, to);
+	  return;
+	}
       }
 
     // General case

@@ -103,6 +103,13 @@ public class OverloadedSymbolExp extends Expression
       {
 	VarSymbol s = (VarSymbol) i.next();
 	
+        if (s.isIgnored())
+          {
+            removed.add(s);
+            i.remove();
+            continue;
+          }
+
 	switch (s.match(arguments)) {
 	case 0 : // Doesn't match 
 	  removed.add(s);
@@ -501,6 +508,12 @@ public class OverloadedSymbolExp extends Expression
 
       case 1:
 	VarSymbol sym = (VarSymbol) removed.get(0);
+
+        if (sym.isIgnored())
+          return sym.getName() + 
+            " cannot be used because it has been ignored.\n" +
+            "See above for the reason why it has been ignored";
+
 	return sym.explainWhyMatchFails(arguments);
 
       default:

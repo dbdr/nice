@@ -136,7 +136,7 @@
     </para>
   </chapter>
 
-  <chapter><title>Classes</title>
+  <chapter><title>Classes and Interfaces</title>
     <section><title>Declaring a class</title>
       <para>
       </para>
@@ -304,6 +304,96 @@ void main(String[] args)
         write code that expects an <type>Integer</type> to come out of our 
         <type>Stack&lt;String&gt;</type>. 
       </para>
+    </section>
+    <section><title>Declaring an Interface</title>
+     <para>
+       Nice has single inheritance, like Java or C#, which means that each 
+       class can have at most one superclass which it extends. Sometimes,
+       it would be nice to have a class that "extends" two (or more) different 
+       classes, taking some of its behavior and data from each. 
+       In Nice, as in Java, this can be accomplished via 
+     <firstterm>interfaces</firstterm>.
+     </para>
+     <para>
+       Interfaces are declared just like classes, except that they may
+       not contain data fields, only methods. Unlike in Java, they may
+       also contain default implementations of the methods, making 
+       iterfaces more convenient and useful than Java interfaces.
+     </para>
+     <para>
+       To say even this much is still to think of interfaces in Java terms,
+       however. In Nice, an interface
+       doesn't really "contain" anything at all, it's just a marker.
+       Just as <literal>java.util.Serializable</literal> is just a tag
+       to tell Java that it's okay to use serialization on instances of
+       a class, all Nice interfaces are really tags.
+     </para>
+     <para>
+       This is because Nice 
+       has multi-methods, which are defined by themselves and not contained
+       in a class or interface. It is always possible to define new 
+       methods for an interface, just as it is always possible to define
+       new methods for a class. Another consequence of the fact Nice is
+       based on multi-methods is that interface definitions can "contain"
+       not only method signatures, but also default implementations.
+     </para>
+     <para>
+       Nice does accept a style of interface definition similar to Java's,
+       as in the following example:
+      <example>
+        <title>Declaring an Interface</title>
+        <programlisting lang="nice">
+interface Component
+{
+
+  String getID();
+
+  (int,int) getPosition();
+
+  (int,int) getDimensions();
+
+  int getArea() 
+  {
+    (int width, int height) = this.getDimensions();
+    return width * height;
+  }
+
+}
+        </programlisting>
+      </example>      
+     </para>
+     <para>
+       However, it's equally possible to define the same interface
+       in this style:
+      <example>
+        <title>Declaring an Interface with Multi-Methods</title>
+        <programlisting lang="nice">
+interface Component {}
+
+String getID(Component comp);
+
+(int,int) getPosition(Component comp);
+
+(int,int) getDimensions(Component comp);
+
+int getArea(Component comp) 
+{
+  (int width, int height) = comp.getDimensions();
+  return width * height;
+}
+        </programlisting>
+      </example>      
+      and in fact, it's fine to mix the two styles, declaring 
+      some of the methods inside the <literal>iterface</literal>
+      block, and some outside. One good practice might be to
+      declare those methods which have no default implementation
+      inside the <literal>interface</literal> block, and those
+      with default implementations outside of it. That way someone
+      reading the code will have a clear idea of which methods
+      must be implemented when implementing an interface. Of
+      course, the compiler will ensure that all necessary methods
+      are implemented, so this is only a suggestion.
+     </para>
     </section>
   </chapter>
 
@@ -505,7 +595,13 @@ lastItem(coll)
             In addition to choosing a method based on the classes of the
             arguments, it's even possible to override a method based on the
             actual values of the arguments. Currently this feature works 
-            with integers, booleans, and strings. This feature makes it
+            with integers, booleans, strings, characters, enums, and 
+	    class instances which are used as package level constants. 
+	    It is also possible to override a method for the special case
+	    of null.
+      </para>
+      <para>
+	    This feature makes it
             convenient to code things that might otherwise have required
             switch statements or nested if/else statements. Using value 
             dispatch can be more flexible than switch or if/else statements,
@@ -532,6 +628,50 @@ String booleanToYesNo(boolean bool);
 
 booleanToYesNo(true) = "yes";
 booleanToYesNo(false) = "no";
+
+enum Grade {
+  A, B, C, D, F
+}
+
+Grade charToGrade(char input);
+
+charToGrade('a') = A;
+charToGrade('b') = B;
+charToGrade('c') = C;
+charToGrade('d') = D;
+charToGrade('f') = F;
+charToGrade(input) {
+  throw new IllegalArgumentException("Not a grade letter: " + input);
+}
+
+char gradeToChar(Grade grade);
+gradeToChar(A) = 'a';
+gradeToChar(B) = 'b';
+gradeToChar(C) = 'c';
+gradeToChar(D) = 'd';
+gradeToChar(F) = 'f';
+
+class Person
+{
+}
+
+let Person BOB = new Person();
+
+void greet(Person p) 
+{
+  println("Hello, anonymous person!");
+}
+
+greet(BOB p) 
+{
+  println("Hi Bob!");
+}
+
+<T> int containsHowMany(?List<T> list);
+
+<T> containsHowMany(list) = list.notNull.size();
+containsHowMany(null) = 0;
+
 ]]></programlisting>
       </example>
 
@@ -756,6 +896,7 @@ interface Buffer<Elem>
      <para>
       Currently, this version of the <literal>for</literal> statement can be
       used to iterate over <literal>Collection</literal>s, arrays, 
+      <literal>Range</literal>s,
       <literal>String</literal>s, and <literal>StringBuffer</literal>s.
      </para>
      <para>
@@ -765,6 +906,20 @@ let String[] strings = ["one", "two", "three"];
 for(String s : strings)
 {
   println(s);
+}
+</programlisting>
+      </example>
+     </para>
+     <para>
+     Since Nice also has syntax for generating ranges of numbers, 
+     another convenient way to use the <literal>for</literal> statement
+     is as follows:
+      <example><title>Extended <literal>for</literal> with Ranges</title>
+	<programlisting lang="nice">
+//Print numbers from 1 to 10, inclusive
+for(int i : 1..10)
+{
+  println(i);
 }
 </programlisting>
       </example>
@@ -960,21 +1115,15 @@ void main(String[] args)
       <para>
       Nice also allows multi-line string literals, using syntax borrowed
       from the Python language. Multi-line strings begin and end with 
-      three double quotes. 
-      <!-- 
-      This is how it _should_ work, IMHO: 
-      Within multi-line strings, double quotes do
+      three double quotes. Within multi-line strings, double quotes do
       not need to be escaped, unless there are three in a row. 
-      --> Note that unlike in Python, it is still necessary to use
-      a backslash before double quotes that should be included in the
-      string. 
       </para>
       <example>
       <title>Multi-line strings</title>
       <programlisting lang="nice"><![CDATA[
       let greeting  = """
             Hello, world.
-	    You may be thinking, \"Why was I called here today?\"
+	    You may be thinking, "Why was I called here today?"
 	    Well, there was a good reason. Honest.
       """;      
       ]]></programlisting>

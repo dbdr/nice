@@ -97,12 +97,13 @@ test:
 check:
 	java -classpath "classes" nice.tools.testsuite.TestNice testsuite
 
+GCJ=gcj
 GCJJAR = /tmp/Nice-gcj.jar
 gcj:
 	cp src/nice/tools/compiler.jar $(GCJJAR)
 	jar umf src/mainClass $(GCJJAR) -C classes nice/doc -C classes nice/getopt -C classes nice/lang -C classes nice/tools/ast -C classes nice/tools/code -C classes nice/tools/compiler -C classes nice/tools/util -C classes mlsub -C classes bossa -C classes gnu
-	gcj -c -o /tmp/getopt.o --resource gnu/getopt/MessagesBundle.properties classes/gnu/getopt/MessagesBundle.properties
-	gcj -g --main=nice.tools.compiler.fun -o bin/nicec.bin $(GCJJAR) /tmp/getopt.o
+	$(GCJ) -c -o /tmp/getopt.o --resource gnu/getopt/MessagesBundle.properties classes/gnu/getopt/MessagesBundle.properties
+	$(GCJ) -g --main=nice.tools.compiler.fun -o bin/nicec.bin $(GCJJAR) /tmp/getopt.o
 
 clean:
 	rm -f src/nice/tools/compiler.jar

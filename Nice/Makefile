@@ -1,24 +1,20 @@
 
+# Target directory for 'make install'
 PREFIX= /usr/local
-# Used by Debian to install in a private directory
-DESTDIR= 
-INSTALLDIR= ${DESTDIR}${PREFIX}
-DOCDIR= ${INSTALLDIR}/share/doc/nice
-MANDIR= ${INSTALLDIR}/share/man/man1
-LISPDIR=${INSTALLDIR}/share/emacs/site-lisp/nice
+BINDIR= ${PREFIX}/bin
+DOCDIR= ${PREFIX}/share/doc/nice
+MANDIR= ${PREFIX}/share/man/man1
+LISPDIR=${PREFIX}/share/emacs/site-lisp/nice
 
 SHELL = /bin/zsh
 TOP=${PWD}
-NICEJAR=/usr/share/java/nice.jar
 
 javac = javac
 #javac = jikes
 
 JAVAC_FLAGS = -O -g
 
-# Compile with stable version
-JC=${javac} -classpath "${TOP}/classes:${NICEJAR}" -sourcepath "${TOP}/src" -d "${TOP}/classes" $(JAVAC_FLAGS)
-JAVAC=  ${javac} -classpath "${TOP}/classes:${TOP}/src:${TOP}/stdlib" -sourcepath "${TOP}/src" -d "${TOP}/classes" $(JAVAC_FLAGS)
+JAVAC= ${javac} -classpath "${TOP}/classes" -sourcepath "${TOP}/src" -d "${TOP}/classes" $(JAVAC_FLAGS)
 JAVACC= CLASSPATH="${TOP}/external/JavaCC.zip:${CLASSPATH}" java COM.sun.labs.javacc.Main
 JAVADOC=javadoc #-linkoffline file:///C%7C/Apps/jdk1.2.1/docs/api file:///usr/opt/java122/docs/api
 
@@ -69,7 +65,7 @@ deb $(CVSBUILDDIR)/$(DEB):
 tar ${TARFILE}: $(CVSBUILDDIR)/$(DEB)
 	rm -rf ${TOP}/dist
 	mkdir ${TOP}/dist
-	cd $(CVSBUILDDIR)/nice-$(VERSION) && $(MAKE) install DESTDIR=${TOP}/dist PREFIX="" 
+	cd $(CVSBUILDDIR)/nice-$(VERSION) && $(MAKE) install PREFIX=${TOP}/dist
 	cd ${TOP}/dist && tar -cf ../${TARFILE} . --owner=0 --group=0
 	rm -rf ${TOP}/dist
 
@@ -87,10 +83,10 @@ zip ${ZIPFILE}: $(CVSBUILDDIR)/$(DEB)
 dist: tar zip
 
 install: share/java/nice.jar
-	mkdir -p ${INSTALLDIR}/bin ${INSTALLDIR}/share/java \
+	mkdir -p ${BINDIR} ${PREFIX}/share/java \
                  ${MANDIR} ${LISPDIR} ${DOCDIR}
-	cp bin/nicec ${INSTALLDIR}/bin/
-	cp share/java/nice.jar ${INSTALLDIR}/share/java/ 
+	cp bin/nicec ${BINDIR}
+	cp share/java/nice.jar ${PREFIX}/share/java/ 
 	cp lib/emacs/nice-mode.el lib/emacs/nice-startup.el ${LISPDIR}
 	./bin/nicec --man > ${MANDIR}/nicec.1
 	-groff -mandoc -Thtml ${MANDIR}/nicec.1 > ${DOCDIR}/nicec.html
@@ -151,8 +147,8 @@ bootstrap: parser
 		src/mlsub/compilation/Module.java \
 		src/bossa/modules/Package.java src/bossa/util/*.java \
 		src/gnu/expr/*.java src/gnu/mapping/*.java \
-		src/nice/tools/code/*.java src/mlsub/typing/*.java src/mlsub/typing/lowlevel/*.java \
-		src/bossa/syntax/dispatch.java
+		src/nice/tools/code/*.java src/mlsub/typing/*.java \
+		src/mlsub/typing/lowlevel/*.java src/bossa/syntax/dispatch.java
 	${NICEC} -R bossa.modules
 	${NICEC} -r nice.tools.ast
 	cd src/bossa/syntax && \
@@ -161,7 +157,7 @@ bootstrap: parser
 	rm classes/bossa/syntax/dispatch.class
 	${NICEC} -r bossa.syntax
 	cd src;\
-	${JC} bossa/modules/Package.java nice/tools/runJar.java ../stdlib/nice/lang/rawArray.java gnu/bytecode/dump.java
+	${JAVAC} bossa/modules/Package.java nice/tools/runJar.java ../stdlib/nice/lang/rawArray.java gnu/bytecode/dump.java
 
 
 #****************************************************************

@@ -398,30 +398,10 @@ public class Nicec extends Task {
 			args.addElement(pack);
 		}
 
-		try {
+		String[] argArray = new String[args.size()];
+		System.arraycopy(args.toArray(), 0, argArray, 0, args.size());
 
-
-			Class c = Class.forName("nice.tools.compiler.package");
-			String[] argArray = new String[args.size()];
-			System.arraycopy(args.toArray(), 0, argArray, 0, args.size());
-
-			Class[] parameterTypes = new Class[] {argArray.getClass()};
-
-			Method mainMethod = c.getMethod("main", parameterTypes);
-			mainMethod.invoke(c.newInstance(), new Object[] {argArray});
-
-		} catch (InstantiationException e) {
-			throw new BuildException(e, location);
-		} catch (ClassNotFoundException e) {
-			throw new BuildException(e, location);
-		} catch (NoSuchMethodException e) {
-			throw new BuildException(e, location);
-		} catch (IllegalAccessException e) {
-			throw new BuildException(e, location);
-		} catch (InvocationTargetException e) {
-			throw new BuildException(e, location);
-		}
-
+		nice.tools.compiler.fun.main(argArray);
 	}
 
 

@@ -29,8 +29,13 @@ class DirectorySource extends PackageSource
 {
   static DirectorySource create(Package pkg, File directory)
   {
-    if (directory.exists())
-      return new DirectorySource(pkg, directory);
+    if (!directory.exists())
+      return null;
+
+    DirectorySource res = new DirectorySource(pkg, directory);
+    if (res.isValid())
+      return res;
+
     return null;
   }
 
@@ -38,13 +43,22 @@ class DirectorySource extends PackageSource
   {
     this.pkg = pkg;
     this.directory = directory;
+
+    this.sources = getSources();
+    this.itf = getInterface();
+  }
+
+  private File[] sources;
+  private File itf;
+
+  /** @return true if this directory indeed hosts a Nice package. */
+  private boolean isValid()
+  {
+    return sources.length > 0 || itf != null;
   }
 
   Unit[] getDefinitions(boolean forceReload)
   {
-    File[] sources = getSources();
-    File itf = getInterface();
-
     lastModification = maxLastModification(sources);
     lastCompilation = itf == null ? -1 : itf.lastModified();
     

@@ -85,7 +85,7 @@ public class ImportedConstructor extends Constructor
   }
 }
 
-public ?ImportedConstructor loadImportedConstructor(NiceClass def, gnu.bytecode.Method method)
+public ?ImportedConstructor loadImportedConstructor(CNiceClass def, gnu.bytecode.Method method)
   {
   if (! method.isConstructor())
     return null;

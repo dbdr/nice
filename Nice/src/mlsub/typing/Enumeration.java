@@ -366,12 +366,7 @@ public class Enumeration
   private static boolean checkClassConstraint(Element var, 
                                               TypeConstructor sol)
   {
-    bossa.syntax.TypeDefinition def = bossa.syntax.dispatch.getTypeDefinition(sol);
-    
-    if (def == null)
-      return true;
-
-    Constraint constraint = def.getResolvedConstraint();
+    Constraint constraint = bossa.syntax.dispatch.getTypeDefResolvedConstraint(sol);
 
     if (mlsub.typing.Constraint.trivial(constraint))
       return true;
@@ -394,7 +389,7 @@ public class Enumeration
     TypeConstructor tc = new TypeConstructor(sol.variance);
     Typing.introduce(tc);
     MonotypeConstructor type =
-      new MonotypeConstructor(tc, def.getTypeParameters());
+      new MonotypeConstructor(tc, bossa.syntax.dispatch.getTypeDefTypeParameters(sol));
 
     try {
       constraint.enter();

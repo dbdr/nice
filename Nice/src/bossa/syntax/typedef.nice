@@ -29,7 +29,7 @@ InterfaceDefinition[] getImplementedInterfaces(TypeDefinition c);
    Abstract syntax for a type definition.
  */
 
-public abstract class CTypeDefinition extends TypeDefinition
+public abstract class TypeDefinition extends MethodContainer
 {
   Modifiers modifiers = new Modifiers();
   mlsub.typing.TypeConstructor tc = cast(null);
@@ -70,7 +70,7 @@ public abstract class CTypeDefinition extends TypeDefinition
 		tc.setMinimal();
   }
 
-  isConcrete() = !modifiers.isAbstract();
+  boolean isConcrete() = !modifiers.isAbstract();
     
   implementsJavaInterface(name)
   {
@@ -85,13 +85,13 @@ public abstract class CTypeDefinition extends TypeDefinition
 
   getTypeSymbol() = tc;
   
-  getAssociatedInterface() = null;
+  ?mlsub.typing.Interface getAssociatedInterface() = null;
 
   getSuperClass() = null;
   
   getSuperClassDefinition() = null;
   
-  getTC() = tc;
+  mlsub.typing.TypeConstructor getTC() = tc;
   
   getImplementedInterfaces()
   {
@@ -142,7 +142,7 @@ public abstract class CTypeDefinition extends TypeDefinition
     this.addTypeSymbol(tc);
   }
 
-  getLocalScope()
+  TypeScope getLocalScope()
   {
     TypeScope localScope = notNull(typeScope);
     if (classConstraint != null)
@@ -177,7 +177,7 @@ public abstract class CTypeDefinition extends TypeDefinition
      Return the type representing a constrained instance of this class,
      or null if this class has no constraint on its type parameters.
   */
-  getConstrainedType()
+  ?mlsub.typing.Polytype getConstrainedType()
   {
     ?mlsub.typing.Constraint cst = this.getResolvedConstraint();
 
@@ -340,7 +340,7 @@ public abstract class CTypeDefinition extends TypeDefinition
     notNull(implementation).resolveBody();
   }
 
-  typecheckClass()
+  void typecheckClass()
   {
     notNull(implementation).typecheck();
   }
@@ -350,10 +350,10 @@ public abstract class CTypeDefinition extends TypeDefinition
     // Typechecking is done earlier, in typecheckClass.
   }
 
-  precompile()
+  void precompile()
   {
     let impl = implementation;
-    if (impl != null && impl instanceof NiceClass)
+    if (impl != null && impl instanceof CNiceClass)
       impl.precompile();
   }
 
@@ -365,7 +365,7 @@ public abstract class CTypeDefinition extends TypeDefinition
   /**
      Called instead of compile if the package is up-to-date.
   */
-  recompile()
+  void recompile()
   {
     notNull(implementation).recompile();
   }
@@ -426,7 +426,7 @@ public abstract class CTypeDefinition extends TypeDefinition
   
   getInterfaces() = interfaces.toArray();
 
-  addInterfaceImplementation(itf)
+  void addInterfaceImplementation(?Interface itf)
   {
     if (itf != null)
       interfaces.add(itf);
@@ -434,7 +434,7 @@ public abstract class CTypeDefinition extends TypeDefinition
 
   getJavaInterfaces() = javaInterfaces;
 
-  setJavaType(javaType)
+  void setJavaType(?gnu.bytecode.Type javaType)
   {
     if (javaType == null)
       return;
@@ -443,14 +443,14 @@ public abstract class CTypeDefinition extends TypeDefinition
     nice.tools.code.Types.set(tc, javaType);
   }
 
-  getJavaType() = notNull(javaType);
+  gnu.bytecode.Type getJavaType() = notNull(javaType);
 
-  setImplementation(implementation)
+  public void setImplementation(ClassImplementation implementation)
   {
     this.implementation = implementation;
   }
 
-  getImplementation() = notNull(implementation);
+  ClassImplementation getImplementation() = notNull(implementation);
   
   getBytecodeFlags() = modifiers.getBits();
 }
@@ -458,7 +458,7 @@ public abstract class CTypeDefinition extends TypeDefinition
 /**
  * Definition for a class
  */
-class ClassDefinition extends CTypeDefinition
+class ClassDefinition extends TypeDefinition
 { 
 	// Super class
   ?MonotypeConstructor superClassIdent = null;
@@ -537,7 +537,7 @@ class ClassDefinition extends CTypeDefinition
 /**
  * Definition for an interface
  */
-class InterfaceDefinition extends CTypeDefinition
+class InterfaceDefinition extends TypeDefinition
 {
   ?mlsub.typing.Interface associatedInterface = null;
  
@@ -708,13 +708,29 @@ void resetTypeDefinitionMappings()
 ?TypeDefinition getTypeDefinition(mlsub.typing.Interface itf) =
   tcToTypeDef.get( itf.associatedTC() );
 
+//used in mlsub.typing.Enumeration
+public ?mlsub.typing.Constraint getTypeDefResolvedConstraint(mlsub.typing.TypeConstructor tc)
+{
+  let def = getTypeDefinition(tc);
+  if (def == null)
+    return null;
+
+  return def.getResolvedConstraint();
+}
+
+//used in mlsub.typing.Enumeration
+public mlsub.typing.Monotype[] getTypeDefTypeParameters(mlsub.typing.TypeConstructor tc)
+{
+   return notNull(getTypeDefinition(tc)).getTypeParameters();
+}
+
 /**
    Returns a monotype based on this tc, provided that the class
    requires no type parameter because it specializes its parent.
  */
 ?mlsub.typing.Monotype getTypeWithTC(TypeConstructor tc)
 {
-  ?CTypeDefinition def = cast(getTypeDefinition(tc));
+  ?TypeDefinition def = cast(getTypeDefinition(tc));
 
   if (def == null)
     return null;
@@ -743,7 +759,7 @@ void resetTypeDefinitionMappings()
  */
 ?mlsub.typing.Monotype getTypeWithTC(TypeConstructor tc, mlsub.typing.Monotype[] sourceParams )
 {
-  ?CTypeDefinition def = cast(getTypeDefinition(tc));
+  ?TypeDefinition def = cast(getTypeDefinition(tc));
 
   if (def == null)
     return null;
@@ -783,7 +799,7 @@ void resetTypeDefinitionMappings()
 
 // Variance lookup
 
-getVariance(CTypeDefinition t)
+getVariance(TypeDefinition t)
 {
   int arity = getVariance(t.implementations);
   if (arity != -1)

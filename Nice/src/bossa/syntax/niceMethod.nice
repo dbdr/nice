@@ -360,12 +360,12 @@ public gnu.expr.Expression getDispatchMethod(NiceMethod def, Module module)
     }
 
   // Try to compile the dispatch method as a member method if possible.
-  ?NiceClass receiver;
+  ?CNiceClass receiver;
   if (argTypes.length == 0)
     receiver = null;
   else
     {
-      receiver = NiceClass.get(def.getArgTypes()[0]);
+      receiver = getNiceClass(def.getArgTypes()[0]);
 
       // JVM interfaces cannot contain code.
       if (receiver != null && receiver.isInterface())

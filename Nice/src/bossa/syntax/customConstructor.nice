@@ -22,7 +22,7 @@ public class CustomConstructor extends UserOperator
   LocatedString className;
   Statement body;
 
-  ?NiceClass classe = null;
+  ?CNiceClass classe = null;
   private ?VarScope thisScope = null;
   private ?TypeScope thisTypeScope = null;
   ?gnu.expr.Expression initializationCode = null;
@@ -44,7 +44,7 @@ public class CustomConstructor extends UserOperator
 
     let tc = Node.getGlobalTypeScope().globalLookup(className);
     addConstructor(tc, this);
-    classe = NiceClass.get(tc);
+    classe = getNiceClass(tc);
 
     if (classe == null)
       User.error(this,

@@ -58,16 +58,17 @@ public class CNiceClass extends NiceClass
 
   getName() = definition.getName();
 
-  getDefinition() = definition;
+  TypeDefinition getDefinition() = definition;
 
-  getTypeParameters() = definition.getTypeParameters();
+  public mlsub.typing.Monotype[] getTypeParameters() = definition.getTypeParameters();
 
-  addField(sym, value, isFinal, isTransient, isVolatile, docString)
+  public void addField(MonoSymbol sym, ?Expression value, boolean isFinal,
+	boolean isTransient, boolean isVolatile, ?String docString)
   {
     if (this.isInterface())
       bossa.util.User.error(sym, "An interface cannot have a field.");
 
-    if (isFinal && notNull(sym).getName().toString().equals("serialVersionUID"))
+    if (isFinal && sym.getName().toString().equals("serialVersionUID"))
       {
 	if (value instanceof ConstantExp && value.value instanceof Long)
           serialVersionUIDValue = cast(value.value);
@@ -80,7 +81,7 @@ public class CNiceClass extends NiceClass
     if (isFinal && isVolatile)
       throw bossa.util.User.error(sym, "A field cannot be final and volatile");
 
-    fields.add(new NewField(declaringClass: this, sym: notNull(sym), value: value,
+    fields.add(new NewField(declaringClass: this, sym: sym, value: value,
 	isFinal_: isFinal, isVolatile: isVolatile, isTransient: isTransient,
 	docString: docString));
   }
@@ -101,14 +102,19 @@ public class CNiceClass extends NiceClass
     valueOverrides.add(new ValueOverride(declaringClass: this, name: fname, value: value));
   }
 
-  isInterface() = definition instanceof InterfaceDefinition;
+  public boolean isInterface() = definition instanceof InterfaceDefinition;
   
   ?CNiceClass getParent()
   {
-    return cast(NiceClass.get(definition.getSuperClass()));
+    let superTC = definition.getSuperClass();
+    if (superTC == null)
+      return null;
+
+    return getNiceClass(superTC);
   }
 
-  addConstructorCallSymbol(sym)
+  // FIXME change to MethodSymbol once this is converted to nice
+  void addConstructorCallSymbol(VarSymbol sym)
   {
     constructors.add(cast(sym));
   }
@@ -242,7 +248,7 @@ public class CNiceClass extends NiceClass
     scope.removeSymbol(thisSymbol);
   }
 
-  getInitializer()
+  ?gnu.expr.Expression getInitializer()
   {
     if (initializerMethod != null)
       return notNull(initializerMethod);
@@ -367,7 +373,7 @@ public class CNiceClass extends NiceClass
     return res;
   }
 
-  getClassExp() = classe;
+  public gnu.expr.ClassExp getClassExp() = classe;
 
   /**
      Collect in 'constraints' the constraints set by each class
@@ -457,12 +463,12 @@ public class CNiceClass extends NiceClass
   {
     let supTC = definition.getSuperClass();
 
-    let ?NiceClass sup = (supTC == null) ? null : NiceClass.get(supTC);
+    let ?CNiceClass sup = (supTC == null) ? null : getNiceClass(supTC);
     List<(?MethodDeclaration, List<Parameter>)> res;
     if (sup == null)
       res = this.getNativeConstructorParameters(cast(supTC));
     else
-      res = cast(sup).getParentConstructorParameters(typeParameters, constraints);
+      res = sup.getParentConstructorParameters(typeParameters, constraints);
 
     /**
        This must be done in a given class for every subclass, since they
@@ -570,7 +576,7 @@ public class CNiceClass extends NiceClass
       }
   }
 
-  precompile()
+  void precompile()
   {
     // We have to do this after resolution, so that bytecode types are known, 
     // but before compilation.
@@ -628,7 +634,7 @@ public class CNiceClass extends NiceClass
   }
 
   /** This native method is redefined for this Nice class. */
-  addJavaMethod(method) = classe.addMethod(method);
+  public gnu.expr.Expression addJavaMethod(gnu.expr.LambdaExp method) = classe.addMethod(method);
 
   private gnu.expr.LambdaExp createJavaMethod(String name, 
 					     gnu.bytecode.Method likeMethod,
@@ -647,7 +653,7 @@ public class CNiceClass extends NiceClass
      method that calls the desired super method, and return a reference to this
      stub.
   */
-  callSuperMethod(superMethod)
+  gnu.expr.Expression callSuperMethod(gnu.bytecode.Method superMethod)
   {
     gnu.expr.Expression[] params = cast(new gnu.expr.Expression
 			[superMethod.getParameterTypes().length + 1]);
@@ -730,7 +736,7 @@ class ThisSymbol extends MonoSymbol
   final CNiceClass declaringClass;
 }
 
-NiceClass createNiceClass(TypeDefinition cdef) = new CNiceClass(definition: cdef);
+CNiceClass createNiceClass(TypeDefinition cdef) = new CNiceClass(definition: cdef);
 
 private TypeSymbol asTypeSymbol(mlsub.typing.Monotype type)
 {
@@ -751,4 +757,21 @@ private gnu.expr.Expression typeExpression(TypeConstructor tc)
     }
   else
     return new gnu.expr.QuoteExp(nice.tools.code.Types.javaType(tc));
+}
+
+?CNiceClass getNiceClass(TypeConstructor tc)
+{
+  let res = getTypeDefinition(tc);
+  if (res != null && res.getImplementation() instanceof NiceClass)
+    return cast(res.getImplementation());
+  else
+    return null;
+}
+
+public ?CNiceClass getNiceClass(mlsub.typing.Monotype type)
+{
+  if (! nice.tools.typing.Types.isSure(type))
+    return null;
+
+  return getNiceClass(nice.tools.typing.Types.constructor(type));
 }

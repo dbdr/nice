@@ -14,18 +14,6 @@ package bossa.syntax;
 
 import bossa.util.*;
 
-/*
-import nice.tools.typing.Types;
-import nice.tools.code.Gen;
-import mlsub.typing.Typing;
-import mlsub.typing.TypeConstructor;
-import mlsub.typing.Monotype;
-import mlsub.typing.MonotypeVar;
-import gnu.bytecode.*;
-import bossa.util.Debug;
-import bossa.util.User;
-*/
-
 /**
    An implementation of a method
 
@@ -210,7 +198,7 @@ public abstract class MethodImplementation extends Definition
     if (def == null || ! (def.getImplementation() instanceof NiceClass))
       return;
 
-    NiceClass c = cast(def.getImplementation());
+    CNiceClass c = cast(def.getImplementation());
 
     gnu.expr.Expression[] params = cast(new gnu.expr.Expression[arity]);
     gnu.expr.LambdaExp method = nice.tools.code.Gen.createMemberMethod

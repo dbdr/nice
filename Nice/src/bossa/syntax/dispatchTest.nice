@@ -242,7 +242,7 @@ private ?gnu.bytecode.ClassType classTypeOfNiceClass(mlsub.typing.TypeConstructo
   if (def == null || ! (def.getImplementation() instanceof NiceClass))
     return null;
 
-  let NiceClass nc = cast(def.getImplementation());
+  let CNiceClass nc = cast(def.getImplementation());
   return nc.getClassExp().getClassType();
 }
 

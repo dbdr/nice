@@ -1089,7 +1089,7 @@ TypeDefinition typeDefinition(Constraint cst, List definitions, boolean storeDoc
    ( { LocatedString javaName; }
      javaName=doted_string()
      { res.setImplementation(new JavaClass(res, javaName)); }
-   | { res.setImplementation(bossa.syntax.dispatch.createPrimitiveType(res)); }
+   | { res.setImplementation(res.createPrimitiveType()); }
    ) ";"
   )
   { return res; } 

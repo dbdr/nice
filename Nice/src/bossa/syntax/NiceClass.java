@@ -34,43 +34,7 @@ public abstract class NiceClass extends ClassImplementation
 {
   abstract public LocatedString getName();
 
-  abstract TypeDefinition getDefinition();
-
-  abstract public boolean isInterface();
-
-  static NiceClass get(TypeConstructor tc)
-  {
-   TypeDefinition res = bossa.syntax.dispatch.getTypeDefinition(tc);
-    if (res != null && res.getImplementation() instanceof NiceClass)
-      return ((NiceClass) res.getImplementation());
-    else
-      return null;
-  }
-
-  public static NiceClass get(mlsub.typing.Monotype type)
-  {
-    if (! nice.tools.typing.Types.isSure(type))
-      return null;
-
-    return get(nice.tools.typing.Types.constructor(type));
-  }
-
-  // FIXME change to MethodSymbol once this is converted to nice
-  abstract void addConstructorCallSymbol(VarSymbol sym);
-
-  abstract public void addField(MonoSymbol sym, Expression value, 
-     boolean isFinal, boolean isTransient, boolean isVolatile, String docString);
-
-  abstract gnu.expr.Expression getInitializer();
-
   abstract public gnu.expr.ClassExp createClassExp();
-
-  abstract public gnu.expr.ClassExp getClassExp();
-
-  abstract void precompile();
-
-  /** This native method is redefined for this Nice class. */
-  abstract public gnu.expr.Expression addJavaMethod(gnu.expr.LambdaExp method);
 
   /**
      Returns an expression to call a super method from outside a class method.
@@ -80,9 +44,5 @@ public abstract class NiceClass extends ClassImplementation
      method that calls the desired super method, and return a reference to this
      stub.
   */
-  abstract gnu.expr.Expression callSuperMethod(gnu.bytecode.Method superMethod);
-
   abstract public Definition importMethod(gnu.bytecode.Method method);
-
-  abstract public mlsub.typing.Monotype[] getTypeParameters();
 }

@@ -25,11 +25,6 @@ public class dispatch
 
   public static void resetConstructorsMap() {}
 
-  static boolean instantiableTC(mlsub.typing.TypeConstructor tc)
-  { return false; }
-
-  public static void loadJavaMethods(String name) {}
-  
   public static mlsub.typing.TypeConstructor lookupJavaClass(String className, bossa.util.Location loc)
   { return null; }
   
@@ -41,19 +36,14 @@ public class dispatch
   public static Monotype createTypeIdent(LocatedString name)
   { return null;}
 
-  static Expression analyse(Expression e, VarScope v, TypeScope t) 
-  { return null; }
-
-  static Expression analyse(Expression e, Info i) 
-  { return null; }
-
-  static void typecheck(Expression e) {}
-
   public static void resetTypeDefinitionMappings() {}
 
-  public static TypeDefinition getTypeDefinition(mlsub.typing.TypeConstructor tc)
+  public static mlsub.typing.Constraint getTypeDefResolvedConstraint(mlsub.typing.TypeConstructor tc)
   { return null; }
   
+  public static mlsub.typing.Monotype[] getTypeDefTypeParameters(mlsub.typing.TypeConstructor tc)
+  { return null; }
+
   public static mlsub.typing.Monotype getTypeWithTC(mlsub.typing.TypeConstructor tc, mlsub.typing.Monotype[] sourceParams )
   { return null; }
 
@@ -62,5 +52,3 @@ public class dispatch
 
   public static void _printStackTraceWithSourceInfo(Throwable t) {}
 }
-
-class Info {}

@@ -360,17 +360,27 @@ public class CallExp extends Expression
   
   public String toString()
   {
-    if(infix)
-      if (declaringClass != null)
-	return declaringClass.getName() +
-	  "." + function + arguments;
-      else
-	return
-	  arguments.getExp(0) + 
-	  "." + function + 
-	  arguments.toStringInfix();
-    else
+    if (!infix)
       return function.toString() + arguments;
+
+    if (declaringClass == null)
+      return arguments.getExp(0) + "." + function + arguments.toStringInfix();
+
+    if (function instanceof SymbolExp &&
+     ((SymbolExp)function).getSymbol() instanceof MethodDeclaration.Symbol)
+      {
+	MethodDeclaration md = ((MethodDeclaration.Symbol)
+		((SymbolExp)function).getSymbol()).getDefinition();
+
+	if (md instanceof RetypedJavaMethod)
+          return function.toString() + arguments;
+
+	if (md instanceof JavaFieldAccess)
+	  return declaringClass.getName() + "." + 
+		((JavaFieldAccess)md).fieldName + arguments;
+      }
+
+    return declaringClass.getName() + "." + function + arguments;
   }
 
   Expression function;

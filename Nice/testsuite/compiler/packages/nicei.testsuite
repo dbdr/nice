@@ -46,11 +46,41 @@
   /// package b import a
   ;
 
-/// PASS bug
+/// PASS
   /// package a
   /// toplevel
   class X {  
     int i = Integer.MAX_VALUE;
+  }
+  /// package b import a
+  ;
+
+/// PASS
+  /// package a
+  /// toplevel
+  class X {  
+    // Long.MAX_VALUE isn't retyped yet
+    long l = Long.MAX_VALUE;
+  }
+  /// package b import a
+  ;
+
+/// PASS
+  /// package a
+  /// toplevel
+  double _rint_(double) = native double Math.rint(double);
+  class X {  
+    double d = Math.rint(1.01);
+  }
+  /// package b import a
+  ;
+
+/// PASS
+  /// package a
+  /// toplevel
+  double _rint_(double) = native double Math.rint(double);
+  class X {  
+    double d = _rint_(1.01);
   }
   /// package b import a
   ;

@@ -151,7 +151,7 @@ public class JavaFieldAccess extends FieldAccess
   /** The java class this method is defined in */
   LocatedString className;
   
-  private String fieldName;
+  String fieldName;
 
   /****************************************************************
    * Module interface

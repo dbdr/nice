@@ -261,7 +261,7 @@ public class JavaMethodDefinition extends MethodDefinition
     javaTypes.set(0, new LocatedString(javaRetType.getName(), t.location()));
     
     reflectMethod = ((ClassType) holder).getDeclaredMethod
-    (methodName, javaArgType);
+      (methodName, javaArgType);
     
     if(reflectMethod == null)
       User.error(this, "method " + methodName + 

@@ -6,12 +6,6 @@ import javax.swing.*;
 
 import nice.ui.common;
 
-
-var ActionEvent -> void blueColor;
-var ActionEvent -> void grayColor;
-var ActionEvent -> void offBlueColor;
-var ActionEvent -> void offGrayColor;
-
 void changeColor(JPanel p, Color c) 
   = p.setBackground(c);
 
@@ -20,8 +14,15 @@ void offButton(JButton button, ActionEvent -> void action)
   
 JPanel makePanel()
 { 
-	// create the panel
-	JPanel panel = new JPanel();
+  // variables that will contain the event actions
+  var ActionEvent->void blueColor;
+  var ActionEvent->void grayColor;
+  var ActionEvent->void offBlueColor;
+  var ActionEvent->void offGrayColor;
+
+
+  // create the panel
+  JPanel panel = new JPanel();
 	 
   // switches background to blue
   blueColor = (ActionEvent e) => changeColor(panel,Color.blue);

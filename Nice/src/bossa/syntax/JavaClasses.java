@@ -189,6 +189,9 @@ public final class JavaClasses
 		 "You probably need to install the corresponding package.");
     }
     
+    for (Field f = classType.getFields(); f != null; f = f.getNext())
+      JavaMethod.addFetchedMethod(f);
+
   addingFetchedMethod:
     for(Method m = classType.getMethods(); m!=null; m = m.getNext())
       {

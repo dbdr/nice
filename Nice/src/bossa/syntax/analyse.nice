@@ -477,6 +477,7 @@ analyse(b@BreakStmt, info)
 
   b.loop = info.currentLoop;
   info.currentLoop.createBlock();
+  info.setUnreachable();
 }
 
 analyse(s@LabeledStmt, info)
@@ -515,6 +516,7 @@ private void mustNotFindLabel(LocatedString label, Info info)
 analyse(b@BreakLabelStmt, info)
 {
   b.statement = findLabel(notNull(b.label), info);
+  info.setUnreachable();
 }
 
 analyse(c@ContinueStmt, info)
@@ -530,6 +532,7 @@ analyse(c@ContinueStmt, info)
     }
   if (c.loop == null)
     throw error(c, "continue must only occur inside loops");
+  info.setUnreachable();
 }
 
 analyse(r@ReturnStmt, info)

@@ -611,6 +611,68 @@ public class ClassExp extends LambdaExp
     sbuf.append(sname.substring(1));
     return sbuf.toString();
   }
+
+  /****************************************************************
+   * Assertions
+   ****************************************************************/
+
+  private Field assertionEnabledField;
+
+  public Field getAssertionEnabledField()
+  {
+    if (assertionEnabledField == null)
+      {
+	assertionEnabledField = ((ClassType) getType()).addField
+	  ("$assertionsEnabled", Type.boolean_type, 
+	   Access.STATIC | Access.FINAL);
+
+	addClassInitializer(new Initializer() {
+	    { field = assertionEnabledField; }
+
+	    public void emit(Compilation comp) {
+	      CodeAttr code = comp.getCode();
+
+	      // Try to get the assertion status, if in JDK 1.4 or later.
+	      code.emitTryStart(false, Type.boolean_type);
+	      code.emitPushString(getName());
+	      code.emitInvokeStatic(forName);
+	      code.emitInvokeVirtual(desiredAssertionStatus);
+	      code.emitTryEnd();
+
+	      // If the method does not exist, get global assertion status.
+	      Variable catchVar = new Variable("e", noSuchMethod);
+	      catchVar.allocateLocal(code);
+	      code.emitCatchStart(catchVar);
+	      code.emitPushString("assertions");
+	      code.emitInvokeStatic(getProperty);
+	      code.emitIfNull();
+	      code.emitPushBoolean(false);
+	      code.emitElse();
+	      code.emitPushBoolean(true);
+	      code.emitFi();
+	      code.emitCatchEnd();
+	      code.emitTryCatchEnd();
+
+	      code.emitPutStatic(field);
+	    }
+	  });
+      }
+
+    return assertionEnabledField;
+  }
+
+  static final ClassType 
+    javaClass = ClassType.make("java.lang.Class"),
+    noSuchMethod = ClassType.make("java.lang.NoSuchMethodError");
+
+  static final Method 
+    forName = javaClass.getDeclaredMethod("forName", 1),
+    desiredAssertionStatus = javaClass.addMethod
+      ("desiredAssertionStatus", Access.PUBLIC, 
+       new Type[]{}, Type.boolean_type),
+    getProperty = ClassType.make("java.lang.System").
+      getDeclaredMethod("getProperty", 1);
+
 }
 
 class AbstractMethodFilter implements gnu.bytecode.Filter

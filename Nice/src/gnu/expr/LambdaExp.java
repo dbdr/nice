@@ -1018,6 +1018,12 @@ public class LambdaExp extends ScopeExp
     this.initChain = elem;
   }
 
+  void addClassInitializer(Initializer elem)
+  {
+    elem.next = this.clinitChain;
+    this.clinitChain = elem;
+  }
+
   private Field instanceField;
   Field getInstanceField()
   {

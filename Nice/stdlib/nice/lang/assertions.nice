@@ -1,20 +1,13 @@
 package nice.lang;
 
-class AssertionFailed extends Exception
-{}
+/** The class of errors raised when an assert fails. 
+    It is used instead of java.lang.AssertionError, to be compatible
+    with pre 1.4 JDKs.
+*/
+class AssertionFailed extends Error {}
 
-void assert(boolean condition);
-void assert(boolean condition, String message);
+void `assert`(boolean condition) = 
+  inline nice.lang.inline.Assert();
 
-assert(condition)
-{
-  if (!condition)
-    throw new AssertionFailed();
-}
-
-assert(condition, message)
-{
-  // message is ignored. Needs constructors, super...
-  if (!condition)
-    throw new AssertionFailed();
-}
+void `assert`(boolean condition, String message) = 
+  inline nice.lang.inline.Assert();

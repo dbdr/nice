@@ -1,0 +1,23 @@
+/// PASS
+  assert true;
+
+/// PASS
+  boolean ok = true;
+  try { assert false; ok = false; }
+  catch(Error e) {}
+  if (! ok) throw new Error();
+
+/// PASS
+  assert true : "Should not fail";
+
+/// PASS
+  boolean ok = true;
+  try { assert false : "Should fail"; ok = false; }
+  catch(Error e) {}
+  if (! ok) throw new Error();
+
+/// Global
+String fail() { throw new Error(); }
+
+/// PASS
+  assert true : fail();

@@ -1596,7 +1596,7 @@ public class Compilation
       }
   }
 
-  LambdaExp topLambda;
+  public LambdaExp topLambda;
   ClassType topClass;
 
   public void addClass (ClassType new_class)

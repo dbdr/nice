@@ -75,7 +75,7 @@ test:
 	cd regtest; /usr/bin/time ./regtest
 
 check:
-	/usr/bin/time java -classpath "classes" nice.tools.testsuite.TestNice testsuite
+	/usr/bin/time java -Dassertions=true -classpath "classes" nice.tools.testsuite.TestNice testsuite
 
 GCJ=gcj
 GCJJAR = /tmp/Nice-gcj.jar

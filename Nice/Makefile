@@ -161,7 +161,7 @@ core-bootstrap:
 	${JAVAC} \
 		src/bossa/syntax/dispatch.java \
 		src/mlsub/typing/TypeConstructorLeqMonotypeCst.java \
-		src/gnu/expr/LoopExp.java \
+		src/gnu/expr/*.java \
 		stdlib/nice/lang/{Native,rawArray}.java \
 		src/bossa/modules/{Package,CompilationListener}.java \
 		src/nice/tools/{code/*.java,util/JDK.java}

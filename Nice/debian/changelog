@@ -1,5 +1,8 @@
 nice (0.7.6) unstable; urgency=low
 
+  * Implemented optional parameters' default value refering to 
+    previous parameters, like 'to' in the following example:
+      <T> T[] slice(T[] array, int from = 0, int to = array.length - 1);
   * Fixed several issues with generic collections.
     In particular, for List<int> there was an ambiguity between 
       remove(int) and remove(T) (since T=int).

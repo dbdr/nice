@@ -1,0 +1,69 @@
+/**************************************************************************/
+/*                          Nice Eclipse-Plugin                           */
+/*                          (c) Alex Greif 2003                           */
+/*                                                                        */
+/*  This program is free software; you can redistribute it and/or modify  */
+/*  it under the terms of the GNU General Public License as published by  */
+/*  the Free Software Foundation; either version 2 of the License, or     */
+/*  (at your option) any later version.                                   */
+/*                                                                        */
+/**************************************************************************/
+
+package nice.eclipse.core.builder;
+
+
+
+
+public class NiceBuildNotifier {
+	?IProgressMonitor monitor;
+	IProject project;
+
+	int workDone = 0;
+	int totalWork = 1000000;
+	float proportionComplete = 0f;
+
+
+
+	void begin() {
+		if (monitor == null)
+			return;
+		notNull(monitor).beginTask("", totalWork); //$NON-NLS-1$
+	}
+
+	
+	void checkCancel() {
+		if (monitor == null)
+			return;
+		if (notNull(monitor).isCanceled())
+			throw new OperationCanceledException();
+	}
+
+
+	public void done() {
+		this.updateProgress(1.0f);
+		if (monitor == null)
+			return;
+		notNull(monitor).done();
+	}
+
+
+	public void updateProgress(float newProportionComplete) {
+		if (newProportionComplete > proportionComplete) {
+			proportionComplete = Math.min(newProportionComplete, 1.0f);
+			int work = Math.round(proportionComplete * totalWork);
+			if (work > workDone) {
+				if (monitor == null)
+					return;
+				notNull(monitor).worked(work - workDone);
+				workDone = work;
+			}
+		}
+	}
+
+	public void updateProgressDelta(float proportionWorked) {
+		this.updateProgress(proportionComplete + proportionWorked);
+	}
+
+}
+
+

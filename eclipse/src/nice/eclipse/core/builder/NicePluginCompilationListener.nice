@@ -1,0 +1,128 @@
+/**************************************************************************/
+/*                          Nice Eclipse-Plugin                           */
+/*                          (c) Alex Greif 2003                           */
+/*                                                                        */
+/*  This program is free software; you can redistribute it and/or modify  */
+/*  it under the terms of the GNU General Public License as published by  */
+/*  the Free Software Foundation; either version 2 of the License, or     */
+/*  (at your option) any later version.                                   */
+/*                                                                        */
+/**************************************************************************/
+
+package nice.eclipse.core.builder;
+
+
+
+
+
+
+
+
+
+class NicePluginCompilationListener implements CompilationListener {
+	?IProgressMonitor monitor;
+	NiceBuildNotifier notifier;
+	IProject project;
+	
+	error(location, message) {
+		//println("nicec error: "+message);
+		IResource resource = project;
+		try {
+			IMarker marker = resource.createMarker(NICE_MODEL_PROBLEM_MARKER);
+			marker.setAttribute(IMarker.MESSAGE, message);
+			marker.setAttribute(IMarker.SEVERITY, IMarker.SEVERITY_ERROR);
+		} catch (Throwable e) {
+			e.printStackTrace();
+		}
+	}
+	
+	error(location@Location.Source, message) {
+		IResource resource = this.getAffectedResource(location);
+		//println("nicec error in source: "+resource+"   line: "+location.getLine()+":"+
+		//		location.getColumn()+"\n"+message);
+		try {
+			IMarker marker = resource.createMarker(NICE_MODEL_PROBLEM_MARKER);
+			marker.setAttribute(IMarker.MESSAGE, message);
+			marker.setAttribute(IMarker.SEVERITY, IMarker.SEVERITY_ERROR);
+			marker.setAttribute(IMarker.LINE_NUMBER, location.getLine());
+			marker.setAttribute(IMarker.CHAR_START, location.getColumn());
+		} catch (Throwable e) {
+			e.printStackTrace();
+		}
+	}
+
+
+	warning(location, message) {
+		//println("nicec warning: "+message);
+		IResource resource = project;
+		try {
+			IMarker marker = resource.createMarker(NICE_MODEL_PROBLEM_MARKER);
+			marker.setAttribute(IMarker.MESSAGE, message);
+			marker.setAttribute(IMarker.SEVERITY, IMarker.SEVERITY_WARNING);
+		} catch (CoreException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	warning(location@Location.Source, message) {
+		IResource resource = this.getAffectedResource(location);
+		//println("nicec warning in source: "+resource+"   line: "+location.getLine()+":"+
+		//		location.getColumn()+"\n"+message);
+		try {
+			IMarker marker = resource.createMarker(NICE_MODEL_PROBLEM_MARKER);
+			marker.setAttribute(IMarker.MESSAGE, message);
+			marker.setAttribute(IMarker.SEVERITY, IMarker.SEVERITY_WARNING);
+			marker.setAttribute(IMarker.LINE_NUMBER, location.getLine());
+			marker.setAttribute(IMarker.CHAR_START, location.getColumn());
+		} catch (CoreException e) {
+			e.printStackTrace();
+		}
+	}
+
+	/** A bug occured in the compiler. 
+		@param url the adress where a bug report should be submitted.
+	 */
+	bug(stackTrace, url) {
+		System.out.println(
+			"nicec bug  stackTrace: " + stackTrace + "  url: " + url);
+	}
+
+	/** Reports the progress of compilation.
+		phase can be: parsing, type-checking, generating code, ...
+		the package can be null if the phase applies to the whole program 
+		(testing dispatch, creating the archive, compiling to native code, ...).
+	*/
+	progress(packageName, phase) {
+		let monitor = this.monitor;
+		if (monitor == null)	return;
+		monitor.subTask("" + phase + " package: " + packageName);
+	}
+
+	/** Gives an approximation of how much of the compilation has been completed.
+	*/
+	progress(proportion) {
+		notifier.updateProgress(proportion);
+	}
+
+
+	IResource getAffectedResource(Location);
+	
+	getAffectedResource(location) {
+		throw new RuntimeException("getAffectedResource() not implemented");
+	}
+	
+	getAffectedResource(location@Location.Source) {
+		String projectPath = project.getLocation().toFile().getAbsolutePath();
+		String resourcePath = location.getFile().getAbsolutePath();
+		Path path = new Path(resourcePath.substring(projectPath.length()));
+		return project.getFile(path);
+	}
+
+}
+
+
+
+
+
+
+

@@ -68,7 +68,7 @@ public class MethodBodyDefinition extends Definition
       return (Pattern[]) formals.toArray(new Pattern[formals.size()]);
 
     Pattern[] res = new Pattern[formals.size() + 1];
-    res[0] = new Pattern(THIS, new TypeIdent(container.getName()));
+    res[0] = new Pattern(THIS, new TypeIdent(container.definition.getName()));
     int n = 1;
     for(Iterator f = formals.iterator(); f.hasNext(); n++)
       res[n] = (Pattern) f.next();
@@ -351,9 +351,6 @@ public class MethodBodyDefinition extends Definition
       }
       
       try{
-	//for (int i = 0; i < monotypes.length; i++)
-	//monotypes[i].setKind(ConstantExp.maybeTC.variance);
-	
 	// The arguments have types below the method declaration domain
 	Monotype[] domain = declaration.getType().domain();
 	for (int i = 0; i < monotypes.length; i++)
@@ -452,7 +449,7 @@ public class MethodBodyDefinition extends Definition
 
     for(int n = 0; n < parameters.length; n++)
       res[n] = formals[n].atNull() 
-	? Types.javaType(ConstantExp.nullTC)
+	? Types.javaType(PrimitiveType.nullTC)
 	: Types.javaType(parameters[n].getMonotype());
 
     return res;
@@ -503,7 +500,7 @@ public class MethodBodyDefinition extends Definition
   NiceClass declaringClass()
   {
     try {
-      return (NiceClass) ClassDefinition.get(firstArgument());
+      return (NiceClass) ClassDefinition.get(firstArgument()).implementation;
     }
     catch (ClassCastException e) {
       throw User.error(this, declaration + " is a native method.\nIt can not be overriden because " + formals[0].tc + " is not a class defined in Nice");

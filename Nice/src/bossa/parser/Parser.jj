@@ -525,7 +525,7 @@ MonoSymbol monoSymbol():
 {
   type=monotype()
   name=ident()
-  { return new MonoSymbol(name,type,null); }
+  { return new MonoSymbol(name,type); }
 }
 
 List monoSymbols():
@@ -719,7 +719,7 @@ FunType OLDfunmonotype():
     t="fun" "(" [ dom=monotypes() ] ")" 
     "(" [ codom=monotype() ] ")"
     { 
-      if (codom == null) codom = ConstantExp.synVoidType;
+      if (codom == null) codom = PrimitiveType.synVoidType;
       FunType res = new FunType(dom, codom);
       System.out.println(new Location(t).toString() + ": This syntax is deprecated. You should use:");
       System.out.println(res.toString());
@@ -943,24 +943,26 @@ MethodDeclaration internalMethodOrFunction(MethodContainer c):
   { return NiceMethod.create(c, name, cst, returnType, parameters, body); }
 }
 
+TypeIdent superClass():
+{ TypeIdent name; }
+{
+  name=typeIdent() 
+    // ignore type parameters
+    // they should be checked
+    [ "<" ident() ( "," ident() )* ">" ]
+  { return name; }
+}
+
 List extensions():
 {
   List res=new ArrayList(0);
   TypeIdent name;
 }
 {
-  "extends"
-  name=typeIdent() 
-    // ignore type parameters
-    // they should be checked
-    [ "<" ident() ( "," ident() )* ">" ]
-  { res.add(name); }
-  ( "," name=typeIdent() 
-    // ignore type parameters
-    // they should be checked
-    [ "<" ident() ( "," ident() )* ">" ]
-    { res.add(name); } )*
-    { return res; }    
+  "extends" 
+        name=superClass() { res.add(name); }
+  ( "," name=superClass() { res.add(name); } )*
+  { return res; }
 }
 
 List interfaces():
@@ -969,14 +971,9 @@ List interfaces():
   TypeIdent name;
 }
 {
-  name=typeIdent() 
-    // ignore type parameters
-    // they should be checked
-    [ "<" ident() ( "," ident() )* ">" ]
-  { res.add(name); }
-  ( "," name=typeIdent() [ "<" ident() ( "," ident() )* ">" ]
-    { res.add(name); } )*
-    { return res; }
+        name=superClass() { res.add(name); }
+  ( "," name=superClass() { res.add(name); } )*
+  { return res; }
 }
 
 void getField(NiceClass c, List fields):
@@ -999,56 +996,63 @@ void getField(NiceClass c, List fields):
 
 void classDefinitionLookahead():
 {}
-{ [ "public" | "private" ] [ "final" | "abstract" ] ( "class" | "interface" ) }
+{ [ "public" | "private" ] ( "interface" | [ "final" | "abstract" ] "class" ) }
 
 ClassDefinition classDefinition():
 {
+  ClassDefinition res;
   LocatedString name;
   List parameters;
   List fields=new ArrayList(),methods=null;
-  List ext=new ArrayList(0),imp=new ArrayList(0),abs=new ArrayList(0);
+  List imp=new ArrayList(0),abs=new ArrayList(0);
   List l;
   List typeParametersVariances = new ArrayList(0);
   boolean isFinal=false, isAbstract=false, isInterface=false;
 }
 {
-(
   [ "public" | "private" ]
+(
+  "interface"
+  name=ident() 
+  parameters=monotypeVars(typeParametersVariances) 
+  { List ext = null; }
+  [ ext = extensions() ]
+  { res = ClassDefinition.makeInterface
+      (name, parameters, typeParametersVariances, ext); }
+|
   [ "final"    { isFinal=true; } 
   | "abstract" { isAbstract=true; }
   ]
   "class"
-|
-  "interface" { isInterface=true; }
-)
   name=ident() 
   parameters=monotypeVars(typeParametersVariances) 
 
+  { TypeIdent sup = null; }
+  [ "extends" sup = superClass() ]
   ( "implements" l=interfaces() { imp.addAll(l); } 
   | "finally" "implements"  l=interfaces() { abs.addAll(l); }
-  | l=extensions()      { ext.addAll(l); }
   )*
+  { res = ClassDefinition.makeClass
+	(name,
+	isFinal,isAbstract,
+	parameters,typeParametersVariances,
+	sup,imp,abs);
+  }
+)
 
   ( 
    "{"
-   {
-     NiceClass res;
-     res=new NiceClass
-     (name,
-      isFinal,isAbstract,isInterface,
-      parameters,typeParametersVariances,
-      ext,imp,abs);
-   }
+   { NiceClass impl = new NiceClass(res); }
    // internal fields and methods
    (
       LOOKAHEAD( getField(null, null) )
-      getField(res, fields)
+      getField(impl, fields)
     |
       [ "public" | "private" ]
       (
 	LOOKAHEAD( methodBodyDefinitionLookahead() )
 	{ MethodBodyDefinition mb; }
-	mb = methodBodyDefinition(res)
+	mb = methodBodyDefinition(impl)
 	{ globalDefinitions.add(mb); }
       |
         { MethodDeclaration m; }
@@ -1063,21 +1067,20 @@ ClassDefinition classDefinition():
    )* 
    "}"
    {
-     res.setFieldsAndMethods(fields, methods);
-     return res;
+     impl.setFieldsAndMethods(fields, methods);
+     res.setImplementation(impl);
    }
   | 
    "=" "native"
-   { LocatedString javaName=null; }
-   [ javaName=doted_string() ] ";"
-   {
-     return new JavaClass
-	(name,
-	isFinal,isAbstract,isInterface,
-	parameters,typeParametersVariances,
-	ext,imp,abs,javaName);
-   }
-  ) 
+   ( { LocatedString javaName; }
+     javaName=doted_string()
+     { res.setImplementation(new JavaClass(res, javaName)); }
+   |
+     { res.setImplementation(new PrimitiveType(res)); }
+   )
+   ";"
+  )
+  { return res; } 
 }
 
 AbstractInterface interfaceDefinition():

@@ -95,7 +95,7 @@ public class TryStmt extends Statement
     CatchClause clause()
     {
       try{
-	Typing.leq(t, ConstantExp.throwableTC());
+	Typing.leq(t, PrimitiveType.throwableTC());
       }
       catch(TypingEx e){
 	User.error(typeLocation, tc + " is not catchable");

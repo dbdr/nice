@@ -1,7 +1,7 @@
 /**************************************************************************/
 /*                                N I C E                                 */
 /*             A high-level object-oriented research language             */
-/*                        (c) Daniel Bonniot 2000                         */
+/*                        (c) Daniel Bonniot 2002                         */
 /*                                                                        */
 /*  This program is free software; you can redistribute it and/or modify  */
 /*  it under the terms of the GNU General Public License as published by  */
@@ -27,86 +27,41 @@ import mlsub.typing.*;
    @author Daniel Bonniot
 */
 
-public class JavaClass extends ClassDefinition
+public class JavaClass extends ClassDefinition.ClassImplementation
 {
-  /**
-   * Creates a java class definition.
-   *
-   * @param name the name of the class
-   * @param isFinal 
-   * @param isAbstract 
-   * @param isInterface true iff the class is an "interface" 
-       (which is not an "abstract interface").
-       isInterface implies isAbstract.
-   * @param typeParameters a list of type symbols
-   * @param extensions a list of TypeConstructors
-   * @param implementations a list of Interfaces
-   * @param abstractions a list of Interfaces
-   * @param javaName the name of the corresponding java class.
-   it must be fully qualified, or the package must have been imported.
-  */
-  public JavaClass(LocatedString name, 
-		   boolean isFinal, boolean isAbstract, 
-		   boolean isInterface,
-		   List typeParameters,
-		   List typeParametersVariances,
-		   List extensions, List implementations, List abstractions,
-		   LocatedString javaName)
+  public JavaClass(ClassDefinition definition, LocatedString javaName)
   {
-    super(name, isFinal, isAbstract, isInterface,
-	  typeParameters, typeParametersVariances,
-	  extensions, implementations, abstractions);
-
+    this.definition = definition;
     this.javaName = javaName;
-    if(javaName == null) // primitive type
-      {
-	isPrimitive = true;
-	gnu.bytecode.Type t = ConstantExp.registerPrimType(name.toString(),tc);
-	if (t == null)
-	  User.error(this, name+" is not a known primitive type");
-	setJavaType(t);
-      }
-    else // wrapper for a java class
-      {
-	TypeConstructor old = 
-	  JavaClasses.setTypeConstructorForJavaClass
-	  (compilation(), this.tc, javaName.toString());
 
-	if(old!=null)
-	  User.error(this, javaName + 
-		     " was already associated with the Nice class " + old);
-      }
+    TypeConstructor old = 
+      JavaClasses.setTypeConstructorForJavaClass
+      (definition.compilation(), definition.tc, javaName.toString());
+
+    if (old != null)
+      User.error(definition, javaName + 
+		 " was already associated with the Nice class " + old);
   }
 
-  void resolve()
-  {
-    super.resolve();
+  ClassDefinition definition;
 
-    if(isPrimitive) return;
-    
+  void resolveClass()
+  {
     java.lang.Class refClass 
       = nice.tools.code.Types.lookupJavaClass(javaName.toString());
     
     if (refClass == null)
       User.error(javaName, javaName + " was not found in classpath");
     
-    setJavaType(gnu.bytecode.Type.make(refClass));
-    JavaClasses.fetchMethods(tc, (gnu.bytecode.ClassType) getJavaType());
+    definition.setJavaType(gnu.bytecode.Type.make(refClass));
+    JavaClasses.fetchMethods(definition.tc, (gnu.bytecode.ClassType) definition.getJavaType());
   }
 
-  private boolean isPrimitive;
-  
-  public void compile()
-  {
-    // nothing to do.
-  }
-  
   public void printInterface(java.io.PrintWriter s)
   {
-    super.printInterface(s);
-    s.print(" = native "+(javaName == null ? "" : javaName.toString())+";\n");
+    s.print(" = native " + javaName.toString() + ";\n");
   }
   
-  /** Is null if this class represents a primitive type. */
+  /** The qualified name of the existing java type. */
   private LocatedString javaName;
 }

@@ -67,7 +67,7 @@ public class FunExp extends Expression implements Function
   {
     if (inferredReturnType == null)
       // There is not return statement in the function.
-      inferredReturnType = ConstantExp.voidPolytype;
+      inferredReturnType = PrimitiveType.voidPolytype;
     else
       if (! alwaysReturns && 
 	  ! nice.tools.code.Types.isVoid(inferredReturnType))

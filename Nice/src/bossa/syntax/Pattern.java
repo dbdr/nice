@@ -159,7 +159,7 @@ public class Pattern
     MonotypeConstructor mc = (MonotypeConstructor) m;
 
     // the argument is not null
-    Typing.leq(mc.getTC(), ConstantExp.sureTC);
+    Typing.leq(mc.getTC(), PrimitiveType.sureTC);
     Monotype type = mc.getTP()[0];
     Typing.leq(type, t);
     if (exactlyAt)
@@ -236,7 +236,7 @@ public class Pattern
       return true;
 
     if (atNull())
-      return tag == ConstantExp.nullTC;
+      return tag == PrimitiveType.nullTC;
 
     // a null tc is an unmatchable argument (e.g. function)
     if (tag == null)

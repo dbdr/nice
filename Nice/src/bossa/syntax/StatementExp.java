@@ -44,7 +44,7 @@ public class StatementExp extends Expression
   
   void computeType()
   {
-    type = ConstantExp.voidPolytype;
+    type = PrimitiveType.voidPolytype;
   }
   
   Statement statement;

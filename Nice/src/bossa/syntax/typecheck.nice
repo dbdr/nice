@@ -219,7 +219,7 @@ typecheck(e@IfExp)
   Expression elseExp = notNull(e.elseExp);
 
   try{
-    condition = checkAssignment(notNull(ConstantExp.boolPolytype), condition);
+    condition = checkAssignment(notNull(PrimitiveType.boolPolytype), condition);
     e.condition = condition;
   }
   catch(TypingEx t){
@@ -306,7 +306,7 @@ private void setVarType(MonoSymbol variable,
 typecheck(e@IncrementExp)
 {
   try{
-    e.variable = checkAssignment(notNull(ConstantExp.longPolytype), 
+    e.variable = checkAssignment(notNull(PrimitiveType.longPolytype), 
 				 notNull(e.variable));
   }
   catch(TypingEx t){
@@ -331,8 +331,7 @@ typecheck(e@NewArrayExp)
     {
       Expression dim = notNull(knownDimensions[i]);
       try{
-	Typing.leq(dim.getType(),
-		   ConstantExp.intPolytype);
+	Typing.leq(dim.getType(), PrimitiveType.intPolytype);
       }
       catch(TypingEx ex){
 	if (notNullError(ex, dim, 
@@ -534,8 +533,8 @@ isNullError(ex@MonotypeLeqEx)
 
   if (tc1 == tc2) return false;
 
-  if (tc1 == ConstantExp.maybeTC &&
-      (tc2 != ConstantExp.maybeTC || tc2 != null))
+  if (tc1 == PrimitiveType.maybeTC &&
+      (tc2 != PrimitiveType.maybeTC || tc2 != null))
     return true;
 
   return false;

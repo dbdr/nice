@@ -63,12 +63,12 @@ public class NewArrayExp extends Expression
     if (resolvedType instanceof MonotypeVar)
       {
 	MonotypeVar res = (MonotypeVar) resolvedType;
-	TypeConstructor tc = new TypeConstructor("nullness", ConstantExp.maybeTC.variance, false, false);
+	TypeConstructor tc = new TypeConstructor("nullness", PrimitiveType.maybeTC.variance, false, false);
 	MonotypeVar raw = new MonotypeVar(res.getName()+"raw");
 	MonotypeConstructor eq = new MonotypeConstructor(tc, new Monotype[]{raw});
 	cst = new Constraint(new TypeSymbol[]{tc, raw},
 			     new AtomicConstraint[]{
-			       new TypeConstructorLeqCst(tc, ConstantExp.maybeTC),
+			       new TypeConstructorLeqCst(tc, PrimitiveType.maybeTC),
 			       new MonotypeLeqCst(eq, res),
 			       new MonotypeLeqCst(res, eq)});
 	monotype = bossa.syntax.Monotype.maybe(raw);
@@ -90,7 +90,7 @@ public class NewArrayExp extends Expression
     
     for (int i = 0; i<knownDimensions.length + unknownDimensions; i++)
       monotype = bossa.syntax.Monotype.sure(new MonotypeConstructor
-	(ConstantExp.arrayTC, new Monotype[]{monotype}));
+	(PrimitiveType.arrayTC, new Monotype[]{monotype}));
     
     // set the Expression type
     type = new Polytype(cst, monotype);

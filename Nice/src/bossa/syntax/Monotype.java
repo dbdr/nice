@@ -256,13 +256,13 @@ implements Located
   public static mlsub.typing.Monotype maybe(mlsub.typing.Monotype type)
   {
     return new mlsub.typing.MonotypeConstructor
-      (ConstantExp.maybeTC, new mlsub.typing.Monotype[]{type});
+      (PrimitiveType.maybeTC, new mlsub.typing.Monotype[]{type});
   }
 
   public static mlsub.typing.Monotype sure(mlsub.typing.Monotype type)
   {
     return new mlsub.typing.MonotypeConstructor
-      (ConstantExp.sureTC, new mlsub.typing.Monotype[]{type});
+      (PrimitiveType.sureTC, new mlsub.typing.Monotype[]{type});
   }
 }
 

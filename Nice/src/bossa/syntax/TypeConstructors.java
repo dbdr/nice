@@ -70,18 +70,7 @@ public final class TypeConstructors
       return true;
 
     ClassDefinition definition = ClassDefinition.get(tc);
-    return definition!=null &&
-      !(definition.isAbstract || definition.isInterface);
-  }
-  
-  /**
-     Test if a type constructor is a # class.
-  */
-  static boolean isSharp(TypeConstructor tc)
-  {
-    ClassDefinition definition = ClassDefinition.get(tc);
-    
-    return definition!=null && !definition.isConcrete();
+    return definition != null && definition.isConcrete();
   }
   
   /**

@@ -107,8 +107,7 @@ public final class TypeIdent extends Monotype implements Located
     if (res instanceof TypeConstructor)
       return (TypeConstructor) res;
     
-    User.error(this, this + " is not a class");
-    return null;
+    throw User.error(this, this + " is not a class");
   }
   
   public mlsub.typing.Interface resolveToItf(TypeMap scope)
@@ -121,12 +120,15 @@ public final class TypeIdent extends Monotype implements Located
     if (res instanceof TypeConstructor)
       {
 	ClassDefinition def = ClassDefinition.get((TypeConstructor) res);
-	if (def != null && def.getAssociatedInterface()!=null)
-	  return def.getAssociatedInterface();
+	if (def != null)
+	  {
+	    mlsub.typing.Interface itf = def.getAssociatedInterface();
+	    if (itf != null)
+	      return itf;
+	  }
       }
     
-    User.error(this, res + " should be an interface");
-    return null;
+    throw User.error(this, res + " should be an interface");
   }
   
   public static TypeConstructor[] resolveToTC(TypeMap scope, List idents)

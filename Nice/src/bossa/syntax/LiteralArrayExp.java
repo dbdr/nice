@@ -50,7 +50,7 @@ public class LiteralArrayExp extends Expression
     this.type = new Polytype
       (elementType.getConstraint(), 
        bossa.syntax.Monotype.sure(new MonotypeConstructor
-	 (ConstantExp.arrayTC, new Monotype[]{elementType.getMonotype()})));
+	 (PrimitiveType.arrayTC, new Monotype[]{elementType.getMonotype()})));
 
     nice.tools.code.Types.setBytecodeType(this.type);
   }

@@ -30,32 +30,11 @@ import nice.tools.code.Gen;
    @version $Date$
    @author Daniel Bonniot
  */
-public class NiceClass extends ClassDefinition
+public class NiceClass extends ClassDefinition.ClassImplementation
 {
-  /**
-   * Creates a class definition.
-   *
-   * @param name the name of the class
-   * @param isFinal 
-   * @param isAbstract 
-   * @param isInterface true iff the class is an "interface" 
-       (which is not an "abstract interface").
-       isInterface implies isAbstract.
-   * @param typeParameters a list of type symbols
-   * @param extensions a list of TypeConstructors
-   * @param implementations a list of Interfaces
-   * @param abstractions a list of Interfaces
-   */
-  public NiceClass(LocatedString name, 
-		   boolean isFinal, boolean isAbstract, 
-		   boolean isInterface,
-		   List typeParameters,
-		   List typeParametersVariances,
-		   List extensions, List implementations, List abstractions)
+  public NiceClass(ClassDefinition definition)
   {
-    super(name.cloneLS(), isFinal, isAbstract, isInterface,
-	  typeParameters, typeParametersVariances,
-	  extensions, implementations, abstractions);
+    this.definition = definition;
 
     // must be called when bytecode types are set, 
     // but before compilation, so that constructors are known
@@ -63,11 +42,13 @@ public class NiceClass extends ClassDefinition
     prepareCodeGeneration();
   }
 
-  private static Field[] noFields = new Field[0];
-  
-  public void setFieldsAndMethods(List fields, List methods)
+  public String getName() { return definition.getName().toString(); }
+
+  public void setFieldsAndMethods(List fields, List methods) 
   {
-    if (fields != null && fields.size() > 0)
+    if (fields == null || fields.size() == 0)
+      this.fields = noFields;
+    else
       {
 	this.fields = (Field[]) fields.toArray(new Field[fields.size()]);
 
@@ -79,15 +60,17 @@ public class NiceClass extends ClassDefinition
 	  {
 	    NiceFieldAccess f = new NiceFieldAccess(this, this.fields[i]);
 	    this.fields[i].method = f;
-	    addChild(f);
+	    definition.addChild(f);
 	  }
       }
-    else
-      this.fields = noFields;
     
     if(methods != null)
-      this.methods = addChildren(methods);
+      this.methods = definition.addChildren(methods);
   }
+
+  ClassDefinition definition;
+
+  private static Field[] noFields = new Field[0];
   
   /****************************************************************
    * Fields
@@ -178,12 +161,11 @@ public class NiceClass extends ClassDefinition
   
   void resolveClass()
   {
-    super.resolveClass();
     classe.supers = computeSupers();
     resolveFields();
     createConstructor();
     createFields();
-    setJavaType(classe.getType());
+    definition.setJavaType(classe.getType());
   }
 
   private void resolveFields()
@@ -191,18 +173,10 @@ public class NiceClass extends ClassDefinition
     if (fields.length == 0)
       return;
 
-    TypeScope localScope = typeScope;
-    if (typeParameters != null)
-      try{
-	localScope = new TypeScope(localScope);
-	localScope.addSymbols(typeParameters);
-      }
-      catch(TypeScope.DuplicateName e){
-	User.error(this, e);
-      }
+    TypeScope localScope = definition.getLocalScope();
     
     for (int i = 0; i < fields.length; i++)
-      fields[i].resolve(scope, localScope);
+      fields[i].resolve(definition.scope, localScope);
   }
 
   private void createFields()
@@ -216,8 +190,8 @@ public class NiceClass extends ClassDefinition
 
   void resolveBody()
   {
-    if (children != null)
-      for (Iterator i = children.iterator(); i.hasNext();)
+    if (methods != null)
+      for (Iterator i = methods.iterator(); i.hasNext();)
 	{
 	  Object child = i.next();
 	  if (child instanceof ToplevelFunction)
@@ -231,7 +205,7 @@ public class NiceClass extends ClassDefinition
 
   void typecheck() 
   { 
-    super.typecheck();
+    //super.typecheck();
     if (fields == null)
       return;
 
@@ -246,7 +220,7 @@ public class NiceClass extends ClassDefinition
 	  Typing.leave();
 	}
 	catch(TypingEx ex) {
-	  User.error(this, "Type error in field declarations");
+	  User.error(this.definition, "Type error in field declarations");
 	}
       }
     }
@@ -256,11 +230,11 @@ public class NiceClass extends ClassDefinition
 
   private void enterTypingContext()
   {
-    if (entered || typeParameters == null) 
+    if (entered || definition.typeParameters == null) 
       return;
     Typing.enter();
     entered = true;
-    Typing.introduce(typeParameters);
+    Typing.introduce(definition.typeParameters);
     try {
       Typing.implies();
     }
@@ -276,14 +250,13 @@ public class NiceClass extends ClassDefinition
 
   public void printInterface(java.io.PrintWriter s)
   {
-    super.printInterface(s);
     s.print
       (
          " {\n"
        + Util.map("",";\n",";\n",fields)
        + "}\n\n"
        );
-    printInterface(methods, s);
+    Definition.printInterface(methods, s);
   }
   
   /****************************************************************
@@ -294,7 +267,7 @@ public class NiceClass extends ClassDefinition
   {
     // The module will lookup the existing class if it is already compiled
     // and call createClassExp if not.
-    classe = module.getClassExp(this);
+    classe = definition.module.getClassExp(this);
   }
 
   gnu.expr.ClassExp classe;
@@ -302,12 +275,10 @@ public class NiceClass extends ClassDefinition
   public gnu.expr.ClassExp createClassExp()
   {
     gnu.expr.ClassExp classe = new gnu.expr.ClassExp();
-    classe.setName(name.toString());
-    classe.setFile(location().getFile());
+    classe.setName(definition.name.toString());
+    classe.setFile(definition.location().getFile());
     classe.setSimple(true);
-    classe.setAccessFlags((isInterface ? Access.INTERFACE : 0) |
-			  (isAbstract ? Access.ABSTRACT : 0) |
-			  (isFinal ? Access.FINAL : 0));
+    classe.setAccessFlags(definition.getBytecodeFlags());
     return classe;
   }
 
@@ -316,9 +287,9 @@ public class NiceClass extends ClassDefinition
   {
     nbFields += this.fields.length;
     FormalParameters.Parameter[] res;
-    ClassDefinition sup = distinguishedSuperClass();
-    if (sup instanceof NiceClass)
-      res = ((NiceClass) sup).getFieldsAsParameters(nbFields, typeParams);
+    ClassDefinition sup = ClassDefinition.get(definition.getSuperClass());
+    if (sup != null && sup.implementation instanceof NiceClass)
+      res = ((NiceClass) sup.implementation).getFieldsAsParameters(nbFields, typeParams);
     else
       res = new FormalParameters.Parameter[nbFields];
 
@@ -333,7 +304,7 @@ public class NiceClass extends ClassDefinition
 	map = new TypeScope(map);
 	for (int i = 0; i < typeParams.length; i++)
 	  try {
-	    map.addMapping(this.typeParameters[i].getName(), typeParams[i]);
+	    map.addMapping(definition.typeParameters[i].getName(), typeParams[i]);
 	  } catch(TypeScope.DuplicateName e) {}
       }
 
@@ -347,19 +318,19 @@ public class NiceClass extends ClassDefinition
 
   private void createConstructor()
   {
-    if (isInterface)
+    if (definition instanceof ClassDefinition.Interface)
       return;
 
-    mlsub.typing.MonotypeVar[] typeParams = createSameTypeParameters();
+    mlsub.typing.MonotypeVar[] typeParams = definition.createSameTypeParameters();
     FormalParameters values = new FormalParameters(getFieldsAsParameters(0, typeParams));
     classe.setFieldCount(values.size);
 
     constructorMethod = new MethodDeclaration
-      (new LocatedString("<init>", location()),
+      (new LocatedString("<init>", definition.location()),
        values, 
        new Constraint(typeParams, null),
-       Monotype.resolve(typeScope, values.types()),
-       Monotype.sure(new MonotypeConstructor(this.tc, typeParams)))
+       Monotype.resolve(definition.typeScope, values.types()),
+       Monotype.sure(new MonotypeConstructor(definition.tc, typeParams)))
       {
 	protected gnu.expr.Expression computeCode()
 	{
@@ -370,68 +341,66 @@ public class NiceClass extends ClassDefinition
 	{ throw new Error("Should not be called"); }
       };
 
-    TypeConstructors.addConstructor(tc, constructorMethod);
+    TypeConstructors.addConstructor(definition.tc, constructorMethod);
   }
 
   public void compile()
   {
-    if (children != null)
-      for (Iterator i = children.iterator(); i.hasNext();)
+    if (methods != null)
+      for (Iterator i = methods.iterator(); i.hasNext();)
 	{
 	  Object child = i.next();
 	  if (child instanceof ToplevelFunction)
 	    ((ToplevelFunction) child).compile();
 	}
 
-    module.addImplementationClass(classe);
+    definition.module.addImplementationClass(classe);
   }
 
   private gnu.expr.Expression typeExpression(TypeConstructor tc)
   {
     ClassDefinition c = ClassDefinition.get(tc);
-    if (c instanceof NiceClass)
-      return ((NiceClass) c).classe;
+    if (c != null && c.implementation instanceof NiceClass)
+      return ((NiceClass) c.implementation).classe;
     else
       return new gnu.expr.QuoteExp(nice.tools.code.Types.javaType(tc));
   }
 
   private gnu.expr.Expression[] computeSupers()
   {
-    if (!isInterface)
-      {
-	if (impl == null)
-	  if (superClass == null)
-	    return null;
-	  else
-	    return new gnu.expr.Expression[]{ typeExpression(superClass[0]) };
-	  
-	ArrayList imp = new ArrayList(impl.length + 1);
-	if (superClass != null)
-	  imp.add(typeExpression(superClass[0]));
-	for (int i = 0; i < impl.length; i++)
-	  {
-	    TypeConstructor assocTC = impl[i].associatedTC();
-	    
-	    if (assocTC == null)
-	      // This interface is abstract: ignore it.
-	      continue;
-	    
-	    imp.add(typeExpression(assocTC));
-	  }
-	return (gnu.expr.Expression[]) 
-	  imp.toArray(new gnu.expr.Expression[imp.size()]);
-      }
-    else 
-      {
-	if (superClass == null)
-	  return null;
-	
-	gnu.expr.Expression[] itfs = new gnu.expr.Expression[superClass.length];
-	for (int i = 0; i < superClass.length; i++)
-	  itfs[i] = typeExpression(superClass[i]);
+    TypeConstructor superClass = definition.getSuperClass();
+    Interface[] interfaces = definition.getInterfaces();
 
-	return itfs;
+    int len = superClass == null ? 0 : 1;
+    if (interfaces != null)
+      len += interfaces.length;
+    if (len == 0)
+      return null;
+
+    gnu.expr.Expression[] res = new gnu.expr.Expression[len];
+
+    if (interfaces != null)
+      for (int i = 0; i < interfaces.length; i++)
+	{
+	  TypeConstructor assocTC = interfaces[i].associatedTC();
+	    
+	  if (assocTC == null)
+	    // This interface is abstract: ignore it.
+	    continue;
+	    
+	  res[--len] = typeExpression(assocTC);
+	}
+    if (superClass != null)
+      res[--len] = typeExpression(superClass);
+
+    if (len != 0) // The array was too big.
+      {
+	gnu.expr.Expression[] tmp = new gnu.expr.Expression[res.length - len];
+	System.arraycopy(res, len, tmp, 0, tmp.length);
+	res = tmp;
       }
+
+    return res;
   }
 
   /** This native method is redefined for this Nice class. */

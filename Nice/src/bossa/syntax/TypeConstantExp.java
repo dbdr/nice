@@ -23,6 +23,6 @@ class TypeConstantExp extends ConstantExp
 {
   TypeConstantExp(LocatedString name)
   {
-    super(ConstantExp.typeTC, name, name.toString(), name.location());
+    super(PrimitiveType.typeTC, name, name.toString(), name.location());
   }
 }

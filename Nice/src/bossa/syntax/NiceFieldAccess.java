@@ -34,13 +34,12 @@ import java.util.*;
  */
 public class NiceFieldAccess extends FieldAccess
 {
-  public NiceFieldAccess
-    (NiceClass classDef, NiceClass.Field field)
+  public NiceFieldAccess (NiceClass classDef, NiceClass.Field field)
   {
-    super(field.sym.name, new Constraint(classDef.typeParameters,null),
-	  makeList(Monotype.sure(classDef.lowlevelMonotype())),
+    super(field.sym.name, new Constraint(classDef.definition.typeParameters,null),
+	  makeList(Monotype.sure(classDef.definition.lowlevelMonotype())),
 	  field.sym.syntacticType);
-    this.definition = classDef;
+
     this.field = field;
   }
   
@@ -53,9 +52,6 @@ public class NiceFieldAccess extends FieldAccess
   
   final NiceClass.Field field;
   
-  /** The class this field belongs to. */
-  NiceClass definition;
-
   /****************************************************************
    * Module interface
    ****************************************************************/

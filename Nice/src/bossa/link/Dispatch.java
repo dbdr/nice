@@ -176,7 +176,7 @@ public final class Dispatch
      @return a List of TypeConstructor[]
        an element of an array is set to:
          null if it cannot be matched (e.g. a function type)
-	 ConstantExp.nullTC if it can be matched by @null
+	 PrimtiveType.nullTC if it can be matched by @null
   **/
   private static List enumerate(Polytype type)
   {
@@ -202,7 +202,7 @@ public final class Dispatch
 	  }
 	else
 	  {
-	    marker = new TypeConstructor(ConstantExp.maybeTC.variance);
+	    marker = new TypeConstructor(PrimitiveType.maybeTC.variance);
 	    MonotypeVar var = new MonotypeVar("dispatchType");
 	    raw = var;
 	    Monotype t = MonotypeConstructor.apply(marker, raw);
@@ -255,8 +255,8 @@ public final class Dispatch
     TypeConstructor[] res = new TypeConstructor[length];
 
     for (int i = length; --i >= 0 ;)
-      if (tags[2 * i] == ConstantExp.nullTC)
-	res[i] = ConstantExp.nullTC;
+      if (tags[2 * i] == PrimitiveType.nullTC)
+	res[i] = PrimitiveType.nullTC;
       else
 	res[i] = tags[2 * i + 1];
 

@@ -14,7 +14,7 @@ package nice.tools.code;
 
 import bossa.util.*;
 import mlsub.typing.*;
-import bossa.syntax.ConstantExp;
+import bossa.syntax.PrimitiveType;
 
 import gnu.bytecode.*;
 import gnu.expr.*;
@@ -86,7 +86,7 @@ public final class Types
       return;
 
     TypeConstructor rigidTC;
-    if (tc == ConstantExp.arrayTC)
+    if (tc == PrimitiveType.arrayTC)
       rigidTC = tc;
     else
       {
@@ -107,7 +107,7 @@ public final class Types
        It that case we associate the bytecode type to the Nice monotype,
        not to the type constructor.
     */
-    if (rigidTC == ConstantExp.arrayTC)
+    if (rigidTC == PrimitiveType.arrayTC)
       {
 	Monotype param = ((MonotypeConstructor) m).getTP()[0];
 
@@ -189,7 +189,7 @@ public final class Types
     MonotypeConstructor mc = (MonotypeConstructor) m;
     TypeConstructor tc = mc.getTC();
 
-    if (tc == ConstantExp.arrayTC)
+    if (tc == PrimitiveType.arrayTC)
       return SpecialTypes.array(javaType(mc.getTP()[0]));
     else
       return javaType(tc);
@@ -264,27 +264,27 @@ public final class Types
     throws ParametricClassException, NotIntroducedClassException
   {
     if(javaType.isVoid())
-      return ConstantExp.voidType;
+      return PrimitiveType.voidType;
     if(javaType == SpecialTypes.intType)
-      return ConstantExp.intType;
+      return PrimitiveType.intType;
     if(javaType == SpecialTypes.booleanType)
-      return ConstantExp.boolType;
+      return PrimitiveType.boolType;
     if(javaType == SpecialTypes.charType)
-      return ConstantExp.charType;
+      return PrimitiveType.charType;
     if(javaType == SpecialTypes.byteType)
-      return ConstantExp.byteType;    
+      return PrimitiveType.byteType;    
     if(javaType == SpecialTypes.shortType)
-      return ConstantExp.shortType;
+      return PrimitiveType.shortType;
     if(javaType == SpecialTypes.longType)
-      return ConstantExp.longType;
+      return PrimitiveType.longType;
     if(javaType == SpecialTypes.floatType)
-      return ConstantExp.floatType;
+      return PrimitiveType.floatType;
     if(javaType == SpecialTypes.doubleType)
-      return ConstantExp.doubleType;
+      return PrimitiveType.doubleType;
 
     if (javaType instanceof ArrayType)
       return new MonotypeConstructor
-	(ConstantExp.arrayTC, 
+	(PrimitiveType.arrayTC, 
 	 new Monotype[]{monotype(((ArrayType) javaType).getComponentType())});
     
     return getMonotype(javaType.getName());
@@ -323,7 +323,7 @@ public final class Types
       {
 	name=name.substring(0,name.length()-2);
 	return new MonotypeConstructor
-	  (ConstantExp.arrayTC, 
+	  (PrimitiveType.arrayTC, 
 	   new Monotype[]{ getMonotype(name) });
       }
     
@@ -564,17 +564,17 @@ public final class Types
     if (tc == null)
       return QuoteExp.nullExp;
 
-    if(tc == ConstantExp.primInt ||
-       tc == ConstantExp.primByte ||
-       tc == ConstantExp.primShort ||
-       tc == ConstantExp.primLong)
+    if(tc == PrimitiveType.intTC ||
+       tc == PrimitiveType.byteTC ||
+       tc == PrimitiveType.shortTC ||
+       tc == PrimitiveType.longTC)
       return zeroInt;
-    if(tc == ConstantExp.primFloat ||
-       tc == ConstantExp.primDouble)
+    if(tc == PrimitiveType.floatTC ||
+       tc == PrimitiveType.doubleTC)
       return zeroFloat;
-    if(tc == ConstantExp.primBool)
+    if(tc == PrimitiveType.boolTC)
       return QuoteExp.falseExp;
-    if(tc == ConstantExp.primChar)
+    if(tc == PrimitiveType.charTC)
       return zeroChar;
     
     return QuoteExp.nullExp;
@@ -613,7 +613,7 @@ public final class Types
   {
     // This is prob. laxist, since getTC() might be different but equivalent to maybeTC (?)
     return (m instanceof MonotypeConstructor)
-      && ((MonotypeConstructor) m).getTC() == ConstantExp.maybeTC;
+      && ((MonotypeConstructor) m).getTC() == PrimitiveType.maybeTC;
   }
 
   static Monotype equivalent(Monotype m)

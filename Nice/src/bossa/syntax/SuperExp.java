@@ -183,14 +183,13 @@ public class SuperExp extends Expression
     if (nice.tools.code.Types.get(tc) == t)
       return tc;
 
-    TypeConstructor[] supers = ClassDefinition.get(tc).superClass;
-    if (supers != null)
-      for (int i = 0; i < supers.length; i++)
-	{
-	  TypeConstructor res = findTCforClass(supers[i], t);
-	  if (res != null)
-	    return res;
-	}
+    TypeConstructor superClass = ClassDefinition.get(tc).getSuperClass();
+    if (superClass != null)
+      {
+	TypeConstructor res = findTCforClass(superClass, t);
+	if (res != null)
+	  return res;
+      }
 
     return null;
   }

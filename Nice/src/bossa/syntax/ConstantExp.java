@@ -1,7 +1,7 @@
 /**************************************************************************/
 /*                                N I C E                                 */
 /*             A high-level object-oriented research language             */
-/*                        (c) Daniel Bonniot 2000                         */
+/*                        (c) Daniel Bonniot 2002                         */
 /*                                                                        */
 /*  This program is free software; you can redistribute it and/or modify  */
 /*  it under the terms of the GNU General Public License as published by  */
@@ -13,10 +13,7 @@
 package bossa.syntax;
 
 import mlsub.typing.TypeConstructor;
-import mlsub.typing.TypeSymbol;
 import mlsub.typing.MonotypeConstructor;
-
-import nice.tools.code.SpecialTypes;
 
 import bossa.util.*;
 
@@ -24,7 +21,7 @@ import bossa.util.*;
    Constant expressions (values) of basic types.
 
    @version $Date$
-   @author Daniel Bonniot (d.bonniot@mail.dotcom.fr)
+   @author Daniel Bonniot (bonniot@users.sourceforge.net)
  */
 public class ConstantExp extends Expression
 {
@@ -46,7 +43,7 @@ public class ConstantExp extends Expression
   
   void computeType()
   {
-    //Already done during resolution
+    // The type is known at creation.
   }
 
   /****************************************************************
@@ -104,11 +101,10 @@ public class ConstantExp extends Expression
 	  int code = Integer.parseInt(s.substring(1), 8);
 	  if(code<0 || code>255)
 	    throw new NumberFormatException();
-	  c = (char) code;    
+	  c = (char) code;
 	}
 	catch(NumberFormatException e){
-	  User.error(value, "Invalid escape sequence: " + value);
-	  c = ' '; // compiler complains about c not being initialized...
+	  throw User.error(value, "Invalid escape sequence: " + value);
 	}
       }
     else
@@ -119,8 +115,8 @@ public class ConstantExp extends Expression
 	c = s.charAt(0);
       }
   
-    return new ConstantExp(primChar, new Character(c), "'" + c + "'",
-			   value.location());
+    return new ConstantExp(PrimitiveType.charTC, new Character(c), 
+			   "'" + c + "'", value.location());
   }
 
   private static Expression makeInt(long value, boolean isLong, 
@@ -131,22 +127,22 @@ public class ConstantExp extends Expression
     
     if (value >= Byte.MIN_VALUE && value <= Byte.MAX_VALUE && !isLong)
       {
-	type = primByte;
+	type = PrimitiveType.byteTC;
 	object = new Byte((byte) value);
       }
     else if (value >= Short.MIN_VALUE && value <= Short.MAX_VALUE && !isLong)
       {
-	type = primShort;
+	type = PrimitiveType.shortTC;
 	object = new Short((short) value);
       }
     else if (value >= Integer.MIN_VALUE && value <= Integer.MAX_VALUE && !isLong)
       {
-	type = primInt;
+	type = PrimitiveType.intTC;
 	object = new Integer((int) value);
       }
     else
       {
-	type = primLong;
+	type = PrimitiveType.longTC;
 	object = new Long(value);
       }
     
@@ -224,7 +220,7 @@ public class ConstantExp extends Expression
 
   public static Expression makeDouble(double value, Location location)
   {
-    return new ConstantExp(primFloat, new Double(value), value+"",
+    return new ConstantExp(PrimitiveType.floatTC, new Double(value), value+"",
 			   location);
   }
   
@@ -243,147 +239,5 @@ public class ConstantExp extends Expression
   public static ConstantExp makeType(LocatedString representation)
   {
     return new TypeConstantExp(representation);
-  }
-  
-  /****************************************************************
-   * Primitive Types
-   ****************************************************************/
-
-  static gnu.bytecode.Type registerPrimType(String name, TypeConstructor tc)
-  {
-    if(name.equals("nice.lang.char"))
-      {
-	primChar = tc;
-	charType = Monotype.sure(new MonotypeConstructor(tc, null));
-	return SpecialTypes.charType;
-      }
-    
-    if(name.equals("nice.lang.byte"))
-      {
-	primByte = tc;
-	byteType = Monotype.sure(new MonotypeConstructor(tc, null));
-	return SpecialTypes.byteType;
-      }
-    
-    if(name.equals("nice.lang.int"))
-      {
-	primInt = tc;
-	intType = Monotype.sure(new MonotypeConstructor(tc, null));
-	intPolytype = new mlsub.typing.Polytype(intType);
-	return SpecialTypes.intType;
-      }
-    
-    if(name.equals("nice.lang.long"))
-      {
-	primLong = tc;
-	longType = Monotype.sure(new MonotypeConstructor(tc, null));
-	longPolytype = new mlsub.typing.Polytype(longType);
-	return SpecialTypes.longType;
-      }
-    
-    if(name.equals("nice.lang.boolean"))
-      {
-	primBool = tc;
-	boolType = Monotype.sure(new MonotypeConstructor(primBool, null));
-	boolPolytype = new mlsub.typing.Polytype(boolType);
-	return SpecialTypes.booleanType;
-      }
-    
-    if(name.equals("nice.lang.short"))
-      {
-	primShort = tc;
-	shortType = Monotype.sure(new MonotypeConstructor(tc, null));
-	return SpecialTypes.shortType;
-      }
-    
-    if(name.equals("nice.lang.double"))
-      {
-	primDouble = tc;
-	doubleType = Monotype.sure(new MonotypeConstructor(tc, null));
-	return SpecialTypes.doubleType;
-      }
-    
-    if(name.equals("nice.lang.float"))
-      {
-	primFloat = tc;
-	floatType = Monotype.sure(new MonotypeConstructor(tc, null));
-	return SpecialTypes.floatType;
-      }
-    
-    if(name.equals("nice.lang.void"))
-      {
-	voidType = Monotype.sure(new MonotypeConstructor(tc, null));
-	voidPolytype = new mlsub.typing.Polytype
-	  (mlsub.typing.Constraint.True, voidType);
-	synVoidType = Monotype.create(voidType);
-	return SpecialTypes.voidType;
-      }
-    
-    if (name.equals("nice.lang.Array"))
-      {
-	arrayTC = tc;
-	return nice.tools.code.SpecialArray.wrappedType();
-      }
-
-    if (name.equals("nice.lang.Maybe"))
-      {
-	maybeTC = tc;
-	mlsub.typing.NullnessKind.initialize(tc);
-	// Reset the cached type of Null, since it is a persistent expression.
-	NullExp.instance.computeType();
-	// to differ with the null result, which signals error
-	return gnu.bytecode.Type.pointer_type;
-      }
-    
-    if (name.equals("nice.lang.Sure"))
-      {
-	sureTC = tc;
-	// to differ with the null result, which signals error
-	return gnu.bytecode.Type.pointer_type;
-      }
-    
-    if (name.equals("nice.lang.Null"))
-      {
-	nullTC = tc;
-	// to differ with the null result, which signals error
-	return gnu.bytecode.Type.pointer_type;
-      }
-    
-    if (name.equals("nice.lang.Type"))
-      {
-	typeTC = tc;
-	// to differ with the null result, which signals error
-	return gnu.bytecode.Type.pointer_type;
-      }
-
-    return null;
-  }
-  
-  public static TypeConstructor primByte, primChar, primInt, primLong, primBool, primShort, primDouble, primFloat, arrayTC;
-  public static mlsub.typing.Monotype byteType, charType, intType, longType, boolType, shortType, doubleType, floatType, voidType;
-  static mlsub.typing.Polytype voidPolytype, boolPolytype, intPolytype, longPolytype;
-
-  public static TypeConstructor maybeTC, sureTC, nullTC;
-
-  // syntatic types
-  public static Monotype synVoidType;
-
-  static TypeConstructor typeTC;
-  static TypeConstructor throwableTC;
-  static TypeConstructor throwableTC()
-  {
-    return throwableTC;
-  }
-	
-  private static mlsub.typing.Polytype throwableType;
-  static mlsub.typing.Polytype throwableType()
-  {
-    if (throwableType == null)
-      {
-	throwableType = new mlsub.typing.Polytype
-	  (mlsub.typing.Constraint.True, 
-	   Monotype.sure(new MonotypeConstructor(throwableTC(), null)));
-      }
-    return throwableType;
   }
 }

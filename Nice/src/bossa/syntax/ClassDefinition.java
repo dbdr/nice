@@ -26,59 +26,303 @@ import java.util.*;
  */
 abstract public class ClassDefinition extends MethodContainer
 {
+  public static 
+    Interface makeInterface(LocatedString name, 
+			    List typeParameters, List typeParametersVariances,
+			    List extensions)
+  {
+    return new Interface(name, typeParameters, typeParametersVariances, 
+			 extensions);
+  }
+
+  static class Interface extends ClassDefinition
+  {
+    Interface(LocatedString name, 
+	      List typeParameters, List typeParametersVariances,
+	      List extensions)
+    {
+      super(name, typeParameters, typeParametersVariances);
+      this.extensions = extensions;
+
+      createTC();
+      associatedInterface = new mlsub.typing.Interface(variance, tc);
+    }
+
+    public boolean isConcrete()
+    {
+      return false;
+    }
+
+    int getBytecodeFlags() { return Access.INTERFACE; }
+
+    public mlsub.typing.TypeSymbol getTypeSymbol()
+    {
+      return associatedInterface;
+    }
+  
+    TypeConstructor getSuperClass() { return null; }
+
+    mlsub.typing.Interface[] getInterfaces() { return extendedInterfaces; }
+
+    void resolveClass()
+    {
+      // If superClass is non null, it was build before.
+      // Extensions should be null in that case.
+      if (extendedInterfaces == null)
+	{
+	  extendedInterfaces = TypeIdent.resolveToItf(typeScope, extensions);
+	  extensions = null;
+	}
+
+      // Resolve the superclass first.
+      if (extendedInterfaces != null)
+	for (int i = 0; i < extendedInterfaces.length; i++)
+	  {
+	    ClassDefinition d = ClassDefinition.get(extendedInterfaces[i].associatedTC());
+	    if (d != null)
+	      d.resolve();
+	  }
+
+      createAssociatedInterface();
+
+      super.resolveClass();
+    }
+
+    void createContext()
+    {
+      try{
+	if (extendedInterfaces != null)
+	  try{
+	    Typing.assertImp(tc, extendedInterfaces, true);
+	  }
+	  catch(KindingEx e){
+	    User.error(name,
+		       "Class " + name + " cannot extend " + e.t2 +
+		       ": they do not have the same number or kind of type parameters");
+	  }
+      
+	Typing.assertImp(tc, associatedInterface, true);
+      }
+      catch(TypingEx e){
+	User.error(name, "Error in class " + name + " : " + e.getMessage());
+      }
+    }
+
+    public void printInterface(java.io.PrintWriter s)
+    {
+      s.print("interface ");
+      s.print(getSimpleName());
+      s.print(this.printTP());
+      s.print(Util.map(" extends ",", ","",extendedInterfaces));
+      implementation.printInterface(s);
+    }
+
+  /****************************************************************
+   * Associated interface
+   ****************************************************************/
+
+  private mlsub.typing.Interface associatedInterface;
+
+  /**
+   * Returns the abstract interface associated to this class, or null.
+   *
+   * An associated abstract interface in created 
+   * for each "interface" class.
+   */
+  public mlsub.typing.Interface getAssociatedInterface()
+  { return associatedInterface; }
+    
+    private void createAssociatedInterface()
+    {
+      // the associated interface extends the associated interfaces
+      // of the classes we extend
+      if (extendedInterfaces != null)
+	for(int i = 0; i < extendedInterfaces.length; i++)
+	  {
+	    mlsub.typing.Interface ai = extendedInterfaces[i];
+	
+	    try{
+	      Typing.assertLeq(associatedInterface, ai);
+	    }
+	    catch(KindingEx e){
+	      User.error(this, "Cannot extend interface " + ai + 
+			 " which has a different variance");
+	    }
+	  }
+    }
+  
+    protected List
+      /* of TypeConstructor */ extensions;
+    mlsub.typing.Interface[] extendedInterfaces;
+  }
+
+  public static 
+    Class makeClass(LocatedString name, 
+		    boolean isFinal, boolean isAbstract, 
+		    List typeParameters,
+		    List typeParametersVariances,
+		    TypeIdent superClassIdent, 
+		    List implementations, List abstractions
+		    )
+  {
+    return new Class(name, isFinal, isAbstract,
+		     typeParameters, typeParametersVariances,
+		     superClassIdent, implementations, abstractions);
+  }
+
+  static class Class extends ClassDefinition
+  {
+    Class(LocatedString name, 
+	  boolean isFinal, boolean isAbstract, 
+	  List typeParameters,
+	  List typeParametersVariances,
+	  TypeIdent superClassIdent, 
+	  List implementations, List abstractions
+	  )
+    {
+      super(name, typeParameters, typeParametersVariances);
+
+      this.isFinal = isFinal;
+      this.isAbstract = isAbstract;
+    
+      this.superClassIdent = superClassIdent;
+      this.implementations = implementations;
+      this.abstractions = abstractions;
+
+      createTC();
+    }
+
+    public boolean isConcrete()
+    {
+      return !isAbstract;
+    }
+
+    int getBytecodeFlags() 
+    { 
+      if (isFinal) 
+	return Access.FINAL;
+      else if (isAbstract)
+	return Access.ABSTRACT;
+      else return 0;
+    }
+
+    public mlsub.typing.TypeSymbol getTypeSymbol()
+    {
+      return tc;
+    }
+  
+    public mlsub.typing.Interface getAssociatedInterface()
+    { 
+      return null;
+    }
+
+    TypeConstructor getSuperClass() { return superClass; }
+
+    mlsub.typing.Interface[] getInterfaces() { return impl; }
+
+    void resolveClass()
+    {
+      if (superClassIdent != null)
+	{
+	  superClass = superClassIdent.resolveToTC(typeScope);
+	  superClassIdent = null;
+
+	  ClassDefinition def = ClassDefinition.get(superClass);
+	  if (def instanceof Interface)
+	    User.error(name,
+		       superClass + " is an interface, so " + name + 
+		       " may only implement it");
+	}
+
+      // Resolve the superclass first.
+      if (superClass != null)
+	{
+	  ClassDefinition d = ClassDefinition.get(superClass);
+	  if (d != null)
+	    d.resolve();
+	}
+
+      impl = TypeIdent.resolveToItf(typeScope, implementations);
+      abs = TypeIdent.resolveToItf(typeScope, abstractions);
+    
+      implementations = abstractions = null;
+
+      super.resolveClass();
+    }
+
+    void createContext()
+    {
+      try{
+	if (superClass != null)
+	  try{
+	    Typing.initialLeq(tc, superClass);
+	  }
+	  catch(KindingEx e){
+	    User.error(name,
+		       "Class " + name + " cannot extend " + e.t2 +
+		       ": they do not have the same number or kind of type parameters");
+	  }
+      
+	if (isFinal)
+	  Typing.assertMinimal(tc);
+
+	if (impl != null)
+	  try{
+	    Typing.assertImp(tc, impl, true);
+	  }
+	  catch(KindingEx e){
+	    User.error(name,
+		       "Class " + name + " cannot implement " + e.t2 +
+		       ": they do not have the same number or kind of type parameters");
+	  }
+
+	if (abs != null)
+	  {
+	    Typing.assertImp(tc, abs, true);
+	    Typing.assertAbs(tc, abs);
+	  }      
+      }
+      catch(TypingEx e){
+	User.error(name, "Error in class " + name + " : " + e.getMessage());
+      }
+    }
+
+    public void printInterface(java.io.PrintWriter s)
+    {
+      if (isFinal) s.print("final ");
+      if (isAbstract) s.print("abstract ");
+      s.print("class ");
+      s.print(getSimpleName());
+      s.print(this.printTP());
+      if (superClass != null)
+	s.print(" extends " + superClass);
+      s.print(Util.map(" implements ",", ","",impl));
+      s.print(Util.map(" finally implements ",", ","",abs));
+      implementation.printInterface(s);
+    }
+
+    protected List
+      /* of Interface */ implementations,
+      /* of Interface */ abstractions;
+    TypeIdent superClassIdent;
+    TypeConstructor superClass;
+    mlsub.typing.Interface[] impl, abs;
+    protected boolean isFinal;
+  
+    boolean isAbstract;
+  }
+
   /**
    * Creates a class definition.
    *
    * @param name the name of the class
-   * @param isFinal 
-   * @param isAbstract 
-   * @param isInterface true iff the class is an "interface" 
-   (which is not an "abstract interface").
-   isInterface implies isAbstract.
    * @param typeParameters a list of type symbols
    * @param extensions a list of TypeConstructors
-   * @param implementations a list of Interfaces
-   * @param abstractions a list of Interfaces
    */
   public ClassDefinition(LocatedString name, 
-			 boolean isFinal, boolean isAbstract, 
-			 boolean isInterface,
-			 List typeParameters,
-			 List typeParametersVariances,
-			 List extensions, 
-			 List implementations, List abstractions
-			 )
+			 List typeParameters, List typeParametersVariances)
   {
     super(name, Node.upper, typeParameters, typeParametersVariances);
-
-    if(isInterface)
-      isAbstract = true;
-    
-    // Testing well formedness
-    if(isInterface)
-      {
-	if(isFinal)
-	  User.error(name,
-		     "Interfaces can't be final");
-	
-	if(implementations!=null && implementations.size()>0)
-	  User.error(name,
-		     "Interfaces can't implement anything");
-	
-	if(abstractions!=null && abstractions.size()>0)
-	  User.error(name,
-		     "Interfaces can't abstract anything");	  
-      }
-    
-    this.isFinal = isFinal;
-    this.isAbstract = isAbstract;
-    this.isInterface = isInterface;
-    
-    this.extensions = extensions;
-    this.implementations = implementations;
-    this.abstractions = abstractions;
-
-    createTC();
   }
   
   void createTC()
@@ -126,18 +370,15 @@ abstract public class ClassDefinition extends MethodContainer
       {
 	tc = new mlsub.typing.TypeConstructor
 	  ("null", mlsub.typing.NullnessKind.instance, isConcrete(), true);
-	ConstantExp.registerPrimType(name.toString(),tc);
+	PrimitiveType.registerPrimType(name.toString(),tc);
       }
     else
       {
 	tc = new mlsub.typing.TypeConstructor
 	  (name.toString(), variance, isConcrete(), true);
 	if (name.equals("nice.lang.Throwable"))
-	  ConstantExp.throwableTC = tc;
+	  PrimitiveType.throwableTC = tc;
       }
-
-    if(isInterface)
-      associatedInterface = new Interface(variance, tc);
 
     tcToClassDef.put(tc, this);
     Typing.introduce(tc);
@@ -147,6 +388,20 @@ abstract public class ClassDefinition extends MethodContainer
   public Collection associatedDefinitions()
   {
     return null;
+  }
+
+  TypeScope getLocalScope()
+  {
+    TypeScope localScope = typeScope;
+    if (typeParameters != null)
+      try{
+	localScope = new TypeScope(localScope);
+	localScope.addSymbols(typeParameters);
+      }
+      catch(TypeScope.DuplicateName e){
+	User.error(this, e);
+      }
+    return localScope;
   }
 
   /****************************************************************
@@ -165,23 +420,17 @@ abstract public class ClassDefinition extends MethodContainer
    * Selectors
    ****************************************************************/
 
-  public mlsub.typing.TypeSymbol getTypeSymbol()
-  {
-    if (associatedInterface != null)
-      return associatedInterface;
-    else
-      return tc;
-  }
+  public abstract mlsub.typing.TypeSymbol getTypeSymbol();
+  public abstract mlsub.typing.Interface getAssociatedInterface();
   
   protected mlsub.typing.Monotype lowlevelMonotype()
   {
     return new mlsub.typing.MonotypeConstructor(tc, typeParameters);
   }
   
-  public final boolean isConcrete()
-  {
-    return !isAbstract;
-  }
+  public abstract boolean isConcrete();
+
+  abstract int getBytecodeFlags();
 
   /****************************************************************
    * Resolution
@@ -200,107 +449,36 @@ abstract public class ClassDefinition extends MethodContainer
 
   void resolveClass()
   {
-    // If superClass is non null, it was build before.
-    // Extensions should be null in that case.
-    if(superClass==null)
-      {
-	superClass = TypeIdent.resolveToTC(typeScope, extensions);
-	extensions = null;
-      }
-
-    // Resolve the superclass first.
-    if (superClass != null)
-      {
-	ClassDefinition d = ClassDefinition.get(superClass[0]);
-	if (d != null)
-	  d.resolve();
-      }
-
-    impl = TypeIdent.resolveToItf(typeScope, implementations);
-    abs = TypeIdent.resolveToItf(typeScope, abstractions);
-    
-    implementations = abstractions = null;
-    
-    // A class cannot extend an interface
-    if(!isInterface && superClass!=null)
-      for(int i=0; i<superClass.length; i++)
-	{
-	  ClassDefinition def = ClassDefinition.get(superClass[i]);
-	  if(def!=null && def.getAssociatedInterface()!=null)
-	    User.error(name,
-		       tc+" is an interface, so "+name+
-		       " may only implement it");
-	}
-
-    createAssociatedInterface();
-
     createContext();
+    implementation.resolveClass();
+  }
+
+  void resolveBody()
+  {
+    implementation.resolveBody();
+  }
+
+  void typecheck()
+  {
+    implementation.typecheck();
+  }
+
+  void compile()
+  {
+    implementation.compile();
   }
 
   /****************************************************************
    * Initial Context
    ****************************************************************/
 
-  private void createContext()
-  {
-    try{
-      if (superClass != null)
-	try{
-	  Typing.initialLeq(tc, superClass);
-	}
-	catch(KindingEx e){
-	  User.error(name,
-		     "Class " + name + " cannot extend " + e.t2 +
-		     ": they do not have the same number or kind of type parameters");
-	}
-      
-      if (isFinal)
-	Typing.assertMinimal(tc);
-
-      if (impl != null)
-	try{
-	  Typing.assertImp(tc, impl, true);
-	}
-	catch(KindingEx e){
-	  User.error(name,
-		     "Class " + name + " cannot implement " + e.t2 +
-		     ": they do not have the same number or kind of type parameters");
-	}
-
-      if (associatedInterface != null)
-	Typing.assertImp(tc, associatedInterface, true);
-      
-      if (abs != null)
-	{
-	  Typing.assertImp(tc, abs, true);
-	  Typing.assertAbs(tc, abs);
-	}      
-    }
-    catch(TypingEx e){
-      User.error(name, "Error in class " + name + " : " + e.getMessage());
-    }
-  }
+  abstract void createContext();
 
   /****************************************************************
    * Module Interface
    ****************************************************************/
 
-  public void printInterface(java.io.PrintWriter s)
-  {
-    s.print
-      (
-         (isFinal ? "final " : "")
-       + (isInterface ? "interface " : 
-	  (isAbstract ? "abstract " : "") + "class ")
-       + getSimpleName()
-       + printTP()
-       + Util.map(" extends ",", ","",superClass)
-       + Util.map(" implements ",", ","",impl)
-       + Util.map(" finally implements ",", ","",abs)
-      );
-  }
-  
-  private String printTP()
+  String printTP()
   {
     if (typeParameters == null)
       return "";
@@ -328,25 +506,12 @@ abstract public class ClassDefinition extends MethodContainer
    * Class hierarchy
    ****************************************************************/
 
-  // Bossa has multiple inheritance, java has not.
-  // So we choose a class that will be described as the super-class
-  // in the bytecode (javaSuperClass)
-
-  final ClassDefinition superClass(int n)
-  {
-    return get(superClass[n]);
-  }
-  
   /**
-   * Our super-class in the bytecode.
+   * Our super-class, or null.
    */
-  ClassDefinition distinguishedSuperClass()
-  {
-    if(superClass == null)
-      return null;
-    else
-      return superClass(0);
-  }
+  abstract TypeConstructor getSuperClass();
+
+  abstract mlsub.typing.Interface[] getInterfaces();
   
   private Type javaType;
 
@@ -374,68 +539,6 @@ abstract public class ClassDefinition extends MethodContainer
       return c.getJavaType();
   }
   
-  ClassType javaSuperClass()
-  {
-    Type res;
-    
-    if(superClass == null)
-      res = gnu.bytecode.Type.pointer_type;
-    else
-      res = nice.tools.code.Types.javaType(superClass[0]);
-    
-    if(!(res instanceof ClassType))
-      Internal.error("Java type="+res+"\nOnly special arrays are not a class type, and they must be final");
-    
-    return (ClassType) res;
-  }
-  
-  /****************************************************************
-   * Associated interface
-   ****************************************************************/
-
-  private mlsub.typing.Interface associatedInterface;
-
-  /**
-   * Returns the abstract interface associated to this class, or null.
-   *
-   * An associated abstract interface in created 
-   * for each "interface" class.
-   */
-  public mlsub.typing.Interface getAssociatedInterface()
-  { return associatedInterface; }
-    
-  private void createAssociatedInterface()
-  {
-    if(associatedInterface==null)
-      return;
-
-    // the associated interface extends the associated interfaces
-    // of the classes we extend
-    if(superClass!=null)
-      for(int i = 0; i<superClass.length; i++)
-	{
-	  ClassDefinition c = ClassDefinition.get(superClass[i]);
-	  if(c==null)
-	    Internal.error(name,
-			   "Superclass "+tc+
-			   "("+tc.getClass()+")"+
-			   " of "+name+
-			   " has no definition");
-	
-	  Interface ai = c.getAssociatedInterface();
-	  if(ai==null)
-	    Internal.error("We should extend only \"interface\" classes");
-	
-	  try{
-	    Typing.assertLeq(associatedInterface, ai);
-	  }
-	  catch(KindingEx e){
-	    User.error(this, "Cannot extend interface " + ai + 
-		       " which has a different variance");
-	  }
-	}
-  }
-  
   /****************************************************************
    * Printing
    ****************************************************************/
@@ -447,13 +550,20 @@ abstract public class ClassDefinition extends MethodContainer
 
   mlsub.typing.TypeConstructor tc;
 
-  protected List
-    /* of TypeConstructor */ extensions,
-    /* of Interface */ implementations,
-    /* of Interface */ abstractions;
-  TypeConstructor[] superClass;
-  Interface[] impl, abs;
-  protected boolean isFinal, isInterface;
-  
-  boolean isAbstract;
+  public void setImplementation(ClassImplementation implementation)
+  {
+    this.implementation = implementation;
+  }
+
+  static abstract class ClassImplementation
+  {
+    abstract void resolveClass();
+    void resolveBody() {}
+    void typecheck() {}
+    void compile() {}
+    abstract void printInterface(java.io.PrintWriter s);
+  }
+
+  ClassImplementation implementation;
 }
+

@@ -28,7 +28,8 @@ public class MonoSymbol extends VarSymbol
 {
   public MonoSymbol(LocatedString name, Monotype type)
   {
-    this(name,type,null);
+    super(name);
+    this.syntacticType=type;
   }
   
   public MonoSymbol(LocatedString name, mlsub.typing.Monotype type)
@@ -37,19 +38,9 @@ public class MonoSymbol extends VarSymbol
     this.type = type;
   }
   
-  public MonoSymbol(LocatedString name, Monotype type, ClassDefinition memberOf)
-  {
-    super(name);
-    this.syntacticType=type;
-    this.memberOf = memberOf;
-  }
-
   public Polytype getType()
   {
-    if(memberOf!=null)
-      return null; //new Polytype(memberOf.getConstraint(),type);
-    else
-      return new Polytype(type);
+    return new Polytype(type);
   }
 
   public mlsub.typing.Monotype getMonotype()
@@ -165,6 +156,4 @@ public class MonoSymbol extends VarSymbol
 
   Monotype syntacticType;
   mlsub.typing.Monotype type;
-  //When this is a field. Maybe unusefull
-  ClassDefinition memberOf;
 }

@@ -54,7 +54,7 @@ public class ImportedAlternative extends Alternative
     Pattern p;
     while ((p = Pattern.read(rep, at, methodName)) != null)
       {
-	if (p.tc == bossa.syntax.ConstantExp.arrayTC)
+	if (p.tc == bossa.syntax.PrimitiveType.arrayTC)
 	  /* Special treatment for arrays:
 	     they are compiled into Object,
 	     but we want a SpecialArray in the method bytecode type.

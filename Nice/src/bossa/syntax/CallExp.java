@@ -154,7 +154,7 @@ public class CallExp extends Expression
     if (m.head() == null)
       throw new ReportErrorEx("Nullness check");
     try{
-      Typing.leq(m.head(), ConstantExp.sureTC);
+      Typing.leq(m.head(), PrimitiveType.sureTC);
     }
     catch(TypingEx ex) {
       throw new ReportErrorEx("This function may be null");

@@ -1,7 +1,7 @@
 /****************************************************************************
  *                                 N I C E                                  *
  *              A high-level object-oriented research language              *
- *                         (c) Daniel Bonniot 2003                          *
+ *                         (c) Daniel Bonniot 2004                          *
  *                                                                          *
  *  This package is free software; you can redistribute it and/or modify    *
  *  it under the terms of the GNU General Public License as published by    *
@@ -24,7 +24,19 @@ package nice.lang;
    @author Daniel Bonniot (Daniel.Bonniot@inria.fr)
  */
 
+/**
+   Throw the given throwable object. This stops the normal flow of execution,
+   and transfers to the closest englobing <code>catch</code> block that matches
+   the thrown object, executing englobing <code>finally</code> blocks along the
+   way.
+*/
 void `throw`(java.lang.Throwable exception) = inline nice.lang.inline.Throw();
 
+/**
+   Tests whether a value is an instance of a given class.
+
+   @return true  if value is not null, and its class is either the given class
+           or one of its subclasses.
+*/
 <T,U> boolean `instanceof`(T value, Class<U>) =
   inline nice.lang.inline.Instanceof();

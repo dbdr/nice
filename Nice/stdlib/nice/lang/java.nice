@@ -51,17 +51,9 @@ Class getType(Field) = native Class Field.getType();
 String getName(Field) = native String Field.getName();
 
 String concat(String, String) = native String String.concat(String);
-StringBuffer append(StringBuffer, ?String) = 
-  native StringBuffer StringBuffer.append(String);
-StringBuffer append(StringBuffer, char) = 
-  native StringBuffer StringBuffer.append(char);
 StringBuffer append(StringBuffer, char[] str, int offset, int len) =
   native StringBuffer StringBuffer.append(char[], int, int);
 char[] toCharArray(String) = native char[] String.toCharArray();
-<T> StringBuffer append(StringBuffer, T) = 
-  native StringBuffer StringBuffer.append(Object);
-<T> StringBuffer insert(StringBuffer, int, T) = 
-  native StringBuffer StringBuffer.insert(int, Object);
 String substring(StringBuffer, int) = 
   native String StringBuffer.substring(int);
 String substring(StringBuffer, int, int) = 

@@ -171,6 +171,16 @@ public class PrimitiveType extends ClassDefinition.ClassImplementation
   public static mlsub.typing.Monotype byteType, charType, intType, longType, boolType, shortType, doubleType, floatType, voidType;
   static Polytype voidPolytype, boolPolytype, bytePolytype, shortPolytype, intPolytype, longPolytype;
 
+  private static Polytype objectPolytype;
+  static Polytype objectPolytype()
+  {
+    if (objectPolytype == null)
+      objectPolytype = new Polytype(mlsub.typing.Constraint.True, 
+                                    Monotype.sure(TopMonotype.instance));
+
+    return objectPolytype;
+  }
+
   public static TypeConstructor maybeTC, sureTC, nullTC;
 
   // syntatic types

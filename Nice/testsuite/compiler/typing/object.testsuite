@@ -57,5 +57,13 @@ void foo(Object o) {
 /// PASS
   ?Object o = null;
 
-/// PASS bug
-  Object[] os = [ "DEF", 1, o ];
+/// PASS
+  Object[] os = [ "DEF", 42 ];
+  foo(os);
+  /// Toplevel
+  void foo(Object[] os) {}
+
+/// PASS
+  use(["s"]);
+  /// Toplevel
+  void use(Object[]) {}

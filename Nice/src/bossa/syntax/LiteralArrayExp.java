@@ -40,15 +40,28 @@ public class LiteralArrayExp extends Expression
   void computeType()
   {
     Polytype elementType = Polytype.union(getType(elements));
+
+    type = array(elementType);
+
+    // If the type cannot be simplified, it must be because elements
+    // have incomparable types. In this case, we give the array the type 
+    // Object[].
+    if (! type.trySimplify())
+      type = array(PrimitiveType.objectPolytype());
     
-    this.type = new Polytype
+    nice.tools.code.Types.setBytecodeType(type);
+  }
+
+  private Polytype array(Polytype elementType)
+  {
+    Polytype res = new Polytype
       (elementType.getConstraint(), 
        bossa.syntax.Monotype.sure(new MonotypeConstructor
 	 (PrimitiveType.arrayTC, new Monotype[]{elementType.getMonotype()})));
-
-    nice.tools.code.Types.setBytecodeType(this.type);
+    res.setNotSimplified();
+    return res;
   }
-  
+
   /****************************************************************
    * Code generation
    ****************************************************************/

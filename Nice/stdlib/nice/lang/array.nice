@@ -21,36 +21,38 @@ package nice.lang;
 
 class Array<T>
   implements Sequence
-  finally implements Collection 
+  finally implements Collection
   = native;
 
-<Any T> T[] resize(T[], int) = native Object Native.resize(Object,int);
+/** Returns a new copy with newSize elements */
+<Any T> T[] resize(T[], int newSize) = native Object Native.resize(Object,int);
 
 <Any T> int length(T[]) = native int java.lang.reflect.Array.getLength(Object);
 
-<Any T> T get(T[],int) = 
+<Any T> T get(T[], int) =
   native Object java.lang.reflect.Array.get(Object,int);
-<Any T> void set(T[], int, T) = 
+//  inline nice.lang.inline.ArrayGetOp("o");
+<Any T> void set(T[], int, T) =
   native void java.lang.reflect.Array.set(Object,int,Object);
 
 
-boolean get(boolean[], int) = native boolean Native.get(boolean[], int);
-byte    get(byte[],    int) = native byte    Native.get(byte[],    int);
-short   get(short[],   int) = native short   Native.get(short[],   int);
-int     get(int[],     int) = native int     Native.get(int[],     int);
-long    get(long[],    int) = native long    Native.get(long[],    int);
-char    get(char[],    int) = native char    Native.get(char[],    int);
-float   get(float[],   int) = native float   Native.get(float[],   int);
-double  get(double[],  int) = native double  Native.get(double[],  int);
+boolean get(boolean[], int) = inline nice.lang.inline.ArrayGetOp("z");
+byte    get(byte[],    int) = inline nice.lang.inline.ArrayGetOp("b");
+short   get(short[],   int) = inline nice.lang.inline.ArrayGetOp("s");
+int     get(int[],     int) = inline nice.lang.inline.ArrayGetOp("i");
+long    get(long[],    int) = inline nice.lang.inline.ArrayGetOp("l");
+char    get(char[],    int) = inline nice.lang.inline.ArrayGetOp("c");
+float   get(float[],   int) = inline nice.lang.inline.ArrayGetOp("f");
+double  get(double[],  int) = inline nice.lang.inline.ArrayGetOp("d");
 
-void set(boolean[],int,boolean)= native void Native.set(boolean[],int,boolean);
-void set(byte[],   int, byte)  = native void Native.set(byte[],   int, byte);
-void set(short[],  int, short) = native void Native.set(short[],  int, short);
-void set(int[],    int, int)   = native void Native.set(int[],    int, int);
-void set(long[],   int, long)  = native void Native.set(long[],   int, long);
-void set(char[],   int, char)  = native void Native.set(char[],   int, char);
-void set(float[],  int, float) = native void Native.set(float[],  int, float);
-void set(double[], int, double)= native void Native.set(double[], int, double);
+void set(boolean[],int,boolean) = inline nice.lang.inline.ArraySetOp("z");
+void set(byte[],   int, byte)   = inline nice.lang.inline.ArraySetOp("b");
+void set(short[],  int, short)  = inline nice.lang.inline.ArraySetOp("s");
+void set(int[],    int, int)    = inline nice.lang.inline.ArraySetOp("i");
+void set(long[],   int, long)   = inline nice.lang.inline.ArraySetOp("l");
+void set(char[],   int, char)   = inline nice.lang.inline.ArraySetOp("c");
+void set(float[],  int, float)  = inline nice.lang.inline.ArraySetOp("f");
+void set(double[], int, double) = inline nice.lang.inline.ArraySetOp("d");
 
 // Define collection methods
 
@@ -60,7 +62,7 @@ size(a@Array) = a.length;
 
 map<C,T,U>(a@Array, f)
 {
-  int l = size(a);
+  int l = a.length;
 
   U[] res = new U[l];
 
@@ -72,14 +74,14 @@ map<C,T,U>(a@Array, f)
 
 filter<C, T>(a@Array, test)
 {
-  int l = size(a);
+  int l = a.length;
   int found = 0;
 
   T[] res = new T[l];
-  
-  a.iter(fun(T elem) => 
-	{ if(test(elem)) { res.set(found,elem); found=found+1; }} );
 
-  return resize(res,found);
+  a.iter(fun(T elem) =>
+	{ if(test(elem)) res.set(found++, elem); } );
+
+  return resize(res, found);
 }
 

@@ -26,7 +26,7 @@ public class NumOp
 extends Procedure2 implements Inlineable
 {
   private final static int
-    error= 0,
+    error=  0,
     Sub  =  1,
     Add  =  2,
     Mul  =  3,
@@ -43,47 +43,26 @@ extends Procedure2 implements Inlineable
   
   public static NumOp create(String param)
   {
-    char typeChar = param.charAt(0);
-    PrimType type;
-    switch(typeChar)
-      {
-      case 'i': type = Type.int_type; break;
-      case 'j': type = Type.long_type; break;
-      case 'f': type = Type.float_type; break;
-      case 'd': type = Type.double_type; break;
-      default: 
-	bossa.util.User.error("Unknown type in inlined numeric operator: " +
-			      typeChar);
-	type = null;
-      }
+    PrimType type = Tools.numericType(param.charAt(0));
+    if (type == null)
+      bossa.util.User.error("Unknown type in inlined numeric operator: " +
+			    param);
 
     param = param.substring(1);
 
     int kind = error;
-    if ("Sub".equals(param))
-      kind = Sub;
-    else if ("Add".equals(param))
-      kind = Add;
-    else if ("Mul".equals(param))
-      kind = Mul;
-    else if ("Div".equals(param))
-      kind = Div;
-    else if ("Rem".equals(param))
-      kind = Rem;
-    else if ("Neg".equals(param))
-      kind = Neg;
-    else if ("And".equals(param))
-      kind = And;
-    else if ("IOr".equals(param))
-      kind = IOr;
-    else if ("XOr".equals(param))
-      kind = XOr;
-    else if ("Shl".equals(param))
-      kind = Shl;
-    else if ("Shr".equals(param))
-      kind = Shr;
-    else if ("uShr".equals(param))
-      kind = uShr;
+    if ("Sub".equals(param))      kind = Sub;
+    else if ("Add".equals(param)) kind = Add;
+    else if ("Mul".equals(param)) kind = Mul;
+    else if ("Div".equals(param)) kind = Div;
+    else if ("Rem".equals(param)) kind = Rem;
+    else if ("Neg".equals(param)) kind = Neg;
+    else if ("And".equals(param)) kind = And;
+    else if ("IOr".equals(param)) kind = IOr;
+    else if ("XOr".equals(param)) kind = XOr;
+    else if ("Shl".equals(param)) kind = Shl;
+    else if ("Shr".equals(param)) kind = Shr;
+    else if ("uShr".equals(param))kind = uShr;
     else
       bossa.util.User.error("Unknown inlined numeric operator " + param);
     return new NumOp (kind, type);

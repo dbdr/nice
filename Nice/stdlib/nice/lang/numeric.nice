@@ -27,34 +27,34 @@ int MAX_INT() = native java.lang.Integer.MAX_VALUE;
 // Comparison
 boolean `<`(double, double) = inline nice.lang.inline.CompOp("dLt");
 boolean `<`(float, float) = inline nice.lang.inline.CompOp("fLt");
-boolean `<`(long, long) = inline nice.lang.inline.CompOp("jLt");
+boolean `<`(long, long) = inline nice.lang.inline.CompOp("lLt");
 boolean `<`(int, int) = inline nice.lang.inline.CompOp("iLt");
 
 boolean `<=`(double, double) = inline nice.lang.inline.CompOp("dLe");
 boolean `<=`(float, float) = inline nice.lang.inline.CompOp("fLe");
-boolean `<=`(long, long) = inline nice.lang.inline.CompOp("jLe");
+boolean `<=`(long, long) = inline nice.lang.inline.CompOp("lLe");
 boolean `<=`(int, int) = inline nice.lang.inline.CompOp("iLe");
 
 boolean `>`(double, double) = inline nice.lang.inline.CompOp("dGt");
 boolean `>`(float, float) = inline nice.lang.inline.CompOp("fGt");
-boolean `>`(long, long) = inline nice.lang.inline.CompOp("jGt");
+boolean `>`(long, long) = inline nice.lang.inline.CompOp("lGt");
 boolean `>`(int, int) = inline nice.lang.inline.CompOp("iGt");
 
 boolean `>=`(double, double) = inline nice.lang.inline.CompOp("dGe");
 boolean `>=`(float, float) = inline nice.lang.inline.CompOp("fGe");
-boolean `>=`(float, float) = inline nice.lang.inline.CompOp("jGe");
+boolean `>=`(float, float) = inline nice.lang.inline.CompOp("lGe");
 boolean `>=`(int, int) = inline nice.lang.inline.CompOp("iGe");
 
 // Equality
 boolean `==`(double, double) = inline nice.lang.inline.CompOp("dEq");
 boolean `==`(float, float) = inline nice.lang.inline.CompOp("fEq");
-boolean `==`(long, long) = inline nice.lang.inline.CompOp("jEq");
+boolean `==`(long, long) = inline nice.lang.inline.CompOp("lEq");
 boolean `==`(int, int) = inline nice.lang.inline.CompOp("iEq");
 
 // Inequality
 boolean `!=`(double, double) = inline nice.lang.inline.CompOp("dNe");
 boolean `!=`(float, float) = inline nice.lang.inline.CompOp("fNe");
-boolean `!=`(long, long) = inline nice.lang.inline.CompOp("jNe");
+boolean `!=`(long, long) = inline nice.lang.inline.CompOp("lNe");
 boolean `!=`(int, int) = inline nice.lang.inline.CompOp("iNe");
 
 // Unary +
@@ -69,57 +69,57 @@ int `+`(int) = inline nice.lang.inline.Nop();
 // unary negation
 double `-`(double) = inline nice.lang.inline.NumOp("dNeg");
 float `-`(float) = inline nice.lang.inline.NumOp("fNeg");
-long `-`(long) = inline nice.lang.inline.NumOp("jNeg");
+long `-`(long) = inline nice.lang.inline.NumOp("lNeg");
 int `-`(int) = inline nice.lang.inline.NumOp("iNeg");
 
 // multiplication
 double `*`(double, double) = inline nice.lang.inline.NumOp("dMul");
 float `*`(float, float) = inline nice.lang.inline.NumOp("fMul");
-long `*`(long, long) = inline nice.lang.inline.NumOp("jMul");
+long `*`(long, long) = inline nice.lang.inline.NumOp("lMul");
 int `*`(int, int) = inline nice.lang.inline.NumOp("iMul");
 
 // division
 double `/`(double, double) = inline nice.lang.inline.NumOp("dDiv");
 float `/`(float, float) = inline nice.lang.inline.NumOp("fDiv");
-long `/`(long, long) = inline nice.lang.inline.NumOp("jDiv");
+long `/`(long, long) = inline nice.lang.inline.NumOp("lDiv");
 int `/`(int, int) = inline nice.lang.inline.NumOp("iDiv");
 
 // remainder
 double `%`(double, double) = inline nice.lang.inline.NumOp("dRem");
 float `%`(float, float) = inline nice.lang.inline.NumOp("fRem");
-long `%`(long, long) = inline nice.lang.inline.NumOp("jRem");
+long `%`(long, long) = inline nice.lang.inline.NumOp("lRem");
 int `%`(int, int) = inline nice.lang.inline.NumOp("iRem");
 
 // addition
 double `+`(double, double) = inline nice.lang.inline.NumOp("dAdd");
 float `+`(float, float) = inline nice.lang.inline.NumOp("fAdd");
-long `+`(long, long) = inline nice.lang.inline.NumOp("jAdd");
+long `+`(long, long) = inline nice.lang.inline.NumOp("lAdd");
 int `+`(int, int) = inline nice.lang.inline.NumOp("iAdd");
 
 // substraction
 double `-`(double, double) = inline nice.lang.inline.NumOp("dSub");
 float `-`(float, float) = inline nice.lang.inline.NumOp("fSub");
-long `-`(long, long) = inline nice.lang.inline.NumOp("jSub");
+long `-`(long, long) = inline nice.lang.inline.NumOp("lSub");
 int `-`(int, int) = inline nice.lang.inline.NumOp("iSub");
 
 // shift
 int  `<<`(int , long) = inline nice.lang.inline.NumOp("iShl");
-long `<<`(long, long) = inline nice.lang.inline.NumOp("jShl");
+long `<<`(long, long) = inline nice.lang.inline.NumOp("lShl");
 
 int  `>>`(int , long) = inline nice.lang.inline.NumOp("iShr");
-long `>>`(long, long) = inline nice.lang.inline.NumOp("jShr");
+long `>>`(long, long) = inline nice.lang.inline.NumOp("lShr");
 
 int  `>>>`(int , long) = inline nice.lang.inline.NumOp("iuShr");
-long `>>>`(long, long) = inline nice.lang.inline.NumOp("juShr");
+long `>>>`(long, long) = inline nice.lang.inline.NumOp("luShr");
 
 // bitwise operators
 int `&`(int, int) = inline nice.lang.inline.NumOp("iAnd");
 int `|`(int, int) = inline nice.lang.inline.NumOp("iIOr");
 int `^`(int, int) = inline nice.lang.inline.NumOp("iXOr");
 
-long `&`(long, long) = inline nice.lang.inline.NumOp("jAnd");
-long `|`(long, long) = inline nice.lang.inline.NumOp("jIOr");
-long `^`(long, long) = inline nice.lang.inline.NumOp("jXOr");
+long `&`(long, long) = inline nice.lang.inline.NumOp("lAnd");
+long `|`(long, long) = inline nice.lang.inline.NumOp("lIOr");
+long `^`(long, long) = inline nice.lang.inline.NumOp("lXOr");
 
 // Comparable interface
 `<`(n1@Number, n2@Number) = n1.doubleValue() < n2.doubleValue();

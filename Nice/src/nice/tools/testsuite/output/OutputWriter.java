@@ -7,7 +7,9 @@ import java.util.*;
 
 
 /**
- * TODO
+ * This class writes the output statements of the test engine to the underlying writer.
+ The output is buffered in a StringBuffer and written to out if the user flushes or
+ closes the writer. This filter writer supports marking and reseting.
  * 
  * @author	Alex Greif <a href="mailto:alex.greif@web.de">alex.greif@web.de</a>
  * @version	$Id$
@@ -15,12 +17,13 @@ import java.util.*;
 public class OutputWriter extends FilterWriter {
 
 	/**
-	 * TODO
+	 * The buffer where the content is collected. This buffer can be flushed.
 	 * 
 	 */
 	private StringBuffer _buf = new StringBuffer();
+
 	/**
-	 * TODO
+	 * The marked position. If the writer is flushed, then the marker is set to zero.
 	 * 
 	 */
 	private int _mark = 0;
@@ -28,7 +31,7 @@ public class OutputWriter extends FilterWriter {
 
 
 	/**
-	 * TODO
+	 * Creates an OutputWriter instance with the destination writer.
 	 * 
 	 * @param	out	TODO
 	 */
@@ -37,20 +40,20 @@ public class OutputWriter extends FilterWriter {
 	}
 
 	/**
-	 * TODO
+	 * Write a string.
 	 * 
 	 * @param	str	TODO
-	 * @exception	IOException	TODO
+	 * @exception	IOException	If an I/O error occurs
 	 */
 	public void write(String str) throws IOException {
 		_buf.append(str);
 	}
 	
 	/**
-	 * TODO
+	 * Write an array of characters.
 	 * 
 	 * @param	chArray	TODO
-	 * @exception	IOException	TODO
+	 * @exception	IOException	If an I/O error occurs
 	 */
 	public void write(char[] chArray) throws IOException {
 		_buf.append(chArray);
@@ -58,19 +61,19 @@ public class OutputWriter extends FilterWriter {
 	
 	
 	/**
-	 * TODO
+	 * Write a portion of a string.
 	 * 
 	 * @param	str	TODO
 	 * @param	offset	TODO
 	 * @param	length	TODO
-	 * @exception	IOException	TODO
+	 * @exception	IOException	If an I/O error occurs
 	 */
 	public void write(String str, int offset, int length) throws IOException {
 		_buf.append(str.substring(offset, length));
 	}
 
 	/**
-	 * TODO
+	 * Write a single character.
 	 * 
 	 * @param	ch	TODO
 	 */
@@ -79,21 +82,21 @@ public class OutputWriter extends FilterWriter {
 	}
 
 	/**
-	 * TODO
+	 * Write a portion of an array of characters.
 	 * 
 	 * @param	chArray	TODO
 	 * @param	offset	TODO
 	 * @param	length	TODO
-	 * @exception	IOException	TODO
+	 * @exception	IOException	If an I/O error occurs
 	 */
 	public void write(char[] chArray, int offset, int length) throws IOException {
 		_buf.append(new String(chArray).substring(offset, length));
 	}
 
 	/**
-	 * TODO
+	 * Flush the stream.
 	 * 
-	 * @exception	IOException	TODO
+	 * @exception	IOException	If an I/O error occurs
 	 */
 	public void flush() throws IOException {
 		out.write(_buf.toString());
@@ -103,9 +106,9 @@ public class OutputWriter extends FilterWriter {
 	}
 	
 	/**
-	 * TODO
+	 * Close the stream.
 	 * 
-	 * @exception	IOException	TODO
+	 * @exception	IOException	If an I/O error occurs
 	 */
 	public void close() throws IOException {
 		flush();
@@ -114,7 +117,7 @@ public class OutputWriter extends FilterWriter {
 
 
 	/**
-	 * TODO
+	 * Marks the current position in the buffer.
 	 * 
 	 */
 	public void mark() {
@@ -122,7 +125,7 @@ public class OutputWriter extends FilterWriter {
 	}
 
 	/**
-	 * TODO
+	 * resets the buffer to the marked position.
 	 * 
 	 */
 	public void reset() {

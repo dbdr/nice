@@ -7,7 +7,7 @@ import java.util.*;
 import nice.tools.testsuite.*;
 
 /**
- * Output logs the statements in a html file.
+ * Output logs the statements in html Format.
  * 
  * @author	Alex Greif <a href="mailto:alex.greif@web.de">alex.greif@web.de</a>
  * @version	$Id$
@@ -15,7 +15,8 @@ import nice.tools.testsuite.*;
 public class HtmlOutput extends AbstractOutput {
 
 	/**
-	 * TODO
+	 * Creates an instance of HtmlFormat where the formatted output
+	 should be written to the specified writer.
 	 * 
 	 * @param	out	TODO
 	 */
@@ -104,10 +105,9 @@ public class HtmlOutput extends AbstractOutput {
 	
 	
 	/**
-	 * TODO
+	 * Returns the line break that is specific to this output.
 	 * 
-	 */
-	protected String getLineBreak() {
+	 */	protected String getLineBreak() {
 		return "<br>";
 	}
 

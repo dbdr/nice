@@ -18,7 +18,8 @@ public class ConsoleOutput extends TextOutput {
 
 
 	/**
-	 * TODO
+	 * Creates an instance of ConsoleOutput that uses the System.out to
+	 * write the messages.
 	 * 
 	 */
 	public ConsoleOutput() {

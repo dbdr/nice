@@ -7,7 +7,8 @@ import java.util.*;
 
 
 /**
- * TODO
+ * Abstract representation of the test engine output.
+ * This class holds a reference to the underlying writer.
  * 
  * @author	Alex Greif <a href="mailto:alex.greif@web.de">alex.greif@web.de</a>
  * @version	$Id$
@@ -22,7 +23,7 @@ public abstract class AbstractOutput implements Output {
 	private OutputWriter _writer;
 
 	/**
-	 * TODO
+	 * Creates an instance of AbstractWriter with the underlying writer.
 	 * 
 	 * @param	out	TODO
 	 */
@@ -32,7 +33,7 @@ public abstract class AbstractOutput implements Output {
 
 
 	/**
-	 * TODO
+	 * Writes a string to the writer of this output.
 	 * 
 	 * @param	str	TODO
 	 */
@@ -46,22 +47,25 @@ public abstract class AbstractOutput implements Output {
 
 
 	/**
-	 * TODO
+	 * Marks the current position in the buffer of the writer of this output.
 	 * 
 	 */
 	protected void mark() {
 		_writer.mark();
 	}
+
+
 	/**
-	 * TODO
+	 * Resets the buffer to the writer to the marked position.
 	 * 
 	 */
 	protected void reset() {
 		_writer.reset();
 	}
 
+
 	/**
-	 * TODO
+	 * Closes the writer of the writer of this output.
 	 * 
 	 */
 	public void close() {
@@ -74,7 +78,7 @@ public abstract class AbstractOutput implements Output {
 
 
 	/**
-	 * TODO
+	 * Flushes the writer of this output.
 	 * 
 	 */
 	protected void flush() {
@@ -158,7 +162,8 @@ public abstract class AbstractOutput implements Output {
 
 
 	/**
-	 * TODO
+	 * Returns the line break that is specific to this output.
+	 * Default is the unix type linebreak
 	 * 
 	 */
 	protected String getLineBreak() {
@@ -166,7 +171,8 @@ public abstract class AbstractOutput implements Output {
 	}
 	
 	/**
-	 * TODO
+	 * Returns the indentation as string that should be used in this output format.
+	 * The daultvalue is an empty string.
 	 * 
 	 */
 	protected String getIndent() {

@@ -1,0 +1,20 @@
+/// PASS
+  /// TOPLEVEL
+  /* A simple global var. */
+  var int x = 0;
+
+/// PASS
+  /// TOPLEVEL
+  /* A global var can have a null value. */
+  var ?int x = null;
+
+/// PASS
+  /// TOPLEVEL
+  /* A global var can have a null value. */
+  var ?String x = null;
+
+/// PASS
+  /* Modifying a global var. */
+  x = 1;
+  /// TOPLEVEL
+  var int x = 0;

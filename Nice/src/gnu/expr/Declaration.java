@@ -529,7 +529,7 @@ public class Declaration
     if (value instanceof QuoteExp)
       {
 	Object val = ((QuoteExp) value).getValue();
-	if (val.getClass().getName().equals(ftype.getName()))
+	if (val != null && val.getClass().getName().equals(ftype.getName()))
 	  {
 	    Literal literal = comp.findLiteral(val);
 	    if (literal.field == null)
@@ -540,8 +540,9 @@ public class Declaration
 	&& (ftype instanceof PrimType
 	    || "java.lang.String".equals(ftype.getName())))
       {
-	field.setConstantValue(((QuoteExp) value).getValue(), 
-			       field.getDeclaringClass());
+	Object val = ((QuoteExp) value).getValue();
+	if (val != null)
+	  field.setConstantValue(val, field.getDeclaringClass());
       }
     else if ((isIndirectBinding() || value != null)
 	     && ! getFlag(IS_UNKNOWN))

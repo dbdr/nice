@@ -213,12 +213,14 @@ public class Pattern implements Located
 
     if (sym instanceof EnumDefinition.EnumSymbol)
       {
-         EnumDefinition.EnumSymbol symbol = (EnumDefinition.EnumSymbol)sym;
-	 NewExp val = (NewExp)symbol.getValue();
+        EnumDefinition.EnumSymbol symbol = (EnumDefinition.EnumSymbol)sym;
+	NewExp val = (NewExp)symbol.getValue();
 
-	 tc = val.tc;
-	 atValue = new ConstantExp(null, tc, symbol,
+	tc = val.tc;
+	atValue = new ConstantExp(null, tc, symbol,
 				name.toString(), location);
+	refName = name;
+        name = null;
         return;
       }
     
@@ -238,6 +240,7 @@ public class Pattern implements Located
 								location));
 	 tc = val.tc;
 	 atValue = val;
+         name = null;
        }
      else if (symbol.getValue() instanceof NewExp)
        {
@@ -246,6 +249,8 @@ public class Pattern implements Located
 	 tc = val.tc;
 	 atValue = new ConstantExp(null, tc, symbol,
 				name.toString(), location);
+	 refName = name;
+         name = null;
        }
      else
        User.error(name, "The value of " + name + " can't be used as pattern");
@@ -648,7 +653,7 @@ public class Pattern implements Located
           return "@\'" + atValue.value + "\'";
 
 	if (atReference())
-          return "@=" + name;
+          return "@=" + refName;
 
         if (atString())
 	  return "@\"" + ((StringConstantExp)atValue).escapedValue + "\""; 

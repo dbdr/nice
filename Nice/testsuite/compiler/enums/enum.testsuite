@@ -112,3 +112,9 @@
   assert nickel.value == nickel.foo();
   assert dime.value == dime.foo();
   assert quarter.value == quarter.foo();
+
+/// PASS
+  /// Toplevel
+  enum Signal { High, Low, X }
+  Signal `&`(Signal x, Signal y) = x;
+  `&`(Low, Low) = Low;

@@ -1,3 +1,10 @@
+nice (0.7.1) unstable; urgency=low
+
+  * Made "instanceof" to work with classes defined in the same package.
+  * Enhanced error message for invalid calls to anonymous functions.
+
+ --
+
 nice (0.7.0) unstable; urgency=low
 
   * Added the possibility to call "super" from a method implementation.

@@ -1,5 +1,16 @@
 nice (0.9.7)
 
+  * Methods can be overriden using the override keyword:
+      class A {
+        A doSomething() { ... }
+      }
+      class B extends A {
+        override B doSomething() { ... }
+      }
+    An important aspect is that the return type can be more precise than the
+    original type (covariance).
+    Overriding without the override keyword (a la Java) is accepted but 
+    generates a warning.
   * When importing a java package, it is possible to specify that its methods
     do not accept null arguments:
       import some.java.pkg.* (!);

@@ -46,7 +46,6 @@
   't   : recompile also the current package
   'all : recompile all packages"
 )
-(defvar nice-static-flag 't)
 (defvar nice-last-location 1)
 (defconst nice-extension ".nice")
 (defconst nice-extension-regexp "\\.nice$")
@@ -294,8 +293,6 @@
   (define-key nice-mode-map [menu-bar] (make-sparse-keymap))
   (define-key nice-mode-map [menu-bar c]
     (cons "Nice" (make-sparse-keymap "Nice")))
-  (define-key nice-mode-map [menu-bar c nice-toggle-static]
-    '("Toggle static compilation mode" . nice-toggle-static))
   (define-key nice-mode-map [menu-bar c nice-toggle-recompile-all]
     '("Toggle force-recompile-all mode" . nice-toggle-recompile-all))
   (define-key nice-mode-map [menu-bar c nice-toggle-recompile]
@@ -364,7 +361,6 @@ Mode for editing/compiling Nice programs.
   C-c p                   nice-toggle-pretty-print
   C-c r                   nice-toggle-recompile
   C-c R                   nice-toggle-recompile-all
-  C-c s                   nice-toggle-static
   C-c e                   nice-toggle-experimental
 
 * THE MODE IS CONTROLED BY THE FOLLOWING VARIABLES:
@@ -439,7 +435,6 @@ Mode for editing/compiling Nice programs.
   (local-set-key "\C-c\C-n" 'nice-next-error)
   (local-set-key "\C-cr" 'nice-toggle-recompile)
   (local-set-key "\C-cR" 'nice-toggle-recompile-all)
-  (local-set-key "\C-cs" 'nice-toggle-static)
   (local-set-key "\C-ce" 'nice-toggle-experimental)
   (local-set-key "\C-l" 'nice-fontify-buffer)
   (local-set-key "{" 'c-electric-brace)
@@ -515,7 +510,7 @@ Mode for editing/compiling Nice programs.
 			(if nice-experimental-flag " -e")
 			(if nice-recompile-flag
 			    (if (equal nice-recompile-flag 'all) " -R" " -r"))
-			(if nice-static-flag " -s")))))
+			))))
 	    (concat prog " " (nice-buffer-pkg-name)))
     )
     

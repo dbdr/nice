@@ -48,6 +48,8 @@ public class Access {
   /**
      @return true if code in class c can access method m, with the first
      argument of the call being receiver.
+
+     receiver is null if the call is static.
   */
   public static boolean legal(ClassType c, Method m, Type receiver)
   {
@@ -62,7 +64,7 @@ public class Access {
 
     // clone is the only method overriden for arrays, where it is public.
     // (JLS-2 10.7)
-    if (m.getName().equals("clone") && receiver.isArray())
+    if (receiver != null && receiver.isArray() && m.getName().equals("clone"))
       return true;
 
     // DEFAULT (PACKAGE) OR PROTECTED
@@ -70,10 +72,7 @@ public class Access {
       return true;
 
     // PROTECTED
-    /* TODO: For now, we consider all default access as also protected. Being 
-       more precise needs an implementation of the visibility system in Nice.
-    */
-    return //(mod & PROTECTED) != 0 &&
+    return (mod & PROTECTED) != 0 &&
       c.isSubclass(target) && receiver.isSubtype(c);
   }
 }

@@ -673,7 +673,7 @@ public class NiceClass extends ClassDefinition.ClassImplementation
      Collect in 'constraints' the constraints set by each class
      on the type parameters.
   */
-  private static List getNativeConstructorParameters
+  private List getNativeConstructorParameters
     (TypeConstructor tc, List constraints)
   {
     List constructors = TypeConstructors.getConstructors(tc);
@@ -690,11 +690,24 @@ public class NiceClass extends ClassDefinition.ClassImplementation
     List res = new ArrayList(constructors.size());
     for (Iterator i = constructors.iterator(); i.hasNext();)
       {
-	MethodDeclaration.Symbol m = (MethodDeclaration.Symbol) i.next();
+	MethodDeclaration m =
+          ((MethodDeclaration.Symbol) i.next()).getMethodDeclaration();
+
+        // Only consider parent methods for which a call from this class
+        // is legal.
+        if (m instanceof JavaMethod)
+          {
+            gnu.bytecode.ClassType thisClass = classe.getClassType();
+            if (! gnu.bytecode.Access.legal(thisClass,
+                                            ((JavaMethod) m).reflectMethod,
+                                            thisClass))
+              continue;
+          }
+
 	List params = new ArrayList(10);
-        params.add(m.getMethodDeclaration());
+        params.add(m);
         res.add(params);
-	mlsub.typing.Monotype[] args = m.getMethodDeclaration().getArgTypes();
+	mlsub.typing.Monotype[] args = m.getArgTypes();
 	for (int j = 0; j < args.length; j++)
 	  params.add(new FormalParameters.Parameter(Monotype.create(args[j])));
       }

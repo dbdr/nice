@@ -153,7 +153,8 @@ public class NiceDoc extends Task {
 												 project.getBaseDir().getAbsolutePath());
 
 			NicecListener listener = new NicecListener(this);
-			Compilation compilation = bossa.modules.fun.createCompilation(listener);
+			Compilation compilation = bossa.modules.fun.createCompilation
+				(listener, new bossa.parser.JavaccParser(true));
 			if (sourcepath != null)
 				compilation.sourcePath = sourcepath;
 			compilation.packagePath = classpath + (nestedClasspath != null ? File.pathSeparator+nestedClasspath : "");

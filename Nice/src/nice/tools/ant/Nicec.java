@@ -290,7 +290,7 @@ public class Nicec extends Task {
 
 						NicecListener listener = new NicecListener(this);
 						Compilation compilation = bossa.modules.fun.createCompilation
-							(listener);
+							(listener, new bossa.parser.JavaccParser(false));
             if (sourcepath != null)
               compilation.sourcePath = sourcepath;
             if (destination != null)

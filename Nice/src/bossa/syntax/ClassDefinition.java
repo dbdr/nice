@@ -78,13 +78,11 @@ abstract public class ClassDefinition extends Definition
     this.isAbstract = isAbstract;
     this.isInterface = isInterface;
     
-    if(typeParameters==null)
-      // XXX optim
-      this.typeParameters = new ArrayList(0);
+    if(typeParameters==null || typeParameters.size() == 0)
+      this.typeParameters = null;
     else
-      this.typeParameters = typeParameters;
-    // XXX remove
-    this.typeParametersVariances = typeParametersVariances;
+      this.typeParameters = (MonotypeVar[]) 
+	typeParameters.toArray(new MonotypeVar[typeParameters.size()]);
     
     this.variance = makeVariance(typeParametersVariances);
     
@@ -179,11 +177,6 @@ abstract public class ClassDefinition extends Definition
    * Selectors
    ****************************************************************/
 
-  List getTypeParameters()
-  {
-    return typeParameters;
-  }
-
   /** Create type parameters with the same names as in the class. */
   public mlsub.typing.MonotypeVar[] createSameTypeParameters()
   {
@@ -203,6 +196,19 @@ abstract public class ClassDefinition extends Definition
     return thisTypeParams;
   }
 
+  public static mlsub.typing.MonotypeVar[] createSameTypeParameters
+    (MonotypeVar[] typeParameters)
+  {
+    if (typeParameters == null)
+      return null;
+    
+    mlsub.typing.MonotypeVar[] thisTypeParams = 
+      new mlsub.typing.MonotypeVar[typeParameters.length];
+    for(int i=0; i<thisTypeParams.length; i++)
+      thisTypeParams[i] = new MonotypeVar(typeParameters[i].toString());
+    return thisTypeParams;
+  }
+
   public mlsub.typing.TypeSymbol getTypeSymbol()
   {
     if (associatedInterface != null)
@@ -213,10 +219,7 @@ abstract public class ClassDefinition extends Definition
   
   protected mlsub.typing.Monotype lowlevelMonotype()
   {
-    return new mlsub.typing.MonotypeConstructor
-      (tc, typeParameters.size()==0 
-       ? null : 
-       (mlsub.typing.Monotype[]) typeParameters.toArray(new MonotypeVar[typeParameters.size()]));
+    return new mlsub.typing.MonotypeConstructor(tc, typeParameters);
   }
   
   public final boolean isConcrete()
@@ -315,15 +318,13 @@ abstract public class ClassDefinition extends Definition
   
   private String printTP()
   {
-    if (typeParameters == null ||
-	typeParameters.size() == 0)
+    if (typeParameters == null)
       return "";
 
     StringBuffer res = new StringBuffer("<");
-    int n = 0;
-    for (Iterator i = typeParameters.iterator(); i.hasNext();)
+    for (int n = 0; n < typeParameters.length; n++)
       {
-	switch (variance.getVariance(n++)) 
+	switch (variance.getVariance(n)) 
 	  {
 	  case Variance.CONTRAVARIANT: 
 	    res.append("-");
@@ -332,8 +333,8 @@ abstract public class ClassDefinition extends Definition
 	    res.append("+");
 	    break;
 	  }
-	res.append(i.next().toString());
-	if (i.hasNext())
+	res.append(typeParameters[n].toString());
+	if (n + 1 < typeParameters.length)
 	  res.append(", ");
       }
     return res.append(">").toString();
@@ -465,10 +466,7 @@ abstract public class ClassDefinition extends Definition
   
   mlsub.typing.TypeConstructor tc;
 
-  //MonotypeVar[] typeParameters;
-  List /* of TypeSymbol */ typeParameters;
-  // XXX remove
-  List /* of Boolean */ typeParametersVariances;
+  private final MonotypeVar[] typeParameters;
   protected List
     /* of TypeConstructor */ extensions,
     /* of Interface */ implementations,

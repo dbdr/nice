@@ -39,6 +39,23 @@ public class Constraint extends Node
     construct(binders,atomics);
   }
   
+  public Constraint(TypeSymbol[] binders, List atomics)
+  {
+    super(Node.upper);
+    construct(arrayToList(binders),atomics);
+  }
+  
+  private List arrayToList(Object[] a)
+  {
+    if (a == null || a.length == 0)
+      return null;
+
+    List res = new ArrayList(a.length);
+    for (int i = 0; i < a.length; i++)
+      res.add(a[i]);
+    return res;
+  }
+
   private void construct(List binders, List atomics)
   {
     if(binders==null)

@@ -129,12 +129,13 @@ public class NiceClass extends ClassDefinition
       return;
     
     TypeScope localScope = new TypeScope(typeScope);
-    try{
-      localScope.addSymbols(typeParameters);
-    }
-    catch(TypeScope.DuplicateName e){
-      User.error(this, e);
-    }
+    if (typeParameters != null)
+      try{
+	localScope.addSymbols(typeParameters);
+      }
+      catch(TypeScope.DuplicateName e){
+	User.error(this, e);
+      }
     
     for (int i = 0; i < fields.length; i++)
       {

@@ -37,7 +37,7 @@ public class NiceFieldAccess extends FieldAccess
   public NiceFieldAccess
     (ClassDefinition classDef, 
      LocatedString fieldName, Monotype fieldType,
-     List classTypeParameters)
+     mlsub.typing.MonotypeVar[] classTypeParameters)
   {
     super(fieldName, new Constraint(classTypeParameters,null),
 	  fieldType, makeList(Monotype.create(Monotype.sure(classDef.lowlevelMonotype()))));

@@ -1,0 +1,9 @@
+/// FAIL
+  System.out./* /// FAIL HERE */println(foo: "abc");
+
+/// FAIL
+  /* /// FAIL HERE */foo(xzy: 10);
+  /// Toplevel
+  void foo(int abc) {}
+  void foo() {}
+

@@ -600,8 +600,8 @@ void atomics(List res):
 // if res is null, we just want lookahead
 { AtomicConstraint k; }
 {
-  k=atomicConstraint() { if(res!=null) res.add(k); }
-  ( "," k=atomicConstraint() { if(res!=null) res.add(k); } ) *
+  k=atomicConstraint() { res.add(k); }
+  ( "," k=atomicConstraint() { res.add(k); } ) *
 }
 
 Constraint constraint():

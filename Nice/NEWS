@@ -38,11 +38,12 @@ nice (0.9.11)
           return buffer.append("ZERO\n");
         ...
       }
-   * Added instanceof on option types. For instance 'x instanceof ?String'
-     is equivalent to 'x == null || x instanceof String'.
-   * Added binary integer literals. Examples: '0B1011' '0b1010_0000_0101_1111'.
-   * Removed octal integer literals.
-   * Bug fixes (negative int hex literals, ...)
+  * Added instanceof on option types. For instance 'x instanceof ?String'
+    is equivalent to 'x == null || x instanceof String'.
+  * Added binary integer literals. Examples: '0B1011' '0b1010_0000_0101_1111'.
+  * Removed octal integer literals.
+  * Some error messages locate more precisely the source of the error.
+  * Bug fixes (negative int hex literals, ...)
 
  --
 

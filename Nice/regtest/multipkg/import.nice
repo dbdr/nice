@@ -23,4 +23,9 @@ test_import()
   println("0=" + getZero());
 
   println("1=" + overload1(1) + ", 1=" + overload2(1));
+
+  polymorphic1(new regtest.basic.Multi());
+  polymorphic2(new regtest.basic.Multi());
+
+  map(["A"], fun(String s)=>{println(s);});
 }

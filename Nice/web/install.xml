@@ -156,7 +156,7 @@ you should also <link linkend="emacs">install the &nice; mode</link>.
 <section id="other"><title>Other systems</title>
 <para>
 There are no specific instructions for other operating systems.
-Howevever &nice; can be used on any system that works with &java;.
+However &nice; can be used on any system that works with &java;.
 If you are in this situation, please 
 <ulink url="mailto:bonniot@users.sourceforge.net">contact me</ulink>
 to share your experience and augment the documentation.

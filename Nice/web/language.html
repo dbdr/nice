@@ -16,7 +16,7 @@ The <font face="Comic Sans MS">Nice</font> programming language</h1></center>
 <blockquote>This page is intended to provide a gentle introduction to the
 Nice programming language. The goal is to help you write your first Nice
 programs. It does not describe every feature of the language, nor gives
-it a complete description of the powerfull type system.
+it a complete description of the powerful type system.
 <br>&nbsp;
 
 <h2>Requirements</h2>
@@ -150,7 +150,7 @@ alternative to the <b>Visitor Pattern</b>.
 There is a 
 <a
 href="http://nice.sourceforge.net/cgi-bin/twiki/view/Doc/FunctionsAndMethods">
-more detailed introduction to methods in Nice</a> on the wiki.
+more detailed introduction to methods in Nice</a> on the Wiki.
 
 <br>&nbsp;
 
@@ -159,7 +159,7 @@ more detailed introduction to methods in Nice</a> on the wiki.
 <h2>Parametric classes</h2>
 
 Classes and interfaces can have type parameters. For example, the <tt>Collection</tt>
-interface is parametrized by the type of its elements:
+interface is parameterized by the type of its elements:
 <p>
 <PRE>
 <FONT COLOR="#0000ee">interface</FONT> <FONT COLOR="#cd0000">Collection</FONT>&lt;T&gt; 
@@ -197,7 +197,7 @@ as long as they are compatible (have a common super type).
 For instance, it's legal to use <tt>equals</tt> to compare expressions 
 of type <tt>Collection&lt;int></tt> and <tt>LinkedList&lt;int></tt>,
 while it is not with types <tt>Collection&lt;String></tt> and <tt>String</tt>.
-<p>This approach is more sensible than Java's one, where the laters would
+<p>This approach is more sensible than Java's one, where the latter would
 be allowed and would always return false (not even raising a runtime error),
 while it is very likely a bug to compare a collection of strings to a string.
 <p>Note that it is also possible to define a function that takes two unrelated
@@ -207,12 +207,12 @@ to have the same typing behaviour it has in Java:
 
 <h2>Precise types</h2>
 
-Java's type system is too simple to express many usefull types. 
+Java's type system is too simple to express many useful types. 
 For instance, let's suppose we want to declare the method <tt>filter</tt> 
 on collections. This method applies a function to each element of 
 the collection, and returns a new collection containing the elements for which
 that function returns <tt>true</tt>. 
-Futhermore, the new collection is an instance of the same class as 
+Furthermore, the new collection is an instance of the same class as 
 the original collection: 
 <tt>filter</tt> applied to a <tt>List</tt> return a new <tt>List</tt>,
 <tt>filter</tt> applied to a <tt>Vector</tt> return a new <tt>Vector</tt>,
@@ -347,10 +347,10 @@ The code of a method implementation, that goes between <tt>{</tt> and
 
 <ul>
 <li>
-<b>No casts</b>. We claim that our powerfull type system makes it possible
+<b>No casts</b>. We claim that our powerful type system makes it possible
 to avoid nearly every cast used in other object-oriented languages (say
 95% of them!). For the 5% remaining, it is possible to write methods that
-do the same job, except you have to explicitely write what happens if
+do the same job, except you have to explicitly write what happens if
 the "cast" fails, which is a nice property.</li>
 
 <li>
@@ -380,7 +380,7 @@ type of the returned expressions.</li>
 <li>
 <b>Functional arguments</b>. A function or a method can have functional
 arguments. The syntax for functional types is <tt>(T1, T2, ..., Tn)
--> T</tt>. The parentheses can be ommited if there is only one argument type:
+-> T</tt>. The parentheses can be omitted if there is only one argument type:
 <tt>int->int</tt>.
 </li>
 
@@ -437,11 +437,11 @@ void main(String[] args)
 <h2>Interfacing with Java</h2>
 
 It is possible to use java classes and methods from Nice programs. This
-is a great advantage, since it gives access to the gigantic and evergrowing
+is a great advantage, since it gives access to the gigantic and ever-growing
 set of Java libraries.
 <p>One can just use java classes in types, and call java methods in Nice
-code. It is not necessary to explicitely import classes or methods. An
-import statement can be used if one does not want to reapeat a package
+code. It is not necessary to explicitly import classes or methods. An
+import statement can be used if one does not want to repeat a package
 name.
 <p><tt>import java.io.*;</tt>
 <p><tt>{</tt>

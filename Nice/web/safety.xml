@@ -25,7 +25,7 @@
 <para>
 Programming is a complex and error prone task. The most obvious
 consequence of this fact is the presence of bugs in programs. Every
-user can experience that, for most softwares, there are are ways to
+user can experience that, for most software, there are are ways to
 use it that lead to inappropriate results, internal error messages or
 even termination of the program, if not of the whole computer. A
 hidden consequence of bugs is a large amount amount of effort, time
@@ -231,7 +231,7 @@ and that are give higher safety and power.
 <para>
 In most object-oriented languages, methods are selected at run time
 depending on the class of the first argument. Because this first
-argument has such a distinct role, it is syntaxically separated from
+argument has such a distinct role, it is syntactically separated from
 the others, and place before the name of the method, before a
 dot. However, it is sometimes necessary to select a method depending
 on <emphasis>several</emphasis> arguments. Here is a typical example,
@@ -475,7 +475,7 @@ use because of their high complexity.
 &nice; offers a much simpler and limited contribution, but it can be
 very useful in practice. Code using arrays contains a few idiomatic
 patterns that occur repeatedly: iterating through the elements of an
-array, finding an element matching a certain criterium, ... These are
+array, finding an element matching a certain criterion, ... These are
 typically done using loops. Besides being a little tedious, these
 patterns open the opportunity for mistakes in the indexes, which leads
 to run time errors. These errors will often be discovered soon while

@@ -833,7 +833,7 @@ Window createMyWindow()
 	In that case, the types (and if applicable names)
 	of the arguments are used to try to disambiguate which method
 	must be called. If only one method is applicable, it is called.
-	Moreoever, if several methods are applicable, but one has a more
+	Moreover, if several methods are applicable, but one has a more
 	restricted domain than all the others, it is chosen
 	<footnote>
 	  <para>
@@ -985,7 +985,7 @@ void main(String[] args)
       example:
       </para>
       <example>
-      <title>String concatentation</title>
+      <title>String concatenation</title>
       <programlisting lang="nice"><![CDATA[
       String name = "Nice";
       int factor = 10;
@@ -1132,7 +1132,7 @@ String concat2(Collection<String> strings)
 	syntax in &java;.
       </para>
       <para>
-      	In most cases, characters should be treatead as abstract entities
+      	In most cases, characters should be treated as abstract entities
 	and not as the numbers that happen to encode them. Therefore,
 	the <literal>char</literal> type is not a numeric type in Nice. 
 	Operations on characters can be performed using the methods of class

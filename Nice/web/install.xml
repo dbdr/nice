@@ -11,7 +11,9 @@
 Installing the Nice compiler
 </description>
 
-<keywords>nice, compiler, install, windows, debian, linux, unix</keywords>
+<keywords>
+nice, compiler, install, windows, debian, linux, unix, eclipse
+</keywords>
 
 <para>
 Select your system:
@@ -19,6 +21,15 @@ Select your system:
 <itemizedlist>
 
 <listitem><para>
+<inlinemediaobject><imageobject>
+<imagedata fileref="images/eclipse.png"/>
+</imageobject></inlinemediaobject>
+
+<link linkend="eclipse">Eclipse</link>
+
+</para></listitem>
+<listitem><para>
+
 <inlinemediaobject><imageobject>
 <imagedata fileref="images/debian.png"/>
 </imageobject></inlinemediaobject>
@@ -80,9 +91,25 @@ Mandrake Linux (rpm)</link>
 </para>
 
 
+<section id="eclipse"><title>Eclipse</title>
+<para>
+Nice can be installed inside the 
+<ulink url="http://eclipse.org">eclipse</ulink> development platform. 
+Download the <ulink 
+url="http://sf.net/project/showfiles.php?group_id=12788&amp;package_id=94229">
+plugin zip file</ulink>, and unzip it inside the <literal>plugins</literal>
+sub-directory of your eclipse directory.
+The Nice plugin works for versions 2.1 and 3.0 of eclipse, and it includes
+the Nice compiler, so you don't need to install it separately.
+</para>
+</section>
+
 <section id="deb"><title>Debian Linux</title>
 <para>
-Simply download the <ulink url="nice.deb">Debian package</ulink>
+Nice is in the Debian archive, so you can
+simply <literal>apt-get install nice</literal>.
+Alternatively, you can download the 
+<ulink url="nice.deb">Debian package</ulink> from this site
 and install it with <literal>dpkg -i nice_*.deb</literal>.
 </para>
 </section>

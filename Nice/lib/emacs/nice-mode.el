@@ -19,6 +19,8 @@
 (require 'cc-defs)
 (require 'cc-langs)
 
+(require 'compile)
+
 (defvar nice-program (if (eq window-system 'w32) "nicec.bat" "nicec")
   "Nice compiler name.")
 
@@ -520,14 +522,14 @@ Mode for editing/compiling Nice programs.
 )
 
 (defun nice-compilation-exit (process-status exit-status exit-message)
-  (case exit-status 
-    ((0) (let ((win (get-buffer-window nice-compile-buffer)))
+  (cond 
+    ((eq exit-status 0) (let ((win (get-buffer-window nice-compile-buffer)))
 	   (if win (delete-window win)))
      '("successful" . "OK"))
-    ((1) '("Compiler bug" . "Bug"))
-    ((2) (save-excursion (next-error) '("error" . "error")))
-    ((3) '("successful with warning" . "warning"))
-    ('otherwise '("Unknown exit status" . ""))
+    ((eq exit-status 1) '("Compiler bug" . "Bug"))
+    ((eq exit-status 2) (save-excursion (next-error) '("error" . "error")))
+    ((eq exit-status 3) '("successful with warning" . "warning"))
+    (t '("Unknown exit status" . ""))
   ) 
 )
 

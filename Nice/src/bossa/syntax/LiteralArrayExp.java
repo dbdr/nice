@@ -55,6 +55,9 @@ public class LiteralArrayExp extends Expression
   */
   Expression resolveOverloading(Polytype expectedType)
   {
+    if (true)
+      return this;
+
     // This can only help
     expectedType.simplify();
 

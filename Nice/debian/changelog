@@ -4,6 +4,10 @@ nice (0.0.020300) unstable; urgency=low
       final String s1 = "Java style";
       const String s2 = "const is a (prefered) synonym for final";
       const s3 = "The type of constants can be omitted";
+  * More compatibility with Java:
+    - checks that all statements are reachable
+    - classes can be declared public or private
+    - ...
 
  --
 

@@ -159,7 +159,8 @@ public final class Dispatch
 	failed = true;
 	if(sortedAlternatives.size()==0)
 	  User.error
-	    (method, "Method " + method + " is declared but never defined");
+	    (method, "Method " + method + " is declared but never defined:\n" +
+	     "no alternative matches " + Util.map("(",", ",")",tags));
 	else
 	  User.warning(method,
 		       "Method " + method + " is not exhaustive:\n" + 
@@ -243,7 +244,7 @@ public final class Dispatch
   }
 
   /** 
-      Translates (nullTC, *) into null and (sureTC, tc) into tc
+      Translates (nullTC, *) into nullTC and (sureTC, tc) into tc
 
       @param tags a list of tuples.
         Each tuple has 2 * length elements, 

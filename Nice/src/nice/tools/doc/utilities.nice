@@ -1,0 +1,107 @@
+package nice.tools.doc;
+
+/*
+ * Provides miscellaneous methods for tasks such as htmlencoding and
+ * escaping filenames
+ * @author Francis Barber
+ * @date 26/11/2004
+ */
+ 
+ /**
+ * Checks a filename to make sure it doesn't contain funny characters.
+ */
+String escapeFilename(String filename) {
+    // Make sure we don't generate another index.html, as it would overwrite
+    // the index (with care to case-insensitive filesystems)
+    if (filename.equalsIgnoreCase("index"))
+      // XXX: we should make sure this is unique
+      return "_index";
+
+    char[] chars = filename.toCharArray();
+    StringBuffer buf = new StringBuffer();
+    for(char c : chars) {
+        if(!Character.isLetterOrDigit(c)) {
+            buf.append('$');
+            buf.append(hexEncode(int(c)));
+        }
+        else {
+            buf.append(c);
+        }
+    }
+    return buf.toString();
+}
+
+String hexEncode(int i) {
+    String num = Integer.toHexString(i);
+    for(int pad = num.length(); pad < 4; pad++)
+        num = "0" + num;
+    return num.toUpperCase();
+}
+
+/** Converts a String that may contain characters such as '<' to one that will display
+ * properly in html.  Submitted by S. Bayer to http://www.rgagnon.com/javadetails/java-0306.html,
+ * although I've made some changes.
+ */
+String htmlEncode(String s) {
+    StringBuffer sb = new StringBuffer(s.length());
+    //true if last char was blank - this is for handling non-breaking spaces
+    boolean lastWasBlankChar = false;
+
+    for (int i = 0; i < s.length(); i++) {
+        char c = s.charAt(i);
+        if (c == ' ') {
+            // blank gets extra work,
+            // this solves the problem you get if you replace all
+            // blanks with &nbsp;, if you do that you lose
+            // word breaking
+            if (lastWasBlankChar) {
+                lastWasBlankChar = false;
+                sb.append("&nbsp;");
+            }
+            else {
+                lastWasBlankChar = true;
+                sb.append(' ');
+            }
+        }
+        else {
+            lastWasBlankChar = false;
+            // HTML Special Chars
+            if (c == '"')
+                sb.append("&quot;");
+            else if (c == '&')
+                sb.append("&amp;");
+            else if (c == '<')
+                sb.append("&lt;");
+            else if (c == '>')
+                sb.append("&gt;");
+            else if (c == '\n')
+                // Handle Newline
+                sb.append("&lt;br/&gt;");
+            else {
+                //char and int are not related in nice, so we can't do a direct cast
+                //hence, we use int(c) instead of (int)c
+                int ci = int(c);
+                /*This was originally 160 in S. Bayer version, but I couldn't see the sense of that
+                 *so I changed it to 128, as 127 is the maximum value of an ascii character
+                 */
+                if(ci < 128)
+                    // nothing special only 7 Bit
+                    sb.append(c);
+                else {
+                    // Not 7 Bit use the unicode system
+                    sb.append("&#");
+                    sb.append(ci);
+                    sb.append(';');
+                }
+            }
+        }
+    }
+    return sb.toString();
+}
+
+/** Convenience method that converts a LocatedString to a String and then htmlEncodes it.
+ * @param s the string to encode
+ */
+String htmlEncode(LocatedString s) {
+    return htmlEncode(s.toString());
+}

@@ -2,5 +2,5 @@
 
 for f in *.java.in ; do
   sed -e '/@if WITHOUT COLLECTIONS@/,/@endif WITHOUT COLLECTIONS@/d' \
-	-e '/@*if WITH COLLECTIONS@/d' $f > `expr match $f '\(.*\).in'`
+	-e '/@*if WITH COLLECTIONS@/d' $f > `expr $f : '\(.*\).in'`
 done

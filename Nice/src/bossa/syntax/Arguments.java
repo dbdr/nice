@@ -41,7 +41,7 @@ public class Arguments
       return (name == null ? "" : name + ":" ) + value;
     }
     
-    Expression value;
+    private Expression value;
     LocatedString name;
   }
   

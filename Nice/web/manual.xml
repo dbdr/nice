@@ -11,28 +11,29 @@
     <author><firstname>Daniel</firstname><surname>Bonniot</surname></author>
     <copyright><year>2002</year><holder>Daniel Bonniot</holder></copyright>
   </bookinfo>
-  <preface><title>Foreword</title> 
-    This manual describes the Nice programming language.
-    It is currently under redaction, which means that many aspects of 
-    the language are absent from it, or that some sections are mostly empty.
-    During this time, it is recommended to read also the 
-    <ulink url="http://nice.sf.net/language.html">Nice tutorial</ulink>, 
-    which contains lots of additional information.
-    Both documents currently assume some knowledge of Java, or at least
-    of an object oriented language.
+  <preface><title>Foreword</title>
+    <para>
+      This manual describes the Nice programming language.
+      It is currently under redaction, which means that many aspects of 
+      the language are absent from it, or that some sections are mostly empty.
+      During this time, it is recommended to read also the 
+      <ulink url="http://nice.sf.net/language.html">Nice tutorial</ulink>, 
+      which contains lots of additional information.
+      Both documents currently assume some knowledge of Java, or at least
+      of an object oriented language.
+    </para>
   </preface>
 
   <chapter><title>Philosophy</title>
-
-    <blockquote>
-      <attribution>Alan J. Perlis</attribution>
-      <para>
-	A language that doesn't affect the way you think about programming, 
-	is not worth knowing.
-      </para>
-    </blockquote>
-
     <para>
+      <blockquote>
+	<attribution>Alan J. Perlis</attribution>
+	<para>
+	  A language that doesn't affect the way you think about programming, 
+	  is not worth knowing.
+	</para>
+      </blockquote>
+
       The Nice programming language is a new object-oriented programming 
       language based on Java. 
       It incorporates features from functional programming, 
@@ -80,6 +81,8 @@
   </chapter>
 
   <chapter><title>Packages</title>
+    <para>
+    </para>
   </chapter>
 
   <chapter><title>Classes</title>
@@ -149,7 +152,7 @@ void test()
 	in the definition of the class
 	<footnote>
 	  <para>
-	    This problem is happens in Java when the order of the parameters 
+	    This problem happens in Java when the order of the parameters 
 	    of a constructor is changed.
 	    If the exchanged parameters have incompatible types, 
 	    the compilation of the caller will fail; 
@@ -186,12 +189,61 @@ void test()
 
   <chapter id="function"><title>Functions</title>
     <section><title>Declaration</title>
+      <para>
+      </para>
     </section>
+
+    <section id="namedParameters"><title>Named parameters</title>
+      <para>
+	When calling a function (or a <link linkend="method">method</link>)
+	it is possible to specify the name of a parameter, followed by
+	<literal>:</literal> before the value given to that parameter.
+	Named parameters can be given in any order.
+	This is useful when writting the call, because one does not
+	need to remember the order of the arguments, but only their names.
+	When reading the code, it is much easier to understand
+	what each parameter is, provided the name was well chosen.
+	
+	<example>
+	  <title>Using named parameters</title>
+	  <programlisting lang="nice">
+void copy(File from, File to) { ... }
+...
+copy(from: f1, to: f2);
+copy(to: f3, from: f4);</programlisting>
+	</example>
+	
+	Of course it is still possible to omit the names of the parameters,
+	in which case the arguments must be given in the order of the 
+	declaration.
+      </para>
+    </section>
+
     <section id="optionalParameters"><title>Optional parameters</title>
+      <para>
+	Many functions have some parameters that are used most of the time
+	with the same value. In Nice, a parameter can be given a default
+	value. It can then be omitted when calling the function and the
+	default value is used. 
+
+	<example>
+	  <title>Using named and optional parameters</title>
+	  <programlisting lang="nice">
+void copy(File from, File to, int bufferSize = 1000) { ... }
+...
+copy(from: f1, to: f2); // with a buffer size of 1000
+copy(from: f1, to: f2, bufferSize: 4000);</programlisting>
+	</example>
+
+	In the function definition, the optional parameters should be 
+	listed after the required parameters. This is needed to allow 
+	calls that do not name the arguments and want to use the default
+	values for the optional parameters.
+      </para>
     </section>
   </chapter>
 
-  <chapter><title>Methods</title>
+  <chapter id="method"><title>Methods</title>
     <section><title>Declaring methods</title>
       <para>
       </para>
@@ -237,6 +289,14 @@ void test()
   </chapter>
 
   <chapter><title>Types</title>
+    <para>
+    </para>
   </chapter>
 
 </book>
+
+<!--
+  Local Variables:
+  sgml-validate-command: "xmllint -noout -valid %s %s"
+  End:
+ -->

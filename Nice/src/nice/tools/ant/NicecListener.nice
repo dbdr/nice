@@ -1,7 +1,7 @@
 /**************************************************************************/
 /*                                N I C E                                 */
 /*             A high-level object-oriented research language             */
-/*                        (c) Daniel Bonniot 2003                         */
+/*                        (c) Daniel Bonniot 2004                         */
 /*                                                                        */
 /*  This program is free software; you can redistribute it and/or modify  */
 /*  it under the terms of the GNU General Public License as published by  */
@@ -10,24 +10,28 @@
 /*                                                                        */
 /**************************************************************************/
 
-package nice.tools.compiler.console;
+package nice.tools.ant;
 
 /**
-   Keep track of messages reported to the user.
+   Listener for Nicec that reports to Ant.
 
-   @author Daniel Bonniot (bonniot@users.sourceforge.net)
+   @author Daniel Bonniot (bonniot@users.sf.net)
  */
 
-public ConsoleOutput consoleOutput() = new ConsoleOutput();
+import nice.tools.compiler;
 
-public final class ConsoleOutput extends StatusCodeListener
+import org.apache.tools.ant.*;
+
+public final class NicecListener extends StatusCodeListener
 {
+  org.apache.tools.ant.Task task;
+
   progress(packageName, phase)
   {
     if (packageName != null)
-      println(packageName + ": " + phase);
+      task.log(packageName + ": " + phase);
     else
-      println(phase);
+      task.log(phase);
   }
 
   progress(percent)
@@ -39,29 +43,30 @@ public final class ConsoleOutput extends StatusCodeListener
   {
     super;
     if (location != null)
-      System.out.println("\n" + location + ":\n" + message);
+      task.log("\n" + location + ":\n" + message);
     else
-      System.out.println("\n" + message);
+      task.log("\n" + message);
   }
   
   error(location, message)
   {
     super;
     if (location != null)
-      System.err.println("\n" + location + ":\n" + message);
+      task.log("\n" + location + ":\n" + message, Project.MSG_ERR);
     else
-      System.err.println("\n" + message);
+      task.log("\n" + message, Project.MSG_ERR);
   }
   
   /** A bug has occured inside the compiler. */
   bug(stackTrace, url)
   {
     super;
-    System.err.println
+    task.log
       ("\nAn exception has occured in the compiler\n" +
        "Please fill-in a bug report at the following webpage:\n" +
        url +
        //       "\n\nException: " + exn.toString() +
-       "\n\nStack trace:\n" + stackTrace);
+       "\n\nStack trace:\n" + stackTrace, 
+       Project.MSG_ERR);
   }
 }

@@ -1,0 +1,64 @@
+/**************************************************************************/
+/*                                N I C E                                 */
+/*             A high-level object-oriented research language             */
+/*                        (c) Daniel Bonniot 2004                         */
+/*                                                                        */
+/*  This program is free software; you can redistribute it and/or modify  */
+/*  it under the terms of the GNU General Public License as published by  */
+/*  the Free Software Foundation; either version 2 of the License, or     */
+/*  (at your option) any later version.                                   */
+/*                                                                        */
+/**************************************************************************/
+
+package nice.tools.compiler;
+
+/**
+   A minimal compilation listener that only keeps track of the result
+   of the compilation (success, failure, bug, warning).
+
+   This can be subclassed to provide additional features, like reporting
+   of the messages to a certain device.
+
+   @author Daniel Bonniot (bonniot@users.sf.net)
+ */
+
+let int OK      = 0; // Normal exit (compilation sucessful, version message)
+let int BUG     = 1; // Abnormal termination (bug in the compiler)
+let int ERROR   = 2; // Error reported (file missing, type error, ...)
+let int WARNING = 3; // Warning reported
+
+abstract class StatusCodeListener implements bossa.modules.CompilationListener
+{
+  public int statusCode = OK;
+
+  private void setStatusCode(int status)
+  {
+    if (worse(status, statusCode))
+      statusCode = status;
+  }
+
+  warning(location, message)
+  {
+    this.setStatusCode(WARNING);
+  }
+  
+  error(location, message)
+  {
+    this.setStatusCode(ERROR);
+  }
+  
+  /** A bug has occured inside the compiler. */
+  bug(stackTrace, url)
+  {
+    this.setStatusCode(BUG);
+  }
+}
+
+  boolean worse(int status, int than)
+{
+  if (than == OK) return true;
+  if (than == BUG) return false;
+  if (than == ERROR) return false;
+  if (than == WARNING) return status == BUG || status == ERROR;
+  return false;
+}

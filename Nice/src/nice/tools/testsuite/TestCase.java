@@ -294,13 +294,13 @@ public abstract class TestCase {
 				if (! _dontCompilePackages.contains(packageName)) {
 					int retval = compilePackage(packageName);
 					switch (retval) {
-					case nice.tools.compiler.console.fun.ERROR:
+					case nice.tools.compiler.fun.ERROR:
 						showMessages = true;
 						throw new TestSuiteException(ERROR_MSG);
-					case nice.tools.compiler.console.fun.BUG:
+					case nice.tools.compiler.fun.BUG:
 						showMessages = true;
 						throw new CompilerBugException(BUG_MSG);
-					case nice.tools.compiler.console.fun.WARNING:
+					case nice.tools.compiler.fun.WARNING:
 						showMessages = true;
 						break;
 					}

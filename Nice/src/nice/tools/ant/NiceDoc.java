@@ -164,14 +164,14 @@ public class NiceDoc extends Task {
 			int retval = console.statusCode;
 
 			switch (retval) {
-			case nice.tools.compiler.console.fun.ERROR:
+			case nice.tools.compiler.fun.ERROR:
 				throw new BuildException(ERROR_MSG, location);
-			case nice.tools.compiler.console.fun.BUG:
+			case nice.tools.compiler.fun.BUG:
 				throw new BuildException(BUG_MSG, location);
-			case nice.tools.compiler.console.fun.WARNING:
+			case nice.tools.compiler.fun.WARNING:
 				log(WARNING_MSG, Project.MSG_WARN);
 				break;
-			case nice.tools.compiler.console.fun.OK:
+			case nice.tools.compiler.fun.OK:
 				log(OK_MSG, Project.MSG_INFO);
 				break;
 			}

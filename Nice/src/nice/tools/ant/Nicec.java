@@ -288,9 +288,9 @@ public class Nicec extends Task {
             System.setProperty("user.dir", 
                                project.getBaseDir().getAbsolutePath());
 
-            nice.tools.compiler.console.ConsoleOutput console = 
-              nice.tools.compiler.console.fun.consoleOutput();
-            Compilation compilation = bossa.modules.fun.createCompilation(console);
+						NicecListener listener = new NicecListener(this);
+						Compilation compilation = bossa.modules.fun.createCompilation
+							(listener);
             if (sourcepath != null)
               compilation.sourcePath = sourcepath;
             if (destination != null)
@@ -304,17 +304,17 @@ public class Nicec extends Task {
             compilation.runtimeFile = runtime;
             nice.tools.compiler.fun.compile
               (compilation, pack, output, native_compiler, editor);
-            int retval = console.statusCode;
+            int retval = listener.statusCode;
 
             switch (retval) {
-            case nice.tools.compiler.console.fun.ERROR:
+            case nice.tools.compiler.fun.ERROR:
               throw new BuildException(ERROR_MSG, location);
-            case nice.tools.compiler.console.fun.BUG:
+            case nice.tools.compiler.fun.BUG:
               throw new BuildException(BUG_MSG, location);
-            case nice.tools.compiler.console.fun.WARNING:
+            case nice.tools.compiler.fun.WARNING:
               log(WARNING_MSG, Project.MSG_WARN);
               break;
-            case nice.tools.compiler.console.fun.OK:
+            case nice.tools.compiler.fun.OK:
               log(OK_MSG, Project.MSG_INFO);
               break;
             }

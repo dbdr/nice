@@ -11,7 +11,7 @@ fi
 
 if [ ! -r flow4j ]; then
   if [ ! -r ${SOURCES} ]; then
-      wget http://flow4j.sf.net/releases/${SOURCES}
+      wget http://nice.sf.net/tests/${SOURCES}
   fi
   mkdir flow4j
   tar zxf ${SOURCES} -C flow4j

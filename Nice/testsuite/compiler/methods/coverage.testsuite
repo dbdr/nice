@@ -1,0 +1,33 @@
+/// FAIL
+  /// Toplevel
+class B implements nice.lang.Comparable {
+ // `<` not implemented  
+}
+
+/// FAIL
+  /// Toplevel
+abstract interface I {
+  boolean fooI(alike);
+}
+
+class nice.lang.boolean implements I;
+fooI(b1@boolean, b2@boolean) = b1;
+
+class A implements I {
+ // `fooI` not implemented  
+}
+
+/// FAIL
+  /// Toplevel
+abstract interface I {
+  boolean fooI(String);
+}
+
+class A implements I {
+  fooI(x) = false;
+}
+
+class B implements I {
+ // `fooI` not implemented  
+}
+

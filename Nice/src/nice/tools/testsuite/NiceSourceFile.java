@@ -97,6 +97,22 @@ public class NiceSourceFile {
 	}
 
 
+
+
+	/**
+	 * Adds the global import statement
+	 * 
+	 */
+	public void addImportGlobal() {
+		_imports.add(GlobalSourceFile.PACKAGE_GLOBAL);
+	}
+
+
+
+
+
+
+
 	/**
 	 * Add a line to the main methods body.
 	 * 
@@ -269,7 +285,7 @@ public class NiceSourceFile {
 			writer.write((String)iter.next());
 			writer.write(";");
 			writer.newLine();
-		}			
+		}		
 	}
 	
 	/**

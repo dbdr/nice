@@ -68,6 +68,9 @@ public class TestCase {
 	private void createNewSourceFile() {
 		_currentSourceFile = new NiceSourceFile();
 		_niceSourceFiles.add(_currentSourceFile);
+		
+		if (_testSuite.hasGlobalSource())
+			_currentSourceFile.addImportGlobal();
 	}
 	
 	
@@ -122,7 +125,8 @@ public class TestCase {
 			sourceFile.write();
 		}
 		
-		_testSuite.getGlobalSource().write();
+		if (_testSuite.hasGlobalSource())
+			_testSuite.getGlobalSource().write();
 	}
 	
 	/**
@@ -287,16 +291,18 @@ public class TestCase {
 			TestNice.getOutput().log("");
 		}
 		//	global file
-		contentWriter = new StringWriter();
-		writer = new BufferedWriter(contentWriter);
-		try {
-			_testSuite.getGlobalSource().write(writer);
-			contentWriter.close();
-			writer.close();
-		} catch(IOException e) {e.printStackTrace();}
-		TestNice.getOutput().log("file " + _testSuite.getGlobalSource().getPackage() + "." + _testSuite.getGlobalSource().getFileName(),
-					contentWriter.toString());
-		TestNice.getOutput().log("");
+		if (_testSuite.hasGlobalSource()) {
+			contentWriter = new StringWriter();
+			writer = new BufferedWriter(contentWriter);
+			try {
+				_testSuite.getGlobalSource().write(writer);
+				contentWriter.close();
+				writer.close();
+			} catch(IOException e) {e.printStackTrace();}
+			TestNice.getOutput().log("file " + _testSuite.getGlobalSource().getPackage() + "." + _testSuite.getGlobalSource().getFileName(),
+						contentWriter.toString());
+			TestNice.getOutput().log("");
+		}
 		
 		//	compiler messages
 		TestNice.getOutput().log("nicec", _compilerMessagesStream.toString());

@@ -152,6 +152,15 @@ public class TestSuite {
 	}
 
 
+	/**
+	 * Returns whether we have a global source file.
+	 * 
+	 */
+	boolean hasGlobalSource() {
+		return ! _globalSource.isEmpty();
+	}
+
+
 
 
 

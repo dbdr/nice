@@ -15,12 +15,15 @@ import java.util.*;
  */
 public class GlobalSourceFile extends NiceSourceFile {
 
+	final static String PACKAGE_GLOBAL = "global";
+
+
 	/**
 	 * TODO
 	 * 
 	 */
 	public GlobalSourceFile() {
-		setPackage("global");
+		setPackage(PACKAGE_GLOBAL);
 	}
 
 
@@ -31,10 +34,6 @@ public class GlobalSourceFile extends NiceSourceFile {
 	 */
 	public void consumeLine(String line) {
 		addToTopLevel(line);
-	}
-
-	public boolean isEmpty() {
-		return false;
 	}
 
 }

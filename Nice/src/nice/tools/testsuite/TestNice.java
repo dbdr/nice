@@ -42,12 +42,6 @@ public class TestNice {
 	 * Keyword.
 	 * 
 	 */
-	static final String KEYWORD_GLOBAL = "global";
-
-	/**
-	 * Keyword.
-	 * 
-	 */
 	static final String KEYWORD_TOPLEVEL = "toplevel";
 
 	/**

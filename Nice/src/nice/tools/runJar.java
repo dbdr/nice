@@ -85,7 +85,7 @@ public class runJar
 	    System.exit(1);
 	  }
 	  catch(Throwable ex){
-	    System.err.println("Uncaught exception: ");
+	    System.err.println("Uncaught exception: " + e);
 	    ex.printStackTrace();
 	    System.exit(1);
 	  }

@@ -68,7 +68,7 @@ public class RetypedJavaMethod extends JavaMethod
         this.setIgnoredRetyping(this, "Ignoring retyping because class " + 
 	 	className + " was not found");
 
-        javaArgType = cast(new Type[javaTypes.size()-1]);
+        javaArgType = cast(new gnu.bytecode.Type[javaTypes.size()-1]);
         return;
       }
 

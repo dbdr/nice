@@ -134,12 +134,6 @@ public final class PrimitiveType
 	return gnu.bytecode.Type.pointer_type;
       }
 
-    if (name.equals("nice.lang.Type"))
-      {
-	// to differ with the null result, which signals error
-	return gnu.bytecode.Type.pointer_type;
-      }
-
     return null;
   }
   

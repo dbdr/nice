@@ -35,7 +35,6 @@ parse(progName@String, args, options)
 	else
 	  l = new LongOpt(name:o.longName,has_arg:optType(o),val:o.shortName);
         l.initLongOpt();
-	o.optval = l.getVal();
 
 	longOptions.add(l);
       }
@@ -52,9 +51,9 @@ parse(progName@String, args, options)
   g.initGetopt();
   // Parsing loop
   char c = g.getopt();
-  while (c != '\1')
+  while (c != noOptionsLeft)
     {
-      ?Option chosen = options.find(Option o => o.optval == c);
+      ?Option chosen = options.find(Option o => o.shortName == c);
       if (chosen != null)
 	chosen.doAction(g);
       

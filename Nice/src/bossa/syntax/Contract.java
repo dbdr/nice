@@ -72,7 +72,7 @@ public class Contract
 
   private Expression symbol(String name, Located loc)
   {
-    return new IdentExp(new LocatedString(name, loc.location()));
+    return dispatch.createIdentExp(new LocatedString(name, loc.location()));
   }
 
   void resolve(VarScope scope, TypeScope typeScope, 

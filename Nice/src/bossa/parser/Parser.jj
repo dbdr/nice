@@ -38,21 +38,21 @@ import mlsub.typing.MonotypeVar;
 
 public class Parser
 {
-  private static IdentExp symb(String name, Token t, boolean quoted)
+  private static Expression symb(String name, Token t, boolean quoted)
   {
-    return new IdentExp(new LocatedString(name, makeLocation(t),quoted));
+    return bossa.syntax.dispatch.createIdentExp(new LocatedString(name, makeLocation(t),quoted));
   }
-  private static IdentExp symb(String name, Token t)
+  private static Expression symb(String name, Token t)
   {
     return symb(name,t,true);
   }
-  private static IdentExp symb(Token t)
+  private static Expression symb(Token t)
   {
     return symb(t.image,t);
   }
-  private static IdentExp symb(String name, Location loc)
+  private static Expression symb(String name, Location loc)
   {
-    return new IdentExp(new LocatedString(name, loc));
+    return bossa.syntax.dispatch.createIdentExp(new LocatedString(name, loc));
   }
 
   private void parseException(String message) throws ParseException
@@ -838,7 +838,7 @@ Expression ParameterTuplePart(List statements, List monotypes):
   type=monotype()  id=ident()
   { monotypes.add(type);
     statements.add(bossa.syntax.dispatch.createLocalVariable(id, type, false, null)); 
-    return new IdentExp(id); }
+    return bossa.syntax.dispatch.createIdentExp(id); }
 | { Token first,last; }
   first="(" 
   { List parts = new LinkedList(); Expression part;
@@ -879,7 +879,7 @@ FormalParameters.Parameter formalParameter(List statements):
       ident = new LocatedString("tuple_arg_" + first.beginLine + "_" + first.beginColumn, 
 				makeLocation(first, last));
     } else { ident = id; }
-    Expression exp = bossa.syntax.dispatch.createAssignExp(new TupleExp(parts),new IdentExp(ident));
+    Expression exp = bossa.syntax.dispatch.createAssignExp(new TupleExp(parts),bossa.syntax.dispatch.createIdentExp(ident));
     exp.setLocation(makeLocation(first,last));
     statements.add(bossa.syntax.dispatch.createExpressionStmt(exp));
     t = new TupleType(types, makeLocation(first, last));
@@ -1659,11 +1659,11 @@ ConstantExp multiLineStringExp():
   }
 }
 
-IdentExp identExp():
+Expression identExp():
 { LocatedString i; }
 {
   i=identOrBackquoted()
-  { return new IdentExp(i); }
+  { return bossa.syntax.dispatch.createIdentExp(i); }
 }
 
 Expression SuperExp() :
@@ -1745,7 +1745,7 @@ MonoSymbol funExpParameter(List statements):
       name = new LocatedString("tuple_arg_" + first.beginLine + "_" + first.beginColumn, 
 				makeLocation(first, last));
     } else { name = ident; }
-    Expression exp = bossa.syntax.dispatch.createAssignExp(new TupleExp(parts),new IdentExp(name));
+    Expression exp = bossa.syntax.dispatch.createAssignExp(new TupleExp(parts),bossa.syntax.dispatch.createIdentExp(name));
     exp.setLocation(makeLocation(first,last));
     statements.add(bossa.syntax.dispatch.createExpressionStmt(exp));
     type = new TupleType(types, makeLocation(first, last));
@@ -2513,11 +2513,11 @@ Expression LocalTuplePart(List statements) :
 {
 ( //first look for a ident without matching a monotype
   LOOKAHEAD( doted_string() ( "," | ")" ) ) id=doted_string() 
-  { return new IdentExp(id); }
+  { return bossa.syntax.dispatch.createIdentExp(id); }
 | //then look for a monotype without matching a tuplePart
   LOOKAHEAD( monotype() ident() ) type=monotype()  id=ident() 
   { statements.add(bossa.syntax.dispatch.createLocalVariable(id, type, false, null)); 
-    return new IdentExp(id); }
+    return  bossa.syntax.dispatch.createIdentExp(id); }
 | //otherwise it's localtuple part
   "(" { List parts = new LinkedList(); Expression part; }
   part = LocalTuplePart(statements) { parts.add(part); }

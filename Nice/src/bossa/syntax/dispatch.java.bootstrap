@@ -12,6 +12,9 @@ import java.util.List;
 
 public class dispatch
 {
+  public static Expression createIdentExp(LocatedString i)
+  { return null; }
+
   public static Expression createSymbolExp(VarSymbol symbol, bossa.util.Location loc)
   { return null; }
 

@@ -477,7 +477,7 @@ analyse(IdentExp e, info) = analyseIdent(e, info, false);
 
 Expression analyseIdent(IdentExp e, Info info, boolean assigned)
 {
-  if (!e.infix) // infix symbols can only come from the global scope
+  if (!e.isInfix()) // infix symbols can only come from the global scope
     {
       ?VarSymbol sym = info.lookup(notNull(e.ident).toString());
 
@@ -507,7 +507,7 @@ Expression analyseIdent(IdentExp e, Info info, boolean assigned)
     }
 
   ?List<VarSymbol> symbols;
-  if (e.infix)
+  if (e.isInfix())
     symbols = cast(notNull(Node.getGlobalScope()).lookup(e.ident));
   else
     symbols = info.globalLookup(notNull(e.ident));

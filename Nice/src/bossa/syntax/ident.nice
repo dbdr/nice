@@ -1,0 +1,63 @@
+/**************************************************************************/
+/*                                N I C E                                 */
+/*             A high-level object-oriented research language             */
+/*                        (c) Daniel Bonniot 2004                         */
+/*                                                                        */
+/*  This program is free software; you can redistribute it and/or modify  */
+/*  it under the terms of the GNU General Public License as published by  */
+/*  the Free Software Foundation; either version 2 of the License, or     */
+/*  (at your option) any later version.                                   */
+/*                                                                        */
+/**************************************************************************/
+
+package bossa.syntax;
+
+import bossa.util.*;
+
+/**
+   Identifier supposed to be a variable (not a type).
+
+*/
+public class IdentExp extends Expression
+{
+  final LocatedString ident;
+
+  private boolean infix = false;
+  /** Resolve to a ClassExp or a PackageExp if ident is not known. */
+  boolean enableClassExp = false;
+  /**
+     Force production of overloaded symbol exp, even if there is just one case.
+   */
+  boolean alwaysOverloadedSymbol = false;
+
+  computeType()
+  {
+    Internal.error(this, "computeType in IdentExp (" + this + ")");
+  }
+
+  compile()
+  {
+    throw Internal.error("compile in IdentExp");
+  }
+  
+  toString() = ident.toString();
+
+  toString(param)
+  {
+    if (param == Printable.parsable)
+      return "`" + ident.toString() + "`";
+
+    return this.toString();
+  }
+
+  /** This ident is the function part of an infix call. */
+  boolean isInfix() = infix;
+  void setInfix() { infix = true; }
+}
+
+public Expression createIdentExp(LocatedString i)
+{
+  let res = new IdentExp(ident: i);
+  res.setLocation(i.location());
+  return res;
+}

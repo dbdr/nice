@@ -44,7 +44,7 @@ public Expression createAssignExp(Expression to, Expression value)
       args.add(new Arguments.Argument(value)); 
 
       return createCallExp(
-	new IdentExp(new LocatedString("set", to.function.location())),
+	createIdentExp(new LocatedString("set", to.function.location())),
         new Arguments(args));
     }  
 

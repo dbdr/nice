@@ -79,7 +79,7 @@ public EnumDefinition createEnumDefinition(LocatedString name, List<LocatedStrin
     // create the method implementation of family()
     globalDefs.add(createMethodBodyDefinition(impl, new LocatedString("family"),
 	null, new LinkedList(), createReturnStmt(createLiteralArrayExp(
-	elements.map(LocatedString elem => new IdentExp(elem))), true)));
+	elements.map(createIdentExp)), true)));
 
   //generate the prettyprint string
   String repr = "enum " + shortName;

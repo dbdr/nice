@@ -36,9 +36,6 @@ public class dispatch
   public static gnu.bytecode.Method getImplementationAbove(JavaMethod decl, gnu.bytecode.ClassType firstArg)
   { return null; }
 
-  static List removeNonMinimal(List l)
-  { return null; }
-
   static void resolveCCThis(Statement stmt, bossa.util.Located thisloc, NiceClass classe) {}
 
   static Pattern resolveGlobalConstants(Pattern pattern)
@@ -50,22 +47,7 @@ public class dispatch
   public static Pattern createPattern(LocatedString name)
   { return null; }
 
-  public static Pattern createPattern(LocatedString name, TypeIdent ti)
-  { return null; }
-
   public static Pattern createPattern(LocatedString name, mlsub.typing.TypeConstructor tc, boolean sure)
-  { return null; }
-
-  public static Pattern createPattern(TypeIdent tc, LocatedString name, boolean exactly, TypeIdent additional, mlsub.typing.TypeConstructor runtimeTC)
-  { return null; }
-
-  public static Pattern createPattern(ConstantExp value)
-  { return null; }
-
-  public static Pattern createPattern(ConstantExp value, TypeIdent additional)
-  { return null; }
-
-  public static Pattern createPattern(String kind, LocatedString name, ConstantExp value, LocatedString refName, bossa.util.Location loc)
   { return null; }
 
   public static boolean leq(Pattern a, Pattern b)
@@ -74,9 +56,6 @@ public class dispatch
   public static boolean disjoint(Pattern a, Pattern b)
   { return false; }
   
-  static Statement analyse(Statement  s, VarScope v, TypeScope t, boolean r)
-  { return null; }
-
   static Statement analyseMethodBody(Statement s, VarScope varScope, TypeScope typeScope, MonoSymbol[] params, boolean mustReturnAValue)
   { return null; }
   
@@ -108,19 +87,7 @@ public class dispatch
     return null;
   }
 
-  static bossa.util.UserError assignmentError
-    (bossa.util.Located responsible,
-     String target,
-     String targetType,
-     Expression value)
-  { return null; }
-
   public static void _printStackTraceWithSourceInfo(Throwable t) {}
-}
-
-class UnknownIdentException extends bossa.util.UserError
-{
-  LocatedString ident;
 }
 
 class Info {}

@@ -82,9 +82,10 @@ public abstract class MethodDeclaration extends Definition
     if (module.compiled() && ! notNull(parameters).hasDefaultValue())
       return;
 
+    boolean check = ! module.compiled();
     if (!mlsub.typing.Constraint.hasBinders(notNull(type).getConstraint()))
       {
-	notNull(parameters).typecheck(notNull(type).domain());
+	notNull(parameters).typecheck(notNull(type).domain(), check);
 	return;
       }
     
@@ -107,7 +108,7 @@ public abstract class MethodDeclaration extends Definition
         */
         mlsub.typing.Typing.implies();
 
-	notNull(parameters).typecheck(notNull(type).domain());
+	notNull(parameters).typecheck(notNull(type).domain(), check);
       }
       finally{
 	mlsub.typing.Typing.leave();

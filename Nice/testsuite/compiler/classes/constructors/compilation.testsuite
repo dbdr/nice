@@ -96,3 +96,14 @@ public class B { }
 
   /// package b import a
   {}
+
+/// PASS
+  /// package a
+  /// Toplevel
+class Scope<Sym>
+{
+  private List<Sym> empty = new Sym[0];
+}
+
+  /// package b import a
+  Scope<String> s = new Scope();

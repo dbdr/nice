@@ -78,10 +78,10 @@ public class FormalParameters extends Node
     return parameters.mapToArray(Parameter param => param.getSymbol());
   }
 
-  void typecheck(mlsub.typing.Monotype[] domain)
+  void typecheck(mlsub.typing.Monotype[] domain, boolean check)
   {
     for (int i = 0; i<this.size(); i++)
-      parameters[i].typecheck(domain[i]);
+      parameters[i].typecheck(domain[i], check);
   }
 
   resolve()
@@ -267,7 +267,7 @@ public class Parameter
   boolean match(String id) = false;
   boolean requiresName() = false;
 
-  void typecheck(mlsub.typing.Monotype domain) {}
+  void typecheck(mlsub.typing.Monotype domain, boolean check) {}
 
   ?Expression value() = null;
 
@@ -398,11 +398,19 @@ public class OptionalParameter extends NamedParameter
       notNull(symbol).state = ARGUMENT_REFERENCE;    
   }
 
-  typecheck(domain)
+  typecheck(domain, check)
   {
     defaultValue = defaultValue.noOverloading();
     //defaultValue = defaultValue.resolveOverloading(new mlsub.typing.Polytype(domain));
+
     typecheck(defaultValue);
+
+    if (! check)
+      {
+	// Make sure that the value's type is computed now (when the typing context is right).
+	defaultValue.getType();
+	return;
+      }
 
     try {
       mlsub.typing.Typing.leq(defaultValue.getType(), domain);

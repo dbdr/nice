@@ -37,7 +37,7 @@ public class UnknownMonotype extends Monotype implements TypeSymbol
 
   void tag(int variance) {}
 
-  public String toString() { return "?"; }
+  public String toString() { return "unknown"; }
 
   /****************************************************************
    * low-level interface

@@ -140,13 +140,35 @@ char `&`(char, char) = inline nice.lang.inline.NumOp("iAnd");
 char `|`(char, char) = inline nice.lang.inline.NumOp("iIOr");
 char `^`(char, char) = inline nice.lang.inline.NumOp("iXOr");
 
-// Accessing individual bits
+/****************************************************************
+ * Utilities (specific to Nice)
+ ****************************************************************/
+
+// Note: we should have testcases for this section.
+
+// Accessing individual bits of a word
 boolean get(long x, int bit) = (x & (1 << bit)) != 0;
 boolean get(int  x, int bit) = (x & (1 << bit)) != 0;
+
+/** Returns a random positive number smaller than limit. */
+int random(int limit) = int(floor(random() * limit));
 
 /****************************************************************
  * Native methods
  ****************************************************************/
+
+long round(double) = native long Math.round(double);
+int  round(float)  = native int  Math.round(float);
+
+double floor(double) = native double Math.floor(double);
+double random() = native double Math.random();
+
+double sin(double)  = native double Math.sin(double);
+double cos(double)  = native double Math.cos(double);
+double tan(double)  = native double Math.tan(double);
+double asin(double) = native double Math.asin(double);
+double acos(double) = native double Math.acos(double);
+double atan(double) = native double Math.atan(double);
 
 double max(double, double) = native double Math.max(double, double);
 double min(double, double) = native double Math.min(double, double);

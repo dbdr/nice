@@ -1,7 +1,7 @@
 /**************************************************************************/
 /*                                N I C E                                 */
 /*             A high-level object-oriented research language             */
-/*                        (c) Daniel Bonniot 2001                         */
+/*                        (c) Daniel Bonniot 2002                         */
 /*                                                                        */
 /*  This program is free software; you can redistribute it and/or modify  */
 /*  it under the terms of the GNU General Public License as published by  */
@@ -20,25 +20,25 @@ package nice.getopt;
 **/
 
 /** Creates a no parameter option. */
-Option option(char shortName = '?',
-	      String longName,
+Option option(String name,
 	      String purpose, 
-	      ()->void action);
+	      ()->void action,
+	      char letter = '?');
 
 /** Creates a required parameter option. */
-Option option(char shortName = '?',
-	      String longname,
+Option option(String name,
 	      String purpose,
 	      String optionHint,
-	      String->void actionParam);
+	      String->void actionParam,
+	      char letter = '?');
 
 /** Creates an optional parameter option. */
-Option option(char shortName = '?',
-	      String longname,
+Option option(String name,
 	      String purpose,
 	      String optionHint,
 	      ()->void actionNoParam,
-	      String->void actionParam);
+	      String->void actionParam,
+	      char letter = '?');
 
 
 abstract class Option
@@ -71,18 +71,18 @@ boolean noShortName(Option o) = o.shortName.equals('?');
  * "Constructors"
  ****************************************************************/
 
-option(shortName, longName, purpose, action) =
+option(longName, purpose, action, shortName) =
   new NoParamOption(shortName: shortName, longName: longName,
 		    purpose: purpose, action: action);
 
-option(shortName, longName, purpose, optionHint, action) =
+option(longName, purpose, optionHint, action, shortName) =
   new ParamOption(shortName: shortName,
 		  longName: longName,
 		  purpose: purpose,
 		  optionHint: optionHint,
 		  actionParam: action);
 
-option(shortName, longName, purpose, optionHint, actionNoParam, actionParam) =
+option(longName, purpose, optionHint, actionNoParam, actionParam, shortName) =
   new OptionalParamOption(shortName: shortName,
 			  longName: longName,
 			  purpose: purpose,

@@ -232,6 +232,7 @@ mlsub.typing.AtomicConstraint[?] resolvedConstraints(MethodContainer) = native M
 mlsub.typing.TypeSymbol[?] getBinders(MethodContainer) = native mlsub.typing.TypeSymbol[] MethodContainer.getBinders();
 ?Expression value(FormalParameters.Parameter) = native Expression FormalParameters.Parameter.value();
 ?LinkedList<MethodDeclaration.Symbol> getConstructors(TypeConstructor) = native LinkedList TypeConstructors.getConstructors(TypeConstructor);
+?gnu.bytecode.Attribute get(gnu.bytecode.AttrContainer, String) = native gnu.bytecode.Attribute gnu.bytecode.Attribute.get(gnu.bytecode.AttrContainer, String);
 
 // Retypings needed since java types are not strict.
 mlsub.typing.Polytype boolPolytype() = native PrimitiveType.boolPolytype;

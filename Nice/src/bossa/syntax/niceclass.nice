@@ -664,7 +664,7 @@ public class CNiceClass extends NiceClass
   importMethod(gnu.bytecode.Method method)
   {
     if (method.isConstructor())
-      return ImportedConstructor.load(this, method);
+      return loadImportedConstructor(this, method);
 
     if (method.getArity() == 0 && method.getName().equals("$init"))
       initializerMethod = nice.tools.code.Gen.superCaller(method);

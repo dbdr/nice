@@ -1,0 +1,113 @@
+/**************************************************************************/
+/*                                N I C E                                 */
+/*             A high-level object-oriented research language             */
+/*                        (c) Daniel Bonniot 2004                         */
+/*                                                                        */
+/*  This program is free software; you can redistribute it and/or modify  */
+/*  it under the terms of the GNU General Public License as published by  */
+/*  the Free Software Foundation; either version 2 of the License, or     */
+/*  (at your option) any later version.                                   */
+/*                                                                        */
+/**************************************************************************/
+
+package bossa.syntax;
+
+import bossa.util.*;
+
+/**
+   A constructor imported from a compiled package.
+
+ */
+public class ImportedConstructor extends Constructor
+{
+  private gnu.bytecode.Method method;
+
+  doResolve()
+  {
+    // Make sure the type is computed first
+    this.removeChild(this.getSymbol());
+    this.getSymbol().doResolve();
+
+    super;
+    this.addConstructorCallSymbol();
+  }
+
+  resolve()
+  {
+    super;
+
+    // Adding the constraint in the type scope. It can be useful for
+    // the default values of the formal parameters
+    // (e.g. an anonymous function refering to a type parameter).
+    let cst = this.getType().getConstraint();
+    if (mlsub.typing.Constraint.hasBinders(cst))
+      try {
+        notNull(typeScope).addSymbols(notNull(cst).binders());
+      } catch (TypeScope.DuplicateName ex) {
+        User.error(this, "Double declaration of the same type parameter");
+      }
+  }
+
+  computeCode()
+  {
+    return new gnu.expr.QuoteExp(new gnu.expr.InstantiateProc(method,
+			notNull(method.arg_types).length - arity));
+  }
+
+  getConstructorInvocation(boolean omitDefaults)
+  {
+    return new gnu.expr.QuoteExp(new gnu.expr.InitializeProc(
+		omitDefaults ? this.getMethodUsingDefaults() : method,
+		false, notNull(method.arg_types).length - arity));
+  }
+
+  getInitializationCode(boolean implicitThis)
+  {
+    return new gnu.expr.QuoteExp(new gnu.expr.InitializeProc(method, 
+		implicitThis, notNull(method.arg_types).length - arity));
+  }
+
+  /**
+      Return the Method for this constructor with the optional parameters
+      left out.
+  */
+  private gnu.bytecode.Method getMethodUsingDefaults()
+  {
+    gnu.bytecode.Type[] fullArgTypes = cast(method.arg_types);
+    List<gnu.bytecode.Type> argTypes = new LinkedList();
+
+    for (int i = 0; i < parameters.size; i++)
+      if (! parameters.hasDefaultValue(i))
+        argTypes.add(fullArgTypes[i]);
+
+    return method.getDeclaringClass().getDeclaredMethod("<init>",
+	 argTypes.toArray());
+  }
+}
+
+public ?ImportedConstructor loadImportedConstructor(NiceClass def, gnu.bytecode.Method method)
+  {
+  if (! method.isConstructor())
+    return null;
+
+  ?gnu.bytecode.MiscAttr attr = cast(gnu.bytecode.Attribute.get(method, "parameters"));
+  if (attr == null)
+    return null;
+
+  let classDef = def.getDefinition();
+  let returnType = Monotype.create(Monotype.sure
+      (new mlsub.typing.MonotypeConstructor(classDef.tc, classDef.getTypeParameters())));
+
+  let constraint = classDef.classConstraint == null ?
+          null : notNull(classDef.classConstraint).shallowClone();
+
+  let res = new ImportedConstructor(def,
+          gnu.bytecode.Attribute.get(method, "default") != null,
+          def.getDefinition().location(),
+          FormalParameters.readBytecodeAttribute(attr, 
+		notNull(JavaClasses.compilation).parser),
+          constraint, returnType, method: method);
+
+  TypeConstructors.addConstructor(res.classe.getDefinition().tc, res);
+  return res;
+}

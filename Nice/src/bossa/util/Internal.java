@@ -76,7 +76,7 @@ public final class Internal
   
   public static void error(String message)
   {
-    System.out.println("[Internal error] "+message);
+    System.out.println("[Internal error]\n" + message);
     printStackTrace();
     System.exit(1);
   }
@@ -94,7 +94,7 @@ public final class Internal
     if (msg == null)
       msg = "";
     
-    System.out.println("[Internal error] "+msg);
+    System.out.println("[Internal error]\n" + msg);
     e.printStackTrace();
     System.exit(1);
   }

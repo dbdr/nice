@@ -121,12 +121,7 @@ abstract public class ClassDefinition extends MethodContainer
       s.print("interface ");
       s.print(getSimpleName());
       s.print(this.printTypeParameters());
-      if (extendedInterfaces != null || javaInterfaces != null)
-	{
-	  s.print(" extends ");
-	  s.print(Util.map("", ", ", "", extendedInterfaces));
-	  s.print(Util.map("", ", ", "", javaInterfaces));	  
-	}
+      s.print(printInterfaces(" extends ", extendedInterfaces));
       implementation.printInterface(s);
     }
 
@@ -331,12 +326,7 @@ abstract public class ClassDefinition extends MethodContainer
       s.print(this.printTypeParameters());
       if (superClass != null)
 	s.print(" extends " + superClass);
-      if (impl != null || javaInterfaces != null)
-	{
-	  s.print(" implements ");
-	  s.print(Util.map("", ", ", "", impl));
-	  s.print(Util.map("", ", ", "", javaInterfaces));	  
-	}
+      s.print(printInterfaces(" implements ", impl));
       s.print(Util.map(" finally implements ",", ","",abs));
       implementation.printInterface(s);
     }
@@ -620,6 +610,22 @@ abstract public class ClassDefinition extends MethodContainer
   public String toString()
   {
     return "class "+name;
+  }
+
+  String printInterfaces(String keyword, mlsub.typing.Interface[] interfaces)
+  {
+    StringBuffer res = new StringBuffer();
+    if (interfaces != null || javaInterfaces != null)
+      {
+	res.append(keyword);
+	String sNice = Util.map("", ", ", "", interfaces);
+	res.append(sNice);
+	String sJava = Util.map("", ", ", "", javaInterfaces);
+	if (sNice != "" && sJava != "")
+	  res.append(", ");
+	res.append(sJava);
+      }
+    return res.toString();
   }
 
   mlsub.typing.TypeConstructor tc;

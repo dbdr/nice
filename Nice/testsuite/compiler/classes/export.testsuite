@@ -8,3 +8,49 @@
   int f() = 0;
   /// package b import a
   ;
+
+/// PASS
+  /// package a
+  /// TOPLEVEL
+  interface I {}
+  class A implements I {}
+  /// package b import a
+  ;
+
+/// PASS
+  /// package a
+  /// TOPLEVEL
+  class A implements java.lang.Comparable {}
+  /// package b import a
+  ;
+
+/// PASS
+  /// package a
+  /// TOPLEVEL
+  interface I {}
+  class A implements I, java.lang.Comparable {}
+  /// package b import a
+  ;
+
+/// PASS
+  /// package a
+  /// TOPLEVEL
+  interface I {}
+  interface J extends I {}
+  /// package b import a
+  ;
+
+/// PASS
+  /// package a
+  /// TOPLEVEL
+  interface I extends java.lang.Comparable {}
+  /// package b import a
+  ;
+
+/// PASS
+  /// package a
+  /// TOPLEVEL
+  interface I {}
+  interface J extends I, java.lang.Comparable {}
+  /// package b import a
+  ;

@@ -24,7 +24,7 @@ import bossa.util.User;
    @author Daniel Bonniot (bonniot@users.sourceforge.net)
  */
 
-abstract class UserOperator extends MethodDeclaration
+public abstract class UserOperator extends MethodDeclaration
 {
   UserOperator(LocatedString name, 
 	       Constraint constraint, Monotype returnType, 
@@ -38,6 +38,11 @@ abstract class UserOperator extends MethodDeclaration
   private Contract contract;
 
   public Contract getContract() { return contract; }
+
+  public boolean isMain()
+  {
+    return false;
+  }
 
   /****************************************************************
    * Resolution
@@ -144,4 +149,10 @@ abstract class UserOperator extends MethodDeclaration
     if (contract != Contract.noContract)
       typecheck();
   }
+
+  public gnu.expr.LambdaExp getLambda()
+  {
+    return null;
+  }
+
 }

@@ -43,7 +43,7 @@ public final class DispatchTest
   // Non instantiable
   private DispatchTest() { }
 
-  public static void register(NiceMethod m)
+  public static void register(UserOperator/*NiceMethod*/ m)
   {
     methods.add(m);
   }
@@ -72,7 +72,7 @@ public final class DispatchTest
     chrono.start();
     try {
       for(Iterator i = methods.iterator(); i.hasNext();)
-	test((NiceMethod) i.next(), module);
+	test((UserOperator/*NiceMethod*/) i.next(), module);
 
       for (Iterator i = javaMethods.iterator(); i.hasNext();)
 	test((JavaMethod) i.next(), module);
@@ -82,7 +82,7 @@ public final class DispatchTest
     }
   }
   
-  private static void test(NiceMethod m, bossa.modules.Package module)
+  private static void test(UserOperator/*NiceMethod*/ m, bossa.modules.Package module)
   {
     Stack sortedAlternatives = Alternative.sortedAlternatives(m);
 
@@ -142,7 +142,7 @@ public final class DispatchTest
     return false;
   }
 
-  private static boolean shortTestOk(NiceMethod method, Stack alternatives)
+  private static boolean shortTestOk(UserOperator/*NiceMethod*/ method, Stack alternatives)
   {
     if (alternatives.size() < 2)
       return false;

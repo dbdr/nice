@@ -394,7 +394,7 @@ public abstract class MethodDeclaration extends Definition
 
     return code;
   }
-  
+
   public gnu.bytecode.Type javaReturnType()
   {
     return nice.tools.code.Types.javaType(getReturnType());

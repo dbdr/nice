@@ -52,7 +52,7 @@ public Definition createMethodWithDefault
        Contract contract, boolean isOverride)
 {
   if (body == null)
-    return new NiceMethod(name, constraint, returnType, parameters,
+    return createNiceMethod(name, constraint, returnType, parameters,
 	contract, isOverride);
 
   return createDefaultMethodImplementation(name, constraint, returnType,
@@ -130,7 +130,7 @@ DefaultMethodImplementation createDefaultMethodImplementation
 	formals: parameters.asList().mapToArray(FormalParameters.Parameter param =>
         createPattern(param.getName() || new LocatedString("_", name.location()))));
   res.declaration = new MethodWithDefault(name, constraint, returnType,
-	parameters, contract, isOverride, implementation: res);
+	parameters, contract, isOverride: isOverride, implementation: res);
   res.addChild(res.declaration);
   return res;
 }

@@ -34,7 +34,7 @@ import java.util.*;
 
 public final class Compilation
 {
-  static void compile(NiceMethod m, 
+  static void compile(UserOperator/*NiceMethod*/ m, 
 		      Stack sortedAlternatives, 
 		      bossa.modules.Package module)
   {

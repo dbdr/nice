@@ -774,7 +774,7 @@ public class Package implements mlsub.compilation.Module, Located, bossa.syntax.
     return null;
   }
   
-  public gnu.expr.Expression getDispatchMethod(NiceMethod def)
+  public gnu.expr.Expression getDispatchMethod(UserOperator/*NiceMethod*/ def)
   {
     String name = def.getName().toString();
     LambdaExp res;

@@ -922,7 +922,7 @@ Definition internalMethodOrFunction(MethodContainer c, boolean isOverride):
   contract = contract()
   ( ";" | body = code() {statements.add(body);} )
   
-  { return NiceMethod.create(c, name, cst, returnType, parameters, 
+  { return bossa.syntax.dispatch.createMemberMethod(c, name, cst, returnType, parameters, 
                              body != null ? bossa.syntax.dispatch.createBlock(statements) : null,
                              contract, isOverride); }
 }

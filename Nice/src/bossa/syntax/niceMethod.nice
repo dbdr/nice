@@ -1,0 +1,314 @@
+/**************************************************************************/
+/*                             N I C E                                    */
+/*        A simple imperative object-oriented research language           */
+/*                   (c)  Daniel Bonniot 2004                             */
+/*                                                                        */
+/*  This program is free software; you can redistribute it and/or modify  */
+/*  it under the terms of the GNU General Public License as published by  */
+/*  the Free Software Foundation; either version 2 of the License, or     */
+/*  (at your option) any later version.                                   */
+/*                                                                        */
+/**************************************************************************/
+
+package bossa.syntax;
+
+import bossa.util.*;
+
+/**
+   A method defined in Nice.
+   
+ */
+public class NiceMethod extends UserOperator
+{
+  private boolean isOverride;
+  private bossa.util.Location returnTypeLocation = Location.nowhere();
+
+  private ?List<VarSymbol> homonyms = null;
+  private ?List<MethodDeclaration> specializedMethods = null;
+
+  {
+    bossa.link.DispatchTest.register(this);
+  }
+
+  isMain()
+  {
+    return name.toString().equals("main") && arity==1 &&
+	this.getType().domain()[0].toString().equals("java.lang.String[]");
+  }
+
+  resolve()
+  {
+    super;
+
+    // In interface files, we can assume that if the method overrides
+    // any other known method, there is an explicit override keyword.
+    // So we can avoid looking for specializations when there isn't one.
+    if (isOverride || ! module.interfaceFile())
+      {
+        homonyms = Node.getGlobalScope().lookup(this.getName());
+        if (notNull(homonyms).size() == 1)
+          homonyms = null;
+        else
+          notNull(homonyms).remove(this.getSymbol());
+      }
+  }
+
+  typedResolve()
+  {
+    this.findSpecializedMethods();
+
+    if (isOverride && specializedMethods == null)
+      User.error(this, "This method does not override any other method");
+
+    if (! this.inInterfaceFile() && ! isOverride && specializedMethods != null)
+      {
+        let parent = notNull(specializedMethods)[0];
+        boolean sameResult = 
+          this.getReturnType().toString().equals(parent.getReturnType().toString());
+
+        if (sameResult)
+          User.warning(this, "This method overrides " + parent +
+	"\nYou should make this explicit, either by omitting the return type" +
+                       "\nor by using the 'override' keyword");
+        else
+          User.warning(this, "This method overrides " + parent +
+	"\nYou should make this explicit by using the 'override' keyword");
+      }
+
+    super;
+  }
+
+  listSpecializedMethods()
+  {
+    return specializedMethods == null ? null : notNull(specializedMethods).iterator();
+  }
+
+  specializesMethods() = specializedMethods != null;
+
+  private void findSpecializedMethods()
+  {
+    if (homonyms == null)
+      return;
+
+    mlsub.typing.Domain ourDomain = nice.tools.typing.Types.domain(this.getType());
+
+    for (s : notNull(homonyms))
+      {
+        let d = s.getMethodDeclaration();
+
+        // Ignore non-methods.
+        if (d == null || d.isIgnored())
+          continue;
+
+        // Check that we have the same number of arguments
+        if (d.getArity() != this.getArity())
+          continue;
+
+        mlsub.typing.Domain itsDomain = nice.tools.typing.Types.domain(s.getType());
+
+        // Do we have a smaller domain?
+        if (! (mlsub.typing.Typing.smaller(ourDomain, itsDomain, true))
+            ||  nice.tools.typing.Types.typeParameterDispatch(this.getType(), s.getType()))
+          {
+            // If the method is imported,
+            // check if the reverse relation holds with that method
+            if (d.module != null && d.module.interfaceFile() &&
+                mlsub.typing.Typing.smaller(itsDomain, ourDomain, true) &&
+                ! nice.tools.typing.Types.typeParameterDispatch(s.getType(), this.getType()))
+              {
+                if (! nice.tools.typing.Types.covariantSpecialization(s.getType(), this.getType()))
+                  User.error
+                    (returnTypeLocation!=null ? returnTypeLocation : this.location(),
+"The return type should be less precise than the return type of method\n" +
+d + "\ndefined in:\n" +
+                     d.location());
+
+                // d is a specialized version of this.
+                if (d instanceof NiceMethod)
+                  d.addSpecializedMethod(this);
+
+                // Therefore, all its implementations also belong to this.
+                bossa.link.Alternative.addAll(d, this);
+              }
+
+            continue;
+          }
+
+        // In a compiled package, we don't need checking.
+        if (module.interfaceFile())
+          {
+            this.addSpecializedMethod(d);
+            continue;
+          }
+
+        if (! nice.tools.typing.Types.covariantSpecialization(this.getType(), s.getType()))
+          {
+            User.error
+              (returnTypeLocation != null ? returnTypeLocation : this.location(), 
+"The return type is less precise than the original return type of method\n" +
+d + "\ndefined in:\n" +
+               d.location());
+          }
+
+        // Check if we are a proper specialization, or if we actually have
+        // the same domain.
+        if (mlsub.typing.Typing.smaller(itsDomain, ourDomain))
+          {
+            if (module == d.module)
+              User.error(this, "This method has a domain identical to " +
+                         d + ", which is defined at " + d.location());
+            else
+              // Methods with identical domains in different packages are
+              // accepted, but they do not specialize each other.
+              // They can be refered to unambiguously by using their
+              // fully qualified name.
+              continue;
+          }
+
+        this.addSpecializedMethod(d);
+      }
+
+    homonyms = null;
+  }
+
+  private void addSpecializedMethod(MethodDeclaration method)
+  {
+    if (specializedMethods == null)
+      specializedMethods = new ArrayList(5);
+
+    notNull(specializedMethods).add(method);
+  }
+
+  /** @return a string that uniquely represents this method */
+  getFullName() = module.getName() + '.' + name + ':' + this.getType();
+
+  computeCode() = module.getDispatchMethod(this);
+
+  getLambda() = nice.tools.code.Gen.dereference(this.getCode());
+
+  compile() {}
+
+  printInterface(s)
+  {
+    if (specializedMethods != null)
+      s.print("override ");
+    s.print(this.toString() + ";\n");
+  }
+}
+
+
+public NiceMethod createNiceMethod(LocatedString name, 
+	Constraint constraint, Monotype returnType, 
+	FormalParameters parameters,
+	Contract contract, boolean isOverride)
+{
+  let res = new NiceMethod(name, constraint, returnType, parameters, contract,
+	isOverride: isOverride, returnTypeLocation: returnType.location());
+  return res; 
+}
+
+/**
+   The method is a class or interface member.
+    
+   @param c the class this method belongs to.
+   @param name the name of the method
+   @param typeParams the type parameters
+   @param constraint the constraint
+   @param returnType the return type
+   @param params the MonoTypes of the parameters
+   @param body the body of the function, or null if this is a real method
+*/
+public Definition createMemberMethod
+    (MethodContainer c,
+     LocatedString name, 
+     Constraint constraint,
+     Monotype returnType,
+     FormalParameters params,
+     Statement body, 
+     Contract contract,
+     boolean isOverride)
+{
+  // it is a class method, there is an implicit "this" argument
+
+  boolean hasAlike = returnType.containsAlike() || params.containsAlike();
+
+  let thisConstraint = c.classConstraint;
+  mlsub.typing.TypeSymbol[?] thisBinders = c.getBinders();
+    
+  int thisBindersLen = (thisBinders == null ? 0 : thisBinders.length);
+
+  mlsub.typing.TypeSymbol container = c.getTypeSymbol();
+  // contains the interface if container is one
+  ?mlsub.typing.Interface itf = null;
+  // contains the associated tc if possible
+  ?mlsub.typing.TypeConstructor tc = null;
+  if (container instanceof mlsub.typing.TypeConstructor)
+      tc = container;
+  else
+    {
+      itf = cast(container);
+      tc = notNull(itf).associatedTC();
+    }
+    
+  // if the constraint is True
+  // we must create a new one, otherwise we would
+  // modify other methods!
+  if (constraint == Constraint.True)
+      constraint = new Constraint
+	(new ArrayList(thisBindersLen + (hasAlike ? 1 : 0)),
+	 new ArrayList((hasAlike ? 1 : 0) + 
+                       (thisConstraint == null ? 0 : 
+                        thisConstraint.getAtoms().size())));
+
+  constraint.addBinders(thisBinders);
+  if (thisConstraint != null)
+    constraint.addAtoms(thisConstraint.getAtoms());
+
+  Monotype thisType;
+
+  // "alike" is not created for a non-abstract interface
+  // if alike is not present in the type, since it saves
+  // a type parameter (more intuituve for rebinding)
+  // and it does not change typing to do so.
+  if (hasAlike || tc == null)
+      {
+	TypeConstructor alikeTC = 
+	  new TypeConstructor("Alike", c.variance, false, false);
+	
+	// Add in front. Important for rebinding in method alternatives
+	constraint.addFirstBinder(alikeTC);
+	
+	mlsub.typing.AtomicConstraint atom;
+	if (itf != null)
+	  atom = new mlsub.typing.ImplementsCst(alikeTC, itf);
+	else
+	  atom = new mlsub.typing.TypeConstructorLeqCst(alikeTC, tc);
+	constraint.addAtom(AtomicConstraint.create(atom));
+
+	thisType = Monotype.create
+          (Monotype.sure
+           (new mlsub.typing.MonotypeConstructor
+            (alikeTC, c.getTypeParameters())));
+
+	if (hasAlike)
+	  {
+	    Map<String, bossa.syntax.Monotype> map = new HashMap();
+	    map.put(getAlikeID(), 
+		createMonotypeConstructor(alikeTC,
+			new TypeParameters(new ArrayList()), notNull(name.location())));
+	    returnType = returnType.substitute(map);
+	    params.substitute(map);
+	  }
+      }
+    else
+      thisType = Monotype.createSure(tc, c.getTypeParameters());
+
+    params.addThis(thisType);
+
+    if (body == null)
+      return createNiceMethod(name, constraint, returnType, params, contract,
+                            isOverride);
+    else
+      return createMethodWithDefault
+        (name, constraint, returnType, params, body, contract, isOverride);
+  }

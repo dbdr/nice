@@ -54,10 +54,11 @@ abstract class FieldAccess extends MethodDeclaration
    * Code generation
    ****************************************************************/
 
+  class UsingAsValue extends Error {}
+
   protected gnu.expr.Expression computeCode()
   {
-    Internal.error("Should not be used as a real method: " + this);
-    return null;
+    throw new UsingAsValue();
   }
 
   protected Declaration fieldDecl;

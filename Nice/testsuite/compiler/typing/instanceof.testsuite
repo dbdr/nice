@@ -214,3 +214,16 @@ void f() {
     f();
     B /* /// FAIL HERE */b = a;
   }
+
+/// FAIL bug
+  A a = new B();
+  if (a instanceof B) {
+    void->void f = () =>
+      { 
+        int x = a./* /// FAIL HERE */life;
+        a = new A();
+      };
+
+    a = new A();
+    f();
+  }

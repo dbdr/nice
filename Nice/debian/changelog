@@ -1,0 +1,9 @@
+nice (0.0.011217-1) unstable; urgency=low
+
+  * Initial Release.
+
+ -- Daniel Bonniot <bonniot@users.sourceforge.net>  Mon, 17 Dec 2001 16:32:13 +0100
+
+Local variables:
+mode: debian-changelog
+End:

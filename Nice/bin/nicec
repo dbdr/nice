@@ -76,7 +76,7 @@ while true; do
   done
 
 find_home "$scriptName"
-NICEC=${APPHOME}/lib/nice/Nice.jar
+NICEC=${APPHOME}/share/java/Nice.jar
 
 if [ "$EMACS" = t ]; then
   JAVA="${JAVA} -Demacs=true"

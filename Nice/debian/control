@@ -1,0 +1,28 @@
+Source: nice
+Section: devel
+Priority: optional
+Maintainer: Daniel Bonniot <bonniot@users.sourceforge.net>
+Build-Depends: debhelper (>> 3.0.0), java-compiler
+Depends: java-virtual-machine, java2-runtime
+Suggests: emacsen
+Standards-Version: 3.5.2
+
+Package: nice
+Architecture: all
+Description: Extension of Java with parametric types, multi-methods, and more.
+ Nice is a new object-oriented programming language. 
+ .
+ It extends Java with many advanced features:
+   * parametric types: this is especially for containers (list, hast-tables)
+     and allow shorter and safer code.
+   * higher-order functions: functions can be manipulated as first-class
+     objects, just like in Lisp, ML. This is much lighter than Java's
+     inner classes in many situations, for instance with listenersin a GUI.
+   * multi-methods: they allow methods to be defined outside
+     classes. This means that new methods can be defined on classes that
+     belong to a different package (even in java.*). 
+     Multi-methods alse extend usual methods with the possibility to
+     dispatch on every argument, instead of only the receiver.
+     This superseeds the Visitor pattern.
+   * tuples: this allows in particular methods to return several values.
+   * named and optional parameters to methods.

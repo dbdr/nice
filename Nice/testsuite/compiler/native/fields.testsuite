@@ -18,8 +18,10 @@ class J extends javax.swing.JPanel
   }
 }
 
-/// PASS bug
+/// PASS
   foo(File.separator);
   /// Toplevel
+import java.io.*;
+
 void foo(String) {}
 void foo(char) {}

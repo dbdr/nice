@@ -38,8 +38,8 @@ PrintStream stderr () = native System.err;
 <T> void println (T object) = System.out.println(object);
 
 // Constructors
-File File(?File, String) = native new File(File, String);
-File File(?String, String) = native new File(String, String);
+File newFile(?File, String) = native new File(File, String);
+File newFile(?String, String) = native new File(String, String);
 
 // OutputStreams
 <T> void print(PrintStream, T) = native void PrintStream.print(Object);

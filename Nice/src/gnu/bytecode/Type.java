@@ -1,4 +1,4 @@
-// Copyright (c) 1997  Per M.A. Bothner.
+// Copyright (c) 1997, 2000  Per M.A. Bothner.
 // This is free software;  for terms and warranty disclaimer see ./COPYING.
 
 package gnu.bytecode;
@@ -502,10 +502,11 @@ public abstract class Type {
   = boolean_ctype.addMethod ("booleanValue", typeArray0,
 			      boolean_type, Access.PUBLIC);
 
-  static public ClassType character_type = ClassType.make("java.lang.Character");
-  static public Method charValue_method
-  = character_type.addMethod ("charValue", typeArray0,
-			       char_type, Access.PUBLIC);
+  static public ClassType character_type = 
+    ClassType.make("java.lang.Character");
+  static public Method charValue_method = 
+    character_type.addMethod ("charValue", typeArray0,
+			      char_type, Access.PUBLIC);
   
   protected Class reflectClass;
 

@@ -23,10 +23,7 @@ public class ContinueStmt extends Statement
 {
   public static ContinueStmt make(LocatedString label)
   {
-    if (label == null)
-      return instance;
-    else
-      return new ContinueStmt(label);
+    return new ContinueStmt(label);
   }
 
   private static ContinueStmt instance = new ContinueStmt(null);

@@ -200,6 +200,37 @@ void _testVisibility()
   assert res.size == 1 && res[0] == 'f';
 }
 
+void _testNestedVisibility()
+{
+  Scope<char> root1 = new Scope(name: "root1", parent: null);
+  Scope<char> inner1 = new Scope(name: "inner1", parent: root1);
+
+  Scope<char> root2 = new Scope(name: "root2", parent: null);
+  Scope<char> inner2 = new Scope(name: "inner2", parent: root2);
+
+  root2.addImplicitOpen(root1);
+
+  List<char> res;
+
+  inner1.add("i", 'i', intimate);
+  res = inner2.get("i");
+  assert res.size == 0;
+  res = root2.get("i");
+  assert res.size == 0;
+
+  inner1.add("f", 'f', familial);
+  res = inner2.get("f");
+  assert res.size == 0;
+  res = root2.get("f");
+  assert res.size == 0;
+
+  inner1.add("g", 'g', general);
+  res = inner2.get("g");
+  assert res.size == 1 && res[0] == 'g';
+  res = root2.get("g");
+  assert res.size == 1 && res[0] == 'g';
+}
+
 void _testGeneralVisibility()
 {
   Scope<char> pkg1 = new Scope(name: "pkg1", parent: null);

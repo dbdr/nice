@@ -19,7 +19,7 @@ package nice.tools.visibility;
  */
 
 private <Sym> ?List<Sym> maybeGet(?Scope<Sym> s, String key) =
-  s == null ? null : s.map[key];
+  s == null ? null : (s.map[key] || s.opens[key] || s.parent.maybeGet(key));
 
 add(Scope this, key, value, visibility) = map.add(key, value);
 add(Scope this, key, value, familial)
@@ -30,8 +30,16 @@ add(Scope this, key, value, familial)
 }
 add(Scope this, key, value, general)
 {
-  super;
-  publicMap.add(key, value);
+  // Put the symbol at the highest possible level
+  if (parent != null)
+    notNull(parent).add(key, value, general);
+  else
+    {
+      // General implies familial
+      this.add(key, value, familial);
+
+      publicMap.add(key, value);
+    }
 }
 
 remove(Scope this, key, value)
@@ -44,7 +52,7 @@ addImplicitOpen(Scope this, Scope scope) = opens.add(scope);
 
 <Sym> get(Scope this, root, key) = this.getScope(root).maybeGet(key) || empty;
 
-<Sym> get(Scope this, key) = map[key] || parent.maybeGet(key) || opens[key] || empty;
+<Sym> get(Scope this, key) = this.maybeGet(key) || empty;
 
 <Sym> ?List<Sym> get(List<Scope<Sym>> scopes, String key)
 {

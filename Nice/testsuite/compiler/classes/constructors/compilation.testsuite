@@ -19,3 +19,28 @@ new A();
   /// package a import b
   /// Toplevel
 class A { String name = ""; }
+
+/// PASS
+  /* Checks that constructors are generated even when they are not used. 
+     This is important, since Java code could rely on them.
+   */
+  /// package a
+  /// Toplevel
+class A extends Error { }
+
+  /// package b import a
+Class.forName("a.A").getDeclaredConstructor([ String.class ]);
+
+/// PASS
+  /* Checks that constructors are generated even when they are not used. 
+     This is important, since Java code could rely on them.
+   */
+  /// package a
+  /// Toplevel
+class A extends Error { }
+
+  /// package b import a
+Class.forName("a.A").getDeclaredConstructor([ String.class ]);
+  /// Toplevel
+class B extends A {}
+equals(this@A, that@B) = true;

@@ -29,6 +29,7 @@ import java.text.*;
 // result is non-null
 
 Runtime getRuntime() = native Runtime Runtime.getRuntime();
+Class classForName(String name) = native Class Class.forName(String);
 
 String concat(String, String) = native String String.concat(String);
 StringBuffer append(StringBuffer, ?String) = 

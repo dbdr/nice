@@ -2,3 +2,4 @@
 *.nicei
 maven.log
 velocity.log
+semantic.cache

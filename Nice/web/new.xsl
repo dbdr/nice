@@ -72,7 +72,7 @@
        <td>
         <table border="0" cellpadding="3" cellspacing="1" width="100%">
          <tr>
-          <td bgcolor="#cccccc"><img align="middle" src="images/doc-48.png" alt="."/>
+          <td bgcolor="#cccccc"><img width="48" height="48" align="middle" src="images/doc-48.png" alt="."/>
            &nbsp;<span class="title">Documentation</span>
           </td>
          </tr>
@@ -108,7 +108,7 @@
        <td>
         <table border="0" cellpadding="3" cellspacing="1" width="100%">
          <tr>
-          <td bgcolor="#cccccc"><img align="middle" src="images/floppy-48.png" alt="."/>
+          <td bgcolor="#cccccc"><img width="48" height="48" align="middle" src="images/floppy-48.png" alt="."/>
            &nbsp;<span class="title"><a href="install.html">Download</a></span>
           </td>
          </tr>
@@ -125,7 +125,7 @@
        <td>
         <table border="0" cellpadding="3" cellspacing="1" width="100%">
          <tr>
-          <td bgcolor="#cccccc"><img align="middle" src="images/envelope-48.png" alt="."/>
+          <td bgcolor="#cccccc"><img width="48" height="48" align="middle" src="images/envelope-48.png" alt="."/>
            &nbsp;<span class="title">User's corner</span>
           </td>
          </tr>
@@ -208,7 +208,7 @@
        <td>
         <table border="0" cellpadding="3" cellspacing="1" width="100%">
          <tr>
-          <td bgcolor="#cccccc"><img align="middle" src="images/academic-48.png" alt="."/>
+          <td bgcolor="#cccccc"><img width="48" height="48" align="middle" src="images/academic-48.png" alt="."/>
            &nbsp;<span class="title"><a href="research.html">Academic Research</a></span>
           </td>
          </tr>

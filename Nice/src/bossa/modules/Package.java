@@ -288,7 +288,7 @@ public class Package implements mlsub.compilation.Module, Located, bossa.syntax.
     nice.tools.code.Types.reset();
     nice.tools.code.SpecialTypes.init();
     bossa.link.Alternative.reset();
-    bossa.link.Dispatch.reset();
+    bossa.link.DispatchTest.reset();
     bossa.syntax.dispatch.resetTypeDefinitionMappings();
     TypeConstructors.reset();
     JavaClasses.reset();
@@ -339,7 +339,7 @@ public class Package implements mlsub.compilation.Module, Located, bossa.syntax.
     if (compiling())
       {
         compilation.progress(this, "linking");
-	bossa.link.Dispatch.test(this);
+	bossa.link.DispatchTest.test(this);
 
 	finishCompilation();
 

@@ -230,7 +230,7 @@ public class RetypedJavaMethod extends JavaMethod
 
     ignoredRetyping = true;
 
-    bossa.link.Dispatch.unregister(this);
+    bossa.link.DispatchTest.unregister(this);
   }
  
   gnu.expr.Expression getConstructorInvocation(boolean omitDefaults)

@@ -122,7 +122,7 @@ public class JavaMethod extends MethodDeclaration
     if (registered)
       return;
 
-    bossa.link.Dispatch.register(this);
+    bossa.link.DispatchTest.register(this);
     registered = true;
   }
 }

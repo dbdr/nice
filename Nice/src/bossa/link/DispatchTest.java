@@ -38,10 +38,10 @@ import nice.tools.util.Chronometer;
    @author Daniel Bonniot
  */
 
-public final class Dispatch
+public final class DispatchTest
 {
   // Non instantiable
-  private Dispatch() { }
+  private DispatchTest() { }
 
   public static void register(NiceMethod m)
   {

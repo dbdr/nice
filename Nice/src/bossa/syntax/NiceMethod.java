@@ -146,7 +146,7 @@ public class NiceMethod extends UserOperator
     super(name, constraint, returnType, parameters, contract);
     this.isOverride = isOverride;
     this.returnTypeLocation = returnType.location();
-    bossa.link.Dispatch.register(this);
+    bossa.link.DispatchTest.register(this);
   }
 
   private boolean isOverride;

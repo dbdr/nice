@@ -43,6 +43,10 @@ cov(s1@null,   s2@null)   {}
 
 ?String double2(?String s) = s == null ? null : s + s;
 ?String double3(?String s) = s != null ? s + s : null;
+// nullness test occuring inside an overloaded function
+String double4(?String s) = "A" + (s != null ? s + s : null);
+// nullness test occuring inside an overloaded constructor
+String double5(?String s) = new String(s != null ? s + s : null);
 
 void f()
 {

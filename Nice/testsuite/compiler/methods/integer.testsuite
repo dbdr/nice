@@ -46,7 +46,7 @@
   /// Toplevel
   void foo(char);
   foo(@char) {}
-  foo('a') {}
+  foo(='a') {}
 
   /// package b import a
   ;
@@ -62,15 +62,15 @@ foo(1) {}
   /// Toplevel
   int fib(int n);
   fib(n) = fib(n-2) + fib(n-1);
-  fib(n@1) = 1;
-  fib(n@2) = 1;
+  fib(n=1) = 1;
+  fib(n=2) = 1;
 
 /// PASS  
   /// Toplevel
   String toStr(char);
   toStr(c@char) = "";
-  toStr(c@'a') = "a";
-  toStr(c@'b') = "b";
+  toStr(c='a') = "a";
+  toStr(c='b') = "b";
 
 /// FAIL
   /// Toplevel
@@ -87,7 +87,7 @@ foo(1) {}
 /// PASS
   /// Toplevel
   String getStr(int i, String str); 
-  getStr(0, str@String) = "no "+str; 
-  getStr(1, str@String) = "one "+str; 
-  getStr(2, str@String) = "many "+str; 
+  getStr(=0, str@String) = "no "+str; 
+  getStr(=1, str@String) = "one "+str; 
+  getStr(=2, str@String) = "many "+str; 
   getStr(i, str@String) = "unknown code"; 

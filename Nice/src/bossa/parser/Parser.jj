@@ -1196,6 +1196,7 @@ MonotypeVar taggedMonotypeVar(List tags, List atoms):
 Pattern pattern():
 {
   LocatedString name = null;
+  LocatedString refName = null;
   Token t;
   TypeIdent tc=null, additional = null;
   TypeConstructor runtimeTC = null;
@@ -1208,26 +1209,25 @@ Pattern pattern():
     val=patternLiteral() { loc = val.location(); }
   |
     (
-      t="@"
+      t="@" tc=typeIdent() { loc = tc.location(); }
     |
-      t="#" { exactlyAt = true;}
-    )
-    (
-      tc=typeIdent() { loc = tc.location(); }
-    |
-      //temporarily added to warn the user about the deprecated '@null' syntax.
-      t="null" 
-      { val = NullExp.instance;
-        loc = new Location(t);
-        User.warning(loc,"The '@null' syntax is deprecated, leave the '@' away.");
-      }
+      t="#" tc=typeIdent() { exactlyAt = true; loc = tc.location(); }
+    | 
+      t="=" 
+      (
+        val=patternLiteral() {loc = val.location(); }
+      |
+        refName=ident() {loc = refName.location(); } 	
+      )
     )
   |
-    name = ident()
+    name=ident()
     (
       t ="@"
       (
-        val=patternLiteral()
+        val=patternLiteral() 
+	{ User.warning(val, 
+          "This syntax is deprecated.\n" +"leave '"+ name+"@' away.");}
       |
         tc=typeIdent()
         [ ":" runtimeTC = typeConstructor() ]
@@ -1235,13 +1235,20 @@ Pattern pattern():
     |
       t ="#" tc=typeIdent() { exactlyAt = true; }
     |
+      t="="
+      (
+        val=patternLiteral() {loc = val.location(); }
+      |
+        refName=ident() {loc = refName.location(); } 	
+      )
+    |
      {} //name only
     )
     { loc = name.location(); }
   )
   [ "(" additional=typeIdent() ")" ]
   {
-    return new Pattern(name, tc, val, exactlyAt, additional, runtimeTC, loc);
+    return new Pattern(name, refName, tc, val, exactlyAt, additional, runtimeTC, loc);
   }
 }
 

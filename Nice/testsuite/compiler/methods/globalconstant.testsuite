@@ -4,8 +4,8 @@
   let int TWO = 2;
   int fib(int n);
   fib(n@int) = fib(n-2) + fib(n-1);
-  fib(ONE) = 1;
-  fib(TWO) = 1;
+  fib(=ONE) = 1;
+  fib(=TWO) = 1;
 
 /// PASS
   assert(foo("abc"));
@@ -14,15 +14,15 @@
   let String xyz = "xyz";
   boolean foo(String);
   foo(s) = false;
-  foo(abc) = true;
-  foo(xyz) = false;
+  foo(=abc) = true;
+  foo(=xyz) = false;
 
 /// FAIL
   /// Toplevel
   let int xxx = 10;
   void foo(int);
   foo(n) {}
-  foo(xxx) {}
+  foo(=xxx) {}
   foo(10) {}
 
 /// FAIL
@@ -30,7 +30,7 @@
   var int xxx = 10;
   void foo(int);
   foo(n) {}
-  foo(xxx) {}
+  foo(=xxx) {}
 
 /// PASS
   assert(foo("abc"));
@@ -41,7 +41,7 @@
   }
   boolean foo(String);
   foo(s) = false;
-  foo(abc) = true;
+  foo(=abc) = true;
 
 /// PASS
   assert(foo(xxx));
@@ -51,10 +51,10 @@
   let A yyy = new A();
   boolean foo(A);
   foo(a) = false;
-  foo(xxx) = true;
-  foo(yyy) = false;
+  foo(=xxx) = true;
+  foo(=yyy) = false;
 
-/// PASS bug
+/// PASS
   /// package a
   /// Toplevel
   class A {}
@@ -62,8 +62,8 @@
   let A yyy = new A();
   boolean foo(A);
   foo(a) = false;
-  foo(xxx) = true;
-  foo(yyy) = false;
+  foo(=xxx) = true;
+  foo(=yyy) = false;
   /// package b import a
   assert(foo(xxx));
 
@@ -73,5 +73,22 @@
   let A xxx = new A();
   void foo(A);
   foo(a) {}
-  foo(xxx) {}
-  foo(xxx) {}
+  foo(=xxx) {}
+  foo(=xxx) {}
+
+/// PASS
+  /// package a
+  /// Toplevel
+  class Color {}
+  let Color red = new Color();
+  let Color blue = new Color();
+  let Color green = new Color();
+  String string(Color);
+  string(color) = "unknown color";
+  string(=red) = "red";
+  string(=blue) = "blue";
+  string(=green) = "green";
+  /// package b import a
+  assert red.string().equals("red");
+  assert blue.string().equals("blue");
+  assert green.string().equals("green");

@@ -48,13 +48,14 @@ public class Pattern implements Located
      @param runtimeTC a type constructor that will be bound to 
        the argument's runtime class.
    */
-  public Pattern(LocatedString name, 
+  public Pattern(LocatedString name, LocatedString refName, 
 		 TypeIdent tc, ConstantExp atValue,
 		 boolean exactlyAt, TypeIdent additional,
 		 TypeConstructor runtimeTC,
 		 Location location)
   {
     this.name = name;
+    this.refName = refName;
     this.typeConstructor = tc;
     this.additional = additional;
     this.runtimeTC = runtimeTC;
@@ -74,7 +75,7 @@ public class Pattern implements Located
 
   Pattern(LocatedString name, TypeIdent tc)
   {
-    this(name, tc, null, false, null, null, name.location());
+    this(name, null, tc, null, false, null, null, name.location());
   }
 
   Pattern(TypeConstructor tc, boolean exactlyAt)
@@ -85,10 +86,14 @@ public class Pattern implements Located
 
   Pattern(ConstantExp atValue)
   {
-    this(null, null, atValue, false, null, null, 
+    this(null, null, null, atValue, false, null, null, 
 	atValue!=null ? atValue.location() : Location.nowhere() );    
   }
 
+  Pattern(LocatedString refName)
+  {
+    this(null, refName, null, null, false, null, null, refName.location());
+  }
 
   final TypeConstructor getRuntimeTC()
   {
@@ -128,48 +133,49 @@ public class Pattern implements Located
  
   void resolveGlobalConstants(VarScope scope, TypeScope typeScope)
   {
-    if (name != null && tc == null & typeConstructor == null)
+    if (refName == null)
+      return;
+
+    GlobalVarDeclaration.GlobalVarSymbol symbol = null;
+    for (Iterator it = scope.lookup(refName).iterator(); it.hasNext();)
       {
-        GlobalVarDeclaration.GlobalVarSymbol symbol = null;
-        for (Iterator it = scope.lookup(name).iterator(); it.hasNext();)
-	  {
-	    Object sym = it.next();
-            if (sym instanceof GlobalVarDeclaration.GlobalVarSymbol)
-	      symbol = (GlobalVarDeclaration.GlobalVarSymbol)sym;
-           }
+	Object sym = it.next();
+	if (sym instanceof GlobalVarDeclaration.GlobalVarSymbol)
+          symbol = (GlobalVarDeclaration.GlobalVarSymbol)sym;
+      }
+    
+    if (symbol == null || !symbol.constant)
+      User.error(refName, "" + refName + " is not declared as global constant");
 
-        if (symbol != null && symbol.constant )
-          {
-	    if (symbol.getValue() instanceof ConstantExp)
-	      {
-		ConstantExp val = (ConstantExp)symbol.getValue();
+    if (symbol.getValue() instanceof ConstantExp)
+      {
+	ConstantExp val = (ConstantExp)symbol.getValue();
 
-		if (val.tc == PrimitiveType.floatTC)
-		  return;
+	if (val.tc == PrimitiveType.floatTC)
+	  return;
 
-		if (val instanceof StringConstantExp)
-		  typeConstructor = new TypeIdent(
-			new LocatedString("java.lang.String", location));
+	if (val instanceof StringConstantExp)
+          typeConstructor = new TypeIdent(new LocatedString("java.lang.String",
+								location));
+	 tc = val.tc;
+	 atValue = val;
+       }
+     else if (symbol.getValue() instanceof NewExp)
+       {
+	 NewExp val = (NewExp)symbol.getValue();
 
-		tc = val.tc;
-		name = null;
-		atValue = val;
-	      }
-	    else if (symbol.getValue() instanceof NewExp)
-              {
-                NewExp val = (NewExp)symbol.getValue();
-
-		symbol.getDefinition().resolve();
-                if (val.tc != null) 
-		  {
-		    tc = val.tc;
-		    atValue = new ConstantExp(null, tc, symbol,
-				name.toString(), location);
-		    name = null;
-		  }
-	      }
-	  }
-      } 
+	 symbol.getDefinition().resolve();
+         if (val.tc != null) 
+	   {
+	     tc = val.tc;
+	     atValue = new ConstantExp(null, tc, symbol,
+				refName.toString(), location);
+	   }
+         else
+	   Internal.error("can't find tc of globalvarsymbol of "+refName);
+       }
+     else
+       User.error(refName, "The value of " + refName + "can't be used as pattern");
   }
 
   static void resolve(TypeScope tscope, VarScope vscope, Pattern[] patterns)
@@ -412,8 +418,8 @@ public class Pattern implements Located
         if (atValue.value instanceof Number)
           return "@" + (atValue.longValue() >= 0 ? "+" : "") + atValue;
 
-	if (atValue.value instanceof VarSymbol)
-          return "@=" + atValue;
+	if (atReference())
+          return "@=" + refName;
 
 	return "@" + atValue;
       }
@@ -469,12 +475,33 @@ public class Pattern implements Located
 		name.substring(1,name.length()-1), Location.nowhere())));
 
         if (name.charAt(0) == '=')
-	  return new Pattern(new LocatedString(name.substring(1),
-		Location.nowhere()), null);
+          {
+            LocatedString refName = new LocatedString(name.substring(1),
+				Location.nowhere());
+	    GlobalVarDeclaration.GlobalVarSymbol symbol = null;
+	    for (Iterator it = Node.getGlobalScope().lookup(refName).iterator(); it.hasNext();)
+	      {
+		Object sym = it.next();
+		if (sym instanceof GlobalVarDeclaration.GlobalVarSymbol)
+	          symbol = (GlobalVarDeclaration.GlobalVarSymbol)sym;
+	      }
+
+            if (symbol == null)
+	      Internal.error("can't find globalvarsymbol of "+refName);
+
+	    NewExp val = (NewExp)symbol.getValue();
+
+	    symbol.getDefinition().resolve();
+            if (val.tc != null) 
+	      return new Pattern(new ConstantExp(null, val.tc, symbol,
+				refName.toString(), refName.location()));
+            else
+	      Internal.error("can't find tc of globalvarsymbol of "+refName);
+          }
       }
 
     if (name.equals("_"))
-      return new Pattern(null);
+      return new Pattern((ConstantExp)null);
 
     if (name.equals("NULL"))
       return new Pattern(NullExp.instance);
@@ -535,7 +562,7 @@ public class Pattern implements Located
    * Fields
    ****************************************************************/
   
-  LocatedString name;
+  LocatedString name, refName;
   TypeIdent typeConstructor, additional;
   public TypeConstructor tc;
   TypeConstructor tc2;
@@ -566,8 +593,5 @@ public class Pattern implements Located
   public boolean atTrue() { return atValue != null && atValue.isTrue(); }
   public boolean atFalse() { return atValue != null && atValue.isFalse(); }
   public boolean atString() { return atValue instanceof StringConstantExp; }
-  public boolean atReference()
-  { 
-    return atValue != null && atValue.value instanceof VarSymbol;
-  }
+  public boolean atReference() { return atValue != null && atValue.value instanceof VarSymbol; }
 }

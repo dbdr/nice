@@ -232,17 +232,18 @@ abstract public class MethodDeclaration extends Definition
       return "method " + getName();
     
     return
-    (syntacticConstraint == null ? "" : syntacticConstraint)
+      (syntacticConstraint == null ? "" : syntacticConstraint)
       + String.valueOf(getType().codomain())
       + " "
       + getName().toQuotedString()
       + "("
-      //+ Util.map("",", ","",getType().domain())
-      + parameters.toString()
+      // parameters can be null if type was set lowlevel (native code, ...)
+      + (parameters != null ? parameters.toString()
+	 : Util.map("",", ","",getType().domain()))
       + ")"
       ;
   }
-
+  
   protected MethodContainer memberOf;
   protected int arity;
   private FormalParameters parameters;

@@ -2042,13 +2042,16 @@ Statement IfStatement() :
  * else's to the innermost if statement.  The LOOKAHEAD specification
  * is to tell JavaCC that we know what we are doing.
  */
-{ Statement s1,s2=null; Expression cond; }
+{ Token first; Statement s1,s2=null; Expression cond; IfExp ifExp; }
 {
-  "if" "(" cond=Expression() ")" 
+  first="if" "(" cond=Expression() ")" 
     s1=Statement() [ LOOKAHEAD(1) "else" s2=Statement() ]
-  { return new ExpressionStmt
-    (new IfExp(cond,new StatementExp(s1),
-	       (s2==null ? null : new StatementExp(s2)))); }
+  { 
+    ifExp = new IfExp(cond, new StatementExp(s1),
+	              (s2 == null ? null : new StatementExp(s2)));
+    ifExp.setLocation(new Location(first, getToken(0)));
+    return new ExpressionStmt(ifExp);
+  }
 }
 
 Statement WhileStatement() :

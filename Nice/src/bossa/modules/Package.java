@@ -798,7 +798,7 @@ public class Package implements mlsub.compilation.Module, Located, bossa.syntax.
 	int end = path.indexOf(File.pathSeparatorChar, start);
 	if (end == -1)
 	  end = path.length();
-	    
+	
 	String pathComponent = path.substring(start, end);
 	if (pathComponent.length() > 0)
 	  {

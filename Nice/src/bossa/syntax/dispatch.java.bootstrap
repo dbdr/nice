@@ -11,7 +11,7 @@ package bossa.syntax;
 
 public class dispatch
 {
-  static Statement  analyse$0(Statement  s, VarScope v, TypeScope t) 
+  static Statement  analyse$0(Statement  s, VarScope v, TypeScope t, boolean r)
   { return null; }
   
   static Expression analyse$1(Expression e, VarScope v, TypeScope t) 

@@ -43,11 +43,6 @@ public class Return extends Procedure1 implements Inlineable
     if (args != null && args.length != 0)
       args[0].compile(comp, new StackTarget(type));
 
-    // Probably a hack that should go away sometime
-    if (type == Type.void_type 
-	&& code.getMethod().getReturnType().getSize() != 0)
-      QuoteExp.voidExp.compile(comp, Target.pushObject);
-
     code.emitReturn();
   }
 

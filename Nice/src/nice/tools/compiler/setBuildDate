@@ -8,5 +8,5 @@ fi
 
 echo > dateBuild.nice
 echo "package nice.tools.compiler;" >> dateBuild.nice
-echo "var String versionNumber = \"$version\";" >> dateBuild.nice
-echo "var String buildDate = \""`date -u +"%Y.%m.%d, %T %Z"`"\";" >> dateBuild.nice
+echo "let String versionNumber = \"$version\";" >> dateBuild.nice
+echo "let String buildDate = \""`date -u +"%Y.%m.%d, %T %Z"`"\";" >> dateBuild.nice

@@ -21,7 +21,7 @@ nice (0.7.4) unstable; urgency=low
     anonymous functions in field initializer, override of void native method,
     tuples, ...).
 
- --
+ -- Daniel Bonniot <bonniot@users.sourceforge.net>  Tue,  1 Oct 2002 14:51:21 +0200
 
 nice (0.7.3) unstable; urgency=low
 

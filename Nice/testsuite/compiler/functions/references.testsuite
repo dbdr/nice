@@ -1,0 +1,4 @@
+/// PASS
+  /// Toplevel
+  void f() {}
+  ()->void g() = f;

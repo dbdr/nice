@@ -25,6 +25,7 @@ public class ExpressionStmt extends Statement
   public ExpressionStmt(Expression exp)
   {
     this.exp = exp;
+    this.setLocation(exp.location());
   }
   
   /****************************************************************

@@ -38,10 +38,14 @@ public abstract class Statement
       {
 	Statement s = statements[i];
 
+	if (s == null)
+	  {
+	    res[i] = gnu.expr.QuoteExp.voidExp;
+	    continue;
+	  }
+
 	try {
-	  res[i] = s == null 
-	    ? gnu.expr.QuoteExp.voidExp 
-	    : statements[i].generateCode();
+	  res[i] = s.generateCode();
 	}
 	catch(UserError e) {
 	  // Make sure that the error is attached to a location.
@@ -52,6 +56,9 @@ public abstract class Statement
 	  // Rethrow.
 	  throw e;
 	}
+
+	if (s.location() != null)
+	  s.location().write(res[i]);
       }
     return res;
   }

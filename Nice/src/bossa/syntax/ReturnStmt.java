@@ -31,6 +31,8 @@ public class ReturnStmt extends Statement
   public ReturnStmt(Expression value)
   {
     this.value = value;
+    if (value != null)
+      this.setLocation(value.location());
   }
 
   Polytype returnType()

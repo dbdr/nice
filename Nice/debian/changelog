@@ -20,6 +20,7 @@ nice (0.7.6) unstable; urgency=low
   * Parser support for public-read and private-write fields (experimental).
   * Performance improvement for anonymous functions and for polymorphic 
     usage of arrays.
+  * Improved references to source lines in the bytecode (stack traces).
   * Bugfixes (using anonymous functions while overriding native methods, 
     automatic array conversions in polymorphic code, nested literal primitive 
     arrays, mutually dependant packages, ...).

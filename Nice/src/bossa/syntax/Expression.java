@@ -192,8 +192,7 @@ public abstract class Expression
   final gnu.expr.Expression generateCode()
   {
     gnu.expr.Expression res = compile();
-    res.setFile(location().getFile());
-    res.setLine(location().getLine(), location().getColumn());
+    location().write(res);
     
     return res;
   }

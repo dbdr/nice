@@ -1256,7 +1256,6 @@ Statement code():
     exp=Expression() ";"
     { 
       code = new ReturnStmt(exp);
-      code.setLocation(exp.location());
     }
     )
   )
@@ -1572,7 +1571,6 @@ FunExp funExp():
     exp=Expression()
     { 
       body=new ReturnStmt(exp);
-      body.setLocation(exp.location());
     }
   )
   { return new FunExp(cst,formals,body); }
@@ -1618,7 +1616,6 @@ FunExp endFunExp(List formals):
         body=new ExpressionStmt(exp);
       else
         body=new ReturnStmt(exp);
-      body.setLocation(exp.location());
     }
   )
   { return new FunExp(Constraint.True,formals,body); }

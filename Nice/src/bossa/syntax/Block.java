@@ -28,6 +28,9 @@ public class Block extends Statement
   public Block(List statements)
   {
     this.statements = cutInBlocks(statements);
+    if (this.statements != null && this.statements.length > 0 &&
+	this.statements[0] != null)
+      this.setLocation(this.statements[0].location());
   }
 
   Block(Statement[] statements)

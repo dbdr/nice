@@ -39,7 +39,11 @@ NICEC1=JAVA="${java}" ${TOP}/bin/nicec ${NICEC_ARGS} -d "${TOP}/classes" --sourc
 
 
 
-all: src/nice/tools/compiler/console.jar compiler2 archive2
+all: src/nice/tools/compiler/console.jar compiler
+
+compiler: setDate
+	${NICEC1} bossa.syntax
+	${NICEC1} -a src/nice/tools/compiler/console.jar nice.tools.compiler.console
 
 stable:   clean bootstrap compiler1 testengine archiveOld
 complete: stable   compiler2 tools libs archive2

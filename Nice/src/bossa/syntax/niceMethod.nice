@@ -135,40 +135,49 @@ d + "\ndefined in:\n" +
           }
 
         // In a compiled package, we don't need checking.
-        if (module.compiled())
-          {
-            this.addSpecializedMethod(d);
+        if (! module.compiled())
+	  if (! this.checkOverride(s, d, ourDomain, itsDomain))
+	    // Ignore. Errors are reported by checkOverride.
             continue;
-          }
-
-        if (! nice.tools.typing.Types.covariantSpecialization(this.getType(), s.getType()))
-          {
-            User.error
-              (returnTypeLocation != null ? returnTypeLocation : this.location(), 
-"The return type is less precise than the original return type of method\n" +
-d + "\ndefined in:\n" +
-               d.location());
-          }
-
-        // Check if we are a proper specialization, or if we actually have
-        // the same domain.
-        if (mlsub.typing.Typing.smaller(itsDomain, ourDomain))
-          {
-            if (module == d.module)
-              User.error(this, "This method has a domain identical to " +
-                         d + ", which is defined at " + d.location());
-            else
-              // Methods with identical domains in different packages are
-              // accepted, but they do not specialize each other.
-              // They can be refered to unambiguously by using their
-              // fully qualified name.
-              continue;
-          }
 
         this.addSpecializedMethod(d);
       }
 
     homonyms = null;
+  }
+
+  /** Return true if the override of d by this is OK.
+      Return false if the override should be ignored.
+  */
+  private boolean checkOverride
+    (VarSymbol s, MethodDeclaration d,
+     mlsub.typing.Domain ourDomain, mlsub.typing.Domain itsDomain)
+  {
+    if (! nice.tools.typing.Types.covariantSpecialization(this.getType(), s.getType()))
+      {
+	User.error
+	(returnTypeLocation != null ? returnTypeLocation : this.location(),
+"The return type is less precise than the original return type of method\n" +
+	 d + "\ndefined in:\n" +
+	 d.location());
+      }
+
+    // Check if we are a proper specialization, or if we actually have
+    // the same domain.
+    if (mlsub.typing.Typing.smaller(itsDomain, ourDomain))
+      {
+	if (module == d.module)
+	  User.error(this, "This method has a domain identical to " +
+		     d + ", which is defined at " + d.location());
+	else
+	  // Methods with identical domains in different packages are
+	  // accepted, but they do not specialize each other.
+	  // They can be refered to unambiguously by using their
+	  // fully qualified name.
+	  return false;
+      }
+
+    return true;
   }
 
   private void addSpecializedMethod(MethodDeclaration method)

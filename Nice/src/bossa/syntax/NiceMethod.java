@@ -60,6 +60,17 @@ public class NiceMethod extends MethodDeclaration
 			     : thisTypeParams.length);
 
     TypeSymbol container = c.getTypeSymbol();
+    // contains the interface if container is one
+    Interface itf = null;
+    // contains the associated tc if possible
+    TypeConstructor tc;
+    if (container instanceof TypeConstructor)
+      tc = (TypeConstructor) container;
+    else
+      {
+	itf = (Interface) container;
+	tc = itf.associatedTC();
+      }
     
     // if the constraint is True
     // we must create a new one, otherwise we would
@@ -72,7 +83,12 @@ public class NiceMethod extends MethodDeclaration
     constraint.addBinders(thisTypeParams);
 	
     mlsub.typing.Monotype thisType;
-    if(hasAlike || container instanceof Interface)
+
+    // "alike" is not created for a non-abstract interface
+    // if alike is not present in the type, since it saves
+    // a type parameter (more intuituve for rebinding)
+    // and it does not change typing to do so.
+    if(hasAlike || tc == null)
       {
 	TypeConstructor alikeTC = 
 	  new TypeConstructor("Alike", c.variance(), false, false);
@@ -81,12 +97,10 @@ public class NiceMethod extends MethodDeclaration
 	// added in front. Important for rebinding in method alternatives
 	
 	mlsub.typing.AtomicConstraint atom;
-	if(container instanceof Interface)
-	  atom = new mlsub.typing.ImplementsCst
-	    (alikeTC, (Interface) container);
+	if (itf != null)
+	  atom = new mlsub.typing.ImplementsCst(alikeTC, itf);
 	else
-	  atom = new mlsub.typing.TypeConstructorLeqCst
-	    (alikeTC, (TypeConstructor) container);
+	  atom = new mlsub.typing.TypeConstructorLeqCst(alikeTC, tc);
 	constraint.addAtom(AtomicConstraint.create(atom));
 	
 	thisType = new mlsub.typing.MonotypeConstructor(alikeTC, thisTypeParams);
@@ -101,8 +115,7 @@ public class NiceMethod extends MethodDeclaration
       }
     else
       thisType = 
-	new mlsub.typing.MonotypeConstructor((TypeConstructor) container, 
-					     thisTypeParams);
+	new mlsub.typing.MonotypeConstructor(tc, thisTypeParams);
     
     parameters.add(0, Monotype.create(thisType));
     

@@ -12,7 +12,6 @@
 
 // File    : Typing.java
 // Created : Tue Jul 20 11:57:17 1999 by bonniot
-//$Modified: Thu Sep 21 16:50:48 2000 by Daniel Bonniot $
 
 package mlsub.typing;
 
@@ -23,7 +22,10 @@ import mlsub.typing.lowlevel.Element;
 import mlsub.typing.lowlevel.Unsatisfiable;
 
 /**
- * Static class for comparing types
+   Static class for comparing types
+
+   @version $Date$
+   @author Daniel Bonniot
  */
 public final class Typing
 {
@@ -32,10 +34,10 @@ public final class Typing
    ****************************************************************/
 
   /**
-   * Enters a new typing context.
-   *
-   * If an enter() completed successfully,
-   * a matching leave() MUST be issued some time later by the caller.
+     Enters a new typing context.
+     
+     If an enter() completed successfully,
+     a matching leave() MUST be issued some time later by the caller.
    */
   public static int enter()
   {
@@ -50,9 +52,9 @@ public final class Typing
   static int level = 0;
   
   /**
-   * Enters a new typing context
-   *
-   * @param message A debug message to know where we are
+     Enters a new typing context
+     
+     @param message A debug message to know where we are
    */
   public static int enter(String message)
   {
@@ -93,15 +95,16 @@ public final class Typing
   }
   
   /**
-   * Leaves the last typing context
-   *
+     Leaves the last typing context.
    */
   public static int leave()
     throws TypingEx
   {
     if(dbg) 
       Debug.println("LEAVE "+(level-1));
-      
+    if (dbg && level-1 <= 0)
+      bossa.util.Internal.printStackTrace();
+    
     try{
       Engine.leave();
     }

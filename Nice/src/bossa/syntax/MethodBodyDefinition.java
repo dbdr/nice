@@ -12,7 +12,6 @@
 
 // File    : MethodBodyDefinition.java
 // Created : Thu Jul 01 18:12:46 1999 by bonniot
-//$Modified: Wed Sep 20 13:56:36 2000 by Daniel Bonniot $
 
 package bossa.syntax;
 
@@ -28,7 +27,10 @@ import mlsub.typing.MonotypeConstructor;
 import mlsub.typing.Constraint;
 
 /**
- * Definition of an alternative for a method.
+   Definition of an alternative for a method.
+
+   @version $Date$
+   @author Daniel Bonniot
  */
 public class MethodBodyDefinition extends Definition 
   implements Function
@@ -270,8 +272,8 @@ public class MethodBodyDefinition extends Definition
     }
     catch(mlsub.typing.BadSizeEx e){
       User.error(name,
-		 "Method \""+name+"\" expects "+e.expected+
-		 " type parameters");
+		 "Method \"" + name + 
+		 "\" expects " + e.expected + " type parameters");
     }
     catch(TypeScope.DuplicateName e) {
       User.error(this, e);
@@ -304,7 +306,10 @@ public class MethodBodyDefinition extends Definition
   {
     lateBuildScope();
 
-    Typing.enter("METHOD BODY of "+name+"\n\n");
+    Typing.enter("METHOD BODY " + this + "\n\n");
+    // remeber that enter was called, to leave.
+    // usefull if previous code throws an exception
+    entered = true;
 
     try{
       try { Constraint.assert(definition.getType().getConstraint()); }
@@ -381,15 +386,20 @@ public class MethodBodyDefinition extends Definition
     }
   }
 
+  private boolean entered = false;
+  
   void endTypecheck()
   {
     try{
-      Typing.leave();
+      if(entered)
+	{
+	  Typing.leave();
+	  entered = false;
+	}
     }
     catch(TypingEx e){
       User.error(this,
-		 "Type error in method "+name,
-		 " :"+e);
+		 "Type error in method "+name, " :"+e);
     }
   }
   

@@ -12,7 +12,6 @@
 
 // File    : ClassDefinition.java
 // Created : Thu Jul 01 11:25:14 1999 by bonniot
-//$Modified: Thu Sep 21 17:36:51 2000 by Daniel Bonniot $
 
 package bossa.syntax;
 
@@ -23,7 +22,10 @@ import gnu.bytecode.*;
 import java.util.*;
 
 /**
- * Abstract syntax for a class definition.
+   Abstract syntax for a class definition.
+
+   @version $Date$
+   @author Daniel Bonniot
  */
 abstract public class ClassDefinition extends Definition
   implements MethodContainer

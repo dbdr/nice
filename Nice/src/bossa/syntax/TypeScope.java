@@ -12,7 +12,7 @@
 
 // File    : TypeScope.java
 // Created : Fri Jul 09 11:29:17 1999 by bonniot
-//$Modified: Thu Aug 31 16:22:15 2000 by Daniel Bonniot $
+//$Modified: Fri Sep 22 14:31:12 2000 by Daniel Bonniot $
 
 package bossa.syntax;
 
@@ -71,7 +71,7 @@ public class TypeScope
   {
     if(symbols!=null &&
        names.size()!=symbols.length)
-      throw new Error(names.size()+" != "+symbols.length);
+      throw new mlsub.typing.BadSizeEx(symbols.length, names.size());
     
     int n = 0;
     for(Iterator in=names.iterator();

@@ -17,7 +17,9 @@ import gnu.expr.*;
 import gnu.bytecode.*;
 
 /**
-   Inlining of native integer operators.
+   Inlining of native numeric types comparison operators.
+
+   @author Daniel Bonniot
 */
 public class ComparisonOperators extends Procedure2 implements Inlineable
 {
@@ -33,7 +35,7 @@ public class ComparisonOperators extends Procedure2 implements Inlineable
   public static ComparisonOperators create(String param)
   {
     char typeChar = param.charAt(0);
-    Type argType;
+    PrimType argType;
     switch(typeChar)
       {
       case 'i': argType = Type.int_type; break;
@@ -66,7 +68,7 @@ public class ComparisonOperators extends Procedure2 implements Inlineable
     return new ComparisonOperators(kind, argType);
   }
 
-  private ComparisonOperators(int kind, Type argType)
+  private ComparisonOperators(int kind, PrimType argType)
   {
     this.kind = kind;
     this.argType = argType;
@@ -84,24 +86,12 @@ public class ComparisonOperators extends Procedure2 implements Inlineable
     args[1].compile(comp, stack);
 
     switch(kind){
-    case Eq:
-      code.emitIfEq();
-      break;
-    case Le: 
-      code.emitIfLe();
-      break;
-    case Ge: 
-      code.emitIfGe();
-      break;
-    case Lt: 
-      code.emitIfIntLt();
-      break;
-    case Gt:
-      code.emitIfGt();
-      break;
-    case Ne:
-      code.emitIfNEq();
-      break;
+    case Eq: code.emitIfEq(); break;
+    case Le: code.emitIfLe(); break;
+    case Ge: code.emitIfGe(); break;
+    case Lt: code.emitIfIntLt(); break;
+    case Gt: code.emitIfGt(); break;
+    case Ne: code.emitIfNEq(); break;
     }
     
     code.emitPushBoolean(true);
@@ -112,7 +102,7 @@ public class ComparisonOperators extends Procedure2 implements Inlineable
     target.compileFromStack(comp, retType);
   }
 
-  private final Type argType;
+  private final PrimType argType;
   private final Type retType = Type.boolean_type;
   
   public Type getReturnType (Expression[] args)

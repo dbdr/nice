@@ -20,8 +20,12 @@ oP(a,b,c,d,e, skip)
 
 void oPFunction(int, int b, int c = 3, int d, int e, boolean skip = false) {}
 
-<Any T> void printAny(T what = "Nothing");
-printAny(what) = println(what);
+/* This is disabled at the moment. 
+   See comment at bossa.syntax.MethodDeclaration method typedResolve,
+   line 148 as of CVS version 1.41.
+*/
+//<Any T> void printAny(T what = "Nothing");
+//printAny(what) = println(what);
 
 void test_optional();
 test_optional()
@@ -34,6 +38,6 @@ test_optional()
   oP(1, b:3, d:3, e:4);
   oP(1, b:3, d:3, e:4, skip:true);
 
-  printAny(3);
-  printAny();
+  //printAny(3);
+  //printAny();
 }

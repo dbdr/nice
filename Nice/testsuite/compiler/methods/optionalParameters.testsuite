@@ -140,3 +140,24 @@ class A {
     int x;
     int getValue(int v = this.x) = v;
   }
+
+/// PASS
+  /// Toplevel
+// Overloading in default values.
+class B {
+  List<String> args;
+  String str;
+} 
+
+class A {
+  String str;
+  AA args;
+  alike f(int i = this.args.i,
+          String s = this.str,
+          String a = this.args.str) = this;
+}
+
+class AA {
+  String str;
+  int i;
+}

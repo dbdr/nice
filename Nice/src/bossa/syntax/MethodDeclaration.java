@@ -143,6 +143,20 @@ abstract public class MethodDeclaration extends Definition
     
       try{
 	type.getConstraint().enter();
+
+        /*
+          We typecheck with rigid type parameters. It means that
+          default values must be valid for any instance of the method type.
+
+          Alternatively, it could be decided that it is ok to have default
+          values that satisfy only specific instances. In that case, it would
+          be necessary to do some changes in K0. The difficulty is with
+          overloading: the (now soft) type variables could be modified
+          in an unsuccesful overloading resolution, and that modifications
+          need to be discarded.
+        */
+        mlsub.typing.Typing.implies();
+
 	parameters.typecheck(type.domain());
       }
       finally{

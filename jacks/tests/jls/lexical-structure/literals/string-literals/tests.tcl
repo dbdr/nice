@@ -1,5 +1,5 @@
 proc literal { name literal } {
-    set data "class $name {String s = \"${literal}\";}\n"
+    set data "main(args) {String s = \"${literal}\";}\n"
     return [compile [saveas $name.java $data]]
 }
 

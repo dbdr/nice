@@ -1,5 +1,5 @@
 proc sequence { name sequence } {
-    set data "class $name {char c = '${sequence}';}\n"
+    set data "main(args) {char c = '${sequence}';}\n"
     return [compile [saveas $name.java $data]]
 }
 

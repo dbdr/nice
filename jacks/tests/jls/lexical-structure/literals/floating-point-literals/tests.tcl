@@ -1,5 +1,5 @@
 proc literal { name literal } {
-    set data "class $name {double d = ${literal};}\n"
+    set data "main(args) {double d = ${literal};}\n"
     return [compile [saveas $name.java $data] ]
 }
 

@@ -1,16 +1,31 @@
 nice (0.9.6)
 
+  * It is now possible to create custom constructors:
+      class Point { double x; double y; }
+
+      new Point(double angle, double distance) 
+      { 
+        this(x: distance * cos(angle), y: distance * sin(angle));
+      }
+    It is then possible to create a Point with either 
+    new Point(x: ..., y: ...) or new Point(angle: ..., distance: ...).
   * Additional fields can be defined for enums and enums can implement 
-    interfaces, example:
+    interfaces, for instance:
       enum Coin(int value) implements Currency
 	{penny(1), nickel(5), dime(10), quarter(25)}
-  * Alternative syntax for calling methods that takes a closure with no 
-    arguments. For example 'loop(5) { doSomeThing(); }' is shorthand for
-    'loop(5, () => { doSomeThing(); });'
+  * Alternative syntax for calling methods that takes an anonymous function
+    with no arguments. For example 'loop(5) { doSomeThing(); }' is a 
+    shorthand for 'loop(5, () => { doSomeThing(); });'
   * "using" statement, as in C#, defined in nice.lang using (!) the above
     syntax.
-  * Stricter parsing of expression used as statement.
-  * Improved performance of arrays used as lists.
+  * Expression-local variables: variables that are declared as the argument
+    of a method call, and that are visible to the other arguments.
+    A typical usage is, still using the above syntax:
+      using(PrintStream s = ...) {
+        s.println("...");
+      }
+  * Stricter parsing of expressions used as statements.
+  * Improved performance for arrays used as lists.
   * New methods (in package nice.functional) for working with iterators 
     and generators.
   * Applications that stop because of an uncaught exception will now

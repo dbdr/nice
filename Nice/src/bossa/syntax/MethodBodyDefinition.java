@@ -152,9 +152,6 @@ public class MethodBodyDefinition extends Definition
     // Register this alternative for the link test
     alternative = new bossa.link.SourceAlternative(this);
 
-    if (d.isMain())
-      User.warning(this, "This syntax for the main function is deprecated.\nPlease use instead the following:\n\nvoid main(String[] args)\n{\n  ...\n}");
-
     parameters = buildSymbols(this.formals, declaration.getArgTypes());
     scope.addSymbols(parameters);
   }

@@ -268,14 +268,6 @@ public abstract class MethodDeclaration extends Definition
     // Do nothing by default.
   }
 
-  /**
-     @return true if this method is the 'main' of the program
-  */
-  public final boolean isMain() 
-  {
-    return arity == 1 && "main".equals(name.content);
-  }
-  
   String explainWhyMatchFails(Arguments arguments)
   {
     return symbol.defaultExplainWhyMatchFails(arguments);

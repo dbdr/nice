@@ -2,6 +2,8 @@ nice (0.9.2) unstable; urgency=low
 
   * Classes that implement java.lang.Cloneable now automatically support 
     the clone method.
+  * The deprecated 'main(args) { ... }' syntax for the main function is not
+    supported anymore. Please use instead: 'void main(String[] args) { ... }'
   * Bugfixes (incrementation of byte local variables, ...)
 
  --

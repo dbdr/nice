@@ -81,7 +81,7 @@ public final class Dispatch
   {
     Stack sortedAlternatives = Alternative.sortedAlternatives(m);
     
-    if (!(m.isMain() || trivialTestOK(sortedAlternatives)))
+    if (! trivialTestOK(sortedAlternatives))
       test(m, sortedAlternatives, false);
     
     if(Debug.codeGeneration)

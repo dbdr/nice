@@ -3,7 +3,7 @@ PREFIX= /usr/local
 # Used by Debian to install in a private directory
 DESTDIR= 
 INSTALLDIR= ${DESTDIR}${PREFIX}
-DOCDIR= ${INSTALLDIR}/share/doc
+DOCDIR= ${INSTALLDIR}/share/doc/nice
 MANDIR= ${INSTALLDIR}/share/man/man1
 LISPDIR= ${INSTALLDIR}/share/emacs/site-lisp/nice
 

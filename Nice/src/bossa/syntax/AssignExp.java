@@ -12,7 +12,7 @@
 
 // File    : AssignExp.java
 // Created : Mon Jul 05 15:49:27 1999 by bonniot
-//$Modified: Tue Aug 29 13:47:56 2000 by Daniel Bonniot $
+//$Modified: Tue Sep 05 16:24:49 2000 by Daniel Bonniot $
 
 package bossa.syntax;
 
@@ -41,7 +41,7 @@ public class AssignExp extends Expression
 	"get".equals(((CallExp) to).fun.toString()))
       {
 	CallExp call = (CallExp) to;
-	((IdentExp) ((ExpressionRef) call.fun).content()).ident.content= "set";
+	((IdentExp) ((ExpressionRef) call.fun).content()).ident.content = "set";
 	ExpressionRef v = new ExpressionRef(value);
 	call.parameters.add(v);
 	call.addChild(v);

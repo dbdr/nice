@@ -75,54 +75,6 @@ interface List<T>
 //  }
 
 /****************************************************************
- * Arrays
- ****************************************************************/
-
-class Array<T> 
-  implements Sequence
-  finally implements Collection 
-  = native AbstractArray;
-
-// Wrappers
-<Any T> Array<T> newArray(int) = native Object[] ObjectArray.newInstance(int);
-<Any T> Array<T> newArray(int,T) = native Object[] ObjectArray.newInstance(int,Object);
-
-<Any T> Array<T> resize(Array<T>, int) = native Object[] ObjectArray.resizeArray(Object[], int);
-<Any T> T array_get(Array<T>, int) = native Object AbstractArray.get(int);
-<Any T> void array_set(Array<T>, int, T) = native void AbstractArray.set(int,Object);
-<Any T> int native_length(Array<T>) = native int AbstractArray.getLength();
-
-
-get(a@Array, n) = array_get(a,n);
-set(a@Array, n, e) = array_set(a,n,e);
-size(a@Array) = native_length(a);
-
-map<C,T,U>(a@Array, f)
-{
-  int l = size(a);
-
-  Array<U> res = newArray(l);
-
-  for(int i=0; i<l; i=i+1)
-    res.set(i,f(a.get(i)));
-
-  return res;
-}
-
-filter<C, T>(a@Array, test)
-{
-  int l = size(a);
-  int found = 0;
-
-  Array<T> res = newArray(l);
-  
-  a.iter(fun(T elem) => 
-	{ if(test(elem)) { res.set(found,elem); found=found+1; }} );
-
-  return resize(res,found);
-}
-
-/****************************************************************
  * Linked Lists
  ****************************************************************/
 
@@ -188,8 +140,7 @@ makeVector<T>(len)
 {
   Vector<T> res = new Vector();
 
-  res.elements = 
-    newArray(len); 
+  res.elements = new T[len]; 
 
   res.length = 0;
   return res;
@@ -198,10 +149,13 @@ makeVector<T>(len)
 <Any T> Vector<T> makeVector(int, T);
 makeVector<T>(len, sample)
 {
+  return makeVector(len);
+/*
   Vector<T> res = new Vector();
   res.elements = newArray(len, sample);
   res.length = 0;
   return res;
+*/
 }
 
 size(v@Vector) = v.length;
@@ -219,11 +173,11 @@ map<C,T,U>(v@Vector, f)
 get(v@Vector, index) = get(v.elements, index);
 set(v@Vector, index, element) = v.elements.set(index, element);
 
-add(v@Vector, element)
+add<T>(v@Vector, element)
 {
   if(v.elements==null)
     {
-      v.elements = newArray(10);
+      v.elements = new T[10];
       v.length = 0;
     }
 
@@ -332,9 +286,29 @@ max(s)
  * Printing
  ****************************************************************/
 
-println(p@PrintStream, s@Sequence)
+/*
+We need overriding of native methods for this
+toString(s@Sequence)
 {
-  if (s.size() == 0) 
+  if (s.size() == 0)
+    return "[]";
+
+  StringBuffer buf = new StringBuffer();
+  buf.append("[");
+  buf.append(s[0].toString());
+  for (int i=1; i<s.size(); i++)
+    {
+      buf.append(", ");
+      buf.append(s[i].toString());
+    }
+  buf.append("]");
+  return buf.toString();
+}
+*/
+
+print(p@PrintStream, s@Sequence)
+{
+  if (s.size() == 0)
     {
       p.println("[]");
       return;

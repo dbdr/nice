@@ -12,7 +12,7 @@
 
 // File    : prelude.nice
 // Created : Thu Dec 02 11:42:48 1999 by bonniot
-//$Modified: Mon Aug 07 14:42:35 2000 by Daniel Bonniot $
+//$Modified: Tue Sep 05 19:27:25 2000 by Daniel Bonniot $
 
 /**
  * Standard prelude file.
@@ -31,7 +31,7 @@ package nice.lang;
 final class void = native;
 final class boolean = native;
 
-class double extends gnu.math.Numeric = native;
+class double /*extends gnu.math.Numeric*/ = native;
 class float extends double = native;
 
 class long extends float = native;
@@ -45,13 +45,18 @@ class char extends int = native;
  * Basic functions
  ****************************************************************/
 
-<Any T> boolean `==`(T,T) = 
-  native boolean nice.lang.Native.pointerEquality(Object,Object);
-<Any T> boolean equals(T,T) = 
-  native boolean Object.equals(Object);
+<Any T> boolean `==`(T,T) = native boolean Native.eq(Object,Object);
+<Any T> boolean `!=`(T,T) = native boolean Native.neq(Object, Object);
 
-<Any T> boolean `!=`(T,T);
-`!=`(x,y) = !(x==y);
+boolean `==`(boolean, boolean) = native boolean Native.eq(boolean,boolean);
+char `==`(char, char) = native char Native.eq(char,char);
+
+boolean `!=`(boolean, boolean) = native boolean Native.neq(boolean,boolean);
+char `!=`(char, char) = native char Native.neq(char,char);
+
+
+
+<Any T> boolean equals(T,T) = native boolean Object.equals(Object);
 
 boolean TRUE() = native Boolean.TRUE;
 boolean FALSE() = native Boolean.FALSE;

@@ -12,7 +12,7 @@
 
 // File    : TypeIdent.java
 // Created : Sat Jul 24 14:02:08 1999 by bonniot
-//$Modified: Wed Jul 26 14:52:08 2000 by Daniel Bonniot $
+//$Modified: Mon Sep 04 14:23:47 2000 by Daniel Bonniot $
 
 package bossa.syntax;
 
@@ -62,16 +62,21 @@ public final class TypeIdent extends Monotype implements Located
       return this;
   }
 
-  public final mlsub.typing.TypeSymbol resolveToTypeSymbol(TypeScope scope)
+  public final TypeSymbol resolveToTypeSymbol(TypeScope scope)
   {
-    return scope.lookup(name.toString());
+    TypeSymbol res = scope.lookup(name.toString());
+
+    if (res == null)
+      User.error(this, name + " is not declared");
+    
+    return res;
   }
   
   public mlsub.typing.Monotype resolve(TypeScope scope)
   {
     TypeSymbol res = resolveToTypeSymbol(scope);
     if (res == null)
-      User.error(this, name + " is not defined", " in " + scope);
+      User.error(this, name + " is not declared");
     
     if (res instanceof MonotypeVar)
       return (MonotypeVar) res;
@@ -96,8 +101,6 @@ public final class TypeIdent extends Monotype implements Located
   public mlsub.typing.TypeConstructor resolveToTC(TypeScope scope)
   {
     TypeSymbol res = resolveToTypeSymbol(scope);
-    if (res == null)
-      User.error(this, name+" is not defined"," in "+scope);
 
     if (res instanceof TypeConstructor)
       return (TypeConstructor) res;
@@ -109,8 +112,6 @@ public final class TypeIdent extends Monotype implements Located
   public mlsub.typing.Interface resolveToItf(TypeScope scope)
   {
     TypeSymbol res = resolveToTypeSymbol(scope);
-    if(res==null)
-      User.error(this, name+" is not defined"," in "+scope);
 
     if (res instanceof Interface)
       return (Interface) res;

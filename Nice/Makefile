@@ -7,10 +7,13 @@ JAVADOC=javadoc -linkoffline file:///C%7C/Apps/jdk1.2.1/docs/api file:///usr/opt
 
 recompile:
 	cd src;\
-	${JAVAC} bossa/*/*.java nice/tools/*.java mlsub/*/*.java ../stdlib/nice/lang/*.java
+	${JAVAC} bossa/*/*.java nice/**/*.java mlsub/*/*.java ../stdlib/nice/lang/*.java
 
 recompileGNU:
 	cd src; ${JAVAC} gnu/*/*.java gnu/*/*/*.java kawa/*/*.java
+
+recompileSTDLIB:
+	${JAVAC} ${TOP}/stdlib/nice/lang/*.java
 
 parser:
 	cd src/bossa/parser; ${JAVACC} Parser.jj

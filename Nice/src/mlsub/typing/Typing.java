@@ -12,7 +12,7 @@
 
 // File    : Typing.java
 // Created : Tue Jul 20 11:57:17 1999 by bonniot
-//$Modified: Tue Aug 29 17:30:13 2000 by Daniel Bonniot $
+//$Modified: Tue Sep 05 19:14:40 2000 by Daniel Bonniot $
 
 package mlsub.typing;
 
@@ -337,7 +337,30 @@ public final class Typing
    * Domains 
    ****************************************************************/
 
-  /** Test if a polytype is in a domain */
+  /** Test if d1 is a subdomain of d2. */
+  public static void leq(Domain d1, Domain d2)
+    throws TypingEx
+  {
+    if(dbg) Debug.println(d1+" leq "+d2);
+    
+    if(d1 == Domain.bot)
+      return;
+
+    enter();
+    try{
+      Constraint.assert(d1.getConstraint());
+
+      Typing.implies();
+
+      Constraint.assert(d2.getConstraint());
+      leq(d1.getMonotype(), d2.getMonotype());
+    }
+    finally{
+      leave();
+    }
+  }
+  
+  /** Test if a polytype is in a domain. */
   public static void in(Polytype type, Domain domain)
     throws TypingEx
   {
@@ -351,7 +374,7 @@ public final class Typing
     leq(type.getMonotype(),domain.getMonotype());
   }
   
-  /** Test if a monotype is in a domain */
+  /** Test if a monotype is in a domain. */
   public static void in(Monotype type, Domain domain)
     throws TypingEx
   {
@@ -518,7 +541,8 @@ public final class Typing
 	return null;
       }
     
-    return (TypeConstructor) cst.lowestRigidSuperElement(tc);
+    // the allowWidening last parameter should be removed if always use it as false
+    return (TypeConstructor) cst.lowestRigidSuperElement(tc, false);
   }
   
   /****************************************************************

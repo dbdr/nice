@@ -10,7 +10,7 @@ compile()
 
 execute()
 {
-  nicer -e ${HOME}/Nice/regtest/$1
+  nicer -el ${HOME}/Nice/regtest/$1
 }
 
 ### Regression test suite

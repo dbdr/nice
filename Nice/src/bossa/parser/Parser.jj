@@ -12,7 +12,7 @@
 
 // File    : parser.jj
 // Created : Thu Jul 01 10:27:05 1999 by bonniot
-//$Modified: Tue Aug 29 13:28:12 2000 by Daniel Bonniot $
+//$Modified: Tue Sep 05 19:19:15 2000 by Daniel Bonniot $
 // Description : Parseur JavaCC pour Nice
 //   Tokens based on the Jazz parser
 
@@ -127,7 +127,6 @@ TOKEN: /* Operators */
 | < MULT:    "*"   >
 | < SLASH:   "/"   >
 | < NEQ:     "!="  >
-//| < DIV:     "div" >
 | < MOD:     "%"   >
 | < LNOT:    "!"   >
 | < BAND:    "&"   >
@@ -425,7 +424,16 @@ Collection strings():
   { return res; }
 }
 
-LocatedString number():
+LocatedString floatingLiteral():
+{
+  Token t;
+}
+{
+  t = <FLOATING_POINT_LITERAL> 
+  { return new LocatedString(t.image, new Location(t)); }
+}
+
+LocatedString integerLiteral():
 {
   Token t;
 }
@@ -1088,17 +1096,17 @@ Expression intConstantExp():
   LocatedString representation;
 }
 {
-  representation=number()
+  representation=integerLiteral()
   { return ConstantExp.makeNumber(representation); }
 }
 
 Expression floatConstantExp():
 {
-  Token t;
+  LocatedString representation;
 }
 {
-  t = <FLOATING_POINT_LITERAL> 
-  { return ConstantExp.makeDouble(Double.parseDouble(t.image), new Location(t)); }
+  representation=floatingLiteral()
+  { return ConstantExp.makeFloating(representation); }
 }
 
 StringConstantExp stringConstantExp():
@@ -1780,7 +1788,7 @@ Statement StatementExpression() :
     }
   ]
   )
-  { 
+  {
     last = getToken(0);
     e1.setLocation(new Location(first, last));
     return new ExpressionStmt(e1); 

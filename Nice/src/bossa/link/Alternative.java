@@ -12,7 +12,7 @@
 
 // File    : Alternative.java
 // Created : Mon Nov 15 12:20:40 1999 by bonniot
-//$Modified: Mon Aug 07 15:49:58 2000 by Daniel Bonniot $
+//$Modified: Tue Sep 05 17:39:54 2000 by Daniel Bonniot $
 
 package bossa.link;
 
@@ -24,6 +24,7 @@ import bossa.syntax.MethodDefinition;
 import bossa.syntax.Pattern;
 import bossa.syntax.LocatedString;
 import bossa.syntax.Node;
+import nice.tools.code.*;
 
 import gnu.bytecode.*;
 import gnu.expr.*;
@@ -212,14 +213,9 @@ public class Alternative
     return instanceOfExp(parameter, nice.tools.code.Types.javaType(dom));
   }
 
-  private static final gnu.mapping.Procedure instanceProc = 
-    new gnu.kawa.reflect.InstanceOf(gnu.expr.Interpreter.getInterpreter());
-  
   static gnu.expr.Expression instanceOfExp(gnu.expr.Expression value, gnu.bytecode.Type ct)
   {
-    gnu.expr.Expression[] callParams = { value, new QuoteExp(ct) };
-    
-    return new ApplyExp(new QuoteExp(instanceProc),callParams);
+    return Inline.inline(new InstanceOfProc(ct), value);
   }
   
   private static final gnu.mapping.Procedure orProc =

@@ -12,18 +12,99 @@
 
 // File    : numeric.nice
 // Created : Wed Dec 01 15:44:03 1999 by bonniot
-//$Modified: Thu Jun 22 22:04:44 2000 by Daniel Bonniot $
 
 /**
- * Numerical hierarchy.
- * 
- * Wrapper for {@link gnu.math <code>gnu.math</code>}.
- *
- * @author bonniot
+   Numerical hierarchy.
+   
+   Wrapper for {@link gnu.math <code>gnu.math</code>}.
+   
+   @version $Date$
+   @author bonniot
  */
 
 package nice.lang;
 
+int MAX_INT() = native java.lang.Integer.MAX_VALUE;
+
+// Comparison
+boolean `<`(double, double) = native boolean Native.lt(double, double);
+boolean `<`(float, float) = native boolean Native.lt(float, float);
+boolean `<`(long, long) = native boolean Native.lt(long, long);
+boolean `<`(int, int) = native boolean Native.lt(int, int);
+
+boolean `<=`(double, double) = native boolean Native.leq(double, double);
+boolean `<=`(float, float) = native boolean Native.leq(float, float);
+boolean `<=`(long, long) = native boolean Native.leq(long, long);
+boolean `<=`(int, int) = native boolean Native.leq(int, int);
+
+boolean `>`(double, double) = native boolean Native.gt(double, double);
+boolean `>`(float, float) = native boolean Native.gt(float, float);
+boolean `>`(long, long) = native boolean Native.gt(long, long);
+boolean `>`(int, int) = native boolean Native.gt(int, int);
+
+boolean `>=`(double, double) = native boolean Native.geq(double, double);
+boolean `>=`(float, float) = native boolean Native.geq(float, float);
+boolean `>=`(float, float) = native boolean Native.geq(float, float);
+boolean `>=`(int, int) = native boolean Native.geq(int, int);
+
+// Equality
+boolean `==`(double, double) = native boolean Native.eq(double, double);
+boolean `==`(float, float) = native boolean Native.eq(float, float);
+boolean `==`(long, long) = native boolean Native.eq(long, long);
+boolean `==`(int, int) = native boolean Native.eq(int, int);
+
+// Inequality
+boolean `!=`(double, double) = native boolean Native.neq(double, double);
+boolean `!=`(float, float) = native boolean Native.neq(float, float);
+boolean `!=`(long, long) = native boolean Native.neq(long, long);
+boolean `!=`(int, int) = native boolean Native.neq(int, int);
+
+// Operators
+/* should be accepted, but compiled to NOP
+   Only effect = promotion if type < int
+double `+`(double) = nop
+float `+`(float) = nop
+long `+`(long) = nop
+int `+`(int) = 
+*/
+
+// unary minus
+double `-`(double) = native double Native.minus(double);
+float `-`(float) = native float Native.minus(float);
+long `-`(long) = native long Native.minus(long);
+int `-`(int) = native int Native.minus(int);
+
+// multiplication
+double `*`(double, double) = native double Native.mult(double, double);
+float `*`(float, float) = native float Native.mult(float, float);
+long `*`(long, long) = native long Native.mult(long, long);
+int `*`(int, int) = native int Native.mult(int, int);
+
+// division
+double `/`(double, double) = native double Native.div(double, double);
+float `/`(float, float) = native float Native.div(float, float);
+long `/`(long, long) = native long Native.div(long, long);
+int `/`(int, int) = native int Native.div(int, int);
+
+// remainder
+double `%`(double, double) = native double Native.remainder(double, double);
+float `%`(float, float) = native float Native.remainder(float, float);
+long `%`(long, long) = native long Native.remainder(long, long);
+int `%`(int, int) = native int Native.remainder(int, int);
+
+// addition
+double `+`(double, double) = native double Native.plus(double, double);
+float `+`(float, float) = native float Native.plus(float, float);
+long `+`(long, long) = native long Native.plus(long, long);
+int `+`(int, int) = native int Native.plus(int, int);
+
+// substraction
+double `-`(double, double) = native double Native.minus(double, double);
+float `-`(float, float) = native float Native.minus(float, float);
+long `-`(long, long) = native long Native.minus(long, long);
+int `-`(int, int) = native int Native.minus(int, int);
+
+/*
 import gnu.math.*;
 
 <Numeric N> N `+`(N, N) = native Numeric Numeric.add(Object);
@@ -46,10 +127,6 @@ boolean `<`(Numeric, Numeric);
 IntNum numerator(RatNum) = native IntNum RatNum.numerator();
 IntNum denominator(RatNum) = native IntNum RatNum.denominator();
 
-/****************************************************************
- * Infinity
- ****************************************************************/
-
 RatNum native_infinity(Numeric) = native RatNum RatNum.infinity(int);
 
 RatNum positiveInfinity();
@@ -62,10 +139,8 @@ num(i) = new gnu.math.IntNum(i);
 
 int MAX_INT() = native java.lang.Integer.MAX_VALUE;
 
-<Any T, Any U, Any V> V apply2(fun(T,U)(V), T, U);
-apply2(f, x, y) = f(x, y);
-
 void test();
 test(){
   `+`(1, 2);
 }
+*/

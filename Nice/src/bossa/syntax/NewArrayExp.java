@@ -12,7 +12,7 @@
 
 // File    : NewArrayExp.java
 // Created : Mon Aug 28 13:37:29 2000 by Daniel Bonniot
-//$Modified: Thu Aug 31 16:29:39 2000 by Daniel Bonniot $
+//$Modified: Mon Sep 04 16:55:23 2000 by Daniel Bonniot $
 
 package bossa.syntax;
 
@@ -26,6 +26,8 @@ import mlsub.typing.MonotypeConstructor;
 import mlsub.typing.MonotypeVar;
 import mlsub.typing.Polytype;
 import mlsub.typing.Constraint;
+import mlsub.typing.TypeConstructor;
+import mlsub.typing.TypeSymbol;
 
 /**
    Allocate a new instance of an Array type.
@@ -56,12 +58,28 @@ public class NewArrayExp extends Expression
     if (tc != null)
       return;
     
-    tc = ti.resolveToTC(typeScope);
-    ti = null;
+    TypeSymbol ts = ti.resolveToTypeSymbol(typeScope);
+    Monotype monotype;
+    
+    if (ts instanceof MonotypeVar)
+      monotype = (MonotypeVar) ts;
+    else
+      {
+	if (!(ts instanceof TypeConstructor))
+	  User.error(ti, ti + " should be a class");
+    
+	tc = (TypeConstructor) ts;
+	monotype = new MonotypeConstructor(tc, MonotypeVar.news(tc.arity()));
+      }
+    
+    for (int i = 0; i<knownDimensions.length + unknownDimensions; i++)
+      monotype = new MonotypeConstructor
+	(ConstantExp.arrayTC, new Monotype[]{monotype});
+    
+    // set the Expression type
+    type = new Polytype(Constraint.True, monotype);
 
-    if (!TypeConstructors.constant(tc))
-      User.error(this,
-		 tc + " should denote a known class");
+    ti = null;
   }
   
   void findJavaClasses()
@@ -79,12 +97,6 @@ public class NewArrayExp extends Expression
   void computeType()
   {
     resolveTC();
-    Monotype t = new MonotypeConstructor(tc, MonotypeVar.news(tc.arity()));
-    
-    for (int i=0; i<knownDimensions.length + unknownDimensions; i++)
-      t = new MonotypeConstructor(ConstantExp.arrayTC, new Monotype[]{t});
-    
-    type = new Polytype(Constraint.True, t);
   }
 
   void typecheck()
@@ -106,11 +118,7 @@ public class NewArrayExp extends Expression
 
   public gnu.expr.Expression compile()
   {
-    Type t = nice.tools.code.Types.javaType(tc);
-    int nbDimensions = knownDimensions.length + unknownDimensions;
-    
-    for (int i = 0; i < nbDimensions; i++)
-      t = nice.tools.code.SpecialArray.create(t);
+    Type t = nice.tools.code.Types.javaType(type);
     
     return new gnu.expr.ApplyExp
       (new nice.tools.code.MultiArrayNewProc((ArrayType) t, 
@@ -122,8 +130,8 @@ public class NewArrayExp extends Expression
   {
     StringBuffer res = new StringBuffer
       ("new " +
-       (ti == null ? tc.toString() : ti.toString()) +
-       " " +
+       (ti != null ? ti.toString() : 
+	tc != null ? tc.toString() : type.toString()) +
        Util.map("[", "]", "]", knownDimensions));
 
     for(int i=0; i<unknownDimensions; i++)
@@ -133,7 +141,7 @@ public class NewArrayExp extends Expression
   }
 
   private TypeIdent ti;
-  private mlsub.typing.TypeConstructor tc;
+  private TypeConstructor tc;
 
   private Expression[] knownDimensions;
   private int unknownDimensions;

@@ -12,7 +12,7 @@
 
 // File    : CallExp.java
 // Created : Mon Jul 05 16:27:27 1999 by bonniot
-//$Modified: Fri Sep 01 12:44:06 2000 by Daniel Bonniot $
+//$Modified: Tue Sep 05 16:11:33 2000 by Daniel Bonniot $
 
 package bossa.syntax;
 
@@ -314,8 +314,8 @@ public class CallExp extends Expression
 	      }
 	    
 	    if (possibilities.size() == 0)
-	      User.error(this, "Class " + declaringClass.getName() +
-			 " has no method " + funName);
+	      User.error(this, "class " + declaringClass.getName() +
+			 " has no method or field " + funName);
 	    
 	    fun = new ExpressionRef
 	      (new OverloadedSymbolExp(possibilities, funName,

@@ -12,7 +12,7 @@
 
 // File    : ConstantExp.java
 // Created : Thu Jul 08 15:36:40 1999 by bonniot
-//$Modified: Mon Aug 28 14:08:10 2000 by Daniel Bonniot $
+//$Modified: Tue Sep 05 19:18:18 2000 by Daniel Bonniot $
 
 package bossa.syntax;
 
@@ -25,9 +25,7 @@ import nice.tools.code.SpecialTypes;
 import bossa.util.*;
 
 /**
- * Abstract class for constant values of basic types.
- *
- * Numeric types come from {@link gnu.math gnu.math}.
+   Abstract class for constant values of basic types.
  */
 public class ConstantExp extends Expression
 {
@@ -141,47 +139,63 @@ public class ConstantExp extends Expression
 
 	c = value.toString().charAt(0);
       }
-    
-    return new ConstantExp(primChar, gnu.text.Char.make(c), "'" + c + "'",
+  
+    return new ConstantExp(primChar, new Character(c), "'" + c + "'",
 			   value.location());
   }
 
-  public static Expression makeNumber(int value)
+  private static Expression makeInt(long value, Location location)
   {
-    return new ConstantExp(primInt, gnu.math.IntNum.make(value), value+"",
-			   Location.nowhere());
+    TypeConstructor type;
+    Number object;
+    
+    if (value >= Byte.MIN_VALUE && value <= Byte.MAX_VALUE)
+      {
+	type = primByte;
+	object = new Byte((byte) value);
+      }
+    else if (value >= Short.MIN_VALUE && value <= Short.MAX_VALUE)
+      {
+	type = primShort;
+	object = new Short((short) value);
+      }
+    else if (value >= Integer.MIN_VALUE && value <= Integer.MAX_VALUE)
+      {
+	type = primInt;
+	object = new Integer((int) value);
+      }
+    else
+      {
+	User.error(location, value + " is not in the range of int values");
+	return null;
+      }
+    
+    return new ConstantExp(type, object, value+"", location);
   }
   
   public static Expression makeNumber(LocatedString representation)
   {
     String rep = representation.toString();
 
-    // Is in a valid int ?
     try{
-      int i = Integer.decode(rep).intValue();
-      
-      TypeConstructor type = primInt;
-      
-      if (i >= Byte.MIN_VALUE && i <= Byte.MAX_VALUE)
-	type = primByte;
-      else if (i >= Short.MIN_VALUE && i <= Short.MAX_VALUE)
-	type = primShort;
-      
-      return new ConstantExp(type, gnu.math.IntNum.make(i), 
-			     i+"", representation.location());
+      long value = Long.decode(rep).longValue();
+      return makeInt(value, representation.location());
     }
     catch(NumberFormatException e){
+      User.error(representation, rep + " is not a valid number");
+      return null;
     }
-
-    User.error(representation,
-	       rep+" is not a valid number");
-    return null;
   }
   
   public static Expression makeDouble(double value, Location location)
   {
-    return new ConstantExp(primFloat, gnu.math.DFloNum.make(value), value+"",
+    return new ConstantExp(primFloat, new Double(value), value+"",
 			   location);
+  }
+  
+  public static Expression makeFloating(LocatedString representation)
+  {
+    return makeDouble(Double.parseDouble(representation.toString()), representation.location());
   }
   
   static gnu.bytecode.Type registerPrimType(String name, TypeConstructor tc)

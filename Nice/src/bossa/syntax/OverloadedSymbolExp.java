@@ -12,7 +12,7 @@
 
 // File    : OverloadedSymbolExp.java
 // Created : Thu Jul 08 12:20:59 1999 by bonniot
-//$Modified: Fri Sep 01 16:42:12 2000 by Daniel Bonniot $
+//$Modified: Fri Sep 01 19:19:39 2000 by Daniel Bonniot $
 
 package bossa.syntax;
 
@@ -254,12 +254,8 @@ public class OverloadedSymbolExp extends Expression
       for(int s2 = 0; s2<len; s2++)
 	if (s1 != s2)
 	  try{
-	    Debug.println("TRYING " + 
-			  syms[s2].getClonedType() + " << " +
-			  syms[s1].getClonedType());
 	    Typing.leq(syms[s2].getClonedType().getDomain(), 
 		       syms[s1].getClonedType().getDomain());
-	    Debug.println("SUCCESS");
 	    remove[s1] = true;
 	    break;
 	  }

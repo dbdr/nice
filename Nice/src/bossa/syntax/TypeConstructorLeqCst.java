@@ -12,7 +12,7 @@
 
 // File    : TypeConstructorLeqCst.java
 // Created : Sat Jul 24 12:02:15 1999 by bonniot
-//$Modified: Tue Jun 13 19:01:18 2000 by Daniel Bonniot $
+//$Modified: Mon Sep 04 14:21:42 2000 by Daniel Bonniot $
 
 package bossa.syntax;
 
@@ -41,9 +41,6 @@ public class TypeConstructorLeqCst extends AtomicConstraint
     // this constraint meant t1 implements t2
 
     TypeSymbol s = t2.resolveToTypeSymbol(ts);
-
-    if(s == null)
-      User.error(t2, t2 + " is not declared");
 
     if(s instanceof Interface)
       return new mlsub.typing.ImplementsCst(t1, (Interface) s);

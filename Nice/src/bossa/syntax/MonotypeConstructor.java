@@ -12,7 +12,7 @@
 
 // File    : MonotypeConstructor.java
 // Created : Thu Jul 22 09:15:17 1999 by bonniot
-//$Modified: Wed Aug 09 16:26:03 2000 by Daniel Bonniot $
+//$Modified: Tue Sep 05 11:14:24 2000 by Daniel Bonniot $
 
 package bossa.syntax;
 
@@ -115,32 +115,6 @@ public class MonotypeConstructor extends Monotype
   {
     return parameters;
   }
-  
-  /****************************************************************
-   * Code generation
-   ****************************************************************/
-
-  /** The value of an initialized variable of this monotype. */
-  /*
-  gnu.expr.Expression defaultValue()
-  {
-    if(tc==ConstantExp.primByte  ||
-       tc==ConstantExp.primChar  ||
-       tc==ConstantExp.primShort ||
-       tc==ConstantExp.primInt   ||
-       tc==ConstantExp.primLong)
-      return zeroInt;
-    else if(tc==ConstantExp.primFloat ||
-	    tc==ConstantExp.primDouble)
-      return zeroFloat;
-    else
-      return super.defaultValue();
-  }
-  */
-  private gnu.expr.Expression zeroInt = 
-    new gnu.expr.QuoteExp(new gnu.math.IntNum(0));
-  private gnu.expr.Expression zeroFloat = 
-    new gnu.expr.QuoteExp(new gnu.math.DFloNum(0.0));
   
   /****************************************************************
    * Printing

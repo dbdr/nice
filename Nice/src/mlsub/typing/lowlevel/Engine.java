@@ -12,7 +12,7 @@
 
 // File    : Engine.java
 // Created : Tue Jul 27 15:34:53 1999 by bonniot
-//$Modified: Thu Aug 31 12:13:02 2000 by Daniel Bonniot $
+//$Modified: Fri Sep 01 18:41:13 2000 by Daniel Bonniot $
 
 package mlsub.typing.lowlevel;
 
@@ -728,7 +728,7 @@ public abstract class Engine
 	k0.leq(e1.getId(),e2.getId()); 
     }
 
-    public Element lowestRigidSuperElement(Element e)
+    public Element lowestRigidSuperElement(Element e, boolean allowWidening)
     {
       int id = e.getId();
       int res = -1;
@@ -742,6 +742,11 @@ public abstract class Engine
 	// could be more precise in presence of interfaces.
 	if (k0.wasEntered(id, i) && (res == -1 || k0.isLeq(i, res)))
 	  res = i;
+
+      if (res == -1 && allowWidening)
+	for (int i = 0; i < k0.initialContextSize(); i++)
+	  if (k0.wasEntered(i, id) && (res == -1 || k0.isLeq(res, i)))
+	    res = i;
       
       if (res == -1)
 	return null;

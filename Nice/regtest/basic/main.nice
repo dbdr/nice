@@ -104,4 +104,6 @@ main(args)
 
     println("" + (bo==false) + (by==0) + (s==0) + (i==0) + (l==0));
   }
+
+  test_arrays();
 }

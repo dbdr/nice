@@ -12,7 +12,6 @@
 
 // File    : Package.java
 // Created : Wed Oct 13 16:09:47 1999 by bonniot
-//$Modified: Thu Aug 31 15:46:35 2000 by Daniel Bonniot $
 
 package bossa.modules;
 
@@ -31,11 +30,11 @@ import bossa.modules.Compilation;
 import bossa.util.Location;
 
 /**
- * A Nice package.
- * 
- * @author bonniot
+   A Nice package.
+   
+   @version $Date$
+   @author bonniot
  */
-
 public class Package implements mlsub.compilation.Module, Located
 {
   public long lastModification()
@@ -465,8 +464,6 @@ public class Package implements mlsub.compilation.Module, Located
     ClassType ct = null;
     gnu.expr.Compilation comp = null;
     try{
-      kawa.standard.Scheme.registerEnvironment();
-      
       ct = new ClassType("dispatch");
       ct.setSuper(Type.pointer_type);
       ct.setModifiers(Access.PUBLIC|Access.FINAL);

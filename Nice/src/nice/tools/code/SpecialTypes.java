@@ -12,25 +12,23 @@
 
 // File    : SpecialTypes.java
 // Created : Mon Jan 17 14:19:30 2000 by bonniot
-//$Modified: Mon Aug 28 18:32:49 2000 by Daniel Bonniot $
 
 package nice.tools.code;
 
 import bossa.util.*;
 import gnu.bytecode.*;
 
-import kawa.standard.Scheme;
-
 /**
- * Used to store types with automatic conversion.
- * 
- * @author bonniot
- */
+   Used to store types with automatic conversion.
+   
+   @version $Date$
+   @author bonniot
+*/
 
 public class SpecialTypes
 {
   static public final Type intType, longType, byteType, charType, 
-    shortType, floatType, doubleType, booleanType, voidType, arrayType;
+    shortType, floatType, doubleType, booleanType, voidType;
   
   public static void init()
   {
@@ -39,23 +37,27 @@ public class SpecialTypes
   
   static
   {
-    intType = Scheme.intType;
-    longType = Scheme.longType;
-    charType = Scheme.charType;
-    byteType = Scheme.byteType;
-    shortType = Scheme.shortType;
-    floatType = Scheme.floatType;
-    doubleType = Scheme.doubleType;
-    booleanType = Scheme.booleanType;
-    voidType = gnu.bytecode.Type.void_type;
+    byteType = Type.byte_type;
+    shortType = Type.short_type;
+    intType = Type.int_type;
+    longType = Type.long_type;
 
-    arrayType = SpecialArray.create(Type.pointer_type);
-    
-    Type.flushTypeChanges();
+    charType = Type.char_type;
+
+    booleanType = Type.boolean_type;
+    voidType = Type.void_type;
+
+    floatType = Type.float_type;
+    doubleType = Type.double_type;
+
+    //Type.flushTypeChanges();
   }
 
-  static public Type makeArrayType(Type elements)
+  static public Type makeArray(Type elements)
   {
+    if (elements == Type.pointer_type)
+      return SpecialArray.unknownTypeArray();
+    
     return SpecialArray.create(elements);
   }
 }

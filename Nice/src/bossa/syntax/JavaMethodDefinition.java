@@ -12,7 +12,6 @@
 
 // File    : JavaMethodDefinition.java
 // Created : Tue Nov 09 11:49:47 1999 by bonniot
-//$Modified: Mon Aug 07 15:34:56 2000 by Daniel Bonniot $
 
 package bossa.syntax;
 
@@ -27,7 +26,10 @@ import mlsub.typing.TypeConstructor;
 import java.util.*;
 
 /**
- * A Native Java Method.
+   A Native Java Method.
+
+   @version $Date$
+   @author Daniel Bonniot
  */
 public class JavaMethodDefinition extends MethodDefinition
 {
@@ -44,7 +46,7 @@ public class JavaMethodDefinition extends MethodDefinition
 			      LocatedString className,
 			      String methodName,
 			      List /* of LocatedString */ javaTypes,
-			      // Bossa information
+			      // Nice information
 			      LocatedString name, 
 			      Constraint constraint,
 			      Monotype returnType,
@@ -64,7 +66,7 @@ public class JavaMethodDefinition extends MethodDefinition
 			       LocatedString className,
 			       String methodName,
 			       List /* of LocatedString */ javaTypes,
-			       // Bossa information
+			       // Nice information
 			       LocatedString name, 
 			       mlsub.typing.Constraint constraint,
 			       mlsub.typing.Monotype returnType,
@@ -205,8 +207,6 @@ public class JavaMethodDefinition extends MethodDefinition
   /** Access flags */
   private int flags;
   
-  private int javaArity;
-  
   /****************************************************************
    * Code generation
    ****************************************************************/
@@ -237,12 +237,7 @@ public class JavaMethodDefinition extends MethodDefinition
 		 "Class " + className + " was not found");
     
     if(!(holder instanceof ClassType))
-      {
-	if (className.toString().equals("ObjectArray"))
-	  holder = nice.tools.code.SpecialArray.objectArrayType;
-	else
-	  User.error(this, className + " is a primitive type");
-      }
+      User.error(this, className + " is a primitive type");
     
     className = new LocatedString(holder.getName(), className.location());
     
@@ -268,12 +263,9 @@ public class JavaMethodDefinition extends MethodDefinition
     reflectMethod = ((ClassType) holder).getDeclaredMethod
     (methodName, javaArgType);
     
-    if(reflectMethod==null)
-      reflectMethod = ((ClassType) holder).getDeclaredMethod
-      (methodName, javaArgType);
-    
     if(reflectMethod == null)
-      User.error(this, this + " was not found in " + holder);
+      User.error(this, "method " + methodName + 
+		 " was not found in class " + holder.getName());
 
     // use the following, or the Type.flushTypeChanges() in SpecialTypes
     //reflectMethod.arg_types = javaArgType;
@@ -285,17 +277,18 @@ public class JavaMethodDefinition extends MethodDefinition
     //if (reflectMethod.isConstructor())
     //.addConstructor(this);
     
+    int javaArity;
     if(reflectMethod.getStaticFlag() || reflectMethod.isConstructor())
-      javaArity = arity;
+      javaArity = javaTypes.size()-1;
     else
-      javaArity = arity-1;
+      javaArity = javaTypes.size();
     
-    if(javaTypes != null && javaTypes.size()-1 != javaArity)
+    if(javaTypes != null && javaArity != arity)
       User.error(this,
-		 "Native method "+this.symbol.name+
-		 " has not the same number of parameters "+
-		 "in Java ("+javaArity+
-		 ") and in Bossa ("+arity+")");    
+		 "Native method " + this.symbol.name + 
+		 " has not the same number of parameters " +
+		 "in Java (" + javaArity +
+		 ") and in Nice (" + arity + ")");    
   }
   
   /****************************************************************

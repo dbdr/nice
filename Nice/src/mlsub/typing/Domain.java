@@ -12,14 +12,14 @@
 
 // File    : Domain.java
 // Created : Fri Jun 02 16:59:06 2000 by Daniel Bonniot
-//$Modified: Wed Aug 02 18:39:43 2000 by Daniel Bonniot $
 
 package mlsub.typing;
 
 /**
- * Ex V. K. \theta
- * 
- * @author Daniel Bonniot
+   Ex V. K. \theta
+   
+   @version $Date$
+   @author Daniel Bonniot
  */
 
 public class Domain
@@ -30,6 +30,9 @@ public class Domain
     this.monotype = monotype;
   }
 
+  /**
+     The domain Ex T. True. T
+  */
   public final static Domain bot = null;
   
   public Constraint getConstraint()
@@ -50,46 +53,6 @@ public class Domain
     return res;
   }
   
-  /**
-   * Returns true iff a <= b.
-   *
-   * Only looks at the head, so is valid for link tests only.
-   */
-  /*
-  public static boolean leq(Domain a, Domain b)
-  {
-    if(b==null) // Ex \alpha . \alpha
-      return true;
-    else if(a==null)
-      return false;
-    
-    TypeConstructor ta = a.monotype.getTC();
-    TypeConstructor tb = b.monotype.getTC();
-
-    if(ta==null)
-      throw new InternalError("Null tycon: "+a.toString()+" "+a.getClass());
-    if(tb==null)
-      throw new InternalError("Null tycon: "+b.toString()+" "+b.getClass());
-    
-    return Typing.testRigidLeq(ta,tb);
-  }
-  */
-  /**
-   * Returns true iff tycon tc \in domain d.
-   *//*
-  public static boolean in(TypeConstructor tc, Domain d)
-  {
-    if(d==Domain.bot)
-      return true;
-    // a null tc means a tag that connot be matched (e.g. a function)
-    else if(tc==null)
-      return false;
-    
-    TypeConstructor t = d.monotype.getTC();
-
-    return Typing.testRigidLeq(tc,t);
-  }
-     */
   /****************************************************************
    * Misc
    ****************************************************************/

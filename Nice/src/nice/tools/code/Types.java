@@ -12,7 +12,6 @@
 
 // File    : Types.java
 // Created : Mon Jun 05 11:28:10 2000 by Daniel Bonniot
-//$Modified: Tue Aug 29 11:33:38 2000 by Daniel Bonniot $
 
 package nice.tools.code;
 
@@ -28,6 +27,7 @@ import java.util.*;
 /**
    Conversion between Nice and bytecode types.
    
+   @version $Date$
    @author Daniel Bonniot
  */
 
@@ -79,21 +79,30 @@ public final class Types
     
     TypeConstructor tc = mc.getTC();
 
-    if (Types.get(tc) != null)
-      // OK, nothing to do
-      return;
-    
-    TypeConstructor rigidTC = Typing.lowestRigidSuperTC(tc);
-    if (rigidTC == null)
-      // We don't know
-      return;
+    TypeConstructor rigidTC;
+    if (tc == ConstantExp.arrayTC)
+      rigidTC = tc;
+    else
+      {
+	if(Types.get(tc) != null)
+	  // OK, nothing to do
+	  return;
+	
+	rigidTC = Typing.lowestRigidSuperTC(tc);
+
+	if (rigidTC == null)
+	  // We don't know
+	  return;
+      }
     
     // Only for arrays, we are interested in the components too
     if (rigidTC == ConstantExp.arrayTC)
       {
 	Monotype param = mc.getTP()[0];
+
 	setBytecodeType(param);
-	Types.set(tc, SpecialArray.create(javaType(param)));
+	if (tc != ConstantExp.arrayTC)
+	  Types.set(tc, SpecialTypes.makeArray(javaType(param)));
       }
     else
       Types.set(tc, Types.get(rigidTC));
@@ -123,6 +132,7 @@ public final class Types
     m = m.equivalent();
 
     if (m instanceof TupleType)
+      // not SpecialArray
       return ArrayType.make(componentType((TupleType) m));
     
     if (!(m instanceof MonotypeConstructor))
@@ -131,7 +141,7 @@ public final class Types
     MonotypeConstructor mc = (MonotypeConstructor) m;
     TypeConstructor tc = mc.getTC();
     if(tc == ConstantExp.arrayTC)
-      return SpecialTypes.makeArrayType(javaType(mc.getTP()[0]));
+      return SpecialTypes.makeArray(javaType(mc.getTP()[0]));
     else
       return javaType(tc);
   }
@@ -152,9 +162,7 @@ public final class Types
   /** Returns the common bytecode type used for elements of this tuple. */
   public static Type componentType(TupleType t)
   {
-    // would work if we write a better javaType function that works for type variables too.
     return lowestCommonSuperType(javaType(t.getComponents()));
-    //return Type.pointer_type;
   }
   
   private static Type lowestCommonSuperType(Type[] types)
@@ -288,9 +296,14 @@ public final class Types
       }
     
     if(s.equals("void")) 	return SpecialTypes.voidType;
-    if(s.equals("int"))  	return SpecialTypes.intType;
-    if(s.equals("long")) 	return SpecialTypes.longType;
     if(s.equals("boolean")) 	return SpecialTypes.booleanType;
+    if(s.equals("byte")) 	return SpecialTypes.byteType;
+    if(s.equals("short")) 	return SpecialTypes.shortType;
+    if(s.equals("int")) 	return SpecialTypes.intType;
+    if(s.equals("long")) 	return SpecialTypes.longType;
+    if(s.equals("char")) 	return SpecialTypes.charType;
+    if(s.equals("float")) 	return SpecialTypes.floatType;
+    if(s.equals("double")) 	return SpecialTypes.doubleType;
     
     Class clas = lookupJavaClass(s);
     if (clas == null)
@@ -386,10 +399,7 @@ public final class Types
     return QuoteExp.nullExp;
   }
 
-  private static gnu.expr.Expression zeroInt = 
-    new QuoteExp(new gnu.math.IntNum(0));
-  private static gnu.expr.Expression zeroFloat = 
-    new QuoteExp(new gnu.math.DFloNum(0.0));
-  private static gnu.expr.Expression zeroChar = 
-    new QuoteExp(new java.lang.Character((char) 0));
+  private static Expression zeroInt = new QuoteExp(new Integer(0));
+  private static Expression zeroFloat = new QuoteExp(new Float(0.0));
+  private static Expression zeroChar = new QuoteExp(new Character((char) 0));
 }

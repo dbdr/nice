@@ -5,21 +5,11 @@ nice (0.9.0) unstable; urgency=low
       foo("blue") { ... }
       foo("red") { ... }
       foo(color) { println("unknown color: " + color); }
-  * Added operator ** to calculate powers of longs, doubles and BigIntegers.
-  * Archives (generated with the -a option) can now be used to distribute
-    Nice libraries.
-  * Interfaces can now implement (finally or not) abstract interfaces.
-  * 'true' and 'false' are now keywords, and better code is generated for them.
-    The termination properties of loops with literal boolean values are now 
-    recognized, as in Java.
-  * The 'char' type is no longer a subtype of int. The integer unicode 
-    representation of a character c can be obtained by int(c).
   * Added dispatch on global constants whose value is a literal. Example:
       let int specialValue = 7;
       void foo(int);
       foo(n) { /*do something*/ }
       foo(=specialValue) { /*do something else*/ }
-  * Redefining of local variables in their scope is not allowed anymore.
   * Dispatch on global constants works also for unique references(new objects).
       class Color {}
       let Color red = new Color();
@@ -28,6 +18,21 @@ nice (0.9.0) unstable; urgency=low
       name(color) = "unknown color";
       name(=red) = "red";
       name(=blue) = "blue";
+  * Implemented simple enums. The above color example can be simplified to:
+      enum Color { red, blue, green }
+      String name(Color);
+      name(=red) = "red";
+      name(=blue) = "blue";
+      name(=green) = "green";
+    The compiler knows now that the method "name" is completely covered.
+  * Added operator ** to calculate powers of longs, doubles and BigIntegers.
+  * The 'char' type is no longer a subtype of int. The integer unicode 
+    representation of a character c can be obtained by int(c).
+  * Interfaces can now implement (finally or not) abstract interfaces.
+  * 'true' and 'false' are now keywords, and better code is generated for them.
+    The termination properties of loops with literal boolean values are now 
+    recognized, as in Java.
+  * Redefining of local variables in their scope is not allowed anymore.
   * Method bodies with a single statement can be written without brackets.
     example: void foo() = throw new Exception; 
   * It is possible to bind the values of tuple arguments to functions:
@@ -37,13 +42,8 @@ nice (0.9.0) unstable; urgency=low
       tuples.add(("abc", 1));
       tuples.foreach(((String name, int number)) =>
         println("name: "+name+" number: "+number) );
-  * Implemented simple enums. The above color example can be simplified to:
-      enum Color { red, blue, green }
-      String name(Color);
-      name(=red) = "red";
-      name(=blue) = "blue";
-      name(=green) = "green";
-    The compiler knows now that the method "name" is completely covered.
+  * Archives (generated with the -a option) can now be used to distribute
+    Nice libraries.
   * In the bytecode, two versions of the instance constructors are created:
     one which lists all the fields, the other one that lists only those
     without default value. This is useful when instantiating Nice classes

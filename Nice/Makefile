@@ -190,8 +190,8 @@ bootstrap: parser
 
 ant:
 	@echo "Building the Ant task definition..."
-	$(NICEC1) --classpath "${ANT_CLASSPATH}" nice.tools.ant
-	@${javac} -sourcepath src -classpath "${ANT_CLASSPATH}:./classes:./classes.old" -d classes src/nice/tools/ant/*.java ||\
+	@$(NICEC1) --classpath "${ANT_CLASSPATH}" nice.tools.ant &&\
+	${javac} -sourcepath src -classpath "${ANT_CLASSPATH}:./classes:./classes.old" -d classes src/nice/tools/ant/*.java ||\
 	echo -e "Compilation of the Ant task definition failed.\n NICE_ANTJAR or ANT_HOME should be set, Ant should be in the CLASSPATH or at least linked to by ./external/ant.jar"
 
 nicedoc:

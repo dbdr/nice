@@ -69,35 +69,15 @@ public class PolySymbol extends VarSymbol
   // explained in OverloadedSymbolExp
 
   private Polytype clonedType;
-  
-  final void makeClonedType(Polytype[] argTypes, int[] used)
+
+  final void makeClonedType()
   {
     if (clonedType != null)
       Internal.error(this, "clonedType in use");
-    
+
     clonedType = type.cloneType();
-
-    /* Where a default value was used, use the declared argument type instead
-       of the value's type. This is more robust, as the application type will 
-       not depend on the default value.
-       Furthermore, this avoids running into problems when the default value
-       refers to type parameters (in anonymous functions, by refering to
-       previous arguments, ...) which would not be in sync with the cloned
-       ones.
-       This is only needed when the type is polymorphic.
-    */
-
-    if (clonedType == type || argTypes == null || used == null)
-      return;
-
-    mlsub.typing.Monotype fun = Types.rawType(clonedType.getMonotype());
-    mlsub.typing.Monotype[] domain = ((mlsub.typing.FunType) fun).domain();
-
-    for (int i = 0; i < argTypes.length; i++)
-      if (used[i] == 0)
-        argTypes[i] = new Polytype(domain[i]);
   }
-  
+
   void releaseClonedType()
   {
     clonedType = null;

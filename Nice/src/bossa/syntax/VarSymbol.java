@@ -116,12 +116,7 @@ public abstract class VarSymbol extends Node implements Located
 
   // explained in OverloadedSymbolExp
 
-  /** @param argTypes types of the arguments used in the call to this
-        symbol.
-      @param used default values were used at those indexes where
-        the value in this array is 0.
-  */
-  abstract void makeClonedType(Polytype[] argTypes, int[] used);
+  abstract void makeClonedType();
   abstract void releaseClonedType();
   abstract Polytype getClonedType();
   

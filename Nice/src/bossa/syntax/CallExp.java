@@ -275,18 +275,28 @@ public class CallExp extends Expression
       // function should be a function abstraction here
       // no default arguments
       {
-	type = getTypeAndReportErrors(location(), function, 
-				      arguments.inOrder());
+	setComputedType(getTypeAndReportErrors(location(), function,
+                                               arguments.inOrder()),
+                        null);
 	arguments.computedExpressions = arguments.inOrder();
       }
+  }
+
+  /** @param argTypes
+        The types of the formal arguments of the function, in the same
+        polymorphic instance as the computed type.
+  */
+  void setComputedType(Polytype type, Monotype[] argTypes)
+  {
+    this.type = type;
 
     if (! type.isMonomorphic() && argTypes != null)
       {
-	/* 
+	/*
 	   We construct the instantiated version of the function type:
-	   the type of the function, constrained by the actual arguments. 
-	   Then we simplify it. 
-	   It is useful to constrain the arguments to have the expected 
+	   the type of the function, constrained by the actual arguments.
+	   Then we simplify it.
+	   It is useful to constrain the arguments to have the expected
 	   bytecode types.
 	*/
 	instanciatedDomain = new Polytype
@@ -299,12 +309,8 @@ public class CallExp extends Expression
 
     if (! type.trySimplify())
       User.warning(this, "This call might have a type error, or this might be a bug in the compiler. \nPlease contact bonniot@users.sourceforge.net");
-  }
 
-  /** The types of the formal arguments of the function, in the same
-      polymorphic instance as the computed type.
-  */  
-  Monotype[] argTypes;
+  }
 
   /** The type of the function, constrained by the actual arguments. */
   private Polytype instanciatedDomain;

@@ -139,11 +139,6 @@ public abstract class MethodDeclaration extends Definition
   */
   void typedResolve()
   {
-    if (module.interfaceFile())
-      return;
-
-    Polytype type = getType();
-    
     if (!Constraint.hasBinders(type.getConstraint()))
       {
 	parameters.typecheck(type.domain());

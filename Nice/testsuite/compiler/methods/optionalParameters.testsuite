@@ -181,3 +181,35 @@ assert foo(2) == 5;
   assert foo(x: 1, y: foo()) == 1;
   /// Toplevel
 int foo(int x = 0, int y = x + 1, int z = x) = z;
+
+/// PASS
+  // Default values using type parameters, in compiled packages
+  /// package a
+  /// Toplevel
+
+class A<T> {
+  int length() = 0;
+}
+
+<T> void myslice(A<T> a, int to = a.length) {}
+
+  /// package b import a
+  /// Toplevel
+
+<T> void foo(A<T> a) = myslice(a);
+
+/// PASS
+  // Default values using type parameters, in compiled packages
+  /// package a
+  /// Toplevel
+
+abstract class A<T> {
+  T get();
+}
+
+<T> void myslice(A<T> a, T to = a.get) {}
+
+  /// package b import a
+  /// Toplevel
+
+<T> void foo(A<T> a) = myslice(a);

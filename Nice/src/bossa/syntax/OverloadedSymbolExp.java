@@ -150,15 +150,17 @@ public class OverloadedSymbolExp extends Expression
 	if(Debug.overloading) 
 	  Debug.println("Overloading: Trying with "+s);
 
-	Polytype[] argsType = 
-	  Expression.getType(arguments.getExpressions(s));
-
 	// we clone the type to avoid clashes with another use
 	// of the same symbol
 	// the cloned type is stored in the VarSymbol
 	// and we check that cloneType() is not called twice
 	// before the clone type is released
-	s.makeClonedType(argsType, arguments.getUsedArguments(s));
+	s.makeClonedType();
+
+        Polytype[] argsType = 
+          computeArgsType(arguments.getExpressions(s),
+                          s.getClonedType(), arguments.getUsedArguments(s));
+
 	Polytype t = CallExp.wellTyped(s.getClonedType(), argsType);
 
 	if (t == null)
@@ -201,10 +203,10 @@ public class OverloadedSymbolExp extends Expression
       {
 	VarSymbol res = (VarSymbol) symbols.get(0);
 	// store the formal argument types for later use together with the type
-	callExp.argTypes = nice.tools.typing.Types.parameters(res.getClonedType());
+        callExp.setComputedType((Polytype) arguments.types.get(res),
+                                nice.tools.typing.Types.parameters(res.getClonedType()));
 	res.releaseClonedType();
 
-	callExp.type = (Polytype) arguments.types.get(res);
 	// store the expression (including default arguments)
 	callExp.arguments.computedExpressions = arguments.getExpressions(res);
 	//callExp.arguments = null; // free memory
@@ -213,6 +215,41 @@ public class OverloadedSymbolExp extends Expression
 
     releaseAllClonedTypes();
     throw new AmbiguityError();
+  }
+
+  private Polytype[] computeArgsType(Expression[] args,
+                                     Polytype functionType,
+                                     int[] usedArguments)
+  {
+    Polytype[] res = new Polytype[args.length];
+
+    mlsub.typing.Monotype[] domain = null;
+
+    /* Where a default value was used, use the declared argument type instead
+       of the value's type. This is more robust, as the application type will
+       not depend on the default value.
+       Furthermore, this avoids running into problems when the default value
+       refers to type parameters (in anonymous functions, by refering to
+       previous arguments, ...) which would not be in sync with the cloned
+       ones.
+       This is only needed when the type is polymorphic.
+    */
+    for (int i = 0; i < res.length; i++)
+      if (usedArguments != null && usedArguments[i] == 0)
+        {
+          System.out.println("Fixing " + i);
+          if (domain == null)
+            {
+              mlsub.typing.Monotype fun = Types.rawType(functionType.getMonotype());
+              domain = ((mlsub.typing.FunType) fun).domain();
+            }
+
+          res[i] = new Polytype(domain[i]);
+        }
+      else
+        res[i] = args[i].getType();
+
+    return res;
   }
 
   Expression resolveOverloading(Polytype expectedType)
@@ -231,7 +268,7 @@ public class OverloadedSymbolExp extends Expression
     for (Iterator i = symbols.iterator(); i.hasNext();)
       {
 	VarSymbol s = (VarSymbol) i.next();
-	s.makeClonedType(null, null);
+	s.makeClonedType();
 	try{
 	  Typing.leq(s.getClonedType(), expectedType);
 	  if(Debug.overloading)

@@ -209,8 +209,8 @@ public class FormalParameters extends Node
       this.overriden = overriden;
     }
 
-    Expression value() 
-    { 
+    Expression value()
+    {
       return defaultValue;
     }
 
@@ -228,14 +228,12 @@ public class FormalParameters extends Node
     void resolve(VarScope scope, TypeScope typeScope)
     {
       defaultValue = dispatch.analyse(defaultValue, scope, typeScope);
-      defaultValue = defaultValue.noOverloading();
       super.resolve(scope, typeScope);
     }
 
     void resolve(Info info)
     {
       defaultValue = dispatch.analyse(defaultValue, info);
-      defaultValue = defaultValue.noOverloading();
       super.resolve(null, null);
     }
 

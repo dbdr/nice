@@ -693,7 +693,10 @@ Monotype funOrTupleMonotype():
   codomain = monotype()
   { 
     FunType res = bossa.syntax.dispatch.createFunType(domain, codomain); 
-    res.nullness = maybe ? res.maybe : res.absent;
+    if (maybe)
+      res.nullness = /*maybe*/1;
+    else
+     res.nullness = /*absent*/3;
     return res; 
   }
   ]
@@ -709,7 +712,7 @@ Monotype funOrTupleMonotype():
     else
       res = new TypeIdent(new LocatedString("void",makeLocation(start, end)));
  
-    res.nullness = res.absent;
+    res.nullness = /*absent*/3;
     return res;
   }
 }
@@ -733,7 +736,10 @@ Monotype monotype():
     else
       domain = new Monotype[]{ res };
     res = bossa.syntax.dispatch.createFunType_(domain, codomain); 
-    res.nullness = maybe ? res.maybe : res.absent; }
+    if (maybe)
+      res.nullness = /*maybe*/1;
+    else
+      res.nullness = /*absent*/3; }
 ]
   { return res; }
 }
@@ -764,7 +770,10 @@ Monotype arrayMonotype(Monotype res):
       (new TypeIdent(new LocatedString("nice.lang.Array", loc)),
        bossa.syntax.dispatch.createTypeParameters(tp),
        loc);
-    res.nullness = maybe ? res.maybe : res.absent;
+    if (maybe)
+      res.nullness = /*maybe*/1;
+    else
+      res.nullness = /*absent*/3;
   }
 ]
   { return res; }
@@ -790,24 +799,24 @@ Monotype simpleMonotype():
 |
   start="alike" [ "<" p=monotypes() ">" ]
   { res=bossa.syntax.dispatch.createAlike(p, makeLocation(start)); }
-  { res.nullness = res.absent; }
+  { res.nullness = /*absent*/3; }
 |
   LOOKAHEAD(monotypeConstructor())
   res=monotypeConstructor()
-  { res.nullness = res.absent; }
+  { res.nullness = /*absent*/3; }
 | 
   res=typeIdent() 
-  { res.nullness = res.absent; }
+  { res.nullness = /*absent*/3; }
   )
   { 
     if ((maybe || sure) && 
-        (res.nullness != res.absent))
+        (res.nullness != /*absent*/3))
       throw bossa.util.User.error
         (res, "Nullness is specified in two ways for " + res);
     if (maybe)
-      res.nullness = res.maybe;
+      res.nullness = /*maybe*/1;
     else if (sure)
-      res.nullness = res.sure;
+      res.nullness = /*sure*/2;
   }
   { return res; }
 |
@@ -847,7 +856,7 @@ Expression ParameterTuplePart(List statements, List monotypes):
   ( "," part = ParameterTuplePart(statements, types) { parts.add(part); } )+
   last=")"
   { Monotype t = new TupleType(types, makeLocation(first, last));
-    t.nullness = Monotype.absent;
+    t.nullness = /*absent*/3;
     monotypes.add(t); 
     return new TupleExp(parts); }
 )
@@ -883,7 +892,7 @@ Parameter formalParameter(List statements):
     exp.setLocation(makeLocation(first,last));
     statements.add(bossa.syntax.dispatch.createExpressionStmt(exp));
     t = new TupleType(types, makeLocation(first, last));
-    t.nullness = Monotype.absent;
+    t.nullness = /*absent*/3;
 
     return bossa.syntax.dispatch.createParameter(t, ident ,val);
   }
@@ -1207,7 +1216,7 @@ MonotypeVar taggedMonotypeVar(List tags, List atoms):
   { 
     if (bound != null)
       {
-        bound.nullness = Monotype.absent;
+        bound.nullness = /*absent*/3;
         atoms.add(new MonotypeLeqCst(Monotype.createVar(mv), bound)); 
       }
 
@@ -1749,7 +1758,7 @@ MonoSymbol funExpParameter(List statements):
     exp.setLocation(makeLocation(first,last));
     statements.add(bossa.syntax.dispatch.createExpressionStmt(exp));
     type = new TupleType(types, makeLocation(first, last));
-    type.nullness = Monotype.absent;
+    type.nullness = /*absent*/3;
     return bossa.syntax.dispatch.createMonoSymbol(name, type);
   }
 )

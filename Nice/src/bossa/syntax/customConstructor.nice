@@ -164,7 +164,7 @@ public CustomConstructor createCustomConstructor(LocatedString className, Constr
 private Monotype getCCReturnType(LocatedString className, Constraint cst)
 {
   let classe = new TypeIdent(name: className);
-  classe.nullness = Monotype.sure;
+  classe.nullness = /*sure*/2;
 
   if (cst == trueConstraint)
     return classe;
@@ -181,6 +181,6 @@ private Monotype getCCReturnType(LocatedString className, Constraint cst)
 
   let res = createMonotypeConstructor
       (classe, new TypeParameters(content: params), classe.location());
-  res.nullness = Monotype.sure;
+  res.nullness = /*sure*/2;
   return res;
 }

@@ -50,10 +50,16 @@ localVariable(SymbolExp e)
 localVariable(AssignExp e) = localVariable(e.to);
 
 mlsub.typing.Monotype makeSure(mlsub.typing.Monotype m) = 
-  notNull(bossa.syntax.Monotype.sure(nice.tools.typing.Types.rawType(m)));
+  notNull(sureMonotype(nice.tools.typing.Types.rawType(m)));
 
 mlsub.typing.Monotype makeUnsure(mlsub.typing.Monotype m) = 
-  notNull(bossa.syntax.Monotype.maybe(nice.tools.typing.Types.rawType(m)));
+  notNull(maybeMonotype(nice.tools.typing.Types.rawType(m)));
+
+mlsub.typing.Monotype sureMonotype(?mlsub.typing.Monotype type) =
+  nice.tools.typing.Types.sureMonotype(type);
+
+mlsub.typing.Monotype maybeMonotype(?mlsub.typing.Monotype type) =
+  nice.tools.typing.Types.maybeMonotype(type);
 
 mlsub.typing.Monotype ensureMonomorphic(mlsub.typing.Polytype type,
 					LocalValue decl)
@@ -120,7 +126,7 @@ bossa.util.UserError ensureLocated(bossa.util.UserError e,
     }
 
   try {
-    return (sym, Monotype.sure(new mlsub.typing.MonotypeConstructor(tc, parameters)));
+    return (sym, sureMonotype(new mlsub.typing.MonotypeConstructor(tc, parameters)));
   } catch(BadSizeEx e) {
     return null;
   }
@@ -236,14 +242,8 @@ void addMappingsLS(TypeScope, Collection<LocatedString>, TypeSymbol[]) = native 
 gnu.expr.CopyArgument CopyArgument(Stack<gnu.bytecode.Variable>) = native new gnu.expr.CopyArgument(Stack);
 AST AST(List<Definition>, int) = native new AST(List, int);
 bossa.syntax.Monotype substitute(bossa.syntax.Monotype,Map<String,bossa.syntax.Monotype>) = native bossa.syntax.Monotype bossa.syntax.Monotype.substitute(Map);
-List<bossa.syntax.Monotype> substitute(Map<String,bossa.syntax.Monotype>,Collection<bossa.syntax.Monotype>) = native List bossa.syntax.Monotype.substitute(Map,Collection);
-boolean containsAlike(List<bossa.syntax.Monotype>) = native boolean bossa.syntax.Monotype.containsAlike(List);
-mlsub.typing.Monotype[] rawResolve(TypeMap,Collection<bossa.syntax.Monotype>) = native mlsub.typing.Monotype[] bossa.syntax.Monotype.rawResolve(TypeMap, Collection);
-boolean containsAlike(Monotype[]) = native boolean Monotype.containsAlike(Monotype[]);
-bossa.syntax.Monotype[] substitute(Map<String,bossa.syntax.Monotype>,bossa.syntax.Monotype[]) = native bossa.syntax.Monotype[] bossa.syntax.Monotype.substitute(Map,bossa.syntax.Monotype[]);
 ?mlsub.typing.TypeSymbol lookup(TypeMap, LocatedString) = native mlsub.typing.TypeSymbol TypeMap.lookup(LocatedString);
 ?mlsub.typing.TypeSymbol lookup(TypeMap, String) = native mlsub.typing.TypeSymbol TypeMap.lookup(String);
-Monotype[] Monotype_toArray(?List<Monotype>) = native Monotype[] Monotype.toArray(List);
 List<VarSymbol> lookup(VarScope, LocatedString) = native List VarScope.lookup(LocatedString);
 Map<gnu.bytecode.Type,mlsub.typing.TypeConstructor> javaTypeConstructors(bossa.modules.Compilation ) = native bossa.modules.Compilation.javaTypeConstructors;
 Map<VarSymbol, int[]> usedArguments(Arguments) = native Arguments.usedArguments;

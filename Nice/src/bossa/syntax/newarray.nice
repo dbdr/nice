@@ -86,9 +86,9 @@ public class NewArrayExp extends Expression
 
     // Add the nullness marker to the element type.
     if (sure)
-      monotype = bossa.syntax.Monotype.sure(monotype);
+      monotype = sureMonotype(monotype);
     else if (nullVars == null)
-      monotype = bossa.syntax.Monotype.maybe(monotype);
+      monotype = maybeMonotype(monotype);
     else
       {
         monotype = mlsub.typing.MonotypeConstructor.apply
@@ -118,12 +118,12 @@ public class NewArrayExp extends Expression
 	  monotype = mlsub.typing.MonotypeConstructor.apply(nullVars[i], monotype);
 	else
 	  // Unknown dimensions are not initialized: give an option type.
-	  monotype = bossa.syntax.Monotype.maybe(monotype);
+	  monotype = maybeMonotype(monotype);
       }
 
     // Known dimensions are initialized: give a sure type.
     for (int i = 0; i < knownDimensions.length; i++)
-      monotype = bossa.syntax.Monotype.sure
+      monotype = sureMonotype
 	(mlsub.typing.MonotypeConstructor.apply(nice.tools.typing.PrimitiveType.arrayTC, monotype));
     
     // set the Expression type

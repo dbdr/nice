@@ -14,11 +14,6 @@ package bossa.syntax;
 
 import bossa.util.*;
 
-//import mlsub.typing.*;
-
-//import gnu.bytecode.*;
-//import gnu.expr.*;
-
 /**
    Declaration of a method.
    

@@ -343,9 +343,9 @@ public final class Types
 	! (javaType instanceof TypeVariable))
       {
 	if (sure)
-	  return bossa.syntax.Monotype.sure(res);
+	  return nice.tools.typing.Types.sureMonotype(res);
     	else
-	  return bossa.syntax.Monotype.maybe(res);
+	  return nice.tools.typing.Types.maybeMonotype(res);
       }
     return res;
   }

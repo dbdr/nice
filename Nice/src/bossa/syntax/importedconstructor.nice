@@ -95,7 +95,7 @@ public ?ImportedConstructor loadImportedConstructor(CNiceClass def, gnu.bytecode
     return null;
 
   let classDef = def.getDefinition();
-  let returnType = Monotype.create(Monotype.sure
+  let returnType = Monotype.create(sureMonotype
       (new mlsub.typing.MonotypeConstructor(classDef.getTC(), classDef.getTypeParameters())));
 
   let constraint = classDef.classConstraint == null ?

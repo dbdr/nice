@@ -33,9 +33,6 @@ public class dispatch
   static VarScope createGlobalVarScope()
   { return null; }
 
-  public static Monotype createTypeIdent(LocatedString name)
-  { return null;}
-
   public static void resetTypeDefinitionMappings() {}
 
   public static mlsub.typing.Constraint getTypeDefResolvedConstraint(mlsub.typing.TypeConstructor tc)

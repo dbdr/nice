@@ -136,7 +136,7 @@ public Statement createForInLoop(?Monotype vartype, LocatedString varName, Locat
       tparams.add(vartype);	
       itertype = createMonotypeConstructor(new TypeIdent(name: new LocatedString("Iterator", loc)),
 	createTypeParameters(tparams), loc);
-      notNull(itertype).nullness = Monotype.sure;
+      notNull(itertype).nullness = /*sure*/2;
     }
 
   let getiter = createCallExp(createIdentExp(new LocatedString("forIterator", loc)), container); 

@@ -23,17 +23,17 @@ public class TupleType extends bossa.syntax.Monotype
   Location location;
 
   rawResolve(typeMap) = new mlsub.typing.TupleType
-      (bossa.syntax.Monotype.rawResolve(notNull(typeMap), types));
+      (bossa.syntax.Monotype.resolve(notNull(typeMap), types.toArray()));
 
   substitute(map)
   {
     bossa.syntax.Monotype res = new bossa.syntax.TupleType
-      ( types : bossa.syntax.Monotype.substitute(map, types), location : location);
+      ( types : types.mapToArray(Monotype t => t.substitute(map)), location : location);
     res.nullness = this.nullness;
     return res;
   }
 
-  containsAlike() = bossa.syntax.Monotype.containsAlike(types);
+  containsAlike() = types.any(Monotype t => t.containsAlike());
   
   location() = location;
   
@@ -112,7 +112,7 @@ public class TupleExp extends bossa.syntax.Expression
     if (expectedComponents == null)
       expectedComponents = components;
 
-    type = new mlsub.typing.Polytype(cst, bossa.syntax.Monotype.sure(tupleType));
+    type = new mlsub.typing.Polytype(cst, sureMonotype(tupleType));
   }
 
   /****************************************************************

@@ -234,7 +234,7 @@ public class CNiceClass extends NiceClass
 
     VarScope scope = notNull(definition.scope);
     mlsub.typing.Monotype thisType =
-      Monotype.sure(new mlsub.typing.MonotypeConstructor(definition.getTC(),
+      sureMonotype(new mlsub.typing.MonotypeConstructor(definition.getTC(),
 			definition.getTypeParameters()));
     thisSymbol = new ThisSymbol(thisName, type: thisType, declaringClass: this);
 
@@ -565,7 +565,7 @@ public class CNiceClass extends NiceClass
 	  specificCst = identifyTypeParameters(cst, parent, notNull(typeParameters));
 
         let cname = new LocatedString("<init>",definition.location());
-        let ctype = new mlsub.typing.Polytype(specificCst, new mlsub.typing.FunType(Monotype.resolve(definition.getLocalScope(), values.types()),Monotype.sure(new mlsub.typing.MonotypeConstructor(definition.getTC(), definition.getTypeParameters()))));
+        let ctype = new mlsub.typing.Polytype(specificCst, new mlsub.typing.FunType(Monotype.resolve(definition.getLocalScope(), values.types()),sureMonotype(new mlsub.typing.MonotypeConstructor(definition.getTC(), definition.getTypeParameters()))));
 	notNull(constructorMethod)[i] = new DefaultConstructor
 	  (cname, Node.global, parameters: values, arity: values.size,
 	   symbol: cast(null), type: ctype,

@@ -28,55 +28,10 @@ import nice.tools.typing.PrimitiveType;
 public abstract class Monotype
 implements Located
 {
-  static final Monotype[] toArray(List monotypes)
-  {
-    if (monotypes == null)
-      return array0;
-
-    return (Monotype[]) monotypes.toArray(new Monotype[monotypes.size()]);
-  }
-  
-  static final Monotype[] array0 = new Monotype[0];
-
-  /****************************************************************
-   * Syntactic fresh monotype variables
-   ****************************************************************/
-  
-  static Monotype fresh(LocatedString associatedVariable)
-  {
-    return dispatch.createTypeIdent(associatedVariable);
-  }
-  
-  static Monotype[] freshs(int arity, LocatedString associatedVariable)
-  {
-    Monotype[] res = new Monotype[arity];
-    for(int i = 0; i < arity; i++)
-      res[i] = fresh(new LocatedString(associatedVariable.content + i,
-				       associatedVariable.location()));
-    return res;
-  }
   
   /** @return true if "alike" appears inside this monotype. */
   abstract boolean containsAlike();
   
-  static final boolean containsAlike(List monotypes)
-  {
-    for(Iterator i = monotypes.iterator(); i.hasNext();)
-      if(((Monotype) i.next()).containsAlike())
-	return true;
- 
-   return false;
-  }
-
-  static final boolean containsAlike(Monotype[] monotypes)
-  {
-    for(int i = monotypes.length; --i >= 0;)
-      if (monotypes[i].containsAlike())
-	return true;
-
-    return false;
-  }
-
   public boolean isVoid() { return false; }
 
   /**************************************************************
@@ -85,19 +40,19 @@ implements Located
 
   /** Set by the parser. */
   public byte nullness;
-
+/*
   public static final byte
     none = 0,
     maybe = 1,
     sure = 2,
     absent = 3;
-
+*/
   final String nullnessString()
   {
     switch(nullness) 
       {
-      case maybe: return "?";
-      case sure:  return "!";
+      case /*maybe*/1: return "?";
+      case /*sure*/2:  return "!";
       default:    return "";
       }
   }
@@ -109,10 +64,10 @@ implements Located
     
     switch (nullness) 
       {
-      case none:  return raw;
-      case maybe: return sourceMaybe(raw);
-      case sure:  return sourceSure(raw);
-      case absent:
+      case /*none*/0:  return raw;
+      case /*maybe*/1: return sourceMaybe(raw);
+      case /*sure*/2:  return sourceSure(raw);
+      case /*absent*/3:
 	if (raw instanceof MonotypeVar)
 	  {
 	    nice.tools.typing.Types.makeMarkedType((MonotypeVar) raw);
@@ -127,33 +82,6 @@ implements Located
 
   abstract mlsub.typing.Monotype rawResolve(TypeMap tm);
 
-  /** iterates resolve() on the collection of Monotype */
-  static final mlsub.typing.Monotype[] rawResolve(TypeMap s, Collection c)
-  {
-    if(c.size()==0)
-      return null;
-    
-    mlsub.typing.Monotype[] res = new mlsub.typing.Monotype[c.size()];
-
-    int n=0;
-    Iterator i=c.iterator();
-    while(i.hasNext())
-      {
-	Object o = i.next();
-	if (!(o instanceof Monotype))
-	  Debug.println(o+" ::: "+o.getClass());
-	
-	Monotype old = (Monotype) o;
-	mlsub.typing.Monotype nou = old.resolve(s);
-
-	if(nou==null)
-	  User.error(old,old+" : Monotype not defined");
-
-	res[n++]=nou;
-      }
-    return res;
-  }
-  
   /** iterates resolve() on the collection of Monotype */
   static final mlsub.typing.Monotype[] resolve(TypeMap s, Monotype[] c)
   {
@@ -176,28 +104,6 @@ implements Located
   }
   
   abstract Monotype substitute(Map map);
-
-  static List substitute(Map map, Collection c)
-  {
-    if(c==null) return null;
-    
-    List res = new ArrayList(c.size());
-    Iterator i = c.iterator();
-
-    while(i.hasNext())
-      res.add( ((Monotype)i.next()).substitute(map));
-
-    return res;
-  }
-
-  static Monotype[] substitute(Map map, Monotype[] m)
-  {
-    Monotype[] res = new Monotype[m.length];
-    for(int i = m.length; --i >= 0;)
-      res[i] = m[i].substitute(map);
-
-    return res;
-  }
 
   //temporarily method to call on TypeIdent's
   public mlsub.typing.TypeSymbol resolveToTypeSymbol(TypeMap scope)

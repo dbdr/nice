@@ -116,6 +116,12 @@ public final class Types
       (PrimitiveType.sureTC, new mlsub.typing.Monotype[]{type});
   }
 
+  public static mlsub.typing.Monotype maybeMonotype(mlsub.typing.Monotype type)
+  {
+    return new mlsub.typing.MonotypeConstructor
+      (PrimitiveType.maybeTC, new mlsub.typing.Monotype[]{type});
+  }
+
   /****************************************************************
    * Functional types
    ****************************************************************/

@@ -70,7 +70,7 @@ public abstract class MethodImplementation extends Definition
 	    type = new mlsub.typing.MonotypeConstructor(notNull(p.getRuntimeTC()), cast(mlsub.typing.MonotypeVar.news(notNull(v).arity())));
 	    type.setKind(notNull(v));
 
-	    type = bossa.syntax.Monotype.sure(type);
+	    type = sureMonotype(type);
 	  }
 	else
 	  {

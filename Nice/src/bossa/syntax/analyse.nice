@@ -626,7 +626,7 @@ analyse(ConstantExp c, info)
     bossa.util.Internal.error("Base type " + c.className + " is not valid");
   
   c.type = new mlsub.typing.Polytype
-    (Monotype.sure(new mlsub.typing.MonotypeConstructor(tc, null)));
+    (sureMonotype(new mlsub.typing.MonotypeConstructor(tc, null)));
 
   return c;
 }
@@ -646,7 +646,7 @@ mlsub.typing.Polytype typeRepresentationToPolytype(String name,
 
       return new mlsub.typing.Polytype
         (res.getConstraint(),
-	 sure ? Monotype.sure(type) : Monotype.maybe(type));
+	 sure ? sureMonotype(type) : maybeMonotype(type));
     }
 
   ?TypeConstructor tc = Node.getGlobalTypeScope().globalLookup(name, loc);

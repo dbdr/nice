@@ -43,7 +43,7 @@ public class NiceFieldAccess extends FieldAccess
 NiceFieldAccess createNiceFieldAccess(NiceField field)
 {
   let classDef = field.getTypeDefinition();
-  let argType = Monotype.sure(classDef.lowlevelMonotype());
+  let argType = sureMonotype(classDef.lowlevelMonotype());
 
   let params = createFormalParameters([new Parameter(type: Monotype.create(argType))]);
   let constr = createConstraint(classDef.getBinders(), null);

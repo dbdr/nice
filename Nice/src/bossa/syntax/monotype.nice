@@ -59,13 +59,13 @@ public class MonotypeConstructor extends Monotype
   {
     Monotype res = createMonotypeConstructor
       (notNull(tc),
-       new TypeParameters(content: Monotype.substitute(map, notNull(parameters.content))),
+       new TypeParameters(content: notNull(parameters.content).mapToArray(Monotype t => t.substitute(map))),
        loc);
     res.nullness = this.nullness;
     return res;
   }
 
-  containsAlike() = Monotype.containsAlike(notNull(parameters.content));
+  containsAlike() = notNull(parameters.content).any(Monotype t => t.containsAlike());
 
   public ?TypeIdent getTC() = tc;
   
@@ -114,7 +114,7 @@ public class TypeParameters
 
 public TypeParameters createTypeParameters(List<Monotype> tps)
 {
-  return new TypeParameters(content: Monotype.toArray(tps));
+  return new TypeParameters(content: tps.toArray());
 }
 /**
    Functional type.
@@ -135,19 +135,19 @@ public class FunType extends bossa.syntax.Monotype
  substitute(map)
   {
     bossa.syntax.Monotype res = new bossa.syntax.FunType
-      (in: bossa.syntax.Monotype.substitute(map,in), out: out.substitute(map));
+      (in: in.mapToArray(Monotype t => t.substitute(map)), out: out.substitute(map));
     res.nullness = this.nullness;
     return res;
   }
 
-  containsAlike() = Monotype.containsAlike(in) || out.containsAlike();
+  containsAlike() = in.any(Monotype t => t.containsAlike()) || out.containsAlike();
   
   location() = out.location();
 
   toString()
   {
     return "(" + Util.map("", ", ", "", in) + 
-      (nullness == maybe ? ")?->" : ")->") + out;
+      (nullness == /*maybe*/1 ? ")?->" : ")->") + out;
   }
   
   toStringExtern() = "(" + Util.map("", ", ", "", in) + ")->" + out.toStringExtern();
@@ -193,7 +193,7 @@ public class Alike extends bossa.syntax.Monotype
 
     assert tc instanceof MonotypeConstructor;
     let res = createMonotypeConstructor(notNull(tc.lowlevelTC), 
-       new TypeParameters(content: Monotype.substitute(map, parameters)), 
+       new TypeParameters(content: parameters.mapToArray(Monotype t => t.substitute(map))), 
        loc);
     res.nullness = this.nullness;
     return res;
@@ -210,7 +210,7 @@ public class Alike extends bossa.syntax.Monotype
 let String alike_id = "<ALIKE>";
 String getAlikeID() = alike_id;
 
-public Monotype createAlike(List<Monotype> parameters, Location location)
+public Monotype createAlike(?List<Monotype> parameters, Location location)
 {
-  return new Alike(parameters: Monotype.toArray(parameters), loc: location);
+  return new Alike(parameters: parameters == null ? [] : parameters.toArray(), loc: location);
 }

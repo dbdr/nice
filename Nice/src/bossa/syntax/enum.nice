@@ -173,7 +173,7 @@ EnumSymbol createEnumSymbol(EnumDefinition def, LocatedString enumName,
 		List<Expression> argExps)
 {
   Monotype type = new TypeIdent(name: enumName);
-  type.nullness = Monotype.absent;
+  type.nullness = /*absent*/3;
   List<Arguments.Argument> args = new ArrayList(2 + fields.size());
   args.add(new Arguments.Argument(createStringConstantExp(name.toString()),
 		new LocatedString("name",name.location)));

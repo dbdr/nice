@@ -26,40 +26,6 @@ public abstract class ConstantExp extends Expression
 
   ?LocatedString className = null;
 
-/*
-  ConstantExp()
-  {
-  }
-  
-  ConstantExp(Polytype type, TypeConstructor tc, Object value, String representation, 
-	      Location location)
-  {
-    this.type = type;
-    this.tc = tc;
-    this.value = value;
-    this.representation = representation;
-    setLocation(location);
-  }
-  
-  ConstantExp(TypeConstructor tc, Object value, String representation,
-	      Location location)
-  {
-    this(new mlsub.typing.Polytype(Monotype.sure(new mlsub.typing.MonotypeConstructor(tc,null))),
-	 tc, value, representation, location);
-  }
-  
-  ConstantExp(TypeConstructor tc, String representation, Location location)
-  {
-    this(tc, null, representation, location);
-  }
-
-  public ConstantExp(Object value)
-  {
-    this.value = value;
-    this.representation = value.toString();
-  }
-*/  
-
   computeType()
   {
     // The type is known at creation.
@@ -286,7 +252,7 @@ public class NullExp extends ConstantExp
   {
     let alpha = new mlsub.typing.MonotypeVar("any");
     return new mlsub.typing.Polytype(new mlsub.typing.Constraint([alpha], null), 
-			bossa.syntax.Monotype.maybe(alpha));
+			maybeMonotype(alpha));
   }
 
   compile() = notNull(gnu.expr.QuoteExp.nullExp);
@@ -497,7 +463,7 @@ public class TypeConstantExp extends ConstantExp
 
     res.type = new mlsub.typing.Polytype
       (type.getConstraint(),
-       Monotype.sure(new mlsub.typing.MonotypeConstructor
+       sureMonotype(new mlsub.typing.MonotypeConstructor
         (nice.tools.typing.PrimitiveType.classTC, [type.getMonotype()])));
     return res;
   }
@@ -575,7 +541,7 @@ mlsub.typing.Polytype universalPolytype(mlsub.typing.TypeConstructor tc, boolean
   mlsub.typing.Monotype type = new mlsub.typing.MonotypeConstructor(tc, cast(vars));
   return new mlsub.typing.Polytype
     (vars == null ? null : new mlsub.typing.Constraint(cast(vars), null),
-     sure ? Monotype.sure(type) : Monotype.maybe(type));
+     sure ? sureMonotype(type) : maybeMonotype(type));
 }
 
 let gnu.bytecode.Method class_forName =   gnu.bytecode.ClassType.make("java.lang.Class").getDeclaredMethod("forName", 1);

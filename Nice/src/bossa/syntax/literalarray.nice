@@ -42,7 +42,7 @@ public class LiteralArrayExp extends Expression
   {
     let res = new mlsub.typing.Polytype
       (elementType.getConstraint(), 
-       bossa.syntax.Monotype.sure(new mlsub.typing.MonotypeConstructor
+       sureMonotype(new mlsub.typing.MonotypeConstructor
 	 (nice.tools.typing.PrimitiveType.arrayTC, [elementType.getMonotype()])));
     res.setNotSimplified();
     return res;

@@ -273,18 +273,7 @@ public FormalParameters createFormalParameters(?List<Parameter> parameters)
   return new FormalParameters(Node.none, parameters: parameters.toArray(),
 	size: parameters.size());
 }
-/*
-  FormalParameters(Parameter[] parameters)
-  {
-    super(Node.none);
 
-    if (parameters == null)
-      return;
-
-    this.parameters = parameters;
-    this.size = parameters.length;
-  }
-*/
 let LocatedString thisName = new LocatedString("this", Location.nowhere());
 
 FormalParameters readParametersFromBytecodeAttribute(gnu.bytecode.MiscAttr attr,

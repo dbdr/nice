@@ -100,7 +100,7 @@ public class FunExp extends Expression implements Function
 			     notNull(_inferredReturnType).getMonotype());
     type = new mlsub.typing.Polytype
       (mlsub.typing.Constraint.and(cst, notNull(_inferredReturnType).getConstraint()),
-       bossa.syntax.Monotype.sure(t));
+       sureMonotype(t));
   }
 
   inferredReturnType()

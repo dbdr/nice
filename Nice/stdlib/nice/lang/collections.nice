@@ -14,6 +14,28 @@ import java.util.*;
 <java.util.Collection C, Any T, Any U> C<U> map(C<T>, T->U);
 <java.util.Collection C, Any T> C<T> filter(C<T>, T->boolean);
 
+<T> void keep  (Collection<T> c, T->boolean test)
+{
+  Iterator<T> i = c.iterator();
+  while (i.hasNext())
+    {
+      T element = i.next();
+      if (! (test(element)))
+	i.remove();
+    }
+}
+
+<T> void remove(Collection<T> c, T->boolean test)
+{
+  Iterator<T> i = c.iterator();
+  while (i.hasNext())
+    {
+      T element = i.next();
+      if (test(element))
+	i.remove();
+    }
+}
+
 // A more precise type for filter would be:
 // <Collection C, T, U | T <: U> C<U> filter(C<T>, T -> boolean);
 // This would allow List<A> lA = lB.filter(...) where B is a subclass of A.

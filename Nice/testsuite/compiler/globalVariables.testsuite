@@ -51,3 +51,9 @@
   /* Modifying a global var from a different package. */
   x = 1; 
   assert(getAX() == 1);
+
+/// PASS
+  /// Toplevel
+  var String f = "";
+  var int f = 0;
+  var String v = f;

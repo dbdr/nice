@@ -1906,12 +1906,16 @@ Expression InstanceOfExpression() :
 }
 
 Expression RelationalExpression() :
-{ Expression e1,e2; Token t; }
+{ Expression e1, e2, e3; Token t; e3 = null; }
 {
-  e1=ShiftExpression() 
-    ( (t="<"|t=">"|t="<="|t=">=") e2=ShiftExpression() 
-      { e1=CallExp.create(symb(t),e1,e2); }
-      )*
+  e1=ShiftExpression()
+    ( (t="<"|t=">"|t="<="|t=">=") e2=ShiftExpression()
+      {
+        if(e3 == null) e1=CallExp.create(symb(t),e1,e2);
+        else e1=CallExp.create(symb("&&",t),e1,CallExp.create(symb(t),e3,e2));
+        e3 = e2;
+      }
+    )*
   { return e1; }
 }
 

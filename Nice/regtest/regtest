@@ -17,13 +17,14 @@ echo()
 
 compile()
 {
-  (cd ..; nicec -e -s --classpath=$PWD/regtest/"$1":$PWD/classes regtest."$1")
+  (cd ..; "$NICE_TOP"/bin/nicec \
+    -e -r --classpath="$NICE_TOP":"$NICE_TOP"/classes regtest."$1")
   return $?
 }
 
 execute()
 {
-  (cd ..; nicer -e regtest/$1)
+  (cd ..; $NICE_TOP/bin/nicer -e regtest/$1)
 }
 
 ### Regression test suite

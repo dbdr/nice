@@ -347,8 +347,7 @@ public class NiceClass extends ClassImplementation
 
     mlsub.typing.Typing.enter();
     entered = true;
-    mlsub.typing.lowlevel.Element[] typeParameters = cast(notNull(definition.classConstraint).typeParameters);
-    mlsub.typing.Typing.introduce(typeParameters);
+    mlsub.typing.Typing.introduceTypeSymbols(notNull(definition.classConstraint).binders.toArray());
     try {
       mlsub.typing.Typing.implies();
     }

@@ -402,3 +402,14 @@ class I {}
 class A extends I {}
 
 <T extends I> class Foo<T> {}
+
+/// PASS
+  /// Toplevel
+abstract interface I {}
+
+class IntTreeNode <U> {}
+
+<I T>
+class IntTree <T> {
+  ?IntTreeNode<T> content = null;
+}

@@ -1,0 +1,31 @@
+/// PASS
+  List<int> a = new ArrayList();
+  a.add(5);a.add(4);a.add(3);a.add(2);a.add(1);
+  int x = 0;
+  for(int i : a) {
+    if (i==4) continue;
+    x += i;
+    if (i==2) break;
+  }
+  assert(x == 10);
+  
+/// PASS
+  String[] arr = ["a","bc","def","ghij","klmno"];
+  String t = "";
+  for (String s : arr) t+=s;
+  assert(t.equals("abcdefghijklmno"));
+
+/// PASS
+  String[] arr = ["a","bc","def","ghij","klmno"];
+  String t = "";
+  for(String s : arr) 
+  	for(char c : s) t+=c;
+  assert(t.equals("abcdefghijklmno"));
+
+/// PASS
+  int[][] array2 = [[1,2],[3,4]];
+  int j = 0;
+  for(int[] array3 : array2) 
+    for(int i : array3) j+=i;
+  assert(j==10);
+  

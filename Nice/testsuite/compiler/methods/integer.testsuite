@@ -2,21 +2,21 @@
   /// Toplevel
   long fac(long n);
   fac(n@long) = n*fac(n-1);
-  fac(@1) = 1;
+  fac(1) = 1;
   
 /// PASS
   /// Toplevel
   int fib(int n);
   fib(n@int) = fib(n-2) + fib(n-1);
-  fib(@1) = 1;
-  fib(@2) = 1;
+  fib(1) = 1;
+  fib(2) = 1;
 
 /// FAIL  
   /// Toplevel
   int ack(int x, int y);
   // missing (0,0) case
-  ack(@0, y@int) = y+1;
-  ack(x@int, @0) = ack(x-1, 1);
+  ack(0, y@int) = y+1;
+  ack(x@int, 0) = ack(x-1, 1);
   ack(x@int, y@int) = ack(x-1, ack(x, y-1));
 
 
@@ -24,9 +24,9 @@
   /// Toplevel
   String toStr(char);
   toStr(@char) = "";
-  toStr(@'a') = "a";
-  toStr(@'b') = "b";
-  toStr(@'a') = "a";
+  toStr('a') = "a";
+  toStr('b') = "b";
+  toStr('a') = "a";
 
 /// PASS
   /// package a
@@ -34,9 +34,9 @@
   /// Toplevel
   int bar(int);
   bar(n@int) = n;
-  bar(@-1) = 1;
-  bar(@-12389) = 12389;
-  bar(@3920) = -3920;
+  bar(-1) = 1;
+  bar(-12389) = 12389;
+  bar(3920) = -3920;
 
   /// package b import a
   ;  
@@ -46,7 +46,7 @@
   /// Toplevel
   void foo(char);
   foo(@char) {}
-  foo(@'a') {}
+  foo('a') {}
 
   /// package b import a
   ;
@@ -55,21 +55,19 @@
  /// Toplevel
  // The default case is missing
 void foo(short);
-foo(@0) {}
-foo(@1) {}
+foo(0) {}
+foo(1) {}
 
 /// PASS
   /// Toplevel
-  // literals without @
   int fib(int n);
   fib(n) = fib(n-2) + fib(n-1);
-  fib(1) = 1;
-  fib(2) = 1;
+  fib(n@1) = 1;
+  fib(n@2) = 1;
 
 /// PASS  
   /// Toplevel
-  // literals without @
   String toStr(char);
-  toStr(@char) = "";
-  toStr('a') = "a";
-  toStr('b') = "b";
+  toStr(c@char) = "";
+  toStr(c@'a') = "a";
+  toStr(c@'b') = "b";

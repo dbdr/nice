@@ -1189,39 +1189,53 @@ MonotypeVar taggedMonotypeVar(List tags, List atoms):
 
 Pattern pattern():
 {
-  Pattern res = null;
-  Expression val = null;
-  LocatedString i;
-}
-{
-( res = anonymousPattern(null)
-| val = patternLiteral() { res = new Pattern(null,null,val,false,null,null,val.location()); }
-| i = ident()
-  ( res = anonymousPattern(i) | { res = new Pattern(i); } )
-)
-{ return res; }
-}
-
-Pattern anonymousPattern(LocatedString name):
-{
+  LocatedString name = null;
+  Token t;
   TypeIdent tc=null, additional = null;
   Monotype type=null;
   Expression val = null;
   boolean exactlyAt = false;
-  Token t;
+  Location loc = null;
 }
 {
-  (
-    t="@" ( val=patternLiteral() | tc=typeIdent() )
-  | 
-    t="#" tc=typeIdent() { exactlyAt = true; }
+  ( 
+    val=patternLiteral() { loc = val.location(); }
+  |
+    (
+      t="@"
+    |
+      t="#" { exactlyAt = true;}
+    )
+    (
+      tc=typeIdent() { loc = tc.location(); }
+    |
+      //temporarily added to warn the user about the deprecated '@null' syntax.
+      t="null" 
+      { val = NullExp.instance;
+        loc = new Location(t);
+        User.warning(loc,"The '@null' syntax is deprecated, leave the '@' away.");
+      }
+    )
+  |
+    name = ident()
+    (
+      t ="@"
+      (
+        val=patternLiteral()
+      |
+        tc=typeIdent()
+      )
+    |
+      t ="#" tc=typeIdent() { exactlyAt = true; }
+    |
+     {} //name only
+    )
+    { loc = name.location(); }
   )
-  [ "(" additional = typeIdent() ")" ]
+  [ "(" additional=typeIdent() ")" ]
   [ ":" type=monotype() ]
-  { 
-    Location loc = name != null ? name.location() 
-      : tc != null ? tc.location() : new Location(t);
-    return new Pattern(name, tc, val, exactlyAt, additional, type, loc); 
+  {
+    return new Pattern(name, tc, val, exactlyAt, additional, type, loc);
   }
 }
 

@@ -21,13 +21,13 @@ package nice.lang;
 //If a "for in" is wanted for another class then they could be added easily.
 
 <E> Iterator<E> forIterator(Collection<E> c) = c.iterator();
-<E> Iterator<E> forIterator(E[] arr) = new ArrayForIterator(arr: arr);
+//<E> Iterator<E> forIterator(E[] arr) = new ArrayForIterator(arr: arr);
 Iterator<char> forIterator(String s) = new StringForIterator(str: s);
 Iterator<char> forIterator(StringBuffer sb) = new StringBufferForIterator(strb: sb);
 Iterator<int> forIterator(Range<int> range) = range.iterator();
 
 //The implementations of additional Iterators
-
+/*
 private class ArrayForIterator<E> implements Iterator<E> {
   E[] arr;
   int pos = 0;
@@ -35,7 +35,7 @@ private class ArrayForIterator<E> implements Iterator<E> {
   next() = arr[pos++];
   remove() { throw new UnsupportedOperationException(); }
 }
-
+*/
 private class StringForIterator<E | E <: char, char <: E> implements Iterator<E> {
   String str;
   int pos = 0;

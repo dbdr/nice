@@ -29,7 +29,7 @@ public class Test
     System.out.println("Test for mlsub.typing");
 
     try{
-      Variance v0 = Variance.make(0);
+      Variance v0 = Variance.make(new int[0]);
 
       TypeConstructor a = new TypeConstructor("a", v0, true, false);
       Monotype ma = new MonotypeConstructor(a, null);

@@ -38,10 +38,10 @@ implements Function
 {
   /**
      @param name the name of the method
-     @param typeParameters the type parameters
      @param constraint the constraint
      @param returnType the return type
      @param parameters the formal parameters
+     @param body the body of the function
    */
   public ToplevelFunction(LocatedString name, 
 			  Constraint constraint,
@@ -65,6 +65,18 @@ implements Function
 
   void resolve()
   {
+    // the type must be found before
+    removeChild(symbol);
+    symbol.doResolve();
+    
+    mlsub.typing.Constraint cst = getType().getConstraint();
+    if (mlsub.typing.Constraint.hasBinders(cst))
+      try{
+	typeScope.addSymbols(cst.binders());
+      }
+      catch(TypeScope.DuplicateName e){
+	User.error(this, e);
+      }
     body = bossa.syntax.dispatch.analyse$0(body, scope, typeScope, voidReturn);
   }
 
@@ -72,8 +84,13 @@ implements Function
    * Typechecking
    ****************************************************************/
 
-  void innerTypecheck()
+  void innerTypecheck() throws TypingEx
   {
+    // The body must be type-checked in a rigid context
+    // This is not done in MethodDeclaration, 
+    // because it is not usefull for all subclasses
+    Typing.implies();
+
     Node.currentFunction = this;
     try{ bossa.syntax.dispatch.typecheck$0(body); }
     finally{ Node.currentFunction = null; }

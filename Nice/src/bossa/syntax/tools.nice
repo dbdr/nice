@@ -226,6 +226,7 @@ mlsub.typing.Monotype[?] Types_parameters(mlsub.typing.Polytype) = native mlsub.
 ?gnu.bytecode.ClassType getSuperclass(gnu.bytecode.ClassType) = native gnu.bytecode.ClassType gnu.bytecode.ClassType.getSuperclass();
 int[?] getUsedArguments(Arguments, VarSymbol) = native int[] Arguments.getUsedArguments(VarSymbol);
 ?mlsub.typing.Constraint getConstraint(mlsub.typing.Polytype) = native mlsub.typing.Constraint mlsub.typing.Polytype.getConstraint();
+MonoSymbol[?] getMonoSymbols(FormalParameters) = native MonoSymbol[] FormalParameters.getMonoSymbols();
 // Retypings needed since java types are not strict.
 
 mlsub.typing.Polytype boolPolytype() = native PrimitiveType.boolPolytype;

@@ -459,8 +459,7 @@ analyse(FunExp e, Info info, noEscape)
       }
     e.constraint = null;
 
-    if (e.formals != null)
-      addVars(info, e.formals);
+    addVars(info, e.formals);
 
     analyse(e.body, info);
     e.setAlwaysReturns(info.getUnreachable());

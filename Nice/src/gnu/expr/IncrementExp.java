@@ -50,11 +50,12 @@ public class IncrementExp extends Expression
 	  // The variable has a non-int type, but we know it must be 
 	  // convertible to int.
 	  {
-	    PrimType type = Type.int_type;
+	    PrimType type = var.getType() == Type.long_ctype ? 
+	      Type.long_type : Type.int_type;
 
 	    code.emitLoad(var);
-	    StackTarget.intTarget.compileFromStack(comp, var.getType());
-	    code.emitPushInt(increment);
+	    StackTarget.getInstance(type).compileFromStack(comp, var.getType());
+	    code.emitPushConstant(increment, type);
 	    code.emitAdd(type);
 	    StackTarget.getInstance(var.getType()).compileFromStack(comp, type);
 	    code.emitStore(var);

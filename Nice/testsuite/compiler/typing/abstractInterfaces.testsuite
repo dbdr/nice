@@ -15,3 +15,25 @@ public <WindowListenerHandler HH> void addNiceWindowListener
 {        
    this.addNWindowListener (new NWindowListener());
 }
+
+/// COMMENT Tests "finally implements"
+
+/// PASS
+  /// Toplevel
+
+  abstract interface I {
+    alike f();
+  }
+  class A finally implements I {}
+  f(x@A) = new A();
+
+/// FAIL
+  /// Toplevel
+
+  /// Toplevel
+
+  abstract interface I {
+    alike f();
+  }
+  class A implements I {}
+  f(x@A) = new A();

@@ -138,7 +138,7 @@ main(args)
       if (rest.size() > 1)
 	println("Supply only one package on the command line.\n" +
 		"nicec will automatically find dependancies.");
-      usage(prg);
+      usage(prg, OutputMessages.ERROR);
     }
   mainPackage = rest[0];
 

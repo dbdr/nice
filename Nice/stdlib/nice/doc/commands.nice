@@ -26,11 +26,12 @@ void help(Program prg)
   System.exit(1);
 }
 
-void usage(Program prg)
+void usage(Program prg) = usage(prg, 0);
+void usage(Program prg, int exitCode)
 {
   println(printUsage(prg));
   println("Type \"" + prg.name + " --help\" to list the options");
-  System.exit(0);
+  System.exit(exitCode);
 }
 
 void man(Program prg)

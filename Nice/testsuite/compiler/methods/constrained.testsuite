@@ -33,7 +33,7 @@
 
   class X<T | A <: T> implements I<T>{}
 
-  void foo(I<A>);
+  void /*/// FAIL HERE */ foo(I<A>);
 
 /// FAIL
   ///Toplevel
@@ -45,7 +45,7 @@
   class X<T | A <: T> implements I<T>{}
   class Y<T> implements I<T> {}
 
-  void foo(I<A>, I<B>);
+  void /*/// FAIL HERE */ foo(I<A>, I<B>);
   foo(Y a, Y b) {}
   // @X,@Y is missing
 
@@ -85,5 +85,5 @@ class A
 class B extends A
 {
   // Use type parameter that does not exist in the declaration
-  <U> f() {}
+  <U> /*/// FAIL HERE */ f() {}
 }

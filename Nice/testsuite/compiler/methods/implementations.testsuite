@@ -29,14 +29,14 @@ class C extends A
 // even though you can imagine many instances for the type.
 interface _Map<K, V> {}
 
-<K, V0, V | V <: ?V0> ?V0 put(_Map<K, V>, V, K);
+<K, V0, V | V <: ?V0> ?V0 /*/// FAIL HERE */ put(_Map<K, V>, V, K);
 
 class MapWrapper<K, V> implements _Map<K, V> {}
 
 /// FAIL
   /// TOPLEVEL
   class A {
-    void fA() {} // default implementation
+    void /*/// FAIL HERE */ fA() {} // default implementation
   }
 
   // Try to implement a method for a case equivalent to the default.
@@ -64,7 +64,7 @@ doSomething(B b) { b.bfield; }
 class First {
   void paint(java.awt.Graphics g);
 }
-paint(java.awt.Component p, g) {
+/*/// FAIL HERE */ paint(java.awt.Component p, g) {
   (notNull (g)).drawString("I love java", 20, 20);
 }
 
@@ -107,11 +107,11 @@ foo(/* /// FAIL HERE */ A x){}
   /// Toplevel
   class A<T> {} 
   class B<T> extends A<T> {} 
-  <T> void j(A<A<T>>); 
+  <T> void /*/// FAIL HERE */ j(A<A<T>>); 
 
 /// FAIL
   /// Toplevel
-  void f(List<Array<String>>);
+  void /*/// FAIL HERE */ f(List<Array<String>>);
 
 /// PASS
   f(null);

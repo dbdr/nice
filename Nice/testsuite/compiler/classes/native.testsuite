@@ -13,7 +13,7 @@ class NBeanContextServicesListener
 /// FAIL
   /// Toplevel
 // java.util.Map is already retyped, with two type parameters
-interface MyMutableArray<Element> = native java.util.Map;
+interface /*/// FAIL HERE */ MyMutableArray<Element> = native java.util.Map;
 
 /// COMMENT Retype two java classes, when one refers to the other.
 /// COMMENT The retyping of the second must not fail because the class was
@@ -31,7 +31,7 @@ interface CharacterIterator<T> = native java.text.CharacterIterator;
 
 /// FAIL
   /// Toplevel
-class Int = native int;
+class /*/// FAIL HERE */ Int = native int;
 
 /// PASS
   /// package nativePkg

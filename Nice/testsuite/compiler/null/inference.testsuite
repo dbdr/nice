@@ -139,7 +139,7 @@
   if (y != null)
     if (x != null)
       x = x + "";
-  y = y + "";
+  y = y /*/// FAIL HERE */ + "";
 
 
 /// PASS
@@ -292,7 +292,7 @@
   if (y != null)
     if (x1 != null && x2 != null)
       x1 = x1 + "";
-  y = y + "";
+  y = y /*/// FAIL HERE */ + "";
 
 
 /// PASS
@@ -327,7 +327,7 @@
 /// FAIL
   ?String x1 = null;
   while ( (x1 = null) == null)
-    x1 = x1 + "";
+    x1 = x1 /*/// FAIL HERE */ + "";
 
 
 /// COMMENT && expressions

@@ -85,36 +85,36 @@ toString(B b) = super + "@B";
 <A T> T m(T);
 
 m(#A a) = new A();
-m(B b) = super;
+m(B b) = /*/// FAIL HERE */ super;
 
 /// FAIL
  B b = m(new B());
  /// Toplevel
 <A T> T m(T);
 
-m(a#A) = new A();
-m(b#B) = super;
+m(#A a) = new A();
+m(#B b) = /*/// FAIL HERE */ super;
 
 /// FAIL
  /// Toplevel
-<Any T> T myclone(T) = native Object Object.clone();
+<T> T myclone(T) = native Object Object.clone();
 
-myclone(a#A) = new A();
-myclone(b#B) = super;
+myclone(#A a) = new A();
+myclone(#B b) = /*/// FAIL HERE */ super;
 
 /// FAIL
  /// Toplevel
-<Any T> T myclone(T) = native Object Object.clone();
+<T> T myclone(T) = native Object Object.clone();
 
 class C extends java.text.DecimalFormat {}
 
-myclone(c#C) = super;
+myclone(#C c) = /*/// FAIL HERE */ super;
 
 /// FAIL
  /// Toplevel
-<Any T> T myclone(T) = native Object Object.clone();
+<T> T myclone(T) = native Object Object.clone();
 
-myclone(a#A) = super;
+myclone(#A a) = /*/// FAIL HERE */ super;
 
 /// PASS
   /// COMMENT super defined in an imported package.

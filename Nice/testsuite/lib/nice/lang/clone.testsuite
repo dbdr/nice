@@ -30,4 +30,4 @@ class A implements Cloneable {}
 class A {}
 
 /// FAIL
-  "abc".clone();
+  /*/// FAIL HERE */ "abc".clone();

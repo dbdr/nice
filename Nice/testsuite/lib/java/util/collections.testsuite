@@ -50,7 +50,7 @@
 /// FAIL   
   List<B> list = new ArrayList();   
   A obj = new A();   
-  list.contains(obj);   
+  list. /*/// FAIL HERE */ contains(obj);   
   /// Toplevel   
   class A{}   
   class B{} 

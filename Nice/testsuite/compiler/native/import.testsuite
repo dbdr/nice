@@ -9,7 +9,7 @@
 /// FAIL
   /// COMMENT We are not importing java.text here.
   /// Toplevel
-  void f(AttributedCharacterIterator.Attribute a) {}
+  void f(/*/// FAIL HERE */ AttributedCharacterIterator.Attribute a) {}
 
 /// PASS
   /// Toplevel

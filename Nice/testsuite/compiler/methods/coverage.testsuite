@@ -7,7 +7,7 @@ class B implements nice.lang.Comparable {
 /// FAIL
   /// Toplevel
 abstract interface I {
-  boolean fooI(alike);
+  boolean /*/// FAIL HERE */ fooI(alike);
 }
 
 class nice.lang.boolean implements I;
@@ -20,7 +20,7 @@ class A implements I {
 /// FAIL
   /// Toplevel
 abstract interface I {
-  boolean fooI(String);
+  boolean /*/// FAIL HERE */ fooI(String);
 }
 
 class A implements I {

@@ -1,4 +1,7 @@
-/// FAIL
+/// FAIL bug
+  B<X> b1 = new B(param: new A());
+  B<Y> b2 = b1;
+  b2.param.foo();
   /// Toplevel
 interface X{}
 interface Y extends X{
@@ -8,8 +11,3 @@ class A implements X{}
 class B<-T>{
     T param;
 }   
-public void main(String[] args){
-    B<X> b1 = new B(param: new A());
-    B<Y> b2 = b1;
-    b2.param.foo();
-}

@@ -187,8 +187,9 @@ class B extends A
 }
 
 /// FAIL
-interface I{}
-equals(I x, I y) = true;
+  /// Toplevel
+  interface I{}
+  /*/// FAIL HERE */ equals(I x, I y) = true;
 
 /// PASS
   Collection<String> b = new Bar();

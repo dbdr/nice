@@ -19,7 +19,7 @@
   abstract interface I {}
   /// package b
   /// Toplevel
-  class java.lang.String implements a.I;
+  class java.lang.String implements a /*/// FAIL HERE */ .I;
 
 /// FAIL
   /// package a
@@ -27,12 +27,12 @@
   abstract interface I {}
   /// package b import a
   /// Toplevel
-  class java.lang.String implements I;
+  class java.lang.String implements /*/// FAIL HERE */ I;
 
 
 /// FAIL
   /// Toplevel
-  abstract interface I { void f(); }
+  abstract interface I { void /*/// FAIL HERE */ f(); }
   class java.lang.String implements I;
 
 /// PASS
@@ -58,7 +58,7 @@
     alike f();
   }
   class java.io.File implements I;
-  f(java.io.File f) = new java.io.File("foo");
+  f(java.io.File f) = /*/// FAIL HERE */ new java.io.File("foo");
 
 /// PASS
   /// Toplevel
@@ -69,13 +69,13 @@
   /// Toplevel
   abstract interface AI {}
   // FileFilter is not a class
-  class java.io.FileFilter implements AI;
+  class /*/// FAIL HERE */ java.io.FileFilter implements AI;
 
 /// FAIL
   /// Toplevel
   abstract interface AI {}
   // String is not an interface
-  interface java.lang.String implements AI;
+  interface /*/// FAIL HERE */ java.lang.String implements AI;
 
 /// PASS
   // bug #904327

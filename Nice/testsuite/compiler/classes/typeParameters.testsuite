@@ -27,7 +27,7 @@ class Coord<Point P>
 }
 
 /// FAIL
-  Coord<Point> dummy = new Coord(p: "");
+  Coord<Point> dummy = /*/// FAIL HERE */ new Coord(p: "");
   /// Toplevel
 class Point { int x; }
 
@@ -37,7 +37,7 @@ class Coord<Point P>
 }
 
 /// FAIL
-  Coord<String> c = new Coord();
+  Coord<String> /*/// FAIL HERE */ c = new Coord();
   /// Toplevel
 class Point { int x; }
 
@@ -45,7 +45,7 @@ class Coord<Point P> {}
 
 /// FAIL
   /// COMMENT class constraints must be "inherited" by subclasses.
-  Coord<String> c = new Coord2();
+  Coord<String> /*/// FAIL HERE */ c = new Coord2();
   /// Toplevel
 class Point { int x; }
 
@@ -155,7 +155,7 @@ public class Elem<List<String> E> {
   E data;
 }
   /// package b import a
-  Elem<List<Sting>> dummy = new Elem(data: "");
+  Elem<List<String>> dummy = /*/// FAIL HERE */ new Elem(data: "");
 
 /// PASS
   /// package a
@@ -305,7 +305,7 @@ class A<T> {}
 /// FAIL
   // bug #992007
   /// Toplevel
-<A,B | B <: A> class Foo<B,X>
+<A,B | B <: A> class Foo /*/// FAIL HERE */ <B,X>
 {
   A a;
   void foo(B b) { a = b; }
@@ -327,7 +327,7 @@ class A<T>
 
 /// FAIL
   A<String> a = new A(x: null);
-  String s = a.x;
+  String /*/// FAIL HERE */ s = a.x;
 
   /// Toplevel
 class A<T>
@@ -348,7 +348,7 @@ class A<T>
 }
 
 /// FAIL
-  A<String> a = new A(x: null);
+  A<String> a = /*/// FAIL HERE */ new A(x: null);
 
   /// Toplevel
 class A<T>
@@ -371,4 +371,4 @@ class A<T> {
 /// FAIL
   /// Toplevel
 class A<T> {}
-class B<T> extends A<U> {}
+class B<T> extends A< /*/// FAIL HERE */ U> {}

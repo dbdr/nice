@@ -1,24 +1,24 @@
 /// FAIL
   // Incorrect call of an anonymous function stored in a variable
   boolean -> void f = boolean b => {};
-  f();
+  /*/// FAIL HERE */ f();
 
 /// FAIL
   // Incorrect call of an anonymous function stored in a local parameter
   /// Toplevel
   void g(boolean -> void f)
   {
-    f();
+    /*/// FAIL HERE */ f();
   }
 
 /// PASS
   int->int f = int x => { if (true) return 0; else return 1; };
 
 /// FAIL
-  int->int f = int x => { if (true) return 0; };
+  int->int f = /*/// FAIL HERE */ int x => { if (true) return 0; };
 
 /// FAIL
-  int->void f = int x => { if (true) return 0; };
+  int->void f = /*/// FAIL HERE */ int x => { if (true) return 0; };
 
 /// PASS
   int->void f = int x => { if (true) return; };
@@ -72,11 +72,11 @@ index.toString());
   int->String f = int i => throw new Error();
 
 /// FAIL
-  int->String f = int i => { if (false) throw new Error(); };
+  int->String /*/// FAIL HERE */ f = int i => { if (false) throw new Error(); };
 
 /// FAIL
   /// Toplevel
-<T> void foo(T->int f = T x => x) {}
+<T> void foo(T->int /*/// FAIL HERE */ f = T x => x) {}
 
 /// PASS
   let t = new Test();

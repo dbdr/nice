@@ -72,14 +72,14 @@
   assert i == 4;
 
 /// FAIL
-  1[0] = false;
+  /*/// FAIL HERE */ 1[0] = false;
 
 /// FAIL
   let int i = 1;
-  i[0] = false;
+  /*/// FAIL HERE */ i[0] = false;
 
 /// FAIL
-  i[0] = false;
+  /*/// FAIL HERE */ i[0] = false;
   /// Toplevel
   let int i = 1;
 

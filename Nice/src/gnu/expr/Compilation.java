@@ -471,7 +471,8 @@ public class Compilation
           }
         catch (Exception ex)
           {
-            error('w', "cannot convert literal (of type "
+            if (value != Values.empty)
+              error('w', "cannot convert literal (of type "
                   + value.getClass().getName() + ") to "
                   + type.getName());
           }

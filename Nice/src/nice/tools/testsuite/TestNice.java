@@ -159,7 +159,12 @@ public class TestNice {
 
 
 	/**
-	 * Main method of the application;
+	 * Main method of the application.
+	 *
+	 * Returns to the system with the code:
+	 *   0 if there are no regressions;
+	 *   1 if there was at least one regression;
+	 *   2 if there was at least one warning on no regression;
 	 * 
 	 * @param	args	console arguments
 	 */

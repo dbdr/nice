@@ -32,11 +32,6 @@ public class Block extends Statement
 
   static abstract class LocalDeclaration extends Statement
   {
-    public LocalDeclaration(Expression value)
-    {
-      this.value = value;
-    }
-
     abstract gnu.expr.Expression compile(gnu.expr.LetExp let);
 
     public gnu.expr.Expression generateCode()
@@ -44,16 +39,15 @@ public class Block extends Statement
       Internal.error("Should not be called");
       return null;
     }
-    
-    protected Expression value = null;
   }
 
   public static class LocalVariable extends LocalDeclaration
   {
     public LocalVariable(LocatedString name, Monotype type, Expression value)
     {
-      super(value);
+      this.value = value;
       this.left = new MonoSymbol(name,type);
+      this.last = this;
     }
     
     gnu.expr.Expression compile(gnu.expr.LetExp let)
@@ -74,8 +68,23 @@ public class Block extends Statement
       return left.name.location();
     }
 
+    Expression value;
     MonoSymbol left;
     public MonoSymbol getLeft() { return left; }
+
+    /* 
+       Local variables are chained to handle multiple var declarations like
+       "int x = 3, y = x, z = y;"
+       We have to be careful about the order, so that dependencies like above
+       work as expected.
+    */
+    LocalVariable next, last;
+
+    public void addNext(LocatedString name, Expression value)
+    {
+      last.next = new LocalVariable(name, left.syntacticType, value);
+      last = last.next;
+    }
   }
 
   public static class LocalFunction extends LocalDeclaration
@@ -96,7 +105,7 @@ public class Block extends Statement
 
     private LocalFunction(FunSymbol symbol, Expression value)
     {
-      super(value);
+      this.value = value;
       this.left = symbol;
     }
 
@@ -126,6 +135,7 @@ public class Block extends Statement
       return left.name.location();
     }
 
+    Expression value;
     FunSymbol left;
     public FunSymbol getLeft() { return left; }
   }
@@ -154,11 +164,18 @@ public class Block extends Statement
 	if (s == null) // emptyStatement
 	  continue;
 	
-	if (s instanceof LocalDeclaration)
-	  {
-	    LocalDeclaration decl = (LocalDeclaration) s;
-	    locals.add(decl);
-	  }
+        if (s instanceof LocalVariable)
+          {
+            LocalVariable decl = (LocalVariable) s;
+            do
+              {
+                locals.add(decl);
+                decl = decl.next;
+              }
+            while (decl != null);
+          }
+	else if (s instanceof LocalDeclaration)
+	  locals.add(s);
 	else 
 	  {
 	    res.add(s);

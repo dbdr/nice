@@ -1130,7 +1130,7 @@ AbstractInterface interfaceDefinition(Constraint prefix, List definitions):
   [ parameters=classTypeParameters(prefix, typeParametersVariances) ]
   [ "extends" extensions=interfaces() ]
   "{"
-  { res = new AbstractInterface(name,parameters,typeParametersVariances,
+  { res = bossa.syntax.dispatch.createAbstractInterface(name,parameters,typeParametersVariances,
 				extensions); }
     (
       { Definition m; }
@@ -1153,7 +1153,7 @@ AbstractInterfaceImplementation abstractInterfaceImplementation():
   className=fullyQualifiedName()
   [ "finally" { _finally = true; } ]
   "implements" interfaceName=ident() ";"
-  { return new AbstractInterfaceImplementation(className, interfaceName,
+  { return new AbstractInterfaceImplementation(className, /*Node.none*/4, className, interfaceName,
 		_finally, _interface);
   }
 }

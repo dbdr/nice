@@ -1,7 +1,7 @@
 /**************************************************************************/
 /*                                N I C E                                 */
 /*             A high-level object-oriented research language             */
-/*                        (c) Daniel Bonniot 2002                         */
+/*                        (c) Daniel Bonniot 2004                         */
 /*                                                                        */
 /*  This program is free software; you can redistribute it and/or modify  */
 /*  it under the terms of the GNU General Public License as published by  */
@@ -12,18 +12,82 @@
 
 package bossa.syntax;
 
-import mlsub.typing.*;
-import bossa.util.User;
+import bossa.util.*;
+
+/**
+   Declaration of an abstract interface (i.e. a ML-Sub interface).
+
+ */
+public class AbstractInterface extends MethodContainer
+{
+  /** ML-Sub interface. */
+  private mlsub.typing.Interface itf = cast(null);
+  private ?List<MonotypeConstructor> extensions; // the super-interfaces
+  private mlsub.typing.Interface[?] superInterfaces = null; // resolved super-interfaces
+
+  getTypeSymbol()= itf;
+
+  resolve()
+  {
+    super;
+
+    if (extensions != null && notNull(extensions).size() != 0)
+      superInterfaces = notNull(extensions).mapToArray(MonotypeConstructor parent =>
+		notNull(parent.tc).resolveToItf(notNull(typeScope)));
+
+    extensions = null;
+
+    this.createContext();
+  }
+
+  private void createContext()
+  {
+    if (superInterfaces != null)
+      try{
+	mlsub.typing.Typing.assertLeq(itf, notNull(superInterfaces));
+      }
+      catch(mlsub.typing.KindingEx e){
+	User.error(name, name + " cannot extends one of the interfaces " +
+		   " because they don't have the same number or kind of " +
+		   " type parameters");
+      }
+  }
+
+  printInterface(w)
+  {
+    super;
+    w.print("abstract interface "
+            + this.getSimpleName()
+            + this.printTypeParameters()
+            + Util.map(" extends ",", ","", superInterfaces)
+            + "{}\n");
+  }
+
+  compile() {}
+
+  toString() = name.toString();
+}
+
+public AbstractInterface createAbstractInterface(LocatedString name, 
+			   MethodContainer.Constraint typeParameters, 
+			   List<?boolean> typeParametersVariances,
+			   List<MonotypeConstructor> extensions
+			  )
+{
+  let res = new AbstractInterface(name, Node.global, typeParameters,
+	 typeParametersVariances, extensions: extensions);
+
+  res.itf = new Interface(res.variance, name.toString());
+  res.addTypeSymbol(res.itf);
+  return res;
+}
 
 /**
    Declaration that an existing class implements an abstract interface.
 
    The abstract interface must belong to the current package.
 
-   @version $Date$
-   @author Daniel Bonniot (bonniot@users.sourceforge.net)
  */
-
 public class AbstractInterfaceImplementation extends Definition
 {
   final LocatedString className;
@@ -31,22 +95,10 @@ public class AbstractInterfaceImplementation extends Definition
   final boolean _finally;
   final boolean _interface;
 
-  public AbstractInterfaceImplementation
-    (LocatedString className, LocatedString interfaceName, boolean _finally,
-		boolean _interface)
-  {
-    super(className, Node.none);
+  ?TypeConstructor classTC = null;
+  ?Interface interfaceITF = null;
 
-    this.className = className;
-    this.interfaceName = interfaceName;
-    this._finally = _finally;
-    this._interface = _interface;
-  }
-
-  TypeConstructor classTC;
-  Interface interfaceITF;
-
-  public void resolve()
+  resolve()
   {
     classTC = new TypeIdent(className).resolveToTC(typeScope);
 
@@ -59,41 +111,41 @@ public class AbstractInterfaceImplementation extends Definition
         if (_interface) User.error(this, ""+classTC+" is not an interface");
       }
 
-    TypeIdent ident = new TypeIdent
+    let ident = new TypeIdent
       (new LocatedString(module.getName() + '.' + interfaceName.content, 
 			 interfaceName.location()));
     interfaceITF = ident.resolveToItf(typeScope);
 
-    TypeDefinition def = dispatch.getTypeDefinition(classTC);
+    let def = getTypeDefinition(notNull(classTC));
 
     boolean isNiceClass = def != null &&
       (def.getImplementation() instanceof NiceClass);
 
-    if (!isNiceClass && interfaceITF.associatedTC() != null)
+    if (!isNiceClass && notNull(interfaceITF).associatedTC() != null)
       User.error(this, className + " is not a class defined in Nice.\n" +
                  "It can only implement abstract interfaces.");
 
     if (def != null)
       def.addInterfaceImplementation(interfaceITF);
 
-    createContext();
+    this.createContext();
   }
 
   private void createContext()
   {
     try {
-      Typing.assertImp(classTC, interfaceITF, true);
+      mlsub.typing.Typing.assertImp(classTC, interfaceITF, true);
       if (_finally)
-	Typing.assertAbs(classTC, interfaceITF);
+	mlsub.typing.Typing.assertAbs(classTC, interfaceITF);
     }
-    catch(TypingEx ex) {
+    catch(mlsub.typing.TypingEx ex) {
       User.error(this, "Class " + classTC + " cannot implement " + 
 		 interfaceITF + ": they do not have the same number or kind of type parameters");
 
     }
   }
 
-  public void printInterface(java.io.PrintWriter w)
+  printInterface(w)
   {
     if (_interface)
       w.print("interface ");
@@ -106,7 +158,5 @@ public class AbstractInterfaceImplementation extends Definition
     w.println(";");
   }
 
-  public void compile()
-  {
-  }
+  compile() {}
 }

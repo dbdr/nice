@@ -231,7 +231,10 @@ public abstract class CTypeDefinition extends TypeDefinition
   void resolveClass()
   {
     this.resolveInterfaces(implementations);
-    abs = AbstractInterface.resolve(notNull(typeScope), abstractions);
+
+    if (abstractions != null && notNull(abstractions).size() != 0)
+      abs = notNull(abstractions).mapToArray(MonotypeConstructor parent =>
+		notNull(parent.tc).resolveToItf(notNull(typeScope)));
 
     implementations = null;
     abstractions = null;

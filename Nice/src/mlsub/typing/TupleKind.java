@@ -47,7 +47,10 @@ public class TupleKind implements Kind
   
   public Monotype freshMonotype()
   {
-    return new TupleType(MonotypeVar.news(arity));
+    Monotype[] args = MonotypeVar.news(arity);
+    Typing.introduce(args);
+
+    return new TupleType(args);
   }
   
   public void register(Element e)

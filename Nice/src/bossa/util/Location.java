@@ -59,9 +59,14 @@ public class Location implements Located
     this(currentFile, startLine, startColumn, endLine, endColumn);
   }
 
+  public Location(String fileName, int startLine, int startColumn)
+  {
+    this(fileName, startLine, startColumn, -1, -1);
+  }
+
   public Location(String fileName)
   {
-    this(fileName,-1,-1,-1,-1);
+    this(fileName, -1, -1);
   }
 
   public Location(String abstractLocation, boolean dummy)

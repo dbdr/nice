@@ -1572,6 +1572,10 @@ public class Compilation
       }
     catch (RuntimeException ex)
       {
+	// Rethrow the error, since it is better handled at the Nice level.
+	if (true) 
+	  throw ex;
+
 	// Try to produce a localized error message.
 	error('f', "Internal compiler exception: "+ex);
 	throw ex;

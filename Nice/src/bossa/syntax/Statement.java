@@ -51,8 +51,8 @@ public abstract class Statement
 	  // Make sure that the error is attached to a location.
 	  // If not, it's better than nothing to located the error in
 	  // the containing statement.
-	  if (e.responsible == null)
-	    e.responsible = s;
+	  if (e.location == null)
+	    e.location = s.location();
 	  // Rethrow.
 	  throw e;
 	}

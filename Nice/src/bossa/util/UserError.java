@@ -30,18 +30,30 @@ public class UserError extends RuntimeException
 
   public UserError(Located responsible, String message)
   {
+    this(responsible.location(), message);
+  }
+
+  public UserError(gnu.expr.Expression responsible, String message)
+  {
+    this(new Location(responsible.getFile(), responsible.getLine(), 
+		      responsible.getColumn()), 
+	 message);
+  }
+
+  public UserError(Location location, String message)
+  {
     this(message);
-    this.responsible = responsible;
+    this.location = location;
   }
 
   public String getMessage()
   {
-    if (responsible == null || responsible.location() == null)
+    if (location == null)
       return message;
     else
-      return responsible.location() + ":\n" + message;
+      return location + ":\n" + message;
   }
 
   public String message;
-  public Located responsible;
+  public Location location;
 }

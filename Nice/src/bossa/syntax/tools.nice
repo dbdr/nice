@@ -61,8 +61,8 @@ mlsub.typing.Monotype makeUnsure(mlsub.typing.Monotype m) =
 bossa.util.UserError ensureLocated(bossa.util.UserError e, 
 				   bossa.util.Located loc)
 {
-  if (e.responsible == null)
-    e.responsible = loc;
+  if (e.location == null)
+    e.location = loc.location();
   return e;
 }
 

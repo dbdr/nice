@@ -117,3 +117,10 @@ new B(int x) {
   [x].foreach(fst);
   this();
 }
+
+/// FAIL
+  /// Toplevel
+  class A {}
+  new /*/// FAIL HERE */A(int n) { 
+    this(n);
+  }

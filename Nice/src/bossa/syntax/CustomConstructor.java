@@ -143,13 +143,22 @@ public class CustomConstructor extends UserOperator
     return res;
   }
 
+  private boolean generatingCode = false;
+
   protected gnu.expr.Expression computeCode()
   {
+    if (generatingCode)
+      User.error(this, "recursive custom constructor calls not allowed");
+
+    generatingCode = true;
+
     ConstructorExp lambda = Gen.createCustomConstructor
       ((ClassType) javaReturnType(), javaArgTypes(), getSymbols());
 
     Gen.setMethodBody(lambda, body.generateCode());
     classe.getClassExp().addMethod(lambda);
+
+    generatingCode = false;
 
     // In the bytecode, we want to use the same type parameter names
     // as the class definition, even if the source of this custom constructor

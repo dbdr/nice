@@ -18,6 +18,7 @@ nice (0.7.6) unstable; urgency=low
   * 'this' can now be left implicit even in implementations of methods
     declared externally to a class.
   * Parser support for public-read and private-write fields (experimental).
+  * Performance improvement for anonymous functions.
   * Bugfixes (using anonymous functions while overriding native methods, 
     automatic array conversions in polymorphic code, ...).
 

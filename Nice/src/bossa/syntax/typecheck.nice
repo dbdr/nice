@@ -165,6 +165,8 @@ void pushConditionalType(MonoSymbol variable, mlsub.typing.Monotype baseType)
 typecheck(e@IfExp)
 {
   Expression condition = notNull(e.condition);
+  Expression thenExp = notNull(e.thenExp);
+  Expression elseExp = notNull(e.elseExp);
 
   try{
     condition = checkAssignment(notNull(ConstantExp.boolPolytype), condition);
@@ -187,8 +189,8 @@ typecheck(e@IfExp)
 
     if (variable == null)
       {
-	typecheck(e.thenExp);
-	typecheck(e.elseExp);
+	typecheck(thenExp);
+	typecheck(elseExp);
 	return;
       }
 
@@ -199,10 +201,13 @@ typecheck(e@IfExp)
       {
 	mlsub.typing.Monotype type = variable.type;
 	variable.type = makeSure(type);
-	typecheck(e.thenExp);
+	typecheck(thenExp);
+	// since the type of the variable is destructively changed,
+	// it is important to compute the branch's type and to store it now.
+	thenExp.computeType();
 
 	variable.type = type;
-	typecheck(e.elseExp);
+	typecheck(elseExp);
 
 	// If else never returns, the variable is known to be non-null
 	// up-to the end of this conditional block
@@ -216,10 +221,13 @@ typecheck(e@IfExp)
       // variable is non-null in the 'else' part
       {
 	mlsub.typing.Monotype type = variable.type;
-	typecheck(e.thenExp);
+	typecheck(thenExp);
 
 	variable.type = makeSure(type);
-	typecheck(e.elseExp);
+	typecheck(elseExp);
+	// since the type of the variable is destructively changed,
+	// it is important to compute the branch's type and to store it now.
+	elseExp.computeType();
 
 	if (e.thenUnreachable)
 	  pushConditionalType(variable, type);

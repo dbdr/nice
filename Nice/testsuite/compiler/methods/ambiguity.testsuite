@@ -29,4 +29,19 @@ override void foo(int x, int y) {}
   void /*/// FAIL HERE */ foo(A x, A y) {}
   foo(B x, B y) {}
   foo(B x, B y) {}
-  
+
+/// FAIL
+  /// Toplevel
+  interface top {
+    int /*/// FAIL HERE */ diamond() = 1;
+  }
+
+  interface left implements top {
+    diamond() = 2;
+  }
+  interface right implements top {
+    diamond() = 3;
+  }
+
+  class bottom implements left, right {}
+  // ambiguity for diamond(bottom)

@@ -1,0 +1,24 @@
+
+package bossa.syntax;
+
+/*
+  This file is only useful to bootstrap the compiler,
+  since bossa.syntax is implemented both in Java and Nice,
+  while we need mutual recursion between the two.
+
+  This class must have the interface of the Nice part of the package.
+*/
+
+public class dispatch
+{
+  static Statement  analyse$0(Statement  s, VarScope v, TypeScope t) 
+  { return null; }
+  
+  static Expression analyse$1(Expression e, VarScope v, TypeScope t) 
+  { return null; }
+}
+
+class UnknownIdentException extends RuntimeException 
+{
+  LocatedString ident;
+}

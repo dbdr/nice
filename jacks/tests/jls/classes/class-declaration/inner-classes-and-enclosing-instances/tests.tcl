@@ -43,7 +43,7 @@ tcltest::test 8.1.2-static-5 { static initializers are not allowed in
     empty_class T812s5 {
         Object o = new Object() {
             static {}
-        }
+        };
     }
 } FAIL
 
@@ -52,7 +52,7 @@ tcltest::test 8.1.2-static-6 { syntax error in illegal static initializers
     empty_class T812s6 {
         Object o = new Object() {
             static { a }
-        }
+        };
     }
 } FAIL
 
@@ -156,5 +156,69 @@ tcltest::test 8.1.2-static-17 { anonymous classes in static context still
                 static int i;
             });
         }
+    }
+} FAIL
+
+tcltest::test 8.1.2-enclosing-1 { A parameter used but not declared
+        in an inner class must be declared final } {
+    empty_class T812e1 {
+void foo(int i)
+{
+    new Object() {
+        int j = i = 0;
+    };
+}
+    }
+} FAIL
+
+tcltest::test 8.1.2-enclosing-2 { A local used but not declared
+        in an inner class must be declared final } {
+    empty_class T812e2 {
+void foo()
+{
+    int i = 0;
+    new Object() {
+        int j = i = 0;
+    };
+}
+    }
+} FAIL
+
+
+tcltest::test 8.1.2-enclosing-3 { A blank final field may not be
+        assigned within an inner class } {
+    empty_class T812e3 {
+void foo()
+{
+    final int i;
+    new Object() {
+        int j = i = 0;
+    };
+}
+    }
+} FAIL
+
+tcltest::test 8.1.2-enclosing-4 { A final field may not be
+        assigned within an inner class } {
+    empty_class T812e4 {
+void foo()
+{
+    final int i = 0;
+    new Object() {
+        int j = i = 0;
+    };
+}
+    }
+} FAIL
+
+tcltest::test 8.1.2-enclosing-5 { A final parameter may not be
+        assigned within an inner class } {
+    empty_class T812e5 {
+void foo(final int i)
+{
+    new Object() {
+        int j = i = 0;
+    };
+}
     }
 } FAIL

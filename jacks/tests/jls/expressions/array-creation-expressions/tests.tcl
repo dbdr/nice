@@ -33,11 +33,17 @@ tcltest::test 15.10-initializer-syntax-5 { array initializer may contain
 } PASS
 
 tcltest::test 15.10-initializer-syntax-6 { array initializers may nest } {
-    empty_main T1510ii6 {
+    empty_main T1510is6 {
         int[][] iaa = new int[][] { {1}, {2} };
     }
 } PASS
 
+tcltest::test 15.10-initializer-syntax-7 { array bounds determined
+        automatically when initialized } {
+    empty_main T1510is7 {
+	Object o = new int[1] {0};
+    }
+} FAIL
 
 tcltest::test 15.10-initializer-type-1 { expressions in array initializer
         must be assignment compatible with array type } {
@@ -131,5 +137,36 @@ tcltest::test 15.10-initializer-type-13 { expressions in array initializer
     }
 } PASS
 
-# FIXME: Add tests for array creation expressions without initializers
+tcltest::test 15.10-uninitialized-1 { At least one dimension must be
+        specified } {
+    empty_main T1510u1 {
+	Object o = new int[][];
+    }
+} FAIL
+
+tcltest::test 15.10-uninitialized-2 { Some dimensions may to be specified } {
+    empty_main T1510u2 {
+	Object o = new int[1][];
+    }
+} PASS
+
+tcltest::test 15.10-uninitialized-3 { All dimensions may to be specified } {
+    empty_main T1510u3 {
+	Object o = new int[1][2];
+    }
+} PASS
+
+tcltest::test 15.10-uninitialized-4 { Trailing dimensions may be specified
+        only when leading ones are } {
+    empty_main T1510u4 {
+	Object o = new int[][2];
+    }
+} FAIL
+
+tcltest::test 15.10-uninitialized-5 { negative constant dimensions are
+        stupid, but legal } {
+    ok_pass_or_warn [empty_main T1510u5 {
+	Object o = new int[-1];
+    }]
+} OK
 

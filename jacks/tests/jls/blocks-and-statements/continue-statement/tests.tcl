@@ -6,7 +6,7 @@ tcltest::test 14.15-plain-1 { continue must occur in a loop statement } {
 
 tcltest::test 14.15-plain-2 { continue must occur in a loop statement } {
     empty_main T1415p2 {
-        for (int i=0; i<10; i++)
+        for (int i=0; i<10; ++i)
             continue;
     }
 } PASS
@@ -14,7 +14,7 @@ tcltest::test 14.15-plain-2 { continue must occur in a loop statement } {
 tcltest::test 14.15-plain-3 { continue must occur in a loop statement } {
     empty_main T1415p3 {
         int i=0;
-        while (i++<10)
+        while (++i<10)
             continue;
     }
 } PASS
@@ -23,13 +23,13 @@ tcltest::test 14.15-plain-4 { continue must occur in a loop statement } {
     empty_main T1415p4 {
         int i=0;
         do continue;
-        while (i++<10);
+        while (++i<10);
     }
 } PASS
 
 tcltest::test 14.15-plain-5 { continue must occur in a loop statement } {
     empty_main T1415p5 {
-        for (int i=0; i<10; i++) {
+        for (int i=0; i<10; ++i) {
             continue;
         }
     }
@@ -38,7 +38,7 @@ tcltest::test 14.15-plain-5 { continue must occur in a loop statement } {
 tcltest::test 14.15-plain-6 { continue must occur in a loop statement } {
     empty_main T1415p6 {
         int i=0;
-        while (i++<10) {
+        while (++i<10) {
             continue;
         }
     }
@@ -49,7 +49,7 @@ tcltest::test 14.15-plain-7 { continue must occur in a loop statement } {
         int i=0;
         do {
             continue;
-        } while (i++<10);
+        } while (++i<10);
     }
 } PASS
 
@@ -95,7 +95,7 @@ tcltest::test 14.15-label-1 { A label targeted by continue
         must have a loop as its statment } {
     empty_main T1415l1 {
         a: {
-            for (int i=0; i<10; i++)
+            for (int i=0; i<10; ++i)
                 continue a;
         }
     }
@@ -104,7 +104,7 @@ tcltest::test 14.15-label-1 { A label targeted by continue
 tcltest::test 14.15-label-2 { A label targeted by continue
         must have a loop as its statment } {
     empty_main T1415l2 {
-        a: b: for (int i=0; i<10; i++)
+        a: b: for (int i=0; i<10; ++i)
             continue a;
     }
 } FAIL
@@ -123,7 +123,7 @@ tcltest::test 14.15-label-4 { continue must occur in a loop statement } {
 
 tcltest::test 14.15-label-5 { continue must occur in a loop statement } {
     empty_main T1415l5 {
-        a: for (int i=0; i<10; i++)
+        a: for (int i=0; i<10; ++i)
             continue a;
     }
 } PASS
@@ -131,7 +131,7 @@ tcltest::test 14.15-label-5 { continue must occur in a loop statement } {
 tcltest::test 14.15-label-6 { continue must occur in a loop statement } {
     empty_main T1415l6 {
         int i=0;
-        a: while (i++<10)
+        a: while (++i<10)
             continue a;
     }
 } PASS
@@ -140,13 +140,13 @@ tcltest::test 14.15-label-7 { continue must occur in a loop statement } {
     empty_main T1415l7 {
         int i=0;
         a: do continue a;
-        while (i++<10);
+        while (++i<10);
     }
 } PASS
 
 tcltest::test 14.15-label-8 { continue must occur in a loop statement } {
     empty_main T1415l8 {
-        a: for (int i=0; i<10; i++) {
+        a: for (int i=0; i<10; ++i) {
             continue a;
         }
     }
@@ -155,7 +155,7 @@ tcltest::test 14.15-label-8 { continue must occur in a loop statement } {
 tcltest::test 14.15-label-9 { continue must occur in a loop statement } {
     empty_main T1415l9 {
         int i=0;
-        a: while (i++<10) {
+        a: while (++i<10) {
             continue a;
         }
     }
@@ -166,7 +166,7 @@ tcltest::test 14.15-label-10 { continue must occur in a loop statement } {
         int i=0;
         a: do {
             continue a;
-        } while (i++<10);
+        } while (++i<10);
     }
 } PASS
 

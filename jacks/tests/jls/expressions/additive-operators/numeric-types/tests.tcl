@@ -65,7 +65,7 @@ tcltest::test 15.18.2-float-4 { the result of floating-point addition follows
 
 tcltest::test 15.18.2-float-5 { Infinity + 0 = Infinity } {
     constant_expression T15182f5 \
-        {Float.POSITIVE_INFINITY + -0.0 == Float.POSITIVE_INFINITY}
+        {Float.POSITIVE_INFINITY + -0.0f == Float.POSITIVE_INFINITY}
 } PASS
 
 tcltest::test 15.18.2-float-6 { Infinity + finite = Same sign Infinity } {
@@ -200,5 +200,62 @@ tcltest::test 15.18.2-double-16 { Floating-point addition takes place with
         for this test case } {
     constant_expression T15182d16 {1.1107651257113993e-16 + 1 ==
         1.0000000000000002}
+} PASS
+
+tcltest::test 15.18.2-mixed-1 { Test mixed type addition to 0 for proper
+        optimization - jikes bug 3078 } {
+    empty_class T15182m1 {
+	void m(int i, long l, float f, double d) {
+	    l = 0L + i;
+	    l = i + 0L;
+	    l = 0L - i;
+	    l = i - 0L;
+
+	    f = 0f + i;
+	    f = i + 0f;
+	    f = 0f - i;
+	    f = i - 0f;
+	    f = -0f + i;
+	    f = i + -0f;
+	    f = -0f - i;
+	    f = i - -0f;
+
+	    f = 0f + l;
+	    f = l + 0f;
+	    f = 0f - l;
+	    f = l - 0f;
+	    f = -0f + l;
+	    f = l + -0f;
+	    f = -0f - l;
+	    f = l - -0f;
+
+	    d = 0. + i;
+	    d = i + 0.;
+	    d = 0. - i;
+	    d = i - 0.;
+	    d = -0. + i;
+	    d = i + -0.;
+	    d = -0. - i;
+	    d = i - -0.;
+
+	    d = 0. + l;
+	    d = l + 0.;
+	    d = 0. - l;
+	    d = l - 0.;
+	    d = -0. + l;
+	    d = l + -0.;
+	    d = -0. - l;
+	    d = l - -0.;
+
+	    d = 0. + f;
+	    d = f + 0.;
+	    d = 0. - f;
+	    d = f - 0.;
+	    d = -0. + f;
+	    d = f + -0.;
+	    d = -0. - f;
+	    d = f - -0.;
+	}
+    }
 } PASS
 

@@ -35,7 +35,7 @@ tcltest::test 3.7-9 { // comment separates tokens } {
 } PASS
 
 tcltest::test 3.7-10 { /**/ comment separates tokens } {
-    compile [saveas T3710.java "class T3710 {int/**/i;}"]
+    compile [saveas T3710.java "class T3710 {int/* */i;}"]
 } PASS
 
 tcltest::test 3.7-11 { // comment cannot appear in literal } {
@@ -43,7 +43,7 @@ tcltest::test 3.7-11 { // comment cannot appear in literal } {
 } FAIL
 
 tcltest::test 3.7-12 { /**/ comment cannot appear in literal } {
-    compile [saveas T3712.java "class T3712 {float f = 1./**/0;}"]
+    compile [saveas T3712.java "class T3712 {float f = 1./* */0;}"]
 } FAIL
 
 tcltest::test 3.7-13 { // comment cannot appear in literal } {
@@ -51,18 +51,18 @@ tcltest::test 3.7-13 { // comment cannot appear in literal } {
 } FAIL
 
 tcltest::test 3.7-14 { /**/ comment cannot appear in literal } {
-    compile [saveas T3714.java "class T3714 {char c = 'a/**/';}"]
+    compile [saveas T3714.java "class T3714 {char c = 'a/* */';}"]
 } FAIL
 
 tcltest::test 3.7-15 { /* must have matching */ } {
     compile [saveas T3715.java "class T3715 {} /*"]
 } FAIL
 
-tcltest::test 3.7-16 { // may end at EOF instad of LineTerminator. This goes
-        against JLS 3, but has always been Sun's behavior. Therefore, the
-        Java Spec Report argues that this should be legal } {
+tcltest::test 3.7-16 { // may not end at EOF, only LineTerminator. Until Sun
+        updates the JLS to permit it, this test must fail - see jikes bug
+        2879 } {
     compile [saveas T3716.java "class T3716 {} //"]
-} PASS
+} FAIL
 
 tcltest::test 3.7-17 { /**/ comment can contain any characters, including \0,
         unterminated quotes } {
@@ -118,3 +118,127 @@ tcltest::test 3.7-27 { /*/ is not a comment, but an opening for /* */ } {
         */
     }
 } PASS
+
+tcltest::test 3.7-28 { /** */ doc comments are legal, in spite of a bug in the
+        grammar which doesn't allow them } {
+    empty_class T3728 "/** */"
+} PASS
+
+tcltest::test 3.7-29 { /**/ is a legal, degenerate doc comment, in spite of
+        a bug in the grammar which doesn't allow it } {
+    empty_class T3729 "/**/"
+} PASS
+
+tcltest::test 3.7-30 { /* */ comments don't nest } {
+    empty_class T3730 "/* /* */ */"
+} FAIL
+
+tcltest::test 3.7-31 { /* */ comments don't nest in // } {
+    empty_class T3731 "// /* \n */"
+} FAIL
+
+tcltest::test 3.7-32 { /** */ comment separates tokens } {
+    compile [saveas T3732.java "class T3732 {int/** */i;}"]
+} PASS
+
+tcltest::test 3.7-33 { /** */ comment separates tokens } {
+    compile [saveas T3733.java "class T3733 {float f = 1./** */0;}"]
+} FAIL
+
+tcltest::test 3.7-34 { /**/ comment cannot appear in literal } {
+    compile [saveas T3734.java "class T3734 {char c = 'a/** */';}"]
+} FAIL
+
+tcltest::test 3.7-35 { /** must have matching */ } {
+    compile [saveas T3735.java "class T3735 {} /**"]
+} FAIL
+
+tcltest::test 3.7-36 { /* must have matching */ } {
+    compile [saveas T3736.java "class T3736 {} /* "]
+} FAIL
+
+tcltest::test 3.7-37 { /** must have matching */ } {
+    compile [saveas T3737.java "class T3737 {} /** "]
+} FAIL
+
+tcltest::test 3.7-38 { /* must have matching */ } {
+    compile [saveas T3738.java "class T3738 {} /* *"]
+} FAIL
+
+tcltest::test 3.7-39 { /** must have matching */ } {
+    compile [saveas T3739.java "class T3739 {} /** *"]
+} FAIL
+
+# These next tests rely on the compiler to output the file name, followed
+# by the line number of the error. Note that the bad token is conveniently
+# placed so that any column numbers in the message avoid false positives.
+tcltest::test 3.7-line-number-1 { test line counts in comments } {
+    compile [saveas T37ln1.java "class T37ln1 { // \n }   oops"]
+    match_err_or_warn {*.java*2*}
+} 1
+
+tcltest::test 3.7-line-number-2 { test line counts in comments } {
+    compile [saveas T37ln2.java "class T37ln2 { // \\u000a }   oops"]
+    match_err_or_warn {*.java*2*}
+} 1
+
+tcltest::test 3.7-line-number-3 { test line counts in comments } {
+    compile [saveas T37ln3.java "class T37ln3 { /* \n */ }oops"]
+    match_err_or_warn {*.java*2*}
+} 1
+
+tcltest::test 3.7-line-number-4 { test line counts in comments } {
+    compile [saveas T37ln4.java "class T37ln4 { /* \\u000a */ }oops"]
+    match_err_or_warn {*.java*2*}
+} 1
+
+tcltest::test 3.7-line-number-5 { test line counts in comments } {
+    compile [saveas T37ln5.java "class T37ln5 { /*\n */ }oops"]
+    match_err_or_warn {*.java*2*}
+} 1
+
+tcltest::test 3.7-line-number-6 { test line counts in comments } {
+    compile [saveas T37ln6.java "class T37ln6 { /*\\u000a */ }oops"]
+    match_err_or_warn {*.java*2*}
+} 1
+
+tcltest::test 3.7-line-number-7 { test line counts in comments } {
+    compile [saveas T37ln7.java "class T37ln7 { /* *\n */ }oops"]
+    match_err_or_warn {*.java*2*}
+} 1
+
+tcltest::test 3.7-line-number-8 { test line counts in comments } {
+    compile [saveas T37ln8.java "class T37ln8 { /* *\\u000a */ }oops"]
+    match_err_or_warn {*.java*2*}
+} 1
+
+tcltest::test 3.7-line-number-9 { test line counts in comments } {
+    compile [saveas T37ln9.java "class T37ln9 { /** \n */ }oops"]
+    match_err_or_warn {*.java*2*}
+} 1
+
+tcltest::test 3.7-line-number-10 { test line counts in comments } {
+    compile [saveas T37ln10.java "class T37ln10 { /** \\u000a */ }oops"]
+    match_err_or_warn {*.java*2*}
+} 1
+
+tcltest::test 3.7-line-number-11 { test line counts in comments } {
+    compile [saveas T37ln11.java "class T37ln11 { /**\n */ }oops"]
+    match_err_or_warn {*.java*2*}
+} 1
+
+tcltest::test 3.7-line-number-12 { test line counts in comments } {
+    compile [saveas T37ln12.java "class T37ln12 { /**\\u000a */ }oops"]
+    match_err_or_warn {*.java*2*}
+} 1
+
+tcltest::test 3.7-line-number-13 { test line counts in comments } {
+    compile [saveas T37ln13.java "class T37ln13 { /** *\n */ }oops"]
+    match_err_or_warn {*.java*2*}
+} 1
+
+tcltest::test 3.7-line-number-14 { test line counts in comments } {
+    compile [saveas T37ln14.java "class T37ln14 { /** *\\u000a */ }oops"]
+    match_err_or_warn {*.java*2*}
+} 1
+

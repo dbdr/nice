@@ -52,3 +52,29 @@ class T14192rj1 \{
 \}\n"
     compile_and_run [saveas T14192rj1.java $class_data]
 } OK
+
+tcltest::test 14.19.2-runtime-2 { Test evaluation of try-finally blocks, with
+        synchronized statement } {runtime} {
+    compile_and_run [saveas T14192r2.java {
+class T14192r2 {
+    public static void main(final String[] args) {
+	try {
+	    foo(args);
+	    System.out.print("exception not thrown");
+	} catch (Exception e) {
+	    System.out.print("2");
+	}
+    }
+    static int foo(Object o) {
+	synchronized (o) {
+	    try {
+		return bar();
+	    } finally {
+		System.out.print("1 ");
+	    }
+	}
+    }
+    static int bar() { throw new RuntimeException(); }
+}
+    }]
+} {1 2}

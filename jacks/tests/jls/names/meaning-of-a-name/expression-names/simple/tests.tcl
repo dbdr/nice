@@ -167,3 +167,73 @@ tcltest::test 6.5.6.1-instance-4 { An expression name which resolves to an
     }
 } FAIL
 
+tcltest::test 6.5.6.1-explicit-constructor-1 { Cannot access instance fields
+        from this class within an explicit constructor } {
+    empty_class T6561ec1 {
+	int i;
+	T6561ec1(int i) {}
+	T6561ec1() {
+	    this(i);
+	}
+    }
+} FAIL
+
+tcltest::test 6.5.6.1-explicit-constructor-2 { Cannot access instance fields
+        from this class within an explicit constructor } {
+    empty_class T6561ec2 {
+	int i;
+	T6561ec2(int i) {}
+	class Sub extends T6561ec2 {
+	    Sub() {
+		super(i); // i is inherited
+	    }
+	}
+    }
+} FAIL
+
+tcltest::test 6.5.6.1-explicit-constructor-3 { Cannot access instance fields
+        from this class within an explicit constructor } {
+    empty_class T6561ec3 {
+	int i;
+	class Inner {
+	    Inner(int i) {}
+	    Inner() {
+		this(i); // i is not inherited, and this$0.i is available
+	    }
+	}
+    }
+} PASS
+
+tcltest::test 6.5.6.1-explicit-constructor-4 { Cannot access instance fields
+        from this class within an explicit constructor } {
+    empty_class T6561ec4 {
+	private int i;
+	T6561ec4(int i) {}
+	class Sub extends T6561ec4 {
+	    Sub() {
+		super(i); // i is not inherited, so it is the enclosing i
+	    }
+	}
+    }
+} PASS
+
+tcltest::test 6.5.6.1-explicit-constructor-5 { Cannot access instance fields
+        from this class within an explicit constructor } {
+    compile [saveas p1/T6561ec5a.java {
+package p1;
+public class T6561ec5a {
+    int i;
+    class C extends p2.T6561ec5b {
+	C(int j) {}
+	C() {
+	    // although c is a subclass of a, it does not inherit i, since
+	    // its superclass is in a different package
+	    this(i);
+	}
+    }
+}
+    }] [saveas p2/T6561ec5b.java {
+package p2;
+public class T6561ec5b extends p1.T6561ec5a {}
+    }]
+} PASS

@@ -109,7 +109,8 @@ tcltest::test 6.5.5.2-example-1 { Example in the specs } {
         public static void main(String[] args) {
             java.util.Date date
                 = new java.util.Date(System.currentTimeMillis());
-            System.out.println(date.toLocaleString());
+            // Just like Sun to deprecate their example!
+            System.out.println(date/*.toLocaleString()*/);
         }
     }
 } PASS

@@ -548,7 +548,6 @@ tcltest::test 15.28-qualified-name-10 { qualified references
     }
 } FAIL
 
-
 # String constants
 
 tcltest::test 15.28-string-1 { literals are constant expressions } {
@@ -646,6 +645,30 @@ tcltest::test 15.28-string-17 { ?: forms constant expressions } {
                                  {"" + (false ? "foo" : "bar") == "bar"} \
 } PASS
 
+tcltest::test 15.28-string-18 { String concatenation form constants } {
+    empty_class T1528s18 {
+        static final String a = "a";
+        static final String b = "b";
+        void foo(int i) {
+            final String s = a + b;
+            switch (i) {
+                case 0:
+                case ((s == "ab") ? 1 : 0):
+            }
+        }
+    }
+} PASS
+
+tcltest::test 15.28-string-19 { test various uses of a constant String
+        expression } {
+    empty_class T1528s19 {
+	void m() {
+	    ("1" + 2).toString();
+	    ("1" + 2).valueOf(1);
+	}
+    }
+} PASS
+
 # simple string variable names
 
 tcltest::test 15.28-simple-namestr-1 { a final variable initialized
@@ -702,7 +725,25 @@ tcltest::test 15.28-simple-namestr-4 { a final variable initialized
     }
 } PASS
 
-
+tcltest::test 15.28-simple-namestr-5 { test various uses of a constant
+        String } {
+    compile [saveas T1528sn5a.java {
+class T1528sn5a {
+    static final String s = "a";
+}
+class T1528sn5b {
+    void m() {
+	class Local extends T1528sn5a {
+	    void m() {
+		s.toString();
+		s.valueOf(1);
+	    }
+	}
+    }
+}
+    }]
+} PASS
+	
 
 # simple string variable names that are not constant expressions
 
@@ -889,15 +930,7 @@ tcltest::test 15.28-qualified-namestr-10 { qualified references
 } FAIL
 
 
-
 # a type other than string does not a constant expression make
-#
-# these are highly debatable because of the
-# note in the JLS about casting to String
-# and the fact that the type of a final
-# variable is not mentioned in 15.28.
-# Also, the only valid cast is (String) ""
-# which seems very odd.
 
 tcltest::test 15.28-notstring-1 { casting a String to anything
         other than string makes is not a constant expression,
@@ -1010,8 +1043,25 @@ tcltest::test 15.28-instanceof-3 { instanceof does not form a constant expressio
 } FAIL
 
 tcltest::test 15.28-instanceof-4 { instanceof does not form a constant expression } {
-    constant_expression T1528i3 {"" + ("" instanceof String) == "true"}
+    constant_expression T1528i4 {"" + ("" instanceof String) == "true"}
 } FAIL
+
+tcltest::test 15.28-instanceof-5 { use of a constant with instanceof } {
+    compile [saveas T1528i5a.java {
+class T1528i5a {
+    static final String s = "a";
+}
+class T1528i5b {
+    void m() {
+	class Local extends T1528i5a {
+	    void m() {
+		boolean b = s instanceof String;
+	    }
+	}
+    }
+}
+    }]
+} PASS
 
 # division by zero
 

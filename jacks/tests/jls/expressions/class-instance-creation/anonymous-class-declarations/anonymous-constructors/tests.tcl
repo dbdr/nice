@@ -76,6 +76,33 @@ class T15951s6_2 {
     compile p1/T15951s6_1.java p2/T15951s6_2.java
 } PASS
 
+tcltest::test 15.9.5.1-superconstructor-7 { An anonymous class may refer to
+        an inaccessible type mentioned as a superconstructor parameter } {
+    compile [saveas p1/T15951s7_2.java {
+package p1;
+class T15951s7_1 {}
+public class T15951s7_2 {
+    public static T15951s7_1 get() { return new T15951s7_2(); }
+    public static class Inner extends Super {}
+    public T15951s7_2(T15951s7_1 s) {}
+}
+    }] [saveas T15951s7_3.java {
+import p1.T15951s7_2;
+class T15951s7_3 {
+    {
+	new T15951s7_2(null);
+	new T15951s7_2(null) {};
+	new T15951s7_2(T15951s7_2.getSuper());
+	new T15951s7_2(T15951s7_2.getSuper()) {};
+	new T15951s7_2(new T15951s7_2.Inner());
+	new T15951s7_2(new T15951s7_2.Inner()) {};
+	new T15951s7_2(new T15951s7_2.Inner() {});
+	new T15951s7_2(new T15951s7_2.Inner() {}) {};
+    }
+}
+    }]
+} PASS
+
 tcltest::test 15.9.5.1-exception-1 { An anonymous class constructor legally
         throws whatever exception the superconstructor does } {
     empty_class T15951e1 {

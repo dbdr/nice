@@ -269,7 +269,7 @@ package p1;
 abstract class T8111da7a {
   abstract void m();
 }
-public abstract class T8111da8b extends T8111da7a {}
+public abstract class T8111da7b extends T8111da7a {}
 }
     saveas p2/T8111da7c.java {
 package p2;

@@ -46,6 +46,21 @@ class T6622ps4b {
 }]
 } PASS
 
+tcltest::test 6.6.2.2-protected-superctor-5 { A protected superconstructor may
+        always be accessed, even by a inner member class } {
+    compile [saveas p1/T6622ps5a.java {
+package p1;
+public class T6622ps5a {
+    protected T6622ps5a() {}
+}
+}] [saveas T6622ps5b.java {
+class T6622ps5b {
+    class C extends p1.T6622ps5a {}
+}
+}]
+} PASS
+
+
 tcltest::test 6.6.2.2-protected-creation-1 { A protected constructor may
         be accessed by instance creation in the same package } {
     compile [saveas T6622pc1a.java {

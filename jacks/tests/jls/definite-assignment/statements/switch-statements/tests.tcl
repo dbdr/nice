@@ -182,3 +182,21 @@ tcltest::test 16.2.8-unassigned-7 { A variable declared in a switch statement
                 byte b = 0;
     }
 } FAIL
+
+tcltest::test 16.2.8-unassigned-8 { v is DU if it is DU before breaks which
+        exit the switch } {
+    empty_main T1628u8 {
+	int i = 1;
+	final int j;
+	switch (i) {
+	    case 0:
+	    try {
+		j = 1;
+		break; // doesn't exit switch
+	    } finally {
+		return;
+	    }
+	}
+	j = 2;
+    }
+} PASS

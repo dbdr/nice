@@ -9,8 +9,9 @@ tcltest::test 3.10.4-jikes-non-ascii-1 { It is a compile-time
             char c = 'a\xa3';
         }
     "
-    list [compile T3104jna1.java] \
-        [match_err_or_warn {*\\u[0-9a-fA-F][0-9a-fA-F][0-9a-fA-F][0-9a-fA-F]*}]
+    list [compile T3104jna1.java] [expr {
+	[match_err_or_warn {*\\u[0-9a-fA-F][0-9a-fA-F][0-9a-fA-F][0-9a-fA-F]*}]
+	+ [match_err_or_warn {*£*}]}]
 } {FAIL 1}
 
 tcltest::test 3.10.4-jikes-non-ascii-2 { It is a compile-time

@@ -18,6 +18,65 @@ interface T912a2d extends T912a2a, T912a2b, T912a2c {}
 }]
 } PASS
 
+tcltest::test 9.1.2-accessible-3 { All interfaces in the extends clause must
+        be accessible } {
+    compile [saveas p1/T912a3a.java {
+package p1;
+public class T912a3a {
+    protected interface I {}
+}
+}] [saveas T912a3b.java {
+interface T912a3b extends p1.T912a3a.I {}
+}]
+} FAIL
+
+tcltest::test 9.1.2-accessible-4 { All interfaces in the extends clause must
+        be accessible } {
+    compile [saveas p1/T912a4a.java {
+package p1;
+interface T912a4a {}
+    }] [saveas T912a4b.java {
+interface T912a4b extends p1.T912a4a {}
+    }]
+} FAIL
+
+tcltest::test 9.1.2-accessible-5 { All interfaces in the extends clause must
+        be accessible } {
+    compile [saveas p1/T912a5a.java {
+package p1;
+public class T912a5a {
+    protected interface I {}
+}
+    }] [saveas T912a5b.java {
+class T912a5b extends p1.T912a5a {
+    interface Sub extends I {}
+}
+    }]
+} PASS
+
+tcltest::test 9.1.2-accessible-6 { All interfaces in the extends clause must
+        be accessible } {
+    empty_class T912a6 {
+	private interface One {}
+	interface Two extends One {}
+    }
+} PASS
+
+tcltest::test 9.1.2-interface-1 { All types in the extends clause must be
+        interfaces } {
+    empty_class T912i1 {
+	interface I extends Object {}
+    }
+} FAIL
+
+tcltest::test 9.1.2-interface-2 { All types in the extends clause must be
+        interfaces } {
+    empty_class T912i2 {
+	class C {}
+	interface I extends C {}
+    }
+} FAIL
+
 tcltest::test 9.1.2-circular-1 { An interface must not depend on itself } {
     compile [saveas T912c1.java "interface T912c1 extends T912c1 {}"]
 } FAIL
@@ -62,14 +121,14 @@ interface T912c5b extends T912c5a {
 tcltest::test 9.1.2-unique-1 { The extends clause must not list an element
         twice, by any name } {
     compile [saveas T912u1.java {
-inteface T912u1 extends Cloneable, Cloneable {}
+interface T912u1 extends Cloneable, Cloneable {}
 }]
 } FAIL
 
 tcltest::test 9.1.2-unique-2 { The extends clause must not list an element
         twice, by any name } {
     compile [saveas T912u2.java {
-inteface T912u2 extends java.lang.Cloneable, Cloneable {}
+interface T912u2 extends java.lang.Cloneable, Cloneable {}
 }]
 } FAIL
 

@@ -562,17 +562,20 @@ tcltest::test non-jls-jsr41.4-definite-unassignment-pass-10 { V is DU after
     }
 } PASS
 
-# definite-unassignment-try - definite assignment of catch and finally
-# blocks must consider assert like throw.
+# definite-unassignment-try - a reachable assignment inside an assert affects
+# the DU status of catch and try blocks
 # NOTE: The proposed final draft of JSR 41 refers to JLS 16.2.14 regarding
 # throw statements, which is buggy because it permits things like:
 #  final int i;
 #  try { throw new AssertionError(i=1);
 #  } catch (AssertionError e) { i=2; }
-tcltest::test non-jls-jsr41.4-definite-unassignment-try-1 { V is not DU before
-        a catch block unless V is DU after Expression1 when false, and
-        after Expression2 if present, for all reachable assert
-        statements contained in the try block } {assert} {
+# The new rules are: v is DU before a catch clause iff it is DU before the
+# try clause and not reachably assigned in the try clause.
+# v is DU before a finally clause iff it is DU before the try clause and not
+# reachably assigned in the try or catch clauses.
+tcltest::test non-jls-jsr41.4-definite-unassignment-try-1 { V is DU before
+        a catch block iff V is DU before the try block and V is not reachably
+        assigned in the try block } {assert} {
     empty_main T414dut1 {
 	final boolean b;
 	try {
@@ -583,10 +586,9 @@ tcltest::test non-jls-jsr41.4-definite-unassignment-try-1 { V is not DU before
     }
 } FAIL
 
-tcltest::test non-jls-jsr41.4-definite-unassignment-try-2 { V is not DU before
-        a finally block unless V is DU after Expression1 when false, and
-        after Expression2 if present, for all reachable assert
-        statements contained in the try block } {assert} {
+tcltest::test non-jls-jsr41.4-definite-unassignment-try-2 { V is DU before
+        a finally block iff V is DU before the try block and V is not
+        reachably assigned in the try or catch blocks } {assert} {
     empty_main T414dut2 {
 	final boolean b;
 	try {
@@ -597,10 +599,9 @@ tcltest::test non-jls-jsr41.4-definite-unassignment-try-2 { V is not DU before
     }
 } FAIL
 
-tcltest::test non-jls-jsr41.4-definite-unassignment-try-3 { V is not DU before
-        a finally block unless V is DU after Expression1 when false, and
-        after Expression2 if present, for all reachable assert
-        statements contained in any catch block } {assert} {
+tcltest::test non-jls-jsr41.4-definite-unassignment-try-3 { V is DU before
+        a finally block iff V is DU before the try block and V is not
+        reachably assigned in the try or catch blocks } {assert} {
     empty_main T414dut3 {
 	final boolean b;
 	try {
@@ -613,39 +614,50 @@ tcltest::test non-jls-jsr41.4-definite-unassignment-try-3 { V is not DU before
     }
 } FAIL
 
-tcltest::test non-jls-jsr41.4-definite-unassignment-try-4 { V is not DU before
-        a catch block unless V is DU after Expression1 when false, and
-        after Expression2 if present, for all reachable assert
-        statements contained in the try block } {assert} {
+tcltest::test non-jls-jsr41.4-definite-unassignment-try-4 { V is DU before
+        a finally block iff V is DU before the try block and V is not
+        reachably assigned in the try or catch blocks } {assert} {
     empty_main T414dut4 {
 	final boolean b;
 	try {
-	    assert false : b = true;
+	    assert b = false;
 	} catch (AssertionError e) {
+	} finally {
 	    b = false;
 	}
     }
 } FAIL
 
-tcltest::test non-jls-jsr41.4-definite-unassignment-try-5 { V is not DU before
-        a finally block unless V is DU after Expression1 when false, and
-        after Expression2 if present, for all reachable assert
-        statements contained in the try block } {assert} {
+tcltest::test non-jls-jsr41.4-definite-unassignment-try-5 { V is DU before
+        a catch block iff V is DU before the try block and V is not reachably
+        assigned in the try block } {assert} {
     empty_main T414dut5 {
 	final boolean b;
 	try {
 	    assert false : b = true;
+	} catch (AssertionError e) {
+	    b = false;
+	}
+    }
+} FAIL
+
+tcltest::test non-jls-jsr41.4-definite-unassignment-try-6 { V is DU before
+        a finally block iff V is DU before the try block and V is not
+        reachably assigned in the try or catch blocks } {assert} {
+    empty_main T414dut6 {
+	final boolean b;
+	try {
+	    assert false : b = true;
 	} finally {
 	    b = false;
 	}
     }
 } FAIL
 
-tcltest::test non-jls-jsr41.4-definite-unassignment-try-6 { V is not DU before
-        a finally block unless V is DU after Expression1 when false, and
-        after Expression2 if present, for all reachable assert
-        statements contained in any catch block } {assert} {
-    empty_main T414dut6 {
+tcltest::test non-jls-jsr41.4-definite-unassignment-try-7 { V is DU before
+        a finally block iff V is DU before the try block and V is not
+        reachably assigned in the try or catch blocks } {assert} {
+    empty_main T414dut7 {
 	final boolean b;
 	try {
 	    throw new RuntimeException();
@@ -657,11 +669,24 @@ tcltest::test non-jls-jsr41.4-definite-unassignment-try-6 { V is not DU before
     }
 } FAIL
 
-tcltest::test non-jls-jsr41.4-definite-unassignment-try-7 { V is not DU before
-        a catch block unless V is DU after Expression1 when false, and
-        after Expression2 if present, for all reachable assert
-        statements contained in the try block } {assert} {
-    empty_main T414dut7 {
+tcltest::test non-jls-jsr41.4-definite-unassignment-try-8 { V is DU before
+        a finally block iff V is DU before the try block and V is not
+        reachably assigned in the try or catch blocks } {assert} {
+    empty_main T414dut8 {
+	final boolean b;
+	try {
+	    assert false : b = true;
+	} catch (AssertionError e) {
+	} finally {
+	    b = false;
+	}
+    }
+} FAIL
+
+tcltest::test non-jls-jsr41.4-definite-unassignment-try-9 { V is DU before
+        a catch block iff V is DU before the try block and V is not reachably
+        assigned in the try block } {assert} {
+    empty_main T414dut9 {
 	final boolean b;
 	try {
 	    assert true : b = true;
@@ -671,11 +696,10 @@ tcltest::test non-jls-jsr41.4-definite-unassignment-try-7 { V is not DU before
     }
 } PASS
 
-tcltest::test non-jls-jsr41.4-definite-unassignment-try-8 { V is not DU before
-        a finally block unless V is DU after Expression1 when false, and
-        after Expression2 if present, for all reachable assert
-        statements contained in the try block } {assert} {
-    empty_main T414dut8 {
+tcltest::test non-jls-jsr41.4-definite-unassignment-try-10 { V is DU before
+        a finally block iff V is DU before the try block and V is not
+        reachably assigned in the try or catch blocks } {assert} {
+    empty_main T414dut10 {
 	final boolean b;
 	try {
 	    assert true : b = true;
@@ -685,11 +709,10 @@ tcltest::test non-jls-jsr41.4-definite-unassignment-try-8 { V is not DU before
     }
 } PASS
 
-tcltest::test non-jls-jsr41.4-definite-unassignment-try-9 { V is not DU before
-        a finally block unless V is DU after Expression1 when false, and
-        after Expression2 if present, for all reachable assert
-        statements contained in any catch block } {assert} {
-    empty_main T414dut9 {
+tcltest::test non-jls-jsr41.4-definite-unassignment-try-11 { V is DU before
+        a finally block iff V is DU before the try block and V is not
+        reachably assigned in the try or catch blocks } {assert} {
+    empty_main T414dut11 {
 	final boolean b;
 	try {
 	    throw new RuntimeException();
@@ -700,6 +723,198 @@ tcltest::test non-jls-jsr41.4-definite-unassignment-try-9 { V is not DU before
 	}
     }
 } PASS
+
+tcltest::test non-jls-jsr41.4-definite-unassignment-try-12 { V is DU before
+        a finally block iff V is DU before the try block and V is not
+        reachably assigned in the try or catch blocks } {assert} {
+    empty_main T414dut12 {
+	final boolean b;
+	try {
+	    assert true : b = true;
+	} catch (AssertionError e) {
+	} finally {
+	    b = false;
+	}
+    }
+} PASS
+
+# Test definite [un]assignment in loop bodies.
+tcltest::test non-jls-jsr41.4-loop-1 { v must not be multiply assigned in
+        loops } {assert} {
+    empty_main T414l1 {
+	final boolean b;
+	while (true)
+	    assert (b = true) && false;
+    }
+} PASS
+
+tcltest::test non-jls-jsr41.4-loop-2 { v must not be multiply assigned in
+        loops } {assert} {
+    empty_main T414l2 {
+	for (final boolean b; ; )
+	    assert (b = true) && false;
+    }
+} PASS
+
+tcltest::test non-jls-jsr41.4-loop-3 { v must not be multiply assigned in
+        loops } {assert} {
+    empty_main T414l3 {
+	final boolean b;
+	do
+	    assert (b = true) && false;
+	while (true);
+    }
+} PASS
+
+tcltest::test non-jls-jsr41.4-loop-4 { v must not be multiply assigned in
+        loops } {assert} {
+    empty_main T414l4 {
+	final boolean b;
+	while (true)
+	    assert b = true;
+    }
+} FAIL
+
+tcltest::test non-jls-jsr41.4-loop-5 { v must not be multiply assigned in
+        loops } {assert} {
+    empty_main T414l5 {
+	for (final boolean b; ; )
+	    assert b = true;
+    }
+} FAIL
+
+tcltest::test non-jls-jsr41.4-loop-6 { v must not be multiply assigned in
+        loops } {assert} {
+    empty_main T414l6 {
+	final boolean b;
+	do
+	    assert b = true;
+	while (true);
+    }
+} FAIL
+
+tcltest::test non-jls-jsr41.4-loop-7 { v must not be multiply assigned in
+        loops } {assert} {
+    empty_main T414l7 {
+	final boolean b;
+	while (true) {
+	    assert b = true;
+	    break;
+	}
+    }
+} PASS
+
+tcltest::test non-jls-jsr41.4-loop-8 { v must not be multiply assigned in
+        loops } {assert} {
+    empty_main T414l8 {
+	for (final boolean b; ; ) {
+	    assert b = true;
+	    break;
+	}
+    }
+} PASS
+
+tcltest::test non-jls-jsr41.4-loop-9 { v must not be multiply assigned in
+        loops } {assert} {
+    empty_main T414l9 {
+	final boolean b;
+	do
+	    assert b = true;
+	while (false);
+    }
+} PASS
+
+tcltest::test non-jls-jsr41.4-loop-10 { v must not be multiply assigned in
+        loops } {assert} {
+    empty_main T414l10 {
+	final boolean b;
+	while (true)
+	    assert true : b = true; // assignment not reachable
+    }
+} PASS
+
+tcltest::test non-jls-jsr41.4-loop-11 { v must not be multiply assigned in
+        loops } {assert} {
+    empty_main T414l11 {
+	for (final boolean b; ; )
+	    assert true : b = true; // assignment not reachable
+    }
+} PASS
+
+tcltest::test non-jls-jsr41.4-loop-12 { v must not be multiply assigned in
+        loops } {assert} {
+    empty_main T414l12 {
+	final boolean b;
+	do
+	    assert true : b = true; // assignment not reachable
+	while (true);
+    }
+} PASS
+
+tcltest::test non-jls-jsr41.4-loop-13 { v must not be multiply assigned in
+        loops } {assert} {
+    empty_main T414l13 {
+	final boolean b;
+	while (true)
+	    assert false : b = true; // if assigned, loop completes abruptly
+    }
+} PASS
+
+tcltest::test non-jls-jsr41.4-loop-14 { v must not be multiply assigned in
+        loops } {assert} {
+    empty_main T414l14 {
+	for (final boolean b; ; )
+	    assert false : b = true; // if assigned, loop completes abruptly
+    }
+} PASS
+
+tcltest::test non-jls-jsr41.4-loop-15 { v must not be multiply assigned in
+        loops } {assert} {
+    empty_main T414l15 {
+	final boolean b;
+	do
+	    assert false : b = true; // if assigned, loop completes abruptly
+	while (true);
+    }
+} PASS
+
+tcltest::test non-jls-jsr41.4-loop-16 { v must not be multiply assigned in
+        loops } {assert} {
+    empty_main T414l16 {
+	final boolean b;
+	while (true) {
+	    assert b = true;
+	    assert false;
+	    // even though an observer can prove that if b is assigned, the
+	    // loop will complete abruptly, DU rules forbid this construct
+	}
+    }
+} FAIL
+
+tcltest::test non-jls-jsr41.4-loop-17 { v must not be multiply assigned in
+        loops } {assert} {
+    empty_main T414l17 {
+	for (final boolean b; ; ) {
+	    assert b = true;
+	    assert false;
+	    // even though an observer can prove that if b is assigned, the
+	    // loop will complete abruptly, DU rules forbid this construct
+	}
+    }
+} FAIL
+
+tcltest::test non-jls-jsr41.4-loop-18 { v must not be multiply assigned in
+        loops } {assert} {
+    empty_main T414l18 {
+	final boolean b;
+	do {
+	    assert b = true;
+	    assert false;
+	    // even though an observer can prove that if b is assigned, the
+	    // loop will complete abruptly, DU rules forbid this construct
+	} while (true);
+    }
+} FAIL
 
 # reachability
 tcltest::test non-jls-jsr41.4-reachability-1 { an assert can complete normally

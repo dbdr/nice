@@ -90,7 +90,7 @@ class E1 extends Exception {}
 class E2 extends Exception {}
 class E3 extends Exception {}
 abstract class T151222a6a {
-    public abstract void m() throws E1, E2 {}
+    public abstract void m() throws E1, E2;
 }
 interface T151222a6b {
     void m() throws E2, E3;
@@ -169,4 +169,110 @@ abstract class T151222a9d extends T151222a9c {
 }
 }]
 } FAIL
+
+tcltest::test 15.12.2.2-ambiguous-10 { When multiple maximally specific methods
+        have the same signature, and all are abstract, it is arbitrary which
+        is chosen, although the throws clauses are merged } {
+    compile [saveas T151222a10a.java {
+class E1 extends Exception {}
+class E2 extends Exception {}
+class E3 extends Exception {}
+abstract class T151222a10a {
+    public abstract void m() throws E1, E2;
+}
+interface T151222a10b {
+    void m() throws E2, E3;
+}
+abstract class T151222a10c extends T151222a10a implements T151222a10b {
+    {
+        try {
+            m(); // whether a.m() or b.m() is chosen, it cannot throw E1 or E3
+	} catch (E1 e1) {
+        } catch (E2 e2) {
+        }
+    }
+}
+}]
+} FAIL
+
+tcltest::test 15.12.2.2-ambiguous-11 { When multiple maximally specific methods
+        have the same signature, and all are abstract, it is arbitrary which
+        is chosen, although the throws clauses are merged } {
+    compile [saveas T151222a11a.java {
+class E1 extends Exception {}
+class E2 extends Exception {}
+class E3 extends Exception {}
+abstract class T151222a11a {
+    public abstract void m() throws E1, E2;
+}
+interface T151222a11b {
+    void m() throws E2, E3;
+}
+abstract class T151222a11c extends T151222a11a implements T151222a11b {
+    {
+        try {
+            m(); // whether a.m() or b.m() is chosen, it cannot throw E1 or E3
+        } catch (E2 e2) {
+        } catch (E3 e3) {
+        }
+    }
+}
+}]
+} FAIL
+
+tcltest::test 15.12.2.2-ambiguous-12 { When multiple maximally specific methods
+        have the same signature, and all are abstract, it is arbitrary which
+        is chosen, although the throws clauses are merged } {
+    compile [saveas T151222a12a.java {
+class E1 extends Exception {}
+class E2 extends E1 {}
+class E3 extends Exception {}
+class E4 extends E3 {}
+abstract class T151222a12a {
+    public abstract void m() throws E1, E4;
+}
+interface T151222a12b {
+    void m() throws E2, E3;
+}
+abstract class T151222a12c extends T151222a12a implements T151222a12b {
+    {
+        try {
+            m();
+	    // whether a.m() or b.m() is chosen, it cannot throw E1 or E3
+	    // directly; but can throw something assignable to E1 or E3
+        } catch (E2 e2) {
+        } catch (E4 e4) {
+        }
+    }
+}
+    }]
+} PASS
+
+tcltest::test 15.12.2.2-ambiguous-13 { When multiple maximally specific methods
+        have the same signature, and all are abstract, it is arbitrary which
+        is chosen, although the throws clauses are merged } {
+    compile [saveas T151222a13a.java {
+class E1 extends Exception {}
+class E2 extends E1 {}
+class E3 extends Exception {}
+class E4 extends E3 {}
+abstract class T151222a13a {
+    public abstract void m() throws E1, E4;
+}
+interface T151222a13b {
+    void m() throws E2, E3;
+}
+abstract class T151222a13c extends T151222a13a implements T151222a13b {
+    {
+        try {
+            m();
+	    // whether a.m() or b.m() is chosen, it cannot throw E1 or E3
+	    // directly; but can throw something assignable to E1 or E3
+        } catch (E1 e1) {
+        } catch (E3 e3) {
+        }
+    }
+}
+    }]
+} PASS
 

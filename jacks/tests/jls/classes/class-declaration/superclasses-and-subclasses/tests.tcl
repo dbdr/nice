@@ -147,8 +147,11 @@ tcltest::test 8.1.3-superclass-1 { A superclass must be accessible } {
 } FAIL
 
 tcltest::test 8.1.3-superclass-2 { A superclass must be accessible } {
-    compile [saveas p1/T813s2a.java "class T813s2a {}"] [saveas T813s2b.java {
-        class T813s2b extends p1.T813s2a {}
+    compile [saveas p1/T813s2a.java {
+package p1;
+class T813s2a {}
+    }] [saveas T813s2b.java {
+class T813s2b extends p1.T813s2a {}
     }]
 } FAIL
 
@@ -166,3 +169,42 @@ class T813s4b extends T813s4a {}
 }]
 } FAIL
 
+tcltest::test 8.1.3-superclass-5 { A superclass must be accessible } {
+    compile [saveas p1/T813s5a.java {
+package p1;
+public class T813s5a {
+    protected static class Inner {}
+}
+}] [saveas T813s5b.java {
+class T813s5b extends p1.T813s5a.Inner {}
+}]
+} FAIL
+
+tcltest::test 8.1.3-superclass-6 { A superclass must be accessible } {
+    compile [saveas T813s6a.java {
+class T813s6a {
+    private static class Inner {}
+}
+class T813s6b extends T813s6a.Inner {}
+}]
+} FAIL
+
+tcltest::test 8.1.3-superclass-7 { A superclass must be accessible } {
+    compile [saveas p1/T813s7a.java {
+package p1;
+public class T813s7a {
+    protected class Inner {}
+}
+    }] [saveas T813s7b.java {
+class T813s7b extends p1.T813s7a {
+    class Sub extends Inner {}
+}
+    }]
+} PASS
+
+tcltest::test 8.1.3-superclass-8 { A superclass must be accessible } {
+    empty_class T813s8 {
+	private class One {}
+	class Two extends One {}
+    }
+} PASS

@@ -32,7 +32,7 @@ public class T752c1a {
 package p1;
 public class T752c1b extends T752c1a {}
 }] [saveas T752c1c.java {
-import p1.T752c1b.Middle.*;
+import p1.T752c1b.Middle.*; // not canonical
 class T752c1c extends Inner {}
 }]
 } FAIL
@@ -61,6 +61,24 @@ import p1.T752c3a.*; // nothing imported
 class T752c3b {}
 }]
 } PASS
+
+tcltest::test 7.5.2-canonical-4 { Imports use the canonical name, hence local
+        and anonymous classes (which do not have a canonical name) cannot
+        be imported } {
+    compile [saveas p1/T752c4a.java {
+package p1;
+public class T752c4a {
+    static Object o = new Object() {};
+}
+}] [saveas T752c4b.java {
+import p1.*;
+class T752c4b {
+    // Compilers are not required to use T752c4a$1 as the anonymous class
+    // name, but it is a common choice
+    Object o = new T752c4a$1();
+}
+}]
+} FAIL
 
 tcltest::test 7.5.2-accessible-1 { It is an error for an import statement to
         mention an inaccessible type or package } {
@@ -152,6 +170,22 @@ class T752d3a {
     static class Inner {}
 }
 class T752d3b extends Inner {}
+}]
+} PASS
+
+tcltest::test 7.5.2-duplicate-4 { It is legal to import the same simple name
+        on demand from multiple packages, if no ambiguous reference is made
+        to that simple name } {
+    compile [saveas p1/T752d4a.java {
+package p1;
+public class T752d4a {}
+}] [saveas p2/T752d4a.java {
+package p2;
+public class T752d4a {}
+}] [saveas T752d4b.java {
+import p1.*;
+import p2.*;
+class T752d4b {}
 }]
 } PASS
 

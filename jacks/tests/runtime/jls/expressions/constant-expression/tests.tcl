@@ -78,3 +78,27 @@ class T1528rc4 \{
 \}\n"
     compile_and_run [saveas T1528rc4.java $class_data]
 } 30989800
+
+# Added because of JLS2 clarifications
+tcltest::test 15.28-runtime-constant-5 { Division by integer 0 is not a
+    constant, but must evaulate at runtime to an exception } {runtime} {
+    set result [ok_pass_or_warn [empty_class T1528rc5a {
+	final int i = 1 / 0;
+        final int j = 1 % 0;
+        final long k = 1L / 0;
+        final long l = 1L % 0;
+        int m = i;
+    }]]
+    delete T1528rc5a.java
+    list $result [compile_and_run -classpath . [saveas T1528rc5b.java {
+class T1528rc5b {
+    public static void main(String[] args) {
+        try {
+	    new T1528rc5a();
+        } catch (ArithmeticException e) {
+            System.out.print("OK");
+        }
+    }
+}
+    }]]
+} {OK OK}

@@ -345,6 +345,18 @@ class T1591ua24_3 extends T1591ua24_1 implements T1591ua24_2 {
     }]
 } PASS
 
+tcltest::test 15.9.1-unqualified-anonymous-25 { The ClassOrInterfaceType must
+        be accessible } {
+    empty_class T1591ua25 {
+	private class One {}
+	class Two {
+	    Two() {
+		new One() {};
+	    }
+	}
+    }
+} PASS
+
 # qualified anonymous creations
 
 tcltest::test 15.9.1-qualified-anonymous-1 { The simple name must be an
@@ -589,6 +601,18 @@ class T1591qa22_2 extends T1591qa22_1 {
     }]
 } FAIL
 
+tcltest::test 15.9.1-qualified-anonymous-23 { The ClassOrInterfaceType must
+        be accessible } {
+    empty_class T1591qa23 {
+	private class One {}
+	class Two {
+	    Two() {
+		T1591qa23.this.new One() {};
+	    }
+	}
+    }
+} PASS
+
 
 # concrete unqualified creation
 
@@ -799,6 +823,18 @@ class T1591uc15_3 extends T1591uc15_1 implements T1591uc15_2 {
     static Object o = new T1591uc15_3.Inner();
 }
     }]
+} PASS
+
+tcltest::test 15.9.1-unqualified-concrete-16 { The ClassOrInterfaceType must
+        be accessible } {
+    empty_class T1591uc16 {
+	private class One {}
+	class Two {
+	    Two() {
+		new One();
+	    }
+	}
+    }
 } PASS
 
 # qualified concrete creations
@@ -1015,4 +1051,16 @@ class T1591qa20_2 extends T1591qa20_1 {
 }
     }]
 } FAIL
+
+tcltest::test 15.9.1-qualified-concrete-21 { The ClassOrInterfaceType must
+        be accessible } {
+    empty_class T1591qc21 {
+	private class One {}
+	class Two {
+	    Two() {
+		T1591qc21.this.new One();
+	    }
+	}
+    }
+} PASS
 

@@ -172,6 +172,70 @@ public class AccessDefaultClass {
     compile pkg/AccessDefaultClass.java pkg/DefaultClass.java
 } PASS
 
+tcltest::test 6.6.1-15 {A class field declared public is accessible from
+        outside the package} {
+
+    saveas pkg/T66115.java {
+package pkg;
+
+public class T66115 {
+    public static int FIELD = 0;
+}
+}
+
+    saveas T66115_Test.java {
+public class T66115_Test {
+    int i = pkg.T66115.FIELD;
+}
+}
+
+    compile pkg/T66115.java T66115_Test.java
+} PASS
+
+tcltest::test 6.6.1-16 {A class field declared public is accessible from
+        outside the package when the .java source is loaded from
+        the CLASSPATH } {
+
+    saveas pkg/T66116.java {
+package pkg;
+
+public class T66116 {
+    public static int FIELD = 0;
+}
+}
+
+    saveas T66116_Test.java {
+public class T66116_Test {
+    int i = pkg.T66116.FIELD;
+}
+}
+
+    compile -classpath . T66116_Test.java
+} PASS
+
+tcltest::test 6.6.1-17 {A class field declared public is accessible from
+        outside the package when the .class file is loaded from the
+        CLASSPATH} {
+
+    saveas pkg/T66117.java {
+package pkg;
+
+public class T66117 {
+    public static int FIELD = 0;
+}
+}
+
+    saveas T66117_Test.java {
+public class T66117_Test {
+    int i = pkg.T66117.FIELD;
+}
+}
+
+    list \
+        [compile pkg/T66117.java] \
+        [compile -classpath . T66117_Test.java]
+} {PASS PASS}
+
 # protected access should be covered in section 6.6.2
 
 # Access of array types

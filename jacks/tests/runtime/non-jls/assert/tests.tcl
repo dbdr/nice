@@ -22,3 +22,25 @@ class Baz extends Bar {
     }]
 } {true false }
 
+tcltest::test non-jls-jsr41.3-runtime-2 { Asserts do not cause class
+        initialization } {assert && runtime} {
+    compile_and_run [saveas T413r2b.java {
+class T413r2a {
+    static { System.out.print(" oops "); }
+    static class Inner {
+	static { System.out.print('O'); }
+	static void m() {
+	    boolean b = true;
+	    assert b;
+	}
+    }
+}
+class T413r2b {
+    public static void main(String[] args) {
+	System.out.print('A');
+	T413r2a.Inner.m();
+	System.out.print('K');
+    }
+}
+    }]
+} AOK

@@ -71,4 +71,36 @@ class T15112s6b extends T15112s6a {
 }]
 } FAIL
 
+tcltest::test 15.11.2-explicit-constructor-1 { Cannot access instance fields
+        from this class within an explicit constructor } {
+    empty_class T15112ec1 {
+	int i;
+	T15112ec1(int i) {}
+	class Sub extends T15112ec1 {
+	    Sub() {
+		// calling superclass version of inherited i is wrong
+		super(super.i);
+	    }
+	}
+    }
+} FAIL
+
+tcltest::test 15.11.2-explicit-constructor-2 { Cannot access instance fields
+        from this class within an explicit constructor } {
+    empty_class T15112ec2 {
+	class One {
+	    int i;
+	}
+	class Two extends One {
+	    class Inner {
+		Inner(int i) {}
+		Inner() {
+		    // calling super field of enclosing class is legal
+		    this(Two.super.i);
+		}
+	    }
+	}
+    }
+} PASS
+
 #TODO: Add tests for remainder of rules.

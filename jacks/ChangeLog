@@ -1,3 +1,672 @@
+2002-08-19  Eric Blake  <ebb9@email.byu.edu>
+
+	* tests/jls/expressions/class-instance-creation/anonymous-class-declarations/anonymous-constructors/tests.tcl:
+	Added test of inaccessible parameter types in anon ctor.
+	* tests/runtime/jls/blocks-and-statements/switch-statement/tests.tcl:
+	Delete 14.10-runtime-local-1, based on Neal Gafter's comments.
+
+2002-08-15  Eric Blake  <ebb9@email.byu.edu>
+
+	* tests/runtime/jls/blocks-and-statements/switch-statement/tests.tcl:
+	Add test of jikes bug 3212.
+	* tests/runtime/jls/binary-compatibility/form-of-binary/tests.tcl:
+	Add test of jikes bug 3218.
+	* tests/jls/expressions/conditional-operator/tests.tcl:
+	* tests/jls/expressions/equality-operators/tests.tcl:
+	* tests/jls/expressions/equality-operators/numerical-equality/tests.tcl:
+	* tests/jls/expressions/equality-operators/reference-equality/tests.tcl:
+	* tests/runtime/jls/expressions/conditional-operator/tests.tcl:
+	* tests/runtime/jls/expressions/equality-operators/reference-equality/tests.tcl:
+	Add more tests for ?:, ==, !=, from jikes bug 3201.
+
+2002-08-06  Eric Blake  <ebb9@email.byu.edu>
+
+	* tests/jvms/class-file-format/limitations/tests.tcl: Add tests of
+	jikes bug 3182.
+
+2002-08-05  Eric Blake  <ebb9@email.byu.edu>
+
+	* tests/jvms/class-file-format/limitations/tests.tcl:
+	Add more tests of limitations.
+	* tests/runtime/jvms/class-file-format/limitations/tests.tcl:
+	Fix, to work around infinite loop in java VM.
+
+2002-08-02  Eric Blake  <ebb9@email.byu.edu>
+
+	* tests/runtime/jls/expressions/class-instance-creation/run-time-evaluation/tests.tcl:
+	New test for jikes bug 3170.
+	* tests/runtime/jls/binary-compatibility/form-of-binary/tests.tcl:
+	Clarification from Neal Gafter, see jikes bug 2991.
+	* tests/jikes/jls/lexical-structure/literals/character-literals/tests.tcl:
+	Update to match jikes new behavior.
+	* tests/jls/lexical-structure/input-elements-and-tokens/tests.tcl:
+	* tests/jls/lexical-structure/unicode-escapes/tests.tcl:
+	More tests of lexing.
+
+2002-08-02  Eric Blake  <ebb9@email.byu.edu>
+
+	* tests/jvms/class-file-format/attributes/deprecated-attribute/tests.tcl:
+	Update to use same rules as javadoc.
+	* tests/jls/lexical-structure/comments/tests.tcl:
+	* tests/jls/lexical-structure/lexical-translations/tests.tcl:
+	* tests/jls/lexical-structure/line-terminators/tests.tcl:
+	* tests/jls/lexical-structure/literals/character-literals/tests.tcl:
+	* tests/jls/lexical-structure/literals/escape-sequences/tests.tcl:
+	* tests/jls/lexical-structure/literals/floating-point-literals/tests.tcl:
+	* tests/jls/lexical-structure/literals/string-literals/tests.tcl:
+	* tests/jls/lexical-structure/unicode-escapes/tests.tcl:
+	Add tests of lexing bugs that I discovered while patching jikes.
+
+2002-07-31  Eric Blake  <ebb9@email.byu.edu>
+
+	* tests/jls/expressions/primary-expressions/class-literals/tests.tcl:
+	Test fix of recent jikes coredump with class literal.
+
+2002-07-29  Eric Blake  <ebb9@email.byu.edu>
+
+	* tests/jls/expressions/method-invocation-expressions/determine-method-signature/choose-most-specific/tests.tcl:
+	One more test of merging throws clauses.
+
+2002-07-29  Eric Blake  <ebb9@email.byu.edu>
+
+	* tests/jls/definite-assignment/statements/do-statements/tests.tcl:
+	* tests/jls/definite-assignment/statements/for-statements/tests.tcl:
+	* tests/jls/definite-assignment/statements/try-statements/tests.tcl:
+	* tests/jls/definite-assignment/statements/while-statements/tests.tcl:
+	* tests/jls/classes/field-declarations/field-modifiers/final-fields/tests.tcl:
+	More tests on definite assignment - Neal Gafter discovered a bug
+	with the current treatment of finally blocks.
+
+2002-07-26  Eric Blake  <ebb9@email.byu.edu>
+
+	* tests/runtime/jls/execution/initialization-of-classes-and-interfaces/when-initialization-occurs/tests.tcl:
+	* tests/runtime/non-jls/assert/tests.tcl:
+	Test that class literals and asserts don't cause initialization.
+
+2002-07-26  Eric Blake  <ebb9@email.byu.edu>
+
+	* tests/jls/expressions/primary-expressions/class-literals/tests.tcl:
+	Directory cleanup.
+	* tests/jls/classes/field-declarations/field-modifiers/final-fields/tests.tcl:
+	Another test of blank final instance fields.
+	* tests/jls/expressions/postfix-expressions/postfix-increment-operator/tests.tcl:
+	* tests/jls/expressions/postfix-expressions/postfix-decrement-operator/tests.tcl:
+	* tests/jls/expressions/unary-operators/prefix-increment-operator/tests.tcl:
+	* tests/jls/expressions/unary-operators/prefix-decrement-operator/tests.tcl:
+	* tests/jls/definite-assignment/expressions/operators-increment-and-decrement/tests.tcl:
+	More tests of ++ and --.
+	* tests/jls/definite-assignment/statements/while-statements/tests.tcl:
+	* tests/jls/definite-assignment/statements/do-statements/tests.tcl:
+	* tests/jls/definite-assignment/statements/for-statements/tests.tcl:
+	Yet more tests of DA/DU, this time, after the loop.
+
+2002-07-25  Eric Blake  <ebb9@email.byu.edu>
+
+	* tests/jls/definite-assignment/expressions/operators-increment-and-decrement/tests.tcl:
+	First cut at ++ and -- tests, more to follow.
+
+2002-07-25  Eric Blake  <ebb9@email.byu.edu>
+
+	* tests/jls/definite-assignment/statements/while-statements/tests.tcl:
+	* tests/jls/definite-assignment/statements/do-statements/tests.tcl:
+	* tests/jls/definite-assignment/statements/for-statements/tests.tcl:
+	Update according to jacks bug 3130.
+	* tests/runtime/jls/execution/initialization-of-classes-and-interfaces/when-initialization-occurs/tests.tcl:
+	Update according to jacks bug 3109.
+	* tests/jls/expressions/method-invocation-expressions/determine-method-signature/choose-most-specific/tests.tcl:
+	Another test of throws clause merging.
+
+2002-07-25  Eric Blake  <ebb9@email.byu.edu>
+
+	* tests/jls/expressions/array-creation-expressions/tests.tcl:
+	Fix test typos.
+	* tests/non-jls/assert/definite-assignment/tests.tcl:
+	* tests/jls/classes/field-declarations/field-modifiers/final-fields/tests.tcl:
+	Test more cases of definite assignment.
+
+2002-07-23  Eric Blake  <ebb9@email.byu.edu>
+
+	* tests/jls/lexical-structure/comments/tests.tcl:
+	* tests/jls/lexical-structure/line-terminators/tests.tcl: Add
+	tests of line numbering in error messages - jikes bug 2721.
+
+2002-07-23  Eric Blake  <ebb9@email.byu.edu>
+
+	* tests/runtime/jls/expressions/array-access-expressions/examples/tests.tcl:
+	* tests/jls/expressions/array-access-expressions/tests.tcl:
+	* tests/jls/expressions/array-creation-expressions/tests.tcl:
+	Add tests for jikes bug 2680.
+	* tests/jls/expressions/primary-expressions/class-literals/tests.tcl:
+	Further test of class literal.
+	* tests/jls/definite-assignment/statements/do-statements/tests.tcl:
+	* tests/jls/definite-assignment/statements/for-statements/tests.tcl:
+	* tests/jls/definite-assignment/statements/while-statements/tests.tcl:
+	Yet more loop assignment tests.
+
+2002-07-23  Eric Blake  <ebb9@email.byu.edu>
+
+	* tests/jls/expressions/constant-expression/tests.tcl:
+	Add tests of jikes bug 3124.
+	* tests/jls/definite-assignment/statements/do-statements/tests.tcl:
+	* tests/jls/definite-assignment/statements/for-statements/tests.tcl:
+	* tests/jls/definite-assignment/statements/try-statements/tests.tcl:
+	* tests/jls/definite-assignment/statements/while-statements/tests.tcl:
+	Further tests of definite assignment in loops.
+
+2002-07-22  Eric Blake  <ebb9@email.byu.edu>
+
+	* tests/runtime/jls/blocks-and-statements/local-class-declarations/tests.tcl:
+	Add test of jikes bug 3119.
+	* tests/jls/classes/field-declarations/field-modifiers/tests.tcl:
+	* tests/jls/classes/field-declarations/field-modifiers/final-fields/tests.tcl:
+	* tests/jls/classes/field-declarations/field-modifiers/static-fields/tests.tcl:
+	* tests/jls/interfaces/field-constant-declarations/tests.tcl:
+	Add tests of field modifiers, as well as exposing a javac bug.
+	* tests/jls/definite-assignment/statements/do-statements/tests.tcl:
+	* tests/jls/definite-assignment/statements/for-statements/tests.tcl:
+	* tests/jls/definite-assignment/statements/labeled-statements/tests.tcl:
+	* tests/jls/definite-assignment/statements/switch-statements/tests.tcl:
+	* tests/jls/definite-assignment/statements/try-statements/tests.tcl:
+	* tests/jls/definite-assignment/statements/while-statements/tests.tcl:
+	Add tests of jikes bug 3117.
+
+2002-07-19  Eric Blake  <ebb9@email.byu.edu>
+
+	* tests/jls/blocks-and-statements/try-statement/tests.tcl:
+	* tests/jls/blocks-and-statements/unreachable-statements/tests.tcl:
+	Add more tests of a bug I just found in jikes, and fix typos.
+
+2002-07-19  Eric Blake  <ebb9@email.byu.edu>
+
+	* tests/jls/blocks-and-statements/try-statement/tests.tcl:
+	Add tests for jikes bug 613.
+	* tests/jls/classes/method-declarations/inheritance-overriding-and-hiding/tests.tcl:
+	* tests/jls/classes/method-declarations/inheritance-overriding-and-hiding/hiding/tests.tcl:
+	* tests/jls/classes/method-declarations/inheritance-overriding-and-hiding/inheriting-same-signature/tests.tcl:
+	* tests/jls/classes/method-declarations/inheritance-overriding-and-hiding/overriding/tests.tcl:
+	* tests/jls/classes/method-declarations/inheritance-overriding-and-hiding/requirements/tests.tcl:
+	* tests/jls/expressions/method-invocation-expressions/chosen-method-appropriate/tests.tcl:
+	* tests/runtime/jls/classes/method-declarations/inheritance-overriding-and-hiding/tests.tcl:
+	Change these tests again. Gilad Bracha corrected me: methods are
+	not inherited except from the direct superclass, but overriding
+	and hiding must take into account non-inherited methods.
+
+2002-07-19  Eric Blake  <ebb9@email.byu.edu>
+
+	* tests/jvms/class-file-format/attributes/deprecated-attribute/tests.tcl:
+	More deprecated tests.
+	* tests/runtime/jls/blocks-and-statements/switch-statement/tests.tcl:
+	Add test for jikes bug 3113.
+
+2002-07-18  Eric Blake  <ebb9@email.byu.edu>
+
+	* tests/jvms/class-file-format/attributes/deprecated-attribute/tests.tcl:
+	Add tests of @deprecated - jikes bug 519.
+
+2002-07-18  Eric Blake  <ebb9@email.byu.edu>
+
+	* tests/runtime/jls/classes/field-declarations/tests.tcl:
+	* tests/runtime/jls/classes/method-declarations/inheritance-overriding-and-hiding/tests.tcl:
+	* tests/jls/expressions/method-invocation-expressions/chosen-method-appropriate/tests.tcl:
+	* tests/jls/classes/method-declarations/inheritance-overriding-and-hiding/tests.tcl:
+	* tests/jls/classes/method-declarations/inheritance-overriding-and-hiding/overriding/tests.tcl:
+	* tests/jls/classes/method-declarations/inheritance-overriding-and-hiding/hiding/tests.tcl:
+	* tests/jls/classes/method-declarations/inheritance-overriding-and-hiding/inheriting-same-signature/tests.tcl:
+	More test cases of inheritance.
+
+2002-07-17  Eric Blake  <ebb9@email.byu.edu>
+
+	* tests/jls/classes/field-declarations/tests.tcl:
+	* tests/jls/classes/member-type-declarations/tests.tcl:
+	* tests/jls/classes/method-declarations/inheritance-overriding-and-hiding/tests.tcl:
+	* tests/jls/classes/method-declarations/inheritance-overriding-and-hiding/hiding/tests.tcl:
+	* tests/jls/classes/method-declarations/inheritance-overriding-and-hiding/inheriting-same-signature/tests.tcl:
+	* tests/jls/classes/method-declarations/inheritance-overriding-and-hiding/overriding/tests.tcl:
+	* tests/jls/classes/method-declarations/inheritance-overriding-and-hiding/requirements/tests.tcl:
+	* tests/runtime/jls/classes/field-declarations/tests.tcl:
+	Add lots of tests about inheritance, after discovering some bugs
+	in both jikes and javac, and in light of Sun bug 4493343.
+
+2002-07-17  Eric Blake  <ebb9@email.byu.edu>
+
+	* logging/javac.changes:
+	* logging/javac.log: Results of javac 1.4.1.
+	* logging/jikes.changes:
+	* logging/jikes.log: Results  of jikes 1.16.
+	* docs/tests.html: Rebuild, in preparation for tag.
+
+2002-07-17  Eric Blake  <ebb9@email.byu.edu>
+
+	* tests/runtime/jls/expressions/constant-expression/tests.tcl:
+	* tests/jls/names/meaning-of-a-name/expression-names/simple/tests.tcl:
+	Fix typos.
+	* tests/runtime/jls/expressions/method-invocation-expressions/chosen-method-appropriate/tests.tcl:
+	Tweak test, to catch problem in patch 329 shown by bug 246, as
+	well as bug 3098.
+
+2002-07-12  Eric Blake  <ebb9@email.byu.edu>
+
+	* tests/jls/names/meaning-of-a-name/expression-names/simple/tests.tcl:
+	* tests/jls/expressions/method-invocation-expressions/chosen-method-appropriate/tests.tcl:
+	More corner cases of jikes bug 3082.
+
+2002-07-12  Eric Blake  <ebb9@email.byu.edu>
+
+	* tests/runtime/jls/blocks-and-statements/do-statement/tests.tcl:
+	Add test of jikes bug 3085.
+
+2002-07-12  Eric Blake  <ebb9@email.byu.edu>
+
+	* tests/runtime/jls/blocks-and-statements/while-statement/tests.tcl:
+	Another manifestation of jikes bug 3077.
+	* tests/runtime/jls/expressions/method-invocation-expressions/chosen-method-appropriate/tests.tcl:
+	Further tests of jikes bug 169.
+	* tests/jls/expressions/field-access-expressions/accessing-superclass-members-using-super/tests.tcl:
+	* tests/jls/expressions/method-invocation-expressions/chosen-method-appropriate/tests.tcl:
+	* tests/jls/names/meaning-of-a-name/expression-names/simple/tests.tcl:
+	* tests/jls/expressions/field-access-expressions/using-a-primary/tests.tcl:
+	Add tests of jikes bug 3082.
+
+2002-07-11  Eric Blake  <ebb9@email.byu.edu>
+
+	* tests/runtime/jls/expressions/method-invocation-expressions/chosen-method-appropriate/tests.tcl:
+	Add tests for jikes bug 169.
+
+2002-07-11  Eric Blake  <ebb9@email.byu.edu>
+
+	* tests/runtime/jls/blocks-and-statements/try-statement/try-catch/tests.tcl:
+	Add test for jikes bug 3071.
+	* tests/runtime/jls/blocks-and-statements/if-statement/if-then-else-statement/tests.tcl:
+	Add test for jikes bug 3076.
+	* tests/jls/expressions/additive-operators/numeric-types/tests.tcl:
+	Add test for jikes bug 3078.
+	* tests/runtime/jls/blocks-and-statements/for-statement/tests.tcl:
+	Add test for jikes bug 3077.
+	
+2002-07-11  Eric Blake  <ebb9@email.byu.edu>
+
+	* tests/jvms/class-file-format/limitations/tests.tcl:
+	* tests/runtime/jvms/class-file-format/limitations/tests.tcl: Move
+	runtime test to proper location.
+
+2002-07-10  Eric Blake  <ebb9@email.byu.edu>
+
+	* tests/jls/definite-assignment/statements/local-class-declaration-statements/tests.tcl:
+	* tests/jls/blocks-and-statements/local-class-declarations/tests.tcl:
+	Add corner cases of local classes in switch statements.
+
+2002-07-10  Eric Blake  <ebb9@email.byu.edu>
+
+	* tests/jls/interfaces/interface-declarations/tests.tcl:
+	* tests/jls/classes/class-declaration/tests.tcl:
+	* tests/jls/blocks-and-statements/local-class-declarations/tests.tcl:
+	Add tests of local class name scopes - jikes bug 2695, as well as
+	rules for enclosing type name clashes.
+
+2002-07-10  Eric Blake  <ebb9@email.byu.edu>
+
+	* tests/jls/expressions/assignment-operators/compound-assignment-operators/tests.tcl:
+	Add tests of jikes bug 3066.
+
+2002-07-09  Eric Blake  <ebb9@email.byu.edu>
+
+	* tests/runtime/jls/blocks-and-statements/try-statement/try-catch-finally/tests.tcl:
+	Another manifestation of bug 3055.
+
+2002-07-09  Eric Blake  <ebb9@email.byu.edu>
+
+	* tests/runtime/jls/blocks-and-statements/try-statement/try-catch/tests.tcl:
+	Add test of jikes bug 3055.
+
+2002-07-09  Eric Blake  <ebb9@email.byu.edu>
+
+	* tests/jls/interfaces/interface-declarations/superinterfaces-and-subinterfaces/tests.tcl:
+	* tests/jls/classes/class-declaration/superclasses-and-subclasses/tests.tcl:
+	* tests/jls/classes/class-declaration/superinterfaces/tests.tcl:
+	Add more tests, for jikes bug 3054. Also fix some typos.
+	* tests/jls/classes/class-declaration/inner-classes-and-enclosing-instances/tests.tcl:
+	* tests/jls/classes/class-declaration/class-modifiers/abstract-classes/tests.tcl:
+	Fix test typos.	
+
+2002-07-09  Mo DeJong  <supermo@bayarea.net>
+
+	* tests/jls/classes/class-declaration/inner-classes-and-enclosing-instances/tests.tcl:
+	Add additional variations of the regression tickled by last checkin.
+
+2002-07-09  Mo DeJong  <supermo@bayarea.net>
+
+	* tests/jls/types-values-and-variables/variables/final-variables/tests.tcl:
+	Add additional test for access of a final parameter that demonstrates
+	a regressions in Jikes.
+
+2002-07-09  Eric Blake  <ebb9@email.byu.edu>
+
+	* jacks: Fix ulimit to allow core dumps.
+	* tests/jls/expressions/primary-expressions/class-literals/tests.tcl:
+	Add test for jikes bug 3053.
+
+2002-07-09  Mo DeJong  <supermo@bayarea.net>
+
+	* tests/jls/classes/field-declarations/field-modifiers/static-fields/tests.tcl:
+	Added tests for section 8.3.1.1, static field modifiers.
+	Test 8.3.1.1-other-2 checks for a regression introduced
+	while fixing jikes bug 2991.
+
+2002-07-08  Mo DeJong  <supermo@bayarea.net>
+
+	* jacks: Remove limit on core file size.
+	* jacks.tcl (_rm_generated_files, _exec_impl, _get_gdb_exe):
+	Check for a core file after running each test case. If one
+	exists, fire up gdb and save a backtrace in $test.stack.
+	Delete the core file after getting the backtrace.
+	* jikes_setup: Add GDB variable.
+
+2002-07-08  Mo DeJong  <supermo@bayarea.net>
+
+	* tests/jls/classes/class-declaration/superinterfaces/tests.tcl:
+	* tests/runtime/jls/binary-compatibility/form-of-binary/tests.tcl:
+	Fixup test names so that 'jacks docgen' works.
+
+2002-07-08  Eric Blake  <ebb9@email.byu.edu>
+
+	* tests/jls/expressions/constant-expression/tests.tcl:
+	Delete tests that were using string match on globbed files, as
+	jacks mailing list discussion points out they broken, and would be
+	more appropriate as binary compatibility tests.
+	* tests/jls/classes/field-declarations/initialization-of-fields/restrictions/tests.tcl:
+	* tests/jls/names/meaning-of-a-name/expression-names/qualified/tests.tcl:
+	Add tests for jikes bug 3044.
+
+2002-07-08  Eric Blake  <ebb9@email.byu.edu>
+
+	* tests/runtime/jls/blocks-and-statements/if-statement/if-then-statement/tests.tcl:
+	Reported by Greg Steuck, patch 317 tracks a testcase from jikes
+	bug 2985.
+
+2002-07-08  Eric Blake  <ebb9@email.byu.edu>
+
+	* tests/jls/packages/import-declarations/single-type-import-declaration/tests.tcl:
+	* tests/jls/packages/import-declarations/type-import-on-demand-declaration/tests.tcl:
+	* tests/jls/interfaces/interface-declarations/superinterfaces-and-subinterfaces/tests.tcl:
+	* tests/jls/classes/class-declaration/superclasses-and-subclasses/tests.tcl:
+	* tests/jls/classes/class-declaration/superinterfaces/tests.tcl:
+	Add more tests of importing and extending inaccessible types.
+
+2002-07-08  Chris Abbey  <jikes@cabbey.net>
+
+	* tests/runtime/jls/expressions/constant-expression/tests.tcl:
+	add missing runtime tag to 15.28-runtime-constant-5
+
+2002-07-01  Eric Blake  <ebb9@email.byu.edu>
+
+	* tests/jls/classes/constructor-declarations/constructor-body/explicit-constructor-invocations/tests.tcl:
+	Add tests of examples listed in 8.8.5.1.
+
+2002-06-28  Eric Blake  <ebb9@email.byu.edu>
+
+	* tests/jls/expressions/conditional-and-operator/tests.tcl:
+	* tests/jls/expressions/conditional-or-operator/tests.tcl:
+	Add tests of jikes bug 3011.
+
+2002-06-27  Eric Blake  <ebb9@email.byu.edu>
+
+	* tests/runtime/jls/expressions/constant-expression/tests.tcl:
+	Increase test case to detect jikes bug 3006.
+
+2002-06-27  Eric Blake  <ebb9@email.byu.edu>
+
+	* tests/jls/blocks-and-statements/synchronized-statement/tests.tcl:
+	Correct directory spelling.
+
+2002-06-27  Eric Blake  <ebb9@email.byu.edu>
+
+	* tests/jls/expressions/class-instance-creation/determining-the-class/tests.tcl:
+	Add tests of jikes bug 3001.
+	* tests/runtime/jls/blocks-and-statements/try-statement/try-catch/tests.tcl:
+	Add test of jikes bug 3003.
+	* tests/jls/expressions/primary-expressions/class-literals/tests.tcl:
+	Fix test typos.
+
+2002-06-26  Eric Blake  <ebb9@email.byu.edu>
+
+	* tests/jls/classes/field-declarations/initialization-of-fields/restrictions/tests.tcl:
+	Change some legal tests to illegal as required by a closer reading
+	of the JLS, as well as supported by javac 1.4.1 and jikes
+	behavior. Note that "int i = (i = 1) + i;" is legal if i is a
+	local variable, but illegal if it is a static or instance field.
+	* tests/runtime/jls/binary-compatibility/form-of-binary/tests.tcl:
+	Add runtime test of JLS clarification for 13.1.
+
+2002-06-26  Eric Blake  <ebb9@email.byu.edu>
+
+	* tests/jls/classes/field-declarations/initialization-of-fields/restrictions/tests.tcl:
+	Add tests of a bug I just uncovered in javac 1.4.1.
+
+2002-06-26  Eric Blake  <ebb9@email.byu.edu>
+
+	* tests/jls/definite-assignment/constructors-and-instance-initializers/tests.tcl:
+	Yet more tests of jikes bug 2999.
+
+2002-06-26  Eric Blake  <ebb9@email.byu.edu>
+
+	* tests/jls/definite-assignment/constructors-and-instance-initializers/tests.tcl:
+	Add test of jikes bug 2999.
+	* tests/jls/binary-compatibility/form-of-binary/tests.tcl:
+	Add test of jikes bug 2995.
+	* tests/jvms/class-file-format/limitations/tests.tcl: Another test
+	- jikes is passing tests 4 and 6, but outputting bad bytecode.
+
+2002-06-24  Eric Blake  <ebb9@email.byu.edu>
+
+	* tests/jls/expressions/primary-expressions/class-literals/tests.tcl:
+	Add test of jikes bug 2924.
+
+2002-06-24  Eric Blake  <ebb9@email.byu.edu>
+
+	* tests/runtime/jls/execution/initialization-of-classes-and-interfaces/when-initialization-occurs/tests.tcl:
+	Add tests of new constant rules - jikes bug 2991.
+
+2002-06-21  Eric Blake  <ebb9@email.byu.edu>
+
+	* tests/runtime/jls/definite-assignment/anonymous-classes/tests.tcl:
+	More heinous tests of local variable shadowing - jikes bug 2986.
+
+2002-06-20  Eric Blake  <ebb9@email.byu.edu>
+
+	* tests/runtime/jls/blocks-and-statements/if-statement/if-then-statement/tests.tcl:
+	* tests/runtime/jls/definite-assignment/anonymous-classes/tests.tcl:
+	Add tests for jikes bugs 2982, 2986.
+
+2002-06-18  Eric Blake  <ebb9@email.byu.edu>
+
+	* tests/runtime/jls/blocks-and-statements/switch-statement/tests.tcl:
+	Expose bug I just discovered in javac.
+
+2002-06-18  Martin Lackner  <lackner@dms.at>
+	    Eric Blake  <ebb9@email.byu.edu>
+
+	* tests/runtime/jls/lexical-structure/literals/string-literals/tests.tcl:
+	Move test 3.10.5-runtime-2 over to JVM limits.
+	* tests/jvms/class-file-format/limitations/tests.tcl: Upgrade the
+	JVM limits tests; add a {jvm} constraint since some of these are
+	very time-consuming and/or system out-of-memory killers.
+	* javac_setup:
+	* jikes_setup:
+	* kaffe_setup:
+	* gcj_setup: Update to use jvm constraint.
+
+2002-06-18  Christopher Abbey  <jacks@www-124.ibm.com>
+
+	* tests/jls/expressions/multiplicative-operators/remainder-operator/tests.tcl:
+	* tests/jls/expressions/multiplicative-operators/division-operator/tests.tcl:
+	Update division by constant 0 to be legal - patch 276.
+
+2002-06-18  Eric Blake  <ebb9@email.byu.edu>
+
+	Patch 275.
+	* tests/runtime/jls/lexical-structure/literals/character-literals/tests.tcl:
+	* tests/jls/expressions/additive-operators/string-concatenation-operator/tests.tcl:
+	Test jikes bug 2919.
+	* tests/jls/expressions/class-instance-creation/determining-enclosing-instances/tests.tcl:
+	* tests/jls/names/access-control/details-on-protected-access/protected-constructor/tests.tcl:
+	Test jikes bug 2920.
+
+2002-06-18  Martin Lackner  <lackner@dms.at>
+
+	* tests/jls/conversions-and-promotions/assignment-conversion/tests.tcl:
+	Two new tests of array conversions.
+
+2002-06-18  Eric Blake  <ebb9@email.byu.edu>
+
+	* tests/jls/classes/constructor-declarations/constructor-body/explicit-constructor-invocations/tests.tcl:
+	Fix 8.8.5.1-qualified-15 to be correct, as well as add 2 new tests.
+
+2002-05-22  Eric Blake  <ebb9@email.byu.edu>
+
+	* tests/runtime/jls/expressions/constant-expression/tests.tcl:
+	* tests/jls/expressions/multiplicative-operators/division-operator/tests.tcl:
+	* tests/jls/expressions/multiplicative-operators/remainder-operator/tests.tcl:
+	* tests/jls/expressions/constant-expression/tests.tcl: Update
+	tests of division by 0 to reflect rules in JLS2 clarifications.
+	Also, move tests of constant inlining over to
+	binary-compatibility, where they belong.
+
+2002-05-22  Eric Blake  <ebb9@email.byu.edu>
+
+	* tests/jls/interfaces/interface-members/tests.tcl: Repair tests
+	now that jikes bug 2878 has been patched.
+	* tests/jikes/tests.tcl: Remove test jikes-2, as it is no longer
+	valid.
+	* tests/jls/classes/constructor-declarations/constructor-body/explicit-constructor-invocations/tests.tcl:
+	* tests/jls/expressions/postfix-expressions/postfix-decrement-operator/tests.tcl:
+	Fix typos.
+
+2002-05-21  Eric Blake  <ebb9@email.byu.edu>
+
+	* tests/jls/lexical-structure/comments/tests.tcl: Update test
+	according to the (lame) verdict from Sun; see jikes bug 2879.
+	* tests/jls/interfaces/interface-members/tests.tcl: Update tests
+	according to the verdict from Sun; see jikes bug 2878.
+	* tests/runtime/jls/blocks-and-statements/local-class-declarations/tests.tcl:
+	Add a test for jikes bug 2885.
+
+2002-05-17  Eric Blake  <ebb9@email.byu.edu>
+
+	* logging/cvs_changes.tcl: Fix format problem in previous commit.
+	* logging/jikes.changes: Update as of jikes 1.15.
+	* logging/jikes.log: Update as of jikes 1.15.
+	* logging/javac.changes: Update as of javac 1.4, with asserts.
+	* logging/javac.log: Update as of javac 1.4, with asserts.
+	* docs/tests.html: Regenerate.
+	* tests/jls/expressions/primary-expressions/parenthesized-expressions/tests.tcl:
+	Fix duplicate test name.
+
+2002-05-16  Eric Blake  <ebb9@email.byu.edu>
+
+	* tests/jls/expressions/primary-expressions/parenthesized-expressions/tests.tcl:
+	Add new tests regarding the use of parenthesis.
+	* tests/jls/expressions/assignment-operators/compound-assignment-operators/tests.tcl:
+	* tests/jls/expressions/postfix-expressions/postfix-decrement-operator/tests.tcl:
+	* tests/jls/expressions/postfix-expressions/postfix-increment-operator/tests.tcl:
+	* tests/jls/expressions/unary-operators/prefix-decrement-operator/tests.tcl:
+	* tests/jls/expressions/unary-operators/prefix-increment-operator/tests.tcl:
+	Update various tests to allow parenthesized variables, in line
+	with the second version JLS.
+
+2002-05-16  Eric Blake  <ebb9@email.byu.edu>
+
+	* logging/cvs_changes.tcl (get_results_from_diff): Account for new
+	date format in updated version of diff.
+
+2002-05-16  Mo DeJong  <supermo@bayarea.net>
+
+	* tests/jls/expressions/conditional-operator/tests.tcl:
+	Check for Jikes regression optimizing conditional expressions.
+
+2002-05-15  Eric Blake  <ebb9@email.byu.edu>
+
+	* tests/jls/expressions/constant-expression/tests.tcl: Add tests.
+	* tests/jls/expressions/additive-operators/numeric-types/tests.tcl:
+	Fix typo.
+
+2002-05-15  Eric Blake  <ebb9@email.byu.edu>
+
+	* tests/jls/classes/constructor-declarations/default-constructor/tests.tcl:
+	* tests/runtime/jls/expressions/class-instance-creation/run-time-evaluation/tests.tcl:
+	* tests/runtime/jls/classes/constructor-declarations/constructor-access/tests.tcl:
+	Add more tests.
+
+2002-05-14  Mo DeJong  <supermo@bayarea.net>
+
+	* tests/jvms/class-file-format/limitations/tests.tcl:
+	Add jvms section 4.10 tests for things like the maximum
+	number of methods in a class.
+
+2002-05-13  Mo DeJong  <supermo@bayarea.net>
+
+	* tests/jls/names/access-control/determining-accessibility/tests.tcl:
+	Add 6.6.1 access checks for fields of a class. These tests expose a
+	regression in Jikes WRT fields of classes loaded from the CLASSPATH.
+
+2002-05-13  Mo DeJong  <supermo@bayarea.net>
+
+	* tests/runtime/jls/classes/constructor-declarations/constructor-body/tests.tcl:
+	* tests/runtime/jls/classes/constructor-declarations/constructor-modifiers/tests.tcl:
+	Add runtime tests for sections 8.8.3 and 8.8.5. These tests expose a verifier
+	error in Jikes.
+
+2002-03-10  Eric Blake  <ebb9@email.byu.edu>
+
+	* tests/jls/lexical-structure/literals/floating-point-literals/tests.tcl:
+	Add floating-point literal test for gcj PR 5902.
+
+2002-02-25  Eric Blake  <ebb9@email.byu.edu>
+
+	* tests/jls/packages/top-level-type-declarations/tests.tcl:
+	* tests/jls/expressions/method-invocation-expressions/determine-method-signature/choose-most-specific/tests.tcl:
+	Fix typos.
+
+2002-02-05  Martin Lackner  <lackner@dms.at>
+
+	* tests/jls/classes/class-declaration/superinterfaces/tests.tcl:
+	Fix test typo.
+
+2002-02-04  Eric Blake  <ebb9@email.byu.edu>
+
+	* tests/jls/expressions/additive-operators/string-concatenation-operator/tests.tcl:
+	Tickle jikes bug 2625.
+
+2002-02-04  Jason Baker  <jbaker@cs.utah.edu>
+
+	* tests/jls/blocks-and-statements/break-statement/tests.tcl:
+	* tests/jls/blocks-and-statements/continue-statement/tests.tcl:
+	Converted i++ to ++i to aid the mayac compiler.
+	* tests/jls/blocks-and-statements/unreachable-statements/tests.tcl:
+	Add test of update statements in for blocks; this test is not
+	specified very well in the JLS.
+
+2002-02-04  Eric Blake  <ebb9@email.byu.edu>
+
+	* tests/jls/names/meaning-of-a-name/type-names/qualified/tests.tcl:
+	Resolve deprecation warning.
+	* tests/jls/expressions/additive-operators/string-concatenation-operator/tests.tcl:
+	Add further string concatenation tests.
+	* tests/jls/classes/constructor-declarations/constructor-body/explicit-constructor-invocations/tests.tcl:
+	Add additional tests, including ones which expose bugs in both
+	javac and jikes.
+	* tests/runtime/jls/classes/class-declaration/inner-classes-and-enclosing-instances/tests.tcl:
+	* tests/jls/names/names-and-identifiers/tests.tcl: New tests.
+
+2002-02-04  Jason Baker  <jbaker@cs.utah.edu>
+
+	* tests/runtime/jls/lexical-structure/literals/string-literals/tests.tcl:
+	Fix test typo.
+
+2002-01-31  Eric Blake  <ebb9@email.byu.edu>
+
+	* tests/runtime/jls/blocks-and-statements/break-statement/tests.tcl:
+	Add test to tickle jikes bug 2538.
+
 2001-12-23  Mo DeJong  <supermo@bayarea.net>
 
 	* tests/jls/expressions/additive-operators/string-concatenation-operator/tests.tcl:

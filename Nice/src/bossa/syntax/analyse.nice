@@ -260,7 +260,7 @@ markAsCallFirstArg(e@IdentExp)
 
 analyse(e@CallExp, info)
 {
-  Arguments args = notNull(e.arguments);
+  Arguments args = e.arguments;
 
   if (e.infix)
     markAsCallFirstArg(notNull(args.getExp(0)));
@@ -428,7 +428,7 @@ analyse(e@NewArrayExp, info)
 
 analyse(e@NewExp, info)
 {
-  notNull(e.arguments).analyse(info);
+  e.arguments.analyse(info);
   e.resolve(info.typeMap);
   return e;
 }

@@ -98,7 +98,7 @@ void typecheckArgs(Arguments args)
 typecheck(e@CallExp)
 {
   typecheck(e.function);
-  notNull(e.arguments).typecheckArgs();
+  e.arguments.typecheckArgs();
 
   // forces computation of the type if not done.
   mlsub.typing.Polytype t = e.getType();
@@ -342,7 +342,7 @@ typecheck(e@NewArrayExp)
 
 typecheck(e@NewExp)
 {
-  notNull(e.arguments).typecheckArgs();
+  e.arguments.typecheckArgs();
   // force computation of type
   e.getType();
 }

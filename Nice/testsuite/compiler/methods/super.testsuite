@@ -217,7 +217,7 @@ abstract class A<T> extends AbstractSet<T> { T x; }
 add(a@A, b) = false;
 add(a@A, b@B) = super;
 
-/// PASS bug
+/// PASS
   new Bar().isEmpty();
   /// Toplevel
 class Bar<T> extends AbstractList<T>

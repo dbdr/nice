@@ -8,6 +8,10 @@ void syntaxTest()
   while(false)
     ;
 
+  // For with empty body
+  for (;;)
+    ;
+
   // If with empty body
   if (true)
     ;
@@ -16,3 +20,9 @@ void syntaxTest()
   if ([] == null)
     throw new Error();
 }
+
+// check that classes in current package have higher priority for lookup
+
+// hide java.lang.Character
+class Character { int dummy; }
+int get(Character other) = other.dummy;

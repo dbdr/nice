@@ -36,6 +36,7 @@ find_home()
 
 java=${JAVA-java}
 scriptName="$0"
+progname=`basename $scriptName`
 experimental=false
 
 while true; do 
@@ -68,14 +69,21 @@ fi
 
 export CLASSPATH
 
-system_args="--runtime=${NICEC_JAR}"
+case $progname in
+    nicedoc)	class=nice.tools.doc.fun              ;;
+    niceunit)	class=nice.tools.unit.console.fun     ;;
+    nicec)	class=nice.tools.compiler.console.fun
 
-gcj="`which gcj 2>/dev/null`"
-# Check the string found is really a file
-# This is a work-around for a bug in OS X: 
-#   which gcj returns 0 (success) and prints "no gcj in $PATH"
-if [ -f "$gcj" ]; then
-    system_args="${system_args} --native-compiler=${gcj}"
-fi
+	system_args="--runtime=${NICEC_JAR}"
 
-exec ${java} nice.tools.compiler.console.fun ${system_args} "$@"
+	gcj="`which gcj 2>/dev/null`"
+        # Check the string found is really a file
+        # This is a work-around for a bug in OS X: 
+        #   `which gcj` returns 0 (success) and prints "no gcj in $PATH"
+	if [ -f "$gcj" ]; then
+	    system_args="${system_args} --native-compiler=${gcj}"
+	fi
+
+esac
+
+exec ${java} $class ${system_args} "$@"

@@ -10,4 +10,5 @@ void testExtensions() {
 
 void main(String[] args)
 {
+  jMethod(new SubJ(), new regtest.java.J.Other());
 }

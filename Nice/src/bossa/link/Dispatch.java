@@ -180,7 +180,7 @@ public final class Dispatch
         }
 	else if (hasValues && 
 	      testValues(method, tags, values, isValue, sortedAlternatives) )
-	  if (++nb_errors > 3)
+	  if (++nb_errors > 0)
 	    break;
 
       }

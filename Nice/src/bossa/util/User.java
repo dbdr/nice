@@ -54,18 +54,14 @@ public final class User
 
   public static void error(Located responsible, String message)
   {
-    Location loc = responsible == null ? null : responsible.location();
-    if (loc == null || loc.toString().length() == 0)
-      error(message);
-    else
-      error(loc + ":\n" + message);
+    if (responsible == null)
+      throw new UserError(message);
+    else 
+      throw new UserError(responsible, message);
   }
 
   public static void error(String message)
   {
-    if(Debug.alwaysDumpStack)
-      Internal.printStackTrace();
-    
     throw new UserError(message);
   }
 

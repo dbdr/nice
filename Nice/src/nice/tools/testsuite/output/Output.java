@@ -7,7 +7,7 @@ import java.util.*;
 import nice.tools.testsuite.*;
 
 /**
- * Appender Interface.
+ * The output Interface.
  * 
  * @author	Alex Greif <a href="mailto:alex.greif@web.de">alex.greif@web.de</a>
  * @version	$Id$

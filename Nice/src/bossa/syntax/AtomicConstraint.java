@@ -16,7 +16,7 @@ import bossa.util.*;
 import java.util.*;
 
 /**
-   A constraint atom. See childs
+   An abstract constraint atom. See children.
    
    @see Constraint
 

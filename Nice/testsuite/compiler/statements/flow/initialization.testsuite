@@ -4,3 +4,7 @@
     i = 1;
   } while (false);
   int j = i;
+
+/// FAIL
+  ()->void f;
+  /* ///FAIL HERE */f();

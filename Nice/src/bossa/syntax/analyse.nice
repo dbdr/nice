@@ -445,6 +445,14 @@ Expression analyseIdent(IdentExp e, Info info, boolean assigned)
         {
 	  if (e.alwaysOverloadedSymbol)
             {
+	      if (sym instanceof MonoSymbol)
+		{
+		  sym.used = true;
+
+		  if (sym instanceof Block.LocalVariable.Symbol)
+		    checkInitialized(sym, info, e.location());
+                }
+
 	      return new OverloadedSymbolExp(sym, e.ident);
             }
 	  else

@@ -23,7 +23,7 @@ JAVACC= CLASSPATH="${TOP}/external/JavaCC.zip:${CLASSPATH}" ${java} COM.sun.labs
 JAVADOC=javadoc
 
 NICEC_ARGS= --exclude-runtime 
-NICEC=CLASSPATH="${TOP}/classes" JAVA="${java}" nicec ${NICEC_ARGS} -d "${TOP}/classes.old" --sourcepath="${TOP}/stdlib.old:${TOP}/stdlib:${TOP}/src.old:${TOP}/src" --classpath="${TOP}/classes"
+NICEC=CLASSPATH="${TOP}/classes" JAVA="${java}" ./bin/nicec.bootstrap ${NICEC_ARGS} -d "${TOP}/classes.old" --sourcepath="${TOP}/stdlib.old:${TOP}/stdlib:${TOP}/src.old:${TOP}/src" --classpath="${TOP}/classes"
 NICEC1=JAVA="${java}" ${TOP}/bin/nicec ${NICEC_ARGS} -d "${TOP}/classes" --sourcepath="${TOP}/stdlib:${TOP}/src" 
 
 

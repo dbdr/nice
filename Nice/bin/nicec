@@ -75,24 +75,26 @@ while true; do
   shift
   done
 
-find_home "$scriptName"
-NICEC=${APPHOME}/share/java/nice.jar
+if [ -z "$NICEC_JAR" ]; then
+  find_home "$scriptName"
+  NICEC_JAR=${APPHOME}/share/java/nice.jar
+fi
 
 case $progname in
   nicec) 
     # Having a trailing ":" at the end of CLASSPATH seems to act as ":." on some platforms.
     # We don't want that by default (if CLASSPATH is empty).
     if [ -z "${CLASSPATH}" ]; then
-	CLASSPATH=${NICEC}
+	CLASSPATH=${NICEC_JAR}
     else
-	CLASSPATH=${NICEC}:${CLASSPATH}
+	CLASSPATH=${NICEC_JAR}:${CLASSPATH}
     fi
     if [ $experimental = true ]; then
 	CLASSPATH=${APPHOME}/classes:${APPHOME}/classes.old:${CLASSPATH}
     fi
     export CLASSPATH
 
-    system_args="--runtime=${NICEC}"
+    system_args="--runtime=${NICEC_JAR}"
 
     gcj="`which gcj 2>/dev/null`"
     # Check the string found is really a file

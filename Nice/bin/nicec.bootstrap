@@ -1,0 +1,23 @@
+#! /bin/sh
+
+### Wrapper for nicec that uses an existing nice.jar for bootstrapping
+
+NICEC_JAR="external/nice-bootstrap.jar"
+
+if [ -r "${NICEC_JAR}" ]; then
+
+  export NICEC_JAR
+  echo $NICEC_JAR
+
+  ./bin/nicec "$@"
+
+elif NICEC="`which nicec`"; then
+
+  ${NICEC} "$@"
+
+else
+
+    echo "An installed version of Nice is needed for bootstrapping."
+    exit 1
+
+fi

@@ -173,6 +173,11 @@ bootstrap: parser
 		src/mlsub/typing/lowlevel/*.java src/bossa/syntax/dispatch.java
 	$(JAVAC_GENERIC) -d classes-inline stdlib/nice/lang/inline/*.java
 	cp -a classes-inline/* classes
+#	We put code used by inline methods inside classes-inline so that it is
+#	used when running the inline methods, not the versions in the running
+#	compiler, which might be outdated.
+	mkdir -p classes-inline/nice/tools/code
+	cp classes/nice/tools/code/*.class classes-inline/nice/tools/code
 	${NICEC} -R bossa.modules
 	${NICEC} -r nice.tools.ast
 	cd src/bossa/syntax && \

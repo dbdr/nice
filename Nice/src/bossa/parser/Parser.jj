@@ -170,7 +170,6 @@ TOKEN: /* Keywords */
 | < DO:		"do"		>
 | < TRUE:       "true"       	>
 | < FALSE:      "false"      	>
-| < FUN:        "fun"        	> /* Nice specific */
 | < ALIKE:      "alike"      	> /* Nice specific */
 //| < THIS:       "this"       	>
 | < SUPER:      "super"         >
@@ -399,7 +398,6 @@ Token doted_string_component():
 {
   ( t = <IDENT> 
   | t = "Any"
-  | t = "fun"
   | t = "alike"
   | t = "var"
   | t = "inline" 

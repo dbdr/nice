@@ -97,49 +97,15 @@ Pattern createPattern(mlsub.typing.TypeConstructor tc)
 
 public class VariablePattern extends Pattern
 {
-  matches(tag) = true;
-
-  matchesValue(ConstantExp val) = true;
-
-  toString() = (name != null) ? notNull(name).toString() : "_";
-
-  bytecodeRepresentation() = "@_";
-
-  matchTest(parameter, dispatchMade) = notNull(gnu.expr.QuoteExp.trueExp);
-
   atAny() = true;
 }
 
 public class NullPattern extends Pattern
 {
-  matches(tag) = tag == PrimitiveType.nullTC;
-
-  matchesValue(ConstantExp val) = false;
-
-  toString() = "null";
-
-  bytecodeRepresentation() = "@NULL";
-
-  matchTest(parameter, dispatchMade) = nice.tools.code.Gen.isNullExp(parameter);
-
   atNull() = true;
 }
 
-public class NotNullPattern extends Pattern
-{
-  matches(tag) = tag != PrimitiveType.nullTC;
-
-  matchesValue(ConstantExp val) = false;
-
-  toString() = "!null";
-
-  bytecodeRepresentation() = "@NONNULL";
-
-  matchTest(parameter, dispatchMade)
-  {
-    return nice.tools.code.Gen.boolNotExp(nice.tools.code.Gen.isNullExp(parameter));
-  }
-}
+public class NotNullPattern extends Pattern {}
 
 public class TypePattern extends Pattern
 {
@@ -161,65 +127,12 @@ public class TypePattern extends Pattern
     return this;
   }
 
-  matches(tag)
-  {
-    if (tag == null)
-      return false;
-
-    if (exactlyAt)
-      return mlsub.typing.Typing.testRigidLeq(tag, tc) && mlsub.typing.Typing.testRigidLeq(tc, tag);
-
-    return mlsub.typing.Typing.testRigidLeq(tag, tc);
-  }
-
-   matchesValue(ConstantExp val) = false;
-
-  toString()
-  {
-    StringBuffer res = new StringBuffer();
-    res.append(exactlyAt ? "#" : (name != null ? "" : "@"));
-    
-    if (typeConstructor != null)
-      res.append(typeConstructor);
-    else if (tc != null)
-      res.append(tc);
-
-    if (name != null)
-      res.append(" " + name);
-    
-    return res.toString();
-  }
-
-  bytecodeRepresentation()
-  {
-   return (exactlyAt ? "#" : "@") + notNull(tc).toString().replace('$','.');
-  }
-
-  matchTest(parameter, dispatchMade)
-  {
-    if (dispatchMade && ! exactlyAt)
-      return notNull(gnu.expr.QuoteExp.trueExp); 
-
-    let ct = nice.tools.code.Types.javaType(tc);
-
-    if (exactlyAt)
-      return nice.tools.code.Gen.isOfClass(parameter, ct);
-      
-    return nice.tools.code.Gen.instanceOfExp(parameter, ct);
-  }
-
   exactlyAtType() = exactlyAt;
 }
 
 public abstract class ValuePattern extends Pattern
 {
   final ConstantExp atValue;
-
-  matches(tag) = false;
-
-  matchesValue(ConstantExp val) = atValue.equals(val);
-
-  toString() = atValue.toString();
 
   addValues(values)
   {
@@ -237,40 +150,16 @@ public class BoolPattern extends ValuePattern
     values.add(ConstantExp.makeBoolean(false, this.location));
   }
 
-  matches(tag) = tag == PrimitiveType.boolTC;
-
-  bytecodeRepresentation() = atValue.isTrue() ? "@true" : "@false";
-
-  matchTest(parameter, dispatchMade)
-  {
-    if (atValue.isFalse())
-      return nice.tools.code.Gen.boolNotExp(parameter);
-
-    return cast(parameter);
-  }
-
   atTypeMatchingValue() = true;
 }
 
 public class StringPattern extends ValuePattern
 {
   override StringConstantExp atValue;
-
-  bytecodeRepresentation() {
-    return "@\"" + atValue.escapedValue + "\"";
-  }
-
-  matchTest(parameter, dispatchMade)
-  {
-    let String val = cast(atValue.value);
-    return nice.tools.code.Gen.stringEquals(val, parameter);
-  }
 }
 
 public class CharPattern extends ValuePattern
 {
-  bytecodeRepresentation() = "@\'" + atValue.value + "\'";
-
   setDomainTC(domaintc)
   {
     if (domaintc != null)
@@ -279,20 +168,10 @@ public class CharPattern extends ValuePattern
     
     User.error(this.location, "Character value patterns are not allowed for methods where the declared parameter isn't a primitive type.");
   }
-
-  matchTest(parameter, dispatchMade)
-  {
-    return nice.tools.code.Gen.integerComparison("Eq", parameter, atValue.longValue());
-  }
 }
 
 public class IntPattern extends ValuePattern
 {
-  matchesValue(ConstantExp val)
-  {
-   return (val.value instanceof Number) && atValue.longValue() == val.longValue();
-  }
- 
   setDomainTC(domaintc)
   {
     if (domaintc != null)
@@ -309,16 +188,7 @@ public class IntPattern extends ValuePattern
           }
       }
     User.error(this.location, "Integer value patterns are not allowed for methods where the declared parameter isn't a primitive type.");
-
   }
-
-  bytecodeRepresentation() = "@" + (atValue.longValue() >= 0 ? "+" : "") + atValue;
-
-  matchTest(parameter, dispatchMade)
-  {
-    return nice.tools.code.Gen.integerComparison("Eq", parameter, atValue.longValue());
-  }
-
 }
 
 enum CompareKind(String prefix, String abbrev) 
@@ -334,22 +204,6 @@ public class IntComparePattern extends IntPattern
 {
   CompareKind kind;
   ?LocatedString refName;
-  
-  matches(tag) = tag != null && mlsub.typing.Typing.testRigidLeq(tag, PrimitiveType.longTC);
-
-  matchesValue(ConstantExp val)
-  {
-    return val.value instanceof Number && matches(kind, val.longValue(), atValue.longValue());
-  }
-
-  toString() = (name!=null? notNull(name).toString() : "") + kind.prefix + atValue;
-
-  bytecodeRepresentation() = "@" + kind.prefix + atValue;
-
-  matchTest(parameter, dispatchMade)
-  {
-    return nice.tools.code.Gen.integerComparison(kind.abbrev, parameter, atValue.longValue());
-  }
   
   addValues(values)
   {
@@ -375,26 +229,15 @@ public class IntComparePattern extends IntPattern
   boolean atLess() = (kind == CK_LT || kind == CK_LE);
 
   atTypeMatchingValue() = true;
-
 }
 
 public class ReferencePattern extends ValuePattern
 {
- 
-  bytecodeRepresentation() = "@=" + name;
-
-  matchTest(parameter, dispatchMade)
-  {
-    return nice.tools.code.Gen.referenceEqualsExp(atValue.compile(), parameter);
-  }
-
   getName() = cast(null);
 }
 
 public class EnumPattern extends ReferencePattern
 {
-  matches(tag) = (tag != null) && mlsub.typing.Typing.testRigidLeq(tag, tc);
-
   addValues(values)
   {
     let EnumDefinition.EnumSymbol esym = cast(atValue.value);
@@ -404,6 +247,38 @@ public class EnumPattern extends ReferencePattern
   }
 
   atTypeMatchingValue() = true;
+}
+
+matches(VariablePattern p, tag) = true;
+matches(NullPattern p, tag) = tag == PrimitiveType.nullTC;
+matches(NotNullPattern p, tag) = tag != PrimitiveType.nullTC;
+matches(TypePattern p, tag)
+{
+  if (tag == null)
+    return false;
+
+  if (p.exactlyAt)
+    return mlsub.typing.Typing.testRigidLeq(tag, p.tc) && mlsub.typing.Typing.testRigidLeq(p.tc, tag);
+
+  return mlsub.typing.Typing.testRigidLeq(tag, p.tc);
+}
+matches(ValuePattern p, tag) = false;
+matches(BoolPattern p, tag) = tag == PrimitiveType.boolTC;
+matches(IntComparePattern p, tag) = tag != null && mlsub.typing.Typing.testRigidLeq(tag, PrimitiveType.longTC);
+matches(EnumPattern p, tag) = (tag != null) && mlsub.typing.Typing.testRigidLeq(tag, p.tc);
+
+matchesValue(VariablePattern p, ConstantExp val) = true;
+matchesValue(NullPattern p, ConstantExp val) = false;
+matchesValue(NotNullPattern p, ConstantExp val) = false;
+matchesValue(TypePattern p, ConstantExp val) = false;
+matchesValue(ValuePattern p, ConstantExp val) = p.atValue.equals(val);
+matchesValue(IntPattern p, ConstantExp val)
+{
+  return (val.value instanceof Number) && p.atValue.longValue() == val.longValue();
+}
+matchesValue(IntComparePattern p, ConstantExp val)
+{
+  return val.value instanceof Number && matches(p.kind, val.longValue(), p.atValue.longValue());
 }
 
 /**
@@ -516,6 +391,74 @@ disjoint(Pattern this, Pattern that)
   return false;
 }
 
+matchTest(VariablePattern p, parameter, dispatchMade) = gnu.expr.QuoteExp.trueExp;
+matchTest(NullPattern p, parameter, dispatchMade) = nice.tools.code.Gen.isNullExp(parameter);
+matchTest(NotNullPattern p, parameter, dispatchMade)
+{
+  return nice.tools.code.Gen.boolNotExp(nice.tools.code.Gen.isNullExp(parameter));
+}
+matchTest(TypePattern p, parameter, dispatchMade)
+{
+  if (dispatchMade && ! p.exactlyAt)
+    return gnu.expr.QuoteExp.trueExp; 
+
+  let ct = nice.tools.code.Types.javaType(p.tc);
+
+  if (p.exactlyAt)
+    return nice.tools.code.Gen.isOfClass(parameter, ct);
+    
+  return nice.tools.code.Gen.instanceOfExp(parameter, ct);
+}
+matchTest(BoolPattern p, parameter, dispatchMade)
+{
+  if (p.atValue.isFalse())
+    return nice.tools.code.Gen.boolNotExp(parameter);
+
+  return cast(parameter);
+}
+matchTest(StringPattern p, parameter, dispatchMade)
+{
+  let String val = cast(p.atValue.value);
+  return nice.tools.code.Gen.stringEquals(val, parameter);
+}
+matchTest(CharPattern p, parameter, dispatchMade)
+{
+  return nice.tools.code.Gen.integerComparison("Eq", parameter, p.atValue.longValue());
+}
+matchTest(IntPattern p, parameter, dispatchMade)
+{
+  return nice.tools.code.Gen.integerComparison("Eq", parameter, p.atValue.longValue());
+}
+matchTest(IntComparePattern p, parameter, dispatchMade)
+{
+  return nice.tools.code.Gen.integerComparison(p.kind.abbrev, parameter, p.atValue.longValue());
+}
+matchTest(ReferencePattern p, parameter, dispatchMade)
+{
+  return nice.tools.code.Gen.referenceEqualsExp(p.atValue.compile(), parameter);
+}
+
+toString(VariablePattern p) = (p.name != null) ? notNull(p.name).toString() : "_";
+toString(NullPattern p) = "null";
+toString(NotNullPattern p) = "!null";
+toString(TypePattern p)
+{
+  let res = new StringBuffer();
+  res.append(p.exactlyAt ? "#" : (p.name != null ? "" : "@"));
+  
+  if (p.typeConstructor != null)
+    res.append(p.typeConstructor);
+  else if (p.tc != null)
+    res.append(p.tc);
+
+  if (p.name != null)
+    res.append(" " +p.name);
+  
+  return res.toString();
+}
+toString(ValuePattern p) = p.atValue.toString();
+toString(IntComparePattern p) = (p.name!=null? notNull(p.name).toString() : "") + p.kind.prefix + p.atValue;
+
 
 private ?VarSymbol findRefSymbol(LocatedString refName)
 {
@@ -596,71 +539,86 @@ resolveGlobalConstants(VariablePattern pattern)
   return pattern;
 }
 
+bytecodeRepresentation(VariablePattern p) = "@_";
+bytecodeRepresentation(NullPattern p) = "@NULL";
+bytecodeRepresentation(NotNullPattern p) = "@NONNULL";
+bytecodeRepresentation(TypePattern p)
+{
+ return (p.exactlyAt ? "#" : "@") + notNull(p.tc).toString().replace('$','.');
+}
+bytecodeRepresentation(BoolPattern p) = p.atValue.isTrue() ? "@true" : "@false";
+bytecodeRepresentation(StringPattern p) = "@\"" + p.atValue.escapedValue + "\"";
+bytecodeRepresentation(CharPattern p) = "@\'" + p.atValue.value + "\'";
+bytecodeRepresentation(IntPattern p) = "@" + (p.atValue.longValue() >= 0 ? "+" : "") + p.atValue;
+bytecodeRepresentation(IntComparePattern p) = "@" + p.kind.prefix + p.atValue;
+bytecodeRepresentation(ReferencePattern p) = "@=" + p.name;
+
 public ?Pattern readPattern(String rep, int[]/*ref*/ pos)
 {
-  if (pos[0] >= rep.length())
+  int cpos = pos[0];
+
+  if (cpos >= rep.length())
     return null;
 
-  if (rep.charAt(pos[0]) != '@' && rep.charAt(pos[0]) != '#')
-    Internal.error("Invalid pattern representation at character " + pos[0] +  ": " + rep);
+  if (rep[cpos] != '@' && rep[cpos] != '#')
+    Internal.error("Invalid pattern representation at character " + cpos +  ": " + rep);
 
-  boolean exact = rep.charAt(pos[0]) == '#';
+  boolean exact = rep[cpos] == '#';
 
-  int start = pos[0]+1;
-  pos[0] += 1;
+  int start = ++cpos;
   int len = rep.length();
 
-  if (rep.charAt(pos[0]) == '\'')
+  if (rep[cpos] == '\'')
     { //char literal patterns are 3 chars
-      pos[0] += 3;
+      cpos += 3;
     }
-  else if (rep.charAt(pos[0]) == '\"')
+  else if (rep[cpos] == '\"')
     { //we need to skip possible '@' or '#' content of the string literal
-      pos[0] += 2;
-      while(pos[0] < len &&
-		! ( ( rep.charAt(pos[0]) == '@' || rep.charAt(pos[0]) != '#')
-		&& rep.charAt(pos[0]-1) == '\"' 
-		&& rep.charAt(pos[0]-2) != '\\') )
-	pos[0] += 1;
+      cpos += 2;
+      while(cpos < len &&
+		! ( ( rep[cpos] == '@' || rep[cpos] != '#')
+		&& rep[cpos-1] == '\"' 
+		&& rep[cpos-2] != '\\') )
+	cpos++;
 
     }
   else
     {
-      while(pos[0] < len && rep.charAt(pos[0]) != '@' && rep.charAt(pos[0]) != '#')
-	pos[0] += 1;
+      while(cpos < len && rep[cpos] != '@' && rep[cpos] != '#')
+	cpos++;
     }
 
-  String name = rep.substring(start, pos[0]);
+  String name = rep.substring(start, cpos);
+  pos[0] = cpos;
   let loc = Location.nowhere();
 
   if (name.length() > 1)
     {
-      if (name.charAt(0) == '\'')
+      if (name[0] == '\'')
 	return createPattern(new ConstantExp(PrimitiveType.charTC,
-		new Character(name.charAt(1)), name, loc));
+		new Character(name[1]), name, loc));
 
-      if (name.charAt(0) == '-')
+      if (name[0] == '-')
         return createPattern(ConstantExp.makeNumber(new LocatedString(name,
 		 loc)));
 
-      if (name.charAt(0) == '+')
+      if (name[0] == '+')
         return createPattern(ConstantExp.makeNumber(new LocatedString(
 		name.substring(1), loc)));
 
-      if (name.charAt(0) == '\"')
+      if (name[0] == '\"')
         return createPattern(ConstantExp.makeString(new LocatedString(
 		name.substring(1,name.length()-1), loc)));
 
-      if (name.charAt(0) == '<' || name.charAt(0) == '>')
+      if (name[0] == '<' || name[0] == '>')
 	{
-	  let prefix = (name.charAt(1) == '=') ? name.substring(0,2) : name.substring(0,1);
+	  let prefix = name.substring(0, (name[1] == '=') ? 2 : 1);
 	  return createPattern(prefix, null, ConstantExp.makeNumber(
 		new LocatedString(name.substring(prefix.length()), loc)), null, loc);
         }
 
-      if (name.charAt(0) == '=')
+      if (name[0] == '=')
         return resolveGlobalConstants(new VariablePattern(new LocatedString(name.substring(1), loc), loc));
-        
     }
 
   if (name.equals("_"))
@@ -677,10 +635,8 @@ public ?Pattern readPattern(String rep, int[]/*ref*/ pos)
   if (sym == null)
     // This can happen if the class exists only in a later version
     // of the JDK.
-    throw new Unknown();
+    throw new Pattern.Unknown();
 
   let mlsub.typing.TypeConstructor tc = cast(sym);
   return new TypePattern(null, tc, Location.nowhere(), exactlyAt:exact);
 }
-
-public class Unknown extends RuntimeException {}

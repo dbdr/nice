@@ -23,7 +23,11 @@ import java.util.*;
  * Collection
  ****************************************************************/
 
-<T> void foreach(Collection<T> coll, T->void func);
+/**
+   Perform <code>action</code> on each element of <code>collection</code>.
+*/
+<T> void foreach(Collection<T> collection, T->void action);
+
 // Backward compatibility. `iter` will probably be removed sometime.
 <T> void iter(Collection<T> coll, T->void func) = coll.foreach(func);
 

@@ -7,3 +7,9 @@
   void foo(int abc) {}
   void foo() {}
 
+/// PASS bug
+  int i = 2;
+  (int a, int b) = foo(y: i, x: ++i);
+  assert a == 3 && b == 2;
+  /// Toplevel
+  (int, int) foo(int x, int y) = (x, y);

@@ -131,8 +131,6 @@ public class PrimitiveType extends ClassDefinition.ClassImplementation
       {
 	maybeTC = tc;
 	mlsub.typing.NullnessKind.initialize(tc);
-	// Reset the cached type of Null, since it is a persistent expression.
-	NullExp.instance.computeType();
 	// to differ with the null result, which signals error
 	return gnu.bytecode.Type.pointer_type;
       }

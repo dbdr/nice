@@ -1,8 +1,8 @@
 Source: nice
-Section: devel
+Section: contrib/devel
 Priority: optional
 Maintainer: Daniel Bonniot <bonniot@users.sourceforge.net>
-Build-Depends-Indep: debhelper (>> 3.0.0), jikes-classpath (>= 1:1.18) | java-compiler, kaffe (>= 1:1.1.1), javacc, groff
+Build-Depends-Indep: debhelper (>> 3.0.0), jikes-classpath (>= 1:1.18) | java-compiler, kaffe (>= 1:1.1.1), javacc, groff, ant
 Standards-Version: 3.6.1
 
 Package: nice

@@ -272,7 +272,8 @@ public class TestNice {
 	 * 
 	 */
 	static void moveFilesToFailFolder() {
-		File folder = new File(_failFolder, "" + _testCasesFailed);
+		File folder = new File(_failFolder, "" + 
+													 (_testCasesFailed + _testCasesKnownBug));
 		_tempFolder.renameTo(folder);
 		
 		_tempFolder.mkdir();

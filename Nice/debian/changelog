@@ -2,13 +2,13 @@ nice (0.9.3) unstable; urgency=low
 
   * Improved type inference by instanceof tests.
   * Added multi line string literals. String that start and end with """
-    may take multiple lines and will include the linebreaks.
+    may take multiple lines and will include the line breaks.
   * Existing interfaces can (like classes) implement abstract interfaces:
       interface packagename.SomeInterface implements AbstractInterface;
-  * Bugfixes (various pretty printing issues, type hole in instanceof inference,
-    calls to abstract methods, chained assignments with arrays like
+  * Bugfixes (various pretty printing issues, type hole in instanceof 
+    inference, calls to abstract methods, chained assignments with arrays like
     'x = arr[y] = z;', error messages of integer dispatch, reachability of
-    labeled break's, ...)
+    labeled breaks, ...)
 
  --
 

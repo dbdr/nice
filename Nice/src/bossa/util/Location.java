@@ -93,19 +93,19 @@ public class Location implements Located
 
   public String toString()
   {
-    if(abstractLocation!= null)
-      return "["+abstractLocation+"]";
+    if (abstractLocation != null)
+      return "[" + abstractLocation + "]";
 
     String res;
 
-    if(fileName!= null)
+    if (fileName != null)
       res = fileName;
     else
       res = "";
 
-    if(!isValid())
-      if(Debug.powerUser)
-	return res+"[no location]";
+    if (!isValid())
+      if (Debug.powerUser)
+	return "[no location]: " + res;
       else
 	return res;
 

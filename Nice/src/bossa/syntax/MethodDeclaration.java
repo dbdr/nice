@@ -40,7 +40,6 @@ abstract public class MethodDeclaration extends Definition
 {
   /**
      @param name the name of the method
-     @param typeParameters the type parameters
      @param constraint the constraint
      @param returnType the return type
      @param parameters the formal parameters
@@ -108,7 +107,7 @@ abstract public class MethodDeclaration extends Definition
   /**
      Do further typechecking, once the context of the method is entered.
   */
-  void innerTypecheck()
+  void innerTypecheck() throws TypingEx
   {
   }
   
@@ -124,8 +123,13 @@ abstract public class MethodDeclaration extends Definition
     
     if (!mlsub.typing.Constraint.hasBinders(type.getConstraint()))
       {
-	parameters.typecheck(getType().domain());
-	innerTypecheck();
+	parameters.typecheck(type.domain());
+	try{
+	  innerTypecheck();
+	}
+	catch(TypingEx e){
+	  User.error(this, "Type error in method " + symbol.name);
+	}
 	return;
       }
     
@@ -134,7 +138,7 @@ abstract public class MethodDeclaration extends Definition
     
       try{
 	type.getConstraint().assert();
-	parameters.typecheck(getType().domain());
+	parameters.typecheck(type.domain());
 	innerTypecheck();
       }
       finally{

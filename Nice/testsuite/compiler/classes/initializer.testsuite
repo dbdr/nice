@@ -121,3 +121,17 @@ class A
   /// package b import a
   assert new A().initialised;
 
+/// PASS bug
+  /// package a
+  /// Toplevel
+class A
+{
+  boolean[] x = [false, false];
+
+  { 
+    for(int i = 0; i<x.length; i++)
+     x[i] = true;
+  }
+}
+  /// package b import a
+  assert new A().x[0];

@@ -12,7 +12,7 @@
 
 // File    : Alternative.java
 // Created : Mon Nov 15 12:20:40 1999 by bonniot
-//$Modified: Wed Sep 20 12:34:24 2000 by Daniel Bonniot $
+//$Modified: Mon Oct 02 18:28:02 2000 by Daniel Bonniot $
 
 package bossa.link;
 
@@ -211,11 +211,23 @@ public class Alternative
     if (dom == null)
       return QuoteExp.trueExp;
 
-    return instanceOfExp(parameter, nice.tools.code.Types.javaType(dom));
+    Type ct = nice.tools.code.Types.javaType(dom);
+    if (parameter.getType().isSubtype(ct))
+      {
+	Debug.println("Saving " + parameter.getType() + " < " + ct);
+	return QuoteExp.trueExp;
+      }
+    
+    return instanceOfExp(parameter, ct);
   }
 
   static Expression instanceOfExp(Expression value, Type ct)
   {
+    // If matching against primitive types, 
+    // we know the runtime type will be the corresponding object class.
+    if (ct instanceof PrimType)
+      ct = Types.equivalentObjectType(ct);
+    
     return Inline.inline(new InstanceOfProc(ct), value);
   }
   

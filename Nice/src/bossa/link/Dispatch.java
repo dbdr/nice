@@ -12,7 +12,6 @@
 
 // File    : Dispatch.java
 // Created : Mon Nov 15 10:36:41 1999 by bonniot
-//$Modified: Wed Sep 20 12:30:55 2000 by Daniel Bonniot $
 
 package bossa.link;
 
@@ -31,9 +30,10 @@ import bossa.util.Debug;
 import gnu.expr.Expression;
 
 /**
- * Static class performing the coverage and non-ambiguity test.
- * 
- * @author bonniot
+   Static class performing the coverage and non-ambiguity test.
+   
+   @version $Date$
+   @author Daniel Bonniot
  */
 
 public final class Dispatch
@@ -57,11 +57,7 @@ public final class Dispatch
   
   private static void test(MethodDeclaration m, bossa.modules.Package module)
   {
-    if(m instanceof JavaMethod || 
-       m instanceof InlinedMethod ||
-       m instanceof StaticFieldAccess ||
-       m instanceof FieldAccessMethod
-       )
+    if(!(m instanceof NiceMethod))
       return;
     
     List alternatives = Alternative.listOfAlternative(m);
@@ -250,9 +246,9 @@ public final class Dispatch
 	param.setParameter(true);
 	params[n] = new ReferenceExp(param);
       }
-    
+    Debug.println("Dispatching " + m);
     block.setBody(dispatch(sortedAlternatives.iterator(),
-			   m.javaReturnType()==gnu.bytecode.Type.void_type,
+			   m.javaReturnType().isVoid(),
 			   block,
 			   params));
 

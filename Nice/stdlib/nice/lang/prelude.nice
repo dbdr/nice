@@ -28,7 +28,6 @@ package nice.lang;
  ****************************************************************/
 
 final class void = native;
-final class boolean = native;
 
 class double /*extends gnu.math.Numeric*/ = native;
 class float extends double = native;
@@ -47,38 +46,15 @@ class char extends int = native;
 <Any T> boolean `==`(T,T) = native boolean Native.eq(Object,Object);
 <Any T> boolean `!=`(T,T) = native boolean Native.neq(Object, Object);
 
-boolean `==`(boolean, boolean) = native boolean Native.eq(boolean,boolean);
 char `==`(char, char) = native char Native.eq(char,char);
-
-boolean `!=`(boolean, boolean) = native boolean Native.neq(boolean,boolean);
 char `!=`(char, char) = native char Native.neq(char,char);
-
 
 
 <Any T> boolean equals(T,T) = native boolean Object.equals(Object);
 
-boolean TRUE() = native Boolean.TRUE;
-boolean FALSE() = native Boolean.FALSE;
-var boolean true  = TRUE();
-var boolean false = FALSE();
-
-boolean `!`(boolean);
-`!`(b) = b ? false : true;
-
-boolean `&`(boolean, boolean);
-`&`(b1,b2) = b1 ? b2 : false;
-
-boolean `|`(boolean, boolean);
-`|`(b1,b2) = b1 ? true : b2;
-
 <Any T> String toString(T) = native String String.valueOf(Object);
 <Any T> Class getClass(T) = native Class Object.getClass();
 
-void traceInstructions(boolean);
-traceInstructions(on) =
-  traceInstructions(getRuntime(),on);
-
-Runtime getRuntime() = native Runtime Runtime.getRuntime();
 java.util.Properties<String,String> getProperties() = 
   native java.util.Properties java.lang.System.getProperties();
 

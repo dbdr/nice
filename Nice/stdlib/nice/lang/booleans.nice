@@ -1,0 +1,28 @@
+package nice.lang;
+
+/**
+   Primitive booleans.
+*/
+
+final class boolean implements BooleanAlgebra = native;
+
+boolean `==`(boolean, boolean) = native boolean Native.eq(boolean,boolean);
+boolean `!=`(boolean, boolean) = native boolean Native.neq(boolean,boolean);
+
+boolean TRUE() = native Boolean.TRUE;
+boolean FALSE() = native Boolean.FALSE;
+var boolean true  = TRUE();
+var boolean false = FALSE();
+
+/**
+  Booleans form a boolean algebra.
+*/
+
+`!`(b@boolean) = b ? false : true;
+`&`(b1@boolean,b2@boolean) = b1 ? b2 : false;
+`|`(b1@boolean,b2@boolean) = b1 ? true : b2;
+
+// same methods, but overloaded for better efficiency (no dispatch).
+boolean `!`(boolean) = inline nice.tools.code.BooleanOperators("!");
+boolean `&`(boolean, boolean) = inline nice.tools.code.BooleanOperators("&");
+boolean `|`(boolean, boolean) = inline nice.tools.code.BooleanOperators("|");

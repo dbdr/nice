@@ -313,6 +313,23 @@ public final class Types
   }
   
   /****************************************************************
+   * Manipulating bytecode types
+   ****************************************************************/
+
+  public static ObjectType equivalentObjectType(Type t)
+  {
+    if (t instanceof ObjectType)
+      return (ObjectType) t;
+    
+    if (t == Type.boolean_type)
+      return Type.boolean_ctype;
+    
+    bossa.util.Internal.error("Equivalent type for " + t +
+			      " is not defined yet");
+    return null;
+  }
+  
+  /****************************************************************
    * On the fly lookup of java types
    ****************************************************************/
 

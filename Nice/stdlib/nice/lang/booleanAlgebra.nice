@@ -1,0 +1,12 @@
+
+package nice.lang;
+
+abstract interface BooleanAlgebra
+{
+  alike `&`(alike);
+  alike `|`(alike);
+  alike `!`();
+}
+
+<BooleanAlgebra B> B nand(B, B);
+nand(b1, b2) = !(b1 & b2);

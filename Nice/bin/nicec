@@ -69,10 +69,7 @@ experimental=false
 while true; do 
   case "x$1" in
     x-J*) read_java_arg "`expr substr "$1" 3 1000`";;
-    x-e) 
-	experimental=true
-	NICE_TOP="$HOME"/Nice
-    ;;
+    x-e)  experimental=true ;;
     *) break;;
     esac
   shift
@@ -80,7 +77,6 @@ while true; do
 
 find_home "$scriptName"
 NICEC=${APPHOME}/lib/nice/Nice.jar
-STDLIB=${APPHOME}/lib/nice/stdlib.jar
 
 if [ "$EMACS" = t ]; then
   JAVA="${JAVA} -Demacs=true"
@@ -88,20 +84,17 @@ fi
 
 case $progname in
   nicec) 
-    if [ $experimental = true ]; then
-	NICEC=${NICE_TOP}/src/nice/tools/compiler.jar:${NICE_TOP}/classes
-	STDLIB=${NICE_TOP}/lib/nice/stdlib.jar
-    fi
     CLASSPATH=${NICEC}:${CLASSPATH}
+    if [ $experimental = true ]; then
+	CLASSPATH=${APPHOME}/classes:${CLASSPATH}
+    fi
     export CLASSPATH
     exec ${JAVA} \
-	-Dnice.systemJar=${STDLIB} \
+	-Dnice.systemJar=${NICEC} \
+	-Dnice.runtime=${NICEC} \
 	nice.tools.compiler.package "$@"
   ;;
   nicer) 
-    if [ $experimental = true ]; then
-	NICEC=${NICE_TOP}/stdlib:${NICE_TOP}/classes
-    fi
     jar=$1
     if [ -z "$jar" ]; then
       usage_nicer

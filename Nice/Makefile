@@ -8,31 +8,93 @@ JAVAC=  javac -classpath "${TOP}/classes:${TOP}/src:${TOP}/stdlib" -sourcepath "
 JAVACC= CLASSPATH="${TOP}/external/JavaCC.zip:${CLASSPATH}" java COM.sun.labs.javacc.Main
 JAVADOC=javadoc #-linkoffline file:///C%7C/Apps/jdk1.2.1/docs/api file:///usr/opt/java122/docs/api
 
-NICEC= nicec --classpath="${TOP}/classes:${NICEJAR}" -d "${TOP}/classes"
-NICEC_DEV= CLASSPATH="${TOP}/src/nice/tools/compiler.jar:${TOP}/classes" java -Dnice.systemJar="${TOP}/stdlib" nice.tools.compiler.package -d "${TOP}/bootstrap.classes" --classpath="${TOP}/stdlib:${TOP}/classes" --sourcepath="${TOP}/stdlib:."
+NICEC_ARGS= --sourcepath="${TOP}/stdlib:${TOP}/src" -d "${TOP}/classes" --exclude-runtime 
+NICEC=nicec ${NICEC_ARGS}
+NICEC1=${TOP}/bin/nicec ${NICEC_ARGS}
 
-# run this first when you just checked out a fresh version
-first: bootstrap compiler jar
+
+
+all: clean compiler1 lib/nice/Nice.jar compiler2 archive
+
+compiler1: bootstrap setDate
+	${NICEC}  bossa.syntax
+	${NICEC}  -R -a src/nice/tools/compiler.jar nice.tools.compiler
+
+compiler2: setDate
+	${NICEC1} -R bossa.syntax
+	${NICEC1} -R -a src/nice/tools/compiler.jar nice.tools.compiler
+
+lib/nice/Nice.jar archive: src/nice/tools/compiler.jar
+	mkdir -p lib/nice
+	cp src/nice/tools/compiler.jar lib/nice/Nice.jar
+	jar umf src/mainClass lib/nice/Nice.jar -C classes nice -C classes mlsub -C classes bossa -C classes gnu
+	if [ -r classes/lang/package.nicei ]; then cd classes; jar uf ../lib/nice/Nice.jar nice/*/package.nicei; fi
+
+
+
+setDate:
+	cd src/nice/tools/compiler; ./setBuildDate
+
+dist: lib/nice/Nice.jar
+	# make sure that nicec is executable
+	chmod a+rx bin/nicec
+	tar cf Nice-`date +"%Y.%m.%d"`.tar bin/nicer bin/nicec lib/nice/Nice.jar lib/emacs/nice-mode.el
+
+test:
+	cd regtest; /usr/bin/time ./regtest
+
+clean:
+	rm -rf classes lib/nice src/bossa/parser/{Parse*.java,Token*.java,ASCII_*.java}
+	find "${TOP}" \( -name "*.class" -o -name "*.nicei" -o -name "*~" \) -exec rm {} \;
+
+
+#****************************************************************
+# CVS
+#****************************************************************
+
+status:
+	cvs -z 9 status 2>&1 | awk -f bin/parse_cvs_status.awk
+
+# Sourceforge
+
+sourceforge:
+	scp web/*.html web/*.css bonniot@shell.sourceforge.net:/home/groups/n/ni/nice/htdocs
+
+#****************************************************************
+#    Bootstrap
+#****************************************************************
 
 parser: src/bossa/parser/Parser.java
 src/bossa/parser/Parser.java: src/bossa/parser/Parser.jj
 	cd src/bossa/parser; ${JAVACC} Parser.jj
 
-setDate:
-	cd src/nice/tools/compiler; ./setBuildDate
+bootstrap: parser
+	cd src/gnu/lists && ./withCollections
+	ln -sf nicec bin/nicer
+	mkdir -p classes
+	cd classes; jar xf ../external/java-getopt.jar gnu
+	-cd src/bossa/syntax && mv -f dispatch.java.bootstrap dispatch.java
+	${JAVAC} \
+		stdlib/nice/lang/Native.java stdlib/nice/lang/inline/*.java \
+		src/mlsub/compilation/Module.java \
+		src/bossa/modules/Package.java src/bossa/util/*.java \
+		src/gnu/expr/*.java src/gnu/mapping/*.java \
+		src/nice/tools/code/*.java src/mlsub/typing/*.java src/mlsub/typing/lowlevel/*.java \
+		src/bossa/syntax/dispatch.java
+	cd src; ${NICEC} -R bossa.modules
+	cd src; ${NICEC} -r nice.tools.ast
+	cd src/bossa/syntax && \
+	${JAVAC} *.java && \
+	mv dispatch.java dispatch.java.bootstrap
+	rm classes/bossa/syntax/dispatch.class
+	cd src; ${NICEC} -r bossa.syntax
+	cd src;\
+	${JC} bossa/modules/Package.java nice/tools/runJar.java ../stdlib/nice/lang/rawArray.java gnu/bytecode/dump.java
 
-nice-pass: 
-	cd src; ${NICEC} bossa.syntax
 
-compiler: setDate nice-pass
-	cd src; ${NICEC} -R -o nice/tools/compiler.jar nice.tools.compiler
-
-compiler-bootstrap: setDate
-	cd src; ${NICEC_DEV} -r bossa.syntax
-	cd src; ${NICEC_DEV} -R nice.tools.compiler
-
-test:
-	cd regtest; /usr/bin/time ./regtest
+#****************************************************************
+#    Recompilations
+#****************************************************************
 
 # erase out-of-date class files and 'make dep' to recompile if javac 
 # has no -[X]depend
@@ -59,13 +121,10 @@ compile:
 native:
 	${JAVAC} stdlib/nice/*/*.java src/nice/tools/code/*.java
 
-clean:
-	rm -rf classes lib/nice src/bossa/parser/{Parse*.java,Token*.java,ASCII_*.java} bootstrap.classes
-	find "${TOP}" \( -name "*.class" -o -name "*.nicei" -o -name "*~" \) -exec rm {} \;
 
-scratch: clean first
-
-## Documentation
+#****************************************************************
+#    Documentation
+#****************************************************************
 
 jdoc:
 	mkdir -p doc
@@ -80,60 +139,3 @@ jdoc:
 tags:
 	jtags
 
-stdlib.jar:
-	${NICEC_DEV} -o lib/nice/stdlib.jar --sourcepath="${TOP}/stdlib" nice.getopt
-# package.nicei files must be included since the standard library is used
-# to lookup packages when compiling Nice programs
-# the next two lines do just that
-	cd bootstrap.classes; jar uf ../lib/nice/stdlib.jar nice/*/package.nicei
-
-jar: stdlib.jar
-	mkdir -p lib/nice
-	cp src/nice/tools/compiler.jar lib/nice/Nice.jar
-	jar umf src/mainClass lib/nice/Nice.jar -C classes nice -C classes mlsub -C classes bossa -C classes gnu
-
-
-dist: jar
-	# make sure that nicec is executable
-	chown a+rx bin/nicec
-	tar cf Nice-`date +"%Y.%m.%d"`.tar bin/nicer bin/nicec lib/nice/Nice.jar lib/nice/stdlib.jar lib/emacs/nice-mode.el
-
-
-#****************************************************************
-# CVS
-#****************************************************************
-
-status:
-	cvs -z 9 status 2>&1 | awk -f bin/parse_cvs_status.awk
-
-# Sourceforge
-
-sourceforge:
-	scp web/*.html web/*.css bonniot@shell.sourceforge.net:/home/groups/n/ni/nice/htdocs
-
-#****************************************************************
-# Bootstrap
-#****************************************************************
-
-bootstrap: parser
-	cd src/gnu/lists && ./withCollections
-	ln -sf nicec bin/nicer
-	mkdir -p classes
-	cd classes; jar xf ../external/java-getopt.jar gnu
-	-cd src/bossa/syntax && mv -f dispatch.java.bootstrap dispatch.java
-	${JAVAC} \
-		stdlib/nice/lang/Native.java stdlib/nice/lang/inline/*.java \
-		src/mlsub/compilation/Module.java \
-		src/bossa/modules/Package.java src/bossa/util/*.java \
-		src/gnu/expr/*.java src/gnu/mapping/*.java \
-		src/nice/tools/code/*.java src/mlsub/typing/*.java src/mlsub/typing/lowlevel/*.java \
-		src/bossa/syntax/dispatch.java
-	cd src; ${NICEC} bossa.modules
-	cd src; ${NICEC} nice.tools.ast
-	cd src/bossa/syntax && \
-	${JAVAC} *.java && \
-	mv dispatch.java dispatch.java.bootstrap
-	rm classes/bossa/syntax/dispatch.class
-	cd src; ${NICEC} bossa.syntax
-	cd src;\
-	${JC} bossa/modules/Package.java nice/tools/runJar.java ../stdlib/nice/lang/rawArray.java gnu/bytecode/dump.java

@@ -195,10 +195,13 @@ public class MonoSymbol extends VarSymbol
   
   toString()
   {
-    if (type == null)
+    if (type != null)
+      return notNull(type) + " " + name;
+
+    if (syntacticType != null)
       return notNull(syntacticType) + " " + name;
 
-    return notNull(type) + " " + name;
+    return ""name;
   }
 }
 

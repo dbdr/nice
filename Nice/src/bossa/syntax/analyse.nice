@@ -370,7 +370,7 @@ Expression analyseIdent(IdentExp e, Info info, boolean assigned)
 
   if (symbols != null && symbols.size() > 0)
     if (!e.alwaysOverloadedSymbol() && symbols.size() == 1)
-      return new SymbolExp(symbols[0]);
+      return new SymbolExp(symbols[0], e.location());
     else
       return new OverloadedSymbolExp(symbols.impl, e.ident);
   if (e.enableClassExp)

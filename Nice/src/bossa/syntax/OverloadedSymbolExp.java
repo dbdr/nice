@@ -74,7 +74,7 @@ public class OverloadedSymbolExp extends Expression
   
   private Expression uniqueExpression(VarSymbol sym, Polytype t)
   {
-    SymbolExp res = new SymbolExp(sym);
+    SymbolExp res = new SymbolExp(sym, location());
     res.type = t;
     return res;
   }

@@ -1,0 +1,73 @@
+package nice.ui.common;
+
+
+<PropertyChangeSupport T> T init
+  (T this,
+   ?String propertyName = null,
+   PropertyChangeEvent -> void propertyChange
+   
+   )
+{
+	if(propertyName != null)  
+    this.addPropertyChangeListener
+      (propertyName: propertyName,
+       propertyChange: propertyChange
+       );
+  else
+    this.addPropertyChangeListener
+      (propertyChange: propertyChange
+       );       
+  return this;                                               
+}
+
+
+<VetoableChangeSupport T> T init
+  (T this,
+   ?String propertyName = null,
+   PropertyChangeEvent -> void vetoableChange     
+   )
+{  
+	if(propertyName != null)
+    this.addVetoableChangeListener
+      (propertyName: propertyName,
+       vetoableChange: vetoableChange
+       );
+  else
+    this.addVetoableChangeListener
+      (vetoableChange: vetoableChange
+       );   
+  return this;                                               
+}
+
+
+<PropertyEditorSupport T> T init
+  (T this,
+   PropertyChangeEvent -> void propertyChange     
+   )
+{
+   this.addPropertyChangeListener
+     (propertyChange: propertyChange
+      ); 
+   return this;                                               
+}
+
+
+<BeanContextChildSupport T> T init
+  (T this,
+   String propertyName,
+   PropertyChangeEvent ?-> void propertyChange = null,       
+   PropertyChangeEvent ?-> void vetoableChange = null
+   )
+{
+  if(propertyChange != null)
+    this.addPropertyChangeListener
+      (propertyName: propertyName,
+       propertyChange: propertyChange
+       ); 
+  if(vetoableChange != null)
+    this.addVetoableChangeListener
+      (propertyName: propertyName,
+       vetoableChange: vetoableChange
+       ); 
+   return this;                                               
+}

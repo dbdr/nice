@@ -16,12 +16,24 @@
  ****************************************************************************/
 
 package nice.lang;
+import java.io.*;
 
-public class Enum
+public abstract class Enum implements Serializable 
 {
   public final int ordinal;
   public final String name;
 
   hashCode() = ordinal;
   toString() = name;
+
+  Object readResolve()
+  {
+    for (elem : this.family())
+      if (this.name.equals(elem.name))
+        return object(elem);
+
+    throw new InvalidObjectException("unknown enum element"); 
+  }
 }
+
+<Enum T> List<T> family(T element);

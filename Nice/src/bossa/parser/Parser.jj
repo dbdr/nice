@@ -1154,7 +1154,7 @@ MonotypeVar taggedMonotypeVar(List tags, List atoms):
   }
 }
 
-EnumDefinition enumDefinition():
+EnumDefinition enumDefinition(List definitions):
 { 
   LocatedString name, elem;
   List elements = new LinkedList();
@@ -1164,7 +1164,7 @@ EnumDefinition enumDefinition():
   "{" elem=ident() { elements.add(elem); }
    ( "," elem =ident() { elements.add(elem); } )+
   "}"
-  { return new EnumDefinition(name, elements); }
+  { return new EnumDefinition(name, elements, definitions); }
 }
 
 /***********************************************************************/
@@ -1456,7 +1456,7 @@ Definition definition(List definitions):
   |
     [ "public" | "private" ]
     ( res=globalVariable()
-    | res=enumDefinition()
+    | res=enumDefinition(definitions)
     | { Constraint cst; } cst = constraint()
       ( 
         LOOKAHEAD ( "abstract" "interface" )

@@ -68,3 +68,12 @@
   assert !c.equals(green);
   /// Toplevel
   enum Color {red, blue, green}
+
+/// PASS
+  List<Color> elems = red.family();
+  assert elems.size() == 3;
+  assert elems.contains(red);
+  assert elems.contains(blue);
+  assert elems.contains(green);
+  /// Toplevel
+  enum Color {red, blue, green}

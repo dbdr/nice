@@ -25,7 +25,7 @@ import java.util.*;
 */
 public class EnumDefinition extends Definition
 {
-  public EnumDefinition(LocatedString name, List/*LocatedString*/ elements)
+  public EnumDefinition(LocatedString name, List/*LocatedString*/ elements, List globalDefs)
   {
     super(name, Node.global);
     shortName = name.toString();
@@ -36,6 +36,21 @@ public class EnumDefinition extends Definition
     NiceClass impl = new NiceClass(classDef);
     impl.setFields(null);
     impl.setOverrides(null);
+
+    if (! inInterfaceFile())
+      {
+        // create the method implementation of family()
+	List exps = new LinkedList();
+        for (Iterator it = elements.iterator(); it.hasNext(); )
+          exps.add(new IdentExp((LocatedString)it.next()));
+
+        Statement body = new ReturnStmt(new LiteralArrayExp(exps), true);
+        LocatedString mName = new LocatedString("family", bossa.util.Location.nowhere());
+        Definition mBodyDef = new MethodBodyDefinition(impl, mName, null,
+				new LinkedList(), body);
+        globalDefs.add(mBodyDef);
+      }
+
     classDef.setImplementation(impl);
 
     addChild(classDef);    
@@ -52,7 +67,7 @@ public class EnumDefinition extends Definition
         ord++;
       }
     addChildren(symbols);
-    
+
   }
 
   class EnumSymbol extends MonoSymbol 

@@ -1,13 +1,10 @@
-/// PASS bug
-  let filename = "color.ser";
-
-  let outf = new FileOutputStream(filename);
-  let outs = new ObjectOutputStream(outf);
+/// PASS
+  let outb = new ByteArrayOutputStream();
+  let outs = new ObjectOutputStream(outb);
   outs.writeObject(red);
-  outf.close();
-
-  let inf = new FileInputStream(filename);
-  let ins = new ObjectInputStream(inf);
+  let store = outb.toByteArray();
+  let inb = new ByteArrayInputStream(store);
+  let ins = new ObjectInputStream(inb);
   let Color color = ins.readObject();
   assert color == red;
 

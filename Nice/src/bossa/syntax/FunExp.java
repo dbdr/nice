@@ -66,9 +66,11 @@ public class FunExp extends Expression implements Function
 	inferredReturnType = null;
       }
     
+    Monotype t = new FunType(MonoSymbol.getMonotype(formals), 
+			     inferredReturnType.getMonotype());
     type = new Polytype
       (Constraint.and(cst, inferredReturnType.getConstraint()),
-       new FunType(MonoSymbol.getMonotype(formals), inferredReturnType.getMonotype()));
+       bossa.syntax.Monotype.sure(t));
   }
 
   private Polytype inferredReturnType;

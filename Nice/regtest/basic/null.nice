@@ -1,0 +1,6 @@
+package regtest.basic;
+
+void test_null()
+{
+  ?List<String> l = null;
+}

@@ -15,12 +15,25 @@ package bossa.syntax;
 
 class FunSymbol extends PolySymbol
 {
-  FunSymbol(LocatedString name, Polytype type, FormalParameters parameters,
-	    int arity)
+  FunSymbol(LocatedString name, 
+	    Constraint constraint, FormalParameters parameters,
+	    Monotype returnType, int arity)
   {
-    super(name, type);
+    super(name, 
+	  new Polytype(constraint, 
+		       new FunType(parameters.types(), returnType)));
     this.parameters = parameters;
     this.arity = arity;
+  }
+
+  FunSymbol(LocatedString name, 
+	    mlsub.typing.Polytype type, FormalParameters parameters,
+	    int arity)
+  {
+    super(name, null);
+    this.parameters = parameters;
+    this.arity = arity;
+    this.type = type;
   }
 
   FormalParameters parameters;

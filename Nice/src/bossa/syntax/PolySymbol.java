@@ -66,22 +66,18 @@ public class PolySymbol extends VarSymbol
 
   // explained in OverloadedSymbolExp
 
-  private boolean clonedTypeInUse;
   private Polytype clonedType;
   
   final void makeClonedType()
   {
-    if(clonedTypeInUse)
+    if(clonedType != null)
       Internal.error(this, "clonedType in use");
-    clonedTypeInUse = true;
     
-    if(clonedType==null)
-      clonedType = type.cloneType();
+    clonedType = type.cloneType();
   }
   
   void releaseClonedType()
   {
-    clonedTypeInUse = false;
     clonedType = null;
   }
   

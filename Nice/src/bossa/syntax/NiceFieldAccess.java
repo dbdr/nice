@@ -40,7 +40,7 @@ public class NiceFieldAccess extends FieldAccess
      List classTypeParameters)
   {
     super(fieldName, new Constraint(classTypeParameters,null),
-	  fieldType, makeList(Monotype.create(classDef.lowlevelMonotype())));
+	  fieldType, makeList(Monotype.create(Monotype.sure(classDef.lowlevelMonotype()))));
     this.definition = classDef;
     this.classTC = classDef.tc;
     this.fieldName = fieldName.toString();

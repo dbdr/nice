@@ -51,6 +51,15 @@ public final class MonotypeConstructor extends Monotype
       }
   }
 
+  /**
+     Return the head type constructor if this monotype is
+     of a known variance, or null.
+  */
+  public TypeConstructor head()
+  {
+    return tc;
+  }
+
   public TypeConstructor getTC()
   {
     return tc;

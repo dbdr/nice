@@ -24,11 +24,11 @@ test_native()
 
   Fields.intS = 2;
   Fields.stringS = "Static field is: ";
-  println(Fields.stringS + Fields.intS);
+  println(notNull(Fields.stringS) + Fields.intS);
 
   Fields f = new Fields();
   f.intI = 3;
   f.stringI = "Instance field is: ";
-  println(f.stringI + f.intI);
+  println(notNull(f.stringI) + f.intI);
 }
 

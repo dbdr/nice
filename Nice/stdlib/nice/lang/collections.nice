@@ -168,28 +168,29 @@ list<T>(l)
  * LinkedList
  ****************************************************************/
 
-<Any T, Any U> U cast(T) = inline nice.lang.inline.Nop();
-
 final class JavaList<T> implements List
 {
   java.util.List impl;  
-}
-  size(this@JavaList) = this.impl.size();
-  get(this@JavaList,index) = cast( this.impl.get(index) );
-  set(this@JavaList,index, elem) { this.impl.set(index, cast(elem)); }
-  add(this@JavaList,elem) { this.impl.add(cast(elem)); }
-  remove(this@JavaList,index) = cast(this.impl.remove(index));
 
-<Any T> JavaList<T> javaList();
-javaList<T>()
+  size() = this.impl.size();
+  get(index) = cast( this.impl.get(index) );
+  set(index, elem) { this.impl.set(index, cast(elem)); }
+  add(elem) { this.impl.add(cast(elem)); }
+  remove(index) = cast(this.impl.remove(index));
+}
+
+/** The returned iterator is always non-null */
+java.util.Iterator iterator(java.util.List) =
+  native java.util.Iterator java.util.List.iterator();
+
+<Any T> JavaList<T> javaList()
 {
   JavaList<T> res = new JavaList();
   res.impl = new java.util.ArrayList();
   return res;
 }
 
-<Any T> JavaList<T> javaList(java.util.List);
-javaList<T>(impl)
+<Any T> JavaList<T> javaList(java.util.List impl)
 {
   JavaList<T> res = new JavaList();
   res.impl = impl;

@@ -29,20 +29,6 @@ void typecheck(Expression);
 
 typecheck(@null(Expression)) {}
 
-/**
-   Checks that right can be assigned to a variable of type left.
-   Returns a new expression to be used instead of right,
-   since overloading resolution is done on the expected type.
-*/
-Expression checkAssignment(mlsub.typing.Polytype left, Expression right);
-checkAssignment(left, right)
-{
-  Expression val = right.resolveOverloading(left);
-  typecheck(val);
-  Typing.leq(val.getType(), left);
-  return val;
-}
-
 typecheck(e@AssignExp)
 {
   e.to = e.to.noOverloading();
@@ -54,8 +40,9 @@ typecheck(e@AssignExp)
     e.value = checkAssignment(e.to.getType(), e.value);
   }
   catch(TypingEx t){
-    throw assignmentError(e, 
-			  e.to.toString(), e.to.getType().toString(), e.value);
+    if (notNullError(t, e, e.to.toString()))
+      throw assignmentError(e, e.to.toString(), 
+			    e.to.getType().toString(), e.value);
   }
 }
 
@@ -116,7 +103,8 @@ typecheck(e@IfExp)
     e.condition = checkAssignment(ConstantExp.boolPolytype, e.condition);
   }
   catch(TypingEx t){
-    throw new bossa.util.UserError
+    if (notNullError(t, e, e.condition.toString()))
+      throw new bossa.util.UserError
       (e, 
        "The condition must be a boolean.\n" + 
        e.condition + " has type " + e.condition.getType());
@@ -132,7 +120,8 @@ typecheck(e@IncrementExp)
     e.variable = checkAssignment(ConstantExp.longPolytype, e.variable);
   }
   catch(TypingEx t){
-    throw new bossa.util.UserError
+    if (notNullError(t, e, e.description()))
+      throw new bossa.util.UserError
       (e, 
        e.description() + " is only valid on integers.\n" + 
        e.variable + " has type " + e.variable.getType());
@@ -153,8 +142,10 @@ typecheck(e@NewArrayExp)
 			      ConstantExp.intPolytype);
     }
     catch(TypingEx ex){
-      bossa.util.User.error(e.knownDimensions[i],
-			    ""+e.knownDimensions[i] + " should be an integer");
+      if (notNullError(ex, e.knownDimensions[i], 
+		       e.knownDimensions[i].toString()))
+	bossa.util.User.error(e.knownDimensions[i],
+			      ""+e.knownDimensions[i]+" should be an integer");
     }
 }
 
@@ -199,14 +190,15 @@ typecheck(decl@Block$LocalVariable)
   if (decl.value == null)
     return;
 
-  MonoSymbol target = decl.getLeft();
+  MonoSymbol target = decl.left();
 
   try{
     decl.value = checkAssignment(target.getType(), decl.value);
   }
   catch(TypingEx t){
-    throw assignmentError(target, target.name.toString(), 
-			  target.getMonotype().toString(), decl.value);
+    if (notNullError(t, target, target.name.toString()))
+      throw assignmentError(target, target.name.toString(), 
+			    target.getMonotype().toString(), decl.value);
   }
 }
 
@@ -217,7 +209,8 @@ typecheck(decl@Block$LocalFunction)
     Typing.leq(decl.inferredReturnType(), decl.declaredReturnType());
   }
   catch(TypingEx t){
-    throw new bossa.util.UserError
+    if (notNullError(t, decl, "returned value"))
+      throw new bossa.util.UserError
       (decl, 
        "Incorrect return type:\n" +
        "Found   : " + decl.inferredReturnType() +
@@ -250,15 +243,17 @@ typecheck(r@ReturnStmt)
   mlsub.typing.Monotype declaredRetType = r.includingFunction.getReturnType();
   if (declaredRetType == null)
     return;
-    
+  
   try{
     Typing.leq(r.returnType(), declaredRetType);
   }
   catch(TypingEx e){
-    bossa.util.User.error(r,
-	       "returned type is " + r.returnType() +
-	       "\nbut this funtion must return a " + declaredRetType,
-	       ": "+e);
+    if (notNullError(e, r, r.value.toString()))
+      bossa.util.User.error(r,
+			    "returned type is " + r.returnType() +
+			    "\nbut this funtion must return a " + 
+			    declaredRetType,
+			    ": "+e);
   }
 }
 
@@ -270,7 +265,8 @@ typecheck(t@ThrowStmt)
     Typing.leq(t.exn.getType(), ConstantExp.throwableType());
   }
   catch(TypingEx e){
-    bossa.util.User.error(t.exn, "" + t.exn + " is not throwable", e);
+    if (notNullError(e, t.exn, t.exn.toString()))
+      bossa.util.User.error(t.exn, "" + t.exn + " is not throwable", e);
   }
 }
 
@@ -281,6 +277,42 @@ typecheck(t@TryStmt)
   typecheck(t.finallyBody);
 }
 
+
+/****************************************************************
+ * Error handling
+ ****************************************************************/
+
+/**
+   Checks that right can be assigned to a variable of type left.
+   Returns a new expression to be used instead of right,
+   since overloading resolution is done on the expected type.
+*/
+Expression checkAssignment(mlsub.typing.Polytype left, Expression right);
+checkAssignment(left, right)
+{
+  Expression val = right.resolveOverloading(left);
+  typecheck(val);
+  Typing.leq(val.getType(), left);
+  return val;
+}
+
+TypeConstructor getTC(mlsub.typing.Monotype m);
+getTC(@mlsub.typing.Monotype) = null;
+getTC(m@mlsub.typing.MonotypeConstructor) = m.getTC();
+
+boolean notNullError(TypingEx ex, bossa.util.Located resp, String value);
+notNullError(@TypingEx, resp, value) = true;
+notNullError(ex@MonotypeLeqEx, resp, value)
+{
+  if (getTC(ex.getM1()) == ConstantExp.maybeTC &&
+      getTC(ex.getM2()) == ConstantExp.sureTC)
+    throw new bossa.util.UserError
+    (resp, "" + value + " may be null");
+  return true;
+}
+
+
 // Local Variables:
 // nice-xprogram: "NICEJAR=$HOME/Nice/stdlib nicec --classpath=\"$HOME/Nice/stdlib:$HOME/Nice/classes:/$HOME/Nice/src\""
+// nice-xprogram: "nicec --classpath=\"$HOME/Nice/stdlib:$HOME/Nice/classes:/$HOME/Nice/src\""
 // End:

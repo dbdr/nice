@@ -21,6 +21,8 @@ import nice.tools.code.*;
 import mlsub.typing.*;
 import mlsub.typing.Polytype;
 import mlsub.typing.Monotype;
+import mlsub.typing.FunType;
+import mlsub.typing.MonotypeConstructor;
 import mlsub.typing.Constraint;
 import mlsub.typing.MonotypeLeqCst;
 
@@ -142,17 +144,32 @@ public class CallExp extends Expression
     ReportErrorEx(String msg) { super(msg); }
   }
   
-  private static Polytype getType(Polytype funt,
+  private static Polytype getType(Polytype type,
 				  Polytype[] parameters)
     throws TypingEx, BadSizeEx, ReportErrorEx
   {
+    Monotype m = type.getMonotype();
+
+    // Check that the function cannot be null
+    if (m.head() == null)
+      throw new ReportErrorEx("Nullness check");
+    try{
+      Typing.leq(m.head(), ConstantExp.sureTC);
+    }
+    catch(TypingEx ex) {
+      throw new ReportErrorEx("This function may be null");
+    }
+    
+    m = Types.rawType(m).equivalent();
+    if (!(m instanceof FunType))
+      System.out.println("Not a function" + m + m.getClass());
+
+    FunType funt = (FunType) m;
+
     Monotype[] dom = funt.domain();
     Monotype codom = funt.codomain();
 
-    if(dom==null || codom==null)
-      throw new ReportErrorEx("Not a function");
-
-    Constraint cst = funt.getConstraint();
+    Constraint cst = type.getConstraint();
     final boolean doEnter = true; //Constraint.hasBinders(cst);
     
     if(doEnter) Typing.enter();
@@ -180,7 +197,7 @@ public class CallExp extends Expression
 	Typing.leave();
     }
 
-    return Polytype.apply(funt, parameters);
+    return Polytype.apply(cst, funt, parameters);
   }
 
   /****************************************************************
@@ -217,6 +234,14 @@ public class CallExp extends Expression
 				      arguments.inOrder());
 	computedExpressions = arguments.inOrder();
       }
+
+    /* 
+       If type is not monomorphic, simplification can result in 
+       a more precise result for the java type used in compilation. 
+       However, it is probably not perfect. setByteCodetype should be usefull.
+       FIXME and test me with regtest case.
+    */
+    //type.simplify();
   }
 
   boolean isAssignable()
@@ -248,7 +273,15 @@ public class CallExp extends Expression
     else
       res = new gnu.expr.ApplyExp(function.generateCode(), params);
 
-    gnu.bytecode.Type expectedType = Types.javaType(getType());
+    gnu.bytecode.Type expectedType;
+    if ("notNull".equals(function.toString()))
+      {
+	expectedType = Types.javaType(getType());
+	System.out.println(this + ", " + res.getType() + "; " + expectedType + "^" + getType());
+	expectedType = Types.javaType(getType());
+	System.out.println(this + ", " + res.getType() + "; " + expectedType + "^" + getType());
+      }
+    expectedType = Types.javaType(getType());
     return EnsureTypeProc.ensure(res, expectedType);
   }
   

@@ -119,7 +119,7 @@ public class NiceMethod extends MethodDeclaration
       thisType = 
 	new mlsub.typing.MonotypeConstructor(tc, thisTypeParams);
     
-    params.addThis(Monotype.create(thisType));
+    params.addThis(Monotype.create(Monotype.sure(thisType)));
     
     if (body == null)
       return new NiceMethod(name, constraint, returnType, params);
@@ -172,7 +172,7 @@ public class NiceMethod extends MethodDeclaration
   {
     // set bytecode types for type variables
     mlsub.typing.FunType ft = (mlsub.typing.FunType) getType().getMonotype();
-    
+
     Types.setBytecodeType(ft.domain());
     Types.setBytecodeType(ft.codomain());
   }

@@ -18,11 +18,22 @@ package nice.lang;
 
 import java.io.*;
 
-void native_print(PrintStream,String) =
-  native void PrintStream.print(String);
-void native_println(PrintStream,String) =
-  native void PrintStream.println(String);
+void native_print(PrintStream,String) = native void PrintStream.print(String);
+void native_println(PrintStream,String) = native void PrintStream.println(String);
 
+/** Printing on the standard output. */
+/*<Any T> void print(T object) = stdout.print(object);
+<Any T> void println(T object) = stdout.println(object);
+*/
+/**
+   Writing on the standard error can be achieved with
+   stderr.print(...) and stderr.println(...)
+
+   System.out and System.err are possibly null.
+   stdout and stderr are typed as non-null for convenience.
+   It is safe as long as System.setOut(null) or System.setErr(null)
+   are not called.
+*/
 PrintStream stdout() = native java.lang.System.out;
 PrintStream stderr() = native java.lang.System.err;
 

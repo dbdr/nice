@@ -200,7 +200,7 @@ public class NiceClass extends ClassDefinition
     constructorMethod.setLowlevelTypes
       (mlsub.typing.Constraint.create(params, null),
        null, 
-       new mlsub.typing.MonotypeConstructor(this.tc, params));
+       Monotype.sure(new mlsub.typing.MonotypeConstructor(this.tc, params)));
 
     TypeConstructors.addConstructor(tc, constructorMethod);
   }
@@ -303,9 +303,6 @@ public class NiceClass extends ClassDefinition
   {
     if(ct == null)
       ct = gnu.bytecode.Type.pointer_type;
-
-    if (ct.getDeclaredMethod("<init>", 0) != null)
-      System.out.println("" + ct.getDeclaredMethod("<init>", 0));
 
     return ct.addMethod
       ("<init>", Access.PUBLIC, gnu.bytecode.Type.typeArray0, 

@@ -492,6 +492,10 @@ public abstract class Engine
 	{
 	  Element e = (Element) i.next();
 	  
+	  // useful for nullness head on monotype vars
+	  if (e.getKind() != null)
+	    continue;
+
 	  if(dbg) Debug.println("Registering variable "+e);
 	  
 	  e.setKind(variablesConstraint);

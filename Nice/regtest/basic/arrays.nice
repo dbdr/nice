@@ -105,18 +105,18 @@ test_collection_arrays(a)
   p(ds);
 
   // idem with non primitive arrays
-  String[] ss = new String[5];
+  ?String[] ss = new String[5];
   ss[2] = "e2"; ss[4] = "e4";
   p(ss);
-  String[] ss2 = filter(ss, fun(String s)=>s!=null);
+  ?String[] ss2 = filter(ss, fun(?String s)=>s!=null);
   p(ss2);
-  p(map(ss2, fun(String s) => s+s));
+  p(map(ss2, fun(?String s)=>{ String str = notNull(s); return str + str; }));
 
   // using an array that is the field of an object
   Fields f = new Fields();
-  f.strings.iter(fun(String s)=>println(s));
+  notNull(f.strings).iter(fun(?String s)=>println(s));
 
-  Collection<String> c = ss;
+  Collection<?String> c = ss;
   println(c.size());
 
   // multidimentional arrays

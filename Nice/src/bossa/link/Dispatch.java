@@ -19,15 +19,14 @@ import bossa.syntax.*;
 import bossa.util.*;
 
 import mlsub.typing.*;
-
-import gnu.expr.*;
-import gnu.bytecode.Access;
-import gnu.bytecode.ClassType;
+import mlsub.typing.Polytype;
+import mlsub.typing.TupleType;
+import mlsub.typing.Monotype;
+import mlsub.typing.MonotypeConstructor;
 
 import java.util.*;
 
 import bossa.util.Debug;
-import gnu.expr.Expression;
 
 /**
    Static class performing the coverage and non-ambiguity test.
@@ -60,16 +59,7 @@ public final class Dispatch
     if (m.isMain() && !module.isRunnable())
       return;
     
-    List alternatives = Alternative.listOfAlternative(m);
-    
-    if(alternatives==null)
-      //User.error(m,"Method "+m+" has no alternative");
-      // It's not an error for a method to have no alternative
-      // if its domain is void.
-      // this will be checked later
-      alternatives = new LinkedList();
-    
-    Stack sortedAlternatives = sort(alternatives);
+    Stack sortedAlternatives = Alternative.sortedAlternatives(m);
     
     if(!(trivialTestOK(sortedAlternatives)))
       test(m, sortedAlternatives);
@@ -77,13 +67,13 @@ public final class Dispatch
     if(Debug.codeGeneration)
       Debug.println("Generating dispatch function for "+m);
     
-    compile(m, sortedAlternatives, module);
+    Compilation.compile(m, sortedAlternatives, module);
   }
 
   private static boolean trivialTestOK(Stack alternatives)
   {
     // return true iff
-    //   there is only one alternative which does not constrain its arguments
+    //   there is only one alternative and it does not constrain its arguments
     if(alternatives.size()!=1)
       return false;
     
@@ -92,67 +82,6 @@ public final class Dispatch
       if(a.patterns[i]!=null)
 	  return false;
     return true;
-  }
-
-  /**
-     Computes a topological sorting of the list of alternatives.
-     
-     Uses a postfix travsersal of the graph.
-     
-     pre: alternatives are marked unvisited.
-  */
-  private static Stack sort(final List alternatives)
-  {
-    Stack sortedAlternatives = new Stack();
-    
-    if (alternatives.size() == 0)
-      return sortedAlternatives;
-
-    // Test if another sort has been done before.
-    // In that case reset the marks.
-    // This can happen if several dependant packages are runnable
-    if (((Alternative) alternatives.get(0)).mark != Alternative.UNVISITED)
-      for(Iterator i = alternatives.iterator(); i.hasNext();)
-	((Alternative) i.next()).mark = Alternative.UNVISITED;
-	
-    for(Iterator i = alternatives.iterator(); i.hasNext();)
-      {
-	Alternative a = (Alternative) i.next();
-	if (a.mark == Alternative.UNVISITED)
-	  visit(a, alternatives, sortedAlternatives);
-      }
-
-    return sortedAlternatives;
-  }
-  
-  private final static void visit
-    (final Alternative a, 
-     final List alternatives,
-     final Stack sortedAlternatives
-     )
-  {
-    // Cycles are possible
-    //   * if two alternatives are identical (same patterns)
-    //   * if there is a cyclic subclass relation
-    //   * that's all, folks ! :-)
-    switch(a.mark)
-      {
-      case Alternative.VISITING : User.error("Cycle in alternatives: "+a);
-      case Alternative.UNVISITED: a.mark = Alternative.VISITING; break;
-      case Alternative.VISITED  : return; //should not happen
-      }
-    
-    for(Iterator i = alternatives.iterator();
-	i.hasNext();)
-      {
-	Alternative daughter = (Alternative) i.next();
-	if(daughter != a 
-	   && daughter.mark == Alternative.UNVISITED 
-	   && Alternative.leq(daughter,a))
-	  visit(daughter,alternatives,sortedAlternatives);
-      }
-    a.mark = Alternative.VISITED;
-    sortedAlternatives.push(a);
   }
 
   private static void test(NiceMethod method,
@@ -172,10 +101,7 @@ public final class Dispatch
 	User.warning(method + " is not in a proper state. Ignoring.");
 	return;
       }
-    
-    Domain domain = type.getDomain();
-    
-    List multitags = Typing.enumerate(domain);
+    List multitags = enumerate(type);
 
     int nb_errors = 0;
     for(Iterator i = multitags.iterator(); i.hasNext();)
@@ -244,69 +170,29 @@ public final class Dispatch
     return failed;
   }
 
-  /****************************************************************
-   * Compilation
-   ****************************************************************/
-
-  private static void compile(NiceMethod m, 
-			      Stack sortedAlternatives, 
-			      bossa.modules.Package module)
+  private static List enumerate(Polytype type)
   {
-    BlockExp block = new BlockExp(m.javaReturnType());
-    LambdaExp lexp = new LambdaExp(block);
-    
-    // parameters of the alternative function are the same in each case, 
-    // so we compute them just once
-    gnu.bytecode.Type[] types = m.javaArgTypes();
-    Expression[] params = new Expression[types.length];
-    lexp.min_args = lexp.max_args = types.length;
-    
-    for(int n = 0; n<types.length; n++)
-      {
-	Declaration param = lexp.addDeclaration("parameter_"+n, types[n]);
-	param.setParameter(true);
-	params[n] = new ReferenceExp(param);
+    Monotype[] domains = type.domain();
+    Monotype[] types = new Monotype[domains.length];
+
+    for (int i = 0; i < domains.length; i++)
+      { 
+	if (!(domains[i] instanceof MonotypeConstructor))
+	  // Unconstrained type variable
+	  {
+	    types[i] = domains[i];
+	    continue;
+	  }
+
+	MonotypeConstructor mc = (MonotypeConstructor) domains[i];
+	TypeConstructor tc = mc.getTC();
+	if (tc == ConstantExp.sureTC)
+	  types[i] = mc.getTP()[0];
+	else
+	  Internal.error("Not implemented: " + tc);
       }
 
-    block.setBody(dispatch(sortedAlternatives.iterator(),
-			   m.getType().codomain(),
-			   m.javaReturnType().isVoid(),
-			   block,
-			   params));
-
-    lexp.setPrimMethod(m.getDispatchPrimMethod());
-    
-    module.compileDispatchMethod(lexp);
-  }
-  
-  private static Expression dispatch(Iterator sortedAlternatives, 
-				     mlsub.typing.Monotype returnType, 
-				     boolean voidReturn,
-				     final BlockExp block, 
-				     Expression[] params)
-  {
-    if(!sortedAlternatives.hasNext())
-      if (voidReturn)
-	return new ThrowExp(new QuoteExp(new Error("Message not understood")));
-      else
-	return new BeginExp
-	  (new ThrowExp(new QuoteExp(new Error("Message not understood"))),
-	   nice.tools.code.Types.defaultValue(returnType));
-    
-    Alternative a = (Alternative) sortedAlternatives.next();
-    Expression matchTest = a.matchTest(params);
-
-    Expression matchCase = new ApplyExp(a.methodExp(), params);
-    if(!voidReturn)
-      matchCase = new ExitExp(matchCase, block);
-    
-    boolean optimize = false;
-
-    if(optimize && !sortedAlternatives.hasNext())
-      return matchCase;
-    else
-      return new gnu.expr.IfExp
-	(matchTest, matchCase, 
-	 dispatch(sortedAlternatives, returnType, voidReturn, block, params));
+    Domain domain = new Domain(type.getConstraint(), new TupleType(types));
+    return mlsub.typing.Enumeration.enumerate(domain);
   }
 }

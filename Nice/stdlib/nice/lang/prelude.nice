@@ -1,7 +1,7 @@
 /**************************************************************************/
-/*                           B O S S A                                    */
-/*        A simple imperative object-oriented research language           */
-/*                   (c)  Daniel Bonniot 1999                             */
+/*                                N I C E                                 */
+/*             A high-level object-oriented research language             */
+/*                        (c) Daniel Bonniot 2001                         */
 /*                                                                        */
 /*  This program is free software; you can redistribute it and/or modify  */
 /*  it under the terms of the GNU General Public License as published by  */
@@ -14,14 +14,34 @@
 // Created : Thu Dec 02 11:42:48 1999 by bonniot
 
 /**
-   Standard prelude file.
-   Should be imported automatically by any nice module.
-
+   This file is part of the nice.lang package, which is imported
+   automatically by any Nice package.
+   In addition, this prelude file is read before any other file
+   in the nice.lang package. Definitions that need to be read
+   early, like native types, should therefore be in this file.
+   It is best to reserve this file for such uses.
+   
    @version $Date$
    @author Daniel Bonniot
  */
 
 package nice.lang;
+
+/****************************************************************
+ * Nullness markers
+ ****************************************************************/
+
+class Maybe<+T> = native;
+final class Sure<+T> extends Maybe<T> = native;
+
+/** 
+    Throws java.lang.NullPointerException if the argument is <code>null</code>.
+
+    This call presently does no check, assuming that a dereferencing
+    is coming next and will detect nullness.
+    This should probably be fixed so that the semantics is well defined.
+*/
+<Any T> !T notNull(?T) = inline nice.lang.inline.Nop();
 
 /****************************************************************
  * Primitive types
@@ -46,6 +66,9 @@ double doubleValue(Number) = native double Number.doubleValue();
    Allows to consider any nice object as an instance of java.lang.Object
 */
 <Any T> Object object(T) = native Object Native.object(Object);
+
+/** Unsafe cast operator. UNSAFE! */
+<Any T, Any U> U cast(T) = inline nice.lang.inline.Nop();
 
 /****************************************************************
  * Basic functions
@@ -75,49 +98,6 @@ java.util.Properties<String,String> getProperties() =
  ****************************************************************/
 
 class Ref<T> { T value; }
-
-/****************************************************************
- * Pairs
- ****************************************************************/
-
-//  class Pair<+A,+B> { A first; B second; }
-
-//  <Any A, Any B> Pair<A,B> pair(A, B);
-//  pair<A,B>(a,b)
-//  {
-//    Pair<A,B> res = new Pair();
-//    res.first = a;
-//    res.second = b;
-//    return res;
-//  }
-
-/****************************************************************
- * Strings
- ****************************************************************/
-
-<Any T> String `+`(String,T);
-`+`(s@String,o) = concat(s,toString(o));
-
-/****************************************************************
- * Comparison operators
- ****************************************************************/
-
-/**
-   For a class to implement Comparable, 
-   it is sufficient to implement the `<` method,
-   since the others can be defined in terms of `<` and boolean negation.
-*/
-abstract interface Comparable
-{
-  boolean `<`(alike);
-  boolean `<=`(alike);
-  boolean `>`(alike);
-  boolean `>=`(alike);
-}
-
-`>`(x, y) = y < x;
-`<=`(x, y) = !(y < x);
-`>=`(x, y) = !(x < y);
 
 /****************************************************************
  * Main

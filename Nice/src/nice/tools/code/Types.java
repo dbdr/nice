@@ -66,17 +66,14 @@ public final class Types
   */
   public static void setBytecodeType(Monotype m)
   {
-    m = m.equivalent();
+    m = equivalent(m);
     
     if (m instanceof TupleType)
       setBytecodeType(((TupleType) m).getComponents());
-    
-    if (!(m instanceof MonotypeConstructor))
-      return;
 
-    MonotypeConstructor mc = (MonotypeConstructor) m;
-    
-    TypeConstructor tc = mc.getTC();
+    TypeConstructor tc = m.head();
+    if (tc == null)
+      return;
 
     TypeConstructor rigidTC;
     if (tc == ConstantExp.arrayTC)
@@ -97,7 +94,7 @@ public final class Types
     // Only for arrays, we are interested in the components too
     if (rigidTC == ConstantExp.arrayTC)
       {
-	Monotype param = mc.getTP()[0];
+	Monotype param = ((MonotypeConstructor) m).getTP()[0];
 
 	setBytecodeType(param);
 	if (tc != ConstantExp.arrayTC)
@@ -128,7 +125,11 @@ public final class Types
    */
   public static Type javaType(Monotype m)
   {
-    m = m.equivalent();
+    //boolean maybe = isMaybe(m);
+    m = equivalent(m);
+
+    // XXX Handle functional types
+    // XXX Map them into gnu.mapping.Procedure(or a subtype?) instead of Object
 
     if (m instanceof TupleType)
       // not SpecialArray
@@ -139,10 +140,21 @@ public final class Types
     
     MonotypeConstructor mc = (MonotypeConstructor) m;
     TypeConstructor tc = mc.getTC();
-    if(tc == ConstantExp.arrayTC)
+    /*if (tc == ConstantExp.sureTC)
+      return javaType(mc.getTP()[0]);
+    else if (tc == ConstantExp.maybeTC)
+      return javaType(mc.getTP()[0]));
+      else*/ if(tc == ConstantExp.arrayTC)
       return SpecialTypes.makeArray(javaType(mc.getTP()[0]));
     else
       return javaType(tc);
+
+    /*
+    if (maybe) 
+      return equivalentObjectType(res);
+    else
+      return res;
+    */
   }
   
   public static Type[] javaType(Monotype[] ms)
@@ -182,6 +194,27 @@ public final class Types
    * Used for automatic declaration of java methods.
    ****************************************************************/
   
+  public static Monotype monotype(Type javaType, boolean sure)
+    throws ParametricClassException, NotIntroducedClassException
+  {
+    Monotype res = getMonotype(javaType);
+    if (sure)
+      return bossa.syntax.Monotype.sure(res);
+    else
+      return bossa.syntax.Monotype.maybe(res);
+  }
+
+  public static Monotype monotype(Type javaType)
+    throws ParametricClassException, NotIntroducedClassException
+  {
+    Monotype res = getMonotype(javaType);
+    if (javaType instanceof ObjectType)
+      return bossa.syntax.Monotype.maybe(res);
+    else
+      // the sure is already there in getMonotype
+      return res;
+  }
+
   public static Monotype getMonotype(Type javaType)
     throws ParametricClassException, NotIntroducedClassException
   {
@@ -207,8 +240,7 @@ public final class Types
     if (javaType instanceof ArrayType)
       return new MonotypeConstructor
 	(ConstantExp.arrayTC, 
-	 new Monotype[]
-	  {getMonotype(((ArrayType) javaType).getComponentType())});
+	 new Monotype[]{monotype(((ArrayType) javaType).getComponentType())});
     
     return getMonotype(javaType.getName());
   }
@@ -455,28 +487,26 @@ public final class Types
 
   public static Expression defaultValue(Monotype m)
   {
-    m = m.equivalent();
+    if (!(m instanceof MonotypeConstructor))
+      return QuoteExp.nullExp;
     
-    TypeConstructor tc = null;
+    TypeConstructor tc = rawType(m).head();
 
-    if(m instanceof MonotypeConstructor)
-      tc = ((MonotypeConstructor) m).getTC();
-    
-    if (tc != null)
-      {
-	if(tc == ConstantExp.primInt ||
-	   tc == ConstantExp.primByte ||
-	   tc == ConstantExp.primShort ||
-	   tc == ConstantExp.primLong)
-	  return zeroInt;
-	if(tc == ConstantExp.primFloat ||
-	   tc == ConstantExp.primDouble)
-	  return zeroFloat;
-	if(tc == ConstantExp.primBool)
-	  return QuoteExp.falseExp;
-	if(tc == ConstantExp.primChar)
-	  return zeroChar;
-      }
+    if (tc == null)
+      return QuoteExp.nullExp;
+
+    if(tc == ConstantExp.primInt ||
+       tc == ConstantExp.primByte ||
+       tc == ConstantExp.primShort ||
+       tc == ConstantExp.primLong)
+      return zeroInt;
+    if(tc == ConstantExp.primFloat ||
+       tc == ConstantExp.primDouble)
+      return zeroFloat;
+    if(tc == ConstantExp.primBool)
+      return QuoteExp.falseExp;
+    if(tc == ConstantExp.primChar)
+      return zeroChar;
     
     return QuoteExp.nullExp;
   }
@@ -492,6 +522,54 @@ public final class Types
   public static boolean isVoid(mlsub.typing.Monotype m)
   {
     // The test to void should be more high-level than string comparison
-    return m.toString().equals("nice.lang.void");
+    String rep = m.toString();
+    return rep.equals("nice.lang.Sure<nice.lang.void>") 
+    || rep.endsWith("nice.lang.void");
+  }
+
+  public static boolean isVoid(mlsub.typing.Polytype t)
+  {
+    return isVoid(t.getMonotype());
+  }
+
+  public static boolean isPrimitive(TypeConstructor tc)
+  {
+    return javaType(tc) instanceof PrimType;
+  }
+
+  /****************************************************************
+   * Manipulations on nice types
+   ****************************************************************/
+
+  static Monotype equivalent(Monotype m)
+  {
+    return rawType(m).equivalent();
+  }
+
+  /** return the type with nullness markers removed */
+  public static Monotype rawType(Monotype m)
+  {
+    m = m.equivalent();
+    if (!(m instanceof MonotypeConstructor))
+      // It is probably a bug if this happens
+      return m;
+    else
+      return ((MonotypeConstructor) m).getTP()[0];
+  }
+
+  /** @return the codomain of a functional polytype with nullness marker */
+  public static Monotype codomain(Polytype type)
+  {
+    return ((FunType) rawType(type.getMonotype())).codomain();
+  }
+
+  /** 
+      Transforms \forall T:K.U into \forall T:K.sure<U>
+  */
+  public static Polytype addSure(Polytype type)
+  {
+    return new Polytype
+      (type.getConstraint(), 
+       bossa.syntax.Monotype.sure(type.getMonotype()));
   }
 }

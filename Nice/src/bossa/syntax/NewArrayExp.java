@@ -17,6 +17,8 @@ import java.util.*;
 
 import gnu.bytecode.*;
 
+import nice.tools.code.Types;
+
 import mlsub.typing.Monotype;
 import mlsub.typing.MonotypeConstructor;
 import mlsub.typing.MonotypeVar;
@@ -60,11 +62,15 @@ public class NewArrayExp extends Expression
     
 	tc = (TypeConstructor) ts;
 	monotype = new MonotypeConstructor(tc, MonotypeVar.news(tc.arity()));
+	if (Types.isPrimitive(tc))
+	  monotype = bossa.syntax.Monotype.sure(monotype);
+	else
+	  monotype = bossa.syntax.Monotype.maybe(monotype);	  
       }
     
     for (int i = 0; i<knownDimensions.length + unknownDimensions; i++)
-      monotype = new MonotypeConstructor
-	(ConstantExp.arrayTC, new Monotype[]{monotype});
+      monotype = bossa.syntax.Monotype.sure(new MonotypeConstructor
+	(ConstantExp.arrayTC, new Monotype[]{monotype}));
     
     // set the Expression type
     type = new Polytype(Constraint.True, monotype);
@@ -82,7 +88,7 @@ public class NewArrayExp extends Expression
 
   public gnu.expr.Expression compile()
   {
-    Type t = nice.tools.code.Types.javaType(type);
+    Type t = Types.javaType(type);
     
     return new gnu.expr.ApplyExp
       (new nice.tools.code.MultiArrayNewProc((ArrayType) t, 

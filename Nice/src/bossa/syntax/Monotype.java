@@ -75,12 +75,40 @@ implements Located
   /**************************************************************
    * Scoping
    **************************************************************/
-  
+
+  /** Set by the parser. */
+  public byte nullness;
+
+  public static final byte
+    none = 0,
+    maybe = 1,
+    sure = 2,
+    absent = 3;
+
   // public since it is called from bossa.dispatch
-  public abstract mlsub.typing.Monotype resolve(TypeMap tm);
+  public final mlsub.typing.Monotype resolve(TypeMap tm)
+  {
+    mlsub.typing.Monotype raw = rawResolve(tm);
+    
+    switch (nullness) 
+      {
+      case none:  return raw;
+      case maybe: return maybe(raw);
+      case sure:  return sure(raw);
+      case absent:
+	if (raw instanceof mlsub.typing.MonotypeVar)
+	  return raw;
+	else
+	  return sure(raw);
+      }
+    Internal.error("Bad nullness tag");
+    return null;
+  }
+
+  abstract mlsub.typing.Monotype rawResolve(TypeMap tm);
 
   /** iterates resolve() on the collection of Monotype */
-  static final mlsub.typing.Monotype[] resolve(TypeMap s, Collection c)
+  static final mlsub.typing.Monotype[] rawResolve(TypeMap s, Collection c)
   {
     if(c.size()==0)
       return null;
@@ -184,7 +212,7 @@ implements Located
 
     boolean containsAlike() { return false; }
     
-    public mlsub.typing.Monotype resolve(TypeMap s)
+    public mlsub.typing.Monotype rawResolve(TypeMap s)
     {
       return type;
     }
@@ -205,6 +233,22 @@ implements Located
     }
     
     private final mlsub.typing.Monotype type;
-  }  
+  }
+
+  /****************************************************************
+   * Nullness markers
+   ****************************************************************/
+
+  public static mlsub.typing.Monotype maybe(mlsub.typing.Monotype type)
+  {
+    return new mlsub.typing.MonotypeConstructor
+      (ConstantExp.maybeTC, new mlsub.typing.Monotype[]{type});
+  }
+
+  public static mlsub.typing.Monotype sure(mlsub.typing.Monotype type)
+  {
+    return new mlsub.typing.MonotypeConstructor
+      (ConstantExp.sureTC, new mlsub.typing.Monotype[]{type});
+  }
 }
 

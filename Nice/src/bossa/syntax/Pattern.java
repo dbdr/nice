@@ -141,16 +141,34 @@ public class Pattern
       {
 	Pattern p = patterns[i];
 	if (p.tc == null) continue;
-
-	Typing.leq(monotypes[i], p.tc);
-	if (p.exactlyAt)
-	  {
-	    Typing.leq(p.tc, monotypes[i]);
-	    MonotypeConstructor mc = (MonotypeConstructor) monotypes[i].equivalent();
-	    Typing.assertMinimal(mc.getTC());
-	  }
+	leq(monotypes[i], p.tc, p.exactlyAt);
       }
   }
+
+  /**
+     Asserts that m is below tag t.
+   */
+  private static void leq(Monotype m, TypeConstructor t, boolean exactlyAt)
+  throws TypingEx
+  {
+    m = m.equivalent();
+    if (!(m instanceof MonotypeConstructor))
+      Internal.error("Nullness check");
+    
+    MonotypeConstructor mc = (MonotypeConstructor) m;
+
+    // the argument is not null
+    Typing.leq(mc.getTC(), ConstantExp.sureTC);
+    Monotype type = mc.getTP()[0];
+    Typing.leq(type, t);
+    if (exactlyAt)
+      {
+	Typing.leq(t, type);
+	MonotypeConstructor inner = (MonotypeConstructor) type.equivalent();
+	Typing.assertMinimal(inner.getTC());
+      }
+  }
+  
 
   /**
    * Iterates getTypeConstructor on a collection of Pattern.
@@ -356,6 +374,7 @@ public class Pattern
   private boolean exactlyAt;
   private Expression atValue;
 
+  //XXX change to == NullExp.instance
   public boolean atNull() { return atValue instanceof NullExp; }
   public boolean atAny()  { return atValue == null && tc == null; }
 }

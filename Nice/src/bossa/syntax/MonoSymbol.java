@@ -12,9 +12,10 @@
 
 package bossa.syntax;
 
-import java.util.*;
-import bossa.util.*;
 import mlsub.typing.Polytype;
+import nice.tools.code.Types;
+
+import bossa.util.*;
 
 /**
    A variable symbol which has a monotype (eg a function parameter)
@@ -111,7 +112,7 @@ public class MonoSymbol extends VarSymbol
   */
   int match(Arguments arguments)
   {
-    mlsub.typing.lowlevel.Kind k = type.getKind();
+    mlsub.typing.lowlevel.Kind k = Types.rawType(type).getKind();
     if(k instanceof mlsub.typing.FunTypeKind)
       if (!arguments.plainApplication(((mlsub.typing.FunTypeKind) k).domainArity))
 	return 0;

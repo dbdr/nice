@@ -53,7 +53,15 @@ public final class Variance
     else
       return res;    
   }
-  
+
+  /**
+     @return the variance of the rankth element
+  */
+  public int getVariance(int rank)
+  {
+    return signs[rank];
+  }
+
   /** Compute a small integer that uniquely identifies a variance. */
   private static int encoding(int[] signs)
   {
@@ -285,6 +293,8 @@ public final class Variance
     if (monotypes == null) return;
     
     for (int i = 0; i<monotypes.length; i++)
+      // XXX incorrect: *variance
       monotypes[i].tag(signs[i]);
   }  
 }
+

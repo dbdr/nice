@@ -93,7 +93,16 @@ abstract public class Monotype implements mlsub.typing.lowlevel.Element
   public Monotype equivalent()
   {
     return this;
-  }  
+  }
+
+  /**
+     Return the head type constructor if this monotype is
+     of a known variance, or null.
+  */
+  public TypeConstructor head()
+  {
+    return null;
+  }
 
   /****************************************************************
    * Simplification

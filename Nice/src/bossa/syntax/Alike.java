@@ -32,7 +32,7 @@ public class Alike extends Monotype
 
   // Alike should be removed as soon as types are constructed.
 
-  public mlsub.typing.Monotype resolve(TypeMap ts)
+  mlsub.typing.Monotype rawResolve(TypeMap tm)
   {
     User.error(this, "\"alike\" can only be used in class method definitions");
     return null;
@@ -48,15 +48,17 @@ public class Alike extends Monotype
   
   Monotype substitute(Map map)
   {
-    Object res = map.get(id);
+    Object tc = map.get(id);
 
-    if (res == null)
+    if (tc == null)
       return this;
-    else
-      return new MonotypeConstructor
-	((mlsub.typing.TypeConstructor) res, 
-	 new TypeParameters(Monotype.substitute(map, parameters)), 
-	 location);
+
+    Monotype res = new MonotypeConstructor
+      ((mlsub.typing.TypeConstructor) tc, 
+       new TypeParameters(Monotype.substitute(map, parameters)), 
+       location);
+    res.nullness = this.nullness;
+    return res;
   }
 
   boolean containsAlike()

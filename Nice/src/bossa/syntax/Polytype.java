@@ -48,7 +48,7 @@ public class Polytype extends Node
     return res;
   }  
 
-  public Constraint getConstraint()
+  Constraint getConstraint()
   {
     return constraint;
   }
@@ -62,7 +62,7 @@ public class Polytype extends Node
     return res;
   }
   
-  public Monotype getMonotype()
+  Monotype getMonotype()
   {
     return monotype;
   }

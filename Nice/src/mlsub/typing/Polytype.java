@@ -127,7 +127,13 @@ public final class Polytype
 
   public static Polytype apply(Polytype funt, Polytype[] parameters)
   {
-    Monotype codom = funt.codomain();
+    return apply(funt.constraint, (FunType) funt.monotype, parameters);
+  }
+
+  public static Polytype apply(Constraint cst, FunType type, 
+			       Polytype[] parameters)
+  {
+    Monotype codom = type.codomain();
     /*
       Optimization:
       If we know codom is a constant,
@@ -136,8 +142,7 @@ public final class Polytype
     if(codom.isRigid())
       return new Polytype(Constraint.True, codom);
 
-    Constraint cst = funt.getConstraint();
-    Monotype[] dom = funt.domain();
+    Monotype[] dom = type.domain();
 
     cst = Constraint.and
       (Polytype.getConstraint(parameters),

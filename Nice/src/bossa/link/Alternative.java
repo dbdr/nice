@@ -221,6 +221,7 @@ public class Alternative
     List l = (List) alternatives.get(methodName);
     if (l == null)
       {
+	// XXX change to LinkedList
 	l = new ArrayList();
 	alternatives.put(methodName,l);
       }
@@ -229,8 +230,78 @@ public class Alternative
     l.add(this);
   }
   
-  static List listOfAlternative(NiceMethod m)
+  static Stack sortedAlternatives(NiceMethod m)
   {
-    return (List) alternatives.get(m.getFullName());
+    List list = (List) alternatives.get(m.getFullName());
+    
+    if (list == null)
+      // It's not an error for a method to have no alternative
+      // as long as its domain is empty.
+      // this will be checked later
+      return new Stack();
+    
+    return sort(list);
+  }
+
+  /****************************************************************
+   * Sorting alternatives by generality
+   ****************************************************************/
+
+  /**
+     Computes a topological sorting of the list of alternatives.
+     
+     Uses a postfix travsersal of the graph.
+  */
+  private static Stack sort(final List alternatives)
+  {
+    Stack sortedAlternatives = new Stack();
+    
+    if (alternatives.size() == 0)
+      return sortedAlternatives;
+
+    // Test if another sort has been done before.
+    // In that case reset the marks.
+    if (((Alternative) alternatives.get(0)).mark != Alternative.UNVISITED)
+      for(Iterator i = alternatives.iterator(); i.hasNext();)
+	((Alternative) i.next()).mark = Alternative.UNVISITED;
+	
+    for(Iterator i = alternatives.iterator(); i.hasNext();)
+      {
+	Alternative a = (Alternative) i.next();
+	if (a.mark == Alternative.UNVISITED)
+	  visit(a, alternatives, sortedAlternatives);
+      }
+
+    return sortedAlternatives;
+  }
+  
+  private final static void visit
+    (final Alternative a, 
+     final List alternatives,
+     final Stack sortedAlternatives
+     )
+  {
+    // Cycles are possible
+    //   * if two alternatives are identical (same patterns)
+    //   * if there is a cyclic subclass relation
+    //   * that's all, folks ! :-)
+    switch(a.mark)
+      {
+      case Alternative.VISITING : User.error("Cycle in alternatives: "+a);
+      case Alternative.UNVISITED: a.mark = Alternative.VISITING; break;
+      case Alternative.VISITED  : return; //should not happen
+      }
+    
+    for(Iterator i = alternatives.iterator();
+	i.hasNext();)
+      {
+	Alternative daughter = (Alternative) i.next();
+	if(daughter != a 
+	   && daughter.mark == Alternative.UNVISITED 
+	   && Alternative.leq(daughter,a))
+	  visit(daughter,alternatives,sortedAlternatives);
+      }
+    a.mark = Alternative.VISITED;
+    sortedAlternatives.push(a);
   }
 }

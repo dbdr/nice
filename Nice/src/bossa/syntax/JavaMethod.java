@@ -96,17 +96,18 @@ public class JavaMethod extends MethodDeclaration
       else
 	{
 	  params = new mlsub.typing.Monotype[paramTypes.length + 1];
-	  params[n++] = Types.getMonotype(m.getDeclaringClass());
+	  params[n++] = Types.monotype(m.getDeclaringClass(), true);
 	}
     
       for(int i = 0; i<paramTypes.length; i++)
-	params[n++] = Types.getMonotype(paramTypes[i]);
+	params[n++] = Types.monotype(paramTypes[i]);
     
       mlsub.typing.Monotype retType;
       if(constructor)
-	retType = Types.getMonotype(m.getDeclaringClass());
+	// the return type is surely not null
+	retType = Types.monotype(m.getDeclaringClass(), true);
       else
-	retType = Types.getMonotype(m.getReturnType());
+	retType = Types.monotype(m.getReturnType());
     
       res = new JavaMethod(null, m.getName(), null,
 			   new LocatedString(m.getName(),Location.nowhere()),
@@ -149,7 +150,7 @@ public class JavaMethod extends MethodDeclaration
     JavaMethod md = JavaMethod.make(m, false);
 
     if(md != null)
-      Node.getGlobalScope().addSymbol(md.symbol);
+      Node.getGlobalScope().addSymbol(md.getSymbol());
 
     return md;
   }
@@ -173,7 +174,7 @@ public class JavaMethod extends MethodDeclaration
   {
     MethodDeclaration md = JavaFieldAccess.make(f);
     if (Node.getGlobalScope() != null && md != null)
-      Node.getGlobalScope().addSymbol(md.symbol);
+      Node.getGlobalScope().addSymbol(md.getSymbol());
 
     return md;
   }
@@ -196,7 +197,7 @@ public class JavaMethod extends MethodDeclaration
 	  MethodDeclaration md = 
 	    JavaMethod.addFetchedMethod(method);
 	  if(md!=null)
-	    possibilities.add(md.symbol);
+	    possibilities.add(md.getSymbol());
 	  else
 	    Debug.println(method + " ignored");
 	}
@@ -207,7 +208,7 @@ public class JavaMethod extends MethodDeclaration
 	gnu.bytecode.Field field = 
 	  declaringClass.getField(funName);
 	if(field!=null)
-	  possibilities.add(JavaMethod.addFetchedMethod(field).symbol);
+	  possibilities.add(JavaMethod.addFetchedMethod(field).getSymbol());
       }
     return possibilities;
   }
@@ -327,7 +328,7 @@ public class JavaMethod extends MethodDeclaration
     
     if(javaTypes != null && javaArity != arity)
       User.error(this,
-		 "Native method " + this.symbol.name + 
+		 "Native method " + this.getSymbol().name + 
 		 " has not the same number of parameters " +
 		 "in Java (" + javaArity +
 		 ") and in Nice (" + arity + ")");

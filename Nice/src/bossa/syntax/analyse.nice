@@ -50,7 +50,7 @@ analyse(s@Statement, varScope, typeScope, mustReturnAValue)
 
   try{
     analyse(s, info);
-  
+    
     if (mustReturnAValue && !info.getUnreachable())
       bossa.util.User.error(s, "Missing return statement");
   }
@@ -281,7 +281,7 @@ analyse(e@FunExp, info)
 
   analyse(e.body, info);
   if (!info.getUnreachable() 
-      && !e.inferredReturnType().toString().equals("nice.lang.void"))
+      && !nice.tools.code.Types.isVoid(e.inferredReturnType()))
     bossa.util.User.error(e, "Missing return statement");
 
   info.end();
@@ -296,7 +296,7 @@ analyse(e@IdentExp, info)
       VarSymbol s = info.lookup(e.ident.toString());
       if (s != null)
 	if (!e.alwaysOverloadedSymbol)
-	  return new SymbolExp(s);
+	  return new SymbolExp(s, e.location());
 	else
 	  return new OverloadedSymbolExp(s, e.ident);
     }
@@ -385,7 +385,7 @@ analyse(c@ConstantExp, info)
     bossa.util.Internal.error("Base type " + c.className + " is not valid");
   
   c.type = new mlsub.typing.Polytype
-    (new mlsub.typing.MonotypeConstructor(tc, null));
+    (Monotype.sure(new mlsub.typing.MonotypeConstructor(tc, null)));
 
   return c;
 }

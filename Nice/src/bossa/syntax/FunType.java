@@ -43,17 +43,19 @@ public class FunType extends bossa.syntax.Monotype
    * Scoping
    ****************************************************************/
 
-  public Monotype resolve(TypeMap typeScope)
+  Monotype rawResolve(TypeMap typeMap)
   {
     return new mlsub.typing.FunType
-      (bossa.syntax.Monotype.resolve(typeScope, in),
-       out.resolve(typeScope));
+      (bossa.syntax.Monotype.resolve(typeMap, in),
+       out.resolve(typeMap));
   }
 
   bossa.syntax.Monotype substitute(Map map)
   {
-    return new bossa.syntax.FunType
+    bossa.syntax.Monotype res = new bossa.syntax.FunType
       (bossa.syntax.Monotype.substitute(map,in), out.substitute(map));
+    res.nullness = this.nullness;
+    return res;
   }
 
   boolean containsAlike()

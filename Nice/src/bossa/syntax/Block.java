@@ -12,8 +12,10 @@
 
 package bossa.syntax;
 
-import java.util.*;
+import nice.tools.code.Types;
+
 import bossa.util.*;
+import java.util.*;
 
 /**
    A block : a list of statements with local variables.
@@ -57,13 +59,12 @@ public class Block extends Statement
     gnu.expr.Expression compile(gnu.expr.LetExp let)
     {
       gnu.expr.Declaration decl = 
-	let.addDeclaration(left.name.toString(),
-			   nice.tools.code.Types.javaType(left.type));
+	let.addDeclaration(left.name.toString(), Types.javaType(left.type));
       decl.noteValue(null);
       left.setDeclaration(decl);
 
       if (value == null)
-	return nice.tools.code.Types.defaultValue(left.type);
+	return Types.defaultValue(left.type);
       else
 	return value.generateCode();
     }
@@ -74,6 +75,7 @@ public class Block extends Statement
     }
 
     MonoSymbol left;
+    public MonoSymbol getLeft() { return left; }
   }
 
   public static class LocalFunction extends LocalDeclaration
@@ -85,12 +87,10 @@ public class Block extends Statement
       Expression value;
       value = new FunExp(Constraint.True, parameters.getMonoSymbols(), body);
 
-      Monotype type = new FunType
-	(MonoSymbol.getSyntacticMonotype(parameters.getMonoSymbols()), 
-	 returnType);
       FunSymbol symbol = new FunSymbol(name, 
-				       new Polytype(Constraint.True, type), 
-				       parameters, parameters.size);
+				       Constraint.True, parameters, 
+				       returnType, parameters.size);
+      symbol.syntacticType.getMonotype().nullness = Monotype.sure;
       return new LocalFunction(symbol, value);
     }
 
@@ -99,7 +99,7 @@ public class Block extends Statement
       super(value);
       this.left = symbol;
     }
-    
+
     mlsub.typing.Polytype inferredReturnType()
     {
       return ((FunExp) value).inferredReturnType();
@@ -107,14 +107,14 @@ public class Block extends Statement
 
     mlsub.typing.Monotype declaredReturnType()
     {
-      return left.getType().codomain();
+      return Types.codomain(left.getType());
     }
 
     gnu.expr.Expression compile(gnu.expr.LetExp let)
     {
       gnu.expr.Declaration decl = 
 	let.addDeclaration(left.name.toString(),
-			   nice.tools.code.Types.javaType(left.type));
+			   Types.javaType(left.type));
       decl.noteValue(null);
       left.setDeclaration(decl);
 
@@ -127,6 +127,7 @@ public class Block extends Statement
     }
 
     FunSymbol left;
+    public FunSymbol getLeft() { return left; }
   }
 
   ArrayList /* of LocalDeclaration */ locals = new ArrayList();

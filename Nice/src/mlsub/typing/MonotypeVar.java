@@ -113,13 +113,14 @@ public final class MonotypeVar extends Monotype
       {
 	// Do the apropriate cast
 	equivalent = value.freshMonotype();
-	
-	if (equivalent instanceof MonotypeConstructor)
-	  {
-	    MonotypeConstructor mc = (MonotypeConstructor) equivalent;
 
+	// equivalent is null if the kind is that of unconstrained variables
+	if (equivalent != null)
+	  {
 	    // set the name for debug or display purposes
-	    mc.getTC().name = this.name + "'";
+	    TypeConstructor tc = equivalent.head();
+	    if (tc != null)
+	      tc.name = this + "'";
 	  }
       }
   }
@@ -130,9 +131,24 @@ public final class MonotypeVar extends Monotype
   // overrides Monotype.equivalent()
   public Monotype equivalent()
   {
-    return equivalent;
+    if (equivalent != null)
+      return equivalent;
+    else
+      return this;
   }
   
+  /**
+     Return the head type constructor if this monotype is
+     of a known variance, or null.
+  */
+  public TypeConstructor head()
+  {
+    if (equivalent != null)
+      return equivalent.head();
+    else
+      return null;
+  }
+
   /****************************************************************
    * Misc.
    ****************************************************************/

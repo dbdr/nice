@@ -62,19 +62,19 @@ public class MonotypeConstructor extends Monotype
    * Scoping
    ****************************************************************/
 
-  public mlsub.typing.Monotype resolve(TypeMap typeScope) 
+  mlsub.typing.Monotype rawResolve(TypeMap typeMap) 
   {
     if(lowlevelTC==null)
       {
-	TypeSymbol newTC = this.tc.resolveToTC(typeScope);
+	TypeSymbol newTC = this.tc.resolveToTC(typeMap);
 	if (!(newTC instanceof TypeConstructor))
 	  User.error(this.tc, this.tc+" should be a type constructor");
 	lowlevelTC = (TypeConstructor) newTC;
       }
     
     try{
-      return new mlsub.typing.MonotypeConstructor
-	(lowlevelTC, parameters.resolve(typeScope));
+      mlsub.typing.Monotype type = new mlsub.typing.MonotypeConstructor(lowlevelTC, parameters.resolve(typeMap));
+      return type;
     }
     catch(mlsub.typing.BadSizeEx e){
       int arity = e.expected;
@@ -94,10 +94,12 @@ public class MonotypeConstructor extends Monotype
     if (newTC==null)
       newTC = tc;
     
-    return new MonotypeConstructor
+    Monotype res = new MonotypeConstructor
       (newTC,
        new TypeParameters(Monotype.substitute(map, parameters.content)),
        loc);
+    res.nullness = this.nullness;
+    return res;
   }
 
   boolean containsAlike()

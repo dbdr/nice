@@ -50,22 +50,6 @@ abstract public class ClassDefinition extends Definition
 			 List implementations, List abstractions
 			 )
   {
-    this(name, isFinal, isAbstract, isInterface,
-	 typeParameters, typeParametersVariances,
-	 extensions, implementations, abstractions, false);
-  }
-
-
-  ClassDefinition(LocatedString name, 
-		  boolean isFinal, boolean isAbstract, 
-		  boolean isInterface,
-		  List typeParameters,
-		  List typeParametersVariances,
-		  List extensions, 
-		  List implementations, List abstractions,
-		  boolean isArray
-		  )
-  {
     super(name, Node.upper);
 
     if(isInterface)
@@ -95,9 +79,11 @@ abstract public class ClassDefinition extends Definition
     this.isInterface = isInterface;
     
     if(typeParameters==null)
+      // XXX optim
       this.typeParameters = new ArrayList(0);
     else
       this.typeParameters = typeParameters;
+    // XXX remove
     this.typeParametersVariances = typeParametersVariances;
     
     this.variance = makeVariance(typeParametersVariances);
@@ -106,17 +92,37 @@ abstract public class ClassDefinition extends Definition
     this.implementations = implementations;
     this.abstractions = abstractions;
 
-    createTC(isArray);
+    createTC();
   }
   
-  void createTC(boolean isArray)
+  void createTC()
   {
-    if (isArray)
+    String name = this.name.toString();
+    if (name.equals("nice.lang.Array"))
       tc = new mlsub.typing.TypeConstructor
 	(name.toString(), variance, isConcrete(), true)
 	{
 	  public String toString(mlsub.typing.Monotype[] parameters)
 	  { return parameters[0] + "[]"; }
+	};
+    else if (name.equals("nice.lang.Sure"))
+      tc = new mlsub.typing.TypeConstructor
+	(name.toString(), variance, isConcrete(), true)
+	{
+	  public String toString(mlsub.typing.Monotype[] parameters)
+	  { 
+	    if (parameters[0] instanceof MonotypeVar)
+	      return "!" + parameters[0].toString();
+	    else
+	      return "!" + parameters[0].toString(); 
+	  }
+	};
+    else if (name.equals("nice.lang.Maybe"))
+      tc = new mlsub.typing.TypeConstructor
+	(name.toString(), variance, isConcrete(), true)
+	{
+	  public String toString(mlsub.typing.Monotype[] parameters)
+	  { return "?" + parameters[0].toString(); }
 	};
     else
       tc = new mlsub.typing.TypeConstructor
@@ -296,13 +302,39 @@ abstract public class ClassDefinition extends Definition
        + (isInterface ? "interface " : 
 	  (isAbstract ? "abstract " : "") + "class ")
        + simpleName
-       + Util.map("<",", ",">",typeParameters)
+       + printTP()
        + Util.map(" extends ",", ","",superClass)
        + Util.map(" implements ",", ","",impl)
        + Util.map(" finally implements ",", ","",abs)
       );
   }
   
+  private String printTP()
+  {
+    if (typeParameters == null ||
+	typeParameters.size() == 0)
+      return "";
+
+    StringBuffer res = new StringBuffer("<");
+    int n = 0;
+    for (Iterator i = typeParameters.iterator(); i.hasNext();)
+      {
+	switch (variance.getVariance(n++)) 
+	  {
+	  case Variance.CONTRAVARIANT: 
+	    res.append("-");
+	    break;
+	  case Variance.COVARIANT: 
+	    res.append("+");
+	    break;
+	  }
+	res.append(i.next().toString());
+	if (i.hasNext())
+	  res.append(", ");
+      }
+    return res.append(">").toString();
+  }
+
   /****************************************************************
    * Class hierarchy
    ****************************************************************/
@@ -429,7 +461,9 @@ abstract public class ClassDefinition extends Definition
   
   mlsub.typing.TypeConstructor tc;
 
+  //MonotypeVar[] typeParameters;
   List /* of TypeSymbol */ typeParameters;
+  // XXX remove
   List /* of Boolean */ typeParametersVariances;
   protected List
     /* of TypeConstructor */ extensions,

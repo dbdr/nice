@@ -12,6 +12,8 @@
 
 package bossa.syntax;
 
+import nice.tools.code.Types;
+
 import bossa.util.*;
 
 import gnu.bytecode.*;
@@ -68,7 +70,7 @@ public class JavaFieldAccess extends FieldAccess
       if(!f.getStaticFlag())
 	{
 	  params = new mlsub.typing.Monotype[]
-	  { nice.tools.code.Types.getMonotype(f.getDeclaringClass()) };
+	  { Types.monotype(f.getDeclaringClass(), true) };
 	}
       else
 	params = null;
@@ -80,17 +82,20 @@ public class JavaFieldAccess extends FieldAccess
 	 new LocatedString(f.getName(),
 			   Location.nowhere()),
 	 null,
-	 nice.tools.code.Types.getMonotype(f.getType()), 
+	 Types.monotype(f.getType()), 
 	 params);
 
       res.field = f;
+
+      if (Debug.javaTypes)
+	Debug.println("Loaded field " + res);
       
       return res;
     }
-    catch(nice.tools.code.Types.ParametricClassException e){
+    catch(Types.ParametricClassException e){
       return null;
     }
-    catch(nice.tools.code.Types.NotIntroducedClassException e){
+    catch(Types.NotIntroducedClassException e){
       return null;
     }
   }
@@ -119,7 +124,7 @@ public class JavaFieldAccess extends FieldAccess
   {
     ClassType c = null;
     try { 
-      c = (ClassType) nice.tools.code.Types.type(javaClass.toString()); 
+      c = (ClassType) Types.type(javaClass.toString()); 
       if (c == null)
 	User.error(javaClass,"Class " + javaClass + " not found");
     }
@@ -168,7 +173,7 @@ public class JavaFieldAccess extends FieldAccess
   public String toString()
   {
     if (getType() == null)
-      return "JavaFieldAccess " + symbol.name;
+      return "JavaFieldAccess " + name;
     else
       return interfaceString();
   }

@@ -55,25 +55,16 @@ public class JavaClass extends ClassDefinition
   {
     super(name, isFinal, isAbstract, isInterface,
 	  typeParameters, typeParametersVariances,
-	  extensions, implementations, abstractions, 
-	  javaName == null && name.toString().equals("Array"));
+	  extensions, implementations, abstractions);
 
     this.javaName = javaName;
     if(javaName == null) // primitive type
       {
 	isPrimitive = true;
-
-	if(name.toString().equals("nice.lang.Array"))
-	  {
-	    ConstantExp.arrayTC = this.tc;
-	    setJavaType(nice.tools.code.SpecialArray.wrappedType());
-	  }
-	else
-	  {
-	    setJavaType(ConstantExp.registerPrimType(name.toString(), tc));
-	    if(getJavaType() == null)
-	      User.error(this, name+" is not a known primitive type");
-	  }
+	gnu.bytecode.Type t = ConstantExp.registerPrimType(name.toString(),tc);
+	if (t == null)
+	  User.error(this, name+" is not a known primitive type");
+	setJavaType(t);
       }
     else // wrapper for a java class
       {
@@ -82,9 +73,8 @@ public class JavaClass extends ClassDefinition
 	  (this.tc, javaName.toString());
 
 	if(old!=null)
-	  User.error(this, 
-		     javaName + " was already associated with nice class " + 
-		     old);
+	  User.error(this, javaName + 
+		     " was already associated with the Nice class " + old);
       }
   }
 

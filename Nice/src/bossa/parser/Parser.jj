@@ -497,7 +497,8 @@ TypeIdent typeIdent():
 }
 {
   name=doted_string()
-  { return new TypeIdent(name);
+  { 
+    return new TypeIdent(name);
   }
 }
 
@@ -712,8 +713,12 @@ Monotype monotype():
   Monotype res;
   List p=null;
   Token start, end;
+  boolean maybe = false, sure = false;
 }
 {
+
+  [ "?" { maybe = true; } | "!" { sure = true; } ]
+
   (
   res=funmonotype()
 |
@@ -731,7 +736,13 @@ Monotype monotype():
   res=typeIdent() 
   )
   
+  { 
+    res.nullness = maybe ? res.maybe : sure ? res.sure : res.absent;
+  }
+
 // T[] as a shortcut for Array<T>
+// ?T[] is equivalent to Array<?T>, 
+// so setting the nullness must be done as above
 (
   end="[]" 
   { 
@@ -742,10 +753,13 @@ Monotype monotype():
       (new TypeIdent(new LocatedString("Array", loc)),
        new TypeParameters(tp),
        loc);
+    res.nullness = res.absent;
   }			  
 )*
 
-  { return res; }
+  { 
+    return res; 
+  }
 }
 
 List monotypes():

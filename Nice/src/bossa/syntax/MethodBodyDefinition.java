@@ -106,10 +106,13 @@ public class MethodBodyDefinition extends Definition
 	  // anonymous pattern
 	  type = new MonotypeVar("anonymous argument " + tn);
 	else
+	  // XXX optimize using this:
+	  // type = new MonotypeVar("type(" + p.name + ")<" + types[tn]);
 	  {
 	    LocatedString typeName;
 	    typeName = p.name.cloneLS();
-	    typeName.prepend("type of ");	
+	    typeName.prepend("type(");	
+	    typeName.append(")<" + types[tn]);
 	    type = new MonotypeVar(typeName.toString());
 	  }
 
@@ -122,9 +125,9 @@ public class MethodBodyDefinition extends Definition
   {
     if (d == null)
       User.error(this, "Method " + name + " is not declared");
-
+    
     this.definition = d;
-    parameters = buildSymbols(this.formals, definition.symbol.type.domain());
+    parameters = buildSymbols(this.formals, definition.getArgTypes());
     scope.addSymbols(parameters);
   }
 
@@ -164,16 +167,17 @@ public class MethodBodyDefinition extends Definition
 	  
       try{
 	int level;
-	if(Debug.overloading)
-	  level = Typing.enter("Trying definition "+m+" for method body "+name);
+	if (Debug.overloading)
+	  level = Typing.enter("Trying definition " + m + 
+			       " for method body "+name);
 	else
 	  level = Typing.enter();
-	
+
 	try{
 	  mlsub.typing.Polytype t = m.getType();
-	  Constraint.assert(t.getConstraint());
-	  Typing.leq(tags, t.domain());
-	  Typing.leq(additionalTags, t.domain());
+	  assert(t.getConstraint());
+	  tagLeq(tags, t.domain());
+	  tagLeq(additionalTags, t.domain());
 	}
 	finally{
 	  if(Typing.leave() != level)
@@ -213,7 +217,40 @@ public class MethodBodyDefinition extends Definition
 	       methods);
     return null;
   }
-  
+
+  private void assert(Constraint c)
+  throws TypingEx
+  {
+    Constraint.assert(c);
+    if (Constraint.hasBinders(c))
+      {
+	TypeSymbol[] binders = c.binders();
+	for (int i = 0; i < binders.length; i++)
+	  if (binders[i] instanceof MonotypeVar)
+	    ((MonotypeVar) binders[i]).setKind(ConstantExp.maybeTC.variance);
+      }
+  }
+	    
+  private void tagLeq(TypeConstructor[] tags, Monotype[] types)
+  throws TypingEx
+  {
+    for (int i = 0; i<tags.length; i++)
+      {
+	if (!(types[i].equivalent() instanceof MonotypeConstructor))
+	  Internal.error("Nullness check in " + this +
+			 " " + i + ": " + types[i].equivalent()
+			 + types[i].getClass());
+
+	MonotypeConstructor type = (MonotypeConstructor) types[i].equivalent();
+
+//  	if (type.getTC() != ConstantExp.maybeTC && 
+//  	    type.getTC() != ConstantExp.sureTC)
+//  	  Internal.error("Nullness check in " + this + " : " + type.getTC());
+
+	Typing.leq(tags[i], type.getTP()[0]);
+      }
+  }
+
   void doResolve()
   {
     //Resolution of the body is delayed to enable overloading
@@ -297,74 +334,75 @@ public class MethodBodyDefinition extends Definition
       // usefull if previous code throws an exception
       entered = true;
 
-      try{
-	try { Constraint.assert(definition.getType().getConstraint()); }
-	catch(TypingEx e){
-	  User.error(name,
-		     "the constraint will never be satisfied",
-		     ": "+e.getMessage());
-	}
+      try { 
+	assert(definition.getType().getConstraint()); 
+      }
+      catch(TypingEx e){
+	User.error(name,
+		   "the constraint will never be satisfied",
+		   ": "+e.getMessage());
+      }
 	
-	// Introduce the types of the arguments
-	Monotype[] monotypes = MonoSymbol.getMonotype(parameters);
+      // Introduce the types of the arguments
+      Monotype[] monotypes = MonoSymbol.getMonotype(parameters);
+      try{
 	Typing.introduce(monotypes);
-
+	//for (int i = 0; i < monotypes.length; i++)
+	//monotypes[i].setKind(ConstantExp.maybeTC.variance);
+	
 	// The arguments have types below the method declaration domain
 	Monotype[] domain = definition.getType().domain();
 	for (int i = 0; i < monotypes.length; i++)
 	  Typing.leq(monotypes[i], domain[i]);
-	
-	// The arguments are specialized by the patterns
-	try{
-	  Pattern.in(monotypes, formals);
-
-	  nice.tools.code.Types.setBytecodeType(monotypes);
-
-	  Typing.implies();
-	}
-	catch(TypingEx e){
-	  User.error(name,"The patterns are not correct", e);
-	}
-      
-	// Introduction of binders for the types of the arguments
-	// as in f(x@C : X)
-	for(int n = 0; n < formals.length; n++)
-	  {
-	    Pattern pat = formals[n];
-	    Monotype type = pat.getType();
-	    if (type == null)
-	      continue;
-	    
-	    MonoSymbol sym = parameters[n];
-	  
-	    try{
-	      if(type instanceof MonotypeConstructor)
-		{
-		  TypeConstructor 
-		    tc = ((MonotypeConstructor) type).getTC(),
-		    formalTC = ((MonotypeConstructor) sym.getMonotype()).getTC();
-		  
-		  tc.setId(formalTC.getId());
-		}
-	      else
-		Internal.error("Not implemented ?");
-	      
-	      Typing.eq(type, sym.getMonotype());
-	    }
-	    catch(TypingEx e){
-	      User.error(pat.name, 
-			 "\":\" constraint for argument "+pat.name+
-			 " is not correct",
-			 ": "+e);
-	    }
-	  }
       }
       catch(mlsub.typing.BadSizeEx e){
 	Internal.error("Bad size in MethodBodyDefinition.typecheck()");
       }
       catch(TypingEx e) {
-	User.error(name,"Typing error in method body \""+name+"\":\n"+e);
+	User.error(name,"Type error in arguments of method body \""+name+"\":\n"+e);
       }
+      
+      // The arguments are specialized by the patterns
+      try{
+	Pattern.in(monotypes, formals);
+
+	nice.tools.code.Types.setBytecodeType(monotypes);
+
+	Typing.implies();
+      }
+      catch(TypingEx e){
+	User.error(name,"The patterns are not correct", e);
+      }
+      
+      // Introduction of binders for the types of the arguments
+      // as in f(x@C : X)
+      for(int n = 0; n < formals.length; n++)
+	{
+	  Pattern pat = formals[n];
+	  Monotype type = pat.getType();
+	  if (type == null)
+	    continue;
+	    
+	  MonoSymbol sym = parameters[n];
+	  
+	  try{
+	    TypeConstructor 
+	      tc = type.head(),
+	      formalTC = ((MonotypeConstructor) sym.getMonotype()).getTC();
+		  
+	    if (tc == null)
+	      Internal.error("Not implemented ?");
+
+	    tc.setId(formalTC.getId());
+	    Typing.eq(type, sym.getMonotype());
+	  }
+	  catch(TypingEx e){
+	    User.error(pat.name, 
+		       "\":\" constraint for argument "+pat.name+
+		       " is not correct",
+		       ": "+e);
+	  }
+	}
 
       Node.currentFunction = this;
       try{
@@ -382,7 +420,7 @@ public class MethodBodyDefinition extends Definition
 	  entered = false;
 	}
 	catch(TypingEx e){
-	  User.error(this, "Type error in method "+name, " :"+e);
+	  User.error(this, "Type error in method "+name, ": "+e);
 	}
     }
   }
@@ -498,3 +536,4 @@ public class MethodBodyDefinition extends Definition
   Collection /* of LocatedString */ binders; // Null if type parameters are not bound
   private Statement body;
 }
+

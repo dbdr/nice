@@ -19,7 +19,7 @@ package nice.lang;
    T[] is an equivalent notation for Array<T>
 */
 
-class Array<T>
+final class Array<T>
   implements Sequence
   finally implements Collection
   = native;

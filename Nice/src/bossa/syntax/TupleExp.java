@@ -58,10 +58,10 @@ public class TupleExp extends bossa.syntax.Expression
     Constraint cst = Constraint.and(Polytype.getConstraint(types), 
 				    null, null);
     TupleType tupleType = new TupleType(Polytype.getMonotype(types));
-    nice.tools.code.Types.setBytecodeType(tupleType);
+    nice.tools.code.Types.setBytecodeType(tupleType.getComponents());
     this.componentType = nice.tools.code.Types.componentType(tupleType);
     
-    type = new Polytype(cst, tupleType);
+    type = new Polytype(cst, Monotype.sure(tupleType));
   }
 
   private Type componentType;

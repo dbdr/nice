@@ -50,7 +50,7 @@ public final class TypeConstructors
 	l = new LinkedList();
 	constructors.put(tc, l);
       }
-    l.add(m.symbol);
+    l.add(m.getSymbol());
   }
 
   private static final HashMap constructors = new HashMap();

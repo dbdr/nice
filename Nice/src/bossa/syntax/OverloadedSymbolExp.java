@@ -127,7 +127,7 @@ public class OverloadedSymbolExp extends Expression
 
     // remembers removed symbols, 
     // to list possibilities if none matches
-    LinkedList removed = new LinkedList();    
+    LinkedList removed = new LinkedList();
 
     Polytype[] types = new Polytype[symbols.size()];
     VarSymbol[] syms = new VarSymbol[symbols.size()];
@@ -282,8 +282,8 @@ public class OverloadedSymbolExp extends Expression
 	//  checking all symbols with same name).
 	if (s1 != s2 && !remove[s2])
 	  try{
-	    Typing.leq(syms[s2].getClonedType().getDomain(), 
-		       syms[s1].getClonedType().getDomain());
+	    Typing.leq(domain(syms[s2].getClonedType()), 
+		       domain(syms[s1].getClonedType()));
 	    remove[s1] = true;
 	    break;
 	  }
@@ -299,7 +299,17 @@ public class OverloadedSymbolExp extends Expression
 	  symbols.remove(syms[i]);
 	}
   }
-  
+
+  private static Domain domain(Polytype t)
+  {
+    // remove nullness marker
+    // XXX optimize: no contruction of Polytype?
+    t = new Polytype(t.getConstraint(),
+		     ((mlsub.typing.MonotypeConstructor) t.getMonotype())
+		     .getTP()[0]);
+    return t.getDomain();
+  }
+
   void computeType()
   {
     Internal.error(this,ident+" has not been resolved yet.\n"+

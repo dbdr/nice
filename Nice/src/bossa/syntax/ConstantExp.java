@@ -35,9 +35,10 @@ public class ConstantExp extends Expression
   ConstantExp(TypeConstructor tc, Object value, String representation,
 	      Location location)
   {
+    // XXX pass a polytype instead
     this.type = new mlsub.typing.Polytype
       (mlsub.typing.Constraint.True, 
-       new MonotypeConstructor(tc,null));
+       Monotype.sure(new MonotypeConstructor(tc,null)));
     this.value = value;
     this.representation = representation;
     setLocation(location);
@@ -237,21 +238,21 @@ public class ConstantExp extends Expression
     if(name.equals("nice.lang.char"))
       {
 	primChar = tc;
-	charType = new MonotypeConstructor(tc, null);
+	charType = Monotype.sure(new MonotypeConstructor(tc, null));
 	return SpecialTypes.charType;
       }
     
     if(name.equals("nice.lang.byte"))
       {
 	primByte = tc;
-	byteType = new MonotypeConstructor(tc, null);
+	byteType = Monotype.sure(new MonotypeConstructor(tc, null));
 	return SpecialTypes.byteType;
       }
     
     if(name.equals("nice.lang.int"))
       {
 	primInt = tc;
-	intType = new MonotypeConstructor(tc, null);
+	intType = Monotype.sure(new MonotypeConstructor(tc, null));
 	intPolytype = new mlsub.typing.Polytype(intType);
 	return SpecialTypes.intType;
       }
@@ -259,7 +260,7 @@ public class ConstantExp extends Expression
     if(name.equals("nice.lang.long"))
       {
 	primLong = tc;
-	longType = new MonotypeConstructor(tc, null);
+	longType = Monotype.sure(new MonotypeConstructor(tc, null));
 	longPolytype = new mlsub.typing.Polytype(longType);
 	return SpecialTypes.longType;
       }
@@ -267,7 +268,7 @@ public class ConstantExp extends Expression
     if(name.equals("nice.lang.boolean"))
       {
 	primBool = tc;
-	boolType = new MonotypeConstructor(primBool, null);
+	boolType = Monotype.sure(new MonotypeConstructor(primBool, null));
 	boolPolytype = new mlsub.typing.Polytype(boolType);
 	return SpecialTypes.booleanType;
       }
@@ -275,31 +276,51 @@ public class ConstantExp extends Expression
     if(name.equals("nice.lang.short"))
       {
 	primShort = tc;
-	shortType = new MonotypeConstructor(tc, null);
+	shortType = Monotype.sure(new MonotypeConstructor(tc, null));
 	return SpecialTypes.shortType;
       }
     
     if(name.equals("nice.lang.double"))
       {
 	primDouble = tc;
-	doubleType = new MonotypeConstructor(tc, null);
+	doubleType = Monotype.sure(new MonotypeConstructor(tc, null));
 	return SpecialTypes.doubleType;
       }
     
     if(name.equals("nice.lang.float"))
       {
 	primFloat = tc;
-	floatType = new MonotypeConstructor(tc, null);
+	floatType = Monotype.sure(new MonotypeConstructor(tc, null));
 	return SpecialTypes.floatType;
       }
     
     if(name.equals("nice.lang.void"))
       {
-	voidType = new MonotypeConstructor(tc, null);
+	voidType = Monotype.sure(new MonotypeConstructor(tc, null));
 	voidPolytype = new mlsub.typing.Polytype
 	  (mlsub.typing.Constraint.True, voidType);
 	synVoidType = Monotype.create(voidType);
 	return SpecialTypes.voidType;
+      }
+    
+    if (name.equals("nice.lang.Array"))
+      {
+	arrayTC = tc;
+	return nice.tools.code.SpecialArray.wrappedType();
+      }
+
+    if (name.equals("nice.lang.Maybe"))
+      {
+	maybeTC = tc;
+	// to differ with the null result, which signals error
+	return gnu.bytecode.Type.pointer_type;
+      }
+    
+    if (name.equals("nice.lang.Sure"))
+      {
+	sureTC = tc;
+	// to differ with the null result, which signals error
+	return gnu.bytecode.Type.pointer_type;
       }
     
     return null;
@@ -308,6 +329,8 @@ public class ConstantExp extends Expression
   public static TypeConstructor primByte, primChar, primInt, primLong, primBool, primShort, primDouble, primFloat, arrayTC;
   public static mlsub.typing.Monotype byteType, charType, intType, longType, boolType, shortType, doubleType, floatType, voidType;
   static mlsub.typing.Polytype voidPolytype, boolPolytype, intPolytype, longPolytype;
+
+  public static TypeConstructor maybeTC, sureTC;
 
   // syntatic types
   public static Monotype synVoidType;
@@ -329,7 +352,7 @@ public class ConstantExp extends Expression
       {
 	throwableType = new mlsub.typing.Polytype
 	  (mlsub.typing.Constraint.True, 
-	   new MonotypeConstructor(throwableTC(), null));
+	   Monotype.sure(new MonotypeConstructor(throwableTC(), null)));
       }
     return throwableType;
   }

@@ -18,6 +18,7 @@ import mlsub.typing.TypeConstructor;
 import mlsub.typing.Interface;
 import mlsub.typing.MonotypeVar;
 import mlsub.typing.TypeSymbol;
+import nice.tools.code.Types;
 
 /**
    A syntactic type identifier.
@@ -69,24 +70,29 @@ public final class TypeIdent extends Monotype implements Located
     return res;
   }
   
-  public mlsub.typing.Monotype resolve(TypeMap scope)
+  mlsub.typing.Monotype rawResolve(TypeMap scope)
   {
     TypeSymbol res = resolveToTypeSymbol(scope);
     
     if (res instanceof MonotypeVar)
-      return (MonotypeVar) res;
+      {
+	MonotypeVar v = (MonotypeVar) res;
+	return v;
+      }
 
     if (res instanceof TypeConstructor)
       {
 	TypeConstructor tc = (TypeConstructor) res;
+	mlsub.typing.Monotype type = null;
 	try{
-	  return new mlsub.typing.MonotypeConstructor(tc, null);
+	  type = new mlsub.typing.MonotypeConstructor(tc, null);
 	}
 	catch(mlsub.typing.BadSizeEx e){
 	  User.error(this, name + " has " + 
 		     e.expected + 
 		     " type parameter" + (e.expected>1 ? "s" : ""));
 	}
+	return type;
       }
     
     Internal.error("Invalid type ident");
@@ -100,7 +106,7 @@ public final class TypeIdent extends Monotype implements Located
     if (res instanceof TypeConstructor)
       return (TypeConstructor) res;
     
-    User.error(this, this+" should be a class");
+    User.error(this, this + " is not a class");
     return null;
   }
   

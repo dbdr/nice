@@ -59,12 +59,17 @@ public class LiteralArrayExp extends Expression
     expectedType.simplify();
 
     Monotype m = expectedType.getMonotype();
+    // get rid of the nullness part
+    m = ((MonotypeConstructor) m).getTP()[0];
+
+    // Look for the element type
+
     if (!(m instanceof MonotypeConstructor))
       return this;
 
     MonotypeConstructor mc = (MonotypeConstructor) m;
     if (!(mc.getTC() == ConstantExp.arrayTC))
-      // there must be an error, but it shal be discovered elsewhere
+      // there must be an error, but it shall be discovered elsewhere
       return this;
     
     // Remember the required element type, to take it as ours if possible.
@@ -94,13 +99,15 @@ public class LiteralArrayExp extends Expression
 	  Typing.leq(elementType, expectedElementType);
 	  elementType = expectedElementType;
 	} catch(TypingEx ex) {
-	  // this is an error, but it shal be reported elsewhere
+	  // this is an error, but it shall be reported elsewhere
 	  // so keep the computed type
+	  System.out.println("Elts: " + elementType + expectedElementType);
 	}
       }
     this.type = new Polytype
-      (elementType.getConstraint(), new MonotypeConstructor
-	(ConstantExp.arrayTC, new Monotype[]{elementType.getMonotype()}));
+      (elementType.getConstraint(), 
+       bossa.syntax.Monotype.sure(new MonotypeConstructor
+	 (ConstantExp.arrayTC, new Monotype[]{elementType.getMonotype()})));
   }
   
   /****************************************************************

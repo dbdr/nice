@@ -1,0 +1,33 @@
+/**************************************************************************/
+/*                                N I C E                                 */
+/*             A high-level object-oriented research language             */
+/*                        (c) Daniel Bonniot 2001                         */
+/*                                                                        */
+/*  This program is free software; you can redistribute it and/or modify  */
+/*  it under the terms of the GNU General Public License as published by  */
+/*  the Free Software Foundation; either version 2 of the License, or     */
+/*  (at your option) any later version.                                   */
+/*                                                                        */
+/**************************************************************************/
+
+/****************************************************************
+ * Comparison operators
+ ****************************************************************/
+
+/**
+   For a class to implement Comparable, 
+   it is sufficient to implement the `<` method,
+   since the others can be defined in terms of `<` and boolean negation.
+*/
+abstract interface Comparable
+{
+  boolean `<`(alike);
+  boolean `<=`(alike);
+  boolean `>`(alike);
+  boolean `>=`(alike);
+}
+
+`>` (x, y) = y < x;
+`<=`(x, y) = !(y < x);
+`>=`(x, y) = !(x < y);
+

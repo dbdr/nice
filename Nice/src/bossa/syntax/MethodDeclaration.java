@@ -13,16 +13,21 @@
 package bossa.syntax;
 
 import bossa.util.*;
+import bossa.util.Location;
+import bossa.util.Debug;
+
 import mlsub.typing.*;
+import mlsub.typing.Polytype;
+import mlsub.typing.Monotype;
+import mlsub.typing.FunType;
+import mlsub.typing.Constraint;
+
 import nice.tools.code.Types;
 
 import gnu.bytecode.*;
 import gnu.expr.*;
 
 import java.util.*;
-
-import bossa.util.Location;
-import bossa.util.Debug;
 
 /**
    Declaration of a method.
@@ -45,8 +50,8 @@ abstract public class MethodDeclaration extends Definition
      @param parameters the formal parameters
    */
   public MethodDeclaration(LocatedString name, 
-			   Constraint constraint,
-			   Monotype returnType,
+			   bossa.syntax.Constraint constraint,
+			   bossa.syntax.Monotype returnType,
 			   FormalParameters parameters)
   {
     super(name, Node.down);
@@ -62,14 +67,13 @@ abstract public class MethodDeclaration extends Definition
 	// remember it to print the interface
 	syntacticConstraint = constraint.toString();
 	
-	List domain = parameters.types();
 	symbol = new MethodDeclaration.Symbol
-	  (name, new Polytype(constraint, 
-			      new FunType(domain, returnType)));
+	  (name, constraint, returnType);
+	
 	symbol.propagate = Node.global;
 	addChild(symbol);
 
-	this.arity = (domain == null ? 0 : domain.size());
+	this.arity = parameters.size;
       }
   }
 
@@ -82,16 +86,32 @@ abstract public class MethodDeclaration extends Definition
     super(name, Node.global);
   }
   
-  void setLowlevelTypes(mlsub.typing.Constraint cst,
-			mlsub.typing.Monotype[] parameters, 
-			mlsub.typing.Monotype returnType)
+  void setLowlevelTypes(Constraint cst,
+			Monotype[] parameters, 
+			Monotype returnType)
   {
     arity = (parameters == null ? 0 : parameters.length);
-    symbol = new MethodDeclaration.Symbol(name, null);
-    symbol.type = new mlsub.typing.Polytype
-      (cst, new mlsub.typing.FunType(parameters, returnType));
+    type = new Polytype(cst, new FunType(parameters, returnType));
+    symbol = new MethodDeclaration.Symbol(name, type);
   }
 
+  private Polytype type;
+
+  public final Polytype getType()
+  {
+    return type;
+  }
+  
+  public final Monotype[] getArgTypes()
+  {
+    return type.domain();
+  }
+  
+  public final Monotype getReturnType()
+  {
+    return type.codomain();
+  }
+  
   /****************************************************************
    * Initial Context
    ****************************************************************/
@@ -119,9 +139,9 @@ abstract public class MethodDeclaration extends Definition
 
     // see getType().checkWellFormedness
 
-    mlsub.typing.Polytype type = getType();
+    Polytype type = getType();
     
-    if (!mlsub.typing.Constraint.hasBinders(type.getConstraint()))
+    if (!Constraint.hasBinders(type.getConstraint()))
       {
 	parameters.typecheck(type.domain());
 	try{
@@ -149,6 +169,104 @@ abstract public class MethodDeclaration extends Definition
       User.error(this,
 		 "The type of method "+symbol.name+
 		 " is not well formed");
+    }
+  }
+
+  /****************************************************************
+   * Module interface
+   ****************************************************************/
+
+  private String syntacticConstraint;
+  
+  public abstract void printInterface(java.io.PrintWriter s);
+
+  /************************************************************
+   * Printing
+   ************************************************************/
+
+  public String toString()
+  {
+    if(getType() == null)
+      return "method " + getName();
+    
+    return
+      (syntacticConstraint != null ? syntacticConstraint
+       : Constraint.toString(getType().getConstraint()))
+      + String.valueOf(getReturnType())
+      + " "
+      + getName().toQuotedString()
+      + "("
+      // parameters can be null if type was set lowlevel (native code, ...)
+      + (getType().domain() != null ? 
+	 Util.map("",", ","", getType().domain()) : parameters.toString())
+      + ")"
+      ;
+  }
+  
+  protected int arity;
+  protected FormalParameters parameters;
+  
+  public int getArity()
+  {
+    return arity;
+  }
+  
+  public FormalParameters formalParameters()
+  {
+    return parameters;
+  }
+  
+  /** 
+   * true if this method represent the access to the field of an object.
+   */
+  public boolean isFieldAccess() { return false; }
+
+  /**
+     @return true if this method is the 'main' of the program
+  */
+  public final boolean isMain() 
+  {
+    return arity == 1 && "main".equals(name.content);
+  }
+  
+  private MethodDeclaration.Symbol symbol;
+  MethodDeclaration.Symbol getSymbol() { return symbol; }
+
+  class Symbol extends FunSymbol
+  {
+    Symbol(LocatedString name, bossa.syntax.Constraint constraint, 
+	   bossa.syntax.Monotype returnType)
+    {
+      super(name, constraint,
+	    MethodDeclaration.this.formalParameters(), 
+	    returnType,
+	    MethodDeclaration.this.arity);
+    }
+
+    Symbol(LocatedString name, Polytype type)
+    {
+      super(name, Types.addSure(type), 
+	    MethodDeclaration.this.formalParameters(), 
+	    MethodDeclaration.this.arity);
+    }
+
+    void resolve()
+    {
+      super.resolve();
+
+      // The method has a raw type, while the symbol needs a nullness marker
+      MethodDeclaration.this.type = this.type;
+      this.type = Types.addSure(this.type);
+    }
+
+    MethodDeclaration getDefinition()
+    {
+      return MethodDeclaration.this;
+    }
+    
+    public String toString()
+    {
+      return MethodDeclaration.this.toString();
     }
   }
 
@@ -193,98 +311,5 @@ abstract public class MethodDeclaration extends Definition
   
   public void compile()
   {
-  }
-
-  /****************************************************************
-   * Module interface
-   ****************************************************************/
-
-  private String syntacticConstraint;
-  
-  public abstract void printInterface(java.io.PrintWriter s);
-
-  /************************************************************
-   * Printing
-   ************************************************************/
-
-  public String toString()
-  {
-    if(symbol == null || getType() == null)
-      return "method " + getName();
-    
-    return
-      (syntacticConstraint != null ? syntacticConstraint
-       : mlsub.typing.Constraint.toString(getType().getConstraint()))
-      + String.valueOf(getReturnType())
-      + " "
-      + getName().toQuotedString()
-      + "("
-      // parameters can be null if type was set lowlevel (native code, ...)
-      + (parameters != null ? parameters.toString()
-	 : Util.map("",", ","",getType().domain()))
-      + ")"
-      ;
-  }
-  
-  protected int arity;
-  protected FormalParameters parameters;
-  
-  public int getArity()
-  {
-    return arity;
-  }
-  
-  public FormalParameters formalParameters()
-  {
-    return parameters;
-  }
-  
-  /** 
-   * true if this method represent the access to the field of an object.
-   */
-  public boolean isFieldAccess() { return false; }
-
-  /**
-     @return true if this method is the 'main' of the program
-  */
-  public final boolean isMain() 
-  {
-    return arity == 1 && "main".equals(name.content);
-  }
-  
-  public final mlsub.typing.Polytype getType()
-  {
-    return symbol.getType();
-  }
-  
-  public final mlsub.typing.Monotype[] getArgTypes()
-  {
-    return symbol.getType().domain();
-  }
-  
-  public final mlsub.typing.Monotype getReturnType()
-  {
-    return symbol.getType().codomain();
-  }
-  
-  MethodDeclaration.Symbol symbol;
-
-  class Symbol extends FunSymbol
-  {
-    Symbol(LocatedString name, Polytype type)
-    {
-      super(name, type, 
-	    MethodDeclaration.this.formalParameters(), MethodDeclaration.this.arity);
-    }
-
-    MethodDeclaration getDefinition()
-    {
-      return MethodDeclaration.this;
-    }
-    
-    public String toString()
-    {
-      return MethodDeclaration.this.toString();
-    }
   }
 }

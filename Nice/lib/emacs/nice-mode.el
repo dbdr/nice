@@ -441,6 +441,9 @@ Mode for editing/compiling Nice programs.
   (local-set-key [mouse-1] 'nice-link-activate)
   (local-set-key [down-mouse-3] 'nice-files-menu)
   (local-set-key [help] 'nice-next-error)
+; Declare that it makes sense to look for spurious whitespaces in Nice buffers
+  (if (boundp 'whitespace-modes) 
+      (setq whitespace-modes (cons 'nice-mode whitespace-modes)))
   (make-local-variable 'font-lock-defaults)
   (setq font-lock-defaults
         '(nice-mode-keywords))

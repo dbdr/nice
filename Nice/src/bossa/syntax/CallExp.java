@@ -22,6 +22,7 @@ import mlsub.typing.*;
 import mlsub.typing.Polytype;
 import mlsub.typing.Monotype;
 import mlsub.typing.FunType;
+import mlsub.typing.TupleType;
 import mlsub.typing.MonotypeConstructor;
 import mlsub.typing.Constraint;
 import mlsub.typing.MonotypeLeqCst;
@@ -265,12 +266,12 @@ public class CallExp extends Expression
 	   It is useful to constrain the arguments to have the expected 
 	   bytecode types.
 	*/
-	instanciatedType = new Polytype
-	  (type.getConstraint(), new FunType(argTypes, type.getMonotype()));
-	instanciatedType = instanciatedType.cloneType();
-	// By default, a polytype is suppose to be simplified.
-	instanciatedType.setNotSimplified();
-	instanciatedType.simplify();
+	instanciatedDomain = new Polytype
+	  (type.getConstraint(), new TupleType(argTypes));
+	instanciatedDomain = instanciatedDomain.cloneType();
+	// By default, a polytype is supposed to be simplified.
+	instanciatedDomain.setNotSimplified();
+	instanciatedDomain.simplify();
       }
 
     if (! type.trySimplify())
@@ -283,7 +284,7 @@ public class CallExp extends Expression
   Monotype[] argTypes;
 
   /** The type of the function, constrained by the actual arguments. */
-  private Polytype instanciatedType;
+  private Polytype instanciatedDomain;
 
   boolean isAssignable()
   {
@@ -325,8 +326,8 @@ public class CallExp extends Expression
     // Make sure the arguments have the expected bytecode type,
     // matching the instantiated type of the (polymorphic) function.
     Monotype[] domain = null;
-    if (instanciatedType != null)
-      domain = Types.domain(instanciatedType);
+    if (instanciatedDomain != null)
+      domain = ((TupleType) instanciatedDomain.getMonotype()).getComponents();
     if (domain != null)
       for (int i = 0; i < params.length; i++)
 	params[i] = EnsureTypeProc.ensure

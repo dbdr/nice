@@ -14,7 +14,6 @@ import bossa.modules.*;
 void main(String[] args)
 {
   String mainPackage;
-  ?String classpath = null;
   File outdir = new File(".");
 
   ConsoleOutput consOutput = new ConsoleOutput();

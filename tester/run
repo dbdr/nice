@@ -27,6 +27,11 @@ if [ -r setup ]; then
     . setup
 fi
 
+if [ "$GCC_HOME" -a ! "$GCJ" ]; then
+  export GCJ=$GCC_HOME/bin/gcj
+  [ -x $GCJ ] || export GCJ=
+fi
+
 if ! ls config.* >/dev/null 2>&1; then
     echo "You must create at least one config.* file."
     exit 1
@@ -101,7 +106,7 @@ for conffile in ../config.*; do
 		1) echo "FAILURE"    ; failed=true ;;
 		2) echo "SKIP"       ;;
 		3) echo "IMPOSSIBLE" ;;
-		*) echo "OTHER"      ;;
+		*) echo "$((code-10))"      ;;
 	    esac
 	} >> $config.res
     done
@@ -112,6 +117,9 @@ done
 
 echo "Admin: $user@users.sourceforge.net" > $machine.id
 echo "System: $system"  >> $machine.id
+if [ "$GCJ" ]; then
+  "$GCJ" --version | head -1 >> $machine.id
+fi
 
 # Send the results to the Test Central
 results_dir=/home/groups/n/ni/nice/test-central/results

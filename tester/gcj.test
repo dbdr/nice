@@ -1,0 +1,19 @@
+#! /bin/sh
+
+[ "$GCJ" ] || exit 2
+
+cd Nice
+
+/usr/bin/time -o TIME java -Xms64M -classpath "classes" nice.tools.testsuite.TestNice -gcc "$GCC_HOME" testsuite > OUT
+RES=$?
+
+# print for the log
+cat OUT
+
+NUM_PREFIX="  regressions: "
+NUM=`tail -10 OUT | grep "$NUM_PREFIX"`
+NUM=`expr match "$NUM" "$NUM_PREFIX"'\(.*\)'`
+
+# Number of errors is encoded as 10+number (since smaller numbers have
+# other meanings)
+exit $((10+NUM))

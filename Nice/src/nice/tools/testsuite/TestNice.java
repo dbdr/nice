@@ -192,6 +192,15 @@ public class TestNice {
 		
 		//	close writer
 		_output.close();
+
+
+		if (getTestCasesFailed() > 0)
+			System.exit(1);
+
+		if (getTestCasesWarning() > 0)
+			System.exit(2);
+
+		System.exit(0);
 	}
 
 

@@ -123,7 +123,7 @@ public final class MonotypeConstructor extends Monotype
     if (tc.variance == value)
       return;
     else
-      throw new Error("SetKind in " + this); 
+      throw new Error("SetKind in " + this +": " + value + " != " + tc.variance);
   }
   
   public boolean equals(Object o)

@@ -42,8 +42,8 @@ public class Assert extends ProcedureN implements Inlineable
   
   private boolean assertEnableCheck;
 
-  private static Assert instance = new Assert(true);
-  private static Assert contractInstance = new Assert(false);
+  private static final Assert instance = new Assert(true);
+  private static final Assert contractInstance = new Assert(false);
 
   public void compile (ApplyExp exp, Compilation comp, Target target)
   {
@@ -77,10 +77,10 @@ public class Assert extends ProcedureN implements Inlineable
     end.define(code);
   }
 
-  private static ClassType 
+  private static final ClassType 
     errorClass = ClassType.make("nice.lang.AssertionFailed");
 
-  private static Method 
+  private static final Method 
     errorInit = errorClass.getDeclaredMethod("<init>", new Type[]{}),
     errorInitString = errorClass.getDeclaredMethod
       ("<init>", new Type[]{Type.string_type});

@@ -170,6 +170,25 @@ void resolveCCThis(Statement stmt, Located thisLoc, NiceClass classe)
   call.function.setLocation(ident.location());
 }
 
+/**
+   A mapping from type names to type symbols.
+
+*/
+public class TypeMaper implements TypeMap
+{
+  nice.tools.ast.SymbolTable<mlsub.typing.TypeSymbol> inner;
+  TypeScope global;
+  
+  lookup(LocatedString name) = this.lookup(name.toString(), name.location());
+
+  lookup(String name) = this.lookup(name, null);
+
+  public ?mlsub.typing.TypeSymbol lookup(String name, ?bossa.util.Location loc)
+  {
+    return inner.get(name) || global.lookup(name, loc);
+  }
+}
+
 // For bootstrap
 void _printStackTraceWithSourceInfo(Throwable t) =
   printStackTraceWithSourceInfo(t);
@@ -263,6 +282,8 @@ List<FormalParameters.Parameter> asList(FormalParameters) = native List FormalPa
 boolean containsAlike(Monotype[]) = native boolean Monotype.containsAlike(Monotype[]);
 bossa.syntax.Monotype[] substitute(Map<TypeIdent,bossa.syntax.Monotype>,bossa.syntax.Monotype[]) = native bossa.syntax.Monotype[] bossa.syntax.Monotype.substitute(Map,bossa.syntax.Monotype[]);
 Monotype[?] types(FormalParameters) = native Monotype[] FormalParameters.types();
+?mlsub.typing.TypeSymbol lookup(TypeMap, LocatedString) = native mlsub.typing.TypeSymbol TypeMap.lookup(LocatedString);
+?mlsub.typing.TypeSymbol lookup(TypeMap, String) = native mlsub.typing.TypeSymbol TypeMap.lookup(String);
 
 // Retypings needed since java types are not strict.
 mlsub.typing.Polytype boolPolytype() = native nice.tools.typing.PrimitiveType.boolPolytype;

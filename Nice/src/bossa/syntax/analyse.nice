@@ -24,9 +24,6 @@ import mlsub.typing.*;
 Statement analyse(Statement, VarScope, TypeScope, boolean mustReturnAValue);
 Expression analyse(Expression, VarScope, TypeScope);
 
-TypeMaper typeMaper(SymbolTable<TypeSymbol>,TypeScope) = 
-  native new TypeMaper(SymbolTable, TypeScope);
-
 // Implementation
 
 Info buildInfo(VarScope varScope, TypeScope typeScope);
@@ -35,7 +32,7 @@ buildInfo(varScope, typeScope)
   let SymbolTable<TypeSymbol> t = new SymbolTable();
   return new Info(vars: new SymbolTable(), typeVars: t,
 		  outerVarScope: varScope, outerTypeScope: typeScope,
-		  typeMap: typeMaper(t, typeScope));
+		  typeMap: new TypeMaper(inner: t, global: typeScope));
 }
 
 analyse(Statement s, varScope, typeScope, mustReturnAValue)

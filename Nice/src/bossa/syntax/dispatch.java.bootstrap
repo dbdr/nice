@@ -11,16 +11,16 @@ package bossa.syntax;
 
 public class dispatch
 {
-  static Statement  analyse$0(Statement  s, VarScope v, TypeScope t, boolean r)
+  static Statement  analyse(Statement  s, VarScope v, TypeScope t, boolean r)
   { return null; }
   
-  static Expression analyse$1(Expression e, VarScope v, TypeScope t) 
+  static Expression analyse(Expression e, VarScope v, TypeScope t) 
   { return null; }
 
-  static void typecheck$0(Statement s) {}
-  static void typecheck$1(Expression e) {}
+  static void typecheck(Statement s) {}
+  static void typecheck(Expression e) {}
 
-  static bossa.util.UserError unknownIdent$0(LocatedString ident)
+  static bossa.util.UserError unknownIdent(LocatedString ident)
   {
     return null;
   }

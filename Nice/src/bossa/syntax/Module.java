@@ -25,8 +25,6 @@ public interface Module extends mlsub.compilation.Module
 {
   String[] listImplicitPackages();
 
-  String mangleName(String name);
-
   /****************************************************************
    * Code generation
    ****************************************************************/
@@ -34,7 +32,7 @@ public interface Module extends mlsub.compilation.Module
   gnu.bytecode.ClassType createClass(String name);
   gnu.expr.Declaration addGlobalVar(String name, gnu.bytecode.Type type);
   gnu.expr.Expression getDispatchMethod(NiceMethod def);
-  gnu.expr.Expression lookupPackageMethod(String methodName);
-  void addMethod(gnu.expr.LambdaExp method, boolean packageMethod);
+  gnu.expr.Expression lookupPackageMethod(String methodName, String type);
+  gnu.expr.ReferenceExp addMethod(gnu.expr.LambdaExp method, boolean packageMethod);
   void addImplementationClass(gnu.bytecode.ClassType classe);
 }

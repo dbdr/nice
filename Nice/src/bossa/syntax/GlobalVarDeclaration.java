@@ -64,7 +64,7 @@ public class GlobalVarDeclaration extends Definition
   void resolve()
   {
     if (value != null)
-      value = bossa.syntax.dispatch.analyse$1(value, scope, typeScope);
+      value = bossa.syntax.dispatch.analyse(value, scope, typeScope);
   }
   
   /****************************************************************
@@ -84,7 +84,7 @@ public class GlobalVarDeclaration extends Definition
     if(value==null) return;
     try{
       value.resolveOverloading(left.getType());
-      bossa.syntax.dispatch.typecheck$1(value);
+      bossa.syntax.dispatch.typecheck(value);
       Typing.leq(value.getType(),left.getType());
     }
     catch(TypingEx e){

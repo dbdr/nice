@@ -660,39 +660,38 @@ public class Package implements mlsub.compilation.Module, Located, bossa.syntax.
      @return an expression to call this method 
      if the package has not been recompiled.
   */
-  public gnu.expr.Expression lookupPackageMethod(String methodName)
+  public gnu.expr.Expression lookupPackageMethod(String methodName, String type)
   {
-    if (source.getBytecode() == null) 
+    Method res = lookupClassMethod(source.getBytecode(), methodName,
+				   "type", type);
+    if (res == null) 
       return null;
 
-    methodName = nice.tools.code.Strings.escape(methodName);
-    
-    for (Method m = source.getBytecode().getDeclaredMethods();
-	 m != null; m = m.getNext())
-      if (m.getName().equals(methodName))
-	return new gnu.expr.QuoteExp(new gnu.expr.PrimProcedure(m));
-
-    return null;
+    return new gnu.expr.QuoteExp(new gnu.expr.PrimProcedure(res));
   }
   
   /**
      @return the bytecode method with this (unique) name
      if the package has not been recompiled.
   */
-  private Method lookupDispatchMethod(String methodName)
+  private Method lookupClassMethod(ClassType clas, String name,
+				   String attribute, String value)
   {
-    if (source.getDispatch() == null) 
+    if (clas == null) 
       return null;
 
-    methodName = nice.tools.code.Strings.escape(methodName);
+    name = nice.tools.code.Strings.escape(name);
     
-    for (Method m = source.getDispatch().getDeclaredMethods();
-	 m != null; m = m.getNext())
-      if (m.getName().equals(methodName))
+    for (Method m = clas.getDeclaredMethods(); m != null; m = m.getNext())
+      if (m.getName().equals(name)
+	  // in rare cases, the method name might have been made unique
+	  // in the bytecode by appending "$..."
+	  || m.getName().startsWith(name) 
+	  && m.getName().charAt(name.length()) == '$')
 	{
-	  // The dispatch code will have to be regenerated anyway
-	  m.eraseCode();
-	  return m;
+	  MiscAttr attr = (MiscAttr) Attribute.get(m, attribute);
+	  if (attr != null && new String(attr.data).equals(value))
+	    return m;
 	}
 
     return null;
@@ -700,8 +699,10 @@ public class Package implements mlsub.compilation.Module, Located, bossa.syntax.
   
   public gnu.expr.Expression getDispatchMethod(NiceMethod def)
   {
-    String bytecodeName = def.getBytecodeName();
+    String name = def.getName().toString();
     LambdaExp res;
+    Type[] argTypes;
+    Type retType;
 
     /*
       If this package is not recompiled,
@@ -712,59 +713,51 @@ public class Package implements mlsub.compilation.Module, Located, bossa.syntax.
         This would not be the case if we recomputed it,
 	as the precise types are found during typechecking.
     */
-    Method meth = lookupDispatchMethod(bytecodeName);
-    if (meth != null)
-      res = nice.tools.code.Gen.createMethod
-	(bytecodeName,
-	 meth.arg_types,
-	 meth.return_type,
-	 def.formalParameters().getMonoSymbols());
-    else
-      res = nice.tools.code.Gen.createMethod
-	(bytecodeName, 
-	 def.javaArgTypes(),
-	 def.javaReturnType(),
-	 def.formalParameters().getMonoSymbols());
+    Method meth = lookupClassMethod(source.getDispatch(), name, 
+				    "id", def.getFullName());
+    if (meth != null) // Reuse existing dispatch method header
+      {
+	// The dispatch code will have to be regenerated anyway
+	meth.eraseCode();
+	
+	argTypes = meth.arg_types;
+	retType  = meth.return_type;
+      }
+    else // Get type information from the nice declaration
+      {
+	argTypes = def.javaArgTypes();
+	retType  = def.javaReturnType();
+      }
+    res = nice.tools.code.Gen.createMethod
+      (name, argTypes, retType, def.formalParameters().getMonoSymbols());
 
-    ReferenceExp ref = nice.tools.code.Gen.referenceTo(res);
-    addMethod(res, false);
-    return ref;
+    // add unique information to disambiguate which method this represents
+    res.addBytecodeAttribute
+      (new MiscAttr("id", def.getFullName().getBytes()));
+
+    return addMethod(res, false);
   }
 
-  public void addMethod(LambdaExp method, boolean packageMethod)
+  /** Add a method to this package and return an expression to refer it. */
+  public ReferenceExp addMethod(LambdaExp method, boolean packageMethod)
   {
+    ReferenceExp res = nice.tools.code.Gen.referenceTo(method);
+
     ClassExp classe = packageMethod ? implementationClass : dispatchClass;
     method.nextSibling = classe.firstChild;
     classe.firstChild = method;
     method.outer = classe;
 
+    // method.nameDecl should be set by Gen.referenceTo
     if (method.nameDecl != null && method.nameDecl.context == null)
       method.nameDecl.context = classe;
+
+    return res;
   }
 
   public String bytecodeName()
   {
     return name.toString();
-  }
-  
-  /****************************************************************
-   * Mangling
-   ****************************************************************/
-
-  private HashMap takenNames = new HashMap();
-  
-  public String mangleName(String str)
-  {
-    int i = 0;
-    String res;
-    do 
-      {
-	res = str + "$" + (i++);
-      }
-    while(takenNames.containsKey(res));
-
-    takenNames.put(res,null);
-    return res;
   }
   
   /****************************************************************

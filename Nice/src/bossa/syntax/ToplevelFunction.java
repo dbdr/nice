@@ -15,6 +15,7 @@ package bossa.syntax;
 import bossa.util.*;
 import mlsub.typing.*;
 import nice.tools.code.Types;
+import nice.tools.code.Gen;
 
 import gnu.bytecode.*;
 import gnu.expr.*;
@@ -59,7 +60,6 @@ implements Function
   private Statement body;
   private MonoSymbol[] symbols;
   private boolean voidReturn ;
-  private String bytecodeName;
 
   void resolve()
   {
@@ -75,10 +75,7 @@ implements Function
       }
     
     if(body != null)
-      body = dispatch.analyse$0(body, scope, typeScope, !voidReturn);
-
-    // this must be done in a deterministic way
-    bytecodeName = module.mangleName(name.toString());
+      body = dispatch.analyse(body, scope, typeScope, !voidReturn);
   }
 
   private void buildParameterSymbols()
@@ -109,7 +106,7 @@ implements Function
     Typing.implies();
 
     Node.currentFunction = this;
-    try{ bossa.syntax.dispatch.typecheck$0(body); }
+    try{ bossa.syntax.dispatch.typecheck(body); }
     finally{ Node.currentFunction = null; }
 
     // set bytecode types for type variables
@@ -127,8 +124,14 @@ implements Function
   {
     if (body == null)
       {
+	// An alternative design would be to leave toplevel functions 
+	// out of .nicei files, and use the type information in the bytecode
+	// attributes (optim: use java type if monomorphic).
+	// Then there would be no need to bother linking declaration and code.
+
 	// Just get the handle to the already compiled function.
-	gnu.expr.Expression res = module.lookupPackageMethod(bytecodeName);
+	gnu.expr.Expression res = module.lookupPackageMethod
+	  (name.toString(), getType().toString());
 
 	if (res != null)
 	  return res;
@@ -137,12 +140,12 @@ implements Function
 		       " was not found in compiled package " + module);
       }
 
-    LambdaExp code = nice.tools.code.Gen.createMethod
-      (bytecodeName, 
-       javaArgTypes(), javaReturnType(), symbols);
-    gnu.expr.ReferenceExp ref = nice.tools.code.Gen.referenceTo(code);
-    module.addMethod(code, true);
-    return ref;
+    LambdaExp code = Gen.createMethod
+      (name.toString(), javaArgTypes(), javaReturnType(), symbols);
+    code.addBytecodeAttribute
+      (new MiscAttr("type", getType().toString().getBytes()));
+
+    return module.addMethod(code, true);
   }
   
   public void compile()
@@ -150,10 +153,9 @@ implements Function
     if (body == null)
       return;
 
-    LambdaExp lexp = nice.tools.code.Gen.dereference(getCode());
+    LambdaExp lexp = Gen.dereference(getCode());
 
-    Statement.currentScopeExp = lexp;
-    nice.tools.code.Gen.setMethodBody(lexp, body.generateCode());
+    Gen.setMethodBody(lexp, body.generateCode());
   }
 
   /****************************************************************

@@ -84,7 +84,7 @@ public class FormalParameters extends Node
 
     void resolve()
     {
-      defaultValue = dispatch.analyse$1(defaultValue, scope, typeScope);
+      defaultValue = dispatch.analyse(defaultValue, scope, typeScope);
     }
 
     void typecheck(mlsub.typing.Monotype domain)

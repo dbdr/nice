@@ -159,8 +159,7 @@ public final class Dispatch
 	failed = true;
 	if(sortedAlternatives.size()==0)
 	  User.error
-	    (method, "Method " + method + " is declared but never defined",
-	     "\nBytecode name: " + method.getBytecodeName());
+	    (method, "Method " + method + " is declared but never defined");
 	else
 	  User.warning(method,
 		       "Method " + method + " is not exhaustive:\n" + 

@@ -296,7 +296,7 @@ public class MethodBodyDefinition extends Definition
 
   void resolveBody()
   {
-    body = bossa.syntax.dispatch.analyse$0
+    body = bossa.syntax.dispatch.analyse
       (body, scope, typeScope, !Types.isVoid(declaration.getReturnType()));
   }
   
@@ -403,7 +403,7 @@ public class MethodBodyDefinition extends Definition
 
       Node.currentFunction = this;
       try{
-	bossa.syntax.dispatch.typecheck$0(body);
+	bossa.syntax.dispatch.typecheck(body);
       } catch(UserError ex){
 	nice.tools.compiler.OutputMessages.error(ex.getMessage());
       }
@@ -463,8 +463,7 @@ public class MethodBodyDefinition extends Definition
   private void compile (NiceMethod definition)
   {
     gnu.expr.LambdaExp lexp = createMethod(name.toString());
-    gnu.expr.ReferenceExp ref = Gen.referenceTo(lexp);
-    module.addMethod(lexp, true);
+    gnu.expr.ReferenceExp ref = module.addMethod(lexp, true);
 
     lexp.addBytecodeAttribute
       (new MiscAttr("definition", definition.getFullName().getBytes()));
@@ -497,11 +496,7 @@ public class MethodBodyDefinition extends Definition
 		       javaArgTypes(),
 		       declaration.javaReturnType(),
 		       parameters);
-
-    //FIXME: comment the next line?
-    Statement.currentScopeExp = lexp;
     Gen.setMethodBody(lexp, body.generateCode());
-
     return lexp;
   }
 

@@ -147,14 +147,6 @@ public class NiceMethod extends MethodDeclaration
     */
     boolean isConstructor = name.toString().equals("<init>");
     
-    // do not generate mangled names for methods
-    // that are not defined in a bossa file 
-    // (e.g. native methods automatically imported).
-    if(module != null && !isConstructor)
-      bytecodeName = module.mangleName(name.toString());  
-    else
-      bytecodeName = name.toString();
-
     if(!isConstructor)
       bossa.link.Dispatch.register(this);
   }
@@ -181,16 +173,10 @@ public class NiceMethod extends MethodDeclaration
    * Code generation
    ****************************************************************/
 
-  String bytecodeName;
-
-  public String getBytecodeName()
-  {
-    return bytecodeName;
-  }
-  
+  /** @return a string that uniquely represents this method */
   public String getFullName()
   {
-    return module.getName().replace('.','$')+'$'+bytecodeName;
+    return module.getName() + '.' + name + ':' + getType();
   }
 
   protected gnu.expr.Expression computeCode()

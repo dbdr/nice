@@ -1274,9 +1274,7 @@ Pattern pattern():
   TypeIdent tc=null, additional = null;
   TypeConstructor runtimeTC = null;
   ConstantExp val = null;
-  boolean exactlyAt = false;
-  int kind = Pattern.NONE;
-  Location loc = null;
+  Token t;
 }
 {
 (
@@ -1288,19 +1286,22 @@ Pattern pattern():
     "(" additional=typeIdent() ")"
   ]  
   name=ident()
-  { loc = tc.location(); }
+  { return bossa.syntax.dispatch.createPattern(tc, name, false, additional, runtimeTC); }
 |
   "#" tc=typeIdent() 
   [ "(" additional=typeIdent() ")" ] 
   [ name=ident() ] 
-  {exactlyAt = true; loc = tc.location();}
+  { return bossa.syntax.dispatch.createPattern(tc, name, true, additional, null); }
 |
   ( 
-    val=patternLiteral() { loc = val.location(); }
+    val=patternLiteral() 
+    [ "(" additional=typeIdent() ")" ]
+    { return bossa.syntax.dispatch.createPattern(val, additional);}
   |
     "@" tc=typeIdent() 
-    { loc = tc.location();
-      User.warning(loc, "This syntax is deprecated, use 'Type paramName' instead.");
+    [ "(" additional=typeIdent() ")" ]
+    { User.warning(tc.location(), "This syntax is deprecated, use 'Type paramName' instead.");
+      return bossa.syntax.dispatch.createPattern(tc, null, false, additional, null);
     }
   |
     name=ident()
@@ -1308,31 +1309,26 @@ Pattern pattern():
       "@" { User.warning(name.location(), "This syntax is deprecated, use 'Type paramName' instead."); }
       tc=typeIdent()
       [ ":" runtimeTC=typeConstructor() ]
+      [ "(" additional=typeIdent() ")" ]
+      { return bossa.syntax.dispatch.createPattern(tc, name, false, additional, runtimeTC); }
     |
       "#" tc=typeIdent() 
-      { exactlyAt = true; 
-        User.warning(name.location(), "This syntax is deprecated, use '#Type paramName' instead.");
+      [ "(" additional=typeIdent() ")" ] 
+      { User.warning(name.location(), "This syntax is deprecated, use '#Type paramName' instead.");
+        return bossa.syntax.dispatch.createPattern(tc, name, true, additional, null);
       }
     |
-      ( ">" {kind = Pattern.GT;}
-      | ">=" {kind = Pattern.GE;}
-      | "<" {kind = Pattern.LT;}
-      | "<=" {kind = Pattern.LE;}
-      )
+      ( t=">" | t=">=" | t="<" | t="<=" )
       ( val=negativeIntConstantExp()
       | val=intConstantExp() 
       | refName=ident()
       )
+      { return bossa.syntax.dispatch.createPattern(t.toString(), name, val, refName, name.location()); }
     |
-     {} //name only
+     { return bossa.syntax.dispatch.createPattern(name); } //name only
     )
-    { loc = name.location(); }
   )
-  [ "(" additional=typeIdent() ")" ]
 )
-{
-  return new Pattern(name, tc, val, refName, exactlyAt, kind, additional, runtimeTC, loc);
-}
 }
 
 void methodBodyDefinitionLookahead():

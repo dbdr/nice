@@ -47,7 +47,7 @@ public class DefaultMethodImplementation extends MethodImplementation
         if (name == null)
           name = new LocatedString("_", loc);
 
-        res[i] = Pattern.any(name);
+        res[i] = bossa.syntax.dispatch.createPattern(name);
       }
     return res;
   }

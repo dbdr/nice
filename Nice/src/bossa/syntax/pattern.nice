@@ -1,0 +1,686 @@
+/**************************************************************************/
+/*                                N I C E                                 */
+/*             A high-level object-oriented research language             */
+/*                        (c) Daniel Bonniot 2004                         */
+/*                                                                        */
+/*  This program is free software; you can redistribute it and/or modify  */
+/*  it under the terms of the GNU General Public License as published by  */
+/*  the Free Software Foundation; either version 2 of the License, or     */
+/*  (at your option) any later version.                                   */
+/*                                                                        */
+/**************************************************************************/
+
+package bossa.syntax;
+
+import bossa.util.*;
+
+public Pattern createPattern(LocatedString name)
+{
+  return new VariablePattern(name, name.location);
+}
+
+public Pattern createPattern(LocatedString name, TypeIdent ti)
+{
+  if (ti.toString().equals("Object"))
+    return new NotNullPattern(name, PrimitiveType.sureTC, name.location);
+
+  return new TypePattern(name, ti, null, name.location(), exactlyAt: false);
+}
+
+//for use in MethodImplementation
+public Pattern createPattern(?LocatedString name, ?mlsub.typing.TypeConstructor tc, boolean sure)
+{
+  let loc = (name != null) ? name.location() : Location.nowhere();
+  if (sure && tc == null)
+    return new NotNullPattern(name, PrimitiveType.sureTC, loc);
+
+  if (nice.tools.typing.Types.isPrimitive(tc))
+    tc = null;
+
+  if (tc == null)
+    return new VariablePattern(name, loc);
+
+  return new TypePattern(name, tc, loc, exactlyAt: false);
+}
+
+public Pattern createPattern(TypeIdent ti, ?LocatedString name, boolean exactly, ?TypeIdent additional, ?mlsub.typing.TypeConstructor runtimeTC)
+{
+  if (ti.toString().equals("Object"))
+    return new NotNullPattern(name, PrimitiveType.sureTC, ti.location);
+
+  return new TypePattern(name, ti, additional, ti.location(), exactlyAt: exactly, runtimeTC: runtimeTC);
+}
+
+public Pattern createPattern(ConstantExp value)
+{
+  return createPattern(value, null);
+}
+
+public Pattern createPattern(ConstantExp value, ?TypeIdent additional)
+{
+  if (value instanceof NullExp)
+    return new NullPattern(value.tc, additional, value.location());
+
+  if (value instanceof StringConstantExp)
+    return new StringPattern(null, new TypeIdent(new LocatedString("java.lang.String", value.location())),
+				additional, value.location(), atValue: value);
+
+  if (value.tc == PrimitiveType.boolTC)
+    return new BoolPattern(value.tc, additional, value.location(), atValue: value);
+
+  if (value.tc == PrimitiveType.charTC)
+    return new CharPattern(value.tc, additional, value.location(), atValue: value);
+
+  return new IntPattern(value.tc, additional, value.location(), atValue: value);
+}
+
+public Pattern createPattern(String kind, ?LocatedString name, ?ConstantExp value, ?LocatedString refName, bossa.util.Location loc)
+{
+  CompareKind k;
+  if ("<".equals(kind))
+    k = CK_LT;
+  else if ("<=".equals(kind))
+    k = CK_LE;
+  else if (">".equals(kind))
+    k = CK_GT;
+  else
+    k = CK_GE;
+
+  let tc = (value != null) ?  value.tc : null;
+  return new IntComparePattern(name, tc, loc, atValue: cast(value), kind: k, refName: refName);
+}
+
+Pattern createPattern(mlsub.typing.TypeConstructor tc)
+{
+  return new TypePattern(null, tc, null, exactlyAt: false);
+}
+
+public class VariablePattern extends Pattern
+{
+  matches(tag) = true;
+
+  matchesValue(ConstantExp val) = true;
+
+  toString() = (name != null) ? notNull(name).toString() : "_";
+
+  bytecodeRepresentation() = "@_";
+
+  matchTest(parameter, dispatchMade) = notNull(gnu.expr.QuoteExp.trueExp);
+
+  atAny() = true;
+}
+
+public class NullPattern extends Pattern
+{
+  matches(tag) = tag == PrimitiveType.nullTC;
+
+  matchesValue(ConstantExp val) = false;
+
+  toString() = "null";
+
+  bytecodeRepresentation() = "@NULL";
+
+  matchTest(parameter, dispatchMade) = nice.tools.code.Gen.isNullExp(parameter);
+
+  atNull() = true;
+}
+
+public class NotNullPattern extends Pattern
+{
+  matches(tag) = tag != PrimitiveType.nullTC;
+
+  matchesValue(ConstantExp val) = false;
+
+  toString() = "!null";
+
+  bytecodeRepresentation() = "@NONNULL";
+
+  matchTest(parameter, dispatchMade)
+  {
+    return nice.tools.code.Gen.boolNotExp(nice.tools.code.Gen.isNullExp(parameter));
+  }
+}
+
+public class TypePattern extends Pattern
+{
+  boolean exactlyAt;
+  ?mlsub.typing.TypeConstructor runtimeTC = null;
+
+  getRuntimeTC() = runtimeTC;
+
+  setDomainEq(equal)
+  {
+    // only set it to atAny if it's a @type pattern
+    if (equal && !exactlyAt)
+      return new VariablePattern(name, this.location);
+
+    // don't allow integer primitive types in @type and #type patterns
+    if (!equal && Typing.testRigidLeq(tc, PrimitiveType.longTC))
+      User.error(this.location, "A pattern cannot have a primitive type that is different from the declaration.");
+
+    return this;
+  }
+
+  matches(tag)
+  {
+    if (tag == null)
+      return false;
+
+    if (exactlyAt)
+      return mlsub.typing.Typing.testRigidLeq(tag, tc) && mlsub.typing.Typing.testRigidLeq(tc, tag);
+
+    return mlsub.typing.Typing.testRigidLeq(tag, tc);
+  }
+
+   matchesValue(ConstantExp val) = false;
+
+  toString()
+  {
+    StringBuffer res = new StringBuffer();
+    res.append(exactlyAt ? "#" : (name != null ? "" : "@"));
+    
+    if (typeConstructor != null)
+      res.append(typeConstructor);
+    else if (tc != null)
+      res.append(tc);
+
+    if (name != null)
+      res.append(" " + name);
+    
+    return res.toString();
+  }
+
+  bytecodeRepresentation()
+  {
+   return (exactlyAt ? "#" : "@") + notNull(tc).toString().replace('$','.');
+  }
+
+  matchTest(parameter, dispatchMade)
+  {
+    if (dispatchMade && ! exactlyAt)
+      return notNull(gnu.expr.QuoteExp.trueExp); 
+
+    let ct = nice.tools.code.Types.javaType(tc);
+
+    if (exactlyAt)
+      return nice.tools.code.Gen.isOfClass(parameter, ct);
+      
+    return nice.tools.code.Gen.instanceOfExp(parameter, ct);
+  }
+
+  exactlyAtType() = exactlyAt;
+}
+
+public abstract class ValuePattern extends Pattern
+{
+  final ConstantExp atValue;
+
+  matches(tag) = false;
+
+  matchesValue(ConstantExp val) = atValue.equals(val);
+
+  toString() = atValue.toString();
+
+  addValues(values)
+  {
+    values.add(atValue);
+  }
+
+  atValue() = true;
+}
+
+public class BoolPattern extends ValuePattern
+{
+  addValues(values)
+  {
+    values.add(ConstantExp.makeBoolean(true, this.location));
+    values.add(ConstantExp.makeBoolean(false, this.location));
+  }
+
+  matches(tag) = tag == PrimitiveType.boolTC;
+
+  bytecodeRepresentation() = atValue.isTrue() ? "@true" : "@false";
+
+  matchTest(parameter, dispatchMade)
+  {
+    if (atValue.isFalse())
+      return nice.tools.code.Gen.boolNotExp(parameter);
+
+    return cast(parameter);
+  }
+
+  atTypeMatchingValue() = true;
+}
+
+public class StringPattern extends ValuePattern
+{
+  override StringConstantExp atValue;
+
+  bytecodeRepresentation() {
+    return "@\"" + atValue.escapedValue + "\"";
+  }
+
+  matchTest(parameter, dispatchMade)
+  {
+    let String val = cast(atValue.value);
+    return nice.tools.code.Gen.stringEquals(val, parameter);
+  }
+}
+
+public class CharPattern extends ValuePattern
+{
+  bytecodeRepresentation() = "@\'" + atValue.value + "\'";
+
+  setDomainTC(domaintc)
+  {
+    if (domaintc != null)
+      if ( Typing.testRigidLeq(domaintc, PrimitiveType.charTC))
+        return;
+    
+    User.error(this.location, "Character value patterns are not allowed for methods where the declared parameter isn't a primitive type.");
+  }
+
+  matchTest(parameter, dispatchMade)
+  {
+    return nice.tools.code.Gen.integerComparison("Eq", parameter, atValue.longValue());
+  }
+}
+
+public class IntPattern extends ValuePattern
+{
+  matchesValue(ConstantExp val)
+  {
+   return (val.value instanceof Number) && atValue.longValue() == val.longValue();
+  }
+ 
+  setDomainTC(domaintc)
+  {
+    if (domaintc != null)
+      {
+	if (Typing.testRigidLeq(domaintc, PrimitiveType.intTC))
+	  {
+	    tc = PrimitiveType.intTC;
+	    return;
+          }
+        else if (Typing.testRigidLeq(domaintc, PrimitiveType.longTC))
+	  {
+	    tc = PrimitiveType.longTC;
+	    return;
+          }
+      }
+    User.error(this.location, "Integer value patterns are not allowed for methods where the declared parameter isn't a primitive type.");
+
+  }
+
+  bytecodeRepresentation() = "@" + (atValue.longValue() >= 0 ? "+" : "") + atValue;
+
+  matchTest(parameter, dispatchMade)
+  {
+    return nice.tools.code.Gen.integerComparison("Eq", parameter, atValue.longValue());
+  }
+
+}
+
+enum CompareKind(String prefix, String abbrev) 
+	{ CK_LT("<", "Lt"), CK_LE("<=", "Le"), CK_GT(">", "Gt"), CK_GE(">=", "Ge") }
+
+boolean matches(CompareKind k, long x, long y);
+matches(CK_LT, x, y) = x < y;
+matches(CK_LE, x, y) = x <= y;
+matches(CK_GT, x, y) = x > y;
+matches(CK_GE, x, y) = x >= y;
+
+public class IntComparePattern extends IntPattern
+{
+  CompareKind kind;
+  ?LocatedString refName;
+  
+  matches(tag) = tag != null && mlsub.typing.Typing.testRigidLeq(tag, PrimitiveType.longTC);
+
+  matchesValue(ConstantExp val)
+  {
+    return val.value instanceof Number && matches(kind, val.longValue(), atValue.longValue());
+  }
+
+  toString() = (name!=null? notNull(name).toString() : "") + kind.prefix + atValue;
+
+  bytecodeRepresentation() = "@" + kind.prefix + atValue;
+
+  matchTest(parameter, dispatchMade)
+  {
+    return nice.tools.code.Gen.integerComparison(kind.abbrev, parameter, atValue.longValue());
+  }
+  
+  addValues(values)
+  {
+    let val = atValue.longValue();
+    long lo = val;
+    long hi = val;
+    if (kind == CK_LT || kind == CK_GE)
+      lo = val-1;
+    else
+      hi = val+1;
+
+    while(values.any(ConstantExp ce => (ce.value instanceof Number) && (ce.longValue == lo)))
+      lo--;
+
+    values.add(new ConstantExp(new Long(lo)));
+
+    while(values.any(ConstantExp ce => (ce.value instanceof Number) && (ce.longValue == hi)))
+      hi++;
+
+    values.add(new ConstantExp(new Long(hi)));
+  }
+
+  boolean atLess() = (kind == CK_LT || kind == CK_LE);
+
+  atTypeMatchingValue() = true;
+
+}
+
+public class ReferencePattern extends ValuePattern
+{
+ 
+  bytecodeRepresentation() = "@=" + name;
+
+  matchTest(parameter, dispatchMade)
+  {
+    return nice.tools.code.Gen.referenceEqualsExp(atValue.compile(), parameter);
+  }
+
+  getName() = cast(null);
+}
+
+public class EnumPattern extends ReferencePattern
+{
+  matches(tag) = (tag != null) && mlsub.typing.Typing.testRigidLeq(tag, tc);
+
+  addValues(values)
+  {
+    let EnumDefinition.EnumSymbol esym = cast(atValue.value);
+    let EnumDefinition edef = cast(esym.getDefinition());
+    for (sym : edef.symbols)
+      values.add(new ConstantExp(null, tc, sym, sym.name.toString(), this.location));
+  }
+
+  atTypeMatchingValue() = true;
+}
+
+/**
+   Order on pattern that is compatible with the specificity of patterns.
+
+   If that matches all values that this matches, the result is true.
+   Additionally, if this matches values that are more specific than
+   the values that matches, the result is also true. 
+*/
+boolean leq(Pattern this, Pattern that);
+
+leq(VariablePattern this, VariablePattern that) = true;
+leq(Pattern this, VariablePattern that) = true;
+leq(VariablePattern this, Pattern that) = false;
+leq(NullPattern this, NullPattern that) = true;
+leq(NullPattern this, VariablePattern that) = true;
+leq(NullPattern this, Pattern that) = false;
+leq(Pattern this, NullPattern that) = false;
+leq(VariablePattern this, NullPattern that) = false;
+leq(NullPattern this, NotNullPattern that) = false;
+leq(NotNullPattern this, NullPattern that) = false;
+leq(Pattern this, NotNullPattern that) = true;
+leq(NotNullPattern this, NotNullPattern that) = true;
+leq(NotNullPattern this, VariablePattern that) = true;
+leq(VariablePattern this, NotNullPattern that) = false;
+leq(NotNullPattern this, Pattern that) = false;
+leq(ValuePattern this, ValuePattern that) = this.atValue.equals(that.atValue);
+leq(TypePattern this, ValuePattern that) = false;
+leq(IntComparePattern this, IntComparePattern that)
+{
+  if (this.atLess() != that.atLess())
+    return false;
+
+  long val = this.atValue.longValue();
+  if (this.kind == CK_LT) val--;
+  if (this.kind == CK_GT) val++;
+
+  return matches(that.kind, val, that.atValue.longValue());
+}
+leq(IntPattern this, IntComparePattern that) = matches(that.kind, this.atValue.longValue(), that.atValue.longValue());
+leq(IntComparePattern this, IntPattern that) = false;
+leq(TypePattern this, TypePattern that)
+{
+    if (this.tc == that.tc)
+      return this.exactlyAt || ! that.exactlyAt;
+
+    return Typing.testRigidLeq(this.tc, that.tc); 
+}
+leq(Pattern this, Pattern that)
+{
+  if (this.tc == that.tc)
+    return true;
+
+  return Typing.testRigidLeq(this.tc, that.tc); 
+}
+
+/**
+ returns true when the patterns can't match the same values.
+ May return false if it can't be determined easily.
+*/
+
+boolean disjoint(Pattern this, Pattern that);
+
+disjoint(VariablePattern this, VariablePattern that) = false;
+disjoint(Pattern this, VariablePattern that) = false;
+disjoint(VariablePattern this, Pattern that) = false;
+disjoint(NullPattern this, NullPattern that) = false;
+disjoint(Pattern this, NullPattern that) = true;
+disjoint(NullPattern this, Pattern that) = false;
+disjoint(NullPattern this, VariablePattern that) = false;
+disjoint(VariablePattern this, NullPattern that) = false;
+disjoint(NotNullPattern this, NotNullPattern that) = false;
+disjoint(NotNullPattern this, NullPattern that) = true;
+disjoint(NullPattern this, NotNullPattern that) = true;
+disjoint(ValuePattern this, ValuePattern that) = ! this.atValue.equals(that.atValue);
+disjoint(IntComparePattern this, IntComparePattern that) 
+{
+	if (this.atLess() == that.atLess())
+	  return false;
+
+        long val = this.atValue.longValue();
+        if (this.kind == CK_LT) val--;
+        if (this.kind == CK_GT) val++;
+
+	return ! matches(that.kind, val, that.atValue.longValue());
+}
+disjoint(IntComparePattern this, IntPattern that) = matches(this.kind, that.atValue.longValue(), this.atValue.longValue());
+disjoint(IntPattern this, IntComparePattern that) = matches(that.kind, this.atValue.longValue(), that.atValue.longValue());
+disjoint(TypePattern this, TypePattern that)
+{
+  if (this.exactlyAt && that.exactlyAt)
+    return this.tc != that.tc;
+
+  if (TypeConstructors.isClass(this.tc) && TypeConstructors.isClass(that.tc))
+    return (! Typing.testRigidLeq(this.tc, that.tc)) &&
+	   (! Typing.testRigidLeq(that.tc, this.tc));
+
+  //TODO: check disjoints for all tc's with a <T | T <: TC_PA, T <: TC_PB> constraint
+
+  return false;
+}
+disjoint(Pattern this, Pattern that)
+{
+  if (TypeConstructors.isClass(this.tc) && TypeConstructors.isClass(that.tc))
+    return (! Typing.testRigidLeq(this.tc, that.tc)) &&
+	   (! Typing.testRigidLeq(that.tc, this.tc));
+
+  //TODO: check disjoints for all tc's with a <T | T <: TC_PA, T <: TC_PB> constraint
+
+  return false;
+}
+
+
+private ?VarSymbol findRefSymbol(LocatedString refName)
+{
+  for (sym : Node.getGlobalScope().lookup(refName))
+    if (sym instanceof GlobalVarDeclaration.GlobalVarSymbol ||
+	sym instanceof EnumDefinition.EnumSymbol )
+      return sym;
+
+  return null;
+}
+
+Pattern resolveGlobalConstants(Pattern pattern)
+{
+  return pattern;
+}
+
+resolveGlobalConstants(IntComparePattern pattern)
+{
+  if (pattern.refName != null)
+    {
+      let symbol = findRefSymbol(notNull(pattern.refName));
+      if (symbol instanceof GlobalVarDeclaration.GlobalVarSymbol)
+	{
+	  if (symbol.getValue() instanceof ConstantExp && symbol.constant)
+	    {
+	      ConstantExp val = cast(symbol.getValue());
+	      if (Typing.testRigidLeq(val.tc, PrimitiveType.longTC))
+                return createPattern(pattern.kind.prefix, pattern.name, val, null, pattern.location);
+	    }
+	}
+      User.error(pattern.refName, notNull(pattern.refName).toString() + " is not a global constant with an integer value."); 
+    }
+  return pattern;
+}
+
+resolveGlobalConstants(VariablePattern pattern)
+{
+  if (pattern.name == null)
+    return pattern;
+
+  let symbol = findRefSymbol(notNull(pattern.name));
+  if (symbol == null)
+    return pattern;
+
+  if (symbol instanceof EnumDefinition.EnumSymbol)
+    {
+      NewExp val = cast(symbol.getValue());
+      return new EnumPattern(pattern.name, val.tc, pattern.location, atValue:
+		new ConstantExp(null, pattern.tc, symbol,
+				notNull(pattern.name).toString(), pattern.location));
+    }
+
+  if (! (symbol instanceof GlobalVarDeclaration.GlobalVarSymbol))
+    return pattern;
+
+  if (symbol.getValue() instanceof ConstantExp)
+    {
+      if (!symbol.constant)
+        User.error(pattern.name, "" + pattern.name + " is not constant");
+
+      ConstantExp val = cast(symbol.getValue());
+
+      if (val.tc == PrimitiveType.floatTC)
+	return pattern;
+
+      return createPattern(val);
+    }
+  else if (symbol.getValue() instanceof NewExp)
+    {
+       NewExp val = cast(symbol.getValue());
+      return new ReferencePattern(pattern.name, val.tc, pattern.location, atValue:
+		new ConstantExp(null, pattern.tc, symbol,
+				notNull(pattern.name).toString(), pattern.location));
+    }
+  else
+    User.error(pattern.name, "The value of " + pattern.name + " can't be used as pattern");
+
+  return pattern;
+}
+
+public ?Pattern readPattern(String rep, int[]/*ref*/ pos)
+{
+  if (pos[0] >= rep.length())
+    return null;
+
+  if (rep.charAt(pos[0]) != '@' && rep.charAt(pos[0]) != '#')
+    Internal.error("Invalid pattern representation at character " + pos[0] +  ": " + rep);
+
+  boolean exact = rep.charAt(pos[0]) == '#';
+
+  int start = pos[0]+1;
+  pos[0] += 1;
+  int len = rep.length();
+
+  if (rep.charAt(pos[0]) == '\'')
+    { //char literal patterns are 3 chars
+      pos[0] += 3;
+    }
+  else if (rep.charAt(pos[0]) == '\"')
+    { //we need to skip possible '@' or '#' content of the string literal
+      pos[0] += 2;
+      while(pos[0] < len &&
+		! ( ( rep.charAt(pos[0]) == '@' || rep.charAt(pos[0]) != '#')
+		&& rep.charAt(pos[0]-1) == '\"' 
+		&& rep.charAt(pos[0]-2) != '\\') )
+	pos[0] += 1;
+
+    }
+  else
+    {
+      while(pos[0] < len && rep.charAt(pos[0]) != '@' && rep.charAt(pos[0]) != '#')
+	pos[0] += 1;
+    }
+
+  String name = rep.substring(start, pos[0]);
+  let loc = Location.nowhere();
+
+  if (name.length() > 1)
+    {
+      if (name.charAt(0) == '\'')
+	return createPattern(new ConstantExp(PrimitiveType.charTC,
+		new Character(name.charAt(1)), name, loc));
+
+      if (name.charAt(0) == '-')
+        return createPattern(ConstantExp.makeNumber(new LocatedString(name,
+		 loc)));
+
+      if (name.charAt(0) == '+')
+        return createPattern(ConstantExp.makeNumber(new LocatedString(
+		name.substring(1), loc)));
+
+      if (name.charAt(0) == '\"')
+        return createPattern(ConstantExp.makeString(new LocatedString(
+		name.substring(1,name.length()-1), loc)));
+
+      if (name.charAt(0) == '<' || name.charAt(0) == '>')
+	{
+	  let prefix = (name.charAt(1) == '=') ? name.substring(0,2) : name.substring(0,1);
+	  return createPattern(prefix, null, ConstantExp.makeNumber(
+		new LocatedString(name.substring(prefix.length()), loc)), null, loc);
+        }
+
+      if (name.charAt(0) == '=')
+        return resolveGlobalConstants(new VariablePattern(new LocatedString(name.substring(1), loc), loc));
+        
+    }
+
+  if (name.equals("_"))
+    return createPattern(new LocatedString("_", loc));
+
+  if (name.equals("NULL"))
+    return createPattern(NullExp.create(loc));
+
+  if (name.equals("true") || name.equals("false") ) 
+    return createPattern(ConstantExp.makeBoolean(name.equals("true"), loc));
+
+  ?TypeSymbol sym = Node.getGlobalTypeScope().lookup(name);
+
+  if (sym == null)
+    // This can happen if the class exists only in a later version
+    // of the JDK.
+    throw new Unknown();
+
+  let mlsub.typing.TypeConstructor tc = cast(sym);
+  return new TypePattern(null, tc, Location.nowhere(), exactlyAt:exact);
+}
+
+public class Unknown extends RuntimeException {}

@@ -55,8 +55,39 @@ public class dispatch
 
   static void resolveCCThis(Statement stmt, bossa.util.Located thisloc, NiceClass classe) {}
 
-  static void resolveGlobalConstants(Pattern pattern) {}
+  static Pattern resolveGlobalConstants(Pattern pattern)
+  { return null; }
 
+  public static Pattern readPattern(String rep, int[] pos)
+  { return null; }
+
+  public static Pattern createPattern(LocatedString name)
+  { return null; }
+
+  public static Pattern createPattern(LocatedString name, TypeIdent ti)
+  { return null; }
+
+  public static Pattern createPattern(LocatedString name, mlsub.typing.TypeConstructor tc, boolean sure)
+  { return null; }
+
+  public static Pattern createPattern(TypeIdent tc, LocatedString name, boolean exactly, TypeIdent additional, mlsub.typing.TypeConstructor runtimeTC)
+  { return null; }
+
+  public static Pattern createPattern(ConstantExp value)
+  { return null; }
+
+  public static Pattern createPattern(ConstantExp value, TypeIdent additional)
+  { return null; }
+
+  public static Pattern createPattern(String kind, LocatedString name, ConstantExp value, LocatedString refName, bossa.util.Location loc)
+  { return null; }
+
+  public static boolean leq(Pattern a, Pattern b)
+  { return false; }
+
+  public static boolean disjoint(Pattern a, Pattern b)
+  { return false; }
+  
   static Statement  analyse(Statement  s, VarScope v, TypeScope t, boolean r)
   { return null; }
   

@@ -363,6 +363,7 @@ public final class Dispatch
       {
 	failed = true;
 	errors.add("no alternative matches "+ toString(tags, values, isValue));
+        Debug.println(sortedAlternatives.toString() + "\n" + toString(tags, values, isValue));
 	break;
       }
     }
@@ -525,7 +526,7 @@ public final class Dispatch
     return res;
   }
 
-  /** Generate all combinations of non boolean values from the alternatives
+  /** Generate all combinations of values from the alternatives
    * @return List<ConstantExp>
    */
   private static List generateValues(List alternatives, boolean[] isValue)
@@ -538,71 +539,20 @@ public final class Dispatch
       List valuesAtPos = new ArrayList();  
       for (Iterator i = alternatives.iterator(); i.hasNext(); ) 
       {
-	Pattern pat = ((Alternative)i.next()).getPatterns()[pos];
-	if (pat.atEnumerableValue())
+        Pattern pat = ((Alternative)i.next()).getPatterns()[pos];
+ 	if (pat.atValue())
         {
 	  isValue[pos] = true;
-	  for (Iterator it = pat.getEnumValues().iterator(); it.hasNext(); )
-	    valuesAtPos.add(it.next());
-
+          pat.addValues(valuesAtPos);
         }
-        else if (pat.atSimpleValue())
-        {
-          isValue[pos] = true;
-	  valuesAtPos.add(pat.atValue);
-	}	   
       }
+
       //remove duplicates
 /*      for (int i = 0; i < valuesAtPos.size(); i++)
 	for (int j = i+1; j < valuesAtPos.size(); j++)
 	  if (valuesAtPos.get(i).equals(valuesAtPos.get(j)))
 	    valuesAtPos.remove(j--);	
 */
-      for (Iterator i = alternatives.iterator(); i.hasNext(); ) 
-      {
-	Pattern pat = ((Alternative)i.next()).getPatterns()[pos];
-	if (pat.atIntCompare())
-	{
-	  isValue[pos] = true;
-	  long val = pat.atValue.longValue();
-          long lo,hi;
-          if (pat.compareKind == Pattern.LT || pat.compareKind == Pattern.GE)
-	    {
-	      lo = val-1;
-	      hi = val;
-	    }
-	  else
-	    {
-	      lo = val;
-	      hi = val+1;
-	    }
-
-	  outer:
-	  for (;true; lo--)
-	    {
-	      for (int j = 0; j<valuesAtPos.size(); j++)
-		if (((ConstantExp)valuesAtPos.get(j)).value instanceof Number &&
-			((ConstantExp)valuesAtPos.get(j)).longValue() == lo)
-		  continue outer;
-
-	      break;
-	    }
-	  valuesAtPos.add(new ConstantExp(new Long(lo)));
-
-          outer:
-	  for (;true; hi++)
-	    {
-	      for (int j = 0; j<valuesAtPos.size(); j++)
-		if (((ConstantExp)valuesAtPos.get(j)).value instanceof Number &&
-			((ConstantExp)valuesAtPos.get(j)).longValue() == hi)
-		  continue outer;
-
-	      break;
-	    }
-
-	  valuesAtPos.add(new ConstantExp(new Long(hi)));
-	}	   
-      }
 
       int valueCount = valuesAtPos.size();
 

@@ -74,7 +74,7 @@ public class MethodBodyDefinition extends MethodImplementation
       return (Pattern[]) formals.toArray(new Pattern[formals.size()]);
 
     Pattern[] res = new Pattern[formals.size() + 1];
-    res[0] = new Pattern(new LocatedString("this", loc), 
+    res[0] = bossa.syntax.dispatch.createPattern(new LocatedString("this", loc), 
 			 new TypeIdent(container.definition.getName()));
     int n = 1;
     for(Iterator f = formals.iterator(); f.hasNext(); n++)
@@ -362,9 +362,8 @@ public class MethodBodyDefinition extends MethodImplementation
         for (int n = 0; n < formals.length; n++)
           {
             TypeConstructor tc = Types.rawType(domain[n]).head();
-
             if (formals[n].tc != null)
-              formals[n].setDomainEq(tc != null &&
+              formals[n] = formals[n].setDomainEq(tc != null &&
                                      Types.isSure(domain[n]) && 
                                      Typing.testLeq(tc, formals[n].tc));
           }

@@ -629,16 +629,15 @@ typecheck(LiteralArrayExp e)
 typecheck(NewArrayExp e)
 {
   Expression[] knownDimensions = notNull(e.knownDimensions);
-
+  typecheckExps(cast(knownDimensions));
   for (int i=0; i<knownDimensions.length; i++)
     {
-      Expression dim = knownDimensions[i] =
-	knownDimensions[i].resolveOverloading(PrimitiveType.intPolytype);
+      Expression dim = knownDimensions[i];
       try{
-	checkAssignment(PrimitiveType.intType, dim);
+	Typing.leq(dim.getType(), PrimitiveType.intPolytype);
       }
       catch(TypingEx ex){
-	if (notNullError(ex, dim,
+	if (notNullError(ex, dim, 
 			 dim.toString()))
 	  bossa.util.User.error(dim, "" + dim + " should be an integer");
       }

@@ -90,7 +90,7 @@ public abstract class MethodImplementation extends Definition
 	      type = new MonotypeVar(types[tn].toString()+ "(" + p.name + ")");
 	  }
 
-	res[tn] = new MonoSymbol(p.name, type);
+	res[tn] = new MonoSymbol(p.getName(), type);
       }
     scope.addSymbols(res);
     parameters = res;
@@ -104,15 +104,11 @@ public abstract class MethodImplementation extends Definition
     Monotype[] parameters = Types.parameters(declaration.getType());
     for (int i = 0; i < formals.length; i++)      
       if (formals[i].tc == null)
-        {
-          formals[i].tc = Types.concreteConstructor(parameters[i]);
-
-          if (formals[i].tc == null && Types.isSure(parameters[i]))
-            formals[i].tc = PrimitiveType.sureTC;
-
-          if (Types.isPrimitive(formals[i].tc))
-            formals[i].tc = null;
-        }
+        formals[i] = bossa.syntax.dispatch.createPattern(formals[i].name,
+		Types.concreteConstructor(parameters[i]),
+		Types.isSure(parameters[i]));
+			
+  
   }
 
   void resolveBody()

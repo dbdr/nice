@@ -24,7 +24,7 @@ public class SuperExp extends Expression
 
   ?List<TypeIdent> types;
 
-  ?List<TypeConstructor> tc = null;
+  ?List<mlsub.typing.TypeConstructor> tc = null;
   ?MethodBodyDefinition currentMethod = null;
   ?Alternative superAlternative = null;
   ?gnu.bytecode.Method superMethod = null;
@@ -49,7 +49,7 @@ public class SuperExp extends Expression
     if (tc == null)
       minimumAlt = null;
     else
-      minimumAlt = new Alternative("", notNull(tc).map(TypeConstructor tc => new Pattern(tc, false)).toArray());
+      minimumAlt = new Alternative("", notNull(tc).map(mlsub.typing.TypeConstructor tc => createPattern(tc)).toArray());
 
     // Look for the first alternative more general than the current one.
     for (alt : Alternative.sortedAlternatives(decl))

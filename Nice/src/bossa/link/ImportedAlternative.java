@@ -60,7 +60,7 @@ public class ImportedAlternative extends Alternative
 
     try {
       Pattern p;
-      while ((p = Pattern.read(rep, at, fullName)) != null)
+      while ((p = bossa.syntax.dispatch.readPattern(rep, at)) != null)
         {
           if (p.getTC() == bossa.syntax.PrimitiveType.arrayTC)
             /* Special treatment for arrays:

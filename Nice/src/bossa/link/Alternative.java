@@ -60,7 +60,7 @@ public class Alternative implements Located
   public static boolean leq(Alternative a, Alternative b)
   {
     for(int i = 0; i<a.patterns.length; i++)
-      if (!a.patterns[i].leq(b.patterns[i]))
+      if (! bossa.syntax.dispatch.leq(a.patterns[i], b.patterns[i]))
 	return false;
     return true;
   }
@@ -73,9 +73,9 @@ public class Alternative implements Located
     boolean strictly = false;
 
     for (int i = 0; i < a.patterns.length; i++)
-      if (!a.patterns[i].leq(b.patterns[i]))
+      if (! bossa.syntax.dispatch.leq(a.patterns[i], b.patterns[i]))
 	return false;
-      else if (!b.patterns[i].leq(a.patterns[i]))
+      else if (! bossa.syntax.dispatch.leq(b.patterns[i], a.patterns[i]))
 	strictly = true;
 
     return strictly;
@@ -84,7 +84,7 @@ public class Alternative implements Located
   static boolean disjoint(Alternative a, Alternative b)
   {
     for(int i = 0; i<a.patterns.length; i++)
-      if (a.patterns[i].disjoint(b.patterns[i]))
+      if (bossa.syntax.dispatch.disjoint(a.patterns[i], b.patterns[i]))
 	return true;
 
     return false;

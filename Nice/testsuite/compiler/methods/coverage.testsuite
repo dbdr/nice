@@ -36,7 +36,7 @@ class B implements I {
   <T> T foo(T x, Object o) = x;
   foo(String s, o) = "";
 
-/// PASS bug
+/// PASS
   assert !foo(null);
   assert foo("");
   /// Toplevel

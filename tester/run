@@ -66,8 +66,10 @@ for conffile in ../config.*; do
 
     if ../Project; then
 	echo "Bootstrap OK"  > $config.res
+	failed=false
     else
 	echo "Bootstrap FAILURE"  > $config.res
+	failed=true
     fi
 
 
@@ -88,7 +90,7 @@ for conffile in ../config.*; do
 	    echo -n "$testname "
 	    case "$code" in
 		0) echo "OK"         ;;
-		1) echo "FAILURE"    ;;
+		1) echo "FAILURE"    ; failed=true ;;
 		2) echo "SKIP"       ;;
 		3) echo "IMPOSSIBLE" ;;
 		*) echo "OTHER"      ;;
@@ -110,6 +112,12 @@ if [ -r $results_dir ]; then
   cp ./*.id ./*.res ./*.html $results_dir
 else
   scp -p ./*.id ./*.res ./*.html $user@shell.sourceforge.net:$results_dir
+
+  # If everything went OK, upload the new development version.
+  if [ $failed = false -a "$NICE_MASTER" ]; then
+    scp Nice/share/java/nice.jar bonniot@shell.sourceforge.net:/home/groups/n/ni/nice/htdocs
+fi
+
 fi
 
 echo ""

@@ -9,8 +9,3 @@ if [ ! -r Nice ]; then
 fi
 
 cd Nice && make universe
-
-# If we got here, the whole bootstrap process succeeded.
-if [ NICE_MASTER ]; then
-  scp ./share/java/nice.jar bonniot@shell.sourceforge.net:/home/groups/n/ni/nice/htdocs
-fi

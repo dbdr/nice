@@ -124,9 +124,9 @@ public class Contract
   public String toString()
   {
     StringBuffer res = new StringBuffer();
-    if (preExp.length > 0)
+    if (preExp != null && preExp.length > 0)
       res.append(requireRepr.toString());
-    if (postExp.length > 0)
+    if (postExp != null && postExp.length > 0)
       res.append(ensureRepr.toString());
     return res.toString();
   }

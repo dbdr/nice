@@ -378,6 +378,7 @@ public class OverloadedSymbolExp extends Expression
                //Arguments.noArguments());
                new Arguments(new Arguments.Argument[]{new Arguments.Argument(Node.thisExp)}));
 
+            res.setLocation(ident.location());
             res.resolveOverloading();
             return res;
           }

@@ -360,6 +360,32 @@ int min(List<int> list) requires !list.isEmpty()
   return res;
 }
 
+<T> void reversefor(List<T> list, T->void func)
+{
+  let it = list.listIterator(list.size());
+  while(it.hasPrevious())
+    func(it.previous());
+}
+
+<T, U> List<U> reversemap(List<T> list, T->U func)
+{
+  List<U> res = new ArrayList(list.size);
+  let it = list.listIterator(list.size());
+  while(it.hasPrevious())
+    res.add(func(it.previous()));
+
+  return res;
+}
+
+<T,U | T <: U> List<U> flatten(List<List<T>> list)
+{
+  List<U> res = new ArrayList();
+  for (elem : list)
+    res.addAll(elem);
+
+  return res;
+}
+
 /****************************************************************
  * toArray
  ****************************************************************/

@@ -208,6 +208,10 @@ long   min(long  , long  ) = native long   Math.min(long  , long  );
 int    max(int   , int   ) = native int    Math.max(int   , int   );
 int    min(int   , int   ) = native int    Math.min(int   , int   );
 
+double abs(double) = native double Math.abs(double);
+float  abs(float ) = native float  Math.abs(float );
+long   abs(long  ) = native long   Math.abs(long  );
+int    abs(int   ) = native int    Math.abs(int   );
 
 // Comparable interface
 `<`(n1@Number, n2@Number) = n1.doubleValue() < n2.doubleValue();
@@ -231,3 +235,21 @@ long `**`(long x, long e)
 }    
 
 double `**`(double, double) = native double Math.pow(double, double);
+
+long gcd(long a, long b) requires a!=0 || b!=0 : "gcd(0,0) undefined"
+{
+  long rem = a % b;
+  long tmp = b;
+  while (rem > 0)
+    (tmp, rem) = (rem, tmp % rem);
+
+  return tmp;
+}
+
+long lcm(long a, long b)
+{
+  if (a==0 || b==0)
+    return 0;
+
+  return abs((a / gcd(a,b)) * b);
+}

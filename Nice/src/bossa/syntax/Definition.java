@@ -58,6 +58,8 @@ public abstract class Definition extends Node implements bossa.util.Located
 
   void printInterface(List definitions, java.io.PrintWriter s)
   {
+    if (definitions == null)
+      return;
     for(Iterator i=definitions.iterator(); i.hasNext();)
       ((Definition) i.next()).printInterface(s);
   }

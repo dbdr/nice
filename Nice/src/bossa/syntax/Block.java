@@ -12,8 +12,6 @@
 
 // File    : Block.java
 // Created : Wed Jul 07 17:42:15 1999 by bonniot
-//$Modified: Thu Aug 31 12:54:18 2000 by Daniel Bonniot $
-// Description : A block : a list of statements with local variables
 
 package bossa.syntax;
 
@@ -22,13 +20,18 @@ import bossa.util.*;
 
 import mlsub.typing.Polytype;
 
+/**
+   A block : a list of statements with local variables.
+
+   @version $Date$
+   @author Daniel Bonniot
+*/
 public class Block extends Statement
 {
   public Block(List statements)
   {
     super(Node.down);
-    this.statements=addChildren(cutInBlocks(statements));
-    //addChildren(locals);
+    this.statements = addChildren(cutInBlocks(statements));
   }
 
   public static class LocalDeclaration extends Statement
@@ -36,11 +39,9 @@ public class Block extends Statement
     public LocalDeclaration(LocatedString name, Monotype type, Expression value)
     {
       super(Node.forward);
-      this.left=new MonoSymbol(name,type);
-      //addChild(this.left);
+      this.left = new MonoSymbol(name,type);
       
-      if(value!=null)
-	//this.value=expChild(value);
+      if (value != null)
 	this.value = new ExpressionRef(value);
     }
     
@@ -50,40 +51,40 @@ public class Block extends Statement
       return null;
     }
     
-    protected ExpressionRef value=null;
+    protected ExpressionRef value = null;
     MonoSymbol left;
   }
 
-  private ArrayList /* of LocalDeclaration */ locals=new ArrayList();
+  private ArrayList /* of LocalDeclaration */ locals = new ArrayList();
 
   /**
-   * Divides the statements in an hierarchy of blocks.
-   *
-   * Each block has a list of local variables
-   * accessible in the block, and a list of statements (possibly sub-blocks).
-   *
-   * @param statements the list of statements, with LocalDeclarations
-   * @return the list of statements of the current block.
+     Divides the statements in an hierarchy of blocks.
+     
+     Each block has a list of local variables
+     accessible in the block, and a list of statements (possibly sub-blocks).
+     
+     @param statements the list of statements, with LocalDeclarations
+     @return the list of statements of the current block.
    */
   private List cutInBlocks(List statements)
   {
-    ArrayList res=new ArrayList();
-    ListIterator i=statements.listIterator();
+    ArrayList res = new ArrayList();
+    ListIterator i = statements.listIterator();
 
     // Finds locals at the beginning
     while(i.hasNext())
       {
-	Object s=i.next();
+	Object s = i.next();
 	
-	if(s==null) // emptyStatement
+	if (s == null) // emptyStatement
 	  continue;
 	
-	if(s instanceof LocalDeclaration)
+	if (s instanceof LocalDeclaration)
 	  {
 	    LocalDeclaration decl = (LocalDeclaration) s;
 	    locals.add(decl);
 	    addChild(decl.left);
-	    if(decl.value!=null)
+	    if (decl.value != null)
 	      addChild(decl.value);
 	  }
 	else 
@@ -98,12 +99,12 @@ public class Block extends Statement
     // Finds statements. Creates a new Block if a local declaration is found
     while(i.hasNext())
       {
-	Object s=i.next();
+	Object s = i.next();
 	
-	if(s==null) // emptyStatement
+	if (s == null) // emptyStatement
 	  continue;
 	
-	if(s instanceof LocalDeclaration)
+	if (s instanceof LocalDeclaration)
 	  {
 	    // Removes all the statements already in res, 
 	    // keeps this LocalDeclarationStmt.
@@ -126,7 +127,7 @@ public class Block extends Statement
 
   void findJavaClasses()
   {
-    for(Iterator i=locals.iterator();
+    for(Iterator i = locals.iterator();
 	i.hasNext();)
       {
 	LocalDeclaration d = (LocalDeclaration) i.next();
@@ -138,22 +139,41 @@ public class Block extends Statement
    * Type checking
    ****************************************************************/
 
+  
   /**
-   * Checks that the local bindings are type-safe.
-   *
-   * This may involve overloading resolution on the values.
-   * 
-   * Typecheking is done after the children, since
-   * an error in a child is more intuitive.
-   * There is no dependency in the order.
+     Checks that the local bindings are type-safe.
+     
+     This may involve overloading resolution on the values.
+     
+     We want fine-grained control about the order:
+     it is more intuitive if right hand sides are typecheked first, 
+     then assignments, 
+     then statements.
    */
-  void endTypecheck()
+  void typecheck()
   {
-    for(Iterator i=locals.iterator();
+    for (Iterator i = children.iterator(); i.hasNext();)
+      {
+	Object o = i.next();
+	if (o instanceof Expression)
+	  ((Expression) o).typecheck();
+      }
+    // removal is not necessary to avoid double typecheck
+    // since there is a meachanism for this in Node,
+    // that remembers if typechecking has already been done
+    
+    checkAssignments();
+    
+    // statements are children, they are going to be checked now
+  }
+  
+  private void checkAssignments()
+  {
+    for(Iterator i = locals.iterator();
 	i.hasNext();)
       {
 	LocalDeclaration local = (LocalDeclaration) i.next();
-	if(local.value==null)
+	if (local.value == null)
 	  continue;
 	try{
 	  AssignExp.checkAssignment(local.left.getType(),local.value);
@@ -170,10 +190,10 @@ public class Block extends Statement
   
   Polytype getType()
   {
-    if(statements.size()>0)
+    if (statements.size()>0)
       {
 	Object o = statements.get(statements.size()-1);
-	if(o instanceof ReturnStmt)
+	if (o instanceof ReturnStmt)
 	  {
 	    ((ReturnStmt)o).value.noOverloading();
 	    return ((ReturnStmt)o).value.getType();
@@ -192,7 +212,7 @@ public class Block extends Statement
 
     gnu.expr.Expression body;
 
-    if(statements.size()!=0)
+    if (statements.size() != 0)
       body = new gnu.expr.BeginExp(null);
     else
       body = gnu.expr.QuoteExp.voidExp;
@@ -202,7 +222,7 @@ public class Block extends Statement
     // That is why we can't set body's body at construction.
     gnu.expr.Expression res = addLocals(locals.iterator(), body);
 
-    if(statements.size()!=0)
+    if (statements.size() != 0)
       ((gnu.expr.BeginExp) body).setExpressions(Statement.compile(statements));
 
     Statement.currentScopeExp = save;
@@ -213,18 +233,18 @@ public class Block extends Statement
   private gnu.expr.Expression addLocals(Iterator vars, 
 					gnu.expr.Expression body)
   {
-    if(!vars.hasNext())
+    if (!vars.hasNext())
       return body;
     
     LocalDeclaration local = (LocalDeclaration) vars.next();
 
-    gnu.expr.Expression[] eVal=new gnu.expr.Expression[1];
+    gnu.expr.Expression[] eVal = new gnu.expr.Expression[1];
     gnu.expr.LetExp res = new gnu.expr.LetExp(eVal);
 
     res.outer = Statement.currentScopeExp;
     Statement.currentScopeExp = res;
     
-    if(local.value==null)
+    if (local.value == null)
       eVal[0] = nice.tools.code.Types.defaultValue(local.left.type);
     else
       eVal[0] = local.value.generateCode();

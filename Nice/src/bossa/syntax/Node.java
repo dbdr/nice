@@ -12,7 +12,6 @@
 
 // File    : Node.java
 // Created : Thu Jul 08 10:24:56 1999 by bonniot
-//$Modified: Thu Aug 03 14:24:19 2000 by Daniel Bonniot $
 
 package bossa.syntax;
 
@@ -21,8 +20,11 @@ import bossa.util.*;
 import mlsub.typing.TypeSymbol;
 
 /**
- * Basic component of the syntax tree.
- * Defines its local scope.
+   Basic component of the syntax tree.
+   Defines its local scope.
+   
+   @version $Date$
+   @author Daniel Bonniot
  */
 abstract public class Node
 {
@@ -317,7 +319,7 @@ abstract public class Node
   // during execution of their typecheck method.
   static Function currentFunction;
   
-  /** override this when typechecking is needed */
+  /** override this when typechecking is needed. */
   void typecheck() { }
 
   /** 
@@ -330,6 +332,12 @@ abstract public class Node
   
   final void doTypecheck()
   {
+    // avoid to typecheck twice
+    // usefull in bossa.syntax.Block for instance
+    if (typecheckingDone)
+      return;
+    typecheckingDone = true;
+    
     Function savedFunction = null;
     
     try{
@@ -354,6 +362,8 @@ abstract public class Node
     }
   }
 
+  private boolean typecheckingDone = false;
+  
   /****************************************************************
    * Misc
    ****************************************************************/

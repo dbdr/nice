@@ -1,5 +1,6 @@
 package gnu.expr;
 import gnu.mapping.*;
+import gnu.bytecode.Type;
 
 /**
  * An Expression that evaluates to a constant value.
@@ -9,11 +10,14 @@ import gnu.mapping.*;
 public class QuoteExp extends Expression
 {
   Object value;
+  Type type = null;
 
   public final Object getValue() { return value; }
 
   public final gnu.bytecode.Type getType()
   {
+    if (type != null)
+      return type;
     if (value == Values.empty)
       return gnu.bytecode.Type.void_type;
     if (value == null)
@@ -29,6 +33,11 @@ public class QuoteExp extends Expression
   static public QuoteExp nullExp = new QuoteExp(null);
 
   public QuoteExp (Object val) { value = val; }
+  public QuoteExp (Object val, Type type) 
+  { 
+    this(val);
+    this.type = type;
+  }
   
   public Object eval (Environment env)
   {

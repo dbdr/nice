@@ -60,7 +60,7 @@ public class ConstantExp extends Expression
     if(value == null)
       Internal.warning(this+"["+this.getClass()+" has no value");
     
-    return new gnu.expr.QuoteExp(value);
+    return new gnu.expr.QuoteExp(value, nice.tools.code.Types.javaType(type));
   }
   
   protected LocatedString className = null;

@@ -1,0 +1,6 @@
+/// PASS
+  int i = 0;
+  boolean closed = false;
+  i = closed 
+    ? (i >= 66 ? 0 : -1000)
+    : i - i;

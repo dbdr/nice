@@ -5,7 +5,7 @@ package gnu.mapping;
  * @author  Per Bothner
  */
 
-public abstract class Procedure implements Named, Printable
+public abstract class Procedure implements Named
 {
   /** If non-null, a sequence of (key, value)-pairs. */
   private Object[] properties;
@@ -119,18 +119,18 @@ public abstract class Procedure implements Named, Printable
 	    result = apply0();
 	    break;
 	  case 1:
-	    result = apply1(ctx.getArgAsObject(0));
+	    result = apply1(ctx.getNextArg());
 	    break;
 	  case 2:
-	    result = apply2(ctx.getArgAsObject(0), ctx.getArgAsObject(1));
+	    result = apply2(ctx.getNextArg(), ctx.getNextArg());
 	    break;
 	  case 3:
-	    result = apply3(ctx.getArgAsObject(0), ctx.getArgAsObject(1),
-			    ctx.getArgAsObject(2));
+	    result = apply3(ctx.getNextArg(), ctx.getNextArg(),
+			    ctx.getNextArg());
 	    break;
 	  case 4:
-	    result = apply4(ctx.getArgAsObject(0), ctx.getArgAsObject(1),
-			    ctx.getArgAsObject(2), ctx.getArgAsObject(3));
+	    result = apply4(ctx.getNextArg(), ctx.getNextArg(),
+			    ctx.getNextArg(), ctx.getNextArg());
 	    break;
 	  default:
 	    result = applyN(ctx.getArgs());
@@ -158,6 +158,14 @@ public abstract class Procedure implements Named, Printable
   }
   */
 
+  public void setSetter (Procedure setter)
+  {
+    if (this instanceof HasSetter)
+      throw new RuntimeException("procedure '"+getName()+
+				 "' has builtin setter - cannot be modified");
+    setProperty(Procedure.setterKey, setter);
+  }
+
   /** If HasSetter, the Procedure is called in the LHS of an assignment. */
   /*
   public void set0(Object result) throws Throwable
@@ -176,14 +184,16 @@ public abstract class Procedure implements Named, Printable
   }
   */
 
-  public void print(java.io.PrintWriter ps)
+  public String toString ()
   {
-    ps.print ("#<procedure ");
+    StringBuffer sbuf = new StringBuffer();
+    sbuf.append ("#<procedure ");
     String n = getName();
     if (n == null)
       n = getClass().getName();
-    ps.print (n);
-    ps.print ('>');
+    sbuf.append(n);
+    sbuf.append('>');
+    return sbuf.toString();
   }
 
   public Object getProperty(Object key, Object defaultValue)

@@ -573,21 +573,36 @@ MonoSymbol monoSymbol():
 /***********************************************************************/
 
 TypeSymbol binder(Collection atomics):
-{
-  TypeIdent first;
-  TypeConstructor second;
-  MonotypeVar id;
-  Token t;
+{ TypeIdent ti;
+  TypeConstructor typevar;
 }
 {
+( LOOKAHEAD( typeConstructor() "extends" )
+  { TypeIdent typevarid; Monotype m2; }
+  typevarid=typeIdent() "extends"
+  { typevar = new TypeConstructor(typevarid.getName().toString()); }
+  ( LOOKAHEAD(typeIdent() ( "," | "|" | ">"))
+    ti=typeIdent()
+    {
+      atomics.add(new TypeConstructorLeqCst(typevar, ti));
+      return typevar;
+    }
+  |
+    m2=monotype()
+    {
+      atomics.add(new MonotypeLeqCst(typevarid, m2));
+      return typevar;
+    }
+  )
+|
   LOOKAHEAD( typeIdent() typeConstructor() )
-  first=typeIdent()
-  second=typeConstructor()
+  ti=typeIdent()
+  typevar=typeConstructor()
   {
-    atomics.add(new TypeConstructorLeqCst(second,first));
-    return second;
+    atomics.add(new TypeConstructorLeqCst(typevar,ti));
+    return typevar;
   }
-| { boolean sure = false; }
+| {   MonotypeVar id; boolean sure = false; }
   [ "!" { sure = true; } ]
   id=monotypeVar()
   {
@@ -595,6 +610,7 @@ TypeSymbol binder(Collection atomics):
       atomics.add(bossa.syntax.dispatch.createSureTypeVar(id));
     return id;
   }
+)
 }
 
 List binders(Collection atomics):
@@ -615,14 +631,14 @@ void atomicConstraint(List list):
 }
 {
 (  LOOKAHEAD(2)
-   m1=monotype() "<:" m2=monotype()
+   m1=monotype() ("<:" | "extends") m2=monotype()
    { list.add(new MonotypeLeqCst(m1,m2)); }
-   ( "<:" { m1 = m2; }
+   ( ("<:" | "extends") { m1 = m2; }
      m2 = monotype()
      { list.add(new MonotypeLeqCst(m1,m2)); }
    )*
 |
-   t=typeConstructorIdent() ":" i=typeIdent()
+   t=typeConstructorIdent() (":" | "implements") i=typeIdent()
    { list.add(new ImplementsCst(t,i)); }
 )
 }

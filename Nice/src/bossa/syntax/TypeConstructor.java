@@ -12,7 +12,7 @@
 
 // File    : TypeConstructor.java
 // Created : Thu Jul 08 11:51:09 1999 by bonniot
-//$Modified: Wed Aug 25 18:11:27 1999 by bonniot $
+//$Modified: Fri Aug 27 12:28:27 1999 by bonniot $
 
 package bossa.syntax;
 
@@ -199,9 +199,8 @@ public class TypeConstructor
   
   public void setKind(Kind value)
   {
-    Internal.warning("Variance set in TC by engine for "+name);
     Internal.error(kind!=null,"Variance already set in TypeConstructor");
-    
+    variance=(Variance)((Engine.K)value).associatedKind;
     kind=value;
   }
   

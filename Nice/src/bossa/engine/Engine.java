@@ -12,7 +12,7 @@
 
 // File    : Engine.java
 // Created : Tue Jul 27 15:34:53 1999 by bonniot
-//$Modified: Thu Aug 26 18:25:11 1999 by bonniot $
+//$Modified: Fri Aug 27 16:36:23 1999 by bonniot $
 
 package bossa.engine;
 
@@ -26,7 +26,6 @@ import bossa.util.*;
  * All accesses are done through this Engine
  * @author bonniot
  */
-
 public abstract class Engine
 {
   /**
@@ -90,7 +89,7 @@ public abstract class Engine
     backtrack();
   }
   
-  private static void backtrack()
+  public static void backtrack()
   {
     for(Iterator i=kinds.iterator();
 	i.hasNext();)
@@ -194,6 +193,17 @@ public abstract class Engine
       e.getKind().register(e);
     else
       floating.add(e);
+  }
+  
+  public static boolean isRigid(Element e)
+  {
+    int id=e.getId();
+    Internal.error(id<0,"Engine.isRigid :"+e+" is not known");
+    Kind kind=e.getKind();
+    Internal.error(kind==null,"null kind in Engine.isRigid for "+e);
+    K k=getConstraint(kind);
+    Internal.error(k==null,"null constraint in Engine.isRigid for "+e);
+    return k.isRigid(id);
   }
   
   /****************************************************************
@@ -304,10 +314,10 @@ public abstract class Engine
   
   /** The constraint of type variables */
   private static final K variablesKind=new K(){
-//      public String toString()
-//      { 
-//        return "Kind of type variables";
-//      }
+    public String toString()
+    { 
+      return "Kind of type variables";
+    }
   };
   
   private static final ArrayList createKinds()
@@ -332,15 +342,30 @@ public abstract class Engine
     if(dbg) Debug.println("Creating new Lowlevel constraint for "+kind);
     
     res=new K();
+    res.associatedKind=kind;
     res.mark();
     kinds.add(res);
     kindsMap.put(kind,res);
     return res;
   }
   
-  private static class K extends K0
+  public static class K extends K0
     implements Kind
   {
+    Collection interfaces=new ArrayList();
+
+    public void addInterface(bossa.syntax.InterfaceDefinition i)
+    {
+      interfaces.add(i);
+      i.resize(size());
+    }
+    
+    void onExtend(int newSize)
+    {
+      for(Iterator i=interfaces.iterator();i.hasNext();)
+	((bossa.syntax.InterfaceDefinition)i.next()).resize(newSize);
+    }
+    
     public final void leq(Element e1, Element e2)
       throws Unsatisfiable
     {
@@ -357,7 +382,7 @@ public abstract class Engine
 	throw e;
       }
     }
-    
+
     public final void register(Element e)
     {
       e.setId(extend());
@@ -373,7 +398,9 @@ public abstract class Engine
     protected void indexDiscarded(int index) {
       Internal.warning("Engine: Index discarded");
     }
+    public Kind associatedKind; // the kind of the elements of this constraint
+    // This is used in TypeConstructor.setKind
   }
 
-  static final boolean dbg = false;
+  static final boolean dbg = true;
 }

@@ -12,7 +12,7 @@
 
 // File    : TypeConstructorLeqCst.java
 // Created : Sat Jul 24 12:02:15 1999 by bonniot
-//$Modified: Wed Jul 28 11:03:09 1999 by bonniot $
+//$Modified: Fri Aug 27 12:57:44 1999 by bonniot $
 
 package bossa.syntax;
 
@@ -34,11 +34,15 @@ public class TypeConstructorLeqCst extends AtomicConstraint
 
   AtomicConstraint substitute(java.util.Map m)
   {
+    t1=t1.substitute(m);
+    t2=t2.substitute(m);
     return this;
   }
 
   AtomicConstraint resolve(TypeScope ts)
   {
+    t1=t1.resolve(ts);
+    t2=t2.resolve(ts);
     return this;
   }
 

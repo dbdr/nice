@@ -12,7 +12,7 @@
 
 // File    : TypeParameters.java
 // Created : Mon Jul 12 17:51:12 1999 by bonniot
-//$Modified: Tue Aug 24 13:50:00 1999 by bonniot $
+//$Modified: Fri Aug 27 17:31:15 1999 by bonniot $
 
 package bossa.syntax;
 
@@ -21,7 +21,8 @@ import bossa.util.*;
 import bossa.typing.Variance;
 
 /**
- * Ground type parameters
+ * Ground type parameters.
+ * Holds a colloction of Monotype.
  */
 public class TypeParameters
 {

@@ -12,7 +12,7 @@
 
 // File    : Typing.java
 // Created : Tue Jul 20 11:57:17 1999 by bonniot
-//$Modified: Fri Aug 27 11:15:59 1999 by bonniot $
+//$Modified: Fri Aug 27 17:26:22 1999 by bonniot $
 
 package bossa.typing;
 
@@ -122,6 +122,18 @@ abstract public class Typing
     }
     
   }
+
+  private static void unsatisfiable(TypingEx e) throws TypingEx
+  {
+    Engine.backtrack();
+    throw e;
+  }
+  
+  private static void unsatisfiable(BadSizeEx e) throws BadSizeEx
+  {
+    Engine.backtrack();
+    throw e;
+  }
   
   /****************************************************************
    * Assertions
@@ -130,7 +142,7 @@ abstract public class Typing
   public static void leq(Collection c1, Collection c2)
     throws TypingEx
   {
-    Internal.error(c1.size()!=c2.size(),"Unequal sizes in assertLeq");
+    Internal.error(c1.size()!=c2.size(),"Unequal sizes in leq");
     Iterator i1=c1.iterator();
     Iterator i2=c2.iterator();
     
@@ -230,7 +242,6 @@ abstract public class Typing
       Engine.leq(m1,m2);
     }
     catch(Unsatisfiable e){
-      if(dbg) e.printStackTrace();
       throw new TypingEx(e.getMessage());
     }    
   }
@@ -281,7 +292,7 @@ abstract public class Typing
     int expected=domains.size();
     int actual=types.size();
     if(expected!=actual)
-      throw new BadSizeEx(expected, actual);
+      unsatisfiable(new BadSizeEx(expected, actual));
 
     Iterator t=types.iterator();
     Iterator d=domains.iterator();
@@ -290,42 +301,69 @@ abstract public class Typing
   }
 
   /****************************************************************
-   * Interfaces
+   * Interfaces assertions
    ****************************************************************/
 
-  public static void imp(TypeConstructor t, Interface i)
-    throws TypingEx
+  public static void assertLeq(InterfaceDefinition i, InterfaceDefinition j)
   {
-    Debug.println(t+" imp "+i);
+    if(dbg) Debug.println(i+" !!!<<!!! "+j);
   }
   
-  public static void abs(TypeConstructor t, Interface i)
+  public static void assertLeq(InterfaceDefinition itf, Collection c)
+  {
+    for(Iterator i=c.iterator();i.hasNext();)
+      assertLeq(itf,((Interface)i.next()).definition);
+  }
+  
+  public static void assertImp(TypeConstructor t, InterfaceDefinition i)
     throws TypingEx
   {
-    Debug.println(t+" abs "+i);
+    User.error(!(t.variance.equals(i.variance)),t+" cannot implement "+i);
+    if(dbg) Debug.println(t+" imp "+i);
+    if(Engine.isRigid(t))
+      if(imp(t,i))
+	return;
+      else
+	unsatisfiable(new TypingEx(t+" doesn't implement "+i));
+    i.addImp(t.getId());
+    try{
+      ((Engine.K)t.getKind()).domains.reduce(t.getId(),i.impv);
+    }
+    catch(Unsatisfiable e){
+      unsatisfiable(new TypingEx("Unsatisfiable 5:"+e.getMessage()));
+    }
+  }
+  
+  public static void assertAbs(TypeConstructor t, InterfaceDefinition i)
+    throws TypingEx
+  {
+    if(dbg) Debug.println(t+" abs "+i);
   }
 
-  public static void imp(TypeConstructor t, Collection c)
+  public static void assertImp(TypeConstructor t, Collection c)
     throws TypingEx
   {
     Iterator i=c.iterator();
-    
     while(i.hasNext())
-      {
-	imp(t,(Interface)i.next());
-      }
+      assertImp(t,((Interface)i.next()).definition);
   }
   
-  public static void abs(TypeConstructor t, Collection c)
+  public static void assertAbs(TypeConstructor t, Collection c)
     throws TypingEx
   {
     Iterator i=c.iterator();
-    
     while(i.hasNext())
-      {
-	abs(t,(Interface)i.next());
-      }
+      assertAbs(t,(InterfaceDefinition)i.next());
   }
 
+  /****************************************************************
+   * Interfaces computations
+   ****************************************************************/
+
+  private static boolean imp(TypeConstructor t, InterfaceDefinition i)
+  {
+    return i.imp(t.getId());
+  }
+  
   static final boolean dbg = true;
 }

@@ -12,7 +12,7 @@
 
 // File    : ClassDefinition.java
 // Created : Thu Jul 01 11:25:14 1999 by bonniot
-//$Modified: Fri Aug 27 10:17:41 1999 by bonniot $
+//$Modified: Fri Aug 27 17:19:32 1999 by bonniot $
 // Description : Abstract syntax for a class definition
 
 package bossa.syntax;
@@ -38,17 +38,16 @@ public class ClassDefinition extends Node
     else
       this.typeParameters=typeParameters;
     this.extensions=extensions;
-    this.implementations=implementations;
-    this.abstractions=abstractions;
-    this.fields=fields;
-    this.methods=methods;
-    this.tc=new TypeConstructor(this);
 
-    addTypeSymbol(this.tc);
+    this.implementations=addChildren(implementations);
+    this.abstractions=addChildren(abstractions);
+    this.methods=addChildren(methods);
+
+    this.fields=fields;
     addChildren(computeAccessMethods(fields));
-    addChildren(methods);
-    addChildren(implementations);
-    addChildren(abstractions);
+
+    this.tc=new TypeConstructor(this);
+    addTypeSymbol(this.tc);
   }
   
   private List computeAccessMethods(List fields)
@@ -100,8 +99,8 @@ public class ClassDefinition extends Node
     try{
       Typing.introduce(tc);
       Typing.leq(tc,extensions);
-      Typing.imp(tc,implementations);
-      Typing.abs(tc,abstractions);
+      Typing.assertImp(tc,implementations);
+      Typing.assertAbs(tc,abstractions);
     }
     catch(TypingEx e){
       User.error(name,"Error in class "+name+" :"+e.getMessage());

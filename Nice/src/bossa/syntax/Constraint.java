@@ -12,7 +12,7 @@
 
 // File    : Constraint.java
 // Created : Fri Jul 02 17:51:35 1999 by bonniot
-//$Modified: Wed Aug 25 18:07:34 1999 by bonniot $
+//$Modified: Fri Aug 27 17:29:52 1999 by bonniot $
 
 package bossa.syntax;
 
@@ -53,12 +53,7 @@ public class Constraint extends Node
     else
       addTypeSymbols(binders);
     this.binders=binders;
-    
-    if(atomics==null)
-      atomics=new ArrayList(0);
-    else
-      addChildren(atomics);
-    this.atomics=atomics;
+    this.atomics=addChildren(atomics);
   }
 
   boolean hasBinders()

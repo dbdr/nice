@@ -12,7 +12,7 @@
 
 // File    : parser.jj
 // Created : Thu Jul 01 10:27:05 1999 by bonniot
-//$Modified: Fri Aug 27 10:53:14 1999 by bonniot $
+//$Modified: Fri Aug 27 17:13:44 1999 by bonniot $
 // Description : Parseur JavaCC pour Bossa
 //   Tokens based on the Jazz parser
 
@@ -506,6 +506,7 @@ AtomicConstraint atomicConstraint():
   AtomicConstraint res;
 }
 {
+(
   LOOKAHEAD(2)
   (
    m1=monotype()
@@ -520,6 +521,7 @@ AtomicConstraint atomicConstraint():
    i=itf()
    { res=new ImplementsCst(t,i); }
   )
+)
   { return res; }
 }
 
@@ -733,26 +735,13 @@ List extensions():
     { return res; }    
 }
 
-List implementations():
+List interfaces():
 {
   List res=new ArrayList(0);
   Interface name;
 }
 {
-  "implements"
-    name=itf() { res.add(name); }
-  ( "," name=itf() { res.add(name); } )*
-    { return res; }    
-}
-
-List abstractions():
-{
-  List res=new ArrayList(0);
-  Interface name;
-}
-{
-  "abstracts"
-    name=itf() { res.add(name); }
+  name=itf() { res.add(name); }
   ( "," name=itf() { res.add(name); } )*
     { return res; }    
 }
@@ -771,8 +760,8 @@ ClassDefinition classDefinition():
     name=string() 
     parameters=monotypeVars(true) 
 
-  ( l=implementations() { imp.addAll(l); } 
-  | l=abstractions()    { abs.addAll(l); }
+  ( "implements" l=interfaces() { imp.addAll(l); } 
+  | "abstracts"  l=interfaces() { abs.addAll(l); }
   | l=extensions()      { ext.addAll(l); }
   )*
 
@@ -793,13 +782,15 @@ InterfaceDefinition interfaceDefinition():
 {
   LocatedString name;
   Collection parameters;
+  List extensions=null;
 }
 {
   "interface"
   name=string()
   parameters=monotypeVars(true)
+  [ "extends" extensions=interfaces() ]
   ";"
-  { return new InterfaceDefinition(name,parameters); }
+  { return new InterfaceDefinition(name,parameters,extensions); }
 }
 
 Pattern pattern(LocatedString name):

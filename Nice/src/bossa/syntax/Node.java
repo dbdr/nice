@@ -12,7 +12,7 @@
 
 // File    : Node.java
 // Created : Thu Jul 08 10:24:56 1999 by bonniot
-//$Modified: Fri Aug 27 10:34:13 1999 by bonniot $
+//$Modified: Fri Aug 27 17:28:47 1999 by bonniot $
 
 package bossa.syntax;
 
@@ -54,12 +54,17 @@ abstract class Node
     children.add(n);
   }
   
-  void addChildren(List c)
+  /**
+   * Always returns the argument (except an empty list for 'null').
+   * This is just a convenience to be able to write 'this.f=addChildren(f)'.
+   */
+  List addChildren(List c)
   {
-    if(c==null) return;
+    if(c==null) return new LinkedList();
     for(Iterator i=c.iterator();
 	i.hasNext();)
       addChild((Node) i.next());
+    return c;
   }
     
   void addSymbol(VarSymbol s)

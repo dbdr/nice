@@ -12,12 +12,14 @@
 
 // File    : InterfaceDefinition.java
 // Created : Thu Jul 01 17:00:14 1999 by bonniot
-//$Modified: Fri Aug 27 11:02:50 1999 by bonniot $
+//$Modified: Fri Aug 27 17:26:43 1999 by bonniot $
 
 package bossa.syntax;
 
 import java.util.*;
 import bossa.util.*;
+import bossa.engine.BitVector;
+import bossa.typing.Variance;
 
 /** 
  * Abstract syntax for an interface definition
@@ -25,17 +27,20 @@ import bossa.util.*;
 public class InterfaceDefinition extends Node
   implements Definition,TypeSymbol
 {
-  public InterfaceDefinition(LocatedString name, Collection typeParameters)
+  public InterfaceDefinition(LocatedString name, Collection typeParameters, List extensions)
   {
     super(Node.forward);
     this.name=name;
     this.parameters=typeParameters;
+    this.variance=new Variance(typeParameters.size());
+    bossa.engine.Engine.getConstraint(variance).addInterface(this);
     addTypeSymbol(this);
+    this.extensions=addChildren(extensions);
   }
 
   public TypeSymbol cloneTypeSymbol()
   {
-    return new InterfaceDefinition(name,parameters);
+    return new InterfaceDefinition(name,parameters,extensions);
   }
   
   public boolean hasName(LocatedString s)
@@ -43,6 +48,36 @@ public class InterfaceDefinition extends Node
     return name.equals(s);
   }
 
+  /****************************************************************
+   * Typechecking
+   ****************************************************************/
+
+  void typecheck()
+  {
+    bossa.typing.Typing.assertLeq(this,extensions);
+  }
+  
+  /****************************************************************
+   * Constraints
+   ****************************************************************/
+
+  public BitVector impv=new BitVector();
+  
+  public void resize(int newSize)
+  {
+    impv.truncate(newSize);
+  }
+  
+  public boolean imp(int id)
+  {
+    return impv.get(id);
+  }
+  
+  public void addImp(int id)
+  {
+    impv.set(id);
+  }
+  
   /****************************************************************
    * Printing
    ****************************************************************/
@@ -66,4 +101,6 @@ public class InterfaceDefinition extends Node
 
   LocatedString name;
   Collection /* of TypeSymbol */ parameters;
+  public Variance variance;
+  private List /* of Interface */ extensions; // the surinterfaces
 }

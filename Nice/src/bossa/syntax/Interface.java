@@ -12,7 +12,7 @@
 
 // File    : Interface.java
 // Created : Thu Jul 08 11:51:09 1999 by bonniot
-//$Modified: Fri Aug 27 10:58:25 1999 by bonniot $
+//$Modified: Fri Aug 27 16:32:29 1999 by bonniot $
 
 package bossa.syntax;
 
@@ -34,7 +34,7 @@ public class Interface extends Node
   {
     super(Node.down);
     this.name=name;
-    this.id=-1;
+    //this.id=-1;
   }
 
   public TypeSymbol cloneTypeSymbol()
@@ -93,6 +93,6 @@ public class Interface extends Node
    ****************************************************************/
 
   LocatedString name;
-  InterfaceDefinition definition;
-  public int id;
+  public InterfaceDefinition definition;
+  //public int id;
 }

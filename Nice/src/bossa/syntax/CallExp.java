@@ -12,7 +12,7 @@
 
 // File    : CallExp.java
 // Created : Mon Jul 05 16:27:27 1999 by bonniot
-//$Modified: Thu Aug 26 17:38:21 1999 by bonniot $
+//$Modified: Fri Aug 27 17:32:46 1999 by bonniot $
 
 package bossa.syntax;
 
@@ -34,8 +34,7 @@ public class CallExp extends Expression
 		 List parameters)
   {
     this.fun=expChild(fun);
-    this.parameters=parameters;
-    addChildren(this.parameters);
+    this.parameters=addChildren(parameters);
   }
 
   public static CallExp create(Expression fun, 

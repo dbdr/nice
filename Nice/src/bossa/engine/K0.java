@@ -221,17 +221,27 @@ abstract public class K0 implements Cloneable {
   abstract protected void indexDiscarded(int index);
   
   /**
+   * Called when the constraint is resized
+   */
+  protected void onResize(int newSize)
+  {
+  }
+  
+  /**
    * Add a new variable to the constraint and returns its index
    **/
   final public int extend() {
     try {
       int result = extend0();
       domains.exclude(result, virtual);
+      onResize(result+1);
       return result;
     } catch (LowlevelUnsatisfiable e) {
       throw S.panic();
     }
   }
+  //To remove
+  //Everything with 'virtual' is a hack for old interfaces
   final public int extendVirtual() {
     try {
       int result = extend0();
@@ -516,7 +526,7 @@ abstract public class K0 implements Cloneable {
   /***********************************************************************
    * Domains management
    ***********************************************************************/
-  private DomainVector domains = new DomainVector(0, 0);
+  public DomainVector domains = new DomainVector(0, 0);
   private void domainIntersect(int x, BitVector constraint)
   throws LowlevelUnsatisfiable {
     domains.reduce(x, constraint);
@@ -670,6 +680,7 @@ abstract public class K0 implements Cloneable {
       this.virtual = backup.savedVirtual;
       this.backup  = backup.savedBackup; // leave this statement at the end !
     }
+    onResize(n);
     //mark();
     clearTags(); //TODO:?? should I leave this ?
   }

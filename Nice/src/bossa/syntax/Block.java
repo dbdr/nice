@@ -12,7 +12,7 @@
 
 // File    : Block.java
 // Created : Wed Jul 07 17:42:15 1999 by bonniot
-//$Modified: Thu Aug 19 13:38:42 1999 by bonniot $
+//$Modified: Fri Aug 27 17:17:20 1999 by bonniot $
 // Description : A block : a list of statements with local variables
 
 package bossa.syntax;
@@ -25,8 +25,7 @@ public class Block extends Statement
   public Block(List statements)
   {
     super(Node.down);
-    addChildren(statements);
-    this.statements=statements;
+    this.statements=addChildren(statements);
   }
 
   private Collection findLocals(Collection statements)

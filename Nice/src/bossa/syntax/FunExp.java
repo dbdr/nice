@@ -12,7 +12,7 @@
 
 // File    : FunExp.java
 // Created : Mon Jul 12 15:09:50 1999 by bonniot
-//$Modified: Tue Aug 24 17:03:04 1999 by bonniot $
+//$Modified: Fri Aug 27 17:20:54 1999 by bonniot $
 // Description : A functional expression
 
 package bossa.syntax;
@@ -26,12 +26,11 @@ public class FunExp extends Expression
 		Constraint cst, List formals, List body)
   {
     this.typeParameters=typeParameters;
-    this.formals=formals;
+    this.formals=addChildren(formals);
     this.constraint=cst;
     this.body=new Block(body);
 
     addChild(constraint);
-    addChildren(formals);
     addChild(this.body);
   }
 

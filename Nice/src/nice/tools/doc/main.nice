@@ -7,9 +7,10 @@ package nice.tools.doc;
  */
 
 import nice.doc;
+import nice.getopt;
 import nice.tools.compiler;
 import nice.tools.compiler.console;
-import bossa.modules.*;
+import bossa.modules;
 
 /**
  * Compilation object allows us to dynamically find out what we are compiling.

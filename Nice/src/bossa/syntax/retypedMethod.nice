@@ -290,6 +290,7 @@ void registerNativeField(JavaFieldAccess f, gnu.bytecode.Field reflectField)
 
 private void removeFromScope(MethodDeclaration m)
 {
-  Module.javaScope.removeSymbol(m.getSymbol());
+  let sym = m.getSymbol();
+  Node.compilation.javaScope.remove(sym.getName().toString(), sym);
   unregisterDispatchTest(m);
 }

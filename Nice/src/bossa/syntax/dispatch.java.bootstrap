@@ -27,7 +27,7 @@ public class dispatch
 
   public static void resetJavaClasses() {}
 
-  public static VarScope createGlobalVarScope()
+  public static VarScope createGlobalVarScope(int dummy, nice.tools.visibility.Scope scope)
   { return null; }
 
   public static void resetTypeDefinitionMappings() {}

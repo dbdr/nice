@@ -10,29 +10,39 @@
 /*                                                                        */
 /**************************************************************************/
 
-package bossa.syntax;
+package nice.tools.visibility;
 
 /**
-   The smallest unit containing code (typically, the content of a file).
+   Flat lookup mode.
 
-   Definitions marked as 'private' are only visible inside their Module.
+   In this mode, symbols in the current scope do not shadow <i>visibile</i>
+   symbols in imported scopes.
+
+   @author Daniel Bonniot (bonniot@users.sf.net)
  */
 
-public class Module
+<Sym> List<Sym> getFlat(Scope<Sym> this, String key)
 {
-  public final bossa.modules.Package pkg;
-  VarScope scope;
-  String name;
+  List<Sym> res = new LinkedList();
 
-  public Module(bossa.modules.Package pkg, String name,
-                nice.tools.visibility.Scope scope)
-  {
-    this.pkg = pkg;
-    this.name = name;
-    this.scope = dispatch.createGlobalVarScope(0, scope);
-  }
+  ?Scope<Sym> s = this;
+  while (s != null)
+    {
+      assert this != null;
 
-  bossa.modules.Compilation compilation() { return pkg.getCompilation(); }
+      ?List<Sym> temp = s.map[key];
+      if (temp != null)
+	res.addAll(temp);
 
-  public boolean compiled() { return pkg.interfaceFile(); }
+      for (o : s.opens)
+	{
+	  temp = o.publicMap[key];
+	  if (temp != null)
+	    res.addAll(temp);
+	}
+
+      s = s.parent;
+    }
+
+  return res;
 }

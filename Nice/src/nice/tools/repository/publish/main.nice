@@ -19,7 +19,9 @@ package nice.tools.repository.publish;
  */
 
 import nice.tools.repository;
+import nice.tools.compiler;
 import nice.tools.compiler.console;
+import nice.tools.unit;
 import nice.tools.unit.console;
 
 let java.text.DateFormat fmt = getVerDateFormat();

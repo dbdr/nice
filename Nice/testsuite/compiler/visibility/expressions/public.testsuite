@@ -1,4 +1,4 @@
-/// FAIL bug
+/// FAIL
   /// package a
   /// Toplevel
 public void fooA() {}
@@ -29,3 +29,30 @@ public void fooB() {}
 
   /// package d import c,b
   {}
+
+/// PASS
+  // Check that methods in the package do not hide methods with the same name
+  // in imported packages.
+  /// package a
+  /// Toplevel
+  class A<T> { public T[] elements; }
+  /// package b import a
+  new B(elements: new int[0]).size();
+  /// Toplevel
+  class B<T> extends A<T> {
+    int size() = this.elements.size();
+  }
+
+
+/// PASS
+  // Check that methods in the package do not hide methods with the same name
+  // in imported packages.
+  /// package a
+  /// Toplevel
+class A {}
+public void foo(A a) {}
+
+  /// package b import a
+  /// Toplevel
+class X { A a; }
+void foo(X x) = foo(x.a);

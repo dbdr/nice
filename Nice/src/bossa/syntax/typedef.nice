@@ -55,6 +55,15 @@ public abstract class TypeDefinition extends MethodContainer
       this.variance = mlsub.typing.Variance.make(new int[arity]);
 
     this.createTC();
+    // Add the symbol immediately, to make sure another one is not created
+    // for the same (bytecode) class.
+    try {
+      Node.getGlobalTypeScope().addSymbol(tc);
+    }
+    catch(TypeScope.DuplicateName e){
+      User.error(this.location(), e.getMessage());
+    }
+
     typeParametersVariances = null;
 
     if( modifiers.isFinal() )
@@ -130,7 +139,6 @@ public abstract class TypeDefinition extends MethodContainer
 
     tcToTypeDef.put(tc, this);
     mlsub.typing.Typing.introduce(tc);
-    this.addTypeSymbol(tc);
   }
 
   TypeScope getLocalScope()

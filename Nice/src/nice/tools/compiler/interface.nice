@@ -20,6 +20,7 @@ package nice.tools.compiler;
  */
 
 import bossa.modules;
+import mlsub.compilation;
 
 void compile(Compilation compilation, String mainPackage,
 	     ?String nativeProgram = null, ?String nativeCompiler = null,

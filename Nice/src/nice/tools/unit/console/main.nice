@@ -2,6 +2,7 @@ package nice.tools.unit.console;
 
 import nice.tools.unit;
 import nice.doc;
+import nice.getopt;
 
 void main(String[] args)
 {

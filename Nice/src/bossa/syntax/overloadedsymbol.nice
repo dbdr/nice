@@ -455,7 +455,7 @@ new AmbiguityError(OverloadedSymbolExp sym)
 	    Util.map("", "\n", "", sym.symbols));
     }
 
-List<VarSymbol> removeNonMinimal(List<VarSymbol> symbols)
+List<VarSymbol> removeNonMinimal(Collection<VarSymbol> symbols)
 {
   List<VarSymbol> removed = new ArrayList();
   // optimization

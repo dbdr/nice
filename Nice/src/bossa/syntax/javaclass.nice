@@ -58,7 +58,7 @@ public class JavaClass extends ClassImplementation
       User.error(definition, javaName + " has " + nativeArity + " type parameters");
     
     let old = setTypeConstructorForJavaClass
-		(definition.compilation(), definition.getTC(), classType);
+		(definition.getTC(), classType, definition.compilation());
 
     if (old != null)
       User.error(definition, javaName + " was already associated with the Nice class " + old);
@@ -71,7 +71,7 @@ public class JavaClass extends ClassImplementation
     if (ignoredRetyping)
       return;
 
-    fetchMethods(definition.getTC(), cast(definition.getJavaType()), Module.javaScope);
+    fetchMethods(definition.getTC(), cast(definition.getJavaType()));
   }
 
   printInterface(s)
@@ -85,7 +85,8 @@ public class JavaClass extends ClassImplementation
  * associated TypeConstructor in which case it is returned.
  */
 ?mlsub.typing.TypeConstructor setTypeConstructorForJavaClass
-    (bossa.modules.Compilation compilation, mlsub.typing.TypeConstructor tc, gnu.bytecode.Type type) =
+    (mlsub.typing.TypeConstructor tc, gnu.bytecode.Type type,
+     bossa.modules.Compilation compilation) =
     	compilation.javaTypeConstructors.put(type, tc);
 
 let gnu.bytecode.Type[] blackListClass = [
@@ -114,8 +115,9 @@ boolean excludedInterface(mlsub.typing.TypeConstructor itf)
 }
 
 mlsub.typing.TypeConstructor createJavaType
-  (bossa.modules.Compilation compilation, String className,
-   gnu.bytecode.Type javaType, VarScope scope)
+  (String className,
+   gnu.bytecode.Type javaType,
+   bossa.modules.Compilation compilation)
 {
   if (bossa.util.Debug.javaTypes)
     bossa.util.Debug.println("Registering java class "+className);
@@ -207,7 +209,7 @@ mlsub.typing.TypeConstructor createJavaType
     }
 
   if (javaType instanceof gnu.bytecode.ClassType)
-    fetchMethods(res, javaType, scope);
+    fetchMethods(res, javaType);
 
   return res;
 }
@@ -234,8 +236,7 @@ boolean instantiable(gnu.bytecode.Type javaType)
        gnu.bytecode.Access.INTERFACE)) == 0;
 }
 
-?mlsub.typing.TypeConstructor lookupJavaClass(String className, ?Location loc,
-					      VarScope scope)
+?mlsub.typing.TypeConstructor lookupJavaClass(String className, ?Location loc)
 {
   let classType = nice.tools.code.TypeImport.lookup(className, loc);
 
@@ -247,5 +248,5 @@ boolean instantiable(gnu.bytecode.Type javaType)
   if (compilation.javaTypeConstructors.containsKey(classType))
     return compilation.javaTypeConstructors.get(classType);
 
-  return createJavaType(compilation, classType.getName(), classType, scope);
+  return createJavaType(classType.getName(), classType, compilation);
 }

@@ -73,8 +73,7 @@ public class Package implements mlsub.compilation.Module, Located
 
     compilation.packages.put(name.toString(), this);
 
-    if (compilation.globalScope == null)
-      compilation.globalScope = bossa.syntax.dispatch.createGlobalVarScope();
+    packageScope = new nice.tools.visibility.Scope(getName(), null);
 
     source = compilation.locator.find(this);
     if (source == null)
@@ -101,13 +100,20 @@ public class Package implements mlsub.compilation.Module, Located
 
     if (!name.toString().equals("nice.lang") && !Debug.ignorePrelude)
       imports.add(new LocatedString("nice.lang",
-				    bossa.util.Location.nowhere()));
+                                    bossa.util.Location.nowhere()));
 
     setOpens(opens);
 
     List p = this.getImports();
     for (Iterator i = p.iterator(); i.hasNext();)
-      source.someImportModified(((Package) i.next()).lastModification());
+      {
+        Package imported = (Package) i.next();
+        source.someImportModified(imported.lastModification());
+        if (imported != this)
+          packageScope.addImplicitOpen(imported.packageScope);
+      }
+
+    packageScope.addImplicitOpen(compilation.javaScope);
   }
 
   /**
@@ -193,7 +199,9 @@ public class Package implements mlsub.compilation.Module, Located
     for(Iterator i = imports.iterator(); i.hasNext();)
       {
 	LocatedString s = (LocatedString) i.next();
-	importedPackages.add(make(s, compilation, false));
+        Package p = make(s, compilation, false);
+        if (! importedPackages.contains(p))
+          importedPackages.add(p);
       }
   }
 
@@ -832,6 +840,8 @@ public class Package implements mlsub.compilation.Module, Located
   public Compilation getCompilation() { return compilation; }
 
   bossa.syntax.Module compiledModule = null;
+
+  nice.tools.visibility.Scope packageScope;
 
   /** 
       @return true if this package was loaded from an interface file,

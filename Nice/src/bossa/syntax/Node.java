@@ -117,20 +117,19 @@ abstract public class Node
    * Scopes shared by all modules.
    */
 
-  private static TypeScope globalTypeScope;
   public static final TypeScope getGlobalTypeScope()
   {
-    return globalTypeScope;
+    return compilation.globalTypeScope;
   }
 
   public static final bossa.modules.Package getGlobalTypeScopeModule()
   {
-    return globalTypeScope.getPackage();
+    return compilation.globalTypeScope.getPackage();
   }
 
   public static mlsub.typing.TypeConstructor globalTypeScopeLookup(String name, Location loc)
   {
-    return globalTypeScope.globalLookup(name, loc);
+    return compilation.globalTypeScope.globalLookup(name, loc);
   }
 
   public static bossa.modules.Compilation compilation = null;
@@ -142,15 +141,16 @@ abstract public class Node
     if (compilation != pkg.getCompilation())
       {
         compilation = pkg.getCompilation();
-	globalTypeScope = dispatch.createGlobalTypeScope();
+        if (compilation.globalTypeScope == null)
+          compilation.globalTypeScope = dispatch.createGlobalTypeScope();
       }
-    globalTypeScope.setPackage(pkg);
+    compilation.globalTypeScope.setPackage(pkg);
   }
 
   void buildScope(bossa.modules.Package pkg)
   {
     setPackage(pkg);
-    buildScope(null, globalTypeScope);
+    buildScope(null, compilation.globalTypeScope);
   }
   
   /** 
@@ -178,7 +178,7 @@ abstract public class Node
       case global:
 	this.scope = outer;
 	this.scope.addSymbols(varSymbols);
-	typeOuter = globalTypeScope;
+	typeOuter = compilation.globalTypeScope;
 	this.typeScope = typeOuter;
 	break;
 
@@ -304,7 +304,7 @@ abstract public class Node
           ((Node)i.next()).doTypecheck();
         }
         catch(UserError ex){
-          globalTypeScope.getPackage().getCompilation().error(ex);
+          compilation.globalTypeScope.getPackage().getCompilation().error(ex);
 	}
   }
 

@@ -21,7 +21,8 @@ public class GlobalVarScope extends VarScope
 {
   private Scope<VarSymbol> impl = new Scope(name: "", parent: null);
 
-  addSymbol(VarSymbol sym) = impl.add(sym.getName().toString(), sym);
+  addSymbol(VarSymbol sym) =
+    impl.add(sym.getName().toString(), sym, visibility: general);
 
   removeSymbol(VarSymbol sym) = impl.remove(sym.getName().toString(), sym);
 
@@ -30,14 +31,11 @@ public class GlobalVarScope extends VarScope
     let s = name.toString();
 
     // If there is any method by that name waiting, load it.
-    loadJavaMethods(s, this);
+    loadJavaMethods(s);
 
-    let res = impl[s];
-
-    if (res == null)
-      return Collections.EMPTY_LIST;
-    else
-      return new LinkedList(res);
+    // Return all visible symbols with the given name, without preference
+    // for those in the current module or package.
+    return impl.getFlat(s);
   }
 
   globalLookup(name) = this.lookup(name);
@@ -46,6 +44,11 @@ public class GlobalVarScope extends VarScope
 VarScope createGlobalVarScope()
 {
   return new GlobalVarScope();
+}
+
+VarScope createGlobalVarScope(int, Scope<VarSymbol> scope)
+{
+  return new GlobalVarScope(impl: scope);
 }
 
 /**
@@ -128,7 +131,7 @@ public class GlobalTypeScope extends TypeScope
     if (res != null)
       return res;
 
-    return cast(lookupJavaClass(notNull(name), loc, Module.javaScope));
+    return cast(lookupJavaClass(notNull(name), loc));
   }
 }
 

@@ -36,6 +36,7 @@ public abstract class Compilation extends CompilationInterface
   public java.util.Map packages;
   public java.util.Map javaTypeConstructors;
 
-  bossa.syntax.VarScope globalScope;
+  nice.tools.visibility.Scope javaScope;
+  public bossa.syntax.TypeScope globalTypeScope;
 }
 

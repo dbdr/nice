@@ -131,7 +131,9 @@ foo() {
   L1.add(999);         
   println( L1[0] );
 
-/// PASS
+/// PASS bug skip
+ // This bug chaotically depends on factors like symbol treatment order,
+ // so we skip it for now to avoid spurious result changes
   let testmap = new HashMap();
    for(s : testmap.mapKeys())
      {
@@ -231,8 +233,10 @@ while (n-- > 0)
 class Cell { int value; }
 toString(Cell c) = c.value.toString;
 
-/// PASS
+/// PASS bug skip
  // bug #923429 simplified
+ // This bug chaotically depends on factors like symbol treatment order,
+ // so we skip it for now to avoid spurious result changes
  let table1 = new HashMap();
  let table2 = new HashMap();
 

@@ -68,7 +68,8 @@ class Content
       readers = source.getDefinitions();
     else
       {
-        pkg.compiledModule = new bossa.syntax.Module(pkg, pkg.getName(), pkg.compilation.globalScope);
+        pkg.compiledModule =
+          new bossa.syntax.Module(pkg, pkg.getName(), pkg.packageScope);
         readers = compiled.getDefinitions();
       }
 
@@ -112,8 +113,18 @@ class Content
   {
     bossa.util.Location.setCurrentFile(unit.file);
 
-    bossa.syntax.Module module = pkg.compiledModule != null ?
-      pkg.compiledModule : new bossa.syntax.Module(pkg, unit.name, pkg.compilation.globalScope);
+    bossa.syntax.Module module;
+
+    if (pkg.compiledModule != null)
+      module = pkg.compiledModule;
+    else
+      {
+        nice.tools.visibility.Scope scope =
+          new nice.tools.visibility.Scope(unit.name, pkg.packageScope);
+
+        module = new bossa.syntax.Module(pkg, unit.name, scope);
+      }
+
     Definition.currentModule = module;
 
     pkg.compilation.parser.read(unit.reader, definitions);

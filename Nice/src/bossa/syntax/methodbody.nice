@@ -254,7 +254,7 @@ public class MethodBodyDefinition extends MethodImplementation
 
     resolvePatterns(notNull(typeScope), module.scope, formals);
 
-    symbols = notNull(scope).lookup(name);
+    symbols = module.scope.lookup(name);
   }
 
   void lateBuildScope()

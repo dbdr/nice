@@ -25,14 +25,19 @@ public class NullnessKind implements AtomicKind
 {
   public static NullnessKind instance = new NullnessKind();
 
-  public static void initialize(TypeConstructor maybeTC)
+  public static void setMaybe(TypeConstructor tc)
   {
-    maybe = maybeTC;
+    maybe = tc;
+  }
+
+  public static void setSure(TypeConstructor tc)
+  {
+    sure = tc;
   }
 
   public int arity() { return 1; }
 
-  private static TypeConstructor maybe;
+  private static TypeConstructor maybe, sure;
 
   public Monotype freshMonotype()
   {
@@ -40,6 +45,7 @@ public class NullnessKind implements AtomicKind
     Typing.introduce(tc);
     try {
       Typing.leq(tc, maybe);
+      Typing.leq(sure, tc);
     } catch(TypingEx ex) {
       bossa.util.Internal.error("Nullness creation error");
     }

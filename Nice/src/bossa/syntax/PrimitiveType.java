@@ -133,7 +133,7 @@ public class PrimitiveType extends ClassDefinition.ClassImplementation
     if (name.equals("nice.lang.Maybe"))
       {
 	maybeTC = tc;
-	mlsub.typing.NullnessKind.initialize(tc);
+	mlsub.typing.NullnessKind.setMaybe(tc);
 	// to differ with the null result, which signals error
 	return gnu.bytecode.Type.pointer_type;
       }
@@ -141,6 +141,7 @@ public class PrimitiveType extends ClassDefinition.ClassImplementation
     if (name.equals("nice.lang.Sure"))
       {
 	sureTC = tc;
+	mlsub.typing.NullnessKind.setSure(tc);
 	// to differ with the null result, which signals error
 	return gnu.bytecode.Type.pointer_type;
       }

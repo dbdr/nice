@@ -37,3 +37,26 @@ void f(?String, int ?-> int) {}
   /// Toplevel
 void f(?String) {}
 void f(?java.io.File) {}
+
+/// PASS
+  // Checks that ! is the minimum amond nullness markers.
+  /// Toplevel
+interface Method <R,A> {
+   R call(A a);
+}
+
+abstract class OOMemoize<R,A> implements Method<R,A> {
+   HashMap<A,R> table = new HashMap();
+
+   R protomethod(A a);
+}
+
+<R,A> call(this@OOMemoize, a){
+   if (this.table.containsKey(a))
+     return notNull(this.table.get(a));
+   else {
+      let R m = this.protomethod(a);
+      this.table.put(a,m);
+      return m;
+   }
+}

@@ -99,10 +99,10 @@ class DirectorySource extends PackageSource
   private File[] getSources()
   {
     File[] res = directory.listFiles
-      (new FilenameFilter()
+      (new FileFilter()
 	{ 
-	  public boolean accept(File dir, String name)
-	  { return name.endsWith(pkg.sourceExt); }
+	  public boolean accept(File f)
+	  { return f.getPath().endsWith(pkg.sourceExt) && f.isFile(); }
 	}
        );
     if (res == null)

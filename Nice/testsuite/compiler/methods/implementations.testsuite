@@ -41,7 +41,7 @@ class MapWrapper<K, V> implements _Map<K, V> {}
 
   // Try to implement a method for a case equivalent to the default.
   // This should create an ambiguity.
-  /*/// FAIL HERE */ fA(A a) {}
+  fA(A a) {}
 
 /// PASS
   /// COMMENT: This tests implementation of a method whose implicit 'this'

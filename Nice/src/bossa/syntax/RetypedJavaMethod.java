@@ -244,6 +244,9 @@ public class RetypedJavaMethod extends JavaMethod
 
   public void printInterface(java.io.PrintWriter s)
   {
+    if (ignoredRetyping)
+      return;
+
     s.print(super.toString() + " = native " +
 	    (methodName.equals("<init>") 
 	     ?  "new " + className

@@ -12,6 +12,13 @@
 
 package nice.tools.doc;
 
+/**
+ * The comment class is an abstraction of a comment block.  It contains an
+ * instance variable <i>tags</i> contains an ArrayList of tuples that map tag
+ * strings to values.  The value <b>null</b> maps to the general comment.
+ * The constructor of this class should be used put a comment block in 
+ * <i>commentStr</i> (the default value is the empty string.
+ */
 class Comment {
     //a list of tuples that maps tags, such as @param, to values
     //this value is initialised by the custom constructor
@@ -24,6 +31,13 @@ class Comment {
     }
 }
 
+/**
+ * Parses a comment block and returns an ArrayList containing tuples that map
+ * tag string (such as @param) to values.  The value <b>null</b> is used as the
+ * parameter for the general comment heading the block.
+ * @param a comment block beginning with &#47;&#42;&#42; and ending with &#42;&#47;
+ * @return a list of tuples mapping tags to values.
+ */
 ArrayList<(?String,String)> parse(String comments) {
     //an initial capacity of 8 is used becuase I don't expect many values
     ArrayList<(?String,String)> list = new ArrayList(8);

@@ -156,3 +156,12 @@ public class Elem<List<String> E> {
 }
   /// package b import a
   new Elem(data: "");
+
+/// PASS
+  /// package a
+  /// Toplevel
+public class A<java.io.File T | java.io.File <: T>
+{}
+
+  /// package b import a
+void dummy() {}

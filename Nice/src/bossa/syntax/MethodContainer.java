@@ -162,7 +162,7 @@ public abstract class MethodContainer extends Definition
 	    first = false;
 	  }
 	  res.append(resolvedConstraints[n]);
-	  if (n + 1 < typeParameters.length)
+	  if (n + 1 < resolvedConstraints.length)
 	    res.append(", ");
 	}
     }

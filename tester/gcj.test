@@ -1,6 +1,6 @@
 #! /bin/sh
 
-[ "$GCJ" ] || exit 2
+[ "$GCJ" ] || exit 8
 
 cd Nice
 

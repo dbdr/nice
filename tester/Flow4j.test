@@ -6,7 +6,7 @@ set -e
 
 if [ ${JDK_VERSION} ] && expr "${JDK_VERSION}" '<' 1.4.0 >/dev/null; then
     echo "JDK 1.4 needed for the Flow4j test. Skipping."
-    exit 2
+    exit 8
 fi
 
 if [ ! -r flow4j ]; then

@@ -104,8 +104,9 @@ for conffile in ../config.*; do
 	    case "$code" in
 		0) echo "OK"         ;;
 		1) echo "FAILURE"    ; failed=true ;;
-		2) echo "SKIP"       ;;
+		2) echo "WARN"       ;;
 		3) echo "IMPOSSIBLE" ;;
+		8) echo "SKIP"       ;;
 		*) echo "$((code-10))"      ;;
 	    esac
 	} >> $config.res

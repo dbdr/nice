@@ -1,3 +1,6 @@
+
+package regtest.typing;
+
 class AInv<T> {}
 class BInv<T> extends AInv<T> {}
 

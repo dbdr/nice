@@ -334,45 +334,22 @@ abstract public class Node
   /** override this when typechecking is needed. */
   void typecheck() { }
 
-  /** 
-   * Usefull when children are to be typechecked in a context
-   * defined by this Node :
-   * the Typing.enter() goes in typecheck()
-   * and the Typing.leave() goes here
-   */
-  void endTypecheck() { }
-  
   final void doTypecheck()
   {
     // avoid to typecheck twice
     // usefull in bossa.syntax.Block for instance
     if (typecheckingDone)
-      return;
+      {
+	//Internal.warning("Attempt to typecheck twice " + this + ", a " + getClass());
+	return;
+      }
     typecheckingDone = true;
     
-    Function savedFunction = null;
+    typecheck();
     
-    try{
-      typecheck();
-
-      if(this instanceof Function)
-	{
-	  savedFunction = currentFunction;
-	  currentFunction = (Function) this;
-	}
-    
-      if (children != null)
-	for(Iterator i = children.iterator();i.hasNext();)
-	  ((Node)i.next()).doTypecheck();
-    }
-    finally{
-      if(savedFunction != null)
-	currentFunction = savedFunction;
-      
-      // it might be necessary to have this endTypecheck guarded by 
-      // this finally, as a leave() might be in it
-      endTypecheck();
-    }
+    if (children != null)
+      for(Iterator i = children.iterator();i.hasNext();)
+	((Node)i.next()).doTypecheck();
   }
 
   private boolean typecheckingDone = false;

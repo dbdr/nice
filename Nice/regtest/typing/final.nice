@@ -1,4 +1,6 @@
 
+package regtest.typing;
+
 class F1 {}
 final class F2 extends F1 {}
 

@@ -251,9 +251,9 @@ boolean or(java.util.List<boolean> s)
   return false;
 }
 
-long max(java.util.List<long> s)
+long max(java.util.List<long> s) requires !s.isEmpty()
 {
-  long res = 0;
+  long res = Long.MIN_VALUE;
 
   for(int i = 0; i < s.size(); i++)
     if (s[i] > res)

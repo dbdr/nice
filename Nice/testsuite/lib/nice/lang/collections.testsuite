@@ -2,3 +2,15 @@
   int count = 0;
   [0,1,2].foreach(int i => `assert`(i == count++));
   assert count == 3;
+
+/// PASS
+  long[] array = [-3,-1,-2];
+  assert array.max() == -1;
+
+/// PASS
+  long[] arr = [];
+  boolean b = false;
+  try {
+    arr.max();
+  } catch (AssertionFailed x) { b = true; }
+  assert b;

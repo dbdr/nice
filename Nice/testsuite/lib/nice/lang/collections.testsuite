@@ -1,0 +1,4 @@
+/// PASS
+  int count = 0;
+  [0,1,2].foreach(int i => assert(i == count++));
+  assert(count == 3);

@@ -12,8 +12,6 @@
 
 package bossa.syntax;
 
-import bossa.util.*;
-
 /**
    A function is either a method body or a lambda expression.
    
@@ -24,8 +22,22 @@ import bossa.util.*;
 interface Function
 {
   /**
-   * Returns the return type of the function,
-   * or null if no typecheking must be done.
+     Called with each type returned from the function.
+     Can be used for either type checking or type inference.
    */
-  mlsub.typing.Monotype getReturnType();
+  void checkReturnedType(mlsub.typing.Polytype returned) 
+   throws WrongReturnType;
+
+  class WrongReturnType extends Exception 
+  {
+    WrongReturnType(mlsub.typing.TypingEx typingException,
+		    mlsub.typing.Monotype expectedReturnType)
+    {
+      this.typingException = typingException;
+      this.expectedReturnType = expectedReturnType;
+    }
+
+    mlsub.typing.TypingEx typingException;
+    mlsub.typing.Monotype expectedReturnType;
+  }
 }

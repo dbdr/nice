@@ -333,9 +333,7 @@ analyse(e@FunExp, info)
     addVars(info, notNull(e.formals));
 
   analyse(e.body, info);
-  if (!info.getUnreachable() 
-      && !nice.tools.code.Types.isVoid(e.inferredReturnType()))
-    throw error(e, "Missing return statement");
+  e.setAlwaysReturns(info.getUnreachable());
 
   info.end();
   info.endInner();

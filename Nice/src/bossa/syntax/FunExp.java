@@ -1,7 +1,7 @@
 /**************************************************************************/
 /*                                N I C E                                 */
 /*             A high-level object-oriented research language             */
-/*                        (c) Daniel Bonniot 2000                         */
+/*                        (c) Daniel Bonniot 2002                         */
 /*                                                                        */
 /*  This program is free software; you can redistribute it and/or modify  */
 /*  it under the terms of the GNU General Public License as published by  */
@@ -48,24 +48,31 @@ public class FunExp extends Expression implements Function
     this.body = body;
   }
 
+  public void checkReturnedType(mlsub.typing.Polytype returned)
+    throws Function.WrongReturnType
+  {
+    if (inferredReturnType == null)
+      inferredReturnType = returned;
+    else
+      inferredReturnType = Polytype.union(inferredReturnType, returned);
+
+    if (type != null)
+      Internal.error("Return statement discovered after computation of the type");
+  }
+
+  private boolean alwaysReturns;
+  void setAlwaysReturns(boolean value) { alwaysReturns = value; }
+
   void computeType()
   {
-    if(body instanceof ReturnStmt)
-      inferredReturnType = ((ReturnStmt) body).returnType();
-    else if(body instanceof Block)
-      {
-	inferredReturnType = ((Block) body).getType();
-	if (inferredReturnType == null)
-	  User.error(this,
-		     "Not implemented: the last statement of "+this+
-		     "must be a return statement");
-      }
+    if (inferredReturnType == null)
+      // There is not return statement in the function.
+      inferredReturnType = ConstantExp.voidPolytype;
     else
-      {
-	Internal.error(this, "Body of lambda expression is not of known form");
-	inferredReturnType = null;
-      }
-    
+      if (! alwaysReturns && 
+	  ! nice.tools.code.Types.isVoid(inferredReturnType))
+	throw User.error(this, "Missing return statement");
+
     Monotype t = new FunType(MonoSymbol.getMonotype(formals), 
 			     inferredReturnType.getMonotype());
     type = new Polytype
@@ -80,11 +87,6 @@ public class FunExp extends Expression implements Function
     return inferredReturnType;
   }
 
-  public Monotype getReturnType()
-  {
-    return null;
-  }
-  
   /****************************************************************
    * Code generation
    ****************************************************************/

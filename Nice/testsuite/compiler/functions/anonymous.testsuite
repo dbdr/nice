@@ -1,0 +1,27 @@
+/// FAIL
+  // Incorrect call of an anonymous function stored in a variable
+  boolean -> void f = boolean b => {};
+  f();
+
+/// FAIL
+  // Incorrect call of an anonymous function stored in a local parameter
+  /// Toplevel
+  void g(boolean -> void f)
+  {
+    f();
+  }
+
+/// PASS
+  int->int f = int x => { if (true) return 0; else return 1; };
+
+/// FAIL
+  int->int f = int x => { if (true) return 0; };
+
+/// FAIL
+  int->void f = int x => { if (true) return 0; };
+
+/// PASS
+  int->void f = int x => { if (true) return; };
+
+/// PASS
+  int->void f = int x => { if (true) return; else return; };

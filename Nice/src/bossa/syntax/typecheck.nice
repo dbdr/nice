@@ -413,8 +413,8 @@ typecheck(decl@Block.LocalVariable)
 
 typecheck(decl@Block.LocalConstant)
 {
-  notNull(decl.left).type = notNull(decl.value).getType();
   typecheck(decl.value);
+  notNull(decl.left).type = notNull(decl.value).getType();
 }
 
 typecheck(decl@Block.LocalFunction)
@@ -473,7 +473,11 @@ typecheck(s@LabeledStmt)
 
 typecheck(r@ReturnStmt)
 {
-  r.includingFunction = Node.currentFunction;
+  ?Function function = Node.currentFunction;
+  if (function == null)
+    throw bossa.util.User.error(r, "This return is not inside a function");
+
+  r.includingFunction = function;
 
   if (r.value != null)
     {
@@ -481,17 +485,13 @@ typecheck(r@ReturnStmt)
       typecheck(r.value);
     }
   
-  ?mlsub.typing.Monotype declaredRetType = notNull(r.includingFunction).getReturnType();
-  if (declaredRetType == null)
-    return;
-  
   try{
-    Typing.leq(r.returnType(), declaredRetType);
+    function.checkReturnedType(r.returnType());
   }
-  catch(TypingEx e){
-    if (notNullError(e, r, String.valueOf(r.value)))
+  catch(Function.WrongReturnType e){
+    if (notNullError(notNull(e.typingException), r, String.valueOf(r.value)))
       wrongReturnType(r, notNull(r.returnType()).toString(), 
-		      declaredRetType.toString(), e);
+		      valueOf(e.expectedReturnType), notNull(e.typingException));
   }
 }
 

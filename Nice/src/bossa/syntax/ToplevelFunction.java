@@ -108,6 +108,17 @@ implements Function
    * Typechecking
    ****************************************************************/
 
+  public void checkReturnedType(mlsub.typing.Polytype returned)
+    throws Function.WrongReturnType
+  {
+    try {
+      Typing.leq(returned, getReturnType());
+    }
+    catch (mlsub.typing.TypingEx e) {
+      throw new Function.WrongReturnType(e, getReturnType());
+    }
+  }
+
   void innerTypecheck() throws TypingEx
   {
     // The body must be type-checked in a rigid context

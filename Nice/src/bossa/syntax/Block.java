@@ -282,28 +282,6 @@ public class Block extends Statement
   }
 
   /****************************************************************
-   * Type checking
-   ****************************************************************/
-  
-  mlsub.typing.Polytype getType()
-  {
-    if (statements.length > 0)
-      {
-	Object o = statements[statements.length - 1];
-	if (o instanceof ReturnStmt)
-	  {
-	    ReturnStmt r = (ReturnStmt) o;
-	    if (r.value != null)
-	      {
-		r.value.noOverloading();
-		return r.value.getType();
-	      }
-	  }
-      }
-    return ConstantExp.voidPolytype;
-  }
-
-  /****************************************************************
    * Code generation
    ****************************************************************/
 

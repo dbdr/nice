@@ -1,0 +1,5 @@
+/// COMMENT: Local functions
+
+/// PASS
+  void f(int x) { if (true) return; }
+

@@ -39,10 +39,10 @@ public class AssignExp extends Expression
   {
     // Rewrite "get(e, i) = v" into "set(e, i, v)"
     if (to instanceof CallExp &&
-	"get".equals(((CallExp) to).fun.toString()))
+	"get".equals(((CallExp) to).function.toString()))
       {
 	CallExp call = (CallExp) to;
-	((IdentExp) ((ExpressionRef) call.fun).content()).ident.content = "set";
+	((IdentExp) call.function.content().ident.content = "set";
 	call.arguments.add(value);
 
 	return call;
@@ -55,11 +55,17 @@ public class AssignExp extends Expression
    * Type cheking
    ****************************************************************/
   
-  static void checkAssignment(Polytype left, ExpressionRef right)
+  /**
+     Checks that right can be assigned to a variable of type left.
+     Returns a new expression to be used instead of right,
+     since overloading resolution is done on the expected type.
+  */
+  static Expression checkAssignment(Polytype left, Expression right)
     throws TypingEx
   {
-    right.resolveOverloading(left);
-    Typing.leq(right.getType(), left);
+    Expression val = right.resolveOverloading(left);
+    Typing.leq(val.getType(), left);
+    return val;
   }
   
   void typecheck()
@@ -70,7 +76,7 @@ public class AssignExp extends Expression
       User.error(this, to + " cannot be assigned a value");
     
     try{
-      checkAssignment(to.getType(), value);
+      value = checkAssignment(to.getType(), value);
     }
     catch(TypingEx t){
       User.error(this,
@@ -105,6 +111,6 @@ public class AssignExp extends Expression
     return to + " = " + value;
   }
 
-  private Expression to;
-  private ExpressionRef value;
+  Expression to;
+  Expression value;
 }

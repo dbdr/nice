@@ -82,6 +82,11 @@ public class Arguments extends Node
     return arguments[num].value;
   }
 
+  void setExp(int num, Expression value)
+  {
+    arguments[num].value = value;
+  }
+
   Scopes buildScope(VarScope outer, TypeScope typeOuter)
   {
     Scopes res = super.buildScope(outer, typeOuter);
@@ -210,5 +215,5 @@ public class Arguments extends Node
     return res.append(")").toString();
   }
   
-  private Argument[] arguments;
+  Argument[] arguments;
 }

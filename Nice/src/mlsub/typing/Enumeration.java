@@ -18,6 +18,7 @@ import mlsub.typing.lowlevel.Engine;
 import mlsub.typing.lowlevel.Unsatisfiable;
 import mlsub.typing.lowlevel.BitVector;
 import mlsub.typing.lowlevel.Element;
+import mlsub.typing.lowlevel.Kind;
 
 /**
    Enumeration of the type constructors in a domain.
@@ -126,16 +127,25 @@ public class Enumeration
     throws Unsatisfiable
   {
     while(minFloating<tags.length 
-	  && (all[minFloating] != doAll ||
-	      tags[minFloating].getKind() != null
-	      && tags[minFloating].getKind() != Engine.variablesConstraint))
+	  && (all[minFloating] != doAll || 
+              isFixedKind(tags[minFloating].getKind())))
       minFloating++;
 
     if(minFloating<tags.length)
       {
-	// There might be a garbagy Engine.variablesConstraint 
-	// in the monotype variable variable
-	tags[minFloating].setKind(null);
+        Element tag = tags[minFloating];
+        
+        if (tag.getKind() == TopMonotype.TopKind.instance)
+          {
+            // Tag is "Object". All TCs are solutions.
+            tag = tags[minFloating] = new MonotypeVar("enumeration");
+          }
+        else
+          {
+            // There might be a garbagy Engine.variablesConstraint 
+            // in the monotype variable variable
+            tag.setKind(null);
+          }
 
 	for(Iterator cs = Engine.listConstraints(); cs.hasNext();)
 	  {
@@ -145,16 +155,16 @@ public class Enumeration
 		c != bossa.syntax.PrimitiveType.nullTC.getKind())
 	      {
 		if(linkDbg)
-		  Debug.println("Choosing kind "+c+" for "+tags[minFloating]);
+		  Debug.println("Choosing kind " + c + " for " + tag);
 		
-		if(tags[minFloating] instanceof MonotypeVar)
-		  Engine.forceKind(tags[minFloating],c.associatedKind);
+		if (tag instanceof MonotypeVar)
+		  Engine.forceKind(tag, c.associatedKind);
 		else
-		  Engine.forceKind(tags[minFloating],c);
+		  Engine.forceKind(tag, c);
 
 		// recursive call
 		setFloatingKinds(tags, all, minFloating + 1, res, doAll);
-		tags[minFloating].setKind(null);
+		tag.setKind(null);
 	    }
 	  }
       }
@@ -181,7 +191,14 @@ public class Enumeration
 	  throw new SolutionFound();
       }
   }
-  
+
+  private static boolean isFixedKind(Kind k)
+  {
+    return k != null
+      && k != Engine.variablesConstraint
+      && k != TopMonotype.TopKind.instance;
+  }
+
   private static class SolutionFound extends RuntimeException {}
 
   private static List enumerateTags(Element[] tags)

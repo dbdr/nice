@@ -31,3 +31,7 @@ class B implements I {
  // `fooI` not implemented  
 }
 
+/// PASS
+  /// Toplevel
+  <T> T foo(T x, Object o) = x;
+  foo(String s, o) = "";

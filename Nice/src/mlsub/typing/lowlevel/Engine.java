@@ -749,11 +749,17 @@ public abstract class Engine
       if(dbg)
 	{	  
 	  Debug.println(e1+" <: "+e2+" ("+e1.getId()+" <: "+e2.getId()+")");
-	  if(e1.getId()<0 || e1.getId()>=k0.size())
-	    Debug.println(e1 + " has invalid index");
+	  if (e1.getId() < 0 || e1.getId() >= k0.size())
+	    {
+	      Debug.println(e1 + " has invalid index");
+	      bossa.util.Internal.printStackTrace();
+	    }
       
-	  if(e2.getId()<0 || e2.getId()>=k0.size())
-	    Debug.println(e2 + " has invalid index");
+	  if (e2.getId() < 0 || e2.getId() >= k0.size())
+	    {
+	      Debug.println(e2 + " has invalid index");
+	      bossa.util.Internal.printStackTrace();
+	    }
 	}
 
       if(initial)

@@ -15,6 +15,7 @@ test_import()
   String s = null;
   println(pToString(s));
 
+  println(0);
   println(isNull(0));
   println(isNull(null));
 }

@@ -310,7 +310,88 @@ Window createMyWindow()
   <chapter><title>Interfacing with Java</title>
     <section><title>Using Java from Nice</title>
       <para>
+        The Java libraries are automatically imported as necessary. 
+	Therefore it is straightforward	to use existing Java code
+	in Nice programs.
       </para>
+
+      <para>
+	This section lists advanced features related to the use of Java code
+	in Nice.
+      </para>
+
+      <section id="optionTypesJava"><title>Option types</title>
+	<para>
+	  Nice's advanced type system makes the distinction between normal 
+	  (e.g. <literal>String</literal>) and option
+	  (e.g. <literal>?String</literal>) types, which allows to 
+	  prevent <literal>NullPointerExceptions</literal>
+	  (see <link linkend="optionTypes">option types</link>).
+	  This poses a problem when using 
+	  existing Java libraries. If my Nice program calls a Java function
+	  that returns a <literal>String</literal> (the Java type), 
+	  does it mean <literal>String</literal> or 
+	  <literal>?String</literal> in Nice? 
+	  Since Java allows the value to be <literal>null</literal>, 
+	  the Nice compiler 
+	  currently suposes it's <literal>?String</literal> (it can only be 
+	  sure about primitive types like <literal>int</literal>).
+	</para>
+
+	<programlisting lang="java">
+// Java code
+public class MyJavaClass {
+  public String getName() {
+    return "foo";
+  }
+}	</programlisting>
+
+	<para>
+          In Nice, if <literal>myJavaClass</literal> is a variable of type 
+	  <literal>MyJavaClass</literal>, then 
+	  <literal>myJavaClass.getName()</literal> has type 
+	  <literal>?String</literal>.
+	</para>
+
+	<para>
+	  If the Java code might indeed return <literal>null</literal>, 
+	  or you are not sure, this is all good. To use the value you will 
+	  have to test it against <literal>null</literal>. However there are 
+	  many cases where you know the value cannot be 
+	  <literal>null</literal>, for instance if this fact is specified in 
+	  the Javadoc comment of the method. In that cases there are currently 
+	  two possibilities. The first is to use the <literal>notNull</literal>
+	  function. It tells the compiler that you know the value is not 
+	  <literal>null</literal>. At runtime, it will throw a 
+	  <literal>NullPointerException</literal> if this was not the case. 
+	  So in our example <literal>notNull(myJavaClass.getName())</literal>
+	  has type <literal>String</literal>. This solution is simple, but can 
+	  be annoying if you call the same method many times, or because it 
+	  makes your code less readable.
+	</para>
+
+	<para>
+	  The second solution is to tell once and for all the compiler the 
+	  precise type of the method (this is also useful for methods with 
+	  parametric types):
+	</para>
+
+	<programlisting lang="nice">
+String getName(MyJavaClass) = native String MyJavaClass.getName();</programlisting>
+
+	<para>
+          The Nice part (on the left of the <literal>=</literal> character) 
+	  is the header of a function definition. Note that return type is 
+	  <literal>String</literal> (without the optional type marker 
+	  <literal>?</literal>). On the other hand, the right part says that 
+	  the function is already defined in class 
+	  <literal>MyJavaClass</literal>, with name <literal>getName</literal>,
+	  the one that takes no argument and returns a 
+	  <literal>String</literal>. With this declaration, 
+	  <literal>myJavaClass.getName()</literal> has type 
+	  <literal>String</literal>.
+	</para>
+      </section>
     </section>
 
     <section><title>Using Nice from Java</title>
@@ -439,6 +520,15 @@ public class Main
   <chapter><title>Types</title>
     <para>
     </para>
+
+    <section id="optionTypes"><title>Option types</title>
+      <para>
+        See 
+	<ulink url="http://nice.sourceforge.net/cgi-bin/view/Doc/OptionType">
+	the Wiki site page about option types</ulink>.
+      </para>
+      </section>
+
   </chapter>
 
 </book>

@@ -66,15 +66,10 @@ abstract public class ClassDefinition extends MethodContainer
 
     void resolveClass()
     {
-      // If superClass is non null, it was build before.
-      // Extensions should be null in that case.
-      if (extendedInterfaces == null)
-	{
-	  extendedInterfaces = resolveInterfaces(extensions);
-	  extensions = null;
-	}
+      extendedInterfaces = this.resolveInterfaces(extensions);
+      extensions = null;
 
-      // Resolve the superclass first.
+      // Resolve the super-interfaces first.
       if (extendedInterfaces != null)
 	for (int i = 0; i < extendedInterfaces.length; i++)
 	  {
@@ -253,7 +248,7 @@ abstract public class ClassDefinition extends MethodContainer
 	    d.resolve();
 	}
 
-      impl = resolveInterfaces(implementations);
+      impl = this.resolveInterfaces(implementations);
       abs = TypeIdent.resolveToItf(typeScope, abstractions);
     
       implementations = abstractions = null;

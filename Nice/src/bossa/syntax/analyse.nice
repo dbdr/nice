@@ -169,6 +169,7 @@ class Info
 	symbol.type = notNull(symbol.syntacticType).resolve(this.typeMap);
 	symbol.syntacticType = null;
       }
+    this.checkNotDefined(symbol);
     this.vars[symbol.name.toString()] = symbol;
   }
 
@@ -181,7 +182,7 @@ class Info
 	if (nice.tools.code.Types.isVoid(symbol.type))
 	  throw error(symbol, "A variable cannot have a void type");
       }
-
+    this.checkNotDefined(symbol);
     this.vars[symbol.name.toString()] = symbol;
   }
 
@@ -190,6 +191,15 @@ class Info
   
   void addTypeVars(Array<TypeSymbol> symbols) = 
     symbols.foreach(TypeSymbol s => this.typeVars[s.toString()] = s);
+
+  void checkNotDefined(VarSymbol symbol)
+  {
+    ?VarSymbol old = this.vars[symbol.name.toString()];
+    if (old != null)
+      throw error(symbol, "Symbol " + symbol.name + " is already defined at " +
+		"line " + old.location().getLine() +
+		", column " + old.location().getColumn());
+  }
 }
 
 void checkInitialized(Block.LocalVariable.Symbol sym, Info info,

@@ -70,3 +70,25 @@
 
 /// PASS
   int i,j,k;
+
+/// FAIL
+  int x = 5;
+  int /* /// FAIL HERE */x = 10;
+
+/// FAIL
+  int x = -1;
+  for (int i = 0; i < 5; i++) {
+    int /* /// FAIL HERE */x = 1;
+  }
+
+/// FAIL
+  int x = 10;
+  [1,2,3].foreach(int /* /// FAIL HERE */x => {} );
+
+/// PASS
+  boolean test = true;
+  if (test) {
+    int x = 5;
+  } else {
+    int x = 3;
+  }

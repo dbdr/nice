@@ -12,7 +12,7 @@
 
 // File    : Engine.java
 // Created : Tue Jul 27 15:34:53 1999 by bonniot
-//$Modified: Wed Aug 18 18:57:54 1999 by bonniot $
+//$Modified: Mon Aug 23 18:54:00 1999 by bonniot $
 
 package bossa.engine;
 
@@ -39,7 +39,11 @@ public abstract class Engine
     
     for(Iterator i=kinds.iterator();
 	i.hasNext();)
-      ((K)i.next()).mark();
+      { 
+	K k=(K)i.next();
+	k.rigidify();
+	k.mark();
+      }
   }
   
   /**
@@ -60,7 +64,7 @@ public abstract class Engine
       { 
 	K k=(K)i.next();
 	k.satisfy();
-	k.rigidify();
+	// the rigidify() is done in the inner enter if necessary
       }
   }
   

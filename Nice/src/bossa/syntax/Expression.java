@@ -12,7 +12,7 @@
 
 // File    : Expression.java
 // Created : Mon Jul 05 16:25:02 1999 by bonniot
-//$Modified: Thu Aug 19 14:33:34 1999 by bonniot $
+//$Modified: Thu Aug 19 17:23:14 1999 by bonniot $
 // Description : 
 
 package bossa.syntax;
@@ -57,6 +57,11 @@ public abstract class Expression extends Node
     return false;
   }
 
+  Expression resolveOverloading(List /* of Expression */ parameters)
+  {
+    return this;
+  }
+  
   /** returns the static type of the expression */
   abstract Type getType();
 

@@ -12,7 +12,7 @@
 
 // File    : VarScope.java
 // Created : Fri Jul 09 11:28:11 1999 by bonniot
-//$Modified: Wed Aug 18 16:03:49 1999 by bonniot $
+//$Modified: Mon Aug 23 18:16:14 1999 by bonniot $
 
 package bossa.syntax;
 
@@ -63,14 +63,14 @@ class VarScope
    * @param i the identifier to lookup
    * @return the symbols if it was found, null otherwise
    */
-  public Iterator lookup(LocatedString i)
+  public Collection lookup(LocatedString i)
   {
     // The semantics is here that when a symbol is defined at one level,
     // it hides all definitions at higher levels.
     // This may be changed
 
-    Iterator res=defs.getAll(i);
-    if(res!=null && res.hasNext())
+    Collection res=defs.getAll(i);
+    if(res!=null)
       return res;
     if(outer!=null)
       return outer.lookup(i);
@@ -79,14 +79,33 @@ class VarScope
 
   public VarSymbol lookupOne(LocatedString s)
   {
-    Iterator i=lookup(s);
-    if(i==null || !(i.hasNext()))
+    Collection i=lookup(s);
+    if(i==null)
       return null;
-    VarSymbol res=(VarSymbol)i.next();
-    User.error(i.hasNext(),s+"'s usage is ambiguous");
-    return res;
+    User.error(i.size()>1,s,s+"'s usage is ambiguous");
+    return (VarSymbol)i.iterator().next();
+  }
+
+  public VarSymbol lookupLast(LocatedString s)
+  {
+    VarSymbol res=(VarSymbol)defs.getLast(s);
+    if(res!=null)
+      return res;
+    if(outer==null)
+      return null;
+    return outer.lookupLast(s);
   }
   
+  public boolean overloaded(LocatedString s)
+  {
+    if(defs.containsKey(s))
+      return defs.elementCount(s)>1;
+    else if(outer!=null)
+      return outer.overloaded(s);
+    else 
+      return false;
+  }
+	
   /**
    * Verifies that a collection of VarSymbol
    * does not contains twice the same identifier

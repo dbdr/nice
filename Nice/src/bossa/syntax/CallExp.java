@@ -12,7 +12,7 @@
 
 // File    : CallExp.java
 // Created : Mon Jul 05 16:27:27 1999 by bonniot
-//$Modified: Thu Aug 19 13:07:47 1999 by bonniot $
+//$Modified: Mon Aug 23 18:11:12 1999 by bonniot $
 
 package bossa.syntax;
 
@@ -45,7 +45,10 @@ public class CallExp extends Expression
     parameters=Expression.resolveExp(parameters);
   }
 
-  Type getType()
+  static Type getType(Location loc,
+		      Expression fun,
+		      List parameters,
+		      boolean report)
   {
     Type funt=fun.getType();
     Collection parametersTypes=null;
@@ -53,24 +56,34 @@ public class CallExp extends Expression
     Collection dom=funt.domain();
     Monotype codom=funt.codomain();
     
-    User.error(dom==null || codom==null,
-	       this,fun+" is not a function");
-    
-    User.error(!(funt instanceof Polytype),this,
-	       "You have to specify the type parameters for function "+
-	       fun);
+    if(report)
+      {
+	User.error(dom==null || codom==null,
+		   loc,fun+" is not a function");
+	
+	User.error(!(funt instanceof Polytype),loc,
+		   "You have to specify the type parameters for function "+
+		   fun);
+      }
+    else if(dom==null || codom==null || !(funt instanceof Polytype))
+      return null;
 
-    Typing.enter(funt.getTypeParameters(),"call "+this.fun);
+    if(report)
+      Typing.enter(funt.getTypeParameters(),"call "+fun);
 
     try{
       Typing.implies();
       
       try{ funt.getConstraint().assert(); }
-      catch(TypingEx e) { User.error(this,"The conditions for using this function are not fullfiled"); }
+      catch(TypingEx e) { 
+	if(report)
+	  User.error(loc,"The conditions for using this function are not fullfiled"); 
+	else return null;
+      }
 
       parametersTypes=Expression.getPolytype(parameters);
-      User.error(parametersTypes==null,this,
-		 "Arguments of functions must not be imperative-parametric");
+      User.error(parametersTypes==null,loc,
+		   "Arguments of functions must not be imperative-parametric");
       
       Typing.in(parametersTypes,
 		Domain.fromMonotypes(funt.domain()));
@@ -79,25 +92,37 @@ public class CallExp extends Expression
 
     }
     catch(BadSizeEx e){
-      User.error(this,e.expected+" parameters expected "+
-		 ", not "+e.actual);
+      if(report)
+	User.error(loc,e.expected+" parameters expected "+
+		   ", not "+e.actual);
+      else
+	return null;
     }
     catch(TypingEx e){
-      if(parameters.size()>=2)
-	User.error(this,"The parameters "+
-		   Util.map("(",", ",")",parameters) +
-		 " are not within the domain of the function");
+      if(report)
+	if(parameters.size()>=2)
+	  User.error(loc,"The parameters "+
+		     Util.map("(",", ",")",parameters) +
+		     " are not within the domain of the function");
+	else
+	  User.error(loc,"The parameter \""+
+		     Util.map("",", ","",parameters) +
+		     "\" is not within the domain of the function");
       else
-	User.error(this,"The parameter "+
-		   Util.map("",", ","",parameters) +
-		 " is not within the domain of the function");
+	return null;
     }
     
+    //computes the resulting type
     Constraint cst=funt.getConstraint().and(Type.getConstraint(parametersTypes));
     cst.and(MonotypeLeqCst.constraint(Type.getMonotype(parametersTypes),dom));
     
-    Polytype res = new Polytype(cst,codom);
-    return res;
+    return new Polytype(cst,codom);
+  }
+  
+  Type getType()
+  {
+    fun=fun.resolveOverloading(parameters);
+    return getType(location(),fun,parameters,true);
   }
 
   public String toString()

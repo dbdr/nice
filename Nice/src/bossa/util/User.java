@@ -12,7 +12,7 @@
 
 // File    : User.java
 // Created : Wed Jul 07 18:20:58 1999 by bonniot
-//$Modified: Tue Jul 20 18:57:30 1999 by bonniot $
+//$Modified: Mon Aug 23 17:44:00 1999 by bonniot $
 // Description : Messages for the user
 
 package bossa.util;
@@ -40,6 +40,11 @@ public class User
   {
     System.out.println(message);
     System.exit(1);
+  }
+
+  public static void warning(Located responsible, String message)
+  {
+    warning(responsible.location()+message);
   }
 
   public static void warning(String message)

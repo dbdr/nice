@@ -12,7 +12,7 @@
 
 // File    : Internal.java
 // Created : Wed Jul 07 18:23:19 1999 by bonniot
-//$Modified: Fri Aug 13 14:36:01 1999 by bonniot $
+//$Modified: Mon Aug 23 17:13:26 1999 by bonniot $
 // Description : Internal errors...
 
 package bossa.util;
@@ -47,6 +47,14 @@ public class Internal
   public static void error(String message)
   {
     System.out.println("[Internal error] "+message);
+    
+    try{  
+      throw new Exception();
+    }
+    catch(Exception e){
+      e.printStackTrace();
+    }
+    
     System.exit(1);
   }
 

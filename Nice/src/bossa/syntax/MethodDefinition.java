@@ -12,7 +12,7 @@
 
 // File    : MethodDefinition.java
 // Created : Thu Jul 01 18:12:46 1999 by bonniot
-//$Modified: Thu Aug 19 13:43:49 1999 by bonniot $
+//$Modified: Thu Aug 19 17:15:15 1999 by bonniot $
 // Description : Abstract syntax for a global method declaration
 
 package bossa.syntax;
@@ -39,6 +39,7 @@ public class MethodDefinition extends PolySymbol implements Definition
     //params.add(c.type);
     params.addAll(parameters);
 
+    this.arity=params.size();
     this.type=Type.newType(typeParameters,
 			   new Polytype(constraint,
 					new FunType(params,returnType)));
@@ -69,6 +70,11 @@ public class MethodDefinition extends PolySymbol implements Definition
     return false;
   }
 
+  int getArity()
+  {
+    return arity;
+  }
+  
   /************************************************************
    * Printing
    ************************************************************/
@@ -87,4 +93,5 @@ public class MethodDefinition extends PolySymbol implements Definition
   }
 
   private ClassDefinition memberOf;
+  private int arity;
 }

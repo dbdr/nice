@@ -12,7 +12,7 @@
 
 // File    : Typing.java
 // Created : Tue Jul 20 11:57:17 1999 by bonniot
-//$Modified: Wed Aug 18 18:57:37 1999 by bonniot $
+//$Modified: Mon Aug 23 18:47:59 1999 by bonniot $
 
 package bossa.typing;
 

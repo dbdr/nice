@@ -12,7 +12,7 @@
 
 // File    : MethodBodyDefinition.java
 // Created : Thu Jul 01 18:12:46 1999 by bonniot
-//$Modified: Thu Aug 19 13:43:21 1999 by bonniot $
+//$Modified: Mon Aug 23 18:54:58 1999 by bonniot $
 // Description : Abstract syntax for a method body
 
 package bossa.syntax;
@@ -42,26 +42,18 @@ public class MethodBodyDefinition extends Node
 
   private Collection buildSymbols(Collection names, Collection types)
   {
-    Collection res=new ArrayList(names.size());
-    Iterator n=names.iterator();
-    Iterator t=types.iterator();
+    User.error(names.size()!=types.size(),this,
+	       "Method "+name+" has "+types.size()+" parameters");
     
-    while(n.hasNext())
+    Collection res=new ArrayList(names.size());
+    for(Iterator n=names.iterator(),t=types.iterator();
+	n.hasNext();)
       {
-	User.error(!t.hasNext(),
-		   "Method body "+this.name+" has two many parameters:\n"+
-		   "It needs "+types.size()+
-		   ", not "+names.size()
-		   );
-
 	Pattern p=(Pattern)n.next();
 	Monotype domt=(Monotype)t.next();
-	
 	res.add(new MonoSymbol(p.name,
-			      Monotype.fresh(p.name,domt),null));
+			       Monotype.fresh(p.name,domt)));
       }
-    User.error(t.hasNext(),
-	       "Method body "+this.name+" has not enough parameters");
     return res;
   }
   
@@ -87,7 +79,7 @@ public class MethodBodyDefinition extends Node
 
   VarScope buildScope(VarScope outer, TypeScope typeOuter)
   {
-    setDefinition((MethodDefinition)outer.lookupOne(name));
+    setDefinition((MethodDefinition)outer.lookupLast(name));
 
     addTypeSymbols(definition.type.getConstraint().binders);
     
@@ -130,7 +122,8 @@ public class MethodBodyDefinition extends Node
 
   void typecheck()
   {
-    Typing.enter(definition.type.getTypeParameters(),"method body of "+name);
+    Typing.enter(definition.type.getTypeParameters(),
+		 "method body of "+name);
 
     try{
       try { definition.type.getConstraint().assert(); }
@@ -145,10 +138,15 @@ public class MethodBodyDefinition extends Node
 	(monotypes,
 	 definition.type.domain());
       
-      Typing.in
-	(VarSymbol.getType(parameters),
-	 Pattern.getDomain(formals));
-
+      try{
+	Typing.in
+	  (VarSymbol.getType(parameters),
+	   Pattern.getDomain(formals));
+      }
+      catch(TypingEx e){
+	User.error(name,"The patterns are not correct");
+      }
+      
       Typing.implies();
 
     }
@@ -156,7 +154,7 @@ public class MethodBodyDefinition extends Node
       Internal.error("Bad size in MethodBodyDefinition.typecheck()");
     }
     catch(TypingEx e) {
-      User.error(name,"Typing error in method body "+name+e);
+      User.error(name,"Typing error in method body \""+name+"\":\n"+e);
     }
 
     // Used to call body.typecheck() here. Now it is done as it is a child

@@ -608,13 +608,14 @@ public final class K0 {
     // saturate the interface subtyping under
     // I < J and J < K => I < K
     closeInterfaceRelation();
-    computeInitialArrows();
-    
+
     BitVector[] rigidImplementors  = closeImplements(R, Rt);
     for (int iid = 0; iid < nInterfaces(); iid++) {
       getInterface(iid).rigidImplementors = rigidImplementors[iid];
     }
 
+    computeInitialArrows();
+    
     if(debugK0)
       S.dbg.println("Initial Context (saturated) "+getName()+":\n"+dumpInterfaces());
     
@@ -971,13 +972,74 @@ public final class K0 {
    * Algorithms on interfaces
    ****************************************************************/
 
+  /**
+   * Computes the arrows a ->_i b
+   * for a's that abstract some surinterface of i
+   */
   private void computeInitialArrows()
     throws LowlevelUnsatisfiable
   {
     for(int iid=0; iid<nInterfaces(); iid++)
       {
 	Interface i=getInterface(iid);
-	BitVector implementors=i.implementors;
+	BitVector abstractors = i.abstractors;
+
+	BitVector subInterfaces = i.subInterfaces;
+	
+	for(int abs = abstractors.getLowestSetBit(); 
+	    abs != BitVector.UNDEFINED_INDEX;
+	    abs = abstractors.getNextBit(abs))
+	  for(int jid = subInterfaces.getLowestSetBit(); 
+	      jid != BitVector.UNDEFINED_INDEX;
+	      jid = subInterfaces.getNextBit(jid))
+	    {
+	      // abs is a constant that abstracts i
+	      // and j is a subInterface of i
+	      Interface j = getInterface(jid);  
+	      BitVector implementors= j.rigidImplementors;
+   
+	      boolean toCheck=false;
+	      int approx=BitVector.UNDEFINED_INDEX;
+	      
+	      //optimize if abs:i ?
+
+	      // finds a minimum node above 'abs' that implements 'i'
+	      for (int x = implementors.getLowestSetBit();
+		   x != BitVector.UNDEFINED_INDEX;
+		   x = implementors.getNextBit(x)) 
+		{
+		  if(R.get(abs,x))
+		    if(approx==BitVector.UNDEFINED_INDEX || R.get(x,approx))
+		      approx=x;
+		    else
+		      // optimize ? :
+		      // make tocheck an int, -1 at start. first to check-> N, second to check->-2
+		      // if at then end toCHeck =N, it's fast !
+		      toCheck=true;
+		}
+
+	      // verifies it is minimal
+	      if(toCheck)
+		for (int x = implementors.getLowestSetBit();
+		     x != BitVector.UNDEFINED_INDEX;
+		     x = implementors.getNextBit(x)) 
+		  if(R.get(abs,x) && !R.get(approx,x))
+		    throw new LowlevelUnsatisfiable("Node "+approx+" and "+x+" are uncomparable and both implement "+jid+
+						    " above "+abs);
+	      if(debugK0) S.dbg.println("Initial approximation for "+interfaceToString(jid)+": "+
+					indexToString(abs)+" -> "+indexToString(approx));
+	      j.setApprox(abs,approx);
+	    }
+      }
+  }
+  
+  private void oldComputeInitialArrows()
+    throws LowlevelUnsatisfiable
+  {
+    for(int iid=0; iid<nInterfaces(); iid++)
+      {
+	Interface i=getInterface(iid);
+	BitVector implementors= i.implementors;
 	for(int node=0;node<m0;node++)
 	  {
 	    boolean toCheck=false;
@@ -1062,6 +1124,7 @@ public final class K0 {
 	      if((n1=i.getApprox(node))!=BitVector.UNDEFINED_INDEX)
 		// node  ->_i  n1
 		for(int p=0;p<n;p++)
+		  // is implementors ok, or should not we compute rigidImplementors first ?
 		  if(i.implementors.get(p)
 		     && Leq.get(node,p))
 		    if(this.isRigid(p))
@@ -1073,7 +1136,9 @@ public final class K0 {
 		      if(!Leq.get(n1,p))
 			 {
 			   if(debugK0) 
-			     S.dbg.println("Abs rule applied : "+n1+" < "+p);
+			     S.dbg.println("Abs rule applied : "+indexToString(n1)+" < "+indexToString(p)
+					   +" using "+indexToString(node)
+					   +" for interface "+interfaceToString(iid));
 			   C .set(n1,p);
 			   Ct.set(p,n1);
 			   Leq.set(n1,p);

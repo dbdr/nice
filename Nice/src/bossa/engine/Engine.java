@@ -12,7 +12,7 @@
 
 // File    : Engine.java
 // Created : Tue Jul 27 15:34:53 1999 by bonniot
-//$Modified: Wed Jan 26 15:29:57 2000 by Daniel Bonniot $
+//$Modified: Thu Jan 27 18:26:38 2000 by Daniel Bonniot $
 
 package bossa.engine;
 
@@ -89,7 +89,15 @@ public abstract class Engine
 	i.hasNext();)
       { 
 	Engine.Constraint k=(Engine.Constraint)i.next();
-	k.satisfy();
+	try{
+	  if(dbg) Debug.println("** Satisfying "+k);
+	  
+	  k.satisfy();
+	}
+	catch(Unsatisfiable e){
+	  if(dbg) Debug.println("** In "+k);
+	  throw e;
+	}
       }
     backtrack();
   }

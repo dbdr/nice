@@ -12,7 +12,7 @@
 
 // File    : User.java
 // Created : Wed Jul 07 18:20:58 1999 by bonniot
-//$Modified: Tue Jan 11 18:58:22 2000 by bonniot $
+//$Modified: Thu Jan 27 16:58:28 2000 by Daniel Bonniot $
 
 package bossa.util;
 

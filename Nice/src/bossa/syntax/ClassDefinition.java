@@ -12,7 +12,7 @@
 
 // File    : ClassDefinition.java
 // Created : Thu Jul 01 11:25:14 1999 by bonniot
-//$Modified: Wed Jan 26 17:49:32 2000 by Daniel Bonniot $
+//$Modified: Thu Jan 27 20:41:19 2000 by Daniel Bonniot $
 
 package bossa.syntax;
 
@@ -28,18 +28,39 @@ import java.util.*;
 public class ClassDefinition extends Node
   implements Definition
 {
+  /**
+   * Creates a class definition.
+   *
+   * @param name the name of the class
+   * @param isFinal 
+   * @param isAbstract 
+   * @param isInterface true iff the class is an "interface" 
+       (which is not an "abstract interface").
+       isInterface implies isAbstract.
+   * @param isSharp true iff it's a #class
+   * @param typeParameters a list of type symbols
+   * @param extensions a list of TypeConstructors
+   * @param implementations a list of Interfaces
+   * @param abstractions a list of Interfaces
+   * @param fields a list of ClassDefinition.Field
+   * @param methods a list of MethodDefinition. Class methods.
+   */
   public ClassDefinition(LocatedString name, 
-			 boolean isFinal, boolean isAbstract,
-			 boolean isSharp,
+			 boolean isFinal, boolean isAbstract, 
+			 boolean isInterface, boolean isSharp,
 			 List typeParameters,
 			 List extensions, List implementations, List abstractions,
 			 List fields, List methods)
   {
     super(Node.global);
+
+    if(isInterface)
+      isAbstract=true;
     
     this.name=name;
     this.isFinal=isFinal;
     this.isAbstract=isAbstract;
+    this.isInterface=isInterface;
     this.isSharp=isSharp;
 
     if(typeParameters==null)
@@ -105,7 +126,7 @@ public class ClassDefinition extends Node
     List parent=new ArrayList(1);
     parent.add(this.tc);
     ClassDefinition c=new ClassDefinition
-      (name,true,false,true,typeParameters,parent,
+      (name,true,false,false,true,typeParameters,parent,
        new LinkedList(),new LinkedList(),fields,methods);
     associatedConcreteClass = c;
     concreteClasses.add(c);
@@ -204,6 +225,7 @@ public class ClassDefinition extends Node
   void resolve()
   {
     extensions=TypeConstructor.resolve(typeScope,extensions);
+    createAssociatedInterface();
   }
 
   /****************************************************************
@@ -233,6 +255,9 @@ public class ClassDefinition extends Node
     catch(TypingEx e){
       User.error(name,"Error in class "+name+" : "+e.getMessage());
     }
+
+    if(associatedInterface!=null)
+      associatedInterface.createContext();
   }
 
   /****************************************************************
@@ -274,7 +299,7 @@ public class ClassDefinition extends Node
   
   ClassDefinition superClass(int n)
   {
-    return ((TypeConstructor) extensions.get(n)).definition;
+    return ((TypeConstructor) extensions.get(n)).getDefinition();
   }
   
   /**
@@ -294,7 +319,7 @@ public class ClassDefinition extends Node
    */
   ClassDefinition abstractClass()
   {
-    return ((TypeConstructor) extensions.get(0)).definition;
+    return ((TypeConstructor) extensions.get(0)).getDefinition();
   }
   
   static ClassType javaClass(ClassDefinition c)
@@ -472,6 +497,49 @@ public class ClassDefinition extends Node
   }
 
   /****************************************************************
+   * Associated interface
+   ****************************************************************/
+
+  private InterfaceDefinition associatedInterface;
+
+  /**
+   * Returns the abstract interface associated to this class, or null.
+   *
+   * An associated abstract interface in created 
+   * for each "interface" class.
+   */
+  public InterfaceDefinition getAssociatedInterface()
+  { return associatedInterface; }
+    
+
+  private void createAssociatedInterface()
+  {
+    if(!isInterface)
+      return;
+
+    // the associated interface extends the associated interfaces
+    // of the classes we extend
+    List ext = new LinkedList();
+    for(Iterator i = extensions.iterator(); i.hasNext();)
+      {
+	TypeConstructor tc = (TypeConstructor) i.next();
+	ClassDefinition c = tc.getDefinition();
+	
+	InterfaceDefinition ai = c.getAssociatedInterface();
+	if(ai==null)
+	  Internal.error("We should extend only \"interface\" classes");
+	ext.add(new Interface(ai));
+      }
+    
+    associatedInterface = new AssociatedInterface
+      (name, typeParameters, ext, this);
+    
+    addChild(associatedInterface);
+
+    implementations.add(new Interface(associatedInterface));
+  }
+  
+  /****************************************************************
    * Printing
    ****************************************************************/
 
@@ -504,7 +572,7 @@ public class ClassDefinition extends Node
   private List /* of Interface */ abstractions;
   private List /* of ClassDefinition.Field */ fields;
   private List methods;
-  private boolean isFinal;
+  private boolean isFinal, isInterface;
   boolean isAbstract;
   boolean isSharp; // This class is a #A (not directly visible to the user)
 

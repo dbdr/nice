@@ -12,7 +12,7 @@
 
 // File    : Variance.java
 // Created : Fri Jul 23 12:15:46 1999 by bonniot
-//$Modified: Mon Dec 13 15:41:48 1999 by bonniot $
+//$Modified: Thu Jan 27 17:25:51 2000 by Daniel Bonniot $
 
 package bossa.typing;
 
@@ -54,7 +54,18 @@ public class Variance
   
   public void register(Element e)
   {
-    // Nothing to do
+//      if(!(e instanceof MonotypeConstructor))
+//        return;
+    
+//      MonotypeConstructor mc = (MonotypeConstructor) e;
+//      TypeConstructor tc = mc.getTC();
+//      Engine.Constraint k = Engine.getConstraint(this);
+    
+//      if(tc.getKind()!=k)
+//        if(tc.getKind()==null)
+//  	Engine.setKind(tc,k);
+//        else
+//  	throw new TypingEx("Bad kinding for "+e);
   }
   
 

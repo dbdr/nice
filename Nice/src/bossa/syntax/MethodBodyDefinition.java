@@ -12,7 +12,7 @@
 
 // File    : MethodBodyDefinition.java
 // Created : Thu Jul 01 18:12:46 1999 by bonniot
-//$Modified: Tue Jan 25 16:10:06 2000 by Daniel Bonniot $
+//$Modified: Thu Jan 27 16:57:23 2000 by Daniel Bonniot $
 
 package bossa.syntax;
 
@@ -43,18 +43,14 @@ public class MethodBodyDefinition extends Node
    */
   public MethodBodyDefinition(LocatedString name, 
 			      Collection binders,
-			      List newTypeVars, List newConstraint,
+			      List newTypeVars,
 			      List formals, List body)
   {
     super(Node.down);
     this.name=name;
     this.binders=binders; 
 
-    if(newTypeVars!=null || newConstraint!=null && newConstraint.size()>0)
-      {
-	this.newConstraint = new Constraint(newTypeVars, newConstraint);
-	addChild(this.newConstraint);
-      }
+    this.newTypeVars=newTypeVars;
 
     this.formals=formals;
     this.body=new Block(body);
@@ -191,8 +187,8 @@ public class MethodBodyDefinition extends Node
 	}
       }
 
-    if(newConstraint!=null)
-      this.typeScope.addSymbols(newConstraint.binders);
+    if(newTypeVars!=null)
+      this.typeScope.addSymbols(newTypeVars);
     
     body.buildScope(this.scope,this.typeScope);
     
@@ -255,6 +251,8 @@ public class MethodBodyDefinition extends Node
     lateBuildScope(this.scope,this.typeScope);
     super.doResolve();
     
+    enteredBindingContext = false;
+    
     Typing.enter(definition.type.getTypeParameters(),
 		 "method body of "+name);
     
@@ -275,20 +273,17 @@ public class MethodBodyDefinition extends Node
 	Typing.in
 	  (VarSymbol.getType(parameters),
 	   Pattern.getDomain(formals));
+
+	Typing.implies();
       }
       catch(TypingEx e){
 	User.error(name,"The patterns are not correct");
       }
       
-      Typing.implies();
-
       // New Constraint
-      if(newConstraint!=null)
-	{
-	  Typing.enter("Binding-constraint for "+name);
-
-	  newConstraint.assert(true);
-	}
+      //if(newTypeVars!=null)
+      //Typing.enter(newTypeVars,
+      //"Binding-constraint for "+name);
       
       for(Iterator f=formals.iterator(), p=parameters.iterator();
 	  f.hasNext();)
@@ -300,9 +295,21 @@ public class MethodBodyDefinition extends Node
 	  if(type==null)
 	    continue;
 	  
-	  if(newConstraint==null)
-	    User.error(pat.name,
-		       "\":\" constraints are not allowed when no local type variable has been introduced (with \"[ ]\")");
+	  //if(newTypeVars==null)
+	  //User.error(pat.name,
+	  //       "\":\" constraints are not allowed when no local type variable has been introduced (with \"[ ]\")");
+	  if(!enteredBindingContext)
+	    {
+	      Typing.enter("Type binders");
+	      enteredBindingContext=true;
+	    }
+	  
+	  type.setKind(sym.getMonotype().getKind());
+
+	  if(type instanceof MonotypeConstructor)
+	    Typing.introduce(((MonotypeConstructor) type).getTC());
+	  else
+	    Internal.error("Not implemented ?");
 	  
 	  try{
 	    Typing.leq(type, sym.getMonotype());
@@ -315,7 +322,7 @@ public class MethodBodyDefinition extends Node
 		       ": "+e);
 	  }       
 	}
-      if(newConstraint!=null)
+      if(enteredBindingContext)
 	Typing.implies();
 
       // end of New Constraint
@@ -328,6 +335,8 @@ public class MethodBodyDefinition extends Node
     }
   }
 
+  private boolean enteredBindingContext;
+  
   void endTypecheck()
   {
     Polytype t=body.getType();
@@ -336,7 +345,7 @@ public class MethodBodyDefinition extends Node
 	User.error(this,"Last statement of body should be \"return\"");
       Typing.leq(t,new Polytype(definition.type.codomain()));
       Typing.leave();
-      if(newConstraint!=null)
+      if(enteredBindingContext)
 	Typing.leave();
     }
     catch(TypingEx e){
@@ -490,5 +499,5 @@ public class MethodBodyDefinition extends Node
   Collection /* of LocatedString */ binders; // Null if type parameters are not bound
   private Block body;
 
-  private Constraint newConstraint;
+  private List /* of TypeSymbol */  newTypeVars;
 }

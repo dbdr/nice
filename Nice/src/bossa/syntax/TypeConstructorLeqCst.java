@@ -12,7 +12,7 @@
 
 // File    : TypeConstructorLeqCst.java
 // Created : Sat Jul 24 12:02:15 1999 by bonniot
-//$Modified: Mon Dec 06 11:36:18 1999 by bonniot $
+//$Modified: Thu Jan 27 14:34:07 2000 by Daniel Bonniot $
 
 package bossa.syntax;
 
@@ -36,7 +36,7 @@ public class TypeConstructorLeqCst extends AtomicConstraint
   {
     TypeConstructorLeqCst res=new TypeConstructorLeqCst
       (t1.substitute(m),t2.substitute(m));
-    identifiesVariances(res.t1,res.t2);
+    identifyVariances(res.t1,res.t2);
     return res;
   }
 
@@ -45,21 +45,42 @@ public class TypeConstructorLeqCst extends AtomicConstraint
     t1=t1.resolve(ts);
     // If t2 resolve to an interface definition,
     // this constraint meant t1 implements t2
+
     TypeSymbol s=t2.resolveToTypeSymbol(ts);
+
     if(s instanceof InterfaceDefinition)
       return new ImplementsCst(t1,(InterfaceDefinition)s);
-    else if(s instanceof TypeConstructor)
+
+    if(s instanceof TypeConstructor)
       t2=(TypeConstructor)s;
     else
       Internal.error(t2+" resolved to a "+s.getClass());
 
-    identifiesVariances(t1,t2);
+    ClassDefinition c2 = t2.getDefinition();
+    if(c2!=null)
+      {
+	InterfaceDefinition associatedInterface =
+	  t2.getDefinition().getAssociatedInterface();
+    
+	if(associatedInterface!=null)
+	  return new ImplementsCst(t1,associatedInterface);
+      }
+    
+    identifyVariances(t1,t2);
     return this;
   }
 
-  private static void identifiesVariances(TypeConstructor t1, TypeConstructor t2)
+  /**
+   * Assert that t1 and t2 have the same variance.
+   *
+   * This is not necessary, as it would be discovered later 
+   * in the constraint solver.
+   * But it seems good to discover it sooner, 
+   * for efficiency reasons
+   * (and for error reporting if we added a check).
+   */
+  private static void identifyVariances(TypeConstructor t1, TypeConstructor t2)
   {
-    // t1 and t2 must have the same variance
     if(t1.variance==null && t2.variance!=null)
       t1.setVariance(t2.variance);
     else if(t2.variance==null && t1.variance!=null)

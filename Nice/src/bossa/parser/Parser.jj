@@ -12,7 +12,7 @@
 
 // File    : parser.jj
 // Created : Thu Jul 01 10:27:05 1999 by bonniot
-//$Modified: Wed Jan 26 18:50:26 2000 by Daniel Bonniot $
+//$Modified: Thu Jan 27 15:33:14 2000 by Daniel Bonniot $
 // Description : Parseur JavaCC pour Bossa
 //   Tokens based on the Jazz parser
 
@@ -792,16 +792,20 @@ ClassDefinition classDefinition():
   List fields=new ArrayList(),methods=new ArrayList(0);
   List ext=new ArrayList(0),imp=new ArrayList(0),abs=new ArrayList(0);
   List l;
-  boolean isFinal=false, isAbstract=false;
+  boolean isFinal=false, isAbstract=false, isInterface=false;
   ClassDefinition res;
 }
 {
+(
   [ "final"    { isFinal=true; } 
   | "abstract" { isAbstract=true; }
   ]
   "class"
-    name=string() 
-    parameters=monotypeVars() 
+|
+  "interface" { isInterface=true; }
+)
+  name=string() 
+  parameters=monotypeVars() 
 
   ( "implements" l=interfaces() { imp.addAll(l); } 
   | "finally" "implements"  l=interfaces() { abs.addAll(l); }
@@ -811,7 +815,9 @@ ClassDefinition classDefinition():
   "{" (getField(fields))* "}"
 
   { 
-    res=new ClassDefinition(name,isFinal,isAbstract,false,parameters,
+    res=new ClassDefinition(name,
+			    isFinal,isAbstract,isInterface,
+			    false,parameters,
 			    ext,imp,abs,fields,methods);
     return res; 
   }
@@ -824,7 +830,7 @@ InterfaceDefinition interfaceDefinition():
   List extensions=null;
 }
 {
-  "interface"
+  "abstract" "interface"
   name=string()
   parameters=monotypeVars()
   [ "extends" extensions=interfaces() ]
@@ -855,7 +861,6 @@ MethodBodyDefinition methodBodyDefinition():
     LocatedString name,i;
     Pattern p;
     Collection binders=null;
-    List atomics=new ArrayList();
     List newTypeVars=null;
     List parameters=new ArrayList();
     List code;
@@ -865,7 +870,7 @@ MethodBodyDefinition methodBodyDefinition():
     name=methodName()
     [ "<" binders=strings() ">" ]
 // introducing new Type variables
-    [ "[" newTypeVars=binders(atomics) "]" ]
+    [ "[" newTypeVars=typeConstructors() "]" ]
     p=pattern(new LocatedString("this",new Location(0,0,0,0))) 
     { parameters.add(p); }
     "("
@@ -886,7 +891,7 @@ MethodBodyDefinition methodBodyDefinition():
       }
     )
     { return new MethodBodyDefinition(name,binders,
-				      newTypeVars,atomics,
+				      newTypeVars,
 				      parameters,code); }
 }
 
@@ -973,9 +978,10 @@ Definition definition():
 }
 {
   (
-    res=classDefinition()
-  | 
+    LOOKAHEAD ( "abstract" "interface" )
     res=interfaceDefinition()
+  | 
+    res=classDefinition()
   | 
     res=globalVariable()
   |

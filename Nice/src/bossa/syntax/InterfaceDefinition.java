@@ -12,7 +12,7 @@
 
 // File    : InterfaceDefinition.java
 // Created : Thu Jul 01 17:00:14 1999 by bonniot
-//$Modified: Wed Jan 26 15:12:44 2000 by Daniel Bonniot $
+//$Modified: Thu Jan 27 17:25:02 2000 by Daniel Bonniot $
 
 package bossa.syntax;
 
@@ -27,7 +27,9 @@ import bossa.typing.Variance;
 public class InterfaceDefinition extends Node
   implements Definition,TypeSymbol
 {
-  public InterfaceDefinition(LocatedString name, Collection typeParameters, List extensions)
+  public InterfaceDefinition(LocatedString name, 
+			     Collection typeParameters, 
+			     List extensions)
   {
     super(Node.global);
     this.name=name;
@@ -102,7 +104,7 @@ public class InterfaceDefinition extends Node
 
   public void printInterface(java.io.PrintWriter s)
   {
-    s.print("interface "
+    s.print("abstract interface "
 	    +name
 	    +Util.map("<",", ",">",parameters)
 	    +Util.map(" extends ",", ","",extensions)

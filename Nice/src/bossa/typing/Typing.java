@@ -12,7 +12,7 @@
 
 // File    : Typing.java
 // Created : Tue Jul 20 11:57:17 1999 by bonniot
-//$Modified: Wed Jan 26 15:25:37 2000 by Daniel Bonniot $
+//$Modified: Thu Jan 27 17:52:04 2000 by Daniel Bonniot $
 
 package bossa.typing;
 
@@ -352,6 +352,9 @@ abstract public class Typing
 	t.variance.initialImplements(t.getId(),i.itf);
       else
 	t.variance.indexImplements(t.getId(),i.itf);
+
+      if(i instanceof AssociatedInterface)
+	Engine.leq(t, ((AssociatedInterface) i).getAssociatedClass(), initial);
     }
     catch(Unsatisfiable e){
       unsatisfiable(new TypingEx(e.getMessage()));

@@ -12,7 +12,7 @@
 
 // File    : Kind.java
 // Created : Wed Jul 28 14:53:22 1999 by bonniot
-//$Modified: Thu Oct 28 15:53:37 1999 by bonniot $
+//$Modified: Thu Jan 27 17:24:40 2000 by Daniel Bonniot $
 
 package bossa.engine;
 

@@ -12,7 +12,7 @@
 
 // File    : TypeConstructor.java
 // Created : Thu Jul 08 11:51:09 1999 by bonniot
-//$Modified: Wed Jan 26 14:54:59 2000 by Daniel Bonniot $
+//$Modified: Thu Jan 27 15:55:02 2000 by Daniel Bonniot $
 
 package bossa.syntax;
 
@@ -296,7 +296,9 @@ public class TypeConstructor
   
   public void setKind(Kind value)
   {
-    Internal.error(kind!=null,"Variance already set in TypeConstructor");
+    if(kind!=null)
+      Internal.error("Variance already set in TypeConstructor");
+
     variance=(Variance)((Engine.Constraint)value).associatedKind;
     kind=value;
   }
@@ -306,13 +308,18 @@ public class TypeConstructor
     return definition!=null && definition.isSharp;
   }
 
+  ClassDefinition getDefinition()
+  {
+    return definition;
+  }
+  
   /****************************************************************
    * Fields
    ****************************************************************/
 
   public int enumerateTagIndex=-1; // used in Typing.enumerate. ugly ! Subclass
 
-  ClassDefinition definition;
+  private ClassDefinition definition;
   public LocatedString name;
   public Variance variance;
 }

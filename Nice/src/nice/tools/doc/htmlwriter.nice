@@ -20,14 +20,14 @@ import java.util.*;
 import java.text.*;
 import java.io.*;
 
-/** Comment
+/** TESTCommentTEST
  */
 int testMethod(double testvar) {
     return 0;
 }
 
 /**
- *Comment
+ *Test Class Comment
  */
 class HTMLWriter {
     
@@ -150,12 +150,13 @@ class HTMLWriter {
     //Note: the comments is deliberately not htmlEncoded because I want people
     //to be able to put their own html in the comment.
     writer.write("<p>\n");
-    String comments;
-    if(gv.docString() != null)
-        comments = notNull(gv.docString());
-    else
-        comments = "null";
-    writer.write(comments + "\n");
+    if(gv.docString() != null) {
+        Comment comm = new Comment(commentStr: notNull(gv.docString()));
+        List<(?String, String)> tags = comm.tags;
+        //write the general comment
+        (?String a, String b) = tags.removeAt(0);
+        writer.write(b + "\n");
+    }
     writer.write("</p>\n");
  
     writer.write(getFooter());
@@ -183,12 +184,12 @@ class HTMLWriter {
     //Note: the comments is deliberately not htmlEncoded because I want people
     //to be able to put their own html in the comment.
     writer.write("<p>\n");
-    String comments;
-    if(m.docString() != null)
-        comments = notNull(m.docString());
-    else
-        comments = "null";
-    writer.write(comments + "\n");
+    if(m.docString() != null) {
+        Comment comm = new Comment(commentStr: notNull(m.docString()));
+        List<(?String, String)> tags = comm.tags;
+        (?String a, String b) = tags.removeAt(0);
+        writer.write(b + "\n");
+    }
     writer.write("</p>");
  
     writer.write(getFooter());

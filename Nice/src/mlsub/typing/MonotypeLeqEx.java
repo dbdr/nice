@@ -20,7 +20,7 @@ public class MonotypeLeqEx extends TypingEx
   MonotypeLeqEx(Monotype m1, Monotype m2, 
 		mlsub.typing.lowlevel.Unsatisfiable origin)
   {
-    super(m1 + " <: " + m2);
+    super(m1 + " <: " + m2 + " because of " + origin);
     this.m1 = m1;
     this.m2 = m2;
   }

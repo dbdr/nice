@@ -28,7 +28,6 @@
 package nice.lang;
 
 import java.text.*;
-import java.io.*;
 import java.lang.reflect.*;
 
 //               PACKAGE: java.lang
@@ -79,37 +78,6 @@ Enumeration<String> propertyNames(Properties<String,String>) =
 
 DateFormat getDateInstance() = native DateFormat DateFormat.getDateInstance();
 DateFormat getDateInstance(int style) = native DateFormat DateFormat.getDateInstance(int);
-
-//               PACKAGE: java.io
-
-<Any T> void print   (PrintStream ps, T object) = 
-  native void PrintStream.print  (Object);
-<Any T> void println (PrintStream ps, T object) = 
-  native void PrintStream.println(Object);
-String getAbsolutePath (File) = native String File.getAbsolutePath();
-
-?String readLine(BufferedReader) = native String BufferedReader.readLine();
-?String readLine(DataInput) = native String DataInput.readLine();
-
-/**
-   In Java, System.out and System.err are possibly null.
-   In Nice we prevent this to happen, and give them a non-null type.
-*/
-
-// prevents to stdout and stderr to be set to null
-void setStdout (PrintStream ps) = native void System.setOut(PrintStream);
-void setStderr (PrintStream ps) = native void System.setErr(PrintStream);
-
-PrintStream stdout () = native System.out;
-PrintStream stderr () = native System.err;
-
-/** Convenience: printing on the standard output. */
-<Any T> void print   (T object) = System.out.print  (object);
-<Any T> void println (T object) = System.out.println(object);
-
-// Serialization
-<Any T> void writeObject(ObjectOutput, T) = native void ObjectOutput.writeObject(Object);
-<Any T> T readObject(ObjectInput) = native Object ObjectInput.readObject();
 
 //               PACKAGE: java.util
 

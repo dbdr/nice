@@ -37,6 +37,10 @@ void _testSingle()
   s.add("a", 'c');
   res = s.get("a");
   assert res.size == 2 && res.contains('b') && res.contains('c');
+
+  s.remove("a", 'b');
+  res = s.get("a");
+  assert res.size == 1 && res[0] == 'c';
 }
 
 void _testNesting()

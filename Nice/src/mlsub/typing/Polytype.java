@@ -125,6 +125,30 @@ public final class Polytype
    * Computations on types
    ****************************************************************/
 
+  public static Polytype apply(Polytype funt, Polytype[] parameters)
+  {
+    Monotype codom = funt.codomain();
+    /*
+      Optimization:
+      If we know codom is a constant,
+      the constraint parameters<dom is useless.
+    */
+    if(codom.isRigid())
+      return new Polytype(Constraint.True, codom);
+
+    Constraint cst = funt.getConstraint();
+    Monotype[] dom = funt.domain();
+
+    cst = Constraint.and
+      (Polytype.getConstraint(parameters),
+       cst,
+       MonotypeLeqCst.constraint(Polytype.getMonotype(parameters), dom));
+    
+    Polytype res = new Polytype(cst, codom);
+    res.simplified = false;
+    return res;
+  }
+
   public static Polytype union(Polytype t1, Polytype t2)
   {
     if (t1 == t2)
@@ -137,6 +161,7 @@ public final class Polytype
 				  new MonotypeLeqCst(t2.monotype,t));
     
     Polytype res = new Polytype(c,t);
+    res.simplified = false;
     return res;
   }
   
@@ -151,6 +176,7 @@ public final class Polytype
       c = Constraint.and(c, types[i].constraint, new MonotypeLeqCst(types[i].monotype, t));
     
     Polytype res = new Polytype(c,t);
+    res.simplified = false;
     return res;
   }
   
@@ -199,9 +225,17 @@ public final class Polytype
    * Simplification
    ****************************************************************/
 
+  /*
+    Whether this polytype is in simplified form.
+    The default value is true, so it shoud be set to false
+    for any polytype constructed in a way that does not guaranty it to
+    be simplified.
+  */
+  private boolean simplified = true;
+  
   public void simplify()
   {
-    if (!Constraint.hasBinders(constraint))
+    if (!Constraint.hasBinders(constraint) || simplified)
       return;
 
     ArrayList binders = new ArrayList(), atoms = new ArrayList();
@@ -231,6 +265,8 @@ public final class Polytype
        : (TypeSymbol[]) binders.toArray(new TypeSymbol[nbinders]),
        natoms   == 0 ? null 
        : (AtomicConstraint[]) atoms.toArray(new AtomicConstraint[natoms]));
+
+    simplified = true;
   }
   
   /****************************************************************
@@ -239,6 +275,9 @@ public final class Polytype
   
   public String toString()
   {
+    // We want a simple form for printing
+    simplify();
+
     return Constraint.toString(constraint) + monotype.toString();
   }
 

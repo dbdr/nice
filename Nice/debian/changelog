@@ -21,7 +21,8 @@ nice (0.7.6) unstable; urgency=low
   * Performance improvement for anonymous functions and for polymorphic 
     usage of arrays.
   * Bugfixes (using anonymous functions while overriding native methods, 
-    automatic array conversions in polymorphic code, ...).
+    automatic array conversions in polymorphic code, nested literal primitive 
+    arrays, ...).
 
  --
 

@@ -21,3 +21,6 @@ class A3 extends A1 {}
   byte[][] s = single([ 0 ]);
   /// Toplevel
   <int T> T[][] single(T[] t) = [ t ];
+
+/// PASS
+  int[][] array2 = [[11,12],[21,22]];

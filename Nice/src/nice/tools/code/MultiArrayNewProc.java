@@ -74,10 +74,18 @@ public class MultiArrayNewProc extends gnu.mapping.ProcedureN
 	   reference types, in case the arrays comes back in the value of
 	   a function.
 	*/
-	if (targetType.getComponentType() instanceof PrimType)
+	if (hasPrimitiveComponents(targetType))
 	  return targetType;
       }
     return computedType;
+  }
+
+  private static boolean hasPrimitiveComponents(ArrayType array)
+  {
+    while (array.getComponentType() instanceof ArrayType)
+      array = (ArrayType) array.getComponentType();
+
+    return array.getComponentType() instanceof PrimType;
   }
 
   public Type getReturnType(Expression[] args)

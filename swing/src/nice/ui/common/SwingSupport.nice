@@ -97,7 +97,7 @@ class javax.swing.JTree implements TreeWillExpandListenerHandler;
 class javax.swing.JTree implements TreeSelectionListenerHandler;
 class javax.swing.JScrollBar implements AdjustmentListenerHandler;
 class javax.swing.undo.UndoableEditSupport implements UndoableEditListenerHandler;
-class javax.swing.text.AbstractDocument implements UndoableEditListenerHandler;
+interface javax.swing.text.Document implements UndoableEditListenerHandler;
 class javax.swing.table.TableColumn implements PropertyChangeListenerHandler;
 interface javax.swing.table.TableColumnModel implements TableColumnModelListenerHandler;
 interface javax.swing.table.TableModel implements TableModelListenerHandler;
@@ -107,7 +107,7 @@ class javax.swing.tree.DefaultTreeModel implements TreeModelListenerHandler;
 class javax.swing.text.JTextComponent implements CaretListenerHandler;
 class javax.swing.colorchooser.DefaultColorSelectionModel implements ChangeListenerHandler;
 class javax.swing.text.DefaultCaret implements ChangeListenerHandler;
-class javax.swing.text.AbstractDocument implements DocumentListenerHandler;
+interface javax.swing.text.Document implements DocumentListenerHandler;
 
 //JDK1.4  class javax.swing.JComboBox implements PopupMenuListenerHandler;
 //JDK1.4  class javax.swing.JSpinner implements ChangeListenerHandler;

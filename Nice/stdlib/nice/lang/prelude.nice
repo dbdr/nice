@@ -33,7 +33,7 @@ package nice.lang;
 
 abstract class Maybe<+T> = native;
 final class Sure<+T> extends Maybe<T> = native;
-final class Null<+T> extends Maybe<T> {}
+final class Null<+T> extends Maybe<T> = native;
 
 /** 
     Throws java.lang.NullPointerException if the argument is <code>null</code>.

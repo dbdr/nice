@@ -47,6 +47,9 @@ void generate(Compilation compilation, String mainPackage, ?File outDirectory)
     Documenter d = new Documenter();
     d.document(packages);
     packages.foreach(bossa.modules.Package p => d.document(p));
+    
+    //we also need to write a stylesheet to control the look and feel
+    writeStylesheet();
   }
   catch (bossa.modules.Exit e) {
     // There was an error. Stop working.

@@ -53,8 +53,7 @@ void typecheckExps(?Expression[] exps)
     typecheck(exps[i]);
 }
 
-void typecheck(Arguments);
-typecheck(args@Arguments)
+void typecheckArgs(Arguments args)
 {
   for (int i = 0; i < args.size(); i++)
     typecheck(args.getExp(i));
@@ -81,7 +80,7 @@ typecheck(e@CallExp)
   }
 
   typecheck(e.function);
-  notNull(e.arguments).typecheck();
+  notNull(e.arguments).typecheckArgs();
 }
 
 typecheck(e@FunExp)

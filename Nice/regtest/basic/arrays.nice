@@ -18,7 +18,7 @@ p(a)
    The difficulty here is that the bytecode type for the argument is Object,
    while it would be rawArray if the domain of the method was bigger.
 */
-reverse<T>(a@Array)
+<T> reverse(a@Array)
 {
   T[] res = fill(new T[a.length], int i => a[a.length - i - 1]);
   return res;
@@ -146,7 +146,7 @@ test_collection_arrays(a)
   ts.iter( String s =>println(s));
 
   float[] tf = [ 1.5, 2, 3.7 ];
-  tf.iter( float f =>println(f+1));
+  tf.iter(float fl => println(fl + 1));
 }
 
 void longarray(long[]) { }

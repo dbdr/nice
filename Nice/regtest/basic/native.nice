@@ -36,12 +36,12 @@ test_native()
   Fields.stringS = "Static field is: ";
   println(Fields.stringS + Fields.intS);
 
-  Fields f = new Fields();
-  f.intI = 3;
-  f.stringI = "Instance field is: ";
-  println(f.stringI + f.intI);
+  Fields fields = new Fields();
+  fields.intI = 3;
+  fields.stringI = "Instance field is: ";
+  println(fields.stringI + fields.intI);
 
-  String s = f.fieldsList[0];
+  String s = fields.fieldsList[0];
   assert (s.equals("First"));
 }
 

@@ -18,7 +18,7 @@ package regtest.basic;
 
 void test_constants()
 {
-  final int x = 1;
-  const long y = x + 1;
-  const z = (y == x);
+  let int x = 1;
+  let long y = x + 1;
+  let z = (y == x);
 }

@@ -44,14 +44,14 @@ class ColoredPoint extends Point
   to test overloading resolution of method bodies with additional patterns
 */
 String pToString(?String);
-pToString(s@null(String)) = "Null string";
+pToString(null(String)) = "Null string";
 pToString(s@String) = "String";
 
 <Any T> boolean isNull(T);
 isNull(x) = false;
-isNull(@null) = true;
+isNull(null) = true;
 
-pToString(@null(Point)) = "Origin";
+pToString(null(Point)) = "Origin";
 
 boolean isSimplePoint(Point);
 isSimplePoint(#Point) = true;  // takes precedence on point
@@ -74,8 +74,8 @@ test_classes()
 
   println(new Point(x:0,y:0).toString());
   println(new ColoredPoint(x:0,y:0,c:0).toString());
-  Point p = new ColoredPoint(x:0,y:0,c:0);
-  println(p.toString());
+  Point pt = new ColoredPoint(x:0,y:0,c:0);
+  println(pt.toString());
 
   new TestFieldInitializers();
 }

@@ -26,9 +26,9 @@ void test_null()
 // Therefore there are exactly four cases:
 
 cov(s1@String, s2@String) {}
-cov(s1@String, s2@null)   {}
-cov(s1@null,   s2@String) {}
-cov(s1@null,   s2@null)   {}
+cov(s1@String, null)   {}
+cov(null,      s2@String) {}
+cov(null,      null)   {}
 
 // nullness marker with a parameterized type in constraint
 <Any T | T <: ?List<String>> void cov2(T x) {}

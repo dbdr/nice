@@ -17,6 +17,7 @@ import mlsub.typing.MonotypeVar;
 import mlsub.typing.TypeSymbol;
 import mlsub.typing.TypeConstructor;
 import bossa.util.User;
+import bossa.util.Location;
 import java.util.List;
 
 /**
@@ -78,7 +79,8 @@ public abstract class MethodContainer extends Definition
                   of this class.
     */
     public static Constraint make(bossa.syntax.Constraint cst, 
-                                  MonotypeVar[] typeParameters, List atoms)
+                                  MonotypeVar[] typeParameters, List atoms,
+                                  Location loc)
     {
       TypeSymbol[] binders;
       List constraints;
@@ -97,15 +99,17 @@ public abstract class MethodContainer extends Definition
           resolve = true;
         }
 
-      return new Constraint(binders, constraints, typeParameters, resolve);
+      return new Constraint
+        (binders, constraints, typeParameters, resolve, loc);
     }
 
-    private Constraint (TypeSymbol[] binders, List atoms, 
-                        MonotypeVar[] typeParameters, boolean resolve)
+    private Constraint (TypeSymbol[] binders, List atoms,
+                        MonotypeVar[] typeParameters, boolean resolve,
+                        Location loc)
     {
       super(binders, atoms);
       if (resolve)
-        findBinders(typeParameters);
+        findBinders(typeParameters, loc);
       else
         this.typeParameters = typeParameters;
 
@@ -118,18 +122,18 @@ public abstract class MethodContainer extends Definition
        Replace those type parameters that have been introduced in the 
        constraint by their definition.
     */
-    private void findBinders(MonotypeVar[] typeParameters)
+    private void findBinders(MonotypeVar[] typeParameters, Location loc)
     {
       this.typeParameters = new mlsub.typing.Monotype[typeParameters.length];
-      for (int i = 0; i < typeParameters.length; i++) 
+      for (int i = 0; i < typeParameters.length; i++)
         {
-          this.typeParameters[i] = findBinder(typeParameters[i]);
+          this.typeParameters[i] = findBinder(typeParameters[i], loc);
         }
     }
 
-    private mlsub.typing.Monotype findBinder(MonotypeVar binder)
+    private mlsub.typing.Monotype findBinder(MonotypeVar binder, Location loc)
     {
-      for (java.util.Iterator i = this.getBinders().iterator(); i.hasNext(); ) 
+      for (java.util.Iterator i = this.getBinders().iterator(); i.hasNext(); )
         {
           TypeSymbol s = (TypeSymbol) i.next();
           if (s.toString().equals(binder.getName()))
@@ -144,8 +148,7 @@ public abstract class MethodContainer extends Definition
             }
         }
 
-      // Not found. It was not introduced earlier, use it as the binder.
-      return binder;
+      throw User.error(loc, binder + " is not declared in the constraint");
     }
 
     /** The type parameters of the class. */

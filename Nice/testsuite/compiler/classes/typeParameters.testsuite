@@ -301,6 +301,15 @@ class A<T> {}
 
 <String S> class B<S> extends A<S> {}
 
+/// FAIL
+  // bug #992007
+  /// Toplevel
+<A,B | B <: A> class Foo<B,X>
+{
+  A a;
+  void foo(B b) { a = b; }
+}
+
 /// PASS
   A<String> a;
   a = new A(x: null);

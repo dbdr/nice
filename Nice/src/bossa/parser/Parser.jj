@@ -1166,22 +1166,23 @@ MethodContainer.Constraint classTypeParameters(Constraint prefix, List tags):
   List atoms = new ArrayList(3);
   MonotypeVar var;
   Token start;
+  Location loc;
 }
 {
-  start="<" 
+  start="<" { loc = makeLocation(start); }
   var=taggedMonotypeVar(tags, atoms) { binders.add(var); }
   ( "," var=taggedMonotypeVar(tags, atoms) { binders.add(var); } )*
   [ "|" atomics(atoms) ]
-  ">" 
+  ">"
   {
     // For the moment, disallow constraints to come from both the prefix
     // and the type parameters.
     if (prefix != Constraint.True && atoms.size() > 0)
       throw bossa.util.User.error
-        (makeLocation(start), "Constraints on type parameters should all be specified in the prefix constraint");
+        (loc, "Constraints on type parameters should all be specified in the prefix constraint");
 
     MonotypeVar[] b = (MonotypeVar[]) binders.toArray(new MonotypeVar[binders.size()]);
-    return MethodContainer.Constraint.make(prefix, b, atoms); 
+    return MethodContainer.Constraint.make(prefix, b, atoms, loc);
   }
 }
 

@@ -54,8 +54,8 @@ double doubleValue(Number) = native double Number.doubleValue();
 <Any T> boolean `==`(T,T) = native boolean Native.eq(Object,Object);
 <Any T> boolean `!=`(T,T) = native boolean Native.neq(Object, Object);
 
-char `==`(char, char) = native char Native.eq(char,char);
-char `!=`(char, char) = native char Native.neq(char,char);
+boolean `==`(char, char) = native boolean Native.eq (char,char);
+boolean `!=`(char, char) = native boolean Native.neq(char,char);
 
 
 <Any T> boolean equals(T,T) = native boolean Object.equals(Object);

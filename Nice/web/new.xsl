@@ -129,19 +129,48 @@
            <a class="nav" href="testimonials.html">Testimonials</a>
            <br />
            &nbsp;<span class="small">o</span><xsl:text> </xsl:text>
-           <a class="nav" href="http://sourceforge.net/forum/&quest;group_id=12788">Forums</a>
+           <a class="nav" href="http://sourceforge.net/forum/forum.php?forum_id=40268">Forums</a>
            <br />
            &nbsp;<span class="small">o</span><xsl:text> </xsl:text>
            <a class="nav" href="http://sourceforge.net/mail/&quest;group_id=12788">Mailing List</a>
+<!--
            <br />
            &nbsp;<span class="small">o</span><xsl:text> </xsl:text>
            <a class="nav" href="http://sourceforge.net/news/&quest;group_id=12788">News</a>
+-->
            <br />
-           &nbsp;<span class="small">o</span><xsl:text> </xsl:text>
-           <a class="nav" href="http://sourceforge.net/project/filemodule_monitor.php&quest;filemodule_id=11365">Be notified of new versions</a>
+           &nbsp;<span class="small">o</span><xsl:text>&nbsp;</xsl:text>
+           <a class="nav" href="http://sourceforge.net/project/filemodule_monitor.php&quest;filemodule_id=11365">Be&nbsp;notified&nbsp;of&nbsp;new&nbsp;versions</a>
            <br />
            &nbsp;<span class="small">o</span><xsl:text> </xsl:text>
            <a class="nav" href="http://sourceforge.net/tracker/&quest;func=add&amp;group_id=12788&amp;atid=112788">Report a bug</a>
+           <br />
+          </td>
+         </tr>
+        </table>
+       </td>
+      </tr>
+     </table>
+     <!-- end sidebox -->
+     <br />
+
+     <!-- sidebox -->
+     <table bgcolor="#000000" border="0" cellpadding="0" cellspacing="0" width="100%">
+      <tr>
+       <td>
+        <table border="0" cellpadding="3" cellspacing="1" width="100%">
+         <tr>
+          <td bgcolor="#cccccc">
+           &nbsp;<span class="title">Development</span>
+          </td>
+         </tr>
+         <tr>
+          <td bgcolor="#ffffff">
+           &nbsp;<span class="small">o</span><xsl:text> </xsl:text>
+           <a class="nav" href="roadmap.html">Roadmap</a>
+           <br />
+           &nbsp;<span class="small">o</span><xsl:text> </xsl:text>
+           <a class="nav" href="http://sourceforge.net/cvs/?group_id=12788">CVS</a>
            <br />
           </td>
          </tr>

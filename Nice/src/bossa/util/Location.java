@@ -33,13 +33,17 @@ public class Location implements Located
    * Enables to set the file name just once,
    * not at each Location construction.
    */
-  public static String currentFile = null;
+  public static void setCurrentFile(String file)
+  {
+    currentFile = nice.tools.util.System.prettyPrintFile(file);
+  }
+  private static String currentFile = null;
 
   public Location(String file,
 		  int startLine, int startColumn,
 		  int endLine, int endColumn)
   {
-    this.fileName = nice.tools.util.System.prettyPrintFile(file);
+    this.fileName = file;
     this.startLine = startLine;
     this.startColumn = startColumn;
     this.endLine = endLine;

@@ -129,46 +129,8 @@ public class TypeConstructor
 
     variance=(Variance)((Engine.Constraint)value).associatedKind;
     kind=value;
-
-    if(willImplementTop)
-      try{
-	//bossa.typing.initialLeq(this, object(this.variance.size));
-	
-	Typing.assertImp
-	  (this,
-	   this.variance.top,
-	   true);
-      }
-      catch(TypingEx e){
-	throw new InternalError("Impossible");
-      }
   }
   
-  /****************************************************************
-   * The Top interface
-   ****************************************************************/
-
-  /**
-   * Marks that as soon as this variable is deconstructed
-   * (so its variance is known)
-   * we will have to assert that the corresponding type constructor
-   * implements the correct Top<n> interface
-   */
-  //used for java classes for the moment
-  //as we don't know their arity in time
-  private boolean willImplementTop=false;
-
-  /**
-   * Marks that as soon as this variable is deconstructed
-   * (so its variance is known)
-   * we will have to assert that the corresponding type constructor
-   * implements the correct Top<n> interface
-   */
-  public void rememberToImplementTop()
-  {
-    willImplementTop = true;
-  }
-
   /****************************************************************
    * Misc
    ****************************************************************/

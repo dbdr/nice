@@ -113,12 +113,7 @@ public final class Polytype
     Typing.enter();
     
     try{
-      // Explanation for the assert(false) statement:
-      // We just want to check the type is well formed,
-      // so there is not need to enter top implementations.
-      // This is just an optimization, this shouldn't
-      // change anything.
-      constraint.assert(false);
+      constraint.assert();
     }
     finally{
       Typing.leave();

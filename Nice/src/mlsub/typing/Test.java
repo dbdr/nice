@@ -34,9 +34,10 @@ public class Test
       TypeConstructor a = new TypeConstructor("a", v0, true, false);
       Monotype ma = new MonotypeConstructor(a, null);
       Typing.introduce(a);
-      Typing.assertImp(a, v0.top, true);
+      Interface i0 = new Interface(v0);
+      Typing.assertImp(a, i0, true);
       Interface i1 = new Interface(v0);
-      Typing.assertLeq(i1, v0.top);
+      Typing.assertLeq(i1, i0);
       //Typing.assertImp(a, i1, true);      
       
       TypeConstructor t1 = new TypeConstructor(v0);

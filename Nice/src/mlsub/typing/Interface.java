@@ -32,11 +32,6 @@ public final class Interface implements TypeSymbol
   {
     this.variance = variance;
     itf = variance.newInterface();
-
-    // variance.top should be null only if this interface is top,
-    // as a top interface is created automatically with the Variance object
-    if(variance.top != null)
-      variance.subInterface(itf, variance.top.itf);
   }
 
   /**

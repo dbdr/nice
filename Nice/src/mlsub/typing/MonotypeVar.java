@@ -108,7 +108,6 @@ public final class MonotypeVar extends Monotype
 	// this variable becomes "free" again
 	equivalent = null;
 	id=-1;
-	//willImplementTop=false;
       }
     else
       {
@@ -121,18 +120,6 @@ public final class MonotypeVar extends Monotype
 
 	    // set the name for debug or display purposes
 	    mc.getTC().name = this.name + "'";
-	    
-	    if (willImplementTop)
-	      try{
-		Typing.assertImp
-		  (mc.getTC(), mc.getTC().variance.top, false);
-	      }
-	      catch(TypingEx e){
-		throw new InternalError("Variable "+this+" couln't implement top");
-	      }
-	      finally{
-		willImplementTop = false;
-	      }
 	  }
       }
   }
@@ -146,29 +133,6 @@ public final class MonotypeVar extends Monotype
     return equivalent;
   }
   
-  /****************************************************************
-   * The Top interface
-   ****************************************************************/
-
-  /**
-   * Marks that as soon as this variable is deconstructed
-   * (so its variance is known)
-   * we will have to assert that the corresponding type constructor
-   * implements the correct Top<n> interface
-   */
-  private boolean willImplementTop = false;
-
-  /**
-   * Marks that as soon as this variable is deconstructed
-   * (so its variance is known)
-   * we will have to assert that the corresponding type constructor
-   * implements the correct Top<n> interface
-   */
-  public void rememberToImplementTop()
-  {
-    willImplementTop = true;
-  }
-
   /****************************************************************
    * Misc.
    ****************************************************************/

@@ -35,9 +35,6 @@ public final class Variance
   {
     this.size = signs.length;
     this.signs = signs;
-
-    this.top = new Interface(this);
-    this.top.name = "top interface " + this;
   }
 
   /** 
@@ -104,15 +101,6 @@ public final class Variance
   }
   
   private static Variance empty = Variance.make(new int[0]);
-  
-  /****************************************************************
-   * The top interface
-   ****************************************************************/
-  
-  /**
-   * top interface for this variance.
-   */
-  public final Interface top;
   
   public mlsub.typing.lowlevel.Engine.Constraint getConstraint()
   {

@@ -247,49 +247,22 @@ public final class Constraint
    * Typechecking
    ****************************************************************/
 
-  public void assert()
-    throws TypingEx
-  {
-    // All user defined variables implicitely implement Top
-    assert(true);
-  }
-  
   public static void assert(Constraint c)
     throws TypingEx
   {
-    if(c!=null)
-      // All user defined variables implicitely implement Top
-      c.assert(true);
+    if( c != null)
+      c.assert();
   }
   
-  public void assert(boolean implementTop)
+  public void assert()
     throws TypingEx
   {
-    if(binders!=null) Typing.introduceTypeSymbols(binders);
+    if (binders != null) 
+      Typing.introduceTypeSymbols(binders);
 
-    // This must be before the stuff about implementing Top
-    // since it should allow to find variance of type constructors
-    if(atoms!=null)
-      for(int i=0; i<natoms; i++)
+    if (atoms != null)
+      for (int i=0; i<natoms; i++)
 	atoms[i].assert();
-
-    if(implementTop)
-      {
-	if(binders!=null)
-	  for(int i=0; i<nbinders; i++)
-	    if(binders[i] instanceof TypeConstructor)
-	      {
-		TypeConstructor t = (TypeConstructor) binders[i];
-	      
-		if(t.variance!=null)
-		  Typing.assertImp
-		    (t, t.variance.top, false);
-		else
-		  bossa.util.Internal.warning(t+" has no known variance, so I can't assert it implement some Top<n> interface");
-	      }
-	    else
-	      ((MonotypeVar) binders[i]).rememberToImplementTop();
-      }
   }
   
   /****************************************************************

@@ -18,3 +18,11 @@ class Array {}
   var l = a.length;
   /// Toplevel
 class Array<T> {}
+
+/// PASS
+  int[] i = [ 1 ];
+  int[] j = i.clone();
+  assert i != j;
+  assert j[0] == 1;
+  j[0] = 2;
+  assert i[0] == 1 && j[0] == 2;

@@ -1,0 +1,15 @@
+/// PASS bug
+  let a1 = new A(x: 1);
+  let a2 = a1.clone();
+  assert a2 != a1;
+  assert a2.x == 1;
+  a2.x = 2;
+  assert a1.x == 1 && a2.x == 2;
+
+  /// Toplevel
+final class A implements Cloneable
+{
+  int x;
+
+  clone() = new A(x: this.x);
+}

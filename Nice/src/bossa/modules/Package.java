@@ -617,10 +617,7 @@ public class Package implements mlsub.compilation.Module, Located, bossa.syntax.
   private ClassExp getImplementationClass()
   {
     if (implementationClass == null)
-      {
-	System.out.println("Creating fun.class for " + this);
-	implementationClass = createClassExp(name + "." + packageClassName);
-      }
+      implementationClass = createClassExp(name + "." + packageClassName);
 
     return implementationClass;
   }

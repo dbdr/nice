@@ -1,0 +1,50 @@
+#! /bin/sh -x
+
+# Automatic Benchmarker
+
+# Stop on errors
+set -e
+
+# Set up variables, that can be overriden in the setup file.
+machine="`hostname -f`"
+system="`uname -a`"
+user="$USER"
+
+export CVS_SOURCEFORGE="cvs.sourceforge.net"
+
+if [ -r setup ]; then
+    . setup
+fi
+
+#rm -rf benchs; mkdir -p benchs
+cd benchs
+
+../cvs-master Nice checkout
+wget -O Nice/external/nice-bootstrap.jar http://nice.sf.net/nice.jar
+
+. ../config-bench
+
+export NICEC=${PWD}/Nice/bin/nicec
+export NICE_JAR=${PWD}/Nice/share/java/nice.jar
+
+ORIGINAL_PATH="$PATH"
+PATH="$JAVA_HOME/bin:$ORIGINAL_PATH"
+
+# Redirect output
+exec > bench.log
+exec 2>&1
+
+days=1
+
+while true; do
+    if cd Nice; cvs update -d -D "$days days ago"; make complete; cd ..; then
+
+        /usr/bin/time -f "$days ago: %Uu %Ss" -a -o ../bench.res ../Swing.test
+
+    else
+	echo "Bootstrap FAILURE"
+    fi
+
+
+    days=$((days + 1))
+done

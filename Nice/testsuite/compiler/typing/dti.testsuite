@@ -110,7 +110,7 @@ boolean maybeTrue() = true;
     maybeThrow();
   } catch (Exception e) {
      s = null;
-  } catch (Exception e) {
+  } catch (Throwable e) {
      s = "xyz";
   } finally {
     s. /*/// FAIL HERE*/ substring(1); 

@@ -1197,15 +1197,36 @@ MonotypeVar taggedMonotypeVar(List tags, List atoms):
 
 EnumDefinition enumDefinition(List definitions):
 { 
-  LocatedString name, elem;
+  LocatedString name;
   List elements = new LinkedList();
+  List fields = new LinkedList();
+  MonoSymbol field;
+  List argsList = new LinkedList();
 }
 {
   "enum" name=ident()
-  "{" elem=ident() { elements.add(elem); }
-   ( "," elem =ident() { elements.add(elem); } )+
+  [ 
+    "(" field=monoSymbol() { fields.add(field); }
+     ( "," field=monoSymbol() { fields.add(field); } )* ")"
+  ]
+  "{" enumElement(elements, argsList)
+   ( "," enumElement(elements, argsList) )+
   "}"
-  { return new EnumDefinition(name, elements, definitions); }
+  { return new EnumDefinition(name, elements, fields, argsList, definitions); }
+}
+
+void enumElement(List elements, List argsList):
+{
+  LocatedString elem;
+  Expression arg;
+  List args = new LinkedList();
+}
+{
+  elem=ident() { elements.add(elem); }
+  [ "(" arg=Expression() { args.add(arg); }
+     ( "," arg=Expression() { args.add(arg); } )* ")"
+  ]
+  { argsList.add(args); }
 }
 
 /***********************************************************************/

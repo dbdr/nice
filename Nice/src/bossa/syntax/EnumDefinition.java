@@ -25,7 +25,9 @@ import java.util.*;
 */
 public class EnumDefinition extends Definition
 {
-  public EnumDefinition(LocatedString name, List/*LocatedString*/ elements, List globalDefs)
+  public EnumDefinition(LocatedString name, List/*LocatedString*/ elements,
+		List/*MonoSymbol*/ fields, List/*List<Expression>*/ argsList,
+		List globalDefs)
   {
     super(name, Node.global);
     shortName = name.toString();
@@ -34,7 +36,19 @@ public class EnumDefinition extends Definition
 	new TypeIdent(new LocatedString("nice.lang.Enum",name.location())),
 	null,null);
     NiceClass impl = new NiceClass(classDef);
-    impl.setFields(null);
+    int fieldsCount = fields.size();
+    if (fieldsCount > 0)
+      {
+        List newFields = new ArrayList(fieldsCount);
+        for (Iterator it = fields.iterator(); it.hasNext(); )
+           newFields.add(impl.makeField((MonoSymbol)it.next(), null, true, 
+		false, false, null));
+
+        impl.setFields(newFields);
+      }
+    else    
+      impl.setFields(null);
+
     impl.setOverrides(null);
 
     if (! inInterfaceFile())
@@ -56,15 +70,20 @@ public class EnumDefinition extends Definition
     addChild(classDef);    
 
     this.elements = elements;
+    this.fields = fields;
+    this.elementsArgs = argsList;
     
     symbols = new LinkedList();
-    int ord = 0;  
-    for (Iterator it = elements.iterator(); it.hasNext(); )
+    for (int ord = 0; ord<elements.size(); ord++ )
       {
+        List args = (List) argsList.get(ord);
+        LocatedString elemName = (LocatedString)elements.get(ord);
+        if (args.size() != fieldsCount)
+	  User.error(elemName, "the number of arguments doesn't match the number of enum fields");
+        
         Monotype type = new TypeIdent(name);
         type.nullness = Monotype.absent;
-        symbols.add(new EnumSymbol(name, (LocatedString)it.next(), type, ord));
-        ord++;
+        symbols.add(new EnumSymbol(name, elemName, type, ord, fields, args));
       }
     addChildren(symbols);
 
@@ -72,16 +91,21 @@ public class EnumDefinition extends Definition
 
   class EnumSymbol extends MonoSymbol 
   {
-    EnumSymbol(LocatedString enumName, LocatedString name, Monotype type, int ordinal)
+    EnumSymbol(LocatedString enumName, LocatedString name, Monotype type,
+	int ordinal, List fields, List argExps)
     {
       super(name, type);
-      List args = new ArrayList(2);
+      List args = new ArrayList(2 + fields.size());
       args.add(new Arguments.Argument(new StringConstantExp(name.toString()),
 		new LocatedString("name",name.location)));
       Integer val = new Integer(ordinal);
       args.add(new Arguments.Argument(new ConstantExp(PrimitiveType.intTC, val,
 		val.toString(), name.location()),
 		new LocatedString("ordinal",name.location)));
+      for (int i = 0; i < fields.size(); i++)
+         args.add(new Arguments.Argument((Expression)argExps.get(i),
+		((MonoSymbol)fields.get(i)).getName()));
+
       this.value = new NewExp(new TypeIdent(enumName), new Arguments(args));
     }
       
@@ -180,11 +204,25 @@ public class EnumDefinition extends Definition
 
   public String toString()
   {
-    return "enum " + shortName + Util.map(" {", " , ", " }", elements);
+    if (fields.isEmpty())
+      return "enum " + shortName + Util.map(" {", " , ", " }", elements);
+
+    String res = "enum " + shortName + Util.map("(", ", ", ")", fields) + " {";
+    for (int i = 0; i < elements.size(); i++)
+      {
+	if (i != 0)
+	  res += ", ";
+
+	res += elements.get(i) + Util.map("(", ", ", ")", (List)elementsArgs.get(i));
+      }
+
+    return res + "}";
   }
 
   String shortName;
   ClassDefinition classDef;
   List elements;
   List symbols;
+  List fields;
+  List elementsArgs;
 }

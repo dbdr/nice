@@ -88,3 +88,13 @@
   assert elems.contains(red);
   assert elems.contains(blue);
   assert elems.contains(green);
+
+/// PASS
+  /// package a 
+  /// Toplevel
+  enum Coin(int value) {penny(1), nickel(5), dime(10), quarter(25)}
+  /// package b import a
+  assert penny.value == 1;
+  assert nickel.value == 5;
+  assert dime.value == 10;
+  assert quarter.value == 25;

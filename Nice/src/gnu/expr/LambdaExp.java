@@ -800,7 +800,7 @@ public class LambdaExp extends ScopeExp
 		 && (((ModuleExp) outer)
 		     .getFlag(ModuleExp.SUPERTYPE_SPECIFIED))));
 	name = nameBuf.toString();
-	if (! classSpecified)
+	if (true || ! classSpecified)
 	  {
 	    // If the base class or interfaces were not explicitly
 	    // specified, then any existing matching method (such as "run"

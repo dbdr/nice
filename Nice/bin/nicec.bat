@@ -41,3 +41,7 @@ goto end
 java -classpath %NICE%\nice.jar;%CLASSPATH% nice.tools.compiler.fun --runtime=%NICE%\nice.jar %1 %2 %3 %4 %5 %6 %7 %8 %9
 
 :end
+
+rem Local variables:
+rem coding:dos
+rem End:

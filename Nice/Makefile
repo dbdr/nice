@@ -60,7 +60,7 @@ deb:
 	@echo Creating Debian package version ${VERSION}
 	env CVSROOT=:pserver:anonymous@cvs.nice.sourceforge.net:/cvsroot/nice cvs-buildpackage -MNice -W${CVSBUILDDIR} -us -uc -rfakeroot -F
 
-dist:
+dist ${TARFILE}: share/java/nice.jar
 	rm -rf ${TOP}/dist
 	mkdir ${TOP}/dist
 	$(MAKE) install DESTDIR=${TOP}/dist PREFIX="" 
@@ -95,7 +95,7 @@ status:
 
 release: release-file web
 
-release-file:
+release-file: ${TARFILE}
 	(echo user anonymous bonniot@users.sf.net; \
          echo binary; echo cd incoming; echo put ${TARFILE}; \
          echo lcd ${CVSBUILDDIR}; echo put ${DEB} )\

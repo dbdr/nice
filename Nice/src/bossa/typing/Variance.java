@@ -12,7 +12,7 @@
 
 // File    : Variance.java
 // Created : Fri Jul 23 12:15:46 1999 by bonniot
-//$Modified: Thu Feb 03 15:14:59 2000 by Daniel Bonniot $
+//$Modified: Mon Apr 03 16:33:04 2000 by Daniel Bonniot $
 
 package bossa.typing;
 
@@ -97,7 +97,7 @@ public class Variance
   public void leq(Element e1, Element e2, boolean initial)
     throws Unsatisfiable
   {
-    Internal.error(initial,"initial leq in Variance");
+    if(initial) Internal.error("initial leq in Variance");
     leq(e1,e2);
   }
 

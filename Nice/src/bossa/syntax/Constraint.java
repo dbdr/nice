@@ -12,7 +12,7 @@
 
 // File    : Constraint.java
 // Created : Fri Jul 02 17:51:35 1999 by bonniot
-//$Modified: Tue Feb 22 12:24:25 2000 by Daniel Bonniot $
+//$Modified: Mon Apr 03 16:22:35 2000 by Daniel Bonniot $
 
 package bossa.syntax;
 
@@ -204,8 +204,9 @@ public class Constraint extends Node
 		    break;
 		  }
 	      }
-	    Internal.error(!ok,tc,
-			   "Unable to print the constraint in a parsable form because of "+tc);
+	    if(!ok)
+	      Internal.error(tc,
+			     "Unable to print the constraint in a parsable form because of "+tc);
 	  }
 		  
 	return 

@@ -12,7 +12,7 @@
 
 // File    : Internal.java
 // Created : Wed Jul 07 18:23:19 1999 by bonniot
-//$Modified: Tue Feb 22 11:54:41 2000 by Daniel Bonniot $
+//$Modified: Mon Apr 03 16:18:35 2000 by Daniel Bonniot $
 // Description : Internal errors...
 
 package bossa.util;
@@ -49,18 +49,6 @@ public class Internal
     System.out.println("[Internal warning] "+message);
   }
 
-  public static void warning(boolean condition, String message)
-  {
-    if(condition)
-      warning(message);
-  }
-
-  public static void error(boolean condition, Located loc, String message)
-  {
-    if(condition)
-      error(loc,message);
-  }
-
   public static void error(Located loc, String message, String dbgMsg)
   {
     if(Debug.powerUser)
@@ -83,12 +71,6 @@ public class Internal
     System.out.println("[Internal error] "+message);
     printStackTrace();
     System.exit(1);
-  }
-
-  public static void error(boolean condition, String message)
-  {
-    if(condition) 
-      error(message);
   }
 
 }

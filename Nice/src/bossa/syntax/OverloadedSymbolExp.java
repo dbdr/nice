@@ -12,7 +12,7 @@
 
 // File    : OverloadedSymbolExp.java
 // Created : Thu Jul 08 12:20:59 1999 by bonniot
-//$Modified: Thu Mar 30 19:21:21 2000 by Daniel Bonniot $
+//$Modified: Mon Apr 03 17:55:28 2000 by Daniel Bonniot $
 
 package bossa.syntax;
 
@@ -84,7 +84,8 @@ public class OverloadedSymbolExp extends Expression
     return new SymbolExp((VarSymbol) symbols.iterator().next(),location());
   }
   
-  Expression resolveOverloading(List /* of Polytype */ parameters)
+  Expression resolveOverloading(List /* of Polytype */ parameters,
+				CallExp callExp)
   {
     if(Debug.overloading) 
       Debug.println("Overloading resolution for "+this);
@@ -123,29 +124,51 @@ public class OverloadedSymbolExp extends Expression
       if(notFound(removedSomething ?
 		  "No method of arity "+arity+" has name "+ident :
 		  "No method has name "+ident))
-	return resolveOverloading(parameters);
+	return resolveOverloading(parameters, callExp);
 
     // we check even if there is only one candidate
+    // if we have not refined yet,
     // since if that one does not fit, maybe an outer one does...
+    if(refinementInProgress && symbols.size()==1)
+      return uniqueExpression();
+    
+    Polytype[] types = new Polytype[symbols.size()];
+    VarSymbol[] syms = new VarSymbol[symbols.size()];
+    int symNum = 0;
     for(Iterator i=symbols.iterator();i.hasNext();)
       {
-	VarSymbol s=(VarSymbol)i.next();
+	VarSymbol s = (VarSymbol) i.next();
 	
 	if(Debug.overloading) 
 	  Debug.println("Overloading: Trying with "+s);
 	
-	if(!CallExp.wellTyped(new SymbolExp(s,location()),parameters))
+	Polytype t = CallExp.wellTyped(new SymbolExp(s,location()),parameters);
+	if(t==null)
 	  i.remove();
+	else
+	  {
+	    types[symNum] = t;
+	    syms[symNum] = s;
+	    symNum++;
+	  }
       }
 
     removeNonMinimal();
     
     if(symbols.size()==1)
-      return uniqueExpression();
+      {
+	VarSymbol res = (VarSymbol) symbols.iterator().next();
+	for(int i=0;;i++)
+	  if(syms[i]==res)
+	    {
+	      callExp.type = types[i];
+	      return uniqueExpression();
+	    }
+      }
     
     if(symbols.size()==0)
       if(notFound("No alternative matches the parameters while resolving overloading for "+ident))
-	return resolveOverloading(parameters);
+	return resolveOverloading(parameters, callExp);
 
     //There is ambiguity
     User.error(this,"Ambiguity for symbol "+ident+". Possibilities are :\n"+
@@ -212,7 +235,7 @@ public class OverloadedSymbolExp extends Expression
 				  ((JavaTypeConstructor) tc).getJavaType());
 	  }
 	
-	User.error(ident + " is not defined");
+	User.error(ident, ident + " is not defined");
       }
     
     User.error(this,"Ambiguity for symbol "+ident+". Possibilities are :\n"+

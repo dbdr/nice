@@ -12,7 +12,7 @@
 
 // File    : TypeScope.java
 // Created : Fri Jul 09 11:29:17 1999 by bonniot
-//$Modified: Mon Mar 13 18:39:13 2000 by Daniel Bonniot $
+//$Modified: Mon Apr 03 15:16:34 2000 by Daniel Bonniot $
 
 package bossa.syntax;
 
@@ -89,6 +89,7 @@ class TypeScope
       // We are in the global type scope
       {
 	TypeConstructor tc = JavaTypeConstructor.lookup(name);
+	    
 	if(tc!=null)
 	  return tc;
 	    
@@ -99,7 +100,7 @@ class TypeScope
 
 	    if(map.containsKey(fullName))
 	      return (TypeSymbol)map.get(fullName);
-	    
+
 	    tc = JavaTypeConstructor.lookup(fullName);
 	    if(tc!=null)
 	      return tc;

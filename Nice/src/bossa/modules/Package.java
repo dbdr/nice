@@ -12,7 +12,7 @@
 
 // File    : Package.java
 // Created : Wed Oct 13 16:09:47 1999 by bonniot
-//$Modified: Fri Mar 31 20:28:25 2000 by Daniel Bonniot $
+//$Modified: Fri Mar 31 20:43:27 2000 by Daniel Bonniot $
 
 package bossa.modules;
 
@@ -476,16 +476,16 @@ public class Package implements mlsub.compilation.Module
    * Mangling
    ****************************************************************/
 
-  private TreeSet takenNames = new TreeSet();
+  private HashMap takenNames = new HashMap();
   
   public String mangleName(String str)
   {
     int i=0;
     String res = str+"$0";
-    while(takenNames.contains(res))
+    while(takenNames.containsKey(res))
       res = str + "$" + (++i);
   
-    takenNames.add(res);
+    takenNames.put(res,null);
     return res;
   }
   

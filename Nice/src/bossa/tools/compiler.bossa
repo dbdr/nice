@@ -12,7 +12,7 @@
 
 // File    : compiler.bossa
 // Created : Sat Feb 19 16:21:04 2000 by Daniel Bonniot
-//$Modified: Tue Mar 14 14:39:32 2000 by Daniel Bonniot $
+//$Modified: Mon Apr 03 15:46:55 2000 by Daniel Bonniot $
 
 package bossa.tools;
 
@@ -57,7 +57,7 @@ main(args)
 		  fun()=>
                   {
 		    println(printOptions(opts));
-		    exit(1);
+		    System.exit(1);
 		  }));
 
   opts.add(option('?',"usage",
@@ -66,8 +66,9 @@ main(args)
 
   Sequence<String> rest = parse("bossac", args, opts);
   if((rest.size()<1) | (rest.size()>1))
-    usage();
-
+    {
+      usage();
+    }
   String packageName = rest.get(0);
 
   //println("Bossa compiler");

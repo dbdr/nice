@@ -12,7 +12,7 @@
 
 // File    : ImplementsCst.java
 // Created : Fri Aug 27 10:45:33 1999 by bonniot
-//$Modified: Mon Dec 06 11:36:27 1999 by bonniot $
+//$Modified: Mon Apr 03 16:29:20 2000 by Daniel Bonniot $
 
 package bossa.syntax;
 
@@ -37,7 +37,8 @@ public class ImplementsCst extends AtomicConstraint
 
   public ImplementsCst(TypeConstructor tc, InterfaceDefinition itfDef)
   {
-    Internal.error(itfDef==null,"Null interface definition");
+    if(itfDef==null)
+      Internal.error("Null interface definition");
     this.tc=tc;
     this.itf=null;
     this.itfDef=itfDef;

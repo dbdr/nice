@@ -12,7 +12,7 @@
 
 // File    : JavaTypeConstructor.java
 // Created : Thu Jul 08 11:51:09 1999 by bonniot
-//$Modified: Fri Mar 31 20:27:33 2000 by Daniel Bonniot $
+//$Modified: Mon Apr 03 13:35:55 2000 by Daniel Bonniot $
 
 package bossa.syntax;
 

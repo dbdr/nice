@@ -12,7 +12,7 @@
 
 // File    : Typing.java
 // Created : Tue Jul 20 11:57:17 1999 by bonniot
-//$Modified: Fri Feb 25 20:05:20 2000 by Daniel Bonniot $
+//$Modified: Mon Apr 03 17:01:29 2000 by Daniel Bonniot $
 
 package bossa.typing;
 
@@ -142,7 +142,8 @@ abstract public class Typing
   public static void leq(Collection c1, Collection c2)
     throws TypingEx
   {
-    Internal.error(c1.size()!=c2.size(),"Unequal sizes in leq");
+    if(c1.size()!=c2.size()) Internal.error("Unequal sizes in leq");
+
     Iterator i1=c1.iterator();
     Iterator i2=c2.iterator();
     
@@ -156,7 +157,7 @@ abstract public class Typing
   public static void leqMono(Collection c1, Collection c2)
     throws TypingEx
   {
-    Internal.error(c1.size()!=c2.size(),"Unequal sizes in leqMono");
+    if(c1.size()!=c2.size()) Internal.error("Unequal sizes in leqMono");
     Iterator i1=c1.iterator();
     Iterator i2=c2.iterator();
     
@@ -193,7 +194,7 @@ abstract public class Typing
     throws TypingEx
   {
     if(dbg) Debug.println("Polytype leq: "+t1+" <: "+t2);
-    
+
     int l;
     if(dbg) l=enter("#"); else l=enter();
     
@@ -219,6 +220,7 @@ abstract public class Typing
     throws TypingEx
   {
     if(dbg) Debug.println("Monotype leq :"+m1+" <: "+m2);
+
     try{
       Engine.leq(m1,m2);
     }
@@ -257,6 +259,7 @@ abstract public class Typing
     throws TypingEx
   {
     if(dbg) Debug.println("TC leq :"+t1+" < "+t2);
+    
     try{
       Engine.leq(t1,t2,false);
     }
@@ -359,9 +362,9 @@ abstract public class Typing
   {
     if(dbg) Debug.println(t+" abs "+i);
 
-    Internal.error(Engine.isRigid(t),
-		   "Abstraction required on a rigid type constructor : \n"+
-		   t+" required to abstract "+i);
+    if(Engine.isRigid(t))
+      Internal.error("Abstraction required on a rigid type constructor : \n"+
+		     t+" required to abstract "+i);
     
     i.variance.initialAbstracts(t.getId(),i.itf);
   }

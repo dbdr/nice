@@ -12,7 +12,7 @@
 
 // File    : Expression.java
 // Created : Mon Jul 05 16:25:02 1999 by bonniot
-//$Modified: Wed Mar 29 15:28:43 2000 by Daniel Bonniot $
+//$Modified: Mon Apr 03 17:53:06 2000 by Daniel Bonniot $
 // Description : 
 
 package bossa.syntax;
@@ -84,11 +84,13 @@ public abstract class Expression extends Node
   }
   
   /**
-   * Resolves overloading, taking into account the parameters the expressions is applied to.
+   * Resolves overloading, taking into account the parameters 
+   * the expressions is applied to.
    *
    * @return the resolved expression. Doesn't return if OR is not possible.
    */
-  Expression resolveOverloading(List /* of Expression */ parameters)
+  Expression resolveOverloading(List /* of Expression */ parameters,
+				CallExp callExp)
   {
     return this;
   }

@@ -12,7 +12,7 @@
 
 // File    : Engine.java
 // Created : Tue Jul 27 15:34:53 1999 by bonniot
-//$Modified: Mon Mar 13 16:30:36 2000 by Daniel Bonniot $
+//$Modified: Mon Apr 03 16:30:57 2000 by Daniel Bonniot $
 
 package bossa.engine;
 
@@ -133,7 +133,8 @@ public abstract class Engine
   public static void leq(Collection e1, Collection e2) 
     throws Unsatisfiable
   {
-    Internal.error(e1.size()!=e2.size(),"Bad size in Engine.leq(Collections)");
+    if(e1.size()!=e2.size())
+      Internal.error("Bad size in Engine.leq(Collections)");
     
     Iterator i1=e1.iterator(),i2=e2.iterator();
     for(int i=e1.size();i>0;i--)
@@ -195,7 +196,7 @@ public abstract class Engine
 	  if(!(floating.contains(e2)))
 	    {
 	      floating.add(e2);
-	      Internal.error("Engine: floating added 2 : "+e2);
+	      Internal.warning("Engine: floating added 2 : "+e2);
 	    }
 	  if(dbg)
 	    Debug.println("Freezing "+e1+" <: "+e2+
@@ -227,9 +228,11 @@ public abstract class Engine
   public static boolean isRigid(Element e)
   {
     Kind kind=e.getKind();
-    Internal.error(kind==null,"null kind in Engine.isRigid for "+e);
+    if(kind==null)
+      Internal.error("null kind in Engine.isRigid for "+e);
     Engine.Constraint k=getConstraint(kind);
-    Internal.error(k==null,"null constraint in Engine.isRigid for "+e);
+    if(k==null)
+      Internal.error("null constraint in Engine.isRigid for "+e);
     return k.isRigid(e);
   }
   
@@ -287,8 +290,8 @@ public abstract class Engine
 		}
 	      else
 		{
-		  Internal.error(leq.e1.getKind()!=leq.e2.getKind(),
-				 "Bad kinding in Engine.setKind 1");
+		  if(leq.e1.getKind()!=leq.e2.getKind())
+		    Internal.error("Bad kinding in Engine.setKind 1");
 		  i.remove();
 		  k.leq(leq.e1,leq.e2,initialContext);
 		}
@@ -297,8 +300,8 @@ public abstract class Engine
 		s.push(leq.e1);
 	      else
 		{
-		  Internal.error(leq.e1.getKind()!=leq.e2.getKind(),
-				 "Bad kinding in Engine.setKind 2");
+		  if(leq.e1.getKind()!=leq.e2.getKind())
+		    Internal.error("Bad kinding in Engine.setKind 2");
 		  i.remove();
 		  k.leq(leq.e1,leq.e2,initialContext);
 		}

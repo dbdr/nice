@@ -1,6 +1,6 @@
 package bossa.engine;
 
-import java.util.Vector;
+import java.util.ArrayList;
 
 /**
  * A square matrix of bits, used to represent a relation between integers.
@@ -10,10 +10,10 @@ import java.util.Vector;
  **/
 final public class BitMatrix implements Cloneable {
   /**
-   * a vector of BitVectors. rows.elementAt(i) is the ith line of
+   * a vector of BitVectors. rows.get(i) is the ith line of
    * the matrix. 
    **/
-  private Vector rows;
+  private ArrayList rows;
 
   /**
    * Constructs an empty matrix
@@ -22,7 +22,7 @@ final public class BitMatrix implements Cloneable {
     this(10);
   }
   private BitMatrix(int rowCapacity) {
-    rows = new Vector(rowCapacity);
+    rows = new ArrayList(rowCapacity);
   }
 
   /**
@@ -44,13 +44,19 @@ final public class BitMatrix implements Cloneable {
       // clear the columns beyond newSize, so that subsequent calls to extend()
       // or setSize will find them empty.
       for (int i = 0; i < newSize; i++) {
-        BitVector row = (BitVector)rows.elementAt(i);
+        BitVector row = (BitVector)rows.get(i);
         if (row != null) {
           row.truncate(newSize);
         }
       }
+      for (int i = oldSize; i>newSize; )
+	rows.remove(--i);
     }
-    rows.setSize(newSize);
+      else {
+        rows.ensureCapacity(newSize);
+        for(int i = oldSize; i<newSize; i++)
+	  rows.add(null);
+      }
   }
 
   /**
@@ -59,7 +65,7 @@ final public class BitMatrix implements Cloneable {
    **/
   public int extend() {
     int n = size();
-    rows.addElement(null);
+    rows.add(null);
     return n;
   }
   
@@ -69,7 +75,7 @@ final public class BitMatrix implements Cloneable {
    **/
   BitVector getRow(int i) {
     if (i < rows.size()) {
-      return (BitVector)rows.elementAt(i);
+      return (BitVector)rows.get(i);
     } else {
       return null;
     }
@@ -80,7 +86,7 @@ final public class BitMatrix implements Cloneable {
    * Assume i and j are valid indexes
    **/
   public boolean get(int i, int j) {
-    BitVector row = (BitVector)rows.elementAt(i);
+    BitVector row = (BitVector)rows.get(i);
     return row != null && row.get(j);
   }
 
@@ -88,10 +94,10 @@ final public class BitMatrix implements Cloneable {
    * Set element at position (i, j) to true. Assume i and j are valid indexes.
    **/
   public void set(int i, int j) {
-    BitVector row = (BitVector)rows.elementAt(i);
+    BitVector row = (BitVector)rows.get(i);
     if (row == null) {
       row = new BitVector(size());
-      rows.setElementAt(row, i);
+      rows.set(i, row);
     }
     row.set(j);
   }
@@ -100,7 +106,7 @@ final public class BitMatrix implements Cloneable {
    * Set element at position (i, j) to false. Assume i and j are valid indexes.
    **/
   public void clear(int i, int j) {
-    BitVector row = (BitVector)rows.elementAt(i);
+    BitVector row = (BitVector)rows.get(i);
     if (row != null) {
       row.clear(j);
     }
@@ -113,10 +119,10 @@ final public class BitMatrix implements Cloneable {
     // Warshall algorithm
     int n = size();
     for (int k = 0; k < n; k++) {
-      BitVector row_k = (BitVector)rows.elementAt(k);
+      BitVector row_k = (BitVector)rows.get(k);
       if (row_k != null) {
         for (int i = 0; i < n; i++) {
-          BitVector row_i = (BitVector)rows.elementAt(i);
+          BitVector row_i = (BitVector)rows.get(i);
           if (row_i != null && row_i.get(k)) { // i < k
             /* for all j such that k < j, add i < j */
             row_i.or(row_k);
@@ -138,7 +144,7 @@ final public class BitMatrix implements Cloneable {
     BitMatrix m = new BitMatrix(n);
     m.setSize(n);
     for (int i = 0; i < n; i++) {
-      BitVector row = (BitVector)rows.elementAt(i);
+      BitVector row = (BitVector)rows.get(i);
       if (row != null) {
         int ncols = row.size();
         for (int j = 0; j < ncols; j++) {
@@ -154,12 +160,12 @@ final public class BitMatrix implements Cloneable {
   public Object clone() {
     try {
       BitMatrix m = (BitMatrix)super.clone();
-      Vector v = (Vector)rows.clone();
+      ArrayList v = (ArrayList)rows.clone();
       int nrows = rows.size();
       for (int i = 0; i < nrows; i++) {
-        BitVector row = (BitVector)v.elementAt(i);
+        BitVector row = (BitVector)v.get(i);
         if (row != null) {
-          v.setElementAt(row.clone(), i);
+          v.set(i, row.clone());
         }
       }
       m.rows = v;
@@ -177,7 +183,7 @@ final public class BitMatrix implements Cloneable {
     int rowCount = rows.size();
     boolean needSeparator = false;
     for (int row = 0; row < rowCount; row++) {
-      BitVector rowBitVector = (BitVector)rows.elementAt(row);
+      BitVector rowBitVector = (BitVector)rows.get(row);
       if (rowBitVector != null) {
         int ncols = rowBitVector.size();
         for (int col = 0; col < ncols; col++) {
@@ -203,14 +209,14 @@ final public class BitMatrix implements Cloneable {
     if (obj == null || !(obj instanceof BitMatrix)) {
       return false;
     } else {
-      Vector rows1 = this.rows;
-      Vector rows2 = ((BitMatrix)obj).rows;
+      ArrayList rows1 = this.rows;
+      ArrayList rows2 = ((BitMatrix)obj).rows;
       int nrows1 = rows1.size();
       int nrows2 = rows2.size();
       int n = Math.min(nrows1, nrows2);
       for (int i = 0; i < n; i++) {
-        BitVector row1 = (BitVector)rows1.elementAt(i);
-        BitVector row2 = (BitVector)rows2.elementAt(i);
+        BitVector row1 = (BitVector)rows1.get(i);
+        BitVector row2 = (BitVector)rows2.get(i);
         if (row1 == null && row2 == null) continue;
         if (row1 == null && row2.isEmpty()) continue;
         if (row2 == null && row1.isEmpty()) continue;
@@ -219,14 +225,14 @@ final public class BitMatrix implements Cloneable {
       }
       if (nrows1 > n) {
         for (int i = n; i < nrows1; i++) {
-          BitVector row1 = (BitVector)rows1.elementAt(i);
+          BitVector row1 = (BitVector)rows1.get(i);
           if (row1 != null && !row1.isEmpty()) {
             return false;
           }
         }
       } else if (nrows2 > n) {
         for (int i = n; i < nrows2; i++) {
-          BitVector row2 = (BitVector)rows2.elementAt(i);
+          BitVector row2 = (BitVector)rows2.get(i);
           if (row2 != null && !row2.isEmpty()) {
             return false;
           }
@@ -332,8 +338,8 @@ final public class BitMatrix implements Cloneable {
    * of getRow(src) must not be used after this call.
    **/
   public void rowMove(int src, int dest) {
-    rows.setElementAt(getRow(src), dest);
-    rows.setElementAt(null, src);
+    rows.set(dest, getRow(src));
+    rows.set(src, null);
   }
 
   /**
@@ -390,12 +396,12 @@ final public class BitMatrix implements Cloneable {
     if (srcRow != null) {
       BitVector destRow = getRow(dest);
       if (destRow == null) {
-        rows.setElementAt(srcRow, dest);
+        rows.set(dest, srcRow);
       } else {
         destRow.or(srcRow);
       }
     }
-    rows.setElementAt(null, src);
+    rows.set(src, null);
   }
 
   /**

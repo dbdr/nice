@@ -12,7 +12,7 @@
 
 // File    : TypeConstructor.java
 // Created : Thu Jul 08 11:51:09 1999 by bonniot
-//$Modified: Fri Feb 25 16:43:15 2000 by Daniel Bonniot $
+//$Modified: Mon Apr 03 16:22:06 2000 by Daniel Bonniot $
 
 package bossa.syntax;
 
@@ -70,7 +70,8 @@ public class TypeConstructor
   {
     this.name=new LocatedString(hint.content+"'",hint.location());
 
-    Internal.error(v==null,name+" : null Variance");
+    if(v==null)
+      Internal.error(name, name+" : null Variance");
     
     setVariance(v);
     this.definition=null;
@@ -131,7 +132,8 @@ public class TypeConstructor
   Polytype instantiate(TypeParameters tp)
     throws BadSizeEx
   {
-    Internal.error(variance==null,"Null variance in TypeConstructor");
+    if(variance==null)
+      Internal.error("Null variance in TypeConstructor");
     
     if(variance.size!=tp.size())
       throw new BadSizeEx(variance.size,tp.size());

@@ -12,7 +12,7 @@
 
 // File    : FunTypeKind.java
 // Created : Wed Jul 28 17:51:02 1999 by bonniot
-//$Modified: Fri Feb 04 15:28:47 2000 by Daniel Bonniot $
+//$Modified: Mon Apr 03 16:31:43 2000 by Daniel Bonniot $
 
 package bossa.typing;
 
@@ -43,7 +43,8 @@ public class FunTypeKind implements Kind
   public void leq(Element e1, Element e2, boolean initial)
     throws Unsatisfiable
   {
-    Internal.error(initial,"initial leq in FunTypeKind");
+    if(initial)
+      Internal.error("initial leq in FunTypeKind");
     leq(e1,e2);
   }
   

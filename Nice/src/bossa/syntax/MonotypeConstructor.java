@@ -12,7 +12,7 @@
 
 // File    : MonotypeConstructor.java
 // Created : Thu Jul 22 09:15:17 1999 by bonniot
-//$Modified: Tue Mar 14 16:59:30 2000 by Daniel Bonniot $
+//$Modified: Mon Apr 03 16:23:13 2000 by Daniel Bonniot $
 
 package bossa.syntax;
 
@@ -37,7 +37,8 @@ public class MonotypeConstructor extends Monotype
   public MonotypeConstructor(TypeConstructor tc, TypeParameters parameters,
 			     Location loc)
   {
-    Internal.error(tc==null,"Null tc in MonotypeConstructor");
+    if(tc==null)
+      Internal.error("Null tc in MonotypeConstructor");
     this.tc=tc;
     if(parameters==null)
       this.parameters=new TypeParameters(null);

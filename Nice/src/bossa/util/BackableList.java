@@ -12,7 +12,7 @@
 
 // File    : BackableList.java
 // Created : Wed Aug 25 12:52:31 1999 by bonniot
-//$Modified: Wed Aug 25 14:05:24 1999 by bonniot $
+//$Modified: Mon Apr 03 16:35:46 2000 by Daniel Bonniot $
 
 package bossa.util;
 
@@ -66,8 +66,9 @@ public class BackableList
   
   public void remove(Object element)
   {
-    Internal.error(iterationInProgress,
-		   "remove during iteration in BackableList");
+    if(iterationInProgress)
+      Internal.error("remove during iteration in BackableList");
+
     content.remove(element);
   }
   
@@ -83,16 +84,18 @@ public class BackableList
   
   public Iterator iterator()
   {
-    Internal.error(iterationInProgress,
-		   "Concurrent iterations in BackableList");
+    if(iterationInProgress)
+      Internal.error("Concurrent iterations in BackableList");
+
     iterationInProgress=true;
     return content.iterator();
   }
   
   public void endOfIteration()
   {
-    Internal.error(!iterationInProgress,
-		   "No iterations to end in BackableList");
+    if(!iterationInProgress)
+      Internal.error("No iterations to end in BackableList");
+
     iterationInProgress=false;
     while(!waitingElements.empty())
       content.add(waitingElements.pop());

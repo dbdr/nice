@@ -1251,11 +1251,11 @@ public final class K0 {
   private void prepareConstraint() throws Unsatisfiable {
     saturateOrigin();
     //collapseMinimal();
-    BitMatrix Leq=(BitMatrix)C.clone();
+    BitMatrix Leq = (BitMatrix)C.clone();
     Leq.closure();
     computeArrows(Leq);
     saturateAbs(Leq);
-    condense(Leq);
+    condense(Leq); // seems faster for the moment
   }
 
 

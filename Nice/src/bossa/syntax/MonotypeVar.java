@@ -12,7 +12,7 @@
 
 // File    : MonotypeVar.java
 // Created : Fri Jul 23 15:36:39 1999 by bonniot
-//$Modified: Tue Feb 15 19:52:52 2000 by Daniel Bonniot $
+//$Modified: Mon Apr 03 16:33:50 2000 by Daniel Bonniot $
 
 package bossa.syntax;
 
@@ -82,7 +82,8 @@ public class MonotypeVar extends Monotype
 
   private void functionalCast(int arity)
   {
-    Internal.error(equivalentCodomain!=null,"equivalentCodomain!=null in MonotypeVar");
+    if(equivalentCodomain!=null)
+      Internal.error("equivalentCodomain!=null in MonotypeVar");
     
     equivalentCodomain=Monotype.fresh(new LocatedString(name.content+"0",name.location()));
     Typing.introduce(equivalentCodomain);
@@ -203,10 +204,10 @@ public class MonotypeVar extends Monotype
   public void setKind(Kind value)
   {
     // it is ok to reset kind to null
-    Internal.error(kind!=null && value!=null 
-		   && kind!=value //TODO: not sure if this case is OK to appen
-		   ,"Variance already set in MonotypeVar :\n"+
-		   this+": kind was "+kind+", value is "+value);
+    if(kind!=null && value!=null
+       && kind!=value) //TODO: not sure if this case is OK to appen
+      Internal.error("Variance already set in MonotypeVar :\n"+
+		     this+": kind was "+kind+", value is "+value);
     
     kind=value;
     if(value==null)

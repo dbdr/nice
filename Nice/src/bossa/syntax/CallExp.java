@@ -12,7 +12,7 @@
 
 // File    : CallExp.java
 // Created : Mon Jul 05 16:27:27 1999 by bonniot
-//$Modified: Thu Mar 30 19:23:21 2000 by Daniel Bonniot $
+//$Modified: Mon Apr 03 17:55:40 2000 by Daniel Bonniot $
 
 package bossa.syntax;
 
@@ -54,21 +54,21 @@ public class CallExp extends Expression
     return new CallExp(fun,params);
   }
   
-  static boolean wellTyped(Expression fun,
+  static Polytype wellTyped(Expression fun,
 			   List /* of Polytype */ parameters)
   {
     try{
       Polytype t = getType(fun,parameters);
-      return true;
+      return t;
     }
     catch(ReportErrorEx e){
-      return false;
+      return null;
     }
     catch(TypingEx e){
-      return false;
+      return null;
     }
     catch(BadSizeEx e){
-      return false;
+      return null;
     }
   }
   
@@ -218,13 +218,14 @@ public class CallExp extends Expression
 	  }
       }
     
-    fun.resolveOverloading(Expression.getType(parameters));
+    fun.resolveOverloading(Expression.getType(parameters), this);
   }
   
   void computeType()
   {
     resolveOverloading();
-    type=getTypeAndReportErrors(location(),fun,parameters);
+    if(type==null)
+      type=getTypeAndReportErrors(location(),fun,parameters);
   }
 
   boolean isAssignable()

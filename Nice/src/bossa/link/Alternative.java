@@ -12,7 +12,7 @@
 
 // File    : Alternative.java
 // Created : Mon Nov 15 12:20:40 1999 by bonniot
-//$Modified: Mon Oct 02 18:43:46 2000 by Daniel Bonniot $
+//$Modified: Fri Oct 06 12:55:08 2000 by Daniel Bonniot $
 
 package bossa.link;
 
@@ -59,10 +59,10 @@ public class Alternative
   /**
    * When read from a bytecode file.
    */
-  public Alternative(String s, ClassType c, Method m)
+  public Alternative(String s, ClassType c, Method method)
   {
     this.definitionClass = c;
-    this.primProcedure = new PrimProcedure(m);
+    this.primProcedure = new PrimProcedure(method);
     
     //Debug.println(s);
     
@@ -76,7 +76,7 @@ public class Alternative
       // This is valid if this method has no parameter
       at = s.length();
     
-    MiscAttr attr = (MiscAttr) Attribute.get(m, "definition");
+    MiscAttr attr = (MiscAttr) Attribute.get(method, "definition");
     if (attr == null)
       Internal.error("Method " + s + " in class " + c.getName() +
 		     " has no definition");
@@ -103,6 +103,17 @@ public class Alternative
 	else
 	  {
 	    TypeSymbol tc = Node.getGlobalTypeScope().lookup(name);
+
+	    if (tc == bossa.syntax.ConstantExp.arrayTC)
+	      /* Special treatment for arrays:
+		 they are compiled into Object,
+		 but we want a SpecialArray in the method bytecode type.
+	      */
+	      {
+		int argnum = patterns.size();
+		if (method.arg_types[argnum] == Type.pointer_type)
+		  method.arg_types[argnum] = SpecialArray.unknownTypeArray();
+	      }
 	    
 	    patterns.add((TypeConstructor) tc);
 	  }

@@ -14,6 +14,11 @@ package bossa.util;
 
 public class UserError extends RuntimeException
 {
+  public UserError()
+  {
+    super();
+  }
+
   UserError(String message)
   {
     super(message);

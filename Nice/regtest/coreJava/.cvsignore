@@ -2,3 +2,5 @@
 *.out
 coreJava.java
 coreJava.nice
+*.class
+package.nicei

@@ -1,2 +1,4 @@
-*.out
+*.class
 *.err
+*.out
+package.nicei

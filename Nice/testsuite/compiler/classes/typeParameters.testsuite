@@ -51,3 +51,19 @@ class Point { int x; }
 
 class Coord<Point P> {}
 class Coord2<Q> extends Coord {}
+
+/// PASS
+  /// COMMENT Use 'this' in an implementation of a method declared outside
+  /// COMMENT of this class. Checks that dispatch @Coord ensures the 
+  /// COMMENT class constraints on the type of the dispatched argument.
+
+  /// Toplevel
+class Point { int x; }
+
+class Coord<Point P>
+{
+  P p;
+
+  toString() = "Coord " + this.p;
+}
+

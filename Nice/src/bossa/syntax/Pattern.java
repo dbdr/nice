@@ -104,6 +104,19 @@ public class Pattern
 	tc2 = additional.resolveToTC(scope);
 	additional = null;
       }
+
+    // Class constraints
+    ClassDefinition def = ClassDefinition.get(tc);
+    if (def == null)
+      return;
+
+    bossa.syntax.Constraint cst = def.getClassConstraint();
+    if (cst == bossa.syntax.Constraint.True)
+      return;
+
+    cst.typeScope = scope;
+    constraint = cst.resolveToLowlevel();
+    patternType = new MonotypeConstructor(tc, def.getTypeParameters());
   }
   
   void resolveType(TypeScope scope)
@@ -141,15 +154,14 @@ public class Pattern
       {
 	Pattern p = patterns[i];
 	if (p.tc == null) continue;
-	leq(monotypes[i], p.tc, p.exactlyAt);
+	p.leq(monotypes[i]);
       }
   }
 
   /**
-     Asserts that m is below tag t.
+     Asserts that m is below this pattern.
    */
-  private static void leq(Monotype m, TypeConstructor t, boolean exactlyAt)
-  throws TypingEx
+  private void leq(Monotype m) throws TypingEx
   {
     Types.setMarkedKind(m);
     m = m.equivalent();
@@ -161,12 +173,27 @@ public class Pattern
     // the argument is not null
     Typing.leq(mc.getTC(), PrimitiveType.sureTC);
     Monotype type = mc.getTP()[0];
-    Typing.leq(type, t);
-    if (exactlyAt)
+
+    if (constraint != null)
       {
-	Typing.leq(t, type);
-	MonotypeConstructor inner = (MonotypeConstructor) type.equivalent();
-	inner.getTC().setMinimal();
+	constraint.enter();
+	Typing.leq(type, patternType);
+	if (exactlyAt)
+	  {
+	    Typing.leq(patternType, type);
+	    MonotypeConstructor inner = (MonotypeConstructor) type.equivalent();
+	    inner.getTC().setMinimal();
+	  }
+      }
+    else
+      {
+	Typing.leq(type, tc);
+	if (exactlyAt)
+	  {
+	    Typing.leq(tc, type);
+	    MonotypeConstructor inner = (MonotypeConstructor) type.equivalent();
+	    inner.getTC().setMinimal();
+	  }
       }
   }
   
@@ -383,6 +410,11 @@ public class Pattern
   TypeConstructor tc2;
   private bossa.syntax.Monotype type;
   private mlsub.typing.Monotype t;
+
+  // The class constraint verified by this pattern.
+  private mlsub.typing.Constraint constraint;
+  // The type of the class matched, if it is constrained.
+  private mlsub.typing.Monotype patternType;
 
   private boolean exactlyAt;
   private Expression atValue;

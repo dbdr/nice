@@ -69,7 +69,10 @@ class Info
   TypeScope outerTypeScope;
 
   ?LoopStmt currentLoop = null;
-  ?Set<VarSymbol> currentLoopVars = null;
+  /* The set of all local constant variables whose scope is the current 
+     most inner loop. Null if we are not inside a loop at this point.
+  */
+  ?Collection<VarSymbol> localsOfCurrentLoop = null;
 
   Stack<LabeledStmt> labels = new Stack();
 
@@ -219,8 +222,8 @@ void setInitialized (Block.LocalVariable.Symbol v, Info info,
   if (v.index != -1)
     {
       if (v.constant && (info.flags[v.index] ||
-		info.currentLoopVars != null && 
-		!notNull(info.currentLoopVars).contains(v)))
+		info.localsOfCurrentLoop != null && 
+		!notNull(info.localsOfCurrentLoop).contains(v)))
 	bossa.util.User.error(loc, 
 		"" + v + " cannot be assigned a value multiple times");
 
@@ -555,8 +558,8 @@ analyse(decl@Block.LocalVariable, info)
     decl.setIndex(++info.varIndex);
   info.addVar(notNull(decl.left));
 
-  if (info.currentLoopVars != null && notNull(decl.left).constant)
-    notNull(info.currentLoopVars).add(notNull(decl.left));
+  if (info.localsOfCurrentLoop != null && notNull(decl.left).constant)
+    notNull(info.localsOfCurrentLoop).add(notNull(decl.left));
 }
 
 analyse(decl@Block.LocalConstant, info)
@@ -613,15 +616,15 @@ analyse(l@LoopStmt, info)
     }
 
   ?LoopStmt save = info.currentLoop;
-  ?Set<VarSymbol> loopVarSave = info.currentLoopVars;
+  ?Collection<VarSymbol> localsOfCurrentLoopSave = info.localsOfCurrentLoop;
 
   info.currentLoop = l;
-  info.currentLoopVars = new HashSet();
+  info.localsOfCurrentLoop = new LinkedList();
 
   analyse(l.loopBody, info);
 
   info.currentLoop = save;
-  info.currentLoopVars = loopVarSave;
+  info.localsOfCurrentLoop = localsOfCurrentLoopSave;
 
   /* The update code is considered reachable even if the loop cannot terminate
      normally. This is normal if the loop contains a continue statement, but 

@@ -34,8 +34,8 @@ class Compilation extends mlsub.compilation.Compilation
   boolean recompilationNeeded;
 }
 
-Compilation make(boolean, boolean, boolean, boolean);
-make(doLink, recompileCommandLine, recompileAll, staticLink)
+Compilation compilation(boolean, boolean, boolean, boolean);
+compilation(doLink, recompileCommandLine, recompileAll, staticLink)
 {
   Compilation res = new Compilation();
 
@@ -57,7 +57,8 @@ make(packageName@String,
      doLink, recompileCommandLine, recompileAll, staticLink)
 {
   recompileCommandLine = recompileCommandLine || recompileAll;
-  Compilation res = make(doLink, recompileCommandLine, recompileAll, staticLink);
+  Compilation res = 
+    compilation(doLink, recompileCommandLine, recompileAll, staticLink);
 
   // forces reading nice.lang first
   if(!(packageName.equals("nice.lang")) && !bossa.util.Debug.ignorePrelude())

@@ -1,23 +1,11 @@
 #! /bin/sh
 
-# Wrapper for cvs, that retries seevral times in case of failure
+# Wrapper for cvs, that retries several times in case of failure
 
-# Usage:
-#   cvs <module name>
+dir="`dirname $0`"
 
-# Try at most 20 times times, in case the cvs server is busy
-tries=0
-
-while ! cvs -d:pserver:anonymous@$CVS_SOURCEFORGE:/cvsroot/nice export \
-    -rHEAD "$@"; do
-
-  tries=`expr $tries + 1`
-
-  if [ $tries -ge 20 ]; then 
-      # Signal that we failed because of a network problem
-      exit 1
-  fi
-
-  echo "$tries failures"
-  sleep 30
-done
+if [ -n "$NICE_MASTER" ]; then
+  $dir/cvs-master "$@"
+else
+  $dir/cvs-pserver "$@"
+fi

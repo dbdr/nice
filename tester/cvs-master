@@ -5,5 +5,5 @@
 # Usage:
 #   cvs <module name>
 
-CVS_RSH=ssh cvs -d:ext:bonniot@$CVS_SOURCEFORGE:/cvsroot/nice export \
-    -rHEAD "$@"
+CVS_RSH=ssh cvs -d:ext:bonniot@$CVS_SOURCEFORGE:/cvsroot/nice ${2:-export} \
+    "${CVS_DATE:--rHEAD}" "$1"

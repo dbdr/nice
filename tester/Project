@@ -4,11 +4,11 @@
 set -e
 
 if [ ! -r Nice ]; then
-  ../cvs${NICE_MASTER:+-master} Nice || exit 3
+  ../cvs Nice || exit 3
   wget -O Nice/external/nice-bootstrap.jar http://nice.sf.net/nice.jar || exit 3
 fi
 
-cd Nice && make world
+cd Nice && make universe
 
 # If we got here, the whole bootstrap process succeeded.
 if [ NICE_MASTER ]; then

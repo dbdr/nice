@@ -12,7 +12,7 @@ import gnu.lists.*;
 
 // NICE: Avoid being dependant of gnu.mapping.MethodProc
 // NICE: This is bad because this class is needed ar runtime
-public abstract class ModuleBody extends ProcedureN implements Runnable
+public class ModuleBody extends ProcedureN// implements Runnable
 {
   /*
   public void apply (CallContext stack)
@@ -91,6 +91,12 @@ public abstract class ModuleBody extends ProcedureN implements Runnable
       }
   }
   */
+
+  // just to implement this abstract method
+  public Object applyN(Object[] o)
+  {
+    throw new Error("Not implemented");
+  }
 
   /**
    * A subclass will typically override this like:

@@ -107,13 +107,14 @@ public final class Typing
       bossa.util.Internal.printStackTrace();
     
     try{
+      level--;
       Engine.leave();
     }
     catch(Unsatisfiable e){
       if(dbg) e.printStackTrace();
       throw new TypingEx("Unsatisfiable 1:"+e.getMessage());
     }
-    return --level;
+    return level;
   }
 
   public static void implies()

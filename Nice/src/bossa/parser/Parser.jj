@@ -1543,27 +1543,18 @@ FunExp funExp():
 {
   List formals;
   Constraint cst;
-  Statement body;
-  Expression exp;
   Token f = null;
+  FunExp res;
 }
 {
-  f = "fun" 
+  [f = "fun"] 
   cst=constraint()
   "(" formals=monoSymbols() ")"
-  "=>"
-  (
-    body=Block()
-  |
-    exp=Expression()
-    { 
-      body=new ReturnStmt(exp);
-    }
-  )
+  res=endFunExp(formals, cst)
   {
     if (f != null) 
       bossa.util.User.warning(new Location(f), "The 'fun(...) =>' syntax is deprecated, just leave 'fun' away."); 
-    return new FunExp(cst,formals,body);
+    return res;
   }
 }
 
@@ -1576,22 +1567,11 @@ FunExp simpleVarFunExp():
 {
   sym=monoSymbol() 
   { formals = new LinkedList(); formals.add(sym); }
-  res=endFunExp(formals)
+  res=endFunExp(formals, Constraint.True)
   { return res; }
 }
 
-FunExp multipleVarsFunExp():
-{
-  List formals;
-  FunExp res;
-}
-{
-  "(" formals=monoSymbols() ")"
-  res=endFunExp(formals)
-  { return res; }
-}
-
-FunExp endFunExp(List formals):
+FunExp endFunExp(List formals, Constraint cst):
 {
   Statement body;
   Expression exp;
@@ -1609,7 +1589,7 @@ FunExp endFunExp(List formals):
         body=new ReturnStmt(exp);
     }
   )
-  { return new FunExp(Constraint.True,formals,body); }
+  { return new FunExp(cst,formals,body); }
 }
 
 /** A statement not terminated by a ";" if applicable. */
@@ -1764,9 +1744,8 @@ Expression Expression() :
   { first=getToken(1); }
 
   ( 
-    e1=funExp() 
+    LOOKAHEAD(funExp()) e1=funExp() 
   | LOOKAHEAD(monoSymbol() "=>") e1=simpleVarFunExp() 
-  | LOOKAHEAD("(" monoSymbols() ")" "=>") e1=multipleVarsFunExp() 
   | e1=ClassicExpression() 
   )
   { 

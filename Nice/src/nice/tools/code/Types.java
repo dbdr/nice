@@ -640,6 +640,12 @@ public final class Types
       return ((MonotypeConstructor) m).getTP()[0];
   }
 
+  /** @return the domain of a functional polytype with nullness marker */
+  public static Monotype[] domain(Polytype type)
+  {
+    return rawType(type.getMonotype()).domain();
+  }
+
   /** @return the codomain of a functional polytype with nullness marker */
   public static Monotype codomain(Polytype type)
   {

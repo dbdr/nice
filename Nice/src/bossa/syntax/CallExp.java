@@ -256,16 +256,34 @@ public class CallExp extends Expression
 	arguments.computedExpressions = arguments.inOrder();
       }
 
-    /* 
-       If type is not monomorphic, simplification can result in 
-       a more precise result for the java type used in compilation. 
-       However, it is probably not perfect. setByteCodetype should be usefull.
-       FIXME and test me with regtest case.
-    */
+    if (! type.isMonomorphic() && argTypes != null)
+      {
+	/* 
+	   We construct the instantiated version of the function type:
+	   the type of the function, constrained by the actual arguments. 
+	   Then we simplify it. 
+	   It is useful to constrain the arguments to have the expected 
+	   bytecode types.
+	*/
+	instanciatedType = new Polytype
+	  (type.getConstraint(), new FunType(argTypes, type.getMonotype()));
+	instanciatedType = instanciatedType.cloneType();
+	// By default, a polytype is suppose to be simplified.
+	instanciatedType.setNotSimplified();
+	instanciatedType.simplify();
+      }
+
     if (! type.trySimplify())
       User.warning(this, "This call might have a type error, or this might be a bug in the compiler. \nPlease contact bonniot@users.sourceforge.net");
-    //Types.setBytecodeType(type);
   }
+
+  /** The types of the formal arguments of the function, in the same
+      polymorphic instance as the computed type.
+  */  
+  Monotype[] argTypes;
+
+  /** The type of the function, constrained by the actual arguments. */
+  private Polytype instanciatedType;
 
   boolean isAssignable()
   {
@@ -285,16 +303,7 @@ public class CallExp extends Expression
     else
       res = new gnu.expr.ApplyExp(function.generateCode(), compileParams());
 
-    gnu.bytecode.Type expectedType;
-    if ("notNull".equals(function.toString()))
-      {
-	expectedType = Types.javaType(getType());
-	//System.out.println(this + ", " + res.getType() + "; " + expectedType + "^" + getType());
-	expectedType = Types.javaType(getType());
-	//System.out.println(this + ", " + res.getType() + "; " + expectedType + "^" + getType());
-      }
-    expectedType = Types.javaType(getType());
-    return EnsureTypeProc.ensure(res, expectedType);
+    return EnsureTypeProc.ensure(res, Types.javaType(type));
   }
 
   private gnu.expr.Expression[] compileParams()
@@ -312,6 +321,16 @@ public class CallExp extends Expression
 	      params[i] = ((gnu.expr.PrimProcedure) q.getValue()).wrapInLambda();
 	    }
 	}
+
+    // Make sure the arguments have the expected bytecode type,
+    // matching the instantiated type of the (polymorphic) function.
+    Monotype[] domain = null;
+    if (instanciatedType != null)
+      domain = Types.domain(instanciatedType);
+    if (domain != null)
+      for (int i = 0; i < params.length; i++)
+	params[i] = EnsureTypeProc.ensure
+	  (params[i], Types.javaType(domain[i]));
 
     return params;
   }

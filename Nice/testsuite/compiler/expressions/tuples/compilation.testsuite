@@ -17,3 +17,9 @@
   (double d1, double d2) = d;
   assert d1 == 1;
   assert d2 == 2;
+
+/// PASS
+  Map<String,(int,int)> mapTest = new HashMap();
+
+  mapTest.put("test", (1,2));
+  ?(int,int) res = mapTest.get("test");

@@ -249,6 +249,11 @@ public final class Polytype
   */
   private boolean simplified = true;
   
+  public void setNotSimplified()
+  {
+    simplified = false;
+  }
+
   public void simplify()
   {
     if (!Constraint.hasBinders(constraint) || simplified)

@@ -173,6 +173,8 @@ public class OverloadedSymbolExp extends Expression
     if (symbols.size() == 1)
       {
 	VarSymbol res = (VarSymbol) symbols.get(0);
+	// store the formal argument types for later use together with the type
+	callExp.argTypes = nice.tools.code.Types.domain(res.getClonedType());
 	res.releaseClonedType();
 
 	callExp.type = (Polytype) arguments.types.get(res);

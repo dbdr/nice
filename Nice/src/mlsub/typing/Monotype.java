@@ -104,6 +104,15 @@ abstract public class Monotype implements mlsub.typing.lowlevel.Element
     return null;
   }
 
+  /**
+     If this monotype is functional, return its domain.
+     Otherwise return null.
+  */
+  public Monotype[] domain()
+  {
+    return null;
+  }
+
   /****************************************************************
    * Simplification
    ****************************************************************/

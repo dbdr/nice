@@ -161,6 +161,8 @@ Arguments arguments(CallExp) = native CallExp.arguments;
 Block newBlock(?Statement[] statements) = native new Block(Statement[]);
 mlsub.typing.Polytype boolPolytype() = native PrimitiveType.boolPolytype;
 mlsub.typing.Polytype longPolytype() = native PrimitiveType.longPolytype;
+mlsub.typing.Monotype boolType() = native PrimitiveType.boolType;
+mlsub.typing.Monotype longType() = native PrimitiveType.longType;
 
 // Local Variables:
 // nice-xprogram: "nicec -d \"$HOME/Nice/classes\" --sourcepath=\"$HOME/Nice/src\" --classpath=\"$HOME/Nice/classes\""

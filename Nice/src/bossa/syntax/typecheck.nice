@@ -52,7 +52,7 @@ typecheck(e@AssignExp)
       if (originalType != null)
       try
         {
-	  checkAssignment(new mlsub.typing.Polytype(originalType), notNull(e.value));
+	  checkAssignment(originalType, notNull(e.value));
 
 	  // It is OK to assign the variable, considering it has the original 
 	  // type.
@@ -84,7 +84,7 @@ typecheck(e@AssignExp)
       let originalType = getOriginalType(variable);
       if (originalType != null)
 	try {
-	  checkAssignment(new mlsub.typing.Polytype(originalType), notNull(e.value));
+	  checkAssignment(originalType, notNull(e.value));
 	} catch (TypingEx t) {
 	  throw assignmentError(e, to.toString(), 
 		to.getType().toString(), notNull(e.value));
@@ -590,7 +590,7 @@ typecheck(e@IncrementExp)
 {
   try{
     e.variable = notNull(e.variable).resolveOverloading(PrimitiveType.longPolytype);
-    checkAssignment(PrimitiveType.longPolytype, notNull(e.variable));
+    checkAssignment(PrimitiveType.longType, notNull(e.variable));
   }
   catch(TypingEx t){
     if (notNullError(t, e, String.valueOf(e.variable)))
@@ -678,7 +678,7 @@ typecheck(e@ExpLocalVariable)
       try{
 	mlsub.typing.Polytype polytype = new mlsub.typing.Polytype(type);
 	e.initValue = decl.value = value = value.resolveOverloading(polytype);
-	checkAssignment(polytype, value);
+	checkAssignment(type, value);
       } 
       catch(TypingEx t){
 	reportNullAssignmentError(decl, t, value: value, 
@@ -747,7 +747,7 @@ typecheck(decl@Block.LocalVariable)
       try{
 	mlsub.typing.Polytype polytype = new mlsub.typing.Polytype(type);
 	decl.value = value = value.resolveOverloading(polytype);
-	checkAssignment(polytype, value);
+	checkAssignment(type, value);
       } 
       catch(TypingEx t){
 	reportNullAssignmentError(decl, t, value: value, 
@@ -926,6 +926,12 @@ void checkAssignment(mlsub.typing.Polytype left, Expression right)
   Typing.leq(right.getType(), left);
 }
 
+void checkAssignment(mlsub.typing.Monotype left, Expression right)
+{
+  typecheck(right);
+  Typing.leq(right.getType(), left);
+}
+
 boolean isNullError(TypingEx ex);
 isNullError(@TypingEx) = false;
 isNullError(ex@MonotypeLeqEx)
@@ -961,7 +967,7 @@ boolean notNullError(TypingEx ex, bossa.util.Located resp, ?String value) {
 
 void checkBooleanCondition(Expression condition) {
   try {
-    checkAssignment(PrimitiveType.boolPolytype, condition);
+    checkAssignment(PrimitiveType.boolType, condition);
   }
   catch(TypingEx t){
     throw new bossa.util.UserError(condition, 

@@ -560,3 +560,26 @@ void setScrollPosition(ScrollPane, Point)
   = native void JOptionPane.showMessageDialog(Component, Object, String, int);
 <T> void showMessageDialog(Component parentComponent, T message, String title, int messageType, Icon icon)
   = native void JOptionPane.showMessageDialog(Component, Object, String, int, Icon);
+
+// class JMenu
+JMenuItem add(JMenu, JMenuItem)
+  = native JMenuItem JMenu.add(JMenuItem);
+JMenuItem add(JMenu, String)
+  = native JMenuItem JMenu.add(String);
+JMenuItem getItem(JMenu, int)
+  = native JMenuItem JMenu.getItem(int);
+JMenuItem insert(JMenu, JMenuItem, int)
+  = native JMenuItem JMenu.insert(JMenuItem, int);
+void insert(JMenu, String, int)
+  = native void JMenu.insert(String, int);
+void remove(JMenu, Component)
+  = native void JMenu.remove(Component);
+void remove(JMenu, JMenuItem)
+  = native void JMenu.remove(JMenuItem);
+
+// class JMenuBar
+JMenu add(JMenuBar, JMenu)
+  = native JMenu JMenuBar.add(JMenu);
+void setHelpMenu(JMenuBar, JMenu)
+  = native void JMenuBar.setHelpMenu(JMenu);
+

@@ -860,9 +860,9 @@ String concat2(Collection<String> strings)
 </example>
     </section>
 
-    <section id="conversion"><title>Conversion between primitive types</title>
+    <section id="conversion"><title>Conversion between numeric primitive types</title>
       <para>
-	The primitive types are, from the largest to the smallest:
+	The numeric primitive types are, from the largest to the smallest:
 	<literal>double, float, long, int, short, byte</literal>, 
 	and <literal>char</literal> which is smaller than 
 	<literal>int</literal> but incomparable with <literal>short</literal>.
@@ -872,7 +872,18 @@ String concat2(Collection<String> strings)
       </para>
       <para>
 	The explicit conversion is done by calling a special function, 
-	whose name is the target type. For instance, here is code to read
+	whose name is the target type. 
+	If <replaceable>e</replaceable> is a numeric expression,
+	and <replaceable>type</replaceable> one of the numeric types, then 
+	<literal><replaceable>type</replaceable>(<replaceable>e</replaceable>)</literal> 
+	will convert the value of the expression, so that it is
+	represented as a value in <replaceable>type</replaceable>.
+	This is equivalent to the 
+	<literal>(<replaceable>type</replaceable>) e</literal>
+	syntax in &java;.
+      </para>
+      <para>
+        For instance, here is code to read
 	characters from a <literal>Reader</literal>, whose 
 	<literal>read</literal> method returns an <literal>int</literal> 
 	(<literal>-1</literal> meaning that the end of stream has been 

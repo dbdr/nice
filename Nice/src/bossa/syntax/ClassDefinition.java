@@ -70,7 +70,10 @@ public abstract class ClassDefinition extends MethodContainer
       return false;
     }
 
-    int getBytecodeFlags() { return Access.INTERFACE; }
+    int getBytecodeFlags()
+    {
+      return Access.INTERFACE | Access.PUBLIC;
+    }
 
     boolean implementsJavaInterface(String name)
     {
@@ -209,11 +212,13 @@ public abstract class ClassDefinition extends MethodContainer
 
     int getBytecodeFlags() 
     { 
-      if (isFinal) 
-	return Access.FINAL;
-      else if (isAbstract)
-	return Access.ABSTRACT;
-      else return 0;
+      int flags = Access.PUBLIC;
+      if (isFinal)
+        flags |= Access.FINAL;
+      if (isAbstract) 
+        flags |= Access.ABSTRACT;
+
+      return flags;
     }
 
     boolean implementsJavaInterface(String name)
@@ -275,6 +280,9 @@ public abstract class ClassDefinition extends MethodContainer
 	    User.error(superClassIdent,
 		       superClass + " is an interface, so " + name +
 		       " may only implement it");
+          if (! nice.tools.code.Types.legalAccess(superClass, module.getName()))
+            User.error(superClassIdent, name + " cannot extend " + 
+		superClass + ".  It is not available to this package.");
 
 	  superClassIdent = null;
 	}

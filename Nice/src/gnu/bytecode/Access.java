@@ -75,4 +75,23 @@ public class Access {
     return (mod & PROTECTED) != 0 &&
       c.isSubclass(target) && receiver.isSubtype(c);
   }
+
+  /***
+   * Returns true if classType is legally accessible in the given package. 
+   */
+  public static boolean legal(ClassType classType, String packageName)
+  {
+    int mod = classType.getModifiers();
+
+    if ((mod & PUBLIC) != 0)
+      return true;
+
+    if ((mod & PRIVATE ) != 0)
+      return false;
+
+    if (! packageName.equals(classType.getPackageName()))
+      return false;
+
+    return true;  	
+  }
 }

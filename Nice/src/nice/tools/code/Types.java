@@ -650,4 +650,16 @@ public final class Types
     tcToGBType = new HashMap();
     Import.reset();
   }
+
+  /**
+   * Test if use of a TypeConstructor is legal within a given package
+   */
+  public static boolean legalAccess(TypeConstructor tc, String packageName )
+  {
+    Type type = get(tc);
+    if (! (type instanceof ClassType))
+      return true;
+
+    return Access.legal((ClassType)type, packageName);
+  }
 }

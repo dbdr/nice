@@ -290,6 +290,11 @@ public class Package implements mlsub.compilation.Module, Located
   
   private void typecheck()
   {
+    // An interface file does not have to be typecheked.
+    // It is known to be type correct from previous compilation!
+    if (!sourcesRead)
+      return;
+
     if (Debug.passes)
       Debug.println(this + ": typechecking");
     
@@ -380,9 +385,10 @@ public class Package implements mlsub.compilation.Module, Located
   
   private void saveInterface()
   {
-    // do not save the interface if we produce a jar
-    // whith all the libraries (staticLink)
-    // since we wont need the interface to execute
+    // do not save the interface 
+    // if this package already comes from an interface file, or
+    // if we produce a jar whith all the libraries (staticLink)
+    //   since we wont need the interface to execute
     if (!sourcesRead || compilation.staticLink)
       return;
 
@@ -805,6 +811,15 @@ public class Package implements mlsub.compilation.Module, Located
   public boolean generatingBytecode()
   {
     return sourcesRead;
+  }
+  
+  /** 
+      @return true if this package was loaded from an interface file,
+      not a source file
+  */
+  public boolean interfaceFile()
+  {
+    return !sourcesRead;
   }
   
   /** Whether we read this package from its interface

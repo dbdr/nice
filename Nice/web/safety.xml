@@ -533,7 +533,7 @@ is the equivalent of <literal>?String</literal> in &nice;. However an
 expression of type String cannot be used where a 
 <literal>String option</literal> is expected. 
 It has to be explicitly injected into an option type with
-the Some constructor. 
+the <literal>Some</literal> constructor. 
 Therefore, <literal>"A"</literal> has type <literal>String</literal>, 
 and <literal>(Some "A")</literal> has type <literal>String option</literal>. 
 This puts a burden on the programmer, and

@@ -66,7 +66,7 @@ public final class SpecialArray extends gnu.bytecode.ArrayType
       {
 	Class c = elements.getReflectClass();
 	if (c == null)
-	  bossa.util.Internal.warning("Null refclass for " + elements);
+	  bossa.util.Internal.warning("Null refclass for " + elements.getName());
 	else
 	  {
 	    c = java.lang.reflect.Array.newInstance(c, 0).getClass();

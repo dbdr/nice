@@ -282,14 +282,11 @@ public class Pattern
     boolean exact = rep.charAt(pos[0]) == '#';
 
     int start = ++pos[0];
-      
-    try{
-      while(rep.charAt(pos[0]) != '@' && rep.charAt(pos[0]) != '#')
-	pos[0]++;
-    }
-    catch(StringIndexOutOfBoundsException ex) {
-      // reached the ned of the string
-    }
+    int len = rep.length();
+
+    while(pos[0] < len && 
+	  rep.charAt(pos[0]) != '@' && rep.charAt(pos[0]) != '#')
+      pos[0]++;
 
     String name = rep.substring(start, pos[0]);
 

@@ -84,14 +84,18 @@ public class NiceClass extends ClassDefinition.ClassImplementation
   private static NewField[] noFields = new NewField[0];
   private static OverridenField[] noOverrides = new OverridenField[0];
   
-  NiceClass getParent()
+  static NiceClass get(TypeConstructor tc)
   {
-    TypeConstructor tc = definition.getSuperClass();
-    ClassDefinition sup = ClassDefinition.get(tc);
-    if (sup != null && sup.implementation instanceof NiceClass)
-      return ((NiceClass) sup.implementation);
+    ClassDefinition res = ClassDefinition.get(tc);
+    if (res != null && res.implementation instanceof NiceClass)
+      return ((NiceClass) res.implementation);
     else
       return null;
+  }
+
+  NiceClass getParent()
+  {
+    return get(definition.getSuperClass());
   }
 
   /****************************************************************

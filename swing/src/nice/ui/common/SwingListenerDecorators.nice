@@ -17,26 +17,26 @@ package nice.ui.common;
  * DECLARATION of methods to add nice.ui.swing.NiceListener to nice.ui.swing.NiceListenerHandler
  */
 
-public <AncestorListenerHandler H> void addNiceAncestorListener(H,NAncestorListener);
-public <CaretListenerHandler H> void addNiceCaretListener(H,NCaretListener);
-public <CellEditorListenerHandler H> void addNiceCellEditorListener(H,NCellEditorListener);
-public <ChangeListenerHandler H> void addNiceChangeListener(H,NChangeListener);
-public <DocumentListenerHandler H> void addNiceDocumentListener(H,NDocumentListener);
-public <HyperlinkListenerHandler H> void addNiceHyperlinkListener(H,NHyperlinkListener);
-public <InternalFrameListenerHandler H> void addNiceInternalFrameListener(H,NInternalFrameListener);
-public <ListDataListenerHandler H> void addNiceListDataListener(H,NListDataListener);
-public <ListSelectionListenerHandler H> void addNiceListSelectionListener(H,NListSelectionListener);
-public <MenuDragMouseListenerHandler H> void addNiceMenuDragMouseListener(H,NMenuDragMouseListener);
-public <MenuKeyListenerHandler H> void addNiceMenuKeyListener(H,NMenuKeyListener);
-public <MenuListenerHandler H> void addNiceMenuListener(H,NMenuListener);
-public <PopupMenuListenerHandler H> void addNicePopupMenuListener(H,NPopupMenuListener);
-public <TableColumnModelListenerHandler H> void addNiceTableColumnModelListener(H,NTableColumnModelListener);
-public <TableModelListenerHandler H> void addNiceTableModelListener(H,NTableModelListener);
-public <TreeExpansionListenerHandler H> void addNiceTreeExpansionListener(H,NTreeExpansionListener);
-public <TreeWillExpandListenerHandler H> void addNiceTreeWillExpandListener(H,NTreeWillExpandListener);
-public <TreeModelListenerHandler H> void addNiceTreeModelListener(H,NTreeModelListener);
-public <TreeSelectionListenerHandler H> void addNiceTreeSelectionListener(H,NTreeSelectionListener);
-public <UndoableEditListenerHandler H> void addNiceUndoableEditListener(H,NUndoableEditListener);
+public <AncestorListenerHandler H> void addNiceAncestorListener(H,NiceAncestorListener);
+public <CaretListenerHandler H> void addNiceCaretListener(H,NiceCaretListener);
+public <CellEditorListenerHandler H> void addNiceCellEditorListener(H,NiceCellEditorListener);
+public <ChangeListenerHandler H> void addNiceChangeListener(H,NiceChangeListener);
+public <DocumentListenerHandler H> void addNiceDocumentListener(H,NiceDocumentListener);
+public <HyperlinkListenerHandler H> void addNiceHyperlinkListener(H,NiceHyperlinkListener);
+public <InternalFrameListenerHandler H> void addNiceInternalFrameListener(H,NiceInternalFrameListener);
+public <ListDataListenerHandler H> void addNiceListDataListener(H,NiceListDataListener);
+public <ListSelectionListenerHandler H> void addNiceListSelectionListener(H,NiceListSelectionListener);
+public <MenuDragMouseListenerHandler H> void addNiceMenuDragMouseListener(H,NiceMenuDragMouseListener);
+public <MenuKeyListenerHandler H> void addNiceMenuKeyListener(H,NiceMenuKeyListener);
+public <MenuListenerHandler H> void addNiceMenuListener(H,NiceMenuListener);
+public <PopupMenuListenerHandler H> void addNicePopupMenuListener(H,NicePopupMenuListener);
+public <TableColumnModelListenerHandler H> void addNiceTableColumnModelListener(H,NiceTableColumnModelListener);
+public <TableModelListenerHandler H> void addNiceTableModelListener(H,NiceTableModelListener);
+public <TreeExpansionListenerHandler H> void addNiceTreeExpansionListener(H,NiceTreeExpansionListener);
+public <TreeWillExpandListenerHandler H> void addNiceTreeWillExpandListener(H,NiceTreeWillExpandListener);
+public <TreeModelListenerHandler H> void addNiceTreeModelListener(H,NiceTreeModelListener);
+public <TreeSelectionListenerHandler H> void addNiceTreeSelectionListener(H,NiceTreeSelectionListener);
+public <UndoableEditListenerHandler H> void addNiceUndoableEditListener(H,NiceUndoableEditListener);
 
 
 
@@ -155,7 +155,7 @@ public <MenuListenerHandler H> void addMenuListener
    )
 {
   this.addNiceMenuListener
-    (new NMenuListener
+    (new NiceMenuListener
       (menuCanceled: menuCanceled,
        menuDeselected: menuDeselected,
        menuSelected: menuSelected
@@ -172,7 +172,7 @@ public <MenuDragMouseListenerHandler H> void addMenuDragMouseListener
    )
 {
   this.addNiceMenuDragMouseListener
-    (new NMenuDragMouseListener
+    (new NiceMenuDragMouseListener
       (menuDragMouseDragged: menuDragMouseDragged,
        menuDragMouseEntered: menuDragMouseEntered,
        menuDragMouseExited: menuDragMouseExited,
@@ -189,7 +189,7 @@ public <MenuKeyListenerHandler H> void addMenuKeyListener
    )
 {
   this.addNiceMenuKeyListener
-    (new NMenuKeyListener
+    (new NiceMenuKeyListener
       (menuKeyPressed: menuKeyPressed,
        menuKeyReleased: menuKeyReleased,
        menuKeyTyped: menuKeyTyped
@@ -203,7 +203,7 @@ public <ChangeListenerHandler H> void addChangeListener
    )
 {
    this.addNiceChangeListener
-     (new NChangeListener
+     (new NiceChangeListener
        (stateChanged: stateChanged
        ));       
 }
@@ -215,7 +215,7 @@ public <UndoableEditListenerHandler H> void addUndoableEditListener
    )
 {
   this.addNiceUndoableEditListener
-    (new NUndoableEditListener
+    (new NiceUndoableEditListener
       (undoableEditHappened: undoableEditHappened
        ));                                                 
 }
@@ -231,7 +231,7 @@ public <TableColumnModelListenerHandler H> void addTableColumnModelListener
    )
 {
   this.addNiceTableColumnModelListener
-    (new NTableColumnModelListener
+    (new NiceTableColumnModelListener
       (columnAdded: columnAdded,
        columnMoved: columnMoved,
        columnRemoved: columnRemoved,
@@ -247,7 +247,7 @@ public <TableModelListenerHandler H> void addTableModelListener
    )
 {
   this.addNiceTableModelListener
-    (new NTableModelListener
+    (new NiceTableModelListener
       (tableChanged: tableChanged
        ));                                                 
 }
@@ -260,7 +260,7 @@ public <CellEditorListenerHandler H> void addNiceiceCellEditorListener
    )
 {
   this.addNiceCellEditorListener
-    (new NCellEditorListener
+    (new NiceCellEditorListener
       (editingCanceled: editingCanceled,
        editingStopped: editingStopped
        ));
@@ -273,7 +273,7 @@ public <ListSelectionListenerHandler H> void addListSelectionListener
    )
 {
   this.addNiceListSelectionListener
-    (new NListSelectionListener
+    (new NiceListSelectionListener
       (listSelectionValueChanged: listSelectionValueChanged
        ));                                                 
 }
@@ -287,7 +287,7 @@ public <ListDataListenerHandler H> void addListDataListener
    )
 {
   this.addNiceListDataListener
-    (new NListDataListener
+    (new NiceListDataListener
       (contentsChanged: contentsChanged,
        intervalAdded: intervalAdded,
        intervalRemoved: intervalRemoved
@@ -304,7 +304,7 @@ public <TreeModelListenerHandler H> void addTreeModelListener
    )
 {
   this.addNiceTreeModelListener
-    (new NTreeModelListener
+    (new NiceTreeModelListener
       (treeNodesChanged: treeNodesChanged,
        treeNodesInserted: treeNodesInserted,
        treeNodesRemoved: treeNodesRemoved,
@@ -319,7 +319,7 @@ public <TreeSelectionListenerHandler H> void addTreeSelectionListener
    )
 {
   this.addNiceTreeSelectionListener
-    (new NTreeSelectionListener
+    (new NiceTreeSelectionListener
       (treeSelectionValueChanged: treeSelectionValueChanged
        ));                                             
 }
@@ -333,7 +333,7 @@ public <DocumentListenerHandler H> void addDocumentListener
    )
 {
   this.addNiceDocumentListener
-    (new NDocumentListener
+    (new NiceDocumentListener
       (changedUpdate: changedUpdate,
        insertUpdate: insertUpdate,
        removeUpdate: removeUpdate
@@ -348,7 +348,7 @@ public <TreeExpansionListenerHandler H> void addTreeExpansionListener
    )
 {   
   this.addNiceTreeExpansionListener
-    (new NTreeExpansionListener(treeCollapsed: treeCollapsed,
+    (new NiceTreeExpansionListener(treeCollapsed: treeCollapsed,
      treeExpanded: treeExpanded
      ));       
 }
@@ -363,7 +363,7 @@ public <TreeModelListenerHandler H> void addTreeModelListener
    )
 {
 	this.addNiceTreeModelListener
-	  (new NTreeModelListener
+	  (new NiceTreeModelListener
   	  (treeNodesChanged: treeNodesChanged,
   	   treeNodesInserted: treeNodesInserted,
   	   treeNodesRemoved: treeNodesRemoved,
@@ -378,7 +378,7 @@ public <TreeWillExpandListenerHandler H> void addTreeWillExpandListener
    )
 {  
   this.addNiceTreeWillExpandListener
-    (new NTreeWillExpandListener
+    (new NiceTreeWillExpandListener
       (treeWillCollapse: treeWillCollapse,
        treeWillExpand: treeWillExpand
        ));  
@@ -397,7 +397,7 @@ public <InternalFrameListenerHandler H> void addInternalFrameListener
    )
 {
   this.addNiceInternalFrameListener
-    (new NInternalFrameListener
+    (new NiceInternalFrameListener
       (internalFrameActivated: internalFrameActivated,
        internalFrameClosed: internalFrameClosed,
        internalFrameClosing: internalFrameClosing,
@@ -417,7 +417,7 @@ public <PopupMenuListenerHandler H> void addPopupMenuListener
    )
 {
   this.addNicePopupMenuListener
-    (new NPopupMenuListener
+    (new NicePopupMenuListener
       (popupMenuCanceled: popupMenuCanceled,
        popupMenuWillBecomeInvisible: popupMenuWillBecomeInvisible,
        popupMenuWillBecomeVisible: popupMenuWillBecomeVisible
@@ -431,7 +431,7 @@ public <HyperlinkListenerHandler H> void addHyperlinkListener
    )
 {
   this.addNiceHyperlinkListener
-    (new NHyperlinkListener
+    (new NiceHyperlinkListener
       (hyperlinkUpdate: hyperlinkUpdate
        ));
 }
@@ -443,7 +443,7 @@ public <CaretListenerHandler H> void addCaretListener
    )
 {
   this.addNiceCaretListener
-    (new NCaretListener
+    (new NiceCaretListener
       (caretUpdate: caretUpdate
        ));
 }
@@ -457,7 +457,7 @@ public <AncestorListenerHandler H> void addAncestorListener
 )
 {
   this.addNiceAncestorListener
-    (new NAncestorListener
+    (new NiceAncestorListener
       (ancestorAdded: ancestorAdded,
        ancestorMoved: ancestorMoved,
        ancestorRemoved: ancestorRemoved

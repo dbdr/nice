@@ -28,13 +28,14 @@ package nice.ui.common;
  * generated constructor
  */
 
-class NPropertyChangeListener implements PropertyChangeListener,MappablePropertyChangeListener
+class NicePropertyChangeListener implements PropertyChangeListener,MappablePropertyChangeListener
 {
   private PropertyChangeEvent ?-> void propertyChange;
 
   public PropertyChangeEvent ?-> void getPropertyChange() = this.propertyChange;  
   public void setPropertyChange(PropertyChangeEvent ?-> void value) { this.propertyChange = value; }
 
+  isLoaded() = this.propertyChange != null;
 
   propertyChange(e)
   {
@@ -44,14 +45,15 @@ class NPropertyChangeListener implements PropertyChangeListener,MappableProperty
 }
 
 
-class NVetoableChangeListener implements VetoableChangeListener,MappableVetoableChangeListener
+class NiceVetoableChangeListener implements VetoableChangeListener,MappableVetoableChangeListener
 {
   private PropertyChangeEvent ?-> void vetoableChange;
 
   public PropertyChangeEvent ?-> void getVetoableChange() = this.vetoableChange;  
   public void setVetoableChange(PropertyChangeEvent ?-> void value) { this.vetoableChange = value; }
   
-  
+  isLoaded() = this.vetoableChange != null;
+    
   vetoableChange(e)
   {
     PropertyChangeEvent ?-> void vetoableChange = this.vetoableChange;
@@ -60,7 +62,7 @@ class NVetoableChangeListener implements VetoableChangeListener,MappableVetoable
 }
 
 
-class NBeanContextMembershipListener implements BeanContextMembershipListener, NiceListener
+class NiceBeanContextMembershipListener implements BeanContextMembershipListener, NiceListener
 {
   private BeanContextMembershipEvent ?-> void childrenAdded = null;
   private BeanContextMembershipEvent ?-> void childrenRemoved = null;
@@ -71,7 +73,10 @@ class NBeanContextMembershipListener implements BeanContextMembershipListener, N
   public void setChildrenAdded(BeanContextMembershipEvent ?-> void value) { this.childrenAdded = value; }
   public void setChildrenRemoved(BeanContextMembershipEvent ?-> void value) { this.childrenRemoved = value; }
   
-  
+  isLoaded() = 
+    this.childrenAdded != null ||
+    this.childrenRemoved != null;
+ 
   childrenAdded(e)
   {
     BeanContextMembershipEvent ?-> void childrenAdded = this.childrenAdded;
@@ -86,13 +91,14 @@ class NBeanContextMembershipListener implements BeanContextMembershipListener, N
 }
 
 
-class NBeanContextServicesListener implements BeanContextServicesListener, NiceListener
+class NiceBeanContextServicesListener implements BeanContextServicesListener, NiceListener
 {
   private BeanContextServiceAvailableEvent ?-> void serviceAvailable;
 
   public BeanContextServiceAvailableEvent ?-> void getServiceAvailable() = this.serviceAvailable; 
   public void setServiceAvailable(BeanContextServiceAvailableEvent ?-> void value) { this.serviceAvailable = value; }
   
+  isLoaded() = this.serviceAvailable != null;  
   
   serviceAvailable(e)
   {
@@ -102,13 +108,14 @@ class NBeanContextServicesListener implements BeanContextServicesListener, NiceL
 }
 
 
-class NBeanContextServiceRevokedListener implements BeanContextServiceRevokedListener, NiceListener
+class NiceBeanContextServiceRevokedListener implements BeanContextServiceRevokedListener, NiceListener
 {
   private BeanContextServiceRevokedEvent ?-> void serviceRevoked;
   
   public BeanContextServiceRevokedEvent ?-> void getServiceRevoked() = this.serviceRevoked;  
   public void setServiceRevoked(BeanContextServiceRevokedEvent ?-> void value) { this.serviceRevoked = value; }
-
+  
+  isLoaded() = this.serviceRevoked != null; 
 
   serviceRevoked(e)
   {
@@ -118,13 +125,15 @@ class NBeanContextServiceRevokedListener implements BeanContextServiceRevokedLis
 }
 
 
-//JDK1.4   class NExceptionListener implements ExceptionListener, NiceListener
+//JDK1.4   class NiceExceptionListener implements ExceptionListener, NiceListener
 //JDK1.4   {
 //JDK1.4     private Exception ?-> void exceptionThrown;
 //JDK1.4      
 //JDK1.4     public Exception ?-> void getExceptionThrown() = this.exceptionThrown;
 //JDK1.4     public void setExceptionThrown(Exception ?-> void value) { this.exceptionThrown = value; }
-//JDK1.4     
+//JDK1.4   
+//JDK1.4     isLoaded() = this.exceptionThrown != null;
+//JDK1.4    
 //JDK1.4     exceptionThrown(e)
 //JDK1.4     {
 //JDK1.4       Exception ?-> void exceptionThrown = this.exceptionThrown;

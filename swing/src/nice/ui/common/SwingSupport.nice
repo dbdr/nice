@@ -17,11 +17,11 @@ package nice.ui.common;
  * used for classes that don't allow the getXxxListener operation
  * this is done to provide that support nevertheless
  */
-var Map<Object,?java.util.List<NChangeListener>> changeListeners = new HashMap();
-var Map<Object,?java.util.List<NCellEditorListener>> cellEditorListeners = new HashMap();
-var Map<Object,?java.util.List<NTableModelListener>> tableModelListeners = new HashMap();
-var Map<Object,?java.util.List<NTableColumnModelListener>> tableColumnModelListeners = new HashMap();
-var Map<Object,?java.util.List<NUndoableEditListener>> undoableEditListeners = new HashMap();
+var Map<Object,?java.util.List<NiceChangeListener>> changeListeners = new HashMap();
+var Map<Object,?java.util.List<NiceCellEditorListener>> cellEditorListeners = new HashMap();
+var Map<Object,?java.util.List<NiceTableModelListener>> tableModelListeners = new HashMap();
+var Map<Object,?java.util.List<NiceTableColumnModelListener>> tableColumnModelListeners = new HashMap();
+var Map<Object,?java.util.List<NiceUndoableEditListener>> undoableEditListeners = new HashMap();
 
 
 

@@ -11,6 +11,71 @@
 
 package nice.ui.common;
 
+
+
+
+/**
+ * DECLARATION of methods to remove nice.ui.beans.NiceListeners from nice.ui.beans.NiceListenerHandlers
+ */
+
+public <PropertyChangeListenerHandler H> void removeNicePropertyChangeListener(H,NicePropertyChangeListener);
+public <VetoableChangeListenerHandler H> void removeNiceVetoableChangeListener(H,NiceVetoableChangeListener);
+public <MappablePropertyChangeListenerHandler H, PropertyChangeKey K> void removeNicePropertyChangeListener(H,K,NicePropertyChangeListener);
+public <MappableVetoableChangeListenerHandler H, PropertyChangeKey K> void removeNiceVetoableChangeListener(H,K,NiceVetoableChangeListener);
+//JDK1.4  public <ExceptionListenerHandler H> void removeExceptionListener(H,NiceExceptionListener);
+
+
+
+/**
+ * DEFINITION of methods to remove NiceListener from NiceListenerHandlers
+ */
+
+removeNicePropertyChangeListener(this@PropertyEditorSupport,listener)
+{
+	this.removePropertyChangeListener(listener);
+	//this.removeInAccessibleListener(listener,propertyChangeListeners);
+}
+
+removeNicePropertyChangeListener(this@PropertyChangeSupport,listener)
+{
+	this.removePropertyChangeListener(listener);
+	//this.removeInAccessibleListener(listener,propertyChangeListeners);
+}
+
+removeNiceVetoableChangeListener(this@VetoableChangeSupport,listener)
+{
+	this.removeVetoableChangeListener(listener);
+	//this.removeInAccessibleListener(listener,vetoableChangeListeners);
+}
+
+removeNicePropertyChangeListener(this@PropertyChangeSupport,key@String,listener)
+{
+	this.removePropertyChangeListener(key,listener);
+	//this.removeMappableListener(key,listener,mappablePropertyChangeListeners);
+}
+
+removeNicePropertyChangeListener(this@BeanContextChildSupport,key@String,listener)
+{
+	this.removePropertyChangeListener(key,listener);
+	//this.removeMappableListener(key,listener,mappablePropertyChangeListeners);
+}
+
+removeNiceVetoableChangeListener(this@VetoableChangeSupport,key@String,listener)
+{
+	this.removeVetoableChangeListener(key,listener);
+	//this.removeMappableListener(key,listener,mappableVetoableChangeListeners);
+}
+
+removeNiceVetoableChangeListener(this@BeanContextChildSupport,key@String,listener)
+{
+	this.removeVetoableChangeListener(key,listener);
+	//this.removeMappableListener(key,listener,mappableVetoableChangeListeners);
+}
+
+//JDK1.4  removeNiceExceptionListener(this@XMLDecoder,listener) = this.setExceptionListener(listener);
+//JDK1.4  removeNiceExceptionListener(this@Encoder,listener) = this.setExceptionListener(listener);
+
+
   
 /**
  * DEFINITION of functions to remove all nice.ui.awt.NiceListener 
@@ -22,10 +87,10 @@ public <PropertyChangeListenerHandler H> void removePropertyChangeListener
    PropertyChangeEvent -> void propertyChange
    )
 {
-  NPropertyChangeListener[?] listeners = this.getNicePropertyChangeListeners(); 
+  NicePropertyChangeListener[?] listeners = this.getNicePropertyChangeListeners(); 
   if(listeners == null) return;
   listeners.foreach
-    (NPropertyChangeListener l =>
+    (NicePropertyChangeListener l =>
      {
        if(l.getPropertyChange() == propertyChange) l.setPropertyChange(null);
      }
@@ -37,10 +102,10 @@ public <VetoableChangeListenerHandler H> void removeVetoableChangeListener
    PropertyChangeEvent -> void vetoableChange
    )
 {
-  NVetoableChangeListener[?] listeners = this.getNiceVetoableChangeListeners();
+  NiceVetoableChangeListener[?] listeners = this.getNiceVetoableChangeListeners();
   if(listeners == null) return;
   listeners.foreach
-    (NVetoableChangeListener l =>
+    (NiceVetoableChangeListener l =>
      {
        if(l.getVetoableChange() == vetoableChange) l.setVetoableChange(null);
      }
@@ -54,10 +119,10 @@ public <VetoableChangeListenerHandler H> void removeVetoableChangeListener
 //JDK1.4      BeanContextMembershipEvent ?-> void childrenRemoved = null
 //JDK1.4      )
 //JDK1.4   {
-//JDK1.4     NBeanContextMembershipListener[?] listeners = this.geNiceBeanContextMembershipListeners():
+//JDK1.4     NiceBeanContextMembershipListener[?] listeners = this.geNiceBeanContextMembershipListeners():
 //JDK1.4     if(listeners == null) return;
 //JDK1.4     listeners.foreach
-//JDK1.4       (NBeanContextMembershipListener l =>
+//JDK1.4       (NiceBeanContextMembershipListener l =>
 //JDK1.4        {
 //JDK1.4          if(childrenAdded != null && l.getChildrenAdded() == childrenAdded) l.setChildrenAdded(null);
 //JDK1.4          if(childrenRemoved != null && l.getChildrenRemoved() == childrenRemoved) l.setChildrenRemoved(null);
@@ -71,10 +136,10 @@ public <VetoableChangeListenerHandler H> void removeVetoableChangeListener
 //JDK1.4      BeanContextServiceAvailableEvent -> void serviceAvailable
 //JDK1.4      )
 //JDK1.4   {
-//JDK1.4     NBeanContextServicesListener[?] listeners = this.getNiceBeanContextServicesListeners();
+//JDK1.4     NiceBeanContextServicesListener[?] listeners = this.getNiceBeanContextServicesListeners();
 //JDK1.4     if(listeners == null) return;
 //JDK1.4     listeners.foreach
-//JDK1.4       (NBeanContextServicesListener l =>
+//JDK1.4       (NiceBeanContextServicesListener l =>
 //JDK1.4        {
 //JDK1.4          if(l.getServiceAvailable() == serviceAvailable) l.setServiceAvailable(null);
 //JDK1.4        }
@@ -87,10 +152,10 @@ public <VetoableChangeListenerHandler H> void removeVetoableChangeListener
 //JDK1.4      BeanContextServiceRevokedEvent -> void serviceRevoked
 //JDK1.4      )
 //JDK1.4   {
-//JDK1.4     NBeanContextServiceRevokedListener[?] listeners = this.getNiceBeanContextServiceRevokedListeners();
+//JDK1.4     NiceBeanContextServiceRevokedListener[?] listeners = this.getNiceBeanContextServiceRevokedListeners();
 //JDK1.4     if(listeners == null) return;
 //JDK1.4     listeners.foreach
-//JDK1.4       (NBeanContextServiceRevokedListener l =>
+//JDK1.4       (NiceBeanContextServiceRevokedListener l =>
 //JDK1.4        {
 //JDK1.4          if(l.getServiceRevoked() == serviceRevoked) l.setServiceRevoked(null);
 //JDK1.4        }
@@ -103,10 +168,10 @@ public <VetoableChangeListenerHandler H> void removeVetoableChangeListener
 //JDK1.4      Exception -> void exceptionThrown
 //JDK1.4      )
 //JDK1.4   {
-//JDK1.4     NExceptionListener[?] listeners = this.getNiceExceptionListeners();
+//JDK1.4     NiceExceptionListener[?] listeners = this.getNiceExceptionListeners();
 //JDK1.4     if(listeners == null) return;
 //JDK1.4     listeners.foreach
-//JDK1.4       (NExceptionListener l =>
+//JDK1.4       (NiceExceptionListener l =>
 //JDK1.4        {
 //JDK1.4          if(l.getExceptionThrown() == exceptionThrown) l.setExceptionThrown(null);
 //JDK1.4        }

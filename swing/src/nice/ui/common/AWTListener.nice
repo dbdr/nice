@@ -28,14 +28,15 @@ package nice.ui.common;
  */
 
 
-class NActionListener implements ActionListener , NiceListener
+class NiceActionListener implements ActionListener , NiceListener
 {
   private ActionEvent ?-> void actionPerformed;
-
-  public ActionEvent ?-> void getActionPerformed() = this.actionPerformed;  
+  
+  public ActionEvent ?-> void getActionPerformed() = this.actionPerformed; 
   public void setActionPerformed(ActionEvent ?-> void value) { this.actionPerformed = value; }
-
-
+  
+  isLoaded() = this.actionPerformed != null;
+  
   actionPerformed(e)
   {
     ActionEvent ?-> void actionPerformed = this.actionPerformed;
@@ -44,13 +45,14 @@ class NActionListener implements ActionListener , NiceListener
 }
 
 
-class NAdjustmentListener implements AdjustmentListener , NiceListener
+class NiceAdjustmentListener implements AdjustmentListener , NiceListener
 {
   private AdjustmentEvent ?-> void adjustmentValueChanged;
 
   public AdjustmentEvent ?-> void getAdjustmentValueChanged() = this.adjustmentValueChanged;  
   public void setAdjustmentValueChanged(AdjustmentEvent ?-> void value) { this.adjustmentValueChanged = value; }
 
+  isLoaded() = this.adjustmentValueChanged != null;
 
   adjustmentValueChanged(e)
   {
@@ -60,14 +62,15 @@ class NAdjustmentListener implements AdjustmentListener , NiceListener
 }
 
 
-class NAWTEventListener implements AWTEventListener , MappableAWTEventListener
+class NiceAWTEventListener implements AWTEventListener , MappableAWTEventListener
 {
   private AWTEvent ?-> void eventDispatched;
 
   public AWTEvent ?-> void getEventDispatched() = this.eventDispatched;  
   public void setEventDispatched(AWTEvent ?-> void value) { this.eventDispatched = value; }
 
-
+  isLoaded() = this.eventDispatched != null;
+  
   eventDispatched(e)
   {
     AWTEvent ?-> void eventDispatched = this.eventDispatched;
@@ -76,7 +79,7 @@ class NAWTEventListener implements AWTEventListener , MappableAWTEventListener
 }  
 
 
-class NComponentListener implements ComponentListener , NiceListener
+class NiceComponentListener implements ComponentListener , NiceListener
 {
   private ComponentEvent ?-> void componentHidden = null;
   private ComponentEvent ?-> void componentMoved  = null;
@@ -92,7 +95,12 @@ class NComponentListener implements ComponentListener , NiceListener
   public void setComponentMoved(ComponentEvent ?-> void value) { this.componentMoved = value; }
   public void setComponentResized(ComponentEvent ?-> void value) { this.componentResized = value; }
   public void setComponentShown(ComponentEvent ?-> void value) { this.componentShown = value; }
-
+  
+  isLoaded() =
+    this.componentHidden != null ||
+    this.componentMoved != null ||
+    this.componentResized != null ||
+    this.componentShown != null;
 
   componentHidden(e)
   {
@@ -120,7 +128,7 @@ class NComponentListener implements ComponentListener , NiceListener
 }
 
 
-class NContainerListener implements ContainerListener , NiceListener
+class NiceContainerListener implements ContainerListener , NiceListener
 {
   private ContainerEvent ?-> void componentAdded = null;
   private ContainerEvent ?-> void componentRemoved = null;
@@ -131,7 +139,10 @@ class NContainerListener implements ContainerListener , NiceListener
   public void setComponentAdded(ContainerEvent ?-> void value) { this.componentAdded = value; }
   public void setComponentRemoved(ContainerEvent ?-> void value) { this.componentRemoved = value; }
 
-
+  isLoaded() =
+    this.componentAdded != null ||
+    this.componentRemoved != null;
+  
   componentAdded(e)
   {
     ContainerEvent ?-> void componentAdded = this.componentAdded;
@@ -146,7 +157,7 @@ class NContainerListener implements ContainerListener , NiceListener
 }
 
 
-class NFocusListener implements FocusListener , NiceListener
+class NiceFocusListener implements FocusListener , NiceListener
 {
   private FocusEvent ?-> void focusGained = null;
   private FocusEvent ?-> void focusLost = null;
@@ -157,7 +168,10 @@ class NFocusListener implements FocusListener , NiceListener
   public void setFocusGained(FocusEvent ?-> void value) { this.focusGained = value; }
   public void setFocusLost(FocusEvent ?-> void value) { this.focusLost = value; }
 
-
+  isLoaded() =
+    this.focusGained != null ||
+    this.focusLost != null;
+  
   focusGained(e)
   {
     FocusEvent ?-> void focusGained = this.focusGained;
@@ -172,7 +186,7 @@ class NFocusListener implements FocusListener , NiceListener
 }
 
 
-class NHierarchyBoundsListener implements HierarchyBoundsListener , NiceListener
+class NiceHierarchyBoundsListener implements HierarchyBoundsListener , NiceListener
 {
   private HierarchyEvent ?-> void hierarchyAncestorMoved = null;
   private HierarchyEvent ?-> void hierarchyAncestorResized = null;
@@ -183,6 +197,9 @@ class NHierarchyBoundsListener implements HierarchyBoundsListener , NiceListener
   public void setHierarchyAncestorMoved(HierarchyEvent ?-> void value) { this.hierarchyAncestorMoved = value; }
   public void setHierarchyAncestorResized(HierarchyEvent ?-> void value) { this.hierarchyAncestorResized = value; }
 
+  isLoaded() =
+    this.hierarchyAncestorMoved != null ||
+    this.hierarchyAncestorResized != null;
 
   ancestorMoved(e)
   {
@@ -198,13 +215,14 @@ class NHierarchyBoundsListener implements HierarchyBoundsListener , NiceListener
 }
 
 
-class NHierarchyListener implements HierarchyListener , NiceListener
+class NiceHierarchyListener implements HierarchyListener , NiceListener
 {
   private HierarchyEvent ?-> void hierarchyChanged;
   
   public HierarchyEvent ?-> void getHierarchyChanged() = this.hierarchyChanged;
   public void setHierarchyChanged(HierarchyEvent ?-> void value) { this.hierarchyChanged = value; }
 
+  isLoaded() = this.hierarchyChanged != null;
 
   hierarchyChanged(e)
   {
@@ -214,7 +232,7 @@ class NHierarchyListener implements HierarchyListener , NiceListener
 }
 
 
-class NInputMethodListener implements InputMethodListener , NiceListener
+class NiceInputMethodListener implements InputMethodListener , NiceListener
 {
   private InputMethodEvent ?-> void caretPositionChanged = null;
   private InputMethodEvent ?-> void inputMethodTextChanged = null;
@@ -225,6 +243,10 @@ class NInputMethodListener implements InputMethodListener , NiceListener
   public void setCaretPositionChanged(InputMethodEvent ?-> void value) { this.caretPositionChanged = value; }
   public void setInputMethodTextChanged(InputMethodEvent ?-> void value) { this.inputMethodTextChanged = value; }
 
+
+  isLoaded() =
+    this.caretPositionChanged != null ||
+    this.inputMethodTextChanged != null;
 
   caretPositionChanged(e)
   {
@@ -240,13 +262,14 @@ class NInputMethodListener implements InputMethodListener , NiceListener
 }
 
 
-class NItemListener implements ItemListener , NiceListener
+class NiceItemListener implements ItemListener , NiceListener
 {
   private ItemEvent ?-> void itemStateChanged;
   
   public ItemEvent ?-> void getItemStateChanged() = this.itemStateChanged;
   public void setItemStateChanged(ItemEvent ?-> void value) { this.itemStateChanged = value; }
 
+  isLoaded() = this.itemStateChanged != null;
 
   itemStateChanged(e)
   {
@@ -256,7 +279,7 @@ class NItemListener implements ItemListener , NiceListener
 }
 
 
-class NKeyListener implements KeyListener , NiceListener
+class NiceKeyListener implements KeyListener , NiceListener
 {
   private KeyEvent ?-> void keyPressed = null;
   private KeyEvent ?-> void keyReleased = null;
@@ -270,6 +293,10 @@ class NKeyListener implements KeyListener , NiceListener
   public void setKeyReleased(KeyEvent ?-> void value) { this.keyReleased = value; }
   public void setKeyTyped(KeyEvent ?-> void value) { this.keyTyped = value; }
 
+  isLoaded() =
+    this.keyPressed != null ||
+    this.keyReleased != null ||
+    this.keyTyped != null;
 
   keyPressed(e)
   {
@@ -291,7 +318,7 @@ class NKeyListener implements KeyListener , NiceListener
 }
 
 
-class NMouseListener implements MouseListener , NiceListener
+class NiceMouseListener implements MouseListener , NiceListener
 {
   private MouseEvent ?-> void mouseClicked = null;
   private MouseEvent ?-> void mouseEntered = null;
@@ -311,6 +338,13 @@ class NMouseListener implements MouseListener , NiceListener
   public void setMousePressed(MouseEvent ?-> void value) { this.mousePressed = value; }
   public void setMouseReleased(MouseEvent ?-> void value) { this.mouseReleased = value; }
 
+  
+  isLoaded() =
+    this.mouseClicked != null ||
+    this.mouseEntered != null ||
+    this.mouseExited != null ||
+    this.mousePressed != null ||
+    this.mouseReleased != null;
 
   mouseClicked(e)
   {
@@ -344,7 +378,7 @@ class NMouseListener implements MouseListener , NiceListener
 }
 
 
-class NMouseMotionListener implements MouseMotionListener , NiceListener
+class NiceMouseMotionListener implements MouseMotionListener , NiceListener
 {
   private MouseEvent ?-> void mouseDragged = null;
   private MouseEvent ?-> void mouseMoved = null;
@@ -355,6 +389,9 @@ class NMouseMotionListener implements MouseMotionListener , NiceListener
   public void setMouseDragged(MouseEvent ?-> void value) { this.mouseDragged = value; }
   public void setMouseMoved(MouseEvent ?-> void value) { this.mouseMoved = value; }
 
+  isLoaded() =
+    this.mouseDragged != null ||
+    this.mouseMoved != null;
 
   mouseDragged(e)
   {
@@ -370,14 +407,15 @@ class NMouseMotionListener implements MouseMotionListener , NiceListener
 }
 
 
-class NTextListener implements TextListener , NiceListener
+class NiceTextListener implements TextListener , NiceListener
 {
   private TextEvent ?-> void textValueChanged;
   
   public TextEvent ?-> void getTextValueChanged() = this.textValueChanged;
   public void setTextValueChanged(TextEvent ?-> void value) { this.textValueChanged = value; }
 
-
+  isLoaded() = this.textValueChanged != null;
+  
   textValueChanged(e)
   {
     TextEvent ?-> void textValueChanged = this.textValueChanged;
@@ -386,7 +424,7 @@ class NTextListener implements TextListener , NiceListener
 }
 
 
-class NWindowListener implements WindowListener , NiceListener
+class NiceWindowListener implements WindowListener , NiceListener
 {
   private WindowEvent ?-> void windowActivated = null;
   private WindowEvent ?-> void windowClosed = null;
@@ -411,7 +449,15 @@ class NWindowListener implements WindowListener , NiceListener
   public void setWindowDeiconified(WindowEvent ?-> void value) { this.windowDeiconified = value; }
   public void setWindowIconified(WindowEvent ?-> void value) { this.windowIconified = value; }
   public void setWindowOpened(WindowEvent ?-> void value) { this.windowOpened = value; }
-
+  
+  isLoaded() =
+    this.windowActivated != null ||
+    this.windowClosed != null ||
+    this.windowClosing != null ||
+    this.windowDeactivated != null ||
+    this.windowDeiconified != null ||
+    this.windowIconified != null ||
+    this.windowOpened != null;
 
   windowActivated(e) 
   {
@@ -457,13 +503,14 @@ class NWindowListener implements WindowListener , NiceListener
 }
 
 
-class NDragGestureListener implements DragGestureListener , NiceListener
+class NiceDragGestureListener implements DragGestureListener , NiceListener
 {
   private DragGestureEvent ?-> void dragGestureRecognized;
   
   public DragGestureEvent ?-> void getDragGestureRecognized() = this.dragGestureRecognized;
   public void setDragGestureRecognized(DragGestureEvent ?-> void value) { this.dragGestureRecognized = value; }
 
+  isLoaded() = this.dragGestureRecognized != null;
 
   dragGestureRecognized(e)
   {
@@ -473,7 +520,7 @@ class NDragGestureListener implements DragGestureListener , NiceListener
 }
 
 
-class NDragSourceListener implements DragSourceListener , NiceListener
+class NiceDragSourceListener implements DragSourceListener , NiceListener
 {
   private DragSourceDropEvent ?-> void dsDragDropEnd = null;
   private DragSourceDragEvent ?-> void dsDragEnter = null;
@@ -492,7 +539,13 @@ class NDragSourceListener implements DragSourceListener , NiceListener
   public void setDsDragOver(DragSourceDragEvent ?-> void value) { this.dsDragOver = value; }
   public void setDsDropActionChanged(DragSourceDragEvent ?-> void value) { this.dsDropActionChanged = value; }
   public void setDsDragExit(DragSourceEvent ?-> void value) { this.dsDragExit = value; }
-
+  
+  isLoaded() =
+    this.dsDragDropEnd != null ||
+    this.dsDragEnter != null ||
+    this.dsDragOver != null ||
+    this.dsDropActionChanged != null ||
+    this.dsDragExit != null;
 
   dragDropEnd(e)
   {
@@ -526,7 +579,7 @@ class NDragSourceListener implements DragSourceListener , NiceListener
 }
 
 
-class NDropTargetListener implements DropTargetListener , NiceListener
+class NiceDropTargetListener implements DropTargetListener , NiceListener
 {
   private DropTargetDropEvent ?-> void dtDrop = null;
   private DropTargetDragEvent ?-> void dtDragEnter = null;
@@ -546,7 +599,13 @@ class NDropTargetListener implements DropTargetListener , NiceListener
   public void setDtDropActionChanged(DropTargetDragEvent ?-> void value) { this.dtDropActionChanged = value; }
   public void setDtDragExit(DropTargetEvent ?-> void value) { this.dtDragExit = value; }
 
-
+  isLoaded() =
+    this.dtDrop != null ||
+    this.dtDragEnter != null ||
+    this.dtDragOver != null ||
+    this.dtDropActionChanged != null ||
+    this.dtDragExit != null;
+    
   drop(e)
   {
     DropTargetDropEvent ?-> void dtDrop = this.dtDrop;
@@ -579,13 +638,14 @@ class NDropTargetListener implements DropTargetListener , NiceListener
 }
 
 
-//JDK1.4  class NDragSourceMotionListener implements DragSourceMotionListener , NiceListener
+//JDK1.4  class NiceDragSourceMotionListener implements DragSourceMotionListener , NiceListener
 //JDK1.4  {
 //JDK1.4    private DragSourceDragEvent ?-> void dragMouseMoved;
 //JDK1.4  
 //JDK1.4    public DragSourceDragEvent ?-> void getDragMouseMoved() = this.dragMouseMoved;
 //JDK1.4    public void setDragMouseMoved(DragSourceDragEvent ?-> void value) { this.dragMouseMoved = value; }
 //JDK1.4    
+//JDK1.4    isLoaded() = this.dragMouseMoved != null;
 //JDK1.4  
 //JDK1.4    dragMouseMoved(e)
 //JDK1.4    {
@@ -595,13 +655,14 @@ class NDropTargetListener implements DropTargetListener , NiceListener
 //JDK1.4  }
 
 
-//JDK1.4  class NMouseWheelListener implements MouseWheelListener , NiceListener
+//JDK1.4  class NiceMouseWheelListener implements MouseWheelListener , NiceListener
 //JDK1.4  {
 //JDK1.4    private MouseWheelEvent ?-> void mouseWheelMoved;
 //JDK1.4
 //JDK1.4    public MouseWheelEvent ?-> void getMouseWheelMoved() = this.mouseWheelMoved;
 //JDK1.4    public void setMouseWheelMoved(MouseWheelEvent ?-> void value) { this.mouseWheelMoved = value; }
-//JDK1.4      
+//JDK1.4    
+//JDK1.4    isLoaded() = this.mouseWheelMoved != null; 
 //JDK1.4    
 //JDK1.4    mouseWheelMoved(e){
 //JDK1.4    { 
@@ -611,7 +672,7 @@ class NDropTargetListener implements DropTargetListener , NiceListener
 //JDK1.4  }
 
 
-//JDK1.4  class NWindowFocusListener implements WindowFocusListener , NiceListener
+//JDK1.4  class NiceWindowFocusListener implements WindowFocusListener , NiceListener
 //JDK1.4  {
 //JDK1.4    private WindowEvent ?-> void windowGainedFocus = null;
 //JDK1.4    private WindowEvent ?-> void windowLostFocus = null;
@@ -622,6 +683,10 @@ class NDropTargetListener implements DropTargetListener , NiceListener
 //JDK1.4    public void setWindowGainedFocus(WindowEvent ?-> void value) { this.windowGainedFocus = value; }
 //JDK1.4    public void setWindowLostFocus(WindowEvent ?-> void value) { this.windowLostFocus = value; }
 //JDK1.4  
+//JDK1.4    isLoaded() = 
+//JDK1.4      this.windowGainedFocus != null ||
+//JDK1.4      this.windowLostFocus != null; 
+//JDK1.4    
 //JDK1.4   
 //JDK1.4    windowGainedFocus(e)
 //JDK1.4    { 
@@ -637,13 +702,14 @@ class NDropTargetListener implements DropTargetListener , NiceListener
 //JDK1.4  }
 
 
-//JDK1.4  class NWindowStateListener implements WindowStateListener , NiceListener
+//JDK1.4  class NiceWindowStateListener implements WindowStateListener , NiceListener
 //JDK1.4  {
 //JDK1.4    private WindowEvent ?-> void windowStateChanged;
 //JDK1.4  
 //JDK1.4    public WindowEvent ?-> void getWindowStateChanged() = this.windowStateChanged;
 //JDK1.4    public void setWindowStateChanged(WindowEvent ?-> void value) { this.windowStateChanged = value; }
-//JDK1.4   
+//JDK1.4  
+//JDK1.4    isLoaded() = this.windowStateChanged != null;  
 //JDK1.4      
 //JDK1.4    windowStateChanged(e)
 //JDK1.4    {

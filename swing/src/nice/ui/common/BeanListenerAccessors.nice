@@ -16,11 +16,11 @@ package nice.ui.common;
  * DECLARATION of methods to get nice.ui.beans.NiceListeners from nice.ui.beans.NiceListenerHandlers
  */
 
-public <PropertyChangeListenerHandler H> NPropertyChangeListener[?] getNicePropertyChangeListeners(H);
-public <VetoableChangeListenerHandler H> NVetoableChangeListener[?] getNiceVetoableChangeListeners(H);
-public <MappablePropertyChangeListenerHandler H, PropertyChangeKey K> NPropertyChangeListener[?] getNicePropertyChangeListeners(H,K);
-public <MappableVetoableChangeListenerHandler H, PropertyChangeKey K> NVetoableChangeListener[?] getNiceVetoableChangeListeners(H,K);
-//JDK1.4  public <ExceptionListenerHandler H> NExceptionListener[?] getNiceExceptionListeners(H);
+public <PropertyChangeListenerHandler H> NicePropertyChangeListener[?] getNicePropertyChangeListeners(H);
+public <VetoableChangeListenerHandler H> NiceVetoableChangeListener[?] getNiceVetoableChangeListeners(H);
+public <MappablePropertyChangeListenerHandler H, PropertyChangeKey K> NicePropertyChangeListener[?] getNicePropertyChangeListeners(H,K);
+public <MappableVetoableChangeListenerHandler H, PropertyChangeKey K> NiceVetoableChangeListener[?] getNiceVetoableChangeListeners(H,K);
+//JDK1.4  public <ExceptionListenerHandler H> NiceExceptionListener[?] getNiceExceptionListeners(H);
 
 
 /**
@@ -30,36 +30,36 @@ public <MappableVetoableChangeListenerHandler H, PropertyChangeKey K> NVetoableC
 
 getNicePropertyChangeListeners(this)
 {
-	?java.util.List<NPropertyChangeListener> result = propertyChangeListeners.get(this.object());
+	?java.util.List<NicePropertyChangeListener> result = propertyChangeListeners.get(this.object());
 	return (result == null) ? null : result.toArray();
 }
 
 getNiceVetoableChangeListeners(this)
 {
-	?java.util.List<NVetoableChangeListener> result = vetoableChangeListeners.get(this.object());
+	?java.util.List<NiceVetoableChangeListener> result = vetoableChangeListeners.get(this.object());
 	return (result == null) ? null : result.toArray();
 }
 
 getNicePropertyChangeListeners(this,propertyName@String)
 {
-	?java.util.List<NPropertyChangeListener> result = mappablePropertyChangeListeners.get((this.object(),propertyName));
+	?java.util.List<NicePropertyChangeListener> result = mappablePropertyChangeListeners.get((this.object(),propertyName));
 	return (result == null) ? null : result.toArray();
 }
 
 getNiceVetoableChangeListeners(this,propertyName@String)
 {
-	?java.util.List<NVetoableChangeListener> result = mappableVetoableChangeListeners.get((this.object(),propertyName));
+	?java.util.List<NiceVetoableChangeListener> result = mappableVetoableChangeListeners.get((this.object(),propertyName));
 	return (result == null) ? null : result.toArray();
 }
 
 //JDK1.4  getNiceExceptionListeners(this@Encoder)
 //JDK1.4  {
 //JDK1.4    EventListener[?] listeners = this.getExceptionListeners();
-//JDK1.4    return (listeners == null) ? null : fill(new NExceptionListener[listeners.length], int i => listeners[i].toNiceExceptionListener());
+//JDK1.4    return (listeners == null) ? null : fill(new NiceExceptionListener[listeners.length], int i => listeners[i].toNiceExceptionListener());
 //JDK1.4  }
 
 //JDK1.4  getNiceExceptionListeners(this@XMLDecoder)
 //JDK1.4  {
 //JDK1.4    EventListener[?] listeners = this.getExceptionListeners();
-//JDK1.4    return (listeners == null) ? null : fill(new NExceptionListener[listeners.length], int i => listeners[i].toNiceExceptionListener());
+//JDK1.4    return (listeners == null) ? null : fill(new NiceExceptionListener[listeners.length], int i => listeners[i].toNiceExceptionListener());
 //JDK1.4  }

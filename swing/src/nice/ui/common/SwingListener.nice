@@ -30,7 +30,7 @@ package nice.ui.common;
  */
 
 
-class NAncestorListener implements AncestorListener , NiceListener
+class NiceAncestorListener implements AncestorListener , NiceListener
 {
   private AncestorEvent ?-> void ancestorAdded = null;
   private AncestorEvent ?-> void ancestorMoved = null;
@@ -44,7 +44,11 @@ class NAncestorListener implements AncestorListener , NiceListener
   public void setAncestorMoved(AncestorEvent ?-> void value) { this.ancestorMoved = value; }
   public void setAncestorRemoved(AncestorEvent ?-> void value) { this.ancestorRemoved = value; }
   
-
+  isLoaded() =
+    this.ancestorAdded != null ||
+    this.ancestorMoved != null ||
+    this.ancestorRemoved != null;
+  
   ancestorAdded(e)
   {
     AncestorEvent ?-> void ancestorAdded = this.ancestorAdded;
@@ -65,13 +69,14 @@ class NAncestorListener implements AncestorListener , NiceListener
 }
 
 
-class NCaretListener implements CaretListener , NiceListener
+class NiceCaretListener implements CaretListener , NiceListener
 {
   private CaretEvent ?-> void caretUpdate;
   
   public CaretEvent ?-> void getCaretUpdate() = this.caretUpdate;
   public void setCaretUpdate(CaretEvent ?-> void value) { this.caretUpdate = value; }
 
+  isLoaded() = this.caretUpdate != null;
 
   caretUpdate(e)
   {
@@ -81,7 +86,7 @@ class NCaretListener implements CaretListener , NiceListener
 }
 
 
-class NCellEditorListener implements CellEditorListener , NiceListener
+class NiceCellEditorListener implements CellEditorListener , NiceListener
 {
   private ChangeEvent ?-> void editingCanceled = null;
   private ChangeEvent ?-> void editingStopped = null;
@@ -91,7 +96,10 @@ class NCellEditorListener implements CellEditorListener , NiceListener
   
   public void setEditingCanceled(ChangeEvent ?-> void value) { this.editingCanceled = value; }
   public void setEditingStopped(ChangeEvent ?-> void value) { this.editingStopped = value; }
-
+  
+  isLoaded() =
+    this.editingCanceled != null ||
+    this.editingStopped != null;
 
   editingCanceled(e)
   {
@@ -107,13 +115,14 @@ class NCellEditorListener implements CellEditorListener , NiceListener
 }
 
 
-class NChangeListener implements ChangeListener , NiceListener
+class NiceChangeListener implements ChangeListener , NiceListener
 {
   private ChangeEvent ?-> void stateChanged;
   
   public ChangeEvent ?-> void getStateChanged() = this.stateChanged;
   public void setStateChanged(ChangeEvent ?-> void value) { this.stateChanged = value; }
 
+  isLoaded() = this.stateChanged != null;
 
   stateChanged(e)
   {
@@ -123,7 +132,7 @@ class NChangeListener implements ChangeListener , NiceListener
 }
 
 
-class NDocumentListener implements DocumentListener , NiceListener
+class NiceDocumentListener implements DocumentListener , NiceListener
 {
   private DocumentEvent ?-> void changedUpdate = null;
   private DocumentEvent ?-> void insertUpdate = null;
@@ -137,6 +146,10 @@ class NDocumentListener implements DocumentListener , NiceListener
   public void setInsertUpdate(DocumentEvent ?-> void value) { this.insertUpdate = value; }
   public void setRemoveUpdate(DocumentEvent ?-> void value) { this.removeUpdate = value; }
   
+  isLoaded() =
+    this.changedUpdate != null ||
+    this.insertUpdate != null ||
+    this.removeUpdate != null;  
 
   changedUpdate(e)
   {
@@ -158,13 +171,14 @@ class NDocumentListener implements DocumentListener , NiceListener
 }
 
 
-class NHyperlinkListener implements HyperlinkListener , NiceListener
+class NiceHyperlinkListener implements HyperlinkListener , NiceListener
 {
   private HyperlinkEvent ?-> void hyperlinkUpdate;
   
   public HyperlinkEvent ?-> void getHyperlinkUpdate() = this.hyperlinkUpdate;
   public void setHyperlinkUpdate(HyperlinkEvent ?-> void value) { this.hyperlinkUpdate = value; }
-  
+
+  isLoaded() = this.hyperlinkUpdate != null;  
 
   hyperlinkUpdate(e)
   {
@@ -174,7 +188,7 @@ class NHyperlinkListener implements HyperlinkListener , NiceListener
 }
 
 
-class NInternalFrameListener implements InternalFrameListener , NiceListener
+class NiceInternalFrameListener implements InternalFrameListener , NiceListener
 {
   private InternalFrameEvent ?-> void internalFrameActivated = null;
   private InternalFrameEvent ?-> void internalFrameClosed = null;
@@ -200,6 +214,14 @@ class NInternalFrameListener implements InternalFrameListener , NiceListener
   public void setInternalFrameIconified(InternalFrameEvent ?-> void value) { this.internalFrameIconified = value; }
   public void setInternalFrameOpened(InternalFrameEvent ?-> void value) { this.internalFrameOpened = value; }
   
+  isLoaded() =
+    this.internalFrameActivated != null ||
+    this.internalFrameClosed != null ||
+    this.internalFrameClosing != null ||
+    this.internalFrameDeactivated != null ||
+    this.internalFrameDeiconified != null ||
+    this.internalFrameIconified != null ||
+    this.internalFrameOpened != null;  
 
   internalFrameActivated(e)
   {
@@ -245,7 +267,7 @@ class NInternalFrameListener implements InternalFrameListener , NiceListener
 }
 
 
-class NListDataListener implements ListDataListener , NiceListener
+class NiceListDataListener implements ListDataListener , NiceListener
 {
   private ListDataEvent ?-> void contentsChanged = null;
   private ListDataEvent ?-> void intervalAdded = null;
@@ -259,6 +281,10 @@ class NListDataListener implements ListDataListener , NiceListener
   public void setIntervalAdded(ListDataEvent ?-> void value) { this.intervalAdded = value; }
   public void setIntervalRemoved(ListDataEvent ?-> void value) { this.intervalRemoved = value; }
   
+  isLoaded() =
+    this.contentsChanged != null ||
+    this.intervalAdded != null ||
+    this.intervalRemoved != null;   
 
   contentsChanged(e)
   {
@@ -280,13 +306,14 @@ class NListDataListener implements ListDataListener , NiceListener
 }
 
 
-class NListSelectionListener implements ListSelectionListener , NiceListener
+class NiceListSelectionListener implements ListSelectionListener , NiceListener
 {
   private ListSelectionEvent ?-> void listSelectionValueChanged;
   
   public ListSelectionEvent ?-> void getListSelectionValueChanged() = this.listSelectionValueChanged;
   public void setListSelectionValueChanged(ListSelectionEvent ?-> void value) { this.listSelectionValueChanged = value; }
-  
+
+  isLoaded() = this.listSelectionValueChanged != null;  
 
   valueChanged(e)
   {
@@ -296,7 +323,7 @@ class NListSelectionListener implements ListSelectionListener , NiceListener
 }
 
 
-class NMenuDragMouseListener implements MenuDragMouseListener , NiceListener
+class NiceMenuDragMouseListener implements MenuDragMouseListener , NiceListener
 {
   private MenuDragMouseEvent ?-> void menuDragMouseDragged = null;
   private MenuDragMouseEvent ?-> void menuDragMouseEntered = null;
@@ -313,7 +340,12 @@ class NMenuDragMouseListener implements MenuDragMouseListener , NiceListener
   public void setMenuDragMouseExited(MenuDragMouseEvent ?-> void value) { this.menuDragMouseExited = value; }
   public void setMenuDragMouseReleased(MenuDragMouseEvent ?-> void value) { this.menuDragMouseReleased = value; }
   
-
+  isLoaded() =
+    this.menuDragMouseDragged != null ||
+    this.menuDragMouseEntered != null ||
+    this.menuDragMouseExited != null ||
+    this.menuDragMouseReleased != null; 
+    
   menuDragMouseDragged(e)
   {
     MenuDragMouseEvent ?-> void menuDragMouseDragged = this.menuDragMouseDragged;
@@ -340,7 +372,7 @@ class NMenuDragMouseListener implements MenuDragMouseListener , NiceListener
 }
 
 
-class NMenuKeyListener implements MenuKeyListener , NiceListener
+class NiceMenuKeyListener implements MenuKeyListener , NiceListener
 {
   private MenuKeyEvent ?-> void menuKeyPressed = null;
   private MenuKeyEvent ?-> void menuKeyReleased = null;
@@ -354,6 +386,10 @@ class NMenuKeyListener implements MenuKeyListener , NiceListener
   public void setMenuKeyReleased(MenuKeyEvent ?-> void value) { this.menuKeyReleased = value; }
   public void setMenuKeyTyped(MenuKeyEvent ?-> void value) { this.menuKeyTyped = value; }
   
+  isLoaded() =
+    this.menuKeyPressed != null ||
+    this.menuKeyReleased != null ||
+    this.menuKeyTyped != null;   
 
   menuKeyPressed(e)
   {
@@ -375,7 +411,7 @@ class NMenuKeyListener implements MenuKeyListener , NiceListener
 }
 
 
-class NMenuListener implements MenuListener , NiceListener
+class NiceMenuListener implements MenuListener , NiceListener
 {
   private MenuEvent ?-> void menuCanceled = null;
   private MenuEvent ?-> void menuDeselected = null;
@@ -389,6 +425,10 @@ class NMenuListener implements MenuListener , NiceListener
   public void setMenuDeselected(MenuEvent ?-> void value) { this.menuDeselected = value; }
   public void setMenuSelected(MenuEvent ?-> void value) { this.menuSelected = value; }
   
+  isLoaded() =
+    this.menuCanceled != null ||
+    this.menuDeselected != null ||
+    this.menuSelected != null;   
 
   menuCanceled(e)
   {
@@ -410,7 +450,7 @@ class NMenuListener implements MenuListener , NiceListener
 }
 
 
-class NPopupMenuListener implements PopupMenuListener , NiceListener
+class NicePopupMenuListener implements PopupMenuListener , NiceListener
 {
   private PopupMenuEvent ?-> void popupMenuCanceled = null;
   private PopupMenuEvent ?-> void popupMenuWillBecomeInvisible = null;
@@ -424,6 +464,10 @@ class NPopupMenuListener implements PopupMenuListener , NiceListener
   public void setPopupMenuWillBecomeInvisible(PopupMenuEvent ?-> void value) { this.popupMenuWillBecomeInvisible = value; }
   public void setPopupMenuWillBecomeVisible(PopupMenuEvent ?-> void value) { this.popupMenuWillBecomeVisible = value; }
   
+  isLoaded() =
+    this.popupMenuCanceled != null ||
+    this.popupMenuWillBecomeInvisible != null ||
+    this.popupMenuWillBecomeVisible != null;  
 
   popupMenuCanceled(e)
   {
@@ -445,7 +489,7 @@ class NPopupMenuListener implements PopupMenuListener , NiceListener
 }
 
 
-class NTableColumnModelListener implements TableColumnModelListener , NiceListener
+class NiceTableColumnModelListener implements TableColumnModelListener , NiceListener
 {
   private TableColumnModelEvent ?-> void columnAdded = null;
   private TableColumnModelEvent ?-> void columnMoved = null;
@@ -465,6 +509,12 @@ class NTableColumnModelListener implements TableColumnModelListener , NiceListen
   public void setColumnSelectionChanged(ListSelectionEvent ?-> void value) { this.columnSelectionChanged = value; }
   public void setColumnMarginChanged(ChangeEvent ?-> void value) { this.columnMarginChanged = value; }
   
+  isLoaded() =
+    this.columnAdded != null ||
+    this.columnMoved != null ||
+    this.columnRemoved != null ||
+    this.columnSelectionChanged != null ||
+    this.columnMarginChanged != null;   
 
   columnAdded(e)
   {
@@ -498,13 +548,14 @@ class NTableColumnModelListener implements TableColumnModelListener , NiceListen
 }
 
 
-class NTableModelListener implements TableModelListener , NiceListener
+class NiceTableModelListener implements TableModelListener , NiceListener
 {
   private TableModelEvent ?-> void tableChanged;
   
   public TableModelEvent ?-> void getTableChanged() = this.tableChanged;
   public void setTableChanged(TableModelEvent ?-> void value) { this.tableChanged = value; }
   
+  isLoaded() = this.tableChanged != null;
   
   tableChanged(e)
   {
@@ -514,7 +565,7 @@ class NTableModelListener implements TableModelListener , NiceListener
 }
 
 
-class NTreeExpansionListener implements TreeExpansionListener , NiceListener
+class NiceTreeExpansionListener implements TreeExpansionListener , NiceListener
 {
   private TreeExpansionEvent ?-> void treeCollapsed = null;
   private TreeExpansionEvent ?-> void treeExpanded = null;
@@ -525,6 +576,9 @@ class NTreeExpansionListener implements TreeExpansionListener , NiceListener
   public void setTreeCollapsed(TreeExpansionEvent ?-> void value) { this.treeCollapsed = value; }
   public void setTreeExpanded(TreeExpansionEvent ?-> void value) { this.treeExpanded = value; }
   
+  isLoaded() =
+    this.treeCollapsed != null ||
+    this.treeExpanded != null;   
 
   treeCollapsed(e)
   {
@@ -540,7 +594,7 @@ class NTreeExpansionListener implements TreeExpansionListener , NiceListener
 }
 
 
-class NTreeModelListener implements TreeModelListener , NiceListener
+class NiceTreeModelListener implements TreeModelListener , NiceListener
 {
   private TreeModelEvent ?-> void treeNodesChanged = null;
   private TreeModelEvent ?-> void treeNodesInserted = null;
@@ -557,6 +611,11 @@ class NTreeModelListener implements TreeModelListener , NiceListener
   public void setTreeNodesRemoved(TreeModelEvent ?-> void value) { this.treeNodesRemoved = value; }
   public void setTreeStructureChanged(TreeModelEvent ?-> void value) { this.treeStructureChanged = value; }
   
+  isLoaded() =
+    this.treeNodesChanged != null ||
+    this.treeNodesInserted != null ||
+    this.treeNodesRemoved != null ||
+    this.treeStructureChanged != null;   
   
   treeNodesChanged(e)
   {
@@ -584,13 +643,14 @@ class NTreeModelListener implements TreeModelListener , NiceListener
 }
 
 
-class NTreeSelectionListener implements TreeSelectionListener , NiceListener
+class NiceTreeSelectionListener implements TreeSelectionListener , NiceListener
 {
   private TreeSelectionEvent ?-> void treeSelectionValueChanged;
 
   public TreeSelectionEvent ?-> void getTreeSelectionValueChanged() = this.treeSelectionValueChanged;
   public void setTreeSelectionValueChanged(TreeSelectionEvent ?-> void value) { this.treeSelectionValueChanged = value; }
   
+  isLoaded() = this.treeSelectionValueChanged != null;
   
   valueChanged(e)
   {
@@ -600,7 +660,7 @@ class NTreeSelectionListener implements TreeSelectionListener , NiceListener
 }
 
 
-class NTreeWillExpandListener implements TreeWillExpandListener , NiceListener
+class NiceTreeWillExpandListener implements TreeWillExpandListener , NiceListener
 {
   private TreeExpansionEvent ?-> void treeWillCollapse = null;
   private TreeExpansionEvent ?-> void treeWillExpand = null;
@@ -611,6 +671,9 @@ class NTreeWillExpandListener implements TreeWillExpandListener , NiceListener
   public void setTreeWillCollapse(TreeExpansionEvent ?-> void value) { this.treeWillCollapse = value; }
   public void setTreeWillExpand(TreeExpansionEvent ?-> void value) { this.treeWillExpand = value; }
   
+  isLoaded() =
+    this.treeWillCollapse != null ||
+    this.treeWillExpand != null;   
 
   treeWillCollapse(e)
   {
@@ -626,13 +689,14 @@ class NTreeWillExpandListener implements TreeWillExpandListener , NiceListener
 }
 
 
-class NUndoableEditListener implements UndoableEditListener , NiceListener
+class NiceUndoableEditListener implements UndoableEditListener , NiceListener
 {
   private UndoableEditEvent ?-> void undoableEditHappened;
   
   public UndoableEditEvent ?-> void getUndoableEditHappened() = this.undoableEditHappened;
   public void setUndoableEditHappened(UndoableEditEvent ?-> void value) { this.undoableEditHappened = value; }
   
+  isLoaded() = this.undoableEditHappened != null;
 
   undoableEditHappened(e)
   {

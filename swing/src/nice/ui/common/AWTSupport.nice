@@ -30,10 +30,10 @@ abstract interface AWTEventKey extends ListenerKey {}
  * used for classes that don't allow the getXxxListener operation
  * this is done to provide that support nevertheless
  */
-var Map<Object,?java.util.List<NDragSourceListener>> dragSourceListeners = new HashMap();
-var Map<Object,?java.util.List<NDragGestureListener>> dragGestureListeners = new HashMap();
-var Map<Object,?java.util.List<NDropTargetListener>> dropTargetListeners = new HashMap();
-var Map<(Object,long),?java.util.List<NAWTEventListener>> mappableAWTEventListeners = new HashMap();
+var Map<Object,?java.util.List<NiceDragSourceListener>> dragSourceListeners = new HashMap();
+var Map<Object,?java.util.List<NiceDragGestureListener>> dragGestureListeners = new HashMap();
+var Map<Object,?java.util.List<NiceDropTargetListener>> dropTargetListeners = new HashMap();
+var Map<(Object,long),?java.util.List<NiceAWTEventListener>> mappableAWTEventListeners = new HashMap();
 
 
 

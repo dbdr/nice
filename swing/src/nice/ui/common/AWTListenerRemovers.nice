@@ -12,6 +12,107 @@
 package nice.ui.common;
 
 
+/**
+ * DECLARATION of methods to remove nice.ui.awt.NiceListener from nice.ui.awt.NiceListenerHandler
+ */
+public <ActionListenerHandler H> void removeNiceActionListener(H,NiceActionListener);
+public <ItemListenerHandler H> void removeNiceItemListener(H,NiceItemListener);
+public <TextListenerHandler H> void removeNiceTextListener(H,NiceTextListener);
+public <AdjustmentListenerHandler H> void removeNiceAdjustmentListener(H,NiceAdjustmentListener);
+public <ContainerListenerHandler H> void removeNiceContainerListener(H,NiceContainerListener);
+public <WindowListenerHandler H> void removeNiceWindowListener(H,NiceWindowListener);
+public <ComponentListenerHandler H> void removeNiceComponentListener(H,NiceComponentListener);
+public <FocusListenerHandler H> void removeNiceFocusListener(H,NiceFocusListener);
+public <HierarchyBoundsListenerHandler H> void removeNiceHierarchyBoundsListener(H,NiceHierarchyBoundsListener);
+public <HierarchyListenerHandler H> void removeNiceHierarchyListener(H,NiceHierarchyListener);
+public <InputMethodListenerHandler H> void removeNiceInputMethodListener(H,NiceInputMethodListener);
+public <KeyListenerHandler H> void removeNiceKeyListener(H,NiceKeyListener);
+public <MouseListenerHandler H> void removeNiceMouseListener(H,NiceMouseListener);
+public <MouseMotionListenerHandler H> void removeNiceMouseMotionListener(H,NiceMouseMotionListener);
+public <DragSourceListenerHandler H> void removeNiceDragSourceListener(H,NiceDragSourceListener);
+public <DropTargetListenerHandler H> void removeNiceDropTargetListener(H,NiceDropTargetListener);
+public <DragGestureListenerHandler H> void removeNiceDragGestureListener(H,NiceDragGestureListener);
+//JDK1.4  public <AWTEventListenerHandler H, AWTEventKey K> void removeNiceAWTEventListener(H,K,NiceAWTEventListener);
+//JDK1.4  public <WindowFocusListenerHandler H> void removeNiceWindowFocusListener(H,NiceWindowFocusListener);
+//JDK1.4  public <WindowStateListenerHandler H> void removeNiceWindowStateListener(H,NiceWindowStateListener);
+//JDK1.4  public <MouseWheelListenerHandler H> void removeNiceMouseWheelListener(H,NiceMouseWheelListener);
+//JDK1.4  public <DragSourceListenerHandler H> void removeNiceDragSourceMotionListener(H,NiceDragSourceMotionListener);
+
+
+/**
+ * DEFINITION of methods to remove nice.ui.awt.NiceListener from nice.ui.awt.NiceListenerHandler
+ */
+removeNiceActionListener(this@java.awt.Button,listener) = this.removeActionListener(listener);
+removeNiceActionListener(this@java.awt.List,listener) = this.removeActionListener(listener);
+removeNiceActionListener(this@java.awt.MenuItem,listener) = this.removeActionListener(listener);
+removeNiceActionListener(this@java.awt.TextField,listener) = this.removeActionListener(listener);
+removeNiceItemListener(this@java.awt.Checkbox,listener) = this.removeItemListener(listener);
+removeNiceItemListener(this@java.awt.CheckboxMenuItem,listener) = this.removeItemListener(listener);
+removeNiceItemListener(this@java.awt.Choice,listener) = this.removeItemListener(listener);
+removeNiceItemListener(this@java.awt.List,listener) = this.removeItemListener(listener);
+removeNiceTextListener(this@java.awt.TextComponent,listener) = this.removeTextListener(listener);
+removeNiceAdjustmentListener(this@java.awt.Scrollbar,listener) = this.removeAdjustmentListener(listener);
+removeNiceContainerListener(this@java.awt.Container,listener) = this.removeContainerListener(listener);
+removeNiceWindowListener(this@java.awt.Window,listener) = this.removeWindowListener(listener);
+removeNiceComponentListener(this@java.awt.Component,listener) = this.removeComponentListener(listener);
+removeNiceFocusListener(this@java.awt.Component,listener) = this.removeFocusListener(listener);
+removeNiceHierarchyBoundsListener(this@java.awt.Component,listener) = this.removeHierarchyBoundsListener(listener);
+removeNiceHierarchyListener(this@java.awt.Component,listener) = this.removeHierarchyListener(listener);
+removeNiceInputMethodListener(this@java.awt.Component,listener) = this.removeInputMethodListener(listener);
+removeNiceKeyListener(this@java.awt.Component,listener) = this.removeKeyListener(listener);
+removeNiceMouseListener(this@java.awt.Component,listener) = this.removeMouseListener(listener);
+removeNiceMouseMotionListener(this@java.awt.Component,listener) = this.removeMouseMotionListener(listener);
+removeNicePropertyChangeListener(this@java.awt.Component,listener) = this.removePropertyChangeListener(listener);
+
+removeNicePropertyChangeListener(this@java.awt.Component,key@String,listener)
+{
+	this.removePropertyChangeListener(key,listener);
+	//this.removeMappableListener(key,listener,mappablePropertyChangeListeners);
+}
+
+removeNiceDragSourceListener(this@java.awt.dnd.DragSourceContext,listener)
+{
+	this.removeDragSourceListener(listener);
+	//this.removeInAccessibleListener(listener,dragSourceListeners);
+}
+
+removeNiceDropTargetListener(this@java.awt.dnd.DropTarget,listener)
+{
+	this.removeDropTargetListener(listener);
+	//this.removeInAccessibleListener(listener,dropTargetListeners);
+}
+
+removeNiceDragGestureListener(this@java.awt.dnd.DragGestureRecognizer,listener)
+{
+	this.removeDragGestureListener(listener);
+	//this.removeInAccessibleListener(listener,dragGestureListeners);
+}
+
+//JDK1.4  removeNicePropertyChangeListeners(this@java.awt.Toolkit,key@String,listener)
+//JDK1.4  {
+//JDK1.4  	this.removePropertyChangeListener(key,listener);
+//JDK1.4  	this.removeMappableListener(key,listener,mappableropertyChangeListeners);
+//JDK1.4  }
+
+//JDK1.4  removeNiceAWTEventListeners(this@java.awt.Toolkit,key@long,listener)  
+//JDK1.4  {
+//JDK1.4  	this.removeAWTEventListener(listener,key);
+//JDK1.4  	this.removeMappableListener(key,listener,mappablePropertyChangeListeners);
+//JDK1.4  }
+
+//JDK1.4  removeNiceDragSourceListener(this@java.awt.dnd.DragSource,listener)
+//JDK1.4  {
+//JDK1.4  	this.removeDragSourceListener(listener);
+//JDK1.4  	this.removeInAccessibleListener(listener,dragSourceListeners);
+//JDK1.4  }
+
+//JDK1.4  removeNiceAdjustmentListener(this@java.awt.ScrollPaneAdjustable,listener) = this.removeAdjustmentListener(listener);
+//JDK1.4  removeNiceWindowFocusListener(this@java.awt.Window,listener) = this.removeWindowFocusListener(listener);
+//JDK1.4  removeNiceWindowStateListener(this@java.awt.Window,listener) = this.removeWindowStateListener(listener);
+//JDK1.4  removeNiceMouseWheelListener(this@java.awt.Component,listener) = this.removeMouseWheelListener(listener);
+//JDK1.4  removeNiceDragSourceMotionListener(this@java.awt.dnd.DragSource,listener) = this.removeDragSourceMotionListener(listener);
+
+
 
 /**
  * DEFINITION of functions to remove all nice.ui.awt.NiceListener 
@@ -23,12 +124,13 @@ public <ActionListenerHandler H> void removeActionListener
    ActionEvent -> void actionPerformed
    )
 {  
-	NActionListener[?] listeners = this.getNiceActionListeners();
+	NiceActionListener[?] listeners = this.getNiceActionListeners();
   if(listeners == null) return;
   listeners.foreach
-    (NActionListener l =>
+    (NiceActionListener l =>
      {
        if(l.getActionPerformed() == actionPerformed) l.setActionPerformed(null);
+       if(!l.isLoaded()) this.removeNiceActionListener(l);
      }
      );
 }
@@ -39,12 +141,13 @@ public <AdjustmentListenerHandler H> void removeAdjustmentListener
    AdjustmentEvent -> void adjustmentValueChanged
    ) 
 {
-  NAdjustmentListener[?] listeners = this.getNiceAdjustmentListeners();
+  NiceAdjustmentListener[?] listeners = this.getNiceAdjustmentListeners();
   if(listeners == null) return;
   listeners.foreach
-    (NAdjustmentListener l =>
+    (NiceAdjustmentListener l =>
      {
        if(l.getAdjustmentValueChanged() == adjustmentValueChanged) l.setAdjustmentValueChanged(null);
+       if(!l.isLoaded()) this.removeNiceAdjustmentListener(l);
      }
      );
 }
@@ -58,15 +161,16 @@ public <ComponentListenerHandler H> void removeComponentListener
    ComponentEvent ?-> void componentShown = null
    )
 {
-  NComponentListener[?] listeners = this.getNiceComponentListeners();
+  NiceComponentListener[?] listeners = this.getNiceComponentListeners();
   if(listeners == null) return;
   listeners.foreach
-    (NComponentListener l =>
+    (NiceComponentListener l =>
      {
        if(componentHidden != null && l.getComponentHidden() == componentHidden) l.setComponentHidden(null);
        if(componentMoved != null && l.getComponentMoved() == componentMoved) l.setComponentMoved(null);
        if(componentResized != null && l.getComponentResized() == componentResized) l.setComponentResized(null);
        if(componentShown != null && l.getComponentShown() == componentShown) l.setComponentShown(null);
+       if(!l.isLoaded()) this.removeNiceComponentListener(l);
      }
      );
 }
@@ -78,13 +182,14 @@ public <ContainerListenerHandler H> void removeContainerListener
    ContainerEvent ?-> void componentRemoved = null
    ) 
 {
-  NContainerListener[?] listeners = this.getNiceContainerListeners();
+  NiceContainerListener[?] listeners = this.getNiceContainerListeners();
   if(listeners == null) return;
   listeners.foreach
-    (NContainerListener l =>
+    (NiceContainerListener l =>
      {
        if(componentAdded != null && l.getComponentAdded() == componentAdded) l.setComponentAdded(null);
        if(componentRemoved != null && l.getComponentRemoved() == componentRemoved) l.setComponentRemoved(null);
+       if(!l.isLoaded()) this.removeNiceContainerListener(l);
      }
      );
 } 
@@ -96,13 +201,14 @@ public <FocusListenerHandler H> void removeFocusListener
    FocusEvent ?-> void focusLost = null
    )
 {
-  NFocusListener[?] listeners = this.getNiceFocusListeners();
+  NiceFocusListener[?] listeners = this.getNiceFocusListeners();
   if(listeners == null) return;
   listeners.foreach
-    (NFocusListener l =>
+    (NiceFocusListener l =>
      {
        if(focusGained != null && l.getFocusGained() == focusGained) l.setFocusGained(null);
        if(focusLost != null && l.getFocusLost() == focusLost) l.setFocusLost(null);
+       if(!l.isLoaded()) this.removeNiceFocusListener(l);
      }
      );
 }
@@ -114,13 +220,14 @@ public <HierarchyBoundsListenerHandler H> void removeHierarchyBoundsListener
    HierarchyEvent ?-> void hierarchyAncestorResized = null
    ) 
 {
-  NHierarchyBoundsListener[?] listeners = this.getNiceHierarchyBoundsListeners();
+  NiceHierarchyBoundsListener[?] listeners = this.getNiceHierarchyBoundsListeners();
   if(listeners == null) return;
   listeners.foreach
-    (NHierarchyBoundsListener l =>
+    (NiceHierarchyBoundsListener l =>
      {
        if(hierarchyAncestorMoved != null && l.getHierarchyAncestorMoved == hierarchyAncestorMoved) l.setHierarchyAncestorMoved(null);
        if(hierarchyAncestorResized != null && l.getHierarchyAncestorResized == hierarchyAncestorResized) l.setHierarchyAncestorResized(null);
+       if(!l.isLoaded()) this.removeNiceHierarchyBoundsListener(l);
      }
      );
 }
@@ -131,12 +238,13 @@ public <HierarchyListenerHandler H> void removeHierarchyListener
    HierarchyEvent -> void hierarchyChanged
    ) 
 {
-  NHierarchyListener[?] listeners = this.getNiceHierarchyListeners();
+  NiceHierarchyListener[?] listeners = this.getNiceHierarchyListeners();
   if(listeners == null) return;
   listeners.foreach
-    (NHierarchyListener l =>
+    (NiceHierarchyListener l =>
      {
        if(l.getHierarchyChanged() == hierarchyChanged) l.setHierarchyChanged(null);
+       if(!l.isLoaded()) this.removeNiceHierarchyListener(l);
      }
      );
 }
@@ -148,13 +256,14 @@ public <InputMethodListenerHandler H> void removeInputMethodListener
    InputMethodEvent ?-> void inputMethodTextChanged = null
    )  
 {
-  NInputMethodListener[?] listeners = this.getNiceInputMethodListeners(); 
+  NiceInputMethodListener[?] listeners = this.getNiceInputMethodListeners(); 
   if(listeners == null) return;
   listeners.foreach
-    (NInputMethodListener l =>
+    (NiceInputMethodListener l =>
      {
        if(caretPositionChanged != null && l.getCaretPositionChanged() == caretPositionChanged) l.setCaretPositionChanged(null);
        if(inputMethodTextChanged != null && l.getInputMethodTextChanged() == inputMethodTextChanged) l.setInputMethodTextChanged(null);
+       if(!l.isLoaded()) this.removeNiceInputMethodListener(l);
      }
      );
 }
@@ -165,12 +274,13 @@ public <ItemListenerHandler H> void removeItemListener
    ItemEvent -> void itemStateChanged
    )  
 {
-  NItemListener[?] listeners = this.getNiceItemListeners();
+  NiceItemListener[?] listeners = this.getNiceItemListeners();
   if(listeners == null) return;
   listeners.foreach
-    (NItemListener l =>
+    (NiceItemListener l =>
      {
        if(l.getItemStateChanged() == itemStateChanged) l.setItemStateChanged(null);
+       if(!l.isLoaded()) this.removeNiceItemListener(l);
      }
      );
 }   
@@ -183,14 +293,15 @@ public <KeyListenerHandler H> void removeKeyListener
    KeyEvent ?-> void keyTyped = null
    )
 {
-  NKeyListener[?] listeners = this.getNiceKeyListeners(); 
+  NiceKeyListener[?] listeners = this.getNiceKeyListeners(); 
   if(listeners == null) return;
   listeners.foreach
-    (NKeyListener l =>
+    (NiceKeyListener l =>
      {
        if(keyPressed != null && l.getKeyPressed() == keyPressed) l.setKeyPressed(null);
        if(keyReleased != null && l.getKeyReleased() == keyReleased) l.setKeyReleased(null);
        if(keyTyped != null && l.getKeyTyped() == keyTyped) l.setKeyTyped(null);
+       if(!l.isLoaded()) this.removeNiceKeyListener(l);
      }
      );
 }  
@@ -205,16 +316,17 @@ public <MouseListenerHandler H> void removeMouseListener
    MouseEvent ?-> void mouseReleased = null
    )
 {
-  NMouseListener[?] listeners = this.getNiceMouseListeners();
+  NiceMouseListener[?] listeners = this.getNiceMouseListeners();
   if(listeners == null) return;
   listeners.foreach
-    (NMouseListener l =>
+    (NiceMouseListener l =>
      {
        if(mouseClicked != null && l.getMouseClicked() == mouseClicked) l.setMouseClicked(null);
        if(mouseEntered != null && l.getMouseEntered() == mouseEntered) l.setMouseEntered(null);
        if(mouseExited != null && l.getMouseExited() == mouseExited) l.setMouseExited(null);
        if(mousePressed != null && l.getMousePressed() == mousePressed) l.setMousePressed(null);
        if(mouseReleased != null && l.getMouseReleased() == mouseReleased) l.setMouseReleased(null);
+       if(!l.isLoaded()) this.removeNiceMouseListener(l);
      }
      );
 }  
@@ -226,13 +338,14 @@ public <MouseMotionListenerHandler H> void removeMouseMotionListener
    MouseEvent ?-> void mouseMoved = null
    ) 
 {
-  NMouseMotionListener[?] listeners = this.getNiceMouseMotionListeners();
+  NiceMouseMotionListener[?] listeners = this.getNiceMouseMotionListeners();
   if(listeners == null) return;
   listeners.foreach
-    (NMouseMotionListener l =>
+    (NiceMouseMotionListener l =>
      {
        if(mouseDragged != null && l.getMouseDragged() == mouseDragged) l.setMouseDragged(null);
        if(mouseMoved != null && l.getMouseMoved() == mouseMoved) l.setMouseMoved(null);
+       if(!l.isLoaded()) this.removeNiceMouseMotionListener(l);
      }
      );
 } 
@@ -243,12 +356,13 @@ public <TextListenerHandler H> void removeTextListener
    TextEvent -> void textValueChanged
    ) 
 {
-  NTextListener[?] listeners = this.getNiceTextListeners();
+  NiceTextListener[?] listeners = this.getNiceTextListeners();
   if(listeners == null) return;
   listeners.foreach
-    (NTextListener l =>
+    (NiceTextListener l =>
      {
        if(l.getTextValueChanged() == textValueChanged) l.setTextValueChanged(null);
+       if(!l.isLoaded()) this.removeNiceTextListener(l);
      }
      );
 }  
@@ -265,10 +379,10 @@ public <WindowListenerHandler H> void removeWindowListener
    WindowEvent ?-> void windowOpened = null
    )  
 {
-  NWindowListener[?] listeners = this.getNiceWindowListeners();
+  NiceWindowListener[?] listeners = this.getNiceWindowListeners();
   if(listeners == null) return;
   listeners.foreach
-    (NWindowListener l =>
+    (NiceWindowListener l =>
      {
        if(windowActivated != null && l.getWindowActivated() == windowActivated) l.setWindowActivated(null);
        if(windowClosed != null && l.getWindowClosed() == windowClosed) l.setWindowClosed(null);
@@ -277,6 +391,7 @@ public <WindowListenerHandler H> void removeWindowListener
        if(windowDeiconified != null && l.getWindowDeiconified() == windowDeiconified) l.setWindowDeiconified(null);
        if(windowIconified != null && l.getWindowIconified() == windowIconified) l.setWindowIconified(null);
        if(windowOpened != null && l.getWindowOpened() == windowOpened) l.setWindowOpened(null);
+       if(!l.isLoaded()) this.removeNiceWindowListener(l);
      }
      );
 }   
@@ -290,16 +405,17 @@ public <DragSourceListenerHandler H> void removeDragSourceListener
    DragSourceEvent ?-> void dsDragExit = null
    ) 
 {
-  NDragSourceListener[?] listeners = this.getNiceDragSourceListeners();
+  NiceDragSourceListener[?] listeners = this.getNiceDragSourceListeners();
   if(listeners == null) return;
   listeners.foreach
-    (NDragSourceListener l =>
+    (NiceDragSourceListener l =>
      {
        if(dsDragDropEnd != null && l.getDsDragDropEnd() == dsDragDropEnd) l.setDsDragDropEnd(null);
        if(dsDragEnter != null && l.getDsDragEnter() == dsDragEnter) l.setDsDragEnter(null);
        if(dsDragOver != null && l.getDsDragOver() == dsDragOver) l.setDsDragOver(null);
        if(dsDropActionChanged != null && l.getDsDropActionChanged() == dsDropActionChanged) l.setDsDropActionChanged(null);
        if(dsDragExit != null && l.getDsDragExit() == dsDragExit) l.setDsDragExit(null);
+       if(!l.isLoaded()) this.removeNiceDragSourceListener(l);
      }
      );
 }
@@ -310,12 +426,13 @@ public <DragGestureListenerHandler H> void removeDragGestureListener
    DragGestureEvent -> void dragGestureRecognized
    ) 
 {
-  NDragGestureListener[?] listeners = this.getNiceDragGestureListeners();
+  NiceDragGestureListener[?] listeners = this.getNiceDragGestureListeners();
   if(listeners == null) return;
   listeners.foreach
-    (NDragGestureListener l =>
+    (NiceDragGestureListener l =>
      {
        if(l.getDragGestureRecognized() == dragGestureRecognized) l.setDragGestureRecognized(null);
+       if(!l.isLoaded()) this.removeNiceDragGestureListener(l);
      }
      );
 }
@@ -330,16 +447,17 @@ public <DropTargetListenerHandler H> void removeDropTargetListener
    DropTargetEvent ?-> void dtDragExit = null
    ) 
 {
-  NDropTargetListener[?] listeners = this.getNiceDropTargetListeners();
+  NiceDropTargetListener[?] listeners = this.getNiceDropTargetListeners();
   if(listeners == null) return;
   listeners.foreach
-    (NDropTargetListener l =>
+    (NiceDropTargetListener l =>
      {
        if(dtDrop != null && l.getDtDrop() == dtDrop) l.setDtDrop(null);
        if(dtDragEnter != null && l.getDtDragEnter() == dtDragEnter) l.setDtDragEnter(null);
        if(dtDragOver != null && l.getDtDragOver() == dtDragOver) l.setDtDragOver(null);
        if(dtDropActionChanged != null && l.getDtDropActionChanged() == dtDropActionChanged) l.setDtDropActionChanged(null);
        if(dtDragExit != null && l.getDtDragExit() == dtDragExit) l.setDtDragExit(null);
+       if(!l.isLoaded()) this.removeNiceDropTargetListener(l);
      }
      );
 }
@@ -350,12 +468,13 @@ public <DropTargetListenerHandler H> void removeDropTargetListener
 //JDK1.4     AWTEvent -> void eventDispatched
 //JDK1.4     )
 //JDK1.4  {
-//JDK1.4    NAWTEventListener[?] listeners = this.getNiceAWTListeners();
+//JDK1.4    NiceAWTEventListener[?] listeners = this.getNiceAWTListeners();
 //JDK1.4    if(listeners == null) return;
 //JDK1.4    listeners.foreach
-//JDK1.4      (NAWTEventListener l =>
+//JDK1.4      (NiceAWTEventListener l =>
 //JDK1.4       {
 //JDK1.4         if(l.getEventDispatched() == eventDispatched) l.setEventDispatched(null);
+//JDK1.4         if(!l.isLoaded()) this.removeNiceAWTEventListener(l);
 //JDK1.4       }
 //JDK1.4       );
 //JDK1.4  }
@@ -366,12 +485,13 @@ public <DropTargetListenerHandler H> void removeDropTargetListener
 //JDK1.4     MouseWheelEvent -> void mouseWheelMoved
 //JDK1.4     )   
 //JDK1.4  {
-//JDK1.4    NMouseWheelListener[?] listeners = this.getNiceMouseWheelListeners();
+//JDK1.4    NiceMouseWheelListener[?] listeners = this.getNiceMouseWheelListeners();
 //JDK1.4    if(listeners == null) return;
 //JDK1.4    listeners.foreach
-//JDK1.4      (NMouseWheelListener l =>
+//JDK1.4      (NiceMouseWheelListener l =>
 //JDK1.4       {
 //JDK1.4         if(l.getMouseWheelMoved() == mouseWheelMoved) l.setMouseWheelMoved(null);
+//JDK1.4         if(!l.isLoaded()) this.removeNiceMouseWheelListener(l);
 //JDK1.4       }
 //JDK1.4       );
 //JDK1.4  } 
@@ -383,13 +503,14 @@ public <DropTargetListenerHandler H> void removeDropTargetListener
 //JDK1.4     WindowEvent ?-> void windowLostFocus = null
 //JDK1.4     )  
 //JDK1.4  {
-//JDK1.4    NWindowFocusListener[?] listeners = this.getNiceWindowFocusListeners();
+//JDK1.4    NiceWindowFocusListener[?] listeners = this.getNiceWindowFocusListeners();
 //JDK1.4    if(listeners == null) return;
 //JDK1.4    listeners.foreach
-//JDK1.4      (NWindowFocusListener l =>
+//JDK1.4      (NiceWindowFocusListener l =>
 //JDK1.4       {
 //JDK1.4         if(windowGainedFocus != null && l.getWindowGainedFocus() == windowGainedFocus) l.setWindowGainedFocus(null);
 //JDK1.4         if(windowLostFocus != null && l.getWindowLostFocus() == windowLostFocus) l.setWindowLostFocus(null);
+//JDK1.4         if(!l.isLoaded()) this.removeNiceWindowFocusListener(l);
 //JDK1.4       }
 //JDK1.4       );
 //JDK1.4  } 
@@ -400,12 +521,13 @@ public <DropTargetListenerHandler H> void removeDropTargetListener
 //JDK1.4     WindowEvent -> void windowStateChanged
 //JDK1.4     ) 
 //JDK1.4  {
-//JDK1.4    NWindowStateListener[?] listeners = this.getNiceWindowStateListeners();
+//JDK1.4    NiceWindowStateListener[?] listeners = this.getNiceWindowStateListeners();
 //JDK1.4    if(listeners == null) return;
 //JDK1.4    listeners.foreach
-//JDK1.4      (NWindowStateListener l =>
+//JDK1.4      (NiceWindowStateListener l =>
 //JDK1.4       {
 //JDK1.4         if(l.getWindowStateChanged() == windowStateChanged) l.setWindowStateChanged(null);
+//JDK1.4         if(!l.isLoaded()) this.removeNiceWindowStateListener(l);
 //JDK1.4       }
 //JDK1.4       );
 //JDK1.4  }
@@ -416,12 +538,13 @@ public <DropTargetListenerHandler H> void removeDropTargetListener
 //JDK1.4     DragSourceDragEvent -> void dragMouseMoved
 //JDK1.4     ) 
 //JDK1.4  {
-//JDK1.4    NDragSourceMotionListener[?] listeners = this.getNiceDragSourceMotionListeners();
+//JDK1.4    NiceDragSourceMotionListener[?] listeners = this.getNiceDragSourceMotionListeners();
 //JDK1.4    if(listeners == null) return;
 //JDK1.4    listeners.foreach
-//JDK1.4      (NDragSourceMotionListener l =>
+//JDK1.4      (NiceDragSourceMotionListener l =>
 //JDK1.4       {
 //JDK1.4         if(l.getDragMouseMoved() == dragMouseMoved) l.setDragMouseMoved(null);
+//JDK1.4         if(!l.isLoaded()) this.removeNiceDragSourceMotionListener(l);
 //JDK1.4       }
 //JDK1.4       );
 //JDK1.4  }

@@ -10,7 +10,139 @@
 
 
 package nice.ui.common;
-  
+
+
+
+/**
+ * DECLARATION of methods to remove nice.ui.swing.NiceListener from nice.ui.swing.NiceListenerHandler
+ */
+
+public <AncestorListenerHandler H> void removeNiceAncestorListener(H,NiceAncestorListener);
+public <CaretListenerHandler H> void removeNiceCaretListener(H,NiceCaretListener);
+public <CellEditorListenerHandler H> void removeNiceCellEditorListener(H,NiceCellEditorListener);
+public <ChangeListenerHandler H> void removeNiceChangeListener(H,NiceChangeListener);
+public <DocumentListenerHandler H> void removeNiceDocumentListener(H,NiceDocumentListener);
+public <HyperlinkListenerHandler H> void removeNiceHyperlinkListener(H,NiceHyperlinkListener);
+public <InternalFrameListenerHandler H> void removeNiceInternalFrameListener(H,NiceInternalFrameListener);
+public <ListDataListenerHandler H> void removeNiceListDataListener(H,NiceListDataListener);
+public <ListSelectionListenerHandler H> void removeNiceListSelectionListener(H,NiceListSelectionListener);
+public <MenuDragMouseListenerHandler H> void removeNiceMenuDragMouseListener(H,NiceMenuDragMouseListener);
+public <MenuKeyListenerHandler H> void removeNiceMenuKeyListener(H,NiceMenuKeyListener);
+public <MenuListenerHandler H> void removeNiceMenuListener(H,NiceMenuListener);
+public <PopupMenuListenerHandler H> void removeNicePopupMenuListener(H,NicePopupMenuListener);
+public <TableColumnModelListenerHandler H> void removeNiceTableColumnModelListener(H,NiceTableColumnModelListener);
+public <TableModelListenerHandler H> void removeNiceTableModelListener(H,NiceTableModelListener);
+public <TreeExpansionListenerHandler H> void removeNiceTreeExpansionListener(H,NiceTreeExpansionListener);
+public <TreeWillExpandListenerHandler H> void removeNiceTreeWillExpandListener(H,NiceTreeWillExpandListener);
+public <TreeModelListenerHandler H> void removeNiceTreeModelListener(H,NiceTreeModelListener);
+public <TreeSelectionListenerHandler H> void removeNiceTreeSelectionListener(H,NiceTreeSelectionListener);
+public <UndoableEditListenerHandler H> void removeNiceUndoableEditListener(H,NiceUndoableEditListener);
+
+
+
+/**
+ * DEFINITION of methods to remove nice.ui.awt.NiceListener from nice.ui.awt.NiceListenerHandler
+ */
+
+removeNiceActionListener(this@javax.swing.AbstractButton,listener) = this.removeActionListener(listener);
+removeNiceActionListener(this@javax.swing.JFileChooser,listener) = this.removeActionListener(listener);
+removeNiceActionListener(this@javax.swing.Timer,listener) = this.removeActionListener(listener);
+removeNiceActionListener(this@javax.swing.DefaultButtonModel,listener) = this.removeActionListener(listener);
+removeNiceActionListener(this@javax.swing.JComboBox,listener) = this.removeActionListener(listener);
+removeNiceActionListener(this@javax.swing.JTextField,listener) = this.removeActionListener(listener);
+removeNiceAdjustmentListener(this@javax.swing.JScrollBar,listener) = this.removeAdjustmentListener(listener);
+removeNiceItemListener(this@javax.swing.AbstractButton,listener) = this.removeItemListener(listener);
+removeNiceItemListener(this@javax.swing.DefaultButtonModel,listener) = this.removeItemListener(listener);
+removeNiceItemListener(this@javax.swing.JComboBox,listener) = this.removeItemListener(listener);
+removeNiceAncestorListener(this@javax.swing.JComponent,listener) = this.removeAncestorListener(listener);
+removeNiceCaretListener(this@javax.swing.text.JTextComponent,listener) = this.removeCaretListener(listener);
+removeNiceCellEditorListener(this@javax.swing.AbstractCellEditor,listener) = this.removeCellEditorListener(listener);
+removeNiceChangeListener(this@javax.swing.AbstractButton,listener) = this.removeChangeListener(listener);
+removeNiceChangeListener(this@javax.swing.JSlider,listener) = this.removeChangeListener(listener);
+removeNiceChangeListener(this@javax.swing.JProgressBar,listener) = this.removeChangeListener(listener);
+removeNiceChangeListener(this@javax.swing.DefaultSingleSelectionModel,listener) = this.removeChangeListener(listener);
+removeNiceChangeListener(this@javax.swing.DefaultBoundedRangeModel,listener) = this.removeChangeListener(listener);
+removeNiceChangeListener(this@javax.swing.DefaultButtonModel,listener) = this.removeChangeListener(listener);
+removeNiceChangeListener(this@javax.swing.text.DefaultCaret,listener) = this.removeChangeListener(listener);
+removeNiceChangeListener(this@javax.swing.JViewport,listener) = this.removeChangeListener(listener);
+removeNiceChangeListener(this@javax.swing.JTabbedPane,listener) = this.removeChangeListener(listener);
+removeNiceDocumentListener(this@javax.swing.text.AbstractDocument,listener) = this.removeDocumentListener(listener);
+removeNiceHyperlinkListener(this@javax.swing.JEditorPane,listener) = this.removeHyperlinkListener(listener);
+removeNiceInternalFrameListener(this@javax.swing.JInternalFrame,listener) = this.removeInternalFrameListener(listener);
+removeNiceListDataListener(this@javax.swing.AbstractListModel,listener) = this.removeListDataListener(listener);
+removeNiceListSelectionListener(this@javax.swing.JList,listener) = this.removeListSelectionListener(listener);
+removeNiceListSelectionListener(this@javax.swing.DefaultListSelectionModel,listener) = this.removeListSelectionListener(listener);
+removeNiceMenuDragMouseListener(this@javax.swing.JMenuItem,listener) = this.removeMenuDragMouseListener(listener);
+removeNiceMenuKeyListener(this@javax.swing.JMenuItem,listener) = this.removeMenuKeyListener(listener);
+removeNiceMenuListener(this@javax.swing.JMenu,listener) = this.removeMenuListener(listener);
+removeNicePopupMenuListener(this@javax.swing.JPopupMenu,listener) = this.removePopupMenuListener(listener);
+removeNiceTreeExpansionListener(this@javax.swing.JTree,listener) = this.removeTreeExpansionListener(listener);
+removeNiceTreeWillExpandListener(this@javax.swing.JTree,listener) = this.removeTreeWillExpandListener(listener);
+removeNiceTreeModelListener(this@javax.swing.tree.DefaultTreeModel,listener) = this.removeTreeModelListener(listener);
+removeNiceTreeSelectionListener(this@javax.swing.JTree,listener) = this.removeTreeSelectionListener(listener);
+removeNiceTreeSelectionListener(this@javax.swing.tree.DefaultTreeSelectionModel,listener) = this.removeTreeSelectionListener(listener);
+
+//JDK1.4  removeNicePopupMenuListener(this@javax.swing.JComboBox,listener) = this.removePopupMenuListener(listener);
+//JDK1.4  removeNiceChangeListener(this@javax.swing.AbstractSpinnerModel,listener) = this.removeChangeListener(listener);
+//JDK1.4  removeNiceChangeListener(this@javax.swing.JSpinner,listener) = this.removeChangeListener(listener);
+
+
+removeNiceVetoableChangeListener(this@javax.swing.JComponent,listener)
+{
+	this.removeVetoableChangeListener(listener);
+	//this.removeInAccessibleListener(listener,vetoableChangeListeners);
+}
+
+removeNicePropertyChangeListener(this@javax.swing.AbstractAction,listener)
+{
+	this.removePropertyChangeListener(listener);
+	//this.removeInAccessibleListener(listener,propertyChangeListeners);
+}
+
+removeNicePropertyChangeListener(this@javax.swing.tree.DefaultTreeSelectionModel,listener)
+{
+	this.removePropertyChangeListener(listener);
+	//this.removeInAccessibleListener(listener,propertyChangeListeners);
+}
+
+removeNicePropertyChangeListener(this@javax.swing.table.TableColumn,listener)
+{
+	this.removePropertyChangeListener(listener);
+	//this.removeInAccessibleListener(listener,propertyChangeListeners);
+}
+
+removeNiceTableModelListener(this@javax.swing.table.TableModel,listener)
+{
+	this.removeTableModelListener(listener);
+	//this.removeInAccessibleListener(listener,tableModelListeners);
+}
+
+removeNiceTableColumnModelListener(this@javax.swing.table.TableColumnModel,listener)
+{
+	this.removeColumnModelListener(listener);
+	//this.removeInAccessibleListener(listener,tableColumnModelListeners);
+}
+
+removeNiceChangeListener(this@javax.swing.MenuSelectionManager,listener)
+{
+	this.removeChangeListener(listener);
+	//this.removeInAccessibleListener(listener,changeListeners);
+}
+
+removeNiceChangeListener(this@javax.swing.colorchooser.DefaultColorSelectionModel,listener)
+{
+	this.removeChangeListener(listener);
+	//this.removeInAccessibleListener(listener,changeListeners);
+}
+
+removeNiceUndoableEditListener(this@javax.swing.undo.UndoableEditSupport,listener)
+{
+	this.removeUndoableEditListener(listener);
+	//this.removeInAccessibleListener(listener,undoableEditListeners);
+}
+
+
+ 
 
 /**
  * DEFINITION of functions to remove all nice.ui.swing.NiceListener 
@@ -24,10 +156,10 @@ public <AncestorListenerHandler H> void removeAncestorListener
    AncestorEvent ?-> void ancestorRemoved = null
    )
 {
-	NAncestorListener[?] listeners = this.getNiceAncestorListeners();
+	NiceAncestorListener[?] listeners = this.getNiceAncestorListeners();
   if(listeners == null) return;
   listeners.foreach
-    (NAncestorListener l =>
+    (NiceAncestorListener l =>
      {
        if(ancestorAdded != null && l.getAncestorAdded() == ancestorAdded) l.setAncestorAdded(null);
        if(ancestorMoved != null && l.getAncestorMoved() == ancestorMoved) l.setAncestorMoved(null);
@@ -41,10 +173,10 @@ public <CaretListenerHandler H> void removeCaretListener
    CaretEvent -> void caretUpdate
    ) 
 {
-	NCaretListener[?] listeners = this.getNiceCaretListeners();
+	NiceCaretListener[?] listeners = this.getNiceCaretListeners();
   if(listeners == null) return;
   listeners.foreach
-    (NCaretListener l =>
+    (NiceCaretListener l =>
      {
        if(l.getCaretUpdate() == caretUpdate) l.setCaretUpdate(null);
      }
@@ -57,10 +189,10 @@ public <CellEditorListenerHandler H> void removeCellEditorListener
    ChangeEvent ?-> void editingStopped = null
    )
 {
-	NCellEditorListener[?] listeners = this.getNiceCellEditorListeners();
+	NiceCellEditorListener[?] listeners = this.getNiceCellEditorListeners();
   if(listeners == null) return;
   listeners.foreach
-    (NCellEditorListener l =>
+    (NiceCellEditorListener l =>
      {
        if(editingCanceled != null && l.getEditingCanceled() == editingCanceled) l.setEditingCanceled(null);
        if(editingStopped != null && l.getEditingStopped() == editingStopped) l.setEditingStopped(null);
@@ -73,10 +205,10 @@ public <ChangeListenerHandler H> void removeChangeListener
    ChangeEvent -> void stateChanged
    ) 
 {
-	NChangeListener[?] listeners = this.getNiceChangeListeners();
+	NiceChangeListener[?] listeners = this.getNiceChangeListeners();
   if(listeners == null) return;
   listeners.foreach
-    (NChangeListener l =>
+    (NiceChangeListener l =>
      {
        if(l.getStateChanged() == stateChanged) l.setStateChanged(null);
      }
@@ -90,10 +222,10 @@ public <DocumentListenerHandler H> void removeDocumentListener
    DocumentEvent ?-> void removeUpdate = null
    ) 
 {
-	NDocumentListener[?] listeners = this.getNiceDocumentListeners();
+	NiceDocumentListener[?] listeners = this.getNiceDocumentListeners();
   if(listeners == null) return;
   listeners.foreach
-    (NDocumentListener l =>
+    (NiceDocumentListener l =>
      {
        if(changedUpdate != null && l.getChangedUpdate() == changedUpdate) l.setChangedUpdate(null);
        if(insertUpdate != null && l.getInsertUpdate() == insertUpdate) l.setInsertUpdate(null);
@@ -107,10 +239,10 @@ public <HyperlinkListenerHandler H> void removeHyperlinkListener
    HyperlinkEvent -> void hyperlinkUpdate
    )
 {
-	NHyperlinkListener[?] listeners = this.getNiceHyperlinkListeners();
+	NiceHyperlinkListener[?] listeners = this.getNiceHyperlinkListeners();
   if(listeners == null) return;
   listeners.foreach
-    (NHyperlinkListener l =>
+    (NiceHyperlinkListener l =>
      {
        if(l.getHyperlinkUpdate() == hyperlinkUpdate) l.setHyperlinkUpdate(null);
      }
@@ -128,10 +260,10 @@ public <InternalFrameListenerHandler H> void removeInternalFrameListener
    InternalFrameEvent ?-> void internalFrameOpened = null
    ) 
 {
-	NInternalFrameListener[?] listeners = this.getNiceInternalFrameListeners();
+	NiceInternalFrameListener[?] listeners = this.getNiceInternalFrameListeners();
   if(listeners == null) return;
   listeners.foreach
-    (NInternalFrameListener l =>
+    (NiceInternalFrameListener l =>
      {
        if(internalFrameActivated != null && l.getInternalFrameActivated() == internalFrameActivated) l.setInternalFrameActivated(null);
        if(internalFrameClosed != null && l.getInternalFrameClosed() == internalFrameClosed) l.setInternalFrameClosed(null);
@@ -151,10 +283,10 @@ public <ListDataListenerHandler H> void removeListDataListener
    ListDataEvent ?-> void intervalRemoved = null
    ) 
 {
-	NListDataListener[?] listeners = this.getNiceListDataListeners();
+	NiceListDataListener[?] listeners = this.getNiceListDataListeners();
   if(listeners == null) return;
   listeners.foreach
-    (NListDataListener l =>
+    (NiceListDataListener l =>
      {
        if(contentsChanged != null && l.getContentsChanged() == contentsChanged) l.setContentsChanged(null);
        if(intervalAdded != null && l.getIntervalAdded() == intervalAdded) l.setIntervalAdded(null);
@@ -168,10 +300,10 @@ public <ListSelectionListenerHandler H> void removeListSelectionListener
    ListSelectionEvent -> void listSelectionValueChanged
    )  
 {
-	NListSelectionListener[?] listeners = this.getNiceListSelectionListeners();
+	NiceListSelectionListener[?] listeners = this.getNiceListSelectionListeners();
   if(listeners == null) return;
   listeners.foreach
-    (NListSelectionListener l =>
+    (NiceListSelectionListener l =>
      {
        if(l.getListSelectionValueChanged() == listSelectionValueChanged) l.setListSelectionValueChanged(null);
      }
@@ -186,10 +318,10 @@ public <MenuDragMouseListenerHandler H> void removeMenuDragMouseListener
    MenuDragMouseEvent ?-> void menuDragMouseReleased = null
    )
 {
-	NMenuDragMouseListener[?] listeners = this.getNiceMenuDragMouseListeners();
+	NiceMenuDragMouseListener[?] listeners = this.getNiceMenuDragMouseListeners();
   if(listeners == null) return;
   listeners.foreach
-    (NMenuDragMouseListener l =>
+    (NiceMenuDragMouseListener l =>
      {
        if(menuDragMouseDragged != null && l.getMenuDragMouseDragged() == menuDragMouseDragged) l.setMenuDragMouseDragged(null);
        if(menuDragMouseEntered != null && l.getMenuDragMouseEntered() == menuDragMouseEntered) l.setMenuDragMouseEntered(null);
@@ -206,10 +338,10 @@ public <MenuKeyListenerHandler H> void removeMenuKeyListener
    MenuKeyEvent ?-> void menuKeyTyped = null
    )
 {
-	NMenuKeyListener[?] listeners = this.getNiceMenuKeyListeners();
+	NiceMenuKeyListener[?] listeners = this.getNiceMenuKeyListeners();
   if(listeners == null) return;
   listeners.foreach
-    (NMenuKeyListener l =>
+    (NiceMenuKeyListener l =>
      {
        if(menuKeyPressed != null && l.getMenuKeyPressed() == menuKeyPressed) l.setMenuKeyPressed(null);
        if(menuKeyReleased != null && l.getMenuKeyReleased() == menuKeyReleased) l.setMenuKeyReleased(null);
@@ -225,10 +357,10 @@ public <MenuListenerHandler H> void removeMenuListener
    MenuEvent ?-> void menuSelected = null
    )
 {
-	NMenuListener[?] listeners = this.getNiceMenuListeners();
+	NiceMenuListener[?] listeners = this.getNiceMenuListeners();
   if(listeners == null) return;
   listeners.foreach
-    (NMenuListener l =>
+    (NiceMenuListener l =>
      {
        if(menuCanceled != null && l.getMenuCanceled() == menuCanceled) l.setMenuCanceled(null);
        if(menuDeselected != null && l.getMenuDeselected() == menuDeselected) l.setMenuDeselected(null);
@@ -244,10 +376,10 @@ public <PopupMenuListenerHandler H> void removePopupMenuListener
    PopupMenuEvent ?-> void popupMenuWillBecomeVisible = null
    )
 {
-	NPopupMenuListener[?] listeners = this.getNicePopupMenuListeners();
+	NicePopupMenuListener[?] listeners = this.getNicePopupMenuListeners();
   if(listeners == null) return;
   listeners.foreach
-    (NPopupMenuListener l =>
+    (NicePopupMenuListener l =>
      {
        if(popupMenuCanceled != null && l.getPopupMenuCanceled() == popupMenuCanceled) l.setPopupMenuCanceled(null);
        if(popupMenuWillBecomeInvisible != null && l.getPopupMenuWillBecomeInvisible() == popupMenuWillBecomeInvisible) l.setPopupMenuWillBecomeInvisible(null);
@@ -265,10 +397,10 @@ public <TableColumnModelListenerHandler H> void removeTableColumnModelListener
    ChangeEvent ?-> void columnMarginChanged = null
    ) 
 {
-	NTableColumnModelListener[?] listeners = this.getNiceTableColumnModelListeners();
+	NiceTableColumnModelListener[?] listeners = this.getNiceTableColumnModelListeners();
   if(listeners == null) return;
   listeners.foreach
-    (NTableColumnModelListener l =>
+    (NiceTableColumnModelListener l =>
      {
        if(columnAdded != null && l.getColumnAdded() == columnAdded) l.setColumnAdded(null);
        if(columnMoved != null && l.getColumnMoved() == columnMoved) l.setColumnMoved(null);
@@ -284,10 +416,10 @@ public <TableModelListenerHandler H> void removeTableModelListener
    TableModelEvent -> void tableChanged
    )  
 {
-	NTableModelListener[?] listeners = this.getNiceTableModelListeners();
+	NiceTableModelListener[?] listeners = this.getNiceTableModelListeners();
   if(listeners == null) return;
   listeners.foreach
-    (NTableModelListener l =>
+    (NiceTableModelListener l =>
      {
        if(l.getTableChanged() == tableChanged) l.setTableChanged(null);
      }
@@ -300,10 +432,10 @@ public <TreeExpansionListenerHandler H> void removeTreeExpansionListener
    TreeExpansionEvent ?-> void treeExpanded = null
    ) 
 {
-	NTreeExpansionListener[?] listeners = this.getNiceTreeExpansionListeners();
+	NiceTreeExpansionListener[?] listeners = this.getNiceTreeExpansionListeners();
   if(listeners == null) return;
   listeners.foreach
-    (NTreeExpansionListener l =>
+    (NiceTreeExpansionListener l =>
      {
        if(treeCollapsed != null && l.getTreeCollapsed() == treeCollapsed) l.setTreeCollapsed(null);
        if(treeExpanded != null && l.getTreeExpanded() == treeExpanded) l.setTreeExpanded(null);
@@ -319,10 +451,10 @@ public <TreeModelListenerHandler H> void removeTreeModelListener
    TreeModelEvent ?-> void treeStructureChanged = null
    ) 
 {
-	NTreeModelListener[?] listeners = this.getNiceTreeModelListeners();
+	NiceTreeModelListener[?] listeners = this.getNiceTreeModelListeners();
   if(listeners == null) return;
   listeners.foreach
-    (NTreeModelListener l =>
+    (NiceTreeModelListener l =>
      {
        if(treeNodesChanged != null && l.getTreeNodesChanged() == treeNodesChanged) l.setTreeNodesChanged(null);
        if(treeNodesInserted != null && l.getTreeNodesInserted() == treeNodesInserted) l.setTreeNodesInserted(null);
@@ -337,10 +469,10 @@ public <TreeSelectionListenerHandler H> void removeTreeSelectionListener
    TreeSelectionEvent -> void treeSelectionValueChanged
    ) 
 {
-	NTreeSelectionListener[?] listeners = this.getNiceTreeSelectionListeners();
+	NiceTreeSelectionListener[?] listeners = this.getNiceTreeSelectionListeners();
   if(listeners == null) return;
   listeners.foreach
-    (NTreeSelectionListener l =>
+    (NiceTreeSelectionListener l =>
      {
        if(l.getTreeSelectionValueChanged() == treeSelectionValueChanged) l.setTreeSelectionValueChanged(null);
      }
@@ -353,10 +485,10 @@ public <TreeWillExpandListenerHandler H> void removeTreeWillExpandListener
    TreeExpansionEvent ?-> void treeWillExpand = null
    )  
 {
-	NTreeWillExpandListener[?] listeners = this.getNiceTreeWillExpandListeners();
+	NiceTreeWillExpandListener[?] listeners = this.getNiceTreeWillExpandListeners();
   if(listeners == null) return;
   listeners.foreach
-    (NTreeWillExpandListener l =>
+    (NiceTreeWillExpandListener l =>
      {
        if(treeWillCollapse != null && l.getTreeWillCollapse() == treeWillCollapse) l.setTreeWillCollapse(null);
        if(treeWillExpand != null && l.getTreeWillExpand() == treeWillExpand) l.setTreeWillExpand(null);
@@ -369,10 +501,10 @@ public <UndoableEditListenerHandler H> void removeUndoableEditListener
    UndoableEditEvent -> void undoableEditHappened
    ) 
 {
-	NUndoableEditListener[?] listeners = this.getNiceUndoableEditListeners();
+	NiceUndoableEditListener[?] listeners = this.getNiceUndoableEditListeners();
   if(listeners == null) return;
   listeners.foreach
-    (NUndoableEditListener l =>
+    (NiceUndoableEditListener l =>
      {
        if(l.getUndoableEditHappened() == undoableEditHappened) l.setUndoableEditHappened(null);
      }

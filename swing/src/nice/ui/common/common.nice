@@ -18,7 +18,10 @@ package nice.ui.common;
  * and outside
  */
  
-interface NiceListener {}
+interface NiceListener 
+{
+  boolean isLoaded();	
+}
 
 
 
@@ -62,11 +65,11 @@ abstract interface ListenerKey {}
 /**
  * Exception to mark an occurance of a non-nice (-> java) listener
  */
-class NoNiceListenerException extends Exception 
+public class NoNiceListenerException extends Exception 
 {
   private EventListener listener;
   
-  EventListener getListener();
+  public EventListener getListener();
 }
 
 getListener(this@NoNiceListenerException) = this.listener;

@@ -34,11 +34,11 @@ abstract interface PropertyChangeKey extends ListenerKey {}
  * this is done to provide that support nevertheless
  */
 
-var Map<Object,?java.util.List<NPropertyChangeListener>> propertyChangeListeners = new HashMap();
-var Map<Object,?java.util.List<NVetoableChangeListener>> vetoableChangeListeners = new HashMap();
+var Map<Object,?java.util.List<NicePropertyChangeListener>> propertyChangeListeners = new HashMap();
+var Map<Object,?java.util.List<NiceVetoableChangeListener>> vetoableChangeListeners = new HashMap();
 
-var Map<(Object,String),?java.util.List<NPropertyChangeListener>> mappablePropertyChangeListeners = new HashMap();
-var Map<(Object,String),?java.util.List<NVetoableChangeListener>> mappableVetoableChangeListeners = new HashMap();
+var Map<(Object,String),?java.util.List<NicePropertyChangeListener>> mappablePropertyChangeListeners = new HashMap();
+var Map<(Object,String),?java.util.List<NiceVetoableChangeListener>> mappableVetoableChangeListeners = new HashMap();
 
 
 

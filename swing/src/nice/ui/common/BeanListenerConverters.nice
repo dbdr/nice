@@ -17,23 +17,23 @@ package nice.ui.common;
  * raises a NoNiceListenerException if this is not possible
  */
 
-NPropertyChangeListener toNicePropertyChangeListener(EventListener);
-toNicePropertyChangeListener(this@NPropertyChangeListener) = this;
+NicePropertyChangeListener toNicePropertyChangeListener(EventListener);
+toNicePropertyChangeListener(this@NicePropertyChangeListener) = this;
 toNicePropertyChangeListener(this) 
 { 
-  throw new NoNiceListenerException("" + this.getClass().getName() + "is no instance of NPropertyChangeListener", listener: this); 
+  throw new NoNiceListenerException("" + this.getClass().getName() + "is no instance of NicePropertyChangeListener", listener: this); 
 }
 
-NVetoableChangeListener toNiceVetoableChangeListener(EventListener);
-toNiceVetoableChangeListener(this@NVetoableChangeListener) = this;
+NiceVetoableChangeListener toNiceVetoableChangeListener(EventListener);
+toNiceVetoableChangeListener(this@NiceVetoableChangeListener) = this;
 toNiceVetoableChangeListener(this) 
 { 
-  throw new NoNiceListenerException("" + this.getClass().getName() + "is no instance of NVetoableChangeListener", listener: this);
+  throw new NoNiceListenerException("" + this.getClass().getName() + "is no instance of NiceVetoableChangeListener", listener: this);
 }
 
-//JDK1.4  NExceptionListener toNiceExceptionListener(EventListener);
-//JDK1.4  toNiceExceptionListener(this@NExceptionListener) = this;
+//JDK1.4  NiceExceptionListener toNiceExceptionListener(EventListener);
+//JDK1.4  toNiceExceptionListener(this@NiceExceptionListener) = this;
 //JDK1.4  toNiceExceptionListener(this)
 //JDK1.4  { 
-//JDK1.4    throw new NoNiceListenerException("" + this.getClass().getName() + "is no instance of NExceptionListener", listener: this);
+//JDK1.4    throw new NoNiceListenerException("" + this.getClass().getName() + "is no instance of NiceExceptionListener", listener: this);
 //JDK1.4  }

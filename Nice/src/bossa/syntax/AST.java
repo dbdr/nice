@@ -29,7 +29,9 @@ public class AST extends Node
   public AST(Module module, List defs)
   {
     super(defs,Node.global);
-    
+    if (children == null)
+      children = new LinkedList();
+
     this.module = module;
     findClasses();
   }
@@ -63,9 +65,6 @@ public class AST extends Node
 
   public void resolveScoping()
   {
-    if (children == null)
-      return;
-
     Location.setCurrentFile(module.toString());
     Location.current = Location.nowhere();
 

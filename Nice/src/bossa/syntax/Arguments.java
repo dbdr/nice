@@ -252,7 +252,7 @@ public class Arguments
       if (arguments[i].name != null)
       { 
 	String s = arguments[i].name.toString();
-	if (!parameters.hasMatchFor(s))
+	if (parameters == null || !parameters.hasMatchFor(s))
 	  res.add(s);
       }
 

@@ -16,6 +16,7 @@ import bossa.util.*;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.LinkedList;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -456,7 +457,7 @@ public class FormalParameters extends Node
   
   public boolean hasMatchFor(String s)
   {
-    for (int i = 0; i<parameters.length; i++)
+    for (int i = 0; i<size; i++)
       if (parameters[i].match(s))
 	return true;
 
@@ -474,13 +475,16 @@ public class FormalParameters extends Node
 
   public Iterator iterator()
   {
-    return Arrays.asList(parameters).iterator();
+    if (parameters != null)
+      return Arrays.asList(parameters).iterator();
+   
+    return new ArrayList().iterator();
   }
 
   public List getNamedParameters()
   {
     LinkedList res = new LinkedList();
-    for(int i = 0; i < parameters.length; i++) 
+    for(int i = 0; i < size; i++) 
       {
         Parameter param = parameters[i];
         if (param instanceof NamedParameter)
@@ -494,7 +498,7 @@ public class FormalParameters extends Node
   public List getRequiredParameters()
   {
     LinkedList res = new LinkedList();
-    for(int i = 0; i < parameters.length; i++) 
+    for(int i = 0; i < size; i++) 
       {
         Parameter param = parameters[i];
         if (!(param instanceof OptionalParameter))

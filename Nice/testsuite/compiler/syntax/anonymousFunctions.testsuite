@@ -19,3 +19,5 @@
   r.foreach(char c => if (! Character.isLetter(c)) assert false);
   r.foreach(char c => if (! Character.isLetter(c)) throw new Error());
 
+/// PASS
+  ?(int -> int) f = null;

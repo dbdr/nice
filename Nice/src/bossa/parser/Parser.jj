@@ -704,26 +704,6 @@ Monotype monotypeConstructor():
     }
 }
 
-// When we remove this, remove the LOOKAHEAD(1) before funExp()
-FunType OLDfunmonotype():
-{
-    Monotype codom=null;
-    List dom=null;
-    Constraint cst;
-    Token t;
-}
-{
-    t="fun" "(" [ dom=monotypes() ] ")" 
-    "(" [ codom=monotype() ] ")"
-    { 
-      if (codom == null) codom = PrimitiveType.synVoidType;
-      FunType res = new FunType(dom, codom);
-      System.out.println(new Location(t).toString() + ": This syntax is deprecated. You should use:");
-      System.out.println(res.toString());
-      return res; 
-    }
-}
-
 Monotype funOrTupleMonotype():
 {
   Monotype codomain;
@@ -768,7 +748,7 @@ Monotype monotype():
   "->"
   { Monotype codomain; } codomain = monotype()
   { res = new FunType(new Monotype[]{ res }, codomain); 
-    res.nullness = maybe ? res.maybe : res.sure; }
+    res.nullness = maybe ? res.maybe : res.absent; }
 ]
 
   { return res; }
@@ -821,9 +801,6 @@ Monotype simpleMonotype():
   [ "?" { maybe = true; } | "!" { sure = true; } ]
 
   (
-  res=OLDfunmonotype()
-  { res.nullness = res.absent; }
-|
   res=funOrTupleMonotype()
 |
   start="alike" [ "<" p=monotypes() ">" ]
@@ -1772,7 +1749,7 @@ Expression Expression() :
 {
   { first=getToken(1); }
 
-  ( LOOKAHEAD(1) /* remove this lookahead when OLDfunmonotype(): is removed */
+  ( 
     e1=funExp() 
   | LOOKAHEAD(monoSymbol() "=>") e1=simpleVarFunExp() 
   | LOOKAHEAD("(" monoSymbols() ")" "=>") e1=multipleVarsFunExp() 

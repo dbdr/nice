@@ -54,12 +54,13 @@ class Content
   List getImports()
   {
     Content.Unit[] readers;
-    /* If the package is up to date, preferably load imports from 
+    /* 
+       If the package is up to date, preferably load imports from 
        the compiled package, since that involves touching only one file 
        instead of possiby several. 
     */
     if (source != null && 
-	(compiled == null || lastModification < lastCompilation))
+	(compiled == null || lastModification > lastCompilation))
       readers = source.getDefinitions();
     else
       readers = compiled.getDefinitions();

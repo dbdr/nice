@@ -108,7 +108,7 @@ typecheck(e@FunExp)
 
 typecheck(e@IdentExp)
 {
-  throw new InternalError("typecheck in IdentExp");
+  throw new Error("typecheck in IdentExp");
 }
 
 typecheck(e@IfExp)

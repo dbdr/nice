@@ -225,30 +225,17 @@ toString(s@List)
 }
 
 
-// We give two versions of put and get, working on Maps with
-// null and non-null element types.
-// This is purely for the convenience of the Map type declaration:
-// it does not really make sense to have a non-null type, 
-// as the lookup can always return null if the key is not present.
+/****************************************************************
+ * Maps
+ ****************************************************************/
 
-// The result can be null if the key is not present.
-<Any Key, Any Element> ?Element get(Map<Key, !Element>, Key) = 
-  native Object java.util.Map.get(Object);
-// This function does not overlap with the previous because Map
-// is non-variant (it would be unsafe to have Map covariant on Element).
-<Any Key, Any Element> ?Element get(Map<Key, ?Element>, Key) = 
-  native Object java.util.Map.get(Object);
-
-// Returns the previous value for that key, which may always be null
-<Any Key, Any Element> ?Element put(Map<Key, !Element>, Key, ?Element) = 
-  native Object java.util.Map.put(Object, Object);
-<Any Key, Any Element> ?Element put(Map<Key, ?Element>, Key, ?Element) = 
-  native Object java.util.Map.put(Object, Object);
-
-
-<Any Key, Any Element> boolean containsKey(Map<Key, !Element>, Key) = 
+<Key, Element> boolean containsKey(Map<Key, Element>, Key) = 
   native boolean java.util.Map.containsKey(Object);
-// This function does not overlap with the previous because Map
-// is non-variant (it would be unsafe to have Map covariant on Element).
-<Any Key, Any Element> boolean containsKey(Map<Key, ?Element>, Key) = 
-  native boolean java.util.Map.containsKey(Object);
+
+// The results can be null even if the value type is non-optional.
+<K, V0, V | V <: ?V0> ?V0 remove(java.util.Map<K, V>, K)=
+  native Object java.util.Map.remove(Object);
+<K, V0, V | V <: ?V0> ?V0 get(java.util.Map<K, V>, K)=
+  native Object java.util.Map.get(Object);
+<K, V0, V | V <: ?V0> ?V0 put(java.util.Map<K, V>, K, V)=
+  native Object java.util.Map.put(Object, Object);

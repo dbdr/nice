@@ -1,0 +1,6 @@
+/// PASS
+  int i;
+  do {
+    i = 1;
+  } while (false);
+  int j = i;

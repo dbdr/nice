@@ -617,7 +617,10 @@ analyse(s@ExpressionStmt, info)
 
 analyse(l@LoopStmt, info)
 {
-  info.beginInner();
+  // If the test comes before the body, then the body might not execute
+  // at all, so we must discard its information.
+  if (l.isTestFirst())
+    info.beginInner();
 
   if (l.isTestFirst() && l.whileExp != null)
     {
@@ -647,7 +650,8 @@ analyse(l@LoopStmt, info)
   if (! l.isTestFirst())
     l.whileExp = analyse(l.whileExp, info);
 
-  info.endInner();
+  if (l.isTestFirst())
+    info.endInner();
 
   if (l.isInfinite())
     info.setUnreachable();

@@ -35,7 +35,7 @@ import bossa.modules;
 
 main(args)
 {
-  Throwable uncaughtException = null;
+  ?Throwable uncaughtException = null;
   boolean memInfo = false;
 
   try{
@@ -156,13 +156,15 @@ main(args)
 
   if(uncaughtException != null)
     {
+      Throwable exn = notNull(uncaughtException);
+
       println
       ("\nAn exception has occured in the compiler\n" +
        "Please fill-in a bug report at the following webpage:\n" +
        "http://sourceforge.net/tracker/?func=add&group_id=12788&atid=112788" +
-       "\n\nException: " + uncaughtException.toString() +
+       "\n\nException: " + exn.toString() +
        "\n\nStack trace:\n");
-      uncaughtException.printStackTrace();
+      exn.printStackTrace();
       System.exit(1);
     }
   
@@ -209,7 +211,7 @@ prettyBytes(bytes)
 void printMemoryUsage();
 printMemoryUsage()
 {
-  Runtime r = Runtime.getRuntime();
+  Runtime r = getRuntime();
   r.gc();
   long mem = r.totalMemory();
   println("Memory allocated: " + prettyBytes(mem) + 

@@ -355,27 +355,21 @@ TOKEN:
 /***********************************************************************/
 
 String rawString():
-{
-  Token t;
-}
+{ Token t; }
 {
   t=<LSTRING>
   { return t.image.substring(1, t.image.length() - 1); }
 }
 
 LocatedString ident():
-{
-  Token t;
-}
+{ Token t; }
 {
   t=<IDENT> 
   { return new LocatedString(t.image, Location.make(t)); }
 }
 
 String unlocIdent():
-{
-  Token t;
-}
+{ Token t; }
 {
   t=<IDENT> 
   { return t.image; }
@@ -390,8 +384,7 @@ LocatedString identOrBackquoted():
   (
    name=<BACKQUOTEDSTRING>
    { res = new LocatedString(name.image.substring(1, name.image.length() - 1),
-			     Location.make(name),
-			     true); }
+			     Location.make(name), true); }
   |
    res = ident()
   )
@@ -402,9 +395,7 @@ LocatedString identOrBackquoted():
    which is useful to specify native java package, class or method names
 */
 Token doted_string_component():
-{
-  Token t;
-}
+{ Token t; }
 {
   ( t = <IDENT> 
   | t = "Any"
@@ -443,19 +434,15 @@ LocatedString fullyQualifiedName():
 {
   start = <IDENT>
   { t = start; image = new StringBuffer(t.image); }
-
   ( LOOKAHEAD(2) // needed to distinguish with ".class"
     "." t=doted_string_component() 
     { image.append(".").append(t.image); } 
   )+
-
   { return new LocatedString(image.toString(), Location.make(start, t)); }
 }
 
 LocatedString doted_array_string():
-{
-  LocatedString res;
-}
+{ LocatedString res; }
 {
   res=doted_string()
   ( "[]" { res.prepend("["); } )*
@@ -474,27 +461,21 @@ Collection strings():
 }
 
 LocatedString floatingLiteral():
-{
-  Token t;
-}
+{ Token t; }
 {
   t = <FLOATING_POINT_LITERAL> 
   { return new LocatedString(t.image, Location.make(t)); }
 }
 
 LocatedString integerLiteral():
-{
-  Token t;
-}
+{ Token t; }
 {
   t = <INTEGER_LITERAL> 
   { return new LocatedString(t.image, Location.make(t)); }
 }
 
 ConstantExp typeExpression():
-{
-  LocatedString name;
-}
+{ LocatedString name; }
 {
   name = doted_array_string()
   { return ConstantExp.makeType(name); }
@@ -505,46 +486,24 @@ ConstantExp typeExpression():
 /***********************************************************************/
 
 TypeIdent typeConstructorIdent():
-{
-  LocatedString name;
-}
+{ LocatedString name; }
 {
   name=doted_string()
   { return new TypeIdent(name); }
 }
 
 TypeConstructor typeConstructor():
-{
-  String name;
-}
+{ String name; }
 {
   name=unlocIdent()
   { return new TypeConstructor(name); }
 }
 
-List typeConstructors():
-{
-  List res;
-  TypeConstructor tc;
-}
-{
-  { res = new LinkedList(); }
-  tc = typeConstructor() { res.add(tc); }
-  ( "," 
-  tc = typeConstructor() { res.add(tc); }
-  )*
-  { return res; }
-}
-
 TypeIdent typeIdent():
-{
-  LocatedString name;
-}
+{ LocatedString name; }
 {
   name=doted_string()
-  { 
-    return new TypeIdent(name);
-  }
+  { return new TypeIdent(name); }
 }
 
 MonoSymbol monoSymbol():
@@ -556,19 +515,6 @@ MonoSymbol monoSymbol():
   type=monotype()
   name=ident()
   { return new MonoSymbol(name,type); }
-}
-
-List monoSymbols():
-{
-  List res=new ArrayList();
-  MonoSymbol name;
-}
-{
-  (
-    name=monoSymbol() { res.add(name); }
-    ( "," name=monoSymbol() { res.add(name); } )*
-  )?
-  { return res; }
 }
 
 /***********************************************************************/
@@ -612,61 +558,36 @@ List binders(Collection atomics):
 AtomicConstraint atomicConstraint():
 {
   Monotype m1,m2;  
-  TypeIdent t;
-  TypeIdent i;
+  TypeIdent t,i;
   AtomicConstraint res;
 }
 {
-(
-  LOOKAHEAD(2)
-  (
-   m1=monotype()
-   "<:"
-   m2=monotype()
+(  LOOKAHEAD(2)
+   m1=monotype() "<:" m2=monotype()
    { res=new MonotypeLeqCst(m1,m2); }
-  )
 |
-  (
-   t=typeConstructorIdent()
-   ":"
-   i=typeIdent()
+   t=typeConstructorIdent() ":" i=typeIdent()
    { res=new ImplementsCst(t,i); }
-  )
 )
   { return res; }
 }
 
 void atomics(List res):
 // if res is null, we just want lookahead
-{
-  AtomicConstraint k;
-}
+{ AtomicConstraint k; }
 {
   k=atomicConstraint() { if(res!=null) res.add(k); }
   ( "," k=atomicConstraint() { if(res!=null) res.add(k); } ) *
 }
 
-Constraint nonVoidConstraint():
-{
-  List b=null;
-  List atoms=new ArrayList();
-}
-{
-  "<" b=binders(atoms) [ "|" atomics(atoms) ] ">" 
-  { return new Constraint(b,atoms); }
-}
-
 Constraint constraint():
+{}
 {
-  Constraint res;
-}
-{
-  ( 
-    res = nonVoidConstraint()
-  |
-    { res = Constraint.True; }
-  )
-  { return res; }
+  [ { List b=null, atoms=new ArrayList(); }
+    "<" b=binders(atoms) [ "|" atomics(atoms) ] ">" 
+    { return new Constraint(b,atoms); }
+  ]
+  { return Constraint.True; }
 }
 
 /***********************************************************************/
@@ -676,9 +597,7 @@ Constraint constraint():
 //Monotypes
 
 MonotypeVar monotypeVar():
-{
-  String name;
-}
+{ String name; }
 {
   name=unlocIdent()
   { return new MonotypeVar(name); }
@@ -692,7 +611,6 @@ Monotype monotypeConstructor():
 }
 {
   { first=getToken(1); }
-
   // monotypeConstructors with no type parameters (and no "<" ">")
   // are parsed as MonotypeVars, not here.
   // This is fixed during scoping.
@@ -748,7 +666,7 @@ Monotype monotype():
 {
   res = simpleMonotype()
   res = arrayMonotype(res)
-  
+
 [ LOOKAHEAD(1)
   { boolean maybe = false; }
   [ "?" { maybe = true; } ]
@@ -764,7 +682,6 @@ Monotype monotype():
     res = new FunType(domain, codomain); 
     res.nullness = maybe ? res.maybe : res.absent; }
 ]
-
   { return res; }
 }
 
@@ -779,9 +696,7 @@ Monotype monotype():
      Array<?Array<T>>
 */
 Monotype arrayMonotype(Monotype res):
-{
-  Token end;
-}
+{ Token end; }
 {
 [ LOOKAHEAD(1)
   { boolean maybe = false; }
@@ -799,9 +714,7 @@ Monotype arrayMonotype(Monotype res):
     res.nullness = maybe ? res.maybe : res.absent;
   }
 ]
-
   { return res; }
-  
 }
 
 Monotype simpleMonotype():
@@ -828,7 +741,6 @@ Monotype simpleMonotype():
   res=typeIdent() 
   { res.nullness = res.absent; }
   )
-
   { 
     if ((maybe || sure) && 
         (res.nullness != res.absent))
@@ -839,7 +751,6 @@ Monotype simpleMonotype():
     else if (sure)
       res.nullness = res.sure;
   }
-
   { return res; }
 }
 
@@ -930,24 +841,16 @@ FormalParameters.Parameter formalParameter(List statements):
 
 FormalParameters formalParameters(boolean leaveRoomForThis, List statements):
 {
-  List params = null;
+  List params = new LinkedList();
   FormalParameters.Parameter p;
 }
 {
-  { 
-    if (leaveRoomForThis) 
-    {
-      params = new LinkedList();
-      params.add(null);
-    }
-  }
+  { if (leaveRoomForThis) params.add(null); }
   [
-    p = formalParameter(statements) 
-    { if (params ==null) params = new LinkedList(); 
-      params.add(p); }
+    p = formalParameter(statements) { params.add(p); }
     ( "," p = formalParameter(statements) { params.add(p); } )*
   ]
-  { return new FormalParameters(params); }
+  { return new FormalParameters(params.isEmpty() ? null : params ); }
 }
 
 MethodDeclaration internalMethodOrFunction(MethodContainer c):
@@ -980,18 +883,6 @@ TypeIdent superClass():
     // they should be checked
     [ "<" ident() ( "," ident() )* ">" ]
   { return name; }
-}
-
-List extensions():
-{
-  List res=new LinkedList();
-  TypeIdent name;
-}
-{
-  "extends" 
-        name=superClass() { res.add(name); }
-  ( "," name=superClass() { res.add(name); } )*
-  { return res; }
 }
 
 List interfaces():
@@ -1034,27 +925,20 @@ void getField(NiceClass c, List fields):
   { fields.add(c.makeField(field, value, isFinal, isTransient, isVolatile)); }
 }
 
-void classDefinitionLookahead():
-{}
-{ [ "public" | "private" ] 
-  ( "interface" | [ "final" | "abstract" ] "class") 
-}
-
 ClassDefinition classDefinition(List definitions):
 {
   ClassDefinition res;
   LocatedString name;
-  MethodContainer.Constraint parameters;
+  MethodContainer.Constraint parameters = null;
   List l;
   List typeParametersVariances = new ArrayList(0);
   List imp = null, abs = null;
 }
 {
-  [ "public" | "private" ]
 (
   "interface"
   name=ident() 
-  parameters=classTypeParameters(typeParametersVariances) 
+  [ parameters=classTypeParameters(typeParametersVariances) ]
   { List ext = null; }
   [ "extends" ext = interfaces() ]
   [ "implements" imp=interfaces() ]
@@ -1068,7 +952,7 @@ ClassDefinition classDefinition(List definitions):
   ]
   "class"
   name=ident() 
-  parameters=classTypeParameters(typeParametersVariances) 
+  [ parameters=classTypeParameters(typeParametersVariances) ]
 
   { TypeIdent sup = null; }
 
@@ -1082,7 +966,6 @@ ClassDefinition classDefinition(List definitions):
 	sup,imp,abs);
   }
 )
-
   ( 
    "{"
    { NiceClass impl = new NiceClass(res); }
@@ -1121,10 +1004,8 @@ ClassDefinition classDefinition(List definitions):
    ( { LocatedString javaName; }
      javaName=doted_string()
      { res.setImplementation(new JavaClass(res, javaName)); }
-   |
-     { res.setImplementation(new PrimitiveType(res)); }
-   )
-   ";"
+   | { res.setImplementation(new PrimitiveType(res)); }
+   ) ";"
   )
   { return res; } 
 }
@@ -1132,7 +1013,7 @@ ClassDefinition classDefinition(List definitions):
 AbstractInterface interfaceDefinition():
 {
   LocatedString name;
-  MethodContainer.Constraint parameters;
+  MethodContainer.Constraint parameters = null;
   List extensions=null;
   List typeParametersVariances = new ArrayList(0);
   AbstractInterface res;
@@ -1140,7 +1021,7 @@ AbstractInterface interfaceDefinition():
 {
   "abstract" "interface"
   name=ident()
-  parameters=classTypeParameters(typeParametersVariances)
+  [ parameters=classTypeParameters(typeParametersVariances) ]
   [ "extends" extensions=interfaces() ]
   "{"
   { res = new AbstractInterface(name,parameters,typeParametersVariances,
@@ -1163,33 +1044,27 @@ AbstractInterfaceImplementation abstractInterfaceImplementation():
 {
   "class" className=fullyQualifiedName()
   [ "finally" { _finally = true; } ]
-  "implements" interfaceName=ident()
-  ";"
+  "implements" interfaceName=ident() ";"
   { return new AbstractInterfaceImplementation(className, interfaceName, _finally); }
 }
 
 
 MethodContainer.Constraint classTypeParameters(List tags):
-{}
 {
-  [
-    {
-      List binders = new ArrayList(3);
-      List atoms = new ArrayList(3);
-      MonotypeVar var;
-    }
-
-    "<" 
-    var=taggedMonotypeVar(tags, atoms) { binders.add(var); }
-    ( "," var=taggedMonotypeVar(tags, atoms) { binders.add(var); } )*
-    [ "|" atomics(atoms) ]
-    ">" 
-    { 
-      MonotypeVar[] b = (MonotypeVar[]) binders.toArray(new MonotypeVar[binders.size()]);
-      return new MethodContainer.Constraint(b, atoms); 
-    }
-  ]
-  { return null; }
+  List binders = new ArrayList(3);
+  List atoms = new ArrayList(3);
+  MonotypeVar var;
+}
+{
+  "<" 
+  var=taggedMonotypeVar(tags, atoms) { binders.add(var); }
+  ( "," var=taggedMonotypeVar(tags, atoms) { binders.add(var); } )*
+  [ "|" atomics(atoms) ]
+  ">" 
+  { 
+    MonotypeVar[] b = (MonotypeVar[]) binders.toArray(new MonotypeVar[binders.size()]);
+    return new MethodContainer.Constraint(b, atoms); 
+  }
 }
 
 MonotypeVar taggedMonotypeVar(List tags, List atoms):
@@ -1207,11 +1082,9 @@ MonotypeVar taggedMonotypeVar(List tags, List atoms):
   | "-" { tags.add(Boolean.FALSE); }
   |     { tags.add(null); }
   )
-
   [ "!" { sure = true; } ]
 
   mv = monotypeVar()
-
   { 
     if (bound != null)
       {
@@ -1219,8 +1092,7 @@ MonotypeVar taggedMonotypeVar(List tags, List atoms):
         atoms.add(new MonotypeLeqCst(Monotype.createVar(mv), bound)); 
       }
 
-    if (sure)
-      atoms.add(AtomicConstraint.sureTypeVar(mv));
+    if (sure) atoms.add(AtomicConstraint.sureTypeVar(mv));
 
     return mv;
   }
@@ -1232,9 +1104,7 @@ EnumDefinition enumDefinition():
   List elements = new LinkedList();
 }
 {
-  [ "public" | "private" ]
-  "enum"
-  name=ident()
+  "enum" name=ident()
   "{" elem=ident() { elements.add(elem); }
    ( "," elem =ident() { elements.add(elem); } )+
   "}"
@@ -1260,11 +1130,8 @@ Pattern pattern():
   ( 
     val=patternLiteral() { loc = val.location(); }
   |
-    (
-      "@" tc=typeIdent() { loc = tc.location(); }
-    |
-      "#" tc=typeIdent() { exactlyAt = true; loc = tc.location(); }
-    )
+    ( "@" | "#" { exactlyAt = true; } ) 
+    tc=typeIdent() { loc = tc.location(); }
   |
     name=ident()
     (
@@ -1285,10 +1152,7 @@ Pattern pattern():
       | "<" {kind = Pattern.LT;}
       | "<=" {kind = Pattern.LE;}
       )
-      ( "-" val=intConstantExp() 
-        { val = ConstantExp.makeNumber(
-           new LocatedString("-"+val.toString(), val.location()));
-        }
+      ( val=negativeIntConstantExp()
       | val=intConstantExp() 
       | refName=ident()
       )
@@ -1310,9 +1174,7 @@ void methodBodyDefinitionLookahead():
 }
 
 Statement code():
-{
-  Statement code;
-}
+{ Statement code; }
 {
   ( 
     // A true body
@@ -1366,10 +1228,9 @@ MethodBodyDefinition methodBodyDefinition(NiceClass container):
     ]
 
     "("
-    ( 
-	p=pattern() { parameters.add(p); }
-	( "," p=pattern() { parameters.add(p); } )*
-    )?
+    [ p=pattern() { parameters.add(p); }
+      ( "," p=pattern() { parameters.add(p); } )*
+    ]
     ")"
     body = code()
     { return new MethodBodyDefinition(container,name,binders,
@@ -1386,7 +1247,6 @@ MethodDeclaration methodDeclaration():
     List statements = new LinkedList();
 }
 {
-  [ "public" | "private" ]
   cst=constraint()
     returnType=monotype()
     name=identOrBackquoted()
@@ -1460,7 +1320,6 @@ MethodDeclaration nativeMethodDeclaration(LocatedString name,
   ")"  
   ";"
 )
-
   { 
     if(isNew)
       {
@@ -1493,7 +1352,6 @@ Definition globalVariable():
   boolean constant;
 }
 {
-  [ "public" | "private" ]
   (
     "var" {constant = false;} 
     t=monotype() name=ident() 
@@ -1523,76 +1381,71 @@ Contract contract() :
   Expression condition, name;
 }
 {
-  [ "requires" 
-    { res = new Contract(); }
-
-      condition = SideEffectFreeExpression() 
-      ( ":" name = SideEffectFreeExpression() 
-        { res.addRequire(condition, name); }
-      | { res.addRequire(condition); } )
-
-    ( "," [ // Trailing "," allowed for easy reordering, removal of last line..
-      condition = SideEffectFreeExpression() 
-      ( ":" name = SideEffectFreeExpression() 
-        { res.addRequire(condition, name); }
-      | { res.addRequire(condition); } )
-    ] )*
+  [ "requires" { res = new Contract(); }
+    contractElements(res, true)
   ]
   [ "ensures" { if (res == Contract.noContract) res = new Contract(); }
-
-      condition = SideEffectFreeExpression() 
-      ( ":" name = SideEffectFreeExpression() 
-        { res.addEnsure(condition, name); }
-      | { res.addEnsure(condition); } )
-
-    ( "," [ // Trailing "," allowed for easy reordering, removal of last line..
-      condition = SideEffectFreeExpression() 
-      ( ":" name = SideEffectFreeExpression() 
-        { res.addEnsure(condition, name); }
-      | { res.addEnsure(condition); } )
-    ] )*
+    contractElements(res, false)
   ]
   { return res; }
 }
 
-Definition definition(List definitions):
+void contractElements(Contract contract, boolean precond) :
+{}
 {
-    Definition res;
+  contractElement(contract, precond)
+  ( "," [ // Trailing "," allowed for easy reordering, removal of last line..
+    contractElement(contract, precond)
+  ] )*
+}
+
+void contractElement(Contract contract, boolean precond) :
+{
+  Expression condition, name=null;
 }
 {
+  condition = SideEffectFreeExpression() 
+  [ ":" name = SideEffectFreeExpression() ]
+  { if (precond)
+      if (name == null)	contract.addRequire(condition);
+      else contract.addRequire(condition, name);
+    else
+      if (name == null)	contract.addEnsure(condition);
+      else contract.addEnsure(condition, name);
+  }
+}
+
+
+Definition definition(List definitions):
+{ Definition res; }
+{
   (
-    LOOKAHEAD(2)
-    res=globalVariable()
-  | 
-    LOOKAHEAD(2)
-    res=enumDefinition()
-  |  
     LOOKAHEAD ( "abstract" "interface" )
     res=interfaceDefinition()
   |
     LOOKAHEAD( "class" fullyQualifiedName() )
     res=abstractInterfaceImplementation()
   | 
-    LOOKAHEAD ( classDefinitionLookahead() )
-    res=classDefinition(definitions)
-  | 
     LOOKAHEAD( methodBodyDefinitionLookahead() )
     res=methodBodyDefinition(null)
   |
-    res=methodDeclaration()
+    [ "public" | "private" ]
+    ( res=globalVariable()
+    | res=enumDefinition()
+    | res=classDefinition(definitions)
+    | res=methodDeclaration()
+    )
   )
   { return res; }
 }
 
 void readDefinitions(List definitions):
 {
-    Definition d;
-    globalDefinitions = definitions;
+  Definition d;
+  globalDefinitions = definitions;
 }
 {
-  ( 
-   d = definition(definitions) { definitions.add(d); } 
-  )*
+  ( d = definition(definitions) { definitions.add(d); } )*
   <EOF> 
 }
 
@@ -1602,36 +1455,37 @@ void readDefinitions(List definitions):
 /***********************************************************************/
 
 ConstantExp booleanConstantExp():
-{
-  Token t;
-}
+{ Token t; }
 {
   t = "true"  { return ConstantExp.makeBoolean(true,  Location.make(t)); }
 | t = "false" { return ConstantExp.makeBoolean(false, Location.make(t)); }
 }
 
 ConstantExp intConstantExp():
-{
-  LocatedString representation;
-}
+{ LocatedString representation; }
 {
   representation=integerLiteral()
   { return ConstantExp.makeNumber(representation); }
 }
 
-ConstantExp floatConstantExp():
-{
-  LocatedString representation;
+ConstantExp negativeIntConstantExp():
+{ LocatedString representation; }
+{ 
+  "-" representation=integerLiteral()
+    { return ConstantExp.makeNumber(
+         new LocatedString("-"+representation.toString(), representation.location()));
+  }
 }
+
+ConstantExp floatConstantExp():
+{ LocatedString representation; }
 {
   representation=floatingLiteral()
   { return ConstantExp.makeFloating(representation); }
 }
 
 ConstantExp charConstantExp():
-{
-  Token t;
-}
+{ Token t; }
 {
   t = <CHARACTER_LITERAL> 
   { return ConstantExp.makeChar
@@ -1641,18 +1495,14 @@ ConstantExp charConstantExp():
 }
 
 StringConstantExp stringConstantExp():
-{
-  String s;
-}
+{ String s; }
 {
   s=rawString()
   { return new StringConstantExp(s); }
 }
 
 IdentExp identExp():
-{
-  LocatedString i;
-}
+{ LocatedString i; }
 {
   i=identOrBackquoted()
   { return new IdentExp(i); }
@@ -1665,8 +1515,7 @@ Expression newExp():
   Expression e;
 }
 {
-  t="new" 
-  classe=typeConstructorIdent()
+  t="new" classe=typeConstructorIdent()
   ( 
     { Arguments arguments; }
     arguments = arguments(false)
@@ -1766,19 +1615,13 @@ FunExp funExp():
 
 /** A statement not terminated by a ";" if applicable. */
 Statement RootShortStatement() :
+{ Statement res; }
 {
-  Statement res;
-}
-{
-  (
-  res = Block()
-|
-  res = ShortIfStatement()
-|
-  res = ShortAssertStatement()
-|
-  res = ShortThrowStatement()
-  )
+( res = Block()
+| res = ShortIfStatement()
+| res = ShortAssertStatement()
+| res = ShortThrowStatement()
+)
   { return res; }
 }
 
@@ -1787,11 +1630,9 @@ Statement ShortStatement() :
   Statement res;
 }
 {
-  (
-  res = RootShortStatement()
-|
-  res = StatementExpression()
-  )
+(  res = RootShortStatement()
+|  res = StatementExpression()
+)
   { return res; }
 }
 
@@ -1804,7 +1645,6 @@ Expression tupleExp():
 {
   // A tuple must have at least two elements (thus a ",")
   // which avoids ambiguity with expression grouping thru "(" ")"
-
   "(" { exps = new LinkedList(); }
   e=Expression() 
 
@@ -1814,10 +1654,7 @@ Expression tupleExp():
     ")" { return e; }
   |
     { exps.add(e); }
-    "," e=Expression() { exps.add(e); }
-    (
-      "," e=Expression() { exps.add(e); }
-    )*
+    ( "," e=Expression() { exps.add(e); } )+
     ")"
     { return new TupleExp(exps); }
   )
@@ -1833,14 +1670,12 @@ Expression arrayLiteralExp():
   "[]" { return new LiteralArrayExp(null); }
 |
   "[" { exps = new LinkedList(); }
-  
   [
     e=Expression() { exps.add(e); }
     (
       "," e=Expression() { exps.add(e); }
     )*
   ]
-
   "]"
   { return new LiteralArrayExp(exps); }
 }
@@ -1850,15 +1685,11 @@ Expression arrayLiteralExp():
  ****************************************************************/
 
 LocatedString readImports(List imports, Collection opens):
-{
-  LocatedString pkgName=null, name;
-}
+{ LocatedString pkgName=null, name; }
 {
   [ "package" pkgName=doted_string() ";" ]
-
   (
    "import" name=doted_string() 
-
    ( ".*" { opens.add(name.toString()); }
    |      { imports.add(name); }
    )
@@ -1868,11 +1699,9 @@ LocatedString readImports(List imports, Collection opens):
 }
 
 void readOpens():
-{
-}
+{}
 {
   [ "package" doted_string() ";" ]
-
   (
    "import" doted_string() [ ".*" ]
    ";"
@@ -2134,7 +1963,7 @@ Expression ExponentialExpression() :
 Expression UnaryExpression() :
 { Expression res; Token t=null; }
 {
-  (
+(
   ( t="+" | t="-" ) res=PrimaryExpression() 
     { res=CallExp.create(symb(t),res); }
 |
@@ -2143,7 +1972,7 @@ Expression UnaryExpression() :
   res=PreDecrementExpression()
 |
   res=UnaryExpressionNotPlusMinus()
-  )
+)
   { return res; }
 }
 
@@ -2166,34 +1995,10 @@ Expression UnaryExpressionNotPlusMinus() :
 {
   ( t="~" | t="!" ) res=PrimaryExpression()
   { return CallExp.create(symb(t),res); }
-
-/*
-|
-  LOOKAHEAD( CastLookahead() )
-  CastExpression()
-*/
-
 |
   res=PostfixExpression()
   { return res; }
 }
-
-/*
-// This production is to determine lookahead only.  The LOOKAHEAD specifications
-// below are not used, but they are there just to indicate that we know about
-// this.
-Expression CastLookahead() :
-{ Expression res; }
-{
-  LOOKAHEAD(2)
-  "(" PrimitiveType()
-|
-  LOOKAHEAD("(" Name() "[")
-  "(" Name() "[" "]"
-|
-  "(" Name() ")" ( "~" | "!" | "(" | <IDENTIFIER> | "this" | "super" | "new" | Literal() )
-}
-*/
 
 Expression PostfixExpression() :
 { Expression res; Token t; }
@@ -2204,18 +2009,6 @@ Expression PostfixExpression() :
   ] 
   { return res; }
 }
-
-/*
-Expression CastExpression() :
-{ Expression res; }
-{
-  LOOKAHEAD("(" PrimitiveType())
-  "(" Type() ")" UnaryExpression()
-|
-  LOOKAHEAD("(" Name())
-  "(" Type() ")" UnaryExpressionNotPlusMinus()
-}
-*/
 
 Expression PrimaryExpression() :
 { Expression res; }
@@ -2230,25 +2023,16 @@ Expression PrimaryPrefix() :
 {
 (
   res=Literal()
-
-/*
-|
-  "this"
-*/
-
 |
   "super" 
   { res = new SuperExp(); }
-
 |
   // This includes the case "(" Expression() ")" to avoid lookahead
   res=tupleExp()
 |
   res=arrayLiteralExp() 
 |
-  //AllocationExpression()
   res=newExp()
-
 |
   LOOKAHEAD( doted_array_string() "." "class" )
   { ConstantExp type; Token t; }
@@ -2257,7 +2041,6 @@ Expression PrimaryPrefix() :
 |
   //Name()
   res=identExp()
-
 )
   { return res; }
 }
@@ -2268,20 +2051,9 @@ Expression PrimarySuffix(Expression start) :
   Arguments args = null;
 }
 {
-
-/*
-  LOOKAHEAD(2)
-  "." "this"
-|
-  LOOKAHEAD(2)
-  "." AllocationExpression()
-|
-*/
-
   { Token t; }
   t="[" res=Expression() "]"
   { return CallExp.create(symb("get",t,false),start,res); }
-
 |
   "." res=identExp()
   [ LOOKAHEAD(1) // a.f(x) is parsed as f(a, x), not as (f(a))(x)
@@ -2299,7 +2071,6 @@ Expression PrimarySuffix(Expression start) :
       args.addReceiver(start);
     return new CallExp(res, args, true, hasBrackets); 
   }
-
 |
   args = arguments(false)
   { return new CallExp(start, args); }
@@ -2311,14 +2082,13 @@ Expression Literal() :
   Token t;
 }
 {
-  (
-  "null" { res = NullExp.instance; }
+( "null" { res = NullExp.instance; }
 | res=booleanConstantExp()
 | res=intConstantExp() 
 | res=floatConstantExp()
 | res=charConstantExp()
 | res=stringConstantExp()
-  )
+)
 { return res; }
 }
 
@@ -2329,17 +2099,13 @@ ConstantExp patternLiteral() :
   Token t;
 }
 {
-  (
-  "null" { res = NullExp.instance; }
-| "-" res=intConstantExp() 
-  { res = ConstantExp.makeNumber(
-         new LocatedString("-"+res.toString(), res.location()));
-  }
+( "null" { res = NullExp.instance; }
+| res=negativeIntConstantExp()
 | res=intConstantExp() 
 | res=charConstantExp()
 | res=booleanConstantExp()
 | res=stringConstantExp()
-  )
+)
 { return res; }
 }
 
@@ -2371,92 +2137,33 @@ Arguments arguments(boolean leaveRoomForReceiver):
 }
 
 /*
-void AllocationExpression() :
-{}
-{
-  LOOKAHEAD(2)
-  "new" PrimitiveType() ArrayDimsAndInits()
-|
-  "new" Name()
-    (
-      ArrayDimsAndInits()
-    |
-      Arguments() [ ClassBody() ]
-    )
-}
-*/
-
-/*
- * The second LOOKAHEAD specification below is to parse to PrimarySuffix
- * if there is an expression between the "[...]".
- */
-/*
-void ArrayDimsAndInits() :
-{}
-{
-  LOOKAHEAD(2)
-  ( LOOKAHEAD(2) "[" Expression() "]" )+ ( LOOKAHEAD(2) "[" "]" )*
-|
-  ( "[" "]" )+ ArrayInitializer()
-}
-*/
-
-
-
-
-/*
  * Statement syntax follows.
  */
 
 Statement Statement() :
-{ Token first, last; Statement res; }
+{ Token first; Statement res; }
 {
   { first = getToken(1); }
-  (
+( 
   LOOKAHEAD(2)
   res=LabeledStatement()
-|
-  res=Block()
-|
-  res=EmptyStatement()
-|
-  res=StatementExpression() ";"
-
-/*
-|
-  res=SwitchStatement()
-*/
-
-|
-  res=IfStatement()
-|
-  res=WhileStatement()
-|
-  res=DoStatement()
-|
-  res=ForStatement()
-|
-  res=BreakStatement()
-|
-  res=ContinueStatement()
-|
-  res=ReturnStatement()
-|
-  res=ThrowStatement()
-|
-  res=TryStatement()
-|
-  res=AssertStatement()
-
-|
-  res=SynchronizedStatement()
-  )
+| res=Block()
+| res=EmptyStatement()
+| res=StatementExpression() ";"
+| res=IfStatement()
+| res=WhileStatement()
+| res=DoStatement()
+| res=ForStatement()
+| res=BreakStatement()
+| res=ContinueStatement()
+| res=ReturnStatement()
+| res=ShortThrowStatement() ";"
+| res=TryStatement()
+| res=ShortAssertStatement() ";"
+| res=SynchronizedStatement()
+)
   { 
-    if (res != null)
-      {
-        last = getToken(0);
-        res.setLocation(Location.make(first, last));
-      }
+    res.setLocation(Location.make(first, getToken(0)));
     return res; 
   }
 }
@@ -2513,11 +2220,7 @@ Statement BlockStatement(List statements) :
   res=LocalTupleDeclaration(statements)
 |
   res=Statement()
-/*
-|
-  UnmodifiedClassDeclaration()
-*/
-  )
+)
   { return res; }
 }
 
@@ -2578,24 +2281,22 @@ Statement LocalFunctionDeclaration() :
   List statements = new LinkedList();
 }
 {
-  (  
-    (
-      (t="final" | t="const")
-        {User.warning(Location.make(t),
-		"'"+t.toString()+"' is deprecated. Use 'let' instead.");
-        }
-    | "let"
-    | "var" {constant = false;}
-    | {constant = false;}
-    )
-    type = monotype()
-    id=ident()
-    "(" parameters=formalParameters(false, statements) ")" 
-    body=code() { statements.add(body); } 
-    { return Block.LocalFunction.make(id, type, parameters, body!=null?new Block(statements):null); }
+  (
+    (t="final" | t="const")
+      {User.warning(Location.make(t),
+	"'"+t.toString()+"' is deprecated. Use 'let' instead.");
+      }
+  | "let"
+  | "var" {constant = false;}
+  | {constant = false;}
   )
-}
+  type = monotype()
+  id=ident()
+  "(" parameters=formalParameters(false, statements) ")" 
+  body=code() { statements.add(body); } 
+  { return Block.LocalFunction.make(id, type, parameters, body!=null?new Block(statements):null); }
 
+}
 
 Statement LocalTupleDeclaration(List statements) :
 {
@@ -2643,7 +2344,6 @@ void LocalTupleDeclarationLookahead() : {}
     The important part is to accept all legal tokens, and to
     correctly parse "(" and ")", so we know the end of the tuple.
   */
-
   "(" NestedMonoSymbols() ")" "="
 }
 
@@ -2678,8 +2378,6 @@ void LocalTupleExpContent() : { }
 )* 
 }
 
-
-
 Statement EmptyStatement() :
 { Token t; }
 {
@@ -2695,7 +2393,7 @@ Statement StatementExpression() :
 { Expression e1; Token first, last; }
 {
   { first = getToken(1); }
-  (
+(
   e1=PreIncrementExpression()
 |
   e1=PreDecrementExpression()
@@ -2718,30 +2416,13 @@ Statement StatementExpression() :
       e1=AssignExp.create(e1,e2);
     }
   ]
-  )
+)
   {
     last = getToken(0);
     e1.setLocation(Location.make(first, last));
     return new ExpressionStmt(e1); 
   }
 }
-
-/*
-Statement SwitchStatement() :
-{ Statement res; }
-{
-  "switch" "(" Expression() ")" "{"
-    ( SwitchLabel() ( BlockStatement() )* )*
-  "}"
-}
-
-void SwitchLabel() :
-{
-  "case" Expression() ":"
-|
-  "default" ":"
-}
-*/
 
 Statement IfStatement() :
 /*
@@ -2881,13 +2562,6 @@ Statement ShortThrowStatement() :
   { return new ExpressionStmt(CallExp.create(symb(t),e)); }
 }
 
-Statement ThrowStatement() :
-{ Statement res; }
-{
-  res = ShortThrowStatement() ";"
-  { return res; }
-}
-
 Statement TryStatement() :
 /*
  * Semantic check required here to make sure that at least one
@@ -2922,14 +2596,6 @@ Statement ShortAssertStatement() :
     { call = CallExp.create(symb(t), condition); }
   )
   { return new ExpressionStmt(call); }
-}
-
-Statement AssertStatement() :
-{ Statement res; }
-{
-  res = ShortAssertStatement()
-  ";"
-  { return res; }
 }
 
 Statement SynchronizedStatement() :

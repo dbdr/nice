@@ -354,23 +354,6 @@ public <TreeExpansionListenerHandler H> void addTreeExpansionListener
 }
 
    
-public <TreeModelListenerHandler H> void addTreeModelListener
-  (H this,
-   TreeModelEvent ?-> void treeNodesChanged = null,
-   TreeModelEvent ?-> void treeNodesInserted = null,
-   TreeModelEvent ?-> void treeNodesRemoved = null,
-   TreeModelEvent ?-> void treeStructureChanged = null
-   )
-{
-	this.addNiceTreeModelListener
-	  (new NiceTreeModelListener
-  	  (treeNodesChanged: treeNodesChanged,
-  	   treeNodesInserted: treeNodesInserted,
-  	   treeNodesRemoved: treeNodesRemoved,
-  	   treeStructureChanged: treeStructureChanged
-  	   ));
-}
-
 public <TreeWillExpandListenerHandler H> void addTreeWillExpandListener
   (H this,  
    TreeExpansionEvent ?-> void treeWillExpand = null,

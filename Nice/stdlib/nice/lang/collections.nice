@@ -84,6 +84,15 @@ import java.util.*;
   return res;
 }
 
+<T> T foldLeft(List<T> list, (T,T)->T func)
+{
+  Iterator<T> iter = list.iterator();
+  T res = iter.next();
+  while(iter.hasNext())
+    res = func(res, iter.next());
+  return res;
+}
+
 <T, U> U foldRight(List<T> list, (T, U)->U func, U init) =
   foldRight(list, func, init, 0);
 
@@ -154,6 +163,9 @@ similarEmptyCollection(c#Vector) = new Vector(c.size());
 similarEmptyCollection(c#Stack) = new Stack();
 
 similarEmptyCollection(c#HashSet) = new HashSet(c.size());
+
+similarEmptyCollection(c#HashMap.Values) = new ArrayList(c.size());
+
 /****************************************************************
  * Sort
  ****************************************************************/
@@ -468,4 +480,26 @@ int min(List<int> list) requires !list.isEmpty()
 {
   for (Map.Entry<K,V> entry : map.entrySet())
     fun(entry.getKey(), entry.getValue());
+}
+
+<K,V> Map<K,V> listToMap(List<(K,V)> list) 
+{
+  let Map<K,V> map = new HashMap();
+  map.putAll(list);
+  return map;
+}
+
+<K,V> void putAll(Map<K,V> map, List<(K,V)> list)
+{
+  for((K,V) tup:list) {
+    (K key, V val) = tup;
+    map.put(key, val);
+  }  
+}
+
+<K,V> void removeAll(Map<K,V> map, List<K> list)
+{
+  for(K key:list) {
+    map.remove(key);
+  }  
 }

@@ -12,13 +12,16 @@
 
 // File    : Util.java
 // Created : Fri Jul 02 18:35:58 1999 by bonniot
-//$Modified: Fri Jun 09 19:12:38 2000 by Daniel Bonniot $
+//$Modified: Tue Jul 18 17:58:45 2000 by Daniel Bonniot $
 // Description : Usefull fonctions used everywhere
 
 package bossa.util;
 
 import java.util.*;
 
+/**
+   Set of useful static methods.
+*/
 public class Util
 {
   /****************************************************************

@@ -25,7 +25,7 @@ scratch: clean parser recompile
 jdoc:
 	${JAVADOC} -windowtitle "Nice" -doctitle "The Nice compiler source" \
 	-overview ${TOP}/src/overview.html \
-	-d ${TOP}/doc -private mlsub.typing mlsub.compilation bossa.syntax bossa.util gnu.bytecode gnu.expr gnu.math gnu.mapping kawa.standard kawa.lang
+	-d ${TOP}/doc -private mlsub.typing mlsub.compilation bossa bossa.syntax bossa.util bossa.link gnu.bytecode gnu.expr gnu.math gnu.mapping kawa.standard kawa.lang
 
 tags:
 	cd ${TOP}

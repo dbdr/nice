@@ -60,6 +60,10 @@ public final class Dispatch
     if(!(m instanceof NiceMethod))
       return;
     
+    // main does not have to be implemented if the module is not runnable
+    if (m.isMain() && !module.isRunnable())
+      return;
+    
     List alternatives = Alternative.listOfAlternative(m);
     
     if(alternatives==null)

@@ -85,6 +85,7 @@ public abstract class Debug
     codeGeneration 	= getBoolean("debug.codeGeneration",false),
     javaTypes		= getBoolean("debug.javaTypes",false),
     linkTests           = getBoolean("debug.linkTests",false),
+    skipLinkTests       = getBoolean("debug.skipLinkTests",false),
     passes		= getBoolean("debug.passes",false),
 
     alwaysDumpStack     = getBoolean("debug.alwaysDumpStack", false),

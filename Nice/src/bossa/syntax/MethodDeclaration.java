@@ -264,6 +264,14 @@ abstract public class MethodDeclaration extends Definition
    */
   public boolean isFieldAccess() { return false; }
 
+  /**
+     @return true if this method is the 'main' of the program
+  */
+  public final boolean isMain() 
+  {
+    return arity == 1 && "main".equals(name.content);
+  }
+  
   /****************************************************************
    * Module and unique name
    ****************************************************************/

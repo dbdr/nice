@@ -306,7 +306,10 @@ public class Package implements mlsub.compilation.Module, Located
     if (!sourcesRead)
       readAlternatives();
     
-    if (isRunnable())
+    if (!isRoot)
+      return;
+    
+    if (!Debug.skipLinkTests || isRunnable())
       {
 	if (Debug.passes)
 	  Debug.println(this + ": linking");

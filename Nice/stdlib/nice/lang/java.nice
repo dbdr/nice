@@ -24,6 +24,7 @@ package nice.lang;
 
 import java.text.*;
 import java.io.*;
+import java.lang.reflect.*;
 
 //               PACKAGE: java.lang
 
@@ -32,6 +33,11 @@ import java.io.*;
 Runtime getRuntime() = native Runtime Runtime.getRuntime();
 Process exec(Runtime, String[]) = native Process Runtime.exec(String[]);
 Class classForName(String name) = native Class Class.forName(String);
+Field[] getFields(Class) = native Field[] Class.getFields();
+Method[] getMethods(Class) = native Method[] Class.getMethods();
+<Any T, Any U> U get(Field, T) = native Object Field.get(Object);
+String getName(Field) = native String Field.getName();
+Class getType(Field) = native Class Field.getType();
 
 String concat(String, String) = native String String.concat(String);
 StringBuffer append(StringBuffer, ?String) = 

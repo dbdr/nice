@@ -5,6 +5,6 @@
   byte->String f = Byte.toString();
 
 /// PASS
-  // Static methods are not in the global score.
+  // Static methods are not in the global scope.
   byte->String f = Byte.toString;
-  String[] s = [1].map(toString);
+  String[] s = [1].map(int i => toString(i));

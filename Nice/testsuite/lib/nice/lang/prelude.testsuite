@@ -1,2 +1,2 @@
 /// PASS
-  assert [ 1 ].map(toString)[0].equals("1");
+  assert [ 1 ].map(int i => toString(i))[0].equals("1");

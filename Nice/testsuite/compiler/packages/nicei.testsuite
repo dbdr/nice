@@ -84,3 +84,10 @@
   }
   /// package b import a
   ;
+
+/// PASS
+  /// package a
+  /// toplevel
+    var int[][] arr = new int[10][10];
+  /// package b import a
+  ;

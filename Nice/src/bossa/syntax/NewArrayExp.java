@@ -172,7 +172,7 @@ public class NewArrayExp extends Expression
   public String toString()
   {
     StringBuffer res = new StringBuffer
-      ("new " + ident + Util.map("[", "]", "]", knownDimensions));
+      ("new " + ident + Util.map("[", "][", "]", knownDimensions));
 
     for(int i=0; i<unknownDimensions; i++)
       res.append("[]");

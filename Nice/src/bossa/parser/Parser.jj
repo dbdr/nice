@@ -92,13 +92,27 @@ PARSER_END(Parser)
 SKIP : { " " | "\t" | "\n" | "\r" | "\f" }
 
 /* COMMENTS */
-TOKEN_MGR_DECLS : { int nestingLevel = 0; }
+TOKEN_MGR_DECLS : { int nestingLevel = 0; Location commentStart = null; }
 
 MORE :
 {
-  <"/**" ~["/"]> { input_stream.backup(1); } : IN_FORMAL_COMMENT
+  <"/**" ~["/"]>
+  {
+    if (commentStart == null)
+      commentStart = Location.make
+        (input_stream.getBeginLine(), input_stream.getBeginColumn(),
+         input_stream.getEndLine(), input_stream.getEndColumn());
+    input_stream.backup(1);
+  } : IN_FORMAL_COMMENT
 |
-  "/*" {nestingLevel++; }: IN_MULTI_LINE_COMMENT
+  "/*"
+  {
+    if (commentStart == null)
+      commentStart = Location.make
+        (input_stream.getBeginLine(), input_stream.getBeginColumn(),
+         input_stream.getEndLine(), input_stream.getEndColumn());
+    nestingLevel++;
+  }: IN_MULTI_LINE_COMMENT
 }
 
 SPECIAL_TOKEN :
@@ -119,7 +133,7 @@ MORE :
 <IN_MULTI_LINE_COMMENT>
 SKIP :
 {
- "*/" { if (--nestingLevel == 0) SwitchTo(DEFAULT); }
+ "*/" { if (--nestingLevel == 0) { commentStart = null; SwitchTo(DEFAULT); } }
 }
 
 <IN_FORMAL_COMMENT,IN_MULTI_LINE_COMMENT>

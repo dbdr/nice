@@ -1,5 +1,8 @@
 /// FAIL
-  /* Untermintated comment!
+  /* /// FAIL HERE */ /* Untermintated comment!
+
+/// FAIL
+  /* /// FAIL HERE */ /** Untermintated doc comment!
 
 /// PASS
   {}

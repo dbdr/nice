@@ -75,10 +75,13 @@ public class JavaccParser implements bossa.modules.Parser
       catch(TokenMgrError e) {
 	String message = e.getMessage();
 	if (message.indexOf("<EOF>") != -1)
-	  message = "Unexpected end of file";
+          if (parser.token_source.commentStart != null)
+            User.error(parser.token_source.commentStart, "Unclosed comment");
+          else
+            message = "Unexpected end of file";
 	User.error(Location.nowhere(), message);
       }
-      }
+    }
     finally {
       chrono.stop();
     }

@@ -169,8 +169,6 @@ public abstract class Alternative
 
   public Pattern[] getPatterns() { return patterns; }
 
-  boolean visiting;
-  
   /****************************************************************
    * Regrouping alternatives per method
    ****************************************************************/

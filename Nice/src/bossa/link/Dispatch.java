@@ -352,21 +352,48 @@ public final class Dispatch
   private static List mergeNullCases(List tuples, int length)
   {
     LinkedList res = new LinkedList();
-
+    Set tupleSet = new TreeSet(tagComp);
     for (Iterator i = tuples.iterator(); i.hasNext();)
-      add(res, flatten((TypeConstructor[]) i.next(), length));
-
+    {
+      TypeConstructor[] tags = flatten((TypeConstructor[]) i.next(), length);
+      //add only non duplicate tags
+      if (tupleSet.add(tags))
+        res.add(tags);
+    }
     return res;
   }
 
-  private static void add(List tuples, TypeConstructor[] tags)
+  private static Comparator tagComp = new TagComparator();
+
+  private static class TagComparator implements Comparator 
   {
-    // FIXME
-    // This implementation creates duplicate tuples
+    public TagComparator(){}
+    
+    public int compare(Object o1, Object o2)
+    {
+      TypeConstructor[] tc1 = (TypeConstructor[])o1;
+      TypeConstructor[] tc2 = (TypeConstructor[])o2;
+      if (tc1 == null) return -1; //these cases does happen
+      if (tc2 == null) return 1;  //for some strange reason
 
-    tuples.add(tags);
+      for(int i = 0; i<tc1.length; i++)
+      {
+        if (tc1[i] == null) return -1;
+        if (tc2[i] == null) return 1;
+	int a = tc1[i].getId();
+        int b = tc2[i].getId();
+	if (a<b) return -1;
+	if (a>b) return 1;
+      }
+      return 0;
+    }
+
+    public boolean equals(Object obj)
+    { 
+      return false;
+    }
+
   }
-
   /** 
       Translates (nullTC, *) into nullTC and (sureTC, tc) into tc
 
@@ -377,7 +404,6 @@ public final class Dispatch
   private static TypeConstructor[] flatten(TypeConstructor[] tags, int length)
   {
     TypeConstructor[] res = new TypeConstructor[length];
-
     for (int i = length; --i >= 0 ;)
       if (tags[2 * i] == PrimitiveType.nullTC)
 	res[i] = PrimitiveType.nullTC;

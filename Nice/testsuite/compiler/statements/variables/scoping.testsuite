@@ -1,0 +1,13 @@
+/// FAIL
+  int x = 0;
+  if (x > 1) {
+    int /*/// FAIL HERE */ x = 1;
+    x++;
+  }
+
+/// FAIL bug
+  /// Toplevel
+void foo(int x) {
+  int /*/// FAIL HERE */ x = 2;
+  x++;
+}

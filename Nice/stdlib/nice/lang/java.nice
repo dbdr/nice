@@ -80,3 +80,8 @@ PrintStream stderr () = native System.err;
 // Serialization
 <Any T> void writeObject(ObjectOutputStream, T) = native void ObjectOutputStream.writeObject(Object);
 <Any T> T readObject(ObjectInputStream) = native Object ObjectInputStream.readObject();
+
+//               PACKAGE: java.util
+
+<Any T> Iterator<T> iterator(Collection<T>) = native Iterator Collection.iterator();
+<Any T> ListIterator<T> listIterator(Collection<T>) = native ListIterator List.listIterator();

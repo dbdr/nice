@@ -245,13 +245,8 @@ public class Package implements mlsub.compilation.Module, Located, bossa.syntax.
     ast.buildScope();
   }
   
-  private boolean loaded = false;
-
   public void load()
   {
-    if (loaded) return;
-    loaded = true;
-
     ast.resolveScoping();
     ast.createContext();
 

@@ -1,0 +1,59 @@
+package nice.ui.common;
+
+
+/**
+ * marker interfaces to specify different MappableListeners 
+ */
+
+interface MappablePropertyChangeListener extends MappableListener {} 
+interface MappableVetoableChangeListener extends MappableListener {} 
+
+
+/**
+ * marker interfaces to specify a ListenerKey 
+ */
+ 
+abstract interface PropertyChangeKey extends ListenerKey {}
+
+
+
+/**
+ * static HashMaps to store references to the added listeners
+ * used for classes that don't allow the getXxxListener operation
+ * this is done to provide that support nevertheless
+ */
+
+var Map<Object,?java.util.List<NPropertyChangeListener>> propertyChangeListeners = new HashMap();
+var Map<Object,?java.util.List<NVetoableChangeListener>> vetoableChangeListeners = new HashMap();
+
+var Map<(Object,String),?java.util.List<NPropertyChangeListener>> mappablePropertyChangeListeners = new HashMap();
+var Map<(Object,String),?java.util.List<NVetoableChangeListener>> mappableVetoableChangeListeners = new HashMap();
+
+
+
+/**
+ * abstract interfaces to qualify over classes being able to handle events as nice.ui.beans.NiceListenerHandler
+ */
+
+abstract interface PropertyChangeListenerHandler extends NiceListenerHandler {}
+abstract interface VetoableChangeListenerHandler extends NiceListenerHandler {}
+abstract interface MappablePropertyChangeListenerHandler extends MappableListenerHandler {}
+abstract interface MappableVetoableChangeListenerHandler extends MappableListenerHandler {}
+//JDK1.4  abstract interface ExceptionListenerHandler extends NiceListenerHandler {}
+
+
+/**
+ * existing java classes implement the defined abstract interfaces
+ */
+
+class java.lang.String implements PropertyChangeKey;
+
+class java.beans.PropertyEditorSupport implements PropertyChangeListenerHandler;
+class java.beans.PropertyChangeSupport implements PropertyChangeListenerHandler;
+class java.beans.VetoableChangeSupport implements VetoableChangeListenerHandler;
+class java.beans.PropertyChangeSupport implements MappablePropertyChangeListenerHandler;
+class java.beans.VetoableChangeSupport implements MappableVetoableChangeListenerHandler;
+class java.beans.beancontext.BeanContextChildSupport implements MappablePropertyChangeListenerHandler;
+class java.beans.beancontext.BeanContextChildSupport implements MappableVetoableChangeListenerHandler;
+//JDK1.4  class java.beans.XMLEncoder implements ExceptionListenerHandler;
+//JDK1.4  class java.beans.XMLDecoder implements ExceptionListenerHandler;

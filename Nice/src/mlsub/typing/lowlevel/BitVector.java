@@ -358,23 +358,9 @@ public class BitVector implements Cloneable, java.io.Serializable {
     if (bits2length < n) {
       n = bits2length;
     }
-
-    if (n<=1)
-    {
-       andW(0, ~(S1.getW(0) & S2.getW(0)) | S3.getW(0));
-    }
-    else
-    {
-      int bits3length = S3.length();
-      if (bits3length > n) {
-        bits3length = n;
-      }
-
-      for (int i = 0; i < bits3length; i++) 
-        bits1[i] &= ~(S1.bits1[i] & S2.bits1[i]) | S3.getW(i);
-
-      for (int i = bits3length; i < n; i++)       
-        bits1[i] &= ~(S1.bits1[i] & S2.bits1[i]);
+    int bits3length = S3.length();
+    for (int i = 0; i < n; i++) {
+      andW(i, ~(S1.getW(i) & S2.getW(i)) | (i < bits3length ? S3.getW(i) : 0L));
     }
   }
   
@@ -386,15 +372,11 @@ public class BitVector implements Cloneable, java.io.Serializable {
       return;
     }
     int setLength = set.nonZeroLength();
-    if (setLength > 1) {
-      ensureCapacity(bitIndex(setLength-1));
-      for (int i = setLength; i-- > 0 ;) {
-        bits1[i] |= set.bits1[i];
-      }
+    if (setLength > 0) {
+      ensureCapacity(bitIndex(setLength-1));// this might cause some problem...
     }
-    else
-    {
-      orW(0, set.getW(0));
+    for (int i = setLength; i-- > 0 ;) {
+      orW(i, set.getW(i));
     }
   }
 
@@ -440,14 +422,13 @@ public class BitVector implements Cloneable, java.io.Serializable {
   
   /*
    * If there are some trailing zeros, don't count them
-   * result is greater or equal to 1
    */
   private int nonZeroLength() {
     if (bits1 == null)
       return 1;
     
     int n = bits1.length;
-    while (n > 1 && bits1[n-1] == 0L) { n--; }
+    while (n > 0 && bits1[n-1] == 0L) { n--; }
     return n;
   }
 
@@ -538,16 +519,10 @@ public class BitVector implements Cloneable, java.io.Serializable {
       result.bits0 = bits0;
     else
       {
-	int n = nonZeroLength();
-	if (n <= 1)
-        {
-	  result.bits0 = bits1[0];
-	}
-	else
-	{
-	  result.bits1 = new long[n];
-	  System.arraycopy(bits1, 0, result.bits1, 0, n);
-	}
+	// optim: shrink to nonZeroLength()?
+	int n = length();
+	result.bits1 = new long[n];
+	System.arraycopy(bits1, 0, result.bits1, 0, n);
       }
     return result;
   }
@@ -615,15 +590,18 @@ public class BitVector implements Cloneable, java.io.Serializable {
   private 
   static /* XXX: work around Symantec JIT bug: comment static */
   int chunkLowestSetBit(long chunk) {
-    int bit = 0;
-    chunk &= -chunk; //fix sign bit
-    if ((chunk & 0xffffffff00000000L) != 0 )  bit += 32;
-    if ((chunk & 0xffff0000ffff0000L) != 0 )  bit += 16;
-    if ((chunk & 0xff00ff00ff00ff00L) != 0 )  bit += 8;
-    if ((chunk & 0xf0f0f0f0f0f0f0f0L) != 0 )  bit += 4;
-    if ((chunk & 0xccccccccccccccccL) != 0 )  bit += 2;
-    if ((chunk & 0xaaaaaaaaaaaaaaaaL) != 0 )  bit += 1;
-    return bit;
+    if (chunk == 0L) {
+      return 64;
+    } else {
+      int bit = 0;
+      if ((chunk & 0xffffffffL) == 0) { bit += 32; chunk >>>= 32; }
+      if ((chunk &     0xffffL) == 0) { bit += 16; chunk >>>= 16; }
+      if ((chunk &       0xffL) == 0) { bit +=  8; chunk >>>=  8; }
+      if ((chunk &        0xfL) == 0) { bit +=  4; chunk >>>=  4; }
+      if ((chunk &        0x3L) == 0) { bit +=  2; chunk >>>=  2; }
+      if ((chunk &        0x1L) == 0) { bit++; }
+      return bit;
+    }
   }
 
   final public static int UNDEFINED_INDEX = Integer.MIN_VALUE;
@@ -633,18 +611,11 @@ public class BitVector implements Cloneable, java.io.Serializable {
    * set is empty.
    **/
   final public int getLowestSetBit() {
-    if (bits1 == null)
-    {
-      if (bits0 != 0L)
-        return chunkLowestSetBit(bits0);
-    }	
-    else
-    {
-      int n = bits1.length;
-      for (int i = 0; i < n; i++) {
-        long chunk = bits1[i];
-        if (chunk != 0L)
-          return (i << BITS_PER_UNIT) + chunkLowestSetBit(chunk);
+    int n = length();
+    for (int i = 0; i < n; i++) {
+      long chunk = getW(i);
+      if (chunk != 0L) {
+        return (i << BITS_PER_UNIT) + chunkLowestSetBit(chunk);
       }
     }
     return UNDEFINED_INDEX;
@@ -686,7 +657,7 @@ public class BitVector implements Cloneable, java.io.Serializable {
         if (i >= n) {
           return UNDEFINED_INDEX;
         }
-        chunk = bits1[i];
+        chunk = getW(i);
       }
     }
   }
@@ -696,7 +667,12 @@ public class BitVector implements Cloneable, java.io.Serializable {
    * UNDEFINED_INDEX if there is none
    **/
   public int getNextBit(int i) {
-    return getLowestSetBit(i + 1);
+    int result = getLowestSetBit(i + 1);
+    if (result < 0) {
+      return UNDEFINED_INDEX;
+    } else {
+      return result;
+    }
   }
     
 
@@ -838,24 +814,14 @@ public class BitVector implements Cloneable, java.io.Serializable {
    **/
   final public void truncate(int newSize) {
     int i = subscript(newSize);
-    if (bits1 == null)
-    {
-      if (i == 0)
-	bits0 &= (1L << (newSize & MASK)) - 1;
-      return;
-    }
-    int bitsLength = nonZeroLength();
-    if (i < bitsLength)
+    int bitsLength = length();
+    if (i < bitsLength) {
       andW(i, (1L << (newSize & MASK)) - 1);
-
-    int newlength = Math.min(bitsLength, i+1);
-
-    if (newlength < bits1.length)
-    {
-      long[] newBits = new long[newlength];
-      System.arraycopy(bits1, 0, newBits, 0, newlength);
-      bits1 = newBits;
+      for (i++; i < bitsLength; i++) {
+        bits1[i] = 0L;
+      }
     }
+    // XXX: should shrink the vector to lower memory usage ?
   }
 
   /**

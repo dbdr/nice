@@ -392,8 +392,8 @@ on the type of the argument -- that is doing <i>pattern-matching</i>.</li>
 <li>
 <b>Tuples</b>. Tuples allow for grouping several values in a single expression,
 without the pain of creating a specific class. For instance, <tt>("String",
-2*3, x.toString())</tt> is a tuple (a triplet in that case). It's type
-is written <tt>&lt;String, int, String></tt>. Tuple types are covariant,
+2*3, x.toString())</tt> is a tuple (a triplet in that case). Its type
+is written <tt>(String, int, String)</tt>. Tuple types are covariant,
 so a couple of <tt>int</tt> can be used where a couple of <tt>long</tt>
 is expected. A funny feature is that swapping two variables can be done
 without a temporary variable, using tuples: <tt>(x, y) = (y, x)</tt>.</li>

@@ -3,9 +3,10 @@ package regtest.basic;
 class C1 {}
 class C2 extends C1 {}
 
-String name(C1);
+String name(?C1);
 name(c@C1) = "C1";
 name(c@C2) = "C2";
+name(@null) = "NULL class";
 
 void test_methods();
 test_methods()
@@ -14,10 +15,5 @@ test_methods()
   println(name(new C1()));
   println(name(new C2()));
   ?C1 c = null;
-  try{
-    println(name(notNull(c)));
-  }
-  catch(NullPointerException ex){
-    println("NULL class");
-  }
+  println(name(c));
 }

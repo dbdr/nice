@@ -15,7 +15,7 @@ compile()
 
 execute()
 {
-  (cd ..; nicer -el regtest/$1)
+  (cd ..; nicer -e regtest/$1)
 }
 
 ### Regression test suite

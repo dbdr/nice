@@ -6,6 +6,7 @@ JAVACC= CLASSPATH=${TOP}/external/JavaCC.zip:${CLASSPATH} java COM.sun.labs.java
 JAVADOC=javadoc #-linkoffline file:///C%7C/Apps/jdk1.2.1/docs/api file:///usr/opt/java122/docs/api
 
 NICEC= NICEJAR=${TOP}/stdlib nicec --classpath="${TOP}/stdlib:${TOP}/classes:${TOP}/src"
+NICEC_DEV= CLASSPATH=${TOP}/src/nice/tools/.compiler.jar:${TOP}/src:${TOP}/classes java -Dnice.systemJar=${TOP}/stdlib nice.tools.compiler.package --classpath="${TOP}/stdlib:${TOP}/classes:${TOP}/src"
 
 # run this first when you just checked out a fresh version
 first: parser bootstrap compiler jar
@@ -20,8 +21,9 @@ setDate:
 compiler: setDate
 	cd src; ${NICEC} -Rs nice.tools.compiler && cp -f nice/tools/compiler.jar nice/tools/.compiler.jar
 
-compiler-bootstrap: setDate nice-pass
-	cd src; CLASSPATH=${TOP}/src/nice/tools/.compiler.jar:${TOP}/src:${TOP}/classes java -Dnice.systemJar=${TOP}/stdlib nice.tools.compiler.package --classpath="${TOP}/stdlib:${TOP}/classes:${TOP}/src" -Rs nice.tools.compiler
+compiler-bootstrap: setDate
+	cd src; ${NICEC_DEV} -r bossa.syntax
+	cd src; ${NICEC_DEV} -Rs nice.tools.compiler
 
 test:
 	cd regtest; /usr/bin/time ./regtest

@@ -182,7 +182,7 @@ d + "\ndefined in:\n" +
   /** @return a string that uniquely represents this method */
   getFullName() = module.getName() + '.' + name + ':' + this.getType();
 
-  computeCode() = module.getDispatchMethod(this);
+  computeCode() = getDispatchMethod(this, module);
 
   getLambda() = nice.tools.code.Gen.dereference(this.getCode());
 
@@ -312,3 +312,69 @@ public Definition createMemberMethod
       return createMethodWithDefault
         (name, constraint, returnType, params, body, contract, isOverride);
   }
+
+public gnu.expr.Expression getDispatchMethod(NiceMethod def, Module module)
+{
+  String name = def.getName().toString();
+  gnu.expr.LambdaExp res;
+  gnu.bytecode.Type[] argTypes;
+  gnu.bytecode.Type retType;
+
+  /*
+    If this package is not recompiled,
+    we fetch the bytecode type information
+    from the previous dispatch class.
+    Benefits: we get the most precise bytecode type for methods,
+      as computed during the initial compilation.
+      This would not be the case if we recomputed it,
+      as the precise types are found during typechecking.
+  */
+  ?gnu.bytecode.Method meth = module.lookupDispatchClassMethod(name, "id", def.getFullName());
+  if (meth != null) // Reuse existing dispatch method header
+    {
+      // The dispatch code will have to be regenerated anyway
+      meth.eraseCode();
+
+      argTypes = notNull(meth.arg_types);
+      retType  = notNull(meth.return_type);
+      // Make sure we use the same bytecode name, since compiled code
+      // can rely on it.
+      name = meth.getName();
+    }
+  else // Get type information from the nice declaration
+    {
+      argTypes = def.javaArgTypes();
+      retType  = def.javaReturnType();
+    }
+
+  // Try to compile the dispatch method as a member method if possible.
+  ?NiceClass receiver;
+  if (argTypes.length == 0)
+    receiver = null;
+  else
+    {
+      receiver = NiceClass.get(def.getArgTypes()[0]);
+
+      // JVM interfaces cannot contain code.
+      if (receiver != null && receiver.isInterface())
+        receiver = null;
+
+      // Special treatment for serialization at the moment.
+      if (def.getArity() == 2 && 
+          (name.equals("writeObject")||name.equals("readObject")))
+        receiver = null;
+    }
+
+  res = nice.tools.code.Gen.createMethod
+    (name, argTypes, retType, def.getSymbols(), true, receiver != null);
+  res.parameterCopies = def.formalParameters().getParameterCopies();
+
+  // add unique information to disambiguate which method this represents
+  res.addBytecodeAttribute
+    (new gnu.bytecode.MiscAttr("id", def.getFullName().getBytes()));
+
+  if (receiver != null)
+    return receiver.addJavaMethod(res);
+  else
+    return module.addMethod(res, false);
+}

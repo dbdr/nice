@@ -1364,10 +1364,10 @@ Statement code():
   |
     // An expression
     { Expression exp; }
-    "=" 
-    ( "..." { return null; } // toplevel function in interface file
-    |
-    exp=Expression() ";" { code = bossa.syntax.dispatch.createReturnStmt(exp, /* fake */ true); }
+    "="
+    (
+      exp=Expression() ";"
+      { code = bossa.syntax.dispatch.createReturnStmt(exp, /* fake */ true); }
     |
       {Statement res;}
       (

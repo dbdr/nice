@@ -29,7 +29,6 @@ public abstract class Compilation extends CompilationInterface
 
   public String output;
   public boolean excludeRuntime;
-  public boolean strictJavaTypes;
   public Parser parser;
 
   public Locator locator;

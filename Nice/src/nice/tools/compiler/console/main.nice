@@ -104,10 +104,6 @@ int compile(String[] args)
 	  "Compile packages but do not link them",
 	  () => { compilation.skipLink = true; }),
 
-   option("strict",
-	  "Type-check uses of java classes more stricly",
-	  () => { compilation.strictJavaTypes = true; }),
-
    // PRIVATE OPTIONS
 
    // This options are only usefull for compiling the compiler itself, 

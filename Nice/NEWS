@@ -12,6 +12,8 @@ nice (0.9.9)
     This make it possible to write type-safe code that uses reflexion,
     in particular when using class literals.
   * Improved speed of coverage tests for some methods.
+  * Removed the '--strict' compiler option.
+
  --
 
 nice (0.9.8)

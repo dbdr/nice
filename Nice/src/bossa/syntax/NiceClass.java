@@ -75,7 +75,8 @@ public class NiceClass extends ClassDefinition
 	for (int i = 0; i < this.fields.length; i++)
 	  this.fields[i].sym.propagate = Node.none; 
 
-	computeMethods();
+	for (int i = 0; i < this.fields.length; i++)
+	  addChild(new NiceFieldAccess(this, this.fields[i]));
       }
     else
       this.fields = noFields;
@@ -90,11 +91,17 @@ public class NiceClass extends ClassDefinition
 
   public static class Field
   {
-    public Field(MonoSymbol sym, Expression value, boolean isFinal)
+    public Field(MonoSymbol sym, Expression value, 
+		 boolean isFinal, boolean isTransient, boolean isVolatile)
     {
       this.sym = sym;
       this.value = value;
       this.isFinal = isFinal;
+      this.isTransient = isTransient;
+      this.isVolatile = isVolatile;
+
+      if (isFinal && isVolatile)
+	throw User.error(sym, "A field cannot be final and volatile");
     }
 
     void resolve(VarScope scope, TypeScope typeScope)
@@ -102,7 +109,7 @@ public class NiceClass extends ClassDefinition
       sym.type = sym.syntacticType.resolve(typeScope);
       
       if (Types.isVoid(sym.type))
-	User.error(sym, "Fields cannot have void type");
+	User.error(sym, "A field cannot have void type");
 
       value = dispatch.analyse(value, scope, typeScope);
     }
@@ -144,17 +151,10 @@ public class NiceClass extends ClassDefinition
     MonoSymbol sym;
     Expression value;
     boolean isFinal;
+    boolean isTransient;
+    boolean isVolatile;
   }
   
-  private void computeMethods()
-  {
-    for (int i = 0; i < fields.length; i++)
-      {
-	MonoSymbol s = fields[i].sym;
-	addChild(new NiceFieldAccess(this, s.name, s.syntacticType));
-      }
-  }
-
   void resolve()
   {
     super.resolve();

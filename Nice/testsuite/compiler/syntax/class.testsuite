@@ -1,0 +1,8 @@
+/// PASS
+ /// Toplevel
+class A
+{
+  transient int t;
+  volatile int v;
+  transient volatile int tv;
+}

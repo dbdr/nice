@@ -35,14 +35,13 @@ import java.util.*;
 public class NiceFieldAccess extends FieldAccess
 {
   public NiceFieldAccess
-    (NiceClass classDef, 
-     LocatedString fieldName, Monotype fieldType)
+    (NiceClass classDef, NiceClass.Field field)
   {
-    super(fieldName, new Constraint(classDef.typeParameters,null),
+    super(field.sym.name, new Constraint(classDef.typeParameters,null),
 	  makeList(Monotype.create(Monotype.sure(classDef.lowlevelMonotype()))),
-	  fieldType);
+	  field.sym.syntacticType);
     this.definition = classDef;
-    this.fieldName = fieldName.toString();
+    this.field = field;
   }
   
   private static FormalParameters makeList(Monotype t)
@@ -52,7 +51,7 @@ public class NiceFieldAccess extends FieldAccess
     return new FormalParameters(res);
   }
   
-  public final String fieldName;
+  final NiceClass.Field field;
   
   /** The class this field belongs to. */
   NiceClass definition;
@@ -79,10 +78,13 @@ public class NiceFieldAccess extends FieldAccess
   private Type fieldType()
   {
     return javaReturnType();
-  }  
+  }
 
   private void createField()
   {
-    fieldDecl = definition.classe.addField(fieldName, fieldType());
+    fieldDecl = definition.classe.addField(field.sym.name.toString(), 
+					   fieldType());
+    fieldDecl.setFlag(field.isTransient, Declaration.TRANSIENT);
+    fieldDecl.setFlag(field.isVolatile , Declaration.VOLATILE);
   }
 }

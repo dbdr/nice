@@ -330,6 +330,10 @@ public class ClassExp extends LambdaExp
 	    else
 	      // This handles class fields.
 	      {
+		if (decl.getFlag(Declaration.TRANSIENT))
+		  flags |= Access.TRANSIENT;
+		if (decl.getFlag(Declaration.VOLATILE))
+		  flags |= Access.VOLATILE;
 		String fname
 		  = Compilation.mangleNameIfNeeded(decl.getName());
 		decl.field

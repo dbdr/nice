@@ -195,6 +195,8 @@ TOKEN: /* Keywords */
 | < PROTECTED:  "protected"  	>
 | < STATIC:     "static"     	>
 | < FINAL:      "final"      	>
+| < TRANSIENT:  "transient"  	>
+| < VOLATILE:   "volatile"   	>
 | < CONST:      "const"      	>
 | < NATIVE:     "native"     	> /* Nice specific */
 | < INLINE:     "inline"        > /* Nice specific */
@@ -969,17 +971,19 @@ List interfaces():
 void getField(List fields):
 {
   MonoSymbol field;
-  boolean isFinal=false;
+  boolean isFinal=false, isTransient = false, isVolatile = false;
   Expression value = null;
 }
 {
   ( ( "final" | "const" ) { isFinal=true; } 
   | "public" | "private"
   )* 
+  [ "transient" { isTransient = true; } ]
+  [ "volatile"  { isVolatile  = true; } ]
   field=monoSymbol() 
   [ "=" value=Expression() ]
   ";" 
-  { fields.add(new NiceClass.Field(field, value, isFinal)); }
+  { fields.add(new NiceClass.Field(field, value, isFinal, isTransient, isVolatile)); }
 }
 
 void classDefinitionLookahead():
@@ -1026,7 +1030,7 @@ ClassDefinition classDefinition():
    }
    // internal fields and methods
    (
-      LOOKAHEAD( [ "final"|"const"|"public"|"private" ] monoSymbol() (";"|"="))
+      LOOKAHEAD( getField(null) )
       getField(fields)
     |
       [ "public" | "private" ]

@@ -43,18 +43,6 @@ abstract public class Node
     addChildren(children);
   }
 
-  /*
-  static long ntot, nchil;
-
-  protected void finalize()
-  {
-    ntot++;
-    if (children.size() != 0)
-      nchil++;
-    System.out.println("Nodes/with children: "+ntot+"/"+nchil);
-  }
-  */
-
   /** child(n) is prefered now */
   void addChild(Node n)
   {
@@ -192,11 +180,7 @@ abstract public class Node
     return globalScope;
   }
   
-  private static final TypeScope globalTypeScope;
-  static
-  {
-    globalTypeScope = new TypeScope(null);
-  }
+  private static final TypeScope globalTypeScope= new TypeScope(null);
   public static final TypeScope getGlobalTypeScope()
   {
     return globalTypeScope;
@@ -275,16 +259,22 @@ abstract public class Node
 	}
       }
 
-    // builds the scope of the children
-    Scopes current = new Scopes(this.scope,this.typeScope);
-    if (children != null)
-      for(Iterator i = children.iterator();i.hasNext();)
-	{
-	  Object d = i.next();
-	  if(d!=null)
-	    current = ((Node)d).buildScope(current.scope,current.typeScope);
-	}
+    // They won't be used anymore
+    // Let's enable the memory to be reclamed
+    varSymbols = typeMapsSymbols = typeMapsNames = null;
 
+    // builds the scope of the children
+    if (children != null)
+      {
+	Scopes current = new Scopes(this.scope,this.typeScope);
+	for(Iterator i = children.iterator();i.hasNext();)
+	  {
+	    Object d = i.next();
+	    //if(d!=null)
+	    current = ((Node)d).buildScope(current.scope,current.typeScope);
+	  }
+      }
+    
     return res;
   }
   
@@ -313,6 +303,11 @@ abstract public class Node
       Debug.println("Resolving " + this + " [" + this.getClass() + "]");
     
     resolve();
+
+    // They won't be used anymore
+    // Let's enable the memory to be reclamed
+    scope = null;
+    typeScope = null;
 
     if (children != null)
       for(Iterator i = children.iterator();i.hasNext();)
@@ -445,7 +440,4 @@ abstract public class Node
   private List varSymbols;
   int propagate;  
   private List typeMapsSymbols,typeMapsNames;
-
-  // Temporary, see MethodBodyDefinition
-  //static boolean resolveIdents = true;
 }

@@ -72,7 +72,7 @@ class Aha implements Buffer<int> {
   void foo() {}
 }
 
-/// PASS bug
+/// PASS
   // bug #1090888
   /// Toplevel
 class Env extends HashMap<String, String> {}

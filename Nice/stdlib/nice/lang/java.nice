@@ -171,6 +171,75 @@ PrintStream stderr () = native System.err;
 <T> void trimToSize(Vector<T>) = native void Vector.trimToSize();
 <T> void removeAllElements(Vector<T>) = native void Vector.removeAllElements();
 
+/*
+<T> AbstractCollection<T> AbstractCollection() = native new AbstractCollection();
+<T> AbstractList<T> AbstractList() = native new AbstractList();
+<T> AbstractSequentialList<T> AbstractSequentialList() = native new AbstractSequentialList();
+<T> AbstractSet<T> AbstractSet() = native new AbstractSet();
+<T> AbstractMap<K,V> AbstractMap() = native new AbstractMap();
+<T> ArrayList<T> ArrayList() = native new ArrayList();        
+<T> ArrayList<T> ArrayArrayList(int) = native new ArrayList(int);
+<T,U | U <: T> ArrayList<T> ArrayList(Collection<U>) = native new ArrayList(Collection);
+<T> LinkedList<T> LinkedList() = native new LinkedList();
+<T,U | U <: T> LinkedList<T> LinkedList(Collection<U>) = native new LinkedList(Collection);
+<T> Stack<T> Stack() = native new Stack();
+<T> Vector<T> Vector() = native new Vector();
+<T> Vector<T> Vector(int) = native new Vector(int);
+<T> Vector<T> Vector(int, int) = native new Vector(int, int);
+<T,U | U <: T> Vector<T> Vector(Collection<U>) = native new Vector(Collection);
+<T> HashSet<T> HashSet() = native new HashSet();
+<T> HashSet<T> HashSet(int) = native new HashSet(int);
+<T> HashSet<T> HashSet(int,float) = native new HashSet(int,float);
+<T,U | U <: T> HashSet<T> HashSet(Collection<U>) = native new HashSet(Collection);
+<T> LinkedHashSet<T> LinkedHashSet() = native new LinkedHashSet();
+<T> LinkedHashSet<T> LinkedHashSet(int) = native new LinkedHashSet(int);
+<T> LinkedHashSet<T> LinkedHashSet(int,float) = native new LinkedHashSet(int,float);
+<T,U | U <: T> LinkedHashSet<T> LinkedHashSet(Collection<U>) = native new LinkedHashSet(Collection);
+<K,V> HashMap<K,V> HashMap() = native new HashMap();
+<K,V> HashMap<K,V> HashMap(int) = native new HashMap(int);
+<K,V> HashMap<K,V> HashMap(int,float) = native new HashMap(int,float);
+<K,K0,V,V0 | K0 <: K, V0 <: V> HashMap<K,V> HashMap(Map<K0,V0>) = native new HashMap(Map);
+<K,V> Hashtable<K,V> Hashtable() = native new Hashtable();
+<K,V> Hashtable<K,V> Hashtable(int) = native new Hashtable(int);
+<K,V> Hashtable<K,V> Hashtable(int,float) = native new Hashtable(int,float);
+<K,K0,V,V0 | K0 <: K, V0 <: V> Hashtable<K,V> Hashtable(Map<K0,V0>) = native new Hashtable(Map);
+<T> TreeSet<T> TreeSet() = native new TreeSet();
+<T,U | U <: T> TreeSet<T> TreeSet(Collection<U>) = native new TreeSet(Collection);
+<T,U | T <: U> TreeSet<T> TreeSet(Comparator<U>) = native new TreeSet(Comparator);
+<T> TreeSet<T> TreeSet(SortedSet<T>) = native new TreeSet(SortedSet);
+<K,V> TreeMap<K,V> TreeMap() = native new TreeMap();
+<K,V,T | K <: T> TreeMap<K,V> TreeMap(Comparator<T>) = native new TreeMap(Comparator);
+<K,K0,V,V0 | K0 <: K, V0 <: V> TreeMap<K,V> TreeMap(Map<K0,V0>) = native new TreeMap(Map);
+<K,V> TreeMap<K,V> TreeMap(Sor/*
+ap<K,V>) = native new TreeMap(SortedMap);
+*/
+/*
+interface Collection<T> = native java.util.Collection;
+interface List<T> extends Collection<T> = native java.util.List;
+interface Set<T> extends Collection<T> = native java.util.Set;
+interface SortedSet<T> extends Set<T> = native java.util.SortedSet;
+interface Iterator<T> = native java.util.Iterator;
+interface ListIterator<T> extends Iterator<T> = native java.util.ListIterator;
+interface Map<K,V> = native java.util.Map;
+interface SortedMap<K,V> extends Map<T> = native java.util.SortedMap;
+interface Map$Entry<K,V> = native java.util.Map.Entry;
+class AbstractCollection<T> = native java.util.AbstractCollection;
+class AbstractList<T> extends AbstractCollection<T> implements List<T> = native java.util.AbstractList;
+class AbstractSequentialList<T> extends AbstractList<T> = native java.util.AbstractSequentialList;
+class AbstractSet<T> extends AbstractCollection<T> implements Set<T> = native java.util.AbstractSet;
+class AbstractMap<K,V> implements Map<K,V> = native java.util.AbstractMap;
+class ArrayList<T> extends AbstractList<T> implements Cloneable, Serializable = native java.util.ArrayList;
+class HashMap<K,V> extends AbstractMap<K,V> implements Cloneable, Serializable = native java.util.HashMap;
+class HashSet<T> extends AbstractSet<T> implements Cloneable, Serializable = native java.util.HashSet;
+class Hashtable<K,V> implements Map<K,V>, Cloneable, Serializable = native java.util.Hashtable;
+class LinkedList<T> extends AbstractSequentialList<T> implements Cloneable, Serializable = native java.util.LinkedList;
+class Stack<T> extends Vector<T> = native java.util.Vector;
+class TreeMap<K,V> extends AbstractMap<K,V> implements SortedMap<K,V>, Cloneable, Serializable = native java.util.TreeMap;
+class TreeSet<T> extends AbstractSet<T> implements SortedSet<T>, Cloneable, Serializable = native java.util.TreeSet;
+class Vector<T> extends AbstractList<T> implements CloneabWeakSerializable = native java.util.Vector;
+class WeakHashMap<K,V> extends AbstractMap<K,V> = native java.util.WeakHashMap;
+*/
+
 <T> Iterator<T> iterator(Collection<T>) = 
   native Iterator Collection.iterator();
 <T> ListIterator<T> listIterator(Collection<T>) = 

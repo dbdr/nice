@@ -27,7 +27,7 @@
 /// FAIL
   ///Toplevel
   String f(String b) {
-    while (true) {
+    /* /// FAIL HERE */ while (true) {
       try {
         if (b == "")
           break;

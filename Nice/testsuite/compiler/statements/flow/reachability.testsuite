@@ -44,7 +44,7 @@
   /*/// FAIL HERE */ {} // Unreachable
 
 /// FAIL
-  `assert`();
+  /*/// FAIL HERE */ `assert`();
 
 /// PASS
   assert true;

@@ -373,7 +373,7 @@ public class Enumeration
 
     Constraint constraint = def.getResolvedConstraint();
 
-    if (constraint == mlsub.typing.Constraint.True)
+    if (mlsub.typing.Constraint.trivial(constraint))
       return true;
 
     if (! (var instanceof Monotype))
@@ -381,8 +381,20 @@ public class Enumeration
 
     Monotype m = (Monotype) var;
 
-    MonotypeConstructor type = 
-      new MonotypeConstructor(sol, def.getTypeParameters());
+    /* We don't want to modify var by reducing its domain, since that would
+       prevent other valid solutions to be discovered later.
+       Therefore we introduce a new tc, since what we want is to test
+       the type parameters.
+
+       Another approach would be to mark/backtrack here. That would at least
+       require to slightly change the marking system, so that the exisisting
+       domain is backed-up and the cloned one is used immediately, since
+       the existing one is held by Satisfier.
+    */
+    TypeConstructor tc = new TypeConstructor(sol.variance);
+    Typing.introduce(tc);
+    MonotypeConstructor type =
+      new MonotypeConstructor(tc, def.getTypeParameters());
 
     try {
       constraint.enter();

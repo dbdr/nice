@@ -23,3 +23,52 @@ method3(f) {} // this case is mandatory to cover method3
 void method3(String);
 method3(f@String) {} // this case is mandatory to cover method3
 method3(/*/// FAIL HERE */null) {}
+
+/// FAIL
+  new B().foo("");
+  /// Toplevel
+abstract interface I<T> {
+  void /*/// FAIL HERE */ foo(T);
+}
+
+class A<T> implements I<T> {
+  int x;
+  foo(t) { this.x = 0; }
+}
+
+class B<T> implements I<T> {
+  // Missing implementation of foo.
+}
+
+/// FAIL
+  new B().foo("");
+  /// Toplevel
+abstract interface I<T> {
+  void /*/// FAIL HERE */ foo(T);
+}
+
+class A implements I<String> {
+  foo(t) { this.bar(); }
+}
+void bar(A a) {}
+
+
+class B<T> implements I<T> {
+  // Missing implementation of foo.
+}
+
+/// FAIL
+  new B().foo(0);
+  /// Toplevel
+abstract interface I<T> {
+  void /*/// FAIL HERE */ foo(T);
+}
+
+class A implements I<String> {
+  foo(t) { this.bar(); }
+}
+void bar(A a) {}
+
+class B implements I<int> {
+  // Missing implementation of foo.
+}

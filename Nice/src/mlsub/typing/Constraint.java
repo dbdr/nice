@@ -62,10 +62,15 @@ public final class Constraint
   }
 
   public static final Constraint True = null;
-  
+
   public static final boolean hasBinders(Constraint c)
   {
     return c!=null && c.binders!=null;
+  }
+
+  public static final boolean trivial(Constraint c)
+  {
+    return c == null || c.natoms == 0;
   }
 
   public TypeSymbol[] binders()

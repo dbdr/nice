@@ -1,7 +1,11 @@
 
 PREFIX= /usr/local
+# Used by Debian to install in a private directory
 DESTDIR= 
-PREF= ${DESTDIR}${PREFIX}
+INSTALLDIR= ${DESTDIR}${PREFIX}
+DOCDIR= ${INSTALLDIR}/share/doc
+MANDIR= ${INSTALLDIR}/share/man/man1
+LISPDIR= ${INSTALLDIR}/share/emacs/site-lisp/nice
 
 SHELL = /bin/zsh
 TOP=${PWD}
@@ -17,6 +21,8 @@ NICEC_ARGS= -d "${TOP}/classes" --exclude-runtime
 NICEC=nicec ${NICEC_ARGS} --sourcepath="${TOP}/src"
 NICEC1=${TOP}/bin/nicec ${NICEC_ARGS} --sourcepath="${TOP}/stdlib:${TOP}/src"
 
+# Get the version from the debian changelog.
+VERSION = ${shell dpkg-parsechangelog | sed -n 's/^Version: //p'}
 
 
 all: clean bootstrap compiler1 share/java/Nice.jar compiler2 archive
@@ -40,18 +46,22 @@ share/java/Nice.jar archive: src/nice/tools/compiler.jar
 setDate:
 	cd src/nice/tools/compiler; ./setBuildDate
 
+deb:
+	@echo Creating Debian package version ${VERSION}
+	env CVSROOT=:pserver:anonymous@cvs.nice.sourceforge.net:/cvsroot/nice cvs-buildpackage -MNice -W/tmp/cvs-build -us -uc -rfakeroot -THEAD -d
+
 dist: share/java/Nice.jar
 	# make sure that nicec is executable
 	chmod a+rx bin/nicec
 	tar cf Nice-`date +"%Y.%m.%d"`.tar bin/nicer bin/nicec share/java/Nice.jar lib/emacs/nice-mode.el
 
 install: share/java/Nice.jar
-	mkdir -p ${PREF}/bin ${PREF}/share/java ${PREF}/share/man/man1 \
-                 ${PREF}/share/emacs/site-lisp/nice/ 
-	cp bin/nicec ${PREF}/bin/
-	cp share/java/Nice.jar ${PREF}/share/java/ 
-	cp lib/emacs/nice-mode.el ${PREF}/share/emacs/site-lisp/nice/
-	./bin/nicec --man > ${PREF}/share/man/man1/nicec.1
+	mkdir -p ${INSTALLDIR}/bin ${INSTALLDIR}/share/java ${MANDIR} ${LISPDIR}
+	cp bin/nicec ${INSTALLDIR}/bin/
+	cp share/java/Nice.jar ${INSTALLDIR}/share/java/ 
+	cp lib/emacs/nice-mode.el ${LISPDIR}
+	./bin/nicec --man > ${MANDIR}/nicec.1
+	groff -mandoc -Thtml ${MANDIR}/nicec.1 > ${DOCDIR}/nicec.html
 
 test:
 	cd regtest; /usr/bin/time ./regtest

@@ -588,12 +588,12 @@ lastItem(coll)
             In addition to choosing a method based on the classes of the
             arguments, it's even possible to override a method based on the
             actual values of the arguments. Currently this feature works 
-            with integers, booleans, and Strings. This feature makes it
+            with integers, booleans, and strings. This feature makes it
             convenient to code things that might otherwise have required
             switch statements or nested if/else statements. Using value 
             dispatch can be more flexible than switch or if/else statements,
             because you can always add new alternatives conveniently by
-            just implementing a new method override.
+            just adding a new method implementation.
       </para>
 	<example>
 	<title>Value Dispatch</title>
@@ -744,14 +744,16 @@ interface Buffer<Elem>
      <para>
       Constants are declared with "let":
      </para>
+     <para>
       <literal>let <optional><replaceable>type</replaceable></optional> 
       <replaceable>variable-name</replaceable> 
       <optional>= <replaceable>initial-value</replaceable></optional>
       ;
       </literal>
+     </para>
      <para>
        If the variable or constant is of a simple type (i.e., not a 
-       <link linked="parametricClasses">parameterized type</link>), then it is
+       <link linkend="parametricClasses">parameterized type</link>), then it is
        not necessary to specify the type yourself, the compiler can infer
        the correct type automatically.
      </para>
@@ -761,9 +763,10 @@ interface Buffer<Elem>
       Since Nice uses <link linkend="packages">packages</link> as its largest
       conceptual unit, variable and constant declarations may appear 
       outside class definitions, and are useful in the same way that 
-      static variables in Java are. Their syntax is identical to the 
-      syntax for local variables, except that either <literal>var</literal> 
-      or <literal>let</literal> must be used, the Java style is not accepted.
+      static variables in Java are. Package variables are introduced
+      with <literal>var</literal>, and package constants with
+      <literal>let</literal>. The type must be specified, since it is
+      a useful documentation.
      </para>
     </section>
     <section id="forStatements"><title>Extended <literal>for</literal> statement</title>
@@ -1468,8 +1471,8 @@ copy(b#Bar) = new Bar(value: b.value, id: generateNewId());
       <section id = "abstractInterfaces">
         <title>Abstract Interfaces</title>
         <para>
-          Nice offers a powerful tool known as the <firstterm>abstract interface
-          </firstterm>. Abstract interfaces are similar in some respects to regular
+          Nice offers a powerful tool known as the <firstterm>abstract interface</firstterm>. 
+          Abstract interfaces are similar in some respects to regular
           Java- or Nice-style interfaces in that they define a set of methods that
           a type must implement to be considered a member of the interface.
         </para>
@@ -1477,7 +1480,8 @@ copy(b#Bar) = new Bar(value: b.value, id: generateNewId());
           Two things make an abstract interface different from a regular interface.
           First, a class can be made to implement an abstract interface <emphasis>after</emphasis>
           it's been defined, and even the source code is unnecessary. You can make
-          the basic String class implement your new abstract interface, if you like.
+          the basic <literal>String</literal> class implement your new
+	  abstract interface, if you like.
           Second, an abstract interface is not actually a type, it's an annotation
           which can be applied to types. This means that when you declare an abstract
           interface, you're not creating a new type, you're saying "types which implement
@@ -1500,8 +1504,8 @@ copy(b#Bar) = new Bar(value: b.value, id: generateNewId());
          one wants to use a method on a group of unrelated types, as in the example 
          below. We have a <literal>log()</literal> method which is parameterized
          for any class which implements the abstract interface <literal>LogEntry</literal>,
-         and we make a number of classes implement LogEntry, so they can be passed
-         to our log method.
+         and we make a number of classes implement
+	 <literal>LogEntry</literal>, so they can be passed to our log method.
         </para>
         <para>
 	<example id="ex:abstractInterface"><title>Abstract Interfaces</title>
@@ -1514,9 +1518,9 @@ abstract interface LogEntry
 }
 
 //Some constants for severity levels
-let DEBUG = 1;
-let INFO = 2;
-let ERROR = 3;
+let int DEBUG = 1;
+let int INFO = 2;
+let int ERROR = 3;
 
 <LogEntry E> void log(E entry, int severity = -1) 
 {
@@ -1566,7 +1570,7 @@ severity(r@HttpServletRequest) = INFO;
           done with a regular interface. So now we can write code like
         </para>
         <para>
-          <literal><programlisting language = "nice">
+          <programlisting lang="nice">
             log(request);
             log("Beginning processing");
             try 
@@ -1577,7 +1581,7 @@ severity(r@HttpServletRequest) = INFO;
               {
                 log(e);
               }
-          </programlisting></literal>
+          </programlisting>
         </para>
         <para>
           and our abstract interface implementations will take care of making
@@ -1588,12 +1592,12 @@ severity(r@HttpServletRequest) = INFO;
           we had defined <literal>log</literal> with the signature <literal>
           &lt;E&gt; void log(E entry, int severity = -1)</literal>, we could 
           have achieved all the same effects, but we would have lost the
-          type safety abstract interfaces gave us above - because &lt;E&gt;
-          means <emphasis>any</emphasis> type is allowed, so we would have
-          had to define some defaults:
+          type safety abstract interfaces gave us above - because
+	  <literal>&lt;E&gt;</literal> means <emphasis>any</emphasis>
+	  type is allowed, so we would have had to define some defaults:
         </para>
         <para>
-          <literal><programlisting language = "nice">
+          <programlisting lang="nice">
             toLogString(e)
             {
               throw new Exception("No toLogString method defined!");
@@ -1603,11 +1607,11 @@ severity(r@HttpServletRequest) = INFO;
             {
               throw new Exception("No severity method defined!");
             }
-          </programlisting></literal>
+          </programlisting>
         </para>
         <para>
           Then we'd be no better off than in a dynamically typed language -
-          we wouldn't find out that we'd tried to log a 5 until we got an
+          we wouldn't find out that we'd tried to log an integer until we got an
           exception at runtime. With abstract interfaces, we were able to
           tell the compiler <emphasis>exactly</emphasis> which classes 
           should be allowed as arguments to <literal>log</literal>, and so

@@ -271,7 +271,9 @@ public class FormalParameters extends Node
       Internal.error("No room for \"this\"");
     
     parameters[0] = new NamedParameter(type, thisName);
-    addChild(parameters[0]);
+    // We need to add it as the first child, because the order
+    // is used when refering to previous parameters inside default values.
+    addFirstChild(parameters[0]);
   }
 
   boolean hasThis()

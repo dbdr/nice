@@ -2,7 +2,9 @@ nice (0.8.0) unstable; urgency=low
 
   * Stable version, based on 0.7.9
   * Bugfixes (some cases of optional parameters, allowing arbitrarily nested
-    tuples on the left side of an assignment, recursion for local functions).
+    tuples on the left side of an assignment, recursion for local functions,
+    allow method parameter's default values to refer to this when the method
+    is declared inside a class).
 
  --
 

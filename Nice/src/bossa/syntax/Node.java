@@ -52,6 +52,15 @@ abstract public class Node
     children.add(n);
   }
   
+  void addFirstChild(Node n)
+  {
+    if (n==null)
+      Internal.error("null child in Node.addChild for node "+this);
+
+    if (children == null) children=new ArrayList();
+    children.add(0, n);
+  }
+  
   final Node child(Node n)
   {
     if(n==null)

@@ -120,3 +120,13 @@ adjust(this, aint) = this;
     return this.adjust();
   }
 }
+
+/// PASS
+  assert new A(x: 13).getValue() == 13;
+
+  /// Toplevel
+  class A 
+  {
+    int x;
+    int getValue(int v = this.x) = v;
+  }

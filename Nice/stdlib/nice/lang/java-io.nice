@@ -36,6 +36,7 @@ PrintStream stderr () = native System.err;
 /** Convenience: printing on the standard output. */
 <T> void print   (T object) = System.out.print  (object);
 <T> void println (T object) = System.out.println(object);
+void println() = System.out.println();
 
 // Constructors
 File newFile(?File, String) = native new File(File, String);

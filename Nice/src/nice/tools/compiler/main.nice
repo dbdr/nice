@@ -39,6 +39,7 @@ import bossa.modules;
 main(args)
 {
   Throwable uncaughtException = null;
+  boolean memInfo = false;
 
   try{
 
@@ -96,6 +97,10 @@ main(args)
 		  "Print usage information and exit",
 		  fun()=>usage()));
 
+  opts.add(option('?', "memory",
+		  "Print memory usage information after compilation",
+		  fun()=>{ memInfo = true; }));
+
   Sequence<String> rest = parse("nicec", args, opts);
   if(rest.size()<1 || rest.size()>1)
     {
@@ -129,6 +134,8 @@ main(args)
       uncaughtException.printStackTrace();
       System.exit(1);
     }
+  
+  if (memInfo) printMemoryUsage();
 
   System.exit(OutputMessages.statusCode());
 }
@@ -149,4 +156,32 @@ version()
   println("Visit the Nice homepage: http://purl.org/net/nice");
   println("Report bugs to d.bonniot@mail.dotcom.fr");
   System.exit(0);
+}
+
+String prettyBytes(long);
+prettyBytes(bytes)
+{
+  long K = 1024;
+  if (bytes < 10 * K)
+    return ""+bytes+" B";
+  else if (bytes < 100 * K)
+    return ""+(bytes/K) + "." + ((bytes % K)/100) + " KB";
+  else if (bytes < 10*K*K)
+    return ""+(bytes/K) + " KB";
+  else if (bytes < 100*K*K)
+    return ""+(bytes/(K*K)) + "." + ((bytes % (K*K))/(100*K)) + " MB";
+  else if (bytes < 10*K*K*K)
+    return ""+(bytes/(K*K)) + " MB";
+  else 
+    return ""+(bytes/(K*K*K)) + " GB";
+}
+
+void printMemoryUsage();
+printMemoryUsage()
+{
+  Runtime r = Runtime.getRuntime();
+  r.gc();
+  long mem = r.totalMemory();
+  println("Memory allocated: " + prettyBytes(mem) + 
+	  ", used: " + prettyBytes(r.totalMemory()-r.freeMemory()));
 }

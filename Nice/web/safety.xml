@@ -1,18 +1,24 @@
 <?xml version="1.0" standalone="no"?>
-<!DOCTYPE website PUBLIC "-//Norman Walsh//DTD Website V2.0b1//EN"
-          "http://docbook.sourceforge.net/release/website/2.0b1/website.dtd" [
+<!DOCTYPE article PUBLIC "-//OASIS//DTD DocBook XML V4.1.2//EN"
+          "http://www.oasis-open.org/docbook/xml/4.1.2/docbookx.dtd" [
 <!ENTITY nice "Nice">
 <!ENTITY java "Java">
 ]>
-<webpage id="safety">
-<config param="footlink" value="home" altval="Home"/>
-<config param="desc" value="Why programs written in Nice have less bugs"/>
-<config param="rcsdate" value="$Date$"/>
-<head>
-<title>Type safety in &nice;</title>
-<summary>Introduction</summary>
-<keywords>nice, safety, java, null pointer, exception, cast</keywords>
-</head>
+<article>
+<articleinfo>
+  <author><firstname>Daniel</firstname><surname>Bonniot</surname></author>
+  <authorinitials>db</authorinitials>
+  <title>Type safety in &nice;</title>
+  <subtitle>Why programs written in Nice have less bugs</subtitle>
+  <keywordset>
+    <keyword>nice</keyword>
+    <keyword>safety</keyword>
+    <keyword>java</keyword>
+    <keyword>null pointer</keyword>
+    <keyword>exception</keyword>
+    <keyword>cast</keyword>
+  </keywordset>
+</articleinfo>
 
 <section><title>Introduction</title>
 
@@ -234,15 +240,7 @@ defining the <function>equals</function> method for a user-defined class:
 
 <para>
 <programlisting lang="java">
-class Object
-{
-  boolean equals(Object that)
-  {
-    return this == that;
-  }
-}
-
-class Person extends Object 
+class Person
 {
   String name;
   int age;
@@ -274,11 +272,6 @@ which is present in &nice;. Here is the &nice; code.
 
 <para>
 <programlisting lang="nice">
-&lt;Any T> boolean equals(T this, T that);
-
-// default implementation
-equals(this, that) = this == that;
-
 class Person
 {
   String name;
@@ -555,4 +548,4 @@ unchanged. That is, provided it was correct!
 </para>
 </section>
 
-</webpage>
+</article>

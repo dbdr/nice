@@ -61,9 +61,9 @@ class Compilation extends mlsub.compilation.Compilation
       this.packagePath = ".";
 
     nice.tools.code.TypeImport.setClasspath
-    ((this.destinationDir | "") + 
+    ((this.destinationDir || "") + 
      java.io.File.pathSeparator + 
-     (this.packagePath | "") + 
+     (this.packagePath || "") + 
      java.io.File.pathSeparator + 
      this.runtimeFile);
 

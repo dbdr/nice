@@ -21,10 +21,8 @@ package nice.lang;
 
 /**
     e1 || e2 
-    Evaluate e1, and return it if it is not null.
+    Evaluate e1, and return it if it is not null (without evaluating e2).
     Otherwise evaluate e2 and return it.
-
-    Currently e2 is evaluated in any case, but this will change.
 */
-<Any T> !T `|`(?T e1, !T e2) = e1 != null ? e1 : e2;
-<Any T> ?T `|`(?T e1, ?T e2) = e1 != null ? e1 : e2;
+<Any T> !T `||`(?T e1, !T e2) = inline nice.lang.inline.OptionOr();
+<Any T> ?T `||`(?T e1, ?T e2) = inline nice.lang.inline.OptionOr();

@@ -1,0 +1,25 @@
+/// PASS
+  assert (("" || null) == "");
+
+/// PASS
+  assert ((null || "") == "");
+
+/// PASS
+  ?String s = null || null;
+
+/// PASS
+  String s = null || "";
+
+/// Global
+<Any T> T fail() { throw new Error(); }
+
+/// PASS
+  ?String s = "" || fail();
+
+/// PASS
+  boolean ok = true;
+  try {
+    String s = fail() || "";
+    ok = false;
+  } catch (Error e) {}
+  assert(ok);

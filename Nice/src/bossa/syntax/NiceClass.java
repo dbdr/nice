@@ -660,7 +660,7 @@ public class NiceClass extends ClassDefinition.ClassImplementation
      on the type parameters.
   */
   private static List getNativeConstructorParameters
-    (TypeConstructor tc, List constraints, TypeSymbol[] binders)
+    (TypeConstructor tc, List constraints)
   {
     List constructors = TypeConstructors.getConstructors(tc);
     if (constructors == null)
@@ -740,7 +740,7 @@ public class NiceClass extends ClassDefinition.ClassImplementation
     NiceClass sup = get(supTC);
     List res;
     if (sup == null)
-      res = getNativeConstructorParameters(supTC, constraints, binders);
+      res = getNativeConstructorParameters(supTC, constraints);
     else
       res = sup.getParentConstructorParameters(constraints, binders);
 

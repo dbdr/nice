@@ -188,6 +188,19 @@ public final class Types
     return new MonotypeConstructor(tc, null);
   }
 
+  public static Monotype unknownArgsMonotype(TypeConstructor tc)
+    throws BadSizeEx
+  {
+    if (tc.variance == null || tc.arity() == 0)
+      return new MonotypeConstructor(tc, null);
+
+    mlsub.typing.Monotype[] args = new mlsub.typing.Monotype[tc.arity()];
+    for (int i = 0; i < tc.arity(); i++)
+      args[i] = UnknownMonotype.instance;
+
+    return new MonotypeConstructor(tc, args);
+  }
+
   /****************************************************************
    * Type parameters
    ****************************************************************/

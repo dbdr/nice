@@ -5,6 +5,10 @@ class A<FOO>
 }
 class B<BAR> extends A<BAR> {}
 
+// workaround to avoid field/method ambiguity
+<K, V> Set<Map.Entry<K, V>> mapEntries(Map<K, V> m) = m.entrySet();
+<K, K0, V | K <: K0> Set<K0> mapKeys(Map<K, V> m) = m.keySet();
+
 /// PASS
   let x = new A();
   x.poly("");
@@ -103,7 +107,7 @@ foo() {
     table1["foo_" + i] = i;
 
   String key; 
-  for (each : table1.entrySet) {
+  for (each : table1.mapEntries) {
     key = each.getKey;
   }
 
@@ -129,7 +133,7 @@ foo() {
 
 /// PASS
   let testmap = new HashMap();
-   for(s : testmap.keySet())
+   for(s : testmap.mapKeys())
      {
        String x = s + " => " + testmap[s];
      }
@@ -138,14 +142,14 @@ foo() {
  let testmap = new HashMap();
  for(s : ["1", "2", "3"])
    testmap[s] = Integer.parseInt(s);
- for(s : testmap.keySet())
+ for(s : testmap.mapKeys())
    println(s + " => " + testmap[s]);
 
 /// PASS
  let testmap = new HashMap();
  for(s : ["1", "2", "3"])
    testmap[s] = Integer.parseInt(s);
- for(String s : testmap.keySet())
+ for(String s : testmap.mapKeys())
    println(s + " => " + testmap[s]);
 
 /// PASS
@@ -196,7 +200,7 @@ void foo(A<boolean>) { assert false; }
  let testmap = new HashMap();
  for(i : 1..10)
    testmap[i] = i.toString();
- for(i : testmap.keySet())
+ for(i : testmap.mapKeys())
    println(i + " => " + testmap[i]);
 
 /// PASS
@@ -214,7 +218,7 @@ int v1;
 ?Cell c2;
 
 while (n-- > 0)
-  for (each : table1.entrySet) {
+  for (each : table1.mapEntries) {
     key = each.getKey;
     v1 = each.getValue.value;
 
@@ -234,7 +238,7 @@ toString(Cell c) = c.value.toString;
 
  ?Cell c2;
 
- for (each : table1.entrySet)
+ for (each : table1.mapEntries)
    {
      let key = each.getKey;
      c2 = table2[key];

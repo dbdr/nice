@@ -411,7 +411,24 @@ public final class Types
     if (javaType == Type.pointer_type)
       return TopMonotype.instance;
 
-    return getMonotype(javaType.getName());
+    TypeConstructor tc = bossa.syntax.Node.getGlobalTypeScope().
+      globalLookup(javaType.getName(), null);
+
+    if (tc == null)
+      {
+	Internal.warning(javaType.getName() + " is not known");
+	throw new NotIntroducedClassException(tc);
+      }
+
+    if (tc.getId() == -1)
+      throw new NotIntroducedClassException(tc);
+
+    try {
+      return nice.tools.typing.Types.unknownArgsMonotype(tc);
+    }
+    catch (BadSizeEx ex) {
+      throw new ParametricClassException(tc.toString());
+    }
   }
   
   /** 
@@ -440,37 +457,6 @@ public final class Types
     NotIntroducedClassException(TypeSymbol symbol)
     {
       this.symbol = symbol;
-    }
-  }
-
-  private static Monotype getMonotype(String name)
-  throws ParametricClassException, NotIntroducedClassException
-  {
-    if(name.endsWith("[]"))
-      {
-	name=name.substring(0,name.length()-2);
-	return new MonotypeConstructor
-	  (PrimitiveType.arrayTC, 
-	   new Monotype[]{ getMonotype(name) });
-      }
-    
-    TypeConstructor tc = bossa.syntax.Node.getGlobalTypeScope().
-      globalLookup(name, null);
-
-    if (tc == null)
-      {
-	Internal.warning(name + " is not known");
-	throw new NotIntroducedClassException(tc);
-      }
-
-    if (tc.getId() == -1)
-      throw new NotIntroducedClassException(tc);
-
-    try {
-      return nice.tools.typing.Types.zeroArgMonotype(tc);
-    }
-    catch (BadSizeEx ex) {
-      throw new ParametricClassException(tc.toString());
     }
   }
 

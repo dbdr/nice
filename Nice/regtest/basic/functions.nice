@@ -23,12 +23,16 @@ class FunctionClass
   void setX(int value) { this.x = value; }
 }
 
+// Function with an optional parameter
 String optFun(String value, String end = ": ") = value + end;
+
+// Function with a parametric type
+<Any T> T identity(T x) = x;
 
 void test_functions()
 {
   println("### Testing functions");
-  FunctionClass o = new FunctionClass();
+  FunctionClass o = identity(new FunctionClass());
   o.setX(42);
   println("x = " + o.getX());
 

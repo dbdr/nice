@@ -90,10 +90,10 @@ public class TypeScope
   }
   
   /**
-   * Used for the search of java classes, as the type symbol
-   * of type binders. See MethodBodyDefinition.
+     Used for the search of java classes, as the type symbol of type binders.
    */
-  private TypeSymbol dummyTypeSymbol = new TypeConstructor("dummy type constructor");
+  private static TypeSymbol dummyTypeSymbol = 
+    new TypeConstructor("dummy type constructor");
 
   public TypeSymbol lookup(String name)
   {

@@ -120,7 +120,7 @@ public class Block extends Statement
     public void addNext(LocatedString name, Expression value)
     {
       last.next = new LocalVariable(name, left.syntacticType, 
-				    left.isAssignable(), value);
+				    ! left.isAssignable(), value);
       last = last.next;
     }
   }

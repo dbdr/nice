@@ -80,7 +80,13 @@ NICEC=${APPHOME}/share/java/nice.jar
 
 case $progname in
   nicec) 
-    CLASSPATH=${NICEC}:${CLASSPATH}
+    # Having a trailing ":" at the end of CLASSPATH seems to act as ":." on some platforms.
+    # We don't want that by default (if CLASSPATH is empty).
+    if [ -z ${CLASSPATH} ]; then
+	CLASSPATH=${NICEC}
+    else
+	CLASSPATH=${NICEC}:${CLASSPATH}
+    fi
     if [ $experimental = true ]; then
 	CLASSPATH=${APPHOME}/classes:${CLASSPATH}
     fi

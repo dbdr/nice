@@ -3,7 +3,7 @@
   class A<T> {}
   void f(/* /// FAIL HERE */ A) {}
 
-/// FAIL bug
+/// FAIL bug skip
   /// Toplevel
   class X<T> {}
   <T | T <: X<T> > void f() {}

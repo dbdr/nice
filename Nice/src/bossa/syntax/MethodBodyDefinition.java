@@ -104,7 +104,7 @@ public class MethodBodyDefinition extends MethodImplementation
     if (d instanceof JavaMethod) {
       ((JavaMethod) d).registerForDispatch();
       if (TypeConstructors.isInterface(formals[0].tc))
-        User.error(this, name + " is a native method. Dispatch can only occur if the first argument is not a interface.");
+        User.error(this, name + " is a native method. Dispatch can only occur if the first argument is not an interface.");
     }
     else if (! (d instanceof NiceMethod))
       User.error(this, "Implementations can only be made for methods, but " + 

@@ -6,7 +6,60 @@ boolean maybeTrue() = true;
 
 /// PASS
   ?String s = maybeString();
+  s = "abc";
+  s.substring(1);
+
+/// FAIL
+  ?String s = maybeString();
   if (s == null)
+    s = "abc";
+
+  s = null;
+  s. /*/// FAIL HERE*/ substring(1);
+
+/// PASS
+  ?String s = maybeString();
+  if (s == null)
+    s = "abc";
+
+  s.substring(1);
+
+/// PASS
+  ?String s = maybeString();
+  s = "abc";
+  if (s != null)
+    s = null;
+
+/// FAIL
+  ?String s = "abc";
+  if (s != null)
+    s = null;
+
+  s. /*/// FAIL HERE*/ substring(1);
+
+/// FAIL
+  ?String s = maybeString();
+  s = "abc";
+  if (maybeTrue())
+    {
+      if (maybeTrue())
+        s = null;
+      else
+        s = "abc";
+    }
+  else
+    s = "abc";
+
+  s. /*/// FAIL HERE*/ substring(1);
+
+/// PASS bug
+  ?String s = maybeString();
+  if (maybeTrue())
+    {
+      if (s == null)
+        s = "abc";
+    }
+  else
     s = "abc";
 
   s.substring(1);

@@ -78,7 +78,8 @@ class Info
   */
   int flags; 
   boolean getUnreachable() = (this.flags & 1) != 0;
-  void setUnreachable() { this.flags |= 1; }
+  void setUnreachable() { this.flags |=  1; }
+  void setReachable()   { this.flags &= (-1)-1; }
 
   Stack<int> flagsStack;
 
@@ -470,7 +471,21 @@ analyse(t@TryStmt, info)
     info.end();
   });
   info.endCases();
+
+  // The finally block is always reachable since the try statement was.
+  // If the try/catch section cannot comlete normally, 
+  // the finally block is still executed;
+  // however the whole try/catch/finally cannot complete normally then.
+  // We care for that after analysing the finally block.
+  // (cf. JLS 14.20)
+
+  boolean tryCatchCannotCompleteNormally = info.getUnreachable();
+
+  info.setReachable();
   analyse(t.finallyBody, info);
+
+  if (tryCatchCannotCompleteNormally)
+    info.setUnreachable();
 }
 
 // Local Variables:

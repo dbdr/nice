@@ -165,6 +165,9 @@ public class NiceMethod extends UserOperator
   {
     findSpecializedMethods();
 
+    if (isOverride && specializedMethods == null)
+      User.error(this, "This method does not override any other method");
+
     super.typedResolve();
   }
 

@@ -177,3 +177,10 @@ class B<T> extends A<T> {}
 
 <T, T1, T2 | T1 <: T, T2 <: T> A<T> foo(A<T1> a1, A<T2> a2);
 <U, U1, U2 | U1 <: U, U2 <: U> B<U> foo(B<U1> a1, B<U2> a2) = new B();
+
+/// FAIL
+  /// Toplevel
+class A {}
+class B {}
+void foo(A a) {}
+override void foo(B b) {}

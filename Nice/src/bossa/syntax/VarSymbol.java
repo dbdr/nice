@@ -123,9 +123,6 @@ abstract class VarSymbol extends Node implements Located
     if (name != null) this.decl.setLine(name.location().getLine());
     this.decl.setCanRead(true);
     this.decl.setCanWrite(true);
-
-    if(declaration.getContext() == null)
-      Internal.warning(this + " has no englobing context");
   }
   
   gnu.expr.Declaration getDeclaration()

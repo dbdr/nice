@@ -87,9 +87,7 @@ public class LiteralArrayExp extends Expression
   {
     Polytype elementType = Polytype.union(getType(elements));
     
-    if (expectedElementType == null)
-      elementType.simplify();
-    else
+    if (expectedElementType != null)
       /* The context requires a certain element type.
 	 First check that it is compatible with the actual elements,
 	 then take it as the element type.

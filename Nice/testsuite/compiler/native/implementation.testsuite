@@ -1,0 +1,24 @@
+/// FAIL
+  new A().run();
+  /// Toplevel
+class A implements Runnable {
+  // missing implementation for run()
+}
+
+/// FAIL
+  new A().getValueAt(0, 0);
+  /// Toplevel
+class A implements javax.swing.table.TableModel {
+  // missing implementation for getValueAt()
+}
+
+/// FAIL bug
+  new A().getValueAt(0, 0);
+  /// Toplevel
+  // The same case, but now getValueAt is retyped.
+Object getValueAt(javax.swing.table.TableModel, int, int) =
+  native Object javax.swing.table.TableModel.getValueAt(int,int);
+
+class A implements javax.swing.table.TableModel {
+  // missing implementation for getValueAt()
+}

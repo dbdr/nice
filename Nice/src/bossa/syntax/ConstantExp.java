@@ -249,15 +249,19 @@ public class ConstantExp extends Expression
     return result;
   }
 
-  public static ConstantExp makeDouble(double value, Location location)
-  {
-    return new ConstantExp(PrimitiveType.floatTC, new Double(value), value+"",
-			   location);
-  }
-  
   public static ConstantExp makeFloating(LocatedString representation)
   {
-    return makeDouble(Double.parseDouble(representation.toString()), representation.location());
+    String repres = representation.toString();
+    if (repres.endsWith("F") || repres.endsWith("f"))
+      {
+	float value = Float.parseFloat(repres);
+	return new ConstantExp(PrimitiveType.floatTC, new Float(value), value+"",
+				representation.location());
+      }	
+
+    double value = Double.parseDouble(repres);
+    return new ConstantExp(PrimitiveType.doubleTC, new Double(value), value+"",
+				representation.location());
   }
   
   public static ConstantExp makeString(LocatedString representation)

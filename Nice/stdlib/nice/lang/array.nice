@@ -27,7 +27,7 @@ final class Array<T>
 /** Returns a new copy with newSize elements */
 <Any T> T[] resize(T[], int newSize) = native Object Native.resize(Object,int);
 
-<Any T> int length(T[]) = native int java.lang.reflect.Array.getLength(Object);
+<Any T> int length(T[]) = inline nice.lang.inline.ArrayLength();
 
 <Any T> T get(T[], int) =
   native Object java.lang.reflect.Array.get(Object,int);

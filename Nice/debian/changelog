@@ -7,6 +7,10 @@ nice (0.7.5) unstable; urgency=low
     It is equivalent to e1 != null ? e1 : e2, except e1 is not evaluated twice.
     This operator is handy to sequence expression to produce a value:
       find(n@Node, elem) = find(n.left, elem) || find(n.right, elem);
+  * Short anonymous functions made of one assignment now return void. Allows:
+      [1,2,3].foreach(int j => i += j);
+    instead of 
+      [1,2,3].foreach(int j => { i += j; });
   * Arrays created with 0 elements have a non-option component type:
       String[] s0 = new String[0];
       ?String[] s1 = new String[1];
@@ -16,7 +20,7 @@ nice (0.7.5) unstable; urgency=low
     initialization. Dimensions are listed in order, instead of reverse order.
     For instance,
       String[][?]
-    is the type of a non-null array of optional string arrays.
+    is the type of a non-null array of optional arrays of strings.
   * Changed typing for creation of arrays with multiple dimensions.
     The dimensions that are not initialized are given an option type:
       String[][?] s = new String[1][];

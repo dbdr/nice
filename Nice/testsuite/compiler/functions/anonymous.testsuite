@@ -25,3 +25,20 @@
 
 /// PASS
   int->void f = int x => { if (true) return; else return; };
+
+/// PASS
+  int i = 0;
+  f(int j => i = j);
+  /// Toplevel
+  void f(int->void g) {}
+
+/// PASS
+  int i1 = 0, i2 = 1;
+  f(int j => i1 = i2 = j);
+  /// Toplevel
+  void f(int->void g) {}
+
+/// PASS
+  int i = 0;
+  [1,2,3].foreach(int j => i += j);
+  assert (i == 6);

@@ -56,6 +56,9 @@ String substring(StringBuffer, int) =
 String substring(StringBuffer, int, int) = 
   native String StringBuffer.substring(int, int);
 
+java.util.Properties<String,String> getProperties() = 
+  native java.util.Properties java.lang.System.getProperties();
+
 //               PACKAGE: java.text
 
 DateFormat getDateInstance() = native DateFormat DateFormat.getDateInstance();

@@ -106,8 +106,14 @@ boolean `!=`(char, char) = inline nice.lang.inline.CompOp("iNe");
 <Any T> String valueOf(T) = native String String.valueOf(Object);
 <Any T> Class getClass(!T) = native Class Object.getClass();
 
-java.util.Properties<String,String> getProperties() = 
-  native java.util.Properties java.lang.System.getProperties();
+/** 
+    This function will throw CloneNotSupportedException if the argument
+    does not implement java.lang.Cloneable.
+
+    We will give a stricter type later when we can uniformly describe
+    cloneable classes of arbitrary variances.
+*/
+<T> T clone(T) = native Object java.lang.Object.clone();
 
 /****************************************************************
  * Ref

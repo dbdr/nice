@@ -35,3 +35,10 @@ class B implements I {
   /// Toplevel
   <T> T foo(T x, Object o) = x;
   foo(String s, o) = "";
+
+/// PASS bug
+  assert !foo(null);
+  assert foo("");
+  /// Toplevel
+<T> boolean foo(T x) = false;
+foo(Object x) = true;

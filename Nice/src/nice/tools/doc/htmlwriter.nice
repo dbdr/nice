@@ -43,7 +43,7 @@ class HTMLWriter {
       //System.err.println("Ignoring " + d.getName() + " (class: " + d.getClass().getName() + ") with docString: "+ d.docString());
   }
 
-  write(c@ClassDefinition.Class, packageName) {
+  write(ClassDefinition.Class c, packageName) {
     // Here we handle classes
     
     //Initialise a FileWriter
@@ -126,7 +126,7 @@ class HTMLWriter {
     writer.close();
   }
 
-  write(gv@GlobalVarDeclaration, packageName) {
+  write(GlobalVarDeclaration gv, packageName) {
     //Handle global variables
     
     //Initialise a FileWriter
@@ -157,7 +157,7 @@ class HTMLWriter {
     writer.close();
   }
   
-  write(m@MethodDeclaration, packageName) {
+  write(MethodDeclaration m, packageName) {
     //Handle methods
     
     //Initialise a FileWriter
@@ -189,7 +189,7 @@ class HTMLWriter {
     writer.close();
   }
 
-  write(m@DefaultMethodImplementation, packageName) {
+  write(DefaultMethodImplementation m, packageName) {
     this.write(m.getDeclaration(), packageName);
   }
 

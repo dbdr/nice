@@ -36,7 +36,7 @@ class Documenter {
 	    " (class: " + d.getClass().getName() + ")");
   }
 
-  document(c@ClassDefinition.Class)
+  document(ClassDefinition.Class c)
   {
     // Here we handle classes
     // Example code that accesses some properties of classes:
@@ -52,19 +52,19 @@ class Documenter {
 		         println("  implements " + i.getName()));
   }
 
-  document(m@MethodDeclaration)
+  document(MethodDeclaration m)
   {
     println("Method " + m.getName);
     // Here we handle methods...
   }
 
-  document(m@MethodImplementation)
+  document(MethodImplementation m)
   {
     // Method implementations can probably be ignored, as they do not
     // belong to the API.
   }
 
-  document(m@DefaultMethodImplementation)
+  document(DefaultMethodImplementation m)
   {
     // However, for a default implementation, we want to handle the corresponding
     // declaration.

@@ -251,3 +251,12 @@ class A<+T> {}
 void foo(A<Object> x) {}
 // This is NOT an override
 override void foo(A<String> x) {}
+
+/// PASS
+  /// package a
+  /// Toplevel
+  boolean foo(?int x) = false;
+  override boolean foo(int x) = true;
+  /// package b import a
+  assert ! foo(null);
+  assert foo(5);

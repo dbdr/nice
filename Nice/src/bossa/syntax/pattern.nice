@@ -29,13 +29,14 @@ public Pattern createPattern(LocatedString name, TypeIdent ti)
 
 //for use in MethodImplementation
 public Pattern createPattern(?LocatedString name, ?mlsub.typing.TypeConstructor tc, boolean sure)
-{
+{ // TODO: don't generate NotNullPatterns if the overriden domain is sure.
   let loc = (name != null) ? name.location() : Location.nowhere();
-  if (sure && tc == null)
-    return new NotNullPattern(name, PrimitiveType.sureTC, loc);
 
   if (nice.tools.typing.Types.isPrimitive(tc))
     tc = null;
+
+  if (sure && tc == null)
+    return new NotNullPattern(name, PrimitiveType.sureTC, loc);
 
   if (tc == null)
     return new VariablePattern(name, loc);
@@ -623,6 +624,9 @@ public ?Pattern readPattern(String rep, int[]/*ref*/ pos)
 
   if (name.equals("_"))
     return createPattern(new LocatedString("_", loc));
+
+  if (name.equals("NONNULL"))
+    return new NotNullPattern(null, PrimitiveType.sureTC, loc);
 
   if (name.equals("NULL"))
     return createPattern(createNullExp(loc));

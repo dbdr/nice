@@ -9,13 +9,11 @@
 
 
 PROC=xsltproc --nonet
-STYLESHEET=common.xsl
-STYLEOPT=
 
 .PHONY : clean send
 
 all: index.html research.html compilation.html testimonials.html install.html \
-     roadmap.html manual.html manual.pdf manual.ps
+     roadmap.html safety.html manual.html manual.pdf manual.ps
 
 send: all
 	scp -r *.html *.pdf *.ps *.css .htaccess images bonniot@shell.sourceforge.net:/home/groups/n/ni/nice/htdocs
@@ -23,14 +21,14 @@ send: all
 old: safety.html
 
 manual.html: manual.xsl manual.xml
-	$(PROC) manual.xsl manual.xml > $@
+	if ! $(PROC) manual.xsl manual.xml > $@; then rm manual.html; fi
 
 manual.pdf manual.ps: manual.xml
 	xmlto $(shell expr match $@ 'manual\.\(.*\)') manual.xml
 
 %.html: %.xml new.xsl
-	$(PROC) new.xsl $*.xml $(STYLEOPT) > $@
+	$(PROC) new.xsl $*.xml > $@
 
 # Old style
-safety.html: %.xml $(STYLESHEET)
-	$(PROC) $(STYLESHEET) $*.xml $(STYLEOPT) > $@
+safety.html: manual.xsl safety.xml
+	if ! $(PROC) manual.xsl safety.xml > $@; then rm safety.html; fi

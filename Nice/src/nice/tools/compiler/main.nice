@@ -198,7 +198,7 @@ void main(String[] args)
 void version()
 {
   println("Nice compiler version " + versionNumber + " (build " + buildDate + ")");
-  println("Copyright (C) 2002 Daniel Bonniot");
+  println("Copyright (C) 2003 Daniel Bonniot");
   println("Visit the Nice homepage: http://nice.sourceforge.net");
   System.exit(0);
 }

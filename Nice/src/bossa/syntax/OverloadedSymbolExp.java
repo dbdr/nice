@@ -119,8 +119,7 @@ public class OverloadedSymbolExp extends Expression
     if (symbols.size() == 0)
       User.error(this, 
 		 removedSomething ?
-		 "No method with name " + ident + 
-		 " matches call " + arguments :
+		 "No method with name " + ident + arguments.explainNoMatch() :
 		 "No method has name " + ident);
 
     // SECOND PASS: check argument types

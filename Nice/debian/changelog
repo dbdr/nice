@@ -1,3 +1,9 @@
+nice (0.0.020300) unstable; urgency=low
+
+  * Better error messages for method calls with wrong number of arguments.
+
+ --
+
 nice (0.0.020205) unstable; urgency=low
 
   * Allow multiple variables to be defined together, as in:

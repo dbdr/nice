@@ -189,6 +189,15 @@ public class Arguments extends Node
 		 (i + 1 < arguments.length ? ", " : ""));
     return res.append(")").toString();
   }
+
+  String explainNoMatch()
+  {
+    for (int i = 0; i < arguments.length; i++)
+      if (arguments[i].name != null)
+	return " has compatible named arguments";
+    
+    return " has " + arguments.length + " arguments";
+  }
   
   Argument[] arguments;
 }

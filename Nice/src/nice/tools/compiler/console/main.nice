@@ -56,7 +56,8 @@ int compile(String[] args)
     (name: "nicec", longName: "The Nice Compiler",
      shortDescription: "compiler for the Nice programming language",
      author: "Daniel Bonniot <bonniot@users.sourceforge.net>, <Daniel.Bonniot@inria.fr>",
-     seeAlso: "http://nice.sourceforge.net        the Nice Home Page\n",
+     seeAlso: "http://nice.sourceforge.net          the Nice Home Page\n" +
+              "http://nice.sf.net/compilation.html  compilation instructions\n",
      manualSection: "1",
      arguments: "package", options: cast(null));
   prg.options = 

@@ -1,10 +1,10 @@
 # Set the paths for your tools in this file
 
-set JAVA_HOME /usr/local/jdk118_v1
+set JAVA_HOME /usr
 
 set JAVA_CLASSPATH ""
 
-set JAVAC /mnt/image/install/bin/gcj
+set JAVAC /usr/bin/gcj
 
 set JAVAC_FLAGS "-C"
 

@@ -1,7 +1,7 @@
 # Set the paths for your tools in this file
 
 #set JAVA_HOME C:/jdk1.3
-set JAVA_HOME /usr/local/IBMJava2-13
+set JAVA_HOME /usr/lib/j2sdk1.3
 
 set JAVA_CLASSPATH ""
 

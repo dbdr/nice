@@ -1,7 +1,6 @@
 # Set the paths for your tools in this file
 
-#set JAVA_HOME C:/jdk1.3
-set JAVA_HOME /usr/local/IBMJava2-13
+set JAVA_HOME /usr/lib/j2sdk1.3
 
 #set JAVA_CLASSPATH ${JAVA_HOME}/lib/classes.zip
 set JAVA_CLASSPATH ${JAVA_HOME}/jre/lib/rt.jar
@@ -13,9 +12,7 @@ foreach var {JIKESPATH BOOTCLASSPATH SOURCEPATH EXTDIRS} {
   }
 }
 
-#set JAVAC /usr/bin/jikes
-#set JAVAC c:/jikes/jikes.exe
-set JAVAC /home/mo/project/build/jikes/src/jikes
+set JAVAC /usr/bin/jikes
 
 set JAVAC_FLAGS ""
 # To test the assert statement, use this setup

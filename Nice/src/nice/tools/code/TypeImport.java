@@ -46,7 +46,20 @@ public class TypeImport
 
   public static Type lookup(String className, bossa.util.Location loc)
   {
-    Type res = lookupQualified(className);
+    Type res = null;
+
+    try {
+      res = lookupQualified(className);
+    }
+    catch(NoClassDefFoundError e) {
+
+      // Note: this can also happen when a class with similar name but with 
+      // different case exists (on case-insensitive file-systems like FAT).
+
+      User.error(loc, "Class " + className + " depends on class " + 
+		 e.getMessage().replace('/', '.') +
+		 ", which is not available on the classpath");
+    }
 
     if (res != null)
       return res;
@@ -140,14 +153,10 @@ public class TypeImport
 
     Class c = null;
 
-    try{ c = classLoader.loadClass(className); }
-    catch(ClassNotFoundException e)
-      // when the class does not exist
-      { }
-    catch(NoClassDefFoundError e) 
-      // when a class with similar name but with different case exists
-      // can occur on case-insensitive file-systems (e.g. FAT)
-      { }
+    try{ 
+      c = classLoader.loadClass(className); 
+    }
+    catch(ClassNotFoundException e) {} // The class does not exist.
 
     stringToReflectClass.put(className, c);
     

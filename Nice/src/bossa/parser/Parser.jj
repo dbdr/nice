@@ -1720,7 +1720,7 @@ Expression ConditionalOrExpression() :
 {
   e1=ConditionalAndExpression() 
     ( t="||" e2=ConditionalAndExpression() 
-      { e1=new IfExp(e1, Parser.trueExp, e2); } )*
+      { e1=CallExp.create(symb(t), e1, e2); } )*
   { return e1; }
 }
 
@@ -1729,7 +1729,7 @@ Expression ConditionalAndExpression() :
 {
   e1=InclusiveOrExpression() 
     ( t="&&" e2=InclusiveOrExpression() 
-      { e1=new IfExp(e1, e2, Parser.falseExp); } )*
+      { e1=CallExp.create(symb(t), e1, e2); } )*
   { return e1; }
 }
 

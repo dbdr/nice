@@ -149,15 +149,13 @@
 /// COMMENT Check several variables at the same time
 
 /// PASS
-  ?int x1 = null;
-  ?int x2 = null;
+  ?int x1 = null, x2 = null;
   if (x1 != null && x2 != null)
     { x1++; x2++; }
 
 
 /// PASS
-  ?int x1 = null;
-  ?int x2 = null;
+  ?int x1 = null, x2 = null;
   if (x1 == null || x2 == null)
     ;
   else
@@ -165,16 +163,14 @@
 
 
 /// PASS
-  ?int x1 = null;
-  ?int x2 = null;
+  ?int x1 = null, x2 = null;
   if (x1 == null || x2 == null)
     return;
   { x1++; x2++; }
 
 
 /// PASS
-  ?int x1 = null;
-  ?int x2 = null;
+  ?int x1 = null, x2 = null;
   if (x1 != null && x2 != null)
     ;
   else
@@ -183,8 +179,7 @@
 
 
 /// PASS
-  ?int x1 = 0;
-  ?int x2 = 0;
+  ?int x1 = 0, x2 = 0;
   if (true)
     if (x1 != null && x2 != null)
       { x1++; x2++; }
@@ -196,8 +191,7 @@
 
 
 /// PASS
-  ?int x1 = 0;
-  ?int x2 = 0;
+  ?int x1 = 0, x2 = 0;
   if (true)
     if (true)
       if (x1 != null && x2 != null)
@@ -210,8 +204,7 @@
   { x1++; x2++; }
 
 /// PASS
-  ?int x1 = 0;
-  ?int x2 = 0;
+  ?int x1 = 0, x2 = 0;
   if (true)
   {
     if (true)
@@ -225,8 +218,7 @@
   }
 
 /// FAIL
-  ?int x1 = null;
-  ?int x2 = null;
+  ?int x1 = null, x2 = null;
   if (false)
     if (x1 == null || x2 == null)
       return;
@@ -234,8 +226,7 @@
   
 
 /// FAIL
-  ?int x1 = null;
-  ?int x2 = null;
+  ?int x1 = null, x2 = null;
   if (false)
     if (x1 != null && x2 != null)
       ;
@@ -247,15 +238,13 @@
 // Assigning a null value
 
 /// PASS
-  ?int x1 = 0;
-  ?int x2 = 0;
+  ?int x1 = 0, x2 = 0;
   if (x1 != null && x2 != null)
     x1 = null;
 
 
 /// FAIL
-  ?int x1 = 0;
-  ?int x2 = 0;
+  ?int x1 = 0, x2 = 0;
   if (x1 != null && x2 != null)
     {
       x1 = null;
@@ -264,8 +253,7 @@
 
 
 /// PASS
-  ?int x1 = 0;
-  ?int x2 = 0;
+  ?int x1 = 0, x2 = 0;
   if (x1 != null && x2 != null)
     if (false)
       x1 = null;
@@ -274,8 +262,7 @@
 
 
 /// FAIL
-  ?String x1 = null;
-  ?String x2 = null;
+  ?String x1 = null, x2 = null;
   ?String y = null;
   if (y != null)
     if (x1 != null && x2 != null)
@@ -284,15 +271,13 @@
 
 
 /// PASS
-  ?int x1 = 0;
-  ?int x2 = 0;
+  ?int x1 = null, x2 = null;
   while (x1 != null && x2 != null)
     { x1++; x2++; }
 
 
 /// FAIL
-  ?int x1 = null;
-  ?int x2 = null;
+  ?int x1 = null, x2 = null;
   while (x1 == null || x2 == null)
     { x1++; x2++; }
 

@@ -188,10 +188,12 @@ nullnessInfo(test@CallExp)
   if (variable == null)
     return (null, null);
 
+  List<MonoSymbol> l = new LinkedList();
+  l.add(variable);
   if (isAlwaysNull)
-    return (null,[variable]);
+    return (null, l);
   else 
-    return ([variable],null);
+    return (l, null);
 }
 
 // Returns a list combining l1 and l2, possibly modifying l1.
@@ -308,55 +310,16 @@ typecheck(e@IfExp)
     // it is important to compute the branch's type and to store it now.
     elseExp.computeType();
 
-/*
-    if (variables == null)
-      {
-	typecheck(thenExp);
-	enterElse();
-	typecheck(elseExp);
-	return;
-      }
-
-    MonoSymbol variable = notNull(variable);
-
-    if (! isAlwaysNull)
-      // variable is non-null in the 'then' part
-      {
-	mlsub.typing.Monotype type = notNull(variable.type);
-	mlsub.typing.Monotype sureType = makeSure(type);
-
-	setVarType(variable, now: sureType, brothers: type);
-
-	typecheck(thenExp);
-	// since the type of the variable is destructively changed,
-	// it is important to compute the branch's type and to store it now.
-	thenExp.computeType();
-
-	enterElse();
-
-	typecheck(elseExp);
-      }
-    else
-      // variable is non-null in the 'else' part
-      {
-	mlsub.typing.Monotype type = variable.type;
-	mlsub.typing.Monotype sureType = makeSure(type);
-	typecheck(thenExp);
-
-	enterElse();
-
-	setVarType(variable, now: sureType, brothers: type);
-
-	typecheck(elseExp);
-	// since the type of the variable is destructively changed,
-	// it is important to compute the branch's type and to store it now.
-	elseExp.computeType();
-      }
-*/
   }
   finally{
     exitIf();
   }
+
+  if (! e.getType().trySimplify())
+    throw bossa.util.User.error
+      (e, "The two branches have incompatible types:" +
+       "\nthen: " + thenExp.getType() +
+       "\nelse: " + elseExp.getType());
 }
 
 /**

@@ -1,0 +1,65 @@
+/// COMMENT Operator &
+
+/// PASS
+  assert (true & true);
+
+/// PASS
+  assert (! (true & false));
+
+/// PASS
+  assert (! (false & true));
+
+/// PASS
+  assert (! (false & false));
+
+/// COMMENT Operator |
+
+/// PASS
+  assert (true | true);
+
+/// PASS
+  assert (true | false);
+
+/// PASS
+  assert (false | true);
+
+/// PASS
+  assert (! (false | false));
+
+/// COMMENT Operator &&
+
+/// PASS
+  assert (true && true);
+
+/// PASS
+  assert (! (true && false));
+
+/// PASS
+  assert (! (false && true));
+
+/// PASS
+  assert (! (false && false));
+
+/// COMMENT Operator ||
+
+/// PASS
+  assert (true || true);
+
+/// PASS
+  assert (true || false);
+
+/// PASS
+  assert (false || true);
+
+/// PASS
+  assert (! (false || false));
+
+/// COMMENT short-circuit
+/// global
+boolean fail() { throw new Error(); }
+
+/// PASS
+  assert (true || fail());
+
+/// PASS
+  assert (! (false && fail()));

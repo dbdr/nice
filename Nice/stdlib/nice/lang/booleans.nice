@@ -29,4 +29,7 @@ boolean `!`(boolean) = inline nice.lang.inline.BoolOp("!");
 boolean `&`(boolean, boolean) = inline nice.lang.inline.BoolOp("&");
 boolean `|`(boolean, boolean) = inline nice.lang.inline.BoolOp("|");
 
+boolean `&&`(boolean, boolean) = inline nice.lang.inline.ShortCircuitOp("&&");
+boolean `||`(boolean, boolean) = inline nice.lang.inline.ShortCircuitOp("||");
+
 `<`(b1@boolean, b2@boolean) = b2 || !b1;

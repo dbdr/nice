@@ -52,6 +52,13 @@ public class Parser
   {
     return new IdentExp(new LocatedString(name, loc));
   }
+
+  private void parseException(String message) throws ParseException
+  {
+    ParseException ex = new ParseException(message);
+    ex.currentToken = getToken(0);
+    throw ex;
+  }
 }
 PARSER_END(Parser)
 
@@ -1674,6 +1681,9 @@ Expression newExp():
     ( LOOKAHEAD(2) "[" e=Expression() "]" { args.add(e); } )+ 
     ( LOOKAHEAD(2) "[]" { furtherDimensions++; } )*
     { return new NewArrayExp(classe, args, furtherDimensions); }
+  |
+    "<"
+    { parseException("Type parameters are not needed in constructor calls"); }
   )
 }
 

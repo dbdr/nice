@@ -103,8 +103,6 @@ public final class Typing
   {
     if(dbg) 
       Debug.println("LEAVE "+(level-1));
-    if (dbg && level-1 <= 0)
-      bossa.util.Internal.printStackTrace();
     
     try{
       level--;

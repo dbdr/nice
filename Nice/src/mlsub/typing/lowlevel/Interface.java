@@ -80,4 +80,9 @@ class Interface {
       abstractors.bitMerge(src, dest);
     }
   }
+
+  public String toString()
+  {
+    return "" + iid;
+  }
 }

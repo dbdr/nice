@@ -112,12 +112,13 @@ public class AbstractInterface extends Definition
             +Util.map(" extends ",", ","",extensions)
             +"{}\n");
 
-    for(Iterator i = children.iterator(); i.hasNext(); )
-      {
-	Object o = i.next();
-	if (o instanceof Definition)
-	  ((Definition) o).printInterface(w);
-      }
+    if (children != null)
+      for(Iterator i = children.iterator(); i.hasNext(); )
+	{
+	  Object o = i.next();
+	  if (o instanceof Definition)
+	    ((Definition) o).printInterface(w);
+	}
   }
   
   /****************************************************************

@@ -139,7 +139,8 @@ public final class K0 {
    **/
   private BitMatrix Ct;
   /**
-   * Total number of indexes. (m <= n)
+   * Total number of indexes. 
+   * Invariant: m <= n && n == C.size()
    **/
   private int n;
 
@@ -517,6 +518,7 @@ public final class K0 {
   /***********************************************************************
    * Construction of the initial rigid context
    ***********************************************************************/
+
   private boolean hasBeenInitialized = false;
   public boolean hasBeenInitialized() {
     return hasBeenInitialized;
@@ -525,6 +527,7 @@ public final class K0 {
   /***********************************************************************
    * Initial rigidification
    ***********************************************************************/
+
   public void createInitialContext() 
     throws LowlevelUnsatisfiable
   {
@@ -536,8 +539,7 @@ public final class K0 {
     R.closure();
     Rt = (BitMatrix)Ct.clone();
     Rt.closure();
-    m = n;
-    m0 = n;
+    m0 = m = n;
     
     // saturate the interface subtyping under
     // I < J and J < K => I < K
@@ -566,7 +568,7 @@ public final class K0 {
     if(m != m0)
       S.dbg.println("releaseInitialContext should be called when in first rigid context");
     
-    m = m0 = 0;
+    m0 = m = 0;
   }
   
   /***********************************************************************
@@ -1125,6 +1127,10 @@ public final class K0 {
 
   public void satisfy() throws Unsatisfiable {
     S.assert(S.a&& hasBeenInitialized);
+
+    if (m == 0 || m == n)
+      return;
+
     try {
       prepareConstraint();
       rawSatisfy();
@@ -1209,6 +1215,10 @@ public final class K0 {
    **/
   public void rigidify() {
     S.assert(S.a&& hasBeenInitialized);
+
+    if (m == 0 || m == n)
+      return;
+    
     R = (BitMatrix)C.clone();
     R.closure();
     Rt = (BitMatrix)Ct.clone();
@@ -1248,8 +1258,7 @@ public final class K0 {
     // may be non-null if backtrackMode==BACKTRACK_UNLIMITED    
     Backup previous;
     int savedM;
-    //int savedN;
-    BitMatrix savedC;
+    int savedN;
     BitVector savedGarbage;
     DomainVector savedDomains;
     //BitVector[] savedImplementors;
@@ -1261,8 +1270,8 @@ public final class K0 {
         this.previous = null;
       }
       this.savedM = K0.this.m;
-      //this.savedN = K0.this.n;
-      this.savedC = (BitMatrix)K0.this.C.clone();
+      this.savedN = K0.this.n;
+      
       this.savedGarbage = (BitVector)K0.this.garbage.clone();
       this.savedDomains = (DomainVector)K0.this.domains.clone();
       /*
@@ -1276,24 +1285,26 @@ public final class K0 {
   }
 
   private Backup backup = null;
+  
   public void mark() {
     S.assert(S.a&& hasBeenInitialized);
+
     backup = new Backup();
   }
 
-  // backtrack to the situation the last time
-  // mark() has been called
+  // backtrack to the situation the last time mark() has been called
   public void backtrack() {
     S.assert(S.a&& hasBeenInitialized);
     S.assert(S.a&& backup != null, "backtrack() without corresponding mark()");
+
     this.m = backup.savedM;
     this.R.setSize(m);
     this.Rt.setSize(m);
-    this.C = backup.savedC;
-    this.Ct = backup.savedC.transpose();
-    this.n = backup.savedC.size();
-    //this.n = backup.savedN;
-    //this.C.setSize(n);
+
+    this.n = backup.savedN;
+    this.C.setSize(this.n);
+    this.Ct.setSize(this.n);
+    
     this.garbage = backup.savedGarbage;
     this.domains = backup.savedDomains;
     

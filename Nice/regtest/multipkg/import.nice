@@ -32,7 +32,7 @@ void test_import()
   polymorphic1(new regtest.basic.Multi());
   polymorphic2(new regtest.basic.Multi());
 
-  iter(["A"], String s => println(s));
+  iter(["A"], String str => println(str));
   /* Must fail: map(["A"], fun(String s)=>{println(s);}); */
 
   cov2(null);

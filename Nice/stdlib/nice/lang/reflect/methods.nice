@@ -56,8 +56,8 @@ void _testCall0()
 {
   java.io.File f = new java.io.File(".");
 
-  String res = f.call("getCanonicalPath");
-  assert res.equals(".");
+  String res = f.call("getPath");
+  assert res.equals(".") : res;
 }
 
 /****************************************************************

@@ -430,7 +430,13 @@ public class PrimProcedure extends MethodProc implements gnu.expr.Inlineable
     if (arg_error != null)
       comp.error('e', arg_error);
 
-    compile(getStaticFlag() ? null : method.getDeclaringClass(), args, comp, target);
+    try {
+      compile(getStaticFlag() ? null : method.getDeclaringClass(), args, comp, target);
+    }
+    catch (VerificationError e) {
+      throw bossa.util.User.error(bossa.util.Location.make(exp), 
+                                  e.getMessage());
+    }
   }
 
   public void compile (Type thisType, Expression[] args, Compilation comp, Target target)

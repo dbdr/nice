@@ -217,6 +217,14 @@ public abstract class Location implements Located
     }
   }
     
+  public static Location make(gnu.expr.Expression expr)
+  {
+    String file = expr.getFile();
+    return new Source(file != null ? new java.io.File(file) : null,
+                      expr.getLine(), expr.getColumn(),
+                      -1, -1);
+  }
+
   /****************************************************************
    * A compilation option
    ****************************************************************/

@@ -1063,12 +1063,14 @@ public class CodeAttr extends Attribute implements AttrContainer
     if (is_invokestatic != ((method.access_flags & Access.STATIC) != 0))
       throw new Error
 	("emitInvokeXxx static flag mis-match method.flags="+method.access_flags);
+    Type receiverType = null;
+
     while (--arg_count >= 0)
       popType();
     if (!is_invokestatic)
       {
         arg_count++;
-        Type receiverType = popType();
+        receiverType = popType();
         // Don't change anything is the call is an invokespecial
         if (opcode != 183 && receiverType != method.getDeclaringClass())
           {
@@ -1092,6 +1094,11 @@ public class CodeAttr extends Attribute implements AttrContainer
               }
           }
       }
+
+    if (! Access.legal(getMethod().getDeclaringClass(), method, receiverType))
+      throw new VerificationError
+        ("Method " + method.getName() + " is not accessible");
+
     put1(opcode);  // invokevirtual, invokespecial, or invokestatic
     putIndex2(getConstants().addMethodRef(method));
     if (opcode == 185)  // invokeinterface

@@ -28,3 +28,6 @@ class A implements Cloneable {}
 
   /// Toplevel
 class A {}
+
+/// FAIL
+  "abc".clone();

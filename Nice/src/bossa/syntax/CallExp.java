@@ -314,6 +314,7 @@ public class CallExp extends Expression
     else
       res = new gnu.expr.ApplyExp(function.generateCodeInCallPosition(), 
                                   compileParams());
+    location().write(res);
 
     return EnsureTypeProc.ensure(res, Types.javaType(type));
   }

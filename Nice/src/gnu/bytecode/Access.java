@@ -44,4 +44,24 @@ public class Access {
       }
     return buf.toString();
   }
+
+  /**
+     @return true if code in class c can access method m, with the first
+     argument of the call being receiver.
+  */
+  public static boolean legal(ClassType c, Method m, Type receiver)
+  {
+    int mod = m.getModifiers();
+    if ((mod & PUBLIC) != 0)
+      return true;
+
+    ClassType target = m.getDeclaringClass();
+
+    if ((mod & PRIVATE) != 0)
+      return c == target;
+
+    // PROTECTED
+    return c.getPackageName().equals(target.getPackageName())
+      || (c.isSubclass(target) && receiver.isSubtype(c));
+  }
 }

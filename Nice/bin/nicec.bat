@@ -5,35 +5,17 @@ rem
 rem Environment Variariable Prerequisites:
 rem
 rem     NICE - the root directory where nice is installed
-rem
-rem thanks to the catalina team for some batch file inspiration
-rem
-rem questions to jamie@thecodecollective.com
-rem
 rem ---------------------------------------------------------------------------
 
 rem -- do we have a nice environment variable?
 if not "%NICE%" == "" goto gotNice
 
-rem -- try some standard places
+echo You must set the NICE environment variable to point to the directory you've installed nice in e.g.
+echo set NICE=C:\programs\nice	(note: do not add a ';' at the end) 
+echo You can do it by modifying Autoexec.bat or in the system settings.
+goto end
 
-set NICE=c:\nice
-if exists %NICE%\nice.jar goto gotNice
-
-set NICE="c:\Program Files\nice"
-if exists %NICE%\nice.jar goto gotNice
-
-echo You must set NICE to point to the directory you've installed nice in e.g.
-echo set NICE=c:\java\nice
-echo You can do it by modifying this script (nicec.bat) or in Autoexec.bat
-goto cleanup
 :gotNice
+java -classpath %NICE%\nice.jar;%CLASSPATH% nice.tools.compiler.fun --runtime=%NICE%\nice.jar %1 %2 %3 %4 %5 %6 %7 %8 %9
 
-rem -- set up the reference to the nice jar file
-set NICEJAR=%NICE%\nice.jar
-java -classpath %NICEJAR%;%CLASSPATH% nice.tools.compiler.fun --runtime=%NICEJAR% %1 %2 %3 %4 %5 %6 %7 %8 %9
-
-rem -- cleanup environment variables
-:cleanup
-set NICEJAR=
-:finish
+:end

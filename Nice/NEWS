@@ -1,3 +1,7 @@
+nice (0.9.7)
+
+  * The 'Any' keyword is now deprecated.
+
 nice (0.9.6)
 
   * It is now possible to create custom constructors:

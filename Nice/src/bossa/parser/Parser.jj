@@ -560,6 +560,7 @@ TypeSymbol binder(Collection atomics):
   TypeIdent first;
   TypeConstructor second;
   MonotypeVar id;
+  Token t;
 }
 {
   LOOKAHEAD( typeIdent() typeConstructor() )
@@ -570,7 +571,10 @@ TypeSymbol binder(Collection atomics):
     return second; 
   }
 | { boolean sure = false; }
-  [ "Any" | "!" { sure = true; } ] id=monotypeVar()
+  [ t="Any" { User.warning(Location.make(t), "The 'Any' keyword is deprecated, leave it away."); }
+  | "!" { sure = true; } 
+  ]
+  id=monotypeVar()
   { 
     if (sure)
       atomics.add(AtomicConstraint.sureTypeVar(id));

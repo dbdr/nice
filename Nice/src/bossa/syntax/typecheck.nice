@@ -362,18 +362,9 @@ typecheck(e@IfExp)
   Expression thenExp = notNull(e.thenExp);
   Expression elseExp = notNull(e.elseExp);
 
-  try{
-    condition = condition.resolveOverloading(PrimitiveType.boolPolytype);
-    checkAssignment(PrimitiveType.boolPolytype, condition);
-    e.condition = condition;
-  }
-  catch(TypingEx t){
-    if (notNullError(t, e, condition.toString()))
-      throw new bossa.util.UserError
-      (e, 
-       "The condition must be a boolean.\n" + 
-       condition + " has type " + condition.getType());
-  }
+  condition = condition.resolveOverloading(PrimitiveType.boolPolytype);
+  checkBooleanCondition(condition);
+  e.condition = condition;
 
   enterIf();
 
@@ -613,16 +604,7 @@ typecheck(l@LoopStmt)
   if (whileExp != null)
     {
       l.whileExp = whileExp = whileExp.resolveOverloading(PrimitiveType.boolPolytype);
-      try {
-	checkAssignment(PrimitiveType.boolPolytype, whileExp);
-      }
-      catch(TypingEx t) {
-	if (notNullError(t, l, whileExp.toString()))
-      throw new bossa.util.UserError
-      (whileExp, 
-       "The condition must be a boolean.\n" + 
-       whileExp + " has type " + whileExp.getType());
-      }
+      checkBooleanCondition(whileExp);
     }
 
   enterIf();
@@ -768,6 +750,18 @@ boolean notNullError(TypingEx ex, bossa.util.Located resp, ?String value) {
   else
     return true;
 }
+
+void checkBooleanCondition(Expression condition) {
+  try {
+    checkAssignment(PrimitiveType.boolPolytype, condition);
+  }
+  catch(TypingEx t){
+    throw new bossa.util.UserError(condition, 
+       "The condition must be a boolean.\n" + 
+       condition + " has type " + condition.getType());
+  }
+}
+
 
 void wrongReturnType(bossa.util.Located responsible, 
 		     String typeFound, 

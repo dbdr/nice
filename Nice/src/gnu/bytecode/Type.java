@@ -64,7 +64,7 @@ public abstract class Type {
 	if (name.endsWith("[]"))
 	  {
 	    type = getType(name.substring(0, name.length()-2));
-	    type = new ArrayType(type, name);
+	    type = nice.tools.code.SpecialArray.create(type);
 	  }
 	else
 	  {
@@ -122,7 +122,7 @@ public abstract class Type {
 	  return (Type) t;
       }
     if (reflectClass.isArray())
-      type = ArrayType.make(Type.make(reflectClass.getComponentType()));
+      type = nice.tools.code.SpecialArray.create(Type.make(reflectClass.getComponentType()));
     else if (reflectClass.isPrimitive())
       throw new Error("internal error - primitive type not found");
     else

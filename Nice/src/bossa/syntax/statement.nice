@@ -53,7 +53,7 @@ gnu.expr.Expression[] compileStatements(Statement[] statements)
         throw e;
       }
 
-      if (s.location() != null)
+      if (s.location() != null && ! res[i].hasLocation())
         s.location().write(res[i]);
     }
   return res;

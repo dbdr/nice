@@ -165,6 +165,11 @@ public abstract class Expression implements Printable
     return position & ((1 << 12) - 1);
   }
 
+  public boolean hasLocation()
+  {
+    return getFile() != null && position != 0;
+  }
+
   /** Return the Type used to represent the values of this Expression. */
   public Type getType()
   {

@@ -52,7 +52,7 @@ public class Block extends Statement
     MonoSymbol left;
   }
 
-  private ArrayList /* of LocalDeclaration */ locals = new ArrayList();
+  ArrayList /* of LocalDeclaration */ locals = new ArrayList();
 
   /**
      Divides the statements in an hierarchy of blocks.
@@ -173,8 +173,10 @@ public class Block extends Statement
 	LocalDeclaration local = (LocalDeclaration) i.next();
 	if (local.value == null)
 	  continue;
+
 	try{
-	  local.value = AssignExp.checkAssignment(local.left.getType(),local.value);
+	  local.value = 
+	    AssignExp.checkAssignment(local.left.getType(),local.value);
 	}
 	catch(mlsub.typing.TypingEx t){
 	  User.error(local.left,

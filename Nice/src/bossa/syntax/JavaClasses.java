@@ -237,6 +237,15 @@ public final class JavaClasses
   /** Utility function for analyse.nice */
 
   static List findJavaMethods
+    (ClassType declaringClass, String funName)
+  {
+    return findJavaMethods(declaringClass, funName, -1);
+  }
+
+  /** If arity == -1, the arity does not matter, 
+      and the method or field must be static.
+   */
+  static List findJavaMethods
     (ClassType declaringClass, String funName, int arity)
   {
     List possibilities = new LinkedList();
@@ -246,8 +255,9 @@ public final class JavaClasses
     for(gnu.bytecode.Method method = declaringClass.getMethods();
 	method!=null; method = method.getNext())
       if(method.getName().equals(funName) &&
-	 (method.arg_types.length + 
-	  (method.getStaticFlag() ? 0 : 1)) == arity)
+	 (arity == -1 && method.getStaticFlag()
+	  || (method.arg_types.length + (method.getStaticFlag() ? 0 : 1)) 
+	      == arity))
 	{
 	  MethodDeclaration md = (JavaMethod) retyped.get(method);
 	  if (md == null)
@@ -260,10 +270,10 @@ public final class JavaClasses
 	}
 
     // search a field
-    if (arity == 0)
+    if (arity <= 0)
       {
 	gnu.bytecode.Field field = declaringClass.getField(funName);
-	if (field != null)
+	if (field != null && field.getStaticFlag)
 	  {
 	    MethodDeclaration md = (JavaFieldAccess) retyped.get(field);
 	    if (md == null)
@@ -275,6 +285,7 @@ public final class JavaClasses
 		Debug.println("Field " + field + " ignored");
 	  }
       }
+
     return possibilities;
   }    
 
@@ -300,7 +311,6 @@ public final class JavaClasses
 	  addSymbol(f, JavaFieldAccess.make(f));
       }
 
-  addingFetchedMethod:
     for(Method m = classType.getMethods(); m!=null; m = m.getNext())
       {
 	if(m.isConstructor())
@@ -312,6 +322,13 @@ public final class JavaClasses
 	  }
 	else
 	  {
+	    /* We don't need to put static methods in the global scope.
+	       They can and must be access by specifying the class explicitely,
+	       like in Java. 
+	    */
+	    if (m.getStaticFlag())
+	      continue;
+
 	    Method base = baseMethod(classType, m);
 	    if (base != null)
 	      continue;

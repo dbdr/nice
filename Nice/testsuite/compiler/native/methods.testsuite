@@ -1,0 +1,10 @@
+/// PASS
+  byte->String f = Byte.toString;
+
+/// FAIL
+  byte->String f = Byte.toString();
+
+/// PASS
+  // Static methods are not in the global score.
+  byte->String f = Byte.toString;
+  String[] s = [1].map(toString);

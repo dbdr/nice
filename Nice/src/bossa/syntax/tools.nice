@@ -81,6 +81,7 @@ List<Block.LocalDeclaration> locals(Block) = native Block.locals;
 ?Statement[] statements(Block) = native Block.statements;
 ?gnu.bytecode.ClassType staticClass(Arguments) = native gnu.bytecode.ClassType Arguments.staticClass();
 List<VarSymbol> findJavaMethods(?gnu.bytecode.ClassType, String, int) = native List JavaClasses.findJavaMethods(gnu.bytecode.ClassType,java.lang.String,int);
+List<VarSymbol> findJavaMethods(?gnu.bytecode.ClassType, String) = native List JavaClasses.findJavaMethods(gnu.bytecode.ClassType,java.lang.String);
 OverloadedSymbolExp newOverloadedSymbolExp(List<bossa.syntax.VarSymbol>, ?bossa.syntax.LocatedString) = native new OverloadedSymbolExp(List,LocatedString);
 Arguments arguments(CallExp) = native CallExp.arguments;
 

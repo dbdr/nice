@@ -1,0 +1,7 @@
+/// PASS
+  java.io.PrintStream s = System.out;
+
+/// PASS
+  java.io.PrintStream s = id(System.out);
+  /// Toplevel
+  <T> T id(T x) = x;

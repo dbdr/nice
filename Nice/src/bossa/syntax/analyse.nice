@@ -277,6 +277,34 @@ analyse(e@CallExp, info)
 			  (e.function, "This is not a valid class member"));
 	  
 	  int arity = args.size();
+
+	  if ((! e.hasBrackets) && (arity == 0))
+	    // This case is link java.lang.Byte.toString:
+	    // look for a method with that name and any arity,
+	    // since the method is not called but just referenced.
+	    {
+	      List<VarSymbol> possibilities = JavaClasses.findJavaMethods
+	        (e.declaringClass, funName.toString());
+
+	      if (possibilities.size() == 0)
+		throw error(e, "Class " + notNull(e.declaringClass).getName() +
+			    " has no static method or static field named " +
+			    funName);
+
+	      /*
+		If there is a field access, then we consider this an access
+		to the static field. Otherwise, it is a reference to
+		the method, not applied.
+	      */
+	      if (possibilities.has(VarSymbol s => s.isFieldAccess()))
+		{
+		  e.function = newOverloadedSymbolExp(possibilities, funName);
+		  return e;
+		}
+	      else
+		return newOverloadedSymbolExp(possibilities, funName);
+	    }
+
 	  List<VarSymbol> possibilities = JavaClasses.findJavaMethods
 	    (e.declaringClass, funName.toString(), arity);
 
@@ -388,7 +416,7 @@ Expression analyseIdent(IdentExp e, Info info, boolean assigned)
 
 	if (sym.isFieldAccess())
 	  return new CallExp(newOverloadedSymbolExp(symbols, e.ident),
-			     Arguments.noArguments);
+			     Arguments.noArguments());
 
 	return new SymbolExp(sym, e.location());
       }

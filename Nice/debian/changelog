@@ -7,6 +7,11 @@ nice (0.7.7) unstable; urgency=low
     Additionally, arrays are always considered to have non-null component 
     types.
     Final fields are considered non-null.
+  * Static native methods are not (wrongly) imported in the global name space.
+    One can just use them as in Java, by prefixing with the class name:
+      String s = Integer.toHexString(0);
+    It's now also possible to refer to static methods as anonymous functions:
+      String[] s = integerArray.map(Integer.toHexString);
   * Faster compilation for large projects with many classes.
   * Bugfixes (anonymous functions inside functionals with constracts).
 

@@ -40,8 +40,7 @@ public class CallExp extends Expression
    */
   public CallExp(Expression function, Arguments arguments)
   {
-    this.function = function;
-    this.arguments = arguments;
+    this(function, arguments, false, true);
   }
 
   /**
@@ -50,10 +49,13 @@ public class CallExp extends Expression
      @param infix true if the first parameter was written before the function,
      using the dot notation: x1.f(x2, x3)
    */
-  public CallExp(Expression function, Arguments arguments, boolean infix)
+  public CallExp(Expression function, Arguments arguments, 
+		 boolean infix, boolean hasBrackets)
   {
-    this(function, arguments);
+    this.function = function;
+    this.arguments = arguments;
     this.infix = infix;
+    this.hasBrackets = hasBrackets;
   }
 
   public static CallExp create(Expression function, 
@@ -355,7 +357,11 @@ public class CallExp extends Expression
   protected Arguments arguments;
   
   /** true iff the first argument was written before the application: e.f(x) */
-  boolean infix;
+  final boolean infix;
+
+  /** true iff this call was made using brackets (i.e. not like 'x.f'). */
+  final boolean hasBrackets;
+
   /** Class this static method is defined in, or null */
   gnu.bytecode.ClassType declaringClass = null;
 }

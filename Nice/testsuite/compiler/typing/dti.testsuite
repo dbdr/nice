@@ -3,6 +3,10 @@
 let ()->?String maybeStringGenerator = (int x => ()=> x++ > 10 ? "abc" : null)(0); 
 void maybeThrow() = throw new Exception();
 boolean maybeTrue() = true;
+class A {}
+class B extends A { int x = 0; }
+class C extends A { int y = 1; }
+class D extends C {}
 
 /// PASS
   ?String s = maybeString();
@@ -196,3 +200,95 @@ StringBuffer func( ?StringBuffer foo ) {
     func = () => {s = null; };
     func();
   }
+
+/// PASS bug
+  ?String s = maybeString();
+  try {
+    s = "abc";
+    maybeThrow();
+  } catch (Exception e) {
+    s = "abc";
+  }
+  s.substring(1);
+
+/// PASS bug
+  ?String s = maybeString();
+  try {
+    s = null;
+    maybeThrow();
+  } catch (Exception e) {
+    s = null;
+  } finally  {
+    s = "abc";
+  }
+  s.substring(1);
+
+/// PASS bug
+  A a = new A();
+  a = new B();
+  assert a.x == 0;
+
+/// PASS bug
+  A a = new A();
+  a = new B();
+  a = new C();
+  assert a.y == 1;
+
+/// PASS bug
+  A a = new A();
+  if (a instanceof B)
+    a = a;
+  else
+    a = new B();
+
+  assert a.x == 0;
+
+/// FAIL
+  A a = new A();
+  if (! (a instanceof B))
+    a = new B();
+
+  a = new A();
+  assert a. /*/// FAIL HERE*/ x == 0;
+
+/// PASS bug
+  A a = new A();
+  if (! (a instanceof B))
+    a = new B();
+  else
+    a = a;
+
+  assert a.x == 0;
+
+/// FAIL
+  A a = new A();
+  if (maybeTrue())
+    a = new B();
+  else 
+    a = new C();
+
+  assert a. /*/// FAIL HERE*/ x == 0;
+
+/// PASS bug
+  A a = new A();
+  if (maybeTrue())
+    a = new C();
+  else 
+    a = new D();
+
+  assert a.y == 1;
+
+/// PASS bug
+ ?C a = new D();
+ if (maybeTrue())
+   {
+     if (a == null)
+       a = new C();
+   }
+ else
+   {
+     if (!(a instanceof D))
+       a = new D(); 
+   }
+
+ assert a.y == 1;

@@ -30,3 +30,8 @@ void syntaxTest()
 // hide java.lang.Character
 class Character { int dummy; }
 int get(Character other) = other.dummy;
+
+
+
+
+// We put this comment on the last line, without a trailing newline.

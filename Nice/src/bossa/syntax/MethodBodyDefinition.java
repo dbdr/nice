@@ -169,9 +169,6 @@ public class MethodBodyDefinition extends Definition
     List symbols = scope.lookup(name);
     if(symbols.size() == 0) return null;
 
-    if(symbols.size() == 1)
-      return (VarSymbol) symbols.get(0);
-
     TypeConstructor[] tags = Pattern.getTC(formals);
     TypeConstructor[] additionalTags = Pattern.getAdditionalTC(formals);
     
@@ -225,7 +222,8 @@ public class MethodBodyDefinition extends Definition
 
     if(symbols.size()==0)
       User.error(this,
-		 "No definition of \""+name+"\" is compatible with the patterns");
+		 "No method called " + name + 
+		 " is compatible with these patterns");
 
     String methods = "";
     for(Iterator i = symbols.iterator(); i.hasNext();)

@@ -73,3 +73,11 @@ paint(p@java.awt.Component, g) {
  
   void foo(I);
   foo(#I){}
+
+/// FAIL
+  /// Toplevel
+class A {}
+class B extends A{}
+
+void foo(B);
+foo(@A){}

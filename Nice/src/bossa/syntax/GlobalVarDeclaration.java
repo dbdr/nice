@@ -32,8 +32,6 @@ public class GlobalVarDeclaration extends Definition
   public GlobalVarDeclaration(LocatedString name, Monotype type, Expression value, boolean constant)
   {
     super(name, Node.global);
-    if (constant && value == null)
-      User.error(name,"A global constant needs a default value");
     
     this.left = new GlobalVarSymbol(name,type,constant);
     this.constant = constant;
@@ -123,9 +121,11 @@ public class GlobalVarDeclaration extends Definition
   public void printInterface(java.io.PrintWriter s)
   {
     if (constant) 
-      s.print( "let " + left + " = " +value.toString() + ";\n");
+      s.print( "let ");
     else	
-      s.print( "var " + left + ";\n");
+      s.print( "var ");
+
+    s.print(left + " = " +value.toString() + ";\n");
   }
   
   /****************************************************************

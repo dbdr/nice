@@ -142,3 +142,7 @@ let String A = "A";
 let QualifiedName QNAME = new QualifiedName(a: A, b: B);
 
 class QualifiedName { String a; String b; }
+
+/// FAIL
+  /// Toplevel
+  var String s;

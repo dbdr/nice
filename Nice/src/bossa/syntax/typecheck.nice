@@ -306,7 +306,7 @@ private ?List<MonoSymbol> combine(?List<MonoSymbol> l1, ?List<MonoSymbol> l2)
     Later, instanceof tests will also be taken into account.
 */
 
-var int ifLevel;
+var int ifLevel = 0;
 var Stack<int> levels = new Stack();
 var Stack<(MonoSymbol, mlsub.typing.Monotype)> conditionalTypes = new Stack();
 

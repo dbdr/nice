@@ -29,12 +29,19 @@ class Constr
   toString() = this.b + "," + this.a;
 }
 
+class Con1<T> { T x; }
+// Inherit a parameterized field, while renaming the type parameter.
+class Con2<U> extends Con1<U> { }
+
 void test_constructors()
 {
   Constr c = new Constr(a: 0, b: "1");
   println(c);
   println(new Constr(a: 0));
   println(new Constr(b: "", a: 0));
+
+  Con1<String> cc = new Con1(x: "Tricky");
+  String s = cc.x;
 }
 
 // Local Variables:

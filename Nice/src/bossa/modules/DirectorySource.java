@@ -12,7 +12,7 @@
 
 // File    : DirectorySource.java
 // Created : Tue Aug 01 16:24:45 2000 by Daniel Bonniot
-//$Modified: Tue Oct 03 10:58:41 2000 by Daniel Bonniot $
+//$Modified: Wed Oct 04 11:52:04 2000 by Daniel Bonniot $
 
 package bossa.modules;
 
@@ -113,7 +113,7 @@ class DirectorySource extends PackageSource
     InputStream s = getBytecodeStream();
     if (s == null)
       {
-	User.warning("Bytecode for " + this + 
+	User.warning("Bytecode for " + this.getName() + 
 		     " was not found, altough its interface exists.\n"+
 		     "Ignoring and recompiling");
 	return null;

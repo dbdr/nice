@@ -8,6 +8,7 @@ LISPDIR=${PREFIX}/share/emacs/site-lisp/nice
 
 # Get the version from the debian changelog.
 VERSION = ${shell expr "`head -1 debian/changelog`" : '.*(\(.*\))'}
+TAG     = ${shell if [ `grep '^ --' debian/changelog |head -1|wc -c` -le 10 ]; then echo prerelease; fi }
 
 SHELL = /bin/sh
 TOP=${PWD}
@@ -69,7 +70,7 @@ install: share/java/nice.jar
 
 
 setDate:
-	cd src/nice/tools/compiler; ./setBuildDate ${VERSION}
+	cd src/nice/tools/compiler; ./setBuildDate ${VERSION} ${TAG}
 
 test:
 	cd regtest; /usr/bin/time ./regtest
@@ -200,4 +201,3 @@ jdoc:
 
 tags:
 	jtags
-

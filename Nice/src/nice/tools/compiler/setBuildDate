@@ -1,6 +1,12 @@
 #! /bin/sh
 
+if [ -z "$2" ]; then
+  version="$1"
+else
+  version="$1 $2"
+fi
+
 echo > dateBuild.nice
 echo "package nice.tools.compiler;" >> dateBuild.nice
-echo "var String versionNumber = \"$1\";" >> dateBuild.nice
+echo "var String versionNumber = \"$version\";" >> dateBuild.nice
 echo "var String buildDate = \""`date -u +"%Y.%m.%d, %T %Z"`"\";" >> dateBuild.nice

@@ -338,7 +338,13 @@ public class Compilation
 	    literal = new Literal (value, this);
 	  }
 	else
-	  literal = new Literal (value, Type.make(value.getClass()), this);
+          {
+            Type literalType = Type.make(value.getClass());
+            if (literalType == Type.byte_ctype || 
+                literalType == Type.short_ctype)
+              literalType = Type.int_ctype;
+            literal = new Literal (value, literalType, this);
+          }
       }
     return literal;
   }

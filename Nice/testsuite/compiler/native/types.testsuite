@@ -16,3 +16,30 @@
   void foo(Class c = java.lang.String.class) {}
   /// package b import a
   {}
+
+/// PASS
+  HashPropertyMap<int,double> h = new HashPropertyMap();
+
+  h.set(1, 2.5);
+  h.get(1);
+
+  /// Toplevel
+public class HashPropertyMap<K,V>
+{
+  V get(K key);
+  void set(K key, V value);
+
+  private HashMap<K,V> data = new HashMap();
+
+  set(key, value){
+    data.put(key, value);
+  }
+
+  get(key){
+    let res = data[key];
+    if (res == null)
+      throw new NoSuchElementException();
+
+    return res;
+  }
+}

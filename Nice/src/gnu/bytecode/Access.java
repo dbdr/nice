@@ -60,6 +60,11 @@ public class Access {
     if ((mod & PRIVATE) != 0)
       return c == target;
 
+    // clone is the only method overriden for arrays, where it is public.
+    // (JLS-2 10.7)
+    if (m.getName().equals("clone") && receiver.isArray())
+      return true;
+
     // PROTECTED
     return c.getPackageName().equals(target.getPackageName())
       || (c.isSubclass(target) && receiver.isSubtype(c));

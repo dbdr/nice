@@ -23,6 +23,8 @@ public class ArrayType extends ObjectType
     this.elements = elements;
   }
 
+  public final boolean isArray () { return true; }
+
   public Type getImplementationType()
   {
     Type eltype = elements.getImplementationType();

@@ -197,6 +197,8 @@ public abstract class Type {
 
   public final boolean isVoid () { return size == 0; }
 
+  public boolean isArray () { return false; }
+
   /** Returns the primitive type corresponding to a signature character.
    * @return a primitive type, or null if there is no such type. */
   public static PrimType signatureToPrimitive(char sig)

@@ -1,3 +1,12 @@
+nice (0.0.020412) unstable; urgency=low
+
+  * Make the compiler compatible with JDK 1.4
+  * Fixes bug that considered that 
+      int a = 10, b;
+    initializes both a and b to 10.
+
+ -- Daniel Bonniot <bonniot@users.sourceforge.net>  Fri, 12 Apr 2002 16:00:36 +0200
+
 nice (0.0.020405) unstable; urgency=low
 
   * Accepts constants:

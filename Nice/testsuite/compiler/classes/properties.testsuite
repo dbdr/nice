@@ -1,0 +1,72 @@
+/// PASS bug
+  let a = new A();
+  assert a.x == 1;
+  a.x = 5;
+  assert a.x == 5;
+  a.x = 105;
+  assert a.x == 105;
+
+  let b = new B();
+  assert b.x == 1;
+  b.x = 5;
+  assert b.x == 1;
+  b.x = 105;
+  assert b.x == 105;
+
+  /// Toplevel  
+class A
+{
+  int x = 1;
+}
+
+class B extends A
+{
+  setX(value) {
+    if (value > 100)
+      super;
+    return x;
+  }
+}
+
+/// PASS bug
+  let a = new A();
+  assert a.x == 1;
+  a.x = -1;
+  assert a.x == 1;
+  a.x = 5;
+  assert a.x == 5;
+  a.x = 105;
+  assert a.x == 105;
+
+  let b = new B();
+  assert b.x == 1;
+  b.x = -1;
+  assert b.x == 1;
+  b.x = 5;
+  assert b.x == 1;
+  b.x = 105;
+  assert b.x == 105;
+
+  /// Toplevel  
+class A
+{
+  private int _x = 1;
+
+  int getX() = _x;
+
+  // a custom setter, that checks the value
+  int setX(int value) {
+    if (value > 0)
+      _x = value;
+    return _x;
+  }
+}
+
+class B extends A
+{
+  setX(value) {
+    if (value > 100)
+      super;
+    return x;
+  }
+}

@@ -132,13 +132,16 @@ public abstract class MethodDeclaration extends Definition
    * Typechecking
    ****************************************************************/
 
-  /** 
+  /**
       This is called in a pass before typechecking itself.
       This is important, to typecheck and disambiguate the default values
       of optional parameters, that will be used to typecheck code.
   */
   void typedResolve()
   {
+    if (module.interfaceFile() && ! parameters.hasDefaultValue())
+      return;
+
     if (!Constraint.hasBinders(type.getConstraint()))
       {
 	parameters.typecheck(type.domain());

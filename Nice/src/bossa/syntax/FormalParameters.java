@@ -316,6 +316,15 @@ public class FormalParameters extends Node
     return p.value() != null && ! p.isOverriden();
   }
 
+  boolean hasDefaultValue()
+  {
+    for (int i = size; --i>=0; )
+      if (parameters[i].value() != null)
+        return true;
+
+    return false;
+  }
+
   /****************************************************************
    * Walk methods, used in NiceMethod.create
    ****************************************************************/

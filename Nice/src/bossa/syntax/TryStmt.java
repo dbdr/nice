@@ -43,7 +43,7 @@ public class TryStmt extends Statement
   
   public void addCatch(TypeIdent tc, LocatedString var, Statement body)
   {
-    catchs.add(child(new Catch(tc, var, body)));
+    catches.add(child(new Catch(tc, var, body)));
   }
   
   public gnu.expr.Expression generateCode()
@@ -53,7 +53,7 @@ public class TryStmt extends Statement
        (finallyBody==null ? null : finallyBody.generateCode()));
 
     CatchClause oldc = null;
-    for(Iterator i=catchs.iterator(); i.hasNext();)
+    for(Iterator i = catches.iterator(); i.hasNext();)
       {
 	Catch c = (Catch) i.next();
 	
@@ -74,9 +74,9 @@ public class TryStmt extends Statement
     return "try ...";
   }
 
-  private Statement body;
-  private Statement finallyBody;
-  private List catchs = new LinkedList();
+  Statement body;
+  Statement finallyBody;
+  List catches = new LinkedList();
   
   public class Catch extends Node
   {
@@ -127,11 +127,11 @@ public class TryStmt extends Statement
       return res;
     }
     
-    private MonoSymbol exnVar;
+    MonoSymbol exnVar;
     private TypeIdent tc;
     private TypeConstructor t;
     private LocatedString var;
-    private Statement body;
+    Statement body;
     private Location typeLocation;
   }
 }

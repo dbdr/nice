@@ -264,7 +264,7 @@ public class CallExp extends Expression
     arguments.noOverloading();
     resolveStaticClassPrefix();
     
-    function.resolveOverloading(this);
+    function = function.resolveOverloading(this);
   }
 
   /** Handle static functions, prefixed by the class name */

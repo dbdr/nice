@@ -21,3 +21,12 @@ foo(null) = true;
   /// Toplevel
 void foo(int x, ?int y) {}
 override void foo(int x, int y) {}
+
+/// FAIL
+  /// Toplevel
+  class A {}
+  class B extends A {}
+  void /*/// FAIL HERE */ foo(A x, A y) {}
+  foo(B x, B y) {}
+  foo(B x, B y) {}
+  

@@ -229,3 +229,9 @@ foo(1) {}
   /// package b import a
   assert foo('\\') == 1;
   assert foo('\'') == 2;
+
+/// PASS
+  /// Toplevel
+  void foo(int x, int y) {}
+  foo(3, y>5) {}
+  foo(x>5, 3) {}

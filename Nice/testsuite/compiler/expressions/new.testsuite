@@ -11,3 +11,8 @@ void foo(Object lock = new Object()) {}
   /// Toplevel
 class Param<T> {}
 <Param P, T> P<T> f() = /*/// FAIL HERE */ new P();
+
+/// FAIL
+  /*/// FAIL HERE */ (new A()) = 5;
+  /// Toplevel
+    class A {}

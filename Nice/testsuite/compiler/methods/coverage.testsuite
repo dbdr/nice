@@ -42,3 +42,12 @@ class B implements I {
   /// Toplevel
 <T> boolean foo(T x) = false;
 foo(Object x) = true;
+
+/// PASS
+  /// Toplevel
+  interface I {}
+  class A implements I {}
+  interface K extends I {}
+  void foo(I x) {}
+  foo(A x) {}
+  foo(K x) {}

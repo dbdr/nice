@@ -20,7 +20,7 @@ import bossa.util.*;
  */
 public class CallExp extends Expression
 {
-  Expression function;
+  ?Expression function;
   Arguments arguments;
   /** true iff the first argument was written before the application: e.f(x) */
   final boolean infix = false;
@@ -51,9 +51,9 @@ public class CallExp extends Expression
     
     arguments.noOverloading();
     
-    function = function.resolveOverloading(this);
+    function = notNull(function).resolveOverloading(this);
 
-    function.checkSpecialRequirements(cast(arguments.computedExpressions));
+    notNull(function).checkSpecialRequirements(cast(arguments.computedExpressions));
 
     // make sure computedExpressions is valid.
     this.getType();
@@ -61,7 +61,7 @@ public class CallExp extends Expression
     // Allow expressions to know in what context they are used.
     // Important for litteral arrays and tuples.
     Expression.adjustToExpectedType(cast(arguments.computedExpressions),
-                                    nice.tools.typing.Types.parameters(function.getType()));
+                                    nice.tools.typing.Types.parameters(notNull(function).getType()));
   }
 
   computeType()
@@ -72,7 +72,7 @@ public class CallExp extends Expression
       // function should be a function abstraction here
       // no default arguments
       {
-	this.setComputedType(notNull(getTypeAndReportErrors(this.location(), function, arguments.inOrder())), null);
+	this.setComputedType(notNull(getTypeAndReportErrors(this.location(), notNull(function), arguments.inOrder())), null);
 	arguments.computedExpressions = arguments.inOrder();
       }
 
@@ -110,7 +110,7 @@ public class CallExp extends Expression
   isAssignable()
   {
     this.resolveOverloading();
-    let fa = function.getFieldAccessMethod();
+    let fa = notNull(function).getFieldAccessMethod();
     return fa != null && ! fa.isFinal();
   }
 
@@ -122,7 +122,7 @@ public class CallExp extends Expression
   getField()
   {
     this.resolveOverloading();
-    return function.getFieldAccessMethod();
+    return notNull(function).getFieldAccessMethod();
   }
 
   /****************************************************************
@@ -154,11 +154,11 @@ public class CallExp extends Expression
       }
 
     gnu.expr.Expression res;
-    let fa = function.getFieldAccessMethod();
+    let fa = notNull(function).getFieldAccessMethod();
     if (fa != null)
       res = fa.compileAccess(this.compileParams());
     else
-      res = new gnu.expr.ApplyExp(function.generateCodeInCallPosition(), this.compileParams());
+      res = new gnu.expr.ApplyExp(notNull(function).generateCodeInCallPosition(), this.compileParams());
     this.location().write(res);
 
     if (firstLetExp != null)
@@ -195,7 +195,7 @@ public class CallExp extends Expression
 
   compileAssign(gnu.expr.Expression value)
   {
-    let access = function.getFieldAccessMethod();
+    let access = notNull(function).getFieldAccessMethod();
     if (access == null)
       throw Internal.error(this, "Assignment to a call that is not a field access");
 
@@ -214,7 +214,7 @@ public class CallExp extends Expression
   toString()
   {
     if (!infix)
-      return function.toString(Printable.parsable) + arguments;
+      return notNull(function).toString(Printable.parsable) + arguments;
 
     if (declaringClass == null)
       return arguments.getExp(0) + "." + function + arguments.toStringInfix();

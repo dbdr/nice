@@ -51,3 +51,12 @@
       doneFinally = true;
     }
   assert doneFinally;
+
+/// FAIL
+  label:
+    {
+       /*/// FAIL HERE */ label: while (true)
+       {
+         break label;
+       }
+    }

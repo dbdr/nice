@@ -224,5 +224,5 @@ void resolveCCThis(Statement stmt, Located thisLoc, NiceClass classe)
 
   call.function = createOverloadedSymbolExp(new ArrayList(cast(classe).getConstructorCallSymbols()),
 					thisName);
-  call.function.setLocation(ident.location());
+  notNull(call.function).setLocation(ident.location());
 }

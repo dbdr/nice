@@ -373,7 +373,7 @@ analyse(CallExp e, info)
   boolean cannotReturn = e.isCallTo("throw") || 
     e.isCallTo("assert") && args.size() > 0 && args.getExp(0).isFalse();
 
-  markAsCallFun(e.function, e.infix);
+  markAsCallFun(notNull(e.function), e.infix);
   e.function = analyse(e.function, info);
   
   if (cannotReturn)

@@ -12,3 +12,7 @@ interface I implements K
   foo() {}
 }
 
+/// FAIL
+  /// Toplevel
+  abstract interface I<T> {}
+  abstract interface /*/// FAIL HERE */ K extends I {}

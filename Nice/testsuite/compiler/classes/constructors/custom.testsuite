@@ -149,3 +149,11 @@ new B(int x) {
   /// Toplevel
 class A {}
 new A(int) { this(); }
+
+/// FAIL
+  let x = /*/// FAIL HERE */ new A();
+  /// Toplevel
+  class A {
+    int x;
+    String s = "abc";
+  }

@@ -20,11 +20,12 @@ import bossa.util.*;
 */
 public class NewExp extends CallExp
 {
-
   private final TypeIdent ti;
 
   /** Can be null if the class instantiated is Object. */
   ?mlsub.typing.TypeConstructor tc = null;
+
+  isAssignable() = false;
 
   void resolve(TypeMap typeScope)
   {
@@ -87,5 +88,5 @@ public class NewExp extends CallExp
 
 public Expression createNewExp(TypeIdent ti, Arguments arguments) 
 {
-  return new NewExp(function: cast(null), arguments: arguments, ti: ti);
+  return new NewExp(function: null, arguments: arguments, ti: ti);
 }

@@ -18,7 +18,7 @@ echo()
 compile()
 {
   (cd ..; "$NICE_TOP"/bin/nicec \
-    -e -r -o regtest/"$1" -d . \
+    -e -r -a regtest/"$1" -d . \
     --classpath="$NICE_TOP":"$NICE_TOP"/classes regtest."$1")
   return $?
 }

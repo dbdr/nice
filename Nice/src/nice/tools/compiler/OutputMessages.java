@@ -61,7 +61,7 @@ public final class OutputMessages
     WARNING = 3; // Warning reported
 
   private static int statusCode = OK;
-  
+
   private static void setStatusCode(int status)
   {
     if (worse(status, statusCode))
@@ -74,7 +74,7 @@ public final class OutputMessages
     case OK: return true;
     case BUG: return false;
     case ERROR: return false;
-    case WARNING: return status == 1 || status == 2;
+    case WARNING: return status == BUG || status == ERROR;
     default: return false;
     }
   }

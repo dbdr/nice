@@ -359,8 +359,13 @@ public abstract class TestCase {
 						Class[] parameterTypes = new Class[] {String[].class};
 						Method m = c.getMethod("main", parameterTypes);
 						Object[] arguments = new Object[] {new String[0]};
-						m.invoke(c.newInstance(), arguments);
+						try {
+							m.invoke(c.newInstance(), arguments);
+						} catch(java.lang.reflect.InvocationTargetException e) {
+							throw e.getTargetException();
+						}
 					} catch(Throwable e) {
+						e.printStackTrace(out);
 						throw new TestSuiteException("Exception while invoking main()", e);
 					}
 				}

@@ -82,7 +82,7 @@ abstract class UserOperator extends MethodDeclaration
 
   public String toString()
   {
-    return super.toString() + contract.toString();
+    return super.toString() + String.valueOf(contract);
   }
 
   private MonoSymbol[] symbols;

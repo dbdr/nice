@@ -323,7 +323,7 @@ public class NiceSourceFile {
 			return;
 			
 		writer.write("// main method");writer.newLine();
-		writer.write("main(args) {\n");
+		writer.write("void main(String[] args) {\n");
 		writer.write(_mainMethodContent.toString());
 		writer.write("}\n");
 	}

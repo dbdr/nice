@@ -2,6 +2,7 @@ nice (0.9.0) unstable; urgency=low
 
   * Archives (generated with the -a option) can now be used to distribute
     Nice libraries.
+  * Interfaces can now implement (finally or not) abstract interfaces.
 
  --
 

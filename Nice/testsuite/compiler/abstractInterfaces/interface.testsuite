@@ -1,0 +1,14 @@
+/// COMMENT Testing normal interfaces implementing abstract interfaces
+
+/// PASS
+  /// Toplevel
+abstract interface K 
+{
+  void foo();
+}
+
+interface I implements K 
+{
+  foo() {}
+}
+

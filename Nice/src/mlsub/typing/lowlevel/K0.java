@@ -913,7 +913,13 @@ public final class K0 {
 	       jid = subInterfaces.getNextBit(jid))
 	    // abs is a constant that abstracts i
 	    // and j is a subInterface of i
-	    setApproxToMinAbove(abs, getInterface(jid), R);
+            {
+              BitVector labs = Rt.getRow(abs);
+              for (int node = labs.getLowestSetBit();
+                   node != BitVector.UNDEFINED_INDEX;
+                   node = labs.getNextBit(node))
+                setApproxToMinAbove(node, getInterface(jid), R);
+            }
       }
     computeApproxMinimals(0, R);
   }
@@ -952,8 +958,8 @@ public final class K0 {
 	    approx = x;
 	  else
 	    // optimize ? :
-	    // make tocheck an int, -1 at start. first to check-> N, second to check->-2
-	    // if at then end toCHeck =N, it's fast !
+	    // make tocheck an int, -1 at start. first to check-> N, second to check->-2 if not comparable with toCheck, otherwise the smaller
+	    // if at then end toCheck == -2, full check. Otherwise just check leq.get(approx, toCheck) !
 	    toCheck = true;
       }
 
@@ -963,8 +969,11 @@ public final class K0 {
 	   x != BitVector.UNDEFINED_INDEX;
 	   x = implementors.getNextBit(x)) 
 	if(leq.get(abs,x) && !leq.get(approx,x))
-	  throw new LowlevelUnsatisfiable("Node "+approx+" and "+x+" are uncomparable and both implement "+ j +
-					  " above "+abs);
+          {
+            approx = BitVector.UNDEFINED_INDEX;
+            break;
+          }
+
     if(debugK0) 
       System.err.println("Initial approximation for " +
 		    j + ": " +
@@ -1021,12 +1030,15 @@ public final class K0 {
 	  {
 	    Interface i=getInterface(iid);
 	    int n1;
+            //XXX optim: if we had a BitVector i.hasApprox, 
+            //           this could be faster.
 	    for(int node=0; node<n; node++)
 	      if((n1=i.getApprox(node))!=BitVector.UNDEFINED_INDEX)
 		// node  ->_i  n1
 		for(int p=0; p<n; p++)
 		  // is implementors OK ?
 		  // or should not we compute rigidImplementors first ?
+                  //XXX optim: use i.implementors.getXXXbit to find p candidates
 		  if(i.implementors.get(p)
 		     && leq.get(node,p))
 		    if(this.isRigid(p))
@@ -1038,7 +1050,7 @@ public final class K0 {
 			   " (node="+indexToString(node)+")\n"+
 			   "interface "+interfaceToString(iid)+"\n"+
 			   this);
-		      else ;
+		      else /* Nothing to do. Cool! */ ;
 		    else 
 		      if(!leq.get(n1,p))
 			 {
@@ -1053,7 +1065,6 @@ public final class K0 {
 			   changed=true;
 			 }
 	  }
-
 	if(changed)
 	  leq.closure();
       }

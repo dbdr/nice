@@ -30,19 +30,22 @@ public abstract class ClassDefinition extends MethodContainer
     Interface makeInterface(LocatedString name, 
 			    Constraint typeParameters, 
 			    List typeParametersVariances,
-			    List extensions)
+			    List extensions,
+                            List implementations, List abstractions)
   {
     return new Interface(name, typeParameters, typeParametersVariances, 
-			 extensions);
+			 extensions, implementations, abstractions);
   }
 
   static class Interface extends ClassDefinition
   {
     Interface(LocatedString name, 
 	      Constraint typeParameters, List typeParametersVariances,
-	      List extensions)
+	      List extensions, 
+              List implementations, List abstractions)
     {
-      super(name, typeParameters, typeParametersVariances);
+      super(name, typeParameters, typeParametersVariances,
+            implementations, abstractions);
       this.extensions = extensions;
 
       this.createTC();
@@ -93,7 +96,7 @@ public abstract class ClassDefinition extends MethodContainer
 	  }
 	  catch(KindingEx e){
 	    User.error(name,
-		       "Class " + name + " cannot extend " + e.t2 +
+		       "Interface " + name + " cannot extend " + e.t2 +
 		       ": they do not have the same number or kind of type parameters");
 	  }
       
@@ -104,15 +107,17 @@ public abstract class ClassDefinition extends MethodContainer
 	    }
 	    catch(KindingEx e){
 	      User.error(name,
-			 "Class " + name + " cannot extend " + e.t2 +
+			 "Interface " + name + " cannot extend " + e.t2 +
 			 ": they do not have the same number or kind of type parameters");
 	    }
 
 	Typing.assertImp(tc, associatedInterface, true);
       }
       catch(TypingEx e){
-	User.error(name, "Error in class " + name + " : " + e.getMessage());
+	User.error(name, "Error in interface " + name + " : " + e.getMessage());
       }
+
+      super.createContext();
     }
 
     public void printInterface(java.io.PrintWriter s)
@@ -187,14 +192,13 @@ public abstract class ClassDefinition extends MethodContainer
 	  List implementations, List abstractions
 	  )
     {
-      super(name, typeParameters, typeParametersVariances);
+      super(name, typeParameters, typeParametersVariances,
+            implementations, abstractions);
 
       this.isFinal = isFinal;
       this.isAbstract = isAbstract;
     
       this.superClassIdent = superClassIdent;
-      this.implementations = implementations;
-      this.abstractions = abstractions;
 
       this.createTC();
       if (isFinal)
@@ -254,21 +258,6 @@ public abstract class ClassDefinition extends MethodContainer
 	    d.resolve();
 	}
 
-      impl = this.resolveInterfaces(implementations);
-      abs = TypeIdent.resolveToItf(typeScope, abstractions);
-    
-      implementations = null;
-      abstractions = null;
-
-      // Resolve the super-interfaces first.
-      if (impl != null)
-	for (int i = 0; i < impl.length; i++)
-	  {
-	    ClassDefinition d = ClassDefinition.get(impl[i].associatedTC());
-	    if (d != null)
-	      d.resolve();
-	  }
-
       super.resolveClass();
     }
 
@@ -295,26 +284,12 @@ public abstract class ClassDefinition extends MethodContainer
 			 "Class " + name + " cannot implement " + e.t2 +
 			 ": they do not have the same number or kind of type parameters");
 	    }
-
-	if (impl != null)
-	  try{
-	    Typing.assertImp(tc, impl, true);
-	  }
-	  catch(KindingEx e){
-	    User.error(name,
-		       "Class " + name + " cannot implement " + e.t2 +
-		       ": they do not have the same number or kind of type parameters");
-	  }
-
-	if (abs != null)
-	  {
-	    Typing.assertImp(tc, abs, true);
-	    Typing.assertAbs(tc, abs);
-	  }
       }
       catch(TypingEx e){
 	User.error(name, "Error in class " + name + " : " + e.getMessage());
       }
+
+      super.createContext();
     }
 
     public void printInterface(java.io.PrintWriter s)
@@ -331,12 +306,8 @@ public abstract class ClassDefinition extends MethodContainer
       implementation.printInterface(s);
     }
 
-    protected List
-      /* of Interface */ implementations,
-      /* of Interface */ abstractions;
     TypeIdent superClassIdent;
     TypeConstructor superClass;
-    mlsub.typing.Interface[] impl, abs;
     protected boolean isFinal;
   
     boolean isAbstract;
@@ -351,11 +322,20 @@ public abstract class ClassDefinition extends MethodContainer
    */
   public ClassDefinition(LocatedString name, 
 			 Constraint typeParameters, 
-			 List typeParametersVariances)
+			 List typeParametersVariances,
+                         List implementations, List abstractions
+                         )
   {
     super(name, Node.upper, typeParameters, typeParametersVariances);
+    this.implementations = implementations;
+    this.abstractions = abstractions;
   }
   
+  protected List
+    /* of Interface */ implementations,
+    /* of Interface */ abstractions;
+  mlsub.typing.Interface[] impl, abs;
+
   void createTC()
   {
     String name = this.name.toString();
@@ -510,6 +490,20 @@ public abstract class ClassDefinition extends MethodContainer
 
   void resolveClass()
   {
+    impl = this.resolveInterfaces(implementations);
+    abs = TypeIdent.resolveToItf(typeScope, abstractions);
+    
+    implementations = abstractions = null;
+
+    // Resolve the super-interfaces first.
+    if (impl != null)
+      for (int i = 0; i < impl.length; i++)
+        {
+          ClassDefinition d = ClassDefinition.get(impl[i].associatedTC());
+          if (d != null)
+            d.resolve();
+        }
+
     createContext();
     implementation.resolveClass();
   }
@@ -596,7 +590,29 @@ public abstract class ClassDefinition extends MethodContainer
    * Initial Context
    ****************************************************************/
 
-  abstract void createContext();
+  void createContext()
+  {
+    try {
+      if (impl != null)
+        try{
+          Typing.assertImp(tc, impl, true);
+        }
+        catch(KindingEx e){
+          User.error(name,
+                     "Class " + name + " cannot implement " + e.t2 +
+                     ": they do not have the same number or kind of type parameters");
+        }
+
+      if (abs != null)
+        {
+          Typing.assertImp(tc, abs, true);
+          Typing.assertAbs(tc, abs);
+        }
+    }
+    catch(TypingEx e){
+      User.error(name, "Error in " + name + " : " + e.getMessage());
+    }
+  }
 
   /****************************************************************
    * Class hierarchy

@@ -48,3 +48,50 @@ public <WindowListenerHandler HH> void addNiceWindowListener
   class B extends A {}
   f(x@B) { A res = new B(); return res; }
 
+/// PASS
+  /// Toplevel
+// We now accept that there are two incomparable nodes that implement
+// an abstract interface, abive a node that could approximate for that 
+// interface. There is just no approximation in that case.
+abstract interface I {}
+
+interface A implements I {}
+interface B finally implements I {}
+class X implements A,B {}
+
+/// FAIL
+  /// Toplevel
+// We now accept that there are two incomparable nodes that implement
+// an abstract interface, abive a node that could approximate for that 
+// interface. There is just no approximation in that case.
+abstract interface I { alike foo(); }
+
+interface A implements I {}
+interface B finally implements I {}
+
+class X implements A,B {}
+
+var B b = new X();
+
+foo(x@X) = b;
+
+/// PASS
+  /// Toplevel
+// This case requires multiple applications of the Abs axiom, the second
+// being valid after the first one is applied. Therefore, it illustrates
+// the need to repeat applying Abs until nothing changed.
+abstract interface I1 {}
+abstract interface I2 {}
+
+interface Root implements I1,I2 {}
+
+interface B extends Root finally implements I2 {}
+class C implements B {}
+
+class A implements Root finally implements I1 {}
+class A1 extends A implements B {}
+
+<I1 T | T : I2> T f(T);
+f(x) = x;
+f(x@C) = new A();
+

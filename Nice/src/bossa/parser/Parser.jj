@@ -1016,7 +1016,7 @@ ClassDefinition classDefinition(List definitions):
   MethodContainer.Constraint parameters;
   List l;
   List typeParametersVariances = new ArrayList(0);
-  boolean isFinal=false, isAbstract=false, isInterface=false;
+  List imp = null, abs = null;
 }
 {
   [ "public" | "private" ]
@@ -1025,10 +1025,13 @@ ClassDefinition classDefinition(List definitions):
   name=ident() 
   parameters=classTypeParameters(typeParametersVariances) 
   { List ext = null; }
-  [ ext = extensions() ]
+  [ "extends" ext = interfaces() ]
+  [ "implements" imp=interfaces() ]
+  [ "finally" "implements"  abs=interfaces() ]
   { res = ClassDefinition.makeInterface
-      (name, parameters, typeParametersVariances, ext); }
+      (name, parameters, typeParametersVariances, ext, imp, abs); }
 |
+  { boolean isFinal=false, isAbstract=false; }
   [ "final"    { isFinal=true; } 
   | "abstract" { isAbstract=true; }
   ]
@@ -1036,7 +1039,7 @@ ClassDefinition classDefinition(List definitions):
   name=ident() 
   parameters=classTypeParameters(typeParametersVariances) 
 
-  { TypeIdent sup = null; List imp = null, abs = null; }
+  { TypeIdent sup = null; }
 
   [ "extends" sup = superClass() ]
   [ "implements" imp=interfaces() ]

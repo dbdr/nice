@@ -109,3 +109,16 @@ interface ITest { String test(); }
 
 class /*/// FAIL HERE */ java.lang.String implements ITest;
 test(String a) = "done";
+
+/// FAIL
+  // Making an existing class implement a non-abstract interface
+  // can only be done with classes defined in Nice.
+  // Retyped classes are not valid either.
+  let l = new ArrayList();
+  println( l.test() );
+
+  /// Toplevel
+interface ITest<T> { String test(); }
+
+interface /*/// FAIL HERE */ java.util.Collection implements ITest;
+test(Collection a) = "done";

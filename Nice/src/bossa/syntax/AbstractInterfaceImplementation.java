@@ -65,11 +65,16 @@ public class AbstractInterfaceImplementation extends Definition
     interfaceITF = ident.resolveToItf(typeScope);
 
     ClassDefinition def = ClassDefinition.get(classTC);
+
+    boolean isNiceClass = def != null &&
+      ! (def.getImplementation() instanceof JavaClass);
+
+    if (!isNiceClass && interfaceITF.associatedTC() != null)
+      User.error(this, className + " is not a class defined in Nice.\n" +
+                 "It can only implement abstract interfaces.");
+
     if (def != null)
       def.addInterfaceImplementation(interfaceITF);
-    else if (interfaceITF.associatedTC() != null)
-      User.error(this, classTC + " is not a class defined in Nice.\n" +
-                 "It can only implement abstract interfaces.");
 
     createContext();
   }

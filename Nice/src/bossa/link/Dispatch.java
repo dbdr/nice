@@ -238,7 +238,7 @@ public final class Dispatch
 	failed = true;
 	if(sortedAlternatives.size()==0)
 	  User.warning
-	    (method, "Method "+method+" is declared but never defined");
+	    (method, "Method " + method + " is declared but never defined");
 	else
 	  User.warning(method,
 		       "Method "+method+" is not exhaustive:\n"+

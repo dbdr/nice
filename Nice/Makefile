@@ -48,9 +48,10 @@ native:
 	${JAVAC} stdlib/nice/*/*.java src/nice/tools/code/*.java
 
 clean:
-	rm -rf ${TOP}/classes/*
+	rm -rf classes lib/nice src/bossa/parser/{Parse*.java,Token*.java,ASCII_*.java}
+	find ${TOP} \( -name "*.class" -or -name "*.nicei" -or -name "*~" \) -exec rm {} \;
 
-scratch: clean parser recompile
+scratch: clean first
 
 ## Documentation
 
@@ -75,7 +76,7 @@ jar:
 	cd stdlib; jar uf ../lib/nice/Nice.jar nice/*/*.nice*
 
 dist: jar
-	tar cf lib/nice/Nice.tar bin/nicer bin/nicec lib/nice/Nice.jar lib/emacs/nice-mode.el
+	jar cfM lib/nice/Nice-`date +"%Y.%m.%d"`.jar bin/nicer bin/nicec lib/nice/Nice.jar lib/emacs/nice-mode.el
 
 #****************************************************************
 # CVS
@@ -113,7 +114,7 @@ bootstrap:
 	${JAVAC} \
 		stdlib/nice/lang/Native.java stdlib/nice/lang/inline/*.java \
 		src/mlsub/compilation/Module.java \
-		src/bossa/modules/Package.java \
+		src/bossa/modules/Package.java src/bossa/util/*.java \
 		src/gnu/expr/*.java src/gnu/mapping/*.java \
 		src/nice/tools/code/*.java src/mlsub/typing/*.java src/mlsub/typing/lowlevel/*.java
 	cd src; ${NICEC} bossa.modules

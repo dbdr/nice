@@ -376,7 +376,7 @@ String unlocIdent():
   { return t.image; }
 }
 
-LocatedString methodName():
+LocatedString identOrBackquoted():
 {
   LocatedString res;
   Token name;
@@ -839,7 +839,7 @@ MethodDeclaration internalMethodOrFunction(MethodContainer c):
 {
   cst=constraint()
   returnType=monotype()
-  name=methodName()
+  name=identOrBackquoted()
   "(" parameters = formalParameters(true) ")"
   ( ";" | body = code() )
   
@@ -1033,7 +1033,7 @@ Pattern anonymousPattern(LocatedString name):
 void methodBodyDefinitionLookahead():
 {}
 {
-  methodName() [ "<" strings() ">" ] "("
+  identOrBackquoted() [ "<" strings() ">" ] "("
 }
 
 Statement code():
@@ -1071,7 +1071,7 @@ MethodBodyDefinition methodBodyDefinition(NiceClass container):
     Expression exp;
 }
 {
-    name=methodName()
+    name=identOrBackquoted()
     [ "<" binders=strings() ">" ]
 
 // introducing new Type variables
@@ -1100,7 +1100,7 @@ MethodDeclaration methodDeclaration():
 {
   cst=constraint()
     returnType=monotype()
-    name=methodName()
+    name=identOrBackquoted()
     "(" parameters = formalParameters(false) ")"
     
     (
@@ -1278,17 +1278,8 @@ IdentExp identExp():
   LocatedString i;
 }
 {
-  i=ident()
+  i=identOrBackquoted()
   { return new IdentExp(i); }
-}
-
-IdentExp backquotedIdentExp():
-{
-  Token t;
-}
-{
-  t=<BACKQUOTEDSTRING> 
-  { return symb(t.image.substring(1,t.image.length()-1),t); }
 }
 
 Expression newExp():
@@ -1732,9 +1723,6 @@ Expression PrimaryPrefix() :
 |
   //Name()
   res=identExp()
-
-|
-  res = backquotedIdentExp()
 
 )
   { return res; }

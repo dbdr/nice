@@ -10,7 +10,7 @@ class A implements I {}
 bar(#A x) = x;
 foo(#A x) = x;
 
-<T> bar(x@B : X)
+<T> bar(B:X x)
 {
   X /*/// FAIL HERE*/ res = foo(x);
   bug(res);
@@ -20,13 +20,13 @@ foo(#A x) = x;
 class B extends A {
   void bug() {}
 }
-foo(#B) = new A();
+foo(#B x) = new A();
 
 /// PASS bug
   /// Toplevel
 <Collection C, T, U> C<U> bar(C<T>, T->U);
 bar(x, f) { throw new Error(); }
-<C,T,U> bar(l@List : L, f)
+<C,T,U> bar(List:L l, f)
 {
   L<U> res = similarEmptyCollection(l);
   res.add(f(l[0]));
@@ -49,7 +49,7 @@ class B extends A { String b; }
   /// Toplevel
 foo(a) = a;
 
-<T> foo(b@B : X) {
+<T> foo(B:X b) {
   X copy = b.foo();
   String useB = copy.b;
   return copy;

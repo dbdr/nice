@@ -40,7 +40,7 @@
   /// Toplevel
   abstract interface I { void f(); }
   class java.lang.String implements I;
-  f(x@String) {}
+  f(String x) {}
 
 /// PASS
   /// Toplevel
@@ -49,7 +49,7 @@
     alike f();
   }
   class java.io.File finally implements I;
-  f(f@java.io.File) = new java.io.File("foo");
+  f(java.io.File f) = new java.io.File("foo");
 
 /// FAIL
   /// Toplevel
@@ -58,7 +58,7 @@
     alike f();
   }
   class java.io.File implements I;
-  f(f@java.io.File) = new java.io.File("foo");
+  f(java.io.File f) = new java.io.File("foo");
 
 /// PASS
   /// Toplevel

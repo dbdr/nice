@@ -76,11 +76,11 @@ class B implements Serializable
   private void readObject(ObjectInputStream in);
 }
 
-writeObject(this@B, out) {
+writeObject(B this, out) {
   out.writeBoolean(true);
 }
 
-readObject(this@B, in) {
+readObject(B this, in) {
   ok = in.readBoolean();
 }
 

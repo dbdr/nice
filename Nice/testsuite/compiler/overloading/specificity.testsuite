@@ -50,7 +50,7 @@ void f(B a, String s, int i = 0) { }
   class B extends A {}
   void foo(A);
   void foo(B);
-  foo(@B) {}
+  foo(B x) {}
 
 /// PASS
   /// Toplevel
@@ -58,8 +58,8 @@ void f(B a, String s, int i = 0) { }
   class B extends A {}
   void foo(A, String);
   void foo(B ,Number);
-  foo(@B(A) ,s) {}
-  foo(@B(B) ,s) {}
+  foo(B(A) x ,s) {}
+  foo(B(B) x ,s) {}
 
 /// PASS
   /// Toplevel
@@ -69,7 +69,7 @@ void f(B a, String s, int i = 0) { }
   void foo(A, B);
   void foo(B, A);
   void foo(B, B);
-  foo(@B,@B) {}
+  foo(B x, B y) {}
 
 /// FAIL
   /// Toplevel
@@ -77,8 +77,8 @@ void f(B a, String s, int i = 0) { }
   class B extends A {}
   void foo(A);
   void foo(A);
-  foo(@B(A)) {}
-  foo(@B(B)) {}
+  foo(B(A) x) {}
+  foo(B(B) x) {}
 
 /// PASS
   /// Toplevel
@@ -87,9 +87,9 @@ void f(B a, String s, int i = 0) { }
   void foo(A, String);
   void foo(B ,Number);
   void foo(B ,Integer);
-  foo(@B, s@String) {}
-  foo(@B, s@Number) {}
-  foo(@B, s@Integer) {}
+  foo(B x, String s) {}
+  foo(B x, Number s) {}
+  foo(B x, Integer s) {}
   
 /// PASS
   /// Toplevel
@@ -97,8 +97,8 @@ void f(B a, String s, int i = 0) { }
   class B extends A {}
   void foo(A, B);
   void foo(B ,A);
-  foo(@B(A) ,x) {}
-  foo(@B(B) ,x) {}
+  foo(B(A) a ,x) {}
+  foo(B(B) a ,x) {}
 
 /// PASS
   B->boolean bar = foo;

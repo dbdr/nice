@@ -45,7 +45,7 @@ class A extends Error { }
 Class.forName("a.A").getDeclaredConstructor([ String.class ]);
   /// Toplevel
 class B extends A {}
-equals(this@A, that@B) = true;
+equals(A this, B that) = true;
 
 /// PASS
   /// Toplevel

@@ -3,8 +3,8 @@
 class A {}
 void /*/// FAIL HERE */ f(A);
 
-f(x@A) {}
-f(x@A) {}
+f(A x) {}
+f(A x) {}
 
 /// PASS
   assert foo(null);

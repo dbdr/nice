@@ -2,7 +2,7 @@
   /// COMMENT Check that native final classes are really considered final.
   /// Toplevel
   <String T> T m(T);
-  m(s@String) = "";
+  m(String s) = "";
 
 /// PASS
   /// COMMENT Check that class is not parameterized when its parents are not.

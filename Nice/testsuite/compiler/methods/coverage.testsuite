@@ -11,7 +11,7 @@ abstract interface I {
 }
 
 class nice.lang.boolean implements I;
-fooI(b1@boolean, b2@boolean) = b1;
+fooI(boolean b1, boolean b2) = b1;
 
 class A implements I {
  // `fooI` not implemented  

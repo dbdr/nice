@@ -51,7 +51,7 @@ abstract class OOMemoize<R,A> implements Method<R,A> {
    R protomethod(A a);
 }
 
-<R,A> call(this@OOMemoize, a){
+<R,A> call(OOMemoize this, a){
    if (this.table.containsKey(a))
      return notNull(this.table.get(a));
    else {

@@ -25,7 +25,7 @@ public <WindowListenerHandler HH> void addNiceWindowListener
     alike f();
   }
   class A finally implements I {}
-  f(x@A) = new A();
+  f(A x) = new A();
 
 /// FAIL
   /// Toplevel
@@ -36,7 +36,7 @@ public <WindowListenerHandler HH> void addNiceWindowListener
     alike f();
   }
   class A implements I {}
-  f(x@A) = new A();
+  f(A x) = new A();
 
 /// PASS
   /// Toplevel
@@ -46,7 +46,7 @@ public <WindowListenerHandler HH> void addNiceWindowListener
   }
   abstract class A finally implements I {}
   class B extends A {}
-  f(x@B) { A res = new B(); return res; }
+  f(B x) { A res = new B(); return res; }
 
 /// PASS
   /// Toplevel
@@ -73,7 +73,7 @@ class X implements A,B {}
 
 var B b = new X();
 
-foo(x@X) = b;
+foo(X x) = b;
 
 /// PASS
   /// Toplevel
@@ -93,5 +93,5 @@ class A1 extends A implements B {}
 
 <I1 T | T : I2> T f(T);
 f(x) = x;
-f(x@C) = new A();
+f(C x) = new A();
 

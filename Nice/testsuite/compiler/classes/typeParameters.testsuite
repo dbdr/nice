@@ -81,7 +81,7 @@ class Game<S | S <: Number>
 //class Game<Number S>
 {
   void play(Number p);
-  play(p@Number) { }
+  play(Number p) { }
 }
 
 /// PASS
@@ -89,7 +89,7 @@ class Game<S | S <: Number>
 class Game<S | S <: Number>
 {
   void play(Game<S> p);
-  play(p@Game) { }
+  play(Game p) { }
 }
 
 /// PASS
@@ -170,21 +170,21 @@ void dummy() {}
 class B {}
 class A<T | T <: B, B <: T> extends AbstractSet<T> { }
 
-add(a@A, b@B) = super;
+add(A a, B b) = super;
 
 /// PASS bug
 abstract class B {}
 class C extends B {}
 class A<T | T <: B, B <: T> extends AbstractSet<T> { }
 
-add(a@A, b@C) = super;
+add(A a, C b) = super;
 
 /// PASS
   /// Toplevel
   class A {}
   void do_something( List<A> x ) {}
   class B<A T | A <: T> extends LinkedList<T> {}
-  add(x@B, o) {
+  add(B x, o) {
     do_something(x);
     return super;
   }

@@ -1,11 +1,11 @@
 /// FAIL
   ///Toplevel
-toString(/*/// FAIL HERE */ i@int) = "";
+toString(/*/// FAIL HERE */ int i) = "";
 
 /// FAIL
   ///Toplevel
 <T> void foo(!T) {}
-foo(/*/// FAIL HERE */ i@int) {}
+foo(/*/// FAIL HERE */ int i) {}
 
 /// FAIL
   ///Toplevel

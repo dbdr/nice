@@ -5,9 +5,9 @@ class M
   alike f();
 }
 
-f(x@M) = x;
+f(M x) = x;
 
-f(x#M) = new M();
+f(#M x) = new M();
 
 /// PASS
   /// Toplevel
@@ -20,7 +20,7 @@ class Packet {
 }
 
 
-addTo(this@Packet, queue)
+addTo(Packet this, queue)
 {
   var next = queue;
   next = next.link;

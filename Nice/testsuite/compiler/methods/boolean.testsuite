@@ -4,7 +4,7 @@
 
   /// Toplevel
 boolean not(boolean);
-not(b@boolean) = !b;
+not(boolean b) = !b;
 
 /// PASS
   assert and(false, false) == false;
@@ -14,7 +14,7 @@ not(b@boolean) = !b;
 
   /// Toplevel
 boolean and(boolean, boolean);
-and(@boolean, @boolean) = false;
+and(boolean a, boolean b) = false;
 and(true, true) = true;
 
 /// PASS
@@ -27,10 +27,10 @@ xor(false, false) = false;
 
 /// FAIL
   /// Toplevel
-boolean or(boolean, boolean);
+boolean or(a, b);
 // Ambiguity for the case (@true, @true)
-or(@true, @boolean) = true;
-or(boolean, true) = true;
+or(true, boolean b) = true;
+or(boolean a, true) = true;
 or(false, false) = false;
 
 /// FAIL

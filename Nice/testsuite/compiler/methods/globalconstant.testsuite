@@ -3,7 +3,7 @@
   let int ONE = 1;
   let int TWO = 2;
   int fib(int n);
-  fib(n@int) = fib(n-2) + fib(n-1);
+  fib(int n) = fib(n-2) + fib(n-1);
   fib(ONE) = 1;
   fib(TWO) = 1;
 

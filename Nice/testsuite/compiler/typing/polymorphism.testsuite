@@ -19,7 +19,7 @@ void usePolymorphicFunction () {
   /// Toplevel
 <T> int m(T);
 m(x) = 0;
-m(c@Collection) = c.size();
+m(Collection c) = c.size();
 
 /// PASS
   /// Toplevel

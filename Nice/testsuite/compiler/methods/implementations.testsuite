@@ -20,7 +20,7 @@ class B extends A
 
 class C extends A
 {
-  // It is OK not to implement m(@C,_), since X has no concrete instance.
+  // It is OK not to implement m(C x,_), since X has no concrete instance.
 }
 
 /// FAIL
@@ -57,14 +57,14 @@ interface A<T>
 
 class B<T> implements A<T> { B<T> bfield; }
 
-doSomething(b@B) { b.bfield; }
+doSomething(B b) { b.bfield; }
 
 /// FAIL
   /// Toplevel
 class First {
   void paint(java.awt.Graphics g);
 }
-paint(p@java.awt.Component, g) {
+paint(java.awt.Component p, g) {
   (notNull (g)).drawString("I love java", 20, 20);
 }
 
@@ -73,22 +73,22 @@ paint(p@java.awt.Component, g) {
   interface I{}
  
   void foo(I);
-  foo(#I){}
+  foo(#I x){}
 
 /// FAIL
   /// Toplevel
   abstract class X {}
  
   void foo(X);
-  foo(#X){}
+  foo(#X x){}
 
 /// FAIL
   /// Toplevel
 class A {}
 class B extends A{}
 
-void foo(B);
-foo(@A){}
+void foo(B x);
+foo(A x){}
 
 /// PASS
   /// Toplevel
@@ -100,8 +100,8 @@ foo(@A){}
   A<T> cons; 
   } 
   <T> A<T> j(A<A<T>>); 
-  j(b@B) = new B(cons: j(b.cons)); 
-  j(c@C) = new C(cons: j(c.cons)); 
+  j(B b) = new B(cons: j(b.cons)); 
+  j(C c) = new C(cons: j(c.cons)); 
 
 /// FAIL
   /// Toplevel
@@ -118,7 +118,7 @@ foo(@A){}
   /// Toplevel
 class A { int i; }
 int f(?A);
-f(x@A) = x.i;
+f(A x) = x.i;
 f(null) = 0;
 
 /// PASS

@@ -46,7 +46,7 @@
   class Y<T> implements I<T> {}
 
   void foo(I<A>, I<B>);
-  foo(@Y,@Y) {}
+  foo(Y a, Y b) {}
   // @X,@Y is missing
 
 /// PASS
@@ -60,8 +60,8 @@
   class Y<T> implements I<T> {}
 
   void foo(I<A>, I<B>);
-  foo(@Y,@Y) {}
-  foo(@X,@Y) {}
+  foo(Y a, Y b) {}
+  foo(X a, Y b) {}
 
 /// FAIL
   ///Toplevel

@@ -29,7 +29,7 @@ class A
 {
   int x;
 
-  equals(that@A) = this.x == that.x;
+  equals(A that) = this.x == that.x;
 }
 
 /// PASS
@@ -43,7 +43,7 @@ class B extends A
 {
   int x;
 
-  equals(that@B) = this.x == that.x;
+  equals(B that) = this.x == that.x;
 }
 
 /// PASS
@@ -51,14 +51,14 @@ class B extends A
 
   /// Toplevel
 class A {
-  equals(that@A) = true;
+  equals(A that) = true;
 }
 
 class B extends A
 {
   int x;
 
-  equals(that@B) = this.x == that.x;
+  equals(B that) = this.x == that.x;
 }
 
 /// PASS
@@ -71,15 +71,15 @@ class A
 {
   int x;
 
-  equals(that@A) = this.x == that.x;
-  equals(that@B) = this.x == that.x && that.y == 0;
+  equals(A that) = this.x == that.x;
+  equals(B that) = this.x == that.x && that.y == 0;
 }
 
 class B extends A
 {
   int y;
 
-  equals(that@B) = this.x == that.x && this.y == that.y;
+  equals(B that) = this.x == that.x && this.y == that.y;
 }
 
 /// PASS
@@ -89,7 +89,7 @@ class A
 {
   int x;
 
-  equals(that@A) = this.x == that.x;
+  equals(A that) = this.x == that.x;
 }
 
   /// package b import a
@@ -103,7 +103,7 @@ class A
   int x;
 
   equals(that) = false;
-  equals(that@A) = this.x == that.x;
+  equals(A that) = this.x == that.x;
 }
 
   /// package b import a
@@ -116,7 +116,7 @@ class A
 {
   int x;
 
-  equals(that@A) = this.x == that.x;
+  equals(A that) = this.x == that.x;
 }
 
   /// package b import a
@@ -124,10 +124,10 @@ class A
   /// Toplevel
 class B extends A
 {
-  equals(that@A) = super;
+  equals(A that) = super;
 }
-equals(this@A, that@B) = false;
-equals(this@B, that@B) = true;
+equals(A this, B that) = false;
+equals(B this, B that) = true;
 
 /// PASS
   /// package a
@@ -136,7 +136,7 @@ class A
 {
   int x;
 
-  equals(that@A) = this.x == that.x;
+  equals(A that) = this.x == that.x;
 }
 
 boolean equals(String dummy1, boolean dummy2) = false;
@@ -146,19 +146,19 @@ boolean equals(String dummy1, boolean dummy2) = false;
 
 /// FAIL
   ///Toplevel
-/*/// FAIL HERE */ toString(s@String) = "";
+/*/// FAIL HERE */ toString(String s) = "";
 
 /// FAIL
   /// COMMENT Ambiguity for equals(B,B)
   /// Toplevel
 class A
 {
-  equals(that@B) = false;
+  equals(B that) = false;
 }
 
 class B extends A
 {
-  equals(that@A) = true;
+  equals(A that) = true;
 }
 
 /// FAIL
@@ -188,7 +188,7 @@ class B extends A
 
 /// FAIL
 interface I{}
-equals(x@I,y@I) = true;
+equals(I x, I y) = true;
 
 /// PASS
   Collection<String> b = new Bar();
@@ -206,7 +206,7 @@ class Bar<T> extends AbstractList<T>
   /// Toplevel
 class Bar<T> extends AbstractList<T>
 {
-  removeAll(other@Bar) = false;
+  removeAll(Bar other) = false;
 
   size() = 0;
   get(i) = cast(null);

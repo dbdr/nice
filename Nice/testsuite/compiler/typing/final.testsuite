@@ -6,4 +6,4 @@ final class F2 extends F1 {}
 <T> T ff(T);
 
 ff(x) = x;
-ff(x@F2) = new F2();
+ff(F2 x) = new F2();

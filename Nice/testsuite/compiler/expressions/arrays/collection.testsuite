@@ -5,6 +5,6 @@
   len([ "" ]);
   /// Toplevel
 <T, Collection C> C<T> len(C<T>);
-len(c@Collection) = c;
-len(c@Array) { int i = c.length; return c; }
+len(Collection c) = c;
+len(Array c) { int i = c.length; return c; }
 

@@ -111,7 +111,7 @@ class A {
   int x;
 }
 
-getX(this@A) = x;
+getX(A this) = x;
 
 /// PASS
   /// Toplevel

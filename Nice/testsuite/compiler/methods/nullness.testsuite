@@ -1,14 +1,14 @@
 /// FAIL
   /// Toplevel
   void m(?String);
-  m(@String) {}
+  m(String x) {}
 
 /// PASS
   assert !foo(null);
   assert foo("abc");
   /// Toplevel
   boolean foo(?String);
-  foo(#String) = true;
+  foo(#String x) = true;
   foo(null) = false;
 
 /// PASS
@@ -17,4 +17,4 @@
   /// Toplevel
   boolean foo(?String);
   foo(null) = false;
-  foo(#String) = true;
+  foo(#String x) = true;

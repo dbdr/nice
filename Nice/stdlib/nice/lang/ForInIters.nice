@@ -25,8 +25,7 @@ package nice.lang;
 Iterator<char> forIterator(String s) = new StringForIterator(str: s);
 Iterator<char> forIterator(StringBuffer sb) = new StringBufferForIterator(strb: sb);
 
-<T | T <: int, int <: T> 
-Iterator<T> forIterator(OpenRange<T> range) = range.openIterator();
+Iterator<int> forIterator(OpenRange<int> range) = range.openIterator();
 
 //The implementations of additional Iterators
 /*

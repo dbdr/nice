@@ -22,22 +22,10 @@ public class dispatch
   static VarScope createGlobalVarScope()
   { return null; }
 
-  static String getAlikeID()
-  { return null; }
-
   public static Monotype createTypeIdent(LocatedString name)
   { return null;}
 
-  public static Definition createMethodWithDefault(LocatedString name, Constraint constraint, Monotype returnType, FormalParameters parameters, Statement body, Contract contract, boolean isOverride)
-  { return null; }
-
-  static Monotype createMonotypeConstructor(mlsub.typing.TypeConstructor tc, TypeParameters parameters, bossa.util.Location loc)
-  { return null; }
-
   public static Expression createIdentExp(LocatedString i)
-  { return null; }
-
-  public static Expression createSymbolExp(VarSymbol symbol, bossa.util.Location loc)
   { return null; }
 
   public static Expression createCallExp(Expression function, Expression param1)
@@ -52,9 +40,6 @@ public class dispatch
   public static VarSymbol createMethodSymbol(MethodDeclaration declaration, LocatedString name, mlsub.typing.Polytype type)
   { return null; }
 
-  public static VarSymbol createConstructorCallSymbol(MethodDeclaration declaration, LocatedString name, mlsub.typing.Polytype type)
-  { return null; }
-
   public static gnu.bytecode.Method getImplementationAbove(MethodDeclaration decl, gnu.bytecode.ClassType firstArg)
   { return null; }
 
@@ -62,9 +47,6 @@ public class dispatch
   { return null; }
 
   public static Pattern readPattern(String rep, int[] pos)
-  { return null; }
-
-  public static Pattern createPattern(LocatedString name)
   { return null; }
 
   public static Pattern createPattern(LocatedString name, mlsub.typing.TypeConstructor tc, boolean sure)
@@ -76,16 +58,12 @@ public class dispatch
   public static boolean disjoint(Pattern a, Pattern b)
   { return false; }
   
-  static Statement analyseMethodBody(Statement s, VarScope varScope, TypeScope typeScope, MonoSymbol[] params, boolean mustReturnAValue)
-  { return null; }
-  
   static Expression analyse(Expression e, VarScope v, TypeScope t) 
   { return null; }
 
   static Expression analyse(Expression e, Info i) 
   { return null; }
 
-  static void typecheck(Statement s) {}
   static void typecheck(Expression e) {}
 
   public static void resetTypeDefinitionMappings() {}
@@ -93,19 +71,11 @@ public class dispatch
   public static TypeDefinition getTypeDefinition(mlsub.typing.TypeConstructor tc)
   { return null; }
   
-  public static mlsub.typing.Monotype getTypeWithTC(mlsub.typing.TypeConstructor tc)
-  { return null; }
-  
   public static mlsub.typing.Monotype getTypeWithTC(mlsub.typing.TypeConstructor tc, mlsub.typing.Monotype[] sourceParams )
   { return null; }
 
   public static AST createAST(Module module, List defs)
   { return null; }
-
-  static bossa.util.UserError unknownIdent(LocatedString ident)
-  {
-    return null;
-  }
 
   public static void _printStackTraceWithSourceInfo(Throwable t) {}
 }

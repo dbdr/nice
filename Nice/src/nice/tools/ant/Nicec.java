@@ -1,9 +1,9 @@
 package nice.tools.ant;
 
 import org.apache.tools.ant.*;
-import java.io.*;
-import java.util.*;
-import java.lang.reflect.*;
+import java.io.File;
+import java.util.Vector;
+import nice.tools.compiler.OutputMessages;
 
 /**
 		<h2><a name="java">Nicec</a></h2>
@@ -327,7 +327,7 @@ public class Nicec extends Task {
 
 
 
-	/**	Executes the ant Nice compiler by reflection.
+	/**	Executes the ant Nice compiler.
 	 */
 	public void execute() throws BuildException {
 		Vector args = new Vector();
@@ -400,8 +400,20 @@ public class Nicec extends Task {
 
 		String[] argArray = new String[args.size()];
 		System.arraycopy(args.toArray(), 0, argArray, 0, args.size());
-
-		nice.tools.compiler.fun.main(argArray);
+		
+		int retval = nice.tools.compiler.fun.compile(argArray);
+		switch (retval) {
+			case OutputMessages.ERROR:
+				throw new BuildException("compile failed with error", location);
+			case OutputMessages.BUG:
+				throw new BuildException("compile reported a bug", location);
+			case OutputMessages.WARNING:
+				log("compile reported a warning", Project.MSG_WARN);
+				break;
+			case OutputMessages.OK:
+				log("compile finished without problems", Project.MSG_VERBOSE);
+				break;
+		}
 	}
 
 

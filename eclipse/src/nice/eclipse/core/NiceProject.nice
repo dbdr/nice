@@ -25,7 +25,9 @@ class NiceProject implements IProjectNature, INiceElement {
 		this.addToBuildSpec(NICE_BUILDER_ID);
 	}
 	
-	deconfigure() {}
+	deconfigure() {
+		this.removeFromBuildSpec(NICE_BUILDER_ID);
+	} 
 	
 	getProject() = project;
 	
@@ -47,6 +49,35 @@ class NiceProject implements IProjectNature, INiceElement {
 			this.setNiceCommand(description, command);
 		}
 	}
+
+
+
+
+	void removeFromBuildSpec(String builderID) {
+		throw new Exception("not implemented yet");
+		/*
+		IProjectDescription description = getProject().getDescription();
+		ICommand[] commands = description.getBuildSpec();
+		for (int i = 0; i < commands.length; ++i) {
+			if (commands[i].getBuilderName().equals(builderID)) {
+				ICommand[] newCommands = new ICommand[commands.length - 1];
+				System.arraycopy(commands, 0, newCommands, 0, i);
+				System.arraycopy(
+					commands,
+					i + 1,
+					newCommands,
+					i,
+					commands.length - i - 1);
+				description.setBuildSpec(newCommands);
+				getProject().setDescription(description, null);
+				return;
+			}
+		}
+
+		 */
+	}
+
+
 
 
 

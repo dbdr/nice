@@ -2,7 +2,7 @@
 <plugin
    id="net.sf.nice"
    name="Nice Plug-in"
-   version="0.1.5"
+   version="0.0.0"
    provider-name="Alex Greif"
    class="nice.eclipse.core.NicePlugin">
 

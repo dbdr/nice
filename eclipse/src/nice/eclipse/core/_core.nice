@@ -26,6 +26,7 @@ import nice.eclipse.core.element;
 
 
 //	force to compile
+import nice.eclipse.ui;
 import nice.eclipse.ui.wizards;
 import nice.eclipse.ui.views;
 import nice.eclipse.ui.editors;

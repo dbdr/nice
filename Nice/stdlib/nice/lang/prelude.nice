@@ -54,7 +54,7 @@ final class Null<+T> extends Maybe<T> = native;
  * Primitive types
  ****************************************************************/
 
-final class void = native;
+final abstract class void = native;
 
 final class boolean implements BooleanAlgebra, Comparable = native;
 

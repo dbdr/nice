@@ -4,6 +4,7 @@ nice (0.9.4) unstable; urgency=low
     Therefore that statement can be used in a branch that is known to be 
     unused, without needing to return a dummy value when the method does not
     return void.
+  * Added source-level debugging information for recent debuggers (jsr 45).
 
  --
 

@@ -619,8 +619,12 @@ analyse(e@TypeConstantExp, info)
     (name.toString(), name.location());
   
   if (type == null)
-    throw new bossa.util.UserError(name, "Class " + name + " is not declared");
-
+    {
+      if (info.lookupType(name) instanceof MonotypeVar)
+        throw new bossa.util.UserError(name, "A type variable cannot be used here");
+      else
+        throw new bossa.util.UserError(name, "Class " + name + " is not declared");
+    }
   e.value = type;
   e.representedType = bossa.syntax.Node.getGlobalTypeScope().
     globalLookup(name.toString(), name.location());

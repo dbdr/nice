@@ -320,10 +320,11 @@ void f() {
       assert x.life == 42;
     });
 
-/// PASS bug
+/// FAIL
+  /// Toplevel
   <T,U | U <: T> U narrow(T obj) 
   {
-    if (obj instanceof U)
+    if (obj instanceof /* /// FAIL HERE */U)
       return obj;
     else
       throw new ClassCastException(obj.getClass().getName());

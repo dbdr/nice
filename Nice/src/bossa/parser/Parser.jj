@@ -472,6 +472,15 @@ LocatedString integerLiteral():
   { return new LocatedString(t.image, new Location(t)); }
 }
 
+ConstantExp typeExpression():
+{
+  LocatedString name;
+}
+{
+  name = doted_array_string()
+  { return ConstantExp.makeType(name); }
+}
+
 /***********************************************************************/
 /*                          Type Symbols                               */
 /***********************************************************************/
@@ -1685,9 +1694,9 @@ Expression InstanceOfExpression() :
 { Expression res; }
 {
   res=RelationalExpression() 
-  [ { Token t; LocatedString type; } 
-    t="instanceof" type=doted_array_string() 
-    { return CallExp.create(symb(t), res, ConstantExp.makeString(type)); }
+  [ { Token t; ConstantExp type; } 
+    t="instanceof" type=typeExpression() 
+    { return CallExp.create(symb(t), res, type); }
   ]
   { return res; }
 }
@@ -1860,9 +1869,9 @@ Expression PrimaryPrefix() :
 
 |
   LOOKAHEAD( doted_array_string() "." "class" )
-  { LocatedString name; Token t; }
-  name=doted_array_string() "." t="class"
-  { return CallExp.create(symb(t), ConstantExp.makeType(name)); }
+  { ConstantExp type; Token t; }
+  type=typeExpression() "." t="class"
+  { return CallExp.create(symb(t), type); }
 |
   //Name()
   res=identExp()

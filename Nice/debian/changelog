@@ -1,6 +1,7 @@
 nice (0.5.6) unstable; urgency=low
 
   * Added the ".class" construct.
+  * Completed the "instanceof" construct.
   * Calling new T[size] where T is a type variable now correctly returns 
     an array with optional element type. It can be filled with non-null values
     using the 'fill' function, e.g. 

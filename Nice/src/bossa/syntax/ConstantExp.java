@@ -240,7 +240,7 @@ public class ConstantExp extends Expression
     return res;
   }
   
-  public static Expression makeType(LocatedString representation)
+  public static ConstantExp makeType(LocatedString representation)
   {
     return new TypeConstantExp(representation);
   }

@@ -1,0 +1,18 @@
+/// PASS
+  boolean b = "A" instanceof java.lang.String;
+
+/// PASS
+  boolean b = "A" instanceof String;
+
+/// FAIL
+  boolean b = "A" instanceof not.Existing;
+
+/// PASS
+  if ("A" instanceof String)
+    ;
+  else
+    throw new Error();
+
+/// PASS
+  if (0 instanceof String)
+    throw new Error();

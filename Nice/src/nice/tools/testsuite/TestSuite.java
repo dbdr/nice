@@ -32,11 +32,22 @@ public class TestSuite {
 	 */
 	private final String KEYWORD_GLOBAL = "global";
 
+	/**
+	 * TODO
+	 * 
+	 */
+	private final String KEYWORD_COMMENT = "comment";
+
 
 	/**
-		The testsuite file on the disc
-	*/
+	 * The testsuite file on the disc
+	 * 
+	 */
 	private File _file;
+	/**
+	 * TODO
+	 * 
+	 */
 	private List _testCases = new ArrayList();
 	
 	/**
@@ -49,8 +60,11 @@ public class TestSuite {
 
 
 	/**
-		Constructor. Reads the testcases and performs the tests in the testsuite.
-	*/
+	 * Constructor. Reads the testcases and performs the tests in the testsuite.
+	 * 
+	 * @param	testSuiteFile	TODO
+	 * @exception	TestSuiteException	TODO
+	 */
 	public TestSuite(File testSuiteFile) throws TestSuiteException {
 		_file = testSuiteFile;			
 		
@@ -62,8 +76,11 @@ public class TestSuite {
 
 
 	/**
-		Reads the testsuite file line by line and creates the appropriate testcases.
-	*/
+	 * Reads the testsuite file line by line and creates the appropriate testcases.
+	 * Also handles globals and comments
+	 * 
+	 * @exception	TestSuiteException	TODO
+	 */
 	private void readTestCases() throws TestSuiteException {
 		BufferedReader reader = null;
 		try {
@@ -71,22 +88,24 @@ public class TestSuite {
 			String line;
 			TestCase testCase = null;
 			boolean isGlobalSource = false;
+			boolean testsuiteKeywordLine;
 			while((line = reader.readLine()) != null) {
 				if (line.trim().length() == 0)	//	ignore empty lines
 					continue;
-
-				if (line.startsWith(TestNice.KEYWORD_SIGN)) {
-					if (line.toLowerCase().indexOf(KEYWORD_GLOBAL) != -1)
-						isGlobalSource = true;
-					else isGlobalSource = false;
-				}
+					
+				testsuiteKeywordLine = line.startsWith(TestNice.KEYWORD_SIGN);
+				if (testsuiteKeywordLine)
+					isGlobalSource = line.toLowerCase().indexOf(KEYWORD_GLOBAL) != -1;
 				
 				if (isGlobalSource) {
 					getGlobalSource().consumeLine(line);
 					continue;
 				}
 				
-				if (line.startsWith(TestNice.KEYWORD_SIGN)) {
+				if (testsuiteKeywordLine  &&  consumeComment(line))
+					continue;
+				
+				if (testsuiteKeywordLine) {
 					testCase = createTestCase(line);
 					_testCases.add(testCase);
 					continue;
@@ -108,9 +127,30 @@ public class TestSuite {
 
 
 	/**
-		Creates and returns a specific TestCase object depending upon
-		the keyword.
-	*/
+	 * Decides whether the line is a comment or not, and if it is one
+	 * then the comment is printed if desired.
+	 * 
+	 */
+	boolean consumeComment(String line) {
+		int commentPos = line.toLowerCase().indexOf(KEYWORD_COMMENT);
+		if (commentPos == -1)
+			return false;
+		if (TestNice.getWriteComments()) {
+			String comment = line.substring(commentPos + KEYWORD_COMMENT.length()).trim();
+			TestNice.getOutput().logAndFlush(KEYWORD_COMMENT, comment);
+		}
+		
+		return true;
+	}
+
+
+	/**
+	 * Creates and returns a specific TestCase object depending upon
+	 * the keyword.
+	 * 
+	 * @param	line	TODO
+	 * @exception	TestSuiteException	TODO
+	 */
 	private TestCase createTestCase(String line) throws TestSuiteException {
 		String type = line.substring(TestNice.KEYWORD_SIGN.length()).trim();
 		
@@ -123,10 +163,12 @@ public class TestSuite {
 
 
 	/**
-		Performs tests on all testcases in this testsuite.
-		Writes the files of the testcase, and calls the specific 
-		TestCase class to perform the test.
-	*/
+	 * Performs tests on all testcases in this testsuite.
+	 * Writes the files of the testcase, and calls the specific 
+	 * TestCase class to perform the test.
+	 * 
+	 * @exception	TestSuiteException	TODO
+	 */
 	private void performTests() throws TestSuiteException {
 		for(Iterator iter = _testCases.iterator(); iter.hasNext(); ) {
 			TestNice.cleanupTempFolder();
@@ -138,6 +180,7 @@ public class TestSuite {
 
 	/**
 	 * Returns the testsuite file.
+	 * 
 	 */
 	public File getFile() {
 		return _file;

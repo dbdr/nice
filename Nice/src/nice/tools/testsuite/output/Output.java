@@ -77,6 +77,21 @@ public interface Output {
 	 */
 	public void log(String prefix, String statement);
 
+	/**
+	 * Logs a statement to this output and flushes the writer.
+	 * 
+	 * @param	statement	TODO
+	 */
+	public void logAndFlush(String statement);
+	
+	
+	/**
+	 * Logs a statement with the given prefix in angled braces and flushes the writer.
+	 * 
+	 * @param	prefix	TODO
+	 * @param	statement	TODO
+	 */
+	public void logAndFlush(String prefix, String statement);
 
 	
 	/**

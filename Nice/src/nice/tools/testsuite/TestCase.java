@@ -45,16 +45,38 @@ public class TestCase {
 		
 
 
+	/**
+	 * TODO
+	 * 
+	 */
 	private TestSuite _testSuite;
+	/**
+	 * TODO
+	 * 
+	 */
 	private List _niceSourceFiles = new ArrayList();
+	/**
+	 * TODO
+	 * 
+	 */
 	private NiceSourceFile _currentSourceFile;
+	/**
+	 * TODO
+	 * 
+	 */
 	private Set _dontCompilePackages = new HashSet();
+	/**
+	 * TODO
+	 * 
+	 */
 	private ByteArrayOutputStream _compilerMessagesStream;
 
 	
 	/**
-		Constructor.
-	*/
+	 * Constructor.
+	 * 
+	 * @param	suite	TODO
+	 */
 	public TestCase(TestSuite suite) {
 		_testSuite = suite;
 		createNewSourceFile();
@@ -62,9 +84,10 @@ public class TestCase {
 	
 	
 	/**
-		Creates a new SourceFile objectand adds it to the list
-		of source files and sets the current source file to this file.
-	*/
+	 * Creates a new SourceFile objectand adds it to the list
+	 * of source files and sets the current source file to this file.
+	 * 
+	 */
 	private void createNewSourceFile() {
 		_currentSourceFile = new NiceSourceFile();
 		_niceSourceFiles.add(_currentSourceFile);
@@ -76,8 +99,10 @@ public class TestCase {
 	
 	/**
 	 * Consumes a read line from the testsuite file.
-	 Sets the status if necessary.
+	 * Sets the status if necessary.
 	 * 
+	 * @param	line	TODO
+	 * @exception	TestSuiteException	TODO
 	 */
 	public void consumeLine(String line) throws TestSuiteException {
 		if (isKeywordLine(line))
@@ -88,9 +113,12 @@ public class TestCase {
 
 	
 	/**
-		Checks whether the line is a keyword line and sets the status new
-		if it is a keyword line
-	*/
+	 * Checks whether the line is a keyword line and sets the status new
+	 * if it is a keyword line
+	 * 
+	 * @param	line	TODO
+	 * @exception	TestSuiteException	TODO
+	 */
 	private boolean isKeywordLine(String line) throws TestSuiteException {
 		int posKeywordSign = line.indexOf(TestNice.KEYWORD_SIGN);
 		if (posKeywordSign == -1)
@@ -107,7 +135,9 @@ public class TestCase {
 			_currentSourceFile.consumePackageKeyword(keywordStatement);
 			if (keywordStatement.indexOf(TestNice.KEYWORD_DONTCOMPILE) != -1)
 				_dontCompilePackages.add(_currentSourceFile.getPackage());
-		}
+		} else
+			//	assume its a comment and delegate it to the testsuite
+			_testSuite.consumeComment(line);
 		
 		return true;
 	}
@@ -118,6 +148,7 @@ public class TestCase {
 	/**
 	 * Writes the files of this testcase to disk.
 	 * 
+	 * @exception	TestSuiteException	TODO
 	 */
 	public void writeFiles() throws TestSuiteException {
 		for (Iterator iter = _niceSourceFiles.iterator(); iter.hasNext(); ) {
@@ -130,15 +161,17 @@ public class TestCase {
 	}
 	
 	/**
-		Performs the test for this testcase
-	*/
+	 * Performs the test for this testcase
+	 * 
+	 */
 	public void performTest() {
 		TestNice.getOutput().startTestCase(this);
 	}
 	
 	/**
-		Returns the involved packages.
-	*/
+	 * Returns the involved packages.
+	 * 
+	 */
 	private List getPackages() {
 		List packages = new ArrayList();
 	
@@ -155,6 +188,8 @@ public class TestCase {
 	/**
 	 * Compiles all packages of this testcase.
 	 * 
+	 * @exception	TestSuiteException	TODO
+	 * @exception	CompilerBugException	TODO
 	 */
 	public void compilePackages() throws TestSuiteException, CompilerBugException {
 		_compilerMessagesStream = new ByteArrayOutputStream();
@@ -198,6 +233,8 @@ public class TestCase {
 	/**
 	 * Compiles the specified package of this testcase.
 	 * 
+	 * @param	packageName	TODO
+	 * @exception	TestSuiteException	TODO
 	 */
 	private int compilePackage(String packageName) throws TestSuiteException {
 		return nice.tools.compiler.fun.compile
@@ -224,8 +261,9 @@ public class TestCase {
 	
 	/**
 	 * Runs the main method of the testcase. Only if main method exists and
-	 the package was compiled.
+	 * the package was compiled.
 	 * 
+	 * @exception	TestSuiteException	TODO
 	 */
 	public void runMain() throws TestSuiteException {
 		ByteArrayOutputStream mainMessagesStream = new ByteArrayOutputStream();
@@ -266,11 +304,19 @@ public class TestCase {
 	}
 	
 	
+	/**
+	 * TODO
+	 * 
+	 */
 	public void pass() {
 		TestNice.increaseSucceeded();
 		TestNice.getOutput().endTestCase(true);
 	}
 	
+	/**
+	 * TODO
+	 * 
+	 */
 	public void fail() {
 		TestNice.increaseFailed();
 		
@@ -317,6 +363,7 @@ public class TestCase {
 	/**
 	 * Determines the location of the nice runtime.
 	 * This method is also used by Nicec
+	 * 
 	 */
 	private String getRuntime() {
 		//	when Nicec is in the nice.jar, then we should use

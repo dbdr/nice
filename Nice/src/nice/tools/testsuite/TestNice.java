@@ -97,13 +97,25 @@ public class TestNice {
 	private static int _testCasesFailed = 0;
 
 	/**
-		The Output where log statements should be written.
-		ConsoleOutput is the default Output.
-	*/
+	 * The Output where log statements should be written.
+	 * ConsoleOutput is the default Output.
+	 * 
+	 */
 	private static Output _output = new ConsoleOutput();
 	
 	
+	/**
+	 * TODO
+	 * 
+	 */
 	private static List _testSuites = new ArrayList();
+
+
+	/**
+	 * Flag whether comments should be included in the output or not.
+	 * 
+	 */
+	private static boolean _writeComments;
 
 
 
@@ -147,25 +159,31 @@ public class TestNice {
 
 	/**
 	 * Processes the command line arguments. Returns true if everything is ok.
+	 * 
+	 * @param	args	TODO
 	 */
 	private static boolean processArgs(String[] args) {
 		for(int i = 0; i < args.length;) {
 			String s = args[i];
 			i++;
 			if(s.startsWith("-")) {
-				if ("-output".equalsIgnoreCase(s)) {
+				if ("-output".equalsIgnoreCase(s))
 					setOutput(args[i++]);
-				} else
+				else if ("-comment".equalsIgnoreCase(s))
+					_writeComments = true;
+				else
 					return false;
-			} else 
+			} else
 				_testSuites.add(s);
 		}
 		return true;
 	}
 
 	/**
-		Sets the output of the test engine
-	*/
+	 * Sets the output of the test engine
+	 * 
+	 * @param	output	TODO
+	 */
 	private static void setOutput(String output) {
 		if ("console".equalsIgnoreCase(output)) {
 			_output = new ConsoleOutput();
@@ -186,6 +204,7 @@ public class TestNice {
 
 	/**
 	 * Prints the usage of this application.
+	 * 
 	 */
 	static private void usage() {
 		System.out.println("usage:\n java nice.tools.testsuiteTestNice [testSuiteFile | folder]");
@@ -222,6 +241,7 @@ public class TestNice {
 	/**
 	 * Moves all files and folders of the temp folder to a
 	 * newly created folder inside the fail folder
+	 * 
 	 */
 	static void moveFilesToFailFolder() {
 		File folder = new File(_failFolder, "" + _testCasesFailed);
@@ -265,6 +285,8 @@ public class TestNice {
 	 * 
 	 * @param	testSuitePath	TODO
 	 * @exception	TestSuiteException	TODO
+	 * @exception	TestSuiteException	TODO
+	 * @exception	TestSuiteException	TODO
 	 */
 	private void performTests(String testSuitePath) throws TestSuiteException {
 		File file = new File(testSuitePath);
@@ -287,6 +309,8 @@ public class TestNice {
 	/**
 	 * Collects all testsuite files in the specified folder in the given collection.
 	 * 
+	 * @param	folder	TODO
+	 * @param	testSuiteFiles	TODO
 	 */
 	private void getTestSuiteFiles(File folder, Set testSuiteFiles) {
 		File[] files = folder.listFiles();
@@ -339,10 +363,9 @@ public class TestNice {
 
 
 
-
-
 	/**
 	 * Returns the Output.
+	 * 
 	 */
 	static Output getOutput() {
 		return _output;
@@ -351,7 +374,17 @@ public class TestNice {
 
 
 	/**
+	 * Returns whether comments should be written to output
+	 * 
+	 */
+	static boolean getWriteComments() {
+		return _writeComments;
+	}
+
+
+	/**
 	 * Returns the number of succeded testcases.
+	 * 
 	 */
 	static public int getTestCasesSucceeded() {
 		return _testCasesSucceeded;
@@ -360,6 +393,7 @@ public class TestNice {
 
 	/**
 	 * Returns the number of failed testcases.
+	 * 
 	 */
 	static public int getTestCasesFailed() {
 		return _testCasesFailed;

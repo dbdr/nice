@@ -39,4 +39,11 @@ test_numeric()
   c  = id(c);
   f  = id(f);
   d  = id(d);
+
+  // unary negation
+  i = -by;
+  i = -s;
+  i = -i;
+  l = -i;
+  l = -l;
 }

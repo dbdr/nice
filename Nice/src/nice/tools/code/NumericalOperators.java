@@ -19,6 +19,7 @@ import gnu.bytecode.*;
 /**
    Inlining of native numeric types operators.
 
+   @version $Date$
    @author Daniel Bonniot
 */
 public class NumericalOperators extends Procedure2 implements Inlineable
@@ -29,7 +30,9 @@ public class NumericalOperators extends Procedure2 implements Inlineable
     Add = 2,
     Mul = 3,
     Div = 4,
-    Rem = 5; // remainder (modulus)
+    Rem = 5, // remainder (modulus)
+    Neg = 6; // negation (unary -)
+  
 
   public static NumericalOperators create(String param)
   {
@@ -60,6 +63,8 @@ public class NumericalOperators extends Procedure2 implements Inlineable
       kind = Div;
     else if ("Rem".equals(param))
       kind = Rem;
+    else if ("Neg".equals(param))
+      kind = Neg;
     else
       bossa.util.User.error("Unknown inlined numeric operator " + param);
     return new NumericalOperators(kind, type);
@@ -79,17 +84,25 @@ public class NumericalOperators extends Procedure2 implements Inlineable
     Expression[] args = exp.getArgs();
     CodeAttr code = comp.getCode();
     Target stack = new StackTarget(type);
-
-    args[0].compile(comp, stack);
-    args[1].compile(comp, stack);
-
-    switch(kind){
-    case Sub: code.emitSub(type); break;
-    case Add: code.emitAdd(type); break;
-    case Mul: code.emitMul();     break;
-    case Div: code.emitDiv();     break;
-    case Rem: code.emitRem();     break;
-    }
+    
+    if (kind == Neg)
+      {
+	args[0].compile(comp, stack);
+	code.emitNeg();
+      }
+    else
+      {
+	args[0].compile(comp, stack);
+	args[1].compile(comp, stack);
+	
+	switch(kind){
+	case Sub: code.emitSub(type); break;
+	case Add: code.emitAdd(type); break;
+	case Mul: code.emitMul();     break;
+	case Div: code.emitDiv();     break;
+	case Rem: code.emitRem();     break;
+	}
+      }
     
     target.compileFromStack(comp, type);
   }

@@ -19,8 +19,8 @@
    Wrapper for {@link gnu.math <code>gnu.math</code>}.
    
    @version $Date$
-   @author bonniot
- */
+   @author Daniel Bonniot
+*/
 
 package nice.lang;
 
@@ -68,11 +68,11 @@ long `+`(long) = nop
 int `+`(int) = 
 */
 
-// unary minus
-double `-`(double) = native double Native.minus(double);
-float `-`(float) = native float Native.minus(float);
-long `-`(long) = native long Native.minus(long);
-int `-`(int) = native int Native.minus(int);
+// unary negation
+double `-`(double) = inline nice.tools.code.NumericalOperators("dNeg");
+float `-`(float) = inline nice.tools.code.NumericalOperators("fNeg");
+long `-`(long) = inline nice.tools.code.NumericalOperators("jNeg");
+int `-`(int) = inline nice.tools.code.NumericalOperators("iNeg");
 
 // multiplication
 double `*`(double, double) = inline nice.tools.code.NumericalOperators("dMul");

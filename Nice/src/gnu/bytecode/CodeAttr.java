@@ -720,7 +720,7 @@ public class CodeAttr extends Attribute implements AttrContainer
   public void emitNewArray (Type element_type, int dims)
   {
     Type top = popType ().promote ();
-    if (top != Type.int_type && top.getSignature() != "I")
+    if (top != Type.int_type)
       throw new Error ("non-int dim. spec. in emitNewArray");
 
     if (element_type instanceof PrimType)
@@ -751,7 +751,7 @@ public class CodeAttr extends Attribute implements AttrContainer
       while (-- dims > 0) // first dim already popped
 	{
 	  top = popType ().promote ();
-	  if (top != Type.int_type && top.getSignature() != "I")
+	  if (top != Type.int_type)
 	    throw new Error ("non-int dim. spec. in emitNewArray");
 	}
     }
@@ -825,6 +825,15 @@ public class CodeAttr extends Attribute implements AttrContainer
   public final void emitIOr () { emitBinop (128); }
   public final void emitXOr () { emitBinop (130); }
 
+  /** Unary numerical negation (-). */
+  public final void emitNeg ()
+  {
+    reserve(1);
+    Type type = popType().promote();
+    put1 (116 + adjustTypedOp(type));
+    pushType (type);
+  }
+  
   public final void emitNot(Type type)
   {
     emitPushConstant(1, type);
@@ -908,7 +917,7 @@ public class CodeAttr extends Attribute implements AttrContainer
 		       +" simple:"+var.isSimple()+", offset: "+offset);
     Type type = var.getType().promote ();
     reserve(6);
-    if (type != Type.int_type && type.getSignature() != "I")
+    if (type != Type.int_type)
       throw new Error("attempting to increment non-int variable");
 
     boolean wide = offset > 255 || inc > 255 || inc < -256;

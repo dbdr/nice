@@ -15,19 +15,8 @@ Comments about the new features are welcome.
 This includes arguing whether they are well designed, proposing alternatives,
 requesting that some feature should be given a higher priority because
 you need them more and proposing new features.
-These discussions can take place on 
-<ulink url="http://sourceforge.net/forum/?group_id=12788">the forums</ulink>, 
-on <ulink url="http://sourceforge.net/mail/?group_id=12788">the mailing list
-</ulink>
-or <ulink url="mailto:bonniot@users.sourceforge.net">privately</ulink>
-(the first two are prefered).
-</para>
-
-<para>
-<!-- The current stable version is 0.6, released July 11th, 2002. -->
-The latest version is 0.7.9, released May 6th, 2003.
-It includes all the planned features for version 0.8, which should be
-released real soon now!
+Each feature should have a link, which leads to a Wiki page where
+it is possible to discuss its design and its implementation.
 </para>
 
 <para>
@@ -35,29 +24,42 @@ released real soon now!
 <varlistentry><term>1.0</term>
 <listitem>
 <para>
-Implement <ulink 
-url="http://nice.sourceforge.net/cgi-bin/twiki/view/Dev/VisibilityModifiers">
-visibility modifiers</ulink> (private, default, public).
+
 Improve the <ulink 
 url="http://nice.sourceforge.net/cgi-bin/twiki/view/Dev/NiceConstructors">
 support for object creation</ulink>, besides automatic constructors.
-A plugin to write Nice programs in <ulink url="http://www.eclipse.org">
-Eclipse</ulink> will likely be included.
+
+Add <ulink
+url="http://nice.sourceforge.net/cgi-bin/twiki/view/Dev/EnumImplementation">
+enumerations</ulink> to the language.
+
+Implement <ulink 
+url="http://nice.sourceforge.net/cgi-bin/twiki/view/Dev/VisibilityModifiers">
+visibility modifiers</ulink> (private, default, public).
+
+<ulink url="http://nice.sourceforge.net/cgi-bin/twiki/view/Dev/StandardLibrary">
+Improve and document the standard library <literal>nice.lang</literal></ulink>.
+
+</para>
+<para>
+A <ulink
+url="http://nice.sourceforge.net/cgi-bin/twiki/view/Dev/EclipsePlugin">
+plugin</ulink> to write Nice programs in <ulink url="http://www.eclipse.org">
+Eclipse</ulink> will also be included.
+
 Finish a first version of the <ulink url="manual.html">User's manual</ulink>.
 </para>
 
 <para>
 This will be the first official stable release of the language. 
-With the above features, the language is rich enough to compete with Java 1.4
-in every aspect. 
-This will be the time for more widespread publicity. 
-<ulink url="mailto:bonniot@users.sourceforge.net">What are the best places 
-to announce Nice ? Tell me !</ulink>
+This will be the time for
+<ulink url="http://nice.sourceforge.net/cgi-bin/twiki/view/Dev/AnnouncingNewReleases">
+more widespread publicity</ulink>, to which everyone is welcome to contribute.
 </para>
 </listitem>
 </varlistentry>
 
-<varlistentry><term>0.8 (done)</term>
+<varlistentry><term>0.8 (released on May 29th, 2003)</term>
 <listitem>
 <para>
 Added various missing Java constructs: super, synchronized statements,

@@ -14,7 +14,13 @@ INSTALLATION STEPS
    It is advised to install in in "C:\".
    Otherwise you must edit the "nicec.bat" script file as explained there.
 
-3. Add the "Nice" directory in your PATH.
+3. Add the "Nice" directory in your PATH:
+     * On Windows NT, open Control Panel, double-click on System, 
+       select the Environment tab, click on user variable PATH and 
+       add C:\Nice; in front of its value. 
+     * On Windows 9x, add 
+         set PATH=C:\Nice;%PATH%
+       at the end of your autoexec.bat.
 
 
 USING THE COMPILER

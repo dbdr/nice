@@ -77,3 +77,12 @@ index.toString());
 /// FAIL
   /// Toplevel
 <T> void foo(T->int f = T x => x) {}
+
+/// PASS
+  let t = new Test();
+  assert (t.a)(t);
+  /// Toplevel
+  class Test {
+    Test->boolean a = f;
+    boolean f() = true;
+  }

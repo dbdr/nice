@@ -1172,10 +1172,13 @@ public class LambdaExp extends ScopeExp
       {
 	comp.generateConstructor(this);
 	//ClassType type = getHeapFrameType(); // Is this more correct?
-	code.emitNew(type);
-	code.emitDup(type);
-	code.emitInvokeSpecial(type.constructor);
-	code.emitPutStatic(instanceField);
+        if (type.constructor != null)
+          {
+            code.emitNew(type);
+            code.emitDup(type);
+            code.emitInvokeSpecial(type.constructor);
+            code.emitPutStatic(instanceField);
+          }
       }
     else if (this instanceof ClassExp)
       // generateConstructor might have been called earlier, but we call it 

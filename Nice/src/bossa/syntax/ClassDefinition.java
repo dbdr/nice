@@ -31,20 +31,17 @@ abstract public class ClassDefinition extends Definition
    * Creates a class definition.
    *
    * @param name the name of the class
-   * @param isConcrete
    * @param isFinal 
    * @param isAbstract 
    * @param isInterface true iff the class is an "interface" 
    (which is not an "abstract interface").
    isInterface implies isAbstract.
-   * @param isSharp true iff it's a #class
    * @param typeParameters a list of type symbols
    * @param extensions a list of TypeConstructors
    * @param implementations a list of Interfaces
    * @param abstractions a list of Interfaces
    */
   public ClassDefinition(LocatedString name, 
-			 boolean isConcrete,
 			 boolean isFinal, boolean isAbstract, 
 			 boolean isInterface,
 			 List typeParameters,
@@ -55,8 +52,6 @@ abstract public class ClassDefinition extends Definition
   {
     super(name, Node.upper);
 
-    this.isConcrete = isConcrete;
-    
     if(isInterface)
       isAbstract = true;
     
@@ -94,7 +89,7 @@ abstract public class ClassDefinition extends Definition
     this.extensions = extensions;
 
     this.tc = new mlsub.typing.TypeConstructor
-      (this.name.toString(), variance, isConcrete, true);
+      (this.name.toString(), variance, isConcrete(), true);
 
     if(isInterface)
       associatedInterface = new Interface(variance, tc);
@@ -186,10 +181,9 @@ abstract public class ClassDefinition extends Definition
        (mlsub.typing.Monotype[]) typeParameters.toArray(new MonotypeVar[typeParameters.size()]));
   }
   
-  final boolean isConcrete;
   public final boolean isConcrete()
   {
-    return isConcrete;
+    return !isAbstract;
   }
 
   /****************************************************************
@@ -198,8 +192,8 @@ abstract public class ClassDefinition extends Definition
 
   void resolve()
   {
-    // if superClass is non null, it was build before
-    // extensions should be null in that case
+    // If superClass is non null, it was build before.
+    // Extensions should be null in that case.
     if(superClass==null)
       {
 	superClass = TypeIdent.resolveToTC(typeScope, extensions);
@@ -242,25 +236,23 @@ abstract public class ClassDefinition extends Definition
 		   ": they do not have the same number or kind of type parameters");
       }
       
-      if(impl!=null)
-	Typing.assertImp(tc,impl,true);
+      if (isFinal)
+	Typing.assertMinimal(tc);
 
-      if(associatedInterface!=null)
+      if (impl != null)
+	Typing.assertImp(tc, impl, true);
+
+      if (associatedInterface != null)
 	Typing.assertImp(tc, associatedInterface, true);
       
-      if(abs!=null)
+      if (abs != null)
 	{
 	  Typing.assertImp(tc, abs, true);
 	  Typing.assertAbs(tc, abs);
-	}
-      
-      if(implementsTop())
-	Typing.assertImp(tc, variance.top, true);
-      if(isFinal)
-	Typing.assertAbs(tc, variance.top);
+	}      
     }
     catch(TypingEx e){
-      User.error(name,"Error in class "+name+" : "+e.getMessage());
+      User.error(name, "Error in class " + name + " : " + e.getMessage());
     }
   }
 
@@ -307,34 +299,40 @@ abstract public class ClassDefinition extends Definition
       return superClass(0);
   }
   
-  /**
-   * The abstract class associated with this class.
-   * If no #class has been generated, returns this.
-   */
-  ClassDefinition abstractClass()
+  private Type javaType;
+
+  protected void setJavaType(Type javaType)
   {
-    return this;
+    this.javaType = javaType;
+    nice.tools.code.Types.set(tc, javaType);
   }
-  
-  abstract Type javaClass();
+
+  final Type getJavaType()
+  {
+    return javaType;
+  }
+
+  final ClassType javaClass()
+  {
+    return (ClassType) javaType;
+  }
 
   final static Type javaClass(ClassDefinition c)
   {
-    if(c==null)
+    if (c == null)
       return gnu.bytecode.Type.pointer_type;
     else
-      return c.javaClass();
+      return c.getJavaType();
   }
   
   ClassType javaSuperClass()
   {
-    ClassDefinition abs = abstractClass();
     Type res;
     
-    if(abs.superClass == null)
+    if(superClass == null)
       res = gnu.bytecode.Type.pointer_type;
     else
-      res = nice.tools.code.Types.javaType(abs.superClass[0]);
+      res = nice.tools.code.Types.javaType(superClass[0]);
     
     if(!(res instanceof ClassType))
       Internal.error("Java type="+res+"\nOnly special arrays are not a class type, and they must be final");
@@ -342,8 +340,6 @@ abstract public class ClassDefinition extends Definition
     return (ClassType) res;
   }
   
-  abstract protected void addFields(ClassType c);
-
   /****************************************************************
    * Associated interface
    ****************************************************************/
@@ -414,8 +410,6 @@ abstract public class ClassDefinition extends Definition
   TypeConstructor[] superClass;
   Interface[] impl, abs;
   protected boolean isFinal, isInterface;
-  
-  abstract protected boolean implementsTop();
   
   boolean isAbstract;
 }

@@ -53,7 +53,7 @@ public class JavaClass extends ClassDefinition
 		   List extensions, List implementations, List abstractions,
 		   LocatedString javaName)
   {
-    super(name, true, isFinal, isAbstract, isInterface,
+    super(name, isFinal, isAbstract, isInterface,
 	  typeParameters, typeParametersVariances,
 	  extensions, implementations, abstractions);
     this.javaName = javaName;
@@ -65,17 +65,15 @@ public class JavaClass extends ClassDefinition
 	if(name.toString().equals("nice.lang.Array"))
 	  {
 	    ConstantExp.arrayTC = this.tc;
-	    javaType = nice.tools.code.SpecialArray.wrappedType();
+	    setJavaType(nice.tools.code.SpecialArray.wrappedType());
 	  }
 	else
 	  {
-	    javaType = ConstantExp.registerPrimType(name.toString(), tc);
-	    if(javaType == null)
+	    setJavaType(ConstantExp.registerPrimType(name.toString(), tc));
+	    if(getJavaType() == null)
 	      User.error(this,
 			 name+" is not a known primitive type");
 	  }
-	
-	nice.tools.code.Types.set(tc, javaType);
       }
     else
       {
@@ -102,32 +100,14 @@ public class JavaClass extends ClassDefinition
     if (refClass == null)
       User.error(javaName, javaName + " was not found in classpath");
     
-    javaType = (gnu.bytecode.ClassType) gnu.bytecode.Type.make(refClass);
-    nice.tools.code.Types.set(tc, javaType);
+    setJavaType(gnu.bytecode.Type.make(refClass));
   }
 
   private boolean isPrimitive;
   
-  private gnu.bytecode.Type javaType;
-  
-  gnu.bytecode.Type javaClass()
-  {
-    return javaType;
-  }
-  
   public void compile()
   {
     // nothing to do.
-  }
-  
-  protected void addFields(gnu.bytecode.ClassType c)
-  {
-    //??
-  }
-
-  protected boolean implementsTop()
-  {
-    return true;
   }
   
   public void printInterface(java.io.PrintWriter s)

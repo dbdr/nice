@@ -37,7 +37,6 @@ public class NiceClass extends ClassDefinition
    * @param isInterface true iff the class is an "interface" 
        (which is not an "abstract interface").
        isInterface implies isAbstract.
-   * @param isSharp true iff it's a #class
    * @param typeParameters a list of type symbols
    * @param extensions a list of TypeConstructors
    * @param implementations a list of Interfaces
@@ -45,23 +44,16 @@ public class NiceClass extends ClassDefinition
    */
   public NiceClass(LocatedString name, 
 		   boolean isFinal, boolean isAbstract, 
-		   boolean isInterface, boolean isSharp,
+		   boolean isInterface,
 		   List typeParameters,
 		   List typeParametersVariances,
 		   List extensions, List implementations, List abstractions)
   {
-    super(name.cloneLS(), isSharp || isFinal, isFinal, isAbstract, isInterface,
+    super(name.cloneLS(), isFinal, isAbstract, isInterface,
 	  typeParameters, typeParametersVariances,
 	  extensions, implementations, abstractions);
 
     this.simpleName = name;
-    this.isSharp = isSharp;
-    
-    // if this class is final, 
-    // no #class is created below.
-    // the associated #class is itself
-    if(this.isFinal && !isSharp)
-      addTypeMap("#"+name.content, this.tc);
   }
 
   private static Field[] noFields = new Field[0];
@@ -84,56 +76,7 @@ public class NiceClass extends ClassDefinition
     if(methods != null)
       this.methods = addChildren(methods);
 
-    if(this.isSharp)
-      classType = module.createClass(simpleName.toString().substring(1));
-    else
-      if(this.isAbstract || this.isFinal)
-	// since no associated concrete class is created,
-	// it needs its own classtype
-	classType = module.createClass(simpleName.toString());
-
-    if(classType != null)
-      nice.tools.code.Types.set(tc, classType);
-  }
-  
-  /**
-   * Creates an immediate descendant, 
-   * that abstracts and doesn't implement Top<n>.
-   */
-  public Collection associatedDefinitions()
-  {
-    if(isFinal || isAbstract)
-      return null;
-
-    LocatedString name = this.simpleName.cloneLS();
-    name.prepend("#");
-
-    NiceClass c = new NiceClass
-      (name,true,false,false,true,typeParameters, typeParametersVariances,
-       null, null, null);
-    c.superClass = new TypeConstructor[]{ this.tc };
-    
-    c.setFieldsAndMethods(null, null);
-    associatedConcreteClass = c;
-    concreteClasses.add(c);
-    
-    nice.tools.code.Types.set(this.tc, c.classType);
-    
-    Collection res = new ArrayList(1);
-    res.add(c);
-    return res;
-  }
-
-  protected boolean implementsTop()
-  {
-    return !isSharp;
-  }
-  
-  static private List concreteClasses = new LinkedList();
-
-  static public ListIterator listConcreteClasses()
-  {
-    return concreteClasses.listIterator();
+    setJavaType(module.createClass(simpleName.toString()));
   }
   
   /****************************************************************
@@ -221,9 +164,6 @@ public class NiceClass extends ClassDefinition
 
   public void printInterface(java.io.PrintWriter s)
   {
-    if(isSharp)
-      return;
-    
     super.printInterface(s);
     s.print
       (
@@ -235,71 +175,28 @@ public class NiceClass extends ClassDefinition
   }
   
   /****************************************************************
-   * Class hierarchy
-   ****************************************************************/
-  
-  /**
-   * The abstract class associated with this class.
-   * If no #class has been generated, returns this.
-   */
-  ClassDefinition abstractClass()
-  {
-    if(isSharp)
-      return ClassDefinition.get(superClass[0]);
-    else
-      return this;
-  }
-  
-  Type javaClass()
-  {
-    if(associatedConcreteClass != null)
-      return javaClass(associatedConcreteClass);
-    else
-      {
-	if(classType == null)
-	  Internal.error(name,
-			 name+" has no classType field");
-
-	return classType;
-      }
-  }
-  
-  /****************************************************************
    * Code generation
    ****************************************************************/
 
   private void prepareClassType()
   {
-    if (associatedConcreteClass != null)
-      associatedConcreteClass.prepareClassType();
-    else if(classType != null)
-      {
-	if(!isInterface)
-	  createConstructor();
+    if(!isInterface)
+      createConstructor();
 
-	// we need this before compile(), 
-	// to know this type is, say, an interface
-	// when it appears in other definitions
-	ClassDefinition me = abstractClass();
-
-	classType.setModifiers(Access.PUBLIC 
-			       | (me.isAbstract  ? Access.ABSTRACT  : 0)
-			       | (me.isFinal     ? Access.FINAL     : 0)
-			       | (me.isInterface ? Access.INTERFACE : 0)
-			       );
-      }
+    ClassType classtype = javaClass();
+    classtype.setModifiers(Access.PUBLIC 
+			   | (isAbstract  ? Access.ABSTRACT  : 0)
+			   | (isFinal     ? Access.FINAL     : 0)
+			   | (isInterface ? Access.INTERFACE : 0)
+			   );
   }
-  
+
   public void compile()
   {
-    if(classType == null)
-      return;
-    
     if(Debug.codeGeneration)
       Debug.println("Compiling class "+name);
     
-    ClassDefinition me = abstractClass();
-
+    ClassType classType = javaClass();
     ClassType[] itfs = null;
     if(isInterface)
       classType.setSuper(gnu.bytecode.Type.pointer_type);
@@ -309,12 +206,12 @@ public class NiceClass extends ClassDefinition
   createItfs:
     if(!isInterface)
       {
-	if(me.impl == null) break createItfs;
+	if(impl == null) break createItfs;
 	
-	ArrayList imp = new ArrayList(me.impl.length);
-	for(int i=0; i<me.impl.length; i++)
+	ArrayList imp = new ArrayList(impl.length);
+	for(int i=0; i<impl.length; i++)
 	  {
-	    TypeConstructor assocTC = me.impl[i].associatedTC();
+	    TypeConstructor assocTC = impl[i].associatedTC();
 	    
 	    if(assocTC == null)
 	      continue;
@@ -344,7 +241,6 @@ public class NiceClass extends ClassDefinition
     classType.setInterfaces(itfs);
     
     addFields(classType);
-    if (me != this) me.addFields(classType);
 
     classType.sourcefile = location().getFile();
     module.addClass(classType);
@@ -352,6 +248,7 @@ public class NiceClass extends ClassDefinition
 
   private void createConstructor()
   {
+    ClassType classType = javaClass();
     gnu.bytecode.Method constructor = constructor(classType);
 
     constructor.initCode();
@@ -377,7 +274,7 @@ public class NiceClass extends ClassDefinition
 
     md.setDispatchMethod(new gnu.expr.PrimProcedure
       (classType, gnu.bytecode.Type.typeArray0));
-    TypeConstructors.addConstructor(abstractClass().tc, md);
+    TypeConstructors.addConstructor(tc, md);
   }
 
   private static gnu.bytecode.Method constructor(ClassType ct)
@@ -390,7 +287,7 @@ public class NiceClass extends ClassDefinition
        gnu.bytecode.Type.void_type);
   }
   
-  protected void addFields(ClassType c)
+  void addFields(ClassType c)
   {
     for (int i = 0; i < fields.length; i++)
       {
@@ -412,10 +309,7 @@ public class NiceClass extends ClassDefinition
 
   private Field[] fields;
   private List methods;
-  private ClassType classType;  
 
   /** Not the fully qualified name */
   private LocatedString simpleName;
-  private boolean isSharp;
-  private NiceClass associatedConcreteClass; // non-null if !isSharp
 }

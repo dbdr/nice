@@ -61,10 +61,7 @@ public class LiteralArrayExp extends Expression
 
   public gnu.expr.Expression compile()
   {
-    // Make sure the type is computed.
-    getType();
-
-    Type t = nice.tools.code.Types.javaType(type);
+    Type t = nice.tools.code.Types.javaType(getType());
     
     return new gnu.expr.ApplyExp
       (new nice.tools.code.LiteralArrayProc((ArrayType) t, 

@@ -4,14 +4,15 @@ nice (0.9.6)
     interfaces, example:
       enum Coin(int value) implements Currency
 	{penny(1), nickel(5), dime(10), quarter(25)}
-  * Alternative syntax for calling methods that takes an closure with no 
+  * Alternative syntax for calling methods that takes a closure with no 
     arguments. For example 'loop(5) { doSomeThing(); }' is shorthand for
     'loop(5, () => { doSomeThing(); });'
+  * "using" statement, as in C#, defined in nice.lang using (!) the above
+    syntax.
   * Stricter parsing of expression used as statement.
   * Improved performance of arrays used as lists.
   * New methods (in package nice.functional) for working with iterators 
     and generators.
-  * "using" statement, as in C#.
   * Fixed the file locations in the RPM package, and added automatic
     registration of the emacs mode for the SuSE Linux distribution.
   * Bug fixes (checking of local variables in a call position, make it possible

@@ -829,7 +829,7 @@ void greet(Person p)
   println("Hello, anonymous person!");
 }
 
-greet(BOB p) 
+greet(BOB) 
 {
   println("Hi Bob!");
 }
@@ -2016,7 +2016,7 @@ public class Main
         </para>
         <para>
           <literal>
-<![CDATA[<Collection C, Any T> C<T> filter(C<T>, T->boolean);]]>
+<![CDATA[<Collection C, T> C<T> filter(C<T>, T->boolean);]]>
           </literal>
         </para>
         <para>
@@ -2027,7 +2027,7 @@ public class Main
         </para>
         <para>
           <literal>
-<![CDATA[<Any T, Any U | U <: T> U[] fill(T[] array, int->U value)]]>
+<![CDATA[<T, U | U <: T> U[] fill(T[] array, int->U value)]]>
           </literal>
         </para>
         <para>

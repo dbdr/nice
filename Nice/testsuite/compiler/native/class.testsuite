@@ -27,7 +27,7 @@
 
 /// FAIL
   /// Toplevel
-Class<String> unsafe(Class c) = c;
+Class<String> unsafe(Class c) = /* /// FAIL HERE */ c;
 
 /// PASS
   /// Toplevel

@@ -36,6 +36,10 @@ public final class Native
   public static Object resize(Object from, int newSize)
   {
     int copyLength = java.lang.reflect.Array.getLength(from);
+
+    if (copyLength == newSize)
+      return from;
+
     if (newSize < copyLength)
       copyLength = newSize;
     

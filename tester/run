@@ -10,8 +10,15 @@ machine="`hostname -f`"
 system="`uname -a`"
 user="$USER"
 
+export CVS_SOURCEFORGE="cvs.sourceforge.net"
+
 if [ -r setup ]; then
     . setup
+fi
+
+if ! ls config.* >/dev/null 2>&1; then
+    echo "You must create at least one config.* file."
+    exit 1
 fi
 
 rm -rf builds

@@ -1,6 +1,6 @@
 
 if [ ! -r Nice ]; then
-  cvs -d:pserver:anonymous@cvs.sourceforge.net:/cvsroot/nice export -rHEAD Nice
+  cvs -d:pserver:anonymous@$CVS_SOURCEFORGE:/cvsroot/nice export -rHEAD Nice
 fi
 
 cd Nice && make world && cd .. || exit 1

@@ -1,7 +1,7 @@
 #! /bin/sh
 
 if [ ! -r swing ]; then
-  cvs -d:pserver:anonymous@cvs.sourceforge.net:/cvsroot/nice export -rHEAD swing
+  cvs -d:pserver:anonymous@$CVS_SOURCEFORGE:/cvsroot/nice export -rHEAD swing
 fi
 cd swing
 

@@ -891,7 +891,7 @@ FormalParameters formalParameters(boolean leaveRoomForThis, List statements):
   { return new FormalParameters(params.isEmpty() ? null : params ); }
 }
 
-Definition internalMethodOrFunction(MethodContainer c):
+Definition internalMethodOrFunction(MethodContainer c, boolean isOverride):
 {
   LocatedString name;
   FormalParameters parameters;
@@ -900,10 +900,8 @@ Definition internalMethodOrFunction(MethodContainer c):
   Statement body = null;
   Contract contract;
   List statements = new LinkedList();
-  boolean isOverride = false;
 }
 {
-  [ "override" { isOverride = true; } ]
   cst=constraint()
   returnType=monotype()
   name=identOrBackquoted()
@@ -1043,14 +1041,15 @@ ClassDefinition classDefinition(Constraint cst, List definitions, boolean storeD
     |
       LOOKAHEAD( getField(null, null) )
       overrides = getField(impl, fields, overrides, storeDocString)
-    | { Definition m; Token t = getToken(1); }
+    | { Definition m; Token t = getToken(1); boolean isOverride = false; }
       [ "public" | "private" ]
+      [ "override" { isOverride = true; } ]
       (
 	LOOKAHEAD( methodBodyDefinitionLookahead() )
 	m = methodBodyDefinition(impl)
 	{ definitions.add(m); }
       |
-        m = internalMethodOrFunction(res)
+        m = internalMethodOrFunction(res, isOverride)
         { 
           if (methods == null)
             methods = new ArrayList(5);
@@ -1125,7 +1124,7 @@ AbstractInterface interfaceDefinition(Constraint prefix):
     (
       { Definition m; }
       [ "public" | "private" ]
-      m = internalMethodOrFunction(res)
+      m = internalMethodOrFunction(res, false)
       { res.addMethod(m); }
     )*
   "}"

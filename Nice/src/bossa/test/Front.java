@@ -12,14 +12,14 @@
 
 // File    : Front.java
 // Created : Thu Jul 01 15:11:18 1999 by bonniot
-//$Modified: Wed Jul 28 22:11:42 1999 by bonniot $
+//$Modified: Thu Jul 29 10:15:06 1999 by bonniot $
 // Description : Front-end test
 
 package bossa.test;
 
 import java.util.*;
-import java.io.*;
-import bossa.parser.Parser;
+
+import bossa.parser.Loader;
 import bossa.syntax.AST;
 
 /** Test of the frontend
@@ -34,32 +34,22 @@ public class Front
    */
   public static void main(String[] args) throws Exception
   {
-    System.out.println("Welcome to Bossa");
-      
+    Collection defs=Loader.open("stdlib.bossa");
+    
+    String file;
+    if(args.length==0)
+      {
+	System.out.println("Usage: bossa file.bossa");
+	//System.exit(0);
+	file="t.bossa";
+      }
+    else file=args[0];
+    
+    defs.addAll(Loader.open(file));
+
     try{
-      bossa.util.Location.currentFile="stdlib.bossa";
-      Reader r = new FileReader("stdlib.bossa");
-      Parser p=new Parser(r);
-      Collection defs=p.definitions();
-
-      String file;
-      if(args.length==0)
-	{
-	  System.out.println("Usage: bossa file.bossa");
-	  //System.exit(0);
-	  file="t.bossa";
-	}
-      else file=args[0];
-      bossa.util.Location.currentFile=file;
-      r = new FileReader(file);
-      p.ReInit(r);
-      defs.addAll(p.definitions());
-
       AST ast=new AST(defs);
       //System.out.print(ast);
-    }
-    catch(bossa.parser.ParseException e){
-      System.out.println(e);
     }
     catch(Exception e){
       System.out.println("Uncaught exception :");

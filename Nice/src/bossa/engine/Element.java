@@ -10,51 +10,25 @@
 /*                                                                        */
 /**************************************************************************/
 
-// File    : NewExp.java
-// Created : Thu Jul 08 17:15:15 1999 by bonniot
-//$Modified: Thu Jul 29 11:13:42 1999 by bonniot $
-// Description : Allocation of a new object
+// File    : Element.java
+// Created : Wed Jul 28 10:42:50 1999 by bonniot
+//$Modified: Wed Jul 28 17:30:54 1999 by bonniot $
 
-package bossa.syntax;
+package bossa.engine;
 
 import bossa.util.*;
 
-public class NewExp extends Expression
+/** Something that can be constrained in this engine
+ * 
+ * 
+ * @author bonniot
+ */
+
+public interface Element
 {
-  public NewExp(TypeConstructor typeConstructor, TypeParameters tp)
-  {
-    this.tc=typeConstructor;
-    if(tp==null)
-      this.tp=new TypeParameters(null);
-    else
-      this.tp=tp;
-  }
+  int getId();
+  void setId(int value);
   
-  Expression resolve(VarScope s, TypeScope ts)
-  {
-    tc=tc.resolve(ts);
-    tp=tp.resolve(ts);
-    return this;
-  }
-  
-  Type getType()
-  {
-    Type res=null;
-    try{
-      res=tc.instantiate(tp);
-    }
-    catch(BadSizeEx e){
-      User.error(this,"class "+tc+" has "+e.expected+" type parameters");
-    }
-
-    return res;
-  }
-
-  public String toString()
-  {
-    return "new "+tc+tp;
-  }
-
-  TypeConstructor tc;
-  TypeParameters tp;
+  Kind getKind();
+  void setKind(Kind value);
 }

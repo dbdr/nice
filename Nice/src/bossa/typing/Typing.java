@@ -12,7 +12,7 @@
 
 // File    : Typing.java
 // Created : Tue Jul 20 11:57:17 1999 by bonniot
-//$Modified: Thu Jul 29 00:28:15 1999 by bonniot $
+//$Modified: Thu Jul 29 16:20:45 1999 by bonniot $
 
 package bossa.typing;
 
@@ -50,7 +50,7 @@ abstract public class Typing
    */
   public static void enter(String message)
   {
-    if(message!=null) Debug.println("## Typechecking "+message);
+    if(message!=null && dbg) Debug.println("## Typechecking "+message);
     Engine.enter();
   }
 
@@ -63,7 +63,7 @@ abstract public class Typing
    */
   public static void enter(Collection symbols, String message)
   {
-    Debug.println("## Typechecking "+message+
+    if(dbg) Debug.println("## Typechecking "+message+
 		  Util.map(" [",", ","]",symbols)
 		  );
     Engine.enter();
@@ -205,7 +205,16 @@ abstract public class Typing
   public static void leq(PolytypeConstructor t1, PolytypeConstructor t2) 
     throws TypingEx
   {
-    Debug.println("!!!!PC "+t1+" <: "+t2);
+    if(dbg) Debug.println(t1+" <: "+t2);
+    Collection tp1=t1.getTypeParameters();
+    Collection tp2=t2.getTypeParameters();
+    
+    enter();
+    leqMono(tp1,tp2);
+    leqMono(tp2,tp1);
+    implies();
+    leq(t1.polytype,t2.polytype);
+    leave();
   }
 
   /****************************************************************

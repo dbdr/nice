@@ -12,7 +12,7 @@
 
 // File    : Location.java
 // Created : Tue Jul 13 11:55:08 1999 by bonniot
-//$Modified: Thu Jul 29 00:26:10 1999 by bonniot $
+//$Modified: Thu Jul 29 11:38:02 1999 by bonniot $
 
 package bossa.util;
 
@@ -24,7 +24,7 @@ import java.util.*;
  *
  * @see Located
  */
-public class Location
+public class Location implements Located
 {
   /**
    * The file beeing parsed.
@@ -89,6 +89,11 @@ public class Location
     return englobe(((Located)llocs.get(llocs.size()-1)).location());
   }
 
+  public Location location()
+  {
+    return this;
+  }
+  
   private int startLine,startColumn,endLine,endColumn;
   private String fileName;
 }

@@ -12,7 +12,7 @@
 
 // File    : TypeConstructor.java
 // Created : Thu Jul 08 11:51:09 1999 by bonniot
-//$Modified: Wed Jul 28 22:14:29 1999 by bonniot $
+//$Modified: Thu Jul 29 16:23:07 1999 by bonniot $
 // Description : A class. It "needs" type parameters to become a Monotype
 
 package bossa.syntax;
@@ -70,9 +70,9 @@ public class TypeConstructor
   private void setVariance(Variance v)
   {
     this.variance=v;
-    Internal.error(kind!=null,"Kind should be null in TC");
+    Internal.error(kind!=null,"Kind should be null in TC.setVariance");
     
-    this.kind=new TypeConstructorKind(v);
+    this.kind=bossa.engine.Engine.getConstraint(v);
   }
   
   static Collection toLocatedString(Collection c)
@@ -186,7 +186,7 @@ public class TypeConstructor
     Internal.warning("Variance set in TC by engine for "+name);
     Internal.error(variance!=null,"Variance already set in TypeConstructor");
     
-    variance=(Variance)value;
+    kind=value;
   }
   
   /****************************************************************

@@ -12,7 +12,7 @@
 
 // File    : CallExp.java
 // Created : Mon Jul 05 16:27:27 1999 by bonniot
-//$Modified: Thu Jul 29 00:32:38 1999 by bonniot $
+//$Modified: Thu Jul 29 12:21:19 1999 by bonniot $
 
 package bossa.syntax;
 
@@ -59,14 +59,14 @@ public class CallExp extends Expression
 	       "You have to specify the type parameters for function "+
 	       fun);
 
-    Typing.enter(funt.getTypeParameters(),"call :"+this.fun);
+    Typing.enter(funt.getTypeParameters(),"call "+this.fun);
 
 
     try{
       Typing.implies();
       
       try{ funt.getConstraint().assert(); }
-      catch(TypingEx e) { User.error(this,"The conditions ofr using this function are not fullfiled"); }
+      catch(TypingEx e) { User.error(this,"The conditions for using this function are not fullfiled"); }
 
       parametersTypes=Expression.getPolytype(parameters);
       User.error(parametersTypes==null,this,
@@ -83,7 +83,14 @@ public class CallExp extends Expression
 		 ", not "+e.actual);
     }
     catch(TypingEx e){
-      User.error(this,"The parameters are not within the domain of the function");
+      if(parameters.size()>=2)
+	User.error(this,"The parameters "+
+		   Util.map("(",", ",")",parameters) +
+		 " are not within the domain of the function");
+      else
+	User.error(this,"The parameter "+
+		   Util.map("",", ","",parameters) +
+		 " is not within the domain of the function");
     }
     
     Constraint cst=funt.getConstraint().and(Type.getConstraint(parametersTypes));

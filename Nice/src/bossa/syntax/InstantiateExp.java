@@ -12,7 +12,7 @@
 
 // File    : InstantiateExp.java
 // Created : Mon Jul 12 17:48:04 1999 by bonniot
-//$Modified: Wed Jul 21 17:50:11 1999 by bonniot $
+//$Modified: Thu Jul 29 11:11:48 1999 by bonniot $
 // Description : instantiation of type parameters
 
 package bossa.syntax;
@@ -42,8 +42,7 @@ public class InstantiateExp extends Expression
       res=exp.getType().instantiate(typeParameters);
       }
     catch(BadSizeEx e){
-      User.error(this,e.expected+" type parameters expected "+
-		 ", not "+e.actual);      
+      User.error(this,exp+" has "+e.expected+" type parameters");      
     }
     
     User.error(res==null,this,"You cannot try to instantiate "+this.exp+

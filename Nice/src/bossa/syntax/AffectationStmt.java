@@ -12,7 +12,7 @@
 
 // File    : AffectationStmt.java
 // Created : Mon Jul 05 15:49:27 1999 by bonniot
-//$Modified: Wed Jul 21 13:01:24 1999 by bonniot $
+//$Modified: Thu Jul 29 11:49:36 1999 by bonniot $
 // Description : Affectation
 
 package bossa.syntax;
@@ -47,11 +47,10 @@ public class AffectationStmt extends Statement
   void typecheck()
   {
     try{
-      Typing.leq(to.getType(),value.getType());
+      Typing.leq(value.getType(),to.getType());
     }
     catch(TypingEx t){
-      User.error(to+" cannot be assigned value "+value+" : "+
-		 t.getMessage());
+      User.error(this,"Typing error : "+to+" cannot be assigned value "+value);
     }
 
   }

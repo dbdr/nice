@@ -12,7 +12,7 @@
 
 // File    : MethodBodyDefinition.java
 // Created : Thu Jul 01 18:12:46 1999 by bonniot
-//$Modified: Wed Jul 28 20:27:13 1999 by bonniot $
+//$Modified: Thu Jul 29 16:18:34 1999 by bonniot $
 // Description : Abstract syntax for a method body
 
 package bossa.syntax;
@@ -99,13 +99,11 @@ public class MethodBodyDefinition extends Node
 	 definition.type.getTypeParameters());
     }
     catch(BadSizeEx e){
-      User.error(name,"Bad number of type parameters for method \""+
-		 name+"\" : I want "+
-		 e.expected+", not "+e.actual);
+      User.error(name,"Method \""+name+"\" expects "+e.expected+" type parameters");
     }
 
-    buildScope(definition.scope,definition.typeScope,parameters);
-    body.buildScope(this.scope,definition.typeScope);
+    buildScope(definition.scope,this.typeScope,parameters);
+    body.buildScope(this.scope,this.typeScope);
   }
 
   void resolveScope()
@@ -124,8 +122,11 @@ public class MethodBodyDefinition extends Node
     Typing.enter(definition.type.getTypeParameters(),"method body of "+name);
 
     try{
-      definition.type.getConstraint().assert();
-
+      try { definition.type.getConstraint().assert(); }
+      catch(TypingEx e){
+	User.error(name,"the constraint will never be satisfied");
+      }
+      
       Collection monotypes=MonoSymbol.getMonotype(parameters);
       Typing.introduce(monotypes);
       
@@ -140,13 +141,13 @@ public class MethodBodyDefinition extends Node
       Typing.implies();
 
     }
-    catch(TypingEx e) {
-      User.error("Typing error in method body "+name+" :"+e.getMessage());
-    }
     catch(BadSizeEx e){
       Internal.error("Bad size in MethodBodyDefinition.typecheck()");
     }
-    
+    catch(TypingEx e) {
+      User.error(name,"Typing error in method body "+name+e);
+    }
+
     body.typecheck();
     try{
       Type t=body.getType();
@@ -156,7 +157,7 @@ public class MethodBodyDefinition extends Node
       Typing.leave();
     }
     catch(TypingEx e){
-      User.error(this,"Bad return type: "+e.getMessage());
+      User.error(this,"Return type is not correct");
     }
   }
 

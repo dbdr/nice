@@ -12,7 +12,7 @@
 
 // File    : LocalDeclarationStmt.java
 // Created : Tue Jul 06 12:06:20 1999 by bonniot
-//$Modified: Thu Jul 29 00:48:21 1999 by bonniot $
+//$Modified: Thu Jul 29 11:09:04 1999 by bonniot $
 // Description : Declaration of a local variable
 //   with optional initial value
 
@@ -49,9 +49,8 @@ public class LocalDeclarationStmt extends Statement
       try{
 	Typing.leq(value.getType(),left.getType());
       }
-      catch(TypingEx t){
-	User.error(this,name+" cannot be assigned value "+value+" : "+
-		   t.getMessage());
+      catch(TypingEx e){
+	User.error(this,"Typing error : "+name+" cannot be assigned value "+value);
       }
     }
   }

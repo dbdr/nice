@@ -12,11 +12,12 @@
 
 // File    : MonotypeVar.java
 // Created : Fri Jul 23 15:36:39 1999 by bonniot
-//$Modified: Wed Jul 28 22:16:40 1999 by bonniot $
+//$Modified: Thu Jul 29 17:42:09 1999 by bonniot $
 
 package bossa.syntax;
 
 import java.util.*;
+
 import bossa.util.*;
 import bossa.engine.*;
 
@@ -40,7 +41,7 @@ public class MonotypeVar extends Monotype
     this.soft=soft;
   }
 
-  bossa.syntax.Monotype cloneType()
+  Monotype cloneType()
   {
     return this;
   }
@@ -165,7 +166,8 @@ public class MonotypeVar extends Monotype
 
     if(value==null)
       return;
-    
+
+    // Do the apropriate cast
     if(value instanceof FunTypeKind)
       functionalCast(((FunTypeKind)value).domainArity);
     else if(value instanceof Variance)
@@ -176,17 +178,10 @@ public class MonotypeVar extends Monotype
 	bossa.typing.Typing.introduce(equivalentTC);
 	equivalentTP=new TypeParameters(this.name,v);
       }
-    // in other cases (kind of the monotype variables)
+    // in other cases (kind of the rigid monotype variables)
     // nothing to do
   }
   
-  /**
-   * If true,  this is really a variable monotype
-   * If false, this must be found in scope
-   */
-
-  private boolean soft;
-
   /** When this variable is comparable to a functional type */
   private Monotype equivalentCodomain;
   private Collection equivalentDomain;
@@ -194,4 +189,11 @@ public class MonotypeVar extends Monotype
 
   private TypeConstructor equivalentTC;
   private TypeParameters equivalentTP;
+
+  /**
+   * If true,  this is really a variable monotype
+   * If false, this must be found in scope
+   */
+
+  private boolean soft;
 }

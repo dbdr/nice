@@ -12,7 +12,7 @@
 
 // File    : Engine.java
 // Created : Tue Jul 27 15:34:53 1999 by bonniot
-//$Modified: Thu Jul 29 00:18:17 1999 by bonniot $
+//$Modified: Thu Jul 29 18:05:33 1999 by bonniot $
 
 package bossa.engine;
 
@@ -29,6 +29,10 @@ import bossa.util.*;
 
 public abstract class Engine
 {
+  /**
+   * Enters a new typing context
+   *
+   */
   public static void enter()
   {
     if(dbg) Debug.println("Enter");
@@ -38,6 +42,12 @@ public abstract class Engine
       ((K)i.next()).mark();
   }
   
+  /**
+   * Rigidify the current constraint
+   * This means no further assumptions will be made on it
+   *
+   * @exception Unsatisfiable if the current context was not well kinded
+   */
   public static void implies()
     throws Unsatisfiable
   {
@@ -54,6 +64,11 @@ public abstract class Engine
       }
   }
   
+  /**
+   * Returns to the state we had before the last 'enter'
+   *
+   * @exception Unsatisfiable if the constraint was not satisfiable
+   */
   public static void leave()
     throws Unsatisfiable
   {
@@ -70,19 +85,6 @@ public abstract class Engine
       }
   }
 
-  private static void leq(Kind k, Element e1, Element e2) 
-    throws Unsatisfiable
-  {
-    if(k.isBase())
-      {
-	if(dbg) Debug.println(k+"  "+e1+":"+e1.getId()+" <= "+e2+":"+e2.getId());
-
-	getConstraint(k).leq(e1.getId(),e2.getId());
-      }
-    else
-      k.leq(e1,e2);
-  }
-  
   /**
    * Iterates leq on two collections of Element
    *
@@ -100,6 +102,14 @@ public abstract class Engine
       leq((Element)i1.next(),(Element)i2.next());
   }
       
+  /**
+   * Asserts that elements have some ordering relation
+   *
+   * @param e1 a value of type 'Element'
+   * @param e2 a value of type 'Element'
+   * @exception Unsatisfiable if the constraint is not satisfiable.
+   * However this fact may also be discovered later
+   */
   public static void leq(Element e1, Element e2) 
     throws Unsatisfiable
   {
@@ -109,23 +119,23 @@ public abstract class Engine
       if(k2!=null)
 	{
 	  if(k1.equals(k2))
-	    leq(k1,e1,e2);
+	    k1.leq(e1,e2);
 	  else
 	    {
-	      Debug.println("Bad kinding discovered by Engine : "+k1+" != "+k2);
+	      if(dbg) Debug.println("Bad kinding discovered by Engine : "+k1+" != "+k2);
 	      throw new LowlevelUnsatisfiable("Bad Kinding");
 	    }
 	}
       else
 	{
 	  setKind(e2,k1);
-	  leq(k1,e1,e2);
+	  k1.leq(e1,e2);
 	}
     else
       if(k2!=null)
 	{
 	  setKind(e1,k2);
-	  leq(k2,e1,e2);
+	  k2.leq(e1,e2);
 	}
       else
 	{
@@ -138,25 +148,20 @@ public abstract class Engine
 	}
   }
   
-//    public static void leq(Element e1, Element e2) 
-//      throws Unsatisfiable
-//    {
-    
-//    }
-  
   /****************************************************************
    * New nodes
    ****************************************************************/
   
+  /**
+   * Prepare a new Element to be used
+   *
+   */
   public static void register(Element e)
   {
     if(dbg) Debug.println("Registering "+e);
     
     if(e.getKind()!=null)
-      if(e.getKind().isBase())
-	e.setId(getConstraint(e.getKind()).extend());
-      else
-	Internal.error("Don't know what to do in Engine.register");
+      e.getKind().register(e);
     else
       floating.add(e);
   }
@@ -165,7 +170,7 @@ public abstract class Engine
    *                          Private
    ****************************************************************/
 
-  static class Leq
+  private static class Leq
   {
     Leq(Element e1,Element e2)
     {
@@ -175,8 +180,9 @@ public abstract class Engine
     Element e1,e2;
   }
 
-  static ArrayList frozenLeqs=new ArrayList();
+  private static ArrayList frozenLeqs=new ArrayList();
   
+  // TODO: This is for sure quite slow and ugly
   private static void setKind(Element e, Kind k)
     throws Unsatisfiable
   {
@@ -185,8 +191,7 @@ public abstract class Engine
       return;
     
     e.setKind(k);
-    if(k.isBase())
-      register(e);
+    k.register(e);
     
     floating.remove(e);
     //Propagates the kind to all comparable elements
@@ -214,7 +219,12 @@ public abstract class Engine
     frozenLeqs=newFrozenLeqs;
   }
   
-  static void assertFrozens()
+  /**
+   * Enter all the 'floating' elements into the variablesKind
+   * and add their frozen constraints
+   *
+   */
+  private static void assertFrozens()
     throws Unsatisfiable
   {
     for(Iterator i=floating.iterator();
@@ -225,7 +235,7 @@ public abstract class Engine
 	if(dbg) Debug.println("Registering variable "+e);
 	
 	e.setKind(variablesKind);
-	e.setId(variablesK.extend());
+	variablesKind.register(e);
       }
     floating.clear();
     	
@@ -235,49 +245,36 @@ public abstract class Engine
 	Leq leq=(Leq)i.next();
 	variablesKind.leq(leq.e1,leq.e2);
       }
-    frozenLeqs=new ArrayList();
+    frozenLeqs=new ArrayList(frozenLeqs.size()); // We asume that the old size is a good hint
   }
   
-  static final ArrayList floating=new ArrayList(); // elements whose kind is not known yet
+  /** The elements that have not yet been added to a Kind  */
+  private static final ArrayList floating=new ArrayList();
   
-  static final K variablesK=new K();
-  static final Kind variablesKind = 
-    new Kind()
-  {
-    public void leq(Element e1, Element e2)
-      throws Unsatisfiable
-    {
-      if(dbg) Debug.println("[variables] "+e1+":"+e1.getId()+" <= "+e2+":"+e2.getId());
-      variablesK.leq(e1.getId(),e2.getId());
-    }
-
-    public boolean isBase() { return true; }
-    
-  };
+  /** The constraint of type variables */
+  private static final K variablesKind=new K();
   
-  static final HashMap createKindsMap()
-  {
-    HashMap res=new HashMap();
-    res.put(variablesKind,variablesK);
-    return res;
-  }
-  
-  static final HashMap kindsMap=createKindsMap();
-  
-  static final ArrayList createKinds()
+  private static final ArrayList createKinds()
   {
     ArrayList res=new ArrayList(10);
-    res.add(variablesK);
+    res.add(variablesKind);
     return res;
   }
   
-  static final ArrayList kinds=createKinds();
+  /** The list of Kinds */
+  private static final ArrayList kinds=createKinds();
   
-  static K getConstraint(Kind kind)
+  /** Maps a Kind to its lowlevel constraint */
+  private static final HashMap kindsMap=new HashMap();
+  
+  public static K getConstraint(Kind kind)
   {
     K res=(K) kindsMap.get(kind);
     if(res!=null)
       return res;
+
+    if(dbg) Debug.println("Creating new Lowlevel constraint for "+kind);
+    
     res=new K();
     res.mark();
     kinds.add(res);
@@ -286,7 +283,19 @@ public abstract class Engine
   }
   
   private static class K extends K0
+    implements Kind
   {
+    public final void leq(Element e1, Element e2)
+      throws Unsatisfiable
+    {
+      leq(e1.getId(),e2.getId());
+    }
+    
+    public final void register(Element e)
+    {
+      e.setId(extend());
+    }
+    
     protected void indexMerged(int src, int dest) {
       if(dbg) Debug.println(this+" merged "+src+" and "+dest);
     }

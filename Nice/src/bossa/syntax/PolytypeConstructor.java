@@ -12,7 +12,7 @@
 
 // File    : PolytypeConstructor.java
 // Created : Mon Jul 19 17:47:49 1999 by bonniot
-//$Modified: Fri Jul 23 19:39:56 1999 by bonniot $
+//$Modified: Thu Jul 29 12:19:11 1999 by bonniot $
 // Description : A type that takes TypeParameters 
 //  and that returns a Polytype
 
@@ -104,6 +104,6 @@ public class PolytypeConstructor extends Type
     return Util.map("<",", ",">",parameters)+" "+polytype;
   }
 
-  Collection /* of TypeSymbol */ parameters;
-  Polytype polytype;
+  Collection /* of MonotypeVar */ parameters;
+  public Polytype polytype;
 }

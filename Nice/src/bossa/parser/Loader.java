@@ -10,51 +10,50 @@
 /*                                                                        */
 /**************************************************************************/
 
-// File    : NewExp.java
-// Created : Thu Jul 08 17:15:15 1999 by bonniot
-//$Modified: Thu Jul 29 11:13:42 1999 by bonniot $
-// Description : Allocation of a new object
+// File    : Loader.java
+// Created : Thu Jul 29 09:43:50 1999 by bonniot
+//$Modified: Thu Jul 29 11:41:18 1999 by bonniot $
 
-package bossa.syntax;
+package bossa.parser;
+
+import java.util.*;
+import java.io.*;
 
 import bossa.util.*;
 
-public class NewExp extends Expression
+/** Static class for loading and parsing files
+ * 
+ * 
+ * @author bonniot
+ */
+
+public abstract class Loader
 {
-  public NewExp(TypeConstructor typeConstructor, TypeParameters tp)
+  public static Collection open(String filename)
   {
-    this.tc=typeConstructor;
-    if(tp==null)
-      this.tp=new TypeParameters(null);
+    Debug.println("Parsing "+filename+"...");
+    bossa.util.Location.currentFile=filename;
+
+    Reader r=null;
+    try{ r=new BufferedReader(new FileReader(filename)); }
+    catch(FileNotFoundException e){
+      User.error(filename+" not found");
+    }
+    
+    if(parser==null)
+      parser=new Parser(r);
     else
-      this.tp=tp;
-  }
-  
-  Expression resolve(VarScope s, TypeScope ts)
-  {
-    tc=tc.resolve(ts);
-    tp=tp.resolve(ts);
-    return this;
-  }
-  
-  Type getType()
-  {
-    Type res=null;
-    try{
-      res=tc.instantiate(tp);
+      parser.ReInit(r);
+    
+    Collection res=null;
+    
+    try{ res=parser.definitions(); }
+    catch(ParseException e){
+      User.error(new Location(e.currentToken.next),e.getMessage());
     }
-    catch(BadSizeEx e){
-      User.error(this,"class "+tc+" has "+e.expected+" type parameters");
-    }
-
+    
     return res;
-  }
+  } 
 
-  public String toString()
-  {
-    return "new "+tc+tp;
-  }
-
-  TypeConstructor tc;
-  TypeParameters tp;
+  static Parser parser = null;
 }

@@ -12,7 +12,7 @@
 
 // File    : TypeScope.java
 // Created : Fri Jul 09 11:29:17 1999 by bonniot
-//$Modified: Sat Jul 24 16:45:39 1999 by bonniot $
+//$Modified: Thu Jul 29 10:46:01 1999 by bonniot $
 
 package bossa.syntax;
 
@@ -86,7 +86,7 @@ abstract class TypeScope
     throws BadSizeEx
   {
     if(vars.size()!=values.size())
-      throw new BadSizeEx(vars.size(),values.size());
+      throw new BadSizeEx(values.size(),vars.size());
 
     TypeScope res=new TypeScope(outer)
     {

@@ -12,12 +12,13 @@
 
 // File    : Variance.java
 // Created : Fri Jul 23 12:15:46 1999 by bonniot
-//$Modified: Wed Jul 28 21:23:15 1999 by bonniot $
+//$Modified: Thu Jul 29 16:03:50 1999 by bonniot $
 
 package bossa.syntax;
 
 import java.util.*;
 import bossa.util.*;
+import bossa.engine.*;
 
 /**
  * Variance of a type constructor
@@ -26,15 +27,19 @@ import bossa.util.*;
  */
 
 public class Variance 
-  implements bossa.engine.Kind /* for MonotypeConstructors */
+  implements Kind /* for MonotypeConstructors */
 {
   public Variance(int n)
   {
     this.size=n;
   }
 
-  public void leq(bossa.engine.Element e1, bossa.engine.Element e2)
-    throws bossa.engine.Unsatisfiable
+  public void register(Element e)
+  {
+  }
+  
+  public void leq(Element e1, Element e2)
+    throws Unsatisfiable
   {
     Monotype m1=(Monotype) e1, m2=(Monotype) e2;
     

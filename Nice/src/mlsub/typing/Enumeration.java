@@ -329,14 +329,11 @@ public class Enumeration
 
     Constraint constraint = def.getResolvedConstraint();
 
-    if (constraint == null)
+    if (constraint == mlsub.typing.Constraint.True)
       return true;
 
     if (! (var instanceof Monotype))
-      {
-        System.out.println("Warning: possibly abnormal condition during dispatch tests.\nThis involves class " + sol);
-        return true;
-      }
+      return true;
 
     Monotype m = (Monotype) var;
 

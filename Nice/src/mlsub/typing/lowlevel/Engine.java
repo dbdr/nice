@@ -223,14 +223,16 @@ public abstract class Engine
 	}
       else // ie k1==null and k2==null
 	{
-	  if(!(floating.contains(e1)))
-	    throw new InternalError("Unknown floating element 1 : "+e1);
-	  if(!(floating.contains(e2)))
-	    throw new InternalError("Unknown floating element 2 : "+e2);
-
 	  if(dbg)
-	    Debug.println("Freezing "+e1+" <: "+e2+
-			  " ("+e1.getId()+" <: "+e2.getId()+")");
+	    {
+	      Debug.println("Freezing "+e1+" <: "+e2+
+			    " ("+e1.getId()+" <: "+e2.getId()+")");
+	      if (!(floating.contains(e1)))
+		throw new InternalError("Unknown floating element 1 : " + e1);
+	      if (!(floating.contains(e2)))
+		throw new InternalError("Unknown floating element 2 : " + e2);
+	    }
+
 	  frozenLeqs.add(new Leq(e1,e2));
 	}
   }

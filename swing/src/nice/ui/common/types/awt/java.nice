@@ -56,6 +56,20 @@ Color RED() = native Color.red;
 Color WHITE() = native Color.white;
 Color YELLOW() = native Color.yellow;
 
+String WEST() = native BorderLayout.WEST;
+String CENTER() = native BorderLayout.CENTER;
+String EAST() = native BorderLayout.EAST;
+String NORTH() = native BorderLayout.NORTH;
+String SOUTH() = native BorderLayout.SOUTH;
+String AFTER_LAST_LINE() = native BorderLayout.AFTER_LAST_LINE;
+String AFTER_LINE_ENDS() = native BorderLayout.AFTER_LINE_ENDS;
+String BEFORE_FIRST_LINE() = native BorderLayout.BEFORE_FIRST_LINE;
+String BEFORE_LINE_BEGINS() = native BorderLayout.BEFORE_LINE_BEGINS;
+String LINE_END() = native BorderLayout.LINE_END;
+String LINE_START() = native BorderLayout.LINE_START;
+String PAGE_END() = native BorderLayout.PAGE_END;
+String PAGE_START() = native BorderLayout.PAGE_START;
+
 
 /**
  * EVENT INTERFACE SECTION
@@ -736,8 +750,6 @@ void printComponents(java.awt.Container, Graphics)
   = native void java.awt.Container.printComponents(Graphics);
 void remove(java.awt.Container, Component)
   = native void java.awt.Container.remove(Component);
-void setLayout(java.awt.Container, LayoutManager)
-  = native void java.awt.Container.setLayout(LayoutManager);
 Component getComponent(java.awt.Container, int)
   = native java.awt.Component java.awt.Container.getComponent(int);
 Component[] getComponents(java.awt.Container)

@@ -4,15 +4,17 @@
   m(@String) {}
 
 /// PASS
-  foo(null);
+  assert !foo(null);
+  assert foo("abc");
   /// Toplevel
-  void foo(?String);
-  foo(#String){}
-  foo(null){}
+  boolean foo(?String);
+  foo(#String) = true;
+  foo(null) = false;
 
 /// PASS
-  foo(null);
+  assert !foo(null);
+  assert foo("abc");
   /// Toplevel
-  void foo(?String);
-  foo(null){}
-  foo(#String){}
+  boolean foo(?String);
+  foo(null) = false;
+  foo(#String) = true;

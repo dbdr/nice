@@ -211,3 +211,13 @@ class Bar<T> extends AbstractList<T>
   size() = 0;
   get(i) = cast(null);
 }
+
+/// FAIL
+ /// Toplevel
+abstract class A<T> extends AbstractList<T> {
+  size() = 10;
+}
+class B<T> extends A<T> {
+  get(index) = /*/// FAIL HERE*/ super;
+  get(0) = cast(null);
+}

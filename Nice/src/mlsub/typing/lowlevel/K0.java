@@ -518,7 +518,7 @@ public final class K0 {
 
   /**
    * Enter the initial assertion that x :: iid
-   * This means that no node strictly x may implement iid
+   * This means that no node strictly lesser than x may implement iid
    **/
   public void initialAbstracts(int x, int iid) {
     S.assume(S.a&& !hasBeenInitialized);

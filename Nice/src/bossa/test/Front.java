@@ -94,7 +94,6 @@ public class Front
 	    r.link();
 	  }    
 	p.link();
-	p.endOfLink();
       }    
   }
   

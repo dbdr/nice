@@ -44,7 +44,7 @@ public class IfExp extends Expression
 
   void computeType()
   {
-    this.type = Polytype.union(thenExp.getType(),elseExp.getType());
+    this.type = Polytype.union(thenExp.getType(), elseExp.getType());
   }
   
   /****************************************************************

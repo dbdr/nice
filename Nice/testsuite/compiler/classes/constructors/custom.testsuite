@@ -81,7 +81,8 @@ new /*/// FAIL HERE */ String(int x) = this("xyz");
   /// Toplevel
 new /*/// FAIL HERE */ FooBar(int x) = this("xyz");
 
-/// PASS bug
+/// PASS
+  /// package a
   A<String> a = new A(x: 5, z: "abc");
   assert a.t.equals("abc");
   /// Toplevel
@@ -90,4 +91,9 @@ new /*/// FAIL HERE */ FooBar(int x) = this("xyz");
     String str;
     T t;
   }
-  new A(int x, T z) = this(str: x.toString(), t: z);
+  // Locally rename the type parameter
+  <U> new A(int x, U z) = this(str: x.toString(), t: z);
+
+  /// package b import a
+  A<String> a = new A(x: 5, z: "abc");
+  A<String> b = new A(str: "5", t: "abc");

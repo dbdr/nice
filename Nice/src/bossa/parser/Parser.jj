@@ -1067,7 +1067,7 @@ ClassDefinition classDefinition(Constraint cst, List definitions, boolean storeD
   { return res; } 
 }
 
-CustomConstructor customConstructor():
+CustomConstructor customConstructor(Constraint cst):
 {
   LocatedString name;
   FormalParameters params;
@@ -1085,7 +1085,7 @@ CustomConstructor customConstructor():
     "}"
   )
   {
-    return CustomConstructor.make(name, params, new Block(statements));
+    return CustomConstructor.make(name, cst, params, new Block(statements));
   }
 }
 
@@ -1526,12 +1526,13 @@ Definition definition(List definitions, boolean storeDocString):
     res=methodBodyDefinition(null)
   |
     [ "public" | "private" ]
-    ( res=customConstructor()
-    | res=globalVariable()
+    ( 
+      res=globalVariable()
     | res=enumDefinition(definitions)
     | { Constraint cst; } cst = constraint()
       ( 
-        LOOKAHEAD ( "abstract" "interface" )
+        res=customConstructor(cst)
+      | LOOKAHEAD ( "abstract" "interface" )
         res=interfaceDefinition(cst)
       | res=classDefinition(cst, definitions, storeDocString)
       | res=methodDeclaration(cst)

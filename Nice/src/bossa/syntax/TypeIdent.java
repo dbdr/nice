@@ -57,7 +57,7 @@ public final class TypeIdent extends Monotype implements Located
 
   Monotype substitute(Map map)
   {
-    Monotype res = (Monotype) map.get(this);
+    Monotype res = (Monotype) map.get(name.toString());
     if(res!=null)
       return res;
     else

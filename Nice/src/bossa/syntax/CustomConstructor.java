@@ -29,21 +29,24 @@ import nice.tools.code.Gen;
 public abstract class CustomConstructor extends UserOperator
 {
   public static CustomConstructor make
-    (LocatedString className, FormalParameters params, Block body)
+    (LocatedString className, Constraint cst, FormalParameters params, 
+     Block body)
   {
-    return new SourceCustomConstructor(className, params, body);
+    return new SourceCustomConstructor(className, cst, params, body);
   }
 
-  CustomConstructor(LocatedString className, FormalParameters params)
+  CustomConstructor(LocatedString className, Constraint cst, 
+                    FormalParameters params)
   {
-    super(new LocatedString("<init>", className.location()), Constraint.True, 
-	  returnType(className), params, Contract.noContract);
+    super(new LocatedString("<init>", className.location()), cst, 
+	  returnType(className, cst), params, Contract.noContract);
   }
 
   CustomConstructor(NiceClass def, FormalParameters parameters)
   {
     super(new LocatedString("<init>", def.definition.location()), 
-          def.definition.classConstraint, 
+          def.definition.classConstraint == null ? 
+          null : def.definition.classConstraint.shallowClone(), 
 	  returnType(def.definition), parameters, 
           Contract.noContract);
     classe = def;
@@ -63,9 +66,26 @@ public abstract class CustomConstructor extends UserOperator
         });
   }
 
-  private static Monotype returnType(LocatedString className)
+  private static Monotype returnType(LocatedString className, Constraint cst)
   {
-    Monotype res = new TypeIdent(className);
+    TypeIdent classe = new TypeIdent(className);
+    classe.nullness = Monotype.sure;
+    
+    if (cst == Constraint.True)
+      return classe;
+
+    TypeSymbol[] syms = cst.getBinderArray();
+    Monotype[] params = new Monotype[syms.length];
+
+    for (int i = 0; i < syms.length; i++)
+      {
+        if (! (syms[i] instanceof mlsub.typing.MonotypeVar))
+          User.error(classe, syms[i] + " is not a type");
+        params[i] = Monotype.create((MonotypeVar) syms[i]);
+      }
+
+    Monotype res = new MonotypeConstructor
+      (classe, new TypeParameters(params), classe.location());
     res.nullness = Monotype.sure;
     return res;
   }
@@ -98,10 +118,10 @@ public abstract class CustomConstructor extends UserOperator
 
   static class SourceCustomConstructor extends CustomConstructor
   {
-    SourceCustomConstructor(LocatedString className, FormalParameters params, 
-                            Block body)
+    SourceCustomConstructor(LocatedString className, Constraint cst,
+                            FormalParameters params, Block body)
     {
-      super(className, params);
+      super(className, cst, params);
 
       this.className = className;
       this.body = body;
@@ -168,6 +188,16 @@ public abstract class CustomConstructor extends UserOperator
       bossa.syntax.dispatch.typecheck(body);
     }
 
+    private Map map(TypeSymbol[] source, mlsub.typing.Monotype[] destination)
+    {
+      Map res = new HashMap(source.length);
+
+      for (int i = 0; i < source.length; i++)
+        res.put(source[i].toString(), Monotype.create(destination[i]));
+
+      return res;
+    }
+
     protected gnu.expr.Expression computeCode()
     {
       ConstructorExp lambda = Gen.createCustomConstructor
@@ -175,6 +205,15 @@ public abstract class CustomConstructor extends UserOperator
 
       Gen.setMethodBody(lambda, body.generateCode());
       classe.getClassExp().addMethod(lambda);
+      
+      // In the bytecode, we want to use the same type parameter names
+      // as the class definition, even if the source of this custom constructor
+      // renamed them locally.
+      mlsub.typing.Constraint cst = getType().getConstraint();
+      if (mlsub.typing.Constraint.hasBinders(cst))
+        parameters.substitute
+          (map(cst.binders(), classe.definition.getTypeParameters()));
+
       lambda.addBytecodeAttribute(parameters.asBytecodeAttribute());
       initializationCode = 
         new QuoteExp(new InitializeProc(lambda));

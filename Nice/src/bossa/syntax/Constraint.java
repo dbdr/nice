@@ -92,7 +92,7 @@ public class Constraint extends Node
    * Returns a new constraint.
    * The lists are new, but the list elements are the same.
    */
-  private Constraint shallowClone()
+  Constraint shallowClone()
   {
     return new Constraint(cloneList(binders),
 			  cloneList(atomics));

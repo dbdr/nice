@@ -11,7 +11,7 @@ class Parameterized<T>
   }
 
   void setX_meth(T value);
-  setX_meth(val)
+  setX_meth<T>(value)
   {
     T tmp = value;
     this.x = tmp;

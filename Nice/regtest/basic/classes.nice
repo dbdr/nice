@@ -14,6 +14,9 @@ class Point
 
   // override a native method
   toString() = "Point";
+
+  Point sum(alike);
+  sum(other@Point) = new Point();
 }
 
 // check that a constructor is also available from functions
@@ -31,6 +34,8 @@ class ColoredPoint extends Point
 
   // override a native method
   toString() = "Colored Point: color=" + this.c;
+
+  sum(other@ColoredPoint) = new ColoredPoint();
 }
 
 /*

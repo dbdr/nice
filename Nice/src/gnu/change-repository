@@ -32,9 +32,17 @@ info ()
 [ -r CVS ] || die "This directory is not under CVS"
 
 if [ -r CVS-upstream ]; then
+    if [ "$1" = "custom" ]; then
+	die  "Already in custom mode"
+    else
 	info "Currently in custom mode"
+    fi
 elif [ -r CVS-custom ]; then
+    if [ "$1" = "upstream" ]; then
+	die  "Already in upstream mode"
+    else
 	info "Currently in upstream mode"
+    fi
 else
 	doc
 	die "Exiting"
@@ -45,7 +53,8 @@ fi
 case $1 in
   upstream)
 	[ -r CVS-upstream ] || die "Not in custom mode"
-	for cvsdir in `find . -type d -name 'CVS'`; do
+	for cvsdir in `find . -type d -name CVS | grep -v CVS-upstream/CVS`; 
+	do
 	  dir=`dirname "$cvsdir"`
 	  echo $dir
 	  mv -i ${dir}/CVS ${dir}/CVS-custom && mv -i ${dir}/CVS-upstream ${dir}/CVS
@@ -53,7 +62,8 @@ case $1 in
 	;;
   custom)
 	[ -r CVS-custom ] || die "Not in upstream mode"
-	for cvsdir in `find . -type d -name 'CVS'`; do
+	for cvsdir in `find . -type d -name CVS | grep -v CVS/CVS`;
+	do
 	  dir=`dirname "$cvsdir"`
 	  echo $dir
 	  mv -i ${dir}/CVS ${dir}/CVS-upstream && mv -i ${dir}/CVS-custom ${dir}/CVS
@@ -65,9 +75,3 @@ case $1 in
 esac
 
 exit
-
-	find . -type d -name 'CVS' \
-	-exec sh -c 'dir=`dirname "$0"` && mv -i ${dir}/CVS ${dir}/CVS-custom && mv -i ${dir}/CVS-upstream ${dir}/CVS' {} \;	
-
-	find . -type d -name 'CVS' \
-	-exec sh -c 'dir=`dirname "$0"` && mv -i ${dir}/CVS ${dir}/CVS-upstream && mv -i ${dir}/CVS-custom ${dir}/CVS' {} \;	

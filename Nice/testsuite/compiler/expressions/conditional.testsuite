@@ -10,3 +10,9 @@
   int nameX() = 0;
   var int nameX = 1;
   int dummy() = false ? 0 : nameX;
+
+/// PASS
+  int i = 0;
+  void f() { if (true) i++; }
+  f();
+  assert i == 1;

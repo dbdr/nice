@@ -12,7 +12,7 @@
 
 // File    : MonotypeVar.java
 // Created : Fri Jul 23 15:36:39 1999 by bonniot
-//$Modified: Wed Sep 08 16:59:49 1999 by bonniot $
+//$Modified: Thu Sep 16 09:42:40 1999 by bonniot $
 
 package bossa.syntax;
 
@@ -163,10 +163,16 @@ public class MonotypeVar extends Monotype
 
   public String toString()
   {
+    String res;
     if(soft)
-      return name.toString();
+      res="&";
     else
-      return "\""+name+"("+id+")\"";
+      res="";
+    
+    if(User.dbg)
+      return "\""+res+name+"(id="+id+","+super.toString().substring(getClass().getName().length())+")\"";
+    else
+      return "\""+res+name+"\"";
   }
 
   public LocatedString getName()

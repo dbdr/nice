@@ -12,7 +12,7 @@
 
 // File    : Monotype.java
 // Created : Thu Jul 01 19:28:28 1999 by bonniot
-//$Modified: Tue Aug 24 16:28:24 1999 by bonniot $
+//$Modified: Wed Sep 15 16:11:06 1999 by bonniot $
 // Description : Abstract syntactic type, without constraint
 
 package bossa.syntax;
@@ -70,9 +70,9 @@ abstract public class Monotype
     return fresh(associatedVariable,null);
   }
   
-  static Collection freshs(int arity, LocatedString associatedVariable)
+  static List freshs(int arity, LocatedString associatedVariable)
   {
-    Collection res=new ArrayList(arity);
+    List res=new ArrayList(arity);
     for(int i=1;i<=arity;i++)
       res.add(fresh(new LocatedString(associatedVariable.content+i,associatedVariable.location())));
     return res;
@@ -85,10 +85,10 @@ abstract public class Monotype
   abstract Monotype resolve(TypeScope ts);
 
   /** iterates resolve() on the collection of Monotype */
-  static Collection resolve(TypeScope s, Collection c)
+  static List resolve(TypeScope s, Collection c)
   //TODO: imperative version ?
   {
-    Collection res=new ArrayList();
+    List res=new ArrayList();
     Iterator i=c.iterator();
     while(i.hasNext())
       { 
@@ -143,9 +143,9 @@ abstract public class Monotype
   
   abstract Monotype substitute(Map map);
 
-  static Collection substitute(Map map, Collection c)
+  static List substitute(Map map, Collection c)
   {
-    Collection res=new ArrayList(c.size());
+    List res=new ArrayList(c.size());
     Iterator i=c.iterator();
 
     while(i.hasNext())

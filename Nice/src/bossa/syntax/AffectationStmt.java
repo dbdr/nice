@@ -12,7 +12,7 @@
 
 // File    : AffectationStmt.java
 // Created : Mon Jul 05 15:49:27 1999 by bonniot
-//$Modified: Tue Aug 24 13:36:35 1999 by bonniot $
+//$Modified: Thu Sep 30 17:02:25 1999 by bonniot $
 
 package bossa.syntax;
 
@@ -40,6 +40,7 @@ public class AffectationStmt extends Statement
   {
     User.error(!to.isAssignable(),to+" cannot be assigned a value");
     try{
+      value.resolveOverloading(to.getType(),null);
       Typing.leq(value.getType(),to.getType());
     }
     catch(TypingEx t){

@@ -12,7 +12,7 @@
 
 // File    : PolytypeConstructor.java
 // Created : Mon Jul 19 17:47:49 1999 by bonniot
-//$Modified: Thu Aug 26 10:32:06 1999 by bonniot $
+//$Modified: Thu Sep 16 10:17:44 1999 by bonniot $
 
 package bossa.syntax;
 
@@ -40,8 +40,9 @@ public class PolytypeConstructor extends Type
     // in the monotype
     if(polytype.allImperative(parameters))
       {
-	polytype.getConstraint().and(new Constraint(parameters,null));
-	return polytype;
+	Polytype res=new Polytype
+	  (Constraint.and(polytype.getConstraint(),new Constraint(parameters,null)),polytype.getMonotype());
+	return res;
       }
     return this;
   }

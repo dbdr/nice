@@ -12,7 +12,7 @@
 
 // File    : Interface.java
 // Created : Thu Jul 08 11:51:09 1999 by bonniot
-//$Modified: Wed Sep 01 18:35:55 1999 by bonniot $
+//$Modified: Tue Sep 21 17:53:12 1999 by bonniot $
 
 package bossa.syntax;
 
@@ -20,7 +20,7 @@ import java.util.*;
 import bossa.util.*;
 
 /** 
- * An interface symbol
+ * An interface symbol.
  */
 public class Interface extends Node
   implements Located, TypeSymbol

@@ -12,7 +12,7 @@
 
 // File    : Internal.java
 // Created : Wed Jul 07 18:23:19 1999 by bonniot
-//$Modified: Wed Aug 25 10:17:17 1999 by bonniot $
+//$Modified: Tue Sep 21 18:21:39 1999 by bonniot $
 // Description : Internal errors...
 
 package bossa.util;

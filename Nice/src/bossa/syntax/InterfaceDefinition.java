@@ -12,7 +12,7 @@
 
 // File    : InterfaceDefinition.java
 // Created : Thu Jul 01 17:00:14 1999 by bonniot
-//$Modified: Mon Aug 30 15:57:55 1999 by bonniot $
+//$Modified: Tue Sep 21 17:54:30 1999 by bonniot $
 
 package bossa.syntax;
 
@@ -22,7 +22,7 @@ import bossa.engine.BitVector;
 import bossa.typing.Variance;
 
 /** 
- * Abstract syntax for an interface definition
+ * Abstract syntax for an interface definition.
  */
 public class InterfaceDefinition extends Node
   implements Definition,TypeSymbol
@@ -107,11 +107,6 @@ public class InterfaceDefinition extends Node
   }
   
   public boolean imp(int id)
-  {
-    return impv.get(id);
-  }
-  
-  public boolean impp(int id)
   {
     return impv.get(id);
   }

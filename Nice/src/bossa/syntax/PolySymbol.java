@@ -12,7 +12,7 @@
 
 // File    : PolySymbol.java
 // Created : Fri Jul 16 17:03:51 1999 by bonniot
-//$Modified: Tue Aug 24 16:40:59 1999 by bonniot $
+//$Modified: Thu Sep 30 17:17:10 1999 by bonniot $
 // Description : A local variable
 
 package bossa.syntax;
@@ -33,9 +33,14 @@ public class PolySymbol extends VarSymbol
     this.type=type;
   }
 
+  public void typecheck()
+  {
+    type=type.removeUnusefullTypeParameters();
+  }
+  
   public Type getType()
   {
-    return type.removeUnusefullTypeParameters();
+    return type;
   }
 
   /****************************************************************

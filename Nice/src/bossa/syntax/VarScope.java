@@ -12,7 +12,7 @@
 
 // File    : VarScope.java
 // Created : Fri Jul 09 11:28:11 1999 by bonniot
-//$Modified: Mon Aug 23 18:16:14 1999 by bonniot $
+//$Modified: Tue Sep 21 16:45:10 1999 by bonniot $
 
 package bossa.syntax;
 
@@ -65,22 +65,18 @@ class VarScope
    */
   public Collection lookup(LocatedString i)
   {
-    // The semantics is here that when a symbol is defined at one level,
-    // it hides all definitions at higher levels.
-    // This may be changed
-
     Collection res=defs.getAll(i);
-    if(res!=null)
-      return res;
+    if(res==null)
+      res=new ArrayList();
     if(outer!=null)
-      return outer.lookup(i);
-    return null;
+      res.addAll(outer.lookup(i));
+    return res;
   }
 
   public VarSymbol lookupOne(LocatedString s)
   {
     Collection i=lookup(s);
-    if(i==null)
+    if(i==null || i.size()==0)
       return null;
     User.error(i.size()>1,s,s+"'s usage is ambiguous");
     return (VarSymbol)i.iterator().next();
@@ -99,7 +95,7 @@ class VarScope
   public boolean overloaded(LocatedString s)
   {
     if(defs.containsKey(s))
-      return defs.elementCount(s)>1;
+      return defs.elementCount(s)>1 || outer.lookup(s).size()>0;
     else if(outer!=null)
       return outer.overloaded(s);
     else 

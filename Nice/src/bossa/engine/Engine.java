@@ -12,7 +12,7 @@
 
 // File    : Engine.java
 // Created : Tue Jul 27 15:34:53 1999 by bonniot
-//$Modified: Wed Sep 08 16:56:03 1999 by bonniot $
+//$Modified: Thu Sep 30 19:16:21 1999 by bonniot $
 
 package bossa.engine;
 
@@ -357,6 +357,15 @@ public abstract class Engine
   public static class K extends K0
     implements Kind
   {
+    private final int bottom; //see constructor
+    
+    K()
+    {
+      //creates the node 0, aka \bottom_C, that implements all interfaces of this variance
+      // should it also abstract them ?
+      bottom=extend();
+    }
+    
     /****************************************************************
      * Interfaces
      ****************************************************************/
@@ -433,6 +442,7 @@ public abstract class Engine
       itfLeq.setSize(nextItfId);
       itfLeq.set(id,id);
       i.resize(size());
+      i.addImp(bottom);
     }
     
     private int findApprox(InterfaceDefinition i, int node)
@@ -467,7 +477,7 @@ public abstract class Engine
       // Optimization (the less we produce arrows, the better) :
       // We can get rid of  a ->_i b  if  b ->_i b
       if(res==-1 || res!=node && i.abs(res))
-        return -1;
+	return -1;
       if(toCheck)
         for(int walk=0;walk<n;walk++)
 	  if(!C.get(res,walk))
@@ -490,7 +500,7 @@ public abstract class Engine
       throws Unsatisfiable
     {
       C.closure();
-      computeApprox();
+        computeApprox();
       for(Iterator it=interfaces.iterator();it.hasNext();)
 	{
 	  InterfaceDefinition i=(InterfaceDefinition)it.next();
@@ -498,7 +508,7 @@ public abstract class Engine
 	  for(int node=0;node<n;node++)
 	    if((n1=i.getApprox(node))!=-1)
 	      for(int p1=0;p1<n;p1++)
-		if(i.impp(p1))
+		if(i.imp(p1))
 		  for(int p=0;p<n;p++)
 		    if(C.get(p,p1) && C.get(p,node))
 		      if(this.isRigid(p1))

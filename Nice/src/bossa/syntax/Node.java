@@ -12,7 +12,7 @@
 
 // File    : Node.java
 // Created : Thu Jul 08 10:24:56 1999 by bonniot
-//$Modified: Wed Sep 08 16:53:48 1999 by bonniot $
+//$Modified: Tue Sep 21 16:20:13 1999 by bonniot $
 
 package bossa.syntax;
 

@@ -12,7 +12,7 @@
 
 // File    : stdlib.bossa
 // Created : Thu Jul 08 16:20:19 1999 by bonniot
-//$Modified: Fri Sep 10 18:27:18 1999 by bonniot $
+//$Modified: Thu Sep 30 17:55:26 1999 by bonniot $
 // Description : Prolog file, included before all bossa file
 
 variable {Any T} T null;
@@ -28,8 +28,16 @@ variable True  true =new True();
 variable False false=new False();
 
 Boolean not(Boolean);
-not(b@True)  { return false; }
-not(b@False) { return true;  }
+not(b@True)  = false;
+not(b@False) = true;
+
+Boolean and(Boolean,Boolean);
+and(b1@True,b2@True) = true;
+and(b1,b2)           = false;
+
+Boolean or(Boolean,Boolean);
+and(b1@False,b2@False) = false;
+and(b1,b2)             = true;
 
 // builtin control structures
 // "if(cond) t else e endif" 
@@ -37,15 +45,9 @@ not(b@False) { return true;  }
 // "_if(cond,fun()=>{return t;},fun()=>{return e;})"
 T _if { Any T } (Boolean,fun()(T),fun()(T));
 
-_if(cond@True,t,e)
-{
-  return t();
-}
+_if(cond@True,t,e) = t();
 
-_if(cond@False,t,e)
-{
-  return e();
-}
+_if(cond@False,t,e) = e();
 
 void _while(fun()(Boolean),fun()());
 _while(test,body)
@@ -57,18 +59,20 @@ _while(test,body)
 }
 
 // Clone
-interface Cloneable;
+//interface Cloneable;
 
-T clone{Cloneable T}(T);
+//T clone{Cloneable T}(T);
 
 //Comparable
+//It is a type class !
 interface Comparable;
 
-Boolean equals{Comparable T}(T,T);
+Boolean equals{/*Comparable*/ Any T}(T,T);
 
 // Numeric
-interface Num extends Cloneable,Comparable;
-T plus {Num T} (T,T);
+interface Num extends Comparable;
+N add {Num N} (N,N);
+T sub {Num T} (T,T);
 
 interface Ordinal;
 T succ {Ordinal T} (T);
@@ -79,26 +83,24 @@ class Integer extends Float
   abstracts Ordinal 
 {}
 
-plus(x@Integer,y@Integer)
+add(x@Integer,y@Integer)
 { return new Integer(); }
 
-plus(x@#Float,y@#Float)
+add(x#Float,y#Float)
 { return new Integer(); }
 
-succ(x@Integer)
-{
-  return plus(x,1);
-}
+succ(x@Integer) = x+1;
 
-Boolean lt(Integer, Integer);
+Boolean lt(Integer, Integer); // strict (<)
+Boolean leq(Integer, Integer);// non-strict (<=)
 
-clone(x@Float)
-{
-  return x;
-}
+// Strings and characters
+class Char {}
 
 class String implements Comparable {}
 
+Char get(String,Integer);
+Integer length(String);
 String concat(String,String);
 
 // Builtin class Array
@@ -114,7 +116,15 @@ Integer
 capacity<T>(Array<T>);
 
 void
-resize<T>(Array<T>, Integer);
+resize<R>(Array<R>, Integer);
+
+// List
+interface Container<T>;
+interface List<T> extends Container;
+
+list<B> map<A,B>{List list}(fun(A)(B),list<A>);
+T fold_left{Any T, Any U, List list}(fun(T,U)(T),T,list<U>);
+U fold_right{Any T, Any U, List list}(fun(T,U)(U),list<T>);
 
 // Main function, called with command line arguments in an array
 Integer main(Array<String>);

@@ -12,7 +12,7 @@
 
 // File    : User.java
 // Created : Wed Jul 07 18:20:58 1999 by bonniot
-//$Modified: Fri Sep 10 19:07:03 1999 by bonniot $
+//$Modified: Thu Sep 30 17:31:24 1999 by bonniot $
 
 package bossa.util;
 
@@ -73,5 +73,11 @@ public class User
       warning(message);
   }
 
-  public final static boolean dbg = false;
+  public static void debug(String msg)
+  {
+    if(dbg)
+      System.out.println(msg);
+  }
+  
+  public static boolean dbg = true;
 }

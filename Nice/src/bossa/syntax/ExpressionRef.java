@@ -12,7 +12,7 @@
 
 // File    : ExpressionRef.java
 // Created : Tue Aug 17 16:04:40 1999 by bonniot
-//$Modified: Wed Sep 08 16:54:39 1999 by bonniot $
+//$Modified: Thu Sep 30 17:05:07 1999 by bonniot $
 
 package bossa.syntax;
 
@@ -49,6 +49,11 @@ public class ExpressionRef extends Expression
 	       this+" was not declared");
   }
   
+  void typecheck()
+  {
+    content.typecheck();
+  }
+  
   void computeType()
   {
     type=content.getType();
@@ -66,10 +71,13 @@ public class ExpressionRef extends Expression
   
   Expression resolveOverloading(List /* of Expression */ parameters, TypeParameters tp)
   {
-    Expression oldContent=content;
     content=content.resolveOverloading(parameters,tp);
-    User.error(content==null,oldContent,
-	       oldContent+" was not declared");
+    return this;
+  }
+  
+  Expression resolveOverloading(Type expectedType, TypeParameters tp)
+  {
+    content=content.resolveOverloading(expectedType,tp);
     return this;
   }
   

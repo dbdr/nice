@@ -12,7 +12,7 @@
 
 // File    : InstantiateExp.java
 // Created : Mon Jul 12 17:48:04 1999 by bonniot
-//$Modified: Tue Aug 24 17:03:05 1999 by bonniot $
+//$Modified: Thu Sep 30 17:44:30 1999 by bonniot $
 
 package bossa.syntax;
 
@@ -67,6 +67,15 @@ public class InstantiateExp extends Expression
     Internal.error(tp!=null,this,
 		   "Type parameters applied twice");
     exp=exp.resolveOverloading(parameters,typeParameters);
+    // The instantiation is not done in resolveOverloading()
+    return this;
+  }
+  
+  Expression resolveOverloading(Type expectedType, TypeParameters tp)
+  {
+    Internal.error(tp!=null,this,
+		   "Type parameters applied twice");
+    exp=exp.resolveOverloading(expectedType,typeParameters);
     // The instantiation is not done in resolveOverloading()
     return this;
   }

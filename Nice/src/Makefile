@@ -1,5 +1,6 @@
 
-TOP=${HOME}/Bossa/src/bossa
+TOPSRC=${HOME}/Bossa/src/bossa
+TOPCLASSES=${HOME}/Bossa/classes
 
 JAVAC=javac -sourcepath ${HOME}/Bossa/src -g
 JAVACC=java -classpath ${HOME}/lib/java/JavaCC/JavaCC.zip COM.sun.labs.javacc.Main
@@ -38,8 +39,7 @@ ${TOP}/parser/Parser.java: ${TOP}/parser/Parser.jj
 	cd ${TOP}/parser; ${JAVACC} Parser.jj
 
 clean:
-	rm -f ${ALL_CLASS}
-	rm -f ${TOP}/parser/*.class
+	rm -rf ${TOPCLASSES}/*
 
 All: parser
 	${JAVAC} bossa/syntax/*.java bossa/typing/*.java bossa/test/*.java

@@ -12,7 +12,7 @@
 
 // File    : AST.java
 // Created : Thu Jul 01 11:01:56 1999 by bonniot
-//$Modified: Wed Sep 08 14:59:14 1999 by bonniot $
+//$Modified: Thu Sep 16 13:10:35 1999 by bonniot $
 
 package bossa.syntax;
 
@@ -42,7 +42,7 @@ public class AST extends Node
     Debug.println("Typechecking");
     // Necessary because toplevel assertions can be unsatisfiable
     // in which case we should be able to backtrack
-    bossa.typing.Typing.enter();
+    bossa.typing.Typing.enter("AST");
     doTypecheck();
   }
 

@@ -12,7 +12,7 @@
 
 // File    : Constraint.java
 // Created : Fri Jul 02 17:51:35 1999 by bonniot
-//$Modified: Wed Sep 08 12:32:57 1999 by bonniot $
+//$Modified: Thu Sep 16 10:47:32 1999 by bonniot $
 
 package bossa.syntax;
 
@@ -84,8 +84,9 @@ public class Constraint extends Node
   public static Constraint and(Constraint c1, Constraint c2)
   {
     Constraint res=c1.shallowClone();
-    c1.addBinders(c2.binders);
-
+    res.addBinders(c2.binders);
+    res.atomics.addAll(c2.atomics);
+    
     return res;
   }
 

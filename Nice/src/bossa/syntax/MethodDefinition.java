@@ -12,7 +12,7 @@
 
 // File    : MethodDefinition.java
 // Created : Thu Jul 01 18:12:46 1999 by bonniot
-//$Modified: Thu Sep 02 17:21:03 1999 by bonniot $
+//$Modified: Thu Sep 30 17:34:12 1999 by bonniot $
 
 package bossa.syntax;
 
@@ -91,6 +91,18 @@ public class MethodDefinition extends PolySymbol implements Definition
     return arity;
   }
   
+  /****************************************************************
+   * Typecheck
+   ****************************************************************/
+
+  public void typecheck()
+  // We can change the type here, since resolution is done now
+  // TODO: it should maybe be done earlier in case of forward reference to this method
+  {
+    removeChild(type);
+    type=type.removeUnusefullTypeParameters();
+  }
+  
   /************************************************************
    * Printing
    ************************************************************/
@@ -101,6 +113,7 @@ public class MethodDefinition extends PolySymbol implements Definition
       type.codomain().toString()
       + " "
       + name
+      + Util.map("<",", ",">",type.getTypeParameters())
       + type.getConstraint().toString()
       + "("
       + Util.map("",", ","",type.domain())

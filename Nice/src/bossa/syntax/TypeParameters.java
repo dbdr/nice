@@ -12,7 +12,7 @@
 
 // File    : TypeParameters.java
 // Created : Mon Jul 12 17:51:12 1999 by bonniot
-//$Modified: Wed Sep 08 15:26:47 1999 by bonniot $
+//$Modified: Wed Sep 15 15:38:47 1999 by bonniot $
 
 package bossa.syntax;
 
@@ -31,7 +31,7 @@ public class TypeParameters
    *
    * @param typeParameters a collection of Monotype
    */
-  public TypeParameters(Collection typeParameters)
+  public TypeParameters(List typeParameters)
   {
     if(typeParameters==null)
       typeParameters=new ArrayList(0);
@@ -46,7 +46,7 @@ public class TypeParameters
   
   static TypeParameters fromSymbols(Collection symbols)
   {
-    Collection res=new ArrayList(symbols.size());
+    List res=new ArrayList(symbols.size());
     Iterator i=symbols.iterator();
     while(i.hasNext())
       {
@@ -79,5 +79,5 @@ public class TypeParameters
     return content.iterator();
   }
   
-  public Collection /* of Monotype */ content;
+  public List /* of Monotype */ content;
 }

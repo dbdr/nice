@@ -12,7 +12,7 @@
 
 // File    : Expression.java
 // Created : Mon Jul 05 16:25:02 1999 by bonniot
-//$Modified: Thu Aug 26 10:32:13 1999 by bonniot $
+//$Modified: Thu Sep 30 17:02:15 1999 by bonniot $
 // Description : 
 
 package bossa.syntax;
@@ -66,8 +66,21 @@ public abstract class Expression extends Node
    * Resolves overloading, taking into account the parameters the expressions is applied to.
    *
    * @param tp type parameters to instantiate before applying the parameters, or null.
+   * @return the resolved expression. Doesn't return if OR is not possible.
    */
   Expression resolveOverloading(List /* of Expression */ parameters, TypeParameters tp)
+  {
+    return this;
+  }
+  
+  /**
+   * Resolve overloading, assuming that this expression
+   * should have some Type.
+   *
+   * @param expectedType the type this expression should have.
+   * @return the resolved expression. Doesn't return if OR is not possible.
+   */
+  Expression resolveOverloading(Type expectedType, TypeParameters typeParameters)
   {
     return this;
   }
@@ -85,13 +98,13 @@ public abstract class Expression extends Node
   /**
    * Maps getType over a collection of Expressions
    *
-   * @param Expressions the collection of Expressions
-   * @return the collection of their Types
+   * @param Expressions the list of Expressions
+   * @return the list of their Types
    */
-  static Collection getType(Collection expressions)
+  static List getType(List expressions)
   {
     Iterator i=expressions.iterator();
-    Collection res=new ArrayList(expressions.size());
+    List res=new ArrayList(expressions.size());
 
     while(i.hasNext())
       res.add( ((Expression) i.next()) .getType());

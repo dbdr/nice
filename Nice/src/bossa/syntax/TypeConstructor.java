@@ -12,7 +12,7 @@
 
 // File    : TypeConstructor.java
 // Created : Thu Jul 08 11:51:09 1999 by bonniot
-//$Modified: Thu Sep 02 17:12:37 1999 by bonniot $
+//$Modified: Tue Sep 21 17:12:34 1999 by bonniot $
 
 package bossa.syntax;
 
@@ -144,8 +144,8 @@ public class TypeConstructor
 	if(s instanceof TypeConstructor)
 	  return (TypeConstructor)s;
 	else
-	  Internal.error(name,"type constructor is not a type symbol but a "
-			 +s.getClass()); 
+	  Internal.error(name,name+" is not a type constructor but a "
+			 +s.getClass().getName()); 
 	return null;
       }
     return this;
@@ -235,6 +235,6 @@ public class TypeConstructor
    ****************************************************************/
 
   ClassDefinition definition;
-  LocatedString name;
+  public LocatedString name;
   public Variance variance;
 }

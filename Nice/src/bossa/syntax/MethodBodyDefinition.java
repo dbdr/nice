@@ -12,7 +12,7 @@
 
 // File    : MethodBodyDefinition.java
 // Created : Thu Jul 01 18:12:46 1999 by bonniot
-//$Modified: Fri Sep 10 19:07:25 1999 by bonniot $
+//$Modified: Thu Sep 30 19:03:20 1999 by bonniot $
 
 package bossa.syntax;
 
@@ -110,13 +110,17 @@ public class MethodBodyDefinition extends Node
 	{
 	  MethodDefinition m=(MethodDefinition)s;
 	  try{
-	    Typing.enter();
+	    Typing.enter("Trying definition "+m+" for method body "+name);
+	    Typing.introduce(m.type.getTypeParameters());
+	    m.type.getConstraint().assert();
 	    Typing.implies();
 	    Typing.in(Pattern.getPolytype(formals),
 		      Domain.fromMonotypes(m.getType().domain()));
 	    Typing.leave();
 	  }
 	  catch(TypingEx e){
+	    if(Typing.dbg) Debug.println("Not the right choice :"+e);
+	    e.printStackTrace();
 	    i.remove();
 	  }
 	  catch(BadSizeEx e){
@@ -195,11 +199,11 @@ public class MethodBodyDefinition extends Node
     
     Typing.enter(definition.type.getTypeParameters(),
 		 "method body of "+name);
-
+    
     try{
       try { definition.type.getConstraint().assert(); }
       catch(TypingEx e){
-	User.error(name,"the constraint will never be satisfied");
+	User.error(name,"the constraint will never be satisfied",": "+e.getMessage());
       }
       
       Collection monotypes=MonoSymbol.getMonotype(parameters);

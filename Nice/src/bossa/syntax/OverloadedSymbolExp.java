@@ -12,7 +12,7 @@
 
 // File    : OverloadedSymbolExp.java
 // Created : Thu Jul 08 12:20:59 1999 by bonniot
-//$Modified: Fri Sep 03 15:23:22 1999 by bonniot $
+//$Modified: Thu Sep 30 18:01:19 1999 by bonniot $
 
 package bossa.syntax;
 
@@ -40,9 +40,10 @@ public class OverloadedSymbolExp extends Expression
     return false;
   }
 
-  Expression resolveOverloading(List /* of expression */ parameters,
+  Expression resolveOverloading(List /* of Type */ parameters,
 				TypeParameters typeParameters)
   {
+    User.debug("Overloading resolution for "+this);
     Iterator i=symbols.iterator();
     while(i.hasNext())
       {
@@ -73,8 +74,11 @@ public class OverloadedSymbolExp extends Expression
 	i=symbols.iterator();
 	while(i.hasNext())
 	  {
-	    if(!CallExp.wellTyped(InstantiateExp.create(new SymbolExp((VarSymbol)i.next(),location()),typeParameters),
-				 parameters))
+	    VarSymbol s=(VarSymbol)i.next();
+	    User.debug("OVERLOADING: Trying with "+s);
+	    
+	    if(!CallExp.wellTyped(InstantiateExp.create(new SymbolExp(s,location()),typeParameters),
+				  parameters))
 	      i.remove();
 	  }
       }
@@ -90,9 +94,45 @@ public class OverloadedSymbolExp extends Expression
     return null;
   }
   
+  Expression resolveOverloading(Type expectedType,TypeParameters typeParameters)
+  {
+    User.debug("Overloading resolution (expected type "+expectedType+") for "+this);
+    Iterator i=symbols.iterator();
+    while(i.hasNext())
+      {
+	VarSymbol s=(VarSymbol)i.next();
+	Type t=s.getType();
+	if(typeParameters!=null)
+	  try{
+	    t=t.instantiate(typeParameters);
+	    if(t==null)
+	      { i.remove(); continue; }
+	  }
+	  catch(BadSizeEx e)
+	    { i.remove(); continue; }
+	try{
+	  bossa.typing.Typing.leq(t,expectedType);
+	}
+	catch(bossa.typing.TypingEx e){
+	  i.remove();
+	}
+      }
+
+    User.error(symbols.size()==0,this,
+	       "No alternative has expected type "+expectedType);
+
+    if(symbols.size()==1)
+      return new SymbolExp((VarSymbol)symbols.iterator().next(),location());
+
+    //There is ambiguity
+    User.error(this,"Ambiguity for symbol "+ident+". Possibilities are :\n"+
+	       Util.map("","","",symbols));
+    return null;    
+  }
+  
   void computeType()
   {
-    User.error(this,ident+" is ambiguous");
+    Internal.error(this,ident+" has not been resolved yet.\nPossibilities are :"+this);
   }
 
   public String toString()

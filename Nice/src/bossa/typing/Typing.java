@@ -12,7 +12,7 @@
 
 // File    : Typing.java
 // Created : Tue Jul 20 11:57:17 1999 by bonniot
-//$Modified: Wed Sep 08 16:55:05 1999 by bonniot $
+//$Modified: Thu Sep 30 19:13:09 1999 by bonniot $
 
 package bossa.typing;
 
@@ -80,6 +80,7 @@ abstract public class Typing
       e.setKind(null);
     
     Engine.register(e);
+    if(dbg) Debug.println("Typing introduced "+e);
   }
   
   static public void introduce(Collection elements)
@@ -224,6 +225,9 @@ abstract public class Typing
     Collection tp2=t2.getTypeParameters();
     
     enter();
+    // Maybe optimise, since tp1"=="tp2
+    introduce(tp1);
+    introduce(tp2);
     leqMono(tp1,tp2);
     leqMono(tp2,tp1);
     implies();
@@ -243,7 +247,8 @@ abstract public class Typing
       Engine.leq(m1,m2);
     }
     catch(Unsatisfiable e){
-      throw new TypingEx(e.getMessage());
+      e.printStackTrace();
+      throw new TypingEx("Typing.leq("+m1+","+m2+") [was "+e.getMessage()+"]");
     }    
   }
   
@@ -359,7 +364,7 @@ abstract public class Typing
       ((Engine.K)t.getKind()).domains.reduce(t.getId(),i.impv);
     }
     catch(Unsatisfiable e){
-      unsatisfiable(new TypingEx("Unsatisfiable 5:"+e.getMessage()));
+      unsatisfiable(new TypingEx(t+" cannot implement "+i+": "+e.getMessage()));
     }
   }
   
@@ -400,5 +405,5 @@ abstract public class Typing
     return i.imp(t.getId());
   }
 
-  public static final boolean dbg = false;
+  public static final boolean dbg = true;
 }

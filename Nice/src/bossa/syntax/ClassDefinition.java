@@ -12,7 +12,7 @@
 
 // File    : ClassDefinition.java
 // Created : Thu Jul 01 11:25:14 1999 by bonniot
-//$Modified: Fri Sep 03 11:35:23 1999 by bonniot $
+//$Modified: Thu Sep 16 11:41:50 1999 by bonniot $
 
 package bossa.syntax;
 
@@ -91,7 +91,7 @@ public class ClassDefinition extends Node
 	MonoSymbol s=(MonoSymbol)i.next();
 	List params=new LinkedList();
 	params.add(getMonotype());
-	MethodDefinition m=new MethodDefinition(this,s.name,typeParameters,Constraint.True(),s.type,params);
+	MethodDefinition m=new MethodDefinition(s.name,typeParameters,Constraint.True(),s.type,params);
 	m.isFieldAccess=true;
 	res.add(m);
       }

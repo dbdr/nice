@@ -12,9 +12,7 @@
 
 // File    : MonotypeConstructor.java
 // Created : Thu Jul 22 09:15:17 1999 by bonniot
-//$Modified: Mon Aug 30 11:16:02 1999 by bonniot $
-// Description : A monotype, build by application of
-//   a type constructor to type parameters
+//$Modified: Mon Sep 20 19:15:00 1999 by bonniot $
 
 package bossa.syntax;
 
@@ -23,6 +21,10 @@ import java.util.*;
 import bossa.util.*;
 import bossa.engine.*;
 
+/**
+ * A monotype, build by application of
+ * a type constructor to type parameters.
+ */
 public class MonotypeConstructor extends Monotype
 {
   /**
@@ -93,7 +95,7 @@ public class MonotypeConstructor extends Monotype
   void typecheck()
   {
     User.error(tc.variance.size!=parameters.size(),this,
-	       tc.variance.size+" type parameters expected");
+	       tc.variance.size+" type parameters expected for "+tc);
     // Check the monotype is well-formed,
     // ie all the parameters in imperative positions are imperative
     User.error(!tc.variance.wellFormed(parameters),

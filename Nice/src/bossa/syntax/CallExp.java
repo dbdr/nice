@@ -12,7 +12,7 @@
 
 // File    : CallExp.java
 // Created : Mon Jul 05 16:27:27 1999 by bonniot
-//$Modified: Wed Sep 08 16:52:54 1999 by bonniot $
+//$Modified: Thu Sep 30 18:02:39 1999 by bonniot $
 
 package bossa.syntax;
 
@@ -55,7 +55,7 @@ public class CallExp extends Expression
   }
 
   static boolean wellTyped(Expression fun,
-			   List /* of Expression */ parameters)
+			   List /* of Type */ parameters)
   {
     try{
       Type t=getType(fun,parameters);
@@ -78,7 +78,7 @@ public class CallExp extends Expression
 				     List /* of Expression */ parameters)
   {
     try{
-      return getType(fun,parameters);
+      return getType(fun,Expression.getType(parameters));
     }
     catch(BadSizeEx e){
       User.error(loc,e.expected+" parameters expected, "+
@@ -91,7 +91,7 @@ public class CallExp extends Expression
       if(Typing.dbg) Debug.println(e.getMessage());
       String end="not within the domain of the function \""+fun+"\"";
       if(parameters.size()>=2)
-	User.error(loc,"The parameters "+
+	Internal.error(loc,"The parameters "+
 		   Util.map("(",", ",")",parameters) +
 		   " are "+end);
       else
@@ -107,11 +107,10 @@ public class CallExp extends Expression
   }
   
   private static Type getType(Expression fun,
-		      List /* of Expression */ parameters)
+			      List /* of Type */ parameters)
     throws TypingEx,BadSizeEx,ReportErrorEx
   {
     Type funt=fun.getType();
-    Collection parametersTypes=null;
 
     Collection dom=funt.domain();
     Monotype codom=funt.codomain();
@@ -122,7 +121,7 @@ public class CallExp extends Expression
       throw new ReportErrorEx("You have to specify the type parameters for function "+fun);
        
     Typing.enter(funt.getTypeParameters(),"call "+fun);
-
+    
     Typing.implies();
 
     try{ funt.getConstraint().assert(); }
@@ -130,42 +129,46 @@ public class CallExp extends Expression
       throw new ReportErrorEx("The conditions for using this function are not fullfiled");
     }
     
-    parametersTypes=Expression.getType(parameters);
-      
+    
     if(Typing.dbg)
-      Debug.println("Types of parameters:\n"+
-		    Util.map("",", ","\n",parametersTypes));
-
-    Typing.in(parametersTypes,
+      {
+	Debug.println("Parameters:\n"+
+		      Util.map("",", ","\n",parameters));
+	Debug.println("Types of parameters:\n"+
+		      Util.map("",", ","\n",parameters));
+      }
+    
+    Typing.in(parameters,
 	      Domain.fromMonotypes(funt.domain()));
 
     Typing.leave();
 
     //computes the resulting type
-    Constraint cst=funt.getConstraint().and(Type.getConstraint(parametersTypes));
-    cst.and(MonotypeLeqCst.constraint(Type.getMonotype(parametersTypes),dom));    
+    Constraint cst=funt.getConstraint().and(Type.getConstraint(parameters));
+    cst.and(MonotypeLeqCst.constraint(Type.getMonotype(parameters),dom));
     return new Polytype(cst,codom);
   }
   
-    void computeType()
-      {
-	fun=fun.resolveOverloading(parameters,null);
-	type=getTypeAndReportErrors(location(),fun,parameters);
-      }
-
-    boolean isAssignable()
-      {
-	fun=fun.resolveOverloading(parameters,null);
-	return fun.isFieldAccess();
-      }
-  
-    public String toString()
-      {
-	return fun
-	  + "(" + Util.map("",", ","",parameters) + ")"
-	  ;
-      }
-
-    protected Expression fun;
-    protected List /* of Expression */ parameters;
+  void computeType()
+  {
+    fun=fun.resolveOverloading(Expression.getType(parameters),null);
+    type=getTypeAndReportErrors(location(),fun,parameters);
   }
+
+  boolean isAssignable()
+  {
+    //TODO: decide where to resolve overloading, and do it just once
+    fun=fun.resolveOverloading(Expression.getType(parameters),null);
+    return fun.isFieldAccess();
+  }
+  
+  public String toString()
+  {
+    return fun
+      + "(" + Util.map("",", ","",parameters) + ")"
+      ;
+  }
+
+  protected Expression fun;
+  protected List /* of Expression */ parameters;
+}

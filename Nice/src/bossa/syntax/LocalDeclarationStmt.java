@@ -12,7 +12,7 @@
 
 // File    : LocalDeclarationStmt.java
 // Created : Tue Jul 06 12:06:20 1999 by bonniot
-//$Modified: Fri Sep 03 15:36:18 1999 by bonniot $
+//$Modified: Thu Sep 30 17:39:38 1999 by bonniot $
 
 package bossa.syntax;
 
@@ -51,6 +51,7 @@ public class LocalDeclarationStmt extends Statement
   {
     if(value==null) return;
     try{
+      value.resolveOverloading(left.getType(),null);
       Typing.leq(value.getType(),left.getType());
     }
     catch(TypingEx e){

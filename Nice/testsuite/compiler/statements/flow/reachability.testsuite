@@ -1,6 +1,10 @@
 /// FAIL
-  while (false) { 
-    /*/// FAIL HERE */ {} // Unreachable
+  while (false) /*/// FAIL HERE */ {
+  }
+
+/// FAIL
+  while (false) /*/// FAIL HERE */ {
+    {} // Unreachable
   }
 
 /// FAIL
@@ -12,8 +16,12 @@
   {} // Reachable
 
 /// FAIL
-  for (;false;) { 
-    /*/// FAIL HERE */ {} // Unreachable
+  for (;false;) /*/// FAIL HERE */ {
+  }
+
+/// FAIL
+  for (;false;) /*/// FAIL HERE */ {
+    {} // Unreachable
   }
 
 /// FAIL

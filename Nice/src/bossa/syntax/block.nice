@@ -135,12 +135,27 @@ public class Block extends Statement
 
 }
 
-public Block createBlock(List<Statement> statements)
+public Statement createBlock(List<Statement> statements) =
+  createBlock(statements, false, null);
+
+/**
+   @param always When true, always create a block. When false, a block might
+                 not be created if there are not several statements.
+*/
+public Statement createBlock(List<Statement> statements, boolean always,
+			     ?Location loc)
 {
-    let res = new Block(statements: cast(null));
-    let stmts = res.cutInBlocks(statements);
-    res.statements = stmts;
-    if (stmts.length > 0)
-      res.setLocation(stmts[0].location());
-    return res;
+  if (!always && statements.size() == 1)
+    return statements[0];
+
+  let res = new Block(statements: cast(null));
+  let stmts = res.cutInBlocks(statements);
+  res.statements = stmts;
+
+  if (loc != null)
+    res.setLocation(loc);
+  else if (stmts.length > 0)
+    res.setLocation(stmts[0].location());
+
+  return res;
 }

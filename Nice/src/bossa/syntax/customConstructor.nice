@@ -192,18 +192,14 @@ void resolveCCThis(Statement stmt, Located thisLoc, NiceClass classe)
     User.error(thisLoc, "The last statement must be a call to 'this' constructor");
   }
 
-  Block block = cast(stmt);
+  var last = stmt;
+  while (last instanceof Block)
+    {
+      if (last.statements.length == 0)
+	missingThisError();
+      last = last.last;
+    }
 
-  if (block.statements.length == 0)
-    missingThisError();
-
-  Statement last = block.last;
-  if (last instanceof Block)
-  {
-    resolveCCThis(last, thisLoc, classe);
-    return;
-  }
-  
   if (! (last instanceof ExpressionStmt))
     missingThisError();
 

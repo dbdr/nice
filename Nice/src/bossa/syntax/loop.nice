@@ -22,7 +22,7 @@ public class LoopStmt extends Statement
 {
   ?Expression whileExp;
   final Statement loopBody;
-  final ?Block iterationStatements = null;
+  final ?Statement iterationStatements = null;
   final boolean testFirst;
 
   ?gnu.expr.LoopExp code = null;
@@ -87,21 +87,36 @@ public class LoopStmt extends Statement
     if (iterationStatements == null)
       return "while (" + whileExp + ")" + loopBody;
 
-    Statement[] itStatements = notNull(iterationStatements).statements;
-    String itStats = "";
-    for (int i = 0; i<itStatements.length; i++)
-      {
-	String tmp = itStatements[i].toString();
-	itStats += tmp.substring(0, tmp.lastIndexOf(';'));
-	if (i<itStatements.length-1) itStats += ", ";
-      }
+    String itStats = iterationStatementsToString(notNull(iterationStatements));
 
-    return "for(; " + whileExp + " ;" + itStats + ")\n " + loopBody;
+    return "for(; "whileExp"; "itStats")\n "loopBody;
   }
 }
 
+private String iterationStatementsToString(Statement s)
+{
+  String res = s.toString();
+  return res.substring(0, res.lastIndexOf(';'));
+}
+
+iterationStatementsToString(Block iterationStatements)
+{
+  Statement[] itStatements = iterationStatements.statements;
+
+  StringBuffer res = new StringBuffer();
+  for (int i = 0; i < itStatements.length; i++)
+    {
+      String tmp = itStatements[i].toString();
+      res.append(tmp.substring(0, tmp.lastIndexOf(';')));
+      if (i < itStatements.length - 1) res.append(", ");
+    }
+
+  return res.toString();
+}
+
+
 public Statement createForLoop
-  (Expression test, Block update, Statement body, List<Statement> inits)
+  (Expression test, Statement update, Statement body, List<Statement> inits)
 {
   inits.add(new LoopStmt(whileExp:test, loopBody: body, iterationStatements: update, testFirst: true));
   return createBlock(inits);

@@ -827,7 +827,8 @@ typecheck(LocalFunction decl)
 typecheck(ExpressionStmt s)
 {
   s.exp = s.exp.noOverloading();
-  typecheck(s.exp);
+  try { typecheck(s.exp); }
+  catch (bossa.util.UserError ex) { throw ensureLocated(ex, s); }
 }
 
 typecheck(LoopStmt l)

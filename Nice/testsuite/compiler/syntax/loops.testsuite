@@ -3,7 +3,7 @@
   for (let iter = list.iterator(); iter.hasNext;) {}
 
 /// PASS
-  for (int x = 0, boolean ok = false; false;) {}
+  for (int x = 0, boolean ok = false; ok;) {}
 
 /// PASS
   int i;

@@ -764,7 +764,7 @@ analyse(LoopStmt l, info)
     {
       l.whileExp = analyse(l.whileExp, info);
       if (notNull(l.whileExp).isFalse())
-	info.setUnreachable();
+	throw error(l.loopBody, "This statement is never executed");
     }
 
   ?LoopStmt save = info.currentLoop;

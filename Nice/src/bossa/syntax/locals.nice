@@ -44,7 +44,17 @@ abstract class LocalDeclaration extends Statement
 
   generateCode()
   {
-    throw Internal.error("Should not be called");
+    /*
+       This declaration is not inside a block, so it must be on its own.
+       We still need to compile it, because the computation of the value
+       can have side effects and for testing/debugging purposes.
+    */
+
+    gnu.expr.Expression[] inits = cast(new gnu.expr.Expression[1]);
+    let letExp = new gnu.expr.LetExp(inits);
+    inits[0] = this.compile(letExp);
+    letExp.setBody(gnu.expr.QuoteExp.voidExp);
+    return letExp;
   }
 
   public String display()

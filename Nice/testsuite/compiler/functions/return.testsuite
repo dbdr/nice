@@ -44,6 +44,6 @@
   int x = 0;
   // local function
   int f()
-  /* /// FAIL HERE */ {
-    if (x > 0) return x;
+  {
+    /* /// FAIL HERE */ if (x > 0) return x;
   }

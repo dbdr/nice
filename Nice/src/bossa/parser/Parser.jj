@@ -2375,7 +2375,7 @@ Statement Statement() :
 (
   LOOKAHEAD(2)
   res=LabeledStatement()
-| res=Block()
+| res=AlwaysBlock()
 | res=RealStatementExpression()
 | res=IfStatement()
 | res=WhileStatement()
@@ -2419,6 +2419,20 @@ Statement LabeledStatement() :
 }
 
 Statement Block() :
+{ Statement res; }
+{
+  res = _Block(false)
+  { return res; }
+}
+
+Statement AlwaysBlock() :
+{ Statement res; }
+{
+  res = _Block(true)
+  { return res; }
+}
+
+Statement _Block(boolean always) :
 { Token first, last; Statement s; List statements; }
 {
   { first = getToken(1); }
@@ -2428,9 +2442,8 @@ Statement Block() :
   "}"
   {
     last = getToken(0);
-    Statement res = bossa.syntax.dispatch.createBlock(statements);
-    res.setLocation(makeLocation(first, last));
-    return res;
+    return bossa.syntax.dispatch.createBlock(statements, always,
+					     makeLocation(first, last));
   }
 }
 
@@ -2727,7 +2740,7 @@ Statement DoStatement() :
 }
 
 Statement ForStatement() :
-{ Block update = null;
+{ Statement update = null;
   Statement loop = null, body, statexp;
   Expression cond = null;
   List init = new ArrayList();
@@ -2773,7 +2786,7 @@ List LocalDeclarationList() :
   { return declarations; }
 }
 
-Block StatementExpressionList() :
+Statement StatementExpressionList() :
 { Statement s; List statements=new LinkedList(); }
 {
   s=ShortStatementExpression() { statements.add(s); }

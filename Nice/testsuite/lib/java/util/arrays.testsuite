@@ -1,0 +1,13 @@
+/// PASS
+  let o1 = "s";
+  let ?String o2 = null;
+  let ?String[] oa1 = [o1, o2];
+  let ?String[] oa2 = [o1, o2];
+  assert Arrays.equals(oa1, oa2);
+
+/// PASS
+  let ArrayList<String> o1 = new ArrayList();
+  let ?ArrayList<String> o2 = null;
+  let ?ArrayList<String>[] oa1 = [o1, o2];
+  let ?List<String>[] oa2 = [o1, o2];
+  assert Arrays.equals(oa1, oa2);

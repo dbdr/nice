@@ -167,6 +167,10 @@ PrintStream stderr () = native System.err;
 <K, V> boolean _isEmpty(java.util.Dictionary<K, V>)=
   native boolean java.util.Dictionary.isEmpty();
 
+
+<T,U,V | U <: T, V <: T> boolean Arrays_equals(U[], V[]) = 
+  native boolean Arrays.equals(Object[],Object[]);
+
 /* StringTokenizer inherits from Enumeration, which makes it 
    wrongly parameterized. We ignore that inheritance.
 */

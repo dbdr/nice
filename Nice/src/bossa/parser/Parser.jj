@@ -1,0 +1,789 @@
+/**************************************************************************/
+/*                           B O S S A                                    */
+/*        A simple imperative object-oriented research language           */
+/*                   (c)  Daniel Bonniot 1999                             */
+/*                                                                        */
+/*  This program is free software; you can redistribute it and/or modify  */
+/*  it under the terms of the GNU General Public License as published by  */
+/*  the Free Software Foundation; either version 2 of the License, or     */
+/*  (at your option) any later version.                                   */
+/*                                                                        */
+/**************************************************************************/
+
+// File    : parser.jj
+// Created : Thu Jul 01 10:27:05 1999 by bonniot
+//$Modified: Fri Jul 09 21:05:36 1999 by bonniot $
+// Description : Parseur JavaCC
+
+options {
+    JAVA_UNICODE_ESCAPE = true;
+//    DEBUG_LOOKAHEAD=true;
+}
+
+PARSER_BEGIN(Parser)
+
+package bossa.parser;
+
+import java.io.*;
+import java.util.*;
+
+import bossa.syntax.*;
+
+public class Parser
+{
+    // it is better to get a Collection than an AST
+    // it is easier to get some definitions from a prolog first
+    public static Collection parse(Reader r) throws ParseException
+    {
+	Parser p=new Parser(r);
+	return p.definitions();
+    }
+}
+
+PARSER_END(Parser)
+
+/***********************************************************************
+ * Comments
+ ***********************************************************************/
+
+// picked from JavaCC-1.1.jj grammar out of JavaCC examples
+
+/* WHITE SPACE */
+
+SKIP :
+{
+  " "
+| "\t"
+| "\n"
+| "\r"
+| "\f"
+}
+
+/* COMMENTS */
+
+MORE :
+{
+  "//" : IN_SINGLE_LINE_COMMENT
+|
+  <"/**" ~["/"]> { input_stream.backup(1); } : IN_FORMAL_COMMENT
+|
+  "/*" : IN_MULTI_LINE_COMMENT
+}
+
+<IN_SINGLE_LINE_COMMENT>
+SPECIAL_TOKEN :
+{
+  <SINGLE_LINE_COMMENT: "\n" | "\r" | "\r\n" > : DEFAULT
+}
+
+<IN_FORMAL_COMMENT>
+SPECIAL_TOKEN :
+{
+  <FORMAL_COMMENT: "*/" > : DEFAULT
+}
+
+<IN_MULTI_LINE_COMMENT>
+SPECIAL_TOKEN :
+{
+  <MULTI_LINE_COMMENT: "*/" > : DEFAULT
+}
+
+<IN_SINGLE_LINE_COMMENT,IN_FORMAL_COMMENT,IN_MULTI_LINE_COMMENT>
+MORE :
+{
+  < ~[] >
+}
+
+/***********************************************************************
+ * Reserved tokens
+ ***********************************************************************/
+
+TOKEN: /* Separators, Delimiters */
+{
+  < LPAR:       "("   >
+| < RPAR:       ")"   >
+| < LBRK:       "["   >
+| < RBRK:       "]"   >
+| < LBRACE:     "{"   >
+| < RBRACE:     "}"   >
+| < LPRAGMA:    "<*"  >
+| < RPRAGMA:    "*>"  >
+| < DOT:        "."   >
+| < COLON:      ":"   >
+| < COMMA:      ","   >
+| < SEMI:       ";"   >
+| < DOTDOT:     ".."  >
+| < MAPSTO:     "->"  >
+| < COND:       "?"   >
+| < ANY:        "_"   >
+| < BACKSLASH:  "\\"  >      
+}
+
+TOKEN: /* Operators */
+{
+  < EQ:      "="   >
+| < PLUS:    "+"   >
+| < MINUS:   "-"   >
+| < POWER:   "**"  >
+| < MULT:    "*"   >
+| < SLASH:   "/"   >
+| < NEQ:     "!="  >
+| < DIV:     "div" >
+| < MOD:     "%"   >
+| < LNOT:    "!"   >
+| < BAND:    "&"   >
+| < BOR:     "|"   >
+| < BXOR:    "^"   >
+| < BNOT:    "~"   >
+| < LEQ:     "<="  >
+| < GEQ:     ">="  >
+| < EQEQ:    "=="  >
+| < SUB:     "<:"  >
+| < LT:      "<"   >
+| < GT:      ">"   >
+| < LAND:    "&&"  >
+| < LOR:     "||"  >
+| < LSHIFT:  "<<"  >
+// RSHIFT is not a token: operator >> is made of two consecutive tokens ">"
+}
+
+TOKEN: /* Keywords */
+{
+  < CLASS:      "class"      >
+| < INTERFACE:  "interface"  >
+| < IMPLEMENTS: "implements" >
+| < ABSTRACTS:  "abstracts"  >
+| < DOMAIN:     "domain"     >
+| < AT:         "@"          >
+| < ASSERT:     "assert"     >
+| < INPUT:      "input"      >
+| < OUTPUT:     "output"     >
+| < FOR:        "for"        >
+| < IF:         "if"         >
+| < ELSE:       "else"       >
+| < TRUE:       "true"       >
+| < FALSE:      "false"      >
+| < PRINT:      "print"      >
+| < FORMAT:     "format"     >
+| < ERROR:      "error"      >
+| < FUN:        "fun"        >
+| < ALIKE:      "alike"      >
+//| < THIS:       "this"       >
+| < EXTENDS:    "extends"    >
+| < RESET:      "reset"      >
+| < ENABLE:     "enable"     >
+| < NATIVE:     "native"     >
+| < FINAL:      "final"      >
+| < PRAGMA:     "pragma"     >
+| < INSTANCEOF: "instanceof" >
+| < DYNAMIC:    "dynamic"    >
+| < NEW:        "new"        >
+| < CLONE:      "clone"      >
+| < PUBLIC:     "public"     >
+| < STATIC:     "static"     >
+| < IMPORT:     "import"     >
+| < PACKAGE:    "package"    >
+| < REQUIRE:    "require"    >
+| < EXPORT:     "export"     >
+| < EXTERN:     "extern"     >
+| < AS:         "as"         >
+| < VAR:        "var"        >
+
+// Statements
+| < RETURN:     "return"     >
+
+// reserved for future use
+| < PRIVATE:    "private"    >
+| < PROTECTED:  "protected"  >      
+}
+
+
+/***********************************************************************
+ * Literals
+ ***********************************************************************/
+TOKEN: /* Different kinds of digits */
+{
+  < #DIGIT:  ["0"-"9"] >                     // decimal
+| < #XDIGIT: ["0"-"9", "a"-"f", "A"-"F"] >   // hexadecimal
+| < #ODIGIT: ["0"-"7"] >		     // octal
+| < #BDIGIT: ["0", "1"] >		     // binary
+}
+
+
+TOKEN: /* Integer literals */
+{
+  < LINT: (  (<DIGIT>)+				// decimal
+           | "0" ["x", "X"] (<XDIGIT>)+		// hexadecimal
+	   | "0" ["o", "O"] (<ODIGIT>)+		// octal
+          )
+  >
+}
+
+TOKEN: /* 2adic literals */
+{
+  < LPER: "#" (  (<BDIGIT>)+			    // binary finite 2adic
+	       |  (<BDIGIT>)* "(" (<BDIGIT>)* ")"   // periodic 2adic
+              )
+  >
+}
+
+TOKEN: /* Floating point literals */
+{
+  < FLOATING_POINT_LITERAL:
+        (["0"-"9"])* "." (["0"-"9"])+ (<EXPONENT>)?
+      | (["0"-"9"])+ <EXPONENT> 
+  >
+|
+  < #EXPONENT: ["e","E"] (["+","-"])? (["0"-"9"])+ >
+      }
+
+
+TOKEN: /* String literals */
+{
+  < LSTRING:
+      "\""
+      (   (~["\"","\\","\n","\r"])
+        | ("\\"
+            ( ["n","t","b","r","f","\\","'","\""]
+            | ["0"-"7"] ( ["0"-"7"] )?
+            | ["0"-"3"] ["0"-"7"] ["0"-"7"]
+            )
+          )
+      )*
+      "\""
+  >
+}
+
+/***********************************************************************
+ * Identifiers
+ ***********************************************************************/
+// identifiers are the same as in Java, except that:
+// 1. the character $ is not allowed
+// 2. the character ' is allowed
+// XXX: conform to Java
+TOKEN:
+{
+  < IDENT: <IDENT_START> (<IDENT_PART>)* >
+| < #IDENT_PART: (<IDENT_START> | <IDENT_DIGIT> | "'") >
+| < #IDENT_START:
+     [
+      "\u0041"-"\u005a",
+      "\u005f",
+      "\u0061"-"\u007a",
+      "\u00c0"-"\u00d6",
+      "\u00d8"-"\u00f6",
+      "\u00f8"-"\u00ff",
+      "\u0100"-"\u1fff",
+      "\u3040"-"\u318f",
+      "\u3300"-"\u337f",
+      "\u3400"-"\u3d2d",
+      "\u4e00"-"\u9fff",
+      "\uf900"-"\ufaff"
+     ]
+  >
+| < #IDENT_DIGIT:
+    [
+     "\u0030"-"\u0039",
+     "\u0660"-"\u0669",
+     "\u06f0"-"\u06f9",
+     "\u0966"-"\u096f",
+     "\u09e6"-"\u09ef",
+     "\u0a66"-"\u0a6f",
+     "\u0ae6"-"\u0aef",
+     "\u0b66"-"\u0b6f",
+     "\u0be7"-"\u0bef",
+     "\u0c66"-"\u0c6f",
+     "\u0ce6"-"\u0cef",
+     "\u0d66"-"\u0d6f",
+     "\u0e50"-"\u0e59",
+     "\u0ed0"-"\u0ed9",
+     "\u1040"-"\u1049"
+    ]
+  >
+}
+ 
+/*
+ * Illegal tokens
+ */
+TOKEN:
+{
+  < ILLEGAL_TOKEN: (~[]) >
+}
+
+/***********************************************************************/
+/*                          Grammar                                    */
+/***********************************************************************/
+
+LocatedString string():
+{
+    Token t;
+}
+{
+    t=<IDENT> 
+    { return new LocatedString(t.image,t.beginLine,t.beginColumn,t.endLine,t.endColumn); }
+}
+
+Ident identifier():
+{
+  LocatedString s;
+}
+{
+  s=string()
+  { return new Ident(s); }
+}
+
+Collection identifiers():
+{
+    Collection res=new ArrayList();
+    Ident i;
+}
+{
+(
+    i=identifier() { res.add(i); }
+    ( "," i=identifier() { res.add(i); } )*
+    { return res; }
+)
+| { return new ArrayList(); }
+}
+
+int integer():
+{
+  Token t;
+}
+{
+  t = <LINT> { return Integer.parseInt(t.image); }
+}
+
+double floating():
+{
+  Token t;
+}
+{
+  t = <FLOATING_POINT_LITERAL> { return Double.parseDouble(t.image); }
+}
+
+/***********************************************************************/
+/*                          Types                                      */
+/***********************************************************************/
+
+
+FunType funtype():
+{
+    Type dom,codom;
+    Collection in;
+}
+{
+    "fun" dom=type() "->" codom=type()
+    { in=new ArrayList();
+      in.add(dom);
+      return new FunType(in,codom);
+    }
+}
+
+Collection types():
+{
+  Collection res=new ArrayList();
+  Type t;
+}
+{
+  t=type() { res.add(t); }
+  ( "," t=type() { res.add(t); } )*
+  { return res; }
+}
+
+Type type():
+{
+    LocatedString s;
+    Type ft;
+    Collection p=null;
+}
+{
+    LOOKAHEAD(2) ft=funtype() { return ft; }
+  | (
+     s=string() 
+     ( "<" p=types() ">" )?
+     { if(p==null) p=new ArrayList(0);
+       return new IdentType(s,p); }
+    )
+    
+}
+
+/***********************************************************************/
+/*                          Constraints                                */
+/***********************************************************************/
+
+Collection binders():
+{
+    Collection res=new ArrayList();
+    TypeSymbol t;
+}
+{
+    t=typeSymbol() { res.add(t); }
+    ( "," t=typeSymbol() { res.add(t); } )*
+    { return res; }
+}
+
+Constraint constraint():
+{
+    Constraint res;
+    Collection b;
+}
+{
+    (
+    ( "<" 
+      b=binders()
+      { res=new Constraint(b); }
+    ">" )
+    | { res=Constraint.emptyConstraint(); }
+    )
+    { return res; }
+}
+
+/***********************************************************************/
+/*                          Classes                                    */
+/***********************************************************************/
+
+void field(Type t, ClassDefinition c):
+{
+    Ident name;
+}
+{
+    name=identifier()
+    ";"
+    { c.addField(name,t); }
+}
+
+void methodDecl(Type returnType,ClassDefinition c):
+{
+    Ident name;
+    Collection parameters;
+    Constraint cst;
+    MethodDefinition def;
+}
+{
+    name=identifier()
+    cst=constraint()
+    "("
+    parameters=types()
+    ")"
+    ";"
+    { c.addMethod(new MethodDefinition(c,name,cst,returnType,parameters)); }
+}
+
+void implementations(ClassDefinition c):
+{
+    Ident name;
+}
+{
+    "implements"
+    name=identifier() { c.addImplementation(name); }
+    ( "," name=identifier() { c.addImplementation(name); } )*
+}
+
+void abstractions(ClassDefinition c):
+{
+    Ident name;
+}
+{
+    "abstracts"
+    name=identifier() { c.addAbstraction(name); }
+    ( "," name=identifier() { c.addAbstraction(name); } )*
+}
+
+ClassDefinition classDefinition():
+{
+    ClassDefinition res;
+    Ident name;
+    Collection parameters;
+    Type t;
+}
+{
+    "class"
+    name=identifier() 
+    parameters=typeSymbols() { res=new ClassDefinition(name,parameters); }
+    ( implementations(res) | abstractions(res) )*
+    "{"
+    ( 
+      t=type() /* type is common to both, and this reduces Lookahead */
+      (LOOKAHEAD(2) field(t,res) | LOOKAHEAD(2) methodDecl(t,res))
+    )*
+    "}"
+    { return res; }
+}
+
+InterfaceDefinition interfaceDefinition():
+{
+    Ident name;
+}
+{
+    "interface" name=identifier() ";"
+    { return new InterfaceDefinition(name); }
+}
+
+Collection typeParameters():
+{
+    Collection res=new ArrayList();
+    Type t;
+}
+{
+    ( "<" 
+      t=type() { res.add(t); }
+      ( "," t=type() { res.add(t); } )*
+    ">" )?
+    { return res; }
+}
+
+TypeSymbol typeSymbol():
+{
+  Ident name;
+}
+{
+  name=identifier()
+  { return new TypeSymbol(name); }
+}
+
+Collection typeSymbols():
+{
+    Collection res=new ArrayList();
+    TypeSymbol name;
+}
+{
+    ( "<" 
+      name=typeSymbol() { res.add(name); }
+      ( "," name=typeSymbol() { res.add(name); } )*
+    ">" )?
+    { return res; }
+}
+
+Pattern pattern(Ident name):
+{
+    Ident i;
+    Collection tp;
+}
+{
+    "@" i=identifier() tp=typeParameters() { return new Pattern(name,i,tp); }
+    | { return new Pattern(name); }
+}
+
+MethodBodyDefinition methodBodyDefinition():
+{
+    Ident name,i;
+    Pattern p;
+    Collection binders;
+    List parameters=new ArrayList();
+    Collection tp,code;
+}
+{
+    name=identifier()
+    tp=typeSymbols()
+    p=pattern(new Ident(new LocatedString("this",0,0,0,0))) 
+      { parameters.add(p); }
+    "("
+    ( 
+	i=identifier() p=pattern(i) { parameters.add(p); }
+	( "," i=identifier() p=pattern(i) { parameters.add(p); } )*
+    )?
+    ")"
+    "{"
+    code=statements()
+    "}"
+    { return new MethodBodyDefinition(name,tp,parameters,code); }
+}
+
+MethodDefinition methodDefinition():
+{
+    Ident name;
+    Type returnType;
+    Collection parameters;
+    Constraint cst;
+    MethodDefinition res;
+}
+{
+    returnType=type()
+    name=identifier()
+    cst=constraint()
+    "("
+    ( parameters=types() | { parameters=new ArrayList(); } )
+    ")"
+    ";"
+    { return new MethodDefinition(name,cst,returnType,parameters); }
+}
+
+Definition definition():
+{
+    Definition res;
+}
+{
+    (
+     res=classDefinition()
+     | res=interfaceDefinition()
+     | LOOKAHEAD(methodBodyDefinition()) res=methodBodyDefinition()
+     | res=methodDefinition()
+    )
+    { return res; }
+}
+
+Collection definitions():
+{
+    Collection defs=new ArrayList();
+    Definition d;
+}
+{
+    (d = definition() { defs.add(d); })*
+    <EOF> { return defs; }
+}
+
+/***********************************************************************/
+/*                          Expressions                                */
+/***********************************************************************/
+
+IntConstantExp intConstantExp():
+{
+  int i;
+}
+{
+  i=integer()
+  { return new IntConstantExp(i); }
+}
+
+FloatConstantExp floatConstantExp():
+{
+  double d;
+}
+{
+  d=floating()
+  { return new FloatConstantExp(d); }
+}
+
+ConstantExp constantExp():
+{
+  ConstantExp res;
+}
+{
+  (
+  res=intConstantExp() 
+| res=floatConstantExp()
+  )
+{ return res; }
+}
+
+IdentExp identExp():
+{
+  Ident i;
+}
+{
+  i=identifier()
+  { return new IdentExp(i); }
+}
+
+NewExp newExp():
+{
+  Type t;
+}
+{
+  "new" t=type() { return new NewExp(t); }
+}
+
+CallExp callExp(Expression prefix):
+{
+  Collection typeParameters=null,parameters;
+}
+{
+  ( "<" typeParameters=types() ">" )?
+  "("
+  parameters=expressions()
+  ")"
+  { return new CallExp(prefix,typeParameters,parameters); }
+}
+
+Expression computedExp(Expression prefix):
+{
+  Expression res=prefix;
+  Ident name;
+}
+{
+  (
+  "." name=identifier()
+  { res=new FieldExp(res,name); }
+| res=callExp(res)
+  )*
+  { return res; }
+}
+
+Expression expression():
+{
+  Expression res;
+  IdentExp e;
+}
+{
+  (
+  res=constantExp()
+| res=newExp()
+| e=identExp() res=computedExp(e)
+  )
+  { return res; }
+}
+
+Collection expressions():
+{
+  Collection res=new ArrayList();
+  Expression e;
+}
+{
+  ( e=expression() { res.add(e); }
+    ( "," e=expression() { res.add(e); } )*
+  )?
+  { return res; }
+}
+
+/***********************************************************************/
+/*                          Statements                                 */
+/***********************************************************************/
+
+AffectationStmt affectation():
+{
+  Expression left;
+  Expression right;
+}
+{
+  left=expression()
+  "="
+  right=expression()
+  { return new AffectationStmt(left,right); }
+}
+
+LocalDeclarationStmt localDeclaration():
+{
+  Type t;
+  Ident id;
+  Expression e=null;
+}
+{
+  t=type()
+  id=identifier()
+  [ "=" e=expression() ]
+  { return new LocalDeclarationStmt(id,t,e); }
+}
+
+Statement statement():
+{
+  Statement res;
+  Expression e;
+}
+{
+  LOOKAHEAD([ "final" ] type() identifier())
+  res=localDeclaration() ";" {return res; }
+| LOOKAHEAD(expression() ";") e=expression() ";" { return new ExpressionStmt(e); }
+| LOOKAHEAD(expression() "=") res=affectation() ";" { return res; }
+| "return" e=expression() ";" { return new ReturnStmt(e); }
+}
+
+Collection statements():
+{
+  Collection res=new ArrayList();
+  Statement s;
+}
+{
+  ( s=statement() { res.add(s); } )*
+  { return res; }
+}

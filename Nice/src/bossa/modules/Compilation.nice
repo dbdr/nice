@@ -18,22 +18,6 @@ package bossa.modules;
 
 import mlsub.compilation;
 
-/**
- * Stores information about a bossa compilation.
- *
- * @author Daniel Bonniot
- */
-
-class Compilation extends mlsub.compilation.Compilation
-{
-  boolean recompileAll;
-  boolean recompileCommandLine;
-  boolean staticLink;
-
-  /** Set if at least one package is not up-to-date. */
-  boolean recompilationNeeded;
-}
-
 Compilation compilation(boolean, boolean, boolean, boolean);
 compilation(doLink, recompileCommandLine, recompileAll, staticLink)
 {
@@ -62,7 +46,7 @@ make(packageName@String,
 
   // forces reading nice.lang first
   if(!(packageName.equals("nice.lang")) && !bossa.util.Debug.ignorePrelude())
-    Package.make("nice.lang", res, recompileAll);
+    Package.make("nice.lang", res, false);
 
   Package root = Package.make(new bossa.syntax.LocatedString(packageName, new bossa.util.Location("Command line")), res, true);
   res.root = root;

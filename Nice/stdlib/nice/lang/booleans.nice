@@ -4,10 +4,6 @@ package nice.lang;
    Primitive booleans.
 */
 
-final class boolean 
-  implements BooleanAlgebra, Comparable
-= native;
-
 boolean `==`(boolean, boolean) = inline nice.lang.inline.BoolOp("==");
 //for booleans is '!=' equal to '^'
 boolean `!=`(boolean, boolean) = inline nice.lang.inline.BoolOp("^");

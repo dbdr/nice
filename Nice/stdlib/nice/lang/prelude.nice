@@ -54,6 +54,8 @@ final class Null<+T> extends Maybe<T> = native;
 
 final class void = native;
 
+final class boolean implements BooleanAlgebra, Comparable = native;
+
 class Number implements Comparable = native java.lang.Number;
 class double extends Number = native;
 class float  extends double = native;

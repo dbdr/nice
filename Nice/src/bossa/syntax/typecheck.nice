@@ -210,6 +210,14 @@ typecheck(CallExp e)
 
   if (e.isCallTo("assert") && 1 <= e.arguments.size() <= 2)
     {
+      ?List<MonoSymbol> l = variablesNotNullIfTestSucceeds(e.arguments.getExp(0));
+      if (l != null)
+        l.foreach(MonoSymbol variable => {
+	  mlsub.typing.Monotype type = notNull(variable.type);
+	  mlsub.typing.Monotype sureType = makeSure(type);
+	  setVarType(variable, now: sureType, out: type);
+        });
+
       ?List<(MonoSymbol, mlsub.typing.Monotype)> instanceofIfSucceeds =
 	first_(instanceofInfo(e.arguments.getExp(0)));
 

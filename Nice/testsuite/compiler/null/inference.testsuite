@@ -389,3 +389,18 @@ if ( s != null)
       s = null;
     } while(x++ < 10);
   } 
+
+/// PASS
+  ?String s = foo();
+  assert s != null;
+  String x = s;
+  /// Toplevel
+  ?String foo() = "";
+
+/// FAIL
+  ?String s = foo();
+  assert s != null;
+  s = null;
+  String  /*/// FAIL HERE*/ x = s;
+  /// Toplevel
+  ?String foo() = "";

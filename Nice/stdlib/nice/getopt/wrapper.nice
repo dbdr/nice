@@ -40,3 +40,12 @@ option(shortName, longName, purpose, optionHint, actionNoParam, actionParam)
 
 boolean noShortName(Option);
 noShortName(o) = o.shortName.equals('?');
+
+/****************************************************************
+ * Wrappers for gnu.getopt
+ ****************************************************************/
+
+// Gives a more precise type, since no parameter or array element can be null.
+Getopt newGetopt(String programName, String[] argv, String optString,
+		 LongOpt[] longOptions) = 
+  native new Getopt(String, String[], String, LongOpt[]);

@@ -62,7 +62,7 @@ optSuffix(o@OptionalParamOption) = "::";
 
 parse(progName, args, options)
 {
-  Vector<LongOpt> longOptions = null;
+  Vector<LongOpt> longOptions = makeVector(options.size);
   String shortOptions = "";
 
   options.iter(fun(Option o)=>
@@ -80,9 +80,6 @@ parse(progName, args, options)
 
 	o.optval = l.getVal();
 
-	if(longOptions == null)
-	  longOptions = makeVector(options.size);
-	
 	longOptions.add(l);
       }
 
@@ -90,7 +87,7 @@ parse(progName, args, options)
         shortOptions = shortOptions + toString(o.shortName) + optSuffix(o);
     });
 
-  Getopt g = new Getopt(progName, args, shortOptions, longOptions.elements);
+  Getopt g = newGetopt(progName, args, shortOptions, longOptions.elements);
 
   // Parsing loop
   int c = g.getopt();
@@ -113,14 +110,14 @@ parse(progName, args, options)
 
 void doAction(Option, Getopt);
 doAction(o@NoParamOption,g) = action(o)();
-doAction(o@RequiredParamOption,g) = action(o)(g.getOptarg());
+doAction(o@RequiredParamOption,g) = action(o)(notNull(g.getOptarg()));
 doAction(o@OptionalParamOption,g)
 {
-  String arg = g.getOptarg();
+  ?String arg = g.getOptarg();
   if(arg == null)
     actionNoParam(o)();
   else
-    actionParam(o)(arg);
+    actionParam(o)(notNull(arg));
 }
 
 var int uniqId = 256;

@@ -1,0 +1,7 @@
+/// FAIL
+  /// Toplevel
+enum Modifier(int bit)
+{
+  PUBLIC(0),
+  /*/// FAIL HERE */ PRIVATE("")
+}

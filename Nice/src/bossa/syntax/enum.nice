@@ -184,6 +184,8 @@ EnumSymbol createEnumSymbol(EnumDefinition def, LocatedString enumName,
   for (int i = 0; i < fields.size(); i++)
     args.add(new Argument(value: argExps[i], name: fields[i].getName()));
 
-  return new EnumSymbol(name, syntacticType: type, definition: def, value: 
-	createNewExp(new TypeIdent(name: enumName), new Arguments(arguments: args)));
+  let value = createNewExp(new TypeIdent(name: enumName), new Arguments(arguments: args));
+  value.setLocation(name.location);
+
+  return new EnumSymbol(name, syntacticType: type, definition: def, value: value);
 }

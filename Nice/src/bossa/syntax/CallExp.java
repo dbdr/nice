@@ -12,7 +12,7 @@
 
 // File    : CallExp.java
 // Created : Mon Jul 05 16:27:27 1999 by bonniot
-//$Modified: Mon Nov 29 20:46:12 1999 by bonniot $
+//$Modified: Mon Dec 06 11:22:47 1999 by bonniot $
 
 package bossa.syntax;
 
@@ -77,8 +77,10 @@ public class CallExp extends Expression
 				     Expression fun,
 				     List /* of Expression */ parameters)
   {
+    List paramTypes = Expression.getType(parameters);
+    
     try{
-      return getType(fun,Expression.getType(parameters));
+      return getType(fun,paramTypes);
     }
     catch(BadSizeEx e){
       User.error(loc,e.expected+" parameters expected, "+
@@ -93,16 +95,18 @@ public class CallExp extends Expression
       if(fun.isFieldAccess())
 	{
 	  // There must be just one parameter in a field access
-	  User.error(loc,Util.map("",", ","",parameters)+
+	  User.error(loc,parameters.get(0)+
 		     " has no field "+fun);
 	}
       else
 	{  
-	  String end="not within the domain of the function \""+fun+"\"";
+	  String end="not within the domain of function \""+fun+"\"";
 	  if(parameters.size()>=2)
-	    User.error(loc,"The parameters "+
-			   Util.map("(",", ",")",parameters) +
-			   " are "+end);
+	    User.error(loc,"Parameters \n"+
+		       Util.map("(",", ",")",parameters) +
+		       "\n of types \n" +
+		       Util.map("(",",\n  ",")",paramTypes) +
+		       "\n are "+end);
 	  else
 	    User.error(loc,"The parameter \""+
 		       Util.map("",", ","",parameters) +

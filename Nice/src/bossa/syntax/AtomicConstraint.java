@@ -12,7 +12,7 @@
 
 // File    : AtomicConstraint.java
 // Created : Mon Jul 19 16:40:18 1999 by bonniot
-//$Modified: Mon Aug 30 17:45:18 1999 by bonniot $
+//$Modified: Mon Dec 06 11:36:41 1999 by bonniot $
 
 package bossa.syntax;
 
@@ -83,4 +83,23 @@ public abstract class AtomicConstraint extends Node
       ((AtomicConstraint) i.next()).assert();
   }
 
+  /****************************************************************
+   * Misc
+   ****************************************************************/
+
+  /**
+   * Returns a string that represents a constraint element
+   * another element was introduced in comparison of.
+   *
+   * For instance, in <Num N | ... >
+   * getParent(N) should be "Num".
+   * Used to reproduce a parsable form of the constraint.
+   *
+   * @param tc a constraint element
+   * @return the representation of its "parent", or <code>null</code>
+   */
+  String getParentFor(TypeConstructor tc)
+  {
+    return null;
+  }
 }

@@ -10,9 +10,9 @@
 /*                                                                        */
 /**************************************************************************/
 
-// File    : AssignStmt.java
+// File    : AssignExp.java
 // Created : Mon Jul 05 15:49:27 1999 by bonniot
-//$Modified: Sat Dec 04 14:17:36 1999 by bonniot $
+//$Modified: Mon Dec 06 18:11:44 1999 by bonniot $
 
 package bossa.syntax;
 
@@ -23,10 +23,10 @@ import bossa.typing.*;
 /**
  * Assignment.
  */
-public class AssignStmt extends Statement
+public class AssignExp extends Expression
 {
-  public AssignStmt(Expression to,
-		    Expression value)
+  public AssignExp(Expression to,
+		   Expression value)
   {
     this.to=expChild(to);
     this.value=expChild(value);
@@ -59,13 +59,30 @@ public class AssignStmt extends Statement
     }
   }
 
+  void computeType()
+  {
+    this.type = value.getType();
+  }
+  
   /****************************************************************
    * Code generation
    ****************************************************************/
 
-  public gnu.expr.Expression generateCode()
+  public gnu.expr.Expression compile()
   {
-    return to.compileAssign(value);
+    gnu.expr.Expression[] val = new gnu.expr.Expression[1];    
+    val[0] = value.compile();    
+    gnu.expr.LetExp let = new gnu.expr.LetExp(val);
+    gnu.expr.Declaration tmp = let.addDeclaration("tmp",val[0].getType());
+    tmp.setCanRead(true);    
+    gnu.expr.Expression tmpExp = new gnu.expr.ReferenceExp(tmp);
+
+    gnu.expr.Expression[] exps = new gnu.expr.Expression[2];
+    exps[0] = to.compileAssign(tmpExp);
+    exps[1] = tmpExp;
+    
+    let.setBody(new gnu.expr.BeginExp(exps));
+    return let;
   }
   
   /****************************************************************

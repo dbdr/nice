@@ -12,7 +12,7 @@
 
 // File    : TypeConstructorLeqCst.java
 // Created : Sat Jul 24 12:02:15 1999 by bonniot
-//$Modified: Wed Sep 08 12:44:14 1999 by bonniot $
+//$Modified: Mon Dec 06 11:36:18 1999 by bonniot $
 
 package bossa.syntax;
 
@@ -83,6 +83,14 @@ public class TypeConstructorLeqCst extends AtomicConstraint
   public String toString()
   {
     return t1+" <: "+t2;
+  }
+
+  String getParentFor(TypeConstructor tc)
+  {
+    if(this.t1==tc)
+      return t2.toString();
+    else
+      return null;
   }
 
   TypeConstructor t1,t2;

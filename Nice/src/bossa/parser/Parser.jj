@@ -12,7 +12,7 @@
 
 // File    : parser.jj
 // Created : Thu Jul 01 10:27:05 1999 by bonniot
-//$Modified: Sat Dec 04 17:05:58 1999 by bonniot $
+//$Modified: Mon Dec 06 15:02:50 1999 by bonniot $
 // Description : Parseur JavaCC pour Bossa
 //   Tokens based on the Jazz parser
 
@@ -539,13 +539,14 @@ AtomicConstraint atomicConstraint():
 }
 
 List atomics(List init):
+// if init is null, we just want lookahead
 {
   List res=init;
   AtomicConstraint k;
 }
 {
-  k=atomicConstraint() { res.add(k); }
-  ( "," k=atomicConstraint() { res.add(k); } ) *
+  k=atomicConstraint() { if(res!=null) res.add(k); }
+  ( "," k=atomicConstraint() { if(res!=null) res.add(k); } ) *
   { return res; }
 }
 
@@ -559,7 +560,7 @@ Constraint constraint():
   (
     ( "<" 
       ( 
-	LOOKAHEAD(2) atoms=atomics(atoms) 
+	LOOKAHEAD(atomics(null)) atoms=atomics(atoms) 
       | 
         b=binders(atoms) [ "|" atoms=atomics(atoms) ] 
       )
@@ -1034,24 +1035,22 @@ Expression ifExp():
 {
   Token iftoken;
   Expression condition;
-  Statement t,e=null;
+  Expression t,e=null;
 }
 {
   iftoken="if"
   "("
   condition=expression()
   ")"
-  t=statementInIf()
-  [ "else" e=statementInIf() "endif" ]
+  //t=statementInIf()
+  t=expression()
+  [ "else" 
+    //e=statementInIf() 
+    e=expression()
+    "endif" 
+  ]
   {
-    List params=new ArrayList(3);
-    params.add(condition);
-    params.add(lazyStmt(t));
-    // if e is 'null', this means 'void'
-    params.add(lazyStmt(e));
-    return new CallExp
-    (symb("_if",iftoken),
-     params);
+    return new IfExp(condition,t,e);
   }
 }
 
@@ -1161,40 +1160,44 @@ Expression expression():
   { first=getToken(1); }
   res=expression1() 
     [ (
-     t="==" e=expression() 
-     { res=CallExp.create(symb("equals",t),res,e); }
-    |
-     t="<=" e=expression()
-     { res=CallExp.create(symb("leq",t),res,e); }
-    |
-     t=">=" e=expression()
-     { res=CallExp.create(symb("leq",t),e,res); }
-    |
-     t="[" e=expression() "]"
-     { res=CallExp.create(symb("get",t),res,e); }
-    |
-     t="^" e=expression()
-     { res=CallExp.create(symb("pow",t),res,e); }
-    |
-     t="+" e=expression()
-     { res=CallExp.create(symb("add",t),res,e); }
-    |
-     t="-" e=expression()
-     { res=CallExp.create(symb("sub",t),res,e); }
-    |
-     t="*" e=expression()
-     { res=CallExp.create(symb("mul",t),res,e); }
-    |
-     t="/" e=expression()
-     { res=CallExp.create(symb("div",t),res,e); }
-    |
-     t="&&" e=expression()
-     { res=CallExp.create(symb("and",t),res,e); }
-    |
-     t="||" e=expression()
-     { res=CallExp.create(symb("or",t),res,e); }
-    )
-    { last=getToken(0);
+       t="=" e=expression()
+       { res=new AssignExp(res,e); }
+      |
+       t="==" e=expression() 
+       { res=CallExp.create(symb("equals",t),res,e); }
+      |
+       t="<=" e=expression()
+       { res=CallExp.create(symb("leq",t),res,e); }
+      |
+       t=">=" e=expression()
+       { res=CallExp.create(symb("geq",t),e,res); }
+      |
+       t="[" e=expression() "]"
+       { res=CallExp.create(symb("get",t),res,e); }
+      |
+       t="^" e=expression()
+       { res=CallExp.create(symb("pow",t),res,e); }
+      |
+       t="+" e=expression()
+       { res=CallExp.create(symb("add",t),res,e); }
+      |
+       t="-" e=expression()
+       { res=CallExp.create(symb("sub",t),res,e); }
+      |
+       t="*" e=expression()
+       { res=CallExp.create(symb("mul",t),res,e); }
+      |
+       t="/" e=expression()
+       { res=CallExp.create(symb("div",t),res,e); }
+      |
+       t="&&" e=expression()
+       { res=CallExp.create(symb("and",t),res,e); }
+      |
+       t="||" e=expression()
+       { res=CallExp.create(symb("or",t),res,e); }
+      )
+    { 
+      last=getToken(0);
       res.setLocation(new Location(first).englobe(new Location(last)));
     }
     ]
@@ -1217,15 +1220,15 @@ List expressions():
 /*                          Statements                                 */
 /***********************************************************************/
 
-AssignStmt affectation(Expression left):
-{
-  Expression right;
-}
-{
-  "="
-  right=expression()
-  { return new AssignStmt(left,right); }
-}
+//  AssignStmt assignment(Expression left):
+//  {
+//    Expression right;
+//  }
+//  {
+//    "="
+//    right=expression()
+//    { return new AssignStmt(left,right); }
+//  }
 
 Block.LocalDeclaration localDeclaration():
 {
@@ -1260,11 +1263,11 @@ Statement statementInIf():
   (
    // Common prefix
    e=expression()
-   (
-    res=affectation(e)
-   |
+   //(
+   // res=affectation(e)
+   //|
     { res=new ExpressionStmt(e); }
-   )
+   //)
   )
 )
   { last=getToken(0);
@@ -1318,11 +1321,11 @@ Object statement():
   (
    // Common prefix
    e=expression()
-   (
+   //(
     ";" { res=new ExpressionStmt(e); }
-   |
-    res=affectation(e) ";" 
-   )
+   //|
+   // res=affectation(e) ";" 
+   //)
   )
 )
   { last=getToken(0);

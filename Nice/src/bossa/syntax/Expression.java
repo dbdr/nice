@@ -12,7 +12,7 @@
 
 // File    : Expression.java
 // Created : Mon Jul 05 16:25:02 1999 by bonniot
-//$Modified: Mon Nov 29 20:45:13 1999 by bonniot $
+//$Modified: Mon Dec 06 17:39:06 1999 by bonniot $
 // Description : 
 
 package bossa.syntax;
@@ -185,7 +185,7 @@ public abstract class Expression extends Node
     return res;
   }
   
-  gnu.expr.Expression compileAssign(Expression value)
+  gnu.expr.Expression compileAssign(gnu.expr.Expression value)
   {
     Internal.error(this,this+" doesn't know how to be modified, it is a "+this.getClass());
     return null;

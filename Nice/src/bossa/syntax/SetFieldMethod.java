@@ -12,7 +12,7 @@
 
 // File    : SetFieldMethod.java
 // Created : Thu Jul 01 18:12:46 1999 by bonniot
-//$Modified: Tue Nov 30 15:22:47 1999 by bonniot $
+//$Modified: Mon Dec 06 17:41:24 1999 by bonniot $
 
 package bossa.syntax;
 
@@ -66,7 +66,7 @@ public class SetFieldMethod extends MethodDefinition
     return "$set_" + fieldName;
   }
   
-  gnu.expr.Expression compileAssign(List parameter, Expression value)
+  gnu.expr.Expression compileAssign(List parameter, gnu.expr.Expression value)
   {
     if(parameter.size()!=1)
       Internal.error(this,"Field access methods must have just one parameter");
@@ -75,7 +75,7 @@ public class SetFieldMethod extends MethodDefinition
     
     gnu.expr.Expression[] callParams = new gnu.expr.Expression[2];
     callParams[0]=param.compile();
-    callParams[1]=value.compile();
+    callParams[1]=value;
     
     return new gnu.expr.ApplyExp(new gnu.expr.QuoteExp(getDispatchMethod()),
 				 callParams);

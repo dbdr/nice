@@ -12,7 +12,7 @@
 
 // File    : FieldAccessMethod.java
 // Created : Thu Jul 01 18:12:46 1999 by bonniot
-//$Modified: Sat Dec 04 12:29:25 1999 by bonniot $
+//$Modified: Mon Dec 06 17:39:57 1999 by bonniot $
 
 package bossa.syntax;
 
@@ -82,7 +82,7 @@ public class FieldAccessMethod extends MethodDefinition
     return "$get_" + fieldName;
   }
   
-  gnu.expr.Expression compileAssign(List parameter, Expression value)
+  gnu.expr.Expression compileAssign(List parameter, gnu.expr.Expression value)
   {
     return setMethod.compileAssign(parameter,value);
   }

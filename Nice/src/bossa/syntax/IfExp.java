@@ -10,74 +10,50 @@
 /*                                                                        */
 /**************************************************************************/
 
-// File    : ImplementsCst.java
-// Created : Fri Aug 27 10:45:33 1999 by bonniot
-//$Modified: Mon Dec 06 11:36:27 1999 by bonniot $
+// File    : IfExp.java
+// Created : Mon Dec 06 12:01:51 1999 by bonniot
+//$Modified: Mon Dec 06 15:20:30 1999 by bonniot $
 
 package bossa.syntax;
 
 import bossa.util.*;
-import java.util.*;
 
 /**
- * A type constructor implements an interface.
+ * Conditional expression (and statement).
  * 
  * @author bonniot
  */
 
-public class ImplementsCst extends AtomicConstraint
+public class IfExp extends Expression
 {
-  public ImplementsCst(TypeConstructor tc, Interface itf)
+  public IfExp(Expression condition, Expression thenExp, Expression elseExp)
   {
-    this.tc=tc;
-    this.itf=itf;
-    this.itfDef=null;
-    addChild(itf);
+    if(elseExp==null)
+      // Then without else
+      elseExp = new VoidConstantExp();
+    
+    this.condition = expChild(condition);
+    this.thenExp = expChild(thenExp);
+    this.elseExp = expChild(elseExp);
   }
 
-  public ImplementsCst(TypeConstructor tc, InterfaceDefinition itfDef)
-  {
-    Internal.error(itfDef==null,"Null interface definition");
-    this.tc=tc;
-    this.itf=null;
-    this.itfDef=itfDef;
-    // We know the variance of tc
-    tc.setVariance(itfDef.variance);
-  }
+  /****************************************************************
+   * Typing
+   ****************************************************************/
 
-  InterfaceDefinition def()
+  void computeType()
   {
-    if(itfDef!=null)
-      return itfDef;
-    else
-      return itf.definition;
+    this.type = Polytype.union(thenExp.getType(),elseExp.getType());
   }
   
   /****************************************************************
-   * Scoping
+   * Code generation
    ****************************************************************/
 
-  AtomicConstraint resolve(TypeScope scope)
+  public gnu.expr.Expression compile()
   {
-    tc=tc.resolve(scope);
-    return this;
-  }
-
-  AtomicConstraint substitute(Map map)
-  {
-    return new ImplementsCst(tc.substitute(map),def());
-  }
-
-  /****************************************************************
-   * Typechecking
-   ****************************************************************/
-
-  /**
-   * Enter the constraint into the typing context.
-   */
-  void assert() throws bossa.typing.TypingEx
-  {
-    bossa.typing.Typing.assertImp(tc,def(),false);
+    condition.noOverloading();
+    return new gnu.expr.IfExp(condition.compile(),thenExp.compile(),elseExp.compile());
   }
   
   /****************************************************************
@@ -86,18 +62,16 @@ public class ImplementsCst extends AtomicConstraint
 
   public String toString()
   {
-    return tc+":"+def();
+    return 
+      "if(" +
+      condition +
+      ")\n" +
+      thenExp +
+      "\nelse\n" +
+      elseExp +
+      "endif"
+      ;
   }
 
-  String getParentFor(TypeConstructor tc)
-  {
-    if(this.tc==tc)
-      return def().toString();
-    else
-      return null;
-  }
-
-  TypeConstructor tc;
-  Interface itf;
-  private InterfaceDefinition itfDef;
+  private Expression condition,thenExp, elseExp;
 }

@@ -12,7 +12,7 @@
 
 // File    : StaticFieldAccess.java
 // Created : Thu Jul 01 18:12:46 1999 by bonniot
-//$Modified: Sat Dec 04 17:09:31 1999 by bonniot $
+//$Modified: Mon Dec 06 15:50:09 1999 by bonniot $
 
 package bossa.syntax;
 
@@ -45,6 +45,8 @@ public class StaticFieldAccess extends MethodDefinition
   {
     super.createContext();
 
+    // We put this here, since we need 'module' to be computed
+    // since it is used to open the imported packages.
     this.field=getField(className,fieldName);
 
     if(field==null)
@@ -90,9 +92,9 @@ public class StaticFieldAccess extends MethodDefinition
   protected gnu.mapping.Procedure computeDispatchMethod()
   {
     return new kawa.lang.PrimGetStatic
-      (gnu.bytecode.ClassType.make(className.toString()),
+      ((ClassType) gnu.bytecode.Type.make(field.getDeclaringClass()),
        field.getName(),
-       ClassType.make(field.getType().getName()),field.getModifiers());
+       Type.make(field.getType()),field.getModifiers());
   }
   
   /****************************************************************

@@ -12,7 +12,7 @@
 
 // File    : Alternative.java
 // Created : Mon Nov 15 12:20:40 1999 by bonniot
-//$Modified: Fri Dec 03 18:43:31 1999 by bonniot $
+//$Modified: Mon Dec 06 17:40:24 1999 by bonniot $
 
 package bossa.link;
 
@@ -57,10 +57,14 @@ public class Alternative
     this.primProcedure = new PrimProcedure(m);
     
     int numCode = s.indexOf(Pattern.AT_encoding);
+    if(numCode==-1)
+      Internal.error("Method "+s+" in class "+c.getName()+
+		     " has not a valid name");
+
     int at = s.indexOf(Pattern.AT_encoding,numCode+1);
     if(at==-1)
-      Internal.error("Method "+s+" in class "+c+
-		     " has not a valid name");
+      // This is valid if this method has no parameter
+      at = s.length();
     
     methodName = c.getName()+"$"+s.substring(0,at);
     
@@ -156,7 +160,7 @@ public class Alternative
     gnu.expr.Expression result = QuoteExp.trueExp;
     
     for(int n=parameters.length-1;n>=0;n--)
-      result = new IfExp(matchTest((Domain) patterns.get(n),parameters[n]),
+      result = new gnu.expr.IfExp(matchTest((Domain) patterns.get(n),parameters[n]),
 			 result,
 			 QuoteExp.falseExp);
     

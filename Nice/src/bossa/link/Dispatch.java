@@ -12,7 +12,7 @@
 
 // File    : Dispatch.java
 // Created : Mon Nov 15 10:36:41 1999 by bonniot
-//$Modified: Fri Dec 03 18:22:06 1999 by bonniot $
+//$Modified: Mon Dec 06 17:40:43 1999 by bonniot $
 
 package bossa.link;
 
@@ -236,7 +236,7 @@ public class Dispatch
     while(types.hasNext())
       {
 	gnu.bytecode.ClassType type = (gnu.bytecode.ClassType) types.next();
-	res = new IfExp(Alternative.instanceOfExp(value,type),
+	res = new gnu.expr.IfExp(Alternative.instanceOfExp(value,type),
 			new ApplyExp(new QuoteExp(new kawa.lang.GetFieldProc(type,method.fieldName)),param),
 			res);
       }
@@ -259,7 +259,7 @@ public class Dispatch
     while(types.hasNext())
       {
 	gnu.bytecode.ClassType type = (gnu.bytecode.ClassType) types.next();
-	res = new IfExp(Alternative.instanceOfExp(value,type),
+	res = new gnu.expr.IfExp(Alternative.instanceOfExp(value,type),
 			new ApplyExp(new QuoteExp(new kawa.lang.SetFieldProc(type,method.fieldName)),params),
 			res);
       }
@@ -292,6 +292,6 @@ public class Dispatch
     if(optimize && !sortedAlternatives.hasNext())
       return matchCase;
     else
-      return new IfExp(matchTest,matchCase,dispatch(sortedAlternatives,voidReturn,block,params));
+      return new gnu.expr.IfExp(matchTest,matchCase,dispatch(sortedAlternatives,voidReturn,block,params));
   }
 }

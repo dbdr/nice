@@ -12,7 +12,7 @@
 
 // File    : ExpressionRef.java
 // Created : Tue Aug 17 16:04:40 1999 by bonniot
-//$Modified: Sat Dec 04 14:09:56 1999 by bonniot $
+//$Modified: Mon Dec 06 17:40:14 1999 by bonniot $
 
 package bossa.syntax;
 
@@ -56,7 +56,8 @@ final public class ExpressionRef extends Expression
   
   void typecheck()
   {
-    content.typecheck();
+    // call doTypecheck to call typecheck on the childs of content also
+    content.doTypecheck();
   }
   
   void computeType()
@@ -101,7 +102,7 @@ final public class ExpressionRef extends Expression
     return content.compile();
   }
 
-  gnu.expr.Expression compileAssign(Expression value)
+  gnu.expr.Expression compileAssign(gnu.expr.Expression value)
   {
     return content.compileAssign(value);
   }

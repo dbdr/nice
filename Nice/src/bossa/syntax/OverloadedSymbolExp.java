@@ -12,7 +12,7 @@
 
 // File    : OverloadedSymbolExp.java
 // Created : Thu Jul 08 12:20:59 1999 by bonniot
-//$Modified: Sat Dec 04 14:10:45 1999 by bonniot $
+//$Modified: Mon Dec 06 15:19:44 1999 by bonniot $
 
 package bossa.syntax;
 
@@ -192,8 +192,8 @@ public class OverloadedSymbolExp extends Expression
 
   public gnu.expr.Expression compile()
   {
-    Internal.error("compile in OverloadedSymbolExp");
-    throw new Error();
+    Internal.error("compile in "+getClass()+" "+this);
+    return null;
   }
   
   /****************************************************************

@@ -12,7 +12,7 @@
 
 // File    : ExpressionStmt.java
 // Created : Mon Jul 05 17:23:36 1999 by bonniot
-//$Modified: Sat Dec 04 12:09:18 1999 by bonniot $
+//$Modified: Mon Dec 06 15:39:48 1999 by bonniot $
 // Description : Compute an expression an forget the value
 
 package bossa.syntax;
@@ -36,7 +36,9 @@ public class ExpressionStmt extends Statement
   void typecheck()
   {
     exp = exp.noOverloading();
-
+    
+    exp.doTypecheck();
+    
     // To force the typechking of the expression,
     // if it is done while computing its type
     // and it has not yet been done

@@ -12,7 +12,7 @@
 
 // File    : Module.java
 // Created : Wed Oct 13 16:09:47 1999 by bonniot
-//$Modified: Sat Dec 04 11:57:40 1999 by bonniot $
+//$Modified: Mon Dec 06 15:44:15 1999 by bonniot $
 
 package bossa.modules;
 
@@ -273,7 +273,7 @@ public class Module
   }
   
   private List initStatements = new LinkedList();
-    
+  
   public void addClassInitStatement(gnu.expr.Expression exp)
   {
     initStatements.add(exp);

@@ -12,7 +12,7 @@
 
 // File    : Constraint.java
 // Created : Fri Jul 02 17:51:35 1999 by bonniot
-//$Modified: Thu Oct 28 15:29:29 1999 by bonniot $
+//$Modified: Mon Dec 06 12:15:06 1999 by bonniot $
 
 package bossa.syntax;
 
@@ -165,28 +165,32 @@ public class Constraint extends Node
 	boolean first=true;
 	
 	Constraint c=this.shallowClone();
+
 	for(Iterator i=c.binders.iterator();i.hasNext();)
 	  {
 	    TypeSymbol s=(TypeSymbol)i.next();
 	    if(!(s instanceof TypeConstructor))
 	      continue;
+
 	    TypeConstructor tc=(TypeConstructor)s;
 	    boolean ok=false;
+
 	    for(Iterator j=c.atomics.iterator();j.hasNext();)
 	      {
-		AtomicConstraint a=(AtomicConstraint)j.next();
-		if(a instanceof ImplementsCst
-		   && ((ImplementsCst)a).tc==tc)
+		AtomicConstraint atom=(AtomicConstraint)j.next();
+		
+		String parent = atom.getParentFor(tc);
+		if(parent!=null)
 		  {
 		    if(first)
 		      first=false;
 		    else
 		      res+=",";
-		    res+=((ImplementsCst)a).def()+" "+tc;
+		    res+=parent+" "+tc;
 		    j.remove();
 		    i.remove();
 		    ok=true;
-		    continue;
+		    break;
 		  }
 	      }
 	    Internal.error(!ok,tc,
@@ -204,6 +208,12 @@ public class Constraint extends Node
    * Internal manipulation
    ****************************************************************/
 
+  void addBinder(TypeSymbol s)
+  {
+    if(!binders.contains(s))
+      binders.add(s);
+  }
+  
   /**
    * Adds binders that are not already present
    *
@@ -213,12 +223,12 @@ public class Constraint extends Node
   {
     Iterator i=b.iterator();
     while(i.hasNext())
-      {
-	//TODO: optimize by removing the cast
-	TypeSymbol s=(TypeSymbol)i.next();
-	if(!binders.contains(s))
-	  binders.add(s);
-      }
+      addBinder((TypeSymbol) i.next());
+  }
+
+  void addAtom(AtomicConstraint atom)
+  {
+    atomics.add(atom);
   }
   
   public List /* of TypeSymbol */ binders;

@@ -12,7 +12,7 @@
 
 // File    : Polytype.java
 // Created : Tue Jul 13 12:51:38 1999 by bonniot
-//$Modified: Mon Nov 15 15:28:00 1999 by bonniot $
+//$Modified: Mon Dec 06 12:14:43 1999 by bonniot $
 
 package bossa.syntax;
 
@@ -54,6 +54,18 @@ public class Polytype extends Node
     m=m.resolve(typeScope);
     
     return new Polytype(m);
+  }
+  
+  static Polytype union(Polytype t1, Polytype t2)
+  {
+    MonotypeVar t = new MonotypeVar(true,new LocatedString("union_of_"+t1+"_"+t2,Location.nowhere()));
+    
+    Constraint c = Constraint.and(t1.constraint,t2.constraint);
+    c.addBinder(t);
+    c.addAtom(new MonotypeLeqCst(t,t1.monotype));
+    c.addAtom(new MonotypeLeqCst(t,t2.monotype));
+
+    return new Polytype(c,t);
   }
   
   static Collection fromMonotypes(Collection monotypes)

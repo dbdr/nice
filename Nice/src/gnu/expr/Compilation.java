@@ -1299,6 +1299,14 @@ public class Compilation
 
   public void compileClassInit(java.util.List initExps)
   {
+    // <clinit> is not mandatory in a class file
+    // it is only usefull if there is code to execute at class initialisation
+    if ((initExps == null || initExps.size() == 0)
+	&& clinitChain == null
+	&& literalsChain == null
+	)
+      return;
+    
     Method save_method = method;
     method = mainClass.addMethod ("<clinit>", apply0args, Type.void_type,
 				  Access.PUBLIC|Access.STATIC);

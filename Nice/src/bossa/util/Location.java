@@ -128,7 +128,8 @@ public class Location implements Located
   
   public Location englobe(Location loc)
   {
-    return new Location(startLine, startColumn, loc.endLine, loc.endColumn);
+    return new Location(fileName,
+			startLine, startColumn, loc.endLine, loc.endColumn);
   }
 
   public Location englobe(Collection /* of Located */ locs)

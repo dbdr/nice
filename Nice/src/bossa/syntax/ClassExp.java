@@ -34,6 +34,7 @@ public final class ClassExp extends Expression
 
   void computeType()
   {
+    throw User.error(this, "Expression expected");
   }
 
   protected gnu.expr.Expression compile()
@@ -74,7 +75,10 @@ public final class ClassExp extends Expression
 	if (type instanceof gnu.bytecode.ClassType)
 	  {
 	    Expression res = new ClassExp((gnu.bytecode.ClassType) type);
-	    res.setLocation(name.location());
+	    Location loc = name.location();
+	    if (root != null && root.location() != null)
+	      loc = root.location().englobe(loc);
+	    res.setLocation(loc);
 	    return res;
 	  }
       }

@@ -1,0 +1,2 @@
+/// FAIL
+Object o = /*/// FAIL HERE */ java.lang.Object();

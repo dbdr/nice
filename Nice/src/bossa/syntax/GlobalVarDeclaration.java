@@ -60,9 +60,10 @@ public class GlobalVarDeclaration extends Definition
     if(!module.generatingBytecode())
       // The code is already there
       {
-	declaration.field = module.getReadBytecode().getField(left.name.toString());
+	declaration.field = 
+	  module.getReadBytecode().getField(left.name.toString());
 	
-	if(declaration.field==null)
+	if (declaration.field == null)
 	  Internal.error(this,
 			 "The compiled file is not consistant with the interface file");
       }

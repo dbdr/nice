@@ -2223,6 +2223,7 @@ Expression patternLiteral() :
   }
 | res=intConstantExp() 
 | res=charConstantExp()
+| res=booleanConstantExp()
   )
 { return res; }
 }

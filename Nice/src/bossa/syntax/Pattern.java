@@ -62,29 +62,12 @@ public class Pattern implements Located
     this.exactlyAt = exactlyAt;
     this.location = location;
 
-    if(tc == null && atValue == null && name != null)
+    if (atValue != null && atValue instanceof ConstantExp &&
+	((ConstantExp)atValue).value instanceof Boolean	)
       {
-	String ident = name.toString();
-	if (ident.equals("true") || ident.equals("false"))
-	  {
-            this.atValue = new IdentExp(name);
-	    this.name = null;
-	    this.typeConstructor = 
-                     new TypeIdent(new LocatedString("boolean",location));
-          }
+        this.tc = PrimitiveType.boolTC;
       }
-    else if (tc != null) 
-      {
-	String ident = tc.getName().toString();
-	if (ident.equals("true") || ident.equals("false"))
-	  {
-	    this.atValue = new IdentExp(tc.getName());
-	    this.typeConstructor = 
-                     new TypeIdent(new LocatedString("boolean",location));
-          }
-      }
-
-    if (atValue != null && atValue instanceof ConstantExp)
+    else if (atValue != null && atValue instanceof ConstantExp)
       {
 	this.atIntValue = true;
 	String typeName = "";
@@ -500,7 +483,7 @@ public class Pattern implements Located
       atValue = NullExp.instance;
     else if (name.equals("true") || name.equals("false") ) 
       {
-	atValue = new IdentExp(new LocatedString(name, Location.nowhere()));
+	atValue = ConstantExp.makeBoolean(name.equals("true"), Location.nowhere());
 	tc = PrimitiveType.boolTC;
       }
     else
@@ -588,10 +571,10 @@ public class Pattern implements Located
     return atValue != null && tc == PrimitiveType.boolTC;
   }
   public boolean atTrue() { 
-    return atBool() && atValue.toString().equals("true");
+    return atBool() && ((ConstantExp)atValue).isTrue();
   }
   public boolean atFalse() { 
-    return atBool() && atValue.toString().equals("false");
+    return atBool() && ((ConstantExp)atValue).isFalse();
   }
 
 }

@@ -132,7 +132,7 @@ public class NiceUnit extends Task {
 			if (! nice.tools.unit.fun.runTests(pack, listener, classpath))
 				throw new BuildException("Package " + pack + " was not found");
 
-			dispatch.printSummary(listener);
+			listener.printSummary();
 		}
 		finally {
 			System.setProperty("user.dir", oldUserDir);

@@ -43,7 +43,7 @@ public class TypeMaper implements TypeMap
 
   public TypeSymbol lookup(String name, bossa.util.Location loc)
   {
-    TypeSymbol res = (TypeSymbol) nice.tools.ast.dispatch.get(inner, name);
+    TypeSymbol res = (TypeSymbol) inner.get(name);
     if (res != null)
       return res;
     else

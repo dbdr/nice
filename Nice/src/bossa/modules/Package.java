@@ -811,15 +811,37 @@ public class Package implements mlsub.compilation.Module, Located, bossa.syntax.
 	argTypes = def.javaArgTypes();
 	retType  = def.javaReturnType();
       }
+
+    // Try to compile the dispatch method as a member method if possible.
+    NiceClass receiver;
+    if (argTypes.length == 0)
+      receiver = null;
+    else
+      {
+        receiver = NiceClass.get(def.getArgTypes()[0]);
+
+        // JVM interfaces cannot contain code.
+        if (receiver != null && receiver.isInterface())
+          receiver = null;
+
+        // Special treatment for serialization at the moment.
+        if (def.getArity() == 2 && 
+            (name.equals("writeObject")||name.equals("readObject")))
+          receiver = null;
+      }
+
     res = nice.tools.code.Gen.createMethod
-      (name, argTypes, retType, def.getSymbols());
+      (name, argTypes, retType, def.getSymbols(), true, receiver != null);
     res.parameterCopies = def.formalParameters().getParameterCopies();
 
     // add unique information to disambiguate which method this represents
     res.addBytecodeAttribute
       (new MiscAttr("id", def.getFullName().getBytes()));
 
-    return addMethod(res, false);
+    if (receiver != null)
+      return receiver.addJavaMethod(res);
+    else
+      return addMethod(res, false);
   }
 
   /** Add a method to this package and return an expression to refer it. */

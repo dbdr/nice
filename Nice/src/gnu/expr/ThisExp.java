@@ -38,6 +38,7 @@ public class ThisExp extends ReferenceExp
       binding.load(comp);
     else
       comp.getCode().emitPushThis();
+    target.compileFromStack(comp, comp.getCode().topType());
   }
 
   protected Expression walk (ExpWalker walker)

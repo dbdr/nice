@@ -221,13 +221,8 @@ public abstract class MethodImplementation extends Definition
   {
     final int arity = formals.length;
     String name = this.name.toString();
-    boolean isPrivate;
 
-    if ((arity == 2) && (name.equals("writeObject") || name.equals("readObject")))
-      isPrivate = true;
-    else if ((arity == 1) && (name.equals("writeReplace") || name.equals("readResolve")))
-      isPrivate = false;
-    else 
+    if (arity != 2 || !(name.equals("writeObject")||name.equals("readObject")))
       return;
 
     ClassDefinition def = ClassDefinition.get(firstArgument());
@@ -246,8 +241,7 @@ public abstract class MethodImplementation extends Definition
 
     Gen.setMethodBody(method, new gnu.expr.ApplyExp(getRefExp(), params));
 
-    c.getClassExp().addMethod(method, isPrivate);
-
+    c.getClassExp().addMethod(method, true);
   }
 
   /****************************************************************

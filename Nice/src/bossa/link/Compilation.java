@@ -45,6 +45,8 @@ public final class Compilation
     int arity = m.getArity();
     Expression[] params = new Expression[arity];
     int rank = 0;
+    if (lexp.isClassMethod())
+      params[rank++] = new ThisExp(lexp.outerClass());
     for(Declaration param = lexp.firstDecl(); rank < arity; 
 	param = param.nextDecl())
       params[rank++] = new ReferenceExp(param);

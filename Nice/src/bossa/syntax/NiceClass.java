@@ -81,6 +81,11 @@ public class NiceClass extends ClassDefinition.ClassImplementation
 
   ClassDefinition definition;
 
+  public boolean isInterface()
+  {
+    return definition instanceof ClassDefinition.Interface;
+  }
+
   private static NewField[] noFields = new NewField[0];
   private static OverridenField[] noOverrides = new OverridenField[0];
   
@@ -91,6 +96,14 @@ public class NiceClass extends ClassDefinition.ClassImplementation
       return ((NiceClass) res.implementation);
     else
       return null;
+  }
+
+  public static NiceClass get(mlsub.typing.Monotype type)
+  {
+    if (! nice.tools.typing.Types.isSure(type))
+      return null;
+
+    return get(nice.tools.typing.Types.constructor(type));
   }
 
   NiceClass getParent()
@@ -119,7 +132,7 @@ public class NiceClass extends ClassDefinition.ClassImplementation
     (MonoSymbol sym, Expression value, 
      boolean isFinal, boolean isTransient, boolean isVolatile, String docString)
   {
-    if (definition instanceof ClassDefinition.Interface)
+    if (isInterface())
       User.error(sym, "An interface cannot have a field.");
 
     return new NewField(sym, value, isFinal, isTransient, isVolatile, docString);
@@ -127,7 +140,7 @@ public class NiceClass extends ClassDefinition.ClassImplementation
 
   public Field makeOverride (MonoSymbol sym, Expression value)
   {
-    if (definition instanceof ClassDefinition.Interface)
+    if (isInterface())
       User.error(sym, "An interface cannot have a field.");
 
     return new OverridenField(sym, value);
@@ -808,7 +821,7 @@ public class NiceClass extends ClassDefinition.ClassImplementation
       // The constructors are loaded from the compiled package.
       return;
 
-    if (definition instanceof ClassDefinition.Interface)
+    if (isInterface())
       return;
 
     List constraints;

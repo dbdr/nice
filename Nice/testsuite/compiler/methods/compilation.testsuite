@@ -1,0 +1,10 @@
+/// PASS
+  // Test that the method is compiled inside the class
+  let m = A.class.getDeclaredMethod("foo", []);
+  assert m.invoke(new A(), null).equals("ABC");
+
+  /// Toplevel
+class A
+{
+  String foo() = "ABC";
+}

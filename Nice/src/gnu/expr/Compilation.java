@@ -986,18 +986,21 @@ public class Compilation
 	for (int j = numApplyMethods;  --j >= 0; )
 	  {
 	    LambdaExp source = (LambdaExp) lexp.applyMethods.elementAt(j);
+            int min_args = source.min_args;
+            if (source.isClassMethod())
+              min_args++;
 	    // Select the subset of source.primMethods[*] that are suitable
 	    // for the current apply method.
 	    Method[] primMethods = source.primMethods;
 	    int numMethods = primMethods.length;
 	    boolean varArgs = source.max_args < 0
 	      || Compilation.usingTailCalls
-	      || source.max_args >= source.min_args + numMethods;
+	      || source.max_args >= min_args + numMethods;
 	    int methodIndex;
 	    boolean skipThisProc = false;
 	    if (i < 5) // Handling apply0 .. apply4
 	      {
-		methodIndex = i - source.min_args;
+		methodIndex = i - min_args;
 		if (methodIndex < 0 || methodIndex >= numMethods
 		    || (methodIndex == numMethods - 1 && varArgs))
 		  skipThisProc = true;
@@ -1006,7 +1009,7 @@ public class Compilation
 	      }
 	    else // Handling applyN
 	      {
-		methodIndex = 5 - source.min_args;
+		methodIndex = 5 - min_args;
 		if (methodIndex > 0 && numMethods <= methodIndex && ! varArgs)
 		  skipThisProc = true;
 		methodIndex = numMethods-1;
@@ -1065,26 +1068,34 @@ public class Compilation
 		counter = code.addLocal(Type.int_type);
 		code.emitLoad(code.getArg(2));
 		code.emitArrayLength();
-		if (source.min_args != 0)
+		if (min_args != 0)
 		  {
-		    code.emitPushInt(source.min_args);
+		    code.emitPushInt(min_args);
 		    code.emitSub(Type.int_type);
 		  }
 		code.emitStore(counter);
 	      }
 
-	    int needsThis = primMethod.getStaticFlag() ? 0 : 1;
-	    if (needsThis > 0)
+	    int argumentStart = 2;
+
+            if (source.getImportsLexVars())
 	      code.emitPushThis();
+
+	    if (source.isClassMethod())
+              {
+                code.emitLoad(code.getArg(argumentStart++));
+                Type ptype = primMethod.getDeclaringClass();
+                ptype.emitCoerceFromObject(code);
+              }
 
 	    Declaration var = source.firstDecl();
 	    for (int k = 0; k < singleArgs;  k++)
 	      {
-		if (counter != null && k >= source.min_args)
+		if (counter != null && k >= min_args)
 		  {
 		    code.emitLoad(counter);
 		    code.emitIfIntLEqZero();
-		    code.emitInvoke(primMethods[k - source.min_args]);
+		    code.emitInvoke(primMethods[k - min_args]);
 		    code.emitElse();
 		    pendingIfEnds++;
 		    code.emitInc(counter, (short) (-1));
@@ -1098,7 +1109,7 @@ public class Compilation
 		    code.emitArrayLoad(Type.pointer_type);
 		  }
 		else // apply'i method
-		  code.emitLoad(code.getArg(k + 2));
+		  code.emitLoad(code.getArg(k + argumentStart));
 		Type ptype = var.getType();
 		if (ptype != Type.pointer_type)
 		  CheckedTarget.emitCheckedCoerce(this, source,

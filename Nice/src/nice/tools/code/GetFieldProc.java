@@ -33,13 +33,18 @@ public class GetFieldProc extends Procedure1 implements Inlineable
 
   public void compile (ApplyExp exp, Compilation comp, Target target)
   {
-    ClassType ctype = field.getDeclaringClass();
-    Class refClass = ctype.getReflectClass();
-
-    exp.getArgs()[0].compile(comp, ctype);
+    boolean isStatic = field.getStaticFlag();
     CodeAttr code = comp.getCode();
-    code.emitGetField(field);
-    
+
+    if (!isStatic)
+      {
+	ClassType ctype = field.getDeclaringClass();
+	exp.getArgs()[0].compile(comp, ctype);
+	code.emitGetField(field);
+      }
+    else
+      code.emitGetStatic(field);
+
     target.compileFromStack(comp, field.getType());
   }
 

@@ -28,6 +28,11 @@ import gnu.mapping.*;
 
 public final class Inline
 {
+  public static Expression inline(Procedure1 proc)
+  {
+    return new ApplyExp(proc, Expression.noExpressions);
+  }
+
   public static Expression inline(Procedure1 proc, Expression arg1)
   {
     return new ApplyExp(proc, new Expression[]{ arg1 });

@@ -146,7 +146,7 @@ public class JavaFieldAccess extends FieldAccess
 
   public void printInterface(java.io.PrintWriter s)
   {
-    s.print(interfaceString());
+    s.print(interfaceString() + "\n");
   }
   
   private String interfaceString()
@@ -160,7 +160,7 @@ public class JavaFieldAccess extends FieldAccess
       + Util.map("",", ","",getType().domain())
       + ") = native "
       + className + "." + (field==null ? fieldName : field.getName())
-      + ";\n"
+      + ";"
       ;
   }
 

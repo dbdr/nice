@@ -51,9 +51,36 @@ public class LiteralArrayProc extends gnu.mapping.ProcedureN
     code.emitPushInt(nbElements);
     code.emitNewArray(arrayType.getComponentType());
     
-    for (int i=0; i<nbElements; i++)
+    /*
+      Optimization:
+      We need to keep the reference to the array.
+
+      Instead of `dup'ing it before each use,
+      we `dup2' it every second iteration.
+
+      This is better than producing all the references in advance,
+      which would make the stack grow unboundedly.
+
+      This saves nbElements/2 bytecodes.
+    */
+
+    if (nbElements > 0)
+      code.emitDup();
+
+    for (int i = 0; i < nbElements; i++)
       {
-	code.emitDup();
+	if (i < nbElements - 2)
+	  {
+	    code.emitDup(2);
+
+	    code.emitPushInt(i);
+	    args[i].compile(comp, arrayType.elements);
+	    code.emitArrayStore(arrayType.elements);
+	    i++;
+	  }
+	else if (i == nbElements - 2)
+	  code.emitDup();
+
 	code.emitPushInt(i);
 	args[i].compile(comp, arrayType.elements);
 	code.emitArrayStore(arrayType.elements);

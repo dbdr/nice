@@ -80,8 +80,8 @@ implements Function
   private void buildParameterSymbols()
   {
     // the type must be found before
-    removeChild(symbol);
-    symbol.doResolve();
+    removeChild(getSymbol());
+    getSymbol().doResolve();
 
     symbols = parameters.getMonoSymbols();
     mlsub.typing.Monotype[] paramTypes = getArgTypes();

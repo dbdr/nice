@@ -2837,12 +2837,12 @@ Statement TryStatement() :
   LocatedString i;
 }
 {
-  "try" body=Block()
+  "try" body=AlwaysBlock()
   { res = new TryStmt(body); }
   ( "catch" "(" tc=typeConstructorIdent() i=ident() ")" b=Block()
   { res.addCatch(tc, i, b); }
   )*
-  [ "finally" b=Block() { res.setFinally(b); } ]
+  [ "finally" b=AlwaysBlock() { res.setFinally(b); } ]
   { return res; }
 }
 
@@ -2866,6 +2866,6 @@ Statement ShortAssertStatement() :
 Statement SynchronizedStatement() :
 { Expression object; Statement body; }
 {
-  "synchronized" "(" object=Expression() ")" body=Block()
+  "synchronized" "(" object=Expression() ")" body=AlwaysBlock()
   { return new SynchronizedStmt(object, body); }
 }

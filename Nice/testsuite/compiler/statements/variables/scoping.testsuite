@@ -19,3 +19,40 @@ new A(int x) {
   int /*/// FAIL HERE */ x = 2;
   this();
 }
+
+/// PASS
+  try {
+    int x = 1;
+  } catch(Error e) {
+    int x = 2;
+  } finally {
+    int x = 3;
+  }
+
+/// PASS
+  try {
+    int x = 1;
+  } catch(Error e) {
+  }
+  int x = 2;
+
+/// PASS
+  try {
+  } catch(Error e) {
+    int x = 1;
+  }
+  int x = 2;
+
+/// PASS
+  try {
+  } finally {
+    int x = 1;
+  }
+  int x = 2;
+
+/// PASS
+  String s = "";
+  synchronized(s) {
+    int x = 1;
+  }
+  int x = 2;

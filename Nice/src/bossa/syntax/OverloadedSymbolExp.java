@@ -359,11 +359,18 @@ public class OverloadedSymbolExp extends Expression
 	return "No method has name " + ident;
 
       case 1:
-	FunSymbol f = (FunSymbol) removed.get(0);
+	VarSymbol sym = (VarSymbol) removed.get(0);
 
-	// If f.parameters == null, f is a native method or constructor.
-	boolean isConstructor = f.parameters != null && "<init>".equals(f.getName().toString());
-	if (!isConstructor)
+	if (! (sym instanceof FunSymbol))
+	  return "Incorrect call to " + ident;
+
+	FunSymbol f = (FunSymbol) sym;
+
+	// If f.parameters == null, 
+	// f is a native method or a native constructor.
+	boolean isConstructor = f.parameters != null && 
+	  "<init>".equals(f.getName().toString());
+	if (! isConstructor)
 	  return "Method " + ident + " expects parameters (" + 
 	    f.describeParameters() + ")";
 
@@ -373,7 +380,7 @@ public class OverloadedSymbolExp extends Expression
 	  " has the following fields:\n" +
 	  f.parameters + "\n" +
 	  "Please provide values for the fields, at least for those with no default value.\nThe syntax is:\n  " + ident + "(field1: value1, ..., fieldN: valueN)";
-	  
+
       default:
 	return "No method with name " + ident + arguments.explainNoMatch();
       }

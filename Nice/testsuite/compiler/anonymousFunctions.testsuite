@@ -1,0 +1,12 @@
+/// FAIL
+  // Incorrect call of an anonymous function stored in a variable
+  boolean -> void f = boolean b => {};
+  f();
+
+/// FAIL
+  // Incorrect call of an anonymous function stored in a local parameter
+  /// Toplevel
+  void g(boolean -> void f)
+  {
+    f();
+  }

@@ -12,7 +12,7 @@
 
 // File    : TypeSymbolType.java
 // Created : Fri Jul 09 15:32:38 1999 by bonniot
-//$Modified: Tue Jul 13 13:22:04 1999 by bonniot $
+//$Modified: Thu Jul 22 10:25:48 1999 by bonniot $
 // Description : Type made of a symbol
 
 package bossa.syntax;
@@ -25,7 +25,10 @@ public class TypeSymbolType extends Monotype
   public TypeSymbolType(TypeSymbol s, Collection parameters)
   {
     this.symbol=s;
-    this.parameters=parameters;
+    if(parameters==null)
+      this.parameters=new ArrayList(0);
+    else
+      this.parameters=parameters;
   }
 
   Monotype cloneType()
@@ -42,6 +45,15 @@ public class TypeSymbolType extends Monotype
   VarScope memberScope()
   {
     return symbol.memberScope();
+  }
+
+  /****************************************************************
+   * Printing
+   ****************************************************************/
+
+  public Location location()
+  {
+    return symbol.location().englobe(parameters);
   }
 
   public String toString()

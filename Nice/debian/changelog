@@ -37,6 +37,13 @@ nice (0.9.0) unstable; urgency=low
       tuples.add(("abc", 1));
       tuples.foreach(((String name, int number)) =>
         println("name: "+name+" number: "+number) );
+  * Implemented simple enums. The above color example can be simplified to:
+      enum Color { red, blue, green }
+      String name(Color);
+      name(=red) = "red";
+      name(=blue) = "blue";
+      name(=green) = "green";
+    The compiler knows now that the method "name" is completely covered.
   * Bugfixes (Parsing of nested tuples, global constants of type char,
     Overloading resolving of methods implementation with additional tc's, ...)
   * Improved some error messages.

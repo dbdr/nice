@@ -12,7 +12,7 @@
 
 // File    : MonotypeVar.java
 // Created : Fri Jun 02 17:12:32 2000 by Daniel Bonniot
-//$Modified: Wed Aug 02 17:42:43 2000 by Daniel Bonniot $
+//$Modified: Fri Aug 04 16:53:10 2000 by Daniel Bonniot $
 
 package mlsub.typing;
 
@@ -115,8 +115,6 @@ public final class MonotypeVar extends Monotype
       {
 	// Do the apropriate cast
 	equivalent = value.freshMonotype();
-	if (equivalent != null)
-	  return;
 	
 	if (equivalent instanceof MonotypeConstructor)
 	  {

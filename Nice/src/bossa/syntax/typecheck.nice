@@ -97,22 +97,94 @@ typecheck(e@IdentExp)
   throw new Error("typecheck in IdentExp");
 }
 
+/**
+   Analyse a boolean test to check if it ensures that some
+   local variable is always null or alwyas non-null.
+
+    @return 
+      the local variable found, or null
+    and
+      true  if the variable if always null     when the test succeeds
+      false if the variable if always non-null when the test succeeds
+*/
+<?MonoSymbol, boolean> nullnessInfo(Expression test);
+nullnessInfo(test) = (null, false);
+nullnessInfo(test@CallExp)
+{
+  // pas bon: test.function est deja resolue. Voir b.s.analyse CallExp
+  boolean isAlwaysNull;
+  if (test.isCallTo("=="))
+    isAlwaysNull = true;
+  else if (test.isCallTo("!="))
+    isAlwaysNull = false;
+  else /// give up
+    return (null, false);
+
+  int varPosition;
+  if (isNullExp(notNull(notNull(test.arguments).getExp(0))))
+    varPosition = 1;
+  else if (isNullExp(notNull(notNull(test.arguments).getExp(1))))
+    varPosition = 0;
+  else /// give up
+    return (null, false);
+
+  return (localVariable(notNull(notNull(test.arguments).getExp(varPosition))), isAlwaysNull);
+}
+
 typecheck(e@IfExp)
 {
+  Expression condition = notNull(e.condition);
+
   try{
-    e.condition = checkAssignment(notNull(ConstantExp.boolPolytype), 
-				  notNull(e.condition));
+    condition = checkAssignment(notNull(ConstantExp.boolPolytype), condition);
+    e.condition = condition;
   }
   catch(TypingEx t){
-    if (notNullError(t, e, notNull(e.condition).toString()))
+    if (notNullError(t, e, condition.toString()))
       throw new bossa.util.UserError
       (e, 
        "The condition must be a boolean.\n" + 
-       e.condition + " has type " + notNull(e.condition).getType());
+       condition + " has type " + condition.getType());
   }
 
-  typecheck(e.thenExp);
-  typecheck(e.elseExp);
+  ?MonoSymbol variable;
+  boolean isAlwaysNull;
+  (variable, isAlwaysNull) = nullnessInfo(condition);
+
+  if (variable == null)
+    {
+      typecheck(e.thenExp);
+      typecheck(e.elseExp);
+      return;
+    }
+
+  MonoSymbol variable = notNull(variable);
+
+  if (! isAlwaysNull)
+    // variable is non-null in the 'then' part
+    {
+      mlsub.typing.Monotype type = notNull(variable.type);
+      variable.type = makeSure(type);
+      typecheck(e.thenExp);
+
+      variable.type = type;
+      typecheck(e.elseExp);
+
+      if (e.elseUnreachable)
+	variable.type = makeSure(type);
+    }
+  else
+    // variable is non-null in the 'else' part
+    {
+      mlsub.typing.Monotype type = variable.type;
+      typecheck(e.thenExp);
+
+      variable.type = makeSure(type);
+      typecheck(e.elseExp);
+
+      if (! e.thenUnreachable)
+	variable.type = type;
+    }
 }
 
 typecheck(e@IncrementExp)
@@ -328,5 +400,5 @@ void wrongReturnType(bossa.util.Located responsible,
 }
 
 // Local Variables:
-// nice-xprogram: "nicec --classpath=\"$HOME/Nice/stdlib:$HOME/Nice/classes\""
+// nice-xprogram: "nicec -d \"$HOME/Nice/classes\" --sourcepath=\"$HOME/Nice/src\" --classpath=\"$HOME/Nice/classes\""
 // End:

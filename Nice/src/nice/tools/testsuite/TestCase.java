@@ -332,11 +332,42 @@ public abstract class TestCase {
 	  compilation.sourcePath = tempDir;
 	  compilation.destinationDir = tempDir;
 	  compilation.runtimeFile = TestNice.getRuntime();
-	  nice.tools.compiler.fun.compile
-	    (compilation, packageName, null, null, false);
+
+		if (TestNice.getGcc() == null)
+			nice.tools.compiler.fun.compile
+				(compilation, packageName, null, null, false);
+		else
+			{
+				compilation.output = new File(tempDir, "testcase.jar").getPath();
+				nice.tools.compiler.fun.compile
+					(compilation, packageName,
+					 new File(tempDir, "testcase.exe").getPath(),
+					 TestNice.getGcc() + "/bin/gcj",
+					 false);
+			}
+
 	  return output.statusCode;
 	}
-	
+
+	public void runNative() throws TestSuiteException {
+		try {
+			String[] env = null;
+			if (TestNice.getGcc() != null)
+				env = new String[]{ "LD_LIBRARY_PATH=" + TestNice.getGcc() + "/lib" };
+
+			Process p = Runtime.getRuntime().exec(TestNice.getTempFolder() + "/testcase.exe", env);
+			CharArrayWriter out = new CharArrayWriter();
+			int exitValue = nice.tools.compiler.dispatch.waitFor(p, out);
+			// Print the output of the execution.
+			System.out.println(out.toString());
+			if (exitValue != 0)
+				throw new TestSuiteException("Exit code: " + exitValue);
+		}
+		catch(IOException e) {
+			throw new TestSuiteException(e.getMessage());
+		}
+	}
+
 	/**
 	 * Runs the main method of the testcase. Only if main method exists and
 	 * the package was compiled.
@@ -351,6 +382,14 @@ public abstract class TestCase {
 		System.setOut(out);
 		System.setErr(out);
 		try {
+
+			if (TestNice.getGcc() != null)
+				{
+					runNative();
+					return;
+				}
+
+
 			for(Iterator iter = _niceSourceFiles.iterator(); iter.hasNext();) {
 				NiceSourceFile sourceFile = (NiceSourceFile)iter.next();
 				if (sourceFile.hasMainMethod()

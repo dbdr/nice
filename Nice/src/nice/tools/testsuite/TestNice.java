@@ -131,8 +131,16 @@ public class TestNice {
 	 * 
 	 */
 	private static Output _output = new ConsoleOutput();
-	
-	
+
+
+	/**
+		 The <b>home</b> directory of gcc.
+		 If you want to use the system-wide version of gcc on a Unix machine,
+		 this should likely be set to "/usr".
+	*/
+	private static String _gcc = null;
+
+
 	/**
 	 * TODO
 	 * 
@@ -262,6 +270,8 @@ public class TestNice {
 			if(s.startsWith("-")) {
 				if ("-output".equalsIgnoreCase(s))
 					setOutput(args[i++]);
+				else if ("-gcc".equalsIgnoreCase(s))
+					setGcc(args[i++]);
 				else if ("-comment".equalsIgnoreCase(s))
 					_writeComments = true;
 				else if ("-runtime".equalsIgnoreCase(s))
@@ -278,7 +288,7 @@ public class TestNice {
 
 	/**
 	 * Sets the output of the test engine
-	 * 
+	 *
 	 * @param	output	TODO
 	 */
 	private static void setOutput(String output) {
@@ -286,7 +296,7 @@ public class TestNice {
 			_output = new ConsoleOutput();
 			return;
 		}
-		
+
 		output = output.toLowerCase();
 		if (output.endsWith(".html")  ||  output.endsWith(".htm"))
 			try {
@@ -296,6 +306,15 @@ public class TestNice {
 			}
 	}
 
+
+
+	private static void setGcc(String gcc) {
+		_gcc = gcc;
+
+		// When doing native compilation, we need a jarred runtime
+		if (_runtime == null)
+			_runtime = "share/java/nice.jar";
+	}
 
 
 
@@ -513,6 +532,12 @@ public class TestNice {
 	 */
 	static Output getOutput() {
 		return _output;
+	}
+
+
+
+	static String getGcc() {
+		return _gcc;
 	}
 
 

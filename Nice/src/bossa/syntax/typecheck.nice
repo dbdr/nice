@@ -586,6 +586,7 @@ typecheck(decl@Block.LocalVariable)
 typecheck(decl@Block.LocalConstant)
 {
   typecheck(decl.value);
+  decl.value = notNull(decl.value).noOverloading();
   mlsub.typing.Polytype type = notNull(decl.value).getType();
   notNull(decl.left).type = type;
 

@@ -1,0 +1,17 @@
+/// PASS
+  /// Toplevel
+class A {
+  ?String cache;
+
+  void get() {
+    let c = cache;
+  }
+}
+
+class B {
+  ?(String, int) cache;
+
+  void get() {
+    let c = cache;
+  }
+}

@@ -27,6 +27,7 @@ public interface Printable
   /** toString parameters  */
   static final int inConstraint = 0;
   static final int detailed = 1;
+  static final int parsable = 2;
   
   public String toString(int param);
 }

@@ -225,6 +225,12 @@ public abstract class MethodDeclaration extends Definition
     }
   }
 
+  /** Typechecking when the package has already been compiled. */
+  void typecheckCompiled()
+  {
+    // Nothing by default
+  }
+
   /****************************************************************
    * Module interface
    ****************************************************************/

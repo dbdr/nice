@@ -27,27 +27,34 @@ public class Contract
   public void addRequire(Expression condition)
   {
     pre.add(CallExp.create(symbol(assertName, condition), condition));
+    requireRepr.append(condition).append(',');
   }
 
   public void addRequire(Expression condition, Expression name)
   {
     pre.add(CallExp.create(symbol(assertName, condition), condition, name));
+    requireRepr.append(condition).append(':').append(name).append(',');
   }
 
   public void addEnsure(Expression condition)
   {
     post.add(CallExp.create(symbol(assertName, condition), condition));
+    ensureRepr.append(condition);
   }
 
   public void addEnsure(Expression condition, Expression name)
   {
     post.add(CallExp.create(symbol(assertName, condition), condition, name));
+    ensureRepr.append(condition).append(':').append(name).append(',');
   }
 
   private static final String assertName = "alwaysAssert";
 
   private List pre  = new LinkedList();
   private List post = new LinkedList();
+
+  private StringBuffer requireRepr = new StringBuffer("requires ");
+  private StringBuffer ensureRepr = new StringBuffer("ensures ");
 
   private Expression symbol(String name, Located loc)
   {
@@ -114,6 +121,16 @@ public class Contract
 				      body);
   }
 
+  public String toString()
+  {
+    StringBuffer res = new StringBuffer();
+    if (preExp.length > 0)
+      res.append(requireRepr.toString());
+    if (postExp.length > 0)
+      res.append(ensureRepr.toString());
+    return res.toString();
+  }
+
   public static final Contract noContract = new Contract() {
       void resolve(VarScope scope, TypeScope typeScope) {}
       void typecheck() {}
@@ -122,5 +139,7 @@ public class Contract
       {
 	return body;
       }
+
+      public String toString() { return ""; }
     };
 }

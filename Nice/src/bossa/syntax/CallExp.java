@@ -366,7 +366,7 @@ public class CallExp extends Expression
   public String toString()
   {
     if (!infix)
-      return function.toString() + arguments;
+      return function.toString(Printable.parsable) + arguments;
 
     if (declaringClass == null)
       return arguments.getExp(0) + "." + function + arguments.toStringInfix();

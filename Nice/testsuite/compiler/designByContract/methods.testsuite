@@ -67,3 +67,19 @@ f() {}
   int f() ensures (/*/// FAIL HERE */(result = 0) == 0);
  
   f() = 1;
+
+/// PASS
+  /// package a
+  /// Toplevel
+  void foo(int x, int y) requires x > 0, y <= 0 {}
+  /// package b import a
+  var ok = false;
+  try {
+    foo(-1, 0);
+  } catch(AssertionFailed e) { ok = true; }
+  assert ok;
+  ok = false;
+  try {
+    foo(0, 1);
+  } catch(AssertionFailed e) { ok = true; }
+  assert ok;

@@ -62,6 +62,14 @@ public class IdentExp extends Expression
     return ident.toString();
   }
 
+  public String toString(int param)
+  {
+    if (param == Printable.parsable)
+      return "`" + ident.toString() + "`";
+    else
+      return super.toString(param);
+  }
+
   protected LocatedString ident;
   
   /** Resolve to a ClassExp or a PackageExp if ident is not known. */

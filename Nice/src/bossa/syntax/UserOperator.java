@@ -74,6 +74,11 @@ abstract class UserOperator extends MethodDeclaration
     contract.resolve(scope, typeScope, getReturnType(), location());
   }
 
+  public String toString()
+  {
+    return super.toString() + contract.toString();
+  }
+
   private MonoSymbol[] symbols;
 
   public MonoSymbol[] getSymbols() { return symbols; }
@@ -104,4 +109,14 @@ abstract class UserOperator extends MethodDeclaration
     Types.setBytecodeType(ft.codomain());
   }
 
+  void typecheckCompiled()
+  {
+    /* We only need typechecking if there is a contract, to resolve
+       overloading.
+       We will probably be able to remove this if contracts cen be reloaded
+       from bytecode.
+    */
+    if (contract != Contract.noContract)
+      typecheck();
+  }
 }

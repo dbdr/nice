@@ -163,7 +163,12 @@ public class AST extends Node
       classes[i].typecheckClass();
 
     if (! compiling)
-      return;
+      {
+        for (int i = 0; i < methods.length; i++)
+          methods[i].typecheckCompiled();
+
+        return;
+      }
 
     doTypecheck();
 

@@ -52,7 +52,7 @@ public class AbstractInterfaceImplementation extends Definition
 
     if (TypeConstructors.isInterface(classTC))
       {
-        if (!_interface) User.error(this, ""+classTC+" is not an class");
+        if (!_interface) User.error(this, ""+classTC+" is not a class");
       }
     else
       {
@@ -85,7 +85,7 @@ public class AbstractInterfaceImplementation extends Definition
   {
     if (_interface)
       w.print("interface ");
-    else 
+    else
       w.print("class ");
 
     w.print(classTC);

@@ -23,140 +23,140 @@ package nice.ui.common;
 
 
 NiceAncestorListener toNiceAncestorListener(EventListener);
-toNiceAncestorListener(this@NiceAncestorListener) = this;
+toNiceAncestorListener(NiceAncestorListener this) = this;
 toNiceAncestorListener(this)
 { 
   throw new NoNiceListenerException("" + this.getClass().getName() + "is no instance of NiceAncestorListener", listener: this);
 }
 
 NiceCaretListener toNiceCaretListener(EventListener);
-toNiceCaretListener(this@NiceCaretListener) = this;
+toNiceCaretListener(NiceCaretListener this) = this;
 toNiceCaretListener(this)
 { 
   throw new NoNiceListenerException("" + this.getClass().getName() + "is no instance of NiceCaretListener", listener: this);
 }
 
 NiceCellEditorListener toNiceCellEditorListener(EventListener);
-toNiceCellEditorListener(this@NiceCellEditorListener) = this;
+toNiceCellEditorListener(NiceCellEditorListener this) = this;
 toNiceCellEditorListener(this)
 { 
   throw new NoNiceListenerException("" + this.getClass().getName() + "is no instance of NiceCellEditorListener", listener: this);
 }
 
 NiceChangeListener toNiceChangeListener(EventListener);
-toNiceChangeListener(this@NiceChangeListener) = this;
+toNiceChangeListener(NiceChangeListener this) = this;
 toNiceChangeListener(this)
 { 
   throw new NoNiceListenerException("" + this.getClass().getName() + "is no instance of NiceChangeListener", listener: this);
 }
 
 NiceDocumentListener toNiceDocumentListener(EventListener);
-toNiceDocumentListener(this@NiceDocumentListener) = this;
+toNiceDocumentListener(NiceDocumentListener this) = this;
 toNiceDocumentListener(this)
 { 
   throw new NoNiceListenerException("" + this.getClass().getName() + "is no instance of NiceDocumentListener", listener: this);
 }
 
 NiceHyperlinkListener toNiceHyperlinkListener(EventListener);
-toNiceHyperlinkListener(this@NiceHyperlinkListener) = this;
+toNiceHyperlinkListener(NiceHyperlinkListener this) = this;
 toNiceHyperlinkListener(this)
 { 
   throw new NoNiceListenerException("" + this.getClass().getName() + "is no instance of NiceHyperlinkListener", listener: this);
 }
 
 NiceInternalFrameListener toNiceInternalFrameListener(EventListener);
-toNiceInternalFrameListener(this@NiceInternalFrameListener) = this;
+toNiceInternalFrameListener(NiceInternalFrameListener this) = this;
 toNiceInternalFrameListener(this)
 { 
   throw new NoNiceListenerException("" + this.getClass().getName() + "is no instance of NiceInternalFrameListener", listener: this);
 }
 
 NiceListDataListener toNiceListDataListener(EventListener);
-toNiceListDataListener(this@NiceListDataListener) = this;
+toNiceListDataListener(NiceListDataListener this) = this;
 toNiceListDataListener(this)
 { 
   throw new NoNiceListenerException("" + this.getClass().getName() + "is no instance of NiceListDataListener", listener: this);
 }
 
 NiceListSelectionListener toNiceListSelectionListener(EventListener);
-toNiceListSelectionListener(this@NiceListSelectionListener) = this;
+toNiceListSelectionListener(NiceListSelectionListener this) = this;
 toNiceListSelectionListener(this)
 { 
   throw new NoNiceListenerException("" + this.getClass().getName() + "is no instance of NiceListSelectionListener", listener: this);
 }
 
 NiceMenuDragMouseListener toNiceMenuDragMouseListener(EventListener);
-toNiceMenuDragMouseListener(this@NiceMenuDragMouseListener) = this;
+toNiceMenuDragMouseListener(NiceMenuDragMouseListener this) = this;
 toNiceMenuDragMouseListener(this)
 { 
   throw new NoNiceListenerException("" + this.getClass().getName() + "is no instance of NiceMenuDragMouseListener", listener: this);
 }
 
 NiceMenuKeyListener toNiceMenuKeyListener(EventListener);
-toNiceMenuKeyListener(this@NiceMenuKeyListener) = this;
+toNiceMenuKeyListener(NiceMenuKeyListener this) = this;
 toNiceMenuKeyListener(this)
 { 
   throw new NoNiceListenerException("" + this.getClass().getName() + "is no instance of NiceMenuKeyListener", listener: this);
 }
 
 NiceMenuListener toNiceMenuListener(EventListener);
-toNiceMenuListener(this@NiceMenuListener) = this;
+toNiceMenuListener(NiceMenuListener this) = this;
 toNiceMenuListener(this)
 { 
   throw new NoNiceListenerException("" + this.getClass().getName() + "is no instance of NiceMenuListener", listener: this);
 }
 
 NicePopupMenuListener toNicePopupMenuListener(EventListener);
-toNicePopupMenuListener(this@NicePopupMenuListener) = this;
+toNicePopupMenuListener(NicePopupMenuListener this) = this;
 toNicePopupMenuListener(this)
 { 
   throw new NoNiceListenerException("" + this.getClass().getName() + "is no instance of NicePopupMenuListener", listener: this);
 }
 
 NiceTableColumnModelListener toNiceTableColumnModelListener(EventListener);
-toNiceTableColumnModelListener(this@NiceTableColumnModelListener) = this;
+toNiceTableColumnModelListener(NiceTableColumnModelListener this) = this;
 toNiceTableColumnModelListener(this)
 { 
   throw new NoNiceListenerException("" + this.getClass().getName() + "is no instance of NiceTableColumnModelListener", listener: this);
 }
 
 NiceTableModelListener toNiceTableModelListener(EventListener);
-toNiceTableModelListener(this@NiceTableModelListener) = this;
+toNiceTableModelListener(NiceTableModelListener this) = this;
 toNiceTableModelListener(this)
 { 
   throw new NoNiceListenerException("" + this.getClass().getName() + "is no instance of NiceTableModelListener", listener: this);
 }
 
 NiceTreeExpansionListener toNiceTreeExpansionListener(EventListener);
-toNiceTreeExpansionListener(this@NiceTreeExpansionListener) = this;
+toNiceTreeExpansionListener(NiceTreeExpansionListener this) = this;
 toNiceTreeExpansionListener(this)
 { 
   throw new NoNiceListenerException("" + this.getClass().getName() + "is no instance of NiceTreeExpansionListener", listener: this);
 }
 
 NiceTreeWillExpandListener toNiceTreeWillExpandListener(EventListener);
-toNiceTreeWillExpandListener(this@NiceTreeWillExpandListener) = this;
+toNiceTreeWillExpandListener(NiceTreeWillExpandListener this) = this;
 toNiceTreeWillExpandListener(this)
 { 
   throw new NoNiceListenerException("" + this.getClass().getName() + "is no instance of NiceTreeWillExpandListener", listener: this);
 }
 
 NiceTreeModelListener toNiceTreeModelListener(EventListener);
-toNiceTreeModelListener(this@NiceTreeModelListener) = this;
+toNiceTreeModelListener(NiceTreeModelListener this) = this;
 toNiceTreeModelListener(this)
 { 
   throw new NoNiceListenerException("" + this.getClass().getName() + "is no instance of NiceTreeModelListener", listener: this);
 }
 
 NiceTreeSelectionListener toNiceTreeSelectionListener(EventListener);
-toNiceTreeSelectionListener(this@NiceTreeSelectionListener) = this;
+toNiceTreeSelectionListener(NiceTreeSelectionListener this) = this;
 toNiceTreeSelectionListener(this)
 { 
   throw new NoNiceListenerException("" + this.getClass().getName() + "is no instance of NiceTreeSelectionListener", listener: this);
 }
 
 NiceUndoableEditListener toNiceUndoableEditListener(EventListener);
-toNiceUndoableEditListener(this@NiceUndoableEditListener) = this;
+toNiceUndoableEditListener(NiceUndoableEditListener this) = this;
 toNiceUndoableEditListener(this)
 { 
   throw new NoNiceListenerException("" + this.getClass().getName() + "is no instance of NiceUndoableEditListener", listener: this);

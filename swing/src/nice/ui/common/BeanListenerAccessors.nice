@@ -40,25 +40,25 @@ getNiceVetoableChangeListeners(this)
 	return (result == null) ? null : result.toArray();
 }
 
-getNicePropertyChangeListeners(this,propertyName@String)
+getNicePropertyChangeListeners(this, String propertyName)
 {
 	?java.util.List<NicePropertyChangeListener> result = mappablePropertyChangeListeners.get((this.object(),propertyName));
 	return (result == null) ? null : result.toArray();
 }
 
-getNiceVetoableChangeListeners(this,propertyName@String)
+getNiceVetoableChangeListeners(this, String propertyName)
 {
 	?java.util.List<NiceVetoableChangeListener> result = mappableVetoableChangeListeners.get((this.object(),propertyName));
 	return (result == null) ? null : result.toArray();
 }
 
-//JDK1.4  getNiceExceptionListeners(this@Encoder)
+//JDK1.4  getNiceExceptionListeners(Encoder this)
 //JDK1.4  {
 //JDK1.4    EventListener[?] listeners = this.getExceptionListeners();
 //JDK1.4    return (listeners == null) ? null : fill(new NiceExceptionListener[listeners.length], int i => listeners[i].toNiceExceptionListener());
 //JDK1.4  }
 
-//JDK1.4  getNiceExceptionListeners(this@XMLDecoder)
+//JDK1.4  getNiceExceptionListeners(XMLDecoder this)
 //JDK1.4  {
 //JDK1.4    EventListener[?] listeners = this.getExceptionListeners();
 //JDK1.4    return (listeners == null) ? null : fill(new NiceExceptionListener[listeners.length], int i => listeners[i].toNiceExceptionListener());

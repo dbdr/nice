@@ -51,188 +51,188 @@ public <DropTargetListenerHandler H> NiceDropTargetListener[?] getNiceDropTarget
  * can only be requested from classes that are able to handle them
  */
 
-getNicePropertyChangeListeners(this@java.awt.Component)
+getNicePropertyChangeListeners(java.awt.Component this)
 {
   EventListener[?] listeners = this.getListeners(PropertyChangeListener.class);
   return (listeners == null) ? null : listeners.map(toNicePropertyChangeListener);
 }
 
-getNiceActionListeners(this@java.awt.Button)
+getNiceActionListeners(java.awt.Button this)
 {
   EventListener[?] listeners = this.getListeners(ActionListener.class);
   return (listeners == null) ? null : listeners.map(toNiceActionListener);
 }
 
-getNiceActionListeners(this@java.awt.List)
+getNiceActionListeners(java.awt.List this)
 {
   EventListener[?] listeners = this.getListeners(ActionListener.class);
   return (listeners == null) ? null : listeners.map(toNiceActionListener);
 }
 
-getNiceActionListeners(this@java.awt.MenuItem)
+getNiceActionListeners(java.awt.MenuItem this)
 {
   EventListener[?] listeners = this.getListeners(ActionListener.class);
   return (listeners == null) ? null : listeners.map(toNiceActionListener);
 }
 
-getNiceActionListeners(this@java.awt.TextField)
+getNiceActionListeners(java.awt.TextField this)
 {
   EventListener[?] listeners = this.getListeners(ActionListener.class);
   return (listeners == null) ? null : listeners.map(toNiceActionListener);
 }
 
-getNiceItemListeners(this@java.awt.Checkbox)
+getNiceItemListeners(java.awt.Checkbox this)
 {
   EventListener[?] listeners = this.getListeners(ItemListener.class);
   return (listeners == null) ? null : listeners.map(toNiceItemListener);
 }
 
-getNiceItemListeners(this@java.awt.CheckboxMenuItem)
+getNiceItemListeners(java.awt.CheckboxMenuItem this)
 {
   EventListener[?] listeners = this.getListeners(ItemListener.class);
   return (listeners == null) ? null : listeners.map(toNiceItemListener);
 }
 
-getNiceItemListeners(this@java.awt.Choice)
+getNiceItemListeners(java.awt.Choice this)
 {
   EventListener[?] listeners = this.getListeners(ItemListener.class);
   return (listeners == null) ? null : listeners.map(toNiceItemListener);
 }
 
-getNiceItemListeners(this@java.awt.List)
+getNiceItemListeners(java.awt.List this)
 {
   EventListener[?] listeners = this.getListeners(ItemListener.class);
   return (listeners == null) ? null : listeners.map(toNiceItemListener);
 }
 
-getNiceTextListeners(this@java.awt.TextComponent)
+getNiceTextListeners(java.awt.TextComponent this)
 {
   EventListener[?] listeners = this.getListeners(TextListener.class);
   return (listeners == null) ? null : listeners.map(toNiceTextListener);
 }
 
-getNiceAdjustmentListeners(this@java.awt.Scrollbar)
+getNiceAdjustmentListeners(java.awt.Scrollbar this)
 {
   EventListener[?] listeners = this.getListeners(AdjustmentListener.class);
   return (listeners == null) ? null : listeners.map(toNiceAdjustmentListener);
 }
 
-getNiceContainerListeners(this@java.awt.Container)
+getNiceContainerListeners(java.awt.Container this)
 {
   EventListener[?] listeners = this.getListeners(ContainerListener.class);
   return (listeners == null) ? null : listeners.map(toNiceContainerListener);
 }
 
-getNiceWindowListeners(this@java.awt.Window)
+getNiceWindowListeners(java.awt.Window this)
 {
   EventListener[?] listeners = this.getListeners(WindowListener.class);
   return (listeners == null) ? null : listeners.map(toNiceWindowListener);
 }
 
-getNiceComponentListeners(this@java.awt.Component)
+getNiceComponentListeners(java.awt.Component this)
 {
   EventListener[?] listeners = this.getListeners(ComponentListener.class);
   return (listeners == null) ? null : listeners.map(toNiceComponentListener);
 }
 
-getNiceFocusListeners(this@java.awt.Component)
+getNiceFocusListeners(java.awt.Component this)
 {
   EventListener[?] listeners = this.getListeners(FocusListener.class);
   return (listeners == null) ? null : listeners.map(toNiceFocusListener);
 }
 
-getNiceHierarchyBoundsListeners(this@java.awt.Component)
+getNiceHierarchyBoundsListeners(java.awt.Component this)
 {
   EventListener[?] listeners = this.getListeners(HierarchyBoundsListener.class);
   return (listeners == null) ? null : listeners.map(toNiceHierarchyBoundsListener);
 }
 
-getNiceHierarchyListeners(this@java.awt.Component)
+getNiceHierarchyListeners(java.awt.Component this)
 {
   EventListener[?] listeners = this.getListeners(HierarchyListener.class);
   return (listeners == null) ? null : listeners.map(toNiceHierarchyListener);
 }
 
-getNiceInputMethodListeners(this@java.awt.Component)
+getNiceInputMethodListeners(java.awt.Component this)
 {
   EventListener[?] listeners = this.getListeners(InputMethodListener.class);
   return (listeners == null) ? null : listeners.map(toNiceInputMethodListener);
 }
 
-getNiceKeyListeners(this@java.awt.Component)
+getNiceKeyListeners(java.awt.Component this)
 {
   EventListener[?] listeners = this.getListeners(KeyListener.class);
   return (listeners == null) ? null : listeners.map(toNiceKeyListener);
 }
 
-getNiceMouseListeners(this@java.awt.Component)
+getNiceMouseListeners(java.awt.Component this)
 {
   EventListener[?] listeners = this.getListeners(MouseListener.class);
   return (listeners == null) ? null : listeners.map(toNiceMouseListener);
 }
 
-getNiceMouseMotionListeners(this@java.awt.Component)
+getNiceMouseMotionListeners(java.awt.Component this)
 {
   EventListener[?] listeners = this.getListeners(MouseMotionListener.class);
   return (listeners == null) ? null : listeners.map(toNiceMouseMotionListener);
 }
 
 
-getNiceDragSourceListeners(this@java.awt.dnd.DragSourceContext)
+getNiceDragSourceListeners(java.awt.dnd.DragSourceContext this)
 {
 	?java.util.List<NiceDragSourceListener> result = dragSourceListeners.get(this.object());
 	return (result == null) ? null : result.toArray();
 }
 
-getNiceDropTargetListeners(this@java.awt.dnd.DropTarget)
+getNiceDropTargetListeners(java.awt.dnd.DropTarget this)
 {
 	?java.util.List<NiceDropTargetListener> result = dropTargetListeners.get(this.object());
 	return (result == null) ? null : result.toArray();
 }
 
-getNiceDragGestureListeners(this@java.awt.dnd.DragGestureRecognizer)
+getNiceDragGestureListeners(java.awt.dnd.DragGestureRecognizer this)
 {
 	?java.util.List<NiceDragGestureListener> result = dragGestureListeners.get(this.object());
 	return (result == null) ? null : result.toArray();
 }
 
-//JDK1.4  getNiceAdjustmentListeners(s@java.awt.ScrollPaneAdjustable)
+//JDK1.4  getNiceAdjustmentListeners(java.awt.ScrollPaneAdjustable s)
 //JDK1.4  {
 //JDK1.4    EventListener[?] listeners = this.getListeners(AdjustmentListener.class);
 //JDK1.4    return (listeners == null) ? null : fill(new NiceAdjustmentListener[listeners.length], int i => listeners[i].toNiceAdjustmentListener());
 //JDK1.4  }
 
-//JDK1.4  getNiceWindowFocusListeners(w@java.awt.Window)
+//JDK1.4  getNiceWindowFocusListeners(java.awt.Window w)
 //JDK1.4  {
 //JDK1.4    EventListener[?] listeners = this.getListeners(WindowFocusListener.class);
 //JDK1.4    return (listeners == null) ? null : fill(new NiceWindowFocusListener[listeners.length], int i => listeners[i].toNiceWindowFocusListener());
 //JDK1.4  }
 
-//JDK1.4  getNiceWindowStateListeners(w@java.awt.Window)
+//JDK1.4  getNiceWindowStateListeners(java.awt.Window w)
 //JDK1.4  {
 //JDK1.4    EventListener[?] listeners = this.getListeners(WindowStateListener.class);
 //JDK1.4    return (listeners == null) ? null : fill(new NiceWindowStateListener[listeners.length], int i => listeners[i].toNiceWindowStateListener());
 //JDK1.4  }
 
-//JDK1.4  getNiceMouseWheelListeners(c@java.awt.Component)
+//JDK1.4  getNiceMouseWheelListeners(java.awt.Component c)
 //JDK1.4  {
 //JDK1.4    EventListener[?] listeners = this.getListeners(MouseWheelListener.class);
 //JDK1.4    return (listeners == null) ? null : fill(new NiceMouseWheelListener[listeners.length], int i => listeners[i].toNiceMouseWheelListener());
 //JDK1.4  }
 
-//JDK1.4  getNiceDragSourceListeners(d@java.awt.dnd.DragSource)
+//JDK1.4  getNiceDragSourceListeners(java.awt.dnd.DragSource d)
 //JDK1.4  {
 //JDK1.4  	?java.util.List<NiceDragGestureListener> result = dragSourceListeners.get(this.object());
 //JDK1.4  	return (result == null) ? null : result.toArray();
 //JDK1.4  }
 
-//JDK1.4  getNiceDragSourceMotionListeners(d@java.awt.dnd.DragSource)
+//JDK1.4  getNiceDragSourceMotionListeners(java.awt.dnd.DragSource d)
 //JDK1.4  {
 //JDK1.4  	?java.util.List<NiceDragGestureListener> result = dragSourceMotionListeners.get(this.object());
 //JDK1.4  	return (result == null) ? null : result.toArray();
 //JDK1.4  }
 
-//JDK1.4  getNiceDragSourceListeners(this@java.awt.dnd.DragSource)
+//JDK1.4  getNiceDragSourceListeners(java.awt.dnd.DragSource this)
 //JDK1.4  {
 //JDK1.4  	?java.util.List<NiceDragSourceListener> result = dragSourceListeners.get(this.object());
 //JDK1.4  	return (result == null) ? null : result.toArray();

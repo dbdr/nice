@@ -30,50 +30,50 @@ public <MappableVetoableChangeListenerHandler H, PropertyChangeKey K> void remov
  * DEFINITION of methods to remove NiceListener from NiceListenerHandlers
  */
 
-removeNicePropertyChangeListener(this@PropertyEditorSupport,listener)
+removeNicePropertyChangeListener(PropertyEditorSupport this,listener)
 {
 	this.removePropertyChangeListener(listener);
 	//this.removeInAccessibleListener(listener,propertyChangeListeners);
 }
 
-removeNicePropertyChangeListener(this@PropertyChangeSupport,listener)
+removeNicePropertyChangeListener(PropertyChangeSupport this,listener)
 {
 	this.removePropertyChangeListener(listener);
 	//this.removeInAccessibleListener(listener,propertyChangeListeners);
 }
 
-removeNiceVetoableChangeListener(this@VetoableChangeSupport,listener)
+removeNiceVetoableChangeListener(VetoableChangeSupport this,listener)
 {
 	this.removeVetoableChangeListener(listener);
 	//this.removeInAccessibleListener(listener,vetoableChangeListeners);
 }
 
-removeNicePropertyChangeListener(this@PropertyChangeSupport,key@String,listener)
+removeNicePropertyChangeListener(PropertyChangeSupport this,String key,listener)
 {
 	this.removePropertyChangeListener(key,listener);
 	//this.removeMappableListener(key,listener,mappablePropertyChangeListeners);
 }
 
-removeNicePropertyChangeListener(this@BeanContextChildSupport,key@String,listener)
+removeNicePropertyChangeListener(BeanContextChildSupport this,String key,listener)
 {
 	this.removePropertyChangeListener(key,listener);
 	//this.removeMappableListener(key,listener,mappablePropertyChangeListeners);
 }
 
-removeNiceVetoableChangeListener(this@VetoableChangeSupport,key@String,listener)
+removeNiceVetoableChangeListener(VetoableChangeSupport this,String key,listener)
 {
 	this.removeVetoableChangeListener(key,listener);
 	//this.removeMappableListener(key,listener,mappableVetoableChangeListeners);
 }
 
-removeNiceVetoableChangeListener(this@BeanContextChildSupport,key@String,listener)
+removeNiceVetoableChangeListener(BeanContextChildSupport this,String key,listener)
 {
 	this.removeVetoableChangeListener(key,listener);
 	//this.removeMappableListener(key,listener,mappableVetoableChangeListeners);
 }
 
-//JDK1.4  removeNiceExceptionListener(this@XMLDecoder,listener) = this.setExceptionListener(listener);
-//JDK1.4  removeNiceExceptionListener(this@Encoder,listener) = this.setExceptionListener(listener);
+//JDK1.4  removeNiceExceptionListener(XMLDecoder this,listener) = this.setExceptionListener(listener);
+//JDK1.4  removeNiceExceptionListener(Encoder this,listener) = this.setExceptionListener(listener);
 
 
   

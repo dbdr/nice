@@ -42,75 +42,75 @@ public <DragGestureListenerHandler H> void removeNiceDragGestureListener(H,NiceD
 /**
  * DEFINITION of methods to remove nice.ui.awt.NiceListener from nice.ui.awt.NiceListenerHandler
  */
-removeNiceActionListener(this@java.awt.Button,listener) = this.removeActionListener(listener);
-removeNiceActionListener(this@java.awt.List,listener) = this.removeActionListener(listener);
-removeNiceActionListener(this@java.awt.MenuItem,listener) = this.removeActionListener(listener);
-removeNiceActionListener(this@java.awt.TextField,listener) = this.removeActionListener(listener);
-removeNiceItemListener(this@java.awt.Checkbox,listener) = this.removeItemListener(listener);
-removeNiceItemListener(this@java.awt.CheckboxMenuItem,listener) = this.removeItemListener(listener);
-removeNiceItemListener(this@java.awt.Choice,listener) = this.removeItemListener(listener);
-removeNiceItemListener(this@java.awt.List,listener) = this.removeItemListener(listener);
-removeNiceTextListener(this@java.awt.TextComponent,listener) = this.removeTextListener(listener);
-removeNiceAdjustmentListener(this@java.awt.Scrollbar,listener) = this.removeAdjustmentListener(listener);
-removeNiceContainerListener(this@java.awt.Container,listener) = this.removeContainerListener(listener);
-removeNiceWindowListener(this@java.awt.Window,listener) = this.removeWindowListener(listener);
-removeNiceComponentListener(this@java.awt.Component,listener) = this.removeComponentListener(listener);
-removeNiceFocusListener(this@java.awt.Component,listener) = this.removeFocusListener(listener);
-removeNiceHierarchyBoundsListener(this@java.awt.Component,listener) = this.removeHierarchyBoundsListener(listener);
-removeNiceHierarchyListener(this@java.awt.Component,listener) = this.removeHierarchyListener(listener);
-removeNiceInputMethodListener(this@java.awt.Component,listener) = this.removeInputMethodListener(listener);
-removeNiceKeyListener(this@java.awt.Component,listener) = this.removeKeyListener(listener);
-removeNiceMouseListener(this@java.awt.Component,listener) = this.removeMouseListener(listener);
-removeNiceMouseMotionListener(this@java.awt.Component,listener) = this.removeMouseMotionListener(listener);
-removeNicePropertyChangeListener(this@java.awt.Component,listener) = this.removePropertyChangeListener(listener);
+removeNiceActionListener(java.awt.Button this,listener) = this.removeActionListener(listener);
+removeNiceActionListener(java.awt.List this,listener) = this.removeActionListener(listener);
+removeNiceActionListener(java.awt.MenuItem this,listener) = this.removeActionListener(listener);
+removeNiceActionListener(java.awt.TextField this,listener) = this.removeActionListener(listener);
+removeNiceItemListener(java.awt.Checkbox this,listener) = this.removeItemListener(listener);
+removeNiceItemListener(java.awt.CheckboxMenuItem this,listener) = this.removeItemListener(listener);
+removeNiceItemListener(java.awt.Choice this,listener) = this.removeItemListener(listener);
+removeNiceItemListener(java.awt.List this,listener) = this.removeItemListener(listener);
+removeNiceTextListener(java.awt.TextComponent this,listener) = this.removeTextListener(listener);
+removeNiceAdjustmentListener(java.awt.Scrollbar this,listener) = this.removeAdjustmentListener(listener);
+removeNiceContainerListener(java.awt.Container this,listener) = this.removeContainerListener(listener);
+removeNiceWindowListener(java.awt.Window this,listener) = this.removeWindowListener(listener);
+removeNiceComponentListener(java.awt.Component this,listener) = this.removeComponentListener(listener);
+removeNiceFocusListener(java.awt.Component this,listener) = this.removeFocusListener(listener);
+removeNiceHierarchyBoundsListener(java.awt.Component this,listener) = this.removeHierarchyBoundsListener(listener);
+removeNiceHierarchyListener(java.awt.Component this,listener) = this.removeHierarchyListener(listener);
+removeNiceInputMethodListener(java.awt.Component this,listener) = this.removeInputMethodListener(listener);
+removeNiceKeyListener(java.awt.Component this,listener) = this.removeKeyListener(listener);
+removeNiceMouseListener(java.awt.Component this,listener) = this.removeMouseListener(listener);
+removeNiceMouseMotionListener(java.awt.Component this,listener) = this.removeMouseMotionListener(listener);
+removeNicePropertyChangeListener(java.awt.Component this,listener) = this.removePropertyChangeListener(listener);
 
-removeNicePropertyChangeListener(this@java.awt.Component,key@String,listener)
+removeNicePropertyChangeListener(java.awt.Component this, String key,listener)
 {
 	this.removePropertyChangeListener(key,listener);
 	//this.removeMappableListener(key,listener,mappablePropertyChangeListeners);
 }
 
-removeNiceDragSourceListener(this@java.awt.dnd.DragSourceContext,listener)
+removeNiceDragSourceListener(java.awt.dnd.DragSourceContext this,listener)
 {
 	this.removeDragSourceListener(listener);
 	//this.removeInAccessibleListener(listener,dragSourceListeners);
 }
 
-removeNiceDropTargetListener(this@java.awt.dnd.DropTarget,listener)
+removeNiceDropTargetListener(java.awt.dnd.DropTarget this,listener)
 {
 	this.removeDropTargetListener(listener);
 	//this.removeInAccessibleListener(listener,dropTargetListeners);
 }
 
-removeNiceDragGestureListener(this@java.awt.dnd.DragGestureRecognizer,listener)
+removeNiceDragGestureListener(java.awt.dnd.DragGestureRecognizer this,listener)
 {
 	this.removeDragGestureListener(listener);
 	//this.removeInAccessibleListener(listener,dragGestureListeners);
 }
 
-//JDK1.4  removeNicePropertyChangeListeners(this@java.awt.Toolkit,key@String,listener)
+//JDK1.4  removeNicePropertyChangeListeners(java.awt.Toolkit thisString ,key,listener)
 //JDK1.4  {
 //JDK1.4  	this.removePropertyChangeListener(key,listener);
 //JDK1.4  	this.removeMappableListener(key,listener,mappableropertyChangeListeners);
 //JDK1.4  }
 
-//JDK1.4  removeNiceAWTEventListeners(this@java.awt.Toolkit,key@long,listener)  
+//JDK1.4  removeNiceAWTEventListeners(java.awt.Toolkit thislong ,key,listener)  
 //JDK1.4  {
 //JDK1.4  	this.removeAWTEventListener(listener,key);
 //JDK1.4  	this.removeMappableListener(key,listener,mappablePropertyChangeListeners);
 //JDK1.4  }
 
-//JDK1.4  removeNiceDragSourceListener(this@java.awt.dnd.DragSource,listener)
+//JDK1.4  removeNiceDragSourceListener(java.awt.dnd.DragSource this,listener)
 //JDK1.4  {
 //JDK1.4  	this.removeDragSourceListener(listener);
 //JDK1.4  	this.removeInAccessibleListener(listener,dragSourceListeners);
 //JDK1.4  }
 
-//JDK1.4  removeNiceAdjustmentListener(this@java.awt.ScrollPaneAdjustable,listener) = this.removeAdjustmentListener(listener);
-//JDK1.4  removeNiceWindowFocusListener(this@java.awt.Window,listener) = this.removeWindowFocusListener(listener);
-//JDK1.4  removeNiceWindowStateListener(this@java.awt.Window,listener) = this.removeWindowStateListener(listener);
-//JDK1.4  removeNiceMouseWheelListener(this@java.awt.Component,listener) = this.removeMouseWheelListener(listener);
-//JDK1.4  removeNiceDragSourceMotionListener(this@java.awt.dnd.DragSource,listener) = this.removeDragSourceMotionListener(listener);
+//JDK1.4  removeNiceAdjustmentListener(java.awt.ScrollPaneAdjustable this,listener) = this.removeAdjustmentListener(listener);
+//JDK1.4  removeNiceWindowFocusListener(java.awt.Window this,listener) = this.removeWindowFocusListener(listener);
+//JDK1.4  removeNiceWindowStateListener(java.awt.Window this,listener) = this.removeWindowStateListener(listener);
+//JDK1.4  removeNiceMouseWheelListener(java.awt.Component this,listener) = this.removeMouseWheelListener(listener);
+//JDK1.4  removeNiceDragSourceMotionListener(java.awt.dnd.DragSource this,listener) = this.removeDragSourceMotionListener(listener);
 
 
 

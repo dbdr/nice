@@ -44,98 +44,98 @@ public <UndoableEditListenerHandler H> void addNiceUndoableEditListener(H,NiceUn
  * DEFINITION of methods to add nice.ui.awt.NiceListener to nice.ui.awt.NiceListenerHandler
  */
 
-addNiceActionListener(this@javax.swing.AbstractButton,listener) = this.addActionListener(listener);
-addNiceActionListener(this@javax.swing.JFileChooser,listener) = this.addActionListener(listener);
-addNiceActionListener(this@javax.swing.Timer,listener) = this.addActionListener(listener);
-addNiceActionListener(this@javax.swing.DefaultButtonModel,listener) = this.addActionListener(listener);
-addNiceActionListener(this@javax.swing.JComboBox,listener) = this.addActionListener(listener);
-addNiceActionListener(this@javax.swing.JTextField,listener) = this.addActionListener(listener);
-addNiceAdjustmentListener(this@javax.swing.JScrollBar,listener) = this.addAdjustmentListener(listener);
-addNiceItemListener(this@javax.swing.AbstractButton,listener) = this.addItemListener(listener);
-addNiceItemListener(this@javax.swing.DefaultButtonModel,listener) = this.addItemListener(listener);
-addNiceItemListener(this@javax.swing.JComboBox,listener) = this.addItemListener(listener);
-addNiceAncestorListener(this@javax.swing.JComponent,listener) = this.addAncestorListener(listener);
-addNiceCaretListener(this@javax.swing.text.JTextComponent,listener) = this.addCaretListener(listener);
-addNiceCellEditorListener(this@javax.swing.AbstractCellEditor,listener) = this.addCellEditorListener(listener);
-addNiceChangeListener(this@javax.swing.AbstractButton,listener) = this.addChangeListener(listener);
-addNiceChangeListener(this@javax.swing.JSlider,listener) = this.addChangeListener(listener);
-addNiceChangeListener(this@javax.swing.JProgressBar,listener) = this.addChangeListener(listener);
-addNiceChangeListener(this@javax.swing.DefaultSingleSelectionModel,listener) = this.addChangeListener(listener);
-addNiceChangeListener(this@javax.swing.DefaultBoundedRangeModel,listener) = this.addChangeListener(listener);
-addNiceChangeListener(this@javax.swing.DefaultButtonModel,listener) = this.addChangeListener(listener);
-addNiceChangeListener(this@javax.swing.text.DefaultCaret,listener) = this.addChangeListener(listener);
-addNiceChangeListener(this@javax.swing.JViewport,listener) = this.addChangeListener(listener);
-addNiceChangeListener(this@javax.swing.JTabbedPane,listener) = this.addChangeListener(listener);
-addNiceDocumentListener(this@javax.swing.text.AbstractDocument,listener) = this.addDocumentListener(listener);
-addNiceHyperlinkListener(this@javax.swing.JEditorPane,listener) = this.addHyperlinkListener(listener);
-addNiceInternalFrameListener(this@javax.swing.JInternalFrame,listener) = this.addInternalFrameListener(listener);
-addNiceListDataListener(this@javax.swing.AbstractListModel,listener) = this.addListDataListener(listener);
-addNiceListSelectionListener(this@javax.swing.JList,listener) = this.addListSelectionListener(listener);
-addNiceListSelectionListener(this@javax.swing.DefaultListSelectionModel,listener) = this.addListSelectionListener(listener);
-addNiceMenuDragMouseListener(this@javax.swing.JMenuItem,listener) = this.addMenuDragMouseListener(listener);
-addNiceMenuKeyListener(this@javax.swing.JMenuItem,listener) = this.addMenuKeyListener(listener);
-addNiceMenuListener(this@javax.swing.JMenu,listener) = this.addMenuListener(listener);
-addNicePopupMenuListener(this@javax.swing.JPopupMenu,listener) = this.addPopupMenuListener(listener);
-addNiceTreeExpansionListener(this@javax.swing.JTree,listener) = this.addTreeExpansionListener(listener);
-addNiceTreeWillExpandListener(this@javax.swing.JTree,listener) = this.addTreeWillExpandListener(listener);
-addNiceTreeModelListener(this@javax.swing.tree.DefaultTreeModel,listener) = this.addTreeModelListener(listener);
-addNiceTreeSelectionListener(this@javax.swing.JTree,listener) = this.addTreeSelectionListener(listener);
-addNiceTreeSelectionListener(this@javax.swing.tree.DefaultTreeSelectionModel,listener) = this.addTreeSelectionListener(listener);
+addNiceActionListener(javax.swing.AbstractButton this,listener) = this.addActionListener(listener);
+addNiceActionListener(javax.swing.JFileChooser this,listener) = this.addActionListener(listener);
+addNiceActionListener(javax.swing.Timer this,listener) = this.addActionListener(listener);
+addNiceActionListener(javax.swing.DefaultButtonModel this,listener) = this.addActionListener(listener);
+addNiceActionListener(javax.swing.JComboBox this,listener) = this.addActionListener(listener);
+addNiceActionListener(javax.swing.JTextField this,listener) = this.addActionListener(listener);
+addNiceAdjustmentListener(javax.swing.JScrollBar this,listener) = this.addAdjustmentListener(listener);
+addNiceItemListener(javax.swing.AbstractButton this,listener) = this.addItemListener(listener);
+addNiceItemListener(javax.swing.DefaultButtonModel this,listener) = this.addItemListener(listener);
+addNiceItemListener(javax.swing.JComboBox this,listener) = this.addItemListener(listener);
+addNiceAncestorListener(javax.swing.JComponent this,listener) = this.addAncestorListener(listener);
+addNiceCaretListener(javax.swing.text.JTextComponent this,listener) = this.addCaretListener(listener);
+addNiceCellEditorListener(javax.swing.AbstractCellEditor this,listener) = this.addCellEditorListener(listener);
+addNiceChangeListener(javax.swing.AbstractButton this,listener) = this.addChangeListener(listener);
+addNiceChangeListener(javax.swing.JSlider this,listener) = this.addChangeListener(listener);
+addNiceChangeListener(javax.swing.JProgressBar this,listener) = this.addChangeListener(listener);
+addNiceChangeListener(javax.swing.DefaultSingleSelectionModel this,listener) = this.addChangeListener(listener);
+addNiceChangeListener(javax.swing.DefaultBoundedRangeModel this,listener) = this.addChangeListener(listener);
+addNiceChangeListener(javax.swing.DefaultButtonModel this,listener) = this.addChangeListener(listener);
+addNiceChangeListener(javax.swing.text.DefaultCaret this,listener) = this.addChangeListener(listener);
+addNiceChangeListener(javax.swing.JViewport this,listener) = this.addChangeListener(listener);
+addNiceChangeListener(javax.swing.JTabbedPane this,listener) = this.addChangeListener(listener);
+addNiceDocumentListener(javax.swing.text.AbstractDocument this,listener) = this.addDocumentListener(listener);
+addNiceHyperlinkListener(javax.swing.JEditorPane this,listener) = this.addHyperlinkListener(listener);
+addNiceInternalFrameListener(javax.swing.JInternalFrame this,listener) = this.addInternalFrameListener(listener);
+addNiceListDataListener(javax.swing.AbstractListModel this,listener) = this.addListDataListener(listener);
+addNiceListSelectionListener(javax.swing.JList this,listener) = this.addListSelectionListener(listener);
+addNiceListSelectionListener(javax.swing.DefaultListSelectionModel this,listener) = this.addListSelectionListener(listener);
+addNiceMenuDragMouseListener(javax.swing.JMenuItem this,listener) = this.addMenuDragMouseListener(listener);
+addNiceMenuKeyListener(javax.swing.JMenuItem this,listener) = this.addMenuKeyListener(listener);
+addNiceMenuListener(javax.swing.JMenu this,listener) = this.addMenuListener(listener);
+addNicePopupMenuListener(javax.swing.JPopupMenu this,listener) = this.addPopupMenuListener(listener);
+addNiceTreeExpansionListener(javax.swing.JTree this,listener) = this.addTreeExpansionListener(listener);
+addNiceTreeWillExpandListener(javax.swing.JTree this,listener) = this.addTreeWillExpandListener(listener);
+addNiceTreeModelListener(javax.swing.tree.DefaultTreeModel this,listener) = this.addTreeModelListener(listener);
+addNiceTreeSelectionListener(javax.swing.JTree this,listener) = this.addTreeSelectionListener(listener);
+addNiceTreeSelectionListener(javax.swing.tree.DefaultTreeSelectionModel this,listener) = this.addTreeSelectionListener(listener);
 
-//JDK1.4  addNicePopupMenuListener(this@javax.swing.JComboBox,listener) = this.addPopupMenuListener(listener);
-//JDK1.4  addNiceChangeListener(this@javax.swing.AbstractSpinnerModel,listener) = this.addChangeListener(listener);
-//JDK1.4  addNiceChangeListener(this@javax.swing.JSpinner,listener) = this.addChangeListener(listener);
+//JDK1.4  addNicePopupMenuListener(javax.swing.JComboBox this,listener) = this.addPopupMenuListener(listener);
+//JDK1.4  addNiceChangeListener(javax.swing.AbstractSpinnerModel this,listener) = this.addChangeListener(listener);
+//JDK1.4  addNiceChangeListener(javax.swing.JSpinner this,listener) = this.addChangeListener(listener);
 
 
-addNiceVetoableChangeListener(this@javax.swing.JComponent,listener)
+addNiceVetoableChangeListener(javax.swing.JComponent this,listener)
 {
 	this.addVetoableChangeListener(listener);
 	this.addInAccessibleListener(listener,vetoableChangeListeners);
 }
 
-addNicePropertyChangeListener(this@javax.swing.AbstractAction,listener)
+addNicePropertyChangeListener(javax.swing.AbstractAction this,listener)
 {
 	this.addPropertyChangeListener(listener);
 	this.addInAccessibleListener(listener,propertyChangeListeners);
 }
 
-addNicePropertyChangeListener(this@javax.swing.tree.DefaultTreeSelectionModel,listener)
+addNicePropertyChangeListener(javax.swing.tree.DefaultTreeSelectionModel this,listener)
 {
 	this.addPropertyChangeListener(listener);
 	this.addInAccessibleListener(listener,propertyChangeListeners);
 }
 
-addNicePropertyChangeListener(this@javax.swing.table.TableColumn,listener)
+addNicePropertyChangeListener(javax.swing.table.TableColumn this,listener)
 {
 	this.addPropertyChangeListener(listener);
 	this.addInAccessibleListener(listener,propertyChangeListeners);
 }
 
-addNiceTableModelListener(this@javax.swing.table.TableModel,listener)
+addNiceTableModelListener(javax.swing.table.TableModel this,listener)
 {
 	this.addTableModelListener(listener);
 	this.addInAccessibleListener(listener,tableModelListeners);
 }
 
-addNiceTableColumnModelListener(this@javax.swing.table.TableColumnModel,listener)
+addNiceTableColumnModelListener(javax.swing.table.TableColumnModel this,listener)
 {
 	this.addColumnModelListener(listener);
 	this.addInAccessibleListener(listener,tableColumnModelListeners);
 }
 
-addNiceChangeListener(this@javax.swing.MenuSelectionManager,listener)
+addNiceChangeListener(javax.swing.MenuSelectionManager this,listener)
 {
 	this.addChangeListener(listener);
 	this.addInAccessibleListener(listener,changeListeners);
 }
 
-addNiceChangeListener(this@javax.swing.colorchooser.DefaultColorSelectionModel,listener)
+addNiceChangeListener(javax.swing.colorchooser.DefaultColorSelectionModel this,listener)
 {
 	this.addChangeListener(listener);
 	this.addInAccessibleListener(listener,changeListeners);
 }
 
-addNiceUndoableEditListener(this@javax.swing.undo.UndoableEditSupport,listener)
+addNiceUndoableEditListener(javax.swing.undo.UndoableEditSupport this,listener)
 {
 	this.addUndoableEditListener(listener);
 	this.addInAccessibleListener(listener,undoableEditListeners);

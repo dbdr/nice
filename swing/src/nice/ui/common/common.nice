@@ -72,7 +72,7 @@ public class NoNiceListenerException extends Exception
   public EventListener getListener();
 }
 
-getListener(this@NoNiceListenerException) = this.listener;
+getListener(NoNiceListenerException this) = this.listener;
 
 
 /**

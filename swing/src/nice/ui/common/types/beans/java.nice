@@ -141,7 +141,7 @@ BeanContextChild getBeanContextProxy(BeanContextProxy)
 
 
 // interfaces BeanContextServiceProvider 
-<Any Element> Iterator<Element> getCurrentServiceSelectors(BeanContextServiceProvider, BeanContextServices, Class)
+<Element> Iterator<Element> getCurrentServiceSelectors(BeanContextServiceProvider, BeanContextServices, Class)
   = native Iterator BeanContextServiceProvider.getCurrentServiceSelectors(BeanContextServices, Class);
 Object getService(BeanContextServiceProvider, BeanContextServices, Object, Class, ?Object)
   = native Object BeanContextServiceProvider.getService(BeanContextServices, Object, Class, Object);
@@ -161,9 +161,9 @@ void removeBeanContextServicesListener(BeanContextServices, BeanContextServicesL
   = native void BeanContextServices.removeBeanContextServicesListener(BeanContextServicesListener);
 boolean addService(BeanContextServices, Class, BeanContextServiceProvider)
   = native boolean BeanContextServices.addService(Class, BeanContextServiceProvider);
-<Any Element> Iterator<Element> getCurrentServiceClasses(BeanContextServices)
+<Element> Iterator<Element> getCurrentServiceClasses(BeanContextServices)
   = native Iterator BeanContextServices.getCurrentServiceClasses();
-<Any Element> Iterator<Element> getCurrentServiceSelectors(BeanContextServices, Class)
+<Element> Iterator<Element> getCurrentServiceSelectors(BeanContextServices, Class)
   = native Iterator BeanContextServices.getCurrentServiceSelectors(Class);
 ?Object getService(BeanContextServices, BeanContextChild, Object, Class, Object, BeanContextServiceRevokedListener)
   = native Object BeanContextServices.getService(BeanContextChild, Object, Class, Object, BeanContextServiceRevokedListener);
@@ -197,7 +197,7 @@ Class getListenerType(EventSetDescriptor) = native Class EventSetDescriptor.getL
 Method getRemoveListenerMethod(EventSetDescriptor) = native Method EventSetDescriptor.getRemoveListenerMethod();  
 
 /* class FeatureDescriptor */
-<Any T> Enumeration<T> attributeNames(FeatureDescriptor) = native Enumeration FeatureDescriptor.attributeNames(); 
+<T> Enumeration<T> attributeNames(FeatureDescriptor) = native Enumeration FeatureDescriptor.attributeNames(); 
 String getDisplayName(FeatureDescriptor) = native String FeatureDescriptor.getDisplayName(); 
 String getName(FeatureDescriptor) = native String FeatureDescriptor.getName();
 String getShortDescription(FeatureDescriptor) = native String FeatureDescriptor.getShortDescription();
@@ -314,13 +314,13 @@ BeanContext getBeanContext(BeanContextEvent) = native BeanContext BeanContextEve
 BeanContext getPropagatedFrom(BeanContextEvent) = native BeanContext BeanContextEvent.getPropagatedFrom();
 
 /* class BeanContextMembershipEvent */
-<Any T> Iterator<T> iterator(BeanContextMembershipEvent) = native Iterator BeanContextMembershipEvent.iterator();
+<T> Iterator<T> iterator(BeanContextMembershipEvent) = native Iterator BeanContextMembershipEvent.iterator();
 Object[] toArray(BeanContextMembershipEvent) = native Object[] BeanContextMembershipEvent.toArray();
 
 /* class BeanContextServiceAvailableEvent */
 BeanContextServices getSourceAsBeanContextServices(BeanContextServiceAvailableEvent) = native BeanContextServices BeanContextServiceAvailableEvent.getSourceAsBeanContextServices();
 Class getServiceClass(BeanContextServiceAvailableEvent) = native Class BeanContextServiceAvailableEvent.getServiceClass();
-<Any T> Iterator<T> getCurrentServiceSelectors(BeanContextServiceAvailableEvent) = native Iterator BeanContextServiceAvailableEvent.getCurrentServiceSelectors();
+<T> Iterator<T> getCurrentServiceSelectors(BeanContextServiceAvailableEvent) = native Iterator BeanContextServiceAvailableEvent.getCurrentServiceSelectors();
 
 /* class BeanContextServiceRevokedEvent */
 Class getServiceClass(BeanContextServiceRevokedEvent) = native Class BeanContextServiceRevokedEvent.getServiceClass();
@@ -328,8 +328,8 @@ BeanContextServices getSourceAsBeanContextServices(BeanContextServiceRevokedEven
 
 /* class BeanContextServicesSupport */
 BeanContextServices getBeanContextServicesPeer(BeanContextServicesSupport) = native BeanContextServices BeanContextServicesSupport.getBeanContextServicesPeer();
-<Any T> Iterator<T> getCurrentServiceClasses(BeanContextServicesSupport) = native Iterator BeanContextServicesSupport.getCurrentServiceClasses();
-<Any T> Iterator<T> getCurrentServiceSelectors(BeanContextServicesSupport, Class) = native Iterator BeanContextServicesSupport.getCurrentServiceSelectors(Class);
+<T> Iterator<T> getCurrentServiceClasses(BeanContextServicesSupport) = native Iterator BeanContextServicesSupport.getCurrentServiceClasses();
+<T> Iterator<T> getCurrentServiceSelectors(BeanContextServicesSupport, Class) = native Iterator BeanContextServicesSupport.getCurrentServiceSelectors(Class);
 
 /* class BeanContextSupport */
 BeanContext getBeanContextPeer(BeanContextSupport) = native BeanContext BeanContextSupport.getBeanContextPeer();
@@ -337,6 +337,6 @@ Locale getLocale(BeanContextSupport) = native Locale BeanContextSupport.getLocal
 URL getResource(BeanContextSupport, String, BeanContextChild) = native URL BeanContextSupport.getResource(String, BeanContextChild);
 InputStream getResourceAsStream(BeanContextSupport, String, BeanContextChild) = native InputStream BeanContextSupport.getResourceAsStream(String, BeanContextChild);
 Object instantiateChild(BeanContextSupport, String) = native Object BeanContextSupport.instantiateChild(String);
-<Any T> Iterator<T> iterator(BeanContextSupport) = native Iterator BeanContextSupport.iterator();
+<T> Iterator<T> iterator(BeanContextSupport) = native Iterator BeanContextSupport.iterator();
 Object[] toArray(BeanContextSupport) = native Object[] BeanContextSupport.toArray();
 Object[] toArray(BeanContextSupport, Object[]) = native Object[] BeanContextSupport.toArray(Object[]); 

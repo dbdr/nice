@@ -18,21 +18,21 @@ package nice.ui.common;
  */
 
 NicePropertyChangeListener toNicePropertyChangeListener(EventListener);
-toNicePropertyChangeListener(this@NicePropertyChangeListener) = this;
+toNicePropertyChangeListener(NicePropertyChangeListener this) = this;
 toNicePropertyChangeListener(this) 
 { 
   throw new NoNiceListenerException("" + this.getClass().getName() + "is no instance of NicePropertyChangeListener", listener: this); 
 }
 
 NiceVetoableChangeListener toNiceVetoableChangeListener(EventListener);
-toNiceVetoableChangeListener(this@NiceVetoableChangeListener) = this;
+toNiceVetoableChangeListener(NiceVetoableChangeListener this) = this;
 toNiceVetoableChangeListener(this) 
 { 
   throw new NoNiceListenerException("" + this.getClass().getName() + "is no instance of NiceVetoableChangeListener", listener: this);
 }
 
 //JDK1.4  NiceExceptionListener toNiceExceptionListener(EventListener);
-//JDK1.4  toNiceExceptionListener(this@NiceExceptionListener) = this;
+//JDK1.4  toNiceExceptionListener(NiceExceptionListener this) = this;
 //JDK1.4  toNiceExceptionListener(this)
 //JDK1.4  { 
 //JDK1.4    throw new NoNiceListenerException("" + this.getClass().getName() + "is no instance of NiceExceptionListener", listener: this);

@@ -30,50 +30,50 @@ public <MappableVetoableChangeListenerHandler H, PropertyChangeKey K> void addNi
  * DEFINITION of methods to add NiceListener to NiceListenerHandlers
  */
 
-addNicePropertyChangeListener(this@PropertyEditorSupport,listener)
+addNicePropertyChangeListener(PropertyEditorSupport this,listener)
 {
 	this.addPropertyChangeListener(listener);
 	this.addInAccessibleListener(listener,propertyChangeListeners);
 }
 
-addNicePropertyChangeListener(this@PropertyChangeSupport,listener)
+addNicePropertyChangeListener(PropertyChangeSupport this,listener)
 {
 	this.addPropertyChangeListener(listener);
 	this.addInAccessibleListener(listener,propertyChangeListeners);
 }
 
-addNiceVetoableChangeListener(this@VetoableChangeSupport,listener)
+addNiceVetoableChangeListener(VetoableChangeSupport this,listener)
 {
 	this.addVetoableChangeListener(listener);
 	this.addInAccessibleListener(listener,vetoableChangeListeners);
 }
 
-addNicePropertyChangeListener(this@PropertyChangeSupport,key@String,listener)
+addNicePropertyChangeListener(PropertyChangeSupport this, String key,listener)
 {
 	this.addPropertyChangeListener(key,listener);
 	this.addMappableListener(key,listener,mappablePropertyChangeListeners);
 }
 
-addNicePropertyChangeListener(this@BeanContextChildSupport,key@String,listener)
+addNicePropertyChangeListener(BeanContextChildSupport this, String key,listener)
 {
 	this.addPropertyChangeListener(key,listener);
 	this.addMappableListener(key,listener,mappablePropertyChangeListeners);
 }
 
-addNiceVetoableChangeListener(this@VetoableChangeSupport,key@String,listener)
+addNiceVetoableChangeListener(VetoableChangeSupport this, String key,listener)
 {
 	this.addVetoableChangeListener(key,listener);
 	this.addMappableListener(key,listener,mappableVetoableChangeListeners);
 }
 
-addNiceVetoableChangeListener(this@BeanContextChildSupport,key@String,listener)
+addNiceVetoableChangeListener(BeanContextChildSupport this, String key,listener)
 {
 	this.addVetoableChangeListener(key,listener);
 	this.addMappableListener(key,listener,mappableVetoableChangeListeners);
 }
 
-//JDK1.4  addNiceExceptionListener(this@XMLDecoder,listener) = this.setExceptionListener(listener);
-//JDK1.4  addNiceExceptionListener(this@Encoder,listener) = this.setExceptionListener(listener);
+//JDK1.4  addNiceExceptionListener(XMLDecoder this,listener) = this.setExceptionListener(listener);
+//JDK1.4  addNiceExceptionListener(Encoder this,listener) = this.setExceptionListener(listener);
 
 
 

@@ -249,7 +249,7 @@ void removeAdjustmentListener(Adjustable, AdjustmentListener)
 
 
 // interface Composite
-<Any Key, Any Element> CompositeContext createContext(Composite, ColorModel, ColorModel, RenderingHints<Key,Element>)
+<Key, Element> CompositeContext createContext(Composite, ColorModel, ColorModel, RenderingHints<Key,Element>)
   = native CompositeContext Composite.createContext(ColorModel, ColorModel, RenderingHints) ;
 
 
@@ -299,7 +299,7 @@ void remove(MenuContainer, MenuComponent)
 
 
 // interface Paint
-<Any Key, Element> PaintContext createContext(Paint, ColorModel, Rectangle, Rectangle2D, AffineTransform, RenderingHints<Key,Element>)
+<Key, Element> PaintContext createContext(Paint, ColorModel, Rectangle, Rectangle2D, AffineTransform, RenderingHints<Key,Element>)
   = native PaintContext Paint.createContext(ColorModel, Rectangle, Rectangle2D, AffineTransform, RenderingHints);
 
 
@@ -690,7 +690,7 @@ void processMouseMotionEvent(Component, MouseEvent)
 //JDK1.4    = native void Component.firePropertyChange(String, boolean, boolean);
 //JDK1.4  void firePropertyChange(Component, String, int, int)
 //JDK1.4    = native void Component.firePropertyChange(String, int, int);
-//JDK1.4  <Any Key, Any Element> void setFocusTraversalKeys(Component, int, Set<Key,Element>)
+//JDK1.4  <Key, Element> void setFocusTraversalKeys(Component, int, Set<Key,Element>)
 //JDK1.4    = native void Component.setFocusTraversalKeys(int, Set);
 //JDK1.4  PropertyChangeListener[] getPropertyChangeListeners(Component)
 //JDK1.4    = native PropertyChangeListener[] Component.getPropertyChangeListeners();
@@ -821,7 +821,7 @@ Font createFont(int, InputStream)
   = native Font Font.createFont(int, InputStream);
 Font decode(String)
   = native Font Font.decode(String);
-<Any Key, Any Element> Font getFont(Map<Key,Element>)
+<Key, Element> Font getFont(Map<Key,Element>)
   = native Font Font.getFont(Map);
 Font getFont(String, Font)
   = native Font Font.getFont(String, Font);
@@ -846,9 +846,9 @@ Font deriveFont(Font, int, AffineTransform)
   = native Font Font.deriveFont(int, AffineTransform);
 Font deriveFont(Font, int, float)
   = native Font Font.deriveFont(int, float);
-<Any Key, Any Element> Font deriveFont(Font, Map<Key,Element>)
+<Key, Element> Font deriveFont(Font, Map<Key,Element>)
   = native Font Font.deriveFont(Map);
-<Any Key, Any Element> Map<Key,Element> getAttributes(Font)
+<Key, Element> Map<Key,Element> getAttributes(Font)
   = native Map Font.getAttributes();
 String getFamily(Font)
   = native String Font.getFamily();
@@ -956,7 +956,7 @@ FontRenderContext getFontRenderContext(Graphics2D) =
   native FontRenderContext Graphics2D.getFontRenderContext();
 Paint getPaint(Graphics2D) =
   native Paint Graphics2D.getPaint();
-<Any Key, Any Element> RenderingHints<Key,Element> getRenderingHints(Graphics2D) =
+<Key, Element> RenderingHints<Key,Element> getRenderingHints(Graphics2D) =
   native RenderingHints Graphics2D.getRenderingHints();
 Stroke getStroke(Graphics2D) =
   native Stroke Graphics2D.getStroke();
@@ -1080,7 +1080,7 @@ void remove(MenuBar, MenuComponent)
   = native void MenuBar.remove(MenuComponent);
 void setHelpMenu(MenuBar, Menu)
   = native void MenuBar.setHelpMenu(Menu);
-<Any Element> Enumeration<Element> shortcuts(MenuBar)
+<Element> Enumeration<Element> shortcuts(MenuBar)
   = native Enumeration MenuBar.shortcuts();
 
 

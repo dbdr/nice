@@ -44,98 +44,98 @@ public <UndoableEditListenerHandler H> void removeNiceUndoableEditListener(H,Nic
  * DEFINITION of methods to remove nice.ui.awt.NiceListener from nice.ui.awt.NiceListenerHandler
  */
 
-removeNiceActionListener(this@javax.swing.AbstractButton,listener) = this.removeActionListener(listener);
-removeNiceActionListener(this@javax.swing.JFileChooser,listener) = this.removeActionListener(listener);
-removeNiceActionListener(this@javax.swing.Timer,listener) = this.removeActionListener(listener);
-removeNiceActionListener(this@javax.swing.DefaultButtonModel,listener) = this.removeActionListener(listener);
-removeNiceActionListener(this@javax.swing.JComboBox,listener) = this.removeActionListener(listener);
-removeNiceActionListener(this@javax.swing.JTextField,listener) = this.removeActionListener(listener);
-removeNiceAdjustmentListener(this@javax.swing.JScrollBar,listener) = this.removeAdjustmentListener(listener);
-removeNiceItemListener(this@javax.swing.AbstractButton,listener) = this.removeItemListener(listener);
-removeNiceItemListener(this@javax.swing.DefaultButtonModel,listener) = this.removeItemListener(listener);
-removeNiceItemListener(this@javax.swing.JComboBox,listener) = this.removeItemListener(listener);
-removeNiceAncestorListener(this@javax.swing.JComponent,listener) = this.removeAncestorListener(listener);
-removeNiceCaretListener(this@javax.swing.text.JTextComponent,listener) = this.removeCaretListener(listener);
-removeNiceCellEditorListener(this@javax.swing.AbstractCellEditor,listener) = this.removeCellEditorListener(listener);
-removeNiceChangeListener(this@javax.swing.AbstractButton,listener) = this.removeChangeListener(listener);
-removeNiceChangeListener(this@javax.swing.JSlider,listener) = this.removeChangeListener(listener);
-removeNiceChangeListener(this@javax.swing.JProgressBar,listener) = this.removeChangeListener(listener);
-removeNiceChangeListener(this@javax.swing.DefaultSingleSelectionModel,listener) = this.removeChangeListener(listener);
-removeNiceChangeListener(this@javax.swing.DefaultBoundedRangeModel,listener) = this.removeChangeListener(listener);
-removeNiceChangeListener(this@javax.swing.DefaultButtonModel,listener) = this.removeChangeListener(listener);
-removeNiceChangeListener(this@javax.swing.text.DefaultCaret,listener) = this.removeChangeListener(listener);
-removeNiceChangeListener(this@javax.swing.JViewport,listener) = this.removeChangeListener(listener);
-removeNiceChangeListener(this@javax.swing.JTabbedPane,listener) = this.removeChangeListener(listener);
-removeNiceDocumentListener(this@javax.swing.text.AbstractDocument,listener) = this.removeDocumentListener(listener);
-removeNiceHyperlinkListener(this@javax.swing.JEditorPane,listener) = this.removeHyperlinkListener(listener);
-removeNiceInternalFrameListener(this@javax.swing.JInternalFrame,listener) = this.removeInternalFrameListener(listener);
-removeNiceListDataListener(this@javax.swing.AbstractListModel,listener) = this.removeListDataListener(listener);
-removeNiceListSelectionListener(this@javax.swing.JList,listener) = this.removeListSelectionListener(listener);
-removeNiceListSelectionListener(this@javax.swing.DefaultListSelectionModel,listener) = this.removeListSelectionListener(listener);
-removeNiceMenuDragMouseListener(this@javax.swing.JMenuItem,listener) = this.removeMenuDragMouseListener(listener);
-removeNiceMenuKeyListener(this@javax.swing.JMenuItem,listener) = this.removeMenuKeyListener(listener);
-removeNiceMenuListener(this@javax.swing.JMenu,listener) = this.removeMenuListener(listener);
-removeNicePopupMenuListener(this@javax.swing.JPopupMenu,listener) = this.removePopupMenuListener(listener);
-removeNiceTreeExpansionListener(this@javax.swing.JTree,listener) = this.removeTreeExpansionListener(listener);
-removeNiceTreeWillExpandListener(this@javax.swing.JTree,listener) = this.removeTreeWillExpandListener(listener);
-removeNiceTreeModelListener(this@javax.swing.tree.DefaultTreeModel,listener) = this.removeTreeModelListener(listener);
-removeNiceTreeSelectionListener(this@javax.swing.JTree,listener) = this.removeTreeSelectionListener(listener);
-removeNiceTreeSelectionListener(this@javax.swing.tree.DefaultTreeSelectionModel,listener) = this.removeTreeSelectionListener(listener);
+removeNiceActionListener(javax.swing.AbstractButton this,listener) = this.removeActionListener(listener);
+removeNiceActionListener(javax.swing.JFileChooser this,listener) = this.removeActionListener(listener);
+removeNiceActionListener(javax.swing.Timer this,listener) = this.removeActionListener(listener);
+removeNiceActionListener(javax.swing.DefaultButtonModel this,listener) = this.removeActionListener(listener);
+removeNiceActionListener(javax.swing.JComboBox this,listener) = this.removeActionListener(listener);
+removeNiceActionListener(javax.swing.JTextField this,listener) = this.removeActionListener(listener);
+removeNiceAdjustmentListener(javax.swing.JScrollBar this,listener) = this.removeAdjustmentListener(listener);
+removeNiceItemListener(javax.swing.AbstractButton this,listener) = this.removeItemListener(listener);
+removeNiceItemListener(javax.swing.DefaultButtonModel this,listener) = this.removeItemListener(listener);
+removeNiceItemListener(javax.swing.JComboBox this,listener) = this.removeItemListener(listener);
+removeNiceAncestorListener(javax.swing.JComponent this,listener) = this.removeAncestorListener(listener);
+removeNiceCaretListener(javax.swing.text.JTextComponent this,listener) = this.removeCaretListener(listener);
+removeNiceCellEditorListener(javax.swing.AbstractCellEditor this,listener) = this.removeCellEditorListener(listener);
+removeNiceChangeListener(javax.swing.AbstractButton this,listener) = this.removeChangeListener(listener);
+removeNiceChangeListener(javax.swing.JSlider this,listener) = this.removeChangeListener(listener);
+removeNiceChangeListener(javax.swing.JProgressBar this,listener) = this.removeChangeListener(listener);
+removeNiceChangeListener(javax.swing.DefaultSingleSelectionModel this,listener) = this.removeChangeListener(listener);
+removeNiceChangeListener(javax.swing.DefaultBoundedRangeModel this,listener) = this.removeChangeListener(listener);
+removeNiceChangeListener(javax.swing.DefaultButtonModel this,listener) = this.removeChangeListener(listener);
+removeNiceChangeListener(javax.swing.text.DefaultCaret this,listener) = this.removeChangeListener(listener);
+removeNiceChangeListener(javax.swing.JViewport this,listener) = this.removeChangeListener(listener);
+removeNiceChangeListener(javax.swing.JTabbedPane this,listener) = this.removeChangeListener(listener);
+removeNiceDocumentListener(javax.swing.text.AbstractDocument this,listener) = this.removeDocumentListener(listener);
+removeNiceHyperlinkListener(javax.swing.JEditorPane this,listener) = this.removeHyperlinkListener(listener);
+removeNiceInternalFrameListener(javax.swing.JInternalFrame this,listener) = this.removeInternalFrameListener(listener);
+removeNiceListDataListener(javax.swing.AbstractListModel this,listener) = this.removeListDataListener(listener);
+removeNiceListSelectionListener(javax.swing.JList this,listener) = this.removeListSelectionListener(listener);
+removeNiceListSelectionListener(javax.swing.DefaultListSelectionModel this,listener) = this.removeListSelectionListener(listener);
+removeNiceMenuDragMouseListener(javax.swing.JMenuItem this,listener) = this.removeMenuDragMouseListener(listener);
+removeNiceMenuKeyListener(javax.swing.JMenuItem this,listener) = this.removeMenuKeyListener(listener);
+removeNiceMenuListener(javax.swing.JMenu this,listener) = this.removeMenuListener(listener);
+removeNicePopupMenuListener(javax.swing.JPopupMenu this,listener) = this.removePopupMenuListener(listener);
+removeNiceTreeExpansionListener(javax.swing.JTree this,listener) = this.removeTreeExpansionListener(listener);
+removeNiceTreeWillExpandListener(javax.swing.JTree this,listener) = this.removeTreeWillExpandListener(listener);
+removeNiceTreeModelListener(javax.swing.tree.DefaultTreeModel this,listener) = this.removeTreeModelListener(listener);
+removeNiceTreeSelectionListener(javax.swing.JTree this,listener) = this.removeTreeSelectionListener(listener);
+removeNiceTreeSelectionListener(javax.swing.tree.DefaultTreeSelectionModel this,listener) = this.removeTreeSelectionListener(listener);
 
-//JDK1.4  removeNicePopupMenuListener(this@javax.swing.JComboBox,listener) = this.removePopupMenuListener(listener);
-//JDK1.4  removeNiceChangeListener(this@javax.swing.AbstractSpinnerModel,listener) = this.removeChangeListener(listener);
-//JDK1.4  removeNiceChangeListener(this@javax.swing.JSpinner,listener) = this.removeChangeListener(listener);
+//JDK1.4  removeNicePopupMenuListener(javax.swing.JComboBox this,listener) = this.removePopupMenuListener(listener);
+//JDK1.4  removeNiceChangeListener(javax.swing.AbstractSpinnerModel this,listener) = this.removeChangeListener(listener);
+//JDK1.4  removeNiceChangeListener(javax.swing.JSpinner this,listener) = this.removeChangeListener(listener);
 
 
-removeNiceVetoableChangeListener(this@javax.swing.JComponent,listener)
+removeNiceVetoableChangeListener(javax.swing.JComponent this,listener)
 {
 	this.removeVetoableChangeListener(listener);
 	//this.removeInAccessibleListener(listener,vetoableChangeListeners);
 }
 
-removeNicePropertyChangeListener(this@javax.swing.AbstractAction,listener)
+removeNicePropertyChangeListener(javax.swing.AbstractAction this,listener)
 {
 	this.removePropertyChangeListener(listener);
 	//this.removeInAccessibleListener(listener,propertyChangeListeners);
 }
 
-removeNicePropertyChangeListener(this@javax.swing.tree.DefaultTreeSelectionModel,listener)
+removeNicePropertyChangeListener(javax.swing.tree.DefaultTreeSelectionModel this,listener)
 {
 	this.removePropertyChangeListener(listener);
 	//this.removeInAccessibleListener(listener,propertyChangeListeners);
 }
 
-removeNicePropertyChangeListener(this@javax.swing.table.TableColumn,listener)
+removeNicePropertyChangeListener(javax.swing.table.TableColumn this,listener)
 {
 	this.removePropertyChangeListener(listener);
 	//this.removeInAccessibleListener(listener,propertyChangeListeners);
 }
 
-removeNiceTableModelListener(this@javax.swing.table.TableModel,listener)
+removeNiceTableModelListener(javax.swing.table.TableModel this,listener)
 {
 	this.removeTableModelListener(listener);
 	//this.removeInAccessibleListener(listener,tableModelListeners);
 }
 
-removeNiceTableColumnModelListener(this@javax.swing.table.TableColumnModel,listener)
+removeNiceTableColumnModelListener(javax.swing.table.TableColumnModel this,listener)
 {
 	this.removeColumnModelListener(listener);
 	//this.removeInAccessibleListener(listener,tableColumnModelListeners);
 }
 
-removeNiceChangeListener(this@javax.swing.MenuSelectionManager,listener)
+removeNiceChangeListener(javax.swing.MenuSelectionManager this,listener)
 {
 	this.removeChangeListener(listener);
 	//this.removeInAccessibleListener(listener,changeListeners);
 }
 
-removeNiceChangeListener(this@javax.swing.colorchooser.DefaultColorSelectionModel,listener)
+removeNiceChangeListener(javax.swing.colorchooser.DefaultColorSelectionModel this,listener)
 {
 	this.removeChangeListener(listener);
 	//this.removeInAccessibleListener(listener,changeListeners);
 }
 
-removeNiceUndoableEditListener(this@javax.swing.undo.UndoableEditSupport,listener)
+removeNiceUndoableEditListener(javax.swing.undo.UndoableEditSupport this,listener)
 {
 	this.removeUndoableEditListener(listener);
 	//this.removeInAccessibleListener(listener,undoableEditListeners);

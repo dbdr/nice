@@ -12,3 +12,11 @@ class SelectionTool implements java.awt.event.MouseListener {
     mousePos = null;
   }
 }
+
+/// PASS
+  assert new A().toString().equals("A.");
+  /// Toplevel
+class A
+{
+  toString() = (["A"].map(String s => s + "."))[0].toString();
+}

@@ -1,7 +1,7 @@
-nice (0.0.020200) unstable; urgency=low
+nice (0.0.020205) unstable; urgency=low
 
   * Allow multiple variables to be defined together, as in:
-	int x = 1, y;
+  	int x = 1, y;
   * Allow variable declaration in tuple affectation:
   	(int x, int y) = f(0);
   * Added 'break' and 'continue' statements.
@@ -11,7 +11,7 @@ nice (0.0.020200) unstable; urgency=low
   * Changed compilation scheme for method alternatives. This results in 
     shorter class files and more intuitive stack traces.
 
- --
+ -- Daniel Bonniot <bonniot@users.sourceforge.net>  Tue,  5 Feb 2002 13:15:03 +0100
 
 nice (0.0.020105) unstable; urgency=low
 

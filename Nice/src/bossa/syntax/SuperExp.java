@@ -106,7 +106,7 @@ public class SuperExp extends Expression
       return null;
     
     return superClass.getMethod(thisMethod.getName(), 
-				thisMethod.getParameterTypes());
+				thisMethod.getParameterTypes(), true);
   }
 
   private boolean leq(MethodBodyDefinition a, MethodBodyDefinition b)

@@ -31,17 +31,25 @@ public void printStackTraceWithSourceInfo(Throwable t) =
   printStackTraceWithSourceInfo(t, java.lang.System.err);
 
 public void printStackTraceWithSourceInfo(Throwable t, PrintStream s) =
-  printStackTraceWithSourceInfo(t, new PrintWriter(s, true));
+  printStackTraceWithSourceInfo(t, s, null);
 
-public void printStackTraceWithSourceInfo(Throwable t, PrintWriter w)
+public void printStackTraceWithSourceInfo(Throwable t, PrintStream s,
+					  ?ClassLoader loader) =
+  printStackTraceWithSourceInfo(t, new PrintWriter(s, true), loader);
+
+public void printStackTraceWithSourceInfo(Throwable t, PrintWriter w) =
+  printStackTraceWithSourceInfo(t, w, null);
+
+public void printStackTraceWithSourceInfo(Throwable t, PrintWriter w,
+					  ?ClassLoader loader)
 {
   w.println("Exception in thread \"" Thread.currentThread().getName "\" " t);
   try {
     let getSTMethod = t.getClass().getMethod("getStackTrace", null);
     let Object[] elements = cast(getSTMethod.invoke(t, null));
     elements.foreach(Object e => {
-      (?String file, int line) = 
-        getSourceLocation__(e.call__("getClassName"), e.call__("getLineNumber"))
+      (?String file, int line) =
+        getSourceLocation__(e.call__("getClassName"), e.call__("getLineNumber"), loader)
         || (e.call__("getFileName"), e.call__("getLineNumber"));
       let location =
         file == null ? (e.call__("isNativeMethod") ? "Native Method" : "Unknown Source")
@@ -93,10 +101,15 @@ private ?int readConstantPool__(DataInputStream dstr)
 }
 
 /** Fetch the SourceDebugExtension attribute from a compiled class. */
-?String sourceDebugExtension__(String className)
+?String sourceDebugExtension__(String className, ?ClassLoader loader)
 {
   let resourceName = className.replace('.', '/') + ".class";
-  let ?InputStream inputStream = java.lang.ClassLoader.getSystemResourceAsStream(resourceName);
+
+  let ?InputStream inputStream =
+    loader == null
+    ? java.lang.ClassLoader.getSystemResourceAsStream(resourceName)
+    : loader.getResourceAsStream(resourceName);
+
   if (inputStream == null)
     return null;
 
@@ -196,14 +209,15 @@ private (int,int,int,int,int) parseLine__(String line, int defaultId)
     {
       outStart = Integer.parseInt(line.substring(pos + 1));
       outInc = 1;
-    }      
+    }
 
   return (start, id, repeat, outStart, outInc);
 }
 
-?(String,int) getSourceLocation__(String className, int lineNumber)
+?(String,int) getSourceLocation__(String className, int lineNumber,
+				  ?ClassLoader loader)
 {
-  let map = sourceDebugExtension__(className);
+  let map = sourceDebugExtension__(className, loader);
   if (map == null)
     return null;
 

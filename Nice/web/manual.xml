@@ -298,7 +298,60 @@ Window createMyWindow()
   <chapter><title>Expressions</title>
     <section><title>Tuples</title>
       <para>
+       A tuple is a groupment of several values in a single expression.
+       For instance, <literal>("Hello", 2*3, x.toString())</literal> 
+       is a tuple whose elements are the string <literal>"Hello"</literal>,
+       the number <literal>6</literal> and the string representation of 
+       <literal>x</literal>. 
+       The type of a tuple is a <emphasis>tuple type</emphasis>, 
+       whose elements are the types of the corresponding values.
+       The type of our example tuple is 
+       <literal>(String, int, String)</literal>. 
       </para>
+
+      <para>
+       A tuple can be of any length. In english, a tuple of two elements
+       is called a couple. For an arbitrary number n, a tuple of n
+       elements is called a n-tuple.
+      </para>
+
+      <para>
+       Tuple types are covariant, so a couple of <literal>int</literal>s 
+       can be used where a couple of <literal>long</literal>s is expected.
+      </para>
+
+      <para>
+       A funny feature is that swapping two variables can be done without a 
+       temporary variable, using tuples: <literal>(x, y) = (y, x)</literal>.
+       An important use of tuples is to allow a function or a method 
+       to return several values. Example <xref linkend="tupleEx" /> defines
+       and uses the function <literal>minMax</literal>, which takes 
+       two integers, and returns the smallest first, the biggest second.
+      </para>
+
+      <example id="tupleEx">
+	<title>Function returning several values using a tuple</title>
+	<programlisting lang="nice"><![CDATA[
+(int, int) minMax(int x, int y) = x < y ? (x, y) : (y, x);
+
+void printTuple((int, int) tuple)
+{
+  /** Declare two local variables, and assign to each the corresponding value
+      in the tuple.
+  */
+  (int x, int y) = tuple;
+
+  println("(" + x + ", " + y + ")");
+}
+
+void main(String[] args)
+{
+  printTuple(minMax(14, 17));
+  printTuple(minMax(42, 41));
+}
+}]]></programlisting>
+      </example>
+
     </section>
 
     <section><title>Anonymous functions</title>
@@ -553,6 +606,6 @@ public class Main
 
 <!--
   Local Variables:
-  sgml-validate-command: "xmllint -noout -valid %s %s"
+  sgml-validate-command: "xmllint -noout -valid"
   End:
  -->

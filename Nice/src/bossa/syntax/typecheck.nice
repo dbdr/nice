@@ -450,16 +450,19 @@ void overrideOuterType(MonoSymbol variable, mlsub.typing.Monotype newType)
 var Stack<(Stack<int>, Stack<(MonoSymbol, mlsub.typing.Monotype)>)> closureEnvironments = new Stack();
 var Stack<List<(MonoSymbol, mlsub.typing.Monotype)>> replacedTypes = new Stack();
 
+/** @return true if exitClosure should be called. */
 boolean enterClosure()
 {
   if (levels.isEmpty())
     return false;
 
-  List<(MonoSymbol, mlsub.typing.Monotype)> replaced = new ArrayList();
-  //set all for all variables the original type back and store it
+  List<(MonoSymbol, mlsub.typing.Monotype)> replaced = 
+    new ArrayList(levels.size());
+
+  // for all variables, set the original type back and store it
   for (int i = levels.size(); i-- > 0;)
     {
-      (MonoSymbol variable, mlsub.typing.Monotype type) = conditionalTypes.get(i);
+      (MonoSymbol variable, mlsub.typing.Monotype type) = conditionalTypes[i];
       replaced.add((variable, variable.type));
       variable.type = type;
     }

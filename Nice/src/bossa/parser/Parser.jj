@@ -1290,15 +1290,21 @@ Pattern pattern():
   ( 
     val=patternLiteral() { loc = val.location(); }
   |
-    "@" tc=typeIdent() { loc = tc.location(); }
+    "@" tc=typeIdent() 
+    { loc = tc.location();
+      User.warning(loc, "This syntax is deprecated, use 'Type paramName' instead.");
+    }
   |
     name=ident()
     (
-      "@"
+      "@" { User.warning(name.location(), "This syntax is deprecated, use 'Type paramName' instead."); }
       tc=typeIdent()
       [ ":" runtimeTC=typeConstructor() ]
     |
-      "#" tc=typeIdent() { exactlyAt = true; }
+      "#" tc=typeIdent() 
+      { exactlyAt = true; 
+        User.warning(name.location(), "This syntax is deprecated, use '#Type paramName' instead.");
+      }
     |
       ( ">" {kind = Pattern.GT;}
       | ">=" {kind = Pattern.GE;}

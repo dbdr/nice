@@ -70,6 +70,8 @@ abstract class UserOperator extends MethodDeclaration
 	    }
 	}
       }
+    else
+      symbols = new MonoSymbol[0];
 
     VarScope scope = this.scope;
     TypeScope typeScope = this.typeScope;

@@ -136,3 +136,11 @@ new B(int x) {
     foo();
     this();
   }
+
+/// PASS
+  // bug #1072970
+  /// Toplevel
+  class X {
+    String str;
+  }
+  new X() = this(str: "abc");

@@ -40,16 +40,11 @@ public class AbstractInterface extends MethodContainer
     addTypeSymbol(itf);
   }
 
-  public void addMethod(Definition m)
-  {
-    addChild(m);
-  }
-  
   mlsub.typing.TypeSymbol getTypeSymbol()
   {
     return itf;
   }
-  
+
   /****************************************************************
    * Resolution
    ****************************************************************/
@@ -80,17 +75,6 @@ public class AbstractInterface extends MethodContainer
     createContext();
   }
 
-  void resolveBody()
-  {
-    if (children != null)
-      for (Iterator i = children.iterator(); i.hasNext();)
-	{
-	  Object child = i.next();
-	  if (child instanceof DefaultMethodImplementation)
-            ((DefaultMethodImplementation) child).resolveBody();
-	}
-  }
-
   /****************************************************************
    * Initial Context
    ****************************************************************/
@@ -107,7 +91,7 @@ public class AbstractInterface extends MethodContainer
 		   " type parameters");
       }
   }
-   
+
   /****************************************************************
    * Module interface
    ****************************************************************/
@@ -120,30 +104,13 @@ public class AbstractInterface extends MethodContainer
             + printTypeParameters()
             + Util.map(" extends ",", ","", superInterfaces)
             + "{}\n");
-
-    if (children != null)
-      for(Iterator i = children.iterator(); i.hasNext(); )
-	{
-	  Object o = i.next();
-	  if (o instanceof Definition)
-	    ((Definition) o).printInterface(w);
-	}
   }
-  
+
   /****************************************************************
    * Code generation
    ****************************************************************/
-
   public void compile()
   {
-    // Compile children methods and functions.
-    if (children != null)
-      for(Iterator i = children.iterator(); i.hasNext(); )
-	{
-	  Object o = i.next();
-	  if (o instanceof Definition)
-	    ((Definition) o).compile();
-	}
   }
 
   /****************************************************************

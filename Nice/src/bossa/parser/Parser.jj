@@ -1144,7 +1144,7 @@ CustomConstructor customConstructor(Constraint cst):
   }
 }
 
-AbstractInterface interfaceDefinition(Constraint prefix):
+AbstractInterface interfaceDefinition(Constraint prefix, List definitions):
 {
   LocatedString name;
   MethodContainer.Constraint parameters = null;
@@ -1164,7 +1164,7 @@ AbstractInterface interfaceDefinition(Constraint prefix):
       { Definition m; }
       [ "public" | "private" ]
       m = internalMethodOrFunction(res, false)
-      { res.addMethod(m); }
+      { definitions.add(m); }
     )*
   "}"
   { return res; }
@@ -1598,7 +1598,7 @@ Definition definition(List definitions, boolean storeDocString):
       ( 
         res=customConstructor(cst)
       | LOOKAHEAD ( "abstract" "interface" )
-        res=interfaceDefinition(cst)
+        res=interfaceDefinition(cst, definitions)
       | res=classDefinition(cst, definitions, storeDocString)
       | res=methodDeclaration(cst, false)
       )

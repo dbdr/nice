@@ -200,7 +200,9 @@ class HTMLWriter {
   }
 
   /**
-   * Generate a list of source files
+   * Generate a list of source files, with sub-lists of the classes, methods,
+   * and global variables within them.
+   *@param p the Package to be documented.
    */
   void write(bossa.modules.Package p) {
     try {

@@ -40,17 +40,14 @@ public class NewArrayExp extends Expression
 		     List /* of Expression */ knownDimensions, 
 		     int unknownDimensions)
   {
-    this.ti = type;
+    this.ident = type;
     this.knownDimensions = toArray(knownDimensions);
     this.unknownDimensions = unknownDimensions;
   }
 
   void resolveTC(TypeMap typeScope)
   {
-    if (ti == null)
-      return;
-    
-    resolvedType = ti.resolveToTypeSymbol(typeScope);
+    resolvedType = ident.resolveToTypeSymbol(typeScope);
   }
   
   private TypeSymbol resolvedType;
@@ -64,7 +61,7 @@ public class NewArrayExp extends Expression
     else
       {
 	if (!(resolvedType instanceof TypeConstructor))
-	  User.error(ti, ti + " should be a class");
+	  User.error(ident, ident + " should be a class");
     
 	TypeConstructor tc = (TypeConstructor) resolvedType;
 	monotype = new MonotypeConstructor(tc, MonotypeVar.news(tc.arity()));
@@ -80,8 +77,6 @@ public class NewArrayExp extends Expression
     
     // set the Expression type
     type = new Polytype(Constraint.True, monotype);
-
-    ti = null;
   }
   
   /****************************************************************
@@ -101,9 +96,7 @@ public class NewArrayExp extends Expression
   public String toString()
   {
     StringBuffer res = new StringBuffer
-      ("new " +
-       (ti != null ? ti.toString() : type.toString()) +
-       Util.map("[", "]", "]", knownDimensions));
+      ("new " + ident + Util.map("[", "]", "]", knownDimensions));
 
     for(int i=0; i<unknownDimensions; i++)
       res.append("[]");
@@ -111,7 +104,8 @@ public class NewArrayExp extends Expression
     return res.toString();
   }
 
-  TypeIdent ti;
+  // We need to keep the ident for toString, which is used when dumping package interface.
+  final TypeIdent ident;
 
   Expression[] knownDimensions;
   private int unknownDimensions;

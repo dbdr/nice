@@ -76,6 +76,13 @@ test_classes()
   println(new ColoredPoint(x:0,y:0,c:0).toString());
   Point p = new ColoredPoint(x:0,y:0,c:0);
   println(p.toString());
+
+  new TestFieldInitializers();
+}
+
+class TestFieldInitializers
+{
+  ?String[] s = new String[0];
 }
 
 // Local Variables:

@@ -3,7 +3,7 @@ nice (0.5.3) unstable; urgency=low
   * It is now possible to use "." (current directory) in 
     the --classpath argument (this needed a workaround for 
     a probable bug in Sun's URLClassLoader, at least in 1.3).
-  * Other bugfixes (creating arrays of "exotic" types).
+  * Other bugfixes (creating arrays of "exotic" types, using arrays in field initializers).
 
  --
 

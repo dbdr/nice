@@ -39,7 +39,7 @@ The reason why it is necessary to enter the packages directory
 is that the default path for looking up source packages 
 is the current directory. 
 It is possible to specify it using <literal>--sourcepath</literal> option.
-The previous exemple is this equivalent to:
+The previous example is this equivalent to:
 <programlisting>nicec --sourcepath=~/nice my.program</programlisting>
 </para>
 

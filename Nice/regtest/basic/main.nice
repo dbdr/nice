@@ -120,4 +120,5 @@ main(args)
   test_optional();
   //test_classes();
   test_global();
+  test_native();
 }

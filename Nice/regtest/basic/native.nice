@@ -1,0 +1,16 @@
+
+package regtest.basic;
+
+/**
+   Test use of native code, imports
+*/
+
+import java.io.*;
+
+void test_native();
+test_native()
+{
+  File f = new File("titi");
+  java.net.Socket s = new java.net.ServerSocket(1235);
+}
+

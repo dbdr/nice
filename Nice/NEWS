@@ -22,6 +22,7 @@ nice (0.9.10)
     the new add method, which makes Collection a valid Addable class.
   * Java methods and fields with parametric types are given a type with
     UnknownTypes as type parameters instead of being ignored.
+  * Number of errors and warning are printed in the console.
   * Bug fixes (disallowed redefinition of parameters, execution order of
     initializers in super classes, visibility checking of java classes,
     cyclic custom constructors, methods and fields in classes with less type

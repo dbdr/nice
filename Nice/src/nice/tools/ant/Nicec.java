@@ -85,11 +85,32 @@ import bossa.modules.Compilation;
 				<td align="center" valign="top">No</td>
 			</tr>
 		</table>
+
+		<h4>classpath</h4>
+		<p><code>Nicec</code>'s <i>classpath</i> attribute is a PATH like structure and can also be set via a nested
+		<i>classpath</i> element. This is very reasonable if you want to make your build script's pathes platform
+		independent. </p>
+		<h5>Example</h5>
+<pre>  
+	&lt;nicec package=&quot;test&quot; &gt;
+	  &lt;classpath&gt;
+	    &lt;pathelement location=&quot;\test.jar&quot;/&gt;
+	    &lt;pathelement path=&quot;${java.class.path}&quot;/&gt;
+	  &lt;/classpath&gt;
+	&lt;/java&gt;
+</pre>
+		<p>It is possible to use the <i>classpath</i> attribute together with the
+		<i>classpath<i> nested tag. In this case the result is a concatenated path.</p>
+		<p>It is highly recommended to use the nested version!<p>
+
+
 		<h3>Examples</h3>
-		<pre>&lt;taskdef name=&quot;nicec&quot; classname=&quot;nice.tools.ant.Nicec&quot;/&gt;<br>
-			&lt;target name=&quot;nice-compiler&quot;&gt;<br>
-			  &lt;nicec package=&quot;test&quot; runtime=&quot;../share/java/nice.jar&quot;/&gt;<br>
-			&lt;/target&gt;</pre>
+<pre>
+	&lt;taskdef name=&quot;nicec&quot; classname=&quot;nice.tools.ant.Nicec&quot;/&gt;
+	&lt;target name=&quot;nice-compiler&quot;&gt;
+	  &lt;nicec package=&quot;test&quot; runtime=&quot;../share/java/nice.jar&quot;/&gt;
+	&lt;/target&gt;
+</pre>
 
 
  * @author Alex Greif <a href="mailto:alex.greif@web.de">alex.greif@web.de</a>

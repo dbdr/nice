@@ -1,0 +1,14 @@
+/// PASS
+  assert isSerializable(new A(elem: null));
+  assert isSerializable(new B());
+  ///Toplevel
+<T> boolean isSerializable(T x) = x instanceof java.io.Serializable;
+
+class A<T> implements java.io.Serializable
+{
+  T elem;
+}
+
+class B implements java.io.Serializable
+{
+}

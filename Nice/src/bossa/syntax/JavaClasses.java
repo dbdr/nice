@@ -79,7 +79,7 @@ public final class JavaClasses
     };
   
   private static boolean excluded(gnu.bytecode.Type[] blackList, 
-				  ClassType classType)
+				  Type classType)
   {
     for(int i=0; i<blackList.length; i++)
       if(classType==blackList[i])
@@ -87,6 +87,12 @@ public final class JavaClasses
     return false;
   }
       
+  static boolean excludedInterface(TypeConstructor itf)
+  {
+    gnu.bytecode.Type t = nice.tools.code.Types.get(itf);
+    return excluded(blackListInterface, t);
+  }
+
   private static TypeConstructor create
     (Compilation compilation, String className, gnu.bytecode.Type javaType)
   {

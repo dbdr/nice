@@ -307,14 +307,15 @@ public abstract class ClassDefinition extends MethodContainer
 
 	if (javaInterfaces != null)
 	  for (int i = 0; i < javaInterfaces.length; i++)
-	    try {
-	      Typing.initialLeq(tc, javaInterfaces[i]);
-	    }
-	    catch(KindingEx e){
-	      User.error(name,
-			 "Class " + name + " cannot implement " + e.t2 +
-			 ": they do not have the same number or kind of type parameters");
-	    }
+            if (! (JavaClasses.excludedInterface(javaInterfaces[i])))
+              try {
+                Typing.initialLeq(tc, javaInterfaces[i]);
+              }
+              catch(KindingEx e){
+                User.error(name,
+                           "Class " + name + " cannot implement " + e.t2 +
+                           ": they do not have the same number or kind of type parameters");
+              }
       }
       catch(TypingEx e){
 	User.error(name, "Error in class " + name + " : " + e.getMessage());

@@ -63,5 +63,4 @@ public class ReturnStmt extends Statement
   }
   
   Expression value;
-  Function includingFunction;
 }

@@ -521,8 +521,6 @@ typecheck(r@ReturnStmt)
   if (function == null)
     throw bossa.util.User.error(r, "This return is not inside a function");
 
-  r.includingFunction = function;
-
   if (r.value != null)
     {
       ?mlsub.typing.Monotype expectedType = function.getExpectedType();

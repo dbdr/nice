@@ -24,7 +24,7 @@ import mlsub.typing.Polytype;
    @author Daniel Bonniot (d.bonniot@mail.dotcom.fr)
 */
 
-abstract class VarSymbol extends Node implements Located
+public abstract class VarSymbol extends Node implements Located
 {
   public VarSymbol(LocatedString name)
   {
@@ -53,9 +53,19 @@ abstract class VarSymbol extends Node implements Located
     return null;
   }
 
+  public MethodDeclaration getMethodDeclaration()
+  {
+    return null;
+  }
+
   void checkSpecialRequirements(Expression[] arguments)
   {
     // Do nothing by default.
+  }
+
+  public Definition getDefinition()
+  {
+    return null;
   }
 
   abstract Polytype getType();

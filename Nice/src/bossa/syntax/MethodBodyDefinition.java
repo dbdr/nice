@@ -176,13 +176,13 @@ public class MethodBodyDefinition extends Definition
 
     for(Iterator i = symbols.iterator(); i.hasNext();){
       VarSymbol s = (VarSymbol)i.next();
-      if(!(s instanceof MethodDeclaration.Symbol))
+      if(s.getMethodDeclaration() == null)
 	{
 	  i.remove();
 	  continue;
 	}
       
-      MethodDeclaration m = ((MethodDeclaration.Symbol) s).getDefinition();
+      MethodDeclaration m = s.getMethodDeclaration();
 
       if (m.getArity() != formals.length
           || !(m instanceof NiceMethod || m instanceof JavaMethod))
@@ -232,13 +232,13 @@ public class MethodBodyDefinition extends Definition
 	boolean[] removed = new boolean[size];
         for (int m1 = 0; m1 < size; m1++)
           {
-	    Monotype[] dom1 = tempSymbols[m1].getDefinition().getType().domain();
+	    Monotype[] dom1 = tempSymbols[m1].getMethodDeclaration().getType().domain();
 	    for (int m2 = 0; m2 < size; m2++)
 	      if (m1 != m2)
                 {
                   boolean remove = true;
 		  boolean additionalsEqual = true;
-		  Monotype[] dom2 = tempSymbols[m2].getDefinition().getType().domain();
+		  Monotype[] dom2 = tempSymbols[m2].getMethodDeclaration().getType().domain();
 		  for (int i = 0; i < len; i++)
 		    if (additionalTags[i] != null)
 		      {
@@ -270,7 +270,7 @@ public class MethodBodyDefinition extends Definition
       }
 
     outer: for(Iterator it = symbols.iterator(); it.hasNext();) {
-      MethodDeclaration m = ((MethodDeclaration.Symbol) it.next()).getDefinition();
+      MethodDeclaration m = ((MethodDeclaration.Symbol) it.next()).getMethodDeclaration();
       if( m instanceof NiceMethod) {
         FormalParameters params = m.formalParameters();
 	for (int i = params.hasThis() ? 1 : 0; i < formals.length; i++)
@@ -294,7 +294,7 @@ public class MethodBodyDefinition extends Definition
     for(Iterator i = symbols.iterator(); i.hasNext();)
       {
 	MethodDeclaration m = 
-	  ((MethodDeclaration.Symbol) i.next()).getDefinition();
+	  ((MethodDeclaration.Symbol) i.next()).getMethodDeclaration();
 	methods += m + " defined " + m.location() + "\n";
       }
     
@@ -331,10 +331,10 @@ public class MethodBodyDefinition extends Definition
     if(s==null)
       User.error(this, name+" is not declared");
     
-    if(!(s instanceof MethodDeclaration.Symbol))
+    if(s.getMethodDeclaration() == null)
       User.error(this, name+" is not a method");
 
-    MethodDeclaration decl = ((MethodDeclaration.Symbol) s).getDefinition();
+    MethodDeclaration decl = s.getMethodDeclaration();
     
     setDeclaration(decl);
 

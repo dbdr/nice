@@ -92,7 +92,7 @@ public class EnumDefinition extends Definition
       return value;
     }
 
-    Definition getDefinition()
+    public Definition getDefinition()
     {
       return EnumDefinition.this;
     }

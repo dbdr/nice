@@ -365,7 +365,7 @@ public class NiceClass extends ClassDefinition.ClassImplementation
       {
 	MethodDeclaration.Symbol m = (MethodDeclaration.Symbol) i.next();
 	res[n] = new FormalParameters.Parameter[nbFields + m.arity];
-	mlsub.typing.Monotype[] args = m.getDefinition().getArgTypes();
+	mlsub.typing.Monotype[] args = m.getMethodDeclaration().getArgTypes();
 	for (int j = 0; j < args.length; j++)
 	  res[n][j] = new FormalParameters.Parameter(Monotype.create(args[j]));
       }

@@ -303,15 +303,15 @@ public abstract class MethodDeclaration extends Definition
 
     FieldAccess getFieldAccessMethod()
     {
-      if(getDefinition() instanceof FieldAccess)
-	return (FieldAccess) getDefinition();
+      if(getMethodDeclaration() instanceof FieldAccess)
+	return (FieldAccess) getMethodDeclaration();
 
       return null;
     }
 
     void checkSpecialRequirements(Expression[] arguments)
     {
-      getDefinition().checkSpecialRequirements(arguments);
+      getMethodDeclaration().checkSpecialRequirements(arguments);
     }
 
     void resolve()
@@ -323,24 +323,29 @@ public abstract class MethodDeclaration extends Definition
       this.type = Types.addSure(this.type);
     }
 
-    public MethodDeclaration getDefinition()
+    public Definition getDefinition()
     {
       return MethodDeclaration.this;
     }
-    
+ 
+    public MethodDeclaration getMethodDeclaration()
+    {
+      return MethodDeclaration.this;
+    }
+
     gnu.expr.Expression compile()
     {
-      return getDefinition().getCode();
+      return getMethodDeclaration().getCode();
     }
 
     gnu.expr.Expression compileInCallPosition()
     {
-      return getDefinition().getCodeInCallPosition();
+      return getMethodDeclaration().getCodeInCallPosition();
     }
 
     String explainWhyMatchFails(Arguments arguments)
     {
-      return MethodDeclaration.this.explainWhyMatchFails(arguments);
+      return getMethodDeclaration().explainWhyMatchFails(arguments);
     }
 
     String defaultExplainWhyMatchFails(Arguments arguments)
@@ -350,7 +355,7 @@ public abstract class MethodDeclaration extends Definition
 
     public String toString()
     {
-      return MethodDeclaration.this.toString();
+      return getMethodDeclaration().toString();
     }
   }
 

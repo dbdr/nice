@@ -16,6 +16,7 @@ import bossa.syntax.Pattern;
 import bossa.syntax.LocatedString;
 import bossa.syntax.MethodDeclaration;
 import bossa.syntax.JavaMethod;
+import bossa.syntax.VarSymbol;
 import nice.tools.code.*;
 
 import gnu.bytecode.*;
@@ -97,10 +98,10 @@ public class ImportedAlternative extends Alternative
     List methods = bossa.syntax.Node.getGlobalScope().lookup(methodName);
     for (Iterator i = methods.iterator(); i.hasNext();)
       {
-	Object next = i.next();
-	if (! (next instanceof MethodDeclaration.Symbol))
+	VarSymbol next = (VarSymbol)i.next();
+	if (next.getMethodDeclaration() == null)
 	  continue;
-	MethodDeclaration md = ((MethodDeclaration.Symbol) next).getDefinition();
+	MethodDeclaration md = next.getMethodDeclaration();
 	if (md.getFullName().equals(fullName))
 	  {
 	    ((JavaMethod) md).registerForDispatch();

@@ -12,7 +12,7 @@
 
 // File    : SpecialTypes.java
 // Created : Mon Jan 17 14:19:30 2000 by bonniot
-//$Modified: Mon Aug 07 15:25:03 2000 by Daniel Bonniot $
+//$Modified: Mon Aug 28 18:32:49 2000 by Daniel Bonniot $
 
 package nice.tools.code;
 
@@ -50,7 +50,7 @@ public class SpecialTypes
     voidType = gnu.bytecode.Type.void_type;
 
     arrayType = SpecialArray.create(Type.pointer_type);
-
+    
     Type.flushTypeChanges();
   }
 

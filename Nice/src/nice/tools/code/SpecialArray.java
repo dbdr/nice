@@ -63,8 +63,22 @@ public final class SpecialArray extends gnu.bytecode.ArrayType
 
   public void emitCoerceFromObject (CodeAttr code)
   {
+    // on ne fait rien si on est deja un tableau du bon type
+    Label cast = new Label(code), end = new Label(code);
+    
+    code.emitDup();
+    code.emitInstanceof(this);
+    code.emitGotoIfIntNeZero(cast);
+    
     code.emitCheckcast(classType);
     code.emitGetField(field);
+    code.emitGoto(end);
+    
+    cast.define(code);
+    // we know this will work
+    code.emitCheckcast(this);
+    
+    end.define(code);
   }
 
   // not called for the moment

@@ -12,7 +12,7 @@
 
 // File    : MonotypeConstructor.java
 // Created : Thu Jul 22 09:15:17 1999 by bonniot
-//$Modified: Thu Jun 08 15:41:21 2000 by Daniel Bonniot $
+//$Modified: Wed Aug 09 16:26:03 2000 by Daniel Bonniot $
 
 package bossa.syntax;
 

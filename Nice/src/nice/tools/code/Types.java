@@ -12,7 +12,7 @@
 
 // File    : Types.java
 // Created : Mon Jun 05 11:28:10 2000 by Daniel Bonniot
-//$Modified: Tue Aug 08 16:12:52 2000 by Daniel Bonniot $
+//$Modified: Tue Aug 29 11:33:38 2000 by Daniel Bonniot $
 
 package nice.tools.code;
 
@@ -75,7 +75,9 @@ public final class Types
     if (!(m instanceof MonotypeConstructor))
       return;
 
-    TypeConstructor tc = ((MonotypeConstructor) m).getTC();
+    MonotypeConstructor mc = (MonotypeConstructor) m;
+    
+    TypeConstructor tc = mc.getTC();
 
     if (Types.get(tc) != null)
       // OK, nothing to do
@@ -86,7 +88,15 @@ public final class Types
       // We don't know
       return;
     
-    Types.set(tc, Types.get(rigidTC));
+    // Only for arrays, we are interested in the components too
+    if (rigidTC == ConstantExp.arrayTC)
+      {
+	Monotype param = mc.getTP()[0];
+	setBytecodeType(param);
+	Types.set(tc, SpecialArray.create(javaType(param)));
+      }
+    else
+      Types.set(tc, Types.get(rigidTC));
   }
 
   /**
@@ -358,15 +368,20 @@ public final class Types
       tc = ((MonotypeConstructor) m).getTC();
     
     if (tc != null)
-      if(tc == ConstantExp.primInt ||
-	 tc == ConstantExp.primByte ||
-	 tc == ConstantExp.primChar ||
-	 tc == ConstantExp.primShort ||
-	 tc == ConstantExp.primLong)
-	return zeroInt;
-      else if(tc == ConstantExp.primFloat ||
-	      tc == ConstantExp.primDouble)
-	return zeroFloat;
+      {
+	if(tc == ConstantExp.primInt ||
+	   tc == ConstantExp.primByte ||
+	   tc == ConstantExp.primShort ||
+	   tc == ConstantExp.primLong)
+	  return zeroInt;
+	if(tc == ConstantExp.primFloat ||
+	   tc == ConstantExp.primDouble)
+	  return zeroFloat;
+	if(tc == ConstantExp.primBool)
+	  return QuoteExp.falseExp;
+	if(tc == ConstantExp.primChar)
+	  return zeroChar;
+      }
     
     return QuoteExp.nullExp;
   }
@@ -375,4 +390,6 @@ public final class Types
     new QuoteExp(new gnu.math.IntNum(0));
   private static gnu.expr.Expression zeroFloat = 
     new QuoteExp(new gnu.math.DFloNum(0.0));
+  private static gnu.expr.Expression zeroChar = 
+    new QuoteExp(new java.lang.Character((char) 0));
 }

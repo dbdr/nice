@@ -12,7 +12,7 @@
 
 // File    : jarMainClass.java
 // Created : Thu Apr 20 14:48:25 2000 by Daniel Bonniot
-//$Modified: Thu Jul 27 14:55:45 2000 by Daniel Bonniot $
+//$Modified: Wed Aug 09 12:10:51 2000 by Daniel Bonniot $
 
 package nice.tools;
 
@@ -20,11 +20,11 @@ import java.util.jar.*;
 import java.lang.reflect.*;
 
 /**
- * Runs a jar file.
- *
- * Does the same as java -jar, except the user classpath is used.
- * 
- * @author Daniel Bonniot
+   Runs a jar file.
+   
+   Does the same as 'java -jar', except the user classpath is used.
+   
+   @author Daniel Bonniot
  */
 
 public class runJar
@@ -44,16 +44,18 @@ public class runJar
 	getMainAttributes().getValue(Attributes.Name.MAIN_CLASS);
     }
     catch(java.util.zip.ZipException e){
-      System.err.println(jar+" is not a valid Jar file");
+      System.err.println(jar + " is not a valid Jar file:\n" +
+			 e.toString());
       System.exit(1);
     }
     catch(java.io.IOException e){
-      System.err.println(jar+" does not exist");
+      System.err.println("Error opening Jar file:\n" +
+			 e.toString());
       System.exit(1);
     }
-    if(mainClass==null)
+    if (mainClass == null)
       {
-	System.err.println(jar+" has no main class");
+	System.err.println(jar + " has no main class");
 	System.exit(2);
       }
     

@@ -12,7 +12,7 @@
 
 // File    : Expression.java
 // Created : Mon Jul 05 16:25:02 1999 by bonniot
-//$Modified: Fri Aug 04 13:40:01 2000 by Daniel Bonniot $
+//$Modified: Mon Aug 28 15:18:53 2000 by Daniel Bonniot $
 // Description : 
 
 package bossa.syntax;
@@ -188,7 +188,7 @@ public abstract class Expression extends Node
   }
   
   /**
-   * Maps {@link #compile()} over a list of expressions.
+   * Maps {@link #generateCode()} over a list of expressions.
    */
   public static gnu.expr.Expression[] compile(List expressions)
   {
@@ -199,6 +199,18 @@ public abstract class Expression extends Node
 	Expression exp = (Expression)i.next();
 	res[n] = exp.generateCode();
       }
+
+    return res;
+  }
+  
+  /**
+   * Maps {@link #generateCode()} over an array of expressions.
+   */
+  public static gnu.expr.Expression[] compile(Expression[] expressions)
+  {
+    gnu.expr.Expression[] res = new gnu.expr.Expression[expressions.length];
+    for (int i=0; i<res.length; i++)
+      res[i] = expressions[i].generateCode();
 
     return res;
   }

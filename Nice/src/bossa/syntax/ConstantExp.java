@@ -12,7 +12,7 @@
 
 // File    : ConstantExp.java
 // Created : Thu Jul 08 15:36:40 1999 by bonniot
-//$Modified: Mon Aug 07 15:35:36 2000 by Daniel Bonniot $
+//$Modified: Mon Aug 28 14:08:10 2000 by Daniel Bonniot $
 
 package bossa.syntax;
 
@@ -204,16 +204,15 @@ public class ConstantExp extends Expression
       {
 	primInt = tc;
 	intType = new MonotypeConstructor(tc, null);
-	return 
-	  SpecialTypes.intType;
+	intPolytype = new mlsub.typing.Polytype(intType);
+	return SpecialTypes.intType;
       }
     
     if(name.equals("nice.lang.long"))
       {
 	primLong = tc;
 	longType = new MonotypeConstructor(tc, null);
-	return 
-	  SpecialTypes.longType;
+	return SpecialTypes.longType;
       }
     
     if(name.equals("nice.lang.boolean"))
@@ -259,7 +258,7 @@ public class ConstantExp extends Expression
   
   public static TypeConstructor primByte, primChar, primInt, primLong, primBool, primShort, primDouble, primFloat, arrayTC;
   public static mlsub.typing.Monotype byteType, charType, intType, longType, boolType, shortType, doubleType, floatType, voidType;
-  static mlsub.typing.Polytype voidPolytype, boolPolytype;
+  static mlsub.typing.Polytype voidPolytype, boolPolytype, intPolytype;
 
   // syntatic types
   static Monotype synVoidType;

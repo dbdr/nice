@@ -12,7 +12,7 @@
 
 // File    : FieldAccessMethod.java
 // Created : Thu Jul 01 18:12:46 1999 by bonniot
-//$Modified: Mon Aug 07 15:31:52 2000 by Daniel Bonniot $
+//$Modified: Tue Aug 29 10:44:16 2000 by Daniel Bonniot $
 
 package bossa.syntax;
 
@@ -96,7 +96,7 @@ public class FieldAccessMethod extends MethodDefinition
   
   gnu.expr.Expression compileAccess(Expression parameter)
   {
-    gnu.expr.Expression res = Inline.inline1
+    gnu.expr.Expression res = Inline.inline
       (new kawa.lang.GetFieldProc((ClassType) 
 				  nice.tools.code.Types.javaType(classTC),
 				  fieldName, 
@@ -111,7 +111,7 @@ public class FieldAccessMethod extends MethodDefinition
   gnu.expr.Expression compileAssign(Expression parameter, 
 				    gnu.expr.Expression value)
   {
-    return Inline.inline2
+    return Inline.inline
       (new SetFieldProc(field()), parameter.generateCode(), value);
   }
 }

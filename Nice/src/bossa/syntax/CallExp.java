@@ -12,7 +12,7 @@
 
 // File    : CallExp.java
 // Created : Mon Jul 05 16:27:27 1999 by bonniot
-//$Modified: Fri Jul 28 21:28:05 2000 by Daniel Bonniot $
+//$Modified: Tue Aug 29 12:13:07 2000 by Daniel Bonniot $
 
 package bossa.syntax;
 
@@ -20,6 +20,7 @@ import java.util.*;
 
 import bossa.util.*;
 import bossa.util.Debug;
+import nice.tools.code.*;
 
 import mlsub.typing.*;
 import mlsub.typing.Polytype;
@@ -60,7 +61,9 @@ public class CallExp extends Expression
   {
     List params = new LinkedList();
     params.add(param1);
-    return new CallExp(fun, params);
+    CallExp res = new CallExp(fun, params);
+    res.setLocation(fun.location());
+    return res;
   }
   
   public static CallExp create(Expression fun, 
@@ -69,7 +72,9 @@ public class CallExp extends Expression
     List params = new ArrayList(2);
     params.add(param1);
     params.add(param2);
-    return new CallExp(fun, params);
+    CallExp res = new CallExp(fun, params);
+    res.setLocation(fun.location());
+    return res;
   }
   
   void resolve()
@@ -337,7 +342,21 @@ public class CallExp extends Expression
   void typecheck()
   {
     // forces computation of the type if not done.
-    getType();
+    Polytype t = getType();
+
+    if (t.getConstraint() != Constraint.True)
+      try{
+	Typing.enter();
+	try{
+	  Constraint.assert(t.getConstraint());
+	  Types.setBytecodeType(t.getMonotype());
+	}
+	finally{
+	  Typing.leave();
+	}
+      }
+      catch(TypingEx e){
+      }
   }
   
   /****************************************************************
@@ -356,16 +375,20 @@ public class CallExp extends Expression
 	    params[i] = ((gnu.expr.PrimProcedure) q.getValue()).wrapInLambda();
 	}
     
+    gnu.expr.Expression res;
     if (fun.isFieldAccess())
       {
 	if (parameters.size() != 1)
 	  Internal.error(this, "A field access should have 1 parameter");
 
-	return fun.getFieldAccessMethod().compileAccess
+	res = fun.getFieldAccessMethod().compileAccess
 	  ((Expression) parameters.get(0));
       }
     else
-      return new gnu.expr.ApplyExp(fun.generateCode(), params);
+      res = new gnu.expr.ApplyExp(fun.generateCode(), params);
+
+    return Inline.inline(new EnsureTypeProc(Types.javaType(getType())),
+			 res);
   }
   
   gnu.expr.Expression compileAssign(gnu.expr.Expression value)

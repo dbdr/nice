@@ -12,7 +12,7 @@
 
 // File    : parser.jj
 // Created : Thu Jul 01 10:27:05 1999 by bonniot
-//$Modified: Thu Aug 03 19:04:28 2000 by Daniel Bonniot $
+//$Modified: Mon Aug 28 15:34:32 2000 by Daniel Bonniot $
 // Description : Parseur JavaCC pour Bossa
 //   Tokens based on the Jazz parser
 
@@ -231,14 +231,6 @@ TOKEN :
   < #OCTAL_LITERAL: "0" (["0"-"7"])* >
 }
 
-//TOKEN: /* 2adic literals */
-//{
-//  < LPER: "#" (  (<BDIGIT>)+			    // binary finite 2adic
-//	       |  (<BDIGIT>)* "(" (<BDIGIT>)* ")"   // periodic 2adic
-//              )
-//  >
-//}
-
 TOKEN: /* Floating point literals */
 {
   < FLOATING_POINT_LITERAL:
@@ -455,7 +447,7 @@ TypeIdent typeConstructorIdent():
   { return new TypeIdent(name); }
 }
 
-TypeConstructor trueTypeConstructor():
+TypeConstructor typeConstructor():
 {
   String name;
 }
@@ -464,22 +456,6 @@ TypeConstructor trueTypeConstructor():
   { return new TypeConstructor(name); }
 }
 
-/*
-List typeConstructors():
-{
-  List res=new ArrayList();
-  TypeIdent t;
-}
-{
-  [
-   "<" 
-      t=typeConstructorIdent() { res.add(t); }
-      ( "," t=typeConstructorIdent() { res.add(t); } )*   
-   ">"
-  ]
-  { return res; }
-}
-*/
 TypeIdent typeIdent():
 {
   LocatedString name;
@@ -530,7 +506,7 @@ TypeSymbol binder(Collection atomics):
   }
 |
   first=typeIdent() 
-  second=trueTypeConstructor()
+  second=typeConstructor()
   { 
     atomics.add(new TypeConstructorLeqCst(second,first)); 
     return second; 
@@ -654,9 +630,11 @@ Monotype monotypeConstructor():
 }
 {
   { first=getToken(1); }
+
   // monotypeConstructors with no type parameters (and no "<" ">")
   // are parsed as MonotypeVars, not here.
   // This is fixed during scoping.
+
     t=typeConstructorIdent() 
     "<" [  p=monotypes() ] ">"
     { if(p==null) p=new ArrayList(0);
@@ -707,6 +685,21 @@ Monotype monotype():
 | 
   res=typeIdent() 
   )
+  
+// T[] as a shortcut for Array<T>
+(
+  end="[]" 
+  { 
+    List tp = new LinkedList();
+    tp.add(res);
+    Location loc = res.location().englobe(new Location(end));
+    res = new MonotypeConstructor
+      (new TypeIdent(new LocatedString("Array", loc)),
+       new TypeParameters(tp),
+       loc);
+  }			  
+)*
+
   { return res; }
 }
 
@@ -745,32 +738,6 @@ TypeParameters typeParameters():
   { return new TypeParameters(res); }
 }
 
-//Polytypes
-/*
-Polytype funpolytype():
-{
-    Monotype codom;
-    List dom;
-    Constraint cst;
-}
-{
-    "fun" cst=constraint() "(" dom=monotypes() ")" "(" codom=monotype() ")"
-    { return new Polytype(cst,new FunType(dom,codom)); }
-}
-
-Polytype polytype():
-{
-  Polytype res;
-  Constraint cst;
-  Monotype m;
-}
-{
-  cst=constraint()
-  m=monotype() 
-  { res=new Polytype(cst,m); }
-  { return res; }
-}
-*/
 /***********************************************************************/
 /*                          Classes                                    */
 /***********************************************************************/
@@ -1152,18 +1119,24 @@ IdentExp identExp():
   { return new IdentExp(i); }
 }
 
-NewExp newExp():
+Expression newExp():
 {
   TypeIdent t;
   List args;
+  Expression e;
 }
 {
   "new" 
   t=typeConstructorIdent()
-  "(" 
-    args=Arguments()
-  ")" 
-  { return new NewExp(t, args); }
+  ( 
+    "(" args=Arguments()  ")" 
+    { return new NewExp(t, args); }
+  |
+    { args = new LinkedList(); int furtherDimensions = 0; }
+    ( LOOKAHEAD(2) "[" e=Expression() "]" { args.add(e); } )+ 
+    ( LOOKAHEAD(2) "[]" { furtherDimensions++; } )*
+    { return new NewArrayExp(t, args, furtherDimensions); }
+  )
 }
 
 FunExp funExp():

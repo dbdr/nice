@@ -12,7 +12,7 @@
 
 // File    : Package.java
 // Created : Wed Oct 13 16:09:47 1999 by bonniot
-//$Modified: Mon Aug 07 15:38:52 2000 by Daniel Bonniot $
+//$Modified: Mon Aug 28 17:18:26 2000 by Daniel Bonniot $
 
 package bossa.modules;
 
@@ -551,7 +551,9 @@ public class Package implements mlsub.compilation.Module, Located
   
   public ClassType createClass(String name)
   {
-    ClassType res = new ClassType(this.name + "." + name);
+    // If we use new ClassType(), we may end up with two different 
+    // objects representing this class
+    ClassType res = ClassType.make(this.name + "." + name);
     res.requireExistingClass(false);
 
     return res;

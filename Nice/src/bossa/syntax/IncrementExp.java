@@ -12,7 +12,7 @@
 
 // File    : IncrementExp.java
 // Created : Fri Jul 21 13:58:26 2000 by Daniel Bonniot
-//$Modified: Tue Jul 25 12:32:17 2000 by Daniel Bonniot $
+//$Modified: Tue Aug 29 10:43:41 2000 by Daniel Bonniot $
 
 package bossa.syntax;
 
@@ -74,7 +74,7 @@ public class IncrementExp extends Expression
       Internal.error(this, "\"var\" is assignable and not a local, " +
 		     "so it should be a call to a FieldAccessMethod");
 
-    return Inline.inline1
+    return Inline.inline
       (new IncrementProc(access.field(), returnOld, increment),
        ((Expression) call.parameters.get(0)).generateCode());
   }

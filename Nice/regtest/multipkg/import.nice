@@ -32,7 +32,7 @@ void test_import()
   polymorphic1(new regtest.basic.Multi());
   polymorphic2(new regtest.basic.Multi());
 
-  iter(["A"], fun(String s)=> println(s));
+  iter(["A"], String s => println(s));
   /* Must fail: map(["A"], fun(String s)=>{println(s);}); */
 
   cov2(null);
@@ -45,16 +45,16 @@ void test_import()
 void test_funs(Funs f0)
 {
   Funs f = new Funs
-  (f1 : fun(int x) => x, 
-   f2 : fun(int x) => f0.f1,
-   f3 : fun(int x) => f0.f2,
-   f4 : fun(int->int x) => x(0),
-   f5 : fun(int->int x) => fun(int y) => x(y),
-   f6 : fun(int x, int y) => x - y,
+  (f1 : int x => x, 
+   f2 : int x => f0.f1,
+   f3 : int x => f0.f2,
+   f4 : int->int x => x(0),
+   f5 : int->int x => fun(int y) => x(y),
+   f6 : (int x, int y) => x - y,
 
    f7 : null,
    f8 : null,
 
-   f9 : fun(int x) => [x],
+   f9 : int x => [x],
    f10 : [ f0.f1 ]);
 }

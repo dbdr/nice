@@ -66,7 +66,7 @@ test_discards()
     bidon();
 
   String s1;
-  String->void test = fun(String s2) => { s1 = s2; };
+  String->void test = String s2 => { s1 = s2; };
 }
 
 void test_captures();
@@ -75,9 +75,9 @@ test_captures()
   // modification of a variable captured in a lambda
   int j=2;
   println("" + j);
-  println(""+(fun()=>--j)());
-  println(""+(fun()=>j++)());
-  println(""+(fun()=>j=2*j)());
+  println(""+(()=>--j)());
+  println(""+(()=>j++)());
+  println(""+(()=>j=2*j)());
 }
 
 void main(String[] args)

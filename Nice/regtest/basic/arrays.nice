@@ -91,9 +91,9 @@ void test_collection_arrays(int[] a);
 test_collection_arrays(a) 
 {
   println(a.size());
-  int[] b = map(a, fun(int i) => i+4);
+  int[] b = map(a, int i => i+4);
   p(b);
-  p(filter(reverse(b), fun(int i)=> i>6));
+  p(filter(reverse(b), int i=> i>6));
 
   long[] ls = map(a, id);
   ls[0] = Long.MAX_VALUE;
@@ -114,14 +114,14 @@ test_collection_arrays(a)
   ?String[] ss = new String[5];
   ss[2] = "e2"; ss[4] = "e4";
   p(ss);
-  ?String[] ss2 = filter(ss, fun(?String s)=>s!=null);
+  ?String[] ss2 = filter(ss, ?String s=>s!=null);
   p(ss2);
-  p(map(ss2, fun(?String s)=>{ String str = notNull(s); return str + str; }));
-  iter(id(ss), fun(?String s)=>{});
+  p(map(ss2, ?String s =>{ String str = notNull(s); return str + str; }));
+  iter(id(ss), ?String s =>{});
 
   // using an array that is the field of an object
   Fields f = new Fields();
-  notNull(f.strings).iter(fun(?String s)=>println(s));
+  notNull(f.strings).iter(?String s =>println(s));
 
   Collection<?String> c = ss;
   println(c.size());
@@ -143,10 +143,10 @@ test_collection_arrays(a)
 
   // Literal arrays
   String[] ts = [ "A", "B" ];
-  ts.iter(fun(String s)=>println(s));
+  ts.iter( String s =>println(s));
 
   float[] tf = [ 1.5, 2, 3.7 ];
-  tf.iter(fun(float f)=>println(f+1));
+  tf.iter( float f =>println(f+1));
 }
 
 void longarray(long[]) { }

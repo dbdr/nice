@@ -17,8 +17,8 @@ void syntaxTest()
     ;
 
   // Anonymous functions with empty body
-  ()->void f = fun()=> {};
-  f = fun()=> { ; };
+  ()->void f = ()=> {};
+  f = ()=> { ; };
 
   // [] is the empty array
   if ([] == null)

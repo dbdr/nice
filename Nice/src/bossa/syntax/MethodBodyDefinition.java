@@ -117,9 +117,9 @@ public class MethodBodyDefinition extends Definition
 	  {
 	    if (p.name == null)
 	      // anonymous pattern
-	      type = new MonotypeVar("anonymous argument " + tn);
+	      type = new MonotypeVar(types[tn].toString()+ "(argument_" + tn+")");
 	    else
-	      type = new MonotypeVar("type(" + p.name + ")<" + types[tn]);
+	      type = new MonotypeVar(types[tn].toString()+ "(" + p.name + ")");
 	  }
 
 	res[tn] = new MonoSymbol(p.name, type);

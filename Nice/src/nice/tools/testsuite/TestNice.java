@@ -227,7 +227,7 @@ public class TestNice {
 	 * Returns the temporary folder.
 	 * 
 	 */
-	static File getTempFolder() {
+	static public File getTempFolder() {
 		return _tempFolder;
 	}
 	

@@ -10,7 +10,7 @@
 /*                                                                        */
 /**************************************************************************/
 
-package nice.tools.util;
+package nice.lang;
 
 /**
    Support for source information in compiled classes.
@@ -19,19 +19,19 @@ package nice.tools.util;
  */
 
 import java.io.*;
-import nice.lang.reflect;
+
+public <!T, R> R call__(T obj, String methodName)
+{
+  let method = obj.getClass().getMethod(methodName, null);
+  return cast( method.invoke(obj, null) );
+}
+
 
 public void printStackTraceWithSourceInfo(Throwable t) = 
   printStackTraceWithSourceInfo(t, java.lang.System.err);
 
 public void printStackTraceWithSourceInfo(Throwable t, PrintStream s) =
   printStackTraceWithSourceInfo(t, new PrintWriter(s));
-
-String STE_getClassName(Object ste) = ste.call("getClassName");
-?String STE_getFileName(Object ste) = ste.call("getFileName");
-String STE_getMethodName(Object ste) = ste.call("getMethodName");
-int STE_getLineNumber(Object ste) = ste.call("getLineNumber");
-boolean STE_isNativeMethod(Object ste) = ste.call("isNativeMethod");
 
 public void printStackTraceWithSourceInfo(Throwable t, PrintWriter w)
 {
@@ -41,13 +41,13 @@ public void printStackTraceWithSourceInfo(Throwable t, PrintWriter w)
     let Object[] elements = cast(getSTMethod.invoke(t, null));
     elements.foreach(Object e => {
       (?String file, int line) = 
-        getSourceLocation(e.STE_getClassName(), e.STE_getLineNumber())
-        || (e.STE_getFileName(), e.STE_getLineNumber());
+        getSourceLocation__(e.call__("getClassName"), e.call__("getLineNumber"))
+        || (e.call__("getFileName"), e.call__("getLineNumber"));
       let location =
-        file == null ? (e.STE_isNativeMethod ? "Native Method" : "Unknown Source")
+        file == null ? (e.call__("isNativeMethod") ? "Native Method" : "Unknown Source")
       : line < 0 ? file
       : (file + ":" + line);
-      w.println("\tat " e.STE_getClassName "." e.STE_getMethodName "(" location ")");
+      w.println("\tat " e.call__("getClassName") "." e.call__("getMethodName") "(" location ")");
     });
   } catch (NoSuchMethodError e) {
     // Fallback in case method Throwable.getStackTrace() is not available.
@@ -58,20 +58,8 @@ Use a JVM version 1.4 or later to get the correct line numbers.""");
   }
 }
 
-let byte CLASS = 7;
-let byte FIELDREF = 9;
-let byte METHODREF = 10;
-let byte INTERFACE_METHODREF = 11;
-let byte STRING = 8;
-let byte INTEGER = 3;
-let byte FLOAT = 4;
-let byte LONG = 5;
-let byte DOUBLE = 6;
-let byte NAME_AND_TYPE = 12;
-let byte UTF8 = 1;
-
 /* Return the index of SourceDebugExtension, or null if it does not appear. */
-private ?int readConstantPool(DataInputStream dstr)
+private ?int readConstantPool__(DataInputStream dstr)
 {
   var ?int result = null;
 
@@ -79,15 +67,15 @@ private ?int readConstantPool(DataInputStream dstr)
   for (int i = 1;  i <= count;  i++)
     {
       byte tag = dstr.readByte();
-      if (tag == UTF8) {
+      if (tag == 1/*UTF8*/) {
 	let value = dstr.readUTF();
 	if (value.equals("SourceDebugExtension"))
 	  result = i;
-      }	else if (tag == LONG || tag == DOUBLE) {
+      }	else if (tag == 5/*LONG*/ || tag == 6/*DOUBLE*/) {
 	dstr.readLong();
 	i++;
       }
-      else if (tag == CLASS || tag == STRING)
+      else if (tag == 7/*CLASS*/ || tag == 8/*STRING*/)
 	dstr.readUnsignedShort();
       else
 	// In all other cases, 4 bytes need to be read.
@@ -97,14 +85,14 @@ private ?int readConstantPool(DataInputStream dstr)
 }
 
 /** Fetch the SourceDebugExtension attribute from a compiled class. */
-?String sourceDebugExtension(String className)
+?String sourceDebugExtension__(String className)
 {
   let resourceName = className.replace('.', '/') + ".class";
   let stream = new DataInputStream
     (java.lang.ClassLoader.getSystemResourceAsStream(resourceName));
 
   stream.skipBytes(8);
-  let sourceDebugExtensionIndex = readConstantPool(stream);
+  let sourceDebugExtensionIndex = readConstantPool__(stream);
   if (sourceDebugExtensionIndex == null)
     return null;
 
@@ -158,7 +146,7 @@ private ?int readConstantPool(DataInputStream dstr)
   return null;
 }
 
-private (int,int,int,int,int) parseLine(String line, int defaultId)
+private (int,int,int,int,int) parseLine__(String line, int defaultId)
 {
 /* Format:
   InputStartLine #LineFileID ,RepeatCount :OutputStartLine ,OutputLineIncrement
@@ -206,9 +194,9 @@ private (int,int,int,int,int) parseLine(String line, int defaultId)
   return (start, id, repeat, outStart, outInc);
 }
 
-?(String,int) getSourceLocation(String className, int lineNumber)
+?(String,int) getSourceLocation__(String className, int lineNumber)
 {
-  let map = sourceDebugExtension(className);
+  let map = sourceDebugExtension__(className);
   if (map == null)
     return null;
 
@@ -274,7 +262,7 @@ private (int,int,int,int,int) parseLine(String line, int defaultId)
 	    break;
 
 	  (int start, id, int repeat, int outStart, int outInc) = 
-	    parseLine(section, id);
+	    parseLine__(section, id);
 
 	  if (lineNumber >= outStart && lineNumber < outStart + repeat * outInc)
 	    {

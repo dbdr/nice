@@ -130,25 +130,48 @@ public class Pattern implements Located
     constraint = def.getResolvedConstraint();
     patternType = new MonotypeConstructor(tc, def.getTypeParameters());
   }
+
+  private static VarSymbol findRefSymbol(LocatedString refName)
+  {
+    VarSymbol symbol = null;
+    for (Iterator it = Node.getGlobalScope().lookup(refName).iterator(); it.hasNext();)
+      {
+	Object sym = it.next();
+	if (sym instanceof GlobalVarDeclaration.GlobalVarSymbol ||
+            sym instanceof EnumDefinition.EnumSymbol )
+          symbol = (VarSymbol)sym;
+      }
+
+    if (symbol == null)
+      User.error(refName, "" + refName + " is not declared");
  
+    return symbol;
+  }
+
   void resolveGlobalConstants(VarScope scope, TypeScope typeScope)
   {
     if (refName == null)
       return;
 
-    GlobalVarDeclaration.GlobalVarSymbol symbol = null;
-    for (Iterator it = scope.lookup(refName).iterator(); it.hasNext();)
+    VarSymbol sym = findRefSymbol(refName);
+    if (sym instanceof EnumDefinition.EnumSymbol)
       {
-	Object sym = it.next();
-	if (sym instanceof GlobalVarDeclaration.GlobalVarSymbol)
-          symbol = (GlobalVarDeclaration.GlobalVarSymbol)sym;
+         EnumDefinition.EnumSymbol symbol = (EnumDefinition.EnumSymbol)sym;
+	 NewExp val = (NewExp)symbol.getValue();
+
+	 symbol.getDefinition().resolve();
+	 tc = val.tc;
+	 atValue = new ConstantExp(null, tc, symbol,
+				refName.toString(), location);
+        return;
       }
     
-    if (symbol == null || !symbol.constant)
-      User.error(refName, "" + refName + " is not declared as global constant");
-
+    GlobalVarDeclaration.GlobalVarSymbol symbol = (GlobalVarDeclaration.GlobalVarSymbol)sym;
     if (symbol.getValue() instanceof ConstantExp)
       {
+        if (!symbol.constant)
+          User.error(refName, "" + refName + " is not constant");
+
 	ConstantExp val = (ConstantExp)symbol.getValue();
 
 	if (val.tc == PrimitiveType.floatTC)
@@ -165,14 +188,9 @@ public class Pattern implements Located
 	 NewExp val = (NewExp)symbol.getValue();
 
 	 symbol.getDefinition().resolve();
-         if (val.tc != null) 
-	   {
-	     tc = val.tc;
-	     atValue = new ConstantExp(null, tc, symbol,
+	 tc = val.tc;
+	 atValue = new ConstantExp(null, tc, symbol,
 				refName.toString(), location);
-	   }
-         else
-	   Internal.error("can't find tc of globalvarsymbol of "+refName);
        }
      else
        User.error(refName, "The value of " + refName + "can't be used as pattern");
@@ -185,7 +203,7 @@ public class Pattern implements Located
       patterns[i].resolveTC(tscope);
     }
   }
-  
+ 
   /****************************************************************
    * Type checking
    ****************************************************************/
@@ -327,6 +345,9 @@ public class Pattern implements Located
     if (this.atBool())
       return that.tc == PrimitiveType.boolTC; 
 
+    if (this.atEnum() && that.atEnum())
+      return this.atValue.toString().compareTo(that.atValue.toString()) < 0;
+
     if (that.atNonBoolValue())
       return this.atNonBoolValue() && this.atValue.equals(that.atValue);
 
@@ -348,7 +369,7 @@ public class Pattern implements Located
     if (tag == null)
       return false;
 
-    if (atNonBoolValue())
+    if (atNonBoolValue() && !atEnum())
       return false;
 
     if (tag == PrimitiveType.trueBoolTC)
@@ -391,7 +412,22 @@ public class Pattern implements Located
     if (!equal && atValue == null && Typing.testRigidLeq(tc, PrimitiveType.longTC))
       User.error(location, "A pattern cannot have a primitive type that is different from the declaration.");
   }     
-        
+
+  public List getEnumValues ()
+  {
+    List res = new LinkedList();
+    if (!atEnum())
+      return res;
+
+    List symbols = ((EnumDefinition)((EnumDefinition.EnumSymbol)atValue.value).getDefinition()).symbols;
+    for (Iterator it = symbols.iterator(); it.hasNext(); )
+      {
+	EnumDefinition.EnumSymbol sym = (EnumDefinition.EnumSymbol)it.next();
+        res.add(new ConstantExp(null, tc, sym, sym.name.toString(), location));
+      }
+
+    return res;
+  }
   /****************************************************************
    * Printing
    ****************************************************************/
@@ -502,25 +538,24 @@ public class Pattern implements Located
           {
             LocatedString refName = new LocatedString(name.substring(1),
 				Location.nowhere());
-	    GlobalVarDeclaration.GlobalVarSymbol symbol = null;
-	    for (Iterator it = Node.getGlobalScope().lookup(refName).iterator(); it.hasNext();)
-	      {
-		Object sym = it.next();
-		if (sym instanceof GlobalVarDeclaration.GlobalVarSymbol)
-	          symbol = (GlobalVarDeclaration.GlobalVarSymbol)sym;
+
+	    VarSymbol sym = findRefSymbol(refName);
+	    NewExp val;
+            if (sym instanceof GlobalVarDeclaration.GlobalVarSymbol )
+              {
+	        GlobalVarDeclaration.GlobalVarSymbol symbol = (GlobalVarDeclaration.GlobalVarSymbol)sym;
+ 	        val = (NewExp)symbol.getValue();
+                symbol.getDefinition().resolve();
 	      }
-
-            if (symbol == null)
-	      Internal.error("can't find globalvarsymbol of "+refName);
-
-	    NewExp val = (NewExp)symbol.getValue();
-
-	    symbol.getDefinition().resolve();
-            if (val.tc != null) 
-	      return new Pattern(new ConstantExp(null, val.tc, symbol,
-				refName.toString(), refName.location()));
             else
-	      Internal.error("can't find tc of globalvarsymbol of "+refName);
+              {
+                EnumDefinition.EnumSymbol symbol = (EnumDefinition.EnumSymbol) sym;
+	        val = (NewExp)symbol.getValue();
+                symbol.getDefinition().resolve();
+              }
+            
+	    return new Pattern(new ConstantExp(null, val.tc, sym,
+		    		refName.toString(), refName.location()));
           }
       }
 
@@ -618,4 +653,5 @@ public class Pattern implements Located
   public boolean atFalse() { return atValue != null && atValue.isFalse(); }
   public boolean atString() { return atValue instanceof StringConstantExp; }
   public boolean atReference() { return atValue != null && atValue.value instanceof VarSymbol; }
+  public boolean atEnum() { return atReference() && atValue.value instanceof EnumDefinition.EnumSymbol; }
 }

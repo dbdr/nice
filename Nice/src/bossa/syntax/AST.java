@@ -49,6 +49,8 @@ public class AST extends Node
 	  classes.add(node);
         else if (node instanceof MethodDeclaration)
           methods.add(node);
+        else if (node instanceof EnumDefinition)
+          classes.add(((EnumDefinition)node).classDef);
       }
 
     this.classes = (ClassDefinition[]) 

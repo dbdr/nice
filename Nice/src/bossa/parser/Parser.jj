@@ -147,6 +147,7 @@ TOKEN: /* Keywords */
 | < INTERFACE:  "interface"	>
 | < IMPLEMENTS: "implements"	>
 | < EXTENDS:    "extends"    	>
+| < ENUM:       "enum"    	>
 
 // Packages
 | < IMPORT:     "import"     	>
@@ -1230,6 +1231,21 @@ MonotypeVar taggedMonotypeVar(List tags, List atoms):
   }
 }
 
+EnumDefinition enumDefinition():
+{ 
+  LocatedString name, elem;
+  List elements = new LinkedList();
+}
+{
+  [ "public" | "private" ]
+  "enum"
+  name=ident()
+  "{" elem=ident() { elements.add(elem); }
+   ( "," elem =ident() { elements.add(elem); } )+
+  "}"
+  { return new EnumDefinition(name, elements); }
+}
+
 /***********************************************************************/
 /*                          Methods                                    */
 /***********************************************************************/
@@ -1547,6 +1563,9 @@ Definition definition(List definitions):
     LOOKAHEAD(2)
     res=globalVariable()
   | 
+    LOOKAHEAD(2)
+    res=enumDefinition()
+  |  
     LOOKAHEAD ( "abstract" "interface" )
     res=interfaceDefinition()
   |

@@ -289,7 +289,8 @@ public final class Dispatch
     {
       Alternative first = null;
       ConstantExp[] values = (ConstantExp[]) valit.next();
-      for (Iterator i = sortedTypeMatches.iterator(); i.hasNext() && !failed;)
+      outer:
+	for (Iterator i = sortedTypeMatches.iterator(); i.hasNext();)
       {
 	Alternative a = (Alternative) i.next();
 	if (a.matchesValuePart(values, isValue))
@@ -304,6 +305,7 @@ public final class Dispatch
 		 "\nFor parameters of type/value " + toString(tags, values, isValue)+
 		 "\nboth\n" + first.printLocated() + 
 		 "\nand\n" + a.printLocated() + "\nmatch.");
+              break outer;
 	    }
       }
       if(first==null)
@@ -313,6 +315,7 @@ public final class Dispatch
 		       "Method " + method + " is not completely covered:\n" + 
 		       "no alternative matches " + 
 		       toString(tags, values, isValue));
+	break;
       }
     }
     return failed;
@@ -515,16 +518,25 @@ public final class Dispatch
     int len = isValue.length;
     for (int pos = 0; pos < len; pos++)
     {
-      ConstantExp[] valuesAtPos = new ConstantExp[alternatives.size()];  
-      int valueCount = 0;
+      List valuesAtPosList = new LinkedList();  
       for (Iterator i = alternatives.iterator(); i.hasNext(); ) 
       {
 	Pattern pat = ((Alternative)i.next()).getPatterns()[pos];
-	if (pat.atNonBoolValue()) {
+	if (pat.atNonBoolValue())
+        {
 	  isValue[pos] = true;
-          valuesAtPos[valueCount++] = pat.atValue;
+          if (pat.atEnum())
+	    for (Iterator it = pat.getEnumValues().iterator(); it.hasNext(); )
+	      valuesAtPosList.add(it.next());
+
+	  else
+	    valuesAtPosList.add(pat.atValue);
 	}	   
       }
+      int valueCount = valuesAtPosList.size();
+      ConstantExp[] valuesAtPos = new ConstantExp[valueCount];
+      valuesAtPosList.toArray(valuesAtPos);
+
       if (valueCount > 0)
       {
 	List res = new ArrayList();

@@ -1,0 +1,52 @@
+/// PASS
+  assert foo(blue);
+  /// Toplevel
+  enum Color {red, blue, green}
+  boolean foo(Color);
+  foo(=red) = false;
+  foo(=blue) = true;
+  foo(=green) = false;
+
+/// PASS
+  /// package a 
+  /// Toplevel
+  enum Color {red, blue, green}
+  boolean foo(Color);
+  foo(=red) = false;
+  foo(=blue) = true;
+  foo(=green) = false;
+  /// package b import a
+  assert foo(blue);
+
+/// FAIL
+  /// Toplevel
+  enum Color {red, blue, green}
+  void foo(Color);
+  foo(=red) = {};
+  foo(=blue) = {};
+
+/// PASS
+  assert foo(blue);
+  /// Toplevel
+  enum Color {red, blue, green}
+  boolean foo(Color);
+  foo(x) = false;
+  foo(=blue) = true;
+  foo(=green) = false;
+
+/// FAIL
+  /// Toplevel
+  enum Single { thing }
+
+/// PASS
+  /// package a 
+  /// Toplevel
+  enum Color {red, blue, green}
+  boolean foo(Color);
+  foo(x) = false;
+  /// package b import a
+  assert foo(green);
+  /// Toplevel
+  foo(=red) = false;
+  foo(=blue) = false;
+  foo(=green) = true;

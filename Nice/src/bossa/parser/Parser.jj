@@ -2019,6 +2019,14 @@ Statement BlockStatement(List statements) :
     res = LocalDeclaration() 
   )
 |
+  // There are two cases for tuples (declaring a variable or not). 
+  // Since it seems we cannot have a lookahead inside another we 
+  // repeat two instances with different lookaheads.
+  LOOKAHEAD( "(" monotype() ident() "," )
+  res=LocalTupleDeclaration(statements)
+| 
+  // Second case (see above).
+  LOOKAHEAD( "(" ident() "," )
   res=LocalTupleDeclaration(statements)
 |
   res=Statement()

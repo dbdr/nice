@@ -10,9 +10,17 @@ apply2(f, x) = f(x);
 class High
 {
   alike high( fun()() );
+
+  String->void fieldFunction;
 }
 
 high(h@High, f)  { f(); return h; }
+
+void test_parsingExp(High h) = (h.fieldFunction)("");
+void test_parsingStmt(High h)
+{
+  (h.fieldFunction)("");
+}
 
 void test_higher_order()
 {

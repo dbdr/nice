@@ -12,7 +12,7 @@
 
 // File    : JavaClass.java
 // Created : Wed Feb 02 16:20:12 2000 by Daniel Bonniot
-//$Modified: Mon Mar 13 12:49:22 2000 by Daniel Bonniot $
+//$Modified: Fri Apr 28 15:28:43 2000 by Daniel Bonniot $
 
 package bossa.syntax;
 
@@ -69,8 +69,16 @@ public class JavaClass extends ClassDefinition
 		     name+" is not a known primitive type");
       }
     else
-      JavaTypeConstructor.registerTypeConstructorForJavaClass
-	(this.tc, javaName.toString());
+      {
+	TypeConstructor old = 
+	  JavaTypeConstructor.setTypeConstructorForJavaClass
+	  (this.tc, javaName.toString());
+
+	if(old!=null)
+	  User.error(this, 
+		     javaName+" was already associated with bossa class "+
+		     old+" defined in "+old.location());
+      }
   }
 
   void resolve()

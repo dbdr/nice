@@ -12,7 +12,7 @@
 
 // File    : Package.java
 // Created : Wed Oct 13 16:09:47 1999 by bonniot
-//$Modified: Fri Apr 21 14:41:34 2000 by Daniel Bonniot $
+//$Modified: Thu Apr 27 19:12:32 2000 by Daniel Bonniot $
 
 package bossa.modules;
 
@@ -109,10 +109,11 @@ public class Package implements mlsub.compilation.Module
     map.put(name.toString(),this);
 
     imports = new LinkedList();
+    
     if(!name.toString().equals("bossa.lang"))
       imports.add(new LocatedString("bossa.lang", 
 				    bossa.util.Location.nowhere()));
-
+    
     opens  = new LinkedList();
     opens.add(this.name);
     opens.add(new LocatedString("java.lang", bossa.util.Location.nowhere()));

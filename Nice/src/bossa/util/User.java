@@ -12,7 +12,7 @@
 
 // File    : User.java
 // Created : Wed Jul 07 18:20:58 1999 by bonniot
-//$Modified: Mon Feb 21 17:31:35 2000 by Daniel Bonniot $
+//$Modified: Fri Apr 28 15:30:49 2000 by Daniel Bonniot $
 
 package bossa.util;
 
@@ -41,7 +41,7 @@ public class User
     if(loc==null)
       error(message);
     else
-      error(loc+message);
+      error(loc+": "+message);
   }
 
   public static void error(String message)
@@ -55,11 +55,11 @@ public class User
 
   public static void warning(Located responsible, String message)
   {
-    warning(responsible.location()+message);
+    warning(responsible.location()+": "+message);
   }
 
   public static void warning(String message)
   {
-    System.out.println("[Warning] "+message);
+    System.out.println("[Warning]: "+message);
   }
 }

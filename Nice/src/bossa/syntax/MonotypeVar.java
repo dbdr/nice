@@ -12,7 +12,7 @@
 
 // File    : MonotypeVar.java
 // Created : Fri Jul 23 15:36:39 1999 by bonniot
-//$Modified: Mon Apr 03 16:33:50 2000 by Daniel Bonniot $
+//$Modified: Wed Apr 26 17:26:52 2000 by Daniel Bonniot $
 
 package bossa.syntax;
 
@@ -156,7 +156,7 @@ public class MonotypeVar extends Monotype
   public String toString(int param)
   {
     switch(param){
-    case Printable.inConstraint: return "Any "+name;
+    case Printable.inConstraint: return "Any "+toString();
     default: Internal.error("toString param="+param); return null;
     }
   }

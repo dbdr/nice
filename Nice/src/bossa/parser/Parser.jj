@@ -12,7 +12,7 @@
 
 // File    : parser.jj
 // Created : Thu Jul 01 10:27:05 1999 by bonniot
-//$Modified: Fri Apr 21 16:52:04 2000 by Daniel Bonniot $
+//$Modified: Tue May 02 11:27:27 2000 by Daniel Bonniot $
 // Description : Parseur JavaCC pour Bossa
 //   Tokens based on the Jazz parser
 
@@ -164,7 +164,7 @@ TOKEN: /* Keywords */
 | < FORMAT:     "format"     	>
 | < ERROR:      "error"      	>
 | < FUN:        "fun"        	>
-//| < ALIKE:      "alike"      	>
+| < ALIKE:      "alike"      	>
 //| < THIS:       "this"       	>
 | < EXTENDS:    "extends"    	>
 | < RESET:      "reset"      	>
@@ -745,7 +745,7 @@ Polytype polytype():
 /*                          Classes                                    */
 /***********************************************************************/
 
-MethodDefinition classMethodDefinition(ClassDefinition c):
+MethodDefinition classMethodDefinition(BossaClass c):
 {
   LocatedString name;
   List parameters;
@@ -754,16 +754,14 @@ MethodDefinition classMethodDefinition(ClassDefinition c):
   MethodDefinition def;
 }
 {
-  returnType=monotype()
-  name=ident()
   cst=constraint()
+  returnType=monotype()
+  name=methodName()
   "("
-  parameters=namedMonotypes()
+  ( parameters=namedMonotypes() | { parameters=new ArrayList(); } )
   ")"
   ";"
-  { 
-    return new MethodDefinition(c,name,cst,returnType,parameters); 
-  }
+  { return new MethodDefinition(c, name,cst,returnType,parameters); }
 }
 
 List extensions():
@@ -810,6 +808,7 @@ ClassDefinition classDefinition():
   List ext=new ArrayList(0),imp=new ArrayList(0),abs=new ArrayList(0);
   List l;
   boolean isFinal=false, isAbstract=false, isInterface=false;
+  MethodDefinition m;
   ClassDefinition res;
 }
 {
@@ -830,13 +829,24 @@ ClassDefinition classDefinition():
   )*
 
   ( 
-   "{" (getField(fields))* "}"
+   "{"
    {
      res=new BossaClass
      (name,
       isFinal,isAbstract,isInterface,
       false,parameters,
-      ext,imp,abs,fields,methods);
+      ext,imp,abs);
+   }   
+   (
+      LOOKAHEAD( [ "final" | "local" ] monoSymbol() ";" )
+      getField(fields)
+    |
+      m=classMethodDefinition((BossaClass) res)
+      { methods.add(m); }
+   )* 
+   "}"
+   {
+     ((BossaClass) res).setFieldsAndMethods(fields, methods);
    }
   | 
    "=" "native"
@@ -894,7 +904,7 @@ MethodBodyDefinition methodBodyDefinition():
     Pattern p;
     Collection binders=null;
     List newTypeVars=null;
-    List parameters=new ArrayList();
+    List parameters=new LinkedList();
     Statement code;
     Expression exp;
 }
@@ -903,8 +913,8 @@ MethodBodyDefinition methodBodyDefinition():
     [ "<" binders=strings() ">" ]
 // introducing new Type variables
     [ "[" newTypeVars=typeConstructors() "]" ]
-    p=pattern(new LocatedString("this",new Location(0,0,0,0))) 
-    { parameters.add(p); }
+//    p=pattern(new LocatedString("this",new Location(0,0,0,0))) 
+//    { parameters.add(p); }
     "("
     ( 
 	i=ident() p=pattern(i) { parameters.add(p); }
@@ -1096,8 +1106,10 @@ NewExp newExp():
 {
   "new" 
   t=typeConstructor()
-  "(" ")" 
-  { return new NewExp(t); }
+  "(" 
+    args=Arguments()
+  ")" 
+  { return new NewExp(t, args); }
 }
 
 FunExp funExp():

@@ -12,7 +12,7 @@
 
 // File    : TypeScope.java
 // Created : Fri Jul 09 11:29:17 1999 by bonniot
-//$Modified: Mon Apr 03 15:16:34 2000 by Daniel Bonniot $
+//$Modified: Thu Apr 27 19:13:12 2000 by Daniel Bonniot $
 
 package bossa.syntax;
 

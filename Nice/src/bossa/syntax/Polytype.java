@@ -12,7 +12,7 @@
 
 // File    : Polytype.java
 // Created : Tue Jul 13 12:51:38 1999 by bonniot
-//$Modified: Wed Apr 05 14:50:53 2000 by Daniel Bonniot $
+//$Modified: Thu Apr 27 19:12:57 2000 by Daniel Bonniot $
 
 package bossa.syntax;
 
@@ -27,9 +27,9 @@ public class Polytype extends Node
   public Polytype(Constraint cst, Monotype monotype)
   {
     super(Node.down);
-    this.constraint=cst;
-    this.monotype=monotype;
-    addChild(cst);
+    this.constraint = cst;
+    addChild(this.constraint);
+    this.monotype = monotype;
   }
 
   /** Constructs a Polytype with the "True" constraint */
@@ -40,9 +40,9 @@ public class Polytype extends Node
 
   static Polytype bottom()
   {
-    MonotypeVar alpha=Monotype.fresh(new LocatedString("alpha",
-						       Location.nowhere()),
-				     null);
+    MonotypeVar alpha = Monotype.fresh(new LocatedString("alpha",
+							 Location.nowhere()),
+				       null);
     return new Polytype
       (new Constraint(alpha,null),
        alpha);
@@ -86,12 +86,12 @@ public class Polytype extends Node
     if(!constraint.hasBinders())
       return this;
 
-    Map map=new HashMap();
-    List newBinders=new ArrayList(constraint.binders.size());
-    for(Iterator i=constraint.binders.iterator();i.hasNext();)
+    Map map = new HashMap();
+    List newBinders = new ArrayList(constraint.binders.size());
+    for(Iterator i = constraint.binders.iterator();i.hasNext();)
       {
-	TypeSymbol old=(TypeSymbol)i.next();
-	TypeSymbol nou=old.cloneTypeSymbol();
+	TypeSymbol old = (TypeSymbol)i.next();
+	TypeSymbol nou = old.cloneTypeSymbol();
 	newBinders.add(nou);
 	map.put(old,nou);
       }
@@ -105,8 +105,8 @@ public class Polytype extends Node
 
   static Collection getConstraint(Collection c)
   {
-    Collection res=new ArrayList(c.size());
-    for(Iterator i=c.iterator();
+    Collection res = new ArrayList(c.size());
+    for(Iterator i = c.iterator();
 	i.hasNext();)
       res.add(((Polytype)i.next()).getConstraint());
     return res;
@@ -114,8 +114,8 @@ public class Polytype extends Node
   
   static Collection getMonotype(Collection c)
   {
-    Collection res=new ArrayList(c.size());
-    for(Iterator i=c.iterator();
+    Collection res = new ArrayList(c.size());
+    for(Iterator i = c.iterator();
 	i.hasNext();)
       res.add(((Polytype)i.next()).getMonotype());
     return res;
@@ -161,12 +161,12 @@ public class Polytype extends Node
 
   void resolve()
   {
-    monotype=monotype.resolve(typeScope);
+    monotype = monotype.resolve(typeScope);
   }
   
   Polytype substitute(Map map)
   {
-    return new Polytype(constraint.substitute(map),monotype.substitute(map));
+    return new Polytype(constraint.substitute(map), monotype.substitute(map));
   }
 
   void typecheck()

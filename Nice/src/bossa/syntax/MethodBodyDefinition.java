@@ -12,7 +12,7 @@
 
 // File    : MethodBodyDefinition.java
 // Created : Thu Jul 01 18:12:46 1999 by bonniot
-//$Modified: Fri Apr 21 16:12:15 2000 by Daniel Bonniot $
+//$Modified: Wed Apr 26 16:41:06 2000 by Daniel Bonniot $
 
 package bossa.syntax;
 
@@ -73,8 +73,8 @@ public class MethodBodyDefinition extends Definition
       switch(types.size()){
       case 0: User.error(this,"Method "+name+" has no parameters");
       case 1: User.error(this,"Method "+name+" has 1 parameter");
-      default:User.error(this,"Method "+name+" has "+types.size()+
-			 " parameters");
+      default:User.error(this,
+			 "Method "+name+" has "+types.size()+" parameters");
       }
     
     Collection res=new ArrayList(names.size());
@@ -106,6 +106,7 @@ public class MethodBodyDefinition extends Definition
     
     // if the method is not a class member,
     // the "this" formal is useless
+    /*
     if(!d.isMember())
       {
 	if(!((Pattern)formals.get(0)).thisAtNothing())
@@ -115,6 +116,7 @@ public class MethodBodyDefinition extends Definition
 
 	formals.remove(0);
       }
+    */
     
     parameters=buildSymbols(this.formals,definition.symbol.type.domain());
     scope.addSymbols(parameters);

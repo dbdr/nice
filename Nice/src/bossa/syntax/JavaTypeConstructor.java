@@ -12,7 +12,7 @@
 
 // File    : JavaTypeConstructor.java
 // Created : Thu Jul 08 11:51:09 1999 by bonniot
-//$Modified: Tue Apr 04 18:37:32 2000 by Daniel Bonniot $
+//$Modified: Fri Apr 28 15:20:59 2000 by Daniel Bonniot $
 
 package bossa.syntax;
 
@@ -72,12 +72,15 @@ public class JavaTypeConstructor extends TypeConstructor
     return new JavaTypeConstructor(name,javaType);
   }
 
-  static void registerTypeConstructorForJavaClass
-    (TypeConstructor tc, String javaName)
+  /**
+     @return null, except if javaName already had an
+     associated TypeConstructor in which case it is returned.
+   */
+  static TypeConstructor setTypeConstructorForJavaClass(TypeConstructor tc, 
+							String javaName)
   {
     Object old = hash.put(javaName, tc);
-    if(old!=null)
-      Internal.error(tc,"TC for "+javaName+" set twice");
+    return (TypeConstructor) old;
   }
   
   private gnu.bytecode.Type javaType;

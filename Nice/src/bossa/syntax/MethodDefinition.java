@@ -12,7 +12,7 @@
 
 // File    : MethodDefinition.java
 // Created : Thu Jul 01 18:12:46 1999 by bonniot
-//$Modified: Wed Apr 05 14:50:37 2000 by Daniel Bonniot $
+//$Modified: Thu Apr 27 19:19:18 2000 by Daniel Bonniot $
 
 package bossa.syntax;
 
@@ -47,18 +47,24 @@ public class MethodDefinition extends Definition
 			  List parameters)
   {
     super(name, Node.global);
-    this.memberOf=c;
+    this.memberOf = c;
 
-    List params=new ArrayList();
+    List params = new ArrayList();
+
     // if it is a class method, there is an implicit "this" argument
-    //TODO    if(c!=null)
-    //params.add(c.type);
+    if(c!=null)
+      {
+	Polytype t = c.getType().cloneType();
+	constraint = Constraint.and(constraint, t.getConstraint());
+	params.add(t.getMonotype());
+      }
+    
     params.addAll(parameters);
     
-    this.arity=params.size();
+    this.arity = params.size();
 
     symbol = new MethodDefinition.Symbol
-      (name,new Polytype(constraint,new FunType(params,returnType)),this);
+      (name, new Polytype(constraint, new FunType(params, returnType)), this);
     addChild(symbol);
 
     bytecodeName = module.mangleName(symbol.name.toString());
@@ -144,7 +150,6 @@ public class MethodDefinition extends Definition
 		 " is not well formed");
     }
   }
-  
 
   void endTypecheck()
   {
@@ -249,7 +254,7 @@ public class MethodDefinition extends Definition
       + symbol.name.toQuotedString()
       + "("
       + Util.map("",", ","",getType().domain())
-      + ")"
+      + ");\n"
       ;
   }
 

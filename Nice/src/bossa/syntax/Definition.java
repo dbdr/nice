@@ -12,11 +12,11 @@
 
 // File    : Definition.java
 // Created : Thu Jul 01 11:17:28 1999 by bonniot
-//$Modified: Sat Feb 19 15:27:20 2000 by Daniel Bonniot $
+//$Modified: Wed Apr 26 16:47:36 2000 by Daniel Bonniot $
 
 package bossa.syntax;
 
-import java.util.Collection;
+import java.util.*;
 
 /**
  * Abstract definition.
@@ -58,6 +58,12 @@ public abstract class Definition extends Node implements bossa.util.Located
    */
   abstract void printInterface(java.io.PrintWriter s);
 
+  void printInterface(List definitions, java.io.PrintWriter s)
+  {
+    for(Iterator i=definitions.iterator(); i.hasNext();)
+      ((Definition) i.next()).printInterface(s);
+  }
+  
   /**
    * Generates bytecode for this definition.
    */

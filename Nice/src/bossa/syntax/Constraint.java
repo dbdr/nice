@@ -12,7 +12,7 @@
 
 // File    : Constraint.java
 // Created : Fri Jul 02 17:51:35 1999 by bonniot
-//$Modified: Mon Apr 03 16:22:35 2000 by Daniel Bonniot $
+//$Modified: Thu Apr 27 19:16:41 2000 by Daniel Bonniot $
 
 package bossa.syntax;
 
@@ -38,22 +38,22 @@ public class Constraint extends Node
     construct(binders,atomics);
   }
   
-  Constraint(MonotypeVar binder, List atomics)
+  Constraint(MonotypeVar binder, ArrayList atomics)
   {
     super(Node.upper);
-    List binders=new ArrayList(1);
+    ArrayList binders=new ArrayList(1);
     binders.add(binder);
     construct(binders,atomics);
   }
-      
+  
   private void construct(List binders, List atomics)
   {
     if(binders==null)
-      binders=new ArrayList(0);
+      binders = new ArrayList(0);
     else
       addTypeSymbols(binders);
-    this.binders=binders;
-    this.atomics=addChildren(atomics);
+    this.binders = binders;
+    this.atomics = addChildren(atomics);
   }
 
   boolean hasBinders()
@@ -69,7 +69,8 @@ public class Constraint extends Node
    *
    * @return a constraint with no binders, always true
    */
-  public static final Constraint True = new Constraint(new ArrayList(0),new ArrayList(0));
+  public static final Constraint True = 
+    new Constraint(new ArrayList(0),new ArrayList(0));
 
   /**
    * Returns a new constraint.
@@ -111,7 +112,7 @@ public class Constraint extends Node
 
   void resolve()
   {
-    atomics=AtomicConstraint.resolve(typeScope,atomics);
+    atomics = AtomicConstraint.resolve(typeScope, atomics);
   }
 
   Constraint substitute(Map map)
@@ -223,7 +224,10 @@ public class Constraint extends Node
   void addBinder(TypeSymbol s)
   {
     if(!binders.contains(s))
-      binders.add(s);
+      {
+	binders.add(s);
+	addTypeSymbol(s);
+      }
   }
   
   /**

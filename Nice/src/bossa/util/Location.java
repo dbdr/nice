@@ -12,7 +12,7 @@
 
 // File    : Location.java
 // Created : Tue Jul 13 11:55:08 1999 by bonniot
-//$Modified: Tue Mar 14 16:33:06 2000 by Daniel Bonniot $
+//$Modified: Fri Apr 28 15:32:45 2000 by Daniel Bonniot $
 
 package bossa.util;
 
@@ -31,19 +31,19 @@ public class Location implements Located
    * Enables to set the file name just once,
    * not at each Location construction.
    */
-  public static String currentFile=null;
+  public static String currentFile = null;
 
   public Location(String file,
 		  int startLine, int startColumn,
 		  int endLine, int endColumn)
   {
-    this.fileName=file;
-    this.startLine=startLine;
+    this.fileName = file;
+    this.startLine = startLine;
     // JavaCC has 1 as first column,
     // and Emacs has 0 !!
-    this.startColumn=startColumn;
-    this.endLine=endLine;
-    this.endColumn=endColumn;
+    this.startColumn = startColumn;
+    this.endLine = endLine;
+    this.endColumn = endColumn;
   }
 
   public Location(
@@ -60,7 +60,7 @@ public class Location implements Located
 
   public Location(String abstractLocation, boolean dummy)
   {
-    this.abstractLocation=abstractLocation;
+    this.abstractLocation = abstractLocation;
   }
 
   public Location(bossa.parser.Token t)
@@ -76,22 +76,22 @@ public class Location implements Located
 
   public String toString()
   {
-    if(abstractLocation!=null)
-      return "["+abstractLocation+"]: ";
+    if(abstractLocation!= null)
+      return "["+abstractLocation+"]";
 
     String res;
 
-    if(fileName!=null)
-      res=fileName+": ";
+    if(fileName!= null)
+      res = fileName;
     else
-      res="";
+      res = "";
 
     if(!isValid())
       if(Debug.powerUser)
-	return res+"[no location] ";
+	return res+"[no location]";
       else
 	return res;
-    return res+"line "+startLine+", column "+(startColumn-1)+": ";
+    return res+"line "+startLine+", column "+(startColumn-1);
   }
 
   public boolean isValid()
@@ -106,7 +106,7 @@ public class Location implements Located
 
   public Location englobe(Collection /* of Located */ locs)
   {
-    List llocs=(List) locs;
+    List llocs = (List) locs;
     return englobe(((Located)llocs.get(llocs.size()-1)).location());
   }
 
@@ -127,5 +127,5 @@ public class Location implements Located
   
   private int startLine,startColumn,endLine,endColumn;
   private String fileName;
-  private String abstractLocation=null; // if non-null, overseeds everyting
+  private String abstractLocation = null; // if non-null, overseeds everyting
 }

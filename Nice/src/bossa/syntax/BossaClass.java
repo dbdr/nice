@@ -12,7 +12,7 @@
 
 // File    : BossaClass.java
 // Created : Thu Jul 01 11:25:14 1999 by bonniot
-//$Modified: Fri Feb 25 13:27:34 2000 by Daniel Bonniot $
+//$Modified: Wed Apr 26 16:47:10 2000 by Daniel Bonniot $
 
 package bossa.syntax;
 
@@ -42,14 +42,12 @@ public class BossaClass extends ClassDefinition
    * @param implementations a list of Interfaces
    * @param abstractions a list of Interfaces
    * @param fields a list of ClassDefinition.Field
-   * @param methods a list of MethodDefinition. Class methods.
    */
   public BossaClass(LocatedString name, 
 		    boolean isFinal, boolean isAbstract, 
 		    boolean isInterface, boolean isSharp,
 		    List typeParameters,
-		    List extensions, List implementations, List abstractions,
-		    List fields, List methods)
+		    List extensions, List implementations, List abstractions)
   {
     super(name.cloneLS(), isFinal, isAbstract, isInterface,
 	  typeParameters, extensions, implementations, abstractions);
@@ -58,30 +56,7 @@ public class BossaClass extends ClassDefinition
     this.isSharp=isSharp;
     this.implementsTop = !isSharp;
     
-    this.fields=keepFields(fields,isSharp);
-
     addTypeSymbol(this.tc);
-    
-    if(this.isSharp)
-      // The sharp class must not declare children, 
-      // since the associated class has already done so.
-      // Anyway, those should be null.
-      {
-	this.methods=methods;
-	addChildren(computeAccessMethods(this.fields));
-
-	classType = module.createClass(simpleName.toString().substring(1));
-      }
-    else
-      {
-	this.methods=addChildren(methods);
-	addChildren(computeAccessMethods(this.fields));
-
-	if(this.isAbstract || this.isFinal)
-	  // since no associated concrete class is created,
-	  // it needs its own classtype
-	  classType = module.createClass(simpleName.toString());
-      }
     
     // if this class is final, 
     // no #class is created below.
@@ -90,6 +65,23 @@ public class BossaClass extends ClassDefinition
       addTypeMap("#"+name.content,this.tc);
   }
 
+  public void setFieldsAndMethods(List fields, List methods)
+  {
+    this.fields = keepFields(fields,isSharp);
+    if(methods!=null)
+      this.methods = addChildren(methods);
+
+    computeMethods();
+
+    if(this.isSharp)
+      classType = module.createClass(simpleName.toString().substring(1));
+    else
+      if(this.isAbstract || this.isFinal)
+	// since no associated concrete class is created,
+	// it needs its own classtype
+	classType = module.createClass(simpleName.toString());
+  }
+  
   /**
    * Creates an immediate descendant, 
    * that abstracts and doesn't implement Top<n>.
@@ -99,17 +91,18 @@ public class BossaClass extends ClassDefinition
     if(isFinal || isAbstract)
       return new LinkedList();
 
-    LocatedString name=this.simpleName.cloneLS();
+    LocatedString name = this.simpleName.cloneLS();
     name.prepend("#");
-    List parent=new ArrayList(1);
+    List parent = new ArrayList(1);
     parent.add(this.tc);
-    ClassDefinition c=new BossaClass
+    BossaClass c = new BossaClass
       (name,true,false,false,true,typeParameters,parent,
-       new LinkedList(),new LinkedList(),fields,methods);
+       new LinkedList(),new LinkedList());
+    c.setFieldsAndMethods(fields, null);
     associatedConcreteClass = c;
     concreteClasses.add(c);
     
-    Collection res=new ArrayList(1);
+    Collection res = new ArrayList(1);
     res.add(c);
     return res;
   }
@@ -132,7 +125,7 @@ public class BossaClass extends ClassDefinition
 
   private List keepFields(List fields, boolean local)
   {
-    List result=new ArrayList(fields.size());
+    List result = new ArrayList(fields.size());
     for(Iterator i=fields.iterator();i.hasNext();)
       {
 	Field f=(Field)i.next();
@@ -168,20 +161,18 @@ public class BossaClass extends ClassDefinition
     boolean isLocal;
   }
   
-  private List computeAccessMethods(List fields)
+  private void computeMethods()
   {
-    List res=new ArrayList(fields.size());
-    for(Iterator i=fields.iterator();i.hasNext();)
+    for(Iterator i=fields.iterator(); i.hasNext();)
       {
-	Field f=(Field)i.next();
+	Field f = (Field) i.next();
 
-	MonoSymbol s=f.sym;
+	MonoSymbol s = f.sym;
 	MethodDefinition m = 
 	  new FieldAccessMethod(this,s.name,s.type,typeParameters);
 
-	res.add(m);
+	addChild(m);
       }
-    return res;
   }
   
   /****************************************************************
@@ -225,9 +216,9 @@ public class BossaClass extends ClassDefinition
       (
          " {\n"
        + Util.map("",";\n",";\n",fields)
-       + Util.map(methods)
        + "}\n\n"
        );
+    printInterface(methods, s);
   }
   
   /****************************************************************

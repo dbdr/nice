@@ -12,7 +12,7 @@
 
 // File    : Node.java
 // Created : Thu Jul 08 10:24:56 1999 by bonniot
-//$Modified: Tue Mar 14 17:20:41 2000 by Daniel Bonniot $
+//$Modified: Thu Apr 27 19:13:55 2000 by Daniel Bonniot $
 
 package bossa.syntax;
 
@@ -281,12 +281,12 @@ abstract public class Node
     
     resolve();
 
-    if(Debug.resolution)
-      Debug.println("Resolved to "+this);
-    
     Iterator i=children.iterator();
     while(i.hasNext())
       ((Node)i.next()).doResolve();
+
+    if(Debug.resolution)
+      Debug.println("Resolved to "+this);
   }
 
   /****************************************************************

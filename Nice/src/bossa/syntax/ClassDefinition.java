@@ -12,7 +12,7 @@
 
 // File    : ClassDefinition.java
 // Created : Thu Jul 01 11:25:14 1999 by bonniot
-//$Modified: Fri Feb 25 15:32:47 2000 by Daniel Bonniot $
+//$Modified: Thu Apr 27 18:52:29 2000 by Daniel Bonniot $
 
 package bossa.syntax;
 
@@ -80,9 +80,13 @@ abstract public class ClassDefinition extends Definition
     this.isInterface=isInterface;
 
     if(typeParameters==null)
-      this.typeParameters=new ArrayList(0);
+      this.typeParameters = new ArrayList(0);
     else
-      this.typeParameters=typeParameters;
+      {
+	this.typeParameters = typeParameters;
+	addTypeSymbols(typeParameters);    
+      }
+
     this.extensions=extensions;
 
     this.tc=new TypeConstructor(this);
@@ -131,8 +135,6 @@ abstract public class ClassDefinition extends Definition
 
   void resolve()
   {
-    typeScope.addSymbols(typeParameters);
-    
     extensions=TypeConstructor.resolve(typeScope,extensions);
 
     // A class cannot extend an interface

@@ -12,7 +12,7 @@
 
 // File    : NewExp.java
 // Created : Thu Jul 08 17:15:15 1999 by bonniot
-//$Modified: Wed Feb 16 18:04:18 2000 by Daniel Bonniot $
+//$Modified: Tue May 02 11:27:53 2000 by Daniel Bonniot $
 // Description : Allocation of a new object
 
 package bossa.syntax;
@@ -23,7 +23,7 @@ public class NewExp extends Expression
 {
   public NewExp(TypeConstructor tc)
   {
-    this.tc=tc;
+    this.tc = tc;
   }
 
   void findJavaClasses()
@@ -33,14 +33,14 @@ public class NewExp extends Expression
   
   void resolve()
   {
-    tc=tc.resolve(typeScope);
+    tc = tc.resolve(typeScope);
   }
   
   void computeType()
   {  
-    TypeParameters tp=new TypeParameters(tc.name,tc.variance);
-    type=new Polytype(new Constraint(tp.content,null),
-		      new MonotypeConstructor(tc,tp,tc.location()));
+    TypeParameters tp = new TypeParameters(tc.name,tc.variance);
+    type = new Polytype(new Constraint(tp.content,null),
+			new MonotypeConstructor(tc,tp,tc.location()));
   }
 
   void typecheck()

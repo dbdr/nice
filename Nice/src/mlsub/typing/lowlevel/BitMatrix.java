@@ -59,14 +59,14 @@ final public class BitMatrix implements Cloneable {
       for (int i = size; i>newSize; )
 	rows[--i] = null;
     }
-      else {
-        if(rows.length<newSize)
-	  {
-	    BitVector[] newRows = new BitVector[rows.length*2];
-	    System.arraycopy(rows, 0, newRows, 0, rows.length);
-	    rows = newRows;
-	  }
-      }
+    else {
+      if(rows.length<newSize)
+	{
+	  BitVector[] newRows = new BitVector[rows.length*2];
+	  System.arraycopy(rows, 0, newRows, 0, rows.length);
+	  rows = newRows;
+	}
+    }
     size = newSize;
   }
 

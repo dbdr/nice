@@ -1,12 +1,14 @@
 
 TOP=${PWD}
 
-JAVAC=javac -classpath ${TOP}/classes:${TOP}/src:${TOP}/stdlib -sourcepath ${TOP}/src -d ${TOP}/classes -O -g
-JAVACC=java -classpath ${TOP}/external/JavaCC.zip COM.sun.labs.javacc.Main
+JAVAC=  javac -classpath ${TOP}/classes:${TOP}/src:${TOP}/stdlib -sourcepath ${TOP}/src -d ${TOP}/classes -O -g
+JAVACC= CLASSPATH=${TOP}/external/JavaCC.zip:${CLASSPATH} java COM.sun.labs.javacc.Main
 JAVADOC=javadoc #-linkoffline file:///C%7C/Apps/jdk1.2.1/docs/api file:///usr/opt/java122/docs/api
 
 # run this first when you just checked out a fresh version
-first: parser
+first: parser bootstrap jar
+
+bootstrap:
 	cd ${TOP}/src/nice/tools/compiler; ./setBuildDate
 	cd stdlib; nicec nice.getopt
 	cd src; nicec bossa.modules
@@ -14,9 +16,14 @@ first: parser
 	cd src; NICEJAR=${HOME}/Nice/stdlib nicec bossa.modules
 	mkdir -p classes
 	cd classes; jar xf ../external/java-getopt-1.0.7.jar gnu
-	ln -sf nicec bin/nicer
 	cd src;\
-	${JAVAC} bossa/modules/Package.java nice/tools/runJar.java nice/tools/code/*.java gnu/bytecode/dump.java ../stdlib/nice/*/*.java
+	${JAVAC} bossa/modules/Package.java nice/tools/runJar.java nice/tools/code/*.java gnu/mapping/*.java gnu/bytecode/dump.java ../stdlib/nice/*/*.java
+	ln -sf nicec bin/nicer
+
+# erase out-of-date class files and 'make dep' to recompile if javac 
+# has no -[X]depend
+dep:
+	cd src; ${JAVAC} bossa/modules/Package.java
 
 recompile: parser
 	${JAVAC} -Xdepend src/bossa/modules/Package.java

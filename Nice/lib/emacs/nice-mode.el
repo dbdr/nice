@@ -470,12 +470,9 @@ Mode for editing/compiling Nice programs.
 (defun nice-buffer-pkg-name ()
   (save-excursion
     (goto-char (point-min))
-    (let ((start (search-forward "package " nil t))
-	  (end (search-forward ";")))
-      (if start
-	  (buffer-substring-no-properties start (- end 1))
-	(error "\"package\" statement not found"))
-    )
+    (if (search-forward-regexp "package +\\(.*\\);" nil t 1)
+	(buffer-substring-no-properties (match-beginning 1) (match-end 1))
+      (error "File should start with \"package <name.of.package>;\""))
   )
 )
 

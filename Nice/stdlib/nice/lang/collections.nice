@@ -113,7 +113,7 @@ set(l@Cons, n, elem)
     l.tail.set(n-1, elem);
 }
 
-set(l@Nil,  n, elem) { /* error */ }
+set(l@Nil,  n, elem) { throw new Exception(); }
 
 map(l@Nil, f) = new Nil();
 
@@ -125,6 +125,26 @@ filter<C,T>(l@Cons, test)
   LinkedList<T> res = filter(l.tail,test);
   return test(l.head) ? cons(l.head, res) : res;
 }
+
+/*
+class LinkedList<T> implements List = java.lang.LinkedList;
+
+size(l@LinkedList) = l.size();
+
+get(l@LinkedList, n) = l.get(n);
+
+set(l@LinkedList, n, elem) = l.set(n, elem);
+
+map<T, U> (l@LinkedList, f)
+{
+  LinkedList<U> res = new LinkedList();
+  return res;
+}
+
+filter<C,T>(l@LinkedList, test)
+{
+}
+*/
 
 /****************************************************************
  * Vector

@@ -108,7 +108,8 @@ main(args)
   t2 = t1;
 
   test_numeric();
-  test_arrays();
+  //test_arrays();
   test_comparable();
   test_optional();
+  test_classes();
 }

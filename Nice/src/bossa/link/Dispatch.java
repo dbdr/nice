@@ -12,7 +12,7 @@
 
 // File    : Dispatch.java
 // Created : Mon Nov 15 10:36:41 1999 by bonniot
-//$Modified: Tue Jan 11 18:05:39 2000 by bonniot $
+//$Modified: Fri Jan 21 15:40:11 2000 by Daniel Bonniot $
 
 package bossa.link;
 
@@ -206,7 +206,7 @@ public class Dispatch
 
     for(int n=0; n<types.length; n++)
       {
-	gnu.expr.Declaration param = lexp.addDeclaration("parameter_"+n,types[n]);
+	Declaration param = lexp.addDeclaration("parameter_"+n,types[n]);
 	param.setParameter(true);
 	params[n]=new ReferenceExp(param);
       }
@@ -227,13 +227,13 @@ public class Dispatch
   
   private static gnu.expr.Expression compileFieldAccess(FieldAccessMethod method, gnu.expr.Expression value)
   {
-    ListIterator types = method.fieldTC.getJavaInstanceTypes();
+    ListIterator types = method.classTC.getJavaInstanceTypes();
     
     gnu.expr.Expression[] param = new gnu.expr.Expression[1];
     param[0] = value;
     
     gnu.expr.Expression res =
-      new ApplyExp(new QuoteExp(new kawa.lang.GetFieldProc((gnu.bytecode.ClassType) types.next(),method.fieldName)),
+      new ApplyExp(new QuoteExp(new kawa.lang.GetFieldProc((gnu.bytecode.ClassType) types.next(),method.fieldName, method.javaReturnType(), gnu.bytecode.Access.PUBLIC)),
 		   param);
     
     while(types.hasNext())
@@ -249,14 +249,14 @@ public class Dispatch
 
   private static gnu.expr.Expression compileSetField(SetFieldMethod method, gnu.expr.Expression obj, gnu.expr.Expression value)
   {
-    ListIterator types = method.fieldTC.getJavaInstanceTypes();
+    ListIterator types = method.classTC.getJavaInstanceTypes();
     
     gnu.expr.Expression[] params = new gnu.expr.Expression[2];
     params[0] = obj;
     params[1] = value;
     
     gnu.expr.Expression res =
-      new ApplyExp(new QuoteExp(new kawa.lang.SetFieldProc((gnu.bytecode.ClassType) types.next(),method.fieldName)),
+      new ApplyExp(new QuoteExp(new kawa.lang.SetFieldProc((gnu.bytecode.ClassType) types.next(),method.fieldName, method.fieldType.getJavaType(), gnu.bytecode.Access.PUBLIC)),
 		   params);
     
     while(types.hasNext())

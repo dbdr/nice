@@ -12,7 +12,7 @@
 
 // File    : SetFieldMethod.java
 // Created : Thu Jul 01 18:12:46 1999 by bonniot
-//$Modified: Mon Dec 06 17:41:24 1999 by bonniot $
+//$Modified: Fri Jan 21 15:37:02 2000 by Daniel Bonniot $
 
 package bossa.syntax;
 
@@ -36,8 +36,9 @@ public class SetFieldMethod extends MethodDefinition
     super(fieldName,new Constraint(classTypeParameters,null),
 	  JavaTypeConstructor.voidType, makeList(classDef.getType().getMonotype(),fieldType));
     this.definition=classDef;
-    this.fieldTC = classDef.tc;
+    this.classTC = classDef.tc;
     this.fieldName = fieldName.toString();
+    this.fieldType = fieldType;
     
     MethodDefinition.addMethod(this);
   }
@@ -50,12 +51,13 @@ public class SetFieldMethod extends MethodDefinition
     return res;
   }
   
-  public final TypeConstructor fieldTC;
-
+  public final TypeConstructor classTC;
+  public final Monotype fieldType;
+  
   public final String fieldName;
   
   /** The java class this method is defined in */
-  ClassDefinition definition;
+  final ClassDefinition definition;
 
   /****************************************************************
    * Code generation

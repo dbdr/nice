@@ -12,7 +12,7 @@
 
 // File    : FieldAccessMethod.java
 // Created : Thu Jul 01 18:12:46 1999 by bonniot
-//$Modified: Mon Dec 06 17:39:57 1999 by bonniot $
+//$Modified: Fri Jan 21 15:35:23 2000 by Daniel Bonniot $
 
 package bossa.syntax;
 
@@ -43,7 +43,7 @@ public class FieldAccessMethod extends MethodDefinition
     super(fieldName,new Constraint(classTypeParameters,null),
 	  fieldType,makeList(classDef.getType().getMonotype()));
     this.definition=classDef;
-    this.fieldTC = classDef.tc;
+    this.classTC = classDef.tc;
     this.fieldName = fieldName.toString();
     
     MethodDefinition.addMethod(this);
@@ -63,7 +63,7 @@ public class FieldAccessMethod extends MethodDefinition
    */
   public boolean isFieldAccess() { return true; }
 
-  public final TypeConstructor fieldTC;
+  public final TypeConstructor classTC;
 
   public final String fieldName;
   

@@ -12,7 +12,7 @@
 
 // File    : TypeConstructor.java
 // Created : Thu Jul 08 11:51:09 1999 by bonniot
-//$Modified: Thu Jan 20 14:12:16 2000 by bonniot $
+//$Modified: Fri Jan 21 15:48:24 2000 by Daniel Bonniot $
 
 package bossa.syntax;
 
@@ -139,10 +139,8 @@ public class TypeConstructor
 
   gnu.bytecode.Type getJavaType()
   {
-    if(name.content.equals("Array"))
-      return 
-	//new gnu.bytecode.ArrayType(gnu.bytecode.Type.pointer_type);
-	bossa.SpecialTypes.arrayType;
+    if(name.content.equals("Array") || name.content.equals("#Array"))
+      return bossa.SpecialTypes.arrayType;
     
     if(definition!=null)
       return ClassDefinition.javaClass(definition);

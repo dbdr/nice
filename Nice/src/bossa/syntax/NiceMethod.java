@@ -83,7 +83,7 @@ public class NiceMethod extends MethodDeclaration
 	 new ArrayList((hasAlike ? 1 : 0)));
 	
     constraint.addBinders(thisTypeParams);
-	
+    
     mlsub.typing.Monotype thisType;
 
     // "alike" is not created for a non-abstract interface

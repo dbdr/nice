@@ -1695,7 +1695,7 @@ public class CodeAttr extends Attribute implements AttrContainer
 	      {
                 // We store the result in a method-level variable, to make sure
                 // that the finally blocks do not use the same slot.
-		result = methodScope().addVariable(this, topType());
+		result = methodScope().addVariable(this, topType(), null);
 		emitStore(result);
 	      }
 	    emitJsr(state.finally_subr);

@@ -86,4 +86,9 @@ case $progname in
 
 esac
 
+# Certain JVMs seem to exit by throwing SIGHUP, thus replacing the exit code
+# with 129.
+# This happens only when running inside Emacs with Sun's 1.4.2_04-b05.
+trap "" SIGHUP
+
 exec ${java} $class ${system_args} "$@"

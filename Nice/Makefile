@@ -120,3 +120,6 @@ bootstrap:
 	cd src; ${NICEC} bossa.syntax
 	cd src;\
 	${JAVAC} bossa/modules/Package.java nice/tools/runJar.java nice/tools/code/*.java ../stdlib/nice/lang/rawArray.java gnu/mapping/*.java gnu/bytecode/dump.java
+
+nice-pass: 
+	cd src; ${NICEC} bossa.syntax

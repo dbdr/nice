@@ -4,8 +4,7 @@
 ###
 ### Wrapper for the native compiler, compiled by gcj.
 ### This script must be placed in a directory with 
-###   ../share/java/nice.jar (for the standard library 
-###                           and the ressources for gnu.getopt)
+###   ../share/java/nice.jar (for the standard library) 
 ###   ./nicec.bin            (the binary executable produced by gcj)
 ###
 ### Copyright 2002 Daniel Bonniot
@@ -28,12 +27,14 @@ find_home()
     fi
   done
 
-  APPHOME="`dirname $PRG`"
+  APPHOME=`expr "$PRG" : '\(.*\)/bin'`
+  if [ -z ${APPHOME} ]; 
+    then APPHOME=`dirname "$PRG"`/..
+  fi
 }
 
 scriptName="$0"
 find_home "$scriptName"
-cd "$APPHOME"
-CLASSPATH=../share/java/nice.jar:$CLASSPATH
-export CLASSPATH
-exec ./nicec.bin "$@"
+runtime=${APPHOME}/share/java/nice.jar
+
+exec ${APPHOME}/bin/nicec.bin --runtime=${runtime} "$@"

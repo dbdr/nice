@@ -144,10 +144,6 @@ private ?int readConstantPool__(DataInputStream dstr)
 	let value = new byte[length];
 	stream.readFully(value);
 	return new String(value, "UTF-8");
-
-	// Skip the two higher-order bytes. Problematic for large source maps?
-	//let dummy = stream.readUnsignedShort();
-	//return stream.readUTF();
       }
 
     let attribute_length = stream.readInt();
@@ -212,7 +208,7 @@ private (int,int,int,int,int) parseLine__(String line, int defaultId)
     return null;
 
   var resultLine = 0;
-  var resultId = 1;
+  var resultId = -1;
 
   let r = new BufferedReader(new StringReader(map));
   if (! (r.readLine().equals("SMAP")))
@@ -281,7 +277,8 @@ private (int,int,int,int,int) parseLine__(String line, int defaultId)
 	      resultLine = start + (lineNumber - outStart)/outInc;
 	      resultId = id;
 
-	      if (files.get(id) != null)
+	      // If we already know the file, we know everything we want.
+	      if (files.size() > id && files.get(id) != null)
 		return (notNull(files.get(id)), resultLine);
 	    }
 	}
@@ -292,6 +289,9 @@ private (int,int,int,int,int) parseLine__(String line, int defaultId)
       // Skip until we find something interesting
       section = r.readLine();
   } while (true);
+
+  if (resultId == -1)
+    return null;
 
   return (notNull(files.get(resultId)), resultLine);
 }

@@ -7,7 +7,7 @@ import java.lang.reflect.*;
 public boolean runTests(String packageName, TestListener listener,
 			?String classpath = null)
 {
-  let classloader = classpath == null 
+  let classloader = classpath == null
     ? ClassLoader.getSystemClassLoader()
     : classloaderFromClasspath(notNull(classpath));
 
@@ -57,24 +57,24 @@ public boolean iterLocations
   return false;
 }
 
-boolean isTestMethod(Method m) = 
+boolean isTestMethod(Method m) =
   m.getName().startsWith("_test") && m.getParameterTypes().length == 0;
 
 void runTestMethod(Method m, TestListener listener)
 {
   let name = m.getDeclaringClass().getName() + "." + m.getName();
-  
+
   listener.start(name);
-  try 
+  try
   {
     m.invoke(null, null);
-  } 
-  catch (InvocationTargetException e) 
+  }
+  catch (InvocationTargetException e)
   {
     let cause = e.getTargetException();
     listener.failure(name, cause);
   }
-  finally 
+  finally
   {
     listener.end(name);
   }
@@ -84,12 +84,12 @@ String replaceLast(String source, char c, String by)
 {
   let index = source.lastIndexOf(c);
   if (index == -1) return source;
-  
+
   StringBuffer res = new StringBuffer(source.length() + by.length() - 1);
   res.append(source.substring(0, index));
   res.append(by);
   res.append(source.substring(index + 1));
-  
+
   return res.toString();
 }
 

@@ -674,15 +674,14 @@ toString(NotNullPattern p) = "!null";
 toString(TypePattern p)
 {
   let res = new StringBuffer();
-  res.append(p.exactlyAt ? "#" : (p.name != null ? "" : "@"));
+  res.append(p.exactlyAt ? "#" : "");
   
   if (p.typeConstructor != null)
     res.append(p.typeConstructor);
   else if (p.tc != null)
     res.append(p.tc);
 
-  if (p.name != null)
-    res.append(" " +p.name);
+  res.append(" " + (p.name != null ? notNull(p.name).toString() : "_"));
   
   return res.toString();
 }

@@ -1512,14 +1512,14 @@ Definition globalVariable():
 
 Contract contract() :
 {
-  Contract res = Contract.noContract;
+  Contract res = bossa.syntax.fun.noContract;
   Expression condition, name;
 }
 {
   [ "requires" { res = new Contract(); }
     contractElements(res, true)
   ]
-  [ "ensures" { if (res == Contract.noContract) res = new Contract(); }
+  [ "ensures" { if (res == bossa.syntax.fun.noContract) res = new Contract(); }
     contractElements(res, false)
   ]
   { return res; }

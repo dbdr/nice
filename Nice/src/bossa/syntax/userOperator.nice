@@ -113,7 +113,7 @@ public abstract class UserOperator extends MethodDeclaration
        We will probably be able to remove this if contracts cen be reloaded
        from bytecode.
     */
-    if (contract != Contract.noContract)
+    if (contract != noContract)
       this.typecheck();
   }
 

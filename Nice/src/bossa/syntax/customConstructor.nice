@@ -143,7 +143,7 @@ public CustomConstructor createCustomConstructor(LocatedString className, Constr
                     FormalParameters params, Statement body)
 {
   return new CustomConstructor(new LocatedString("<init>", className.location()),
-	cst, getCCReturnType(className, cst), params, contract: Contract.noContract,
+	cst, getCCReturnType(className, cst), params, contract: noContract,
 	className: className, body: body);
 
 }

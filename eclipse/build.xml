@@ -1,1 +1,184 @@
 <?xml version="1.0" encoding="UTF-8"?>
+
+
+<!--
+/**************************************************************************/
+/*                          Nice Eclipse-Plugin                           */
+/*                          (c) Alex Greif 2003                           */
+/*                                                                        */
+/*  This program is free software; you can redistribute it and/or modify  */
+/*  it under the terms of the GNU General Public License as published by  */
+/*  the Free Software Foundation; either version 2 of the License, or     */
+/*  (at your option) any later version.                                   */
+/*                                                                        */
+/**************************************************************************/
+-->
+
+
+
+<project default="dist" basedir=".">
+
+
+
+  <property name="build.properties" value="nice_plugin_build.properties"/>
+  <property file="${build.properties}"/>
+
+  <property name="main.package" value="nice.eclipse.core"/>
+  <property name="plugin.jar.name" value="niceplugin.jar"/>
+
+  <property name="src.dir" value="src"/>
+  
+  <property name="build.dir" value="build"/>
+  
+  <property name="dist.dir" value="dist"/>
+
+  <property name="plugin.id" value="net.sf.nice"/>
+  <property name="plugin.version" value="0.1.6"/>
+  <property name="plugin.id.version" value="${plugin.id}_${plugin.version}"/>
+  <property name="plugin.dir" value="${build.dir}/${plugin.id.version}"/>
+  <property name="plugin.manifest.name" value="plugin.xml"/>
+
+
+
+
+
+
+  <target name="clean">
+    <delete dir="${build.dir}"/>
+    <delete dir="${dist.dir}"/>
+  </target>
+
+
+
+  <target name="check-nice-runtime">
+    <fail unless="nice.runtime">
+      please set the "nice.runtime" property in
+      the file "${build.properties}". It must point to the
+      nice runtime file "nice.jar". You can download it from
+      http://sourceforge.net/projects/nice/
+    </fail>
+
+	  <echo message="nice runtime: ${nice.runtime}"/>
+    <!-- The task definition for the Nice compile task -->
+    <path id="classpath">
+      <pathelement location="${nice.runtime}"/>
+    </path>
+	  <taskdef name="nicec"
+	    classname="nice.tools.ant.Nicec"
+	    classpathref="classpath"/>
+  </target>
+  
+  
+  <target name="check-eclipse-home">
+    <fail unless="eclipse.home">
+      please set the "eclipse.home" property in
+      the file "${build.properties}". It must point to the
+      eclipse home folder
+    </fail>
+	  <echo message="eclipse home: ${eclipse.home}"/>
+  </target>
+  
+  
+
+
+
+  <target name="init" depends="check-nice-runtime,check-eclipse-home,clean">
+    <mkdir dir="${build.dir}"/>
+    <mkdir dir="${dist.dir}"/>
+  </target>
+
+
+
+
+  <target name="check-eclipse-properties" depends="check-eclipse-home,clean">
+    <property name="eclipse.properties" value="${build.dir}/eclipse.properties"/>
+    <copy file="${eclipse.home}/.eclipseproduct" tofile="${eclipse.properties}"/>
+    <!-- get rid of whitespaces -->
+    <replace file="${eclipse.properties}" token=" " value=""/>
+    <replace file="${eclipse.properties}" token="\t" value=""/>
+    
+    <!-- rename properties -->
+    <replace file="${eclipse.properties}" token="version" value="eclipse.version"/>
+    
+    <property file="${eclipse.properties}"/>
+    
+    <fail unless="eclipse.version">
+      eclipse version not found.
+      Check whether there is a file ".eclipseproduct" in eclipse home.
+      If the file is missing, then please report a bugreport at
+      http://sourceforge.net/tracker/?group_id=12788&amp;atid=112788
+      include your platform and eclipse version
+      thanks.
+    </fail>
+	  <echo message="eclipse version: ${eclipse.version}"/>
+
+  </target>
+
+
+
+
+
+
+
+  <target name="compile" depends="check-eclipse-properties,init">
+    <nicec package="${main.package}"
+      sourcepath="${src.dir}"
+      destination="${build.dir}"
+      jar="${build.dir}/${plugin.jar.name}">
+      <classpath>
+        <pathelement location="${eclipse.home}/plugins/org.eclipse.core.resources_${eclipse.version}/resources.jar"/>
+        <pathelement location="${eclipse.home}/plugins/org.eclipse.ui_${eclipse.version}/ui.jar"/>
+        <pathelement location="${eclipse.home}/plugins/org.eclipse.swt.carbon_${eclipse.version}/ws/carbon/swt.jar"/>
+        <pathelement location="${eclipse.home}/plugins/org.eclipse.text_${eclipse.version}/text.jar"/>
+        <pathelement location="${eclipse.home}/plugins/org.eclipse.jface_${eclipse.version}/jface.jar"/>
+        <pathelement location="${eclipse.home}/plugins/org.eclipse.jface.text_${eclipse.version}/jfacetext.jar"/>
+        <pathelement location="${eclipse.home}/plugins/org.eclipse.ui.views_${eclipse.version}/views.jar"/>
+        <pathelement location="${eclipse.home}/plugins/org.eclipse.ui.workbench_${eclipse.version}/workbench.jar"/>
+        <pathelement location="${eclipse.home}/plugins/org.eclipse.ui.workbench.texteditor_${eclipse.version}/texteditor.jar"/>
+        <pathelement location="${eclipse.home}/plugins/org.eclipse.ui.editors_${eclipse.version}/editors.jar"/>
+        <pathelement location="${eclipse.home}/plugins/org.eclipse.debug.ui_${eclipse.version}/dtui.jar"/>
+        <pathelement location="${eclipse.home}/plugins/org.eclipse.core.runtime_${eclipse.version}/runtime.jar"/>
+      </classpath>
+    </nicec>
+  
+  </target>
+
+
+
+
+
+
+
+
+
+  <target name="dist" depends="compile">
+    <mkdir dir="${plugin.dir}"/>
+    <move file="${build.dir}/${plugin.jar.name}" todir="${plugin.dir}"/>
+    <copy file="${src.dir}/${plugin.manifest.name}" todir="${plugin.dir}"/>
+    <replace file="${plugin.dir}/${plugin.manifest.name}" token="_plugin.version_" value="${plugin.version}"/>
+    
+
+    <property name="plugin.tar" value="${dist.dir}/${plugin.id.version}.tar"/>
+    <tar destfile="${plugin.tar}" basedir="${build.dir}" includes="${plugin.id.version}/**"/>
+    <gzip src="${plugin.tar}" zipfile="${dist.dir}/${plugin.id.version}.tgz"/>
+    
+    <zip destfile="${dist.dir}/${plugin.id.version}.zip" basedir="${build.dir}" includes="${plugin.id.version}/**"/>
+    
+    <echo>
+      following files were placed in folder ${dist.dir}:
+      ${plugin.id.version}.tgz
+      ${plugin.id.version}.tar
+      ${plugin.id.version}.zip
+    </echo>
+  </target>
+
+
+
+
+
+
+
+</project>
+
+
+

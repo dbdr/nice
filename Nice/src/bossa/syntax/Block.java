@@ -189,13 +189,15 @@ public class Block extends Statement
 				       Constraint.True, parameters, 
 				       returnType, parameters.size);
       symbol.syntacticType.getMonotype().nullness = Monotype.sure;
-      return new LocalFunction(symbol, value);
+      return new LocalFunction(symbol, value, parameters);
     }
 
-    private LocalFunction(FunSymbol symbol, Expression value)
+    private LocalFunction(FunSymbol symbol, Expression value,
+			  FormalParameters parameters)
     {
       this.value = value;
       this.left = symbol;
+      this.parameters = parameters;
     }
 
     String getName() { return left.name.toString(); }
@@ -213,6 +215,7 @@ public class Block extends Statement
     }
 
     FunSymbol left;
+    FormalParameters parameters;
   }
 
   ArrayList /* of LocalDeclaration */ locals = new ArrayList();

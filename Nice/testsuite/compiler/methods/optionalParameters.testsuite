@@ -1,0 +1,47 @@
+/// PASS
+  assert test(1) == 1;
+  /// Toplevel
+int test(int x, int y = x) = y;
+
+/// FAIL
+  /// Toplevel
+int test(int x = x) = x;
+
+/// FAIL
+  /// Toplevel
+int test(int x = y, int y = x) = y;
+
+/// PASS
+  assert test(0,0) == 2;
+  /// Toplevel
+int test(int x, int y = x)
+{
+  if (x == 0) return test(2);
+  else return y;
+}
+
+/// PASS
+  assert test(0,0) == 4;
+  /// Toplevel
+int test(int x, int y = x * 2)
+{
+  if (x == 0) return test(2);
+  else return y;
+}
+
+/// PASS
+  assert test(0,0) == 0;
+  /// Toplevel
+int test(int x, int y = x)
+{
+  if (x == 0) return test(2,x);
+  else return y;
+}
+
+/// PASS
+  assert test0(99) == 99;
+  /// Toplevel
+int test0(int z) {
+  int test(int x, int y = z) = y;
+  return test(0);
+}

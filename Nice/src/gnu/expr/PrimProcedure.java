@@ -329,6 +329,9 @@ public class PrimProcedure extends MethodProc implements gnu.expr.Inlineable
     int fix_arg_count = variable ? arg_count - (is_static ? 1 : 2)
       : args.length;
     Declaration argDecl = source == null ? null : source.firstDecl();
+
+    Scope scope = code.pushScope();
+
     for (int i = 0; ; ++i)
       {
         if (variable && i == fix_arg_count)
@@ -361,11 +364,19 @@ public class PrimProcedure extends MethodProc implements gnu.expr.Inlineable
 	  source == null ? CheckedTarget.getInstance(arg_type, name, i)
 	  : CheckedTarget.getInstance(arg_type, source, i);
 	args[i].compileNotePosition(comp, target);
+	if (argDecl != null && argDecl.mustCopyValue())
+	  {
+	    Variable value = scope.addVariable(code, target.getType(), argDecl.getName());
+	    argDecl.setCopyVariable(value);
+	    code.emitDup();
+	    code.emitStore(value);
+	  }
         if (i >= fix_arg_count)
           code.emitArrayStore(arg_type);
 	if (argDecl != null && (is_static || i > 0))
 	  argDecl = argDecl.nextDecl();
       }
+    code.popScope();
   }
 
   public void compile (ApplyExp exp, Compilation comp, Target target)

@@ -42,7 +42,7 @@ abstract class UserOperator extends MethodDeclaration
    * Resolution
    ****************************************************************/
 
-  void resolve()
+  void doResolve()
   {
     // the type must be found before
     removeChild(getSymbol());
@@ -59,7 +59,14 @@ abstract class UserOperator extends MethodDeclaration
 	      scope.addSymbol(symbols[i]);
 	    }
       }
-    
+
+    VarScope scope = this.scope;
+    TypeScope typeScope = this.typeScope;
+
+    super.doResolve();
+
+    // The contract must be resolved after the formal parameters since they
+    // can refer to them.
     contract.resolve(scope, typeScope, getReturnType());
   }
 

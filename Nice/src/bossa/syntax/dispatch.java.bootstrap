@@ -17,6 +17,9 @@ public class dispatch
   static Expression analyse(Expression e, VarScope v, TypeScope t) 
   { return null; }
 
+  static Expression analyse(Expression e, Info i) 
+  { return null; }
+
   static void typecheck(Statement s) {}
   static void typecheck(Expression e) {}
 
@@ -37,3 +40,5 @@ class UnknownIdentException extends bossa.util.UserError
 {
   LocatedString ident;
 }
+
+class Info {}

@@ -372,6 +372,19 @@ Expression analyseIdent(IdentExp e, Info info, boolean assigned)
     if (!e.alwaysOverloadedSymbol() && symbols.size() == 1)
       {
 	VarSymbol sym = symbols[0];
+
+	if (sym instanceof FormalParameters.Parameter.Symbol)
+	  {
+	    FormalParameters.Parameter.Symbol s = cast(sym);
+	    int state = s.getState();
+	    if (state == 0/*XXX: FormalParameters.Parameter.Symbol.NOT_ACCESSIBLE*/)
+	      throw error(e, "Parameter " + e + " is not accessible");
+
+	    if (state == 1/*XXX: FormalParameters.Parameter.Symbol.ARGUMENT_REFERENCE*/)
+		return new FormalParameters.Parameter.AccessExp(s, e.location());
+	    // Otherwise, we are in the normal case.
+	  }
+
 	if (sym.isFieldAccess())
 	  return new CallExp(newOverloadedSymbolExp(symbols, e.ident),
 			     Arguments.noArguments);
@@ -503,6 +516,8 @@ analyse(decl@Block.LocalConstant, info)
 
 analyse(decl@Block.LocalFunction, info)
 {
+  notNull(decl.parameters).resolveCalledFromAnalyse(cast(info));
+
   decl.value = analyse(decl.value, info);
   info.addVar(notNull(decl.left));
 }

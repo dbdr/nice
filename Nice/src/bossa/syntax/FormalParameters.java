@@ -41,12 +41,91 @@ public class FormalParameters extends Node
 
     Expression value() { return null; }
 
+    void resolve()
+    {
+      if (symbol != null)
+	symbol.state = Symbol.ARGUMENT_REFERENCE;
+    }
+
+    void resolve(Info info)
+    {
+      if (symbol != null)
+	symbol.state = Symbol.ARGUMENT_REFERENCE;
+    }
+
     public String toString()
     {
       return type.toString();
     }
 
     LocatedString getName() { return null; }
+
+    Symbol getSymbol()
+    {
+      symbol = new Symbol(getName(), type);
+      return symbol;
+    }
+
+    static class Symbol extends MonoSymbol
+    {
+      private Symbol (LocatedString name, Monotype type)
+      {
+	super(name, type);
+	this.state = NOT_ACCESSIBLE;
+      }
+
+      /** The symbol is not accessible.
+	  This ensures that there are no forward references to
+	  another parameter inside a default value.
+      */
+      static final int NOT_ACCESSIBLE = 0;
+
+      /** The symbol can be accessed by later arguments, using special means. 
+       */
+      static final int ARGUMENT_REFERENCE = 1;
+
+      /** The symbol is fully accessible, for the body of the function.
+      */
+      static final int ACCESSIBLE = 2;
+
+      private int state;
+
+      int getState () 
+      { 
+	if (state == ARGUMENT_REFERENCE)
+	  captured = true;
+
+	return state;
+      }
+
+      private boolean captured = false;
+
+      public void setDeclaration (gnu.expr.Declaration declaration, 
+				  boolean isThis)
+      {
+	super.setDeclaration(declaration, isThis);
+	
+	if (captured)
+	  getDeclaration().mustCopyValue(true);
+      }
+    }
+
+    private Symbol symbol;
+
+    static class AccessExp extends SymbolExp
+    {
+      AccessExp (Symbol symbol, Location location)
+      {
+	super(symbol, location);
+      }
+
+      boolean isAssignable () { return false; }
+
+      public gnu.expr.Expression compile ()
+      {
+	return new gnu.expr.CopyArgument(this.getSymbol().getDeclaration());
+      }
+    }
   }
 
   /**
@@ -99,7 +178,7 @@ public class FormalParameters extends Node
 
     Expression value() 
     { 
-      return defaultValue; 
+      return defaultValue;
     }
 
     Expression defaultValue;
@@ -108,6 +187,14 @@ public class FormalParameters extends Node
     {
       defaultValue = dispatch.analyse(defaultValue, scope, typeScope);
       defaultValue = defaultValue.noOverloading();
+      super.resolve();
+    }
+
+    void resolve(Info info)
+    {
+      defaultValue = dispatch.analyse(defaultValue, info);
+      defaultValue = defaultValue.noOverloading();
+      super.resolve();
     }
 
     void typecheck(mlsub.typing.Monotype domain)
@@ -237,7 +324,7 @@ public class FormalParameters extends Node
     
     MonoSymbol[] res = new MonoSymbol[size];
     for (int i = 0; i < size; i++)
-      res[i] = new MonoSymbol(parameters[i].getName(), parameters[i].type);
+      res[i] = parameters[i].getSymbol();
     return res;
   }
 
@@ -246,7 +333,25 @@ public class FormalParameters extends Node
     for (int i = 0; i<size; i++)
       parameters[i].typecheck(domain[i]);
   }
-    
+
+  void doResolve()
+  {
+    super.doResolve();
+
+    for (int i = 0; i<size; i++)
+      if (parameters[i].symbol != null)
+	parameters[i].symbol.state = Parameter.Symbol.ACCESSIBLE;
+  }
+
+  /** This is a hack to allow bossa.syntax.analyse to make the
+      default values be resolved.
+  */
+  void resolveCalledFromAnalyse(Info info)
+  {
+    for (int i = 0; i<size; i++)
+      parameters[i].resolve(info);
+  }
+
   /****************************************************************
    * Resolving overloading
    ****************************************************************/

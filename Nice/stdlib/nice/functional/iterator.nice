@@ -1,0 +1,659 @@
+/**************************************************************************/
+/*                                N I C E                                 */
+/*             A high-level object-oriented research language             */
+/*                        (c) Daniel Bonniot 2003                         */
+/*                                                                        */
+/*  This package is free software; you can redistribute it and/or modify  */
+/*  it under the terms of the GNU Lesser General Public License as        */
+/*  published by the Free Software Foundation; either version 2 of the    */
+/*  License, or (at your option) any later version.                       */
+/*                                                                        */
+/**************************************************************************/
+
+/**
+   A library for dealing with iterators - either Java-style
+   <code>Iterator&lt;T%gt;</code>s (in iterator.nice), or Nice-style 
+   ()->T generators (in generator.nice)
+
+   @author Bryn Keller (xoltar@users.sourceforge.net)
+ */
+
+
+/**
+ * Creates an <code>Iterator</code> from a function.
+ * The function should call <code>stop()</code> to indicate 
+ * that the iteraton should stop. 
+ */
+<A> Iterator<A> iterator(()->A func) = new FunctionIterator(func: func);
+
+/**
+ * Maps a function over an iterator, producing a new iterator.
+ */
+<A,B> Iterator<B> map(Iterator<A> it, A->B xform) = 
+  iterator(() => xform(it.next()));
+    
+
+/**
+ * Produces a new iterator which only yields elements of the initial
+ * iterator that pass the test function.
+ * 
+ * @param it the original iterator
+ * @param filt the function that tests whether an item should be
+ *        in the new iterator.
+ */
+<A> Iterator<A> filter(Iterator<A> it, A->boolean filt) = iterator(()=> 
+  { 
+    while (it.hasNext()) 
+    {
+      let item = it.next();
+      if (filt(item)) 
+      {
+    return item;
+      }
+    }
+    return stop();
+  });
+
+
+/**
+ * Folds an iterator. For example,
+ * <pre>
+ * int sum(Iterator<int> it) = it.fold(`+`, 0);
+ * </pre>
+ * 
+ * @see nice.lang#foldLeft
+ */
+<A,B> B fold(Iterator<A> it, (B,A)->B foldfunc, B start)
+{
+  while(it.hasNext())
+    {
+      start = foldfunc(start, it.next());
+    }
+  return start;
+}
+
+/**
+ * Folds an iterator. For example,
+ * <pre>
+ * int sum(Iterator<int> it) = it.fold1(`+`);
+ * </pre>
+ * 
+ * @see nice.lang#foldLeft
+ */
+<A> A fold1(Iterator<A> it, (A,A)->A foldfunc)
+{
+  A start = it.next();
+  while(it.hasNext())
+    {
+      start = foldfunc(start, it.next());
+    }
+  return start;
+}
+
+/**
+ * Checks that all elements of an iterator are members of a given predicate.
+ * Stops executing as soon as one element fails the test.
+ */
+<A> boolean all(Iterator<A> iter, A->boolean predicate) 
+{
+  try 
+  {
+    while(iter.hasNext())
+      {
+    if (!predicate(iter.next()))
+      return false;
+      }
+    return true;
+  }
+  catch(GeneratorEnd e)
+  {
+    return true;
+  }
+}
+
+/**
+ * Checks that at least one element of an iterator is a member of a given 
+ * predicate. Stops executing as soon as one element passes the test.
+ */
+<A> boolean any(Iterator<A> iter, A->boolean predicate) 
+{
+  try 
+  {
+    while(iter.hasNext())
+      {
+    if (predicate(iter.next()))
+      return true;
+      }
+    return false;
+  }
+  catch(GeneratorEnd e)
+  {
+    return false;
+  }
+}
+
+
+/**
+ * Calls a function once for each item in an <code>Iterator</code>.
+ * If you want to keep the results of the function calls, use <code>map</code>
+ * instead.
+ *
+ * @see map
+ */
+<A> void foreach(Iterator<A> it, A->void func)
+{
+  while(it.hasNext())
+    func(it.next());
+}
+      
+/**
+ * Creates a <code>List</code> from the elements of an iterator.
+ */
+<A> List<A> toList(Iterator<A> it) 
+{
+  let List<A> list = new ArrayList();
+  list.addAll(it);
+  return list;
+}
+
+/**
+ * Add all the elements of an itertor to a collection.
+ */     
+<A> void addAll(Collection<A> coll, Iterator<A> it)
+{
+  while(it.hasNext())
+    coll.add(it.next());
+}
+
+/**
+ * Converts 2 iterators into a single iterator
+ * that yields 2-tuples.
+ */
+<A,B> Iterator<(A,B)> zip(Iterator<A> one, Iterator<B> two) = 
+    iterator(zip(one.generator, two.generator));
+         
+/**
+ * Converts 3 iterators into a single iterator
+ * that yields 3-tuples.
+ */
+<A,B,C> Iterator<(A,B,C)> zip(Iterator<A> one, 
+                   Iterator<B> two, 
+                   Iterator<C> three) =
+        iterator(zip(one.generator, two.generator, three.generator));
+
+/**
+ * Converts 4 iterators into a single iterator
+ * that yields 4-tuples.
+ */
+<A,B,C,D> Iterator<(A,B,C,D)> zip(Iterator<A> one, 
+                  Iterator<B> two, 
+                  Iterator<C> three,
+                  Iterator<D> four) =
+        iterator(zip(one.generator, two.generator, 
+		     three.generator, four.generator));
+        
+/**
+ * Converts an iterator which yields 2-tuples into into a 2-tuple 
+ * containing 2 iterators.
+ */
+<A,B> (Iterator<A>, Iterator<B>) unzip(Iterator<(A,B)> it) 
+{
+  (void->A one, void->B two) = unzip(it.generator);
+  return (one.iterator, two.iterator);
+}
+
+/**
+ * Converts an iterator which yields 2-tuples into into a 2-tuple 
+ * containing 3 iterators.
+ */
+<A,B,C> (Iterator<A>, Iterator<B>, Iterator<C>) unzip(Iterator<(A,B,C)> it) 
+{
+    (void->A one, void->B two, void->C three) = unzip(it.generator());
+    return (one.iterator, two.iterator, three.iterator);
+}
+
+/**
+ * Converts an iterator which yields 2-tuples into into a 2-tuple 
+ * containing 4 iterators.
+ */
+<A,B,C,D> (Iterator<A>, Iterator<B>, Iterator<C>, Iterator<D>) 
+  unzip(Iterator<(A,B,C,D)> it)
+{
+    (void->A one, void->B two, void->C three, void->D four) = 
+    unzip(it.generator());
+    return (one.iterator, two.iterator, three.iterator, four.iterator);
+}
+
+/**
+ * Merges two iterators using the given zipper function. For example:
+ * <pre>
+ * println(zipWith(["hello, "].iterator, ["world"].iterator, 
+ *                      (String s1, String s2) => s1 + s2).next());
+ * </pre>
+ * will print "hello, world".
+ */
+<A,B,C> Iterator<C> zipWith(Iterator<A> one, Iterator<B> two, (A,B)->C zipper)
+{
+  return iterator(zipWith(generator(one), generator(two), zipper));
+}
+
+/**
+ * Merges three iterators using the given zipper function. 
+ * @see <A,B,C> Iterator<C> zipWith(Iterator<A>, Iterator<B>, (A,B)->C)
+ */
+<A,B,C,D> Iterator<D> zipWith(Iterator<A> one, Iterator<B> two, 
+                  Iterator<C> three, (A,B,C)->D zipper)
+{
+  return iterator(zipWith(generator(one), generator(two), generator(three), 
+              zipper));
+}
+
+/**
+ * Merges three iterators using the given zipper function. 
+ * @see <A,B,C> Iterator<C> zipWith(Iterator<A>, Iterator<B>, (A,B)->C)
+ */
+<A,B,C,D,E> Iterator<E> zipWith(Iterator<A> one, Iterator<B> two, 
+                Iterator<C> three, Iterator<D> four, 
+                (A,B,C,D)->E zipper)
+{
+  return iterator(zipWith(generator(one), generator(two), 
+              generator(three), generator(four), zipper));
+}
+
+/**
+ * Returns a new iterator made up of elements from the original 
+ * iterator which pass the test function. The first element which
+ * doesn't pass the test function marks the end of the new iterator,
+ * and the item that failed is not included in the new iterator.
+ */
+<A> Iterator<A> takeWhile(Iterator<A> it, A->boolean test) = 
+  iterator(()=>
+    {
+      if (it.hasNext())
+      {
+    let n = it.next();
+    if (test(n))
+    {
+      return n;
+    }
+      }
+      return stop();
+    });
+
+/**
+ * The reverse of takeWhile, this function returns a new iterator
+ * based on the original iterator, but with all the leading elements
+ * which pass the test function removed.
+ */
+<A> Iterator<A> dropWhile(Iterator<A> it, A->boolean test) 
+{
+  var failed = false;
+  return iterator(()=>
+    {
+      if (failed)
+      {
+    if (it.hasNext())
+    {
+      return it.next();
+    }
+      }
+      else
+      {      
+    while (it.hasNext())
+    {
+      let n = it.next();
+      if (!test(n))
+      {
+        failed = true;
+        return n;
+      }
+    }
+      }
+      return stop();
+    });
+}
+
+/**
+ * Returns a new iterator which has the first <i>number</i> elements
+ * from the original iterator.
+ */
+<A> Iterator<A> take(Iterator<A> it, int number)
+  requires number >= 0
+{
+  return iterator(()=> 
+    {
+      if (number > 0)
+      {
+        number--;
+        return it.next();
+      }
+      return stop();
+    });
+}
+
+/**
+ * Returns a new iterator which has the same contents as the original
+ * iterator, but without the first <i>number</i> elements.
+ */
+<A> Iterator<A> drop(Iterator<A> it, int number)
+  requires number >= 0
+{
+  return iterator(()=> 
+    {
+      while (number > 0)
+      {
+    number--;
+    it.next();
+      }
+      return it.next();
+    });  
+}
+
+/**
+ * Blends two iterators together, taking an element from the
+ * first, then from the second, then again from the first, etc.
+ */
+<A> Iterator<A> blend(Iterator<A> one, Iterator<A> two)
+{
+  boolean first = true;
+  return iterator( () =>
+    {
+      var A item = cast(null);
+      if (first)
+        item = one.next();
+      else
+        item = two.next();
+      first = !first;
+      return item;
+    });
+}
+
+/**
+ * Joins the second iterator to the first. That is, produces a new 
+ * iterator which yields all the elements in the first iterator, 
+ * followed by all the elements in the second iterator.
+ */
+<A> Iterator<A> concat(Iterator<A> first, Iterator<A> second)
+{
+  return iterator(() => first.hasNext()? first.next() : second.next());
+}
+
+/** 
+ * Returns two iterators based on the iterator argument - the first
+ * iterator contains all the elements of the original iterator that
+ * passed the test, until one failed. All the remaining items in the
+ * original iterator now appear in the second iterator.
+ */
+<A> (Iterator<A>, Iterator<A>) span(Iterator<A> it, A-> boolean test) 
+{
+    (void->A left, void->A right) = it.generator().span(test);
+    return (left.iterator(), right.iterator());
+}
+
+/** 
+ * Returns two iterators based on the iterator argument - the first
+ * iterator contains all the elements of the original iterator that
+ * passed the test. Those elements that didn't pass the test will 
+ * appear in the second iterator.
+ */
+<A> (Iterator<A>, Iterator<A>) partition(Iterator<A> it, A-> boolean test) {
+    (void->A pass, void->A fail) = it.generator.partition(test);
+    return (pass.iterator, fail.iterator);
+}
+
+
+// ---- Some handy functions for testing ---- 
+
+/**
+ * An iterator which yields natural numbers.
+ */
+private Iterator<int> naturals_iter() 
+{
+  var int num = 1;
+  return iterator(()=>num++);
+}
+
+
+
+// ---- Private implementation details -----
+
+/**
+ * This class wraps a function and turns it into an <code>Iterator.</code>
+ * The function should throw <code>GeneratorEnd</code> to indicate 
+ * that the iteraton should stop. Use the <code>iterator</code>
+ * function instead of using this class directly.
+ *
+ * @see iterator
+ */
+private class FunctionIterator<A> implements Iterator<A>
+{
+  ()-> A func;
+  A cache = cast(null);
+  boolean cacheLoaded = false;
+  boolean finished = false;
+
+  hasNext()
+    {
+      if (cacheLoaded) 
+        return true;
+      if (finished)
+        return false;
+      else
+    {
+      try
+      {
+        cache = (this.func)();
+        cacheLoaded = true;
+      }
+      catch (GeneratorEnd e) 
+      {
+        finished = true;
+      }
+      catch (NoSuchElementException e)
+      {
+        finished = true;
+      }
+      return cacheLoaded;
+    }
+    }
+
+  <A> next() 
+    {
+      if (this.hasNext()) 
+    {
+      A item = cache;
+      cache = cast(null);
+      cacheLoaded = false;
+      return item;
+    }
+      else
+    {
+      throw new NoSuchElementException();
+    }
+    }
+
+  remove() { throw new UnsupportedOperationException(); }
+}
+
+/**
+ * Synchronized wrapper around an <code>Iterator</code>
+ */
+// class SyncIterator<A> implements Iterator<A>
+// {
+//   Iterator<A> inner;
+//   synchronized next() 
+//     {
+//       return inner.next();
+//     }
+//   synchronized hasNext()
+//     {
+//       return inner.hasNext();
+//     }
+//   synchronized remove()
+//     {
+//       return inner.remove();
+//     }
+// }
+
+
+
+
+
+
+
+
+void _testIterators() {
+  
+  var nats = naturals_iter();
+  let List<int> list = new ArrayList();
+  list.addAll(nats.take(10));
+  assert list.size() == 10;
+  assert list[0] == 1;
+  assert list[9] == 10;
+
+  assert naturals_iter().take(10).drop(10).hasNext() == false;
+
+  assert naturals_iter().takeWhile(int i => i < 11).toList().size() == 10;
+  assert naturals_iter().dropWhile(int i => i < 11).next() == 11;
+
+  nats = naturals_iter().map(int i => i + 2);
+  assert nats.next() == 3;
+  assert nats.next() == 4;
+
+  nats = naturals_iter().filter(_even);
+  assert nats.next() == 2;
+  assert nats.next() == 4;
+  assert nats.next() == 6;
+
+  let (int,int)-> int intAdd = `+`;
+  assert naturals_iter().take(5).fold(intAdd, 0) == 15;
+  assert naturals_iter().take(5).fold1(intAdd) == 15;
+
+  (Iterator<int> evens, Iterator<int> odds) = naturals_iter().partition(_even);
+  assert evens.next() == 2;
+  assert evens.next() == 4;
+  assert odds.next() == 1;
+  assert odds.next() == 3;
+
+  (evens, odds) = naturals_iter().span(_even);
+  assert !evens.hasNext();
+  assert odds.next() == 1;
+
+  assert naturals_iter().take(10).concat(
+		naturals_iter().take(10)).toList().size() == 20;
+
+  (evens, odds) = naturals_iter().partition(_even);
+  var it = odds.blend(evens);
+  assert it.next() == 1;
+  assert it.next() == 2;
+  assert it.next() == 3;
+
+
+  //Test fails due to compiler bug  
+  var zipped = zip(naturals_iter(), naturals_iter());
+  (int left, int right) = zipped.next();
+  assert left == right && left == 1;
+
+  var Iterator<int> doubled = 
+      zipWith(naturals_iter(), naturals_iter(), intAdd);
+  assert doubled.next() == 2;
+  assert doubled.next() == 4;
+  assert doubled.next() == 6;
+
+  var Iterator<int> trebled = zipWith(naturals_iter(), naturals_iter(), 
+				      naturals_iter(), 
+            (int a, int b, int c) => a + b + c);
+  assert trebled.next() == 3;
+  assert trebled.next() == 6;
+  assert trebled.next() == 9;
+
+}
+ 
+void _testGenerators()
+{
+  var nats = naturals();
+  let List<int> list = new ArrayList();
+  list.addAll(nats.take(10));
+  assert list.size() == 10: "" + list.size();
+  assert list[0] == 1;
+  assert list[9] == 10;
+
+  assert naturals().take(10).drop(10).iterator.hasNext() == false;
+
+  assert naturals().takeWhile(int i => i < 11).toList().size() == 10;
+  assert naturals().dropWhile(int i => i < 11)() == 11;
+
+  nats = naturals().map(int i => i + 2);
+  assert nats() == 3;
+  assert nats() == 4;
+
+  nats = naturals().filter(_even);
+  assert nats() == 2;
+  assert nats() == 4;
+  assert nats() == 6;
+
+  let (int,int)-> int intAdd = `+`;
+  assert naturals().take(5).fold(intAdd, 0) == 15;
+//  assert naturals().take(5).fold1(intAdd) == 15;
+
+  (void->int evens, void->int odds) = naturals().partition(_even);
+  assert evens() == 2;
+  assert evens() == 4;
+  assert odds() == 1;
+  assert odds() == 3;
+
+  (evens, odds) = naturals().span(_even);
+  assert !evens.iterator.hasNext();
+  assert odds() == 1;
+
+  assert naturals().take(10).concat(naturals().take(10)).toList().size() == 20;
+
+  (evens, odds) = naturals().partition(_even);
+  var it = odds.blend(evens);
+  assert it() == 1;
+  assert it() == 2;
+  assert it() == 3;
+
+  // Test fails due to compiler bug  
+  var zipped = zip(naturals(), naturals());
+  (int left, int right) = zipped();
+  assert left == right && left == 1;
+
+  (void->int leftGen, void->int rightGen) = unzip(zip(naturals(), naturals()));
+  left = leftGen();
+  right = rightGen();
+  assert left == right && left == 1;
+  assert leftGen() == 2;
+  assert leftGen() == 3;
+  assert rightGen() == 2;
+
+  var doubled = zipWith(naturals(), naturals(), intAdd);
+  assert doubled() == 2;
+  assert doubled() == 4;
+  assert doubled() == 6;
+
+  var trebled = zipWith(naturals(), naturals(), naturals(), 
+			(int a, int b, int c) => 
+    a + b + c);
+
+  assert trebled() == 3;
+  assert trebled() == 6;
+  assert trebled() == 9;
+  
+}
+
+// void main(String[] args) 
+// {
+//   try 
+//   {
+//     assert 1 > 2;
+//     throw new Exception("Assertions not enabled.");
+//   }
+//   catch(AssertionFailed e) {
+//     //assertions enabled.
+//   }
+// _testIterators();
+// _testGenerators();
+// println("Tests passed."); 
+
+// }

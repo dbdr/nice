@@ -1,0 +1,559 @@
+/**************************************************************************/
+/*                                N I C E                                 */
+/*             A high-level object-oriented research language             */
+/*                        (c) Daniel Bonniot 2003                         */
+/*                                                                        */
+/*  This package is free software; you can redistribute it and/or modify  */
+/*  it under the terms of the GNU Lesser General Public License as        */
+/*  published by the Free Software Foundation; either version 2 of the    */
+/*  License, or (at your option) any later version.                       */
+/*                                                                        */
+/**************************************************************************/
+
+/**
+   A library for dealing with iterators - either Java-style
+   <code>Iterator&lt;T%gt;</code>s (in iterator.nice), or Nice-style 
+   ()->T generators (in generator.nice)
+
+   @author Bryn Keller (xoltar@users.sourceforge.net)
+ */
+ 
+ 
+/**
+ * Special class thrown by generator functions when
+ * they should end.
+ */
+class GeneratorEnd extends Throwable {} 
+ 
+/** 
+ * Stop a generator function.
+ */
+ 
+<A> A stop() { throw new GeneratorEnd(); }
+
+<A> ()->A generator(Iterator<A> iter) = () => 
+{
+    if (iter.hasNext())
+        return iter.next();
+    else
+        return stop();
+};
+
+<A> ()->A generator(Collection<A> coll) = coll.iterator.generator;
+
+/**
+ * Function composition.
+ */
+<A,B,C> A->C compose(B->C second, A->B first) = A input => second(first(input));
+
+<A,B> (B, A) swap((A a, B b)) = (b, a);
+
+<A,B,C> (C, B) first((A a, B b), A->C xform) = (xform(a), b);
+
+<A,B> ()->B map(()->A gen, A->B xform) = () => xform(gen());
+
+/**
+ * Produces a new generator which only yields elements of the initial
+ * generator that pass the test function.
+ * 
+ * @param gen the original generator
+ * @param filt the function that tests whether an item should be
+ *        in the new iterator.
+ */
+<A> ()->A filter(()->A gen, A->boolean filt) = ()=> 
+  {
+    var A value = gen();
+    while(!filt(value))
+      value = gen();
+    return value;
+  };
+
+
+/**
+ * Folds a generator. For example,
+ * <pre>
+ * int sum(()->int gen) = gen.fold(`+`, 0);
+ * </pre>
+ * 
+ * @see nice.lang#foldLeft
+ */
+
+<A,B> B fold(()->A gen, (B,A)->B foldfunc, B start)
+{
+    try
+    {
+      while(true)
+        {
+          start = foldfunc(start, gen());
+        }
+     }
+     catch (GeneratorEnd e)
+     {
+       //Ignore.
+     }
+        
+  return start;
+}
+
+/**
+ * Checks that all elements of a generator are members of a given predicate.
+ * Stops executing as soon as one element fails the test.
+ */
+<A> boolean all(void->A gen, A->boolean predicate) 
+{
+  try 
+  {
+    while(true)
+      {
+    if (!predicate(gen()))
+      return false;
+      }
+  }
+  catch(GeneratorEnd e)
+  {
+    return true;
+  }
+}
+
+/**
+ * Checks that at least one element of a generator is a member of a given 
+ * predicate. Stops executing as soon as one element passes the test.
+ */
+<A> boolean any(void->A gen, A->boolean predicate) 
+{
+  try 
+  {
+    while(true)
+      {
+    if (predicate(gen()))
+      return true;
+      }
+  }
+  catch(GeneratorEnd e)
+  {
+    return false;
+  }
+}
+
+/**
+ * Calls a function once for each item yielded by a generator.
+ */
+<A> void foreach(()->A gen, A->void func)
+{
+    try
+    {
+      while(true)
+        func(gen());
+     }
+     catch (GeneratorEnd e)
+     {
+     }
+}
+      
+/**
+ * Creates a <code>List</code> from the elements of a generator.
+ */
+<A> List<A> toList(()->A gen) 
+{
+  let List<A> list = new ArrayList();
+  gen.foreach(A a => list.add(a));
+  return list;
+}
+
+/**
+ * Add all the elements of a generator to a collection.
+ */     
+<A> void addAll(Collection<A> coll, ()->A gen)
+{
+  gen.foreach(A a => coll.add(a));
+}
+
+/**
+ * Converts 2 generators into a single generator
+ * that yields 2-tuples
+ */
+//<A,B> ()->(A,B) zip(()->A one, ()->B two) = () => (one(), two());
+<A,B> ()->(A,B) zip(()->A one, ()->B two) = unsafeZip(cast([one,two]));
+
+/**
+ * Converts 3 generators into a single generator
+ * that yields 3-tuples
+ */
+<A,B,C> ()->(A,B,C) zip(()->A one, ()->B two, ()->C three) = 
+unsafeZip(cast([one,two,three]));
+
+/**
+ * Converts 4 generators into a single generator
+ * that yields 4-tuples
+ */
+<A,B,C,D> ()->(A,B,C,D) zip(()->A one, ()->B two, ()->C three, ()->D four) = 
+   unsafeZip(cast([one,two,three,four]));
+
+
+/**
+ * Merges two generators using the given zipper function. For example:
+ * <pre>
+ * println(zipWith(["hello, "].generator, ["world"].generator, 
+ *                               (String s1, String s2) => s1 + s2)());
+ * </pre>
+ * will print "hello, world".
+ */
+<A,B,C> void->C zipWith(void->A one, void->B two, (A,B)->C zipper) =
+  unsafeZipWith(cast([one,two]), cast(zipper));
+
+/**
+ * Merges three generators using the given zipper function. 
+ * @see <A,B,C> void->C zipWith(void->A, void->B, (A,B)->C)
+ */
+<A,B,C,D> void->D zipWith(void->A one, 
+			  void->B two, 
+			  void->C three, 
+			  (A,B,C)->D zipper) =
+  unsafeZipWith(cast([one,two,three]), cast(zipper));
+
+/**
+ * Merges four generators using the given zipper function.
+ * @see <A,B,C> void->C zipWith(void->A, void->B, (A,B)->C)
+ */
+<A,B,C,D,E> void->E zipWith(void->A one, 
+			    void->B two, 
+			    void->C three, 
+			    void->D four, 
+			    (A,B,C,D)->E zipper) =
+  unsafeZipWith(cast([one,two,three,four]), cast(zipper));
+
+
+/**
+ * Back door to Nice's method dispatching. You promise that you know you're
+ * passing a method, and arguments that make sense for the method. Nice
+ * calls it and hands you back the results, which you promise are of the
+ * correct type. The compiler cannot verify this, the programmer is responsible
+ * for ensuring type safety.
+ */
+private <T,U> U apply(T fun, Object[?] args)
+{
+ // The internal representation of functional values
+ gnu.mapping.Procedure proc = cast(fun);
+ return cast(proc.applyN(args));
+}
+
+/**
+ * Converts an array of generators into a single generator that yields
+ * tuples of the appropriate size. Bypasses Nice's type system, so users
+ * must ensure that types are correct. It's usually better to use one of
+ * the strongly typed versions above instead.
+ */
+private <R> ()->R unsafeZip((()->?Object)[] generators) 
+{
+  let (?Object[], int->?Object)->?Object[] f = fill;
+return () => { ?Object[] res = f(new Object[generators.size()],
+                    int i => generators[i]());
+           return cast(res);
+};
+}
+        
+        
+/**
+ * Converts an array of generators into a single generator that yields
+ * the results of calling <code>func</code> with arguments from the
+ * array of generators. Bypasses Nice's type system, so users
+ * must ensure that types are correct. It's usually better to use one of
+ * the strongly typed versions above instead.
+ */
+private <R> ()->R unsafeZipWith(Array<()->Object> generators, Object->R func)
+{
+  let (?Object[], int->Object)->Object[] f = fill;
+
+   return () => apply(func, f(new Object[generators.size()],
+              int i => generators[i]()));
+}
+
+private <R> R unsafeUnzip(()->Object gen)
+{
+  Object[] tuple = cast(gen());
+  List<LinkedList<Object>> cache = new ArrayList();
+  tuple.size.times(int i => 
+    {
+      cache.add(new LinkedList());
+      cache[i].add(tuple[i]);
+    });
+  Object nextItem(int index) 
+  {
+    if (cache[index].size == 0)
+      {
+	tuple = cast(gen());
+	tuple.size.times( int i => cache[i].add(tuple[i]));
+      }
+    return cache[index].removeFirst();
+  }
+  let (?Object[], int->?Object)->?Object[] f = fill;
+  ?Object[] funcs = f(new Object[tuple.size],
+            int i => () => nextItem(i));
+  return cast(funcs);
+}
+ 
+/**
+ * Converts a generator which yields 2-tuples into into a 2-tuple 
+ * containing 2 generators.
+ */
+<A,B> (()->A, ()->B) unzip(()->(A,B) gen) = unsafeUnzip(gen);
+         
+/**
+ * Converts a generator which yields 3-tuples into into a 3-tuple 
+ * containing 3 generators.
+ */
+<A,B,C> (()->A, ()->B, ()->C) unzip(()->(A,B,C) gen) = unsafeUnzip(gen);
+
+/**
+ * Converts a generator which yields 4-tuples into into a 4-tuple 
+ * containing 4 generators.
+ */
+<A,B,C,D> (()->A, ()->B, ()->C, ()->D) unzip(()->(A,B,C,D) gen) = 
+    unsafeUnzip(gen);
+
+
+/**
+ * Returns a new generator made up of elements from the original 
+ * generator which pass the test function. The first element which
+ * doesn't pass the test function marks the end of the new generator,
+ * and the item that failed is not included in the new generator.
+ */
+<A> ()->A takeWhile(()->A gen, A->boolean test) = ()=> {
+
+    let value = gen();
+    if (test(value))
+        return value;
+    else
+        return stop();
+};
+
+/**
+ * The reverse of takeWhile, this function returns a new generator
+ * based on the original generator, but with all the leading elements
+ * which pass the test function removed.
+ */
+<A> ()->A dropWhile(()->A gen, A->boolean test) 
+{
+  var failed = false;
+  return ()=>
+    {
+        if (failed)
+            return gen();
+        while(!failed)
+        {
+            let value = gen();
+            if (!test(value))
+            {
+                failed = true;
+                return value;
+            }           
+        }
+        return gen();
+    };
+}
+
+/**
+ * Returns a new generator which has the first <i>number</i> elements
+ * from the original generator.
+ */
+<A> ()->A take(()->A gen, int number)
+  requires number >= 0
+{
+    return gen.takeWhile(A a => number-- > 0);
+}
+
+/**
+ * Returns a new generator which has the same contents as the original
+ * generator, but without the first <i>number</i> elements.
+ */
+<A> ()->A drop(()->A gen, int number)
+  requires number >= 0
+{
+    return gen.dropWhile(A a => number-- > 0);
+}
+
+/**
+ * Blends two generators together, taking an element from the
+ * first, then from the second, then again from the first, etc.
+ */
+<A> ()->A blend(()->A one, ()->A two)
+{
+  boolean first = true;
+  return () =>
+    {
+      var A item = first ? one() : two();
+      first = !first;
+      return item;
+    };
+}
+
+/**
+ * Joins the second generator to the first. That is, produces a new 
+ * generator which yields all the elements in the first generator, 
+ * followed by all the elements in the second generator.
+ */
+<A> ()->A concat(()->A first, ()->A second)
+{
+    var failed = false;
+  return () => {
+    if (failed)
+        return second();
+    else
+        try 
+        {
+            return first();
+        }
+        catch (GeneratorEnd e)
+        {
+            failed = true;
+            return second();
+        }
+    };
+}
+
+/** 
+ * Returns two generators based on the generator argument - the first
+ * generator contains all the elements of the original generator that
+ * passed the test, until one failed. All the remaining items in the
+ * original generator now appear in the second generator.
+ */
+<A> (()->A, ()->A) span(()->A gen, A-> boolean test)
+{
+    var failed = false;
+    LinkedList<A> passed = new LinkedList();
+    return (() =>
+                {
+                    if (!passed.isEmpty)
+                        return passed.removeFirst();
+                    else
+                    {
+                        if (failed)
+                            return stop();
+                        else
+                        {
+                            let value = gen();
+                            if (test(value))
+                                return value;
+                            else
+                            {
+                                failed = true;
+                                gen = (() => { return value; }).concat(gen);
+                            }
+                        }
+                    }
+                    return stop();
+                },
+            () =>
+                {
+                    while(!failed)
+                    {
+                        let value = gen();
+                        if (test(value))
+                            passed.add(value);
+                        else
+                        {
+                            failed = true;
+                            return value;
+                        }
+                    }
+                    return gen();
+                });
+}
+
+
+/** 
+ * Returns two generators based on the generator argument - the first
+ * generator contains all the elements of the original generator that
+ * passed the test. Those elements that didn't pass the test will 
+ * appear in the second generator.
+ */
+<A> (()->A, ()->A) partition(()->A gen, A-> boolean test) 
+{
+    let LinkedList<A> passed = new LinkedList();
+    let LinkedList<A> failed = new LinkedList();
+    void load() { 
+      let v = gen(); 
+      if (test(v)) 
+	passed.add(v); 
+      else 
+	failed.add(v); 
+    }
+    return (
+        () => 
+            {
+                while (passed.isEmpty)
+                    load();
+                return passed.removeFirst();
+            },
+        () =>
+            {
+                while (failed.isEmpty)
+                    load();
+                return failed.removeFirst();
+            }
+        );
+                    
+}
+
+/**
+ * Like a for loop.
+ */
+<T> void times(int max, int->void func)
+{
+  int counter = 0;
+  while(counter < max)
+    {
+      try 
+      {
+    func(counter++);
+      }
+      catch (GeneratorEnd e)
+      {
+    return;
+      }
+    }
+}
+
+/**
+ * Like a for loop.
+ */
+<T> void times(int max, void->void func)
+{
+  int counter = 0;
+  while(counter < max)
+    {
+      try 
+      {
+    func();
+    counter++;
+      }
+      catch (GeneratorEnd e)
+      {
+    return;
+      }
+    }
+}
+
+// ---- Some handy functions for testing ---- 
+
+/**
+ * A generator which yields natural numbers.
+ */
+()->int naturals() 
+{
+  var int num = 1;
+  return (()=>num++);
+}
+
+/**
+ * Is the number even?
+ */
+private boolean _even(int num) = num % 2 == 0;
+
+/**
+ * Is the number odd?
+ */
+private boolean _odd(int num) = !_even(num);
+
+
+

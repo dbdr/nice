@@ -2,15 +2,16 @@ nice (0.8) unstable; urgency=low
 
   * Stable version, based on 0.7.9
   * Added operators to compute with java.math.BigInteger (+,-,*,/,%,...).
-  * In returntypes is '()' now equivalent to 'void' so int->() is a valid type.
+  * In functional types, '()' is always equivalent to 'void'. Ex: int->()
+  * Anonymous functions that never return normally can be used with any 
+    return type.
   * Bugfixes (some cases of optional parameters, allowing arbitrarily nested
     tuples on the left side of an assignment, recursion for local functions,
     allow method parameter's default values to refer to 'this' when the method
     is declared inside a class, declaration of multiple local variables,
     nested type parameters in method declarations, improved some error messages,
     resolving overloading between fields and global variables, implemented 
-    nullness inference for local constants, return type of error throwing 
-    anonymous functions).
+    nullness inference for local constants).
 
  -- Daniel Bonniot <bonniot@users.sourceforge.net>  Wed, 14 May 2003 16:30:15 +0200
 

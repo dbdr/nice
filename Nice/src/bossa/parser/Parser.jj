@@ -1371,7 +1371,7 @@ LocatedString readImports(List imports, Collection opens):
   (
    "import" name=doted_string() 
 
-   ( ".*" { opens.add(name); }
+   ( ".*" { opens.add(name.toString()); }
    | { imports.add(name); }
    )
    ";"

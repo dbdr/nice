@@ -346,17 +346,17 @@ public final class Types
   {
     Class res = lookupQualifiedJavaClass(className);
 
-    if (res == null)
-      for (Iterator i = bossa.syntax.Node.getGlobalTypeScope()
-	     .module.listImplicitPackages(); i.hasNext();)
+    if (res != null)
+      return res;
+    
+    String[] pkgs = bossa.syntax.Node.getGlobalTypeScope().module.listImplicitPackages();
+    for (int i = 0; i < pkgs.length; i++)
 	{
-	  String pkg = ((bossa.syntax.LocatedString) i.next()).toString();
-
-	  res = lookupQualifiedJavaClass(pkg + "." + className);
+	  res = lookupQualifiedJavaClass(pkgs[i] + "." + className);
 	  if(res != null)
-	    break;
+	    return res;
 	}
-    return res;
+    return null;
   }
   
   private static final HashMap stringToReflectClass = new HashMap();
@@ -460,7 +460,8 @@ public final class Types
   {
     if (tc == null) return "_";
     if (tc == bossa.syntax.Pattern.nullTC) return "NULL";
-    return tc.toString();
+    /* Hack for inner classes: we replace '$' with '.' */
+    return Strings.escape(tc.toString().replace('$','.'));
   }
 
   /****************************************************************

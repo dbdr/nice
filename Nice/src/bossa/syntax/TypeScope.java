@@ -106,74 +106,93 @@ public class TypeScope implements TypeMap
 
     if(outer!=null)
       return outer.lookup(name, loc);
-    else
-      // This is the global type scope
+
+    // This is the global type scope
+    boolean notFullyQualified = name.indexOf('.') == -1;
+	
+    /* Try first to find the symbol in Nice definitions.
+       The first package is the current package.
+       If the symbol is not found there, we check there is no 
+       ambiguity with another symbol from another package.
+    */
+    boolean first = true;
+    if (notFullyQualified && (module != null))
       {
-	boolean notFullyQualified = name.indexOf('.') == -1;
-	
-	/* Try first to find the symbol in Nice definitions.
-	   The first package is the current package.
-	   If the symbol is not found there, we check there is no 
-	   ambiguity with another symbol from another package.
-	*/
-	boolean first = true;
-	if (notFullyQualified)
-	  if (module != null)
-	    for (Iterator i = module.listImplicitPackages(); i.hasNext();)
-	      {
-		String pkg = ((LocatedString) i.next()).toString();
-		String fullName = pkg + "." + name;
-		
-		TypeSymbol sym = (TypeSymbol) map.get(fullName);
-		if (sym != null)
-		  if (res == null)
-		    {
-		      res = sym;
-		      if (first) break;
-		    }
-		  else
-		    User.error(loc, "Ambiguity for symbol " + name + 
-			       ":\n" + res + " and " + sym +
-			       " both exist");
-		first = false;
-	      }
-	  else
-	    Internal.warning("null module in TypeScope");
-	
-	if (res != null)
-	  return res;
+	String[] pkgs = module.listImplicitPackages();
+	for (int i = 0; i < pkgs.length; i++)
+	  {
+	    String fullName = pkgs[i] + "." + name;
+	    TypeSymbol sym = (TypeSymbol) map.get(fullName);
+	    if (sym != null)
+	      if (res == null)
+		{
+		  res = sym;
+		  if (first) break;
+		}
+	      else
+		User.error(loc, "Ambiguity for symbol " + name + 
+			   ":\n" + res + " and " + sym +
+			   " both exist");
+	    first = false;
+	  }
+      }
+    
+    if (res != null)
+      return res;
 
-	// Now try as a java class
-	TypeConstructor tc = JavaClasses.lookup(name);
-	
-	if (tc != null)
-	  return tc;
-	
-	first = true;
-	if (notFullyQualified && (module != null))
-	  for (Iterator i = module.listImplicitPackages(); i.hasNext();)
-	    {
-	      String pkg = ((LocatedString) i.next()).toString();
-	      String fullName = pkg + "." + name;
+    res = lookupNative(name, loc);
+    
+    if (res != null)
+      return res;
 
-	      tc = JavaClasses.lookup(fullName);
-	      if (tc != null)
-		  if (res == null)
-		    {
-		      res = tc;
-		      if (first) break;
-		    }
-		  else
-		      User.error(loc, "Ambiguity for native class " + name + 
-				 ":\n" + res + " and " + tc +
-				 " both exist");
-	      first = false;
-	    }
+    // Try inner classes
+    StringBuffer innerName = new StringBuffer(name);
+    for (int i = innerName.length(); --i > 0; )
+      if (innerName.charAt(i) == '.')
+	{
+	  innerName.setCharAt(i, '$');
+	  res = lookupNative(innerName.toString(), loc);
+	  if (res != null)
+	    return res;
+	}
+
+    return null;
+  }
+
+  private TypeSymbol lookupNative(String name, Location loc)
+  {
+    TypeSymbol res = null;
+    TypeConstructor tc = JavaClasses.lookup(name);
+	
+    if (tc != null)
+      return tc;
+	
+    boolean notFullyQualified = name.indexOf('.') == -1;
+    boolean first = true;
+    if (notFullyQualified && (module != null))
+      {
+	String[] pkgs = module.listImplicitPackages();
+	for (int i = 0; i < pkgs.length; i++)
+	  {
+	    String fullName = pkgs[i] + "." + name;
+	    tc = JavaClasses.lookup(fullName);
+	    if (tc != null)
+	      if (res == null)
+		{
+		  res = tc;
+		  if (first) break;
+		}
+	      else
+		User.error(loc, "Ambiguity for native class " + name + 
+			   ":\n" + res + " and " + tc +
+			   " both exist");
+	    first = false;
+	  }
       }
     
     return res;
   }
-
+  
   /****************************************************************
    * Debugging
    ****************************************************************/

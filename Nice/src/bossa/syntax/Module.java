@@ -25,7 +25,7 @@ import gnu.bytecode.Method;
 
 public interface Module extends mlsub.compilation.Module
 {
-  abstract Iterator listImplicitPackages();
+  abstract String[] listImplicitPackages();
 
   abstract String mangleName(String name);
 

@@ -88,21 +88,13 @@ public class Package implements mlsub.compilation.Module, Located, bossa.syntax.
       imports.add(new LocatedString("nice.lang", 
 				    bossa.util.Location.nowhere()));
     
-    opens  = new TreeSet();
-
     findPackageSource();
     if (source == null)
       User.error(name, "Could not find package " + name);
     
-    opens.add(this.name);
-    opens.add(new LocatedString("java.lang", bossa.util.Location.nowhere()));
-    
     read(compilation.recompileAll || 
 	 isRoot && compilation.recompileCommandLine);
     
-    // when we import a bossa package, we also open it.
-    opens.addAll(imports);
-
     computeImportedPackages();
   }
 
@@ -112,6 +104,9 @@ public class Package implements mlsub.compilation.Module, Located, bossa.syntax.
     Definition.currentModule = this;
     
     List definitions = new LinkedList();
+    TreeSet opens = new TreeSet();
+    opens.add(this.name.toString());
+    opens.add("java.lang");    
 
     if (Debug.passes)
       Debug.println(this + ": parsing " + source.getName());
@@ -121,9 +116,14 @@ public class Package implements mlsub.compilation.Module, Located, bossa.syntax.
       sourcesRead();
     
     for(int i = 0; i<readers.length; i++)
-      read(readers[i], definitions);
+      read(readers[i], definitions, opens);
     
     this.ast = new AST(this, expand(definitions));
+
+    // when we import a bossa package, we also open it.
+    for (Iterator i = imports.iterator(); i.hasNext();)
+      opens.add(((LocatedString) i.next()).toString());
+    this.opens = (String[]) opens.toArray(new String[opens.size()]);
 
     // if we are root, and read the AST from an interface file, 
     // we don't know yet if we are runnable
@@ -186,7 +186,7 @@ public class Package implements mlsub.compilation.Module, Located, bossa.syntax.
     return definitions;
   }
   
-  private void read(PackageSource.Unit unit, List definitions)
+  private void read(PackageSource.Unit unit, List definitions, Set opens)
   {
     bossa.util.Location.setCurrentFile(unit.name);
 
@@ -244,11 +244,14 @@ public class Package implements mlsub.compilation.Module, Located, bossa.syntax.
     return getImports();
   }
   
-  public Iterator /* of String */ listImplicitPackages()
+  public String[] listImplicitPackages()
   {
-    return opens.iterator();
+    return opens;
   }
   
+  /** List of the packages implicitely opened, a la 'import pkg.*' 
+   */
+  private String[] opens;
   private List /* of LocatedString */ imports;
   private List /* of Package */ importedPackages;
 
@@ -270,9 +273,6 @@ public class Package implements mlsub.compilation.Module, Located, bossa.syntax.
 	importedPackages.add(make(s, compilation, false));
       }
   }
-
-  /** List of the LocatedStrings of packages implicitely opened. */
-  Collection opens;
 
   /****************************************************************
    * Passes
@@ -344,6 +344,10 @@ public class Package implements mlsub.compilation.Module, Located, bossa.syntax.
     if (!isRoot)
       return;
     
+    // If at least one package is recompiled, the root will also be recompiled
+    if (!sourcesRead)
+      return;
+    
     if (!Debug.skipLinkTests || isRunnable())
       {
 	if (Debug.passes)
@@ -357,7 +361,7 @@ public class Package implements mlsub.compilation.Module, Located, bossa.syntax.
   {
     if (jar != null)
       closeJar();
-    else if (!Debug.skipLinkTests)
+    else if (dispatchClass != null)
       addClass(dispatchClass);
     nice.tools.compiler.OutputMessages.exitIfErrors();
   }
@@ -382,9 +386,9 @@ public class Package implements mlsub.compilation.Module, Located, bossa.syntax.
 	  f.print("import "+m.getName()+";\n");
 	}
     
-      for(Iterator i = opens.iterator(); i.hasNext();)
+      for(int i = 0; i < opens.length; i++)
 	{
-	  f.print("import " + i.next() + ".*;\n");
+	  f.print("import " + opens[i] + ".*;\n");
 	}
     
       ast.printInterface(f);
@@ -727,7 +731,8 @@ public class Package implements mlsub.compilation.Module, Located, bossa.syntax.
   
   public void compileDispatchMethod(gnu.expr.LambdaExp meth)
   {
-    meth.compileAsMethod(dispatchComp);
+    if (dispatchComp != null)
+      meth.compileAsMethod(dispatchComp);
   }
   
   /****************************************************************

@@ -14,9 +14,22 @@ nice (0.9.0) unstable; urgency=low
     recognized, as in Java.
   * The 'char' type is no longer a subtype of int. The integer unicode 
     representation of a character c can be obtained by int(c).
-  * Added dispatch on global constants which value is a literal.
+  * Added dispatch on global constants which value is a literal. example:
+    let int specialValue = 7;
+    void foo(int);
+    foo(n) { /*do something*/ }
+    foo(=specialValue) { /*do something else*/ }
   * Redefining of local variables in their scope is not allowed anymore.
-  * Bugfixes (Parsing of nested tuples, global constants of type char ...)
+  * Dispatch on global constants works also for unique references(new Objects).
+    class Color {}
+    let Color red = new Color();
+    let Color blue = new Color();
+    String name(Color);
+    name(color) = "unknown color";
+    name(=red) = "red";
+    name(=blue) = "blue";
+  * Bugfixes (Parsing of nested tuples, global constants of type char,
+    Overloading resolving of methods implementation with additional tc's, ...)
   * Improved some error messages.
   
  --

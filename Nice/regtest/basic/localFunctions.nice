@@ -1,0 +1,14 @@
+package regtest.basic;
+
+void test_localFunctions()
+{
+  println("### Testing local functions");
+  int doubleIt(int x) = 2*x;
+
+  int pts = 1;
+  int getPoints() = doubleIt(pts);
+  println(getPoints());
+  pts = 2;
+  println(getPoints());
+
+}

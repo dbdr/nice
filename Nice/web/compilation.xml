@@ -15,7 +15,7 @@ I suggest you create a root directory for your nice packages:
 
 <para>
 Each time you begin writing a new package, just create a directory for it.
-For instance, for package <literal>my.package:</literal>
+For instance, for package <literal>my.program:</literal>
 </para>
 
 <programlisting>mkdir -p ~/nice/my/package</programlisting>
@@ -30,7 +30,7 @@ To compile your new package:
 
 <programlisting>
 cd ~/nice
-nicec my.package
+nicec my.program
 </programlisting>
 
 <para>
@@ -40,7 +40,7 @@ is that the default path for looking up source packages
 is the current directory. 
 It is possible to specify it using <literal>--sourcepath</literal> option.
 The previous exemple is this equivalent to:
-<programlisting>nicec --sourcepath=~/nice my.package</programlisting>
+<programlisting>nicec --sourcepath=~/nice my.program</programlisting>
 </para>
 
 <para>
@@ -58,7 +58,7 @@ that is appropriate for execution with <literal>java</literal>:
 </para>
 
 <programlisting>
-nicec -a program.jar my.package
+nicec -a program.jar my.program
 java -jar program.jar
 </programlisting>
 

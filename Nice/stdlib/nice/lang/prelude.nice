@@ -97,13 +97,17 @@ boolean `!=`(char, char) = inline nice.lang.inline.CompOp("iNe");
     return a==b;  // true iff both null
 }
 
-
-
 <T> int hashCode(!T) = native int Object.hashCode();
 
 <Any T> String toString(!T) = native String Object.toString();
 <Any T> String valueOf(T) = native String String.valueOf(Object);
 <Any T> Class getClass(!T) = native Class Object.getClass();
+
+<Any T> void wait(!T) = native void Object.wait();
+<Any T> void wait(!T, long) = native void Object.wait(long);
+<Any T> void wait(!T, long, int) = native void Object.wait(long, int);
+<Any T> void notify(!T) = native void Object.notify();
+<Any T> void notifyAll(!T) = native void Object.notifyAll();
 
 /** 
     This function will throw CloneNotSupportedException if the argument

@@ -105,6 +105,7 @@ main(args)
   test_optional();
   test_classes();
   test_methods();
+  test_functions();
   test_global();
   test_native();
   test_exceptions();

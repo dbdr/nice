@@ -49,6 +49,10 @@ String, Null string
 C1
 C2
 NULL class
+### Testing functions
+x = 42
+Functions: a Nice feature!
+### Testing globals
 Global Variables: 1, 3
 Static field is: 2
 Instance field is: 3

@@ -32,7 +32,7 @@ CVSBUILDDIR = /tmp/cvs-build
 
 all: complete
 
-stable:   clean bootstrap ant compiler1 archive
+stable:   clean bootstrap compiler1 ant archive
 complete: stable   compiler2 archive2
 fixpoint: complete compiler3 archive3
 

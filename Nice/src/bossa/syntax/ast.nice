@@ -12,6 +12,8 @@
 
 package bossa.syntax;
 
+import bossa.modules;
+
 import bossa.util.*;
 
 /**

@@ -54,7 +54,7 @@ class Compilation extends CompilationInterface
   Parser parser;
 
   Map<String,Package> packages = new HashMap();
-  Map<String,mlsub.typing.TypeConstructor> javaTypeConstructors = new HashMap();
+  Map<gnu.bytecode.Type, mlsub.typing.TypeConstructor> javaTypeConstructors = new HashMap();
   nice.tools.visibility.Scope</*VarSymbol*/bossa.syntax.Symbol> javaScope =
     new nice.tools.visibility.Scope(name: "java", parent: null);
 

@@ -184,7 +184,7 @@ public abstract class Engine
   /** Marker used to know how deep we are inside existential mode, so that
       we know when to exit from it.
   */
-  public static int existentialLevel = 0;
+  private static int existentialLevel = 0;
 
   public static void startSimplify()
   {

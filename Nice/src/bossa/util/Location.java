@@ -95,6 +95,10 @@ public abstract class Location implements Located
   {
   }
 
+  public void writeEnd(gnu.expr.Expression exp)
+  {
+  }
+
   public void write(gnu.expr.Declaration decl)
   {
   }
@@ -170,7 +174,7 @@ public abstract class Location implements Located
     {
       return startLine;
     }
-  
+
     public int getColumn()
     {
       return startColumn;
@@ -198,6 +202,12 @@ public abstract class Location implements Located
     {
       super.write(exp);
       exp.setLine(getLine(), getColumn());
+    }
+
+    public void writeEnd(gnu.expr.Expression exp)
+    {
+      super.write(exp);
+      exp.setLine(endLine, endColumn);
     }
 
     public void write(gnu.expr.Declaration decl)

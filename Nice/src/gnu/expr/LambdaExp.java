@@ -488,7 +488,14 @@ public class LambdaExp extends ScopeExp
 	    && (code.SP > 0 || comp.method.getReturnType().isVoid())
 	    && (! Compilation.usingTailCalls
 		|| isModuleBody() || isClassMethod() || isHandlingTailCalls()))
-	  code.emitReturn();
+	  {
+            // The line of a method is by convention it's last one,
+            // specifically to make this feature possible.
+            if (getLine() > 0)
+              code.putLineNumber(getFile(), getLine());
+
+            code.emitReturn();
+          }
 	code.popScope();        // Undoes enterScope in allocParameters
       }
     if (! Compilation.fewerClasses) // FIXME

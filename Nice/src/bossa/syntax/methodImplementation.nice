@@ -140,6 +140,12 @@ public abstract class MethodImplementation extends Definition
       {
         ref = this.createRef();
         nice.tools.code.Gen.setMethodBody(compiledMethod, body.generateCode());
+
+	/* We remember the end of the method's body as its location.
+	   This information is used to give the line number of implicit
+	   returns at the end of void methods.
+	*/
+	body.location().writeEnd(compiledMethod);
       }
 
     return notNull(ref);

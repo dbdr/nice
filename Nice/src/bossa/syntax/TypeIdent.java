@@ -12,7 +12,7 @@
 
 // File    : TypeIdent.java
 // Created : Sat Jul 24 14:02:08 1999 by bonniot
-//$Modified: Sat Dec 04 12:44:56 1999 by bonniot $
+//$Modified: Sat Dec 04 16:11:26 1999 by bonniot $
 
 package bossa.syntax;
 
@@ -46,7 +46,7 @@ public class TypeIdent
 
   TypeSymbol resolve(TypeScope scope)
   {
-    TypeSymbol res = scope.lookup(name);
+    TypeSymbol res = scope.lookup(name.toString());
     if(res==null)
       User.error(this,name+" is not defined"," in "+scope);
 

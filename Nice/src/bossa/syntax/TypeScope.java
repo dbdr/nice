@@ -12,7 +12,7 @@
 
 // File    : TypeScope.java
 // Created : Fri Jul 09 11:29:17 1999 by bonniot
-//$Modified: Sat Dec 04 11:14:25 1999 by bonniot $
+//$Modified: Sat Dec 04 16:24:14 1999 by bonniot $
 
 package bossa.syntax;
 
@@ -33,7 +33,7 @@ class TypeScope
 
   void addSymbol(TypeSymbol s)
   {
-    map.put(s.getName(),s);
+    map.put(s.getName().toString(),s);
   }
   
   void addSymbols(Collection c)
@@ -43,7 +43,7 @@ class TypeScope
       addSymbol((TypeSymbol)i.next());
   }
 
-  void addMapping(LocatedString name, TypeSymbol s)
+  void addMapping(String name, TypeSymbol s)
   {
     map.put(name,s);
   }
@@ -52,10 +52,10 @@ class TypeScope
   {
     for(Iterator in=names.iterator(),is=symbols.iterator();
 	in.hasNext();)
-      addMapping((LocatedString)in.next(),(TypeSymbol)is.next());
+      addMapping((String)in.next(),(TypeSymbol)is.next());
   }
   
-  public TypeSymbol lookup(LocatedString name)
+  public TypeSymbol lookup(String name)
   {
     TypeSymbol res;
     if(map.containsKey(name))

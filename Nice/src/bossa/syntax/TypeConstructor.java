@@ -12,7 +12,7 @@
 
 // File    : TypeConstructor.java
 // Created : Thu Jul 08 11:51:09 1999 by bonniot
-//$Modified: Sat Dec 04 14:09:42 1999 by bonniot $
+//$Modified: Sat Dec 04 16:09:36 1999 by bonniot $
 
 package bossa.syntax;
 
@@ -166,7 +166,7 @@ public class TypeConstructor
   {
     if(definition==null)
       {
-	TypeSymbol s=typeScope.lookup(name);
+	TypeSymbol s=typeScope.lookup(name.toString());
 	if(s==null)
 	  User.error(this,"Class "+name+" is not defined"," in "+typeScope);
 	
@@ -184,7 +184,7 @@ public class TypeConstructor
   {
     if(definition==null)
       {
-	TypeSymbol s=typeScope.lookup(name);
+	TypeSymbol s=typeScope.lookup(name.toString());
 	if(s==null)
 	  User.error(this,"Class or interface "+name+" is not defined");
 

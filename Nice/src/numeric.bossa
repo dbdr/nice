@@ -12,7 +12,7 @@
 
 // File    : numeric.bossa
 // Created : Wed Dec 01 15:44:03 1999 by bonniot
-//$Modified: Sat Dec 04 11:27:11 1999 by bonniot $
+//$Modified: Sat Dec 04 16:32:16 1999 by bonniot $
 
 /**
  * Numerical hierarchy.
@@ -27,22 +27,22 @@ import io;
 
 import gnu.math.*;
 
-native Numeric add(Numeric, Numeric) = gnu.math.Numeric gnu.math.Numeric.add(java.lang.Object);
-native Numeric sub(Numeric, Numeric) = gnu.math.Numeric gnu.math.Numeric.sub(java.lang.Object);
-native Numeric mul(Numeric, Numeric) = gnu.math.Numeric gnu.math.Numeric.mul(java.lang.Object);
-native Numeric div(Numeric, Numeric) = gnu.math.Numeric gnu.math.Numeric.div(java.lang.Object);
-native Numeric pow(Numeric, IntNum)  = gnu.math.Numeric gnu.math.Numeric.power(gnu.math.IntNum);
+native Numeric add(Numeric, Numeric) = Numeric Numeric.add(Object);
+native Numeric sub(Numeric, Numeric) = Numeric Numeric.sub(Object);
+native Numeric mul(Numeric, Numeric) = Numeric Numeric.mul(Object);
+native Numeric div(Numeric, Numeric) = Numeric Numeric.div(Object);
+native Numeric pow(Numeric, IntNum)  = Numeric Numeric.power(IntNum);
 
 native IntNum numerator(RatNum) = 
-  gnu.math.IntNum gnu.math.RatNum.numerator();
+  IntNum RatNum.numerator();
 native IntNum denominator(RatNum) = 
-  gnu.math.IntNum gnu.math.RatNum.denominator();
+  IntNum RatNum.denominator();
 
 /****************************************************************
  * Infinity
  ****************************************************************/
 
-native RatNum native_infinity(Numeric) = gnu.math.RatNum gnu.math.RatNum.infinity(int);
+native RatNum native_infinity(Numeric) = RatNum RatNum.infinity(int);
 
 RatNum positiveInfinity();
 positiveInfinity() = native_infinity(1);
@@ -50,9 +50,9 @@ RatNum negativeInfinity();
 negativeInfinity() = native_infinity(0-1);
 
 // java.lang.Integer -> gnu.math.IntNum
-native void set(IntNum, java.lang.Integer) = void gnu.math.IntNum.set(int);
+native void set(IntNum, Integer) = void IntNum.set(int);
 
-IntNum num(java.lang.Integer);
+IntNum num(Integer);
 num(i)
 {
   IntNum res = new IntNum();

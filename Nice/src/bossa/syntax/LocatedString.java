@@ -12,7 +12,7 @@
 
 // File    : LocatedString.java
 // Created : Fri Jul 09 19:09:47 1999 by bonniot
-//$Modified: Thu Dec 02 11:55:22 1999 by bonniot $
+//$Modified: Sat Dec 04 16:41:57 1999 by bonniot $
 // Description : A string + location information
 
 package bossa.syntax;
@@ -38,6 +38,10 @@ public class LocatedString
     return location;
   }
 
+  /****************************************************************
+   * Wrapper for string functions
+   ****************************************************************/
+
   public void append(String suffix)
   {
     this.content=this.content+suffix;
@@ -46,6 +50,11 @@ public class LocatedString
   public void prepend(String prefix)
   {
     this.content=prefix+this.content;
+  }
+  
+  public LocatedString substring(int beginIndex, int endIndex)
+  {
+    return new LocatedString(content.substring(beginIndex,endIndex),location);
   }
   
   public boolean equals(Object o)

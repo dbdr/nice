@@ -12,17 +12,17 @@
 
 // File    : io.bossa
 // Created : Mon Nov 08 19:46:09 1999 by bonniot
-//$Modified: Sat Dec 04 11:32:40 1999 by bonniot $
+//$Modified: Sat Dec 04 16:33:14 1999 by bonniot $
 
 import prelude;
 
 import java.io.*;
 
 native void native_println(PrintStream,String) =
-  void java.io.PrintStream.println(java.lang.String);
+  void PrintStream.println(String);
 
-native PrintStream stdout() = java.lang.System.out;
-native PrintStream stderr() = java.lang.System.err;
+native PrintStream stdout() = System.out;
+native PrintStream stderr() = System.err;
 
 void println<Any T>(PrintStream, T);
 println(ps,object)    = native_println(ps,toString(object));

@@ -12,7 +12,7 @@
 
 // File    : MonotypeVar.java
 // Created : Fri Jul 23 15:36:39 1999 by bonniot
-//$Modified: Wed Dec 01 16:07:46 1999 by bonniot $
+//$Modified: Sat Dec 04 16:09:35 1999 by bonniot $
 
 package bossa.syntax;
 
@@ -110,7 +110,7 @@ public class MonotypeVar extends Monotype
     if(soft)
       return this;
     
-    TypeSymbol s=ts.lookup(this.name);
+    TypeSymbol s=ts.lookup(this.name.toString());
     if(s==null)
       User.error(this,this.name+" is not defined"," in "+ts);
 

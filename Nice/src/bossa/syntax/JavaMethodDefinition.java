@@ -12,7 +12,7 @@
 
 // File    : JavaMethodDefinition.java
 // Created : Tue Nov 09 11:49:47 1999 by bonniot
-//$Modified: Sat Dec 04 12:45:54 1999 by bonniot $
+//$Modified: Sat Dec 04 17:08:50 1999 by bonniot $
 
 package bossa.syntax;
 
@@ -38,9 +38,9 @@ public class JavaMethodDefinition extends MethodDefinition
   public JavaMethodDefinition(
 			      // Informations about the java method
 			      // These 3 args are null if we are in an interface file
-			      String className,
+			      LocatedString className,
 			      String methodName,
-			      List /* of String */ javaTypes,
+			      List /* of LocatedString */ javaTypes,
 			      // Bossa information
 			      LocatedString name, 
 			      Constraint constraint,
@@ -52,9 +52,16 @@ public class JavaMethodDefinition extends MethodDefinition
     this.className=className;
     this.methodName=methodName;
     this.javaTypes=javaTypes;
+  }
 
+  public void createContext()
+  {
+    super.createContext();
+
+    // We put this here, since we need 'module' to be computed
+    // since it is used to open the imported packages.
     boolean isStatic = java.lang.reflect.Modifier.isStatic
-      (findReflectMethod(className,methodName,javaTypes).getModifiers());
+      (findReflectMethod().getModifiers());
     
     flags=0;
     if(isStatic)
@@ -73,37 +80,49 @@ public class JavaMethodDefinition extends MethodDefinition
 		 "Native method "+this.name+
 		 " has not the same number of parameters in Java and Bossa !");
   }
-
+  
   // Class.forName doesn't report errors nicely, I do it myself !
-  private Class getClass(String name)
+  private Class getClass(LocatedString className)
   {
-    try{
-      if(name.equals("void"))
-	return Void.TYPE;
-      else if(name.equals("int"))
-	return Integer.TYPE;
-      else if(name.equals("boolean"))
-	return Boolean.TYPE;
-      else
-	return Class.forName(name);
-    }
-    catch(ClassNotFoundException e){
-      User.error(this,
+    Class res;
+    String name = className.toString();
+    
+    if(name.equals("void"))
+      res = Void.TYPE;
+    else if(name.equals("int"))
+      res = Integer.TYPE;
+    else if(name.equals("boolean"))
+      res = Boolean.TYPE;
+    else
+      res = JavaTypeConstructor.lookupJavaClass(name);
+    
+    if(res==null)
+      User.error(className,
 		 "Class \""+name+"\" does not exists");
-      return null;
-    }
+    return res;
   }
   
   private java.lang.reflect.Method
-    findReflectMethod(String className, String methodName, List javaTypes)
+    findReflectMethod()
   {
     try
       {
 	Class[] classes = new Class[javaTypes.size()-1];
 	for(int i=1;i<javaTypes.size();i++)
-	  classes[i-1]=getClass((String) javaTypes.get(i));
+	  {
+	    LocatedString t = (LocatedString) javaTypes.get(i);
+	    
+	    classes[i-1]=getClass(t);
+	    // set the fully qualified name back
+	    javaTypes.set(i,new LocatedString(classes[i-1].getName(),t.location()));
+	  }
+	// set the fully qualified name of the return type back
+	javaTypes.set(0,new LocatedString(getClass((LocatedString) javaTypes.get(0)).getName(),((LocatedString) javaTypes.get(0)).location()));
 	
-	return getClass(className).
+	Class holder = getClass(className);
+	className = new LocatedString(holder.getName(),className.location());
+	
+	return holder.
 	  getDeclaredMethod(methodName,classes);
       }
     catch(NoSuchMethodException e){
@@ -115,12 +134,12 @@ public class JavaMethodDefinition extends MethodDefinition
   }
   
   /** The java class this method is defined in */
-  String className;
+  LocatedString className;
 
   /** Its name in the java class */
   String methodName;
   
-  List /* of String */ javaTypes;
+  List /* of LocatedString */ javaTypes;
   
   /** Access flags */
   private int flags;
@@ -145,20 +164,20 @@ public class JavaMethodDefinition extends MethodDefinition
   }
   
   protected gnu.bytecode.Type returnJavaType() 
-  { return type((String)javaTypes.get(0)); }
+  { return type(javaTypes.get(0).toString()); }
 
   protected gnu.bytecode.Type[] argumentsJavaTypes()
   {
     gnu.bytecode.Type[] res=new gnu.bytecode.Type[javaArity];
     for(int i=0;i<javaArity;i++)
-      res[i]=type((String)javaTypes.get(i+1));
+      res[i]=type(javaTypes.get(i+1).toString());
     
     return res;
   }
 
   protected gnu.mapping.Procedure computeDispatchMethod()
   {
-    ClassType c=ClassType.make(className);
+    ClassType c=ClassType.make(className.toString());
     return new gnu.expr.PrimProcedure
       (
        c.addMethod

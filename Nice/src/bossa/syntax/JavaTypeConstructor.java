@@ -12,7 +12,7 @@
 
 // File    : JavaTypeConstructor.java
 // Created : Thu Jul 08 11:51:09 1999 by bonniot
-//$Modified: Sat Dec 04 11:23:30 1999 by bonniot $
+//$Modified: Sat Dec 04 16:16:12 1999 by bonniot $
 
 package bossa.syntax;
 
@@ -181,23 +181,32 @@ public class JavaTypeConstructor extends TypeConstructor
    * On the fly lookup of java types
    ****************************************************************/
 
-  static JavaTypeConstructor lookup(LocatedString className)
+  static java.lang.Class lookupJavaClass(String className)
   {
-    Class c=null;
+    Class c = null;
     String pkg = null;    
     
-    try{ c=Class.forName(className.content); }
+    try{ c=Class.forName(className); }
     catch(ClassNotFoundException e){ }
 
-    if(c==null)
-      for(Iterator i = globalTypeScope.module.listImplicitPackages();
-	  i.hasNext();)
-	{
-	  pkg = (String) i.next();
-	  
-	  try{ c=Class.forName(pkg+"."+className.content); break; }
-	  catch(ClassNotFoundException e){ }
-	}
+    if(c!=null)
+      return c;
+    
+    for(Iterator i = globalTypeScope.module.listImplicitPackages();
+	i.hasNext();)
+      {
+	pkg = (String) i.next();
+	
+	try{ c=Class.forName(pkg+"."+className); break; }
+	catch(ClassNotFoundException e){ }
+      }
+    
+    return c;
+  }
+
+  static JavaTypeConstructor lookup(String className)
+  {
+    Class c = lookupJavaClass(className);    
     
     if(c==null)
       return null;
@@ -210,7 +219,7 @@ public class JavaTypeConstructor extends TypeConstructor
     globalTypeScope.addSymbol(res);
     
     // Remembers the short name as an alias
-    if(pkg!=null)
+    if(!(className.equals(c.getName())))
       globalTypeScope.addMapping(className,res);
     
     return res;

@@ -12,7 +12,7 @@
 
 // File    : ConstantExp.java
 // Created : Thu Jul 08 15:36:40 1999 by bonniot
-//$Modified: Thu Dec 02 12:01:14 1999 by bonniot $
+//$Modified: Sat Dec 04 16:11:22 1999 by bonniot $
 
 package bossa.syntax;
 
@@ -27,7 +27,7 @@ abstract public class ConstantExp extends Expression
 {
   void resolve()
   {
-    TypeSymbol s=typeScope.lookup(new LocatedString(className,Location.nowhere()));
+    TypeSymbol s=typeScope.lookup(className);
     
     if(s==null)
       Internal.error("Base class "+className+

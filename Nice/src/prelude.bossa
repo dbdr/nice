@@ -12,7 +12,7 @@
 
 // File    : prelude.bossa
 // Created : Thu Dec 02 11:42:48 1999 by bonniot
-//$Modified: Sat Dec 04 11:30:21 1999 by bonniot $
+//$Modified: Sat Dec 04 16:33:54 1999 by bonniot $
 
 /**
  * Standard prelude file.
@@ -25,17 +25,17 @@
 //import io;
 //import numeric;
 
-native Boolean TRUE() = java.lang.Boolean.TRUE;
-native Boolean FALSE() = java.lang.Boolean.FALSE;
+native Boolean TRUE() = Boolean.TRUE;
+native Boolean FALSE() = Boolean.FALSE;
 var Boolean true  = TRUE();
 var Boolean false = FALSE();
 
 native String toString<Any T>(T) =
-  java.lang.String java.lang.String.valueOf(java.lang.Object);
+  String String.valueOf(Object);
 
-native void exit(Number) = void java.lang.System.exit(int);
-native void traceInstructions(Runtime,Boolean) = void java.lang.Runtime.traceInstructions(boolean);
-native Runtime getRuntime() = java.lang.Runtime java.lang.Runtime.getRuntime();
+native void exit(Number) = void System.exit(int);
+native void traceInstructions(Runtime,Boolean) = void Runtime.traceInstructions(boolean);
+native Runtime getRuntime() = Runtime Runtime.getRuntime();
 
 void traceInstructions(Boolean);
 traceInstructions(on) =

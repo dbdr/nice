@@ -768,7 +768,7 @@ boolean isAncestorOf(java.awt.Container, Component)
   = native boolean java.awt.Container.isAncestorOf(Component);
 void processContainerEvent(java.awt.Container, ContainerEvent)
   = native void java.awt.Container.processContainerEvent(ContainerEvent);
-void setLayout(java.awt.Container, LayoutManager)
+void setLayout(java.awt.Container, ?LayoutManager)
   = native void java.awt.Container.setLayout(LayoutManager);
 
 //JDK1.4  ContainerListener[] getContainerListeners(java.awt.Container)

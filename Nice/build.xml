@@ -176,7 +176,7 @@
   </target>
   <target name="setDate">
     <!-- TODO: Extract the current Nice version from the head of the NEWS file. -->
-    <property name="version" value="0.9.10" />
+    <property name="version" value="0.9.11 prerelease" />
     <property name="to" value="src/nice/tools/compiler/dateBuild.nice" />
     <tstamp>
       <format property="NICE_DATE" timezone="UTC" pattern="yyyy.MM.dd, HH:mm:ss zzz" />

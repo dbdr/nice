@@ -50,10 +50,11 @@ deb:
 	@echo Creating Debian package version ${VERSION}
 	env CVSROOT=:pserver:anonymous@cvs.nice.sourceforge.net:/cvsroot/nice cvs-buildpackage -MNice -W/tmp/cvs-build -us -uc -rfakeroot -THEAD -d
 
-dist: share/java/nice.jar
-	# make sure that nicec is executable
-	chmod a+rx bin/nicec
-	tar cf Nice-`date +"%Y.%m.%d"`.tar bin/nicer bin/nicec share/java/nice.jar lib/emacs/nice-mode.el
+dist:
+	rm -rf ${TOP}/dist
+	mkdir ${TOP}/dist
+	$(MAKE) install DESTDIR=${TOP}/dist PREFIX="" 
+	cd ${TOP}/dist && tar -cf ../Nice-`date +"%Y.%m.%d"`.tar . --owner=0 --group=0
 
 install: share/java/nice.jar
 	mkdir -p ${INSTALLDIR}/bin ${INSTALLDIR}/share/java \
@@ -69,7 +70,7 @@ test:
 
 clean:
 	rm -f src/nice/tools/compiler.jar
-	-rm -rf classes share/java src/bossa/parser/{Parse*.java,Token*.java,ASCII_*.java}
+	-rm -rf dist classes share/java src/bossa/parser/{Parse*.java,Token*.java,ASCII_*.java}
 	find "${TOP}" \( -name "*.class" -o -name "*.nicei" -o -name "*~" \) -exec rm {} \;
 
 

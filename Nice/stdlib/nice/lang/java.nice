@@ -98,23 +98,24 @@ PrintStream stderr () = native System.err;
 <T> java.util.ListIterator<T> listIterator(java.util.List<T>, int) =
   native java.util.ListIterator java.util.List.listIterator(int);
 
+<T, U | U <: T> boolean addAll(Collection<T>, Collection<U>) =
+  native boolean java.util.Collection.addAll(java.util.Collection);
 
 // Some methods use Object, when they should use a type variable.
-// It's in fact correct in java to use Object instead of a contravariant type.
-<E,T | E <: T> boolean contains(java.util.Collection<E>, T) =
+<E> boolean contains(java.util.Collection<E>, E) =
   native boolean java.util.Collection.contains(Object);
-<E,T | E <: T> boolean remove(java.util.Collection<E>, T) =
+<E> boolean remove(java.util.Collection<E>, E) =
   native boolean java.util.Collection.remove(Object);
 
-<E,T | E <: T> int indexOf(java.util.List<E>, T) =
+<E> int indexOf(java.util.List<E>, E) =
   native int java.util.List.indexOf(Object);
-<E,T | E <: T> int lastIndexOf(java.util.List<E>, T) =
+<E> int lastIndexOf(java.util.List<E>, E) =
   native int java.util.List.lastIndexOf(Object);
-<E,T | E <: T> int lastIndexOf(java.util.Vector<E>, T, int) =
+<E> int lastIndexOf(java.util.Vector<E>, E, int) =
   native int java.util.Vector.lastIndexOf(Object, int);
-<E,T | E <: T> boolean removeElement(java.util.Vector<E>, T) =
+<E> boolean removeElement(java.util.Vector<E>, E) =
   native boolean java.util.Vector.removeElement(Object);
-<E,T | E <: T> int search(java.util.Stack<E>, T) = 
+<E> int search(java.util.Stack<E>, E) = 
   native int java.util.Stack.search(Object);
 
 /* For List<int> there is an ambiguity between 

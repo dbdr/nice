@@ -76,6 +76,12 @@ public abstract class MethodContainer extends Definition
       this.atoms = atoms;
     }
 
+    public static AtomicConstraint sureTypeVar(MonotypeVar tv)
+    {
+      return AtomicConstraint.create
+	(new mlsub.typing.MonotypeLeqTcCst(tv, PrimitiveType.sureTC));
+    }
+
     MonotypeVar[] typeParameters;
     List atoms;
   }

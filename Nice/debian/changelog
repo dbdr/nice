@@ -1,6 +1,9 @@
 nice (0.7.5) unstable; urgency=low
 
   * Addition of design by contract: assertions, pre- and post-conditions.
+  * A class type parameter can now be constrained to be a non-option type,
+    by prefixing it with the ! character:
+      class Elem<!A> { ... }
   * Addition of the || operator on optional values:
       e1 || e2
     evalues e1 and returns its value if it is not null (without evaluating e2).

@@ -108,3 +108,17 @@ abstract class Move extends game.Move {}
   /// package game.schnapsen import game, game.ai
   /// Toplevel
 class State<M> extends game.ai.State<M> {}
+
+/// FAIL
+  /// Toplevel
+public class Elem<A> {
+  A data;
+  toString() = data. /*/// FAIL HERE */ toString();
+}
+
+/// PASS
+  /// Toplevel
+public class Elem<!A> {
+  A data;
+  toString() = data.toString();
+}

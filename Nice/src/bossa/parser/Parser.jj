@@ -1153,6 +1153,7 @@ MonotypeVar taggedMonotypeVar(List tags, List atoms):
 {
   MonotypeVar mv;
   TypeIdent bound = null;
+  boolean sure = false;
 }
 {
   [ LOOKAHEAD( typeIdent() ("+" | "-" | monotypeVar()) )
@@ -1164,6 +1165,8 @@ MonotypeVar taggedMonotypeVar(List tags, List atoms):
   |     { tags.add(null); }
   )
 
+  [ "!" { sure = true; } ]
+
   mv = monotypeVar()
 
   { 
@@ -1172,6 +1175,9 @@ MonotypeVar taggedMonotypeVar(List tags, List atoms):
         bound.nullness = Monotype.absent;
         atoms.add(new MonotypeLeqCst(Monotype.createVar(mv), bound)); 
       }
+
+    if (sure)
+      atoms.add(MethodContainer.Constraint.sureTypeVar(mv));
 
     return mv;
   }

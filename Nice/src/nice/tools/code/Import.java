@@ -90,18 +90,65 @@ public class Import
 					 typeParameters, niceTP);
 	  }
 
-	for (int i = 0; i < paramTypes.length; i++)
-	  params[n++] = Types.monotype(paramTypes[i], typeParameters, niceTP);
-    
+	boolean strictImport =  bossa.modules.Package.currentCompilation.
+					strictJavaTypes;
+        if (strictImport)
+	{
+	  for (int i = 0; i < paramTypes.length; i++)
+	  //arguments of a method are considered not null 
+	    params[n++] = Types.monotype(paramTypes[i], true, typeParameters,
+				       niceTP, true);
+	} else {
+	  for (int i = 0; i < paramTypes.length; i++)
+	  //arguments maybe null
+	    params[n++] = Types.monotype(paramTypes[i], false, typeParameters,
+					niceTP, true);
+	}
+
 	mlsub.typing.Monotype retType;
 	if (constructor)
-	  // the return type is surely not null
-	  retType = Types.monotype(declaringClass.thisType(), true,
-				   typeParameters, niceTP);
-	else
-	  retType = Types.monotype(m.getFullReturnType(), 
-				   typeParameters, niceTP);
-
+	    // the return type is surely not null
+	    retType = Types.monotype(declaringClass.thisType(), true,
+				     typeParameters, niceTP);
+	else if (strictImport)
+	{		
+	  Type returnType = m.getFullReturnType();
+	  if (m.getStaticFlag())
+	    //no exception found yet to this assumption 
+	    retType = Types.monotype(returnType, true, 
+				     typeParameters, niceTP, true);
+	  else
+	    {
+	      Type classType = declaringClass.thisType();
+	    
+	      if ((returnType.getName() != null) && returnType.getName().
+						 equals(classType.getName()))
+	        //if returntype equals declaringclass than it's almost sure
+	        //that returntype isn't null, this sort of methods are common
+	        //in immutable classes such as String	
+	        retType = Types.monotype(returnType, true, typeParameters,
+				         niceTP);
+	      else if ((returnType instanceof ParameterizedType) &&
+		       (classType instanceof ParameterizedType) &&
+		     (((ParameterizedType)returnType).main.getName() != null) &&
+		     (((ParameterizedType)returnType).main.getName().equals(
+		      ((ParameterizedType)classType).main.getName())))
+	        //same as above for parameterized classes a bit more difficult
+	        retType = Types.monotype(returnType, true, typeParameters,
+				         niceTP);
+	      else if (returnType instanceof ArrayType)
+	        //an array can be empty so it should never be null
+	        retType = Types.monotype(returnType, true, typeParameters,
+				       niceTP, true);
+	      else
+	        //the rest where no good guess is possible about nullness
+	        retType = Types.monotype(returnType, typeParameters, niceTP);
+	    }
+	} else {
+	   //if not strict then returntype not null.
+	   retType = Types.monotype(m.getFullReturnType(), true,
+				    typeParameters, niceTP, true);
+	}	  
 	Constraint cst = niceTP == null ? null : new Constraint(niceTP, null);
 	return new Polytype(cst, new FunType(params, retType));
       }

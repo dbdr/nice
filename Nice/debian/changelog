@@ -1,5 +1,11 @@
 nice (0.7.7) unstable; urgency=low
 
+  * New policy for typing calls to Java methods. By default, the typing
+    is more convenient, considering arguments as possibly null, and 
+    results as non-null. With the '-- strict' compiler option, use a stricter
+    heuristics.
+    Additionally, arrays are always considered to have non-null component 
+    types.
   * Faster compilation for large projects with many classes.
 
  --

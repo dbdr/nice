@@ -306,9 +306,42 @@ public final class Types
       return res;
   }
 
+  /**
+    Special version for use in Import.java,
+    it always checks whether nullness info may be added.
+    And can handle arrays different(not yet implemented)
+  */
+  public static Monotype monotype(Type javaType, boolean sure,
+				  TypeVariable[] typeVariables,
+				  TypeSymbol[] niceTypeVariables,
+				  boolean arraySure)
+    throws ParametricClassException, NotIntroducedClassException
+  {
+    Monotype res = getMonotype(javaType, typeVariables, niceTypeVariables,
+			       arraySure);
+    //primitivetypes and typevariables should not get nullness info
+    if (javaType instanceof ObjectType &&
+	! (javaType instanceof TypeVariable))
+      {
+	if (sure)
+	  return bossa.syntax.Monotype.sure(res);
+    	else
+	  return bossa.syntax.Monotype.maybe(res);
+      }
+    return res;	
+  }
   private static Monotype getMonotype(Type javaType,
 				      TypeVariable[] typeVariables,
 				      TypeSymbol[] niceTypeVariables)
+    throws ParametricClassException, NotIntroducedClassException
+  {
+    return getMonotype(javaType, typeVariables, niceTypeVariables, false);
+  }
+
+  private static Monotype getMonotype(Type javaType,
+				      TypeVariable[] typeVariables,
+				      TypeSymbol[] niceTypeVariables,
+				      boolean arraySure)
     throws ParametricClassException, NotIntroducedClassException
   {
     if(javaType.isVoid())
@@ -331,7 +364,16 @@ public final class Types
       return PrimitiveType.doubleType;
 
     if (javaType instanceof ArrayType)
-      return new MonotypeConstructor
+      if (arraySure)
+	//making the component of an array sure
+	return new MonotypeConstructor
+	  (PrimitiveType.arrayTC, 
+	   new Monotype[]{
+	     monotype(((ArrayType) javaType).getComponentType(), true, 
+		      typeVariables, niceTypeVariables, true)
+	   });
+      else
+	return new MonotypeConstructor
 	(PrimitiveType.arrayTC, 
 	 new Monotype[]{
 	   monotype(((ArrayType) javaType).getComponentType(), 

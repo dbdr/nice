@@ -180,8 +180,8 @@ class Info
   void addVars(Array<?MonoSymbol> symbols) = 
     symbols.iter(?MonoSymbol s => this.addVar(notNull(s)));
   
-  void addTypeVars(Array<?TypeSymbol> symbols) = 
-    symbols.iter(?TypeSymbol s => this.typeVars[notNull(s).toString()]=notNull(s));
+  void addTypeVars(Array<TypeSymbol> symbols) = 
+    symbols.iter(TypeSymbol s => this.typeVars[s.toString()] = s);
 }
 
 void checkInitialized(Block.LocalVariable.Symbol sym, Info info,
@@ -323,7 +323,8 @@ analyse(e@FunExp, info)
   if (e.constraint != Constraint.True && e.constraint != null)
     {
       e.cst = notNull(e.constraint).resolveToLowlevel();
-      addTypeVars(info, notNull(notNull(e.cst).binders()));
+      ///TODO: remove the cast when base compiler > 0.7.6 (new java types)
+      addTypeVars(info, cast(notNull(e.cst).binders()));
     }
   e.constraint = null;
 

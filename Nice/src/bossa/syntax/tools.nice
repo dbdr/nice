@@ -84,6 +84,10 @@ List<VarSymbol> findJavaMethods(?gnu.bytecode.ClassType, String, int) = native L
 OverloadedSymbolExp newOverloadedSymbolExp(List<bossa.syntax.VarSymbol>, ?bossa.syntax.LocatedString) = native new OverloadedSymbolExp(List,LocatedString);
 Arguments arguments(CallExp) = native CallExp.arguments;
 
+// Retypings needed since java types are not strict.
+
+Block newBlock(?Statement[] statements) = native new Block(Statement[]);
+
 // Local Variables:
 // nice-xprogram: "nicec -d \"$HOME/Nice/classes\" --sourcepath=\"$HOME/Nice/src\" --classpath=\"$HOME/Nice/classes\""
 // End:

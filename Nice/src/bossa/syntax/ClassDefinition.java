@@ -12,7 +12,7 @@
 
 // File    : ClassDefinition.java
 // Created : Thu Jul 01 11:25:14 1999 by bonniot
-//$Modified: Wed Sep 20 18:35:04 2000 by Daniel Bonniot $
+//$Modified: Wed Sep 20 18:37:17 2000 by Daniel Bonniot $
 
 package bossa.syntax;
 
@@ -228,7 +228,7 @@ abstract public class ClassDefinition extends Definition
       catch(KindingEx e){
 	User.error(name,
 		   "Class "+name+" cannot extend "+e.t2+
-		   ": they do not have the number or kind of type parameters");
+		   ": they do not have the same number or kind of type parameters");
       }
       
       if(impl!=null)

@@ -2402,12 +2402,10 @@ Statement LocalDeclaration() :
     | t="var" {constant = false;}
     )
     id=ident()
-    [ "=" e=Expression() ]
+    "=" e=Expression()
     { Block.LocalValue res;
-      if (constant) {res = new Block.LocalConstant(id,e);}
-      else if (e != null) 
-        res = new Block.LocalVariable(id, null, constant, e);
-      else {throw new UserError(new Location(t), "'var' without type nor value is not implemented (yet)");}
+      if (constant) { res = new Block.LocalConstant(id,e);}
+      else { res = new Block.LocalVariable(id, null, constant, e);}
     }
     ( "," id=ident() "=" e=Expression() { res.addNext(id,e); } )*
     ";" 

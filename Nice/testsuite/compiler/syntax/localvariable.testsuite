@@ -35,10 +35,6 @@
   var int i = 0;
   i = 1;
 
-/// PASS bug
-  let i;
-  i = 0;
-
 /// PASS
   let i = 0;
 
@@ -47,27 +43,11 @@
   assert i == 2;
   assert j == 3;
 
-/// PASS bug 
-/// COMMENT: not implemented yet
-  var i;
-  i = 0;
-
 /// PASS
   var i = 0;
 
-/// FAIL bug
-  let i;
-  i = 0;
-  i = 1;
-
 /// FAIL
   let i = 0;
-  i = 1;
-
-/// PASS bug 
-/// COMMENT: not implemented yet
-  var i;
-  i = 0;
   i = 1;
 
 /// PASS

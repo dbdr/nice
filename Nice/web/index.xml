@@ -48,7 +48,7 @@ safety.
   avoided by using Nice's advanced features. 
   Ever got bored
   of writing tons of loops, casts, overloaded methods with default
-  values, ... ?
+  values, anonymous classes, ... ?
 </para>
 </listitem>
 </varlistentry>
@@ -86,6 +86,11 @@ In addition to traditional object-oriented features, Nice offers:
   They allow methods to be defined outside classes.
   This means that new methods can be defined on classes that
   belong to a different package (even in java.*). 
+  This allows for a more modular style: you don't need to pack classes with
+  all possibly useful methods, but you can split them into several packages
+  dealing with different aspects. Development can then happen independently
+  if each package.
+  </para><para>
   Multi-methods also extend usual methods with the possibility to
   dispatch on every argument, instead of only the receiver class.
   <ulink url="visitor.html">This article</ulink> shows why using multi-methods 
@@ -96,8 +101,7 @@ In addition to traditional object-oriented features, Nice offers:
   
 
 <varlistentry><term>Tuples</term><listitem><para> 
-  This allows in particular methods to return 
-  several values.
+  This allows in particular methods to return several values.
 </para>
 </listitem>
 </varlistentry>
@@ -107,7 +111,8 @@ In addition to traditional object-oriented features, Nice offers:
   Optional parameters have a default value that is used when the parameter 
   is not present in the call. This is much simpler than in Java, where one 
   has to write several versions of the method for each combination of 
-  parameters. 
+  parameters. The names of the arguments can also be specified at the call
+  site, improving readability and making argument order irrelevant.
 </para>
 </listitem>
 </varlistentry>

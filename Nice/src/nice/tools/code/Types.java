@@ -557,8 +557,7 @@ public final class Types
   {
     // The test to void should be more high-level than string comparison
     String rep = m.toString();
-    return rep.equals("nice.lang.Sure<nice.lang.void>") 
-    || rep.endsWith("nice.lang.void");
+    return rep.equals("nice.lang.void");
   }
 
   public static boolean isVoid(mlsub.typing.Polytype t)

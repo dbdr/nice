@@ -694,7 +694,7 @@ Monotype monotypeConstructor():
     }
 }
 
-FunType funmonotype():
+FunType OLDfunmonotype():
 {
     Monotype codom=null;
     List dom=null;
@@ -710,6 +710,24 @@ FunType funmonotype():
     }
 }
 
+FunType funmonotype():
+{
+  Monotype codomain;
+  List domain = null;
+  boolean maybe = false;
+}
+{
+  "(" [ domain = monotypes() ] ")" 
+  [ "?" { maybe = true; } ]
+  "->"
+  codomain = monotype()
+  { 
+    FunType res = new FunType(domain, codomain); 
+    res.nullness = maybe ? res.maybe : res.absent;
+    return res; 
+  }
+}
+
 Monotype monotype():
 {
   Monotype res;
@@ -722,6 +740,8 @@ Monotype monotype():
   [ "?" { maybe = true; } | "!" { sure = true; } ]
 
   (
+  res=OLDfunmonotype()
+|
   res=funmonotype()
 |
   start="alike" [ "<" p=monotypes() ">" ]
@@ -757,6 +777,15 @@ Monotype monotype():
        loc);
     res.nullness = res.absent;
   }
+
+  |
+  { maybe = false; }
+  [ "?" { maybe = true; } ]
+  "->"
+  { Monotype codomain; } codomain = monotype()
+  { res = new FunType(new Monotype[]{ res }, codomain); 
+    res.nullness = maybe ? res.maybe : res.absent; }
+  
 )*
 
   { 
@@ -1971,8 +2000,6 @@ Statement BlockStatement(List statements) :
 { Statement res; }
 {
   (
-  res=LocalTupleDeclaration(statements)
-|
   LOOKAHEAD( "final" | "const" | monotype() <IDENT>)
   (
     LOOKAHEAD( ( "final" | "const" ) <IDENT> "=" )
@@ -1980,6 +2007,8 @@ Statement BlockStatement(List statements) :
   |
     res = LocalDeclaration() 
   )
+|
+  res=LocalTupleDeclaration(statements)
 |
   res=Statement()
 /*

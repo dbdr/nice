@@ -92,8 +92,8 @@ public final class FunType extends Monotype
   
   public String toString()
   {
-    return "fun(" + bossa.util.Util.map("", ", ", "", in)
-      + ")(" + out + ")";
+    return "(" + bossa.util.Util.map("", ", ", "", in)
+      + ")->" + out;
   }
 
   private Monotype[] in;

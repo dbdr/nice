@@ -52,3 +52,18 @@ class Multi
   alike polymorphic2();
   polymorphic2() = this;
 }
+
+// Test functional types, the way they are parsed and dumped in the interface.
+class Funs
+{
+  int->int f1;
+  int->int->int f2;
+  int->int->int->int f3;
+  (int->int)->int f4;
+  (int->int)->int->int f5;
+
+  (int,int)->int f6;
+
+  int ?-> int f7;
+  (int,int)?->int f8;
+}

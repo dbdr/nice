@@ -13,8 +13,7 @@ import regtest.basic;
 final class KAA implements I2 {}
 kf(k@KAA) = k;
 
-void test_import();
-test_import()
+void test_import()
 {
   // tests reading of @null patterns
   ?String s = null;
@@ -37,4 +36,18 @@ test_import()
   /* Must fail: map(["A"], fun(String s)=>{println(s);}); */
 
   cov2(null);
+}
+
+void test_funs()
+{
+  Funs f = new Funs();
+  f.f1 = fun(int x) => x;
+  f.f2 = fun(int x) => f.f1;
+  f.f3 = fun(int x) => f.f2;
+  f.f4 = fun(int->int x) => x(0);
+  f.f5 = fun(int->int x) => fun(int y) => x(y);
+  f.f6 = fun(int x, int y) => x - y;
+
+  f.f7 = null;
+  f.f8 = null;
 }

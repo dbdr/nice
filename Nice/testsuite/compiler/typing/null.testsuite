@@ -7,6 +7,13 @@ nonnull(x@String) {}
 nonnull(x) {}
 
 /// PASS
+  ?int i = f();
+  /// Toplevel
+
+<T> ?T f(?T s = null, !T?->!T i = null) = s;
+
+/// PASS
+  javax.swing.JFrame f = new javax.swing.JFrame().init();
   /// Toplevel
 
 <java.awt.Component T> T init
@@ -16,5 +23,3 @@ nonnull(x) {}
 {                            
   return this;
 }
-
-void callInit(javax.swing.JFrame f) { f.init(); }

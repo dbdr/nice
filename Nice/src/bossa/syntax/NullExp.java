@@ -23,7 +23,7 @@ import mlsub.typing.Constraint;
    The 'null' expression.   
 
    @version $Date$
-   @author Daniel Bonniot (d.bonniot@mail.dotcom.fr)
+   @author Daniel Bonniot (bonniot@users.sourceforge.net)
 */
 
 public class NullExp extends Expression
@@ -37,11 +37,16 @@ public class NullExp extends Expression
 
   void computeType()
   {
-    MonotypeVar alpha = new MonotypeVar("any");
-    this.type = new Polytype(new Constraint(new TypeSymbol[]{alpha}, null), 
-			     bossa.syntax.Monotype.maybe(alpha));
+    // The type needs to be generated each time, since it is polymorphic.
   }
   
+  Polytype getType()
+  {
+    MonotypeVar alpha = new MonotypeVar("any");
+    return new Polytype(new Constraint(new TypeSymbol[]{alpha}, null), 
+			bossa.syntax.Monotype.maybe(alpha));
+  }
+
   protected gnu.expr.Expression compile()
   {
     return gnu.expr.QuoteExp.nullExp;

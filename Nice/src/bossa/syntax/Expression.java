@@ -123,7 +123,7 @@ public abstract class Expression
   /** computes the static type of the expression */
   abstract void computeType();
 
-  final Polytype getType()
+  Polytype getType()
   {
     if(type==null)
       {

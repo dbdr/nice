@@ -1,5 +1,10 @@
 nice (0.9.0) unstable; urgency=low
 
+  * Added dispatch on String literals. This can be used as a switch on Strings.
+      void foo(String color);
+      foo("blue") { ... }
+      foo("red") { ... }
+      foo(color) { println("unknown color" + color); }
   * Added operator ** to calculate powers of longs, doubles and BigIntegers.
   * Archives (generated with the -a option) can now be used to distribute
     Nice libraries.

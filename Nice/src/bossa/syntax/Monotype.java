@@ -85,6 +85,16 @@ implements Located
     sure = 2,
     absent = 3;
 
+  final String nullnessString()
+  {
+    switch(nullness) 
+      {
+      case maybe: return "?";
+      case sure:  return "!";
+      default:    return "";
+      }
+  }
+
   // public since it is called from bossa.dispatch
   public final mlsub.typing.Monotype resolve(TypeMap tm)
   {

@@ -160,7 +160,7 @@ public final class TypeIdent extends Monotype implements Located
 
   public String toString()
   {
-    return name.toString();
+    return nullnessString() + name.toString();
   }
 
   public LocatedString getName()

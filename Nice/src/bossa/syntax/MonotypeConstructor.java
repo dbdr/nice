@@ -131,7 +131,10 @@ public class MonotypeConstructor extends Monotype
 
   public String toString()
   {
-    return (lowlevelTC != null ? lowlevelTC.toString() : tc.toString()) + parameters;
+    return 
+      nullnessString() + 
+      (lowlevelTC != null ? lowlevelTC.toString() : tc.toString()) 
+      + parameters;
   }
 
   public TypeIdent tc;

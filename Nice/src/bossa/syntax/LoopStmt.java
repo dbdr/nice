@@ -54,7 +54,7 @@ public class LoopStmt extends Statement
 			new TypeParameters(tparams), loc);
     itertype.nullness = Monotype.sure;
     getiter = CallExp.create(new IdentExp(new LocatedString("forIterator", loc)), container); 
-    iter = new LocatedString("for_in_iter", loc);
+    iter = new LocatedString("for_in_iter_"+loc.getLine()+"_"+loc.getColumn(), loc);
     init = new Block.LocalVariable(iter, itertype, true, getiter);
     iterexp = new IdentExp(iter);
     cond = CallExp.create(new IdentExp(new LocatedString("hasNext", loc)), iterexp);

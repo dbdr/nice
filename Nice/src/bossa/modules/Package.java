@@ -755,11 +755,14 @@ public class Package implements mlsub.compilation.Module, Located, bossa.syntax.
     if (compiling())
       return def.createClassExp();
 
-    ClassType classe = source.readClass(def.getName().toString());
+    String name = def.getName().toString();
+    ClassType classe = source.readClass(name);
     if (classe == null)
       Internal.error("Compiled class " + def + " was not found");
-    ClassExp res = new ClassExp(classe);
-    return res;
+
+    Type.registerTypeForName(name, classe);
+
+    return new ClassExp(classe);
   }
 
   public String bytecodeName()

@@ -47,6 +47,17 @@ public class ClassFileInput extends DataInputStream
     return ctype;
   }
 
+  /** Read a class of a known name (in .class format) from an InputStream.
+    * @return A ClassType object representing the class that was read.
+    */
+  public static ClassType readClassType (String name, InputStream str)
+       throws IOException, ClassFormatError
+  {
+    ClassType ctype = ClassType.make(name);
+    ClassFileInput reader = new ClassFileInput(ctype, str);
+    return ctype;
+  }
+
   public boolean readHeader () throws IOException
   {
     int magic = readInt();

@@ -61,13 +61,12 @@ class DirectoryCompiledContent extends CompiledContent
 
   ClassType readClass(String name)
   {
-    name = bossa.util.Util.simpleName(name);
-    InputStream s = getFileStream(name + ".class");
+    InputStream s = getFileStream(bossa.util.Util.simpleName(name) + ".class");
     if (s == null)
       return null;
     
     ClassType res = null;    
-    try{ res = gnu.bytecode.ClassFileInput.readClassType(s); }
+    try{ res = gnu.bytecode.ClassFileInput.readClassType(name, s); }
     catch(LinkageError e){}
     catch(IOException e){}
     
@@ -82,8 +81,8 @@ class DirectoryCompiledContent extends CompiledContent
     if (!itf.exists())
       return null;
     
-    bytecode = readClass("package");
-    dispatch = readClass("dispatch");
+    bytecode = readClass(pkg.getName() + ".package");
+    dispatch = readClass(pkg.getName() + ".dispatch");
 
     if (bytecode == null || dispatch == null)
       return null;

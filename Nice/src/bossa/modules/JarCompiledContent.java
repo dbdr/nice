@@ -89,7 +89,7 @@ class JarCompiledContent extends CompiledContent
       return null;
 
     try {
-      return ClassFileInput.readClassType(jar.getInputStream(entry));
+      return ClassFileInput.readClassType(name, jar.getInputStream(entry));
     }
     catch (IOException e) {
       return null;

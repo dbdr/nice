@@ -41,3 +41,13 @@
 /// FAIL
   for(;;)
     continue /*/// FAIL HERE */ undefined_label;
+
+/// PASS bug
+  boolean doneFinally = false;
+  for(;;)
+    try {
+      break;
+    } finally {
+      doneFinally = true;
+    }
+  assert doneFinally;

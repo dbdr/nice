@@ -54,24 +54,13 @@ public class ObjectType extends Type
   /** Get the java.lang.Class object for the representation type. */
   public Class getReflectClass()
   {
-    try
-      {
-	if (reflectClass == null && (flags & EXISTING_CLASS) != 0)
-	  reflectClass = Class.forName(getInternalName().replace('/', '.'));
-	
-        //flags |= EXISTING_CLASS;
-      }
-    catch (java.lang.ClassNotFoundException ex)
-      {
-        if ((flags & EXISTING_CLASS) != 0)
-          throw new RuntimeException("no such class: "+getName());
-      }
-    catch (java.lang.NoClassDefFoundError ex)
-      {
-	System.out.println(ex);
-        if ((flags & EXISTING_CLASS) != 0)
-          throw new RuntimeException("no such class: "+getName());
-      }
+    if (reflectClass == null && (flags & EXISTING_CLASS) != 0)
+      reflectClass = 
+	nice.tools.code.Types.lookupQualifiedJavaClass(getInternalName().replace('/', '.'));
+
+    if (reflectClass == null && (flags & EXISTING_CLASS) != 0)
+      throw new RuntimeException("no such class: "+getName());
+
     return reflectClass;
   }
 

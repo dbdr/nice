@@ -9,8 +9,10 @@ JAVADOC=javadoc -linkoffline file:///C%7C/Apps/jdk1.2.1/docs/api file:///usr/opt
 first: parser
 	cd src; nicec bossa.modules
 	mkdir -p classes
+	cd classes; jar xf ../external/java-getopt-1.0.7.jar gnu
+	ln -sf nicec bin/nicer
 	cd src;\
-	${JAVAC} bossa/modules/Package.java
+	${JAVAC} bossa/modules/Package.java gnu/bytecode/dump.java ../stdlib/nice/*/*.java
 
 recompile:
 	cd src;\
@@ -24,7 +26,7 @@ recompileSTDLIB:
 
 compiler:
 	${TOP}/src/nice/tools/compiler/setBuildDate ${TOP}/src/nice/tools/compiler
-	nicec -e -Rs nice.tools.compiler
+	cd src; nicec -Rs nice.tools.compiler
 
 parser:
 	cd src/bossa/parser; ${JAVACC} Parser.jj

@@ -559,9 +559,17 @@ analyse(l@LoopStmt, info)
   info.currentLoop = l;
   analyse(l.loopBody, info);
   info.currentLoop = save;
+
+  /* The update code is considered reachable even if the loop cannot terminate
+     normally. This is normal if the loop contains a continue statement, but 
+     the JLS allows that even without one.
+  */
+  info.setReachable();
   analyse(l.iterationStatements, info);
+
   if (! l.isTestFirst())
     l.whileExp = analyse(l.whileExp, info);
+
   info.endInner();
 }
 

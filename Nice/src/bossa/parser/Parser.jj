@@ -166,7 +166,7 @@ TOKEN: /* Keywords */
 | < ANY_:	"Any"        	> /* Nice specific */
 
 // Expressions
-//| < ASSERT:     "assert"     	>
+| < ASSERT:     "assert"     	>
 | < FOR:        "for"        	>
 | < IF:         "if"         	>
 | < ELSE:       "else"       	>
@@ -1548,7 +1548,10 @@ FunExp endFunExp(List formals):
   |
     exp=Expression()
     { 
-      body=new ReturnStmt(exp);
+      if (exp instanceof AssignExp)
+        body=new ExpressionStmt(exp);
+      else
+        body=new ReturnStmt(exp);
       body.setLocation(exp.location());
     }
   )
@@ -2146,6 +2149,8 @@ Statement Statement() :
   res=ThrowStatement()
 |
   res=TryStatement()
+|
+  res=AssertStatement()
 
 |
   res=SynchronizedStatement()
@@ -2482,6 +2487,24 @@ Statement TryStatement() :
   )*
   [ "finally" b=Block() { res.setFinally(b); } ]
   { return res; }
+}
+
+Statement AssertStatement() :
+{
+  Token t;
+  Expression condition, message;
+  CallExp call;
+}
+{
+  t = "assert"
+  condition = Expression()
+  ( ":" message = Expression() 
+    { call = CallExp.create(symb(t), condition, message); }
+  |
+    { call = CallExp.create(symb(t), condition); }
+  )
+  ";"
+  { return new ExpressionStmt(call); }
 }
 
 Statement SynchronizedStatement() :

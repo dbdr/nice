@@ -102,7 +102,7 @@ top(l@List) = l.get(l.size() - 1);
 
 abstract class FList<T> 
   implements Sequence 
-  //finally implements Collection
+  finally implements Collection
   {}
 
 final class Nil<T>  extends FList<T> {}
@@ -138,10 +138,10 @@ map(l@Nil, f) = new Nil();
 
 map(l@Cons, ff) = cons(ff(l.head), map(l.tail, ff));
 
-filter(l@Nil , test) = new Nil();
+filter(l@Nil , test) = l;
 filter<C,T>(l@Cons, test)
 {
-  FList<T> res = filter(l.tail,test);
+  FList<T> res = filter(l.tail, test);
   return test(l.head) ? cons(l.head, res) : res;
 }
 

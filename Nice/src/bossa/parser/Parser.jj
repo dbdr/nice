@@ -1307,8 +1307,8 @@ MethodDeclaration nativeMethodDeclaration(LocatedString name,
     if(isNew)
       {
 	javaTypes.add(0,method);
-	return new JavaMethod(method,"<init>",javaTypes,
-			      name,cst,returnType,parameters);
+	return new RetypedJavaMethod(method,"<init>",javaTypes,
+			             name,cst,returnType,parameters);
       }
     int dot=method.toString().lastIndexOf('.');
     if(dot==-1)
@@ -1319,8 +1319,8 @@ MethodDeclaration nativeMethodDeclaration(LocatedString name,
     LocatedString className=method.substring(0,dot);
     
     if(javaTypes!=null)
-      return new JavaMethod(className,methodName,javaTypes,
-			    name,cst,returnType,parameters);
+      return new RetypedJavaMethod(className,methodName,javaTypes,
+			           name,cst,returnType,parameters);
     else
       return new JavaFieldAccess(className,methodName,
 				 name,cst,returnType,parameters);

@@ -44,6 +44,7 @@ public class LiteralArrayExp extends Expression
   void computeType()
   {
     Polytype elementType = Polytype.union(getType(elements));
+    elementType.simplify();
     this.type = new Polytype
 	(elementType.getConstraint(), new MonotypeConstructor
 	    (ConstantExp.arrayTC, new Monotype[]{elementType.getMonotype()}));

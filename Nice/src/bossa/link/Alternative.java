@@ -95,10 +95,10 @@ public abstract class Alternative
   /**
    * Tests the matching of tags against a method alternative.
    */
-  boolean matches(boolean used[], TypeConstructor[] tags)
+  boolean matches(TypeConstructor[] tags)
   {
     for(int i = 0, n = 0; i < patterns.length; i++)
-      if (used[i] && !patterns[i].matches(tags[n++]))
+      if (!patterns[i].matches(tags[n++]))
 	return false;
 
     return true;

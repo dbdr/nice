@@ -92,22 +92,17 @@ public final class Dispatch
 
   private static boolean[] findUsedPositions(int len, Stack alternatives)
   {
-    boolean[] res = new boolean[len];
+    // We want all solutions for both the nullness marker and the tag,
+    // if that position is used.
 
-    if (alternatives.isEmpty())
-      {
-	/* If there are no alternatives, we must say that all positions
-	   are used, to check that if there is no possible call. */
-	for (int i = 0; i < len; i++)
-	  res[i] = true;
-      }
+    boolean[] res = new boolean[len * 2];
 
     for (Iterator it = alternatives.iterator(); it.hasNext();)
       {
 	Alternative a = (Alternative) it.next();
 	for (int i = 0; i < len; i++)
 	  if (! a.patterns[i].atAny())
-	    res[i] = true;
+	    res[2*i] = res[2*i + 1] = true;
       }
 
     return res;
@@ -123,8 +118,7 @@ public final class Dispatch
 	  Debug.println("Alternative: "+i.next().toString());
       }
 
-    boolean[] used = findUsedPositions(method.getArity(),
-					     sortedAlternatives);
+    boolean[] used = findUsedPositions(method.getArity(), sortedAlternatives);
 
     mlsub.typing.Polytype type = method.getType();
     if (type == null)
@@ -137,7 +131,7 @@ public final class Dispatch
       {
 	TypeConstructor[] tags = (TypeConstructor[]) i.next();
 	
-	if (test(method, used, tags, sortedAlternatives))
+	if (test(method, tags, sortedAlternatives))
 	  if (++nb_errors > 9)
 	    break;
       }
@@ -156,7 +150,6 @@ public final class Dispatch
      @return true if the test failed
    */
   private static boolean test(NiceMethod method, 
-			      boolean[] used,
 			      TypeConstructor[] tags, 
 			      final Stack sortedAlternatives)
   {
@@ -173,7 +166,7 @@ public final class Dispatch
 	i.hasNext();)
       {
 	Alternative a = (Alternative) i.next();
-	if (a.matches(used, tags))
+	if (a.matches(tags))
 	  if (first == null)
 	    first = a;
 	  else if (!Alternative.less(first, a))
@@ -182,7 +175,7 @@ public final class Dispatch
 	      User.warning
 		(method,
 		 "Ambiguity for method "+method+
-		 "\nFor parameters of type " + toString(used, tags)+
+		 "\nFor parameters of type " + toString(tags)+
 		 "\nboth\n" + first.printLocated() + 
 		 "\nand\n" + a.printLocated() + "\nmatch.");
 	    }
@@ -193,27 +186,24 @@ public final class Dispatch
 	if(sortedAlternatives.size()==0)
 	  User.error
 	    (method, "Method " + method + " is declared but never defined:\n" +
-	     "no alternative matches " + toString(used, tags));
+	     "no alternative matches " + toString(tags));
 	else
 	  User.warning(method,
 		       "Method " + method + " is not exhaustive:\n" + 
 		       "no alternative matches " + 
-		       toString(used, tags));
+		       toString(tags));
       }
     return failed;
   }
 
-  private static String toString(boolean[] used, TypeConstructor[] tags)
+  private static String toString(TypeConstructor[] tags)
   {
     StringBuffer res = new StringBuffer();
     res.append('(');
-    for (int i = 0, n = 0; i < used.length; i++)
+    for (int i = 0, n = 0; i < tags.length; i++)
       {
-	if (used[i])
-	  res.append(tags[n++]);
-	else
-	  res.append("_");
-	if (i + 1 < used.length)
+	res.append(tags[n++]);
+	if (i + 1 < tags.length)
 	  res.append(", ");
       }
     return res.append(')').toString();
@@ -232,20 +222,12 @@ public final class Dispatch
     Monotype[] domains = type.domain();
     Constraint cst = type.getConstraint();
 
-    int nbUsed = 0;
-    for (int i = 0; i < used.length; i++)
-      if (used[i])
-	nbUsed++;
-
-    int len = nbUsed * 2;
+    int len = used.length;
 
     Element[] types = new Element[len];
 
     for (int i = domains.length; --i >= 0;)
       {
-	if (! used[i])
-	  continue;
-
 	Monotype arg = domains[i];
 
 	TypeConstructor marker;
@@ -274,8 +256,9 @@ public final class Dispatch
 	types[--len] = marker;
       }
     if (! (len == 0)) throw new Error();
-    List res = mlsub.typing.Enumeration.enumerate(cst, types);
-    return mergeNullCases(res, nbUsed);
+
+    List res = mlsub.typing.Enumeration.enumerate(cst, types, used);
+    return mergeNullCases(res, domains.length);
   }
 
   /** 

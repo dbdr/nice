@@ -4,6 +4,35 @@
     void m();
   }
 
+/// PASS
+  /// Toplevel
+abstract class X {}
+
+abstract class A
+{
+  void m(X);
+}
+
+class B extends A 
+{
+  m(x) {}
+}
+
+class C extends A
+{
+  // It is OK not to implement m(@C,_), since X has no concrete instance.
+}
+
+/// FAIL
+  /// Toplevel
+// This fails since put is not implemented. It should also fail *fast*,
+// even though you can imagine many instances for the type.
+interface _Map<K, V> {}
+
+<K, V0, V | V <: ?V0> ?V0 put(_Map<K, V>, V, K);
+
+class MapWrapper<K, V> implements _Map<K, V> {}
+
 /// FAIL
   /// TOPLEVEL
   class A { 

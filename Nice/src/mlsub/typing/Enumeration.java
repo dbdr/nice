@@ -77,11 +77,14 @@ public class Enumeration
   /**
    * Enumerate all the tuples of tags in a Domain
    *
+   * If all[i] is false, we are not interested in getting all solutions 
+   * for position i, only one witness is enough.
+   *
    * @return a List of TypeConstructor[]
    *   an element of an array is set to null
    *   if it cannot be matched (e.g. a function type)
    */
-  public static List enumerate(Constraint cst, Element[] tags)
+  public static List enumerate(Constraint cst, Element[] tags, boolean[] all)
   {
     // XXX try LinkedList
     List res = new ArrayList();
@@ -92,7 +95,7 @@ public class Enumeration
 
 	try{
 	  Constraint.enter(cst);
-	  setFloatingKinds(tags, 0, res);
+	  setFloatingKinds(tags, all, 0, res, true);
 	}
 	finally{
 	  if (Typing.leave() != l)
@@ -110,15 +113,22 @@ public class Enumeration
     return res;
   }
   
-  /** Try all combinations of Kinds for free type variables */
+  /** Try all combinations of Kinds for free type variables. 
+      There are two stages:
+      If doAll is true, set the tags for which all solutions must be listed.
+      Otherwise, set the other tags, and stop as soon as one solution is found.
+   */
   private static final void setFloatingKinds(Element[] tags, 
+					     boolean[] all,
 					     int minFloating, 
-					     List res) 
+					     List res,
+					     boolean doAll) 
     throws Unsatisfiable
   {
     while(minFloating<tags.length 
-	  && tags[minFloating].getKind() != null
-	  && tags[minFloating].getKind() != Engine.variablesConstraint)
+	  && (all[minFloating] != doAll ||
+	      tags[minFloating].getKind() != null
+	      && tags[minFloating].getKind() != Engine.variablesConstraint))
       minFloating++;
 
     if(minFloating<tags.length)
@@ -131,7 +141,8 @@ public class Enumeration
 	  {
 	    Engine.Constraint c = (Engine.Constraint) cs.next();
 	    
-	    if(c.hasConstants())
+	    if (c.hasConstants() && 
+		c != bossa.syntax.PrimitiveType.nullTC.getKind())
 	      {
 		if(linkDbg)
 		  Debug.println("Choosing kind "+c+" for "+tags[minFloating]);
@@ -142,15 +153,37 @@ public class Enumeration
 		  Engine.forceKind(tags[minFloating],c);
 
 		// recursive call
-		setFloatingKinds(tags,minFloating+1,res);
+		setFloatingKinds(tags, all, minFloating + 1, res, doAll);
 		tags[minFloating].setKind(null);
 	    }
 	  }
       }
+    else if (doAll)
+      {
+	try {
+	  setFloatingKinds(tags, all, 0, res, false);
+	}
+	catch(SolutionFound ex) {
+	  // Continue with modifying kinds of all-marked tags.
+	}
+      }
     else
-      res.addAll(enumerateTags(tags));
+      {
+	List solutions = enumerateTags(tags);
+	res.addAll(solutions);
+	if (solutions.size() > 0) 
+	  /*
+	     We found solutions for the current choice of kinds for tags.
+	     We might find more by changing the kinds of non all-marked tags,
+	     but we are not interested in this. So we skip to the next choice
+	     of kinds for all-marked tags.
+	  */
+	  throw new SolutionFound();
+      }
   }
   
+  private static class SolutionFound extends RuntimeException {}
+
   private static List enumerateTags(Element[] tags)
   {
     TagsList tuples = new TagsList(tags.length);

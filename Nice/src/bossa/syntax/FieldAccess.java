@@ -53,7 +53,7 @@ abstract class FieldAccess extends MethodDeclaration
 
   protected gnu.mapping.Procedure computeDispatchMethod()
   {
-    Internal.error("Should not be used as a real method");
+    Internal.error("Should not be used as a real method: " + this);
     return null;
   }
 

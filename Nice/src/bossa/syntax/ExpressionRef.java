@@ -78,7 +78,7 @@ final public class ExpressionRef extends Expression
     // there must not be overloading ambiguity
     
     // XXX we could remove some noOverloading here and there now
-    content=content.noOverloading();
+    content = content.noOverloading();
 
     type=content.getType();
   }
@@ -106,13 +106,13 @@ final public class ExpressionRef extends Expression
   
   Expression resolveOverloading(Polytype expectedType)
   {
-    content=content.resolveOverloading(expectedType);
+    content = content.resolveOverloading(expectedType);
     return this;
   }
   
   Expression noOverloading()
   {
-    content=content.noOverloading();
+    content = content.noOverloading();
     return this;
   }
   

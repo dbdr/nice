@@ -43,20 +43,13 @@ public class MonotypeLeqCst extends AtomicConstraint
    */
   AtomicConstraint substitute(java.util.Map map)
   {
-    Object mm1, mm2;
-    mm1 = map.get(m1);
-    mm2 = map.get(m2);
+    Monotype new1 = m1.substitute(map);
+    Monotype new2 = m2.substitute(map);
     
-    if(mm1==null && mm2==null)
+    if (new1 == m1 && new2 == m2)
       return this;
     
-    if(mm1==null)
-      mm1 = m1;
-    else if(mm2==null)
-      mm2 = m2;
-    
-    return new MonotypeLeqCst
-      ((Monotype) mm1, (Monotype) mm2);
+    return new MonotypeLeqCst(new1, new2);
   }
 
   void assert()

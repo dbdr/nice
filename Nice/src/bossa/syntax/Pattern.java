@@ -381,6 +381,15 @@ public class Pattern implements Located
     return atPrimTypeFitting(val);
   }
 
+  //TODO: call this from methodbodydefition when the pattern has the same
+  //type as the the methoddeclaration
+  public void setAtAny()
+  {
+    // only set it to atAny if it's a @type pattern
+    if (atValue == null && !exactlyAt && !atIntValue)
+      tc = null;
+  }
+
   /****************************************************************
    * Printing
    ****************************************************************/

@@ -48,5 +48,5 @@ echo install...
 echo clean...
 
 %files
-/usr
+%attr(-, root, root) /usr
 

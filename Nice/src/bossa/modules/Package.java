@@ -597,7 +597,7 @@ public class Package implements mlsub.compilation.Module, Located
     }
   }
 
-  public gnu.bytecode.Method addDispatchMethod(MethodDefinition def)
+  public gnu.bytecode.Method addDispatchMethod(MethodDeclaration def)
   {
     return dispatchClass.addMethod
       (nice.tools.code.Strings.escape(def.getFullName()),

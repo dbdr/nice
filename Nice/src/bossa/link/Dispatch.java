@@ -12,7 +12,7 @@
 
 // File    : Dispatch.java
 // Created : Mon Nov 15 10:36:41 1999 by bonniot
-//$Modified: Thu Sep 07 17:35:10 2000 by Daniel Bonniot $
+//$Modified: Wed Sep 20 12:30:55 2000 by Daniel Bonniot $
 
 package bossa.link;
 
@@ -41,7 +41,7 @@ public final class Dispatch
   // Non instantiable
   private Dispatch() { }
 
-  public static void register(MethodDefinition m)
+  public static void register(MethodDeclaration m)
   {
     methods.add(m);
   }
@@ -52,12 +52,12 @@ public final class Dispatch
   {
     for(Iterator i = methods.iterator();
 	i.hasNext();)
-      test((MethodDefinition) i.next(), module);
+      test((MethodDeclaration) i.next(), module);
   }
   
-  private static void test(MethodDefinition m, bossa.modules.Package module)
+  private static void test(MethodDeclaration m, bossa.modules.Package module)
   {
-    if(m instanceof JavaMethodDefinition || 
+    if(m instanceof JavaMethod || 
        m instanceof InlinedMethod ||
        m instanceof StaticFieldAccess ||
        m instanceof FieldAccessMethod
@@ -160,7 +160,7 @@ public final class Dispatch
     sortedAlternatives.push(a);
   }
 
-  private static void test(MethodDefinition method,
+  private static void test(MethodDeclaration method,
 	    final Stack sortedAlternatives)
   {
     if(Debug.linkTests)
@@ -191,7 +191,7 @@ public final class Dispatch
    * @param tags a tuple of TypeConstructors
    * @param alternatives a list of Alternatives
    */
-  private static void test(MethodDefinition method, 
+  private static void test(MethodDeclaration method, 
 			   TypeConstructor[] tags, 
 			   final Stack sortedAlternatives)
   {
@@ -232,7 +232,7 @@ public final class Dispatch
    * Compilation
    ****************************************************************/
 
-  private static void compile(MethodDefinition m, 
+  private static void compile(MethodDeclaration m, 
 			      Stack sortedAlternatives, 
 			      bossa.modules.Package module)
   {

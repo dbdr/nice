@@ -12,7 +12,7 @@
 
 // File    : parser.jj
 // Created : Thu Jul 01 10:27:05 1999 by bonniot
-//$Modified: Tue Sep 05 19:19:15 2000 by Daniel Bonniot $
+//$Modified: Wed Sep 20 12:59:23 2000 by Daniel Bonniot $
 // Description : Parseur JavaCC pour Nice
 //   Tokens based on the Jazz parser
 
@@ -751,13 +751,13 @@ TypeParameters typeParameters():
 /*                          Classes                                    */
 /***********************************************************************/
 
-MethodDefinition classMethodDefinition(BossaClass c):
+MethodDeclaration classMethodDeclaration(NiceClass c):
 {
   LocatedString name;
   List parameters;
   Constraint cst;
   Monotype returnType;
-  MethodDefinition def;
+  MethodDeclaration def;
 }
 {
   cst=constraint()
@@ -767,7 +767,7 @@ MethodDefinition classMethodDefinition(BossaClass c):
   ( parameters=namedMonotypes() | { parameters=new ArrayList(); } )
   ")"
   ";"
-  { return new MethodDefinition(c, name,cst,returnType,parameters); }
+  { return NiceMethod.create(c, name, cst, returnType, parameters); }
 }
 
 List extensions():
@@ -817,7 +817,7 @@ void getField(List fields):
   | "public" | "private"
   )* 
   field=monoSymbol() ";" 
-  { fields.add(new BossaClass.Field(field,isFinal,isLocal)); }
+  { fields.add(new NiceClass.Field(field,isFinal,isLocal)); }
 }
 
 ClassDefinition classDefinition():
@@ -828,7 +828,7 @@ ClassDefinition classDefinition():
   List ext=new ArrayList(0),imp=new ArrayList(0),abs=new ArrayList(0);
   List l;
   boolean isFinal=false, isAbstract=false, isInterface=false;
-  MethodDefinition m;
+  MethodDeclaration m;
   ClassDefinition res;
 }
 {
@@ -851,7 +851,7 @@ ClassDefinition classDefinition():
   ( 
    "{"
    {
-     res=new BossaClass
+     res=new NiceClass
      (name,
       isFinal,isAbstract,isInterface,
       false,parameters,
@@ -862,12 +862,12 @@ ClassDefinition classDefinition():
       getField(fields)
     |
       [ "public" | "private" ]
-      m=classMethodDefinition((BossaClass) res)
+      m=classMethodDeclaration((NiceClass) res)
       { methods.add(m); }
    )* 
    "}"
    {
-     ((BossaClass) res).setFieldsAndMethods(fields, methods);
+     ((NiceClass) res).setFieldsAndMethods(fields, methods);
    }
   | 
    "=" "native"
@@ -959,13 +959,13 @@ MethodBodyDefinition methodBodyDefinition():
 				      parameters,code); }
 }
 
-MethodDefinition methodDefinition():
+MethodDeclaration methodDefinition():
 {
     LocatedString name;
     Monotype returnType;
     List parameters;
     Constraint cst;
-    MethodDefinition res;
+    MethodDeclaration res;
 }
 {
   cst=constraint()
@@ -978,11 +978,11 @@ MethodDefinition methodDefinition():
     (
       // Nice method
       ";"
-      { res = new MethodDefinition(name,cst,returnType,parameters); }
+      { res = new NiceMethod(name,cst,returnType,parameters); }
     |
       "=" 
       (
-        "native" res=nativeMethodDefinition(name,cst,returnType,parameters)
+        "native" res=nativeMethodDeclaration(name,cst,returnType,parameters)
       |
 	"inline" 
 	{ LocatedString inlinedName; String param = null; }
@@ -999,7 +999,7 @@ MethodDefinition methodDefinition():
 }
 
 // Designing a java method, found thru reflection
-MethodDefinition nativeMethodDefinition(LocatedString name,
+MethodDeclaration nativeMethodDeclaration(LocatedString name,
 					Constraint cst,
 					Monotype returnType,
 					List parameters):
@@ -1040,8 +1040,8 @@ MethodDefinition nativeMethodDefinition(LocatedString name,
     if(isNew)
       {
 	javaTypes.add(0,method);
-	return new JavaMethodDefinition(method,"<init>",javaTypes,
-					name,cst,returnType,parameters);
+	return new JavaMethod(method,"<init>",javaTypes,
+			      name,cst,returnType,parameters);
       }
     int dot=method.toString().lastIndexOf('.');
     if(dot==-1){
@@ -1054,8 +1054,8 @@ MethodDefinition nativeMethodDefinition(LocatedString name,
     LocatedString className=method.substring(0,dot);
     
     if(javaTypes!=null)
-      return new JavaMethodDefinition(className,methodName,javaTypes,
-				      name,cst,returnType,parameters);
+      return new JavaMethod(className,methodName,javaTypes,
+			    name,cst,returnType,parameters);
     else
       return new StaticFieldAccess(className,methodName,
 				   name,cst,returnType,parameters);

@@ -12,7 +12,7 @@
 
 // File    : Alternative.java
 // Created : Mon Nov 15 12:20:40 1999 by bonniot
-//$Modified: Thu Sep 07 17:26:50 2000 by Daniel Bonniot $
+//$Modified: Wed Sep 20 12:34:24 2000 by Daniel Bonniot $
 
 package bossa.link;
 
@@ -20,7 +20,7 @@ import bossa.util.*;
 
 import mlsub.typing.*;
 
-import bossa.syntax.MethodDefinition;
+import bossa.syntax.MethodDeclaration;
 import bossa.syntax.Pattern;
 import bossa.syntax.LocatedString;
 import bossa.syntax.Node;
@@ -45,7 +45,7 @@ public class Alternative
   /**
    * When read from a source file.
    */
-  public Alternative(MethodDefinition m, TypeConstructor[] patterns, 
+  public Alternative(MethodDeclaration m, TypeConstructor[] patterns, 
 		     ClassType c, Method method)
   {
     this.definitionClass = c;
@@ -262,7 +262,7 @@ public class Alternative
     l.add(this);
   }
   
-  static List listOfAlternative(MethodDefinition m)
+  static List listOfAlternative(MethodDeclaration m)
   {
     return (List) alternatives.get(m.getFullName());
   }

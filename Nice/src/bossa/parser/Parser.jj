@@ -1113,7 +1113,7 @@ CustomConstructor customConstructor(Constraint cst):
     "}"
   )
   {
-    return CustomConstructor.make(name, cst, params, bossa.syntax.dispatch.createBlock(statements));
+    return bossa.syntax.dispatch.createCustomConstructor(name, cst, params, bossa.syntax.dispatch.createBlock(statements));
   }
 }
 

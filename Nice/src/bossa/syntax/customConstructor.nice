@@ -1,0 +1,173 @@
+/**************************************************************************/
+/*                                N I C E                                 */
+/*             A high-level object-oriented research language             */
+/*                        (c) Daniel Bonniot 2004                         */
+/*                                                                        */
+/*  This program is free software; you can redistribute it and/or modify  */
+/*  it under the terms of the GNU General Public License as published by  */
+/*  the Free Software Foundation; either version 2 of the License, or     */
+/*  (at your option) any later version.                                   */
+/*                                                                        */
+/**************************************************************************/
+
+package bossa.syntax;
+
+import bossa.util.*;
+
+/**
+   A user defined constructor, in a source program.
+ */
+public class CustomConstructor extends UserOperator
+{
+  LocatedString className;
+  Statement body;
+
+  ?NiceClass classe = null;
+  private ?VarScope thisScope = null;
+  private ?TypeScope thisTypeScope = null;
+  ?gnu.expr.Expression initializationCode = null;
+  ?gnu.expr.Expression initializationCodeImplicitThis = null;
+  private boolean generatingCode = false;
+
+  void addConstructorCallSymbol()
+  {
+    mlsub.typing.Polytype type = new mlsub.typing.Polytype
+      (this.getType().getConstraint(),
+       new mlsub.typing.FunType(this.getArgTypes(), nice.tools.typing.PrimitiveType.voidType));
+    notNull(classe).addConstructorCallSymbol(
+	dispatch.createConstructorCallSymbol(this, name, type));
+  }
+
+  resolve()
+  {
+    super;
+
+    let tc = Node.getGlobalTypeScope().globalLookup(className);
+    TypeConstructors.addConstructor(tc, this);
+    classe = NiceClass.get(tc);
+
+    if (classe == null)
+      User.error(this,
+                 "It is impossible to add a constructor to class " + tc);
+
+    this.addConstructorCallSymbol();
+
+    // Save the scopes, since we need them later, but they get null'ed.
+    thisScope = scope;
+    thisTypeScope = typeScope;
+  }
+
+  resolveBody()
+  {
+    resolveCCThis(body, this, notNull(classe));
+    body = analyseMethodBody(body, notNull(thisScope), notNull(thisTypeScope), this.getSymbols(), false);
+  }
+
+  innerTypecheck()
+  {
+    super;
+
+    typecheck(body);
+  }
+
+  printInterface(s)
+  {
+    // Constructors are not printed, they are loaded from the bytecode.
+  }
+
+  compile()
+  {
+    // Make sure the constructor is generated.
+    this.getCode();
+  }
+
+  private Map<String, Monotype> typeParamMap(TypeSymbol[] source, mlsub.typing.Monotype[] destination)
+  {
+    Map<String, Monotype> res = new HashMap(source.length);
+
+    for (int i = 0; i < source.length; i++)
+      res.put(source[i].toString(), Monotype.create(destination[i]));
+
+    return res;
+  }
+
+  computeCode()
+  {
+    if (generatingCode)
+      User.error(this, "recursive custom constructor calls not allowed");
+
+    generatingCode = true;
+
+    let lambda = nice.tools.code.Gen.createCustomConstructor
+      (cast(this.javaReturnType()), this.javaArgTypes(), this.getSymbols());
+
+    nice.tools.code.Gen.setMethodBody(lambda, body.generateCode());
+    notNull(classe).getClassExp().addMethod(lambda);
+
+    generatingCode = false;
+
+    // In the bytecode, we want to use the same type parameter names
+    // as the class definition, even if the source of this custom constructor
+    // renamed them locally.
+    let cst = this.getType().getConstraint();
+    if (mlsub.typing.Constraint.hasBinders(cst))
+      parameters.substitute
+        (this.typeParamMap(notNull(cst).binders(), notNull(classe).getTypeParameters()));
+
+    lambda.addBytecodeAttribute(parameters.asBytecodeAttribute());
+    initializationCode =
+      new gnu.expr.QuoteExp(new gnu.expr.InitializeProc(lambda));
+    initializationCodeImplicitThis =
+      new gnu.expr.QuoteExp(new gnu.expr.InitializeProc(lambda, true));
+
+    return new gnu.expr.QuoteExp(new gnu.expr.InstantiateProc(lambda));
+  }
+
+  getConstructorInvocation(boolean)
+  {
+    this.getCode();
+    return notNull(initializationCode);
+  }
+
+  gnu.expr.Expression getInitializationCode(boolean implicitThis)
+  {
+    this.getCode();
+    if (implicitThis)
+      return notNull(initializationCodeImplicitThis);
+    else
+      return notNull(initializationCode);
+  }
+}
+
+public CustomConstructor createCustomConstructor(LocatedString className, Constraint cst,
+                    FormalParameters params, Statement body)
+{
+  return new CustomConstructor(new LocatedString("<init>", className.location()),
+	cst, getCCReturnType(className, cst), params, Contract.noContract,
+	className: className, body: body);
+
+}
+
+private Monotype getCCReturnType(LocatedString className, Constraint cst)
+{
+  let classe = new TypeIdent(className);
+  classe.nullness = Monotype.sure;
+
+  if (cst == Constraint.True)
+    return classe;
+
+  TypeSymbol[] syms = cst.getBinderArray();
+  Monotype[?] params = cast(new Monotype[syms.length]);
+
+  for (int i = 0; i < syms.length; i++)
+    {
+      if (! (syms[i] instanceof mlsub.typing.MonotypeVar))
+        User.error(classe, syms[i] + " is not a type");
+      notNull(params)[i] = Monotype.create(cast(syms[i]));
+    }
+
+  let res = new MonotypeConstructor
+      (classe, new TypeParameters(params), classe.location());
+  res.nullness = Monotype.sure;
+  return res;
+}

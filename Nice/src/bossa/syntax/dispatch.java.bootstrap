@@ -36,8 +36,6 @@ public class dispatch
   public static gnu.bytecode.Method getImplementationAbove(JavaMethod decl, gnu.bytecode.ClassType firstArg)
   { return null; }
 
-  static void resolveCCThis(Statement stmt, bossa.util.Located thisloc, NiceClass classe) {}
-
   static Pattern resolveGlobalConstants(Pattern pattern)
   { return null; }
 

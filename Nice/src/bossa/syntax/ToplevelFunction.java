@@ -55,6 +55,7 @@ implements Function
     this.voidReturn = returnType.toString().equals("nice.lang.void");
   }
 
+  /** Can be null if this funtion is taken from an interface file. */
   private Statement body;
   private MonoSymbol[] symbols;
   private boolean voidReturn ;
@@ -71,7 +72,9 @@ implements Function
       catch(TypeScope.DuplicateName e){
 	User.error(this, e);
       }
-    body = bossa.syntax.dispatch.analyse$0(body, scope, typeScope, voidReturn);
+    
+    if(body != null)
+      body = dispatch.analyse$0(body, scope, typeScope, voidReturn);
   }
 
   private void buildParameterSymbols()
@@ -125,6 +128,9 @@ implements Function
   
   public void compile()
   {
+    if (body == null)
+      return;
+
     // forces computation of primMethod
     // it already exists if this function is called 
     // by code anterior to its definition
@@ -145,6 +151,6 @@ implements Function
   public void printInterface(java.io.PrintWriter w)
   {
     w.print(super.toString());
-    w.print(" = fun;");
+    w.print(" = ...\n");
   }
 }

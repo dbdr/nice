@@ -119,7 +119,6 @@ TOKEN: /* Separators, Delimiters */
 | < COLON:      ":"   >
 | < COMMA:      ","   >
 | < SEMI:       ";"   >
-| < DOTDOT:     ".."  >
 | < MAPSTO:     "->"  >
 | < COND:       "?"   >
 | < ANY:        "_"   >
@@ -1048,11 +1047,15 @@ Statement code():
   |
     // An expression
     { Expression exp; }
-    "=" exp=Expression() ";"
+    "=" 
+    ( "." "." "." { return null; } // toplevel function in interface file
+    |
+    exp=Expression() ";"
     { 
       code = new ReturnStmt(exp);
       code.setLocation(exp.location());
     }
+    )
   )
   { return code; }
 }

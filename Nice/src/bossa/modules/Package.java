@@ -201,24 +201,7 @@ public class Package implements mlsub.compilation.Module, Located, bossa.syntax.
     for(Method method = source.bytecode.getMethods();
 	method != null;
 	method = method.getNext())
-      {
-	String methodName = nice.tools.code.Strings.unescape(method.getName());
-
-	if (
-	    // main is not an alternative
-	    methodName.equals("main")
-	    //|| methodName.startsWith("main$")
-
-	    // Class initialization
-	    || methodName.equals("<clinit>")
-
-	    // Instance initialization
-	    || methodName.equals("<init>")
-	    )
-	  continue;
-
-	new bossa.link.Alternative(methodName, source.bytecode, method);
-      }
+      bossa.link.Alternative.read(source.bytecode, method);
   }
   
   private boolean alternativesHaveMain()
@@ -426,6 +409,13 @@ public class Package implements mlsub.compilation.Module, Located, bossa.syntax.
   private ClassType outputBytecode;
   public  ClassType getOutputBytecode() { return outputBytecode; }
   public  ClassType getReadBytecode() { return source.bytecode; }
+  ClassType getBytecode()
+  {
+    if (sourcesRead)
+      return getOutputBytecode();
+    else
+      return getReadBytecode();
+  }
 
   private static ModuleExp pkg;
   public ScopeExp getPackageScopeExp()
@@ -714,7 +704,7 @@ public class Package implements mlsub.compilation.Module, Located, bossa.syntax.
   public gnu.bytecode.Method addPackageMethod
     (String name, Type[] argTypes, Type retType)
   {
-    return getOutputBytecode().addMethod
+    return getBytecode().addMethod
       (nice.tools.code.Strings.escape(name),
        argTypes, retType,
        Access.PUBLIC|Access.STATIC|Access.FINAL);

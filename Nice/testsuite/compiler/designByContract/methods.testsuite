@@ -84,7 +84,12 @@ f() {}
   } catch(AssertionFailed e) { ok = true; }
   assert ok;
 
-/// PASS bug
+/// PASS
+  // bug #982048
+  // Use of 'this' in a contract
+
+  bar(new A(foo: null));
+
   /// Toplevel
   class A { ?int foo; }
   void bar(A a) requires a.foo == null || notNull(a.foo) >= 0 {}

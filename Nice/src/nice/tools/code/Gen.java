@@ -196,7 +196,10 @@ public class Gen
 
 	gnu.expr.Declaration d;
 	if (isThis)
-	  d = new Declaration(parameterName);
+	  {
+            d = new Declaration(parameterName);
+            d.context = lexp;
+          }
 	else
 	  d = lexp.addDeclaration(parameterName);
 	if (argTypes != null)

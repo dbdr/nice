@@ -12,7 +12,7 @@ if [ "$ANT_BOOTSTRAP" ]; then
   mkdir -p Nice/share/java
   cp Nice/external/nice-bootstrap.jar Nice/share/java/nice.jar
   cd Nice && ant jar
-  exit 0
+  exit $?
 fi
 
 # In benchmark mode, don't run the testsuite

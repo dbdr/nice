@@ -1421,7 +1421,7 @@ Definition globalVariable():
 }
 {
   ( "var" {constant = false;} 
-    t=monotype() name=ident() [ "=" value=Expression() ]
+    t=monotype() name=ident() [ "=" value=SideEffectFreeExpression() ]
   | "let" {constant = true;}
     t=monotype() name=ident() "=" value=SideEffectFreeExpression() 
   )

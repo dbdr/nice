@@ -47,7 +47,7 @@ public class ObjectExp extends LambdaExp
 	    int j = 0;
 	    for (int i = 0;  i < len;  i++)
 	      {
-                Type st = kawa.standard.Scheme.exp2Type(supers[i]);
+                Type st = supers[i].getType();
                 if (st == null || ! (st instanceof ClassType))
                   throw new Error("invalid super type");
                 ClassType t = (ClassType) st;

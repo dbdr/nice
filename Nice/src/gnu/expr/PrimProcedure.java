@@ -306,11 +306,13 @@ public class PrimProcedure extends MethodProc implements gnu.expr.Inlineable
         if (variable && i == fix_arg_count)
           {
             arg_type = argTypes[arg_count-1+skipArg];
+	    /*
 	    if (arg_type == Compilation.scmListType)
 	      {
 		kawa.standard.list_v.compile(args, i, comp);
 		break;
 	      }
+	    */
             code.emitPushInt(args.length - fix_arg_count);
             arg_type = ((ArrayType) arg_type).getComponentType();
             code.emitNewArray(arg_type);

@@ -152,6 +152,7 @@ public class SetExp extends Expression
 	     && binding.getValue() != null)
       { // This is handled in ModuleExp's allocFields method.
       }
+    /*
     else if (binding instanceof kawa.lang.Macro
 	     && binding.context instanceof ModuleExp
 	     && ((kawa.lang.Macro) binding).expander instanceof LambdaExp
@@ -166,6 +167,7 @@ public class SetExp extends Expression
 	  }
 	binding.makeField(comp, new_value);
       }
+    */
     else if (binding != null)
       {
 	Declaration decl = binding;

@@ -26,7 +26,7 @@ public abstract class ModuleBody extends Procedure0
   /** This is invoked by main when ModuleBody is compiled with --main. */
   public final void runAsMain (String[] args)
   {
-    kawa.repl.setArgs(args, 0);
+    //kawa.repl.setArgs(args, 0);
     apply0();
   }
 

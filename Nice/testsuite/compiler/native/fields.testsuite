@@ -17,3 +17,9 @@ class J extends javax.swing.JPanel
     let i = WHEN_IN_FOCUSED_WINDOW;
   }
 }
+
+/// PASS bug
+  foo(File.separator);
+  /// Toplevel
+void foo(String) {}
+void foo(char) {}

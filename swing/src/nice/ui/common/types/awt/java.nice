@@ -1,7 +1,5 @@
 package nice.ui.common.types.awt;
 
-//JDK1.4   all imports for this package 
-//JDK1.4   are defined in this file
 
 import java.io.*;
 import java.util.*;
@@ -17,9 +15,7 @@ import java.beans.beancontext.*;
 import javax.accessibility.*;
 import java.text.*;
 
-//JDK1.4   Indications to the compiler 
-//JDK1.4   about the precise types of some Swing features.
-//JDK1.4   The colors are not null:
+
 
 Color black() = native Color.black;
 Color blue() = native Color.blue;
@@ -58,13 +54,16 @@ Color YELLOW() = native Color.yellow;
 void actionPerformed(ActionListener, ActionEvent)
   = native void ActionListener.actionPerformed(ActionEvent);
 
+
 // interface AdjustmentListener
 void adjustmentValueChanged(AdjustmentListener, AdjustmentEvent)
   = native void AdjustmentListener.adjustmentValueChanged(AdjustmentEvent);
 
+
 // interface AWTEventListener
 void eventDispatched(AWTEventListener, AWTEvent)
   = native void AWTEventListener.eventDispatched(AWTEvent);
+
 
 // interface ComponentListener
 void componentHidden(ComponentListener, ComponentEvent)
@@ -76,11 +75,13 @@ void componentShown(ComponentListener, ComponentEvent)
 void componentResized(ComponentListener, ComponentEvent)
   = native void ComponentListener.componentResized(ComponentEvent);
 
+
 // interface ContainerListener
 void componentAdded(ContainerListener, ContainerEvent)
   = native void ContainerListener.componentAdded(ContainerEvent);
 void componentRemoved(ContainerListener, ContainerEvent)
   = native void ContainerListener.componentRemoved(ContainerEvent);
+
 
 // interface FocusListener
 void focusGained(FocusListener, FocusEvent)
@@ -88,15 +89,18 @@ void focusGained(FocusListener, FocusEvent)
 void focusLost(FocusListener, FocusEvent)
   = native void FocusListener.focusLost(FocusEvent);
 
+
 // interface HierarchyBoundsListener
 void ancestorMoved(HierarchyBoundsListener, HierarchyEvent)
   = native void HierarchyBoundsListener.ancestorMoved(HierarchyEvent);
 void ancestorResized(HierarchyBoundsListener, HierarchyEvent)
   = native void HierarchyBoundsListener.ancestorResized(HierarchyEvent);
 
+
 // interface HierarchyListener
 void hierarchyChanged(HierarchyListener, HierarchyEvent)
   = native void HierarchyListener.hierarchyChanged(HierarchyEvent);
+
 
 // interface InputMethodListener
 void caretPositionChanged(InputMethodListener, InputMethodEvent)
@@ -104,9 +108,11 @@ void caretPositionChanged(InputMethodListener, InputMethodEvent)
 void inputMethodTextChanged(InputMethodListener, InputMethodEvent)
   = native void InputMethodListener.inputMethodTextChanged(InputMethodEvent);
 
+
 // interface ItemListener
 void itemStateChanged(ItemListener, ItemEvent)
   = native void ItemListener.itemStateChanged(ItemEvent);
+
 
 // interface KeyListener
 void keyPressed(KeyListener, KeyEvent)
@@ -115,6 +121,7 @@ void keyReleased(KeyListener, KeyEvent)
   = native void KeyListener.keyReleased(KeyEvent);
 void keyTyped(KeyListener, KeyEvent)
   = native void KeyListener.keyTyped(KeyEvent);
+
 
 // interface MouseListener
 void mouseClicked(MouseListener, MouseEvent)
@@ -128,6 +135,7 @@ void mousePressed(MouseListener, MouseEvent)
 void mouseReleased(MouseListener, MouseEvent)
   = native void MouseListener.mouseReleased(MouseEvent);
 
+
 // interface MouseMotionListener
 void mouseDragged(MouseMotionListener, MouseEvent)
   = native void MouseMotionListener.mouseDragged(MouseEvent);
@@ -138,6 +146,7 @@ void mouseMoved(MouseMotionListener, MouseEvent)
 // interface TextListener
 void textValueChanged(TextListener, TextEvent)
   = native void TextListener.textValueChanged(TextEvent);
+
 
 // interface WindowListener
 void windowActivated(WindowListener, WindowEvent)
@@ -155,19 +164,11 @@ void windowIconified(WindowListener, WindowEvent)
 void windowOpened(WindowListener, WindowEvent)
   = native void WindowListener.windowOpened(WindowEvent);
 
-//JDK1.4  // interface WindowStateListener
-//JDK1.4  void windowStateChanged(WindowStateListener, WindowEvent)
-//JDK1.4    = native void WindowStateListener.windowStateChanged(WindowEvent);
-
-//JDK1.4  // interface WindowFocusListener
-//JDK1.4  void windowGainedFocus(WindowFocusListener, WindowEvent)
-//JDK1.4    = native void WindowFocusListener.windowGainedFocus(WindowEvent);
-//JDK1.4  void windowLostFocus(WindowFocusListener, WindowEvent)
-//JDK1.4    = native void WindowFocusListener.windowLostFocus(WindowEvent);
 
 // interface DragGestureListener
 void dragGestureRecognized(DragGestureListener, DragGestureEvent)
   = native void DragGestureListener.dragGestureRecognized(DragGestureEvent);
+
 
 // interface DragSourceListener
 void dragDropEnd(DragSourceListener, DragSourceDropEvent)
@@ -181,6 +182,7 @@ void dragOver(DragSourceListener, DragSourceDragEvent)
 void dropActionChanged(DragSourceListener, DragSourceDragEvent)
   = native void DragSourceListener.dropActionChanged(DragSourceDragEvent);
 
+
 // interface DropTargetListener
 void dragEnter(DropTargetListener, DropTargetDragEvent)
   = native void DropTargetListener.dragEnter(DropTargetDragEvent);
@@ -193,9 +195,20 @@ void drop(DropTargetListener, DropTargetDropEvent)
 void dropActionChanged(DropTargetListener, DropTargetDragEvent)
   = native void DropTargetListener.dropActionChanged(DropTargetDragEvent);
 
+
 //JDK1.4  // interface DragSourceMotionListener
 //JDK1.4  void dragMouseMoved(DragSourceMotionListener, DragSourceDragEvent)
 //JDK1.4    = native void DragSourceMotionListener.dragMouseMoved(DragSourceDragEvent);
+
+//JDK1.4  // interface WindowStateListener
+//JDK1.4  void windowStateChanged(WindowStateListener, WindowEvent)
+//JDK1.4    = native void WindowStateListener.windowStateChanged(WindowEvent);
+
+//JDK1.4  // interface WindowFocusListener
+//JDK1.4  void windowGainedFocus(WindowFocusListener, WindowEvent)
+//JDK1.4    = native void WindowFocusListener.windowGainedFocus(WindowEvent);
+//JDK1.4  void windowLostFocus(WindowFocusListener, WindowEvent)
+//JDK1.4    = native void WindowFocusListener.windowLostFocus(WindowEvent);
 
 
 
@@ -204,8 +217,9 @@ void dropActionChanged(DropTargetListener, DropTargetDragEvent)
  */
 
 // interface Composite
-<Any Key, Any Element> CompositeContext createContext(Composite, ColorModel, ColorModel, RenderingHints<Key,Element>) 
+<Any Key, Any Element> CompositeContext createContext(Composite, ColorModel, ColorModel, RenderingHints<Key,Element>)
   = native CompositeContext Composite.createContext(ColorModel, ColorModel, RenderingHints) ;
+
 
 // interface LayoutManager
 Dimension minimumLayoutSize(LayoutManager, Container)
@@ -213,343 +227,393 @@ Dimension minimumLayoutSize(LayoutManager, Container)
 Dimension preferredLayoutSize(LayoutManager, Container)
   = native Dimension LayoutManager.preferredLayoutSize(Container);
 
+
 // interface LayoutManager2
 Dimension maximumLayoutSize(LayoutManager2, Container)
   = native Dimension LayoutManager2.maximumLayoutSize(Container);
 
+
 // interface MenuContainer
 Font getFont(MenuContainer)
   = native Font MenuContainer.getFont();
+void remove(MenuContainer, MenuComponent)
+  = native void MenuContainer.remove(MenuComponent);
+
 
 // interface Paint
-<Any Key, Element> PaintContext createContext(Paint, ColorModel, Rectangle, Rectangle2D, AffineTransform, RenderingHints<Key,Element>) 
+<Any Key, Element> PaintContext createContext(Paint, ColorModel, Rectangle, Rectangle2D, AffineTransform, RenderingHints<Key,Element>)
   = native PaintContext Paint.createContext(ColorModel, Rectangle, Rectangle2D, AffineTransform, RenderingHints);
+
 
 // interface PaintContext
 ColorModel getColorModel(PaintContext)
   = native ColorModel PaintContext.getColorModel();
-Raster getRaster(PaintContext, int, int, int, int) 
+Raster getRaster(PaintContext, int, int, int, int)
   = native Raster PaintContext.getRaster(int, int, int, int);
+
 
 // interface PrintGraphics
 PrintJob getPrintJob(PrintGraphics)
   = native PrintJob PrintGraphics.getPrintJob();
+
 
 // interface Shape
 Rectangle getBounds(Shape)
   = native Rectangle Shape.getBounds();
 Rectangle2D getBounds2D(Shape)
   = native Rectangle2D Shape.getBounds2D();
-PathIterator getPathIterator(Shape, AffineTransform) 
+PathIterator getPathIterator(Shape, AffineTransform)
   = native PathIterator Shape.getPathIterator(AffineTransform);
 PathIterator getPathIterator(Shape, AffineTransform, double)
   = native PathIterator Shape.getPathIterator(AffineTransform, double);
+
 
 // interface Stroke
 Shape createStrokedShape(Stroke, Shape)
   = native Shape Stroke.createStrokedShape(Shape);
 
 
+// interface javax.accessibility.Accessible
+AccessibleContext getAccessibleContext(javax.accessibility.Accessible)
+  = native AccessibleContext javax.accessibility.Accessible.getAccessibleContext();
 
 
-// class AlphaComposite
-// static methods
-AlphaComposite getInstance(int) 
-  = native AlphaComposite AlphaComposite.getInstance(int);
-AlphaComposite getInstance(int, float) 
-  = native AlphaComposite AlphaComposite.getInstance(int, float);
-//  nonstatic methods
-<Any Key, Any Element> CompositeContext createContext(AlphaComposite, ColorModel, ColorModel, RenderingHints<Key, Element>) 
-  = native CompositeContext AlphaComposite.createContext(ColorModel, ColorModel, RenderingHints);
+// interface java.awt.image.ImageObserver
+boolean imageUpdate(ImageObserver, Image, int, int, int, int, int)
+  = native boolean ImageObserver.imageUpdate(Image, int, int, int, int, int);
 
-// class AWTEvent
-String paramString(AWTEvent) 
-  = native String AWTEvent.paramString(); 
-String toString(AWTEvent) 
-  = native String AWTEvent.toString();
 
 // class AWTEventMulticaster
-ActionListener add(ActionListener, ActionListener) 
+ActionListener add(ActionListener, ActionListener)
   = native ActionListener AWTEventMulticaster.add(ActionListener, ActionListener);
-AdjustmentListener add(AdjustmentListener, AdjustmentListener) 
+AdjustmentListener add(AdjustmentListener, AdjustmentListener)
   = native AdjustmentListener AWTEventMulticaster.add(AdjustmentListener, AdjustmentListener);
-ComponentListener  add(ComponentListener , ComponentListener ) 
+ComponentListener  add(ComponentListener , ComponentListener )
   = native ComponentListener  AWTEventMulticaster.add(ComponentListener , ComponentListener );
-ContainerListener add(ContainerListener, ContainerListener) 
+ContainerListener add(ContainerListener, ContainerListener)
   = native ContainerListener AWTEventMulticaster.add(ContainerListener, ContainerListener);
-FocusListener  add(FocusListener , FocusListener ) 
+FocusListener  add(FocusListener , FocusListener )
   = native FocusListener  AWTEventMulticaster.add(FocusListener , FocusListener );
-HierarchyBoundsListener add(HierarchyBoundsListener, HierarchyBoundsListener) 
+HierarchyBoundsListener add(HierarchyBoundsListener, HierarchyBoundsListener)
   = native HierarchyBoundsListener AWTEventMulticaster.add(HierarchyBoundsListener, HierarchyBoundsListener);
-HierarchyListener  add(HierarchyListener , HierarchyListener ) 
+HierarchyListener  add(HierarchyListener , HierarchyListener )
   = native HierarchyListener  AWTEventMulticaster.add(HierarchyListener , HierarchyListener );
-InputMethodListener  add(InputMethodListener , InputMethodListener ) 
+InputMethodListener  add(InputMethodListener , InputMethodListener )
   = native InputMethodListener  AWTEventMulticaster.add(InputMethodListener , InputMethodListener);
-ItemListener add(ItemListener, ItemListener) 
+ItemListener add(ItemListener, ItemListener)
   = native ItemListener AWTEventMulticaster.add(ItemListener, ItemListener);
-KeyListener add(KeyListener, KeyListener) 
+KeyListener add(KeyListener, KeyListener)
   = native KeyListener AWTEventMulticaster.add(KeyListener, KeyListener);
-MouseListener add(MouseListener, MouseListener) 
+MouseListener add(MouseListener, MouseListener)
   = native MouseListener AWTEventMulticaster.add(MouseListener, MouseListener);
-MouseMotionListener add(MouseMotionListener, MouseMotionListener) 
+MouseMotionListener add(MouseMotionListener, MouseMotionListener)
   = native MouseMotionListener AWTEventMulticaster.add(MouseMotionListener, MouseMotionListener);
-TextListener add(TextListener, TextListener) 
+TextListener add(TextListener, TextListener)
   = native TextListener AWTEventMulticaster.add(TextListener, TextListener);
-WindowListener add(WindowListener, WindowListener) 
+WindowListener add(WindowListener, WindowListener)
   = native WindowListener AWTEventMulticaster.add(WindowListener, WindowListener);
-//JDK1.4  EventListener[] getListeners(EventListener, Class) 
-//JDK1.4    = native EventListener[] AWTEventMulticaster.getListeners(EventListener, Class);
-//JDK1.4  EventListener[] getListeners(java.awt.Component, Class) 
-//JDK1.4    = native EventListener[] java.awt.Component.getListeners(Class);
-//JDK1.4  MouseWheelListener add(MouseWheelListener, MouseWheelListener) 
-//JDK1.4    = native MouseWheelListener AWTEventMulticaster.add(MouseWheelListener, MouseWheelListener);
-//JDK1.4  WindowFocusListener  add(WindowFocusListener , WindowFocusListener) 
-//JDK1.4    = native WindowFocusListener AWTEventMulticaster.add(WindowFocusListener, WindowFocusListener);
-//JDK1.4  WindowStateListener add(WindowStateListener, WindowStateListener) 
-//JDK1.4    = native WindowStateListener AWTEventMulticaster.add(WindowStateListener, WindowStateListener);
-
-ActionListener remove(ActionListener, ActionListener) 
+ActionListener remove(ActionListener, ActionListener)
   = native ActionListener AWTEventMulticaster.remove(ActionListener, ActionListener);
-AdjustmentListener remove(AdjustmentListener, AdjustmentListener) 
+AdjustmentListener remove(AdjustmentListener, AdjustmentListener)
   = native AdjustmentListener AWTEventMulticaster.add(AdjustmentListener, AdjustmentListener);
-ComponentListener  remove(ComponentListener , ComponentListener ) 
+ComponentListener  remove(ComponentListener , ComponentListener )
   = native ComponentListener  AWTEventMulticaster.add(ComponentListener , ComponentListener );
-ContainerListener remove(ContainerListener, ContainerListener) 
+ContainerListener remove(ContainerListener, ContainerListener)
   = native ContainerListener AWTEventMulticaster.add(ContainerListener, ContainerListener);
-FocusListener  remove(FocusListener , FocusListener ) 
+FocusListener  remove(FocusListener , FocusListener )
   = native FocusListener  AWTEventMulticaster.add(FocusListener , FocusListener );
-HierarchyBoundsListener remove(HierarchyBoundsListener, HierarchyBoundsListener) 
+HierarchyBoundsListener remove(HierarchyBoundsListener, HierarchyBoundsListener)
   = native HierarchyBoundsListener AWTEventMulticaster.add(HierarchyBoundsListener, HierarchyBoundsListener);
-HierarchyListener  remove(HierarchyListener , HierarchyListener ) 
+HierarchyListener  remove(HierarchyListener , HierarchyListener )
   = native HierarchyListener  AWTEventMulticaster.add(HierarchyListener , HierarchyListener );
-InputMethodListener  remove(InputMethodListener , InputMethodListener ) 
+InputMethodListener  remove(InputMethodListener , InputMethodListener )
   = native InputMethodListener  AWTEventMulticaster.add(InputMethodListener , InputMethodListener);
-ItemListener remove(ItemListener, ItemListener) 
+ItemListener remove(ItemListener, ItemListener)
   = native ItemListener AWTEventMulticaster.add(ItemListener, ItemListener);
-KeyListener remove(KeyListener, KeyListener) 
+KeyListener remove(KeyListener, KeyListener)
   = native KeyListener AWTEventMulticaster.add(KeyListener, KeyListener);
-MouseListener remove(MouseListener, MouseListener) 
+MouseListener remove(MouseListener, MouseListener)
   = native MouseListener AWTEventMulticaster.add(MouseListener, MouseListener);
-MouseMotionListener remove(MouseMotionListener, MouseMotionListener) 
+MouseMotionListener remove(MouseMotionListener, MouseMotionListener)
   = native MouseMotionListener AWTEventMulticaster.add(MouseMotionListener, MouseMotionListener);
-TextListener remove(TextListener, TextListener) 
+TextListener remove(TextListener, TextListener)
   = native TextListener AWTEventMulticaster.add(TextListener, TextListener);
-WindowListener remove(WindowListener, WindowListener) 
+WindowListener remove(WindowListener, WindowListener)
   = native WindowListener AWTEventMulticaster.add(WindowListener, WindowListener);
-//JDK1.4  MouseWheelListener remove(MouseWheelListener, MouseWheelListener) 
+//JDK1.4  EventListener[] getListeners(EventListener, Class)
+//JDK1.4    = native EventListener[] AWTEventMulticaster.getListeners(EventListener, Class);
+//JDK1.4  EventListener[] getListeners(java.awt.Component, Class)
+//JDK1.4    = native EventListener[] java.awt.Component.getListeners(Class);
+//JDK1.4  MouseWheelListener add(MouseWheelListener, MouseWheelListener)
 //JDK1.4    = native MouseWheelListener AWTEventMulticaster.add(MouseWheelListener, MouseWheelListener);
-//JDK1.4  WindowFocusListener  remove(WindowFocusListener , WindowFocusListener) 
+//JDK1.4  WindowFocusListener  add(WindowFocusListener , WindowFocusListener)
 //JDK1.4    = native WindowFocusListener AWTEventMulticaster.add(WindowFocusListener, WindowFocusListener);
-//JDK1.4  WindowStateListener remove(WindowStateListener, WindowStateListener) 
+//JDK1.4  WindowStateListener add(WindowStateListener, WindowStateListener)
+//JDK1.4    = native WindowStateListener AWTEventMulticaster.add(WindowStateListener, WindowStateListener);
+//JDK1.4  MouseWheelListener remove(MouseWheelListener, MouseWheelListener)
+//JDK1.4    = native MouseWheelListener AWTEventMulticaster.add(MouseWheelListener, MouseWheelListener);
+//JDK1.4  WindowFocusListener  remove(WindowFocusListener , WindowFocusListener)
+//JDK1.4    = native WindowFocusListener AWTEventMulticaster.add(WindowFocusListener, WindowFocusListener);
+//JDK1.4  WindowStateListener remove(WindowStateListener, WindowStateListener)
 //JDK1.4    = native WindowStateListener AWTEventMulticaster.add(WindowStateListener, WindowStateListener);
 
-//JDK1.4  //JDK1.4   class AWTKeyStroke
-//JDK1.4  //JDK1.4   static methods
-//JDK1.4  AWTKeyStroke getAWTKeyStroke(char) 
-//JDK1.4    = native AWTKeyStroke AWTKeyStroke.getAWTKeyStroke(char);
-//JDK1.4  AWTKeyStroke getAWTKeyStroke(Character, int) 
-//JDK1.4    = native AWTKeyStroke AWTKeyStroke.getAWTKeyStroke(Character, int);
-//JDK1.4  AWTKeyStroke getAWTKeyStroke(int, int) 
-//JDK1.4    = native AWTKeyStroke AWTKeyStroke.getAWTKeyStroke(int, int);
-//JDK1.4  AWTKeyStroke getAWTKeyStroke(int, int, boolean) 
-//JDK1.4    = native AWTKeyStroke AWTKeyStroke.getAWTKeyStroke(int, int, boolean);
-//JDK1.4  AWTKeyStroke getAWTKeyStroke(String) 
-//JDK1.4    = native AWTKeyStroke AWTKeyStroke.getAWTKeyStroke(String);
-//JDK1.4  AWTKeyStroke getAWTKeyStrokeForEvent(KeyEvent) 
-//JDK1.4    = native AWTKeyStroke AWTKeyStroke.getAWTKeyStrokeForEvent(KeyEvent);
-//JDK1.4  //JDK1.4   nonstatic methods
-//JDK1.4  String toString(AWTKeyStroke) 
-//JDK1.4    = native String AWTKeyStroke.toString();
 
-//JDK1.4   class AWTPermission
-
-
-// class BasicStroke
-Shape createStrokedShape(BasicStroke, Shape) 
-  = native Shape BasicStroke.createStrokedShape(Shape);
-
-//JDK1.4   class BorderLayout
-//JDK1.4  Dimension maximumLayoutSize(BorderLayout, java.awt.Container) 
-//JDK1.4    = native Dimension BorderLayout.maximumLayoutSize(java.awt.Container);
-//JDK1.4  Dimension minimumLayoutSize(BorderLayout, java.awt.Container) 
-//JDK1.4    = native Dimension BorderLayout.minimumLayoutSize(BorderLayout, java.awt.Container);
-//JDK1.4  Dimension preferredLayoutSize(BorderLayout, java.awt.Container) 
-//JDK1.4    = native Dimension BorderLayout.preferredLayoutSize(java.awt.Container);
+// class BorderLayout
 String CENTER() = native BorderLayout.CENTER;
-String toString(BorderLayout) 
-  = native String BorderLayout.toString();
 
-//JDK1.4  //JDK1.4   class BufferCapabilities
-//JDK1.4  Object clone(BufferCapabilities) 
-//JDK1.4    = native Object BufferCapabilities.clone();
-//JDK1.4  ImageCapabilities getBackBufferCapabilities(BufferCapabilities) 
-//JDK1.4    = native ImageCapabilities BufferCapabilities.getBackBufferCapabilities();
-//JDK1.4  ImageCapabilities getFrontBufferCapabilities(BufferCapabilities) 
-//JDK1.4    = native ImageCapabilities BufferCapabilities.getFrontBufferCapabilities();
-//JDK1.4  
-//JDK1.4  //JDK1.4   class BufferCapabilities.FlipContents
-//JDK1.4  String toString(BufferCapabilities.FlipContents) 
-//JDK1.4    = native String BufferCapabilities.FlipContents.toString();
 
 // class Button
-AccessibleContext getAccessibleContext(Button) 
+AccessibleContext getAccessibleContext(Button)
   = native AccessibleContext Button.getAccessibleContext();
-String getActionCommand(Button) 
+String getActionCommand(Button)
   = native String Button.getActionCommand();
-//JDK1.4  ActionListener[] getActionListeners(Button) 
+void processActionEvent(Button, ActionEvent)
+  = native void Button.processActionEvent(ActionEvent);
+//JDK1.4  ActionListener[] getActionListeners(Button)
 //JDK1.4    = native ActionListener[] Button.getActionListeners();
 
+
 // class Canvas
-AccessibleContext getAccessibleContext(Canvas) 
+AccessibleContext getAccessibleContext(Canvas)
   = native AccessibleContext Canvas.getAccessibleContext();
 //JDK1.4  BufferStrategy getBufferStrategy(Canvas)
 //JDK1.4    = native BufferStrategy Canvas.getBufferStrategy();
+//JDK1.4  void createBufferStrategy(Canvas, int, BufferCapabilities)
+//JDK1.4    = native void Canvas.createBufferStrategy(int, BufferCapabilities);
 
-//JDK1.4  // class CardLayout
-//JDK1.4  Dimension maximumLayoutSize(CardLayout, java.awt.Container) 
-//JDK1.4    = native Dimension CardLayout.maximumLayoutSize(java.awt.Container);
-//JDK1.4  Dimension minimumLayoutSize(CardLayout, java.awt.Container) 
-//JDK1.4    = native Dimension CardLayout.minimumLayoutSize(java.awt.Container);
-//JDK1.4  Dimension preferredLayoutSize(CardLayout, java.awt.Container) 
-//JDK1.4    = native Dimension CardLayout.preferredLayoutSize(java.awt.Container);
-String toString(CardLayout) 
-  = native String CardLayout.toString();
 
 // class Checkbox
-AccessibleContext getAccessibleContext(Checkbox) 
+AccessibleContext getAccessibleContext(Checkbox)
   = native AccessibleContext Checkbox.getAccessibleContext();
-//JDK1.4  ItemListener[] getItemListeners(Checkbox) 
-//JDK1.4    = native ItemListener[] Checkbox.getItemListeners();
-//JDK1.4  EventListener[] getListeners(Checkbox, Class) 
-//JDK1.4    = native EventListener[] Checkbox.getListeners(Class);
 Object[] getSelectedObjects(Checkbox)
   = native Object[] Checkbox.getSelectedObjects();
-
-//JDK1.4   class CheckboxGroup
+void processItemEvent(Checkbox, ItemEvent)
+  = native void Checkbox.processItemEvent(ItemEvent);
+//JDK1.4  ItemListener[] getItemListeners(Checkbox)
+//JDK1.4    = native ItemListener[] Checkbox.getItemListeners();
+//JDK1.4  EventListener[] getListeners(Checkbox, Class)
+//JDK1.4    = native EventListener[] Checkbox.getListeners(Class);
 
 
 // class CheckboxMenuItem
-AccessibleContext getAccessibleContext(CheckboxMenuItem) 
+AccessibleContext getAccessibleContext(CheckboxMenuItem)
   = native AccessibleContext CheckboxMenuItem.getAccessibleContext();
-//JDK1.4  ItemListener[] getItemListeners(CheckboxMenuItem) 
-//JDK1.4    = native ItemListener[] CheckboxMenuItem.getItemListeners();
-Object[] getSelectedObjects(CheckboxMenuItem) 
+Object[] getSelectedObjects(CheckboxMenuItem)
   = native Object[] CheckboxMenuItem.getSelectedObjects();
-String paramString(CheckboxMenuItem)
-  = native String CheckboxMenuItem.paramString();
+void processItemEvent(CheckboxMenuItem, ItemEvent)
+  = native void CheckboxMenuItem.processItemEvent(ItemEvent);
+//JDK1.4  ItemListener[] getItemListeners(CheckboxMenuItem)
+//JDK1.4    = native ItemListener[] CheckboxMenuItem.getItemListeners();
+
 
 // class Choice
-AccessibleContext getAccessibleContext(Choice) 
+void add(Choice, String)
+  = native void Choice.add(String);
+void addItem(Choice, String)
+  = native void Choice.addItem(String);
+void remove(Choice, String)
+  = native void Choice.remove(String);
+void select(Choice, String)
+  = native void Choice.select(String);
+void insert(Choice, String, int)
+  = native void Choice.insert(String, int);
+AccessibleContext getAccessibleContext(Choice)
   = native AccessibleContext Choice.getAccessibleContext();
-//JDK1.4  ItemListener[] getItemListeners(Choice) 
-//JDK1.4    = native ItemListener[] Choice.getItemListeners();
-String getItem(Choice, int) 
+String getItem(Choice, int)
   = native String Choice.getItem(int);
-String getSelectedItem(Choice) 
+String getSelectedItem(Choice)
   = native String Choice.getSelectedItem();
-Object[] getSelectedObjects(Choice) 
+Object[] getSelectedObjects(Choice)
   = native Object[] Choice.getSelectedObjects();
+//JDK1.4  ItemListener[] getItemListeners(Choice)
+//JDK1.4    = native ItemListener[] Choice.getItemListeners();
+
 
 // class Component
-Image createImage(Component, ImageProducer) 
+void add(Component, PopupMenu)
+  = native void Component.add(PopupMenu);
+boolean contains(Component, Point)
+  = native boolean Component.contains(Point);
+void firePropertyChange(Component, String, Object, Object)
+  = native void Component.firePropertyChange(String, Object, Object);
+void list(Component, PrintStream)
+  = native void Component.list(PrintStream);
+void list(Component, PrintStream, int)
+  = native void Component.list(PrintStream, int);
+void list(Component, PrintWriter)
+  = native void Component.list(PrintStream);
+void list(Component, PrintWriter, int)
+  = native void Component.list(PrintStream, int);
+void paint(Component, Graphics)
+  = native void Component.paint(Graphics);
+void paintAll(Component, Graphics)
+  = native void Component.paintAll(Graphics);
+void print(Component, Graphics)
+  = native void Component.print(Graphics);
+void printAll(Component, Graphics)
+  = native void Component.printAll(Graphics);
+void remove(Component, MenuComponent)
+  = native void Component.remove(MenuComponent);
+void setBackground(Component, Color)
+  = native void Component.setBackground(Color);
+void setBounds(Component, Rectangle)
+  = native void Component.setBounds(Rectangle);
+void setComponentOrientation(Component, ComponentOrientation)
+  = native void Component.setComponentOrientation(ComponentOrientation);
+void setDropTarget(Component, DropTarget)
+  = native void Component.setDropTarget(DropTarget);
+void setFont(Component, Font)
+  = native void Component.setFont(Font);
+void setCursor(Component, Cursor)
+  = native void Component.setCursor(Cursor);
+void setForeground(Component, Color)
+  = native void Component.setForeground(Color);
+void setLocale(Component, Locale)
+  = native void Component.setLocale(Locale);
+void setLocation(Component, Point)
+  = native void Component.setLocation(Point);
+void setName(Component, String)
+  = native void Component.setName(String);
+void setSize(Component, Dimension)
+  = native void Component.setSize(Dimension);
+void update(Component, Graphics)
+  = native void Component.update(Graphics);
+Image createImage(Component, ImageProducer)
   = native Image Component.createImage(ImageProducer);
-Image createImage(Component, int, int) 
+Image createImage(Component, int, int)
   = native Image Component.createImage(int, int);
-AccessibleContext getAccessibleContext(Component) 
+AccessibleContext getAccessibleContext(Component)
   = native AccessibleContext Component.getAccessibleContext();
-Color getBackground(Component) 
+Color getBackground(Component)
   = native Color Component.getBackground();
-Rectangle getBounds(Component) 
+Rectangle getBounds(Component)
   = native Rectangle Component.getBounds();
-Rectangle getBounds(Component, Rectangle) 
+Rectangle getBounds(Component, Rectangle)
   = native Rectangle Component.getBounds(Rectangle);
-ColorModel getColorModel(Component) 
+ColorModel getColorModel(Component)
   = native ColorModel Component.getColorModel();
-//JDK1.4  ComponentListener[] getComponentListeners(Component) 
-//JDK1.4    = native ComponentListener[] Component.getComponentListeners();
 ComponentOrientation getComponentOrientation(Component)
   = native ComponentOrientation Component.getComponentOrientation();
-Cursor getCursor(Component) 
+Cursor getCursor(Component)
   = native Cursor Component.getCursor();
-DropTarget getDropTarget(Component) 
+DropTarget getDropTarget(Component)
   = native DropTarget Component.getDropTarget();
-//JDK1.4  Container getFocusCycleRootAncestor(Component) 
-//JDK1.4    = native Container Component.getFocusCycleRootAncestor();
-//JDK1.4  FocusListener[] getFocusListeners(Component) 
-//JDK1.4    = native FocusListener[] Component.getFocusListeners();
-//JDK1.4  Set getFocusTraversalKeys(Component, int) 
-//JDK1.4    = native Set Component.getFocusTraversalKeys(int);
-Font getFont(Component) 
+Font getFont(Component)
   = native Font Component.getFont();
-FontMetrics getFontMetrics(Component, Font) 
+FontMetrics getFontMetrics(Component, Font)
   = native FontMetrics Component.getFontMetrics(Font);
-Color getForeground(Component) 
+Color getForeground(Component)
   = native Color Component.getForeground();
-Graphics getGraphics(Component) 
+Graphics getGraphics(Component)
   = native Graphics Component.getGraphics();
-GraphicsConfiguration getGraphicsConfiguration(Component) 
+GraphicsConfiguration getGraphicsConfiguration(Component)
   = native GraphicsConfiguration Component.getGraphicsConfiguration();
-//JDK1.4  HierarchyBoundsListener[] getHierarchyBoundsListeners(Component) 
-//JDK1.4    = native HierarchyBoundsListener[] Component.getHierarchyBoundsListeners();
-//JDK1.4  HierarchyListener[] getHierarchyListeners(Component) 
-//JDK1.4    = native HierarchyListener[] Component.getHierarchyListeners();
-//JDK1.4  InputMethodListener[] getInputMethodListeners(Component) 
-//JDK1.4    = native InputMethodListener[] Component.getInputMethodListeners();
-//JDK1.4  KeyListener[] getKeyListeners(Component) 
-//JDK1.4    = native KeyListener[] Component.getKeyListeners();
-EventListener[?] getListeners(Component, Class) 
+EventListener[?] getListeners(Component, Class)
   = native EventListener[] Component.getListeners(Class);
-Locale getLocale(Component) 
+Locale getLocale(Component)
   = native Locale Component.getLocale();
-Point getLocation(Component) 
+Point getLocation(Component)
   = native Point Component.getLocation();
-Point getLocation(Component, Point) 
+Point getLocation(Component, Point)
   = native Point Component.getLocation(Point);
-Point getLocationOnScreen(Component) 
+Point getLocationOnScreen(Component)
   = native Point Component.getLocationOnScreen();
-Dimension getMaximumSize(Component) 
+Dimension getMaximumSize(Component)
   = native Dimension Component.getMaximumSize();
-Dimension getMinimumSize(Component) 
+Dimension getMinimumSize(Component)
   = native Dimension Component.getMinimumSize();
-//JDK1.4  MouseListener[] getMouseListeners(Component) 
-//JDK1.4    = native MouseListener[] Component.getMouseListeners();
-//JDK1.4  MouseMotionListener[] getMouseMotionListeners(Component) 
-//JDK1.4    = native MouseMotionListener[] Component.getMouseMotionListeners();
-//JDK1.4  MouseWheelListener[] getMouseWheelListeners(Component) 
-//JDK1.4    = native MouseWheelListener[] Component.getMouseWheelListeners();
-String getName(Component) 
+String getName(Component)
   = native String Component.getName();
-java.awt.Container getParent(Component) 
+java.awt.Container getParent(Component)
   = native java.awt.Container Component.getParent();
-Dimension getPreferredSize(Component) 
+Dimension getPreferredSize(Component)
   = native Dimension Component.getPreferredSize();
-//JDK1.4  PropertyChangeListener[] getPropertyChangeListeners(Component) 
+Dimension getSize(Component)
+  = native Dimension Component.getSize();
+Dimension getSize(Component, Dimension)
+  = native Dimension Component.getSize(Dimension);
+Toolkit getToolkit(Component)
+  = native Toolkit Component.getToolkit();
+Object getTreeLock(Component)
+  = native Object Component.getTreeLock();
+Component locate(Component, int, int)
+  = native Component Component.locate(int, int);
+Point location(Component)
+  = native Point Component.location();
+String toString(Component)
+  = native String Component.toString();
+void processEvent(Component, AWTEvent)
+  = native void Component.processEvent(AWTEvent);
+void processComponentEvent(Component, ComponentEvent)
+  = native void Component.processComponentEvent(ComponentEvent);
+void processFocusEvent(Component, FocusEvent)
+  = native void Component.processFocusEvent(FocusEvent);
+void processHierarchyBoundsEvent(Component, HierarchyEvent)
+  = native void Component.processHierarchyBoundsEvent(HierarchyEvent);
+void processHierarchyEvent(Component, HierarchyEvent)
+  = native void Component.processHierarchyEvent(HierarchyEvent);
+void processInputMethodEvent(Component, InputMethodEvent)
+  = native void Component.processInputMethodEvent(InputMethodEvent);
+void processKeyEvent(Component, KeyEvent)
+  = native void Component.processKeyEvent(KeyEvent);
+void processMouseEvent(Component, MouseEvent)
+  = native void Component.processMouseEvent(MouseEvent);
+void processMouseMotionEvent(Component, MouseEvent)
+  = native void Component.processMouseMotionEvent(MouseEvent);
+//JDK1.4  void processMouseWheelEvent(Component, MouseWheelEvent)
+//JDK1.4    = native void Component.processMouseWheelEvent(MouseWheelEvent);
+//JDK1.4  void firePropertyChange(Component, String, boolean, boolean)
+//JDK1.4    = native void Component.firePropertyChange(String, boolean, boolean);
+//JDK1.4  void firePropertyChange(Component, String, int, int)
+//JDK1.4    = native void Component.firePropertyChange(String, int, int);
+//JDK1.4  <Any Key, Any Element> void setFocusTraversalKeys(Component, int, Set<Key,Element>)
+//JDK1.4    = native void Component.setFocusTraversalKeys(int, Set);
+//JDK1.4  PropertyChangeListener[] getPropertyChangeListeners(Component)
 //JDK1.4    = native PropertyChangeListener[] Component.getPropertyChangeListeners();
 //JDK1.4  PropertyChangeListener[] getPropertyChangeListeners(Component, String)
 //JDK1.4    = native PropertyChangeListener[] Component.getPropertyChangeListeners(String);
-Dimension getSize(Component) 
-  = native Dimension Component.getSize();
-Dimension getSize(Component, Dimension) 
-  = native Dimension Component.getSize(Dimension);
-Toolkit getToolkit(Component) 
-  = native Toolkit Component.getToolkit();
-Object getTreeLock(Component) 
-  = native Object Component.getTreeLock();
-Component locate(Component, int, int)   //JDK1.4   deprecated -> getComponentAt
-  = native Component Component.locate(int, int);
-Point location(Component) 
-  = native Point Component.location();
-String toString(Component) 
-  = native String Component.toString();  
+//JDK1.4  MouseListener[] getMouseListeners(Component)
+//JDK1.4    = native MouseListener[] Component.getMouseListeners();
+//JDK1.4  MouseMotionListener[] getMouseMotionListeners(Component)
+//JDK1.4    = native MouseMotionListener[] Component.getMouseMotionListeners();
+//JDK1.4  MouseWheelListener[] getMouseWheelListeners(Component)
+//JDK1.4    = native MouseWheelListener[] Component.getMouseWheelListeners();
+//JDK1.4  HierarchyBoundsListener[] getHierarchyBoundsListeners(Component)
+//JDK1.4    = native HierarchyBoundsListener[] Component.getHierarchyBoundsListeners();
+//JDK1.4  HierarchyListener[] getHierarchyListeners(Component)
+//JDK1.4    = native HierarchyListener[] Component.getHierarchyListeners();
+//JDK1.4  InputMethodListener[] getInputMethodListeners(Component)
+//JDK1.4    = native InputMethodListener[] Component.getInputMethodListeners();
+//JDK1.4  KeyListener[] getKeyListeners(Component)
+//JDK1.4    = native KeyListener[] Component.getKeyListeners();
+//JDK1.4  ComponentListener[] getComponentListeners(Component)
+//JDK1.4    = native ComponentListener[] Component.getComponentListeners();
+//JDK1.4  Container getFocusCycleRootAncestor(Component)
+//JDK1.4    = native Container Component.getFocusCycleRootAncestor();
+//JDK1.4  FocusListener[] getFocusListeners(Component)
+//JDK1.4    = native FocusListener[] Component.getFocusListeners();
+//JDK1.4  Set getFocusTraversalKeys(Component, int)
+//JDK1.4    = native Set Component.getFocusTraversalKeys(int);
+//JDK1.4  boolean isFocusCycleRoot(Component, Container)
+//JDK1.4    = native boolean Component.isFocusCycleRoot(Container);
 
-// class ComponentOrientation
-// static methods
-ComponentOrientation getOrientation(Locale)
-  = native ComponentOrientation ComponentOrientation.getOrientation(Locale);
-ComponentOrientation getOrientation(ResourceBundle)
-  = native ComponentOrientation ComponentOrientation.getOrientation(ResourceBundle);
+
 
 // class java.awt.Container
+void add(java.awt.Container, Component, Object)
+  = native void java.awt.Container.add(Component, Object);
+void add(java.awt.Container, Component, Object, int)
+  = native void java.awt.Container.add(Component, Object, int);
+void addImpl(java.awt.Container, Component, Object, int)
+  = native void java.awt.Container.addImpl(Component, Object, int);
+void paintComponents(java.awt.Container, Graphics)
+  = native void java.awt.Container.paintComponents(Graphics);
+void printComponents(java.awt.Container, Graphics)
+  = native void java.awt.Container.printComponents(Graphics);
+void remove(java.awt.Container, Component)
+  = native void java.awt.Container.remove(Component);
+void setLayout(java.awt.Container, LayoutManager)
+  = native void java.awt.Container.setLayout(LayoutManager);
 java.awt.Component add(java.awt.Container, Component)
   = native java.awt.Component java.awt.Container.add(Component);
 java.awt.Component add(java.awt.Container, Component, int)
@@ -560,10 +624,6 @@ java.awt.Component getComponent(java.awt.Container, int)
   = native java.awt.Component java.awt.Container.getComponent(int);
 java.awt.Component[] getComponents(java.awt.Container)
   = native java.awt.Component[] java.awt.Container.getComponents();
-//JDK1.4  ContainerListener[] getContainerListeners(java.awt.Container)
-//JDK1.4    = native ContainerListener[] java.awt.Container.getContainerListeners();
-//JDK1.4  Set getFocusTraversalKeys(java.awt.Container, int)
-//JDK1.4    = native Set java.awt.Container.getFocusTraversalKeys(int);
 Insets getInsets(java.awt.Container)
   = native Insets java.awt.Container.getInsets();
 LayoutManager getLayout(java.awt.Container)
@@ -574,12 +634,20 @@ Dimension getMinimumSize(java.awt.Container)
   = native Dimension java.awt.Container.getMinimumSize();
 Dimension getPreferredSize(java.awt.Container)
   = native Dimension java.awt.Container.getPreferredSize();
-Insets insets(java.awt.Container)   //JDK1.4   deprecated
+Insets insets(java.awt.Container)
   = native Insets java.awt.Container.insets();
-Dimension minimumSize(java.awt.Container)   //JDK1.4   deprecated
+Dimension minimumSize(java.awt.Container)
   = native Dimension java.awt.Container.minimumSize();
-Dimension preferredSize(java.awt.Container) //JDK1.4   deprecated
+Dimension preferredSize(java.awt.Container)
   = native Dimension java.awt.Container.preferredSize();
+//JDK1.4  ContainerListener[] getContainerListeners(java.awt.Container)
+//JDK1.4    = native ContainerListener[] java.awt.Container.getContainerListeners();
+//JDK1.4  Set getFocusTraversalKeys(java.awt.Container, int)
+//JDK1.4    = native Set java.awt.Container.getFocusTraversalKeys(int);
+//JDK1.4  void applyComponentOrientation(java.awt.Container, ComponentOrientation)
+//JDK1.4    = native void java.awt.Container.applyComponentOrientation(ComponentOrientation);
+//JDK1.4  void setFocusTraversalPolicy(java.awt.Container, FocusTraversalPolicy)
+//JDK1.4    = native void java.awt.Container.setFocusTraversalPolicy(FocusTraversalPolicy);
 
 
 // class Cursor
@@ -590,9 +658,6 @@ Cursor getPredefinedCursor(int)
   = native Cursor Cursor.getPredefinedCursor(int);
 Cursor getSystemCustomCursor(String)
   = native Cursor Cursor.getSystemCustomCursor(String);
-//JDK1.4   nonstatic methods
-String toString(Cursor)
-  = native String Cursor.toString();
 
 
 // class Dialog
@@ -605,11 +670,6 @@ Dimension getSize(Dimension)
   = native Dimension Dimension.getSize();
 
 
-// class Event
-String toString(Event)   //JDK1.4   OBSOLETE
-  = native String Event.toString();
-
-
 // class EventQueue
 AWTEvent getNextEvent(EventQueue)
   = native AWTEvent EventQueue.getNextEvent();
@@ -620,15 +680,8 @@ AWTEvent peekEvent(EventQueue)
 // class FileDialog
 FilenameFilter getFilenameFilter(FileDialog)
   = native FilenameFilter FileDialog.getFilenameFilter();
-
-
-// class FlowLayout
-Dimension minimumLayoutSize(FlowLayout, java.awt.Container)
-  = native Dimension FlowLayout.minimumLayoutSize(java.awt.Container);
-Dimension preferredLayoutSize(FlowLayout, java.awt.Container)
-  = native Dimension FlowLayout.preferredLayoutSize(java.awt.Container);
-String toString(FlowLayout)
-  = native String FlowLayout.toString();
+void setFilenameFilter(FileDialog, FilenameFilter)
+  = native void FileDialog.setFilenameFilter(FilenameFilter);
 
 
 // class Font
@@ -666,8 +719,6 @@ Font deriveFont(Font, int, float)
   = native Font Font.deriveFont(Map);
 <Any Key, Any Element> Map<Key,Element> getAttributes(Font)
   = native Map Font.getAttributes();
-//JDK1.4  AttributedCharacterIterator.Attribute[] getAvailableAttributes(Font)
-//JDK1.4    = native AttributedCharacterIterator.Attribute[] Font.getAvailableAttributes();
 String getFamily(Font)
   = native String Font.getFamily();
 String getFamily(Font, Locale)
@@ -702,8 +753,8 @@ AffineTransform getTransform(Font)
   = native AffineTransform Font.getTransform();
 //JDK1.4  GlyphVector layoutGlyphVector(Font, FontRenderContext, char[], int, int, int)
 //JDK1.4    = native GlyphVector Font.layoutGlyphVector(FontRenderContext, char[], int, int, int);
-String toString(Font)
-  = native String Font.toString();
+//JDK1.4  AttributedCharacterIterator.Attribute[] getAvailableAttributes(Font)
+//JDK1.4    = native AttributedCharacterIterator.Attribute[] Font.getAvailableAttributes();
 
 
 // class FontMetrics
@@ -738,19 +789,14 @@ AccessibleContext getAccessibleContext(Frame)
   = native AccessibleContext Frame.getAccessibleContext();
 String getTitle(Frame)
   = native String Frame.getTitle();
-
-
-// class GradientPaint
-<Any Key, Any Element> PaintContext createContext(GradientPaint, ColorModel, Rectangle, Rectangle2D, AffineTransform, RenderingHints<Key,Element>)
-  = native PaintContext GradientPaint.createContext(ColorModel, Rectangle, Rectangle2D, AffineTransform, RenderingHints);
-Color getColor1(GradientPaint)
-  = native Color GradientPaint.getColor1();
-Color getColor2(GradientPaint)
-  = native Color GradientPaint.getColor2();
-Point2D getPoint1(GradientPaint)
-  = native Point2D GradientPaint.getPoint1();
-Point2D getPoint2(GradientPaint)
-  = native Point2D GradientPaint.getPoint2();
+void setIconImage(Frame, Image)
+  = native void Frame.setIconImage(Image);
+void setMenuBar(Frame, MenuBar)
+  = native void Frame.setMenuBar(MenuBar);
+void setTitle(Frame, String)
+  = native void Frame.setTitle(String);
+//JDK1.4  void setMaximizedBounds(Frame, Rectangle)
+//JDK1.4    = native void Frame.setMaximizedBounds(Rectangle);
 
 
 // class Graphics
@@ -779,83 +825,15 @@ FontRenderContext getFontRenderContext(Graphics2D) =
   native FontRenderContext Graphics2D.getFontRenderContext();
 Paint getPaint(Graphics2D) =
   native Paint Graphics2D.getPaint();
-//JDK1.4  Object getRenderingHint(Graphics2D, java.awt.Key) =
-//JDK1.4    native Object Graphics2D.getRenderingHint(java.awt.Key);
 <Any Key, Any Element> RenderingHints<Key,Element> getRenderingHints(Graphics2D) =
   native RenderingHints Graphics2D.getRenderingHints();
 Stroke getStroke(Graphics2D) =
   native Stroke Graphics2D.getStroke();
 AffineTransform getTransform(Graphics2D) =
   native AffineTransform Graphics2D.getTransform();
+//JDK1.4  Object getRenderingHint(Graphics2D, java.awt.Key) =
+//JDK1.4    native Object Graphics2D.getRenderingHint(java.awt.Key);
 
-
-// class GraphicsConfigTemplate
-GraphicsConfiguration getBestConfiguration(GraphicsConfigTemplate, GraphicsConfiguration[]) =
-  native GraphicsConfiguration GraphicsConfigTemplate.getBestConfiguration(GraphicsConfiguration[]);
-
-
-// class GraphicsConfiguration
-BufferedImage createCompatibleImage(GraphicsConfiguration, int, int)
-  = native BufferedImage GraphicsConfiguration.createCompatibleImage(int, int);
-BufferedImage createCompatibleImage(GraphicsConfiguration, int, int, int)
-  = native BufferedImage GraphicsConfiguration.createCompatibleImage(int, int, int);
-//JDK1.4  VolatileImage createCompatibleVolatileImage(GraphicsConfiguration, int, int)
-//JDK1.4    = native VolatileImage GraphicsConfiguration.createCompatibleVolatileImage(int, int);
-//JDK1.4  VolatileImage createCompatibleVolatileImage(GraphicsConfiguration, int, int, ImageCapabilities)
-//JDK1.4    = native VolatileImage GraphicsConfiguration.createCompatibleVolatileImage(int, int, ImageCapabilities);
-Rectangle getBounds(GraphicsConfiguration)
-  = native Rectangle GraphicsConfiguration.getBounds();
-//JDK1.4  BufferCapabilities getBufferCapabilities(GraphicsConfiguration)
-//JDK1.4    = native BufferCapabilities GraphicsConfiguration.getBufferCapabilities();
-ColorModel getColorModel(GraphicsConfiguration)
-  = native ColorModel GraphicsConfiguration.getColorModel();
-ColorModel getColorModel(GraphicsConfiguration, int)
-  = native ColorModel GraphicsConfiguration.getColorModel(int);
-AffineTransform getDefaultTransform(GraphicsConfiguration)
-  = native AffineTransform GraphicsConfiguration.getDefaultTransform();
-GraphicsDevice getDevice(GraphicsConfiguration)
-  = native GraphicsDevice GraphicsConfiguration.getDevice();
-//JDK1.4  ImageCapabilities getImageCapabilities(GraphicsConfiguration)
-//JDK1.4    = native ImageCapabilities GraphicsConfiguration.getImageCapabilities();
-AffineTransform getNormalizingTransform(GraphicsConfiguration)
-  = native AffineTransform GraphicsConfiguration.getNormalizingTransform();
-
-// java.awt.GraphicsDevice
-GraphicsConfiguration getBestConfiguration(GraphicsDevice, GraphicsConfigTemplate)
-  = native GraphicsConfiguration GraphicsDevice.getBestConfiguration(GraphicsConfigTemplate);
-GraphicsConfiguration[] getConfigurations(GraphicsDevice)
-  = native GraphicsConfiguration[] GraphicsDevice.getConfigurations();
-GraphicsConfiguration getDefaultConfiguration(GraphicsDevice)
-  = native GraphicsConfiguration GraphicsDevice.getDefaultConfiguration();
-//JDK1.4  DisplayMode getDisplayMode(GraphicsDevice)
-//JDK1.4    = native DisplayMode GraphicsDevice.getDisplayMode();
-//JDK1.4  DisplayMode[] getDisplayModes(GraphicsDevice)
-//JDK1.4    = native DisplayMode[] GraphicsDevice.getDisplayModes();
-//JDK1.4  Window getFullScreenWindow(GraphicsDevice)
-//JDK1.4    = native Window GraphicsDevice.getFullScreenWindow();
-String getIDstring(GraphicsDevice)
-  = native String GraphicsDevice.getIDstring();
-
-
-// java.awt.GraphicsEnvironment
-Graphics2D createGraphics(GraphicsEnvironment, BufferedImage)
-  = native Graphics2D GraphicsEnvironment.createGraphics(BufferedImage);
-Font[] getAllFonts(GraphicsEnvironment)
-  = native Font[] GraphicsEnvironment.getAllFonts();
-String[] getAvailableFontFamilyNames(GraphicsEnvironment)
-  = native String[] GraphicsEnvironment.getAvailableFontFamilyNames();
-String[] getAvailableFontFamilyNames(GraphicsEnvironment, Locale)
-  = native String[] GraphicsEnvironment.getAvailableFontFamilyNames(Locale);
-//JDK1.4  Point getCenterPoint(GraphicsEnvironment)
-//JDK1.4    = native Point GraphicsEnvironment.getCenterPoint();
-GraphicsDevice getDefaultScreenDevice(GraphicsEnvironment)
-  = native GraphicsDevice GraphicsEnvironment.getDefaultScreenDevice();
-GraphicsEnvironment getLocalGraphicsEnvironment()
-  = native GraphicsEnvironment GraphicsEnvironment.getLocalGraphicsEnvironment();
-//JDK1.4  Rectangle getMaximumWindowBounds(GraphicsEnvironment)
-//JDK1.4    = native Rectangle GraphicsEnvironment.getMaximumWindowBounds();
-GraphicsDevice[] getScreenDevices(GraphicsEnvironment)
-  = native GraphicsDevice[] GraphicsEnvironment.getScreenDevices();
 
 // java.awt.GridBagLayout
 GridBagConstraints getConstraints(GridBagLayout, Component)
@@ -883,3 +861,191 @@ ImageProducer getSource(Image)
 // java.awt.MenuItem
 EventListener[?] getListeners(MenuItem, Class)
   = native EventListener[] MenuItem.getListeners(Class);
+
+
+// class Menu
+MenuItem add(Menu, MenuItem)
+  = native MenuItem Menu.add(MenuItem);
+void add(Menu, String)
+  = native void Menu.add(String);
+MenuItem getItem(Menu, int)
+  = native MenuItem Menu.getItem(int);
+void insert(Menu, MenuItem, int)
+  = native void Menu.insert(MenuItem, int);
+void insert(Menu, String, int)
+  = native void Menu.insert(String, int);
+void remove(Menu, MenuComponent)
+  = native void Menu.remove(MenuComponent);
+
+
+// java.awt.Label
+String getText(Label)
+  = native String Label.getText();
+String paramString(Label)
+  = native String Label.paramString();
+void setText(Label, String)
+  = native void Label.setText(String);
+
+
+// java.awt.List
+void add(java.awt.List, String)
+  = native void java.awt.List.add(String);
+void add(java.awt.List, String, int)
+  = native void java.awt.List.add(String, int);
+String getItem(java.awt.List, int)
+  = native String java.awt.List.getItem(int);
+void processActionEvent(java.awt.List, ActionEvent)
+  = native void java.awt.List.processActionEvent(ActionEvent);
+void processItemEvent(java.awt.List, ItemEvent)
+  = native void java.awt.List.processItemEvent(ItemEvent);
+void remove(java.awt.List, String)
+  = native void java.awt.List.remove(String);
+void replaceItem(java.awt.List, String, int)
+  = native void java.awt.List.replaceItem(String, int);
+
+
+// java.awt.Scrollbar
+void processAdjustmentEvent(Scrollbar, AdjustmentEvent)
+  = native void Scrollbar.processAdjustmentEvent(AdjustmentEvent);
+String paramString(Scrollbar)
+  = native String Scrollbar.paramString();
+
+
+// class TextComponent
+void processTextEvent(TextComponent, TextEvent)
+  = native void TextComponent.processTextEvent(TextEvent);
+void setText(TextComponent, String)
+  = native void TextComponent.setText(String);
+
+
+// class ScrollPane
+void addImpl(ScrollPane, Component, Object, int)
+  = native void ScrollPane.addImpl(Component, Object, int);
+void setScrollPosition(ScrollPane, Point)
+  = native void ScrollPane.setScrollPosition(Point);
+
+
+// class MenuComponent
+String getName(MenuComponent)
+  = native String MenuComponent.getName();
+Object getTreeLock(MenuComponent)
+  = native Object MenuComponent.getTreeLock();
+String paramString(MenuComponent)
+  = native String MenuComponent.paramString();
+void processEvent(MenuComponent, AWTEvent)
+  = native void MenuComponent.processEvent(AWTEvent);
+void setFont(MenuComponent, Font)
+  = native void MenuComponent.setFont(Font);
+void setName(MenuComponent, String)
+  = native void MenuComponent.setName(String);
+
+
+// class MenuBar
+Menu add(MenuBar, Menu)
+  = native Menu MenuBar.add(Menu);
+void deleteShortcut(MenuBar, MenuShortcut)
+  = native void MenuBar.deleteShortcut(MenuShortcut);
+void remove(MenuBar, MenuComponent)
+  = native void MenuBar.remove(MenuComponent);
+void setHelpMenu(MenuBar, Menu)
+  = native void MenuBar.setHelpMenu(Menu);
+<Any Element> Enumeration<Element> shortcuts(MenuBar)
+  = native Enumeration MenuBar.shortcuts();
+
+
+// class MenuItem
+void processActionEvent(MenuItem, ActionEvent)
+  = native void MenuItem.processActionEvent(ActionEvent);
+void setActionCommand(MenuItem, String)
+  = native void MenuItem.setActionCommand(String);
+void setLabel(MenuItem, String)
+  = native void MenuItem.setLabel(String);
+void setShortcut(MenuItem, MenuShortcut)
+  = native void MenuItem.setShortcut(MenuShortcut);
+
+
+// class Window
+GraphicsConfiguration getGraphicsConfiguration(Window)
+  = native GraphicsConfiguration Window.getGraphicsConfiguration();
+Window[] getOwnedWindows(Window)
+  = native Window[] Window.getOwnedWindows();
+Window getOwner(Window)
+  = native Window Window.getOwner();
+void processWindowEvent(Window, WindowEvent)
+  = native void Window.processWindowEvent(WindowEvent);
+//JDK1.4  void processWindowFocusEvent(Window, WindowEvent)
+//JDK1.4    = native void Window.processWindowFocusEvent(WindowEvent);
+//JDK1.4  void processWindowStateEvent(Window, WindowEvent)
+//JDK1.4    = native void Window.processWindowStateEvent(WindowEvent);
+//JDK1.4  Component getMostRecentFocusOwner(Window)
+//JDK1.4    = native Component Window.getMostRecentFocusOwner();
+//JDK1.4  void createBufferStrategy(Window, int, BufferCapabilities)
+//JDK1.4    = native void Window.createBufferStrategy(int, BufferCapabilities);
+//JDK1.4  BufferStrategy getBufferStrategy(Window)
+//JDK1.4    = native BufferStrategy Window.getBufferStrategy();
+
+
+// class MediaTracker
+void addImage(MediaTracker, Image, int)
+  = native void MediaTracker.addImage(Image, int);
+void addImage(MediaTracker, Image, int, int, int)
+  = native void MediaTracker.addImage(Image, int, int, int);
+void removeImage(MediaTracker, Image)
+  = native void MediaTracker.removeImage(Image);
+void removeImage(MediaTracker, Image, int)
+  = native void MediaTracker.removeImage(Image, int);
+void removeImage(MediaTracker, Image, int, int, int)
+  = native void MediaTracker.removeImage(Image, int, int, int);
+
+
+// class MenuShortcut
+String paramString(MenuShortcut)
+  = native String MenuShortcut.paramString();
+
+
+// class PopupMenu
+void show(PopupMenu, Component, int, int)
+  = native void PopupMenu.show(Component, int, int);
+
+
+// class Rectangle
+void add(Rectangle, Point)
+  = native void Rectangle.add(Point);
+void add(Rectangle, Rectangle)
+  = native void Rectangle.add(Rectangle);
+boolean contains(Rectangle, Point)
+  = native boolean Rectangle.contains(Point);
+boolean contains(Rectangle, Rectangle)
+  = native boolean Rectangle.contains(Rectangle);
+Rectangle2D createIntersection(Rectangle, Rectangle2D)
+  = native Rectangle2D Rectangle.createIntersection(Rectangle2D);
+Rectangle2D createUnion(Rectangle, Rectangle2D)
+  = native Rectangle2D Rectangle.createUnion(Rectangle2D);
+Point getLocation(Rectangle)
+  = native Point Rectangle.getLocation();
+Dimension getSize(Rectangle)
+  = native Dimension Rectangle.getSize();
+Rectangle intersection(Rectangle, Rectangle)
+  = native Rectangle Rectangle.intersection(Rectangle);
+void setBounds(Rectangle, Rectangle)
+  = native void Rectangle.setBounds(Rectangle);
+void setLocation(Rectangle, Point)
+  = native void Rectangle.setLocation(Point);
+void setSize(Rectangle, Dimension)
+  = native void Rectangle.setSize(Dimension);
+Rectangle union(Rectangle, Rectangle)
+  = native Rectangle Rectangle.union(Rectangle);
+
+
+// class TextArea
+void append(TextArea, String)
+  = native void TextArea.append(String);
+void insert(TextArea, String, int)
+  = native void TextArea.insert(String, int);
+void replaceRange(TextArea, String, int, int)
+  = native void TextArea.replaceRange(String, int, int);
+
+
+// class TextField
+void processActionEvent(TextField, ActionEvent)
+  = native void TextField.processActionEvent(ActionEvent);

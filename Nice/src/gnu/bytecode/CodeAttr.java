@@ -1273,6 +1273,13 @@ public class CodeAttr extends Attribute implements AttrContainer
     emitIfCompare1(153); // ifeq
   }
 
+  /** Compile start of conditional:  if (x == 0) ...
+   * Also use this if you have pushed a boolean value:  if (!b) ... */
+  public final void emitIfIntZero()
+  {
+    emitIfCompare1(154); // ifne
+  }
+
   /** Compile start of conditional:  if (x <= 0) */
   public final void emitIfIntLEqZero()
   {

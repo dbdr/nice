@@ -101,11 +101,14 @@ public class JavaFieldAccess extends FieldAccess
 
     // We put this here, since we need 'module' to be computed
     // since it is used to open the imported packages.
-    this.field = getField(className,fieldName);
+    if (field == null)
+      {
+	field = getField(className,fieldName);
 
-    if(field==null)
-      User.error(this,
-		 "Field "+fieldName+" not found in class "+className);
+	if(field == null)
+	  User.error(this,
+		     "Field "+fieldName+" not found in class "+className);
+      }
   }
   
   /****************************************************************

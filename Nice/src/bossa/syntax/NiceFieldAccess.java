@@ -60,6 +60,12 @@ public class NiceFieldAccess extends FieldAccess
   /** The java class this method is defined in */
   ClassDefinition definition;
 
+  public void createContext()
+  {
+    super.createContext();
+    findField();
+  }
+
   /****************************************************************
    * Module interface
    ****************************************************************/
@@ -73,20 +79,16 @@ public class NiceFieldAccess extends FieldAccess
    * Code generation
    ****************************************************************/
 
+  private void findField()
+  {
+    ClassType owner = (ClassType) nice.tools.code.Types.javaType(classTC);
+    field = owner.getDeclaredField(fieldName);
+    if (field == null)
+      field = owner.addField(fieldName, fieldType(), Access.PUBLIC);
+  }
+
   private Type fieldType()
   {
     return javaReturnType();
-  }
-  
-  protected Field field()
-  {
-    if (field == null)
-      {
-	ClassType owner = (ClassType) nice.tools.code.Types.javaType(classTC);
-	field = owner.getDeclaredField(fieldName);
-	if (field == null)
-	  field = owner.addField(fieldName, fieldType(), Access.PUBLIC);
-      }
-    return field;
-  }
+  }  
 }

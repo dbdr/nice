@@ -59,25 +59,26 @@ abstract class FieldAccess extends MethodDeclaration
 
   protected Field field;
   
-  protected Field field()
-  {
-    return field;
-  }
-
   public gnu.expr.Expression compileAccess(Arguments arguments)
   {
     if (arguments.size() == 0)
-      return Inline.inline(new GetFieldProc(field()));
+      return Inline.inline(new GetFieldProc(field));
     else
-      return Inline.inline(new GetFieldProc(field()), 
+      return Inline.inline(new GetFieldProc(field), 
 			   arguments.getExp(0).generateCode());
   }
   
-  public gnu.expr.Expression compileAssign(Expression parameter, 
-				    gnu.expr.Expression value)
+  public gnu.expr.Expression compileAssign(gnu.expr.Expression value)
   {
     return Inline.inline
-      (new SetFieldProc(field()), parameter.generateCode(), value);
+      (new SetStaticFieldProc(field), value);
+  }
+
+  public gnu.expr.Expression compileAssign(Expression parameter, 
+					   gnu.expr.Expression value)
+  {
+    return Inline.inline
+      (new SetFieldProc(field), parameter.generateCode(), value);
   }
 }
 

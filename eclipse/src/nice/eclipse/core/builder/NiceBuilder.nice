@@ -46,8 +46,9 @@ class NiceBuilder extends IncrementalProjectBuilder {
 			this.getProject().deleteMarkers(
 				NICE_MODEL_PROBLEM_MARKER, true, IResource.DEPTH_INFINITE);
 
-			Compilation compilation = 
-			  new bossa.modules.Compilation(listener: embedded);
+			Compilation compilation =
+			  new bossa.modules.Compilation(listener: embedded,
+																			parser: new bossa.parser.JavaccParser());
 
 			File projectFolder = currentProject.getLocation().toFile();
 			compilation.sourcePath = new File(projectFolder, getSourcepathProperty(currentProject)).toString();

@@ -394,14 +394,40 @@ public final class rawArray extends java.util.AbstractList
       Object[] res = (Object[]) java.lang.reflect.Array.newInstance
 	(Class.forName(componentClass), len);
 
-      for (int i = len; --i >= 0;)
-	res[i] = Array.get(array, i);
+      // If the components are primitive arrays, we must recursively
+      // convert them.
+      boolean primitiveArray = 
+	componentClass.charAt(0) == '[' &&
+	componentClass.charAt(1) != 'L';
+
+      for (int i = len; --i >= 0;) {
+	Object value = Array.get(array, i);
+
+	if (primitiveArray)
+	  value = convertPrimitive(value, componentClass.substring(1));
+
+	Array.set(res, i, value);
+      }
 
       return res;
     }
     catch(ClassNotFoundException e){
       throw new Error("Could not find class " + componentClass +
 		      " during array conversion");
+    }
+  }
+
+  private static Object convertPrimitive (Object array, String component)
+  {
+    switch (component.charAt(0)) {
+      case 'Z': return gconvert_boolean(array);
+      case 'B': return gconvert_byte(array);
+      case 'S': return gconvert_short(array);
+      case 'I': return gconvert_int(array);
+      case 'L': return gconvert_long(array);
+      case 'F': return gconvert_float(array);
+      case 'D': return gconvert_double(array);
+      default : throw new Error("Unexpected error in array conversion");
     }
   }
 }

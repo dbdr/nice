@@ -13,3 +13,8 @@ class A3 extends A1 {}
   String[][] s = single(["A"]);
   /// Toplevel
   <T> T[][] single(T[] t) = [ t ];
+
+/// PASS
+  byte[][] s = single([ 0 ]);
+  /// Toplevel
+  <int T> T[][] single(T[] t) = [ t ];

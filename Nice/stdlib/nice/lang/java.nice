@@ -85,3 +85,7 @@ PrintStream stderr () = native System.err;
 
 <Any T> Iterator<T> iterator(Collection<T>) = native Iterator Collection.iterator();
 <Any T> ListIterator<T> listIterator(Collection<T>) = native ListIterator List.listIterator();
+
+// Some methods use Object, when they should use a type variable:
+<E> boolean contains(java.util.Collection<E>, E) =
+  native boolean java.util.Collection.contains(Object);

@@ -4,3 +4,8 @@
   class Flowlet {
     java.util.Set<String> connectors = new java.util.HashSet();
   }
+
+/// PASS
+  List<String> l = new LinkedList();
+  l.add("AA");
+  assert (l.contains("AA"));

@@ -805,7 +805,6 @@ public class Package implements mlsub.compilation.Module, Located, bossa.syntax.
     // add unique information to disambiguate which method this represents
     res.addBytecodeAttribute
       (new MiscAttr("id", def.getFullName().getBytes()));
-    res.addBytecodeAttribute(MiscAttr.synthetic());
 
     return addMethod(res, false);
   }

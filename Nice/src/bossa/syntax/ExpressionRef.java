@@ -12,7 +12,7 @@
 
 // File    : ExpressionRef.java
 // Created : Tue Aug 17 16:04:40 1999 by bonniot
-//$Modified: Mon Dec 13 14:19:18 1999 by bonniot $
+//$Modified: Thu Feb 03 13:34:51 2000 by Daniel Bonniot $
 
 package bossa.syntax;
 
@@ -47,6 +47,11 @@ final public class ExpressionRef extends Expression
   Scopes buildScope(VarScope outer, TypeScope typeOuter)
   {
     return content.buildScope(outer, typeOuter);
+  }
+
+  void findJavaClasses() 
+  {
+    content.findJavaClasses();
   }
 
   void resolve()

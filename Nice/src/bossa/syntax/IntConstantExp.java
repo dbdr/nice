@@ -12,7 +12,7 @@
 
 // File    : IntConstantExp.java
 // Created : Mon Jul 05 17:30:56 1999 by bonniot
-//$Modified: Mon Jan 17 13:55:02 2000 by bonniot $
+//$Modified: Thu Feb 03 11:27:37 2000 by Daniel Bonniot $
 
 package bossa.syntax;
 
@@ -27,11 +27,12 @@ public class IntConstantExp extends ConstantExp
   
   {
     className = "gnu.math.IntNum";
-    if(!initialized)
-      {
-	JavaTypeConstructor.lookup(className);
-	initialized=true;
-      }
+    // already initialized in JavaTypeConstructor.addJavaTypes
+    //  if(!initialized)
+//        {
+//  	JavaTypeConstructor.lookup(className);
+//  	initialized=true;
+//        }
   }
   
   public IntConstantExp(int value)

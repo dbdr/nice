@@ -12,7 +12,7 @@
 
 // File    : parser.jj
 // Created : Thu Jul 01 10:27:05 1999 by bonniot
-//$Modified: Mon Jan 31 15:24:35 2000 by Daniel Bonniot $
+//$Modified: Wed Feb 02 17:34:57 2000 by Daniel Bonniot $
 // Description : Parseur JavaCC pour Bossa
 //   Tokens based on the Jazz parser
 
@@ -782,7 +782,7 @@ void getField(List fields):
   | "local" { isLocal=true; }
   ] 
   field=monoSymbol() ";" 
-  { fields.add(new ClassDefinition.Field(field,isFinal,isLocal)); }
+  { fields.add(new BossaClass.Field(field,isFinal,isLocal)); }
 }
 
 ClassDefinition classDefinition():
@@ -812,13 +812,27 @@ ClassDefinition classDefinition():
   | l=extensions()      { ext.addAll(l); }
   )*
 
-  "{" (getField(fields))* "}"
-
+  ( 
+   "{" (getField(fields))* "}"
+   {
+     res=new BossaClass
+     (name,
+      isFinal,isAbstract,isInterface,
+      false,parameters,
+      ext,imp,abs,fields,methods);
+   }
+  |
+   { LocatedString javaName; }
+   "=" "native" javaName=doted_string() ";"
+   {
+     res = new JavaClass
+     (name,
+      isFinal,isAbstract,isInterface,
+      parameters,
+      ext,imp,abs,javaName);
+   }
+  ) 
   { 
-    res=new ClassDefinition(name,
-			    isFinal,isAbstract,isInterface,
-			    false,parameters,
-			    ext,imp,abs,fields,methods);
     return res; 
   }
 }
@@ -1198,6 +1212,9 @@ Expression expression():
       |
        t="==" e=expression() 
        { res=CallExp.create(symb("==",t),res,e); }
+      |
+       t="!=" e=expression() 
+       { res=CallExp.create(symb("!=",t),res,e); }
       |
        t="<" e=expression()
        { res=CallExp.create(symb("<",t),res,e); }

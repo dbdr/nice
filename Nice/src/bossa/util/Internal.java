@@ -12,7 +12,7 @@
 
 // File    : Internal.java
 // Created : Wed Jul 07 18:23:19 1999 by bonniot
-//$Modified: Tue Jan 11 19:25:12 2000 by bonniot $
+//$Modified: Thu Feb 03 16:27:31 2000 by Daniel Bonniot $
 // Description : Internal errors...
 
 package bossa.util;
@@ -60,6 +60,14 @@ public class Internal
       error(loc,message);
   }
 
+  public static void error(Located loc, String message, String dbgMsg)
+  {
+    if(Debug.powerUser)
+      error(loc, message+dbgMsg);
+    else
+      error(loc, message);
+  }
+  
   public static void error(Located loc, String message)
   {
     Location l = loc.location();

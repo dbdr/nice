@@ -12,7 +12,7 @@
 
 // File    : ClassDefinition.java
 // Created : Thu Jul 01 11:25:14 1999 by bonniot
-//$Modified: Mon Jan 31 15:44:30 2000 by Daniel Bonniot $
+//$Modified: Wed Feb 02 17:29:45 2000 by Daniel Bonniot $
 
 package bossa.syntax;
 
@@ -25,7 +25,7 @@ import java.util.*;
 /**
  * Abstract syntax for a class definition.
  */
-public class ClassDefinition extends Node
+abstract public class ClassDefinition extends Node
   implements Definition
 {
   /**
@@ -35,8 +35,8 @@ public class ClassDefinition extends Node
    * @param isFinal 
    * @param isAbstract 
    * @param isInterface true iff the class is an "interface" 
-       (which is not an "abstract interface").
-       isInterface implies isAbstract.
+   (which is not an "abstract interface").
+   isInterface implies isAbstract.
    * @param isSharp true iff it's a #class
    * @param typeParameters a list of type symbols
    * @param extensions a list of TypeConstructors
@@ -47,10 +47,10 @@ public class ClassDefinition extends Node
    */
   public ClassDefinition(LocatedString name, 
 			 boolean isFinal, boolean isAbstract, 
-			 boolean isInterface, boolean isSharp,
+			 boolean isInterface,
 			 List typeParameters,
-			 List extensions, List implementations, List abstractions,
-			 List fields, List methods)
+			 List extensions, List implementations, List abstractions
+			 )
   {
     super(Node.global);
 
@@ -74,7 +74,6 @@ public class ClassDefinition extends Node
     this.isFinal=isFinal;
     this.isAbstract=isAbstract;
     this.isInterface=isInterface;
-    this.isSharp=isSharp;
 
     if(typeParameters==null)
       this.typeParameters=new ArrayList(0);
@@ -82,133 +81,18 @@ public class ClassDefinition extends Node
       this.typeParameters=typeParameters;
     this.extensions=extensions;
 
-    this.fields=keepFields(fields,isSharp);
-
     this.tc=new TypeConstructor(this);
     addTypeSymbol(this.tc);
     
-    if(isSharp)
-      // The sharp class must not declare children, 
-      // since the associated class has already done so.
-      // Anyway, those should be null.
-      {
-	this.implementations=implementations;
-	this.abstractions=abstractions;
-	this.methods=methods;
-	addChildren(computeAccessMethods(this.fields));
-
-	classType = gnu.bytecode.ClassType.make
-	  (name.toString().substring(1));
-	classType.requireExistingClass(false);
-      }
-    else
-      {
-	this.implementations=addChildren(implementations);
-	this.abstractions=addChildren(abstractions);
-	this.methods=addChildren(methods);
-	addChildren(computeAccessMethods(this.fields));
-
-	if(isAbstract || isFinal)
-	  // since no associated concrete class is created,
-	  // it needs its own classtype
-	  {
-	    classType = gnu.bytecode.ClassType.make
-	      (name.toString());
-	    classType.requireExistingClass(false);
-	  }
-      }
-    
-    // if this class is final, 
-    // no #class is created below.
-    // the associated #class is itself
-    if(isFinal && !isSharp)
-      addTypeMap("#"+name.content,this.tc);
+    this.implementations=addChildren(implementations);
+    this.abstractions=addChildren(abstractions);
   }
 
-  /**
-   * Creates an immediate descendant, 
-   * that abstracts and doesn't implement Top<n>.
-   */
   public Collection associatedDefinitions()
   {
-    if(isFinal || isAbstract)
-      return new LinkedList();
-
-    Collection res=new ArrayList(1);
-    LocatedString name=new LocatedString("#"+this.name.content,this.name.location());
-    List parent=new ArrayList(1);
-    parent.add(this.tc);
-    ClassDefinition c=new ClassDefinition
-      (name,true,false,false,true,typeParameters,parent,
-       new LinkedList(),new LinkedList(),fields,methods);
-    associatedConcreteClass = c;
-    concreteClasses.add(c);
-    
-    res.add(c);
-    return res;
+    return null;
   }
 
-  static private List concreteClasses = new LinkedList();
-
-  static public ListIterator listConcreteClasses()
-  {
-    return concreteClasses.listIterator();
-  }
-  
-  /****************************************************************
-   * Fields
-   ****************************************************************/
-
-  private List keepFields(List fields, boolean local)
-  {
-    List result=new ArrayList(fields.size());
-    for(Iterator i=fields.iterator();i.hasNext();)
-      {
-	Field f=(Field)i.next();
-	if(f.isLocal==local)
-	  result.add(f);
-      }
-    return result;
-  }
-  
-  public static class Field
-  {
-    public Field(MonoSymbol sym, boolean isFinal, boolean isLocal)
-    {
-      this.sym=sym;
-      this.isFinal=isFinal;
-      this.isLocal=isLocal;
-    }
-
-    public String toString()
-    {
-      return 
-	(isFinal ? "final" : "") +
-	(isLocal ? "local" : "") +
-	sym;
-    }
-    
-    MonoSymbol sym;
-    boolean isFinal;
-    boolean isLocal;
-  }
-  
-  private List computeAccessMethods(List fields)
-  {
-    List res=new ArrayList(fields.size());
-    for(Iterator i=fields.iterator();i.hasNext();)
-      {
-	Field f=(Field)i.next();
-
-	MonoSymbol s=f.sym;
-	MethodDefinition m = 
-	  new FieldAccessMethod(this,s.name,s.type,typeParameters);
-
-	res.add(m);
-      }
-    return res;
-  }
-  
   /****************************************************************
    * Selectors
    ****************************************************************/
@@ -235,6 +119,12 @@ public class ClassDefinition extends Node
        name.location());
   }
   
+  abstract public boolean isConcrete();
+
+  /****************************************************************
+   * Resolution
+   ****************************************************************/
+
   void resolve()
   {
     extensions=TypeConstructor.resolve(typeScope,extensions);
@@ -276,8 +166,6 @@ public class ClassDefinition extends Node
       Typing.assertAbs(tc,abstractions);
       if(isFinal)
 	Typing.assertAbs(tc,InterfaceDefinition.top(typeParameters.size()));
-      if(!isSharp)
-	Typing.assertImp(tc,InterfaceDefinition.top(typeParameters.size()),true);
     }
     catch(TypingEx e){
       User.error(name,"Error in class "+name+" : "+e.getMessage());
@@ -293,7 +181,6 @@ public class ClassDefinition extends Node
 
   public void printInterface(java.io.PrintWriter s)
   {
-    if(!isSharp)
     s.print
       (
          (isFinal ? "final " : "")
@@ -304,11 +191,7 @@ public class ClassDefinition extends Node
        + Util.map(" extends ",", ","",extensions)
        + Util.map(" implements ",", ","",implementations)
        + Util.map(" finally implements ",", ","",abstractions)
-       + " {\n"
-       + Util.map("",";\n",";\n",fields)
-       + Util.map(methods)
-       + "}\n\n"
-       );
+      );
   }
   
   /****************************************************************
@@ -322,8 +205,6 @@ public class ClassDefinition extends Node
   // A child class of A whose javaSuperClass is not A
   // is called an "illegitimate" child
 
-  private ClassType classType;
-  
   ClassDefinition superClass(int n)
   {
     return ((TypeConstructor) extensions.get(n)).getDefinition();
@@ -341,37 +222,26 @@ public class ClassDefinition extends Node
   }
   
   /**
-   * The abstract class associated with a concrete class.
-   * pre: this.isSharp() is true
+   * The abstract class associated with this class.
+   * If no #class has been generated, returns this.
    */
   ClassDefinition abstractClass()
   {
-    return ((TypeConstructor) extensions.get(0)).getDefinition();
+    return this;
   }
   
-  static ClassType javaClass(ClassDefinition c)
+  abstract ClassType javaClass();
+
+  final static ClassType javaClass(ClassDefinition c)
   {
     if(c==null)
       return gnu.bytecode.Type.pointer_type;
-    
-    if(c.associatedConcreteClass!=null)
-      return javaClass(c.associatedConcreteClass);
-    else
-      {
-	if(c.classType==null)
-	  Internal.error(c.name,
-			 c+" has no classType field");
-
-	return c.classType;
-      }
+    return c.javaClass();
   }
   
   ClassType javaSuperClass()
   {
-    if(isSharp)
-      return abstractClass().javaSuperClass();
-    
-    return javaClass(distinguishedSuperClass());
+    return javaClass(abstractClass().distinguishedSuperClass());
   }
   
   /**
@@ -381,11 +251,11 @@ public class ClassDefinition extends Node
    * 
    * It would be possible to minimize this list (TODO !)
    */
-  private List /* of ClassDefinition */ illegitimateChildren = new LinkedList();
-  private List /* of ClassDefinition */ illegitimateParents  = new LinkedList();
+  protected List /* of ClassDefinition */ illegitimateChildren = new LinkedList();
+  protected List /* of ClassDefinition */ illegitimateParents  = new LinkedList();
 
   // child must be concrete
-  private void addIllegitimateChild(ClassDefinition child)
+  protected void addIllegitimateChild(ClassDefinition child)
   {
     illegitimateChildren.add(child.abstractClass());
     child.illegitimateParents.add(this);
@@ -410,30 +280,6 @@ public class ClassDefinition extends Node
    */
   public void computeIllegitimateChildren()
   {
-    if(!isSharp)
-      return;
-    
-    // We are sharp, let's take our immediate parent
-    ClassDefinition me = abstractClass();
-    
-    for(Iterator i = listConcreteClasses();
-	i.hasNext();)
-      {
-	ClassDefinition concrete = (ClassDefinition) i.next();
-	ClassDefinition that = concrete.abstractClass();
-	
-	if(
-	   that!=me &&
-	   this.tc.getKind()==that.tc.getKind() &&
-	   Typing.testRigidLeq(that.tc,me.tc) &&
-	   !Typing.testRigidLeq(that.distinguishedSuperClass().tc,me.tc)
-	   )
-	  me.addIllegitimateChild(concrete);
-      }  
-
-    if(Debug.linkTests && me.illegitimateChildren.size()>0)
-      Debug.println(me.name+" has illegitimate childs "+
-		    Util.map("",", ","",me.illegitimateChildren));
   }
   
   // Illegitimate children computations are done while typechecking
@@ -443,85 +289,7 @@ public class ClassDefinition extends Node
     computeIllegitimateChildren();
   }
 
-  /****************************************************************
-   * Code generation
-   ****************************************************************/
-
-  public void compile()
-  {
-    if(!isSharp && !(isAbstract || isFinal))
-      return;
-    
-    classType.setModifiers(Access.PUBLIC 
-			   | (isAbstract ? Access.ABSTRACT : 0)
-			   | (isFinal    ? Access.FINAL    : 0)
-			   );
-    classType.setSuper(javaSuperClass());
-
-    addFields(classType);
-    if(isSharp) abstractClass().addFields(classType);
-
-    for(Iterator i = illegitimateParents.iterator();
-	i.hasNext();)
-      ((ClassDefinition) i.next()).addFields(classType);
-    
-    gnu.bytecode.Method constructor = classType.addNewMethod("<init>", Access.PUBLIC, new gnu.bytecode.Type[0], gnu.bytecode.Type.void_type);
-
-    constructor.initCode();
-    gnu.bytecode.CodeAttr code = constructor.getCode();
-    gnu.bytecode.Variable thisVar = new gnu.bytecode.Variable();
-    thisVar.setName("this");
-    thisVar.setType(classType);
-    thisVar.setParameter(true);
-    thisVar.allocateLocal(code);
-
-    code.emitLoad(thisVar);
-    code.emitInvokeSpecial(constructor(javaSuperClass()));
-    code.emitReturn();
-    
-    module.addClass(classType);
-  }
-
-  private static gnu.bytecode.Method constructor(ClassType parent)
-  {
-    if(parent==null)
-      parent = gnu.bytecode.Type.pointer_type;
-    
-    gnu.bytecode.Method res = parent.addNewMethod("<init>", Access.PUBLIC, new gnu.bytecode.Type[0], gnu.bytecode.Type.void_type);
-
-    return res;
-  }
-  
-  private void addFields(ClassType c)
-  {
-    for(Iterator i=fields.iterator();
-	i.hasNext();)
-      {
-	Field f=(Field)i.next();
-	gnu.bytecode.Field field=
-	  c.addField(f.sym.name.toString(),
-		     f.sym.type.getJavaType(),
-		     Access.PUBLIC);
-      }
-  }
-  
-  /****************************************************************
-   * Module
-   ****************************************************************/
-  
-  private bossa.modules.Module module;
-  
-  public void setModule(bossa.modules.Module module)
-  {
-    this.module = module;
-    for(Iterator i = children.iterator();
-	i.hasNext();)
-      {
-	Object child = i.next();
-	if(child instanceof Definition)
-	  ((Definition) child).setModule(module);
-      }
-  }
+  abstract protected void addFields(ClassType c);
 
   /****************************************************************
    * Associated interface
@@ -565,6 +333,24 @@ public class ClassDefinition extends Node
   }
   
   /****************************************************************
+   * Module
+   ****************************************************************/
+  
+  protected bossa.modules.Module module;
+  
+  public void setModule(bossa.modules.Module module)
+  {
+    this.module = module;
+    for(Iterator i = children.iterator();
+	i.hasNext();)
+      {
+	Object child = i.next();
+	if(child instanceof Definition)
+	  ((Definition) child).setModule(module);
+      }
+  }
+
+  /****************************************************************
    * Printing
    ****************************************************************/
 
@@ -577,29 +363,16 @@ public class ClassDefinition extends Node
       + Util.map(" extends ",", ","",extensions)
       + Util.map(" implements ",", ","",implementations)
       + Util.map(" abstract ",", ","",abstractions)
-      + " {\n"
-      + Util.map("",";\n",";\n",fields)
-      + Util.map(methods)
-      + "}\n\n"
       ;
-  }
-
-  Collection methodDefinitions()
-  {
-    return methods;
   }
 
   LocatedString name;
   TypeConstructor tc;
   List /* of TypeSymbol */ typeParameters;
-  private List /* of TypeConstructor */ extensions;
-  private List /* of Interface */ implementations;
-  private List /* of Interface */ abstractions;
-  private List /* of ClassDefinition.Field */ fields;
-  private List methods;
-  private boolean isFinal, isInterface;
+  protected List
+    /* of TypeConstructor */ extensions,
+    /* of Interface */ implementations,
+    /* of Interface */ abstractions;
+  protected boolean isFinal, isInterface;
   boolean isAbstract;
-  boolean isSharp; // This class is a #A (not directly visible to the user)
-
-  private ClassDefinition associatedConcreteClass; // non-null if !isSharp
 }

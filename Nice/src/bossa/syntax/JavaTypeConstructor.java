@@ -12,7 +12,7 @@
 
 // File    : JavaTypeConstructor.java
 // Created : Thu Jul 08 11:51:09 1999 by bonniot
-//$Modified: Wed Jan 26 18:53:25 2000 by Daniel Bonniot $
+//$Modified: Thu Feb 03 18:41:40 2000 by Daniel Bonniot $
 
 package bossa.syntax;
 
@@ -33,18 +33,18 @@ public class JavaTypeConstructor extends TypeConstructor
    * If an existing JTC has the same name, returns it,
    * else creates a new one.
    */
-  static JavaTypeConstructor make(LocatedString name)
+  static TypeConstructor make(LocatedString name)
   {
     return make(name,
 		gnu.bytecode.ClassType.make(name.content));
   }
 
-  static JavaTypeConstructor make(String name)
+  static TypeConstructor make(String name)
   {
     return make(new LocatedString(name,Location.nowhere()));
   }
   
-  static JavaTypeConstructor make(String name, gnu.bytecode.Type javaType)
+  static TypeConstructor make(String name, gnu.bytecode.Type javaType)
   {
     return make(new LocatedString(name,Location.nowhere()),javaType);
   }
@@ -55,12 +55,12 @@ public class JavaTypeConstructor extends TypeConstructor
    * <p>
    * Usefull for primitive types.
    */
-  static JavaTypeConstructor make(LocatedString name, 
-				  gnu.bytecode.Type javaType)
+  private static TypeConstructor make(LocatedString name, 
+				      gnu.bytecode.Type javaType)
   {
     Object o=hash.get(name.content);
     if(o!=null)
-      return (JavaTypeConstructor) o;
+      return (TypeConstructor) o;
     
     JavaTypeConstructor res=new JavaTypeConstructor(name,javaType);
 
@@ -68,23 +68,48 @@ public class JavaTypeConstructor extends TypeConstructor
     return res;
   }
 
+  static void registerTypeConstructorForJavaClass
+    (TypeConstructor tc, String javaName)
+  {
+    Object old = hash.put(javaName, tc);
+    if(old!=null)
+      Internal.error("TC for "+javaName+" set twice");
+  }
+  
   private gnu.bytecode.Type javaType;
   
   private static HashMap hash = new HashMap();
+
+  private static final gnu.bytecode.Type[] blackListClass =
+    new gnu.bytecode.Type[] {
+      gnu.bytecode.Type.pointer_type,
+      gnu.bytecode.ClassType.make("java.lang.Throwable")
+    }
+  ;
   
+  private static final gnu.bytecode.Type[] blackListInterface =
+    new gnu.bytecode.Type[] {
+      gnu.bytecode.ClassType.make("java.io.Serializable"),
+      gnu.bytecode.ClassType.make("java.lang.Cloneable"),
+      gnu.bytecode.ClassType.make("java.lang.Comparable"),
+      gnu.bytecode.ClassType.make("java.lang.Runnable")
+    };
+  
+  private boolean excluded(gnu.bytecode.Type[] blackList, 
+			   gnu.bytecode.ClassType classType)
+  {
+    for(int i=0; i<blackList.length; i++)
+      if(classType==blackList[i])
+	return true;
+    return false;
+  }
+      
   private JavaTypeConstructor(LocatedString className, gnu.bytecode.Type javaType)
   {
     super(className);
     
-    setVariance(Variance.make(0));
+    //setVariance(Variance.make(0));
     bossa.typing.Typing.introduce(this);
-    try{
-      bossa.typing.Typing.assertImp(this,InterfaceDefinition.top(0),true);
-    }
-    catch(bossa.typing.TypingEx e){
-      Internal.error("Impossible");
-    }
-    
     this.javaType = javaType;
     
     // Searching for java super class
@@ -94,9 +119,9 @@ public class JavaTypeConstructor extends TypeConstructor
 	//Class ref = javaType.getReflectClass();
 
 	gnu.bytecode.ClassType superClass = ((gnu.bytecode.ClassType) javaType).getSuperclass();
-	if(superClass!=null)
+	if(superClass!=null && !(excluded(blackListClass, superClass)))
 	  {    	
-	    JavaTypeConstructor superTC = make(superClass.getName(),superClass);
+	    TypeConstructor superTC = make(superClass.getName(),superClass);
 
 	    try{
 	      bossa.typing.Typing.initialLeq(this,superTC);
@@ -109,33 +134,81 @@ public class JavaTypeConstructor extends TypeConstructor
 	gnu.bytecode.ClassType[] itfs = ((gnu.bytecode.ClassType) javaType).getInterfaces();
 	if(itfs!=null)
 	  for(int i=0; i<itfs.length; i++)
+	    if(!(excluded(blackListInterface,itfs[i])))
 	    {    	
-	      JavaTypeConstructor superTC = make(itfs[i].getName(),itfs[i]);
+	      TypeConstructor superTC = make(itfs[i].getName(),itfs[i]);
 	      
 	      try{
 		bossa.typing.Typing.initialLeq(this,superTC);
 	      }
 	      catch(bossa.typing.TypingEx e){
-		Internal.error("Invalid java implemented interface "+itfs[i]+" for "+this);
+		Internal.error(this,
+			       this+" cannot implement "+
+			       itfs[i],
+			       ": "+e.toString());
 	      }
 	    }
       }
+    javaTypeConstructors.add(this);
   }
 
+  private static List javaTypeConstructors = new ArrayList(100);
+
+  public static void createContext()
+  {
+    for(Iterator i = javaTypeConstructors.iterator(); i.hasNext();)
+      {
+	JavaTypeConstructor tc = (JavaTypeConstructor) i.next();
+	if(tc.getKind()==null)
+	try{
+	  Engine.setKind(tc,Variance.make(0).getConstraint());
+	}
+	catch(Unsatisfiable e){
+	  User.error(tc,
+		     "Java class "+tc+" is not well kinded");
+	}
+      }
+  }
+    
   public TypeSymbol cloneTypeSymbol()
   {
     return this;
   }
   
+  public void setKind(Kind k)
+  {
+    super.setKind(k);
+    try{
+      //bossa.typing.initialLeq(this, object(this.variance.size));
+      bossa.typing.Typing.assertImp
+	(this,
+	 InterfaceDefinition.top(this.variance.size),
+	 true);
+    }
+    catch(bossa.typing.TypingEx e){
+      Internal.error("Impossible");
+    }
+  }
+      
   Polytype getType()
   {
     return new Polytype(new MonotypeConstructor(this,null,name.location()));
   }
+
   boolean instantiable()
   {
-    //TODO: abstract class ?
+    if(!(javaType instanceof gnu.bytecode.ClassType))
+      return false;
+
+    return (((gnu.bytecode.ClassType)javaType).getModifiers() 
+	    & (gnu.bytecode.Access.ABSTRACT|
+	       gnu.bytecode.Access.INTERFACE)) == 0;
+  }
+  
+  boolean constant()
+  {
     return true;
-  }  
+  }
   
   public boolean isConcrete()
   {
@@ -206,6 +279,25 @@ public class JavaTypeConstructor extends TypeConstructor
   private static TypeScope globalTypeScope;
   
   /****************************************************************
+   * List of TCs for java.lang.Object: one per variance.
+   ****************************************************************/
+
+  private final Vector objects = new Vector(5);
+  
+  TypeConstructor object(int arity)
+  {
+    if(arity>=objects.size())
+      objects.setSize(arity+1);
+    
+    TypeConstructor res = (TypeConstructor) objects.get(arity);
+    if(res==null)
+      {
+	res = make("java.lang.Object", gnu.bytecode.Type.pointer_type);
+      }
+    return res;
+  }
+  
+  /****************************************************************
    * On the fly lookup of java types
    ****************************************************************/
 
@@ -233,7 +325,7 @@ public class JavaTypeConstructor extends TypeConstructor
     return c;
   }
 
-  static JavaTypeConstructor lookup(String className)
+  static TypeConstructor lookup(String className)
   {
     Class c = lookupJavaClass(className);    
     
@@ -243,7 +335,8 @@ public class JavaTypeConstructor extends TypeConstructor
     if(Debug.javaTypes)
       Debug.println("Registering java class "+c.getName());
     
-    JavaTypeConstructor res = JavaTypeConstructor.make(c.getName(),gnu.bytecode.Type.make(c));
+    TypeConstructor res = JavaTypeConstructor.make
+      (c.getName(),gnu.bytecode.Type.make(c));
     globalTypeScope.addSymbol(res);
     
     // Remembers the short name as an alias

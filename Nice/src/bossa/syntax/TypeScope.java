@@ -12,7 +12,7 @@
 
 // File    : TypeScope.java
 // Created : Fri Jul 09 11:29:17 1999 by bonniot
-//$Modified: Mon Jan 03 18:52:03 2000 by bonniot $
+//$Modified: Thu Feb 03 16:19:53 2000 by Daniel Bonniot $
 
 package bossa.syntax;
 
@@ -86,7 +86,7 @@ class TypeScope
     if(outer!=null)
       return outer.lookup(name);
 
-    JavaTypeConstructor tc = JavaTypeConstructor.lookup(name);
+    TypeConstructor tc = JavaTypeConstructor.lookup(name);
     if(tc!=null)
       return tc;
     

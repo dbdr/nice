@@ -12,7 +12,7 @@
 
 // File    : Node.java
 // Created : Thu Jul 08 10:24:56 1999 by bonniot
-//$Modified: Thu Jan 20 12:44:42 2000 by bonniot $
+//$Modified: Thu Feb 03 13:36:04 2000 by Daniel Bonniot $
 
 package bossa.syntax;
 
@@ -273,7 +273,7 @@ abstract public class Node
    */
   void findJavaClasses() { }
 
-  void doFindJavaClasses()
+  final void doFindJavaClasses()
   {
     findJavaClasses();
     for(Iterator i=children.iterator();

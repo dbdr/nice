@@ -12,7 +12,7 @@
 
 // File    : TypeConstructor.java
 // Created : Thu Jul 08 11:51:09 1999 by bonniot
-//$Modified: Thu Jan 27 15:55:02 2000 by Daniel Bonniot $
+//$Modified: Thu Feb 03 16:01:15 2000 by Daniel Bonniot $
 
 package bossa.syntax;
 
@@ -74,7 +74,6 @@ public class TypeConstructor
     
     setVariance(v);
     this.definition=null;
-    //if(!name.location().isValid()) Internal.warning(name+"");
   }
 
   /**
@@ -83,14 +82,16 @@ public class TypeConstructor
    */
   void setVariance(Variance v)
   {
-    if(variance!=null)
-      {
-	if(!(variance.equals(v)))
-	  User.error(this,"Incorrect variance for "+this);
-	return;
-      }
-    this.variance=v;
-    this.kind=bossa.engine.Engine.getConstraint(v);
+    setKind(v.getConstraint());
+    
+    //  if(variance!=null)
+//        {
+//  	if(!(variance.equals(v)))
+//  	  User.error(this,"Incorrect variance for "+this);
+//  	return;
+//        }
+//      this.variance=v;
+//      this.kind=bossa.engine.Engine.getConstraint(v);
   }
 
   TypeConstructor substitute(Map map)
@@ -145,9 +146,7 @@ public class TypeConstructor
     if(definition!=null)
       return ClassDefinition.javaClass(definition);
     else
-      return 
-	gnu.bytecode.Type.pointer_type;
-	//gnu.bytecode.ClassType.make(name.content);
+      return gnu.bytecode.Type.pointer_type;
   }
 
   /**
@@ -305,7 +304,7 @@ public class TypeConstructor
   
   public boolean isConcrete()
   {
-    return definition!=null && definition.isSharp;
+    return definition!=null && definition.isConcrete();
   }
 
   ClassDefinition getDefinition()

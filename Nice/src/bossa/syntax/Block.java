@@ -12,7 +12,7 @@
 
 // File    : Block.java
 // Created : Wed Jul 07 17:42:15 1999 by bonniot
-//$Modified: Tue Jan 25 17:56:41 2000 by Daniel Bonniot $
+//$Modified: Thu Feb 03 11:30:51 2000 by Daniel Bonniot $
 // Description : A block : a list of statements with local variables
 
 package bossa.syntax;

@@ -12,7 +12,7 @@
 
 // File    : Engine.java
 // Created : Tue Jul 27 15:34:53 1999 by bonniot
-//$Modified: Thu Jan 27 18:26:38 2000 by Daniel Bonniot $
+//$Modified: Thu Feb 03 16:05:33 2000 by Daniel Bonniot $
 
 package bossa.engine;
 
@@ -263,8 +263,8 @@ public abstract class Engine
 	    throw new LowlevelUnsatisfiable("Bad Kinding for "+e);
 	
 	// e.getKind()==null
-	e.setKind(k);
 	k.register(e);
+	e.setKind(k);
 	
 	floating.remove(e);
 
@@ -283,7 +283,7 @@ public abstract class Engine
 		  Internal.error(leq.e1.getKind()!=leq.e2.getKind(),
 				 "Bad kinding in Engine.setKind 1");
 		  i.remove();
-		  k.leq(leq.e1,leq.e2);
+		  k.leq(leq.e1,leq.e2,initialContext);
 		}
 	    else if(leq.e2==e)
 	      if(leq.e1.getKind()==null)
@@ -293,7 +293,7 @@ public abstract class Engine
 		  Internal.error(leq.e1.getKind()!=leq.e2.getKind(),
 				 "Bad kinding in Engine.setKind 2");
 		  i.remove();
-		  k.leq(leq.e1,leq.e2);
+		  k.leq(leq.e1,leq.e2,initialContext);
 		}
 	  }
 	frozenLeqs.endOfIteration();
@@ -370,7 +370,7 @@ public abstract class Engine
 	i.hasNext();)
       {
 	Leq leq=(Leq)i.next();
-	variablesConstraint.leq(leq.e1,leq.e2);
+	variablesConstraint.leq(leq.e1,leq.e2,initialContext);
       }
     frozenLeqs.endOfIteration();
     frozenLeqs.clear();

@@ -12,7 +12,7 @@
 
 // File    : Module.java
 // Created : Wed Oct 13 16:09:47 1999 by bonniot
-//$Modified: Tue Feb 01 18:34:10 2000 by Daniel Bonniot $
+//$Modified: Thu Feb 03 16:46:00 2000 by Daniel Bonniot $
 
 package bossa.modules;
 
@@ -46,10 +46,43 @@ public class Module
       User.error("Invalid file extension: "+name);
 
     this.name=this.name.substring(0,this.name.lastIndexOf("."));
-    this.imports=imports;
+
+    this.imports = new LinkedList();
+    this.opens = new LinkedList();
+
+    for(Iterator i = imports.iterator(); i.hasNext();)
+      {
+	LocatedString s = (LocatedString) i.next();
+	if(s.toString().endsWith(".*"))
+	  this.opens.add(s.toString().substring(0,s.toString().length()-2));
+	else
+	  this.imports.add(s);
+      }
     this.definitions=new AST(this,definitions);
   }
 
+  public static Module make(LocatedString lname)
+  {
+    String name = lname.toString();
+    File source = tryOpenSource(name+sourceExt);
+    
+    File itf = tryOpenSource(name+interfaceExt);
+    
+    File file = null;
+    if(itf!=null &&
+       (source==null || 
+	source.lastModified() <= itf.lastModified())
+       )
+      file = itf;
+    else
+      if(source!=null)
+	file = source;
+      else
+	User.error(lname, name+" was not found");
+
+    return Loader.open(file);
+  }
+  
   public static void compile(LocatedString file) throws IOException
   {
     Module module=Loader.open(openSource(file));
@@ -62,6 +95,7 @@ public class Module
     load();
 
     try{
+      JavaTypeConstructor.createContext();
       bossa.engine.Engine.createInitialContext();
     }
     catch(bossa.engine.Unsatisfiable e){
@@ -98,16 +132,13 @@ public class Module
   
   private void loadImports()
   {
+    for(Iterator i=opens.iterator();i.hasNext();) 
+      addImplicitPackageOpen((String)i.next());
+    
     for(Iterator i=imports.iterator();i.hasNext();) 
       {
 	LocatedString name = (LocatedString)i.next();
 	String sname = name.toString();
-	
-	if(sname.endsWith(".*"))
-	  {
-	    addImplicitPackageOpen(sname.substring(0,sname.length()-2));
-	    continue;
-	  }
 	
 	LocatedString itfName = name.cloneLS();
 	itfName.append(interfaceExt);
@@ -340,6 +371,11 @@ public class Module
       }
     return f;
   }
+
+  static private File tryOpenSource(String name)
+  {
+    return openFile(name, Debug.getProperty("bossa.source.path", "."));
+  }
   
   static private File openSource(String name)
   {
@@ -350,8 +386,8 @@ public class Module
   {
     String name = lname.toString();
     
-    File f = openFile(name, Debug.getProperty("bossa.source.path", "."));
-
+    File f = tryOpenSource(name);
+    
     if(f==null)
       User.error(lname, name+" was not found");
     
@@ -378,7 +414,12 @@ public class Module
   }
   
   public String name;
-  List /* of LocatedString */ imports;
+  
+  private List /* of Module */ imports;
+  public List getImports() { return imports; }
+
+  List /* of LocatedString */ opens; /* package open */
+  
   private AST definitions;
 
   private boolean dbg = Debug.modules;

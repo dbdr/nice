@@ -12,7 +12,7 @@
 
 // File    : NewExp.java
 // Created : Thu Jul 08 17:15:15 1999 by bonniot
-//$Modified: Thu Jan 20 12:14:38 2000 by bonniot $
+//$Modified: Thu Feb 03 14:14:57 2000 by Daniel Bonniot $
 // Description : Allocation of a new object
 
 package bossa.syntax;
@@ -26,6 +26,11 @@ public class NewExp extends Expression
     this.tc=tc;
   }
 
+  void findJavaClasses()
+  {
+    tc.resolve(typeScope);
+  }
+  
   void resolve()
   {
     tc=tc.resolve(typeScope);
@@ -55,10 +60,8 @@ public class NewExp extends Expression
 
   public gnu.expr.Expression compile()
   {
-    gnu.bytecode.ClassType ct = new gnu.bytecode.ClassType(tc.name.toString());
+    gnu.bytecode.ClassType ct = (gnu.bytecode.ClassType) tc.getJavaType();
     
-    //return new gnu.expr.NewExp(ct);
-
     return new gnu.expr.ApplyExp
       (new gnu.expr.QuoteExp(new gnu.expr.PrimProcedure
 			     (ct,new gnu.bytecode.Type[0])),

@@ -12,7 +12,7 @@
 
 // File    : Variance.java
 // Created : Fri Jul 23 12:15:46 1999 by bonniot
-//$Modified: Thu Jan 27 17:25:51 2000 by Daniel Bonniot $
+//$Modified: Thu Feb 03 15:14:59 2000 by Daniel Bonniot $
 
 package bossa.typing;
 
@@ -47,7 +47,7 @@ public class Variance
   // just to optimize memory footprint, Variance(0) is shared
   private static final Variance nullVariance = new Variance(0);
   
-  bossa.engine.Engine.Constraint getConstraint()
+  public bossa.engine.Engine.Constraint getConstraint()
   {
     return bossa.engine.Engine.getConstraint(this);
   }

@@ -12,7 +12,7 @@
 
 // File    : MethodBodyDefinition.java
 // Created : Thu Jul 01 18:12:46 1999 by bonniot
-//$Modified: Fri Jan 28 18:39:52 2000 by Daniel Bonniot $
+//$Modified: Thu Feb 03 13:35:51 2000 by Daniel Bonniot $
 
 package bossa.syntax;
 
@@ -114,7 +114,7 @@ public class MethodBodyDefinition extends Node
       }
     
     parameters=buildSymbols(this.formals,definition.type.domain());
-    addSymbols(parameters);
+    scope.addSymbols(parameters);
   }
 
   /**
@@ -169,10 +169,8 @@ public class MethodBodyDefinition extends Node
   }
   
   Scopes buildScope(VarScope outer, TypeScope typeOuter)
-  // The scoping is delayed to enable overloading
   {
-    this.scope=outer;
-    this.typeScope=typeOuter;
+    Scopes res = super.buildScope(outer, typeOuter);
 
     // we just want Java classes to be discovered at this stage,
     // to add them in the rigid context.
@@ -190,23 +188,21 @@ public class MethodBodyDefinition extends Node
     if(newTypeVars!=null)
       this.typeScope.addSymbols(newTypeVars);
     
-    body.buildScope(this.scope,this.typeScope);
+    body.doFindJavaClasses();
     
-    body.findJavaClasses();
-    
-    return new Scopes(outer,typeOuter);
+    return res;
   }
 
   void doResolve()
   {
-    //Resolution is delayed to enable overloading
+    //Resolution of the body is delayed to enable overloading
+
+    Pattern.resolveTC(typeScope,formals);
   }
   
-  void lateBuildScope(VarScope outer, TypeScope typeOuter)
+  void lateBuildScope()
   {
-    Pattern.resolveTC(this.typeScope,formals);
-
-    VarSymbol s=findSymbol(outer);
+    VarSymbol s=findSymbol(scope);
 
     if(s==null)
       User.error(this,name+" is not defined");
@@ -219,18 +215,19 @@ public class MethodBodyDefinition extends Node
     // Get type parameters
     if(binders!=null)
     try{
-      addTypeMaps
+      typeScope.addMappings
 	(binders,
 	 definition.type.getConstraint().binders);
     }
     catch(BadSizeEx e){
-      User.error(name,"Method \""+name+"\" expects "+e.expected+
+      User.error(name,
+		 "Method \""+name+"\" expects "+e.expected+
 		 " type parameters");
     }
 
-    Scopes res=super.buildScope(outer,typeOuter);
-
+    // We can resolve now
     Pattern.resolveType(this.typeScope,formals);
+    super.doResolve();
   }
 
   /****************************************************************
@@ -248,9 +245,8 @@ public class MethodBodyDefinition extends Node
 
   void typecheck()
   {
-    lateBuildScope(this.scope,this.typeScope);
-    super.doResolve();
-    
+    lateBuildScope();
+
     Typing.enter(definition.type.getTypeParameters(),
 		 "method body of "+name);
     
@@ -355,7 +351,7 @@ public class MethodBodyDefinition extends Node
   public void compile()
   {
     if(Debug.codeGeneration)
-      Debug.println("Compiling "+name);
+      Debug.println("Compiling method body "+name);
     
     gnu.expr.BlockExp block = new gnu.expr.BlockExp();
     Statement.currentMethodBlock=block;

@@ -191,3 +191,15 @@ new C(int x) = this();
 
   /// package b import a
   C c = new C(0);
+
+/// PASS bug
+  /// Toplevel
+class A<T> {}
+void foo(A<int> a) {}
+
+class B extends A<int>
+{
+  {
+    foo(this);
+  }
+}

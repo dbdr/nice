@@ -95,25 +95,7 @@ main(args)
   String[] elements = v.elements;
   v.elements.size();
 
-  // Tuples
-
-  <String, String> cs = ("world!", "Hello, ");
-  String s1;
-  String s2;
-  s1 = " toto";
-  (s1, s2) = cs;
-  (s1, s2) = (s2, s1);
-  println(s1 + s2);
-
-  int a;
-  int b;
-  (a,b) = min_max(17, 14);
-  println("" + a + " < " + b);
-
-  <int, long> t1;
-  <long, long> t2;
-  t2 = t1;
-
+  test_tuples();
   test_numeric();
   test_arrays();
   test_comparable();
@@ -121,4 +103,5 @@ main(args)
   //test_classes();
   test_global();
   test_native();
+  test_exceptions();
 }

@@ -2,15 +2,18 @@
 package regtest.basic;
 
 /**
-   Test use of native code, imports
+   Test use of native code, import of native classes, inlined methods
 */
 
 import java.io.*;
 
+<Any T> T nop(T) = inline regtest.basic.Nop();
+
 void test_native();
 test_native()
 {
-  File f = new File("titi");
+  File f = nop(new File("titi"));
   java.net.ServerSocket s = new java.net.ServerSocket(1235);
+  java.lang.Runtime.getRuntime();
 }
 

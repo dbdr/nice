@@ -1,0 +1,32 @@
+// Tests for exception handling
+
+package regtest.basic;
+
+class MyEx extends Exception {}
+
+void test_exceptions();
+test_exceptions()
+{
+  String s = null;
+  try{
+    try{
+      s.length();
+    }
+    finally{
+      println("finally");
+    }
+  }
+  catch(NullPointerException e){
+    println("NullPointerException");
+  }
+  
+  try{
+    throw new MyEx();
+  }
+  catch(MyEx e){
+    println("MyEx");
+  }
+  catch(Exception e){
+    println("Exception");
+  }
+}

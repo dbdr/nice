@@ -169,7 +169,11 @@ public class MethodBodyDefinition extends Definition
 
     TypeConstructor[] tags = Pattern.getTC(formals);
     TypeConstructor[] additionalTags = Pattern.getAdditionalTC(formals);
-    
+    boolean hasAdditionalTags = false;
+    for (int i = 0; i<tags.length; i++)
+      if (additionalTags[i] != null)
+        hasAdditionalTags = true;
+
     for(Iterator i = symbols.iterator(); i.hasNext();){
       VarSymbol s = (VarSymbol)i.next();
       if(!(s instanceof MethodDeclaration.Symbol))
@@ -199,7 +203,8 @@ public class MethodBodyDefinition extends Definition
 	  mlsub.typing.Polytype t = m.getType();
 	  Constraint.enter(t.getConstraint());
 	  tagLeq(tags, t.domain());
-	  tagLeq(additionalTags, t.domain());
+          if (hasAdditionalTags) //optimization
+	    tagLeq(additionalTags, t.domain());
 	}
 	finally{
 	  if(Typing.leave() != level)
@@ -214,6 +219,55 @@ public class MethodBodyDefinition extends Definition
 	i.remove();
       }
     }
+
+    /* If the method are ambigious and the implementation has additional tc's
+     * then try to find the most specific declaration(s) using these tc's
+     */   
+    if (symbols.size() > 1 && hasAdditionalTags)
+      {
+        MethodDeclaration.Symbol[] tempSymbols = new MethodDeclaration.Symbol[symbols.size()];
+	symbols.toArray(tempSymbols);
+        int size = symbols.size();
+        int len = formals.length;
+	boolean[] removed = new boolean[size];
+        for (int m1 = 0; m1 < size; m1++)
+          {
+	    Monotype[] dom1 = tempSymbols[m1].getDefinition().getType().domain();
+	    for (int m2 = 0; m2 < size && !removed[m1]; m2++)
+	      if (m1 != m2)
+                {
+                  boolean remove = true;
+                  boolean equal = true;
+		  Monotype[] dom2 = tempSymbols[m2].getDefinition().getType().domain();
+		  for (int i = 0; i < len && remove; i++)
+                    {
+	  	      try {
+		        domainMonotypeLeq(dom2[i], dom1[i]);
+		        try {
+		          domainMonotypeLeq(dom1[i], dom2[i]);
+		        }
+		        catch (TypingEx e) {
+                          // may not remove if an argument without
+			  // additional tc is not equal.
+		          remove = additionalTags[i] != null;
+                          equal = false;
+		        }
+		      }
+		      catch(TypingEx e) {
+		        remove = false;
+			equal = false;
+		      }
+		    }
+                  // don't remove identical methods.
+		  removed[m1] = remove && !equal;
+	        }
+	  }
+
+        symbols = new LinkedList();
+	for (int i = 0; i < size; i++)
+	  if (!removed[i])
+	    symbols.add(tempSymbols[i]);
+      }
 
     if(symbols.size() == 1) 
       return (VarSymbol) symbols.get(0);
@@ -252,6 +306,16 @@ public class MethodBodyDefinition extends Definition
       }
   }
 
+  private void domainMonotypeLeq(Monotype m1, Monotype m2) throws TypingEx
+  {
+    if (m1 == m2)
+      return;
+
+    Types.setMarkedKind(m1);
+    Types.setMarkedKind(m2);
+    Typing.leq(((MonotypeConstructor) m1.equivalent()).getTP()[0],
+	       ((MonotypeConstructor) m2.equivalent()).getTP()[0]);
+  }
   void doResolve()
   {
     //Resolution of the body is delayed to enable overloading

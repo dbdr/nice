@@ -44,3 +44,52 @@ void f(A a, String s) { }
 void f(B a, String s) { }
 void f(B a, String s, int i = 0) { }
 
+/// PASS
+  /// Toplevel
+  abstract class A {}
+  class B extends A {}
+  void foo(A);
+  void foo(B);
+  foo(@B(A)) {}
+  foo(@B(B)) {}
+
+/// PASS
+  /// Toplevel
+  abstract class A {}
+  class B extends A {}
+  void foo(A, String);
+  void foo(B, String);
+  foo(@B(A), s) {}
+  foo(@B(B), s) {}
+
+/// FAIL
+  /// Toplevel
+  abstract class A {}
+  class B extends A {}
+  void foo(A, String);
+  void foo(B ,Number);
+  //still ambigious for the second argument
+  foo(@B(A) ,s) {}
+  foo(@B(B) ,s) {}
+
+/// PASS
+  /// Toplevel
+  abstract class A {}
+  class B extends A {}
+  void foo(A, A);
+  void foo(A, B);
+  void foo(B, A);
+  void foo(B, B);
+  foo(@B(A) ,@B(A)) {}
+  foo(@B(A) ,@B(B)) {}
+  foo(@B(B) ,@B(A)) {}
+  foo(@B(B) ,@B(B)) {}
+
+/// FAIL
+  /// Toplevel
+  abstract class A {}
+  class B extends A {}
+  void foo(A);
+  void foo(A);
+  foo(@B(A)) {}
+  foo(@B(B)) {}

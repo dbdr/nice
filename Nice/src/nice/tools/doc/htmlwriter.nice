@@ -199,37 +199,106 @@ class HTMLWriter {
     this.write(m.getDeclaration(), packageName);
   }
 
+  /**
+   * Generate a list of source files
+   */
   void write(bossa.modules.Package p) {
+    try {
+      File dir = new File(outdir, p.getName().replace('.',java.io.File.separator));
+      //if the directory doesn't exist try to create it
+      if(!dir.exists() && !dir.mkdirs()) {
+          System.err.println("Error creating directory structure");
+      }
+      BufferedWriter writer = new BufferedWriter
+        (new FileWriter(new File(dir, "index.html")));
+      
+      String javascript = "<script type=\"text/javascript\">\n" +
+                          "  function toggle(elem) {\n" +
+                          "    //transform the string element into an element\n" +
+                          "    elem = document.getElementById(elem);\n" +
+                          "    if(elem.style.display != \"none\")\n" +
+                          "      elem.style.display = \"none\";\n" +
+                          "    else\n" +
+                          "      elem.style.display = \"\";\n" +
+                          "  }\n" +
+                          "</script>";
+      //temporary measure while stylesheets are broken
+      String css = "<style type=\"text/css\">\n" +
+                   "h3.listheading {\n" +
+                   "  font-size: medium;\n" +
+                   "  margin: 0px 0px 0px 0px;\n" +
+                   "}\n" +
+                   "</style>\n";
+      
+      writer.write(getHeader("Package " + p.getName(), javascript + css));
+            
+      //create a list of source files in the package
+      //we use a map instead of a set of definitions because
+      //we also want keep a list of which files contain which definitions.
+      Map<File, List<Definition>> map = new HashMap();
+      
+      for(Definition d : p.getDefinitions().definitions()) {
+        //we only display information about these types
+        if(d instanceof ClassDefinition.Class ||
+           d instanceof MethodDeclaration ||
+           d instanceof DefaultMethodImplementation ||
+           d instanceof GlobalVarDeclaration) {
+          //check that there is a file associated with this definition
+          bossa.util.Location loc = d.location();
+          if(loc instanceof bossa.util.Location.File) {
+              File file = loc.getFile();
+              if(!map.containsKey(file))
+                  map.put(file, new LinkedList());
+              //although map.get() returns something of type ?List we know
+              //that it cannot be null because we checked that with the
+              //previous if statement.
+              //here, we get the List associated with file, assert that it is
+              //not null, and then add d to the list.
+              notNull(map.get(file)).add(d);
+          }
+        }
+        else {
+          //System.err.println("Ignoring " d "\n  (type " d.getClass() ")");
+        }
+      }
+      
+      //we can look at both keys and values by enumerating the entries of the
+      //map.  thanks to Core Java 2 Volume II - Advanced Features by Cay S.
+      //Horstmann and Gary Cornell. due to a lack of publishing details I'll
+      //just provide the ISBN: 0-13-092738-4
+      Set<Map.Entry<File, List<Definition>>> entries = map.entrySet();
+      Iterator<Map.Entry<File, List<Definition>>> iterator = entries.iterator();
+      while(iterator.hasNext()) {
+          Map.Entry<File, List<Definition>> entry = iterator.next();
+          File file = entry.getKey();
+          List<Definition> list = entry.getValue();
+          writer.write(sourceCodeFiles(file, list));
+      }
+      
+      writer.write(getFooter());
+      writer.close();
+    } catch(IOException ioe) {
+      ioe.printStackTrace();
+    }
+  }
+  
+  /**
+   * Writes a list of all classes, methods, and global variables
+   */
+  void writeIndex(bossa.modules.Package p) {
     try {
       File dir = new File(outdir, p.getName().replace('.',java.io.File.separator));
       if(!dir.exists() && !dir.mkdirs()) {
           System.err.println("Error creating directory structure");
       }
       BufferedWriter writer = new BufferedWriter
-        (new FileWriter(new File(dir, "index.html")));
+        (new FileWriter(new File(dir, "package-index.html")));
       writer.write(getHeader("Package " + p.getName()));
             
       //we need to separate class, methods, and global variables
-      ArrayList<ClassDefinition.Class> classes = new ArrayList();
-      ArrayList<MethodDeclaration> methods = new ArrayList();
-      ArrayList<GlobalVarDeclaration> globalVars = new ArrayList();
-      for(Definition d : p.getDefinitions().definitions()) {
-        if(d instanceof ClassDefinition.Class) {
-          classes.add(d);
-        }
-        else if(d instanceof MethodDeclaration) {
-          methods.add(d);
-        }
-        else if(d instanceof DefaultMethodImplementation) {
-          methods.add(d.getDeclaration());
-        }
-        else if(d instanceof GlobalVarDeclaration) {
-          globalVars.add(d);
-        }
-        else {
-          //System.err.println("Ignoring " d "\n  (type " d.getClass() ")");
-        }
-      }
+      (ArrayList<ClassDefinition.Class> classes,
+       ArrayList<MethodDeclaration> methods,
+       ArrayList<GlobalVarDeclaration> globalVars) = separateDefinitions(p.getDefinitions().definitions());
       
       //Write classes
       if(classes.size() > 0) {
@@ -365,9 +434,10 @@ String htmlEncode(LocatedString s) {
 
 /** Returns a string containing everything required up to and including the <body> tag
  * @param title a String to be displayed in the browser's title bar
+ * @param misc a String containing any miscellaneous items (such as JavaScript, CSS, ...)
  * @param depth the number of levels down we are (required for linking the stylesheet)
  */
-String getHeader(String title, int depth) {
+String getHeader(String title, ?String misc, int depth) {
   //we could also include some kind of visible header as well
   
   //if depth is 2, this string will contain "../../" etc, etc
@@ -385,12 +455,21 @@ String getHeader(String title, int depth) {
   "<!-- Generated by nicedoc on "  df.format(new Date())  " -->\n" +
   "\t<title>" title "</title>\n" +
   "\t<link rel=\"stylesheet\" type=\"text/css\" href=\"" depthstr "main.css\" />\n" +
+  (misc != null ? "\t" misc "\n" : "") +
   "</head>\n" +
   "<body>\n";
 }
 
 String getHeader(String title) {
     return getHeader(title, 0);
+}
+
+String getHeader(String title, String misc) {
+    return getHeader(title, misc, 0);
+}
+
+String getHeader(String title, int depth) {
+    return getHeader(title, null, depth);
 }
 
 /** Returns a string containing everything after and including the </body> tag
@@ -439,3 +518,99 @@ String hexEncode(int i) {
         num = "0" + num;
     return num.toUpperCase();
 }
+
+/**
+ * Takes a List of definitions and sorts them into class definitions, 
+ * method declarations, and global variable declarations.
+ */
+(ArrayList<ClassDefinition.Class>,
+ ArrayList<MethodDeclaration>,
+ ArrayList<GlobalVarDeclaration>) separateDefinitions(List<Definition> definitions) {
+    ArrayList<ClassDefinition.Class> classes = new ArrayList();
+    ArrayList<MethodDeclaration> methods = new ArrayList();
+    ArrayList<GlobalVarDeclaration> globalVars = new ArrayList();
+    for(Definition d : definitions) {
+        if(d instanceof ClassDefinition.Class) {
+          classes.add(d);
+        }
+        else if(d instanceof MethodDeclaration) {
+          methods.add(d);
+        }
+        else if(d instanceof DefaultMethodImplementation) {
+          methods.add(d.getDeclaration());
+        }
+        else if(d instanceof GlobalVarDeclaration) {
+          globalVars.add(d);
+        }
+        else {
+          //System.err.println("Ignoring " d "\n  (type " d.getClass() ")");
+        }
+    }
+    return (classes, methods, globalVars);
+}
+
+/**
+ * Given a file and a list of Definitions, this method generates the appropriate
+ * html starting and ending with the <ul> tag.
+ */
+String sourceCodeFiles(File file, List<Definition> definitions) {
+  
+  StringBuffer buffer = new StringBuffer();
+  //we need to separate class, methods, and global variables
+  (ArrayList<ClassDefinition.Class> classes,
+   ArrayList<MethodDeclaration> methods,
+   ArrayList<GlobalVarDeclaration> globalVars) = separateDefinitions(definitions);
+  
+  //write file heading
+  buffer.append("<ul>\n");
+  buffer.append("  <li><a href=\"javascript:toggle('" file.getName() "');\">" file.getName() "</a>\n");
+  buffer.append("    <span id=\"" file.getName() "\" style=\"display: none;\">\n");
+  
+  //write classes
+  if(classes.size() > 0) {
+    buffer.append("    <h3 class=\"listheading\"><a href=\"javascript:toggle('" file.getName() "Classes');\">Classes</a></h3>\n");
+    buffer.append("    <span id=\"" file.getName() "Classes\" style=\"display: none;\">\n");
+    buffer.append("    <ul>\n");
+    for(ClassDefinition.Class c : classes) {
+      String s = c.getName().toString();
+      int index = s.lastIndexOf('.');
+      if(index != s.length()-1)
+          s = s.substring(index+1);
+      buffer.append("      <li><a href='" escapeFilename(s) ".html'>" htmlEncode(s) "</a></li>\n");
+    }
+    buffer.append("    </ul>\n");
+    buffer.append("    </span>\n");
+  }
+  
+  //Write methods
+  if(methods.size() > 0) {
+    buffer.append("    <h3 class=\"listheading\"><a href=\"javascript:toggle('" file.getName() "Methods');\">Methods</a></h3>\n");
+    buffer.append("    <span id=\"" file.getName() "Methods\" style=\"display: none;\">\n");
+    buffer.append("    <ul>\n");
+    for(MethodDeclaration m : methods) {
+      buffer.append("      <li><a href='" escapeFilename(getMethodFilename(m)) ".html'>" htmlEncode(m.getName()) "</a>" +
+               ": " htmlEncode(m.getType().toString()) "</li>\n");
+    }
+    buffer.append("    </ul>\n");
+    buffer.append("    </span>\n");
+  }
+  
+  //Write global vars
+  if(globalVars.size() > 0) {
+    buffer.append("    <h3 class=\"listheading\"><a href=\"javascript:toggle('" file.getName() "GlobalVars');\">Global Variables</a></h3>\n");
+    buffer.append("    <span id=\"" file.getName() "GlobalVars\" style=\"display: none;\">\n");
+    buffer.append("    <ul>\n");
+    for(GlobalVarDeclaration gv : globalVars) {
+      buffer.append("      <li><a href='gv_" escapeFilename("" gv.getName()) ".html'>" htmlEncode(gv.getName()) "</a></li>\n");
+    }
+    buffer.append("    </ul>\n");
+    buffer.append("    </span>\n");
+  }
+  
+  //finish file heading tags
+  buffer.append("    </span>\n");
+  buffer.append("  </li>");
+  buffer.append("</ul>");
+  
+  return buffer.toString();
+} 

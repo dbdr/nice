@@ -162,6 +162,10 @@
            <br />
            &nbsp;<span class="small">o</span><xsl:text> </xsl:text>
            <a class="nav" href="http://sourceforge.net/tracker/&quest;func=add&amp;group_id=12788&amp;atid=112788">Report a bug</a>
+
+           <br />
+           &nbsp;<span class="small">o</span><xsl:text> </xsl:text>
+           <a class="nav" href="http://sourceforge.net/tracker/&quest;group_id=12788&amp;atid=362788">Feature requests</a>
            <br />
           </td>
          </tr>

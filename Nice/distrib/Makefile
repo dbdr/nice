@@ -47,12 +47,12 @@ tar ${TARFILE}: $(DEB)
 	${clean-tmp} && mkdir tmp/$(BUILDROOT)
 	cd $(BUILDROOT) && $(MAKE) install PREFIX=${CURDIR}/tmp/$(BUILDROOT)
 	# Preprend a specific message for manual installations
-	echo -e 
+	echo -e \
 	 ';; Load this file from your .emacs file with:\n' \
 	 ';;   (load "/usr/local/share/emacs/site-lisp/nice/nice-startup.el")'\
          '\n\n(setq load-path (cons "/usr/local/share/emacs/site-lisp/nice" load-path))\n\n' \
 	> ${CURDIR}/tmp/$(BUILDROOT)/share/emacs/site-lisp/nice/nice-startup.el
-	cat $(BUILDROOT)/lib/share/emacs/site-lisp/nice/nice-startup.el \
+	cat $(BUILDROOT)/lib/emacs/nice-startup.el \
 	>>${CURDIR}/tmp/$(BUILDROOT)/share/emacs/site-lisp/nice/nice-startup.el
 	cd tmp && tar -czf ../${TARFILE} $(BUILDROOT) --owner=0 --group=0
 

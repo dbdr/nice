@@ -186,14 +186,6 @@ public class RetypedJavaMethod extends JavaMethod
     //if(!methodName.equals("<init>"))
     //reflectMethod.return_type = javaRetType;
 
-    if (! reflectMethod.isConstructor() &&
-	! reflectMethod.return_type.getName().equals(javaRetType.getName()))
-      User.error(retTypeString,
-		 "Method " + methodName +
-		 " has not the indicated return type." +
-		 "\nIndicated: " + javaRetType.getName() +
-		 "\nFound    : " + reflectMethod.return_type.getName());
-    
     if (reflectMethod.isConstructor())
       {
 	try {

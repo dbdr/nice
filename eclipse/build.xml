@@ -18,6 +18,7 @@
 
 <project default="dist" basedir=".">
 
+  <property name="plugin.version" value="0.1.10"/>
 
 
   <property name="build.properties" value="nice_plugin_build.properties"/>
@@ -33,10 +34,10 @@
   
   <property name="build.dir" value="build"/>
   
+  <property name="icons.dir" value="icons"/>
   <property name="dist.dir" value="dist"/>
 
   <property name="plugin.id" value="net.sf.nice"/>
-  <property name="plugin.version" value="0.1.8"/>
   <property name="plugin.id.version" value="${plugin.id}_${plugin.version}"/>
   <property name="plugin.dir" value="${build.dir}/${plugin.id.version}"/>
   <property name="plugin.manifest.name" value="plugin.xml"/>
@@ -70,6 +71,7 @@
   </target>
   
   
+  
   <target name="check-eclipse-home">
     <fail unless="eclipse.home">
       please set the "eclipse.home" property in
@@ -83,7 +85,7 @@
 
 
 
-  <target name="init" depends="check-nice-runtime,check-eclipse-home,clean">
+  <target name="init" depends="clean,check-nice-runtime,check-eclipse-home">
     <mkdir dir="${build.dir}"/>
     <mkdir dir="${dist.dir}"/>
   </target>
@@ -91,7 +93,7 @@
 
 
 
-  <target name="check-eclipse-properties" depends="check-eclipse-home,clean">
+  <target name="check-eclipse-properties" depends="init,check-eclipse-home">
     <property name="eclipse.properties" value="${build.dir}/eclipse.properties"/>
     <copy file="${eclipse.home}/.eclipseproduct" tofile="${eclipse.properties}"/>
     <!-- get rid of whitespaces -->
@@ -121,7 +123,7 @@
 
 
 
-  <target name="compile" depends="check-eclipse-properties,init">
+  <target name="compile" depends="init,check-eclipse-properties">
     <nicec package="${main.package}"
       sourcepath="${src.dir}"
       destination="${build.dir}"
@@ -172,8 +174,15 @@
 
 
 
+  <target name="copy-icons">
+    <mkdir dir="${plugin.dir}/${icons.dir}"/>
+    <copy todir="${plugin.dir}/${icons.dir}">
+      <fileset dir="${icons.dir}" includes="**/*"/>
+    </copy> 
+  </target>
 
-  <target name="dist" depends="compile,split-ant-taskdefs">
+
+  <target name="dist" depends="compile,split-ant-taskdefs,copy-icons">
     <mkdir dir="${plugin.dir}"/>
     <move file="${build.dir}/${plugin.jar}" todir="${plugin.dir}"/>
     <copy file="${src.dir}/${plugin.manifest.name}" todir="${plugin.dir}"/>

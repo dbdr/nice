@@ -59,7 +59,7 @@
 			project="true"
 			finalPerspective="net.sf.nice.nice_perspective"
 			preferredPerspectives="net.sf.nice.nice_perspective"
-			icon="icons/full/ctool16/newjprj_wiz.gif">
+			icon="icons/full/ctool16/newjprj_wiz.png">
 			<description>NewNiceProject.description</description>
 	  </wizard>	
 	  <wizard
@@ -67,7 +67,7 @@
 			name="Nice Source File"
 			class="nice.eclipse.ui.wizards.NewNiceFileCreationWizard"
 			category="net.sf.nice.nice_wizard_category"
-			icon="wiz.gif">
+			icon="icons/full/ctool16/newnfile_wiz.png">
 			<description>Create a Nice File</description>
 		</wizard>
 	</extension>
@@ -81,7 +81,7 @@
 		<perspective
 			id="net.sf.nice.nice_perspective"
 			name="Nice Perspective"
-			icon="icons/full/cview16/nperspective.gif"
+			icon="icons/full/cview16/nice.png"
 			class="nice.eclipse.ui.NicePerspectiveFactory">
 		</perspective>
 	</extension>
@@ -94,7 +94,7 @@
          point="org.eclipse.ui.views">
       <view
             name="Nice resources View"
-            icon="icons/full/ctool16/nice.png"
+            icon="icons/full/cview16/nice.png"
             class="nice.eclipse.ui.views.NiceResourcesView"
             id="net.sf.nice.nice_resources_view">
       </view>
@@ -110,7 +110,7 @@
       <editor
             name="Nice Editor"
             default="true"
-            icon="icons/full/ctool16/nice_page.gif"
+            icon="icons/full/obj16/nice_obj.png"
             extensions="nice"
             class="nice.eclipse.ui.editors.NiceFileEditor"
             id="net.sf.nice.nice_file_editor"

@@ -51,6 +51,10 @@ public class StackTarget extends Target
       return true;
 
     stackType.emitCoerceTo(type, code);
+
+    if (code.topType().isAssignableTo(type))
+      return true;
+
     type.emitCoerceFrom(code.topType(), code);
     
     // Checks if the coercions worked.

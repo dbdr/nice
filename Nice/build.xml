@@ -87,6 +87,7 @@
   </macrodef>
 
   <!-- Find an existing "nice.jar". -->
+  <!-- Fresh "nice.jar" is usually available at "http://nice.sourceforge.net/nice.jar". -->
   <target name="envNicec1" if="env.NICEPATH">
     <property name="NICE_JAR" value="${env.NICEPATH}${file.separator}nice.jar" />
   </target>
@@ -179,13 +180,14 @@
     <!-- TODO: Extract the current Nice version from the head of the NEWS file. -->
     <property name="version" value="0.9.11 prerelease" />
     <property name="to" value="src/nice/tools/compiler/dateBuild.nice" />
+    <property name="LET" value="public let String" />
     <tstamp>
       <format property="NICE_DATE" timezone="UTC" pattern="yyyy.MM.dd, HH:mm:ss zzz" />
     </tstamp>
     <echo file="${to}" append="no" message="package nice.tools.compiler;&#10;" />
-    <echo file="${to}" append="yes" message="let String versionNumber = &quot;${version}&quot;;&#10;" />
-    <echo file="${to}" append="yes" message="let String buildDate = &quot;${NICE_DATE}&quot;;&#10;" />
-    <echo file="${to}" append="yes" message="let String javaVersion = &quot;${java.version}&quot;;&#10;" />
+    <echo file="${to}" append="yes" message="${LET} versionNumber = &quot;${version}&quot;;&#10;" />
+    <echo file="${to}" append="yes" message="${LET} buildDate = &quot;${NICE_DATE}&quot;;&#10;" />
+    <echo file="${to}" append="yes" message="${LET} javaVersion = &quot;${java.version}&quot;;&#10;" />
     <manifest file="src/nice/tools/compiler/Manifest">
       <attribute name="Main-Class" value="nice.tools.compiler.console.fun" />
       <attribute name="Implementation-Title" value="Nice Compiler" />

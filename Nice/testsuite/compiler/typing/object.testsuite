@@ -67,3 +67,7 @@ void foo(Object o) {
   use(["s"]);
   /// Toplevel
   void use(Object[]) {}
+
+/// PASS
+  ?Object[] o1 = new Object[1];
+  Object[] o0 = new Object[0];

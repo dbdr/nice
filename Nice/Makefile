@@ -6,9 +6,9 @@ DOCDIR= ${PREFIX}/share/doc/nice
 MANDIR= ${PREFIX}/share/man/man1
 LISPDIR=${PREFIX}/share/emacs/site-lisp/nice
 
-# Get the version from the debian changelog.
-VERSION = ${shell expr "`head -1 debian/changelog`" : '.*(\(.*\))'}
-TAG     = ${shell if [ `grep '^ --' debian/changelog |head -1|wc -c` -le 10 ]; then echo prerelease; fi }
+# Get the version from the NEWS file.
+VERSION = ${shell expr "`head -1 NEWS`" : '.*(\(.*\))'}
+TAG     = ${shell if [ `grep '^ --' NEWS |head -1|wc -c` -le 10 ]; then echo prerelease; fi }
 
 # ANT classpath; we will use NICE_ANTJAR or ANT_HOME (in that order) 
 # if present, otherwise try good default

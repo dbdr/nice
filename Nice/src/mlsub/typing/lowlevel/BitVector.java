@@ -1,21 +1,37 @@
 package mlsub.typing.lowlevel;
 
 /**
- * Same as java.util.BitSet, without the synchronization stuff
- * plus additional features.
- *
- * @see java.util.BitSet
- *
- * @version $Revision$, $Date$
- * @author Alexandre Frey
- * @author Daniel Bonniot (replaced the underlying 
- java.util.Vector by an array for efficiency reasons)
+   Same as java.util.BitSet, without the synchronization stuff
+   plus additional features.
+   
+   @see java.util.BitSet
+   
+   @version $Revision$, $Date$
+   @author Alexandre Frey
+   @author Daniel Bonniot 
+   (replaced the underlying java.util.Vector by an array 
+    for efficiency reasons;
+    most bitvectors are less than 64 elements, so using a long often avoids
+    allocating the array)
  **/
 public class BitVector implements Cloneable, java.io.Serializable {
   private final static int BITS_PER_UNIT = 6;
   private final static int MASK = (1<<BITS_PER_UNIT)-1;
-  private long bits[];
 
+  private long bits0; // first 64 bits
+  private long bits1[]; // used if more than 64 bits are stored
+
+  /**
+     @return number of WORDS allocated
+  */
+  private int length()
+  {
+    if (bits1 == null)
+      return 1;
+    else
+      return bits1.length;
+  }
+  
   /**
    * Convert bitIndex to a subscript into the bits[] array.
    */
@@ -45,12 +61,23 @@ public class BitVector implements Cloneable, java.io.Serializable {
     if (nbits < 0) {
       throw new NegativeArraySizeException(Integer.toString(nbits));
     }
-    /* On wraparound, truncate size; almost certain to o-flo memory. */
-    if (nbits + MASK < 0) {
-      nbits = Integer.MAX_VALUE - MASK;
-    }
-    /* subscript(nbits + MASK) is the length of the array needed to hold nbits */
-    bits = new long[subscript(nbits + MASK)];
+    if (nbits <= (1 << BITS_PER_UNIT))
+      // can fit on a word
+      {
+	bits0 = 0L;
+	bits1 = null;
+      }
+    else
+      {
+	/* On wraparound, truncate size; almost certain to o-flo memory. */
+	if (nbits + MASK < 0) {
+	  System.out.println("Wraparoud");
+	  nbits = Integer.MAX_VALUE - MASK;
+	}
+	/* subscript(nbits + MASK) is the length of the array needed to hold nbits */
+	int length = subscript(nbits + MASK);
+	bits1 = new long[length];
+      }
   }
 
   /**
@@ -60,12 +87,22 @@ public class BitVector implements Cloneable, java.io.Serializable {
    */
   private void ensureCapacity(int nth) {
     int required = subscript(nth) + 1;  /* +1 to get length, not index */
-    if (required > bits.length) {
+    if (required == 1)
+      return;
+    if (required > length()) {
       /* Ask for larger of doubled size or required size */
-      int request = Math.max(2 * bits.length, required);
-      long newBits[] = new long[request];
-      System.arraycopy(bits, 0, newBits, 0, bits.length);
-      bits = newBits;
+      int request = Math.max(2 * length(), required);
+      if (bits1 == null)
+	{
+	  bits1 = new long[request];
+	  bits1[0] = bits0;
+	}
+      else
+	{
+	  long[] newBits = new long[request];
+	  System.arraycopy(bits1, 0, newBits, 0, bits1.length);
+	  bits1 = newBits;
+	}
     }
   }
 
@@ -78,7 +115,10 @@ public class BitVector implements Cloneable, java.io.Serializable {
       throw new IndexOutOfBoundsException(Integer.toString(bit));
     }
     ensureCapacity(bit);
-    bits[subscript(bit)] |= (1L << (bit & MASK));
+    if (bits1 == null)
+      bits0 |= (1L << bit); // we know that bit <= 64
+    else
+      bits1[subscript(bit)] |= (1L << (bit & MASK));
   }
 
   /**
@@ -90,7 +130,10 @@ public class BitVector implements Cloneable, java.io.Serializable {
       throw new IndexOutOfBoundsException(Integer.toString(bit));
     }
     ensureCapacity(bit);
-    bits[subscript(bit)] &= ~(1L << (bit & MASK));
+    if (bits1 == null)
+      bits0 &= ~(1L << bit); // we know that bit <= 64
+    else
+      bits1[subscript(bit)] &= ~(1L << (bit & MASK));
   }
 
   /**
@@ -101,10 +144,18 @@ public class BitVector implements Cloneable, java.io.Serializable {
     if (bit < 0) {
       throw new IndexOutOfBoundsException(Integer.toString(bit));
     }
+    if (bits1 == null)
+      if (bit <= MASK)
+	return (bits0 & (1L << bit)) != 0L;
+      else
+	return false;
+
+    // long representation
+
     int n = subscript(bit);     /* always positive */
     
-    if (n < bits.length)
-      return (bits[n] & (1L << (bit & MASK))) != 0L;
+    if (n < length())
+      return (bits1[n] & (1L << (bit & MASK))) != 0L;
     return false;
   }
 
@@ -113,48 +164,146 @@ public class BitVector implements Cloneable, java.io.Serializable {
    * @param set the bit set to be ANDed with
    */
   final public void and(BitVector set) {
+    if (bits1 == null)
+      {
+	if (set.bits1 == null)
+	  bits0 &= set.bits0;
+	else
+	  bits0 &= set.bits1[0];
+	return;
+      }
+    
     if (this == set) {
       return;
     }
-    int bitsLength = bits.length;
-    int setLength = set.bits.length;
+
+    if (set.bits1 == null)
+      {
+	// go back to a short representation
+	bits0 = bits1[0] & set.bits0;
+	bits1 = null;
+	return;
+      }
+    
+    int bitsLength = length();
+    int setLength = set.length();
     int n = Math.min(bitsLength, setLength);
     for (int i = n ; i-- > 0 ; ) {
-      bits[i] &= set.bits[i];
+      bits1[i] &= set.bits1[i];
     }
     for (; n < bitsLength ; n++) {
-      bits[n] = 0L;
+      bits1[n] = 0L;
     }
   }
   /**
    * do this = this & ~(set)
    */
   final public void andNot(BitVector set) {
-    if (this == set) {
-      clearAll();
-    } else {
-      int bitsLength = bits.length;
-      int setLength = set.bits.length;
-      int n = Math.min(bitsLength, setLength);
-      for (int i = n ; i-- > 0 ; ) {
-        bits[i] &= ~set.bits[i];
+    if (this == set)
+      {
+	clearAll();
+	return;
       }
+    
+    if (bits1 == null)
+      {
+	if (set.bits1 == null)
+	  bits0 &= ~set.bits0;
+	else
+	  bits0 &= ~set.bits1[0];
+	return;
+      }
+
+    if (set.bits1 == null)
+      {
+	bits1[0] &= ~set.bits0;
+	return;
+      }
+    
+    int bitsLength = length();
+    int setLength = set.length();
+    int n = Math.min(bitsLength, setLength);
+    for (int i = n ; i-- > 0 ; ) {
+      bits1[i] &= ~set.bits1[i];
     }
   }
 
+  /** 
+      Assumes i is a valid word index.
+
+      @return  bits[i] 
+  */
+  private long getW(int i)
+  {
+    if (bits1 == null)
+      return bits0; // since i is valid, it must be 0
+    else
+      return bits1[i];
+  }
+      
+  /** 
+      Sets bits[i] = w 
+
+      Assumes i is a valid word index.      
+  */
+  private void setW(int i, long w)
+  {
+    if (bits1 == null)
+      bits0 = w;
+    else
+      bits1[i] = w;
+  }
+  
+  /** 
+      Do bits[i] &= w 
+
+      Assumes i is a valid word index.
+  */
+  private void andW(int i, long w)
+  {
+    if (bits1 == null)
+      bits0 &= w;
+    else
+      bits1[i] &= w;
+  }
+      
+  /** 
+      Do bits[i] |= w 
+
+      Assumes i is a valid word index.
+  */
+  private void orW(int i, long w)
+  {
+    if (bits1 == null)
+      bits0 |= w;
+    else
+      bits1[i] |= w;
+  }
+      
+  /** 
+      Do bits[i] ^= w 
+
+      Assumes i is a valid word index.
+  */
+  private void xorW(int i, long w)
+  {
+    if (bits1 == null)
+      bits0 ^= w;
+    else
+      bits1[i] ^= w;
+  }
+      
   /**
    * do this = this & (~set) on bits >= from
    */
   final public void andNot(int from, BitVector set) {
-    int bitsLength = bits.length;
-    int setLength = set.bits.length;
-    int n = Math.min(bitsLength, setLength);
+    int n = Math.min(length(), set.length());
     int i = subscript(from);
     if (i < n) {
-      bits[i] &= ~set.bits[i] & (-1L) << (from & MASK);
+      andW(i, ~set.getW(i) & (-1L) << (from & MASK));
       i++;
       for (; i < n; i++) {
-        bits[i] &= ~set.bits[i];
+        bits1[i] &= ~set.getW(i);
       }
     }
   }
@@ -163,16 +312,16 @@ public class BitVector implements Cloneable, java.io.Serializable {
    * Do this = this & (~set1 | set2) on all bits >= from
    **/
   final public void andNotOr(int from, BitVector set1, BitVector set2) {
-    int bitsLength = bits.length;
-    int set1Length = set1.bits.length;
-    int set2Length = set2.bits.length;
+    int bitsLength = length();
+    int set1Length = set1.length();
+    int set2Length = set2.length();
     int n = Math.min(bitsLength, set1Length);
     int i = subscript(from);
     if (i < n) {
-      bits[i] &= ~(set1.bits[i] & ((-1L) << (from & MASK))) | (i < set2Length ? set2.bits[i] : 0L);
+      andW(i, ~(set1.getW(i) & ((-1L) << (from & MASK))) | (i < set2Length ? set2.getW(i) : 0L)); // BUG? pas de from pour set2? daniel
       i++;
       for (; i < n; i++) {
-        bits[i] &= ~set1.bits[i] | (i < set2Length ? set2.bits[i] : 0L);
+        bits1[i] &= ~set1.getW(i) | (i < set2Length ? set2.getW(i) : 0L);
       }
     }
   }
@@ -188,10 +337,10 @@ public class BitVector implements Cloneable, java.io.Serializable {
    * Do this = this & ~(S1 & S2)
    **/
   final public void andNotAnd(BitVector set1, BitVector set2) {
-    int n = Math.min(this.bits.length,
-                     Math.min(set1.bits.length, set2.bits.length));
+    int n = Math.min(this.length(),
+                     Math.min(set1.length(), set2.length()));
     for (int i = 0; i < n; i++) {
-      bits[i] &= ~(set1.bits[i] & set2.bits[i]);
+      andW(i, ~(set1.getW(i) & set2.getW(i)));
     }
   }
   
@@ -200,18 +349,18 @@ public class BitVector implements Cloneable, java.io.Serializable {
    * i.e. this = this & ~(S1 & S2 & ~S3)
    **/
   final public void andNotAndOr(BitVector S1, BitVector S2, BitVector S3) {
-    int n = bits.length;
-    int bits1length = S1.bits.length;
+    int n = length();
+    int bits1length = S1.length();
     if (bits1length < n) {
       n = bits1length;
     }
-    int bits2length = S2.bits.length;
+    int bits2length = S2.length();
     if (bits2length < n) {
       n = bits2length;
     }
-    int bits3length = S3.bits.length;
+    int bits3length = S3.length();
     for (int i = 0; i < n; i++) {
-      bits[i] &= ~(S1.bits[i] & S2.bits[i]) | (i < bits3length ? S3.bits[i] : 0L);
+      andW(i, ~(S1.getW(i) & S2.getW(i)) | (i < bits3length ? S3.getW(i) : 0L));
     }
   }
   
@@ -227,7 +376,7 @@ public class BitVector implements Cloneable, java.io.Serializable {
       ensureCapacity(bitIndex(setLength-1));// this might cause some problem...
     }
     for (int i = setLength; i-- > 0 ;) {
-      bits[i] |= set.bits[i];
+      orW(i, set.getW(i));
     }
   }
 
@@ -239,15 +388,15 @@ public class BitVector implements Cloneable, java.io.Serializable {
       return;
     }
     int set1Length = set1.nonZeroLength();
-    int set2Length = set2.bits.length;
+    int set2Length = set2.length();
     if (set1Length > 0) {
       ensureCapacity(bitIndex(set1Length - 1)); // XXX: problem ?
     }
     for (int i = set1Length; i-- > 0;) {
       if (i < set2Length) {
-        bits[i] |= set1.bits[i] & ~set2.bits[i];
+        orW(i, set1.getW(i) & ~set2.getW(i));
       } else {
-        bits[i] |= set1.bits[i];
+        orW(i, set1.getW(i));
       }
     }
   }
@@ -265,18 +414,21 @@ public class BitVector implements Cloneable, java.io.Serializable {
       ensureCapacity(bitIndex(setLength-1));// this might cause some problem...
     }
     for (int i = setLength; i-- > 0 ;) {
-      bits[i] |= set1.bits[i] & set2.bits[i];
+      orW(i, set1.getW(i) & set2.getW(i));
     }
   }
-      
-      
-
+  
+  
+  
   /*
    * If there are some trailing zeros, don't count them
    */
   private int nonZeroLength() {
-    int n = bits.length;
-    while (n > 0 && bits[n-1] == 0L) { n--; }
+    if (bits1 == null)
+      return 1;
+    
+    int n = length();
+    while (n > 0 && bits1[n-1] == 0L) { n--; }
     return n;
   }
 
@@ -285,12 +437,12 @@ public class BitVector implements Cloneable, java.io.Serializable {
    * Do this = this ^ set
    **/
   final public void xor(BitVector set) {
-    int setLength = set.bits.length;
+    int setLength = set.length();
     if (setLength > 0) {
       ensureCapacity(bitIndex(setLength-1));
     }
     for (int i = setLength; i-- > 0 ;) {
-      bits[i] ^= set.bits[i];
+      xorW(i, set.getW(i));
     }
   }
 
@@ -299,8 +451,8 @@ public class BitVector implements Cloneable, java.io.Serializable {
    */
   final public int hashCode() {
     long h = 1234;
-    for (int i = bits.length; --i >= 0; ) {
-      h ^= bits[i] * (i + 1);
+    for (int i = length(); --i >= 0; ) {
+      h ^= getW(i) * (i + 1);
     }
     return (int)((h >> 32) ^ h);
   }
@@ -310,7 +462,7 @@ public class BitVector implements Cloneable, java.io.Serializable {
    * The maximum element in the set is the size - 1st element.
    */
   final public int size() {
-    return bits.length << BITS_PER_UNIT;
+    return length() << BITS_PER_UNIT;
   }
 
   /**
@@ -319,35 +471,35 @@ public class BitVector implements Cloneable, java.io.Serializable {
    * @return true if the objects are the same; false otherwise.
    */
   final public boolean equals(Object obj) {
-    if ((obj != null) && (obj instanceof BitVector)) {
-      if (this == obj) {
-        return true;
-      }
-      BitVector set = (BitVector) obj;
-      int bitsLength = bits.length;
-      int setLength = set.bits.length;
-      int n = Math.min(bitsLength, setLength);
-      for (int i = n ; i-- > 0 ;) {
-        if (bits[i] != set.bits[i]) {
-          return false;
-        }
-      }
-      if (bitsLength > n) {
-        for (int i = bitsLength ; i-- > n ;) {
-          if (bits[i] != 0L) {
-            return false;
-          }
-        }
-      } else if (setLength > n) {
-        for (int i = setLength ; i-- > n ;) {
-          if (set.bits[i] != 0L) {
-            return false;
-          }
-        }
-      }
+    if ((obj == null) || !(obj instanceof BitVector))
+      return false;
+    
+    if (this == obj)
       return true;
+
+    BitVector set = (BitVector) obj;
+    int bitsLength = length();
+    int setLength = set.length();
+    int n = Math.min(bitsLength, setLength);
+    for (int i = n ; i-- > 0 ;) {
+      if (getW(i) != set.getW(i)) {
+	return false;
+      }
     }
-    return false;
+    if (bitsLength > n) {
+      for (int i = bitsLength ; i-- > n ;) {
+	if (bits1[i] != 0L) {
+	  return false;
+	}
+      }
+    } else if (setLength > n) {
+      for (int i = setLength ; i-- > n ;) {
+	if (set.bits1[i] != 0L) {
+	  return false;
+	}
+      }
+    }
+    return true;
   }
 
 
@@ -362,8 +514,16 @@ public class BitVector implements Cloneable, java.io.Serializable {
     } catch (CloneNotSupportedException e) {
       throw new InternalError("this shouldn't happen, since we are Cloneable");
     }
-    result.bits = new long[bits.length];
-    System.arraycopy(bits, 0, result.bits, 0, result.bits.length);
+
+    if (bits1 == null)
+      result.bits0 = bits0;
+    else
+      {
+	// optim: shrink to nonZeroLength()?
+	int n = length();
+	result.bits1 = new long[n];
+	System.arraycopy(bits1, 0, result.bits1, 0, n);
+      }
     return result;
   }
 
@@ -392,9 +552,9 @@ public class BitVector implements Cloneable, java.io.Serializable {
    **/
   final public int bitCount() {
     int cnt = 0;
-    int bitsLength = bits.length;
+    int bitsLength = length();
     for (int i = 0; i < bitsLength; i++) {
-      long chunk = bits[i];
+      long chunk = getW(i);
       while(chunk != 0L) {
         chunk &= chunk - 1L;
         cnt++;
@@ -409,27 +569,26 @@ public class BitVector implements Cloneable, java.io.Serializable {
   final public int bitCount(int n) {
     int cnt = 0;
     int maxChunk = subscript(n);
-    if (maxChunk < bits.length) {
-      for (int i = 0; i < maxChunk; i++) {
-        long chunk = bits[i];
-        while (chunk != 0L) {
-          chunk &= chunk - 1L;
-          cnt++;
-        }
-      }
-      long lastChunk = bits[maxChunk] & ((1L << (n & MASK)) - 1);
-      while (lastChunk != 0L) {
-        lastChunk &= lastChunk - 1L;
-        cnt++;
-      }
-      return cnt;
-    } else {
+    if (maxChunk >= length())
       return bitCount();
+    
+    for (int i = 0; i < maxChunk; i++) {
+      long chunk = getW(i);
+      while (chunk != 0L) {
+	chunk &= chunk - 1L;
+	cnt++;
+      }
     }
+    long lastChunk = getW(maxChunk) & ((1L << (n & MASK)) - 1);
+    while (lastChunk != 0L) {
+      lastChunk &= lastChunk - 1L;
+      cnt++;
+    }
+    return cnt;
   }
 
   private 
-  /* static // XXX: work around Symantec JIT bug */
+  static /* XXX: work around Symantec JIT bug: comment static */
   int chunkLowestSetBit(long chunk) {
     if (chunk == 0L) {
       return 64;
@@ -452,9 +611,9 @@ public class BitVector implements Cloneable, java.io.Serializable {
    * set is empty.
    **/
   final public int getLowestSetBit() {
-    int n = bits.length;
+    int n = length();
     for (int i = 0; i < n; i++) {
-      long chunk = bits[i];
+      long chunk = getW(i);
       if (chunk != 0L) {
         return (i << BITS_PER_UNIT) + chunkLowestSetBit(chunk);
       }
@@ -468,10 +627,10 @@ public class BitVector implements Cloneable, java.io.Serializable {
    * value)
    **/
   final public int getLowestClearedBit() {
-    int n = bits.length;
+    int n = length();
     int i;
     for (i = 0; i < n; i++) {
-      long chunk = bits[i];
+      long chunk = getW(i);
       if (chunk != ~0L) {
 	return (i << BITS_PER_UNIT) + chunkLowestSetBit(~chunk);
       }
@@ -484,12 +643,12 @@ public class BitVector implements Cloneable, java.io.Serializable {
    * UNDEFINED_INDEX if there is no such bit
    **/
   final public int getLowestSetBit(int pos) {
-    int n = bits.length;
+    int n = length();
     int i = subscript(pos);
     if (i >= n) {
       return UNDEFINED_INDEX; // was -1, Alex's bug?
     } else {
-      long chunk = bits[i] & ((~0L) << (pos & MASK));
+      long chunk = getW(i) & ((~0L) << (pos & MASK));
       while (true) {
         if (chunk != 0L) {
           return (i << BITS_PER_UNIT) + chunkLowestSetBit(chunk);
@@ -498,7 +657,7 @@ public class BitVector implements Cloneable, java.io.Serializable {
         if (i >= n) {
           return UNDEFINED_INDEX;
         }
-        chunk = bits[i];
+        chunk = getW(i);
       }
     }
   }
@@ -522,12 +681,12 @@ public class BitVector implements Cloneable, java.io.Serializable {
    * @return UNDEFINED_INDEX if there is no such bit
    **/
   final public int getLowestSetBitNotIn(BitVector set) {
-    int n = bits.length;
-    int setLength = set.bits.length;
+    int n = length();
+    int setLength = set.length();
     for (int i = 0; i < n; i++) {
-      long chunk = bits[i];
+      long chunk = getW(i);
       if (i < setLength) {
-        chunk &= ~set.bits[i];
+        chunk &= ~set.getW(i);
       }
       if (chunk != 0L) {
         return (i << BITS_PER_UNIT) + chunkLowestSetBit(chunk);
@@ -541,13 +700,13 @@ public class BitVector implements Cloneable, java.io.Serializable {
    * @return UNDEFINED_INDEX if there is no such bit
    **/
   final public int getLowestSetBitAnd(BitVector set) {
-    int n = bits.length;
-    int setLength = set.bits.length;
+    int n = length();
+    int setLength = set.length();
     int result = 0;
     for (int i = 0; i < n; i++) {
-      long chunk = bits[i];
+      long chunk = getW(i);
       if (i < setLength) {
-        chunk &= set.bits[i];
+        chunk &= set.getW(i);
       } else {
         return UNDEFINED_INDEX;
       }
@@ -561,19 +720,19 @@ public class BitVector implements Cloneable, java.io.Serializable {
   }
 
   final public int getLowestSetBitAndNotIn(BitVector set, BitVector exclude) {
-    int n = bits.length;
-    int setLength = set.bits.length;
-    int excludeLength = exclude.bits.length;
+    int n = length();
+    int setLength = set.length();
+    int excludeLength = exclude.length();
     int result = 0;
     for (int i = 0; i < n; i++) {
-      long chunk = bits[i];
+      long chunk = getW(i);
       if (i < setLength) {
-        chunk &= set.bits[i];
+        chunk &= set.getW(i);
       } else {
         return UNDEFINED_INDEX;
       }
       if (i < excludeLength) {
-        chunk &= ~exclude.bits[i];
+        chunk &= ~exclude.getW(i);
       }
       if (chunk != 0L) {
         return result + chunkLowestSetBit(chunk);
@@ -597,7 +756,7 @@ public class BitVector implements Cloneable, java.io.Serializable {
         return false;
       } else {
         for (int i = 0; i < bitsLength; i++) {
-          if ((bits[i] & ~set.bits[i]) != 0L) {
+          if ((getW(i) & ~set.getW(i)) != 0L) {
             return false;
           }
         }
@@ -610,19 +769,17 @@ public class BitVector implements Cloneable, java.io.Serializable {
    * Clear all the bits in this BitVector
    **/
   final public void clearAll() {
-    int n = bits.length;
-    for (int i = 0; i < n; i++) {
-      bits[i] = 0L;
-    }
+    bits0 = 0L;
+    bits1 = null;
   }
 
   /**
    * Returns true if no bit is set in this BitVector
    **/
   public boolean isEmpty() {
-    int n = bits.length;
+    int n = length();
     for (int i = 0; i < n; i++) {
-      if (bits[i] != 0L) {
+      if (getW(i) != 0L) {
         return false;
       }
     }
@@ -657,11 +814,11 @@ public class BitVector implements Cloneable, java.io.Serializable {
    **/
   final public void truncate(int newSize) {
     int i = subscript(newSize);
-    int bitsLength = bits.length;
+    int bitsLength = length();
     if (i < bitsLength) {
-      bits[i++] &= (1L << (newSize & MASK)) - 1;
-      for (; i < bitsLength; i++) {
-        bits[i] = 0L;
+      andW(i, (1L << (newSize & MASK)) - 1);
+      for (i++; i < bitsLength; i++) {
+        bits1[i] = 0L;
       }
     }
     // XXX: should shrink the vector to lower memory usage ?
@@ -674,10 +831,10 @@ public class BitVector implements Cloneable, java.io.Serializable {
     ensureCapacity(n - 1);
     int maxChunk = subscript(n);
     for (int i = 0; i < maxChunk; i++) {
-      bits[i] = ~0L;
+      setW(i, ~0L);
     }
-    if (maxChunk < bits.length) {
-      bits[maxChunk] |= (1L << (n & MASK)) - 1;
+    if (maxChunk < length()) {
+      orW(maxChunk, (1L << (n & MASK)) - 1);
     }
   }
 
@@ -687,13 +844,13 @@ public class BitVector implements Cloneable, java.io.Serializable {
    **/
   final public void fillNot(int n) {
     int maxChunk = subscript(n);
-    if (maxChunk >= bits.length) {
+    if (maxChunk >= length()) {
       clearAll();
     } else {
       for (int i = 0; i < maxChunk; i++) {
-        bits[i] = 0L;
+        setW(i, 0L);
       }
-      bits[maxChunk] &= (~0L) << (n & MASK);
+      andW(maxChunk, (~0L) << (n & MASK));
     }
   }
 

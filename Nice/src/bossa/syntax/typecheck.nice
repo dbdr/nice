@@ -585,6 +585,8 @@ typecheck(decl@Block.LocalVariable)
       value.typecheck();
       decl.value = value = value.noOverloading();
       target.type = checkMonomorphic(value.getType(), decl);
+      if (target.type == PrimitiveType.byteType)
+	target.type = notNull(PrimitiveType.intType);
     }
   else
     {

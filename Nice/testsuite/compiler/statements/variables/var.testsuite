@@ -33,3 +33,8 @@ class B {
     var ?boolean c = cache;
   }
 }
+
+/// PASS
+  var i = 0;
+  // i must have type int, not byte.
+  i = i + 1;

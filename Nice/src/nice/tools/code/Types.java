@@ -15,7 +15,7 @@ package nice.tools.code;
 import mlsub.typing.*;
 import bossa.util.Debug;
 import bossa.util.Internal;
-import bossa.syntax.PrimitiveType;
+import nice.tools.typing.PrimitiveType;
 
 import gnu.bytecode.*;
 import gnu.expr.*;

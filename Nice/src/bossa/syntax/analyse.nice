@@ -641,7 +641,7 @@ mlsub.typing.Polytype typeRepresentationToPolytype(String name,
 	typeRepresentationToPolytype(name.substring(1), loc, info, sure: false);
 
       let type = new mlsub.typing.MonotypeConstructor
-        (PrimitiveType.arrayTC, [res.getMonotype()]);
+        (nice.tools.typing.PrimitiveType.arrayTC, [res.getMonotype()]);
 
       return new mlsub.typing.Polytype
         (res.getConstraint(),
@@ -653,7 +653,7 @@ mlsub.typing.Polytype typeRepresentationToPolytype(String name,
   if (tc == null)
     {
       if (name.equals("Object") || name.equals("java.lang.Object"))
-	return PrimitiveType.objectPolytype();
+	return nice.tools.typing.PrimitiveType.objectPolytype();
 
       if (info.typeVars[name] instanceof MonotypeVar)
         throw new bossa.util.UserError(loc, "A type variable cannot be used here");

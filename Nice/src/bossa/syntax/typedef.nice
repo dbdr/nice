@@ -124,17 +124,17 @@ public abstract class CTypeDefinition extends TypeDefinition
       {
         tc = new mlsub.typing.TypeConstructor
           ("null", mlsub.typing.NullnessKind.instance, this.isConcrete(), true);
-  	PrimitiveType.registerPrimType(name, tc);
+  	nice.tools.typing.PrimitiveType.register(name, tc);
       }
     else
       {
         tc = new mlsub.typing.TypeConstructor(name, variance, this.isConcrete(), true);
         if (name.equals("nice.lang.Throwable"))
-	  PrimitiveType.throwableTC = tc;
+	  nice.tools.typing.PrimitiveType.throwableTC = tc;
         else if (name.equals("nice.lang.Collection"))
-          PrimitiveType.collectionTC = tc;
+          nice.tools.typing.PrimitiveType.collectionTC = tc;
         else if (name.equals("nice.lang.Class"))
-          PrimitiveType.classTC = tc;
+          nice.tools.typing.PrimitiveType.classTC = tc;
       }
 
     tcToTypeDef.put(tc, this);
@@ -507,8 +507,8 @@ class ClassDefinition extends CTypeDefinition
       {
          d.resolve();
 
-         if (d.getImplementation() instanceof PrimitiveType &&
-             !(this.getImplementation() instanceof PrimitiveType))
+         if (d.getImplementation() instanceof PrimitiveTypeImplementation &&
+             !(this.getImplementation() instanceof PrimitiveTypeImplementation))
            User.error(this, "A class can't extends a primitive");
       }
     

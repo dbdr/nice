@@ -519,7 +519,7 @@ typecheck(IfExp e)
   Expression thenExp = e.thenExp;
   Expression elseExp = e.elseExp;
 
-  condition = condition.resolveOverloading(PrimitiveType.boolPolytype);
+  condition = condition.resolveOverloading(nice.tools.typing.PrimitiveType.boolPolytype);
   checkBooleanCondition(condition);
   e.condition = condition;
 
@@ -617,8 +617,8 @@ private void setVarType(MonoSymbol variable,
 typecheck(IncrementExp e)
 {
   try{
-    e.variable = e.variable.resolveOverloading(PrimitiveType.longPolytype);
-    checkAssignment(PrimitiveType.longType, e.variable);
+    e.variable = e.variable.resolveOverloading(nice.tools.typing.PrimitiveType.longPolytype);
+    checkAssignment(nice.tools.typing.PrimitiveType.longType, e.variable);
   }
   catch(TypingEx t){
     if (notNullError(t, e, String.valueOf(e.variable)))
@@ -641,9 +641,9 @@ typecheck(NewArrayExp e)
   for (int i=0; i<knownDimensions.length; i++)
     {
       Expression dim = knownDimensions[i] =
-      knownDimensions[i].resolveOverloading(PrimitiveType.intPolytype);
+      knownDimensions[i].resolveOverloading(nice.tools.typing.PrimitiveType.intPolytype);
       try{
-  	checkAssignment(PrimitiveType.intType, dim);
+  	checkAssignment(nice.tools.typing.PrimitiveType.intType, dim);
       }
       catch(TypingEx ex){
 	if (notNullError(ex, dim,
@@ -770,9 +770,9 @@ typecheck(LocalVariable decl)
       value.typecheck();
       decl.value = value = value.noOverloading();
       target.type = ensureMonomorphic(value.getType(), decl);
-      if (target.type == PrimitiveType.byteType || 
-          target.type == PrimitiveType.shortType)
-	target.type = PrimitiveType.intType;
+      if (target.type == nice.tools.typing.PrimitiveType.byteType || 
+          target.type == nice.tools.typing.PrimitiveType.shortType)
+	target.type = nice.tools.typing.PrimitiveType.intType;
 
       if (nice.tools.typing.Types.isVoid(target.type))
         throw error(decl, "A variable cannot have a void type");
@@ -837,7 +837,7 @@ typecheck(LoopStmt l)
   ?Expression whileExp = l.whileExp;
   if (whileExp != null)
     {
-      l.whileExp = whileExp = whileExp.resolveOverloading(PrimitiveType.boolPolytype);
+      l.whileExp = whileExp = whileExp.resolveOverloading(nice.tools.typing.PrimitiveType.boolPolytype);
       checkBooleanCondition(whileExp);
     }
 
@@ -1004,8 +1004,8 @@ isNullError(MonotypeLeqEx ex)
 
   if (tc1 == tc2) return false;
 
-  if (tc1 == PrimitiveType.maybeTC &&
-      (tc2 != PrimitiveType.maybeTC || tc2 != null))
+  if (tc1 == nice.tools.typing.PrimitiveType.maybeTC &&
+      (tc2 != nice.tools.typing.PrimitiveType.maybeTC || tc2 != null))
     return true;
 
   return false;
@@ -1025,7 +1025,7 @@ boolean notNullError(TypingEx ex, bossa.util.Located resp, ?String value) {
 
 void checkBooleanCondition(Expression condition) {
   try {
-    checkAssignment(PrimitiveType.boolType, condition);
+    checkAssignment(nice.tools.typing.PrimitiveType.boolType, condition);
   }
   catch(TypingEx t){
     throw new bossa.util.UserError(condition, 
@@ -1053,12 +1053,12 @@ void wrongReturnType(bossa.util.Located responsible,
 void checkNotNull(mlsub.typing.Polytype type)
 {
   if (type.isMonomorphic())
-    Typing.leq(type.getMonotype(), PrimitiveType.sureTC);
+    Typing.leq(type.getMonotype(), nice.tools.typing.PrimitiveType.sureTC);
   else
     try {
     Typing.enter();
     notNull(type.getConstraint()).enter();
-    Typing.leq(type.getMonotype(), PrimitiveType.sureTC);
+    Typing.leq(type.getMonotype(), nice.tools.typing.PrimitiveType.sureTC);
     Typing.implies();
   }
   finally {

@@ -23,7 +23,7 @@ import mlsub.typing.MonotypeConstructor;
 import mlsub.typing.Constraint;
 import mlsub.typing.MonotypeLeqCst;
 import mlsub.typing.lowlevel.Element;
-
+import nice.tools.typing.PrimitiveType;
 import gnu.bytecode.ClassType;
 
 import java.util.*;

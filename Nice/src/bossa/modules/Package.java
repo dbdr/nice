@@ -17,6 +17,7 @@ import bossa.syntax.*;
 import gnu.bytecode.*;
 import gnu.expr.*;
 import nice.tools.code.Import;
+import nice.tools.typing.PrimitiveType;
 
 import java.util.*;
 import java.util.jar.*;

@@ -349,7 +349,7 @@ private mlsub.typing.Polytype getType(mlsub.typing.Polytype type, mlsub.typing.P
     throw new ReportErrorEx("Nullness check");
 
   try{
-    mlsub.typing.Typing.leq(m.head(), PrimitiveType.sureTC);
+    mlsub.typing.Typing.leq(m.head(), nice.tools.typing.PrimitiveType.sureTC);
   }
   catch(TypingEx ex) {
     throw new ReportErrorEx("This function may be null");

@@ -82,7 +82,7 @@ public class ACatch
   gnu.expr.CatchClause clause()
   {
     try {
-      mlsub.typing.Typing.leq(t, PrimitiveType.throwableTC);
+      mlsub.typing.Typing.leq(t, nice.tools.typing.PrimitiveType.throwableTC);
     }
     catch (mlsub.typing.TypingEx e) {
       User.error(typeLocation, notNull(t) + " is not catchable");

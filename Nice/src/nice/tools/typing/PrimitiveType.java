@@ -1,7 +1,7 @@
 /**************************************************************************/
 /*                                N I C E                                 */
 /*             A high-level object-oriented research language             */
-/*                        (c) Daniel Bonniot 2002                         */
+/*                        (c) Daniel Bonniot 2004                         */
 /*                                                                        */
 /*  This program is free software; you can redistribute it and/or modify  */
 /*  it under the terms of the GNU General Public License as published by  */
@@ -10,7 +10,7 @@
 /*                                                                        */
 /**************************************************************************/
 
-package bossa.syntax;
+package nice.tools.typing;
 
 import bossa.util.*;
 import java.util.*;
@@ -25,44 +25,24 @@ import mlsub.typing.Constraint;
 import nice.tools.code.SpecialTypes;
 
 /**
-   A primitive type.
    
-   @version $Date$
-   @author Daniel Bonniot
 */
-
-public class PrimitiveType extends ClassImplementation
+public final class PrimitiveType
 {
-  public PrimitiveType(TypeDefinition definition)
-  {
-    gnu.bytecode.Type t = registerPrimType(definition.name.toString(), definition.getTC());
-    if (t == null)
-      User.error(definition, definition.name + " is not a known primitive type");
-    definition.setJavaType(t);
-  }
 
-  void resolveClass()
-  {
-  }
-
-  public void printInterface(java.io.PrintWriter s)
-  {
-    s.print(" = native ;\n");
-  }
-
-  static gnu.bytecode.Type registerPrimType(String name, TypeConstructor tc)
+  public static gnu.bytecode.Type register(String name, TypeConstructor tc)
   {
     if(name.equals("nice.lang.char"))
       {
 	charTC = tc;
-	charType = Monotype.sure(new MonotypeConstructor(tc, null));
+	charType = sureMonotype(new MonotypeConstructor(tc, null));
 	return SpecialTypes.charType;
       }
     
     if(name.equals("nice.lang.byte"))
       {
 	byteTC = tc;
-	byteType = Monotype.sure(new MonotypeConstructor(tc, null));
+	byteType = sureMonotype(new MonotypeConstructor(tc, null));
 	bytePolytype = new Polytype(byteType);
 	return SpecialTypes.byteType;
       }
@@ -70,7 +50,7 @@ public class PrimitiveType extends ClassImplementation
     if(name.equals("nice.lang.short"))
       {
 	shortTC = tc;
-	shortType = Monotype.sure(new MonotypeConstructor(tc, null));
+	shortType = sureMonotype(new MonotypeConstructor(tc, null));
 	shortPolytype = new Polytype(shortType);
 	return SpecialTypes.shortType;
       }
@@ -78,7 +58,7 @@ public class PrimitiveType extends ClassImplementation
     if(name.equals("nice.lang.int"))
       {
 	intTC = tc;
-	intType = Monotype.sure(new MonotypeConstructor(tc, null));
+	intType = sureMonotype(new MonotypeConstructor(tc, null));
 	intPolytype = new Polytype(intType);
 	return SpecialTypes.intType;
       }
@@ -86,7 +66,7 @@ public class PrimitiveType extends ClassImplementation
     if(name.equals("nice.lang.long"))
       {
 	longTC = tc;
-	longType = Monotype.sure(new MonotypeConstructor(tc, null));
+	longType = sureMonotype(new MonotypeConstructor(tc, null));
 	longPolytype = new Polytype(longType);
 	return SpecialTypes.longType;
       }
@@ -94,7 +74,7 @@ public class PrimitiveType extends ClassImplementation
     if(name.equals("nice.lang.boolean"))
       {
 	boolTC = tc;
-	boolType = Monotype.sure(new MonotypeConstructor(tc, null));
+	boolType = sureMonotype(new MonotypeConstructor(tc, null));
 	boolPolytype = new Polytype(boolType);
 	return SpecialTypes.booleanType;
       }
@@ -102,14 +82,14 @@ public class PrimitiveType extends ClassImplementation
     if(name.equals("nice.lang.double"))
       {
 	doubleTC = tc;
-	doubleType = Monotype.sure(new MonotypeConstructor(tc, null));
+	doubleType = sureMonotype(new MonotypeConstructor(tc, null));
 	return SpecialTypes.doubleType;
       }
     
     if(name.equals("nice.lang.float"))
       {
 	floatTC = tc;
-	floatType = Monotype.sure(new MonotypeConstructor(tc, null));
+	floatType = sureMonotype(new MonotypeConstructor(tc, null));
 	return SpecialTypes.floatType;
       }
     
@@ -117,9 +97,8 @@ public class PrimitiveType extends ClassImplementation
       {
 	voidTC = tc;
 	mlsub.typing.lowlevel.Engine.setTop(tc);
-	voidType = Monotype.sure(new MonotypeConstructor(tc, null));
+	voidType = sureMonotype(new MonotypeConstructor(tc, null));
 	voidPolytype = new Polytype(Constraint.True, voidType);
-	synVoidType = Monotype.create(voidType);
 	return SpecialTypes.voidType;
       }
     
@@ -161,17 +140,23 @@ public class PrimitiveType extends ClassImplementation
     return null;
   }
   
+  private static mlsub.typing.Monotype sureMonotype(mlsub.typing.Monotype type)
+  {
+    return new mlsub.typing.MonotypeConstructor
+      (PrimitiveType.sureTC, new mlsub.typing.Monotype[]{type});
+  }
+
   public static TypeConstructor byteTC, charTC, intTC, longTC, boolTC, shortTC, doubleTC, floatTC, arrayTC, voidTC;
 
   public static mlsub.typing.Monotype byteType, charType, intType, longType, boolType, shortType, doubleType, floatType, voidType;
-  static Polytype voidPolytype, boolPolytype, bytePolytype, shortPolytype, intPolytype, longPolytype;
+  public static Polytype voidPolytype, boolPolytype, bytePolytype, shortPolytype, intPolytype, longPolytype;
 
   private static Polytype objectPolytype;
-  static Polytype objectPolytype()
+  public static Polytype objectPolytype()
   {
     if (objectPolytype == null)
       objectPolytype = new Polytype(mlsub.typing.Constraint.True, 
-                                    Monotype.sure(TopMonotype.instance));
+                                    sureMonotype(TopMonotype.instance));
 
     return objectPolytype;
   }
@@ -180,21 +165,18 @@ public class PrimitiveType extends ClassImplementation
 
   public static TypeConstructor maybeTC, sureTC, nullTC;
 
-  // syntatic types
-  public static Monotype synVoidType;
-
   public static TypeConstructor classTC;
-  static TypeConstructor collectionTC;
-  static TypeConstructor throwableTC;
+  public static TypeConstructor collectionTC;
+  public static TypeConstructor throwableTC;
 
   private static Polytype throwableType;
-  static Polytype throwableType()
+  public static Polytype throwableType()
   {
     if (throwableType == null)
       {
 	throwableType = new Polytype
 	  (Constraint.True, 
-	   Monotype.sure(new MonotypeConstructor(throwableTC, null)));
+	   sureMonotype(new MonotypeConstructor(throwableTC, null)));
       }
     return throwableType;
   }

@@ -107,7 +107,7 @@ bossa.util.UserError ensureLocated(bossa.util.UserError e,
   if (tc == null)
     return null;
 
-  if (tc == PrimitiveType.arrayTC)
+  if (tc == nice.tools.typing.PrimitiveType.arrayTC)
     return (sym, notNull(arg2.representedType));
 
   mlsub.typing.Monotype[?] parameters = null;
@@ -247,12 +247,12 @@ Pattern[] formals(MethodImplementation) = native MethodImplementation.formals;
 LocatedString name(Definition) = native Definition.name;
 
 // Retypings needed since java types are not strict.
-mlsub.typing.Polytype boolPolytype() = native PrimitiveType.boolPolytype;
-mlsub.typing.Polytype longPolytype() = native PrimitiveType.longPolytype;
-mlsub.typing.Polytype voidPolytype() = native PrimitiveType.voidPolytype;
-mlsub.typing.Monotype boolType() = native PrimitiveType.boolType;
-mlsub.typing.Monotype intType() = native PrimitiveType.intType;
-mlsub.typing.Monotype longType() = native PrimitiveType.longType;
+mlsub.typing.Polytype boolPolytype() = native nice.tools.typing.PrimitiveType.boolPolytype;
+mlsub.typing.Polytype longPolytype() = native nice.tools.typing.PrimitiveType.longPolytype;
+mlsub.typing.Polytype voidPolytype() = native nice.tools.typing.PrimitiveType.voidPolytype;
+mlsub.typing.Monotype boolType() = native nice.tools.typing.PrimitiveType.boolType;
+mlsub.typing.Monotype intType() = native nice.tools.typing.PrimitiveType.intType;
+mlsub.typing.Monotype longType() = native nice.tools.typing.PrimitiveType.longType;
 gnu.expr.QuoteExp trueExp() = native gnu.expr.QuoteExp.trueExp;
 gnu.expr.QuoteExp voidExp() = native gnu.expr.QuoteExp.voidExp;
 

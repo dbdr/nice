@@ -451,8 +451,8 @@ public class MethodBodyDefinition extends MethodImplementation
 
     for(int n = 0; n < notNull(parameters).length; n++)
       res[n] = formals[n].atNull() ? 
-	nice.tools.code.Types.javaType(PrimitiveType.nullTC) :
-	formals[n].tc == bossa.syntax.PrimitiveType.arrayTC ?
+	nice.tools.code.Types.javaType(nice.tools.typing.PrimitiveType.nullTC) :
+	formals[n].tc == nice.tools.typing.PrimitiveType.arrayTC ?
 	nice.tools.code.SpecialArray.unknownTypeArray() :
 	nice.tools.code.Types.javaType(notNull(parameters)[n].getMonotype());
 

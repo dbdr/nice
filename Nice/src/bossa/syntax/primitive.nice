@@ -15,43 +15,24 @@ package bossa.syntax;
 import bossa.util.*;
 
 /**
-   A statement made by the evaluation of an expression.
+   A primitive type.
+   
 */
-
-public class StatementExp extends Expression
+public class PrimitiveTypeImplementation extends ClassImplementation
 {
-  Statement statement;
+  resolveClass() {}
 
-  toString() = statement.toString();
-
-  compile()
+  printInterface(s)
   {
-    return new gnu.expr.BeginExp(statement.generateCode(), gnu.expr.QuoteExp.voidExp);
+    s.print(" = native ;\n");
   }
-  
-  computeType()
-  {
-    type = nice.tools.typing.PrimitiveType.voidPolytype;
-  }
-  
 }
 
-/**
-   Compute an expression and forget the value.
-
-*/   
-public class ExpressionStmt extends Statement
+PrimitiveTypeImplementation createPrimitiveType(TypeDefinition definition)
 {
-  Expression exp;
-
-  generateCode() = exp.generateCode();
-
-  toString() = exp.toString() + ";";
-}
-
-Statement createExpressionStmt(Expression exp)
-{
-  let res = new ExpressionStmt(exp: exp);
-  res.setLocation(exp.location());
-  return res;
+  ?gnu.bytecode.Type t = nice.tools.typing.PrimitiveType.register(definition.name.toString(), definition.getTC());
+  if (t == null)
+    User.error(definition, definition.name + " is not a known primitive type");
+  definition.setJavaType(t);
+  return new PrimitiveTypeImplementation();
 }

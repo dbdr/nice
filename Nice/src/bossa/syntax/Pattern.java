@@ -22,6 +22,7 @@ import mlsub.typing.Polytype;
 import mlsub.typing.Typing;
 import mlsub.typing.TypingEx;
 import nice.tools.typing.Types;
+import nice.tools.typing.PrimitiveType;
 
 //import gnu.expr.*;
 

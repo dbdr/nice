@@ -35,7 +35,7 @@ public class LiteralArrayExp extends Expression
     // have incomparable types. In this case, we give the array the type 
     // Object[].
     if (! notNull(type).trySimplify())
-      type = this.array(PrimitiveType.objectPolytype());
+      type = this.array(nice.tools.typing.PrimitiveType.objectPolytype());
   }
 
   private mlsub.typing.Polytype array(mlsub.typing.Polytype elementType)
@@ -43,7 +43,7 @@ public class LiteralArrayExp extends Expression
     let res = new mlsub.typing.Polytype
       (elementType.getConstraint(), 
        bossa.syntax.Monotype.sure(new mlsub.typing.MonotypeConstructor
-	 (PrimitiveType.arrayTC, [elementType.getMonotype()])));
+	 (nice.tools.typing.PrimitiveType.arrayTC, [elementType.getMonotype()])));
     res.setNotSimplified();
     return res;
   }
@@ -101,9 +101,9 @@ public class LiteralArrayExp extends Expression
     // This cannot be found easily during code generation for nested arrays
     // since the bytecode type of both List<List<T>> and List<T[]> is
     // simply List.
-    if (tc != PrimitiveType.arrayTC &&
+    if (tc != nice.tools.typing.PrimitiveType.arrayTC &&
         tc != null && tc.isRigid() &&
-        mlsub.typing.Typing.testRigidLeq(tc, PrimitiveType.collectionTC))
+        mlsub.typing.Typing.testRigidLeq(tc, nice.tools.typing.PrimitiveType.collectionTC))
       {
         wrapAsCollection = true;
       }

@@ -181,7 +181,7 @@ public class TypeConstantExp extends ConstantExp
     this.type = new mlsub.typing.Polytype
       (type.getConstraint(),
        Monotype.sure(new mlsub.typing.MonotypeConstructor
-        (PrimitiveType.classTC, [type.getMonotype()])));
+        (nice.tools.typing.PrimitiveType.classTC, [type.getMonotype()])));
   }
 
   compile()

@@ -70,7 +70,7 @@ public class FunExp extends Expression implements Function
           */
           _inferredReturnType = mlsub.typing.Polytype.bottom();
         else
-          _inferredReturnType = PrimitiveType.voidPolytype;
+          _inferredReturnType = nice.tools.typing.PrimitiveType.voidPolytype;
       }
     else
       if (! alwaysReturns && 

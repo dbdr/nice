@@ -22,6 +22,7 @@ import gnu.bytecode.Method;
 import gnu.bytecode.Attribute;
 import gnu.bytecode.MiscAttr;
 import nice.tools.code.Gen;
+import nice.tools.typing.PrimitiveType;
 
 /**
    A user defined constructor, in a source program.

@@ -19,7 +19,7 @@ package nice.tools.typing;
  */
 
 import mlsub.typing.*;
-import bossa.syntax.PrimitiveType;
+
 
 public final class Types
 {

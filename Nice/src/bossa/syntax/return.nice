@@ -44,7 +44,7 @@ public class VoidReturnStmt extends Statement
 
   mlsub.typing.Polytype returnType()
   {
-    return PrimitiveType.voidPolytype;
+    return nice.tools.typing.PrimitiveType.voidPolytype;
   }
   
   generateCode()

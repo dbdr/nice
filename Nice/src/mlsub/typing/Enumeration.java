@@ -152,7 +152,7 @@ public class Enumeration
 	    Engine.Constraint c = (Engine.Constraint) cs.next();
 	    
 	    if (c.hasConstants() && 
-		c != bossa.syntax.PrimitiveType.nullTC.getKind())
+		c != nice.tools.typing.PrimitiveType.nullTC.getKind())
 	      {
 		if(linkDbg && Typing.dbg)
 		  Debug.println("Choosing kind " + c + " for " + tag);

@@ -62,7 +62,7 @@ public class ImportedAlternative extends Alternative
       Pattern p;
       while ((p = bossa.syntax.dispatch.readPattern(rep, at)) != null)
         {
-          if (p.getTC() == bossa.syntax.PrimitiveType.arrayTC)
+          if (p.getTC() == nice.tools.typing.PrimitiveType.arrayTC)
             /* Special treatment for arrays:
                they are compiled into Object,
                but we want a SpecialArray in the method bytecode type.

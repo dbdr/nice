@@ -16,6 +16,7 @@ import mlsub.typing.TypeConstructor;
 import mlsub.typing.MonotypeConstructor;
 import mlsub.typing.Polytype;
 import gnu.expr.QuoteExp;
+import nice.tools.typing.PrimitiveType;
 
 import bossa.util.*;
 

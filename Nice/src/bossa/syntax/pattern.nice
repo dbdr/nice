@@ -22,7 +22,7 @@ public Pattern createPattern(LocatedString name)
 public Pattern createPattern(LocatedString name, TypeIdent ti)
 {
   if (ti.toString().equals("Object"))
-    return new NotNullPattern(name, PrimitiveType.sureTC, name.location);
+    return new NotNullPattern(name, nice.tools.typing.PrimitiveType.sureTC, name.location);
 
   return new TypePattern(name, ti, null, name.location(), exactlyAt: false);
 }
@@ -36,7 +36,7 @@ public Pattern createPattern(?LocatedString name, ?mlsub.typing.TypeConstructor 
     tc = null;
 
   if (sure && tc == null)
-    return new NotNullPattern(name, PrimitiveType.sureTC, loc);
+    return new NotNullPattern(name, nice.tools.typing.PrimitiveType.sureTC, loc);
 
   if (tc == null)
     return new VariablePattern(name, loc);
@@ -47,7 +47,7 @@ public Pattern createPattern(?LocatedString name, ?mlsub.typing.TypeConstructor 
 public Pattern createPattern(TypeIdent ti, ?LocatedString name, boolean exactly, ?TypeIdent additional, ?mlsub.typing.TypeConstructor runtimeTC)
 {
   if (ti.toString().equals("Object"))
-    return new NotNullPattern(name, PrimitiveType.sureTC, ti.location);
+    return new NotNullPattern(name, nice.tools.typing.PrimitiveType.sureTC, ti.location);
 
   return new TypePattern(name, ti, additional, ti.location(), exactlyAt: exactly, runtimeTC: runtimeTC);
 }
@@ -66,10 +66,10 @@ public Pattern createPattern(ConstantExp value, ?TypeIdent additional)
     return new StringPattern(null, new TypeIdent(new LocatedString("java.lang.String", value.location())),
 				additional, value.location(), atValue: value);
 
-  if (value.tc == PrimitiveType.boolTC)
+  if (value.tc == nice.tools.typing.PrimitiveType.boolTC)
     return new BoolPattern(value.tc, additional, value.location(), atValue: value);
 
-  if (value.tc == PrimitiveType.charTC)
+  if (value.tc == nice.tools.typing.PrimitiveType.charTC)
     return new CharPattern(value.tc, additional, value.location(), atValue: value);
 
   return new IntPattern(value.tc, additional, value.location(), atValue: value);
@@ -124,7 +124,7 @@ public class TypePattern extends Pattern
       return new VariablePattern(name, this.location);
 
     // don't allow integer primitive types in @type and #type patterns
-    if (!equal && Typing.testRigidLeq(tc, PrimitiveType.longTC))
+    if (!equal && Typing.testRigidLeq(tc, nice.tools.typing.PrimitiveType.longTC))
       User.error(this.location, "A pattern cannot have a primitive type that is different from the declaration.");
 
     return this;
@@ -166,7 +166,7 @@ public class CharPattern extends ValuePattern
   setDomainTC(domaintc)
   {
     if (domaintc != null)
-      if ( Typing.testRigidLeq(domaintc, PrimitiveType.charTC))
+      if ( Typing.testRigidLeq(domaintc, nice.tools.typing.PrimitiveType.charTC))
         return;
     
     User.error(this.location, "Character value patterns are not allowed for methods where the declared parameter isn't a primitive type.");
@@ -179,14 +179,14 @@ public class IntPattern extends ValuePattern
   {
     if (domaintc != null)
       {
-	if (Typing.testRigidLeq(domaintc, PrimitiveType.intTC))
+	if (Typing.testRigidLeq(domaintc, nice.tools.typing.PrimitiveType.intTC))
 	  {
-	    tc = PrimitiveType.intTC;
+	    tc = nice.tools.typing.PrimitiveType.intTC;
 	    return;
           }
-        else if (Typing.testRigidLeq(domaintc, PrimitiveType.longTC))
+        else if (Typing.testRigidLeq(domaintc, nice.tools.typing.PrimitiveType.longTC))
 	  {
-	    tc = PrimitiveType.longTC;
+	    tc = nice.tools.typing.PrimitiveType.longTC;
 	    return;
           }
       }
@@ -252,8 +252,8 @@ public class EnumPattern extends ReferencePattern
 }
 
 matches(VariablePattern p, tag) = true;
-matches(NullPattern p, tag) = tag == PrimitiveType.nullTC;
-matches(NotNullPattern p, tag) = tag != PrimitiveType.nullTC;
+matches(NullPattern p, tag) = tag == nice.tools.typing.PrimitiveType.nullTC;
+matches(NotNullPattern p, tag) = tag != nice.tools.typing.PrimitiveType.nullTC;
 matches(TypePattern p, tag)
 {
   if (tag == null)
@@ -265,8 +265,8 @@ matches(TypePattern p, tag)
   return mlsub.typing.Typing.testRigidLeq(tag, p.tc);
 }
 matches(ValuePattern p, tag) = false;
-matches(BoolPattern p, tag) = tag == PrimitiveType.boolTC;
-matches(IntComparePattern p, tag) = tag != null && mlsub.typing.Typing.testRigidLeq(tag, PrimitiveType.longTC);
+matches(BoolPattern p, tag) = tag == nice.tools.typing.PrimitiveType.boolTC;
+matches(IntComparePattern p, tag) = tag != null && mlsub.typing.Typing.testRigidLeq(tag, nice.tools.typing.PrimitiveType.longTC);
 matches(EnumPattern p, tag) = (tag != null) && mlsub.typing.Typing.testRigidLeq(tag, p.tc);
 
 matchesValue(VariablePattern p, ConstantExp val) = true;
@@ -487,7 +487,7 @@ resolveGlobalConstants(IntComparePattern pattern)
 	  if (symbol.getValue() instanceof ConstantExp && !symbol.isAssignable())
 	    {
 	      ConstantExp val = cast(symbol.getValue());
-	      if (Typing.testRigidLeq(val.tc, PrimitiveType.longTC))
+	      if (Typing.testRigidLeq(val.tc, nice.tools.typing.PrimitiveType.longTC))
                 return createPattern(pattern.kind.prefix, pattern.name, val, null, pattern.location);
 	    }
 	}
@@ -523,7 +523,7 @@ resolveGlobalConstants(VariablePattern pattern)
 
       ConstantExp val = cast(symbol.getValue());
 
-      if (val.tc == PrimitiveType.floatTC)
+      if (val.tc == nice.tools.typing.PrimitiveType.floatTC)
 	return pattern;
 
       return createPattern(val);
@@ -597,7 +597,7 @@ public ?Pattern readPattern(String rep, int[]/*ref*/ pos)
   if (name.length() > 1)
     {
       if (name[0] == '\'')
-	return createPattern(new ConstantExp(PrimitiveType.charTC,
+	return createPattern(new ConstantExp(nice.tools.typing.PrimitiveType.charTC,
 		new Character(name[1]), name, loc));
 
       if (name[0] == '-')
@@ -625,7 +625,7 @@ public ?Pattern readPattern(String rep, int[]/*ref*/ pos)
     return createPattern(new LocatedString("_"));
 
   if (name.equals("NONNULL"))
-    return new NotNullPattern(null, PrimitiveType.sureTC, loc);
+    return new NotNullPattern(null, nice.tools.typing.PrimitiveType.sureTC, loc);
 
   if (name.equals("NULL"))
     return createPattern(createNullExp(loc));

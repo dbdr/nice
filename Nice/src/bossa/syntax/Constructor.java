@@ -17,6 +17,7 @@ import bossa.util.*;
 import bossa.util.Location;
 import mlsub.typing.Constraint;
 import mlsub.typing.Monotype;
+import nice.tools.typing.PrimitiveType;
 
 /**
    An object constructor.

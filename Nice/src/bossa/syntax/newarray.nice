@@ -48,7 +48,7 @@ public class NewArrayExp extends Expression
     if (zero)
       {
 	nullVars = fill(new TypeConstructor[unknownDimensions + 1], int i => 
-		new TypeConstructor("n" + i, notNull(PrimitiveType.maybeTC).variance, 
+		new TypeConstructor("n" + i, notNull(nice.tools.typing.PrimitiveType.maybeTC).variance, 
 		false, false));
       }
     else
@@ -113,7 +113,7 @@ public class NewArrayExp extends Expression
     for (int i = 0; i < unknownDimensions; i++)
       {
 	monotype = new mlsub.typing.MonotypeConstructor
-	  (PrimitiveType.arrayTC, [monotype]);
+	  (nice.tools.typing.PrimitiveType.arrayTC, [monotype]);
 	if (nullVars != null)
 	  monotype = mlsub.typing.MonotypeConstructor.apply(nullVars[i], monotype);
 	else
@@ -124,7 +124,7 @@ public class NewArrayExp extends Expression
     // Known dimensions are initialized: give a sure type.
     for (int i = 0; i < knownDimensions.length; i++)
       monotype = bossa.syntax.Monotype.sure
-	(mlsub.typing.MonotypeConstructor.apply(PrimitiveType.arrayTC, monotype));
+	(mlsub.typing.MonotypeConstructor.apply(nice.tools.typing.PrimitiveType.arrayTC, monotype));
     
     // set the Expression type
     type = new mlsub.typing.Polytype(cst, monotype);

@@ -14,6 +14,7 @@ package bossa.syntax;
 
 import bossa.util.*;
 import java.util.*;
+import nice.tools.typing.PrimitiveType;
 
 /**
    An abstract constraint atom. See children.

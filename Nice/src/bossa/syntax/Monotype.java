@@ -16,6 +16,7 @@ import java.util.*;
 import bossa.util.*;
 
 import mlsub.typing.MonotypeVar;
+import nice.tools.typing.PrimitiveType;
 
 /**
    Syntactic monomorphic type.

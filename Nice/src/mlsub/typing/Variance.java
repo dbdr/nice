@@ -231,10 +231,11 @@ public final class Variance
 	throw new InternalError("Incorrect sizes " + 
 				tp1.length + " and " + tp2.length);
     
-    if(tp1.length!=size)
-      throw new BadSizeEx(size,tp1.length);
-    if(tp2.length!=size)
-      throw new BadSizeEx(size,tp2.length);
+    if (tp1 == null || tp1.length != size)
+      throw new BadSizeEx(size, tp1 == null ? 0 : tp1.length);
+    if (tp2 == null || tp2.length != size)
+      throw new BadSizeEx(size, tp2 == null ? 0 : tp2.length);
+
     for(int i=0; i<size; i++)
       switch(signs[i]){
       case COVARIANT:

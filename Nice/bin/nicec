@@ -54,7 +54,7 @@ fi
 
 find_home()
 {
-PRG=`$0`
+PRG="$0"
 # Resolve symlinks.
 while [ -h "$PRG" ]; do
     lsResult=`$ls -ld "$PRG"`

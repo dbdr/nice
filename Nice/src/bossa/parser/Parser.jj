@@ -1985,11 +1985,12 @@ Expression PostfixExpression() :
 }
 
 Expression PrimaryExpression() :
-{ Expression res; }
+{ Expression res; Token first = getToken(1);}
 {
   res=PrimaryPrefix() 
     ( LOOKAHEAD(2) res=PrimarySuffix(res) )*
-  { return res; }
+  { res.setLocation(Location.make(first, getToken(0))); 
+    return res; }
 }
 
 Expression PrimaryPrefix() :

@@ -57,5 +57,5 @@ void f()
 
 /// FAIL
   /// Toplevel
-  int f() ensures ((/*/// FAIL HERE */ result = 0) == 0)
+  int f() ensures (/*/// FAIL HERE */(result = 0) == 0)
   = 1;

@@ -79,7 +79,7 @@ f() {}
 /// FAIL
   /// Toplevel
 class A {
-  int f() ensures ((/*/// FAIL HERE */ result = 0) == 0);
+  int f() ensures (/*/// FAIL HERE */(result = 0) == 0);
  
   f() = 1;
 }

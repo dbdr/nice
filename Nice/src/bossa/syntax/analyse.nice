@@ -442,10 +442,13 @@ Expression analyseIdent(IdentExp e, Info info, boolean assigned)
 	  }
 
 	if (sym.isFieldAccess() && Node.thisExp != null)
-	  return new CallExp
-	    (newOverloadedSymbolExp(symbols, e.ident),
-	     new Arguments([new Arguments.Argument(Node.thisExp)]));
-
+          {
+	    CallExp res = new CallExp
+	      (newOverloadedSymbolExp(symbols, e.ident),
+	      new Arguments([new Arguments.Argument(Node.thisExp)]));
+            res.setLocation(e.location());
+            return res;
+          }
 	return new SymbolExp(sym, e.location());
       }
     else

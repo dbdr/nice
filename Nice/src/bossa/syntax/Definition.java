@@ -12,15 +12,17 @@
 
 // File    : Definition.java
 // Created : Thu Jul 01 11:17:28 1999 by bonniot
-//$Modified: Mon Aug 30 15:42:52 1999 by bonniot $
-// Description : Abstract definition
-//   May be a class definition, a method definition, 
-//   an interface definition...
+//$Modified: Fri Sep 03 11:37:33 1999 by bonniot $
 
 package bossa.syntax;
 
 import java.util.Collection;
 
+/**
+ * Abstract definition
+ * May be a class definition, a method definition, 
+ * an interface definition...
+ */
 public interface Definition
 {
   /**
@@ -30,4 +32,8 @@ public interface Definition
    * with the definition of class #A (#A<:A, #A is final, abstracts Top without implementing it).
    */
   Collection associatedDefinitions();
+  // If we turn Definition to an abstract class,
+  // it would be good to have a default implementation
+  // that returns null, it would save lines
+  // since only ClassDefinition has a different implementation.
 }

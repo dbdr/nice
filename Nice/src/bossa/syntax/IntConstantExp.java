@@ -12,13 +12,15 @@
 
 // File    : IntConstantExp.java
 // Created : Mon Jul 05 17:30:56 1999 by bonniot
-//$Modified: Tue Jul 13 11:46:50 1999 by bonniot $
-// Description : An integer constant
+//$Modified: Thu Sep 02 14:58:42 1999 by bonniot $
 
 package bossa.syntax;
 
 import bossa.util.*;
 
+/**
+ * An integer constant
+ */
 public class IntConstantExp extends ConstantExp
 {
   public IntConstantExp(int value)

@@ -12,7 +12,7 @@
 
 // File    : NewExp.java
 // Created : Thu Jul 08 17:15:15 1999 by bonniot
-//$Modified: Tue Aug 24 17:00:45 1999 by bonniot $
+//$Modified: Wed Sep 08 15:48:38 1999 by bonniot $
 // Description : Allocation of a new object
 
 package bossa.syntax;
@@ -30,7 +30,7 @@ public class NewExp extends Expression
   {
     monotype=monotype.resolve(typeScope);
     User.error(!monotype.isImperative(),
-  	       this,"Type parameters in \"New\" expressions must be imperative");
+  	       this,"Type parameters in \"new\" expressions must be imperative");
   }
   
   void computeType()

@@ -12,7 +12,7 @@
 
 // File    : Node.java
 // Created : Thu Jul 08 10:24:56 1999 by bonniot
-//$Modified: Mon Aug 30 17:57:15 1999 by bonniot $
+//$Modified: Wed Sep 08 16:53:48 1999 by bonniot $
 
 package bossa.syntax;
 
@@ -54,6 +54,20 @@ abstract class Node
     children.add(n);
   }
   
+  void removeChild(Node n)
+  {
+    Internal.error(!children.contains(n),"Not a child");
+    children.remove(n);
+  }
+  
+  void removeChildren(List c)
+  {
+    if(c==null) return;
+    for(Iterator i=c.iterator();
+	i.hasNext();)
+      removeChild((Node) i.next());
+  }
+
   /**
    * Always returns the argument (except an empty list for 'null').
    * This is just a convenience to be able to write 'this.f=addChildren(f)'.
@@ -176,10 +190,19 @@ abstract class Node
 	if(d!=null)
 	  current=((Node)d).buildScope(current.scope,current.typeScope);
       }
-
     return res;
   }
   
+  VarScope getScope()
+  {
+    return scope;
+  }
+
+  TypeScope getTypeScope()
+  {
+    return typeScope;
+  }
+
   /****************************************************************
    * Scoping resolution
    ****************************************************************/
@@ -195,16 +218,6 @@ abstract class Node
     Iterator i=children.iterator();
     while(i.hasNext())
       ((Node)i.next()).doResolve();
-  }
-
-  VarScope getScope()
-  {
-    return scope;
-  }
-
-  TypeScope getTypeScope()
-  {
-    return typeScope;
   }
 
   /****************************************************************

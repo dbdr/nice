@@ -12,8 +12,7 @@
 
 // File    : MethodBodyDefinition.java
 // Created : Thu Jul 01 18:12:46 1999 by bonniot
-//$Modified: Mon Aug 30 15:44:51 1999 by bonniot $
-// Description : Abstract syntax for a method body
+//$Modified: Fri Sep 10 19:07:25 1999 by bonniot $
 
 package bossa.syntax;
 
@@ -21,6 +20,9 @@ import java.util.*;
 import bossa.util.*;
 import bossa.typing.*;
 
+/**
+ * Definition of an alternative for a method.
+ */
 public class MethodBodyDefinition extends Node 
   implements Definition, Located
 {
@@ -82,18 +84,77 @@ public class MethodBodyDefinition extends Node
 		   ", it cannot have a main pattern");
 	formals.remove(0);
       }
-
+    
     parameters=buildSymbols(this.formals,definition.type.domain());
     addSymbols(parameters);
   }
 
-  Scopes buildScope(VarScope outer, TypeScope typeOuter)
+  /**
+   * Returns the symbol of the method this declaration belongs to
+   */
+  private VarSymbol findSymbol(VarScope scope)
   {
-    setDefinition((MethodDefinition)outer.lookupLast(name));
+    VarSymbol res;
+    if(!(scope.overloaded(name)))
+      return scope.lookupOne(name);
 
-    //addTypeSymbols(definition.type.getTypeParameters());
-    //addTypeSymbols(definition.type.getConstraint().binders);
+    Collection symbols=scope.lookup(name);
+    if(symbols.size()==0) return null;
     
+    // TODO
+    for(Iterator i=symbols.iterator();i.hasNext();){
+      VarSymbol s=(VarSymbol)i.next();
+      if(!(s instanceof MethodDefinition))
+	i.remove();
+      else
+	{
+	  MethodDefinition m=(MethodDefinition)s;
+	  try{
+	    Typing.enter();
+	    Typing.implies();
+	    Typing.in(Pattern.getPolytype(formals),
+		      Domain.fromMonotypes(m.getType().domain()));
+	    Typing.leave();
+	  }
+	  catch(TypingEx e){
+	    i.remove();
+	  }
+	  catch(BadSizeEx e){
+	    i.remove();
+	  }
+	}
+    }
+    if(symbols.size()==1) return (VarSymbol)symbols.iterator().next();
+    User.error(symbols.size()==0,this,
+	       "No definition of \""+name+"\" is compatible with the patterns");
+    User.error(this,"There is an ambiguity about which version of the overloaded method \""+
+	       name+"\" this alternative belongs to.\n"+
+	       "Try to use more patterns.");
+    return null;
+  }
+  
+  Scopes buildScope(VarScope outer, TypeScope typeOuter)
+  // The scoping is delayed to enable overloading
+  {
+    this.scope=outer;
+    this.typeScope=typeOuter;
+    return new Scopes(outer,typeOuter);
+  }
+
+  void doResolve()
+  // Resolution is delayed to enable overloading
+  {
+  }
+  
+  void lateBuildScope(VarScope outer, TypeScope typeOuter)
+  {
+    Pattern.resolve(typeScope,formals);
+    VarSymbol s=findSymbol(outer);
+
+    User.error(s==null,this,name+" is not defined");
+    User.error(!(s instanceof MethodDefinition),this,name+" is not a method");
+    setDefinition((MethodDefinition)s);
+
     // Get imperative type parameters
     if(typeParameters.size()>0)
       try{
@@ -120,12 +181,7 @@ public class MethodBodyDefinition extends Node
 
     Scopes res=super.buildScope(outer,typeOuter);
 
-    return res;
-  }
-
-  void resolve()
-  {
-    Pattern.resolve(typeScope,formals);
+    //return res;
   }
 
   /****************************************************************
@@ -134,6 +190,9 @@ public class MethodBodyDefinition extends Node
 
   void typecheck()
   {
+    lateBuildScope(this.scope,this.typeScope);
+    super.doResolve();
+    
     Typing.enter(definition.type.getTypeParameters(),
 		 "method body of "+name);
 
@@ -180,7 +239,7 @@ public class MethodBodyDefinition extends Node
       Typing.leave();
     }
     catch(TypingEx e){
-      User.error(this,"Return type is not correct :"+e);
+      User.error(this,"Return type is not correct"," :"+e);
     }
   }
   

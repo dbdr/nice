@@ -12,7 +12,7 @@
 
 // File    : Typing.java
 // Created : Tue Jul 20 11:57:17 1999 by bonniot
-//$Modified: Mon Aug 30 17:55:52 1999 by bonniot $
+//$Modified: Wed Sep 08 16:55:05 1999 by bonniot $
 
 package bossa.typing;
 
@@ -102,6 +102,7 @@ abstract public class Typing
   public static void leave()
     throws TypingEx
   {
+    if(dbg) Debug.println("LEAVE");
     try{
       Engine.leave();
     }
@@ -114,6 +115,7 @@ abstract public class Typing
   public static void implies()
     throws TypingEx
   {
+    if(dbg) Debug.println("IMPLIES");
     try{
       Engine.implies();
     }
@@ -206,20 +208,18 @@ abstract public class Typing
     
     t2.getConstraint().assert();
 
-    if(dbg) Debug.println("IMPLIES");
     implies();
     
     t1.getConstraint().assert();
     leq(t1.getMonotype(),t2.getMonotype());
 
-    if(dbg) Debug.println("LEAVE");
     leave();
   }
 
   public static void leq(PolytypeConstructor t1, PolytypeConstructor t2) 
     throws TypingEx
   {
-    if(dbg) Debug.println(t1+" <: "+t2);
+    if(dbg) Debug.println("PolytypeConstructor leq : "+t1+" <: "+t2);
     Collection tp1=t1.getTypeParameters();
     Collection tp2=t2.getTypeParameters();
     
@@ -238,6 +238,7 @@ abstract public class Typing
   public static void leq(Monotype m1, Monotype m2)
     throws TypingEx
   {
+    if(dbg) Debug.println("Monotype leq :"+m1+" <: "+m2);
     try{
       Engine.leq(m1,m2);
     }
@@ -265,6 +266,21 @@ abstract public class Typing
    * Domains 
    ****************************************************************/
 
+  public static void in(Type type, Domain domain)
+    throws TypingEx
+  {
+    if(type instanceof Polytype)
+      in((Polytype)type,domain);
+    else if(type instanceof PolytypeConstructor)
+      {
+	PolytypeConstructor ptc=(PolytypeConstructor)type;
+	introduce(ptc.getTypeParameters());
+	in(ptc.polytype,domain);
+      }
+    else
+      Internal.error("Unknown kind of Type");
+  }
+      
   public static void in(Polytype type, Domain domain)
     throws TypingEx
   {
@@ -297,7 +313,7 @@ abstract public class Typing
     Iterator t=types.iterator();
     Iterator d=domains.iterator();
     while(t.hasNext())
-      in((Polytype)t.next(),(Domain)d.next());
+      in((Type)t.next(),(Domain)d.next());
   }
 
   /****************************************************************
@@ -384,5 +400,5 @@ abstract public class Typing
     return i.imp(t.getId());
   }
 
-  static final boolean dbg = true;
+  public static final boolean dbg = false;
 }

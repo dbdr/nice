@@ -10,47 +10,29 @@
 /*                                                                        */
 /**************************************************************************/
 
-// File    : AST.java
-// Created : Thu Jul 01 11:01:56 1999 by bonniot
-//$Modified: Wed Sep 08 14:59:14 1999 by bonniot $
+// File    : StringConstantExp.java
+// Created : Thu Sep 02 14:49:48 1999 by bonniot
+//$Modified: Thu Sep 02 14:58:21 1999 by bonniot $
 
 package bossa.syntax;
 
-import java.util.*;
 import bossa.util.*;
 
 /**
- * The Abstract Syntax Tree :
- * A collection of definitions
- *
- * @see Definition
+ * A String constant
  */
-public class AST extends Node
+public class StringConstantExp extends ConstantExp
 {
-  public AST(List defs)
+  public StringConstantExp(String value)
   {
-    super(defs,Node.global);
-    
-    this.definitions=defs;
-    
-    Debug.println("Scoping (build  )");
-    buildScope();
-
-    Debug.println("Scoping (resolve)");
-    doResolve();
-
-    Debug.println("Typechecking");
-    // Necessary because toplevel assertions can be unsatisfiable
-    // in which case we should be able to backtrack
-    bossa.typing.Typing.enter();
-    doTypecheck();
+    className="String";
+    this.value=value;
   }
 
   public String toString()
   {
-    return Util.map(definitions);
+    return "\""+value+"\"";
   }
 
-  private List /* of Definition */ definitions;
+  protected String value;
 }
-

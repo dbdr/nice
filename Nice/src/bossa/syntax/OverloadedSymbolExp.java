@@ -12,7 +12,7 @@
 
 // File    : OverloadedSymbolExp.java
 // Created : Thu Jul 08 12:20:59 1999 by bonniot
-//$Modified: Tue Aug 24 18:10:57 1999 by bonniot $
+//$Modified: Fri Sep 03 15:23:22 1999 by bonniot $
 
 package bossa.syntax;
 
@@ -20,7 +20,7 @@ import java.util.*;
 import bossa.util.*;
 
 /**
- * A symbol, for which overloading resolution has yet to be done
+ * A symbol, for which overloading resolution has yet to be done.
  */
 public class OverloadedSymbolExp extends Expression
 {
@@ -47,9 +47,13 @@ public class OverloadedSymbolExp extends Expression
     while(i.hasNext())
       {
 	VarSymbol s=(VarSymbol)i.next();
-	if(s instanceof MethodDefinition)
-	  if(((MethodDefinition)s).getArity()!=parameters.size())
-	    { i.remove(); continue; }
+	if(!(s instanceof MethodDefinition))
+	  {
+	    i.remove();
+	    continue;
+	  }
+	if(((MethodDefinition)s).getArity()!=parameters.size())
+	  { i.remove(); continue; }
 	Type t=s.getType();
 	if(typeParameters==null)
 	  if(t instanceof PolytypeConstructor)
@@ -69,10 +73,8 @@ public class OverloadedSymbolExp extends Expression
 	i=symbols.iterator();
 	while(i.hasNext())
 	  {
-	    if(CallExp.getType(location(),
-			       InstantiateExp.create(new SymbolExp((VarSymbol)i.next(),location()),typeParameters),
-			       parameters,
-			       false)==null)
+	    if(!CallExp.wellTyped(InstantiateExp.create(new SymbolExp((VarSymbol)i.next(),location()),typeParameters),
+				 parameters))
 	      i.remove();
 	  }
       }
@@ -83,9 +85,8 @@ public class OverloadedSymbolExp extends Expression
     User.error(symbols.size()==0,this,
 	       "No alternative matches the parameters while resolving overloading for "+ident);
     //There is ambiguity
-    System.out.println("Ambiguity for symbol "+ident+". Possibilities are :");
-    System.out.println(Util.map("","","",symbols));
-    User.error("");
+    User.error(this,"Ambiguity for symbol "+ident+". Possibilities are :\n"+
+	       Util.map("","","",symbols));
     return null;
   }
   

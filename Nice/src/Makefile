@@ -58,3 +58,7 @@ doc:
 tags:
 	cd ${TOP}
 	jtags
+
+jar:
+	cd ${TOP}/../../classes;\
+	jar cf ../Bossa.jar bossa/

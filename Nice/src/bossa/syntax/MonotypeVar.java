@@ -12,7 +12,7 @@
 
 // File    : MonotypeVar.java
 // Created : Fri Jul 23 15:36:39 1999 by bonniot
-//$Modified: Wed Aug 25 18:27:30 1999 by bonniot $
+//$Modified: Wed Sep 08 16:59:49 1999 by bonniot $
 
 package bossa.syntax;
 
@@ -104,10 +104,10 @@ public class MonotypeVar extends Monotype
     Internal.error(equivalentCodomain!=null,"equivalentCodomain!=null in MonotypeVar");
     
     equivalentCodomain=Monotype.fresh(new LocatedString(name.content+"0",name.location()));
-    bossa.typing.Typing.introduce(equivalentCodomain);
+    Typing.introduce(equivalentCodomain);
     
     equivalentDomain=Monotype.freshs(arity,name);
-    bossa.typing.Typing.introduce(equivalentDomain);
+    Typing.introduce(equivalentDomain);
   }
   
   public TypeConstructor getTC()
@@ -130,7 +130,7 @@ public class MonotypeVar extends Monotype
       return this;
     
     TypeSymbol s=ts.lookup(this.name);
-    User.error(s==null,this,this.name+" is not defined in "+ts);
+    User.error(s==null,this,this.name+" is not defined"," in "+ts);
 
     if(s instanceof Monotype)
       return (Monotype) s;
@@ -208,6 +208,7 @@ public class MonotypeVar extends Monotype
 	equivalentCodomain=null;
 	equivalentDomain=null;
 	id=-1;
+	willImplementTop=false;
       }
     else
       {
@@ -219,9 +220,22 @@ public class MonotypeVar extends Monotype
 	    Variance v=(Variance) value;
 	
 	    equivalentTC=new TypeConstructor(this,v);
-	    bossa.typing.Typing.introduce(equivalentTC);
+	    Typing.introduce(equivalentTC);
 	    equivalentTP=new TypeParameters(this.name,v);
-	    bossa.typing.Typing.introduce(equivalentTP.content);
+	    Typing.introduce(equivalentTP.content);
+	    if(willImplementTop){
+	      try{
+		Typing.assertImp
+		  (equivalentTC,InterfaceDefinition.top(v.size));
+	      }
+	      catch(TypingEx e){
+		Internal.error(this,
+			       "This variable couln't implement top");
+	      }
+	      finally{
+		willImplementTop=false;
+	      }
+	    }
 	  }
 	// in other cases (kind of the rigid monotype variables)
 	// nothing to do
@@ -243,4 +257,27 @@ public class MonotypeVar extends Monotype
   private boolean soft;
 
   private boolean imperative;
+
+  /****************************************************************
+   * The Top interface
+   ****************************************************************/
+
+  /**
+   * Marks that as soon as this variable is deconstructed
+   * (so its variance is known)
+   * we will have to assert that the corresponding type constructor
+   * implements the correct Top<n> interface
+   */
+  private boolean willImplementTop=false;
+
+  /**
+   * Marks that as soon as this variable is deconstructed
+   * (so its variance is known)
+   * we will have to assert that the corresponding type constructor
+   * implements the correct Top<n> interface
+   */
+  void rememberToImplementTop()
+  {
+    willImplementTop=true;
+  }
 }

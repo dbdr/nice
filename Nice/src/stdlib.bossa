@@ -12,7 +12,7 @@
 
 // File    : stdlib.bossa
 // Created : Thu Jul 08 16:20:19 1999 by bonniot
-//$Modified: Mon Aug 30 17:58:24 1999 by bonniot $
+//$Modified: Fri Sep 10 18:27:18 1999 by bonniot $
 // Description : Prolog file, included before all bossa file
 
 variable {Any T} T null;
@@ -32,6 +32,9 @@ not(b@True)  { return false; }
 not(b@False) { return true;  }
 
 // builtin control structures
+// "if(cond) t else e endif" 
+// is rewritten *by the parser* into asbtract syntax for 
+// "_if(cond,fun()=>{return t;},fun()=>{return e;})"
 T _if { Any T } (Boolean,fun()(T),fun()(T));
 
 _if(cond@True,t,e)
@@ -44,7 +47,7 @@ _if(cond@False,t,e)
   return e();
 }
 
-void _while(fun()(Boolean),fun()(void));
+void _while(fun()(Boolean),fun()());
 _while(test,body)
 {
   if(not(test()))
@@ -53,7 +56,7 @@ _while(test,body)
   _while(test,body);
 }
 
-// Copy
+// Clone
 interface Cloneable;
 
 T clone{Cloneable T}(T);
@@ -61,44 +64,48 @@ T clone{Cloneable T}(T);
 //Comparable
 interface Comparable;
 
-//Boolean equals{Comparable T}(T,T);
-
-//Boolean equal{Any T,Any T'|T':Comparable<T>}(T,T');
+Boolean equals{Comparable T}(T,T);
 
 // Numeric
 interface Num extends Cloneable,Comparable;
+T plus {Num T} (T,T);
+
+interface Ordinal;
+T succ {Ordinal T} (T);
 
 class Float implements Num {}
-class Integer extends Float abstracts Num {}
+class Integer extends Float 
+  abstracts Num 
+  abstracts Ordinal 
+{}
 
-T plus{Num T}(T,T);
 plus(x@Integer,y@Integer)
 { return new Integer(); }
 
 plus(x@#Float,y@#Float)
-{ return new Float(); }
+{ return new Integer(); }
 
-Integer succ(Integer);
-succ(x)
+succ(x@Integer)
 {
   return plus(x,1);
 }
 
 Boolean lt(Integer, Integer);
-Boolean equal(Integer,Integer);
 
 clone(x@Float)
 {
   return x;
 }
 
-class String{}
+class String implements Comparable {}
 
-// Array
+String concat(String,String);
+
+// Builtin class Array
 class Array<T>{}
 
 T 
-get<T>(Array<T>,Integer);
+get<T>(Array<T>, Integer);
 
 void 
 set<T>(Array<T>, Integer, T);

@@ -12,8 +12,7 @@
 
 // File    : ClassDefinition.java
 // Created : Thu Jul 01 11:25:14 1999 by bonniot
-//$Modified: Mon Aug 30 17:03:57 1999 by bonniot $
-// Description : Abstract syntax for a class definition
+//$Modified: Fri Sep 03 11:35:23 1999 by bonniot $
 
 package bossa.syntax;
 
@@ -21,6 +20,9 @@ import java.util.*;
 import bossa.util.*;
 import bossa.typing.*;
 
+/**
+ * Abstract syntax for a class definition.
+ */
 public class ClassDefinition extends Node
   implements Definition
 {

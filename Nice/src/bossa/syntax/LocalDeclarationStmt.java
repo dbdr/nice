@@ -12,7 +12,7 @@
 
 // File    : LocalDeclarationStmt.java
 // Created : Tue Jul 06 12:06:20 1999 by bonniot
-//$Modified: Mon Aug 30 15:49:23 1999 by bonniot $
+//$Modified: Fri Sep 03 15:36:18 1999 by bonniot $
 
 package bossa.syntax;
 
@@ -54,7 +54,9 @@ public class LocalDeclarationStmt extends Statement
       Typing.leq(value.getType(),left.getType());
     }
     catch(TypingEx e){
-      User.error(this,"Typing error : "+left+" cannot be assigned value "+value+" : "+e);
+      User.error(this,"Typing error : "+left+" cannot be assigned value "+value+
+		 " of type "+value.getType()+" : \n"+
+		 e);
     }
   }
 

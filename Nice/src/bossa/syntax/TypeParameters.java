@@ -12,7 +12,7 @@
 
 // File    : TypeParameters.java
 // Created : Mon Jul 12 17:51:12 1999 by bonniot
-//$Modified: Fri Aug 27 17:31:15 1999 by bonniot $
+//$Modified: Wed Sep 08 15:26:47 1999 by bonniot $
 
 package bossa.syntax;
 
@@ -40,6 +40,7 @@ public class TypeParameters
 
   TypeParameters(LocatedString s, Variance v)
   {
+    Internal.error(v==null,s,s+" has no variance");
     this.content=Monotype.freshs(v.size,s);
   }
   
@@ -78,5 +79,5 @@ public class TypeParameters
     return content.iterator();
   }
   
-  Collection /* of Monotype */ content;
+  public Collection /* of Monotype */ content;
 }

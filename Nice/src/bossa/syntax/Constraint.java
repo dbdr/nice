@@ -12,7 +12,7 @@
 
 // File    : Constraint.java
 // Created : Fri Jul 02 17:51:35 1999 by bonniot
-//$Modified: Fri Aug 27 17:29:52 1999 by bonniot $
+//$Modified: Wed Sep 08 12:32:57 1999 by bonniot $
 
 package bossa.syntax;
 
@@ -71,9 +71,14 @@ public class Constraint extends Node
     return new Constraint(new ArrayList(0),new ArrayList(0));
   }
 
-  Constraint shallowClone()
+  /**
+   * Returns a new constraint.
+   * The lists are new, but the list elements are the same.
+   */
+  private Constraint shallowClone()
   {
-    return new Constraint((List)((ArrayList)binders).clone(),(List)((ArrayList)atomics).clone());
+    return new Constraint((List)((ArrayList)binders).clone(),
+			  (List)((ArrayList)atomics).clone());
   }
 
   public static Constraint and(Constraint c1, Constraint c2)
@@ -107,14 +112,14 @@ public class Constraint extends Node
   {
     atomics=AtomicConstraint.resolve(typeScope,atomics);
   }
-  
+
   Constraint substitute(Map map)
   {
-    //TODO:check binders do not conflict with keys in map,
-    // or is it done before ?
-    return new Constraint(binders,AtomicConstraint.substitute(map,atomics));
+    // Substitution is not done on binders.
+    // This is intended for imperative type parameters substitution only.
+    return new Constraint(binders, AtomicConstraint.substitute(map,atomics));
   }
-
+  
   /****************************************************************
    * Typechecking
    ****************************************************************/
@@ -123,6 +128,22 @@ public class Constraint extends Node
     throws bossa.typing.TypingEx
   {
     bossa.typing.Typing.introduce(binders);
+    // All user defined variables implicitely implement Top
+    for(Iterator i=binders.iterator();i.hasNext();)
+      {
+	TypeSymbol s=(TypeSymbol)i.next();
+	if(s instanceof TypeConstructor)
+	  {
+	    TypeConstructor t=(TypeConstructor)s;
+	    if(t.variance!=null)
+	      bossa.typing.Typing.assertImp
+		(t,InterfaceDefinition.top(t.variance.size));
+	    else
+	      Internal.warning(t+" has no known variance, so I can't assert it implement some Top<n> interface");
+	  }
+	else if(s instanceof MonotypeVar)
+	  ((MonotypeVar)s).rememberToImplementTop();
+      }
     AtomicConstraint.assert(atomics);
   }
 

@@ -12,7 +12,7 @@
 
 // File    : Polytype.java
 // Created : Tue Jul 13 12:51:38 1999 by bonniot
-//$Modified: Thu Aug 26 10:29:44 1999 by bonniot $
+//$Modified: Thu Sep 02 17:16:36 1999 by bonniot $
 
 package bossa.syntax;
 

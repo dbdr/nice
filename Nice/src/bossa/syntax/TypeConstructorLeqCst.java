@@ -12,7 +12,7 @@
 
 // File    : TypeConstructorLeqCst.java
 // Created : Sat Jul 24 12:02:15 1999 by bonniot
-//$Modified: Mon Aug 30 14:07:11 1999 by bonniot $
+//$Modified: Wed Sep 08 12:44:14 1999 by bonniot $
 
 package bossa.syntax;
 
@@ -34,9 +34,10 @@ public class TypeConstructorLeqCst extends AtomicConstraint
 
   AtomicConstraint substitute(java.util.Map m)
   {
-    t1=t1.substitute(m);
-    t2=t2.substitute(m);
-    return this;
+    TypeConstructorLeqCst res=new TypeConstructorLeqCst
+      (t1.substitute(m),t2.substitute(m));
+    identifiesVariances(res.t1,res.t2);
+    return res;
   }
 
   AtomicConstraint resolve(TypeScope ts)
@@ -51,9 +52,20 @@ public class TypeConstructorLeqCst extends AtomicConstraint
       t2=(TypeConstructor)s;
     else
       Internal.error(t2+" resolved to a "+s.getClass());
+
+    identifiesVariances(t1,t2);
     return this;
   }
 
+  private static void identifiesVariances(TypeConstructor t1, TypeConstructor t2)
+  {
+    // t1 and t2 must have the same variance
+    if(t1.variance==null && t2.variance!=null)
+      t1.setVariance(t2.variance);
+    else if(t2.variance==null && t1.variance!=null)
+      t2.setVariance(t1.variance);
+  }
+  
   /****************************************************************
    * Typechecking
    ****************************************************************/

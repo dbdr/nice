@@ -12,7 +12,7 @@
 
 // File    : Pattern.java
 // Created : Mon Jul 05 14:36:52 1999 by bonniot
-//$Modified: Fri Aug 13 16:14:08 1999 by bonniot $
+//$Modified: Fri Sep 03 14:58:53 1999 by bonniot $
 // Description : Syntactic pattern for method bodies declaration
 
 package bossa.syntax;
@@ -47,6 +47,41 @@ public class Pattern
 					      typeConstructor.location()));
   }
   
+  Polytype getPolytype()
+  {
+    if(typeConstructor==null)
+      return Polytype.bottom();
+    
+    TypeParameters tp=new TypeParameters
+      (typeConstructor.name,typeConstructor.variance);
+    bossa.typing.Typing.introduce(tp.content);
+    
+    return new Polytype(Constraint.True(), 
+			new MonotypeConstructor(typeConstructor,
+						tp,
+						typeConstructor.location()));
+  }
+  
+  /**
+   * Iterates getPolytype on a collection of Pattern.
+   */
+  static Collection getPolytype(Collection patterns)
+  {
+    Iterator i=patterns.iterator();
+    Collection res=new ArrayList(patterns.size());
+
+    while(i.hasNext())
+      {
+	Pattern p=(Pattern)i.next();
+	if(!p.thisAtNothing())
+	  res.add(p.getPolytype());
+      }
+    return res;
+  }
+  
+  /**
+   * Iterates getDomain on a collection of Pattern.
+   */
   static Collection getDomain(Collection patterns)
   {
     Iterator i=patterns.iterator();

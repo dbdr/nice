@@ -12,7 +12,7 @@
 
 // File    : Engine.java
 // Created : Tue Jul 27 15:34:53 1999 by bonniot
-//$Modified: Mon Aug 30 17:54:49 1999 by bonniot $
+//$Modified: Wed Sep 08 16:56:03 1999 by bonniot $
 
 package bossa.engine;
 
@@ -146,7 +146,7 @@ public abstract class Engine
 		Debug.println("Bad kinding discovered by Engine : "+
 			      k1+" != "+k2+
 			      " for elements "+e1+" and "+e2);
-	      throw new LowlevelUnsatisfiable("Bad Kinding");
+	      throw new LowlevelUnsatisfiable("Bad Kinding for "+e1+ " and "+e2);
 	    }
 	}
       else
@@ -193,7 +193,10 @@ public abstract class Engine
     if(e.getKind()!=null)
       e.getKind().register(e);
     else
-      floating.add(e);
+      {
+	e.setId(-2);
+	floating.add(e);
+      }
   }
   
   public static boolean isRigid(Element e)
@@ -242,8 +245,9 @@ public abstract class Engine
 	  if(e.getKind()==k)
 	    continue;
 	  else
-	    Internal.error("Bad kinding in setKind for "+e);
+	    throw new LowlevelUnsatisfiable("Bad Kinding for "+e);
 	
+	// e.getKind()==null
 	e.setKind(k);
 	k.register(e);
 	
@@ -460,7 +464,8 @@ public abstract class Engine
 	      else
 		toCheck=true;
 	  }
-      // We can get rid of a ->_i b if b ->_i b
+      // Optimization (the less we produce arrows, the better) :
+      // We can get rid of  a ->_i b  if  b ->_i b
       if(res==-1 || res!=node && i.abs(res))
         return -1;
       if(toCheck)
@@ -557,5 +562,5 @@ public abstract class Engine
     // This is used in TypeConstructor.setKind
   }
 
-  static final boolean dbg = true;
+  static final boolean dbg = false;
 }

@@ -12,7 +12,7 @@
 
 // File    : parser.jj
 // Created : Thu Jul 01 10:27:05 1999 by bonniot
-//$Modified: Mon Aug 30 16:20:31 1999 by bonniot $
+//$Modified: Fri Sep 10 18:30:14 1999 by bonniot $
 // Description : Parseur JavaCC pour Bossa
 //   Tokens based on the Jazz parser
 
@@ -354,13 +354,22 @@ TOKEN:
 /*                          Grammar                                    */
 /***********************************************************************/
 
-LocatedString string():
+String rawString():
 {
-    Token t;
+  Token t;
 }
 {
-    t=<IDENT> 
-    { return new LocatedString(t.image,new Location(t)); }
+  t=<LSTRING>
+  { return t.image.substring(1, t.image.length() - 1); }
+}
+
+LocatedString string():
+{
+  Token t;
+}
+{
+  t=<IDENT> 
+  { return new LocatedString(t.image,new Location(t)); }
 }
 
 Collection strings():
@@ -611,12 +620,18 @@ Monotype monotypeConstructor():
 
 FunType funmonotype():
 {
-    Monotype codom;
+    Monotype codom=null;
     Collection dom=null;
     Constraint cst;
+    Token t;
 }
 {
-    "fun" "(" [ dom=monotypes() ] ")" "(" codom=monotype() ")"
+    "fun" "(" [ dom=monotypes() ] ")" 
+    t="(" [ codom=monotype() ] ")"
+    { if(codom==null) codom=
+      new MonotypeConstructor
+      (new TypeConstructor(new LocatedString("void",new Location(t))),
+       new TypeParameters(null),new Location(t)); }
     { return new FunType(dom,codom); }
 }
 
@@ -927,6 +942,15 @@ FloatConstantExp floatConstantExp():
   { return new FloatConstantExp(d); }
 }
 
+StringConstantExp stringConstantExp():
+{
+  String s;
+}
+{
+  s=rawString()
+  { return new StringConstantExp(s); }
+}
+
 ConstantExp constantExp():
 {
   ConstantExp res;
@@ -935,6 +959,7 @@ ConstantExp constantExp():
   (
   res=intConstantExp() 
 | res=floatConstantExp()
+| res=stringConstantExp()
   )
 { return res; }
 }
@@ -1066,7 +1091,7 @@ Expression expression():
   res=expression1() 
     [ 
      t="==" e=expression() 
-     { res=CallExp.create(symb("equal",t),res,e); }
+     { res=CallExp.create(symb("equals",t),res,e); }
     |
      t="[" e=expression() "]"
      { res=CallExp.create(symb("get",t),res,e); }

@@ -12,14 +12,16 @@
 
 // File    : SymbolExpr.java
 // Created : Thu Jul 08 12:20:59 1999 by bonniot
-//$Modified: Thu Aug 26 10:36:19 1999 by bonniot $
-// Description : Access to the value of a symbol
+//$Modified: Wed Sep 08 16:45:42 1999 by bonniot $
 
 package bossa.syntax;
 
 import java.util.*;
 import bossa.util.*;
 
+/**
+ * Access to a symbol
+ */
 public class SymbolExp extends Expression
 {
   SymbolExp(VarSymbol s)
@@ -49,7 +51,7 @@ public class SymbolExp extends Expression
   {
     // Very important: each SymbolExp gets a copy of the type of the symbol.
     // Thus it has fresh binders.
-    // Otherwise there is an "aliasing" effect.
+    // Otherwise there would be an "aliasing" effect.
     // An important supposition is that two uses of a symbol
     // are two different SymbolExp objects (with a reference to the same symbol).
     // So they hold different (but equivalent) types.
@@ -58,9 +60,7 @@ public class SymbolExp extends Expression
 
   public String toString()
   {
-    return 
-      symbol.name.toString()
-      ;
+    return symbol.name.toString();
   }
 
   VarSymbol symbol;

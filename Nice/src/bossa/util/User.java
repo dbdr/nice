@@ -12,17 +12,32 @@
 
 // File    : User.java
 // Created : Wed Jul 07 18:20:58 1999 by bonniot
-//$Modified: Thu Aug 26 10:49:04 1999 by bonniot $
-// Description : Messages for the user
+//$Modified: Fri Sep 10 19:07:03 1999 by bonniot $
 
 package bossa.util;
 
+/**
+ * Messages for the user.
+ */
 public class User
 {
-  public static void error(boolean condition, Located responsible, String message)
+  public static void error(boolean condition, Located responsible, String message, String dbgMsg)
   {
     if(condition)
-      error(responsible,message);
+      error(responsible,message,dbgMsg);
+  }
+
+  public static void error(boolean condition, Located responsible, String message)
+  {
+    error(condition,responsible,message,"");
+  }
+  
+  public static void error(Located responsible, String message, String dbgMsg)
+  {
+    if(dbg)
+      error(responsible.location()+message+dbgMsg);
+    else
+      error(responsible.location()+message);
   }
 
   public static void error(Located responsible, String message)
@@ -57,4 +72,6 @@ public class User
     if(condition)
       warning(message);
   }
+
+  public final static boolean dbg = false;
 }

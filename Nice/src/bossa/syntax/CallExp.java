@@ -12,7 +12,7 @@
 
 // File    : CallExp.java
 // Created : Mon Jul 05 16:27:27 1999 by bonniot
-//$Modified: Fri Aug 27 17:32:46 1999 by bonniot $
+//$Modified: Wed Sep 08 16:52:54 1999 by bonniot $
 
 package bossa.syntax;
 
@@ -48,101 +48,124 @@ public class CallExp extends Expression
   
   void resolve()
   {
+    removeChild(fun);
     fun=fun.resolveExp();
+    removeChildren(parameters);
     parameters=Expression.resolveExp(parameters);
   }
 
-  static Type getType(Location loc,
-		      Expression fun,
-		      List /* of Expression */ parameters,
-		      boolean report)
+  static boolean wellTyped(Expression fun,
+			   List /* of Expression */ parameters)
+  {
+    try{
+      Type t=getType(fun,parameters);
+      if(t==null) return false;
+    }
+    catch(ReportErrorEx e){
+      return false;
+    }
+    catch(TypingEx e){
+      return false;
+    }
+    catch(BadSizeEx e){
+      return false;
+    }
+    return true;
+  }
+  
+  static Type getTypeAndReportErrors(Location loc,
+				     Expression fun,
+				     List /* of Expression */ parameters)
+  {
+    try{
+      return getType(fun,parameters);
+    }
+    catch(BadSizeEx e){
+      User.error(loc,e.expected+" parameters expected, "+
+		 "not "+e.actual);
+    }
+    catch(ReportErrorEx e){
+      User.error(loc,e.getMessage());
+    }
+    catch(TypingEx e){
+      if(Typing.dbg) Debug.println(e.getMessage());
+      String end="not within the domain of the function \""+fun+"\"";
+      if(parameters.size()>=2)
+	User.error(loc,"The parameters "+
+		   Util.map("(",", ",")",parameters) +
+		   " are "+end);
+      else
+	User.error(loc,"The parameter \""+
+		   Util.map("",", ","",parameters) +
+		   "\" is "+end);      
+    }
+    return null;
+  }
+
+  static class ReportErrorEx extends Exception {
+    ReportErrorEx(String msg) { super(msg); }
+  }
+  
+  private static Type getType(Expression fun,
+		      List /* of Expression */ parameters)
+    throws TypingEx,BadSizeEx,ReportErrorEx
   {
     Type funt=fun.getType();
-    Collection parametersTypes=null;//=Expression.getPolytype(parameters);
+    Collection parametersTypes=null;
 
     Collection dom=funt.domain();
     Monotype codom=funt.codomain();
-    
-    if(report)
-      {
-	User.error(dom==null || codom==null,
-		   loc,fun+" is not a function");
-	
-	User.error(!(funt instanceof Polytype),loc,
-		   "You have to specify the type parameters for function "+
-		   fun);
-      }
-    else if(dom==null || codom==null || !(funt instanceof Polytype))
-      return null;
 
+    if(dom==null || codom==null)
+      throw new ReportErrorEx(fun+" is not a function");
+    if(!(funt instanceof Polytype))
+      throw new ReportErrorEx("You have to specify the type parameters for function "+fun);
+       
     Typing.enter(funt.getTypeParameters(),"call "+fun);
 
-    try{
-      Typing.implies();
+    Typing.implies();
 
-      try{ funt.getConstraint().assert(); }
-      catch(TypingEx e) { 
-	if(report)
-	  User.error(loc,"The conditions for using this function are not fullfiled"); 
-	else return null;
-      }
+    try{ funt.getConstraint().assert(); }
+    catch(TypingEx e) { 
+      throw new ReportErrorEx("The conditions for using this function are not fullfiled");
+    }
+    
+    parametersTypes=Expression.getType(parameters);
       
-      parametersTypes=Expression.getPolytype(parameters);
-      User.error(parametersTypes==null,loc,
-		   "Arguments of functions must not be imperative-parametric");
-      
-      Typing.in(parametersTypes,
-		Domain.fromMonotypes(funt.domain()));
+    if(Typing.dbg)
+      Debug.println("Types of parameters:\n"+
+		    Util.map("",", ","\n",parametersTypes));
 
-      Typing.leave();
-    }
-    catch(BadSizeEx e){
-      if(report)
-	User.error(loc,e.expected+" parameters expected, "+
-		   "not "+e.actual);
-      else
-	return null;
-    }
-    catch(TypingEx e){
-      if(report){
-	String end="not within the domain of the function \""+fun+"\"";
-	if(parameters.size()>=2)
-	  User.error(loc,"The parameters "+
-		     Util.map("(",", ",")",parameters) +
-		     " are "+end);
-	else
-	  User.error(loc,"The parameter \""+
-		     Util.map("",", ","",parameters) +
-		     "\" is "+end);
-      }
-      else
-	return null;
-    }
+    Typing.in(parametersTypes,
+	      Domain.fromMonotypes(funt.domain()));
+
+    Typing.leave();
+
     //computes the resulting type
     Constraint cst=funt.getConstraint().and(Type.getConstraint(parametersTypes));
     cst.and(MonotypeLeqCst.constraint(Type.getMonotype(parametersTypes),dom));    
     return new Polytype(cst,codom);
   }
   
-  void computeType()
-  {
-    fun=fun.resolveOverloading(parameters,null);
-    type=getType(location(),fun,parameters,true);
-  }
+    void computeType()
+      {
+	fun=fun.resolveOverloading(parameters,null);
+	type=getTypeAndReportErrors(location(),fun,parameters);
+      }
 
-  boolean isAssignable()
-  {
-    fun=fun.resolveOverloading(parameters,null);
-    return fun.isFieldAccess();
-  }
+    boolean isAssignable()
+      {
+	fun=fun.resolveOverloading(parameters,null);
+	return fun.isFieldAccess();
+      }
   
-  public String toString()
-  {
-    return fun
-      + "(" + Util.map("",", ","",parameters) + ")"
-      ;
-  }
+    public String toString()
+      {
+	return fun
+	  + "(" + Util.map("",", ","",parameters) + ")"
+	  ;
+      }
 
-  protected Expression fun;
-  protected List /* of Expression */ parameters;
-}
+    protected Expression fun;
+    protected List /* of Expression */ parameters;
+  }

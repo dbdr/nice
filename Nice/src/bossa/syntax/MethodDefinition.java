@@ -12,7 +12,7 @@
 
 // File    : MethodDefinition.java
 // Created : Thu Jul 01 18:12:46 1999 by bonniot
-//$Modified: Mon Aug 30 15:43:21 1999 by bonniot $
+//$Modified: Thu Sep 02 17:21:03 1999 by bonniot $
 
 package bossa.syntax;
 

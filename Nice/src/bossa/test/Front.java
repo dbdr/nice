@@ -12,7 +12,7 @@
 
 // File    : Front.java
 // Created : Thu Jul 01 15:11:18 1999 by bonniot
-//$Modified: Fri Aug 27 12:19:07 1999 by bonniot $
+//$Modified: Fri Sep 10 18:17:01 1999 by bonniot $
 
 package bossa.test;
 
@@ -21,8 +21,8 @@ import java.util.*;
 import bossa.parser.Loader;
 import bossa.syntax.AST;
 
-/** Test of the frontend
- * 
+/** 
+ * Test of the frontend.
  */
 public class Front
 {
@@ -39,9 +39,9 @@ public class Front
     if(args.length==0)
       {
 	System.out.println("Usage: bossa file.bossa");
-	//System.exit(0);
+	System.exit(0);
 	//file="GJ-loophole.bossa";
-	file="itf.bossa";
+	file="fr.bossa";
       }
     else file=args[0];
     
@@ -55,8 +55,10 @@ public class Front
     }
     catch(Exception e){
       System.out.println("Uncaught exception :");
-      //System.out.println(e);
-      e.printStackTrace();
+      if(bossa.util.User.dbg)
+	e.printStackTrace();
+      else
+	System.out.println(e.toString());
     }
   }
 }

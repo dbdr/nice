@@ -12,7 +12,7 @@
 
 // File    : Interface.java
 // Created : Thu Jul 08 11:51:09 1999 by bonniot
-//$Modified: Mon Aug 30 17:25:39 1999 by bonniot $
+//$Modified: Wed Sep 01 18:35:55 1999 by bonniot $
 
 package bossa.syntax;
 
@@ -64,10 +64,13 @@ public class Interface extends Node
     if(definition==null)
       {
 	TypeSymbol s;
-	if(name.content.startsWith("Top"))
+	// Should not be usefull anymore
+	/*
+	  if(name.content.startsWith("Top"))
 	  s=InterfaceDefinition.top(Integer.parseInt(name.content.substring(3)));
-	else
-	  s=typeScope.lookup(name);
+	  else
+	*/
+	s=typeScope.lookup(name);
 	if(s==null)
 	  User.error(name,"Interface "+name+" is not defined");
 	if(s instanceof InterfaceDefinition)

@@ -12,7 +12,7 @@
 
 // File    : TypeConstructor.java
 // Created : Thu Jul 08 11:51:09 1999 by bonniot
-//$Modified: Mon Aug 30 16:40:58 1999 by bonniot $
+//$Modified: Thu Sep 02 17:12:37 1999 by bonniot $
 
 package bossa.syntax;
 
@@ -37,7 +37,7 @@ public class TypeConstructor
     this.definition=d;
     this.name=d.name;
     setVariance(new Variance(d.typeParameters.size()));
-    this.id=-1;
+    this.id=-1-new Random().nextInt(100000);
   }
 
   /**
@@ -52,7 +52,7 @@ public class TypeConstructor
     this.name=className;
     this.definition=null;
     variance=null;
-    this.id=-1;
+    this.id=-1-new Random().nextInt(100000);
   }
 
   /**
@@ -155,8 +155,11 @@ public class TypeConstructor
   {
     if(definition==null)
       {
-	if(name.content.startsWith("Top"))
+	// Should not be usefull anymore
+	/*
+	  if(name.content.startsWith("Top"))
 	  return InterfaceDefinition.top(Integer.parseInt(name.content.substring(3)));
+	*/
 	TypeSymbol s=typeScope.lookup(name);
 	User.error(s==null,this,"Class or interface "+name+" is not defined");
 	return s;
@@ -191,10 +194,14 @@ public class TypeConstructor
 
   public String toString()
   {
+    String res;
     if(definition!=null)
-      return definition.name.toString();
+      res=definition.name.toString();
     else 
-      return "\""+name.toString()+"\"";
+      res="\""+name.toString()+"\"";
+    if(bossa.typing.Typing.dbg) res+="("+id+")";
+    //if(bossa.typing.Typing.dbg) res+=super.toString();
+    return res;
   }
 
   public LocatedString getName()

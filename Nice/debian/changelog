@@ -12,6 +12,8 @@ nice (0.0.020405) unstable; urgency=low
     Most failures come from the difference in the syntax of method declaration.
   * Arrays of void values are forbidden. They most probably originate from
     a bug in the source program.
+  * Better handling of inhomogenous tuples with native types (e.g. <int, long>)
+  * Better wrapping/unwrapping code for arrays used as Collections.
   * Bugfixes for some polymorphic operations on arrays.
   * Bugfixed the bitshift operators >>, >>> and <<.
 

@@ -14,8 +14,8 @@ import java.lang.reflect.*;
  * However, ModuleMethod uses virtual method calls, while ApplyMethodProc
  * uses the possibly much slower interface method calls.
  */
-// NICE: Avoid being dependant of gnu.mapping.MethodProc
-// NICE: This is bad because this class is needed ar runtime
+// NICE: Avoid being dependant of gnu.mapping.MethodProc.
+// NICE: This is bad because this class is needed at runtime.
 public class ModuleMethod extends ProcedureN
 {
   ModuleBody module;

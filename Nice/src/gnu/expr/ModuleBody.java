@@ -10,8 +10,8 @@ import gnu.lists.*;
  * faster virtual method calls instead of slower interface calls).
  */
 
-// NICE: Avoid being dependant of gnu.mapping.MethodProc
-// NICE: This is bad because this class is needed ar runtime
+// NICE: Avoid being dependant of gnu.mapping.MethodProc.
+// NICE: This is bad because this class is needed at runtime.
 public class ModuleBody extends ProcedureN// implements Runnable
 {
   /*

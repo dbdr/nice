@@ -41,6 +41,9 @@ class Compilation extends mlsub.compilation.Compilation
   */
   boolean excludeRuntime = false;
 
+  /** Location of the nice.jar file. */
+  ?String runtimeFile = null;
+
   ?Locator locator = null;
 
   void setMainPackage(String packageName)

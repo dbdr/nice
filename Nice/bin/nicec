@@ -85,11 +85,18 @@ case $progname in
 	CLASSPATH=${APPHOME}/classes:${CLASSPATH}
     fi
     export CLASSPATH
+
+# properties should be removed when the stable compiler understands --runtime
     properties="-Dnice.systemJar=${NICEC} -Dnice.runtime=${NICEC}"
+    args="--runtime=${NICEC}"
+
     if which gcj >/dev/null 2>&1; then
+# properties should be removed when the stable compiler understands --runtime
       properties="$properties -Dgcj=`which gcj 2>/dev/null`"
+      args="${args} --native-compiler=`which gcj 2>/dev/null`"
     fi
-    exec ${JAVA} ${properties} nice.tools.compiler.package "$@"
+
+    exec ${JAVA} ${properties} nice.tools.compiler.package ${args} "$@"
   ;;
   nicer) 
     jar=$1

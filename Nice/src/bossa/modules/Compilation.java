@@ -15,6 +15,9 @@ public class Compilation extends mlsub.compilation.Compilation
   /** Set if at least one package is not up-to-date. */
   public boolean recompilationNeeded;
 
+  /** Location of the nice.jar file. */
+  public String runtimeFile;
+
   public String sourcePath;
   public String packagePath;
   public String destinationDir;

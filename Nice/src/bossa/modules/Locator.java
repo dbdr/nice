@@ -31,7 +31,7 @@ final class Locator
     sourceRoots = splitPath(compilation.sourcePath);
     packageRoots = splitPath(compilation.packagePath + File.pathSeparator + 
 			     compilation.destinationDir + File.pathSeparator + 
-			     Debug.getProperty("nice.systemJar", ""));
+			     compilation.runtimeFile);
   }
 
   Content find (Package pkg)

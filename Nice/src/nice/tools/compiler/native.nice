@@ -20,14 +20,13 @@ package nice.tools.compiler;
    @author Daniel Bonniot (bonniot@users.sourceforge.net)
  */
 
-void produceNativeProgram(String pkg, String output)
+void produceNativeProgram(?String nativeCompiler, String pkg, String output)
 {
-  compileWithGcj(pkg, output);
+  compileWithGcj(nativeCompiler, pkg, output);
 }
 
-void compileWithGcj(String pkg, String output)
+void compileWithGcj(?String gcj, String pkg, String output)
 {
-  ?String gcj = System.getProperty("gcj");
   if (gcj == null)
     {
       fail("gcj was not found in the path");

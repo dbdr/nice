@@ -420,7 +420,7 @@ public class Package implements mlsub.compilation.Module, Located, bossa.syntax.
       {
 	JarOutputStream jarStream = createJarStream(jarFile);
 	if (! compilation.excludeRuntime)
-	  writeRuntime(jarStream);
+	  writeRuntime(compilation.runtimeFile, jarStream);
 	// The link was performed iff this package (root) was recompiled.
 	this.addToArchive(jarStream, compiling());
 	jarStream.close();
@@ -467,17 +467,16 @@ public class Package implements mlsub.compilation.Module, Located, bossa.syntax.
   /**
      Write all base classes that are needed to run generated code.
   */
-  private static void writeRuntime(JarOutputStream jarStream)
+  private static void writeRuntime(String runtimeJar, JarOutputStream jarStream)
   throws IOException
   {
-    String filename = System.getProperty("nice.runtime");
-    if (filename == null)
+    if (runtimeJar == null)
       {
 	Internal.warning("Runtime was not found. The archive is not self-contained");
 	return;
       }
       
-    JarFile runtime = new JarFile(filename);
+    JarFile runtime = new JarFile(runtimeJar);
 
     // add individual classes
     String[] classes = 

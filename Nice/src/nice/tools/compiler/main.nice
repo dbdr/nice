@@ -40,6 +40,7 @@ main(args)
   boolean memInfo = false;
   String mainPackage;
   ?String nativeProgram = null;
+  ?String nativeCompiler = null;
 
   try{
 
@@ -102,11 +103,21 @@ main(args)
 	  fun() => { compilation.skipLink = true; }),
 
 
+   // PRIVATE OPTIONS
+
    // This options is usefull for compiling the compiler itself. 
    // Should not be advertised since it should not be usefull otherwise
    option('?', "exclude-runtime", 
 	  "Avoid inclusion of the runtime in the archive", 
 	  fun() => { compilation.excludeRuntime = true; }),
+   option('?', "runtime", 
+	  "Location of nice.jar", 
+	  "file",
+	  fun(String file) => { compilation.runtimeFile = file; }),
+   option('?', "native-compiler", 
+	  "Location of the native compiler binary (gcj)", 
+	  "file",
+	  fun(String file) => { nativeCompiler = file; }),
 
 
    option('h', "help", "Print help message and exit",
@@ -145,7 +156,7 @@ main(args)
   make(compilation);
 
   if (nativeProgram != null)
-    produceNativeProgram(mainPackage, nativeProgram);
+    produceNativeProgram(nativeCompiler, mainPackage, nativeProgram);
   }
   catch(bossa.util.UserError e){
     bossa.util.Internal.warning("user error only caught in main"); 

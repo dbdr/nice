@@ -491,13 +491,13 @@ public class FormalParameters extends Node
     return res;
   }
 
-  public List getRequiredNamedParameters()
+  public List getRequiredParameters()
   {
     LinkedList res = new LinkedList();
     for(int i = 0; i < parameters.length; i++) 
       {
         Parameter param = parameters[i];
-        if (param instanceof NamedParameter && ! (param instanceof OptionalParameter))
+        if (!(param instanceof OptionalParameter))
           {
             res.add(parameters[i]);
           }

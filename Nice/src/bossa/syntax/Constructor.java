@@ -185,33 +185,44 @@ class Constructor extends MethodDeclaration
         return res.toString();
       }
 
-    //Required fields missing - two different messages depending on whether
+    //Required fields missing, or else too many arguments
+    // - three different messages depending on whether
     //an explanation of the syntax is necessary
     res = new StringBuffer();
-    res.append("Fields of class ").append(name).append(" require initial values.\n");      
-
+    List missing = arguments.missingArgs(parameters);
     Iterator missingFields = null;
-      
-    if (arguments.size() == 0)
-      {
-        res.append(syntaxExample())
-          .append("Class ").append(name).append(" has the following fields:\n");
-        missingFields = parameters.iterator();
-      }
-    else 
-      {
-        res.append("These fields are missing:\n");
-        missingFields = arguments.missingNamedArgs(parameters, false).iterator();
-      }
 
+    if (arguments.size() == 0 || missing.size() > 0)
+      {
+        res.append("Fields of class ").append(name).append(" require initial values.\n");      
+        if (arguments.size() == 0)
+          {
+            res.append(syntaxExample())
+              .append("Class ").append(name).append(" has the following fields:\n");
+            missingFields = parameters.iterator();
+          }
+        else 
+          {
+            res.append("These fields are missing:\n");
+            missingFields = missing.iterator();
+          }
+      }
+    else
+      {
+        res.append("Too many arguments when constructing new instance of class ")
+          .append(name)
+          .append(".\n")
+          .append("The constructor accepts the following arguments:\n" );
+        missingFields = parameters.iterator();
+      }        
     while(missingFields.hasNext())
       {
         res.append("  ")
           .append(missingFields.next())
           .append("\n");
       }
-      
     return res.toString();
+
   }
 
   private String syntaxExample()
@@ -221,13 +232,13 @@ class Constructor extends MethodDeclaration
     res.append("Use the following syntax:\n")
       .append("  new ").append(name).append("(");
     
-    Iterator params = parameters.getRequiredNamedParameters().iterator();
+    Iterator params = parameters.getRequiredParameters().iterator();
     int paramCount = 0;
     int len = name.length();
     while(params.hasNext())
       {
-        FormalParameters.NamedParameter param = 
-          (FormalParameters.NamedParameter)params.next();
+        FormalParameters.Parameter param = 
+          (FormalParameters.Parameter)params.next();
         if (paramCount != 0) 
           res.append(", ");
         if (paramCount == 3 && params.hasNext())
@@ -237,7 +248,10 @@ class Constructor extends MethodDeclaration
             res.append("        ");
             paramCount = 0;
           }
-        res.append(param.getName()).append(": value");
+        if (param instanceof FormalParameters.NamedParameter)
+          res.append(param.getName()).append(": value");
+        else
+          res.append("value");
         paramCount++;
       }
     res.append(")\n\n");

@@ -259,27 +259,43 @@ public class Arguments
     return res;
   }
  
-  List missingNamedArgs(FormalParameters parameters, boolean includeDefaultedArgs)
+  List missingArgs(FormalParameters parameters)
   {
     List missing = new LinkedList();
-    Iterator namedParams = parameters.getNamedParameters().iterator();
-    while(namedParams.hasNext()) 
+    Iterator reqParams = parameters.getRequiredParameters().iterator();
+    int lastUsedPositional = -1;
+    while(reqParams.hasNext()) 
       {
-        FormalParameters.NamedParameter param = (FormalParameters.NamedParameter)namedParams.next();	 
-        if (param.value() != null  && !includeDefaultedArgs)
-          continue;
         boolean found = false;
-        for (int i = 0; i < arguments.length; i++)
-          if (arguments[i].name != null)
-            { 
-              String s = arguments[i].name.toString();
-              if (param.match(s))
+        FormalParameters.Parameter param = (FormalParameters.Parameter)reqParams.next();
+        if (param.value() != null)
+          continue;
+        if (param instanceof FormalParameters.NamedParameter) 
+          {
+            FormalParameters.NamedParameter namedParam = (FormalParameters.NamedParameter)param;
+            for (int i = 0; i < arguments.length; i++)
+              if (arguments[i].name != null)
+                { 
+                  String s = arguments[i].name.toString();
+                  if (param.match(s))
+                    {
+                      found = true;
+                      break;
+                    }
+                }
+          }
+        else {           
+          for(int i = lastUsedPositional + 1; i < arguments.length; i++)
+            {
+              if (arguments[i].name == null) 
                 {
                   found = true;
+                  lastUsedPositional = i;
                   break;
-                }
+                }                  
             }
-        if (!found) 
+        }
+        if (!found)
           missing.add(param);
       }
     return missing;

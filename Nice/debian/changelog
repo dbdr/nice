@@ -1,4 +1,4 @@
-nice (0.0.020300) unstable; urgency=low
+nice (0.0.020226) unstable; urgency=low
 
   * Fixed bug that prevented using "this" in overriden native methods.
   * Better error messages for method calls with wrong number of arguments.
@@ -8,7 +8,7 @@ nice (0.0.020300) unstable; urgency=low
     This really makes it possible to use them across packages.
   * Various other bugfixes.
 
- --
+ -- Daniel Bonniot <bonniot@users.sourceforge.net>  Tue, 26 Feb 2002 16:06:00 +0100
 
 nice (0.0.020205) unstable; urgency=low
 

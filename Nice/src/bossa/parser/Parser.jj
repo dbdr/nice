@@ -1420,19 +1420,23 @@ Definition globalVariable():
   boolean constant;
 }
 {
-  ( "var" {constant = false;} 
+  (
+    "var" {constant = false;} 
     t=monotype() name=ident() 
     [ "=" 
-      ( LOOKAHEAD(funExp()) value=funExp() 
-      | LOOKAHEAD(monoSymbol() "=>") value=simpleVarFunExp() 
-      |	value=SideEffectFreeExpression()
+      ( 
+        LOOKAHEAD(funExp()) value=funExp() 
+      |	
+        value=SideEffectFreeExpression()
       )
     ]
-  | "let" {constant = true;}
+  | 
+    "let" {constant = true;}
     t=monotype() name=ident() "="
-    ( LOOKAHEAD(funExp()) value=funExp() 
-    | LOOKAHEAD(monoSymbol() "=>") value=simpleVarFunExp() 
-    | value=SideEffectFreeExpression()
+    ( 
+      LOOKAHEAD(funExp()) value=funExp() 
+    | 
+      value=SideEffectFreeExpression()
     )
   )
   ";"
@@ -1593,49 +1597,29 @@ Expression newExp():
 FunExp funExp():
 {
   List formals;
-  Constraint cst;
-  Token f = null;
-  FunExp res;
-}
-{
-  [f = "fun"] 
-  cst=constraint()
-  "(" formals=monoSymbols() ")"
-  res=endFunExp(formals, cst)
-  {
-    if (f != null) 
-      bossa.util.User.warning(new Location(f), "The 'fun(...) =>' syntax is deprecated, just leave 'fun' away."); 
-    return res;
-  }
-}
-
-FunExp simpleVarFunExp():
-{
+  Constraint cst = Constraint.True;
   MonoSymbol sym;
-  List formals;
-  FunExp res;
-}
-{
-  sym=monoSymbol() 
-  { formals = new LinkedList(); formals.add(sym); }
-  res=endFunExp(formals, Constraint.True)
-  { return res; }
-}
-
-FunExp endFunExp(List formals, Constraint cst):
-{
   Statement body;
   Expression exp;
+  Token f;
 }
 {
+  ( 
+    LOOKAHEAD ( ["fun"] constraint() "(" monoSymbols() ")" )
+    [
+      f="fun" { bossa.util.User.warning(new Location(f),
+		 "The 'fun(...) =>' syntax is deprecated, just leave 'fun' away."); } 
+    ] 
+    cst=constraint()
+    "(" formals=monoSymbols() ")"
+  |
+    sym=monoSymbol() { formals = new LinkedList(); formals.add(sym); }
+  ) 
   "=>"
   (
-    body = RootShortStatement()
+    body=RootShortStatement()
   |
-    exp=Expression()
-    { 
-      body=new ReturnStmt(exp);
-    }
+    exp=Expression() { body = new ReturnStmt(exp); }
   )
   { return new FunExp(cst,formals,body); }
 }
@@ -1791,9 +1775,8 @@ Expression Expression() :
 {
   { first=getToken(1); }
 
-  ( //TODO: simplify next lookahead after removal of the 'fun' keyword.
+  ( 
     LOOKAHEAD(funExp()) e1=funExp() 
-  | LOOKAHEAD(monoSymbol() "=>") e1=simpleVarFunExp() 
   | e1=ClassicExpression() 
   )
   { 

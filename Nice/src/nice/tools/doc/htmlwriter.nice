@@ -233,6 +233,9 @@ class HTMLWriter {
                    "</style>\n";
       
       writer.write(getHeader("Package " + p.getName(), javascript + css));
+      
+      //write a heading
+      writer.write("<h1>Package " htmlEncode(p.getName()) "</h1>\n");
             
       //create a list of source files in the package
       //we use a map instead of a set of definitions because
@@ -297,6 +300,9 @@ class HTMLWriter {
       BufferedWriter writer = new BufferedWriter
         (new FileWriter(new File(dir, "package-index.html")));
       writer.write(getHeader("Package " + p.getName()));
+      
+      //write a heading
+      writer.write("<h1>Package " htmlEncode(p.getName()) "</h1>\n");
             
       //we need to separate class, methods, and global variables
       (ArrayList<ClassDefinition.Class> classes,

@@ -97,4 +97,5 @@ main(args)
   test_exceptions();
   test_higher_order();
   test_localFunctions();
+  test_null();
 }

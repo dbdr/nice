@@ -255,6 +255,7 @@ public class FormalParameters extends Node
 
     public String toString()
     {
+      defaultValue = defaultValue.noOverloading();
       return type + " " + name + " = " + defaultValue;
     }
   }
@@ -574,7 +575,10 @@ public class FormalParameters extends Node
         bossa.parser.Loader.getParser(value).formalParameters(false, null);
     }
     catch (bossa.parser.ParseException ex) {
-      return null;
+      throw Internal.error
+        ("Could not parse '" + attr.getName() + "' bytecode attribute:\n" +
+         "In method: " + attr.getContainer() + "\n" +
+         "Value    : " + value);
     }
   }
 

@@ -144,3 +144,17 @@ class Polynomial<T> implements Ring {
 
    zero(){}
 }
+
+/// PASS
+  /// package a
+  /// TOPLEVEL
+class Visibilitymodifier {}
+let Visibilitymodifier PUBLIC = new Visibilitymodifier();
+
+//variable entity aka variables
+class A {
+    // visibility
+    Visibilitymodifier visibility = PUBLIC;
+}
+  /// package b import a
+  {}

@@ -621,9 +621,29 @@ public class Pattern implements Located
     int start = ++pos[0];
     int len = rep.length();
 
-    while(pos[0] < len && 
-	  rep.charAt(pos[0]) != '@' && rep.charAt(pos[0]) != '#')
-      pos[0]++;
+    if (rep.charAt(pos[0]) == '\'')
+      { //we need to skip possible '@' or '#' content of the char literal
+        pos[0] += 3;
+	while(pos[0] < len && 
+		rep.charAt(pos[0]) != '@' && rep.charAt(pos[0]) != '#')
+	  pos[0]++;
+      }
+    else if (rep.charAt(pos[0]) == '\"')
+      { //idem for string literal
+        pos[0] += 2;
+	while(pos[0] < len &&
+		( ( rep.charAt(pos[0]) != '@' && rep.charAt(pos[0]) != '#') ||
+		  ( rep.charAt(pos[0]-1) == '\"' &&
+		    rep.charAt(pos[0]-2) != '\\' ) ) )
+	  pos[0]++;
+
+      }
+    else
+      {
+	while(pos[0] < len && 
+		rep.charAt(pos[0]) != '@' && rep.charAt(pos[0]) != '#')
+	  pos[0]++;
+      }
 
     String name = rep.substring(start, pos[0]);
 

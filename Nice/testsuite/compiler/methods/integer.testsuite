@@ -190,3 +190,13 @@ foo(1) {}
   foo(n>3) = n;
   foo(4) = 0;
   foo(5) = 1;
+
+/// PASS
+  /// package a
+  /// Toplevel
+  boolean foo(char c);
+  foo(c) = false;
+  foo('#') = true;
+  foo('(') = false;
+  /// package b import a
+  assert foo('#');

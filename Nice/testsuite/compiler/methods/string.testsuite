@@ -47,3 +47,24 @@ class String {}
 void foos(java.lang.String);
 foos(x) {}
 foos("abc") {}
+
+/// PASS
+  /// package a
+  /// Toplevel
+  boolean foo(String s);
+  foo(s) = false;
+  foo("@") = true;
+  foo("(") = false;
+  /// package b import a
+  assert foo("@");
+
+/// PASS bug
+  /// package a
+  /// Toplevel
+  boolean foo(String s);
+  foo(s) = false;
+  foo("x") = false;
+  foo("\"x") = true;
+  foo("\\\"x") = false;
+  /// package b import a
+  assert foo("\"x");

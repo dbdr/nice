@@ -128,6 +128,28 @@ m(a@A) {}
 m(b@B) { super; }
 
 /// PASS
+  /// COMMENT super defined in an imported package, with mutual import.
+  /// package a import b
+  /// Toplevel
+void m(A);
+m(@A) { if (false) m(new A()); }
+
+  /// package b import a
+  /// Toplevel
+m(@B) { super; }
+
+/// PASS
+  /// COMMENT super defined in an imported package, with mutual import.
+  /// package a import b
+  /// Toplevel
+m(@B) { super; }
+
+  /// package b import a
+  /// Toplevel
+void m(A);
+m(@A) { if (false) m(new A()); }
+
+/// PASS
   assert (new C().foo() == 1);
   /// Toplevel
 class A {

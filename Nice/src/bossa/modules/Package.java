@@ -219,6 +219,16 @@ public class Package implements mlsub.compilation.Module, Located, bossa.syntax.
       readAlternatives();
   }
 
+  public void typedResolve()
+  {
+    ast.typedResolve();
+  }
+
+  public void localResolve()
+  {
+    ast.localResolve();
+  }
+
   public void compile()
   {
     typecheck();

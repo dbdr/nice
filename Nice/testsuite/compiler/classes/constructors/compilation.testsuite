@@ -3,3 +3,19 @@
     new A();
   /// Toplevel
   class A {}
+
+/// PASS
+  /// package a import b
+  /// Toplevel
+class A { String name = ""; }
+
+  /// package b import a
+new A();
+
+/// PASS
+  /// package b import a
+new A();
+
+  /// package a import b
+  /// Toplevel
+class A { String name = ""; }

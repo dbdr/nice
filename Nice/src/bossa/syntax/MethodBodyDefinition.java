@@ -464,6 +464,7 @@ public class MethodBodyDefinition extends Definition
   }
 
   gnu.expr.ReferenceExp ref;
+  gnu.expr.LambdaExp compiledMethod;
 
   public gnu.expr.ReferenceExp getRefExp()
   {
@@ -480,20 +481,21 @@ public class MethodBodyDefinition extends Definition
 
   public void compile()
   {
-    if(Debug.codeGeneration)
+    if (Debug.codeGeneration)
       Debug.println("Compiling method body " + this);
 
     getRefExp();
+    Gen.setMethodBody(compiledMethod, body.generateCode());
   }
 
   private gnu.expr.ReferenceExp compile (NiceMethod definition)
   {
-    gnu.expr.LambdaExp lexp = createMethod(name.toString(), false);
-    gnu.expr.ReferenceExp ref = module.addMethod(lexp, true);
+    createMethod(name.toString(), false);
+    gnu.expr.ReferenceExp ref = module.addMethod(compiledMethod, true);
 
-    lexp.addBytecodeAttribute
+    compiledMethod.addBytecodeAttribute
       (new MiscAttr("definition", definition.getFullName().getBytes()));
-    lexp.addBytecodeAttribute
+    compiledMethod.addBytecodeAttribute
       (new MiscAttr("patterns", 
 		    Pattern.bytecodeRepresentation(formals).getBytes()));
 
@@ -519,22 +521,20 @@ public class MethodBodyDefinition extends Definition
 
   private void compile (JavaMethod declaration)
   {
-    gnu.expr.LambdaExp lexp = createMethod(declaration.getName().toString(), true);
+    createMethod(declaration.getName().toString(), true);
 
     // Compile as a method in the class of the first argument
-    declaringClass().addJavaMethod(lexp);
+    declaringClass().addJavaMethod(compiledMethod);
   }
 
-  private gnu.expr.LambdaExp createMethod (String bytecodeName, boolean member)
+  private void createMethod (String bytecodeName, boolean member)
   {
-    gnu.expr.LambdaExp lexp = 
+    compiledMethod = 
       Gen.createMethod(bytecodeName, 
 		       javaArgTypes(),
 		       declaration.javaReturnType(),
 		       parameters,
 		       true, member);
-    Gen.setMethodBody(lexp, body.generateCode());
-    return lexp;
   }
 
   gnu.expr.Expression[] compiledArguments()

@@ -82,10 +82,11 @@ public class AST extends Node
 
     nice.tools.compiler.OutputMessages.exitIfErrors();
   }
-  
-  public void typechecking()
+
+  public void typedResolve()
   {
     Node.setModule(module);
+
     for(Iterator i = children.iterator(); i.hasNext();)
       {
 	Object o = i.next();
@@ -98,23 +99,32 @@ public class AST extends Node
 	  }
       }
     nice.tools.compiler.OutputMessages.exitIfErrors();
+  }
 
-    module.unfreezeGlobalContext();
-    try{
-      for(Iterator i = children.iterator(); i.hasNext();)
-	{
-	  Definition d = (Definition) i.next();
-	  try{
-	    d.resolveBody();
-	  }
-	  catch(UserError ex){
-	    nice.tools.compiler.OutputMessages.error(ex.getMessage());
-	  }
+  public void localResolve()
+  {
+    Node.setModule(module);
+
+    for (Iterator i = children.iterator(); i.hasNext();)
+      {
+	Definition d = (Definition) i.next();
+	try{
+	  d.resolveBody();
 	}
-    } finally {
-      module.freezeGlobalContext();
-    }
+	catch(UserError ex){
+	  nice.tools.compiler.OutputMessages.error(ex.getMessage());
+	}
+      }
+
     nice.tools.compiler.OutputMessages.exitIfErrors();
+
+    for (int i = 0; i < classes.length; i++)
+      classes[i].precompile();
+  }
+
+  public void typechecking()
+  {
+    Node.setModule(module);
 
     // Classes are typechecked first, since code can depend on them.
     for(int i = 0; i < classes.length; i++)
@@ -135,9 +145,6 @@ public class AST extends Node
   */
   public void compile(boolean generateCode)
   {
-    for(int i = 0; i < classes.length; i++)
-      classes[i].precompile();
-
     if (! generateCode)
       return;
 

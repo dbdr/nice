@@ -33,6 +33,17 @@ void compileComponent(Compilation compilation, List<Module> modules,
   notNull(compilation.root).freezeGlobalContext();
 
   try {
+    modules.foreach(Module m => m.typedResolve());
+  }
+  finally {
+    notNull(compilation.root).unfreezeGlobalContext();
+  }
+
+  modules.foreach(Module m => m.localResolve());
+
+  notNull(compilation.root).freezeGlobalContext();
+
+  try {
     modules.foreach(Module m => m.compile());
 
     if (doLink)

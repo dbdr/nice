@@ -35,6 +35,12 @@ public interface Module
   /** Resolve scoping and load the constants in the context. */
   void load();
 
+  /** Resolve scoping for entities that need the global context. */
+  void typedResolve();
+
+  /** Resolve local entities, that might increase the global context. */
+  void localResolve();
+
   /** Compile the module.
 
       This may involve:

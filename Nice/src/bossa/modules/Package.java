@@ -743,7 +743,14 @@ public class Package implements mlsub.compilation.Module, Located, bossa.syntax.
     meth.setCanRead(true);
     gnu.expr.FindCapturedVars.findCapturedVars(meth);
 
-    meth.compileAsMethod(comp);
+    try {
+      meth.compileAsMethod(comp);
+    }
+    catch(Error e) {
+      Debug.println("Error while generating bytecode for method " + 
+		    meth.getName());
+      throw e;
+    }
   }
   
   public void compileDispatchMethod(gnu.expr.LambdaExp meth)

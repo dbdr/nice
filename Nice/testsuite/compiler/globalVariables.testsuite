@@ -82,7 +82,7 @@ var Map<String,String> classMap = (()=> {
   let int x = 0;
 
 /// FAIL
-  s = "";
+  /* /// FAIL HERE */ s = "";
   /// TOPLEVEL
   let String s = "abc";
 
@@ -103,7 +103,7 @@ var Map<String,String> classMap = (()=> {
   /// TOPLEVEL
   public let int x = 0;
   /// package b import a
-  x = 1;
+  /* /// FAIL HERE */ x = 1;
 
 /// PASS 
   /// package a 
@@ -162,4 +162,4 @@ boolean computeFoo() = f.getPath().equals("foo");
 
 /// FAIL
   /// Toplevel
-  var String s;
+  var String s /* /// FAIL HERE */ ;

@@ -79,7 +79,7 @@
   if (false)
     if (x == null)
       return;
-  x++;
+  /* /// FAIL HERE */ x++;
   
 
 /// FAIL
@@ -89,7 +89,7 @@
       {}
     else
       return;
-  x++;
+  /* /// FAIL HERE */ x++;
 
 
 // Assigning a null value
@@ -110,7 +110,7 @@
   if (x != null)
     {
       x = null;
-      x++;
+      /* /// FAIL HERE */ x++;
     }
 
 
@@ -129,7 +129,7 @@
     {
       if (false)
         x = null;
-      x++;
+      /* /// FAIL HERE */ x++;
     }
 
 
@@ -151,7 +151,7 @@
 /// FAIL
   ?int x = null;
   while (x == null)
-    x++;
+    /* /// FAIL HERE */ x++;
 
 /// FAIL
   ?int x = 0;
@@ -247,7 +247,7 @@
   if (false)
     if (x1 == null || x2 == null)
       return;
-  { x1++; x2++; }
+  { /* /// FAIL HERE */ x1++; x2++; }
   
 
 /// FAIL
@@ -257,7 +257,7 @@
       {}
     else
       return;
-  { x1++; x2++; }
+  { /* /// FAIL HERE */ x1++; x2++; }
 
 
 // Assigning a null value
@@ -273,7 +273,7 @@
   if (x1 != null && x2 != null)
     {
       x1 = null;
-      { x1++; x2++; }
+      { /* /// FAIL HERE */ x1++; x2++; }
     }
 
 
@@ -304,7 +304,7 @@
 /// FAIL
   ?int x1 = null, x2 = null;
   while (x1 == null || x2 == null)
-    { x1++; x2++; }
+    { /* /// FAIL HERE */ x1++; x2++; }
 
 /// PASS
   ?String x1 = null;
@@ -339,7 +339,7 @@
 /// FAIL
   ?String x = null;
   boolean b = x != null && x.length() > 3;
-  b = x.length() > 3;
+  b = x. /* /// FAIL HERE */ length() > 3;
 
 /// PASS
   ?String x = null;
@@ -352,7 +352,7 @@
 
 /// FAIL
   ?String x = null;
-  boolean b = x != null && (x = null) == null && x.length() > 3;
+  boolean b = x != null && (x = null) == null && x. /* /// FAIL HERE */ length() > 3;
   
 
 /// COMMENT || expressions
@@ -364,7 +364,7 @@
 /// FAIL
   ?String x = null;
   boolean b = x == null || x.length() > 3;
-  b = x.length() > 3;
+  b = x. /* /// FAIL HERE */ length() > 3;
 
 /// PASS
   ?String x = null;
@@ -379,7 +379,7 @@
 
 /// FAIL
   ?String x = null;
-  boolean b = x == null || (x = null) == "" || x.length() > 3;
+  boolean b = x == null || (x = null) == "" || x. /* /// FAIL HERE */ length() > 3;
 
 /// FAIL bug
 ?String s = "xyz";

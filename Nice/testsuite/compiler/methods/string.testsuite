@@ -18,14 +18,14 @@
 
 /// FAIL
   /// Toplevel
-  void foo(String);
+  void /* /// FAIL HERE */ foo(String);
   foo(s) {}
   foo("abc") {}
   foo("abc") {}
 
 /// FAIL
   /// Toplevel
-  void foo(String, String);
+  void /* /// FAIL HERE */ foo(String, String);
   foo(s1 ,s2) {}
   foo("abc", s2) {}
   foo(s1, "xyz") {}

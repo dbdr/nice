@@ -15,7 +15,7 @@
   class Local {}
 
 /// FAIL
-  boolean b = "A" instanceof not.Existing;
+  boolean b = "A" instanceof /* /// FAIL HERE */ not.Existing;
 
 /// PASS
   if ("A" instanceof String)

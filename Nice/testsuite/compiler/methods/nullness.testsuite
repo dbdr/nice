@@ -1,6 +1,6 @@
 /// FAIL
   /// Toplevel
-  void m(?String);
+  void /* /// FAIL HERE */ m(?String);
   m(String x) {}
 
 /// PASS

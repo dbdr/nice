@@ -20,7 +20,7 @@
 /// FAIL
   /// Toplevel
   let int xxx = 10;
-  void foo(int);
+  void /* /// FAIL HERE */ foo(int);
   foo(n) {}
   foo(xxx) {}
   foo(10) {}
@@ -30,7 +30,7 @@
   var int xxx = 10;
   void foo(int);
   foo(n) {}
-  foo(xxx) {}
+  foo( /* /// FAIL HERE */ xxx) {}
 
 /// PASS
   assert(foo("abc"));
@@ -71,7 +71,7 @@
   /// Toplevel
   class A {}
   let A xxx = new A();
-  void foo(A);
+  void /* /// FAIL HERE */ foo(A);
   foo(a) {}
   foo(xxx) {}
   foo(xxx) {}
@@ -109,20 +109,20 @@
   var int xyz = 3;
   void foo(int n);
   foo(n) {}
-  foo(n>xyz) {}  
+  foo(n> /* /// FAIL HERE */ xyz) {}  
 
 /// FAIL
   /// Toplevel
   var String xyz = "xyz";
   void foo(int n);
   foo(n) {}
-  foo(n>xyz) {}  
+  foo(n> /* /// FAIL HERE */ xyz) {}  
 
 /// FAIL
   /// Toplevel
   void foo(int n);
   foo(n) {}
-  foo(n>xyz) {}  
+  foo(n> /* /// FAIL HERE */ xyz) {}  
 
 
 /// PASS
@@ -137,7 +137,7 @@
   /// Toplevel
   boolean foo(String d);
   foo(d) = false;
-  foo(END_OF_TIME) = true;
+  foo( /* /// FAIL HERE */ END_OF_TIME) = true;
   let Date END_OF_TIME = new Date(Long.MAX_VALUE);
 
 /// PASS

@@ -1,7 +1,7 @@
 /// FAIL
   /// Toplevel
   class A {
-    void m();
+    void /* /// FAIL HERE */ m();
   }
 
 /// PASS
@@ -73,14 +73,14 @@ paint(java.awt.Component p, g) {
   interface I{}
  
   void foo(I);
-  foo(#I x){}
+  foo(# /* /// FAIL HERE */ I x){}
 
 /// FAIL
   /// Toplevel
   abstract class X {}
  
   void foo(X);
-  foo(#X x){}
+  foo(# /* /// FAIL HERE */ X x){}
 
 /// FAIL
   /// Toplevel
@@ -88,7 +88,7 @@ class A {}
 class B extends A{}
 
 void foo(B x);
-foo(A x){}
+foo(/* /// FAIL HERE */ A x){}
 
 /// PASS
   /// Toplevel

@@ -2,7 +2,7 @@
   /// TOPLEVEL
   class A
   {
-    int x = "Type error";
+    int x = /* /// FAIL HERE */ "Type error";
   }
 
 /// PASS
@@ -91,7 +91,7 @@
   /// Toplevel
   interface I
   {
-    String s;
+    String /* /// FAIL HERE */ s;
   }
 
 /// PASS
@@ -103,7 +103,7 @@
 
 /// FAIL
   /// Toplevel
-class A { int x; int x; }
+class A { int x; int /* /// FAIL HERE */ x; }
 
 /// FAIL
   /// Toplevel
@@ -114,7 +114,7 @@ class C extends B {}
 /// FAIL
   /// Toplevel
 class A { final int x = 1; }
-int f(A a) = a.x++;
+int f(A a) = /* /// FAIL HERE */ a.x++;
 
 /// PASS
   // accessing a final static field of an interface implemented by ObjectInputStream

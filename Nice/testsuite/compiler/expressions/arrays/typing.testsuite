@@ -1,5 +1,5 @@
 /// FAIL
-  ?String[][] s = new String[1][];
+  ?String[][] /* /// FAIL HERE */ s = new String[1][];
   println(s[0].length);
 
 /// PASS
@@ -10,7 +10,7 @@
   ?String[][][?][?] s = new String[1][1][][];
 
 /// FAIL
-  new int[""];
+  int[] x = new int[ /* /// FAIL HERE */ ""];
 
 /// PASS
   /// Toplevel

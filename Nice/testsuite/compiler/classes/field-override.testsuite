@@ -19,14 +19,14 @@ class A
 
 class B extends A
 {
-  override B x;
+  override B /* /// FAIL HERE */ x;
 }
 
 /// FAIL
   /// Toplevel
 class A
 {
-  override A x;
+  override A /* /// FAIL HERE */ x;
 }
 
 /// FAIL
@@ -38,7 +38,7 @@ class A
 
 class B extends A
 {
-  override B dummy;
+  override B /* /// FAIL HERE */ dummy;
 }
 
 /// PASS
@@ -67,7 +67,7 @@ class B extends A
   override B x;
 }
 
-B goo(A a) = new B(x: a);
+B goo(A a) = /* /// FAIL HERE */ new B(x: a);
 
 /// FAIL
   /// Toplevel
@@ -78,7 +78,7 @@ class A
 
 class B extends A
 {
-  override String x;
+  override String /* /// FAIL HERE */ x;
 }
 
 /// FAIL
@@ -94,7 +94,7 @@ class B extends A
 }
 class C extends B
 {
-  override B x;
+  override B /* /// FAIL HERE */ x;
 }
 
 /// PASS
@@ -118,7 +118,7 @@ class A<T>
 
 class B<T> extends A
 {
-  override List<T> x;
+  override List<T> /* /// FAIL HERE */ x;
 }
 
 /// FAIL
@@ -130,7 +130,7 @@ class A<T>
 
 class B<T> extends A
 {
-  override List<String> x;
+  override List<String> /* /// FAIL HERE */ x;
 }
 
 /// FAIL
@@ -218,5 +218,5 @@ B b = new BB(val: new B()).val;
   }
   class BB extends AA {
     override B val;
-    override C val;
+    override C /* /// FAIL HERE */ val;
   }

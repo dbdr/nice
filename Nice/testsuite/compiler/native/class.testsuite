@@ -14,16 +14,16 @@
   assert (c.getName().equals("[[Ljava.lang.String;"));
 
 /// FAIL
-  Class c = NotExisting.class;
+  Class c = /* /// FAIL HERE */ NotExisting.class;
 
 /// FAIL
-  Class<NotExisting> c = NotExisting.class;
+  Class<NotExisting> c = /* /// FAIL HERE */ NotExisting.class;
 
 /// FAIL
-  Class<String> c = NotExisting.class;
+  Class<String> c = /* /// FAIL HERE */ NotExisting.class;
 
 /// FAIL
-  Class<String> c = java.io.File.class;
+  Class<String> /* /// FAIL HERE */ c = java.io.File.class;
 
 /// FAIL
   /// Toplevel

@@ -13,7 +13,7 @@
 
 /// FAIL  
   /// Toplevel
-  int ack(int x, int y);
+  int /* /// FAIL HERE */ ack(int x, int y);
   // missing (0,0) case
   ack(0, int y) = y+1;
   ack(int x, 0) = ack(x-1, 1);
@@ -22,7 +22,7 @@
 
 /// FAIL  
   /// Toplevel
-  String toStr(char);
+  String /* /// FAIL HERE */ toStr(char);
   toStr(char x) = "";
   toStr('a') = "a";
   toStr('b') = "b";
@@ -54,7 +54,7 @@
 /// FAIL
  /// Toplevel
  // The default case is missing
-void foo(short);
+void /* /// FAIL HERE */ foo(short);
 foo(0) {}
 foo(1) {}
 
@@ -76,13 +76,13 @@ foo(1) {}
   /// Toplevel
   void foo(long);
   foo(long n) {}
-  foo(int n) {}
+  foo( /* /// FAIL HERE */ int n) {}
 
 /// FAIL
   /// Toplevel
   void foo(long);
   foo(long n) {}
-  foo(#int n) {}
+  foo(# /* /// FAIL HERE */ int n) {}
 
 /// PASS
   /// Toplevel
@@ -118,7 +118,7 @@ foo(1) {}
 
 /// FAIL
   /// Toplevel
-  void foo(int n);
+  void /* /// FAIL HERE */ foo(int n);
   foo(n>5) {}
   foo(n<=3) {}
 
@@ -133,7 +133,8 @@ foo(1) {}
   foo(n<3) = 2;
 
 /// FAIL
-  void foo(int n);
+  /// Toplevel
+  void /* /// FAIL HERE */ foo(int n);
   foo(n) {}
   foo(n>=5) {}
   foo(n<10) {}
@@ -157,7 +158,7 @@ foo(1) {}
 
 /// FAIL
   /// Toplevel
-  void foo(int n, int m);
+  void /* /// FAIL HERE */ foo(int n, int m);
   foo(n>0, m) {}
   foo(n, m>0) {}
   foo(n, m) {}
@@ -176,7 +177,7 @@ foo(1) {}
 
 /// FAIL
   /// Toplevel
-  void foo(int n);
+  void /* /// FAIL HERE */ foo(int n);
   foo(n) {}
   foo(n>5) {}
   foo(n>5) {}
@@ -215,7 +216,7 @@ foo(1) {}
 
 /// FAIL
   /// Toplevel
-  void foo(int n);
+  void /* /// FAIL HERE */ foo(int n);
   foo(n<=1) {}
   foo(n>=0) {}
 

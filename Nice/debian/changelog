@@ -7,6 +7,9 @@ nice (0.7.4) unstable; urgency=low
     to java.util Collections.
   * Fixed error message for calling new on an interface or Java abstract
     class, and when a class or interface (indirectly) implements itself.
+  * Allow the <T> syntax to introduce type variables, in addition to
+    <Any T> (that is, any is optional). This is consistent with GJ, 
+    and the syntax for class type parameters.
   * Removed the old syntax <T1, T2> for tuples. Use (T1, T2) instead.
   * Bugfixes (forward reference to constructor in field initializer,
     anonymous functions in field initializer).

@@ -573,16 +573,16 @@ TypeSymbol binder(Collection atomics):
   MonotypeVar id;
 }
 {
-  "Any" id=monotypeVar()
-  { return id;
-  }
-|
+  LOOKAHEAD( typeIdent() typeConstructor() )
   first=typeIdent() 
   second=typeConstructor()
   { 
     atomics.add(new TypeConstructorLeqCst(second,first)); 
     return second; 
   }
+|
+  [ "Any" ] id=monotypeVar()
+  { return id; }
 }
 
 List binders(Collection atomics):

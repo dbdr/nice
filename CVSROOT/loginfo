@@ -31,3 +31,6 @@ CVSROOT /cvsroot/sitedocs/CVSROOT/cvstools/syncmail %{sVv} bonniot@users.sourcef
 
 ## Send other changes to the nice-commit mailing list.
 DEFAULT /cvsroot/sitedocs/CVSROOT/cvstools/syncmail %{sVv} nice-commit@lists.sourceforge.net
+
+## Notify all changes to the CIA
+ALL        $CVSROOT/CVSROOT/ciabot_cvs.pl %{,,,s} $USER

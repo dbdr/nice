@@ -42,11 +42,12 @@ final class VarScope
   }
   
   /**
-   * Adds a collection of VarSymbols
-   *
+     Adds a collection of VarSymbols
    */
   void addSymbols(Collection c)
   {
+    if (c == null) return;
+
     Iterator i = c.iterator();
     while(i.hasNext())
       {

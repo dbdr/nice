@@ -33,28 +33,35 @@ abstract public class Node
 
   Node(int propagate)
   {
-    this(null,propagate);
+    this.propagate = propagate;
   }
   
   Node(List /* of Node */ children, 
        int propagate)
   {
-    this.propagate = propagate;
-    this.children = new ArrayList();
-    this.varSymbols = new ArrayList();
-    this.typeSymbols = new ArrayList();
-    typeMapsNames = new ArrayList();
-    typeMapsSymbols = new ArrayList();
-
+    this(propagate);
     addChildren(children);
   }
+
+  /*
+  static long ntot, nchil;
+
+  protected void finalize()
+  {
+    ntot++;
+    if (children.size() != 0)
+      nchil++;
+    System.out.println("Nodes/with children: "+ntot+"/"+nchil);
+  }
+  */
 
   /** child(n) is prefered now */
   void addChild(Node n)
   {
-    if(n==null)
+    if (n==null)
       Internal.error("null child in Node.addChild for node "+this);
 
+    if (children == null) children=new ArrayList();
     children.add(n);
   }
   
@@ -63,6 +70,7 @@ abstract public class Node
     if(n==null)
       return null;
 
+    if (children == null) children=new ArrayList();
     children.add(n);
     return n;
   }
@@ -72,13 +80,14 @@ abstract public class Node
     if(n==null)
       return null;
 
+    if (children == null) children=new ArrayList();
     children.add(n);
     return n;
   }
   
   void removeChild(Node n)
   {
-    if(!children.contains(n))
+    if(children == null || !children.contains(n))
       Internal.error(n+" is not a child of "+this);
 
     children.remove(n);
@@ -107,28 +116,43 @@ abstract public class Node
     
   void addSymbol(VarSymbol s)
   {
+    if (varSymbols == null)
+      varSymbols = new ArrayList();
     varSymbols.add(s);
   }
   
   void addSymbols(Collection c)
   {
     if(c!=null)
-      varSymbols.addAll(c);
+      {
+	if (varSymbols == null)
+	  varSymbols = new ArrayList();
+	varSymbols.addAll(c);
+      }
   }
   
   void addTypeSymbol(TypeSymbol s)
   {
-    typeSymbols.add(s);
+    addTypeMap(s.toString(), s);
   }
   
   void addTypeSymbols(Collection c)
   {
     if(c!=null)
-      typeSymbols.addAll(c);
+      for(Iterator i=c.iterator(); i.hasNext();)
+	{
+	  TypeSymbol s = (TypeSymbol) i.next();
+	  addTypeMap(s.toString(), s);
+	}
   }
   
   void addTypeMap(String name, TypeSymbol symbol)
   {
+    if (typeMapsNames == null)
+      {
+	typeMapsNames = new ArrayList();
+	typeMapsSymbols = new ArrayList();
+      }
     typeMapsNames.add(name);
     typeMapsSymbols.add(symbol);
   }
@@ -138,6 +162,12 @@ abstract public class Node
     if(names.size()!=symbols.size()) 
       throw new Error(symbols.size()+" != "+names.size());
     
+    if (typeMapsNames == null)
+      {
+	typeMapsNames = new ArrayList();
+	typeMapsSymbols = new ArrayList();
+      }
+
     for(Iterator n = names.iterator();n.hasNext();)
       typeMapsNames.add(((LocatedString) n.next()).toString());
     typeMapsSymbols.addAll(symbols);
@@ -235,25 +265,26 @@ abstract public class Node
     if(propagate!=none)
       {
 	try{
-	  this.typeScope.addSymbols(typeSymbols);
-	  this.typeScope.addMappings
-	    (typeMapsNames, (TypeSymbol[]) 
-	     typeMapsSymbols.toArray(new TypeSymbol[typeMapsSymbols.size()]));
+	  if (typeMapsNames != null)
+	    this.typeScope.addMappings
+	      (typeMapsNames, (TypeSymbol[]) 
+	       typeMapsSymbols.toArray(new TypeSymbol[typeMapsSymbols.size()]));
 	}
 	catch(TypeScope.DuplicateName e){
 	  User.error(e);
 	}
       }
-    
+
     // builds the scope of the children
     Scopes current = new Scopes(this.scope,this.typeScope);
-    Iterator i = children.iterator();
-    while(i.hasNext())
-      {
-	Object d = i.next();
-	if(d!=null)
-	  current = ((Node)d).buildScope(current.scope,current.typeScope);
-      }
+    if (children != null)
+      for(Iterator i = children.iterator();i.hasNext();)
+	{
+	  Object d = i.next();
+	  if(d!=null)
+	    current = ((Node)d).buildScope(current.scope,current.typeScope);
+	}
+
     return res;
   }
   
@@ -283,9 +314,9 @@ abstract public class Node
     
     resolve();
 
-    Iterator i = children.iterator();
-    while(i.hasNext())
-      ((Node)i.next()).doResolve();
+    if (children != null)
+      for(Iterator i = children.iterator();i.hasNext();)
+	((Node)i.next()).doResolve();
 
     if(Debug.resolution)
       Debug.println("Resolved to "+this + " [" + this.getClass() + "]");
@@ -303,9 +334,9 @@ abstract public class Node
   final void doFindJavaClasses()
   {
     findJavaClasses();
-    for(Iterator i = children.iterator();
-	i.hasNext();)
-      ((Node)i.next()).doFindJavaClasses();
+    if (children != null)
+      for(Iterator i = children.iterator();i.hasNext();)
+	((Node)i.next()).doFindJavaClasses();
   }
   
   /****************************************************************
@@ -346,8 +377,9 @@ abstract public class Node
 	  currentFunction = (Function) this;
 	}
     
-      for(Iterator i = children.iterator(); i.hasNext();)
-	((Node)i.next()).doTypecheck();
+      if (children != null)
+	for(Iterator i = children.iterator();i.hasNext();)
+	  ((Node)i.next()).doTypecheck();
     }
     finally{
       if(savedFunction != null)
@@ -410,7 +442,7 @@ abstract public class Node
   protected TypeScope typeScope;
 
   protected List children;
-  private List varSymbols, typeSymbols;
+  private List varSymbols;
   int propagate;  
   private List typeMapsSymbols,typeMapsNames;
 

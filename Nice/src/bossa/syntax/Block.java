@@ -149,12 +149,13 @@ public class Block extends Statement
    */
   void typecheck()
   {
-    for (Iterator i = children.iterator(); i.hasNext();)
-      {
-	Object o = i.next();
-	if (o instanceof Expression)
-	  ((Expression) o).typecheck();
-      }
+    if (children != null)
+      for (Iterator i = children.iterator(); i.hasNext();)
+	{
+	  Object o = i.next();
+	  if (o instanceof Expression)
+	    ((Expression) o).typecheck();
+	}
     // removal is not necessary to avoid double typecheck
     // since there is a meachanism for this in Node,
     // that remembers if typechecking has already been done

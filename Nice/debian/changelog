@@ -7,7 +7,7 @@ nice (0.5.6) unstable; urgency=low
     using the 'fill' function, e.g. 
         fill(new T[size], int i => f(x[i]))
 
- -- Daniel Bonniot <bonniot@users.sourceforge.net>  Tue,  2 Jul 2002 11:37:20 +0200
+ -- Daniel Bonniot <bonniot@users.sourceforge.net>  Sat,  6 Jul 2002 12:44:51 +0200
 
 nice (0.5.5) unstable; urgency=low
 

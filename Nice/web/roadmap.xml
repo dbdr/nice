@@ -35,11 +35,15 @@ released real soon now!
 <varlistentry><term>1.0</term>
 <listitem>
 <para>
-Implement visibility modifiers (private, default, public).
-Improve the support for object creation, besides automatic constructors.
-A plugin to write Nice programs in <ulink url="http://www.eclipse.org">Eclipse
-</ulink> will likely be included.
-Finish a first version of the User's manual.
+Implement <ulink 
+url="http://nice.sourceforge.net/cgi-bin/twiki/view/Dev/VisibilityModifiers">
+visibility modifiers</ulink> (private, default, public).
+Improve the <ulink 
+url="http://nice.sourceforge.net/cgi-bin/twiki/view/Dev/NiceConstructors">
+support for object creation</ulink>, besides automatic constructors.
+A plugin to write Nice programs in <ulink url="http://www.eclipse.org">
+Eclipse</ulink> will likely be included.
+Finish a first version of the <ulink url="manual.html">User's manual</ulink>.
 </para>
 
 <para>

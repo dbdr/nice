@@ -24,15 +24,9 @@ import gnu.expr.*;
 */
 public class SymbolExp extends Expression
 {
-  SymbolExp(VarSymbol s)
+  SymbolExp(VarSymbol symbol, Location loc)
   {
-    this.symbol = s;
-    setLocation(s.name.location());
-  }
-
-  SymbolExp(VarSymbol s, Location loc)
-  {
-    this(s);
+    this.symbol = symbol;
     setLocation(loc);
   }
   
@@ -77,7 +71,13 @@ public class SymbolExp extends Expression
 
   public gnu.expr.Expression compile()
   {
-    return symbol.compile();
+    try {
+      return symbol.compile();
+    }
+    catch(FieldAccess.UsingAsValue e) {
+      throw User.error(this, 
+		       "You must supply the object that contains this field");
+    }
   }
   
   /** @return the declaration of the variable denoted by this expression,

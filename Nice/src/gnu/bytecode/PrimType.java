@@ -111,8 +111,6 @@ public class PrimType extends Type {
 
   private static Field trueBoolean;
   private static Field falseBoolean;
-  public static ClassType int_ctype, long_ctype, char_ctype;
-  public static ClassType float_ctype, double_ctype;
   private static Method int_init, long_init, char_init;
   private static Method float_init, double_init;
   
@@ -136,9 +134,8 @@ public class PrimType extends Type {
 	code.emitFi();
 	return;
       case 'I': case 'S': case 'B': // int, short, byte
-	if (int_ctype == null)
+	if (int_init == null)
 	  {
-	    int_ctype = ClassType.make("java.lang.Integer");
 	    int_init = int_ctype.getDeclaredMethod("<init>", 
 						   new Type[]{int_type});
 	  }
@@ -149,9 +146,8 @@ public class PrimType extends Type {
 	code.emitInvokeSpecial(int_init);
 	return;
       case 'J': // long
-	if (long_ctype == null)
+	if (long_init == null)
 	  {
-	    long_ctype = ClassType.make("java.lang.Long");
 	    long_init = long_ctype.getDeclaredMethod("<init>", 
 						     new Type[]{this});
 	  }
@@ -163,9 +159,8 @@ public class PrimType extends Type {
 	code.emitInvokeSpecial(long_init);
 	return;
       case 'F': // float
-	if (float_ctype == null)
+	if (float_init == null)
 	  {
-	    float_ctype = ClassType.make("java.lang.Float");
 	    float_init = float_ctype.getDeclaredMethod("<init>", 
 						       new Type[]{float_type});
 	  }
@@ -176,9 +171,8 @@ public class PrimType extends Type {
 	code.emitInvokeSpecial(float_init);
 	return;
       case 'D': // double
-	if (double_ctype == null)
+	if (double_init == null)
 	  {
-	    double_ctype = ClassType.make("java.lang.Double");
 	    double_init = double_ctype.getDeclaredMethod("<init>", 
 							 new Type[]{double_type});
 	  }
@@ -190,9 +184,8 @@ public class PrimType extends Type {
 	code.emitInvokeSpecial(double_init);
 	return;
       case 'C': // char
-	if (char_ctype == null)
+	if (char_init == null)
 	  {
-	    char_ctype = ClassType.make("java.lang.Character");
 	    char_init = char_ctype.getDeclaredMethod("<init>", 
 						     new Type[]{this});
 	  }

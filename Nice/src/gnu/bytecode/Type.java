@@ -469,6 +469,11 @@ public abstract class Type {
   public static final PrimType void_type
     = new PrimType ("void", "V", 0, java.lang.Void.TYPE);
 
+  public static ClassType int_ctype  = ClassType.make("java.lang.Integer");
+  public static ClassType long_ctype = ClassType.make("java.lang.Long");
+  public static ClassType char_ctype = ClassType.make("java.lang.Character");
+  public static ClassType float_ctype = ClassType.make("java.lang.Float");
+  public static ClassType double_ctype = ClassType.make("java.lang.Double");
 
   /** The magic type of null. */
   public static final ObjectType nullType = new ObjectType("(type of null)");

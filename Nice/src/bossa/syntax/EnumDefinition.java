@@ -33,7 +33,7 @@ public class EnumDefinition extends Definition
     shortName = name.toString();
     classDef = ClassDefinition.makeClass
 	(name,true,false, null, new ArrayList(0),
-	new TypeIdent(new LocatedString("nice.lang.Enum",name.location())),
+	new MonotypeConstructor(new TypeIdent(new LocatedString("nice.lang.Enum",name.location())), null, this.location()),
 	interfaces,null);
     NiceClass impl = new NiceClass(classDef);
     int fieldsCount = fields.size();

@@ -62,22 +62,28 @@ public class MonotypeConstructor extends Monotype
    * Scoping
    ****************************************************************/
 
-  mlsub.typing.Monotype rawResolve(TypeMap typeMap) 
+  mlsub.typing.Monotype rawResolve(TypeMap typeMap)
   {
-    if(lowlevelTC==null)
+    if (lowlevelTC == null)
       {
 	TypeSymbol newTC = this.tc.resolveToTC(typeMap);
-	if (!(newTC instanceof TypeConstructor))
+	if (! (newTC instanceof TypeConstructor))
 	  User.error(this.tc, this.tc+" should be a type constructor");
 	lowlevelTC = (TypeConstructor) newTC;
       }
-    
+
+    mlsub.typing.Monotype[] resolvedParams = parameters.resolve(typeMap);
+
     try{
-      mlsub.typing.Monotype type = new mlsub.typing.MonotypeConstructor(lowlevelTC, parameters.resolve(typeMap));
-      return type;
+      return new mlsub.typing.MonotypeConstructor(lowlevelTC, resolvedParams);
     }
     catch(mlsub.typing.BadSizeEx e){
-      throw User.error(this, (tc!=null ? "Class "+tc : lowlevelTC.toString()) +  
+      // See if this is a class with default type parameters
+      mlsub.typing.Monotype res = ClassDefinition.toType(lowlevelTC, resolvedParams);
+      if (res != null)
+        return res;
+
+      throw User.error(this, (tc!=null ? "Class "+tc : lowlevelTC.toString()) +
 		       Util.has(e.expected, "type parameter", e.actual));
     }
   }

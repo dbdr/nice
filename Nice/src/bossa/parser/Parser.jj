@@ -934,20 +934,20 @@ Definition internalMethodOrFunction(MethodContainer c, boolean isOverride):
                              contract, isOverride); }
 }
 
-TypeIdent superClass():
-{ TypeIdent name; }
+MonotypeConstructor superClass():
+{ TypeIdent name; List params = null; }
 {
-  name=typeIdent() 
+  name=typeIdent()
     // ignore type parameters
     // they should be checked
-    [ "<" ident() ( "," ident() )* ">" ]
-  { return name; }
+    [ "<" params = monotypes() ">" ]
+  { return new MonotypeConstructor(name, params == null ? null : new TypeParameters(params), name.location()); }
 }
 
 List interfaces():
 {
   List res=new LinkedList();
-  TypeIdent name;
+  MonotypeConstructor name;
 }
 {
         name=superClass() { res.add(name); }
@@ -1049,7 +1049,7 @@ ClassDefinition classDefinition(Constraint cst, List definitions, boolean storeD
   name=ident() 
   [ parameters=classTypeParameters(cst, typeParametersVariances) ]
 
-  { TypeIdent sup = null; }
+  { MonotypeConstructor sup = null; }
 
   [ "extends" sup = superClass() ]
   [ "implements" imp=interfaces() ]

@@ -11,6 +11,9 @@ nice (0.9.9)
       <T> T newInstance(Class<T>);
     This make it possible to write type-safe code that uses reflexion,
     in particular when using class literals.
+  * Subclasses can have less type parameters than their parent by fixing
+    the value of the others. For instance:
+      class BitField implements List<boolean> { ... }
   * Improved speed of coverage tests for some methods.
   * Removed the '--strict' compiler option.
 

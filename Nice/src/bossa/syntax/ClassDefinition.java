@@ -14,6 +14,7 @@ package bossa.syntax;
 
 import bossa.util.*;
 import mlsub.typing.*;
+import mlsub.typing.Monotype;
 
 import gnu.bytecode.*;
 import java.util.*;
@@ -47,6 +48,18 @@ public abstract class ClassDefinition extends MethodContainer
       super(name, typeParameters, typeParametersVariances,
             implementations, abstractions);
       this.extensions = extensions;
+
+      // Find out the real variance of the interface
+      int arity = getVariance(extensions);
+      if (arity == -1)
+        arity = getVariance(implementations);
+      if (arity == -1)
+        arity = getVariance(abstractions);
+
+      if (arity == -1 || arity <= typeParametersVariances.size())
+        this.variance = makeVariance(typeParametersVariances);
+      else
+        this.variance = Variance.make(new int[arity]);
 
       this.createTC();
       associatedInterface = new mlsub.typing.Interface(variance, tc);
@@ -140,12 +153,12 @@ public abstract class ClassDefinition extends MethodContainer
       /* of TypeConstructor */ extensions;
   }
 
-  public static 
-    Class makeClass(LocatedString name, 
-		    boolean isFinal, boolean isAbstract, 
+  public static
+    Class makeClass(LocatedString name,
+		    boolean isFinal, boolean isAbstract,
 		    Constraint typeParameters,
 		    List typeParametersVariances,
-		    TypeIdent superClassIdent, 
+		    MonotypeConstructor superClassIdent,
 		    List implementations, List abstractions
 		    )
   {
@@ -156,11 +169,11 @@ public abstract class ClassDefinition extends MethodContainer
 
   public static class Class extends ClassDefinition
   {
-    Class(LocatedString name, 
-	  boolean isFinal, boolean isAbstract, 
+    Class(LocatedString name,
+	  boolean isFinal, boolean isAbstract,
 	  Constraint typeParameters,
 	  List typeParametersVariances,
-	  TypeIdent superClassIdent, 
+	  MonotypeConstructor superClassIdent,
 	  List implementations, List abstractions
 	  )
     {
@@ -169,8 +182,20 @@ public abstract class ClassDefinition extends MethodContainer
 
       this.isFinal = isFinal;
       this.isAbstract = isAbstract;
-    
+
       this.superClassIdent = superClassIdent;
+
+      // Find out the real variance of the interface
+      int arity = getVariance(superClassIdent);
+      if (arity == -1)
+        arity = getVariance(implementations);
+      if (arity == -1)
+        arity = getVariance(abstractions);
+
+      if (arity == -1 || arity <= typeParametersVariances.size())
+        this.variance = makeVariance(typeParametersVariances);
+      else
+        this.variance = Variance.make(new int[arity]);
 
       this.createTC();
       if (isFinal)
@@ -237,16 +262,18 @@ public abstract class ClassDefinition extends MethodContainer
 
     void resolveClass()
     {
+      Monotype[] params = null;
       if (superClassIdent != null)
 	{
-	  superClass = superClassIdent.resolveToTC(typeScope);
+          params = resolveParent(superClassIdent, getLocalScope());
+	  superClass = superClassIdent.tc.resolveToTC(typeScope);
 
 	  if (superClass.isMinimal())
 	    User.error(superClassIdent,
 		       superClass + " is a final class. It cannot be extended");
 	  if (TypeConstructors.isInterface(superClass))
 	    User.error(superClassIdent,
-		       superClass + " is an interface, so " + name + 
+		       superClass + " is an interface, so " + name +
 		       " may only implement it");
 
 	  superClassIdent = null;
@@ -256,6 +283,8 @@ public abstract class ClassDefinition extends MethodContainer
       if (d != null)
         {
           d.resolve();
+
+          useParent(d, params);
 
           if(d.getImplementation() instanceof PrimitiveType && ! 
 		(this.getImplementation() instanceof PrimitiveType))
@@ -300,7 +329,7 @@ public abstract class ClassDefinition extends MethodContainer
       implementation.printInterface(s);
     }
 
-    TypeIdent superClassIdent;
+    MonotypeConstructor superClassIdent;
     TypeConstructor superClass;
     protected boolean isFinal;
   
@@ -324,11 +353,11 @@ public abstract class ClassDefinition extends MethodContainer
                          List implementations, List abstractions
                          )
   {
-    super(name, Node.upper, typeParameters, typeParametersVariances);
+    super(name, Node.upper, typeParameters);
     this.implementations = implementations;
     this.abstractions = abstractions;
   }
-  
+
   protected List
     /* of Interface */ implementations,
     /* of Interface */ abstractions;
@@ -425,12 +454,17 @@ public abstract class ClassDefinition extends MethodContainer
 
   private static Map tcToClassDef;
   public static void reset() { tcToClassDef = new HashMap(); }
-  
+
   public static final ClassDefinition get(TypeConstructor tc)
   {
     return (ClassDefinition) tcToClassDef.get(tc);
   }
-  
+
+  public static final ClassDefinition get(mlsub.typing.Interface itf)
+  {
+    return ClassDefinition.get(itf.associatedTC());
+  }
+
   /****************************************************************
    * Selectors
    ****************************************************************/
@@ -494,10 +528,15 @@ public abstract class ClassDefinition extends MethodContainer
 
     status = RESOLVING;
 
-    try 
+    try
       {
-	super.resolve();
 	resolveClass();
+
+	super.resolve();
+
+        // This needs to be after super.resolve(), so that the constraint is
+        // resolved
+        implementation.resolveClass();
       }
     finally
       {
@@ -508,8 +547,8 @@ public abstract class ClassDefinition extends MethodContainer
   void resolveClass()
   {
     this.resolveInterfaces(implementations);
-    abs = TypeIdent.resolveToItf(typeScope, abstractions);
-    
+    abs = AbstractInterface.resolve(typeScope, abstractions);
+
     implementations = abstractions = null;
 
     // Resolve the super-interfaces first.
@@ -522,7 +561,6 @@ public abstract class ClassDefinition extends MethodContainer
       }
 
     createContext();
-    implementation.resolveClass();
   }
 
   /** Java interfaces implemented or extended by this class/interface. */
@@ -537,11 +575,20 @@ public abstract class ClassDefinition extends MethodContainer
 
     for (Iterator i = names.iterator(); i.hasNext();)
       {
-	TypeIdent name = (TypeIdent) i.next();
+        MonotypeConstructor parent = (MonotypeConstructor) i.next();
+        Monotype[] params = resolveParent(parent, getLocalScope());
+
+	TypeIdent name = parent.tc;
 	TypeSymbol s = name.resolvePreferablyToItf(typeScope);
-	
+
 	if (s instanceof mlsub.typing.Interface)
-	  interfaces.add(s);
+	  {
+            interfaces.add(s);
+
+            ClassDefinition def = ClassDefinition.get((mlsub.typing.Interface) s);
+            if (def != null)
+              useParent(def, params);
+          }
 	else
 	  {
 	    TypeConstructor tc = (TypeConstructor) s;
@@ -558,6 +605,14 @@ public abstract class ClassDefinition extends MethodContainer
     if (javaInterfaces != null)
       this.javaInterfaces = (TypeConstructor[])
         javaInterfaces.toArray(new TypeConstructor[javaInterfaces.size()]);
+  }
+
+  Monotype[] resolveParent(MonotypeConstructor parent, TypeScope typeScope)
+  {
+    if (parent.parameters == null)
+      return null;
+
+    return bossa.syntax.Monotype.resolve(typeScope, parent.parameters.content);
   }
 
   void resolveBody()
@@ -634,6 +689,155 @@ public abstract class ClassDefinition extends MethodContainer
     catch(TypingEx e){
       User.error(name, "Error in " + name + " : " + e.getMessage());
     }
+  }
+
+  /**
+     Returns a monotype based on this tc, provided that the class
+     requires no type parameter because it specializes its parent.
+  */
+  static Monotype toType(TypeConstructor tc)
+  {
+    ClassDefinition def = ClassDefinition.get(tc);
+    if (def == null)
+      return null;
+
+    if (def.parentParams == null)
+      return null;
+
+    // Look for missing type parameters
+    int missing = 0;
+    for (int i = 0; i < def.parentParams.length; i++)
+      if (def.parentParams[i] == null)
+        missing++;
+
+    if (missing == 0)
+      return new mlsub.typing.MonotypeConstructor(tc, def.parentParams);
+
+    return null;
+  }
+
+  /**
+     Returns a monotype based on this tc, provided that the class
+     requires exactly these type parameters because it specializes its parent.
+  */
+  static Monotype toType(TypeConstructor tc, Monotype[] sourceParams)
+  {
+    ClassDefinition def = ClassDefinition.get(tc);
+    if (def == null)
+      return null;
+
+    if (def.parentParams == null)
+      return null;
+
+    Monotype[] fullParams = new Monotype[def.parentParams.length];
+
+    int used = 0;
+    for (int i = 0; i < fullParams.length; i++)
+      if (def.parentParams[i] == null)
+        {
+          fullParams[i] = sourceParams[def.parentTypeParameterMap[i]];
+          used++;
+        }
+      else
+        fullParams[i] = def.parentParams[i];
+
+    if (used < sourceParams.length)
+      return null;
+
+    return new mlsub.typing.MonotypeConstructor(tc, fullParams);
+  }
+
+  private Monotype[] parentParams;
+  private int[] parentTypeParameterMap;
+
+  MethodContainer.Constraint specialize(MethodContainer.Constraint our,
+                                        MethodContainer.Constraint parent,
+                                        Monotype[] params)
+  {
+    if (parent == null)
+      return null;
+
+    if (params == null)
+      return our;
+
+    this.parentParams = params;
+    this.parentTypeParameterMap = new int[params.length];
+
+    List binders = new ArrayList();
+    List atoms = new ArrayList();
+    Monotype[] typeParameters = new Monotype[params.length];
+
+    if (our != null)
+      {
+        binders.addAll(Arrays.asList(our.getBinderArray()));
+        atoms.addAll(our.getAtoms());
+      }
+
+    for (int i = 0; i < params.length; i++)
+      {
+        if (params[i] instanceof MonotypeVar)
+          {
+            typeParameters[i] = params[i];
+            parentTypeParameterMap[i] = find(params[i], our.typeParameters);
+            parentParams[i] = null;
+            continue;
+          }
+
+        MonotypeVar mvar = new MonotypeVar("D" + i);
+        binders.add(mvar);
+        typeParameters[i] = mvar;
+
+        bossa.syntax.Monotype var = bossa.syntax.Monotype.create(mvar);
+        atoms.add(new MonotypeLeqCst(bossa.syntax.Monotype.create(params[i]), var));
+        atoms.add(new MonotypeLeqCst(var, bossa.syntax.Monotype.create(params[i])));
+      }
+
+    return new MethodContainer.Constraint
+      ((TypeSymbol[]) binders.toArray(new TypeSymbol[binders.size()]),
+       atoms,
+       typeParameters,
+       this.location());
+  }
+
+  private int find(Object o, Object[] array)
+  {
+    for (int i = 0; ; i++)
+      if (array[i] == o)
+        return i;
+  }
+
+  int getVariance(List parents)
+  {
+    if (parents == null)
+      return -1;
+
+    int res;
+
+    for (Iterator i = parents.iterator(); i.hasNext();)
+      {
+        res = getVariance((MonotypeConstructor) i.next());
+        if (res != -1)
+          return res;
+      }
+
+    return -1;
+  }
+
+  int getVariance(MonotypeConstructor parent)
+  {
+    if (parent == null || parent.parameters.content == null)
+      return -1;
+
+    // Assume non-variance
+    return parent.parameters.content.length;
+  }
+
+  void useParent(MethodContainer parent, Monotype[] params)
+  {
+    if (parentParams == null)
+      classConstraint =
+        specialize(this.classConstraint, parent.classConstraint, params);
+
   }
 
   /****************************************************************

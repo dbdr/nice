@@ -1,0 +1,42 @@
+/// PASS
+  B b = new B(x: "");
+  String s = b.x;
+  /// Toplevel
+class A<T> { T x; }
+class B extends A<String> {}
+
+/// PASS
+  B b = new B();
+  String s = b.get();
+  /// Toplevel
+abstract class A<T> { T get(); }
+class B extends A<String> { get() = ""; }
+
+/// PASS
+  B b = new B();
+  String s = b.get();
+  /// Toplevel
+interface A<T> { T get(); }
+class B implements A<String> { get() = ""; }
+
+/// FAIL
+  B /*/// FAIL HERE */ b = new B(x: 0);
+  /// Toplevel
+class A<T> { T x; }
+class B extends A<String> {}
+
+/// PASS
+  B<int> b = new B(x: 0, y: "");
+  C<int> c = new C(x: "", y: 0);
+  /// Toplevel
+class A<T,U> { T x; U y; }
+class B<V> extends A<V, String> {}
+class C<W> extends A<String, W> {}
+
+/// PASS
+  B<int,boolean> b = new B(x: 0,    y: "", z: false);
+  C<int,boolean> c = new C(x: true, y: "", z: 0);
+  /// Toplevel
+class A<T,U,V> { T x; U y; V z; }
+class B<T,V> extends A<T, String, V> {}
+class C<T,V> extends A<V, String, T> {}

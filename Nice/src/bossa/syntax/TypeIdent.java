@@ -90,6 +90,11 @@ public final class TypeIdent extends Monotype implements Located
 	  return nice.tools.typing.Types.zeroArgMonotype(tc);
 	}
 	catch(mlsub.typing.BadSizeEx e){
+          // See if this is a class with default type parameters
+          mlsub.typing.Monotype type = ClassDefinition.toType(tc);
+          if (type != null)
+            return type;
+
 	  throw User.error(this, name +
 			   Util.has(e.expected, "type parameter", e.actual));
 	}

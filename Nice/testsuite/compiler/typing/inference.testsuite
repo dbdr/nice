@@ -3,7 +3,7 @@ class A<FOO>
 {
   void poly(FOO) {}
 }
-class B<BAR> extends A<FOO> {}
+class B<BAR> extends A<BAR> {}
 
 /// PASS
   let x = new A();

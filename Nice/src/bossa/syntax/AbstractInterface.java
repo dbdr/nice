@@ -54,11 +54,27 @@ public class AbstractInterface extends MethodContainer
    * Resolution
    ****************************************************************/
 
+  static Interface[] resolve(TypeMap scope, List types)
+  {
+    if (types == null || types.size() == 0) return null;
+
+    Interface[] res = new Interface[types.size()];
+
+    int n = 0;
+    for (Iterator i = types.iterator(); i.hasNext(); n++)
+      {
+        MonotypeConstructor parent = (MonotypeConstructor) i.next();
+        res[n++] = parent.tc.resolveToItf(scope);
+      }
+
+    return res;
+  }
+
   void resolve()
   {
     super.resolve();
 
-    surinterfaces = TypeIdent.resolveToItf(typeScope, extensions);
+    superInterfaces = resolve(typeScope, extensions);
     extensions = null;
 
     createContext();
@@ -81,12 +97,12 @@ public class AbstractInterface extends MethodContainer
 
   private void createContext()
   {
-    if (surinterfaces != null)
+    if (superInterfaces != null)
       try{
-	Typing.assertLeq(itf, surinterfaces);
+	Typing.assertLeq(itf, superInterfaces);
       }
       catch(mlsub.typing.KindingEx e){
-	User.error(name, name + " cannot extends one of the surinterfaces " +
+	User.error(name, name + " cannot extends one of the interfaces " +
 		   " because they don't have the same number or kind of " +
 		   " type parameters");
       }
@@ -102,7 +118,7 @@ public class AbstractInterface extends MethodContainer
     w.print("abstract interface "
             + getSimpleName()
             + printTypeParameters()
-            + Util.map(" extends ",", ","", surinterfaces)
+            + Util.map(" extends ",", ","", superInterfaces)
             + "{}\n");
 
     if (children != null)
@@ -141,7 +157,7 @@ public class AbstractInterface extends MethodContainer
 
   /** ML-Sub interface. */
   private Interface itf;
-  
-  private List /* of Interface */ extensions; // the surinterfaces
-  private Interface[] surinterfaces; // resolved surinterfaces
+
+  private List /* of Interface */ extensions; // the super-interfaces
+  private Interface[] superInterfaces; // resolved super-interfaces
 }

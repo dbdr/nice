@@ -32,16 +32,21 @@ import java.util.List;
 
 public abstract class MethodContainer extends Definition
 {
-  MethodContainer (LocatedString name, int propagate, 
-		   MethodContainer.Constraint classConstraint, 
-		   List variance)
+  MethodContainer (LocatedString name, int propagate,
+		   MethodContainer.Constraint classConstraint)
   {
     super(name, propagate);
 
     this.name.prepend(module.getName() + ".");
-    
-    this.variance = makeVariance(variance);
     this.classConstraint = classConstraint;
+  }
+
+  MethodContainer (LocatedString name, int propagate,
+		   MethodContainer.Constraint classConstraint,
+		   List variance)
+  {
+    this(name, propagate, classConstraint);
+    this.variance = makeVariance(variance);
   }
 
   /** The name of this method container without package qualification. */
@@ -55,7 +60,7 @@ public abstract class MethodContainer extends Definition
 
   abstract mlsub.typing.TypeSymbol getTypeSymbol();
 
-  private static Variance makeVariance(java.util.List typeParametersVariances)
+  static Variance makeVariance(java.util.List typeParametersVariances)
   {
     int[] variances = new int[typeParametersVariances.size()];
     for (int i = typeParametersVariances.size(); --i >= 0;)
@@ -118,8 +123,16 @@ public abstract class MethodContainer extends Definition
         nice.tools.typing.Types.makeMarkedType(typeParameters[i]);
     }
 
+    Constraint (TypeSymbol[] binders, List atoms,
+                mlsub.typing.Monotype[] typeParameters,
+                Location loc)
+    {
+      super(binders, atoms);
+      this.typeParameters = typeParameters;
+    }
+
     /**
-       Replace those type parameters that have been introduced in the 
+       Replace those type parameters that have been introduced in the
        constraint by their definition.
     */
     private void findBinders(MonotypeVar[] typeParameters, Location loc)
@@ -155,7 +168,7 @@ public abstract class MethodContainer extends Definition
     mlsub.typing.Monotype[] typeParameters;
   }
 
-  final Constraint classConstraint;
+  Constraint classConstraint;
   mlsub.typing.AtomicConstraint[] resolvedConstraints;
 
   void resolve()

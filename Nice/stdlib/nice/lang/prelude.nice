@@ -94,6 +94,7 @@ boolean `!=`(char, char) = native boolean Native.neq(char,char);
 
 
 <Any T> boolean equals(T,T) = native boolean Object.equals(Object);
+<T> int hashCode(T) = native int Object.hashCode();
 
 // can be overriden in nice
 <Any T> boolean eq(T,T);

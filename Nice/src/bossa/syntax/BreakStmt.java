@@ -34,6 +34,5 @@ public class BreakStmt extends Statement
     return new gnu.expr.ExitExp(loop.block);
   }
 
-  LocatedString label;
   LoopStmt loop;
 }

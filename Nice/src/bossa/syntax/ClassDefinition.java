@@ -12,7 +12,7 @@
 
 // File    : ClassDefinition.java
 // Created : Thu Jul 01 11:25:14 1999 by bonniot
-//$Modified: Mon Jan 24 18:28:52 2000 by Daniel Bonniot $
+//$Modified: Wed Jan 26 17:49:32 2000 by Daniel Bonniot $
 
 package bossa.syntax;
 
@@ -74,7 +74,7 @@ public class ClassDefinition extends Node
 	this.methods=addChildren(methods);
 	addChildren(computeAccessMethods(this.fields));
 
-	if(isAbstract)
+	if(isAbstract || isFinal)
 	  // since no associated concrete class is created,
 	  // it needs its own classtype
 	  {
@@ -98,7 +98,7 @@ public class ClassDefinition extends Node
   public Collection associatedDefinitions()
   {
     if(isFinal || isAbstract)
-      return new ArrayList(0);
+      return new LinkedList();
 
     Collection res=new ArrayList(1);
     LocatedString name=new LocatedString("#"+this.name.content,this.name.location());
@@ -251,7 +251,7 @@ public class ClassDefinition extends Node
        + Util.map("<",", ",">",typeParameters)
        + Util.map(" extends ",", ","",extensions)
        + Util.map(" implements ",", ","",implementations)
-       + Util.map(" abstracts ",", ","",abstractions)
+       + Util.map(" finally implements ",", ","",abstractions)
        + " {\n"
        + Util.map("",";\n",";\n",fields)
        + Util.map(methods)
@@ -290,7 +290,7 @@ public class ClassDefinition extends Node
   
   /**
    * The abstract class associated with a concrete class.
-   * pre: this.isSharp()
+   * pre: this.isSharp() is true
    */
   ClassDefinition abstractClass()
   {
@@ -397,7 +397,7 @@ public class ClassDefinition extends Node
 
   public void compile()
   {
-    if(!isSharp && !isAbstract)
+    if(!isSharp && !(isAbstract || isFinal))
       return;
     
     classType.setModifiers(Access.PUBLIC 

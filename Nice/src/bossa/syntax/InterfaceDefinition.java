@@ -12,7 +12,7 @@
 
 // File    : InterfaceDefinition.java
 // Created : Thu Jul 01 17:00:14 1999 by bonniot
-//$Modified: Mon Dec 13 15:38:42 1999 by bonniot $
+//$Modified: Wed Jan 26 15:12:44 2000 by Daniel Bonniot $
 
 package bossa.syntax;
 
@@ -58,10 +58,13 @@ public class InterfaceDefinition extends Node
     itf=variance.newInterface();
   }
   
-  static private Vector tops=new Vector();
+  static private Vector tops;
   
   static InterfaceDefinition top(int arity)
   {
+    if(tops==null)
+      tops = new Vector(5);
+    
     if(arity>=tops.size())
       tops.setSize(arity+1);
     InterfaceDefinition res=(InterfaceDefinition)tops.get(arity);

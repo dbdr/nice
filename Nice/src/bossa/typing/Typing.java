@@ -12,7 +12,7 @@
 
 // File    : Typing.java
 // Created : Tue Jul 20 11:57:17 1999 by bonniot
-//$Modified: Tue Jan 25 15:06:49 2000 by Daniel Bonniot $
+//$Modified: Wed Jan 26 15:25:37 2000 by Daniel Bonniot $
 
 package bossa.typing;
 
@@ -135,13 +135,15 @@ abstract public class Typing
 
   private static void unsatisfiable(TypingEx e) throws TypingEx
   {
-    Engine.backtrack();
+    if(Engine.isInRigidContext())
+      Engine.backtrack();
     throw e;
   }
   
   private static void unsatisfiable(BadSizeEx e) throws BadSizeEx
   {
-    Engine.backtrack();
+    if(Engine.isInRigidContext())
+      Engine.backtrack();
     throw e;
   }
   

@@ -12,7 +12,7 @@
 
 // File    : TypeConstructor.java
 // Created : Thu Jul 08 11:51:09 1999 by bonniot
-//$Modified: Fri Jan 21 15:48:24 2000 by Daniel Bonniot $
+//$Modified: Wed Jan 26 14:54:59 2000 by Daniel Bonniot $
 
 package bossa.syntax;
 
@@ -187,10 +187,11 @@ public class TypeConstructor
   {
     if(definition==null
        // FIXME: bad hack
-       && !(name.toString().equals("dummy type symbol"))
+       //&& !(name.toString().equals("dummy type symbol"))
        )
       {
 	TypeSymbol s=typeScope.lookup(name.toString());
+	
 	if(s==null)
 	  User.error(name,"Class "+name+" is not defined"," in "+typeScope);
 	

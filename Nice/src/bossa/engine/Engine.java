@@ -12,7 +12,7 @@
 
 // File    : Engine.java
 // Created : Tue Jul 27 15:34:53 1999 by bonniot
-//$Modified: Thu Jan 20 12:20:17 2000 by bonniot $
+//$Modified: Wed Jan 26 15:29:57 2000 by Daniel Bonniot $
 
 package bossa.engine;
 
@@ -267,7 +267,9 @@ public abstract class Engine
 	    Leq leq=(Leq)i.next();
 	    if(leq.e1==e)
 	      if(leq.e2.getKind()==null)
-		s.push(leq.e2);
+		{
+		  s.push(leq.e2);
+		}
 	      else
 		{
 		  Internal.error(leq.e1.getKind()!=leq.e2.getKind(),
@@ -422,10 +424,6 @@ public abstract class Engine
     return constraints.iterator();
   }
   
-  /****************************************************************
-   * Engine.Constraint
-   ****************************************************************/
-
   public static void createInitialContext()
     throws Unsatisfiable
   {
@@ -439,7 +437,12 @@ public abstract class Engine
   }
   
   private static boolean initialContext=true;
-  
+  public static boolean isInRigidContext() { return !initialContext; }
+
+  /****************************************************************
+   * Engine.Constraint
+   ****************************************************************/
+
   final public static class Constraint
     implements Kind
   {

@@ -12,7 +12,7 @@
 
 // File    : parser.jj
 // Created : Thu Jul 01 10:27:05 1999 by bonniot
-//$Modified: Tue Jan 25 17:11:15 2000 by Daniel Bonniot $
+//$Modified: Wed Jan 26 18:50:26 2000 by Daniel Bonniot $
 // Description : Parseur JavaCC pour Bossa
 //   Tokens based on the Jazz parser
 
@@ -1106,13 +1106,20 @@ CallExp callExp(Expression prefix):
 Expression computedExp(Expression prefix):
 {
   Expression res=prefix;
-  TypeParameters tp=null;
+  List parameters;
   LocatedString name;
 }
 {
   (
+    { parameters=null; }
     "." name=string()
-    { res=FieldExp.create(res,name); }
+    [ "(" parameters=expressions() ")" ]
+    { 
+      if(parameters==null)
+        parameters=new ArrayList(1);
+      parameters.add(0,res);
+      res = new CallExp(new IdentExp(name),parameters); 
+    }
   |
     res=callExp(res)
   )*

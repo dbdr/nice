@@ -12,7 +12,7 @@
 
 // File    : MonotypeVar.java
 // Created : Fri Jul 23 15:36:39 1999 by bonniot
-//$Modified: Tue Jan 25 15:49:50 2000 by Daniel Bonniot $
+//$Modified: Wed Jan 26 14:23:09 2000 by Daniel Bonniot $
 
 package bossa.syntax;
 

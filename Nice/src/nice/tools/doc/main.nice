@@ -11,13 +11,19 @@ import nice.tools.compiler;
 import nice.tools.compiler.console;
 import bossa.modules.*;
 
+/**
+ * Compilation object allows us to dynamically find out what we are compiling.
+ * It is initialised by the main method.
+ */
+var Compilation compilation = cast(null);
+
 void main(String[] args)
 {
   String mainPackage;
   File outdir = new File(".");
 
   ConsoleOutput consOutput = new ConsoleOutput();
-  Compilation compilation = new Compilation
+  compilation = new Compilation
     (listener: consOutput, parser: new bossa.parser.JavaccParser(true));
 
   Program prg = new Program
@@ -77,3 +83,4 @@ void main(String[] args)
 
   generate(compilation, mainPackage, outdir);
 }
+

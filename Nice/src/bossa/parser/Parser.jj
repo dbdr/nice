@@ -100,7 +100,7 @@ MORE :
   "/*" {nestingLevel++; }: IN_MULTI_LINE_COMMENT
 }
 
-SPECIAL_TOKEN : 
+SPECIAL_TOKEN :
 { <SINGLE_LINE_COMMENT: "//" (~["\n", "\r"])* ("\n" | "\r" | "\r\n" )? > }
 
 <IN_FORMAL_COMMENT>
@@ -118,7 +118,7 @@ MORE :
 <IN_MULTI_LINE_COMMENT>
 SKIP :
 {
- "*/" { if (--nestingLevel == 0) SwitchTo(DEFAULT); } 
+ "*/" { if (--nestingLevel == 0) SwitchTo(DEFAULT); }
 }
 
 <IN_FORMAL_COMMENT,IN_MULTI_LINE_COMMENT>
@@ -146,7 +146,7 @@ TOKEN: /* Separators, Delimiters */
 | < MAPSTO:     "->"  >
 | < COND:       "?"   >
 | < ANY:        "_"   >
-| < BACKSLASH:  "\\"  >      
+| < BACKSLASH:  "\\"  >
 }
 
 TOKEN: /* Operators */
@@ -182,37 +182,37 @@ TOKEN: /* Keywords */
   < CLASS:      "class"		>
 | < INTERFACE:  "interface"	>
 | < IMPLEMENTS: "implements"	>
-| < EXTENDS:    "extends"    	>
-| < ENUM:       "enum"    	>
+| < EXTENDS:    "extends"	>
+| < ENUM:       "enum"		>
 | < OVERRIDE:   "override"      >
 
 // Packages
-| < IMPORT:     "import"     	>
-| < PACKAGE:    "package"    	>
+| < IMPORT:     "import"	>
+| < PACKAGE:    "package"	>
 
-| < AT:         "@"          	>
-| < EXACTLY_AT: "#"          	>
+| < AT:         "@"		>
+| < EXACTLY_AT: "#"		>
 
 // Assertions
-| < ASSERT:     "assert"     	>
-| < REQUIRE:    "requires"     	>
-| < ENSURE:     "ensures"     	>
+| < ASSERT:     "assert"	>
+| < REQUIRE:    "requires"	>
+| < ENSURE:     "ensures"	>
 
 // Expressions
-| < FOR:        "for"        	>
-| < IF:         "if"         	>
-| < ELSE:       "else"       	>
-| < WHILE:      "while"      	>
+| < FOR:        "for"		>
+| < IF:         "if"		>
+| < ELSE:       "else"		>
+| < WHILE:      "while"		>
 | < DO:		"do"		>
-| < TRUE:       "true"       	>
-| < FALSE:      "false"      	>
-| < ALIKE:      "alike"      	> /* Nice specific */
+| < TRUE:       "true"		>
+| < FALSE:      "false"		>
+| < ALIKE:      "alike"		> /* Nice specific */
 | < UNKNOWN:	"unknown"       > /* Nice specific */
-//| < THIS:       "this"       	>
+//| < THIS:       "this"	>
 | < SUPER:      "super"         >
-| < INSTANCEOF: "instanceof" 	>
+| < INSTANCEOF: "instanceof"	>
 | < SYNCHRONIZED: "synchronized">
-| < NEW:        "new"        	>
+| < NEW:        "new"		>
 | < NULL:	"null"		>
 
 | < BREAK:	"break"		>
@@ -222,30 +222,30 @@ TOKEN: /* Keywords */
 | < SWITCH:	"switch"	>
 
 // Statements
-| < RETURN:     "return"     	>
-| < VARIABLE:   "var"   	> /* Nice specific */
-| < LET:   	"let"   	> /* Nice specific */
+| < RETURN:     "return"	>
+| < VARIABLE:   "var"		> /* Nice specific */
+| < LET:	"let"		> /* Nice specific */
 
 // modifiers
-| < PUBLIC:     "public"     	>
-| < PRIVATE:    "private"    	>
-| < PUBLICR:    "public-read" 	>
+| < PUBLIC:     "public"	>
+| < PRIVATE:    "private"	>
+| < PUBLICR:    "public-read"	>
 | < PRIVATEW:   "private-write"	>
-| < PROTECTED:  "protected"  	>
-| < STATIC:     "static"     	>
-| < FINAL:      "final"      	>
-| < TRANSIENT:  "transient"  	>
-| < VOLATILE:   "volatile"   	>
-| < CONST:      "const"      	>
-| < NATIVE:     "native"     	> /* Nice specific */
+| < PROTECTED:  "protected"	>
+| < STATIC:     "static"	>
+| < FINAL:      "final"		>
+| < TRANSIENT:  "transient"	>
+| < VOLATILE:   "volatile"	>
+| < CONST:      "const"		>
+| < NATIVE:     "native"	> /* Nice specific */
 | < INLINE:     "inline"        > /* Nice specific */
-| < ABSTRACT:   "abstract"   	>
+| < ABSTRACT:   "abstract"	>
 
 // exceptions
 | < THROW:	"throw"		>
-| < TRY:	"try" 		>
-| < CATCH:	"catch" 	>
-| < FINALLY:    "finally"    	>
+| < TRY:	"try"		>
+| < CATCH:	"catch"		>
+| < FINALLY:    "finally"	>
 }
 
 
@@ -361,7 +361,7 @@ TOKEN:
      [
       "\u0024",
       "\u0041"-"\u005a",
-      "\u005f", 
+      "\u005f",
       "\u0061"-"\u007a",
       "\u00c0"-"\u00d6",
       "\u00d8"-"\u00f6",
@@ -394,7 +394,7 @@ TOKEN:
     ]
   >
 }
- 
+
 /*
  * Illegal tokens
  */
@@ -417,14 +417,14 @@ String rawString():
 LocatedString ident():
 { Token t; }
 {
-  t=<IDENT> 
+  t=<IDENT>
   { return new LocatedString(t.image, makeLocation(t)); }
 }
 
 String unlocIdent():
 { Token t; }
 {
-  t=<IDENT> 
+  t=<IDENT>
   { return t.image; }
 }
 
@@ -450,11 +450,11 @@ LocatedString identOrBackquoted():
 Token doted_string_component():
 { Token t; }
 {
-  ( t = <IDENT> 
+  ( t = <IDENT>
   | t = "alike"
   | t = "var"
-  | t = "inline" 
-  | t = "native" 
+  | t = "inline"
+  | t = "native"
   )
   { return t; }
 }
@@ -469,8 +469,8 @@ LocatedString doted_string():
   { t = start; image = new StringBuffer(start.image); }
 
   ( LOOKAHEAD(2) // needed to distinguish with ".class"
-    "." t=doted_string_component() 
-    { image.append(".").append(t.image); } 
+    "." t=doted_string_component()
+    { image.append(".").append(t.image); }
   )*
 
   { return new LocatedString(image.toString(), makeLocation(start, t)); }
@@ -486,8 +486,8 @@ LocatedString fullyQualifiedName():
   start = <IDENT>
   { t = start; image = new StringBuffer(t.image); }
   ( LOOKAHEAD(2) // needed to distinguish with ".class"
-    "." t=doted_string_component() 
-    { image.append(".").append(t.image); } 
+    "." t=doted_string_component()
+    { image.append(".").append(t.image); }
   )+
   { return new LocatedString(image.toString(), makeLocation(start, t)); }
 }
@@ -514,14 +514,14 @@ Collection strings():
 LocatedString floatingLiteral():
 { Token t; }
 {
-  t = <FLOATING_POINT_LITERAL> 
+  t = <FLOATING_POINT_LITERAL>
   { return new LocatedString(t.image, makeLocation(t)); }
 }
 
 LocatedString integerLiteral():
 { Token t; }
 {
-  t = <INTEGER_LITERAL> 
+  t = <INTEGER_LITERAL>
   { return new LocatedString(t.image, makeLocation(t)); }
 }
 
@@ -581,19 +581,19 @@ TypeSymbol binder(Collection atomics):
 }
 {
   LOOKAHEAD( typeIdent() typeConstructor() )
-  first=typeIdent() 
+  first=typeIdent()
   second=typeConstructor()
-  { 
-    atomics.add(new TypeConstructorLeqCst(second,first)); 
-    return second; 
+  {
+    atomics.add(new TypeConstructorLeqCst(second,first));
+    return second;
   }
 | { boolean sure = false; }
   [ "!" { sure = true; } ]
   id=monotypeVar()
-  { 
+  {
     if (sure)
       atomics.add(bossa.syntax.dispatch.createSureTypeVar(id));
-    return id; 
+    return id;
   }
 }
 
@@ -610,7 +610,7 @@ List binders(Collection atomics):
 
 void atomicConstraint(List list):
 {
-  Monotype m1,m2;  
+  Monotype m1,m2;
   TypeIdent t,i;
 }
 {
@@ -637,7 +637,7 @@ Constraint constraint():
 {}
 {
   [ { List b=null, atoms=new ArrayList(); }
-    "<" b=binders(atoms) [ "|" atomics(atoms) ] ">" 
+    "<" b=binders(atoms) [ "|" atomics(atoms) ] ">"
     { return bossa.syntax.dispatch.createConstraint(b,atoms); }
   ]
   { return bossa.syntax.dispatch.createConstraint(null,null); }
@@ -668,13 +668,13 @@ Monotype monotypeConstructor():
   // are parsed as MonotypeVars, not here.
   // This is fixed during scoping.
 
-    t=typeConstructorIdent() 
+    t=typeConstructorIdent()
     "<" [  p=monotypes() ] ">"
     { if(p==null) p=new ArrayList(0);
       last=getToken(0);
 
       return bossa.syntax.fun.createMonotypeConstructor(t,bossa.syntax.dispatch.createTypeParameters(p),
-				     makeLocation(first, last)); 
+				     makeLocation(first, last));
     }
 }
 
@@ -686,21 +686,21 @@ Monotype funOrTupleMonotype():
   Token start,end;
 }
 {
-  start="(" [ domain = monotypes() ] end=")" 
+  start="(" [ domain = monotypes() ] end=")"
   [ LOOKAHEAD("?"|"->")
   [ "?" { maybe = true; } ]
   "->"
   codomain = monotype()
-  { 
-    FunType res = bossa.syntax.dispatch.createFunType(domain, codomain); 
+  {
+    FunType res = bossa.syntax.dispatch.createFunType(domain, codomain);
     if (maybe)
       res.nullness = /*maybe*/1;
     else
      res.nullness = /*absent*/3;
-    return res; 
+    return res;
   }
   ]
-  { 
+  {
     if (domain != null && domain.size() == 1)
       // (T) is T, the parenthesis helping to resolve ambiguities
       {
@@ -708,10 +708,10 @@ Monotype funOrTupleMonotype():
       }
     Monotype res;
     if (domain != null)
-      res = new TupleType(domain, makeLocation(start, end)); 
+      res = new TupleType(domain, makeLocation(start, end));
     else
       res = new TypeIdent(new LocatedString("void",makeLocation(start, end)));
- 
+
     res.nullness = /*absent*/3;
     return res;
   }
@@ -728,14 +728,14 @@ Monotype monotype():
   [ "?" { maybe = true; } ]
   "->"
   { Monotype codomain; } codomain = monotype()
-  { 
+  {
     Monotype[] domain;
     // Make void->... mean the same as ()->...
     if (res.isVoid())
       domain = null;
     else
       domain = new Monotype[]{ res };
-    res = bossa.syntax.dispatch.createFunType_(domain, codomain); 
+    res = bossa.syntax.dispatch.createFunType_(domain, codomain);
     if (maybe)
       res.nullness = /*maybe*/1;
     else
@@ -762,7 +762,7 @@ Monotype arrayMonotype(Monotype res):
   ( end="[]" | end="[?]" { maybe = true; } )
   // parse recursively until then end of array qualifiers
   res = arrayMonotype(res)
-  { 
+  {
     List tp = new LinkedList();
     tp.add(res);
     Location loc = res.location();
@@ -804,12 +804,12 @@ Monotype simpleMonotype():
   LOOKAHEAD(monotypeConstructor())
   res=monotypeConstructor()
   { res.nullness = /*absent*/3; }
-| 
-  res=typeIdent() 
+|
+  res=typeIdent()
   { res.nullness = /*absent*/3; }
   )
-  { 
-    if ((maybe || sure) && 
+  {
+    if ((maybe || sure) &&
         (res.nullness != /*absent*/3))
       throw bossa.util.User.error
         (res, "Nullness is specified in two ways for " + res);
@@ -842,14 +842,14 @@ List monotypes():
 Expression ParameterTuplePart(List statements, List monotypes):
 { LocatedString id; Monotype type; }
 {
-( 
+(
   LOOKAHEAD( monotype() ident() )
   type=monotype()  id=ident()
   { monotypes.add(type);
-    statements.add(bossa.syntax.dispatch.createLocalVariable(id, type, false, null)); 
+    statements.add(bossa.syntax.dispatch.createLocalVariable(id, type, false, null));
     return bossa.syntax.dispatch.createIdentExp(id); }
 | { Token first,last; }
-  first="(" 
+  first="("
   { List parts = new LinkedList(); Expression part;
     List types = new LinkedList(); }
   part = ParameterTuplePart(statements, types) { parts.add(part); }
@@ -857,7 +857,7 @@ Expression ParameterTuplePart(List statements, List monotypes):
   last=")"
   { Monotype t = new TupleType(types, makeLocation(first, last));
     t.nullness = /*absent*/3;
-    monotypes.add(t); 
+    monotypes.add(t);
     return new TupleExp(parts); }
 )
 }
@@ -885,7 +885,7 @@ Parameter formalParameter(List statements):
   last=")"
   [ id=ident() [ "=" val=Expression() ] ]
   { if (id == null) {
-      ident = new LocatedString("tuple_arg_" + first.beginLine + "_" + first.beginColumn, 
+      ident = new LocatedString("tuple_arg_" + first.beginLine + "_" + first.beginColumn,
 				makeLocation(first, last));
     } else { ident = id; }
     Expression exp = bossa.syntax.dispatch.createAssignExp(new TupleExp(parts),bossa.syntax.dispatch.createIdentExp(ident));
@@ -896,7 +896,7 @@ Parameter formalParameter(List statements):
 
     return t.createParameter(ident ,val);
   }
-)  
+)
 }
 
 FormalParameters formalParameters(List statements):
@@ -929,8 +929,8 @@ Definition internalMethodOrFunction(MethodContainer c, boolean isOverride):
   "(" parameters = formalParameters(statements) ")"
   contract = contract()
   ( ";" | body = code() {statements.add(body);} )
-  
-  { return c.createMemberMethod(name, cst, returnType, parameters, 
+
+  { return c.createMemberMethod(name, cst, returnType, parameters,
                              body != null ? bossa.syntax.dispatch.createBlock(statements) : null,
                              contract, isOverride); }
 }
@@ -959,18 +959,18 @@ List interfaces():
 void fieldLookahead():
 {}
 {
-  ( "override" 
+  ( "override"
   |
     ( "public-read" [ "private-write" ]
     | "private-write"
-    | ( ("public" | "private" | {} ) 
+    | ( ("public" | "private" | {} )
         [ "final" ]
       )
-    ) 
+    )
     [ "transient" ]
     [ "volatile" ]
   )
-  monoSymbol() 
+  monoSymbol()
   ( "=" | ";" )
 }
 
@@ -991,20 +991,20 @@ void getField(NiceClass c, boolean storeDocString):
  (
    "override" { isOverride = true; }
  |
-  ( 
+  (
     "public-read" [ "private-write" ]
   | "private-write"
-  | ( ("public" | "private" | {} ) 
+  | ( ("public" | "private" | {} )
       [ "final" { isFinal=true; } ]
     )
-  ) 
+  )
   [ "transient" { isTransient = true; } ]
   [ "volatile"  { isVolatile  = true; } ]
  )
-  field=monoSymbol() 
+  field=monoSymbol()
   [ "=" value=Expression() ]
-  ";" 
-  { 
+  ";"
+  {
     if (isOverride)
       c.addOverride(field, value);
     else
@@ -1027,7 +1027,7 @@ TypeDefinition typeDefinition(Constraint cst, List definitions, boolean storeDoc
 
 (
   "interface"
-  name=ident() 
+  name=ident()
   [ parameters=classTypeParameters(cst, typeParametersVariances) ]
   { List ext = null; }
   [ "extends" ext = interfaces() ]
@@ -1055,7 +1055,7 @@ TypeDefinition typeDefinition(Constraint cst, List definitions, boolean storeDoc
 	sup,imp,abs);
   }
 )
-  ( 
+  (
    "{"
    { NiceClass impl = new NiceClass(res); List methods = new ArrayList();}
    // internal fields and methods
@@ -1082,17 +1082,17 @@ TypeDefinition typeDefinition(Constraint cst, List definitions, boolean storeDoc
       |
         m = internalMethodOrFunction(res, isOverride)
         { methods.add(m); }
-      ) 
+      )
       { if (storeDocString && isDocStringToken(t))
           m.docString = t.specialToken.image;
       }
-   )* 
+   )*
    "}"
    {
      res.setImplementation(impl);
      definitions.addAll(methods);
    }
-  | 
+  |
    "=" "native"
    ( { LocatedString javaName; }
      javaName=doted_string()
@@ -1100,7 +1100,7 @@ TypeDefinition typeDefinition(Constraint cst, List definitions, boolean storeDoc
    | { res.setImplementation(res.createPrimitiveType()); }
    ) ";"
   )
-  { return res; } 
+  { return res; }
 }
 
 CustomConstructor customConstructor(Constraint cst):
@@ -1111,11 +1111,11 @@ CustomConstructor customConstructor(Constraint cst):
   Expression exp;
   Statement stmt;
 }
-{ 
+{
   "new" name=ident() "(" params=formalParameters(statements) ")"
-  ( 
+  (
     "=" exp=Expression() ";" { statements.add(bossa.syntax.dispatch.createExpressionStmt(exp)); }
-  | 
+  |
     "{"
     ( stmt=BlockStatement(statements) { statements.add(stmt); } )*
     "}"
@@ -1202,7 +1202,7 @@ MonotypeVar taggedMonotypeVar(List tags, List atoms):
 }
 {
   [ LOOKAHEAD( monotype() ("+" | "-" | monotypeVar()) )
-    bound=monotype() 
+    bound=monotype()
   ]
 
   ( "+" { tags.add(Boolean.TRUE); }
@@ -1212,11 +1212,11 @@ MonotypeVar taggedMonotypeVar(List tags, List atoms):
   [ "!" { sure = true; } ]
 
   mv = monotypeVar()
-  { 
+  {
     if (bound != null)
       {
         bound.nullness = /*absent*/3;
-        atoms.add(new MonotypeLeqCst(new MonotypeVarWrapper(mv), bound)); 
+        atoms.add(new MonotypeLeqCst(new MonotypeVarWrapper(mv), bound));
       }
 
     if (sure) atoms.add(bossa.syntax.dispatch.createSureTypeVar(mv));
@@ -1226,7 +1226,7 @@ MonotypeVar taggedMonotypeVar(List tags, List atoms):
 }
 
 EnumDefinition enumDefinition(List definitions):
-{ 
+{
   LocatedString name;
   List elements = new LinkedList();
   List fields = new LinkedList();
@@ -1236,7 +1236,7 @@ EnumDefinition enumDefinition(List definitions):
 }
 {
   "enum" name=ident()
-  [ 
+  [
     "(" field=monoSymbol() { fields.add(field); }
      ( "," field=monoSymbol() { fields.add(field); } )* ")"
   ]
@@ -1284,21 +1284,21 @@ Pattern pattern():
     ":" runtimeTC=typeConstructor()
   |
     "(" additional=typeIdent() ")"
-  ]  
+  ]
   name=ident()
   { return bossa.syntax.fun.createPattern(tc, name, false, additional, runtimeTC); }
 |
-  "#" tc=typeIdent() 
-  [ "(" additional=typeIdent() ")" ] 
-  [ name=ident() ] 
+  "#" tc=typeIdent()
+  [ "(" additional=typeIdent() ")" ]
+  [ name=ident() ]
   { return bossa.syntax.fun.createPattern(tc, name, true, additional, null); }
 |
-  ( 
-    val=patternLiteral() 
+  (
+    val=patternLiteral()
     [ "(" additional=typeIdent() ")" ]
     { return val.createPattern(additional);}
   |
-    "@" tc=typeIdent() 
+    "@" tc=typeIdent()
     [ "(" additional=typeIdent() ")" ]
     { User.warning(tc.location(), "This syntax is deprecated, use 'Type paramName' instead.");
       return bossa.syntax.fun.createPattern(tc, null, false, additional, null);
@@ -1312,15 +1312,15 @@ Pattern pattern():
       [ "(" additional=typeIdent() ")" ]
       { return bossa.syntax.fun.createPattern(tc, name, false, additional, runtimeTC); }
     |
-      "#" tc=typeIdent() 
-      [ "(" additional=typeIdent() ")" ] 
+      "#" tc=typeIdent()
+      [ "(" additional=typeIdent() ")" ]
       { User.warning(name.location(), "This syntax is deprecated, use '#Type paramName' instead.");
         return bossa.syntax.fun.createPattern(tc, name, true, additional, null);
       }
     |
       ( t=">" | t=">=" | t="<" | t="<=" )
       ( val=negativeIntConstantExp()
-      | val=intConstantExp() 
+      | val=intConstantExp()
       | refName=ident()
       )
       { return bossa.syntax.dispatch.createPattern(t.toString(), name, val, refName, name.location()); }
@@ -1340,7 +1340,7 @@ void methodBodyDefinitionLookahead():
 Statement code():
 { Statement code; }
 {
-  ( 
+  (
     // A true body
     code=Block()
   |
@@ -1359,7 +1359,7 @@ Statement code():
       |
 	res = ShortThrowStatement()
       )
-      ";" 
+      ";"
       { List statements = new LinkedList();
         statements.add(res);
 	return bossa.syntax.dispatch.createBlock(statements); }
@@ -1402,15 +1402,15 @@ Definition methodDeclaration(Constraint cst, boolean isOverride):
     returnType=monotype()
     name=identOrBackquoted()
     "(" parameters = formalParameters(statements) ")"
-    
+
     ( LOOKAHEAD(2)
-      "=" 
+      "="
       (
         "native" res=nativeMethodDeclaration(name,cst,returnType,parameters)
       |
-	"inline" 
+	"inline"
 	{ LocatedString inlinedName; String param = null; }
-	inlinedName = doted_string() 
+	inlinedName = doted_string()
 	[
 	  "(" [ param=rawString() ] ")"
 	]
@@ -1424,8 +1424,8 @@ Definition methodDeclaration(Constraint cst, boolean isOverride):
         { Statement body; }
         body=code() { statements.add(body); }
         { res = bossa.syntax.dispatch.createMethodWithDefault
-            (name, cst, returnType, parameters, 
-             bossa.syntax.dispatch.createBlock(statements), 
+            (name, cst, returnType, parameters,
+             bossa.syntax.dispatch.createBlock(statements),
              contract, isOverride);
         }
       |
@@ -1452,15 +1452,15 @@ MethodDeclaration nativeMethodDeclaration(LocatedString name,
 (
   "new" { isNew = true; }
 |
-  s=doted_array_string() 
+  s=doted_array_string()
 )
 
 // If we stop here with a ";", it's a field else it's a method.
-( 
+(
   ";"
   { method=s; }
-| 
-  { 
+|
+  {
     javaTypes=new ArrayList();
      if(!isNew) javaTypes.add(s);
   }
@@ -1471,10 +1471,10 @@ MethodDeclaration nativeMethodDeclaration(LocatedString name,
     s=doted_array_string() { javaTypes.add(s); }
     ( "," s=doted_array_string() { javaTypes.add(s); } )*
   ]
-  ")"  
+  ")"
   ";"
 )
-  { 
+  {
     if(isNew)
       {
 	javaTypes.add(0,method);
@@ -1484,11 +1484,11 @@ MethodDeclaration nativeMethodDeclaration(LocatedString name,
     int dot=method.toString().lastIndexOf('.');
     if(dot==-1)
       throw bossa.util.User.error(method, "Class or method name missing");
-    
+
     String methodName=method.toString();
     methodName = methodName.substring(dot+1,methodName.length());
     LocatedString className=method.substring(0,dot);
-    
+
     if(javaTypes!=null)
       return bossa.syntax.dispatch.createRetypedJavaMethod(className,methodName,javaTypes,
 			           name,cst,returnType,parameters);
@@ -1507,11 +1507,11 @@ Definition globalVariable():
 }
 {
   ( "var" {constant = false;} | "let" )
-  t=monotype() name=ident() 
-  "=" 
-  ( LOOKAHEAD(funExpLookahead()) 
-    value=funExp() 
-  | 
+  t=monotype() name=ident()
+  "="
+  ( LOOKAHEAD(funExpLookahead())
+    value=funExp()
+  |
     value=SideEffectFreeExpression()
   )
   ";"
@@ -1545,7 +1545,7 @@ void contractElements(Contract contract, boolean precond) :
 void contractElement(Contract contract, boolean precond) :
 { Expression condition, name=null; }
 {
-  condition = SideEffectFreeExpression() 
+  condition = SideEffectFreeExpression()
   [ ":" name = SideEffectFreeExpression() ]
   { contract.addElement(condition, name, precond); }
 }
@@ -1557,18 +1557,18 @@ Definition definition(List definitions, boolean storeDocString):
   (
     LOOKAHEAD( ("class" | "interface") fullyQualifiedName() )
     res=abstractInterfaceImplementation()
-  | 
+  |
     LOOKAHEAD( methodBodyDefinitionLookahead() )
     res=methodBodyDefinition(null)
   |
     [ "public" | "private" ]
-    ( 
+    (
       res=globalVariable()
     | res=enumDefinition(definitions)
-    | "override" { Constraint cst; } cst = constraint() 
+    | "override" { Constraint cst; } cst = constraint()
       res=methodDeclaration(cst, true)
     | cst = constraint()
-      ( 
+      (
         res=customConstructor(cst)
       | LOOKAHEAD ( "abstract" "interface" )
         res=interfaceDefinition(cst, definitions)
@@ -1587,7 +1587,7 @@ void readDefinitions(List definitions,boolean storeDocString):
 }
 { { t = getToken(1); }
   ( d = definition(definitions, storeDocString)
-    { 
+    {
       if (storeDocString && isDocStringToken(t))
         d.docString = t.specialToken.image;
 
@@ -1595,7 +1595,7 @@ void readDefinitions(List definitions,boolean storeDocString):
       t = getToken(1);
     }
   )*
-  <EOF> 
+  <EOF>
 }
 
 
@@ -1606,7 +1606,7 @@ void readDefinitions(List definitions,boolean storeDocString):
 ConstantExp nullConstantExp():
 { Token t; }
 {
-  t="null" 
+  t="null"
   { return bossa.syntax.dispatch.createNullExp(makeLocation(t)); }
 }
 
@@ -1626,9 +1626,9 @@ ConstantExp intConstantExp():
 
 ConstantExp negativeIntConstantExp():
 { LocatedString representation; }
-{ 
+{
   "-" representation=integerLiteral()
-  { 
+  {
     representation.prepend("-");
     return bossa.syntax.dispatch.createIntegerConstantExp(representation);
   }
@@ -1644,7 +1644,7 @@ ConstantExp floatConstantExp():
 ConstantExp charConstantExp():
 { Token t; }
 {
-  t = <CHARACTER_LITERAL> 
+  t = <CHARACTER_LITERAL>
   { return bossa.syntax.dispatch.createCharConstant
       (new LocatedString(t.image.substring(1, t.image.length() - 1),
 			 makeLocation(t)));
@@ -1677,8 +1677,8 @@ Expression identExp():
 Expression SuperExp() :
 { TypeIdent typeId;  List types = null; }
 {
-  "super" 
-  [ LOOKAHEAD("(") "(" 
+  "super"
+  [ LOOKAHEAD("(") "("
     typeId=typeIdent() { types=new ArrayList(); types.add(typeId); }
     ( "," typeId=typeIdent() { types.add(typeId); } )*
     ")"
@@ -1694,16 +1694,16 @@ Expression newExp():
 }
 {
   t="new" classe=typeConstructorIdent()
-  ( 
+  (
     { Arguments arguments; }
     arguments = arguments()
-    { e = bossa.syntax.fun.createNewExp(classe, arguments); 
+    { e = bossa.syntax.fun.createNewExp(classe, arguments);
       e.setLocation(makeLocation(t));
       return e;
     }
   |
     { List args = new LinkedList(); int furtherDimensions = 0; }
-    ( LOOKAHEAD(2) "[" e=Expression() "]" { args.add(e); } )+ 
+    ( LOOKAHEAD(2) "[" e=Expression() "]" { args.add(e); } )+
     ( LOOKAHEAD(2) "[]" { furtherDimensions++; } )*
     { return new NewArrayExp(classe, args, furtherDimensions); }
   |
@@ -1715,14 +1715,14 @@ Expression newExp():
 void funExpLookahead():
 {}
 {
-  ( 
+  (
     LOOKAHEAD ( "(" ")" ) "(" ")"
   |
     LOOKAHEAD ( monoSymbol() )
     monoSymbol()
   |
     constraint() "(" NestedMonoSymbols() ")"
-  ) 
+  )
   "=>"
 }
 
@@ -1736,7 +1736,7 @@ MonoSymbol funExpParameter(List statements):
   LOOKAHEAD( monotype() )
   type=monotype() name=ident()
   { return bossa.syntax.dispatch.createMonoSymbol(name,type); }
-| 
+|
   { Token first,last;
     List parts = new LinkedList();
     Expression part;
@@ -1750,7 +1750,7 @@ MonoSymbol funExpParameter(List statements):
   last=")"
   [ ident=ident() ]
   { if (ident == null) {
-      name = new LocatedString("tuple_arg_" + first.beginLine + "_" + first.beginColumn, 
+      name = new LocatedString("tuple_arg_" + first.beginLine + "_" + first.beginColumn,
 				makeLocation(first, last));
     } else { name = ident; }
     Expression exp = bossa.syntax.dispatch.createAssignExp(new TupleExp(parts),bossa.syntax.dispatch.createIdentExp(name));
@@ -1773,17 +1773,17 @@ Expression funExp():
   List statements = new LinkedList();
 }
 {
-  ( 
+  (
     LOOKAHEAD ( "(" ")" ) "(" ")"
-  | 
-    LOOKAHEAD ( monoSymbol() ) 
+  |
+    LOOKAHEAD ( monoSymbol() )
     sym=monoSymbol() { formals.add(sym); }
-  | 
-    cst=constraint() "(" 
+  |
+    cst=constraint() "("
     sym=funExpParameter(statements) { formals.add(sym); }
     ( "," sym=funExpParameter(statements) { formals.add(sym); } )*
     ")"
-  ) 
+  )
   "=>"
   (
     body=RootShortStatement()
@@ -1825,7 +1825,7 @@ Expression tupleExp():
   // A tuple must have at least two elements (thus a ",")
   // which avoids ambiguity with expression grouping thru "(" ")"
   "(" { exps = new LinkedList(); }
-  e=Expression() 
+  e=Expression()
 
   // either we have another expression ans it's a real tuple
   // either we close the parenthesis and it was grouping
@@ -1868,9 +1868,9 @@ LocatedString readImports(List imports, Collection opens):
 {
   [ "package" pkgName=doted_string() ";" ]
   (
-   "import" name=doted_string() 
+   "import" name=doted_string()
    ( ".*" { opens.add(name.toString()); }
-     [ "(" "!" ")"  
+     [ "(" "!" ")"
        { nice.tools.code.Import.addStrictPackage(name.toString()); }
      ]
    |      { imports.add(name); }
@@ -1905,7 +1905,7 @@ void module(List definitions, boolean storeDocStrings):
  * JAVA statements and expressions
  ****************************************************************/
 
-// Java 1.1 syntax-compliant 
+// Java 1.1 syntax-compliant
 // Derived from the Java1.1.jj file that comes with JavaCC
 
 /*
@@ -1926,23 +1926,23 @@ Expression Expression() :
 {
   { first=getToken(1); }
 
-  ( 
-    LOOKAHEAD(funExpLookahead()) e1=funExp() 
+  (
+    LOOKAHEAD(funExpLookahead()) e1=funExp()
   |
     e1=ConditionalExpression()
-    [ 
+    [
       { e1.setLocation(makeLocation(first, getToken(0))); }
-      op=AssignmentOperator() 
+      op=AssignmentOperator()
       e2=Expression()
       {
         if(op.image.length()!=1)
           e2=bossa.syntax.dispatch.createCallExp(symb(op.image.substring(0, 1),op),e1,e2);
-  
+
         e1=bossa.syntax.dispatch.createAssignExp(e1,e2);
       }
     ]
   )
-  { 
+  {
     last=getToken(0);
     e1.setLocation(makeLocation(first, last));
     return e1;
@@ -1962,9 +1962,9 @@ Token AssignmentOperator() :
   (
     res = "="
   |
-    res= < assignmentOperator : 
-      "*=" | "/=" | "%=" | "+=" | "-=" | 
-      "<<=" | ">>=" | ">>>=" | "&=" | "^=" | "|=" 
+    res= < assignmentOperator :
+      "*=" | "/=" | "%=" | "+=" | "-=" |
+      "<<=" | ">>=" | ">>>=" | "&=" | "^=" | "|="
       >
   )
   { return res; }
@@ -1973,10 +1973,10 @@ Token AssignmentOperator() :
 Expression ConditionalExpression() :
 { Expression res,e1,e2; Token start; }
 {
-  res=ImpliesExpression() 
+  res=ImpliesExpression()
     [
-      "?" e1=Expression() start=":" e2=ConditionalExpression() 
-      { e2.setLocation(makeLocation(start, getToken(0))); 
+      "?" e1=Expression() start=":" e2=ConditionalExpression()
+      { e2.setLocation(makeLocation(start, getToken(0)));
         res=new IfExp(res,e1,e2); }
     ]
   { return res; }
@@ -1985,8 +1985,8 @@ Expression ConditionalExpression() :
 Expression ImpliesExpression() :
 { Expression e1,e2; Token t; }
 {
-  e1=ConditionalOrExpression() 
-//    ( t="->" e2=ConditionalOrExpression() 
+  e1=ConditionalOrExpression()
+//    ( t="->" e2=ConditionalOrExpression()
 //      { e1=CallExp.create(symb(t), e1, e2); } )?
   { return e1; }
 }
@@ -1994,8 +1994,8 @@ Expression ImpliesExpression() :
 Expression ConditionalOrExpression() :
 { Expression e1,e2; Token t; }
 {
-  e1=ConditionalAndExpression() 
-    ( t="||" e2=ConditionalOrExpression() 
+  e1=ConditionalAndExpression()
+    ( t="||" e2=ConditionalOrExpression()
       { e1=bossa.syntax.dispatch.createCallExp(symb(t), e1, e2); } )?
   { return e1; }
 }
@@ -2003,7 +2003,7 @@ Expression ConditionalOrExpression() :
 Expression ConditionalAndExpression() :
 { Expression e1,e2; Token t; }
 {
-  e1=InclusiveOrExpression() 
+  e1=InclusiveOrExpression()
     ( t="&&" e2=ConditionalAndExpression()
       { e1=bossa.syntax.dispatch.createCallExp(symb(t), e1, e2); } )?
   { return e1; }
@@ -2012,8 +2012,8 @@ Expression ConditionalAndExpression() :
 Expression InclusiveOrExpression() :
 { Expression e1,e2; Token t; }
 {
-  e1=ExclusiveOrExpression() 
-    ( t="|" e2=ExclusiveOrExpression() 
+  e1=ExclusiveOrExpression()
+    ( t="|" e2=ExclusiveOrExpression()
       { e1=bossa.syntax.dispatch.createCallExp(symb(t),e1,e2); } )*
   { return e1; }
 }
@@ -2021,8 +2021,8 @@ Expression InclusiveOrExpression() :
 Expression ExclusiveOrExpression() :
 { Expression e1,e2; Token t; }
 {
-  e1=AndExpression() 
-    ( t="^" e2=AndExpression() 
+  e1=AndExpression()
+    ( t="^" e2=AndExpression()
       { e1=bossa.syntax.dispatch.createCallExp(symb(t),e1,e2); } )*
   { return e1; }
 }
@@ -2030,8 +2030,8 @@ Expression ExclusiveOrExpression() :
 Expression AndExpression() :
 { Expression e1,e2; Token t; }
 {
-  e1=EqualityExpression() 
-    ( t="&" e2=EqualityExpression() 
+  e1=EqualityExpression()
+    ( t="&" e2=EqualityExpression()
       { e1=bossa.syntax.dispatch.createCallExp(symb(t),e1,e2); } )*
   { return e1; }
 }
@@ -2039,8 +2039,8 @@ Expression AndExpression() :
 Expression EqualityExpression() :
 { Expression e1,e2; Token t; }
 {
-  e1=InstanceOfExpression() 
-    ( ( t="==" | t="!=" ) e2=InstanceOfExpression() 
+  e1=InstanceOfExpression()
+    ( ( t="==" | t="!=" ) e2=InstanceOfExpression()
       { e1=bossa.syntax.dispatch.createCallExp(symb(t),e1,e2); }
       )*
   { return e1; }
@@ -2080,9 +2080,9 @@ Expression RelationalExpression() :
 Expression RangeExpression() :
 { Expression e1 = null,e2 = null; Token t = null; }
 {
-  ( 
+  (
     e1=ShiftExpression() [ t=".." [e2=ShiftExpression()]]
-  |  
+  |
     t=".." [e2 = ShiftExpression()]
   )
   {
@@ -2094,7 +2094,7 @@ Expression RangeExpression() :
 	if (e2 == null)
 	  e2 = bossa.syntax.dispatch.createNullExp(makeLocation(t));
 
-        e1=bossa.syntax.dispatch.createCallExp(symb(t),e1,e2); 
+        e1=bossa.syntax.dispatch.createCallExp(symb(t),e1,e2);
       }
 
     return e1;
@@ -2104,13 +2104,13 @@ Expression RangeExpression() :
 Expression ShiftExpression() :
 { Expression e1,e2; Token t,t1=null; boolean left=false; }
 {
-  e1=AdditiveExpression() 
+  e1=AdditiveExpression()
     ( LOOKAHEAD(2)
      ( t="<" "<" { left=true; }
      | t=">" ">" [ t1=">" ]
      )
-     e2=AdditiveExpression() 
-     { 
+     e2=AdditiveExpression()
+     {
        String func;
        if(left)
          func = "<<";
@@ -2124,8 +2124,8 @@ Expression ShiftExpression() :
 Expression AdditiveExpression() :
 { Expression e1,e2; Token t; }
 {
-  e1=MultiplicativeExpression() 
-    ( ( t="+" | t="-" ) e2=MultiplicativeExpression() 
+  e1=MultiplicativeExpression()
+    ( ( t="+" | t="-" ) e2=MultiplicativeExpression()
       { e1=bossa.syntax.dispatch.createCallExp(symb(t),e1,e2); }
       )*
   { return e1; }
@@ -2134,8 +2134,8 @@ Expression AdditiveExpression() :
 Expression MultiplicativeExpression() :
 { Expression e1,e2; Token t; }
 {
-  e1=ExponentialExpression() 
-    ( (t="*"|t="/"|t="%") e2=ExponentialExpression() 
+  e1=ExponentialExpression()
+    ( (t="*"|t="/"|t="%") e2=ExponentialExpression()
       { e1=bossa.syntax.dispatch.createCallExp(symb(t),e1,e2); }
     )*
   { return e1; }
@@ -2144,9 +2144,9 @@ Expression MultiplicativeExpression() :
 Expression ExponentialExpression() :
 { Expression e1,e2; Token t; }
 {
-  e1=UnaryExpression() 
+  e1=UnaryExpression()
     // '**' has right associativity
-    [ t="**" e2=ExponentialExpression() 
+    [ t="**" e2=ExponentialExpression()
       { e1=bossa.syntax.dispatch.createCallExp(symb(t),e1,e2); }
     ]
   { return e1; }
@@ -2156,15 +2156,15 @@ Expression UnaryExpression() :
 { Expression res; Token t=null; }
 {
 (
-  ( ( t="~" | t="!" ) res=PrimaryExpression() 
+  ( ( t="~" | t="!" ) res=PrimaryExpression()
     { res=bossa.syntax.dispatch.createCallExp(symb(t),res); }
   |
-    ( t="+" | t="-" ) res=PrimaryExpression() 
+    ( t="+" | t="-" ) res=PrimaryExpression()
     { if (res instanceof NumberConstantExp)
       {
         if (t.kind == MINUS)
           res = ((NumberConstantExp)res).makeNegative();
-      } 
+      }
       else
 	res=bossa.syntax.dispatch.createCallExp(symb(t),res);
     }
@@ -2187,19 +2187,19 @@ Expression Pre_crementExpression() :
 Expression PostfixExpression() :
 { Expression res; Token t; }
 {
-  res=PrimaryExpression() 
+  res=PrimaryExpression()
   [ "++" { res=bossa.syntax.dispatch.createIncrementExp(res, false, true); }
   | "--" { res=bossa.syntax.dispatch.createIncrementExp(res, false, false); }
-  ] 
+  ]
   { return res; }
 }
 
 Expression PrimaryExpression() :
 { Expression res; Token first = getToken(1);}
 {
-  res=PrimaryPrefix() 
+  res=PrimaryPrefix()
     ( res=PrimarySuffix(res) )*
-  { res.setLocation(makeLocation(first, getToken(0))); 
+  { res.setLocation(makeLocation(first, getToken(0)));
     return res; }
 }
 
@@ -2208,13 +2208,13 @@ Expression PrimaryPrefix() :
 {
 (
   res=Literal()
-| 
+|
   res = SuperExp()
 |
   // This includes the case "(" Expression() ")" to avoid lookahead
   res=tupleExp()
 |
-  res=arrayLiteralExp() 
+  res=arrayLiteralExp()
 |
   res=newExp()
 |
@@ -2230,14 +2230,14 @@ Expression PrimaryPrefix() :
 }
 
 Expression PrimarySuffix(Expression start) :
-{ 
+{
   Expression res;
   Arguments args = null;
 }
 {
   { Token t; List bracketArgs = new ArrayList();
     bracketArgs.add(new Argument(start)); }
-  t="[" res=Expression() {bracketArgs.add(new Argument(res));} 
+  t="[" res=Expression() {bracketArgs.add(new Argument(res));}
     ( "," res=Expression() {bracketArgs.add(new Argument(res));} )*
   "]"
   { return bossa.syntax.dispatch.createCallExp(symb("get",t,false),new Arguments(bracketArgs)); }
@@ -2245,7 +2245,7 @@ Expression PrimarySuffix(Expression start) :
   "." res=identExp()
   [ LOOKAHEAD(1) // a.f(x) is parsed as f(a, x), not as (f(a))(x)
     args = arguments() ]
-  { 
+  {
     boolean hasBrackets = args != null;
 
     if (args == null)
@@ -2253,7 +2253,7 @@ Expression PrimarySuffix(Expression start) :
     else
       args.addReceiver(start);
 
-    return bossa.syntax.dispatch.createCallExp(res, args, true, hasBrackets); 
+    return bossa.syntax.dispatch.createCallExp(res, args, true, hasBrackets);
   }
 |
   args = arguments()
@@ -2277,13 +2277,13 @@ Expression Literal() :
 {
 ( res=nullConstantExp()
 | res=booleanConstantExp()
-| res=intConstantExp() 
+| res=intConstantExp()
 | res=floatConstantExp()
 | res=charConstantExp()
 | res=stringConstantExp()
-  ( {Expression e;} e=StringLiteralSuffixExpression() 
+  ( {Expression e;} e=StringLiteralSuffixExpression()
     { res = bossa.syntax.dispatch.createCallExp(symb("+", e.location()), res, e); }
-    [ e=stringConstantExp() 
+    [ e=stringConstantExp()
       { res = bossa.syntax.dispatch.createCallExp(symb("+", e.location()), res, e); }
     ]
   )*
@@ -2309,7 +2309,7 @@ ConstantExp patternLiteral() :
 {
 ( res=nullConstantExp()
 | res=negativeIntConstantExp()
-| res=intConstantExp() 
+| res=intConstantExp()
 | res=charConstantExp()
 | res=booleanConstantExp()
 | res=stringConstantExp()
@@ -2372,7 +2372,7 @@ Statement Statement() :
 { Token first; Statement res; }
 {
   { first = getToken(1); }
-( 
+(
   LOOKAHEAD(2)
   res=LabeledStatement()
 | res=Block()
@@ -2389,32 +2389,32 @@ Statement Statement() :
 | res=ShortAssertStatement() ";"
 | res=SynchronizedStatement()
 )
-  { 
+  {
     res.setLocation(makeLocation(first, getToken(0)));
-    return res; 
+    return res;
   }
 }
 
 Statement LabeledStatement() :
 { LocatedString label; Statement res; boolean forLoop; }
 {
-  label=ident() ":" 
+  label=ident() ":"
   { forLoop = "for".equals(getToken(1).toString()); }
   ( res=Block()
   | res=ForStatement()
   | res=WhileStatement()
   | res=DoStatement()
   )
-  { 
+  {
     // Fix labeling of for loops:
     // for(int i, ...) is parsed as a block defining a local variable i
     // however we want the label to target the loop so that continue works
     if (forLoop && !(res instanceof LoopStmt))
       return new LabeledStmt(label, res, (LoopStmt) ((Block) res).last());
     else if (res instanceof LoopStmt)
-      return new LabeledStmt(label, res, (LoopStmt) res); 
+      return new LabeledStmt(label, res, (LoopStmt) res);
     else
-      return new LabeledStmt(label, res, null); 
+      return new LabeledStmt(label, res, null);
   }
 }
 
@@ -2422,13 +2422,13 @@ Statement Block() :
 { Token first, last; Statement s; List statements; }
 {
   { first = getToken(1); }
-  "{" 
+  "{"
   { statements = new LinkedList(); }
-  ( s=BlockStatement(statements) { statements.add(s); } )* 
+  ( s=BlockStatement(statements) { statements.add(s); } )*
   "}"
-  { 
+  {
     last = getToken(0);
-    Statement res = bossa.syntax.dispatch.createBlock(statements); 
+    Statement res = bossa.syntax.dispatch.createBlock(statements);
     res.setLocation(makeLocation(first, last));
     return res;
   }
@@ -2439,9 +2439,9 @@ Statement BlockStatement(List statements) :
 {
 (
   LOOKAHEAD( "var" | "let" | monotype() <IDENT>)
-  ( 
+  (
     LOOKAHEAD( [ "var" | "let" ] monotype() <IDENT> "(" )
-    res = LocalFunctionDeclaration() 
+    res = LocalFunctionDeclaration()
   |
     res = LocalDeclaration() ";"
   )
@@ -2474,9 +2474,9 @@ Statement LocalDeclaration() :
     [ LOOKAHEAD ( monotype() <IDENT> ) type=monotype() ]
   )
   id=ident()
-  [ "=" e=Expression() ] 
+  [ "=" e=Expression() ]
   { res = bossa.syntax.dispatch.createLocalVariable(id,type,constant,e); }
-  ( LOOKAHEAD( "," <IDENT> ( "=" | ";" | ",") ) 
+  ( LOOKAHEAD( "," <IDENT> ( "=" | ";" | ",") )
     "," id=ident() {e=null;} [ "=" e=Expression() ] { res.addNext(id, e); } )*
 
   { return res; }
@@ -2496,8 +2496,8 @@ Statement LocalFunctionDeclaration() :
   [ "let" {constant = true;} | "var" ]
   type = monotype()
   id=ident()
-  "(" parameters=formalParameters(statements) ")" 
-  body=code() { statements.add(body); } 
+  "(" parameters=formalParameters(statements) ")"
+  body=code() { statements.add(body); }
   { return bossa.syntax.dispatch.createLocalFunction(id, type, parameters, body!=null?bossa.syntax.dispatch.createBlock(statements):null); }
 }
 
@@ -2511,7 +2511,7 @@ Statement LocalTupleDeclaration(List statements) :
   part = LocalTuplePart(statements) { parts.add(part); }
   ( "," part = LocalTuplePart(statements) { parts.add(part); } )+
   last=")"
-  "=" e=Expression() ";" 
+  "=" e=Expression() ";"
   { Expression exp = bossa.syntax.dispatch.createAssignExp(new TupleExp(parts), e);
     exp.setLocation(makeLocation(first,last));
     return bossa.syntax.dispatch.createExpressionStmt(exp); }
@@ -2521,11 +2521,11 @@ Expression LocalTuplePart(List statements) :
 { LocatedString id; Monotype type; }
 {
 ( //first look for a ident without matching a monotype
-  LOOKAHEAD( doted_string() ( "," | ")" ) ) id=doted_string() 
+  LOOKAHEAD( doted_string() ( "," | ")" ) ) id=doted_string()
   { return bossa.syntax.dispatch.createIdentExp(id); }
 | //then look for a monotype without matching a tuplePart
-  LOOKAHEAD( monotype() ident() ) type=monotype()  id=ident() 
-  { statements.add(bossa.syntax.dispatch.createLocalVariable(id, type, false, null)); 
+  LOOKAHEAD( monotype() ident() ) type=monotype()  id=ident()
+  { statements.add(bossa.syntax.dispatch.createLocalVariable(id, type, false, null));
     return  bossa.syntax.dispatch.createIdentExp(id); }
 | //otherwise it's localtuple part
   "(" { List parts = new LinkedList(); Expression part; }
@@ -2563,7 +2563,7 @@ void NestedMonoSymbols() : { }
 )+
 }
 
-// lookahead for a tupleExp on left side of an assignment 
+// lookahead for a tupleExp on left side of an assignment
 void LocalTupleExpLookahead() : {}
 {
   "(" LocalTupleExpContent() ")" "="
@@ -2573,12 +2573,12 @@ void LocalTupleExpContent() : { }
 {
 ( "(" LocalTupleExpContent() ")"
 | doted_string()
-) 
-( "," 
+)
+( ","
   ( "(" LocalTupleExpContent() ")"
   | doted_string()
   )
-)* 
+)*
 }
 
 void PostfixBlocks(Expression exp) :
@@ -2605,7 +2605,7 @@ Statement RealStatementExpression() :
     e1=SuperExp() ";"
   |
     e1=PrimaryPrefix()
-    ( 
+    (
       e1=PostfixStatementExpression(e1, first) ";"
     |
       ( e1=PrimarySuffix(e1) )+
@@ -2622,7 +2622,7 @@ Statement RealStatementExpression() :
   {
     last = getToken(0);
     e1.setLocation(makeLocation(first, last));
-    return bossa.syntax.dispatch.createExpressionStmt(e1); 
+    return bossa.syntax.dispatch.createExpressionStmt(e1);
   }
 }
 
@@ -2637,7 +2637,7 @@ Statement ShortStatementExpression() :
     e1=SuperExp()
   |
     e1=PrimaryPrefix()
-    ( 
+    (
       e1=PostfixStatementExpression(e1, first)
     |
       ( e1=PrimarySuffix(e1) )+
@@ -2652,7 +2652,7 @@ Statement ShortStatementExpression() :
   {
     last = getToken(0);
     e1.setLocation(makeLocation(first, last));
-    return bossa.syntax.dispatch.createExpressionStmt(e1); 
+    return bossa.syntax.dispatch.createExpressionStmt(e1);
   }
 
 }
@@ -2665,15 +2665,15 @@ Expression PostfixStatementExpression(Expression e1, Token first) :
   |
     "--" { e1=bossa.syntax.dispatch.createIncrementExp(e1, false, false); }
   |
-    { Token op; Expression e2; 
+    { Token op; Expression e2;
       e1.setLocation(makeLocation(first, getToken(0)));
     }
-    op=AssignmentOperator() 
+    op=AssignmentOperator()
     e2=Expression()
     {
       if(op.image.length()!=1)
         e2=bossa.syntax.dispatch.createCallExp(symb(op.image.substring(0, 1),op),e1,e2);
-  
+
       e1=bossa.syntax.dispatch.createAssignExp(e1,e2);
     }
   )
@@ -2688,10 +2688,10 @@ Statement IfStatement() :
  */
 { Token first; Statement s1,s2=null; Expression cond; IfExp ifExp; }
 {
-  first="if" "(" cond=Expression() ")" 
+  first="if" "(" cond=Expression() ")"
     s1=Statement() [ LOOKAHEAD(1) "else" s2=Statement() ]
-  { 
-    return bossa.syntax.dispatch.createIfStmt(cond, s1, s2, 
+  {
+    return bossa.syntax.dispatch.createIfStmt(cond, s1, s2,
 				makeLocation(first, getToken(0)));
   }
 }
@@ -2704,10 +2704,10 @@ Statement ShortIfStatement() :
  */
 { Token first; Statement s1,s2=null; Expression cond; IfExp ifExp; }
 {
-  first="if" "(" cond=Expression() ")" 
+  first="if" "(" cond=Expression() ")"
     s1=ShortStatement() [ LOOKAHEAD(1) "else" s2=ShortStatement() ]
-  { 
-    return bossa.syntax.dispatch.createIfStmt(cond, s1, s2, 
+  {
+    return bossa.syntax.dispatch.createIfStmt(cond, s1, s2,
 				makeLocation(first, getToken(0)));
   }
 }
@@ -2733,32 +2733,32 @@ Statement ForStatement() :
   List init = new ArrayList();
 }
 {
-  "for" "(" 
-  (  
+  "for" "("
+  (
     LOOKAHEAD( <IDENT> ":" ) loop=ForInStatement()
   |
     LOOKAHEAD( monotype() <IDENT> ":" ) loop=ForInStatement()
   | (
-      LOOKAHEAD( "var" | "let" | monotype() <IDENT>) 
-      init=LocalDeclarationList() 
+      LOOKAHEAD( "var" | "let" | monotype() <IDENT>)
+      init=LocalDeclarationList()
     | statexp=ShortStatementExpression() ";" {init.add(statexp);}
     | ";"
     )
-    [ cond=Expression() ] ";" [ update=StatementExpressionList() ] ")" 
+    [ cond=Expression() ] ";" [ update=StatementExpressionList() ] ")"
     body=Statement()
     { loop=bossa.syntax.dispatch.createForLoop(cond,update,body,init); }
   )
   { return loop; }
 }
 
-Statement ForInStatement() :                                                
+Statement ForInStatement() :
 { Statement body; Monotype vartype = null; LocatedString var; Expression container; Token t; }
 {
-  ( 
+  (
     LOOKAHEAD( <IDENT> ":") var=ident()
-  | 
-    vartype=monotype() var=ident() 
-  ) 
+  |
+    vartype=monotype() var=ident()
+  )
   t=":" container=Expression() ")"
   body=Statement()
   { return bossa.syntax.dispatch.createForInLoop(vartype,var,makeLocation(t),container,body); }
@@ -2767,7 +2767,7 @@ Statement ForInStatement() :
 List LocalDeclarationList() :
 { Statement d; List declarations = new LinkedList(); }
 {
-  d=LocalDeclaration() {declarations.add(d);} 
+  d=LocalDeclaration() {declarations.add(d);}
   ( "," d=LocalDeclaration() {declarations.add(d);} )*
   ";"
   { return declarations; }
@@ -2801,7 +2801,7 @@ Statement ReturnStatement() :
 {
   t="return" [ val=Expression() ] ";"
   {
-    Statement res = bossa.syntax.dispatch.createReturnStmt(val); 
+    Statement res = bossa.syntax.dispatch.createReturnStmt(val);
     res.setLocation(makeLocation(t));
     return res;
   }
@@ -2819,14 +2819,14 @@ Statement TryStatement() :
  * Semantic check required here to make sure that at least one
  * finally/catch is present.
  */
-{ TryStmt res; Statement body, b; 
+{ TryStmt res; Statement body, b;
   TypeIdent tc;
   LocatedString i;
 }
 {
   "try" body=Block()
   { res = new TryStmt(body); }
-  ( "catch" "(" tc=typeConstructorIdent() i=ident() ")" b=Block() 
+  ( "catch" "(" tc=typeConstructorIdent() i=ident() ")" b=Block()
   { res.addCatch(tc, i, b); }
   )*
   [ "finally" b=Block() { res.setFinally(b); } ]
@@ -2842,7 +2842,7 @@ Statement ShortAssertStatement() :
 {
   t = "assert"
   condition = SideEffectFreeExpression()
-  ( ":" message = SideEffectFreeExpression() 
+  ( ":" message = SideEffectFreeExpression()
     { call = bossa.syntax.dispatch.createCallExp(symb(t), condition, message); }
   |
     { call = bossa.syntax.dispatch.createCallExp(symb(t), condition); }

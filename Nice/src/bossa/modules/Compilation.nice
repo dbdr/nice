@@ -36,6 +36,11 @@ class Compilation extends mlsub.compilation.Compilation
   /** Archive file in which to write the program. */
   String output;
 
+  /** Prevent the runtime to be written in the archive.
+      Usefull for the compiler itself, if for nothing else.
+  */
+  boolean excludeRuntime;
+
   Locator locator;
 
   void setMainPackage(String packageName)

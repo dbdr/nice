@@ -20,6 +20,7 @@ public class Compilation extends mlsub.compilation.Compilation
   public String destinationDir;
 
   public String output;
+  public boolean excludeRuntime;
 
   public Locator locator;
 }

@@ -96,20 +96,22 @@ main(args)
 	  fun(String path) => nice.tools.code.Types.setClasspath(path)),
 
 
+   option('a', "jar",
+	  "Compile to archive",
+	  "file",
+	  fun(String output)=>{ compilation.output = output; }),
+
+   // This will specify native compilation in the future
    option('o', "output",
 	  "Compile to archive",
 	  "file",
 	  fun(String output)=>{ compilation.output = output; }),
 
-/*
-   option('s', "static",
-	  "Store compiled packages in the jar file",
-	  fun()=>{ compilation.staticLink = true; }),
-
-   option('?', "dynamic",
-	  "Store compiled packages in their directory (default)",
-	  fun()=>{ compilation.staticLink = false; }),
-*/
+   // This options is usefull for the compiler itself. 
+   // Should not be advertised since it should not be usefull otherwise
+   option('?', "exclude-runtime", 
+	  "Avoid inclusion of the runtime in the archive", 
+	  fun() => { compilation.excludeRuntime = true; }),
 
 
    option('h', "help", "Print help message and exit",
@@ -173,16 +175,14 @@ main(args)
   OutputMessages.exit();
 }
 
-void usage();
-usage()
+void usage()
 {
   println("Usage: nicec [options] [package]");
   println("Type \"nicec --help\" for a list of options");
   System.exit(0);
 }
 
-void version();
-version()
+void version()
 {
   println("Nice compiler beta version (" + buildDate + ")");
   println("Copyright (C) 2001 Daniel Bonniot");
@@ -190,8 +190,7 @@ version()
   System.exit(0);
 }
 
-String prettyBytes(long);
-prettyBytes(bytes)
+String prettyBytes(long bytes)
 {
   long K = 1024;
   if (bytes < 10 * K)
@@ -208,12 +207,12 @@ prettyBytes(bytes)
     return ""+(bytes/(K*K*K)) + " GB";
 }
 
-void printMemoryUsage();
-printMemoryUsage()
+void printMemoryUsage()
 {
   Runtime r = getRuntime();
   r.gc();
-  long mem = r.totalMemory();
-  println("Memory allocated: " + prettyBytes(mem) + 
-	  ", used: " + prettyBytes(r.totalMemory()-r.freeMemory()));
+  long total = r.totalMemory();
+  long free  = r.freeMemory();
+  println("Memory allocated: " + prettyBytes(total) + 
+	  ", used: " + prettyBytes(total - free));
 }

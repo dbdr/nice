@@ -428,7 +428,8 @@ public class Package implements mlsub.compilation.Module, Located, bossa.syntax.
     try
       {
 	JarOutputStream jarStream = createJarStream(jarFile);
-	writeRuntime(jarStream);
+	if (! compilation.excludeRuntime)
+	  writeRuntime(jarStream);
 	this.addToArchive(jarStream);
 	jarStream.close();
       }

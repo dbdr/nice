@@ -120,18 +120,12 @@ public abstract class Location implements Located
 
     public java.io.File getFile() { return file; }
 
-    private static final String home = java.lang.System.getProperty("user.home");
-
     public String toString()
     {
       if (file == null)
         return "";
-
-      String name = file.toString();
-      if (name != null && name.startsWith(home))
-        return "~" + name.substring(home.length());
       else
-        return name;
+        return nice.tools.util.System.prettyPrint(file);
     }
 
     public void write(gnu.expr.Expression exp)

@@ -24,6 +24,8 @@ import bossa.syntax.Node;
 import gnu.bytecode.*;
 import gnu.expr.*;
 
+import nice.tools.code.Gen;
+
 import java.util.*;
 
 /**
@@ -143,12 +145,28 @@ public abstract class Alternative
 		     Util.map("",", ","",parameters)+
 		     " for " + this);
     
+    if (parameters.length == 0)
+      return QuoteExp.trueExp;
+
+    if (parameters.length == 1)
+      return patterns[0].matchTest(parameters[0]);
+
     Expression result = QuoteExp.trueExp;
-    
-    for(int n = parameters.length; --n >= 0; )
-      result = gnu.expr.IfExp.make(patterns[n].matchTest(parameters[n]),
-				   result,
-				   QuoteExp.falseExp);
+    int index = 0;
+
+    //find the first non-trivial test
+    for(; index<parameters.length; index++)
+      if (!patterns[index].atAny())
+      {
+	result = patterns[index].matchTest(parameters[index]);
+	index++;
+        break;
+      } 
+  
+    for(; index<parameters.length; index++)
+      if (!patterns[index].atAny())
+        result = Gen.shortCircuitAnd(result,
+			patterns[index].matchTest(parameters[index]));
     
     return result;
   }

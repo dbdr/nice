@@ -536,7 +536,7 @@ public class Pattern implements Located
   public gnu.expr.Expression matchTest(gnu.expr.Expression parameter)
   {
     if (atNull())
-      return Inline.inline(IsNullProc.instance, parameter);
+      return Gen.isNullExp(parameter);
 
     if (atAny())
       return QuoteExp.trueExp;
@@ -544,14 +544,12 @@ public class Pattern implements Located
     if (atBool())
       {
 	if (atFalse())
-          return Inline.inline(nice.lang.inline.BoolNotOp.instance, parameter);
+          return Gen.boolNotExp(parameter);
         return parameter;
       }
 
     if (atIntValue)
-      return Inline.inline(nice.lang.inline.CompOp.create("lEq"),
-	 new gnu.expr.QuoteExp(new Long(value), gnu.bytecode.Type.long_type),
-         parameter);	
+      return Gen.integerComparison("Eq", parameter, value);	
 
     gnu.bytecode.Type ct = nice.tools.code.Types.javaType(tc);
 
@@ -566,7 +564,7 @@ public class Pattern implements Located
       //if (parameter.getType().isSubtype(ct))
       //return QuoteExp.trueExp;
       
-      return InstanceOfProc.instanceOfExp(parameter, ct);
+      return Gen.instanceOfExp(parameter, ct);
   }
 
   /****************************************************************

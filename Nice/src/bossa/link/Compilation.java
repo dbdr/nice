@@ -93,7 +93,7 @@ public final class Compilation
     if(optimize && !sortedAlternatives.hasNext())
       return matchCase;
     else
-      return gnu.expr.IfExp.make
+      return gnu.expr.SimpleIfExp.make
 	(alt.matchTest(params), 
 	 matchCase, 
 	 dispatch(sortedAlternatives, returnType, voidReturn, params));

@@ -21,36 +21,55 @@ import bossa.syntax.MonoSymbol;
 */
 public class Gen
 {
-  /**
-     Code that returns true if either expression is true.
-     Evaluates both expressions.
-  */ 
-  public static Expression or(Expression e1, Expression e2)
-  {
-    return new ApplyExp(orProc, new Expression[]{ e1, e2 });
-  }
-  
-  /** 
-      Procedure to emit <code>or</code>. 
-      Shared since it is not parametrized.
-  */
-  private static final Expression orProc = 
-    new gnu.expr.QuoteExp(new nice.tools.code.OrProc());
 
   public static Expression instanceOfExp(Expression value, Type ct)
   {
-    // If matching against primitive types, 
-    // we know the runtime type will be the corresponding object class.
+    // don't do an instanceof on primitive types. This special case 
+    // should not happen and should be removed when pattern.java is fixed
     if (ct instanceof PrimType)
-      ct = Types.equivalentObjectType(ct);
+      return QuoteExp.trueExp;
     
-    return Inline.inline(new InstanceOfProc(ct), value);
+    return Inline.inline(nice.lang.inline.Instanceof.instance, value,
+		new QuoteExp(ct));
   }
   
   public static Expression isOfClass(Expression value, Type ct)
   {
     return Inline.inline(new IsOfClassProc(ct), value);
   }
+
+  public static Expression isNullExp(Expression value)
+  {
+    return Inline.inline(nice.lang.inline.ReferenceOp.create("=="), value,
+  		QuoteExp.nullExp);
+  }
+
+  public static Expression boolNotExp(Expression value)
+  {
+    return Inline.inline(nice.lang.inline.BoolNotOp.instance, value);
+  }
+
+  public static Expression integerComparison(String kind, Expression value1,
+						long value2)
+  {
+    char type = value1.getType().getSignature().charAt(0);
+    if (type == 'J')
+      return Inline.inline(nice.lang.inline.CompOp.create("l"+kind), value1,
+	new gnu.expr.QuoteExp(new Long(value2), gnu.bytecode.Type.long_type));
+
+    if (type == 'B' || type == 'S' || type == 'I' || type == 'C')
+      return Inline.inline(nice.lang.inline.CompOp.create("i"+kind), value1,
+	new gnu.expr.QuoteExp(new Long(value2), gnu.bytecode.Type.int_type));
+
+    throw bossa.util.Internal.error("not an integer type");
+  }
+
+  public static Expression shortCircuitAnd(Expression value1, Expression value2)
+  {
+    return Inline.inline(nice.lang.inline.ShortCircuitOp.create("&&"), value1,
+			value2);
+  }
+
 
   /**
      Create a lambda expression to generate code for the method.

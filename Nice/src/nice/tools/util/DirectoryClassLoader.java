@@ -36,7 +36,7 @@ public class DirectoryClassLoader extends java.lang.ClassLoader
   /**
    * This is the method where the task of class loading
    * is delegated to our custom loader.
-   * 
+   *
    * @param	name the name of the class
    * @return	the resulting <code>Class</code> object
    * @exception	ClassNotFoundException if the class could not be found
@@ -76,5 +76,25 @@ public class DirectoryClassLoader extends java.lang.ClassLoader
         fi.close();
       } catch (java.io.IOException e) {}
     }
+  }
+
+  protected java.net.URL findResource(String name)
+  {
+    for (int i = 0; i < dirs.length; i++)
+      {
+        File res = new File(dirs[i], name);
+        if (res.exists())
+          try {
+            return res.toURL();
+          }
+          catch(java.net.MalformedURLException e) {
+            // TODO: probably use the following when we drop JDK 1.3:
+            // throw new RuntimeException(e);
+
+            return null;
+          }
+      }
+
+    return null;
   }
 }

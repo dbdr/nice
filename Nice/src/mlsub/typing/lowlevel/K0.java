@@ -1371,8 +1371,12 @@ public final class K0 {
 
   // backtrack to the situation the last time mark() has been called
   public void backtrack() {
+    if (backup == null)
+      // This can happen for a K0 that has been created on the fly
+      // at a point where (several) backups existed.
+      return;
+
     S.assume(S.a&& hasBeenInitialized);
-    S.assume(S.a&& backup != null, "backtrack() without corresponding mark()");
 
     this.m = backup.savedM;
     this.R.setSize(m);

@@ -41,7 +41,7 @@ class TestListener implements nice.tools.unit.TestListener
     task.log("Finished " + test, Project.MSG_DEBUG);
   }
 
-  failure(test, cause)
+  failure(test, cause, loader)
   {
     failures++;
 
@@ -49,8 +49,9 @@ class TestListener implements nice.tools.unit.TestListener
 
     let couldPrint = iterLocations
       (test, cause, (?String file, String method, int line) =>
-       println("Location: " + file + " method " + method + 
-	       (line < 0 ? "" : " line " + line)));
+       println("Location: " + file + " method " + method +
+	       (line < 0 ? "" : " line " + line)),
+       loader);
 
     if (! couldPrint)
       cause.printStackTrace();
@@ -61,7 +62,7 @@ class TestListener implements nice.tools.unit.TestListener
     if (failures > 0)
       throw new BuildException(""failures" tests failed", task.getLocation);
 
-    task.log("Unit testing done: "tests" tests successful", 
+    task.log("Unit testing done: "tests" tests successful",
 	     Project.MSG_INFO);
   }
 }

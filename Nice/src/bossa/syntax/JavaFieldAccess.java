@@ -112,6 +112,8 @@ public class JavaFieldAccess extends FieldAccess
 	if(field == null)
 	  User.error(this,
 		     "Field "+fieldName+" not found in class "+className);
+
+	JavaClasses.registerNativeField(this, field);
       }
   }
   

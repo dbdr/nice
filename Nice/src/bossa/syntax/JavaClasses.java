@@ -185,6 +185,63 @@ public final class JavaClasses
   private static List javaTypeConstructors = new ArrayList(100);
 
   /**
+      Remembers native methods and fields explicitly bound with a new type.
+  */
+  private static Map retyped = new HashMap();
+  
+  static void registerNativeMethod(JavaMethod m, Method reflectMethod)
+  {
+    retyped.put(reflectMethod, m);
+  }
+
+  static void registerNativeField(JavaFieldAccess f, Field reflectField)
+  {
+    retyped.put(reflectField, f);
+  }
+
+  /** Utility function for analyse.nice */
+
+  static List findJavaMethods
+    (ClassType declaringClass, String funName, int arity)
+  {
+    List possibilities = new LinkedList();
+    declaringClass.addMethods();
+    
+    // search methods
+    for(gnu.bytecode.Method method = declaringClass.getMethods();
+	method!=null; method = method.getNext())
+      if(method.getName().equals(funName) &&
+	 (method.arg_types.length + 
+	  (method.getStaticFlag() ? 0 : 1)) == arity)
+	{
+	  MethodDeclaration md = (JavaMethod) retyped.get(method);
+	  if (md == null)
+	    md = JavaMethod.make(method, false);
+	  if (md != null)
+	    possibilities.add(md.getSymbol());
+	  else
+	    Debug.println("Method " + method + " ignored");
+	}
+
+    // search a field
+    if (arity == 0)
+      {
+	gnu.bytecode.Field field = declaringClass.getField(funName);
+	if (field != null)
+	  {
+	    MethodDeclaration md = (JavaFieldAccess) retyped.get(field);
+	    if (md == null)
+	      md = JavaFieldAccess.make(field);
+	    if (md != null)
+	      possibilities.add(md.getSymbol());
+	    else
+	      Debug.println("Field " + field + " ignored");
+	  }
+      }
+    return possibilities;
+  }    
+
+  /**
    * Loads the methods defined in the java class
    * to make them available to the nice code.
    */
@@ -201,12 +258,17 @@ public final class JavaClasses
     }
     
     for (Field f = classType.getFields(); f != null; f = f.getNext())
-      JavaMethod.addFetchedMethod(f);
+      addSymbol(JavaFieldAccess.make(f));
   addingFetchedMethod:
     for(Method m = classType.getMethods(); m!=null; m = m.getNext())
       {
 	if(m.isConstructor())
-	  JavaMethod.addFetchedConstructor(m, tc);
+	  {
+	    JavaMethod res = JavaMethod.make(m, true);
+    
+	    if (res != null)
+	      TypeConstructors.addConstructor(tc, res);
+	  }
 	else
 	  {
 	    // skips m if it was just overriden in classType
@@ -221,9 +283,15 @@ public final class JavaClasses
 		if(alreadyHasMethod(itfs[i],m))
 		  continue addingFetchedMethod;
 	
-	    JavaMethod.addFetchedMethod(m);
+	    addSymbol(JavaMethod.make(m, false));
 	  }
       }
+  }
+
+  private static void addSymbol(MethodDeclaration def)
+  {
+    if (def != null && Node.getGlobalScope() != null)
+      Node.getGlobalScope().addSymbol(def.getSymbol());
   }
 
   private static boolean alreadyHasMethod(ClassType c, Method m)

@@ -234,7 +234,7 @@ analyse(e@CallExp, info)
 	    bossa.util.Internal.error(e.function, 
 				      "This is not a valid class member");
 	  
-	  java.util.List possibilities = JavaMethod.findJavaMethods
+	  java.util.List possibilities = JavaClasses.findJavaMethods
 	    (e.declaringClass, funName.toString(), args.size());
 
 	  if (possibilities.size() == 0)

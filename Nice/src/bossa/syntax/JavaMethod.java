@@ -59,7 +59,7 @@ public class JavaMethod extends MethodDeclaration
     this.javaTypes = javaTypes;
   }
 
-  private JavaMethod
+  JavaMethod
     (
      // Informations about the java method
      // These 3 args are null if we are in an interface file
@@ -82,7 +82,7 @@ public class JavaMethod extends MethodDeclaration
     setLowlevelTypes(constraint, parameters, returnType);
   }
 
-  private static JavaMethod make(Method m, boolean constructor)
+  static JavaMethod make(Method m, boolean constructor)
   {
     try {
       JavaMethod res;
@@ -128,92 +128,6 @@ public class JavaMethod extends MethodDeclaration
     }
   }
   
-  /****************************************************************
-   * Store automatically fetched java methods.
-   * Do not take them into account if an explicit java method
-   * was declared for the same reflect method.
-   ****************************************************************/
-
-  private static Map declaredMethods = new HashMap();
-  
-  /**
-     Creates a nice method for the given native method 
-     and puts it in global scope.
-     
-     @param m the native method.
-     @return the created JavaMethod.
-   */
-  public static JavaMethod addFetchedMethod(Method m)
-  {
-    JavaMethod res = (JavaMethod) declaredMethods.get(m);
-    if (res != null)
-      return res;
-
-    res = JavaMethod.make(m, false);
-
-    if (res != null)
-      Node.getGlobalScope().addSymbol(res.getSymbol());
-
-    return res;
-  }
-
-  public static JavaMethod addFetchedConstructor
-    (Method m,
-     TypeConstructor declaringClass)
-  {
-    JavaMethod res = (JavaMethod) declaredMethods.get(m);
-    if (res != null)
-      return res;
-
-    res = JavaMethod.make(m, true);
-    
-    if (res != null)
-      TypeConstructors.addConstructor(declaringClass, res);
-
-    return res;
-  }
-
-  public static MethodDeclaration addFetchedMethod(Field f)
-  {
-    MethodDeclaration md = JavaFieldAccess.make(f);
-    if (Node.getGlobalScope() != null && md != null)
-      Node.getGlobalScope().addSymbol(md.getSymbol());
-
-    return md;
-  }
-
-  /** Utility function for analyse.nice */
-
-  static List findJavaMethods
-    (ClassType declaringClass, String funName, int arity)
-  {
-    List possibilities = new LinkedList();
-    declaringClass.addMethods();
-    
-    // search methods
-    for(gnu.bytecode.Method method = declaringClass.getMethods();
-	method!=null; method = method.getNext())
-      if(method.getName().equals(funName) &&
-	 (method.arg_types.length + 
-	  (method.getStaticFlag() ? 0 : 1)) == arity)
-	{
-	  MethodDeclaration md = JavaMethod.addFetchedMethod(method);
-	  if (md != null)
-	    possibilities.add(md.getSymbol());
-	  else
-	    Debug.println("Method " + method + " ignored");
-	}
-
-    // search a field
-    if (arity == 0)
-      {
-	gnu.bytecode.Field field = declaringClass.getField(funName);
-	if(field!=null)
-	  possibilities.add(JavaMethod.addFetchedMethod(field).getSymbol());
-      }
-    return possibilities;
-  }
-    
   void buildScope(VarScope outer, TypeScope typeOuter)
   {
     // We put this here, since we need 'module' to be computed
@@ -296,8 +210,8 @@ public class JavaMethod extends MethodDeclaration
     javaTypes.set(0, new LocatedString(javaRetType.getName(), 
 				       retTypeString.location()));
     
-    reflectMethod = ((ClassType) holder).getDeclaredMethod
-      (methodName, javaArgType);
+    reflectMethod = 
+      ((ClassType) holder).getDeclaredMethod (methodName, javaArgType);
     
     if(reflectMethod == null)
       User.error(this, "method " + methodName + 
@@ -316,8 +230,8 @@ public class JavaMethod extends MethodDeclaration
 		 "\nIndicated: " + javaRetType.getName() +
 		 "\nFound    : " + reflectMethod.return_type.getName());
     
-    declaredMethods.put(reflectMethod, this);
-    
+    JavaClasses.registerNativeMethod(this, reflectMethod);    
+
     //if (reflectMethod.isConstructor())
     //.addConstructor(this);
     

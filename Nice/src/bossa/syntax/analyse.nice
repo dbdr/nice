@@ -443,38 +443,26 @@ Expression analyseIdent(IdentExp e, Info info, boolean assigned)
 
       if (sym != null)
         {
-	  if (e.alwaysOverloadedSymbol)
-            {
-	      if (sym instanceof MonoSymbol)
-		{
-		  sym.used = true;
-
-		  if (sym instanceof Block.LocalVariable.Symbol)
-		    checkInitialized(sym, info, e.location());
-                }
-
-	      return new OverloadedSymbolExp(sym, e.ident);
-            }
-	  else
+          if (sym instanceof MonoSymbol)
 	    {
-	      if (sym instanceof MonoSymbol)
-		{
-		  sym.used = true;
+	      sym.used = true;
 
-		  if (assigned && sym.depth < info.anonFunDepth)
-		    sym.captured = true;
+	      if (assigned && sym.depth < info.anonFunDepth)
+	        sym.captured = true;
 
-		  if (sym instanceof Block.LocalVariable.Symbol)
-		    {
-		      if (assigned)
-			setInitialized(sym, info, e.location());
-		      else
-			checkInitialized(sym, info, e.location());
-		    }
-		}
-
-	      return new SymbolExp(sym, e.location());
+	      if (sym instanceof Block.LocalVariable.Symbol)
+	        {
+	          if (assigned)
+		    setInitialized(sym, info, e.location());
+	          else
+		    checkInitialized(sym, info, e.location());
+	        }
 	    }
+
+	  if (e.alwaysOverloadedSymbol)
+	    return new OverloadedSymbolExp(sym, e.ident);
+	  else
+	    return new SymbolExp(sym, e.location());
 	}
     }
 

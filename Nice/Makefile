@@ -128,7 +128,8 @@ release-file: ${TARFILE} ${ZIPFILE}
          echo put ${TARFILE}; echo put ${ZIPFILE}; \
          echo lcd ${CVSBUILDDIR}; echo put ${DEB} )\
         | ftp -n upload.sourceforge.net
-	echo "Redirect /Nice.tar http://prdownloads.sourceforge.net/nice/${TARFILE}" > web/.htaccess
+	echo "Redirect /Wiki http://nice.sourceforge.net/cgi-bin/view" > web/.htaccess
+	echo "Redirect /Nice.tar http://prdownloads.sourceforge.net/nice/${TARFILE}" >> web/.htaccess
 	echo "Redirect /Nice.zip http://prdownloads.sourceforge.net/nice/${ZIPFILE}" >> web/.htaccess
 	echo "Redirect /nice.deb http://prdownloads.sourceforge.net/nice/${DEB}" >> web/.htaccess
 

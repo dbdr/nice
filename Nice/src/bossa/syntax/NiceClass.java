@@ -97,6 +97,24 @@ public class NiceClass extends ClassDefinition
       this.isFinal = isFinal;
     }
 
+    void typecheck(NiceClass c)
+    {
+      if (value != null)
+	{
+	  System.out.println("Tc " + this);
+	  c.enterTypingContext();
+	  mlsub.typing.Polytype declaredType = sym.getType();
+	  value = value.resolveOverloading(declaredType);
+	  try {
+	    Typing.leq(value.getType(), declaredType);
+	  } 
+	  catch (mlsub.typing.TypingEx ex) {
+	    throw bossa.syntax.dispatch.assignmentError
+	      (value, sym.getName().toString(), sym.getType().toString(), value);
+	  }
+	}
+    }
+
     public String toString()
     {
       return 
@@ -175,6 +193,45 @@ public class NiceClass extends ClassDefinition
 
     setJavaType(classe.getType());
   }
+
+  /****************************************************************
+   * Type checking
+   ****************************************************************/
+
+  void typecheck() 
+  { 
+    super.typecheck();
+    if (fields == null)
+      return;
+
+    try {
+      for (int i = 0; i < fields.length; i++)
+	fields[i].typecheck(this);
+    }
+    finally {
+      if (entered) {
+	entered = false;
+	try {
+	  Typing.leave();
+	}
+	catch(TypingEx ex) {
+	  User.error(this, "Type error in field declarations");
+	}
+      }
+    }
+  }
+
+  private boolean entered = false;
+
+  private void enterTypingContext()
+  {
+    if (entered || typeParameters == null) 
+      return;
+    Typing.enter();
+    entered = true;
+    Typing.introduce(typeParameters);
+  }
+
 
   /****************************************************************
    * Module Interface

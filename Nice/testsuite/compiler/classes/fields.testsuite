@@ -4,3 +4,10 @@
   {
     int x = "Type error";
   }
+
+/// PASS
+  /// TOPLEVEL
+  class A<T>
+  {
+    ?T x = null;
+  }

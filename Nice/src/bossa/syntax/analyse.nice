@@ -689,7 +689,7 @@ private void mustNotFindLabel(LocatedString label, Info info)
   
 analyse(b@BreakLabelStmt, info)
 {
-  b.statement = findLabel(notNull(b.label), info);
+  b.statement = mustFindLabel(notNull(b.label), info);
   info.setUnreachable();
 }
 
@@ -701,7 +701,7 @@ analyse(c@ContinueStmt, info)
     }
   else
     {
-      LabeledStmt l = findLabel(notNull(c.label), info);
+      LabeledStmt l = mustFindLabel(notNull(c.label), info);
       c.loop = l.getLoop();
     }
   if (c.loop == null)

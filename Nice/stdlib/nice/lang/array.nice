@@ -88,9 +88,9 @@ void set(double[], int, double)  = inline nice.lang.inline.ArraySetOp("d");
 
 // Define collection methods
 
-map<C,T,U>(a@Array, f) = fill(new U[a.length], int i => f(a[i]));
+<C,T,U> map(a@Array, f) = fill(new U[a.length], int i => f(a[i]));
 
-filter<C, T>(a@Array, test) = a.filter(test);
+<C,T> filter(a@Array, test) = a.filter(test);
 
 // Specialized versions for arrays.
 

@@ -101,7 +101,7 @@ U foldRight(java.util.List<T> l, (T, U)->U f, U init, int from)
 /** 
     Default implementation, using an Iterator.
 */
-foreach<T>(c@java.util.Collection, f) 
+<T> foreach(c@java.util.Collection, f) 
 {
   for (java.util.Iterator<T> i = c.iterator(); i.hasNext();)
     f(i.next());
@@ -116,14 +116,14 @@ foreach(l@java.util.List, f)
     f(l.get(i));
 }
 
-map<C,T,U>(c, f)
+<C,T,U> map(c, f)
 {
   C<U> res = c.similarEmptyCollection();
   c.foreach(T elem => { res.add(f(elem)); });
   return res;
 }
 
-filter<C,T>(c, test)
+<C,T> filter(c, test)
 {
   C<T> res = c.similarEmptyCollection();
   c.foreach(T elem => { if(test(elem)) res.add(elem); });
@@ -135,29 +135,13 @@ similarEmptyCollection(c)
   throw new Error("The method similarEmptyCollection is not yet implemented for " + c.getClass());
 }
 
-similarEmptyCollection<C,T,U>(c#ArrayList)
-{
-  ArrayList<U> res = new ArrayList(c.size());
-  return res;
-}
+similarEmptyCollection(c#ArrayList) = new ArrayList(c.size());
 
-similarEmptyCollection<C,T,U>(c#LinkedList)
-{
-  LinkedList<U> res = new LinkedList();
-  return res;
-}
+similarEmptyCollection(c#LinkedList) = new LinkedList();
 
-similarEmptyCollection<C,T,U>(c#java.util.Vector)
-{
-  java.util.Vector<U> res = new java.util.Vector(c.size());
-  return res;
-}
+similarEmptyCollection(c#Vector) = new Vector(c.size());
 
-similarEmptyCollection<C,T,U>(c#java.util.Stack)
-{
-  java.util.Stack<U> res = new java.util.Stack();
-  return res;
-}
+similarEmptyCollection(c#Stack) = new Stack();
 
 /****************************************************************
  * Sort

@@ -18,7 +18,7 @@ package nice.tools.ast;
 
 // Interface
 
-<Any Sym> SymbolTable<Sym> symbolTable();
+<Sym> SymbolTable<Sym> symbolTable();
 
 class SymbolTable<Sym>
 {
@@ -35,7 +35,7 @@ class SymbolTable<Sym>
   ?Binder<Sym> marks = null;     // remembers topBinders at each begin
 }
 
-<Any Sym> ?Sym get(SymbolTable<!Sym>, String name);
+<Sym> ?Sym get(SymbolTable<!Sym>, String name);
 
 class Binder<Sym>
 {
@@ -45,9 +45,9 @@ class Binder<Sym>
   ?Binder<Sym> oldBinding;
 }
 
-symbolTable<Sym>() = new SymbolTable();
+symbolTable() = new SymbolTable();
 
-get<Sym>(t@SymbolTable, name)
+<Sym> get(t@SymbolTable, name)
 {
   ?Binder<!Sym> binder = t.symbols.get(name);
   if (binder == null)
@@ -56,7 +56,7 @@ get<Sym>(t@SymbolTable, name)
     return binder.value;
 }
 
-set<Sym>(t@SymbolTable, name, sym)
+<Sym> set(t@SymbolTable, name, sym)
 {
   Binder<Sym> binder = new Binder(value: sym, name: name, 
 				  nextBinder: t.topBinder, 
@@ -65,14 +65,14 @@ set<Sym>(t@SymbolTable, name, sym)
   t.symbols.put(name, binder);
 }
 
-begin<Sym>(t@SymbolTable)
+<Sym> begin(t@SymbolTable)
 {
   Binder<Sym> mark = new Binder(value: cast(null), name: null, nextBinder: t.topBinder, oldBinding: t.marks);
   t.topBinder = null;
   t.marks = mark;
 }
 
-end<Sym>(t@SymbolTable)
+<Sym> end(t@SymbolTable)
 {
   ?Binder<Sym> top = t.topBinder;
   while (top != null)

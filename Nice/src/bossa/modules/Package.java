@@ -12,7 +12,7 @@
 
 // File    : Package.java
 // Created : Wed Oct 13 16:09:47 1999 by bonniot
-//$Modified: Wed Jul 19 16:09:20 2000 by Daniel Bonniot $
+//$Modified: Wed Jul 19 17:02:26 2000 by Daniel Bonniot $
 
 package bossa.modules;
 
@@ -218,7 +218,7 @@ public class Package implements mlsub.compilation.Module
 				 definitions, imports, opens);
       if(pkgName!=null && !pkgName.equals(this.name))
 	User.error(pkgName,
-		   sourceFile+" declares belonging to package "+pkgName+
+		   sourceFile+" declares it belongs to package "+pkgName+
 		   ", but it was found in package "+name);
     }
     catch(FileNotFoundException e){
@@ -339,6 +339,9 @@ public class Package implements mlsub.compilation.Module
   
   private void createJar()
   {
+    if (jar != null)
+      return;
+    
     String name = this.name.toString();
     int lastDot = name.lastIndexOf('.');
     if(lastDot!=-1)

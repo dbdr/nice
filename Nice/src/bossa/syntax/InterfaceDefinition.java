@@ -12,7 +12,7 @@
 
 // File    : InterfaceDefinition.java
 // Created : Thu Jul 01 17:00:14 1999 by bonniot
-//$Modified: Fri Aug 27 17:26:43 1999 by bonniot $
+//$Modified: Mon Aug 30 15:57:55 1999 by bonniot $
 
 package bossa.syntax;
 
@@ -33,9 +33,44 @@ public class InterfaceDefinition extends Node
     this.name=name;
     this.parameters=typeParameters;
     this.variance=new Variance(typeParameters.size());
-    bossa.engine.Engine.getConstraint(variance).addInterface(this);
+    variance.getConstraint().addInterface(this);
     addTypeSymbol(this);
     this.extensions=addChildren(extensions);
+  }
+
+  public Collection associatedDefinitions()
+  {
+    return null;
+  }
+  
+  /****************************************************************
+   * The top interface
+   ****************************************************************/
+  
+  private InterfaceDefinition(String name, int arity)
+  {
+    super(Node.forward);
+    this.name=new LocatedString(name,Location.nowhere());
+    this.parameters=null;
+    this.variance=new Variance(arity);
+    variance.getConstraint().addInterface(this);
+    addTypeSymbol(this);
+    extensions=null;
+  }
+  
+  static private Vector tops=new Vector();
+  
+  static InterfaceDefinition top(int arity)
+  {
+    if(arity>=tops.size())
+      tops.setSize(arity+1);
+    InterfaceDefinition res=(InterfaceDefinition)tops.get(arity);
+    if(res==null)
+      {
+	res=new InterfaceDefinition("Top"+arity,arity);
+	tops.set(arity,res);
+      }
+    return res;
   }
 
   public TypeSymbol cloneTypeSymbol()
@@ -55,17 +90,20 @@ public class InterfaceDefinition extends Node
   void typecheck()
   {
     bossa.typing.Typing.assertLeq(this,extensions);
+    bossa.typing.Typing.assertLeq(this,top(parameters.size()));
   }
   
   /****************************************************************
    * Constraints
    ****************************************************************/
 
-  public BitVector impv=new BitVector();
+  public BitVector impv=new BitVector(),absv=new BitVector();
   
   public void resize(int newSize)
   {
     impv.truncate(newSize);
+    absv.truncate(newSize);
+    approx.setSize(newSize);
   }
   
   public boolean imp(int id)
@@ -73,9 +111,37 @@ public class InterfaceDefinition extends Node
     return impv.get(id);
   }
   
+  public boolean impp(int id)
+  {
+    return impv.get(id);
+  }
+  
   public void addImp(int id)
   {
     impv.set(id);
+  }
+  
+  public boolean abs(int id)
+  {
+    return absv.get(id);
+  }
+  
+  public void addAbs(int id)
+  {
+    absv.set(id);
+  }
+  
+  private Vector approx=new Vector();
+  
+  public void setApprox(int node, int value)
+  {
+    Internal.error(node>=approx.size(),"Incorrect node "+node+" in "+this);
+    approx.set(node,new Integer(value));
+  }
+  
+  public int getApprox(int node)
+  {
+    return ((Integer)approx.get(node)).intValue();
   }
   
   /****************************************************************
@@ -103,4 +169,14 @@ public class InterfaceDefinition extends Node
   Collection /* of TypeSymbol */ parameters;
   public Variance variance;
   private List /* of Interface */ extensions; // the surinterfaces
+
+  private int id;
+  public void setId(int id)
+  {
+    this.id=id;
+  }
+  public int getId()
+  {
+    return id;
+  }
 }

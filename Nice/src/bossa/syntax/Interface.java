@@ -12,7 +12,7 @@
 
 // File    : Interface.java
 // Created : Thu Jul 08 11:51:09 1999 by bonniot
-//$Modified: Fri Aug 27 16:32:29 1999 by bonniot $
+//$Modified: Mon Aug 30 17:25:39 1999 by bonniot $
 
 package bossa.syntax;
 
@@ -34,12 +34,20 @@ public class Interface extends Node
   {
     super(Node.down);
     this.name=name;
-    //this.id=-1;
   }
 
+  Interface(InterfaceDefinition def)
+  {
+    super(Node.down);
+    this.definition=def;
+  }
+  
   public TypeSymbol cloneTypeSymbol()
   {
-    return new Interface(name);
+    if(definition==null)
+      return new Interface(name);
+    else
+      return new Interface(definition);
   }
   
   public boolean hasName(LocatedString s)
@@ -55,7 +63,11 @@ public class Interface extends Node
   {
     if(definition==null)
       {
-	TypeSymbol s=typeScope.lookup(name);
+	TypeSymbol s;
+	if(name.content.startsWith("Top"))
+	  s=InterfaceDefinition.top(Integer.parseInt(name.content.substring(3)));
+	else
+	  s=typeScope.lookup(name);
 	if(s==null)
 	  User.error(name,"Interface "+name+" is not defined");
 	if(s instanceof InterfaceDefinition)
@@ -94,5 +106,4 @@ public class Interface extends Node
 
   LocatedString name;
   public InterfaceDefinition definition;
-  //public int id;
 }

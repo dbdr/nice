@@ -12,7 +12,7 @@
 
 // File    : ClassDefinition.java
 // Created : Thu Jul 01 11:25:14 1999 by bonniot
-//$Modified: Fri Aug 27 17:19:32 1999 by bonniot $
+//$Modified: Mon Aug 30 17:03:57 1999 by bonniot $
 // Description : Abstract syntax for a class definition
 
 package bossa.syntax;
@@ -25,6 +25,7 @@ public class ClassDefinition extends Node
   implements Definition
 {
   public ClassDefinition(LocatedString name, 
+			 boolean isFinal, boolean isSharp,
 			 List typeParameters,
 			 List extensions, List implementations, List abstractions,
 			 List fields,
@@ -33,21 +34,51 @@ public class ClassDefinition extends Node
     super(Node.forward);
     
     this.name=name;
+    this.isFinal=isFinal;
+    this.isSharp=isSharp;
+
     if(typeParameters==null)
       this.typeParameters=new ArrayList(0);
     else
       this.typeParameters=typeParameters;
     this.extensions=extensions;
 
-    this.implementations=addChildren(implementations);
-    this.abstractions=addChildren(abstractions);
-    this.methods=addChildren(methods);
-
-    this.fields=fields;
-    addChildren(computeAccessMethods(fields));
-
     this.tc=new TypeConstructor(this);
     addTypeSymbol(this.tc);
+
+    this.fields=fields;
+    if(isSharp)
+      // The sharp class must not declare children, 
+      // since the associated class as already done so
+      {
+	this.implementations=implementations;
+	this.abstractions=abstractions;
+	this.methods=methods;
+      }
+    else
+      {
+	this.implementations=addChildren(implementations);
+	this.abstractions=addChildren(abstractions);
+	this.methods=addChildren(methods);
+	addChildren(computeAccessMethods(fields));
+      }
+    
+    if(isFinal && !isSharp)
+      addTypeMap("#"+name.content,this.tc);
+  }
+
+  public Collection associatedDefinitions()
+  {
+    // Creates an immediate descendant, that abstracts and doesn't implement Top<n>
+    if(isFinal)
+      return new ArrayList(0);
+    Collection res=new ArrayList(1);
+    LocatedString name=new LocatedString("#"+this.name.content,this.name.location());
+    List parent=new ArrayList(1);
+    parent.add(this.tc);
+    ClassDefinition c=new ClassDefinition(name,true,true,typeParameters,parent,new LinkedList(),new LinkedList(),fields,methods);
+    res.add(c);
+    return res;
   }
   
   private List computeAccessMethods(List fields)
@@ -94,13 +125,22 @@ public class ClassDefinition extends Node
     extensions=TypeConstructor.resolve(typeScope,extensions);
   }
 
+  /****************************************************************
+   * Typechecking
+   ****************************************************************/
+
   void typecheck()
   {
     try{
       Typing.introduce(tc);
       Typing.leq(tc,extensions);
       Typing.assertImp(tc,implementations);
+      Typing.assertImp(tc,abstractions);
       Typing.assertAbs(tc,abstractions);
+      if(isFinal)
+	Typing.assertAbs(tc,InterfaceDefinition.top(typeParameters.size()));
+      if(!isSharp)
+	Typing.assertImp(tc,InterfaceDefinition.top(typeParameters.size()));
     }
     catch(TypingEx e){
       User.error(name,"Error in class "+name+" :"+e.getMessage());
@@ -136,4 +176,6 @@ public class ClassDefinition extends Node
   private List /* of TypeConstructor */ abstractions;
   private List /* of MonoSymbol */ fields;
   private List methods;
+  private boolean isFinal;
+  private boolean isSharp; // This class is a #A (not directly visible to the user)
 }

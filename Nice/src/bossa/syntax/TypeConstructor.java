@@ -12,7 +12,7 @@
 
 // File    : TypeConstructor.java
 // Created : Thu Jul 08 11:51:09 1999 by bonniot
-//$Modified: Fri Aug 27 12:28:27 1999 by bonniot $
+//$Modified: Mon Aug 30 16:40:58 1999 by bonniot $
 
 package bossa.syntax;
 
@@ -71,11 +71,18 @@ public class TypeConstructor
     this.definition=null;
   }
 
-  private void setVariance(Variance v)
+  /**
+   * Tell which variance this TypeConstructor has.
+   * Can be called from ImplementsCst.
+   */
+  void setVariance(Variance v)
   {
+    if(variance!=null)
+      {
+	User.error(!(variance.equals(v)),this,"Incorrect variance for "+this);
+	return;
+      }
     this.variance=v;
-    Internal.error(kind!=null,"Kind should be null in TC.setVariance");
-    
     this.kind=bossa.engine.Engine.getConstraint(v);
   }
 
@@ -132,8 +139,7 @@ public class TypeConstructor
     if(definition==null)
       {
 	TypeSymbol s=typeScope.lookup(name);
-	if(s==null)
-	  User.error(name,"Class "+name+" is not defined"); 
+	User.error(s==null,this,"Class "+name+" is not defined"); 
 	
 	if(s instanceof TypeConstructor)
 	  return (TypeConstructor)s;
@@ -141,6 +147,19 @@ public class TypeConstructor
 	  Internal.error(name,"type constructor is not a type symbol but a "
 			 +s.getClass()); 
 	return null;
+      }
+    return this;
+  }
+
+  TypeSymbol resolveToTypeSymbol(TypeScope typeScope)
+  {
+    if(definition==null)
+      {
+	if(name.content.startsWith("Top"))
+	  return InterfaceDefinition.top(Integer.parseInt(name.content.substring(3)));
+	TypeSymbol s=typeScope.lookup(name);
+	User.error(s==null,this,"Class or interface "+name+" is not defined");
+	return s;
       }
     return this;
   }

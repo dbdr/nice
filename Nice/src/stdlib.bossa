@@ -12,12 +12,12 @@
 
 // File    : stdlib.bossa
 // Created : Thu Jul 08 16:20:19 1999 by bonniot
-//$Modified: Fri Aug 27 11:11:07 1999 by bonniot $
+//$Modified: Mon Aug 30 17:58:24 1999 by bonniot $
 // Description : Prolog file, included before all bossa file
 
 variable {Any T} T null;
 
-class void {}
+final class void {}
 
 // Booleans
 class Boolean {}
@@ -53,12 +53,44 @@ _while(test,body)
   _while(test,body);
 }
 
+// Copy
+interface Cloneable;
+
+T clone{Cloneable T}(T);
+
+//Comparable
+interface Comparable;
+
+//Boolean equals{Comparable T}(T,T);
+
+//Boolean equal{Any T,Any T'|T':Comparable<T>}(T,T');
+
 // Numeric
-class Float{}
-class Integer extends Float {}
+interface Num extends Cloneable,Comparable;
+
+class Float implements Num {}
+class Integer extends Float abstracts Num {}
+
+T plus{Num T}(T,T);
+plus(x@Integer,y@Integer)
+{ return new Integer(); }
+
+plus(x@#Float,y@#Float)
+{ return new Float(); }
+
 Integer succ(Integer);
+succ(x)
+{
+  return plus(x,1);
+}
+
 Boolean lt(Integer, Integer);
 Boolean equal(Integer,Integer);
+
+clone(x@Float)
+{
+  return x;
+}
 
 class String{}
 

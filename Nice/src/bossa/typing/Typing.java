@@ -12,7 +12,7 @@
 
 // File    : Typing.java
 // Created : Tue Jul 20 11:57:17 1999 by bonniot
-//$Modified: Fri Aug 27 17:26:22 1999 by bonniot $
+//$Modified: Mon Aug 30 17:55:52 1999 by bonniot $
 
 package bossa.typing;
 
@@ -306,7 +306,9 @@ abstract public class Typing
 
   public static void assertLeq(InterfaceDefinition i, InterfaceDefinition j)
   {
-    if(dbg) Debug.println(i+" !!!<<!!! "+j);
+    if(dbg) Debug.println(i+" < "+j);
+    User.error(!(i.variance.equals(j.variance)),i+" and "+j+" are not comparable");
+    i.variance.getConstraint().itfLeq(i,j);
   }
   
   public static void assertLeq(InterfaceDefinition itf, Collection c)
@@ -318,14 +320,25 @@ abstract public class Typing
   public static void assertImp(TypeConstructor t, InterfaceDefinition i)
     throws TypingEx
   {
-    User.error(!(t.variance.equals(i.variance)),t+" cannot implement "+i);
     if(dbg) Debug.println(t+" imp "+i);
+    try{
+      Engine.setKind(t,i.variance.getConstraint());
+    }
+    catch(Unsatisfiable e){
+      unsatisfiable(new TypingEx(t+" cannot implement "+i));
+    }
+
     if(Engine.isRigid(t))
       if(imp(t,i))
 	return;
       else
 	unsatisfiable(new TypingEx(t+" doesn't implement "+i));
-    i.addImp(t.getId());
+
+    // 't' implements 'i' and all interfaces above 'i'
+    for(Iterator it=t.variance.getConstraint().itfGeqIter(i);it.hasNext();)
+      ((InterfaceDefinition)it.next()).addImp(t.getId());
+
+    // Reduce the domain of 't'
     try{
       ((Engine.K)t.getKind()).domains.reduce(t.getId(),i.impv);
     }
@@ -338,6 +351,12 @@ abstract public class Typing
     throws TypingEx
   {
     if(dbg) Debug.println(t+" abs "+i);
+
+    Internal.error(Engine.isRigid(t),
+		   "Abstraction required on a rigid type constructor : \n"+
+		   t+" required to abstract "+i);
+    
+    i.addAbs(t.getId());
   }
 
   public static void assertImp(TypeConstructor t, Collection c)
@@ -353,7 +372,7 @@ abstract public class Typing
   {
     Iterator i=c.iterator();
     while(i.hasNext())
-      assertAbs(t,(InterfaceDefinition)i.next());
+      assertAbs(t,((Interface)i.next()).definition);
   }
 
   /****************************************************************
@@ -364,6 +383,6 @@ abstract public class Typing
   {
     return i.imp(t.getId());
   }
-  
+
   static final boolean dbg = true;
 }

@@ -12,7 +12,7 @@
 
 // File    : TypeConstructorLeqCst.java
 // Created : Sat Jul 24 12:02:15 1999 by bonniot
-//$Modified: Fri Aug 27 12:57:44 1999 by bonniot $
+//$Modified: Mon Aug 30 14:07:11 1999 by bonniot $
 
 package bossa.syntax;
 
@@ -42,7 +42,15 @@ public class TypeConstructorLeqCst extends AtomicConstraint
   AtomicConstraint resolve(TypeScope ts)
   {
     t1=t1.resolve(ts);
-    t2=t2.resolve(ts);
+    // If t2 resolve to an interface definition,
+    // this constraint meant t1 implements t2
+    TypeSymbol s=t2.resolveToTypeSymbol(ts);
+    if(s instanceof InterfaceDefinition)
+      return new ImplementsCst(t1,(InterfaceDefinition)s);
+    else if(s instanceof TypeConstructor)
+      t2=(TypeConstructor)s;
+    else
+      Internal.error(t2+" resolved to a "+s.getClass());
     return this;
   }
 

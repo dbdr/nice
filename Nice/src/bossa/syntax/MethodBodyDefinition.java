@@ -12,7 +12,7 @@
 
 // File    : MethodBodyDefinition.java
 // Created : Thu Jul 01 18:12:46 1999 by bonniot
-//$Modified: Fri Aug 27 11:07:22 1999 by bonniot $
+//$Modified: Mon Aug 30 15:44:51 1999 by bonniot $
 // Description : Abstract syntax for a method body
 
 package bossa.syntax;
@@ -40,6 +40,11 @@ public class MethodBodyDefinition extends Node
     addChild(this.body);
   }
 
+  public Collection associatedDefinitions()
+  {
+    return null;
+  }
+  
   private Collection buildSymbols(Collection names, Collection types)
   {
     if(names.size()!=types.size())

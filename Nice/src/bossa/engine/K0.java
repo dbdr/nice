@@ -60,15 +60,15 @@ abstract public class K0 implements Cloneable {
   /**
    * C maintains the constraint as it is entered
    **/
-  private BitMatrix C;
+  protected BitMatrix C;
   /**
    * Transpose of C
    **/
-  private BitMatrix Ct;
+  protected BitMatrix Ct;
   /**
    * Total number of indexes.
    **/
-  private int n;
+  protected int n;
 
   public int size() {
     return n;
@@ -587,8 +587,14 @@ abstract public class K0 implements Cloneable {
     }
   }
 
+  protected void beforeSatisfy()
+    throws Unsatisfiable
+  {
+  }
+  
   final public void satisfy() throws Unsatisfiable {
     try {
+      beforeSatisfy();
       condense();
       rawSatisfy();
     } catch (LowlevelUnsatisfiable e) {

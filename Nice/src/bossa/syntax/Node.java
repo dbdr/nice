@@ -12,7 +12,7 @@
 
 // File    : Node.java
 // Created : Thu Jul 08 10:24:56 1999 by bonniot
-//$Modified: Fri Aug 27 17:28:47 1999 by bonniot $
+//$Modified: Mon Aug 30 17:57:15 1999 by bonniot $
 
 package bossa.syntax;
 
@@ -89,6 +89,12 @@ abstract class Node
       typeSymbols.addAll(c);
   }
   
+  void addTypeMap(String name, TypeSymbol symbol)
+  {
+    typeMapsNames.add(new LocatedString(name,Location.nowhere()));
+    typeMapsSymbols.add(symbol);
+  }
+  
   void addTypeMaps(Collection names, Collection symbols)
     throws BadSizeEx
   {
@@ -119,7 +125,10 @@ abstract class Node
   // Default behaviour, must be overriden in nodes
   // that really define a new scope
   {
-    Internal.error(this.scope!=null,"Scope set twice for "+this);
+    if(scope!=null)
+      scope=null;
+    Internal.error(this.scope!=null,
+		   "Scope set twice for "+this);
 
     Scopes res=null;
     switch(propagate)

@@ -12,14 +12,22 @@
 
 // File    : Definition.java
 // Created : Thu Jul 01 11:17:28 1999 by bonniot
-//$Modified: Wed Jul 07 17:02:26 1999 by bonniot $
+//$Modified: Mon Aug 30 15:42:52 1999 by bonniot $
 // Description : Abstract definition
 //   May be a class definition, a method definition, 
 //   an interface definition...
 
 package bossa.syntax;
 
+import java.util.Collection;
+
 public interface Definition
 {
-
+  /**
+   * Returns a collection of definitions that are derived
+   * from the current definition.
+   * For example, a class definition A returns a collection
+   * with the definition of class #A (#A<:A, #A is final, abstracts Top without implementing it).
+   */
+  Collection associatedDefinitions();
 }

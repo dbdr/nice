@@ -12,13 +12,14 @@
 
 // File    : Engine.java
 // Created : Tue Jul 27 15:34:53 1999 by bonniot
-//$Modified: Fri Aug 27 16:36:23 1999 by bonniot $
+//$Modified: Mon Aug 30 17:54:49 1999 by bonniot $
 
 package bossa.engine;
 
 import java.util.*;
 
 import bossa.util.*;
+import bossa.syntax.InterfaceDefinition;
 
 /**
  * Public interface to lowlevel constraint implication checker
@@ -227,7 +228,7 @@ public abstract class Engine
   private static final BackableList frozenLeqs=new BackableList();
   
   // TODO: This is for sure quite slow and ugly
-  private static void setKind(Element element, Kind k)
+  public static void setKind(Element element, Kind k)
     throws Unsatisfiable
   {
     Stack s=new Stack();
@@ -352,18 +353,172 @@ public abstract class Engine
   public static class K extends K0
     implements Kind
   {
+    /****************************************************************
+     * Interfaces
+     ****************************************************************/
+    
     Collection interfaces=new ArrayList();
 
-    public void addInterface(bossa.syntax.InterfaceDefinition i)
+    private int nextItfId=0; // NOT static, interfaces are structural
+    
+    private BitMatrix itfLeq=new BitMatrix(); // order on interfaces, idem (not static)
+
+    /**
+     * Assert that i extends j
+     */
+    public void itfLeq(InterfaceDefinition i, InterfaceDefinition j)
+    {
+      itfLeq.set(i.getId(),j.getId());
+      itfLeq.closure();
+    }
+    
+    /**
+     * Return an iterator of all interfaces above i (i included)
+     * in an unspecified order.
+     */
+    public Iterator itfGeqIter(final InterfaceDefinition i)
+    {
+      return new Iterator()
+      {
+	private InterfaceDefinition next;
+	private int id=-1;
+	private final int wantedId=i.getId();
+	
+	public boolean hasNext()
+	{
+	  if(next!=null)
+	    return true;
+	  while(++id<nextItfId)
+	    if(itfLeq.get(wantedId,id))
+	      {
+		next=getItf(id);
+		return true;
+	      }
+	  return false;
+	}
+	
+	public Object next()
+	{
+	  if(next==null)
+	    hasNext();
+	  InterfaceDefinition res=next;
+	  next=null;
+	  return res;
+	}
+
+	public void remove() { throw new UnsupportedOperationException(); }
+      };
+    }
+
+    private InterfaceDefinition getItf(int id)
+    {
+      for(Iterator i=interfaces.iterator();i.hasNext();)
+	{
+	  InterfaceDefinition res=(InterfaceDefinition)i.next();
+	  if(res.getId()==id)
+	    return res;
+	}
+      return null;
+    }
+    
+    public void addInterface(InterfaceDefinition i)
     {
       interfaces.add(i);
+      int id=nextItfId++;
+      i.setId(id);
+      itfLeq.setSize(nextItfId);
+      itfLeq.set(id,id);
       i.resize(size());
     }
     
-    void onExtend(int newSize)
+    private int findApprox(InterfaceDefinition i, int node)
+    {
+      int res=-1;
+      boolean toCheck=false;
+      boolean absOk=false; // Set to true if some surinterface of i is abstracted at n 
+
+      if(node==18)
+	node=18;
+      
+      for(Iterator it=itfGeqIter(i);it.hasNext();)
+	{
+	  InterfaceDefinition j=(InterfaceDefinition)it.next();
+	  if(j.abs(node)){
+	    absOk=true;
+	    break;
+	  }
+	}
+      if(!absOk)
+	return -1;
+      
+      for(int walk=0; walk<n; walk++)
+	if(C.get(node,walk))
+	  {
+	    if(i.imp(walk))
+	      if(res==-1 || C.get(walk,res))
+		res=walk;
+	      else
+		toCheck=true;
+	  }
+      // We can get rid of a ->_i b if b ->_i b
+      if(res==-1 || res!=node && i.abs(res))
+        return -1;
+      if(toCheck)
+        for(int walk=0;walk<n;walk++)
+	  if(!C.get(res,walk))
+	    return -1;
+      if(dbg) Debug.println("Approximation for "+i+node+" -> "+res);
+      return res;
+    }
+	
+    private void computeApprox()
+    {
+      for(Iterator it=interfaces.iterator();it.hasNext();)
+	{
+	  InterfaceDefinition i=(InterfaceDefinition)it.next();
+	  for(int node=0;node<n;node++)
+	    i.setApprox(node,findApprox(i,node));
+	}
+    }
+    
+    private void approxPropagate()
+      throws Unsatisfiable
+    {
+      C.closure();
+      computeApprox();
+      for(Iterator it=interfaces.iterator();it.hasNext();)
+	{
+	  InterfaceDefinition i=(InterfaceDefinition)it.next();
+	  int n1;
+	  for(int node=0;node<n;node++)
+	    if((n1=i.getApprox(node))!=-1)
+	      for(int p1=0;p1<n;p1++)
+		if(i.impp(p1))
+		  for(int p=0;p<n;p++)
+		    if(C.get(p,p1) && C.get(p,node))
+		      if(this.isRigid(p1))
+			if(!C.get(n1,p1))
+			  throw new LowlevelUnsatisfiable("approxPropagate: there should be "+n1+" <: "+p1);
+			else ;
+		      else 
+			{
+			  if(dbg) Debug.println("Abs rule applied : "+n1+" < "+p1);
+			  C .set(n1,p1);
+			  Ct.set(p1,n1);
+			}
+	}	    
+    }
+    
+    protected void onResize(int newSize)
     {
       for(Iterator i=interfaces.iterator();i.hasNext();)
-	((bossa.syntax.InterfaceDefinition)i.next()).resize(newSize);
+	((InterfaceDefinition)i.next()).resize(newSize);
+    }
+
+    protected void beforeSatisfy()
+      throws Unsatisfiable
+    {
+      approxPropagate();
     }
     
     public final void leq(Element e1, Element e2)

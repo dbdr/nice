@@ -12,15 +12,18 @@
 
 // File    : LocalDeclarationStmt.java
 // Created : Tue Jul 06 12:06:20 1999 by bonniot
-//$Modified: Thu Aug 26 15:49:07 1999 by bonniot $
-// Description : Declaration of a local variable
-//   with optional initial value
+//$Modified: Mon Aug 30 15:49:23 1999 by bonniot $
 
 package bossa.syntax;
 
 import bossa.util.*;
 import bossa.typing.*;
+import java.util.*;
 
+/**
+ * Declaration of a local variable
+ * with an optional initial value
+ */
 public class LocalDeclarationStmt extends Statement
   implements Definition
 {
@@ -35,6 +38,11 @@ public class LocalDeclarationStmt extends Statement
       this.value=expChild(value);
   }
 
+  public Collection associatedDefinitions()
+  {
+    return null;
+  }
+  
   /****************************************************************
    * Type cheking
    ****************************************************************/

@@ -12,7 +12,7 @@
 
 // File    : AtomicConstraint.java
 // Created : Mon Jul 19 16:40:18 1999 by bonniot
-//$Modified: Wed Aug 25 18:13:32 1999 by bonniot $
+//$Modified: Mon Aug 30 17:45:18 1999 by bonniot $
 
 package bossa.syntax;
 
@@ -36,7 +36,7 @@ public abstract class AtomicConstraint extends Node
    ****************************************************************/
 
   abstract AtomicConstraint resolve(TypeScope scope);
-
+  
   static List resolve(TypeScope scope, Collection c)
   {
     List res=new ArrayList(c.size());

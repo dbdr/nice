@@ -8,16 +8,6 @@ class A
 <Any I> I id(I);
 id(x) = x;
 
-void test_higher_order();
-test_higher_order()
-{
-  println(id("ID"));
-  println((fun<Any T>(T x)=>x)("LAMBDA"));
-
-  // Presently fails
-  //id (x); // x is A's field method, of type A->int
-}
-
 void bidon();
 bidon()
 {
@@ -36,6 +26,9 @@ min_max(x,y) = x < y ? (x, y) : (y, x);
 void test_discards();
 test_discards()
 {
+  // Presently fails
+  //id (x); // x is A's field method, of type A->int
+
   A a = new A();
   int i;
   boolean b = false;

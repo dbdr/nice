@@ -1,0 +1,23 @@
+package regtest.basic;
+
+/** Tests higher order functions */
+
+<Any T, Any U> U apply(fun(T)(U) f, T x) = f(x);
+
+<Any T, Any U> U apply2(fun(T)(U) f, T x);
+apply2(f, x) = f(x);
+
+class High
+{
+  alike high( fun()() );
+}
+
+high(h@High, f)  { f(); return h; }
+
+void test_higher_order()
+{
+  println(id("ID"));
+  println((fun<Any T>(T x)=>x)("LAMBDA"));
+  println(apply(fun<Any T>(T x)=>x, "LAMBDA"));
+}
+

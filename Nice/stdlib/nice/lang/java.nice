@@ -53,6 +53,7 @@ String getName(Field) = native String Field.getName();
 String concat(String, String) = native String String.concat(String);
 StringBuffer append(StringBuffer, char[] str, int offset, int len) =
   native StringBuffer StringBuffer.append(char[], int, int);
+StringBuffer append(StringBuffer, char) = native StringBuffer StringBuffer.append(char);
 char[] toCharArray(String) = native char[] String.toCharArray();
 String substring(StringBuffer, int) = 
   native String StringBuffer.substring(int);

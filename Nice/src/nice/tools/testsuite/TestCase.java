@@ -30,7 +30,7 @@ import bossa.modules.Compilation;
  * @author	Alex Greif <a href="mailto:alex.greif@web.de">alex.greif@web.de</a>
  * @version	$Id$
  */
-public class TestCase {
+public abstract class TestCase {
 	/**
 	 * Compiler message
 	 * 
@@ -99,6 +99,7 @@ public class TestCase {
 	private int _lineCounter = 0;
 
 
+	boolean isKnownBug;
 
 
 
@@ -382,7 +383,10 @@ public class TestCase {
 	 * 
 	 */
 	public void pass() {
-		TestNice.increaseSucceeded();
+		if (isKnownBug)
+			TestNice.increaseFixed();
+		else
+			TestNice.increaseSucceeded();
 		TestNice.getOutput().endTestCase(true);
 	}
 	
@@ -391,15 +395,19 @@ public class TestCase {
 	 * This is the place for output messages.
 	 */
 	public void fail() {
-		TestNice.increaseFailed();
-		
-		//	log the sources
-		printSources();
-		
-		//	compiler messages
-		TestNice.getOutput().log("nicec", getCompilerMessages());
-		TestNice.getOutput().endTestCase(false);
-		
+		if (isKnownBug)
+			TestNice.increaseKnownBug();
+		else {
+			TestNice.increaseFailed();
+			
+			//	log the sources
+			printSources();
+			
+			//	compiler messages
+			TestNice.getOutput().log("nicec", getCompilerMessages());
+			TestNice.getOutput().endTestCase(false);
+		}
+
 		//	move contents of temp folder to a new folder in the fail folder
 		TestNice.moveFilesToFailFolder();
 	}

@@ -165,13 +165,24 @@ public class TestSuite {
 	 */
 	private TestCase createTestCase(String line) throws TestSuiteException {
 		String type = line.substring(TestNice.KEYWORD_SIGN.length()).trim();
-		
-		if (TESTCASE_TYPE_PASS.equalsIgnoreCase(type))
-			return new PassTestCase(this);
-		else if (TESTCASE_TYPE_FAIL.equalsIgnoreCase(type))
-			return new FailTestCase(this);
 
-		throw new TestSuiteException("Unknown testcase type: " + type);
+		boolean isKnownBug = false;
+		if (type.endsWith("bug"))
+			{
+				isKnownBug = true;
+				type = type.substring(0, type.length() - "bug".length()).trim();
+			}
+
+		TestCase res;
+		if (TESTCASE_TYPE_PASS.equalsIgnoreCase(type))
+			res = new PassTestCase(this);
+		else if (TESTCASE_TYPE_FAIL.equalsIgnoreCase(type))
+			res = new FailTestCase(this);
+		else
+			throw new TestSuiteException("Unknown testcase type: " + type);
+
+		res.isKnownBug = isKnownBug;
+		return res;
 	}
 
 

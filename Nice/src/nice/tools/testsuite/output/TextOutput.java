@@ -83,10 +83,14 @@ public class TextOutput extends AbstractOutput {
 		_indent--;
 		log("test engine finished");
 		log("");
-		log("number of testcases: " + (TestNice.getTestCasesSucceeded() + TestNice.getTestCasesFailed()));
-		log("  succeeded: " + TestNice.getTestCasesSucceeded());
-		log("  failed   : " + TestNice.getTestCasesFailed());
-		log("  warnings : " + TestNice.getTestCasesWarning());
+		log("number of testcases: " + (TestNice.getTotalTestCases()));
+		log("  successes  : " + TestNice.getTestCasesSucceeded());
+		log("  regressions: " + TestNice.getTestCasesFailed());
+		log("  warnings   : " + TestNice.getTestCasesWarning());
+		log("  known bugs : " + TestNice.getTestCasesKnownBug());
+		if (TestNice.getTestCasesFixed() > 0)
+		  log("  FIXES :-)) : " + TestNice.getTestCasesFixed());
+		
 		logAndFlush("");
 	}
 	

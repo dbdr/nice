@@ -120,6 +120,10 @@ public class TestNice {
 	 */
 	private static int _testCasesWarning = 0;
 
+	private static int _testCasesKnownBug = 0;
+
+	private static int _testCasesFixed = 0;
+
 	/**
 	 * The Output where log statements should be written.
 	 * ConsoleOutput is the default Output.
@@ -393,6 +397,14 @@ public class TestNice {
 		++_testCasesWarning;
 	}
 
+	public static void increaseKnownBug() {
+		++_testCasesKnownBug;
+	}
+
+	public static void increaseFixed() {
+		++_testCasesFixed;
+	}
+
 
 
 	/**
@@ -411,6 +423,16 @@ public class TestNice {
 	 */
 	static boolean getWriteComments() {
 		return _writeComments;
+	}
+
+
+	/**
+	 * Returns the total number of testcases.
+	 * 
+	 */
+	static public int getTotalTestCases() {
+		return _testCasesSucceeded + _testCasesFailed + _testCasesWarning
+			+ _testCasesKnownBug + _testCasesFixed;
 	}
 
 
@@ -437,6 +459,14 @@ public class TestNice {
 	 */
 	static public int getTestCasesWarning() {
 		return _testCasesWarning;
+	}
+
+	static public int getTestCasesKnownBug() {
+		return _testCasesKnownBug;
+	}
+
+	static public int getTestCasesFixed() {
+		return _testCasesFixed;
 	}
 
 }

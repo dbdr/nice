@@ -62,7 +62,7 @@ class HTMLWriter {
     
     writer.write(getHeader(c.getName().toString()));
 
-    writer.write("<h1>Class " + c.getName() + "</h1>\n");
+    writer.write("<h1>Class " + htmlEncode(c.getName()) + "</h1>\n");
 
     //Print hierarchy
     ArrayList<ClassDefinition.Class> list = new ArrayList();
@@ -86,7 +86,7 @@ class HTMLWriter {
       hierarchy = list.get(i).getName() + "\n" + spaces + "|\n" + spaces + "+--" + hierarchy;
     }
     writer.write("<pre>\n");
-    writer.write(hierarchy);
+    writer.write(htmlEncode(hierarchy));
     writer.write("</pre>\n");
 
     //Implemented interfaces
@@ -95,7 +95,7 @@ class HTMLWriter {
       writer.write("<b>Implemented interfaces:</b>\n");
       writer.write("<ul>\n");
       interfaces.foreach(ClassDefinition.Interface i => 
-  		         writer.write("<li>" + i.getName() + "</li>\n"));
+  		         writer.write("<li>" + htmlEncode(i.getName()) + "</li>\n"));
       writer.write("</ul>\n");
     }
     
@@ -104,6 +104,8 @@ class HTMLWriter {
     if(c.docString() != null) {
         comments = notNull(c.docString());
         
+        //Note: the comments is deliberately not htmlEncoded because I want people
+        //to be able to put their own html in the comment.
         Comment c = new Comment(commentStr: comments);
         List<(?String, String)> tags = c.tags;
         //write the general comment
@@ -141,10 +143,12 @@ class HTMLWriter {
     
     writer.write(getHeader(gv.getName().toString()));
   
-    writer.write("<h1>Global Variable " + gv.getName() + "</h1>\n");
+    writer.write("<h1>Global Variable " + htmlEncode(gv.getName()) + "</h1>\n");
   
-    writer.write(htmlSafe(gv.toString()));
+    writer.write(htmlEncode(gv.toString()));
   
+    //Note: the comments is deliberately not htmlEncoded because I want people
+    //to be able to put their own html in the comment.
     writer.write("<p>\n");
     String comments;
     if(gv.docString() != null)
@@ -172,12 +176,13 @@ class HTMLWriter {
     
     writer.write(getHeader(m.getName().toString()));
   
-    writer.write("<h1>Method " + m.getName() + "</h1>\n");
+    writer.write("<h1>Method " + htmlEncode(m.getName()) + "</h1>\n");
   
-    writer.write(htmlSafe(m.toString()));
-  
+    writer.write(htmlEncode(m.toString()));
+    
+    //Note: the comments is deliberately not htmlEncoded because I want people
+    //to be able to put their own html in the comment.
     writer.write("<p>\n");
-    writer.write("<p>");
     String comments;
     if(m.docString() != null)
         comments = notNull(m.docString());
@@ -235,7 +240,7 @@ class HTMLWriter {
             int index = s.lastIndexOf('.');
             if(index != s.length()-1)
                 s = s.substring(index+1);
-            writer.write("<li><a href='" + escapeFilename(s) + ".html'>" + s + "</a></li>\n");
+            writer.write("<li><a href='" escapeFilename(s) ".html'>" htmlEncode(s) "</a></li>\n");
         }
         writer.write("</ul>\n");
       }
@@ -245,7 +250,7 @@ class HTMLWriter {
         writer.write("<b>Methods:</b>\n");
         writer.write("<ul>\n");
         for(MethodDeclaration m : methods) {
-            writer.write("<li><a href='" escapeFilename(getMethodFilename(m)) ".html'>" m.getName() "</a>" +
+            writer.write("<li><a href='" escapeFilename(getMethodFilename(m)) ".html'>" htmlEncode(m.getName()) "</a>" +
                    ": " m.getType() "</li>\n");
         }
         writer.write("</ul>\n");
@@ -256,7 +261,7 @@ class HTMLWriter {
         writer.write("<b>Global Variables:</b>\n");
         writer.write("<ul>\n");
         for(GlobalVarDeclaration gv : globalVars) {
-            writer.write("<li><a href='gv_" escapeFilename("" gv.getName()) ".html'>" gv.getName() "</a></li>\n");
+            writer.write("<li><a href='gv_" escapeFilename("" gv.getName()) ".html'>" htmlEncode(gv.getName()) "</a></li>\n");
         }
         writer.write("</ul>\n");
       }
@@ -279,7 +284,7 @@ class HTMLWriter {
       writer.write("<b>Packages:</b>\n");
       writer.write("<ul>\n");
       for(bossa.modules.Package p : packages) {
-          writer.write("<li><a href='" + p.getName().replace('.', "/") + "/index.html'>" + p.getName() + "</a></li>\n");
+          writer.write("<li><a href='" p.getName().replace('.', "/") "/index.html'>" htmlEncode(p.getName()) "</a></li>\n");
       }
       writer.write("</ul>\n");
       writer.write(getFooter());
@@ -294,7 +299,7 @@ class HTMLWriter {
  * properly in html.  Submitted by S. Bayer to http://www.rgagnon.com/javadetails/java-0306.html,
  * although I've made some changes.
  */
-String htmlSafe(String s) {
+String htmlEncode(String s) {
     StringBuffer sb = new StringBuffer(s.length());
     //true if last char was blank - this is for handling non-breaking spaces
     boolean lastWasBlankChar = false;
@@ -349,6 +354,13 @@ String htmlSafe(String s) {
         }
     }
     return sb.toString();
+}
+
+/** Convenience method that converts a LocatedString to a String and then htmlEncodes it.
+ * @param s the string to encode
+ */
+String htmlEncode(LocatedString s) {
+    return htmlEncode(s.toString());
 }
 
 /** Returns a string containing everything required up to and including the <body> tag

@@ -31,7 +31,7 @@ public void printStackTraceWithSourceInfo(Throwable t) =
   printStackTraceWithSourceInfo(t, java.lang.System.err);
 
 public void printStackTraceWithSourceInfo(Throwable t, PrintStream s) =
-  printStackTraceWithSourceInfo(t, new PrintWriter(s));
+  printStackTraceWithSourceInfo(t, new PrintWriter(s, true));;
 
 public void printStackTraceWithSourceInfo(Throwable t, PrintWriter w)
 {

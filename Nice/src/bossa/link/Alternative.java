@@ -12,7 +12,7 @@
 
 // File    : Alternative.java
 // Created : Mon Nov 15 12:20:40 1999 by bonniot
-//$Modified: Fri Jul 28 18:47:58 2000 by Daniel Bonniot $
+//$Modified: Fri Aug 04 17:19:16 2000 by Daniel Bonniot $
 
 package bossa.link;
 
@@ -66,33 +66,38 @@ public class Alternative
     //Debug.println(s);
     
     int numCode = s.indexOf('$');
-    if(numCode==-1)
-      Internal.error("Methd "+s+" in class "+c.getName()+
+    if (numCode == -1)
+      Internal.error("Method " + s + " in class " + c.getName() +
 		     " has no valid name");
 
     int at = s.indexOf(Pattern.AT_encoding, numCode+1);
-    if(at==-1)
+    if (at == -1)
       // This is valid if this method has no parameter
       at = s.length();
     
-    methodName = new String(((MiscAttr) Attribute.get(m, "definition")).data);
+    MiscAttr attr = (MiscAttr) Attribute.get(m, "definition");
+    if (attr == null)
+      Internal.error("Method " + s + " in class " + c.getName() +
+		     " has no definition");
+    
+    methodName = new String(attr.data);
     
     /*methodName = c.getName().substring(0,c.getName().length()-".package".length()).replace('.','$')
       +"$"+s.substring(0,at);*/
     
-    //Debug.println("name="+methodName);
+    //Debug.println("name=" + methodName);
     
     ArrayList patterns = new ArrayList(5);
 
     while(at<s.length())
       {
 	int next = s.indexOf(Pattern.AT_encoding,at+Pattern.AT_len);
-	if(next==-1)
-	  next=s.length();
+	if (next == -1)
+	  next = s.length();
 	
 	String name = s.substring(at+Pattern.AT_len,next);
-	//Debug.println("pattern="+name);
-	if(name.equals("_"))
+	//Debug.println("pattern=" + name);
+	if (name.equals("_"))
 	  patterns.add(null);
 	else
 	  {
@@ -130,17 +135,17 @@ public class Alternative
    */
   static boolean leq(Alternative a, Alternative b)
   {
-    for(int i=0; i<a.patterns.length; i++)
+    for(int i = 0; i<a.patterns.length; i++)
       {
 	TypeConstructor tb = b.patterns[i];
-	if(tb==null)
+	if (tb == null)
 	  continue;
 	
 	TypeConstructor ta = a.patterns[i];
-	if(ta==null)
+	if (ta == null)
 	  return false;
 	
-	if(!Typing.testRigidLeq(ta, tb))
+	if (!Typing.testRigidLeq(ta, tb))
 	  return false;
       }
     return true;
@@ -151,18 +156,18 @@ public class Alternative
    */
   boolean matches(TypeConstructor[] tags)
   {
-    for(int i=0; i<patterns.length; i++)
+    for(int i = 0; i<patterns.length; i++)
       {
 	TypeConstructor td = patterns[i];
-	if(td ==null)
+	if (td == null)
 	  continue;
 	
 	TypeConstructor tc = tags[i];
 	// a null tc is an unmatchable argument (e.g. function)
-	if(tc==null)
+	if (tc == null)
 	  return false;
 	
-	if(!Typing.testRigidLeq(tc, td))
+	if (!Typing.testRigidLeq(tc, td))
 	  return false;
       }
 
@@ -190,7 +195,7 @@ public class Alternative
     
     gnu.expr.Expression result = QuoteExp.trueExp;
     
-    for(int n = parameters.length-1; n>=0; n--)
+    for(int n = parameters.length-1; n >= 0; n--)
       result = new gnu.expr.IfExp(matchTest(patterns[n],parameters[n]),
 				  result,
 				  QuoteExp.falseExp);
@@ -201,7 +206,7 @@ public class Alternative
   private static gnu.expr.Expression matchTest(TypeConstructor dom, 
 					       gnu.expr.Expression parameter)
   {
-    if(dom == null)
+    if (dom == null)
       return QuoteExp.trueExp;
 
     return instanceOfExp(parameter, bossa.CodeGen.javaType(dom));
@@ -212,9 +217,7 @@ public class Alternative
   
   static gnu.expr.Expression instanceOfExp(gnu.expr.Expression value, gnu.bytecode.Type ct)
   {
-    gnu.expr.Expression[] callParams = new gnu.expr.Expression[2];
-    callParams[0]=value;
-    callParams[1]=new QuoteExp(ct);
+    gnu.expr.Expression[] callParams = { value, new QuoteExp(ct) };
     
     return new ApplyExp(new QuoteExp(instanceProc),callParams);
   }
@@ -224,9 +227,7 @@ public class Alternative
   
   private static gnu.expr.Expression orExp(gnu.expr.Expression e1, gnu.expr.Expression e2)
   {
-    gnu.expr.Expression[] callParams = new gnu.expr.Expression[2];
-    callParams[0]=e1;
-    callParams[1]=e2;
+    gnu.expr.Expression[] callParams = { e1, e2 };
     
     return new ApplyExp(new QuoteExp(orProc),callParams);
   }
@@ -255,7 +256,7 @@ public class Alternative
   private void add()
   {
     List l = (List) alternatives.get(methodName);
-    if(l==null)
+    if (l == null)
       {
 	l = new ArrayList();
 	alternatives.put(methodName,l);

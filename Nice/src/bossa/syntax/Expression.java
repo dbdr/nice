@@ -12,7 +12,7 @@
 
 // File    : Expression.java
 // Created : Mon Jul 05 16:25:02 1999 by bonniot
-//$Modified: Thu Aug 03 14:02:26 2000 by Daniel Bonniot $
+//$Modified: Fri Aug 04 13:40:01 2000 by Daniel Bonniot $
 // Description : 
 
 package bossa.syntax;
@@ -192,13 +192,12 @@ public abstract class Expression extends Node
    */
   public static gnu.expr.Expression[] compile(List expressions)
   {
-    gnu.expr.Expression[] res=new gnu.expr.Expression[expressions.size()];
-    int n=0;
-    for(Iterator i=expressions.iterator();
-	i.hasNext();n++)
+    gnu.expr.Expression[] res = new gnu.expr.Expression[expressions.size()];
+    int n = 0;
+    for(Iterator i = expressions.iterator(); i.hasNext();n++)
       {
 	Expression exp = (Expression)i.next();
-	res[n]=exp.generateCode();
+	res[n] = exp.generateCode();
       }
 
     return res;

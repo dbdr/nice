@@ -12,7 +12,7 @@
 
 // File    : TupleExp.java
 // Created : Wed Aug 02 19:49:23 2000 by Daniel Bonniot
-//$Modified: Fri Aug 04 12:00:52 2000 by Daniel Bonniot $
+//$Modified: Fri Aug 04 13:44:24 2000 by Daniel Bonniot $
 
 package bossa.syntax;
 
@@ -93,6 +93,7 @@ public class TupleExp extends bossa.syntax.Expression
 		       ((bossa.syntax.Expression) expressions.get(i))
 		       .generateCode()
 		     });
+    
     stmts[len] = array;
     
     let.setBody(new BeginExp(stmts));

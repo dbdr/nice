@@ -14,7 +14,7 @@
   (String, int) tuple = ("abc", 5);
   assert tuple==foo(tuple);
 
-/// PASS bug
+/// PASS
   /// Toplevel
   let ((String, String))->() foo = ((String s, String t))=> {
    println(s+t);

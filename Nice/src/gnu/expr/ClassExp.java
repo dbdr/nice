@@ -598,7 +598,7 @@ public class ClassExp extends LambdaExp
 	for (Declaration decl = firstDecl(); decl != null; 
 	     decl = decl.nextDecl())
 	  if (decl.isStatic() && decl.value != null)
-	    walker.walkExpression(decl.value);
+            decl.value.walk(walker);
       }
     finally
       {

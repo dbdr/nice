@@ -480,15 +480,32 @@ public class LambdaExp extends ScopeExp
     gnu.bytecode.CodeAttr code = comp.getCode();
     if (! getInlineOnly())
       {
-	if (comp.method.reachableHere() 
-	    /* Work-around since reachableHere is not computed properly:
-	       Only return if the method is void or if there is a value 
-	       on the stack.
-	    */
-	    && (comp.method.getReturnType().isVoid() || code.SP > 0)
+	if (comp.method.reachableHere()
 	    && (! Compilation.usingTailCalls
 		|| isModuleBody() || isClassMethod() || isHandlingTailCalls()))
-	  code.emitReturn();
+          {
+            /* If there is a value to return, or the method returns void,
+               then emit a return.
+            */
+            if (code.SP > 0 || comp.method.getReturnType().isVoid())
+              code.emitReturn();
+            else
+              /*
+                This can happen for unreachable code, like after an
+                'assert false' in a non-void method.
+
+                It can also be because reachableHere is not computed properly.
+              */
+              {
+                // Throw an error explaining the situation.
+                ClassType error = ClassType.make("java.lang.Error");
+                code.emitNew(error);
+                code.emitDup();
+                code.emitPushString("Invalid location reached. Enable assertion checking to get more precise information");
+                code.emitInvokeSpecial(error.getDeclaredMethod("<init>", new Type[]{Type.string_type}));
+                code.emitThrow();
+              }
+          }
 	code.popScope();        // Undoes enterScope in allocParameters
       }
     if (! Compilation.fewerClasses) // FIXME

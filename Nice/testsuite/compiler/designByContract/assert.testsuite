@@ -23,3 +23,27 @@ String fail() { throw new Error(); }
 
 /// PASS
   assert true : fail();
+
+/// PASS
+  // bug #1090913
+  foo(1);
+  /// TOPLEVEL
+String foo(int x);
+foo(0) { assert false; }
+foo(x) = "";
+
+/// PASS
+  // bug #1090913
+  foo(1);
+  /// TOPLEVEL
+int foo(int x);
+foo(0) { assert false; }
+foo(x) = 1;
+
+/// PASS
+  // bug #1090913
+  foo(1);
+  /// TOPLEVEL
+long foo(int x);
+foo(0) { assert false; }
+foo(x) = 1;

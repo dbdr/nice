@@ -518,7 +518,7 @@ public final class Dispatch
     int len = isValue.length;
     for (int pos = 0; pos < len; pos++)
     {
-      List valuesAtPosList = new LinkedList();  
+      List valuesAtPos = new ArrayList();  
       for (Iterator i = alternatives.iterator(); i.hasNext(); ) 
       {
 	Pattern pat = ((Alternative)i.next()).getPatterns()[pos];
@@ -527,30 +527,75 @@ public final class Dispatch
 	  isValue[pos] = true;
           if (pat.atEnum())
 	    for (Iterator it = pat.getEnumValues().iterator(); it.hasNext(); )
-	      valuesAtPosList.add(it.next());
+	      valuesAtPos.add(it.next());
 
 	  else
-	    valuesAtPosList.add(pat.atValue);
+	    valuesAtPos.add(pat.atValue);
 	}	   
       }
-      int valueCount = valuesAtPosList.size();
-      ConstantExp[] valuesAtPos = new ConstantExp[valueCount];
-      valuesAtPosList.toArray(valuesAtPos);
+      //remove duplicates
+/*      for (int i = 0; i < valuesAtPos.size(); i++)
+	for (int j = i+1; j < valuesAtPos.size(); j++)
+	  if (valuesAtPos.get(i).equals(valuesAtPos.get(j)))
+	    valuesAtPos.remove(j--);	
+*/
+      for (Iterator i = alternatives.iterator(); i.hasNext(); ) 
+      {
+	Pattern pat = ((Alternative)i.next()).getPatterns()[pos];
+	if (pat.atIntCompare())
+	{
+	  isValue[pos] = true;
+	  long val = pat.atValue.longValue();
+          long lo,hi;
+          if (pat.compareKind == Pattern.LT || pat.compareKind == Pattern.GE)
+	    {
+	      lo = val-1;
+	      hi = val;
+	    }
+	  else
+	    {
+	      lo = val;
+	      hi = val+1;
+	    }
+
+	  outer:
+	  for (;true; lo--)
+	    {
+	      for (int j = 0; j<valuesAtPos.size(); j++)
+		if (((ConstantExp)valuesAtPos.get(j)).value instanceof Number &&
+			((ConstantExp)valuesAtPos.get(j)).longValue() == lo)
+		  continue outer;
+
+	      break;
+	    }
+	  valuesAtPos.add(new ConstantExp(new Long(lo)));
+
+          outer:
+	  for (;true; hi++)
+	    {
+	      for (int j = 0; j<valuesAtPos.size(); j++)
+		if (((ConstantExp)valuesAtPos.get(j)).value instanceof Number &&
+			((ConstantExp)valuesAtPos.get(j)).longValue() == hi)
+		  continue outer;
+
+	      break;
+	    }
+
+	  valuesAtPos.add(new ConstantExp(new Long(hi)));
+	}	   
+      }
+
+      int valueCount = valuesAtPos.size();
 
       if (valueCount > 0)
       {
 	List res = new ArrayList();
-	//remove duplicates
-	for (int i = 0; i < valueCount; i++)
-	  for (int j = i+1; j < valueCount; j++)
-	    if (valuesAtPos[i].equals(valuesAtPos[j]))
-	      valuesAtPos[i] = valuesAtPos[--valueCount];	
 
 	if (values.size() == 0)
 	  for (int i = 0; i < valueCount; i++)
 	  {
 	    ConstantExp[] arr2 = new ConstantExp[len];
-	    arr2[pos] = valuesAtPos[i];
+	    arr2[pos] = (ConstantExp)valuesAtPos.get(i);
 	    res.add(arr2);
 	  }
 
@@ -562,7 +607,7 @@ public final class Dispatch
 	    {
 	      ConstantExp[] arr2 = new ConstantExp[len];
 	      System.arraycopy(arr,0,arr2,0,len);
-	      arr2[pos] = valuesAtPos[i];
+	      arr2[pos] = (ConstantExp)valuesAtPos.get(i);
 	        res.add(arr2);
 	    }
 	  }

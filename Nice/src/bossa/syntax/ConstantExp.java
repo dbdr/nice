@@ -52,6 +52,11 @@ public class ConstantExp extends Expression
   {
     this(tc, null, representation, location);
   }
+
+  public ConstantExp(Object value)
+  {
+    this.value = value;
+  }
   
   boolean isZero()
   {
@@ -79,7 +84,7 @@ public class ConstantExp extends Expression
   
   protected LocatedString className = null;
   
-  protected Object value;
+  public Object value;
   private String representation;
   public TypeConstructor tc;  
 
@@ -301,7 +306,7 @@ public class ConstantExp extends Expression
     private QuoteExp compiledValue;
   }
 
-  long longValue()
+  public long longValue()
   {
     if (value instanceof Character)
       return ((Character)value).charValue();

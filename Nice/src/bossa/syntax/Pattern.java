@@ -50,7 +50,8 @@ public class Pattern implements Located
    */
   public Pattern(LocatedString name,
 		 TypeIdent tc, ConstantExp atValue,
-		 boolean exactlyAt, TypeIdent additional,
+		 boolean exactlyAt, int kind,
+		 TypeIdent additional,
 		 TypeConstructor runtimeTC,
 		 Location location)
   {
@@ -60,6 +61,7 @@ public class Pattern implements Located
     this.runtimeTC = runtimeTC;
     this.atValue = atValue;
     this.exactlyAt = exactlyAt;
+    this.compareKind = kind;
     this.location = location;
 
     if (atValue != null) 
@@ -74,7 +76,7 @@ public class Pattern implements Located
 
   Pattern(LocatedString name, TypeIdent tc)
   {
-    this(name, tc, null, false, null, null, name.location());
+    this(name, tc, null, false, NONE, null, null, name.location());
   }
 
   Pattern(TypeConstructor tc, boolean exactlyAt)
@@ -85,13 +87,18 @@ public class Pattern implements Located
 
   Pattern(ConstantExp atValue)
   {
-    this(null, null, atValue, false, null, null, 
+    this(null, null, atValue, false, NONE, null, null, 
 	atValue!=null ? atValue.location() : Location.nowhere() );    
+  }
+
+  Pattern(int kind, ConstantExp atValue)
+  {
+    this(null, null, atValue, false, kind, null, null, atValue.location());    
   }
 
   Pattern(LocatedString name)
   {
-    this(name, null, null, false, null, null, name.location());
+    this(name, null, null, false, NONE, null, null, name.location());
   }
 
   final TypeConstructor getRuntimeTC()
@@ -347,6 +354,21 @@ public class Pattern implements Located
     if (this.atEnum() && that.atEnum())
       return this.atValue.toString().compareTo(that.atValue.toString()) < 0;
 
+    if (this.atIntCompare() && that.atIntCompare())
+      {
+	if (this.atLess() != that.atLess())
+	  return atLess();
+
+        long val = this.atValue.longValue();
+        if (this.compareKind == LT) val--;
+        if (this.compareKind == GT) val++;
+
+	return that.matchesCompareValue(val);
+      }
+      
+    if (that.atIntCompare())
+      return this.atIntValue() && that.matchesCompareValue(this.atValue.longValue());
+
     if (that.atNonBoolValue())
       return this.atNonBoolValue() && this.atValue.equals(that.atValue);
 
@@ -368,8 +390,11 @@ public class Pattern implements Located
     if (tag == null)
       return false;
 
-    if (atNonBoolValue() && !atEnum())
+    if (atNonBoolValue() && !atEnum() )
       return false;
+
+    if (atIntCompare())
+      return Typing.testRigidLeq(tag, PrimitiveType.longTC);
 
     if (tag == PrimitiveType.trueBoolTC)
       {
@@ -398,7 +423,27 @@ public class Pattern implements Located
     if (atAny())
       return true;
 
+    if (atIntCompare())
+      return val.value instanceof Number && matchesCompareValue(val.longValue());
+
     return atNonBoolValue() && atValue.equals(val);
+  }
+
+  private boolean matchesCompareValue(long val)
+  {
+    if (compareKind == LT)
+      return val < atValue.longValue();
+
+    if (compareKind == LE)
+      return val <= atValue.longValue();
+
+    if (compareKind == GE)
+      return val >= atValue.longValue();
+
+    if (compareKind == GT)
+      return val > atValue.longValue();
+
+    return false;
   }
 
   public void setDomainEq(boolean equal)
@@ -410,7 +455,19 @@ public class Pattern implements Located
     // don't allow integer primitive types in @type and #type patterns
     if (!equal && atValue == null && Typing.testRigidLeq(tc, PrimitiveType.longTC))
       User.error(location, "A pattern cannot have a primitive type that is different from the declaration.");
+
   }     
+
+  public void setDomainTC(TypeConstructor domaintc)
+  {
+    if (atIntValue())
+      {
+	if (Typing.testRigidLeq(domaintc, PrimitiveType.intTC))
+	  tc = PrimitiveType.intTC;
+        else if (Typing.testRigidLeq(domaintc, PrimitiveType.longTC))
+	  tc = PrimitiveType.longTC;
+      }
+  }
 
   public List getEnumValues ()
   {
@@ -433,6 +490,16 @@ public class Pattern implements Located
 
   public String toString()
   {
+    if (atIntCompare())
+      {
+	String prefix = "";
+	if (compareKind == LT) prefix = "<";
+	if (compareKind == LE) prefix = "<=";
+	if (compareKind == GT) prefix = ">";
+	if (compareKind == GE) prefix = ">=";
+        return (name!=null? name.toString() : "") + prefix + atValue;
+      }
+
     if (atValue != null)
       return atValue.toString();
 
@@ -474,6 +541,17 @@ public class Pattern implements Located
 
     if (atValue != null)
       {
+        if (atIntCompare())
+	  {
+            String prefix = "";
+	    if (compareKind == LT) prefix = "<";
+	    if (compareKind == LE) prefix = "<=";
+	    if (compareKind == GT) prefix = ">";
+	    if (compareKind == GE) prefix = ">=";
+
+	    return "@" + prefix + atValue;
+	  }
+
         if (atValue.value instanceof Number)
           return "@" + (atValue.longValue() >= 0 ? "+" : "") + atValue;
 
@@ -533,6 +611,26 @@ public class Pattern implements Located
           return new Pattern(ConstantExp.makeString(new LocatedString(
 		name.substring(1,name.length()-1), Location.nowhere())));
 
+        if (name.charAt(0) == '<')
+	  {
+	    if (name.charAt(1) == '=')
+	      return new Pattern(LE, ConstantExp.makeNumber(new LocatedString(
+		name.substring(2), Location.nowhere())));
+
+	    return new Pattern(LT, ConstantExp.makeNumber(new LocatedString(
+		name.substring(1), Location.nowhere())));
+          }
+
+        if (name.charAt(0) == '>')
+	  {
+	    if (name.charAt(1) == '=')
+	      return new Pattern(GE, ConstantExp.makeNumber(new LocatedString(
+		name.substring(2), Location.nowhere())));
+
+	    return new Pattern(GT, ConstantExp.makeNumber(new LocatedString(
+		name.substring(1), Location.nowhere())));
+          }
+        
         if (name.charAt(0) == '=')
           {
             LocatedString refName = new LocatedString(name.substring(1),
@@ -601,7 +699,16 @@ public class Pattern implements Located
       }
 
     if (atIntValue())
-      return Gen.integerComparison("Eq", parameter, atValue.longValue());
+      {
+        String kind;
+        if (compareKind == LT) kind = "Lt";
+        else if (compareKind == LE) kind = "Le";
+        else if (compareKind == GE) kind = "Ge";
+        else if (compareKind == GT) kind = "Gt";
+        else kind = "Eq";
+
+        return Gen.integerComparison(kind, parameter, atValue.longValue());
+      }
 
     if (atString())
       return Gen.stringEquals((String)atValue.value, parameter);
@@ -633,6 +740,13 @@ public class Pattern implements Located
 
   private boolean exactlyAt;
   public ConstantExp atValue;
+  public int compareKind = NONE;
+
+  public static final int NONE = 0;
+  public static final int LT = 1;
+  public static final int LE = 2;
+  public static final int GT = 4;
+  public static final int GE = 5;
 
   private Location location;
 
@@ -641,7 +755,7 @@ public class Pattern implements Located
 		atValue.value instanceof Character);
   }
   public boolean atNonBoolValue() { 
-    return atValue != null && !atBool() && !atNull();
+    return atValue != null && !atBool() && !atNull() &&!atIntCompare();
   }
   public boolean atNull() { return atValue == NullExp.instance; }
   public boolean atAny()  { return atValue == null && tc == null; }
@@ -653,4 +767,6 @@ public class Pattern implements Located
   public boolean atString() { return atValue instanceof StringConstantExp; }
   public boolean atReference() { return atValue != null && atValue.value instanceof VarSymbol; }
   public boolean atEnum() { return atReference() && atValue.value instanceof EnumDefinition.EnumSymbol; }
+  public boolean atIntCompare() { return compareKind > 0;}
+  public boolean atLess() { return compareKind == LT || compareKind == LE; }
 }

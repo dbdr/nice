@@ -424,6 +424,15 @@ public class MethodBodyDefinition extends Definition
 	      Typing.introduce(runtimeTC);
 	  }
 
+	Monotype[] domain = declaration.getType().domain();
+
+	for(int n = 0; n < formals.length; n++)
+	{
+	  TypeConstructor tc = Types.rawType(domain[n]).head();
+	  if (tc != null && formals[n].tc != null)
+	    formals[n].setDomainTC(tc);
+        }
+
 	// The arguments are specialized by the patterns
 	try{
 	  Pattern.in(monotypes, formals);
@@ -433,7 +442,6 @@ public class MethodBodyDefinition extends Definition
 	}
       
 	// The arguments have types below the method declaration domain
-	Monotype[] domain = declaration.getType().domain();
 	for (int i = 0; i < monotypes.length; i++)
 	  try{
 	    Typing.leq(monotypes[i], domain[i]);

@@ -1252,6 +1252,7 @@ Pattern pattern():
   TypeConstructor runtimeTC = null;
   ConstantExp val = null;
   boolean exactlyAt = false;
+  int kind = Pattern.NONE;
   Location loc = null;
 }
 {
@@ -1262,8 +1263,6 @@ Pattern pattern():
       "@" tc=typeIdent() { loc = tc.location(); }
     |
       "#" tc=typeIdent() { exactlyAt = true; loc = tc.location(); }
-    | 
-      "=" val=patternLiteral() {loc = val.location(); }
     )
   |
     name=ident()
@@ -1280,13 +1279,25 @@ Pattern pattern():
     |
       "#" tc=typeIdent() { exactlyAt = true; }
     |
+      ( ">" {kind = Pattern.GT;}
+      | ">=" {kind = Pattern.GE;}
+      | "<" {kind = Pattern.LT;}
+      | "<=" {kind = Pattern.LE;}
+      )
+      ( "-" val=intConstantExp() 
+        { val = ConstantExp.makeNumber(
+           new LocatedString("-"+val.toString(), val.location()));
+        }
+      | val=intConstantExp() 
+      )
+    |
      {} //name only
     )
     { loc = name.location(); }
   )
   [ "(" additional=typeIdent() ")" ]
   {
-    return new Pattern(name, tc, val, exactlyAt, additional, runtimeTC, loc);
+    return new Pattern(name, tc, val, exactlyAt, kind, additional, runtimeTC, loc);
   }
 }
 

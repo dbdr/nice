@@ -1,0 +1,61 @@
+/// PASS
+  String s = "ABC";
+  Object o = s;
+  //if (o instanceof String)
+    //s = o;
+
+  List<Object> l = new LinkedList();
+  l.add(s);
+  l.add(new java.io.File("."));
+
+  boolean b = o == s;
+  b = s == o;
+
+/// FAIL
+  /// Toplevel
+<U,T> T foo(T x, Object o) {
+  /*/// FAIL HERE*/ x = o;
+  return x;
+}
+
+/// PASS
+  /// Toplevel
+<T> T pick(T x, T y) = x;
+
+void foo(Object o, String s) {
+  Object x = pick(o,s);
+  x = pick(s,o);
+}
+
+/// FAIL
+  /// Toplevel
+<T> T pick(T x, T y) = x;
+
+void foo(Object o, String s) {
+  String /*/// FAIL HERE*/ x = pick(o,s);
+}
+
+/// FAIL
+  /// Toplevel
+<T> T pick(T x, T y) = x;
+
+void foo(Object o, String s) {
+  String /*/// FAIL HERE*/ x = pick(s,o);
+}
+
+/// PASS
+  /// Toplevel
+<T, U | U <: T> U pick(T x, U y) = y;
+
+void foo(Object o) {
+  ?int x = pick(o,null);
+}
+
+/// FAIL
+  Object o = null;
+
+/// PASS
+  ?Object o = null;
+
+/// PASS bug
+  Object[] os = [ "DEF", 1, o ];

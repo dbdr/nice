@@ -200,6 +200,9 @@ public final class Types
     if (m instanceof FunType)
       return gnu.expr.Compilation.typeProcedure;
 
+    if (m == TopMonotype.instance)
+      return Type.pointer_type;
+
     if (!(m instanceof MonotypeConstructor))
       return null;
     
@@ -426,6 +429,9 @@ public final class Types
 			 " is not known");
 	throw new NotIntroducedClassException(null);
       }
+
+    if (javaType == Type.pointer_type)
+      return TopMonotype.instance;
 
     return getMonotype(javaType.getName());
   }

@@ -1,0 +1,6 @@
+package regtest.java;
+
+void testObject(regtest.java.J.J j)
+{
+  ?Object o = j.obj;
+}

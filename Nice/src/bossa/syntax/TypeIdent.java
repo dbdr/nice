@@ -78,11 +78,8 @@ public final class TypeIdent extends Monotype implements Located
   {
     TypeSymbol res = resolveToTypeSymbol(scope);
     
-    if (res instanceof MonotypeVar)
-      {
-	MonotypeVar v = (MonotypeVar) res;
-	return v;
-      }
+    if (res instanceof mlsub.typing.Monotype)
+      return (mlsub.typing.Monotype) res;
 
     if (res instanceof TypeConstructor)
       {

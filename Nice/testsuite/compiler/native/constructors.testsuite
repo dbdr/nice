@@ -44,7 +44,7 @@
   boolean ran = false;
   Runnable r = thread(() => ran = true);
 
-  A instance = cast(make.newInstance([object(r)]));
+  A instance = cast(make.newInstance([r]));
   instance.start();
   try { instance.join(); }
   catch(InterruptedException ex) {}

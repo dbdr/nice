@@ -64,8 +64,8 @@ public final class ClassExp extends Expression
     if (root != null)
       fullName = root.name.append(".").append(fullName).toString();
     
-    mlsub.typing.TypeConstructor tc = (mlsub.typing.TypeConstructor)
-      Node.getGlobalTypeScope().lookup(fullName, name.location());
+    mlsub.typing.TypeConstructor tc = 
+      Node.getGlobalTypeScope().globalLookup(fullName, name.location());
 
     if(tc != null)
       {

@@ -3,13 +3,13 @@
 /// PASS
   /// Toplevel
   abstract interface I {}
-  class java.lang.Object implements I;
+  class java.lang.String implements I;
 
 /// PASS
   /// package a
   /// Toplevel
   abstract interface I {}
-  class java.lang.Object implements I;
+  class java.lang.String implements I;
   /// package b import a
   true;
 
@@ -19,7 +19,7 @@
   abstract interface I {}
   /// package b
   /// Toplevel
-  class java.lang.Object implements a.I;
+  class java.lang.String implements a.I;
 
 /// FAIL
   /// package a
@@ -27,20 +27,20 @@
   abstract interface I {}
   /// package b import a
   /// Toplevel
-  class java.lang.Object implements I;
+  class java.lang.String implements I;
 
 
 /// FAIL
   /// Toplevel
   abstract interface I { void f(); }
-  class java.lang.Object implements I;
+  class java.lang.String implements I;
 
 /// PASS
-  f(new Object());
+  f("ABC");
   /// Toplevel
   abstract interface I { void f(); }
-  class java.lang.Object implements I;
-  f(x@Object) {}
+  class java.lang.String implements I;
+  f(x@String) {}
 
 /// PASS
   /// Toplevel
@@ -68,9 +68,11 @@
 /// FAIL
   /// Toplevel
   abstract interface AI {}
+  // FileFilter is not a class
   class java.io.FileFilter implements AI;
 
 /// FAIL
   /// Toplevel
   abstract interface AI {}
-  interface java.lang.Object implements AI;
+  // String is not an interface
+  interface java.lang.String implements AI;

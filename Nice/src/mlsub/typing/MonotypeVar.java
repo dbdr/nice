@@ -137,6 +137,13 @@ public final class MonotypeVar extends Monotype
       }
   }
   
+  /** Allows modifying the existing kind. Use in special cases only. */
+  public void resetKind(Kind value)
+  {
+    setKind(null);
+    setKind(value);
+  }
+
   public void setPersistentKind(Kind k)
   {
     persistentKind = k;
@@ -209,7 +216,8 @@ public final class MonotypeVar extends Monotype
   {
     if (equivalent != null)
       equivalent.tag(variance);
-    else
+    // A type var with kind TopKind will be equivalent to Top, no need to tag.
+    else if (kind != TopMonotype.TopKind.instance)
       mlsub.typing.lowlevel.Engine.tag(this, variance);
   }
 
@@ -217,6 +225,9 @@ public final class MonotypeVar extends Monotype
   {
     if (equivalent != null)
       return equivalent.canonify();
+    // A type var with kind TopKind is equivalent to Top.
+    else if (kind == TopMonotype.TopKind.instance)
+      return TopMonotype.instance;
     else
       return (MonotypeVar) mlsub.typing.lowlevel.Engine.canonify(this);
   }

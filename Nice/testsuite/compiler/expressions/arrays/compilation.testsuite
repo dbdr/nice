@@ -40,7 +40,21 @@ void heapsort(T[] ra) {
 
 /// PASS
   // Check that Object[] is really compiled as an object array, not just Object
-  foo([object("1")]);
+  foo([toObj("1")]);
+  /// Toplevel
+<!T> Object toObj(T x) = x;
+
+void foo(Object[] oo)
+{
+  java.lang.Integer i = cast
+    (java.lang.Integer.class.getConstructor([String.class]).newInstance(oo));
+  assert i.intValue() == 1;
+}
+
+/// PASS
+  // Check that Object[] is really compiled as an object array, not just Object
+  Object o = "1";
+  foo([o]);
   /// Toplevel
 void foo(Object[] oo)
 {

@@ -203,7 +203,11 @@ public abstract class Engine
     if (e2 == top) return;
 
     Kind k1 = e1.getKind(), k2 = e2.getKind();
-    
+
+    // If e2 is Top, this is trivial.
+    if (k2 == mlsub.typing.TopMonotype.TopKind.instance)
+      return;
+
     if(k1!=null)
       if(k2!=null)
 	{
@@ -211,6 +215,20 @@ public abstract class Engine
 	    k1.leq(e1,e2,initial);
 	  else
 	    {
+              /* If a non-rigid type variable was previously compared to some
+                 rigid element, it will have its type.
+                 it is still possible for it to be greater than Top
+                 (and therefore equal to Top). For this, we just need to
+                 forget its previous kind.
+              */
+              if (k1 == mlsub.typing.TopMonotype.TopKind.instance &&
+                  e2 instanceof mlsub.typing.MonotypeVar &&
+                  ! isRigid(e2))
+                {
+                  ((mlsub.typing.MonotypeVar) e2).resetKind(k1);
+                  return;
+                }
+
 	      if(dbg) 
 		Debug.println("Bad kinding discovered by Engine : "+
 			      k1+" != "+k2+
@@ -261,13 +279,18 @@ public abstract class Engine
       e.getKind().register(e);
     else
       {
-	e.setId(-2); // for debugging purposes
+	e.setId(FLOATING); // for debugging purposes
 	floating.add(e);
       }
   }
   
+  private static final int FLOATING = -3;
+
   public static boolean isRigid(Element e)
   {
+    if (e.getId() == FLOATING)
+      return false;
+
     Kind kind = e.getKind();
     if(kind==null)
       throw new InternalError("null kind in Engine.isRigid for "+e);
@@ -386,6 +409,8 @@ public abstract class Engine
   public static void setKind(Element element, Kind k)
     throws Unsatisfiable
   {
+    boolean toTop = k == mlsub.typing.TopMonotype.TopKind.instance;
+
     Stack s = new Stack();
 
     s.push(element);
@@ -426,7 +451,10 @@ public abstract class Engine
 		    k.leq(leq.e1,leq.e2,initialContext);
 		  }
 	      else if(leq.e2==e)
-		if(leq.e1.getKind()==null)
+                // If e is Top, e1 <: e is trivial and can be discarded.
+                if (toTop)
+                  i.remove();
+                else if (leq.e1.getKind() == null)
 		  s.push(leq.e1);
 		else
 		  {

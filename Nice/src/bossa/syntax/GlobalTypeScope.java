@@ -30,6 +30,10 @@ public class GlobalTypeScope extends TypeScope
   {
     super(null);
     set = new HashSet();
+
+    try {
+      addMapping("java.lang.Object", mlsub.typing.TopMonotype.instance);
+    } catch (DuplicateName ex) {}
   }
 
   void addMapping(String name, TypeSymbol s)

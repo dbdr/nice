@@ -283,7 +283,7 @@ typecheck(e@NewExp)
 {
   // force computation of type
   e.getType();
-  notNull(e.arguments).typecheck();
+  notNull(e.arguments).typecheckArgs();
 }
 
 typecheck(e@StatementExp)

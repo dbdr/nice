@@ -178,7 +178,7 @@
        <td>
         <table border="0" cellpadding="3" cellspacing="1" width="100%">
          <tr>
-          <td bgcolor="#cccccc">
+          <td bgcolor="#cccccc"><img width="48" height="48" align="middle" src="images/dev-48.png" alt="."/>
            &nbsp;<span class="title">Development</span>
           </td>
          </tr>

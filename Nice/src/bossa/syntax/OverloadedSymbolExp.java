@@ -195,10 +195,7 @@ public class OverloadedSymbolExp extends Expression
 	    }
       }
     
-    //There is ambiguity
-    User.error(this,"Ambiguity for symbol "+ident+". Possibilities are :\n"+
-	       Util.map("","\n","",symbols));
-    return null;
+    throw new AmbiguityError();
   }
 
   Expression resolveOverloading(Polytype expectedType)
@@ -237,10 +234,7 @@ public class OverloadedSymbolExp extends Expression
       User.error(this, 
 		 "No alternative has expected type "+expectedType);
     
-    //There is ambiguity
-    User.error(this,"Ambiguity for symbol "+ident+".\nPossibilities are :\n"+
-	       Util.map("","\n","",symbols));
-    return null;
+    throw new AmbiguityError();
   }
   
   Expression noOverloading()
@@ -251,9 +245,7 @@ public class OverloadedSymbolExp extends Expression
     if(symbols.size()==1)
       return uniqueExpression();
 
-    User.error(this,"Ambiguity for symbol "+ident+". Possibilities are :\n"+
-	       Util.map("","\n","",symbols));
-    return null;
+    throw new AmbiguityError();
   }
 
   /**
@@ -342,4 +334,15 @@ public class OverloadedSymbolExp extends Expression
 
   List symbols;
   LocatedString ident;
+
+  class AmbiguityError extends UserError
+  {
+    AmbiguityError()
+    {
+      super(OverloadedSymbolExp.this, 
+	    "Ambiguity for symbol " + ident + ". Possibilities are :\n" + 
+	    Util.map("", "\n", "", symbols));
+    }
+  }
 }
+

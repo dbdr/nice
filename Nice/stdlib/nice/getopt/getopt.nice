@@ -50,11 +50,11 @@ parse(progName, args, options)
 
   // Parsing loop
   int c = g.getopt();
-  while(!(c.equals(-1)))
+  while (c != -1)
     {
-      Option choosen = options.find(fun(Option o)=>o.optval.equals(c));
-      if(choosen != null)
-	choosen.doAction(g);
+      ?Option choosen = options.find(fun(Option o)=> o.optval == c);
+      if (choosen != null)
+	notNull(choosen).doAction(g);
       
       c = g.getopt();
     }

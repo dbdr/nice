@@ -300,15 +300,23 @@ filter<C,T>(v@Vector, test)
  * Standard operations
  ****************************************************************/
 
-<Any T> T find(Sequence<T>, fun(T)(boolean));
-find(s, test)
+<Any T> T find (Sequence<T> s, fun(T)(boolean) test)
 {
-  for(int i=0; i<s.size(); i=i+1)
-    if(test(s.get(i)))
+  for (int i = 0; i < s.size(); i = i + 1)
+    if (test(s.get(i)))
       return s.get(i);
 
   if (true) throw new java.util.NoSuchElementException();
   return s.get(0);
+}
+
+<Any T> ?T find (Sequence<!T> s, fun(!T)(boolean) test)
+{
+  for (int i = 0; i < s.size(); i = i + 1)
+    if (test(s.get(i)))
+      return s.get(i);
+
+  return null;
 }
 
 boolean or(Sequence<boolean>);

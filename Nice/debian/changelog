@@ -23,6 +23,10 @@ nice (0.7.6) unstable; urgency=low
   * Bugfixes (using anonymous functions while overriding native methods, 
     automatic array conversions in polymorphic code, nested literal primitive 
     arrays, ...).
+  * For convenience of command-line tools (shells) with automatic completion, 
+    we allow a directory name instead of the corresponding package name.
+    That is, we replace '/' (which is illegal in package names) by '.'.
+    It is therefore possible to type 'nicec my/package/'.
 
  --
 

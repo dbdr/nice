@@ -37,5 +37,14 @@ String replace(String source, char c, String with)
   return res.append(tab, pos, tab.length - pos).toString();
 }
 
+String deleteAtEnd(String source, String what)
+{
+  if (!(source.endsWith(what)))
+    return source;
+
+  int pos = source.lastIndexOf(what);
+  return notNull(source.substring(0, pos));
+}
+
 char get(String s, int index) = native char String.charAt(int);
 char charAt(String s, int index) = native char String.charAt(int);

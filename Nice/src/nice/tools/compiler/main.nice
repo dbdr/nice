@@ -157,6 +157,13 @@ int compile(String[] args)
     }
   mainPackage = rest[0];
 
+  /* 
+     For convenience of command-line tools (shells) with completions, 
+     we treat a directory name as the corresponding package name.
+     That is, we replace '/' (which is illegal in package names) by '.'.
+  */
+  mainPackage = mainPackage.deleteAtEnd("/").replace('/', ".");
+
   int res = compile(compilation, mainPackage, nativeProgram, nativeCompiler,
 		    editorMode);
 

@@ -279,7 +279,6 @@ public class NiceSourceFile {
 	 * @exception	IOException	TODO
 	 */
 	private void writeImports(BufferedWriter writer) throws IOException {
-		_imports.add("global");
 		for (Iterator iter = _imports.iterator(); iter.hasNext();) {
 			writer.write("import ");
 			writer.write((String)iter.next());

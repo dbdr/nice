@@ -165,8 +165,12 @@ TOKEN: /* Keywords */
 | < EXACTLY_AT: "#"          	>
 | < ANY_:	"Any"        	> /* Nice specific */
 
-// Expressions
+// Assertions
 | < ASSERT:     "assert"     	>
+| < REQUIRE:    "require"     	>
+| < ENSURE:     "ensure"     	>
+
+// Expressions
 | < FOR:        "for"        	>
 | < IF:         "if"         	>
 | < ELSE:       "else"       	>
@@ -929,15 +933,18 @@ MethodDeclaration internalMethodOrFunction(MethodContainer c):
   Constraint cst;
   Monotype returnType;
   Statement body = null;
+  Contract contract;
 }
 {
   cst=constraint()
   returnType=monotype()
   name=identOrBackquoted()
   "(" parameters = formalParameters(true) ")"
+  contract = contract()
   ( ";" | body = code() )
   
-  { return NiceMethod.create(c, name, cst, returnType, parameters, body); }
+  { return NiceMethod.create(c, name, cst, returnType, parameters, 
+                             body, contract); }
 }
 
 TypeIdent superClass():
@@ -1284,14 +1291,7 @@ MethodDeclaration methodDeclaration():
     name=identOrBackquoted()
     "(" parameters = formalParameters(false) ")"
     
-    (
-      // Nice method
-      ";"
-      { res = new NiceMethod(name,cst,returnType,parameters); }
-    | LOOKAHEAD(2)      { Statement body; }
-      body = code()
-      { res = new ToplevelFunction(name, cst, returnType, parameters, body);}
-    |
+    ( LOOKAHEAD(2)
       "=" 
       (
         "native" res=nativeMethodDeclaration(name,cst,returnType,parameters)
@@ -1305,6 +1305,19 @@ MethodDeclaration methodDeclaration():
 	";"
 	{ res=new InlinedMethod(name,cst,returnType,parameters,
 				inlinedName, param); }
+      )
+    | { Contract contract; }
+      contract = contract()
+      (
+        { Statement body; }
+        body = code()
+        { res = new ToplevelFunction(name, cst, returnType, parameters, 
+                                     body, contract);}
+      |
+        // Nice method
+        // Match a ";" only if there is not one already (from the contract)
+        [ LOOKAHEAD( { contract == Contract.noContract } ) ";" ]
+        { res = new NiceMethod(name,cst,returnType,parameters,contract); }
       )
     )
   { return res; }
@@ -1385,6 +1398,42 @@ Definition globalVariable():
   [ "=" value=Expression() ]
   ";"
   { return new GlobalVarDeclaration(name,t,value); }
+}
+
+Contract contract() :
+{
+  Contract res = Contract.noContract;
+  Expression condition, name;
+}
+{
+  [ "require" 
+    { res = new Contract(); }
+
+      condition = Expression() 
+      ( ":" name = Expression() { res.addRequire(condition, name); }
+      | { res.addRequire(condition); } )
+
+    ( "," 
+      condition = Expression() 
+      ( ":" name = Expression() { res.addRequire(condition, name); }
+      | { res.addRequire(condition); } )
+    )*
+    ";"
+  ]
+  [ "ensure" { if (res == Contract.noContract) res = new Contract(); }
+
+      condition = Expression() 
+      ( ":" name = Expression() { res.addEnsure(condition, name); }
+      | { res.addEnsure(condition); } )
+
+    ( ","
+      condition = Expression() 
+      ( ":" name = Expression() { res.addEnsure(condition, name); }
+      | { res.addEnsure(condition); } )
+    )*
+    ";"
+  ]
+  { return res; }
 }
 
 Definition definition():

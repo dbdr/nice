@@ -14,7 +14,6 @@ package bossa.syntax;
 
 import bossa.util.*;
 import mlsub.typing.*;
-import nice.tools.code.Types;
 
 import gnu.bytecode.*;
 import gnu.expr.*;
@@ -30,7 +29,7 @@ import bossa.util.Debug;
    @version $Date$
    @author Daniel Bonniot
  */
-public class NiceMethod extends MethodDeclaration
+public class NiceMethod extends UserOperator
 {
   /**
      The method is a class or interface member.
@@ -49,7 +48,8 @@ public class NiceMethod extends MethodDeclaration
      Constraint constraint,
      Monotype returnType,
      FormalParameters params,
-     Statement body)
+     Statement body, 
+     Contract contract)
   {
     // it is a class method, there is an implicit "this" argument
 
@@ -126,32 +126,21 @@ public class NiceMethod extends MethodDeclaration
     params.addThis(Monotype.create(Monotype.sure(thisType)));
     
     if (body == null)
-      return new NiceMethod(name, constraint, returnType, params);
+      return new NiceMethod(name, constraint, returnType, params, contract);
     else
-      return new ToplevelFunction(name, constraint, returnType, params, body);
+      return new ToplevelFunction(name, constraint, returnType, params, 
+				  body, contract);
   }
 
   public NiceMethod(LocatedString name, 
 		    Constraint constraint, Monotype returnType, 
-		    FormalParameters parameters)
+		    FormalParameters parameters,
+		    Contract contract)
   {
-    super(name, constraint, returnType, parameters);
+    super(name, constraint, returnType, parameters, contract);
     bossa.link.Dispatch.register(this);
   }
 
-  /****************************************************************
-   * Typechecking
-   ****************************************************************/
-
-  void innerTypecheck()
-  {
-    // set bytecode types for type variables
-    mlsub.typing.FunType ft = (mlsub.typing.FunType) getType().getMonotype();
-
-    Types.setBytecodeType(ft.domain());
-    Types.setBytecodeType(ft.codomain());
-  }
-  
   /****************************************************************
    * Code generation
    ****************************************************************/

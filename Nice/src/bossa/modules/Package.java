@@ -707,7 +707,7 @@ public class Package implements mlsub.compilation.Module, Located, bossa.syntax.
 	retType  = def.javaReturnType();
       }
     res = nice.tools.code.Gen.createMethod
-      (name, argTypes, retType, def.formalParameters().getMonoSymbols());
+      (name, argTypes, retType, def.getSymbols());
 
     // add unique information to disambiguate which method this represents
     res.addBytecodeAttribute

@@ -1618,7 +1618,12 @@ public class CodeAttr extends Attribute implements AttrContainer
   public final void emitReturn ()
   {
     callFinallyBlocks();
+    checkPostcondition();
+    emitRealReturn();
+  }
 
+  private void emitRealReturn()
+  {
     if (getMethod().getReturnType().size == 0)
       {
 	reserve(1);
@@ -2344,4 +2349,60 @@ public class CodeAttr extends Attribute implements AttrContainer
 	  }
       }
   }
+
+  /****************************************************************
+   * Postcondition
+   ****************************************************************/
+
+  public void preparePostcondition(Field assertionEnabled)
+  {
+    this.assertionEnabled = assertionEnabled;
+    postconditionStart = new Label(this);
+  }
+
+  public void startPostcondition()
+  {
+    postconditionStart.define(this);
+    Type type = getMethod().getReturnType();
+    if (! type.isVoid())
+      {
+	// We expect the returned value on the stack.
+	pushType(type);
+	resultVar = addLocal(type);
+	emitStore(resultVar);
+      }
+  }
+
+  public void endPostcondition()
+  {
+    if (resultVar != null)
+      loadResult();
+    emitRealReturn();
+  }
+
+  public void loadResult()
+  {
+    emitLoad(resultVar);
+  }
+
+  void checkPostcondition()
+  {
+    if (postconditionStart == null)
+      return;
+
+    Label end = new Label(this);
+    ifAssertionsDisabledGoto(assertionEnabled, end);
+    emitGoto(postconditionStart);
+    end.define(this);
+  }
+
+  public void ifAssertionsDisabledGoto(Field assertionEnabled, Label l)
+  {
+    emitGetStatic(assertionEnabled);
+    emitGotoIfIntEqZero(l);
+  }
+
+  private Label postconditionStart, postCondtionEnd;
+  private Variable resultVar;
+  private Field assertionEnabled;
 }

@@ -48,10 +48,10 @@ public final class Compilation
 	param = param.nextDecl())
       params[rank++] = new ReferenceExp(param);
 
-    Gen.setMethodBody
-      (lexp, 
-       dispatch(sortedAlternatives.iterator(),
-		m.javaReturnType(), m.javaReturnType().isVoid(), params));
+    Expression body = dispatch
+      (sortedAlternatives.iterator(), 
+       m.javaReturnType(), m.javaReturnType().isVoid(), params);
+    Gen.setMethodBody(lexp, m.getContract().compile(body));
   }
   
   private static gnu.bytecode.Method newError;

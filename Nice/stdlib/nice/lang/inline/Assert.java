@@ -41,8 +41,8 @@ public class Assert extends ProcedureN implements Inlineable
     CodeAttr code = comp.getCode();
     Label end = new Label(code);
     
-    code.emitGetStatic(((ClassExp)comp.topLambda).getAssertionEnabledField());
-    code.emitGotoIfIntEqZero(end); // Assertions are disabled.
+    code.ifAssertionsDisabledGoto
+      (((ClassExp)comp.topLambda).getAssertionEnabledField(), end);
 
     args[0].compile(comp, Type.boolean_type);
     code.emitGotoIfIntNeZero(end); // The assertion is true.

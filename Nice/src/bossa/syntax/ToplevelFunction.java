@@ -34,7 +34,7 @@ import bossa.util.Debug;
    @version $Date$
    @author Daniel Bonniot (d.bonniot@mail.dotcom.fr)
 */
-public class ToplevelFunction extends MethodDeclaration 
+public class ToplevelFunction extends UserOperator
 implements Function
 {
   /**
@@ -48,9 +48,10 @@ implements Function
 			  Constraint constraint,
 			  Monotype returnType,
 			  FormalParameters parameters,
-			  Statement body)
+			  Statement body,
+			  Contract contract)
   {
-    super(name, constraint, returnType, parameters);
+    super(name, constraint, returnType, parameters, contract);
 
     this.body = body;
     this.voidReturn = returnType.toString().equals("void");
@@ -58,13 +59,12 @@ implements Function
 
   /** Can be null if this funtion is taken from an interface file. */
   private Statement body;
-  private MonoSymbol[] symbols;
-  private boolean voidReturn ;
+  private boolean voidReturn;
 
   void resolve()
   {
-    buildParameterSymbols();
-    
+    super.resolve();
+
     mlsub.typing.Constraint cst = getType().getConstraint();
     if (mlsub.typing.Constraint.hasBinders(cst))
       try{
@@ -81,22 +81,6 @@ implements Function
 
   private VarScope thisScope;
   private TypeScope thisTypeScope;
-
-  private void buildParameterSymbols()
-  {
-    // the type must be found before
-    removeChild(getSymbol());
-    getSymbol().doResolve();
-
-    symbols = parameters.getMonoSymbols();
-    mlsub.typing.Monotype[] paramTypes = getArgTypes();
-    for (int i = 0; i < paramTypes.length; i++)
-      if (symbols[i].name != null)
-	{
-	  symbols[i].type = paramTypes[i];
-	  scope.addSymbol(symbols[i]);
-	}
-  }
 
   void resolveBody()
   {
@@ -126,14 +110,11 @@ implements Function
 
   void innerTypecheck() throws TypingEx
   {
-    // The body must be type-checked in a rigid context
-    // This is not done in MethodDeclaration, 
-    // because it is not usefull for all subclasses
-    Typing.implies();
+    super.innerTypecheck();
 
     Node.currentFunction = this;
     if (parameters.hasThis())
-      Node.thisExp = new SymbolExp(symbols[0], location());
+      Node.thisExp = new SymbolExp(getSymbols()[0], location());
 
     try{ 
       bossa.syntax.dispatch.typecheck(body); 
@@ -142,12 +123,6 @@ implements Function
       Node.currentFunction = null; 
       Node.thisExp = null;
     }
-
-    // set bytecode types for type variables
-    mlsub.typing.FunType ft = (mlsub.typing.FunType) getType().getMonotype();
-
-    Types.setBytecodeType(ft.domain());
-    Types.setBytecodeType(ft.codomain());
   }
 
   /****************************************************************
@@ -175,7 +150,7 @@ implements Function
       }
 
     LambdaExp code = Gen.createMethod
-      (name.toString(), javaArgTypes(), javaReturnType(), symbols);
+      (name.toString(), javaArgTypes(), javaReturnType(), getSymbols());
     code.addBytecodeAttribute
       (new MiscAttr("type", getType().toString().getBytes()));
 
@@ -192,7 +167,7 @@ implements Function
 
     LambdaExp lexp = Gen.dereference(getCode());
 
-    Gen.setMethodBody(lexp, body.generateCode());
+    Gen.setMethodBody(lexp, getContract().compile(body.generateCode()));
   }
 
   /****************************************************************

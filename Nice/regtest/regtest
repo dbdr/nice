@@ -5,7 +5,7 @@ if [ -z $NICE_TOP ]; then
   NICE_TOP=$PWD
   # PWD return different values on different systems:
   # Nice/regtest with bash on Linux, Nice/ under sh on Digital Unix
-  if expr match $NICE_TOP '.*regtest$' >/dev/null; then
+  if expr $NICE_TOP : '.*regtest$' >/dev/null; then
     NICE_TOP=`dirname $NICE_TOP`
   fi
 

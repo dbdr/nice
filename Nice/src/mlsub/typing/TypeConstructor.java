@@ -50,9 +50,7 @@ public class TypeConstructor
   }
   
   /**
-   * Creates a non-concrete TypeConstructor with a known variance.
-   *
-   * Equivalent to TypeConstructor(v, false)
+     Creates an anonymous non-concrete TypeConstructor with a known variance.
    */
   public TypeConstructor(Variance v)
   {

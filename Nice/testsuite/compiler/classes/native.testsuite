@@ -49,33 +49,9 @@ class Container<T> = native nativePkg.Container;
   /// package a
   /// Toplevel
   class NonExist<T> = native NonExist;
-  /// package b import a
-  ;
-/// PASS
-  /// package a
-  /// Toplevel
   void foo(NonExist) = native void NonExist.foo();
-  /// package b import a
-  ;
-
-/// PASS
-  /// package a
-  /// Toplevel
   void isNotAMethod(String) = native void String.isNotAMethod();
-  /// package b import a
-  ;
-
-/// PASS
-  /// package a
-  /// Toplevel
   void isNotAMethod(String, NonExist) = native void String.isNotAMethod(NonExist);
-  /// package b import a
-  ;
-
-/// PASS
-  /// package a
-  /// Toplevel
   NonExist NonExist(long) = native new NonExist(long);
   /// package b import a
   ;
-

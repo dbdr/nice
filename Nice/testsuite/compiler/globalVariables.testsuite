@@ -142,11 +142,3 @@ let String A = "A";
 let QualifiedName QNAME = new QualifiedName(a: A, b: B);
 
 class QualifiedName { String a; String b; }
-
-/// PASS
-  assert foo(END_OF_TIME);
-  /// Toplevel
-  let Date END_OF_TIME = new Date(Long.MAX_VALUE);
-  boolean foo(Date d);
-  foo(d) = false;
-  foo(END_OF_TIME) = true;

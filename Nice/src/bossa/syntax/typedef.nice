@@ -586,13 +586,26 @@ printInterface(ClassDefinition c, java.io.PrintWriter s)
   s.print(" class " );
   s.print(c.getSimpleName());
   s.print(c.printTypeParameters());
-  if (c.superClass != null)
-    s.print(" extends " + c.superClass);   
+  let sup = c.superClass;
+  if (sup != null)
+    s.print(" extends " + c.completeParams(sup));
   s.print(printInterfaces(" implements ", c.interfaces, c.javaInterfaces));
   if (c.abs != null)
     s.print(Util.map(" finally implements ",", ","",notNull(c.abs)));
 
   notNull(c.implementation).printInterface(s);
+}
+
+String completeParams(TypeDefinition this, mlsub.typing.TypeConstructor tc)
+{
+  let params = completeTypeParameters
+    (this,
+     declaredClassConstraint == null ? null : notNull(declaredClassConstraint).typeParameters);
+
+  if (params == null)
+    return tc.toString();
+  else
+    return tc.toString + Util.map("<", ",", ">", params);
 }
 
 printInterface(InterfaceDefinition i, java.io.PrintWriter s)
@@ -739,6 +752,39 @@ public mlsub.typing.Monotype[?] getTypeDefTypeParameters(mlsub.typing.TypeConstr
 }
 
 /**
+   Compute the full type parameters for the class (including possibly implicit
+   ones made necessary by a superclass with more type parameters which have
+   been specialized).
+*/
+?(mlsub.typing.Monotype[]) completeTypeParameters(TypeDefinition def, mlsub.typing.Monotype[?] sourceParams)
+{
+  let params = def.parentParams;
+  let paramMap = def.parentTypeParameterMap;
+
+  if (params == null || paramMap == null)
+    return null;
+
+  ?mlsub.typing.Monotype[] fullParams = new mlsub.typing.Monotype[params.length];
+
+  int used = 0;
+  for (int i = 0; i < fullParams.length; i++)
+    if (params[i] == null)
+      {
+	if (sourceParams == null)
+	  return null;
+        fullParams[i] = sourceParams[paramMap[i]];
+        used++;
+      }
+    else
+      fullParams[i] = params[i];
+
+  if (sourceParams != null && used < sourceParams.length)
+    return null;
+
+  return cast(fullParams);
+}
+
+/**
    Returns a monotype based on this tc, provided that the class
    requires exactly these type parameters because it specializes its parent.
  */
@@ -748,26 +794,9 @@ public mlsub.typing.Monotype[?] getTypeDefTypeParameters(mlsub.typing.TypeConstr
 
   if (def == null)
     return null;
-  	
-  let params = def.parentParams;
-  let paramMap = def.parentTypeParameterMap;
-  
-  if (params == null || paramMap == null)
-    return null;
-  	
-  ?mlsub.typing.Monotype[] fullParams = new mlsub.typing.Monotype[params.length];
 
-  int used = 0;
-  for (int i = 0; i < fullParams.length; i++)
-    if (params[i] == null)
-      {
-        fullParams[i] = notNull(sourceParams)[paramMap[i]];
-        used++;
-      }
-    else
-      fullParams[i] = params[i];
-
-  if (sourceParams != null && used < sourceParams.length)
+  let fullParams = completeTypeParameters(def, sourceParams);
+  if (fullParams == null)
     return null;
 
   return new mlsub.typing.MonotypeConstructor(tc, cast(fullParams));

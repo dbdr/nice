@@ -95,8 +95,8 @@ public ?ImportedConstructor loadImportedConstructor(NiceClass def, gnu.bytecode.
     return null;
 
   let classDef = def.getDefinition();
-  let returnType = new MonotypeWrapper(type: sureMonotype
-      (new mlsub.typing.MonotypeConstructor(classDef.getTC(), classDef.getTypeParameters())));
+  let returnType = new SureMonotypeWrapper
+    (tc: classDef.getTC(), params: classDef.getTypeParameters());
 
   let constraint = classDef.classConstraint == null ?
           trueConstraint : notNull(classDef.classConstraint).shallowClone();

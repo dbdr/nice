@@ -94,3 +94,21 @@ void _test_makeEnv() {
   interface A<T> {}
   interface B extends A<boolean> {}
   class C implements B {}
+
+/// PASS
+  /// package a
+  /// Toplevel
+class A<T> {}
+class B extends A<String> {}
+
+  /// package b import a
+  B b = new B();
+
+/// PASS
+  /// package a
+  /// Toplevel
+class A<T,U> { T x; }
+class B<T> extends A<T,String> {}
+
+  /// package b import a
+  B<int> b = new B(x: 0);

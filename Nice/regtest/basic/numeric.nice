@@ -10,6 +10,8 @@ package regtest.basic;
 void test_numeric();
 test_numeric()
 {
+  println("### Testing native numbers ###\n");
+
   // testing default values
   boolean bo;
   byte by;
@@ -22,6 +24,11 @@ test_numeric()
   // should do something so that c==0 returns true.
 
   println("" + (bo==false) + (by==0) + (s==0) + (i==0) + (l==0));
+
+  println("" + 14 + " " +
+	  (14 > 17) + (14 > 14) + (17 > 14) + 
+	  (14 < 17) + (14 < 14) + (17 < 14) +
+	  (14 == 17) + (14 == 14) + (14 != 17) + (14 != 14));
 
   // testing correct wrapping/unwrapping
   bo = id(bo);

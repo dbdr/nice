@@ -49,7 +49,7 @@ public class IdentExp extends Expression
     else if(enableClassExp)
       return ClassExp.create(ident);
     else
-      User.error(ident, "Variable " + ident + " is not declared");    
+      User.error(ident, ident + " is not declared");    
     return null;
   }
 

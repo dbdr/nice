@@ -27,37 +27,37 @@ package nice.lang;
 int MAX_INT() = native java.lang.Integer.MAX_VALUE;
 
 // Comparison
-boolean `<`(double, double) = native boolean Native.lt(double, double);
-boolean `<`(float, float) = native boolean Native.lt(float, float);
-boolean `<`(long, long) = native boolean Native.lt(long, long);
-boolean `<`(int, int) = native boolean Native.lt(int, int);
+boolean `<`(double, double) = inline nice.tools.code.ComparisonOperators("dLt");
+boolean `<`(float, float) = inline nice.tools.code.ComparisonOperators("fLt");
+boolean `<`(long, long) = inline nice.tools.code.ComparisonOperators("jLt");
+boolean `<`(int, int) = inline nice.tools.code.ComparisonOperators("iLt");
 
-boolean `<=`(double, double) = native boolean Native.leq(double, double);
-boolean `<=`(float, float) = native boolean Native.leq(float, float);
-boolean `<=`(long, long) = native boolean Native.leq(long, long);
-boolean `<=`(int, int) = native boolean Native.leq(int, int);
+boolean `<=`(double, double) = inline nice.tools.code.ComparisonOperators("dLe");
+boolean `<=`(float, float) = inline nice.tools.code.ComparisonOperators("fLe");
+boolean `<=`(long, long) = inline nice.tools.code.ComparisonOperators("jLe");
+boolean `<=`(int, int) = inline nice.tools.code.ComparisonOperators("iLe");
 
-boolean `>`(double, double) = native boolean Native.gt(double, double);
-boolean `>`(float, float) = native boolean Native.gt(float, float);
-boolean `>`(long, long) = native boolean Native.gt(long, long);
-boolean `>`(int, int) = native boolean Native.gt(int, int);
+boolean `>`(double, double) = inline nice.tools.code.ComparisonOperators("dGt");
+boolean `>`(float, float) = inline nice.tools.code.ComparisonOperators("fGt");
+boolean `>`(long, long) = inline nice.tools.code.ComparisonOperators("jGt");
+boolean `>`(int, int) = inline nice.tools.code.ComparisonOperators("iGt");
 
-boolean `>=`(double, double) = native boolean Native.geq(double, double);
-boolean `>=`(float, float) = native boolean Native.geq(float, float);
-boolean `>=`(float, float) = native boolean Native.geq(float, float);
-boolean `>=`(int, int) = native boolean Native.geq(int, int);
+boolean `>=`(double, double) = inline nice.tools.code.ComparisonOperators("dGe");
+boolean `>=`(float, float) = inline nice.tools.code.ComparisonOperators("fGe");
+boolean `>=`(float, float) = inline nice.tools.code.ComparisonOperators("jGe");
+boolean `>=`(int, int) = inline nice.tools.code.ComparisonOperators("iGe");
 
 // Equality
-boolean `==`(double, double) = native boolean Native.eq(double, double);
-boolean `==`(float, float) = native boolean Native.eq(float, float);
-boolean `==`(long, long) = native boolean Native.eq(long, long);
-boolean `==`(int, int) = native boolean Native.eq(int, int);
+boolean `==`(double, double) = inline nice.tools.code.ComparisonOperators("dEq");
+boolean `==`(float, float) = inline nice.tools.code.ComparisonOperators("fEq");
+boolean `==`(long, long) = inline nice.tools.code.ComparisonOperators("jEq");
+boolean `==`(int, int) = inline nice.tools.code.ComparisonOperators("iEq");
 
 // Inequality
-boolean `!=`(double, double) = native boolean Native.neq(double, double);
-boolean `!=`(float, float) = native boolean Native.neq(float, float);
-boolean `!=`(long, long) = native boolean Native.neq(long, long);
-boolean `!=`(int, int) = native boolean Native.neq(int, int);
+boolean `!=`(double, double) = inline nice.tools.code.ComparisonOperators("dNe");
+boolean `!=`(float, float) = inline nice.tools.code.ComparisonOperators("fNe");
+boolean `!=`(long, long) = inline nice.tools.code.ComparisonOperators("jNe");
+boolean `!=`(int, int) = inline nice.tools.code.ComparisonOperators("iNe");
 
 // Operators
 /* should be accepted, but compiled to NOP

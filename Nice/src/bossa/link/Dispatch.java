@@ -58,6 +58,7 @@ public final class Dispatch
   private static void test(MethodDefinition m, bossa.modules.Package module)
   {
     if(m instanceof JavaMethodDefinition || 
+       m instanceof InlinedMethod ||
        m instanceof StaticFieldAccess ||
        m instanceof FieldAccessMethod
        )

@@ -4,7 +4,10 @@
 4
 Hello, world!
 14 < 17
+### Testing native numbers ###
+
 truetruetruetruetrue
+14 falsefalsetruetruefalsefalsefalsetruetruefalse
 
 ### Testing native arrays ###
 

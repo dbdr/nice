@@ -193,6 +193,7 @@ TOKEN: /* Keywords */
 | < STATIC:     "static"     	>
 | < FINAL:      "final"      	>
 | < NATIVE:     "native"     	>
+| < INLINE:     "inline"        >
 | < ABSTRACT:   "abstract"   	>
 | < LOCAL:      "local"      	>
 
@@ -977,65 +978,88 @@ MethodDefinition methodDefinition():
     (
       // Nice method
       ";"
-      { return new MethodDefinition(name,cst,returnType,parameters); }
+      { res = new MethodDefinition(name,cst,returnType,parameters); }
     |
-      // Native (java) method
-      "=" "native"
-
-      {
-	List javaTypes=null;
-	LocatedString method,s=null;
-	boolean isNew=false;
-      }
-
+      "=" 
       (
-       "new" { isNew = true; }
+        "native" res=nativeMethodDefinition(name,cst,returnType,parameters)
       |
-       s=doted_array_string() 
+	"inline" 
+	{ LocatedString inlinedName; String param = null; }
+	inlinedName = doted_string() 
+	[
+	  "(" [ param=rawString() ] ")"
+	]
+	";"
+	{ res=new InlinedMethod(name,cst,returnType,parameters,
+				inlinedName, param); }
       )
-      // if we stop here, it's a static field
-      // else it's a method
-      ( 
-       ";"
-       { method=s; }
-      | 
-       { 
-	 javaTypes=new ArrayList();
-	 if(!isNew) javaTypes.add(s);
-       }
-       method=doted_array_string()
-       "("
-       [
-	s=doted_array_string() { javaTypes.add(s); }
-	( "," s=doted_array_string() { javaTypes.add(s); } )*
-       ]
-       ")"  
-       ";"
-       )
-      { 
-	if(isNew)
-	{
-	  javaTypes.add(0,method);
-	  return new JavaMethodDefinition(method,"<init>",javaTypes,
-					  name,cst,returnType,parameters);
-	}
-	int dot=method.toString().lastIndexOf('.');
-	if(dot==-1){
-	  System.err.println("class or method name missing");
-	  System.exit(-1);
-	}
-	
-	String methodName=method.toString().substring(dot+1,method.toString().length());
-	LocatedString className=method.substring(0,dot);
-
-	if(javaTypes!=null)
-	  return new JavaMethodDefinition(className,methodName,javaTypes,
-					  name,cst,returnType,parameters);
-	else
-	  return new StaticFieldAccess(className,methodName,
-				       name,cst,returnType,parameters);
-      }
     )
+  { return res; }
+}
+
+// Designing a java method, found thru reflection
+MethodDefinition nativeMethodDefinition(LocatedString name,
+					Constraint cst,
+					Monotype returnType,
+					List parameters):
+{
+  List javaTypes=null;
+  LocatedString method,s=null;
+  boolean isNew=false;
+}
+{
+(
+  "new" { isNew = true; }
+|
+  s=doted_array_string() 
+)
+
+// if we stop here with a ";", it's a static field
+// else it's a method
+( 
+  ";"
+  { method=s; }
+| 
+  { 
+    javaTypes=new ArrayList();
+     if(!isNew) javaTypes.add(s);
+  }
+
+  method=doted_string()
+  "("
+  [
+    s=doted_array_string() { javaTypes.add(s); }
+    ( "," s=doted_array_string() { javaTypes.add(s); } )*
+  ]
+  ")"  
+  ";"
+)
+
+  { 
+    if(isNew)
+      {
+	javaTypes.add(0,method);
+	return new JavaMethodDefinition(method,"<init>",javaTypes,
+					name,cst,returnType,parameters);
+      }
+    int dot=method.toString().lastIndexOf('.');
+    if(dot==-1){
+      System.err.println("class or method name missing");
+      System.exit(-1);
+    }
+    
+    String methodName=method.toString();
+    methodName = methodName.substring(dot+1,methodName.length());
+    LocatedString className=method.substring(0,dot);
+    
+    if(javaTypes!=null)
+      return new JavaMethodDefinition(className,methodName,javaTypes,
+				      name,cst,returnType,parameters);
+    else
+      return new StaticFieldAccess(className,methodName,
+				   name,cst,returnType,parameters);
+  }
 }
 
 Definition globalVariable():

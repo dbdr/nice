@@ -488,6 +488,13 @@ public class CodeAttr extends Attribute implements AttrContainer
       }
   }
 
+  public final void emitPushBoolean(boolean b)
+  {
+    reserve(1);
+    put1(b ? 4 : 3);
+    pushType(Type.boolean_type);
+  }
+
   public final void emitPushInt(int i)
   {
     reserve(3);

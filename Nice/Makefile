@@ -3,7 +3,7 @@ TOP=${HOME}/Nice
 
 JAVAC=javac -classpath ${TOP}/classes:${TOP}/src:${TOP}/stdlib -sourcepath ${TOP}/src -d ${TOP}/classes -O -g
 JAVACC=java -classpath ${TOP}/external/JavaCC.zip COM.sun.labs.javacc.Main
-JAVADOC=javadoc -linkoffline file:///C%7C/Apps/jdk1.2.1/docs/api file:///usr/opt/java122/docs/api
+JAVADOC=javadoc #-linkoffline file:///C%7C/Apps/jdk1.2.1/docs/api file:///usr/opt/java122/docs/api
 
 # run this first when you just checked out a fresh version
 first: parser
@@ -19,7 +19,7 @@ recompile:
 #	${JAVAC} bossa/*/*.java nice/**/*.java mlsub/*/*.java ../stdlib/nice/lang/*.java
 
 recompileGNU:
-	cd src; ${JAVAC} gnu/*/*.java gnu/*/*/*.java kawa/*/*.java
+	cd src; ${JAVAC} gnu/*/*.java gnu/*/*/*.java
 
 recompileSTDLIB:
 	${JAVAC} ${TOP}/stdlib/nice/lang/*.java
@@ -43,10 +43,13 @@ test:
 
 jdoc:
 	mkdir -p doc
-	${JAVADOC} -windowtitle "Nice" -doctitle "The Nice compiler source" \
+	cd src; ${JAVADOC} -windowtitle "Nice" -doctitle "The Nice compiler source" \
 	-overview ${TOP}/src/overview.html \
 	-d ${TOP}/doc -private -author -version \
-	mlsub.typing mlsub.typing.lowlevel mlsub.compilation bossa bossa.syntax bossa.util bossa.link gnu.bytecode gnu.expr gnu.math gnu.mapping kawa.standard kawa.lang
+	nice.tools.code \
+	mlsub.typing mlsub.typing.lowlevel mlsub.compilation \
+	bossa.syntax bossa.util bossa.link \
+	gnu.bytecode gnu.expr gnu.math gnu.mapping gnu.kawa.reflect
 
 tags:
 	jtags

@@ -269,7 +269,7 @@ public class MethodDefinition extends Definition
   }
   
   public final gnu.mapping.Procedure getDispatchMethod() 
-  { 
+  {
     if(dispatchMethod==null)
       {
 	dispatchMethod = computeDispatchMethod();

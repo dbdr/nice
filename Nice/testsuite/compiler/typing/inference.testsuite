@@ -198,3 +198,48 @@ void foo(A<boolean>) { assert false; }
    testmap[i] = i.toString();
  for(i : testmap.keySet())
    println(i + " => " + testmap[i]);
+
+/// PASS
+ // bug #923429
+var n = 1;
+let nKeys = 10000;
+
+let table1 = new HashMap(nKeys);
+let table2 = new HashMap();
+for (int i = 0; i <= nKeys; i++)
+table1["foo_" + i] = new Cell(value: i);
+
+String key;
+int v1;
+?Cell c2;
+
+while (n-- > 0)
+  for (each : table1.entrySet) {
+    key = each.getKey;
+    v1 = each.getValue.value;
+
+    if ( (c2 = table2[key]) != null)
+      c2.value += v1;
+    else
+      table2[key] = new Cell(value: v1); //HERE
+  }
+  /// Toplevel
+class Cell { int value; }
+toString(Cell c) = c.value.toString;
+
+/// PASS
+ // bug #923429 simplified
+ let table1 = new HashMap();
+ let table2 = new HashMap();
+
+ ?Cell c2;
+
+ for (each : table1.entrySet)
+   {
+     let key = each.getKey;
+     c2 = table2[key];
+     table2[key] = new Cell(value: each.getValue.value);
+   }
+  /// Toplevel
+
+class Cell { int value; }

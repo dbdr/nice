@@ -156,6 +156,7 @@ public abstract class Engine
         if (! commit)
           frozenLeqs.backtrack();
 
+        /*
         if (tentative && !commit)
           {
             // These type variables used to be free. Since we don't commit, 
@@ -172,6 +173,7 @@ public abstract class Engine
               formerFree.endOfIteration();
             }
           }
+        */
       }
 
     soft.backtrack();

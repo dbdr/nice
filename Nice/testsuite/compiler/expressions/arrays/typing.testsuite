@@ -1,0 +1,10 @@
+/// FAIL
+  ?String[][] s = new String[1][];
+  println(s[0].length);
+
+/// PASS
+  ?String[][?] s = new String[1][];
+  ?String[?] s2 = s[0];
+
+/// PASS
+  ?String[][][?][?] s = new String[1][1][][];

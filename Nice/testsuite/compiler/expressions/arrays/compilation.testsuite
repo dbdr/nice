@@ -1,0 +1,9 @@
+/// PASS
+  byte[] b = f(new byte[2]);
+  /// Toplevel
+  <int T> T[] f(T[] t) = t; 
+
+/// PASS
+  ?String[][] s = single(new String[1]);
+  /// Toplevel
+  <T> T[][] single(T[] t) = [ t ];

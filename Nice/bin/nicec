@@ -72,7 +72,7 @@ export CLASSPATH
 case $progname in
     nicedoc)	class=nice.tools.doc.dispatch          ;;
     niceunit)	class=nice.tools.unit.console.dispatch ;;
-    nicec)	class=nice.tools.compiler.console.fun
+    nicec)	class=nice.tools.compiler.console.dispatch
 
 	system_args="--runtime=${NICEC_JAR}"
 

@@ -14,7 +14,7 @@ for %%x in (%NICEPATH%) do goto gotNice
 goto end
 
 :gotNice
-java -Xms8M -classpath %NICEPATH%\nice.jar;%CLASSPATH% nice.tools.compiler.console.fun --runtime=%NICEPATH%\nice.jar %1 %2 %3 %4 %5 %6 %7 %8 %9
+java -Xms8M -classpath %NICEPATH%\nice.jar;%CLASSPATH% nice.tools.compiler.console.dispatch --runtime=%NICEPATH%\nice.jar %1 %2 %3 %4 %5 %6 %7 %8 %9
 
 :end
 rem -- clean up a bit

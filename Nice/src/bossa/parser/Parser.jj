@@ -694,6 +694,7 @@ Monotype monotypeConstructor():
     }
 }
 
+// When we remove this, remove the LOOKAHEAD(1) before funExp()
 FunType OLDfunmonotype():
 {
     Monotype codom=null;
@@ -1410,6 +1411,49 @@ FunExp funExp():
   { return new FunExp(cst,formals,body); }
 }
 
+FunExp simpleVarFunExp():
+{
+  MonoSymbol sym;
+  List formals;
+  FunExp res;
+}
+{
+  sym=monoSymbol() 
+  { formals = new LinkedList(); formals.add(sym); }
+  res=endFunExp(formals)
+  { return res; }
+}
+
+FunExp multipleVarsFunExp():
+{
+  List formals;
+  FunExp res;
+}
+{
+  "(" formals=monoSymbols() ")"
+  res=endFunExp(formals)
+  { return res; }
+}
+
+FunExp endFunExp(List formals):
+{
+  Statement body;
+  Expression exp;
+}
+{
+  "=>"
+  (
+    body=Block()
+  |
+    exp=Expression()
+    { 
+      body=new ReturnStmt(exp);
+      body.setLocation(exp.location());
+    }
+  )
+  { return new FunExp(Constraint.True,formals,body); }
+}
+
 // ( e1, ..., en )
 Expression tupleExp():
 {
@@ -1525,8 +1569,12 @@ Expression Expression() :
 {
   { first=getToken(1); }
 
-  ( e1=funExp() | e1=ClassicExpression() )
-
+  ( LOOKAHEAD(1) /* remove this lookahead when OLDfunmonotype(): is removed */
+    e1=funExp() 
+  | LOOKAHEAD(monoSymbol() "=>") e1=simpleVarFunExp() 
+  | LOOKAHEAD("(" monoSymbols() ")" "=>") e1=multipleVarsFunExp() 
+  | e1=ClassicExpression() 
+  )
   { 
     last=getToken(0);
     e1.setLocation(new Location(first, last));

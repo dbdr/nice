@@ -1,0 +1,11 @@
+/// PASS
+  final f = (int x)=> x+1;
+
+/// PASS
+  final f = (int x, int y)=> x+y;
+
+/// PASS
+  final f = int x => x+1;
+
+/// PASS
+  final f = int x => int y => x+y;

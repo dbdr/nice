@@ -1,5 +1,8 @@
 nice (0.5.4) unstable; urgency=low
 
+  * Added short syntax for anonymous functions:
+      int i => i+1          /* function of one argument */
+      (int i, int j) => i+j /* function of several arguments */
   * Fixed inference for possibly null variables in some complex cases.
   * Anonymous function cannot appear where a statement is expected 
     (some expressions can). This is good since an anonymous function which 

@@ -399,7 +399,7 @@ public class MethodBodyDefinition extends Definition
 	{
 	  TypeConstructor tc = Types.rawType(domain[n]).head();
 	  if (tc != null && formals[n].tc != null)
-	    formals[n].setDomainEq(Typing.testRigidLeq(tc, formals[n].tc));
+	    formals[n].setDomainEq(Types.isSure(domain[n]) && Typing.testRigidLeq(tc, formals[n].tc));
 
         }
 

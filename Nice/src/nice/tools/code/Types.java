@@ -607,11 +607,18 @@ public final class Types
    * Manipulations on nice types
    ****************************************************************/
 
-  static boolean isMaybe(Monotype m)
+  public static boolean isMaybe(Monotype m)
   {
     // This is prob. laxist, since getTC() might be different but equivalent to maybeTC (?)
     return (m instanceof MonotypeConstructor)
       && ((MonotypeConstructor) m).getTC() == PrimitiveType.maybeTC;
+  }
+
+  public static boolean isSure(Monotype m)
+  {
+    // see comment by isMaybe (e?)
+    return (m instanceof MonotypeConstructor)
+      && ((MonotypeConstructor) m).getTC() == PrimitiveType.sureTC;
   }
 
   static Monotype equivalent(Monotype m)

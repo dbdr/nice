@@ -104,3 +104,8 @@ foo(@A){}
 /// FAIL
   /// Toplevel
   void f(List<Array<String>>);
+
+/// FAIL
+  /// Toplevel
+  void m(?String);
+  m(@String) {}

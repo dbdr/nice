@@ -10,6 +10,18 @@ LISPDIR=${PREFIX}/share/emacs/site-lisp/nice
 VERSION = ${shell expr "`head -1 debian/changelog`" : '.*(\(.*\))'}
 TAG     = ${shell if [ `grep '^ --' debian/changelog |head -1|wc -c` -le 10 ]; then echo prerelease; fi }
 
+# ANT classpath; we will use NICE_ANTJAR or ANT_HOME (in that order) 
+# if present, otherwise try good default
+ANT_CLASSPATH= ${shell if [ "z${NICE_ANTJAR}" != "z" ] ; \
+	then echo "${NICE_ANTJAR}"; \
+	elif [ "z${ANT_HOME}" != "z" ] ; \
+	then echo "${ANT_HOME}/lib/ant.jar"; \
+	else if [ "z${CLASSPATH}" != "z" ]; \
+	        then echo "/usr/share/java/ant.jar:./external/ant.jar:${CLASSPATH}"; \
+		else echo "/usr/share/java/ant.jar:./external/ant.jar:"; \
+	    	fi \
+	fi }
+
 SHELL = /bin/sh
 TOP=${PWD}
 
@@ -70,7 +82,12 @@ install: share/java/nice.jar
 
 
 setDate:
-	cd src/nice/tools/compiler; ./setBuildDate "${VERSION}" "${TAG}"
+	cd src; ${JAVAC} nice/tools/compiler/JavaVersion.java
+	${java} -classpath classes nice.tools.compiler.JavaVersion > src/nice/tools/compiler/javaVersion
+	@echo "We are using compiler `cat src/nice/tools/compiler/javaVersion` (at least our java version let us assume that)"
+	cd src/nice/tools/compiler; ./setBuildDate "${VERSION}" "`cat javaVersion`" "${TAG}"
+	@rm src/nice/tools/compiler/javaVersion
+	@rm classes/nice/tools/compiler/JavaVersion.class
 
 test:
 	cd regtest; JAVA="${java}" /usr/bin/time ./regtest
@@ -159,8 +176,8 @@ bootstrap: parser
 
 ant:
 	@echo "Building the Ant task definition..."
-	@${javac} -sourcepath src -classpath "/usr/share/java/ant.jar:./external/ant.jar:./classes:./classes.old" -d classes src/nice/tools/ant/Nicec.java ||\
-	echo "Compilation of the Ant task definition failed.\nAnt should be in the classpath, or linked to by ./external/ant.jar"
+	@${javac} -sourcepath src -classpath "${ANT_CLASSPATH}:./classes:./classes.old" -d classes src/nice/tools/ant/Nicec.java ||\
+	echo -e "Compilation of the Ant task definition failed.\n NICE_ANTJAR or ANT_HOME should be set, Ant should be in the CLASSPATH or at least linked to by ./external/ant.jar"
 
 testengine:
 	@echo "Building the testsuite engine..."

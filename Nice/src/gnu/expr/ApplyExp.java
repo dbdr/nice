@@ -515,15 +515,4 @@ public class ApplyExp extends Expression
       }
   }
 
-  public Branchable getBranchable()
-  {
-    if (func instanceof QuoteExp)
-    {
-      Object proc = ((QuoteExp) func).getValue();
-      if (proc instanceof Branchable)
-	return (Branchable)proc;
-    }
-    return null;
-  }
-
 }

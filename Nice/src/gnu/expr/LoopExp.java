@@ -88,21 +88,17 @@ public class LoopExp extends Expression
   /** 
       Jump to label <code>to</code> if <code>ifExp</code> is true.
 
-      Optimizes the case where ifExp is a integer comparison, 
+      Optimizes the case where ifExp is a branchable operator, 
       since specific JVM bytecode handle these cases.
   */
   private void compileIfJump(Compilation comp, Expression ifExp, Label to)
   {
-    if (ifExp instanceof ApplyExp)
-      {
-	ApplyExp app = (ApplyExp) ifExp;
-	Branchable branchOp = app.getBranchable();
-	if (branchOp != null)
-	{
-	  branchOp.compileJump(comp, app.args, to);
-	  return;
-	}
-      }
+    Branchable branchOp = ifExp.getBranchable();
+    if (branchOp != null)
+    {
+      branchOp.compileJump(comp, ((ApplyExp)ifExp).args, to);
+      return;
+    }
 
     // General case
     whileExp.compile(comp, Type.boolean_type);

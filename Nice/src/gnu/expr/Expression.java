@@ -194,4 +194,20 @@ public abstract class Expression implements Printable
   {
     return (flags & flag) != 0;
   }
+
+  public Branchable getBranchable()
+  {
+    if (this instanceof ApplyExp)
+    {
+      Expression func = ((ApplyExp)this).func;
+      if (func instanceof QuoteExp)
+      {
+	Object proc = ((QuoteExp) func).getValue();
+	if (proc instanceof Branchable)
+	  return (Branchable)proc;
+      }
+    }
+    return null;
+  }
+
 }

@@ -139,6 +139,14 @@ public class NiceMethod extends UserOperator
     bossa.link.Dispatch.register(this);
   }
 
+  public boolean isMain()
+  {
+    if (! (name.toString().equals("main") && arity == 1))
+      return false;
+
+    return getType().domain()[0].toString().equals("java.lang.String[]");
+  }
+
   /****************************************************************
    * Code generation
    ****************************************************************/

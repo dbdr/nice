@@ -498,7 +498,7 @@ public class Package implements mlsub.compilation.Module, Located, bossa.syntax.
     Manifest manifest = new Manifest();
     manifest.getMainAttributes().put(Attributes.Name.MANIFEST_VERSION,"1.0");
     manifest.getMainAttributes().put(Attributes.Name.MAIN_CLASS, 
-                                       this.name + "." + packageClassName);
+                                     this.name + ".dispatch");
     return new JarOutputStream(new FileOutputStream(jarFile), manifest);
   }
 

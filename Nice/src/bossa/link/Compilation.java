@@ -52,6 +52,10 @@ public final class Compilation
     Expression body = dispatch
       (sortedAlternatives.iterator(), 
        m.javaReturnType(), m.javaReturnType().isVoid(), params);
+
+    if (m.isMain())
+      body = beautifyUncaughtExceptions(body);
+
     Gen.setMethodBody(lexp, m.getContract().compile(body));
   }
   
@@ -98,6 +102,24 @@ public final class Compilation
 	(alt.matchTest(params, false), 
 	 matchCase, 
 	 dispatch(sortedAlternatives, returnType, voidReturn, params));
+  }
+
+  private static Expression beautifyUncaughtExceptions(Expression body)
+  {
+    TryExp res = new TryExp(body, null);
+
+    CatchClause c = new CatchClause("uncaughtException", Type.throwable_type);
+    res.setCatchClauses(c);
+
+    gnu.bytecode.Method print = ClassType.make("nice.lang.dispatch").
+      getDeclaredMethod("printStackTraceWithSourceInfo", 1);
+
+    c.setBody
+      (new ApplyExp
+       (new PrimProcedure(print),
+        new Expression[]{ new ReferenceExp(c.getDeclaration()) }));
+
+    return res;
   }
 
   /****************************************************************

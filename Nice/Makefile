@@ -14,14 +14,14 @@ setDate:
 bootstrap: setDate
 	cd stdlib; nicec nice.getopt
 	cd src; nicec bossa.modules
-	cd src; NICEJAR=${HOME}/Nice/stdlib nicec -Rs nice.tools.compiler
-	cd src; NICEJAR=${HOME}/Nice/stdlib nicec bossa.modules
+	cd src; NICEJAR=${TOP}/stdlib nicec -Rs nice.tools.compiler
+	cd src; NICEJAR=${TOP}/stdlib nicec bossa.modules
 
 class:
 	mkdir -p classes
 	cd classes; jar xf ../external/java-getopt-1.0.7.jar gnu
 	cd src;\
-	${JAVAC} bossa/modules/Package.java nice/tools/runJar.java nice/tools/code/*.java gnu/mapping/*.java gnu/bytecode/dump.java ../stdlib/nice/*/*.java
+	${JAVAC} bossa/modules/Package.java bossa/syntax/*.java nice/tools/runJar.java nice/tools/code/*.java gnu/mapping/*.java gnu/bytecode/dump.java ../stdlib/nice/*/*.java
 	ln -sf nicec bin/nicer
 
 # erase out-of-date class files and 'make dep' to recompile if javac 
@@ -30,8 +30,8 @@ dep:
 	cd src; ${JAVAC} bossa/modules/Package.java
 
 recompile: parser
-	${JAVAC} -Xdepend src/bossa/modules/Package.java
-#	${JAVAC} bossa/*/*.java nice/**/*.java mlsub/*/*.java ../stdlib/nice/lang/*.java
+#	${JAVAC} -Xdepend src/bossa/modules/Package.java
+	cd src; ${JAVAC} bossa/**/*.java nice/**/*.java mlsub/**/*.java ../stdlib/nice/lang/*.java
 
 recompileGNU:
 	cd src; ${JAVAC} gnu/*/*.java gnu/*/*/*.java
@@ -104,3 +104,21 @@ cvs-Nice:
 
 sourceforge:
 	scp web/*.html web/*.css bonniot@shell.sourceforge.net:/home/groups/nice/htdocs
+
+#****************************************************************
+# Bootstrap
+#****************************************************************
+
+boot: parser bossa
+
+bossa: 
+	mkdir -p classes
+	${JAVAC} stdlib/nice/lang/inl/*.java
+	cd src; NICEJAR=${TOP}/stdlib nicec bossa.modules
+	cd src; NICEJAR=${TOP}/stdlib nicec nice.tools.ast
+	cd src/bossa/syntax; \
+	${JAVAC} *Exp.java *Stmt.java  Block.java *Scope.java *Symbol.java TypeMaper.java
+	cd src; nicec bossa.syntax
+	cd classes; jar xf ../external/java-getopt-1.0.7.jar gnu
+	cd src;\
+	${JAVAC} bossa/modules/Package.java nice/tools/runJar.java nice/tools/code/*.java gnu/mapping/*.java gnu/bytecode/dump.java ../stdlib/nice/*/*.java

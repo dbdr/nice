@@ -70,8 +70,8 @@ public abstract class Definition extends Node implements bossa.util.Located
   /**
    * The module this definition appears in.
    */
-  protected bossa.modules.Package module;
-  static public bossa.modules.Package currentModule;
+  protected Module module;
+  static public Module currentModule;
 
   /****************************************************************
    * Name and location of the definition

@@ -112,7 +112,7 @@ public final class JavaClasses
     // (thus used at link test with an error)
     // these late TCs should be avoided
     boolean instantiable = 
-      !bossa.modules.Package.contextFrozen() && instantiable(javaType);
+      !Typing.isInRigidContext() && instantiable(javaType);
       
     TypeConstructor res = new TypeConstructor(className, null, 
 					      instantiable, true);
@@ -120,7 +120,7 @@ public final class JavaClasses
 
     nice.tools.code.Types.set(res, javaType);
     
-    if(bossa.modules.Package.contextFrozen())
+    if(Typing.isInRigidContext())
       // We should not add new classes at this point.
       // The new TC should not implement top, as it would cause an error
       // to assert it. It doesn't matter, as this type is not used

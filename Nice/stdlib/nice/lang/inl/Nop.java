@@ -10,33 +10,40 @@
 /*                                                                        */
 /**************************************************************************/
 
-package bossa.syntax;
+package nice.lang.inl;
 
-import mlsub.typing.TypeSymbol;
+import gnu.expr.*;
+import gnu.bytecode.*;
 
 /**
-   A mapping from type names to type symbols.
-
+   Just compiles its argument, producing no bytecode itself.
+   
    @version $Date$
-   @author Daniel Bonniot (d.bonniot@mail.dotcom.fr)
-*/
-public class TypeMaper implements TypeMap
+   @author Daniel Bonniot
+ */
+
+public class Nop 
+extends gnu.mapping.Procedure1 implements Inlineable
 {
-  public TypeMaper(nice.tools.ast.SymbolTable inner, TypeScope global)
+  public static Nop create(String param)
   {
-    this.inner = inner;
-    this.global = global;
+    return nop;
   }
   
-  nice.tools.ast.SymbolTable inner;
-  TypeScope global;
+  private static Nop nop = new Nop();
   
-  public TypeSymbol lookup(String name)
+  public void compile (ApplyExp exp, Compilation comp, Target target)
   {
-    TypeSymbol res = null;//(TypeSymbol) nice.tools.ast.dispatch.get$0(inner, name);
-    if (res != null)
-      return res;
-    else
-      return global.lookup(name);
+    exp.getArgs()[0].compile(comp, target);
+  }
+  
+  public gnu.bytecode.Type getReturnType (Expression[] args)
+  {
+    return args[0].getType();
+  }
+
+  public Object apply1 (Object arg1)
+  {
+    return arg1;
   }
 }

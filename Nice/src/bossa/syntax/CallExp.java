@@ -213,77 +213,8 @@ public class CallExp extends Expression
     overloadingResolved = true;
     
     arguments.noOverloading();
-    resolveStaticClassPrefix();
     
     function = function.resolveOverloading(this);
-  }
-
-  /** Handle static functions, prefixed by the class name */
-  private void resolveStaticClassPrefix()
-  {
-    if(infix)
-      {
-	declaringClass = arguments.staticClass();
-	
-	if(declaringClass == null)
-	  // check that the function was found in scope
-	  {
-	    if (function instanceof IdentExp)
-	      User.error(function, 
-			 function + " is not declared");
-	    return;
-	  }
-	
-	// A static function is called
-	LocatedString funName;
-	    
-	if(function instanceof OverloadedSymbolExp)
-	  funName = ((OverloadedSymbolExp) function).ident;
-	else if(function instanceof IdentExp)
-	  funName = ((IdentExp) function).getIdent();
-	else if(function instanceof SymbolExp)
-	  funName = ((SymbolExp) function).getName();
-	else
-	  {
-	    Internal.error("Unknown case " +
-			   function.getClass() + " in CallExp");
-	    return;
-	  }
-
-	List possibilities = new LinkedList();
-	declaringClass.addMethods();
-	int arity = arguments.size();
-	    
-	// search methods
-	for(gnu.bytecode.Method method = declaringClass.getMethods();
-	    method!=null; method = method.getNext())
-	  if(method.getName().equals(funName.content) &&
-	     (method.arg_types.length + 
-	      (method.getStaticFlag() ? 0 : 1)) == arity)
-	    {
-	      MethodDeclaration md = 
-		JavaMethod.addFetchedMethod(method);
-	      if(md!=null)
-		possibilities.add(md.symbol);
-	      else
-		Debug.println(method + " ignored");
-	    }
-
-	// search a field
-	if (arity == 0)
-	  {
-	    gnu.bytecode.Field field = 
-	      declaringClass.getField(funName.toString());
-	    if(field!=null)
-	      possibilities.add(JavaMethod.addFetchedMethod(field).symbol);
-	  }
-	    
-	if (possibilities.size() == 0)
-	  User.error(this, "class " + declaringClass.getName() +
-		     " has no method or field " + funName);
-	    
-	function = new OverloadedSymbolExp(possibilities, funName);
-      }
   }
 
   /** Hold real parameter, after default parameters
@@ -355,7 +286,7 @@ public class CallExp extends Expression
     
     gnu.expr.Expression res;
     if (function.isFieldAccess())
-      res = function.getFieldAccessMethod().compileAccess(arguments);
+      res = function.getAssignable().compileAccess(arguments);
     else
       res = new gnu.expr.ApplyExp(function.generateCode(), params);
 
@@ -369,8 +300,7 @@ public class CallExp extends Expression
     if (arguments.size() != 1)
       Internal.error(this, "A field access should have 1 parameter");
 
-    return function.getFieldAccessMethod().compileAssign
-      (arguments.getExp(0), value);
+    return function.getAssignable().compileAssign(arguments.getExp(0), value);
   }
 
   /****************************************************************

@@ -64,6 +64,21 @@ abstract class VarSymbol extends Node implements Located
   }
 
   /****************************************************************
+   * Overloading resolution
+   ****************************************************************/
+
+  /**
+     @return
+     0 : doesn't match
+     1 : wasn't even a function
+     2 : matches
+  */
+  int match(Arguments arguments)
+  {
+    return 1;
+  }
+
+  /****************************************************************
    * Cloning types
    ****************************************************************/
 
@@ -76,6 +91,16 @@ abstract class VarSymbol extends Node implements Located
   /****************************************************************
    * Misc.
    ****************************************************************/
+
+  Assignable getAssignable()
+  {
+    return null;
+  }
+
+  gnu.mapping.Procedure getDispatchMethod()
+  {
+    return null;
+  }
 
   public Location location()
   {

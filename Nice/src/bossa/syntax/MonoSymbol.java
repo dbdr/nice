@@ -103,6 +103,28 @@ public class MonoSymbol extends VarSymbol
   }
 
   /****************************************************************
+   * Overloading resolution
+   ****************************************************************/
+
+  /**
+     @return
+     0 : doesn't match
+     1 : wasn't even a function
+     2 : matches
+  */
+  int match(Arguments arguments)
+  {
+    mlsub.typing.lowlevel.Kind k = type.getKind();
+    if(k instanceof mlsub.typing.FunTypeKind)
+      if (!arguments.plainApplication(((mlsub.typing.FunTypeKind) k).domainArity))
+	return 0;
+      else
+	return 2;
+    else 
+      return 1;
+  }
+
+  /****************************************************************
    * Cloning types
    ****************************************************************/
 

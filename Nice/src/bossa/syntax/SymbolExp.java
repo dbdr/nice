@@ -36,20 +36,9 @@ public class SymbolExp extends Expression
     setLocation(loc);
   }
   
-  boolean isAssignable()
+  Assignable getAssignable()
   {
-    return symbol.isAssignable();
-  }
-
-  FieldAccess getFieldAccessMethod()
-  {
-    if(symbol instanceof MethodDeclaration.Symbol)
-      {
-	MethodDeclaration.Symbol s = (MethodDeclaration.Symbol) symbol;
-	if(s.definition instanceof FieldAccess)
-	  return (FieldAccess)s.definition;
-      }
-    return null;
+    return symbol.getAssignable();
   }
 
   void computeType()
@@ -77,13 +66,9 @@ public class SymbolExp extends Expression
 
   public gnu.expr.Expression compile()
   {
-    if(symbol instanceof MethodDeclaration.Symbol)
-      {
-	gnu.mapping.Procedure proc = 
-	  ((MethodDeclaration.Symbol)symbol).definition.getDispatchMethod();
-
-	return new QuoteExp(proc);
-      }
+    gnu.mapping.Procedure proc = symbol.getDispatchMethod();
+    if (proc != null)
+      return new QuoteExp(proc);
     
     gnu.expr.Declaration decl = symbol.getDeclaration();
     
@@ -118,15 +103,6 @@ public class SymbolExp extends Expression
   public String toString()
   {
     return symbol.name.toString();
-  }
-
-  public String toString(int param)
-  {
-    if (param == Printable.detailed && 
-	symbol instanceof MethodDeclaration.Symbol)
-      return symbol.toString();
-    else
-      return super.toString(param);
   }
 
   private VarSymbol symbol;

@@ -142,6 +142,8 @@ public final class Typing
     Engine.releaseInitialContext();
   }
   
+  public static boolean isInRigidContext() { return Engine.isInRigidContext(); }
+
   /****************************************************************
    * Assertions
    ****************************************************************/

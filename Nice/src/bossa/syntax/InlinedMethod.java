@@ -71,7 +71,7 @@ public class InlinedMethod extends MethodDeclaration
     }
     catch(NoSuchMethodException e){
       User.error(inlineProcedure,
-		 "Inlined emthod " + inlineProcedure +
+		 "Inlined method " + inlineProcedure +
 		 " has no static create(String)");
     }
 

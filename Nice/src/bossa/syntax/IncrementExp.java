@@ -60,7 +60,7 @@ public class IncrementExp extends Expression
       Internal.error(this, "\"var\" is assignable and not a local, " +
 		     "so it should be a call to a FieldAccessMethod");
 
-    FieldAccess access = call.function.getFieldAccessMethod();
+    Assignable access = call.function.getAssignable();
     if (access == null)
       Internal.error(this, "\"var\" is assignable and not a local, " +
 		     "so it should be a call to a FieldAccessMethod");

@@ -151,18 +151,17 @@ list<T>(l)
  * LinkedList
  ****************************************************************/
 
-<Any T, Any U> U cast(T) = inline nice.tools.code.Nop();
+<Any T, Any U> U cast(T) = inline nice.lang.inl.Nop();
 
 final class JavaList<T> implements List
 {
-  java.util.List impl;
-  
-  size() = this.impl.size();
-  get(index) = cast( this.impl.get(index) );
-  set(index, elem) { this.impl.set(index, cast(elem)); }
-  add(elem) { this.impl.add(cast(elem)); }
-  remove(index) = cast(this.impl.remove(index));
+  java.util.List impl;  
 }
+  size(this@JavaList) = this.impl.size();
+  get(this@JavaList,index) = cast( this.impl.get(index) );
+  set(this@JavaList,index, elem) { this.impl.set(index, cast(elem)); }
+  add(this@JavaList,elem) { this.impl.add(cast(elem)); }
+  remove(this@JavaList,index) = cast(this.impl.remove(index));
 
 <Any T> JavaList<T> javaList();
 javaList<T>()
@@ -212,7 +211,8 @@ class Vector<T>
   Array<T> elements;
   int length;
 
-  remove<T>(index)
+}
+  remove<T>(this@Vector,index)
   {
     if (this.length == 0)
       throw new IndexOutOfBoundsException();
@@ -223,7 +223,6 @@ class Vector<T>
     this[this.length] = null;
     return res;
   }
-}
 
 <Any T> Vector<T> makeVector(int);
 makeVector<T>(len)

@@ -178,6 +178,39 @@ public class JavaMethod extends MethodDeclaration
     return md;
   }
 
+  /** Utility function for analyse.nice */
+
+  List findJavaMethods(ClassType declaringClass, String funName, int arity)
+  {
+    List possibilities = new LinkedList();
+    declaringClass.addMethods();
+	    
+    // search methods
+    for(gnu.bytecode.Method method = declaringClass.getMethods();
+	method!=null; method = method.getNext())
+      if(method.getName().equals(funName) &&
+	 (method.arg_types.length + 
+	  (method.getStaticFlag() ? 0 : 1)) == arity)
+	{
+	  MethodDeclaration md = 
+	    JavaMethod.addFetchedMethod(method);
+	  if(md!=null)
+	    possibilities.add(md.symbol);
+	  else
+	    Debug.println(method + " ignored");
+	}
+
+    // search a field
+    if (arity == 0)
+      {
+	gnu.bytecode.Field field = 
+	  declaringClass.getField(funName);
+	if(field!=null)
+	  possibilities.add(JavaMethod.addFetchedMethod(field).symbol);
+      }
+    return possibilities;
+  }
+    
   Scopes buildScope(VarScope outer, TypeScope typeOuter)
   {
     // We put this here, since we need 'module' to be computed

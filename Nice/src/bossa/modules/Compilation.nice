@@ -18,6 +18,16 @@ package bossa.modules;
 
 import mlsub.compilation;
 
+class Compilation extends mlsub.compilation.Compilation
+{
+  boolean recompileAll;
+  boolean recompileCommandLine;
+  boolean staticLink;
+
+  /** Set if at least one package is not up-to-date. */
+  boolean recompilationNeeded;
+}
+
 Compilation compilation(boolean, boolean, boolean, boolean);
 compilation(doLink, recompileCommandLine, recompileAll, staticLink)
 {

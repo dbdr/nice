@@ -32,7 +32,7 @@ import java.util.*;
    @version $Date$
    @author Daniel Bonniot (d.bonniot@mail.dotcom.fr)
  */
-abstract class FieldAccess extends MethodDeclaration
+abstract class FieldAccess extends MethodDeclaration implements Assignable
 {
   public FieldAccess(LocatedString name, 
 		     Constraint constraint,
@@ -59,12 +59,12 @@ abstract class FieldAccess extends MethodDeclaration
 
   protected Field field;
   
-  protected Field field()
+  public Field field()
   {
     return field;
   }
 
-  gnu.expr.Expression compileAccess(Arguments arguments)
+  public gnu.expr.Expression compileAccess(Arguments arguments)
   {
     if (arguments.size() == 0)
       return Inline.inline(new GetFieldProc(field()));
@@ -73,7 +73,7 @@ abstract class FieldAccess extends MethodDeclaration
 			   arguments.getExp(0).generateCode());
   }
   
-  gnu.expr.Expression compileAssign(Expression parameter, 
+  public gnu.expr.Expression compileAssign(Expression parameter, 
 				    gnu.expr.Expression value)
   {
     return Inline.inline

@@ -1,7 +1,7 @@
 /**************************************************************************/
-/*                           B O S S A                                    */
-/*        A simple imperative object-oriented research language           */
-/*                   (c)  Daniel Bonniot 1999                             */
+/*                                N I C E                                 */
+/*             A high-level object-oriented research language             */
+/*                        (c) Daniel Bonniot 2000                         */
 /*                                                                        */
 /*  This program is free software; you can redistribute it and/or modify  */
 /*  it under the terms of the GNU General Public License as published by  */
@@ -10,14 +10,12 @@
 /*                                                                        */
 /**************************************************************************/
 
-// File    : numeric.nice
-// Created : Wed Dec 01 15:44:03 1999 by bonniot
-
 /**
    Numerical hierarchy.
-   
-   Wrapper for {@link gnu.math <code>gnu.math</code>}.
-   
+
+   Usual operations on native types are inlined, 
+   so they have the same efficiency as in Java code.
+
    @version $Date$
    @author Daniel Bonniot
 */
@@ -27,101 +25,101 @@ package nice.lang;
 int MAX_INT() = native java.lang.Integer.MAX_VALUE;
 
 // Comparison
-boolean `<`(double, double) = inline nice.tools.code.ComparisonOperators("dLt");
-boolean `<`(float, float) = inline nice.tools.code.ComparisonOperators("fLt");
-boolean `<`(long, long) = inline nice.tools.code.ComparisonOperators("jLt");
-boolean `<`(int, int) = inline nice.tools.code.ComparisonOperators("iLt");
+boolean `<`(double, double) = inline nice.lang.inl.CompOp("dLt");
+boolean `<`(float, float) = inline nice.lang.inl.CompOp("fLt");
+boolean `<`(long, long) = inline nice.lang.inl.CompOp("jLt");
+boolean `<`(int, int) = inline nice.lang.inl.CompOp("iLt");
 
-boolean `<=`(double, double) = inline nice.tools.code.ComparisonOperators("dLe");
-boolean `<=`(float, float) = inline nice.tools.code.ComparisonOperators("fLe");
-boolean `<=`(long, long) = inline nice.tools.code.ComparisonOperators("jLe");
-boolean `<=`(int, int) = inline nice.tools.code.ComparisonOperators("iLe");
+boolean `<=`(double, double) = inline nice.lang.inl.CompOp("dLe");
+boolean `<=`(float, float) = inline nice.lang.inl.CompOp("fLe");
+boolean `<=`(long, long) = inline nice.lang.inl.CompOp("jLe");
+boolean `<=`(int, int) = inline nice.lang.inl.CompOp("iLe");
 
-boolean `>`(double, double) = inline nice.tools.code.ComparisonOperators("dGt");
-boolean `>`(float, float) = inline nice.tools.code.ComparisonOperators("fGt");
-boolean `>`(long, long) = inline nice.tools.code.ComparisonOperators("jGt");
-boolean `>`(int, int) = inline nice.tools.code.ComparisonOperators("iGt");
+boolean `>`(double, double) = inline nice.lang.inl.CompOp("dGt");
+boolean `>`(float, float) = inline nice.lang.inl.CompOp("fGt");
+boolean `>`(long, long) = inline nice.lang.inl.CompOp("jGt");
+boolean `>`(int, int) = inline nice.lang.inl.CompOp("iGt");
 
-boolean `>=`(double, double) = inline nice.tools.code.ComparisonOperators("dGe");
-boolean `>=`(float, float) = inline nice.tools.code.ComparisonOperators("fGe");
-boolean `>=`(float, float) = inline nice.tools.code.ComparisonOperators("jGe");
-boolean `>=`(int, int) = inline nice.tools.code.ComparisonOperators("iGe");
+boolean `>=`(double, double) = inline nice.lang.inl.CompOp("dGe");
+boolean `>=`(float, float) = inline nice.lang.inl.CompOp("fGe");
+boolean `>=`(float, float) = inline nice.lang.inl.CompOp("jGe");
+boolean `>=`(int, int) = inline nice.lang.inl.CompOp("iGe");
 
 // Equality
-boolean `==`(double, double) = inline nice.tools.code.ComparisonOperators("dEq");
-boolean `==`(float, float) = inline nice.tools.code.ComparisonOperators("fEq");
-boolean `==`(long, long) = inline nice.tools.code.ComparisonOperators("jEq");
-boolean `==`(int, int) = inline nice.tools.code.ComparisonOperators("iEq");
+boolean `==`(double, double) = inline nice.lang.inl.CompOp("dEq");
+boolean `==`(float, float) = inline nice.lang.inl.CompOp("fEq");
+boolean `==`(long, long) = inline nice.lang.inl.CompOp("jEq");
+boolean `==`(int, int) = inline nice.lang.inl.CompOp("iEq");
 
 // Inequality
-boolean `!=`(double, double) = inline nice.tools.code.ComparisonOperators("dNe");
-boolean `!=`(float, float) = inline nice.tools.code.ComparisonOperators("fNe");
-boolean `!=`(long, long) = inline nice.tools.code.ComparisonOperators("jNe");
-boolean `!=`(int, int) = inline nice.tools.code.ComparisonOperators("iNe");
+boolean `!=`(double, double) = inline nice.lang.inl.CompOp("dNe");
+boolean `!=`(float, float) = inline nice.lang.inl.CompOp("fNe");
+boolean `!=`(long, long) = inline nice.lang.inl.CompOp("jNe");
+boolean `!=`(int, int) = inline nice.lang.inl.CompOp("iNe");
 
-// Operators
-/* should be accepted, but compiled to NOP
-   Only effect = promotion if type < int
-double `+`(double) = nop
-float `+`(float) = nop
-long `+`(long) = nop
-int `+`(int) = 
-*/
+// Unary +
+// Only effect = promotion if type < int
+// This conforms to Java. Should we say instead that +(byte) is byte?
+double `+`(double) = inline nice.lang.inl.Nop();
+float `+`(float) = inline nice.lang.inl.Nop();
+long `+`(long) = inline nice.lang.inl.Nop();
+int `+`(int) = inline nice.lang.inl.Nop();
+
 
 // unary negation
-double `-`(double) = inline nice.tools.code.NumericalOperators("dNeg");
-float `-`(float) = inline nice.tools.code.NumericalOperators("fNeg");
-long `-`(long) = inline nice.tools.code.NumericalOperators("jNeg");
-int `-`(int) = inline nice.tools.code.NumericalOperators("iNeg");
+double `-`(double) = inline nice.lang.inl.NumOp("dNeg");
+float `-`(float) = inline nice.lang.inl.NumOp("fNeg");
+long `-`(long) = inline nice.lang.inl.NumOp("jNeg");
+int `-`(int) = inline nice.lang.inl.NumOp("iNeg");
 
 // multiplication
-double `*`(double, double) = inline nice.tools.code.NumericalOperators("dMul");
-float `*`(float, float) = inline nice.tools.code.NumericalOperators("fMul");
-long `*`(long, long) = inline nice.tools.code.NumericalOperators("jMul");
-int `*`(int, int) = inline nice.tools.code.NumericalOperators("iMul");
+double `*`(double, double) = inline nice.lang.inl.NumOp("dMul");
+float `*`(float, float) = inline nice.lang.inl.NumOp("fMul");
+long `*`(long, long) = inline nice.lang.inl.NumOp("jMul");
+int `*`(int, int) = inline nice.lang.inl.NumOp("iMul");
 
 // division
-double `/`(double, double) = inline nice.tools.code.NumericalOperators("dDiv");
-float `/`(float, float) = inline nice.tools.code.NumericalOperators("fDiv");
-long `/`(long, long) = inline nice.tools.code.NumericalOperators("jDiv");
-int `/`(int, int) = inline nice.tools.code.NumericalOperators("iDiv");
+double `/`(double, double) = inline nice.lang.inl.NumOp("dDiv");
+float `/`(float, float) = inline nice.lang.inl.NumOp("fDiv");
+long `/`(long, long) = inline nice.lang.inl.NumOp("jDiv");
+int `/`(int, int) = inline nice.lang.inl.NumOp("iDiv");
 
 // remainder
-double `%`(double, double) = inline nice.tools.code.NumericalOperators("dRem");
-float `%`(float, float) = inline nice.tools.code.NumericalOperators("fRem");
-long `%`(long, long) = inline nice.tools.code.NumericalOperators("jRem");
-int `%`(int, int) = inline nice.tools.code.NumericalOperators("iRem");
+double `%`(double, double) = inline nice.lang.inl.NumOp("dRem");
+float `%`(float, float) = inline nice.lang.inl.NumOp("fRem");
+long `%`(long, long) = inline nice.lang.inl.NumOp("jRem");
+int `%`(int, int) = inline nice.lang.inl.NumOp("iRem");
 
 // addition
-double `+`(double, double) = inline nice.tools.code.NumericalOperators("dAdd");
-float `+`(float, float) = inline nice.tools.code.NumericalOperators("fAdd");
-long `+`(long, long) = inline nice.tools.code.NumericalOperators("jAdd");
-int `+`(int, int) = inline nice.tools.code.NumericalOperators("iAdd");
+double `+`(double, double) = inline nice.lang.inl.NumOp("dAdd");
+float `+`(float, float) = inline nice.lang.inl.NumOp("fAdd");
+long `+`(long, long) = inline nice.lang.inl.NumOp("jAdd");
+int `+`(int, int) = inline nice.lang.inl.NumOp("iAdd");
 
 // substraction
-double `-`(double, double) = inline nice.tools.code.NumericalOperators("dSub");
-float `-`(float, float) = inline nice.tools.code.NumericalOperators("fSub");
-long `-`(long, long) = inline nice.tools.code.NumericalOperators("jSub");
-int `-`(int, int) = inline nice.tools.code.NumericalOperators("iSub");
+double `-`(double, double) = inline nice.lang.inl.NumOp("dSub");
+float `-`(float, float) = inline nice.lang.inl.NumOp("fSub");
+long `-`(long, long) = inline nice.lang.inl.NumOp("jSub");
+int `-`(int, int) = inline nice.lang.inl.NumOp("iSub");
 
 // shift
-int  `<<`(int , long) = inline nice.tools.code.NumericalOperators("iShl");
-long `<<`(long, long) = inline nice.tools.code.NumericalOperators("jShl");
+int  `<<`(int , long) = inline nice.lang.inl.NumOp("iShl");
+long `<<`(long, long) = inline nice.lang.inl.NumOp("jShl");
 
-int  `>>`(int , long) = inline nice.tools.code.NumericalOperators("iShr");
-long `>>`(long, long) = inline nice.tools.code.NumericalOperators("jShr");
+int  `>>`(int , long) = inline nice.lang.inl.NumOp("iShr");
+long `>>`(long, long) = inline nice.lang.inl.NumOp("jShr");
 
-int  `>>>`(int , long) = inline nice.tools.code.NumericalOperators("iuShr");
-long `>>>`(long, long) = inline nice.tools.code.NumericalOperators("juShr");
+int  `>>>`(int , long) = inline nice.lang.inl.NumOp("iuShr");
+long `>>>`(long, long) = inline nice.lang.inl.NumOp("juShr");
 
 // bitwise operators
-int `&`(int, int) = inline nice.tools.code.NumericalOperators("iAnd");
-int `|`(int, int) = inline nice.tools.code.NumericalOperators("iIOr");
-int `^`(int, int) = inline nice.tools.code.NumericalOperators("iXOr");
+int `&`(int, int) = inline nice.lang.inl.NumOp("iAnd");
+int `|`(int, int) = inline nice.lang.inl.NumOp("iIOr");
+int `^`(int, int) = inline nice.lang.inl.NumOp("iXOr");
 
-long `&`(long, long) = inline nice.tools.code.NumericalOperators("jAnd");
-long `|`(long, long) = inline nice.tools.code.NumericalOperators("jIOr");
-long `^`(long, long) = inline nice.tools.code.NumericalOperators("jXOr");
+long `&`(long, long) = inline nice.lang.inl.NumOp("jAnd");
+long `|`(long, long) = inline nice.lang.inl.NumOp("jIOr");
+long `^`(long, long) = inline nice.lang.inl.NumOp("jXOr");
 
 // Comparable interface
 `<`(n1@Number, n2@Number) = n1.doubleValue() < n2.doubleValue();

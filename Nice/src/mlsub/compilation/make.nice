@@ -24,6 +24,12 @@ import mlsub.compilation.*;
  * @author Daniel Bonniot (d.bonniot@mail.dotcom.fr)
  */
 
+class Compilation
+{
+  boolean skipLink;
+  Module root;
+}
+
 void compileComponent(List<Module>, boolean doLink);
 compileComponent(modules, doLink)
 {

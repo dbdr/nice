@@ -12,31 +12,19 @@
 
 package bossa.syntax;
 
-import mlsub.typing.TypeSymbol;
-
 /**
-   A mapping from type names to type symbols.
+   Can be read and written.
 
    @version $Date$
    @author Daniel Bonniot (d.bonniot@mail.dotcom.fr)
-*/
-public class TypeMaper implements TypeMap
+ */
+interface Assignable
 {
-  public TypeMaper(nice.tools.ast.SymbolTable inner, TypeScope global)
-  {
-    this.inner = inner;
-    this.global = global;
-  }
+  gnu.expr.Expression compileAccess(Arguments arguments);
   
-  nice.tools.ast.SymbolTable inner;
-  TypeScope global;
-  
-  public TypeSymbol lookup(String name)
-  {
-    TypeSymbol res = null;//(TypeSymbol) nice.tools.ast.dispatch.get$0(inner, name);
-    if (res != null)
-      return res;
-    else
-      return global.lookup(name);
-  }
+  gnu.expr.Expression compileAssign(Expression parameter, 
+				    gnu.expr.Expression value);
+
+  gnu.bytecode.Field field();
 }
+

@@ -186,7 +186,7 @@ abstract public class Node
     return globalTypeScope;
   }
   
-  void buildScope(bossa.modules.Package module)
+  void buildScope(Module module)
   {
     globalTypeScope.module = module;
     

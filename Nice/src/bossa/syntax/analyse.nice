@@ -166,9 +166,31 @@ analyse(e@CallExp, info)
 {
   if (e.infix)
     markAsCallFirstArg(e.arguments.getExp(0));
+
   e.arguments.analyse(info);
+
   if (e.infix)
     {
+      e.declaringClass = e.arguments.staticClass();
+      
+      if (e.declaringClass != null)
+	{
+	  String funName = identString(e.function);
+	  if (funName == null)
+	    bossa.util.Internal.error(e.function, "This is not a valid class member");
+	  
+	  java.util.List possibilities = JavaMethod.findNativeMethods
+	    (e.declaringClass, funName, e.arguments.size());
+
+	  if (possibilities.size() == 0)
+	    User.error(e, "class " + e.declaringClass.getName() +
+		       " has no method or field " + funName);
+	    
+	  e.function = new OverloadedSymbolExp(possibilities, funName);
+
+	  return e;
+	}
+      
       PackageExp pkg = e.arguments.packageExp();
       if (pkg != null)
 	{
@@ -223,8 +245,8 @@ analyse(e@IdentExp, i)
   if (e.enableClassExp)
     return ClassExp.create(e.ident);
 
-  if (e.infix)
-    return e;
+  //if (e.infix)
+    //return e;
 
   throw unknownIdent(e.ident);
   return null; // work-around pb with non-reachable code

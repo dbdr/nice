@@ -302,6 +302,43 @@ abstract public class MethodDeclaration extends Definition
       this.definition = MethodDeclaration.this;
     }
 
+    /****************************************************************
+     * Overloading resolution
+     ****************************************************************/
+    
+    /**
+       @return
+       0 : doesn't match
+       1 : wasn't even a function
+       2 : matches
+    */
+    int match(Arguments arguments)
+    {
+      if (definition.formalParameters() == null)
+	// true for constructors, for instance. case might be removed
+	if (!arguments.plainApplication(definition.getArity()))
+	  return 0;
+	else
+	  return 2;
+      else if(!definition.formalParameters().match(arguments))
+	return 0;
+      else
+	return 2;
+    }
+
+    Assignable getFieldAccessMethod()
+    {
+      if(definition instanceof FieldAccess)
+	return (FieldAccess) definition;
+      else
+	return null;
+    }
+
+    gnu.mapping.Procedure getDispatchMethod()
+    {
+      return definition.getDispatchMethod();
+    }
+
     public String toString()
     {
       return definition.toString();

@@ -524,7 +524,7 @@ public class MethodBodyDefinition extends Definition
 //      comp.compileClassInit();
 //    }
   
-  public static void compileMain(bossa.modules.Package module, 
+  public static void compileMain(Module module, 
 				 gnu.bytecode.Method mainAlternative)
   {
     if(Debug.codeGeneration)

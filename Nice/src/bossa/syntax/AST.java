@@ -26,7 +26,7 @@ import java.util.*;
  */
 public class AST extends Node
 {
-  public AST(bossa.modules.Package module, List defs)
+  public AST(Module module, List defs)
   {
     super(defs,Node.global);
     
@@ -87,7 +87,7 @@ public class AST extends Node
     return "Abstract Syntax Tree ("+definitions.size()+" definitions)";
   }
 
-  private bossa.modules.Package module;
+  private Module module;
   private List /* of Definition */ definitions;
 }
 

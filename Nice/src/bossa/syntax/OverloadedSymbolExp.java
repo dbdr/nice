@@ -97,34 +97,23 @@ public class OverloadedSymbolExp extends Expression
     
     for(Iterator i = symbols.iterator(); i.hasNext();)
       {
-	Object s = i.next();
-
-	if(s instanceof MonoSymbol)
-	  {
-	    Kind k = ((MonoSymbol) s).type.getKind();
-	    if(k instanceof FunTypeKind)
-	      if (!arguments.plainApplication(((FunTypeKind) k).domainArity))
-		{ i.remove(); removedSomething = true; continue; }
-	      else ;  
-	    else { i.remove(); continue; }
-	  }
-	else if(s instanceof MethodDeclaration.Symbol)
-	  {
-	    MethodDeclaration md = ((MethodDeclaration.Symbol) s).definition;
-	    
-	    if (md.formalParameters() == null)
-	      // true for constructors, for instance. case might be removed
-	      if (!arguments.plainApplication(md.getArity()))
-		{ i.remove(); removedSomething = true; continue; }
-	      else ;  
-	    else if(!md.formalParameters().match(arguments))
-	      { i.remove(); removedSomething = true; continue; }
-	  }
-	else
-	  { 
-	    Internal.warning("Unknown O.R. case: " + s.getClass()); 
-	    i.remove(); continue; 
-	  }
+	VarSymbol s = (VarSymbol) i.next();
+	
+	switch (s.match(arguments)) {
+	case 0 : // Doesn't match 
+	  removedSomething = true;
+	  i.remove();
+	  break;
+	case 1: // Wasn't even a function or method
+	  i.remove();
+	  break;
+	case 2: // Matches
+	  break;
+	default: // Should not happen
+	  Internal.warning("Unknown O.R. case: " + s.getClass()); 
+	  i.remove(); 
+	  break;
+	}
       }
 
     if (symbols.size() == 0)

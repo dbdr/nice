@@ -297,6 +297,7 @@ public abstract class Engine
 	for (int b = k.k0.weakMarkedSize(); b < n; b++)
 	  binders.add(k.getElement(b));
 	
+	// add every constraint, except between two rigid varaibles
 	for (int b = k.k0.weakMarkedSize(); b < n; b++)
 	  for (int i = 0; i < n; i++)
 	    addIfLeq(b, i, k, atoms);

@@ -285,11 +285,12 @@ public class MethodBodyDefinition extends Definition
 
   void typecheck()
   {
+    int level = -1;
     try{
       if (Debug.typing)
-	Typing.enter("METHOD BODY " + this + "\n\n");
+	level = Typing.enter("METHOD BODY " + this + "\n\n");
       else
-	Typing.enter();
+	level = Typing.enter();
 
       // remember that enter was called, to leave.
       // usefull if previous code throws an exception
@@ -375,7 +376,8 @@ public class MethodBodyDefinition extends Definition
       Node.currentFunction = null;
       if(entered)
 	try{
-	  Typing.leave();
+	  if (Typing.leave() != level)
+	    Internal.error("Unmatching enter/leave");
 	  entered = false;
 	}
 	catch(TypingEx e){

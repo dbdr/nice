@@ -72,11 +72,8 @@ public class LoopExp extends Expression
 		op.compileJump(comp, app.args, to);
 		return;
 	      }
-	    else System.out.println("3" + proc.getClass());
 	  }
-	else System.out.println("2" + app.func.getClass());
       }
-    else System.out.println("1" + ifExp.getClass());
 
     // General case
     whileExp.compile(comp, Type.boolean_type);

@@ -226,3 +226,23 @@ void f() {
     a = new A();
     f();
   }
+
+/// FAIL
+  A a = new B();
+  if (a instanceof B) {
+    void->void f = () =>
+      { 
+        a = new A();
+      };
+
+    f();
+    int x = a./* /// FAIL HERE */life;
+  }
+
+/// PASS
+  A a = new B();
+  if (a instanceof B) {
+    void->void f = () => { };
+    
+    int x = a.life;
+  }

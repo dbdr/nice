@@ -95,14 +95,6 @@ typecheck(e@AssignExp)
 
 }
 
-boolean hasConditionalType(MonoSymbol v)
-{
-  return conditionalTypes.has((MonoSymbol, mlsub.typing.Monotype) couple =>{
-    (MonoSymbol other, mlsub.typing.Monotype t) = couple;
-    return v == other;
-  });
-}
-
 void typecheckExps(?Expression[] exps)
 {
   for (int i = 0; i < exps.length; i++)
@@ -390,8 +382,7 @@ instanceofInfo(test@CallExp)
 /** 
     Collects knowledge about more precise type in branches of conditionals.
     
-    At the moments only tests agains null are considered.
-    Later, instanceof tests will also be taken into account.
+    At the moments tests agains null and instanceof tests are considered.
 */
 
 var int ifLevel = 0;
@@ -462,6 +453,7 @@ void enterClosure()
 {
   Set<MonoSymbol> done = new HashSet();
   List<(MonoSymbol, mlsub.typing.Monotype)> replaced = new ArrayList();
+  //set all for all variables the original type back and store it
   for (int i = 0; i < levels.size(); i++)
     {
       (MonoSymbol variable, mlsub.typing.Monotype type) = conditionalTypes.get(i);
@@ -482,10 +474,12 @@ void enterClosure()
 void exitClosure()
 { 
   List<(MonoSymbol, mlsub.typing.Monotype)> replaced = replacedTypes.pop();
+  //set back the stored conditional types
   for (int i = 0; i < replaced.size(); i++)
     {    
       (MonoSymbol variable, mlsub.typing.Monotype type) = replaced.get(i);
-      variable.type = type;
+      if (!variable.captured)
+        variable.type = type;
     }
 
   (levels, conditionalTypes) = closureEnvironments.pop();
@@ -496,6 +490,7 @@ void setCaptured(MonoSymbol variable)
   if (!variable.captured)
     {
       variable.captured = true;
+      //set all conditional types back to the original type
       let origType = getOriginalType(variable) || variable.type;
       variable.type = origType;
       for (int i = 0; i < closureEnvironments.size(); i++)

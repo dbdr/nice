@@ -15,16 +15,7 @@ public class dispatch
   public static Statement createReturnStmt(Expression value, boolean fake)
   { return null; }
 
-  public static Expression createFunExp(bossa.syntax.Constraint cst, List formals, Statement body)
-  { return null; }
-
-  static Expression createFunExp(bossa.syntax.Constraint cst, MonoSymbol[] formals, Statement body)
-  { return null; }
-
   public static Expression createLiteralArrayExp(List exps)
-  { return null; }
-
-  static Expression createOverloadedSymbolExp(List l, LocatedString s)
   { return null; }
 
   public static Expression createNewExp(TypeIdent ti, Arguments arguments) 
@@ -35,17 +26,6 @@ public class dispatch
 
   public static Expression createCallExp(Expression function, Expression param1, Expression param2)
   { return null; }
-
-  public static Expression createCallExp(Expression function, Expression param1, Expression param2, Expression param3)
-  { return null; }
-
-  public static Expression createCallExp(Expression func, Arguments args, boolean infix, boolean hasBrackets)
-  { return null; }
-
-  public static Expression createCallExp(Expression func, Arguments args)
-  { return null; }
-
-  public static void addBlockArgument(Expression callexp, Statement block, LocatedString name) {}
 
   public static gnu.bytecode.Method getImplementationAbove(JavaMethod decl, gnu.bytecode.ClassType firstArg)
   { return null; }
@@ -88,17 +68,6 @@ public class dispatch
   public static boolean disjoint(Pattern a, Pattern b)
   { return false; }
   
-  public static Expression createExpLocalVariable(LocatedString name, Expression value, boolean constant, Monotype type)
-  { return null; }
-
-  public static Statement createLocalVariable(LocatedString name, Monotype type, boolean constant, Expression value)
-  { return null; }
-
-  public void addNextLocal(Statement localValue, LocatedString name, Expression value) {}
-
-  public static Statement createLocalFunction(LocatedString name, Monotype returnType, FormalParameters parameters, Statement body)
-  { return null; }
-
   public static Statement createBlock(List statements)
   { return null; }
 

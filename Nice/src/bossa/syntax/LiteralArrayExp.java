@@ -43,67 +43,10 @@ public class LiteralArrayExp extends Expression
     this.elements = toArray(elements);
   }
 
-  /**
-     Adjust the array type according to the context.
-
-     This is usefull because arrays are non-variant.
-     For instance, different code must be generated 
-     for [ 1, 2 ] in the contexts:
-     int[] i = [ 1, 2 ]
-     and 
-     byte[] b = [ 1, 2 ]
-  */
-  Expression resolveOverloading(Polytype expectedType)
-  {
-    if (true)
-      return this;
-
-    // This can only help
-    expectedType.simplify();
-
-    Monotype m = expectedType.getMonotype();
-    // get rid of the nullness part
-    m = ((MonotypeConstructor) m).getTP()[0];
-
-    // Look for the element type
-
-    if (!(m instanceof MonotypeConstructor))
-      return this;
-
-    MonotypeConstructor mc = (MonotypeConstructor) m;
-    if (!(mc.getTC() == ConstantExp.arrayTC))
-      // there must be an error, but it shall be discovered elsewhere
-      return this;
-    
-    // Remember the required element type, to take it as ours if possible.
-    // This is done in computeType
-    Monotype elementMonotype = mc.getTP()[0];
-    expectedElementType = new Polytype(expectedType.getConstraint(), 
-				       elementMonotype);
-
-    return this;
-  }
-
-  private Polytype expectedElementType;
-
   void computeType()
   {
     Polytype elementType = Polytype.union(getType(elements));
     
-    if (expectedElementType != null)
-      /* The context requires a certain element type.
-	 First check that it is compatible with the actual elements,
-	 then take it as the element type.
-      */
-      {
-	try{
-	  Typing.leq(elementType, expectedElementType);
-	  elementType = expectedElementType;
-	} catch(TypingEx ex) {
-	  // this is an error, but it shall be reported elsewhere
-	  // so keep the computed type
-	}
-      }
     this.type = new Polytype
       (elementType.getConstraint(), 
        bossa.syntax.Monotype.sure(new MonotypeConstructor

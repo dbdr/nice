@@ -19,6 +19,7 @@ void main(String[] args)
 
   ConsoleOutput consOutput = new ConsoleOutput();
   Compilation compilation = new Compilation(listener: consOutput);
+  compilation.storeDocStrings = true;
 
   Program prg = new Program
     (name: "nicedoc", longName: "The Nice Documentation Generator",

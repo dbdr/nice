@@ -24,8 +24,8 @@ it a complete description of the powerfull type system.
 For simplicity and conciseness, this tutorial presents Nice as an extension
 of the Java programming language. You should therefore be familiar with
 Java. If not, you could read about it, for example 
-<a href="http://web2.java.sun.com/docs/books/tutorial/">Javasoft's tutorial
-</a>.
+<a href="http://java.sun.com/docs/books/tutorial/java/index.html">
+Javasoft's tutorial</a>.
 <br>&nbsp;
 
 <h2>Declaring classes and methods</h2>
@@ -68,6 +68,24 @@ for method <tt>display </tt>:
 { 
   <FONT COLOR="#0000ee">return</FONT> p.name + <FONT COLOR="#a020f0">&quot; (age+&quot;</FONT> + p.age + <FONT COLOR="#a020f0">&quot;, salary=&quot;</FONT> + p.salary + <FONT COLOR="#a020f0">&quot;)&quot;</FONT>; 
 } 
+</PRE>
+<br>&nbsp;
+
+<h2>The main method</h2>
+
+A particular case of method definition is the <code>main</code> method.
+The standard package <code>nice.lang</code> declares <code>main</code> 
+like this:
+<PRE>
+void main(String[] args);
+</PRE>
+You have to define in the main package of your program. 
+Here is the Hello World example:
+<PRE>
+main(args)
+{
+  System.out.println("Hello, world!");
+}
 </PRE>
 <br>&nbsp;
 
@@ -247,7 +265,7 @@ interface Collection
 interface List extends Collection
 { ... }
 
-void main(String[] args)
+static void main(String[] args)
 {
 &nbsp; List l1;
 &nbsp; BoolFunction f;

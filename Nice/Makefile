@@ -161,7 +161,7 @@ bootstrap: parser
 
 ant:
 	@echo "Building the Ant task definition..."
-	@${javac} -classpath "/usr/share/java/ant.jar:./external/ant.jar:./classes" src/nice/tools/ant/Nicec.java ||\
+	@${javac} -classpath "/usr/share/java/ant.jar:./external/ant.jar:./classes" -d classes src/nice/tools/ant/Nicec.java ||\
 	echo "Compilation of the Ant task definition failed.\nAnt should be in the classpath, or linked to by ./external/ant.jar"
 
 #****************************************************************

@@ -85,6 +85,8 @@ public class BitOp
           code.emitPushBoolean(false);
           code.emitFi();
         }
+
+      target.compileFromStack(comp, Type.boolean_type);
     }
 
     public Type getReturnType (Expression[] args)

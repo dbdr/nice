@@ -28,7 +28,7 @@
   for (int i = 0; i < lbits.length; i++)
     assert lvalue[i] == (lbits[i] == 1);
 
-/// PASS bug
+/// PASS
   byte b = byte(-1);
   assert b[8] == false;
 
@@ -77,3 +77,7 @@
 /// FAIL
   let int i = 1;
   i[0] = false;
+
+/// COMMENT Using the result polymorphically
+/// PASS
+  String s = 20[1].toString();

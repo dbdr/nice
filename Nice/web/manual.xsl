@@ -11,7 +11,7 @@
 
 -->
 
-<!DOCTYPE xsl:stylesheet [ <!ENTITY nbsp "&#xA0;"> <!ENTITY quest "&#x3F;"> ]>
+<!DOCTYPE xsl:stylesheet>
 <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
                 version='1.0'
                 xmlns="http://www.w3.org/TR/xhtml1/transitional"

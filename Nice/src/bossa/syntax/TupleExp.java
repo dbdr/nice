@@ -77,9 +77,9 @@ public class TupleExp extends bossa.syntax.Expression
     // The array is not a special array, since it has nothing to
     // do with collections.
     
-    Expression arrayVal = 
-      new ApplyExp(new gnu.kawa.reflect.ArrayNew(componentType),
-		   new Expression[]{intExp(len)});
+    Expression arrayVal = new gnu.expr.ApplyExp
+      (new nice.tools.code.MultiArrayNewProc(new ArrayType(componentType), 1),
+       new Expression[]{intExp(len)});
 
     LetExp let = new LetExp(new Expression[]{arrayVal});
     //let.outer = Statement.currentScopeExp;
@@ -94,7 +94,7 @@ public class TupleExp extends bossa.syntax.Expression
     Expression[] stmts = new Expression[1 + len];
     for (int i=0; i<len; i++)
       stmts[i] = 
-	new ApplyExp(new gnu.kawa.reflect.ArraySet(componentType),
+	new ApplyExp(new nice.lang.inline.ArraySetOp(componentType),
 		     new Expression[]{
 		       array, intExp(i), expressions[i].generateCode()
 		     });
@@ -133,7 +133,7 @@ public class TupleExp extends bossa.syntax.Expression
     Expression[] stmts = new Expression[len];
     for (int i=0; i<len; i++)
       stmts[i] = expressions[i].compileAssign
-	(new ApplyExp(new gnu.kawa.reflect.ArrayGet(componentType),
+	(new ApplyExp(new nice.lang.inline.ArrayGetOp(componentType),
 		      new Expression[]{
 			tupleExp, 
 			intExp(i)}));

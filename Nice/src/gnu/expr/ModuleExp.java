@@ -183,7 +183,7 @@ public class ModuleExp extends LambdaExp
 	else
 	  {
 	    ModuleBody mod = (ModuleBody) eval (env);
-	    gnu.kawa.reflect.ClassMemberConstraint.defineAll(mod, env);
+	    //gnu.kawa.reflect.ClassMemberConstraint.defineAll(mod, env);
 	    ctx.proc = mod;
 	  }
 	ctx.runUntilDone();

@@ -35,7 +35,7 @@ extends Procedure3 implements Inlineable
     return new ArraySetOp(type);
   }
 
-  private ArraySetOp(Type type)
+  public ArraySetOp(Type type)
   {
     this.type = type;
     arrayTarget = new StackTarget(nice.tools.code.SpecialTypes.array(type));

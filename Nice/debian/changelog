@@ -5,7 +5,11 @@ nice (0.8) unstable; urgency=low
   * Bugfixes (some cases of optional parameters, allowing arbitrarily nested
     tuples on the left side of an assignment, recursion for local functions,
     allow method parameter's default values to refer to 'this' when the method
-    is declared inside a class, declaration of multiple local variables).
+    is declared inside a class, declaration of multiple local variables,
+    nested type parameters in method declarations, improved some error messages,
+    resolving overloading between fields and global variables, implemented 
+    nullness inference for local constants, return type of error throwing 
+    anonymous functions).
 
  -- Daniel Bonniot <bonniot@users.sourceforge.net>  Wed, 14 May 2003 16:30:15 +0200
 

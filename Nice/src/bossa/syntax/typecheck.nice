@@ -458,31 +458,36 @@ typecheck(e@IfExp)
   enterIf();
 
   try{
-    (?List<MonoSymbol> notNullInThen, ?List<MonoSymbol> notNullInElse) = 
-      nullnessInfo(condition);
+    ?List<MonoSymbol> notNullInThen, notNullInElse;
+    ?List<(MonoSymbol, mlsub.typing.Monotype)> instanceofInThen; 
+    ?List<(MonoSymbol, mlsub.typing.Monotype)> instanceofInElse;
 
-    if (notNullInThen != null)
-      notNullInThen.foreach(MonoSymbol variable => {
-	mlsub.typing.Monotype type = notNull(variable.type);
-	mlsub.typing.Monotype sureType = makeSure(type);
-	setVarType(variable, now: sureType, otherBranch: type);
-      });
+    try {
+      (notNullInThen, notNullInElse) = nullnessInfo(condition);
 
-    (?List<(MonoSymbol, mlsub.typing.Monotype)> instanceofInThen,
-	?List<(MonoSymbol, mlsub.typing.Monotype)> instanceofInElse) = 
-      	instanceofInfo(condition);
+      if (notNullInThen != null)
+	notNullInThen.foreach(MonoSymbol variable => {
+	  mlsub.typing.Monotype type = notNull(variable.type);
+	  mlsub.typing.Monotype sureType = makeSure(type);
+	  setVarType(variable, now: sureType, otherBranch: type);
+	});
 
-    if (instanceofInThen != null) 
-      instanceofInThen.foreach( ((MonoSymbol variable, mlsub.typing.Monotype type)) =>
-	setVarType(variable, now: type, otherBranch: variable.type));
-      
-    e.thenExp = thenExp = notNull(thenExp.noOverloading());
-    typecheck(thenExp);
-    // since the type of the variable is destructively changed,
-    // it is important to compute the branch's type and to store it now.
-    thenExp.getType();
+      (instanceofInThen, instanceofInElse) = instanceofInfo(condition);
 
-    enterElse();
+      if (instanceofInThen != null) 
+        instanceofInThen.foreach( ((MonoSymbol variable, mlsub.typing.Monotype type)) =>
+	  setVarType(variable, now: type, otherBranch: variable.type));
+
+      e.thenExp = thenExp = notNull(thenExp.noOverloading());
+      typecheck(thenExp);
+      // since the type of the variable is destructively changed,
+      // it is important to compute the branch's type and to store it now.
+      thenExp.getType();
+    } finally {
+      // Calling this is important for clearning the conditional types stack,
+      // which is good when calling the compiler repeatedly from the same JVM.
+      enterElse();
+    }
 
     if (notNullInElse != null)
       notNullInElse.foreach(MonoSymbol variable => {
@@ -713,31 +718,34 @@ typecheck(l@LoopStmt)
 
   enterIf();
 
-  if (whileExp != null)
-    if (l.isTestFirst)
-      {
-	?List<MonoSymbol> variables = variablesNotNullIfTestSucceeds(whileExp);
-	if (variables != null)
-	  variables.foreach (MonoSymbol variable => 
-			     setVarType(variable, 
-					now: makeSure(variable.type), 
-					out: variable.type));
+  try {
+    if (whileExp != null)
+      if (l.isTestFirst)
+	{
+          ?List<MonoSymbol> variables = variablesNotNullIfTestSucceeds(whileExp);
+	  if (variables != null)
+	    variables.foreach (MonoSymbol variable => 
+			       setVarType(variable, 
+					  now: makeSure(variable.type), 
+					  out: variable.type));
 
-	?List<(MonoSymbol, mlsub.typing.Monotype)> instanceofIfTrue = 
-		first_(instanceofInfo(notNull(whileExp)));
+	  ?List<(MonoSymbol, mlsub.typing.Monotype)> instanceofIfTrue = 
+	    first_(instanceofInfo(notNull(whileExp)));
 
-	if (instanceofIfTrue != null)
-	  instanceofIfTrue.foreach( ((MonoSymbol variable, mlsub.typing.Monotype type)) =>
+	  if (instanceofIfTrue != null)
+	    instanceofIfTrue.foreach( ((MonoSymbol variable, mlsub.typing.Monotype type)) =>
 		setVarType(variable, now: type, out: variable.type));
-      }
+	}
 
-  typecheck(l.loopBody);
-  typecheck(l.iterationStatements);
-
-  // There is no else part in a loop, but this call is necessary to pop off
-  // conditional type information (from assignments) from the stack.
-  enterElse();
-  exitIf();
+    typecheck(l.loopBody);
+    typecheck(l.iterationStatements);
+  }
+  finally {
+    // There is no else part in a loop, but this call is necessary to pop off
+    // conditional type information (from assignments) from the stack.
+    enterElse();
+    exitIf();
+  }
 }
 
 typecheck(b@BreakStmt) {}

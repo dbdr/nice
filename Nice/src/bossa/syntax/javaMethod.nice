@@ -33,9 +33,10 @@ public class JavaMethod extends MethodDeclaration
   /** @return a string that uniquely represents this method */
   getFullName()
   {
-    return "JAVA:" + name + ':' +
-      this.getReflectMethod().getDeclaringClass().getName() + '.' +
-      this.getReflectMethod().getSignature();
+    let reflectMethod = notNull(reflectMethod);
+    return "JAVA:" + reflectMethod.getName() + ':' +
+      reflectMethod.getDeclaringClass().getName() + '.' +
+      reflectMethod.getSignature();
   }
 
   gnu.expr.LambdaExp getLambda() = nice.tools.code.Gen.dereference(this.getCode());

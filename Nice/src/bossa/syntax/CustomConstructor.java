@@ -40,13 +40,23 @@ public abstract class CustomConstructor extends UserOperator
 	  returnType(className), params, Contract.noContract);
   }
 
+  void addConstructorCallSymbol()
+  {
+    mlsub.typing.Polytype type = new mlsub.typing.Polytype
+      (getType().getConstraint(), 
+       new mlsub.typing.FunType(getArgTypes(), PrimitiveType.voidType));
+    classe.addConstructorCallSymbol
+      (new MethodDeclaration.Symbol(name, type) {
+          gnu.expr.Expression compileInCallPosition()
+          {
+            return getInitializationCode();
+          }
+        });
+  }
+
   CustomConstructor(NiceClass def, FormalParameters parameters)
   {
-    super(new LocatedString("<init>", def.definition.location()), 
-          Constraint.True, 
-	  returnType(def.definition.getName()), 
-          parameters, 
-          Contract.noContract);
+    this(def.definition.getName(), parameters);
     classe = def;
   }
 
@@ -67,6 +77,8 @@ public abstract class CustomConstructor extends UserOperator
     // Make sure the constructor is generated.
     getCode();
   }
+
+  abstract gnu.expr.Expression getInitializationCode();
 
   NiceClass classe;
 
@@ -90,6 +102,8 @@ public abstract class CustomConstructor extends UserOperator
       TypeConstructor tc = Node.getGlobalTypeScope().globalLookup(className);
       TypeConstructors.addConstructor(tc, this);
       classe = NiceClass.get(tc);
+
+      addConstructorCallSymbol();
 
       // Save the scopes, since we need them later, but they get null'ed.
       thisScope = scope;
@@ -148,12 +162,20 @@ public abstract class CustomConstructor extends UserOperator
       Gen.setMethodBody(lambda, body.generateCode());
       classe.getClassExp().addMethod(lambda);
       lambda.addBytecodeAttribute(parameters.asBytecodeAttribute());
+      initializationCode = new QuoteExp(new InitializeProc(lambda, true));
 
       return new QuoteExp(new InstantiateProc(lambda));
     }
 
+    gnu.expr.Expression getInitializationCode()
+    {
+      getCode();
+      return initializationCode;
+    }
+
     LocatedString className;
     Statement body;
+    gnu.expr.Expression initializationCode;
   }
 
   /****************************************************************
@@ -183,12 +205,19 @@ public abstract class CustomConstructor extends UserOperator
     void resolve()
     {
       TypeConstructors.addConstructor(classe.definition.tc, this);
+      addConstructorCallSymbol();
     }
 
     protected gnu.expr.Expression computeCode()
     {
       int dummyArgs = method.arg_types.length - arity;
       return new QuoteExp(new InstantiateProc(method, dummyArgs));
+    }
+
+    gnu.expr.Expression getInitializationCode()
+    {
+      int dummyArgs = method.arg_types.length - arity;
+      return new QuoteExp(new InitializeProc(method, true, dummyArgs));
     }
 
     private Method method;

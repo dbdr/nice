@@ -20,7 +20,10 @@ class Point2 { double x; double y; }
 new Point2(double angle, double distance) 
 { this(x: distance * cos(angle), y: distance * sin(angle)); }
 
-/// PASS bug
+/// PASS
+  let p = new Point((0,1));
+  assert abs(p.x - 1) < 0.01 && abs(p.y) < 0.01;
+
   /// Toplevel
 new Point(double angle, double distance) 
 { this(x: distance * cos(angle), y: distance * sin(angle)); }

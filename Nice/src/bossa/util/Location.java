@@ -12,7 +12,7 @@
 
 // File    : Location.java
 // Created : Tue Jul 13 11:55:08 1999 by bonniot
-//$Modified: Wed Aug 02 19:12:14 2000 by Daniel Bonniot $
+//$Modified: Thu Aug 31 16:08:30 2000 by Daniel Bonniot $
 
 package bossa.util;
 
@@ -75,7 +75,7 @@ public class Location implements Located
    */
   public Location(Token start, Token end)
   {
-    this(start.beginColumn, start.beginColumn, end.endLine, end.endColumn);
+    this(start.beginLine, start.beginColumn, end.endLine, end.endColumn);
   }
 
   /** returns the "invalid" location */

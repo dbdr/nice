@@ -1,0 +1,42 @@
+/**************************************************************************/
+/*                                N I C E                                 */
+/*             A high-level object-oriented research language             */
+/*                        (c) Daniel Bonniot 2001                         */
+/*                                                                        */
+/*  This program is free software; you can redistribute it and/or modify  */
+/*  it under the terms of the GNU General Public License as published by  */
+/*  the Free Software Foundation; either version 2 of the License, or     */
+/*  (at your option) any later version.                                   */
+/*                                                                        */
+/**************************************************************************/
+
+package nice.doc;
+
+/**
+   Centralizes information about a program. 
+   It can then be used to parse command line arguments, display help,
+   produce manpages, ...
+
+   @version $Date$
+   @author Daniel Bonniot (bonniot@users.sourceforge.net)
+*/
+
+import nice.getopt;
+
+class Program
+{
+  String name;
+  String longName;
+  String shortDescription;
+  String manualSection;
+  ?String author;
+  ?String seeAlso;
+
+  Sequence<Option> options;
+}
+
+/** Parses the list of strings according to the options,
+    and returns the non-options arguments. */
+Sequence<String> parse(Program prg, Array<String> arguments) = 
+  parse(prg.name, arguments, prg.options);
+

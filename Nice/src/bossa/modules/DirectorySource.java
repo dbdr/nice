@@ -12,7 +12,7 @@
 
 // File    : DirectorySource.java
 // Created : Tue Aug 01 16:24:45 2000 by Daniel Bonniot
-//$Modified: Tue Aug 01 18:53:22 2000 by Daniel Bonniot $
+//$Modified: Tue Oct 03 10:58:41 2000 by Daniel Bonniot $
 
 package bossa.modules;
 
@@ -40,7 +40,7 @@ class DirectorySource extends PackageSource
     this.directory = directory;
   }
 
-  BufferedReader[] getDefinitions(boolean forceReload)
+  Unit[] getDefinitions(boolean forceReload)
   {
     File[] sources = getSources();
     File itf = getInterface();
@@ -50,7 +50,7 @@ class DirectorySource extends PackageSource
     if (!forceReload &&
 	itf != null && 
 	lastModification <= itf.lastModified())
-      return new BufferedReader[]{ read(itf) };
+      return new Unit[]{ new Unit(read(itf), itf.toString()) };
     
     if (sources.length == 0)
       User.error(pkg.name, 
@@ -59,9 +59,9 @@ class DirectorySource extends PackageSource
 		 nice.tools.util.System.prettyPrint(directory));
     
     sourcesRead = true;
-    BufferedReader[] res = new BufferedReader[sources.length];
+    Unit[] res = new Unit[sources.length];
     for(int i = 0; i<res.length; i++)
-      res[i] = read(sources[i]);
+      res[i] = new Unit(read(sources[i]), sources[i].toString());
     
     return res;
   }

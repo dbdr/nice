@@ -12,7 +12,7 @@
 
 // File    : JarSource.java
 // Created : Tue Aug 01 16:57:33 2000 by Daniel Bonniot
-//$Modified: Tue Aug 01 18:55:46 2000 by Daniel Bonniot $
+//$Modified: Tue Oct 03 10:54:34 2000 by Daniel Bonniot $
 
 package bossa.modules;
 
@@ -55,7 +55,7 @@ class JarSource extends PackageSource
     this.bytecodeEntry = bytecodeEntry;
   }
 
-  BufferedReader[] getDefinitions(boolean forceReload)
+  Unit[] getDefinitions(boolean forceReload)
   {
     BufferedReader res = null;
 
@@ -71,7 +71,7 @@ class JarSource extends PackageSource
 		 "Error reading archive " + getName());
     }
     
-    return new BufferedReader[]{ res };
+    return new Unit[]{ new Unit(res, pkg.name.toString()) };
   }
 
   InputStream getBytecodeStream()

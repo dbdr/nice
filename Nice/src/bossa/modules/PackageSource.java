@@ -12,7 +12,6 @@
 
 // File    : PackageSource.java
 // Created : Tue Aug 01 16:18:53 2000 by Daniel Bonniot
-//$Modified: Tue Aug 01 18:32:57 2000 by Daniel Bonniot $
 
 package bossa.modules;
 
@@ -20,14 +19,26 @@ import bossa.util.*;
 import java.io.*;
 
 /**
- * An abstract package source.
- * 
- * @author Daniel Bonniot
+   An abstract package source, where source or interface files 
+   and compiled code if applicable can be found.
+   
+   @version $Date$
+   @author Daniel Bonniot
  */
 
 abstract class PackageSource
 {
-  abstract BufferedReader[] getDefinitions(boolean forceReload);
+  protected class Unit
+  {
+    protected Unit(BufferedReader reader, String name)
+    {
+      this.reader = reader;
+      this.name = name;
+    }
+    BufferedReader reader;
+    String name;
+  }
+  abstract Unit[] getDefinitions(boolean forceReload);
 
   long lastModification;
 
@@ -35,13 +46,15 @@ abstract class PackageSource
   
   gnu.bytecode.ClassType bytecode;
 
-  /** return the directory in which to place generated files from this package. */
+  /** @return the directory in which to place generated files 
+      of this package. 
+  */
   abstract File getOutputDirectory();
 
-  /** 
-      Return an IntputStream to read the existing bytecode, or null. 
-      
-      The bytecode here existed before the current compilation.
+  /**
+     Return an IntputStream to read the existing bytecode, or null. 
+     
+     The bytecode here existed before the current compilation.
   */
   abstract InputStream getBytecodeStream();
   

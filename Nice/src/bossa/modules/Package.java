@@ -147,11 +147,9 @@ public class Package implements mlsub.compilation.Module, Located
     if (Debug.passes)
       Debug.println(this + ": parsing " + source.getName());
 
-    BufferedReader[] readers = source.getDefinitions(forceReload);
+    PackageSource.Unit[] readers = source.getDefinitions(forceReload);
     if(source.sourcesRead)
       sourcesRead();
-    
-    bossa.util.Location.currentFile = toString();
     
     for(int i = 0; i<readers.length; i++)
       read(readers[i], definitions);
@@ -195,10 +193,12 @@ public class Package implements mlsub.compilation.Module, Located
     return definitions;
   }
   
-  private void read(BufferedReader reader, List definitions)
+  private void read(PackageSource.Unit unit, List definitions)
   {
+    bossa.util.Location.currentFile = unit.name;
+
     LocatedString pkgName = 
-      bossa.parser.Loader.open(reader,
+      bossa.parser.Loader.open(unit.reader,
 			       definitions, imports, opens);
     if (pkgName!=null && !pkgName.equals(this.name))
       User.error(pkgName,

@@ -37,4 +37,8 @@ interface CompilationListener
       (testing dispatch, creating the archive, compiling to native code, ...).
   */
   void progress(String packageName, String phase);
+
+  /** Gives an approximation of how much of the compilation has been completed.
+  */
+  void progress(float percent);
 }

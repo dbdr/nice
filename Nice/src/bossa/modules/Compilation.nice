@@ -112,6 +112,32 @@ class Compilation extends CompilationInterface
   {
     listener.progress(notNull(pkg).getName(), notNull(phase));
   }
+
+  /****************************************************************
+   * Approximation of how far the compilation has gone.
+   ****************************************************************/
+
+  /** We wight each package by its number of declarations divided by 
+      the total number. 
+  */
+  int totalNumberOfDeclarations = 0;
+
+  getNumberOfDeclarations() = totalNumberOfDeclarations;
+
+  addNumberOfDeclarations(n)
+  {
+    totalNumberOfDeclarations += n;
+  }
+
+  /** We accumulate the progress, because we want to report the total so far.
+   */
+  float totalProgress = 0;
+
+  addProgress(weight)
+  {
+    totalProgress += weight / totalNumberOfDeclarations;
+    listener.progress(totalProgress * 100);
+  }
 }
 
 Compilation createCompilation(CompilationListener listener) = 

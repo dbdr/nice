@@ -121,6 +121,7 @@ public class Package implements mlsub.compilation.Module, Located, bossa.syntax.
     compilation.progress(this, "parsing");
 
     this.ast = new AST(this, source.getDefinitions(shouldReload));
+    compilation.addNumberOfDeclarations(ast.numberOfDeclarations());
 
     if (compiling())
       // Inform compilation that at least one package is going to generate code
@@ -197,6 +198,33 @@ public class Package implements mlsub.compilation.Module, Located, bossa.syntax.
   }
 
   /****************************************************************
+   * Progress
+   ****************************************************************/
+
+  /** The average contribution to compile time of the different phases.
+      The sum should be 1.0 
+  */
+  private static float
+    PROGRESS_SCOPE           = 0.04f,
+    PROGRESS_LOAD            = 0.04f,
+    PROGRESS_TYPED_RESOLVE   = 0.04f,
+    PROGRESS_LOCAL_RESOLVE   = 0.04f,
+    PROGRESS_TYPECHECK       = 0.50f,
+    PROGRESS_GENERATE_CODE   = 0.10f,
+    PROGRESS_SAVE_INTERFACE  = 0.04f,
+    PROGRESS_LINK            = 0.20f;
+
+  void addProgress(float weight)
+  {
+    compilation.addProgress(weight * ast.numberOfDeclarations());
+  }
+
+  void addGlobalProgress(float weight)
+  {
+    compilation.addProgress(weight * compilation.getNumberOfDeclarations());
+  }
+
+  /****************************************************************
    * Passes
    ****************************************************************/
 
@@ -208,6 +236,8 @@ public class Package implements mlsub.compilation.Module, Located, bossa.syntax.
     scoped = true;
 
     ast.buildScope();
+
+    addProgress(PROGRESS_SCOPE);
   }
   
   public void load()
@@ -217,24 +247,38 @@ public class Package implements mlsub.compilation.Module, Located, bossa.syntax.
     // this must be done before freezing
     if (!compiling())
       readAlternatives();
+
+    addProgress(PROGRESS_LOAD);
   }
 
   public void typedResolve()
   {
     ast.typedResolve();
+
+    addProgress(PROGRESS_TYPED_RESOLVE);
   }
 
   public void localResolve()
   {
     ast.localResolve();
+
+    addProgress(PROGRESS_LOCAL_RESOLVE);
   }
 
   public void compile()
   {
     typecheck();
+
+    addProgress(PROGRESS_TYPECHECK);
+
     compilation.exitIfErrors();
     generateCode();
+
+    addProgress(PROGRESS_GENERATE_CODE);
+
     saveInterface();
+
+    addProgress(PROGRESS_SAVE_INTERFACE);
   }
 
   public static void startNewCompilation()
@@ -299,6 +343,8 @@ public class Package implements mlsub.compilation.Module, Located, bossa.syntax.
     
 	compilation.exitIfErrors();
       }
+
+    addGlobalProgress(PROGRESS_LINK);
 
     // Write the archive even if nothing was compiled.
     // This is useful to bundle the application after it was compiled.

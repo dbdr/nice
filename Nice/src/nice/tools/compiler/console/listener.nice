@@ -43,6 +43,11 @@ public final class ConsoleOutput implements CompilationListener
       println(phase);
   }
 
+  progress(percent)
+  {
+    // This is not reported to the console.
+  }
+
   warning(location, message)
   {
     this.setStatusCode(WARNING);

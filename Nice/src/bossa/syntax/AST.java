@@ -178,7 +178,12 @@ public class AST extends Node
   
   public String toString()
   {
-    return "Abstract Syntax Tree ("+children.size()+" definitions)";
+    return "Abstract Syntax Tree (" + numberOfDeclarations() +" declarations)";
+  }
+
+  public int numberOfDeclarations()
+  {
+    return children.size();
   }
 
   private Module module;

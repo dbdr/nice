@@ -28,5 +28,9 @@ public abstract class CompilationInterface
   public abstract void exitIfErrors();
 
   public abstract void progress(Package pkg, String phase);
+
+  public abstract void addNumberOfDeclarations(int number);
+  public abstract int  getNumberOfDeclarations();
+  public abstract void addProgress(float weight);
 }
 

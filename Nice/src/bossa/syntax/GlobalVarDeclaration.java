@@ -132,15 +132,21 @@ public class GlobalVarDeclaration extends Definition
    * Code generation
    ****************************************************************/
 
-  public void compile()
+  public void precompile()
   {
+    // Compute the value first, and this might use another global value,
+    // which will then be properly initialized before use.
+    gnu.expr.Expression value = 
+      this.value != null ? this.value.compile() : null;
+
     gnu.expr.Declaration declaration = left.getDeclaration();
     if (constant) declaration.setFlag(Declaration.IS_CONSTANT);
 
-    if (value == null)
-      declaration.noteValue(null);
-    else
-      declaration.noteValue(value.compile());
+    declaration.noteValue(value);
+  }
+
+  public void compile()
+  {
   }
 
   /****************************************************************

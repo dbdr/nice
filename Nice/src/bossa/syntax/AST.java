@@ -41,6 +41,7 @@ public class AST extends Node
   {
     ArrayList classes = new ArrayList(children.size());
     ArrayList methods = new ArrayList(children.size());
+    ArrayList globals = new ArrayList(10);
 
     for(Iterator i = children.iterator(); i.hasNext();)
       {
@@ -51,6 +52,8 @@ public class AST extends Node
           methods.add(node);
         else if (node instanceof EnumDefinition)
           classes.add(((EnumDefinition)node).classDef);
+        else if (node instanceof GlobalVarDeclaration)
+          globals.add(node);
       }
 
     this.classes = (ClassDefinition[]) 
@@ -58,6 +61,9 @@ public class AST extends Node
 
     this.methods = (MethodDeclaration[]) 
       methods.toArray(new MethodDeclaration[methods.size()]);
+
+    this.globals = (GlobalVarDeclaration[])
+      globals.toArray(new GlobalVarDeclaration[globals.size()]);
   }
   
   public void buildScope()
@@ -176,6 +182,11 @@ public class AST extends Node
       }
     else
       {
+        // Globals are compiled first, so that we can find out their 
+        // dependencies, and initialize them in the right order.
+	for (int i = 0; i < globals.length; i++)
+	  globals[i].precompile();
+
 	for(Iterator i = children.iterator();i.hasNext();)
 	  ((Definition)i.next()).compile();
       }
@@ -194,5 +205,6 @@ public class AST extends Node
   private Module module;
   private ClassDefinition[] classes;
   private MethodDeclaration[] methods;
+  private GlobalVarDeclaration[] globals;
 }
 

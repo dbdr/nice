@@ -111,3 +111,35 @@ var Map<String,String> classMap = (()=> {
   let char x = 'x';
   /// package b import a
   ;
+
+/// PASS
+  check();
+  /// Toplevel
+void check()
+{
+  assert QNAME.b != null;
+}
+
+let String A = "A";
+let String B = A + ".B";
+
+let QualifiedName QNAME = new QualifiedName(a: A, b: B);
+
+class QualifiedName { String a; String b; }
+
+/// PASS
+  check();
+  /// Toplevel
+void check()
+{
+  assert QNAME.b != null;
+}
+
+let String B = AA + ".B";
+let String AA = A + ".A";
+let String A = "A";
+
+let QualifiedName QNAME = new QualifiedName(a: A, b: B);
+
+class QualifiedName { String a; String b; }
+

@@ -402,7 +402,7 @@ public class Compilation
 		    Number num = (Number) value;
 		    switch (sig1)
 		      {
-		      case 'B':  case 'S':  case 'I':
+		      case 'B':  case 'S':  case 'I': case 'C':
 			code.emitPushInt(num.intValue());
 			return;
 		      case 'J':
@@ -415,6 +415,14 @@ public class Compilation
 			code.emitPushDouble(num.doubleValue());
 			return;
 		      }
+		  }
+		else if (value instanceof Character)
+		  {
+		    if (sig1 == 'C' || sig1 == 'I' || sig1 == 'J')
+		      {
+			code.emitPushInt(((Character) value).charValue());
+			return;
+		      }		    
 		  }
 		if (sig1 == 'C')
 		  {

@@ -14,9 +14,11 @@ NICEJAR=/usr/share/java/nice.jar
 javac = javac
 #javac = jikes
 
+JAVAC_FLAGS = -O -g
+
 # Compile with stable version
-JC=${javac} -classpath "${TOP}/classes:${NICEJAR}" -sourcepath "${TOP}/src" -d "${TOP}/classes" -O -g
-JAVAC=  ${javac} -classpath "${TOP}/classes:${TOP}/src:${TOP}/stdlib" -sourcepath "${TOP}/src" -d "${TOP}/classes" -O -g
+JC=${javac} -classpath "${TOP}/classes:${NICEJAR}" -sourcepath "${TOP}/src" -d "${TOP}/classes" $(JAVAC_FLAGS)
+JAVAC=  ${javac} -classpath "${TOP}/classes:${TOP}/src:${TOP}/stdlib" -sourcepath "${TOP}/src" -d "${TOP}/classes" $(JAVAC_FLAGS)
 JAVACC= CLASSPATH="${TOP}/external/JavaCC.zip:${CLASSPATH}" java COM.sun.labs.javacc.Main
 JAVADOC=javadoc #-linkoffline file:///C%7C/Apps/jdk1.2.1/docs/api file:///usr/opt/java122/docs/api
 

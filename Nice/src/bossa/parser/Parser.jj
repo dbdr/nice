@@ -160,7 +160,7 @@ TOKEN: /* Keywords */
 
 | < AT:         "@"          	>
 | < EXACTLY_AT: "#"          	>
-| < ANY_:	"Any"        	>
+| < ANY_:	"Any"        	> /* Nice specific */
 
 // Expressions
 //| < ASSERT:     "assert"     	>
@@ -171,8 +171,8 @@ TOKEN: /* Keywords */
 | < DO:		"do"		>
 //| < TRUE:       "true"       	>
 //| < FALSE:      "false"      	>
-| < FUN:        "fun"        	>
-| < ALIKE:      "alike"      	>
+| < FUN:        "fun"        	> /* Nice specific */
+| < ALIKE:      "alike"      	> /* Nice specific */
 //| < THIS:       "this"       	>
 //| < INSTANCEOF: "instanceof" 	>
 | < NEW:        "new"        	>
@@ -180,7 +180,7 @@ TOKEN: /* Keywords */
 
 // Statements
 | < RETURN:     "return"     	>
-| < VARIABLE:   "var"   	>
+| < VARIABLE:   "var"   	> /* Nice specific */
 
 // modifiers
 | < PUBLIC:     "public"     	>
@@ -188,10 +188,10 @@ TOKEN: /* Keywords */
 | < PROTECTED:  "protected"  	>
 | < STATIC:     "static"     	>
 | < FINAL:      "final"      	>
-| < NATIVE:     "native"     	>
-| < INLINE:     "inline"        >
+| < NATIVE:     "native"     	> /* Nice specific */
+| < INLINE:     "inline"        > /* Nice specific */
 | < ABSTRACT:   "abstract"   	>
-| < LOCAL:      "local"      	>
+| < LOCAL:      "local"      	> /* Nice specific */
 
 // exceptions
 | < THROW:	"throw"		>
@@ -389,16 +389,41 @@ LocatedString methodName():
   { return res; }
 }
 
+/* This allows idents as well as nice specific keywords,
+   which is useful to specify native java package, class or method names
+*/
+Token doted_string_component():
+{
+  Token t;
+}
+{
+  ( t = <IDENT> 
+  | t = "Any"
+  | t = "fun"
+  | t = "alike"
+  | t = "var"
+  | t = "inline" 
+  | t = "native" 
+  )
+  { return t; }
+}
+
 LocatedString doted_string():
 {
   Token t;
-  String image;
+  StringBuffer image;
   Location loc;
 }
 {
-  t=<IDENT> { image=t.image; loc = new Location(t); }
-    ( "." t=<IDENT> {image+="."+t.image; loc.englobe(new Location(t)); } ) *
-  { return new LocatedString(image,loc); }
+  t = <IDENT>
+  { image = new StringBuffer(t.image); loc = new Location(t); }
+
+  ( "." t=doted_string_component() 
+    { image.append(".").append(t.image); 
+      loc.englobe(new Location(t)); } 
+  )*
+
+  { return new LocatedString(image.toString(), loc); }
 }
 
 LocatedString doted_array_string():

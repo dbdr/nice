@@ -54,3 +54,10 @@ class C<T,V> extends A<V, String, T> {}
   class B extends A<String> {
     int x;
   }
+
+/// PASS bug
+  /// Toplevel
+  class A<T> {}
+  class B extends A<String> {
+    void foo() {}
+  }

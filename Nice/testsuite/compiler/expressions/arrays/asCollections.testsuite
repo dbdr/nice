@@ -19,3 +19,18 @@
   class B<T> extends A<T> {
     int size() = this.elements.size();
   }
+
+
+/// COMMENT the next two bugs should be fixable by using the
+/// COMMENT instanciatedDomain in bossa.syntax call.nice even when the
+/// COMMENT result type is not polymorhic, but the function call is.
+
+/// PASS bug
+  int[][] l = [[0,1],[1,2]];
+  let bar = l.map(List<int> x => x[1]);
+
+/// PASS bug
+  int[][] l = [[0,1],[1,2]];
+  use(l, List<int> list => {});
+  /// Toplevel
+<T> void use(T[] l, T->void f) = f(l[0]);

@@ -178,8 +178,8 @@ abstract public class Node
     return globalScope;
   }
   
-  private static TypeScope globalTypeScope;
-  public static final TypeScope getGlobalTypeScope()
+  private static GlobalTypeScope globalTypeScope;
+  public static final GlobalTypeScope getGlobalTypeScope()
   {
     return globalTypeScope;
   }
@@ -188,11 +188,11 @@ abstract public class Node
   {
     // For multiple compilations in the same JVM:
     // If we are starting a new compilation, reset the global scopes.
-    if (TypeScope.compilation != module.compilation())
+    if (GlobalTypeScope.compilation != module.compilation())
       {
-	TypeScope.compilation = module.compilation();
+	GlobalTypeScope.compilation = module.compilation();
 	globalScope = new VarScope(null);
-	globalTypeScope= new TypeScope(null);
+	globalTypeScope= new GlobalTypeScope();
       }
     globalTypeScope.module = module;
     

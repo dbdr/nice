@@ -40,7 +40,11 @@ abstract class PackageSource
   }
   abstract Unit[] getDefinitions(boolean forceReload);
 
-  long lastModification, lastCompilation;
+  /** Date of the last modification of the source of this package. */
+  long lastModification;
+
+  /** Date of the last succesful compileation of this package. */
+  long lastCompilation;
 
   boolean sourcesRead;
   

@@ -123,11 +123,10 @@ public class InlinedMethod extends MethodDeclaration
   {
     String inlinedMethodsRepository = System.getProperty("nice.inlined");
     if (inlinedMethodsRepository != null)
-      try {
-        inlinedMethodsRepository = "file://" + 
-          new java.io.File(inlinedMethodsRepository).getAbsolutePath() + '/';
-        loader = new java.net.URLClassLoader
-          (new java.net.URL[]{ new java.net.URL(inlinedMethodsRepository) })
+      {
+        loader = new nice.tools.util.DirectoryClassLoader
+          (new java.io.File[]{ new java.io.File(inlinedMethodsRepository) },
+           null)
           {
             protected Class loadClass(String name, boolean resolve)
               throws ClassNotFoundException
@@ -161,11 +160,6 @@ public class InlinedMethod extends MethodDeclaration
               return res;
             }
           };
-      }
-      catch (java.net.MalformedURLException ex) {
-        bossa.util.Internal.warning
-          ("Incorrect location for inlined methods: " + 
-           inlinedMethodsRepository);
       }
   }
 

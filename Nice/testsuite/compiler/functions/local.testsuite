@@ -11,3 +11,12 @@
   } 
   f2(4); 
   assert x==5;
+
+/// COMMENT A local function returns any type iff it never returns
+/// COMMENT normally (e.g. always throws an exception).
+
+/// PASS
+  String f(int i) { throw new Error(); }
+
+/// FAIL
+  String f(int i) { if (false) throw new Error(); }

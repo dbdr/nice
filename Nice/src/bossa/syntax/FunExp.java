@@ -82,7 +82,16 @@ public class FunExp extends Expression implements Function
   {
     if (inferredReturnType == null)
       // There is not return statement in the function.
-      inferredReturnType = PrimitiveType.voidPolytype;
+      {
+        if (alwaysReturns)
+          /* This function never returns normally since there was no 
+             inferredReturnType, so it always throws an exception.
+             Therefore, it can be considered to return any type.
+          */
+          inferredReturnType = Polytype.bottom();
+        else
+          inferredReturnType = PrimitiveType.voidPolytype;
+      }
     else
       if (! alwaysReturns && 
 	  ! nice.tools.code.Types.isVoid(inferredReturnType))

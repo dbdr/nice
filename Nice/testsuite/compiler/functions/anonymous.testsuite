@@ -64,3 +64,12 @@ index.toString());
   else 
     /* /// FAIL HERE */ return ""; 
   };
+
+/// COMMENT An anonymous function returns any type iff it never returns
+/// COMMENT normally (e.g. always throws an exception).
+
+/// PASS
+  int->String f = int i => throw new Error();
+
+/// FAIL
+  int->String f = int i => { if (false) throw new Error(); };

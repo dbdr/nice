@@ -44,7 +44,7 @@ save it as <literal>/tmp/Nice.tar</literal>.
 <para>
 Uncompress the archive:
 <programlisting>
-cd /usr
+cd /usr/local
 tar xf /tmp/Nice.tar
 </programlisting>
 </para>
@@ -80,8 +80,9 @@ the <ulink url="nicec.bat">nicec.bat</ulink> file contributed by Jamie McCrindle
 Further documentation is needed.
 </para>
 <para>
-If you use Emacs, you should also 
-<link linkend="emacs">install the &nice; mode</link>.
+<ulink url="http://www.gnu.org/software/emacs/windows/">Emacs for Windows</ulink> is a good editor for Nice programs. 
+If you use it, 
+you should also <link linkend="emacs">install the &nice; mode</link>.
 </para>
 </section>
 

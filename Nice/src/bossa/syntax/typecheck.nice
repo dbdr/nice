@@ -45,7 +45,7 @@ typecheck(e@AssignExp)
     checkAssignment(to.getType(), notNull(e.value));
   }
   catch(TypingEx t){
-    ?MonoSymbol variable = monoSymbol(to);
+    ?MonoSymbol variable = localVariable(to);
     if (variable != null)
       if (hasConditionalType(variable) && isNullError(t)) {
       try
@@ -76,16 +76,6 @@ typecheck(e@AssignExp)
     throw assignmentError(e, to.toString(), 
 			  to.getType().toString(), notNull(e.value));
   }
-}
-
-?MonoSymbol monoSymbol(Expression);
-monoSymbol(e) = null;
-monoSymbol(e@SymbolExp)
-{
-  if (e.getSymbol() instanceof bossa.syntax.MonoSymbol)
-    return cast(e.getSymbol());
-  else
-    return null;
 }
 
 boolean hasConditionalType(MonoSymbol v)

@@ -148,6 +148,13 @@ public class TestNice {
 
 
 	/**
+		 Whether to wait at the end of the run.
+		 This is useful for profiling memory after all the work is done,
+		 using a debugger/memory profiler.
+	*/ 
+	private static boolean _wait;
+
+	/**
 	 * Classpath entry that contains the Nice standard library.
 	 * 
 	 * This is only needed when the testsuite is not run from a JVM
@@ -194,11 +201,22 @@ public class TestNice {
 		} catch(TestSuiteException e) {
 			e.printStackTrace();
 		}
+
+		if (_wait)
+			{
+				reclaimMemory(true);
+
+				System.out.println("Test finished.\nPress return to terminate:");
+				try {
+					new DataInputStream(System.in).readLine();
+				}
+				catch (IOException e) {}
+			}
+        
 		_output.endApplication();
 		
 		//	close writer
 		_output.close();
-
 
 		if (getTestCasesFailed() > 0)
 			System.exit(1);
@@ -209,7 +227,28 @@ public class TestNice {
 		System.exit(0);
 	}
 
+	private static void reclaimMemory(boolean clear)
+	{
+		// Reclaim memory.
+		bossa.modules.Package.startNewCompilation();
+		mlsub.typing.NullnessKind.setSure(null);
+		mlsub.typing.NullnessKind.setMaybe(null);
 
+		// Create an OutOfMemoryError, so that soft references are also let loose.
+		if (clear)
+			try {
+				int[] l = new int[1000];
+				for (;;)
+					{
+						l = new int[l.length * 2];
+					}
+			}
+			catch (OutOfMemoryError e) {}
+
+		System.gc();
+
+		nice.tools.compiler.console.fun.printMemoryUsage();
+	}
 
 	/**
 	 * Processes the command line arguments. Returns true if everything is ok.
@@ -227,6 +266,8 @@ public class TestNice {
 					_writeComments = true;
 				else if ("-runtime".equalsIgnoreCase(s))
 					_runtime = args[i++];
+				else if ("-wait".equalsIgnoreCase(s))
+					_wait = true;
 				else
 					return false;
 			} else
@@ -554,4 +595,5 @@ public class TestNice {
 
 // Local Variables:
 // tab-width: 2
+// indent-tabs-mode: t
 // End:

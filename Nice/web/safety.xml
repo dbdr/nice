@@ -1,0 +1,558 @@
+<?xml version="1.0" standalone="no"?>
+<!DOCTYPE website PUBLIC "-//Norman Walsh//DTD Website V2.0b1//EN"
+          "http://docbook.sourceforge.net/release/website/2.0b1/website.dtd" [
+<!ENTITY nice "Nice">
+<!ENTITY java "Java">
+]>
+<webpage id="safety">
+<config param="footlink" value="home" altval="Home"/>
+<config param="desc" value="Why programs written in Nice have less bugs"/>
+<config param="rcsdate" value="$Date$"/>
+<head>
+<title>Type safety in &nice;</title>
+<summary>Introduction</summary>
+<keywords>nice, safety, java, null pointer, exception, cast</keywords>
+</head>
+
+<section><title>Introduction</title>
+
+<para>
+Programming is a complex and error prone task. The most obvious
+consequence of this fact is the presence of bugs in programs. Every
+user can experience that, for most softwares, there are are ways to
+use it that lead to inappropriate results, internal error messages or
+even termination of the program, if not of the whole computer. A
+hidden consequence of bugs is a large amount amount of effort, time
+and money spent in tracking and solving them.
+</para>
+
+<para>
+Some bugs are due to an error in the global conception of the
+program. These can only be solved -- or better, prevented -- by clever
+programmers using adequate design methods and appropriate
+testing. However, many bugs come from small mistakes. Every programmer
+will sometimes forget to initialize a variable, omit an argument to a
+function, ... The fact is that Man is capable of complex abstract
+thinking, but rather bad at checking small but numerous
+details. Luckily computers are precisely the opposite: poor at
+thinking, tremendously efficient at tedious tasks. 
+</para>
+
+<para>
+This observation naturally leads to our motto: that 
+<emphasis>programming languages should rule out as many trivial errors 
+from programs as possible</emphasis>. The programmer can then
+concentrate on higher level issues. The degree in which a language
+guarantees that a correct program while not fail at runtime is
+sometimes called <emphasis>static safety</emphasis>. 
+All in all, this approach can lead to easier to create 
+and more reliable software.
+</para>
+
+<para>
+We shall first look at a few advances that have been made in the past
+in this direction. Then we will see how Nice improves on existing
+languages in this respect.
+</para>
+
+</section>
+<section><title>Existing safety features</title>
+
+<para>
+Let us first distinguish different kinds of errors in a program, in
+decreasing order of severity:
+<variablelist>
+<varlistentry><term>Run Time Crashes</term>
+<listitem>
+<para>
+The program is abruptly terminated by the
+Operating System, or hangs the computer
+<footnote><para>In a decent operating system a program should of course 
+not be able to hang the computer.</para></footnote>.
+</para>
+</listitem>
+</varlistentry>
+<varlistentry><term>Run Time Error</term>
+<listitem>
+<para>
+An incorrect behavior is detected during the program execution. 
+In the least, this allows for graceful termination of the program. 
+Better, only some feature of the program is out of order, 
+but the execution continues normally. 
+This is the case in a language with exceptions,
+if the program catches the exception and is able to recover.
+</para>
+</listitem>
+</varlistentry>
+<varlistentry><term>Compile Time Error</term>
+<listitem>
+<para>
+The compiler detects a problem, and refuses to generate the
+executable version of the program. The compiler should also
+locate and describe the error to ease the correction by the
+programmer. 
+</para>
+</listitem>
+</varlistentry>
+</variablelist>
+</para>
+
+<para>
+The use of types prevents from mixing up numbers, strings, booleans,
+arrays and user-defined data. 
+</para>
+
+<para>
+All run time crashes can be converted to run time errors, 
+which is unarguably an improvement of
+the safety. This typically involves checking at run time all
+possibly invalid code before executing it. An example is checking that
+an access to an array lies inside its bounds. 
+These checks can either be inserted in the generated code, or done by
+an interpreter.
+</para>
+
+<para>
+This is roughly the situation today for mainstream languages
+today. While it has improved since, say, the C programming language,
+there are still many run time errors that can occur. 
+Now let us see how &nice; can
+transform many of these run time errors into compile time errors, 
+thus improving safety.
+</para>
+
+
+
+</section>
+<section><title>Advanced safety features in Nice</title>
+
+<section><title>Casts (<javaexn name="ClassCastException"/>)</title>
+<para>
+&java; allow casts of the form: <literal>(T) e</literal>. 
+At compile time, this assumes that <literal>e</literal> has type
+<literal>T</literal>. 
+At run time, if <literal>e</literal> does not evaluate to a value of type 
+<literal>T</literal>, a <javaexn name="ClassCastException"/> is thrown.
+In this case, there is usually nothing that can be done to recover
+from the situation: the code that follows relies on the fact that
+<literal>e</literal> has indeed type <literal>T</literal>. Therefore
+<javaexn name="ClassCastException"/>s are usually not caught before 
+the very top level of the program, making at least a whole feature to fail.
+It would be great to ensure that no vast can fail. Even better, not
+to have casts at all.
+</para>
+
+<para>
+So why does &java; allow casts? It needs them, because its type system
+is too limited. &nice; has a powerful type system and no casts. So let
+us look at the different uses of casts in &java; and their cast-free
+equivalent in &nice;.
+</para>
+
+<section><title>Collections</title>
+<para>
+One of the limitations of &java; is the absence of genericity: classes
+and methods cannot have type parameters. Casts are often a poor way to
+make up for this absence. Here is the example of a stack in &java;:
+</para>
+
+<para>
+<programlisting lang="java">
+interface Stack
+{
+  void push(Object element);
+  Object pop();
+}
+
+Stack st = new StackImpl(); // we want a stack of strings
+st.push("Element A");
+st.push(new Object()); // invalid code, but not detected
+...
+String s = (String) st.pop(); // throws a <javaexn name="ClassCastException"/>
+</programlisting>
+</para>
+
+<para>
+A few remarks on this &java; code:
+<itemizedlist>
+<listitem><para>
+   there is no way to specify that the stack should only contain
+   strings
+</para></listitem>
+<listitem><para>
+   this forces to cast every element pop'ed out of the stack
+</para></listitem>
+<listitem><para>
+   the invalid push is not detected at compile time. Much worse, it
+   will not even fail at runtime. On the contrary, the error occurs at
+   the pop line, which is perfectly valid. It might require a good
+   debugger and fair amount of time to track down where an invalid
+   element was pushed on the stack.
+</para></listitem>
+</itemizedlist>
+</para>
+
+<para>
+Here here the equivalent in &nice;, using a parameterized interface:
+</para>
+
+<para>
+<programlisting lang="nice">
+interface Stack&lt;T>
+{
+  void push(T element);
+  T pop();
+}
+
+Stack&lt;String> st = new StackImpl();
+st.push("Element A");
+//st.push(new Object()); // type error
+...
+String s = st.pop(); // no cast needed
+</programlisting>
+</para>
+
+<para>
+&nice; is not the only alternative to &java; with parameterized
+classes. See for instance GJ, which puts a strong emphasis on
+compatibility with &java;. However we shall now move on to other 
+features of &nice; and that are not present in other languages,
+and that are give higher safety and power.
+</para>
+</section>
+
+<section><title>Multiple dispatch</title>
+<para>
+In most object-oriented languages, methods are selected at run time
+depending on the class of the first argument. Because this first
+argument has such a distinct role, it is syntaxically separated from
+the others, and place before the name of the method, before a
+dot. However, it is sometimes necessary to select a method depending
+on <emphasis>several</emphasis> arguments. Here is a typical example,
+defining the <function>equals</function> method for a user-defined class:
+</para>
+
+<para>
+<programlisting lang="java">
+class Object
+{
+  boolean equals(Object that)
+  {
+    return this == that;
+  }
+}
+
+class Person extends Object 
+{
+  String name;
+  int age;
+
+  boolean equals(Object that)
+  {
+    if(!(that instanceof Person))
+      return false;
+    return 
+       name.equals(((Person) that).name)
+       &amp;&amp; age==((Person) that).age;
+  }
+}
+</programlisting>
+</para>
+
+<para>
+Ideally, we would only want to define the value of <function>equals</function>
+when both arguments are of this class. When it is not the case, we
+would rely on other code for deciding equality.
+This is possible using <emphasis>multiple dispatch</emphasis>
+<footnote><para>Multiple dispatch has other benefits that are not 
+closely related to safety.
+In particular, it allows for the addition of methods to pre-existing
+classes. This is important to fully achieve modular
+programming.</para></footnote>, 
+which is present in &nice;. Here is the &nice; code.
+</para>
+
+<para>
+<programlisting lang="nice">
+&lt;Any T> boolean equals(T this, T that);
+
+// default implementation
+equals(this, that) = this == that;
+
+class Person
+{
+  String name;
+  int age;
+
+  boolean equals(that@Person)
+  {
+    return 
+       this.name.equals(that.name)
+       &amp;&amp; this.age == that.age;
+  }
+}
+</programlisting>
+</para>
+</section>
+
+<section><title><literal>Instanceof</literal></title>
+<para>
+Casts are not always used to overcome limitations of the type
+system. They can also be used in conjunction with run time type
+testing to write code that depends on the class of a value. For
+instance, suppose we want to access the list of children of a GUI
+component, but not all components have a children property:
+</para>
+
+<para>
+<programlisting lang="java">
+Component c = ...;
+
+List children;
+if (c instanceof ContainerComponent)
+  children = ((ContainerComponent) c).getChildren();
+else
+  children = null;
+</programlisting>
+</para>
+
+<para>
+There are two possibilities in &nice; :
+</para>
+
+<orderedlist numeration="loweralpha">
+<listitem><para>create a method</para>
+
+<para>
+This is impossible in &java; because methods can only be defined
+inside the class they deal with. &nice; allows methods to be defined
+directly at the toplevel of a package. Thus we can define a
+children method that operates on all components, and that returns
+null if the argument is not a container:
+</para>
+
+<para>
+<programlisting lang="nice">
+private List&lt;Component> children(Component);
+
+children(c@Component) = null;
+children(c@ContainerComponent) = c.getChildren();
+</programlisting>
+</para>
+
+<para>
+We can now write our example with only:
+<programlisting lang="nice">
+Component c = ...;
+
+List&lt;Component> children = children(c);
+</programlisting>
+</para>
+
+<para>
+This is especially useful if this code occurs at many places.
+We shall now see the alternative, which matches very closely the
+&java; version, and is practical if the code is rare.
+</para>
+
+</listitem>
+<listitem>
+<para>safe version of <literal>instanceof</literal>  (work in progress)</para>
+
+<para>
+The idea here is simply that just after an <literal>instanceof</literal> 
+test, the compiler
+can automatically adjust the type of the variable tested to take into
+account that the test succeeded. Therefore, the cast is completely
+useless; there is no reason to ask the programmer to write
+it. Therefore, it is perfectly legal in &nice; to write:
+<programlisting lang="nice">
+Component c = ...;
+
+List&lt;Component> children;
+if (c instanceof ContainerComponent)
+  children = c.getChildren();
+else
+  children = null;
+</programlisting>
+</para>
+
+<para>
+In the first branch of the <literal>if</literal> test, <literal>c</literal> has
+type <classname>ContainerComponent</classname>. 
+The compiler then checks that <function>getChildren</function> 
+can be called safely.
+</para>
+
+<para>
+This feature is being worked on. It is not present in the last
+released version of the compiler.
+</para>
+</listitem>
+</orderedlist>
+
+</section>
+
+</section>
+
+<section><title>Null pointers (<javaexn name="NullPointerException"/>)</title>
+<para>
+In current imperative languages, references (or pointers) can hold a
+special value meaning "reference to nothing". This value is called
+<constant>null</constant> in &java;, <constant>NULL</constant> in C and C++. 
+At run time, however, dereferencing this value results to a 
+runtime error (<javaexn name="NullPointerException"/>) 
+or a run time crash (bus error, segmentation fault, protection fault, ...). 
+</para>
+
+<para>
+To prevent this error, a reference must be tested before use. However
+it is easy to forget to do so. Furthermore, there are references that
+are never null, or rather that should never be. Testing such
+references clutters the code. Every variable should therefore be
+documented as being possibly null or not. Every method should document
+whether each of its argument can be null or not, and whether it can
+return a null result. But then remains the task of checking that the
+code indeed is correct and indeed conforms to the
+documentation. Correctness requires for instance that if a variable is
+possibly null, it should always be tested before dereferencing. It
+also requires to match arguments of a method to its documented
+behavior regarding null arguments.
+All these checks are rather simple but very tedious. 
+The situation is even much worse when code evolves: this checking
+must be done all over again.
+</para>
+
+<para>
+Here obviously comes our motto: all this checking should be done
+automatically. This is exactly what Nice does. One documents whether a
+type can hold the null value by simply prefixing it with the '?'
+symbol. Thus:
+<literal>?String name;</literal> is the declaration of String variable that
+might be null. To get its length, one must write
+<literal>int len = (name == null) ? 0 : name.length();</literal>. Calling
+<literal>name.length()</literal> directly is a type error. It would only be
+possible if <literal>name</literal> was defined as
+<literal>String name = "Some non-null string";</literal>.
+</para>
+</section>
+
+<section>
+<title>Writes to covariant arrays (<javaexn name="ArrayStoreException"/>)
+</title>
+<para>
+In &java; arrays are covariant: a <literal>String[]</literal> array can be
+passed to a method that expects an <literal>Object[]</literal> argument.
+But what happens if the method writes a <classname>Picture</classname>
+into the array? No error is detected at compile time.
+At run time, an <javaexn name="ArrayStoreException"/> is thrown. 
+</para>
+
+<para>
+This shows that arrays should <emphasis>not</emphasis> not be covariant. 
+So why are they covariant in &java;? 
+Once again, mostly because of its limited type system. 
+<literal>Object[]</literal> is often a poor replacement
+for <literal>T[]</literal> where <literal>T</literal> is a type parameter. 
+Another reason is that covariant arrays are <emphasis>sometimes</emphasis> 
+safe: when they are used in a read-only way.
+</para>
+
+<para>
+In &nice;, arrays are not covariant. Therefore run time errors like
+<javaexn name="ArrayStoreException"/> never occur. Moreover, it is still
+possible to use covariantly arrays while only reading from them. This
+require &nice;'s powerful type system: constrained type parameters:
+<literal>&lt;java.awt.Component T> void read(T[]);</literal>
+can be applied to arrays whose component types are subtypes of
+<classname>java.awt.Component</classname>. 
+Type checking guarantees that the array will not be written to 
+by this method, so that there will be no run time failure.
+</para>
+</section>
+
+<section><title>Array index out of bounds 
+(<javaexn name="ArrayIndexOutOfBoundsException"/>)</title>
+<para>
+A run time error occurs when a program tries to access an element from
+an array with an index outside its bounds. 
+Solving this issue is still an open problem. Partial solutions exist,
+notably using dependent types, but they are not ready for widespread
+use because of their high complexity.
+</para>
+
+<para>
+&nice; offers a much simpler and limited contribution, but it can be
+very useful in practice. Code using arrays contains a few idiomatic
+patterns that occur repeatedly: iterating through the elements of an
+array, finding an element matching a certain criterium, ... These are
+typically done using loops. Besides being a little tedious, these
+patterns open the opportunity for mistakes in the indexes, which leads
+to run time errors. These errors will often be discovered soon while
+running the program, but it is still better if they can be detected by
+the compiler. And if they are seldom executed, and the
+indexes go out of bounds in rare circumstances, detection becomes more
+hazardous. 
+Moreover, if a loop misses the incrementation step, it will
+loop forever, which gives no information on the location of the
+problem. It becomes then necessary to use a debugger and takes some
+time to spot what was but a minor mistake.
+</para>
+
+<para>
+Using two features of &nice;, genericity and higher order functions,
+it is possible to use and write functions that perform the most common
+tasks on arrays, and more generally collections. For instance, a
+simple iteration on the elements
+<programlisting lang="java">
+for (int i = 0; i &lt; a.length; i++)
+  doSomething;
+</programlisting>
+can also be written in &nice;
+<programlisting lang="nice">
+a.iter( fun(int i) => doSomething );
+</programlisting>
+Using these functions makes the code somewhat clearer by avoiding the
+repetition of the loop code over and over. Moreover, it removes the
+risks of wrong indexes, forgetting to increment the index, ...
+Even if a custom looping function is needed, it only has to be checked only
+once and for all.
+</para>
+</section>
+
+
+</section>
+
+<section><title>Comparison with functional languages</title>
+
+<para>
+We considered here imperative languages. There is another important
+family of languages that is worth considering: functional
+languages. More precisely, since we are interested in static safety,
+statically typed functional languages, the two major ones 
+being ML and Haskell. These languages are doing very well as far
+as static safety is concerned. However, they achieve this safety by
+enforcing a quite different programming style. This makes it difficult
+to compare expressiveness, and definitely compromises their chances of
+becoming used widely.
+</para>
+
+<para>
+Let us take the example of the null value. The approach of functional
+languages is to provide option types. Thus <literal>String option</literal>
+is the equivalent of <literal>?String</literal> in &nice;. However an
+expression of type String cannot be used where a 
+<literal>String option</literal> is expected. 
+It has to be explicitly injected into an option type with
+the Some constructor. 
+Therefore, <literal>"A"</literal> has type <literal>String</literal>, 
+and <literal>(Some "A")</literal> has type <literal>String option</literal>. 
+This puts a burden on the programmer, and
+forces a very different approach onto the current practice. 
+On the other hand, using &nice; requires a minimal change: adding some
+question marks to possibly null types. The code itself can be kept
+unchanged. That is, provided it was correct!
+</para>
+</section>
+
+</webpage>

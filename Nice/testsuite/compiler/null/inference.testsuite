@@ -40,6 +40,33 @@
   x++;
 
 
+/// PASS
+  ?int x = 0;
+  if (true)
+    if (true)
+      if (x != null)
+	x++;
+      else
+        return;
+    else
+      return;
+  else return;
+  x++;
+
+/// PASS
+  ?int x = 0;
+  if (true)
+  {
+    if (true)
+      if (x != null)
+	x++;
+      else
+        return;
+    else
+      return;
+    x++;
+  }
+
 /// FAIL
   ?int x = null;
   if (false)

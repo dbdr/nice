@@ -1,0 +1,95 @@
+/**************************************************************************/
+/*                                N I C E                                 */
+/*             A high-level object-oriented research language             */
+/*                        (c) Daniel Bonniot 2002                         */
+/*                                                                        */
+/*  This program is free software; you can redistribute it and/or modify  */
+/*  it under the terms of the GNU General Public License as published by  */
+/*  the Free Software Foundation; either version 2 of the License, or     */
+/*  (at your option) any later version.                                   */
+/*                                                                        */
+/**************************************************************************/
+
+/*
+   Rewriting on the abstract syntax tree.
+
+   Currently rewrites
+     if (b)
+       S1;
+     else
+       S2;
+     S3;
+   with S2 that never returns into:
+     if (b)
+       S1; S3;
+     else
+       S2;
+   (and the symmetric case when S1 never returns).
+   This is useful for nullness-inference, when b test if a local variable
+   is not null (the test is still known to be true in S3).
+*/
+
+package bossa.syntax;
+
+Statement rewrite(Statement);
+rewrite(s@Statement) = s;
+rewrite(s@Block)
+{
+  s.statements = rewrite(s.statements);
+  return s;
+}
+
+Statement[] rewrite(Statement[] statements)
+{
+  println("Rewriting:\n");
+  for (int i = 0; i < statements.length - 1; i++)
+    {
+      Statement s = statements[i];
+      ?IfExp ifExp = ifExp(s);
+      println("Head: " + ifExp);
+      if (ifExp != null)
+	if (ifExp.thenUnreachable)
+	  {
+	    ifExp.elseExp = new StatementExp
+	    (rewrite(makeBlock(notNull(ifExp.elseExp), 
+			       statements.split(from: i+1))));
+	    return statements.split(to: i);
+	  }
+	else if (ifExp.elseUnreachable)
+	  {
+	    ifExp.thenExp = new StatementExp
+	    (rewrite(makeBlock(notNull(ifExp.thenExp), 
+			       statements.split(from: i+1))));
+	    return statements.split(to: i);
+	  }
+	}
+  println("Unchanged:\n");
+  return statements;
+}
+
+?IfExp ifExp(Statement);
+ifExp(s@Statement) = null;
+ifExp(s@ExpressionStmt)
+{
+  if (s.exp instanceof bossa.syntax.IfExp)
+    return cast(s.exp);
+  else
+    return null;
+}
+
+Statement makeStatement(Expression);
+makeStatement(e@Expression) = new ExpressionStmt(e);
+makeStatement(e@StatementExp) = e.statement;
+
+Block makeBlock(Expression first, Statement[] rest)
+{
+  ?Statement[] res = new Statement[rest.length + 1];
+  res[0] = makeStatement(first);
+  copy(rest, 0, res, 1, rest.length);
+  return new Block(res);
+}
+
+
+// Local Variables:
+// nice-xprogram: "nicec -d \"$HOME/Nice/classes\" --sourcepath=\"$HOME/Nice/src\" --classpath=\"$HOME/Nice/classes\""
+// End:

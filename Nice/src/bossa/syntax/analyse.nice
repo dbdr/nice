@@ -505,42 +505,8 @@ Statement[] analyse(Statement[] statements, Info info)
       if (info.getUnreachable())
 	throw error(s, "This statement is never executed");
       analyse(s, info);
-      ?IfExp ifExp = ifExp(s);
-      if (ifExp != null)
-	if (ifExp.thenUnreachable)
-	  {
-	    ifExp.elseExp = new StatementExp
-	    (makeBlock(notNull(ifExp.elseExp), 
-		       analyse(statements.split(from: i+1), info)));
-	    return statements.split(to: i);
-	  }
-	else if (ifExp.elseUnreachable)
-	  {
-	    ifExp.thenExp = new StatementExp
-	    (makeBlock(notNull(ifExp.thenExp), 
-		       analyse(statements.split(from: i+1), info)));
-	    return statements.split(to: i);
-	  }
-	}
+    }
   return statements;
-}
-
-?IfExp ifExp(Statement);
-ifExp(s@Statement) = null;
-ifExp(s@ExpressionStmt)
-{
-  if (s.exp instanceof bossa.syntax.IfExp)
-    return cast(s.exp);
-  else
-    return null;
-}
-
-Block makeBlock(Expression first, Statement[] rest)
-{
-  ?Statement[] res = new Statement[rest.length + 1];
-  res[0] = new ExpressionStmt(first);
-  copy(rest, 0, res, 1, rest.length);
-  return new Block(res);
 }
 
 analyse(s@ExpressionStmt, info)

@@ -58,6 +58,7 @@ LocatedString name(VarSymbol) = native VarSymbol.name;
 mlsub.typing.Polytype getType(Expression) = 
   native mlsub.typing.Polytype Expression.getType();
 Statement[] statements(Block) = native Block.statements;
+Statement statement(StatementExp) = native StatementExp.statement;
 mlsub.typing.Monotype type(MonoSymbol) = native MonoSymbol.type;
 
 // Local Variables:

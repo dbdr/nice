@@ -351,6 +351,8 @@ typecheck(e@NewExp)
 
 typecheck(e@StatementExp)
 {
+  e.statement = rewrite(e.statement);
+
   typecheck(e.statement);
 }
 
@@ -374,6 +376,8 @@ typecheck(@null(Statement)) {}
 
 typecheck(b@Block)
 {
+  b.statements = rewrite(b.statements);
+
   new JavaList(impl: notNull(b.locals)).iter(fun(?Block.LocalDeclaration d)=> typecheck(d));
   notNull(b.statements).iter(fun(?Statement s)=> typecheck(s));
 }

@@ -21,3 +21,17 @@
   /// package b import a
   /// TOPLEVEL
   void code() { f(null); }
+
+/// PASS
+  /// package a
+  /// TOPLEVEL
+  class A { ?int[?] f; } 
+  /// package b import a
+  new A(f: null);
+
+/// PASS
+  /// package a
+  /// TOPLEVEL
+  class A { int?->int f; } 
+  /// package b import a
+  new A(f: null);

@@ -138,5 +138,17 @@ abstract public class Monotype implements mlsub.typing.lowlevel.Element
 
     return res;
   }
+
+  /****************************************************************
+   * Printing
+   ****************************************************************/
+
+  /**
+     Print the monotype when it can be null.
+  */
+  public String toStringNull()
+  {
+    return "?" + toString();
+  }
 }
 

@@ -152,6 +152,14 @@ public class TypeConstructor
     return "" + this + bossa.util.Util.map("<", ", ", ">", parameters);
   }
 
+  /**
+     Print the monotype when it can be null.
+  */
+  public String toStringNull(Monotype[] parameters)
+  {
+    return "?" + toString(parameters);
+  }
+
   /****************************************************************
    * Fields
    ****************************************************************/

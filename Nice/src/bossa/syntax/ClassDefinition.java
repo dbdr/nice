@@ -96,6 +96,11 @@ abstract public class ClassDefinition extends MethodContainer
 	    else
 	      return component + "[]"; 
 	  }
+
+	  public String toStringNull(mlsub.typing.Monotype[] parameters)
+	  {
+	    return parameters[0].toString() + "[?]";
+	  }
 	};
     else if (name.equals("nice.lang.Sure"))
       tc = new mlsub.typing.TypeConstructor
@@ -115,7 +120,7 @@ abstract public class ClassDefinition extends MethodContainer
 	(name.toString(), variance, isConcrete(), true)
 	{
 	  public String toString(mlsub.typing.Monotype[] parameters)
-	  { return "?" + parameters[0].toString(); }
+	  { return parameters[0].toStringNull(); }
 	};
     else if (name.equals("nice.lang.Null"))
       {

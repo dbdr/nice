@@ -393,15 +393,7 @@ public abstract class MethodDeclaration extends Definition
   private gnu.expr.Expression code;
 
   protected abstract gnu.expr.Expression computeCode();
-  
-  final void setCode(gnu.expr.Expression code) 
-  {
-    if(this.code != null)
-      Internal.error("code already set");
-    
-    this.code = code;
-  }
-  
+
   gnu.expr.Expression getCode() 
   {
     // Default implementation.

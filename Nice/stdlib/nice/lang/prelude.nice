@@ -37,18 +37,27 @@ abstract class Maybe<+T> = native;
 final class Sure<+T> extends Maybe<T> = native;
 final class Null<+T> extends Maybe<T> = native;
 
-/** 
-    Throws java.lang.NullPointerException if the argument is <code>null</code>.
-
-    This call presently does no check, assuming that a dereferencing
-    is coming next and will detect nullness.
-    This should probably be fixed so that the semantics is well defined.
-*/
+/**
+ * Assert that a <code>value</code> it not <code>null</code>.
+ * Throws java.lang.AssertionError if assertions are enabled and the argument is <code>null</code>.
+ */
 <T> !T notNull(?T value)
 {
   assert(value != null);
   return cast(value);
 }
+
+/**
+ * Tell the compiler that the <code>value</code> might be <code>null</code>.<br>
+ * Useful to check if the variable is <code>null</code>
+ * without issuing a compile-time warning: <code>if( maybeNull( var ) == null )</code>.<br>
+ * The need for this method might arise in particular when using
+ * existing Java libraries. Nice often thinks that Java method
+ * would not return a <code>null</code> value, and it is not always practical
+ * to write a retyping for the method.<br>
+ * See also the "Option types" chapter of the Nice manual.
+ */
+<T> ?T maybeNull(!T value) = value;
 
 /****************************************************************
  * Primitive types

@@ -34,6 +34,7 @@ public class DefaultMethodImplementation extends MethodImplementation
     super(name, body, getAnyPatterns(parameters, name.location()));
     this.declaration = new NiceMethod.WithDefault
       (name, constraint, returnType, parameters, contract, isOverride, this);
+    this.declaration.docString = this.docString;
     addChild(declaration);
   }
 

@@ -36,7 +36,7 @@ public class MethodBodyDefinition extends Definition
   implements Function
 {
   /**
-   * Describe constructor here.
+   * Create a method alternative.
    *
    * @param name the name of the method.
    * @param binders 
@@ -508,7 +508,6 @@ public class MethodBodyDefinition extends Definition
     lexp.forceGeneration();
 
     gnu.expr.Declaration args = lexp.addDeclaration("args");
-    //args.setParameter(true);
     args.noteValue(null);
     args.setType(gnu.bytecode.ArrayType.make(Type.string_type));
 

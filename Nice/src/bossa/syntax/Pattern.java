@@ -726,7 +726,7 @@ public class Pattern implements Located
       return new Pattern((ConstantExp)null);
 
     if (name.equals("NULL"))
-      return new Pattern(NullExp.instance);
+      return new Pattern(NullExp.create(Location.nowhere()));
 
     if (name.equals("true") || name.equals("false") ) 
       return new Pattern(ConstantExp.makeBoolean(name.equals("true"),
@@ -823,7 +823,7 @@ public class Pattern implements Located
   public boolean atNonBoolValue() { 
     return atValue != null && !atBool() && !atNull() &&!atIntCompare();
   }
-  public boolean atNull() { return atValue == NullExp.instance; }
+  public boolean atNull() { return atValue instanceof NullExp; }
   public boolean atAny()  { return atValue == null && tc == null; }
   public boolean atBool() { 
     return atValue != null && tc == PrimitiveType.boolTC;

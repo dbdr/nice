@@ -1160,14 +1160,8 @@ Pattern pattern():
     name=ident()
     (
       "@"
-      (
-        val=patternLiteral() 
-	{ User.warning(name, 
-          "This syntax is deprecated.\n" + "Leave '"+ name+"@' away.");}
-      |
-        tc=typeIdent()
-        [ ":" runtimeTC = typeConstructor() ]
-      )
+      tc=typeIdent()
+      [ ":" runtimeTC = typeConstructor() ]
     |
       "#" tc=typeIdent() { exactlyAt = true; }
     |
@@ -1239,18 +1233,7 @@ MethodBodyDefinition methodBodyDefinition(NiceClass container):
 }
 {
     [ "<" binders=strings() ">" ]
-
     name=identOrBackquoted()
-
-    // Deprecated.
-    [ { Token t; } 
-      t="<" binders=strings() ">" 
-      { User.warning(Location.make(t), 
-                     "This syntax is deprecated.\n" + 
-"Type parameters should now be placed in front of the method implementation.");
-      }
-    ]
-
     "("
     [ p=pattern() { parameters.add(p); }
       ( "," p=pattern() { parameters.add(p); } )*
@@ -1466,6 +1449,13 @@ void readDefinitions(List definitions):
 /***********************************************************************/
 /*                          Expressions                                */
 /***********************************************************************/
+
+ConstantExp nullConstantExp():
+{ Token t; }
+{
+  t="null" 
+  { return NullExp.create(Location.make(t)); }
+}
 
 ConstantExp booleanConstantExp():
 { Token t; }
@@ -2075,7 +2065,7 @@ Expression Literal() :
   Token t;
 }
 {
-( "null" { res = NullExp.instance; }
+( res=nullConstantExp()
 | res=booleanConstantExp()
 | res=intConstantExp() 
 | res=floatConstantExp()
@@ -2092,7 +2082,7 @@ ConstantExp patternLiteral() :
   Token t;
 }
 {
-( "null" { res = NullExp.instance; }
+( res=nullConstantExp()
 | res=negativeIntConstantExp()
 | res=intConstantExp() 
 | res=charConstantExp()

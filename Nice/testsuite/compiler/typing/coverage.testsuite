@@ -22,4 +22,4 @@ method3(f) {} // this case is mandatory to cover method3
   /// TOPLEVEL
 void method3(String);
 method3(f@String) {} // this case is mandatory to cover method3
-method3(/*/// FAIL HERE */ f@null) {}
+method3(/*/// FAIL HERE */null) {}

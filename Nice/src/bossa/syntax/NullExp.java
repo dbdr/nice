@@ -31,9 +31,16 @@ public class NullExp extends ConstantExp
   /** There is only one instance of NullExp,
       since it has no state.
   */
-  public static final NullExp instance = new NullExp();
+//  public static final NullExp instance = new NullExp();
   
   private NullExp() {}
+
+  public static NullExp create(Location loc)
+  {
+    NullExp res = new NullExp();
+    res.setLocation(loc);
+    return res;
+  }
 
   void computeType()
   {

@@ -1,0 +1,22 @@
+package regtest.basic;
+
+/*
+  Test the comparable types.
+*/
+
+<Comparable C> void comp(C, C);
+comp(c1, c2)
+{
+  if (!(c1 < c2))
+    println("Error with " + c1 + " < " + c2);
+}
+
+void test_comparable();
+test_comparable()
+{
+  comp(1, 2);
+  comp(1.2, 3.14);
+  comp(0, 2.0);
+
+  comp(false, true);
+}

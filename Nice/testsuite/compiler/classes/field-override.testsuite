@@ -156,7 +156,7 @@ class B extends A
   override LinkedList<String> names = new LinkedList();
 }
 
-/// PASS bug
+/// PASS
   /// Toplevel
   class A {
     final ?String s;

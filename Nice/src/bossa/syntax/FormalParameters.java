@@ -45,6 +45,8 @@ public class FormalParameters extends Node
 
     Expression value() { return null; }
 
+    boolean isOverriden() { return false; }
+
     void resolve()
     {
       if (symbol != null)
@@ -187,12 +189,24 @@ public class FormalParameters extends Node
       this.nameRequired = nameRequired;
     }
 
+    public OptionalParameter
+      (Monotype type, LocatedString name, boolean nameRequired, 
+       Expression value, boolean overriden)
+    { 
+      this(type, name, nameRequired, value);
+      this.overriden = overriden;
+    }
+
     Expression value() 
     { 
       return defaultValue;
     }
 
     Expression defaultValue;
+
+    boolean overriden;
+
+    boolean isOverriden() { return overriden; }
 
     void resolve()
     {
@@ -293,7 +307,8 @@ public class FormalParameters extends Node
 
   boolean hasDefaultValue(int rank)
   {
-    return parameters[rank].value() != null;
+    Parameter p = parameters[rank];
+    return p.value() != null && ! p.isOverriden();
   }
 
   /****************************************************************

@@ -251,7 +251,8 @@ public class NiceClass extends ClassDefinition.ClassImplementation
         if (inherited[i].match(name))
           {
             if (value != null)
-              inherited[i] = asParameter(scope);
+              inherited[i] = new FormalParameters.OptionalParameter
+                (type, sym.getName(), true, value, true);
             else
               inherited[i].resetType(type);
           }

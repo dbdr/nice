@@ -155,3 +155,12 @@ class B extends A
 {
   override LinkedList<String> names = new LinkedList();
 }
+
+/// PASS bug
+  /// Toplevel
+  class A {
+    final ?String s;
+  }
+  class B extends A {
+    override String s = "abc";
+  }

@@ -441,6 +441,23 @@ public abstract class ClassDefinition extends MethodContainer
     return new mlsub.typing.MonotypeConstructor(tc, getTypeParameters());
   }
   
+  /**
+     Return the type representing a constrained instance of this class,
+     or null if this class has no constraint on its type parameters.
+  */
+  mlsub.typing.Polytype getConstrainedType()
+  {
+    mlsub.typing.Constraint cst = getResolvedConstraint();
+
+    if (cst == null)
+      return null;
+
+    mlsub.typing.Polytype res = new mlsub.typing.Polytype
+      (cst, lowlevelMonotype());
+
+    return res.cloneType();
+  }
+
   public abstract boolean isConcrete();
 
   abstract int getBytecodeFlags();

@@ -90,7 +90,7 @@ public final class MonotypeVar extends Monotype
     for(int i=0; i<n; i++)
       {
 	res[i] = new MonotypeVar(existential);
-	res[i].persistentKind = NullnessKind.instance;
+	res[i].setPersistentKind(NullnessKind.instance);
       }
     return res;
   }
@@ -156,7 +156,15 @@ public final class MonotypeVar extends Monotype
 
   public void setPersistentKind(Kind k)
   {
+    if (persistentKind == k)
+      return;
+
     persistentKind = k;
+    if (k == NullnessKind.instance)
+      {
+        kind = k;
+        equivalent = NullnessKind.instance.persistentFreshMonotype();
+      }
   }
 
   Kind persistentKind;
@@ -164,13 +172,29 @@ public final class MonotypeVar extends Monotype
   void reset()
   {
     if (persistentKind == null)
-      setKind(null);
-    else
       {
-	// Forget about the old equivalent.
+        setKind(null);
+      }
+    else if (existential)
+      {
 	equivalent = null;
 	kind = null;
 	setKind(persistentKind);
+      }
+    else if (equivalent != null)
+      {
+        if (persistentKind == NullnessKind.instance)
+          {
+            MonotypeConstructor mc = (MonotypeConstructor) equivalent();
+
+            TypeConstructor tc = mc.getTC();
+            // Reassign a new id
+            NullnessKind.introduce(tc);
+
+            MonotypeVar raw = (MonotypeVar) mc.getTP()[0];
+            raw.reset();
+            mlsub.typing.lowlevel.Engine.register(raw);
+          }
       }
   }
 

@@ -6,6 +6,13 @@ nice (0.9.8)
   * Is is now possible to make a class of an imported package implement
     an interface defined in the current package, with:
       class some.pkg.ClassName implements MyInterface;
+  * Type parameters can always be qualified with nullness markers '?' and '!'.
+    For instance, a class declaration can be
+      class OptionalRef<T>
+      {
+        // The value might be null
+        ?T value;
+      }
   * Allow calls to Java methods defined in a Java class that implements
     several Java interfaces declaring that same method, like
     java.io.ObjectOutputStream.flush()

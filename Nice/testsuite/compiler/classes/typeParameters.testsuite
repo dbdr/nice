@@ -300,3 +300,60 @@ class Translated<T> extends Shape {
 class A<T> {}
 
 <String S> class B<S> extends A<S> {}
+
+/// PASS
+  A<String> a;
+  a = new A(x: null);
+  a = new A(x: "");
+  a.x = null;
+  a.x = "";
+  ?String s = a.x;
+
+  /// Toplevel
+class A<T>
+{
+  ?T x;
+}
+
+/// FAIL
+  A<String> a = new A(x: null);
+  String s = a.x;
+
+  /// Toplevel
+class A<T>
+{
+  ?T x;
+}
+
+/// PASS
+  A<?String> a;
+  a = new A(x: "");
+  a.x = "";
+  String s = a.x;
+
+  /// Toplevel
+class A<T>
+{
+  !T x;
+}
+
+/// FAIL
+  A<String> a = new A(x: null);
+
+  /// Toplevel
+class A<T>
+{
+  !T x;
+}
+
+/// PASS
+  A<int> a1 = new A(a: 2);
+  ?int i = a1.get(2);
+  /// Toplevel
+class A<T> {
+  T a;
+
+  ?T get(int i);
+  get(1) = a;
+  get(i) = null;
+}

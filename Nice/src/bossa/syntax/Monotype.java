@@ -108,8 +108,8 @@ implements Located
     switch (nullness) 
       {
       case none:  return raw;
-      case maybe: return maybe(raw);
-      case sure:  return sure(raw);
+      case maybe: return sourceMaybe(raw);
+      case sure:  return sourceSure(raw);
       case absent:
 	if (raw instanceof MonotypeVar)
 	  {
@@ -280,10 +280,30 @@ implements Located
    * Nullness markers
    ****************************************************************/
 
+  /**
+     Return a maybe type based on the raw type of the argument
+     if the argument is a full type.
+  */
+  static mlsub.typing.Monotype sourceMaybe(mlsub.typing.Monotype type)
+  {
+    mlsub.typing.Monotype raw = nice.tools.typing.Types.rawType(type);
+    return maybe(raw);
+  }
+
   public static mlsub.typing.Monotype maybe(mlsub.typing.Monotype type)
   {
     return new mlsub.typing.MonotypeConstructor
       (PrimitiveType.maybeTC, new mlsub.typing.Monotype[]{type});
+  }
+
+  /**
+     Return a sure type based on the raw type of the argument
+     if the argument is a full type.
+  */
+  static mlsub.typing.Monotype sourceSure(mlsub.typing.Monotype type)
+  {
+    mlsub.typing.Monotype raw = nice.tools.typing.Types.rawType(type);
+    return sure(raw);
   }
 
   public static mlsub.typing.Monotype sure(mlsub.typing.Monotype type)

@@ -98,14 +98,10 @@ public final class Types
   public static Monotype rawType(Monotype m)
   {
     m = m.equivalent();
-    if (!(m instanceof MonotypeConstructor))
-      {
-	// It is probably a bug if this happens
-	//Internal.warning("Not kinded monotype: " + m);
-	return m;
-      }
-    else
-      return ((MonotypeConstructor) m).getTP()[0];
+    if (! (m.getKind() == NullnessKind.instance))
+      return m;
+
+    return ((MonotypeConstructor) m).getTP()[0];
   }
 
   /** return the type with nullness markers removed */

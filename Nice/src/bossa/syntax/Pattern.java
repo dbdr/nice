@@ -18,6 +18,7 @@ import mlsub.typing.*;
 import mlsub.typing.TypeConstructor;
 import mlsub.typing.Monotype;
 import mlsub.typing.MonotypeConstructor;
+import mlsub.typing.Polytype;
 import mlsub.typing.Typing;
 import mlsub.typing.TypingEx;
 import nice.tools.typing.Types;
@@ -159,8 +160,12 @@ public class Pattern implements Located
     if (def == null)
       return;
 
-    constraint = def.getResolvedConstraint();
-    patternType = new MonotypeConstructor(tc, def.getTypeParameters());
+    Polytype classType = def.getConstrainedType();
+    if (classType != null)
+      {
+        constraint = classType.getConstraint();
+        patternType = classType.getMonotype();
+      }
   }
 
   private static VarSymbol findRefSymbol(LocatedString refName)

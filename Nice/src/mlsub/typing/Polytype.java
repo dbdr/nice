@@ -57,6 +57,15 @@ public final class Polytype
       {
 	newBinders[i] = binders[i].cloneTypeSymbol();
 	map.put(binders[i], newBinders[i]);
+        // Clone the persistent equivalents of marked type variables.
+        if (binders[i] instanceof MonotypeVar &&
+            ((MonotypeVar) binders[i]).persistentKind != null)
+          {
+            MonotypeConstructor mc = (MonotypeConstructor) ((MonotypeVar) binders[i]).equivalent();
+            MonotypeConstructor nmc = (MonotypeConstructor) ((MonotypeVar) newBinders[i]).equivalent();
+            map.put(mc.getTC(), nmc.getTC());
+            map.put(mc.getTP()[0], nmc.getTP()[0]);
+          }
       }
 
     return new Polytype

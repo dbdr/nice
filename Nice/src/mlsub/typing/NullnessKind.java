@@ -42,13 +42,7 @@ public class NullnessKind implements AtomicKind
   public Monotype freshMonotype(boolean existential)
   {
     TypeConstructor tc = new TypeConstructor(instance);
-    Typing.introduce(tc);
-    try {
-      Typing.leq(tc, maybe);
-      Typing.leq(sure, tc);
-    } catch(TypingEx ex) {
-      bossa.util.Internal.error("Nullness creation error");
-    }
+    introduce(tc);
 
     Monotype raw = new MonotypeVar(existential);
     Typing.introduce(raw);
@@ -56,6 +50,25 @@ public class NullnessKind implements AtomicKind
     return new MonotypeConstructor(tc, new Monotype[]{ raw });
   }
   
+  public Monotype persistentFreshMonotype()
+  {
+    TypeConstructor tc = new TypeConstructor(instance);
+    Monotype raw = new MonotypeVar();
+
+    return new MonotypeConstructor(tc, new Monotype[]{ raw });
+  }
+  
+  static void introduce(TypeConstructor tc)
+  {
+    tc.getKind().register(tc);
+    try {
+      Typing.leq(tc, maybe);
+      Typing.leq(sure, tc);
+    } catch(TypingEx ex) {
+      bossa.util.Internal.error("Nullness creation error");
+    }
+  }
+
   public void register(Element e)
   {
   }

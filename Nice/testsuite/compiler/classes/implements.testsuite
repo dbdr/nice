@@ -8,6 +8,32 @@
   class A implements I {}
 
 /// PASS
+  /// COMMENT Check that bytecode class implements statement is correct
+  /// COMMENT when classes are defined in reverse order.  
+  assert(new B() instanceof I);
+  /// Toplevel
+  interface I {}
+  class B extends A {}
+  class A implements I {}
+
+/// PASS
+  /// COMMENT Check that bytecode class implements statement is correct
+  /// COMMENT when classes are defined in reverse order.  
+  assert(new A() instanceof I);
+  /// Toplevel
+  class A implements I {}
+  interface I {}
+
+/// PASS
+  /// COMMENT Check that bytecode class implements statement is correct
+  /// COMMENT when classes are defined in reverse order.  
+  assert(new A() instanceof I);
+  /// Toplevel
+  class A implements J {}
+  interface J extends I {}
+  interface I {}
+
+/// PASS
   use(new A());
   /// Toplevel
   class A implements java.lang.Comparable {}

@@ -259,6 +259,15 @@ abstract public class ClassDefinition extends MethodContainer
     
       implementations = abstractions = null;
 
+      // Resolve the super-interfaces first.
+      if (impl != null)
+	for (int i = 0; i < impl.length; i++)
+	  {
+	    ClassDefinition d = ClassDefinition.get(impl[i].associatedTC());
+	    if (d != null)
+	      d.resolve();
+	  }
+
       super.resolveClass();
     }
 

@@ -135,7 +135,17 @@
 
 /// FAIL
   /// Toplevel
-boolean foo(String d);
-foo(d) = false;
-foo(END_OF_TIME) = true;
-let Date END_OF_TIME = new Date(Long.MAX_VALUE);
+  boolean foo(String d);
+  foo(d) = false;
+  foo(END_OF_TIME) = true;
+  let Date END_OF_TIME = new Date(Long.MAX_VALUE);
+
+/// PASS
+  /// package a
+  /// toplevel
+  let Date END_OF_TIME = new Date(Long.MAX_VALUE);
+  void foo(Date d);
+  foo(d) {}
+  foo(END_OF_TIME) {}
+  /// package b import a
+  foo(new Date());

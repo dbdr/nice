@@ -710,13 +710,11 @@ public class Pattern implements Located
               {
 	        GlobalVarDeclaration.GlobalVarSymbol symbol = (GlobalVarDeclaration.GlobalVarSymbol)sym;
  	        val = (NewExp)symbol.getValue();
-                symbol.getDefinition().resolve();
 	      }
             else
               {
                 EnumDefinition.EnumSymbol symbol = (EnumDefinition.EnumSymbol) sym;
 	        val = (NewExp)symbol.getValue();
-                symbol.getDefinition().resolve();
               }
             
 	    return new Pattern(new ConstantExp(null, val.tc, sym,

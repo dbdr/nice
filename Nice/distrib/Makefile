@@ -16,7 +16,7 @@ all: deb tar zip rpm
 
 deb $(CVSBUILDDIR)/$(DEB):
 	@echo Creating Debian package version ${VERSION}
-	cd .. && env CVSROOT=:pserver:anonymous@cvs.nice.sourceforge.net:/cvsroot/nice cvs-buildpackage -MNice -W${CVSBUILDDIR} -us -uc -rfakeroot -F
+	cd .. && env CVSROOT=:pserver:anonymous@cvs.nice.sourceforge.net:/cvsroot/nice cvs-buildpackage -MNice -W${CVSBUILDDIR} -H${PWD}/prepare-bootstrap -us -uc -rfakeroot -F
 
 
 .PHONY: tar

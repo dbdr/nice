@@ -1,0 +1,5 @@
+#! /bin/sh -x
+
+echo $0 $1 $2 $3
+
+cp -i ../../../share/java/nice.jar external/nice-bootstrap.jar

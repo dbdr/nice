@@ -1,13 +1,11 @@
-This package was debianized by Daniel Bonniot <bonniot@users.sourceforge.net> 
-on Mon, 17 Dec 2001 16:32:13 +0100.
+This software is copyright (c) 2003 by Daniel Bonniot.
 
 It was downloaded from http://nice.sourceforge.net
 
 Upstream Author: Daniel Bonniot <bonniot@users.sourceforge.net>
 
-This software is copyright (c) 2003 by Daniel Bonniot
-
 You are free to distribute this software under the terms of
-the GNU General Public License.
+the GNU General Public License, version 2 or later.
+
 On Debian systems, the complete text of the GNU General Public
-License can be found in /usr/share/common-licenses/GPL file.
+License, version 2, can be found in /usr/share/common-licenses/GPL-2.

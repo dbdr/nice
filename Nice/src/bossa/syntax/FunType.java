@@ -27,16 +27,18 @@ import mlsub.typing.FunTypeKind;
  */
 public class FunType extends bossa.syntax.Monotype
 {
-  public FunType(List /* of Monotype */ in, bossa.syntax.Monotype out)
+  public FunType(List /* of bossa.syntax.Monotype */ in, 
+		 bossa.syntax.Monotype out)
   {
-    if (in == null)
-      in = emptyList;
+    this(bossa.syntax.Monotype.toArray(in), out);
+  }
+
+  public FunType(bossa.syntax.Monotype[] in, bossa.syntax.Monotype out)
+  {
     this.in = in;
     this.out = out;
   }
 
-  private static List emptyList = new LinkedList();
-  
   /****************************************************************
    * Scoping
    ****************************************************************/
@@ -51,7 +53,7 @@ public class FunType extends bossa.syntax.Monotype
   bossa.syntax.Monotype substitute(Map map)
   {
     return new bossa.syntax.FunType
-      (bossa.syntax.Monotype.substitute(map,in),out.substitute(map));
+      (bossa.syntax.Monotype.substitute(map,in), out.substitute(map));
   }
 
   boolean containsAlike()
@@ -65,29 +67,20 @@ public class FunType extends bossa.syntax.Monotype
 
   public Location location()
   {
-    return out.location().englobe(in);
+    return out.location();
   }
 
   public String toString()
   {
-    return "fun"+Util.map("(",", ",")",true,in)+"("+out+")";
-      //return "("+toStringExtern()+")";
+    return "fun(" + Util.map("", ", ", "", in) + ")(" + out + ")";
+    //return "("+toStringExtern()+")";
   }
   
   public String toStringExtern()
   {
-    return Util.map("(",", ",")",true,in)+"->"+out.toStringExtern();
+    return "(" + Util.map("", ", ", "", in) + ")->" + out.toStringExtern();
   }
 
-  public boolean equals(Object o)
-  {
-    if(!(o instanceof FunType))
-      return false;
-    FunType that = (FunType) o;
-    
-    return out.equals(that.out) && in.equals(that.in);
-  }
-  
-  private List in;
+  private bossa.syntax.Monotype[] in;
   private bossa.syntax.Monotype out;
 }

@@ -71,14 +71,5 @@ public class TupleType extends bossa.syntax.Monotype
     return Util.map("<",", ",">", types);
   }
   
-  public boolean equals(Object o)
-  {
-    if (!(o instanceof TupleType))
-      return false;
-    TupleType that = (TupleType) o;
-    
-    return types.equals(that.types);
-  }
-  
   private List types;
 }

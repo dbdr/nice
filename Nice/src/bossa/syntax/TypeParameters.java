@@ -32,27 +32,24 @@ public class TypeParameters
    */
   public TypeParameters(List typeParameters)
   {
-    if(typeParameters==null)
-      typeParameters=new ArrayList(0);
-    this.content=typeParameters;
+    this(Monotype.toArray(typeParameters));
+  }
+
+  public TypeParameters(Monotype[] typeParameters)
+  {
+    this.content = typeParameters;
   }
 
   TypeParameters(LocatedString s, Variance v)
   {
-    if(v==null)
-      Internal.error(s,s+" has no variance");
-    this.content = Monotype.freshs(v.size,s);
+    if (v == null)
+      Internal.error(s, s + " has no variance");
+    this.content = Monotype.freshs(v.size, s);
   }
 
-  static TypeParameters fromMonotypeVars(Collection symbols)
-  {
-    List res = new ArrayList(symbols);
-    return new TypeParameters(res);
-  }
-  
   mlsub.typing.Monotype[] resolve(TypeMap ts)
   {
-    return Monotype.resolve(ts,content);
+    return Monotype.resolve(ts, content);
   }
 
   public String toString()
@@ -62,18 +59,8 @@ public class TypeParameters
 
   public int size()
   {
-    return content.size();
+    return content.length;
   }
 
-  public Iterator iterator()
-  {
-    return content.iterator();
-  }
-
-  public boolean equals(TypeParameters that)
-  {
-    return content.equals(that.content);
-  }
-  
-  public List /* of Monotype */ content;
+  public Monotype[] content;
 }

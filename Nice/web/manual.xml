@@ -57,11 +57,11 @@
 	  <para>
 	    Nice detects more errors during compilation than existing 
 	    object-oriented languages (null pointer accesses, 
-	    casts exceptions).
+	    cast exceptions).
 	    This means that programs written in Nice never throw the infamous
 	    <literal>NullPointerException</literal> nor 
 	    <literal>ClassCastException</literal>.
-	    This aspect is developed in more details in 
+	    This aspect is developed in more detail in 
 	    <ulink url="http://nice.sf.net/safety.html">this article</ulink>.
 	  </para>
 	</listitem>
@@ -92,7 +92,7 @@
 
   <chapter id = "packages" ><title>Packages</title>
     <para>
-     A <firstterm>package</firstterm> is a group of related classes, functions,
+     A <firstterm>package</firstterm> is a group of related classes, 
      methods, and variables. You can declare that all the code in a particular
      <literal>.nice</literal> file belongs to a certain package with the 
      declaration:
@@ -213,10 +213,10 @@ void test()
       <para>
 	If a behaviour different than that of the automatic constructor is 
 	needed, it is possible to define
-	a creation <link linkend="function">function</link> that can perform 
+	a creation <link linkend="method">method</link> that can perform 
 	the task, calling the constructor to create the object and 
 	initialize the fields.
-	This function should by convention be called <literal>create</literal>
+	This method should by convention be called <literal>create</literal>
 	suffixed by the name of the class to create.
       </para>
     </section>
@@ -297,119 +297,8 @@ void main(String[] args)
         <type>Stack&lt;String&gt;</type>. 
       </para>
     </section>
-
-    <section><title>Functions and methods</title>
-      <para>
-        Nice makes a simple distinction between functions and methods:
-        Methods can be overridden and specialized, and functions cannot. A 
-        function is just a reusable piece of code, much like a procedure
-        in a language like Pascal or C, whereas a method may use different
-        code depending on the types of its arguments, like methods in most
-        object-oriented languages. We use the term <firstterm>functionals</firstterm>
-        when we want to refer to both functions and methods without making
-        a distinction.
-      </para>
-      <para>        
-        Functions and methods in Nice have some important differences from
-        other languages you may be used to - they are <firstterm>first class</firstterm>,
-        which means they can be passed as arguments to other functionals, or
-        used as return values from functionals.
-      </para>
-    </section>
   </chapter>
 
-  <chapter id="function"><title>Functions</title>
-    <section><title>Declaration</title>
-      <para>
-       Functions are declared like this:
-      </para>
-
-      <para>
-       <literal>
-       <optional><replaceable>type-parameters</replaceable></optional> 
-       <replaceable>return-type</replaceable> 
-       <replaceable>function-name</replaceable>
-       (<optional><replaceable>parameters</replaceable></optional>) 
-       &LBRACE; <replaceable>body</replaceable> &RBRACE;
-       </literal>
-      </para>
-
-      <para>
-       There is a also a simpler syntax for functions whose body
-       consists of a single expression:
-      </para>
-
-      <para>
-       <literal>
-       <optional><replaceable>type-parameters</replaceable></optional> 
-       <replaceable>return-type</replaceable> 
-       <replaceable>function-name</replaceable>
-       (<optional><replaceable>parameters</replaceable></optional>) 
-       = <replaceable>expression</replaceable>;
-       </literal>
-      </para>
-
-      
-    </section>
-
-    <section id="namedParameters"><title>Named parameters</title>
-      <para>
-	When <link linkend="call">calling</link> a function 
-	(or a <link linkend="method">method</link>)
-	it is possible to specify the name of a parameter, followed by
-	<literal>:</literal> before the value given to that parameter.
-	Named parameters can be given in any order.
-	This is useful when writing the call, because one does not
-	need to remember the order of the arguments, but only their names.
-	When reading the code, it is much easier to understand
-	what each parameter is, provided the name was well chosen.
-	
-	<example>
-	  <title>Using named parameters</title>
-	  <programlisting lang="nice">
-void copy(File from, File to) { ... }
-...
-copy(from: f1, to: f2);
-copy(to: f3, from: f4);</programlisting>
-	</example>
-	
-	It is of course still possible to omit the names of the parameters,
-	in which case the arguments must be given in the order of the 
-	declaration.
-      </para>
-    </section>
-
-    <section id="optionalParameters"><title>Optional parameters</title>
-      <para>
-	Many functions have some parameters that are used most of the time
-	with the same value. In Nice, a parameter can be given a default
-	value. It can then be omitted when calling the function and the
-	default value is used. 
-
-	<example>
-	  <title>Using named and optional parameters</title>
-	  <programlisting lang="nice">
-void copy(File from, File to, int bufferSize = 1000) { ... }
-...
-copy(from: f1, to: f2); // with a buffer size of 1000
-copy(from: f1, to: f2, bufferSize: 4000);</programlisting>
-	</example>
-
-	In the function definition, the optional parameters should be 
-	listed after the required parameters. This is needed to allow 
-	calls that do not name the arguments and want to use the default
-	values for the optional parameters.
-      </para>
-      <para>
-       Note that the optional values of parameters can be based on other
-       parameters, for example:
-      </para>
-      <para>
-       <literal> T[] slice(T[] array, int from = 0, 
-       int to = array.length - 1);</literal>
-      </para>
-    </section>
-  </chapter>
 
   <chapter id="method"><title>Methods</title>
     <section><title>Declaring methods</title>
@@ -427,16 +316,30 @@ copy(from: f1, to: f2, bufferSize: 4000);</programlisting>
       </para>
 
       <para>
-        The syntax is very similar to that for functions, except that
-        no body is provided. 
 	Note that in Nice, methods can be defined within the
         body of a class definition, or outside of it - both are identical
         for the compiler's purposes.
       </para>
+
+      <para>
+        It is also possible to define a default implementation at the same
+        time that the method signature is defined. This form looks like:
+      </para>
+      <para>
+        <literal>
+        <optional><replaceable>type-parameters</replaceable></optional> 
+        <replaceable>return-type</replaceable> 
+        <replaceable>method-name</replaceable>
+        (<optional><replaceable>parameters</replaceable></optional>)
+        {
+	  <replaceable>code-body</replaceable>
+        }
+        </literal>
+      </para>
     </section>
     <section><title>Implementing methods</title>
       <para>
-        In comparison to their declarations, method implementations are
+        In comparison to their declarations, method implementations can be
         quite terse:
       </para>
 
@@ -448,7 +351,7 @@ copy(from: f1, to: f2, bufferSize: 4000);</programlisting>
         </literal>
       </para>
 
-      <para>Like functions, there is another form for single expressions:</para>
+      <para>There is also a special form for methods which consist of a single expression:</para>
 
       <para>
         <literal>
@@ -470,11 +373,11 @@ copy(from: f1, to: f2, bufferSize: 4000);</programlisting>
       <para>or</para>
 
       <para>
-        <literal><replaceable>name</replaceable>@<replaceable>class-name</replaceable></literal>
+        <literal><replaceable>class-name</replaceable> <replaceable>name</replaceable></literal>
       </para>
 
       <para>
-        The <literal>@<replaceable>class-name</replaceable></literal> 
+        The <literal><replaceable>class-name</replaceable></literal> 
 	is used to specialize the method on that argument. 
 	An example should make the difference clear. Also note the
         use of both the block- and expression-style methods.
@@ -497,13 +400,13 @@ numberOfWheels(vehicle)
 }
 
 //Specialize for Cars
-numberOfWheels(car@Car)
+numberOfWheels(Car car)
 { 
     return 4;
 }
 
 //Specialize for Motorcycles
-numberOfWheels(mc@Motorcycle) = 2;
+numberOfWheels(Motorcycle mc) = 2;
 
         </programlisting>
       </example>
@@ -516,7 +419,7 @@ numberOfWheels(mc@Motorcycle) = 2;
        specified. The syntax for exact matching is:
       </para>
       <para>
-       <literal><replaceable>name</replaceable>#<replaceable>class-name</replaceable></literal>
+       <literal>#<replaceable>class-name</replaceable> <replaceable>name</replaceable></literal>
       </para>
 
       <para>
@@ -570,16 +473,16 @@ lastItem(coll)
          This means that methods of the form:
         </para>
         <para>
-         <literal><![CDATA[foo(string@Collection<String>){}]]></literal>
+         <literal><![CDATA[foo(Collection<String> string){}]]></literal>
         </para>
         <para>or</para>
         <para>
-         <literal><![CDATA[foo(array@String[]){}]]></literal>
+         <literal><![CDATA[foo(String[] array){}]]></literal>
         </para>
         <para>
          are not valid. You should use respectively the specializers
-	 <literal>@Collection</literal> and 
-	 <literal>@Array</literal> instead.
+	 <literal>Collection</literal> and 
+	 <literal>Array</literal> instead.
         </para>        
        
     </section>
@@ -619,14 +522,61 @@ booleanToYesNo(false) = "no";
       </example>
 
     </section>
-    <section><title>Optional parameters</title>
+    <section id="namedParameters"><title>Named parameters</title>
       <para>
-	Methods, like functions, can have optional parameters.
-	They are declared in the method declaration, using the
-	<link linkend="optionalParameters">same syntax as in the case 
-	  of functions</link>.
-	Method implementations must still bind all parameters,
-	including the optional ones, and can dispatch on them.
+	When <link linkend="call">calling</link> a method
+	it is possible to specify the name of a parameter, followed by
+	<literal>:</literal> before the value given to that parameter.
+	Named parameters can be given in any order.
+	This is useful when writing the call, because one does not
+	need to remember the order of the arguments, but only their names.
+	This makes the code much easier to understand
+	what each parameter represents, provided that parameter names are
+	chosen carefully.
+	
+	<example>
+	  <title>Using named parameters</title>
+	  <programlisting lang="nice">
+void copy(File from, File to) { ... }
+...
+copy(from: f1, to: f2);
+copy(to: f3, from: f4);</programlisting>
+	</example>
+	
+	It is of course still possible to omit the names of the parameters,
+	in which case the arguments must be given in the order of the 
+	declaration.
+      </para>
+    </section>
+
+    <section id="optionalParameters"><title>Optional parameters</title>
+      <para>
+	Many methods have some parameters that are used most of the time
+	with the same value. In Nice, a parameter can be given a default
+	value. That argument can then be omitted when calling the method, 
+	and the	default value will be used. 
+
+	<example>
+	  <title>Using named and optional parameters</title>
+	  <programlisting lang="nice">
+void copy(File from, File to, int bufferSize = 1000) { ... }
+...
+copy(from: f1, to: f2); // with a buffer size of 1000
+copy(from: f1, to: f2, bufferSize: 4000);</programlisting>
+	</example>
+
+	In the method definition, the optional parameters should be 
+	listed after the required parameters. This is needed to allow 
+	calls that do not name the arguments and want to use the default
+	values for the optional parameters.
+      </para>
+      <para>
+       Note that the optional values of parameters can be based on other
+       parameters, for example:
+      </para>
+      <para>
+       <literal> T[] slice(T[] array, int from = 0, 
+       int to = array.length - 1);</literal>
       </para>
     </section>
   </chapter>
@@ -800,15 +750,17 @@ for(String s : strings)
       </example>
      </para>
     </section>
-    <section id="localFunctions"><title>Local functions</title>
+    <section id="localMethods"><title>Local methods</title>
       <para>
-	Local functions are similar to toplevel functions, 
-        except that they are defined inside another function or method,
+	Local methods are similar to toplevel methods, 
+        except that they are defined inside another method,
         and therefore only usable in that scope.
 	They can refer to local variables from their context.
+	Like <link linkend = "anonymousMethods">anonymous methods</link>,
+	local methods cannot be overridden.
       </para>
 
-      <example><title>Local function</title>
+      <example><title>Local method</title>
 	<programlisting lang="nice">
 Window createMyWindow()
 {
@@ -830,14 +782,14 @@ Window createMyWindow()
   </chapter>
 
   <chapter><title>Expressions</title>
-    <section id="call"><title>Function calls</title>
+    <section id="call"><title>Method calls</title>
       <para>
         A call is usually of the form <literal>f(e1, ..., en)</literal>.
-	<literal>f</literal> can be a function name, a method name, or
-	more generally any expression which has a functional type
+	<literal>f</literal> can be a method name, or
+	more generally any expression which has a method type
 	(for instance, a local parameter).
 	<literal>e1, ..., en</literal> is the list of arguments to the 
-	function. Arguments can optionally be 
+	method. Arguments can optionally be 
 	<link linkend="namedParameters">named</link>.
       </para>
 
@@ -850,28 +802,28 @@ Window createMyWindow()
 	<footnote>
 	  <para>
 	    A consequence of these rules is that if the field 
-	    <literal>f</literal> contains a function, it must be called with
+	    <literal>f</literal> contains a method, it must be called with
 	    <literal>(e.f)(e1, ..., en)</literal>.
 	  </para>
 	</footnote>.
       </para>
 
       <para>
-        It is possible that a name refers to several unrelated functions.
+        It is possible that a name refers to several unrelated methods.
 	In that case, the types (and if applicable names)
-	of the arguments are used to try to disambiguate which function
-	must be called. If only one function is applicable, it is called.
-	Moreoever, if several functions are applicable, but one has a more
+	of the arguments are used to try to disambiguate which method
+	must be called. If only one method is applicable, it is called.
+	Moreoever, if several methods are applicable, but one has a more
 	restricted domain than all the others, it is chosen
 	<footnote>
 	  <para>
-	    For instance, suppose two functions 
+	    For instance, suppose two methods
 	    <literal><![CDATA[<T> void foo(Collection<T>)]]></literal> and 
 	    <literal><![CDATA[<T> void foo(List<T>)]]></literal> are declared, 
 	    and <literal>aList</literal> is an expression of static type 
 	    <type>List</type>.
 	    The expression <literal>foo(aList)</literal> will result in
-	    calling the second <literal>foo</literal> function, 
+	    calling the second <literal>foo</literal> method, 
 	    because <type>List</type>
 	    is a subclass of <type>Collection</type>.
 	  </para>
@@ -907,14 +859,14 @@ Window createMyWindow()
       <para>
        A funny feature is that swapping two variables can be done without a 
        temporary variable, using tuples: <literal>(x, y) = (y, x)</literal>.
-       An important use of tuples is to allow a function or a method 
+       An important use of tuples is to allow a method
        to return several values. <xref linkend="tupleEx" /> defines
-       and uses the function <literal>minMax</literal>, which takes 
+       and uses the method <literal>minMax</literal>, which takes 
        two integers, and returns the smallest first, the biggest second.
       </para>
 
       <example id="tupleEx">
-	<title>Function returning several values using a tuple</title>
+	<title>Method returning several values using a tuple</title>
 	<programlisting lang="nice"><![CDATA[
 (int, int) minMax(int x, int y) = x < y ? (x, y) : (y, x);
 
@@ -938,15 +890,103 @@ void main(String[] args)
 
     </section>
 
-    <section id="anonymousFunctions"><title>Anonymous functions</title>
+    <section><title>Arrays</title>
       <para>
-       Since Nice allows functions and methods to be passed as arguments, and
-       returned as results, it is convenient to allow small anonymous functions
-       to be defined at the same point in the program in which they are used,
-       similar to the use of anonymous classes in Java.       
+      An array can be created by simply enclosing the elements of the
+      new array in brackets. 
       </para>
       <para>
-       The syntax of anonymous functions is:
+            <literal><replaceable>class-name</replaceable>[]
+	    <replaceable>variable-name</replaceable> = [
+	    <replaceable>element1</replaceable>,
+	          <replaceable>element2</replaceable>, ...]</literal>
+      </para>
+      <para>
+      It is also possible to create an array
+      which is filled with nulls, or some single value, or a value
+      which is calculated on a cell-by-cell basis, by using the 
+      <literal>fill</literal> method in the standard library.
+      <example>
+      <title>Initializing an array with a single value</title>
+      <programlisting lang="nice"><![CDATA[
+      //Fill every cell with the value 5000.
+      int[] points = new int[10];
+      fill(points, 5000);
+      ]]></programlisting>
+      </example>
+      <example>
+      <title>Initializing an array with a calculated value</title>
+      <programlisting lang="nice"><![CDATA[     
+      //build a little table of squares 
+      int[] squares = fill(new int[10], int i => i * i);
+      ]]></programlisting>
+      </example>
+      </para>
+    </section>
+
+    <section><title>String Literals</title>
+      <para>
+      Literal strings are surrounded with double quotes, for instance:
+      </para>
+      <para>
+      <literal>
+      String s = "Hello";
+      </literal>
+      </para>
+      <para>
+      The backslash character <literal>\</literal> is used for escaping,
+      as in Java.
+      </para>
+      <para>
+      Nice also allows multi-line string literals, using syntax borrowed
+      from the Python language. Multi-line strings begin and end with 
+      three double quotes. 
+      <!-- 
+      This is how it _should_ work, IMHO: 
+      Within multi-line strings, double quotes do
+      not need to be escaped, unless there are three in a row. 
+      --> Note that unlike in Python, it is still necessary to use
+      a backslash before double quotes that should be included in the
+      string. 
+      </para>
+      <example>
+      <title>Multi-line strings</title>
+      <programlisting lang="nice"><![CDATA[
+      let greeting  = """
+            Hello, world.
+	    You may be thinking, \"Why was I called here today?\"
+	    Well, there was a good reason. Honest.
+      """;      
+      ]]></programlisting>
+      </example>
+      <para>
+      Strings can be combined by simple juxtaposition - that is, by
+      placing them side by side with some other expression. For
+      example:
+      </para>
+      <example>
+      <title>String concatentation</title>
+      <programlisting lang="nice"><![CDATA[
+      String name = "Nice";
+      int factor = 10;
+      println("My favorite language is " name ", which is " factor 
+                   " times better than what they make me use at work.");
+      ]]>
+      </programlisting>
+      </example>
+
+    </section>
+
+    <section id="anonymousMethods"><title>Anonymous methods</title>
+      <para>
+       Since Nice allows methods to be passed as arguments, and
+       returned as results, it is convenient to allow small anonymous methods
+       to be defined at the same point in the program in which they are used,
+       similar to the use of anonymous classes in Java. Anonymous methods 
+       cannot be overridden, and have exactly one implementation.
+      </para>
+      <para>
+       The syntax of anonymous methods is:
       </para>
       <para>
         <literal>
@@ -955,7 +995,7 @@ void main(String[] args)
         </literal>
       </para>
       <para>
-       As with the other functionals, there is also a single-expression format:
+       As with named methods, there is also a single-expression format:
       </para>
       <para>
         <literal>
@@ -964,17 +1004,17 @@ void main(String[] args)
         </literal>
       </para>
       <para>
-       The brackets around the parameters are optional if there is only one
+       The parentheses around the parameters are optional if there is only one
        parameter.
       </para>
       <para>
-       The return type of an anonymous function is automatically determined by 
+       The return type of an anonymous method is automatically determined by 
        the compiler using a process called 
        <firstterm>type inference</firstterm>, so it is not necessary or possible
        to specify it.
       </para>
 <example>
-<title>Using Anonymous Functions</title>
+<title>Using Anonymous Methods</title>
 <programlisting lang="nice"><![CDATA[
 String concat(Collection<String> strings) 
 {
@@ -996,6 +1036,50 @@ String concat2(Collection<String> strings)
 </example>
     </section>
 
+    <section id="operators"><title>Operators</title>
+      <para>
+        Nice supports a wide range of operators which will be familiar to 
+        most programmers. The table below lists the operators and their
+	precedence levels.
+      </para>
+      <table>
+        <tbody>
+ <!-- Lifted from http://nice.sourceforge.net/cgi-bin/twiki/view/Doc/NiceExpressions -->
+<row><entry>  <verbatim> () </verbatim>  </entry><entry align="right">   grouping  </entry><entry>  none  </entry></row>
+<row><entry>  <verbatim> [], . </verbatim>  </entry><entry>  postfix  </entry><entry>  left  </entry></row>
+
+<row><entry>  <verbatim> new </verbatim>  </entry><entry>  prefix  </entry><entry>  right </entry></row>
+<row><entry>  <verbatim> ++, -- </verbatim>  </entry><entry>  postfix  </entry><entry>  left  </entry></row>
+
+<row><entry>  <verbatim> +, -, ++, --, ~, ! </verbatim>  </entry><entry>  prefix  </entry><entry>  right  </entry></row>
+<row><entry>  <verbatim> ** </verbatim>  </entry><entry>  binary  </entry><entry>  right  </entry></row>
+
+<row><entry>  <verbatim> *, /, % </verbatim>  </entry><entry>  binary  </entry><entry>  left  </entry></row>
+<row><entry>  <verbatim> +, - </verbatim>  </entry><entry>  binary  </entry><entry>  left  </entry></row>
+
+<row><entry>  <verbatim> &lt;&lt;, &gt;&gt;, &gt;&gt;&gt; </verbatim>  </entry><entry>  binary  </entry><entry>  left  </entry></row>
+<row><entry>  <verbatim> .. </verbatim>  </entry><entry>  binary  </entry><entry>  left  </entry></row>
+
+<row><entry>  <verbatim>  &lt;, &lt;=, &gt;, &gt;= </verbatim>  </entry><entry>  binary  </entry><entry>  both  </entry></row>
+<row><entry>  <verbatim> instanceof </verbatim>  </entry><entry>  binary  </entry><entry>  left  </entry></row>
+
+<row><entry>  <verbatim> <code>=, !</code> </verbatim>  </entry><entry>  binary  </entry><entry>  left  </entry></row>
+<row><entry>  <verbatim> &amp; </verbatim>  </entry><entry>  binary  </entry><entry>  left  </entry></row>
+
+<row><entry>  <verbatim> ^ </verbatim>  </entry><entry>  binary  </entry><entry>  left  </entry></row>
+<row><entry>  _  </entry><entry>  binary  </entry><entry>  left  </entry></row>
+<row><entry>  <verbatim> &amp;&amp; </verbatim>  </entry><entry>  binary  </entry><entry>  left  </entry></row>
+
+<row><entry>  <verbatim> __ </verbatim>  </entry><entry>  binary  </entry><entry>  left  </entry></row>
+<row><entry>  <verbatim> ?: </verbatim>  </entry><entry>  ternary  </entry><entry>  right  </entry></row>
+
+<row><entry>  <verbatim> =&gt; </verbatim>  </entry><entry>  binary  </entry><entry>  right  </entry></row>
+<row><entry>  <verbatim> *=, /=, %=, +=, -=, &amp;=, ^=, _=, &lt;&lt;=, &gt;&gt;=, &gt;&gt;&gt;=, = </verbatim>  </entry><entry>  binary  </entry><entry>  right  </entry></row>
+        </tbody>
+
+      </table>
+    </section>
+
     <section id="conversion"><title>Conversion between numeric primitive types</title>
       <para>
 	The numeric primitive types are, from the largest to the smallest:
@@ -1007,7 +1091,7 @@ String concat2(Collection<String> strings)
 	since they can lose information about the magnitude of the value.
       </para>
       <para>
-	The explicit conversion is done by calling a special function, 
+	The explicit conversion is done by calling a special method, 
 	whose name is the target type. 
 	If <replaceable>e</replaceable> is a numeric expression,
 	and <replaceable>type</replaceable> one of the numeric types, then 
@@ -1102,7 +1186,7 @@ while ((v = r.read()) != -1) {
 	  prevent <literal>NullPointerExceptions</literal>
 	  (see <link linkend="optionTypes">option types</link>).
 	  This poses a problem when using 
-	  existing Java libraries. If my Nice program calls a Java function
+	  existing Java libraries. If my Nice program calls a Java method
 	  that returns a <type>String</type> (the Java type), 
 	  does it mean <type>String</type> or 
 	  <type>?String</type> in Nice? 
@@ -1136,7 +1220,7 @@ public class MyJavaClass {
 	  the Javadoc comment of the method. In that cases there are currently 
 	  two possibilities. The first is to use the 
 	  <link linkend="notNull"><literal>notNull</literal>
-	  function</link>. 
+	  method</link>. 
 	  So in our example <literal>notNull(myJavaClass.getName())</literal>
 	  has type <type>String</type>. This solution is simple, but can 
 	  be annoying if you call the same method many times, or because it 
@@ -1154,10 +1238,10 @@ String getName(MyJavaClass) = native String MyJavaClass.getName();</programlisti
 
 	<para>
           The Nice part (on the left of the <literal>=</literal> character) 
-	  is the header of a function definition. Note that return type is 
+	  is the header of a method definition. Note that return type is 
 	  <type>String</type> (without the optional type marker 
 	  <literal>?</literal>). On the other hand, the right part says that 
-	  the function is already defined in class 
+	  the method is already defined in class 
 	  <type>MyJavaClass</type>, with name <literal>getName</literal>,
 	  the one that takes no argument and returns a 
 	  <type>String</type>. With this declaration, 
@@ -1176,9 +1260,9 @@ String getName(MyJavaClass) = native String MyJavaClass.getName();</programlisti
 	with javac.
       </para>
 
-      <section><title>Calling a function</title>
+      <section><title>Calling a method</title>
 	<para>
-	  You can call a <link linkend="function">function</link> 
+	  You can call a <link linkend="method">method</link> 
 	  <literal>f</literal>
 	  defined in a nice package <literal>pkg</literal> 
 	  by naming it <literal>pkg.fun.f</literal> in the Java program.
@@ -1237,7 +1321,7 @@ class Worker extends Person
 
   display() = "Worker: " + name + " salary: " + salary;
 
-  // A function:
+  // A method:
   boolean isRich() = salary > 500;
 }
 
@@ -1269,7 +1353,7 @@ public class Main
 
       <section><title>Optional parameters</title>
 	<para>
-	  Nice allows function and method parameters to be 
+	  Nice allows method and parameters to be 
 	  <link linkend="optionalParameters">optional</link>.
 	  Since this feature is not available in Java, you have to 
 	  provide the value of all parameters, regardless of their
@@ -1332,7 +1416,7 @@ public class Main
 	<para id="notNull">
 	  Sometimes, you know that a value cannot be &NULL;,
 	  although it has an option type.
-	  You can then use the <literal>notNull</literal> function to
+	  You can then use the <literal>notNull</literal> method to
 	  assert this fact.
 	  If an expression <replaceable>e</replaceable> has type
 	  <type>?<replaceable>type</replaceable></type>, then
@@ -1343,7 +1427,7 @@ public class Main
 	  is the same as <type><replaceable>type</replaceable></type>.
 	</para>
 	<para>
-	  The <literal>notNull</literal> function uses 
+	  The <literal>notNull</literal> method uses 
 	  <link linkend="contracts"><literal>assert</literal></link>
 	  to check that the argument is not &NULL;. 
 	  This means that the check will only happen at runtime
@@ -1395,10 +1479,10 @@ public class Main
        equivalent to <type><replaceable>type</replaceable></type>.
       </para>
       <para>
-	For instance, in the following function:
+	For instance, in the following method:
       </para>
       <para>
-       <literal><![CDATA[<T> T myFunction(Collection<T>);]]></literal>
+       <literal><![CDATA[<T> T myMethod(Collection<T>);]]></literal>
       </para>
       <para>
        the type parameter <type>T</type> can be
@@ -1407,13 +1491,13 @@ public class Main
        from the domain of <type>T</type>, the type can be specified this way:
       </para>
       <para>
-       <literal><![CDATA[<!T> !T myFunction(Collection<!T>);]]></literal>
+       <literal><![CDATA[<!T> !T myMethod(Collection<!T>);]]></literal>
       </para>
       </section>
 
       <section id = "typeParameters"><title>Type Parameters</title>
         <para>
-          Classes, functions, and methods can all be parameterized with type
+          Classes and methods can be parameterized with type
           variables in Nice as is demonstrated in each of their respective
           chapters. In addition to the ability to introduce type variables,
           Nice provides the ability to constrain those types in certain ways.
@@ -1475,14 +1559,14 @@ class Foo
   alike copy();
 }
 
-copy(f#Foo) = new Foo(value: f.value);
+copy(#Foo f) = new Foo(value: f.value);
 
 class Bar extends Foo
 {
   int id;
 }
 
-copy(b#Bar) = new Bar(value: b.value, id: generateNewId());
+copy(#Bar b) = new Bar(value: b.value, id: generateNewId());
 </programlisting>
         </example>
 	</para>
@@ -1556,14 +1640,14 @@ let int ERROR = 3;
 //Make strings pass straight through as DEBUG info.
 class java.lang.String implements LogEntry;
 
-toLogString(s@String) = s;
-severity(s@String) = DEBUG;
+toLogString(String s) = s;
+severity(String s) = DEBUG;
 
 
 //Make throwables print a stack trace, plus a message
 class nice.lang.Throwable implements LogEntry;
 
-toLogString(t@Throwable) 
+toLogString(Throwable t) 
 {
   let writer = new StringWriter();
   let printWriter = new PrintWriter(writer);
@@ -1573,13 +1657,13 @@ toLogString(t@Throwable)
   return writer.toString();
 }
 
-severity(t@Throwable) = ERROR;
+severity(Throwable t) = ERROR;
 
 //We like to log requests, too
 class javax.servlet.http.HttpServletRequest implements LogEntry;
 
-toLogString(r@HttpServletRequest) = "Request from: " + r.getRemoteHost();
-severity(r@HttpServletRequest) = INFO;
+toLogString(HttpServletRequest r) = "Request from: " + r.getRemoteHost();
+severity(HttpServletRequest r) = INFO;
 
 ]]>
 </programlisting>

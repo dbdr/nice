@@ -55,11 +55,7 @@ public class SymbolExp extends Expression
     // (with a reference to the same symbol).
     // So they hold different (but equivalent) types.
 
-    // it's not necessary if the symbol is monomorphic
-    if (symbol instanceof PolySymbol)
-      type = symbol.getType().cloneType();
-    else
-      type = symbol.getType();
+    type = symbol.getType().cloneType();
   }
 
   /****************************************************************

@@ -22,9 +22,9 @@ JAVAC=  ${javac} -classpath "${TOP}/classes:${TOP}/src:${TOP}/stdlib" -sourcepat
 JAVACC= CLASSPATH="${TOP}/external/JavaCC.zip:${CLASSPATH}" java COM.sun.labs.javacc.Main
 JAVADOC=javadoc #-linkoffline file:///C%7C/Apps/jdk1.2.1/docs/api file:///usr/opt/java122/docs/api
 
-NICEC_ARGS= -d "${TOP}/classes" --exclude-runtime --sourcepath="${TOP}/stdlib:${TOP}/src" --classpath="${TOP}/classes"
-NICEC=nicec ${NICEC_ARGS}
-NICEC1=${TOP}/bin/nicec ${NICEC_ARGS}
+NICEC_ARGS= -d "${TOP}/classes" --exclude-runtime --classpath="${TOP}/classes"
+NICEC=nicec ${NICEC_ARGS} --sourcepath="${TOP}/stdlib:${TOP}/src" 
+NICEC1=${TOP}/bin/nicec ${NICEC_ARGS} --sourcepath="${TOP}/stdlib.new:${TOP}/src.new" 
 
 # Get the version from the debian changelog.
 VERSION = ${shell dpkg-parsechangelog | sed -n 's/^Version: //p'}
@@ -45,6 +45,8 @@ compiler1: setDate
 	${NICEC}  -R -a src/nice/tools/compiler.jar nice.tools.compiler
 
 compiler2 compiler3: setDate
+	if [ ! -r stdlib.new ]; then ln -s stdlib stdlib.new; fi
+	if [ ! -r src.new ]; then ln -s src src.new; fi
 	${NICEC1} -R bossa.syntax
 	${NICEC1} -R -a src/nice/tools/compiler.jar nice.tools.compiler
 

@@ -513,20 +513,19 @@ analyse(b@Block, info)
 {
   info.begin();
   notNull(b.locals).iter(Block.LocalDeclaration l => analyse(l, info));
-  b.statements = analyse(b.statements, info);
+  analyse(b.statements, info);
   info.end();
 }
 
-Statement[] analyse(Statement[] statements, Info info)
+void analyse(?Statement[] statements, Info info)
 {
   for (int i = 0; i < statements.length; i++)
     {
-      Statement s = statements[i];
+      ?Statement s = statements[i];
       if (info.getUnreachable())
 	throw error(s, "This statement is never executed");
       analyse(s, info);
     }
-  return statements;
 }
 
 analyse(s@ExpressionStmt, info)

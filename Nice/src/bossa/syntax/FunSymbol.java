@@ -67,11 +67,11 @@ class FunSymbol extends PolySymbol
   {
     if (parameters == null)
       // true for constructors, for instance. case might be removed
-      if (!arguments.plainApplication(arity))
+      if (!arguments.plainApplication(arity, this))
 	return 0;
       else
 	return 2;
-    else if (!parameters.match(arguments))
+    else if (!parameters.match(arguments, this))
       return 0;
     else
       return 2;

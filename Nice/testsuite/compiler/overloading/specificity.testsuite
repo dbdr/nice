@@ -1,0 +1,46 @@
+/// COMMENT Symbols that are less specific than others are ignored.
+
+/// Global
+
+class A {}
+class B extends A {}
+
+
+/// PASS
+  f(new B());
+
+  ///Toplevel
+void f(A) { assert (false); }
+void f(B, ?String s = null) {}
+
+
+/// PASS
+  f(a: new B(), "");
+
+  ///Toplevel
+void f(A a, String s) { assert(false); }
+void f(B a, String s) { }
+
+/// PASS
+  f(a: new B(), "");
+
+  ///Toplevel
+void f(A a, String s) { assert(false); }
+void f(int s, int a) {}
+void f(B a, String s) { }
+
+/// PASS
+  h(a: new B());
+
+  ///Toplevel
+void h(?String s = null, A a) {}
+void h(B a, ?String s = null) {}
+
+/// FAIL
+  f(a: new B(), "");
+
+  ///Toplevel
+void f(A a, String s) { }
+void f(B a, String s) { }
+void f(B a, String s, int i = 0) { }
+

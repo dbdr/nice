@@ -20,6 +20,9 @@ import bossa.util.Debug;
 import mlsub.typing.*;
 import mlsub.typing.lowlevel.Kind;
 import mlsub.typing.Polytype;
+import mlsub.typing.FunType;
+import mlsub.typing.TupleType;
+import mlsub.typing.Monotype;
 
 /**
    A symbol, for which overloading resolution has yet to be done.
@@ -123,8 +126,6 @@ public class OverloadedSymbolExp extends Expression
 
     removed.clear();
 
-    Polytype[] types = new Polytype[symbols.size()];
-    VarSymbol[] syms = new VarSymbol[symbols.size()];
     int sym = 0;
     for(Iterator i = symbols.iterator(); i.hasNext(); sym++)
       {
@@ -140,7 +141,7 @@ public class OverloadedSymbolExp extends Expression
 	// before the clone type is released
 	s.makeClonedType();
 	Polytype[] argsType = 
-	  Expression.getType(arguments.getExpressions(sym));
+	  Expression.getType(arguments.getExpressions(s));
 	Polytype t = CallExp.wellTyped(s.getClonedType(), argsType);
 
 	if (t == null)
@@ -151,8 +152,7 @@ public class OverloadedSymbolExp extends Expression
 	  }
 	else
 	  {
-	    types[sym] = t;
-	    syms[sym] = s;
+	    arguments.types.put(s, t);
 	  }
       }
 
@@ -168,22 +168,18 @@ public class OverloadedSymbolExp extends Expression
 		   "\nPossibilities:\n" + 
 		   Util.map("", "\n", "", removed));
 
-    removeNonMinimal();
+    removeNonMinimal(symbols, arguments);
     
     if (symbols.size() == 1)
       {
 	VarSymbol res = (VarSymbol) symbols.get(0);
 	res.releaseClonedType();
 
-	for (int i = 0;; i++)
-	  if (syms[i] == res)
-	    {
-	      callExp.type = types[i];
-	      // store the expression (including default arguments)
-	      callExp.arguments.computedExpressions = arguments.getExpressions(i);
-	      //callExp.arguments = null; // free memory
-	      return uniqueExpression();
-	    }
+	callExp.type = (Polytype) arguments.types.get(res);
+	// store the expression (including default arguments)
+	callExp.arguments.computedExpressions = arguments.getExpressions(res);
+	//callExp.arguments = null; // free memory
+	return uniqueExpression();
       }
 
     releaseAllClonedTypes();
@@ -289,12 +285,7 @@ public class OverloadedSymbolExp extends Expression
    * This allows for java-style overloading, 
    * where the most precise method is choosen at compile-time.
    */
-  private void removeNonMinimal()
-  {
-    removeNonMinimal(symbols);
-  }
-  
-  private static void removeNonMinimal(List symbols)
+  private static void removeNonMinimal(List symbols, Arguments arguments)
   {
     // optimization
     if(symbols.size()<2)
@@ -305,25 +296,42 @@ public class OverloadedSymbolExp extends Expression
       symbols.toArray(new VarSymbol[len]);
     boolean[] remove = new boolean[len];
     
-    for(int s1 = 0; s1<len; s1++)
+    for(int s1 = 0; s1<len; s1++) {
+
+      Domain d1 = domain(syms[s1].getClonedType(), 
+			 arguments.getUsedArguments(syms[s1]));
+      
       for(int s2 = 0; s2<len; s2++)
-	// avoid the diagonal
-	// if s2 was removed, there is s'1 below s2 so we can ignore it
-	// makes removal faster
-	// funny special case is when too symbols have the same domain,
-	// we silently remove only one of them
-	// should do something about that 
-	// (but maybe only once per package, 
-	//  checking all symbols with same name).
-	if (s1 != s2 && !remove[s2])
+	/*
+	  Look for symbols s1 and s2 such that
+	    d2 <: d1 and not d1 <: d2
+	  In that case s1 can be removed, since it is less specific than s2.
+
+	  Optimizations:
+	    Skip the diagonal.
+	    If s2 was removed, then there is s3 below s2.
+	    Therefore s1 will be removed anyway.
+	*/
+	if (s1 != s2 && !remove[s2]) {
+
+	  Domain d2 = domain(syms[s2].getClonedType(), 
+			     arguments.getUsedArguments(syms[s2]));
+
 	  try{
-	    Typing.leq(domain(syms[s2].getClonedType()), 
-		       domain(syms[s1].getClonedType()));
-	    remove[s1] = true;
-	    break;
+	    Typing.leq(d2, d1);
+	    try {
+	      Typing.leq(d1, d2);
+	    }
+	    catch (TypingEx e) {
+	      remove[s1] = true;
+	      break;
+	    }
 	  }
 	  catch(TypingEx e){
 	  }
+	}
+    }
+
     for(int i = 0; i<len; i++)
       if(remove[i])
 	{
@@ -335,14 +343,33 @@ public class OverloadedSymbolExp extends Expression
 	}
   }
 
-  private static Domain domain(Polytype t)
+  private static Domain domain(Polytype t, int[] usedArguments)
   {
     // remove nullness marker
-    // XXX optimize: no contruction of Polytype?
-    t = new Polytype(t.getConstraint(),
-		     ((mlsub.typing.MonotypeConstructor) t.getMonotype())
-		     .getTP()[0]);
-    return t.getDomain();
+    Monotype[] m = ((FunType)
+      ((mlsub.typing.MonotypeConstructor) t.getMonotype()).getTP()[0])
+      .domain();
+
+    Monotype[] dom;
+
+    if (usedArguments == null)
+      dom = m;
+    else
+      {
+	int n = 0;
+	for (int i = 0; i < usedArguments.length; i++)
+	  if (usedArguments[i] != 0)
+	    n++;
+
+	dom = new Monotype[n];
+
+	for (int i = 0; i < usedArguments.length; i++)
+	  if (usedArguments[i] != 0)
+	    dom[usedArguments[i] - 1] = m[i];
+
+      }
+
+    return new Domain(t.getConstraint(), new TupleType(dom));
   }
 
   void computeType()

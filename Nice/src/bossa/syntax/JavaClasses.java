@@ -272,7 +272,11 @@ public final class JavaClasses
     }
     
     for (Field f = classType.getFields(); f != null; f = f.getNext())
-      addSymbol(JavaFieldAccess.make(f));
+      {
+	if (retyped.get(f) == null)
+	  addSymbol(JavaFieldAccess.make(f));
+      }
+
   addingFetchedMethod:
     for(Method m = classType.getMethods(); m!=null; m = m.getNext())
       {

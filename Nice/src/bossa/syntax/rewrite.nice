@@ -39,33 +39,33 @@ rewrite(s@Block)
   return s;
 }
 
-Statement[] rewrite(Statement[] statements)
+?Statement[] rewrite(?Statement[] statements)
 {
   for (int i = 0; i < statements.length - 1; i++)
     {
-      Statement s = statements[i];
+      ?Statement s = statements[i];
       ?IfExp ifExp = ifExp(s);
       if (ifExp != null)
 	if (ifExp.thenUnreachable)
 	  {
 	    ifExp.elseExp = new StatementExp
 	    (rewrite(makeBlock(notNull(ifExp.elseExp), 
-			       statements.split(from: i+1))));
-	    return statements.split(to: i);
+			       statements.slice(from: i+1))));
+	    return statements.slice(to: i);
 	  }
 	else if (ifExp.elseUnreachable)
 	  {
 	    ifExp.thenExp = new StatementExp
 	    (rewrite(makeBlock(notNull(ifExp.thenExp), 
-			       statements.split(from: i+1))));
-	    return statements.split(to: i);
+			       statements.slice(from: i+1))));
+	    return statements.slice(to: i);
 	  }
 	}
   return statements;
 }
 
-?IfExp ifExp(Statement);
-ifExp(s@Statement) = null;
+?IfExp ifExp(?Statement);
+ifExp(s) = null;
 ifExp(s@ExpressionStmt)
 {
   if (s.exp instanceof bossa.syntax.IfExp)
@@ -78,7 +78,7 @@ Statement makeStatement(Expression);
 makeStatement(e@Expression) = new ExpressionStmt(e);
 makeStatement(e@StatementExp) = e.statement;
 
-Block makeBlock(Expression first, Statement[] rest)
+Block makeBlock(Expression first, ?Statement[] rest)
 {
   ?Statement[] res = new Statement[rest.length + 1];
   res[0] = makeStatement(first);

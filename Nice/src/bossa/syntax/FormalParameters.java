@@ -258,7 +258,7 @@ public class FormalParameters extends Node
      the computed array of expressions, that denote the call,
      including the default values of the optional parameters not passed.
   */
-  boolean match(Arguments args)
+  boolean match(Arguments args, FunSymbol symbol)
   {
     int[] map = new int[size];
 
@@ -292,7 +292,8 @@ public class FormalParameters extends Node
 	}
       else
 	exps[i] = args.getExp(map[i] - 1);
-    args.applicationExpressions.add(exps);
+    args.applicationExpressions.put(symbol, exps);
+    args.usedArguments.put(symbol, map);
     return true;
   }
   

@@ -51,11 +51,18 @@ void set(float[],  int, float)   = inline nice.lang.inline.ArraySetOp("f");
 void set(double[], int, double)  = inline nice.lang.inline.ArraySetOp("d");
 
 
-<Any T> void copy(!T[] from, int fromIndex = 0, ?T[] to, int toIndex = 0, 
-		  int count) = 
+<T,U | T <: U> void copy(T[] from, int fromIndex = 0, 
+			 U[] to, int toIndex = 0, int count) = 
   native void System.arraycopy(Object, int, Object, int, int);
 
-<Any T> T[] split(T[] array, int from = 0, int to = -1)
+<T,U | T <: U> void copy(List<T> from, int fromIndex = 0, 
+			 U[] to, int toIndex = 0, int count)
+{
+  for (int i = fromIndex + count; --i >= fromIndex;)
+    to[i] = from[toIndex + i];
+}
+
+<Any T> T[] slice(T[] array, int from = 0, int to = -1)
 {
   if (to == -1) 
     to = array.length - 1;

@@ -160,24 +160,34 @@ public class Arguments
     return res;
   }
 
-  java.util.List applicationExpressions = new java.util.ArrayList();
+  java.util.Map applicationExpressions = new java.util.HashMap();
   
-  Expression[] getExpressions(int num)
+  Expression[] getExpressions(VarSymbol s)
   {
-    return (Expression[]) applicationExpressions.get(num);
+    return (Expression[]) applicationExpressions.get(s);
   }
   
+  // Map actual arguments to formal arguments. Indexes are 1-based.
+  java.util.Map usedArguments = new java.util.HashMap();
+  
+  int[] getUsedArguments(VarSymbol s)
+  {
+    return (int[]) usedArguments.get(s);
+  }
+  
+  java.util.Map types = new java.util.HashMap();
+
   /**
      return true if there are arity non-tagged arguments.
   */
-  boolean plainApplication(int arity)
+  boolean plainApplication(int arity, VarSymbol symbol)
   {
     if (arguments.length != arity)
       return false;
     for (int i = 0; i<arguments.length; i++)
       if (arguments[i].name != null)
 	return false;
-    applicationExpressions.add(inOrder());
+    applicationExpressions.put(symbol, inOrder());
     return true;
   }
   

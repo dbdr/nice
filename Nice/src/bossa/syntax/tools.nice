@@ -60,13 +60,12 @@ mlsub.typing.Monotype makeUnsure(mlsub.typing.Monotype m) =
 LocatedString name(VarSymbol) = native VarSymbol.name;
 mlsub.typing.Polytype getType(Expression) = 
   native mlsub.typing.Polytype Expression.getType();
-Statement[] statements(Block) = native Block.statements;
 Statement statement(StatementExp) = native StatementExp.statement;
 mlsub.typing.Monotype type(MonoSymbol) = native MonoSymbol.type;
 GlobalTypeScope getGlobalTypeScope() = native GlobalTypeScope Node.getGlobalTypeScope();
 List<TryStmt.Catch> catches(TryStmt) = native TryStmt.catches;
 List<Block.LocalDeclaration> locals(Block) = native Block.locals;
-List<Statement> statements(Block) = native Block.statements;
+?Statement[] statements(Block) = native Block.statements;
 ?gnu.bytecode.ClassType staticClass(Arguments) = native gnu.bytecode.ClassType Arguments.staticClass();
 List<VarSymbol> findJavaMethods(?gnu.bytecode.ClassType, String, int) = native List JavaClasses.findJavaMethods(gnu.bytecode.ClassType,java.lang.String,int);
 OverloadedSymbolExp newOverloadedSymbolExp(List<bossa.syntax.VarSymbol>, ?bossa.syntax.LocatedString) = native new OverloadedSymbolExp(List,LocatedString);

@@ -70,8 +70,6 @@ parse(progName@String, args, options)
   return res;
 }
 
-<Any T> T notNull(T) = inline nice.lang.inline.Nop();
-
 void doAction(Option, Getopt);
 doAction(o@NoParamOption,g) = action(o)();
 doAction(o@ParamOption,g) = actionParam(o)(notNull(g.getOptarg()));

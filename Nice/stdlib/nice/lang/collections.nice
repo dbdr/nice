@@ -33,6 +33,17 @@ U foldRight(java.util.List<T> l, (T, U)->U f, U init, int from)
     return init;
 }
 
+<Any T> List<T> slice(List<T> list, int from = 0, int to = -1)
+{
+  if (to == -1) 
+    to = list.size() - 1;
+
+  List<T> res = new ArrayList(to - from + 1);
+  for (int i = from; i <= to; i++)
+    res.add(list[i]);
+  return res;
+}
+
 /****************************************************************
  * Implementations
  ****************************************************************/

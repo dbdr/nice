@@ -14,6 +14,8 @@ nice (0.7.4) unstable; urgency=low
   * Allow the <T> syntax to introduce type variables, in addition to
     <Any T> (that is, any is optional). This is consistent with GJ, 
     and the syntax for class type parameters.
+  * Improved overloading resolution when used on functions with optional
+    arguments.
   * Removed the old syntax <T1, T2> for tuples. Use (T1, T2) instead.
   * Bugfixes (forward reference to constructor in field initializer,
     anonymous functions in field initializer, override of void native method,

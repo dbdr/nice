@@ -13,6 +13,7 @@
 package bossa.syntax;
 
 import mlsub.typing.Polytype;
+import mlsub.typing.FunTypeKind;
 import nice.tools.code.Types;
 
 import bossa.util.*;
@@ -104,8 +105,8 @@ public class MonoSymbol extends VarSymbol
   int match(Arguments arguments)
   {
     mlsub.typing.lowlevel.Kind k = Types.rawType(type).getKind();
-    if(k instanceof mlsub.typing.FunTypeKind)
-      if (!arguments.plainApplication(((mlsub.typing.FunTypeKind) k).domainArity))
+    if(k instanceof FunTypeKind)
+      if (!arguments.plainApplication(((FunTypeKind) k).domainArity, this))
 	return 0;
       else
 	return 2;
@@ -116,9 +117,9 @@ public class MonoSymbol extends VarSymbol
   String explainWhyMatchFails(Arguments arguments)
   {
     mlsub.typing.lowlevel.Kind k = Types.rawType(type).getKind();
-    if(k instanceof mlsub.typing.FunTypeKind)
+    if(k instanceof FunTypeKind)
       { 
-	int arity = ((mlsub.typing.FunTypeKind) k).domainArity;
+	int arity = ((FunTypeKind) k).domainArity;
 	if (arguments.size() != arity)
 	  return name + Util.has(arity, "parameter", arguments.size());
 	else

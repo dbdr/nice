@@ -1,13 +1,15 @@
-#! /bin/sh
+#! /bin/sh -x
+
+SOURCES=flow4j-src-latest.tar.gz
 
 set -e
 
 if [ ! -r flow4j ]; then
   if [ ! -r flow4j-src-0.5.tar.gz ]; then
-      wget http://cesnet.dl.sourceforge.net/sourceforge/flow4j/flow4j-src-0.5.tar.gz
+      wget http://flow4j.sf.net/releases/${SOURCES}
   fi
   mkdir flow4j
-  tar zxf flow4j-src-0.5.tar.gz -C flow4j
+  tar zxf ${SOURCES} -C flow4j
   chmod a+x flow4j/build.sh
 fi
 

@@ -1,3 +1,13 @@
+nice (0.5.6) unstable; urgency=low
+
+  * Added the ".class" construct.
+  * Calling new T[size] where T is a type variable now correctly returns 
+    an array with optional element type. It can be filled with non-null values
+    using the 'fill' function, e.g. 
+        fill(new T[size], int i => f(x[i]))
+
+ -- Daniel Bonniot <bonniot@users.sourceforge.net>  Tue,  2 Jul 2002 11:37:20 +0200
+
 nice (0.5.5) unstable; urgency=low
 
   * Merged --classpath and --packagepath options into --classpath.

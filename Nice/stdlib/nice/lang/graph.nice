@@ -1,7 +1,5 @@
 package nice.lang;
 
-import gnu.math.*;
-
 /** 
     Returns the strongly connected components
     of the graph rooted at the first argument,

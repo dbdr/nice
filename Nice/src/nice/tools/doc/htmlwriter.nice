@@ -237,7 +237,8 @@ class HTMLWriter {
       //create a list of source files in the package
       //we use a map instead of a set of definitions because
       //we also want keep a list of which files contain which definitions.
-      Map<File, List<Definition>> map = new HashMap();
+      //the list is sorted by filename (treemap automatically sorts).
+      Map<File, List<Definition>> map = new TreeMap();
       
       for(Definition d : p.getDefinitions().definitions()) {
         //we only display information about these types

@@ -35,7 +35,7 @@ public class FunType extends bossa.syntax.Monotype
     this.out = out;
   }
 
-  private static emptyList = new LinkedList();
+  private static List emptyList = new LinkedList();
   
   /****************************************************************
    * Scoping

@@ -144,3 +144,8 @@ new B(int x) {
     String str;
   }
   new X() = this(str: "abc");
+
+/// PASS
+  /// Toplevel
+class A {}
+new A(int) { this(); }

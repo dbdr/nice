@@ -202,6 +202,10 @@ class Info
 
   void addVar(MonoSymbol symbol)
   {
+    // Anonymous symbols are OK, but can be ignored.
+    if (symbol.name == null)
+      return;
+
     ?Monotype type = symbol.syntacticType;
     if (type != null)
       {

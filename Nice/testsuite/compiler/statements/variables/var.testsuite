@@ -38,3 +38,7 @@ class B {
   var i = 0;
   // i must have type int, not byte.
   i = i + 1;
+
+/// PASS
+  var i = 200;
+  i = i + 1;

@@ -18,12 +18,12 @@ public class NiceSourceFile {
 
 	public static final String DEFAULT_PACKAGE = "defaultpackage";
 	
-	private String _package = DEFAULT_PACKAGE;
+	private String _package = DEFAULT_PACKAGE +  TestNice.getFileCounter();
 	private StringBuffer _mainMethodContent = new StringBuffer();
 	private StringBuffer _topLevelContent = new StringBuffer();
 	private Set _imports = new HashSet();
 	
-	private final String _className = "file_" + TestNice.getFileCounter();
+	private final String _className = "main";
 	private final String _fileName = _className + ".nice";
 
 

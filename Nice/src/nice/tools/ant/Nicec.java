@@ -1,27 +1,15 @@
 package nice.tools.ant;
 
-
-
 import org.apache.tools.ant.*;
-import org.apache.tools.ant.taskdefs.*;
-import org.apache.tools.ant.types.Commandline;
 import java.io.*;
-
+import java.util.*;
+import java.lang.reflect.*;
 
 /**
-
 		<h2><a name="java">Nicec</a></h2>
 		<h3>Description</h3>
 		<p>Runs the Nice compiler.</p>
-		This Task extends the Java Task because calling the Nicec compiler from the command line looks like
-		<pre>java -classpath ../nice.jar -Dnice.systemJar=../nice.jar -Dnice.runtime=../nice.jar     nice.tools.compiler.package &quot;$@&quot;</pre>
-		<p>Allmost all parameters of the Java Task can be uses in this task with the following restrictions</p>
-		<ul>
-			<li>the nested &lt;arg&gt; attribute is ignored, the Nice package is automatically the argument to the Java command
-			<li>running the Nice compiler task automatically forks a new VM, otherwise we could not use additional jvm arguments
-			<li>the classname parameter is ignored, because the main class of the Nice compiler is always the Java class to execute.
-		</ul>
-		<p>All arguments to the Nice compiler Task has to be placed as attributes in the nicec xml-element. Additional parameters to the Java task can be nested in the nicec element or also put as an attribute in the nicec element itself. All Parameters of the Nice compiler that are already used by the Java task are prefixed with &quot;nice_&quot; or &quot;nicec_&quot;.</p>
+		All arguments to the Nice compiler Task has to be placed as attributes in the nicec xml-element.
 		<h3>Parameters</h3>
 		<table border="1" cellpadding="2" cellspacing="0">
 			<tr>
@@ -29,89 +17,13 @@ import java.io.*;
 				<td valign="top"><b>Description</b></td>
 				<td align="center" valign="top"><b>Required</b></td>
 			</tr>
-			<tr bgcolor="#dedede">
-				<td colspan="3" valign="top"><b>Java parameters</b></td>
-			</tr>
-			<tr>
-				<td valign="top">classname</td>
-				<td valign="top">the Java class to execute.<br>
-					<font color="red">Ignored, because the main class of the Nice compiler is always the Java class to execute.</font></td>
-				<td align="center" valign="top">Either jar or classname</td>
-			</tr>
-			<tr>
-				<td valign="top">jar</td>
-				<td valign="top">the location of the jar file to execute (must have a Main-Class entry in the manifest). Fork must be set to true if this option is selected.</td>
-				<td align="center" valign="top">Either jar or classname</td>
-			</tr>
-			<tr>
-				<td valign="top">args</td>
-				<td valign="top">the arguments for the class that is executed. <b>deprecated, use nested <code>&lt;arg&gt;</code> elements instead.<br>
-					</b><font color="red">Ignored, because the Nicec package is the only argument.</font></td>
-				<td align="center" valign="top">No</td>
-			</tr>
-			<tr>
-				<td valign="top">classpath</td>
-				<td valign="top">the classpath to use.<br>
-					<font color="red">The nice.jar file must be included.</font></td>
-				<td align="center" valign="top">No</td>
-			</tr>
-			<tr>
-				<td valign="top">classpathref</td>
-				<td valign="top">the classpath to use, given as <a href="../using.html#references">reference</a> to a PATH defined elsewhere.</td>
-				<td align="center" valign="top">No</td>
-			</tr>
-			<tr>
-				<td valign="top">fork</td>
-				<td valign="top">if enabled triggers the class execution in another VM (disabled by default).<br>
-					<font color="red">Ignored, because the Nice compiler always sets this flag to true.</font></td>
-				<td align="center" valign="top">No</td>
-			</tr>
-			<tr>
-				<td valign="top">jvm</td>
-				<td valign="top">the command used to invoke the Java Virtual Machine, default is 'java'. The command is resolved by java.lang.Runtime.exec(). Ignored if fork is disabled.</td>
-				<td align="center" valign="top">No</td>
-			</tr>
-			<tr>
-				<td valign="top">jvmargs</td>
-				<td valign="top">the arguments to pass to the forked VM (ignored if fork is disabled). <b>deprecated, use nested <code>&lt;jvmarg&gt;</code> elements instead.<br>
-					</b><font color="red">The values of the following jvm arguments must be supported:</font>
-					<ul>
-						<li><font color="red">nice.systemJar</font>
-						<li><font color="red">nice.runtime</font>
-					</ul>
-				</td>
-				<td align="center" valign="top">No</td>
-			</tr>
-			<tr>
-				<td valign="top">maxmemory</td>
-				<td valign="top">Max amount of memory to allocate to the forked VM (ignored if fork is disabled)</td>
-				<td align="center" valign="top">No</td>
-			</tr>
-			<tr>
-				<td valign="top">failonerror</td>
-				<td valign="top">Stop the buildprocess if the command exits with a returncode other than 0. Only available if fork is true.</td>
-				<td align="center" valign="top">No</td>
-			</tr>
-			<tr>
-				<td valign="top">dir</td>
-				<td valign="top">The directory to invoke the VM in. (ignored if fork is disabled)</td>
-				<td align="center" valign="top">No</td>
-			</tr>
-			<tr>
-				<td valign="top">output</td>
-				<td valign="top">Name of a file to write the output to.</td>
-				<td align="center" valign="top">No</td>
-			</tr>
-			<tr bgcolor="#dedede">
-				<td colspan="3" valign="top"><b>Nicec parameters</b></td>
-			</tr>
 			<tr>
 				<td valign="top">package</td>
 				<td valign="top">The Nice package to compile.</td>
 				<td align="center" valign="top">Yes</td>
 			</tr>
 			<tr>
-				<td valign="top">nice_jar</td>
+				<td valign="top">jar</td>
 				<td valign="top">Compile the Nice sources to archive.</td>
 				<td align="center" valign="top">No</td>
 			</tr>
@@ -131,12 +43,12 @@ import java.io.*;
 				<td align="center" valign="top">No</td>
 			</tr>
 			<tr>
-				<td valign="top">nicec_classpath</td>
+				<td valign="top">classpath</td>
 				<td valign="top">Lookup path for external classes.</td>
 				<td align="center" valign="top">No</td>
 			</tr>
 			<tr>
-				<td valign="top">nicec_output</td>
+				<td valign="top">output</td>
 				<td valign="top">Generate native executable.</td>
 				<td align="center" valign="top">No</td>
 			</tr>
@@ -152,7 +64,7 @@ import java.io.*;
 			</tr>
 			<tr>
 				<td valign="top">recompile_all</td>
-				<td valign="top">Force recompilation of all dependant packages</td>
+				<td valign="top">Force recompilation of all dependant packages.</td>
 				<td align="center" valign="top">No</td>
 			</tr>
 			<tr>
@@ -161,8 +73,23 @@ import java.io.*;
 				<td align="center" valign="top">No</td>
 			</tr>
 			<tr>
+				<td valign="top">runtime</td>
+				<td valign="top">Location of nice.jar.</td>
+				<td align="center" valign="top">Yes</td>
+			</tr>
+			<tr>
+				<td valign="top">native_compiler</td>
+				<td valign="top">Location of the native compiler binary (gcj).</td>
+				<td align="center" valign="top">No</td>
+			</tr>
+			<tr>
 				<td valign="top">help</td>
 				<td valign="top">Print help message and exit.</td>
+				<td align="center" valign="top">No</td>
+			</tr>
+			<tr>
+				<td valign="top">editor</td>
+				<td valign="top">Tell nicec that it is called by an editor.</td>
 				<td align="center" valign="top">No</td>
 			</tr>
 			<tr>
@@ -187,25 +114,16 @@ import java.io.*;
 			</tr>
 		</table>
 		<h3>Examples</h3>
-		<pre>  		&lt;property name=&quot;nice.jar&quot; value=&quot;../nice.jar&quot;/&gt;
-
-    <b>&lt;nicec package=&quot;test&quot; nice_jar=&quot;test.jar&quot; memory=&quot;true&quot;&gt;</b>
-        &lt;classpath&gt;
-    				    &lt;pathelement location=&quot;${nice.jar}&quot;/&gt;
-     			&lt;/classpath&gt;
-			     &lt;jvmarg value=&quot;<b>-Dnice.systemJar</b>=${nice.jar}&quot;/&gt;
-    			 &lt;jvmarg value=&quot;<b>-Dnice.runtime</b>=${nice.jar}&quot;/&gt;
-  		&lt;/nicec&gt;
-</pre>
-
-
-
+		<pre>&lt;taskdef name=&quot;nicec&quot; classname=&quot;nice.tools.ant.Nicec&quot;/&gt;<br>
+			&lt;target name=&quot;nice-compiler&quot;&gt;<br>
+			  &lt;nicec package=&quot;test&quot; runtime=&quot;../share/java/nice.jar&quot;/&gt;<br>
+			&lt;/target&gt;</pre>
 
 
  * @author Alex Greif <a href="mailto:alex.greif@web.de">alex.greif@web.de</a>
  */
 
-public class Nicec extends Java {
+public class Nicec extends Task {
 
 
 
@@ -243,31 +161,31 @@ public class Nicec extends Java {
 
 	/**	Lookup path for external classes
 	 */
-	private String nicec_classpath;
+	private String classpath;
 
-	public void setNicec_classpath(String nicec_classpath)
+	public void setClasspath(String classpath)
 	{
-		this.nicec_classpath = nicec_classpath;
+		this.classpath = classpath;
 	}
 
 	/**	Compile to archive
 	 You can then run the program with 'java -jar FILE'
 	 */
-	private String nice_jar;
+	private String jar;
 
-	public void setNice_jar(String nice_jar)
+	public void setJar(String jar)
 	{
-		this.nice_jar = nice_jar;
+		this.jar = jar;
 	}
 
 
 	/**	Generate native executable
 	 */
-	private String nicec_output;
+	private String output;
 
-	public void setOutput(String nicec_output)
+	public void setOutput(String output)
 	{
-		this.nicec_output = nicec_output;
+		this.output = output;
 	}
 
 
@@ -310,6 +228,30 @@ public class Nicec extends Java {
 		this.exclude_runtime = exclude_runtime;
 	}
 
+	/**	Location of nice.jar
+	 */
+	private String runtime;
+
+	public void setRuntime(String runtime)
+	{
+		this.runtime = runtime;
+	}
+
+	/**	Location of the native compiler binary (gcj)
+	 */
+	private String native_compiler;
+
+	public void setNative_compiler(String native_compiler)
+	{
+		this.native_compiler = native_compiler;
+	}
+
+
+
+
+
+
+
 
 	/**	Print help message and exit
 	 */
@@ -318,6 +260,16 @@ public class Nicec extends Java {
 	public void setHelp(boolean help)
 	{
 		this.help = help;
+	}
+
+
+	/**	Tell nicec that it is called by an editor.
+	 */
+	private boolean editor;
+
+	public void setEditor(boolean editor)
+	{
+		this.editor = editor;
 	}
 
 
@@ -375,137 +327,109 @@ public class Nicec extends Java {
 
 
 
-
-
-
-
-
-
-
-
-	/**	Flag whether the java argument is specified in the buildfile.
-	 In this case this message will be logged.
-	 */
-	private boolean java_arg_specified;
-
-	/**
-	 * Creates a nested arg element.
-	 */
-	public Commandline.Argument createArg() {
-		java_arg_specified = true;
-
-		return super.createArg();
-	}
-
-
-	/**
-	 * Set the forking flag.
-	 */
-	public void setFork(boolean s) {
-		if (!s)
-			log("The Nice compiler allways forks another VM. " +
-					"The value of the fork attribute is ignored.");
-		super.setFork(true);
-	}
-
-
-
-	/**	The main class of the Nice compiler.
-	 */
-	private static final String NICEC_CLASS = "nice.tools.compiler.package";
-
-
-
-	/**
-	 * Set the class name.
-	 */
-	public void setClassname(String s) throws BuildException {
-		log("The Nice compiler runs the main class of the Nice compiler.");
-		super.setClassname(NICEC_CLASS);
-	}
-
-
-
-	/**	Error message in the case that the arg of the java command
-	 should be specified.
-	 */
-	private static final String JAVA_ARG_SPECIFIED_MSG =
-		"The nested arg element is not supported. " +
-		"Please use the package attribute instead.";
-
-
-
-
-	/**	Executes the ant Nice compiler. Calls the Java task with the
-	 appropriate parameters and arguments.
+	/**	Executes the ant Nice compiler by reflection.
 	 */
 	public void execute() throws BuildException {
-
-		if (java_arg_specified) {
-			log(JAVA_ARG_SPECIFIED_MSG, Project.MSG_ERR);
-			throw new BuildException(JAVA_ARG_SPECIFIED_MSG, location);
-		}
-		setClassname(NICEC_CLASS);
-		setFork(true);
+		Vector args = new Vector();
 
 		if (sourcepath != null) {
-			createArg().setValue("--sourcepath");
-			createArg().setValue(sourcepath);
+			args.addElement("--sourcepath");
+			args.addElement(sourcepath);
 		}
 		if (destination != null) {
-			createArg().setValue("--destination");
-			createArg().setValue(destination.getAbsolutePath());
+			args.addElement("--destination");
+			args.addElement(destination.getAbsolutePath());
 		}
 		if (packagepath != null) {
-			createArg().setValue("--packagepath");
-			createArg().setValue(packagepath);
+			args.addElement("--packagepath");
+			args.addElement(packagepath);
 		}
-		if (nicec_classpath != null) {
-			createArg().setValue("--classpath");
-			createArg().setValue(nicec_classpath);
+		if (classpath != null) {
+			args.addElement("--classpath");
+			args.addElement(classpath);
 		}
-		if (nice_jar != null) {
-			createArg().setValue("--jar");
-			createArg().setValue(nice_jar);
+		if (jar != null) {
+			args.addElement("--jar");
+			args.addElement(jar);
 		}
-		if (nicec_output != null) {
-			createArg().setValue("--output");
-			createArg().setValue(nicec_output);
+		if (output != null) {
+			args.addElement("--output");
+			args.addElement(output);
 		}
 		if (recompile) {
-			createArg().setValue("--recompile");
+			args.addElement("--recompile");
 		}
 		if (recompile_all) {
-			createArg().setValue("--recompile-all");
+			args.addElement("--recompile-all");
 		}
 		if (compile) {
-			createArg().setValue("--compile");
+			args.addElement("--compile");
 		}
 		if (exclude_runtime) {
-			createArg().setValue("--exclude-runtime");
+			args.addElement("--exclude-runtime");
+		}
+		if (runtime != null) {
+			args.addElement("--runtime");
+			args.addElement(runtime);
+		}
+		if (native_compiler != null) {
+			args.addElement("--native-compiler");
+			args.addElement(native_compiler);
 		}
 		if (help) {
-			createArg().setValue("--help");
+			args.addElement("--help");
+		}
+		if (editor) {
+			args.addElement("--editor");
 		}
 		if (man) {
-			createArg().setValue("--man");
+			args.addElement("--man");
 		}
 		if (version) {
-			createArg().setValue("--version");
+			args.addElement("--version");
 		}
 		if (usage) {
-			createArg().setValue("--usage");
+			args.addElement("--usage");
 		}
 		if (memory) {
-			createArg().setValue("--memory");
+			args.addElement("--memory");
 		}
 		if (pack != null) {
-			createArg().setValue(pack);
+			args.addElement(pack);
 		}
-		super.execute();
+
+		try {
+			Class c = Class.forName("nice.tools.compiler.package");
+			String[] argArray = new String[args.size()];
+			System.arraycopy(args.toArray(), 0, argArray, 0, args.size());
+
+			Class[] parameterTypes = new Class[] {argArray.getClass()};
+
+			Method mainMethod = c.getMethod("main", parameterTypes);
+			mainMethod.invoke(c.newInstance(), new Object[] {argArray});
+
+		} catch (InstantiationException e) {
+			throw new BuildException(e, location);
+		} catch (ClassNotFoundException e) {
+			throw new BuildException(e, location);
+		} catch (NoSuchMethodException e) {
+			throw new BuildException(e, location);
+		} catch (IllegalAccessException e) {
+			throw new BuildException(e, location);
+		} catch (InvocationTargetException e) {
+			throw new BuildException(e, location);
+		}
+
 	}
 
-
+	/** Only for test usage.
+	 */
+	public static void main(String[] args) {
+		Nicec nicec = new Nicec();
+		nicec.setRuntime("../share/java/nice.jar");
+		nicec.setPackage("test");
+		nicec.execute();
+	}
 
 }
 

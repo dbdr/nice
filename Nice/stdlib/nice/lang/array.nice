@@ -23,6 +23,13 @@ final class Array<T>
   implements java.util.List<T>
   = native;
 
+<Any T> !T[] elementsNotNull(?T[] arr)
+{
+  assert(!arr.has(?T elem => elem == null));
+  return cast(arr);
+}
+
+
 /** Returns an array with the newSize first elements. 
     The result can be the same array as the argument.
 */

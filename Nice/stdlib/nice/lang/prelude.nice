@@ -44,12 +44,8 @@ final class Null<+T> extends Maybe<T> = native;
 */
 <Any T> !T notNull(?T value)
 {
-  if (value != null)
-    return cast(value);
-
-  if (true) 
-    throw new NullPointerException("Null value");
-  return cast(null);
+  assert(value != null);
+  return cast(value);
 }
 
 /****************************************************************

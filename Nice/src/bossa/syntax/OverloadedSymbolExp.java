@@ -202,6 +202,10 @@ public class OverloadedSymbolExp extends Expression
       Debug.println("Overloading resolution (expected type " + expectedType +
 		    ") for " + this);
 
+    // remembers removed symbols, 
+    // to list possibilities if none matches
+    LinkedList removed = new LinkedList();
+
     // Useful in case of failure.
     List fieldAccesses = filterFieldAccesses();
 
@@ -216,6 +220,7 @@ public class OverloadedSymbolExp extends Expression
 			  s.getClonedType() + " matches");
 	}
 	catch(TypingEx e){
+	  removed.add(s);
 	  i.remove();
 	  s.releaseClonedType();
 	  if(Debug.overloading) 
@@ -233,9 +238,11 @@ public class OverloadedSymbolExp extends Expression
       }
 
     try {
-      return givePriorityToFields(fieldAccesses, 
-                                  "No symbol named " + ident + 
-                                  " has expected type " + expectedType);
+      Expression res = givePriorityToFields(fieldAccesses);
+      if (res != null)
+        return res;
+
+      throw User.error(this, noMatchError(removed, expectedType));
     }
     finally {
       releaseAllClonedTypes();
@@ -259,13 +266,19 @@ public class OverloadedSymbolExp extends Expression
     if(symbols.size()==1)
       return uniqueExpression();
 
-    return givePriorityToFields
-      (filterFieldAccesses(),
-       "No variable or field in this class has name " + ident);
+    Expression res = givePriorityToFields(filterFieldAccesses());
+
+    if (res != null)
+      return res;
+
+    throw User.error(this, 
+                     "No variable or field in this class has name " + ident);
   }
 
-  private Expression givePriorityToFields
-    (List fieldAccesses, String errorMessage)
+  /**
+     @return null if there is no solution.
+  */
+  private Expression givePriorityToFields (List fieldAccesses)
   {
     if (fieldAccesses.size() != 0)
       {
@@ -283,14 +296,15 @@ public class OverloadedSymbolExp extends Expression
 
         symbols.removeAll(filterFieldAccesses());
 
-        if (symbols.size() == 0)
-          User.error(this, errorMessage);
-
         if (symbols.size() == 1)
           return uniqueExpression();
       }
 
-    throw new AmbiguityError();
+    if (symbols.size() != 0)
+      throw new AmbiguityError();
+
+    // There is no solution.
+    return null;
   }
 
   private List filterFieldAccesses()
@@ -521,6 +535,27 @@ public class OverloadedSymbolExp extends Expression
 		arguments.explainNoMatch(removed);
       }
   }
+
+  /** No symbol in removed had the expected type. */
+  private String noMatchError(List removed, Polytype expectedType)
+  {
+    switch (removed.size())
+      {
+      case 0:
+	return "No symbol has name " + ident;
+
+      case 1:
+	VarSymbol sym = (VarSymbol) removed.get(0);
+	return ident + " has type " + sym.getType();
+
+      default:
+	return "No symbol with name " + ident + 
+		" has type " + expectedType + ":\n" +
+                Util.map("", "\n", "", removed);
+      }
+  }
+
+    
 
   class AmbiguityError extends UserError
   {

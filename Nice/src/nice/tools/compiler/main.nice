@@ -111,11 +111,11 @@ main(args)
     }
   String packageName = rest.get(0);
 
-  bossa.modules.Compilation compilation = 
+  Compilation compilation = 
     make(packageName, doLink, recompileCL, recAll, staticLink);
 
   make(compilation);
-
+  
   }
   catch(ExceptionInInitializerError e){
     uncaughtException = e.getException();

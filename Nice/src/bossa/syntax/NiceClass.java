@@ -343,6 +343,7 @@ public class NiceClass extends ClassDefinition
     addFields(classType);
     if (me != this) me.addFields(classType);
 
+    classType.sourcefile = location().getFile();
     module.addClass(classType);
   }
 

@@ -49,8 +49,8 @@ compileComponent(modules, doLink)
     modules.get(0).unfreezeGlobalContext();
 }
 
-void make(Compilation);
-make(compilation@Compilation)
+void make(mlsub.compilation.Compilation);
+make(compilation@mlsub.compilation.Compilation)
 {
   List<List<Module>> sccs =
     stronglyConnectedComponents(compilation.root, 

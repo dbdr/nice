@@ -22,8 +22,19 @@ import mlsub.typing.*;
 
 // Interface
 
-Expression analyse(Expression, Info);
-Statement analyse(Statement, Info);
+Statement analyse(Statement, VarScope, TypeScope);
+
+analyse(s, varScope, typeScope)
+{
+  Info info = new Info();
+  info.vars = new SymbolTable();
+  info.typeVars = new SymbolTable();
+  info.globalVarScope = varScope;
+  info.globalTypeScope = typeScope;
+
+  analyse(s, info);
+  return s;
+}
 
 // Implementation
 
@@ -31,6 +42,9 @@ class Info
 {
   SymbolTable<VarSymbol> vars;
   SymbolTable<TypeSymbol> typeVars;
+
+  VarScope globalVarScope;
+  TypeScope globalTypeScope;
 
   void begin();
   begin()
@@ -49,16 +63,26 @@ class Info
   VarSymbol lookup(String);
   lookup(name) = this.vars[name];
 
-  VarSymbol[] globalLookup(String);
-  globalLookup(name) = null;
+  LinkedList<VarSymbol> globalLookup(LocatedString);
+  globalLookup(name) = linkedList(this.globalVarScope.lookup(name));
+
+  void addVars(List<VarSymbol>);
+  addVars(symbols) = symbols.iter(fun(VarSymbol s)=>this.vars[s.toString()]=s);
+    
+  void addTypeVars(List<TypeSymbol>);
+  addTypeVars(symbols) = symbols.iter(fun(TypeSymbol s)=>this.typeVars[s.toString()]=s);
 }
 
 void setInitialized(Expression, Info);
 setInitialized(e, i) {}
 setInitialized(e@SymbolExp, i) {}
 
-void addVars(Info, java.util.Collection);
-void addTypeVars(Info, java.util.Collection);
+Expression analyse(Expression, Info);
+void analyse(Statement, Info);
+
+/****************************************************************
+ * Expressions
+ ****************************************************************/
 
 analyse(e@Expression, i) = e;
 
@@ -103,8 +127,8 @@ analyse(e@CallExp, i)
 analyse(e@FunExp, info)
 {
   info.begin();
-  addVars(info, e.formals);
-  e.body = analyse(e.body, info);
+  addVars(info, linkedList(e.formals));
+  analyse(e.body, info);
   info.end();
   return e;
 }
@@ -127,9 +151,9 @@ analyse(e@IdentExp, i)
 	  }
     }
 
-  Array<VarSymbol> symbols = i.globalLookup(name);
+  LinkedList<VarSymbol> symbols = i.globalLookup(e.ident);
   if (symbols != null)
-    return new OverloadedSymbolExp(symbols, e.ident);
+    return new OverloadedSymbolExp(javaList(symbols), e.ident, null);
 
   if (e.infix)
     return e;
@@ -160,3 +184,41 @@ analyse(e@LiteralArrayExp, info)
   return e;
 }
 
+analyse(e@NewArrayExp, info)
+{
+  analyseExps(e.knownDimensions, info);
+  return e;
+}
+
+analyse(e@NewExp, info)
+{
+  return e;
+}
+
+analyse(e@StatementExp, info)
+{
+  analyse(e.statement, info);
+  return e;
+}
+
+analyse(e@TupleExp, info)
+{
+  //e.expressions = analyse(ex.expressions)
+  return e;
+}
+
+/****************************************************************
+ * Statements
+ ****************************************************************/
+
+analyse(s@Statement, info) {}
+
+analyse(b@Block, info)
+{
+  iter(linkedList(b.statements), fun(Statement s)=>analyse(s, info));
+}
+
+main(args)
+{
+
+}

@@ -58,7 +58,7 @@ public class JavaClass extends ClassDefinition
 	  extensions, implementations, abstractions);
     this.javaName = javaName;
 
-    if(name.toString().equals("nice.lang.Array"))
+    if(name.toString().equals("nice.lang$Array") || name.toString().equals("nice.lang.Array"))
       {
 	ConstantExp.arrayTC = this.tc;
 	javaType = nice.tools.code.SpecialArray.wrappedType();
@@ -83,7 +83,7 @@ public class JavaClass extends ClassDefinition
 
 	if(old!=null)
 	  User.error(this, 
-		     javaName+" was already associated with bossa class "+
+		     javaName + " was already associated with nice class " + 
 		     old);
       }
   }

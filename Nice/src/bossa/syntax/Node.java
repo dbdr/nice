@@ -101,7 +101,7 @@ abstract public class Node
 
     return c;
   }
-    
+  
   void addSymbol(VarSymbol s)
   {
     if (varSymbols == null)

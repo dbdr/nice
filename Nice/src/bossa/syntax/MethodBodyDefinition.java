@@ -258,7 +258,7 @@ public class MethodBodyDefinition extends Definition
     VarSymbol s = findSymbol(scope);
 
     if(s==null)
-      User.error(this, name+" is not defined");
+      User.error(this, name+" is not declared");
     
     if(!(s instanceof MethodDeclaration.Symbol))
       User.error(this, name+" is not a method");
@@ -268,7 +268,7 @@ public class MethodBodyDefinition extends Definition
     if(!(def instanceof NiceMethod))
       User.error(this, name + " is not a Nice method.\n" +
 		 "An alternative cannot be defined for it.\n" +
-		 name + " was defined at " + def.location()
+		 name + " was declared at " + def.location()
 		 );
     
     //Debug.println("Def for "+this+" is "+s+" "+s.location());
@@ -317,6 +317,8 @@ public class MethodBodyDefinition extends Definition
   void typecheck()
   {
     lateBuildScope();
+
+    bossa.syntax.analyse$0(body, scope, typeScope);
 
     Typing.enter("METHOD BODY " + this + "\n\n");
     // remeber that enter was called, to leave.

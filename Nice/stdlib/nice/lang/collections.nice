@@ -151,6 +151,10 @@ list<T>(l)
 
 final class LinkedList<T> implements List = native java.util.LinkedList;
 <Any T> LinkedList<T> linkedList() = native new java.util.LinkedList();
+<Any T> LinkedList<T> linkedList(java.util.Collection) =
+  native new java.util.LinkedList(java.util.Collection);
+<Any T> java.util.List javaList(LinkedList<T>) = inline nice.tools.code.Nop();
+
 <Any T> java.util.ListIterator listIterator(LinkedList<T>) =
   native java.util.ListIterator java.util.List.listIterator();
 <Any T> void add(LinkedList<T>, T) = native void java.util.Collection.add(Object);

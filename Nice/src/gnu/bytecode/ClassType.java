@@ -44,7 +44,7 @@ public class ClassType extends ObjectType implements AttrContainer {
   public final void setAttributes (Attribute attributes)
     { this.attributes = attributes; }
 
-  String sourcefile;
+  public String sourcefile;
 
   boolean emitDebugInfo = true;
 

@@ -15,6 +15,7 @@
     <title>The Nice user's manual</title>
     <author><firstname>Daniel</firstname><surname>Bonniot</surname></author>
     <author><firstname>Bryn</firstname><surname>Keller</surname></author>
+    <author><firstname>Francis></firstname><surname>Barber</surname></author>
     <copyright><year>2003</year><holder>Daniel Bonniot</holder></copyright>
   </bookinfo>
   <preface><title>Foreword</title>
@@ -1948,6 +1949,43 @@ public class Main
       <para>
        <literal><![CDATA[<!T> !T myMethod(Collection<!T>);]]></literal>
       </para>
+      </section>
+      
+      <section id="classCasting"><title>Class Casting</title>
+        <para>
+        Class casting is not used in Nice.  Similar to <link 
+        linkend="optionTypes">Option types</link> and nullness, if the compiler
+        can prove that the type of an object is compatible with the target
+        context, it will allow that object to be used.  This can be done using
+        the <literal>instanceof</literal> operator and an <literal>if</literal>
+        statement:
+        </para>
+<example>
+  <title>Title</title>
+<programlisting lang="nice">
+	void foo(FileOutputStream arg) {...}
+	
+	void bar(OutputStream arg) {
+		if (arg instanceof FileOutputStream) {
+			//Here Nice knows arg is a FileOutputStream, so it can 
+			// be passed to a method which takes a FileOutputStream.
+			foo(arg);
+		} 
+		foo(arg); //Here arg may or may not be a FileOutputStream, 
+			  //so Nice gives a compilation error.
+	}
+</programlisting>
+</example>
+        <para>
+        As with <link linkend="optionTypes">Option types</link>, type inference
+        doesn't work on fields of objects or on method calls, only on local
+        variables. There's a good reason for this: the value of an instance 
+        variable may have changed (updated by another thread, perhaps) between
+        the time the value was checked for its type and the time it is actually
+        used. Similarly, method calls can return objects of different sub-types
+        every time they are called.  To avoid this problem, simply assign the
+        value to a local variable first.
+        </para>
       </section>
 
       <section id = "typeParameters"><title>Type Parameters</title>

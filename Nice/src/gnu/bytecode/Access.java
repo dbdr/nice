@@ -77,7 +77,7 @@ public class Access {
   }
 
   /***
-   * Returns true if classType is legally accessible in the given package. 
+   * Returns true if classType is legally accessible in the given package.
    */
   public static boolean legal(ClassType classType, String packageName)
   {
@@ -92,6 +92,6 @@ public class Access {
     if (! packageName.equals(classType.getPackageName()))
       return false;
 
-    return true;  	
+    return true;
   }
 }

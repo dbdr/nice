@@ -193,7 +193,7 @@ equals(x@I,y@I) = true;
 /// PASS
   Collection<String> b = new Bar();
   /// Toplevel
-class Bar<T> extends AbstractList<T>
+class Bar<T> extends ArrayList<T>
 {
   isEmpty() = false;
 }
@@ -201,7 +201,7 @@ class Bar<T> extends AbstractList<T>
 /// PASS bug
   Collection<String> b = new Bar();
   /// Toplevel
-class Bar<T> extends AbstractList<T>
+class Bar<T> extends ArrayList<T>
 {
   removeAll(other@Bar) = false;
 }

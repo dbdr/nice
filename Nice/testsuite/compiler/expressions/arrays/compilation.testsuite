@@ -92,3 +92,18 @@ void foo(Object[] oo)
 /// PASS bug
   (List<int>, String) x = ([1,2,3], "abc");
   (List<int> arr, String str) = x;
+
+/// PASS bug
+  (int[], int[]) t1 = ([1, 2], [3, 4]);
+  (List<int>, List<int>) t2 = t1;
+  (List<int> la, List<int> lb) = t2;
+  assert la[0] == 1;
+  assert la[1] == 2;
+
+/// PASS bug
+  ((int[], String) , String) t1 = (([1, 2], "abc"), "xyz");
+  ((List<int>, String), String) t2 = t1;                   
+  ((List<int>, String) t3, String s1) = t2;                
+  (List<int> la, String s2) = t3;                          
+  assert la[0] == 1;                                       
+  assert la[1] == 2;                                       

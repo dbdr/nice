@@ -67,11 +67,7 @@ public class AssignExp extends Expression
     to = to.noOverloading();
 
     if(!to.isAssignable())
-      {
-	Debug.println("to=" + to + ((ExpressionRef) to).content().getClass());
-	
-	User.error(this, to + " cannot be assigned a value");
-      }
+      User.error(this, to + " cannot be assigned a value");
     
     try{
       checkAssignment(to.getType(), value);
@@ -80,7 +76,7 @@ public class AssignExp extends Expression
       User.error(this,
 		 "Typing error : " + to + 
 		 " cannot be assigned value " + value + 
-		 "\nof type " + value.getType(),
+		 " of type " + value.getType(),
 		 "\n" + t.getMessage());
     }
   }

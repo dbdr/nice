@@ -176,10 +176,12 @@ public class Block extends Statement
 	  AssignExp.checkAssignment(local.left.getType(),local.value);
 	}
 	catch(mlsub.typing.TypingEx t){
-	  User.error(local.left,"Typing error : "+local.left.name+
-		     " cannot be assigned value \""+local.value+"\"",
-		     " of type "+local.value.getType()+" since "+
-		     local.left.name+" has type "+
+	  User.error(local.left,
+		     "Typing error : " + local.left.name +
+		     " cannot be assigned value " + local.value +
+		     " of type " + local.value.getType(),
+		     " since " +
+		     local.left.name + " has type " + 
 		     local.left.type);
 	}
       }

@@ -29,7 +29,7 @@
   String s = (<Any T>(T x)=>x)("ABC");
 
 /// PASS
-  int->() f = int i => {}1;
+  int->() f = int i => {};
 
 /// PASS
   void m(boolean->() f) {}

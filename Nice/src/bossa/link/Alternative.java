@@ -12,7 +12,7 @@
 
 // File    : Alternative.java
 // Created : Mon Nov 15 12:20:40 1999 by bonniot
-//$Modified: Mon Oct 02 18:28:02 2000 by Daniel Bonniot $
+//$Modified: Mon Oct 02 18:43:46 2000 by Daniel Bonniot $
 
 package bossa.link;
 
@@ -213,10 +213,7 @@ public class Alternative
 
     Type ct = nice.tools.code.Types.javaType(dom);
     if (parameter.getType().isSubtype(ct))
-      {
-	Debug.println("Saving " + parameter.getType() + " < " + ct);
-	return QuoteExp.trueExp;
-      }
+      return QuoteExp.trueExp;
     
     return instanceOfExp(parameter, ct);
   }

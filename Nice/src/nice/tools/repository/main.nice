@@ -124,7 +124,7 @@ public String packagePath(String pkg) = pkg.replace('.', '/') + '/';
 }
 
 /**
-   Find the latest version of a give package, but searching for
+   Find the latest version of a given package, but searching for
    a 'latest' file in the repository.
 */
 private ?String latestVersionRemote(URL repo, String pkg)
@@ -142,7 +142,7 @@ private ?String latestVersionRemote(URL repo, String pkg)
 }
 
 /**
-   Find the latest version of a give package, by listing all versions.
+   Find the latest version of a given package, by listing all versions.
 */
 private ?String latestVersionLocal(URL repo, String pkg)
 {

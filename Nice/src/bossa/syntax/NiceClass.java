@@ -125,6 +125,7 @@ public class NiceClass extends ClassDefinition.ClassImplementation
       if (value != null)
 	{
 	  value = dispatch.analyse(value, scope, typeScope);
+	  dispatch.typecheck(value);
 
 	  c.enterTypingContext();
 	  mlsub.typing.Polytype declaredType = sym.getType();

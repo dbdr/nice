@@ -322,7 +322,7 @@ analyse(e@FunExp, info)
   info.beginInner(true);
   info.begin();
 
-  if (e.constraint != Constraint.True)
+  if (e.constraint != Constraint.True && e.constraint != null)
     {
       e.cst = notNull(e.constraint).resolveToLowlevel();
       addTypeVars(info, notNull(notNull(e.cst).binders()));

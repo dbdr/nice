@@ -34,3 +34,26 @@
     B b = new B();
   }
   class B {}
+
+/// PASS
+  assert ((new A().f)(3) == 3);
+  /// Toplevel
+  class A
+  {
+    int->int f = int x => x;
+  }
+
+/// PASS
+  /// Toplevel
+  class A<T>
+  {
+    T->T f = T x => x;
+  }
+
+/// PASS
+  /// Toplevel
+  class A<T>
+  {
+    int i = constante;
+  }
+  var int constante = 42;

@@ -81,5 +81,6 @@ test_arrays()
   String[] ts = [ "A", "B" ];
   ts.iter(fun(String s)=>println(s));
 
-  float[] tf = [ 1.2, 1, 0 ];
+  float[] tf = [ 1.5, 2, 3.7 ];
+  tf.iter(fun(float f)=>println(f+1));
 }

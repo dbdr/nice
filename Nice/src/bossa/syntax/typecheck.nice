@@ -153,7 +153,7 @@ nullnessInfo(test@CallExp)
       (?List<MonoSymbol> notNullIfTrue1, ?List<MonoSymbol> notNullIfFalse1) =
 	nullnessInfo(notNull(test.arguments.getExp(1)));
 
-      // If this test is fase, it is because both subtests are.
+      // If this test is false, it is because both subtests are.
       return (null, combine(notNullIfFalse0, notNullIfFalse1));
     }
 
@@ -164,7 +164,7 @@ nullnessInfo(test@CallExp)
       (?List<MonoSymbol> notNullIfTrue1, ?List<MonoSymbol> notNullIfFalse1) =
 	nullnessInfo(notNull(test.arguments.getExp(1)));
 
-      // If this test is fase, it is because both subtests are.
+      // If this test is true, it is because both subtests are.
       return (combine(notNullIfTrue0, notNullIfTrue1), null);
     }
 
@@ -173,7 +173,7 @@ nullnessInfo(test@CallExp)
     isAlwaysNull = true;
   else if (test.isCallTo("!="))
     isAlwaysNull = false;
-  else /// give up
+  else // Give up.
     return (null, null);
 
   int varPosition;

@@ -57,3 +57,13 @@ void f() = doSomethingAndReturnAStatusBoolean();
   /// Toplevel
   void foo() = bar();
   ?String bar() = "abc";
+
+/// FAIL
+  let x = foo();
+  /// Toplevel
+  void foo() {}
+
+/// FAIL
+  var x = foo();
+  /// Toplevel
+  void foo() {}

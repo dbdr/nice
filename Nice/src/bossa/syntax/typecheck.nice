@@ -659,6 +659,10 @@ typecheck(decl@Block.LocalVariable)
       if (target.type == PrimitiveType.byteType || 
           target.type == PrimitiveType.shortType)
 	target.type = notNull(PrimitiveType.intType);
+
+      if (nice.tools.code.Types.isVoid(target.type))
+        throw error(decl, "A variable cannot have a void type");
+
     }
   else
     {
@@ -685,6 +689,9 @@ typecheck(decl@Block.LocalConstant)
   mlsub.typing.Polytype type = notNull(decl.value).getType();
 
   notNull(decl.left).type = checkMonomorphic(type, decl);
+  if (nice.tools.code.Types.isVoid(notNull(decl.left).type))
+     throw error(decl, "A variable cannot have a void type");
+
 }
 
 typecheck(decl@Block.LocalFunction)

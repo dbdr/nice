@@ -153,6 +153,8 @@ public class AST extends Node
       return;
 
     doTypecheck();
+
+    module.compilation().exitIfErrors();
   }
 
   public void printInterface(java.io.PrintWriter s)

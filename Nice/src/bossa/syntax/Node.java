@@ -354,7 +354,12 @@ abstract public class Node
     
     if (children != null)
       for(Iterator i = children.iterator();i.hasNext();)
-	((Node)i.next()).doTypecheck();
+        try{
+          ((Node)i.next()).doTypecheck();
+        }
+        catch(UserError ex){
+          globalTypeScope.module.compilation().error(ex);
+	}
   }
 
   private boolean typecheckingDone = false;

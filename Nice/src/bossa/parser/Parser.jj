@@ -1183,17 +1183,32 @@ Pattern pattern():
   Location loc = null;
 }
 {
+(
+  LOOKAHEAD( typeIdent() ( ":" | ident() | "(" typeIdent() ")" ident() ) )
+  tc=typeIdent()
+  [
+    ":" runtimeTC=typeConstructor()
+  |
+    "(" additional=typeIdent() ")"
+  ]  
+  name=ident()
+  { loc = tc.location(); }
+|
+  "#" tc=typeIdent() 
+  [ "(" additional=typeIdent() ")" ] 
+  [ name=ident() ] 
+  {exactlyAt = true; loc = tc.location();}
+|
   ( 
     val=patternLiteral() { loc = val.location(); }
   |
-    ( "@" | "#" { exactlyAt = true; } ) 
-    tc=typeIdent() { loc = tc.location(); }
+    "@" tc=typeIdent() { loc = tc.location(); }
   |
     name=ident()
     (
       "@"
       tc=typeIdent()
-      [ ":" runtimeTC = typeConstructor() ]
+      [ ":" runtimeTC=typeConstructor() ]
     |
       "#" tc=typeIdent() { exactlyAt = true; }
     |
@@ -1212,9 +1227,10 @@ Pattern pattern():
     { loc = name.location(); }
   )
   [ "(" additional=typeIdent() ")" ]
-  {
-    return new Pattern(name, tc, val, refName, exactlyAt, kind, additional, runtimeTC, loc);
-  }
+)
+{
+  return new Pattern(name, tc, val, refName, exactlyAt, kind, additional, runtimeTC, loc);
+}
 }
 
 void methodBodyDefinitionLookahead():

@@ -1,0 +1,26 @@
+/// PASS
+  assert new A(x: 5).equals(new A(x: 5));
+  /// Toplevel
+  class A {
+    int x;
+    equals(A other) = this.x == other.x;
+  }
+
+/// PASS
+  assert foo(new A()) == true;
+  assert foo(new B()) == false;
+  /// Toplevel
+  class A {}
+  class B extends A {}
+  boolean foo(A x);
+  foo(x) = false;
+  foo(#A x) = true;
+
+/// PASS
+  /// Toplevel
+  interface X {}
+  interface Y {}
+  class A implements X, Y {}
+  void foo(X x) {}
+  void foo(Y y) {}
+  foo(A(Y) y) {}

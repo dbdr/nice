@@ -1425,7 +1425,7 @@ Definition globalVariable():
     t=monotype() name=ident() 
     [ "=" 
       ( 
-        LOOKAHEAD(funExp()) value=funExp() 
+        LOOKAHEAD(funExpLookahead()) value=funExp() 
       |	
         value=SideEffectFreeExpression()
       )
@@ -1434,7 +1434,7 @@ Definition globalVariable():
     "let" {constant = true;}
     t=monotype() name=ident() "="
     ( 
-      LOOKAHEAD(funExp()) value=funExp() 
+      LOOKAHEAD(funExpLookahead()) value=funExp() 
     | 
       value=SideEffectFreeExpression()
     )
@@ -1592,6 +1592,19 @@ Expression newExp():
     ( LOOKAHEAD(2) "[]" { furtherDimensions++; } )*
     { return new NewArrayExp(classe, args, furtherDimensions); }
   )
+}
+
+FunExp funExpLookahead():
+{}
+{
+  ( 
+    LOOKAHEAD ( ["fun"] constraint() "(" monoSymbols() ")" )
+    ["fun"] constraint() "(" monoSymbols() ")"
+  |
+    monoSymbol()
+  ) 
+  "=>"
+  { return null; }
 }
 
 FunExp funExp():
@@ -1776,7 +1789,7 @@ Expression Expression() :
   { first=getToken(1); }
 
   ( 
-    LOOKAHEAD(funExp()) e1=funExp() 
+    LOOKAHEAD(funExpLookahead()) e1=funExp() 
   | e1=ClassicExpression() 
   )
   { 

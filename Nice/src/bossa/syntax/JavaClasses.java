@@ -305,7 +305,18 @@ public final class JavaClasses
       findStaticJavaFields(declaringClass, funName, possibilities);
 
     return possibilities;
-  }    
+  }
+
+  private static JavaMethod objectConstructor;
+
+  static JavaMethod getObjectConstructor()
+  {
+    if (objectConstructor == null)
+      objectConstructor = JavaMethod.make
+        (Type.pointer_type.getDeclaredMethod("<init>", 0), true);
+
+    return objectConstructor;
+  }
 
   /**search recursively in superclasses and interfaces for static java fields*/
   private static void findStaticJavaFields 

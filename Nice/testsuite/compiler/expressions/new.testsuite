@@ -1,6 +1,12 @@
 /// FAIL
 Object o = /*/// FAIL HERE */ java.lang.Object();
 
+/// PASS
+Object o = new java.lang.Object();
+  /// Toplevel
+// Make it necessary to print 'new Object()' in package.nicei.
+void foo(Object lock = new Object()) {}
+
 /// FAIL
   /// Toplevel
 class Param<T> {}

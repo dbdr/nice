@@ -14,6 +14,8 @@ package bossa.syntax;
 
 import bossa.util.*;
 import java.util.*;
+import mlsub.typing.TypeSymbol;
+import mlsub.typing.TypeConstructor;
 
 /**
    Call of an object constructor.
@@ -29,14 +31,23 @@ public class NewExp extends CallExp
     this.ti = ti;
   }
 
-  private void resolveTC(TypeMap typeScope)
+  void resolve(TypeMap typeScope)
   {
-    if (tc != null)
-      return;
-    
-    tc = ti.resolveToTC(typeScope);
-    ti = null;
-    if(!TypeConstructors.instantiable(tc))
+    TypeSymbol sym = ti.resolveToTypeSymbol(typeScope);
+
+    if (sym == mlsub.typing.TopMonotype.instance)
+      setObject();
+    else if (sym instanceof TypeConstructor)
+      setTC((TypeConstructor) sym);
+    else
+      throw User.error(ti, ti + " is not a class" + sym.getClass());
+  }
+
+  private void setTC(TypeConstructor tc)
+  {
+    this.tc = tc;
+
+    if (! TypeConstructors.instantiable(tc))
       {
 	String message;
 	if (TypeConstructors.isInterface(tc))
@@ -47,15 +58,7 @@ public class NewExp extends CallExp
 	  message = tc + " is a type variable, it can't be instantiated";
 	throw User.error(this, message);
       }
-  }
-  
-  void resolve(TypeMap typeScope)
-  {
-    if (tc != null)
-      return;
 
-    resolveTC(typeScope);
-    
     // Make sure that the constructors have been created.
     ClassDefinition definition = ClassDefinition.get(tc);
     if (definition != null)
@@ -78,17 +81,26 @@ public class NewExp extends CallExp
     function = new OverloadedSymbolExp
       (constructors, new LocatedString("new " + tc, location()));
   }
+  
+  private void setObject()
+  {
+    JavaMethod method = JavaClasses.getObjectConstructor();
 
+    function = new SymbolExp(method.getSymbol(), ti.location());
+  }
+  
   /****************************************************************
    * Printing
    ****************************************************************/
 
   public String toString()
   {
-    String cl = (ti == null ? tc.toString() : ti.toString());
+    String cl = ti.toString();
     return "new " + cl + arguments;
   }
 
   private TypeIdent ti;
-  mlsub.typing.TypeConstructor tc;
+
+  /** Can be null if the class instantiated is Object. */
+  TypeConstructor tc = null;
 }

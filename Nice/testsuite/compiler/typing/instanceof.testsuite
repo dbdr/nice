@@ -258,3 +258,31 @@ void f() {
   }  
   /// Toplevel
   class C extends B {}
+
+/// PASS
+  new LinkedList().foreach(A arg => {
+    arg = new B();
+    if (arg instanceof B) {
+      assert arg.life == 42;
+    }
+  });
+
+/// FAIL
+  ?int x = 1;
+
+  let f = void->void g => {
+    if (x != null) {
+      g();
+      int /*/// FAIL HERE*/ y = x;
+    }
+  };
+  f(() => { x = null; });
+
+/// PASS
+  Vector<A> ll = new Vector();
+  ll.foreach(A arg => {
+    arg = new B();
+    if (arg instanceof B) {
+      int x = arg.life;
+     }
+  });

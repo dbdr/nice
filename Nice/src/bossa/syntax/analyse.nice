@@ -82,6 +82,16 @@ class Info
   long flags = 0; 
   int varIndex = 0;
 
+  /*
+    The number of nested blocks.
+  */
+  int depth = 0;
+
+  /*
+    The depth of the current anonymous function.
+  */
+  int anonFunDepth = 0;
+
   boolean getUnreachable() = (this.flags & 1) != 0;
   void setUnreachable() { this.flags |=  1; }
   void setReachable()   { this.flags &= ~1; }
@@ -141,12 +151,14 @@ class Info
   {
     this.vars.begin();
     this.typeVars.begin();
+    this.depth++;
   }
 
   void end()
   {
     this.vars.end();
     this.typeVars.end();
+    this.depth--;
   }
 
   ?VarSymbol lookup(String name) = this.vars[name];
@@ -187,6 +199,7 @@ class Info
 
     this.checkNotDefined(symbol);
     this.vars[symbol.name.toString()] = symbol;
+    symbol.depth = this.depth;
   }
 
   void addVars(MonoSymbol[] symbols) = 
@@ -376,25 +389,33 @@ analyse(e@CallExp, info)
 
 analyse(e@FunExp, info)
 {
-  info.beginInner();
-  info.begin();
+  let savedDepth = info.anonFunDepth;
 
-  if (e.constraint != Constraint.True && e.constraint != null)
-    {
-      e.cst = notNull(e.constraint).resolveToLowlevel();
-      addTypeVars(info, notNull(e.cst).binders());
-    }
-  e.constraint = null;
+  try {
+    info.beginInner();
+    info.begin();
+    info.anonFunDepth = info.depth;
 
-  if (e.formals != null)
-    addVars(info, elementsNotNull(notNull(e.formals)));
+    if (e.constraint != Constraint.True && e.constraint != null)
+      {
+	e.cst = notNull(e.constraint).resolveToLowlevel();
+	addTypeVars(info, notNull(e.cst).binders());
+      }
+    e.constraint = null;
 
-  analyse(e.body, info);
-  e.setAlwaysReturns(info.getUnreachable());
+    if (e.formals != null)
+      addVars(info, elementsNotNull(notNull(e.formals)));
 
-  info.end();
-  info.endInner();
-  return e;
+    analyse(e.body, info);
+    e.setAlwaysReturns(info.getUnreachable());
+
+    return e;
+  }
+  finally {
+    info.end();
+    info.endInner();
+    info.anonFunDepth = savedDepth;
+  }
 }
 
 analyse(e@IdentExp, info) = analyseIdent(e, info, false);
@@ -413,13 +434,20 @@ Expression analyseIdent(IdentExp e, Info info, boolean assigned)
             }
 	  else
 	    {
-	      if (sym instanceof Block.LocalVariable.Symbol)
-	        {
-		  if (assigned)
-		    setInitialized(sym, info, e.location());
-		  else
-		    checkInitialized(sym, info, e.location());
-	        }
+	      if (sym instanceof MonoSymbol)
+		{
+		  if (sym.depth < info.anonFunDepth)
+		    sym.captured = true;
+
+		  if (sym instanceof Block.LocalVariable.Symbol)
+		    {
+		      if (assigned)
+			setInitialized(sym, info, e.location());
+		      else
+			checkInitialized(sym, info, e.location());
+		    }
+		}
+
 	      return new SymbolExp(sym, e.location());
 	    }
 	}

@@ -41,8 +41,6 @@ typecheck(e@AssignExp)
     bossa.util.User.error(e, "" + to + " cannot be assigned a value");
 
   let variable = localVariable(to);
-  if (variable != null && Node.getCurrentFunction() instanceof FunExp)
-    setCaptured(variable);
   
   try{
     e.value = notNull(e.value).resolveOverloading(to.getType());
@@ -487,27 +485,6 @@ void exitClosure()
     }
 
   (levels, conditionalTypes) = closureEnvironments.pop();
-}
-
-void setCaptured(MonoSymbol variable)
-{
-  if (!variable.captured)
-    {
-      variable.captured = true;
-      //set all conditional types back to the original type
-      let origType = getOriginalType(variable) || variable.type;
-      variable.type = origType;
-      for (int i = 0; i < closureEnvironments.size(); i++)
-        {
-	  (Stack<int> lvls, Stack<(MonoSymbol, mlsub.typing.Monotype)> condTypes) = closureEnvironments.get(i);
-          for (int k = 0; k < condTypes.size(); k++)
-	    {
-              (MonoSymbol v, mlsub.typing.Monotype t) = condTypes.get(k);
-              if (v == variable)
-		condTypes.set(k, (v, origType));
-	    }
-        }
-    }
 }
 
 typecheck(e@IfExp)

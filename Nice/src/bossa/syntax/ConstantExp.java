@@ -312,6 +312,12 @@ public class ConstantExp extends Expression
       return compiledValue;
     }
 
+    public boolean equals(Object other)
+    {
+      return other instanceof ConstantExp.Boolean &&
+	(isTrue() == ((ConstantExp.Boolean)other).isTrue());
+    }
+
     private QuoteExp compiledValue;
   }
 
@@ -325,6 +331,9 @@ public class ConstantExp extends Expression
 
   public boolean equals(Object other)
   {
+    if (other instanceof ConstantExp.Boolean)
+      return false;
+
     return other instanceof ConstantExp &&
 	value.equals(((ConstantExp)other).value);
   }

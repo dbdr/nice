@@ -449,8 +449,7 @@ public final class Dispatch
     if (! (len == 0)) throw new Error();
 
     List res = mlsub.typing.Enumeration.enumerate(cst, types, used);
-    res = mergeNullCases(res, domains.length);
-    return enumerateBooleans(res, domains.length);
+    return mergeNullCases(res, domains.length);
   }
 
   /** 
@@ -526,36 +525,6 @@ public final class Dispatch
     return res;
   }
 
-  /** Expand the 'boolean' case into 'true' and 'false'.
-   */
-  private static List enumerateBooleans(List tags, int length)
-  {
-    if (tags.size() < 1) return tags;
-
-    List res;
-    for (int pos = 0; pos < length; pos++)
-    {
-      res = new ArrayList();  
-      for (Iterator i = tags.iterator(); i.hasNext(); ) 
-      {
-        TypeConstructor[] tc = (TypeConstructor[]) i.next();
-        if (tc[pos] == PrimitiveType.boolTC)
-          {
-	    // Create two copies of this case, one for true and one for false.
-            TypeConstructor[] tc2 = new TypeConstructor[tc.length];
-            System.arraycopy(tc, 0, tc2, 0, tc.length);
-	    tc[pos] = PrimitiveType.trueBoolTC;
-            res.add(tc);
-            tc2[pos] = PrimitiveType.falseBoolTC;
-            res.add(tc2);
-          }
-	else res.add(tc);
-      }
-      tags = res;
-    }
-    return tags;	
-  }
-
   /** Generate all combinations of non boolean values from the alternatives
    * @return List<ConstantExp>
    */
@@ -570,15 +539,17 @@ public final class Dispatch
       for (Iterator i = alternatives.iterator(); i.hasNext(); ) 
       {
 	Pattern pat = ((Alternative)i.next()).getPatterns()[pos];
-	if (pat.atNonBoolValue())
+	if (pat.atEnumerableValue())
         {
 	  isValue[pos] = true;
-          if (pat.atEnum())
-	    for (Iterator it = pat.getEnumValues().iterator(); it.hasNext(); )
-	      valuesAtPos.add(it.next());
+	  for (Iterator it = pat.getEnumValues().iterator(); it.hasNext(); )
+	    valuesAtPos.add(it.next());
 
-	  else
-	    valuesAtPos.add(pat.atValue);
+        }
+        else if (pat.atSimpleValue())
+        {
+          isValue[pos] = true;
+	  valuesAtPos.add(pat.atValue);
 	}	   
       }
       //remove duplicates

@@ -326,12 +326,6 @@ public class Pattern implements Located
     if (this.atNonNull())
       return false;
 
-    if (that.atBool())
-      return this.atBool() && (this.atTrue() == that.atTrue());
-
-    if (this.atBool())
-      return that.tc == PrimitiveType.boolTC; 
-
     if (this.atEnum() && that.atEnum())
       return this.atValue.equals(that.atValue);
 
@@ -350,8 +344,8 @@ public class Pattern implements Located
     if (that.atIntCompare())
       return this.atIntValue() && that.matchesCompareValue(this.atValue.longValue());
 
-    if (that.atNonBoolValue())
-      return this.atNonBoolValue() && this.atValue.equals(that.atValue);
+    if (that.atValue != null && !that.atNull() &&!that.atIntCompare())
+      return (this.atValue != null && !this.atNull() &&!this.atIntCompare()) && this.atValue.equals(that.atValue);
 
     if (this.tc == that.tc)
       return this.exactlyAt || ! that.exactlyAt;
@@ -372,7 +366,7 @@ public class Pattern implements Located
       return true;
 
     if (this.atBool() && that.atBool())
-      return this.atTrue() ^ that.atTrue();
+      return ! this.atValue.equals(that.atValue);
 
     if (this.atReference() && that.atReference())
       return ! this.atValue.equals(that.atValue);
@@ -428,28 +422,12 @@ public class Pattern implements Located
     if (tag == null)
       return false;
 
-    if (atNonBoolValue() && !atEnum() )
+    if ((atValue != null) && ! atTypeMatchingValue())
       return false;
 
     if (atIntCompare())
       return Typing.testRigidLeq(tag, PrimitiveType.longTC);
 
-    if (tag == PrimitiveType.trueBoolTC)
-      {
-	if (atBool())
-          return atTrue();
-
-        return tc == PrimitiveType.boolTC;
-      }
-
-    if (tag == PrimitiveType.falseBoolTC)
-      {
-	if (atBool())
-          return atFalse();
-
-        return tc == PrimitiveType.boolTC;
-      }
-	
     if (exactlyAt)
       return Typing.testRigidLeq(tag, tc) && Typing.testRigidLeq(tc, tag);
 
@@ -464,7 +442,10 @@ public class Pattern implements Located
     if (atIntCompare())
       return val.value instanceof Number && matchesCompareValue(val.longValue());
 
-    return atNonBoolValue() && atValue.equals(val);
+    if (atNull())
+      return false;
+
+    return (atValue != null) && atValue.equals(val);
   }
 
   private boolean matchesCompareValue(long val)
@@ -522,9 +503,15 @@ public class Pattern implements Located
   public List getEnumValues ()
   {
     List res = new LinkedList();
-    if (!atEnum())
-      return res;
 
+    if (atBool())
+      {
+        res.add(ConstantExp.makeBoolean(true, location));
+        res.add(ConstantExp.makeBoolean(false, location));
+        return res;
+      }
+
+    // atEnum()
     List symbols = ((EnumDefinition)((EnumDefinition.EnumSymbol)atValue.value).getDefinition()).symbols;
     for (Iterator it = symbols.iterator(); it.hasNext(); )
       {
@@ -768,7 +755,7 @@ public class Pattern implements Located
 
     if (atBool())
       {
-	if (atFalse())
+	if (atValue.isFalse())
           return Gen.boolNotExp(parameter);
 
         return parameter;
@@ -831,9 +818,6 @@ public class Pattern implements Located
     return atValue != null && (atValue.value instanceof Number ||
 		atValue.value instanceof Character);
   }
-  public boolean atNonBoolValue() { 
-    return atValue != null && !atBool() && !atNull() &&!atIntCompare();
-  }
   public boolean atNull() { return (atValue != null) && atValue.isNull(); }
   /** This pattern only specifies that the vlaue is not null.
       This cannot be explicitely used in source programs, but it is useful
@@ -845,12 +829,12 @@ public class Pattern implements Located
   public boolean atBool() { 
     return atValue != null && tc == PrimitiveType.boolTC;
   }
-  public boolean atTrue() { return atValue != null && atValue.isTrue(); }
-  public boolean atFalse() { return atValue != null && atValue.isFalse(); }
   public boolean atString() { return atValue instanceof StringConstantExp; }
   public boolean atReference() { return atValue != null && atValue.value instanceof VarSymbol; }
   public boolean atEnum() { return atReference() && atValue.value instanceof EnumDefinition.EnumSymbol; }
   public boolean atIntCompare() { return compareKind > 0;}
   public boolean atLess() { return compareKind == LT || compareKind == LE; }
-  public boolean atTypeMatchingValue() { return atEnum() || atIntCompare(); }
+  public boolean atTypeMatchingValue() { return atEnum() || atIntCompare() || atBool();}
+  public boolean atSimpleValue() { return atString() || (atIntValue() && ! atIntCompare()); }
+  public boolean atEnumerableValue() { return atBool() || atEnum(); }
 }

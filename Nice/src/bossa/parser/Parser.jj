@@ -46,6 +46,12 @@ class Parser
     return symb(t.image,t);
   }
 
+  private static final Expression trueExp = 
+    new IdentExp(new LocatedString("true", Location.nowhere()));
+
+  private static final Expression falseExp = 
+    new IdentExp(new LocatedString("false", Location.nowhere()));
+
   static List globalDefinitions;
 }
 PARSER_END(Parser)
@@ -1464,7 +1470,7 @@ Expression ConditionalOrExpression() :
 {
   e1=ConditionalAndExpression() 
     ( t="||" e2=ConditionalAndExpression() 
-      { e1=new IfExp(e1, new IdentExp(new LocatedString("true", Location.nowhere())), e2); } )*
+      { e1=new IfExp(e1, Parser.trueExp, e2); } )*
   { return e1; }
 }
 
@@ -1473,7 +1479,7 @@ Expression ConditionalAndExpression() :
 {
   e1=InclusiveOrExpression() 
     ( t="&&" e2=InclusiveOrExpression() 
-      { e1=new IfExp(e1, e2, new IdentExp(new LocatedString("false", Location.nowhere()))); } )*
+      { e1=new IfExp(e1, e2, Parser.falseExp); } )*
   { return e1; }
 }
 
@@ -1505,11 +1511,15 @@ Expression AndExpression() :
 }
 
 Expression EqualityExpression() :
-{ Expression e1,e2; Token t; }
+{ Expression e1,e2; Token t, first; }
 {
   e1=InstanceOfExpression() 
-    ( ( t="==" | t="!=" ) e2=InstanceOfExpression() 
-      { e1=CallExp.create(symb(t),e1,e2); }
+    ( ( t="==" | t="!=" ) 
+      { first = getToken(1); }
+      e2=InstanceOfExpression() 
+      { e2.setLocation(new Location(first, getToken(0)));
+        e1=CallExp.create(symb(t),e1,e2); 
+      }
       )*
   { return e1; }
 }
@@ -1751,7 +1761,7 @@ Expression Literal() :
 }
 {
   (
-  "null" { res=new NullExp(); }
+  "null" { res=NullExp.instance; }
 | res=intConstantExp() 
 | res=floatConstantExp()
 | t=<CHARACTER_LITERAL> 

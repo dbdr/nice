@@ -23,9 +23,12 @@ import bossa.util.*;
 
 public class NullExp extends Expression
 {
-  public NullExp()
-  {
-  }
+  /** There is only one instance of NullExp,
+      since it has no state.
+  */
+  public static final NullExp instance = new NullExp();
+  
+  private NullExp() {}
 
   void computeType()
   {

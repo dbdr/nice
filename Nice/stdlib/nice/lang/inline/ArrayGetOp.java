@@ -35,7 +35,7 @@ extends Procedure2 implements Inlineable
     return new ArrayGetOp(type);
   }
 
-  private ArrayGetOp(Type type)
+  public ArrayGetOp(Type type)
   {
     this.type = type;
     arrayTarget = new StackTarget(nice.tools.code.SpecialTypes.array(type));
@@ -54,11 +54,11 @@ extends Procedure2 implements Inlineable
     args[1].compile(comp, Tools.intTarget);
     
     if (bytecodeArray)
-      code.emitArrayLoad(type);
+      code.emitArrayLoad();
     else
       code.emitInvokeStatic(reflectGet);
 
-    target.compileFromStack(comp, type);
+    target.compileFromStack(comp, code.topType());
   }
 
   private static Method reflectGet = 
@@ -66,6 +66,13 @@ extends Procedure2 implements Inlineable
 
   public Type getReturnType (Expression[] args)
   {
+    Type array = args[0].getType();
+    
+    // We expect an array type
+    if (array instanceof ArrayType)
+      return ((ArrayType) array).getComponentType();
+
+    // If not (possible with polymorphism) the base type is a safe bet
     return type;
   }
 

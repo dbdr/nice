@@ -705,6 +705,18 @@ public class CodeAttr extends Attribute implements AttrContainer
     pushType(element_type);
   }
 
+  /** Load an element from an array.
+   * Must already have pushed the array and the index (in that order):
+   * Stack:  ..., array, index => ..., value */
+  public void emitArrayLoad ()
+  {
+    popType();  // Pop index
+    ArrayType arrayType = (ArrayType) popType();  // Pop array reference
+    Type elementType = arrayType.getComponentType();
+    emitTypedOp(46, elementType);
+    pushType(elementType);
+  }
+
   /**
    * Invoke new on a class type.
    * Does not call the constructor!

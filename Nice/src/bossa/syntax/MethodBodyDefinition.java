@@ -178,7 +178,7 @@ public class MethodBodyDefinition extends Definition
 
 	try{
 	  mlsub.typing.Polytype t = m.getType();
-	  assert(t.getConstraint());
+	  Constraint.assert(t.getConstraint());
 	  tagLeq(tags, t.domain());
 	  tagLeq(additionalTags, t.domain());
 	}
@@ -211,46 +211,24 @@ public class MethodBodyDefinition extends Definition
 	methods += m + " defined " + m.location() + "\n";
       }
     
-    User.error(this,
-	       "There is an ambiguity about which version " + 
-	       " of the overloaded method \"" + name + 
-	       "\" this alternative belongs to.\n" +
-	       "Try to use more patterns.\n\n" +
-	       "Possible methods:\n" +
-	       methods);
-    return null;
+    throw User.error
+      (this,
+       "There is an ambiguity about which version " + 
+       " of the overloaded method \"" + name + 
+       "\" this alternative belongs to.\n" +
+       "Try to use more patterns.\n\n" +
+       "Possible methods:\n" +
+       methods);
   }
 
-  private void assert(Constraint c)
-  throws TypingEx
-  {
-    Constraint.assert(c);
-    if (Constraint.hasBinders(c))
-      {
-	TypeSymbol[] binders = c.binders();
-	for (int i = 0; i < binders.length; i++)
-	  if (binders[i] instanceof MonotypeVar)
-	    ((MonotypeVar) binders[i]).setKind(ConstantExp.maybeTC.variance);
-      }
-  }
-	    
   private void tagLeq(TypeConstructor[] tags, Monotype[] types)
   throws TypingEx
   {
     for (int i = 0; i<tags.length; i++)
       {
-	if (!(types[i].equivalent() instanceof MonotypeConstructor))
-	  Internal.error("Nullness check in " + this +
-			 " " + i + ": " + types[i].equivalent()
-			 + types[i].getClass());
-
-	MonotypeConstructor type = (MonotypeConstructor) types[i].equivalent();
-
-//  	if (type.getTC() != ConstantExp.maybeTC && 
-//  	    type.getTC() != ConstantExp.sureTC)
-//  	  Internal.error("Nullness check in " + this + " : " + type.getTC());
-
-	Typing.leq(tags[i], type.getTP()[0]);
+	types[i].setKind(ConstantExp.maybeTC.variance);
+	Monotype type = types[i].equivalent();
+	Typing.leq(tags[i], ((MonotypeConstructor) type).getTP()[0]);
       }
   }
 
@@ -332,7 +310,7 @@ public class MethodBodyDefinition extends Definition
       entered = true;
 
       try { 
-	assert(declaration.getType().getConstraint()); 
+	Constraint.assert(declaration.getType().getConstraint());
       }
       catch(TypingEx e){
 	User.error(name,
@@ -342,8 +320,17 @@ public class MethodBodyDefinition extends Definition
 	
       // Introduce the types of the arguments
       Monotype[] monotypes = MonoSymbol.getMonotype(parameters);
+      Typing.introduce(monotypes);
+
+      // The arguments are specialized by the patterns
       try{
-	Typing.introduce(monotypes);
+	Pattern.in(monotypes, formals);
+      }
+      catch(TypingEx e){
+	User.error(name,"The patterns are not correct", e);
+      }
+      
+      try{
 	//for (int i = 0; i < monotypes.length; i++)
 	//monotypes[i].setKind(ConstantExp.maybeTC.variance);
 	
@@ -359,18 +346,15 @@ public class MethodBodyDefinition extends Definition
 	User.error(name,"Type error in arguments of method body \""+name+"\":\n"+e);
       }
       
-      // The arguments are specialized by the patterns
-      try{
-	Pattern.in(monotypes, formals);
-
+      try {
 	Types.setBytecodeType(monotypes);
 
 	Typing.implies();
       }
-      catch(TypingEx e){
-	User.error(name,"The patterns are not correct", e);
+      catch(TypingEx e) {
+	User.error(name, "Type error in method body \""+name+"\":\n"+e);
       }
-      
+
       // Introduction of binders for the types of the arguments
       // as in f(x@C : X)
       for(int n = 0; n < formals.length; n++)
@@ -462,7 +446,7 @@ public class MethodBodyDefinition extends Definition
 
   private void compile (NiceMethod definition)
   {
-    gnu.expr.LambdaExp lexp = createMethod(name.toString());
+    gnu.expr.LambdaExp lexp = createMethod(name.toString(), false);
     gnu.expr.ReferenceExp ref = module.addMethod(lexp, true);
 
     lexp.addBytecodeAttribute
@@ -477,7 +461,7 @@ public class MethodBodyDefinition extends Definition
 
   private void compile (JavaMethod declaration)
   {
-    gnu.expr.LambdaExp lexp = createMethod(declaration.methodName);
+    gnu.expr.LambdaExp lexp = createMethod(declaration.methodName, true);
     
     // Compile as a method in the class of the first argument
     try {
@@ -489,13 +473,14 @@ public class MethodBodyDefinition extends Definition
     }
   }
 
-  private gnu.expr.LambdaExp createMethod (String bytecodeName)
+  private gnu.expr.LambdaExp createMethod (String bytecodeName, boolean member)
   {
     gnu.expr.LambdaExp lexp = 
       Gen.createMethod(bytecodeName, 
 		       javaArgTypes(),
 		       declaration.javaReturnType(),
-		       parameters);
+		       parameters,
+		       true, member);
     Gen.setMethodBody(lexp, body.generateCode());
     return lexp;
   }

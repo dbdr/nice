@@ -97,8 +97,7 @@ public class DefaultMethodImplementation extends MethodImplementation
 
   public void printInterface(java.io.PrintWriter s)
   {
-    s.print(declaration.toString());
-    s.print("= ...\n");
+    declaration.printInterface(s);
   }
 
   protected gnu.bytecode.Type[] javaArgTypes()

@@ -54,9 +54,11 @@ for conffile in ../config.*; do
     config=$machine:$name
 
     # Redirect output
-    exec > $config.log
+    exec > $config.log.html
     exec 2>&1
-    
+
+    echo '<html><body><pre>'
+
     if ../Project; then
 	echo "Bootstrap OK"  > $config.res
     else
@@ -66,6 +68,7 @@ for conffile in ../config.*; do
 
     for test in ../*.test; do
 	testname="`expr match $test '../\(.*\)\.test'`"
+	echo "<a name='$testname'>"
 	echo ""
 	echo "======================"
 	echo "Running $testname"
@@ -77,6 +80,9 @@ for conffile in ../config.*; do
 	    echo "$testname FAILURE"  >> $config.res
 	fi
     done
+
+    echo '</pre></body></html>'
+
 done
 
 echo "Admin: $user@users.sourceforge.net" > $machine.id
@@ -86,9 +92,9 @@ echo "System: $system"  >> $machine.id
 results_dir=/home/groups/n/ni/nice/test-central/results
 if [ -r $results_dir ]; then
   # We are on sourceforge!
-  cp ./*.id ./*.res ./*.log $results_dir
+  cp ./*.id ./*.res ./*.html $results_dir
 else
-  scp -p ./*.id ./*.res ./*.log $user@shell.sourceforge.net:$results_dir
+  scp -p ./*.id ./*.res ./*.html $user@shell.sourceforge.net:$results_dir
 fi
 
 echo ""

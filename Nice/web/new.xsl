@@ -132,10 +132,8 @@
          <tr>
           <td bgcolor="#ffffff">
            &nbsp;<span class="small">o</span><xsl:text> </xsl:text>
-           <!-- <a class="nav" href="Wiki">Collaborative site (Wiki)</a>-->
-           <span class="nav">Wiki&nbsp;&nbsp;</span>
-           <a class="nav" href="/cgi-bin/twiki/view/Dev/WebHome">Dev</a>
-           &nbsp;<a class="nav" href="/cgi-bin/twiki/view/Doc/WebHome">Doc</a>
+           <a class="nav" href="/cgi-bin/twiki/view/Doc/WebHome">
+           Collaborative site (Wiki)</a>
            <br />
            &nbsp;<span class="small">o</span><xsl:text> </xsl:text>
            <a class="nav" href="http://sourceforge.net/forum/forum.php?forum_id=40268">Forums</a>
@@ -149,7 +147,7 @@
 -->
            <br />
            &nbsp;<span class="small">o</span><xsl:text>&nbsp;</xsl:text>
-           <a class="nav" href="http://sourceforge.net/project/filemodule_monitor.php&quest;filemodule_id=11365">Be&nbsp;notified&nbsp;of&nbsp;new&nbsp;versions</a>
+           <a class="nav" href="http://sourceforge.net/project/filemodule_monitor.php&quest;filemodule_id=11365">Notify&nbsp;me&nbsp;of&nbsp;new&nbsp;versions</a>
            <br />
            &nbsp;<span class="small">o</span><xsl:text> </xsl:text>
            <a class="nav" href="http://sourceforge.net/tracker/&quest;func=add&amp;group_id=12788&amp;atid=112788">Report a bug</a>
@@ -180,6 +178,9 @@
            <br />
            &nbsp;<span class="small">o</span><xsl:text> </xsl:text>
            <a class="nav" href="tests.html">Tests</a>
+           <br />
+           &nbsp;<span class="small">o</span><xsl:text>&nbsp;</xsl:text>
+           <a class="nav" href="/cgi-bin/twiki/view/Dev/WebHome">Wiki</a>
            <br />
            &nbsp;<span class="small">o</span><xsl:text> </xsl:text>
            <a class="nav" href="http://sourceforge.net/cvs/?group_id=12788">CVS</a>

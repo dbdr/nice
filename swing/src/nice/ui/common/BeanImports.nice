@@ -1,0 +1,15 @@
+package nice.ui.common;
+
+/**
+ * all imports for this package 
+ * are defined in this file
+ */
+ 
+//import nice.ui.common;
+import nice.ui.common.types.beans;
+
+import java.lang.reflect.*;
+import java.net.*;
+import java.io.*;
+import java.beans.*;
+import java.beans.beancontext.*;

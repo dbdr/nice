@@ -21,7 +21,7 @@ import mlsub.typing.*;
 
 // Interface
 
-Statement analyse(Statement, VarScope, TypeScope);
+Statement analyse(Statement, VarScope, TypeScope, boolean mustReturnAValue);
 Expression analyse(Expression, VarScope, TypeScope);
 
 TypeMaper typeMaper(SymbolTable<TypeSymbol>,TypeScope) = 
@@ -38,13 +38,18 @@ buildInfo(varScope, typeScope)
   info.globalVarScope = varScope;
   info.globalTypeScope = typeScope;
   info.typeMap = typeMaper(info.typeVars, typeScope);
+  info.flags = 0;
+  info.flagsStack = new Vector();
 
   return info;
 }
 
-analyse(s@Statement, varScope, typeScope)
+analyse(s@Statement, varScope, typeScope, mustReturnAValue)
 {
-  analyse(s, buildInfo(varScope, typeScope));
+  Info info = buildInfo(varScope, typeScope);
+  analyse(s, info);
+  if (mustReturnAValue && !info.getUnreachable())
+    bossa.util.User.error(s, "Missing return statement");
 
   return s;
 }
@@ -59,6 +64,51 @@ class Info
 
   VarScope globalVarScope;
   TypeScope globalTypeScope;
+
+  /* bit 0: point not reachable 
+  */
+  int flags; 
+  boolean getUnreachable(); getUnreachable() = (this.flags & 1) != 0;
+  void setUnreachable(); setUnreachable() { this.flags |= 1; }
+
+  Stack<int> flagsStack;
+
+  void beginInner(boolean reset);
+  beginInner(reset)
+  {
+    this.flagsStack.push(this.flags);
+    if (reset)
+      this.flags = 0;
+  }
+
+  void endInner();
+  endInner()
+  {
+    this.flags = this.flagsStack.pop();
+  }
+
+  void beginCases();
+  beginCases()
+  {
+    this.flagsStack.push(this.flags);
+    this.flagsStack.push(-1);
+  }
+  
+  void otherCase();
+  otherCase()
+  {
+    int prevResult = this.flagsStack.pop();
+    int outer = this.flagsStack.top();
+    this.flagsStack.push(this.flags & prevResult);
+    this.flags = outer;
+  }
+
+  void endCases();
+  endCases()
+  {
+    this.flags &= this.flagsStack.pop();
+    this.flagsStack.pop();
+  }
 
   // Abstract type for uniform lookup in both scopes
   // Shall probably go away sometime (at least the TypeMaper)
@@ -184,7 +234,7 @@ analyse(e@CallExp, info)
 
 	  if (possibilities.size() == 0)
 	    bossa.util.User.error(e, "class " + e.declaringClass.getName() +
-		       " has no method or field " + funName);
+				  " has no method or field " + funName);
 	  
 	  e.function = new OverloadedSymbolExp(possibilities, funName);
 
@@ -211,10 +261,15 @@ analyse(e@CallExp, info)
 
 analyse(e@FunExp, info)
 {
+  info.beginInner(true);
   info.begin();
   addVars(info, javaList(e.formals));
   analyse(e.body, info);
+  if (!info.getUnreachable() 
+      && !e.inferredReturnType().toString().equals("nice.lang.void"))
+    bossa.util.User.error(e, "Missing return statement");
   info.end();
+  info.endInner();
   return e;
 }
 
@@ -250,15 +305,21 @@ analyse(e@IdentExp, i)
   //if (e.infix)
     //return e;
 
-  throw unknownIdent(e.ident);
+  if (true) throw unknownIdent(e.ident);
   return null; // work-around pb with non-reachable code
 }
 
-analyse(e@IfExp, i)
+analyse(e@IfExp, info)
 {
-  e.condition = analyse(e.condition, i);
-  e.thenExp = analyse(e.thenExp, i);
-  e.elseExp = analyse(e.elseExp, i);
+  e.condition = analyse(e.condition, info);
+
+  info.beginCases();
+  e.thenExp = analyse(e.thenExp, info);
+
+  info.otherCase();
+  e.elseExp = analyse(e.elseExp, info);
+
+  info.endCases();
   return e;
 }
 
@@ -335,7 +396,11 @@ analyse(b@Block, info)
       l.value = analyse(l.value, info);
     info.addVar(l.left);
   });
-  javaList(b.statements).iter(fun(Statement s)=>analyse(s, info));
+  javaList(b.statements).iter(fun(Statement s)=>{
+    if (info.getUnreachable())
+      bossa.util.User.error(s, "Statement is never executed");
+    analyse(s, info);
+  });
   info.end();
 }
 
@@ -346,26 +411,32 @@ analyse(s@ExpressionStmt, info)
 
 analyse(l@LoopStmt, info)
 {
+  info.beginInner(false);
   l.whileExp = analyse(l.whileExp, info);
   analyse(l.loopBody, info);
   analyse(l.iterationStatements, info);
+  info.endInner();
 }
 
 analyse(r@ReturnStmt, info)
 {
   r.value = analyse(r.value, info);
+  info.setUnreachable();
 }
 
 analyse(t@ThrowStmt, info)
 {
   t.exn = analyse(t.exn, info);
+  info.setUnreachable();
 }
 
 analyse(t@TryStmt, info)
 {
+  info.beginCases();
   analyse(t.body, info);
-  analyse(t.finallyBody, info);
+
   javaList(t.catches).iter(fun(TryStmt$Catch c)=>{
+    info.otherCase();
     info.begin();
     info.addVar(c.exnVar);
     c.t = c.tc.resolveToTC(info.typeMap);
@@ -373,5 +444,7 @@ analyse(t@TryStmt, info)
     analyse(c.body, info);
     info.end();
   });
+  info.endCases();
+  analyse(t.finallyBody, info);
 }
 

@@ -50,14 +50,12 @@ public class FunExp extends Expression implements Function
       User.error(this,"functional expression is ill-typed");
     }
     
-    Polytype returnType;
-
     if(body instanceof ReturnStmt)
-      returnType = ((ReturnStmt) body).returnType();
+      inferredReturnType = ((ReturnStmt) body).returnType();
     else if(body instanceof Block)
       {
-	returnType = ((Block) body).getType();
-	if(returnType==null)
+	inferredReturnType = ((Block) body).getType();
+	if (inferredReturnType == null)
 	  User.error(this,
 		     "Not implemented: the last statement of "+this+
 		     "must be a return statement");
@@ -66,12 +64,19 @@ public class FunExp extends Expression implements Function
       {
 	Internal.error(this,
 		       "Body of lambda expression is not of known form");
-	returnType=null;
+	inferredReturnType = null;
       }
     
     type = new Polytype
-      (Constraint.and(cst, returnType.getConstraint()),
-       new FunType(MonoSymbol.getMonotype(formals), returnType.getMonotype()));
+      (Constraint.and(cst, inferredReturnType.getConstraint()),
+       new FunType(MonoSymbol.getMonotype(formals), inferredReturnType.getMonotype()));
+  }
+
+  private Polytype inferredReturnType;
+  Polytype inferredReturnType()
+  {
+    getType();
+    return inferredReturnType;
   }
 
   public Monotype getReturnType()

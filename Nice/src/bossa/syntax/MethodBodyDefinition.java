@@ -245,7 +245,9 @@ public class MethodBodyDefinition extends Definition
   void resolveBody()
   {
     try{
-      body = bossa.syntax.dispatch.analyse$0(body, scope, typeScope);
+      body = bossa.syntax.dispatch.analyse$0
+	(body, scope, typeScope,
+	 !definition.getType().codomain().toString().equals("nice.lang.void"));
     }
     catch(UnknownIdentException e){
       User.error(e.ident, e.ident + " is not declared");

@@ -62,7 +62,7 @@ public class IfExp extends Expression
     else if (thenCode.getType() == SpecialTypes.voidType)
       elseCode = voidify(elseCode);
     
-    return new gnu.expr.IfExp(condition.generateCode(),
+    return new gnu.expr.SimpleIfExp(condition.generateCode(),
 			      thenCode,
 			      elseCode);
   }

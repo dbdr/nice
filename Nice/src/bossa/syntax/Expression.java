@@ -179,6 +179,7 @@ public abstract class Expression extends Node
   final gnu.expr.Expression generateCode()
   {
     gnu.expr.Expression res = compile();
+    res.setFile(location().getFile());
     res.setLine(location().getLine(), location().getColumn());
     
     return res;

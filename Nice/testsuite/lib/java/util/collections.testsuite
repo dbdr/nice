@@ -36,3 +36,21 @@
   sort(list, (String s1, String s2) => s1.compareTo(s2));
   assert list[0] == "A";
   assert list[1] == "BA";
+
+/// PASS
+  List<B> list = new ArrayList();
+  B b = new B();
+  list.add(b);
+  A obj = b;
+  assert(list.contains(obj));  
+  /// Toplevel
+  class A{}
+  class B extends A{}
+
+/// FAIL
+  List<B> list = new ArrayList();
+  A obj = new A();
+  list.contains(obj);  
+  /// Toplevel
+  class A{}
+  class B{}

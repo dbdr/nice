@@ -30,3 +30,10 @@
   Map<String,(int,int)> map = new HashMap();
   return map.get("") || (1,1);
 }
+
+/// PASS bug
+  Map<String,int> map = new HashMap();
+  String s = "abc";
+  map.put(s,1);
+  int i = map.get(s) || 0;
+  assert(i==0);

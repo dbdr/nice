@@ -69,6 +69,8 @@ class Info
   TypeScope outerTypeScope;
 
   ?LoopStmt currentLoop = null;
+  ?Set<VarSymbol> currentLoopVars = null;
+
   Stack<LabeledStmt> labels = new Stack();
 
   /* bit 0: point not reachable 
@@ -216,9 +218,11 @@ void setInitialized (Block.LocalVariable.Symbol v, Info info,
 {
   if (v.index != -1)
     {
-      if (v.constant && info.flags[v.index])
+      if (v.constant && (info.flags[v.index] ||
+		info.currentLoopVars != null && 
+		!notNull(info.currentLoopVars).contains(v)))
 	bossa.util.User.error(loc, 
-			      "" + v + " cannot be assigned a value twice");
+		"" + v + " cannot be assigned a value multiple times");
 
       info.flags |= 1 << v.index;
     }
@@ -550,6 +554,9 @@ analyse(decl@Block.LocalVariable, info)
   else
     decl.setIndex(++info.varIndex);
   info.addVar(notNull(decl.left));
+
+  if (info.currentLoopVars != null && notNull(decl.left).constant)
+    notNull(info.currentLoopVars).add(notNull(decl.left));
 }
 
 analyse(decl@Block.LocalConstant, info)
@@ -606,11 +613,15 @@ analyse(l@LoopStmt, info)
     }
 
   ?LoopStmt save = info.currentLoop;
+  ?Set<VarSymbol> loopVarSave = info.currentLoopVars;
+
   info.currentLoop = l;
+  info.currentLoopVars = new HashSet();
 
   analyse(l.loopBody, info);
 
   info.currentLoop = save;
+  info.currentLoopVars = loopVarSave;
 
   /* The update code is considered reachable even if the loop cannot terminate
      normally. This is normal if the loop contains a continue statement, but 

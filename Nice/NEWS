@@ -40,6 +40,8 @@ nice (0.9.11)
       }
    * Added instanceof on option types. For instance 'x instanceof ?String'
      is equivalent to 'x == null || x instanceof String'.
+   * Added binary integer literals. Examples: '0B1011' '0b1010_0000_0101_1111'.
+   * Bug fixes (negative int hex literals, ...)
 
  --
 

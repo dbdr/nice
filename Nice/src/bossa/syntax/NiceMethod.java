@@ -129,7 +129,7 @@ public class NiceMethod extends UserOperator
       return new NiceMethod(name, constraint, returnType, params, contract, 
                             isOverride);
     else
-      return NiceMethod.WithDefault.create
+      return dispatch.createMethodWithDefault
         (name, constraint, returnType, params, body, contract, isOverride);
   }
 
@@ -342,66 +342,4 @@ d + "\ndefined in:\n" +
     s.print(super.toString() + ";\n");
   }
 
-  /****************************************************************
-   * Method with default implementation
-   ****************************************************************/
-
-  public static class WithDefault extends NiceMethod
-  {
-    /**
-       @param name the name of the method
-       @param constraint the constraint
-       @param returnType the return type
-       @param parameters the formal parameters
-       @param body the body of the function
-    */
-    public static Definition create
-      (LocatedString name, 
-       Constraint constraint,
-       Monotype returnType,
-       FormalParameters parameters,
-       Statement body,
-       Contract contract, boolean isOverride)
-    {
-      if (body == null)
-        return new NiceMethod
-          (name, constraint, returnType, parameters, contract, isOverride);
-
-      return new DefaultMethodImplementation
-        (name, constraint, returnType, parameters, contract, isOverride, body);
-    }
-
-    public WithDefault
-      (LocatedString name, 
-       Constraint constraint, Monotype returnType, 
-       FormalParameters parameters,
-       Contract contract, boolean isOverride,
-       DefaultMethodImplementation impl)
-    {
-      super(name, constraint, returnType, parameters, contract, isOverride);
-      this.implementation = impl;
-    }
-
-    DefaultMethodImplementation implementation;
-
-    void innerTypecheck() throws TypingEx
-    {
-      super.innerTypecheck();
-      implementation.innerTypecheck();
-    }
-
-    protected gnu.expr.Expression computeCode()
-    {
-      // We need to store the result before compiling the implementation.
-      code = super.computeCode();
-
-      // Compile the implementation before returning. This is used to detect
-      // dependencies between global variables through default method 
-      // implementations, so that the global variables can be initialized in
-      // the proper order.
-      implementation.getRefExp();
-
-      return code;
-    }
-  }
 }

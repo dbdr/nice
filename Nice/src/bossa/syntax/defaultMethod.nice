@@ -1,0 +1,136 @@
+/**************************************************************************/
+/*                                N I C E                                 */
+/*             A high-level object-oriented research language             */
+/*                        (c) Daniel Bonniot 2004                         */
+/*                                                                        */
+/*  This program is free software; you can redistribute it and/or modify  */
+/*  it under the terms of the GNU General Public License as published by  */
+/*  the Free Software Foundation; either version 2 of the License, or     */
+/*  (at your option) any later version.                                   */
+/*                                                                        */
+/**************************************************************************/
+
+package bossa.syntax;
+
+import bossa.util.*;
+
+/**
+   Method with default implementation.
+
+ */
+public class MethodWithDefault extends NiceMethod
+{
+  DefaultMethodImplementation implementation;
+
+  innerTypecheck()
+  {
+    super;
+    implementation.innerTypecheck();
+  }
+
+  computeCode()
+  {
+    // We need to store the result before compiling the implementation.
+    code = super;
+
+    // Compile the implementation before returning. This is used to detect
+    // dependencies between global variables through default method 
+    // implementations, so that the global variables can be initialized in
+    // the proper order.
+    implementation.getRefExp();
+
+    return notNull(code);
+  }
+}
+
+public Definition createMethodWithDefault
+      (LocatedString name, 
+       Constraint constraint,
+       Monotype returnType,
+       FormalParameters parameters,
+       Statement body,
+       Contract contract, boolean isOverride)
+{
+  if (body == null)
+    return new NiceMethod(name, constraint, returnType, parameters,
+	contract, isOverride);
+
+  return createDefaultMethodImplementation(name, constraint, returnType,
+	parameters, contract, isOverride, body);
+}
+
+/**
+   The default implementation of a method.
+
+ */
+public class DefaultMethodImplementation extends MethodImplementation
+{
+
+  firstArgument()
+  {
+    return notNull(nice.tools.typing.Types.equivalent(notNull(declaration).getArgTypes()[0]).head());
+  }
+
+  doResolve()
+  {
+    notNull(this.declaration).docString = this.docString;
+
+    //scope = declaration.scope;
+    typeScope = notNull(declaration).typeScope;
+
+    notNull(declaration).doResolve();
+    this.buildSymbols();
+
+    // Do not reset scope and typeScope to null.
+  }
+
+  void typedResolve()
+  {
+    notNull(declaration).typedResolve();
+  }
+
+  void innerTypecheck()
+  {
+    // If the method we implement specialize others, then we cannot
+    // omit the patterns, as we do handle only a special case of those
+    // more general methods.
+    if (notNull(declaration).specializesMethods())
+      this.addPatterns();
+
+    Node.currentFunction = this;
+    if (this.hasThis())
+      Node.thisExp = createSymbolExp(notNull(parameters)[0], this.location());
+
+    try { 
+      typecheck(body);
+    }
+    finally { 
+      Node.currentFunction = null; 
+      Node.thisExp = null;
+    }
+  }
+
+  printInterface(s)
+  {
+    notNull(declaration).printInterface(s);
+  }
+
+  javaArgTypes() = notNull(declaration).javaArgTypes();
+}
+
+DefaultMethodImplementation createDefaultMethodImplementation 
+    (LocatedString name, 
+     Constraint constraint,
+     Monotype returnType,
+     FormalParameters parameters,
+     Contract contract, boolean isOverride,
+     Statement body)
+{
+  let res = new DefaultMethodImplementation(name, body,
+	parameters.asList().mapToArray(FormalParameters.Parameter param =>
+        createPattern(param.getName() || new LocatedString("_", name.location()))));
+  res.declaration = new MethodWithDefault(name, constraint, returnType,
+	parameters, contract, isOverride, implementation: res);
+  res.addChild(res.declaration);
+  return res;
+}

@@ -15,6 +15,28 @@ nice (0.9.11)
       }
     becouse Nice will detect that "instance" is of a "sure type"
     after the "instance = new Foo();" assignment.
+  * Allow value returns in void methods. It's useful when exiting from
+    the method in a branch after doing a single operation. For instance,
+    instead of:
+
+      void add(int x)
+      {
+        if (x == 0)
+          {
+            buffer.append("ZERO\n");
+            return;
+          }
+        ...
+      }
+
+    one can now more simply write:
+
+      void add(int x)
+      {
+        if (x == 0)
+          return buffer.append("ZERO\n");
+        ...
+      }
 
  --
 

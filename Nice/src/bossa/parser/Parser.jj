@@ -1349,7 +1349,7 @@ Statement code():
     "="
     (
       exp=Expression() ";"
-      { code = bossa.syntax.dispatch.createReturnStmt(exp, /* fake */ true); }
+      { code = bossa.syntax.dispatch.createReturnStmt(exp); }
     |
       {Statement res;}
       (

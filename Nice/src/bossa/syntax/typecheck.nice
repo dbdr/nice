@@ -913,18 +913,13 @@ typecheck(ReturnStmt r)
   if (expectedType == null)
     r.value = r.value.noOverloading();
   else
-    {
-      if (! r.fake && nice.tools.typing.Types.isVoid(expectedType))
-	throw bossa.util.User.error(r, "Cannot return a value here");
-	  
-      r.value = r.value.resolveOverloading(new mlsub.typing.Polytype(expectedType));
-    }
+    r.value = r.value.resolveOverloading(new mlsub.typing.Polytype(expectedType));
 
   try { typecheck(r.value); }
   catch (bossa.util.UserError ex) { throw ensureLocated(ex, r); }
   
   try{
-    if (! (r.fake && expectedType != null && nice.tools.typing.Types.isVoid(expectedType)))
+    if (! (expectedType != null && nice.tools.typing.Types.isVoid(expectedType)))
       function.checkReturnedType(r.returnType());
   }
   catch(WrongReturnType e){

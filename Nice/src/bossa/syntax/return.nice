@@ -21,7 +21,6 @@ import bossa.util.*;
 public class ReturnStmt extends Statement
 {
   Expression value;
-  boolean fake = false;
 
   mlsub.typing.Polytype returnType()
   {
@@ -60,19 +59,10 @@ public class VoidReturnStmt extends Statement
 
 public Statement createReturnStmt(?Expression value)
 {
-  return createReturnStmt(value, false);
-}
-
-/**
-   @param fake  This return was not explicitely written, but is the result
-                of syntactic sugar.
-*/
-public Statement createReturnStmt(?Expression value, boolean fake)
-{
   if (value == null)
     return new VoidReturnStmt();
 
-  let res = new ReturnStmt(value: value, fake: fake);
+  let res = new ReturnStmt(value: value);
   res.setLocation(value.location());
   return res;
 }

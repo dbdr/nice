@@ -9,10 +9,36 @@
 
   assert buffer.toString().equals("foobar");
 
-/// FAIL
+/// PASS
+  foo(0);
+  foo(1);
   /// Toplevel
-void goo() { 
-  /* /// FAIL HERE */ return 1; 
+void fooZero() {}
+
+void foo(int x)
+{
+  if (x == 0)
+    return fooZero();
+
+  // do something else
+}
+
+/// PASS
+  let a = new A();
+  a.add(1);
+  a.add(0);
+  /// Toplevel
+class A
+{
+  StringBuffer s = new StringBuffer();
+
+  void add(int x)
+  {
+    if (x == 0)
+      return s.append("ZERO\n");
+
+    // do something complex
+  }
 }
 
 /// PASS
@@ -56,6 +82,11 @@ void f() = doSomethingAndReturnAStatusBoolean();
 /// PASS
   /// Toplevel
   void foo() = bar();
+  ?String bar() = "abc";
+
+/// PASS
+  /// Toplevel
+  void foo() { if (1 == 2) return bar(); }
   ?String bar() = "abc";
 
 /// FAIL

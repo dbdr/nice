@@ -414,6 +414,15 @@ public class CodeAttr extends Attribute implements AttrContainer
     return locals.current_scope;
   }
 
+  /** Return the toplevel scope, corresponding to the current method. */
+  public Scope methodScope()
+  {
+    Scope res = getCurrentScope();
+    while (res.parent != null)
+      res = res.parent;
+    return res;
+  }
+
   public Scope popScope () {
     Scope scope = locals.current_scope;
     locals.current_scope = scope.parent;
@@ -1684,7 +1693,9 @@ public class CodeAttr extends Attribute implements AttrContainer
 	  {
 	    if (saveResult && result == null)
 	      {
-		result = addLocal(topType());
+                // We store the result in a method-level variable, to make sure
+                // that the finally blocks do not use the same slot.
+		result = methodScope().addVariable(this, topType());
 		emitStore(result);
 	      }
 	    emitJsr(state.finally_subr);

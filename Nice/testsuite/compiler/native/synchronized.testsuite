@@ -41,3 +41,18 @@ String f(String s)
       synchronized(buffer) { }
     } 
   }
+
+/// PASS
+  /// Toplevel
+class Foo {}
+
+int bar (Foo obj)
+{
+  synchronized(obj)
+  {
+    ?Throwable exn = new Exception();
+    if (exn != null)
+      throw exn;
+    return 1;
+  }
+}

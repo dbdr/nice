@@ -1501,6 +1501,18 @@ Expression floatConstantExp():
   { return ConstantExp.makeFloating(representation); }
 }
 
+Expression charConstantExp():
+{
+  Token t;
+}
+{
+  t = <CHARACTER_LITERAL> 
+  { return ConstantExp.makeChar
+      (new LocatedString(t.image.substring(1, t.image.length() - 1),
+			 new Location(t)));
+  }
+}
+
 StringConstantExp stringConstantExp():
 {
   String s;
@@ -2114,11 +2126,7 @@ Expression Literal() :
   "null" { res = NullExp.instance; }
 | res=intConstantExp() 
 | res=floatConstantExp()
-| t=<CHARACTER_LITERAL> 
-    { res=ConstantExp.makeChar
-      (new LocatedString(t.image.substring(1,t.image.length()-1),
-			 new Location(t)));
-    }
+| res=charConstantExp()
 | res=stringConstantExp()
   )
 { return res; }
@@ -2134,11 +2142,7 @@ Expression patternLiteral() :
   (
   "null" { res = NullExp.instance; }
 | res=intConstantExp() 
-| t=<CHARACTER_LITERAL> 
-    { res=ConstantExp.makeChar
-      (new LocatedString(t.image.substring(1,t.image.length()-1),
-			 new Location(t)));
-    }
+| res=charConstantExp()
   )
 { return res; }
 }

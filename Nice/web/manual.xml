@@ -1160,11 +1160,11 @@ public class Main
 	void bar(?String arg) {
 		if (arg != null) {
 			//Here Nice knows arg is not null, so it can 
-			// be passed to a method which takes a String!
-			foo(arg);	
+			// be passed to a method which takes a String.
+			foo(arg);
 		} 
 		foo(arg); //Here arg may or may not be null, 
-			  //so Nice gives a compile error.
+			  //so Nice gives a compilation error.
 	}
 </programlisting>
 </example>
@@ -1188,7 +1188,7 @@ public class Main
 
       <para>
         For more details, see 
-	<ulink url="http://nice.sourceforge.net/cgi-bin/twiki/view/Doc/OptionType">
+	<ulink url="http://nice.sourceforge.net/cgi-bin/twiki/view/Doc/OptionTypes">
 	the Wiki page about option types</ulink>.
       </para>
 

@@ -159,7 +159,7 @@ public class RetypedJavaMethod extends JavaMethod
           reflectMethod = 
             holder.getDeclaredMethod(methodName, javaArgType.length);
         } catch (Error e) {
-          User.error(this, "The types of the arguments don't exactly match any of the declarations");
+          setIgnoredRetyping(this, "Ignored retyping because no declaration exist with " + javaArgType.length + " arguments");
 	}
 	if (reflectMethod == null)
 	  {
@@ -175,7 +175,7 @@ public class RetypedJavaMethod extends JavaMethod
             return;
 	  }
 
-        User.error(className, "The types of the arguments don't match the declaration:\n"
+        setIgnoredRetyping(className, "Ignored retyping because The types of the arguments don't match the declaration:\n"
 			 + reflectMethod);
 
       }

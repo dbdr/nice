@@ -32,7 +32,7 @@ import bossa.util.Location;
    @version $Date$
    @author bonniot
  */
-public class Package implements mlsub.compilation.Module, Located
+public class Package implements mlsub.compilation.Module, Located, bossa.syntax.Module
 {
   public long lastModification()
   {
@@ -133,7 +133,7 @@ public class Package implements mlsub.compilation.Module, Located
 
   private void read(boolean forceReload)
   {
-    Package oldModule = Definition.currentModule;
+    Module oldModule = Definition.currentModule;
     Definition.currentModule = this;
     
     List definitions = new LinkedList();

@@ -1,5 +1,5 @@
 
-package nice.opt;
+package nice.getopt;
 
 import gnu.getopt.*;
 

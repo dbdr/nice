@@ -12,7 +12,7 @@
 
 // File    : main.nice
 // Created : Sat Feb 19 16:21:04 2000 by Daniel Bonniot
-//$Modified: Thu Aug 03 18:04:47 2000 by Daniel Bonniot $
+//$Modified: Fri Aug 04 12:11:04 2000 by Daniel Bonniot $
 
 package nice.tools.compiler;
 
@@ -28,7 +28,7 @@ package nice.tools.compiler;
  */
 
 import mlsub.compilation;
-import nice.opt;
+import nice.getopt;
 import bossa.modules;
 
 main(args)

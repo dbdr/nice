@@ -25,3 +25,11 @@ import java.io.*;
 
 void foo(String) {}
 void foo(char) {}
+
+/// FAIL
+  // Access to private field (possibly, depending on the runtime used)
+  let v = ""./*/// FAIL HERE*/ value;
+
+/// FAIL bug
+  // Access to protected field
+  let f = javax.swing.JComboBox b => b.actionCommand;

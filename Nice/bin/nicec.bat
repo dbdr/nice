@@ -53,3 +53,9 @@ java -classpath %NICEPATH%\nice.jar;%CLASSPATH% nice.tools.compiler.console.fun 
 :end
 rem -- clean up a bit
 set NICEPATH=
+
+rem Setting for Emacs so that it will treat the file as a DOS file whatever
+rem OS it is running on. Please keep this.
+rem Local variables:
+rem coding:dos
+rem End:

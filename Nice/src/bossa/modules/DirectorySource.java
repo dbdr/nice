@@ -50,6 +50,9 @@ class DirectorySource extends PackageSource
   private File[] sources;
   private File itf;
 
+  /** Date of the last successful compilation */
+  private long lastCompilation = -1;
+
   /** @return true if this directory indeed hosts a Nice package. */
   private boolean isValid()
   {
@@ -59,7 +62,6 @@ class DirectorySource extends PackageSource
   Unit[] getDefinitions(boolean forceReload)
   {
     lastModification = maxLastModification(sources);
-    lastCompilation = itf == null ? -1 : itf.lastModified();
    
     if (!forceReload && lastModification <= lastCompilation)
       {
@@ -139,6 +141,7 @@ class DirectorySource extends PackageSource
   private File getInterface()
   {
     File itf = new File(directory, "package.nicei");
+    File dispatchFile = new File(directory, "dispatch.class");
 
     if (!itf.exists())
       return null;
@@ -148,6 +151,9 @@ class DirectorySource extends PackageSource
 
     if (bytecode == null || dispatch == null)
       return null;
+
+    lastCompilation = Math.min(itf.lastModified(), 
+			       dispatchFile.lastModified());
 
     return itf;
   }

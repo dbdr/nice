@@ -87,17 +87,17 @@ public class TryStmt extends Statement
       this.exnVar = new MonoSymbol
 	(var, 
 	 new MonotypeConstructor(tc, null, tc.location()));
-      addChild(exnVar);
+      this.addChild(exnVar);
       
       this.tc = tc;
       this.typeLocation = tc.location();
       this.var = var;
-      this.body = child(body);
+      this.body = this.child(body);
     }
 
     void findJavaClasses()
     {
-      t = tc.resolveToTC(typeScope);
+      t = tc.resolveToTC(this.typeScope);
       tc = null;
     }
     

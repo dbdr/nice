@@ -12,8 +12,8 @@
 
 // File    : parser.jj
 // Created : Thu Jul 01 10:27:05 1999 by bonniot
-//$Modified: Mon Aug 28 15:34:32 2000 by Daniel Bonniot $
-// Description : Parseur JavaCC pour Bossa
+//$Modified: Tue Aug 29 13:28:12 2000 by Daniel Bonniot $
+// Description : Parseur JavaCC pour Nice
 //   Tokens based on the Jazz parser
 
 options {
@@ -967,7 +967,7 @@ MethodDefinition methodDefinition():
     ")"
     
     (
-      // Bossa method
+      // Nice method
       ";"
       { return new MethodDefinition(name,cst,returnType,parameters); }
     |
@@ -1263,7 +1263,7 @@ Expression Expression() :
       if(op.image.length()!=1)
         e2=CallExp.create(symb(op.image.substring(0, 1),op),e1,e2);
 
-      e1=new AssignExp(e1,e2);
+      e1=AssignExp.create(e1,e2);
     }
   ]
   { 
@@ -1429,7 +1429,6 @@ Expression PreIncrementExpression() :
 { Expression res; Token t; }
 {
   t="++" res=PrimaryExpression()
-//  { return new AssignExp(res,CallExp.create(symb("+",t),res,ConstantExp.makeNumber(1))); }
   { return new IncrementExp(res, true, true); }
 }
 
@@ -1437,7 +1436,6 @@ Expression PreDecrementExpression() :
 { Expression res; Token t; }
 {
   t="--" res=PrimaryExpression()
-//  { return new AssignExp(res,CallExp.create(symb("-",t),res,ConstantExp.makeNumber(1))); }
   { return new IncrementExp(res, true, false); }
 }
 
@@ -1528,7 +1526,7 @@ Expression PrimaryPrefix() :
   //AllocationExpression()
   res=newExp()
 |
-  // Bossa specific
+  // Nice specific
   res=funExp()
 
 /* What's that ?
@@ -1778,7 +1776,7 @@ Statement StatementExpression() :
       if(op.image.length()!=1)
         e2=CallExp.create(symb(op.image.substring(0, 1),op),e1,e2);
 
-      e1=new AssignExp(e1,e2);
+      e1=AssignExp.create(e1,e2);
     }
   ]
   )

@@ -91,4 +91,17 @@ main(args)
   <int, long> t1;
   <long, long> t2;
   t2 = t1;  
+
+  // testing default values
+  {
+    boolean bo;
+    byte by;
+    short s;
+    int i;
+    long l;
+    char c;
+    // should do something so that c==0 returns true.
+
+    println("" + (bo==false) + (by==0) + (s==0) + (i==0) + (l==0));
+  }
 }

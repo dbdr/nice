@@ -12,7 +12,7 @@
 
 // File    : AssignExp.java
 // Created : Mon Jul 05 15:49:27 1999 by bonniot
-//$Modified: Thu Aug 03 14:16:23 2000 by Daniel Bonniot $
+//$Modified: Tue Aug 29 13:47:56 2000 by Daniel Bonniot $
 
 package bossa.syntax;
 
@@ -25,11 +25,31 @@ import mlsub.typing.Polytype;
  */
 public class AssignExp extends Expression
 {
-  public AssignExp(Expression to,
-		   Expression value)
+  private AssignExp(Expression to, Expression value)
   {
     this.to = expChild(to);
     this.value = expChild(value);
+  }
+
+  /**
+     Create the assignment expression, applying rewrite rules first. 
+  */
+  public static Expression create(Expression to, Expression value)
+  {
+    // Rewrite get(e, i) = v into set(e, i, v)
+    if (to instanceof CallExp &&
+	"get".equals(((CallExp) to).fun.toString()))
+      {
+	CallExp call = (CallExp) to;
+	((IdentExp) ((ExpressionRef) call.fun).content()).ident.content= "set";
+	ExpressionRef v = new ExpressionRef(value);
+	call.parameters.add(v);
+	call.addChild(v);
+
+	return call;
+      }
+    
+    return new AssignExp(to, value);
   }
 
   /****************************************************************

@@ -31,8 +31,8 @@ interface Container<T>
 interface Sequence<T> 
   extends Collection<T>
 {
-  T    get(int);
-  void set(int, T);
+  T    get(int);    // alternative syntax: a[i]
+  void set(int, T); // alternative syntax: a[i]=v
 }
 
 iter(l@Sequence, f)

@@ -597,6 +597,23 @@ public class Package implements mlsub.compilation.Module, Located, bossa.syntax.
   **/
   static final String packageClassName = "fun";
 
+  public ClassExp getClassExp(NiceClass def)
+  {
+    if (compiling())
+      return def.createClassExp();
+    
+    String name = def.getName().toString();
+    ClassType classe = source.readClass(name);
+    if (classe == null)
+      Internal.error("Compiled class " + def + " was not found");
+    
+    Type.registerTypeForName(name, classe);
+    
+    ClassExp res = new ClassExp(classe);
+    addImplementationClass(res);
+    return res;
+  }
+
   public void addImplementationClass(gnu.expr.ClassExp classe)
   {
     thisPkg.addClass(classe);

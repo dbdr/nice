@@ -516,8 +516,10 @@ public class NiceClass extends ClassDefinition.ClassImplementation
        add methods for the multiple dispatch of java methods in the class 
        (and maybe for adding fields, or optimizing the dispatch of Nice
        methods in the future).
+       However, the ClassExp object refers to the existing ClassType object,
+       and only adds or modifies features when needed.
     */
-    classe = createClassExp();
+    classe = definition.module.getClassExp(this);
   }
 
   static gnu.bytecode.Method cloneMethod = 
@@ -535,15 +537,15 @@ public class NiceClass extends ClassDefinition.ClassImplementation
     addJavaMethod(lambda);    
   }
 
-  private gnu.expr.ClassExp createClassExp()
+  public gnu.expr.ClassExp createClassExp()
   {
-    gnu.expr.ClassExp classe = new gnu.expr.ClassExp();
-    classe.setName(definition.name.toString());
-    definition.location().write(classe);
-    classe.setSimple(true);
-    classe.setAccessFlags(definition.getBytecodeFlags());
-    definition.module.addImplementationClass(classe);
-    return classe;
+    gnu.expr.ClassExp res = new gnu.expr.ClassExp();
+    res.setName(definition.name.toString());
+    definition.location().write(res);
+    res.setSimple(true);
+    res.setAccessFlags(definition.getBytecodeFlags());
+    definition.module.addImplementationClass(res);
+    return res;
   }
 
   gnu.expr.ClassExp classe;
@@ -758,7 +760,7 @@ public class NiceClass extends ClassDefinition.ClassImplementation
   }
 
   /**
-     Called instead of compile is the package is up-to-date.
+     Called instead of compile if the package is up-to-date.
   */
   public void recompile()
   {

@@ -236,6 +236,16 @@ public class LambdaExp extends ScopeExp
     return type;
   }
 
+  public Type[] getArgTypes()
+  {
+    Type[] res = new Type[max_args];
+    int n = 0;
+    for (Declaration d = firstDecl(); d != null; d = d.nextDecl())
+      res[n++] = d.getType();
+    return res;
+  }
+
+
   /** Number of argument variable actually passed by the caller.
    * For functions that accept more than 4 argument, or take a variable number,
    * this is 1, since in that all arguments are passed in a single array. */

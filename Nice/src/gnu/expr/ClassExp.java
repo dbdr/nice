@@ -93,6 +93,18 @@ public class ClassExp extends LambdaExp
     method.nextSibling = this.firstChild;
     this.firstChild = method;
 
+    if (instanceType != null)
+      {
+        Method m = instanceType.getDeclaredMethod
+          (method.getName(), method.getArgTypes());
+        if (m != null)
+          {
+            m.eraseCode();
+            method.declareThis(instanceType);
+            method.primMethods = new Method[]{ m };
+          }
+      }
+
     return new ReferenceExp(decl);
   }
 
@@ -278,7 +290,9 @@ public class ClassExp extends LambdaExp
 	 decl != null;  decl = decl.nextDecl())
       {
 	// If the declaration derives from a method, don't create field.
-	if (decl.getCanRead())
+        // Also, field can already exist if the class is imported from a
+        // compiled package.
+	if (decl.getCanRead() && decl.field == null)
 	  {
 	    int flags = Access.PUBLIC;
 	    if (decl.getFlag(Declaration.STATIC_SPECIFIED))
@@ -314,6 +328,11 @@ public class ClassExp extends LambdaExp
     for (LambdaExp child = firstChild;  child != null;
 	 child = child.nextSibling)
       {
+        // When we recompile an existing method in an existing class,
+        // we keep the same Method objects.
+        if (child.primMethods != null)
+          continue;
+
 	if (child != initMethod || ! isMakingClassPair())
 	  child.addMethodFor(type, null, null);
 	if (isMakingClassPair())

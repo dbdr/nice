@@ -12,7 +12,7 @@
 
 // File    : Variance.java
 // Created : Fri Jul 23 12:15:46 1999 by bonniot
-//$Modified: Thu Nov 04 15:16:54 1999 by bonniot $
+//$Modified: Mon Dec 13 15:41:48 1999 by bonniot $
 
 package bossa.typing;
 
@@ -31,11 +31,22 @@ import bossa.syntax.*;
 public class Variance 
   implements Kind /* Variance is the Kind of MonotypeConstructors */
 {
-  public Variance(int n)
+  private Variance(int n)
   {
     this.size=n;
   }
 
+  public static final Variance make(int n)
+  {
+    if(n==0)
+      return nullVariance;
+    else
+      return new Variance(n);
+  }
+  
+  // just to optimize memory footprint, Variance(0) is shared
+  private static final Variance nullVariance = new Variance(0);
+  
   bossa.engine.Engine.Constraint getConstraint()
   {
     return bossa.engine.Engine.getConstraint(this);

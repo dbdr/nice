@@ -12,7 +12,7 @@
 
 // File    : MonotypeConstructor.java
 // Created : Thu Jul 22 09:15:17 1999 by bonniot
-//$Modified: Sat Dec 04 14:07:27 1999 by bonniot $
+//$Modified: Thu Jan 20 14:05:33 2000 by bonniot $
 
 package bossa.syntax;
 
@@ -62,9 +62,8 @@ public class MonotypeConstructor extends Monotype
 
   public Monotype resolve(TypeScope typeScope) 
   {
-    tc=tc.resolve(typeScope);
-    parameters=parameters.resolve(typeScope);
-    return this;
+    return new MonotypeConstructor
+      (tc.resolve(typeScope),parameters.resolve(typeScope),loc);
   }
   
   Monotype substitute(Map map)

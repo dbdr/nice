@@ -12,7 +12,7 @@
 
 // File    : User.java
 // Created : Wed Jul 07 18:20:58 1999 by bonniot
-//$Modified: Sat Dec 04 14:14:36 1999 by bonniot $
+//$Modified: Tue Jan 11 18:58:22 2000 by bonniot $
 
 package bossa.util;
 
@@ -29,7 +29,7 @@ public class User
 {
   public static void error(Located responsible, String message, String dbgMsg)
   {
-    if(Debug.errorMsg)
+    if(Debug.powerUser)
       error(responsible,message+dbgMsg);
     else
       error(responsible,message);
@@ -46,6 +46,9 @@ public class User
 
   public static void error(String message)
   {
+    // only at debug time
+    //Internal.printStackTrace();
+    
     System.out.println(message);
     System.exit(1);
   }

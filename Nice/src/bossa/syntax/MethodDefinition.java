@@ -12,7 +12,7 @@
 
 // File    : MethodDefinition.java
 // Created : Thu Jul 01 18:12:46 1999 by bonniot
-//$Modified: Sat Dec 04 12:10:46 1999 by bonniot $
+//$Modified: Thu Jan 20 16:46:26 2000 by bonniot $
 
 package bossa.syntax;
 
@@ -124,19 +124,31 @@ public class MethodDefinition extends PolySymbol implements Definition
    ****************************************************************/
 
   private gnu.mapping.Procedure dispatchMethod;
+  private gnu.bytecode.Method   dispatchPrimMethod;
 
   protected gnu.mapping.Procedure computeDispatchMethod()
   {
-    return new gnu.expr.PrimProcedure
-      (module.addDispatchMethod(this));
+    dispatchPrimMethod = module.addDispatchMethod(this);
+    return new gnu.expr.PrimProcedure(dispatchPrimMethod);
   }
   
   public final gnu.mapping.Procedure getDispatchMethod() 
   { 
     if(dispatchMethod==null)
-      dispatchMethod=computeDispatchMethod();
+      dispatchMethod = computeDispatchMethod();
     
     return dispatchMethod;
+  }
+  
+  public final gnu.bytecode.Method getDispatchPrimMethod() 
+  { 
+    if(dispatchMethod==null)
+      dispatchMethod = computeDispatchMethod();
+ 
+    if(dispatchPrimMethod==null)
+      Internal.error(this,"dispatchPrimMethod not computed in "+this);
+    
+    return dispatchPrimMethod;
   }
   
   public gnu.bytecode.Type javaReturnType()
@@ -147,7 +159,7 @@ public class MethodDefinition extends PolySymbol implements Definition
   public gnu.bytecode.Type[] javaArgTypes()
   {
     List domain=this.type.domain();
-    gnu.bytecode.Type[] res=new ClassType[domain.size()];
+    gnu.bytecode.Type[] res=new gnu.bytecode.Type[domain.size()];
     int n=0;
     for(Iterator i=domain.iterator();i.hasNext();n++)
       res[n]=((Monotype)i.next()).getJavaType();
@@ -174,11 +186,11 @@ public class MethodDefinition extends PolySymbol implements Definition
   public String toString()
   {
     return
-      type.codomain().toString()
+      type.getConstraint().toString()
+      + String.valueOf(type.codomain())
       + " "
-      + name
+      + name.toQuotedString()
       + Util.map("<",", ",">",type.getTypeParameters())
-      + type.getConstraint().toString()
       + "("
       + Util.map("",", ","",type.domain())
       + ");\n"
@@ -205,12 +217,12 @@ public class MethodDefinition extends PolySymbol implements Definition
     bytecodeName = module.mangleName(name.toString());
   }
 
-  public String getBytecodeName()
+  public String getName()
   {
     return bytecodeName;
   }
   
-  public String getFullBytecodeName()
+  public String getFullName()
   {
     return module.name+"$"+bytecodeName;
   }

@@ -12,7 +12,7 @@
 
 // File    : AST.java
 // Created : Thu Jul 01 11:01:56 1999 by bonniot
-//$Modified: Sat Dec 04 12:09:14 1999 by bonniot $
+//$Modified: Tue Dec 07 20:13:49 1999 by bonniot $
 
 package bossa.syntax;
 
@@ -48,8 +48,6 @@ public class AST extends Node
   
   public void createContext()
   {
-    ClassDefinition.createSpecialContext();
-    
     for(Iterator i=definitions.iterator();i.hasNext();)
       ((Definition) i.next()).createContext();
   }

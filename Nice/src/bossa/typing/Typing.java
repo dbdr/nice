@@ -12,7 +12,7 @@
 
 // File    : Typing.java
 // Created : Tue Jul 20 11:57:17 1999 by bonniot
-//$Modified: Sat Dec 04 14:16:05 1999 by bonniot $
+//$Modified: Wed Jan 19 16:40:19 2000 by bonniot $
 
 package bossa.typing;
 
@@ -38,20 +38,24 @@ abstract public class Typing
    * Enters a new typing context
    *
    */
-  public static void enter()
+  public static int enter()
   {
-    enter("");
+    return enter("");
   }
 
+  // used to verify that enter abd leaves match
+  static int level=0;
+  
   /**
    * Enters a new typing context
    *
    * @param message A debug message to know where we are
    */
-  public static void enter(String message)
+  public static int enter(String message)
   {
     if(message!=null && dbg) Debug.println("## Typechecking "+message);
     Engine.enter();
+    return level++;
   }
 
   /**
@@ -61,7 +65,7 @@ abstract public class Typing
    *   which represent the new symbols of the context
    * @param context the constraint to ass to the current context
    */
-  public static void enter(Collection symbols, String message)
+  public static int enter(Collection symbols, String message)
   {
     if(dbg) Debug.println("## Typechecking "+message+
 		  Util.map(" [",", ","]",symbols)
@@ -69,6 +73,7 @@ abstract public class Typing
     Engine.enter();
     
     introduce(symbols);
+    return level++;
   }
 
   static public void introduce(Element e)
@@ -98,7 +103,7 @@ abstract public class Typing
    * Leaves the last typing context
    *
    */
-  public static void leave()
+  public static int leave()
     throws TypingEx
   {
     if(dbg) Debug.println("LEAVE");
@@ -108,7 +113,7 @@ abstract public class Typing
     catch(Unsatisfiable e){
       throw new TypingEx("Unsatisfiable 1:"+e.getMessage());
     }
-    
+    return --level;
   }
 
   public static void implies()
@@ -195,7 +200,8 @@ abstract public class Typing
   {
     if(dbg) Debug.println("Polytype leq: "+t1+" <: "+t2);
     
-    if(dbg) enter("#"); else enter();
+    int l;
+    if(dbg) l=enter("#"); else l=enter();
     
     t2.getConstraint().assert();
 
@@ -204,7 +210,8 @@ abstract public class Typing
     t1.getConstraint().assert();
     leq(t1.getMonotype(),t2.getMonotype());
 
-    leave();
+    if(leave()!=l)
+      Internal.error("Unmatched enters and leaves");
   }
 
   /****************************************************************
@@ -219,7 +226,7 @@ abstract public class Typing
       Engine.leq(m1,m2);
     }
     catch(Unsatisfiable e){
-      //e.printStackTrace();
+      if(dbg) e.printStackTrace();
       throw new TypingEx("Typing.leq("+m1+","+m2+") [was "+e.getMessage()+"]");
     }    
   }
@@ -238,7 +245,7 @@ abstract public class Typing
       Engine.leq(t1,t2,true);
     }
     catch(Unsatisfiable e){
-      throw new TypingEx("Not satisfiable 4:"+e.getMessage());
+      throw new KindingEx(t1,t2);
     }
   }
   
@@ -372,12 +379,13 @@ abstract public class Typing
 
   public static boolean testRigidLeq(TypeConstructor t1, TypeConstructor t2)
   {
-    if(t1.getKind()!=t2.getKind())
-      Internal.error("Bad kinding in isRigidLeq for "+t1+" and "+t2);
-
-    if(t1.getKind()==null)
-      Internal.error("Null kind for "+t1+" and "+t2);
+    if(t1.getKind()==null 
+       || t2.getKind()==null)
+      Internal.error("Null kind for "+t1+" or "+t2);
     
+    if(t1.getKind()!=t2.getKind())
+      return false;
+
     return ((Engine.Constraint) t1.getKind()).isLeq(t1,t2);
   }
   
@@ -385,6 +393,13 @@ abstract public class Typing
    * Enumeration
    ****************************************************************/
 
+  /**
+   * Enumerate all the tuples of tags in a Domain
+   *
+   * @return a List of TypeConstructor[]
+   *   an element of an array is set to null
+   *   if it cannot be matched (e.g. a function type)
+   */
   public static List enumerate(Domain domain)
   {
     List res = new ArrayList();
@@ -393,13 +408,20 @@ abstract public class Typing
 
     try
       {
-	enter();
+	int l=enter();
 	domain.constraint.assert();
 	setFloatingKinds(tags,0,res);
-	leave();
+	if(leave()!=l)
+	  Internal.error("Unmatched enter and leaves");
       }
     catch(TypingEx e){
-      Internal.error("The domain to enumerate is not well formed");
+      // backtrack has already been done in Engine,
+      // but a call to leave will also be done here...
+      // hacky
+      Engine.enter();
+
+      // There is no solution
+      return new LinkedList();
     }
     catch(Unsatisfiable e){
       Internal.error("This shouldn't happen");
@@ -445,7 +467,7 @@ abstract public class Typing
   private static List enumerateTags(Monotype[] tags)
   {
     List tuples = new ArrayList(); /* of List of TypeConstructor */
-    List kinds = new ArrayList(tags.length); // at most one kind per tag
+    List kinds = new ArrayList(tags.length); // euristic: at most one kind per tag
     List observers = new ArrayList(tags.length); // idem
 
     for(int i=0;i<tags.length;i++)
@@ -462,11 +484,18 @@ abstract public class Typing
 	else
 	  obs = (bossa.engine.BitVector) observers.get(idx);
 	
+	if(tags[i].getKind() instanceof FunTypeKind)
+	  {
+	    continue;
+	  }
+
 	TypeConstructor constTC = tags[i].getTC();
 	if(constTC==null)
-	  Internal.error(tags[i].getKind()+" is not a valid kind in enumerate");
+	  Internal.error(tags[i].getKind()+
+			 " is not a valid kind in enumerate");
 	
 	TypeConstructor varTC = new TypeConstructor(new LocatedString("enum"+i,Location.nowhere()),constTC.variance);
+      	
 	varTC.enumerateTagIndex=i;
 	introduce(varTC);
 	obs.set(varTC.getId());
@@ -475,7 +504,14 @@ abstract public class Typing
 	  k.reduceDomainToConcrete(varTC);
 	}
 	catch(Unsatisfiable e){
-	  Internal.error("Typing.enumerate");
+	  //Internal.error("Typing.enumerate");
+
+	  // backtrack has already been done in Engine,
+	  // but a call to leave will also be done here...
+	  // hacky
+	  Engine.enter();
+	  // tuples is empty here
+	  return tuples;
 	}
       }
     
@@ -494,8 +530,10 @@ abstract public class Typing
     return tuples;
   }
   
-  private static void enumerateInConstraints(Engine.Constraint[] kinds,bossa.engine.BitVector[] observers,
-					     final List tuples,int width)
+  private static void enumerateInConstraints(Engine.Constraint[] kinds,
+					     bossa.engine.BitVector[] observers,
+					     final List tuples,
+					     int width)
   {
     final boolean[] first=new boolean[1]; // using boolean[1] is a trick to access it from the closure
     for(int act=0;act<kinds.length;act++)
@@ -527,7 +565,6 @@ abstract public class Typing
 		       TypeConstructor var,sol;
 		       var=(TypeConstructor) kind.getElement(x);
 		       sol=(TypeConstructor) kind.getElement(getSolutionOf(x));
-			 
 		       for(int i=0;i<ancientSize;i++)
 			 ((TypeConstructor[])tuples.get(i))[var.enumerateTagIndex]=sol;
 		     }

@@ -12,7 +12,7 @@
 
 // File    : Domain.java
 // Created : Sat Jul 24 19:10:04 1999 by bonniot
-//$Modified: Thu Dec 02 19:55:08 1999 by bonniot $
+//$Modified: Wed Jan 12 15:50:44 2000 by bonniot $
 
 package bossa.syntax;
 
@@ -108,6 +108,9 @@ public class Domain
   {
     if(d==Domain.bot)
       return true;
+    // a null tc means a tag that connot be matched (e.g. a function)
+    else if(tc==null)
+      return false;
     
     TypeConstructor t = d.monotype.getTC();
 

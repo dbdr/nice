@@ -12,7 +12,7 @@
 
 // File    : Alternative.java
 // Created : Mon Nov 15 12:20:40 1999 by bonniot
-//$Modified: Mon Dec 06 17:40:24 1999 by bonniot $
+//$Modified: Tue Jan 18 20:23:17 2000 by bonniot $
 
 package bossa.link;
 
@@ -43,7 +43,7 @@ public class Alternative
     this.definitionClass = c;
     this.primProcedure = new PrimProcedure(method);
     
-    this.methodName=m.getFullBytecodeName();
+    this.methodName=m.getFullName();
     this.patterns=patterns;
     add();
   }
@@ -81,7 +81,12 @@ public class Alternative
 	  patterns.add(Domain.bot); // Domain Ex a .a 
 	else
 	  {
-	    Monotype type = new MonotypeConstructor(new TypeConstructor(new LocatedString(name,bossa.util.Location.nowhere())),null,bossa.util.Location.nowhere());
+	    bossa.util.Location loc = bossa.util.Location.nowhere();
+	    
+	    Monotype type = new MonotypeConstructor
+	      (new TypeConstructor(new LocatedString(name,loc)),
+	       null,loc);
+
 	    type = type.resolve(Node.getGlobalTypeScope());    
 	    patterns.add(new Domain(null,type));
 	  }
@@ -241,6 +246,6 @@ public class Alternative
   
   static List listOfAlternative(MethodDefinition m)
   {
-    return (List) alternatives.get(m.getFullBytecodeName());
+    return (List) alternatives.get(m.getFullName());
   }
 }

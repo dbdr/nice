@@ -12,7 +12,7 @@
 
 // File    : FunExp.java
 // Created : Mon Jul 12 15:09:50 1999 by bonniot
-//$Modified: Sat Dec 04 14:14:59 1999 by bonniot $
+//$Modified: Thu Jan 20 12:06:48 2000 by bonniot $
 // Description : A functional expression
 
 package bossa.syntax;
@@ -51,6 +51,12 @@ public class FunExp extends Expression
 		      new FunType(MonoSymbol.getMonotype(formals),
 				  returnType.getMonotype()));
   }
+
+  void findJavaClasses()
+  {
+    List types = MonoSymbol.getMonotype(formals);
+    Monotype.findJavaClasses(types, typeScope);
+  }
   
   /****************************************************************
    * Code generation
@@ -58,7 +64,36 @@ public class FunExp extends Expression
 
   public gnu.expr.Expression compile()
   {
-    return new gnu.expr.LambdaExp(body.generateCode());
+    gnu.expr.LambdaExp res = new gnu.expr.LambdaExp();
+
+    gnu.expr.BlockExp block = new gnu.expr.BlockExp();
+    gnu.expr.BlockExp savedBlock = Statement.currentMethodBlock;
+    Statement.currentMethodBlock=block;
+
+    res.min_args = res.max_args = formals.size();
+    
+    res.setCanRead(true);
+    res.outer = Statement.currentScopeExp;
+    Statement.currentScopeExp = res;       // push
+    
+    for(Iterator i=formals.iterator();
+	i.hasNext();)
+      {
+	MonoSymbol s = (MonoSymbol) i.next();
+	
+	gnu.expr.Declaration decl = 
+	  res.addDeclaration(s.name.toString(), s.type.getJavaType());
+	decl.setParameter(true);	
+	s.setDeclaration(decl);
+      }
+    
+    res.body = block;
+    block.setBody(body.generateCode());
+
+    Statement.currentMethodBlock = savedBlock;
+    Statement.currentScopeExp = res.outer; // pop
+    
+    return res;
   }
   
   /****************************************************************
@@ -76,7 +111,7 @@ public class FunExp extends Expression
       ;
   }
   
-  Collection /* of FieldSymbol */ formals;
+  Collection /* of MonoSymbol */ formals;
   Constraint constraint;
   Block body;
 }

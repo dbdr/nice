@@ -12,7 +12,7 @@
 
 // File    : NewExp.java
 // Created : Thu Jul 08 17:15:15 1999 by bonniot
-//$Modified: Sat Dec 04 14:10:50 1999 by bonniot $
+//$Modified: Thu Jan 20 12:14:38 2000 by bonniot $
 // Description : Allocation of a new object
 
 package bossa.syntax;
@@ -41,8 +41,12 @@ public class NewExp extends Expression
   void typecheck()
   {
     if(!tc.instantiable())
-      User.error(this,
-		 tc+" is abstract, it can't be instantiated");
+      if(tc.constant())
+	User.error(this,
+		   tc+" is abstract, it can't be instantiated");
+      else
+	User.error(this,
+		   tc+" is a type variable, it can't be instantiated");
   }
   
   /****************************************************************

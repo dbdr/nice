@@ -12,7 +12,7 @@
 
 // File    : Node.java
 // Created : Thu Jul 08 10:24:56 1999 by bonniot
-//$Modified: Sat Dec 04 14:48:09 1999 by bonniot $
+//$Modified: Thu Jan 20 12:44:42 2000 by bonniot $
 
 package bossa.syntax;
 
@@ -57,7 +57,9 @@ abstract public class Node
   
   void removeChild(Node n)
   {
-    Internal.error(!children.contains(n),n+" is not a child of "+this);
+    if(!children.contains(n))
+      Internal.error(n+" is not a child of "+this);
+
     children.remove(n);
   }
   
@@ -106,7 +108,7 @@ abstract public class Node
   
   void addTypeMap(String name, TypeSymbol symbol)
   {
-    typeMapsNames.add(new LocatedString(name,Location.nowhere()));
+    typeMapsNames.add(name);
     typeMapsSymbols.add(symbol);
   }
   
@@ -114,7 +116,9 @@ abstract public class Node
     throws BadSizeEx
   {
     if(names.size()!=symbols.size()) throw new BadSizeEx(symbols.size(),names.size());
-    typeMapsNames.addAll(names);
+    
+    for(Iterator n=names.iterator();n.hasNext();)
+      typeMapsNames.add(((LocatedString) n.next()).toString());
     typeMapsSymbols.addAll(symbols);
   }
   
@@ -207,7 +211,12 @@ abstract public class Node
       }
 
     this.typeScope.addSymbols(typeSymbols);
-    this.typeScope.addMappings(typeMapsNames,typeMapsSymbols);
+    try{ 
+      this.typeScope.addMappings(typeMapsNames,typeMapsSymbols);
+    }
+    catch(BadSizeEx e){
+      Internal.error(e.toString());
+    }
 
     // builds the scope of the children
     Scopes current=new Scopes(this.scope,this.typeScope);
@@ -242,12 +251,36 @@ abstract public class Node
 
   void doResolve()
   {
+    if(Debug.resolution)
+      Debug.println("Resolving "+this+" ["+this.getClass()+"]");
+    
     resolve();
+
+    if(Debug.resolution)
+      Debug.println("Resolved to "+this);
+    
     Iterator i=children.iterator();
     while(i.hasNext())
       ((Node)i.next()).doResolve();
   }
 
+  /****************************************************************
+   * Java Classes
+   ****************************************************************/
+  
+  /**
+   * Add the java classes in the expression to the rigid context.
+   */
+  void findJavaClasses() { }
+
+  void doFindJavaClasses()
+  {
+    findJavaClasses();
+    for(Iterator i=children.iterator();
+	i.hasNext();)
+      ((Node)i.next()).doFindJavaClasses();
+  }
+  
   /****************************************************************
    * Type checking
    ****************************************************************/
@@ -256,7 +289,7 @@ abstract public class Node
   void typecheck() { }
 
   /** 
-   * Usefull when children are to be typechecked in a content
+   * Usefull when children are to be typechecked in a context
    * defined by this Node :
    * the Typing.enter() goes in typecheck()
    * and the Typing.leave() goes here
@@ -287,6 +320,19 @@ abstract public class Node
     return res;
   }
 
+  /**
+   * Creates references to expressions.
+   */
+  List expChildren(List values)
+  {
+    List res = new ArrayList(values.size());
+    
+    for(Iterator i=values.iterator();i.hasNext();)
+      res.add(expChild((Expression) i.next()));
+    
+    return res;
+  }
+
   protected VarScope scope;
   protected TypeScope typeScope;
 
@@ -294,4 +340,7 @@ abstract public class Node
   private List varSymbols, typeSymbols;
   int propagate;  
   private List typeMapsSymbols,typeMapsNames;
+
+  // Temporary, see MethodBodyDefinition
+  //static boolean resolveIdents = true;
 }

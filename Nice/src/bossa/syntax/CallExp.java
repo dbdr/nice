@@ -12,7 +12,7 @@
 
 // File    : CallExp.java
 // Created : Mon Jul 05 16:27:27 1999 by bonniot
-//$Modified: Mon Dec 06 11:22:47 1999 by bonniot $
+//$Modified: Thu Jan 20 14:32:12 2000 by bonniot $
 
 package bossa.syntax;
 
@@ -34,7 +34,7 @@ public class CallExp extends Expression
 		 List parameters)
   {
     this.fun=expChild(fun);
-    this.parameters=addChildren(parameters);
+    this.parameters=expChildren(parameters);
   }
 
   public static CallExp create(Expression fun, 
@@ -46,14 +46,6 @@ public class CallExp extends Expression
     return new CallExp(fun,params);
   }
   
-  void resolve()
-  {
-    removeChild(fun);
-    fun=fun.resolveExp();
-    removeChildren(parameters);
-    parameters=Expression.resolveExp(parameters);
-  }
-
   static boolean wellTyped(Expression fun,
 			   List /* of Polytype */ parameters)
   {
@@ -164,7 +156,7 @@ public class CallExp extends Expression
   //TODO: decide where to resolve overloading, and do it just once
   {
     parameters=Expression.noOverloading(parameters);
-    fun=fun.resolveOverloading(Expression.getType(parameters));
+    fun.resolveOverloading(Expression.getType(parameters));
   }
   
   void computeType()
@@ -180,15 +172,26 @@ public class CallExp extends Expression
   }
   
   /****************************************************************
+   * Typechecking
+   ****************************************************************/
+
+  void typecheck()
+  {
+    resolveOverloading();
+  }
+  
+  /****************************************************************
    * Code generation
    ****************************************************************/
 
   public gnu.expr.Expression compile()
   {
-    return new gnu.expr.ApplyExp(fun.compile(),compile(parameters));
+    //resolveOverloading();
+    return new gnu.expr.ApplyExp(fun.generateCode(),
+				 Expression.compile(parameters));
   }
   
-  gnu.expr.Expression compileAssign(Expression value)
+  gnu.expr.Expression compileAssign(gnu.expr.Expression value)
   {
     if(!fun.isFieldAccess())
       Internal.error(this,"Assignment to a call that is not a field access.");
@@ -207,6 +210,6 @@ public class CallExp extends Expression
       ;
   }
 
-  protected Expression fun;
-  protected List /* of Expression */ parameters;
+  protected ExpressionRef fun;
+  protected List /* of ExpressionRef */ parameters;
 }

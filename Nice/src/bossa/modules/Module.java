@@ -12,7 +12,7 @@
 
 // File    : Module.java
 // Created : Wed Oct 13 16:09:47 1999 by bonniot
-//$Modified: Mon Dec 06 15:44:15 1999 by bonniot $
+//$Modified: Thu Jan 20 11:28:12 2000 by bonniot $
 
 package bossa.modules;
 
@@ -37,17 +37,22 @@ public class Module
   
   public Module(String name, List imports, List definitions)
   {
+    File file = openSource(name);
+    
+    this.name = file.getName();
+    
     if(!name.endsWith(interfaceExt) 
        && !name.endsWith(sourceExt))
-      User.error("Invalid file name: "+name);
-    this.name=name.substring(0,name.lastIndexOf("."));
+      User.error("Invalid file extension: "+name);
+
+    this.name=this.name.substring(0,this.name.lastIndexOf("."));
     this.imports=imports;
     this.definitions=new AST(this,definitions);
   }
 
   public static void compile(LocatedString file) throws IOException
   {
-    Module module=Loader.open(file);
+    Module module=Loader.open(openSource(file));
     module.compile();
   }
   
@@ -79,6 +84,8 @@ public class Module
 	link();
 	addClass(dispatchClass);
       }
+
+    if(Debug.passes) Debug.println("Compilation done");
   }
   
   private void load()
@@ -94,48 +101,54 @@ public class Module
     for(Iterator i=imports.iterator();i.hasNext();) 
       {
 	LocatedString name = (LocatedString)i.next();
+	String sname = name.toString();
 	
-	if(name.toString().endsWith(".*"))
+	if(sname.endsWith(".*"))
 	  {
-	    addImplicitPackageOpen(name.toString().substring(0,name.toString().length()-2));
+	    addImplicitPackageOpen(sname.substring(0,sname.length()-2));
 	    continue;
 	  }
 	
 	LocatedString itfName = name.cloneLS();
 	itfName.append(interfaceExt);
-	String bytecodeName = name.toString()+".class";	
+	String bytecodeName = sname+".class";	
 
 	// Get the alternatives from the bytecode file
 	try{
-	  InputStream file = new FileInputStream(bytecodeName);
+	  Module m=Loader.open(openSource(itfName));
 
-	  Module m=Loader.open(itfName);
+	  InputStream file = openClass(bytecodeName);
 	  m.bytecode = gnu.bytecode.ClassFileInput.readClassType(file);	  
 
+	  m.load();
+	  
 	  for(Method method=m.bytecode.getMethods();
 	      method!=null;
 	      method=method.getNext())
 	    {
-	      String methodName = method.getName();
+	      String methodName = bossa.Bytecode.unescapeString(method.getName());
 
 	      if(
 		 // "main" is not a real alternative
 		 methodName.equals("main")
 		 || methodName.startsWith("main$")
+
 		 // $get and $set methods
 		 || methodName.startsWith("$")
+
 		 // Class initialization
 		 || methodName.equals("<clinit>")
+
+		 // Instance initialization
+		 || methodName.equals("<init>")
 		 )
 		continue;
 
 	      new bossa.link.Alternative(methodName,m.bytecode,method);
 	    }
-
-	  m.load();
 	}
 	catch(IOException e){
-	  User.error("Compilation of module "+name+" failed");
+	  User.error("Compilation of module "+name+" failed:\n"+e.getMessage());
 	}
       }
   }
@@ -184,13 +197,16 @@ public class Module
     bytecode = ClassType.make(name);
     bytecode.setSuper("java.lang.Object");
     bytecode.setModifiers(Access.FINAL);
-
+    bytecode.requireExistingClass(false);
+    
     compilation = new gnu.expr.Compilation(bytecode,name,name,"prefix",false);
     
     definitions.compile();
     compilation.compileClassInit(initStatements);
     
     addClass(bytecode);
+    for (int iClass = 0;  iClass < compilation.numClasses;  iClass++)
+      addClass(compilation.classes[iClass]);
   }
 
   //public gnu.expr.ModuleExp moduleExp;
@@ -226,7 +242,7 @@ public class Module
   public gnu.bytecode.Method addDispatchMethod(MethodDefinition def)
   {
     return dispatchClass.addMethod
-      (def.getFullBytecodeName(),
+      (bossa.Bytecode.escapeString(def.getFullName()),
        Access.PUBLIC|Access.STATIC|Access.FINAL,
        def.javaArgTypes(),def.javaReturnType());
   }
@@ -289,6 +305,73 @@ public class Module
     
   }
   
+  /****************************************************************
+   * Files
+   ****************************************************************/
+
+  /**
+   * Searches a file in the specified path.
+   */
+  static private File openFile(String name, String path)
+  {
+    File f = new File(name);
+    
+    if(!f.isAbsolute())
+      {
+	f=null;
+	int start=0;
+	while(start<path.length())
+	  {
+	    int end=path.indexOf(File.pathSeparatorChar,start);
+	    if(end==-1)
+	      end=path.length();
+	    
+	    String pathComponent=path.substring(start,end);
+	    if(pathComponent.length()>0)
+	      {
+		f=new File(pathComponent,name);
+		if(f.exists())
+		  break;
+		else
+		  f=null;
+	      }
+	    start=end+1;
+	  }
+      }
+    return f;
+  }
+  
+  static private File openSource(String name)
+  {
+    return openSource(new LocatedString(name, bossa.util.Location.nowhere()));
+  }
+  
+  static private File openSource(LocatedString lname)
+  {
+    String name = lname.toString();
+    
+    File f = openFile(name, Debug.getProperty("bossa.source.path", "."));
+
+    if(f==null)
+      User.error(lname, name+" was not found");
+    
+    return f;
+  }
+  
+  static private InputStream openClass(String name)
+  {
+    File f = openFile(name, Debug.getProperty("bossa.source.path", "."));
+
+    try{
+      if(f!=null)
+	return new FileInputStream(f);
+    }
+    catch(FileNotFoundException e){}
+
+    User.error(name+" was not found");
+    return null;
+  } 
+
   public String toString()
   {
     return "module "+name;

@@ -12,7 +12,7 @@
 
 // File    : JavaMethodDefinition.java
 // Created : Tue Nov 09 11:49:47 1999 by bonniot
-//$Modified: Sat Dec 04 17:08:50 1999 by bonniot $
+//$Modified: Mon Jan 17 17:45:14 2000 by bonniot $
 
 package bossa.syntax;
 
@@ -156,9 +156,9 @@ public class JavaMethodDefinition extends MethodDefinition
     if(s.equals("void"))
       return gnu.bytecode.Type.void_type;
     else if(s.equals("int"))
-      return gnu.bytecode.Type.int_type;
+      return bossa.SpecialTypes.intType;
     else if(s.equals("boolean"))
-      return gnu.bytecode.Type.boolean_type;
+      return bossa.SpecialTypes.booleanType;
     else
       return ClassType.make(s);
   }
@@ -199,15 +199,15 @@ public class JavaMethodDefinition extends MethodDefinition
   private String interfaceString()
   {
     return
-      type.codomain().toString()
+      type.getConstraint().toString()
+      + type.codomain().toString()
       + " "
-      + name
+      + name.toQuotedString()
       + Util.map("<",", ",">",type.getTypeParameters())
-      + type.getConstraint().toString()
       + "("
       + Util.map("",", ","",type.domain())
       + ")"
-      + " = "
+      + " = native "
       + returnJavaType().getName()
       + " " + className
       + "." + methodName
@@ -233,6 +233,6 @@ public class JavaMethodDefinition extends MethodDefinition
 
   public String toString()
   {
-    return "native " + interfaceString();
+    return interfaceString();
   }
 }

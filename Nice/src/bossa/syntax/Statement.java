@@ -12,7 +12,7 @@
 
 // File    : Statement.java
 // Created : Mon Jul 05 15:48:25 1999 by bonniot
-//$Modified: Sat Dec 04 12:06:48 1999 by bonniot $
+//$Modified: Thu Jan 20 11:47:08 2000 by bonniot $
 
 package bossa.syntax;
 
@@ -58,6 +58,8 @@ public abstract class Statement extends Node
    * Maybe this would be nicer not to be global.
    */
   static gnu.expr.BlockExp currentMethodBlock=null;
+
+  static gnu.expr.ScopeExp currentScopeExp=null;
   
   static gnu.expr.Expression sequence(gnu.expr.Expression e1, gnu.expr.Expression e2)
   {

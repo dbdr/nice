@@ -12,7 +12,7 @@
 
 // File    : numeric.bossa
 // Created : Wed Dec 01 15:44:03 1999 by bonniot
-//$Modified: Mon Dec 06 17:20:03 1999 by bonniot $
+//$Modified: Wed Jan 12 16:36:21 2000 by bonniot $
 
 /**
  * Numerical hierarchy.
@@ -22,33 +22,31 @@
  * @author bonniot
  */
 
-import prelude;
-import io;
-
 import gnu.math.*;
 
-native Numeric add(Numeric, Numeric) = Numeric Numeric.add(Object);
-native N sub<Numeric N>(N, N) = Numeric Numeric.sub(Object);
-native Numeric mul(Numeric, Numeric) = Numeric Numeric.mul(Object);
-native Numeric div(Numeric, Numeric) = Numeric Numeric.div(Object);
-native Numeric pow(Numeric, IntNum)  = Numeric Numeric.power(IntNum);
+<Numeric N> N "+"(N, N) = native Numeric Numeric.add(Object);
+<Numeric N> N "-"(N, N) = native Numeric Numeric.sub(Object);
+<Numeric N> N "*"(N, N) = native Numeric Numeric.mul(Object);
+Numeric "/"(Numeric, Numeric) = native Numeric Numeric.div(Object);
+Numeric "^"(Numeric, IntNum)  = native Numeric Numeric.power(IntNum);
 
-native Boolean grt(Numeric, Numeric) = boolean Numeric.grt(Object);
-native Boolean geq(Numeric, Numeric) = boolean Numeric.geq(Object);
+boolean ">" (Numeric, Numeric) = native boolean Numeric.grt(Object);
+boolean ">="(Numeric, Numeric) = native boolean Numeric.geq(Object);
 
-//Boolean leq(Numeric, Numeric);
-//leq(x,y) = !(grt(y,x));
+boolean "<="(Numeric, Numeric);
+"<="(x,y) = y>=x;
 
-native IntNum numerator(RatNum) = 
-  IntNum RatNum.numerator();
-native IntNum denominator(RatNum) = 
-  IntNum RatNum.denominator();
+boolean "<"(Numeric, Numeric);
+"<"(x,y) = y>x;
+
+IntNum numerator(RatNum) = native IntNum RatNum.numerator();
+IntNum denominator(RatNum) = native IntNum RatNum.denominator();
 
 /****************************************************************
  * Infinity
  ****************************************************************/
 
-native RatNum native_infinity(Numeric) = RatNum RatNum.infinity(int);
+RatNum native_infinity(Numeric) = native RatNum RatNum.infinity(int);
 
 RatNum positiveInfinity();
 positiveInfinity() = native_infinity(1);
@@ -56,7 +54,7 @@ RatNum negativeInfinity();
 negativeInfinity() = native_infinity(0-1);
 
 // java.lang.Integer -> gnu.math.IntNum
-native void set(IntNum, Integer) = void IntNum.set(int);
+void set(IntNum, Integer) = native void IntNum.set(int);
 
 IntNum num(Integer);
 num(i)
@@ -64,23 +62,4 @@ num(i)
   IntNum res = new IntNum();
   set(res,i);
   return res;
-}
-
-main(args)
-{
-  traceInstructions(true);
-  Numeric x = 2^30;
-  //x = x^300;
-  println(stderr(),x/x);
-  Numeric y = x+1;
-  //println(x/y);
-  println(positiveInfinity());
-  println(numerator(negativeInfinity()));
-  if(false)
-    1//x=21*2
-  else
-    x=y=3
-  endif;
-  println(y);
-  exit(x);
 }

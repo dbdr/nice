@@ -12,7 +12,7 @@
 
 // File    : Expression.java
 // Created : Mon Jul 05 16:25:02 1999 by bonniot
-//$Modified: Mon Dec 06 17:39:06 1999 by bonniot $
+//$Modified: Thu Jan 20 14:46:55 2000 by bonniot $
 // Description : 
 
 package bossa.syntax;
@@ -127,7 +127,9 @@ public abstract class Expression extends Node
   final Polytype getType()
   {
     if(type==null)
-      computeType();
+      {
+	computeType();
+      }
     return type;
   }
   
@@ -172,16 +174,39 @@ public abstract class Expression extends Node
   /****************************************************************
    * Code generation
    ****************************************************************/
-
-  abstract public gnu.expr.Expression compile();
-
+  
+  /**
+   * Creates the bytecode expression to evaluate this Expression.
+   *
+   * This must be overrided in any Expression, but not called directly. 
+   * Call generateCode() instead.
+   *
+   * @see generateCode
+   */
+  abstract protected gnu.expr.Expression compile();
+  
+  /**
+   * Creates the bytecode expression to evaluate this Expression.
+   */
+  final gnu.expr.Expression generateCode()
+  {
+    gnu.expr.Expression res = compile();
+    res.setLine(location().getLine());
+    
+    return res;
+  }
+  
   public static gnu.expr.Expression[] compile(List expressions)
   {
     gnu.expr.Expression[] res=new gnu.expr.Expression[expressions.size()];
     int n=0;
     for(Iterator i=expressions.iterator();
 	i.hasNext();n++)
-      res[n]=((Expression)i.next()).compile();
+      {
+	Expression exp = (Expression)i.next();
+	res[n]=exp.generateCode();
+      }
+
     return res;
   }
   

@@ -12,7 +12,7 @@
 
 // File    : ReturnStmt.java
 // Created : Mon Jul 05 17:21:40 1999 by bonniot
-//$Modified: Sat Dec 04 12:09:01 1999 by bonniot $
+//$Modified: Thu Jan 20 14:28:33 2000 by bonniot $
 // Description : return in a function or method
 
 package bossa.syntax;
@@ -25,14 +25,14 @@ public class ReturnStmt extends Statement
   {
     this.value=expChild(value);
   }
-  
+
   /****************************************************************
    * Code generation
    ****************************************************************/
 
   public gnu.expr.Expression generateCode()
   {
-    return new gnu.expr.ExitExp(value.compile(),currentMethodBlock);
+    return new gnu.expr.ExitExp(value.generateCode(),currentMethodBlock);
   }
   
   /****************************************************************

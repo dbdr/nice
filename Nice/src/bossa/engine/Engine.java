@@ -12,7 +12,7 @@
 
 // File    : Engine.java
 // Created : Tue Jul 27 15:34:53 1999 by bonniot
-//$Modified: Sat Dec 04 12:38:23 1999 by bonniot $
+//$Modified: Thu Jan 20 12:20:17 2000 by bonniot $
 
 package bossa.engine;
 
@@ -180,7 +180,7 @@ public abstract class Engine
 	  if(!(floating.contains(e2)))
 	    {
 	      floating.add(e2);
-	      Internal.warning("Engine: floating added 2 : "+e2);
+	      Internal.error("Engine: floating added 2 : "+e2);
 	    }
 	  if(dbg)
 	    Debug.println("Freezing "+e1+" <: "+e2+
@@ -386,7 +386,10 @@ public abstract class Engine
     // we have to change the state of the constraint here
     if(!initialContext)
       try{
+	if(dbg)
+	  Debug.println("createInitialContext() and mark() called for new constraint");
 	res.createInitialContext();
+	res.mark();
       }
     catch(Unsatisfiable e){
       Internal.error("This shouldn't happen, Engine.Constraint is empty here !");

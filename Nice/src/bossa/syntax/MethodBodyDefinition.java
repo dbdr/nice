@@ -12,7 +12,7 @@
 
 // File    : MethodBodyDefinition.java
 // Created : Thu Jul 01 18:12:46 1999 by bonniot
-//$Modified: Sat Dec 04 12:48:00 1999 by bonniot $
+//$Modified: Thu Jan 20 12:36:11 2000 by bonniot $
 
 package bossa.syntax;
 
@@ -114,13 +114,14 @@ public class MethodBodyDefinition extends Node
 	{
 	  MethodDefinition m=(MethodDefinition)s;
 	  try{
-	    Typing.enter("Trying definition "+m+" for method body "+name);
+	    int level=Typing.enter("Trying definition "+m+" for method body "+name);
 	    Typing.introduce(m.type.getTypeParameters());
 	    m.type.getConstraint().assert();
 	    Typing.in(Pattern.getPolytype(formals),
 		      Domain.fromMonotypes(m.getType().domain()));
 	    Typing.implies();
-	    Typing.leave();
+	    if(Typing.leave()!=level)
+	      Internal.error("Enter/Leave error");
 	  }
 	  catch(TypingEx e){
 	    if(Typing.dbg) Debug.println("Not the right choice :"+e);
@@ -148,12 +149,35 @@ public class MethodBodyDefinition extends Node
   {
     this.scope=outer;
     this.typeScope=typeOuter;
+
+    // we just want Java classes to be discovered at this stage,
+    // to add them in the rigid context.
+    if(binders!=null) 
+      {
+	try{ this.typeScope.addMappings(binders,null); } 
+	catch(BadSizeEx e) {
+	  Internal.error("Should not happen");
+	}
+      }
+    body.buildScope(this.scope,this.typeScope);
+    
+    body.findJavaClasses();
+    
+    // FIXME: Super hacky
+    // we just want types to be resolved now
+    // otherwise ident symbols are resolved in a bad scope
+
+    //  boolean tmp = Node.resolveIdents;
+//      Node.resolveIdents = false;
+//      body.doResolve();
+//      Node.resolveIdents = tmp;
+    
     return new Scopes(outer,typeOuter);
   }
 
   void doResolve()
   {
-    // Resolution is delayed to enable overloading
+    //Resolution is delayed to enable overloading
   }
   
   void lateBuildScope(VarScope outer, TypeScope typeOuter)
@@ -167,7 +191,7 @@ public class MethodBodyDefinition extends Node
     if(!(s instanceof MethodDefinition))
       User.error(this,name+" is not a method");
 
-    setDefinition((MethodDefinition)s);
+    setDefinition((MethodDefinition) s);
 
     // Get type parameters
     if(binders!=null)
@@ -240,15 +264,15 @@ public class MethodBodyDefinition extends Node
 
   void endTypecheck()
   {
+    Polytype t=body.getType();
     try{
-      Polytype t=body.getType();
       if(t==null)
 	User.error(this,"Last statement of body should be \"return\"");
       Typing.leq(t,new Polytype(definition.type.codomain()));
       Typing.leave();
     }
     catch(TypingEx e){
-      User.error(this,"Return type is not correct"," :"+e);
+      User.error(this,"Return type "+t+" is not correct"," :"+e);
     }
   }
   
@@ -272,14 +296,16 @@ public class MethodBodyDefinition extends Node
     
     gnu.expr.BlockExp block = new gnu.expr.BlockExp();
     Statement.currentMethodBlock=block;
+
     gnu.expr.LambdaExp lexp = new gnu.expr.LambdaExp(block);
+    Statement.currentScopeExp = lexp;
     
     lexp.primMethod=module.bytecode.addMethod
-      (definition.getBytecodeName()+Pattern.bytecodeRepresentation(formals),
+      (bossa.Bytecode.escapeString(definition.getName()+Pattern.bytecodeRepresentation(formals)),
        definition.javaArgTypes(),definition.javaReturnType(),
        Access.PUBLIC|Access.STATIC|Access.FINAL);
 
-    if(name.content.equals("main"))
+    if(name.content.equals("main") && formals.size()==1)
       mainAlternative=lexp.primMethod;
 
     // Parameters
@@ -338,7 +364,7 @@ public class MethodBodyDefinition extends Node
     lexp.min_args=lexp.max_args=1;
     gnu.expr.Declaration args=lexp.addDeclaration("args");
     args.setParameter(true);
-    args.setType(new ArrayType(Type.string_type));
+    args.setType(bossa.SpecialTypes.makeArrayType(Type.string_type));
 
     // Call arguments
     gnu.expr.Expression[] eVal=new gnu.expr.Expression[1];

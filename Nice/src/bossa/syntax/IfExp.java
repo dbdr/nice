@@ -12,7 +12,7 @@
 
 // File    : IfExp.java
 // Created : Mon Dec 06 12:01:51 1999 by bonniot
-//$Modified: Mon Dec 06 15:20:30 1999 by bonniot $
+//$Modified: Mon Dec 13 14:41:09 1999 by bonniot $
 
 package bossa.syntax;
 
@@ -69,7 +69,7 @@ public class IfExp extends Expression
       thenExp +
       "\nelse\n" +
       elseExp +
-      "endif"
+      "\nendif"
       ;
   }
 

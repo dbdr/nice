@@ -12,7 +12,7 @@
 
 // File    : AssignExp.java
 // Created : Mon Jul 05 15:49:27 1999 by bonniot
-//$Modified: Mon Dec 06 18:11:44 1999 by bonniot $
+//$Modified: Thu Jan 20 14:40:52 2000 by bonniot $
 
 package bossa.syntax;
 
@@ -55,7 +55,9 @@ public class AssignExp extends Expression
     }
     catch(TypingEx t){
       User.error(this,"Typing error : "+to+
-		 " cannot be assigned value "+value);
+		 " cannot be assigned value "+value+
+		 "\nof type "+value.getType(),
+		 "\n"+t.getMessage());
     }
   }
 
@@ -70,8 +72,10 @@ public class AssignExp extends Expression
 
   public gnu.expr.Expression compile()
   {
+    to=to.noOverloading();
+
     gnu.expr.Expression[] val = new gnu.expr.Expression[1];    
-    val[0] = value.compile();    
+    val[0] = value.generateCode();    
     gnu.expr.LetExp let = new gnu.expr.LetExp(val);
     gnu.expr.Declaration tmp = let.addDeclaration("tmp",val[0].getType());
     tmp.setCanRead(true);    
@@ -79,6 +83,7 @@ public class AssignExp extends Expression
 
     gnu.expr.Expression[] exps = new gnu.expr.Expression[2];
     exps[0] = to.compileAssign(tmpExp);
+    exps[0].setLine(to.location().getLine());
     exps[1] = tmpExp;
     
     let.setBody(new gnu.expr.BeginExp(exps));

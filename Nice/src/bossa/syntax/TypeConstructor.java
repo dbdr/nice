@@ -12,7 +12,7 @@
 
 // File    : TypeConstructor.java
 // Created : Thu Jul 08 11:51:09 1999 by bonniot
-//$Modified: Sat Dec 04 16:09:36 1999 by bonniot $
+//$Modified: Thu Jan 20 14:12:16 2000 by bonniot $
 
 package bossa.syntax;
 
@@ -36,11 +36,12 @@ public class TypeConstructor
   {
     this.definition=d;
     this.name=d.name;
-    setVariance(new Variance(d.typeParameters.size()));
+    setVariance(Variance.make(d.typeParameters.size()));
     bossa.typing.Typing.introduce(this); /* The introduction is done here,
 					  * in order to enable recursive class definitions
 					  * (the id is determined here)
 					  */
+    //if(!name.location().isValid()) Internal.warning(name+"");
   }
 
   /**
@@ -56,6 +57,7 @@ public class TypeConstructor
     this.definition=null;
     variance=null;
     this.id=-1-new Random().nextInt(100000);
+    //if(!name.location().isValid()) Internal.warning(name+"");
   }
 
   /**
@@ -72,6 +74,7 @@ public class TypeConstructor
     
     setVariance(v);
     this.definition=null;
+    //if(!name.location().isValid()) Internal.warning(name+"");
   }
 
   /**
@@ -136,7 +139,17 @@ public class TypeConstructor
 
   gnu.bytecode.Type getJavaType()
   {
-    return gnu.bytecode.ClassType.make(name.content);
+    if(name.content.equals("Array"))
+      return 
+	//new gnu.bytecode.ArrayType(gnu.bytecode.Type.pointer_type);
+	bossa.SpecialTypes.arrayType;
+    
+    if(definition!=null)
+      return ClassDefinition.javaClass(definition);
+    else
+      return 
+	gnu.bytecode.Type.pointer_type;
+	//gnu.bytecode.ClassType.make(name.content);
   }
 
   /**
@@ -149,13 +162,23 @@ public class TypeConstructor
     List illegitimateChildren = definition.getIllegitimateChildren();
     
     List res = new ArrayList(1+illegitimateChildren.size());
-    res.add(this.getJavaType());
+    addType(res,this.getJavaType());
     
     for(Iterator i = illegitimateChildren.iterator();
 	i.hasNext();)
-      res.add(((ClassDefinition) i.next()).tc.getJavaType());
+      addType(res,((ClassDefinition) i.next()).tc.getJavaType());
     
     return res.listIterator();
+  }
+  
+  /**
+   * Usefull for types with implicit coercion.
+   */
+  private void addType(List res, gnu.bytecode.Type type)
+  {
+    res.add(type);
+    if(type instanceof gnu.bytecode.ArrayType)
+      res.add(gnu.bytecode.ClassType.make("_Array"));
   }
   
   /****************************************************************
@@ -164,17 +187,27 @@ public class TypeConstructor
 
   TypeConstructor resolve(TypeScope typeScope)
   {
-    if(definition==null)
+    if(definition==null
+       // FIXME: bad hack
+       && !(name.toString().equals("dummy type symbol"))
+       )
       {
 	TypeSymbol s=typeScope.lookup(name.toString());
 	if(s==null)
-	  User.error(this,"Class "+name+" is not defined"," in "+typeScope);
+	  User.error(name,"Class "+name+" is not defined"," in "+typeScope);
 	
 	if(s instanceof TypeConstructor)
-	  return (TypeConstructor)s;
+	  return (TypeConstructor) s;
 	else
-	  Internal.error(name,name+" is not a type constructor but a "
-			 +s.getClass().getName()); 
+	  {
+	    String what;
+	    if(s instanceof InterfaceDefinition)
+	      what="an interface";
+	    else
+	      what="a "+s.getClass();
+	    
+	    User.error(name,name+" should be a class, not "+what);
+	  }
 	return null;
       }
     return this;
@@ -240,9 +273,12 @@ public class TypeConstructor
 
   boolean instantiable()
   {
-    Internal.error(definition==null,"Null definition");
-    
-    return !definition.isAbstract;
+    return definition!=null && !definition.isAbstract;
+  }
+  
+  boolean constant()
+  {
+    return definition!=null;
   }
   
   /****************************************************************

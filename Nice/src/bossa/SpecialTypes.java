@@ -10,38 +10,39 @@
 /*                                                                        */
 /**************************************************************************/
 
-// File    : io.bossa
-// Created : Mon Nov 08 19:46:09 1999 by bonniot
-//$Modified: Sat Dec 04 16:33:14 1999 by bonniot $
+// File    : SpecialTypes.java
+// Created : Mon Jan 17 14:19:30 2000 by bonniot
+//$Modified: Tue Jan 18 21:05:51 2000 by bonniot $
 
-import prelude;
+package bossa;
 
-import java.io.*;
+import bossa.util.*;
+import gnu.bytecode.*;
 
-native void native_println(PrintStream,String) =
-  void PrintStream.println(String);
+/**
+ * Used to store types with automatic conversion.
+ * 
+ * @author bonniot
+ */
 
-native PrintStream stdout() = System.out;
-native PrintStream stderr() = System.err;
-
-void println<Any T>(PrintStream, T);
-println(ps,object)    = native_println(ps,toString(object));
-println(ps,str@String)= native_println(ps,str);
-
-void println<Any T>(T);
-println(object)
+public class SpecialTypes
 {
-  println(stdout(),toString(object));
-}
+  static public Type intType, booleanType, voidType, arrayType;
 
-println(s@String)
-{
-  println(stdout(),s);
-}
+  static 
+  {
+    intType = new SpecialType
+      ("int", "I", 4, java.lang.Boolean.TYPE);
+    booleanType = new SpecialType
+      ("boolean", "Z", 1, java.lang.Boolean.TYPE);
+    voidType = new SpecialType
+      ("void", "V", 0, java.lang.Void.TYPE);
 
-main(args)
-{
-  String helloWorld = "Hello, world !";
-  println(helloWorld);
-  println(args);
+    arrayType = new SpecialArray(Type.pointer_type);
+  }
+
+  static public Type makeArrayType(Type elements)
+  {
+    return new SpecialArray(elements);
+  }
 }

@@ -12,7 +12,7 @@
 
 // File    : Location.java
 // Created : Tue Jul 13 11:55:08 1999 by bonniot
-//$Modified: Wed Dec 01 17:28:15 1999 by bonniot $
+//$Modified: Tue Jan 11 19:17:05 2000 by bonniot $
 
 package bossa.util;
 
@@ -39,7 +39,7 @@ public class Location implements Located
   {
     this.fileName=file;
     this.startLine=startLine;
-    // substracts 1 since JavaCC has 1 as first column,
+    // JavaCC has 1 as first column,
     // and Emacs has 0 !!
     this.startColumn=startColumn;
     this.endLine=endLine;
@@ -51,6 +51,16 @@ public class Location implements Located
 		  int endLine, int endColumn)
   {
     this(currentFile,startLine, startColumn, endLine, endColumn);
+  }
+
+  public Location(String fileName)
+  {
+    this(fileName,-1,-1,-1,-1);
+  }
+
+  public Location(String abstractLocation, boolean dummy)
+  {
+    this.abstractLocation=abstractLocation;
   }
 
   public Location(bossa.parser.Token t)
@@ -66,6 +76,9 @@ public class Location implements Located
 
   public String toString()
   {
+    if(abstractLocation!=null)
+      return abstractLocation;
+
     String res;
 
     if(fileName!=null)
@@ -73,11 +86,19 @@ public class Location implements Located
     else
       res="";
 
-    if(startLine<0)
-      return res;
+    if(!isValid())
+      if(Debug.powerUser)
+	return res+"[no location]";
+      else
+	return res;
     return res+"line "+startLine+", column "+(startColumn-1)+": ";
   }
 
+  public boolean isValid()
+  {
+    return abstractLocation!=null || startLine>=0;
+  }
+  
   public Location englobe(Location loc)
   {
     return new Location(startLine, startColumn, loc.endLine, loc.endColumn);
@@ -101,4 +122,5 @@ public class Location implements Located
   
   private int startLine,startColumn,endLine,endColumn;
   private String fileName;
+  private String abstractLocation=null; // if non-null, overseeds everyting
 }

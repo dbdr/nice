@@ -12,7 +12,7 @@
 
 // File    : Constraint.java
 // Created : Fri Jul 02 17:51:35 1999 by bonniot
-//$Modified: Mon Dec 06 12:15:06 1999 by bonniot $
+//$Modified: Tue Dec 07 20:02:53 1999 by bonniot $
 
 package bossa.syntax;
 
@@ -198,8 +198,8 @@ public class Constraint extends Node
 	  }
 		  
 	return 
-	  res+Util.map(", ",", ","",c.binders,Printable.inConstraint)
-	  + Util.map("|",", ","",c.atomics)
+	  res+Util.map(res.length()>1 ? ", " : "",", ","",c.binders,Printable.inConstraint)
+	  + Util.map(" | ",", ","",c.atomics)
 	  + ">";
       }
   }

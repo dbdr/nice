@@ -12,7 +12,7 @@
 
 // File    : Block.java
 // Created : Wed Jul 07 17:42:15 1999 by bonniot
-//$Modified: Sat Dec 04 12:09:20 1999 by bonniot $
+//$Modified: Thu Jan 20 14:49:27 2000 by bonniot $
 // Description : A block : a list of statements with local variables
 
 package bossa.syntax;
@@ -26,15 +26,19 @@ public class Block extends Statement
   {
     super(Node.down);
     this.statements=addChildren(cutInBlocks(statements));
+    addChildren(locals);
   }
 
-  public static class LocalDeclaration
+  public static class LocalDeclaration extends Node
   {
     public LocalDeclaration(LocatedString name, Monotype type, Expression value)
     {
+      super(Node.down);
       this.left=new MonoSymbol(name,type);
+      addChild(this.left);
+      
       if(value!=null)
-	this.value=new ExpressionRef(value);
+	this.value=expChild(value);
     }
 
     protected ExpressionRef value=null;
@@ -99,6 +103,20 @@ public class Block extends Statement
   }
 
   /****************************************************************
+   * Java Classes
+   ****************************************************************/
+
+  void findJavaClasses()
+  {
+    for(Iterator i=locals.iterator();
+	i.hasNext();)
+      {
+	LocalDeclaration d = (LocalDeclaration) i.next();
+	d.left.getMonotype().resolve(typeScope);
+      }
+  }
+  
+  /****************************************************************
    * Type checking
    ****************************************************************/
 
@@ -115,13 +133,12 @@ public class Block extends Statement
 	if(local.value==null)
 	  continue;
 	try{
-	  AssignStmt.checkAssignment(local.left.getType(),local.value);
+	  AssignExp.checkAssignment(local.left.getType(),local.value);
 	}
 	catch(bossa.typing.TypingEx t){
 	  User.error(local.left,"Typing error : "+local.left+
 		     " cannot be assigned value "+local.value);
-    }
-
+	}
       }
   }
   
@@ -145,26 +162,50 @@ public class Block extends Statement
 
   public gnu.expr.Expression generateCode()
   {
-    if(statements.size()==0)
-      return new gnu.expr.QuoteExp(null);
+    gnu.expr.ScopeExp save = Statement.currentScopeExp;
+
+    gnu.expr.Expression body;
+
+    if(statements.size()!=0)
+      body = new gnu.expr.BeginExp();
+    else
+      body = new gnu.expr.QuoteExp(null);
+
+    // addLocals must appear before Statement.compile(statements)
+    // in order to define the locals before their use
+    gnu.expr.Expression res = addLocals(locals.iterator(),body);
+
+    if(statements.size()!=0)
+      ((gnu.expr.BeginExp) body).setExpressions(Statement.compile(statements));
+
+    Statement.currentScopeExp = save;
+
+    return res;
+  }
+
+  private gnu.expr.Expression addLocals(Iterator vars, gnu.expr.Expression body)
+  {
+    if(!vars.hasNext())
+      return body;
     
-    gnu.expr.Expression[] eVal=new gnu.expr.Expression[locals.size()];
-    gnu.expr.LetExp res=new gnu.expr.LetExp(eVal);
+    LocalDeclaration local = (LocalDeclaration) vars.next();
+
+    gnu.expr.Expression[] eVal=new gnu.expr.Expression[1];
+    gnu.expr.LetExp res = new gnu.expr.LetExp(eVal);
+
+    res.outer = Statement.currentScopeExp;
+    Statement.currentScopeExp = res;
     
-    int n=0;
-    for(Iterator i=locals.iterator();
-	i.hasNext();n++)
-      {
-	LocalDeclaration local = (LocalDeclaration) i.next();
-	if(local.value==null)
-	  eVal[n]=new gnu.expr.QuoteExp(null);
-	else
-	  eVal[n]=local.value.compile();
-	local.left.setDeclaration(res.addDeclaration(local.left.name.toString(),
-						     local.left.type.getJavaType()));
-      }
+    if(local.value==null)
+      eVal[0]=new gnu.expr.QuoteExp(null);
+    else
+      eVal[0]=local.value.generateCode();
+    local.left.setDeclaration(res.addDeclaration(local.left.name.toString(),
+						 local.left.type.getJavaType()));
+
+    res.setBody(addLocals(vars,body));
+    res.setLine(local.left.name.location().getLine());
     
-    res.setBody(new gnu.expr.BeginExp(Statement.compile(statements)));
     return res;
   }
   

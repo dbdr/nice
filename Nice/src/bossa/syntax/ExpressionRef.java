@@ -12,7 +12,7 @@
 
 // File    : ExpressionRef.java
 // Created : Tue Aug 17 16:04:40 1999 by bonniot
-//$Modified: Mon Dec 06 17:40:14 1999 by bonniot $
+//$Modified: Mon Dec 13 14:19:18 1999 by bonniot $
 
 package bossa.syntax;
 
@@ -38,16 +38,19 @@ final public class ExpressionRef extends Expression
     if(e==null)
       Internal.error("Null expression in a new ExpressionRef");
     content=e;
-    addChild(content);
   }
 
   /****************************************************************
    * Scoping
    ****************************************************************/
 
+  Scopes buildScope(VarScope outer, TypeScope typeOuter)
+  {
+    return content.buildScope(outer, typeOuter);
+  }
+
   void resolve()
   {
-    removeChild(content);
     content=content.resolveExp();
     if(content==null)
       User.error(this,
@@ -58,10 +61,21 @@ final public class ExpressionRef extends Expression
   {
     // call doTypecheck to call typecheck on the childs of content also
     content.doTypecheck();
+
+    // To force the typechking of the expression,
+    // if it is done while computing its type
+    // and it has not yet been done
+    //content.getType();
   }
   
   void computeType()
   {
+    // if we want to know the type,
+    // there must not be overloading ambiguity
+    
+    // XXX we could remove some noOverloading here and there now
+    content=content.noOverloading();
+
     type=content.getType();
   }
   
@@ -99,6 +113,7 @@ final public class ExpressionRef extends Expression
 
   public gnu.expr.Expression compile()
   {
+    content=content.noOverloading();
     return content.compile();
   }
 

@@ -12,7 +12,7 @@
 
 // File    : Dispatch.java
 // Created : Mon Nov 15 10:36:41 1999 by bonniot
-//$Modified: Mon Dec 06 17:40:43 1999 by bonniot $
+//$Modified: Tue Jan 11 18:05:39 2000 by bonniot $
 
 package bossa.link;
 
@@ -65,8 +65,12 @@ public class Dispatch
     List alternatives = Alternative.listOfAlternative(m);
     
     if(alternatives==null)
-      User.error(m,"Method "+m+" has no alternative");
-
+      //User.error(m,"Method "+m+" has no alternative");
+      // It's not an error for a method to have no alternative
+      // if its domain is void.
+      // this will be checked later
+      alternatives=new LinkedList();
+    
     Stack sortedAlternatives = sort(alternatives);
     
     if(Debug.linkTests)
@@ -206,7 +210,6 @@ public class Dispatch
 	param.setParameter(true);
 	params[n]=new ReferenceExp(param);
       }
-
     
     if(m instanceof FieldAccessMethod)
       block.setBody(compileFieldAccess((FieldAccessMethod) m,params[0]));
@@ -217,7 +220,7 @@ public class Dispatch
 			     m.javaReturnType()==gnu.bytecode.Type.void_type,
 			     block,params));
 
-    lexp.primMethod = module.addDispatchMethod(m);
+    lexp.primMethod = m.getDispatchPrimMethod();
     
     lexp.compileAsMethod(module.dispatchComp);
   }

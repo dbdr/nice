@@ -12,7 +12,7 @@
 
 // File    : ClassDefinition.java
 // Created : Thu Jul 01 11:25:14 1999 by bonniot
-//$Modified: Sat Dec 04 12:19:33 1999 by bonniot $
+//$Modified: Thu Jan 20 16:45:13 2000 by bonniot $
 
 package bossa.syntax;
 
@@ -65,6 +65,7 @@ public class ClassDefinition extends Node
 
 	classType = gnu.bytecode.ClassType.make
 	  (name.toString().substring(1));
+	classType.requireExistingClass(false);
       }
     else
       {
@@ -72,6 +73,15 @@ public class ClassDefinition extends Node
 	this.abstractions=addChildren(abstractions);
 	this.methods=addChildren(methods);
 	addChildren(computeAccessMethods(this.fields));
+
+	if(isAbstract)
+	  // since no associated concrete class is created,
+	  // it needs its own classtype
+	  {
+	    classType = gnu.bytecode.ClassType.make
+	      (name.toString());
+	    classType.requireExistingClass(false);
+	  }
       }
     
     // if this class is final, 
@@ -149,7 +159,9 @@ public class ClassDefinition extends Node
 	Field f=(Field)i.next();
 
 	MonoSymbol s=f.sym;
-	MethodDefinition m=new FieldAccessMethod(this,s.name,s.type,typeParameters);
+	MethodDefinition m = 
+	  new FieldAccessMethod(this,s.name,s.type,typeParameters);
+
 	res.add(m);
       }
     return res;
@@ -193,7 +205,15 @@ public class ClassDefinition extends Node
   public void createContext()
   {
     try{
-      Typing.initialLeq(tc,extensions);
+      try{
+	Typing.initialLeq(tc,extensions);
+      }
+      catch(KindingEx e){
+	User.error(name,
+		   "Class "+name+" cannot extend "+e.t2
+		   +": they do not have the same kind");
+      }
+      
       Typing.assertImp(tc,implementations,true);
       Typing.assertImp(tc,abstractions,true);
       Typing.assertAbs(tc,abstractions);
@@ -207,37 +227,6 @@ public class ClassDefinition extends Node
     }
   }
 
-  public static void createSpecialContext()
-  {
-    try{
-      for(Iterator i=specialTypeConstructors.iterator();i.hasNext();)
-	{
-	  TypeConstructor tc = (TypeConstructor)i.next();
-	  // Introduction is supposed to be done before
-	  // This allows for initialLeqs during construction (see JavaTypeConstructor)
-	  //Typing.introduce(tc);
-	  Typing.assertImp(tc,InterfaceDefinition.top(0),true);
-	}
-    }
-    catch(TypingEx e){
-      Internal.error("Initial context error in java classes");
-    }
-  }
-  
-  /**
-   * Registers a type constructor that was not defined by a class.
-   *
-   * This is used to add special type constructors
-   * -- like {@link bossa.syntax.JavaTypeConstructor JavaTypeConstructor} --
-   * in the initial context.
-   */
-  static void addSpecialTypeConstructor(TypeConstructor tc)
-  {
-    specialTypeConstructors.add(tc);
-  }
-  
-  private static ArrayList specialTypeConstructors = new ArrayList(10);
-  
   /****************************************************************
    * Module Interface
    ****************************************************************/
@@ -308,7 +297,13 @@ public class ClassDefinition extends Node
     if(c.associatedConcreteClass!=null)
       return javaClass(c.associatedConcreteClass);
     else
-      return c.classType;
+      {
+	if(c.classType==null)
+	  Internal.error(c.name,
+			 c+" has no classType field");
+
+	return c.classType;
+      }
   }
   
   ClassType javaSuperClass()
@@ -394,21 +389,26 @@ public class ClassDefinition extends Node
 
   public void compile()
   {
-    if(!isSharp)
+    if(!isSharp && !isAbstract)
       return;
     
+    classType.setModifiers(Access.PUBLIC 
+			   | (isAbstract ? Access.ABSTRACT : 0)
+			   | (isFinal    ? Access.FINAL    : 0)
+			   );
     classType.setSuper(javaSuperClass());
+
     addFields(classType);
-    abstractClass().addFields(classType);
+    if(isSharp) abstractClass().addFields(classType);
+
     for(Iterator i = illegitimateParents.iterator();
 	i.hasNext();)
       ((ClassDefinition) i.next()).addFields(classType);
     
-    gnu.bytecode.Method constructor = classType.addMethod
-      ("<init>",
-       Access.PUBLIC,
-       new gnu.bytecode.Type[0],gnu.bytecode.Type.void_type
-       );
+    gnu.bytecode.Method constructor = classType.addMethod("<init>",Access.PUBLIC);
+    constructor.setArgTypes(new gnu.bytecode.Type[0]);
+    constructor.setReturnType(gnu.bytecode.Type.void_type);
+
     constructor.initCode();
     gnu.bytecode.CodeAttr code = constructor.getCode();
     gnu.bytecode.Variable thisVar = new gnu.bytecode.Variable();
@@ -429,11 +429,10 @@ public class ClassDefinition extends Node
     if(parent==null)
       parent = gnu.bytecode.Type.pointer_type;
     
-    return parent.addMethod
-      ("<init>",
-       Access.PUBLIC,
-       new gnu.bytecode.Type[0],gnu.bytecode.Type.void_type
-       );
+    gnu.bytecode.Method res = parent.addMethod("<init>",Access.PUBLIC);
+    res.setArgTypes(new gnu.bytecode.Type[0]);
+    res.setReturnType(gnu.bytecode.Type.void_type);
+    return res;
   }
   
   private void addFields(ClassType c)

@@ -12,7 +12,7 @@
 
 // File    : Debug.java
 // Created : Thu Jul 22 15:37:02 1999 by bonniot
-//$Modified: Tue Nov 16 19:39:39 1999 by bonniot $
+//$Modified: Tue Jan 18 17:37:52 2000 by bonniot $
 
 package bossa.util;
 
@@ -38,7 +38,7 @@ public abstract class Debug
     System.out.print(msg);
   }
 
-  final public static Properties props;
+  final private static Properties props;
   static 
   {
     props=new Properties();
@@ -57,7 +57,7 @@ public abstract class Debug
     }
   }
 
-  public static boolean getBoolean(boolean defaultValue, String name)
+  public static boolean getBoolean(String name, boolean defaultValue)
   {
     String value = props.getProperty(name);
     if (value == null)
@@ -66,17 +66,25 @@ public abstract class Debug
       return value.equals("true");
   }
 
-  public static final boolean 
-    K0			= getBoolean(false,"debug.K0"),
-    typing		= getBoolean(false,"debug.typing"),
-    engine		= getBoolean(false,"debug.engine"),
-    modules		= getBoolean(false,"debug.modules"),
-    IDs			= getBoolean(false,"debug.IDs"),
-    overloading 	= getBoolean(false,"debug.overloading"),
-    errorMsg		= getBoolean(false,"debug.errorMsg"),
-    codeGeneration 	= getBoolean(false,"debug.codeGeneration"),
-    javaTypes		= getBoolean(false,"debug.javaTypes"),
-    linkTests           = getBoolean(false,"debug.linkTests"),
-    passes		= getBoolean(false,"debug.passes");
+  public static String getProperty(String name, String def)
+  {
+    return props.getProperty(name, def);
+  }
   
+  public static final boolean 
+    resolution		= getBoolean("debug.resolution",false),
+    K0			= getBoolean("debug.K0",false),
+    typing		= getBoolean("debug.typing",false),
+    engine		= getBoolean("debug.engine",false),
+    modules		= getBoolean("debug.modules",false),
+    IDs			= getBoolean("debug.IDs",false),
+    overloading 	= getBoolean("debug.overloading",false),
+    powerUser		= getBoolean("debug.powerUser",false),
+    codeGeneration 	= getBoolean("debug.codeGeneration",false),
+    javaTypes		= getBoolean("debug.javaTypes",false),
+    linkTests           = getBoolean("debug.linkTests",false),
+    passes		= getBoolean("debug.passes",false);
+
+  public static final String
+    defaultFile = props.getProperty("debug.defaultFile", null);
 }

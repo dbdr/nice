@@ -12,7 +12,7 @@
 
 // File    : StaticFieldAccess.java
 // Created : Thu Jul 01 18:12:46 1999 by bonniot
-//$Modified: Mon Dec 06 15:50:09 1999 by bonniot $
+//$Modified: Mon Jan 03 16:23:08 2000 by bonniot $
 
 package bossa.syntax;
 
@@ -109,15 +109,15 @@ public class StaticFieldAccess extends MethodDefinition
   private String interfaceString()
   {
     return
-      type.codomain().toString()
+      type.getConstraint().toString()
+      + type.codomain().toString()
       + " "
       + name
       + Util.map("<",", ",">",type.getTypeParameters())
-      + type.getConstraint().toString()
       + "("
       + Util.map("",", ","",type.domain())
-      + ") = "
-      + className + "." + field.getName()
+      + ") = native "
+      + className + "." + (field==null ? fieldName : field.getName())
       + ";\n"
       ;
   }
@@ -128,6 +128,6 @@ public class StaticFieldAccess extends MethodDefinition
 
   public String toString()
   {
-    return "native " + interfaceString();
+    return interfaceString();
   }
 }

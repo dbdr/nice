@@ -12,7 +12,7 @@
 
 // File    : IdentExp.java
 // Created : Mon Jul 05 16:25:58 1999 by bonniot
-//$Modified: Tue Nov 09 11:23:32 1999 by bonniot $
+//$Modified: Thu Jan 20 12:14:14 2000 by bonniot $
 
 package bossa.syntax;
 

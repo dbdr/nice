@@ -12,7 +12,7 @@
 
 // File    : TypeScope.java
 // Created : Fri Jul 09 11:29:17 1999 by bonniot
-//$Modified: Sat Dec 04 16:24:14 1999 by bonniot $
+//$Modified: Mon Jan 03 18:52:03 2000 by bonniot $
 
 package bossa.syntax;
 
@@ -48,11 +48,33 @@ class TypeScope
     map.put(name,s);
   }
 
-  void addMappings(Collection names, Collection symbols)
+  void addMappings(Collection names, Collection symbols) throws BadSizeEx
   {
-    for(Iterator in=names.iterator(),is=symbols.iterator();
+    Iterator is;
+    if(symbols==null)
+      is=null;
+    else
+      {
+	is=symbols.iterator();
+	if(names.size()!=symbols.size())
+	  throw new BadSizeEx(names.size(),symbols.size());
+      }
+    
+    for(Iterator in=names.iterator();
 	in.hasNext();)
-      addMapping((String)in.next(),(TypeSymbol)is.next());
+      {
+	Object name_o = in.next();
+	String name;
+	if(name_o instanceof LocatedString)
+	  name = ((LocatedString) name_o).toString();
+	else
+	  name = (String) name_o;
+	
+	if(is==null)
+	  addMapping(name,TypeSymbol.dummy);
+	else
+	  addMapping(name,(TypeSymbol)is.next());
+      }
   }
   
   public TypeSymbol lookup(String name)

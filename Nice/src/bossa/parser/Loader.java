@@ -12,7 +12,7 @@
 
 // File    : Loader.java
 // Created : Thu Jul 29 09:43:50 1999 by bonniot
-//$Modified: Thu Dec 02 11:49:35 1999 by bonniot $
+//$Modified: Tue Jan 18 17:40:39 2000 by bonniot $
 
 package bossa.parser;
 
@@ -23,23 +23,24 @@ import bossa.syntax.LocatedString;
 import bossa.util.*;
 import bossa.modules.Module;
 
-/** Static class for loading and parsing files
- * 
+/** 
+ * Static class for loading and parsing files
  * 
  * @author bonniot
  */
 
 public abstract class Loader
 {
-  public static Module open(LocatedString filename)
+  public static Module open(File file)
   {
-    if(Debug.passes) Debug.println("Parsing "+filename+" ...");
-    Location.currentFile=filename.toString();
+    if(Debug.passes) Debug.println("Parsing "+file.getName()+" ...");
+    Location.currentFile=file.getName();
 
     Reader r=null;
-    try{ r=new BufferedReader(new FileReader(filename.toString())); }
+    try{ r=new BufferedReader(new FileReader(file)); }
     catch(FileNotFoundException e){
-      User.error(filename,filename+" not found");
+      // Should not happen, test has already been done in Module
+      User.error(file.getName()+" not found");
     }
     
     if(parser==null)
@@ -50,7 +51,7 @@ public abstract class Loader
     Module res=null;
     
     try{
-      res=parser.module(filename.toString());
+      res=parser.module(file.getName());
     }
     catch(ParseException e){
       if(e.currentToken!=null)

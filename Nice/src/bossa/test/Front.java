@@ -12,7 +12,7 @@
 
 // File    : Front.java
 // Created : Thu Jul 01 15:11:18 1999 by bonniot
-//$Modified: Mon Dec 06 11:40:14 1999 by bonniot $
+//$Modified: Thu Jan 20 12:13:09 2000 by bonniot $
 
 package bossa.test;
 
@@ -37,8 +37,8 @@ public class Front
     if(args.length==0)
       {
 	System.out.println("Usage: bossa file.bossa");
-	//System.exit(0);
-	file="numeric.bossa";
+	if((file=bossa.util.Debug.defaultFile)==null)
+	  System.exit(-1);
       }
     else file=args[0];
     

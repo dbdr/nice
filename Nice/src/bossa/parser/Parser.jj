@@ -12,7 +12,7 @@
 
 // File    : parser.jj
 // Created : Thu Jul 01 10:27:05 1999 by bonniot
-//$Modified: Mon Dec 06 15:02:50 1999 by bonniot $
+//$Modified: Thu Jan 20 15:52:35 2000 by bonniot $
 // Description : Parseur JavaCC pour Bossa
 //   Tokens based on the Jazz parser
 
@@ -204,6 +204,7 @@ TOKEN: /* Keywords */
 | < ENABLE:     "enable"     >
 | < NATIVE:     "native"     >
 | < FINAL:      "final"      >
+| < FINALLY:    "finally"    >
 | < ABSTRACT:   "abstract"   >
 | < LOCAL:      "local"      >
 | < PRAGMA:     "pragma"     >
@@ -362,6 +363,23 @@ LocatedString string():
 {
   t=<IDENT> 
   { return new LocatedString(t.image,new Location(t)); }
+}
+
+LocatedString methodName():
+{
+  LocatedString res;
+  Token name;
+}
+{
+  (
+   name=<LSTRING>
+   { res = new LocatedString(name.image.substring(1, name.image.length() - 1),
+			     new Location(name),
+			     true); }
+  |
+   res = string()
+  )
+  { return res; }
 }
 
 LocatedString doted_string():
@@ -786,7 +804,7 @@ ClassDefinition classDefinition():
     parameters=monotypeVars() 
 
   ( "implements" l=interfaces() { imp.addAll(l); } 
-  | "final" "implements"  l=interfaces() { abs.addAll(l); }
+  | "finally" "implements"  l=interfaces() { abs.addAll(l); }
   | l=extensions()      { ext.addAll(l); }
   )*
 
@@ -836,7 +854,7 @@ MethodBodyDefinition methodBodyDefinition():
     Expression exp;
 }
 {
-    name=string()
+    name=methodName()
     [ "<" binders=strings() ">" ]
     p=pattern(new LocatedString("this",new Location(0,0,0,0))) 
     { parameters.add(p); }
@@ -869,67 +887,57 @@ MethodDefinition methodDefinition():
     MethodDefinition res;
 }
 {
-  returnType=monotype()
-    name=string()
-    cst=constraint()
+  cst=constraint()
+    returnType=monotype()
+    name=methodName()
     "("
     ( parameters=monotypes() | { parameters=new ArrayList(); } )
     ")"
-    ";"
-    { return new MethodDefinition(name,cst,returnType,parameters); }
-}
-
-MethodDefinition nativeMethodDefinition():
-{
-    LocatedString name;
-    Monotype returnType;
-    List parameters;
-    Constraint cst;
-    MethodDefinition res;
-    LocatedString method,s;
-    List javaTypes=null;
-}
-{
-  "native" 
-  returnType=monotype()
-    name=string()
-    cst=constraint()
-    "("
-    ( parameters=monotypes() | { parameters=new ArrayList(); } )
-    ")"
-
-    "="
-      
-    s=doted_string() 
-    // if we stop here, it's a static field
-    // else it's a method
-    ( 
+    
+    (
+      // Bossa method
       ";"
-      { method=s; }
-    | 
-      { 
-	javaTypes=new ArrayList();
-	javaTypes.add(s); 
+      { return new MethodDefinition(name,cst,returnType,parameters); }
+    |
+      // Native (java) method
+      "=" "native"
+
+      {
+	List javaTypes=null;
+	LocatedString method,s;
       }
-      method=doted_string()
-      "("
-      [
-       s=doted_string() { javaTypes.add(s); }
-       ( "," s=doted_string() { javaTypes.add(s); } )*
-      ]
-      ")"  
-      ";"
-      )
-  { 
-    int dot=method.toString().lastIndexOf('.');
-    String methodName=method.toString().substring(dot+1,method.toString().length());
-    LocatedString className=method.substring(0,dot);
 
-    if(javaTypes!=null)
-      return new JavaMethodDefinition(className,methodName,javaTypes,name,cst,returnType,parameters);
-    else
-      return new StaticFieldAccess(className,methodName,name,cst,returnType,parameters);
-  }
+      s=doted_string() 
+      // if we stop here, it's a static field
+      // else it's a method
+      ( 
+       ";"
+       { method=s; }
+      | 
+       { 
+	 javaTypes=new ArrayList();
+	 javaTypes.add(s); 
+       }
+       method=doted_string()
+       "("
+       [
+	s=doted_string() { javaTypes.add(s); }
+	( "," s=doted_string() { javaTypes.add(s); } )*
+       ]
+       ")"  
+       ";"
+       )
+      { 
+	int dot=method.toString().lastIndexOf('.');
+	String methodName=method.toString().substring(dot+1,method.toString().length());
+	LocatedString className=method.substring(0,dot);
+
+	if(javaTypes!=null)
+	  return new JavaMethodDefinition(className,methodName,javaTypes,name,cst,returnType,parameters);
+	else
+	  return new StaticFieldAccess(className,methodName,name,cst,returnType,parameters);
+      }
+    )
 }
 
 Definition globalVariable():
@@ -959,9 +967,7 @@ Definition definition():
   | 
     res=globalVariable()
   |
-    res=nativeMethodDefinition()
-  |
-    LOOKAHEAD( monotype() string() )
+    LOOKAHEAD( constraint() monotype() methodName() )
     res=methodDefinition()
   | 
     res=methodBodyDefinition()
@@ -1164,37 +1170,49 @@ Expression expression():
        { res=new AssignExp(res,e); }
       |
        t="==" e=expression() 
-       { res=CallExp.create(symb("equals",t),res,e); }
+       { res=CallExp.create(symb("==",t),res,e); }
+      |
+       t="<" e=expression()
+       { res=CallExp.create(symb("<",t),res,e); }
+      |
+       t=">" e=expression()
+       { res=CallExp.create(symb(">",t),res,e); }
       |
        t="<=" e=expression()
-       { res=CallExp.create(symb("leq",t),res,e); }
+       { res=CallExp.create(symb("<=",t),res,e); }
       |
        t=">=" e=expression()
-       { res=CallExp.create(symb("geq",t),e,res); }
+       { res=CallExp.create(symb(">=",t),res,e); }
       |
        t="[" e=expression() "]"
        { res=CallExp.create(symb("get",t),res,e); }
       |
        t="^" e=expression()
-       { res=CallExp.create(symb("pow",t),res,e); }
+       { res=CallExp.create(symb("^",t),res,e); }
       |
        t="+" e=expression()
-       { res=CallExp.create(symb("add",t),res,e); }
+       { res=CallExp.create(symb("+",t),res,e); }
       |
        t="-" e=expression()
-       { res=CallExp.create(symb("sub",t),res,e); }
+       { res=CallExp.create(symb("-",t),res,e); }
       |
        t="*" e=expression()
-       { res=CallExp.create(symb("mul",t),res,e); }
+       { res=CallExp.create(symb("*",t),res,e); }
       |
        t="/" e=expression()
-       { res=CallExp.create(symb("div",t),res,e); }
+       { res=CallExp.create(symb("/",t),res,e); }
       |
        t="&&" e=expression()
-       { res=CallExp.create(symb("and",t),res,e); }
+       { res=CallExp.create(symb("&&",t),res,e); }
       |
        t="||" e=expression()
-       { res=CallExp.create(symb("or",t),res,e); }
+       { res=CallExp.create(symb("||",t),res,e); }
+      |
+       t="&" e=expression()
+       { res=CallExp.create(symb("&",t),res,e); }
+      |
+       t="|" e=expression()
+       { res=CallExp.create(symb("|",t),res,e); }
       )
     { 
       last=getToken(0);
@@ -1275,28 +1293,91 @@ Statement statementInIf():
     return res; }
 }
 
+List loopBody():
+{
+  List res;
+  Object stmt;
+}
+{
+ (
+  "{"
+  res=statements()
+  "}"
+ | 
+  // Empty body
+  ";"
+  { res = new LinkedList(); }
+ |
+  stmt=statement()
+  { res = new LinkedList();
+    res.add(stmt);
+  }
+ )
+   { return res; }
+}
+
 Statement whileStmt():
 {
   Token whiletoken;
   Expression test;
-  List stmts;
+  List statements;
 }
 {
   whiletoken="while" "(" test=expression() ")"
-  "{"
-  stmts=statements()
-  "}"
+  statements = loopBody()
   { 
-    return new ExpressionStmt(CallExp.create
-			      (symb("_while",whiletoken),
-			       lazyExp(test),
-			       new FunExp(Constraint.True(),
-					  new ArrayList(0),
-					  stmts)));
+    return new LoopStmt(test,statements);
+  }
+}
+
+Statement forStmt():
+{
+  Token token;
+  Expression test;
+  List initStmts = new LinkedList();
+  List iterStmts = new LinkedList();
+  Object stmt;
+  List stmts;
+}
+{
+  token="for" 
+    "(" 
+    [ 
+     stmt=statementWithoutSemicolon() { initStmts.add(stmt); }
+     ( "," stmt=statementWithoutSemicolon()  { initStmts.add(stmt); } )* 
+    ]
+    ";"
+    test=expression() 
+    ";"
+    [ 
+     stmt=statementWithoutSemicolon() { iterStmts.add(stmt); }
+     ( "," stmt=statementWithoutSemicolon()  { iterStmts.add(stmt); } )* 
+    ]
+    ")"
+  stmts=loopBody()
+  { 
+    initStmts.add(new LoopStmt(test,stmts,iterStmts));
+    return new Block(initStmts);
   }
 }
 
 Object statement():
+{
+  Object res;
+}
+{
+  res=statementWithoutSemicolon() 
+  (
+   LOOKAHEAD({res instanceof bossa.syntax.Block
+	      || res instanceof bossa.syntax.LoopStmt})
+   {}
+  |
+   ";"
+  )
+  { return res; }
+}
+
+Object statementWithoutSemicolon():
 {
   Object res;
   Expression e=null;
@@ -1305,30 +1386,28 @@ Object statement():
 {
   { first=getToken(1); }
 (
-  "return" [ e=expression() ] ";" 
-  { 
-    if(e==null)
-      res=new ReturnStmt(new VoidConstantExp());
-    else
-      res=new ReturnStmt(e); 
-  }
+ "return" [ e=expression() ]
+ { 
+   if(e==null)
+     res=new ReturnStmt(new VoidConstantExp());
+   else
+     res=new ReturnStmt(e); 
+ }
 |
   res=whileStmt()
+|
+  res=forStmt()
 |  
   LOOKAHEAD(monotype() string())
-  res=localDeclaration() ";" 
+  res=localDeclaration()
 | 
-  (
-   // Common prefix
-   e=expression()
-   //(
-    ";" { res=new ExpressionStmt(e); }
-   //|
-   // res=affectation(e) ";" 
-   //)
-  )
+  e=expression()
+  { res=new ExpressionStmt(e); }
 )
-  { last=getToken(0);
+
+  { 
+    last=getToken(0);
+
     if(res instanceof Statement) ((Statement)res).setLocation(new Location(first).englobe(new Location(last)));
     return res; }
 }

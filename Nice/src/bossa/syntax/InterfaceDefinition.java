@@ -12,7 +12,7 @@
 
 // File    : InterfaceDefinition.java
 // Created : Thu Jul 01 17:00:14 1999 by bonniot
-//$Modified: Sat Dec 04 12:09:17 1999 by bonniot $
+//$Modified: Mon Dec 13 15:38:42 1999 by bonniot $
 
 package bossa.syntax;
 
@@ -32,7 +32,7 @@ public class InterfaceDefinition extends Node
     super(Node.global);
     this.name=name;
     this.parameters=typeParameters;
-    this.variance=new Variance(typeParameters.size());
+    this.variance=Variance.make(typeParameters.size());
     addTypeSymbol(this);
     this.extensions=addChildren(extensions);
     itf=variance.newInterface();
@@ -52,7 +52,7 @@ public class InterfaceDefinition extends Node
     super(Node.forward);
     this.name=new LocatedString(name,Location.nowhere());
     this.parameters=null;
-    this.variance=new Variance(arity);
+    this.variance=Variance.make(arity);
     addTypeSymbol(this);
     extensions=null;
     itf=variance.newInterface();

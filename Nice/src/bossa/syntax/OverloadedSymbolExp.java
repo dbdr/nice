@@ -12,7 +12,7 @@
 
 // File    : OverloadedSymbolExp.java
 // Created : Thu Jul 08 12:20:59 1999 by bonniot
-//$Modified: Mon Dec 06 15:19:44 1999 by bonniot $
+//$Modified: Mon Jan 17 14:05:46 2000 by bonniot $
 
 package bossa.syntax;
 
@@ -97,11 +97,22 @@ public class OverloadedSymbolExp extends Expression
       {
 	Object s=i.next();
 
-	if(!(s instanceof MethodDefinition))
+	if(s instanceof MonoSymbol)
+	  {
+	    bossa.engine.Kind k = ((MonoSymbol) s).type.getKind();
+	    if(k instanceof bossa.typing.FunTypeKind)
+	      if(((bossa.typing.FunTypeKind) k).domainArity!=arity)
+		{ i.remove(); removedSomething=true; continue; }
+	      else ;  
+	    else { i.remove(); continue; }
+	  }
+	else if(s instanceof MethodDefinition)
+	  {
+	    if(((MethodDefinition)s).getArity()!=arity)
+	      { i.remove(); removedSomething=true; continue; }
+	  }
+	else
 	  { i.remove(); continue; }
-
-	if(((MethodDefinition)s).getArity()!=arity)
-	  { i.remove(); removedSomething=true; continue; }
       }
 
     if(symbols.size()==0)
@@ -141,7 +152,8 @@ public class OverloadedSymbolExp extends Expression
 
   Expression resolveOverloading(Polytype expectedType)
   {
-    if(Debug.overloading) Debug.println("Overloading resolution (expected type "+expectedType+") for "+this);
+    if(Debug.overloading) 
+      Debug.println("Overloading resolution (expected type "+expectedType+") for "+this);
     Iterator i=symbols.iterator();
     while(i.hasNext())
       {
@@ -152,6 +164,8 @@ public class OverloadedSymbolExp extends Expression
 	}
 	catch(bossa.typing.TypingEx e){
 	  i.remove();
+	  if(Debug.overloading) 
+	    Debug.println("Not "+s+" of type\n"+t+"\nbecause "+e);
 	}
       }
 
@@ -173,7 +187,7 @@ public class OverloadedSymbolExp extends Expression
       return uniqueExpression();
 
     if(symbols.size()==0)
-      User.error(this,ident + " is not defined");
+      User.error(this,ident + " is not defined...");
 
     User.error(this,"Ambiguity for symbol "+ident+". Possibilities are :\n"+
 	       Util.map("","","",symbols));

@@ -30,7 +30,7 @@ import gnu.expr.QuoteExp;
    Abstract syntax for a class definition.
 
  */
-public abstract class NiceClass extends ClassDefinition.ClassImplementation
+public abstract class NiceClass extends ClassImplementation
 {
   abstract public LocatedString getName();
 

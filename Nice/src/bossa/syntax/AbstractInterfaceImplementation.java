@@ -67,7 +67,7 @@ public class AbstractInterfaceImplementation extends Definition
     ClassDefinition def = ClassDefinition.get(classTC);
 
     boolean isNiceClass = def != null &&
-      ! (def.getImplementation() instanceof JavaClass);
+      (def.getImplementation() instanceof NiceClass);
 
     if (!isNiceClass && interfaceITF.associatedTC() != null)
       User.error(this, className + " is not a class defined in Nice.\n" +

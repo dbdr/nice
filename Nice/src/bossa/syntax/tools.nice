@@ -235,6 +235,8 @@ mlsub.typing.TypeSymbol[?] getBinders(MethodContainer) = native mlsub.typing.Typ
 ?gnu.bytecode.Attribute get(gnu.bytecode.AttrContainer, String) = native gnu.bytecode.Attribute gnu.bytecode.Attribute.get(gnu.bytecode.AttrContainer, String);
 void printInterface(Definition, java.io.PrintWriter) = native void Definition.printInterface(java.io.PrintWriter);
 ?gnu.expr.Declaration getDeclaration(VarSymbol) = native gnu.expr.Declaration VarSymbol.getDeclaration();
+void printInterface(ClassImplementation, java.io.PrintWriter) = native void ClassImplementation.printInterface(java.io.PrintWriter);
+?gnu.bytecode.Type TypeImport_lookup(LocatedString) = native gnu.bytecode.Type nice.tools.code.TypeImport.lookup(LocatedString);
 
 // Retypings needed since java types are not strict.
 mlsub.typing.Polytype boolPolytype() = native PrimitiveType.boolPolytype;

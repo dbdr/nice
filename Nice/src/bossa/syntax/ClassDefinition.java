@@ -904,16 +904,6 @@ public abstract class ClassDefinition extends MethodContainer
     this.implementation = implementation;
   }
 
-  abstract static class ClassImplementation
-  {
-    abstract void resolveClass();
-    void resolveBody() {}
-    void typecheck() {}
-    void compile() {}
-    void recompile() {}
-    abstract void printInterface(java.io.PrintWriter s);
-  }
-
   ClassImplementation implementation;
 
   public ClassImplementation getImplementation()

@@ -335,7 +335,7 @@ public class CNiceClass extends NiceClass
 
   printInterface(s)
   {
-    notNull(s).print(" {\n"
+    s.print(" {\n"
        + Util.map("", ";\n", ";\n", fields)
        + Util.map("", ";\n", ";\n", overrides)
        + ((serialVersionUIDValue == null) ? "" :

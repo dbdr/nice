@@ -1,7 +1,7 @@
 /**************************************************************************/
 /*                                N I C E                                 */
 /*             A high-level object-oriented research language             */
-/*                        (c) Daniel Bonniot 2002                         */
+/*                        (c) Daniel Bonniot 2004                         */
 /*                                                                        */
 /*  This program is free software; you can redistribute it and/or modify  */
 /*  it under the terms of the GNU General Public License as published by  */
@@ -13,10 +13,6 @@
 package bossa.syntax;
 
 import bossa.util.*;
-import java.util.*;
-
-import mlsub.typing.*;
-import gnu.bytecode.ClassType;
 
 /**
    A class definition which reflects an existing native java class.
@@ -24,35 +20,24 @@ import gnu.bytecode.ClassType;
    This is usefull when you want to add type parameters
    to an existing java class.
    
-   @version $Date$
-   @author Daniel Bonniot
 */
-
-public class JavaClass extends ClassDefinition.ClassImplementation
+public class JavaClass extends ClassImplementation
 {
-  public JavaClass(ClassDefinition definition, LocatedString javaName)
-  {
-    this.definition = definition;
-    this.javaName = javaName;
-
-    lookup();
-  }
-
   ClassDefinition definition;
+  LocatedString javaName;
+  boolean ignoredRetyping = false;
+
+  {
+    this.lookup();
+  }  
 
   /**
      This must be called in a first pass, before bytecode types are implicitely
-     loaded, so that the retyping is tyken into account.
+     loaded, so that the retyping is taken into account.
   */
   private void lookup()
   {
-    ClassType classType;
-    try {
-      classType = (ClassType) nice.tools.code.TypeImport.lookup(javaName);
-    }
-    catch(ClassCastException ex) {
-      throw User.error(definition, javaName + " is a primitive type");
-    }
+    let classType = nice.tools.code.TypeImport.lookup(javaName);
     
     if (classType == null)
       {
@@ -63,37 +48,34 @@ public class JavaClass extends ClassDefinition.ClassImplementation
 	return;
       }
 
+    if (! (classType instanceof gnu.bytecode.ClassType))
+       throw User.error(definition, javaName + " is a primitive type");
+
     // Check that we don't give a wrong arity to a generic class.
     int nativeArity = classType.getArity();
-    if (nativeArity != -1 && nativeArity != definition.tc.arity())
-      User.error(definition, javaName + " has " + nativeArity +
-		 " type parameters");
     
-    TypeConstructor old = 
-      JavaClasses.setTypeConstructorForJavaClass
-      (definition.compilation(), definition.tc, classType);
+    if (nativeArity != -1 && nativeArity != notNull(definition.tc).arity())
+      User.error(definition, javaName + " has " + nativeArity + " type parameters");
+    
+    let old = JavaClasses.setTypeConstructorForJavaClass
+		(definition.compilation(), definition.tc, classType);
 
     if (old != null)
-      User.error(definition, javaName + 
-		 " was already associated with the Nice class " + old);
+      User.error(definition, javaName + " was already associated with the Nice class " + old);
+    
     definition.setJavaType(classType);
   }
 
-  void resolveClass()
+  resolveClass()
   {
     if (ignoredRetyping)
       return;
 
-    JavaClasses.fetchMethods(definition.tc, 
-			     (gnu.bytecode.ClassType) definition.getJavaType());
+    JavaClasses.fetchMethods(definition.tc, cast(definition.getJavaType()));
   }
 
-  public void printInterface(java.io.PrintWriter s)
+  printInterface(s)
   {
     s.print(" = native " + javaName.toString() + ";\n");
   }
-  
-  /** The qualified name of the existing java type. */
-  private LocatedString javaName;
-  boolean ignoredRetyping;
 }

@@ -31,7 +31,7 @@ import nice.tools.code.SpecialTypes;
    @author Daniel Bonniot
 */
 
-public class PrimitiveType extends ClassDefinition.ClassImplementation
+public class PrimitiveType extends ClassImplementation
 {
   public PrimitiveType(ClassDefinition definition)
   {

@@ -74,6 +74,10 @@ while true; do
 	NICE=${NICE_DEVEL-${HOME}/Nice/src/nice/tools/.compiler.jar:${HOME}/Nice/classes:${HOME}/Nice/stdlib:${HOME}/Nice/src:}
 	NICEJAR=${HOME}/Nice/stdlib
 	doTest=false;;
+    x-eJ) 
+	NICE=${HOME}/Nice/classes:${HOME}/Nice/lib/nice/Nice.jar
+	NICEJAR=${HOME}/Nice/stdlib
+	doTest=false;;
     x-el) 
 	NICE=${NICE_DEVEL-${HOME}/Nice/classes:${HOME}/Nice/stdlib:${HOME}/Nice/src:${HOME}/Nice/src/nice/tools/.compiler.jar}
 	NICEJAR=${HOME}/Nice/stdlib

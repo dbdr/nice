@@ -40,7 +40,7 @@ recompileSTDLIB:
 	${JAVAC} ${TOP}/stdlib/nice/lang/*.java
 
 compiler: setDate
-	cd src; nicec -e -Rs nice.tools.compiler
+	cd src; nicec -eJ -Rs nice.tools.compiler
 
 parser:
 	cd src/bossa/parser; ${JAVACC} Parser.jj

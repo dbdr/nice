@@ -146,6 +146,17 @@ public class TestNice {
 	private static boolean _writeComments;
 
 
+	/**
+	 * Classpath entry that contains the Nice standard library.
+	 * 
+	 * This is only needed when the testsuite is not run from a JVM
+   * (for instance after native compilation), or if the standard library
+	 * is not in the classpath.
+	 * 
+	 */
+	private static String _runtime;
+
+
 
 	/**
 	 * Main method of the application;
@@ -199,6 +210,8 @@ public class TestNice {
 					setOutput(args[i++]);
 				else if ("-comment".equalsIgnoreCase(s))
 					_writeComments = true;
+				else if ("-runtime".equalsIgnoreCase(s))
+					_runtime = args[i++];
 				else
 					return false;
 			} else
@@ -424,6 +437,15 @@ public class TestNice {
 	 */
 	static boolean getWriteComments() {
 		return _writeComments;
+	}
+
+
+	/**
+	 * Returns the runtime, where the Nice standard library is.
+	 * 
+	 */
+	static String getRuntime() {
+		return _runtime;
 	}
 
 

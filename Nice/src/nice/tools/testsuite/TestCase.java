@@ -328,6 +328,7 @@ public abstract class TestCase {
 	  String tempDir = TestNice.getTempFolder().getAbsolutePath();
 	  compilation.sourcePath = tempDir;
 	  compilation.destinationDir = tempDir;
+	  compilation.runtimeFile = TestNice.getRuntime();
 	  return nice.tools.compiler.fun.compile
 	    (compilation, packageName, null, null, false);
 	}

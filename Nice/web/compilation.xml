@@ -72,4 +72,17 @@ All imported packages are found automatically, and recompiled if necessary.
 Nice enjoys separate compilation.
 </para>
 
+<para>
+Instead of starting the compiler in a terminal, you can of course automate
+this by using a build system. If you are familiar with make, you can
+just invoke the compiler as above in a Makefile. There is also a
+<literal>nicec</literal> task for the 
+<ulink
+url="http://ant.apache.org">Ant build system</ulink>. 
+The use of Nice with Ant is
+<ulink
+url="http://nice.sourceforge.net/cgi-bin/twiki/view/Doc/NicecAntTaskdef">
+documented</ulink> in the Wiki.
+</para>
+
 </page>

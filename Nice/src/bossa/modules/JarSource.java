@@ -57,6 +57,10 @@ class JarSource extends PackageSource
     this.itfEntry = itfEntry;
     this.bytecodeEntry = bytecodeEntry;
     this.dispatchEntry = dispatchEntry;
+
+    this.lastCompilation = this.lastModification =
+      Math.min(itfEntry.getTime(),
+	       Math.min(bytecodeEntry.getTime(), dispatchEntry.getTime()));
   }
 
   Unit[] getDefinitions(boolean forceReload)

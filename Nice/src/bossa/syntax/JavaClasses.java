@@ -282,7 +282,9 @@ public final class JavaClasses
 		if(alreadyHasMethod(itfs[i],m))
 		  continue addingFetchedMethod;
 	
-	    addSymbol(JavaMethod.make(m, false));
+	    // Ignore the method if it is explicitely retyped
+	    if (retyped.get(m) == null)
+	      addSymbol(JavaMethod.make(m, false));
 	  }
       }
   }

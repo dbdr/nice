@@ -1,5 +1,5 @@
 Redirect /Wiki http://nice.sourceforge.net/cgi-bin/twiki/view 
-Redirect /Nice.tar http://prdownloads.sourceforge.net/nice/Nice-0.8-unix.tar.gz 
-Redirect /Nice.zip http://prdownloads.sourceforge.net/nice/Nice-0.8-windows.zip 
-Redirect /nice.deb http://prdownloads.sourceforge.net/nice/nice_0.8_all.deb 
-Redirect /nice.rpm http://prdownloads.sourceforge.net/nice/Nice-0.8-1.noarch.rpm
+Redirect /Nice.tar http://prdownloads.sourceforge.net/nice/Nice-0.9.0-unix.tar.gz 
+Redirect /Nice.zip http://prdownloads.sourceforge.net/nice/Nice-0.9.0-windows.zip 
+Redirect /nice.deb http://prdownloads.sourceforge.net/nice/nice_0.9.0_all.deb 
+Redirect /nice.rpm http://prdownloads.sourceforge.net/nice/Nice-0.9.0-1.noarch.rpm

@@ -84,7 +84,7 @@ public final class Compilation
     else
       matchCase = Gen.returnValue(matchCase);
     
-    boolean optimize = false;
+    boolean optimize = true;
 
     if(optimize && !sortedAlternatives.hasNext())
       return matchCase;

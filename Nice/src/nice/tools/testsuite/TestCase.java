@@ -196,20 +196,26 @@ public class TestCase {
 	 * 
 	 */
 	private int compilePackage(String packageName) throws TestSuiteException {
-		Vector args = new Vector();
-
-		args.addElement("--sourcepath");
-		args.addElement(TestNice.getTempFolder().getAbsolutePath());
-		args.addElement("--destination");
-		args.addElement(TestNice.getTempFolder().getAbsolutePath());
-		args.addElement("--runtime");
-		args.addElement(getRuntime());
-		args.addElement(packageName);
-
-		String[] argArray = new String[args.size()];
-		System.arraycopy(args.toArray(), 0, argArray, 0, args.size());
-		
-		return nice.tools.compiler.fun.compile(argArray);
+		return nice.tools.compiler.fun.compile
+			(packageName,
+			TestNice.getTempFolder().getAbsolutePath(),
+			TestNice.getTempFolder(),
+			null,//classpath,
+			null,//jar,
+			null,//output,
+			false,//recompile,
+			false,//recompile_all,
+			false,//compile,
+			false,//exclude_runtime,
+			getRuntime(),
+			null,//native_compiler,
+			false,//help,
+			false,//editor,
+			false,//man,
+			false,//version,
+			false,//usage,
+			false//memory
+			);
 	}
 	
 	/**

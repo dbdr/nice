@@ -19,6 +19,7 @@ package nice.lang;
 <E> Iterator<E> forIterator(E[] arr) = new ArrayForIterator(arr: arr);
 Iterator<char> forIterator(String s) = new StringForIterator(str: s);
 Iterator<char> forIterator(StringBuffer sb) = new StringBufferForIterator(strb: sb);
+Iterator<int> forIterator(Range<int> range) = range.iterator();
 
 //The implementations of additional Iterators
 

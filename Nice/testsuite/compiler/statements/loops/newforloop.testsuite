@@ -41,3 +41,9 @@
   for(array3 : array2) 
     for(i : array3) j+=i;
   assert(j==10);
+
+/// PASS
+  int sum = 0;
+  for(x : 1..10)
+    sum += x;
+  assert(sum==55);

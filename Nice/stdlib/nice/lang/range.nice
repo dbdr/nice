@@ -1,0 +1,61 @@
+/**************************************************************************/
+/*                                N I C E                                 */
+/*             A high-level object-oriented research language             */
+/*                        (c) Daniel Bonniot 2003                         */
+/*                                                                        */
+/*  This program is free software; you can redistribute it and/or modify  */
+/*  it under the terms of the GNU General Public License as published by  */
+/*  the Free Software Foundation; either version 2 of the License, or     */
+/*  (at your option) any later version.                                   */
+/*                                                                        */
+/**************************************************************************/
+
+package nice.lang;
+
+public class Range<T | T <: int, int <: T> extends AbstractList<T> {
+
+  private final int begin;
+  private final int end;
+
+  isEmpty() = false;
+
+  size() = 1+end-begin;
+
+  get(index) {
+    if (index < 0 || index >= 1+end-begin) throw new IndexOutOfBoundsException();
+    return begin + index;
+  }
+  
+  add(elem) =  throw new UnsupportedOperationException();
+
+  contains(elem) = begin <= cast(elem) <= end;
+
+  iterator() = new RangeIterator(range: this, pos: begin-1);
+
+  listIterator() = new RangeIterator(range: this, pos: begin-1);
+
+  listIterator(index) = new RangeIterator(range: this, pos: begin + index-1);	
+
+}
+
+public class RangeIterator<T | T <: int, int <: T> implements ListIterator<T> {
+
+  final Range<int> range;
+  int pos;
+
+  hasNext() = pos+1 <= range.end;
+  next() = ++pos;
+  hasPrevious() = pos-1 >= range.begin;
+  previous() = --pos;
+  nextIndex() = (pos-range.begin) + 1;
+  previousIndex() = pos - range.begin;
+
+  remove() = throw new UnsupportedOperationException();
+  set(elem) = throw new UnsupportedOperationException();
+  add(elem) = throw new UnsupportedOperationException();
+}
+
+public Range<int> `..`(int begin, int end) requires begin <= end 
+{
+  return new Range(begin: begin, end: end);
+}

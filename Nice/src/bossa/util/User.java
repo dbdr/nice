@@ -54,7 +54,7 @@ public final class User
 
   public static void error(Located responsible, String message)
   {
-    Location loc = responsible.location();
+    Location loc = responsible == null ? null : responsible.location();
     if (loc == null || loc.toString().length() == 0)
       error(message);
     else

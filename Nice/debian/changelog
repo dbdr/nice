@@ -1,6 +1,7 @@
 nice (0.0.020300) unstable; urgency=low
 
   * Better error messages for method calls with wrong number of arguments.
+  * Accept methods with no implementation when their domain is empty.
 
  --
 

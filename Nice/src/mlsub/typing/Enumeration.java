@@ -1,7 +1,7 @@
 /**************************************************************************/
 /*                                N I C E                                 */
 /*             A high-level object-oriented research language             */
-/*                        (c) Daniel Bonniot 2001                         */
+/*                        (c) Daniel Bonniot 2002                         */
 /*                                                                        */
 /*  This program is free software; you can redistribute it and/or modify  */
 /*  it under the terms of the GNU General Public License as published by  */
@@ -211,7 +211,8 @@ public class Enumeration
       BitVector[] pObs = (BitVector[]) 
 	observers.toArray(new BitVector[observers.size()]);
       
-      enumerateInConstraints(pKinds,pObs,tuples);
+      if (enumerateInConstraints(pKinds,pObs,tuples))
+	return emptyList;
     }
     finally{
       Engine.backtrack();
@@ -222,7 +223,8 @@ public class Enumeration
 
   private static List emptyList = new LinkedList();
 
-  private static void enumerateInConstraints
+  /** return true if there is no solution. */
+  private static boolean enumerateInConstraints
     (Engine.Constraint[] kinds,
      BitVector[] observers,
      final TagsList tuples)
@@ -253,7 +255,14 @@ public class Enumeration
 		 }
 	     }
 	   );
+
+	// If there is no solution for a variable in the current kind,
+	// then handle() will never be called and endAddition() returns true.
+	// There is therefore no global solution, and we return true.
+	if (tuples.endAddition())
+	  return true;
       }
+    return false;
   }
 
   /** 
@@ -285,7 +294,7 @@ public class Enumeration
     }
 
     private int size, width;
-    private boolean first = true;
+    private boolean first;
     final List tags = new ArrayList();
 
     /** Call before enumeration of the possibilities for some tags */
@@ -293,6 +302,12 @@ public class Enumeration
     {
       size = tags.size();
       first = true;
+    }
+
+    // return true if there is no solution
+    boolean endAddition()
+    {
+      return first; 
     }
 
     /** Call before each possibility for these tags */

@@ -41,7 +41,8 @@ typecheck(e@AssignExp)
     bossa.util.User.error(e, "" + to + " cannot be assigned a value");
   
   try{
-    e.value = checkAssignment(to.getType(), notNull(e.value));
+    e.value = notNull(e.value).resolveOverloading(to.getType());
+    checkAssignment(to.getType(), notNull(e.value));
   }
   catch(TypingEx t){
     ?MonoSymbol variable = monoSymbol(to);
@@ -50,7 +51,7 @@ typecheck(e@AssignExp)
       try
         {
 	  let unsureType = makeUnsure(variable.type);
-	  e.value = checkAssignment(new mlsub.typing.Polytype(unsureType), notNull(e.value));
+	  checkAssignment(new mlsub.typing.Polytype(unsureType), notNull(e.value));
 
 	  // It is OK to assign the variable with a null value.
 	  variable.setVarType(now: unsureType,
@@ -372,7 +373,8 @@ typecheck(e@IfExp)
   Expression elseExp = notNull(e.elseExp);
 
   try{
-    condition = checkAssignment(PrimitiveType.boolPolytype, condition);
+    condition = condition.resolveOverloading(PrimitiveType.boolPolytype);
+    checkAssignment(PrimitiveType.boolPolytype, condition);
     e.condition = condition;
   }
   catch(TypingEx t){
@@ -460,8 +462,8 @@ private void setVarType(MonoSymbol variable,
 typecheck(e@IncrementExp)
 {
   try{
-    e.variable = checkAssignment(notNull(PrimitiveType.longPolytype), 
-				 notNull(e.variable));
+    e.variable = notNull(e.variable).resolveOverloading(PrimitiveType.longPolytype);
+    checkAssignment(PrimitiveType.longPolytype, notNull(e.variable));
   }
   catch(TypingEx t){
     if (notNullError(t, e, String.valueOf(e.variable)))
@@ -565,12 +567,15 @@ typecheck(decl@Block.LocalVariable)
   if (type == null)
     {
       value.typecheck();
+      decl.value = value = value.noOverloading();
       target.type = checkMonomorphic(value.getType(), decl);
     }
   else
     {
       try{
-	decl.value = checkAssignment(new mlsub.typing.Polytype(type), value);
+	mlsub.typing.Polytype polytype = new mlsub.typing.Polytype(type);
+	decl.value = value = value.resolveOverloading(polytype);
+	checkAssignment(polytype, value);
       } 
       catch(TypingEx t){
 	reportNullAssignmentError(decl, t, value: value, 
@@ -617,7 +622,19 @@ typecheck(l@LoopStmt)
 {
   ?Expression whileExp = l.whileExp;
   if (whileExp != null)
-    l.whileExp = checkAssignment(PrimitiveType.boolPolytype, whileExp);
+    {
+      l.whileExp = whileExp = whileExp.resolveOverloading(PrimitiveType.boolPolytype);
+      try {
+	checkAssignment(PrimitiveType.boolPolytype, whileExp);
+      }
+      catch(TypingEx t) {
+	if (notNullError(t, l, whileExp.toString()))
+      throw new bossa.util.UserError
+      (whileExp, 
+       "The condition must be a boolean.\n" + 
+       whileExp + " has type " + whileExp.getType());
+      }
+    }
 
   enterIf();
 
@@ -718,15 +735,15 @@ typecheck(s@SynchronizedStmt)
 
 /**
    Checks that right can be assigned to a variable of type left.
-   Returns a new expression to be used instead of right,
-   since overloading resolution is done on the expected type.
+
+   Overloading resolution must already have taken place (it cannot be done 
+   here, since the new value needs to be returned, which would not work
+   when a typing error is thrown).
 */
-Expression checkAssignment(mlsub.typing.Polytype left, Expression right)
+void checkAssignment(mlsub.typing.Polytype left, Expression right)
 {
-  Expression val = notNull(right.resolveOverloading(left));
-  typecheck(val);
-  Typing.leq(val.getType(), left);
-  return val;
+  typecheck(right);
+  Typing.leq(right.getType(), left);
 }
 
 boolean isNullError(TypingEx ex);

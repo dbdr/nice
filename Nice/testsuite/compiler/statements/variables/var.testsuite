@@ -1,0 +1,35 @@
+/// PASS
+  /// Toplevel
+class A {
+  ?String cache;
+
+  void get() {
+    var c = cache;
+  }
+}
+
+class B {
+  ?(String, int) cache;
+
+  void get() {
+    var c = cache;
+  }
+}
+
+/// FAIL
+  /// Toplevel
+class A {
+  ?String cache;
+
+  void get() {
+    var c = cache;
+  }
+}
+
+class B {
+  ?(String, int) cache;
+
+  void get() {
+    var ?boolean c = cache;
+  }
+}

@@ -72,6 +72,19 @@ class B extends A {}
 boolean foo(B); foo(B x) = true;
 
 /// PASS
+  A a = new C();
+  B b = new C();
+  assert a.foo();
+  assert b.foo();
+  /// Toplevel
+interface A {}
+interface B{}
+class C implements A,B {}
+boolean foo(A a) = false;
+boolean foo(B b) = false;
+boolean foo(C c) = true;
+
+/// PASS
   /// Toplevel
 class A{}
 <T> void foo(A,Object) {}

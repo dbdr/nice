@@ -51,18 +51,6 @@ public abstract class Alternative implements Located
   }
 
   /****************************************************************
-   * Graph traversal
-   ****************************************************************/
-
-  static final int 
-    UNVISITED = 1,
-    VISITING  = 2,
-    VISITED   = 3;
-  
-  /** Marks the state of this node in the graph traversal. */
-  int mark = UNVISITED;
-  
-  /****************************************************************
    * Order on alternatives
    ****************************************************************/
 
@@ -221,6 +209,15 @@ public abstract class Alternative implements Located
   }
 
   /****************************************************************
+   * Graph traversal
+   ****************************************************************/
+
+  /** Marks the state of this node in the graph traversal. */
+  private int mark = 0;
+
+  private static int currentVisitedMark = 0;
+
+  /****************************************************************
    * Sorting alternatives by generality
    ****************************************************************/
 
@@ -236,17 +233,16 @@ public abstract class Alternative implements Located
     if (alternatives.size() == 0)
       return sortedAlternatives;
 
-    // Test if another sort has been done before.
-    // In that case reset the marks.
-    if (((Alternative) alternatives.get(0)).mark != Alternative.UNVISITED)
-      for(Iterator i = alternatives.iterator(); i.hasNext();)
-	((Alternative) i.next()).mark = Alternative.UNVISITED;
-	
+    // We used a different mark for each sort.
+    // Useful since an alternative can belong to several methods because of
+    // overriding, and SuperExp also lists alternatives.
+    int visited = ++currentVisitedMark;
+
     for(Iterator i = alternatives.iterator(); i.hasNext();)
       {
 	Alternative a = (Alternative) i.next();
-	if (a.mark == Alternative.UNVISITED)
-	  visit(a, alternatives, sortedAlternatives);
+	if (a.mark != visited)
+	  visit(a, alternatives, sortedAlternatives, visited);
       }
 
     return sortedAlternatives;
@@ -255,30 +251,21 @@ public abstract class Alternative implements Located
   private final static void visit
     (final Alternative a, 
      final List alternatives,
-     final Stack sortedAlternatives
+     final Stack sortedAlternatives,
+     final int visited
      )
   {
-    // Cycles are possible
-    //   * if two alternatives are identical (same patterns)
-    //   * if there is a cyclic subclass relation
-    //   * that's all, folks ! :-)
-    switch(a.mark)
-      {
-      case Alternative.VISITING : User.error("Cycle in alternatives: "+a);
-      case Alternative.UNVISITED: a.mark = Alternative.VISITING; break;
-      case Alternative.VISITED  : return; //should not happen
-      }
+    a.mark = visited;
     
     for(Iterator i = alternatives.iterator();
 	i.hasNext();)
       {
 	Alternative daughter = (Alternative) i.next();
-	if(daughter != a 
-	   && daughter.mark == Alternative.UNVISITED 
-	   && Alternative.leq(daughter,a))
-	  visit(daughter,alternatives,sortedAlternatives);
+	if (daughter.mark != visited 
+            && Alternative.leq(daughter,a))
+	  visit(daughter, alternatives, sortedAlternatives, visited);
       }
-    a.mark = Alternative.VISITED;
+
     sortedAlternatives.push(a);
   }
 }

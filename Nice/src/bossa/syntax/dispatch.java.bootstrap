@@ -12,6 +12,9 @@ import java.util.List;
 
 public class dispatch
 {
+  public static bossa.link.Alternative createJavaAlternative(bossa.syntax.MethodDeclaration method)
+  { return null; }
+
   static TypeScope createGlobalTypeScope()
   { return null; }
 

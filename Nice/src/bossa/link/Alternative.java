@@ -241,7 +241,7 @@ public class Alternative implements Located
     String fullName = to.getFullName();
 
     if (from.isJavaMethod())
-      new JavaAlternative(from).add(fullName);
+      bossa.syntax.dispatch.createJavaAlternative(from).add(fullName);
 
     List list = (List) alternatives.get(from.getFullName());
 

@@ -45,3 +45,26 @@ public Alternative createSourceAlternative(MethodImplementation implementation)
 
   return res;
 }
+
+/**
+   An alternative for calling an existing Java method.
+
+ */
+class JavaAlternative extends Alternative
+{
+  MethodDeclaration method;
+
+  methodExp() = method.getCode();
+}
+
+public Alternative createJavaAlternative(bossa.syntax.MethodDeclaration method)
+{
+
+  Pattern[] patterns = notNull(nice.tools.typing.Types.parameters(method.getType())).
+	mapToArray(mlsub.typing.Monotype param => createPattern(null,
+		nice.tools.typing.Types.concreteConstructor(param),
+         	nice.tools.typing.Types.isSure(param)));
+
+  return new JavaAlternative(method.getName().toString(), patterns,
+	method: method);
+}

@@ -12,7 +12,7 @@
 
 // File    : OverloadedSymbolExp.java
 // Created : Thu Jul 08 12:20:59 1999 by bonniot
-//$Modified: Wed Nov 10 16:47:57 1999 by bonniot $
+//$Modified: Mon Nov 29 20:04:31 1999 by bonniot $
 
 package bossa.syntax;
 
@@ -143,8 +143,8 @@ public class OverloadedSymbolExp extends Expression
 	}
       }
 
-    User.error(symbols.size()==0,this,
-	       "No alternative has expected type "+expectedType);
+    if(symbols.size()==0)
+      User.error(this,"No alternative has expected type "+expectedType);
 
     if(symbols.size()==1)
       return uniqueExpression();
@@ -159,6 +159,9 @@ public class OverloadedSymbolExp extends Expression
   {
     if(symbols.size()==1)
       return uniqueExpression();
+
+    if(symbols.size()==0)
+      User.error(this,ident + " is not defined");
 
     User.error(this,"Ambiguity for symbol "+ident+". Possibilities are :\n"+
 	       Util.map("","","",symbols));

@@ -12,7 +12,7 @@
 
 // File    : AssignStmt.java
 // Created : Mon Jul 05 15:49:27 1999 by bonniot
-//$Modified: Mon Nov 15 16:24:39 1999 by bonniot $
+//$Modified: Mon Nov 29 20:10:35 1999 by bonniot $
 
 package bossa.syntax;
 
@@ -62,13 +62,15 @@ public class AssignStmt extends Statement
 
   public gnu.expr.Expression compile()
   {
-    gnu.expr.Declaration decl=to.declaration();
+    return to.compileAssign(value);
     
-    if(decl!=null)
-      return new gnu.expr.SetExp(decl,value.compile());
+//      gnu.expr.Declaration decl=to.declaration();
+    
+//      if(decl!=null)
+//        return new gnu.expr.SetExp(decl,value.compile());
 	
-    Internal.warning(this,"Assignment to "+to.getClass());
-    return new gnu.expr.SetExp(to.toString(),value.compile());
+//      Internal.warning(this,"Assignment to "+to.getClass());
+//      return new gnu.expr.SetExp(to.toString(),value.compile());
   }
   
   /****************************************************************

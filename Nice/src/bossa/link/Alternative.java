@@ -12,12 +12,15 @@
 
 // File    : Alternative.java
 // Created : Mon Nov 15 12:20:40 1999 by bonniot
-//$Modified: Tue Nov 16 20:28:02 1999 by bonniot $
+//$Modified: Mon Nov 29 17:56:04 1999 by bonniot $
 
 package bossa.link;
 
 import bossa.syntax.*;
 import bossa.util.*;
+
+import gnu.bytecode.*;
+import gnu.expr.*;
 
 import java.util.*;
 
@@ -35,8 +38,11 @@ public class Alternative
   /**
    * When read from a source file.
    */
-  public Alternative(MethodDefinition m, List patterns)
+  public Alternative(MethodDefinition m, List patterns, ClassType c, Method method)
   {
+    this.definitionClass = c;
+    this.primProcedure = new PrimProcedure(method);
+    
     this.method=m.bytecodeName();
     this.patterns=patterns;
     add();
@@ -45,16 +51,19 @@ public class Alternative
   /**
    * When read from a bytecode file.
    */
-  public Alternative(String s)
+  public Alternative(String s, ClassType c, Method m)
   {
-    int at = s.indexOf('@');
+    this.definitionClass = c;
+    this.primProcedure = new PrimProcedure(m);
+    
+    int at = s.indexOf(Pattern.AT_encoding);
     method = s.substring(0,at);
     
     this.patterns = new ArrayList();
 
     while(at<s.length())
       {
-	int next = s.indexOf('@',at+1);
+	int next = s.indexOf(Pattern.AT_encoding,at+1);
 	if(next==-1)
 	  next=s.length();
 	
@@ -63,9 +72,9 @@ public class Alternative
 	  patterns.add(Domain.bot); // Domain Ex a .a 
 	else
 	  {
-	    Monotype m = new MonotypeConstructor(new TypeConstructor(new LocatedString(name,Location.nowhere())),null,Location.nowhere());
-	    m = m.resolve(Node.getGlobalTypeScope());    
-	    patterns.add(new Domain(null,m));
+	    Monotype type = new MonotypeConstructor(new TypeConstructor(new LocatedString(name,bossa.util.Location.nowhere())),null,bossa.util.Location.nowhere());
+	    type = type.resolve(Node.getGlobalTypeScope());    
+	    patterns.add(new Domain(null,type));
 	  }
 	
 	at = next;
@@ -119,12 +128,80 @@ public class Alternative
     
     return true;
   }
+
+  /**
+   * @return the expression that represents the method body.
+   */
+  gnu.expr.Expression methodExp()
+  {
+    return new gnu.expr.QuoteExp(primProcedure);
+  }
+  
+  /**
+   * @return the expression that tests if this alternative 
+   * the tuple of 'parameters'.
+   */
+  gnu.expr.Expression matchTest(gnu.expr.Expression[] parameters)
+  {
+    gnu.expr.Expression result = QuoteExp.trueExp;
+    
+    for(int n=parameters.length-1;n>=0;n--)
+      result = new IfExp(matchTest((Domain) patterns.get(n),parameters[n]),
+			 result,
+			 QuoteExp.falseExp);
+    
+    return result;
+  }
+  
+  private static gnu.expr.Expression matchTest(Domain d, gnu.expr.Expression parameter)
+  {
+    if(d == Domain.bot)
+      return QuoteExp.trueExp;
+
+    ListIterator types = d.getMonotype().getTC().getJavaInstanceTypes();
+    
+    gnu.expr.Expression res =
+      instanceOfExp(parameter,(gnu.bytecode.Type) types.next());
+    
+    while(types.hasNext())
+      res = orExp(instanceOfExp(parameter,(gnu.bytecode.Type) types.next()),res);
+    return res;
+  }
+
+  private static final gnu.mapping.Procedure instanceProc = 
+    new kawa.standard.instance();
+  
+  static gnu.expr.Expression instanceOfExp(gnu.expr.Expression value, gnu.bytecode.Type ct)
+  {
+    gnu.expr.Expression[] callParams = new gnu.expr.Expression[2];
+    callParams[0]=value;
+    callParams[1]=new QuoteExp(ct);
+    
+    return new ApplyExp(new QuoteExp(instanceProc),callParams);
+  }
+  
+  private static final gnu.mapping.Procedure orProc =
+    new kawa.standard.or();
+  
+  private static gnu.expr.Expression orExp(gnu.expr.Expression e1, gnu.expr.Expression e2)
+  {
+    gnu.expr.Expression[] callParams = new gnu.expr.Expression[2];
+    callParams[0]=e1;
+    callParams[1]=e2;
+    
+    return new ApplyExp(new QuoteExp(orProc),callParams);
+  }
   
   public String toString()
   {
     return method+Util.map("(",", ",")",patterns);
   }
 
+  /** The bytecode class this alternative is defined in */
+  ClassType definitionClass;
+
+  PrimProcedure primProcedure;
+  
   String method;
   List /* of Domain */ patterns;
 

@@ -12,7 +12,7 @@
 
 // File    : ClassDefinition.java
 // Created : Thu Jul 01 11:25:14 1999 by bonniot
-//$Modified: Tue Nov 23 17:48:10 1999 by bonniot $
+//$Modified: Mon Nov 29 15:45:52 1999 by bonniot $
 
 package bossa.syntax;
 
@@ -152,9 +152,7 @@ public class ClassDefinition extends Node
 	Field f=(Field)i.next();
 
 	MonoSymbol s=f.sym;
-	List params=new LinkedList();
-	params.add(getMonotype());
-	MethodDefinition m=new MethodDefinition(s.name,new Constraint(typeParameters,null),s.type,params,true);
+	MethodDefinition m=new FieldAccessMethod(this,s.name,s.type,typeParameters);
 	res.add(m);
       }
     return res;
@@ -294,6 +292,15 @@ public class ClassDefinition extends Node
       return superClass(0);
   }
   
+  /**
+   * The abstract class associated with a concrete class.
+   * pre: this.isSharp()
+   */
+  ClassDefinition abstractClass()
+  {
+    return ((TypeConstructor) extensions.get(0)).definition;
+  }
+  
   static ClassType javaClass(ClassDefinition c)
   {
     if(c==null)
@@ -308,7 +315,7 @@ public class ClassDefinition extends Node
   ClassType javaSuperClass()
   {
     if(isSharp)
-      return superClass(0).javaSuperClass();
+      return abstractClass().javaSuperClass();
     
     return javaClass(distinguishedSuperClass());
   }
@@ -323,10 +330,16 @@ public class ClassDefinition extends Node
   private List /* of ClassDefinition */ illegitimateChildren = new LinkedList();
   private List /* of ClassDefinition */ illegitimateParents  = new LinkedList();
 
+  // child must be concrete
   private void addIllegitimateChild(ClassDefinition child)
   {
-    illegitimateChildren.add(child);
+    illegitimateChildren.add(child.abstractClass());
     child.illegitimateParents.add(this);
+  }
+  
+  List getIllegitimateChildren()
+  {
+    return illegitimateChildren;
   }
   
   /**
@@ -347,13 +360,13 @@ public class ClassDefinition extends Node
       return;
     
     // We are sharp, let's take our immediate parent
-    ClassDefinition me = superClass(0);
+    ClassDefinition me = abstractClass();
     
     for(Iterator i = listConcreteClasses();
 	i.hasNext();)
       {
 	ClassDefinition concrete = (ClassDefinition) i.next();
-	ClassDefinition that = concrete.superClass(0);
+	ClassDefinition that = concrete.abstractClass();
 	
 	if(
 	   that!=me &&
@@ -387,14 +400,43 @@ public class ClassDefinition extends Node
     
     classType.setSuper(javaSuperClass());
     addFields(classType);
-    superClass(0).addFields(classType);
+    abstractClass().addFields(classType);
     for(Iterator i = illegitimateParents.iterator();
 	i.hasNext();)
       ((ClassDefinition) i.next()).addFields(classType);
     
+    gnu.bytecode.Method constructor = classType.addMethod
+      ("<init>",
+       Access.PUBLIC,
+       new gnu.bytecode.Type[0],gnu.bytecode.Type.void_type
+       );
+    constructor.initCode();
+    gnu.bytecode.CodeAttr code = constructor.getCode();
+    gnu.bytecode.Variable thisVar = new gnu.bytecode.Variable();
+    thisVar.setName("this");
+    thisVar.setType(classType);
+    thisVar.setParameter(true);
+    thisVar.allocateLocal(code);
+
+    code.emitLoad(thisVar);
+    code.emitInvokeSpecial(constructor(javaSuperClass()));
+    code.emitReturn();
+    
     module.addClass(classType);
   }
 
+  private static gnu.bytecode.Method constructor(ClassType parent)
+  {
+    if(parent==null)
+      parent = gnu.bytecode.Type.pointer_type;
+    
+    return parent.addMethod
+      ("<init>",
+       Access.PUBLIC,
+       new gnu.bytecode.Type[0],gnu.bytecode.Type.void_type
+       );
+  }
+  
   private void addFields(ClassType c)
   {
     for(Iterator i=fields.iterator();

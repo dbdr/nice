@@ -12,7 +12,7 @@
 
 // File    : SymbolExpr.java
 // Created : Thu Jul 08 12:20:59 1999 by bonniot
-//$Modified: Thu Nov 18 18:30:53 1999 by bonniot $
+//$Modified: Mon Nov 29 20:44:41 1999 by bonniot $
 
 package bossa.syntax;
 
@@ -41,12 +41,14 @@ public class SymbolExp extends Expression
     return symbol.isAssignable();
   }
 
-  boolean isFieldAccess()
+  FieldAccessMethod getFieldAccessMethod()
   {
-    return symbol instanceof MethodDefinition
-      && ((MethodDefinition)symbol).isFieldAccess();
+    if(symbol instanceof FieldAccessMethod)
+      return (FieldAccessMethod)symbol;
+    else
+      return null;
   }
-  
+
   void computeType()
   {
     // Very important: each SymbolExp gets a copy of the type of the symbol.
@@ -72,9 +74,11 @@ public class SymbolExp extends Expression
     return new gnu.expr.ReferenceExp(symbol.name.toString(),symbol.decl);
   }
   
-  public gnu.expr.Declaration declaration()
+  gnu.expr.Expression compileAssign(Expression value)
   {
-    return symbol.decl;
+    Internal.warning(symbol.decl==null,this+" has no gnu decl");
+
+    return new gnu.expr.SetExp(symbol.decl,value.compile());
   }
   
   /****************************************************************

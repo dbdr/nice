@@ -12,7 +12,7 @@
 
 // File    : Expression.java
 // Created : Mon Jul 05 16:25:02 1999 by bonniot
-//$Modified: Tue Nov 09 11:24:24 1999 by bonniot $
+//$Modified: Mon Nov 29 20:45:13 1999 by bonniot $
 // Description : 
 
 package bossa.syntax;
@@ -61,9 +61,17 @@ public abstract class Expression extends Node
    * @return true iff this method codes
    * the access to the field of a class.
    */
-  boolean isFieldAccess()
+  final boolean isFieldAccess()
   {
-    return false;
+    return getFieldAccessMethod()!=null;
+  }
+
+  /**
+   * @return the FieldAccessMethod behind this expression, or null
+   */
+  FieldAccessMethod getFieldAccessMethod()
+  {
+    return null;
   }
   
   /**
@@ -177,7 +185,16 @@ public abstract class Expression extends Node
     return res;
   }
   
-  public gnu.expr.Declaration declaration()
+  gnu.expr.Expression compileAssign(Expression value)
+  {
+    Internal.error(this,this+" doesn't know how to be modified, it is a "+this.getClass());
+    return null;
+  }
+  
+  /**
+   * @return The declaration 
+   */
+  public Boolean declaration()
   {
     return null;
   }

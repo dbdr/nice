@@ -12,7 +12,7 @@
 
 // File    : JavaMethodDefinition.java
 // Created : Tue Nov 09 11:49:47 1999 by bonniot
-//$Modified: Mon Nov 15 12:00:02 1999 by bonniot $
+//$Modified: Mon Nov 29 14:46:01 1999 by bonniot $
 
 package bossa.syntax;
 
@@ -29,7 +29,6 @@ import java.util.*;
 public class JavaMethodDefinition extends MethodDefinition
 {
   /**
-   * @param c the class this method belongs to, or 'null'
    * @param name the name of the method
    * @param typeParameters the type parameters
    * @param constraint the constraint
@@ -38,6 +37,7 @@ public class JavaMethodDefinition extends MethodDefinition
    */
   public JavaMethodDefinition(
 			      // Informations about the java method
+			      // These 3 args are null if we are in an interface file
 			      String className,
 			      String methodName,
 			      List /* of String */ javaTypes,
@@ -63,7 +63,10 @@ public class JavaMethodDefinition extends MethodDefinition
     else
       javaArity=arity-1;
 
-    User.error(javaTypes.size()-1!=javaArity,
+    if(className==null)
+      MethodDefinition.addMethod(this);
+
+    User.error(javaTypes!=null && javaTypes.size()-1!=javaArity,
 	       this.name,
 	       "Native method "+this.name+" has not the same number of parameters in Java and Bossa !");
   }
@@ -106,18 +109,18 @@ public class JavaMethodDefinition extends MethodDefinition
     return res;
   }
 
-  public void compile(bossa.modules.Module module)
+  protected gnu.mapping.Procedure computeDispatchMethod()
   {
     ClassType c=ClassType.make(className);
-    dispatchMethod=new gnu.expr.PrimProcedure
+    return new gnu.expr.PrimProcedure
       (
        c.addMethod
        (methodName,
 	argumentsJavaTypes(),returnJavaType(),
 	flags)
-       );
+	);
   }
-
+  
   /****************************************************************
    * Module interface
    ****************************************************************/
@@ -126,23 +129,44 @@ public class JavaMethodDefinition extends MethodDefinition
   {
     s.print(toString());
   }
-  
-  /************************************************************
-   * Printing
-   ************************************************************/
 
-  public String toString()
+  private String interfaceString()
   {
     return
-      "native "
-      + type.codomain().toString()
+      type.codomain().toString()
       + " "
       + name
       + Util.map("<",", ",">",type.getTypeParameters())
       + type.getConstraint().toString()
       + "("
       + Util.map("",", ","",type.domain())
-      + ");\n"
-      ;
+      + ")"
+      + " = "
+      + returnJavaType().getName()
+      + " " + className
+      + "." + methodName
+      + mapGetName(argumentsJavaTypes())
+      + ";\n";
+  }
+  
+  private static String mapGetName(gnu.bytecode.Type[] types)
+  {
+    String res="(";
+    for(int n=0;n<types.length;n++)
+      {
+	if(n!=0)
+	  res+=", ";
+	res+=types[n].getName();
+      }
+    return res+")";
+  }
+    
+  /************************************************************
+   * Printing
+   ************************************************************/
+
+  public String toString()
+  {
+    return "native " + interfaceString();
   }
 }

@@ -12,7 +12,7 @@
 
 // File    : MonotypeConstructor.java
 // Created : Thu Jul 22 09:15:17 1999 by bonniot
-//$Modified: Tue Nov 16 19:33:28 1999 by bonniot $
+//$Modified: Thu Nov 25 15:17:44 1999 by bonniot $
 
 package bossa.syntax;
 
@@ -51,7 +51,7 @@ public class MonotypeConstructor extends Monotype
     return new MonotypeConstructor(tc,parameters,loc);
   }
 
-  gnu.bytecode.Type getJavaType()
+  public gnu.bytecode.Type getJavaType()
   {
     return tc.getJavaType();
   }

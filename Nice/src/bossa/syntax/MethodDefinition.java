@@ -12,7 +12,7 @@
 
 // File    : MethodDefinition.java
 // Created : Thu Jul 01 18:12:46 1999 by bonniot
-//$Modified: Thu Nov 18 18:32:26 1999 by bonniot $
+//$Modified: Mon Nov 29 20:28:23 1999 by bonniot $
 
 package bossa.syntax;
 
@@ -63,46 +63,17 @@ public class MethodDefinition extends PolySymbol implements Definition
     bossa.link.Dispatch.register(this);
   }
 
-  /** the Method is global */
-  public MethodDefinition(LocatedString name,
+  public MethodDefinition(LocatedString name, 
 			  Constraint constraint,
 			  Monotype returnType,
-			  List parameters,
-			  boolean isFieldAccess)
+			  List parameters)
   {
     this(null,name,constraint,returnType,parameters);
-    this.fieldAccess=isFieldAccess;
   }
-
-  public MethodDefinition(LocatedString name,
-			  Constraint constraint,
-			  Monotype returnType,
-			  List parameters
-			  )
-  {
-    this(name,constraint,returnType,parameters,false);
-  }
-
+  
   public Collection associatedDefinitions()
   {
     return null;
-  }
-  
-  /****************************************************************
-   * Native methods
-   ****************************************************************/
-
-  private static ArrayList methods = new ArrayList();
-  
-  static void addMethod(MethodDefinition m)
-  {
-    methods.add(m);
-  }
-  
-  static void compileMethods(bossa.modules.Module module)
-  {
-    for(Iterator i=methods.iterator();i.hasNext();)
-      ((MethodDefinition)i.next()).compile(module);
   }
   
   /** true iff the method was declared inside a class */
@@ -123,6 +94,23 @@ public class MethodDefinition extends PolySymbol implements Definition
   }
   
   /****************************************************************
+   * Native methods
+   ****************************************************************/
+
+  private static ArrayList methods = new ArrayList();
+  
+  static void addMethod(MethodDefinition m)
+  {
+    methods.add(m);
+  }
+  
+  static void compileMethods(bossa.modules.Module module)
+  {
+    for(Iterator i=methods.iterator();i.hasNext();)
+      ((MethodDefinition)i.next()).compile(module);
+  }
+  
+  /****************************************************************
    * Initial Context
    ****************************************************************/
 
@@ -135,24 +123,33 @@ public class MethodDefinition extends PolySymbol implements Definition
    * Code generation
    ****************************************************************/
 
-  protected gnu.mapping.Procedure dispatchMethod;
-  public gnu.mapping.Procedure getDispatchMethod() { return dispatchMethod; }
-  
-  private gnu.bytecode.Type type(Monotype m)
-  {
-    // FIXME
-    if(m.toString().equals("void"))
-      return gnu.bytecode.Type.void_type;
-    else
-      return ClassType.make(m.toString());
-  }
+  private gnu.mapping.Procedure dispatchMethod;
 
-  protected gnu.bytecode.Type javaReturnType()
+  protected gnu.mapping.Procedure computeDispatchMethod()
   {
-    return type(this.type.codomain());
+    return new gnu.expr.PrimProcedure
+      (
+       bossa.modules.Module.dispatchClass.addMethod
+       (bytecodeName(),
+	javaArgTypes(),javaReturnType(),
+	Access.PUBLIC|Access.STATIC|Access.FINAL)
+       );
   }
   
-  protected gnu.bytecode.Type[] javaArgTypes()
+  public final gnu.mapping.Procedure getDispatchMethod() 
+  { 
+    if(dispatchMethod==null)
+      dispatchMethod=computeDispatchMethod();
+    
+    return dispatchMethod;
+  }
+  
+  public gnu.bytecode.Type javaReturnType()
+  {
+    return this.type.codomain().getJavaType();
+  }
+  
+  public gnu.bytecode.Type[] javaArgTypes()
   {
     List domain=this.type.domain();
     gnu.bytecode.Type[] res=new ClassType[domain.size()];
@@ -164,15 +161,6 @@ public class MethodDefinition extends PolySymbol implements Definition
   
   public void compile(bossa.modules.Module module)
   {
-    dispatchMethod=new gnu.expr.PrimProcedure
-      (
-       module.dispatchClass.addMethod
-       (name.toString()
-	//+Pattern.bytecodeRepresentation(parameters)
-	,
-	javaArgTypes(),javaReturnType(),
-	Access.PUBLIC|Access.STATIC|Access.FINAL)
-       );
   }
 
   /****************************************************************
@@ -210,13 +198,8 @@ public class MethodDefinition extends PolySymbol implements Definition
   private ClassDefinition memberOf;
   protected int arity;
 
-  private boolean fieldAccess=false; 
-
   /** 
    * true if this method represent the access to the field of an object.
    */
-  public boolean isFieldAccess()
-  {
-    return fieldAccess;
-  }
+  public boolean isFieldAccess() { return false; }
 }

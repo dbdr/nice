@@ -12,7 +12,7 @@
 
 // File    : Module.java
 // Created : Wed Oct 13 16:09:47 1999 by bonniot
-//$Modified: Tue Nov 23 17:40:53 1999 by bonniot $
+//$Modified: Fri Nov 26 16:37:08 1999 by bonniot $
 
 package bossa.modules;
 
@@ -32,10 +32,13 @@ import java.io.*;
 
 public class Module
 {
+  final static String sourceExt = ".bossa";
+  final static String interfaceExt = ".bossi";
+  
   public Module(String name, List imports, List definitions)
   {
-    if(!name.endsWith(".bossa") 
-       && !name.endsWith(".bossi"))
+    if(!name.endsWith(interfaceExt) 
+       && !name.endsWith(sourceExt))
       User.error("Invalid file name: "+name);
     this.name=name.substring(0,name.lastIndexOf("."));
     this.imports=imports;
@@ -74,6 +77,7 @@ public class Module
 	if(Debug.passes)
 	  Debug.println("Linking");
 	link();
+	addClass(dispatchClass);
       }
   }
   
@@ -91,7 +95,7 @@ public class Module
       {
 	String name = ((LocatedString)i.next()).toString();
 	
-	Module m=Loader.open(name+".bossi");
+	Module m=Loader.open(name+interfaceExt);
 	m.load();
 	
 	// Get the alternatives from the bytecode file
@@ -100,7 +104,16 @@ public class Module
 	  gnu.bytecode.ClassType c = gnu.bytecode.ClassFileInput.readClassType(file);
 	  
 	  for(Method method=c.getMethods();method!=null;method=method.getNext())
-	    new bossa.link.Alternative(method.getName());
+	    {
+	      String methodName = method.getName();
+
+	      // "main" is not a real alternative
+	      if(methodName.equals("main")
+		 || methodName.startsWith("main$"))
+		continue;
+
+	      new bossa.link.Alternative(methodName,c,method);
+	    }
 	}
 	catch(IOException e){
 	  User.error("Module "+name+" is not compiled");
@@ -113,7 +126,7 @@ public class Module
    */
   private void saveInterface() throws IOException
   {
-    Writer f=new BufferedWriter(new FileWriter(name+".bossi"));
+    Writer f=new BufferedWriter(new FileWriter(name+interfaceExt));
     definitions.printInterface(new PrintWriter(f));
     f.close();
   }
@@ -133,8 +146,13 @@ public class Module
   
   public gnu.bytecode.ClassType bytecode;
 
-  public static final gnu.bytecode.ClassType dispatchClass
-    = new gnu.bytecode.ClassType("dispatchClass");
+  public static final gnu.bytecode.ClassType dispatchClass;
+  static
+  {
+    dispatchClass = new gnu.bytecode.ClassType("dispatchClass");
+    dispatchClass.setSuper(Type.pointer_type);
+    dispatchClass.setModifiers(Access.PUBLIC|Access.FINAL);
+  }
   
   /**
    * Creates bytecode for the alternatives defined in the module.
@@ -148,27 +166,42 @@ public class Module
     addClass(bytecode);
   }
 
+  public gnu.expr.ModuleExp moduleExp;
+  
   /**
    * Creates bytecode for the alternatives defined in the module.
-   * Not implemented yet.
    */
-//    private void generateCode()
-//    {
-//      gnu.expr.ModuleExp moduleExp = new gnu.expr.ModuleExp();
-//      moduleExp.setFile(name+".bossa");
-//      moduleExp.mustCompile = true;
-//      //definitions.compile(moduleExp);
-//    }
+  private void generateCode2()
+  {
+    moduleExp = new gnu.expr.ModuleExp();
+    moduleExp.setFile(name+sourceExt);
+    moduleExp.mustCompile = true;
+    definitions.compile(this);
+    try{
+      moduleExp.compileToArchive(name+".zip");
+    }
+    catch(IOException e){
+      User.error("Could not write code for "+this);
+    }    
+  }
 
   public void addClass(ClassType c)
   {
     try{
-      c.setSourceFile(name+".bossa");
+      c.setSourceFile(name+sourceExt);
       c.writeToFile();
     }
     catch(IOException e){
       User.error("Could not write code for "+this);
     }    
+  }
+
+  public gnu.bytecode.Method addDispatchMethod(MethodDefinition def)
+  {
+    return dispatchClass.addMethod
+      (def.bytecodeName(),
+       Access.PUBLIC|Access.STATIC|Access.FINAL,
+       def.javaArgTypes(),def.javaReturnType());
   }
   
   /****************************************************************
@@ -177,7 +210,8 @@ public class Module
 
   private void link()
   {
-    bossa.link.Dispatch.test();
+    bossa.link.Dispatch.test(this);
+    
   }
   
   public String toString()

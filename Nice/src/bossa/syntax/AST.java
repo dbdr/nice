@@ -12,7 +12,7 @@
 
 // File    : AST.java
 // Created : Thu Jul 01 11:01:56 1999 by bonniot
-//$Modified: Mon Nov 15 13:03:47 1999 by bonniot $
+//$Modified: Fri Nov 26 17:33:14 1999 by bonniot $
 
 package bossa.syntax;
 
@@ -63,7 +63,7 @@ public class AST extends Node
   public void compile(bossa.modules.Module module)
   {
     // compile all the field accesses that have been generated
-    FieldAccessMethod.compileMethods(module);
+    MethodDefinition.compileMethods(module);
     
     for(Iterator i=definitions.iterator();i.hasNext();)
       ((Definition)i.next()).compile(module);

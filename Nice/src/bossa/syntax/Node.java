@@ -12,7 +12,7 @@
 
 // File    : Node.java
 // Created : Thu Jul 08 10:24:56 1999 by bonniot
-//$Modified: Wed Nov 17 18:22:30 1999 by bonniot $
+//$Modified: Fri Nov 26 17:34:37 1999 by bonniot $
 
 package bossa.syntax;
 
@@ -30,7 +30,7 @@ abstract public class Node
   static final int down    = 2;
   static final int upper   = 3;
   static final int none    = 4;
-  
+
   Node(int propagate)
   {
     this(null,propagate);

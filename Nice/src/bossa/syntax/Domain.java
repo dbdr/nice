@@ -12,7 +12,7 @@
 
 // File    : Domain.java
 // Created : Sat Jul 24 19:10:04 1999 by bonniot
-//$Modified: Tue Nov 16 20:00:50 1999 by bonniot $
+//$Modified: Thu Nov 25 15:00:57 1999 by bonniot $
 
 package bossa.syntax;
 
@@ -56,6 +56,13 @@ public class Domain
     return res;
   }
 
+  public Monotype getMonotype()
+  {
+    Internal.error(monotype==null,"Null monotype");
+    
+    return monotype;
+  }
+  
   // TODO: make better
   public final static Domain bot = null;
   

@@ -12,7 +12,7 @@
 
 // File    : CallExp.java
 // Created : Mon Jul 05 16:27:27 1999 by bonniot
-//$Modified: Tue Nov 09 15:15:50 1999 by bonniot $
+//$Modified: Mon Nov 29 20:46:12 1999 by bonniot $
 
 package bossa.syntax;
 
@@ -92,7 +92,7 @@ public class CallExp extends Expression
 
       if(fun.isFieldAccess())
 	{
-	  // There must be just one parameter
+	  // There must be just one parameter in a field access
 	  User.error(loc,Util.map("",", ","",parameters)+
 		     " has no field "+fun);
 	}
@@ -184,6 +184,14 @@ public class CallExp extends Expression
     return new gnu.expr.ApplyExp(fun.compile(),compile(parameters));
   }
   
+  gnu.expr.Expression compileAssign(Expression value)
+  {
+    if(!fun.isFieldAccess())
+      Internal.error(this,"Assignment to a call that is not a field access.");
+    
+    return fun.getFieldAccessMethod().compileAssign(parameters,value);
+  }
+
   /****************************************************************
    * Printing
    ****************************************************************/

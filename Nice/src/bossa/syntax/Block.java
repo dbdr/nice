@@ -12,7 +12,7 @@
 
 // File    : Block.java
 // Created : Wed Jul 07 17:42:15 1999 by bonniot
-//$Modified: Mon Nov 15 16:25:41 1999 by bonniot $
+//$Modified: Wed Nov 24 19:02:53 1999 by bonniot $
 // Description : A block : a list of statements with local variables
 
 package bossa.syntax;
@@ -161,7 +161,7 @@ public class Block extends Statement
 	else
 	  eVal[n]=local.value.compile();
 	local.left.decl=res.addDeclaration(local.left.name.toString(),
-					   gnu.bytecode.ClassType.make(local.left.type.toString()));
+					   local.left.type.getJavaType());
 	local.left.decl.setCanRead(true);
 	
       }

@@ -12,7 +12,7 @@
 
 // File    : Monotype.java
 // Created : Thu Jul 01 19:28:28 1999 by bonniot
-//$Modified: Tue Nov 16 19:31:10 1999 by bonniot $
+//$Modified: Mon Nov 29 11:52:39 1999 by bonniot $
 // Description : Abstract syntactic type, without constraint
 
 package bossa.syntax;
@@ -63,7 +63,7 @@ abstract public class Monotype
   /**
    * Returns the name of a java class that is decribed by this type
    */
-  gnu.bytecode.Type getJavaType()
+  public gnu.bytecode.Type getJavaType()
   {
     return gnu.bytecode.Type.pointer_type;
   }
@@ -119,13 +119,13 @@ abstract public class Monotype
 
   public TypeConstructor getTC()
   {
-    User.error("decomposeTC should not be called in class "+getClass());
+    User.error("getTC should not be called in class "+getClass());
     return null;
   }
   
   public TypeParameters getTP()
   {
-    User.error("decomposeTP should not be called in class "+getClass());
+    User.error("getTP should not be called in class "+getClass());
     return null;
   }
   

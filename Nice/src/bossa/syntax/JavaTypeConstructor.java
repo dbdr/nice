@@ -12,7 +12,7 @@
 
 // File    : JavaTypeConstructor.java
 // Created : Thu Jul 08 11:51:09 1999 by bonniot
-//$Modified: Mon Nov 15 20:03:23 1999 by bonniot $
+//$Modified: Tue Nov 30 15:23:16 1999 by bonniot $
 
 package bossa.syntax;
 
@@ -127,12 +127,17 @@ public class JavaTypeConstructor extends TypeConstructor
   static void addJavaTypes(TypeScope globalTypeScope)
   // Called by Node
   {
-    // We need to remeber it in order to add new java classes on the fly (see "lookup" below)
-    JavaTypeConstructor.globalTypeScope=globalTypeScope;
-    
-    globalTypeScope.addSymbol(JavaTypeConstructor.make("void",gnu.bytecode.Type.void_type));
+    // We need to remember it in order to add new java classes on the fly (see "lookup" below)
+    JavaTypeConstructor.globalTypeScope = globalTypeScope;
+
+    TypeConstructor voidTC = JavaTypeConstructor.make("void",gnu.bytecode.Type.void_type);
+    voidType = new MonotypeConstructor(voidTC,null,Location.nowhere());
+
+    globalTypeScope.addSymbol(voidTC);
   }
 
+  public static Monotype voidType;
+  
   private static TypeScope globalTypeScope;
   
   /****************************************************************

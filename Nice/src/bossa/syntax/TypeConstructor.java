@@ -12,7 +12,7 @@
 
 // File    : TypeConstructor.java
 // Created : Thu Jul 08 11:51:09 1999 by bonniot
-//$Modified: Mon Nov 15 20:02:56 1999 by bonniot $
+//$Modified: Mon Nov 29 12:26:37 1999 by bonniot $
 
 package bossa.syntax;
 
@@ -136,6 +136,25 @@ public class TypeConstructor
   gnu.bytecode.Type getJavaType()
   {
     return gnu.bytecode.ClassType.make(name.content);
+  }
+
+  /**
+   * @return a list L of gnu.bytecode.Type such that
+   * a bytecode value V is below 'this' iff
+   * there exists T in L such that V instanceof T
+   */
+  public ListIterator getJavaInstanceTypes()
+  {
+    List illegitimateChildren = definition.getIllegitimateChildren();
+    
+    List res = new ArrayList(1+illegitimateChildren.size());
+    res.add(this.getJavaType());
+    
+    for(Iterator i = illegitimateChildren.iterator();
+	i.hasNext();)
+      res.add(((ClassDefinition) i.next()).tc.getJavaType());
+    
+    return res.listIterator();
   }
   
   /****************************************************************

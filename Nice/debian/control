@@ -14,7 +14,7 @@ Description: Extension of Java with parametric types, multi-methods, and more.
  .
  It extends Java with many advanced features:
    * Parametric types: this is especially useful for containers 
-     (list, hast-tables) and allows for shorter and safer code.
+     (lists, hash-tables) and allows for shorter and safer code.
    * Anonymous functions: functions can be created and manipulated as 
      first-class expressions, just like in Lisp and ML. 
      This is much lighter than Java's anonymous classes in many situations, 

@@ -126,3 +126,17 @@ void f(B a, String s, int i = 0) { }
   override String foo(String);
   foo(null) = null;
   foo(String s) = s;
+
+/// PASS
+  /// Toplevel
+abstract interface I {
+  void foo();
+}
+
+abstract class A {
+  void foo() {}
+}
+
+class B extends A implements I {}
+
+foo(B(I) b) {}

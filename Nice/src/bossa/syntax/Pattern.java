@@ -37,6 +37,7 @@ public abstract class Pattern implements Located
   private TypeIdent additional;
   TypeConstructor tc;
   TypeConstructor tc2;
+  mlsub.typing.Interface itf2;
 
   // The class constraint verified by this pattern.
   private mlsub.typing.Constraint constraint;
@@ -108,7 +109,16 @@ public abstract class Pattern implements Located
       }
     if (additional != null)
       {
-	tc2 = additional.resolveToTC(scope);
+        TypeSymbol sym = additional.resolveToTypeSymbol(scope);
+
+        if (sym instanceof TypeConstructor)
+          tc2 = (TypeConstructor) sym;
+        else if (sym instanceof mlsub.typing.Interface)
+          itf2 = (mlsub.typing.Interface) sym;
+        else
+          User.error(additional,
+                     additional + " should be a class or an interface");
+
 	additional = null;
       }
 
@@ -219,6 +229,8 @@ public abstract class Pattern implements Located
 
     if (tc2 != null)
       Typing.leq(tc2, rawType);
+    else if (itf2 != null)
+      Typing.assertImp(rawType.head(), itf2, false);
   }
 
   static TypeConstructor[] getTC(Pattern[] patterns)

@@ -1,0 +1,106 @@
+/**************************************************************************/
+/*                          Nice Eclipse-Plugin                           */
+/*                          (c) Alex Greif 2003                           */
+/*                                                                        */
+/*  This program is free software; you can redistribute it and/or modify  */
+/*  it under the terms of the GNU General Public License as published by  */
+/*  the Free Software Foundation; either version 2 of the License, or     */
+/*  (at your option) any later version.                                   */
+/*                                                                        */
+/**************************************************************************/
+
+package nice.eclipse.ui.editors.syntaxhighlight;
+
+import java.util.*;
+
+import org.eclipse.jface.text.source.*;
+
+
+import org.eclipse.jface.text.presentation.*;
+import org.eclipse.jface.text.rules.*;
+import org.eclipse.jface.text.*;
+import org.eclipse.swt.*;
+import org.eclipse.swt.graphics.*;
+
+
+
+
+
+let String NICE_TEXT_COLOR_DEFAULT = "nice_text_color_default";
+let String NICE_TEXT_COLOR_COMMENT = "nice_text_color_comment";
+let String NICE_TEXT_COLOR_KEYWORD = "nice_text_color_keyword";
+let String NICE_TEXT_COLOR_STRING = "nice_text_color_string";
+
+
+let String[] NICE_KEYWORDS = [
+				"fun", "static", "final", "transient", "volatile", 
+				"const", "let", "extends", "implements", "abstract", 
+				"public", "private", "var", "class", "interface", 
+				"override", "new", "else", "native", "inline", "import", 
+				"package", "alike", "Any", "return", "break", "continue", 
+				"super", "try", "catch", "finally", "throw", "instanceof", 
+				"requires", "ensures", "assert", "do"];
+
+
+let String[] NICE_WORD_FRAGMENT_KEYWORDS = [
+				"@", "!", "=>", "?", "#"];
+
+
+
+Token Token(TextAttribute) = native new Token(Object);
+
+
+
+
+
+
+IToken getNiceSourceToken(String type) {
+	Token newToken = new Token(getNiceSourceTextAttribute(type));
+	return newToken;
+}
+
+
+
+TextAttribute getNiceSourceTextAttribute(String);
+
+getNiceSourceTextAttribute(type) {
+	return getNiceSourceTextAttribute(NICE_TEXT_COLOR_DEFAULT);
+}
+
+getNiceSourceTextAttribute(NICE_TEXT_COLOR_DEFAULT) {
+	return new TextAttribute(new Color(org.eclipse.swt.widgets.Display.getCurrent(), new RGB(0,0,0)), null, SWT.NORMAL);
+}
+
+getNiceSourceTextAttribute(NICE_TEXT_COLOR_COMMENT) {
+	return new TextAttribute(new Color(org.eclipse.swt.widgets.Display.getCurrent(), new RGB(255,0,0)), null, SWT.NORMAL);
+}
+
+getNiceSourceTextAttribute(NICE_TEXT_COLOR_KEYWORD) {
+	return new TextAttribute(new Color(org.eclipse.swt.widgets.Display.getCurrent(), new RGB(0,0,255)), null, SWT.NORMAL);
+}
+
+getNiceSourceTextAttribute(NICE_TEXT_COLOR_STRING) {
+	return new TextAttribute(new Color(org.eclipse.swt.widgets.Display.getCurrent(), new RGB(100,100,100)), null, SWT.NORMAL);
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

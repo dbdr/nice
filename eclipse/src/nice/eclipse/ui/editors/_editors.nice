@@ -18,5 +18,6 @@ import org.eclipse.ui.texteditor.*;
 
 
 import nice.eclipse.core;
+import nice.eclipse.ui.editors.syntaxhighlight;
 
 

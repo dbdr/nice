@@ -1,0 +1,122 @@
+/**************************************************************************/
+/*                          Nice Eclipse-Plugin                           */
+/*                          (c) Alex Greif 2003                           */
+/*                                                                        */
+/*  This program is free software; you can redistribute it and/or modify  */
+/*  it under the terms of the GNU General Public License as published by  */
+/*  the Free Software Foundation; either version 2 of the License, or     */
+/*  (at your option) any later version.                                   */
+/*                                                                        */
+/**************************************************************************/
+
+package nice.eclipse.ui.editors.syntaxhighlight;
+
+
+
+
+class AbstractSourceScanner extends BufferedRuleBasedScanner {
+	
+	//	initializer
+	{
+		this.initializeRules();
+	}
+	
+	
+	List<IRule> createRules();
+	createRules() {
+		return new ArrayList();
+	}
+	
+	void initializeRules() {
+		this.setRules(this.createRules().toArray());
+	}
+}
+
+
+
+
+
+class NiceSourceScanner extends AbstractSourceScanner {
+
+	createRules() {
+		List<IRule> rules = new ArrayList();
+
+		IToken token;
+		
+		//	Strings
+		token = getNiceSourceToken(NICE_TEXT_COLOR_STRING);
+		rules.add(new SingleLineRule("'", "'", token));
+		
+		token = getNiceSourceToken(NICE_TEXT_COLOR_STRING);
+		rules.add(new SingleLineRule("\"", "\"", token));
+		
+		//	Comment
+		token = getNiceSourceToken(NICE_TEXT_COLOR_COMMENT);
+		rules.add(new EndOfLineRule("//", token));
+
+		token = getNiceSourceToken(NICE_TEXT_COLOR_COMMENT);
+		rules.add(new MultiLineRule("/*", "*/", token));
+		
+		
+		//	Default
+		token = getNiceSourceToken(NICE_TEXT_COLOR_DEFAULT);
+		this.setDefaultReturnToken(token);
+		WordRule wordRule = new WordRule(new NiceWordDetector(), token);
+		rules.add(wordRule);
+
+		
+
+		//	Keywords
+		token = getNiceSourceToken(NICE_TEXT_COLOR_KEYWORD);
+		for (String keyword : NICE_KEYWORDS)
+			wordRule.addWord(keyword, token);	
+		
+		for (String keyword : NICE_WORD_FRAGMENT_KEYWORDS)
+			rules.add(new NiceWordFragmentPatternRule(keyword, null, token));
+
+		return rules;
+	}
+}
+
+
+
+
+
+public class NiceWordDetector implements IWordDetector {
+
+	isWordStart(c) {
+		return Character.isLetter(c) ||
+				'_' == c;
+	}
+
+	isWordPart(c) {
+		return Character.isLetterOrDigit(c) ||
+				'_' == c;
+	}
+}
+
+
+
+/**
+ * 	This Rule finds Strings independantly where they are in the line.
+ */
+class NiceWordFragmentPatternRule extends SingleLineRule {
+	//	This method is called if the start-sequence was found. 
+	//	so we can return true, that means, that the string was found
+	endSequenceDetected(scanner) {
+		return true;
+	}
+}
+
+
+
+
+
+
+
+
+
+
+
+
+

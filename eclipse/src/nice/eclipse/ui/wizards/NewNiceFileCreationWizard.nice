@@ -1,0 +1,113 @@
+/**************************************************************************/
+/*                          Nice Eclipse-Plugin                           */
+/*                          (c) Alex Greif 2003                           */
+/*                                                                        */
+/*  This program is free software; you can redistribute it and/or modify  */
+/*  it under the terms of the GNU General Public License as published by  */
+/*  the Free Software Foundation; either version 2 of the License, or     */
+/*  (at your option) any later version.                                   */
+/*                                                                        */
+/**************************************************************************/
+
+package nice.eclipse.ui.wizards;
+
+
+
+
+
+public class NewNiceFileCreationWizard extends Wizard implements INewWizard {
+	NiceFileCreationWizardPage wizardPage = cast(null);
+	IStructuredSelection selection = cast(null);
+	IWorkbench workbench = cast(null);
+
+	addPages() {
+		wizardPage = new NiceFileCreationWizardPage(workbench: workbench,
+										"niceFileCreationPage",	//	pageName
+										selection	//	selection
+										);
+		this.addPage(wizardPage);
+	}
+
+	//void init(IWorkbench aWorkbench,IStructuredSelection currentSelection) {
+	init(aWorkbench, currentSelection) {
+		workbench = notNull(aWorkbench);
+		selection = notNull(currentSelection);
+	}
+	
+	performFinish(){
+		return wizardPage.finish();
+	}
+
+}
+
+
+
+
+
+class NiceFileCreationWizardPage 
+	extends WizardNewFileCreationPage 
+	//implements SelectionListener
+{
+	IWorkbench workbench;
+	String pageName = cast(null);
+	IStructuredSelection selection = cast(null);
+
+	//	initializer
+	{
+		this.setTitle("Create Nice File");
+		this.setDescription("Create a new Nice file resource");
+		//this.setImageDescriptor(ImageDescriptor.createFromFile(getClass(),"icons/logicbanner.gif"));  //$NON-NLS-1$
+	}
+
+
+
+	validatePage() {return super;}
+
+
+
+	createControl(parentComposite) {
+		super;
+		this.setFileName("untitled.nice");  //$NON-NLS-2$//$NON-NLS-1$
+
+		this.setPageComplete(this.validatePage());
+	}
+
+
+	boolean finish() {
+		?IFile newFile = this.createNewFile();
+		if (newFile == null) 
+			return false;  // ie.- creation was unsuccessful
+	
+		// Since the file resource was created fine, open it for editing
+		// iff requested by the user
+		try {
+			?IWorkbenchWindow dwindow = workbench.getActiveWorkbenchWindow();
+			if (dwindow != null) {
+				?IWorkbenchPage page = dwindow.getActivePage();
+				if (page != null) 
+					page.openEditor(newFile);
+			}
+		} 
+		catch (org.eclipse.ui.PartInitException e) {
+			e.printStackTrace();
+			return false;
+		}
+
+		return true;
+	}
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

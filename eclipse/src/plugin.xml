@@ -53,7 +53,7 @@
 		</category>
 		<wizard 
 			id="net.sf.nice.new_nice_project_creation_wizard"
-			name="NewNiceProject.label"
+			name="Nice Project"
 			class="nice.eclipse.ui.wizards.NewProjectCreationWizard"
 			category="net.sf.nice.nice_wizard_category"
 			project="true"
@@ -61,7 +61,15 @@
 			preferredPerspectives="net.sf.nice.nice_perspective"
 			icon="icons/full/ctool16/newjprj_wiz.gif">
 			<description>NewNiceProject.description</description>
-	    </wizard>	
+	  </wizard>	
+	  <wizard
+			id="net.sf.nice.new_nice_file_creation_wizard"
+			name="Nice Source File"
+			class="nice.eclipse.ui.wizards.NewNiceFileCreationWizard"
+			category="net.sf.nice.nice_wizard_category"
+			icon="icons/full/ctool16/newclass_wiz.gif">
+			<description>Create a Nice File</description>
+		</wizard>
 	</extension>
 
 
@@ -101,11 +109,13 @@
          point="org.eclipse.ui.editors">
       <editor
             name="Nice Editor"
+            default="true"
             icon="icons/full/ctool16/nice_page.gif"
             extensions="nice"
             class="nice.eclipse.ui.editors.NiceFileEditor"
-            id="net.sf.nice.nice_file_editor">
-           <!--contributorClass="net.sf.nice.internal.ui.niceeditor.NiceEditorActionContributor"-->
+            id="net.sf.nice.nice_file_editor"
+            >
+            <!--contributorClass="net.sf.nice.ui.editors.NiceEditorActionContributor"-->
       </editor>
    </extension>
 

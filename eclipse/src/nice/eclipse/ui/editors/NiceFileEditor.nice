@@ -15,8 +15,13 @@ package nice.eclipse.ui.editors;
 
 class NiceFileEditor extends TextEditor {
 	
+	
+	setSourceViewerConfiguration(sourceViewerConfiguration) {super;}
+	
+	
 	initializeEditor() {
 		this.configurePreferenceStore();
+		this.setSourceViewerConfiguration(new NiceSourceViewerConfiguration());
 	}
 	
 	setPreferenceStore(preferenceStore) {
@@ -31,4 +36,23 @@ class NiceFileEditor extends TextEditor {
 	}
 	
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 

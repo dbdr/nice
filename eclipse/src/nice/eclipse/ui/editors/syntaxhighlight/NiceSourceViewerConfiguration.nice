@@ -9,22 +9,32 @@
 /*                                                                        */
 /**************************************************************************/
 
-package nice.eclipse.ui.wizards;
+package nice.eclipse.ui.editors.syntaxhighlight;
 
-import org.eclipse.ui.*;
-import org.eclipse.ui.wizards.newresource.*;
-import org.eclipse.ui.dialogs.*;
-import org.eclipse.core.resources.*;
-import org.eclipse.core.runtime.*;
-import org.eclipse.jdt.internal.ui.actions.*;
-import org.eclipse.jface.operation.*;
-import org.eclipse.jface.viewers.*;
-import org.eclipse.jface.wizard.*;
-import org.eclipse.ui.actions.*;
 
-import nice.eclipse.core;
-import nice.eclipse.ui;
-import nice.eclipse.util;
+
+class NiceSourceViewerConfiguration extends SourceViewerConfiguration {
+
+	getPresentationReconciler(sourceViewer) {
+		PresentationReconciler presReconciler = new PresentationReconciler();
+		
+		DefaultDamagerRepairer dr = new DefaultDamagerRepairer(new NiceSourceScanner());
+		presReconciler.setDamager(dr, IDocument.DEFAULT_CONTENT_TYPE);
+		presReconciler.setRepairer(dr, IDocument.DEFAULT_CONTENT_TYPE);
+
+		return presReconciler;
+	}
+	
+	
+	
+	
+}
+
+
+
+
+
+
 
 
 

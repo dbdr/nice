@@ -32,6 +32,7 @@ import nice.eclipse.ui.views;
 import nice.eclipse.ui.editors;
 import nice.eclipse.ui.preferences;
 import nice.eclipse.ui.properties;
+import nice.eclipse.ui.editors.syntaxhighlight;
 import nice.eclipse.core.builder;
 
 

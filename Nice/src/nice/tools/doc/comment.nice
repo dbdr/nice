@@ -1,0 +1,73 @@
+/**************************************************************************/
+/*                                N I C E                                 */
+/*             A high-level object-oriented research language             */
+/*                        (c) Daniel Bonniot 2004                         */
+/*                                                                        */
+/*  This program is free software; you can redistribute it and/or modify  */
+/*  it under the terms of the GNU General Public License as published by  */
+/*  the Free Software Foundation; either version 2 of the License, or     */
+/*  (at your option) any later version.                                   */
+/*                                                                        */
+/**************************************************************************/
+
+package nice.tools.doc;
+
+class Comment {
+    //a list of tuples that maps tags, such as @param, to values
+    //this value is initialised by the custom constructor
+    ArrayList<(?String,String)> tags = cast(null);
+    String commentStr = "";
+    
+    /*Initialisation*/
+    {
+        tags = parse(commentStr);
+    }
+}
+
+ArrayList<(?String,String)> parse(String comments) {
+    //an initial capacity of 8 is used becuase I don't expect many values
+    ArrayList<(?String,String)> list = new ArrayList(8);
+    StringBuffer buf = new StringBuffer(comments);
+    //the first and last chars should be '/'
+    if(buf.charAt(0) == '/' && buf.charAt(buf.length() - 1) == '/') {
+        buf.deleteCharAt(0);
+        buf.deleteCharAt(buf.length()-1);
+    }
+    //else do something
+    for(int i = 0; i < buf.length; /*no increment*/) {
+        if(buf.charAt(i) == '*' && (i == 0 || buf.charAt(i-1) == '\n')) {
+            buf.deleteCharAt(i);
+        }
+        else {
+            i++;
+        }
+    }
+    for(int i = 0; i < buf.length; i++) {
+        if(buf.charAt(i) == '\n') {
+            buf.replace(i, i+1, " ");
+        }
+    }
+    StringTokenizer st = new StringTokenizer(buf.toString(), "@", true /*return delimiters*/);
+    boolean isParam = false;
+    for(int i = 0; st.hasMoreTokens(); i++) {
+        //println("\"Token " i ": " st.nextToken().trim() "\"");
+        String token = st.nextToken().trim();
+        if(token.equals("@")) {
+            //the next token will be a param string
+            isParam = true;
+        }
+        else if(isParam) {
+            /*this token will have the form "<param name> <comment string>"
+             *extract the param name and insert it as the key.  add the rest as a comment
+             */
+            int index = token.indexOf(' ');
+            list.add(("@" token.substring(0, index), token.substring(index+1)));
+            isParam = false;
+        }
+        else {
+            //this is a general comment
+            list.add((null, token));
+        }
+    }
+    return list;
+}

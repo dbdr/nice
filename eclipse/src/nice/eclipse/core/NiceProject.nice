@@ -52,9 +52,13 @@ class NiceProject implements IProjectNature, INiceElement {
 
 
 
-
+	
 	void removeFromBuildSpec(String builderID) {
-		throw new Exception("not implemented yet");
+		let description = project.getDescription();
+		let commands = description.getBuildSpec();
+		let newCommands = commands.filter(ICommand c => ! c.getBuilderName().equals(builderID));
+		description.setBuildSpec(newCommands);
+		project.setDescription(description, null);
 		/*
 		IProjectDescription description = getProject().getDescription();
 		ICommand[] commands = description.getBuildSpec();

@@ -22,3 +22,5 @@ import org.eclipse.core.resources.*;
 
 
 IWorkspace getWorkspace() = native IWorkspace ResourcesPlugin.getWorkspace();
+
+

@@ -18,8 +18,8 @@ first: parser
 	cd src;\
 	${JAVAC} bossa/modules/Package.java nice/tools/runJar.java nice/tools/code/*.java gnu/bytecode/dump.java ../stdlib/nice/*/*.java
 
-recompile:
-	${JAVAC} src/bossa/modules/Package.java
+recompile: parser
+	${JAVAC} -Xdepend src/bossa/modules/Package.java
 #	${JAVAC} bossa/*/*.java nice/**/*.java mlsub/*/*.java ../stdlib/nice/lang/*.java
 
 recompileGNU:

@@ -46,6 +46,11 @@ public class ConstantExp extends Expression
 	 value, representation, location);
   }
   
+  boolean isZero()
+  {
+    return ((Number) this.value).intValue() == 0;
+  }
+
   void computeType()
   {
     // The type is known at creation.

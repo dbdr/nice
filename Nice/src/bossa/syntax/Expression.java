@@ -83,8 +83,7 @@ public abstract class Expression
   
   boolean isZero()
   {
-    return this instanceof ConstantExp &&
-      ((Number) ((ConstantExp) this).value).intValue() == 0;
+    return false;
   }
 
   boolean isFalse()

@@ -8,3 +8,6 @@
 
 /// PASS
   ?String[][][?][?] s = new String[1][1][][];
+
+/// FAIL
+  new int[""];

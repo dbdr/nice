@@ -17,7 +17,7 @@
 
 package nice.lang;
 
-// Operators to manipulate java.math.BigInteger.
+// Operators to manipulate java.math.BigInteger and java.math.BigDecimal.
 
 import java.math.*;
 
@@ -47,3 +47,12 @@ BigInteger `~`(BigInteger) = native BigInteger BigInteger.not();
    implementations that use < and boolean negation.
 */
 `<`(BigInteger x, BigInteger y) = x.compareTo(y) < 0;
+
+
+BigDecimal `-`(BigDecimal) = native BigDecimal BigDecimal.negate();
+BigDecimal `+`(BigDecimal, BigDecimal) = native BigDecimal BigDecimal.add(BigDecimal);
+BigDecimal `-`(BigDecimal, BigDecimal) = native BigDecimal BigDecimal.subtract(BigDecimal);
+BigDecimal `*`(BigDecimal, BigDecimal) = native BigDecimal BigDecimal.multiply(BigDecimal);
+BigDecimal `/`(BigDecimal x, BigDecimal y) = x.divide(y, BigDecimal.ROUND_HALF_UP);
+
+`<`(BigDecimal x, BigDecimal y) = x.compareTo(y) < 0;

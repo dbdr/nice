@@ -35,5 +35,5 @@ public interface Module extends mlsub.compilation.Module
   gnu.expr.ReferenceExp addMethod(gnu.expr.LambdaExp method, 
 				  boolean packageMethod);
   gnu.expr.ClassExp getClassExp(NiceClass def);
-  void addImplementationClass(gnu.expr.ClassExp classe);
+  void addUserClass(gnu.expr.ClassExp classe);
 }

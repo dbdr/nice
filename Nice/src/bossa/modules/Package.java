@@ -609,21 +609,17 @@ public class Package implements mlsub.compilation.Module, Located, bossa.syntax.
       Internal.error("Compiled class " + def + " was not found");
     
     ClassExp res = new ClassExp(classe);
-    addImplementationClass(res);
+    addUserClass(res);
     return res;
   }
 
-  public void addImplementationClass(gnu.expr.ClassExp classe)
+  public void addUserClass(gnu.expr.ClassExp classe)
   {
     thisPkg.addClass(classe);
 
-    /* If a class need an outer frame (for instance if the constructor
-       defines an anonymous function), then use the dispatch class.
-       The implementation class would be inappropriate, since it is
-       not regenerated when importing a compiled package, while
-       classes and the dispatch class are. 
-    */
-    classe.outer = dispatchClass;
+    // A class only needs an outer frame if we are compiling the package.
+    if (compiling())
+      classe.outer = getImplementationClass();
   }
 
   public gnu.expr.Declaration addGlobalVar(String name, Type type, boolean constant)

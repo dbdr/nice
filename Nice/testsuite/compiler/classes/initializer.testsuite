@@ -170,7 +170,7 @@ class A
   /// package b import a
   assert new A().x;
 
-/// PASS bug
+/// PASS
   /// package a
   /// Toplevel
   class TestA {

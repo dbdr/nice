@@ -599,7 +599,7 @@ public class NiceClass extends ClassDefinition.ClassImplementation
     definition.location().write(res);
     res.setSimple(true);
     res.setAccessFlags(definition.getBytecodeFlags());
-    definition.module.addImplementationClass(res);
+    definition.module.addUserClass(res);
     return res;
   }
 

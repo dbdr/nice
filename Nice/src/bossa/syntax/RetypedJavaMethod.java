@@ -108,7 +108,7 @@ public class RetypedJavaMethod extends JavaMethod
 		 "Class " + className + " was not found");
     
     if(!(holder instanceof ClassType))
-      User.error(this, className + " is a primitive type");
+      User.error(className, className + " is a primitive type");
     
     className = new LocatedString(holder.getName(), className.location());
     
@@ -136,7 +136,10 @@ public class RetypedJavaMethod extends JavaMethod
       ((ClassType) holder).getDeclaredMethod (methodName, javaArgType);
     
     if(reflectMethod == null)
-      User.error(this, "Method " + methodName + 
+      User.error(className, 
+                 (methodName.equals("<init>") 
+                  ? "Constructor"
+                  : "Method " + methodName) + 
 		 " was not found in class " + holder.getName());
 
     // use the following, or the Type.flushTypeChanges() in SpecialTypes

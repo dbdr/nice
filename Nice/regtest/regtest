@@ -32,7 +32,7 @@ compile()
 
 execute()
 {
-  $JAVA -classpath "$1.jar":${CLASSPATH} regtest.$1.fun
+  $JAVA -classpath "$1.jar":..:${CLASSPATH} regtest.$1.fun
 }
 
 ### Regression test suite

@@ -268,9 +268,18 @@ filter<C,T>(v@Vector, test)
  * Standard operations
  ****************************************************************/
 
+<Any T> boolean has (Sequence<T> s, T->boolean test)
+{
+  for (int i = 0; i < s.size(); i++)
+    if (test(s.get(i)))
+      return true;
+
+  return false;
+}
+
 <Any T> T find (Sequence<T> s, T->boolean test)
 {
-  for (int i = 0; i < s.size(); i = i + 1)
+  for (int i = 0; i < s.size(); i++)
     if (test(s.get(i)))
       return s.get(i);
 
@@ -288,7 +297,7 @@ filter<C,T>(v@Vector, test)
 
 <Any T> ?T find (Sequence<!T> s, !T->boolean test)
 {
-  for (int i = 0; i < s.size(); i = i + 1)
+  for (int i = 0; i < s.size(); i++)
     if (test(s.get(i)))
       return s.get(i);
 

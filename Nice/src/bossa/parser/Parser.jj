@@ -51,7 +51,6 @@ class Parser
   {
     return new IdentExp(new LocatedString(name, loc));
   }
-  static List globalDefinitions;
 }
 PARSER_END(Parser)
 
@@ -1031,14 +1030,13 @@ ClassDefinition classDefinition(Constraint cst, List definitions, boolean storeD
       (
 	LOOKAHEAD( methodBodyDefinitionLookahead() )
 	m = methodBodyDefinition(impl)
-	{ globalDefinitions.add(m); }
+	{ definitions.add(m); }
       |
         m = internalMethodOrFunction(res)
         { 
           if (methods == null)
             methods = new ArrayList(5);
           methods.add(m);
-	  //globalDefinitions.add(m);
         }
       ) 
       { if (storeDocString && t.specialToken != null && t.specialToken.kind == FORMAL_COMMENT)
@@ -1501,7 +1499,6 @@ Definition definition(List definitions, boolean storeDocString):
 void readDefinitions(List definitions,boolean storeDocString):
 {
   Definition d;
-  globalDefinitions = definitions;
   Token t;
 }
 { { t = getToken(1); }

@@ -993,10 +993,12 @@ void getField(NiceClass c, List fields):
   Expression value = null;
 }
 {
-  ( ( "final" | "const" ) { isFinal=true; } ("public" | "private")
-  | "public"  | "public-read" [ "private-write" ]
-  | "private" | "private-write"
-  | {}
+  ( 
+    "public-read" [ "private-write" ]
+  | "private-write"
+  | ( ("public" | "private" | {} ) 
+    [ ( "final" | "const" ) { isFinal=true; } ]
+    )
   ) 
   [ "transient" { isTransient = true; } ]
   [ "volatile"  { isVolatile  = true; } ]

@@ -54,14 +54,7 @@ public class Package implements mlsub.compilation.Module, Located, bossa.syntax.
     if (res != null)
       return res;
     
-    try{
-      return new Package(lname, compilation, isRoot);
-    }
-    catch(ExceptionInInitializerError e){
-      e.getException().printStackTrace();
-      Internal.error("Exception in initializer: "+e.getException());
-      return null;
-    }
+    return new Package(lname, compilation, isRoot);
   }
 
   /****************************************************************

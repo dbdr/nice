@@ -300,7 +300,7 @@ typecheck(e@IfExp)
     enterElse();
 
     if (notNullInElse != null)
-      notNullInElse.iter(MonoSymbol variable => {
+      notNullInElse.foreach(MonoSymbol variable => {
 	mlsub.typing.Monotype type = notNull(variable.type);
 	mlsub.typing.Monotype sureType = makeSure(type);
 	setVarType(variable, now: sureType, brothers: type);
@@ -427,7 +427,7 @@ typecheck(b@Block)
 {
   b.statements = rewrite(b.statements);
 
-  b.locals.iter(?Block.LocalDeclaration d => typecheck(d));
+  b.locals.foreach(?Block.LocalDeclaration d => typecheck(d));
   b.statements.foreach
   (?Statement s => {
     try { typecheck(s); } 
@@ -551,7 +551,7 @@ typecheck(r@ReturnStmt)
 typecheck(t@TryStmt)
 {
   typecheck(t.body);
-  t.catches.iter(TryStmt.Catch c => typecheck(c.body));
+  t.catches.foreach(TryStmt.Catch c => typecheck(c.body));
   typecheck(t.finallyBody);
 }
 

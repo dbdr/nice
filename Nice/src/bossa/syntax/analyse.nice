@@ -178,10 +178,10 @@ class Info
   }
 
   void addVars(Array<?MonoSymbol> symbols) = 
-    symbols.iter(?MonoSymbol s => this.addVar(notNull(s)));
+    symbols.foreach(?MonoSymbol s => this.addVar(notNull(s)));
   
   void addTypeVars(Array<TypeSymbol> symbols) = 
-    symbols.iter(TypeSymbol s => this.typeVars[s.toString()] = s);
+    symbols.foreach(TypeSymbol s => this.typeVars[s.toString()] = s);
 }
 
 void checkInitialized(Block.LocalVariable.Symbol sym, Info info,
@@ -554,7 +554,7 @@ analyse(decl@Block.LocalFunction, info)
 analyse(b@Block, info)
 {
   info.begin();
-  notNull(b.locals).iter(Block.LocalDeclaration l => analyse(l, info));
+  notNull(b.locals).foreach(Block.LocalDeclaration l => analyse(l, info));
   analyse(b.statements, info);
   info.end();
 }
@@ -622,7 +622,7 @@ analyse(s@LabeledStmt, info)
 
 private LabeledStmt findLabel(LocatedString label, Info info) 
 {
-  return info.labels.findLast(fun(LabeledStmt l)=> l.name.equals(label.toString()));
+  return info.labels.findLast(LabeledStmt l => l.name.equals(label.toString()));
 }
 
 private LabeledStmt mustFindLabel(LocatedString label, Info info) 
@@ -678,7 +678,7 @@ analyse(t@TryStmt, info)
   info.beginCases();
   analyse(t.body, info);
 
-  t.catches.iter(TryStmt.Catch c =>{
+  t.catches.foreach(TryStmt.Catch c =>{
     info.otherCase();
     info.begin();
     info.addVar(notNull(c.exnVar));

@@ -15,3 +15,13 @@ void stripChar(char c, boolean b) {
   // Capture a long.
   long l = 0;
   [1].foreach(int i => { println(l); });
+
+
+/// PASS bug
+  boolean b = false;
+  [].foreach(int x => {
+    [].foreach(int y => {
+      if (true || false)
+	b = true;
+    });
+  });

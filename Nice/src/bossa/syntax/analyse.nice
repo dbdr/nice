@@ -929,14 +929,6 @@ analyse(SynchronizedStmt s, info)
   analyse(s.body, info);
 }
 
-/****************************************************************
- * Misc
- ****************************************************************/
-
-bossa.util.UserError error(?bossa.util.Located responsible, String message) = 
-     native bossa.util.UserError bossa.util.User.error
-     (bossa.util.Located, String);
-
 // Local Variables:
 // nice-xprogram: "../bin/nicec -d ../classes --sourcepath=../src"
 // End:

@@ -132,6 +132,10 @@ public final class Dispatch
     for (Iterator it = alternatives.iterator(); it.hasNext();)
       {
 	Alternative a = (Alternative) it.next();
+        if (len != a.patterns.length)
+	  Internal.error("Expected number of patterns is " + len + 
+		".\nThe incorrect alternative: " + a);
+
 	for (int i = 0; i < len; i++)
 	  if (! a.patterns[i].atAny())
 	    res[2*i] = res[2*i + 1] = true;

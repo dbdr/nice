@@ -69,13 +69,13 @@ public class AbstractInterface extends MethodContainer
 }
 
 public AbstractInterface createAbstractInterface(LocatedString name, 
-			   MethodContainer.Constraint typeParameters, 
+			   ClassConstraint typeParameters, 
 			   List<?boolean> typeParametersVariances,
 			   List<MonotypeConstructor> extensions
 			  )
 {
-  let res = new AbstractInterface(name, Node.global, typeParameters,
-	 typeParametersVariances, extensions: extensions);
+  let res = new AbstractInterface(name, Node.global, classConstraint: typeParameters,
+	 variance: makeVariance(typeParametersVariances), extensions: extensions);
 
   res.itf = new Interface(res.variance, name.toString());
   res.addTypeSymbol(res.itf);

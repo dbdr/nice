@@ -46,7 +46,7 @@ NiceFieldAccess createNiceFieldAccess(NiceField field)
   let argType = Monotype.sure(classDef.lowlevelMonotype());
 
   let params = createFormalParameters([new Parameter(type: Monotype.create(argType))]);
-  let constr = Constraint.create(classDef.getBinders());
+  let constr = bossa.syntax.Constraint.create(classDef.getBinders());
   let res = new NiceFieldAccess(field.getName(), Node.down,
 	parameters: params,
         syntacticConstraint: constr.toString(),

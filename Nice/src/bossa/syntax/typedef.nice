@@ -35,7 +35,7 @@ public abstract class TypeDefinition extends MethodContainer
   mlsub.typing.TypeConstructor tc = cast(null);
   ?ClassImplementation implementation = null;
   ?gnu.bytecode.Type javaType = null;
-  ?List<int> typeParametersVariances = null;
+  ?List<?boolean> typeParametersVariances = null;
  
 	// Interfaces
   ?List<MonotypeConstructor> implementations = new LinkedList(); 
@@ -370,7 +370,7 @@ public abstract class TypeDefinition extends MethodContainer
     notNull(implementation).recompile();
   }
 
-  MethodContainer.Constraint specialize(?MethodContainer.Constraint our,
+  ClassConstraint specialize(?ClassConstraint our,
                                         mlsub.typing.Monotype[?] params)
   {
     if (params == null)
@@ -410,11 +410,8 @@ public abstract class TypeDefinition extends MethodContainer
       atoms.add(new MonotypeLeqCst(m1: v, m2: bossa.syntax.Monotype.create(params[i])));
     }
 
-    return new MethodContainer.Constraint(
-       binders.toArray(),
-       atoms,
-       typeParameters,
-       this.location());
+    return new ClassConstraint(binders, atoms,
+	typeParameters: cast(typeParameters));
   }
 
 
@@ -719,7 +716,7 @@ public ?mlsub.typing.Constraint getTypeDefResolvedConstraint(mlsub.typing.TypeCo
 }
 
 //used in mlsub.typing.Enumeration
-public mlsub.typing.Monotype[] getTypeDefTypeParameters(mlsub.typing.TypeConstructor tc)
+public mlsub.typing.Monotype[?] getTypeDefTypeParameters(mlsub.typing.TypeConstructor tc)
 {
    return notNull(getTypeDefinition(tc)).getTypeParameters();
 }
@@ -757,7 +754,7 @@ public mlsub.typing.Monotype[] getTypeDefTypeParameters(mlsub.typing.TypeConstru
    Returns a monotype based on this tc, provided that the class
    requires exactly these type parameters because it specializes its parent.
  */
-?mlsub.typing.Monotype getTypeWithTC(TypeConstructor tc, mlsub.typing.Monotype[] sourceParams )
+?mlsub.typing.Monotype getTypeWithTC(TypeConstructor tc, mlsub.typing.Monotype[?] sourceParams )
 {
   ?TypeDefinition def = cast(getTypeDefinition(tc));
 
@@ -776,7 +773,7 @@ public mlsub.typing.Monotype[] getTypeDefTypeParameters(mlsub.typing.TypeConstru
   for (int i = 0; i < fullParams.length; i++)
     if (params[i] == null)
       {
-        fullParams[i] = sourceParams[paramMap[i]];
+        fullParams[i] = notNull(sourceParams)[paramMap[i]];
         used++;
       }
     else
@@ -853,8 +850,8 @@ int getVariance(?MonotypeConstructor parent)
   
 ClassDefinition makeClass(LocatedString name,
 		    boolean isFinal, boolean isAbstract,
-		    ?MethodContainer.Constraint typeParameters,
-		    List<int> typeParametersVariances,
+		    ?ClassConstraint typeParameters,
+		    List<?boolean> typeParametersVariances,
 		    MonotypeConstructor superClassIdent,
 		    ?List<MonotypeConstructor> implementations,
 		    ?List<MonotypeConstructor> abstractions )
@@ -864,7 +861,7 @@ ClassDefinition makeClass(LocatedString name,
   if (isAbstract) mod.makeAbstract();
 
   return new ClassDefinition(
-     name, Node.upper, typeParameters,
+     name, Node.upper, classConstraint: typeParameters,
      modifiers : mod,
      typeParametersVariances : typeParametersVariances,
      superClassIdent : superClassIdent,
@@ -873,14 +870,14 @@ ClassDefinition makeClass(LocatedString name,
 }
 
 InterfaceDefinition makeInterface(LocatedString name, 
-   		 ?MethodContainer.Constraint typeParameters,
-   		 List<int> typeParametersVariances,
+   		 ?ClassConstraint typeParameters,
+   		 List<?boolean> typeParametersVariances,
 	     ?List<MonotypeConstructor> extensions,
 	     ?List<MonotypeConstructor> implementations,
 	     ?List<MonotypeConstructor> abstractions )
 {
   return new InterfaceDefinition(
-     name, Node.upper, typeParameters,
+     name, Node.upper, classConstraint: typeParameters,
      typeParametersVariances : typeParametersVariances, 
 	 extensions : extensions,
 	 implementations : implementations,

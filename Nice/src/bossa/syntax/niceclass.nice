@@ -60,7 +60,7 @@ public class CNiceClass extends NiceClass
 
   TypeDefinition getDefinition() = definition;
 
-  public mlsub.typing.Monotype[] getTypeParameters() = definition.getTypeParameters();
+  public mlsub.typing.Monotype[] getTypeParameters() = notNull(definition.getTypeParameters());
 
   public void addField(MonoSymbol sym, ?Expression value, boolean isFinal,
 	boolean isTransient, boolean isVolatile, ?String docString)
@@ -428,7 +428,7 @@ public class CNiceClass extends NiceClass
         // class to the corresponding symbol in the constructor.
 	scope = new TypeScope(scope);
         map = new HashMap();
-        let ourTypeParameters = definition.getTypeParameters();
+        let ourTypeParameters = notNull(definition.getTypeParameters());
 	for (int i = 0; i < ourTypeParameters.length; i++)
 	  try {
             TypeSymbol ourSym = asTypeSymbol(ourTypeParameters[i]);
@@ -459,7 +459,7 @@ public class CNiceClass extends NiceClass
 
   private List<(?MethodDeclaration, List<Parameter>)> 
 		getConstructorParameters(?List<mlsub.typing.AtomicConstraint> constraints, 
-		mlsub.typing.Monotype[] typeParameters)
+		mlsub.typing.Monotype[?] typeParameters)
   {
     let supTC = definition.getSuperClass();
 
@@ -533,7 +533,7 @@ public class CNiceClass extends NiceClass
     else 
       constraints = new LinkedList();
 
-    mlsub.typing.Monotype[] typeParameters = definition.getTypeParameters();
+    mlsub.typing.Monotype[?] typeParameters = definition.getTypeParameters();
 
     List<(?MethodDeclaration, List<Parameter>)> allConstructorParams = 
       this.getConstructorParameters(constraints, typeParameters);
@@ -562,7 +562,7 @@ public class CNiceClass extends NiceClass
 	// There might be simpler code to do this, and we could avoid
 	// duplicating the type variables.
 	if (parent instanceof JavaMethod && ! notNull(parent.getType()).isMonomorphic())
-	  specificCst = identifyTypeParameters(cst, parent, typeParameters);
+	  specificCst = identifyTypeParameters(cst, parent, notNull(typeParameters));
 
         let cname = new LocatedString("<init>",definition.location());
         let ctype = new mlsub.typing.Polytype(specificCst, new mlsub.typing.FunType(Monotype.resolve(definition.getLocalScope(), values.types()),Monotype.sure(new mlsub.typing.MonotypeConstructor(definition.getTC(), definition.getTypeParameters()))));

@@ -321,7 +321,7 @@ typecheck(decl@Block.LocalVariable)
   if (value == null)
     return;
 
-  MonoSymbol target = decl.getLeft();
+  MonoSymbol target = decl.left();
 
   try{
     decl.value = checkAssignment(notNull(target.getType()), value);
@@ -332,6 +332,11 @@ typecheck(decl@Block.LocalVariable)
 			    String.valueOf(target.getMonotype), 
 			    value);
   }
+}
+
+typecheck(decl@Block.LocalConstant)
+{
+  typecheck(decl.value);
 }
 
 typecheck(decl@Block.LocalFunction)

@@ -151,7 +151,11 @@ class Info
 
   void addVar(PolySymbol symbol)
   {
-    symbol.type = notNull(symbol.syntacticType).resolve(this.typeMap);
+    if (symbol.type == null)
+      {
+	symbol.type = notNull(symbol.syntacticType).resolve(this.typeMap);
+	symbol.syntacticType = null;
+      }
     this.vars[symbol.name.toString()] = symbol;
   }
 
@@ -421,10 +425,16 @@ analyse(decl@Block.LocalVariable, info)
   info.addVar(notNull(decl.left));
 }
 
+analyse(decl@Block.LocalConstant, info)
+{
+  decl.value = analyse(decl.value, info);
+  notNull(decl.left).type = notNull(decl.value).getType();
+  info.addVar(notNull(decl.left));
+}
+
 analyse(decl@Block.LocalFunction, info)
 {
-  if (decl.value != null)
-    decl.value = analyse(decl.value, info);
+  decl.value = analyse(decl.value, info);
   info.addVar(notNull(decl.left));
 }
 

@@ -1,7 +1,7 @@
 /**************************************************************************/
 /*                                N I C E                                 */
 /*             A high-level object-oriented research language             */
-/*                        (c) Daniel Bonniot 2000                         */
+/*                        (c) Daniel Bonniot 2002                         */
 /*                                                                        */
 /*  This program is free software; you can redistribute it and/or modify  */
 /*  it under the terms of the GNU General Public License as published by  */
@@ -37,7 +37,33 @@ public class Block extends Statement
 
   static abstract class LocalDeclaration extends Statement
   {
-    abstract gnu.expr.Expression compile(gnu.expr.LetExp let);
+    abstract String getName();
+    abstract VarSymbol getSymbol();
+    abstract gnu.bytecode.Type getBytecodeType();
+
+    Expression value;
+
+    gnu.expr.Expression initValue()
+    {
+      return value.generateCode();
+    }
+
+    public Location location()
+    {
+      return getSymbol().name.location();
+    }
+
+    gnu.expr.Expression compile(gnu.expr.LetExp let)
+    {
+      gnu.expr.Declaration decl = 
+	let.addDeclaration(getName(), getBytecodeType());
+      decl.noteValue(null);
+      if (! getSymbol().isAssignable())
+	decl.setFlag(gnu.expr.Declaration.IS_CONSTANT);
+      getSymbol().setDeclaration(decl);
+
+      return initValue();
+    }
 
     public gnu.expr.Expression generateCode()
     {
@@ -46,36 +72,12 @@ public class Block extends Statement
     }
   }
 
-  public static class LocalVariable extends LocalDeclaration
+  public static abstract class LocalValue extends LocalDeclaration
   {
-    public LocalVariable(LocatedString name, Monotype type, Expression value)
+    public LocalValue()
     {
-      this.value = value;
-      this.left = new MonoSymbol(name,type);
       this.last = this;
     }
-    
-    gnu.expr.Expression compile(gnu.expr.LetExp let)
-    {
-      gnu.expr.Declaration decl = 
-	let.addDeclaration(left.name.toString(), Types.javaType(left.type));
-      decl.noteValue(null);
-      left.setDeclaration(decl);
-
-      if (value == null)
-	return Types.defaultValue(left.type);
-      else
-	return value.generateCode();
-    }
-
-    public Location location()
-    {
-      return left.name.location();
-    }
-
-    Expression value;
-    MonoSymbol left;
-    public MonoSymbol getLeft() { return left; }
 
     /* 
        Local variables are chained to handle multiple var declarations like
@@ -83,11 +85,64 @@ public class Block extends Statement
        We have to be careful about the order, so that dependencies like above
        work as expected.
     */
-    LocalVariable next, last;
+    LocalValue next, last;
+  }
+
+  public static class LocalVariable extends LocalValue
+  {
+    public LocalVariable(LocatedString name, Monotype type, 
+			 boolean constant, Expression value)
+    {
+      this.value = value;
+      if (constant)
+	this.left = new MonoSymbol(name,type) { 
+	    boolean isAssignable() { return false; }
+	  };
+      else
+	this.left = new MonoSymbol(name,type);
+      this.last = this;
+    }
+    
+    String getName() { return left.name.toString(); }
+    VarSymbol getSymbol() { return left; }
+    gnu.bytecode.Type getBytecodeType() { return Types.javaType(left.type); }
+
+    gnu.expr.Expression initValue()
+    {
+      if (value == null)
+	return Types.defaultValue(left.type);
+      else
+	return value.generateCode();
+    }
+
+    MonoSymbol left;
 
     public void addNext(LocatedString name, Expression value)
     {
-      last.next = new LocalVariable(name, left.syntacticType, value);
+      last.next = new LocalVariable(name, left.syntacticType, 
+				    left.isAssignable(), value);
+      last = last.next;
+    }
+  }
+
+  public static class LocalConstant extends LocalValue
+  {
+    public LocalConstant(LocatedString name, Expression value)
+    {
+      this.value = value;
+      this.left = new PolySymbol(name,null);
+      this.last = this;
+    }
+    
+    String getName() { return left.name.toString(); }
+    VarSymbol getSymbol() { return left; }
+    gnu.bytecode.Type getBytecodeType() { return Types.javaType(left.type); }
+
+    PolySymbol left;
+
+    public void addNext(LocatedString name, Expression value)
+    {
+      last.next = new LocalConstant(name, value);
       last = last.next;
     }
   }
@@ -114,6 +169,10 @@ public class Block extends Statement
       this.left = symbol;
     }
 
+    String getName() { return left.name.toString(); }
+    VarSymbol getSymbol() { return left; }
+    gnu.bytecode.Type getBytecodeType() { return Types.javaType(left.type); }
+
     mlsub.typing.Polytype inferredReturnType()
     {
       return ((FunExp) value).inferredReturnType();
@@ -124,25 +183,7 @@ public class Block extends Statement
       return Types.codomain(left.getType());
     }
 
-    gnu.expr.Expression compile(gnu.expr.LetExp let)
-    {
-      gnu.expr.Declaration decl = 
-	let.addDeclaration(left.name.toString(),
-			   Types.javaType(left.type));
-      decl.noteValue(null);
-      left.setDeclaration(decl);
-
-      return value.generateCode();
-    }
-
-    public Location location()
-    {
-      return left.name.location();
-    }
-
-    Expression value;
     FunSymbol left;
-    public FunSymbol getLeft() { return left; }
   }
 
   ArrayList /* of LocalDeclaration */ locals = new ArrayList();
@@ -169,9 +210,9 @@ public class Block extends Statement
 	if (s == null) // emptyStatement
 	  continue;
 	
-        if (s instanceof LocalVariable)
+        if (s instanceof LocalValue)
           {
-            LocalVariable decl = (LocalVariable) s;
+            LocalValue decl = (LocalValue) s;
             do
               {
                 locals.add(decl);

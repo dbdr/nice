@@ -194,6 +194,7 @@ TOKEN: /* Keywords */
 | < PROTECTED:  "protected"  	>
 | < STATIC:     "static"     	>
 | < FINAL:      "final"      	>
+| < CONST:      "const"      	>
 | < NATIVE:     "native"     	> /* Nice specific */
 | < INLINE:     "inline"        > /* Nice specific */
 | < ABSTRACT:   "abstract"   	>
@@ -903,7 +904,7 @@ void getField(List fields):
   boolean isFinal=false;
 }
 {
-  ( "final" { isFinal=true; } 
+  ( ( "final" | "const" ) { isFinal=true; } 
   | "public" | "private"
   )* 
   field=monoSymbol() ";" 
@@ -949,7 +950,7 @@ ClassDefinition classDefinition():
    }
    // internal fields and methods
    (
-      LOOKAHEAD( [ "final" | "public" | "private" ] monoSymbol() ";" )
+      LOOKAHEAD( [ "final" | "const" | "public" | "private" ] monoSymbol() ";")
       getField(fields)
     |
       [ "public" | "private" ]
@@ -1964,10 +1965,15 @@ Statement BlockStatement(List statements) :
 { Statement res; }
 {
   (
-  LOOKAHEAD([ "final" ] monotype() <IDENT>)
-  res=LocalDeclaration() 
-|
   res=LocalTupleDeclaration(statements)
+|
+  LOOKAHEAD( "final" | "const" | monotype() <IDENT>)
+  (
+    LOOKAHEAD( ( "final" | "const" ) <IDENT> "=" )
+    res = LocalConstant()
+  |
+    res = LocalDeclaration() 
+  )
 |
   res=Statement()
 /*
@@ -1980,25 +1986,46 @@ Statement BlockStatement(List statements) :
 
 Statement LocalDeclaration() :
 {
-  Monotype t;
+  Monotype t = null;
   LocatedString id;
   FormalParameters parameters;
   Statement body;
   Expression e=null;
+  boolean constant = false;
 }
 {
-  t=monotype()
+  [ ( "final" | "const" ) { constant = true; } ]
+  t = monotype()
   id=ident()
   (
     "(" parameters = formalParameters(false) ")" body = code() 
     { return Block.LocalFunction.make(id, t, parameters, body); }
   | 
     [ "=" e=Expression() ] 
-    { Block.LocalVariable res = new Block.LocalVariable(id,t,e); }
+    { Block.LocalVariable res = new Block.LocalVariable(id,t,constant,e); }
     ( "," id=ident() [ "=" e=Expression() ] { res.addNext(id,e); } )*
     ";" 
     { return res; }
   )
+}
+
+Statement LocalConstant() :
+{
+  LocatedString id;
+  FormalParameters parameters;
+  Statement body;
+  Expression e=null;
+  boolean constant = false;
+}
+{
+  ( "final" | "const" )
+  id=ident()
+  "=" 
+  e=Expression()
+  { Block.LocalConstant res = new Block.LocalConstant(id,e); }
+  ( "," id=ident() "=" e=Expression() { res.addNext(id,e); } )*
+  ";" 
+  { return res; }
 }
 
 Statement LocalTupleDeclaration(List statements) :
@@ -2013,14 +2040,14 @@ Statement LocalTupleDeclaration(List statements) :
   [ LOOKAHEAD(monotype() ident()) t=monotype() ] id=ident() 
   { variables.add(new IdentExp(id));
     if (t != null) {
-      statements.add(new Block.LocalVariable(id,t,null)); 
+      statements.add(new Block.LocalVariable(id,t,false,null)); 
       t = null;
     }
   }
   ( "," [ LOOKAHEAD(monotype() ident()) t=monotype() ] id=ident() 
   { variables.add(new IdentExp(id));
     if (t != null) {
-      statements.add(new Block.LocalVariable(id,t,null)); 
+      statements.add(new Block.LocalVariable(id,t,false,null)); 
       t = null;
     }
   }
@@ -2146,7 +2173,7 @@ Statement ForInit() :
 { Statement res; }
 {
   (
-  LOOKAHEAD( [ "final" ] monotype() <IDENT> )
+  LOOKAHEAD( [ "final" | "const" ] monotype() <IDENT> )
   res=LocalDeclaration()
 |
   res=StatementExpressionList() ";"

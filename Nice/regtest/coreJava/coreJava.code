@@ -94,7 +94,11 @@
     boolean test = 'a' != 'a';
     if (test) p("Oops!2");
   }
-  
+
+  // final variables
+  final String constant = "Constant String";
+  p(constant);
+
   //   LOOPS
   for (int i=0; i<6; ++i)
     {

@@ -60,11 +60,13 @@ deb:
 	@echo Creating Debian package version ${VERSION}
 	env CVSROOT=:pserver:anonymous@cvs.nice.sourceforge.net:/cvsroot/nice cvs-buildpackage -MNice -W${CVSBUILDDIR} -us -uc -rfakeroot -F
 
+.PHONY: dist
 dist ${TARFILE}: share/java/nice.jar
 	rm -rf ${TOP}/dist
 	mkdir ${TOP}/dist
 	$(MAKE) install DESTDIR=${TOP}/dist PREFIX="" 
 	cd ${TOP}/dist && tar -cf ../${TARFILE} . --owner=0 --group=0
+	rm -rf ${TOP}/dist
 
 install: share/java/nice.jar
 	mkdir -p ${INSTALLDIR}/bin ${INSTALLDIR}/share/java \

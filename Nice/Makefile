@@ -77,6 +77,9 @@ test:
 check:
 	/usr/bin/time java -Dassertions=true -classpath "classes" nice.tools.testsuite.TestNice testsuite
 
+coverage: share/java/nice.jar
+	$(MAKE) -C coverage all
+
 GCJ=gcj
 GCJJAR = /tmp/Nice-gcj.jar
 gcj:

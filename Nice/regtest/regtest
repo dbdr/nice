@@ -1,11 +1,16 @@
 #! /bin/sh
 
-NICE_TOP=$PWD
-# PWD return different values on different systems:
-# Nice/regtest with bash on Linux, Nice/ under sh on Digital Unix
-if expr match $NICE_TOP '.*regtest$' >/dev/null; then
-  NICE_TOP=`dirname $NICE_TOP`
+if [ -z $NICE_TOP ]; then
+
+  NICE_TOP=$PWD
+  # PWD return different values on different systems:
+  # Nice/regtest with bash on Linux, Nice/ under sh on Digital Unix
+  if expr match $NICE_TOP '.*regtest$' >/dev/null; then
+    NICE_TOP=`dirname $NICE_TOP`
+  fi
+
 fi
+
 export NICE_TOP
 
 JAVA=${JAVA-java}
@@ -27,7 +32,7 @@ compile()
 
 execute()
 {
-  $JAVA -jar "$1.jar"
+  $JAVA -classpath "$1.jar":${CLASSPATH} regtest.$1.fun
 }
 
 ### Regression test suite
@@ -102,7 +107,7 @@ pkg_ok=0
 pkg_broken=0
 
 for subdir in *; do
-  [ -r $subdir/main.nice -o -r $subdir/Makefile ] || continue
+  [ -r "$subdir"/main.nice -o -r "$subdir"/Makefile ] || continue
 
   pkg=`expr $pkg + 1`
 

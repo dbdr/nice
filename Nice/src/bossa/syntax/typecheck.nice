@@ -674,9 +674,9 @@ typecheck(r@ReturnStmt)
   if (function == null)
     throw bossa.util.User.error(r, "This return is not inside a function");
 
+  ?mlsub.typing.Monotype expectedType = function.getExpectedType();
   if (r.value != null)
     {
-      ?mlsub.typing.Monotype expectedType = function.getExpectedType();
       if (expectedType == null)
 	r.value = notNull(r.value).noOverloading();
       else
@@ -693,7 +693,8 @@ typecheck(r@ReturnStmt)
     }
   
   try{
-    function.checkReturnedType(r.returnType());
+    if ( !(r.fake && expectedType != null && nice.tools.code.Types.isVoid(expectedType)))
+      function.checkReturnedType(r.returnType());
   }
   catch(Function.WrongReturnType e){
     if (notNullError(notNull(e.typingException), r, String.valueOf(r.value)))

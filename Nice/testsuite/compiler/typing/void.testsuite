@@ -48,3 +48,12 @@ void f() = true;
 boolean doSomethingAndReturnAStatusBoolean() = false;
 
 void f() = doSomethingAndReturnAStatusBoolean();
+
+/// PASS
+  /// Toplevel
+  void f() = null;
+
+/// PASS
+  /// Toplevel
+  void foo() = bar();
+  ?String bar() = "abc";

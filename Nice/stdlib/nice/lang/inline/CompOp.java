@@ -10,7 +10,7 @@
 /*                                                                        */
 /**************************************************************************/
 
-package nice.tools.code;
+package nice.lang.inline;
 
 import gnu.mapping.Procedure2;
 import gnu.expr.*;
@@ -21,7 +21,7 @@ import gnu.bytecode.*;
 
    @author Daniel Bonniot
 */
-public class ComparisonOperators extends Procedure2 implements Inlineable
+public class CompOp extends Procedure2 implements Inlineable
 {
   private final static int
     error = 0,
@@ -32,7 +32,7 @@ public class ComparisonOperators extends Procedure2 implements Inlineable
     Gt = 5,
     Ne = 6;
 
-  public static ComparisonOperators create(String param)
+  public static CompOp create(String param)
   {
     char typeChar = param.charAt(0);
     PrimType argType;
@@ -65,10 +65,10 @@ public class ComparisonOperators extends Procedure2 implements Inlineable
       kind = Ne;
     else
       bossa.util.User.error("Unknown inlined numeric operator " + param);
-    return new ComparisonOperators(kind, argType);
+    return new CompOp (kind, argType);
   }
 
-  private ComparisonOperators(int kind, PrimType argType)
+  private CompOp (int kind, PrimType argType)
   {
     this.kind = kind;
     this.argType = argType;

@@ -10,7 +10,7 @@
 /*                                                                        */
 /**************************************************************************/
 
-package nice.lang.inl;
+package nice.lang.inline;
 
 import gnu.mapping.ProcedureN;
 import gnu.expr.*;

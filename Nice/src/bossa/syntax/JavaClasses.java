@@ -121,17 +121,13 @@ public final class JavaClasses
     
     if(Typing.isInRigidContext())
       // We should not add new classes at this point.
-      // The new TC should not implement top, as it would cause an error
-      // to assert it. It doesn't matter, as this type is not used
-      // explicitely.
+      // It doesn't matter, as this type is not used explicitely.
       {
 	Internal.warning(className + " added late");
 	
 	res.setKind(Variance.empty().getConstraint());
 	return res;
       }
-
-    res.rememberToImplementTop();
 
     Typing.introduce(res);
     
@@ -190,7 +186,7 @@ public final class JavaClasses
 
   /**
    * Loads the methods defined in the java class
-   * to make them available to the bossa code.
+   * to make them available to the nice code.
    */
   private static void fetchMethods(TypeConstructor tc, ClassType classType)
   {
@@ -198,9 +194,10 @@ public final class JavaClasses
       classType.addMethods();
     }
     catch(NoClassDefFoundError e){
-      User.error("Class "+e.getMessage().replace('/','.')+
-		 " was not found.\n"+
-		 "You probably need to install the corresponding package.");
+      User.warning("Class " + e.getMessage().replace('/','.') + 
+		   " was not found.\n" + 
+		   "It is refered to in class " + classType.getName() +
+		   "\nYou probably need to install the corresponding package.");
     }
     
     for (Field f = classType.getFields(); f != null; f = f.getNext())

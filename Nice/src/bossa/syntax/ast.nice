@@ -1,0 +1,185 @@
+/**************************************************************************/
+/*                                N I C E                                 */
+/*             A high-level object-oriented research language             */
+/*                        (c) Daniel Bonniot 2004                         */
+/*                                                                        */
+/*  This program is free software; you can redistribute it and/or modify  */
+/*  it under the terms of the GNU General Public License as published by  */
+/*  the Free Software Foundation; either version 2 of the License, or     */
+/*  (at your option) any later version.                                   */
+/*                                                                        */
+/**************************************************************************/
+
+package bossa.syntax;
+
+import bossa.util.*;
+
+/**
+   The Abstract Syntax Tree : a collection of definitions.
+
+   @see Definition
+
+ */
+public class CAST extends AST
+{
+  private Module module;
+  private ArrayList<TypeDefinition> classes = new ArrayList();
+  private ArrayList<MethodDeclaration> methods = new ArrayList();
+  private ArrayList<MethodBodyDefinition> methodImplementations = new ArrayList();
+  private ArrayList<GlobalVarDeclaration> globals = new ArrayList();
+  private ArrayList<CustomConstructor> customConstructors = new ArrayList();
+
+  void findElements()
+  {
+    for (node : children)
+      {
+	if (node instanceof TypeDefinition)
+	  classes.add(node);
+        else if (node instanceof CustomConstructor)
+          {
+            customConstructors.add(node);
+            methods.add(node);
+          }
+        else if (node instanceof MethodDeclaration)
+          methods.add(node);
+        else if (node instanceof MethodBodyDefinition)
+          methodImplementations.add(node);
+        else if (node instanceof EnumDefinition)
+          classes.add(node.classDef);
+        else if (node instanceof GlobalVarDeclaration)
+          globals.add(node);
+        else if (node instanceof DefaultMethodImplementation)
+          methods.add(node.getDeclaration());
+      }
+  }
+
+  buildScope()
+  {
+    this.buildScope(module);
+  }
+  
+  private void resolve(Node n)
+  {
+    try {
+      n.doResolve();
+    } catch(UserError ex) {
+      module.compilation().error(ex);
+    }
+  }
+
+  resolveScoping()
+  {
+    Node.setModule(module);
+
+    // Resolve custom constructors early, classes depend on them
+    for (cc : customConstructors)
+      this.resolve(cc);
+
+    // Classes are then resolved, since code can depend on them
+    for (c : classes)
+      this.resolve(c);
+
+    // Resolve all the rest
+    for (node : children)
+      this.resolve(node);
+
+    module.compilation().exitIfErrors();
+  }
+
+  typedResolve()
+  {
+    Node.setModule(module);
+
+    for (m : methods)
+      try {
+        m.typedResolve();
+      } catch(UserError ex) {
+        module.compilation().error(ex);
+      }
+
+    for (mi : methodImplementations)
+      try {
+        mi.lateBuildScope();
+      } catch(UserError ex) {
+        module.compilation().error(ex);
+      }
+
+    module.compilation().exitIfErrors();
+  }
+
+  localResolve()
+  {
+    Node.setModule(module);
+
+    for (d : children)
+      try {
+        assert (d instanceof Definition);
+        d.resolveBody();
+      } catch(UserError ex) {
+        module.compilation().error(ex);
+      }
+
+    module.compilation().exitIfErrors();
+
+    for (c : classes)
+      c.precompile();
+  }
+
+  typechecking(compiling)
+  {
+    Node.setModule(module);
+
+    // Classes are typechecked first, since code can depend on them.
+    for (c : classes)
+      c.typecheckClass();
+
+    if (! compiling)
+      {
+        for (m : methods)
+          m.typecheckCompiled();
+
+        return;
+      }
+
+    this.doTypecheck();
+
+    module.compilation().exitIfErrors();
+  }
+
+
+  /**
+     @param generateCode
+       false if the current module was already compiled and up-to-date.
+  */
+  compile(generateCode)
+  {
+    if (! generateCode)
+      {
+	for (c : classes)
+	  c.recompile();
+      }
+    else
+      {
+        // Globals are compiled first, so that we can find out their 
+        // dependencies, and initialize them in the right order.
+	for (g : globals)
+	  g.compile();
+
+	for (d : children)
+          {
+            assert (d instanceof Definition);
+	    d.compile();
+          }
+      }
+  }
+  
+  toString() = "Abstract Syntax Tree (" + this.numberOfDeclarations() +" declarations)";
+
+}
+
+public AST createAST(Module module, ?List<Definition> defs)
+{
+  let res = new CAST(defs || new ArrayList(), Node.global, module: module);
+  res.findElements();
+  return res;
+}

@@ -24,8 +24,6 @@ public class GlobalVarDeclaration extends Definition
   Expression value;
   boolean constant;
 
-  isGlobalVarDeclaration() = true;
-
   resolve()
   {
     value = analyse(value, notNull(scope), notNull(typeScope));

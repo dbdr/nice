@@ -94,6 +94,9 @@ public class dispatch
   public static mlsub.typing.Monotype getTypeWithTC(mlsub.typing.TypeConstructor tc, mlsub.typing.Monotype[] sourceParams )
   { return null; }
 
+  public static AST createAST(Module module, List defs)
+  { return null; }
+
   static bossa.util.UserError unknownIdent(LocatedString ident)
   {
     return null;

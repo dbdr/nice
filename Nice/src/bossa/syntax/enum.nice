@@ -33,9 +33,6 @@ public class EnumDefinition extends Definition
     this.addChild(sym);
   }
 
-  isEnumDefinition() = true;
-  getEnumClass() = classDef;
-
   resolve()
   {
     for (symbol : symbols)

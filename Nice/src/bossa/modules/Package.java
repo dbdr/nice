@@ -119,7 +119,7 @@ public class Package implements mlsub.compilation.Module, Located, bossa.syntax.
 
     definitions = new ArrayList();
     source.getDefinitions(definitions, shouldReload);
-    this.ast = new AST(this, definitions);
+    this.ast = bossa.syntax.dispatch.createAST(this, definitions);
     definitions = null;
     compilation.addNumberOfDeclarations(ast.numberOfDeclarations());
 

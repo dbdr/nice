@@ -244,6 +244,7 @@ MethodContainer.Constraint MethodContainer$Constraint(TypeSymbol[], List<AtomicC
 ?gnu.bytecode.Type TypeImport_lookup(LocatedString) = native gnu.bytecode.Type nice.tools.code.TypeImport.lookup(LocatedString);
 MethodBodyDefinition MethodBodyDefinition(NiceClass, LocatedString, ?Collection<LocatedString>, List<Pattern>, Statement) = native new MethodBodyDefinition(NiceClass, LocatedString, Collection, List, Statement);
 ?FormalParameters getFormalParameters(VarSymbol) = native FormalParameters VarSymbol.getFormalParameters();
+List<Node> children(Node) = native Node.children;
 
 // Retypings needed since java types are not strict.
 mlsub.typing.Polytype boolPolytype() = native PrimitiveType.boolPolytype;

@@ -532,25 +532,17 @@ void exitClosure()
   (levels, conditionalTypes) = closureEnvironments.pop();
 }
 
+var Stack<Map<MonoSymbol,mlsub.typing.Monotype>> deepMemory = new Stack();
+
 /**
  * Collect inference information from branches,
  * so that it can be propagated outwards.
  */
-class DeepMemoryRec {
-  MonoSymbol variable;
-  mlsub.typing.Monotype type;
-  toString() = "(" variable "," type ")";
-}
-var Stack<Stack<DeepMemoryRec>> deepMemory = new Stack();
-equals( DeepMemoryRec a, DeepMemoryRec b ) = a.variable == b.variable;
-
 void populateDeepMemory(MonoSymbol variable, mlsub.typing.Monotype type)
 {
   if(deepMemory.size() == 0) return;
   let branch = deepMemory.peek();
-  let rec = new DeepMemoryRec(variable: variable, type: type);
-  while( branch.removeElement( rec ) ){}
-  branch.push(rec);
+  branch.put( variable, type );
 }
 
 typecheck(IfExp e)
@@ -565,8 +557,8 @@ typecheck(IfExp e)
 
   enterBlock();
 
-  let Stack<DeepMemoryRec> ifBranchInference = new Stack();
-  let Stack<DeepMemoryRec> elseBranchInference = new Stack();
+  let Map<MonoSymbol,mlsub.typing.Monotype> thenBranchInference = new HashMap();
+  let Map<MonoSymbol,mlsub.typing.Monotype> elseBranchInference = new HashMap();
   deepMemory.push( elseBranchInference );
 
   try{
@@ -574,7 +566,7 @@ typecheck(IfExp e)
     ?List<(MonoSymbol, mlsub.typing.Monotype)> instanceofInThen; 
     ?List<(MonoSymbol, mlsub.typing.Monotype)> instanceofInElse;
 
-    deepMemory.push( ifBranchInference );
+    deepMemory.push( thenBranchInference );
 
     try {
       (notNullInThen, notNullInElse) = nullnessInfo(condition);
@@ -601,7 +593,7 @@ typecheck(IfExp e)
       // Calling this is important for clearning the conditional types stack,
       // which is good when calling the compiler repeatedly from the same JVM.
       enterElse();
-      let got = deepMemory.pop(); assert got == ifBranchInference;
+      let got = deepMemory.pop(); assert got == thenBranchInference;
     }
 
     if (notNullInElse != null)
@@ -634,23 +626,21 @@ typecheck(IfExp e)
        "\nelse: " + elseExp.getType());
 
   // Check if we can propagate some of the type inference information outwards.
-  if(ifBranchInference.size() != 0 || elseBranchInference.size() != 0)
-    ifPropagation(e, ifBranchInference, elseBranchInference);
+  if(thenBranchInference.size() != 0 || elseBranchInference.size() != 0)
+    ifMerging(e, thenBranchInference, elseBranchInference);
 }
 
-void ifPropagation(IfExp e, Stack<DeepMemoryRec> ifBranchInference, Stack<DeepMemoryRec> elseBranchInference){
-  let condition = e.condition;
-  if(! (condition instanceof bossa.syntax.CallExp) || ! condition.isCallTo("==")) return;
-  if(condition.arguments.size() != 2) return;
-  let argle = condition.arguments.get(0); let leNull = argle.value.isNull();
-  let argri = condition.arguments.get(1); let riNull = argri.value.isNull();
-  if((leNull || riNull) && leNull != riNull){
-    if(e.elseExp instanceof bossa.syntax.VoidConstantExp && ifBranchInference.size() != 0){
-      let arg = leNull ? argri.value : argle.value;
-      let variable = localVariable( arg ); if( null == variable ) return;
-      for(rec : ifBranchInference) if(variable == rec.variable)
-        variable.setVarType( rec.type, otherBranch: variable.type, out: variable.type );
-    }
+void ifMerging(IfExp e,
+               Map<MonoSymbol,mlsub.typing.Monotype> thenBranchInference,
+               Map<MonoSymbol,mlsub.typing.Monotype> elseBranchInference){
+  let entryIt = thenBranchInference.entrySet().iterator();
+  while( entryIt.hasNext() ){
+    Map$Entry<MonoSymbol,mlsub.typing.Monotype> leEntry = entryIt.next();
+    MonoSymbol variable = leEntry.getKey();
+    ?mlsub.typing.Monotype riType = elseBranchInference.get( variable ); if(riType == null) continue;
+    mlsub.typing.Monotype leType = leEntry.getValue();
+    ?mlsub.typing.Monotype merged = Types_merge( leType, riType ); if(merged == null) continue;
+    variable.setVarType( merged, otherBranch: variable.type, out: variable.type );
   }
 }
 

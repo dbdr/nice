@@ -388,4 +388,57 @@ public final class Types
     // OK, no covariant dispatch
     return false;
   }
+
+  /****************************************************************
+   * Merging
+   ****************************************************************/
+
+  // <bonniot> this merge is not optimal since it does not search of a common supertype,
+  // <bonniot> only if one is smaller than the other
+  // <bonniot> but it should be useful already, and enough to test an algo that needs it
+  // <arjanb> yeah it would handle 95% of the cases
+  public static Monotype merge(Monotype m1, Monotype m2)
+  {
+    if (m1 == m2)
+      return m1;
+
+    Monotype raw1 = equivalent(m1);
+    Monotype raw2 = equivalent(m2);
+
+    TypeConstructor head;
+    if (Typing.testRigidLeq(raw1.head(), raw2.head()))
+      head = raw2.head();
+    else if (Typing.testRigidLeq(raw2.head(), raw1.head()))
+      head = raw1.head();
+    else
+      return null;
+
+    Monotype[] args1 = ((MonotypeConstructor) raw1).getTP();
+    Monotype[] args2 = ((MonotypeConstructor) raw2).getTP();
+    Monotype[] args;
+    if (args1 == null && args2 == null)
+      // no-arg type constructors
+      args = null;
+    else
+      {
+        // Resursively merge the type parameters.
+        args = new Monotype[args1.length];
+        for (int i = 0; i < args.length; i++)
+          {
+            args[i] = merge(args1[i], args2[i]);
+            if (args[i] == null)
+              return null;
+          }
+      }
+
+    Monotype raw = new MonotypeConstructor(head, args);
+
+    TypeConstructor marker;
+    if (isSure(m1) && isSure(m2))
+      marker = PrimitiveType.sureTC;
+    else
+      marker = PrimitiveType.maybeTC;
+
+    return new MonotypeConstructor(marker, new Monotype[]{raw});
+  }
 }

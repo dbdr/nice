@@ -195,6 +195,7 @@ mlsub.typing.AtomicConstraint[?] atoms(mlsub.typing.Constraint) = native mlsub.t
 gnu.bytecode.ClassType Type_pointer_type() = native gnu.bytecode.Type.pointer_type;
 ?mlsub.typing.TypeConstructor TypeConstructor_fromTypeSymbol(mlsub.typing.TypeSymbol) = native mlsub.typing.TypeConstructor mlsub.typing.TypeConstructor.fromTypeSymbol(mlsub.typing.TypeSymbol);
 ?gnu.bytecode.Type TypeImport_lookup(String, ?Location) = native gnu.bytecode.Type nice.tools.code.TypeImport.lookup(String, Location);
+?mlsub.typing.Monotype Types_merge(mlsub.typing.Monotype, mlsub.typing.Monotype) = native mlsub.typing.Monotype nice.tools.typing.Types.merge(mlsub.typing.Monotype, mlsub.typing.Monotype);
 
 // Retypings needed since java types are not strict.
 mlsub.typing.Polytype boolPolytype() = native nice.tools.typing.PrimitiveType.boolPolytype;

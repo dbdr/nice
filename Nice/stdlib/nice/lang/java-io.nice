@@ -19,8 +19,7 @@
    Retypings for the java.io package
  */
 
-import java.io.*;
-import java.net.*;
+import java.io.*(!);
 
 /**
    In Java, System.out and System.err are possibly null.
@@ -39,133 +38,37 @@ PrintStream stderr () = native System.err;
 <T> void println (T object) = System.out.println(object);
 
 // Constructors
-BufferedInputStream BufferedInputStream(InputStream) = native new BufferedInputStream(InputStream);
-BufferedInputStream BufferedInputStream(InputStream, int) = native new BufferedInputStream(InputStream, int);
-BufferedOutputStream BufferedOutputStream(OutputStream) = native new BufferedOutputStream(OutputStream);
-BufferedOutputStream BufferedOutputStream(OutputStream, int) = native new BufferedOutputStream(OutputStream, int);
-BufferedReader BufferedReader(Reader) = native new BufferedReader(Reader);
-BufferedReader BufferedReader(Reader,int) = native new BufferedReader(Reader, int);
-BufferedWriter BufferedWriter(Writer) = native new BufferedWriter(Writer);
-BufferedWriter BufferedWriter(Writer, int) = native new BufferedWriter(Writer, int);
-ByteArrayInputStream ByteArrayInputStream(byte[]) = native new ByteArrayInputStream(byte[]);
-ByteArrayInputStream ByteArrayInputStream(byte[], int, int) = native new ByteArrayInputStream(byte[], int, int);
-ByteArrayOutputStream ByteArrayOutputStream(int) = native new ByteArrayOutputStream(int);
-CharArrayReader CharArrayReader(char[]) = native new CharArrayReader(char[]);
-CharArrayReader CharArrayReader(char[], int, int) = native new CharArrayReader(char[], int, int);
-DataInputStream DataInputStream(InputStream) = native new DataInputStream(InputStream);
-DataOutputStream DataOutputStream(OutputStream) = native new DataOutputStream(OutputStream);
 File File(?File, String) = native new File(File, String);
-File File(String) = native new File(String);
 File File(?String, String) = native new File(String, String);
-File File(URI) = native new File(URI);
-FileInputStream FileInputStream(File) = native new FileInputStream(File);
-FileInputStream FileInputStream(FileDescriptor) = native new FileInputStream(FileDescriptor);
-FileInputStream FileInputStream(String) = native new FileInputStream(String);
-FileOutputStream FileOutputStream(File) = native new FileOutputStream(File);
-FileOutputStream FileOutputStream(File, boolean) = native new FileOutputStream(File, boolean);
-FileOutputStream FileOutputStream(FileDescriptor) = native new FileOutputStream(FileDescriptor);
-FileOutputStream FileOutputStream(String) = native new FileOutputStream(String);
-FileOutputStream FileOutputStream(String, boolean) = native new FileOutputStream(String, boolean);
-FilePermission FilePermission(String, String) = native new FilePermission(String, String);
-FileReader FileReader(File) = native new FileReader(File);
-FileReader FileReader(FileDescriptor) = native new FileReader(FileDescriptor);
-FileReader FileReader(String) = native new FileReader(String);
-FileWriter FileWriter(File) = native new FileWriter(File);
-FileWriter FileWriter(File, boolean) = native new FileWriter(File, boolean);
-FileWriter FileWriter(FileDescriptor) = native new FileWriter(FileDescriptor);
-FileWriter FileWriter(String) = native new FileWriter(String);
-FileWriter FileWriter(String, boolean) = native new FileWriter(String, boolean);
-FilterInputStream FilterInputStream(InputStream) = native new FilterInputStream(InputStream);
-FilterOutputStream FilterOutputStream(OutputStream) = native new FilterOutputStream(OutputStream);
-FilterReader FilterReader(Reader) = native new FilterReader(Reader);
-FilterWriter FilterWriter(Writer) = native new FilterWriter(Writer);
-
-// InputStreams
-int read(InputStream, byte[]) = native int InputStream.read(byte[]);
-int read(InputStream, byte[], int, int) = native int InputStream.read( byte[], int, int);
-void unread(PushbackInputStream, byte[]) = native void PushbackInputStream.unread(byte[]);
-void unread(PushbackInputStream, byte[], int, int) = native void PushbackInputStream.unread( byte[], int, int);
-void connect(PipedInputStream, PipedOutputStream) = native void PipedInputStream.connect(PipedOutputStream);
 
 // OutputStreams
-void write(OutputStream, byte[]) = native void OutputStream.write(byte[]);
-void write(OutputStream, byte[], int, int) = native void OutputStream.write( byte[], int, int);
-byte[] toByteArray(ByteArrayOutputStream) = native byte[] ByteArrayOutputStream.toByteArray();
-String toString(ByteArrayOutputStream, String) = native String ByteArrayOutputStream.toString(String);
-void writeTo(ByteArrayOutputStream, OutputStream)  = native void ByteArrayOutputStream.writeTo(OutputStream);
-
 <T> void print(PrintStream, T) = native void PrintStream.print(Object);
-void print(PrintStream, String) = native void PrintStream.print(String);
-void print(PrintStream, char[]) = native void PrintStream.print(char[]);
 <T> void println(PrintStream, T) = native void PrintStream.println(Object);
-void println(PrintStream, String) = native void PrintStream.println(String);
-void println(PrintStream, char[]) = native void PrintStream.println(char[]);
-void connect(PipedOutputStream, PipedInputStream) = native void PipedOutputStream.connect(PipedInputStream);
 
 // Readers
-int read(Reader, char[]) = native int Reader.read(char[]);
-int read(Reader, char[], int, int) = native int Reader.read(char[], int, int);
 ?String readLine(BufferedReader) = native String BufferedReader.readLine();
-void unread(PushbackReader, char[]) = native void PushbackReader.unread(char[]);
-void unread(PushbackReader, char[], int, int) = native void PushbackReader.unread(char[], int, int);
 ?String getEncoding(InputStreamReader) = native String InputStreamReader.getEncoding();
-void connect(PipedReader, PipedWriter) = native void PipedReader.connect(PipedWriter);
 
 // Writers
-void write(Writer, char[]) = native void Writer.write(char[]);
-void write(Writer, char[], int, int) = native void Writer.write(char[], int, int);
-void write(Writer, String) = native void Writer.write(String);
-void write(Writer, String, int, int) = native void Writer.write(String, int, int);
-char[] toCharArray(CharArrayWriter) = native char[] CharArrayWriter.toCharArray();
-void writeTo(CharArrayWriter, Writer) = native void CharArrayWriter.writeTo(Writer);
 ?String getEncoding(OutputStreamWriter) = native String OutputStreamWriter.getEncoding();
-void connect(PipedWriter, PipedReader) = native void PipedWriter.connect(PipedReader);
 <T> void print(PrintWriter, T) = native void PrintWriter.print(Object);
-void print(PrintWriter, String) = native void PrintWriter.print(String);
-void print(PrintWriter, char[]) = native void PrintWriter.print(char[]);
 <T> void println(PrintWriter, T) = native void PrintWriter.println(Object);
-void println(PrintWriter, String) = native void PrintWriter.println(String);
-void println(PrintWriter, char[]) = native void PrintWriter.println(char[]);
-StringBuffer getBuffer(StringWriter) = native StringBuffer StringWriter.getBuffer();
 
 // File 
 File createTempFile(String, ?String) = native File File.createTempFile(String, String);
 File createTempFile(String, ?String, ?File) = native File File.createTempFile(String, String, File);
-File getAbsoluteFile(File) = native File File.getAbsoluteFile();
-String getAbsolutePath(File) = native String File.getAbsolutePath();
-File getCanonicalFile(File) = native File File.getCanonicalFile();
-String getCanonicalPath(File) = native String File.getCanonicalPath();
-String getName(File) = native String File.getName();
 ?String getParent(File) = native String File.getParent();
 ?File getParentFile(File) = native File File.getParentFile();
-String getPath(File) = native String File.getPath();
 ?(String[]) list(File) = native String[] File.list();
 ?(String[]) list(File, FilenameFilter) = native String[] File.list(FilenameFilter);
 ?(File[]) listFiles(File) = native File[] File.listFiles();
 ?(File[]) listFiles(File, FileFilter) = native File[] File.listFiles(FileFilter);
 ?(File[]) listFiles(File, FilenameFilter) = native File[] File.listFiles(FilenameFilter);
 ?(File[]) listRoots() = native File[] File.listRoots();
-URI toURI(File) = native URI File.toURI();
-URL toURL(File) = native URL File.toURL();
 
 // DataInput/Output
-void readFully(DataInput, byte[]) = native void DataInput.readFully(byte[]);
-void readFully(DataInput, byte[], int, int) = native void DataInput.readFully( byte[], int, int);
 ?String readLine(DataInput) = native String DataInput.readLine();
-String readUTF(DataInput) = native String DataInput.readUTF();
-void write(DataOutput, byte[]) = native void DataOutput.write(byte[]);
-void write(DataOutput, byte[], int, int) = native void DataOutput.write( byte[], int, int);
-void writeBytes(DataOutput, String) = native void DataOutput.writeBytes(String);
-void writeChars(DataOutput, String) = native void DataOutput.writeChars(String);
-void writeUTF(DataOutput, String) = native void DataOutput.writeUTF(String);
 
 // Serialization
 <T> void writeObject(ObjectOutput, T) = native void ObjectOutput.writeObject(Object);
 <T> T readObject(ObjectInput) = native Object ObjectInput.readObject();
-
-void readExternal(Externalizable, ObjectInput) = native void Externalizable.readExternal(ObjectInput);
-void writeExternal(Externalizable, ObjectOutput) = native void Externalizable.writeExternal(ObjectOutput);
-
-// Other
-boolean accept(FileFilter, File) = native boolean FileFilter.accept(File);
-boolean accept(FilenameFilter, File, String) = native boolean FilenameFilter.accept(File, String);

@@ -31,6 +31,7 @@ package nice.tools.compiler;
 
 import mlsub.compilation;
 import nice.getopt;
+import nice.doc;
 import bossa.modules;
 
 main(args)
@@ -42,8 +43,14 @@ main(args)
 
   Compilation compilation = new Compilation();
 
-  Sequence<Option> options;
-  options = 
+  Program prg = new Program();
+  prg.name = "nicec";
+  prg.longName = "The Nice Compiler";
+  prg.shortDescription = "compiler for the Nice programming language";
+  prg.author = "Daniel Bonniot <bonniot@users.sourceforge.net>, <Daniel.Bonniot@inria.fr>";
+  prg.seeAlso = "http://nice.sourceforge.net        the Nice Home Page\n";
+  prg.manualSection = "1";
+  prg.options = 
   [
    option('?', "sourcepath",
 	  "Lookup path for source packages\nPATH is a list of directories and .jar archives",
@@ -101,8 +108,15 @@ main(args)
    option('h', "help", "Print help message and exit",
 	  fun()=>
             {
-	      println(printOptions(options));
+	      println(printOptions(prg.options));
 	      System.exit(1);
+	    }),
+
+   option('?', "man", "Print man page to stdout",
+	  fun()=>
+            {
+	      println(man(prg));
+	      System.exit(0);
 	    }),
 
    option('?', "version",
@@ -118,7 +132,7 @@ main(args)
 	  fun()=>{ memInfo = true; })
   ];
 
-  Sequence<String> rest = parse("nicec", args, options);
+  Sequence<String> rest = parse(prg, args);
   if (rest.size() != 1 || rest[0].length() == 0)
     {
       if (rest.size() > 1)

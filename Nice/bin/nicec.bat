@@ -35,7 +35,7 @@ goto cleanup
 rem -- set up the reference to the nice jar file
 set NICEJAR=%NICE%\nice.jar
 set CLASSPATH=%CLASSPATH%;%NICEJAR%
-java nice.tools.compiler.package --runtime=%NICEJAR% %1 %2 %3 %4 %5 %6 %7 %8 %9
+java nice.tools.compiler.fun --runtime=%NICEJAR% %1 %2 %3 %4 %5 %6 %7 %8 %9
 
 rem -- cleanup environment variables
 :cleanup

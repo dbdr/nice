@@ -16,6 +16,7 @@ import java.util.*;
 
 import mlsub.typing.lowlevel.Engine;
 import mlsub.typing.lowlevel.Unsatisfiable;
+import mlsub.typing.lowlevel.BitVector;
 
 /**
    Enumeration of the type constructors in a domain.
@@ -120,16 +121,16 @@ public class Enumeration
       for(int i = 0;i<tags.length;i++)
 	{
 	  Engine.Constraint k = Engine.getConstraint(tags[i].getKind());
-	  mlsub.typing.lowlevel.BitVector obs;
+	  BitVector obs;
 	  
 	  int idx = kinds.indexOf(k);
 	  if(idx<0)
 	    {
 	      kinds.add(k);
-	      observers.add(obs = new mlsub.typing.lowlevel.BitVector());
+	      observers.add(obs = new BitVector());
 	    }
 	  else
-	    obs = (mlsub.typing.lowlevel.BitVector) observers.get(idx);
+	    obs = (BitVector) observers.get(idx);
 	  
 	  // ignore non matchable kinds
 	  // XXX move up ?
@@ -156,13 +157,11 @@ public class Enumeration
 	  }
 	}
     
-      Object[] a = kinds.toArray();
-      Engine.Constraint[] pKinds = new Engine.Constraint[a.length];
-      System.arraycopy(a,0,pKinds,0,a.length);
+      Engine.Constraint[] pKinds = (Engine.Constraint[])
+	kinds.toArray(new Engine.Constraint[kinds.size()]);
       
-      a = observers.toArray();
-      mlsub.typing.lowlevel.BitVector[] pObs = new mlsub.typing.lowlevel.BitVector[a.length];
-      System.arraycopy(a,0,pObs,0,a.length);
+      BitVector[] pObs = (BitVector[]) 
+	observers.toArray(new BitVector[observers.size()]);
       
       enumerateInConstraints(pKinds,pObs,tuples);
     }
@@ -177,14 +176,14 @@ public class Enumeration
 
   private static void enumerateInConstraints
     (Engine.Constraint[] kinds,
-     mlsub.typing.lowlevel.BitVector[] observers,
+     BitVector[] observers,
      final TagsList tuples)
   {
     for(int act = 0; act<kinds.length;act++)
       {
 	tuples.startAddition();
 	
-	final mlsub.typing.lowlevel.BitVector obs = observers[act];
+	final BitVector obs = observers[act];
 	final mlsub.typing.lowlevel.Engine.Constraint kind = kinds[act];
 	
 	kind.enumerate
@@ -195,7 +194,7 @@ public class Enumeration
 		 {
 		   tuples.startEntry();
 		   for (int x = obs.getLowestSetBit();
-			x != mlsub.typing.lowlevel.BitVector.UNDEFINED_INDEX;
+			x != BitVector.UNDEFINED_INDEX;
 			x = obs.getNextBit(x))
 		     {
 		       TypeConstructor var,sol;

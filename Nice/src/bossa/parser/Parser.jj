@@ -2399,7 +2399,7 @@ Statement LocalDeclaration() :
 		"'"+t.toString()+"' is deprecated. Use 'let' instead.");
 	}
     | "let"
-    | t="var" {constant = false;}
+    | "var" {constant = false;}
     )
     id=ident()
     "=" e=Expression()

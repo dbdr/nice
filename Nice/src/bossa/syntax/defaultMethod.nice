@@ -130,7 +130,7 @@ DefaultMethodImplementation createDefaultMethodImplementation
 	formals: parameters.asList().mapToArray(FormalParameters.Parameter param =>
         createPattern(param.getName() || new LocatedString("_", name.location()))));
   res.declaration = new MethodWithDefault(name, constraint, returnType,
-	parameters, contract, isOverride: isOverride, implementation: res);
+	parameters, contract: contract, isOverride: isOverride, implementation: res);
   res.addChild(res.declaration);
   return res;
 }

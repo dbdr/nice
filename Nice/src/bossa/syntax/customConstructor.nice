@@ -60,7 +60,7 @@ public class CustomConstructor extends UserOperator
   resolveBody()
   {
     resolveCCThis(body, this, notNull(classe));
-    body = analyseMethodBody(body, notNull(thisScope), notNull(thisTypeScope), this.getSymbols(), false);
+    body = analyseMethodBody(body, notNull(thisScope), notNull(thisTypeScope), notNull(this.getSymbols()), false);
   }
 
   innerTypecheck()
@@ -143,7 +143,7 @@ public CustomConstructor createCustomConstructor(LocatedString className, Constr
                     FormalParameters params, Statement body)
 {
   return new CustomConstructor(new LocatedString("<init>", className.location()),
-	cst, getCCReturnType(className, cst), params, Contract.noContract,
+	cst, getCCReturnType(className, cst), params, contract: Contract.noContract,
 	className: className, body: body);
 
 }

@@ -1,7 +1,7 @@
 /**************************************************************************/
 /*                                N I C E                                 */
 /*             A high-level object-oriented research language             */
-/*                        (c) Daniel Bonniot 2002                         */
+/*                        (c) Daniel Bonniot 2004                         */
 /*                                                                        */
 /*  This program is free software; you can redistribute it and/or modify  */
 /*  it under the terms of the GNU General Public License as published by  */
@@ -12,112 +12,79 @@
 
 package bossa.syntax;
 
-import nice.tools.code.Types;
-import bossa.util.User;
+import bossa.util.*;
 
 /**
    An operator whose semantics is defined by the user (i.e. not built-in).
 
    A contract can be attached to a user operator.
 
-   @version $Date$
-   @author Daniel Bonniot (bonniot@users.sourceforge.net)
  */
-
 public abstract class UserOperator extends MethodDeclaration
 {
-  UserOperator(LocatedString name, 
-	       Constraint constraint, Monotype returnType, 
-	       FormalParameters parameters,
-	       Contract contract)
-  {
-    super(name, constraint, returnType, parameters);
-    this.contract = contract;
-  }
-
   private Contract contract;
 
-  public Contract getContract() { return contract; }
-
-  public boolean isMain()
-  {
-    return false;
-  }
-
-  /****************************************************************
-   * Resolution
-   ****************************************************************/
-
   private boolean resolved = false;
+  private MonoSymbol[?] symbols = null;
 
-  void doResolve()
+  public Contract getContract() = contract;
+  public MonoSymbol[?] getSymbols() = symbols;
+
+  doResolve()
   {
     if (resolved)
       return;
     resolved = true;
 
     // the type must be found before
-    removeChild(getSymbol());
-    getSymbol().doResolve();
+    this.removeChild(this.getSymbol());
+    this.getSymbol().doResolve();
 
     symbols = parameters.getMonoSymbols();
     if (symbols != null)
       {
-	mlsub.typing.Monotype[] paramTypes = getArgTypes();
-	for (int i = 0; i < symbols.length; i++) {
+	mlsub.typing.Monotype[] paramTypes = this.getArgTypes();
+	for (int i = 0; i < notNull(symbols).length; i++) {
 	  if (nice.tools.typing.Types.isVoid(paramTypes[i]))
-	    throw bossa.util.User.error(symbols[i].syntacticType, 
+	    throw bossa.util.User.error(notNull(symbols)[i].syntacticType, 
 					"A parameter cannot have a void type");
-	  if (symbols[i].name != null)
+	  if (notNull(symbols)[i].name != null)
 	    {
-	      symbols[i].type = paramTypes[i];
-	      scope.addSymbol(symbols[i]);
+	      notNull(symbols)[i].type = paramTypes[i];
+	      notNull(scope).addSymbol(notNull(symbols)[i]);
 	    }
 	}
       }
     else
       symbols = new MonoSymbol[0];
 
-    VarScope scope = this.scope;
-    TypeScope typeScope = this.typeScope;
+    VarScope scope = notNull(this.scope);
+    TypeScope typeScope = notNull(this.typeScope);
 
-    super.doResolve();
+    super;
 
     // The contract must be resolved after the formal parameters since they
     // can refer to them.
-    contract.resolve(scope, typeScope, getReturnType(), location());
+    contract.resolve(scope, typeScope, this.getReturnType(), this.location());
   }
 
-  void resolve()
+  resolve()
   {
-    super.resolve();
+    super;
 
     // Adding the constraint in the type scope. It can be useful for
     // the default values of the formal parameters 
     // (e.g. an anonymous function refering to a type parameter).
-    mlsub.typing.Constraint cst = getType().getConstraint();
+    let cst = this.getType().getConstraint();
     if (mlsub.typing.Constraint.hasBinders(cst))
       try {
-        typeScope.addSymbols(cst.binders());
+        notNull(typeScope).addSymbols(notNull(cst).binders());
       } catch (TypeScope.DuplicateName ex) {
         User.error(this, "Double declaration of the same type parameter");
       }
   }
 
-  public String toString()
-  {
-    return super.toString() + String.valueOf(contract);
-  }
-
-  private MonoSymbol[] symbols;
-
-  public MonoSymbol[] getSymbols() { return symbols; }
-
-  /****************************************************************
-   * Typechecking
-   ****************************************************************/
-
-  void innerTypecheck() throws mlsub.typing.TypingEx
+  innerTypecheck()
   {
     /* 
        The body must be type-checked in a rigid context
@@ -133,13 +100,13 @@ public abstract class UserOperator extends MethodDeclaration
     contract.typecheck();
 
     // Set bytecode types for type variables.
-    mlsub.typing.FunType ft = (mlsub.typing.FunType) getType().getMonotype();
+    mlsub.typing.FunType ft = cast(this.getType().getMonotype());
 
-    Types.setBytecodeType(ft.domain());
-    Types.setBytecodeType(ft.codomain());
+    nice.tools.code.Types.setBytecodeType(ft.domain());
+    nice.tools.code.Types.setBytecodeType(ft.codomain());
   }
 
-  void typecheckCompiled()
+  typecheckCompiled()
   {
     /* We only need typechecking if there is a contract, to resolve
        overloading.
@@ -147,12 +114,8 @@ public abstract class UserOperator extends MethodDeclaration
        from bytecode.
     */
     if (contract != Contract.noContract)
-      typecheck();
+      this.typecheck();
   }
 
-  public gnu.expr.LambdaExp getLambda()
-  {
-    return null;
-  }
-
+  toString() = super + contract;
 }

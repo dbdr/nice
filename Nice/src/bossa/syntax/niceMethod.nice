@@ -30,7 +30,7 @@ public class NiceMethod extends UserOperator
     registerDispatchTest(this);
   }
 
-  isMain()
+  public boolean isMain()
   {
     return name.toString().equals("main") && arity==1 &&
 	this.getType().domain()[0].toString().equals("java.lang.String[]");
@@ -184,7 +184,7 @@ d + "\ndefined in:\n" +
 
   computeCode() = getDispatchMethod(this, module);
 
-  getLambda() = nice.tools.code.Gen.dereference(this.getCode());
+  public gnu.expr.LambdaExp getLambda() = nice.tools.code.Gen.dereference(this.getCode());
 
   compile() {}
 
@@ -202,7 +202,7 @@ public NiceMethod createNiceMethod(LocatedString name,
 	FormalParameters parameters,
 	Contract contract, boolean isOverride)
 {
-  let res = new NiceMethod(name, constraint, returnType, parameters, contract,
+  let res = new NiceMethod(name, constraint, returnType, parameters, contract: contract,
 	isOverride: isOverride, returnTypeLocation: returnType.location());
   return res; 
 }

@@ -84,6 +84,7 @@ install: share/java/nice.jar
 	mkdir -p ${BINDIR} ${PREFIX}/share/java \
                  ${MANDIR} ${LISPDIR} ${DOCDIR}
 	cp bin/nicec ${BINDIR}
+	ln -sf nicec ${BINDIR}/niceunit
 	cp share/java/nice.jar ${PREFIX}/share/java/ 
 	cp lib/emacs/nice-mode.el lib/emacs/nice-startup.el ${LISPDIR}
 	./bin/nicec --man > ${MANDIR}/nicec.1

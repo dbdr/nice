@@ -408,6 +408,14 @@ public class MethodBodyDefinition extends Definition
 	    }
 	  }
 
+	for(int n = 0; n < formals.length; n++)
+	{
+	  TypeConstructor tc = Types.rawType(domain[n]).head();
+	  if (tc != null && formals[n].tc != null)
+	    formals[n].setDomainEq(Typing.testRigidLeq(tc, formals[n].tc));
+
+        }
+
 	Node.currentFunction = this;
 	if (insideClass)
 	  Node.thisExp = new SymbolExp(parameters[0], location());

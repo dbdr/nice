@@ -368,28 +368,35 @@ public class Pattern implements Located
 	
     if (exactlyAt)
       return Typing.testRigidLeq(tag, tc) && Typing.testRigidLeq(tc, tag);
-    else
-      return Typing.testRigidLeq(tag, tc);
+
+    return Typing.testRigidLeq(tag, tc);
   }
 
   public boolean matchesValue(long val)
   {
     if (atAny())
       return true;
-    if (atIntValue)
-      return this.value == val;
-    return atPrimTypeFitting(val);
+
+    return atIntValue && this.value == val;
   }
 
-  //TODO: call this from methodbodydefition when the pattern has the same
-  //type as the the methoddeclaration
-  public void setAtAny()
+  public void setDomainEq(boolean equal)
   {
     // only set it to atAny if it's a @type pattern
-    if (atValue == null && !exactlyAt && !atIntValue)
+    if (equal && atValue == null && !exactlyAt && !atIntValue)
       tc = null;
-  }
 
+    // don't allow primitive types(except boolean) in @type and #type patterns
+    if (!equal && !atBool() && !atIntValue && (
+	tc == PrimitiveType.longTC ||
+	tc == PrimitiveType.intTC ||
+	tc == PrimitiveType.shortTC ||
+	tc == PrimitiveType.charTC ||
+	tc == PrimitiveType.byteTC) ) 
+      User.error(typeConstructor,"A pattern cannot have a primitive type that is different from the declararion.");
+
+  }     
+        
   /****************************************************************
    * Printing
    ****************************************************************/
@@ -601,13 +608,6 @@ public class Pattern implements Located
   }
   public boolean atFalse() { 
     return atBool() && atValue.toString().equals("false");
-  }
-  public boolean atPrimTypeFitting(long val){
-    return ( tc == PrimitiveType.longTC ) ||
-      (tc == PrimitiveType.intTC && val >= Integer.MIN_VALUE && val <= Integer.MAX_VALUE) ||
-      (tc == PrimitiveType.shortTC && val >= Short.MIN_VALUE && val <= Short.MAX_VALUE) ||
-      (tc == PrimitiveType.charTC && val >= Character.MIN_VALUE && val <= Character.MAX_VALUE) ||
-      (tc == PrimitiveType.byteTC && val >= Byte.MIN_VALUE && val <= Byte.MAX_VALUE);
   }
 
 }

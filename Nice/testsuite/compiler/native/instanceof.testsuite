@@ -29,3 +29,9 @@
 
 /// FAIL
   boolean b = /* /// FAIL HERE */ 1 instanceof int;
+
+/// PASS
+  if (true instanceof boolean)
+    ;
+  else
+    throw new Error();

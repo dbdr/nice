@@ -24,11 +24,6 @@ public class Gen
 
   public static Expression instanceOfExp(Expression value, Type ct)
   {
-    // don't do an instanceof on primitive types. This special case 
-    // should not happen and should be removed when pattern.java is fixed
-    if (ct instanceof PrimType)
-      return QuoteExp.trueExp;
-    
     return Inline.inline(nice.lang.inline.Instanceof.instance, value,
 		new QuoteExp(ct));
   }

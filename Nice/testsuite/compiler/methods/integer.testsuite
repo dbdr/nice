@@ -71,3 +71,15 @@ foo(1) {}
   toStr(c@char) = "";
   toStr(c@'a') = "a";
   toStr(c@'b') = "b";
+
+/// FAIL
+  /// Toplevel
+  void foo(long);
+  foo(@long) {}
+  foo(@int) {}
+
+/// FAIL
+  /// Toplevel
+  void foo(long);
+  foo(@long) {}
+  foo(#int) {}

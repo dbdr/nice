@@ -1,0 +1,48 @@
+package nice.lang;
+
+//the interface used in for in
+public interface ForInIterator<E> {
+	boolean next();
+	E current();
+}
+
+//Methods that returns a ForInIterator interface for iteration over a particular class.
+//If a "for in" is wanted for another class is could easily be added.
+
+<E> ForInIterator<E> forInIterator(Collection<E> c) = new CollectionForInIter(iter: c.iterator());
+<E> ForInIterator<E> forInIterator(E[] arr) = new ArrayForInIter(arr: arr);
+ForInIterator<char> forInIterator(String s) = new StringForInIter(str: s);
+ForInIterator<char> forInIterator(StringBuffer sb) = new StringBufferForInIter(strb: sb);
+
+//temporaly left out because of retyping
+//<K, V> Set<K> keySet(Map<K,V>) = native Set Map.keySet();
+//<K,V> ForInIterator<K> forInIterator(Map<K ,V> m) = new CollectionForInIter(iter: m.keySet().iterator());
+
+//The implementations of specific ForInIterators
+
+private class CollectionForInIter<E> implements ForInIterator<E>{
+  Iterator<E> iter;
+  next() = iter.hasNext();
+  current() = iter.next();
+}
+
+private class ArrayForInIter<E> implements ForInIterator<E>{
+  E[] arr;
+  int pos = -1;
+  next() = ++pos<arr.length;
+  current() = arr[pos];
+}
+
+private class StringForInIter<E | E <: char, char <: E> implements ForInIterator<E>{
+  String str;
+  int pos = -1;
+  next() = ++pos<str.length();
+  current() = str.charAt(pos);
+}
+
+private class StringBufferForInIter<E | E <: char, char <: E> implements ForInIterator<E>{
+  StringBuffer strb;
+  int pos = -1;
+  next() = ++pos<strb.length();
+  current() = strb.charAt(pos);
+}

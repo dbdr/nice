@@ -349,6 +349,13 @@ public final class Typing
     if(d1 == Domain.bot)
       return;
 
+    if (!(Constraint.hasBinders(d1.getConstraint()) || 
+	  Constraint.hasBinders(d2.getConstraint())))
+      {
+	leq(d1.getMonotype(), d2.getMonotype());
+	return;
+      }
+    
     enter();
     try{
       Constraint.assert(d1.getConstraint());

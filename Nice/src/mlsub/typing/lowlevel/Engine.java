@@ -565,24 +565,39 @@ public abstract class Engine
     }
     soft.clear();
 
-    try {
-      for(Iterator i = frozenLeqs.iterator(); i.hasNext();)
-	{
-	  Leq leq = (Leq) i.next();
-          Element e1 = leq.e1;
-          Element e2 = leq.e2;
+    boolean more;
+    do {
+      more = false;
+      try {
+        for(Iterator i = frozenLeqs.iterator(); i.hasNext();)
+          {
+            Leq leq = (Leq) i.next();
+            Element e1 = leq.e1;
+            Element e2 = leq.e2;
 
-          // If at least one of the two is existential, then we must
-          // keep 
-          if (e1.isExistential())
-            ((mlsub.typing.MonotypeVar) e2).setExistential();
-          else if (e2.isExistential())
-            ((mlsub.typing.MonotypeVar) e1).setExistential();
-	}
+            // If at least one of the two is existential, then we must
+            // keep both frozen.
+            if ((e1.isExistential() && ! e2.isExistential())
+                ||
+                (e2.isExistential() && ! e1.isExistential()))
+              {
+                // Since we are marking an element as existential, we should
+                // do one more pass to make sure all related elements are
+                // marked
+                more = true;
+
+                if (e1.isExistential())
+                  ((mlsub.typing.MonotypeVar) e2).setExistential();
+                else if (e2.isExistential())
+                  ((mlsub.typing.MonotypeVar) e1).setExistential();
+              }
+          }
+      }
+      finally{
+        frozenLeqs.endOfIteration();
+      }
     }
-    finally{
-      frozenLeqs.endOfIteration();
-    }
+    while (more);
 
     try {
       for(Iterator i = floating.iterator();

@@ -126,3 +126,10 @@ foo() {
   let L1 = new LinkedList();
   L1.add(999);         
   println( L1[0] );
+
+/// PASS bug
+  let testmap = new HashMap();
+   for(s : testmap.keySet())
+     {
+       String x = s + " => " + testmap[s];
+     }

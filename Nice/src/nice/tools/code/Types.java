@@ -12,7 +12,7 @@
 
 // File    : Types.java
 // Created : Mon Jun 05 11:28:10 2000 by Daniel Bonniot
-//$Modified: Mon Aug 07 15:37:41 2000 by Daniel Bonniot $
+//$Modified: Mon Aug 07 17:57:42 2000 by Daniel Bonniot $
 
 package nice.tools.code;
 
@@ -67,7 +67,7 @@ public final class Types
     m = m.equivalent();
 
     if (m instanceof mlsub.typing.TupleType)
-      return SpecialTypes.arrayType;
+      return ArrayType.make(componentType((mlsub.typing.TupleType) m));
     
     if (!(m instanceof mlsub.typing.MonotypeConstructor))
       return gnu.bytecode.Type.pointer_type;
@@ -91,6 +91,26 @@ public final class Types
   public static Type javaType(mlsub.typing.Polytype t)
   {
     return javaType(t.getMonotype());
+  }
+
+  /** Returns the common bytecode type used for elements of this tuple. */
+  public static Type componentType(mlsub.typing.TupleType t)
+  {
+    // would work if we write a better javaType function that works for type variables too.
+    //return lowestCommonSuperType(javaType(t.getComponents()));
+    return Type.pointer_type;
+  }
+  
+  private static Type lowestCommonSuperType(Type[] types)
+  {
+    Type res = types[0];
+    for (int i = 1; res!=null && i<types.length; i++)
+      res = Type.lowestCommonSuperType(res, types[i]);
+    
+    if (res == null)
+      return Type.pointer_type;
+    else
+      return res;
   }
   
   /****************************************************************

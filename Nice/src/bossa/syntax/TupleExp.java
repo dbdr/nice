@@ -12,7 +12,7 @@
 
 // File    : TupleExp.java
 // Created : Wed Aug 02 19:49:23 2000 by Daniel Bonniot
-//$Modified: Fri Aug 04 13:44:24 2000 by Daniel Bonniot $
+//$Modified: Mon Aug 07 17:41:00 2000 by Daniel Bonniot $
 
 package bossa.syntax;
 
@@ -57,11 +57,14 @@ public class TupleExp extends bossa.syntax.Expression
   void computeType()
   {
     Polytype[] types = bossa.syntax.Expression.getType(expressions);
-    // should create a new and method without the last dummy parameters
+    // should create a new <tt>and</tt> method without the last dummy parameters
     Constraint cst = Constraint.and(Polytype.getConstraint(types), 
 				    null, null);
-    type = new Polytype(cst, new TupleType(Polytype.getMonotype(types)));
+    this.tupleType = new TupleType(Polytype.getMonotype(types));
+    type = new Polytype(cst, tupleType);
   }
+
+  private TupleType tupleType;
   
   /****************************************************************
    * Code genaration
@@ -70,9 +73,10 @@ public class TupleExp extends bossa.syntax.Expression
   protected gnu.expr.Expression compile()
   {
     int len = expressions.size();
-    Type elementType = Type.pointer_type;
+    Type elementType = nice.tools.code.Types.componentType(tupleType);
     
-    // The array is not a special array
+    // The array is not a special array, since it has nothing to
+    // do with collections.
     
     Expression arrayVal = 
       new ApplyExp(new gnu.kawa.reflect.ArrayNew(elementType),
@@ -104,7 +108,7 @@ public class TupleExp extends bossa.syntax.Expression
   gnu.expr.Expression compileAssign(gnu.expr.Expression array)
   {
     int len = expressions.size();
-    Type elementType = Type.pointer_type;
+    Type elementType = nice.tools.code.Types.componentType(tupleType);
 
     LetExp let = null;
     Expression tupleExp;

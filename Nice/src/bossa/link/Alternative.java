@@ -12,7 +12,7 @@
 
 // File    : Alternative.java
 // Created : Mon Nov 15 12:20:40 1999 by bonniot
-//$Modified: Fri Aug 04 17:19:16 2000 by Daniel Bonniot $
+//$Modified: Mon Aug 07 15:49:58 2000 by Daniel Bonniot $
 
 package bossa.link;
 
@@ -209,7 +209,7 @@ public class Alternative
     if (dom == null)
       return QuoteExp.trueExp;
 
-    return instanceOfExp(parameter, bossa.CodeGen.javaType(dom));
+    return instanceOfExp(parameter, nice.tools.code.Types.javaType(dom));
   }
 
   private static final gnu.mapping.Procedure instanceProc = 

@@ -104,9 +104,6 @@ public class Arguments
 
   void setExp(int num, Expression value)
   {
-    if (computedExpressions != null)
-      Internal.error("Late setExp");
-
     arguments[num].value = value;
   }
 

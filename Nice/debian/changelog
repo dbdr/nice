@@ -1,10 +1,10 @@
 nice (0.7.8) unstable; urgency=low
 
   * Some error messages are more usefull.
-  * All operators are inlined and some operators(&&, ||, ! and comparisons) 
+  * All operators are inlined and some operators (&&, ||, ! and comparisons) 
     and if-statements generate better bytecode now.
-  * Improved bytecode generation of pre\post-condition.
-  * Implemented the enhanced for loop(similar to java 1.5 proposal).
+  * Improved bytecode generation of pre/post-condition.
+  * Implemented the enhanced for loop (similar to java 1.5 proposal).
     The loop works on arrays and collections, example:
     int[] arr = [1,2,3,4,5];
     for (int i : arr) print(i);
@@ -15,13 +15,13 @@ nice (0.7.8) unstable; urgency=low
   * Allow functions returning a value to be used as arguments where
     functions returning void are expected.
   * Allow ?(T[]) syntax for optional arrays, as an alternative to T[?].
-  * Allow // comments at then end of a file, without a trailing newline.
+  * Allow // comments at the end of a file, without a trailing newline.
     Also report more nicely /* comments that are not closed.
   * Allow nested tuples on the left side of a tuple assignment:
       (String a, (String b, String c)) = ("a", ("b", "c"));
   * Bugfixes (solved problems with case insentive filenames, ...).
 
- --
+ -- Daniel Bonniot <bonniot@users.sourceforge.net>  Tue,  8 Apr 2003 21:03:43 +0200
 
 nice (0.7.7) unstable; urgency=low
 

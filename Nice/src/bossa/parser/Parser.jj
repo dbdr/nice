@@ -798,7 +798,7 @@ Monotype arrayMonotype(Monotype res):
     tp.add(res);
     Location loc = res.location().englobe(new Location(end));
     res = new MonotypeConstructor
-      (new TypeIdent(new LocatedString("Array", loc)),
+      (new TypeIdent(new LocatedString("nice.lang.Array", loc)),
        new TypeParameters(tp),
        loc);
     res.nullness = maybe ? res.maybe : res.absent;

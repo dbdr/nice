@@ -7,3 +7,14 @@
 /// PASS
   // Concatenation can be covariant.
   float[] f = concat([0], [128]);
+
+/// PASS
+  var l = new int[1].length;
+  /// Toplevel
+class Array {}
+
+/// PASS
+  int[] a = new int[1];
+  var l = a.length;
+  /// Toplevel
+class Array<T> {}

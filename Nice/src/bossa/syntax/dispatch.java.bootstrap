@@ -34,6 +34,8 @@ public class dispatch
      String targetType,
      Expression value)
   { return null; }
+
+  public static void printStackTraceWithSourceInfo(Throwable t) {}
 }
 
 class UnknownIdentException extends bossa.util.UserError

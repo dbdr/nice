@@ -25,14 +25,14 @@ public final class Internal
 {
   public static void printStackTrace()
   {
-    try{  
+    try{ 
       throw new Exception();
     }
     catch(Exception e){
-      nice.lang.dispatch.printStackTraceWithSourceInfo(e);
+      bossa.syntax.dispatch.printStackTraceWithSourceInfo(e);
     }
   }
-        
+
   public static void warning(Located loc, String message)
   {
     Location l = loc.location();

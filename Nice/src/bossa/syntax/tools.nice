@@ -135,6 +135,10 @@ bossa.util.UserError ensureLocated(bossa.util.UserError e,
   }
 }
 
+// For bootstrap
+void bootstrapPrintStackTraceWithSourceInfo(Throwable t) =
+  printStackTraceWithSourceInfo(t);
+
 /****************************************************************
  * Temporary: this should be solved when AST classes are written 
  * in Nice, with precise types for the fields.

@@ -8,7 +8,7 @@ nice (0.5.5) unstable; urgency=low
     an IDE) to call the compiler repetively, without starting a new JVM.
   * Fixed several bugs (export of optional functional types, ...).
 
- --
+ -- Daniel Bonniot <bonniot@users.sourceforge.net>  Fri, 21 Jun 2002 09:18:20 +0200
 
 nice (0.5.4) unstable; urgency=low
 

@@ -230,7 +230,7 @@ public class Nicec extends Task {
 
 	/**	Location of nice.jar
 	 */
-	private String runtime;
+	private String runtime = getRuntime();
 
 	public void setRuntime(String runtime)
 	{
@@ -399,6 +399,8 @@ public class Nicec extends Task {
 		}
 
 		try {
+
+
 			Class c = Class.forName("nice.tools.compiler.package");
 			String[] argArray = new String[args.size()];
 			System.arraycopy(args.toArray(), 0, argArray, 0, args.size());
@@ -422,6 +424,40 @@ public class Nicec extends Task {
 
 	}
 
+
+
+	/**
+	 * Determines the location of the nice runtime.
+	 *
+	 */
+	private String getRuntime() {
+		//	when Nicec is in the nice.jar, then we should use
+		//	nice.tools.ant.Nicec dummy = new ...
+		nice.tools.runJar dummy = new nice.tools.runJar();
+		String className = nice.tools.runJar.class.getName();
+
+		String resource = new String(className);
+
+		// Format the file name into a valid resource name.
+		if (!resource.startsWith("/")) {
+			resource = "/" + resource;
+		}
+		resource = resource.replace('.', '/');
+		resource = resource + ".class";
+
+		// Attempt to locate the file using the class loader.
+		java.net.URL classUrl = Nicec.class.getResource(resource);
+		String file = classUrl.getFile();
+		
+		if (classUrl == null) {
+			return null;
+		} else {
+			return file.substring(file.indexOf(":")+1, file.indexOf("!"));
+		}
+	}
+
+
+
 	/** Only for test usage.
 	 */
 	public static void main(String[] args) {
@@ -430,6 +466,8 @@ public class Nicec extends Task {
 		nicec.setPackage("test");
 		nicec.execute();
 	}
+
+
 
 }
 

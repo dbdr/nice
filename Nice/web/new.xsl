@@ -228,6 +228,32 @@
      <!-- end sidebox -->
      <br />
 
+     <!-- SEARCH sidebox -->
+     <table bgcolor="#000000" border="0" cellpadding="0" cellspacing="0" width="100%">
+      <tr>
+       <td>
+        <table border="0" cellpadding="3" cellspacing="1" width="100%">
+         <tr>
+          <td bgcolor="#cccccc">&nbsp;
+
+<div align="center">
+<form method="get" action="http://www.google.com/custom">
+  <input type="text" name="q" class="find-text" maxlength="255" value="" />
+  <input type="hidden" name="domains" value="nice.sourceforge.net" />
+  <input type="hidden" name="sitesearch" value="nice.sourceforge.net" />
+  <input type="submit" name="sa" class="find-submit" value="Search" />
+</form>
+</div>
+
+          </td>
+         </tr>
+        </table>
+       </td>
+      </tr>
+     </table>
+     <!-- end SEARCH sidebox -->
+     <br />
+
      <div align="center">
      <a href="http://sourceforge.net/projects/nice">
      <img 

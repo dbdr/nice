@@ -144,6 +144,32 @@ PrintStream stderr () = native System.err;
 <K,V> V getValue(Map.Entry<K,V>) = native Object Map.Entry.getValue();
 <K,V> V setValue(Map.Entry<K,V>, V) = native Object Map.Entry.setValue(Object);
 
+<T> void ensureCapacity(ArrayList<T>, int) = native void ArrayList.ensureCapacity(int);
+<T> void trimToSize(ArrayList<T>) = native void ArrayList.trimToSize();
+<T> void addFirst(LinkedList<T>, T) = native void LinkedList.addFirst(Object);
+<T> void addLast(LinkedList<T>, T) = native void LinkedList.addLast(Object);
+<T> T getFirst(LinkedList<T>) = native Object LinkedList.getFirst();
+<T> T getLast(LinkedList<T>) = native Object LinkedList.getLast();
+<T> T removeFirst(LinkedList<T>) = native Object LinkedList.removeFirst();
+<T> T removeLast(LinkedList<T>) = native Object LinkedList.removeLast();
+<T> boolean empty(Stack<T>) = native boolean Stack.empty();
+<T> T peek(Stack<T>) = native Object Stack.peek();
+<T> T pop(Stack<T>) = native Object Stack.pop();
+<T> T push(Stack<T>, T) = native Object Stack.push(Object);
+<T,U | T <: U> int search(Stack<T>, U) = native int Stack.search(Object);
+<T> void addElement(Vector<T>, T) = native void Vector.addElement(Object);
+<T> int capacity(Vector<T>) = native int Vector.capacity();
+<T,U | T <: U> void copyInto(Vector<T>, U[]) = native void Vector.copyInto(Object[]);
+<T> T elementAt(Vector<T>, int) = native Object Vector.elementAt(int);
+<T> T firstElement(Vector<T>) = native Object Vector.firstElement();
+<T> T lastElement(Vector<T>) = native Object Vector.lastElement();
+<T> boolean removeElement(Vector<T>, T) = native boolean Vector.removeElement(Object);
+<T> void removeElementAt(Vector<T>, int) = native void Vector.removeElementAt(int);
+<T> void setElementAt(Vector<T>, T, int) = native void Vector.setElementAt(Object, int);
+<T> void insertElementAt(Vector<T>, T, int) = native void Vector.insertElementAt(Object, int);
+<T> void setSize(Vector<T>,int) = native void Vector.setSize(int);
+<T> void trimToSize(Vector<T>) = native void Vector.trimToSize();
+<T> void removeAllElements(Vector<T>) = native void Vector.removeAllElements();
 
 <T> Iterator<T> iterator(Collection<T>) = 
   native Iterator Collection.iterator();
@@ -208,7 +234,7 @@ PrintStream stderr () = native System.err;
   native java.util.Set java.util.Map.keySet();
 <K, V, V0 | V <: V0> java.util.Collection<V0> values(java.util.Map<K, V>) =
   native java.util.Collection java.util.Map.values();
-<K, K0, V, V0 | K <: K0, V <: V0> java.util.Set<java.util.Map.Entry<K0, V0>> entrySet(java.util.Map<K, V>) = 
+<K, V> java.util.Set<java.util.Map.Entry<K, V>> entrySet(java.util.Map<K, V>) = 
   native java.util.Set java.util.Map.entrySet();
 <K, V, V0 | V <: V0> boolean contains(java.util.Hashtable<K,V>, V0) = 
   native boolean java.util.Hashtable.contains(Object);

@@ -25,10 +25,6 @@ package nice.ui.common;
  *
  * The field can be initialized by using the automatically 
  * generated constructor
- *
- * TODO
- * make it work with visibility modifiers. this means providing
- * get/set methods for the fields...
  */
 
 
@@ -544,11 +540,11 @@ class NDropTargetListener implements DropTargetListener , NiceListener
   public DropTargetDragEvent ?-> void getDtDropActionChanged() = this.dtDropActionChanged;
   public DropTargetEvent ?-> void getDtDragExit() = this.dtDragExit;
   
-  public void getDtDrop(DropTargetDropEvent ?-> void value) { this.dtDrop = value; }
-  public void getDtDragEnter(DropTargetDragEvent ?-> void value) { this.dtDragEnter = value; }
-  public void getDtDragOver(DropTargetDragEvent ?-> void value) { this.dtDragOver = value; }
-  public void getDtDropActionChanged(DropTargetDragEvent ?-> void value) { this.dtDropActionChanged = value; }
-  public void getDtDragExit(DropTargetEvent ?-> void value) { this.dtDragExit = value; }
+  public void setDtDrop(DropTargetDropEvent ?-> void value) { this.dtDrop = value; }
+  public void setDtDragEnter(DropTargetDragEvent ?-> void value) { this.dtDragEnter = value; }
+  public void setDtDragOver(DropTargetDragEvent ?-> void value) { this.dtDragOver = value; }
+  public void setDtDropActionChanged(DropTargetDragEvent ?-> void value) { this.dtDropActionChanged = value; }
+  public void setDtDragExit(DropTargetEvent ?-> void value) { this.dtDragExit = value; }
 
 
   drop(e)

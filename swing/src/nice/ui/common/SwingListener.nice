@@ -284,8 +284,8 @@ class NListSelectionListener implements ListSelectionListener , NiceListener
 {
   private ListSelectionEvent ?-> void listSelectionValueChanged;
   
-  public ListSelectionEvent ?-> void getlistSelectionValueChanged() = this.listSelectionValueChanged;
-  public void setlistSelectionValueChanged(ListSelectionEvent ?-> void value) { this.listSelectionValueChanged = value; }
+  public ListSelectionEvent ?-> void getListSelectionValueChanged() = this.listSelectionValueChanged;
+  public void setListSelectionValueChanged(ListSelectionEvent ?-> void value) { this.listSelectionValueChanged = value; }
   
 
   valueChanged(e)

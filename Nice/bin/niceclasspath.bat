@@ -7,22 +7,22 @@ for %%x in (%NICE%) do goto gotNiceEnvVar
 rem -- try some standard places
 
 set NICEPATH=c:\nice
-if exist %NICEPATH%\nice.jar goto end
+if exist "%NICEPATH%\nice.jar" goto end
 
 set NICEPATH="c:\Program Files\nice"
-if exist %NICEPATH%\nice.jar goto end
+if exist "%NICEPATH%\nice.jar" goto end
 
 set NICEPATH=c:\programs\nice
-if exist %NICEPATH%\nice.jar goto end
+if exist "%NICEPATH%\nice.jar" goto end
 
 set NICEPATH=d:\nice
-if exist %NICEPATH%\nice.jar goto end
+if exist "%NICEPATH%\nice.jar" goto end
 
 set NICEPATH="d:\Program Files\nice"
-if exist %NICEPATH%\nice.jar goto end
+if exist "%NICEPATH%\nice.jar" goto end
 
 set NICEPATH=d:\programs\nice
-if exist %NICEPATH%\nice.jar goto end
+if exist "%NICEPATH%\nice.jar" goto end
 
 goto error
 
@@ -38,7 +38,7 @@ set NICEPATH=
 goto end
 
 :gotNiceEnvVar
-if not exist %NICE%\nice.jar goto envError
+if not exist "%NICE%\nice.jar" goto envError
 set NICEPATH=%NICE%
 
 :end

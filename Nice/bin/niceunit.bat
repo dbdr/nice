@@ -14,7 +14,7 @@ for %%x in (%NICEPATH%) do goto gotNice
 goto end
 
 :gotNice
-java -classpath %NICEPATH%\nice.jar;%CLASSPATH% nice.tools.unit.console.dispatch %1 %2 %3 %4 %5 %6 %7 %8 %9
+java -classpath "%NICEPATH%\nice.jar;%CLASSPATH%" nice.tools.unit.console.dispatch %1 %2 %3 %4 %5 %6 %7 %8 %9
 
 :end
 rem -- clean up a bit

@@ -260,5 +260,31 @@ public class Arguments
     return res;
   }
  
+  List missingNamedArgs(FormalParameters parameters, boolean includeDefaultedArgs)
+  {
+    List missing = new LinkedList();
+    Iterator namedParams = parameters.getNamedParameters().iterator();
+    while(namedParams.hasNext()) 
+      {
+        FormalParameters.NamedParameter param = (FormalParameters.NamedParameter)namedParams.next();	 
+        if (param.value() != null  && !includeDefaultedArgs)
+          continue;
+        boolean found = false;
+        for (int i = 0; i < arguments.length; i++)
+          if (arguments[i].name != null)
+            { 
+              String s = arguments[i].name.toString();
+              if (param.match(s))
+                {
+                  found = true;
+                  break;
+                }
+            }
+        if (!found) 
+          missing.add(param);
+      }
+    return missing;
+  }
+
   Argument[] arguments;
 }

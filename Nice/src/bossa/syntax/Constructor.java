@@ -101,27 +101,79 @@ class Constructor extends MethodDeclaration
   
     StringBuffer res = new StringBuffer();
     res.append("Class ").append(name);
-    if (parameters.size == 0)
-    {
-      res.append(" has no fields. Therefore its constructor takes no arguments.");
-      return res.toString();
-    }
 
+
+    //Arguments where none expected
+    if (parameters.size == 0)
+      {
+        res.append(" has no fields. Therefore its constructor takes no arguments.");
+        return res.toString();
+      }
+
+    //No such field
     List nonmatching = arguments.noMatchByName(parameters);
     if (!nonmatching.isEmpty())
-    {
-      res.append(" has no field named "+nonmatching.get(0));
-      return res.toString();
-    }
+      {
+        res.append(" has no field named "+nonmatching.get(0));
+        return res.toString();
+      }
 
-    res.append(" has the following fields:\n")
-       .append(parameters)
-       .append('\n')
-       .append("Please provide values for the fields, ")
-       .append("at least for those with no default value.\n")
-       .append("The syntax is:\n")
-       .append("new " + name + "(field1: value1, ..., fieldN: valueN)");
+    //Required fields missing - two different messages depending on whether
+    //an explanation of the syntax is necessary
+    res = new StringBuffer();
+    res.append("Fields of class ").append(name).append(" require initial values.\n");      
 
+    Iterator missingFields = null;
+      
+    if (arguments.size() == 0)
+      {
+        res.append(syntaxExample())
+          .append("Class ").append(name).append(" has the following fields:\n");
+        missingFields = parameters.iterator();
+      }
+    else 
+      {
+        res.append("These fields are missing:\n");
+        missingFields = arguments.missingNamedArgs(parameters, false).iterator();
+      }
+
+    while(missingFields.hasNext())
+      {
+        res.append("  ")
+          .append(missingFields.next())
+          .append("\n");
+      }
+      
+    return res.toString();
+  }
+
+  private String syntaxExample()
+  {
+    String name = classe.getName();
+    StringBuffer res = new StringBuffer();
+    res.append("Use the following syntax:\n")
+      .append("  new ").append(name).append("(");
+    
+    Iterator params = parameters.getRequiredNamedParameters().iterator();
+    int paramCount = 0;
+    int len = name.length();
+    while(params.hasNext())
+      {
+        FormalParameters.NamedParameter param = 
+          (FormalParameters.NamedParameter)params.next();
+        if (paramCount != 0) 
+          res.append(", ");
+        if (paramCount == 3 && params.hasNext())
+          {
+            res.append('\n');
+            for(int i = 0; i < len; i++) {res.append(' ');}
+            res.append("        ");
+            paramCount = 0;
+          }
+        res.append(param.getName()).append(": value");
+        paramCount++;
+      }
+    res.append(")\n\n");
     return res.toString();
   }
 }

@@ -13,6 +13,10 @@
 package bossa.syntax;
 
 import bossa.util.*;
+import java.util.Arrays;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
 
 /**
    Parameters of a method declaration.
@@ -447,6 +451,39 @@ public class FormalParameters extends Node
   public String toString()
   {
     return Util.map("", ", ", "", parameters);
+  }
+
+  public Iterator iterator()
+  {
+    return Arrays.asList(parameters).iterator();
+  }
+
+  public List getNamedParameters()
+  {
+    LinkedList res = new LinkedList();
+    for(int i = 0; i < parameters.length; i++) 
+      {
+        Parameter param = parameters[i];
+        if (param instanceof NamedParameter)
+          {
+            res.add(parameters[i]);
+          }
+      }
+    return res;
+  }
+
+  public List getRequiredNamedParameters()
+  {
+    LinkedList res = new LinkedList();
+    for(int i = 0; i < parameters.length; i++) 
+      {
+        Parameter param = parameters[i];
+        if (param instanceof NamedParameter && ! (param instanceof OptionalParameter))
+          {
+            res.add(parameters[i]);
+          }
+      }
+    return res;
   }
 
   private Parameter[] parameters;

@@ -625,6 +625,7 @@ private void removeOverlappingJavaMethods(List<VarSymbol> symbols)
                                  syms[j].getMethodDeclaration()))
         {
           // We can remove either, since they lead to the same implementation
+	  syms[i].releaseClonedType();
           symbols.remove(syms[i]);
           // Since we removed i, we don't need to continue this loop.
           // This would not be true if we decided to remove j.

@@ -9,4 +9,5 @@
   void foo(ObjectOutputStream o)
   {
     o.flush();
+    o.flush();
   }

@@ -282,6 +282,12 @@ public class CodeAttr extends Attribute implements AttrContainer
     pushType (type);
   }
 
+  public void emitNop ()
+  {
+    reserve(1);
+    put1 (0); // nop
+  }
+
   /** Emit code to duplicate the top element of the stack
       and place the copy before the previous element. */
   public void emitDupX ()

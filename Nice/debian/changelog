@@ -1,4 +1,4 @@
-nice (0.7.9-1) unstable; urgency=low
+nice (0.7.9) unstable; urgency=low
 
   * Allow implementations of methods declared in Java to dispatch on
     all their arguments. So now we can at last write:
@@ -17,10 +17,10 @@ nice (0.7.9-1) unstable; urgency=low
       <C,T,U> bar(l@List : L, f) // L is the runtime class of l.
       {
         L<U> res = similarEmptyCollection(l);
-	res.add(f(l[0]));
+        res.add(f(l[0]));
 
-	// Now we use the fact the res is a list.
-	// Therefore, it would be impossible to declare its type as C<U>.
+        // Now we use the fact the res is a list.
+        // Therefore, it would be impossible to declare its type as C<U>.
         res.add(res[0]); 
 
         // By returning res, we need the fact that it is a subtype of C<U>,
@@ -40,7 +40,7 @@ nice (0.7.9-1) unstable; urgency=low
       List<int> list = new ArrayList();
       list.addAll(arr);
       for(let iter = list.iterator(); iter.hasNext();) {
-	let String s;
+        let String s;
         var i = iter.next();
         if (i % 2 == 0) { s = "even"; }
         else { s = "odd"; }

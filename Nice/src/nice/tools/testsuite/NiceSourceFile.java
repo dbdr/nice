@@ -80,8 +80,8 @@ public class NiceSourceFile {
 	 * TODO
 	 * 
 	 */
-	private Set _imports = new HashSet();
-	
+	private List _imports = new LinkedList();
+
 	/**
 	 * TODO
 	 * 

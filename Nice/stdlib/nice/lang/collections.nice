@@ -35,11 +35,8 @@ import java.util.*;
 //temporaly using a non polymorpic return because of type inference
 <Collection C, T> C<T> filter(C<T>, T->boolean);
 
-/** Return a collection containing all elements for which converter
+/** Return a collection containing all the elements for which converter
     returns a non-null value.
-    It is possible to retain only elemnts with a subtype of the original
-    element type, in which case the returned collection has that 
-    element type.
 */
 <Collection C, T, U> C<!U> filter(C<T> source, T->?U converter)
 {

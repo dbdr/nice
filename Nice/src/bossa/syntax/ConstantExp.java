@@ -235,17 +235,11 @@ public class ConstantExp extends Expression
     if (rep.startsWith("-", index))
       throw new NumberFormatException("Negative sign in wrong position");
 
-    try {
-      result = Long.parseLong(rep.substring(index), radix);
-      if (negative) 
-	result = -result;
-    } catch (NumberFormatException e) {
-      // Handle the case Long.MIN_VALUE:
-      // the absolute value overflows, but it should be valid
-      String constant = negative ? new String("-" + rep.substring(index))
-	: rep.substring(index);
-      result = Long.parseLong(constant, radix);
-    }
+    result = new java.math.BigInteger(rep.substring(index), radix).longValue();
+
+    if (negative) 
+      result = -result;
+
     return result;
   }
 

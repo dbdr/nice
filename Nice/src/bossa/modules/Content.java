@@ -120,7 +120,7 @@ class Content
     else
       {
         nice.tools.visibility.Scope scope =
-          new nice.tools.visibility.Scope(unit.name, pkg.packageScope);
+          new nice.tools.visibility.Scope(unit.getName(), pkg.packageScope);
 
         module = new bossa.syntax.Module(pkg, unit.name, scope);
       }
@@ -273,6 +273,15 @@ class Content
       this.reader = reader;
       this.name = name;
     }
+
+    public String getName()
+    {
+      if (file != null)
+        return file.toString();
+      else
+        return name;
+    }
+
     BufferedReader reader;
     String name;
     File file;

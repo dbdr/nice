@@ -9,7 +9,7 @@ JAVADOC=javadoc #-linkoffline file:///C%7C/Apps/jdk1.2.1/docs/api file:///usr/op
 first: parser
 	cd stdlib; nicec nice.getopt
 	${TOP}/src/nice/tools/compiler/setBuildDate ${TOP}/src/nice/tools/compiler
-	cd src; NICEJAR=${HOME}/Nice/stdlib nicec nice.tools.compiler
+	cd src; NICEJAR=${HOME}/Nice/stdlib nicec -Rs nice.tools.compiler
 	mkdir -p classes
 	cd classes; jar xf ../external/java-getopt-1.0.7.jar gnu
 	ln -sf nicec bin/nicer

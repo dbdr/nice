@@ -218,3 +218,14 @@ foo(1) {}
   void foo(int n);
   foo(n<=1) {}
   foo(n>=0) {}
+
+/// PASS
+  /// package a
+  /// Toplevel
+  int foo(char c);
+  foo(c) = 0;
+  foo('\\') = 1;
+  foo('\'') = 2;
+  /// package b import a
+  assert foo('\\') == 1;
+  assert foo('\'') == 2;

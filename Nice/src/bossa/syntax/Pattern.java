@@ -673,8 +673,8 @@ public class Pattern implements Located
     if (name.length() > 1)
       {
 	if (name.charAt(0) == '\'')
-	  return new Pattern(ConstantExp.makeChar(new LocatedString(
-		name.substring(1,name.length()-1), Location.nowhere())));
+	  return new Pattern(new ConstantExp(PrimitiveType.charTC,
+		new Character(name.charAt(1)), name, Location.nowhere()));
 
 	if (name.charAt(0) == '-')
           return new Pattern(ConstantExp.makeNumber(new LocatedString(name,

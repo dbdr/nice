@@ -177,6 +177,91 @@ void resolveCCThis(Statement stmt, Located thisLoc, NiceClass classe)
   notNull(call.function).setLocation(loc);
 }
 
+void resolveGlobalConstants(Pattern pattern)
+{
+  ?VarSymbol findRefSymbol(LocatedString refName)
+  {
+    for (sym : Node.getGlobalScope().lookup(refName))
+      {
+	if (sym instanceof GlobalVarDeclaration.GlobalVarSymbol ||
+            sym instanceof EnumDefinition.EnumSymbol )
+          return sym;
+      }
+
+    return null;
+  }
+
+  if (pattern.refName != null)
+      {
+	?VarSymbol symbol = findRefSymbol(notNull(pattern.refName));
+	if (symbol instanceof GlobalVarDeclaration.GlobalVarSymbol)
+	  {
+	    if (symbol.getValue() instanceof ConstantExp && symbol.constant)
+	      {
+		ConstantExp val = cast(symbol.getValue());
+		if (Typing.testRigidLeq(val.tc, PrimitiveType.longTC))
+		  {
+		    pattern.tc = val.tc;
+		    pattern.atValue = val;
+                    return;
+		  }
+	      }
+	  }
+	User.error(pattern.refName, notNull(pattern.refName).toString() + " is not a global constant with an integer value."); 
+      }
+
+  if (pattern.name == null)
+    return;
+
+  ?VarSymbol symbol = findRefSymbol(notNull(pattern.name));
+  if (symbol == null)
+    return;
+
+  if (symbol instanceof EnumDefinition.EnumSymbol)
+    {
+      NewExp val = cast(symbol.getValue());
+
+      pattern.tc = val.tc;
+      pattern.atValue = new ConstantExp(null, pattern.tc, symbol,
+				notNull(pattern.name).toString(), pattern.location);
+      pattern.refName = pattern.name;
+      pattern.name = null;
+      return;
+    }
+
+  if (! (symbol instanceof GlobalVarDeclaration.GlobalVarSymbol))
+    return;
+
+  if (symbol.getValue() instanceof ConstantExp)
+    {
+      if (!symbol.constant)
+        User.error(pattern.name, "" + pattern.name + " is not constant");
+
+      ConstantExp val = cast(symbol.getValue());
+
+      if (val.tc == PrimitiveType.floatTC)
+	return;
+
+	if (val instanceof StringConstantExp)
+          pattern.typeConstructor = new TypeIdent(new LocatedString("java.lang.String",
+								pattern.location));
+	 pattern.tc = val.tc;
+	 pattern.atValue = val;
+         pattern.name = null;
+    }
+  else if (symbol.getValue() instanceof NewExp)
+    {
+       NewExp val = cast(symbol.getValue());
+       pattern.tc = val.tc;
+       pattern.atValue = new ConstantExp(null, pattern.tc, symbol,
+				notNull(pattern.name).toString(), pattern.location);
+       pattern.refName = pattern.name;
+       pattern.name = null;
+    }
+  else
+    User.error(pattern.name, "The value of " + pattern.name + " can't be used as pattern");
+}
+
 
 // For bootstrap
 void _printStackTraceWithSourceInfo(Throwable t) =

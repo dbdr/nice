@@ -168,94 +168,6 @@ public class Pattern implements Located
       }
   }
 
-  private static VarSymbol findRefSymbol(LocatedString refName)
-  {
-    VarSymbol symbol = null;
-    for (Iterator it = Node.getGlobalScope().lookup(refName).iterator(); it.hasNext();)
-      {
-	Object sym = it.next();
-	if (sym instanceof GlobalVarDeclaration.GlobalVarSymbol ||
-            sym instanceof EnumDefinition.EnumSymbol )
-          symbol = (VarSymbol)sym;
-      }
-
-    return symbol;
-  }
-
-  void resolveGlobalConstants()
-  {
-    if (refName != null)
-      {
-	VarSymbol sym = findRefSymbol(refName);
-	if (sym instanceof GlobalVarDeclaration.GlobalVarSymbol)
-	  {
-	    GlobalVarDeclaration.GlobalVarSymbol symbol = (GlobalVarDeclaration.GlobalVarSymbol)sym;
-	    if (symbol.getValue() instanceof ConstantExp && symbol.constant)
-	      {
-		ConstantExp val = (ConstantExp)symbol.getValue();
-		if (Typing.testRigidLeq(val.tc, PrimitiveType.longTC))
-		  {
-		    tc = val.tc;
-		    atValue = val;
-                    return;
-		  }
-	      }
-	  }
-	User.error(refName, refName.toString() + " is not a global constant with an integer value."); 
-      }
-
-    if (name == null)
-      return;
-
-    VarSymbol sym = findRefSymbol(name);
-    if (sym == null)
-      return;
-
-    if (sym instanceof EnumDefinition.EnumSymbol)
-      {
-        EnumDefinition.EnumSymbol symbol = (EnumDefinition.EnumSymbol)sym;
-	NewExp val = (NewExp)symbol.getValue();
-
-	tc = val.tc;
-	atValue = new ConstantExp(null, tc, symbol,
-				name.toString(), location);
-	refName = name;
-        name = null;
-        return;
-      }
-    
-    GlobalVarDeclaration.GlobalVarSymbol symbol = (GlobalVarDeclaration.GlobalVarSymbol)sym;
-    if (symbol.getValue() instanceof ConstantExp)
-      {
-        if (!symbol.constant)
-          User.error(name, "" + name + " is not constant");
-
-	ConstantExp val = (ConstantExp)symbol.getValue();
-
-	if (val.tc == PrimitiveType.floatTC)
-	  return;
-
-	if (val instanceof StringConstantExp)
-          typeConstructor = new TypeIdent(new LocatedString("java.lang.String",
-								location));
-	 tc = val.tc;
-	 atValue = val;
-         name = null;
-       }
-     else if (symbol.getValue() instanceof NewExp)
-       {
-	 NewExp val = (NewExp)symbol.getValue();
-
-	 tc = val.tc;
-	 atValue = new ConstantExp(null, tc, symbol,
-				name.toString(), location);
-	 refName = name;
-         name = null;
-       }
-     else
-       User.error(name, "The value of " + name + " can't be used as pattern");
-  }
-
   static void resolve(TypeScope tscope, VarScope vscope, Pattern[] patterns)
   {
     for(int i = 0; i < patterns.length; i++) {
@@ -266,7 +178,7 @@ public class Pattern implements Located
   static void resolveValues(Pattern[] patterns)
   {
     for(int i = 0; i < patterns.length; i++) {
-      patterns[i].resolveGlobalConstants();
+      bossa.syntax.dispatch.resolveGlobalConstants(patterns[i]);
     }
   }
  
@@ -807,21 +719,9 @@ public class Pattern implements Located
             LocatedString refName = new LocatedString(name.substring(1),
 				Location.nowhere());
 
-	    VarSymbol sym = findRefSymbol(refName);
-	    NewExp val;
-            if (sym instanceof GlobalVarDeclaration.GlobalVarSymbol )
-              {
-	        GlobalVarDeclaration.GlobalVarSymbol symbol = (GlobalVarDeclaration.GlobalVarSymbol)sym;
- 	        val = (NewExp)symbol.getValue();
-	      }
-            else
-              {
-                EnumDefinition.EnumSymbol symbol = (EnumDefinition.EnumSymbol) sym;
-	        val = (NewExp)symbol.getValue();
-              }
-            
-	    return new Pattern(new ConstantExp(null, val.tc, sym,
-		    		refName.toString(), refName.location()));
+            Pattern res = new Pattern(refName);
+            bossa.syntax.dispatch.resolveGlobalConstants(res);
+	    return res;
           }
       }
 
@@ -904,7 +804,8 @@ public class Pattern implements Located
    ****************************************************************/
   
   LocatedString name,refName;
-  private TypeIdent typeConstructor, additional;
+  TypeIdent typeConstructor;
+  private TypeIdent additional;
   TypeConstructor tc;
   TypeConstructor tc2;
   private TypeConstructor runtimeTC;

@@ -35,6 +35,8 @@ public class dispatch
 
   static void resolveCCThis(Statement stmt, bossa.util.Located thisloc, NiceClass classe) {}
 
+  static void resolveGlobalConstants(Pattern pattern) {}
+
   static Statement  analyse(Statement  s, VarScope v, TypeScope t, boolean r)
   { return null; }
   

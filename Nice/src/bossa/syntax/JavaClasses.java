@@ -211,6 +211,7 @@ public final class JavaClasses
   {
     retyped = new HashMap();
     knownMethods = new HashMap();
+    objectConstructor = null;
   }
 
   /**

@@ -17,6 +17,8 @@ import java.io.*;
 String stringS() = native Fields.stringS;
 String stringI(Fields) = native Fields.stringI;
 
+List<String> fieldsList(Fields) = native Fields.stringList;
+
 void test_native();
 test_native()
 {
@@ -38,6 +40,9 @@ test_native()
   f.intI = 3;
   f.stringI = "Instance field is: ";
   println(f.stringI + f.intI);
+
+  String s = f.fieldsList[0];
+  assert (s.equals("First"));
 }
 
 // Tests creation of an array with a native type component.

@@ -12,6 +12,8 @@
 
 package regtest.basic;
 
+import java.util.*;
+
 /**
    Class with static and non-static fields,
    to test field access.
@@ -26,4 +28,10 @@ class Fields
   String stringI;
 
   String[] strings = new String[]{"A"};
+
+  List stringList;
+  {
+    stringList = new LinkedList();
+    stringList.add("First");
+  }
 }

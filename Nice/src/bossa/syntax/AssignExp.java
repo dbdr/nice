@@ -12,7 +12,7 @@
 
 // File    : AssignExp.java
 // Created : Mon Jul 05 15:49:27 1999 by bonniot
-//$Modified: Tue Jun 06 09:44:01 2000 by Daniel Bonniot $
+//$Modified: Fri Jul 21 15:56:29 2000 by Daniel Bonniot $
 
 package bossa.syntax;
 
@@ -28,8 +28,8 @@ public class AssignExp extends Expression
   public AssignExp(Expression to,
 		   Expression value)
   {
-    this.to=expChild(to);
-    this.value=expChild(value);
+    this.to = expChild(to);
+    this.value = expChild(value);
   }
 
   /****************************************************************
@@ -45,13 +45,13 @@ public class AssignExp extends Expression
   
   void typecheck()
   {
-    to=to.noOverloading();
+    to = to.noOverloading();
 
     if(!to.isAssignable())
-      User.error(this,to+" cannot be assigned a value");
+      User.error(this, to+" cannot be assigned a value");
 
     try{
-      checkAssignment(to.getType(),value);
+      checkAssignment(to.getType(), value);
     }
     catch(TypingEx t){
       User.error(this,
@@ -73,14 +73,14 @@ public class AssignExp extends Expression
 
   public gnu.expr.Expression compile()
   {
-    to=to.noOverloading();
+    to = to.noOverloading();
 
     gnu.expr.Expression[] val = new gnu.expr.Expression[1];    
     val[0] = value.generateCode();    
     gnu.expr.LetExp let = new gnu.expr.LetExp(val);
-    let.outer=Statement.currentScopeExp;
+    let.outer = Statement.currentScopeExp;
     
-    gnu.expr.Declaration tmp = let.addDeclaration("tmp",val[0].getType());
+    gnu.expr.Declaration tmp = let.addDeclaration("tmp", val[0].getType());
     tmp.setCanRead(true);
     tmp.noteValue(null);
     gnu.expr.Expression tmpExp = new gnu.expr.ReferenceExp(tmp);
@@ -100,7 +100,7 @@ public class AssignExp extends Expression
 
   public String toString()
   {
-    return to+" = "+value;
+    return to + " = " + value;
   }
 
   private Expression to;

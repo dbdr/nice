@@ -78,7 +78,7 @@ for subdir in *; do
 
   pkg=`expr $pkg + 1`
 
-  echo -n "Testing package $subdir"
+  echo -n "Testing package \"$subdir\""
 
   # execute package dependant script before compilation
   if [ -x $subdir/prepare ]; then

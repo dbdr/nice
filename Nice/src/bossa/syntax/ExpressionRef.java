@@ -12,7 +12,7 @@
 
 // File    : ExpressionRef.java
 // Created : Tue Aug 17 16:04:40 1999 by bonniot
-//$Modified: Wed Jun 14 12:53:26 2000 by Daniel Bonniot $
+//$Modified: Fri Jul 21 15:33:48 2000 by Daniel Bonniot $
 
 package bossa.syntax;
 
@@ -126,10 +126,18 @@ final public class ExpressionRef extends Expression
 
   public gnu.expr.Expression compile()
   {
-    content=content.noOverloading();
+    content = content.noOverloading();
     return content.compile();
   }
 
+  /** @return the declaration of the variable denoted by this expression,
+      or <code>null</code> if this expression is not a variable.
+  */
+  gnu.expr.Declaration getDeclaration()
+  {
+    return content.getDeclaration();
+  }
+  
   gnu.expr.Expression compileAssign(gnu.expr.Expression value)
   {
     return content.compileAssign(value);

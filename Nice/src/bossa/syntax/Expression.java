@@ -12,7 +12,7 @@
 
 // File    : Expression.java
 // Created : Mon Jul 05 16:25:02 1999 by bonniot
-//$Modified: Wed Jun 14 12:25:22 2000 by Daniel Bonniot $
+//$Modified: Fri Jul 21 15:44:39 2000 by Daniel Bonniot $
 // Description : 
 
 package bossa.syntax;
@@ -203,9 +203,22 @@ public abstract class Expression extends Node
     return res;
   }
   
+  /** @return the declaration of the local variable denoted by this expression,
+      or <code>null</code> if this expression is not a local variable.
+  */
+  gnu.expr.Declaration getDeclaration()
+  {
+    return null;
+  }
+  
   gnu.expr.Expression compileAssign(gnu.expr.Expression value)
   {
-    Internal.error(this,this+" doesn't know how to be modified, it is a "+this.getClass());
+    gnu.expr.Declaration decl = getDeclaration();
+    if (decl != null)
+      return new gnu.expr.SetExp(decl, value);
+
+    Internal.error(this, this + " doesn't know how to be modified, it is a " +
+		   this.getClass());
     return null;
   }
   

@@ -12,7 +12,7 @@
 
 // File    : parser.jj
 // Created : Thu Jul 01 10:27:05 1999 by bonniot
-//$Modified: Thu Jul 20 14:43:37 2000 by Daniel Bonniot $
+//$Modified: Fri Jul 21 17:31:38 2000 by Daniel Bonniot $
 // Description : Parseur JavaCC pour Bossa
 //   Tokens based on the Jazz parser
 
@@ -1409,14 +1409,16 @@ Expression PreIncrementExpression() :
 { Expression res; Token t; }
 {
   t="++" res=PrimaryExpression()
-  { return new AssignExp(res,CallExp.create(symb("+",t),res,ConstantExp.makeNumber(1))); }
+//  { return new AssignExp(res,CallExp.create(symb("+",t),res,ConstantExp.makeNumber(1))); }
+  { return new IncrementExp(res, true, true); }
 }
 
 Expression PreDecrementExpression() :
 { Expression res; Token t; }
 {
   t="--" res=PrimaryExpression()
-  { return new AssignExp(res,CallExp.create(symb("-",t),res,ConstantExp.makeNumber(1))); }
+//  { return new AssignExp(res,CallExp.create(symb("-",t),res,ConstantExp.makeNumber(1))); }
+  { return new IncrementExp(res, true, false); }
 }
 
 Expression UnaryExpressionNotPlusMinus() :
@@ -1456,7 +1458,10 @@ Expression CastLookahead() :
 Expression PostfixExpression() :
 { Expression res; Token t; }
 {
-  res=PrimaryExpression() /* [ "++" | "--" ] */
+  res=PrimaryExpression() 
+  [ "++" { res=new IncrementExp(res, false, true); }
+  | "--" { res=new IncrementExp(res, false, false); }
+  ] 
   { return res; }
 }
 
@@ -1738,12 +1743,10 @@ Statement StatementExpression() :
 |
   e1=PrimaryExpression()
   [
-/*
-    "++"
+    "++" { e1=new IncrementExp(e1, false, true); }
   |
-    "--"
+    "--" { e1=new IncrementExp(e1, false, false); }
   |
-*/
     { Token op; Expression e2; }
     op=AssignmentOperator() 
     e2=Expression()

@@ -12,7 +12,7 @@
 
 // File    : Dispatch.java
 // Created : Mon Nov 15 10:36:41 1999 by bonniot
-//$Modified: Wed Jul 19 16:42:36 2000 by Daniel Bonniot $
+//$Modified: Fri Jul 21 15:14:21 2000 by Daniel Bonniot $
 
 package bossa.link;
 
@@ -22,13 +22,16 @@ import bossa.util.*;
 import mlsub.typing.*;
 
 import gnu.expr.*;
+import gnu.bytecode.Access;
+import gnu.bytecode.ClassType;
 
 import java.util.*;
 
 import bossa.util.Debug;
+import gnu.expr.Expression;
 
 /**
- * Static class to make the coverage and non-ambiguity test.
+ * Static class performing the coverage and non-ambiguity test.
  * 
  * @author bonniot
  */
@@ -248,7 +251,7 @@ public final class Dispatch
     
     // parameters of the alternative function are the same in each case, so we compute them just once
     gnu.bytecode.Type[] types = m.javaArgTypes();
-    gnu.expr.Expression[] params = new gnu.expr.Expression[types.length];
+    Expression[] params = new Expression[types.length];
     lexp.min_args = lexp.max_args = types.length;
     
     for(int n = 0; n<types.length; n++)
@@ -261,7 +264,7 @@ public final class Dispatch
     if(m instanceof FieldAccessMethod)
       block.setBody(compileFieldAccess((FieldAccessMethod) m, params[0]));
     else if(m instanceof SetFieldMethod)
-      block.setBody(compileSetField((SetFieldMethod) m,params[0],params[1]));
+      block.setBody(compileSetField((SetFieldMethod) m, params[0], params[1]));
     else
       block.setBody(dispatch(sortedAlternatives.iterator(),
 			     m.javaReturnType()==gnu.bytecode.Type.void_type,
@@ -273,23 +276,22 @@ public final class Dispatch
     module.compileDispatchMethod(lexp);
   }
   
-  private static gnu.expr.Expression compileFieldAccess
-    (FieldAccessMethod method, gnu.expr.Expression value)
+  private static Expression compileFieldAccess(FieldAccessMethod method, 
+					       Expression value)
   {
     //ListIterator types = method.classTC.getJavaInstanceTypes();
-    gnu.bytecode.ClassType type = (gnu.bytecode.ClassType) 
-      bossa.CodeGen.javaType(method.classTC);
+    ClassType type = (ClassType) bossa.CodeGen.javaType(method.classTC);
     
-    gnu.expr.Expression[] param = { value };
+    Expression[] param = { value };
     
-    gnu.expr.Expression res =
-      new ApplyExp(new kawa.lang.GetFieldProc(type,method.fieldName, method.javaReturnType(), gnu.bytecode.Access.PUBLIC),
+    Expression res =
+      new ApplyExp(new kawa.lang.GetFieldProc(type,method.fieldName, method.javaReturnType(), Access.PUBLIC),
 		   param);
     
     /*
     while(types.hasNext())
       {
-	gnu.bytecode.ClassType type = (gnu.bytecode.ClassType) types.next();
+	ClassType type = (ClassType) types.next();
 	res = new gnu.expr.IfExp(Alternative.instanceOfExp(value,type),
 				 new ApplyExp(new kawa.lang.GetFieldProc(type,method.fieldName),param),
 			res);
@@ -298,29 +300,31 @@ public final class Dispatch
     return res;
   }
 
-  private static gnu.expr.Expression compileSetField(SetFieldMethod method, gnu.expr.Expression obj, gnu.expr.Expression value)
+  private static Expression compileSetField
+    (SetFieldMethod method, Expression obj, Expression value)
   {
     //ListIterator types = method.classTC.getJavaInstanceTypes();
-    gnu.bytecode.ClassType type = (gnu.bytecode.ClassType) 
-      bossa.CodeGen.javaType(method.classTC);
+    ClassType type = (ClassType) bossa.CodeGen.javaType(method.classTC);
     
-    gnu.expr.Expression[] params = { obj, value };
+    Expression[] params = { obj, value };
     
-    gnu.expr.Expression res =
-      new ApplyExp(new QuoteExp(new kawa.lang.SetFieldProc(type,method.fieldName, method.javaArgTypes()[1], gnu.bytecode.Access.PUBLIC)),
+    Expression res = 
+      new ApplyExp(new kawa.lang.SetFieldProc(type, method.fieldName, 
+					      method.javaArgTypes()[1], 
+					      Access.PUBLIC), 
 		   params);
     /*
     while(types.hasNext())
       {
-	gnu.bytecode.ClassType type = (gnu.bytecode.ClassType) types.next();
+	ClassType type = (ClassType) types.next();
 	res = new gnu.expr.IfExp
 	  (Alternative.instanceOfExp(value,type),
 	   new ApplyExp(new QuoteExp(new kawa.lang.SetFieldProc
 	     (type,
 	      method.fieldName, 
 	      method.javaArgTypes()[1], 
-	      gnu.bytecode.Access.PUBLIC)), params),
-			res);
+	      Access.PUBLIC)), params),
+	      res);
       }
     */
     return res;
@@ -329,22 +333,22 @@ public final class Dispatch
   private static final gnu.mapping.Procedure throwProc 
     = new kawa.standard.prim_throw();
   
-  private static gnu.expr.Expression dispatch(Iterator sortedAlternatives, 
-					      boolean voidReturn, 
-					      final BlockExp block, 
-					      gnu.expr.Expression[] params)
+  private static Expression dispatch(Iterator sortedAlternatives, 
+				     boolean voidReturn, 
+				     final BlockExp block, 
+				     Expression[] params)
   {
     if(!sortedAlternatives.hasNext())
       {
-	gnu.expr.Expression[] exn = 
+	Expression[] exn = 
 	{ new QuoteExp(new Error("Message not understood")) };
 	return new ApplyExp(throwProc,exn);
       }
     
     Alternative a = (Alternative) sortedAlternatives.next();
-    gnu.expr.Expression matchTest = a.matchTest(params);
+    Expression matchTest = a.matchTest(params);
 
-    gnu.expr.Expression matchCase;
+    Expression matchCase;
     if(voidReturn)
       matchCase = new ApplyExp(a.methodExp(),params);
     else

@@ -12,7 +12,7 @@
 
 // File    : SymbolExpr.java
 // Created : Thu Jul 08 12:20:59 1999 by bonniot
-//$Modified: Wed Jun 14 15:16:44 2000 by Daniel Bonniot $
+//$Modified: Fri Jul 21 14:25:04 2000 by Daniel Bonniot $
 
 package bossa.syntax;
 
@@ -94,14 +94,17 @@ public class SymbolExp extends Expression
     return new gnu.expr.ReferenceExp(symbol.name.toString(),decl);
   }
   
-  gnu.expr.Expression compileAssign(gnu.expr.Expression value)
+  /** @return the declaration of the variable denoted by this expression,
+      or <code>null</code> if this expression is not a variable.
+  */
+  gnu.expr.Declaration getDeclaration()
   {
     gnu.expr.Declaration decl = symbol.getDeclaration();
     
     if(decl==null)
       Internal.error(this+" has no bytecode declaration");
     
-    return new gnu.expr.SetExp(decl,value);
+    return decl;
   }
   
   /****************************************************************

@@ -1,3 +1,5 @@
+// -*- mode:java -*-
+
 /*
   Test of core java features:
   - builtin types (integers, floats, chars)
@@ -12,43 +14,67 @@
  */
 
 {
-
   //   STRINGS
   p("Hello, world!");
-  p("String " + "\t\t" + "\101 concatenation"); // escapes, octal escape
+  p("String " + "\t\t" + "Z\70 \12X \101 concatenation"); // escapes, octal escape
   p("\u0041\u0042\u0043"); // unicode escapes
 
   //   CHARS
 
-  p("" + 'A' + '\n' + '\u0201');
+  p("" + 'A' + '\n' + '\u0201' + '\u4567');
   
   // unicode in identifiers
-  int é = 12;
-  p("" + é);
+  int é\u0123 = 12;
+  p("" + é\u0123);
 
   //   ARITHMETIC
 
-  // ints
-  p("1 = " + 1);
-  p("1+1 = " + (1+1));
+  {
+    // ints
+    p("1 = " + 1);
+    p("1+1 = " + (1+1));
   
-  int i = 100;
-  long j = 123;
-  p("100 + 123 = " + (i+j));
-  p("" + (i+(j-i)*(j+i*i)-4));
+    int i = 100;
+    long j = 123;
+    p("100 + 123 = " + (i+j));
+    p("" + (i+(j-i)*(j+i*i)-4));
+
+    p("" + (i++));
+    p("" + i);
+    i = i++;
+    i++;
+    i--;
+    p("" + i);
+    j=--i;
+    int k=++i;
+    p("" + i + " " + j + " " + k);
+    
+    // floats
+    float x = 0.1f;
+    double y = 3.4;
+    p("0.1 - 3.4 = " + (x-y));
   
-  // floats
-  float x = 0.1f;
-  double y = 3.4;
-  p("0.1 - 3.4 = " + (x-y));
+    p("" + (i+(j-y)*x));
+  }
   
-  p("" + (i+(j-y)*x));
-  
-  //booleans
+  // booleans
   p("" + ((false && true) | true));
   boolean b = false;
   if(b) p("A"); else p("B");
   p(!b ? "A" : (b ? "B" : "C"));
+    
+  //   LOOPS
+  for (int i=0; i<5; ++i)
+    {
+      int j=i;
+      while (j>0)
+	{
+	  p("i=" + i + ", j=" + j);
+	  --j;
+	}
+    }
 
+  //   ARRAYS
+  //String[] t = { "Hello, ", "world!" };
 }
 

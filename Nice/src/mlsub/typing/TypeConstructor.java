@@ -62,6 +62,17 @@ public class TypeConstructor
   {
     return new TypeConstructor(name, variance, concrete, rigid);
   }
+
+  /**
+     @return s if it is a type constructor, null otherwise
+  */
+  public static TypeConstructor fromTypeSymbol(TypeSymbol s)
+  {
+    if (s instanceof TypeConstructor)
+      return (TypeConstructor) s;
+    else
+      return null;
+  }
   
   /**
    * Tell which variance this TypeConstructor has.

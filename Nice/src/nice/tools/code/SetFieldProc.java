@@ -29,6 +29,8 @@ public class SetFieldProc extends gnu.mapping.Procedure2 implements Inlineable
   public SetFieldProc (Declaration fieldDecl)
   {
     this.fieldDecl = fieldDecl; 
+    if (fieldDecl == null)
+      throw new NullPointerException();
   }
 
   public Object apply2 (Object arg1, Object arg2)

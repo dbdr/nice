@@ -2391,8 +2391,10 @@ Statement BlockStatement(List statements) :
   |
     res = LocalDeclaration() ";"
   )
+| //try first a tupleExp before a tupleDeclaration
+  LOOKAHEAD ( LocalTupleExpLookahead() )
+  res=Statement()
 |
-
   LOOKAHEAD( LocalTupleDeclarationLookahead() )
   res=LocalTupleDeclaration(statements)
 |
@@ -2496,22 +2498,22 @@ Statement LocalTupleDeclaration(List statements) :
 }
 
 Expression LocalTuplePart(List statements) :
-{}
+{ LocatedString id; Monotype type; }
 {
-  LOOKAHEAD( "(" LocalTuplePart() "," )
+( //first look for a ident without matching a monotype
+  LOOKAHEAD( doted_string() ( "," | ")" ) ) id=doted_string() 
+  { return new IdentExp(id); }
+| //then look for a monotype without matching a tuplePart
+  LOOKAHEAD( monotype() ident() ) type=monotype()  id=ident() 
+  { statements.add(new Block.LocalVariable(id, type, false, null)); 
+    return new IdentExp(id); }
+| //otherwise it's localtuple part
   "(" { List parts = new LinkedList(); Expression part; }
   part = LocalTuplePart(statements) { parts.add(part); }
   ( "," part = LocalTuplePart(statements) { parts.add(part); } )+
   ")"
   { return new TupleExp(parts); }
-|
-  { LocatedString id; Monotype type = null; }
-  [ LOOKAHEAD(monotype() ident()) type = monotype() ] id = ident() 
-  { 
-    if (type != null)
-      statements.add(new Block.LocalVariable(id, type, false, null)); 
-    return new IdentExp(id);
-  }
+)
 }
 
 void LocalTupleDeclarationLookahead() : {}
@@ -2534,13 +2536,33 @@ void LocalTupleDeclarationContent() : { }
 (
   "(" LocalTupleDeclarationContent() ")"
 // Identifiers, either in types, or as a variable to assign to.
-| <IDENT> 
+| <IDENT>
 // All tokens that can be part of a monotype
 // (exception "(" and ")" which are already handled, since they are
 // be balanced in a monotype too).
 | "<" | ">" | "," | "->" | "." | "?" | "!" | "[]" | "[?]" | "alike"
 )+
 }
+
+// lookahead for a tupleExp on left side of an assignment 
+void LocalTupleExpLookahead() : {}
+{
+  "(" LocalTupleExpContent() ")" "="
+}
+
+void LocalTupleExpContent() : { }
+{
+( "(" LocalTupleExpContent() ")"
+| doted_string()
+) 
+( "," 
+  ( "(" LocalTupleExpContent() ")"
+  | doted_string()
+  )
+)* 
+}
+
+
 
 Statement EmptyStatement() :
 { Token t; }

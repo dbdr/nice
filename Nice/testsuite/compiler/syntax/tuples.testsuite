@@ -27,3 +27,28 @@
 
 /// FAIL
   /*/// FAIL HERE */(String s, int i) = (5, "abc");
+
+/// PASS
+  int x;
+  int y;
+  int z;
+  (x, (y, z)) = (1, (2, 3));
+
+/// PASS
+  int x;
+  int y;
+  (x, (y, int z)) = (1, (2, 3));
+
+/// PASS
+  int x;
+  (x, (int, int) tuple) = (1, (2, 3));
+
+/// PASS
+  let x = new X();
+  (x.a , x.b) = (x.b , x.a);
+  assert x.a==10 && x.b==5;
+  /// Toplevel
+  class X {
+    int a = 5;
+    int b = 10;
+  }

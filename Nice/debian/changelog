@@ -14,6 +14,7 @@ nice (0.9.0) unstable; urgency=low
     recognized, as in Java.
   * The 'char' type is no longer a subtype of int. The integer unicode 
     representation of a character c can be obtained by int(c).
+  * Bugfixes (Parsing of nested tuples, ...)
 
  --
 

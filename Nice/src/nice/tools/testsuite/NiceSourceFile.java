@@ -9,7 +9,7 @@ import java.util.*;
 /**
  * Class represents a nice source file.
  * 
- * @author	Alex Greif
+ * @author	Alex Greif <a href="mailto:alex.greif@web.de">alex.greif@web.de</a>
  * @version	$Id$
  */
 public class NiceSourceFile {
@@ -208,10 +208,9 @@ public class NiceSourceFile {
 		try {
 			StringWriter debugWriter = new StringWriter();
 			writer = new BufferedWriter(debugWriter);
-			writePackage(writer);
-			writeImports(writer);
-			writeTopLevel(writer);
-			writeMainMethod(writer);
+			
+			write(writer);
+			
 			writer.close();
 			//System.out.println("#####\n" + debugWriter.toString() + "\n###\n");
 			writer = new BufferedWriter(new FileWriter(sourceFile));
@@ -227,6 +226,17 @@ public class NiceSourceFile {
 				}
 		}
 	}
+	
+	/**
+	 * Writes the contenmts to the writer
+	 */
+	void write(BufferedWriter writer) throws IOException {
+		writePackage(writer);
+		writeImports(writer);
+		writeTopLevel(writer);
+		writeMainMethod(writer);
+	}
+	
 	
 	
 	/**

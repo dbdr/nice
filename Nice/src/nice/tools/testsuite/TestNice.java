@@ -4,7 +4,7 @@ package nice.tools.testsuite;
 import java.io.*;
 import java.util.*;
 
-
+import nice.tools.testsuite.output.*;
 
 /**
  * Example:
@@ -21,7 +21,7 @@ import java.util.*;
  * f();
  * 
  * @author	Alex Greif <a href="mailto:alex.greif@web.de">alex.greif@web.de</a>
- * @version	$Id$	TODO
+ * @version	$Id$
  */
 
 public class TestNice {
@@ -33,37 +33,37 @@ public class TestNice {
 	static private final String TESTSUITE_FILE_EXTENSION = ".testsuite";
 
 	/**
-	 * TODO
+	 * Keyword indicator.
 	 * 
 	 */
 	static final String KEYWORD_SIGN = "///";
 
 	/**
-	 * TODO
+	 * Keyword.
 	 * 
 	 */
 	static final String KEYWORD_GLOBAL = "global";
 
 	/**
-	 * TODO
+	 * Keyword.
 	 * 
 	 */
 	static final String KEYWORD_TOPLEVEL = "toplevel";
 
 	/**
-	 * TODO
+	 * Keyword.
 	 * 
 	 */
 	static final String KEYWORD_PACKAGE = "package";
 
 	/**
-	 * TODO
+	 * Keyword.
 	 * 
 	 */
 	static final String KEYWORD_IMPORT = "import";
 
 	/**
-	 * TODO
+	 * Keyword.
 	 * 
 	 */
 	static final String KEYWORD_DONTCOMPILE = "dontcompile";
@@ -73,7 +73,7 @@ public class TestNice {
 
 
 	/**
-	 * TODO
+	 * The temporary folder where nice sources and the compiled bytecod is placed.
 	 * 
 	 */
 	private static File _tempFolder = new File("temp-nice-testsuite");
@@ -103,14 +103,18 @@ public class TestNice {
 	 */
 	private static int _testCasesFailed = 0;
 
+	/**
+		The Output where log statements should be written.
+		ConsoleOutput is the default Output.
+	*/
+	private static Output _output = new ConsoleOutput();
 
 
 
 	/**
-	 * TODO
+	 * Main method of the application;
 	 * 
-	 * @param	args	TODO
-	 * @exception	Exception	TODO
+	 * @param	args	console arguments
 	 */
 	static public void main(String[] args) {
 		if (args.length != 1) {
@@ -118,21 +122,20 @@ public class TestNice {
 			System.exit(1);
 		}
 		
+		_output.startApplication();
 		cleanupTempFolder();
 		
 		try {
 			new TestNice().performTests(args[0]);
-			
-			System.out.println();
-			System.out.println("number of testcases: " + (_testCasesSucceeded + _testCasesFailed));
-			System.out.println("succeeded: " + _testCasesSucceeded);
-			System.out.println("failed   : " + _testCasesFailed);
 		} catch(TestSuiteException e) {
 			e.printStackTrace();
 		}
+		_output.endApplication();
 	}
 
-
+	/**
+	 * Prints the usage of this application.
+	 */
 	static private void usage() {
 		System.out.println("usage:\n java nice.tools.testsuiteTestNice [testSuiteFile | folder]");
 	}
@@ -140,7 +143,7 @@ public class TestNice {
 
 	/**
 	 * Deletes the temporary folder with all its contents and
-	 creates a new empty one.
+	 * creates a new empty one.
 	 * 
 	 */
 	static void cleanupTempFolder() {
@@ -181,7 +184,7 @@ public class TestNice {
 
 	/**
 	 * Performs the tests in a single testsuite file or in all testsuite files in 
-	 a folder
+	 * a folder
 	 * 
 	 * @param	testSuitePath	TODO
 	 * @exception	TestSuiteException	TODO
@@ -255,6 +258,47 @@ public class TestNice {
 	public static void increaseFailed() {
 		++_testCasesFailed;
 	}
+
+
+
+
+
+	/**
+	 * Returns the Output.
+	 */
+	static Output getOutput() {
+		return _output;
+	}
+
+
+
+	/**
+	 * Returns the number of succeded testcases.
+	 */
+	static public int getTestCasesSucceeded() {
+		return _testCasesSucceeded;
+	}
+
+
+	/**
+	 * Returns the number of failed testcases.
+	 */
+	static public int getTestCasesFailed() {
+		return _testCasesFailed;
+	}
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

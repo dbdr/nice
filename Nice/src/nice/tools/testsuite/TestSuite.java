@@ -9,6 +9,8 @@ import java.util.*;
 /**
  * Class represents a testsuite file with its testcases.
  * 
+ * @author	Alex Greif <a href="mailto:alex.greif@web.de">alex.greif@web.de</a>
+ * @version	$Id$
  */
 public class TestSuite {
 
@@ -32,17 +34,20 @@ public class TestSuite {
 
 
 
-	private File _testSuiteFile;
+	private File _file;
 	private List _testCases = new ArrayList();
 
 	/**
 		Constructor. Reads the testcases and performs the tests in the testsuite.
 	*/
 	public TestSuite(File testSuiteFile) throws TestSuiteException {
-		_testSuiteFile = testSuiteFile;			
-		System.out.println("testsuite " + _testSuiteFile);
+		_file = testSuiteFile;			
+		//System.out.println("testsuite " + _testSuiteFile);
+		
+		TestNice.getOutput().startTestSuite(this);
 		readTestCases();
 		performTests();
+		TestNice.getOutput().endTestSuite();
 	}
 
 
@@ -52,7 +57,7 @@ public class TestSuite {
 	private void readTestCases() throws TestSuiteException {
 		BufferedReader reader = null;
 		try {
-			reader = new BufferedReader(new FileReader(_testSuiteFile));
+			reader = new BufferedReader(new FileReader(_file));
 			String line;
 			TestCase testCase = null;
 			boolean isGlobalSource = false;
@@ -80,13 +85,13 @@ public class TestSuite {
 				testCase.consumeLine(line);
 			}
 		} catch(IOException e) {
-			throw new TestSuiteException("Exception while reading file: " + _testSuiteFile, e);
+			throw new TestSuiteException("Exception while reading file: " + _file, e);
 		} finally {
 			if (reader != null)
 				try {
 					reader.close();
 				} catch(IOException e) {
-					throw new TestSuiteException("could not close file: " + _testSuiteFile);
+					throw new TestSuiteException("could not close file: " + _file);
 				}
 		}
 	}
@@ -120,6 +125,13 @@ public class TestSuite {
 			testCase.writeFiles();
 			testCase.performTest();
 		}
+	}
+
+	/**
+	 * Returns the testsuite file.
+	 */
+	public File getFile() {
+		return _file;
 	}
 
 }

@@ -4,6 +4,8 @@ package nice.tools.testsuite;
 /**
  * TestCase class fot the case that the test should pass
  * 
+ * @author	Alex Greif <a href="mailto:alex.greif@web.de">alex.greif@web.de</a>
+ * @version	$Id$
  */
 public class PassTestCase extends TestCase {
 
@@ -13,17 +15,17 @@ public class PassTestCase extends TestCase {
 		should be successfully.
 	*/
 	public void performTest() throws TestSuiteException {
+		super.performTest();
 		try {
 			compilePackages();
 			runMain();
 		} catch(TestSuiteException e) {
-			TestNice.increaseFailed();
-			e.printStackTrace();
+			fail();
+			//e.printStackTrace();
 			return;
 		}
 		
-		TestNice.increaseSucceeded();
-
+		pass();
 	}
 
 }

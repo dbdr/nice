@@ -10,7 +10,7 @@ import java.util.*;
 /**
  * TODO
  * 
- * @author	Alex Greif
+ * @author	Alex Greif <a href="mailto:alex.greif@web.de">alex.greif@web.de</a>
  * @version	$Id$
  */
 public class GlobalSourceFile extends NiceSourceFile {

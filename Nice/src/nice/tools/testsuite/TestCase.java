@@ -14,8 +14,10 @@ import nice.tools.compiler.OutputMessages;
 /**
  * Class represents a testcase in the testsuite file.
  * 
+ * @author	Alex Greif <a href="mailto:alex.greif@web.de">alex.greif@web.de</a>
+ * @version	$Id$
  */
-public abstract class TestCase {
+public class TestCase {
 	/**
 	 * TODO
 	 * 
@@ -47,6 +49,8 @@ public abstract class TestCase {
 	private List _niceSourceFiles = new ArrayList();
 	private NiceSourceFile _currentSourceFile;
 	private Set _dontCompilePackages = new HashSet();
+	private ByteArrayOutputStream _compilerMessagesStream;
+
 	
 	/**
 		Constructor.
@@ -89,7 +93,6 @@ public abstract class TestCase {
 			return false;
 		
 		String keywordStatement = line.substring(posKeywordSign + TestNice.KEYWORD_SIGN.length()).trim();
-		//System.out.println("keywordStatement: " + keywordStatement);
 		
 		if (TestNice.KEYWORD_TOPLEVEL.equalsIgnoreCase(keywordStatement.toLowerCase()))
 			_currentSourceFile.setStatus(NiceSourceFile.STATUS_TOPLEVEL);
@@ -98,12 +101,9 @@ public abstract class TestCase {
 				createNewSourceFile();
 
 			_currentSourceFile.consumePackageKeyword(keywordStatement);
-			//System.out.println(" package: " + _currentSourceFile.getPackage());
 			if (keywordStatement.indexOf(TestNice.KEYWORD_DONTCOMPILE) != -1)
 				_dontCompilePackages.add(_currentSourceFile.getPackage());
 		}
-		
-		
 		
 		return true;
 	}
@@ -127,7 +127,9 @@ public abstract class TestCase {
 	/**
 		Performs the test for this testcase
 	*/
-	public abstract void performTest() throws TestSuiteException;
+	public void performTest() throws TestSuiteException {
+		TestNice.getOutput().startTestCase(this);
+	}
 	
 	/**
 		Returns the involved packages.
@@ -150,11 +152,44 @@ public abstract class TestCase {
 	 * 
 	 */
 	public void compilePackages() throws TestSuiteException {
-		List packageNames = getPackages();
-		for (Iterator iter = packageNames.iterator(); iter.hasNext();) {
-			String packageName = (String)iter.next();
-			if (! _dontCompilePackages.contains(packageName))
-				compilePackage(packageName);
+		_compilerMessagesStream = new ByteArrayOutputStream();
+		PrintStream out = new PrintStream(_compilerMessagesStream);
+		PrintStream origOut = System.out;
+		PrintStream origErr = System.err;
+		System.setOut(out);
+		System.setErr(out);
+		boolean showMessages = false;
+		
+		try {
+			List packageNames = getPackages();
+			for (Iterator iter = packageNames.iterator(); iter.hasNext();) {
+				String packageName = (String)iter.next();
+				if (! _dontCompilePackages.contains(packageName)) {
+					int retval = compilePackage(packageName);
+					switch (retval) {
+					case OutputMessages.ERROR:
+						showMessages = true;
+						throw new TestSuiteException(ERROR_MSG);
+					case OutputMessages.BUG:
+						showMessages = true;
+						throw new TestSuiteException(BUG_MSG);
+					case OutputMessages.WARNING:
+						showMessages = true;
+						break;
+					/*case OutputMessages.OK:
+						System.out.println(OK_MSG);
+						break;
+						*/
+					}
+				}
+			}
+		} finally {
+			System.setOut(origOut);
+			System.setErr(origErr);
+			try {
+				_compilerMessagesStream.close();
+				out.close();
+			} catch(IOException e) {}
 		}
 	}
 	
@@ -163,7 +198,7 @@ public abstract class TestCase {
 	 * Compiles the specified package of this testcase.
 	 * 
 	 */
-	private void compilePackage(String packageName) throws TestSuiteException {
+	private int compilePackage(String packageName) throws TestSuiteException {
 		Vector args = new Vector();
 
 		args.addElement("--sourcepath");
@@ -176,20 +211,8 @@ public abstract class TestCase {
 
 		String[] argArray = new String[args.size()];
 		System.arraycopy(args.toArray(), 0, argArray, 0, args.size());
-		int retval = nice.tools.compiler.fun.compile(argArray);
-		switch (retval) {
-		case OutputMessages.ERROR:
-			throw new TestSuiteException(ERROR_MSG);
-		case OutputMessages.BUG:
-			throw new TestSuiteException(BUG_MSG);
-		case OutputMessages.WARNING:
-			System.out.println(WARNING_MSG);
-			break;
-		case OutputMessages.OK:
-			System.out.println(OK_MSG);
-			break;
-		}
-
+		
+		return nice.tools.compiler.fun.compile(argArray);
 	}
 	
 	/**
@@ -198,31 +221,84 @@ public abstract class TestCase {
 	 * 
 	 */
 	public void runMain() throws TestSuiteException {
-		for(Iterator iter = _niceSourceFiles.iterator(); iter.hasNext();) {
-			NiceSourceFile sourceFile = (NiceSourceFile)iter.next();
-			if (sourceFile.hasMainMethod()
-				&&  ! _dontCompilePackages.contains(sourceFile.getPackage()))
-			{
-				/*System.out.println("Run main() of file: " + sourceFile.getPackage()
-									+ "."
-									+ sourceFile.getClassName());
-				*/
-				try {
-					Class c = Class.forName(sourceFile.getPackage() + ".fun",
-								true,
-								new TestSuiteClassLoader(this.getClass().getClassLoader()));
-					Class[] parameterTypes = new Class[] {String[].class};
-					Method m = c.getMethod("main", parameterTypes);
-					Object[] arguments = new Object[] {new String[0]};
-					m.invoke(c.newInstance(), arguments);
-				} catch(Exception e) {
-					throw new TestSuiteException("Exception while invoking main()", e);
+		ByteArrayOutputStream mainMessagesStream = new ByteArrayOutputStream();
+		PrintStream out = new PrintStream(mainMessagesStream);
+		PrintStream origOut = System.out;
+		PrintStream origErr = System.err;
+		System.setOut(out);
+		System.setErr(out);
+		try {
+			for(Iterator iter = _niceSourceFiles.iterator(); iter.hasNext();) {
+				NiceSourceFile sourceFile = (NiceSourceFile)iter.next();
+				if (sourceFile.hasMainMethod()
+					&&  ! _dontCompilePackages.contains(sourceFile.getPackage()))
+				{
+					try {
+						Class c = Class.forName(sourceFile.getPackage() + ".fun",
+									true,
+									new TestSuiteClassLoader(this.getClass().getClassLoader()));
+						Class[] parameterTypes = new Class[] {String[].class};
+						Method m = c.getMethod("main", parameterTypes);
+						Object[] arguments = new Object[] {new String[0]};
+						m.invoke(c.newInstance(), arguments);
+					} catch(Exception e) {
+						throw new TestSuiteException("Exception while invoking main()", e);
+					}
 				}
 			}
+		} finally {
+			System.setOut(origOut);
+			System.setErr(origErr);
+			try {
+				mainMessagesStream.close();
+				out.close();
+			} catch(IOException e) {}
+			if (mainMessagesStream.size() != 0)
+				TestNice.getOutput().log("main", mainMessagesStream.toString());
 		}
 	}
 	
 	
+	public void pass() {
+		TestNice.increaseSucceeded();
+		TestNice.getOutput().endTestCase(true);
+	}
+	
+	public void fail() {
+		TestNice.increaseFailed();
+		
+		BufferedWriter writer;
+		StringWriter contentWriter;
+		//	ordinary files
+		for (Iterator iter = _niceSourceFiles.iterator(); iter.hasNext(); ) {
+			NiceSourceFile sourceFile = (NiceSourceFile)iter.next();
+			contentWriter = new StringWriter();
+			writer = new BufferedWriter(contentWriter);
+			try {
+				sourceFile.write(writer);
+				contentWriter.close();
+				writer.close();
+			} catch(IOException e) {e.printStackTrace();}
+			TestNice.getOutput().log("file " + sourceFile.getPackage() + "." + sourceFile.getFileName(),
+						contentWriter.toString());
+			TestNice.getOutput().log("");
+		}
+		//	global file
+		contentWriter = new StringWriter();
+		writer = new BufferedWriter(contentWriter);
+		try {
+			TestNice.getGlobalSource().write(writer);
+			contentWriter.close();
+			writer.close();
+		} catch(IOException e) {e.printStackTrace();}
+		TestNice.getOutput().log("file " + TestNice.getGlobalSource().getPackage() + "." + TestNice.getGlobalSource().getFileName(),
+					contentWriter.toString());
+		TestNice.getOutput().log("");
+		
+		//	compiler messages
+		TestNice.getOutput().log("nicec", _compilerMessagesStream.toString());
+		TestNice.getOutput().endTestCase(false);
+	}
 	
 	
 	

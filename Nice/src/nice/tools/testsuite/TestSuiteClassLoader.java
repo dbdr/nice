@@ -3,24 +3,31 @@ package nice.tools.testsuite;
 import java.io.*;
 
 /**
- * TODO
+ * Classloader that loads the newly created and compiled classes for a testcase.
  * 
+ * @author	Alex Greif <a href="mailto:alex.greif@web.de">alex.greif@web.de</a>
+ * @version	$Id$
  */
 public class TestSuiteClassLoader extends ClassLoader {
 	
 	
+	/**
+	 * Constructor
+	 * 
+	 * @param	parent	the parent classloader
+	 */
 	public TestSuiteClassLoader(ClassLoader parent) {
 		super(parent);
 	}
 
 	/**
-	*  This is the method where the task of class loading
-	*  is delegated to our custom loader.
-	*
-	* @param  name the name of the class
-	* @return the resulting <code>Class</code> object
-	* @exception ClassNotFoundException if the class could not be found
-	*/
+	 * This is the method where the task of class loading
+	 * is delegated to our custom loader.
+	 * 
+	 * @param	name the name of the class
+	 * @return	the resulting <code>Class</code> object
+	 * @exception	ClassNotFoundException if the class could not be found
+	 */
 	protected Class findClass(String name) throws ClassNotFoundException
 	{
 		FileInputStream fi = null;

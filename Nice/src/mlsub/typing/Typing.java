@@ -195,7 +195,10 @@ public final class Typing
       Engine.setKind(m, v);
     }
     catch(Unsatisfiable e){
-      throw new TypingEx(t+" < "+m+"'s head");
+      if (dbg)
+	throw new TypingEx(t + " < " + m + "'s head :" + e);
+      else
+	throw new TypingEx("Debugging off");
     }
     leq(t, ((MonotypeConstructor) m.equivalent()).getTC());
   }

@@ -36,10 +36,10 @@ public final class MonotypeVar extends Monotype
     this.name = name;
   }
 
-  private MonotypeVar(String name, TypeConstructor persistentHeadLeq)
+  private MonotypeVar(String name, Kind persistentKind)
   {
     this.name = name;
-    this.persistentHeadLeq = persistentHeadLeq;
+    setPersistentKind(persistentKind);
   }
 
   private String name;
@@ -47,7 +47,7 @@ public final class MonotypeVar extends Monotype
 
   public TypeSymbol cloneTypeSymbol()
   {
-    return new MonotypeVar(name, persistentHeadLeq);
+    return new MonotypeVar(name, persistentKind);
   }
   
   /**
@@ -78,7 +78,10 @@ public final class MonotypeVar extends Monotype
     
     MonotypeVar[] res = new MonotypeVar[n];
     for(int i=0; i<n; i++)
-      res[i] = new MonotypeVar();
+      {
+	res[i] = new MonotypeVar();
+	res[i].persistentKind = NullnessKind.instance;
+      }
     return res;
   }
   
@@ -118,7 +121,7 @@ public final class MonotypeVar extends Monotype
       }
     else
       {
-	// Do the apropriate cast
+	// Do the appropriate cast
 	equivalent = value.freshMonotype();
 
 	// equivalent is null if the kind is that of unconstrained variables
@@ -132,33 +135,30 @@ public final class MonotypeVar extends Monotype
       }
   }
   
-  public void setPersistentHeadLeq(TypeConstructor h)
+  public void setPersistentKind(Kind k)
   {
-    persistentHeadLeq = h;
+    persistentKind = k;
   }
 
-  TypeConstructor persistentHeadLeq;
+  Kind persistentKind;
 
   void reset()
   {
-    if (persistentHeadLeq == null)
+    if (persistentKind == null)
       setKind(null);
     else
       {
-	// Force update of the equivalent.
+	// Forget about the old equivalent.
+	equivalent = null;
 	kind = null;
-	setKind(persistentHeadLeq.variance);
-	try {
-	  Typing.leq(((MonotypeConstructor) equivalent).getTC(), persistentHeadLeq);
-	} catch(TypingEx ex) {
-	  bossa.util.Internal.error("Reset of type variable failed");
-	}
+	setKind(persistentKind);
       }
   }
 
   /** When this variable is discovered to be of some given kind,
       an equivalent monotype is created. */
   private Monotype equivalent;
+
   // overrides Monotype.equivalent()
   public Monotype equivalent()
   {

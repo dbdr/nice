@@ -29,7 +29,7 @@ import mlsub.typing.lowlevel.*;
    @author Daniel Bonniot
  */
 public final class Variance 
-  implements Kind /* Variance is the Kind of MonotypeConstructors */
+  implements AtomicKind /* Variance is the Kind of MonotypeConstructors */
 {
   private Variance(int[] signs)
   {
@@ -278,7 +278,9 @@ public final class Variance
     return "Variance (" + sb.toString() + ")";
   }
   
-  public int size;
+  private int size;
+
+  public int arity() { return size; }
 
   /****************************************************************
    * Simplification

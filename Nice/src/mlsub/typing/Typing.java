@@ -193,7 +193,7 @@ public final class Typing
     if(t == null)
       return;
     
-    Variance v = t.variance;
+    AtomicKind v = t.variance;
     if(v == null)
       throw new InternalError("Don't know how to handle this");
     
@@ -220,7 +220,7 @@ public final class Typing
   public static void leq(Monotype m, TypeConstructor t)
   throws TypingEx
   {
-    Variance v = t.variance;
+    AtomicKind v = t.variance;
     if(v == null)
       throw new InternalError("Don't know how to handle this");
     
@@ -495,9 +495,9 @@ public final class Typing
 
     try{
       if(initial)
-	t.variance.initialImplements(t.getId(),i.itf);
+	((Variance) t.variance).initialImplements(t.getId(),i.itf);
       else
-	t.variance.indexImplements(t.getId(),i.itf);
+	((Variance) t.variance).indexImplements(t.getId(),i.itf);
 
       TypeConstructor tc = i.associatedTC();
       if(tc != null)

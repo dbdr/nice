@@ -104,7 +104,7 @@ abstract public class ClassDefinition extends MethodContainer
 	};
     else if (name.equals("nice.lang.Sure"))
       tc = new mlsub.typing.TypeConstructor
-	(name.toString(), variance, isConcrete(), true)
+	(name.toString(), mlsub.typing.NullnessKind.instance, isConcrete(), true)
 	{
 	  public String toString(mlsub.typing.Monotype[] parameters)
 	  { 
@@ -117,7 +117,7 @@ abstract public class ClassDefinition extends MethodContainer
 	};
     else if (name.equals("nice.lang.Maybe"))
       tc = new mlsub.typing.TypeConstructor
-	(name.toString(), variance, isConcrete(), true)
+	(name.toString(), mlsub.typing.NullnessKind.instance, isConcrete(), true)
 	{
 	  public String toString(mlsub.typing.Monotype[] parameters)
 	  { return parameters[0].toStringNull(); }
@@ -125,7 +125,7 @@ abstract public class ClassDefinition extends MethodContainer
     else if (name.equals("nice.lang.Null"))
       {
 	tc = new mlsub.typing.TypeConstructor
-	  ("null", variance, isConcrete(), true);
+	  ("null", mlsub.typing.NullnessKind.instance, isConcrete(), true);
 	ConstantExp.registerPrimType(name.toString(),tc);
       }
     else

@@ -151,7 +151,7 @@ public class Pattern
   private static void leq(Monotype m, TypeConstructor t, boolean exactlyAt)
   throws TypingEx
   {
-    m.setKind(ConstantExp.maybeTC.variance);
+    Types.setMarkedKind(m);
     m = m.equivalent();
     if (!(m instanceof MonotypeConstructor))
       Internal.error("Nullness check");

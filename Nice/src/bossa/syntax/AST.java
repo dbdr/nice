@@ -86,18 +86,21 @@ public class AST extends Node
     nice.tools.compiler.OutputMessages.exitIfErrors();
 
     module.unfreezeGlobalContext();
-    for(Iterator i = definitions.iterator(); i.hasNext();)
-      {
-	Definition d = (Definition) i.next();
-	try{
-	  d.resolveBody();
+    try{
+      for(Iterator i = definitions.iterator(); i.hasNext();)
+	{
+	  Definition d = (Definition) i.next();
+	  try{
+	    d.resolveBody();
+	  }
+	  catch(UserError ex){
+	    nice.tools.compiler.OutputMessages.error(ex.getMessage());
+	  }
 	}
-	catch(UserError ex){
-	  nice.tools.compiler.OutputMessages.error(ex.getMessage());
-	}
-      }
+    } finally {
+      module.freezeGlobalContext();
+    }
     nice.tools.compiler.OutputMessages.exitIfErrors();
-    module.freezeGlobalContext();
     doTypecheck();
   }
 

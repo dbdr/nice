@@ -328,6 +328,7 @@ public class ConstantExp extends Expression
     if (name.equals("nice.lang.Maybe"))
       {
 	maybeTC = tc;
+	mlsub.typing.NullnessKind.initialize(tc);
 	// Reset the cached type of Null, since it is a persistent expression.
 	NullExp.instance.computeType();
 	// to differ with the null result, which signals error

@@ -623,12 +623,12 @@ public final class Types
 
   public static void setMarkedKind(Monotype m)
   {
-    m.setKind(ConstantExp.maybeTC.variance);
+    m.setKind(NullnessKind.instance);
   }
 
   public static void makeMarkedType(MonotypeVar m)
   {
-    m.setPersistentHeadLeq(ConstantExp.maybeTC);
+    m.setPersistentKind(NullnessKind.instance);
   }
 
   /** return the type with nullness markers removed */

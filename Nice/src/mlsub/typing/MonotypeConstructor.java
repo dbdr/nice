@@ -158,7 +158,11 @@ public final class MonotypeConstructor extends Monotype
   void tag(int variance)
   {
     Engine.tag(tc, variance);
-    tc.variance.tag(parameters, variance);
+    if (tc.variance instanceof Variance)
+      ((Variance) tc.variance).tag(parameters, variance);
+    else
+      // Nullness Kind
+      parameters[0].tag(variance);
   }
 
   Monotype canonify()

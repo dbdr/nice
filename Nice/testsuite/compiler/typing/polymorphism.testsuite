@@ -14,3 +14,9 @@ void usePolymorphicFunction () {
   /// COMMENT Currently we allow only <C T> if C is a type constructor.
   /// Toplevel
   <Any T, T U> void f();
+
+/// PASS
+  /// Toplevel
+<Any T> int m(T);
+m(x) = 0;
+m(c@Collection) = c.size();

@@ -44,7 +44,7 @@ public class TypeParameters
   {
     if (v == null)
       Internal.error(s, s + " has no variance");
-    this.content = Monotype.freshs(v.size, s);
+    this.content = Monotype.freshs(v.arity(), s);
   }
 
   mlsub.typing.Monotype[] resolve(TypeMap ts)

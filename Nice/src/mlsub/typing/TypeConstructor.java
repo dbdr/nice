@@ -30,7 +30,7 @@ public class TypeConstructor
    *
    * A concrete TC is a TC that can tag runtime objects.
    */
-  public TypeConstructor(String name, Variance v, boolean concrete, 
+  public TypeConstructor(String name, AtomicKind v, boolean concrete, 
 			 boolean rigid)
   {
     this.name = name;
@@ -52,7 +52,7 @@ public class TypeConstructor
   /**
      Creates an anonymous non-concrete TypeConstructor with a known variance.
    */
-  public TypeConstructor(Variance v)
+  public TypeConstructor(AtomicKind v)
   {
     this(null, v, false, false);
   }
@@ -78,7 +78,7 @@ public class TypeConstructor
    * Tell which variance this TypeConstructor has.
    * Can be called from ImplementsCst.
    */
-  protected void setVariance(Variance v)
+  protected void setVariance(AtomicKind v)
   {
     setKind(v.getConstraint());
   }
@@ -88,7 +88,7 @@ public class TypeConstructor
     if(variance==null)
       throw new InternalError("Variance of "+this+" not known in arity()");
     
-    return variance.size;
+    return variance.arity();
   }
 
   public boolean isConcrete()
@@ -119,7 +119,7 @@ public class TypeConstructor
 	throw new InternalError
 	  ("Variance already set in type constructor " + this);
 
-    variance = (Variance) ((Engine.Constraint) value).associatedKind;
+    variance = (AtomicKind) ((Engine.Constraint) value).associatedKind;
     kind = value;
   }
   
@@ -166,7 +166,7 @@ public class TypeConstructor
 
   public int enumerateTagIndex = -1; // used in Typing.enumerate. ugly ! Subclass
 
-  public Variance variance;
+  public AtomicKind variance;
   private boolean concrete;
   private boolean rigid;
   public final boolean isRigid() { return rigid; };

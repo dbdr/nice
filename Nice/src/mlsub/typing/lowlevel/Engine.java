@@ -310,7 +310,7 @@ public abstract class Engine
 		mlsub.typing.TypeConstructor tc = 
 		  (mlsub.typing.TypeConstructor) k.getElement(x);
 		atoms.add(new mlsub.typing.ImplementsCst
-		  (tc, tc.variance.getInterface(iid)));
+		  (tc, ((mlsub.typing.Variance) tc.variance).getInterface(iid)));
 	      }
 	    });
 
@@ -501,7 +501,7 @@ public abstract class Engine
 	    continue;
 
 	  if(dbg) Debug.println("Registering variable "+e);
-	  
+
 	  e.setKind(variablesConstraint);
 	  variablesConstraint.register(e);
 	}

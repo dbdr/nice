@@ -147,7 +147,7 @@ public class SuperExp extends Expression
 		    // above Object
 		    superTC = JavaClasses.object
 		      (GlobalTypeScope.compilation, 
-		       currentMethod.firstArgument().variance.size);
+		       currentMethod.firstArgument().variance.arity());
 		  }
 	      }
 

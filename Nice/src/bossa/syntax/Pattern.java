@@ -33,25 +33,38 @@ import mlsub.typing.MonotypeConstructor;
 public class Pattern
 {
   /**
-   * Builds a new pattern.
-   *
-   * @param name the name of the argument
-   * @param tc a TypeConstructor that the argument must match
+     Builds a new pattern.
+     
+     @param name the name of the argument
+     @param tc a TypeConstructor that the argument must match
        for this alternative to be selected
-   * @param type a monotype that must be equal to 
-   *    the argument's runtime type. This is usefull to introduce
-   *    a type constructor variable with the exact type of the argument.
+     @param additional an additional TypeConstructor that 
+       the argument must match.
+       It must be a super-class of <code>tc</code>.
+       It is only used for overloading resolution, not at runtime.
+     @param type a monotype that must be equal to 
+       the argument's runtime type. This is usefull to introduce
+       a type constructor variable with the exact type of the argument.
    */
-  public Pattern(LocatedString name, TypeIdent tc, bossa.syntax.Monotype type)
+  public Pattern(LocatedString name, 
+		 TypeIdent tc, boolean atNull, TypeIdent additional,
+		 bossa.syntax.Monotype type)
   {
     this.name = name;
     this.typeConstructor = tc;
+    this.additional = additional;
     this.type = type;
+    this.atNull = atNull;
   }
 
   public Pattern(LocatedString name, TypeIdent tc)
   {
-    this(name, tc, null);
+    this(name, tc, false, null, null);
+  }
+
+  public Pattern(LocatedString name)
+  {
+    this(name, null, false, null, null);
   }
 
   final mlsub.typing.Monotype getType()
@@ -79,14 +92,12 @@ public class Pattern
   /**
    * Iterates getDomain on a collection of Pattern.
    */
-  static Domain[] getDomain(Collection patterns)
+  static Domain[] getDomain(Pattern[] patterns)
   {
-    Iterator i=patterns.iterator();
-    Domain[] res = new Domain[patterns.size()];
+    Domain[] res = new Domain[patterns.length];
 
-    int n = 0;
-    while(i.hasNext())
-      res[n++] = ((Pattern) i.next()).getDomain();
+    for (int i = 0; i < patterns.length; i++)
+      res[i] = patterns[i].getDomain();
 
     return res;
   }
@@ -94,14 +105,38 @@ public class Pattern
   /**
    * Iterates getTypeConstructor on a collection of Pattern.
    */
-  static TypeConstructor[] getTC(Collection patterns)
+  static TypeConstructor[] getTC(Pattern[] patterns)
   {
-    Iterator i=patterns.iterator();
-    TypeConstructor[] res = new TypeConstructor[patterns.size()];
+    TypeConstructor[] res = new TypeConstructor[patterns.length];
 
-    int n = 0;
-    while(i.hasNext())
-      res[n++] = ((Pattern)i.next()).tc;
+    for (int i = 0; i < patterns.length; i++)
+      res[i] = patterns[i].tc;
+
+    return res;
+  }
+  
+  public static final TypeConstructor nullTC = 
+    new TypeConstructor("null", null, false, true);
+
+  static TypeConstructor[] getLinkTC(Pattern[] patterns)
+  {
+    TypeConstructor[] res = new TypeConstructor[patterns.length];
+
+    for (int i = 0; i < patterns.length; i++)
+      if (patterns[i].atNull)
+	res[i] = nullTC;
+    else
+	res[i] = patterns[i].tc;
+
+    return res;
+  }
+  
+  static TypeConstructor[] getAdditionalTC(Pattern[] patterns)
+  {
+    TypeConstructor[] res = new TypeConstructor[patterns.length];
+
+    for (int i = 0; i < patterns.length; i++)
+      res[i] = patterns[i].tc2;
 
     return res;
   }
@@ -127,9 +162,8 @@ public class Pattern
     int n = 0;
     while(i.hasNext())
       {
-	Pattern p=(Pattern)i.next();
-	if(!p.thisAtNothing())
-	  res[n++] = p.getPolytype();
+	Pattern p = (Pattern) i.next();
+	res[n++] = p.getPolytype();
       }
     return res;
   }
@@ -140,10 +174,15 @@ public class Pattern
   
   void resolveTC(TypeScope scope)
   {
-    if(typeConstructor!=null)
+    if (typeConstructor != null)
       {
 	tc = typeConstructor.resolveToTC(scope);
 	typeConstructor = null;
+      }
+    if (additional != null)
+      {
+	tc2 = additional.resolveToTC(scope);
+	additional = null;
       }
   }
   
@@ -156,20 +195,16 @@ public class Pattern
       }
   }
   
-  static void resolveTC(TypeScope scope, Collection patterns)
+  static void resolveTC(TypeScope scope, Pattern[] patterns)
   {
-    Iterator i=patterns.iterator();
-
-    while(i.hasNext())
-      ((Pattern)i.next()).resolveTC(scope);
+    for(int i = 0; i < patterns.length; i++)
+      patterns[i].resolveTC(scope);
   }
   
-  static void resolveType(TypeScope scope, Collection patterns)
+  static void resolveType(TypeScope scope, Pattern[] patterns)
   {
-    Iterator i=patterns.iterator();
-
-    while(i.hasNext())
-      ((Pattern)i.next()).resolveType(scope);
+    for(int i = 0; i < patterns.length; i++)
+      patterns[i].resolveType(scope);
   }
   
   /****************************************************************
@@ -178,14 +213,16 @@ public class Pattern
 
   public String toString()
   {
-    String res = name.toString();
+    StringBuffer res = new StringBuffer();
+    if (name != null)
+      res.append(name.toString());
 
-    if(typeConstructor!=null)
-      res += "@" + typeConstructor;
-    else if(tc!=null)
-      res += "@" + tc;
+    if (typeConstructor != null)
+      res.append("@").append(typeConstructor.toString());
+    else if (tc != null)
+      res.append("@").append(tc.toString());
     
-    return res;
+    return res.toString();
   }
 
   public final static String AT_encoding = "$";
@@ -198,36 +235,26 @@ public class Pattern
    */
   public String bytecodeRepresentation()
   {
-    String enc = nice.tools.code.Types.bytecodeRepresentation(tc);
+    String enc = 
+      atNull ? "NULL" : nice.tools.code.Types.bytecodeRepresentation(tc);
 
-    return AT_encoding+enc;
+    return AT_encoding + enc;
   }
   
-  public static String bytecodeRepresentation(List patterns)
+  public static String bytecodeRepresentation(Pattern[] patterns)
   {
-    String res="";
-    for(Iterator i=patterns.iterator();
-	i.hasNext();)
-      res+=((Pattern)i.next()).bytecodeRepresentation();
-    return res;
+    StringBuffer res = new StringBuffer();
+    for(int i = 0; i < patterns.length; i++)
+      res.append(patterns[i].bytecodeRepresentation());
+    return res.toString();
   }
   
-  /****************************************************************
-   * Misc.
-   ****************************************************************/
-  
-  /** 
-   * Expresses that this pattern was a fake one.
-   * @see MethodBodyDefinition
-   */
-  boolean thisAtNothing()
-  {
-    return typeConstructor==null && name.content.equals("this");
-  }
-
   LocatedString name;
-  TypeIdent typeConstructor;
-  TypeConstructor tc;
+  TypeIdent typeConstructor, additional;
+  TypeConstructor tc, tc2;
   private bossa.syntax.Monotype type;
   private mlsub.typing.Monotype t;
+
+  private boolean atNull;
+  public boolean atNull() { return atNull; }
 }

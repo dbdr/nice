@@ -82,7 +82,8 @@ public final class Typing
       return;
     
     for(int i = 0; i<elements.length; i++)
-      introduce(elements[i]);
+      if (elements[i] != null)
+	introduce(elements[i]);
   }
   
   // TODO: fix this?
@@ -162,16 +163,6 @@ public final class Typing
 	leq((Polytype)i1.next(),
 	    (Polytype)i2.next());
       }
-  }
-  
-  public static void leqMono(Monotype[] c1, Monotype[] c2)
-    throws TypingEx
-  {
-    if(c1.length != c2.length) 
-      throw new InternalError("Unequal sizes in leqMono");
-
-    for(int i = 0; i<c1.length; i++)
-      leq(c1[i], c2[i]);
   }
   
   public static void initialLeq(TypeConstructor t, TypeConstructor[] ts)

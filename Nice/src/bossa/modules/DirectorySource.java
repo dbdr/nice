@@ -10,10 +10,6 @@
 /*                                                                        */
 /**************************************************************************/
 
-// File    : DirectorySource.java
-// Created : Tue Aug 01 16:24:45 2000 by Daniel Bonniot
-//$Modified: Wed Oct 04 11:52:04 2000 by Daniel Bonniot $
-
 package bossa.modules;
 
 import bossa.util.*;
@@ -22,9 +18,10 @@ import java.io.*;
 import gnu.bytecode.ClassType;
 
 /**
- * A package located in a directory.
- * 
- * @author Daniel Bonniot
+   A package located in a directory.
+ 
+   @version $Date$
+   @author Daniel Bonniot
  */
 
 class DirectorySource extends PackageSource
@@ -63,9 +60,13 @@ class DirectorySource extends PackageSource
   {
     lastModification = maxLastModification(sources);
     lastCompilation = itf == null ? -1 : itf.lastModified();
-    
+   
     if (!forceReload && lastModification <= lastCompilation)
-      return new Unit[]{ new Unit(read(itf), itf.toString()) };
+      {
+	if (Debug.modules)
+	  Debug.println("Loading compiled version of " + pkg);
+	return new Unit[]{ new Unit(read(itf), itf.toString()) };
+      }
 
     if (Debug.modules && !forceReload && itf != null)
       Debug.println(pkg + " has changed, recompiling");

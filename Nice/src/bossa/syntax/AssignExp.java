@@ -68,25 +68,6 @@ public class AssignExp extends Expression
     return val;
   }
   
-  void typecheck()
-  {
-    to = to.noOverloading();
-
-    if(!to.isAssignable())
-      User.error(this, to + " cannot be assigned a value");
-    
-    try{
-      value = checkAssignment(to.getType(), value);
-    }
-    catch(TypingEx t){
-      User.error(this,
-		 "Typing error : " + to + 
-		 " cannot be assigned value " + value + 
-		 " of type " + value.getType(),
-		 "\n" + t.getMessage());
-    }
-  }
-
   void computeType()
   {
     this.type = value.getType();

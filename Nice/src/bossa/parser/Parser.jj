@@ -992,22 +992,37 @@ AbstractInterface interfaceDefinition():
   { return res; }
 }
 
-Pattern pattern(LocatedString name):
+Pattern pattern():
 {
-    TypeIdent tc=null;
-    Monotype type=null;
+  Pattern res = null;
+  LocatedString i;
 }
 {
-  [
-    "@" tc=typeIdent() 
+( res = anonymousPattern(null)
+| i = ident()
+  ( res = anonymousPattern(i) | { res = new Pattern(i); } )
+)
+{ return res; }
+}
+
+Pattern anonymousPattern(LocatedString name):
+{
+  TypeIdent tc=null, additional = null;
+  Monotype type=null;
+  boolean atNull = false; 
+}
+{
+  (
+    "@" ( "null" { atNull = true; } | tc=typeIdent() )
   | 
     "#" tc=typeIdent()
     { tc.name.prepend("#"); }
-  ]
+  )
+  [ "(" additional = typeIdent() ")" ]
   [
     ":" type=monotype()
   ]
-  { return new Pattern(name,tc,type); }
+  { return new Pattern(name, tc, atNull, additional, type); }
 }
 
 void methodBodyDefinitionLookahead():
@@ -1018,7 +1033,7 @@ void methodBodyDefinitionLookahead():
 
 MethodBodyDefinition methodBodyDefinition(NiceClass container):
 {
-    LocatedString name,i;
+    LocatedString name;
     Pattern p;
     Collection binders=null;
     //List newTypeVars=null;
@@ -1029,14 +1044,14 @@ MethodBodyDefinition methodBodyDefinition(NiceClass container):
 {
     name=methodName()
     [ "<" binders=strings() ">" ]
+
 // introducing new Type variables
 //    [ "[" newTypeVars=typeConstructors() "]" ]
-//    p=pattern(new LocatedString("this",new Location(0,0,0,0))) 
-//    { parameters.add(p); }
+
     "("
     ( 
-	i=ident() p=pattern(i) { parameters.add(p); }
-	( "," i=ident() p=pattern(i) { parameters.add(p); } )*
+	p=pattern() { parameters.add(p); }
+	( "," p=pattern() { parameters.add(p); } )*
     )?
     ")"
     ( 

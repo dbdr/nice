@@ -16,6 +16,9 @@ public class dispatch
   
   static Expression analyse$1(Expression e, VarScope v, TypeScope t) 
   { return null; }
+
+  static void typecheck$0(Statement s) {}
+  static void typecheck$1(Expression e) {}
 }
 
 class UnknownIdentException extends RuntimeException 

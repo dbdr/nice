@@ -76,19 +76,6 @@ public class NewArrayExp extends Expression
   {
   }
   
-  void typecheck()
-  {
-    for (int i=0; i<knownDimensions.length; i++)
-      try{
-	mlsub.typing.Typing.leq(knownDimensions[i].getType(),
-				ConstantExp.intPolytype);
-      }
-      catch(mlsub.typing.TypingEx e){
-	User.error(knownDimensions[i],
-		   knownDimensions[i] + " should be an integer");
-      }
-  }
-  
   /****************************************************************
    * Code generation
    ****************************************************************/

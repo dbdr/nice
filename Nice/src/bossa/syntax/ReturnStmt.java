@@ -41,25 +41,6 @@ public class ReturnStmt extends Statement
       return value.getType();
   }
   
-  void typecheck()
-  {
-    includingFunction = Node.currentFunction;
-    
-    Monotype declaredRetType = includingFunction.getReturnType();
-    if(declaredRetType==null)
-      return;
-    
-    try{
-      Typing.leq(returnType(), declaredRetType);
-    }
-    catch(TypingEx e){
-      User.error(this,
-		 "returned type is " + returnType() +
-		 "\nbut this funtion must return a " + declaredRetType,
-		 ": "+e);
-    }
-  }
-  
   /****************************************************************
    * Code generation
    ****************************************************************/
@@ -83,5 +64,5 @@ public class ReturnStmt extends Statement
   }
   
   Expression value;
-  private Function includingFunction;
+  Function includingFunction;
 }

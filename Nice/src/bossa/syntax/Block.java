@@ -28,7 +28,8 @@ public class Block extends Statement
   public Block(List statements)
   {
     super(Node.down);
-    this.statements = addChildren(cutInBlocks(statements));
+    this.statements = cutInBlocks(statements);
+    addChildren(this.statements);
   }
 
   public static class LocalDeclaration extends Statement
@@ -61,7 +62,7 @@ public class Block extends Statement
      @param statements the list of statements, with LocalDeclarations
      @return the list of statements of the current block.
    */
-  private List cutInBlocks(List statements)
+  private Statement[] cutInBlocks(List statements)
   {
     ArrayList res = new ArrayList();
     ListIterator i = statements.listIterator();
@@ -113,71 +114,18 @@ public class Block extends Statement
     // idem
     res.trimToSize();
     
-    return res;
+    return (Statement[]) res.toArray(new Statement[res.size()]);
   }
 
   /****************************************************************
    * Type checking
    ****************************************************************/
   
-  /**
-     Checks that the local bindings are type-safe.
-     
-     This may involve overloading resolution on the values.
-     
-     We want fine-grained control about the order:
-     it is more intuitive if right hand sides are typecheked first, 
-     then assignments, 
-     then statements.
-   */
-  void typecheck()
-  {
-    if (children != null)
-      for (Iterator i = children.iterator(); i.hasNext();)
-	{
-	  Object o = i.next();
-	  if (o instanceof Expression)
-	    ((Expression) o).typecheck();
-	}
-    // removal is not necessary to avoid double typecheck
-    // since there is a meachanism for this in Node,
-    // that remembers if typechecking has already been done
-    
-    checkAssignments();
-    
-    // statements are children, they are going to be checked now
-  }
-  
-  private void checkAssignments()
-  {
-    for(Iterator i = locals.iterator();
-	i.hasNext();)
-      {
-	LocalDeclaration local = (LocalDeclaration) i.next();
-	if (local.value == null)
-	  continue;
-
-	try{
-	  local.value = 
-	    AssignExp.checkAssignment(local.left.getType(),local.value);
-	}
-	catch(mlsub.typing.TypingEx t){
-	  User.error(local.left,
-		     "Typing error : " + local.left.name +
-		     " cannot be assigned value " + local.value +
-		     " of type " + local.value.getType(),
-		     " since " +
-		     local.left.name + " has type " + 
-		     local.left.type);
-	}
-      }
-  }
-  
   Polytype getType()
   {
-    if (statements.size()>0)
+    if (statements.length > 0)
       {
-	Object o = statements.get(statements.size()-1);
+	Object o = statements[statements.length - 1];
 	if (o instanceof ReturnStmt)
 	  {
 	    ReturnStmt r = (ReturnStmt) o;
@@ -201,7 +149,7 @@ public class Block extends Statement
 
     gnu.expr.Expression body;
 
-    if (statements.size() != 0)
+    if (statements.length != 0)
       body = new gnu.expr.BeginExp(null);
     else
       body = gnu.expr.QuoteExp.voidExp;
@@ -211,7 +159,7 @@ public class Block extends Statement
     // That is why we can't set body's body at construction.
     gnu.expr.Expression res = addLocals(locals.iterator(), body);
 
-    if (statements.size() != 0)
+    if (statements.length != 0)
       ((gnu.expr.BeginExp) body).setExpressions(Statement.compile(statements));
 
     Statement.currentScopeExp = save;
@@ -260,5 +208,5 @@ public class Block extends Statement
       + "}\n";
   }
 
-  List /* of Statement */ statements;
+  Statement[] statements;
 }

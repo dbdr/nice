@@ -64,7 +64,8 @@ final class VarScope
     if (s == null) return;
 
     for(int i = 0; i < s.length; i++)
-      addSymbol(s[i]);
+      if (s[i].name != null)	
+	addSymbol(s[i]);
   }
   
   /**

@@ -66,6 +66,7 @@ public class AST extends Node
 	if (o instanceof MethodBodyDefinition)
 	  ((MethodBodyDefinition) o).resolveBody();
       }
+    nice.tools.compiler.OutputMessages.exitIfErrors();
     module.freezeGlobalContext();
     doTypecheck();
   }

@@ -47,7 +47,17 @@ buildInfo(varScope, typeScope)
 analyse(s@Statement, varScope, typeScope, mustReturnAValue)
 {
   Info info = buildInfo(varScope, typeScope);
-  analyse(s, info);
+
+  try{
+    analyse(s, info);
+  }
+  catch(UnknownIdentException e){
+    bossa.util.User.error(e.ident, "" + e.ident + " is not declared");
+  }
+  catch(bossa.util.UserError e){
+    nice.tools.compiler.OutputMessages.error(e.getMessage());
+  }
+  
   if (mustReturnAValue && !info.getUnreachable())
     bossa.util.User.error(s, "Missing return statement");
 
@@ -396,7 +406,7 @@ analyse(b@Block, info)
       l.value = analyse(l.value, info);
     info.addVar(l.left);
   });
-  javaList(b.statements).iter(fun(Statement s)=>{
+  b.statements.iter(fun(Statement s)=>{
     if (info.getUnreachable())
       bossa.util.User.error(s, "Statement is never executed");
     analyse(s, info);
@@ -448,3 +458,6 @@ analyse(t@TryStmt, info)
   analyse(t.finallyBody, info);
 }
 
+// Local Variables:
+// nice-xprogram: "NICEJAR=$HOME/Nice/stdlib nicec --classpath=\"$HOME/Nice/stdlib:$HOME/Nice/classes:/$HOME/Nice/src\""
+// End:

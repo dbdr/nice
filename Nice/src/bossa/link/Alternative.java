@@ -95,9 +95,16 @@ public class Alternative
 	//Debug.println("pattern=" + name);
 	if (name.equals("_"))
 	  patterns.add(null);
+	else if (name.equals("NULL"))
+	  patterns.add(Pattern.nullTC);
 	else
 	  {
 	    TypeSymbol tc = Node.getGlobalTypeScope().lookup(name);
+
+	    if (tc == null)
+	      User.error("Pattern " + name +
+			 " of method " + methodName + 
+			 " is not known");
 
 	    if (tc == bossa.syntax.ConstantExp.arrayTC)
 	      /* Special treatment for arrays:
@@ -153,6 +160,12 @@ public class Alternative
 	if (ta == null)
 	  return false;
 	
+	if (ta == tb)
+	  continue;
+
+	if (ta == Pattern.nullTC || tb == Pattern.nullTC)
+	  return false;
+
 	if (!Typing.testRigidLeq(ta, tb))
 	  return false;
       }
@@ -170,6 +183,10 @@ public class Alternative
 	if (td == null)
 	  continue;
 	
+	// @null matches no class
+	if (td == Pattern.nullTC)
+	  return false;
+
 	TypeConstructor tc = tags[i];
 	// a null tc is an unmatchable argument (e.g. function)
 	if (tc == null)
@@ -203,8 +220,8 @@ public class Alternative
     
     Expression result = QuoteExp.trueExp;
     
-    for(int n = parameters.length-1; n >= 0; n--)
-      result = new gnu.expr.IfExp(matchTest(patterns[n],parameters[n]),
+    for(int n = parameters.length; --n >= 0; )
+      result = new gnu.expr.IfExp(matchTest(patterns[n], parameters[n]),
 				  result,
 				  QuoteExp.falseExp);
     
@@ -217,9 +234,18 @@ public class Alternative
     if (dom == null)
       return QuoteExp.trueExp;
 
+    if (dom == Pattern.nullTC)
+      return Inline.inline(IsNullProc.instance, parameter);
+
     Type ct = nice.tools.code.Types.javaType(dom);
-    if (parameter.getType().isSubtype(ct))
-      return QuoteExp.trueExp;
+    
+    /* 
+       This is not correct if the parameter is null:
+       we don't want @C to match a null value 
+       OPTIM: produce a '!is_null' in this case
+    */
+    //if (parameter.getType().isSubtype(ct))
+    //return QuoteExp.trueExp;
     
     return instanceOfExp(parameter, ct);
   }

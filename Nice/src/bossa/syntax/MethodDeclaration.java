@@ -86,7 +86,7 @@ abstract public class MethodDeclaration extends Definition
 			mlsub.typing.Monotype[] parameters, 
 			mlsub.typing.Monotype returnType)
   {
-    arity = (parameters==null ? 0 : parameters.length);
+    arity = (parameters == null ? 0 : parameters.length);
     symbol = new MethodDeclaration.Symbol(name, null);
     symbol.type = new mlsub.typing.Polytype
       (cst, new mlsub.typing.FunType(parameters, returnType));

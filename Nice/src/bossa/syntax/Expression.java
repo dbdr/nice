@@ -33,6 +33,8 @@ public abstract class Expression extends Node
     super(Node.down);
   }
 
+  public static final Expression[] noExpressions = new Expression[0];
+
   /** @return true iff this expression can be assigned a value. */
   boolean isAssignable()
   {

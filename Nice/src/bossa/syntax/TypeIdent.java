@@ -64,7 +64,7 @@ public final class TypeIdent extends Monotype implements Located
     TypeSymbol res = scope.lookup(name.toString());
 
     if (res == null)
-      User.error(this, name + " is not declared");
+      throw dispatch.unknownIdent$0(name);
     
     return res;
   }
@@ -72,8 +72,6 @@ public final class TypeIdent extends Monotype implements Located
   public mlsub.typing.Monotype resolve(TypeMap scope)
   {
     TypeSymbol res = resolveToTypeSymbol(scope);
-    if (res == null)
-      User.error(this, name + " is not declared");
     
     if (res instanceof MonotypeVar)
       return (MonotypeVar) res;

@@ -66,7 +66,7 @@ public class IncrementExp extends Expression
 		     "so it should be a call to a FieldAccessMethod");
 
     return Inline.inline
-      (new IncrementProc(access.field(), returnOld, increment),
+      (new IncrementProc(access.field, returnOld, increment),
        call.arguments.getExp(0).generateCode());
   }
 

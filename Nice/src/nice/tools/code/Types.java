@@ -458,7 +458,8 @@ public final class Types
 
   public static String bytecodeRepresentation(TypeConstructor tc)
   {
-    if(tc==null) return "_";
+    if (tc == null) return "_";
+    if (tc == bossa.syntax.Pattern.nullTC) return "NULL";
     return tc.toString();
   }
 

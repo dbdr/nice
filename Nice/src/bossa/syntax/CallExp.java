@@ -244,38 +244,16 @@ public class CallExp extends Expression
   }
 
   /****************************************************************
-   * Typechecking
-   ****************************************************************/
-
-  void typecheck()
-  {
-    // forces computation of the type if not done.
-    Polytype t = getType();
-    
-    // Prepare the bytecode type for EnsureTypeProc
-    if (t.getConstraint() != Constraint.True)
-      try{
-	Typing.enter();
-	try{
-	  Constraint.assert(t.getConstraint());
-	  Types.setBytecodeType(t.getMonotype());
-	}
-	finally{
-	  Typing.leave();
-	}
-      }
-      catch(TypingEx e){
-      }
-  }
-  
-  /****************************************************************
    * Code generation
    ****************************************************************/
 
   protected gnu.expr.Expression compile()
   {
-    // wraps the arguments that reference methods into LambdaExps
+    if (computedExpressions == null)
+      System.out.println("NULL is " + this);
     gnu.expr.Expression[] params = Expression.compile(computedExpressions);
+
+    // wraps the arguments that reference methods into LambdaExps
     for(int i=0; i<params.length; i++)
       if(params[i] instanceof gnu.expr.QuoteExp)
 	{
@@ -297,10 +275,18 @@ public class CallExp extends Expression
   {
     if (!function.isFieldAccess())
       Internal.error(this, "Assignment to a call that is not a field access");
-    if (arguments.size() != 1)
-      Internal.error(this, "A field access should have 1 parameter");
 
-    return function.getFieldAccessMethod().compileAssign(arguments.getExp(0), value);
+    FieldAccess access = function.getFieldAccessMethod();
+    switch (arguments.size())
+    {
+    case 0:
+      return access.compileAssign(value);
+    case 1:
+      return access.compileAssign(arguments.getExp(0), value);
+    default:
+      Internal.error(this, "A field access should have 0 or 1 parameter");
+      return null;
+    }
   }
 
   /****************************************************************

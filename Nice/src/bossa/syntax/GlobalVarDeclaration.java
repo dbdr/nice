@@ -97,6 +97,7 @@ public class GlobalVarDeclaration extends Definition
     if(value==null) return;
     try{
       value.resolveOverloading(left.getType());
+      bossa.syntax.dispatch.typecheck$1(value);
       Typing.leq(value.getType(),left.getType());
     }
     catch(TypingEx e){

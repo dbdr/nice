@@ -21,25 +21,42 @@ package nice.tools.compiler;
 
 public final class OutputMessages
 {
-  /**
-   Exit code table:
-   0 : Normal exit (compilation sucessful, version message)
-   1 : Abnormal termination (bug in the compiler)
-   2 : Error reported (file missing, type error, ...)
-   3 : Warning reported
-  */
-  public static int statusCode()
-  {
-    return statusCode;
-  }
-  
   public static void warning(String message)
   {
-    setStatusCode(3);
+    setStatusCode(WARNING);
     System.out.println(message);
   }
   
-  private static int statusCode = 0;
+  public static void error(String message)
+  {
+    setStatusCode(ERROR);
+    System.out.println(message);
+  }
+  
+  public static void fatal(String message)
+  {
+    error(message);
+    exitIfErrors();
+  }
+  
+  public static void exitIfErrors()
+  {
+    if (statusCode == ERROR || statusCode == BUG)
+      exit();
+  }
+
+  public static void exit()
+  {
+    System.exit(statusCode);
+  }
+  
+  public static final int 
+    OK      = 0, // Normal exit (compilation sucessful, version message)
+    BUG     = 1, // Abnormal termination (bug in the compiler)
+    ERROR   = 2, // Error reported (file missing, type error, ...)
+    WARNING = 3; // Warning reported
+
+  private static int statusCode = OK;
   
   private static void setStatusCode(int status)
   {
@@ -50,10 +67,10 @@ public final class OutputMessages
   private static boolean worse(int status, int than)
   {
     switch(than){
-    case 0: return true;
-    case 1: return false;
-    case 2: return false;
-    case 3: return status == 1 || status == 2;
+    case OK: return true;
+    case BUG: return false;
+    case ERROR: return false;
+    case WARNING: return status == 1 || status == 2;
     default: return false;
     }
   }

@@ -124,6 +124,9 @@ main(args)
   make(compilation);
   
   }
+  catch(bossa.util.UserError e){
+    nice.tools.compiler.OutputMessages.error(e.getMessage());
+  }
   catch(ExceptionInInitializerError e){
     uncaughtException = e.getException();
   }
@@ -144,7 +147,7 @@ main(args)
   
   if (memInfo) printMemoryUsage();
 
-  System.exit(OutputMessages.statusCode());
+  OutputMessages.exit();
 }
 
 void usage();

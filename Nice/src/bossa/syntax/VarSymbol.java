@@ -106,7 +106,7 @@ abstract class VarSymbol extends Node implements Located
   void setDeclaration(gnu.expr.Declaration declaration)
   {
     this.decl = declaration;
-    this.decl.setLine(name.location().getLine());
+    if (name != null) this.decl.setLine(name.location().getLine());
     this.decl.setCanRead(true);
     this.decl.setCanWrite(true);
 

@@ -47,11 +47,6 @@ public class IfExp extends Expression
     this.type = Polytype.union(thenExp.getType(),elseExp.getType());
   }
   
-  void typecheck()
-  {
-    condition.resolveOverloading(ConstantExp.boolPolytype);
-  }
-
   /****************************************************************
    * Code generation
    ****************************************************************/

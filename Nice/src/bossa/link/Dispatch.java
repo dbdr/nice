@@ -234,7 +234,8 @@ public final class Dispatch
 	failed = true;
 	if(sortedAlternatives.size()==0)
 	  User.error
-	    (method, "Method " + method + " is declared but never defined");
+	    (method, "Method " + method + " is declared but never defined",
+	     "\nBytecode name: " + method.getBytecodeName());
 	else
 	  User.warning(method,
 		       "Method "+method+" is not exhaustive:\n"+
@@ -268,17 +269,19 @@ public final class Dispatch
       }
 
     block.setBody(dispatch(sortedAlternatives.iterator(),
+			   m.getType().codomain(),
 			   m.javaReturnType().isVoid(),
 			   block,
 			   params));
-    
+
     lexp.setPrimMethod(m.getDispatchPrimMethod());
     
     module.compileDispatchMethod(lexp);
   }
   
   private static Expression dispatch(Iterator sortedAlternatives, 
-				     boolean voidReturn, 
+				     mlsub.typing.Monotype returnType, 
+				     boolean voidReturn,
 				     final BlockExp block, 
 				     Expression[] params)
   {
@@ -288,22 +291,22 @@ public final class Dispatch
       else
 	return new BeginExp
 	  (new ThrowExp(new QuoteExp(new Error("Message not understood"))),
-	   QuoteExp.nullExp);
+	   nice.tools.code.Types.defaultValue(returnType));
     
     Alternative a = (Alternative) sortedAlternatives.next();
     Expression matchTest = a.matchTest(params);
 
-    Expression matchCase;
-    if(voidReturn)
-      matchCase = new ApplyExp(a.methodExp(),params);
-    else
-      matchCase = new ExitExp(new ApplyExp(a.methodExp(),params),block);
+    Expression matchCase = new ApplyExp(a.methodExp(), params);
+    if(!voidReturn)
+      matchCase = new ExitExp(matchCase, block);
     
-    boolean optimize = true;
-    
+    boolean optimize = false;
+
     if(optimize && !sortedAlternatives.hasNext())
       return matchCase;
     else
-      return new gnu.expr.IfExp(matchTest, matchCase, dispatch(sortedAlternatives,voidReturn,block,params));
+      return new gnu.expr.IfExp
+	(matchTest, matchCase, 
+	 dispatch(sortedAlternatives, returnType, voidReturn, block, params));
   }
 }

@@ -102,6 +102,12 @@ abstract public class Node
     return c;
   }
   
+  void addChildren(Node[] values)
+  {
+    for (int i = 0; i < values.length; i++)
+      addChild(values[i]);
+  }
+
   void addSymbol(VarSymbol s)
   {
     if (varSymbols == null)
@@ -322,6 +328,8 @@ abstract public class Node
   // The current function should be saved in nodes that need it
   // during execution of their typecheck method.
   static Function currentFunction;
+  static Function getCurrentFunction() { return currentFunction; }
+  static void setCurrentFunction(Function f) { currentFunction = f; }
   
   /** override this when typechecking is needed. */
   void typecheck() { }

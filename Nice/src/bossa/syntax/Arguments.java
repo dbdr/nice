@@ -89,7 +89,7 @@ public class Arguments extends Node
 
   void typecheck()
   {
-    for (int i = arguments.length; --i>=0; )
+    for (int i = arguments.length; --i >= 0; )
       arguments[i].value.doTypecheck();
   }
   
@@ -107,6 +107,9 @@ public class Arguments extends Node
   
   Expression[] inOrder()
   {
+    if (arguments.length == 0)
+      return Expression.noExpressions;
+
     Expression[] res = new Expression[arguments.length];
     
     for (int i = arguments.length; --i>=0; )

@@ -275,4 +275,26 @@ public class ConstantExp extends Expression
 
   // syntatic types
   static Monotype synVoidType;
+
+  private static TypeConstructor throwableTC;
+  static TypeConstructor throwableTC()
+  {
+    if(throwableTC==null)
+      throwableTC = JavaClasses.make
+	("java.lang.Throwable", gnu.bytecode.Type.throwable_type);
+
+    return throwableTC;
+  }
+	
+  private static mlsub.typing.Polytype throwableType;
+  static mlsub.typing.Polytype throwableType()
+  {
+    if (throwableType == null)
+      {
+	throwableType = new mlsub.typing.Polytype
+	  (mlsub.typing.Constraint.True, 
+	   new MonotypeConstructor(throwableTC(), null));
+      }
+    return throwableType;
+  }
 }

@@ -32,40 +32,6 @@ public class ThrowStmt extends Statement
     this.exn = expChild(e);
   }
 
-  private static TypeConstructor throwableTC;
-  static TypeConstructor throwableTC()
-  {
-    if(throwableTC==null)
-      throwableTC = JavaClasses.make
-	("java.lang.Throwable", gnu.bytecode.Type.throwable_type);
-
-    return throwableTC;
-  }
-	
-  private static Polytype throwableType;
-  static Polytype throwableType()
-  {
-    if(throwableType==null)
-      {
-	throwableType = new Polytype
-	  (mlsub.typing.Constraint.True, 
-	   new MonotypeConstructor(throwableTC() ,null));
-      }
-    return throwableType;
-  }
-  
-  public void typecheck()
-  {
-    try{
-      Typing.leq(exn.getType(), throwableType());
-    }
-    catch(TypingEx e){
-      User.error(exn,
-		 exn+" is not throwable",
-		 e);
-    }
-  }
-  
   public gnu.expr.Expression generateCode()
   {
     return new gnu.expr.ThrowExp(exn.generateCode());

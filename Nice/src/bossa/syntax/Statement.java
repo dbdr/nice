@@ -41,13 +41,21 @@ public abstract class Statement extends Node
 
   abstract gnu.expr.Expression generateCode();
 
-  static gnu.expr.Expression[] compile(List statements)
+  /*static gnu.expr.Expression[] compile(List statements)
   {
     gnu.expr.Expression[] res=new gnu.expr.Expression[statements.size()];
     int n=0;
     for(Iterator i=statements.iterator();
 	i.hasNext();n++)
       res[n]=((Statement)i.next()).generateCode();
+    return res;
+    }*/
+
+  static gnu.expr.Expression[] compile(Statement[] statements)
+  {
+    gnu.expr.Expression[] res = new gnu.expr.Expression[statements.length];
+    for(int i = 0; i < statements.length; i++)
+      res[i] = statements[i].generateCode();
     return res;
   }
 

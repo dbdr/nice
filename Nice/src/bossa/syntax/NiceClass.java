@@ -173,9 +173,13 @@ public class NiceClass extends ClassDefinition
   {
     super.createContext();
     
-    if (methods != null)
-      for (Iterator i = methods.iterator(); i.hasNext();)
-	((MethodDeclaration) i.next()).createContext();
+    if (children != null)
+      for (Iterator i = children.iterator(); i.hasNext();)
+	{
+	  Object child = i.next();
+	  if (child instanceof MethodDeclaration)
+	    ((MethodDeclaration) child).createContext();
+	}
   }
 
   void resolve()

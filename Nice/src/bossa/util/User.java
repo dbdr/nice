@@ -17,13 +17,12 @@
 package bossa.util;
 
 /**
- * Messages for the user.
- *
- * When the error or warning is conditional, 
- * put it inside a 'if'.
- * This is better than passing a boolean to error(), 
- * since the latter, forcing evaluation of the string,
- * would slow down compilation.
+   Messages for the user.
+   
+   When the error or warning is conditional, put it inside a 'if'.
+   This is better than passing a boolean to error(), 
+   since the latter, forcing evaluation of the string,
+   would slow down compilation.
  */
 public final class User
 {
@@ -67,8 +66,7 @@ public final class User
     if(Debug.alwaysDumpStack)
       Internal.printStackTrace();
     
-    System.out.println(message);
-    System.exit(2);
+    throw new UserError(message);
   }
 
   public static void warning(Located responsible, String message)

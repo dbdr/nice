@@ -54,15 +54,25 @@ public class MethodBodyDefinition extends Definition
 
     this.binders = binders; 
 
-    this.formals = formals;
+    this.formals = makeFormals(formals, container);
     this.body = body;
     this.definition = null;
     
-    if (container != null)
-      formals.add(0, new Pattern(THIS, new TypeIdent(container.getName())));
-
     if(name.content.equals("main") && formals.size()==1)
       module.isRunnable(true);
+  }
+
+  private static Pattern[] makeFormals(List formals, NiceClass container)
+  {
+    if (container == null)
+      return (Pattern[]) formals.toArray(new Pattern[formals.size()]);
+
+    Pattern[] res = new Pattern[formals.size() + 1];
+    res[0] = new Pattern(THIS, new TypeIdent(container.getName()));
+    int n = 1;
+    for(Iterator f = formals.iterator(); f.hasNext(); n++)
+      res[n++] = (Pattern) f.next();
+    return res;
   }
 
   private static LocatedString THIS = 
@@ -73,9 +83,9 @@ public class MethodBodyDefinition extends Definition
     return null;
   }
   
-  private MonoSymbol[] buildSymbols(Collection names, Monotype[] types)
+  private MonoSymbol[] buildSymbols(Pattern[] names, Monotype[] types)
   {
-    if(names.size() != types.length)
+    if(names.length != types.length)
       switch(types.length){
       case 0: User.error(this,"Method "+name+" has no parameters");
       case 1: User.error(this,"Method "+name+" has 1 parameter");
@@ -83,17 +93,24 @@ public class MethodBodyDefinition extends Definition
 			 "Method "+name+" has "+types.length+" parameters");
       }
     
-    MonoSymbol[] res = new MonoSymbol[names.size()];
-    int tn = 0;
-    for(Iterator n = names.iterator(); n.hasNext(); tn++)
+    MonoSymbol[] res = new MonoSymbol[names.length];
+    for(int tn = 0; tn < names.length; tn++)
       {
-	Pattern p = (Pattern)n.next();
-	Monotype domt = types[tn];
+	Pattern p = names[tn];
 
-	LocatedString typeName = p.name.cloneLS();
-	typeName.prepend("type of ");
-	
-	MonotypeVar type = new MonotypeVar(typeName.toString());
+	MonotypeVar type;
+
+	if (p.name == null)
+	  // anonymous pattern
+	  type = new MonotypeVar("anonymous argument " + tn);
+	else
+	  {
+	    LocatedString typeName;
+	    typeName = p.name.cloneLS();
+	    typeName.prepend("type of ");	
+	    type = new MonotypeVar(typeName.toString());
+	  }
+
 	if(!p.isSharp())
 	  type.rememberToImplementTop();
 	
@@ -108,7 +125,7 @@ public class MethodBodyDefinition extends Definition
       User.error(this, "Method " + name + " is not declared");
 
     this.definition = d;
-    parameters = buildSymbols(this.formals,definition.symbol.type.domain());
+    parameters = buildSymbols(this.formals, definition.symbol.type.domain());
     scope.addSymbols(parameters);
   }
 
@@ -126,6 +143,7 @@ public class MethodBodyDefinition extends Definition
       return (VarSymbol) symbols.get(0);
 
     TypeConstructor[] tags = Pattern.getTC(formals);
+    TypeConstructor[] additionalTags = Pattern.getAdditionalTC(formals);
     
     for(Iterator i = symbols.iterator(); i.hasNext();){
       VarSymbol s = (VarSymbol)i.next();
@@ -139,7 +157,7 @@ public class MethodBodyDefinition extends Definition
 
       // It doesn't make sense to define a body for a native method, does it ?
       if(!(m instanceof NiceMethod) 
-	 || m.getArity() != formals.size())
+	 || m.getArity() != formals.length)
 	{
 	  i.remove();
 	  continue;
@@ -151,10 +169,12 @@ public class MethodBodyDefinition extends Definition
 	  level = Typing.enter("Trying definition "+m+" for method body "+name);
 	else
 	  level = Typing.enter();
-	    
+	
 	try{
-	  Constraint.assert(m.getType().getConstraint());
-	  Typing.leq(tags, m.getType().domain());
+	  mlsub.typing.Polytype t = m.getType();
+	  Constraint.assert(t.getConstraint());
+	  Typing.leq(tags, t.domain());
+	  Typing.leq(additionalTags, t.domain());
 	}
 	finally{
 	  if(Typing.leave() != level)
@@ -162,7 +182,7 @@ public class MethodBodyDefinition extends Definition
 	}
       }
       catch(TypingEx e){
-	if(Debug.typing) Debug.println("Not the right choice :"+e);
+	if(Debug.overloading) Debug.println("Not the right choice :"+e);
 	i.remove();
       }
       catch(mlsub.typing.BadSizeEx e){
@@ -243,18 +263,9 @@ public class MethodBodyDefinition extends Definition
 
   void resolveBody()
   {
-    try{
-      body = bossa.syntax.dispatch.analyse$0
-	(body, scope, typeScope,
-	 !definition.getType().codomain().toString().equals("nice.lang.void"));
-    }
-    catch(UnknownIdentException e){
-      User.error(e.ident, e.ident + " is not declared");
-      }
-    catch(RuntimeException e){
-      Debug.println("Nice analysis error: " + e);
-      e.printStackTrace();
-    }
+    body = bossa.syntax.dispatch.analyse$0
+    (body, scope, typeScope,
+     !definition.getType().codomain().toString().equals("nice.lang.void"));
   }
   
   /****************************************************************
@@ -277,7 +288,11 @@ public class MethodBodyDefinition extends Definition
 
   void typecheck()
   {
-    Typing.enter("METHOD BODY " + this + "\n\n");
+    if (Debug.typing)
+      Typing.enter("METHOD BODY " + this + "\n\n");
+    else
+      Typing.enter();
+
     // remeber that enter was called, to leave.
     // usefull if previous code throws an exception
     entered = true;
@@ -290,17 +305,20 @@ public class MethodBodyDefinition extends Definition
 		   ": "+e.getMessage());
       }
       
+      // Introduce the types of the arguments
       Monotype[] monotypes = MonoSymbol.getMonotype(parameters);
       Typing.introduce(monotypes);
 
-      Typing.leqMono
-	(monotypes,
-	 definition.getType().domain());
+      // The arguments have types below the method declaration domain
+      Monotype[] domain = definition.getType().domain();
+      for (int i = 0; i < monotypes.length; i++)
+	Typing.leq(monotypes[i], domain[i]);
       
+      // The arguments are specialized by the patterns
       try{
-	Typing.in
-	  (monotypes,
-	   Pattern.getDomain(formals));
+	Domain[] patDomain = Pattern.getDomain(formals);
+	for (int i = 0; i < monotypes.length; i++)
+	  Typing.in(monotypes[i], patDomain[i]);
 
 	nice.tools.code.Types.setBytecodeType(monotypes);
 
@@ -310,15 +328,16 @@ public class MethodBodyDefinition extends Definition
 	User.error(name,"The patterns are not correct", e);
       }
       
-      int n = 0;
-      for(Iterator f = formals.iterator(); f.hasNext(); n++)
+      // Introduction of binders for the types of the arguments
+      // as in f(x@C : X)
+      for(int n = 0; n < formals.length; n++)
 	{
-	  Pattern pat = (Pattern)f.next();
-	  MonoSymbol sym = parameters[n];
-	  
+	  Pattern pat = formals[n];
 	  Monotype type = pat.getType();
-	  if(type==null)
+	  if (type == null)
 	    continue;
+	  
+	  MonoSymbol sym = parameters[n];
 	  
 	  try{
 	    if(type instanceof MonotypeConstructor)
@@ -341,7 +360,6 @@ public class MethodBodyDefinition extends Definition
 		       ": "+e);
 	  }       
 	}
-      // end of New Constraint
     }
     catch(mlsub.typing.BadSizeEx e){
       Internal.error("Bad size in MethodBodyDefinition.typecheck()");
@@ -351,7 +369,8 @@ public class MethodBodyDefinition extends Definition
     }
 
     Node.currentFunction = this;
-    body.doTypecheck();
+    bossa.syntax.dispatch.typecheck$0(body);
+    Node.currentFunction = null;
   }
 
   private boolean entered = false;
@@ -422,7 +441,7 @@ public class MethodBodyDefinition extends Definition
 
     lexp.setPrimMethod(primMethod);
 
-    if(name.content.equals("main") && formals.size()==1)
+    if(name.content.equals("main") && formals.length == 1)
       module.setMainAlternative(lexp.getMainMethod());
 
     // Parameters
@@ -432,7 +451,9 @@ public class MethodBodyDefinition extends Definition
       {
 	MonoSymbol param = (MonoSymbol) parameters[n];
 	
-	gnu.expr.Declaration d = lexp.addDeclaration(param.name.toString());
+	String name = param.name == null ? 
+	  "anonymous_" + n : param.name.toString();
+	gnu.expr.Declaration d = lexp.addDeclaration(name);
 	d.setParameter(true);
 	d.setType(javaArgTypes[n]);
 	d.noteValue(null);
@@ -445,7 +466,7 @@ public class MethodBodyDefinition extends Definition
 
     //Register this alternative for the link test
     new bossa.link.Alternative(this.definition,
-			       Pattern.getTC(this.formals),
+			       Pattern.getLinkTC(this.formals),
 			       module.getOutputBytecode(),
 			       lexp.getMainMethod());
   }
@@ -493,7 +514,7 @@ public class MethodBodyDefinition extends Definition
 
   private NiceMethod definition;
   protected MonoSymbol[] parameters;
-  protected List       /* of Patterns */   formals;
+  protected Pattern[] formals;
   Collection /* of LocatedString */ binders; // Null if type parameters are not bound
   private Statement body;
 }

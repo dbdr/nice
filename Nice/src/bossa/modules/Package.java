@@ -301,6 +301,7 @@ public class Package implements mlsub.compilation.Module, Located, bossa.syntax.
   public void compile()
   {    
     typecheck();
+    nice.tools.compiler.OutputMessages.exitIfErrors();
     generateCode();
     saveInterface();
   }
@@ -358,6 +359,7 @@ public class Package implements mlsub.compilation.Module, Located, bossa.syntax.
       closeJar();
     else if (!Debug.skipLinkTests)
       addClass(dispatchClass);
+    nice.tools.compiler.OutputMessages.exitIfErrors();
   }
 
   private void saveInterface()
@@ -743,7 +745,7 @@ public class Package implements mlsub.compilation.Module, Located, bossa.syntax.
 	res = str + "$" + (i++);
       }
     while(takenNames.containsKey(res));
-    
+
     takenNames.put(res,null);
     return res;
   }

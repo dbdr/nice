@@ -57,10 +57,10 @@ public class MonoSymbol extends VarSymbol
   }
 
   /**
-   * Maps getMonotype over an array of MonoSymbols
-   *
-   * @param symbols the array of MonoSymbols
-   * @return the array of their Monotypes
+     Maps getMonotype over an array of MonoSymbols.
+
+     @param symbols the array of MonoSymbols
+     @return the array of their Monotypes
    */
   static mlsub.typing.Monotype[] getMonotype(MonoSymbol[] symbols)
   {

@@ -13,6 +13,8 @@ nice (0.7.6) unstable; urgency=low
       (char c => assert c != 'Z')
   * Method type parameters can be constrained to be non null by prefixing
     with the ! character, just like class type parameters.
+  * 'this' can now be left implicit even in implementations of methods
+    declared externally to a class.
   * Parser support for public-read and private-write fields (experimental).
   * Bugfixes (using anonymous functions while overriding native methods, 
     automatic array conversions in polymorphic code, ...).

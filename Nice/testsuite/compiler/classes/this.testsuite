@@ -90,3 +90,14 @@ class A{
 class B{
   String _field;
 }
+
+/// PASS
+  /// Toplevel
+// Use implicit this in an implementation of an external method.
+int getX(A);
+
+class A {
+  int x;
+
+   getX() = x;
+}

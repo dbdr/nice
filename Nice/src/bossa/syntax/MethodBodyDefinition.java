@@ -60,6 +60,8 @@ public class MethodBodyDefinition extends Definition
     this.formals = makeFormals(formals, container, name.location());
     this.body = body;
     this.declaration = null;
+
+    this.insideClass = container != null;
   }
 
   private static Pattern[] makeFormals(List formals, NiceClass container,
@@ -406,7 +408,7 @@ public class MethodBodyDefinition extends Definition
 	  }
 
 	Node.currentFunction = this;
-	if (declaration.hasThis())
+	if (insideClass)
 	  Node.thisExp = new SymbolExp(parameters[0], location());
 
 	bossa.syntax.dispatch.typecheck(body);
@@ -555,5 +557,6 @@ public class MethodBodyDefinition extends Definition
   private Pattern[] formals;
   Collection /* of LocatedString */ binders; // Null if type parameters are not bound
   private Statement body;
+  private boolean insideClass;
 }
 

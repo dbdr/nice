@@ -6,8 +6,10 @@ nice (0.5.2) unstable; urgency=low
   * Fixed parsing problem with (x.f)(e) as a statement.
   * Allow classpath to be set for external java classes without
     requiring to include Nice's bootstrap classes.
+  * Functions are generated in a class "<packagename>.fun", so that
+    they can be called from code written in Java.
 
- -- Daniel Bonniot <bonniot@users.sourceforge.net>  Mon,  6 May 2002 11:21:17 +0200
+ -- Daniel Bonniot <bonniot@users.sourceforge.net>  Tue,  7 May 2002 15:23:53 +0200
 
 nice (0.5.1) unstable; urgency=low
 

@@ -24,6 +24,12 @@ public final class NiceUtils
      return nice.tools.code.Inline.inline(proc, arg1, arg2);
   }
 
+  public static gnu.mapping.Procedure getThrowInstance()
+  {
+    return nice.lang.inline.Throw.instance;
+  }
+
+
   static ClassLoader inlineLoader;
 
   static

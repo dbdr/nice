@@ -76,10 +76,10 @@ private void testNiceMethod(NiceMethod m, bossa.modules.Package module)
   if(bossa.util.Debug.codeGeneration)
     bossa.util.Debug.println("Generating dispatch function for "+m);
     
-  Compilation.compile(m, sortedAlternatives, module);
+  compileNiceMethod(m, sortedAlternatives, module);
 }
 
-private void testJavaMethod(MethodDeclaration/*JavaMethod*/ m, bossa.modules.Package module)
+private void testJavaMethod(JavaMethod m, bossa.modules.Package module)
 {
   Stack<Alternative> sortedAlternatives = Alternative.sortedAlternatives(m);
 
@@ -89,7 +89,7 @@ private void testJavaMethod(MethodDeclaration/*JavaMethod*/ m, bossa.modules.Pac
   if(bossa.util.Debug.codeGeneration)
     bossa.util.Debug.println("Generating dispatch function for " + m);
 
-  Compilation.compile(m, sortedAlternatives, module);
+  compileJavaMethod(m, sortedAlternatives, module);
 }
 
 private boolean trivialTestOK(Stack<Alternative> alternatives)

@@ -172,7 +172,7 @@ public class Alternative implements Located
      @return the expression that tests if this alternative matches
      the tuple <code>parameters</code>.
    */
-  Expression matchTest(Expression[] parameters, boolean skipFirst)
+  public Expression matchTest(Expression[] parameters, boolean skipFirst)
   {
     if (parameters.length != patterns.length)
       Internal.error("Incorrect parameters "+

@@ -1,0 +1,201 @@
+/**************************************************************************/
+/*                                N I C E                                 */
+/*             A high-level object-oriented research language             */
+/*                        (c) Daniel Bonniot 2001                         */
+/*                                                                        */
+/*  This program is free software; you can redistribute it and/or modify  */
+/*  it under the terms of the GNU General Public License as published by  */
+/*  the Free Software Foundation; either version 2 of the License, or     */
+/*  (at your option) any later version.                                   */
+/*                                                                        */
+/**************************************************************************/
+
+// TODO: this class belongs in bossa.link
+package bossa.syntax;
+
+import bossa.link.*;
+
+/**
+   Compilation of the dispatch functions.
+
+ */
+
+let gnu.bytecode.Method newError = notNull(gnu.bytecode.ClassType.
+	make("java.lang.Error")).getDeclaredMethod("<init>",
+	[cast(gnu.bytecode.Type.string_type)]);
+
+public void compileNiceMethod(NiceMethod m, 
+		      Stack<Alternative> sortedAlternatives, 
+		      bossa.modules.Package module)
+{
+  gnu.expr.LambdaExp lexp = m.getLambda();
+    
+  // parameters of the alternative function are the same in each case, 
+  // so we compute them just once
+  int arity = m.getArity();
+  gnu.expr.Expression[] params = cast(new gnu.expr.Expression[arity]);
+  int rank = 0;
+  if (lexp.isClassMethod())
+    params[rank++] = new gnu.expr.ThisExp(lexp.outerClass());
+  for(gnu.expr.Declaration param = lexp.firstDecl(); rank < arity; param = param.nextDecl())
+      params[rank++] = new gnu.expr.ReferenceExp(param);
+
+  gnu.expr.Expression body = dispatchNiceMethod
+      (sortedAlternatives.iterator(), 
+       m.javaReturnType(), m.javaReturnType().isVoid(), params);
+
+  if (m.isMain())
+    body = beautifyUncaughtExceptions(body);
+
+  nice.tools.code.Gen.setMethodBody(lexp, m.getContract().compile(body));
+}
+  
+private gnu.expr.Expression dispatchNiceMethod(Iterator<Alternative> sortedAlternatives, 
+				     gnu.bytecode.Type returnType, 
+				     boolean voidReturn,
+				     gnu.expr.Expression[] params)
+{
+  if (!sortedAlternatives.hasNext())
+    // We produce code that should never be reached at run-time.
+    return  new gnu.expr.ApplyExp(NiceUtils.getThrowInstance(),
+	[new gnu.expr.ApplyExp(new gnu.expr.InstantiateProc(newError), 
+		[new gnu.expr.QuoteExp("Message not understood")])]);
+
+  Alternative alt = sortedAlternatives.next();
+  gnu.expr.Expression matchCase = new gnu.expr.ApplyExp(alt.methodExp(), params);
+
+  if (voidReturn)
+    matchCase = new gnu.expr.BeginExp(matchCase, nice.tools.code.Gen.returnVoid());
+  else
+    matchCase = nice.tools.code.Gen.returnValue(matchCase);
+    
+  boolean optimize = true;
+
+  if (optimize && !sortedAlternatives.hasNext())
+    return matchCase;
+  else
+    return gnu.expr.SimpleIfExp.make(alt.matchTest(params, false), matchCase, 
+	 dispatchNiceMethod(sortedAlternatives, returnType, voidReturn, params));
+}
+
+private gnu.expr.Expression beautifyUncaughtExceptions(gnu.expr.Expression body)
+{
+  gnu.expr.TryExp res = new gnu.expr.TryExp(body, null);
+
+  gnu.expr.CatchClause c = new gnu.expr.CatchClause("uncaughtException", gnu.bytecode.Type.throwable_type);
+  res.setCatchClauses(c);
+
+  gnu.bytecode.Method print = gnu.bytecode.ClassType.make("nice.lang.dispatch").
+      addMethod("printStackTraceWithSourceInfo", 
+                gnu.bytecode.Access.PUBLIC | gnu.bytecode.Access.STATIC,
+                [cast(gnu.bytecode.Type.throwable_type)],
+                gnu.bytecode.Type.void_type);
+
+  c.setBody(new gnu.expr.ApplyExp(new gnu.expr.PrimProcedure(print),
+        [new gnu.expr.ReferenceExp(c.getDeclaration())]));
+
+  return res;
+}
+
+
+public void compileJavaMethod(JavaMethod m, Stack<Alternative> sortedAlternatives, 
+		bossa.modules.Package module)
+{
+  int arity = m.getArity();
+
+  while (sortedAlternatives.size() > 0) 
+    {
+      // We pick a class, and compile all implementations whose
+      // first argument is at that class.
+      Iterator<Alternative> i = sortedAlternatives.iterator();
+      Alternative a = i.next();
+      NiceClass c = declaringClass(m, a);
+      i.remove();
+
+      List<Alternative> l = new LinkedList();
+      l.add(a);
+      while (i.hasNext())
+        {
+          a = i.next();
+          if (declaringClass(m, a) == c)
+            {
+              l.add(a);
+              i.remove();
+            }
+        }
+
+      gnu.expr.Expression[] params = cast(new gnu.expr.Expression[arity]);
+      gnu.expr.LambdaExp lambda = nice.tools.code.Gen.createMemberMethod
+	    (m.getName().toString(), 
+	     c.getClassExp().getType(), 
+	     m.javaArgTypes(),
+	     m.javaReturnType(),
+	     params);
+
+      c.addJavaMethod(lambda);
+      gnu.expr.Expression body = dispatchJavaMethod
+	  (l.iterator(), m.javaReturnType(), m.javaReturnType().isVoid(), 
+	   params, cast(c.getClassExp().getType()), m);
+      nice.tools.code.Gen.setMethodBody(lambda, body);
+    }
+}
+
+private NiceClass declaringClass(JavaMethod m, Alternative alt)
+{
+  mlsub.typing.TypeConstructor firstArgument = alt.getPatterns()[0].getTC();
+  let def = getTypeDefinition(firstArgument);
+
+
+  if (def != null && def.getImplementation() instanceof NiceClass)
+    return cast(def.getImplementation());
+
+  // Explain that this cannot be done.
+  String msg = m + " is a native method.\n";
+
+  if (firstArgument == null)
+    msg += "It cannot be implemented without dispatch on the first argument";
+  else
+    msg += "It cannot be overriden because the first argument " +
+           firstArgument + " is not a class defined in Nice";
+
+  throw User.error(alt, msg);
+}
+
+private gnu.expr.Expression dispatchJavaMethod(Iterator<Alternative> sortedAlternatives, 
+     gnu.bytecode.Type returnType, 
+     boolean voidReturn,
+     gnu.expr.Expression[] params,
+     gnu.bytecode.ClassType c, JavaMethod m)
+{
+  if (!sortedAlternatives.hasNext())
+    {
+      // Call super.
+      gnu.bytecode.ClassType superClass = notNull(c.getSuperclass());
+      ?gnu.bytecode.Method superMethod = superClass.getMethod
+	  (m.getName().toString(), m.javaArgTypes(), true);
+      if (superMethod != null)
+	  return new gnu.expr.ApplyExp
+	    (new gnu.expr.QuoteExp(gnu.expr.PrimProcedure.specialCall(superMethod)), params);
+	
+      // We produce code that should never be reached at run-time.
+
+      return  new gnu.expr.ApplyExp(NiceUtils.getThrowInstance(),
+		[new gnu.expr.ApplyExp(new gnu.expr.InstantiateProc(newError),
+			[new gnu.expr.QuoteExp("Message not understood")])]);
+
+    }
+
+  Alternative alt = sortedAlternatives.next();
+  gnu.expr.Expression matchCase = new gnu.expr.ApplyExp(alt.methodExp(), params);
+
+  if (voidReturn)
+    matchCase = new gnu.expr.BeginExp(matchCase, nice.tools.code.Gen.returnVoid());
+  else
+    matchCase = nice.tools.code.Gen.returnValue(matchCase);
+    
+  return gnu.expr.SimpleIfExp.make
+      (alt.matchTest(params, /* skip first */ true), 
+       matchCase, 
+       dispatchJavaMethod(sortedAlternatives, returnType, voidReturn, 
+			  params, c, m));
+}

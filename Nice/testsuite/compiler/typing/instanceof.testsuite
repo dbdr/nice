@@ -2,6 +2,9 @@
 class A{}
 class B extends A { int life = 42; }
 
+// An arbitrary higher-order function, that might let its argument escape.
+<T,U> void use(T->U f) {}
+
 /// PASS
   A a;
   a = new B();
@@ -260,7 +263,7 @@ void f() {
   class C extends B {}
 
 /// PASS
-  new LinkedList().foreach(A arg => {
+  use(A arg => {
     arg = new B();
     if (arg instanceof B) {
       assert arg.life == 42;
@@ -285,3 +288,26 @@ void f() {
       int x = a.life;
     }
   };
+
+/// PASS
+  // We know that foreach does not let its arguments escape.
+  A x = new A();
+  new LinkedList().foreach(A arg => {
+    x = arg;
+  });
+  if (x instanceof B)
+    assert x.life == 42;
+      
+/// FAIL
+  A x = new A();
+  void ?-> void f = null;
+  [0].foreach(int arg => {
+    // This anonymous function escapes, even though it is inside an arg of 
+    // foreach.
+    f = () => x = new A();
+  });
+  if (x instanceof B) {
+    if (f != null)
+      f();
+    assert x.life == 42;
+  }

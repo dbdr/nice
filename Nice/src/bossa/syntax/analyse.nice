@@ -277,11 +277,10 @@ void analyseExps(?Expression[] exps, Info info)
     exps[i] = analyse(exps[i], info);
 }
 
-void analyse(Arguments, Info);
-analyse(args@Arguments, info)
+void analyse(Arguments args, Info info, boolean noEscape)
 {
   for (int i = 0; i < args.size(); i++)
-    args.setExp(i, analyse(args.getExp(i), info));
+    args.setExp(i, analyse(args.getExp(i), info, noEscape: noEscape));
 }
 
 void markAsCallFun(Expression, boolean);
@@ -306,7 +305,10 @@ analyse(e@CallExp, info)
   if (e.infix)
     markAsCallFirstArg(notNull(args.getExp(0)));
 
-  args.analyse(info);
+  boolean noEscape = args.size() == 2 &&
+    (e.isCallTo("foreach") || e.isCallTo("forbreak") || e.isCallTo("map") ||
+     e.isCallTo("filter"));
+  args.analyse(info, noEscape);
 
   if (e.infix)
     {
@@ -392,14 +394,20 @@ Expression analyseQualifiedCall(CallExp e, Info info)
   return e;
 }      
 
-analyse(e@FunExp, info)
+?Expression analyse(Expression e, Info info, boolean noEscape) =
+  analyse(e, info);
+
+analyse(e@FunExp, info) = analyse(e, info, false);
+
+analyse(e@FunExp, info@Info, noEscape)
 {
   let savedDepth = info.anonFunDepth;
 
   try {
     info.beginInner();
     info.begin();
-    info.anonFunDepth = info.depth;
+    if (! noEscape)
+      info.anonFunDepth = info.depth;
 
     if (e.constraint != Constraint.True && e.constraint != null)
       {
@@ -553,7 +561,7 @@ analyse(e@NewArrayExp, info)
 
 analyse(e@NewExp, info)
 {
-  e.arguments.analyse(info);
+  e.arguments.analyse(info, noEscape: false);
   e.resolve(info.typeMap);
   return e;
 }

@@ -207,6 +207,7 @@ public class TestSuite {
 			TestCase testCase = (TestCase)iter.next();
 
       if (testCase.skip) {
+        TestNice.getOutput().startTestCase(testCase);
         testCase.fail();
         continue;
       }

@@ -58,21 +58,23 @@ public class JavaClass extends ClassDefinition
 	  extensions, implementations, abstractions);
     this.javaName = javaName;
 
-    if(name.toString().equals("nice.lang$Array") || name.toString().equals("nice.lang.Array"))
-      {
-	ConstantExp.arrayTC = this.tc;
-	javaType = nice.tools.code.SpecialArray.wrappedType();
-	nice.tools.code.Types.set(tc, javaType);
-      }
-    
     if(javaName == null) // primitive type
       {
 	isPrimitive = true;
-	javaType = ConstantExp.registerPrimType(name.toString(), tc);
-	if(javaType == null)
-	  User.error(this,
-		     name+" is not a known primitive type");
-      
+
+	if(name.toString().equals("nice.lang.Array"))
+	  {
+	    ConstantExp.arrayTC = this.tc;
+	    javaType = nice.tools.code.SpecialArray.wrappedType();
+	  }
+	else
+	  {
+	    javaType = ConstantExp.registerPrimType(name.toString(), tc);
+	    if(javaType == null)
+	      User.error(this,
+			 name+" is not a known primitive type");
+	  }
+	
 	nice.tools.code.Types.set(tc, javaType);
       }
     else
@@ -94,18 +96,14 @@ public class JavaClass extends ClassDefinition
 
     if(isPrimitive) return;
     
-    if (javaType == null)
-      {
-	java.lang.Class refClass 
-	  = nice.tools.code.Types.lookupJavaClass(javaName.toString());
+    java.lang.Class refClass 
+      = nice.tools.code.Types.lookupJavaClass(javaName.toString());
     
-	if(refClass==null)
-	  User.error(javaName,
-		     javaName+" was not found");
+    if (refClass == null)
+      User.error(javaName, javaName + " was not found in classpath");
     
-	javaType = (gnu.bytecode.ClassType) gnu.bytecode.Type.make(refClass);
-	nice.tools.code.Types.set(tc, javaType);
-      }
+    javaType = (gnu.bytecode.ClassType) gnu.bytecode.Type.make(refClass);
+    nice.tools.code.Types.set(tc, javaType);
   }
 
   private boolean isPrimitive;

@@ -1,42 +1,56 @@
+/**************************************************************************/
+/*                                N I C E                                 */
+/*             A high-level object-oriented research language             */
+/*                        (c) Daniel Bonniot 2000                         */
+/*                                                                        */
+/*  This program is free software; you can redistribute it and/or modify  */
+/*  it under the terms of the GNU General Public License as published by  */
+/*  the Free Software Foundation; either version 2 of the License, or     */
+/*  (at your option) any later version.                                   */
+/*                                                                        */
+/**************************************************************************/
+
 package nice.lang;
 
 /**
    Support for native arrays.
    Make them elements of the collection hierarchy.
+
+   T[] is an equivalent notation for Array<T>
 */
 
-class Array<T> // T[] is an equivalent notation for Array<T>
+class Array<T>
   implements Sequence
   finally implements Collection 
-  = native rawArray;
+  = native;
 
-<Any T> T[] resize(T[], int) = native Object rawArray.resize(Object,int);
+<Any T> T[] resize(T[], int) = native Object Native.resize(Object,int);
 
 <Any T> int length(T[]) = native int java.lang.reflect.Array.getLength(Object);
 
-<Any T> T get(T[],int) = native Object java.lang.reflect.Array.get(Object,int);
+<Any T> T get(T[],int) = 
+  native Object java.lang.reflect.Array.get(Object,int);
+<Any T> void set(T[], int, T) = 
+  native void java.lang.reflect.Array.set(Object,int,Object);
+
 
 boolean get(boolean[], int) = native boolean Native.get(boolean[], int);
-byte get(byte[], int) = native byte Native.get(byte[], int);
-short get(short[], int) = native short Native.get(short[], int);
-int get(int[], int) = native int Native.get(int[],int);
-long get(long[], int) = native long Native.get(long[], int);
-char get(char[], int) = native char Native.get(char[], int);
-float get(float[], int) = native float Native.get(float[], int);
-double get(double[], int) = native double Native.get(double[], int);
+byte    get(byte[],    int) = native byte    Native.get(byte[],    int);
+short   get(short[],   int) = native short   Native.get(short[],   int);
+int     get(int[],     int) = native int     Native.get(int[],     int);
+long    get(long[],    int) = native long    Native.get(long[],    int);
+char    get(char[],    int) = native char    Native.get(char[],    int);
+float   get(float[],   int) = native float   Native.get(float[],   int);
+double  get(double[],  int) = native double  Native.get(double[],  int);
 
-<Any T> void set(T[], int, T) = native void java.lang.reflect.Array.set(Object,int,Object);
-
-void set(boolean[], int, boolean) = native void Native.set(boolean[], int, boolean);
-void set(byte[], int, byte) = native void Native.set(byte[], int, byte);
-void set(short[], int, short) = native void Native.set(short[], int, short);
-void set(int[], int, int) = native void Native.set(int[],int,int);
-void set(long[], int, long) = native void Native.set(long[], int, long);
-void set(char[], int, char) = native void Native.set(char[], int, char);
-void set(float[], int, float) = native void Native.set(float[], int, float);
-void set(double[], int, double) = native void Native.set(double[], int, double);
-
-//<Any T> T[] value(T[]) = native Object rawArray.value();
+void set(boolean[],int,boolean)= native void Native.set(boolean[],int,boolean);
+void set(byte[],   int, byte)  = native void Native.set(byte[],   int, byte);
+void set(short[],  int, short) = native void Native.set(short[],  int, short);
+void set(int[],    int, int)   = native void Native.set(int[],    int, int);
+void set(long[],   int, long)  = native void Native.set(long[],   int, long);
+void set(char[],   int, char)  = native void Native.set(char[],   int, char);
+void set(float[],  int, float) = native void Native.set(float[],  int, float);
+void set(double[], int, double)= native void Native.set(double[], int, double);
 
 // Define collection methods
 

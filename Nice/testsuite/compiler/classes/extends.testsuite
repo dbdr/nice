@@ -1,7 +1,7 @@
 /// FAIL
   /// Toplevel
   class A<T> { T x;}
-  class B<T,U> extends A<T> { U y; }
+  class /*/// FAIL HERE */ B<T,U> extends A<T> { U y; }
 
 /// FAIL
   /// Toplevel

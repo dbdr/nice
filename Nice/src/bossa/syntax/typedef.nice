@@ -905,7 +905,10 @@ recomputeVariance(ClassDefinition this)
 
 private void copyVariance(TypeDefinition this, TypeDefinition from)
 {
-  if (this.variance != from.variance)
+  if (this.variance != from.variance &&
+      // Only specialization is supported
+      (this.variance == null ||
+       notNull(this.variance).arity() < notNull(from.variance).arity()))
     {
       this.variance = from.variance;
       tc.discard();

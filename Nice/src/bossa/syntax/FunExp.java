@@ -109,7 +109,8 @@ public class FunExp extends Expression implements Function
   public String toString()
   {
     return 
-      (constraint == null ? mlsub.typing.Constraint.toString(cst) : "")
+      (constraint == null ? 
+       mlsub.typing.Constraint.toString(cst) : constraint.toString())
       + "fun ("
       + Util.map("",", ","",formals)
       + ") => "

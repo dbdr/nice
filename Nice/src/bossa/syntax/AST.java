@@ -26,6 +26,8 @@ public abstract class AST extends Node
   AST(List children, int propagate)
   {
     super(children, propagate);
+    if (this.children == null)
+      this.children = new LinkedList();
   }
 
   public List definitions()

@@ -54,8 +54,12 @@ public final class Compilation
 		m.javaReturnType(), m.javaReturnType().isVoid(), params));
   }
   
-  private static gnu.bytecode.Method newError =
-    ClassType.make("java.lang.Error").getDeclaredMethod("<init>", 1);
+  private static gnu.bytecode.Method newError;
+  static 
+  {
+    ClassType error = ClassType.make("java.lang.Error");
+    newError = error.getDeclaredMethod("<init>", new Type[]{Type.string_type});
+  }
 
   private static Expression dispatch(Iterator sortedAlternatives, 
 				     Type returnType, 

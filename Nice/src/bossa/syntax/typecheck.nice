@@ -217,7 +217,11 @@ typecheck(r@ReturnStmt)
 {
   r.includingFunction = Node.currentFunction;
 
-  typecheck(r.value);
+  if (r.value != null)
+    {
+      r.value = r.value.noOverloading();
+      typecheck(r.value);
+    }
   
   mlsub.typing.Monotype declaredRetType = r.includingFunction.getReturnType();
   if (declaredRetType == null)

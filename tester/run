@@ -8,7 +8,7 @@ set -e
 if [ "$1" != "updated" ]; then
     # We first update the tester code, then start a new copy of this file
     # (since it might have been updated).
-    if cvs update; then
+    if cvs -q update; then
 	exec "$0" updated
     else
 	echo "Update of the tester code failed. Exiting."

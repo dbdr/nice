@@ -97,10 +97,8 @@ public final class Dispatch
 
     mlsub.typing.Polytype type = method.getType();
     if (type == null)
-      {
-	User.warning(method + " is not in a proper state. Ignoring.");
-	return;
-      }
+      throw Internal.error(method + " is not in a proper state.");
+
     List multitags = enumerate(type);
 
     int nb_errors = 0;
@@ -113,7 +111,8 @@ public final class Dispatch
 	    break;
       }
     if (nb_errors > 0)
-      System.exit(2);
+      User.error(method, "The implementation test failed for method " + 
+		 method.getName());
   }
   
   /**

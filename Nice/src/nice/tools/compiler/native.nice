@@ -42,14 +42,14 @@ void compileWithGcj(?String gcj, String pkg, String output, String jar)
 	"--classpath=", // We set the classpath to null to ignore nice.jar
 	"--main=" + pkg + ".fun", 
         "-o", output, jar ]);
-    let CharArrayWriter output = new CharArrayWriter();
-    let exitValue = waitFor(p, output); 
+    let CharArrayWriter out = new CharArrayWriter();
+    let exitValue = waitFor(p, out); 
     if (exitValue != 0)
       {
 	fail();
 
 	// Print the output of the process
-	let in = new BufferedReader(new CharArrayReader(output.toCharArray));
+	let in = new BufferedReader(new CharArrayReader(out.toCharArray));
 	try {
 	  for (?String line = in.readLine(); line != null; 
 	       line = in.readLine())

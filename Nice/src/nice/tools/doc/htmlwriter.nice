@@ -106,8 +106,8 @@ class HTMLWriter {
         
         //Note: the comments is deliberately not htmlEncoded because I want people
         //to be able to put their own html in the comment.
-        Comment c = new Comment(commentStr: comments);
-        List<(?String, String)> tags = c.tags;
+        Comment comm = new Comment(commentStr: comments);
+        List<(?String, String)> tags = comm.tags;
         //write the general comment
         (?String a, String b) = tags.removeAt(0);
         writer.write("<div class='generalComment' >\n");

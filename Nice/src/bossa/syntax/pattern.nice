@@ -99,6 +99,8 @@ Pattern createPattern(mlsub.typing.TypeConstructor tc)
 public class VariablePattern extends Pattern
 {
   atAny() = true;
+
+  getName() = notNull(name).toString().equals("_") ? null : name;
 }
 
 public class NullPattern extends Pattern
@@ -234,7 +236,7 @@ public class IntComparePattern extends IntPattern
 
 public class ReferencePattern extends ValuePattern
 {
-  getName() = cast(null);
+  getName() = null;
 }
 
 public class EnumPattern extends ReferencePattern

@@ -211,6 +211,8 @@ List<VarSymbol> symbols(EnumDefinition) = native EnumDefinition.symbols;
 void addValues(Pattern, List<ConstantExp>) = native void Pattern.addValues(List);
 ?mlsub.typing.TypeConstructor getRuntimeTC(Pattern) = native mlsub.typing.TypeConstructor Pattern.getRuntimeTC();
 boolean matchesValue(Pattern, ConstantExp) = native boolean Pattern.matchesValue(ConstantExp);
+public ?LocatedString getName(Pattern) = native LocatedString Pattern.getName();
+
 // Retypings needed since java types are not strict.
 
 mlsub.typing.Polytype boolPolytype() = native PrimitiveType.boolPolytype;

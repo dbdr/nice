@@ -241,7 +241,7 @@ typecheck(CallExp e)
 	Typing.leave();
       }
     }
-  catch(TypingEx e){
+  catch(TypingEx te){
   }
 }
 

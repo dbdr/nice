@@ -111,8 +111,8 @@ public class CustomConstructor extends UserOperator
   void resolveBody()
   {
     bossa.syntax.dispatch.resolveCCThis(body, this, classe);
-    body = bossa.syntax.dispatch.analyse
-      (body, thisScope, thisTypeScope, false);
+    body = bossa.syntax.dispatch.analyseMethodBody
+      (body, thisScope, thisTypeScope, getSymbols(), false);
   }
 
   void innerTypecheck() throws TypingEx

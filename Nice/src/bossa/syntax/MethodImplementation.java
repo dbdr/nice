@@ -90,7 +90,8 @@ public abstract class MethodImplementation extends Definition
 	      type = new MonotypeVar(types[tn].toString()+ "(" + p.name + ")");
 	  }
 
-	res[tn] = new MonoSymbol(p.getName(), type);
+        LocatedString argName = p.getName() != null ? p.getName() : new LocatedString("argument_"+tn, bossa.util.Location.nowhere());
+	res[tn] = new MonoSymbol(argName, type);
       }
     scope.addSymbols(res);
     parameters = res;
@@ -115,8 +116,8 @@ public abstract class MethodImplementation extends Definition
       Node.thisExp = new SymbolExp(parameters[0], location());
 
     try {
-      body = bossa.syntax.dispatch.analyse
-        (body, scope, typeScope, !Types.isVoid(declaration.getReturnType()));
+      body = bossa.syntax.dispatch.analyseMethodBody
+        (body, scope, typeScope, parameters, !Types.isVoid(declaration.getReturnType()));
     }
     finally {
       Node.thisExp = null;

@@ -74,7 +74,10 @@ public class dispatch
   public static ConstantExp createStringConstantExp(String value)
   { return null; }
 
-  static Statement  analyse(Statement  s, VarScope v, TypeScope t, boolean r)
+  static Statement analyse(Statement  s, VarScope v, TypeScope t, boolean r)
+  { return null; }
+
+  static Statement analyseMethodBody(Statement s, VarScope varScope, TypeScope typeScope, MonoSymbol[] params, boolean mustReturnAValue)
   { return null; }
   
   static Expression analyse(Expression e, VarScope v, TypeScope t) 

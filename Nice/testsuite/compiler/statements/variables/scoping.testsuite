@@ -5,9 +5,17 @@
     x++;
   }
 
-/// FAIL bug
+/// FAIL
   /// Toplevel
 void foo(int x) {
   int /*/// FAIL HERE */ x = 2;
   x++;
+}
+
+/// FAIL
+  /// Toplevel
+class A {}
+new A(int x) {
+  int /*/// FAIL HERE */ x = 2;
+  this();
 }

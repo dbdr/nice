@@ -50,6 +50,22 @@ analyse(Statement s, varScope, typeScope, mustReturnAValue)
   return s;
 }
 
+Statement analyseMethodBody(Statement s, VarScope varScope, TypeScope typeScope,
+		MonoSymbol[] params, boolean mustReturnAValue)
+{
+  Info info = buildInfo(varScope, typeScope);
+
+  info.addVars(params);
+
+  analyse(s, info);
+    
+  if (mustReturnAValue && !info.getUnreachable())
+    throw error(s, "Missing return statement");
+
+  return s;
+}
+
+
 analyse(Expression e, varScope, typeScope) = 
     analyse(e, buildInfo(varScope, typeScope));
 
@@ -839,8 +855,8 @@ analyse(BreakLabelStmt b, info)
   else
     {
       // if it isn't a loop it must be a block because of the parser
-      Block b = cast(target.getStatement());
-      b.isBreakTarget = true;
+      Block block = cast(target.getStatement());
+      block.isBreakTarget = true;
     }   
 
   info.setUnreachable();

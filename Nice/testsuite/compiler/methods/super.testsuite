@@ -47,10 +47,10 @@ m(x@B)
 /// Comment: Ambiguous call to super
   /// Toplevel
 void m(A, A);
-m(a, a) {}
-m(a@A, b@B) {}
-m(b@B, a@A) {}
-m(b@B, b@B) { /*/// FAIL HERE */ super; } 
+m(x, y) {}
+m(x@A, y@B) {}
+m(x@B, y@A) {}
+m(x@B, y@B) { /*/// FAIL HERE */ super; } 
 
 /// PASS
  /// Comment: Calling a Java super method.

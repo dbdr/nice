@@ -50,7 +50,7 @@ public class MethodBodyDefinition extends Definition
 			      List formals, 
 			      Statement body)
   {
-    super(name,Node.down);
+    super(name, Node.down);
 
     this.binders = binders; 
 
@@ -58,7 +58,7 @@ public class MethodBodyDefinition extends Definition
     this.body = body;
     this.definition = null;
     
-    if(name.content.equals("main") && formals.size()==1)
+    if (name.content.equals("main") && formals.size() == 1)
       module.isRunnable(true);
   }
 
@@ -415,54 +415,30 @@ public class MethodBodyDefinition extends Definition
     
     if(definition == null)
       Internal.error(this, this+" has no definition");
-    
-    blockExp = new gnu.expr.BlockExp(definition.javaReturnType());
 
-    gnu.expr.LambdaExp lexp = new gnu.expr.LambdaExp(blockExp);
-    Statement.currentScopeExp = lexp;
-    lexp.setName(name.toString());
-
-    Type[] javaArgTypes = javaArgTypes();
-
-    Method primMethod = module.getOutputBytecode().addMethod
-      (nice.tools.code.Strings.escape
-       (definition.getBytecodeName()+Pattern.bytecodeRepresentation(formals)),
-       javaArgTypes, definition.javaReturnType(),
-       Access.PUBLIC|Access.STATIC|Access.FINAL);
+    Method primMethod = module.addPackageMethod
+      (definition.getBytecodeName() + Pattern.bytecodeRepresentation(formals),
+       javaArgTypes(), definition.javaReturnType());
     new MiscAttr("definition", 
 		 definition.getFullName().getBytes())
       .addToFrontOf(primMethod);
 
-    lexp.setPrimMethod(primMethod);
+
+    gnu.expr.LambdaExp lexp = 
+      nice.tools.code.Gen.createMethod(primMethod, parameters);
+    Statement.currentScopeExp = lexp;
+    blockExp = (gnu.expr.BlockExp) lexp.body;
+    blockExp.setBody(body.generateCode());
+    module.compileMethod(lexp);
 
     if(name.content.equals("main") && formals.length == 1)
-      module.setMainAlternative(lexp.getMainMethod());
-
-    // Parameters
-    lexp.min_args = lexp.max_args = parameters.length;
-
-    for(int n = 0; n < parameters.length; n++)
-      {
-	MonoSymbol param = (MonoSymbol) parameters[n];
-	
-	String name = param.name == null ? 
-	  "anonymous_" + n : param.name.toString();
-	gnu.expr.Declaration d = lexp.addDeclaration(name);
-	d.setParameter(true);
-	d.setType(javaArgTypes[n]);
-	d.noteValue(null);
-	param.setDeclaration(d);
-      }
-
-    blockExp.setBody(body.generateCode());
-
-    module.compileMethod(lexp);
+      module.setMainAlternative(primMethod);
 
     //Register this alternative for the link test
     new bossa.link.Alternative(this.definition,
 			       Pattern.getLinkTC(this.formals),
 			       module.getOutputBytecode(),
-			       lexp.getMainMethod());
+			       primMethod);
   }
 
   public static void compileMain(Module module, 

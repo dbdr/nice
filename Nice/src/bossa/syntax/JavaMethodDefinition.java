@@ -12,7 +12,7 @@
 
 // File    : JavaMethodDefinition.java
 // Created : Tue Nov 09 11:49:47 1999 by bonniot
-//$Modified: Wed Jul 26 14:56:43 2000 by Daniel Bonniot $
+//$Modified: Fri Jul 28 21:27:43 2000 by Daniel Bonniot $
 
 package bossa.syntax;
 
@@ -117,6 +117,11 @@ public class JavaMethodDefinition extends MethodDefinition
       }
     catch(bossa.CodeGen.ParametricClassException e){
       // The fetched method involves parametric java classes.
+      // Ignore.
+      return null;
+    }
+    catch(bossa.CodeGen.NotIntroducedClassException e){
+      // The fetched method involves invalid types.
       // Ignore.
       return null;
     }

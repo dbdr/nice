@@ -12,7 +12,7 @@
 
 // File    : TypeConstructor.java
 // Created : Thu Jul 08 11:51:09 1999 by bonniot
-//$Modified: Thu Jun 22 21:34:26 2000 by Daniel Bonniot $
+//$Modified: Fri Jul 28 21:26:51 2000 by Daniel Bonniot $
 
 package mlsub.typing;
 
@@ -37,7 +37,7 @@ public class TypeConstructor
     this.concrete = concrete;
     this.rigid = rigid;
     
-    if (v!=null)
+    if (v != null)
       setVariance(v);
   }
   

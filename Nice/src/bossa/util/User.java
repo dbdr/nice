@@ -12,7 +12,7 @@
 
 // File    : User.java
 // Created : Wed Jul 07 18:20:58 1999 by bonniot
-//$Modified: Mon Jun 05 13:52:27 2000 by Daniel Bonniot $
+//$Modified: Thu Jul 27 16:06:06 2000 by Daniel Bonniot $
 
 package bossa.util;
 
@@ -68,7 +68,7 @@ public final class User
       Internal.printStackTrace();
     
     System.out.println(message);
-    System.exit(1);
+    System.exit(2);
   }
 
   public static void warning(Located responsible, String message)

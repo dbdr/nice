@@ -55,7 +55,8 @@ public final class K0 {
   // one must call method createInitialContext()
   //
   // The constraint is then in normal mode, one can no more use the
-  // above-mentioned methods, but must use leq, eq, indexImplements, satisfy,
+  // above-mentioned methods (except extend),
+  // but must use leq, eq, indexImplements, satisfy,
   // enumerate, rigidify, mark, backtrack, weakMark, weakBacktrack, getSnap,
   // startSimplify, stopSimplify, tag, simplify, isLeq,
   // solveConstructorOverloading, solveInterfaceOverloading

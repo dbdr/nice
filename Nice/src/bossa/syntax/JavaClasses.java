@@ -12,7 +12,7 @@
 
 // File    : JavaClasses.java
 // Created : Thu Jul 08 11:51:09 1999 by bonniot
-//$Modified: Thu Jun 22 21:40:38 2000 by Daniel Bonniot $
+//$Modified: Fri Jul 28 21:29:11 2000 by Daniel Bonniot $
 
 package bossa.syntax;
 
@@ -113,14 +113,20 @@ public final class JavaClasses
 					      instantiable(javaType), true);
     hash.put(className, res);
 
-    res.rememberToImplementTop();
     bossa.CodeGen.set(res, javaType);
     
     if(bossa.modules.Package.contextFrozen())
-      // we should not add new classes at this point    
-      return res;
+      // We should not add new classes at this point.
+      // The new TC should not implement top, as it would cause an error
+      // to assert it. It doesn't matter, as this type is not used
+      // explicitely.
+      {
+	res.setKind(Variance.make(0).getConstraint());
+	return res;
+      }
 
-    //setVariance(Variance.make(0));
+    res.rememberToImplementTop();
+
     Typing.introduce(res);
     
     // Recursive searching for java super classes
@@ -227,13 +233,13 @@ public final class JavaClasses
       {
 	TypeConstructor tc = (TypeConstructor) i.next();
 	
-	if(tc.getKind()==null)
+	if(tc.getKind() == null)
 	  try{
 	    mlsub.typing.lowlevel.Engine.setKind
 	      (tc, Variance.make(0).getConstraint());
 	  }
 	  catch(mlsub.typing.lowlevel.Unsatisfiable e){
-	    User.error("Java class "+tc+" is not well kinded");
+	    User.error("Java class " + tc + " is not well kinded");
 	  }
       }
   }

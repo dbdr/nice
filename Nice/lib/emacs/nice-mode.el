@@ -1196,11 +1196,11 @@ Mode for editing/compiling Nice programs.
    ((string-match "exited abnormally with code 2" change)
     (setq nice-compiling nil)
     (beep)
-    (message "Error."))
+    (message "Error"))
    ((string-match "exited abnormally with code" change)
     (setq nice-compiling nil)
     (beep)
-    (message "Compiler bug." change)))
+    (message "Compiler bug" change)))
   (save-excursion
     (set-buffer (process-buffer process))
     (toggle-read-only 1)))

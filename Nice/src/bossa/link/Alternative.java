@@ -12,7 +12,7 @@
 
 // File    : Alternative.java
 // Created : Mon Nov 15 12:20:40 1999 by bonniot
-//$Modified: Mon Jul 24 15:07:50 2000 by Daniel Bonniot $
+//$Modified: Fri Jul 28 18:47:58 2000 by Daniel Bonniot $
 
 package bossa.link;
 
@@ -50,7 +50,7 @@ public class Alternative
     this.definitionClass = c;
     this.primProcedure = new PrimProcedure(method);
     
-    this.methodName=m.getFullName();
+    this.methodName = m.getFullName();
     this.patterns = patterns;
     add();
   }
@@ -75,8 +75,10 @@ public class Alternative
       // This is valid if this method has no parameter
       at = s.length();
     
-    methodName = c.getName().substring(0,c.getName().length()-".package".length()).replace('.','$')
-      +"$"+s.substring(0,at);
+    methodName = new String(((MiscAttr) Attribute.get(m, "definition")).data);
+    
+    /*methodName = c.getName().substring(0,c.getName().length()-".package".length()).replace('.','$')
+      +"$"+s.substring(0,at);*/
     
     //Debug.println("name="+methodName);
     
@@ -265,6 +267,8 @@ public class Alternative
   
   static List listOfAlternative(MethodDefinition m)
   {
+    //Debug.println("LOOKING for "+m.getFullName());
+    
     return (List) alternatives.get(m.getFullName());
   }
 }

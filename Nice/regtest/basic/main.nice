@@ -5,8 +5,13 @@ class A
   int x;
 }
 
-long bidon();
+void bidon();
 bidon()
+{
+}
+
+long returnLong();
+returnLong()
 {
   long j;
   return j=j;

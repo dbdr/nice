@@ -12,7 +12,7 @@
 
 // File    : Dispatch.java
 // Created : Mon Nov 15 10:36:41 1999 by bonniot
-//$Modified: Mon Jul 24 15:41:04 2000 by Daniel Bonniot $
+//$Modified: Fri Jul 28 17:11:21 2000 by Daniel Bonniot $
 
 package bossa.link;
 
@@ -52,7 +52,7 @@ public final class Dispatch
   {
     for(Iterator i = methods.iterator();
 	i.hasNext();)
-      test((MethodDefinition)i.next(), module);
+      test((MethodDefinition) i.next(), module);
   }
   
   private static void test(MethodDefinition m, bossa.modules.Package module)

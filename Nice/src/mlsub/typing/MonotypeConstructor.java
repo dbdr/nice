@@ -12,7 +12,7 @@
 
 // File    : MonotypeConstructor.java
 // Created : Thu Jul 22 09:15:17 1999 by bonniot
-//$Modified: Wed Jul 26 14:45:00 2000 by Daniel Bonniot $
+//$Modified: Fri Jul 28 21:50:57 2000 by Daniel Bonniot $
 
 package mlsub.typing;
 
@@ -96,9 +96,13 @@ public final class MonotypeConstructor extends Monotype
   public void setId(int value) 	{ throw new Error(); }
   
   public Kind getKind() 	  { return tc.variance; }  
-  public void setKind(Kind value) { throw new Error(); 
-  // or if(value instanceof bossa.typing.Variance)
-  // tc.setVariance((bossa.typing.Variance) value)
+  public void setKind(Kind value) { 
+    /* This could be correct, but never happens at the moment
+    if (tc.variance == null && value instanceof Variance)
+      tc.setVariance((Variance) value);
+    else
+    */
+      throw new Error("SetKind in " + this); 
   }
   
   public boolean equals(Object o)
@@ -115,7 +119,7 @@ public final class MonotypeConstructor extends Monotype
   
   public String toString()
   {
-    return ""+tc+bossa.util.Util.map("<", ", ", ">", parameters);
+    return "" + tc + bossa.util.Util.map("<", ", ", ">", parameters);
   }
 
   public TypeConstructor tc;

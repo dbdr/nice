@@ -12,7 +12,7 @@
 
 // File    : main.nice
 // Created : Sat Feb 19 16:21:04 2000 by Daniel Bonniot
-//$Modified: Thu Jul 27 14:49:14 2000 by Daniel Bonniot $
+//$Modified: Fri Jul 28 22:11:55 2000 by Daniel Bonniot $
 
 package nice.tools.compiler;
 
@@ -35,6 +35,7 @@ main(args)
   boolean recompileCL = false;
   boolean recAll = false;
   boolean doLink = true;
+  boolean staticLink = false;
   List<Option> opts = makeVector(10);
 
   opts.add(option('r', "recompile",
@@ -62,6 +63,14 @@ main(args)
 		  "Compile packages, do not link them",
   		  fun()=>{ doLink=false; }));
 
+  opts.add(option('s', "static",
+		  "Store compiled packages in the jar file",
+  		  fun()=>{ staticLink=true; }));
+
+  opts.add(option('?', "dynamic",
+		  "Store compiled packages in their directory (default)",
+  		  fun()=>{ staticLink=false; }));
+
   opts.add(option('h', "help", "Print help message and exit",
 		  fun()=>
                   {
@@ -88,7 +97,7 @@ main(args)
   String packageName = rest.get(0);
 
   bossa.modules.Compilation compilation = 
-    make(packageName, doLink, recompileCL, recAll);
+    make(packageName, doLink, recompileCL, recAll, staticLink);
 
   make(compilation);
 
@@ -96,7 +105,7 @@ main(args)
   catch(ExceptionInInitializerError e){
     uncaughtException = e.getException();
   }
-  catch(Exception e){
+  catch(Throwable e){
     uncaughtException = e;
   }
 
@@ -104,7 +113,7 @@ main(args)
     {
       System.out.println
       ("\nAn exception has occured in the compiler\n" +
-       "please report to d.bonniot@mail.dotcom.fr\n\n" +
+       "please report a simple case showing this behavious to d.bonniot@mail.dotcom.fr\n\n" +
        "Exception: " + uncaughtException.toString() +
        "\n\nStack trace:\n");
       uncaughtException.printStackTrace();
@@ -115,7 +124,7 @@ main(args)
 void usage();
 usage()
 {
-  println("Usage: nicec [options] [package name]");
+  println("Usage: nicec [options] [package]");
   println("Type \"nicec --help\" for a list of options");
   System.exit(0);
 }

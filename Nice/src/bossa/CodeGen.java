@@ -12,7 +12,7 @@
 
 // File    : CodeGen.java
 // Created : Mon Jun 05 11:28:10 2000 by Daniel Bonniot
-//$Modified: Tue Jul 25 20:46:59 2000 by Daniel Bonniot $
+//$Modified: Fri Jul 28 21:09:34 2000 by Daniel Bonniot $
 
 package bossa;
 
@@ -95,10 +95,32 @@ public final class CodeGen
    ****************************************************************/
   
   public static Monotype getMonotype(Type javaType)
-  throws ParametricClassException
+    throws ParametricClassException, NotIntroducedClassException
   {
-    if(javaType == Type.neverReturnsType)
+    if(javaType.isVoid())
       return ConstantExp.voidType;
+    if(javaType == SpecialTypes.intType)
+      return ConstantExp.intType;
+    if(javaType == SpecialTypes.booleanType)
+      return ConstantExp.boolType;
+    if(javaType == SpecialTypes.charType)
+      return ConstantExp.charType;
+    if(javaType == SpecialTypes.byteType)
+      return ConstantExp.byteType;    
+    if(javaType == SpecialTypes.shortType)
+      return ConstantExp.shortType;
+    if(javaType == SpecialTypes.longType)
+      return ConstantExp.longType;
+    if(javaType == SpecialTypes.floatType)
+      return ConstantExp.floatType;
+    if(javaType == SpecialTypes.doubleType)
+      return ConstantExp.doubleType;
+
+    if (javaType instanceof ArrayType)
+      return new mlsub.typing.MonotypeConstructor
+	(ConstantExp.arrayTC, 
+	 new mlsub.typing.Monotype[]
+	  {getMonotype(((ArrayType) javaType).getComponentType())});
     
     return getMonotype(javaType.getName());
   }
@@ -112,8 +134,25 @@ public final class CodeGen
   */
   public static class ParametricClassException extends Exception { }
   
+  /**
+     Thrown when the type would contain elements that
+     are not valid for typechecking.
+     This happens for native classes that are discovered
+     after the context rigidification (due to ClassExp expressions).
+  */
+  public static class NotIntroducedClassException extends Exception 
+  {
+    /** The invalid type element. */
+    public TypeSymbol symbol;
+    
+    NotIntroducedClassException(TypeSymbol symbol)
+    {
+      this.symbol = symbol;
+    }
+  }
+
   public static Monotype getMonotype(String name)
-  throws ParametricClassException
+  throws ParametricClassException, NotIntroducedClassException
   {
     if(name.endsWith("[]"))
       {
@@ -131,8 +170,11 @@ public final class CodeGen
       {
 	TypeConstructor tc = (TypeConstructor) ts;
 
-	if(tc.variance!=null && tc.arity()!=0)
+	if (tc.variance != null && tc.arity() != 0)
 	  throw new ParametricClassException();
+
+	if (tc.getId() == -1)
+	  throw new NotIntroducedClassException(tc);
 	
 	return new MonotypeConstructor(tc, null);
       }  

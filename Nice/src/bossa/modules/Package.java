@@ -12,7 +12,7 @@
 
 // File    : Package.java
 // Created : Wed Oct 13 16:09:47 1999 by bonniot
-//$Modified: Wed Jul 26 16:11:28 2000 by Daniel Bonniot $
+//$Modified: Fri Jul 28 21:54:05 2000 by Daniel Bonniot $
 
 package bossa.modules;
 
@@ -30,7 +30,7 @@ import java.io.*;
 import bossa.modules.Compilation;
 
 /**
- * A Bossa Package.
+ * A Nice package.
  * 
  * @author bonniot
  */
@@ -45,22 +45,22 @@ public class Package implements mlsub.compilation.Module
   public void lastModifiedRequirement(long date)
   {
     // If we've already loaded the source
-    // or we knew the state of all our imports last time we compiled,
+    // or none of our imports changed since last time we compiled,
     // there is nothing to do
-    if(sourcesRead || date<=lastModified)
+    if (sourcesRead || date<=lastModified)
       return;
     
-    if(itfFromJar!=null)
-      User.error(name+" should be recompiled, but it was loaded from an archive file");
+    if (itfFromJar != null)
+      User.error(name + " should be recompiled, but it was loaded from an archive file");
     
-    if(Debug.modules)
-      Debug.println("Recompiling "+this+
-		    " because a required package changed "+
+    if (Debug.modules)
+      Debug.println("Recompiling " + this + 
+		    " because a required package changed " + 
 		    new java.util.Date(date));
     
     List definitions = new LinkedList();
-    read(getSources(), definitions);
     sourcesRead();
+    read(getSources(), definitions);
     ast = new AST(this, definitions);
   }
   
@@ -76,25 +76,25 @@ public class Package implements mlsub.compilation.Module
    ****************************************************************/
   
   public static Package make(String name, Compilation compilation,
-			     boolean forceReload)
+			     boolean isRoot)
   {
     return make(new LocatedString(name, bossa.util.Location.nowhere()), 
-		compilation,forceReload);
+		compilation, isRoot);
   }
   
   private static final Map map = new HashMap();
   
   public static Package make(LocatedString lname, Compilation compilation,
-			     boolean forceReload)
+			     boolean isRoot)
   {
     String name = lname.toString();
 
     Package res = (Package) map.get(name);
-    if(res!=null)
+    if (res != null)
       return res;
     
     try{
-      return new Package(lname, compilation, forceReload);
+      return new Package(lname, compilation, isRoot);
     }
     catch(ExceptionInInitializerError e){
       e.getException().printStackTrace();
@@ -108,33 +108,36 @@ public class Package implements mlsub.compilation.Module
    ****************************************************************/
   
   private Package(LocatedString name, Compilation compilation,
-		  boolean forceReload)
+		  boolean isRoot)
   {
     this.name = name;
     this.compilation = compilation;
+    this.isRoot = isRoot;
     
     map.put(name.toString(),this);
 
     imports = new LinkedList();
     
-    if(!name.toString().equals("nice.lang") && !Debug.ignorePrelude)
+    if (!name.toString().equals("nice.lang") && !Debug.ignorePrelude)
       imports.add(new LocatedString("nice.lang", 
 				    bossa.util.Location.nowhere()));
     
     opens  = new LinkedList();
 
     findPackageDirectory();
-    if(directory==null && itfFromJar==null)
-      User.error(name,"Could not find package "+name);
-    //Debug.println("Dir of "+this+" is "+directory.getPath());
+    if (directory == null && itfFromJar == null)
+      User.error(name, "Could not find package " + name);
     
     opens.add(this.name);
     opens.add(new LocatedString("java.lang", bossa.util.Location.nowhere()));
     
-    read(forceReload || compilation.recompileAll);
+    read(compilation.recompileAll || 
+	 isRoot && compilation.recompileCommandLine);
     
     // when we import a bossa package, we also open it.
     opens.addAll(imports);
+
+    computeImportedPackages();
   }
 
   private void read(boolean forceReload)
@@ -143,7 +146,7 @@ public class Package implements mlsub.compilation.Module
     Definition.currentModule = this;
     
     List definitions = new LinkedList();
-    if(itfFromJar!=null)
+    if (itfFromJar != null)
       bossa.parser.Loader.open(itfFromJar, name.toString(), 
 			       definitions, imports, opens);
     else
@@ -153,21 +156,29 @@ public class Package implements mlsub.compilation.Module
 
 	lastModified = maxLastModified(sources);
     
-	if(!forceReload &&
-	   itf!=null && lastModified <= itf.lastModified())
+	if (!forceReload &&
+	    itf != null && 
+	    lastModified <= itf.lastModified())
 	  read(itf, definitions);
 	else
 	  {
-	    if(sources.length==0)
-	      User.error(name, "Package "+name+" has no source file in "+directory);
+	    if (sources.length == 0)
+	      User.error(name, 
+			 "Package " + name + 
+			 " has no source file in "+directory);
 	
-	    read(sources, definitions);
 	    sourcesRead();
+	    read(sources, definitions);
 	  }
       }
     
     this.ast = new AST(this, expand(definitions));
 
+    // if we are root, and read the AST from an interface file, 
+    // we don't know yet if we are runnable
+    if (isRoot && !sourcesRead)
+      isRunnable(alternativesHaveMain());
+    
     Definition.currentModule = oldModule;
   }
   
@@ -175,10 +186,14 @@ public class Package implements mlsub.compilation.Module
   {
     sourcesRead = true;
     
+    // Inform compilation that at least one package is going to generate code
+    compilation.recompilationNeeded = true;
+    
+    // We are going to generate new code, create the class file
     // Do not use ClassType.make, we want to create a NEW class
-    bytecode = new ClassType(name+".package");
+    bytecode = new ClassType(name + ".package");
     bytecode.setSuper("java.lang.Object");
-    bytecode.setModifiers(Access.FINAL|Access.PUBLIC);
+    bytecode.setModifiers(Access.FINAL | Access.PUBLIC);
     bytecode.requireExistingClass(false);
   }
   
@@ -189,7 +204,7 @@ public class Package implements mlsub.compilation.Module
       {
 	Definition d = (Definition) i.next();
 	Collection c = d.associatedDefinitions();
-	if(c!=null)
+	if (c!=null)
 	  ads.addAll(c);
       }
     definitions.addAll(ads);
@@ -202,22 +217,22 @@ public class Package implements mlsub.compilation.Module
     for(int i = 0; i<files.length; i++)
       {
 	long time = files[i].lastModified();
-	if(time>res) res = time;
+	if (time>res) res = time;
       }
     return res;
   }
   
   private void read(File sourceFile, List definitions)
   {
-    if(Debug.passes)
-      Debug.println("Parsing "+sourceFile);
+    if (Debug.passes)
+      Debug.println(this + ": parsing " + sourceFile);
     
     try{
       Reader reader = new BufferedReader(new FileReader(sourceFile));
       LocatedString pkgName = 
 	bossa.parser.Loader.open(reader, sourceFile.getName(),
 				 definitions, imports, opens);
-      if(pkgName!=null && !pkgName.equals(this.name))
+      if (pkgName!=null && !pkgName.equals(this.name))
 	User.error(pkgName,
 		   sourceFile+" declares it belongs to package "+pkgName+
 		   ", but it was found in package "+name);
@@ -236,32 +251,39 @@ public class Package implements mlsub.compilation.Module
   private void readAlternatives()
   {
     for(Method method = bytecode.getMethods();
-	method!=null;
+	method != null;
 	method = method.getNext())
       {
 	String methodName = bossa.Bytecode.unescapeString(method.getName());
 
-	if(
-	   // "main" is not a real alternative
-	   methodName.equals("main")
-	   || methodName.startsWith("main$")
+	if (
+	    // main is not an alternative
+	    methodName.equals("main")
+	    //|| methodName.startsWith("main$")
 
-	   // $get and $set methods
-	   || methodName.startsWith("$")
+	    // Class initialization
+	    || methodName.equals("<clinit>")
 
-	   // Class initialization
-	   || methodName.equals("<clinit>")
-
-	   // Instance initialization
-	   || methodName.equals("<init>")
-	   )
+	    // Instance initialization
+	    || methodName.equals("<init>")
+	    )
 	  continue;
 
 	new bossa.link.Alternative(methodName, bytecode, method);
       }
   }
   
-
+  private boolean alternativesHaveMain()
+  {
+    for(Method method = bytecode.getMethods();
+	method != null;
+	method = method.getNext())
+      if (method.getName().equals("main"))
+	return true;
+    
+    return false;
+  }
+  
   public List /* of Package */ getRequirements()
   {
     return getImports();
@@ -310,43 +332,46 @@ public class Package implements mlsub.compilation.Module
   
   private void typecheck()
   {
-    //if(!sourcesRead)
+    //if (!sourcesRead)
     //return;
     
-    if(Debug.passes)
-      Debug.println("Typechecking "+this);
+    if (Debug.passes)
+      Debug.println(this + ": typechecking");
     
     ast.typechecking();
   }
 
   public void link()
   {
-    if(!sourcesRead)
+    if (!sourcesRead)
       readAlternatives();
     
-    if(Debug.passes)
-      Debug.println("Linking "+this);
-    if(isRunnable())
-      bossa.link.Dispatch.test(this);
+    if (isRunnable())
+      {
+	if (Debug.passes)
+	  Debug.println(this + ": linking");
+	
+	bossa.link.Dispatch.test(this);
+      }
   }
   
   public void endOfLink()
   {
-    if(jar != null)
+    if (jar != null)
       closeJar();
   }
   
   private static JarOutputStream jar;
   private static File jarDestFile;
   
-  private void createJar()
+  public void createJar()
   {
     if (jar != null)
-      return;
+      Internal.error(this + " can't create a jar file again");
     
     String name = this.name.toString();
     int lastDot = name.lastIndexOf('.');
-    if(lastDot!=-1)
+    if (lastDot!=-1)
       name = name.substring(lastDot+1, name.length());
     
     try{
@@ -400,10 +425,10 @@ public class Package implements mlsub.compilation.Module
   
   private void saveInterface()
   {
-    // do not save the interface if a Jar is produced for this package
-    // because it's not supposed to be a library,
-    // and it produces a warning! (interface, but no bytecode)
-    if(!sourcesRead || jar!=null)
+    // do not save the interface if we produce a jar
+    // whith all the libraries (staticLink)
+    // since we wont need the interface to execute
+    if (!sourcesRead || compilation.staticLink)
       return;
 
     try{
@@ -474,6 +499,8 @@ public class Package implements mlsub.compilation.Module
   private gnu.expr.Compilation comp;
   public  gnu.expr.Compilation getCompilation() { return comp; }
   
+  private boolean isRoot;
+  
   public static final ClassType dispatchClass;
   public static final gnu.expr.Compilation dispatchComp;
   static
@@ -502,14 +529,14 @@ public class Package implements mlsub.compilation.Module
    */
   private void generateCode()
   {
-    if(!sourcesRead)
+    if (!sourcesRead)
       {
 	ast.compile();
 	return;
       }
 
-    if(Debug.passes)
-      Debug.println("Generating code for "+this);    
+    if (Debug.passes)
+      Debug.println(this + ": generating code");    
     
     //comp = new gnu.expr.Compilation(pkg, name.toString()+"DUMMY",
     //name.toString()+".", false);
@@ -519,7 +546,7 @@ public class Package implements mlsub.compilation.Module
     
     ast.compile();
     
-    if(isRunnable()) 
+    if (isRunnable()) 
       MethodBodyDefinition.compileMain(this, mainAlternative);
     
     comp.compileClassInit(initStatements);
@@ -531,7 +558,7 @@ public class Package implements mlsub.compilation.Module
 
   public ClassType createClass(String name)
   {
-    ClassType res = ClassType.make(this.name+"."+name);
+    ClassType res = new ClassType(this.name + "." + name);
     res.requireExistingClass(false);
 
     return res;
@@ -540,28 +567,28 @@ public class Package implements mlsub.compilation.Module
   public void addClass(ClassType c)
   {
     // if we did not have to recompile, no class has to be regenerated
-    if(!sourcesRead)
+    if (!sourcesRead)
       return;
     
     try{
       c.setSourceFile(name+sourceExt);
       String filename = c.getName();
 
-      if(jar==null)
+      if (jar == null || !compilation.staticLink)
 	{
-	  filename = filename.replace('.', File.separatorChar)+".class";
+	  filename = filename.replace('.', File.separatorChar) + ".class";
 	  c.writeToFile(new File(rootDirectory, filename));
 	}
       else
 	{
 	  // Jar and Zip files use forward slashes
-	  filename = filename.replace('.', '/')+".class";
+	  filename = filename.replace('.', '/') + ".class";
 	  jar.putNextEntry(new JarEntry(filename));
 	  c.writeToStream(jar);
 	}
     }
     catch(IOException e){
-      User.error(this.name,"Could not write code for "+this,": "+e);
+      User.error(this.name, "Could not write code for "+this, ": "+e);
     }
   }
 
@@ -633,23 +660,31 @@ public class Package implements mlsub.compilation.Module
   private static final Object[] packageRoots;
   static 
   {
-    String path = Debug.getProperty("nice.package.path",".");
+    String systemJar = Debug.getProperty("nice.systemJar", "");
+    String path = Debug.getProperty("nice.package.path", ".") +
+      File.pathSeparatorChar + systemJar;
+    
     LinkedList res = new LinkedList();
     
     int start = 0;
+    // skip starting separators
+    while (start<path.length() && 
+	   path.charAt(start) == File.pathSeparatorChar)
+      start++;
+    
     while(start<path.length())
       {
-	int end = path.indexOf(File.pathSeparatorChar,start);
-	if(end==-1)
+	int end = path.indexOf(File.pathSeparatorChar, start);
+	if (end == -1)
 	  end = path.length();
 	    
-	String pathComponent = path.substring(start,end);
-	if(pathComponent.length()>0)
+	String pathComponent = path.substring(start, end);
+	if (pathComponent.length()>0)
 	  {
 	    File f = new File(pathComponent);
-	    if(f.exists())
+	    if (f.exists())
 	      {
-		if(pathComponent.endsWith(".jar"))
+		if (pathComponent.endsWith(".jar"))
 		  try{
 		    res.add(new JarFile(f));
 		  }
@@ -669,7 +704,7 @@ public class Package implements mlsub.compilation.Module
     File f = new File(directory, "package.class");
 
     try{
-      if(f!=null)
+      if (f != null)
 	return new FileInputStream(f);
     }
     catch(FileNotFoundException e){}
@@ -686,13 +721,13 @@ public class Package implements mlsub.compilation.Module
 	  { return name.endsWith(sourceExt); }
 	}
        );
-    if(res==null)
+    if (res == null)
       User.error(name,"Could not list source files in "+name);
     
     // put nice.lang.prelude first if it exists
-    if(name.toString().equals("nice.lang"))
+    if (name.toString().equals("nice.lang"))
       for(int i = 0; i<res.length; i++)
-	if(res[i].getName().equals("prelude"+sourceExt))
+	if (res[i].getName().equals("prelude" + sourceExt))
 	  {
 	    File tmp = res[i];
 	    res[i] = res[0];
@@ -705,13 +740,13 @@ public class Package implements mlsub.compilation.Module
 
   private File getInterface()
   {
-    File itf = new File(directory,"package.nicei");
+    File itf = new File(directory, "package.nicei");
 
-    if(!itf.exists())
+    if (!itf.exists())
       return null;
     
     InputStream s = openClass();
-    if(s == null)
+    if (s == null)
       {
 	User.warning("Bytecode for " + this + 
 		     " was not found, altough its interface exists.\n"+
@@ -723,7 +758,7 @@ public class Package implements mlsub.compilation.Module
     catch(LinkageError e){}
     catch(IOException e){}
 
-    if(bytecode != null)
+    if (bytecode != null)
       return itf;
     
     User.warning("Bytecode for " + this + 
@@ -735,35 +770,51 @@ public class Package implements mlsub.compilation.Module
   
   private void findPackageDirectory()
   {
-    String rname = name.toString().replace('.',File.separatorChar);
+    String filesystemName = name.toString().replace('.', File.separatorChar);
+    // Jar and Zip files use forward slashes
+    String jarName = name.toString().replace('.', '/');
+    JarFile jar = null;
     
-    for(int i = 0; i<packageRoots.length; i++)
-      if(packageRoots[i] instanceof File)
+    search:
+    for (int i = 0; i<packageRoots.length; i++)
+      if (packageRoots[i] instanceof File)
 	{
-	  directory = new File((File) packageRoots[i], rname);
-	  if(directory.exists())
+	  directory = new File((File) packageRoots[i], filesystemName);
+	  if (directory.exists())
 	    {
 	      rootDirectory = (File) packageRoots[i];
-	      return;
+	      break search;
 	    }
 	  else
 	    directory = null;
 	}
       else
 	{
-	  JarFile jar = (JarFile) packageRoots[i];
-	  JarEntry ent = jar.getJarEntry(rname+"/package.nicei");
-	  if(ent!=null)
+	  jar = (JarFile) packageRoots[i];
+	  JarEntry ent = jar.getJarEntry(jarName + "/package.nicei");
+
+	  if (ent != null)
 	    try{
 	      itfFromJar = new BufferedReader
 		(new InputStreamReader(jar.getInputStream(ent)));
-	      ent = jar.getJarEntry(rname+"/package.class");
+	      ent = jar.getJarEntry(jarName + "/package.class");
 	      bytecode = ClassFileInput.readClassType(jar.getInputStream(ent));
+	      break search;
 	    }
 	    catch(IOException e){
-	      User.error(this.name, "Error reading archive "+jar);
+	      // We just issue a warning and go on, trying to find it elsewhere
+	      User.warning(this.name, 
+			   "Error reading archive " + jar.getName());
+	      itfFromJar = null;
+	      bytecode = null;
 	    }
 	}
+
+    if (Debug.modules)
+      Debug.println(this + " was found in " +
+		    (directory != null 
+		     ? directory.toString()
+		     : jar != null ? jar.getName() : "nothing"));
   }
   
   /****************************************************************
@@ -777,7 +828,7 @@ public class Package implements mlsub.compilation.Module
   
   public String toString()
   {
-    return "package "+name;
+    return "package " + name;
   }
   
   public LocatedString name;
@@ -787,7 +838,7 @@ public class Package implements mlsub.compilation.Module
 
   private List getImports()
   {
-    if(importedPackages==null)
+    if (importedPackages == null)
       computeImportedPackages();
     
     return importedPackages; 
@@ -830,8 +881,6 @@ public class Package implements mlsub.compilation.Module
   public void isRunnable(boolean isRunnable)
   {
     this.isRunnable = isRunnable;
-    if(isRunnable && !compilation.skipLink)
-      createJar();
   }
 
   private gnu.bytecode.Method mainAlternative = null;
@@ -856,6 +905,4 @@ public class Package implements mlsub.compilation.Module
   private boolean sourcesRead;
 
   private long lastModified;
-  
-  private boolean dbg = Debug.modules;
 }

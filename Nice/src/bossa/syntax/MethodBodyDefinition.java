@@ -12,7 +12,7 @@
 
 // File    : MethodBodyDefinition.java
 // Created : Thu Jul 01 18:12:46 1999 by bonniot
-//$Modified: Tue Jul 25 21:05:40 2000 by Daniel Bonniot $
+//$Modified: Fri Jul 28 18:29:53 2000 by Daniel Bonniot $
 
 package bossa.syntax;
 
@@ -422,10 +422,16 @@ public class MethodBodyDefinition extends Definition
     Statement.currentScopeExp = lexp;
     lexp.setName(name.toString());
 
-    lexp.setPrimMethod(module.getBytecode().addMethod
-      (bossa.Bytecode.escapeString(definition.getBytecodeName()+Pattern.bytecodeRepresentation(formals)),
-       definition.javaArgTypes(),definition.javaReturnType(),
-       Access.PUBLIC|Access.STATIC|Access.FINAL));
+    Method primMethod = module.getBytecode().addMethod
+      (bossa.Bytecode.escapeString(definition.getBytecodeName() + 
+				   Pattern.bytecodeRepresentation(formals)),
+       definition.javaArgTypes(), definition.javaReturnType(),
+       Access.PUBLIC|Access.STATIC|Access.FINAL);
+    new MiscAttr("definition", 
+		 definition.getFullName().getBytes())
+      .addToFrontOf(primMethod);
+
+    lexp.setPrimMethod(primMethod);
 
     if(name.content.equals("main") && formals.size()==1)
       module.setMainAlternative(lexp.getMainMethod());

@@ -10,42 +10,42 @@
 /*                                                                        */
 /**************************************************************************/
 
-// File    : make.bossa
+// File    : make.nice
 // Created : Tue Feb 01 18:20:51 2000 by Daniel Bonniot
-//$Modified: Sat May 06 12:17:36 2000 by Daniel Bonniot $
+//$Modified: Fri Jul 28 15:24:13 2000 by Daniel Bonniot $
 
 package mlsub.compilation;
 
 import mlsub.compilation.*;
 
 /**
- * 'Make' tool.
+ * 'Make' tool for mlsub modules.
  * 
- * @author Daniel Bonniot
+ * @author Daniel Bonniot (d.bonniot@mail.dotcom.fr)
  */
 
 void compileComponent(nice.lang.List<Module>, boolean doLink);
-compileComponent(modules,ddoLink)
+compileComponent(modules, doLink)
 {
   print("Compiling");
-  modules.iter(fun(Module m)=>print(" "+m));
+  modules.iter(fun(Module m) => print(" "+m));
   println("");
 
-  modules.iter(fun(Module m)=>
+  modules.iter(fun(Module m) =>
 	       m.lastModifiedRequirement(max(list(m.getImports()).map(fun(Module mi)=>mi.lastModification()))));
 
-  modules.iter(fun(Module m)=>m.scope());
-  modules.iter(fun(Module m)=>m.load());
+  modules.iter(fun(Module m) => m.scope());
+  modules.iter(fun(Module m) => m.load());
 
-  if(modules.size()>=1)
+  if (modules.size() >= 1)
     modules.get(0).freezeGlobalContext();
 
-  modules.iter(fun(Module m)=>m.compile());
+  modules.iter(fun(Module m) => m.compile());
 
-  if(ddoLink)
-    modules.iter(fun(Module m)=>m.link());
+  if (doLink)
+    modules.iter(fun(Module m) => m.link());
 
-  if(modules.size()>=1)
+  if (modules.size() >= 1)
     modules.get(0).unfreezeGlobalContext();
 }
 
@@ -54,12 +54,12 @@ make(compilation@Compilation)
 {
   List<List<Module>> sccs =
     stronglyConnectedComponents(compilation.root, 
-				fun(Module m)=> list(m.getImports()));
-  sccs.iter(fun(List<Module> scc)=> 
+				fun(Module m) => list(m.getImports()));
+  sccs.iter(fun(List<Module> scc) => 
     { compileComponent(scc,
 		       !compilation.skipLink); });
   
-  if(!compilation.skipLink) 
+  if (!compilation.skipLink) 
     compilation.root.endOfLink();
 }
 

@@ -43,4 +43,4 @@ jar:
 	cd classes; jar uf ../lib/nice/Nice.jar *.class; cd ..
 
 dist: jar
-	tar cf bin/Nice.tar bin/nicer bin/nicec lib/nice/Nice.jar lib/emacs/nice-mode.el
+	tar cf lib/nice/Nice.tar bin/nicer bin/nicec lib/nice/Nice.jar lib/emacs/nice-mode.el

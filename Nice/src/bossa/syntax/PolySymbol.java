@@ -59,6 +59,7 @@ public class PolySymbol extends VarSymbol
   {
     type = syntacticType.resolveToLowlevel();
     syntacticType = null;
+    children = null;
   }
   
   /****************************************************************

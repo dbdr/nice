@@ -18,7 +18,7 @@ Each time you begin writing a new package, just create a directory for it.
 For instance, for package <literal>my.program:</literal>
 </para>
 
-<programlisting>mkdir -p ~/nice/my/package</programlisting>
+<programlisting>mkdir -p ~/nice/my/program</programlisting>
 
 <para>
 Then you place all the Nice source
@@ -65,6 +65,15 @@ java -jar program.jar
 <para>
 The <literal>program.jar</literal> file is self-contained.
 It can be run by any simple JVM.
+</para>
+
+<para>
+If you need to put additional jars on the classpath to run your
+program, you cannot use the <literal>java -jar</literal> command,
+because it ignores the classpath. You then need to use
+<literal>java -classpath lib1.jar:lib2.jar:program.jar
+my.program.dispatch</literal> (use <literal>;</literal> instead of
+<literal>:</literal> on Windows systems).
 </para>
 
 <para>

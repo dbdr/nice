@@ -336,6 +336,11 @@ class WeakHashMap<K,V> extends AbstractMap<K,V> = native java.util.WeakHashMap;
 <T> void sort(List<T>, Comparator<T>) = 
   native void Collections.sort(List, Comparator);
 
+// these 3 have a too large type because they can't use comparable yet.
+<T> void sort(List<!T>) = native void Collections.sort(List);
+<T> !T min(Collection<!T>) = native Object Collections.min(Collection);
+<T> !T max(Collection<!T>) = native Object Collections.max(Collection);
+
 <T,U,V | U <: T, V <: T> boolean Arrays_equals(U[], V[]) = 
   native boolean Arrays.equals(Object[],Object[]);
 

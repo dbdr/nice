@@ -85,6 +85,9 @@
            <a class="nav" href="language.html">Tutorial</a>
            <br />
            &nbsp;<span class="small">o</span><xsl:text> </xsl:text>
+           <a class="nav" href="manual.html">Manual</a>
+           <br />
+           &nbsp;<span class="small">o</span><xsl:text> </xsl:text>
            <a class="nav" href="compilation.html">Using the compiler</a>
            <br />
           </td>

@@ -1,0 +1,242 @@
+<?xml version="1.0" standalone="no"?>
+<!DOCTYPE book PUBLIC '-//OASIS//DTD DocBook XML V4.1.2//EN' 		     
+'http://www.oasis-open.org/docbook/xml/4.1.2/docbookx.dtd' [ 
+<!ENTITY nice "Nice">
+<!ENTITY java "Java">
+]>
+
+<book>
+  <bookinfo>
+    <title>The Nice user's manual</title>
+    <author><firstname>Daniel</firstname><surname>Bonniot</surname></author>
+    <copyright><year>2002</year><holder>Daniel Bonniot</holder></copyright>
+  </bookinfo>
+  <preface><title>Foreword</title> 
+    This manual describes the Nice programming language.
+    It is currently under redaction, which means that many aspects of 
+    the language are absent from it, or that some sections are mostly empty.
+    During this time, it is recommended to read also the 
+    <ulink url="http://nice.sf.net/language.html">Nice tutorial</ulink>, 
+    which contains lots of additional information.
+    Both documents currently assume some knowledge of Java, or at least
+    of an object oriented language.
+  </preface>
+
+  <chapter><title>Philosophy</title>
+
+    <blockquote>
+      <attribution>Alan J. Perlis</attribution>
+      <para>
+	A language that doesn't affect the way you think about programming, 
+	is not worth knowing.
+      </para>
+    </blockquote>
+
+    <para>
+      The Nice programming language is a new object-oriented programming 
+      language based on Java. 
+      It incorporates features from functional programming, 
+      and puts into practice state-of-the-art results from academic research. 
+      This results in more expressivity, modularity and safety.
+    </para>
+
+    <variablelist>
+      <varlistentry><term>Safety</term>
+	<listitem>
+	  <para>
+	    Nice detects more errors during compilation than existing 
+	    object-oriented languages (null pointer accesses, 
+	    casts exceptions).
+	    This means that programs written in Nice never throw the infamous
+	    <literal>NullPointerException</literal> nor 
+	    <literal>ClassCastException</literal>.
+	    This aspect is developed in more details in 
+	    <ulink url="http://nice.sf.net/safety.html">this article</ulink>.
+	  </para>
+	</listitem>
+      </varlistentry>
+
+      <varlistentry><term>Modularity</term><listitem><para>
+	    In object-oriented languages, it is possible to add a new class 
+	    to an existing class hierarchy. 
+	    In Nice, it is also possible to add <emphasis>methods</emphasis> to 
+	    existing classes without modifying their source file. 
+	    This is a special case of <emphasis>multi-methods</emphasis>.
+	  </para>
+	</listitem>
+      </varlistentry>
+
+      <varlistentry><term>Expressivity</term><listitem><para>
+	    Many repetitive programming tasks can be
+	    avoided by using Nice's advanced features. 
+	    Ever got bored
+	    of writing tons of loops, casts, overloaded methods with default
+	    values, ... ?
+	  </para>
+	</listitem>
+      </varlistentry>
+    </variablelist>
+
+  </chapter>
+
+  <chapter><title>Packages</title>
+  </chapter>
+
+  <chapter><title>Classes</title>
+    <section><title>Declaring a class</title>
+      <para>
+      </para>
+    </section>
+
+    <section><title>Fields</title>
+      <para>
+	The main component of a class is the list of its fields.
+	A field is a variable that is attached to each instance of
+	the class. It has a type, a name, and optionally a default 
+	initial value.
+	The syntax for field declaration is:
+	<programlisting>
+	  <type>Type</type> fieldName<optional> = initialValue</optional>;
+	</programlisting>
+	If no default value is given, then every call to the constructor
+	must specify the value for this field.
+	If it is given, a call to the constructor call still override
+	it with a different value, in which case the default value is
+	not computed (this fact is only important if it has side effects).
+      </para>
+    </section>
+
+    <section><title>Constructors</title>
+      <para>
+	There is no way to define a constructor in Nice. The reason is that
+	in languages that support them, most constructors just take 
+	as parameters the initial values for the fields and assign them
+	to the new object. This simple but tedious task has to be done
+	by the programmer for each class definition.
+	In Nice, such a constructor is generated automatically by the compiler.
+	It is called the automatic constructor. 
+	It takes the names of the fields as named arguments, 
+	and those who have an initial value are optional.
+	The constructor is called <literal>new</literal> followed by
+	the name of the class to create.
+      </para>
+
+      <example><title>Class definition and creations using the automatic constructor</title>
+	<programlisting lang="nice">
+class Car
+{
+  String brand;
+  String model;
+  int numberOfWheels = 4;
+  int numberOfDrivingWheels = 2;
+}
+
+void test()
+{
+  Car renault5 = new Car(brand: "Renault", model: "Cinq");
+  Car jeep = new Car("Jeep", "Some jeep", numberOfDrivingWheels: 4);
+}</programlisting>
+      </example>
+      
+      <para>
+	Note that it is possible to omit the names of the fields when
+	calling the constructor. They are then take in the syntactic order
+	of their definition, starting from the super-classes.
+	This makes the call to the constructor similar to Java.
+	However it is advised to use the names of the fields for two reasons:
+	it is a good documentation of the code, and it prevents
+	problems from happening if the order of the fields is changed
+	in the definition of the class
+	<footnote>
+	  <para>
+	    This problem is happens in Java when the order of the parameters 
+	    of a constructor is changed.
+	    If the exchanged parameters have incompatible types, 
+	    the compilation of the caller will fail; 
+	    otherwise the code might even compile and produce
+	    wrong results at runtime. 
+	    There is no simple way to prevent this in Java.
+	    Using names in the call to the constructor in Nice is the solution.
+	  </para>
+	</footnote>. When the names of the fields are used, they can be given
+	in any order.
+      </para>
+
+      <para>
+	If a behaviour different than that of the automatic constructor is 
+	needed, it is possible to define
+	a creation <link linkend="function">function</link> that can perform 
+	the task, calling the constructor to create the object and 
+	initialize the fields.
+	This function should by convention be called <literal>create</literal>
+	suffixed by the name of the class to create.
+      </para>
+    </section>
+
+    <section><title>Parametric classes</title>
+      <para>
+      </para>
+    </section>
+
+    <section><title>Functions and methods</title>
+      <para>
+      </para>
+    </section>
+  </chapter>
+
+  <chapter id="function"><title>Functions</title>
+    <section><title>Declaration</title>
+    </section>
+    <section id="optionalParameters"><title>Optional parameters</title>
+    </section>
+  </chapter>
+
+  <chapter><title>Methods</title>
+    <section><title>Declaring methods</title>
+      <para>
+      </para>
+    </section>
+    <section><title>Implementing methods</title>
+      <para>
+      </para>
+    </section>
+    <section><title>Optional parameters</title>
+      <para>
+	Methods, like functions, can have optional parameters.
+	They are declared in the method declaration, using the
+	<link linkend="optionalParameters">same syntax as in the case 
+	  of functions</link>.
+	Method implementations must still binds all parameters,
+	including the optional ones, and can dispatch on them.
+      </para>
+    </section>
+  </chapter>
+
+  <chapter><title>Expressions</title>
+    <section><title>Tuples</title>
+      <para>
+      </para>
+    </section>
+
+    <section><title>Anonymous functions</title>
+      <para>
+      </para>
+    </section>
+  </chapter>
+
+  <chapter><title>Interfacing with Java</title>
+    <section><title>Using Java from Nice</title>
+      <para>
+      </para>
+    </section>
+
+    <section><title>Using Nice from Java</title>
+      <para>
+      </para>
+    </section>
+  </chapter>
+
+  <chapter><title>Types</title>
+  </chapter>
+
+</book>

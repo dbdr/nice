@@ -36,3 +36,37 @@
   sort(list, (String s1, String s2) => s1.compareTo(s2));
   assert list[0] == "A";
   assert list[1] == "BA";
+
+/// PASS   
+  List<B> list = new ArrayList();   
+  B b = new B();   
+  list.add(b);   
+  A obj = b;   
+  assert(list.contains(obj));   
+  /// Toplevel   
+  class A{}   
+  class B extends A{}   
+
+/// FAIL   
+  List<B> list = new ArrayList();   
+  A obj = new A();   
+  list.contains(obj);   
+  /// Toplevel   
+  class A{}   
+  class B{} 
+
+/// PASS
+  /// Toplevel
+  <T,U,V | U <: T, V <: T> Set<T> intersection(Set<U>, Set<V>);
+  
+  intersection<T,U,V>(s1@Set, s2@Set) {
+     Set<T> res = new HashSet();
+     if (s1.size() < s2.size()) {
+         for(U elem : s1) 
+             if (s2.contains(elem)) res.add(elem);
+     } else {
+         for(V elem : s2) 
+             if (s1.contains(elem)) res.add(elem);
+     }
+     return res;
+  }

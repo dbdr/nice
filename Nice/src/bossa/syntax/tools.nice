@@ -245,6 +245,11 @@ MethodContainer.Constraint MethodContainer$Constraint(TypeSymbol[], List<AtomicC
 List<Node> children(Node) = native Node.children;
 Pattern[] formals(MethodImplementation) = native MethodImplementation.formals;
 LocatedString name(Definition) = native Definition.name;
+void addMappingsLS(TypeScope, Collection<LocatedString>, TypeSymbol[]) = native void TypeScope.addMappingsLS(Collection, TypeSymbol[]);
+Stack<gnu.bytecode.Variable> copies(FormalParameters.Parameter.Symbol) = native FormalParameters.Parameter.Symbol.copies;
+gnu.expr.CopyArgument CopyArgument(Stack<gnu.bytecode.Variable>) = native new gnu.expr.CopyArgument(Stack);
+MethodContainer MethodContainer(LocatedString, int, MethodContainer.Constraint, List<?boolean>) = native new MethodContainer(LocatedString, int, MethodContainer.Constraint, List);
+AST AST(List<Definition>, int) = native new AST(List, int);
 
 // Retypings needed since java types are not strict.
 mlsub.typing.Polytype boolPolytype() = native nice.tools.typing.PrimitiveType.boolPolytype;

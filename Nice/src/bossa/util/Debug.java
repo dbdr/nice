@@ -82,6 +82,7 @@ public abstract class Debug
     IDs			= getBoolean("debug.IDs",false),
     overloading 	= getBoolean("debug.overloading",false),
     powerUser		= getBoolean("debug.powerUser",false),
+    bytecodeAttributes 	= getBoolean("debug.bytecodeAttributes",false),
     codeGeneration 	= getBoolean("debug.codeGeneration",false),
     javaTypes		= getBoolean("debug.javaTypes",false),
     linkTests           = getBoolean("debug.linkTests",false),

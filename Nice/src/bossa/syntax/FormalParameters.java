@@ -564,6 +564,11 @@ public class FormalParameters extends Node
   static FormalParameters readBytecodeAttribute(gnu.bytecode.MiscAttr attr)
   {
     String value = new String(attr.data);
+
+    if (Debug.bytecodeAttributes)
+      Debug.println("Read attribute " + attr.getName() + "=\"" + value + 
+                    "\" from " + attr.getContainer());
+
     try {
       return 
         bossa.parser.Loader.getParser(value).formalParameters(false, null);

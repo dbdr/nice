@@ -1,28 +1,28 @@
 /// FAIL
   while (false) { 
-    /*/// FAIL HERE */ ; // Unreachable
+    /*/// FAIL HERE */ {} // Unreachable
   }
 
 /// FAIL
-  while (true) ;
-  /*/// FAIL HERE */ ; // Unreachable
+  while (true) {}
+  /*/// FAIL HERE */ {} // Unreachable
 
 /// PASS
   while (true) break;
-  ; // Reachable
+  {} // Reachable
 
 /// FAIL
   for (;false;) { 
-    /*/// FAIL HERE */ ; // Unreachable
+    /*/// FAIL HERE */ {} // Unreachable
   }
 
 /// FAIL
-  for (;;) ;
-  /*/// FAIL HERE */ ; // Unreachable
+  for (;;) {}
+  /*/// FAIL HERE */ {} // Unreachable
 
 /// PASS
   for (;;) break;
-  ; // Reachable
+  {} // Reachable
 
 /// PASS
   label: {
@@ -33,11 +33,11 @@
 
 /// FAIL
   assert false;
-  /*/// FAIL HERE */ ; // Unreachable
+  /*/// FAIL HERE */ {} // Unreachable
 
 /// FAIL
   `assert`();
 
 /// PASS
   assert true;
-  ; // Reachable
+  {} // Reachable

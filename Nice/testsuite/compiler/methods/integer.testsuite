@@ -39,7 +39,7 @@
   bar(3920) = -3920;
 
   /// package b import a
-  ;  
+  {}  
 
 /// PASS
   /// package a

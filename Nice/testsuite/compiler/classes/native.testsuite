@@ -54,4 +54,4 @@ class Container<T> = native nativePkg.Container;
   void isNotAMethod(String, NonExist) = native void String.isNotAMethod(NonExist);
   NonExist NonExist(long) = native new NonExist(long);
   /// package b import a
-  ;
+  {}

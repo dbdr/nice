@@ -77,6 +77,6 @@ void foo() {
       public ?AA<T> x;
   }
   /// package c import a
-  ; 
+  {} 
   /// package d import a,c 
   new AA(x:null);

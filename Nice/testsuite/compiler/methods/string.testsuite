@@ -14,7 +14,7 @@
   foo("X") {}
 
   /// package b import a
-  ;
+  {}
 
 /// FAIL
   /// Toplevel

@@ -32,7 +32,7 @@ class B extends A { int life = 42; }
   A a;
   a = new B();
   if (a instanceof B)
-    ;
+    {}
   else
     throw new Error();
   assert a.life == 42;

@@ -55,7 +55,7 @@ String[] array = new String[5].fill(int index =>
 index.toString());
 }
   /// package b import a
-  ;
+  {}
 
 /// FAIL
   () -> int f = () => { 

@@ -19,7 +19,7 @@
 
 /// PASS
   if ("A" instanceof String)
-    ;
+    {}
   else
     throw new Error();
 
@@ -32,6 +32,6 @@
 
 /// PASS
   if (true instanceof boolean)
-    ;
+    {}
   else
     throw new Error();

@@ -7,7 +7,7 @@
 /// PASS
   ?int x = null;
   if (x == null)
-    ;
+    {}
   else
     x++;
 
@@ -29,7 +29,7 @@
 /// PASS
   ?int x = null;
   if (x != null)
-    ;
+    {}
   else
     return;
   x++;
@@ -86,7 +86,7 @@
   ?int x = null;
   if (false)
     if (x != null)
-      ;
+      {}
     else
       return;
   x++;
@@ -182,7 +182,7 @@
 /// PASS
   ?int x1 = null, x2 = null;
   if (x1 == null || x2 == null)
-    ;
+    {}
   else
     { x1++; x2++; }
 
@@ -197,7 +197,7 @@
 /// PASS
   ?int x1 = null, x2 = null;
   if (x1 != null && x2 != null)
-    ;
+    {}
   else
     return;
   { x1++; x2++; }
@@ -254,7 +254,7 @@
   ?int x1 = null, x2 = null;
   if (false)
     if (x1 != null && x2 != null)
-      ;
+      {}
     else
       return;
   { x1++; x2++; }
@@ -366,7 +366,7 @@
 /// PASS
   ?String x = null;
   if (x == null || x.length() > 3 || x.length() > 4)
-    ;
+    {}
   else
     x.length();
 

@@ -139,7 +139,7 @@ class A
     do k++;
     while (k<5);
 
-    ;
+    {}
 
     try {
       k = 1;

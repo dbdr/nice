@@ -258,3 +258,10 @@ override void foo(A<String> x) {}
   /// package b import a
   assert ! foo(null);
   assert foo(5);
+
+/// PASS bug
+  /// Toplevel
+  class A {}
+  class B extends A {}
+  void foo(?A x) {}
+  override void foo(?B x) {}

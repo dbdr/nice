@@ -133,7 +133,7 @@ public class Constraint extends Node
   public String toString()
   {
     if(atomics.size()==0)
-      return Util.map("<Any ",", Any ","> ",binders);
+      return Util.map("<",", ","> ",binders);
     else if(binders.size()==0)
       return Util.map("<",", ","> ",atomics);
     else 
@@ -196,7 +196,7 @@ public class Constraint extends Node
 	      Internal.error("Unable to print the constraint in a parsable form because of "+tc);
 	  }
 	
-	res.append(Util.map((res.length()>1 ? ", " : "") + "Any ",", Any ","", 
+	res.append(Util.map((res.length()>1 ? ", " : ""),", ","", 
 			    c.binders));
 	res.append(Util.map(" | ",", ","",c.atomics)).append("> ");
 	return res.toString();

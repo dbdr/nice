@@ -1,7 +1,7 @@
 /**************************************************************************/
-/*                           B O S S A                                    */
-/*        A simple imperative object-oriented research language           */
-/*                   (c)  Daniel Bonniot 1999                             */
+/*                                N I C E                                 */
+/*             A high-level object-oriented research language             */
+/*                        (c) Daniel Bonniot 2002                         */
 /*                                                                        */
 /*  This program is free software; you can redistribute it and/or modify  */
 /*  it under the terms of the GNU General Public License as published by  */
@@ -9,10 +9,6 @@
 /*  (at your option) any later version.                                   */
 /*                                                                        */
 /**************************************************************************/
-
-// File    : ImplementsCst.java
-// Created : Fri Aug 27 10:45:33 1999 by bonniot
-//$Modified: Fri Jun 16 16:14:18 2000 by Daniel Bonniot $
 
 package mlsub.typing;
 
@@ -28,8 +24,22 @@ public final class ImplementsCst extends AtomicConstraint
   {
     this.tc = tc;
     this.itf = itf;
+    identifyVariances();
   }
 
+  /**
+     Assert that the type constructor and the interface have the same variance.
+     
+     This is not necessary, as it would be discovered later in the constraint 
+     solver. However it is good to discover it sooner, for efficiency reasons
+     (less inequalities get frozen) and for earlier error reporting.
+  */
+  private void identifyVariances()
+  {
+    if (tc.variance == null && itf.variance != null)
+      tc.setVariance(itf.variance);
+  }
+  
   /**
    * Perform type symbol substitution inside the constraint.
    *

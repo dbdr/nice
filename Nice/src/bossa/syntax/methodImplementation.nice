@@ -140,7 +140,7 @@ public abstract class MethodImplementation extends Definition
       mlsub.typing.Typing.leq(returned, notNull(declaration).getReturnType());
     }
     catch (mlsub.typing.TypingEx e) {
-      throw new Function.WrongReturnType(e, notNull(declaration).getReturnType());
+      throw new WrongReturnType(typingException: e, expectedReturnType: notNull(declaration).getReturnType());
     }
   }
 

@@ -290,9 +290,9 @@ abstract public class Node
 
   // The current function should be saved in nodes that need it
   // during execution of their typecheck method.
-  static Function currentFunction;
-  static Function getCurrentFunction() { return currentFunction; }
-  static void setCurrentFunction(Function f) { currentFunction = f; }
+  static /*Function*/Object currentFunction;
+  static /*Function*/Object getCurrentFunction() { return currentFunction; }
+  static void setCurrentFunction(/*Function*/Object f) { currentFunction = f; }
   
   /** The this parameter of the current function, or null. */
   static Expression thisExp;

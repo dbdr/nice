@@ -247,7 +247,7 @@ typecheck(CallExp e)
 
 typecheck(FunExp e)
 {
-  ?Function saved = Node.getCurrentFunction();
+  /* ?Function*/ ?Object saved = Node.getCurrentFunction();
   Node.setCurrentFunction(e);
 
   let needExit = e.mightEscape && enterClosure();
@@ -884,7 +884,7 @@ typecheck(LabeledStmt s)
 
 typecheck(ReturnStmt r)
 {
-  ?Function function = Node.currentFunction;
+  ?Function function = cast(Node.currentFunction);
   if (function == null)
     throw bossa.util.User.error(r, "This return is not inside a function");
 
@@ -906,19 +906,19 @@ typecheck(ReturnStmt r)
     if (! (r.fake && expectedType != null && nice.tools.typing.Types.isVoid(expectedType)))
       function.checkReturnedType(r.returnType());
   }
-  catch(Function.WrongReturnType e){
+  catch(WrongReturnType e){
     if (notNullError(notNull(e.typingException), r, String.valueOf(r.value)))
       wrongReturnType(r, r.returnType().toString(), 
 		      valueOf(e.expectedReturnType), notNull(e.typingException));
   }
-  catch(Function.IncompatibleReturnType e){
+  catch(IncompatibleReturnType e){
     throw bossa.util.User.error(r, "The returned value is incompatible with the return type: " + e.previouslyInferredType);
   }
 }
 
 typecheck(VoidReturnStmt r)
 {
-  ?Function function = Node.currentFunction;
+  ?Function function = cast(Node.currentFunction);
   if (function == null)
     throw bossa.util.User.error(r, "This return is not inside a function");
 
@@ -928,11 +928,11 @@ typecheck(VoidReturnStmt r)
     if (! (expectedType != null && nice.tools.typing.Types.isVoid(expectedType)))
       function.checkReturnedType(r.returnType());
   }
-  catch(Function.WrongReturnType e){
+  catch(WrongReturnType e){
     wrongReturnType(r, r.returnType().toString(), 
 		      valueOf(e.expectedReturnType), notNull(e.typingException));
   }
-  catch(Function.IncompatibleReturnType e){
+  catch(IncompatibleReturnType e){
     throw bossa.util.User.error(r, "The returned value is incompatible with the return type: " + e.previouslyInferredType);
   }
 }

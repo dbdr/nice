@@ -15,6 +15,25 @@ package bossa.syntax;
 import bossa.util.*;
 
 /**
+   A function is either a method body or a lambda expression.
+   
+*/
+interface Function
+{
+  /**
+     The expected return type of this function.
+     Can be null if it is not known (e.g. the type is inferred).
+  */
+  ?mlsub.typing.Monotype getExpectedType();
+
+  /**
+     Called with each type returned from the function.
+     Can be used for either type checking or type inference.
+   */
+  void checkReturnedType(mlsub.typing.Polytype returned);
+}
+
+/**
    A functional abstraction expression.
 */
 public class FunExp extends Expression implements Function
@@ -46,7 +65,7 @@ public class FunExp extends Expression implements Function
 	_inferredReturnType = mlsub.typing.Polytype.union(_inferredReturnType, returned);
 
 	if (! notNull(_inferredReturnType).trySimplify())
-	  throw new Function.IncompatibleReturnType(old);
+	  throw new IncompatibleReturnType(previouslyInferredType: old);
       }
 
     /* This is disabled, since currently default values of class fields are
@@ -138,4 +157,17 @@ override Expression createFunExp(bossa.syntax.Constraint cst, MonoSymbol[] forma
   let res = new FunExp(constraint: cst, formals: formals, body: body);
   res.setLocation(body.location());
   return res;
+}
+
+abstract class ReturnTypeError extends Exception {}
+
+class WrongReturnType extends ReturnTypeError
+{
+  mlsub.typing.TypingEx typingException;
+  mlsub.typing.Monotype expectedReturnType;
+}
+
+class IncompatibleReturnType extends ReturnTypeError
+{
+  mlsub.typing.Polytype previouslyInferredType;
 }

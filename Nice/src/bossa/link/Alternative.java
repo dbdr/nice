@@ -92,6 +92,22 @@ public class Alternative implements Located
     return false;
   }
 
+  static Alternative greatestLowerBound(Alternative a, Alternative b)
+  {
+    Pattern[] pats = new Pattern[a.patterns.length];
+    for (int i = 0; i < a.patterns.length; i++)
+      {
+        if (bossa.syntax.dispatch.leq(a.patterns[i], b.patterns[i]))
+          pats[i] = a.patterns[i];
+        else if (bossa.syntax.dispatch.leq(b.patterns[i], a.patterns[i]))
+          pats[i] = b.patterns[i];
+        else
+          return null;
+      }
+
+    return new Alternative(a.methodName, pats);
+  }
+
   /**
    * Tests the matching of tags against a method alternative.
    */

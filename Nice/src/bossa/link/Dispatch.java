@@ -163,7 +163,22 @@ public final class Dispatch
 				altB.printLocated());
 
           if (! (Alternative.leq(altA, altB) || Alternative.disjoint(altA, altB)))
-            return false;
+            {
+              Alternative glb = Alternative.greatestLowerBound(altA, altB);
+              if (glb == null)
+                return false;
+
+              boolean glbMatch = false;
+              for (int j = i-1; j >= 0; j--)
+                if (Alternative.leq(glb, (Alternative)alternatives.get(j)))
+                  {
+                    glbMatch = true;
+                    break;
+                  }
+
+              if (! glbMatch)
+                return false;
+            }
         }
 
     return true;

@@ -148,9 +148,9 @@ main(args)
     uncaughtException = e;
   }
 
-  if(uncaughtException != null)
+  if (uncaughtException != null)
     {
-      Throwable exn = notNull(uncaughtException);
+      Throwable exn = uncaughtException;
 
       println
       ("\nAn exception has occured in the compiler\n" +
@@ -170,7 +170,7 @@ main(args)
 void version()
 {
   println("Nice compiler beta version (" + buildDate + ")");
-  println("Copyright (C) 2001 Daniel Bonniot");
+  println("Copyright (C) 2002 Daniel Bonniot");
   println("Visit the Nice homepage: http://nice.sourceforge.net");
   System.exit(0);
 }

@@ -282,6 +282,8 @@ void substitute(bossa.syntax.FormalParameters, Map<java.lang.String, bossa.synta
 Monotype[] Monotype_toArray(?List<Monotype>) = native Monotype[] Monotype.toArray(List);
 List<VarSymbol> lookup(VarScope, LocatedString) = native List VarScope.lookup(LocatedString);
 Map<gnu.bytecode.Type,mlsub.typing.TypeConstructor> javaTypeConstructors(bossa.modules.Compilation ) = native bossa.modules.Compilation.javaTypeConstructors;
+bossa.syntax.Constraint newConstraint(List<TypeSymbol>, List<AtomicConstraint>) = native new Constraint(List, List);
+void addAtoms(Constraint, List<AtomicConstraint>) = native void Constraint.addAtoms(List);
 
 // Retypings needed since java types are not strict.
 mlsub.typing.Polytype boolPolytype() = native nice.tools.typing.PrimitiveType.boolPolytype;

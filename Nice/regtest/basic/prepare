@@ -8,7 +8,7 @@ if newer Nop.class Nop.java; then
   exit
 fi
 
-CLASSPATH=.:$CLASSPATH
+CLASSPATH=$NICE_TOP/classes:$CLASSPATH
 export CLASSPATH
 
-javac -classpath $PWD/../../classes Nop.java
+javac -classpath $NICE_TOP/classes Nop.java

@@ -1,5 +1,8 @@
 #! /bin/sh
 
+NICE_TOP=$PWD
+export NICE_TOP
+
 echo()
 {
   /bin/echo -e "$@"

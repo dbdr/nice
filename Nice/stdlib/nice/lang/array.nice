@@ -52,7 +52,8 @@ void set(float[],  int, float)   = inline nice.lang.inline.ArraySetOp("f");
 void set(double[], int, double)  = inline nice.lang.inline.ArraySetOp("d");
 
 
-<Any T> void copy(!T[] from, int, ?T[] to, int, int) = 
+<Any T> void copy(!T[] from, int fromIndex = 0, ?T[] to, int toIndex = 0, 
+		  int count) = 
   native void System.arraycopy(Object, int, Object, int, int);
 
 <Any T> T[] split(T[] array, int from = 0, int to = -1)

@@ -20,3 +20,8 @@
   ("a".f4)("b")("c");
   /// TOPLEVEL
   String->String->void f4(String x) = String y => String z => {};
+
+/// PASS
+  assert """abc
+  def\nghi
+  xyz""".equals("abc\n  def\nghi\n  xyz");

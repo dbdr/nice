@@ -24,8 +24,17 @@ public class StringConstantExp extends ConstantExp
 {
   public StringConstantExp(String value)
   {
+    this(value, false);
+  }
+
+  public StringConstantExp(String value, boolean multiline)
+  {
     className = stringName;
     this.escapedValue = value;
+    this.multiline = multiline;
+    if (multiline)
+      value = escapeEOL(value);
+
     this.value=unescape(value);
   }
 
@@ -87,10 +96,31 @@ public class StringConstantExp extends ConstantExp
     return sb.toString();
   }
 
+  static String escapeEOL(String s)
+  {
+    StringBuffer sb = new StringBuffer();
+    int n = s.length();
+    for (int i = 0; i < n; i++) {
+      char c = s.charAt(i);
+      if (c == '\n')
+        sb.append("\\n");
+      else if (c == '\r')
+	{
+	  sb.append("\\n");
+          if (s.charAt(i+1) == '\n')
+	    i++;
+	}
+      else
+        sb.append(c);
+    }
+    return sb.toString();
+  }
+
   public String toString()
   {
     return "\""+value+"\"";
   }
 
   String escapedValue;
+  boolean multiline;
 }

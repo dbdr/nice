@@ -27,7 +27,7 @@ import java.io.*;
 import java.util.*;
 
 import bossa.util.*;
-import bossa.syntax.*;
+import bossa.syntax.*;   
 
 import mlsub.typing.TypeSymbol;
 import mlsub.typing.TypeConstructor;
@@ -267,6 +267,20 @@ TOKEN: /* Char literals */
 
 TOKEN: /* String literals */
 {
+  < MULTILINESTRING:
+      "\"" "\"" "\""
+      (   (~["\"","\\"])
+        | ("\\"
+            ( ["n","t","b","r","f","\\","'","\""]
+            | ["0"-"7"] ( ["0"-"7"] )?
+            | ["0"-"3"] ["0"-"7"] ["0"-"7"]
+            )
+          )
+        | ( ["\n","\r"] )
+      )*
+      "\"" "\"" "\""
+  >   
+|
   < LSTRING:
       "\""
       (   (~["\"","\\","\n","\r"])
@@ -1511,6 +1525,15 @@ StringConstantExp stringConstantExp():
   { return new StringConstantExp(s); }
 }
 
+StringConstantExp multiLineStringExp():
+{ Token t; String s; }
+{
+  t = <MULTILINESTRING>
+  { s = t.image.substring(3, t.image.length() - 3);
+    return new StringConstantExp(s, true);
+  }
+}
+
 IdentExp identExp():
 { LocatedString i; }
 {
@@ -2078,6 +2101,7 @@ Expression Literal() :
 | res=floatConstantExp()
 | res=charConstantExp()
 | res=stringConstantExp()
+| res=multiLineStringExp()
 )
 { return res; }
 }

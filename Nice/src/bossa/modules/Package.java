@@ -590,7 +590,7 @@ public class Package implements mlsub.compilation.Module, Located, bossa.syntax.
     res.setName(name);
     res.setSimple(true);
     res.body = QuoteExp.voidExp;
-    
+    res.setFile(source.getName());
     return res;
   }
 

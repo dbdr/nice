@@ -77,19 +77,22 @@ public class GlobalTypeScope extends TypeScope
       throw new TypeScope.DuplicateName(this, name);
   }
 
-  public mlsub.typing.TypeConstructor globalLookup(LocatedString name)
+  public ?mlsub.typing.TypeConstructor globalLookup(LocatedString name)
   {
     return this.globalLookup(name.toString(), name.location());
   }
 
   globalLookup(name, loc)
   {
-    mlsub.typing.TypeSymbol res = this.lookup(name, loc);
+    let res = this.lookup(name, loc);
 
     if (res instanceof mlsub.typing.TypeConstructor)
       return res;
 
-    return cast(null);
+    if (res != null)
+      Internal.warning("Non type-constructor found in global type scope");
+
+    return null;
   }
 
   lookup(name, loc)

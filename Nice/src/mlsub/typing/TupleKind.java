@@ -42,8 +42,8 @@ public class TupleKind implements Kind
     Engine.getConstraint(this);
   }
 
-  /** Arity arbitrarily limited to 40 for implementation reasons. */
-  private static final TupleKind tupleKinds[] = new TupleKind[40];
+  /** Arity arbitrarily limited to 200 for implementation reasons. */
+  private static final TupleKind tupleKinds[] = new TupleKind[200];
   
   public Monotype freshMonotype()
   {

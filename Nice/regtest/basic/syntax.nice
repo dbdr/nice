@@ -9,7 +9,7 @@ void syntaxTest()
     ;
 
   // For with empty body
-  for (;;)
+  for (;false;)
     ;
 
   // If with empty body

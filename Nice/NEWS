@@ -27,8 +27,8 @@ nice (0.9.9)
     operations. There is a new bit of syntax, '@', which indicates
     the index of the last item in a list, which can be used for working
     with indexes relative to the end of the list, instead of the beginning.
-    
-    For instance, given a list of ints from 0 to 6 called 
+
+    For instance, given a list of ints from 0 to 6 called
     'intList':
 	intList[@] is 6,
 	intList[@-1] is 5,

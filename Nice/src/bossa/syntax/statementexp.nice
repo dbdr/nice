@@ -35,3 +35,23 @@ public class StatementExp extends Expression
   }
   
 }
+
+/**
+   Compute an expression and forget the value.
+
+*/   
+public class ExpressionStmt extends Statement
+{
+  Expression exp;
+
+  generateCode() = exp.generateCode();
+
+  toString() = exp.toString() + ";";
+}
+
+Statement createExpressionStmt(Expression exp)
+{
+  let res = new ExpressionStmt(exp: exp);
+  res.setLocation(exp.location());
+  return res;
+}

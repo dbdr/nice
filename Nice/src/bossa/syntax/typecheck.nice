@@ -828,7 +828,7 @@ typecheck(LocalFunction decl)
 
 typecheck(ExpressionStmt s)
 {
-  s.exp = notNull(s.exp).noOverloading();
+  s.exp = s.exp.noOverloading();
   typecheck(s.exp);
 }
 

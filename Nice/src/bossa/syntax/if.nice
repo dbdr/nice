@@ -78,5 +78,5 @@ public Statement createIfStmt(Expression cond, Statement thenStmt, ?Statement el
 			elseExp: (elseStmt == null ? new VoidConstantExp() : 
 				new StatementExp(statement: elseStmt)));
   ifExp.setLocation(loc);
-  return new ExpressionStmt(ifExp);
+  return createExpressionStmt(ifExp);
 }

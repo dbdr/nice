@@ -886,7 +886,7 @@ FormalParameters.Parameter formalParameter(List statements):
     } else { ident = id; }
     Expression exp = bossa.syntax.dispatch.createAssignExp(new TupleExp(parts),new IdentExp(ident));
     exp.setLocation(makeLocation(first,last));
-    statements.add(new ExpressionStmt(exp));
+    statements.add(bossa.syntax.dispatch.createExpressionStmt(exp));
     t = new TupleType(types, makeLocation(first, last));
     t.nullness = Monotype.absent;
     if (val != null)
@@ -1132,7 +1132,7 @@ CustomConstructor customConstructor(Constraint cst):
 { 
   "new" name=ident() "(" params=formalParameters(false, statements) ")"
   ( 
-    "=" exp=Expression() ";" { statements.add(new ExpressionStmt(exp)); }
+    "=" exp=Expression() ";" { statements.add(bossa.syntax.dispatch.createExpressionStmt(exp)); }
   | 
     "{"
     ( stmt=BlockStatement(statements) { statements.add(stmt); } )+
@@ -1780,7 +1780,7 @@ MonoSymbol funExpParameter(List statements):
     } else { name = ident; }
     Expression exp = bossa.syntax.dispatch.createAssignExp(new TupleExp(parts),new IdentExp(name));
     exp.setLocation(makeLocation(first,last));
-    statements.add(new ExpressionStmt(exp));
+    statements.add(bossa.syntax.dispatch.createExpressionStmt(exp));
     type = new TupleType(types, makeLocation(first, last));
     type.nullness = Monotype.absent;
     return new MonoSymbol(name, type);
@@ -2546,7 +2546,7 @@ Statement LocalTupleDeclaration(List statements) :
   "=" e=Expression() ";" 
   { Expression exp = bossa.syntax.dispatch.createAssignExp(new TupleExp(parts), e);
     exp.setLocation(makeLocation(first,last));
-    return new ExpressionStmt(exp); }
+    return bossa.syntax.dispatch.createExpressionStmt(exp); }
 }
 
 Expression LocalTuplePart(List statements) :
@@ -2654,7 +2654,7 @@ Statement RealStatementExpression() :
   {
     last = getToken(0);
     e1.setLocation(makeLocation(first, last));
-    return new ExpressionStmt(e1); 
+    return bossa.syntax.dispatch.createExpressionStmt(e1); 
   }
 }
 
@@ -2684,7 +2684,7 @@ Statement ShortStatementExpression() :
   {
     last = getToken(0);
     e1.setLocation(makeLocation(first, last));
-    return new ExpressionStmt(e1); 
+    return bossa.syntax.dispatch.createExpressionStmt(e1); 
   }
 
 }
@@ -2849,7 +2849,7 @@ Statement ShortThrowStatement() :
 { Expression e; Token t; }
 {
   t="throw" e=Expression()
-  { return new ExpressionStmt(bossa.syntax.dispatch.createCallExp(symb(t),e)); }
+  { return bossa.syntax.dispatch.createExpressionStmt(bossa.syntax.dispatch.createCallExp(symb(t),e)); }
 }
 
 Statement TryStatement() :
@@ -2885,7 +2885,7 @@ Statement ShortAssertStatement() :
   |
     { call = bossa.syntax.dispatch.createCallExp(symb(t), condition); }
   )
-  { return new ExpressionStmt(call); }
+  { return bossa.syntax.dispatch.createExpressionStmt(call); }
 }
 
 Statement SynchronizedStatement() :

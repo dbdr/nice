@@ -75,7 +75,7 @@ ifExp(ExpressionStmt s)
 }
 
 Statement makeStatement(Expression);
-makeStatement(Expression e) = new ExpressionStmt(e);
+makeStatement(Expression e) = createExpressionStmt(e);
 makeStatement(StatementExp e) = e.statement;
 
 Block makeBlock(Expression first, Statement[] rest)

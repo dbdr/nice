@@ -1,5 +1,7 @@
 package nice.tools.unit;
 
+import nice.tools.locator;
+
 import java.lang.reflect.*;
 
 public boolean runTests(String packageName, TestListener listener,
@@ -93,43 +95,8 @@ String replaceLast(String source, char c, String by)
 
 ClassLoader classloaderFromClasspath(String classpath)
 {
-  LinkedList<java.net.URL> components = new LinkedList();
-    
-  int start = 0;
-  // skip starting separators
-  while (start<classpath.length() && 
-	 classpath.charAt(start) == java.io.File.pathSeparatorChar)
-    start++;
-    
-  while (start<classpath.length())
-    {
-      int end = classpath.indexOf(java.io.File.pathSeparatorChar, start);
-      if (end == -1)
-	end = classpath.length();
-      
-      String pathComponent = classpath.substring(start, end);
-      if (pathComponent.length() > 0)
-	try{
-	java.io.File f = new java.io.File(pathComponent);
-	if (f.canRead())
-	  components.add(f.getCanonicalFile().toURL());
-	else
-	  {
-	    if (!f.exists())
-	      System.err.println("Classpath component " + pathComponent + " does not exist");
-	    else
-	      System.err.println("Classpath component " + pathComponent + " is not readable");
-	  }
-      }
-      catch(java.net.MalformedURLException e){
-	System.err.println("Classpath component " + pathComponent + " is invalid");
-      }
-      catch(java.io.IOException e){
-	System.err.println("Classpath component " + pathComponent + " is invalid");
-      }
-      start = end + 1;
-    }
+  java.net.URL[] path = parsePath(classpath,
+			 String message => System.err.println(message));
 
-  return new java.net.URLClassLoader(components.toArray(), 
-				     /* no parent */ null);
+  return new java.net.URLClassLoader(path, /* no parent */ null);
 }

@@ -19,7 +19,7 @@ import gnu.bytecode.ClassType;
 
 /**
    A package located in a directory.
- 
+
    @version $Date$
    @author Daniel Bonniot
  */
@@ -38,13 +38,21 @@ class DirectorySourceContent extends SourceContent
     return null;
   }
 
+  static DirectorySourceContent create(Package pkg, java.net.URL url)
+  {
+    if (! url.getProtocol().equals("file"))
+      User.error("Cannot use " + url + " to get sources for package " + pkg);
+
+    return create(pkg, new File(url.getFile()));
+  }
+
   DirectorySourceContent(Package pkg, File directory)
   {
     this.pkg = pkg;
     this.directory = directory;
 
     this.sources = getSources();
-    lastModification = maxLastModification(sources);   
+    lastModification = maxLastModification(sources);
   }
 
   private File[] sources;

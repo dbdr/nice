@@ -32,54 +32,34 @@ public class ClassLoader
   public ClassLoader(String classpath, Registrar registrar)
   {
     this.registrar = registrar;
-    this.locations = splitPath(classpath);
+    this.locator = new nice.tools.locator.Locator
+      (classpath,
+       new gnu.mapping.Procedure1() {
+         public Object apply1(Object o) {
+           return null;
+         }
+       });
   }
 
   public ClassType load(String className)
   {
-    String filesystemName = className.replace('.', File.separatorChar) + ".class";
-    String jarName = className.replace('.', '/') + ".class";
+    String name = className.replace('.', '/') + ".class";
 
-    for (int i = 0; i < locations.length; i++)
-      {
-	InputStream input = null;
+    java.net.URLConnection resource = locator.get(name);
 
-	if (locations[i] instanceof File)
-	  {
-	    File dir = (File) locations[i];
-	    File file = new File(dir, filesystemName);
-	    try {
-	      input = new FileInputStream(file);
-	    }
-	    catch(FileNotFoundException ex) {
-	    }
-	  }
-	else
-	  {
-	    JarFile jar = (JarFile) locations[i];
-	    JarEntry e = jar.getJarEntry(jarName);
-	    if (e != null)
-	      try {
-		input = jar.getInputStream(e);
-	      }
-	      catch(java.io.IOException ex) {
-	      }
-	  }
+    if (resource == null)
+      return null;
 
-	if (input != null)
-	  {
-	    ClassType res = new ClassType();
-	    registrar.register(className, res);
-	    try {
-	      new ClassFileInput(res, input);
-	      return res;
-	    }
-	    catch (IOException ex) {
-	    }
-	  }
-      }
-
-    return null;
+    try {
+      InputStream input = resource.getInputStream();
+      ClassType res = new ClassType();
+      registrar.register(className, res);
+      new ClassFileInput(res, input);
+      return res;
+    }
+    catch (IOException ex) {
+      return null;
+    }
   }
 
   /****************************************************************
@@ -87,9 +67,9 @@ public class ClassLoader
    ****************************************************************/
 
   /** where to find compiled packages. */
-  private final Object[] locations;
+  private final nice.tools.locator.Locator locator;
 
-  /** Map from class names to types. 
+  /** Map from class names to types.
       Used to avoid loading several copies of the same class.
    */
   private final Registrar registrar;
@@ -98,43 +78,4 @@ public class ClassLoader
   {
     public abstract void register(String className, ClassType type);
   }
-
-  private static Object[] splitPath (String path)
-  {
-    LinkedList res = new LinkedList();
-    
-    int start = 0;
-    // skip starting separators
-    while (start < path.length() && 
-	   path.charAt(start) == File.pathSeparatorChar)
-      start++;
-    
-    while(start < path.length())
-      {
-	int end = path.indexOf(File.pathSeparatorChar, start);
-	if (end == -1)
-	  end = path.length();
-	
-	String pathComponent = path.substring(start, end);
-	if (pathComponent.length() > 0)
-	  {
-	    File f = nice.tools.util.System.getFile(pathComponent);
-	    // Ignore non-existing directories and archives
-	    if (f.exists())
-	      {
-		if (pathComponent.endsWith(".jar"))
-		  try{
-		    res.add(new JarFile(f));
-		  }
-		  catch(IOException e){}
-		else
-		  res.add(f);
-	      }
-	  }
-	start = end + 1;
-      }
-
-    return res.toArray(new Object[res.size()]);
-  }
-
 }

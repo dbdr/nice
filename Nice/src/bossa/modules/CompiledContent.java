@@ -60,4 +60,28 @@ abstract class CompiledContent
 
   /** return a longer string that identifies the type of package source too. */
   abstract public String toString();
+
+  static CompiledContent create(Package pkg, java.net.URL url)
+  {
+    if (url.getProtocol().equals("file"))
+      {
+        File dir = new File(url.getFile()).getParentFile();
+        return DirectoryCompiledContent.create(pkg, dir);
+      }
+
+    if (url.getProtocol().equals("jar"))
+      {
+        String jar = url.getFile();
+        jar = jar.substring(jar.indexOf(':') + 1, jar.indexOf('!'));
+        try {
+          return JarCompiledContent.create
+            (pkg, new java.util.jar.JarFile(jar));
+        }
+        catch(IOException e) {
+          return null;
+        }
+      }
+
+    return null;
+  }
 }

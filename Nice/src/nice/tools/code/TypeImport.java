@@ -178,45 +178,16 @@ public class TypeImport
 
     currentClasspath = classpath;
 
-    LinkedList components = new LinkedList();
-    
-    int start = 0;
-    // skip starting separators
-    while (start<classpath.length() && 
-	   classpath.charAt(start) == File.pathSeparatorChar)
-      start++;
-    
-    while(start<classpath.length())
-      {
-	int end = classpath.indexOf(File.pathSeparatorChar, start);
-	if (end == -1)
-	  end = classpath.length();
-	    
-	String pathComponent = classpath.substring(start, end);
-	if (pathComponent.length() > 0)
-	  try{
-	    File f = nice.tools.util.System.getFile(pathComponent);
-	    if (f.canRead())
-	      components.add(f.getCanonicalFile().toURL());
-	    else
-	      {
-		if (!f.exists())
-		  User.warning("Classpath component " + pathComponent + " does not exist");
-		else
-		  User.warning("Classpath component " + pathComponent + " is not readable");
-	      }
-	  }
-	  catch(java.net.MalformedURLException e){
-	    User.warning("Classpath component " + pathComponent + " is invalid");
-	  }
-	  catch(java.io.IOException e){
-	    User.warning("Classpath component " + pathComponent + " is invalid");
-	  }
-	start = end+1;
-      }
+    URL[] path = nice.tools.locator.dispatch.parsePath
+      (classpath,
+       new gnu.mapping.Procedure1() {
+         public Object apply1(Object o) {
+           String message = (String) o;
+           User.warning(message);
+           return null;
+         }
+       });
 
-    classLoader = new java.net.URLClassLoader
-      ((URL[]) components.toArray(new URL[components.size()]), 
-       /* no parent */ null);
+    classLoader = new java.net.URLClassLoader(path, /* no parent */ null);
   }
 }

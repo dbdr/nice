@@ -29,8 +29,25 @@ final class Locator
 {
   Locator (Compilation compilation, String classpath)
   {
-    sourceRoots = splitPath(compilation.sourcePath);
-    packageRoots = splitPath(classpath);
+    sources = new nice.tools.locator.Locator
+      (compilation.sourcePath,
+       new gnu.mapping.Procedure1() {
+         public Object apply1(Object o) {
+           String message = (String) o;
+           User.warning(message);
+           return null;
+         }
+       });
+
+    packages = new nice.tools.locator.Locator
+      (classpath,
+       new gnu.mapping.Procedure1() {
+         public Object apply1(Object o) {
+           String message = (String) o;
+           User.warning(message);
+           return null;
+         }
+       });
   }
 
   Content find (Package pkg)
@@ -38,21 +55,17 @@ final class Locator
     SourceContent source = null;
     CompiledContent compiled = null;
 
-    String filesystemName = pkg.getName().replace('.', File.separatorChar);
-    
-    for (int i = 0; source == null && i < sourceRoots.length; i++)
-      // source files cannot be in Jar files
-      if (sourceRoots[i] instanceof File)
-	source = DirectorySourceContent.create
-	  (pkg, new File((File) sourceRoots[i], filesystemName));
+    String name = pkg.getName().replace('.', '/');
 
-    for (int i = 0; compiled == null && i < packageRoots.length; i++)
-      if (packageRoots[i] instanceof File)
-	compiled = DirectoryCompiledContent.create
-	  (pkg, new File((File) packageRoots[i], filesystemName));
-      else
-	compiled = JarCompiledContent.create(pkg, (JarFile) packageRoots[i]);
-    
+    java.net.URLConnection sroot = sources.get(name);
+    java.net.URLConnection croot = packages.get(name + "/package.nicei");
+
+    if (sroot != null)
+      source = DirectorySourceContent.create(pkg, sroot.getURL());
+
+    if (croot != null)
+      compiled = CompiledContent.create(pkg, croot.getURL());
+
     Content res = new Content(pkg, source, compiled);
 
     if (Debug.modules)
@@ -64,52 +77,10 @@ final class Locator
   /****************************************************************
    * Private
    ****************************************************************/
-  
+
   /** where to find source files. */
-  private final Object[] sourceRoots;
+  private final nice.tools.locator.Locator sources;
 
   /** where to find compiled packages. */
-  private final Object[] packageRoots;
-
-  private static Object[] splitPath (String path)
-  {
-    LinkedList res = new LinkedList();
-    
-    int start = 0;
-    // skip starting separators
-    while (start<path.length() && 
-	   path.charAt(start) == File.pathSeparatorChar)
-      start++;
-    
-    while(start<path.length())
-      {
-	int end = path.indexOf(File.pathSeparatorChar, start);
-	if (end == -1)
-	  end = path.length();
-	
-	String pathComponent = path.substring(start, end);
-	if (pathComponent.length() > 0)
-	  {
-	    File f = nice.tools.util.System.getFile(pathComponent).getAbsoluteFile();
-	    // Ignore non-existing directories and archives
-	    if (f.exists())
-	      {
-		if (pathComponent.endsWith(".jar"))
-		  try{
-		    res.add(new JarFile(f));
-		  }
-		  catch(IOException e){}
-		else if (f.isDirectory())
-		  res.add(f);
-                else
-                  User.warning("Path " + f + " is not valid");
-	      }
-            else
-              User.warning("Path " + f + " does not exist");
-	  }
-	start = end + 1;
-      }
-
-    return res.toArray(new Object[res.size()]);
-  }
+  private final nice.tools.locator.Locator packages;
 }

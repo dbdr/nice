@@ -1,0 +1,70 @@
+/**************************************************************************/
+/*                                N I C E                                 */
+/*             A high-level object-oriented research language             */
+/*                        (c) Daniel Bonniot 2004                         */
+/*                                                                        */
+/*  This program is free software; you can redistribute it and/or modify  */
+/*  it under the terms of the GNU General Public License as published by  */
+/*  the Free Software Foundation; either version 2 of the License, or     */
+/*  (at your option) any later version.                                   */
+/*                                                                        */
+/**************************************************************************/
+
+package nice.tools.locator;
+
+/**
+   Handle string representations of a path.
+
+   @author Daniel Bonniot (bonniot@users.sourceforge.net)
+ */
+
+public URL[] parsePath(String path, String->void warning)
+{
+  List<URL> components = new ArrayList();
+
+  int start = 0;
+  // skip starting separators
+  while (start < path.length() &&
+	 path.charAt(start) == java.io.File.pathSeparatorChar)
+    start++;
+
+  while(start < path.length())
+    {
+      int end = path.indexOf(java.io.File.pathSeparatorChar, start);
+      if (end == -1)
+	end = path.length();
+
+      String pathComponent = path.substring(start, end);
+      if (pathComponent.length() > 0)
+	try{
+	  java.io.File f = nice.tools.util.System.getFile(pathComponent);
+	  if (f.canRead())
+	    components.add(url(f.getCanonicalFile()));
+	  else
+	    {
+	      if (!f.exists())
+		warning("Path component "pathComponent" does not exist");
+	      else
+		warning("Path component "pathComponent" is not readable");
+	    }
+        }
+        catch(java.net.MalformedURLException e){
+	  warning("Path component "pathComponent" is invalid");
+	}
+	catch(java.io.IOException e){
+	  warning("Path component "pathComponent" is invalid");
+	}
+      start = end + 1;
+    }
+
+  return components.toArray();
+}
+
+URL url(java.io.File f)
+{
+  String path = f.getPath();
+  if (path.endsWith(".jar"))
+    return new URL("jar", "", "file:" path "!/");
+  else
+    return f.toURL();
+}

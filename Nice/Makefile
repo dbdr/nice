@@ -64,6 +64,7 @@ compiler1: setDate
 	${NICEC}  -R -a src/nice/tools/compiler/console.jar nice.tools.compiler.console
 
 compiler2 compiler3: setDate
+	${NICEC1} -r nice.tools.locator
 	${NICEC1} -R bossa.syntax
 	${NICEC1} -R -a src/nice/tools/compiler/console.jar nice.tools.compiler.console
 
@@ -158,6 +159,8 @@ core-bootstrap:
 	mkdir -p classes classes-inline
 	ln -sf nicec bin/nicedoc; ln -sf nicec bin/niceunit
 	-cd src/bossa/syntax && mv -f dispatch.java.bootstrap dispatch.java
+	${JAVAC} src/nice/tools/util/System.java
+	${NICEC} nice.tools.locator
 	${JAVAC} \
 		src/bossa/syntax/dispatch.java \
 		stdlib/nice/lang/{Native,rawArray}.java \

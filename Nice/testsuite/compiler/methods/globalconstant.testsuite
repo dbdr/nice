@@ -123,3 +123,19 @@
   void foo(int n);
   foo(n) {}
   foo(n>xyz) {}  
+
+
+/// PASS
+  assert foo(END_OF_TIME);
+  /// Toplevel
+  let Date END_OF_TIME = new Date(Long.MAX_VALUE);
+  boolean foo(Date d);
+  foo(d) = false;
+  foo(END_OF_TIME) = true;
+
+/// FAIL
+  /// Toplevel
+boolean foo(String d);
+foo(d) = false;
+foo(END_OF_TIME) = true;
+let Date END_OF_TIME = new Date(Long.MAX_VALUE);

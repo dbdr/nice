@@ -1,6 +1,6 @@
 /**************************************************************************/
-/*                                N I C E                                 */
-/*             A high-level object-oriented research language             */
+/*                            NICE Testsuite                              */
+/*             A testsuite for the Nice programming language              */
 /*                         (c) Alex Greif 2002                            */
 /*                                                                        */
 /*  This program is free software; you can redistribute it and/or modify  */

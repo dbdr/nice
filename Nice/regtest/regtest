@@ -1,6 +1,11 @@
 #! /bin/sh
 
 NICE_TOP=$PWD
+# PWD return different values on different systems:
+# Nice/regtest with bash on Linux, Nice/ under sh on Digital Unix
+if expr match $NICE_TOP '.*regtest$' >/dev/null; then
+  NICE_TOP=`dirname $NICE_TOP`
+fi
 export NICE_TOP
 
 echo()

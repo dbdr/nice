@@ -12,7 +12,7 @@
 
 // File    : CallExp.java
 // Created : Mon Jul 05 16:27:27 1999 by bonniot
-//$Modified: Mon Aug 23 18:11:12 1999 by bonniot $
+//$Modified: Tue Aug 24 17:20:49 1999 by bonniot $
 
 package bossa.syntax;
 
@@ -33,9 +33,8 @@ public class CallExp extends Expression
   public CallExp(Expression fun, 
 		 List parameters)
   {
-    this.fun=new ExpressionRef(fun);
+    this.fun=expChild(fun);
     this.parameters=parameters;
-    addChild(this.fun);
     addChildren(this.parameters);
   }
 
@@ -47,7 +46,7 @@ public class CallExp extends Expression
 
   static Type getType(Location loc,
 		      Expression fun,
-		      List parameters,
+		      List /* of Expression */ parameters,
 		      boolean report)
   {
     Type funt=fun.getType();
@@ -80,7 +79,7 @@ public class CallExp extends Expression
 	  User.error(loc,"The conditions for using this function are not fullfiled"); 
 	else return null;
       }
-
+      
       parametersTypes=Expression.getPolytype(parameters);
       User.error(parametersTypes==null,loc,
 		   "Arguments of functions must not be imperative-parametric");
@@ -93,8 +92,8 @@ public class CallExp extends Expression
     }
     catch(BadSizeEx e){
       if(report)
-	User.error(loc,e.expected+" parameters expected "+
-		   ", not "+e.actual);
+	User.error(loc,e.expected+" parameters expected, "+
+		   "not "+e.actual);
       else
 	return null;
     }
@@ -119,12 +118,18 @@ public class CallExp extends Expression
     return new Polytype(cst,codom);
   }
   
-  Type getType()
+  void computeType()
   {
-    fun=fun.resolveOverloading(parameters);
-    return getType(location(),fun,parameters,true);
+    fun=fun.resolveOverloading(parameters,null);
+    type=getType(location(),fun,parameters,true);
   }
 
+  boolean isAssignable()
+  {
+    fun=fun.resolveOverloading(parameters,null);
+    return fun.isFieldAccess();
+  }
+  
   public String toString()
   {
     return fun

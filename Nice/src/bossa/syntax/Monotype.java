@@ -12,7 +12,7 @@
 
 // File    : Monotype.java
 // Created : Thu Jul 01 19:28:28 1999 by bonniot
-//$Modified: Thu Aug 19 14:40:04 1999 by bonniot $
+//$Modified: Tue Aug 24 16:28:24 1999 by bonniot $
 // Description : Abstract syntactic type, without constraint
 
 package bossa.syntax;
@@ -23,6 +23,24 @@ import bossa.util.*;
 abstract public class Monotype
   implements Located, bossa.engine.Element
 {
+  boolean allImperative(List symbols)
+  {
+    return false;
+  }
+  
+  public abstract boolean appear(TypeSymbol s, boolean imperatively);
+  
+  static boolean appear(TypeSymbol s, boolean imperatively, Collection c)
+  {
+    for(Iterator i=c.iterator();i.hasNext();)
+      {
+	Monotype m=(Monotype)i.next();
+	if(m.appear(s,imperatively))
+	  return true;
+      }
+    return false;
+  }
+  
   abstract Monotype cloneType();
 
   Collection cloneTypes(Collection types)
@@ -152,6 +170,6 @@ abstract public class Monotype
     return toString();
   }
 
-  Constraint constraint=Constraint.emptyConstraint();
+  Constraint constraint=Constraint.True();
 }
 

@@ -12,7 +12,7 @@
 
 // File    : Engine.java
 // Created : Tue Jul 27 15:34:53 1999 by bonniot
-//$Modified: Mon Aug 23 18:54:00 1999 by bonniot $
+//$Modified: Tue Aug 24 18:16:35 1999 by bonniot $
 
 package bossa.engine;
 
@@ -317,5 +317,5 @@ public abstract class Engine
     }
   }
 
-  static final boolean dbg = false;
+  static final boolean dbg = true;
 }

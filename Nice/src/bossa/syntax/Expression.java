@@ -12,7 +12,7 @@
 
 // File    : Expression.java
 // Created : Mon Jul 05 16:25:02 1999 by bonniot
-//$Modified: Thu Aug 19 17:23:14 1999 by bonniot $
+//$Modified: Tue Aug 24 17:03:48 1999 by bonniot $
 // Description : 
 
 package bossa.syntax;
@@ -27,7 +27,7 @@ public abstract class Expression extends Node
   {
     super(Node.down);
   }
-  
+
   /** 
    * Returns an equivalent expression with scoping resolved 
    * Expressions that resolve to a new expressions should
@@ -57,14 +57,31 @@ public abstract class Expression extends Node
     return false;
   }
 
-  Expression resolveOverloading(List /* of Expression */ parameters)
+  boolean isFieldAccess()
+  {
+    return false;
+  }
+  
+  /**
+   * Resolves overloading, taking into account the parameters the expressions is applied to.
+   *
+   * @param tp type parameters to instantiate before applying the parameters, or null.
+   */
+  Expression resolveOverloading(List /* of Expression */ parameters, TypeParameters tp)
   {
     return this;
   }
   
-  /** returns the static type of the expression */
-  abstract Type getType();
+  /** computes the static type of the expression */
+  abstract void computeType();
 
+  final Type getType()
+  {
+    if(type==null)
+      computeType();
+    return type;
+  }
+  
   /**
    * Maps getType over a collection of Expressions
    *
@@ -118,4 +135,5 @@ public abstract class Expression extends Node
   }
 
   Location loc=Location.nowhere();
+  protected Type type;
 }

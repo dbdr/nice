@@ -12,7 +12,7 @@
 
 // File    : parser.jj
 // Created : Thu Jul 01 10:27:05 1999 by bonniot
-//$Modified: Wed Aug 18 13:29:19 1999 by bonniot $
+//$Modified: Tue Aug 24 16:27:08 1999 by bonniot $
 // Description : Parseur JavaCC pour Bossa
 //   Tokens based on the Jazz parser
 
@@ -599,9 +599,9 @@ Monotype monotype():
   { return res; }
 }
 
-Collection monotypes():
+List monotypes():
 {
-  Collection res=new ArrayList();
+  List res=new ArrayList();
   Monotype t;
 }
 {
@@ -652,7 +652,7 @@ Polytype polytype():
 Type type():
 {
   Polytype p;
-  Collection tp;
+  List tp;
 }
 {
   tp=monotypeVars(true)
@@ -664,22 +664,10 @@ Type type():
 /*                          Classes                                    */
 /***********************************************************************/
 
-void field(ClassDefinition c):
-{
-  Monotype t;
-  LocatedString name;
-}
-{
-  t=monotype()
-  name=string()
-  ";"
-  { c.addField(name,t); }
-}
-
-void methodDecl(ClassDefinition c):
+MethodDefinition methodDef(ClassDefinition c):
 {
   LocatedString name;
-  Collection parameters,tp;
+  List parameters,tp;
   Constraint cst;
   Monotype returnType;
   MethodDefinition def;
@@ -693,62 +681,75 @@ void methodDecl(ClassDefinition c):
   parameters=monotypes()
   ")"
   ";"
-  { c.addMethod(new MethodDefinition(c,name,tp,cst,returnType,parameters)); }
+  { return new MethodDefinition(c,name,tp,cst,returnType,parameters); }
 }
 
-void extensions(ClassDefinition c):
+List extensions():
 {
-    TypeConstructor name;
+  List res=new ArrayList(0);
+  TypeConstructor name;
 }
 {
-    "extends"
-    name=typeConstructor() { c.addExtension(name); }
-    ( "," name=typeConstructor() { c.addExtension(name); } )*
-}
-
-void implementations(ClassDefinition c):
-{
-    Interface name;
-}
-{
-    "implements"
-    name=itf() { c.addImplementation(name); }
-    ( "," name=itf() { c.addImplementation(name); } )*
+  "extends"
+    name=typeConstructor() { res.add(name); }
+  ( "," name=typeConstructor() { res.add(name); } )*
+    { return res; }    
 }
 
-void abstractions(ClassDefinition c):
+List implementations():
 {
-    Interface name;
+  List res=new ArrayList(0);
+  Interface name;
 }
 {
-    "abstracts"
-    name=itf() { c.addAbstraction(name); }
-    ( "," name=itf() { c.addAbstraction(name); } )*
+  "implements"
+    name=itf() { res.add(name); }
+  ( "," name=itf() { res.add(name); } )*
+    { return res; }    
+}
+
+List abstractions():
+{
+  List res=new ArrayList(0);
+  Interface name;
+}
+{
+  "abstracts"
+    name=itf() { res.add(name); }
+  ( "," name=itf() { res.add(name); } )*
+    { return res; }    
 }
 
 ClassDefinition classDefinition():
 {
-    ClassDefinition res;
-    LocatedString name;
-    List parameters;
+  LocatedString name;
+  List parameters;
+  MonoSymbol field;
+  List fields=new ArrayList(),methods=new ArrayList(0);
+  List ext=new ArrayList(0),imp=new ArrayList(0),abs=new ArrayList(0);
+  List l;
 }
 {
   "class"
     name=string() 
     parameters=monotypeVars(true) 
-    { res=new ClassDefinition(name,parameters); }
-    ( implementations(res) | abstractions(res) | extensions(res) )*
+
+  ( l=implementations() { imp.addAll(l); } 
+  | l=abstractions()    { abs.addAll(l); }
+  | l=extensions()      { ext.addAll(l); }
+  )*
+
     "{"
     ( 
       (
-       //LOOKAHEAD(field(res)) 
-        field(res)
+       //LOOKAHEAD(monoSymbol() ";") 
+       field=monoSymbol() ";" { fields.add(field); }
 	//| 
         //methodDecl(res)
       )
     )*
-    "}"
-    { return res; }
+      "}"
+  { return new ClassDefinition(name,parameters,ext,imp,abs,fields,methods); }
 }
 
 InterfaceDefinition interfaceDefinition():
@@ -780,7 +781,7 @@ MethodBodyDefinition methodBodyDefinition():
     Pattern p;
     Collection binders=null;
     List parameters=new ArrayList();
-    Collection tp;
+    List tp;
     List code;
 }
 {
@@ -805,7 +806,7 @@ MethodDefinition methodDefinition():
 {
     LocatedString name;
     Monotype returnType;
-    Collection parameters,tp;
+    List parameters,tp;
     Constraint cst;
     MethodDefinition res;
 }

@@ -12,7 +12,7 @@
 
 // File    : MonotypeVar.java
 // Created : Fri Jul 23 15:36:39 1999 by bonniot
-//$Modified: Thu Aug 19 13:19:19 1999 by bonniot $
+//$Modified: Tue Aug 24 16:24:27 1999 by bonniot $
 
 package bossa.syntax;
 
@@ -59,6 +59,14 @@ public class MonotypeVar extends Monotype
    * Imperative type variables
    ****************************************************************/
 
+  public boolean appear(TypeSymbol s, boolean imperatively)
+  {
+    if(imperatively)
+      return false;
+    else
+      return name.equals(s.getName());
+  }
+  
   public boolean isImperative()
   {
     return imperative;

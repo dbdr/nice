@@ -12,7 +12,7 @@
 
 // File    : ClassDefinition.java
 // Created : Thu Jul 01 11:25:14 1999 by bonniot
-//$Modified: Thu Aug 19 13:39:02 1999 by bonniot $
+//$Modified: Tue Aug 24 15:06:28 1999 by bonniot $
 // Description : Abstract syntax for a class definition
 
 package bossa.syntax;
@@ -24,7 +24,11 @@ import bossa.typing.*;
 public class ClassDefinition extends Node
   implements Definition
 {
-  public ClassDefinition(LocatedString name, List typeParameters)
+  public ClassDefinition(LocatedString name, 
+			 List typeParameters,
+			 List extensions, List implementations, List abstractions,
+			 List fields,
+			 List methods)
   {
     super(Node.global);
     
@@ -33,18 +37,33 @@ public class ClassDefinition extends Node
       this.typeParameters=new ArrayList(0);
     else
       this.typeParameters=typeParameters;
-    extensions=new ArrayList();
-    implementations=new ArrayList();
-    abstractions=new ArrayList();
-    methods=new ArrayList();
-    fields=new ArrayList();
+    this.extensions=extensions;
+    this.implementations=implementations;
+    this.abstractions=abstractions;
+    this.fields=fields;
+    this.methods=methods;
     this.tc=new TypeConstructor(this);
 
     addTypeSymbol(this.tc);
+    addChildren(computeAccessMethods(fields));
     addChildren(methods);
-    addChildren(fields);
     addChildren(implementations);
     addChildren(abstractions);
+  }
+  
+  private List computeAccessMethods(List fields)
+  {
+    List res=new ArrayList(fields.size());
+    for(Iterator i=fields.iterator();i.hasNext();)
+      {
+	MonoSymbol s=(MonoSymbol)i.next();
+	List params=new LinkedList();
+	params.add(getMonotype());
+	MethodDefinition m=new MethodDefinition(this,s.name,typeParameters,Constraint.True(),s.type,params);
+	m.isFieldAccess=true;
+	res.add(m);
+      }
+    return res;
   }
   
   Constraint getConstraint()
@@ -52,21 +71,25 @@ public class ClassDefinition extends Node
     return new Constraint(typeParameters,null);
   }
 
-  boolean isAssignable()
-  {
-    return false;
-  }
-
   Type getType()
   {
     return Type.newType
       (typeParameters,
-       new Polytype(new MonotypeConstructor
-		    (this.tc,
-		     TypeParameters.fromSymbols(typeParameters),
-		     name.location())));
+       new Polytype(getMonotype()));
   }
 
+  /**
+   * Returns the 'Monotype' part of the type.
+   * Private use only (to compute the type of the field access methods).
+   */
+  private Monotype getMonotype()
+  {
+    return new MonotypeConstructor
+      (this.tc,
+       TypeParameters.fromSymbols(typeParameters),
+       name.location());
+  }
+  
   void resolve()
   {
     extensions=TypeConstructor.resolve(typeScope,extensions);
@@ -83,31 +106,6 @@ public class ClassDefinition extends Node
     catch(TypingEx e){
       User.error(name,"Error in class "+name+" :"+e.getMessage());
     }
-  }
-
-  public void addExtension(TypeConstructor name)
-  {
-    extensions.add(name);
-  }
-
-  public void addImplementation(Interface name)
-  {
-    implementations.add(name);
-  }
-
-  public void addAbstraction(Interface name)
-  {
-    abstractions.add(name);
-  }
-
-  public void addField(LocatedString name, Monotype type)
-  {
-    fields.add(new MonoSymbol(name,type,this));
-  }
-
-  public void addMethod(MethodDefinition m)
-  {
-    methods.add(m);
   }
 
   public String toString()
@@ -137,6 +135,6 @@ public class ClassDefinition extends Node
   private List /* of TypeConstructor */ extensions;
   private List /* of TypeConstructor */ implementations;
   private List /* of TypeConstructor */ abstractions;
-  private List /* of VarSymbol */ fields;
+  private List /* of MonoSymbol */ fields;
   private List methods;
 }

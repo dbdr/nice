@@ -12,7 +12,7 @@
 
 // File    : FunExp.java
 // Created : Mon Jul 12 15:09:50 1999 by bonniot
-//$Modified: Tue Aug 17 17:38:09 1999 by bonniot $
+//$Modified: Tue Aug 24 17:03:04 1999 by bonniot $
 // Description : A functional expression
 
 package bossa.syntax;
@@ -22,7 +22,7 @@ import bossa.util.*;
 
 public class FunExp extends Expression
 {
-  public FunExp(Collection typeParameters, 
+  public FunExp(List typeParameters, 
 		Constraint cst, List formals, List body)
   {
     this.typeParameters=typeParameters;
@@ -35,7 +35,7 @@ public class FunExp extends Expression
     addChild(this.body);
   }
 
-  Type getType()
+  void computeType()
   {
     try{
       constraint.assert();
@@ -49,13 +49,13 @@ public class FunExp extends Expression
     User.error(returnType==null,"The last statement of "+this+
 	       "must be a return statement");
  
-    Collection tp=returnType.getTypeParameters();
+    List tp=returnType.getTypeParameters();
     if(tp==null)
       tp=typeParameters;
     else
       tp.addAll(typeParameters);
 
-    return Type.newType
+    type=Type.newType
       (tp,
        new Polytype(Constraint.and(constraint,returnType.getConstraint()),
 		    new FunType(MonoSymbol.getMonotype(formals),
@@ -77,7 +77,7 @@ public class FunExp extends Expression
       ;
   }
   
-  Collection /* of TypeSymbol*/ typeParameters;
+  List /* of TypeSymbol*/ typeParameters;
   Collection /* of FieldSymbol */ formals;
   Constraint constraint;
   Block body;

@@ -12,7 +12,7 @@
 
 // File    : Constraint.java
 // Created : Fri Jul 02 17:51:35 1999 by bonniot
-//$Modified: Thu Aug 19 13:39:35 1999 by bonniot $
+//$Modified: Tue Aug 24 15:06:39 1999 by bonniot $
 
 package bossa.syntax;
 
@@ -59,16 +59,6 @@ public class Constraint extends Node
     else
       addChildren(atomics);
     this.atomics=atomics;
-  }
-
-  /**
-   * Nickname for True()
-   *
-   * @return the trivial constraint
-   */
-  public static final Constraint emptyConstraint()
-  { 
-    return new Constraint(new ArrayList(0),new ArrayList(0));
   }
 
   /**

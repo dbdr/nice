@@ -12,7 +12,7 @@
 
 // File    : Node.java
 // Created : Thu Jul 08 10:24:56 1999 by bonniot
-//$Modified: Thu Aug 19 14:29:01 1999 by bonniot $
+//$Modified: Tue Aug 24 12:19:09 1999 by bonniot $
 
 package bossa.syntax;
 
@@ -191,6 +191,21 @@ abstract class Node
     Iterator i=children.iterator();
     while(i.hasNext())
       ((Node)i.next()).doTypecheck();
+  }
+
+  /****************************************************************
+   * Misc
+   ****************************************************************/
+
+  /**
+   * Creates a reference to an expression, 
+   * adds it as a child and returns it.
+   */
+  ExpressionRef expChild(Expression value)
+  {
+    ExpressionRef res=new ExpressionRef(value);
+    addChild(res);
+    return res;
   }
 
   protected VarScope scope;

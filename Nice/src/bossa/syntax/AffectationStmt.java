@@ -12,8 +12,7 @@
 
 // File    : AffectationStmt.java
 // Created : Mon Jul 05 15:49:27 1999 by bonniot
-//$Modified: Wed Aug 18 16:08:08 1999 by bonniot $
-// Description : Affectation
+//$Modified: Tue Aug 24 13:36:35 1999 by bonniot $
 
 package bossa.syntax;
 
@@ -21,18 +20,16 @@ import bossa.util.*;
 import bossa.parser.ParseException;
 import bossa.typing.*;
 
+/**
+ * Assignment.
+ */
 public class AffectationStmt extends Statement
 {
   public AffectationStmt(Expression to,
-			 Expression value) throws ParseException
+			 Expression value) 
   {
-    if(!(to instanceof FieldExp) && !(to instanceof IdentExp))
-      throw new ParseException("Affectation should be done to a field");
-
-    this.to=new ExpressionRef(to);
-    this.value=new ExpressionRef(value);
-    addChild(this.to);
-    addChild(this.value);
+    this.to=expChild(to);
+    this.value=expChild(value);
   }
 
   /****************************************************************
@@ -46,9 +43,9 @@ public class AffectationStmt extends Statement
       Typing.leq(value.getType(),to.getType());
     }
     catch(TypingEx t){
-      User.error(this,"Typing error : "+to+" cannot be assigned value "+value);
+      User.error(this,"Typing error : "+to+
+		 " cannot be assigned value "+value);
     }
-
   }
 
   /****************************************************************
@@ -60,5 +57,5 @@ public class AffectationStmt extends Statement
     return to+" = "+value;
   }
 
-  protected Expression to,value;
+  private Expression to,value;
 }

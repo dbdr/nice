@@ -12,7 +12,7 @@
 
 // File    : NewExp.java
 // Created : Thu Jul 08 17:15:15 1999 by bonniot
-//$Modified: Wed Aug 18 15:40:10 1999 by bonniot $
+//$Modified: Tue Aug 24 17:00:45 1999 by bonniot $
 // Description : Allocation of a new object
 
 package bossa.syntax;
@@ -21,27 +21,27 @@ import bossa.util.*;
 
 public class NewExp extends Expression
 {
-  public NewExp(Monotype type)
+  public NewExp(Monotype monotype)
   {
-    this.type=type;
+    this.monotype=monotype;
   }
 
   void resolve()
   {
-    type=type.resolve(typeScope);
-    User.error(!type.isImperative(),
+    monotype=monotype.resolve(typeScope);
+    User.error(!monotype.isImperative(),
   	       this,"Type parameters in \"New\" expressions must be imperative");
   }
   
-  Type getType()
+  void computeType()
   {
-    return new Polytype(type);
+    type=new Polytype(monotype);
   }
 
   public String toString()
   {
-    return "new "+type;
+    return "new "+monotype;
   }
 
-  Monotype type;
+  Monotype monotype;
 }

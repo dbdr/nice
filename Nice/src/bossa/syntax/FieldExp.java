@@ -12,20 +12,21 @@
 
 // File    : FieldExp.java
 // Created : Mon Jul 05 17:29:46 1999 by bonniot
-//$Modified: Thu Aug 19 13:11:39 1999 by bonniot $
-// Description : Access to the field of an expression
-//   the field may be the name of a method
-//   since it can be considered as a field holding a closure
+//$Modified: Tue Aug 24 17:01:30 1999 by bonniot $
+// Description : 
 
 package bossa.syntax;
 
 import bossa.util.*;
 
+/**
+ * Access to the field of an expression.
+ */
 public class FieldExp extends Expression
 {
   public FieldExp(Expression prefix, LocatedString field)
   {
-    this.prefix=prefix;
+    this.prefix=expChild(prefix);
     this.field=field;
   }
   
@@ -44,10 +45,10 @@ public class FieldExp extends Expression
     return access.isAssignable();
   }
 
-  Type getType()
+  void computeType()
   {
     Internal.error(access==null,"getType while access is still null");
-    return access.getType();
+    type=access.getType();
   }
 
   public String toString()

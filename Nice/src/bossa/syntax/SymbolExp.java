@@ -12,7 +12,7 @@
 
 // File    : SymbolExpr.java
 // Created : Thu Jul 08 12:20:59 1999 by bonniot
-//$Modified: Thu Aug 19 13:21:42 1999 by bonniot $
+//$Modified: Tue Aug 24 17:04:47 1999 by bonniot $
 // Description : Access to the value of a symbol
 
 package bossa.syntax;
@@ -25,16 +25,29 @@ public class SymbolExp extends Expression
   SymbolExp(VarSymbol s)
   {
     this.symbol=s;
+    setLocation(s.name.location());
   }
 
+  SymbolExp(VarSymbol s, Location loc)
+  {
+    this(s);
+    setLocation(loc);
+  }
+  
   boolean isAssignable()
   {
     return symbol.isAssignable();
   }
 
-  Type getType()
+  boolean isFieldAccess()
   {
-    return symbol.getType();
+    return symbol instanceof MethodDefinition
+      && ((MethodDefinition)symbol).isFieldAccess;
+  }
+  
+  void computeType()
+  {
+    type=symbol.getType();
   }
 
   public String toString()

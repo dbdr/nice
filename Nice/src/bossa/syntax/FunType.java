@@ -12,7 +12,7 @@
 
 // File    : FunType.java
 // Created : Fri Jul 02 17:41:24 1999 by bonniot
-//$Modified: Wed Aug 18 13:39:09 1999 by bonniot $
+//$Modified: Tue Aug 24 16:28:28 1999 by bonniot $
 
 package bossa.syntax;
 
@@ -50,6 +50,29 @@ public class FunType extends Monotype
     return out;
   }
 
+  /****************************************************************
+   * Imperative type variables
+   ****************************************************************/
+
+  boolean allImperative(List symbols)
+  {
+    for(Iterator i=symbols.iterator();i.hasNext();)
+      {
+	TypeSymbol s=(TypeSymbol)i.next();
+	if(!appear(s,true,in))
+	  return false;
+      }
+    return true;
+  }
+  
+  public boolean appear(TypeSymbol s, boolean imperatively)
+  {
+    if(imperatively)
+      return false;
+    else
+      return appear(s,imperatively,in);
+  }
+  
   /****************************************************************
    * Scoping
    ****************************************************************/

@@ -12,20 +12,31 @@
 
 // File    : MethodDefinition.java
 // Created : Thu Jul 01 18:12:46 1999 by bonniot
-//$Modified: Thu Aug 19 17:15:15 1999 by bonniot $
-// Description : Abstract syntax for a global method declaration
+//$Modified: Tue Aug 24 16:19:09 1999 by bonniot $
 
 package bossa.syntax;
 
 import java.util.*;
 import bossa.util.*;
 
+/**
+ * Abstract syntax for a global method declaration.
+ */
 public class MethodDefinition extends PolySymbol implements Definition
 {
-  /** the Method is a class member */
+  /**
+   * The method is a class member if c!=null.
+   *
+   * @param c the class this method belongs to, or 'null'
+   * @param name the name of the method
+   * @param typeParameters the type parameters
+   * @param constraint the constraint
+   * @param returnType the return type
+   * @param parameters the MonoTypes of the parameters
+   */
   public MethodDefinition(ClassDefinition c,
 			  LocatedString name, 
-			  Collection typeParameters,
+			  List typeParameters,
 			  Constraint constraint,
 			  Monotype returnType,
 			  Collection parameters)
@@ -38,7 +49,7 @@ public class MethodDefinition extends PolySymbol implements Definition
     //TODO    if(c!=null)
     //params.add(c.type);
     params.addAll(parameters);
-
+    
     this.arity=params.size();
     this.type=Type.newType(typeParameters,
 			   new Polytype(constraint,
@@ -49,8 +60,8 @@ public class MethodDefinition extends PolySymbol implements Definition
   }
 
   /** the Method is global */
-  public MethodDefinition(LocatedString name, 
-			  Collection typeParameters,
+  public MethodDefinition(LocatedString name,
+			  List typeParameters,
 			  Constraint constraint,
 			  Monotype returnType,
 			  Collection parameters)
@@ -94,4 +105,5 @@ public class MethodDefinition extends PolySymbol implements Definition
 
   private ClassDefinition memberOf;
   private int arity;
+  boolean isFieldAccess=false; //true if this method represent the access to the field of an object.
 }

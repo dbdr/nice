@@ -12,7 +12,7 @@
 
 // File    : LocalDeclarationStmt.java
 // Created : Tue Jul 06 12:06:20 1999 by bonniot
-//$Modified: Thu Aug 19 14:37:06 1999 by bonniot $
+//$Modified: Tue Aug 24 11:19:20 1999 by bonniot $
 // Description : Declaration of a local variable
 //   with optional initial value
 
@@ -30,10 +30,8 @@ public class LocalDeclarationStmt extends Statement
     this.type=type;
     addChild(type);
 
-    if(value!=null){
-      this.value=new ExpressionRef(value);
-      addChild(this.value);
-    }
+    if(value!=null)
+      this.value=expChild(value);
   }
 
   /****************************************************************

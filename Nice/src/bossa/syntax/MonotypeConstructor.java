@@ -12,7 +12,7 @@
 
 // File    : MonotypeConstructor.java
 // Created : Thu Jul 22 09:15:17 1999 by bonniot
-//$Modified: Thu Aug 19 14:47:04 1999 by bonniot $
+//$Modified: Tue Aug 24 16:52:47 1999 by bonniot $
 // Description : A monotype, build by application of
 //   a type constructor to type parameters
 
@@ -48,6 +48,18 @@ public class MonotypeConstructor extends Monotype
     return new MonotypeConstructor(tc,parameters,loc);
   }
 
+  /****************************************************************
+   * Imperative type variables
+   ****************************************************************/
+
+  public boolean appear(TypeSymbol s, boolean imperatively)
+  {
+    if(imperatively)
+      return tc.variance.appearImperatively(s,parameters);
+    else
+      return Monotype.appear(s,false,parameters.content);
+  }
+  
   /****************************************************************
    * Scoping
    ****************************************************************/

@@ -12,7 +12,7 @@
 
 // File    : TypeParameters.java
 // Created : Mon Jul 12 17:51:12 1999 by bonniot
-//$Modified: Thu Aug 19 13:27:02 1999 by bonniot $
+//$Modified: Tue Aug 24 13:50:00 1999 by bonniot $
 
 package bossa.syntax;
 
@@ -49,7 +49,10 @@ public class TypeParameters
     while(i.hasNext())
       {
 	TypeSymbol s=(TypeSymbol) i.next();
-	res.add(new MonotypeConstructor(((ClassDefinition) s).tc,null,null));
+	if(s instanceof ClassDefinition)
+	  res.add(new MonotypeConstructor(((ClassDefinition) s).tc,null,null));
+	else if(s instanceof MonotypeVar)
+	  res.add((MonotypeVar)s);
       }
     return new TypeParameters(res);
   }

@@ -12,42 +12,77 @@
 
 // File    : InstantiateExp.java
 // Created : Mon Jul 12 17:48:04 1999 by bonniot
-//$Modified: Thu Aug 19 13:13:29 1999 by bonniot $
-// Description : instantiation of type parameters
+//$Modified: Tue Aug 24 17:03:05 1999 by bonniot $
 
 package bossa.syntax;
 
 import bossa.util.*;
+import java.util.*;
 
+/**
+ * Instantiation of type parameters
+ */
 public class InstantiateExp extends Expression
 {
   public InstantiateExp(Expression exp, TypeParameters tp)
   {
     this.exp=exp;
     this.typeParameters=tp;
-    loc=exp.location().englobe(tp.content);
+    setLocation(exp.location().englobe(tp.content));
     addChild(exp);
   }
 
+  public InstantiateExp(Expression exp, TypeParameters tp, Location loc)
+  {
+    this(exp,tp);
+    setLocation(loc);
+  }
+  
+  /**
+   * Create an InstantiateExp object if necessary,
+   * and returns the expression 'exp' otherwise.
+   */
+  static Expression create(Expression exp, TypeParameters tp)
+  {
+    if(tp==null || tp.size()==0)
+      return exp;
+    Expression res=new InstantiateExp(exp,tp);
+    res.setLocation(exp.location());
+    return res;
+  }
+
+  boolean isFieldAccess()
+  {
+    return exp.isFieldAccess();
+  }
+  
   void resolve()
   {
     exp=exp.resolveExp();
     typeParameters=typeParameters.resolve(this.typeScope);
   }
 
-  Type getType()
+  Expression resolveOverloading(List parameters, TypeParameters tp)
   {
-    Polytype res=null;
+    Internal.error(tp!=null,this,
+		   "Type parameters applied twice");
+    exp=exp.resolveOverloading(parameters,typeParameters);
+    // The instantiation is not done in resolveOverloading()
+    return this;
+  }
+  
+  void computeType()
+  {
+    type=null;
     try{
-      res=exp.getType().instantiate(typeParameters);
+      type=exp.getType().instantiate(typeParameters);
       }
     catch(BadSizeEx e){
       User.error(this,exp+" has "+e.expected+" type parameters");      
     }
     
-    User.error(res==null,this,"You cannot try to instantiate "+this.exp+
-	       ", it has not a parametric type");
-    return res;
+    User.error(type==null,this,
+	       "You cannot try to instantiate "+this.exp+", it has not a parametric type");
   }
 
   public String toString()

@@ -12,7 +12,7 @@
 
 // File    : IdentExp.java
 // Created : Mon Jul 05 16:25:58 1999 by bonniot
-//$Modified: Thu Aug 19 17:06:42 1999 by bonniot $
+//$Modified: Tue Aug 24 16:59:43 1999 by bonniot $
 
 package bossa.syntax;
 
@@ -30,10 +30,9 @@ public class IdentExp extends Expression
     loc=i.location();
   }
   
-  Type getType()
+  void computeType()
   {
-    Internal.error("getType in IdentExp ("+this+")");
-    return null;
+    Internal.error("computeType in IdentExp ("+this+")");
   }
 
   /****************************************************************

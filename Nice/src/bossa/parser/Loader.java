@@ -12,7 +12,7 @@
 
 // File    : Loader.java
 // Created : Thu Jul 29 09:43:50 1999 by bonniot
-//$Modified: Tue Aug 17 17:43:26 1999 by bonniot $
+//$Modified: Tue Aug 24 13:35:46 1999 by bonniot $
 
 package bossa.parser;
 
@@ -49,7 +49,10 @@ public abstract class Loader
     
     try{ res=parser.definitions(); }
     catch(ParseException e){
-      User.error(new Location(e.currentToken.next),e.getMessage());
+      if(e.currentToken!=null)
+	User.error(new Location(e.currentToken.next),e.getMessage());
+      else
+	User.error(e.getMessage());
     }
     
     return res;

@@ -12,7 +12,7 @@
 
 // File    : Typing.java
 // Created : Tue Jul 20 11:57:17 1999 by bonniot
-//$Modified: Mon Aug 23 18:47:59 1999 by bonniot $
+//$Modified: Tue Aug 24 15:14:31 1999 by bonniot $
 
 package bossa.typing;
 
@@ -192,13 +192,13 @@ abstract public class Typing
     else
       enter();
     
-    t2.constraint.assert();
+    t2.getConstraint().assert();
 
     if(dbg) Debug.println("IMPLIES");
     implies();
     
-    t1.constraint.assert();
-    leq(t1.monotype,t2.monotype);
+    t1.getConstraint().assert();
+    leq(t1.getMonotype(),t2.getMonotype());
 
     if(dbg) Debug.println("LEAVE");
     leave();
@@ -259,9 +259,9 @@ abstract public class Typing
   {
     if(dbg) Debug.println(type+" in "+domain);
     
-    type.constraint.assert();
+    type.getConstraint().assert();
     domain.constraint.assert();
-    leq(type.monotype,domain.monotype);
+    leq(type.getMonotype(),domain.monotype);
   }
   
   /**

@@ -12,7 +12,7 @@
 
 // File    : Polytype.java
 // Created : Tue Jul 13 12:51:38 1999 by bonniot
-//$Modified: Thu Aug 19 14:39:38 1999 by bonniot $
+//$Modified: Tue Aug 24 16:22:12 1999 by bonniot $
 
 package bossa.syntax;
 
@@ -37,6 +37,11 @@ public class Polytype extends Type
     this(Constraint.True(),monotype);
   }
 
+  boolean allImperative(List symbols)
+  {
+    return monotype.allImperative(symbols);
+  }
+  
   static Polytype bottom()
   {
     MonotypeVar alpha=Monotype.fresh(new LocatedString("alpha",
@@ -72,7 +77,7 @@ public class Polytype extends Type
   }
 
   //Acces methods
-  public Collection getTypeParameters()
+  public List getTypeParameters()
   {
     return new ArrayList(0);
   }
@@ -129,6 +134,6 @@ public class Polytype extends Type
     return constraint+" "+monotype.toStringExtern();
   }
 
-  public Constraint constraint;
-  public Monotype monotype;
+  private Constraint constraint;
+  private Monotype monotype;
 }

@@ -12,7 +12,7 @@
 
 // File    : MonoSymbol.java
 // Created : Fri Jul 16 17:10:53 1999 by bonniot
-//$Modified: Thu Aug 19 13:44:00 1999 by bonniot $
+//$Modified: Tue Aug 24 15:11:27 1999 by bonniot $
 
 package bossa.syntax;
 
@@ -42,7 +42,7 @@ public class MonoSymbol extends VarSymbol
     if(memberOf!=null)
       return new Polytype(memberOf.getConstraint(),type);
     else
-      return new Polytype(Constraint.emptyConstraint(),type);
+      return new Polytype(Constraint.True(),type);
   }
 
   public Monotype getMonotype()
@@ -51,19 +51,16 @@ public class MonoSymbol extends VarSymbol
   }
 
   /**
-   * Maps getMonotype over a collection of FieldSymbols
+   * Maps getMonotype over a collection of MonoSymbols
    *
-   * @param varsymbols the collection of FieldSymbols
+   * @param varsymbols the collection of MonoSymbols
    * @return the collection of their Monotypes
    */
   static Collection getMonotype(Collection c)
   {
-    Iterator i=c.iterator();
     Collection res=new ArrayList(c.size());
-
-    while(i.hasNext())
+    for(Iterator i=c.iterator();i.hasNext();)
       res.add(((MonoSymbol)i.next()).getMonotype());
-
     return res;
   }
 

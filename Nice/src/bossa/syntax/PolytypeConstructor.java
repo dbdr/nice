@@ -12,18 +12,20 @@
 
 // File    : PolytypeConstructor.java
 // Created : Mon Jul 19 17:47:49 1999 by bonniot
-//$Modified: Thu Aug 19 13:45:21 1999 by bonniot $
-// Description : A type that takes TypeParameters 
-//  and that returns a Polytype
+//$Modified: Tue Aug 24 16:39:25 1999 by bonniot $
 
 package bossa.syntax;
 
 import bossa.util.*;
 import java.util.*;
 
+/**
+ * A type that takes type parameters and that returns a Polytype.
+ */
 public class PolytypeConstructor extends Type
 {
-  PolytypeConstructor(Collection parameters, Polytype polytype)
+  // The only place where this constructor should be used is Type.newType
+  PolytypeConstructor(List parameters, Polytype polytype)
   {
     this.parameters=parameters;
     this.polytype=polytype;
@@ -31,8 +33,22 @@ public class PolytypeConstructor extends Type
     addChild(polytype);
   }
 
+  Type removeUnusefullTypeParameters()
+  {
+    // We try to remove the need to pass imperative parameters explicitely
+    // when the imperative type parameters all appear at imperative places
+    // in the monotype
+    if(polytype.allImperative(parameters))
+      {
+	polytype.getConstraint().and(new Constraint(parameters,null));
+	return polytype;
+      }
+    return this;
+  }
+  
   //Acces methods
-  public Collection getTypeParameters()
+
+  public List getTypeParameters()
   {
     return parameters;
   }
@@ -86,13 +102,12 @@ public class PolytypeConstructor extends Type
   /****************************************************************
    * Printing
    ****************************************************************/
-
   
   public String toString()
   {
     return Util.map("<",", ",">",parameters)+" "+polytype;
   }
 
-  Collection /* of MonotypeVar */ parameters;
+  List /* of MonotypeVar */ parameters;
   public Polytype polytype;
 }

@@ -12,7 +12,7 @@
 
 // File    : Type.java
 // Created : Mon Jul 19 17:45:27 1999 by bonniot
-//$Modified: Wed Aug 18 18:28:47 1999 by bonniot $
+//$Modified: Tue Aug 24 16:38:21 1999 by bonniot $
 // Description : Any type. 
 //   Can either be a Polytype or a PolytypeConstructor
 
@@ -35,18 +35,22 @@ public abstract class Type extends Node
    * @param p the type body
    * @return the new type
    */
-  public static Type newType(Collection typeParameters, Polytype p)
+  public static Type newType(List typeParameters, Polytype p)
   {
     if(typeParameters==null || 
        typeParameters.size()==0) 
       return p; 
-    else 
-      return new PolytypeConstructor(typeParameters,p);
+    return new PolytypeConstructor(typeParameters,p);
+  }
+
+  Type removeUnusefullTypeParameters()
+  {
+    return this;
   }
 
   //the get* methods are used to construct new Type. 
   //See FunExp for instance
-  public abstract Collection getTypeParameters();
+  public abstract List getTypeParameters();
   public abstract Constraint getConstraint();
   public abstract Monotype   getMonotype();
 

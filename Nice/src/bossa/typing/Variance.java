@@ -12,7 +12,7 @@
 
 // File    : Variance.java
 // Created : Fri Jul 23 12:15:46 1999 by bonniot
-//$Modified: Fri Aug 13 11:27:13 1999 by bonniot $
+//$Modified: Tue Aug 24 16:29:22 1999 by bonniot $
 
 package bossa.typing;
 
@@ -94,6 +94,18 @@ public class Variance
       if(!((Monotype)i.next()).isImperative())
 	return false;
     return true;
+  }
+  
+  public boolean appearImperatively(TypeSymbol s, TypeParameters tp)
+  {
+    //TODO: change when all variance ahs non-imperative holes
+    for(Iterator i=tp.iterator();i.hasNext();)
+      {
+	Monotype m=(Monotype)i.next();
+	if(m.appear(s,false))
+	  return true;
+      }
+    return false;
   }
   
   /****************************************************************

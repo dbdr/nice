@@ -177,7 +177,7 @@ public final class Compilation
 	// Call super.
 	ClassType superClass = c.getSuperclass();
 	gnu.bytecode.Method superMethod = superClass.getMethod
-	  (m.getName().toString(), m.javaArgTypes());
+	  (m.getName().toString(), m.javaArgTypes(), true);
 	if (superMethod != null)
 	  return new ApplyExp
 	    (new QuoteExp(PrimProcedure.specialCall(superMethod)), params);

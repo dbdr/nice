@@ -1,5 +1,5 @@
 /// FAIL
-  B /* FAIL HERE*/ b = bar(new B());
+  B /* /// FAIL HERE*/ b = bar(new B());
   /// Toplevel
 interface I {}
 <I T> T foo(T);
@@ -58,4 +58,4 @@ foo(a) = a;
 /// FAIL
   /// Toplevel
 // : can only come after a real dispatch, otherwise it is useless.
-<T> foo(a : X) {}
+<T> foo(a : X /*/// FAIL HERE*/ ) {}

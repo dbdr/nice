@@ -63,7 +63,7 @@ public class IdentExp extends Expression
     if(ignoreInexistant)
       User.error(ident, "Variable " + ident + " is not declared");
     else
-      Internal.error("computeType in IdentExp (" + this + ")");
+      Internal.error(this, "computeType in IdentExp (" + this + ")");
   }
 
   /****************************************************************

@@ -19,6 +19,7 @@ import gnu.bytecode.*;
 import java.util.*;
 
 import bossa.util.Debug;
+import nice.tools.code.Types;
 
 /**
    Abstract syntax for a class definition.
@@ -54,6 +55,12 @@ public class NiceClass extends ClassDefinition
 	  extensions, implementations, abstractions);
 
     this.simpleName = name;
+
+
+    // must be called when bytecode types are set, 
+    // but before compilation, so that constructors are known
+    // even in package variable initializers.
+    prepareClassType();
   }
 
   private static Field[] noFields = new Field[0];
@@ -75,8 +82,6 @@ public class NiceClass extends ClassDefinition
     
     if(methods != null)
       this.methods = addChildren(methods);
-
-    setJavaType(module.createClass(simpleName.toString()));
   }
   
   /****************************************************************
@@ -112,27 +117,12 @@ public class NiceClass extends ClassDefinition
       }
   }
 
-  public void createContext()
-  {
-    super.createContext();
-    
-    if (children != null)
-      for (Iterator i = children.iterator(); i.hasNext();)
-	{
-	  Object child = i.next();
-	  if (child instanceof MethodDeclaration)
-	    ((MethodDeclaration) child).createContext();
-	}
-  }
-
   void resolve()
   {
     super.resolve();
 
-    // must be called when bytecode types are set, 
-    // but before compilation, so that constructors are known
-    // even in package variable initializers.
-    prepareClassType();
+    if (!isInterface)
+      compileConstructor();
 
     //optim
     if (fields.length == 0)
@@ -152,10 +142,22 @@ public class NiceClass extends ClassDefinition
 	
 	f.sym.type = f.sym.syntacticType.resolve(localScope);
 
-	// The test to void should be more high-level than string comparison
-	if (f.sym.type.toString().equals("nice.lang.void"))
+	if (Types.isVoid(f.sym.type))
 	  User.error(f.sym, "Fields cannot have void type");
       }
+  }
+
+  public void createContext()
+  {
+    super.createContext();
+    
+    if (children != null)
+      for (Iterator i = children.iterator(); i.hasNext();)
+	{
+	  Object child = i.next();
+	  if (child instanceof MethodDeclaration)
+	    ((MethodDeclaration) child).createContext();
+	}
   }
 
   /****************************************************************
@@ -180,15 +182,27 @@ public class NiceClass extends ClassDefinition
 
   private void prepareClassType()
   {
-    if(!isInterface)
-      createConstructor();
+    setJavaType(module.createClass(simpleName.toString()));
+    createConstructor();
+  }
 
-    ClassType classtype = javaClass();
-    classtype.setModifiers(Access.PUBLIC 
-			   | (isAbstract  ? Access.ABSTRACT  : 0)
-			   | (isFinal     ? Access.FINAL     : 0)
-			   | (isInterface ? Access.INTERFACE : 0)
-			   );
+  private MethodDeclaration constructorMethod;
+
+  private void createConstructor()
+  {
+    if (isInterface)
+      return;
+
+    mlsub.typing.MonotypeVar[] params = createSameTypeParameters();
+    constructorMethod = new NiceMethod
+      (new LocatedString("<init>", location()),
+       null, null, null);
+    constructorMethod.setLowlevelTypes
+      (mlsub.typing.Constraint.create(params, null),
+       null, 
+       new mlsub.typing.MonotypeConstructor(this.tc, params));
+
+    TypeConstructors.addConstructor(tc, constructorMethod);
   }
 
   public void compile()
@@ -205,56 +219,66 @@ public class NiceClass extends ClassDefinition
       Debug.println("Compiling class "+name);
     
     ClassType classType = javaClass();
-    ClassType[] itfs = null;
+
+    classType.setModifiers(Access.PUBLIC 
+			   | (isAbstract  ? Access.ABSTRACT  : 0)
+			   | (isFinal     ? Access.FINAL     : 0)
+			   | (isInterface ? Access.INTERFACE : 0)
+			   );
+
     if(isInterface)
       classType.setSuper(gnu.bytecode.Type.pointer_type);
     else
       classType.setSuper(javaSuperClass());
     
-  createItfs:
-    if(!isInterface)
-      {
-	if(impl == null) break createItfs;
-	
-	ArrayList imp = new ArrayList(impl.length);
-	for(int i=0; i<impl.length; i++)
-	  {
-	    TypeConstructor assocTC = impl[i].associatedTC();
-	    
-	    if(assocTC == null)
-	      continue;
-	    
-	    imp.add(nice.tools.code.Types.javaType(assocTC));
-	  }
-	itfs = (ClassType[]) imp.toArray(new ClassType[imp.size()]);
-      }
-    else 
-      {
-	if(superClass == null) break createItfs;
-	
-	itfs = new ClassType[superClass.length];
-	for(int i=0; i<superClass.length; i++)
-	  {
-	    Interface itf = get(superClass[i]).getAssociatedInterface();
-	    if(itf == null)
-	      {
-		Internal.warning("Should not happen. size of itfs gona be wrong");
-		continue;
-	      }
-	    itfs[i] = (ClassType) 
-	      nice.tools.code.Types.javaType(itf.associatedTC());
-	  }
-      }
-    
-    classType.setInterfaces(itfs);
-    
+    classType.setInterfaces(computeImplementedInterfaces());
     addFields(classType);
 
     classType.sourcefile = location().getFile();
     module.addClass(classType);
   }
 
-  private void createConstructor()
+  private ClassType[] computeImplementedInterfaces()
+  {
+    if(!isInterface)
+      {
+	if (impl == null) 
+	  return null;
+	
+	ArrayList imp = new ArrayList(impl.length);
+	for(int i=0; i<impl.length; i++)
+	  {
+	    TypeConstructor assocTC = impl[i].associatedTC();
+	    
+	    if (assocTC == null)
+	      continue;
+	    
+	    imp.add(nice.tools.code.Types.javaType(assocTC));
+	  }
+	return (ClassType[]) imp.toArray(new ClassType[imp.size()]);
+      }
+    else 
+      {
+	if (superClass == null)
+	  return null;
+	
+	ClassType[] itfs = new ClassType[superClass.length];
+	for (int i=0; i<superClass.length; i++)
+	  {
+	    Interface itf = get(superClass[i]).getAssociatedInterface();
+	    if (itf == null)
+	      {
+		Internal.warning("Should not happen");
+		continue;
+	      }
+	    itfs[i] = (ClassType) 
+	      nice.tools.code.Types.javaType(itf.associatedTC());
+	  }
+	return itfs;
+      }
+  }
+
+  private void compileConstructor()
   {
     ClassType classType = javaClass();
     gnu.bytecode.Method constructor = constructor(classType);
@@ -271,25 +295,18 @@ public class NiceClass extends ClassDefinition
     code.emitInvokeSpecial(constructor(javaSuperClass()));
     code.emitReturn();
 
-    mlsub.typing.MonotypeVar[] params = createSameTypeParameters();
-    MethodDeclaration md = new NiceMethod
-      (new LocatedString("<init>", location()),
-       null, null, null);
-    md.setLowlevelTypes
-      (mlsub.typing.Constraint.create(params, null),
-       null, 
-       new mlsub.typing.MonotypeConstructor(this.tc, params));
-
-    md.setDispatchMethod(new gnu.expr.PrimProcedure
-      (classType, gnu.bytecode.Type.typeArray0));
-    TypeConstructors.addConstructor(tc, md);
+    constructorMethod.setDispatchMethod
+      (new gnu.expr.PrimProcedure(constructor));
   }
 
   private static gnu.bytecode.Method constructor(ClassType ct)
   {
     if(ct == null)
       ct = gnu.bytecode.Type.pointer_type;
-    
+
+    if (ct.getDeclaredMethod("<init>", 0) != null)
+      System.out.println("" + ct.getDeclaredMethod("<init>", 0));
+
     return ct.addMethod
       ("<init>", Access.PUBLIC, gnu.bytecode.Type.typeArray0, 
        gnu.bytecode.Type.void_type);
@@ -300,7 +317,6 @@ public class NiceClass extends ClassDefinition
     for (int i = 0; i < fields.length; i++)
       {
 	Field f = fields[i];
-	
 	String name = f.sym.name.toString();
 	
 	// The field might have been created by a NiceFieldAccess.compile*()

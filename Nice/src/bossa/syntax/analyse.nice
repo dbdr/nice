@@ -29,7 +29,7 @@ TypeMaper typeMaper(SymbolTable<TypeSymbol>,TypeScope) =
 
 // Implementation
 
-Info buildInfo(VarScope, TypeScope);
+Info buildInfo(VarScope varScope, TypeScope typeScope);
 buildInfo(varScope, typeScope)
 {
   Info info = new Info();
@@ -82,8 +82,7 @@ class Info
 
   Stack<int> flagsStack;
 
-  void beginInner(boolean reset);
-  beginInner(reset)
+  void beginInner(boolean reset)
   {
     this.flagsStack.push(this.flags);
     if (reset)
@@ -186,8 +185,7 @@ analyse(e@AssignExp, i)
   return e;
 }
 
-void analyseExps(Expression[], Info);
-analyseExps(exps, info)
+void analyseExps(Expression[] exps, Info info)
 {
   for (int i = 0; i < exps.length; i++)
     exps[i] = analyse(exps[i], info);
@@ -405,15 +403,14 @@ analyse(e@TupleExp, info)
 analyse(s@Statement, info) {}
 analyse(s@null(Statement), info) {}
 
-//void analyseL(Block$LocalDeclaration, Info);
-analyse(decl@Block$LocalVariable, info)
+analyse(decl@Block.LocalVariable, info)
 {
   if (decl.value != null)
     decl.value = analyse(decl.value, info);
   info.addVar(decl.left);
 }
 
-analyse(decl@Block$LocalFunction, info)
+analyse(decl@Block.LocalFunction, info)
 {
   if (decl.value != null)
     decl.value = analyse(decl.value, info);
@@ -423,7 +420,7 @@ analyse(decl@Block$LocalFunction, info)
 analyse(b@Block, info)
 {
   info.begin();
-  javaList(b.locals).iter(fun(Block$LocalDeclaration l) => analyse(l, info));
+  javaList(b.locals).iter(fun(Block.LocalDeclaration l) => analyse(l, info));
   b.statements.iter(fun(Statement s)=>{
     if (info.getUnreachable())
       bossa.util.User.error(s, "Statement is never executed");

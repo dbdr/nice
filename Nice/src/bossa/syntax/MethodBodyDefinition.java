@@ -20,6 +20,8 @@ import java.util.*;
 
 import bossa.util.Debug;
 import bossa.util.Location;
+import nice.tools.code.Types;
+
 import mlsub.typing.Monotype;
 import mlsub.typing.MonotypeConstructor;
 import mlsub.typing.Constraint;
@@ -261,8 +263,7 @@ public class MethodBodyDefinition extends Definition
   void resolveBody()
   {
     body = bossa.syntax.dispatch.analyse$0
-    (body, scope, typeScope,
-     !definition.getReturnType().toString().equals("nice.lang.void"));
+      (body, scope, typeScope, !Types.isVoid(definition.getReturnType()));
   }
   
   /****************************************************************

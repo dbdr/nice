@@ -44,6 +44,12 @@ public class GlobalVarDeclaration extends Definition
     return null;
   }
   
+  void resolve()
+  {
+    if (value != null)
+      value = bossa.syntax.dispatch.analyse$1(value, scope, typeScope);
+  }
+  
   /****************************************************************
    * Initial Context
    ****************************************************************/
@@ -52,7 +58,6 @@ public class GlobalVarDeclaration extends Definition
   {
     // Not really related to the rigid context, 
     // but it a good time to do this (must be done after resolving).
-
     gnu.expr.Declaration declaration = 
       new gnu.expr.Declaration(left.name.toString(),
 			       nice.tools.code.Types.javaType(left.type));
@@ -82,14 +87,8 @@ public class GlobalVarDeclaration extends Definition
     left.setDeclaration(declaration);
   }
 
-  void resolve()
-  {
-    if (value != null)
-      value = bossa.syntax.dispatch.analyse$1(value, scope, typeScope);
-  }
-  
   /****************************************************************
-   * Type cheking
+   * Type checking
    ****************************************************************/
   
   void typecheck()

@@ -39,21 +39,37 @@ public class AST extends Node
     buildScope(module);
   }
   
+  private void resolve(Node n)
+  {
+    try{
+      n.doResolve();
+    }
+    catch(UnknownIdentException e){
+      bossa.util.User.error(e.ident, e.ident + " is not declared");
+    }
+    catch(UserError ex){
+      nice.tools.compiler.OutputMessages.error(ex.getMessage());
+    }
+  }
+
   public void resolveScoping()
   {
-    if (children != null)
-      for(Iterator i = children.iterator();i.hasNext();)
-	try{
-	  try{
-	    ((Node)i.next()).doResolve();
-	  }
-	  catch(UnknownIdentException e){
-	    bossa.util.User.error(e.ident, e.ident + " is not declared");
-	  }
-	}
-	catch(UserError ex){
-	  nice.tools.compiler.OutputMessages.error(ex.getMessage());
-	}
+    if (children == null)
+      return;
+
+    // Classes are resolved first, since code can depend on them
+    for(Iterator i = children.iterator();i.hasNext();)
+      {
+	Node n = (Node) i.next();
+	if (n instanceof ClassDefinition)
+	  resolve(n);
+      }
+    for(Iterator i = children.iterator();i.hasNext();)
+      {
+	Node n = (Node) i.next();
+	if (!(n instanceof ClassDefinition))
+	  resolve(n);
+      }
     nice.tools.compiler.OutputMessages.exitIfErrors();
   }
   

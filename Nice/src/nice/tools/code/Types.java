@@ -178,7 +178,7 @@ public final class Types
   
   /****************************************************************
    * Converting a bytecode type (coming from reflection for instance)
-   * into a bossa type.
+   * into a Nice type.
    * Used for automatic declaration of java methods.
    ****************************************************************/
   
@@ -484,4 +484,14 @@ public final class Types
   private static Expression zeroInt = new QuoteExp(new Integer(0));
   private static Expression zeroFloat = new QuoteExp(new Float(0.0));
   private static Expression zeroChar = new QuoteExp(new Character((char) 0));
+
+  /****************************************************************
+   * Predicates
+   ****************************************************************/
+
+  public static boolean isVoid(mlsub.typing.Monotype m)
+  {
+    // The test to void should be more high-level than string comparison
+    return m.toString().equals("nice.lang.void");
+  }
 }

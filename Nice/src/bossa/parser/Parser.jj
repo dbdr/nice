@@ -1135,7 +1135,7 @@ CustomConstructor customConstructor(Constraint cst):
     "=" exp=Expression() ";" { statements.add(bossa.syntax.dispatch.createExpressionStmt(exp)); }
   | 
     "{"
-    ( stmt=BlockStatement(statements) { statements.add(stmt); } )+
+    ( stmt=BlockStatement(statements) { statements.add(stmt); } )*
     "}"
   )
   {

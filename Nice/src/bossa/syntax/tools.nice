@@ -139,7 +139,15 @@ bossa.util.UserError ensureLocated(bossa.util.UserError e,
 
 void resolveCCThis(Statement stmt, Located thisLoc, NiceClass classe)
 {
+  void missingThisError()
+  {
+    User.error(thisLoc, "The last statement must be a call to 'this' constructor");
+  }
+
   Block block = cast(stmt);
+
+  if (block.statements.length == 0)
+    missingThisError();
 
   Statement last = block.last;
   if (last instanceof Block)
@@ -148,11 +156,6 @@ void resolveCCThis(Statement stmt, Located thisLoc, NiceClass classe)
     return;
   }
   
-  void missingThisError()
-  {
-    User.error(thisLoc, "The last statement must be a call to 'this' constructor");
-  }
-
   if (! (last instanceof ExpressionStmt))
     missingThisError();
 

@@ -555,9 +555,7 @@ public class ClassType extends ObjectType implements AttrContainer {
 	while (-- i >= 0)
 	  {
 	    if (arg_types[i] != method_args[i] &&
-		!(arg_types[i] instanceof PrimType &&
-		  method_args[i] instanceof PrimType &&
-		  arg_types[i].getSignature().equals(method_args[i].getSignature())))
+		!(arg_types[i].getSignature().equals(method_args[i].getSignature())))
 	      { 
 		//System.out.println(arg_types[i]+" ("+arg_types[i].getClass()+") != "+method_args[i]+" ("+method_args[i].getClass()+")"); 
 		break;

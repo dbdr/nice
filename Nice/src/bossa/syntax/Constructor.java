@@ -56,31 +56,33 @@ class Constructor extends MethodDeclaration
   Expression getConstructorInvocation(boolean omitDefaults)
   {
     getCode();
-    ConstructorExp lambda = 
+    return 
       // lambdaOmitDefaults is null if the two versions are identical
-      omitDefaults && lambdaOmitDefaults != null 
-      ? lambdaOmitDefaults : this.lambda;
-    return new QuoteExp(new InitializeProc(lambda));
+      omitDefaults && initializeOmitDefaults != null 
+      ? initializeOmitDefaults : initialize;
   }
 
-  /** The constructor, with all the arguments. */
-  private ConstructorExp lambda;
+  /** Call the constructor, with all the arguments. */
+  private Expression initialize;
 
-  /** The constructor, with only non-default. */
-  private ConstructorExp lambdaOmitDefaults;
+  /** Call the constructor, with only non-default arguments. */
+  private Expression initializeOmitDefaults;
+
+  /** Instantiate the class, calling the constructor with all the arguments. */
+  private Expression instantiate;
 
   protected Expression computeCode()
   {
-    this.lambdaOmitDefaults = createBytecode(true);
-    this.lambda = createBytecode(false);
-    return new QuoteExp(new InstantiateProc(this.lambda));
+    createBytecode(true);
+    createBytecode(false);
+    return instantiate;
   }
 
   /**
      @param omitDefaults if true, do not take the value of fields with
             default values as parameters, but use that default instead.
   */
-  private ConstructorExp createBytecode(boolean omitDefaults)
+  private void createBytecode(boolean omitDefaults)
   {
     ClassType thisType = (ClassType) javaReturnType();
     Expression thisExp = new ThisExp(thisType);
@@ -103,12 +105,30 @@ class Constructor extends MethodDeclaration
     // Do not create a second constructor omiting defaults if there is
     // no default to omit!
     if (omitDefaults && args.size() == fullArgs.length)
-      return null;
+      return;
+
+    Type[] argTypesArray = (Type[]) argTypes.toArray(new Type[argTypes.size()]);
+    MonoSymbol[] argsArray = (MonoSymbol[]) args.toArray(new MonoSymbol[args.size()]);
+
+    if (classe.definition.inInterfaceFile())
+      {
+        Method m = classe.getClassExp().getClassType().getDeclaredMethod
+          ("<init>", argTypesArray);
+
+        if (omitDefaults)
+          {
+            initializeOmitDefaults = new QuoteExp(new InitializeProc(m));
+          }
+        else
+          {
+            initialize = new QuoteExp(new InitializeProc(m));
+            instantiate = new QuoteExp(new InstantiateProc(m));
+          }
+        return;
+      }
 
     ConstructorExp lambda = Gen.createConstructor
-      (thisType, 
-       (Type[]) argTypes.toArray(new Type[argTypes.size()]), 
-       (MonoSymbol[]) args.toArray(new MonoSymbol[args.size()]));
+      (thisType, argTypesArray, argsArray);
 
     Expression[] body = 
       new Expression[1 + fields.length + classe.nbInitializers()];
@@ -139,7 +159,15 @@ class Constructor extends MethodDeclaration
     Gen.setMethodBody(lambda, new BeginExp(body));
     classe.getClassExp().addMethod(lambda);
 
-    return lambda;
+    if (omitDefaults)
+      {
+        initializeOmitDefaults = new QuoteExp(new InitializeProc(lambda));
+      }
+    else
+      {
+        initialize = new QuoteExp(new InitializeProc(lambda));
+        instantiate = new QuoteExp(new InstantiateProc(lambda));
+      }
   }
 
   private Expression callSuper(Expression thisExp, MonoSymbol[] args,

@@ -69,3 +69,14 @@ class Binder {}
 void foo() {
   let SymbolTable<String> t = new SymbolTable();
 }
+
+/// PASS
+  /// package a
+  /// Toplevel
+  public class AA<T> { 
+      public ?AA<T> x;
+  }
+  /// package c import a
+  ; 
+  /// package d import a,c 
+  new AA(x:null);

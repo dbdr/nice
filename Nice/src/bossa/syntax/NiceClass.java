@@ -548,7 +548,6 @@ public class NiceClass extends ClassDefinition.ClassImplementation
        + Util.map("", ";\n", ";\n", fields)
        + serialUIDFieldString()
        + Util.map("", ";\n", ";\n", overrides)
-       + Util.map("{\n", "\n", "}\n", initializers)
        + "}\n\n"
        );
   }

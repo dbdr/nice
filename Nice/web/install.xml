@@ -13,16 +13,63 @@ Installing the Nice compiler
 
 <keywords>nice, compiler, install, windows, debian, linux, unix</keywords>
 
-<section>
 <para>
 Select your system:
+
+<itemizedlist>
+
+<listitem><para>
+<inlinemediaobject><imageobject>
+<imagedata fileref="images/debian.png"/>
+</imageobject></inlinemediaobject>
+
 <link linkend="deb">Debian</link>
-<link linkend="rpm">Redhat or Mandrake Linux (rpm)</link>
+
+</para></listitem>
+<listitem><para>
+
+<inlinemediaobject><imageobject>
+<imagedata fileref="images/redhat.png"/>
+</imageobject></inlinemediaobject>
+
+<link linkend="rpm">Redhat or 
+<inlinemediaobject><imageobject>
+<imagedata fileref="images/mandrake.png"/>
+</imageobject></inlinemediaobject>
+Mandrake Linux (rpm)</link>
+
+</para></listitem>
+<listitem><para>
+
+<inlinemediaobject><imageobject>
+<imagedata fileref="images/linux.png"/>
+</imageobject></inlinemediaobject>
+
 <link linkend="unix">Unix</link>
+
+</para></listitem>
+<listitem><para>
+
+<inlinemediaobject><imageobject>
+<imagedata fileref="images/win32.png"/>
+</imageobject></inlinemediaobject>
+
 <link linkend="win">Windows</link>
+
+</para></listitem>
+<listitem><para>
+
+<inlinemediaobject><imageobject>
+<imagedata fileref="images/unknown.png"/>
+</imageobject></inlinemediaobject>
+
 <link linkend="other">Other</link>
+
+</para></listitem>
+</itemizedlist>
+
 </para>
-</section>
+
 
 <section id="deb"><title>Debian Linux</title>
 <para>

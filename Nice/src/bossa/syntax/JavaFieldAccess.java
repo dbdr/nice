@@ -155,13 +155,7 @@ public class JavaFieldAccess extends FieldAccess
   private String interfaceString()
   {
     return
-      mlsub.typing.Constraint.toString(getType().getConstraint())
-      + getType().codomain().toString()
-      + " "
-      + symbol.name
-      + "("
-      + Util.map("",", ","",getType().domain())
-      + ") = native "
+      super.toString() + " = native "
       + className + "." + (field==null ? fieldName : field.getName())
       + ";"
       ;

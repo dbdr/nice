@@ -1,11 +1,17 @@
 /// PASS
   Class c = String.class;
+  assert (! c.isArray());
+  assert (c.getName().equals("java.lang.String"));
 
 /// PASS
   Class c = String[].class;
+  assert (c.isArray());
+  assert (c.getName().equals("[Ljava.lang.String;"));
 
 /// PASS
   Class c = String[][].class;
+  assert (c.isArray());
+  assert (c.getName().equals("[[Ljava.lang.String;"));
 
 /// FAIL
   Class c = NotExisting.class;

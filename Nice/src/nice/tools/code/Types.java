@@ -377,6 +377,25 @@ public final class Types
     return Type.make(clas);
   }
   
+  public static final 
+  gnu.bytecode.Type typeRepresentationToBytecode(String type, 
+						 bossa.util.Location loc)
+  {
+    if(type.charAt(0)=='[')
+      {
+	Type res = typeRepresentationToBytecode(type.substring(1), loc);
+	if (res == null)
+	  return null;
+	else
+          return SpecialArray.create(res);
+      }
+    
+    TypeConstructor sym = 
+      bossa.syntax.Node.getGlobalTypeScope().globalLookup(type, loc);
+
+    return get(sym);
+  }
+  
   /****************************************************************
    * Manipulating bytecode types
    ****************************************************************/

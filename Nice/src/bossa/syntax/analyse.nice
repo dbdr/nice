@@ -34,7 +34,7 @@ buildInfo(varScope, typeScope)
 {
   final t = new SymbolTable();
   return new Info(vars: new SymbolTable(), typeVars: t,
-		  globalVarScope: varScope, globalTypeScope: typeScope,
+		  outerVarScope: varScope, outerTypeScope: typeScope,
 		  typeMap: typeMaper(t, typeScope));
 }
 
@@ -65,8 +65,8 @@ class Info
   SymbolTable<VarSymbol> vars;
   SymbolTable<TypeSymbol> typeVars;
 
-  VarScope globalVarScope;
-  TypeScope globalTypeScope;
+  VarScope outerVarScope;
+  TypeScope outerTypeScope;
 
   ?LoopStmt currentLoop = null;
   Vector<LabeledStmt> labels = makeVector(10);
@@ -152,7 +152,7 @@ class Info
   ?VarSymbol lookup(String name) = this.vars[name];
 
   JavaList<VarSymbol> globalLookup(LocatedString name) = 
-    new JavaList(impl: this.globalVarScope.lookup(name));
+    new JavaList(impl: this.outerVarScope.lookup(name));
 
   ?TypeSymbol lookupType(LocatedString name)
   {
@@ -160,7 +160,7 @@ class Info
     if (res != null)
       return res;
     else
-      return this.globalTypeScope.lookup(name);
+      return this.outerTypeScope.lookup(name);
   }
 
   void addVar(PolySymbol symbol)
@@ -458,11 +458,15 @@ analyse(c@ConstantExp, info)
 analyse(e@TypeConstantExp, info)
 {
   LocatedString name = cast(e.value);
-  ?gnu.bytecode.Type type = nice.tools.code.Types.type(name.toString()); //info.typeMap.lookup(name);
+  
+  ?gnu.bytecode.Type type = nice.tools.code.Types.typeRepresentationToBytecode
+    (name.toString(), name.location());
+  
   if (type == null)
     throw unknownIdent(name);
 
   e.value = object(type);
+
   return e;
 }
 

@@ -60,6 +60,7 @@ mlsub.typing.Polytype getType(Expression) =
 Statement[] statements(Block) = native Block.statements;
 Statement statement(StatementExp) = native StatementExp.statement;
 mlsub.typing.Monotype type(MonoSymbol) = native MonoSymbol.type;
+GlobalTypeScope getGlobalTypeScope() = native GlobalTypeScope Node.getGlobalTypeScope();
 
 // Local Variables:
 // nice-xprogram: "nicec -d \"$HOME/Nice/classes\" --sourcepath=\"$HOME/Nice/src\" --classpath=\"$HOME/Nice/classes\""

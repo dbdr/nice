@@ -30,13 +30,25 @@ public class GlobalTypeScope extends TypeScope
     super(null);
   }
 
+  public TypeConstructor globalLookup(String name, Location loc)
+  {
+    TypeSymbol res = lookup(name, loc);
+
+    if (res instanceof TypeConstructor)
+      return (TypeConstructor) res;
+
+    if (res != null)
+      Internal.warning("Non type-constructor found in global type scope");
+
+    return null;
+  }
+
   TypeSymbol lookup(String name, Location loc)
   {
     TypeSymbol res = super.lookup(name, loc);
     if (res != null)
       return res;
 
-    // This is the global type scope
     boolean notFullyQualified = name.indexOf('.') == -1;
 	
     if (notFullyQualified && (module != null))

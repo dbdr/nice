@@ -4,6 +4,11 @@
 /// PASS
   boolean b = "A" instanceof String;
 
+/// PASS
+  boolean b = "A" instanceof Local;
+  /// Toplevel
+  class Local {}
+
 /// FAIL
   boolean b = "A" instanceof not.Existing;
 

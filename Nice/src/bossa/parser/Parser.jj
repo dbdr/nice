@@ -1336,8 +1336,7 @@ MethodDeclaration nativeMethodDeclaration(LocatedString name,
   s=doted_array_string() 
 )
 
-// if we stop here with a ";", it's a static field
-// else it's a method
+// If we stop here with a ";", it's a field else it's a method.
 ( 
   ";"
   { method=s; }

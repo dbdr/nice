@@ -23,10 +23,10 @@ import java.util.*;
 import bossa.util.Location;
 
 /**
-   A native java static field access.
+   A native java field access.
 
    @version $Date$
-   @author Daniel Bonniot (d.bonniot@mail.dotcom.fr)
+   @author Daniel Bonniot (bonniot@users.sourceforge.net)
 */
 public class JavaFieldAccess extends FieldAccess
 {

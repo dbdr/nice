@@ -88,6 +88,8 @@ final public class BitMatrix implements Cloneable {
   
   /**
    * Get ith row. May return null if it is empty or if row is beyond size()
+   *
+   * <p>If the matrix is reflexive, the row MUST NOT be modified by the caller.
    **/
   BitVector getRow(int i) {
     if (i < size) {
@@ -334,6 +336,9 @@ final public class BitMatrix implements Cloneable {
     }
   }
 
+  /**
+     Move index src to dest.
+   */
   public void indexMove(int src, int dest)
   {
     rowMove(src, dest);
@@ -362,6 +367,9 @@ final public class BitMatrix implements Cloneable {
     }
   }
 
+  /**
+     Merge indexes src and dest, put the result in dest.
+  */
   public void indexMerge(int src, int dest)
   {
     rowMerge(src, dest);

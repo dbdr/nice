@@ -47,8 +47,21 @@ test_exceptions()
   catch (MyEx e) {
   }
 
+  try {
+    // This throw expression is well-typed
+    // It will never be executed but should be compiled into valid bytecode.
+    throw neverReturns();
+  }
+  catch(Error e) {
+  }
+
   testFinally(true);
   testFinally(false);  
+}
+
+<Any T> T neverReturns()
+{
+  throw new Error();
 }
 
 int exnRaiser(boolean b) 

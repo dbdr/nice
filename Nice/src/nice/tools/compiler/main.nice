@@ -1,7 +1,7 @@
 /**************************************************************************/
 /*                                N I C E                                 */
 /*             A high-level object-oriented research language             */
-/*                        (c) Daniel Bonniot 2000                         */
+/*                        (c) Daniel Bonniot 2002                         */
 /*                                                                        */
 /*  This program is free software; you can redistribute it and/or modify  */
 /*  it under the terms of the GNU General Public License as published by  */
@@ -26,7 +26,7 @@ package nice.tools.compiler;
    <tt>nice-mode.el</tt>.
 
    @version $Date$
-   @author Daniel Bonniot (d.bonniot@mail.dotcom.fr)
+   @author Daniel Bonniot (bonniot@users.sourceforge.net)
  */
 
 import mlsub.compilation;
@@ -55,33 +55,33 @@ main(args)
      arguments: "package", options: cast(null));
   prg.options = 
   [
-   option('?', "sourcepath",
+   option("sourcepath",
 	  "Lookup path for source packages\nPATH is a list of directories and .jar archives",
 	  "path",
 	  fun(String path) => { compilation.sourcePath = path; }),
 
-   option('d', "destination",
+   option(letter: 'd', "destination",
 	  "Destination directory for compiled packages",
 	  "dir",
 	  fun(String dir)=>{ compilation.destinationDir = dir; }),
 
-   option('?', "packagepath",
+   option("packagepath",
 	  "Additional lookup path for compiled packages\nPATH is a list of directories and .jar archives",
 	  "path",
 	  fun(String path) =>{ compilation.packagePath = path; }),
 
-   option('?', "classpath",
+   option("classpath",
 	  "Lookup path for external classes",
 	  "path",
 	  fun(String path) => nice.tools.code.Types.setClasspath(path)),
 
 
-   option('a', "jar",
+   option(letter: 'a', "jar",
 	  "Compile to archive\nYou can then run the program with 'java -jar FILE'",
 	  "file",
 	  fun(String output) => { compilation.output = output; }),
 
-   option('o', "output",
+   option(letter: 'o', "output",
 	  "Generate native executable",
 	  "file",
 	  fun(String output) => { 
@@ -90,15 +90,15 @@ main(args)
 	  }),
 
 
-   option('r', "recompile",
+   option(letter: 'r', "recompile",
 	  "Force recompilation of package",
 	  fun() => { compilation.recompileCommandLine = true; }),
 
-   option('R', "recompile-all",
+   option(letter: 'R', "recompile-all",
 	  "Force recompilation of all dependant packages",
 	  fun() => { compilation.recompileAll = true; }),
 
-   option('c', "compile",
+   option(letter: 'c', "compile",
 	  "Compile packages but do not link them",
 	  fun() => { compilation.skipLink = true; }),
 
@@ -107,37 +107,37 @@ main(args)
 
    // This options is usefull for compiling the compiler itself. 
    // Should not be advertised since it should not be usefull otherwise
-   option('?', "exclude-runtime", 
+   option("exclude-runtime", 
 	  "Avoid inclusion of the runtime in the archive", 
 	  fun() => { compilation.excludeRuntime = true; }),
-   option('?', "runtime", 
+   option("runtime", 
 	  "Location of nice.jar", 
 	  "file",
 	  fun(String file) => { compilation.runtimeFile = file; }),
-   option('?', "native-compiler", 
+   option("native-compiler", 
 	  "Location of the native compiler binary (gcj)", 
 	  "file",
 	  fun(String file) => { nativeCompiler = file; }),
 
 
-   option('h', "help", "Print help message and exit",
+   option(letter: 'h', "help", "Print help message and exit",
 	  fun()=> help(prg)),
 
-   option('?', "editor", "Tell nicec that it is called by an editor.",
+   option("editor", "Tell nicec that it is called by an editor.",
 	  fun()=> { bossa.util.Location.editorMode = true; }),
 
-   option('?', "man", "Print man page to stdout",
+   option("man", "Print man page to stdout",
 	  fun()=> man(prg)),
 
-   option('?', "version",
+   option("version",
 	  "Print version info and exit",
 	  fun()=>version()),
 
-   option('?', "usage",
+   option("usage",
 	  "Print usage information and exit",
 	  fun()=>usage(prg)),
 
-   option('?', "memory",
+   option("memory",
 	  "Print memory usage information after compilation",
 	  fun()=>{ memInfo = true; })
   ];

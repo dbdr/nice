@@ -41,6 +41,7 @@ main(args)
   String mainPackage;
   ?String nativeProgram = null;
   ?String nativeCompiler = null;
+  ?String classpath = null;
 
   try{
 
@@ -73,7 +74,7 @@ main(args)
    option("classpath",
 	  "Lookup path for external classes",
 	  "path",
-	  fun(String path) => nice.tools.code.Types.setClasspath(path)),
+	  fun(String path) => { classpath = path; }),
 
 
    option(letter: 'a', "jar",
@@ -151,6 +152,9 @@ main(args)
       usage(prg, OutputMessages.ERROR);
     }
   mainPackage = rest[0];
+
+  if (classpath != null)
+    nice.tools.code.Types.setClasspath(compilation.runtimeFile + ":" + classpath);
 
   compilation.setMainPackage(mainPackage);
   make(compilation);

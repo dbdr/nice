@@ -1,9 +1,11 @@
 nice (0.5.2) unstable; urgency=low
 
-  * Calls to constructors must now require using the fields' names.
-  * Fixed parsing problem with (x.f)(e) as a statement.
+  * Calls to constructors now require using the fields' names.
   * Produce a meaningful message when a field is used without using
     an object to load it from.
+  * Fixed parsing problem with (x.f)(e) as a statement.
+  * Allow classpath to be set for external java classes without
+    requiring to include Nice's bootstrap classes.
 
  --
 

@@ -119,14 +119,15 @@ bossa.util.UserError ensureLocated(bossa.util.UserError e,
   mlsub.typing.Monotype[?] parameters;
 
   if (tc.arity() == 0)
-	  parameters = null;
-  else if (sym.getMonotype() instanceof mlsub.typing.MonotypeConstructor)
+    parameters = null;
+  else 
     {
-      mlsub.typing.MonotypeConstructor mc = cast(sym.getMonotype());
-      parameters = mc.getTP();
+      let originalType = nice.tools.code.Types.rawType(sym.getMonotype());
+      if (originalType instanceof mlsub.typing.MonotypeConstructor)
+	parameters = originalType.getTP();
+      else
+	return null;
     }
-  else
-    return null;
 
   return (sym, Monotype.sure(new mlsub.typing.MonotypeConstructor(tc, parameters)));
 }

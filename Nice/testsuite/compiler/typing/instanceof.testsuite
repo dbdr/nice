@@ -180,3 +180,17 @@ class B extends A { int life = 42; }
   A x = new B();
   if (x instanceof B || x./* /// FAIL HERE */life == 42)
     assert true;
+
+/// PASS
+  /// Toplevel
+class C<T> {}
+class D<T> extends C<T> {
+  T t;
+}
+
+void f() {
+  C<String> c = new D(t: "hi");
+  if (c instanceof D) {
+    String s = c.t;
+  }
+}

@@ -466,3 +466,13 @@ int min(List<int> list) requires !list.isEmpty()
 
   return res;
 }
+
+/****************************************************************
+ * Map operations
+ ****************************************************************/
+
+<K,V> void foreach(Map<K,V> map, (K,V)->void fun)
+{
+  for (Map.Entry<K,V> entry : map.entrySet())
+    fun(entry.getKey(), entry.getValue());
+}

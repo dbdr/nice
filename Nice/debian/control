@@ -7,7 +7,7 @@ Standards-Version: 3.6.1
 
 Package: nice
 Architecture: all
-Depends: java-virtual-machine, java1-runtime | java2-runtime
+Depends: kaffe | java-virtual-machine, kaffe | java1-runtime | java2-runtime
 Suggests: emacsen, ant
 Description: Extension of Java with parametric types, multi-methods, and more
  Nice is a new object-oriented programming language.

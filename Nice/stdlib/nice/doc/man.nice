@@ -63,7 +63,7 @@ String printMan(Program prg)
 String manUsage(Program prg)
 {
   StringBuffer res = new StringBuffer();
-  res.append(".B").append(prg.name).append("\n\\&");
+  res.append(".B ").append(prg.name).append("\n\\&");
   if (prg.options != null)
     res.append("[OPTIONS]");
   if (prg.arguments != null)

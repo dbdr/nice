@@ -40,8 +40,12 @@
 (defvar nice-directory nil)
 (defvar nice-process nil)
 (defvar nice-experimental-flag nil "Compile using development nice compiler")
-(defvar nice-recompile-flag nil)
-(defvar nice-recompile-all-flag nil)
+(defvar nice-recompile-flag nil
+  "Defines what packages should be recompiled.
+  nil  : recompile only out-of-date packages
+  't   : recompile also the current package
+  'all : recompile all packages"
+)
 (defvar nice-static-flag 't)
 (defvar nice-last-location 1)
 (defconst nice-extension ".nice")
@@ -504,8 +508,8 @@ Mode for editing/compiling Nice programs.
            (if nice-xprogram nice-xprogram nice-program)
 	   " "
            (if nice-experimental-flag "-e ")
-           (if nice-recompile-flag "-r ")
-           (if nice-recompile-all-flag "-R ")
+           (if nice-recompile-flag
+	       (if (equal nice-recompile-flag 'all) "-R " "-r "))
            (if nice-static-flag "-s ")
            (nice-buffer-pkg-name))
     )
@@ -617,16 +621,20 @@ Mode for editing/compiling Nice programs.
   (newline-and-indent))
 
 (defun nice-toggle-recompile ()
-  "Disable/enable recompile mode."
+  "Enable/disable recompile mode."
   (interactive)
-  (setq nice-recompile-flag (not nice-recompile-flag))
-  (message "Forced recompilation %s" (if nice-recompile-flag "on" "off")))
+  (setq nice-recompile-flag (if (equal nice-recompile-flag 't) nil 't))
+  (message (if nice-recompile-flag 
+	       "Always recompile this package"
+	       "Recompile only out-of-date packages")))
 
 (defun nice-toggle-recompile-all ()
   "Disable/enable the recompile-all mode."
   (interactive)
-  (setq nice-recompile-all-flag (not nice-recompile-all-flag))
-  (message "Forced recompilation of all packages %s" (if nice-recompile-all-flag "on" "off")))
+  (setq nice-recompile-flag (if (equal nice-recompile-flag 'all) nil 'all))
+  (message (if nice-recompile-flag 
+	       "Recompile all packages"
+	       "Recompile only out-of-date packages")))
 
 (defun nice-toggle-static ()
   "Disable/enable static compilation mode."

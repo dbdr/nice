@@ -258,19 +258,6 @@ typecheck(r@ReturnStmt)
   }
 }
 
-typecheck(t@ThrowStmt)
-{
-  typecheck(t.exn);
-
-  try{
-    Typing.leq(notNull(t.exn).getType(), ConstantExp.throwableType());
-  }
-  catch(TypingEx e){
-    if (notNullError(e, notNull(t.exn), t.exn.toString()))
-      bossa.util.User.error(t.exn, "" + t.exn + " is not throwable", e);
-  }
-}
-
 typecheck(t@TryStmt)
 {
   typecheck(t.body);

@@ -2142,12 +2142,10 @@ Statement ReturnStatement() :
 }
 
 Statement ThrowStatement() :
-{ Expression e; }
+{ Expression e; Token t; }
 {
-  //XXX change by using nice.lang.`throw` with ApplyExp("throw", e)
-  //XXX and remove bossa.syntax.ThrowStmt and gnu.expr.ThrowExp
-  "throw" e=Expression() ";"
-  { return new ThrowStmt(e); }
+  t="throw" e=Expression() ";"
+  { return new ExpressionStmt(CallExp.create(symb(t),e)); }
 }
 
 Statement TryStatement() :

@@ -34,8 +34,6 @@ public class ExpWalker
   protected Expression walkIncrementExp (IncrementExp exp) { return walkExpression(exp); }
   //protected Expression walkSwitchExp (SwitchExp exp) { return walkExpression(exp); }
   protected Expression walkTryExp (TryExp exp) { return walkExpression(exp); }
-  protected Expression walkThrowExp (ThrowExp exp) { return walkExpression(exp); }
-
   protected Expression walkBeginExp (BeginExp exp) { return walkExpression(exp); }
   protected Expression walkQuoteExp (QuoteExp exp) { return walkExpression(exp); }
   protected Expression walkReferenceExp (ReferenceExp exp)

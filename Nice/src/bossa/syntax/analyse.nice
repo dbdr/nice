@@ -216,7 +216,7 @@ markAsCallFirstArg(e@IdentExp)
   e.enableClassExp = true;
 }
 
-?LocatedString identString(Expression);
+?LocatedString identString(?Expression);
 identString(e) = null;
 identString(e@IdentExp) = e.ident;
 
@@ -235,9 +235,10 @@ analyse(e@CallExp, info)
       
       if (e.declaringClass != null)
 	{
-	  ?LocatedString funName = identString(notNull(e.function));
+	  ?LocatedString funName = identString(e.function);
 	  if (funName == null)
-	    bossa.util.Internal.error(e.function, "This is not a valid class member");
+	    bossa.util.Internal.error(e.function, 
+				      "This is not a valid class member");
 	  
 	  java.util.List possibilities = JavaMethod.findJavaMethods
 	    (e.declaringClass, funName.toString(), args.size());
@@ -254,7 +255,7 @@ analyse(e@CallExp, info)
       PackageExp pkg = args.packageExp();
       if (pkg != null)
 	{
-	  LocatedString nextComponent = identString(notNull(e.function));
+	  LocatedString nextComponent = identString(e.function);
 
 	  if (nextComponent == null)
 	    throw unknownIdent(pkg.locatedName());
@@ -263,8 +264,13 @@ analyse(e@CallExp, info)
 	}
     }
 
+  boolean cannotReturn = "throw".equals(identString(e.function).toString());
+
   markAsCallFun(notNull(e.function), e.infix);
   e.function = analyse(e.function, info);
+  
+  if (cannotReturn)
+    info.setUnreachable();
 
   return e;
 }
@@ -428,7 +434,7 @@ analyse(b@Block, info)
   javaList(notNull(b.locals)).iter(fun(Block.LocalDeclaration l) => analyse(l, info));
   notNull(b.statements).iter(fun(?Statement s)=>{
     if (info.getUnreachable())
-      bossa.util.User.error(s, "Statement is never executed");
+      bossa.util.User.error(s, "This statement is never executed");
     analyse(s, info);
   });
   info.end();
@@ -451,12 +457,6 @@ analyse(l@LoopStmt, info)
 analyse(r@ReturnStmt, info)
 {
   r.value = analyse(r.value, info);
-  info.setUnreachable();
-}
-
-analyse(t@ThrowStmt, info)
-{
-  t.exn = analyse(t.exn, info);
   info.setUnreachable();
 }
 

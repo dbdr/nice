@@ -104,7 +104,13 @@ public class MethodBodyDefinition extends Definition
 
 	Monotype type;
 
-	if (p.getRuntimeTC() != null)
+        if (p.atAny())
+          {
+            // When a parameter is not dispatched on, it has the declared type
+            // of that parameter in the method declaration.
+            type = types[tn];
+          }
+        else if (p.getRuntimeTC() != null)
 	  {
 	    AtomicKind v = p.tc.variance;
 	    p.getRuntimeTC().setVariance(v);

@@ -8,3 +8,20 @@ class M
 f(x@M) = x;
 
 f(x#M) = new M();
+
+/// PASS
+  /// Toplevel
+let Packet NO_PACKET = new Packet();
+
+class Packet {
+  private Packet link = NO_PACKET;
+
+  void addTo(Packet);
+}
+
+
+addTo(this@Packet, queue)
+{
+  var next = queue;
+  next = next.link;
+}

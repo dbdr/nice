@@ -11,6 +11,8 @@ nice (0.9.2) unstable; urgency=low
     supported anymore. Please use instead: 'void main(String[] args) { ... }'
   * Floating point literals are now of type double by default, adding 
     'f' or 'F' at the end will make them of type float.
+  * Method parameters that are not dispatched on simply get their declared
+    type. This avoids some type errors, and simplifies error messages.
   * Bugfixes (incrementation of byte local variables, require a default value
     for global variables, ...)
 

@@ -872,15 +872,15 @@ public class ClassType extends ObjectType implements AttrContainer {
 
   public final boolean isSubclass(ClassType other)
   {
-    if (this == other)
-      return true;
-    
     if ((this == tostring_type && other == string_type)
 	|| (this == string_type && other == tostring_type))
       return true;
     ClassType baseClass = this;
     do
       {
+        if (baseClass == other)
+          return true;
+
 	ClassType[] itfs = baseClass.getInterfaces();
 	
 	if(itfs!=null)

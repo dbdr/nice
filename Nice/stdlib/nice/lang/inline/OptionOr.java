@@ -37,37 +37,18 @@ public class OptionOr extends Procedure2 implements Inlineable
   {
     Expression[] args = exp.getArgs();
     CodeAttr code = comp.getCode();
-    Label _end = new Label(code);
 
-    fixAndLoadArgument(args[0], comp, target);
+    // We cannot use target for the first argument, since its value maybe
+    // be null, while the target may not.
+    args[0].compile(comp, Target.pushObject);
     code.emitDup();
-    code.emitGotoIfNotNull(_end);
+    code.emitIfNotNull();
+    target.compileFromStack(comp, code.topType());
+    code.emitElse();
     code.emitPop(1);
-    fixAndLoadArgument(args[1], comp, target);
-    _end.define(code);
+    args[1].compile(comp, target);
+    code.emitFi();
   }
-
-  private void fixAndLoadArgument(Expression arg, Compilation comp, Target target)
-  {
-    if (arg instanceof ReferenceExp && ((ReferenceExp)arg).getBinding() != null)
-    {
-      Declaration.followAliases(((ReferenceExp)arg).getBinding()).load(comp);
-      return;
-    }
-    if ((arg instanceof ApplyExp) && (((ApplyExp)arg).getFunction() instanceof QuoteExp))
-    {
-      Object ensTP = ((QuoteExp)((ApplyExp)arg).getFunction()).getValue();
-      if (ensTP != null && (ensTP instanceof EnsureTypeProc))
-      {
-        Target t = new CheckedTarget(((EnsureTypeProc)ensTP).getReturnType(((ApplyExp)arg).getArgs()),
- 			"nice.tools.code.EnsureTypeProc", gnu.mapping.WrongType.ARG_DESCRIPTION);
-	((ApplyExp)arg).getArgs()[0].compile(comp, t);
-        return;
-      }        
-    }
-    arg.compile(comp, target);
-  }    
-
 
   public Type getReturnType (Expression[] args)
   {

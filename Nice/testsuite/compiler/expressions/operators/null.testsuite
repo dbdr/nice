@@ -31,9 +31,17 @@
   return map.get("") || (1,1);
 }
 
-/// PASS bug
+/// PASS
+  ?int i = 1;
+  int j = i || 0;
+  assert j == 1;
+
+/// PASS
   Map<String,int> map = new HashMap();
   String s = "abc";
   map.put(s,1);
   int i = map.get(s) || 0;
   assert(i==1);
+
+/// PASS
+  int[] i = [1,2] || [3,4];

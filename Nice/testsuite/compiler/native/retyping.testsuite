@@ -1,0 +1,17 @@
+/// PASS
+  /// package a
+  /// Toplevel
+  ?java.awt.color.ColorSpace space(java.awt.Color c) = c.getColorSpace();
+  /// package b import a
+  java.awt.color.ColorSpace space2(java.awt.Color c) = c.getColorSpace();
+  /// Toplevel
+  java.awt.color.ColorSpace getColorSpace(java.awt.Color) = native java.awt.color.ColorSpace java.awt.Color.getColorSpace();
+
+/// PASS
+  /// package a
+  /// Toplevel
+  ?java.awt.Color someColor() = black();
+  /// package b import a
+  java.awt.Color black = black();
+  /// Toplevel
+  java.awt.Color black() = native java.awt.Color.black;

@@ -68,6 +68,11 @@ final class VarScope
 	addSymbol(s[i]);
   }
   
+  void removeSymbol(VarSymbol sym)
+  {
+    defs.remove(sym.name, sym);
+  }
+
   /**
    * The lookup method to call when you need to get a VarSymbol
    * from its name

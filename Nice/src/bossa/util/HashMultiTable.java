@@ -67,6 +67,35 @@ public class HashMultiTable {
   }
 
   /**
+   * Remove a mapping key -> value
+   */
+  public void remove(Object key, Object value) {
+    Bucket bucket = (Bucket)table.get(key);
+    if (bucket == null)
+      return;
+    if (bucket.value == value)
+      {
+	if (bucket.next == null)
+	  table.remove(key);
+	else
+	  table.put(key, bucket.next);
+	elementCount--;
+	return;
+      }
+    do
+      {
+	if (bucket.next != null && bucket.next.value == value)
+	  {
+	    bucket.next = bucket.next.next;
+	    elementCount--;
+	    return;
+	  }
+	bucket = bucket.next;
+      }
+    while (bucket != null);
+  }
+
+  /**
    * Returns a collection of all the values mapped from key
    * Last entered elements are enumerated first
    */

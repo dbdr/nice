@@ -194,21 +194,41 @@ public final class JavaClasses
 
   public static void reset()
   {
+    retyped = new HashMap();
   }
 
   /**
       Remembers native methods and fields explicitly bound with a new type.
+      Also store implicit method and fields (automatically fetched from the
+      bytecode), so that they can be discarded if an explicit retyping
+      is found later.
   */
-  private static Map retyped = new HashMap();
+  private static Map retyped;
   
-  static void registerNativeMethod(JavaMethod m, Method reflectMethod)
+  static void registerNativeMethod(RetypedJavaMethod m, Method reflectMethod)
   {
-    retyped.put(reflectMethod, m);
+    MethodDeclaration auto = (MethodDeclaration) retyped.put(reflectMethod, m);
+    /*
+      If auto is a RetypedJavaMethod, we are explicitely declaring two
+      methods forthe same native method. This is useful to give it several
+      incomparable types.
+      Otherwise, auto is an implicit java method, and we discard it
+      in favor of the new explicit one.
+    */
+    if (auto != null && ! (auto instanceof RetypedJavaMethod))
+      removeFromScope(auto);
   }
 
   static void registerNativeField(JavaFieldAccess f, Field reflectField)
   {
-    retyped.put(reflectField, f);
+    MethodDeclaration auto = (MethodDeclaration) retyped.put(reflectField, f);
+    if (auto != null)
+      removeFromScope(auto);
+  }
+
+  private static void removeFromScope(MethodDeclaration m)
+  {
+    Node.getGlobalScope().removeSymbol(m.getSymbol());    
   }
 
   /** Utility function for analyse.nice */
@@ -274,7 +294,7 @@ public final class JavaClasses
     for (Field f = classType.getFields(); f != null; f = f.getNext())
       {
 	if (retyped.get(f) == null)
-	  addSymbol(JavaFieldAccess.make(f));
+	  addSymbol(f, JavaFieldAccess.make(f));
       }
 
   addingFetchedMethod:
@@ -298,7 +318,7 @@ public final class JavaClasses
 	      {
 		if (Debug.javaTypes)
 		  Debug.println("Loaded native method " + m);
-		addSymbol(JavaMethod.make(m, false));
+		addSymbol(m, JavaMethod.make(m, false));
 	      }
 	  }
       }
@@ -329,10 +349,13 @@ public final class JavaClasses
   }	
 
 
-  private static void addSymbol(MethodDeclaration def)
+  private static void addSymbol(Object key, MethodDeclaration def)
   {
-    if (def != null && Node.getGlobalScope() != null)
-      Node.getGlobalScope().addSymbol(def.getSymbol());
+    if (def == null || Node.getGlobalScope() == null)
+      return;
+
+    Node.getGlobalScope().addSymbol(def.getSymbol());
+    retyped.put(key, def);
   }
 
   private static Method alreadyHasMethod(ClassType c, Method m)

@@ -1,0 +1,358 @@
+<project name="swinglib" default="deploy-swing" basedir=".">
+
+	<description>
+        File to build all separate packages of the Nice Swing Library and examples that come with it
+        </description>
+        
+        
+	<!-- Currently the Nicec Task is not known by the ant framework, -->
+	<!-- thats why we have to write the following declaration of the task -->
+	<!-- definition inside the ant build file -->
+	<taskdef name="nicec" classname="nice.tools.ant.Nicec"/>
+	
+	
+	<!-- set global properties for this build -->
+	<property name="source" location="src"/>
+	<property name="classes" location="classes"/>
+	<property name="classes-lib" location="classes/swinglib"/>
+	<property name="classes-examples" location="classes/examples"/>
+	<property name="deploy" location="deploy"/>
+	<property name="deploy-lib" location="deploy/swinglib"/>
+	<property name="deploy-examples" location="deploy/examples"/>
+	
+	
+	<!-- COMMON SECTION -->
+		
+	<target 
+	  name="init-classes-lib"
+	  description="create the swinglib build directory structure used by the swinglib compile targets"
+	  >
+	  <tstamp/>
+	  <mkdir dir="${classes-lib}"/>
+	</target>
+		
+	<target 
+	  name="init-classes-examples"
+	  description="create the examples build directory structure used by the examples compile targets"
+	  >
+	  <tstamp/>
+	  <mkdir dir="${classes-examples}"/>
+	</target>
+		
+	<target 
+	  name="init-deploy-lib"
+	  description="create the deploy build directory structure used by the swinglib deploy targets"
+	  >
+	  <tstamp/>
+	  <mkdir dir="${deploy-lib}"/>
+	</target>
+		
+	<target 
+	  name="init-deploy-examples"
+	  description="create the deploy build directory structure used by the examples deploy targets"
+	  >
+	  <tstamp/>
+	  <mkdir dir="${deploy-examples}"/>
+	</target>
+			
+	<target 
+	  name="clean-all" 
+	  description="Delete the ${classes} and ${deploy} directory trees"
+	  >
+	  <delete dir="${classes}"/>
+	  <delete dir="${deploy}"/>
+	</target>
+		
+	<target 
+	  name="clean-classes" 
+	  description="delete the ${classes} directory tree"
+	  >
+	  <delete dir="${classes}"/>
+	</target>
+		
+	<target 
+	  name="clean-classes-lib" 
+	  description="delete the ${classes-lib} directory tree"
+	  >
+	  <delete dir="${classes-lib}"/>
+	</target>
+
+	<target 
+	  name="clean-classes-examples" 
+	  description="delete the ${classes-examples} directory tree"
+	  >
+	  <delete dir="${classes-examples}"/>
+	</target>
+	
+	<target 
+	  name="clean-deploy" 
+	  description="Delete the ${classes} and ${deploy} directory trees"
+	  >
+	  <delete dir="${deploy}"/>
+	</target>
+			
+	<target 
+	  name="clean-deploy-lib" 
+	  description="delete the ${deploy}/swinglib directory tree"
+	  >
+	  <delete dir="${deploy}/swinglib"/>
+	</target>	
+
+	<target 
+	  name="clean-deploy-examples" 
+	  description="delete the ${deploy}/examples directory tree"
+	  >
+	  <delete dir="${deploy}/examples"/>
+	</target>
+
+		
+	<!-- LIBRARY SECTION -->
+	
+	<target 
+	  name="compile-common" 
+	  depends="init-classes-lib" 
+	  description="compile content of nice.common from ${src} to ${classes}"
+	  >
+	  <nicec 
+	    package="nice.ui.common" 
+	    destination="${classes-lib}" 
+	    sourcepath="${source}"
+	   />
+	</target>	
+	
+	<target 
+	  name="compile-beans" 
+	  depends="init-classes-lib" 
+	  description="compile content of nice.ui.beans from ${src} to ${classes}"
+	  >
+	  <nicec 
+	    package="nice.ui.beans" 
+	    destination="${classes-lib}" 
+	    sourcepath="${source}"
+	   />
+	</target>
+	
+	<target 
+	  name="compile-beans-clean" 
+	  depends="clean-classes-lib,init-classes-lib" 
+	  description="compile content of nice.ui.beans from ${source} to ${classes-lib} after deleting ${classes-lib}"
+	  >
+	  <nicec 
+	    package="nice.ui.beans" 
+	    destination="${classes-lib}" 
+	    sourcepath="${source}"
+	   />
+	</target>
+	
+	<target 
+	  name="deploy-beans" 
+	  depends="init-classes-lib,init-deploy-lib,compile-beans-clean" 
+	  description="compile content of nice.ui.beans from ${source} to ${classes} and deploy it in ${deploy-lib}/beans.jar"
+	  >
+          <nicec 
+            package="nice.ui.beans" 
+            destination="${classes-lib}" 
+            sourcepath="${source}" 
+            jar="${deploy-lib}/beans.jar"
+           />
+	</target>
+
+	<!-- targets for nice.ui.awt -->
+	
+	<target 
+	  name="compile-awt" 
+	  depends="init-classes-lib" 
+	  description="compile content of nice.ui.awt from ${source} to ${classes-lib}"
+	  >
+	  <nicec 
+	    package="nice.ui.awt" 
+	    destination="${classes-lib}" 
+	    sourcepath="${source}"
+	   />
+	</target>
+		
+	<target 
+	  name="compile-awt-clean" 
+	  depends="clean-classes-lib,init-classes-lib" 
+	  description="compile content of nice.ui.awt from ${source} to ${classes-lib} after deleting ${classes-lib}"
+	  >
+	  <nicec 
+	    package="nice.ui.awt" 
+	    destination="${classes-lib}" 
+	    sourcepath="${source}"
+	   />
+	</target>
+	
+	<target 
+	  name="deploy-awt" 
+	  depends="init-classes-lib,init-deploy-lib,compile-awt-clean" 
+	  description="compile content of nice.ui.beans from ${source} to ${classes-lib} and deploy it in ${deploy-lib}/awt.jar"
+	  >
+	  <nicec 
+	    package="nice.ui.awt" 
+	    destination="${classes-lib}" 
+	    sourcepath="${source}" 
+	    jar="${deploy-lib}/awt.jar"
+	   />
+	</target>
+	
+	<!-- targets for nice.ui.swing -->	
+		
+	<target 
+	  name="compile-swing" 
+	  depends="init-classes-lib" 
+	  description="compile content of nice.ui.swing from ${source} to ${classes-lib}"
+	  >
+	  <nicec 
+	    package="nice.ui.swing" 
+	    destination="${classes-lib}" 
+	    sourcepath="${source}"
+	   />
+	</target>
+		
+	<target 
+	  name="compile-swing-clean" 
+	  depends="clean-classes-lib,init-classes-lib" 
+	  description="compile content of nice.ui.swing from ${source} to ${classes-lib} after deleting ${classes-lib}"
+	  >
+	  <nicec 
+	    package="nice.ui.swing" 
+	    destination="${classes-lib}" 
+	    sourcepath="${source}"
+	   />
+	</target>
+	
+	<target 
+	  name="deploy-swing" 
+	  depends="init-classes-lib,init-deploy-lib,compile-swing-clean" 
+	  description="compile content of nice.ui.beans from ${source} to ${classes-lib} and deploy it in ${deploy-lib}/swing.jar"
+	  >
+	  <nicec 
+	    package="nice.ui.swing" 
+	    destination="${classes-lib}" 
+	    sourcepath="${source}" 
+	    jar="${deploy-lib}/swing.jar"
+	   />
+	</target>
+	
+	
+	<!-- EXAMPLES SECTION -->
+	
+	<!-- targets for examples.events -->
+	
+	<target 
+	  name="compile-examples-events" 
+	  depends="init-classes-examples,compile-common" 
+	  description="compile content of examples.events from ${source} to ${classes-examples}"
+	  >
+	  <nicec 
+	    package="examples.events" 
+	    destination="${classes-examples}" 
+	    sourcepath="${basedir}" 
+	    classpath="${classes-lib}"
+	   />
+	</target>
+	
+	<target 
+	  name="deploy-examples-events" 
+	  depends="init-classes-examples,init-deploy-examples,compile-examples-events" 
+	  description="compile content of examples.events from ${source} to ${classes-examples} and deploy it in ${deploy-examples}/events.jar"
+	  >
+	  <nicec 
+	    package="examples.events" 
+	    destination="${classes-examples}" 
+	    sourcepath="${basedir}" 
+	    classpath="${classes-lib}" 
+	    jar="${deploy-examples}/events.jar"
+	   />
+	</target>	
+	
+	<target 
+	  name="run-examples-events" 
+	  description="run examples.events application"
+	  >
+	  <java 
+	    fork="true" 
+	    jar="${deploy-examples}/events.jar"
+	   />
+	</target>
+	
+	<!-- targets for examples.complete -->	
+
+	<target 
+	  name="compile-examples-complete" 
+	  depends="init-classes-examples,compile-common" 
+	  description="compile content of examples.complete from ${source} to ${classes-examples}"
+	  >
+	  <nicec 
+	    package="examples.complete" 
+	    destination="${classes-examples}" 
+	    sourcepath="${basedir}" 
+	    classpath="${classes-lib}"
+	   />
+	</target>
+	
+	<target 
+	  name="deploy-examples-complete" 
+	  depends="init-classes-examples,init-deploy-examples,compile-examples-complete" 
+	  description="compile content of examples.events from ${source} to ${classes-examples} and deploy it in ${deploy-examples}/complete.jar"
+	  >
+	  <nicec 
+	    package="examples.complete" 
+	    destination="${classes-examples}" 
+	    sourcepath="${basedir}" 
+	    classpath="${classes-lib}" 
+	    jar="${deploy-examples}/complete.jar"
+	   />
+	</target>
+	
+	<target 
+	  name="run-examples-complete"
+	  description="run examples.complete application"
+	  >
+	  <java 
+	    fork="true" 
+	    jar="${deploy-examples}/complete.jar"
+	   />
+	</target>
+		
+	<!-- targets for examples.helloworld -->
+		
+	<target 
+	  name="compile-examples-helloworld" 
+	  depends="init-classes-examples,compile-common" 
+	  description="compile content of examples.helloworld from ${source} to ${classes-examples}"
+	  >
+	  <nicec 
+	    package="examples.helloworld" 
+	    destination="${classes-examples}" 
+	    sourcepath="${basedir}" 
+	    classpath="${classes-lib}"
+	   />
+	</target>
+		
+	<target 
+	  name="deploy-examples-helloworld" 
+	  depends="init-classes-examples,init-deploy-examples,compile-examples-helloworld" 
+	  description="compile content of examples.events from ${source} to ${classes-examples} and deploy it in ${deploy-examples}/helloworld.jar"
+	  >
+	  <nicec 
+	    package="examples.helloworld" 
+	    destination="${classes-examples}" 
+	    sourcepath="${basedir}"
+	    classpath="${classes-lib}" 
+	    jar="${deploy-examples}/helloworld.jar"
+           />
+	</target>
+		
+	<target 
+	  name="run-examples-helloworld" 
+	  description="run examples.helloworld application"
+	  >
+	  <java 
+            fork="true" 
+            jar="${deploy-examples}/helloworld.jar"
+           />
+	</target>
+	
+</project>

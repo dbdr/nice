@@ -12,7 +12,7 @@
 
 // File    : CallExp.java
 // Created : Mon Jul 05 16:27:27 1999 by bonniot
-//$Modified: Thu Aug 31 18:29:22 2000 by Daniel Bonniot $
+//$Modified: Fri Sep 01 12:44:06 2000 by Daniel Bonniot $
 
 package bossa.syntax;
 
@@ -289,12 +289,14 @@ public class CallExp extends Expression
 	    parameters.remove(0);
 	    List possibilities = new LinkedList();
 	    declaringClass.addMethods();
+	    int arity = parameters.size();
 	    
 	    // search methods
 	    for(gnu.bytecode.Method method = declaringClass.getMethods();
 		method!=null; method = method.getNext())
 	      if(method.getName().equals(funName.content) &&
-		 method.arg_types.length==parameters.size())
+		 (method.arg_types.length + 
+		  (method.getStaticFlag() ? 0 : 1)) == arity)
 		{
 		  MethodDefinition md = 
 		    JavaMethodDefinition.addFetchedMethod(method);

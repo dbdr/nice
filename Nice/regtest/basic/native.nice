@@ -20,7 +20,7 @@ test_native()
 
   File f = nop(new File("titi"));
   java.net.ServerSocket s = new java.net.ServerSocket(1235);
-  java.lang.Runtime.getRuntime();
+  java.lang.System.currentTimeMillis();
 
   Fields.intS = 2;
   Fields.stringS = "Static field is: ";

@@ -33,8 +33,11 @@ public class ThisExp extends ReferenceExp
 
   public void compile (Compilation comp, Target target)
   {
-    CodeAttr code = comp.getCode();
-    code.emitPushThis();
+    // If we have been captured, load ourselve the hard way.
+    if (binding != null && binding.field != null)
+      binding.load(comp);
+    else
+      comp.getCode().emitPushThis();
   }
 
   protected Expression walk (ExpWalker walker)

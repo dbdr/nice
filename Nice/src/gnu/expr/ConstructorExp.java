@@ -23,12 +23,21 @@ import gnu.bytecode.*;
 
 public class ConstructorExp extends LambdaExp
 {
-  public ConstructorExp(ClassType classType)
+  public ConstructorExp(Declaration thisDecl)
   {
-    this.classType = classType;
+    this.thisDecl = thisDecl;
+    this.classType = (ClassType) thisDecl.getType();
+    thisDecl.context = this;
   }
 
+  public void setSuperCall(Expression superCall)
+  {
+    this.superCall = superCall;
+  }
+
+  private Declaration thisDecl;
   private ClassType classType;
+  private Expression superCall;
 
   ClassType getClassType() { return classType; }
 
@@ -54,5 +63,23 @@ public class ConstructorExp extends LambdaExp
     Method method = ctype.addMethod
       ("<init>", args, Type.void_type, Access.PUBLIC);
     primMethods = new Method[] { method };
+  }
+
+  void enterFunction (Compilation comp)
+  {
+    // The super call has to come before anything else.
+    superCall.compile(comp, Target.Ignore);
+
+    // Do the normal stuff.
+    super.enterFunction(comp);
+
+    // Save 'this' if it is captured
+    if (thisDecl.field != null)
+      {
+        CodeAttr code = comp.getCode();
+        thisDecl.loadOwningObject(comp);
+        code.emitPushThis();
+        code.emitPutField(thisDecl.field);
+      }
   }
 }

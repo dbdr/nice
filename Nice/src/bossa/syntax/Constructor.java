@@ -85,7 +85,9 @@ class Constructor extends MethodDeclaration
   private void createBytecode(boolean omitDefaults)
   {
     ClassType thisType = (ClassType) javaReturnType();
-    Expression thisExp = new ThisExp(thisType);
+    Declaration thisDecl = new Declaration("this");
+    thisDecl.setType(thisType);
+    Expression thisExp = new ThisExp(thisDecl);
 
     MonoSymbol[] fullArgs = parameters.getMonoSymbols();
     Type[] fullArgTypes = javaArgTypes();
@@ -128,35 +130,10 @@ class Constructor extends MethodDeclaration
       }
 
     ConstructorExp lambda = Gen.createConstructor
-      (thisType, argTypesArray, argsArray);
+      (thisDecl, argTypesArray, argsArray);
+    lambda.setSuperCall(callSuper(thisExp, fullArgs, omitDefaults));
 
-    Expression[] body = 
-      new Expression[1 + fields.length + classe.nbInitializers()];
-
-    body[0] = callSuper(thisExp, fullArgs, omitDefaults);
-
-    final int superArgs = fullArgs.length - fields.length;
-
-    for (int i = 0; i < fields.length; i++)
-      {
-        bossa.syntax.Expression value = fields[i].value;
-
-        Expression fieldValue;
-        if (!omitDefaults || value == null)
-          // Use the provided parameter.
-          fieldValue = fullArgs[superArgs + i].compile();
-        else
-          // Use the default value.
-          fieldValue = value.compile();
-
-        body[1 + i] = fields[i].method.compileAssign(thisExp, fieldValue);
-      }
-
-    classe.setThisExp(thisExp);
-    for (int i = 0; i < classe.nbInitializers(); i++)
-      body[1 + fields.length + i] = classe.compileInitializer(i);
-
-    Gen.setMethodBody(lambda, new BeginExp(body));
+    Gen.setMethodBody(lambda, body(thisExp, fullArgs, omitDefaults));
     classe.getClassExp().addMethod(lambda);
 
     if (omitDefaults)
@@ -185,6 +162,40 @@ class Constructor extends MethodDeclaration
     Expression superExp = classe.getSuper(index, omitDefaults);
     return new ApplyExp(superExp, (Expression[])
                         superArgs.toArray(new Expression[superArgs.size()]));
+  }
+
+  private Expression body(Expression thisExp,
+                          MonoSymbol[] fullArgs, boolean omitDefaults)
+  {
+    int len = fields.length + classe.nbInitializers();
+
+    if (len == 0)
+      return QuoteExp.voidExp;
+
+    Expression[] body = new Expression[len];
+
+    final int superArgs = fullArgs.length - fields.length;
+
+    for (int i = 0; i < fields.length; i++)
+      {
+        bossa.syntax.Expression value = fields[i].value;
+
+        Expression fieldValue;
+        if (!omitDefaults || value == null)
+          // Use the provided parameter.
+          fieldValue = fullArgs[superArgs + i].compile();
+        else
+          // Use the default value.
+          fieldValue = value.compile();
+
+        body[i] = fields[i].method.compileAssign(thisExp, fieldValue);
+      }
+
+    classe.setThisExp(thisExp);
+    for (int i = 0; i < classe.nbInitializers(); i++)
+      body[fields.length + i] = classe.compileInitializer(i);
+
+    return new BeginExp(body);
   }
 
   public void printInterface(java.io.PrintWriter s)

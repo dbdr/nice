@@ -985,7 +985,19 @@ public class LambdaExp extends ScopeExp
 	  {
 	    ClassExp outerClass = outerClass();
 	    if (outerClass != null)
-	      frameType = new ClassType(comp.generateUniqueName(outerClass.getName()+"$" + getName()));
+              {
+                String name = getName();
+                if (name == null)
+                  name = "lambda";
+                // At least for constructors ("<init>") we need to make sure
+                // the name is valid.
+                name = Compilation.mangleName(name);
+                // Use the outer class as a prefix name.
+                name = outerClass.getName() + "$" + name;
+                // Make sure the name is unique.
+                name = comp.generateUniqueName(name);
+                frameType = new ClassType(name);
+              }
 	    else
 	      frameType = new ClassType(comp.generateClassName("frame"));
 	    if (Compilation.usingTailCalls) // FIXME

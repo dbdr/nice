@@ -132,10 +132,11 @@ public class Gen
   }
 
   public static ConstructorExp createConstructor
-    (ClassType classType, Type[] argTypes, MonoSymbol[] args)
+    (Declaration thisDecl, Type[] argTypes, MonoSymbol[] args)
   {
-    ConstructorExp res = new ConstructorExp(classType);
-    createMethod(res, "<init>", argTypes, Type.void_type, args, true, false, true);
+    ConstructorExp res = new ConstructorExp(thisDecl);
+    createMethod(res, "<init>", argTypes, Type.void_type, args, 
+                 true, false, true);
     return res;
   }
 

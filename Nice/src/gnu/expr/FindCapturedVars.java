@@ -319,8 +319,9 @@ public class FindCapturedVars extends ExpWalker
 
   protected Expression walkThisExp (ThisExp exp)
   {
-    // FIXME - not really right, but works in simple cases.
-    if (false) getCurrentLambda ().setImportsLexVars();
+    // This can be captured like any other variable.
+    if (exp.getBinding() != null)
+      capture(exp.getBinding());
     return exp;
   }
 

@@ -154,7 +154,7 @@ class A
   /// package b import a
   assert new A().x[0];
 
-/// PASS bug
+/// PASS
   /// package a
   /// Toplevel
   class A
@@ -162,6 +162,7 @@ class A
     boolean x = false;
     {
       void foo() {
+        // Implicit capture of 'this' inside an initializer
         x = true;
       }
       foo();
@@ -184,3 +185,17 @@ class A
   }
   /// package b import a
   let x = new TestA();
+
+/// PASS
+  // Capture of 'this' inside an initializer
+  new TestA(a: "ABC").b.equals("ABC");
+  /// Toplevel
+class TestA 
+{
+  String a;
+  String b = "";
+  { 
+    let f = (String l) => this;
+    b = f("").a;
+  }
+}

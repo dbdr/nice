@@ -14,6 +14,7 @@
   <bookinfo>
     <title>The Nice user's manual</title>
     <author><firstname>Daniel</firstname><surname>Bonniot</surname></author>
+    <author><firstname>Bryn</firstname><surname>Keller</surname></author>
     <copyright><year>2003</year><holder>Daniel Bonniot</holder></copyright>
   </bookinfo>
   <preface><title>Foreword</title>
@@ -97,14 +98,14 @@
      declaration:
     </para>
     <para>
-      <literal>package</literal> package-name<literal>;</literal>
+      <literal>package <replaceable>package-name</replaceable>;</literal>
     </para>
     <para>
      To make use of all the public entities from another Nice package,
      use the <literal>import</literal> statement:
     </para>
     <para>
-      <literal>import</literal> package-name<literal>;</literal>
+      <literal>import <replaceable>package-name</replaceable>;</literal>
     </para>
     <para>
       Note that this is somewhat different from Java packages.
@@ -141,7 +142,7 @@
 	initial value.
 	The syntax for field declaration is:
 	<programlisting>
-	  <type>Type</type> fieldName<optional> = initialValue</optional>;
+	  <type><replaceable>type</replaceable></type> <replaceable>field-name</replaceable><optional> = <replaceable>initial-value</replaceable></optional>;
 	</programlisting>
 	If no default value is given, then every call to the constructor
 	must specify the value for this field.
@@ -286,13 +287,14 @@ void main(String[] args)
 ]]></programlisting>
       </example>
       <para>
-        In the Nice version, we've parameterized <classname>Stack</classname> by 
-        a type <type>T</type>. Essentially, <classname>Stack&lt;T&gt;</classname> 
-        is a recipe for the compiler that tells it how to create a Stack that 
+        In the Nice version, we have parameterized <classname>Stack</classname> by 
+        a type <type>T</type>. Essentially, <type>Stack&lt;T&gt;</type> 
+        is a recipe for the compiler that tells it how to create a 
+	<classname>Stack</classname> that 
         works for any given type. So now the compiler knows that we only mean 
         for Strings to go into our stack, and it reports an error when we
-        write code that expects an Integer to come out of our 
-        <classname>Stack&lt;String&gt;</classname>. 
+        write code that expects an <type>Integer</type> to come out of our 
+        <type>Stack&lt;String&gt;</type>. 
       </para>
     </section>
 
@@ -323,19 +325,28 @@ void main(String[] args)
       </para>
 
       <para>
-       <literal>[type-parameters] return-type 
-        function-name([parameters]) &LBRACE; body &RBRACE;</literal>
+       <literal>
+       <optional><replaceable>type-parameters</replaceable></optional> 
+       <replaceable>return-type</replaceable> 
+       <replaceable>function-name</replaceable>
+       (<optional><replaceable>parameters</replaceable></optional>) 
+       &LBRACE; <replaceable>body</replaceable> &RBRACE;
+       </literal>
       </para>
 
       <para>
-       Where <literal>[parameters]</literal> and 
-       <literal>[type-parameters]</literal> are optional. There is a also
-       a special case for functions whose body consists of a single expression:
+       There is a also a simpler syntax for functions whose body
+       consists of a single expression:
       </para>
 
       <para>
-       <literal>[type-parameters] return-type function-name([parameters]) 
-        = expression;</literal>
+       <literal>
+       <optional><replaceable>type-parameters</replaceable></optional> 
+       <replaceable>return-type</replaceable> 
+       <replaceable>function-name</replaceable>
+       (<optional><replaceable>parameters</replaceable></optional>) 
+       = <replaceable>expression</replaceable>;
+       </literal>
       </para>
 
       
@@ -395,7 +406,7 @@ copy(from: f1, to: f2, bufferSize: 4000);</programlisting>
       </para>
       <para>
        <literal> T[] slice(T[] array, int from = 0, 
-       int to = array.length - 1);</literal>.
+       int to = array.length - 1);</literal>
       </para>
     </section>
   </chapter>
@@ -407,13 +418,18 @@ copy(from: f1, to: f2, bufferSize: 4000);</programlisting>
       </para>
 
       <para>
-        <literal>[type-parameters] return-type 
-        method-name([parameters]);</literal>
+        <literal>
+        <optional><replaceable>type-parameters</replaceable></optional> 
+        <replaceable>return-type</replaceable> 
+        <replaceable>method-name</replaceable>
+        (<optional><replaceable>parameters</replaceable></optional>);
+        </literal>
       </para>
 
       <para>
-        The syntax is very similar to that for functions, but no body is 
-        provided. Note that in Nice, methods can be defined within the
+        The syntax is very similar to that for functions, except that
+        no body is provided. 
+	Note that in Nice, methods can be defined within the
         body of a class definition, or outside of it - both are identical
         for the compiler's purposes.
       </para>
@@ -425,33 +441,42 @@ copy(from: f1, to: f2, bufferSize: 4000);</programlisting>
       </para>
 
       <para>
-        method-name([arguments]) &LBRACE; body &RBRACE;
+        <literal>
+	<replaceable>method-name</replaceable>
+        (<optional><replaceable>arguments</replaceable></optional>)
+	&LBRACE; body &RBRACE;
+        </literal>
       </para>
 
       <para>Like functions, there is another form for single expressions:</para>
 
       <para>
-        method-name([arguments]) = expression;
+        <literal>
+	<replaceable>method-name</replaceable>
+        (<optional><replaceable>arguments</replaceable></optional>)
+	= <replaceable>expression</replaceable>;
+        </literal>
       </para>
 
       <para>
-        The <literal>[arguments]</literal> consist of names, and optionally
-        types, of the form
+        The <optional><replaceable>arguments</replaceable></optional>
+	consist of names, and optionally types, of the form
       </para>
 
       <para>
-        <literal>name</literal>
+        <literal><replaceable>name</replaceable></literal>
       </para>
 
       <para>or</para>
 
       <para>
-        <literal>name@type</literal>
+        <literal><replaceable>name</replaceable>@<replaceable>class-name</replaceable></literal>
       </para>
 
       <para>
-        The <literal>@type</literal> is used to specialize the method on that 
-        argument. An example should make the difference clear. Also note the
+        The <literal>@<replaceable>class-name</replaceable></literal> 
+	is used to specialize the method on that argument. 
+	An example should make the difference clear. Also note the
         use of both the block- and expression-style methods.
       </para>
 
@@ -485,23 +510,34 @@ numberOfWheels(mc@Motorcycle) = 2;
 
       <para id="exactMatching">
        It is also possible to specialize a method on the 
-       <emphasis>exact</emphasis> type of the argument. Then the method will
-       apply to arguments which match the type exactly, and 
-       <emphasis>not</emphasis> to an argument which is a subtype of the type
+       <emphasis>exact</emphasis> class of the argument. Then the method will
+       apply to arguments which match the class exactly, and 
+       <emphasis>not</emphasis> to an argument which is a subclass of the class
        specified. The syntax for exact matching is:
       </para>
       <para>
-       name<literal>#</literal>type
+       <literal><replaceable>name</replaceable>#<replaceable>class-name</replaceable></literal>
       </para>
+
+      <para>
+        There is an <link linkend="ex:copy">example</link> where 
+	exact matching is required to
+	type-check a method with a precise polymorphic type.
+      </para>
+
       <para>     
        When specializing a method with type parameters, it is not necessary 
-       or possible to restate the type parameters in the method implementation. 
+       or possible to restate the type parameters in the method implementation.
        However, if you need access to the type parameters as in the example
        below, use the syntax:
       </para>
       <para>
-       <literal>method-name&LT;type-parameters&GT; (...) &LBRACE; body &RBRACE;
-       </literal>
+        <literal>
+	<replaceable>method-name</replaceable>
+	&LT;<replaceable>type-parameters</replaceable>&GT;
+        (<optional><replaceable>arguments</replaceable></optional>)
+	&LBRACE; body &RBRACE;
+        </literal>
       </para>
       <example>
        <title>Using Type Parameters in Method Implementations</title>
@@ -511,8 +547,7 @@ numberOfWheels(mc@Motorcycle) = 2;
 <T> T lastItem(Collection<T> coll);
 
 
-/*
-This version won't compile because the T type isn't in scope:
+/* This version won't compile because the T type isn't in scope:
 
 lastItem(coll)
 {
@@ -521,8 +556,7 @@ lastItem(coll)
 }
 */
 
-/*
-This one won't compile because Iterator needs a type argument:
+/* This one won't compile because Iterator needs a type argument:
 
 lastItem(coll)
 {
@@ -531,15 +565,13 @@ lastItem(coll)
 }
 */
 
-//This one will work correctly
+// This one will work correctly:
 lastItem<T>(coll)
 {
   Iterator<T> = coll.iterator();
   //...
 }
-  
-]]>
-       </programlisting>
+]]></programlisting>
       </example>
         <para>
          Note that it is not possible to dispatch a method call on an array 
@@ -596,9 +628,10 @@ lastItem<T>(coll)
       </para>
       <para>
 	For example, we can define the contract of the add method
-	of a <literal>Buffer</literal> interface.
-	It is guaranteed that <literal>isEmpty</literal> returns true
-	if, and only if, <literal>size</literal> returns <literal>0</literal>.
+	of a <type>Buffer</type> interface.
+	It is guaranteed that <literal>isEmpty</literal> returns 
+	<literal>true</literal>	if, and only if, 
+	<literal>size</literal> returns <literal>0</literal>.
 	The <literal>add</literal> method can be called only when the buffer
 	is not full. It is guaranteed to make the buffer non-empty, and
 	to increase the size by one.
@@ -625,7 +658,7 @@ interface Buffer<Elem>
       </para>
     </section>
 
-    <section><title>Enabling assertions and contract checking</title>
+    <section id="enablingAssertions"><title>Enabling assertions and contract checking</title>
       <para>
         By default, assertions and contracts are not used at runtime.
 	They are discarded by the just-in-time compiler, and should
@@ -637,7 +670,7 @@ interface Buffer<Elem>
         <para>
 	  The mechanism is the same as for Java assertions. 
 	  Checking can be enabled at runtime with 
-	  <literal>java -ea ...</literal>.
+	  <userinput>java -ea ...</userinput>.
 	</para>
       </section>
 
@@ -648,7 +681,7 @@ interface Buffer<Elem>
 	  Nice programs using assertions anc contracts. Since java will not 
 	  know the <literal>-ea</literal> command line option, they are 
 	  disabled by default. You can enable them with 
-	  <literal>java -Dassertions=true ...</literal>.
+	  <userinput>java -Dassertions=true ...</userinput>.
 	</para>
       </section>
     </section>
@@ -664,8 +697,11 @@ interface Buffer<Elem>
       Java are. Here is the syntax:
      </para>
      <para>
-      <literal>var</literal> type-name variable-name [= initializer]
-      <literal>;</literal>
+      <literal>var <replaceable>type</replaceable> 
+      <replaceable>variable-name</replaceable> 
+      <optional>= <replaceable>initial-value</replaceable></optional>
+      ;
+      </literal>
      </para>
     </section>
     <section id="localFunctions"><title>Local functions</title>
@@ -737,11 +773,11 @@ Window createMyWindow()
 	    <literal><![CDATA[<T> void foo(Collection<T>)]]></literal> and 
 	    <literal><![CDATA[<T> void foo(List<T>)]]></literal> are declared, 
 	    and <literal>aList</literal> is an expression of static type 
-	    <literal>List</literal>.
+	    <type>List</type>.
 	    The expression <literal>foo(aList)</literal> will result in
 	    calling the second <literal>foo</literal> function, 
-	    because <literal>List</literal>
-	    is a subclass of <literal>Collection</literal>.
+	    because <type>List</type>
+	    is a subclass of <type>Collection</type>.
 	  </para>
 	</footnote>.
 	Otherwise, the compiler reports an ambiguity error.
@@ -768,8 +804,8 @@ Window createMyWindow()
       </para>
 
       <para>
-       Tuple types are covariant, so a couple of <literal>int</literal>s 
-       can be used where a couple of <literal>long</literal>s is expected.
+       Tuple types are covariant, so a couple of <type>int</type>s 
+       can be used where a couple of <type>long</type>s is expected.
       </para>
 
       <para>
@@ -801,7 +837,7 @@ void main(String[] args)
   printTuple(minMax(14, 17));
   printTuple(minMax(42, 41));
 }
-}]]></programlisting>
+]]></programlisting>
       </example>
 
     </section>
@@ -817,13 +853,19 @@ void main(String[] args)
        The syntax of anonymous functions is:
       </para>
       <para>
-       ([parameters]) <literal>=></literal> &LBRACE; body &RBRACE;
+        <literal>
+        (<optional><replaceable>parameters</replaceable></optional>)
+        => &LBRACE; body &RBRACE;
+        </literal>
       </para>
       <para>
        As with the other functionals, there is also a single-expression format:
       </para>
       <para>
-       ([parameters]) <literal>=></literal> expression
+        <literal>
+	(<optional><replaceable>parameters</replaceable></optional>)
+	=> <replaceable>expression</replaceable>
+        </literal>
       </para>
       <para>
        The brackets around the parameters are optional if there is only one
@@ -854,8 +896,6 @@ String concat2(Collection<String> strings)
 {
   return strings.foldLeft((String accum, String s) => accum + s, "");
 }
-
-
 ]]></programlisting>
 </example>
     </section>
@@ -863,9 +903,9 @@ String concat2(Collection<String> strings)
     <section id="conversion"><title>Conversion between numeric primitive types</title>
       <para>
 	The numeric primitive types are, from the largest to the smallest:
-	<literal>double, float, long, int, short, byte</literal>, 
-	and <literal>char</literal> which is smaller than 
-	<literal>int</literal> but incomparable with <literal>short</literal>.
+	<type>double, float, long, int, short, byte</type>, 
+	and <type>char</type> which is smaller than 
+	<type>int</type> but incomparable with <type>short</type>.
 	Conversion from a smaller to a larger type is automatic.
 	Conversion from a larger to a smaller type must be done explicitely,
 	since they can lose information about the magnitude of the value.
@@ -884,8 +924,8 @@ String concat2(Collection<String> strings)
       </para>
       <para>
         For instance, here is code to read
-	characters from a <literal>Reader</literal>, whose 
-	<literal>read</literal> method returns an <literal>int</literal> 
+	characters from a <type>Reader</type>, whose 
+	<literal>read</literal> method returns an <type>int</type> 
 	(<literal>-1</literal> meaning that the end of stream has been 
 	reached):
 
@@ -923,8 +963,8 @@ while ((v = r.read()) != -1) {
 	  it is possible to make the package part of their name implicit.
 	  For instance, after a declaration
 	  <literal>import java.io.*;</literal> it is possible
-	  to refer to class <literal>java.io.File</literal>
-	  with the short name <literal>File</literal>. It is not possible to 
+	  to refer to class <type>java.io.File</type>
+	  with the short name <type>File</type>. It is not possible to 
           import only a single name, such as 
           <literal>import java.io.File;</literal>, you must import the whole
           package.
@@ -941,19 +981,19 @@ while ((v = r.read()) != -1) {
       <section id="optionTypesJava"><title>Option types</title>
 	<para>
 	  Nice's advanced type system makes the distinction between normal 
-	  (e.g. <literal>String</literal>) and option
-	  (e.g. <literal>?String</literal>) types, which allows to 
+	  (e.g. <type>String</type>) and option
+	  (e.g. <type>?String</type>) types, which allows to 
 	  prevent <literal>NullPointerExceptions</literal>
 	  (see <link linkend="optionTypes">option types</link>).
 	  This poses a problem when using 
 	  existing Java libraries. If my Nice program calls a Java function
-	  that returns a <literal>String</literal> (the Java type), 
-	  does it mean <literal>String</literal> or 
-	  <literal>?String</literal> in Nice? 
-	  Since Java allows the value to be <literal>null</literal>, 
+	  that returns a <type>String</type> (the Java type), 
+	  does it mean <type>String</type> or 
+	  <type>?String</type> in Nice? 
+	  Since Java allows the value to be &NULL;, 
 	  the Nice compiler 
-	  currently suposes it's <literal>?String</literal> (it can only be 
-	  sure about primitive types like <literal>int</literal>).
+	  currently suposes it's <type>?String</type> (it can only be 
+	  sure about primitive types like <type>int</type>).
 	</para>
 
 	<programlisting lang="java">
@@ -966,24 +1006,23 @@ public class MyJavaClass {
 
 	<para>
           In Nice, if <literal>myJavaClass</literal> is a variable of type 
-	  <literal>MyJavaClass</literal>, then 
+	  <type>MyJavaClass</type>, then 
 	  <literal>myJavaClass.getName()</literal> has type 
-	  <literal>?String</literal>.
+	  <type>?String</type>.
 	</para>
 
 	<para>
-	  If the Java code might indeed return <literal>null</literal>, 
+	  If the Java code might indeed return &NULL;, 
 	  or you are not sure, this is all good. To use the value you will 
-	  have to test it against <literal>null</literal>. However there are 
+	  have to test it against &NULL;. However there are 
 	  many cases where you know the value cannot be 
-	  <literal>null</literal>, for instance if this fact is specified in 
+	  &NULL;, for instance if this fact is specified in 
 	  the Javadoc comment of the method. In that cases there are currently 
-	  two possibilities. The first is to use the <literal>notNull</literal>
-	  function. It tells the compiler that you know the value is not 
-	  <literal>null</literal>. At runtime, it will throw a 
-	  <literal>NullPointerException</literal> if this was not the case. 
+	  two possibilities. The first is to use the 
+	  <link linkend="notNull"><literal>notNull</literal>
+	  function</link>. 
 	  So in our example <literal>notNull(myJavaClass.getName())</literal>
-	  has type <literal>String</literal>. This solution is simple, but can 
+	  has type <type>String</type>. This solution is simple, but can 
 	  be annoying if you call the same method many times, or because it 
 	  makes your code less readable.
 	</para>
@@ -1000,14 +1039,14 @@ String getName(MyJavaClass) = native String MyJavaClass.getName();</programlisti
 	<para>
           The Nice part (on the left of the <literal>=</literal> character) 
 	  is the header of a function definition. Note that return type is 
-	  <literal>String</literal> (without the optional type marker 
+	  <type>String</type> (without the optional type marker 
 	  <literal>?</literal>). On the other hand, the right part says that 
 	  the function is already defined in class 
-	  <literal>MyJavaClass</literal>, with name <literal>getName</literal>,
+	  <type>MyJavaClass</type>, with name <literal>getName</literal>,
 	  the one that takes no argument and returns a 
-	  <literal>String</literal>. With this declaration, 
+	  <type>String</type>. With this declaration, 
 	  <literal>myJavaClass.getName()</literal> has type 
-	  <literal>String</literal>.
+	  <type>String</type>.
 	</para>
       </section>
     </section>
@@ -1172,22 +1211,62 @@ public class Main
         Therefore, you never have to check that all your arguments 
         aren't &NULL; again, unless you actually want to allow &NULL;s.
       </para>
+
+      <section id="notNull"><title>The <literal>notNull</literal> function</title>
+	<para>
+	  Sometimes, you know that a value cannot be &NULL;,
+	  although it has an option type.
+	  You can then use the <literal>notNull</literal> function to
+	  assert this fact.
+	  If an expression <replaceable>e</replaceable> has type
+	  <type>?<replaceable>type</replaceable></type>, then
+	  <literal>notNull(<replaceable>e</replaceable>)</literal>
+	  has type <type>!<replaceable>type</replaceable></type>.
+	  Note that if <replaceable>type</replaceable> is not a type
+	  variable, <type>!<replaceable>type</replaceable></type>
+	  is the same as <type><replaceable>type</replaceable></type>.
+	</para>
+	<para>
+	  The <literal>notNull</literal> function uses 
+	  <link linkend="contracts"><literal>assert</literal></link>
+	  to check that the argument is not &NULL;. 
+	  This means that the check will only happen at runtime
+	  if <link linkend="enablingAssertions">assertion checks are
+	  enabled</link>.
+	  Otherwise, execution will continue, but the JVM will probably
+	  fail soon afterwards with a <literal>NullPointerException</literal>
+	  if the value is &NULL;, and it is used as
+	  if it was not &NULL;. 
+	</para>
+      </section>
+
       <para>
-        Two useful functions for dealing with nulls are 
-        <literal>notNull</literal> and <literal>cast</literal>. The
-        <literal>notNull</literal> function is described above in the
-        <link linkend="optionTypesJava">section on option types and Java
-        code</link>. The <literal>cast</literal> function is used in those
-        (rare) situations where it is necessary to allow a null where one
-        shouldn't normally go, for instance if you need to declare a
-        variable before entering a loop, but don't have a value to initialize
-        it with. These situations are rare, and are usually the result of
-        thinking about the problem in a Java way rather than a Nice way,
-        but sometimes <literal>cast</literal> is the only way.
+	There are (rare) situations where it is necessary to allow a 
+	&NULL; where one shouldn't normally go, for
+	instance if you need to declare a variable before entering a
+	loop, but don't have a value to initialize it with. 
+	You should first try to think about an alternative way of
+	writing the code so that this is not needed. However, if there
+	is none, a solution is to use <literal>cast(null)</literal>.
+	This expression will be accepted in any context.
+	It is then your responsability to make sure that this value is
+	not used.
       </para>
 
       <para>
-        For more details, see 
+        Note that <literal>notNull</literal> and <literal>cast(null)</literal>
+	have completely different uses. <literal>notNull</literal> is
+	used to tell the compiler that you know a certain value is not 
+	&NULL;, although the type system does not guarantee it. 
+	On the other hand, <literal>cast(null)</literal>
+	is used to provide a non-null value which is never going to be
+	used. You could not use <literal>notNull(null)</literal> for
+	that purpose, because this would fail at runtime if assertion
+	checks are enabled.
+      </para>
+
+      <para>
+        Additional information is available on
 	<ulink url="http://nice.sourceforge.net/cgi-bin/twiki/view/Doc/OptionTypes">
 	the Wiki page about option types</ulink>.
       </para>
@@ -1196,21 +1275,27 @@ public class Main
        There is related type, which is prefixed with an exclamation point
        (<literal>!</literal>). This is used to specify a non-&NULL; type
        when it is not known if the original type allowed &NULL; or not. This
-       generally happens with parameterized types, for instance the type
+       is only needed for type parameters; for all other types,
+       <type>!<replaceable>type</replaceable></type> is
+       equivalent to <type><replaceable>type</replaceable></type>.
       </para>
       <para>
-       <type><![CDATA[<T> T myFunction(Collection<T>)]]></type>
+	For instance, in the following function:
       </para>
       <para>
-       can be
+       <literal><![CDATA[<T> T myFunction(Collection<T>);]]></literal>
+      </para>
+      <para>
+       the type parameter <type>T</type> can be
        instantiated at <emphasis>any</emphasis> type, including option types
        like <type>?String</type>. If it is necessary to exclude option types
-       from the domain of T, the type is specified this way:
+       from the domain of <type>T</type>, the type can be specified this way:
       </para>
       <para>
-       <type><![CDATA[<!T> !T myFunction(Collection<!T>)]]></type>.
+       <literal><![CDATA[<!T> !T myFunction(Collection<!T>);]]></literal>
       </para>
       </section>
+
       <section id = "typeParameters"><title>Type Parameters</title>
         <para>
           Classes, functions, and methods can all be parameterized with type
@@ -1223,7 +1308,9 @@ public class Main
           Simple type parameters of the form
         </para>
         <para>
-          <type>&LT;type-variable[, type-variable...]&GT;</type>
+          <type>&LT;<replaceable>type-variable</replaceable>
+	  <optional>, <replaceable>type-variable</replaceable> ...
+	  </optional>&GT;</type>
         </para>
         <para>
           are commonly encountered in Nice, but are a simplified form of a more
@@ -1256,15 +1343,15 @@ public class Main
         </para>
         <para>
           There is also a notation for the same class as the declaring class
-	  of a method: <literal>alike</literal>.
-	  For instance, the following class <literal>Foo</literal> declares
+	  of a method: <type>alike</type>.
+	  For instance, the following class <type>Foo</type> declares
 	   a method <literal>copy</literal>, such that 
 	   <literal>x.copy()</literal>
 	  has the same type as <literal>x</literal>, <literal>x</literal> 
-	  being of any subclass of <literal>Foo</literal>.
+	  being of any subclass of <type>Foo</type>.
         </para>
         <para>
-	<example><title>A copy method with an exact type</title>
+	<example id="ex:copy"><title>A copy method with an exact type</title>
 	<programlisting lang="nice">
 class Foo
 {
@@ -1281,7 +1368,7 @@ class Bar extends Foo
 }
 
 copy(b#Bar) = new Bar(value: b.value, id: generateNewId());
-}</programlisting>
+</programlisting>
         </example>
 	</para>
         <para>

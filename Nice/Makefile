@@ -114,6 +114,7 @@ sourceforge:
 #****************************************************************
 
 bootstrap: parser
+	cd src/gnu/lists && ./withCollections
 	ln -sf nicec bin/nicer
 	mkdir -p classes
 	cd classes; jar xf ../external/java-getopt.jar gnu

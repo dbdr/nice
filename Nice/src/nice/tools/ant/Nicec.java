@@ -281,37 +281,47 @@ public class Nicec extends Task {
 	 */
 	public void execute() throws BuildException {
 	  log("runtime: " + runtime, Project.MSG_VERBOSE);
+          log("Base dir: " + project.getBaseDir(), Project.MSG_VERBOSE);
 
-	  nice.tools.compiler.console.ConsoleOutput console = 
-	    nice.tools.compiler.console.fun.consoleOutput();
-	  Compilation compilation = bossa.modules.fun.createCompilation(console);
-	  if (sourcepath != null)
-	    compilation.sourcePath = sourcepath;
-	  if (destination != null)
-	    compilation.destinationDir = destination.getAbsolutePath();
-	  compilation.packagePath = classpath + (nestedClasspath != null ? File.pathSeparator+nestedClasspath : "");
-	  compilation.output = jar;
-	  compilation.recompileCommandLine = recompile;
-	  compilation.recompileAll = recompile_all;
-	  compilation.skipLink = compile;
-	  compilation.excludeRuntime = exclude_runtime;
-	  compilation.runtimeFile = runtime;
-	  nice.tools.compiler.fun.compile
-	    (compilation, pack, output, native_compiler, editor);
-	  int retval = console.statusCode;
+          String oldUserDir = System.getProperty("user.dir");
+          try {
+            System.setProperty("user.dir", 
+                               project.getBaseDir().getAbsolutePath());
 
-	  switch (retval) {
-	  case nice.tools.compiler.console.fun.ERROR:
-	    throw new BuildException(ERROR_MSG, location);
-	  case nice.tools.compiler.console.fun.BUG:
-	    throw new BuildException(BUG_MSG, location);
-	  case nice.tools.compiler.console.fun.WARNING:
-	    log(WARNING_MSG, Project.MSG_WARN);
-	    break;
-	  case nice.tools.compiler.console.fun.OK:
-	    log(OK_MSG, Project.MSG_INFO);
-	    break;
-	  }
+            nice.tools.compiler.console.ConsoleOutput console = 
+              nice.tools.compiler.console.fun.consoleOutput();
+            Compilation compilation = bossa.modules.fun.createCompilation(console);
+            if (sourcepath != null)
+              compilation.sourcePath = sourcepath;
+            if (destination != null)
+              compilation.destinationDir = destination.getAbsolutePath();
+            compilation.packagePath = classpath + (nestedClasspath != null ? File.pathSeparator+nestedClasspath : "");
+            compilation.output = jar;
+            compilation.recompileCommandLine = recompile;
+            compilation.recompileAll = recompile_all;
+            compilation.skipLink = compile;
+            compilation.excludeRuntime = exclude_runtime;
+            compilation.runtimeFile = runtime;
+            nice.tools.compiler.fun.compile
+              (compilation, pack, output, native_compiler, editor);
+            int retval = console.statusCode;
+
+            switch (retval) {
+            case nice.tools.compiler.console.fun.ERROR:
+              throw new BuildException(ERROR_MSG, location);
+            case nice.tools.compiler.console.fun.BUG:
+              throw new BuildException(BUG_MSG, location);
+            case nice.tools.compiler.console.fun.WARNING:
+              log(WARNING_MSG, Project.MSG_WARN);
+              break;
+            case nice.tools.compiler.console.fun.OK:
+              log(OK_MSG, Project.MSG_INFO);
+              break;
+            }
+          }
+          finally {
+            System.setProperty("user.dir", oldUserDir);
+          }
 	}
 
 

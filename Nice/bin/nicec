@@ -78,10 +78,6 @@ while true; do
 find_home "$scriptName"
 NICEC=${APPHOME}/share/java/nice.jar
 
-if [ "$EMACS" = t ]; then
-  JAVA="${JAVA} -Demacs=true"
-fi
-
 case $progname in
   nicec) 
     CLASSPATH=${NICEC}:${CLASSPATH}

@@ -15,8 +15,12 @@ nice (0.5) unstable; urgency=low
     case-insensivity of the file system.
   * Fixed creation of archive from up-to-date packages stored in jar.
   * Accept anonymous functions that do nothing.
+  * Editor (emacs) mode is now driven by command-line instead of inspecting
+    the EMACS environment variable. This works around a bug in emacs 21.2.1
+    and might be more portable. Also makes it easier to write a nice-mode
+    for other editors without changing the existing code or script.
 
- --
+ -- Daniel Bonniot <bonniot@users.sourceforge.net>  Thu, 18 Apr 2002 14:44:13 +0200
 
 nice (0.0.020405) unstable; urgency=low
 

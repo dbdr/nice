@@ -113,6 +113,9 @@ main(args)
    option('h', "help", "Print help message and exit",
 	  fun()=> help(prg)),
 
+   option('?', "editor", "Tell nicec that it is called by an editor.",
+	  fun()=> { bossa.util.Location.editorMode = true; }),
+
    option('?', "man", "Print man page to stdout",
 	  fun()=> man(prg)),
 

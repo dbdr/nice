@@ -510,7 +510,7 @@ Mode for editing/compiling Nice programs.
 			(if nice-recompile-flag
 			    (if (equal nice-recompile-flag 'all) " -R" " -r"))
 			))))
-	    (concat prog " " (nice-buffer-pkg-name)))
+	    (concat prog " --editor " (nice-buffer-pkg-name)))
     )
     
     ;; Save the current directory

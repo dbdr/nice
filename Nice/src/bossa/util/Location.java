@@ -109,7 +109,7 @@ public class Location implements Located
       else
 	return res;
 
-    if (emacsMode)
+    if (editorMode)
       return 
 	(res.length()>0 ? (res + ":") : "") +
 	startLine + ":" + startColumn;
@@ -160,8 +160,8 @@ public class Location implements Located
   private String abstractLocation = null; // if non-null, overseeds everyting
 
   /****************************************************************
-   * Different behaviour wether compiler is invoked by emacs
+   * Different behaviour wether compiler is invoked by an editor.
    ****************************************************************/
 
-  private static boolean emacsMode = Boolean.getBoolean("emacs");
+  public static boolean editorMode = false;
 }

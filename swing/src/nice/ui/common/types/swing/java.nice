@@ -1,0 +1,199 @@
+package nice.ui.common.types.swing;
+
+// all imports for this package 
+// are defined in this file
+
+import java.awt.*;
+import javax.swing.*;
+import javax.swing.event.*;
+import javax.swing.text.*;
+import javax.swing.tree.*;
+
+
+/**
+ * EVENT INTERFACES SECTION
+ */
+
+// interface AncestorListener
+void ancestorAdded(AncestorListener,AncestorEvent)
+  = native void AncestorListener.ancestorAdded(AncestorEvent);
+void ancestorMoved(AncestorListener,AncestorEvent)
+  = native void AncestorListener.ancestorMoved(AncestorEvent);
+void ancestorRemoved(AncestorListener,AncestorEvent)
+  = native void AncestorListener.ancestorRemoved(AncestorEvent);
+
+// interface CaretListener
+void caretUpdate(CaretListener, CaretEvent)
+  = native void CaretListener.caretUpdate(CaretEvent);
+
+// interface CellEditorListener
+void editingCanceled(CellEditorListener, ChangeEvent)
+  = native void CellEditorListener.editingCanceled(ChangeEvent);
+void editingStopped(CellEditorListener, ChangeEvent)
+  = native void CellEditorListener.editingStopped(ChangeEvent);
+
+// interface ChangeListener
+void stateChanged(ChangeListener, ChangeEvent)
+  = native void ChangeListener.stateChanged(ChangeEvent);
+
+// interface DocumentListener
+void changedUpdate(DocumentListener, DocumentEvent)
+  = native void DocumentListener.changedUpdate(DocumentEvent);
+void insertUpdate(DocumentListener, DocumentEvent)
+  = native void DocumentListener.insertUpdate(DocumentEvent);
+void removeUpdate(DocumentListener, DocumentEvent)
+  = native void DocumentListener.removeUpdate(DocumentEvent);
+
+// interface HyperlinkListener
+void hyperlinkUpdate(HyperlinkListener, HyperlinkEvent)
+  = native void HyperlinkListener.hyperlinkUpdate(HyperlinkEvent);
+
+// interface InternalFrameListener
+void internalFrameActivated(InternalFrameListener, InternalFrameEvent)
+  = native void InternalFrameListener.internalFrameActivated(InternalFrameEvent);
+void internalFrameClosed(InternalFrameListener, InternalFrameEvent)
+  = native void InternalFrameListener.internalFrameClosed(InternalFrameEvent);
+void internalFrameClosing(InternalFrameListener, InternalFrameEvent)
+  = native void InternalFrameListener.internalFrameClosing(InternalFrameEvent);
+void internalFrameDeactivated(InternalFrameListener, InternalFrameEvent)
+  = native void InternalFrameListener.internalFrameDeactivated(InternalFrameEvent);
+void internalFrameDeiconified(InternalFrameListener, InternalFrameEvent)
+  = native void InternalFrameListener.internalFrameDeiconified(InternalFrameEvent);
+void internalFrameIconified(InternalFrameListener, InternalFrameEvent)
+  = native void InternalFrameListener.internalFrameIconified(InternalFrameEvent);
+void internalFrameOpened(InternalFrameListener, InternalFrameEvent)
+  = native void InternalFrameListener.internalFrameOpened(InternalFrameEvent);
+
+// interface ListDataListener
+void contentsChanged(ListDataListener, ListDataEvent)
+  = native void ListDataListener.contentsChanged(ListDataEvent);
+void intervalAdded(ListDataListener, ListDataEvent)
+  = native void ListDataListener.intervalAdded(ListDataEvent);
+void intervalRemoved(ListDataListener, ListDataEvent)
+  = native void ListDataListener.intervalRemoved(ListDataEvent);
+
+// interface ListSelectionListener
+void valueChanged(ListSelectionListener, ListSelectionEvent)
+  = native void ListSelectionListener.valueChanged(ListSelectionEvent);
+
+// interface MenuDragMouseListener
+void menuDragMouseDragged(MenuDragMouseListener, MenuDragMouseEvent)
+  = native void MenuDragMouseListener.menuDragMouseDragged(MenuDragMouseEvent);
+void menuDragMouseEntered(MenuDragMouseListener, MenuDragMouseEvent)
+  = native void MenuDragMouseListener.menuDragMouseEntered(MenuDragMouseEvent);
+void menuDragMouseExited(MenuDragMouseListener, MenuDragMouseEvent)
+  = native void MenuDragMouseListener.menuDragMouseExited(MenuDragMouseEvent);
+void menuDragMouseReleased(MenuDragMouseListener, MenuDragMouseEvent)
+  = native void MenuDragMouseListener.menuDragMouseReleased(MenuDragMouseEvent);  
+
+// interface MenuKeyListener
+void menuKeyPressed(MenuKeyListener, MenuKeyEvent)
+  = native void MenuKeyListener.menuKeyPressed(MenuKeyEvent);
+void menuKeyReleased(MenuKeyListener, MenuKeyEvent)
+  = native void MenuKeyListener.menuKeyReleased(MenuKeyEvent);
+void menuKeyTyped(MenuKeyListener, MenuKeyEvent)
+  = native void MenuKeyListener.menuKeyTyped(MenuKeyEvent);
+
+// interface MenuListener
+void menuCanceled(MenuListener, MenuEvent)
+  = native void MenuListener.menuCanceled(MenuEvent);
+void menuDeselected(MenuListener, MenuEvent)
+  = native void MenuListener.menuDeselected(MenuEvent);
+void menuSelected(MenuListener, MenuEvent)
+  = native void MenuListener.menuSelected(MenuEvent);
+
+// interface PopupMenuListener
+void popupMenuCanceled(PopupMenuListener, PopupMenuEvent)
+  = native void PopupMenuListener.popupMenuCanceled(PopupMenuEvent);
+void popupMenuWillBecomeInvisible(PopupMenuListener, PopupMenuEvent)
+  = native void PopupMenuListener.popupMenuWillBecomeInvisible(PopupMenuEvent);
+void popupMenuWillBecomeVisible(PopupMenuListener, PopupMenuEvent)
+  = native void PopupMenuListener.popupMenuWillBecomeVisible(PopupMenuEvent);
+
+// interface TableColumnModelListener
+void columnAdded(TableColumnModelListener, TableColumnModelEvent)
+  = native void TableColumnModelListener.columnAdded(TableColumnModelEvent);
+void columnMarginChanged(TableColumnModelListener, ChangeEvent)
+  = native void TableColumnModelListener.columnMarginChanged(ChangeEvent);
+void columnMoved(TableColumnModelListener, TableColumnModelEvent)
+  = native void TableColumnModelListener.columnMoved(TableColumnModelEvent);
+void columnRemoved(TableColumnModelListener, TableColumnModelEvent)
+  = native void TableColumnModelListener.columnRemoved(TableColumnModelEvent);
+void columnSelectionChanged(TableColumnModelListener, ListSelectionEvent)
+  = native void TableColumnModelListener.columnSelectionChanged(ListSelectionEvent);
+
+// interface TableModelListener
+void tableChanged(TableModelListener, TableModelEvent)
+  = native void TableModelListener.tableChanged(TableModelEvent);
+
+// interface TreeExpansionListener
+void treeCollapsed(TreeExpansionListener, TreeExpansionEvent)
+  = native void TreeExpansionListener.treeCollapsed(TreeExpansionEvent);
+void treeExpanded(TreeExpansionListener, TreeExpansionEvent)
+  = native void TreeExpansionListener.treeExpanded(TreeExpansionEvent);
+
+// interface TreeModelListener
+void treeNodesChanged(TreeModelListener, TreeModelEvent)
+  = native void TreeModelListener.treeNodesChanged(TreeModelEvent);
+void treeNodesInserted(TreeModelListener, TreeModelEvent)
+  = native void TreeModelListener.treeNodesInserted(TreeModelEvent);
+void treeNodesRemoved(TreeModelListener, TreeModelEvent)
+  = native void TreeModelListener.treeNodesRemoved(TreeModelEvent);
+void treeStructureChanged(TreeModelListener, TreeModelEvent)
+  = native void TreeModelListener.treeStructureChanged(TreeModelEvent);
+
+// interface TreeSelectionListener
+void valueChanged(TreeSelectionListener, TreeSelectionEvent)
+  = native void TreeSelectionListener.valueChanged(TreeSelectionEvent);
+
+// interface TreeWillExpandListener
+void treeWillCollapse(TreeWillExpandListener, TreeExpansionEvent)
+  = native void TreeWillExpandListener.treeWillCollapse(TreeExpansionEvent);
+void treeWillExpand(TreeWillExpandListener, TreeExpansionEvent)
+  = native void TreeWillExpandListener.treeWillExpand(TreeExpansionEvent);
+
+// interface UndoableEditListener
+void undoableEditHappened(UndoableEditListener, UndoableEditEvent)
+  = native void UndoableEditListener.undoableEditHappened(UndoableEditEvent);
+
+
+
+// class JComponent
+void paintComponent(JComponent, Graphics)
+  = native void JComponent.paintComponent(Graphics);
+
+// class DefaultButtonModel
+EventListener[?] getListeners(DefaultButtonModel, Class)
+  = native EventListener[] DefaultButtonModel.getListeners(Class);
+
+// class Timer
+EventListener[?] getListeners(javax.swing.Timer, Class)
+  = native EventListener[] javax.swing.Timer.getListeners(Class);
+
+// class DefaultBoundedRangeModel
+EventListener[?] getListeners(DefaultBoundedRangeModel, Class)
+  = native EventListener[] DefaultBoundedRangeModel.getListeners(Class);
+
+// class DefaultSingleSelectionModel
+EventListener[?] getListeners(DefaultSingleSelectionModel, Class)
+  = native EventListener[] DefaultSingleSelectionModel.getListeners(Class);
+
+// class DefaultCaret
+EventListener[?] getListeners(DefaultCaret, Class)
+  = native EventListener[] DefaultCaret.getListeners(Class);
+
+// class AbstractListModel
+EventListener[?] getListeners(AbstractListModel, Class)
+  = native EventListener[] AbstractListModel.getListeners(Class);
+
+// class DefaultTreeSelectionModel
+EventListener[?] getListeners(DefaultTreeSelectionModel, Class)
+  = native EventListener[] DefaultTreeSelectionModel.getListeners(Class);
+
+// class DefaultTreeModel
+EventListener[?] getListeners(DefaultTreeModel, Class)
+  = native EventListener[] DefaultTreeModel.getListeners(Class);
+
+// class DefaultListSelectionModel
+EventListener[?] getListeners(DefaultListSelectionModel, Class)
+  = native EventListener[] DefaultListSelectionModel.getListeners(Class);

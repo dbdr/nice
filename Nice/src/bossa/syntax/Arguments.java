@@ -240,10 +240,9 @@ public class Arguments
       }
       if (!argnames.isEmpty())
 	return " has an argument named " + argnames.get(0);
-
-      return " has compatible named arguments";
     }
-    return " has " + arguments.length + " arguments";
+    //fall back to default error message
+    return null;
   }
 
   List noMatchByName(FormalParameters parameters)

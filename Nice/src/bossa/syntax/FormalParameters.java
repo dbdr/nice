@@ -500,26 +500,12 @@ public class FormalParameters extends Node
     return Util.map("", ", ", "", parameters);
   }
 
-  public Iterator iterator()
+  public List asList()
   {
     if (parameters != null)
-      return Arrays.asList(parameters).iterator();
+      return Arrays.asList(parameters);
    
-    return new ArrayList().iterator();
-  }
-
-  public List getNamedParameters()
-  {
-    LinkedList res = new LinkedList();
-    for(int i = 0; i < size; i++) 
-      {
-        Parameter param = parameters[i];
-        if (param instanceof NamedParameter)
-          {
-            res.add(parameters[i]);
-          }
-      }
-    return res;
+    return new ArrayList();
   }
 
   public List getRequiredParameters()

@@ -107,7 +107,7 @@ abstract class Constructor extends MethodDeclaration
     //an explanation of the syntax is necessary
     res = new StringBuffer();
     List missing = arguments.missingArgs(parameters);
-    Iterator fieldsToList;
+    List fieldsToList;
 
     if (arguments.size() == 0)
       {
@@ -115,12 +115,12 @@ abstract class Constructor extends MethodDeclaration
           .append(" require initial values.\n");
         res.append(syntaxExample())
           .append("Class ").append(name).append(" has the following fields:\n");
-        fieldsToList = parameters.iterator();
+        fieldsToList = parameters.asList();
       }
     else if (missing.size() > 0)
       {
         res.append("The following fields require initial values:\n");
-        fieldsToList = missing.iterator();
+        fieldsToList = missing;
       }
     else
       {
@@ -128,12 +128,13 @@ abstract class Constructor extends MethodDeclaration
           .append(name)
           .append(".\n")
           .append("The constructor accepts the following arguments:\n" );
-        fieldsToList = parameters.iterator();
+        fieldsToList = parameters.asList();
       }
-    while (fieldsToList.hasNext())
+    Iterator fieldsIt = fieldsToList.iterator();
+    while (fieldsIt.hasNext())
       {
         res.append("  ")
-          .append(fieldsToList.next())
+          .append(fieldsIt.next())
           .append("\n");
       }
     return res.toString();

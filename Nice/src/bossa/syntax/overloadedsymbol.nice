@@ -102,7 +102,7 @@ public class OverloadedSymbolExp extends Expression
               return res;
           }
 
-        User.error(this, this.noMatchError(removed, arguments));
+        User.error(this, this.noMatchByNameError(removed, arguments));
       }
 
     // SECOND PASS: check argument types
@@ -148,14 +148,7 @@ public class OverloadedSymbolExp extends Expression
               return res;
           }
 
-        if (removed.size() == 1)
-          User.error(this, "Arguments " + arguments.printTypes() +
-                     " do not fit:\n" + removed[0]);
-        else
-          User.error(this, "No possible call for " + ident +
-                     ".\nArguments: " + arguments.printTypes() +
-                     "\nPossibilities:\n" +
-                     Util.map("", "\n", "", removed.toArray()));
+        User.error(this, this.noMatchError(removed, arguments));
       }
 
     removeNonMinimal(symbols, arguments);
@@ -379,7 +372,7 @@ public class OverloadedSymbolExp extends Expression
    ****************************************************************/
 
   /** No method in removed matched these arguments. */
-  private String noMatchError(List<VarSymbol> removed, Arguments arguments)
+  private String noMatchByNameError(List<VarSymbol> removed, Arguments arguments)
   {
     if (removed.size() == 0)
       return "No method has name " + ident;
@@ -395,7 +388,23 @@ public class OverloadedSymbolExp extends Expression
 	return sym.explainWhyMatchFails(arguments);
       }
 
-    return "No method with name " + ident + arguments.explainNoMatch(removed);
+    let reason = arguments.explainNoMatch(removed);
+    if (reason != null)
+      return "No method with name " + ident + reason;
+
+    return this.noMatchError(removed, arguments);
+  }
+
+  private String noMatchError(List<VarSymbol> removed, Arguments arguments)
+  {
+    if (removed.size() == 1)
+      return "Arguments " + arguments.printTypes() +
+                     " do not fit:\n" + removed[0];
+     else
+       return "No possible call for " + ident +
+                     ".\nArguments: " + arguments.printTypes() +
+                     "\nPossibilities:\n" +
+                     Util.map("", "\n", "", removed.toArray());
   }
 
   /** No symbol in removed had the expected type. */

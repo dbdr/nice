@@ -12,7 +12,7 @@
 
 // File    : Node.java
 // Created : Thu Jul 08 10:24:56 1999 by bonniot
-//$Modified: Tue Nov 16 19:32:57 1999 by bonniot $
+//$Modified: Wed Nov 17 18:22:30 1999 by bonniot $
 
 package bossa.syntax;
 
@@ -130,7 +130,7 @@ abstract public class Node
   /**
    * Scopes shared by all modules.
    */
-  
+
   private static final VarScope globalScope=new VarScope(null);
   private static final TypeScope globalTypeScope;
   static

@@ -12,7 +12,7 @@
 
 // File    : ClassDefinition.java
 // Created : Thu Jul 01 11:25:14 1999 by bonniot
-//$Modified: Mon Nov 15 20:04:18 1999 by bonniot $
+//$Modified: Tue Nov 23 17:48:10 1999 by bonniot $
 
 package bossa.syntax;
 
@@ -52,7 +52,7 @@ public class ClassDefinition extends Node
 
     this.tc=new TypeConstructor(this);
     addTypeSymbol(this.tc);
-            
+    
     if(isSharp)
       // The sharp class must not declare children, 
       // since the associated class has already done so.
@@ -62,6 +62,9 @@ public class ClassDefinition extends Node
 	this.abstractions=abstractions;
 	this.methods=methods;
 	addChildren(computeAccessMethods(this.fields));
+
+	classType = gnu.bytecode.ClassType.make
+	  (name.toString().substring(1));
       }
     else
       {
@@ -86,6 +89,7 @@ public class ClassDefinition extends Node
   {
     if(isFinal || isAbstract)
       return new ArrayList(0);
+
     Collection res=new ArrayList(1);
     LocatedString name=new LocatedString("#"+this.name.content,this.name.location());
     List parent=new ArrayList(1);
@@ -93,8 +97,18 @@ public class ClassDefinition extends Node
     ClassDefinition c=new ClassDefinition
       (name,true,false,true,typeParameters,parent,
        new LinkedList(),new LinkedList(),fields,methods);
+    associatedConcreteClass = c;
+    concreteClasses.add(c);
+    
     res.add(c);
     return res;
+  }
+
+  static private List concreteClasses = new LinkedList();
+
+  static public ListIterator listConcreteClasses()
+  {
+    return concreteClasses.listIterator();
   }
   
   /****************************************************************
@@ -108,7 +122,10 @@ public class ClassDefinition extends Node
       {
 	Field f=(Field)i.next();
 	if(f.isLocal==local)
-	  result.add(f);
+	  {
+	    result.add(f);
+	    addChild(f.sym);
+	  }
       }
     return result;
   }
@@ -137,8 +154,7 @@ public class ClassDefinition extends Node
 	MonoSymbol s=f.sym;
 	List params=new LinkedList();
 	params.add(getMonotype());
-	MethodDefinition m=new MethodDefinition(s.name,new Constraint(typeParameters,null),s.type,params);
-	m.isFieldAccess=true;
+	MethodDefinition m=new MethodDefinition(s.name,new Constraint(typeParameters,null),s.type,params,true);
 	res.add(m);
       }
     return res;
@@ -202,7 +218,7 @@ public class ClassDefinition extends Node
       for(Iterator i=specialTypeConstructors.iterator();i.hasNext();)
 	{
 	  TypeConstructor tc = (TypeConstructor)i.next();
-	  bossa.typing.Typing.introduce(tc);
+	  Typing.introduce(tc);
 	  Typing.assertImp(tc,InterfaceDefinition.top(0),true);
 	}
     }
@@ -250,6 +266,117 @@ public class ClassDefinition extends Node
   }
   
   /****************************************************************
+   * Class hierarchy
+   ****************************************************************/
+
+  // Bossa has multiple inheritance, java has not.
+  // So we choose a class that will be described as the super-class
+  // in the bytecode (javaSuperClass)
+
+  // A child class of A whose javaSuperClass is not A
+  // is called an "illegitimate" child
+
+  private ClassType classType;
+  
+  ClassDefinition superClass(int n)
+  {
+    return ((TypeConstructor) extensions.get(n)).definition;
+  }
+  
+  /**
+   * Our super-class in the bytecode.
+   */
+  ClassDefinition distinguishedSuperClass()
+  {
+    if(extensions.size()==0)
+      return null;
+    else
+      return superClass(0);
+  }
+  
+  static ClassType javaClass(ClassDefinition c)
+  {
+    if(c==null)
+      return gnu.bytecode.Type.pointer_type;
+    
+    if(c.associatedConcreteClass!=null)
+      return javaClass(c.associatedConcreteClass);
+    else
+      return c.classType;
+  }
+  
+  ClassType javaSuperClass()
+  {
+    if(isSharp)
+      return superClass(0).javaSuperClass();
+    
+    return javaClass(distinguishedSuperClass());
+  }
+  
+  /**
+   * illegitimateChildren is a list of ClassDefinition.
+   * It is a list of classes that are below 'this'
+   * but that have not 'this' in their (bytecode) super chain.
+   * 
+   * It would be possible to minimize this list (TODO !)
+   */
+  private List /* of ClassDefinition */ illegitimateChildren = new LinkedList();
+  private List /* of ClassDefinition */ illegitimateParents  = new LinkedList();
+
+  private void addIllegitimateChild(ClassDefinition child)
+  {
+    illegitimateChildren.add(child);
+    child.illegitimateParents.add(this);
+  }
+  
+  /**
+   * Computes the minimal set S of classes below this concrete class C
+   * such that for all concrete D,
+   *
+   * the test D<=C (where <= defined by Bossa (multiple-)inheritance)
+   *
+   * is equivalent to 
+   * 
+   * the test D<C or D<s for some s in S
+   * (where < is the single-inheritance relation in the bytecode)
+   *
+   */
+  public void computeIllegitimateChildren()
+  {
+    if(!isSharp)
+      return;
+    
+    // We are sharp, let's take our immediate parent
+    ClassDefinition me = superClass(0);
+    
+    for(Iterator i = listConcreteClasses();
+	i.hasNext();)
+      {
+	ClassDefinition concrete = (ClassDefinition) i.next();
+	ClassDefinition that = concrete.superClass(0);
+	
+	if(
+	   that!=me &&
+	   this.tc.getKind()==that.tc.getKind() &&
+	   Typing.testRigidLeq(that.tc,me.tc) &&
+	   !Typing.testRigidLeq(that.distinguishedSuperClass().tc,me.tc)
+	   )
+	  me.addIllegitimateChild(concrete);
+      }  
+
+    if(Debug.linkTests && me.illegitimateChildren.size()>0)
+      Debug.println(me.name+" has illegitimate childs "+
+		    Util.map("",", ","",me.illegitimateChildren));
+  }
+  
+  // Illegitimate children computations are done while typechecking
+
+  void typecheck()
+  {
+    computeIllegitimateChildren();
+  }
+
+  /****************************************************************
    * Code generation
    ****************************************************************/
 
@@ -258,9 +385,14 @@ public class ClassDefinition extends Node
     if(!isSharp)
       return;
     
-    ClassType c=ClassType.make(module.className(name.toString().substring(1)),gnu.bytecode.Type.pointer_type);
-    addFields(c);    
-    module.addClass(c);
+    classType.setSuper(javaSuperClass());
+    addFields(classType);
+    superClass(0).addFields(classType);
+    for(Iterator i = illegitimateParents.iterator();
+	i.hasNext();)
+      ((ClassDefinition) i.next()).addFields(classType);
+    
+    module.addClass(classType);
   }
 
   private void addFields(ClassType c)
@@ -271,13 +403,9 @@ public class ClassDefinition extends Node
 	Field f=(Field)i.next();
 	gnu.bytecode.Field field=
 	  c.addField(f.sym.name.toString(),
-		     Type.pointer_type,
+		     f.sym.type.getJavaType(),
 		     Access.PUBLIC);
-	c.setSuper(Type.pointer_type);
       }
-    for(Iterator i=extensions.iterator();
-	i.hasNext();)
-      ((TypeConstructor)i.next()).definition.addFields(c);
   }
   
   /****************************************************************
@@ -316,4 +444,6 @@ public class ClassDefinition extends Node
   private boolean isFinal;
   boolean isAbstract;
   boolean isSharp; // This class is a #A (not directly visible to the user)
+
+  private ClassDefinition associatedConcreteClass; // non-null if !isSharp
 }

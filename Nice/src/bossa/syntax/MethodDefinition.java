@@ -12,7 +12,7 @@
 
 // File    : MethodDefinition.java
 // Created : Thu Jul 01 18:12:46 1999 by bonniot
-//$Modified: Mon Nov 15 19:12:56 1999 by bonniot $
+//$Modified: Thu Nov 18 18:32:26 1999 by bonniot $
 
 package bossa.syntax;
 
@@ -67,9 +67,20 @@ public class MethodDefinition extends PolySymbol implements Definition
   public MethodDefinition(LocatedString name,
 			  Constraint constraint,
 			  Monotype returnType,
-			  List parameters)
+			  List parameters,
+			  boolean isFieldAccess)
   {
     this(null,name,constraint,returnType,parameters);
+    this.fieldAccess=isFieldAccess;
+  }
+
+  public MethodDefinition(LocatedString name,
+			  Constraint constraint,
+			  Monotype returnType,
+			  List parameters
+			  )
+  {
+    this(name,constraint,returnType,parameters,false);
   }
 
   public Collection associatedDefinitions()
@@ -198,5 +209,14 @@ public class MethodDefinition extends PolySymbol implements Definition
 
   private ClassDefinition memberOf;
   protected int arity;
-  boolean isFieldAccess=false; //true if this method represent the access to the field of an object.
+
+  private boolean fieldAccess=false; 
+
+  /** 
+   * true if this method represent the access to the field of an object.
+   */
+  public boolean isFieldAccess()
+  {
+    return fieldAccess;
+  }
 }

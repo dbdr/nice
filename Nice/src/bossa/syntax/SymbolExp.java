@@ -12,7 +12,7 @@
 
 // File    : SymbolExpr.java
 // Created : Thu Jul 08 12:20:59 1999 by bonniot
-//$Modified: Mon Nov 08 18:52:02 1999 by bonniot $
+//$Modified: Thu Nov 18 18:30:53 1999 by bonniot $
 
 package bossa.syntax;
 
@@ -44,7 +44,7 @@ public class SymbolExp extends Expression
   boolean isFieldAccess()
   {
     return symbol instanceof MethodDefinition
-      && ((MethodDefinition)symbol).isFieldAccess;
+      && ((MethodDefinition)symbol).isFieldAccess();
   }
   
   void computeType()

@@ -12,7 +12,7 @@
 
 // File    : Module.java
 // Created : Wed Oct 13 16:09:47 1999 by bonniot
-//$Modified: Tue Nov 16 19:41:05 1999 by bonniot $
+//$Modified: Tue Nov 23 17:40:53 1999 by bonniot $
 
 package bossa.modules;
 
@@ -61,6 +61,7 @@ public class Module
     }
     
     definitions.typechecking();
+    
     if(Debug.passes) Debug.println("Generating code");
     generateCode();
 

@@ -1,4 +1,4 @@
-PROC=xsltproc
+PROC=xsltproc --nonet
 STYLEDIR=/usr/share/sgml/docbook/custom/website/2.0b1/xsl
 STYLESHEET=common.xsl
 STYLEOPT=

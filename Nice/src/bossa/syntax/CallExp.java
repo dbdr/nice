@@ -160,9 +160,20 @@ public class CallExp extends Expression
       throw new ReportErrorEx("This function may be null");
     }
     
-    m = Types.rawType(m).equivalent();
+    m = Types.rawType(m);
+
+    // The function might not be of a functional kind.
+    // Only usefull for null?
+    // First reset the kind, that comes from a previous typing.
+    if (m.getKind() == mlsub.typing.lowlevel.Engine.variablesConstraint)
+      m.setKind(null);
+    if (m.getKind() == null)
+      m.setKind(FunTypeKind.get(parameters.length));
+
+    m = m.equivalent();
+
     if (!(m instanceof FunType))
-      System.out.println("Not a function" + m + m.getClass());
+      throw new ReportErrorEx("Not a function");
 
     FunType funt = (FunType) m;
 

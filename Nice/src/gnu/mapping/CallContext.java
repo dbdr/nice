@@ -1,5 +1,5 @@
  package gnu.mapping;
-import gnu.math.*;
+//import gnu.math.*;
 import gnu.lists.*;
 
 /** A procedure activation stack (when compiled with explicit stacks). */
@@ -62,8 +62,8 @@ public class CallContext implements Runnable
           case ARG_IN_VALUE2:  return value2;
           case ARG_IN_VALUE3:  return value3;
           case ARG_IN_VALUE4:  return value4;
-          case ARG_IN_IVALUE1:  return IntNum.make(ivalue1);
-          case ARG_IN_IVALUE2:  return IntNum.make(ivalue2);
+          //case ARG_IN_IVALUE1:  return IntNum.make(ivalue1);
+          //case ARG_IN_IVALUE2:  return IntNum.make(ivalue2);
           }
       }
     return values[i];

@@ -13,7 +13,7 @@ public class KawaConvert extends Convert
   public static Convert getInstance() { return instance; }
 
   public static void setInstance(Convert value) { instance = value; };
-
+/*
   public Object charToObject(char ch)
   {
     return gnu.text.Char.make(ch);
@@ -73,6 +73,6 @@ public class KawaConvert extends Convert
   {
     return gnu.math.DFloNum.make(value);
   }
-
+*/
 
 }

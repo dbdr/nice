@@ -317,7 +317,8 @@ public abstract class Interpreter
 
   public Object coerceToObject(int val)
   {
-    return gnu.math.IntNum.make(val);
+    //return gnu.math.IntNum.make(val);
+    return null;
   }
 
   public Procedure getPrompter()

@@ -144,10 +144,10 @@ class Info
   JavaList<VarSymbol> globalLookup(LocatedString);
   globalLookup(name) = javaList(this.globalVarScope.lookup(name));
 
-  TypeSymbol lookupType(String);
+  TypeSymbol lookupType(LocatedString);
   lookupType(name)
   {
-    TypeSymbol res = this.typeVars[name];
+    TypeSymbol res = this.typeVars[name.toString()];
     if (res != null)
       return res;
     else
@@ -164,7 +164,7 @@ class Info
   void addVars(Sequence<MonoSymbol>);
   addVars(symbols) = symbols.iter(fun(MonoSymbol s)=>this.addVar(s));
   
-  void addTypeVars(List<TypeSymbol>);
+  void addTypeVars(Sequence<TypeSymbol>);
   addTypeVars(symbols) = symbols.iter(fun(TypeSymbol s)=>this.typeVars[s.toString()]=s);
 }
 
@@ -273,23 +273,31 @@ analyse(e@FunExp, info)
 {
   info.beginInner(true);
   info.begin();
+
+  if (e.constraint != Constraint.True)
+    {
+      e.cst = e.constraint.resolveToLowlevel();
+      addTypeVars(info, e.cst.binders());
+    }
+  e.constraint = null;
+
   addVars(info, e.formals);
+
   analyse(e.body, info);
   if (!info.getUnreachable() 
       && !e.inferredReturnType().toString().equals("nice.lang.void"))
     bossa.util.User.error(e, "Missing return statement");
+
   info.end();
   info.endInner();
   return e;
 }
 
-analyse(e@IdentExp, i)
+analyse(e@IdentExp, info)
 {
-  String name = e.ident.toString();
-  
   if (!e.infix) // infix symbols can only come from the global scope
     {
-      VarSymbol s = i.lookup(name);
+      VarSymbol s = info.lookup(e.ident.toString());
       if (s != null)
 	if (!e.alwaysOverloadedSymbol)
 	  return new SymbolExp(s);
@@ -301,7 +309,7 @@ analyse(e@IdentExp, i)
   if (e.infix)
     symbols = javaList(Node.getGlobalScope().lookup(e.ident));
   else
-    symbols = i.globalLookup(e.ident);
+    symbols = info.globalLookup(e.ident);
 
   if (symbols != null && symbols.size() > 0)
     if (!e.alwaysOverloadedSymbol() && symbols.size() == 1)
@@ -333,9 +341,9 @@ analyse(e@IfExp, info)
   return e;
 }
 
-analyse(e@IncrementExp, i)
+analyse(e@IncrementExp, info)
 {
-  e.variable = analyse(e.variable, i);
+  e.variable = analyse(e.variable, info);
   return e;
 }
 

@@ -546,15 +546,24 @@ typecheck(decl@Block.LocalVariable)
 
   MonoSymbol target = notNull(decl.left());
 
-  try{
-    decl.value = checkAssignment(notNull(target.getType()), value);
-  }
-  catch(TypingEx t){
-    if (notNullError(t, target, value.toString()))
-      throw assignmentError(target, target.name.toString(), 
-			    String.valueOf(target.getMonotype), 
-			    value);
-  }
+  ?mlsub.typing.Monotype type = target.getMonotype();
+  if (type == null)
+    {
+      value.typecheck();
+      target.type = checkMonomorphic(value.getType(), decl);
+    }
+  else
+    {
+      try{
+	decl.value = checkAssignment(new mlsub.typing.Polytype(type), value);
+      } 
+      catch(TypingEx t){
+	if (notNullError(t, target, value.toString()))
+	  throw assignmentError(target, target.name.toString(), 
+				String.valueOf(target.getMonotype), 
+				value);
+      }
+    }
 }
 
 typecheck(decl@Block.LocalConstant)
@@ -563,19 +572,7 @@ typecheck(decl@Block.LocalConstant)
   mlsub.typing.Polytype type = notNull(decl.value).getType();
   notNull(decl.left).type = type;
 
-  // Check that the type is not polymorphic, as this could be unsafe.
-  if (type.isMonomorphic())
-    return;
-  
-  type.simplify();
-  if (type.isMonomorphic())
-    return;
-  
-  throw new bossa.util.UserError
-    (decl, 
-     "The value has a polymorphic type: " + type +
-     "\nOmitting the type here is not supported by Nice yet." + 
-     "\nPlease declare the monomorphic type of " + decl.getName());
+  checkMonomorphic(type, decl);
 }
 
 typecheck(decl@Block.LocalFunction)

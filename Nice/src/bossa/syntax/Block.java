@@ -95,6 +95,8 @@ public class Block extends Statement
        We have to be careful about the order, so that dependencies like above
        work as expected.
     */
+    public abstract void addNext(LocatedString name, Expression value);
+
     LocalValue next, last;
   }
 

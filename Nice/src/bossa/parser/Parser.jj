@@ -985,7 +985,7 @@ void getField(NiceClass c, List fields):
       { isFinal=true;
 	if (t!=null) 
           User.warning(new Location(t),
-		"'const' is deprecated use 'final' instead.");
+		"'const' is deprecated. Use 'final' instead.");
       }
     ]
     )
@@ -2374,7 +2374,7 @@ Statement LocalDeclaration() :
     (
       (t="final" | t="const")
         {User.warning(new Location(t),
-		"'"+t.toString()+"' is deprecated use 'let' instead.");
+		"'"+t.toString()+"' is deprecated. Use 'let' instead.");
         }
     | "let"
     | "var" {constant = false;}
@@ -2396,16 +2396,18 @@ Statement LocalDeclaration() :
     (
       (t="final" | t="const") 
         {User.warning(new Location(t),
-		"'"+t.toString()+"' is deprecated use 'let' instead.");
+		"'"+t.toString()+"' is deprecated. Use 'let' instead.");
 	}
     | "let"
     | t="var" {constant = false;}
     )
     id=ident()
     [ "=" e=Expression() ]
-    { Block.LocalConstant res;
+    { Block.LocalValue res;
       if (constant) {res = new Block.LocalConstant(id,e);}
-      else {throw new UserError(new Location(t), "'var' without type not implemented yet");}
+      else if (e != null) 
+        res = new Block.LocalVariable(id, null, constant, e);
+      else {throw new UserError(new Location(t), "'var' without type nor value is not implemented (yet)");}
     }
     ( "," id=ident() "=" e=Expression() { res.addNext(id,e); } )*
     ";" 

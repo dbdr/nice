@@ -3,3 +3,6 @@
 /// FAIL
   int x = 0;
   x = x /*/// FAIL HERE */ && x = x;
+
+/// FAIL
+  /*/// FAIL HERE */ [ "0" ].map(String s => println(s));

@@ -44,7 +44,12 @@ public class AST extends Node
     if (children != null)
       for(Iterator i = children.iterator();i.hasNext();)
 	try{
-	  ((Node)i.next()).doResolve();
+	  try{
+	    ((Node)i.next()).doResolve();
+	  }
+	  catch(UnknownIdentException e){
+	    bossa.util.User.error(e.ident, e.ident + " is not declared");
+	  }
 	}
 	catch(UserError ex){
 	  nice.tools.compiler.OutputMessages.error(ex.getMessage());

@@ -78,7 +78,7 @@ public final class K0 {
     this.negTagged = new BitVector();
     this.interfaces = new Vector();
     if (debugK0) {
-      S.dbg.println("created K0 #" + ID);
+      System.err.println("created K0 #" + ID);
     }
   }
 
@@ -494,7 +494,7 @@ public final class K0 {
     Interface iface = new Interface(this, iid);
     interfaces.addElement(iface);
     if (debugK0) {
-      S.dbg.println("newInterface in #" + ID + " -> " + iid);
+      System.err.println("newInterface in #" + ID + " -> " + iid);
     }
     return iid;
   }
@@ -563,7 +563,7 @@ public final class K0 {
     computeInitialArrows();
     
     if(debugK0)
-      S.dbg.println("Initial Context (saturated) "+getName()+":\n" +
+      System.err.println("Initial Context (saturated) "+getName()+":\n" +
 		    this + "\n" + 
 		    dumpInterfaces() + "\n");
     
@@ -576,8 +576,8 @@ public final class K0 {
     hasBeenInitialized=false;
 
     if(m != m0)
-      S.dbg.println("releaseInitialContext should be called when in first rigid context");
-    
+      System.err.println("releaseInitialContext should be called when in first rigid context");
+
     m0 = m = 0;
   }
   
@@ -604,7 +604,7 @@ public final class K0 {
   // this method makes no effort to report refined unsatisfiability
   private void indexImplements0(int x, int iid) throws LowlevelUnsatisfiable {
     if (debugK0) {
-      S.dbg.println("#" + ID + " -> " + indexToString(x) + ": " + interfaceToString(iid));
+      System.err.println("#" + ID + " -> " + indexToString(x) + ": " + interfaceToString(iid));
     }
     Interface iface = getInterface(iid);
     if (iface.implementors.get(x)) {
@@ -665,7 +665,7 @@ public final class K0 {
   // in case of rigid clash
   private void leq0(int x1, int x2) throws LowlevelUnsatisfiable {
     if (debugK0) {
-      S.dbg.println("#" + ID + " -> " + indexToString(x1) + " <: " + indexToString(x2));
+      System.err.println("#" + ID + " -> " + indexToString(x1) + " <: " + indexToString(x2));
     }
     if (x1 == x2) { return; }
     if (C.get(x1, x2)) { return; }
@@ -707,9 +707,9 @@ public final class K0 {
   // need to optimize this method.
   private LowlevelUnsatisfiable refine(LowlevelUnsatisfiable e) {
     if (K0.debugK0) {
-      S.dbg.println("Trying to refine " + e);
-      S.dbg.println("The constraint is " + this.toString());
-      S.dbg.println("The rigid constraint is " + dumpRigid());
+      System.err.println("Trying to refine " + e);
+      System.err.println("The constraint is " + this.toString());
+      System.err.println("The rigid constraint is " + dumpRigid());
       e.printStackTrace();
     }
     if (e instanceof LowlevelRigidClash
@@ -831,9 +831,9 @@ public final class K0 {
       }
     } else {
       if(debugK0){
-	S.dbg.println("Reducing domain of "+indexToString(x));
-	S.dbg.println("from "+domains.getDomain(x));
-	S.dbg.println("with "+set);
+	System.err.println("Reducing domain of "+indexToString(x));
+	System.err.println("from "+domains.getDomain(x));
+	System.err.println("with "+set);
       }
       domains.reduce(x, unit, set);
     }
@@ -963,7 +963,7 @@ public final class K0 {
 	  throw new LowlevelUnsatisfiable("Node "+approx+" and "+x+" are uncomparable and both implement "+ j +
 					  " above "+abs);
     if(debugK0) 
-      S.dbg.println("Initial approximation for " +
+      System.err.println("Initial approximation for " +
 		    j + ": " +
 		    indexToString(abs) + " -> " + 
 		    indexToString(approx));
@@ -993,7 +993,7 @@ public final class K0 {
 		    {
 		      i.setApprox(node,approx);
 		      if(debugK0) 
-			S.dbg.println("Approximation for "+iid+": "+
+			System.err.println("Approximation for "+iid+": "+
 				      indexToString(node)+" -> "
 				      +indexToString(approx));
 		    }
@@ -1040,7 +1040,7 @@ public final class K0 {
 		      if(!leq.get(n1,p))
 			 {
 			   if(debugK0) 
-			     S.dbg.println("Abs rule applied : "+
+			     System.err.println("Abs rule applied : "+
 					   indexToString(n1)+" < "+indexToString(p)+
 					   " using "+indexToString(node)+
 					   " for interface "+interfaceToString(iid));
@@ -1094,8 +1094,8 @@ public final class K0 {
     Tt.closure();
 
     if(debugK0){
-      S.dbg.println(toString());
-      S.dbg.println(domainsToString());
+      System.err.println(toString());
+      System.err.println(domainsToString());
     }
     
     for (int i = 0; i < n; i++) {
@@ -1385,7 +1385,7 @@ public final class K0 {
       mark();
     }
     if (debugK0) {
-      S.dbg.println("backtracked #" + ID);
+      System.err.println("backtracked #" + ID);
     }
   }
 
@@ -1490,7 +1490,7 @@ public final class K0 {
     weakMarkedSize = n;
     weakMarkedM = m;
     if (debugK0) {
-      S.dbg.println("weakMark'ed");
+      System.err.println("weakMark'ed");
     }
   }
   public void weakBacktrack() {
@@ -1514,7 +1514,7 @@ public final class K0 {
     }
     */
     if (debugK0) {
-      S.dbg.println("weakBacktrack'ed");
+      System.err.println("weakBacktrack'ed");
     }
   }
 
@@ -1575,7 +1575,7 @@ public final class K0 {
         return;
       }
       if (S.debugSimpl) {
-        S.dbg.println("SIMPL: start simplification");
+        System.err.println("SIMPL: start simplification");
       }
       BitVector simplified = new BitVector(n);
       simplified.fill(n);
@@ -1635,7 +1635,7 @@ public final class K0 {
 
     private void computeInitialDomains() {
       if (S.debugSimpl) {
-        S.dbg.println("SIMPL: computing initial domains");
+        System.err.println("SIMPL: computing initial domains");
       }
       // 
       // Compute the initial value of D(x) for all simplified variable x
@@ -1698,7 +1698,7 @@ public final class K0 {
         }
       }
       if (S.debugSimpl) {
-        S.dbg.println("SIMPL: initial domains are : " + domainsToString());
+        System.err.println("SIMPL: initial domains are : " + domainsToString());
       }
     }
 
@@ -1749,18 +1749,18 @@ public final class K0 {
           DomainVector savedDomains = (DomainVector)Sdomains.clone();
           try {
             if (S.debugSimpl) {
-              S.dbg.println("Try excluding " + excludedA);
+              System.err.println("Try excluding " + excludedA);
             }
             Sdomains.exclude(excludedA);
             if (S.debugSimpl) {
-              S.dbg.println("Satisfying with " + Sdomains.dump());
+              System.err.println("Satisfying with " + Sdomains.dump());
             }
             findSolution(strategy, solution);
             return excludedA;
           }
           catch (LowlevelUnsatisfiable e) {
             if (S.debugSimpl) {
-              S.dbg.println("Failed");
+              System.err.println("Failed");
             }
             // try another value
           }
@@ -1779,13 +1779,13 @@ public final class K0 {
      **/
     private void simplifyIndex(int x, int[] solution, int[] nker) {
       if (S.debugSimpl) {
-        S.dbg.println("x = " + x + " nker[x - initN] = " + nker[x - initN] + " garbage.get(x) = " + garbage.get(x));
+        System.err.println("x = " + x + " nker[x - initN] = " + nker[x - initN] + " garbage.get(x) = " + garbage.get(x));
       }
       while (x >= initN && simplified.get(x) && nker[x - initN] == 0) {
         // OK, x is not in the codomain of sigma, we can eliminate it
 
         if (S.debugSimpl) {
-          S.dbg.println("Eliminate " + x);
+          System.err.println("Eliminate " + x);
         }
         try {
           //
@@ -1833,7 +1833,7 @@ public final class K0 {
             S.assert(S.a&& sx >= 0);
             // discard x by merging with sx
             if (S.debugSimpl) {
-              S.dbg.println("Merge " + x + " and " + sx);
+              System.err.println("Merge " + x + " and " + sx);
             }
             if (simplified.get(sx)) {
               if (posTagged(x) && !posTagged(sx)) {
@@ -1884,7 +1884,7 @@ public final class K0 {
     private void reduce(BitMatrix C, BitMatrix R, BitMatrix Rt) {
       BitVector garbage = K0.this.garbage;
       if (S.debugSimpl) {
-        S.dbg.println("reduce C = " + C + ", R = " + R + ", garbage = " + garbage);
+        System.err.println("reduce C = " + C + ", R = " + R + ", garbage = " + garbage);
       }
       for (int k = 0; k < n; k++) {
         if (!garbage.get(k)) {
@@ -1910,7 +1910,7 @@ public final class K0 {
         }
       }
       if (S.debugSimpl) {
-        S.dbg.println("reduced C = " + C + ", R = " + R + ", garbage = " + garbage);
+        System.err.println("reduced C = " + C + ", R = " + R + ", garbage = " + garbage);
       }
     }
 
@@ -1955,13 +1955,13 @@ public final class K0 {
      **/
     void reduce() {
       if (S.debugSimpl) {
-        S.dbg.println("starting reduction: K = " + K0.this);
+        System.err.println("starting reduction: K = " + K0.this);
       }
       reduce(C, R, Rt);
       reduce(Ct, Rt, R);
       reduceImplements();
       if (S.debugSimpl) {
-        S.dbg.println("finished reduction: K = " + K0.this);
+        System.err.println("finished reduction: K = " + K0.this);
       }
     }
     
@@ -1997,27 +1997,27 @@ public final class K0 {
 	    }
 	  }
           if (S.debugSimpl) {
-            S.dbg.println("Try to simplify " + K0.this.toString());
-            S.dbg.println("with domains " + Sdomains.dump());
+            System.err.println("Try to simplify " + K0.this.toString());
+            System.err.println("with domains " + Sdomains.dump());
           }
           excludedA = findNonSurjective(excludedA, strategy, solution);
           if (S.debugSimpl) {
-            S.dbg.print(" sigma = {");
+            System.err.print(" sigma = {");
             Separator sep = new Separator(", ");
             for (int x = initN; x < n; x++) {
               if (Sdomains.getDomain(x) != null) {
-                S.dbg.print(sep);
-                S.dbg.print(indexToString(x));
-                S.dbg.print(" -> ");
+                System.err.print(sep);
+                System.err.print(indexToString(x));
+                System.err.print(" -> ");
                 int sx = solution[x-initN];
                 if (sx == -1) {
-                  S.dbg.print("unit");
+                  System.err.print("unit");
                 } else {
-                  S.dbg.print(indexToString(sx));
+                  System.err.print(indexToString(sx));
                 }
               }
             }
-            S.dbg.println("}");
+            System.err.println("}");
           }
           simplifyOnce(solution);
         }

@@ -1,5 +1,5 @@
 proc identifier { name identifier } {
-    set data "class $name {int ${identifier} = 0;}\n"
+    set data "main(args) {int ${identifier} = 0;}\n"
     return [compile [saveas $name.java $data]]
 }
 

@@ -22,6 +22,7 @@ nice (0.9.9)
       class BitField implements List<boolean> { ... }
 
   * Improved speed of coverage tests for some methods.
+  * Much improved nicedoc tool.
   * Removed the '--strict' compiler option.
   * Underscores are allowed and ignored in literal numbers. example:
       long x = 1_000_123_000_456;
@@ -47,7 +48,7 @@ nice (0.9.9)
 	Several more options are available, an update to the manual will
 	reflect this.
 
- -- Sat,  4 Sep 2004 21:10:36 +0200
+ -- Wed, 22 Sep 2004 01:53:29 +0200
 
 nice (0.9.8)
 

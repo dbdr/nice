@@ -12,7 +12,7 @@
 
 // File    : Internal.java
 // Created : Wed Jul 07 18:23:19 1999 by bonniot
-//$Modified: Mon Jun 19 14:39:09 2000 by Daniel Bonniot $
+//$Modified: Wed Oct 04 11:47:18 2000 by Daniel Bonniot $
 // Description : Internal errors...
 
 package bossa.util;
@@ -46,13 +46,13 @@ public final class Internal
   {
     if(Debug.alwaysDumpStack)
       printStackTrace();
-    System.out.println("[Internal warning] "+message);
+    nice.tools.compiler.OutputMessages.warning("[Internal warning] "+message);
   }
 
   public static void error(Located loc, String message, String dbgMsg)
   {
     if(Debug.powerUser)
-      error(loc, message+dbgMsg);
+      error(loc, message + dbgMsg);
     else
       error(loc, message);
   }

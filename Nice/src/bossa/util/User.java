@@ -12,7 +12,7 @@
 
 // File    : User.java
 // Created : Wed Jul 07 18:20:58 1999 by bonniot
-//$Modified: Thu Jul 27 16:06:06 2000 by Daniel Bonniot $
+//$Modified: Wed Oct 04 11:46:29 2000 by Daniel Bonniot $
 
 package bossa.util;
 
@@ -81,6 +81,6 @@ public final class User
     if(Debug.alwaysDumpStack)
       Internal.printStackTrace();
     
-    System.out.println("[Warning]: "+message);
+    nice.tools.compiler.OutputMessages.warning("Warning: " + message);
   }
 }

@@ -12,7 +12,7 @@
 
 // File    : JavaClass.java
 // Created : Wed Feb 02 16:20:12 2000 by Daniel Bonniot
-//$Modified: Thu Feb 03 15:05:51 2000 by Daniel Bonniot $
+//$Modified: Thu Feb 17 21:36:05 2000 by Daniel Bonniot $
 
 package bossa.syntax;
 
@@ -70,21 +70,26 @@ public class JavaClass extends ClassDefinition
   {
     super.resolve();
 
-    java.lang.Class refClass 
-      = JavaTypeConstructor.lookupJavaClass(javaName.toString());
+    if(javaName.toString().equals("_Array"))
+      javaType = new bossa.SpecialArray(gnu.bytecode.Type.pointer_type);
+    else
+      {
+	java.lang.Class refClass 
+	  = JavaTypeConstructor.lookupJavaClass(javaName.toString());
     
-    if(refClass==null)
-      User.error(javaName,
-		 javaName+" was not found");
+	if(refClass==null)
+	  User.error(javaName,
+		     javaName+" was not found");
     
-    classType = (gnu.bytecode.ClassType) gnu.bytecode.Type.make(refClass);
+	javaType = (gnu.bytecode.ClassType) gnu.bytecode.Type.make(refClass);
+      }
   }
   
-  private gnu.bytecode.ClassType classType;
+  private gnu.bytecode.Type javaType;
   
-  gnu.bytecode.ClassType javaClass()
+  gnu.bytecode.Type javaClass()
   {
-    return classType;
+    return javaType;
   }
   
   public void compile()
@@ -100,7 +105,7 @@ public class JavaClass extends ClassDefinition
   public void printInterface(java.io.PrintWriter s)
   {
     super.printInterface(s);
-    s.print(" = native "+classType.getName()+";\n");
+    s.print(" = native "+javaName+";\n");
   }
   
   private LocatedString javaName;

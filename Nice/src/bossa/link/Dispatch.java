@@ -12,7 +12,7 @@
 
 // File    : Dispatch.java
 // Created : Mon Nov 15 10:36:41 1999 by bonniot
-//$Modified: Mon Jan 24 19:13:12 2000 by Daniel Bonniot $
+//$Modified: Wed Feb 23 17:36:52 2000 by Daniel Bonniot $
 
 package bossa.link;
 
@@ -41,14 +41,14 @@ public class Dispatch
   
   private static Collection methods = new ArrayList();
 
-  public static void test(bossa.modules.Module module)
+  public static void test(bossa.modules.Package module)
   {
     for(Iterator i=methods.iterator();
 	i.hasNext();)
       test((MethodDefinition)i.next(), module);
   }
   
-  private static void test(MethodDefinition m, bossa.modules.Module module)
+  private static void test(MethodDefinition m, bossa.modules.Package module)
   {
     if(m instanceof JavaMethodDefinition
        || m instanceof StaticFieldAccess
@@ -94,7 +94,7 @@ public class Dispatch
       }
 
     if(Debug.codeGeneration)
-      Debug.print("Generating dispatch function for "+m);
+      Debug.println("Generating dispatch function for "+m);
     
     compile(m,sortedAlternatives,module);
   }
@@ -189,7 +189,7 @@ public class Dispatch
    * Compilation
    ****************************************************************/
 
-  private static void compile(MethodDefinition m, Stack sortedAlternatives, bossa.modules.Module module)
+  private static void compile(MethodDefinition m, Stack sortedAlternatives, bossa.modules.Package module)
   {
     if(m instanceof JavaMethodDefinition
        || m instanceof StaticFieldAccess
@@ -203,7 +203,7 @@ public class Dispatch
     gnu.bytecode.Type[] types = m.javaArgTypes();
     gnu.expr.Expression[] params = new gnu.expr.Expression[types.length];
     lexp.min_args=lexp.max_args=types.length;
-
+    
     for(int n=0; n<types.length; n++)
       {
 	Declaration param = lexp.addDeclaration("parameter_"+n,types[n]);
@@ -222,7 +222,7 @@ public class Dispatch
 
     lexp.setPrimMethod(m.getDispatchPrimMethod());
     
-    lexp.compileAsMethod(module.dispatchComp);
+    module.compileDispatchMethod(lexp);
   }
   
   private static gnu.expr.Expression compileFieldAccess(FieldAccessMethod method, gnu.expr.Expression value)
@@ -256,14 +256,19 @@ public class Dispatch
     params[1] = value;
     
     gnu.expr.Expression res =
-      new ApplyExp(new QuoteExp(new kawa.lang.SetFieldProc((gnu.bytecode.ClassType) types.next(),method.fieldName, method.fieldType.getJavaType(), gnu.bytecode.Access.PUBLIC)),
+      new ApplyExp(new QuoteExp(new kawa.lang.SetFieldProc((gnu.bytecode.ClassType) types.next(),method.fieldName, method.javaArgTypes()[1], gnu.bytecode.Access.PUBLIC)),
 		   params);
     
     while(types.hasNext())
       {
 	gnu.bytecode.ClassType type = (gnu.bytecode.ClassType) types.next();
-	res = new gnu.expr.IfExp(Alternative.instanceOfExp(value,type),
-			new ApplyExp(new QuoteExp(new kawa.lang.SetFieldProc(type,method.fieldName)),params),
+	res = new gnu.expr.IfExp
+	  (Alternative.instanceOfExp(value,type),
+	   new ApplyExp(new QuoteExp(new kawa.lang.SetFieldProc
+	     (type,
+	      method.fieldName, 
+	      method.javaArgTypes()[1], 
+	      gnu.bytecode.Access.PUBLIC)), params),
 			res);
       }
     

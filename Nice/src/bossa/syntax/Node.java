@@ -12,7 +12,7 @@
 
 // File    : Node.java
 // Created : Thu Jul 08 10:24:56 1999 by bonniot
-//$Modified: Thu Feb 03 13:36:04 2000 by Daniel Bonniot $
+//$Modified: Tue Feb 22 16:17:53 2000 by Daniel Bonniot $
 
 package bossa.syntax;
 
@@ -147,7 +147,7 @@ abstract public class Node
     return globalTypeScope;
   }
   
-  void buildScope(bossa.modules.Module module)
+  void buildScope(bossa.modules.Package module)
   {
     globalTypeScope.module = module;
     
@@ -170,6 +170,7 @@ abstract public class Node
     Scopes res=null;
     switch(propagate)
       {
+      case none:
       case down: 
 	this.scope=new VarScope(outer,varSymbols);
 	this.typeScope=new TypeScope(typeOuter);
@@ -202,22 +203,21 @@ abstract public class Node
 	res=new Scopes(this.scope,this.typeScope);
 	break;
 
-      case none:
-	res=null;
-	break;
-	
       default:
 	Internal.error("Invalid case in Node.buildScope");
       }
 
-    this.typeScope.addSymbols(typeSymbols);
-    try{ 
-      this.typeScope.addMappings(typeMapsNames,typeMapsSymbols);
-    }
-    catch(BadSizeEx e){
-      Internal.error(e.toString());
-    }
-
+    if(propagate!=none)
+      {
+	this.typeScope.addSymbols(typeSymbols);
+	try{ 
+	  this.typeScope.addMappings(typeMapsNames,typeMapsSymbols);
+	}
+	catch(BadSizeEx e){
+	  Internal.error(e.toString());
+	}
+      }
+    
     // builds the scope of the children
     Scopes current=new Scopes(this.scope,this.typeScope);
     Iterator i=children.iterator();
@@ -285,6 +285,10 @@ abstract public class Node
    * Type checking
    ****************************************************************/
 
+  // The current function should be saved in nodes that need it
+  // curing execution of their typecheck method.
+  static Function currentFunction;
+  
   /** override this when typechecking is needed */
   void typecheck() { }
 
@@ -296,13 +300,24 @@ abstract public class Node
    */
   void endTypecheck() { }
   
-  void doTypecheck()
+  final void doTypecheck()
   {
     typecheck();
+
+    Function savedFunction=null;
+    if(this instanceof Function)
+      {
+	savedFunction = currentFunction;
+	currentFunction = (Function) this;
+      }
+    
     Iterator i=children.iterator();
     while(i.hasNext())
       ((Node)i.next()).doTypecheck();
     endTypecheck();
+
+    if(savedFunction!=null)
+      currentFunction=savedFunction;
   }
 
   /****************************************************************

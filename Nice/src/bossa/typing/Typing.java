@@ -12,7 +12,7 @@
 
 // File    : Typing.java
 // Created : Tue Jul 20 11:57:17 1999 by bonniot
-//$Modified: Fri Jan 28 17:10:35 2000 by Daniel Bonniot $
+//$Modified: Tue Feb 22 14:54:22 2000 by Daniel Bonniot $
 
 package bossa.typing;
 
@@ -526,7 +526,7 @@ abstract public class Typing
 
 	  // backtrack has already been done in Engine,
 	  // but a call to leave will also be done here...
-	  // hacky
+	  // hacky!
 	  Engine.enter();
 	  // tuples is empty here
 	  return tuples;

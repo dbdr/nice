@@ -12,7 +12,7 @@
 
 // File    : Engine.java
 // Created : Tue Jul 27 15:34:53 1999 by bonniot
-//$Modified: Thu Feb 03 16:05:33 2000 by Daniel Bonniot $
+//$Modified: Thu Feb 24 12:41:53 2000 by Daniel Bonniot $
 
 package bossa.engine;
 
@@ -388,7 +388,8 @@ public abstract class Engine
     if(res!=null)
       return res;
 
-    if(dbg) Debug.println("Creating new Lowlevel constraint for "+kind);
+    if(dbg)
+      Debug.println("Creating new Lowlevel constraint for "+kind);
     
     res=new Engine.Constraint("kind "+kind.toString());
     res.associatedKind=kind;
@@ -442,6 +443,17 @@ public abstract class Engine
 	k.createInitialContext();
       }
     initialContext=false;
+  }
+  
+  public static void releaseInitialContext()
+  {
+    for(Iterator i=constraints.iterator();
+	i.hasNext();)
+      { 
+	Engine.Constraint k=(Engine.Constraint)i.next();
+	k.releaseInitialContext();
+      }
+    initialContext=true;
   }
   
   private static boolean initialContext=true;
@@ -509,14 +521,25 @@ public abstract class Engine
     class Callbacks extends K0.Callbacks
     {
       protected void indexMerged(int src, int dest) {
+	if(dbg)
+	  Debug.println("Merged "+indexToString(src)+" into "+
+			indexToString(dest));
 	getElement(src).setId(dest);
       }
       protected void indexMoved(int src, int dest) {
-	getElement(src).setId(dest);
+	if(dbg)
+	  Debug.println("Changed index of "+indexToString(src));
+	// indexToString(dest) is meaningless
+
+	Element movedElement = getElement(src);
+	movedElement.setId(dest);
+	elements.set(dest,movedElement);
       }
       protected void indexDiscarded(int index) {
-	Internal.warning("Engine: Index discarded");
+	if(dbg)
+	  Debug.println("Discarded "+indexToString(index));
 	getElement(index).setId(-2);
+	elements.set(index,null); // enable garbage collection, maybe
       }
       /*
        * Pretty printing
@@ -601,6 +624,11 @@ public abstract class Engine
     void createInitialContext() throws Unsatisfiable
     {
       k0.createInitialContext();
+    }
+
+    void releaseInitialContext()
+    {
+      k0.releaseInitialContext();
     }
 
     public int newInterface()

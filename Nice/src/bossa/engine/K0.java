@@ -623,6 +623,15 @@ public final class K0 {
     hasBeenInitialized = true;
   }
 
+  public void releaseInitialContext() 
+  {
+    hasBeenInitialized=false;
+
+    if(m!=m0)
+      S.dbg.println("releaseInitialContext should be called when in first rigid context");
+    
+    m=m0=0;
+  }
   
   /***********************************************************************
    * Constraints
@@ -1104,17 +1113,10 @@ public final class K0 {
     throws Unsatisfiable
   {
     boolean changed;
-    //boolean first=true;
+
     do
       {
 	changed=false;
-
-	/*
-	if(!first)
-	  Leq.closure();
-	else
-	  first=false;
-	*/
 
 	for(int iid=0; iid<nInterfaces(); iid++)
 	  {
@@ -1124,28 +1126,36 @@ public final class K0 {
 	      if((n1=i.getApprox(node))!=BitVector.UNDEFINED_INDEX)
 		// node  ->_i  n1
 		for(int p=0;p<n;p++)
-		  // is implementors ok, or should not we compute rigidImplementors first ?
+		  // is implementors OK ?
+		  // or should not we compute rigidImplementors first ?
 		  if(i.implementors.get(p)
 		     && Leq.get(node,p))
 		    if(this.isRigid(p))
 		      if(!Leq.get(n1,p))
-			throw new LowlevelUnsatisfiable("saturateAbs: there should be "+n1+" <: "+p+
-							" (node="+node+")");
+			throw new LowlevelUnsatisfiable
+			  ("saturateAbs: there should be "+
+			   indexToString(n1)+" <: "+
+			   indexToString(p)+
+			   " (node="+indexToString(node)+")\n"+
+			   this);
 		      else ;
 		    else 
 		      if(!Leq.get(n1,p))
 			 {
 			   if(debugK0) 
-			     S.dbg.println("Abs rule applied : "+indexToString(n1)+" < "+indexToString(p)
-					   +" using "+indexToString(node)
-					   +" for interface "+interfaceToString(iid));
+			     S.dbg.println("Abs rule applied : "+
+					   indexToString(n1)+" < "+indexToString(p)+
+					   " using "+indexToString(node)+
+					   " for interface "+interfaceToString(iid));
 			   C .set(n1,p);
 			   Ct.set(p,n1);
 			   Leq.set(n1,p);
 			   changed=true;
 			 }
 	  }
-	Leq.closure();
+
+	if(changed)
+	  Leq.closure();
       }
     while(changed);
   }

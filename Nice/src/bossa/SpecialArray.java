@@ -17,8 +17,17 @@ public class SpecialArray extends gnu.bytecode.ArrayType
   public SpecialArray (Type elements)
   {
     super (elements);
-    //setSignature("L_Array;");
-    //this_name = "_Array";
+    setSignature("L_Array;");
+  }
+  
+  public String getNameOrSignature()
+  {
+    return "_Array";
+  }
+  
+  public String getName()
+  {
+    return "_Array";
   }
   
   public Object coerceFromObject (Object obj)
@@ -28,8 +37,14 @@ public class SpecialArray extends gnu.bytecode.ArrayType
 
   public void emitCoerceFromObject (CodeAttr code)
   {
-    code.emitCheckcast(_ArrayType);
-    code.emitGetField(_ArrayField);
+    if(_ArrayMakeMethod == null)
+      {
+	Type[] args = new Type[1];
+	args[0] = ArrayType.make(Type.pointer_type);
+	_ArrayMakeMethod = _ArrayType.getDeclaredMethod("make", args, _ArrayType);
+      }
+    
+    code.emitInvokeStatic(_ArrayMakeMethod);
   }
 
   public Object coerceToObject (Object obj)
@@ -39,15 +54,17 @@ public class SpecialArray extends gnu.bytecode.ArrayType
 
   public void emitCoerceToObject (CodeAttr code)
   {
-    code.emitInvokeStatic(_ArrayMakeMethod);
+    code.emitCheckcast(_ArrayType);
+    code.emitGetField(_ArrayField);
   }
 
   public boolean isSubtype (Type other)
   {
-    if(other instanceof SpecialArray)
-      return true;
+    boolean res = other instanceof SpecialArray || _ArrayType.isSubtype(other);
+    if(!res)
+      bossa.util.Debug.println("SpecialArray is not subtype of "+other);
     
-    return false;
+    return res;
   }
   
   /****************************************************************
@@ -61,13 +78,14 @@ public class SpecialArray extends gnu.bytecode.ArrayType
   static
   {
     _ArrayType = ClassType.make("_Array");
-    Type[] args = new Type[1];
-    args[0] = new ArrayType(Type.pointer_type);
-    _ArrayMakeMethod = _ArrayType.addMethod ("make", args, _ArrayType,
-					   Access.PUBLIC|Access.STATIC);
+    
+    ClassType sequence = ClassType.make("bossa.lang.Sequence");
+    sequence.access_flags = Access.PUBLIC|Access.INTERFACE;
+    _ArrayType.setInterfaces(new ClassType[]{sequence});
+    
     _ArrayField = new Field(_ArrayType);
     _ArrayField.setName("value");
-    _ArrayField.setType(args[0]);
+    _ArrayField.setType(ArrayType.make(Type.pointer_type));
   }
   
   public String toString()

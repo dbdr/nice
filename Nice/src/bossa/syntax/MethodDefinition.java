@@ -12,7 +12,7 @@
 
 // File    : MethodDefinition.java
 // Created : Thu Jul 01 18:12:46 1999 by bonniot
-//$Modified: Thu Jan 20 16:46:26 2000 by bonniot $
+//$Modified: Wed Feb 23 17:36:28 2000 by Daniel Bonniot $
 
 package bossa.syntax;
 
@@ -23,10 +23,12 @@ import gnu.expr.*;
 
 import java.util.*;
 
+import bossa.util.Location;
+
 /**
  * Abstract syntax for a global method declaration.
  */
-public class MethodDefinition extends PolySymbol implements Definition
+public class MethodDefinition extends Definition
 {
   /**
    * The method is a class member if c!=null.
@@ -44,9 +46,7 @@ public class MethodDefinition extends PolySymbol implements Definition
 			  Monotype returnType,
 			  List parameters)
   {
-    // hack, super must be the first call
-    super(name,null);
-    this.propagate=Node.global;
+    super(name, Node.global);
     
     List params=new ArrayList();
     // if it is a class method, there is an implicit "this" argument
@@ -55,10 +55,14 @@ public class MethodDefinition extends PolySymbol implements Definition
     params.addAll(parameters);
     
     this.arity=params.size();
-    this.type=new Polytype(constraint,new FunType(params,returnType));
-    addChild(type);
+
+    symbol = new MethodDefinition.Symbol
+      (name,new Polytype(constraint,new FunType(params,returnType)),this);
+    addChild(symbol);
 
     this.memberOf=c;
+
+    bytecodeName = module.mangleName(symbol.name.toString());
 
     bossa.link.Dispatch.register(this);
   }
@@ -104,10 +108,10 @@ public class MethodDefinition extends PolySymbol implements Definition
     methods.add(m);
   }
   
-  static void compileMethods(bossa.modules.Module module)
+  static void compileMethods(bossa.modules.Package module)
   {
-    for(Iterator i=methods.iterator();i.hasNext();)
-      ((MethodDefinition)i.next()).compile();
+    //for(Iterator i=methods.iterator();i.hasNext();)
+    //((MethodDefinition)i.next()).compile();
   }
   
   /****************************************************************
@@ -117,6 +121,55 @@ public class MethodDefinition extends PolySymbol implements Definition
   public void createContext()
   {
     //Nothing
+  }
+  
+  /****************************************************************
+   * Typechecking
+   ****************************************************************/
+
+  void typecheck()
+  {
+    Constraint cst = getType().getConstraint();
+    
+    // Optimization
+    if(cst==Constraint.True ||
+       cst.binders.size()==0)
+      return;
+    
+    bossa.typing.Typing.enter("Definition of "+symbol.name);
+    
+    try{
+      // Explanation for the assert(false) statement:
+      // We just want to check the type is well formed,
+      // so there is not need to enter top implementations.
+      // This is just an optimization, this shouldn't
+      // change anything.
+      getType().getConstraint().assert(false);
+    }
+    catch(bossa.typing.TypingEx e){
+      User.error(this,
+		 "The constraint of method "+symbol.name+
+		 " is not well formed");
+    }
+  }
+  
+
+  void endTypecheck()
+  {
+    Constraint cst = getType().getConstraint();
+    
+    if(cst==Constraint.True ||
+       cst.binders.size()==0)
+      return;
+    
+    try{
+      bossa.typing.Typing.leave();
+    }
+    catch(bossa.typing.TypingEx e){
+      User.error(this,
+		 "The type of method "+symbol.name+
+		 " is not well formed");
+    }
   }
   
   /****************************************************************
@@ -135,7 +188,12 @@ public class MethodDefinition extends PolySymbol implements Definition
   public final gnu.mapping.Procedure getDispatchMethod() 
   { 
     if(dispatchMethod==null)
-      dispatchMethod = computeDispatchMethod();
+      {
+	dispatchMethod = computeDispatchMethod();
+      
+	if(dispatchMethod==null)
+	  Internal.error(this,"Null dispatch method for "+this);
+      }
     
     return dispatchMethod;
   }
@@ -153,12 +211,12 @@ public class MethodDefinition extends PolySymbol implements Definition
   
   public gnu.bytecode.Type javaReturnType()
   {
-    return this.type.codomain().getJavaType();
+    return this.getType().codomain().getJavaType();
   }
   
   public gnu.bytecode.Type[] javaArgTypes()
   {
-    List domain=this.type.domain();
+    List domain=this.getType().domain();
     gnu.bytecode.Type[] res=new gnu.bytecode.Type[domain.size()];
     int n=0;
     for(Iterator i=domain.iterator();i.hasNext();n++)
@@ -176,7 +234,15 @@ public class MethodDefinition extends PolySymbol implements Definition
 
   public void printInterface(java.io.PrintWriter s)
   {
-    s.print(toString());
+    s.print(
+	    getType().getConstraint().toString()
+	    + String.valueOf(getType().codomain())
+	    + " "
+	    + symbol.name.toQuotedString()
+	    + Util.map("<",", ",">",getType().getTypeParameters())
+	    + "("
+	    + Util.map("",", ","",getType().domain())
+	    + ");\n");
   }
   
   /************************************************************
@@ -186,14 +252,14 @@ public class MethodDefinition extends PolySymbol implements Definition
   public String toString()
   {
     return
-      type.getConstraint().toString()
-      + String.valueOf(type.codomain())
+      getType().getConstraint().toString()
+      + String.valueOf(getType().codomain())
       + " "
-      + name.toQuotedString()
-      + Util.map("<",", ",">",type.getTypeParameters())
+      + symbol.name.toQuotedString()
+      + Util.map("<",", ",">",getType().getTypeParameters())
       + "("
-      + Util.map("",", ","",type.domain())
-      + ");\n"
+      + Util.map("",", ","",getType().domain())
+      + ")"
       ;
   }
 
@@ -209,23 +275,32 @@ public class MethodDefinition extends PolySymbol implements Definition
    * Module and unique name
    ****************************************************************/
   
-  bossa.modules.Module module;
-  
-  public void setModule(bossa.modules.Module module)
-  {
-    this.module = module;
-    bytecodeName = module.mangleName(name.toString());
-  }
-
-  public String getName()
+  public String getBytecodeName()
   {
     return bytecodeName;
   }
   
   public String getFullName()
   {
-    return module.name+"$"+bytecodeName;
+    return module.getName()+"$"+bytecodeName;
+  }
+
+  public Polytype getType()
+  {
+    return symbol.getType();
   }
   
   private String bytecodeName;
+  MethodDefinition.Symbol symbol;
+
+  class Symbol extends PolySymbol
+  {
+    Symbol(LocatedString name, Polytype type, MethodDefinition definition)
+    {
+      super(name, type);
+      this.definition=definition;
+    }
+
+    MethodDefinition definition;
+  }
 }

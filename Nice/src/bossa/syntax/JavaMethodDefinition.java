@@ -12,7 +12,7 @@
 
 // File    : JavaMethodDefinition.java
 // Created : Tue Nov 09 11:49:47 1999 by bonniot
-//$Modified: Mon Jan 17 17:45:14 2000 by bonniot $
+//$Modified: Thu Feb 24 14:54:59 2000 by Daniel Bonniot $
 
 package bossa.syntax;
 
@@ -60,15 +60,13 @@ public class JavaMethodDefinition extends MethodDefinition
 
     // We put this here, since we need 'module' to be computed
     // since it is used to open the imported packages.
-    boolean isStatic = java.lang.reflect.Modifier.isStatic
-      (findReflectMethod().getModifiers());
+
+    findReflectMethod();
     
-    flags=0;
-    if(isStatic)
-      {
-	flags|=Access.STATIC;
-	javaArity=arity;
-      }
+    flags = reflectMethod.getModifiers();
+    
+    if((flags & Access.STATIC) != 0 || methodName.equals("<init>"))
+      javaArity=arity;
     else
       javaArity=arity-1;
 
@@ -76,61 +74,42 @@ public class JavaMethodDefinition extends MethodDefinition
       MethodDefinition.addMethod(this);
 
     if(javaTypes!=null && javaTypes.size()-1!=javaArity)
-      User.error(this.name,
-		 "Native method "+this.name+
-		 " has not the same number of parameters in Java and Bossa !");
+      User.error(this,
+		 "Native method "+this.symbol.name+
+		 " has not the same number of parameters "+
+		 "in Java ("+javaArity+
+		 ") and in Bossa ("+arity+")");
   }
   
-  // Class.forName doesn't report errors nicely, I do it myself !
-  private Class getClass(LocatedString className)
+  private gnu.bytecode.Type type(LocatedString s)
   {
-    Class res;
-    String name = className.toString();
-    
-    if(name.equals("void"))
-      res = Void.TYPE;
-    else if(name.equals("int"))
-      res = Integer.TYPE;
-    else if(name.equals("boolean"))
-      res = Boolean.TYPE;
-    else
-      res = JavaTypeConstructor.lookupJavaClass(name);
-    
+    Type res = type(s.toString());
     if(res==null)
-      User.error(className,
-		 "Class \""+name+"\" does not exists");
+      User.error(s, s+" is not a valid java type");
     return res;
   }
   
-  private java.lang.reflect.Method
-    findReflectMethod()
+  private gnu.bytecode.Type type(String s)
   {
-    try
-      {
-	Class[] classes = new Class[javaTypes.size()-1];
-	for(int i=1;i<javaTypes.size();i++)
-	  {
-	    LocatedString t = (LocatedString) javaTypes.get(i);
-	    
-	    classes[i-1]=getClass(t);
-	    // set the fully qualified name back
-	    javaTypes.set(i,new LocatedString(classes[i-1].getName(),t.location()));
-	  }
-	// set the fully qualified name of the return type back
-	javaTypes.set(0,new LocatedString(getClass((LocatedString) javaTypes.get(0)).getName(),((LocatedString) javaTypes.get(0)).location()));
-	
-	Class holder = getClass(className);
-	className = new LocatedString(holder.getName(),className.location());
-	
-	return holder.
-	  getDeclaredMethod(methodName,classes);
-      }
-    catch(NoSuchMethodException e){
-      User.error(this,
-		 "Method "+className+"."+methodName+" does not exists");
-    }
+    if(s.length()==0)
+      return null;
     
-    return null;
+    if(s.charAt(0)=='[')
+      {
+	Type res = type(s.substring(1));
+	if(res==null)
+	  return null;
+	else
+	  return gnu.bytecode.ArrayType.make(res);
+      }
+    
+    if(s.equals("void")) 	return bossa.SpecialTypes.voidType;
+    if(s.equals("int"))  	return bossa.SpecialTypes.intType;
+    if(s.equals("long")) 	return bossa.SpecialTypes.longType;
+    if(s.equals("boolean")) 	return bossa.SpecialTypes.booleanType;
+    //if(s.equals("_Array"))	return bossa.SpecialTypes.arrayType;
+    
+    return Type.make(JavaTypeConstructor.lookupJavaClass(s));
   }
   
   /** The java class this method is defined in */
@@ -150,41 +129,56 @@ public class JavaMethodDefinition extends MethodDefinition
    * Code generation
    ****************************************************************/
 
-  private gnu.bytecode.Type type(String s)
-  {
-    // FIXME
-    if(s.equals("void"))
-      return gnu.bytecode.Type.void_type;
-    else if(s.equals("int"))
-      return bossa.SpecialTypes.intType;
-    else if(s.equals("boolean"))
-      return bossa.SpecialTypes.booleanType;
-    else
-      return ClassType.make(s);
-  }
+  private Type javaRetType;
+  private Type[] javaArgType;
+  private Method reflectMethod;
   
-  protected gnu.bytecode.Type returnJavaType() 
-  { return type(javaTypes.get(0).toString()); }
+  public gnu.bytecode.Type javaReturnType() 
+  { return javaRetType; }
 
-  protected gnu.bytecode.Type[] argumentsJavaTypes()
-  {
-    gnu.bytecode.Type[] res=new gnu.bytecode.Type[javaArity];
-    for(int i=0;i<javaArity;i++)
-      res[i]=type(javaTypes.get(i+1).toString());
-    
-    return res;
-  }
+  public gnu.bytecode.Type[] javaArgTypes()
+  { return javaArgType; }
 
   protected gnu.mapping.Procedure computeDispatchMethod()
   {
-    ClassType c=ClassType.make(className.toString());
-    return new gnu.expr.PrimProcedure
-      (
-       c.addMethod
-       (methodName,
-	argumentsJavaTypes(),returnJavaType(),
-	flags)
-	);
+    return new gnu.expr.PrimProcedure(reflectMethod);
+  }
+  
+  private void findReflectMethod()
+  {
+    javaArgType = new Type[javaTypes.size()-1];
+    
+    for(int i=1;i<javaTypes.size();i++)
+      {
+	LocatedString t = (LocatedString) javaTypes.get(i);
+	    
+	javaArgType[i-1]=type(t);
+	    
+	// set the fully qualified name back
+	javaTypes.set(i,new LocatedString(javaArgType[i-1].getName(),
+					  t.location()));
+      }
+
+    LocatedString t = (LocatedString) javaTypes.get(0);
+    javaRetType = type(t);
+    
+    // set the fully qualified name of the return type back
+    javaTypes.set(0,new LocatedString(javaRetType.getName(),t.location()));
+	
+    Type holder = type(className.toString());
+    className = new LocatedString(holder.getName(),className.location());
+    
+    if(!(holder instanceof ClassType))
+      User.error(this, className+" is a primitive type");
+    
+    reflectMethod = ((ClassType) holder).getDeclaredMethod(methodName,javaArgType);
+    // use the following, or the Type.flushTypeChanges() in SpecialTypes
+    //reflectMethod.arg_types = javaArgType;
+    //if(!methodName.equals("<init>"))
+    //reflectMethod.return_type = javaRetType;
+    
+    if(reflectMethod==null)
+      User.error(this, this+" was not found");
   }
   
   /****************************************************************
@@ -193,36 +187,47 @@ public class JavaMethodDefinition extends MethodDefinition
 
   public void printInterface(java.io.PrintWriter s)
   {
-    s.print(toString());
+    s.print(interfaceString());
   }
 
   private String interfaceString()
   {
-    return
-      type.getConstraint().toString()
-      + type.codomain().toString()
+    String res =
+      symbol.type.getConstraint().toString()
+      + symbol.type.codomain().toString()
       + " "
-      + name.toQuotedString()
-      + Util.map("<",", ",">",type.getTypeParameters())
+      + symbol.name.toQuotedString()
+      + Util.map("<",", ",">",symbol.type.getTypeParameters())
       + "("
-      + Util.map("",", ","",type.domain())
+      + Util.map("",", ","",symbol.type.domain())
       + ")"
-      + " = native "
-      + returnJavaType().getName()
-      + " " + className
-      + "." + methodName
-      + mapGetName(argumentsJavaTypes())
+      + " = native ";
+    if(methodName.equals("<init>"))
+       res += "new " + className;
+    else
+      res +=  javaReturnType().getName() 
+	+ " " + className 
+	+ "." + methodName;
+    
+    return res
+      + mapGetName(javaArgTypes())
       + ";\n";
   }
   
   private static String mapGetName(gnu.bytecode.Type[] types)
   {
+    if(types == null)
+      return "((NULL))";
+    
     String res="(";
     for(int n=0;n<types.length;n++)
       {
 	if(n!=0)
 	  res+=", ";
-	res+=types[n].getName();
+	if(types[n] == null)
+	  res+="[NULL]";
+	else
+	  res+=types[n].getName();
       }
     return res+")";
   }
@@ -233,6 +238,7 @@ public class JavaMethodDefinition extends MethodDefinition
 
   public String toString()
   {
-    return interfaceString();
+    return "native "+className+"."+methodName+mapGetName(javaArgTypes());
+    
   }
 }

@@ -12,7 +12,7 @@
 
 // File    : OverloadedSymbolExp.java
 // Created : Thu Jul 08 12:20:59 1999 by bonniot
-//$Modified: Mon Jan 17 14:05:46 2000 by bonniot $
+//$Modified: Tue Feb 22 15:58:07 2000 by Daniel Bonniot $
 
 package bossa.syntax;
 
@@ -106,9 +106,9 @@ public class OverloadedSymbolExp extends Expression
 	      else ;  
 	    else { i.remove(); continue; }
 	  }
-	else if(s instanceof MethodDefinition)
+	else if(s instanceof MethodDefinition.Symbol)
 	  {
-	    if(((MethodDefinition)s).getArity()!=arity)
+	    if(((MethodDefinition.Symbol)s).definition.getArity()!=arity)
 	      { i.remove(); removedSomething=true; continue; }
 	  }
 	else
@@ -146,7 +146,7 @@ public class OverloadedSymbolExp extends Expression
 
     //There is ambiguity
     User.error(this,"Ambiguity for symbol "+ident+". Possibilities are :\n"+
-	       Util.map("","","",symbols));
+	       Util.map("","\n","",symbols));
     return null;
   }
 
@@ -161,6 +161,8 @@ public class OverloadedSymbolExp extends Expression
 	Polytype t=s.getType();
 	try{
 	  bossa.typing.Typing.leq(t,expectedType);
+	  if(Debug.overloading)
+	    Debug.println(s+"("+s.location()+") of type "+t+" matches");
 	}
 	catch(bossa.typing.TypingEx e){
 	  i.remove();
@@ -169,15 +171,15 @@ public class OverloadedSymbolExp extends Expression
 	}
       }
 
-    if(symbols.size()==0)
-      User.error(this,"No alternative has expected type "+expectedType);
-
     if(symbols.size()==1)
       return uniqueExpression();
 
+    if(symbols.size()==0)
+      User.error(this,"No alternative has expected type "+expectedType);
+
     //There is ambiguity
-    User.error(this,"Ambiguity for symbol "+ident+". Possibilities are :\n"+
-	       Util.map("","","",symbols));
+    User.error(this,"Ambiguity for symbol "+ident+".\nPossibilities are :\n"+
+	       Util.map("","\n","",symbols));
     return null;    
   }
   
@@ -187,10 +189,10 @@ public class OverloadedSymbolExp extends Expression
       return uniqueExpression();
 
     if(symbols.size()==0)
-      User.error(this,ident + " is not defined...");
+      User.error(this,ident + " is not defined");
 
     User.error(this,"Ambiguity for symbol "+ident+". Possibilities are :\n"+
-	       Util.map("","","",symbols));
+	       Util.map("","\n","",symbols));
     return null;
   }
   

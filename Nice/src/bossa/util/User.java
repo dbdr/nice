@@ -12,7 +12,7 @@
 
 // File    : User.java
 // Created : Wed Jul 07 18:20:58 1999 by bonniot
-//$Modified: Tue Feb 01 20:09:07 2000 by Daniel Bonniot $
+//$Modified: Mon Feb 21 17:31:35 2000 by Daniel Bonniot $
 
 package bossa.util;
 
@@ -41,13 +41,13 @@ public class User
     if(loc==null)
       error(message);
     else
-      error(responsible.location()+message);
+      error(loc+message);
   }
 
   public static void error(String message)
   {
-    // only at debug time
-    //Internal.printStackTrace();
+    if(Debug.alwaysDumpStack)
+      Internal.printStackTrace();
     
     System.out.println(message);
     System.exit(1);

@@ -12,7 +12,7 @@
 
 // File    : Debug.java
 // Created : Thu Jul 22 15:37:02 1999 by bonniot
-//$Modified: Tue Jan 18 17:37:52 2000 by bonniot $
+//$Modified: Mon Feb 14 15:49:23 2000 by Daniel Bonniot $
 
 package bossa.util;
 
@@ -83,7 +83,9 @@ public abstract class Debug
     codeGeneration 	= getBoolean("debug.codeGeneration",false),
     javaTypes		= getBoolean("debug.javaTypes",false),
     linkTests           = getBoolean("debug.linkTests",false),
-    passes		= getBoolean("debug.passes",false);
+    passes		= getBoolean("debug.passes",false),
+
+    alwaysDumpStack     = getBoolean("debug.alwaysDumpStack", false);
 
   public static final String
     defaultFile = props.getProperty("debug.defaultFile", null);

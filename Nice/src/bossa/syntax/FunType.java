@@ -12,7 +12,7 @@
 
 // File    : FunType.java
 // Created : Fri Jul 02 17:41:24 1999 by bonniot
-//$Modified: Tue Nov 16 20:26:39 1999 by bonniot $
+//$Modified: Tue Feb 15 19:52:19 2000 by Daniel Bonniot $
 
 package bossa.syntax;
 
@@ -66,6 +66,16 @@ public class FunType extends Monotype
   Monotype substitute(Map map)
   {
     return new FunType(Monotype.substitute(map,in),out.substitute(map));
+  }
+
+  /****************************************************************
+   * Typechecking
+   ****************************************************************/
+
+  void typecheck()
+  {
+    out.typecheck();
+    typecheck(in);
   }
 
   /****************************************************************

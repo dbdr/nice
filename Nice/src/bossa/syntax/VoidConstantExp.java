@@ -12,7 +12,7 @@
 
 // File    : VoidConstantExp.java
 // Created : Mon Jul 05 17:30:56 1999 by bonniot
-//$Modified: Tue Jan 25 16:28:35 2000 by Daniel Bonniot $
+//$Modified: Tue Feb 22 15:24:32 2000 by Daniel Bonniot $
 // Description : An integer constant
 
 package bossa.syntax;

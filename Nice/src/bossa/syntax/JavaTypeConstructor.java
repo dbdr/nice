@@ -12,13 +12,15 @@
 
 // File    : JavaTypeConstructor.java
 // Created : Thu Jul 08 11:51:09 1999 by bonniot
-//$Modified: Thu Feb 03 18:41:40 2000 by Daniel Bonniot $
+//$Modified: Thu Feb 24 12:18:56 2000 by Daniel Bonniot $
 
 package bossa.syntax;
 
 import bossa.util.*;
 import bossa.engine.*;
-import bossa.typing.Variance;
+import bossa.typing.*;
+
+import gnu.bytecode.Type;
 
 import java.util.*;
 
@@ -73,10 +75,11 @@ public class JavaTypeConstructor extends TypeConstructor
   {
     Object old = hash.put(javaName, tc);
     if(old!=null)
-      Internal.error("TC for "+javaName+" set twice");
+      Internal.error(tc,"TC for "+javaName+" set twice");
   }
   
   private gnu.bytecode.Type javaType;
+  private boolean isPrimitive;
   
   private static HashMap hash = new HashMap();
 
@@ -112,13 +115,11 @@ public class JavaTypeConstructor extends TypeConstructor
     bossa.typing.Typing.introduce(this);
     this.javaType = javaType;
     
-    // Searching for java super class
-    // This is recursive !
+    // Recursive searching for java super classes
     if(javaType instanceof gnu.bytecode.ClassType)
       {
-	//Class ref = javaType.getReflectClass();
-
-	gnu.bytecode.ClassType superClass = ((gnu.bytecode.ClassType) javaType).getSuperclass();
+	gnu.bytecode.ClassType superClass = 
+	  ((gnu.bytecode.ClassType) javaType).getSuperclass();
 	if(superClass!=null && !(excluded(blackListClass, superClass)))
 	  {    	
 	    TypeConstructor superTC = make(superClass.getName(),superClass);
@@ -160,13 +161,13 @@ public class JavaTypeConstructor extends TypeConstructor
       {
 	JavaTypeConstructor tc = (JavaTypeConstructor) i.next();
 	if(tc.getKind()==null)
-	try{
-	  Engine.setKind(tc,Variance.make(0).getConstraint());
-	}
-	catch(Unsatisfiable e){
-	  User.error(tc,
-		     "Java class "+tc+" is not well kinded");
-	}
+	  try{
+	    Engine.setKind(tc,Variance.make(0).getConstraint());
+	  }
+	  catch(Unsatisfiable e){
+	    User.error(tc,
+		       "Java class "+tc+" is not well kinded");
+	  }
       }
   }
     
@@ -184,6 +185,17 @@ public class JavaTypeConstructor extends TypeConstructor
 	(this,
 	 InterfaceDefinition.top(this.variance.size),
 	 true);
+      if(isPrimitive)
+	try{
+	  if(this.variance.size!=0)
+	    Internal.warning(this, "Primitive type "+name+
+			     " with arity "+this.variance.size);
+	  Typing.assertAbs(this, InterfaceDefinition.top(this.variance.size));
+	}
+	catch(TypingEx e){
+	  Internal.warning
+	    (this, "Could not make primitive type "+name+" final");
+	}
     }
     catch(bossa.typing.TypingEx e){
       Internal.error("Impossible");
@@ -250,7 +262,17 @@ public class JavaTypeConstructor extends TypeConstructor
   /****************************************************************
    * Global Scope
    ****************************************************************/
-  
+
+  private static void makePrimType(String name, Type javaType)
+  {
+    JavaTypeConstructor jtc = (JavaTypeConstructor) JavaTypeConstructor.make
+      (new LocatedString(name,new Location("Base type",true)),javaType);
+    jtc.isPrimitive = true;
+    
+    globalTypeScope.addSymbol(jtc);
+    globalTypeScope.addMapping("#"+name, jtc);
+  }
+      
   static void addJavaTypes(TypeScope globalTypeScope)
   // Called by Node
   {
@@ -263,15 +285,15 @@ public class JavaTypeConstructor extends TypeConstructor
 
     JavaTypeConstructor.voidType = 
       new MonotypeConstructor(voidTC,null, voidTC.name.location());
-
     globalTypeScope.addSymbol(voidTC);
-    globalTypeScope.addSymbol
-      (JavaTypeConstructor.make
-       (new LocatedString("boolean",new Location("Base type",true)),
-	bossa.SpecialTypes.booleanType));
+
+    makePrimType("boolean",bossa.SpecialTypes.booleanType);
+    makePrimType("char",bossa.SpecialTypes.charType);
 
     globalTypeScope.addMapping
       ("int", JavaTypeConstructor.lookup("gnu.math.IntNum"));
+    globalTypeScope.addMapping
+      ("long", JavaTypeConstructor.lookup("gnu.math.IntNum"));
   }
 
   public static Monotype voidType;
@@ -304,11 +326,16 @@ public class JavaTypeConstructor extends TypeConstructor
   static java.lang.Class lookupJavaClass(String className)
   {
     Class c = null;
-    String pkg = null;    
-    
-    try{ c=Class.forName(className); }
-    catch(ClassNotFoundException e){ }
 
+    try{ c=Class.forName(className); }
+    catch(ClassNotFoundException e)
+      // when the class does not exist
+      { }
+    catch(NoClassDefFoundError e) 
+      // when a class with similar name but with different case exists
+      // can occur in Windows
+      { }
+      
     if(c!=null)
       return c;
     
@@ -316,7 +343,7 @@ public class JavaTypeConstructor extends TypeConstructor
       for(Iterator i = globalTypeScope.module.listImplicitPackages();
 	  i.hasNext();)
 	{
-	  pkg = (String) i.next();
+	  String pkg = ((LocatedString) i.next()).toString();
 	  
 	  try{ c=Class.forName(pkg+"."+className); break; }
 	  catch(ClassNotFoundException e){ }
@@ -349,5 +376,10 @@ public class JavaTypeConstructor extends TypeConstructor
       }
     
     return res;
+  }
+
+  String bytecodeRepresentation()
+  {
+    return name.toString();
   }
 }

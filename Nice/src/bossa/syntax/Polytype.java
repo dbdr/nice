@@ -12,7 +12,7 @@
 
 // File    : Polytype.java
 // Created : Tue Jul 13 12:51:38 1999 by bonniot
-//$Modified: Tue Dec 07 17:53:55 1999 by bonniot $
+//$Modified: Tue Feb 15 22:02:52 2000 by Daniel Bonniot $
 
 package bossa.syntax;
 
@@ -35,7 +35,7 @@ public class Polytype extends Node
   /** Constructs a Polytype with the "True" constraint */
   public Polytype(Monotype monotype)
   {
-    this(Constraint.True(),monotype);
+    this(Constraint.True,monotype);
   }
 
   static Polytype bottom()
@@ -76,7 +76,7 @@ public class Polytype extends Node
     Collection res=new ArrayList(monotypes.size());
     for(Iterator i=monotypes.iterator();
 	i.hasNext();)
-      res.add(new Polytype(Constraint.True(),(Monotype)i.next()));
+      res.add(new Polytype(Constraint.True,(Monotype)i.next()));
     return res;
   }
   

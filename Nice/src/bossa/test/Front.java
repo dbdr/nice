@@ -12,7 +12,7 @@
 
 // File    : Front.java
 // Created : Thu Jul 01 15:11:18 1999 by bonniot
-//$Modified: Thu Jan 20 12:13:09 2000 by bonniot $
+//$Modified: Thu Feb 24 11:39:16 2000 by Daniel Bonniot $
 
 package bossa.test;
 
@@ -20,6 +20,8 @@ import java.util.*;
 
 import bossa.parser.Loader;
 import bossa.syntax.AST;
+import bossa.modules.Package;
+import bossa.util.Debug;
 
 /** 
  * Test of the frontend.
@@ -43,12 +45,60 @@ public class Front
     else file=args[0];
     
     try{
-      bossa.modules.Module.compile(new bossa.syntax.LocatedString(file,bossa.util.Location.nowhere()));
+      compile(file);
     }
     catch(Exception e){
       System.out.println("Uncaught exception :");
       e.printStackTrace();
     }
+    catch(Error e){
+      System.out.println("Uncaught error :");
+      e.printStackTrace();
+    }
   }
+
+  private static void compile(String file)
+  {
+    bossa.modules.Package p = (Package) Package.make(file,true);
+    
+    List req = p.getRequirements();
+    for(Iterator i = req.iterator(); i.hasNext();)
+      {
+	Package r = (Package) i.next();
+	r.scope();
+	r.load();
+      }
+    
+    p.scope();
+    p.load();
+
+    try{
+      bossa.syntax.JavaTypeConstructor.createContext();
+      bossa.engine.Engine.createInitialContext();
+    }
+    catch(bossa.engine.Unsatisfiable e){
+      bossa.util.User.error("Unsatisfiable initial context: "+e.getMessage());
+    }
+    
+    for(Iterator i = req.iterator(); i.hasNext();)
+      {
+	Package r = (Package) i.next();
+	r.compile();
+      }
+    
+    p.compile();
+
+    if(p.isRunnable())
+      {
+	for(Iterator i = req.iterator(); i.hasNext();)
+	  {
+	    Package r = (Package) i.next();
+	    r.link();
+	  }    
+	p.link();
+	p.endOfLink();
+      }    
+  }
+  
 }
 

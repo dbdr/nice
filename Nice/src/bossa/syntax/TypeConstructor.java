@@ -12,7 +12,7 @@
 
 // File    : TypeConstructor.java
 // Created : Thu Jul 08 11:51:09 1999 by bonniot
-//$Modified: Thu Feb 03 16:01:15 2000 by Daniel Bonniot $
+//$Modified: Mon Feb 21 11:33:19 2000 by Daniel Bonniot $
 
 package bossa.syntax;
 
@@ -140,13 +140,7 @@ public class TypeConstructor
 
   gnu.bytecode.Type getJavaType()
   {
-    if(name.content.equals("Array") || name.content.equals("#Array"))
-      return bossa.SpecialTypes.arrayType;
-    
-    if(definition!=null)
-      return ClassDefinition.javaClass(definition);
-    else
-      return gnu.bytecode.Type.pointer_type;
+    return ClassDefinition.javaClass(definition);
   }
 
   /**
@@ -177,6 +171,14 @@ public class TypeConstructor
     if(type instanceof gnu.bytecode.ArrayType)
       res.add(gnu.bytecode.ClassType.make("_Array"));
   }
+
+  public int arity()
+  {
+    if(variance==null)
+      Internal.error(this,"Variance of "+this+" not known in arity()");
+    
+    return variance.size;
+  }
   
   /****************************************************************
    * Scoping
@@ -184,44 +186,38 @@ public class TypeConstructor
 
   TypeConstructor resolve(TypeScope typeScope)
   {
-    if(definition==null
-       // FIXME: bad hack
-       //&& !(name.toString().equals("dummy type symbol"))
-       )
+    if(definition!=null)
+      return this;  
+    
+    TypeSymbol s=typeScope.lookup(name.toString());
+    if(s==null)
+      User.error(name,"Class "+name+" is not defined"," in "+typeScope);
+    
+    if(s instanceof TypeConstructor)
+      return (TypeConstructor) s;
+    else
       {
-	TypeSymbol s=typeScope.lookup(name.toString());
-	
-	if(s==null)
-	  User.error(name,"Class "+name+" is not defined"," in "+typeScope);
-	
-	if(s instanceof TypeConstructor)
-	  return (TypeConstructor) s;
+	String what;
+	if(s instanceof InterfaceDefinition)
+	  what="an interface";
 	else
-	  {
-	    String what;
-	    if(s instanceof InterfaceDefinition)
-	      what="an interface";
-	    else
-	      what="a "+s.getClass();
-	    
-	    User.error(name,name+" should be a class, not "+what);
-	  }
-	return null;
+	  what="a "+s.getClass();
+	
+	User.error(name,name+" should be a class, not "+what);
       }
-    return this;
+    return null;
   }
 
   TypeSymbol resolveToTypeSymbol(TypeScope typeScope)
   {
-    if(definition==null)
-      {
-	TypeSymbol s=typeScope.lookup(name.toString());
-	if(s==null)
-	  User.error(this,"Class or interface "+name+" is not defined");
+    if(definition!=null)
+      return this;  
+    
+    TypeSymbol s=typeScope.lookup(name.toString());
+    if(s==null)
+      User.error(this,"Class or interface "+name+" is not defined");
 
-	return s;
-      }
-    return this;
+    return s;
   }
 
   /** iterates resolve on the collection of TypeConstructor */
@@ -311,7 +307,12 @@ public class TypeConstructor
   {
     return definition;
   }
-  
+
+  String bytecodeRepresentation()
+  {
+    return getDefinition().abstractClass().name.toString();
+  }
+
   /****************************************************************
    * Fields
    ****************************************************************/

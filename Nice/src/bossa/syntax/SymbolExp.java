@@ -12,7 +12,7 @@
 
 // File    : SymbolExpr.java
 // Created : Thu Jul 08 12:20:59 1999 by bonniot
-//$Modified: Mon Jan 24 16:23:31 2000 by Daniel Bonniot $
+//$Modified: Sat Feb 19 14:49:48 2000 by Daniel Bonniot $
 
 package bossa.syntax;
 
@@ -43,10 +43,14 @@ public class SymbolExp extends Expression
 
   FieldAccessMethod getFieldAccessMethod()
   {
-    if(symbol instanceof FieldAccessMethod)
-      return (FieldAccessMethod)symbol;
-    else
-      return null;
+    if(symbol instanceof MethodDefinition.Symbol)
+      {
+	MethodDefinition.Symbol s = (MethodDefinition.Symbol) symbol;
+	if(s.definition instanceof FieldAccessMethod)
+	  return (FieldAccessMethod)s.definition;
+      }
+    
+  return null;
   }
 
   void computeType()
@@ -66,8 +70,8 @@ public class SymbolExp extends Expression
 
   public gnu.expr.Expression compile()
   {
-    if(symbol instanceof MethodDefinition)
-      return new gnu.expr.QuoteExp(((MethodDefinition)symbol).getDispatchMethod());
+    if(symbol instanceof MethodDefinition.Symbol)
+      return new gnu.expr.QuoteExp(((MethodDefinition.Symbol)symbol).definition.getDispatchMethod());
     
     gnu.expr.Declaration decl = symbol.getDeclaration();
     

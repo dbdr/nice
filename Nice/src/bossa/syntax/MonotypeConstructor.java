@@ -12,7 +12,7 @@
 
 // File    : MonotypeConstructor.java
 // Created : Thu Jul 22 09:15:17 1999 by bonniot
-//$Modified: Thu Jan 27 16:06:48 2000 by Daniel Bonniot $
+//$Modified: Fri Feb 18 21:41:47 2000 by Daniel Bonniot $
 
 package bossa.syntax;
 
@@ -62,8 +62,8 @@ public class MonotypeConstructor extends Monotype
 
   public Monotype resolve(TypeScope typeScope) 
   {
-    return new MonotypeConstructor
-      (tc.resolve(typeScope),parameters.resolve(typeScope),loc);
+    TypeConstructor newTC = this.tc.resolve(typeScope);
+    return new MonotypeConstructor(newTC,parameters.resolve(typeScope),loc);
   }
   
   Monotype substitute(Map map)
@@ -86,9 +86,13 @@ public class MonotypeConstructor extends Monotype
   
   void typecheck()
   {
-    if(tc.variance.size!=parameters.size())
+    int arity = tc.arity();
+    
+    if(arity!=parameters.size())
       User.error(this,
-		 tc.variance.size+" type parameters expected for "+tc);
+		 "Class "+tc+" has "+
+		 (arity==0 ? "no" : ""+arity)+
+		 " type parameter"+(arity>1 ? "" : "s"));
   }
   
   /****************************************************************

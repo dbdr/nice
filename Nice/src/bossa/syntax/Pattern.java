@@ -12,7 +12,7 @@
 
 // File    : Pattern.java
 // Created : Mon Jul 05 14:36:52 1999 by bonniot
-//$Modified: Fri Jan 28 17:01:41 2000 by Daniel Bonniot $
+//$Modified: Tue Feb 15 22:30:35 2000 by Daniel Bonniot $
 // Description : Syntactic pattern for method bodies declaration
 
 package bossa.syntax;
@@ -57,7 +57,7 @@ public class Pattern
   final boolean isSharp()
   {
     return typeConstructor!=null &&
-      typeConstructor.name.toString().charAt(0)=='#';
+      typeConstructor.isConcrete();
   }
   
   Domain getDomain()
@@ -171,13 +171,12 @@ public class Pattern
    */
   public String bytecodeRepresentation()
   {
+    String enc;
     if(typeConstructor==null)
-      return AT_encoding+"_";
+      enc = "_";
+    else
+      enc = typeConstructor.bytecodeRepresentation();
 
-    String enc=typeConstructor.name.toString();
-    if(isSharp())
-      enc=enc.substring(1);
-    
     return AT_encoding+enc;
   }
   

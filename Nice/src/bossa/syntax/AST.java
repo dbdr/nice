@@ -12,7 +12,7 @@
 
 // File    : AST.java
 // Created : Thu Jul 01 11:01:56 1999 by bonniot
-//$Modified: Thu Feb 03 16:46:03 2000 by Daniel Bonniot $
+//$Modified: Tue Feb 22 17:46:29 2000 by Daniel Bonniot $
 
 package bossa.syntax;
 
@@ -21,28 +21,27 @@ import bossa.util.*;
 import java.util.*;
 
 /**
- * The Abstract Syntax Tree :
- * A collection of definitions
+ * The Abstract Syntax Tree : a collection of definitions.
  *
  * @see Definition
  */
 public class AST extends Node
 {
-  public AST(bossa.modules.Module module, List defs)
+  public AST(bossa.modules.Package module, List defs)
   {
     super(defs,Node.global);
     
     this.module=module;
     this.definitions=defs;
-
-    for(Iterator i = defs.iterator();
-	i.hasNext();)
-      ((Definition) i.next()).setModule(module);
   }
   
-  public void load()
+  public void buildScope()
   {
     buildScope(module);
+  }
+  
+  public void resolveScoping()
+  {
     doResolve();
   }
   
@@ -70,8 +69,6 @@ public class AST extends Node
     
     for(Iterator i=definitions.iterator();i.hasNext();)
       ((Definition)i.next()).compile();
-
-    MethodBodyDefinition.compileMain(module);
   }
   
   public String toString()
@@ -79,7 +76,7 @@ public class AST extends Node
     return Util.map(definitions);
   }
 
-  private bossa.modules.Module module;
+  private bossa.modules.Package module;
   private List /* of Definition */ definitions;
 }
 

@@ -12,7 +12,7 @@
 
 // File    : parser.jj
 // Created : Thu Jul 01 10:27:05 1999 by bonniot
-//$Modified: Wed Feb 02 17:34:57 2000 by Daniel Bonniot $
+//$Modified: Wed Feb 23 19:29:59 2000 by Daniel Bonniot $
 // Description : Parseur JavaCC pour Bossa
 //   Tokens based on the Jazz parser
 
@@ -30,18 +30,9 @@ import java.util.*;
 
 import bossa.util.*;
 import bossa.syntax.*;
-import bossa.modules.Module;
 
 class Parser
 {
-  // it is better to get a Collection than an AST:
-  // it is thus easier to get some definitions from a prolog first
-  public static Collection parse(Reader r) throws ParseException
-  {
-    Parser p=new Parser(r);
-    return p.definitions();
-  }
-
   /** 
    * Returns a function with no parameters that returns the expression.
    * if exp is 'null', this functions returns void.
@@ -51,7 +42,7 @@ class Parser
     List statements=new ArrayList(1);
     if(exp!=null)
       statements.add(new ReturnStmt(exp));
-    return new FunExp(Constraint.True(),
+    return new FunExp(Constraint.True,
 		      new ArrayList(0),
 		      statements);
   }
@@ -65,7 +56,7 @@ class Parser
 
     List statements=new ArrayList(1);
     statements.add(statement);
-    return new FunExp(Constraint.True(),
+    return new FunExp(Constraint.True,
 		      new ArrayList(0),
 		      statements);
   }
@@ -177,57 +168,57 @@ TOKEN: /* Operators */
 
 TOKEN: /* Keywords */
 {
-  < CLASS:      "class"      >
-| < INTERFACE:  "interface"  >
-| < IMPLEMENTS: "implements" >
-| < DOMAIN:     "domain"     >
-| < AT:         "@"          >
-| < EXACTLY_AT: "#"          >
-| < ASSERT:     "assert"     >
-| < INPUT:      "input"      >
-| < OUTPUT:     "output"     >
-| < FOR:        "for"        >
-| < IF:         "if"         >
-| < ELSE:       "else"       >
-| < ENDIF:      "endif"      >
-| < WHILE:      "while"      >
-		  //| < TRUE:       "true"       >
-		  //| < FALSE:      "false"      >
-| < PRINT:      "print"      >
-| < FORMAT:     "format"     >
-| < ERROR:      "error"      >
-| < FUN:        "fun"        >
-//| < ALIKE:      "alike"      >
-//| < THIS:       "this"       >
-| < EXTENDS:    "extends"    >
-| < RESET:      "reset"      >
-| < ENABLE:     "enable"     >
-| < NATIVE:     "native"     >
-| < FINAL:      "final"      >
-| < FINALLY:    "finally"    >
-| < ABSTRACT:   "abstract"   >
-| < LOCAL:      "local"      >
-| < PRAGMA:     "pragma"     >
-//| < INSTANCEOF: "instanceof" >
-| < DYNAMIC:    "dynamic"    >
-| < NEW:        "new"        >
-| < PUBLIC:     "public"     >
-| < STATIC:     "static"     >
-| < IMPORT:     "import"     >
-| < PACKAGE:    "package"    >
-| < REQUIRE:    "require"    >
-| < EXPORT:     "export"     >
-| < EXTERN:     "extern"     >
-| < AS:         "as"         >
+  < CLASS:      "class"		>
+| < INTERFACE:  "interface"	>
+| < IMPLEMENTS: "implements"	>
+| < DOMAIN:     "domain"     	>
+| < AT:         "@"          	>
+| < EXACTLY_AT: "#"          	>
+| < ASSERT:     "assert"     	>
+| < INPUT:      "input"      	>
+| < OUTPUT:     "output"     	>
+| < FOR:        "for"        	>
+| < IF:         "if"         	>
+| < ELSE:       "else"       	>
+| < ENDIF:      "endif"      	>
+| < WHILE:      "while"      	>
+//| < TRUE:       "true"       	>
+//| < FALSE:      "false"      	>
+| < FORMAT:     "format"     	>
+| < ERROR:      "error"      	>
+| < FUN:        "fun"        	>
+//| < ALIKE:      "alike"      	>
+//| < THIS:       "this"       	>
+| < EXTENDS:    "extends"    	>
+| < RESET:      "reset"      	>
+| < ENABLE:     "enable"     	>
+| < NATIVE:     "native"     	>
+| < FINAL:      "final"      	>
+| < FINALLY:    "finally"    	>
+| < ABSTRACT:   "abstract"   	>
+| < LOCAL:      "local"      	>
+| < PRAGMA:     "pragma"     	>
+//| < INSTANCEOF: "instanceof" 	>
+| < DYNAMIC:    "dynamic"    	>
+| < NEW:        "new"        	>
+| < NULL:	"null"		>
+| < PUBLIC:     "public"     	>
+| < STATIC:     "static"     	>
+| < IMPORT:     "import"     	>
+| < PACKAGE:    "package"    	>
+| < REQUIRE:    "require"    	>
+| < EXPORT:     "export"     	>
+| < EXTERN:     "extern"     	>
+| < AS:         "as"         	>
 
-| < ANY_:	"Any"        >
+| < ANY_:	"Any"        	>
 // Statements
-| < RETURN:     "return"     >
-| < VARIABLE:   "var"   >
+| < RETURN:     "return"     	>
+| < VARIABLE:   "var"   	>
 
 // reserved for future use
-| < PRIVATE:    "private"    >
-| < PROTECTED:  "protected"  >      
+| < PRIVATE:    "private"    	>
+| < PROTECTED:  "protected"  	>
 }
 
 
@@ -270,6 +261,21 @@ TOKEN: /* Floating point literals */
   < #EXPONENT: ["e","E"] (["+","-"])? (["0"-"9"])+ >
       }
 
+TOKEN: /* Char literals */
+{
+  < CHARACTER_LITERAL:
+      "'"
+      (   (~["'","\\","\n","\r"])
+        | ("\\"
+            ( ["n","t","b","r","f","\\","'","\""]
+            | ["0"-"7"] ( ["0"-"7"] )?
+            | ["0"-"3"] ["0"-"7"] ["0"-"7"]
+            )
+          )
+      )
+      "'"
+  >
+}
 
 TOKEN: /* String literals */
 {
@@ -394,6 +400,16 @@ LocatedString doted_string():
   { return new LocatedString(image,loc); }
 }
 
+LocatedString doted_array_string():
+{
+  LocatedString res;
+}
+{
+  res=doted_string()
+  ( "[]" { res.prepend("["); } )*
+  { return res; }
+}
+
 Collection strings():
 {
   Collection res=new ArrayList();
@@ -439,7 +455,7 @@ Interface itf():
   LocatedString name;
 }
 {
-  name=string()
+  name=doted_string()
   {
     return new Interface(name);
   }
@@ -586,7 +602,7 @@ Constraint constraint():
       
       { res=new Constraint(b,atoms); }
     )
-    | { res=Constraint.True(); }
+    | { res=Constraint.True; }
   )
   { return res; }
 }
@@ -901,7 +917,9 @@ MethodBodyDefinition methodBodyDefinition():
       "=" exp=expression() ";"
       { 
 	code=new ArrayList(1);
-	code.add(new ReturnStmt(exp));
+	ReturnStmt ret = new ReturnStmt(exp);
+	ret.setLocation(exp.location());
+	code.add(ret);
       }
     )
     { return new MethodBodyDefinition(name,binders,
@@ -935,10 +953,15 @@ MethodDefinition methodDefinition():
 
       {
 	List javaTypes=null;
-	LocatedString method,s;
+	LocatedString method,s=null;
+	boolean isNew=false;
       }
 
-      s=doted_string() 
+      (
+       "new" { isNew = true; }
+      |
+       s=doted_array_string() 
+      )
       // if we stop here, it's a static field
       // else it's a method
       ( 
@@ -947,18 +970,23 @@ MethodDefinition methodDefinition():
       | 
        { 
 	 javaTypes=new ArrayList();
-	 javaTypes.add(s); 
+	 if(!isNew) javaTypes.add(s); 
        }
-       method=doted_string()
+       method=doted_array_string()
        "("
        [
-	s=doted_string() { javaTypes.add(s); }
-	( "," s=doted_string() { javaTypes.add(s); } )*
+	s=doted_array_string() { javaTypes.add(s); }
+	( "," s=doted_array_string() { javaTypes.add(s); } )*
        ]
        ")"  
        ";"
        )
       { 
+	if(isNew)
+	{
+	  javaTypes.add(0,method);
+	  return new JavaMethodDefinition(method,"<init>",javaTypes,name,cst,returnType,parameters);
+	}
 	int dot=method.toString().lastIndexOf('.');
 	String methodName=method.toString().substring(dot+1,method.toString().length());
 	LocatedString className=method.substring(0,dot);
@@ -983,7 +1011,7 @@ Definition globalVariable():
   name=string()
   [ "=" value=expression() ]
   ";"
-  { return new LocalDeclarationStmt(name,t,value,true); }
+  { return new GlobalVarDeclaration(name,t,value); }
 }
 
 Definition definition():
@@ -1007,22 +1035,15 @@ Definition definition():
   { return res; }
 }
 
-List definitions():
+void readDefinitions(List definitions):
 {
-    List res=new ArrayList();
     Definition d;
 }
 {
-  (d = definition() 
-   { 
-     res.add(d); 
-     Collection ads=d.associatedDefinitions();
-     if(ads!=null)
-       res.addAll(ads);
-   }
+  ( 
+   d = definition() { definitions.add(d); } 
   )*
   <EOF> 
-  { return res; }
 }
 
 /***********************************************************************/
@@ -1056,14 +1077,21 @@ StringConstantExp stringConstantExp():
   { return new StringConstantExp(s); }
 }
 
-ConstantExp constantExp():
+Expression constantExp():
 {
-  ConstantExp res;
+  Expression res;
+  Token t;
 }
 {
   (
-  res=intConstantExp() 
+  "null" { res=new NullExp(); }
+| res=intConstantExp() 
 | res=floatConstantExp()
+| t=<CHARACTER_LITERAL> 
+    { res=new CharConstant
+      (new LocatedString(t.image.substring(1,t.image.length()-1),
+			 new Location(t))); 
+    }
 | res=stringConstantExp()
   )
 { return res; }
@@ -1178,8 +1206,9 @@ Expression expression1():
 }
 {
   { first=getToken(1); }
-  (
-  "(" res=expression() ")"
+
+(
+"(" res=expression() ")"
 |
   res=constantExp()
 | 
@@ -1491,28 +1520,35 @@ List statements():
  * Imported Packages
  ****************************************************************/
 
-List packages():
+void readImports(List imports, List opens):
 {
-  List res=new ArrayList();
   LocatedString name;
 }
 {
+  [ "package" doted_string() ";" ]
+
   (
    "import" name=doted_string() 
-   [ ".*" { name.append(".*"); } ]
+
+   ( ".*" { opens.add(0,name); }
+   | { imports.add(name); }
+   )
    ";"
-   { res.add(name); }
   )*
-  { return res; }
 }
 
 /****************************************************************
  * Modules
  ****************************************************************/
 
-Module module(String name):
+void module(List definitions,
+	    List imports,
+	    List opens):
 {
 }
 {
-  { return new Module(name,packages(),definitions()); }
+  { 
+    readImports(imports, opens);
+    readDefinitions(definitions);
+  }
 }

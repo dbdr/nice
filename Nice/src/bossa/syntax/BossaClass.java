@@ -10,9 +10,9 @@
 /*                                                                        */
 /**************************************************************************/
 
-// File    : BossaClassDefinition.java
+// File    : BossaClass.java
 // Created : Thu Jul 01 11:25:14 1999 by bonniot
-//$Modified: Thu Feb 03 10:44:59 2000 by Daniel Bonniot $
+//$Modified: Tue Feb 22 16:13:49 2000 by Daniel Bonniot $
 
 package bossa.syntax;
 
@@ -26,7 +26,6 @@ import java.util.*;
  * Abstract syntax for a class definition.
  */
 public class BossaClass extends ClassDefinition
-  implements Definition
 {
   /**
    * Creates a class definition.
@@ -52,11 +51,12 @@ public class BossaClass extends ClassDefinition
 		    List extensions, List implementations, List abstractions,
 		    List fields, List methods)
   {
-    super(name, isFinal, isAbstract, isInterface,
+    super(name.cloneLS(), isFinal, isAbstract, isInterface,
 	  typeParameters, extensions, implementations, abstractions);
-    
-    this.isSharp=isSharp;
 
+    this.simpleName = name;    
+    this.isSharp=isSharp;
+    
     this.fields=keepFields(fields,isSharp);
 
     addTypeSymbol(this.tc);
@@ -69,9 +69,7 @@ public class BossaClass extends ClassDefinition
 	this.methods=methods;
 	addChildren(computeAccessMethods(this.fields));
 
-	classType= gnu.bytecode.ClassType.make
-	  (name.toString().substring(1));
-	classType.requireExistingClass(false);
+	classType = module.createClass(simpleName.toString().substring(1));
       }
     else
       {
@@ -81,11 +79,7 @@ public class BossaClass extends ClassDefinition
 	if(this.isAbstract || this.isFinal)
 	  // since no associated concrete class is created,
 	  // it needs its own classtype
-	  {
-	    classType = gnu.bytecode.ClassType.make
-	      (name.toString());
-	    classType.requireExistingClass(false);
-	  }
+	  classType = module.createClass(simpleName.toString());
       }
     
     // if this class is final, 
@@ -104,8 +98,8 @@ public class BossaClass extends ClassDefinition
     if(isFinal || isAbstract)
       return new LinkedList();
 
-    Collection res=new ArrayList(1);
-    LocatedString name=new LocatedString("#"+this.name.content,this.name.location());
+    LocatedString name=this.simpleName.cloneLS();
+    name.prepend("#");
     List parent=new ArrayList(1);
     parent.add(this.tc);
     ClassDefinition c=new BossaClass
@@ -114,6 +108,7 @@ public class BossaClass extends ClassDefinition
     associatedConcreteClass = c;
     concreteClasses.add(c);
     
+    Collection res=new ArrayList(1);
     res.add(c);
     return res;
   }
@@ -141,7 +136,11 @@ public class BossaClass extends ClassDefinition
       {
 	Field f=(Field)i.next();
 	if(f.isLocal==local)
-	  result.add(f);
+	  {
+	    result.add(f);
+	    addChild(f.sym);
+	    f.sym.propagate=Node.none; // do not enter into global scope
+	  }
       }
     return result;
   }
@@ -191,7 +190,7 @@ public class BossaClass extends ClassDefinition
   public void createContext()
   {
     super.createContext();
-    
+
     try{
       if(!isSharp)
 	Typing.assertImp(tc,InterfaceDefinition.top(typeParameters.size()),true);
@@ -199,6 +198,24 @@ public class BossaClass extends ClassDefinition
     catch(TypingEx e){
       User.error(name,"Error in class "+name+" : "+e.getMessage());
     }
+
+    // This is done here for convenience only
+    if(classType!=null)
+      {
+	if(!isInterface)
+	  createConstructor();
+
+	// we need this before compile, 
+	// to know this type is, say, an interface
+	// when it appears in other definitions
+	ClassDefinition me = abstractClass();
+
+	classType.setModifiers(Access.PUBLIC 
+			       | (me.isAbstract ? Access.ABSTRACT : 0)
+			       | (me.isFinal    ? Access.FINAL    : 0)
+			       | (me.isInterface? Access.INTERFACE: 0)
+			       );
+      }
   }
 
   /****************************************************************
@@ -236,7 +253,7 @@ public class BossaClass extends ClassDefinition
       return this;
   }
   
-  ClassType javaClass()
+  Type javaClass()
   {
     if(associatedConcreteClass!=null)
       return javaClass(associatedConcreteClass);
@@ -253,7 +270,6 @@ public class BossaClass extends ClassDefinition
   /**
    * Computes the minimal set S of classes below this concrete class C
    * such that for all concrete D,
-   *
    * the test D<=C (where <= defined by Bossa (multiple-)inheritance)
    *
    * is equivalent to 
@@ -299,25 +315,72 @@ public class BossaClass extends ClassDefinition
     if(!(isSharp || isAbstract || isFinal))
       return;
     
-    ClassDefinition me = abstractClass();
-
     if(Debug.codeGeneration)
       Debug.println("Compiling class "+name);
     
-    classType.setModifiers(Access.PUBLIC 
-			   | (me.isAbstract ? Access.ABSTRACT : 0)
-			   | (me.isFinal    ? Access.FINAL    : 0)
-			   );
-    classType.setSuper(javaSuperClass());
+    ClassDefinition me = abstractClass();
 
+    ClassType[] itfs;
+    if(!isInterface)
+      {
+	classType.setSuper(javaSuperClass());
+      }
+    else
+      {
+	classType.setSuper(gnu.bytecode.Type.pointer_type);
+      }
+    
+    if(!isInterface)
+      {
+	List imp = new ArrayList(me.implementations.size());
+	for(Iterator i = me.implementations.iterator(); i.hasNext();)
+	  {
+	    InterfaceDefinition itf = ((Interface) i.next()).definition;
+	    if(!(itf instanceof AssociatedInterface))
+	      {
+		//Debug.println(itf+" ---- "+this);
+		continue;
+	      }
+	    
+	    imp.add(((AssociatedInterface) itf).getAssociatedClass().getJavaType());
+	  }
+	itfs = new ClassType[imp.size()];
+	int n=0;
+	for(Iterator i = imp.iterator(); i.hasNext();)
+	  itfs[n++] = (ClassType) i.next();
+      }
+    else
+      {
+	itfs = new ClassType[extensions.size()];
+	int n=0;
+	for(Iterator i = extensions.iterator(); i.hasNext();)
+	  {
+	    ClassDefinition c = ((TypeConstructor)i.next()).getDefinition();
+	    AssociatedInterface itf = c.getAssociatedInterface();
+	    if(itf==null)
+	      {
+		Internal.warning("Should not happen. size of itfs gona be wrong");
+		continue;
+	      }
+	    itfs[n++] = (ClassType) itf.getAssociatedClass().getJavaType();
+	  }
+      }
+    
+    classType.setInterfaces(itfs);
+    
     addFields(classType);
     if(me!=this) me.addFields(classType);
 
     for(Iterator i = illegitimateParents.iterator();
 	i.hasNext();)
       ((ClassDefinition) i.next()).addFields(classType);
-    
-    gnu.bytecode.Method constructor = classType.addMethod("<init>", Access.PUBLIC, new gnu.bytecode.Type[0], gnu.bytecode.Type.void_type);
+
+    module.addClass(classType);
+  }
+
+  private void createConstructor()
+  {
+    gnu.bytecode.Method constructor = constructor(classType);
 
     constructor.initCode();
     gnu.bytecode.CodeAttr code = constructor.getCode();
@@ -327,19 +390,17 @@ public class BossaClass extends ClassDefinition
     thisVar.setParameter(true);
     thisVar.allocateLocal(code);
 
-    code.emitLoad(thisVar);
+    code.emitLoad(thisVar);    
     code.emitInvokeSpecial(constructor(javaSuperClass()));
     code.emitReturn();
-    
-    module.addClass(classType);
   }
 
-  private static gnu.bytecode.Method constructor(ClassType parent)
+  private static gnu.bytecode.Method constructor(ClassType ct)
   {
-    if(parent==null)
-      parent = gnu.bytecode.Type.pointer_type;
+    if(ct==null)
+      ct = gnu.bytecode.Type.pointer_type;
     
-    gnu.bytecode.Method res = parent.addMethod("<init>", Access.PUBLIC, new gnu.bytecode.Type[0], gnu.bytecode.Type.void_type);
+    gnu.bytecode.Method res = ct.addMethod("<init>", Access.PUBLIC, gnu.bytecode.Type.typeArray0, gnu.bytecode.Type.void_type);
 
     return res;
   }
@@ -350,6 +411,7 @@ public class BossaClass extends ClassDefinition
 	i.hasNext();)
       {
 	Field f=(Field)i.next();
+	
 	gnu.bytecode.Field field=
 	  c.addField(f.sym.name.toString(),
 		     f.sym.type.getJavaType(),
@@ -358,24 +420,8 @@ public class BossaClass extends ClassDefinition
   }
   
   /****************************************************************
-   * Printing
+   * Misc.
    ****************************************************************/
-
-  public String toString()
-  {
-    return
-      "class "
-      + name.toString()
-      + Util.map("<",", ",">",typeParameters)
-      + Util.map(" extends ",", ","",extensions)
-      + Util.map(" implements ",", ","",implementations)
-      + Util.map(" abstract ",", ","",abstractions)
-      + " {\n"
-      + Util.map("",";\n",";\n",fields)
-      + Util.map(methods)
-      + "}\n\n"
-      ;
-  }
 
   Collection methodDefinitions()
   {
@@ -387,5 +433,7 @@ public class BossaClass extends ClassDefinition
   boolean isSharp; // This class is a #A (not directly visible to the user)
   private ClassType classType;  
 
+  /** Not the fully qualified name */
+  private LocatedString simpleName;
   private ClassDefinition associatedConcreteClass; // non-null if !isSharp
 }

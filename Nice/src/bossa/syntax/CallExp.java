@@ -12,7 +12,7 @@
 
 // File    : CallExp.java
 // Created : Mon Jul 05 16:27:27 1999 by bonniot
-//$Modified: Wed Jan 26 18:54:11 2000 by Daniel Bonniot $
+//$Modified: Fri Feb 18 13:01:35 2000 by Daniel Bonniot $
 
 package bossa.syntax;
 
@@ -102,6 +102,8 @@ public class CallExp extends Expression
 	  else
 	    User.error(loc,"The parameter \""+
 		       Util.map("",", ","",parameters) +
+		       " of type " +
+		       Util.map("",", ","",paramTypes) +
 		       "\" is "+end);      
 	}
     }
@@ -136,8 +138,6 @@ public class CallExp extends Expression
     if(Typing.dbg)
       {
 	Debug.println("Parameters:\n"+
-		      Util.map("",", ","\n",parameters));
-	Debug.println("Types of parameters:\n"+
 		      Util.map("",", ","\n",parameters));
       }
     
@@ -177,7 +177,8 @@ public class CallExp extends Expression
 
   void typecheck()
   {
-    resolveOverloading();
+    // forces computation of the type if not done.
+    getType();
   }
   
   /****************************************************************

@@ -54,6 +54,7 @@ class Interface {
   }
   void indexMove(int src, int dest) {
     implementors.bitCopy(src, dest);
+    approx.set(dest,approx.get(src));
     if (k0.isRigid(src)) {
       // strange as the relation on the rigid indexes should already be
       // condensed... but let's be general

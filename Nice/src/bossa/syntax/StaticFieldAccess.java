@@ -12,7 +12,7 @@
 
 // File    : StaticFieldAccess.java
 // Created : Thu Jul 01 18:12:46 1999 by bonniot
-//$Modified: Mon Jan 03 16:23:08 2000 by bonniot $
+//$Modified: Wed Feb 23 13:14:17 2000 by Daniel Bonniot $
 
 package bossa.syntax;
 
@@ -50,11 +50,11 @@ public class StaticFieldAccess extends MethodDefinition
     this.field=getField(className,fieldName);
 
     if(field==null)
-      User.error(name,
+      User.error(this,
 		 "Field "+fieldName+" not found in class "+className);
 
     if(!java.lang.reflect.Modifier.isStatic(field.getModifiers()))
-      User.error(name,
+      User.error(this,
 		 fieldName+" should be a static field");
   }
   
@@ -62,12 +62,15 @@ public class StaticFieldAccess extends MethodDefinition
    * Reflection
    ****************************************************************/
 
-  static java.lang.reflect.Field getField(LocatedString javaClass, String name)
+  java.lang.reflect.Field getField(LocatedString javaClass, String name)
   {
     Class c = JavaTypeConstructor.lookupJavaClass(javaClass.toString());
 
     if(c==null)
       User.error(javaClass,"Class "+javaClass+" not found");
+    
+    // remembers the fully qualified name
+    className.content = c.getName();
     
     java.lang.reflect.Field[] fields=c.getFields();
     
@@ -109,13 +112,13 @@ public class StaticFieldAccess extends MethodDefinition
   private String interfaceString()
   {
     return
-      type.getConstraint().toString()
-      + type.codomain().toString()
+      getType().getConstraint().toString()
+      + getType().codomain().toString()
       + " "
-      + name
-      + Util.map("<",", ",">",type.getTypeParameters())
+      + symbol.name
+      + Util.map("<",", ",">",getType().getTypeParameters())
       + "("
-      + Util.map("",", ","",type.domain())
+      + Util.map("",", ","",getType().domain())
       + ") = native "
       + className + "." + (field==null ? fieldName : field.getName())
       + ";\n"

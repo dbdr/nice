@@ -12,7 +12,7 @@
 
 // File    : Expression.java
 // Created : Mon Jul 05 16:25:02 1999 by bonniot
-//$Modified: Tue Jan 25 10:55:56 2000 by Daniel Bonniot $
+//$Modified: Fri Feb 04 11:48:42 2000 by Daniel Bonniot $
 // Description : 
 
 package bossa.syntax;
@@ -146,27 +146,6 @@ public abstract class Expression extends Node
 
     while(i.hasNext())
       res.add( ((Expression) i.next()) .getType());
-
-    return res;
-  }
-
-  /**
-   * Maps getType over a collection of Expressions.
-   *
-   * @param Expressions the collection of Expressions
-   * @return the collection of their Polytypes, 
-   * or null if there is a PolytypeConstructor
-   */
-  static Collection getPolytype(Collection expressions)
-  {
-    Iterator i=expressions.iterator();
-    Collection res=new ArrayList(expressions.size());
-
-    while(i.hasNext())
-      {
-	Polytype t=((Expression) i.next()).getType();
-	res.add(t);
-      }
 
     return res;
   }

@@ -12,7 +12,7 @@
 
 // File    : NewExp.java
 // Created : Thu Jul 08 17:15:15 1999 by bonniot
-//$Modified: Thu Feb 03 14:14:57 2000 by Daniel Bonniot $
+//$Modified: Wed Feb 16 18:04:18 2000 by Daniel Bonniot $
 // Description : Allocation of a new object
 
 package bossa.syntax;
@@ -64,7 +64,7 @@ public class NewExp extends Expression
     
     return new gnu.expr.ApplyExp
       (new gnu.expr.QuoteExp(new gnu.expr.PrimProcedure
-			     (ct,new gnu.bytecode.Type[0])),
+			     (ct,gnu.bytecode.Type.typeArray0)),
        new gnu.expr.Expression[0]);
   }
   

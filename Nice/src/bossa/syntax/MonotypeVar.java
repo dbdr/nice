@@ -12,7 +12,7 @@
 
 // File    : MonotypeVar.java
 // Created : Fri Jul 23 15:36:39 1999 by bonniot
-//$Modified: Wed Jan 26 14:23:09 2000 by Daniel Bonniot $
+//$Modified: Tue Feb 15 19:52:52 2000 by Daniel Bonniot $
 
 package bossa.syntax;
 
@@ -132,6 +132,15 @@ public class MonotypeVar extends Monotype
     if(map.containsKey(this))
       return (Monotype) map.get(this);
     return this;
+  }
+
+  /****************************************************************
+   * Typechecking
+   ****************************************************************/
+
+  void typecheck()
+  {
+    // Nothing
   }
 
   /****************************************************************

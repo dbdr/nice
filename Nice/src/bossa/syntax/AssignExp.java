@@ -12,7 +12,7 @@
 
 // File    : AssignExp.java
 // Created : Mon Jul 05 15:49:27 1999 by bonniot
-//$Modified: Mon Jan 24 15:41:40 2000 by Daniel Bonniot $
+//$Modified: Mon Feb 07 15:43:22 2000 by Daniel Bonniot $
 
 package bossa.syntax;
 

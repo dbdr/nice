@@ -12,7 +12,7 @@
 
 // File    : FunTypeKind.java
 // Created : Wed Jul 28 17:51:02 1999 by bonniot
-//$Modified: Thu Oct 28 16:06:18 1999 by bonniot $
+//$Modified: Fri Feb 04 15:28:47 2000 by Daniel Bonniot $
 
 package bossa.typing;
 
@@ -31,6 +31,9 @@ public class FunTypeKind implements Kind
   public FunTypeKind(int domainArity)
   {
     this.domainArity=domainArity;
+    // forces the creation of the constraint
+    // we don't want it to be created during link.
+    Engine.getConstraint(this);
   }
 
   public void register(Element e)

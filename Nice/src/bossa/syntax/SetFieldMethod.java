@@ -12,7 +12,7 @@
 
 // File    : SetFieldMethod.java
 // Created : Thu Jul 01 18:12:46 1999 by bonniot
-//$Modified: Fri Jan 21 15:37:02 2000 by Daniel Bonniot $
+//$Modified: Wed Feb 23 17:17:14 2000 by Daniel Bonniot $
 
 package bossa.syntax;
 
@@ -34,11 +34,11 @@ public class SetFieldMethod extends MethodDefinition
      List classTypeParameters)
   {
     super(fieldName,new Constraint(classTypeParameters,null),
-	  JavaTypeConstructor.voidType, makeList(classDef.getType().getMonotype(),fieldType));
+	  JavaTypeConstructor.voidType, 
+	  makeList(classDef.getType().getMonotype(),fieldType));
     this.definition=classDef;
     this.classTC = classDef.tc;
     this.fieldName = fieldName.toString();
-    this.fieldType = fieldType;
     
     MethodDefinition.addMethod(this);
   }
@@ -52,7 +52,6 @@ public class SetFieldMethod extends MethodDefinition
   }
   
   public final TypeConstructor classTC;
-  public final Monotype fieldType;
   
   public final String fieldName;
   

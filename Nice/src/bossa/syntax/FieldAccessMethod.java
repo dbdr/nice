@@ -12,7 +12,7 @@
 
 // File    : FieldAccessMethod.java
 // Created : Thu Jul 01 18:12:46 1999 by bonniot
-//$Modified: Fri Jan 21 15:35:23 2000 by Daniel Bonniot $
+//$Modified: Mon Feb 21 11:31:44 2000 by Daniel Bonniot $
 
 package bossa.syntax;
 
@@ -49,6 +49,7 @@ public class FieldAccessMethod extends MethodDefinition
     MethodDefinition.addMethod(this);
 
     setMethod = new SetFieldMethod(classDef,fieldName,fieldType,classTypeParameters);
+    addChild(setMethod);
   }
   
   private static List makeList(Monotype t)
@@ -87,14 +88,4 @@ public class FieldAccessMethod extends MethodDefinition
     return setMethod.compileAssign(parameter,value);
   }
 
-  /****************************************************************
-   * Module
-   ****************************************************************/
-  
-  public void setModule(bossa.modules.Module module)
-  {
-    super.setModule(module);
-    setMethod.setModule(module);
-  }
-  
 }

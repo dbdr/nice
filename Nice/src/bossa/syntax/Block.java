@@ -12,7 +12,7 @@
 
 // File    : Block.java
 // Created : Wed Jul 07 17:42:15 1999 by bonniot
-//$Modified: Thu Feb 03 11:30:51 2000 by Daniel Bonniot $
+//$Modified: Thu Feb 17 19:54:51 2000 by Daniel Bonniot $
 // Description : A block : a list of statements with local variables
 
 package bossa.syntax;
@@ -136,9 +136,9 @@ public class Block extends Statement
 	  AssignExp.checkAssignment(local.left.getType(),local.value);
 	}
 	catch(bossa.typing.TypingEx t){
-	  User.error(local.left,"Typing error : "+local.left+
-		     " cannot be assigned value "+local.value,
-		     " with type "+local.value.getType());
+	  User.error(local.left,"Typing error : "+local.left.name+
+		     " cannot be assigned value \""+local.value+"\"",
+		     " of type "+local.value.getType());
 	}
       }
   }

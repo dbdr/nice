@@ -12,7 +12,7 @@
 
 // File    : Constraint.java
 // Created : Fri Jul 02 17:51:35 1999 by bonniot
-//$Modified: Tue Jan 25 15:59:34 2000 by Daniel Bonniot $
+//$Modified: Tue Feb 22 12:24:25 2000 by Daniel Bonniot $
 
 package bossa.syntax;
 
@@ -62,14 +62,14 @@ public class Constraint extends Node
   }
   
   /**
-   * The trivial constraint 
+   * The trivial constraint.
+   *
+   * This field is final, so pointer equality can be used 
+   * to test whether a constraint is True.
    *
    * @return a constraint with no binders, always true
    */
-  public static final Constraint True()
-  { 
-    return new Constraint(new ArrayList(0),new ArrayList(0));
-  }
+  public static final Constraint True = new Constraint(new ArrayList(0),new ArrayList(0));
 
   /**
    * Returns a new constraint.
@@ -136,7 +136,11 @@ public class Constraint extends Node
     throws bossa.typing.TypingEx
   {
     bossa.typing.Typing.introduce(binders);
-    
+
+    // This should be before the stuff about implementing Top
+    // since it should allow to find variance of type constructors
+    AtomicConstraint.assert(atomics);
+
     if(implementTop)
       for(Iterator i=binders.iterator();i.hasNext();)
 	{
@@ -148,13 +152,11 @@ public class Constraint extends Node
 		bossa.typing.Typing.assertImp
 		  (t,InterfaceDefinition.top(t.variance.size),false);
 	      else
-		Internal.warning(t+" has no known variance, so I can't assert it implement some Top<n> interface");
+		Internal.warning(t, t+" has no known variance, so I can't assert it implement some Top<n> interface");
 	    }
 	  else if(s instanceof MonotypeVar)
 	    ((MonotypeVar)s).rememberToImplementTop();
 	}
-
-    AtomicConstraint.assert(atomics);
   }
 
   /****************************************************************

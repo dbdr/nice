@@ -12,7 +12,7 @@
 
 // File    : Monotype.java
 // Created : Thu Jul 01 19:28:28 1999 by bonniot
-//$Modified: Thu Jan 20 12:07:37 2000 by bonniot $
+//$Modified: Tue Feb 15 22:02:00 2000 by Daniel Bonniot $
 // Description : Abstract syntactic type, without constraint
 
 package bossa.syntax;
@@ -100,8 +100,12 @@ abstract public class Monotype
     return res;
   }
   
-  void typecheck()
+  abstract void typecheck();
+  
+  final void typecheck(List monotypes)
   {
+    for(Iterator i=monotypes.iterator(); i.hasNext();)
+      ((Monotype) i.next()).typecheck();
   }
   
   /****************************************************************
@@ -172,6 +176,6 @@ abstract public class Monotype
     return toString();
   }
 
-  Constraint constraint=Constraint.True();
+  //??? Constraint constraint=Constraint.True;
 }
 

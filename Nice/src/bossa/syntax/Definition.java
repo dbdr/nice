@@ -12,35 +12,43 @@
 
 // File    : Definition.java
 // Created : Thu Jul 01 11:17:28 1999 by bonniot
-//$Modified: Sat Dec 04 12:01:19 1999 by bonniot $
+//$Modified: Sat Feb 19 15:27:20 2000 by Daniel Bonniot $
 
 package bossa.syntax;
 
 import java.util.Collection;
 
 /**
- * Abstract definition
+ * Abstract definition.
  * May be a class definition, a method definition, 
  * an interface definition...
  */
-public interface Definition
+public abstract class Definition extends Node implements bossa.util.Located
 {
+
+  Definition(LocatedString name, int propagate)
+  {
+    super(propagate);
+    
+    this.name = name;
+    module = currentModule;
+  }
+  
   /**
    * Returns a collection of definitions that are derived
    * from the current definition.
    * For example, a class definition A returns a collection
-   * with the definition of class #A (#A<:A, #A is final, abstracts Top without implementing it).
+   * with the definition of class #A.
    */
-  Collection associatedDefinitions();
-  // If we turn Definition to an abstract class,
-  // it would be good to have a default implementation
-  // that returns null, it would save lines
-  // since only ClassDefinition has a different implementation.
-
+  public Collection associatedDefinitions()
+  {
+    return null;
+  }
+  
   /**
    * Creates the initial rigid context.
    */
-  void createContext();
+  abstract void createContext();
   
   /**
    * Write the exported interface of the definition
@@ -48,15 +56,32 @@ public interface Definition
    *
    * @param s a PrintWriter
    */
-  void printInterface(java.io.PrintWriter s);
+  abstract void printInterface(java.io.PrintWriter s);
 
   /**
    * Generates bytecode for this definition.
    */
-  void compile();
+  abstract void compile();
   
   /**
-   * Set the module this definition appears in.
+   * The module this definition appears in.
    */
-  void setModule(bossa.modules.Module module);
+  protected bossa.modules.Package module;
+  static public bossa.modules.Package currentModule;
+
+  /****************************************************************
+   * Name and location of the definition
+   ****************************************************************/
+  
+  public LocatedString getName()
+  {
+    return name;
+  }
+
+  public bossa.util.Location location()
+  {
+    return name.location();
+  }
+
+  LocatedString name;
 }

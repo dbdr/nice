@@ -12,14 +12,14 @@
 
 // File    : SpecialTypes.java
 // Created : Mon Jan 17 14:19:30 2000 by bonniot
-//$Modified: Mon Jan 24 19:30:45 2000 by Daniel Bonniot $
+//$Modified: Thu Feb 24 14:54:04 2000 by Daniel Bonniot $
 
 package bossa;
 
 import bossa.util.*;
 import gnu.bytecode.*;
 
-import kawa.lang.SpecialType;
+import kawa.standard.Scheme;
 
 /**
  * Used to store types with automatic conversion.
@@ -29,18 +29,19 @@ import kawa.lang.SpecialType;
 
 public class SpecialTypes
 {
-  static public Type intType, booleanType, voidType, arrayType;
+  static public final Type intType, longType, charType, booleanType, voidType, arrayType;
 
   static 
   {
-    intType = new SpecialType
-      ("int", 		"I", 4, java.lang.Boolean.TYPE);
-    booleanType = new SpecialType
-      ("boolean", 	"Z", 1, java.lang.Boolean.TYPE);
-    voidType = new SpecialType
-      ("void", 		"V", 0, java.lang.Void.TYPE);
+    intType = Scheme.intType;
+    longType = Scheme.longType;
+    charType = Scheme.charType;
+    booleanType = Scheme.booleanType;
+    voidType = gnu.bytecode.Type.void_type;
 
     arrayType = new SpecialArray(Type.pointer_type);
+
+    Type.flushTypeChanges();
   }
 
   static public Type makeArrayType(Type elements)

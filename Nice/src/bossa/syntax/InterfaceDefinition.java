@@ -12,7 +12,7 @@
 
 // File    : InterfaceDefinition.java
 // Created : Thu Jul 01 17:00:14 1999 by bonniot
-//$Modified: Thu Jan 27 17:25:02 2000 by Daniel Bonniot $
+//$Modified: Wed Feb 16 16:14:00 2000 by Daniel Bonniot $
 
 package bossa.syntax;
 
@@ -24,15 +24,15 @@ import bossa.typing.Variance;
 /** 
  * Abstract syntax for an interface definition.
  */
-public class InterfaceDefinition extends Node
-  implements Definition,TypeSymbol
+public class InterfaceDefinition extends Definition
+  implements TypeSymbol
 {
   public InterfaceDefinition(LocatedString name, 
 			     Collection typeParameters, 
 			     List extensions)
   {
-    super(Node.global);
-    this.name=name;
+    super(name, Node.global);
+
     this.parameters=typeParameters;
     this.variance=Variance.make(typeParameters.size());
     addTypeSymbol(this);
@@ -51,8 +51,8 @@ public class InterfaceDefinition extends Node
   
   private InterfaceDefinition(String name, int arity)
   {
-    super(Node.forward);
-    this.name=new LocatedString(name,Location.nowhere());
+    super(new LocatedString(name,Location.nowhere()), Node.forward);
+
     this.parameters=null;
     this.variance=Variance.make(arity);
     addTypeSymbol(this);
@@ -121,17 +121,6 @@ public class InterfaceDefinition extends Node
   }
 
   /****************************************************************
-   * Module
-   ****************************************************************/
-  
-  private bossa.modules.Module module;
-  
-  public void setModule(bossa.modules.Module module)
-  {
-    this.module = module;
-  }
-
-  /****************************************************************
    * Printing
    ****************************************************************/
 
@@ -142,18 +131,7 @@ public class InterfaceDefinition extends Node
     return res;
   }
 
-  public LocatedString getName()
-  {
-    return name;
-  }
-
-  public Location location()
-  {
-    return name.location();
-  }
-
   public int itf; // The associated lowlevel interface
-  LocatedString name;
   Collection /* of TypeSymbol */ parameters;
   public Variance variance;
   private List /* of Interface */ extensions; // the surinterfaces

@@ -12,7 +12,7 @@
 
 // File    : FunExp.java
 // Created : Mon Jul 12 15:09:50 1999 by bonniot
-//$Modified: Tue Jan 25 10:49:59 2000 by Daniel Bonniot $
+//$Modified: Thu Feb 24 13:06:15 2000 by Daniel Bonniot $
 // Description : A functional expression
 
 package bossa.syntax;
@@ -20,7 +20,7 @@ package bossa.syntax;
 import java.util.*;
 import bossa.util.*;
 
-public class FunExp extends Expression
+public class FunExp extends Expression implements Function
 {
   public FunExp(Constraint cst, List formals, List body)
   {
@@ -52,6 +52,11 @@ public class FunExp extends Expression
 				  returnType.getMonotype()));
   }
 
+  public Monotype getReturnType()
+  {
+    return null;
+  }
+  
   void findJavaClasses()
   {
     List types = MonoSymbol.getMonotype(formals);
@@ -62,13 +67,17 @@ public class FunExp extends Expression
    * Code generation
    ****************************************************************/
 
+  private gnu.expr.BlockExp blockExp;
+  public gnu.expr.BlockExp getBlock() { return blockExp; }
+
   public gnu.expr.Expression compile()
   {
+    //if(Debug.codeGeneration)
+    //Debug.println("Compiling "+this);
+    
     gnu.expr.LambdaExp res = new gnu.expr.LambdaExp();
 
-    gnu.expr.BlockExp block = new gnu.expr.BlockExp();
-    gnu.expr.BlockExp savedBlock = Statement.currentMethodBlock;
-    Statement.currentMethodBlock=block;
+    blockExp = new gnu.expr.BlockExp();
 
     res.min_args = res.max_args = formals.size();
     
@@ -83,18 +92,19 @@ public class FunExp extends Expression
 	
 	gnu.expr.Declaration decl = 
 	  res.addDeclaration(s.name.toString(), 
+			     //s.getMonotype().getJavaType()
 			     // Since a applyN method will be produced,
 			     // we must forget about the types... :-(
-			     gnu.bytecode.Type.pointer_type);
+			     gnu.bytecode.Type.pointer_type
+			     );
 
 	decl.setParameter(true);	
 	s.setDeclaration(decl);
       }
     
-    res.body = block;
-    block.setBody(body.generateCode());
+    res.body = blockExp;
+    blockExp.setBody(body.generateCode());
 
-    Statement.currentMethodBlock = savedBlock;
     Statement.currentScopeExp = res.outer; // pop
     
     return res;

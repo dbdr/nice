@@ -12,7 +12,7 @@
 
 // File    : Location.java
 // Created : Tue Jul 13 11:55:08 1999 by bonniot
-//$Modified: Tue Jan 25 10:56:34 2000 by Daniel Bonniot $
+//$Modified: Mon Feb 21 17:34:21 2000 by Daniel Bonniot $
 
 package bossa.util;
 
@@ -77,7 +77,7 @@ public class Location implements Located
   public String toString()
   {
     if(abstractLocation!=null)
-      return abstractLocation;
+      return "["+abstractLocation+"]: ";
 
     String res;
 

@@ -12,7 +12,7 @@
 
 // File    : ClassDefinition.java
 // Created : Thu Jul 01 11:25:14 1999 by bonniot
-//$Modified: Wed Feb 02 17:29:45 2000 by Daniel Bonniot $
+//$Modified: Mon Feb 21 10:50:52 2000 by Daniel Bonniot $
 
 package bossa.syntax;
 
@@ -25,8 +25,7 @@ import java.util.*;
 /**
  * Abstract syntax for a class definition.
  */
-abstract public class ClassDefinition extends Node
-  implements Definition
+abstract public class ClassDefinition extends Definition
 {
   /**
    * Creates a class definition.
@@ -52,7 +51,7 @@ abstract public class ClassDefinition extends Node
 			 List extensions, List implementations, List abstractions
 			 )
   {
-    super(Node.global);
+    super(name, Node.upper);
 
     if(isInterface)
       isAbstract=true;
@@ -64,13 +63,18 @@ abstract public class ClassDefinition extends Node
 	  User.error(name,
 		     "Interfaces can't be final");
 	
-	if(implementations!=null && implementations.size()>0 ||
-	   abstractions!=null && abstractions.size()>0)
+	if(implementations!=null && implementations.size()>0)
 	  User.error(name,
 		     "Interfaces can't implement anything");
+	
+	if(abstractions!=null && abstractions.size()>0)
+	  User.error(name,
+		     "Interfaces can't abstract anything");	  
       }
     
-    this.name=name;
+    this.simpleName = this.name.toString();
+    this.name.prepend(module.getName()+".");
+    
     this.isFinal=isFinal;
     this.isAbstract=isAbstract;
     this.isInterface=isInterface;
@@ -127,6 +131,8 @@ abstract public class ClassDefinition extends Node
 
   void resolve()
   {
+    typeScope.addSymbols(typeParameters);
+    
     extensions=TypeConstructor.resolve(typeScope,extensions);
 
     // A class cannot extend an interface
@@ -186,7 +192,7 @@ abstract public class ClassDefinition extends Node
          (isFinal ? "final " : "")
        + (isInterface ? "interface " : 
 	  (isAbstract ? "abstract " : "") + "class ")
-       + name.toString()
+       + simpleName
        + Util.map("<",", ",">",typeParameters)
        + Util.map(" extends ",", ","",extensions)
        + Util.map(" implements ",", ","",implementations)
@@ -230,18 +236,23 @@ abstract public class ClassDefinition extends Node
     return this;
   }
   
-  abstract ClassType javaClass();
+  abstract Type javaClass();
 
-  final static ClassType javaClass(ClassDefinition c)
+  final static Type javaClass(ClassDefinition c)
   {
     if(c==null)
       return gnu.bytecode.Type.pointer_type;
-    return c.javaClass();
+    else
+      return c.javaClass();
   }
   
   ClassType javaSuperClass()
   {
-    return javaClass(abstractClass().distinguishedSuperClass());
+    Type res = javaClass(abstractClass().distinguishedSuperClass());
+    if(!(res instanceof ClassType))
+      Internal.error("Only _Array is not a class type, and it must be final");
+    
+    return (ClassType) res;
   }
   
   /**
@@ -295,7 +306,7 @@ abstract public class ClassDefinition extends Node
    * Associated interface
    ****************************************************************/
 
-  private InterfaceDefinition associatedInterface;
+  private AssociatedInterface associatedInterface;
 
   /**
    * Returns the abstract interface associated to this class, or null.
@@ -303,7 +314,7 @@ abstract public class ClassDefinition extends Node
    * An associated abstract interface in created 
    * for each "interface" class.
    */
-  public InterfaceDefinition getAssociatedInterface()
+  public AssociatedInterface getAssociatedInterface()
   { return associatedInterface; }
     
 
@@ -319,6 +330,12 @@ abstract public class ClassDefinition extends Node
       {
 	TypeConstructor tc = (TypeConstructor) i.next();
 	ClassDefinition c = tc.getDefinition();
+	if(c==null)
+	  Internal.error(name,
+			 "Superclass "+tc+
+			 "("+tc.getClass()+")"+
+			 " of "+name+
+			 " has no definition");
 	
 	InterfaceDefinition ai = c.getAssociatedInterface();
 	if(ai==null)
@@ -333,40 +350,17 @@ abstract public class ClassDefinition extends Node
   }
   
   /****************************************************************
-   * Module
-   ****************************************************************/
-  
-  protected bossa.modules.Module module;
-  
-  public void setModule(bossa.modules.Module module)
-  {
-    this.module = module;
-    for(Iterator i = children.iterator();
-	i.hasNext();)
-      {
-	Object child = i.next();
-	if(child instanceof Definition)
-	  ((Definition) child).setModule(module);
-      }
-  }
-
-  /****************************************************************
    * Printing
    ****************************************************************/
 
   public String toString()
   {
-    return
-      "class "
-      + name.toString()
-      + Util.map("<",", ",">",typeParameters)
-      + Util.map(" extends ",", ","",extensions)
-      + Util.map(" implements ",", ","",implementations)
-      + Util.map(" abstract ",", ","",abstractions)
-      ;
+    return "class "+name;
   }
 
-  LocatedString name;
+  /** The name of the class without package qualification. */
+  String simpleName;
+  
   TypeConstructor tc;
   List /* of TypeSymbol */ typeParameters;
   protected List

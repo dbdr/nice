@@ -12,7 +12,7 @@
 
 // File    : Bytecode.java
 // Created : Fri Dec 10 19:03:56 1999 by bonniot
-//$Modified: Mon Dec 13 15:29:09 1999 by bonniot $
+//$Modified: Fri Feb 18 18:57:15 2000 by Daniel Bonniot $
 
 package bossa;
 
@@ -26,8 +26,8 @@ import bossa.util.*;
 
 public abstract class Bytecode
 {
-  private static final char firstEscapeChar = '$';
-  private static final char escapeChar = '\u0001';
+  private static final char firstEscapeChar = '£';
+  private static final char escapeChar = '£';
 
   static
   {

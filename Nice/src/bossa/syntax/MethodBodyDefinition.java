@@ -12,13 +12,12 @@
 
 // File    : MethodBodyDefinition.java
 // Created : Thu Jul 01 18:12:46 1999 by bonniot
-//$Modified: Thu Feb 03 13:35:51 2000 by Daniel Bonniot $
+//$Modified: Thu Feb 24 12:06:07 2000 by Daniel Bonniot $
 
 package bossa.syntax;
 
 import bossa.util.*;
 import bossa.typing.*;
-import bossa.modules.Module;
 
 import gnu.bytecode.*;
 import java.util.*;
@@ -26,8 +25,8 @@ import java.util.*;
 /**
  * Definition of an alternative for a method.
  */
-public class MethodBodyDefinition extends Node 
-  implements Definition, Located
+public class MethodBodyDefinition extends Definition 
+  implements Function
 {
   /**
    * Describe constructor here.
@@ -46,8 +45,8 @@ public class MethodBodyDefinition extends Node
 			      List newTypeVars,
 			      List formals, List body)
   {
-    super(Node.down);
-    this.name=name;
+    super(name,Node.down);
+
     this.binders=binders; 
 
     this.newTypeVars=newTypeVars;
@@ -113,7 +112,7 @@ public class MethodBodyDefinition extends Node
 	formals.remove(0);
       }
     
-    parameters=buildSymbols(this.formals,definition.type.domain());
+    parameters=buildSymbols(this.formals,definition.symbol.type.domain());
     scope.addSymbols(parameters);
   }
 
@@ -132,15 +131,15 @@ public class MethodBodyDefinition extends Node
     // TODO
     for(Iterator i=symbols.iterator();i.hasNext();){
       VarSymbol s=(VarSymbol)i.next();
-      if(!(s instanceof MethodDefinition))
+      if(!(s instanceof MethodDefinition.Symbol))
 	i.remove();
       else
 	{
-	  MethodDefinition m=(MethodDefinition)s;
+	  MethodDefinition m=(MethodDefinition)((MethodDefinition.Symbol)s).definition;
 	  try{
 	    int level=Typing.enter("Trying definition "+m+" for method body "+name);
-	    Typing.introduce(m.type.getTypeParameters());
-	    m.type.getConstraint().assert();
+	    Typing.introduce(m.symbol.type.getTypeParameters());
+	    m.symbol.type.getConstraint().assert();
 	    Typing.in(Pattern.getPolytype(formals),
 		      Domain.fromMonotypes(m.getType().domain()));
 	    Typing.implies();
@@ -148,7 +147,7 @@ public class MethodBodyDefinition extends Node
 	      Internal.error("Enter/Leave error");
 	  }
 	  catch(TypingEx e){
-	    if(Typing.dbg) Debug.println("Not the right choice :"+e);
+	    if(Debug.typing) Debug.println("Not the right choice :"+e);
 	    i.remove();
 	  }
 	  catch(BadSizeEx e){
@@ -188,8 +187,6 @@ public class MethodBodyDefinition extends Node
     if(newTypeVars!=null)
       this.typeScope.addSymbols(newTypeVars);
     
-    body.doFindJavaClasses();
-    
     return res;
   }
 
@@ -197,6 +194,9 @@ public class MethodBodyDefinition extends Node
   {
     //Resolution of the body is delayed to enable overloading
 
+    // we look for java classes
+    body.doFindJavaClasses();
+    
     Pattern.resolveTC(typeScope,formals);
   }
   
@@ -207,17 +207,17 @@ public class MethodBodyDefinition extends Node
     if(s==null)
       User.error(this,name+" is not defined");
     
-    if(!(s instanceof MethodDefinition))
+    if(!(s instanceof MethodDefinition.Symbol))
       User.error(this,name+" is not a method");
 
-    setDefinition((MethodDefinition) s);
+    setDefinition((MethodDefinition) ((MethodDefinition.Symbol) s).definition);
 
     // Get type parameters
     if(binders!=null)
     try{
       typeScope.addMappings
 	(binders,
-	 definition.type.getConstraint().binders);
+	 definition.getType().getConstraint().binders);
     }
     catch(BadSizeEx e){
       User.error(name,
@@ -243,17 +243,24 @@ public class MethodBodyDefinition extends Node
    * Type checking
    ****************************************************************/
 
+  public Monotype getReturnType()
+  {
+    return definition.getType().codomain();
+  }
+  
   void typecheck()
   {
     lateBuildScope();
 
-    Typing.enter(definition.type.getTypeParameters(),
+    Typing.enter(definition.getType().getTypeParameters(),
 		 "method body of "+name);
     
     try{
-      try { definition.type.getConstraint().assert(); }
+      try { definition.getType().getConstraint().assert(); }
       catch(TypingEx e){
-	User.error(name,"the constraint will never be satisfied",": "+e.getMessage());
+	User.error(name,
+		   "the constraint will never be satisfied",
+		   ": "+e.getMessage());
       }
       
       Collection monotypes=MonoSymbol.getMonotype(parameters);
@@ -261,7 +268,7 @@ public class MethodBodyDefinition extends Node
 
       Typing.leqMono
 	(monotypes,
-	 definition.type.domain());
+	 definition.getType().domain());
       
       try{
 	Typing.in
@@ -323,15 +330,13 @@ public class MethodBodyDefinition extends Node
 
   void endTypecheck()
   {
-    Polytype t=body.getType();
     try{
-      if(t==null)
-	User.error(this,"Last statement of body should be \"return\"");
-      Typing.leq(t,new Polytype(definition.type.codomain()));
       Typing.leave();
     }
     catch(TypingEx e){
-      User.error(this,"Return type "+t+" is not correct"," :"+e);
+      User.error(this,
+		 "?? Type error in method "+name,
+		 " :"+e);
     }
   }
   
@@ -348,29 +353,34 @@ public class MethodBodyDefinition extends Node
    * Code generation
    ****************************************************************/
 
+  private gnu.expr.BlockExp blockExp;
+  public gnu.expr.BlockExp getBlock() { return blockExp; }
+  
   public void compile()
   {
     if(Debug.codeGeneration)
       Debug.println("Compiling method body "+name);
     
-    gnu.expr.BlockExp block = new gnu.expr.BlockExp();
-    Statement.currentMethodBlock=block;
+    if(definition==null)
+      Internal.error(this, this+" has no definition");
+    
+    blockExp = new gnu.expr.BlockExp();
 
-    gnu.expr.LambdaExp lexp = new gnu.expr.LambdaExp(block);
+    gnu.expr.LambdaExp lexp = new gnu.expr.LambdaExp(blockExp);
     Statement.currentScopeExp = lexp;
     
-    lexp.setPrimMethod(module.bytecode.addMethod
-      (bossa.Bytecode.escapeString(definition.getName()+Pattern.bytecodeRepresentation(formals)),
+    lexp.setPrimMethod(module.getBytecode().addMethod
+      (bossa.Bytecode.escapeString(definition.getBytecodeName()+Pattern.bytecodeRepresentation(formals)),
        definition.javaArgTypes(),definition.javaReturnType(),
        Access.PUBLIC|Access.STATIC|Access.FINAL));
 
     if(name.content.equals("main") && formals.size()==1)
-      mainAlternative=lexp.getMainMethod();
+      module.setMainAlternative(lexp.getMainMethod());
 
     // Parameters
     lexp.min_args=lexp.max_args=parameters.size();
     Iterator p,t;
-    for(p=parameters.iterator(),t=definition.type.domain().iterator();
+    for(p=parameters.iterator(),t=definition.getType().domain().iterator();
 	p.hasNext();)
       {
 	MonoSymbol param = (MonoSymbol) p.next();
@@ -382,14 +392,14 @@ public class MethodBodyDefinition extends Node
 	param.setDeclaration(d);
       }
 
-    block.setBody(body.generateCode());
+    blockExp.setBody(body.generateCode());
 
     gnu.expr.FindCapturedVars.findCapturedVars(lexp);
     
-    lexp.compileAsMethod(module.compilation);
+    module.compileMethod(lexp);
 
     //Register this alternative for the link test
-    new bossa.link.Alternative(this.definition,Pattern.getDomain(this.formals),module.bytecode,lexp.getMainMethod());
+    new bossa.link.Alternative(this.definition,Pattern.getDomain(this.formals),module.getBytecode(),lexp.getMainMethod());
   }
 
   //  public static void compileMethod(gnu.expr.LambdaExp lexp, ClassType inClass, String name)
@@ -403,20 +413,11 @@ public class MethodBodyDefinition extends Node
 //      comp.compileClassInit();
 //    }
   
-  private static gnu.bytecode.Method mainAlternative=null;
-  
-  public static boolean hasMain()
+  public static void compileMain(bossa.modules.Package module, 
+				 gnu.bytecode.Method mainAlternative)
   {
-    return mainAlternative!=null;
-  }
-  
-  static void compileMain(bossa.modules.Module module)
-  {
-    if(mainAlternative==null)
-      return;
-    
     if(Debug.codeGeneration)
-      Debug.println("Compiling main method");
+      Debug.println("Compiling MAIN method");
     
     gnu.expr.BlockExp block = new gnu.expr.BlockExp();
     gnu.expr.LambdaExp lexp = new gnu.expr.LambdaExp(block);
@@ -425,7 +426,7 @@ public class MethodBodyDefinition extends Node
     lexp.min_args=lexp.max_args=1;
     gnu.expr.Declaration args=lexp.addDeclaration("args");
     args.setParameter(true);
-    args.setType(bossa.SpecialTypes.makeArrayType(Type.string_type));
+    args.setType(new gnu.bytecode.ArrayType(Type.string_type));
 
     // Call arguments
     gnu.expr.Expression[] eVal=new gnu.expr.Expression[1];
@@ -434,48 +435,24 @@ public class MethodBodyDefinition extends Node
     block.setBody
       (new gnu.expr.ApplyExp(new gnu.expr.QuoteExp(new gnu.expr.PrimProcedure(mainAlternative)),eVal));
 
-    lexp.setPrimMethod(module.bytecode.addMethod
+    lexp.setPrimMethod(module.getBytecode().addMethod
       ("main",
        "([Ljava.lang.String;)V",
        Access.PUBLIC | Access.STATIC));
 
-    lexp.compileAsMethod(module.compilation);
-  }
-
-  /****************************************************************
-   * Module
-   ****************************************************************/
-  
-  private bossa.modules.Module module;
-  
-  public void setModule(bossa.modules.Module module)
-  {
-    this.module = module;
+    module.compileMethod(lexp);
   }
 
   /****************************************************************
    * Printing
    ****************************************************************/
 
-  public bossa.util.Location location()
-  {
-    return name.location();
-  }
-
   public String toString()
   {
-    String res;
-    res=name.toString()
-      +"("
-      + Util.map("",", ","",parameters)
-      + ") "
-      + body
-      + "\n";
-    return res;
+    return name+"("+Util.map("",", ","",parameters)+")";
   }
 
   private MethodDefinition definition;
-  protected LocatedString name;
   protected Collection /* of FieldSymbol */  parameters;
   protected List       /* of Patterns */   formals;
   Collection /* of LocatedString */ binders; // Null if type parameters are not bound

@@ -12,7 +12,7 @@
 
 // File    : Domain.java
 // Created : Sat Jul 24 19:10:04 1999 by bonniot
-//$Modified: Wed Jan 12 15:50:44 2000 by bonniot $
+//$Modified: Tue Feb 15 22:14:43 2000 by Daniel Bonniot $
 
 package bossa.syntax;
 
@@ -130,7 +130,7 @@ public class Domain
     List res=new ArrayList(monotypes.size());
     for(Iterator i=monotypes.iterator();
 	i.hasNext();)
-      res.add(new Domain(Constraint.True(),(Monotype)i.next()));
+      res.add(new Domain(Constraint.True,(Monotype)i.next()));
     return res;
   }
   

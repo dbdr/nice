@@ -12,7 +12,7 @@
 
 // File    : Alternative.java
 // Created : Mon Nov 15 12:20:40 1999 by bonniot
-//$Modified: Mon Jan 24 19:20:46 2000 by Daniel Bonniot $
+//$Modified: Fri Feb 18 21:12:55 2000 by Daniel Bonniot $
 
 package bossa.link;
 
@@ -59,16 +59,17 @@ public class Alternative
     int numCode = s.indexOf(Pattern.AT_encoding);
     if(numCode==-1)
       Internal.error("Method "+s+" in class "+c.getName()+
-		     " has not a valid name");
+		     " has no valid name");
 
     int at = s.indexOf(Pattern.AT_encoding,numCode+1);
     if(at==-1)
       // This is valid if this method has no parameter
       at = s.length();
     
-    methodName = c.getName()+"$"+s.substring(0,at);
+    methodName = c.getName().substring(0,c.getName().length()-".package".length())
+      +"$"+s.substring(0,at);
     
-    this.patterns = new ArrayList();
+    this.patterns = new ArrayList(5);
 
     while(at<s.length())
       {

@@ -65,7 +65,7 @@ public class RetypedJavaMethod extends JavaMethod
   {
     // We put this here, since we need 'module' to be computed
     // since it is used to open the imported packages.
-    findReflectMethod();    
+    findReflectMethod();
     
     super.buildScope(outer, typeOuter);
   }
@@ -99,7 +99,7 @@ public class RetypedJavaMethod extends JavaMethod
   private Type javaRetType;
   private Type[] javaArgType;
   
-  public gnu.bytecode.Type javaReturnType() 
+  public gnu.bytecode.Type javaReturnType()
   { return javaRetType; }
 
   public gnu.bytecode.Type[] javaArgTypes()
@@ -166,10 +166,10 @@ public class RetypedJavaMethod extends JavaMethod
 	if (reflectMethod == null)
 	  {
             if (methodName.equals("<init>"))
-              setIgnoredRetyping(className, "Ignored retyping because class " + 
+              setIgnoredRetyping(className, "Ignored retyping because class " +
 			holder.getName() + " has no constructor with " + 
 			javaArgType.length + " arguments");
-	    else 
+	    else
 	      setIgnoredRetyping(className, "Ignored retyping because no method named " +
 			methodName + " with " +	javaArgType.length + 
 			" arguments was found in class " + holder.getName());
@@ -177,7 +177,7 @@ public class RetypedJavaMethod extends JavaMethod
             return;
 	  }
 
-        setIgnoredRetyping(className, "Ignored retyping because The types of the arguments don't match the declaration:\n"
+        setIgnoredRetyping(className, "Ignored retyping because the types of the arguments don't match the declaration:\n"
 			 + reflectMethod);
 
       }
@@ -199,14 +199,14 @@ public class RetypedJavaMethod extends JavaMethod
 	catch(Types.NotIntroducedClassException ex) {}
       }
     else
-      JavaClasses.registerNativeMethod(this, reflectMethod);    
-      
+      JavaClasses.registerNativeMethod(this, reflectMethod);
+
     int javaArity;
     if(reflectMethod.getStaticFlag() || reflectMethod.isConstructor())
       javaArity = javaTypes.size()-1;
     else
       javaArity = javaTypes.size();
-    
+
     if(javaTypes != null && javaArity != arity)
       User.error(this,
 		 "Native method " + this.getSymbol().name + 

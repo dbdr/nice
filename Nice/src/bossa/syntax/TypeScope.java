@@ -57,7 +57,7 @@ public class TypeScope implements TypeMap
   {
     DuplicateName(String name, TypeSymbol old, TypeSymbol nou)
     {
-      super(name+" is defined twice");
+      super(name + " is already declared");
     }
   }
   

@@ -246,8 +246,11 @@ abstract public class Node
 	       typeMapsSymbols.toArray(new TypeSymbol[typeMapsSymbols.size()]));
 	}
 	catch(TypeScope.DuplicateName e){
-	  // XXX Produce a better, localized error message.
-	  User.error(e);
+	  if (this instanceof Located)
+	    User.error(((Located) this).location(), e.getMessage());
+	  else
+	    /// XXX This error will not be located.
+	    User.error(e);
 	}
       }
 

@@ -134,6 +134,22 @@
       See the section on <link linkend="importJava">Java imports</link> 
       for details.
     </para>
+    <section id="mainMethod"><title>The <literal>main</literal> method</title>
+      <para>
+        If a package contains a method whose name is <literal>main</literal>
+	and the method has a <literal>void</literal> return type and takes
+	a single <literal>String[]</literal> as its argument, this method
+	receives special treatment, in that when the program is run, execution
+	will begin with this <literal>main</literal> method. The runtime
+	system will pass the command line arguments used to invoke the program
+	as the argument to <literal>main</literal>.
+      </para>
+      <para>
+        Note that since the main unit of code in Nice is the package, 
+	and not the class, the <literal>main</literal> method should
+	be implemented outside of any class declaration.
+      </para>
+    </section>
   </chapter>
 
   <chapter><title>Classes and Interfaces</title>
@@ -162,17 +178,16 @@
 
     <section id="constructor"><title>Constructors</title>
       <para>
-	There is no way to define a constructor in Nice. The reason is that
-	in languages that support them, most constructors just take 
-	as parameters the initial values for the fields and assign them
-	to the new object. This simple but tedious task has to be done
-	by the programmer for each class definition.
-	In Nice, such a constructor is generated automatically by the compiler.
-	It is called the automatic constructor. 
-	It takes the names of the fields as named arguments, 
-	and those who have an initial value are optional.
-	The constructor is called <literal>new</literal> followed by
-	the name of the class to create.
+	Classes in Nice have a default (or "automatic") constructor 
+	which is generated
+	automatically by the compiler. This constructor allows all the
+	fields of the class to be specified explicitly, though if the
+	field has a default value in the class definition, it can be
+	omitted from the constructor call and the default value will
+	be used. In many cases this default constructor is all that
+	is needed, and it saves the programmer from having to write
+	tedious code that simply accepts values and assigns them to
+	fields.
       </para>
 
       <example><title>Class definition and creations using the automatic constructor</title>
@@ -219,13 +234,102 @@ void test()
       </para>
 
       <para>
-	If a behaviour different than that of the automatic constructor is 
-	needed, it is possible to define
-	a creation <link linkend="method">method</link> that can perform 
-	the task, calling the constructor to create the object and 
-	initialize the fields.
-	This method should by convention be called <literal>create</literal>
-	suffixed by the name of the class to create.
+        When more control over construction is desired, it is possible
+	to write new constructors that can be used in place of the
+	automatic constructor. These are written much like any other
+	method, but they use a slightly different declaration syntax:
+	<programlisting>
+	  new <type><replaceable>class-name</replaceable></type>(<type><replaceable>param-type</replaceable></type><replaceable>param-name</replaceable><optional> = <replaceable>initial-value</replaceable></optional>, ...) 
+	  { 
+	    <replaceable>method-body</replaceable>;
+	    this(<replaceable>argument</replaceable>, ...);
+	  }
+	</programlisting>
+	This syntax requires that the last statement in any custom 
+	constructor calls some other constructor for the same type.
+	In most cases, the automatic constructor will be called.
+      </para>
+      <example><title>Class definition and creations using custom constructors</title>
+	<programlisting lang="nice"><![CDATA[
+/** 
+ * Class which encapsulates a strategy for 
+ * way of translating a character.
+ */
+class Translator
+{
+  //The function that actually performs the translation
+  char->char transFunction;
+
+  //convenience method 
+  char translate(char input) 
+    {
+      return (this.transFunction)(input);
+    }
+}
+
+/**
+ * Constructor which takes a map of characters, and
+ * returns a Translator which looks up the input 
+ * character in the map, or just returns the input
+ * character if it's not in the map.
+ */
+new Translator(Map<char,char> characters) 
+{
+  this(transFunction: char c => characters.get(c) || c);
+}
+
+
+
+
+//A translator which provides rot13 ciphering.
+//Uses automatic constructor.
+var Translator rot13 = new Translator(transFunction: 
+				      char c => char(int(c) + 13));
+
+//A translator which just changes 's' or 'S' to '$'.
+//Uses custom constructor.
+var Translator sToDollar = new Translator(characters: listToMap([
+						      ('s', '$'), 
+						      ('S', '$')
+						      ]));
+	]]></programlisting>
+      </example>
+      <para>
+      It is also possible to define <firstterm>initializers</firstterm>
+      for your classes. An initializer is simply a block of code that
+      executes after construction is finished. To define an initializer,
+      simply include code directly in the class definition, inside
+      a block:
+	<programlisting>
+	  class <type><replaceable>class-name</replaceable></type>
+	  { 
+	    {
+	      <replaceable>initializer</replaceable>
+	    }
+	    <replaceable>fields-and-methods</replaceable>
+	  }
+	</programlisting>
+      </para>
+      <para>
+        Here is an example. Notice that since the initializer runs
+	after any constructors, the hidden counter field will always
+	be set to zero, even if the caller had tried to set it to
+	some other value when the object was created.
+      <example><title>Class initializers</title>
+	<programlisting lang="nice"><![CDATA[
+class Counter
+{
+
+    { 
+      this._internal_counter = 0;
+    }
+
+  int _internal_counter = 0;
+}
+
+	]]></programlisting>
+      </example>
+
       </para>
     </section>
 
@@ -366,7 +470,7 @@ interface Component
        However, it's equally possible to define the same interface
        in this style:
       <example>
-        <title>Declaring an Interface with Multi-Methods</title>
+        <title>Declaring an Interface with External Methods</title>
         <programlisting lang="nice">
 interface Component {}
 
@@ -394,6 +498,67 @@ int getArea(Component comp)
       course, the compiler will ensure that all necessary methods
       are implemented, so this is only a suggestion.
      </para>
+    </section>
+    <section id="enums"><title>Enumerations</title>
+      <para>
+      Enumerations or simply (<literal>enum</literal>s) are a group
+      of related constants. Many languages support defining simple
+      constants, and of course <link linkend="constants">Nice does 
+      also</link>. Many programs are written to use certain numeric
+      constants with special meanings. For instance, one might
+      write a method for a vending machine:
+      <programlisting language="nice">
+	let int NICKEL = 5;
+	let int DIME = 10;
+	let int QUARTER = 25;
+
+	class VendingMachine
+	{
+	  int change = 0;
+	}
+	
+        void addCoin(VendingMachine machine, int cents)
+	{
+	  machine.change += cents;
+	}
+      </programlisting>
+      but this method isn't very safe! It will accept any amount of
+      change, including nonsensical amounts like 3, or 234320. One
+      way to address this problem would be to do runtime checks to
+      ensure that the value is acceptable, and throw an exception if
+      it is not. However, there is an easier solution in Nice: the enum.
+	<programlisting>
+	  enum <type><replaceable>class-name</replaceable></type><optional>(<replaceable><type>parameter-type</type></replaceable><replaceable>parameter-name</replaceable>, ...)</optional>
+	  { 
+	    <replaceable>option,...</replaceable>
+	  }
+	</programlisting>
+      Enums can be simple symbols like
+      <programlisting language="nice">
+      enum Color { Red, Orange, Yellow, Blue, Indigo, Violet }
+      </programlisting> 
+      or they can contain integer (or other) values:
+      <programlisting language="nice">
+        enum VendingCoin(int value) 
+	{
+	  nickel(5), dime(10), quarter(25);
+	}
+	
+	class VendingMachine
+	{
+	  int change = 0;
+	}
+	
+        void addCoin(VendingMachine machine, VendingCoin cents)
+	{
+	  machine.change += cents.value;
+	}
+      </programlisting>
+      Of course, a realistic vending machine would have to keep track of 
+      the actual number of each coin rather than a total value!
+      </para>
+           
+      
     </section>
   </chapter>
 
@@ -851,7 +1016,7 @@ interface Buffer<Elem>
       ;
       </literal>
      </para>
-     <para>
+     <para id="constants">
       Constants are declared with "let":
      </para>
      <para>
@@ -861,7 +1026,7 @@ interface Buffer<Elem>
       ;
       </literal>
      </para>
-     <para>
+     <para id="monomorphicLet">
        If the variable or constant is of a simple type (i.e., not a 
        <link linkend="parametricClasses">parameterized type</link>), then it is
        not necessary to specify the type yourself, the compiler can infer
@@ -927,7 +1092,8 @@ for(int i : 1..10)
     </section>
     <section id="localMethods"><title>Local methods</title>
       <para>
-	Local methods are similar to toplevel methods, 
+	Local methods are similar to regular methods (defined
+	at the package or class level), 
         except that they are defined inside another method,
         and therefore only usable in that scope.
 	They can refer to local variables from their context.
@@ -1005,6 +1171,61 @@ Window createMyWindow()
 	</footnote>.
 	Otherwise, the compiler reports an ambiguity error.
       </para>
+        <section id="blockCall"><title>Block Syntax for Method Calls</title>
+	  <para>
+	    Nice supports an alternative syntax for method calls when one 
+	    of the arguments is a method of type <literal><type>void-&gt; 
+	    <replaceable>T</replaceable></type></literal>:
+	  </para>
+	  <programlisting language="nice">
+	    <replaceable>method-name</replaceable>(<replaceable>argument</replaceable>, ...)
+	    {
+	      <replaceable>argument-body</replaceable>
+	    }
+          </programlisting>
+	  <para>
+	    If an <link linkend = "anonymousMethods">
+	    anonymous method</link> would normally be used, it is permissible
+	    to omit the arguments and <literal>=></literal> and instead write
+	    the code for the anonymous method in a block following the call. 
+	    An example will be helpful:
+	  </para>
+	  <example id="blockSyntaxEx">
+	  <title>Block syntax for method calls</title>
+	  <programlisting lang="nice"><![CDATA[
+	  //First define the method we're going to call:
+	  //Like an 'if' statement
+	  void when(boolean condition, void->void action)
+	  {
+	    if (condition)
+	      action();
+	  }	    
+
+	  //Now exercise our method with block syntax:
+	  void main(String[] args) 
+	  {
+	    when(1 > 0) 
+	    {
+	      println("Math is working correctly!");
+	    }
+	  }
+	  ]]></programlisting> 	  
+	  </example>
+	  <para>
+	  Note that we could just as easily have written:
+	  <programlisting>
+	    when(1 > 0, () => { 
+	      println("Math is working correctly!");
+	    });
+	  </programlisting>
+	  but with the alternative block call syntax, the code becomes
+	  less cluttered, and easier to read. It also helps to eliminate
+	  the distinctions between built-in statements and user-defined
+	  methods. For instance, the standard <literal>using</literal> 
+	  statement is actually just a method defined in the standard 
+	  library.
+	  </para>
+	</section>
     </section>
 
     <section><title>Tuples</title>
@@ -1112,38 +1333,45 @@ void main(String[] args)
       The backslash character <literal>\</literal> is used for escaping,
       as in Java.
       </para>
-      <para>
-      Nice also allows multi-line string literals, using syntax borrowed
-      from the Python language. Multi-line strings begin and end with 
-      three double quotes. Within multi-line strings, double quotes do
-      not need to be escaped, unless there are three in a row. 
-      </para>
-      <example>
-      <title>Multi-line strings</title>
-      <programlisting lang="nice"><![CDATA[
-      let greeting  = """
+      <section id="multiLine"><title>Multi-line Strings</title>
+        <para>
+          Nice also allows multi-line string literals, using syntax borrowed
+          from the Python language. Multi-line strings begin and end with 
+          three double quotes. Within multi-line strings, double quotes do
+          not need to be escaped, unless there are three in a row. 
+        </para>
+        <example>
+        <title>Multi-line strings</title>
+        <programlisting lang="nice"><![CDATA[
+        let greeting  = """
             Hello, world.
 	    You may be thinking, "Why was I called here today?"
 	    Well, there was a good reason. Honest.
-      """;      
-      ]]></programlisting>
-      </example>
-      <para>
-      Strings can be combined by simple juxtaposition - that is, by
-      placing them side by side with some other expression. For
-      example:
-      </para>
-      <example>
-      <title>String concatenation</title>
-      <programlisting lang="nice"><![CDATA[
-      String name = "Nice";
-      int factor = 10;
-      println("My favorite language is " name ", which is " factor 
+        """;      
+        ]]></programlisting>
+        </example>
+      </section>
+      <section id="stringConcat"><title>String concatenation</title>
+        <para>
+	  Just as in many other languages, strings can be concatenated
+	  using the plus (<literal>+</literal>) operator.
+	</para>
+        <para>
+          Strings can also be combined by simple juxtaposition - that is, by
+          placing them side by side with some other expression. For
+          example:
+        </para>
+        <example>
+          <title>String concatenation</title>
+          <programlisting lang="nice"><![CDATA[
+        String name = "Nice";
+        int factor = 10;
+        println("My favorite language is " name ", which is " factor 
                    " times better than what they make me use at work.");
-      ]]>
-      </programlisting>
-      </example>
-
+        ]]>
+          </programlisting>
+        </example>
+      </section>
     </section>
 
     <section id="anonymousMethods"><title>Anonymous methods</title>
@@ -1418,7 +1646,7 @@ public class MyJavaClass {
 	</para>
 
 	<para>
-	  The second solution is to tell once and for all the compiler the 
+	  The second solution is to once and for all tell the compiler the 
 	  precise type of the method (this is also useful for methods with 
 	  parametric types):
 	</para>
@@ -1593,6 +1821,41 @@ public class Main
         Therefore, you never have to check that all your arguments 
         aren't &NULL; again, unless you actually want to allow &NULL;s.
       </para>
+      <para>
+        It's important to remember that nullness inference doesn't
+	work on fields of objects, only on local variables. There's
+	a good reason for this: the value of an instance variable may
+	have changed (updated by another thread, perhaps) between
+	the time the value was checked for nullness and the time it
+	is actually used. To avoid this problem, simply take a local
+	reference to the field first:
+      </para>
+<example>
+  <title>Nullness inference with fields</title>
+<programlisting lang="nice">
+  class Person 
+  {
+    ?String name
+  }
+
+  //Takes a String, not a ?String
+  void printName(String name)
+  {
+    println(name);
+  } 
+
+  void main(String[] args) 
+  {
+    Person p = loadPersonFromFile(args[0]);
+    let name = p.name;
+    if (name == null)
+      throw new Exception("Unknown person!");
+    else
+      //safe to call printName, we know name is a String.
+      printName(name);
+  }
+</programlisting>
+</example>
 
 	<para id="notNull">
 	  Sometimes, you know that a value cannot be &NULL;,

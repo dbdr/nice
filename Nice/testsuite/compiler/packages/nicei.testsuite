@@ -91,3 +91,14 @@
     var int[][] arr = new int[10][10];
   /// package b import a
   {}
+
+/// PASS
+  /// package a
+  /// toplevel
+    let String s = "abc\n";
+    let String t = """abc
+def""";
+
+  /// package b import a
+  assert s.equals("abc\n");
+  assert t.equals("abc\ndef");

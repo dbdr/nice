@@ -30,10 +30,10 @@ public class StringConstantExp extends ConstantExp
   public StringConstantExp(String value, boolean multiline)
   {
     className = stringName;
-    this.escapedValue = value;
     if (multiline)
       value = escapeEOL(value);
 
+    this.escapedValue = value;
     this.value=unescape(value);
   }
 
@@ -117,7 +117,7 @@ public class StringConstantExp extends ConstantExp
 
   public String toString()
   {
-    return "\""+value+"\"";
+    return "\""+escapedValue+"\"";
   }
 
   String escapedValue;

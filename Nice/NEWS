@@ -11,7 +11,8 @@ nice (0.9.6)
   * Improved performance of arrays used as lists.
   * Bug fixes (checking of local variables in a call position, make it possible
     to use new Object() and dispatch on Object again, code generation of 
-    integer constants, overloading of function symbols, ... )
+    integer constants, overloading of function symbols, printing of string
+    literals with escaped chars, ... )
 
  --
 

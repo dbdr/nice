@@ -58,7 +58,7 @@ foos("abc") {}
   /// package b import a
   assert foo("@");
 
-/// PASS bug
+/// PASS
   /// package a
   /// Toplevel
   boolean foo(String s);

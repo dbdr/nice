@@ -562,6 +562,16 @@ public class Pattern implements Located
   
   /**
    * Returns a string used to recognize this pattern in the bytecode.
+   * for the different patterns the following signatures are used:
+   *   any 		: `@_`
+   *   null 		: `@NULL`
+   *   type 		: `@` + type   where `.` in type are replaced by `$`
+   *   exactly at type  : `#` + type   idem
+   *   integer literal	: `@-` / `@+` + int_literal 
+   *   char literal	: `@'c'`   where c is an unescaped char
+   *   string literal	: `@"string"` where string is an escaped string
+   *   reference        : `@` + globalconstantname
+   *   int comparison   : `@>` / `@>=` / `@<` / `@<=` + int_literal
    *
    * This is usefull to distinguish alternatives of a method.
    */
@@ -591,6 +601,9 @@ public class Pattern implements Located
 
 	if (atReference())
           return "@=" + name;
+
+        if (atString())
+	  return "@\"" + ((StringConstantExp)atValue).escapedValue + "\""; 
 
 	return "@" + atValue;
       }
@@ -622,14 +635,11 @@ public class Pattern implements Located
     int len = rep.length();
 
     if (rep.charAt(pos[0]) == '\'')
-      { //we need to skip possible '@' or '#' content of the char literal
+      { //char literal patterns are 3 chars
         pos[0] += 3;
-	while(pos[0] < len && 
-		rep.charAt(pos[0]) != '@' && rep.charAt(pos[0]) != '#')
-	  pos[0]++;
       }
     else if (rep.charAt(pos[0]) == '\"')
-      { //idem for string literal
+      { //we need to skip possible '@' or '#' content of the string literal
         pos[0] += 2;
 	while(pos[0] < len &&
 		( ( rep.charAt(pos[0]) != '@' && rep.charAt(pos[0]) != '#') ||

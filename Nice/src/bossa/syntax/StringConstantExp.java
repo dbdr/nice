@@ -25,6 +25,7 @@ public class StringConstantExp extends ConstantExp
   public StringConstantExp(String value)
   {
     className = stringName;
+    this.escapedValue = value;
     this.value=unescape(value);
   }
 
@@ -90,4 +91,6 @@ public class StringConstantExp extends ConstantExp
   {
     return "\""+value+"\"";
   }
+
+  String escapedValue;
 }

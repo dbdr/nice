@@ -80,6 +80,14 @@ public class Block extends Statement
       Internal.error("Should not be called");
       return null;
     }
+
+    public String display()
+    {
+      if (value == null)
+        return getSymbol().toString();
+      else
+        return getSymbol().toString() + '=' + value;        
+    }
   }
 
   public abstract static class LocalValue extends LocalDeclaration
@@ -98,6 +106,21 @@ public class Block extends Statement
     public abstract void addNext(LocatedString name, Expression value);
 
     LocalValue next, last;
+
+    public String toString()
+    {
+      StringBuffer res = new StringBuffer();
+      LocalValue v = this;
+      while (true) {
+        res.append(v.display());
+        v = v.next;
+        if (v == null)
+          break;
+        else
+          res.append(',');
+      }
+      return res.toString();
+    }
   }
 
   public static class LocalVariable extends LocalValue
@@ -169,6 +192,11 @@ public class Block extends Statement
 				    ! left.isAssignable(), value);
       last = last.next;
     }
+
+    public String display()
+    {
+      return "var " + super.display();
+    }
   }
 
   public static class LocalConstant extends LocalValue
@@ -203,6 +231,11 @@ public class Block extends Statement
 
       last.next = new LocalConstant(name, value);
       last = last.next;
+    }
+
+    public String toString()
+    {
+      return "let " + super.display();
     }
   }
 
@@ -376,6 +409,7 @@ public class Block extends Statement
   public String toString()
   {
     return "{\n"
+      + Util.map("",";\n",";\n",locals)
       + Util.map("",";\n",";\n",statements)
       + "}\n";
   }

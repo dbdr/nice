@@ -33,6 +33,6 @@ public class VoidConstantExp extends ConstantExp
 
   public String toString()
   {
-    return "()";
+    return "{}";
   }
 }

@@ -43,7 +43,7 @@ public class ExpressionStmt extends Statement
 
   public String toString()
   {
-    return exp.toString();
+    return exp.toString() + ";";
   }
 
   Expression exp;

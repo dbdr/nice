@@ -88,7 +88,7 @@ public class IfExp extends Expression
       String.valueOf(thenExp) +
       "\nelse\n" +
       String.valueOf(elseExp) +
-      "\nendif"
+      "\n"
       ;
   }
 

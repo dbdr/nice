@@ -84,9 +84,10 @@ public class InlinedMethod extends MethodDeclaration
       o = m.invoke(null, new Object[]{ parameter });
     }
     catch(InvocationTargetException e){
+      Throwable realEx = e.getTargetException();
       User.error(inlineProcedure,
 		 "Inlined method " + inlineProcedure +
-		 ": " + e.getMessage());
+		 ": " + realEx);
     }
     catch(IllegalAccessException e){
       User.error(inlineProcedure,

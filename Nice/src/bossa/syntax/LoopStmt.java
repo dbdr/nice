@@ -63,7 +63,7 @@ public class LoopStmt extends Statement
     iterexp = new IdentExp(iter);
     cond = CallExp.create(new IdentExp(new LocatedString("hasNext", loc)), iterexp);
     getvar = CallExp.create(new IdentExp(new LocatedString("next", loc)), iterexp);
-    assign = new Block.LocalVariable(var, vartype, false, getvar);
+    assign = new Block.LocalVariable(var, vartype, true, getvar);
     List loopbody = new LinkedList();
     loopbody.add(assign);
     loopbody.add(body);

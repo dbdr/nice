@@ -47,3 +47,8 @@
   for(x : 1..10)
     sum += x;
   assert(sum==55);
+
+/// FAIL
+  for (x : 1..10)
+    if (x == 5)
+      x = 7;

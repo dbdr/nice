@@ -195,7 +195,10 @@ public class Block extends Statement
 
     public String display()
     {
-      return "var " + super.display();
+      if (left.constant)
+	return "let "+ super.display();
+      else
+        return "var " + super.display();
     }
   }
 

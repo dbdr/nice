@@ -18,7 +18,7 @@ setDate:
 	cd src/nice/tools/compiler; ./setBuildDate
 
 compiler: setDate
-	cd src; ${NICEC} -Rs nice.tools.compiler; cp -f nice/tools/compiler.jar nice/tools/.compiler.jar
+	cd src; ${NICEC} -Rs nice.tools.compiler && cp -f nice/tools/compiler.jar nice/tools/.compiler.jar
 
 compiler-bootstrap: setDate nice-pass
 	cd src; CLASSPATH=${TOP}/src/nice/tools/.compiler.jar:${TOP}/src:${TOP}/classes java -Dnice.systemJar=${TOP}/stdlib nice.tools.compiler.package --classpath="${TOP}/stdlib:${TOP}/classes:${TOP}/src" -Rs nice.tools.compiler

@@ -1,3 +1,14 @@
+
+/**************************************************************************/
+/*                                                                        */
+/*  This program is free software; you can redistribute it and/or modify  */
+/*  it under the terms of the GNU General Public License as published by  */
+/*  the Free Software Foundation; either version 2 of the License, or     */
+/*  (at your option) any later version.                                   */
+/*                                                                        */
+/**************************************************************************/
+
+
 package nice.ui.common.types.beans;
 
 import java.beans.*;
@@ -5,8 +16,8 @@ import java.beans.beancontext.*;
 import java.lang.reflect.*;
 import java.net.*;
 import java.io.*;
-
-
+import java.applet.*;
+import java.awt.*;
 
 
 /**
@@ -35,12 +46,137 @@ void serviceRevoked(BeanContextServiceRevokedListener, BeanContextServiceRevoked
 void serviceAvailable(BeanContextServicesListener, BeanContextServiceAvailableEvent)
   = native void BeanContextServicesListener.serviceAvailable(BeanContextServiceAvailableEvent);
 
-
-
+//JDK1.4  // interface ExceptionListener 
+//JDK1.4  void exceptionThrown(ExceptionListener, Exception)
+//JDK1.4    = native void ExceptionListener.exceptionThrown(Exception);
 
 
 /**
-  * give precise types to methods declared in java.beans.*
+ * INTERFACES SECTION
+ */
+
+// interface AppletInitializer 
+void activate(AppletInitializer, Applet)
+  = native void AppletInitializer.activate(Applet);
+void initialize(AppletInitializer, Applet, ?BeanContext)
+  = native void AppletInitializer.initialize(Applet, BeanContext);
+
+
+// interface BeanInfo 
+BeanInfo[?] getAdditionalBeanInfo(BeanInfo)
+  = native BeanInfo[] BeanInfo.getAdditionalBeanInfo();
+PropertyDescriptor[?] getPropertyDescriptors(BeanInfo)
+  = native PropertyDescriptor[] BeanInfo.getPropertyDescriptors();
+MethodDescriptor[?] getMethodDescriptors(BeanInfo)
+  = native MethodDescriptor[] BeanInfo.getMethodDescriptors();
+
+
+// interface Customizer 
+void addPropertyChangeListener(Customizer, PropertyChangeListener)
+  = native void Customizer.addPropertyChangeListener(PropertyChangeListener);
+void removePropertyChangeListener(Customizer, PropertyChangeListener)
+  = native void Customizer.removePropertyChangeListener(PropertyChangeListener);
+void setObject(Customizer, Object)
+  = native void Customizer.setObject(Object);
+
+
+// interface PropertyEditor 
+void addPropertyChangeListener(PropertyEditor, PropertyChangeListener)
+  = native void PropertyEditor.addPropertyChangeListener(PropertyChangeListener);
+void removePropertyChangeListener(PropertyEditor, PropertyChangeListener)
+  = native void PropertyEditor.removePropertyChangeListener(PropertyChangeListener);
+String[?] getTags(PropertyEditor)
+  = native String[] PropertyEditor.getTags();
+void setAsText(PropertyEditor, String)
+  = native void PropertyEditor.setAsText(String);
+String getJavaInitializationString(PropertyEditor)
+  = native String PropertyEditor.getJavaInitializationString();
+void paintValue(PropertyEditor, Graphics, Rectangle)
+  = native void PropertyEditor.paintValue(Graphics, Rectangle);
+Object getValue(PropertyEditor)
+  = native Object PropertyEditor.getValue();
+void setValue(PropertyEditor, Object)
+  = native void PropertyEditor.setValue(Object);
+
+
+// interface BeanContext 
+void addBeanContextMembershipListener(BeanContext, BeanContextMembershipListener)
+  = native void BeanContext. addBeanContextMembershipListener(BeanContextMembershipListener);
+void removeBeanContextMembershipListener(BeanContext, BeanContextMembershipListener)
+  = native void BeanContext.removeBeanContextMembershipListener(BeanContextMembershipListener);
+URL getResource(BeanContext, String, BeanContextChild)
+  = native URL BeanContext.getResource(String, BeanContextChild);
+Object instantiateChild(BeanContext, String)
+  = native Object BeanContext.instantiateChild(String);
+
+
+// interface BeanContextChild 
+void addPropertyChangeListener(BeanContextChild, String, PropertyChangeListener)
+  = native void BeanContextChild.addPropertyChangeListener(String, PropertyChangeListener);
+void removePropertyChangeListener(BeanContextChild, String, PropertyChangeListener)
+  = native void BeanContextChild.removePropertyChangeListener(String, PropertyChangeListener);
+void addVetoableChangeListener(BeanContextChild, String, VetoableChangeListener)
+  = native void BeanContextChild.addVetoableChangeListener(String, VetoableChangeListener);
+void removeVetoableChangeListener(BeanContextChild, String, VetoableChangeListener)
+  = native void BeanContextChild.removeVetoableChangeListener(String, VetoableChangeListener);
+BeanContext getBeanContext(BeanContextChild)
+  = native BeanContext BeanContextChild.getBeanContext();
+void setBeanContext(BeanContextChild, BeanContext)
+  = native void BeanContextChild.setBeanContext(BeanContext);
+
+
+// interfaces BeanContextChildComponentProxy 
+Component getComponent(BeanContextChildComponentProxy)
+  = native Component BeanContextChildComponentProxy.getComponent();
+
+
+// interfaces BeanContextContainerProxy 
+Container getContainer(BeanContextContainerProxy)
+  = native Container BeanContextContainerProxy.getContainer();
+
+
+// interfaces BeanContextProxy 
+BeanContextChild getBeanContextProxy(BeanContextProxy)
+  = native BeanContextChild BeanContextProxy.getBeanContextProxy();
+
+
+// interfaces BeanContextServiceProvider 
+<Any Element> Iterator<Element> getCurrentServiceSelectors(BeanContextServiceProvider, BeanContextServices, Class)
+  = native Iterator BeanContextServiceProvider.getCurrentServiceSelectors(BeanContextServices, Class);
+Object getService(BeanContextServiceProvider, BeanContextServices, Object, Class, ?Object)
+  = native Object BeanContextServiceProvider.getService(BeanContextServices, Object, Class, Object);
+void releaseService(BeanContextServiceProvider, BeanContextServices, Object, Object)
+  = native void BeanContextServiceProvider.releaseService(BeanContextServices, Object, Object);
+
+
+// interfaces BeanContextServiceProviderBeanInfo
+BeanInfo[] getServicesBeanInfo(BeanContextServiceProviderBeanInfo)
+  = native BeanInfo[] BeanContextServiceProviderBeanInfo.getServicesBeanInfo();
+
+
+// interfaces BeanContextServices 
+void addBeanContextServicesListener(BeanContextServices, BeanContextServicesListener)
+  = native void BeanContextServices.addBeanContextServicesListener(BeanContextServicesListener);
+void removeBeanContextServicesListener(BeanContextServices, BeanContextServicesListener)
+  = native void BeanContextServices.removeBeanContextServicesListener(BeanContextServicesListener);
+boolean addService(BeanContextServices, Class, BeanContextServiceProvider)
+  = native boolean BeanContextServices.addService(Class, BeanContextServiceProvider);
+<Any Element> Iterator<Element> getCurrentServiceClasses(BeanContextServices)
+  = native Iterator BeanContextServices.getCurrentServiceClasses();
+<Any Element> Iterator<Element> getCurrentServiceSelectors(BeanContextServices, Class)
+  = native Iterator BeanContextServices.getCurrentServiceSelectors(Class);
+?Object getService(BeanContextServices, BeanContextChild, Object, Class, Object, BeanContextServiceRevokedListener)
+  = native Object BeanContextServices.getService(BeanContextChild, Object, Class, Object, BeanContextServiceRevokedListener);
+boolean hasService(BeanContextServices, Class)
+  = native boolean BeanContextServices.hasService(Class);
+void releaseService(BeanContextServices, BeanContextChild, Object, Object)
+  = native void BeanContextServices.releaseService(BeanContextChild, Object, Object);
+void revokeService(BeanContextServices, Class, BeanContextServiceProvider, boolean)
+  = native void BeanContextServices.revokeService(Class, BeanContextServiceProvider, boolean);
+
+
+/**
+  * CLASSES SECTION
   */
 
 /* class BeanDescriptor */

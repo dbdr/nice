@@ -1,3 +1,14 @@
+
+/**************************************************************************/
+/*                                                                        */
+/*  This program is free software; you can redistribute it and/or modify  */
+/*  it under the terms of the GNU General Public License as published by  */
+/*  the Free Software Foundation; either version 2 of the License, or     */
+/*  (at your option) any later version.                                   */
+/*                                                                        */
+/**************************************************************************/
+
+
 package nice.ui.common.types.awt;
 
 
@@ -216,12 +227,37 @@ void dropActionChanged(DropTargetListener, DropTargetDragEvent)
  * INTERFACES SECTION
  */
 
+// interface Adjustable
+void addAdjustmentListener(Adjustable, AdjustmentListener)
+  = native void Adjustable.addAdjustmentListener(AdjustmentListener);
+void removeAdjustmentListener(Adjustable, AdjustmentListener)
+  = native void Adjustable.removeAdjustmentListener(AdjustmentListener);
+
+
 // interface Composite
 <Any Key, Any Element> CompositeContext createContext(Composite, ColorModel, ColorModel, RenderingHints<Key,Element>)
   = native CompositeContext Composite.createContext(ColorModel, ColorModel, RenderingHints) ;
 
 
+// interface CompositeContext
+void compose(CompositeContext, Raster, Raster, WritableRaster)
+  = native void CompositeContext.compose(Raster, Raster, WritableRaster);
+
+
+// interface ItemSelectable
+void addItemListener(ItemSelectable, ItemListener)
+  = native void ItemSelectable.addItemListener(ItemListener);
+void removeItemListener(ItemSelectable, ItemListener)
+  = native void ItemSelectable.removeItemListener(ItemListener);
+
+
 // interface LayoutManager
+void addLayoutComponent(LayoutManager, String, Component)
+  = native void LayoutManager.addLayoutComponent(String, Component);
+void layoutContainer(LayoutManager, Container)
+  = native void LayoutManager.layoutContainer(Container);
+void removeLayoutComponent(LayoutManager, Component)
+  = native void LayoutManager.removeLayoutComponent(Component);
 Dimension minimumLayoutSize(LayoutManager, Container)
   = native Dimension LayoutManager.minimumLayoutSize(Container);
 Dimension preferredLayoutSize(LayoutManager, Container)
@@ -229,6 +265,14 @@ Dimension preferredLayoutSize(LayoutManager, Container)
 
 
 // interface LayoutManager2
+void addLayoutComponent(LayoutManager2, Component, Object)
+  = native void LayoutManager2.addLayoutComponent(Component, Object);
+float getLayoutAlignmentX(LayoutManager2, Container)
+  = native float LayoutManager2.getLayoutAlignmentX(Container);
+float getLayoutAlignmentY(LayoutManager2, Container)
+  = native float LayoutManager2.getLayoutAlignmentY(Container);
+void invalidateLayout(LayoutManager2, Container)
+  = native void LayoutManager2.invalidateLayout(Container);
 Dimension maximumLayoutSize(LayoutManager2, Container)
   = native Dimension LayoutManager2.maximumLayoutSize(Container);
 
@@ -258,6 +302,12 @@ PrintJob getPrintJob(PrintGraphics)
 
 
 // interface Shape
+boolean contains(Shape, Point2D)
+  = native boolean Shape.contains(Point2D);
+boolean contains(Shape, Rectangle2D)
+  = native boolean Shape.contains(Rectangle2D);
+boolean intersects(Shape, Rectangle2D)
+  = native boolean Shape.intersects(Rectangle2D);
 Rectangle getBounds(Shape)
   = native Rectangle Shape.getBounds();
 Rectangle2D getBounds2D(Shape)
@@ -281,6 +331,22 @@ AccessibleContext getAccessibleContext(javax.accessibility.Accessible)
 // interface java.awt.image.ImageObserver
 boolean imageUpdate(ImageObserver, Image, int, int, int, int, int)
   = native boolean ImageObserver.imageUpdate(Image, int, int, int, int, int);
+
+
+//JDK1.4  // interface KeyEventDispatcher
+//JDK1.4  boolean dispatchKeyEvent(KeyEventDispatcher, KeyEvent)
+//JDK1.4    = native boolean KeyEventDispatcher.dispatchKeyEvent(KeyEvent);
+
+
+//JDK1.4  // interface KeyEventPostProcessor
+//JDK1.4  boolean postProcessKeyEvent(KeyEventPostProcessor, KeyEvent)
+//JDK1.4    = native boolean KeyEventPostProcessor.postProcessKeyEvent(KeyEvent);
+
+
+
+/**
+ * CLASSES SECTION
+ */
 
 
 // class AWTEventMulticaster
@@ -430,6 +496,46 @@ Object[] getSelectedObjects(Choice)
 
 
 // class Component
+void addComponentListener(Component, ComponentListener)
+  = native void Component.addComponentListener(ComponentListener);
+void addFocusListener(Component, FocusListener)
+  = native void Component.addFocusListener(FocusListener);
+void addHierarchyBoundsListener(Component, HierarchyBoundsListener)
+  = native void Component.addHierarchyBoundsListener(HierarchyBoundsListener);
+void addHierarchyListener(Component, HierarchyListener)
+  = native void Component.addHierarchyListener(HierarchyListener);
+void addInputMethodListener(Component, InputMethodListener)
+  = native void Component.addInputMethodListener(InputMethodListener);
+void addKeyListener(Component, KeyListener)
+  = native void Component.addKeyListener(KeyListener);
+void addMouseListener(Component, MouseListener)
+  = native void Component.addMouseListener(MouseListener);
+void addMouseMotionListener(Component, MouseMotionListener)
+  = native void Component.addMouseMotionListener(MouseMotionListener);
+void addPropertyChangeListener(Component, PropertyChangeListener)
+  = native void Component.addPropertyChangeListener(PropertyChangeListener);
+void addPropertyChangeListener(Component, String, PropertyChangeListener)
+  = native void Component.addPropertyChangeListener(String, PropertyChangeListener);
+void removeComponentListener(Component, ComponentListener)
+  = native void Component.removeComponentListener(ComponentListener);
+void removeFocusListener(Component, FocusListener)
+  = native void Component.removeFocusListener(FocusListener);
+void removeHierarchyBoundsListener(Component, HierarchyBoundsListener)
+  = native void Component.removeHierarchyBoundsListener(HierarchyBoundsListener);
+void removeHierarchyListener(Component, HierarchyListener)
+  = native void Component.removeHierarchyListener(HierarchyListener);
+void removeInputMethodListener(Component, InputMethodListener)
+  = native void Component.removeInputMethodListener(InputMethodListener);
+void removeKeyListener(Component, KeyListener)
+  = native void Component.removeKeyListener(KeyListener);
+void removeMouseListener(Component, MouseListener)
+  = native void Component.removeMouseListener(MouseListener);
+void removeMouseMotionListener(Component, MouseMotionListener)
+  = native void Component.removeMouseMotionListener(MouseMotionListener);
+void removePropertyChangeListener(Component, PropertyChangeListener)
+  = native void Component.removePropertyChangeListener(PropertyChangeListener);
+void removePropertyChangeListener(Component, String, PropertyChangeListener)
+  = native void Component.removePropertyChangeListener(String, PropertyChangeListener);
 void add(Component, PopupMenu)
   = native void Component.add(PopupMenu);
 boolean contains(Component, Point)
@@ -560,6 +666,10 @@ void processMouseEvent(Component, MouseEvent)
   = native void Component.processMouseEvent(MouseEvent);
 void processMouseMotionEvent(Component, MouseEvent)
   = native void Component.processMouseMotionEvent(MouseEvent);
+//JDK1.4  void addMouseWheelListener(Component, MouseWheelListener)
+//JDK1.4    = native void Component.addMouseWheelListener(MouseWheelListener);
+//JDK1.4  void removeMouseWheelListener(Component, MouseWheelListener)
+//JDK1.4    = native void Component.removeMouseWheelListener(MouseWheelListener);
 //JDK1.4  void processMouseWheelEvent(Component, MouseWheelEvent)
 //JDK1.4    = native void Component.processMouseWheelEvent(MouseWheelEvent);
 //JDK1.4  void firePropertyChange(Component, String, boolean, boolean)
@@ -600,12 +710,26 @@ void processMouseMotionEvent(Component, MouseEvent)
 
 
 // class java.awt.Container
+Component add(java.awt.Container, Component)
+  = native Component java.awt.Container.add(Component);
+Component add(java.awt.Container, Component, int)
+  = native Component java.awt.Container.add(Component, int);
+Component add(java.awt.Container, String, Component)
+  = native java.awt.Component java.awt.Container.add(String, Component);
 void add(java.awt.Container, Component, Object)
   = native void java.awt.Container.add(Component, Object);
 void add(java.awt.Container, Component, Object, int)
   = native void java.awt.Container.add(Component, Object, int);
+void addContainerListener(java.awt.Container, ContainerListener)
+  = native void java.awt.Container.addContainerListener(ContainerListener);
+void removeContainerListener(java.awt.Container, ContainerListener)
+  = native void java.awt.Container.removeContainerListener(ContainerListener);
 void addImpl(java.awt.Container, Component, Object, int)
   = native void java.awt.Container.addImpl(Component, Object, int);
+?Component findComponentAt(java.awt.Container, Point)
+  = native Component java.awt.Container.findComponentAt(Point);
+?Component getComponentAt(java.awt.Container, Point)
+  = native Component java.awt.Container.getComponentAt(Point);
 void paintComponents(java.awt.Container, Graphics)
   = native void java.awt.Container.paintComponents(Graphics);
 void printComponents(java.awt.Container, Graphics)
@@ -614,32 +738,29 @@ void remove(java.awt.Container, Component)
   = native void java.awt.Container.remove(Component);
 void setLayout(java.awt.Container, LayoutManager)
   = native void java.awt.Container.setLayout(LayoutManager);
-java.awt.Component add(java.awt.Container, Component)
-  = native java.awt.Component java.awt.Container.add(Component);
-java.awt.Component add(java.awt.Container, Component, int)
-  = native java.awt.Component java.awt.Container.add(Component, int);
-java.awt.Component add(java.awt.Container, String, Component)
-  = native java.awt.Component java.awt.Container.add(String, Component);
-java.awt.Component getComponent(java.awt.Container, int)
+Component getComponent(java.awt.Container, int)
   = native java.awt.Component java.awt.Container.getComponent(int);
-java.awt.Component[] getComponents(java.awt.Container)
+Component[] getComponents(java.awt.Container)
   = native java.awt.Component[] java.awt.Container.getComponents();
 Insets getInsets(java.awt.Container)
   = native Insets java.awt.Container.getInsets();
 LayoutManager getLayout(java.awt.Container)
   = native LayoutManager java.awt.Container.getLayout();
-Dimension getMaximumSize(java.awt.Container)
-  = native Dimension java.awt.Container.getMaximumSize();
-Dimension getMinimumSize(java.awt.Container)
-  = native Dimension java.awt.Container.getMinimumSize();
-Dimension getPreferredSize(java.awt.Container)
-  = native Dimension java.awt.Container.getPreferredSize();
 Insets insets(java.awt.Container)
   = native Insets java.awt.Container.insets();
 Dimension minimumSize(java.awt.Container)
   = native Dimension java.awt.Container.minimumSize();
 Dimension preferredSize(java.awt.Container)
   = native Dimension java.awt.Container.preferredSize();
+boolean isAncestorOf(java.awt.Container, Component)
+  = native boolean java.awt.Container.isAncestorOf(Component);
+void processContainerEvent(java.awt.Container, ContainerEvent)
+  = native void java.awt.Container.processContainerEvent(ContainerEvent);
+void remove(java.awt.Container, Component)
+  = native void java.awt.Container.remove(Component);
+void setLayout(java.awt.Container, LayoutManager)
+  = native void java.awt.Container.setLayout(LayoutManager);
+
 //JDK1.4  ContainerListener[] getContainerListeners(java.awt.Container)
 //JDK1.4    = native ContainerListener[] java.awt.Container.getContainerListeners();
 //JDK1.4  Set getFocusTraversalKeys(java.awt.Container, int)

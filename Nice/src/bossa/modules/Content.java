@@ -39,9 +39,12 @@ class Content
       User.error(pkg, "Package " + pkg.getName() + " is not available." +
 		 "\nThe source  path is: " + str(pkg.compilation.sourcePath) + 
 		 "\nThe package path is: " + str(pkg.compilation.packagePath));
-    
+
+    // By default, use the last compilation time also as last modification time
+    // This is a safe bet, and will be overwritten if source is also available.
     if (compiled != null)
-      lastCompilation = compiled.lastCompilation;
+      lastModification = lastCompilation = compiled.lastCompilation;
+
     if (source != null)
       lastModification = source.lastModification;
   }

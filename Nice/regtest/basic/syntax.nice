@@ -5,11 +5,11 @@ package regtest.basic;
 void syntaxTest()
 {
   // While with empty body
-  while(false)
+  while(1 == 2)
     {}
 
   // For with empty body
-  for (;false;)
+  for (;1 == 2;)
     {}
 
   // If with empty body
@@ -34,4 +34,6 @@ int get(Character other) = other.dummy;
 
 
 
-// We put this comment on the last line, without a trailing newline.
+// We put a comment on the last line, without a trailing newline.
+// Local Variables: ***
+// require-final-newline:nil ***

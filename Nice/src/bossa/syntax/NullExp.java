@@ -26,7 +26,7 @@ import mlsub.typing.Constraint;
    @author Daniel Bonniot (bonniot@users.sourceforge.net)
 */
 
-public class NullExp extends Expression
+public class NullExp extends ConstantExp
 {
   /** There is only one instance of NullExp,
       since it has no state.

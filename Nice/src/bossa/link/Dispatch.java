@@ -288,7 +288,7 @@ public final class Dispatch
     for (Iterator valit = valueCombis.iterator(); valit.hasNext(); )
     {
       Alternative first = null;
-      long[] values = (long[]) valit.next();
+      ConstantExp[] values = (ConstantExp[]) valit.next();
       for (Iterator i = sortedTypeMatches.iterator(); i.hasNext();)
       {
 	Alternative a = (Alternative) i.next();
@@ -332,7 +332,7 @@ public final class Dispatch
     return res.append(')').toString();
   }
 
-  private static String toString(TypeConstructor[] tags, long[] values, boolean[] isValue)
+  private static String toString(TypeConstructor[] tags, ConstantExp[] values, boolean[] isValue)
   {
     StringBuffer res = new StringBuffer();
     res.append('(');
@@ -505,7 +505,8 @@ public final class Dispatch
     return tags;	
   }
 
-  /** Generate all combinations of integer values from the alternatives
+  /** Generate all combinations of non boolean values from the alternatives
+   * @return List<ConstantExp>
    */
   private static List generateValues(List alternatives, boolean[] isValue)
   {
@@ -514,14 +515,14 @@ public final class Dispatch
     int len = isValue.length;
     for (int pos = 0; pos < len; pos++)
     {
-      long[] valuesAtPos = new long[alternatives.size()];  
+      ConstantExp[] valuesAtPos = new ConstantExp[alternatives.size()];  
       int valueCount = 0;
       for (Iterator i = alternatives.iterator(); i.hasNext(); ) 
       {
 	Pattern pat = ((Alternative)i.next()).getPatterns()[pos];
-	if (pat.atIntValue) {
+	if (pat.atNonBoolValue()) {
 	  isValue[pos] = true;
-          valuesAtPos[valueCount++] = pat.value;
+          valuesAtPos[valueCount++] = pat.atValue;
 	}	   
       }
       if (valueCount > 0)
@@ -530,13 +531,13 @@ public final class Dispatch
 	//remove duplicates
 	for (int i = 0; i < valueCount; i++)
 	  for (int j = i+1; j < valueCount; j++)
-	    if (valuesAtPos[i] == valuesAtPos[j])
+	    if (valuesAtPos[i].equals(valuesAtPos[j]))
 	      valuesAtPos[i] = valuesAtPos[--valueCount];	
 
 	if (values.size() == 0)
 	  for (int i = 0; i < valueCount; i++)
 	  {
-	    long[] arr2 = new long[len];
+	    ConstantExp[] arr2 = new ConstantExp[len];
 	    arr2[pos] = valuesAtPos[i];
 	    res.add(arr2);
 	  }
@@ -544,10 +545,10 @@ public final class Dispatch
 	else
 	  for (Iterator it = values.iterator(); it.hasNext(); )
 	  {
-	    long[] arr = (long[])it.next();
+	    ConstantExp[] arr = (ConstantExp[])it.next();
 	    for (int i = 0; i < valueCount; i++)
 	    {
-	      long[] arr2 = new long[len];
+	      ConstantExp[] arr2 = new ConstantExp[len];
 	      System.arraycopy(arr,0,arr2,0,len);
 	      arr2[pos] = valuesAtPos[i];
 	        res.add(arr2);

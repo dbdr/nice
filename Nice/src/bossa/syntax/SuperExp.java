@@ -149,7 +149,7 @@ public class SuperExp extends Expression
 
 	    constraint = addLeq
 	      (type.getConstraint(), 
-	       new Pattern[]{new Pattern(superTC, null, false)}, 
+	       new Pattern[]{new Pattern(superTC, false)}, 
 	       monotype.domain());
 	  }
       }

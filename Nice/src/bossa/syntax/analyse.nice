@@ -501,6 +501,8 @@ analyse(e@StatementExp, info)
   return e;
 }
 
+analyse(e@NullExp, i) = e;
+
 analyse(c@ConstantExp, info)
 {
   if (c.type != null)

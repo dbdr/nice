@@ -20,6 +20,7 @@ import bossa.syntax.MethodDeclaration;
 import bossa.syntax.Pattern;
 import bossa.syntax.LocatedString;
 import bossa.syntax.Node;
+import bossa.syntax.ConstantExp;
 
 import gnu.bytecode.*;
 import gnu.expr.*;
@@ -115,7 +116,7 @@ public abstract class Alternative implements Located
     return true;
   }
 
-  boolean matchesValuePart(long[] values, boolean[] isValue)
+  boolean matchesValuePart(ConstantExp[] values, boolean[] isValue)
   {
     for(int i = 0, n = 0; i < patterns.length; i++)
       if (isValue[i] && !patterns[i].matchesValue(values[n++]))

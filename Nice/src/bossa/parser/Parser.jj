@@ -1199,7 +1199,7 @@ Pattern pattern():
   Token t;
   TypeIdent tc=null, additional = null;
   TypeConstructor runtimeTC = null;
-  Expression val = null;
+  ConstantExp val = null;
   boolean exactlyAt = false;
   Location loc = null;
 }
@@ -1526,7 +1526,7 @@ void readDefinitions(List definitions):
 /*                          Expressions                                */
 /***********************************************************************/
 
-Expression booleanConstantExp():
+ConstantExp booleanConstantExp():
 {
   Token t;
 }
@@ -1535,7 +1535,7 @@ Expression booleanConstantExp():
 | t = "false" { return ConstantExp.makeBoolean(false, new Location(t)); }
 }
 
-Expression intConstantExp():
+ConstantExp intConstantExp():
 {
   LocatedString representation;
 }
@@ -1544,7 +1544,7 @@ Expression intConstantExp():
   { return ConstantExp.makeNumber(representation); }
 }
 
-Expression floatConstantExp():
+ConstantExp floatConstantExp():
 {
   LocatedString representation;
 }
@@ -1553,7 +1553,7 @@ Expression floatConstantExp():
   { return ConstantExp.makeFloating(representation); }
 }
 
-Expression charConstantExp():
+ConstantExp charConstantExp():
 {
   Token t;
 }
@@ -2208,10 +2208,10 @@ Expression Literal() :
 { return res; }
 }
 
-Expression patternLiteral() :
+ConstantExp patternLiteral() :
 //restricted literal for use in dispatch patterns
 {
-  Expression res;
+  ConstantExp res;
   Token t;
 }
 {

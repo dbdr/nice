@@ -49,7 +49,7 @@ public class Pattern implements Located
        the argument's runtime class.
    */
   public Pattern(LocatedString name, 
-		 TypeIdent tc, Expression atValue,
+		 TypeIdent tc, ConstantExp atValue,
 		 boolean exactlyAt, TypeIdent additional,
 		 TypeConstructor runtimeTC,
 		 Location location)
@@ -62,46 +62,8 @@ public class Pattern implements Located
     this.exactlyAt = exactlyAt;
     this.location = location;
 
-    if (atValue != null && atValue instanceof ConstantExp &&
-	((ConstantExp)atValue).value instanceof Boolean	)
-      {
-        this.tc = PrimitiveType.boolTC;
-      }
-    else if (atValue != null && atValue instanceof ConstantExp)
-      {
-	this.atIntValue = true;
-	String typeName = "";
- 	Object val = ((ConstantExp)atValue).value;
-
-	if (val instanceof Byte) {
-	  this.value = ((Byte)val).byteValue();
-	  typeName = "byte";
-        }
-	else if (val instanceof Short) {
-	  this.value = ((Short)val).shortValue();
-	  typeName = "short";
-        }
-	else if (val instanceof Character) {
-	  this.value = ((Character)val).charValue();
-	  typeName = "char";
-        }
-	else if (val instanceof Integer) {
-	  this.value = ((Integer)val).intValue();
-	  typeName = "int";
-        }
-	else if (val instanceof Long) {
-	  this.value = ((Long)val).longValue();
-	  typeName = "long";
-        }
-	this.typeConstructor = 
-                 new TypeIdent(new LocatedString(typeName,location));
-      }
-
-  }
-
-  public Pattern(LocatedString name)
-  {
-    this(name, null, null, false, null, null, name.location());
+    if (atValue != null)
+      this.tc = atValue.tc;
   }
 
   Pattern(LocatedString name, TypeIdent tc)
@@ -109,19 +71,16 @@ public class Pattern implements Located
     this(name, tc, null, false, null, null, name.location());
   }
 
-  Pattern(TypeConstructor tc, Expression atValue, boolean exactlyAt)
+  Pattern(TypeConstructor tc, boolean exactlyAt)
   {
     this.tc = tc;
-    this.atValue = atValue;
     this.exactlyAt = exactlyAt;
   }
 
-  Pattern(TypeConstructor tc, Expression atValue, long value)
+  Pattern(ConstantExp atValue)
   {
-    this.tc = tc;
-    this.atValue = atValue;
-    this.value = value;
-    this.atIntValue = true;
+    this(null, null, atValue, false, null, null, 
+	atValue!=null ? atValue.location() : Location.nowhere() );    
   }
 
 
@@ -178,10 +137,7 @@ public class Pattern implements Located
   throws TypingEx
   {
     for (int i = 0; i < monotypes.length; i++)
-      {
-	Pattern p = patterns[i];
-	p.leq(monotypes[i]);
-      }
+      patterns[i].leq(monotypes[i]);
   }
 
   /**
@@ -197,13 +153,11 @@ public class Pattern implements Located
     MonotypeConstructor mc = (MonotypeConstructor) m;
 
     if (atNull())
-      {
-	Typing.leq(PrimitiveType.maybeTC, mc.getTC());
-      }
+      Typing.leq(PrimitiveType.maybeTC, mc.getTC());
 
     if (tc == null)
       return;
-    
+
     // the argument is not null
     Typing.leq(mc.getTC(), PrimitiveType.sureTC);
     Monotype type = mc.getTP()[0];
@@ -238,7 +192,6 @@ public class Pattern implements Located
   static TypeConstructor[] getTC(Pattern[] patterns)
   {
     TypeConstructor[] res = new TypeConstructor[patterns.length];
-
     for (int i = 0; i < patterns.length; i++)
       res[i] = patterns[i].tc;
 
@@ -248,7 +201,6 @@ public class Pattern implements Located
   static TypeConstructor[] getAdditionalTC(Pattern[] patterns)
   {
     TypeConstructor[] res = new TypeConstructor[patterns.length];
-
     for (int i = 0; i < patterns.length; i++)
       res[i] = patterns[i].tc2;
 
@@ -291,8 +243,8 @@ public class Pattern implements Located
     if (this.atBool())
       return that.tc == PrimitiveType.boolTC; 
 
-    if (that.atIntValue)
-      return this.atIntValue && (this.value == that.value);
+    if (that.atNonBoolValue())
+      return this.atNonBoolValue() && this.atValue.equals(that.atValue);
 
     if (this.tc == that.tc)
       return this.exactlyAt || ! that.exactlyAt;
@@ -312,7 +264,7 @@ public class Pattern implements Located
     if (tag == null)
       return false;
 
-    if (atIntValue)
+    if (atNonBoolValue())
       return false;
 
     if (tag == PrimitiveType.trueBoolTC)
@@ -337,29 +289,23 @@ public class Pattern implements Located
     return Typing.testRigidLeq(tag, tc);
   }
 
-  public boolean matchesValue(long val)
+  public boolean matchesValue(ConstantExp val)
   {
     if (atAny())
       return true;
 
-    return atIntValue && this.value == val;
+    return atNonBoolValue() && atValue.equals(val);
   }
 
   public void setDomainEq(boolean equal)
   {
     // only set it to atAny if it's a @type pattern
-    if (equal && atValue == null && !exactlyAt && !atIntValue)
+    if (equal && atValue == null && !exactlyAt)
       tc = null;
 
-    // don't allow primitive types(except boolean) in @type and #type patterns
-    if (!equal && !atBool() && !atIntValue && (
-	tc == PrimitiveType.longTC ||
-	tc == PrimitiveType.intTC ||
-	tc == PrimitiveType.shortTC ||
-	tc == PrimitiveType.charTC ||
-	tc == PrimitiveType.byteTC) ) 
+    // don't allow integer primitive types in @type and #type patterns
+    if (!equal && atValue == null && Typing.testRigidLeq(tc, PrimitiveType.longTC))
       User.error(location, "A pattern cannot have a primitive type that is different from the declaration.");
-
   }     
         
   /****************************************************************
@@ -368,32 +314,27 @@ public class Pattern implements Located
 
   public String toString()
   {
-    if (atNull())
-      return "null";
+    if (atValue != null)
+      return atValue.toString();
+
     if (atAny())
       return "@_";
-    if (atBool())
-      return atValue.toString();
-    if (atIntValue)
-      return "@" + atValue.toString();
+
     StringBuffer res = new StringBuffer();
     if (name != null)
-      res.append(name.toString());
+      res.append(name);
 
     res.append(exactlyAt ? '#' : '@');
     
     if (typeConstructor != null)
-      res.append(typeConstructor.toString());
+      res.append(typeConstructor);
     else if (tc != null)
-      res.append(tc.toString());
+      res.append(tc);
     
     return res.toString();
   }
 
-  public Location location()
-  {
-    return location;
-  }
+  public Location location() { return location; }
 
   /****************************************************************
    * Bytecode representation
@@ -409,19 +350,18 @@ public class Pattern implements Located
     if (atAny())
       return "@_";
 
-    if (atBool())
-      return "@" + atValue.toString();
+    if (atNull())
+      return "@NULL";
 
-    if (atIntValue)
-      if (tc == PrimitiveType.charTC) 
-	return "@" + atValue.toString();
-      else 
-        return "@" + (value >= 0 ? "+" : "") + Long.toString(value);
+    if (atValue != null)
+      {
+        if (atValue.value instanceof Number)
+          return "@" + (atValue.longValue() >= 0 ? "+" : "") + atValue;
 
-    return 
-      (exactlyAt ? "#" : "@") 
-      +
-      (atNull() ? "NULL" : tc.toString().replace('$','.'));
+	return "@" + atValue;
+      }
+
+    return (exactlyAt ? "#" : "@") + tc.toString().replace('$','.');
   }
   
   public static String bytecodeRepresentation(Pattern[] patterns)
@@ -429,6 +369,7 @@ public class Pattern implements Located
     StringBuffer res = new StringBuffer();
     for(int i = 0; i < patterns.length; i++)
       res.append(patterns[i].bytecodeRepresentation());
+
     return res.toString();
   }
   
@@ -452,52 +393,38 @@ public class Pattern implements Located
 
     String name = rep.substring(start, pos[0]);
 
-    TypeConstructor tc = null;
-    Expression atValue = null;
-
     if (name.length() > 1)
       {
 	if (name.charAt(0) == '\'')
-	  {
-	    atValue = ConstantExp.makeChar(new LocatedString(name.substring(1,name.length()-1),Location.nowhere()));
-	    return new Pattern(PrimitiveType.charTC, atValue, ((Character)((ConstantExp)atValue).value).charValue());
-	  }
-	if (name.charAt(0) == '+' || name.charAt(0) == '-')
-	  {
-	    if (name.charAt(0) == '+')
-	      name = name.substring(1);
-	    Object val = ((ConstantExp)ConstantExp.makeNumber(new LocatedString(name,Location.nowhere()))).value;
-	    if (val instanceof Byte)
-              return new Pattern(PrimitiveType.byteTC, null, ((Byte)val).byteValue());
-	    if (val instanceof Short)
-              return new Pattern(PrimitiveType.shortTC, null, ((Short)val).shortValue());
-	    if (val instanceof Integer)
-              return new Pattern(PrimitiveType.intTC, null, ((Integer)val).intValue());
-            return new Pattern(PrimitiveType.longTC, null, ((Long)val).longValue());
-	  }		
+	  return new Pattern(ConstantExp.makeChar(new LocatedString(
+		name.substring(1,name.length()-1), Location.nowhere())));
+
+	if (name.charAt(0) == '-')
+          return new Pattern(ConstantExp.makeNumber(new LocatedString(name,
+		 Location.nowhere())));
+
+        if (name.charAt(0) == '+')
+          return new Pattern(ConstantExp.makeNumber(new LocatedString(
+		name.substring(1), Location.nowhere())));
       }
 
     if (name.equals("_"))
-      tc = null;
-    else if (name.equals("NULL"))
-      atValue = NullExp.instance;
-    else if (name.equals("true") || name.equals("false") ) 
-      {
-	atValue = ConstantExp.makeBoolean(name.equals("true"), Location.nowhere());
-	tc = PrimitiveType.boolTC;
-      }
-    else
-      {
-	mlsub.typing.TypeSymbol sym = Node.getGlobalTypeScope().lookup(name);
+      return new Pattern(null);
 
-	if (sym == null)
-	  User.error("Pattern " + name +
-		     " of method " + methodName + 
-		     " is not known");
+    if (name.equals("NULL"))
+      return new Pattern(NullExp.instance);
 
-	tc = (TypeConstructor) sym;
-      }
-    return new Pattern(tc, atValue, exact);
+    if (name.equals("true") || name.equals("false") ) 
+      return new Pattern(ConstantExp.makeBoolean(name.equals("true"),
+		Location.nowhere()));
+
+    mlsub.typing.TypeSymbol sym = Node.getGlobalTypeScope().lookup(name);
+
+    if (sym == null)
+      User.error("Pattern " + name + " of method " + methodName + 
+	     " is not known");
+
+    return new Pattern((TypeConstructor) sym, exact);
   }
 
   /****************************************************************
@@ -523,23 +450,14 @@ public class Pattern implements Located
         return parameter;
       }
 
-    if (atIntValue)
-      return Gen.integerComparison("Eq", parameter, value);	
+    if (atIntValue())
+      return Gen.integerComparison("Eq", parameter, atValue.longValue());
 
-    gnu.bytecode.Type ct = nice.tools.code.Types.javaType(tc);
-
+    gnu.bytecode.Type ct = Types.javaType(tc);
     if (exactlyAt)
       return Gen.isOfClass(parameter, ct);
-    else
-      /* 
-	 This is not correct if the parameter is null:
-	 we don't want @C to match a null value 
-	 OPTIM: produce a '!is_null' in this case
-      */
-      //if (parameter.getType().isSubtype(ct))
-      //return QuoteExp.trueExp;
       
-      return Gen.instanceOfExp(parameter, ct);
+    return Gen.instanceOfExp(parameter, ct);
   }
 
   /****************************************************************
@@ -558,23 +476,23 @@ public class Pattern implements Located
   private mlsub.typing.Monotype patternType;
 
   private boolean exactlyAt;
-  public Expression atValue;
+  public ConstantExp atValue;
 
   private Location location;
 
-  public long value;
-  public boolean atIntValue = false;
-
+  public boolean atIntValue() { 
+    return atValue != null && (atValue.value instanceof Number ||
+		atValue.value instanceof Character);
+  }
+  public boolean atNonBoolValue() { 
+    return atValue != null && !atBool() && !atNull();
+  }
   public boolean atNull() { return atValue == NullExp.instance; }
   public boolean atAny()  { return atValue == null && tc == null; }
   public boolean atBool() { 
     return atValue != null && tc == PrimitiveType.boolTC;
   }
-  public boolean atTrue() { 
-    return atBool() && ((ConstantExp)atValue).isTrue();
-  }
-  public boolean atFalse() { 
-    return atBool() && ((ConstantExp)atValue).isFalse();
-  }
+  public boolean atTrue() { return atValue != null && atValue.isTrue(); }
+  public boolean atFalse() { return atValue != null && atValue.isFalse(); }
 
 }

@@ -30,10 +30,11 @@ public class ConstantExp extends Expression
   {
   }
   
-  ConstantExp(Polytype type, Object value, String representation, 
+  ConstantExp(Polytype type, TypeConstructor tc, Object value, String representation, 
 	      Location location)
   {
     this.type = type;
+    this.tc = tc;
     this.value = value;
     this.representation = representation;
     setLocation(location);
@@ -43,7 +44,7 @@ public class ConstantExp extends Expression
 	      Location location)
   {
     this(new Polytype(Monotype.sure(new MonotypeConstructor(tc,null))),
-	 value, representation, location);
+	 tc, value, representation, location);
   }
   
   boolean isZero()
@@ -60,7 +61,7 @@ public class ConstantExp extends Expression
    * Code generation
    ****************************************************************/
 
-  public gnu.expr.Expression compile()
+  protected gnu.expr.Expression compile()
   {
     if(value == null)
       Internal.warning(this+"["+this.getClass()+" has no value");
@@ -72,7 +73,8 @@ public class ConstantExp extends Expression
   
   protected Object value;
   private String representation;
-  
+  public TypeConstructor tc;  
+
   public String toString()
   {
     return representation;
@@ -82,7 +84,7 @@ public class ConstantExp extends Expression
    * Creating constant expressions for the parser
    ****************************************************************/
 
-  public static Expression makeChar(LocatedString value)
+  public static ConstantExp makeChar(LocatedString value)
   {
     String s = value.toString();
     char c;
@@ -129,37 +131,42 @@ public class ConstantExp extends Expression
 			   "'" + c + "'", value.location());
   }
 
-  private static Expression makeInt(long value, boolean isLong, 
+  private static ConstantExp makeInt(long value, boolean isLong, 
 				    Location location)
   {
     Polytype type;
+    TypeConstructor tc;
     Number object;
     
     if (value >= Byte.MIN_VALUE && value <= Byte.MAX_VALUE && !isLong)
       {
 	type = PrimitiveType.bytePolytype;
+        tc = PrimitiveType.byteTC;
 	object = new Byte((byte) value);
       }
     else if (value >= Short.MIN_VALUE && value <= Short.MAX_VALUE && !isLong)
       {
 	type = PrimitiveType.shortPolytype;
+        tc = PrimitiveType.shortTC;
 	object = new Short((short) value);
       }
     else if (value >= Integer.MIN_VALUE && value <= Integer.MAX_VALUE && !isLong)
       {
 	type = PrimitiveType.intPolytype;
+        tc = PrimitiveType.intTC;
 	object = new Integer((int) value);
       }
     else
       {
 	type = PrimitiveType.longPolytype;
+        tc = PrimitiveType.longTC;
 	object = new Long(value);
       }
     
-    return new ConstantExp(type, object, value+"", location);
+    return new ConstantExp(type, tc, object, value+"", location);
   }
   
-  public static Expression makeNumber(LocatedString representation)
+  public static ConstantExp makeNumber(LocatedString representation)
   {
     String rep = representation.toString();
 
@@ -228,18 +235,18 @@ public class ConstantExp extends Expression
     return result;
   }
 
-  public static Expression makeDouble(double value, Location location)
+  public static ConstantExp makeDouble(double value, Location location)
   {
     return new ConstantExp(PrimitiveType.floatTC, new Double(value), value+"",
 			   location);
   }
   
-  public static Expression makeFloating(LocatedString representation)
+  public static ConstantExp makeFloating(LocatedString representation)
   {
     return makeDouble(Double.parseDouble(representation.toString()), representation.location());
   }
   
-  public static Expression makeString(LocatedString representation)
+  public static ConstantExp makeString(LocatedString representation)
   {
     StringConstantExp res = new StringConstantExp(representation.toString());
     res.setLocation(representation.location());
@@ -274,4 +281,19 @@ public class ConstantExp extends Expression
   {
     return value == Boolean.TRUE;
   }
+
+  long longValue()
+  {
+    if (value instanceof Character)
+      return ((Character)value).charValue();
+
+    return ((Number)value).longValue();
+  }
+
+  public boolean equals(Object other)
+  {
+    return other instanceof ConstantExp &&
+	value.equals(((ConstantExp)other).value);
+  }
+
 }

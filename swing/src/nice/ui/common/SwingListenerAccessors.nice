@@ -84,211 +84,211 @@ getNiceUndoableEditListeners(this@javax.swing.undo.UndoableEditSupport)
 getNiceActionListeners(this@javax.swing.AbstractButton)
 {
   EventListener[?] listeners = this.getListeners(ActionListener.class);
-  return (listeners == null) ? null : fill(new NiceActionListener[listeners.length], int i => listeners[i].toNiceActionListener());
+  return (listeners == null) ? null : listeners.map(toNiceActionListener);
 }
 
 getNiceActionListeners(this@javax.swing.DefaultButtonModel)
 {
   EventListener[?] listeners = this.getListeners(ActionListener.class);
-  return (listeners == null) ? null : fill(new NiceActionListener[listeners.length], int i => listeners[i].toNiceActionListener());
+  return (listeners == null) ? null : listeners.map(toNiceActionListener);
 }
 
 getNiceActionListeners(this@javax.swing.JComboBox)
 {
   EventListener[?] listeners = this.getListeners(ActionListener.class);
-  return (listeners == null) ? null : fill(new NiceActionListener[listeners.length], int i => listeners[i].toNiceActionListener());
+  return (listeners == null) ? null : listeners.map(toNiceActionListener);
 }
 
 getNiceActionListeners(this@javax.swing.JFileChooser)
 {
   EventListener[?] listeners = this.getListeners(ActionListener.class);
-  return (listeners == null) ? null : fill(new NiceActionListener[listeners.length], int i => listeners[i].toNiceActionListener());
+  return (listeners == null) ? null : listeners.map(toNiceActionListener);
 }
 
 getNiceActionListeners(this@javax.swing.JTextField)
 {
   EventListener[?] listeners = this.getListeners(ActionListener.class);
-  return (listeners == null) ? null : fill(new NiceActionListener[listeners.length], int i => listeners[i].toNiceActionListener());
+  return (listeners == null) ? null : listeners.map(toNiceActionListener);
 }
 
 getNiceActionListeners(this@javax.swing.Timer)
 {
   EventListener[?] listeners = this.getListeners(ActionListener.class);
-  return (listeners == null) ? null : fill(new NiceActionListener[listeners.length], int i => listeners[i].toNiceActionListener());
+  return (listeners == null) ? null : listeners.map(toNiceActionListener);
 }
 
 getNiceItemListeners(this@javax.swing.DefaultButtonModel)
 {
   EventListener[?] listeners = this.getListeners(ItemListener.class);
-  return (listeners == null) ? null : fill(new NiceItemListener[listeners.length], int i => listeners[i].toNiceItemListener());
+  return (listeners == null) ? null : listeners.map(toNiceItemListener);
 }
 
 getNiceItemListeners(this@javax.swing.AbstractButton)
 {
   EventListener[?] listeners = this.getListeners(ItemListener.class);
-  return (listeners == null) ? null : fill(new NiceItemListener[listeners.length], int i => listeners[i].toNiceItemListener());
+  return (listeners == null) ? null : listeners.map(toNiceItemListener);
 }
 
 getNiceItemListeners(this@javax.swing.JComboBox)
 {
   EventListener[?] listeners = this.getListeners(ItemListener.class);
-  return (listeners == null) ? null : fill(new NiceItemListener[listeners.length], int i => listeners[i].toNiceItemListener());
+  return (listeners == null) ? null : listeners.map(toNiceItemListener);
 }
 
 getNiceAdjustmentListeners(this@javax.swing.JScrollBar)
 {
   EventListener[?] listeners = this.getListeners(AdjustmentListener.class);
-  return (listeners == null) ? null : fill(new NiceAdjustmentListener[listeners.length], int i => listeners[i].toNiceAdjustmentListener());
+  return (listeners == null) ? null : listeners.map(toNiceAdjustmentListener);
 }
 
 getNiceCaretListeners(this@javax.swing.text.JTextComponent)
 {
   EventListener[?] listeners = this.getListeners(CaretListener.class);
-  return (listeners == null) ? null : fill(new NiceCaretListener[listeners.length], int i => listeners[i].toNiceCaretListener());
+  return (listeners == null) ? null : listeners.map(toNiceCaretListener);
 }
 
 getNiceChangeListeners(this@javax.swing.AbstractButton)
 {
   EventListener[?] listeners = this.getListeners(ChangeListener.class);
-  return (listeners == null) ? null : fill(new NiceChangeListener[listeners.length], int i => listeners[i].toNiceChangeListener());
+  return (listeners == null) ? null : listeners.map(toNiceChangeListener);
 }
 
 getNiceChangeListeners(this@javax.swing.DefaultBoundedRangeModel)
 {
   EventListener[?] listeners = this.getListeners(ChangeListener.class);
-  return (listeners == null) ? null : fill(new NiceChangeListener[listeners.length], int i => listeners[i].toNiceChangeListener());
+  return (listeners == null) ? null : listeners.map(toNiceChangeListener);
 }
 
 getNiceChangeListeners(this@javax.swing.DefaultSingleSelectionModel)
 {
   EventListener[?] listeners = this.getListeners(ChangeListener.class);
-  return (listeners == null) ? null : fill(new NiceChangeListener[listeners.length], int i => listeners[i].toNiceChangeListener());
+  return (listeners == null) ? null : listeners.map(toNiceChangeListener);
 }
 
 getNiceChangeListeners(this@javax.swing.text.DefaultCaret)
 {
   EventListener[?] listeners = this.getListeners(ChangeListener.class);
-  return (listeners == null) ? null : fill(new NiceChangeListener[listeners.length], int i => listeners[i].toNiceChangeListener());
+  return (listeners == null) ? null : listeners.map(toNiceChangeListener);
 }
 
 getNiceChangeListeners(this@javax.swing.JProgressBar)
 {
   EventListener[?] listeners = this.getListeners(ChangeListener.class);
-  return (listeners == null) ? null : fill(new NiceChangeListener[listeners.length], int i => listeners[i].toNiceChangeListener());
+  return (listeners == null) ? null : listeners.map(toNiceChangeListener);
 }
 
 getNiceChangeListeners(this@javax.swing.JSlider)
 {
   EventListener[?] listeners = this.getListeners(ChangeListener.class);
-  return (listeners == null) ? null : fill(new NiceChangeListener[listeners.length], int i => listeners[i].toNiceChangeListener());
+  return (listeners == null) ? null : listeners.map(toNiceChangeListener);
 }
 
 getNiceChangeListeners(this@javax.swing.JTabbedPane)
 {
   EventListener[?] listeners = this.getListeners(ChangeListener.class);
-  return (listeners == null) ? null : fill(new NiceChangeListener[listeners.length], int i => listeners[i].toNiceChangeListener());
+  return (listeners == null) ? null : listeners.map(toNiceChangeListener);
 }
 
 getNiceChangeListeners(this@javax.swing.JViewport)
 {
   EventListener[?] listeners = this.getListeners(ChangeListener.class);
-  return (listeners == null) ? null : fill(new NiceChangeListener[listeners.length], int i => listeners[i].toNiceChangeListener());
+  return (listeners == null) ? null : listeners.map(toNiceChangeListener);
 }
 
 getNiceChangeListeners(this@javax.swing.DefaultButtonModel)
 {
   EventListener[?] listeners = this.getListeners(ChangeListener.class);
-  return (listeners == null) ? null : fill(new NiceChangeListener[listeners.length], int i => listeners[i].toNiceChangeListener());
+  return (listeners == null) ? null : listeners.map(toNiceChangeListener);
 }
 
 getNiceListDataListeners(this@javax.swing.AbstractListModel)
 {
   EventListener[?] listeners = this.getListeners(ListDataListener.class);
-  return (listeners == null) ? null : fill(new NiceListDataListener[listeners.length], int i => listeners[i].toNiceListDataListener());
+  return (listeners == null) ? null : listeners.map(toNiceListDataListener);
 }
 
 getNiceListSelectionListeners(this@javax.swing.DefaultListSelectionModel)
 {
   EventListener[?] listeners = this.getListeners(ListSelectionListener.class);
-  return (listeners == null) ? null : fill(new NiceListSelectionListener[listeners.length], int i => listeners[i].toNiceListSelectionListener());
+  return (listeners == null) ? null : listeners.map(toNiceListSelectionListener);
 }
 
 getNiceListSelectionListeners(this@javax.swing.JList)
 {
   EventListener[?] listeners = this.getListeners(ListSelectionListener.class);
-  return (listeners == null) ? null : fill(new NiceListSelectionListener[listeners.length], int i => listeners[i].toNiceListSelectionListener());
+  return (listeners == null) ? null : listeners.map(toNiceListSelectionListener);
 }
 
 getNiceAncestorListeners(this@javax.swing.JComponent)
 {
   EventListener[?] listeners = this.getListeners(AncestorListener.class);
-  return (listeners == null) ? null : fill(new NiceAncestorListener[listeners.length], int i => listeners[i].toNiceAncestorListener());
+  return (listeners == null) ? null : listeners.map(toNiceAncestorListener);
 }
 
 getNiceHyperlinkListeners(this@javax.swing.JEditorPane)
 {
   EventListener[?] listeners = this.getListeners(HyperlinkListener.class);
-  return (listeners == null) ? null : fill(new NiceHyperlinkListener[listeners.length], int i => listeners[i].toNiceHyperlinkListener());
+  return (listeners == null) ? null : listeners.map(toNiceHyperlinkListener);
 }
 
 getNiceInternalFrameListeners(this@javax.swing.JInternalFrame)
 {
   EventListener[?] listeners = this.getListeners(InternalFrameListener.class);
-  return (listeners == null) ? null : fill(new NiceInternalFrameListener[listeners.length], int i => listeners[i].toNiceInternalFrameListener());
+  return (listeners == null) ? null : listeners.map(toNiceInternalFrameListener);
 }
 
 getNiceMenuListeners(this@javax.swing.JMenu)
 {
   EventListener[?] listeners = this.getListeners(MenuListener.class);
-  return (listeners == null) ? null : fill(new NiceMenuListener[listeners.length], int i => listeners[i].toNiceMenuListener());
+  return (listeners == null) ? null : listeners.map(toNiceMenuListener);
 }
 
 getNiceMenuDragMouseListeners(this@javax.swing.JMenuItem)
 {
   EventListener[?] listeners = this.getListeners(MenuDragMouseListener.class);
-  return (listeners == null) ? null : fill(new NiceMenuDragMouseListener[listeners.length], int i => listeners[i].toNiceMenuDragMouseListener());
+  return (listeners == null) ? null : listeners.map(toNiceMenuDragMouseListener);
 }
 
 getNiceMenuKeyListeners(this@javax.swing.JMenuItem)
 {
   EventListener[?] listeners = this.getListeners(MenuKeyListener.class);
-  return (listeners == null) ? null : fill(new NiceMenuKeyListener[listeners.length], int i => listeners[i].toNiceMenuKeyListener());
+  return (listeners == null) ? null : listeners.map(toNiceMenuKeyListener);
 }
 
 getNicePopupMenuListeners(this@javax.swing.JPopupMenu)
 {
   EventListener[?] listeners = this.getListeners(PopupMenuListener.class);
-  return (listeners == null) ? null : fill(new NicePopupMenuListener[listeners.length], int i => listeners[i].toNicePopupMenuListener());
+  return (listeners == null) ? null : listeners.map(toNicePopupMenuListener);
 }
 
 getNiceTreeExpansionListeners(this@javax.swing.JTree)
 {
   EventListener[?] listeners = this.getListeners(TreeExpansionListener.class);
-  return (listeners == null) ? null : fill(new NiceTreeExpansionListener[listeners.length], int i => listeners[i].toNiceTreeExpansionListener());
+  return (listeners == null) ? null : listeners.map(toNiceTreeExpansionListener);
 }
 
 getNiceTreeWillExpandListeners(this@javax.swing.JTree)
 {
   EventListener[?] listeners = this.getListeners(TreeWillExpandListener.class);
-  return (listeners == null) ? null : fill(new NiceTreeWillExpandListener[listeners.length], int i => listeners[i].toNiceTreeWillExpandListener());
+  return (listeners == null) ? null : listeners.map(toNiceTreeWillExpandListener);
 }
 
 getNiceTreeSelectionListeners(this@javax.swing.JTree)
 {
   EventListener[?] listeners = this.getListeners(TreeSelectionListener.class);
-  return (listeners == null) ? null : fill(new NiceTreeSelectionListener[listeners.length], int i => listeners[i].toNiceTreeSelectionListener());
+  return (listeners == null) ? null : listeners.map(toNiceTreeSelectionListener);
 }
 
 getNiceTreeSelectionListeners(this@javax.swing.tree.DefaultTreeSelectionModel)
 {
   EventListener[?] listeners = this.getListeners(TreeSelectionListener.class);
-  return (listeners == null) ? null : fill(new NiceTreeSelectionListener[listeners.length], int i => listeners[i].toNiceTreeSelectionListener());
+  return (listeners == null) ? null : listeners.map(toNiceTreeSelectionListener);
 }
 
 getNiceTreeModelListeners(this@javax.swing.tree.DefaultTreeModel)
 {
   EventListener[?] listeners = this.getListeners(TreeModelListener.class);
-  return (listeners == null) ? null : fill(new NiceTreeModelListener[listeners.length], int i => listeners[i].toNiceTreeModelListener());
+  return (listeners == null) ? null : listeners.map(toNiceTreeModelListener);
 }
 
 

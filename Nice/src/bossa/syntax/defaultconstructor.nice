@@ -74,7 +74,7 @@ class DefaultConstructor extends Constructor
     thisDecl.setType(thisType);
     let thisExp = new gnu.expr.ThisExp(thisDecl);
 
-    let fullArgs = notNull(notNull(parameters).getMonoSymbols());
+    let fullArgs = notNull(parameters).getMonoSymbols();
     let fullArgTypes = this.javaArgTypes();
 
     List<MonoSymbol> args = new LinkedList();

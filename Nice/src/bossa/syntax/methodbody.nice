@@ -196,7 +196,7 @@ public class MethodBodyDefinition extends MethodImplementation
         FormalParameters params = notNull(m.formalParameters());
 	for (int i = params.hasThis() ? 1 : 0; i < formals.length; i++)
           if (formals[i].atAny() && formals[i].name != null && params.getName(i) != null &&
-		!notNull(formals[i].name).toString().equals(params.getName(i).toString())) {
+		!notNull(formals[i].name).toString().equals(notNull(params.getName(i)).toString())) {
             errorList.add(m, new LocatedString("Parameter " + formals[i] +
 			" should be called " + params.getName(i),
 			formals[i].location()));

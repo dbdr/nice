@@ -49,13 +49,14 @@ abstract class NiceField
       value = analyse(notNull(value), scope, typeScope);
   }
 
-  FormalParameters.Parameter asParameter()
+  Parameter asParameter()
   {
     Monotype type = notNull(sym.syntacticType);
     if (value == null)
-      return new FormalParameters.NamedParameter(type, sym.getName(), true);
+      return new NamedParameter(type: type, name: sym.getName(), nameRequired: true);
     else
-      return new FormalParameters.OptionalParameter (type, sym.getName(), true, value);
+      return new OptionalParameter(type: type, name: sym.getName(),
+		nameRequired: true, defaultValue: notNull(value));
   }
 
   void typecheck()
@@ -129,8 +130,7 @@ final class NewField extends NiceField
     declaringClass.classe.addMethod(setter);
   }
 
-  void checkNoDuplicate(List<FormalParameters.Parameter> fields, 
-                          int rankInThisClass)
+  void checkNoDuplicate(List<Parameter> fields, int rankInThisClass)
   {
     /*
        We check that there is no duplicate in all the inherited fields,
@@ -158,7 +158,7 @@ final class OverridenField extends NiceField
      Update the type and default values for the constructor, according
      to this overriding.
   */
-  void updateConstructorParameter(List<FormalParameters.Parameter> inherited)
+  void updateConstructorParameter(List<Parameter> inherited)
   {
       String name = sym.getName().toString();
       Monotype type = notNull(sym.syntacticType);
@@ -169,9 +169,9 @@ final class OverridenField extends NiceField
           if (param.match(name))
             {
               if (value != null)
-                inherited[i] = new FormalParameters.OptionalParameter(type,
-				sym.getName(), true, value, 
-                             	param.value() == null || param.isOverriden());
+                inherited[i] = new OptionalParameter(type: type,
+				name: sym.getName(), nameRequired: true, defaultValue: notNull(value), 
+                             	overriden: param.value() == null || param.isOverriden());
               else
                 param.resetType(type);
             }
@@ -253,14 +253,15 @@ public final class ValueOverride
 
   boolean hasName(LocatedString name) = this.name.equals(name);
 
-  void updateConstructorParameter(List<FormalParameters.Parameter> inherited)
+  void updateConstructorParameter(List<Parameter> inherited)
   {
     for (int i = 0; i < inherited.size(); i++)
       {
         let param = inherited[i];
         if (param.match(name.toString()))
-          inherited[i] = new FormalParameters.OptionalParameter(param.type,
-		name, true, value, param.value() == null || param.isOverriden());
+          inherited[i] = new OptionalParameter(type: param.type,
+		name: name, nameRequired: true, defaultValue: value,
+		overriden: param.value() == null || param.isOverriden());
       }
   }
 

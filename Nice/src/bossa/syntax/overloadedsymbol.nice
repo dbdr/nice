@@ -656,7 +656,7 @@ private boolean overlappingJavaMethods(MethodDeclaration m1,
     {
       for (noMatch : noMatches)
         if (noMatch.isFunSymbol())
-          argnames.retainAll(args.noMatchByName(noMatch.getFormalParameters()));
+          argnames.retainAll(args.noMatchByName(cast(noMatch.getFormalParameters())));
 
       if (!argnames.isEmpty())
 	return " has an argument named " + argnames.get(0);

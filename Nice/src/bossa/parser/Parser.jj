@@ -853,7 +853,7 @@ Expression ParameterTuplePart(List statements, List monotypes):
 )
 }
 
-FormalParameters.Parameter formalParameter(List statements):
+Parameter formalParameter(List statements):
 {
   Monotype t;
   LocatedString id = null;
@@ -863,7 +863,7 @@ FormalParameters.Parameter formalParameter(List statements):
 (
   LOOKAHEAD(monotype())
   t=monotype() [ id=ident() [ "=" val=Expression() ]]
-  { return FormalParameters.createParameter(t, id ,val); }
+  { return bossa.syntax.dispatch.createParameter(t, id ,val); }
 |
   { Token first,last;
   List parts = new LinkedList();
@@ -885,7 +885,7 @@ FormalParameters.Parameter formalParameter(List statements):
     t = new TupleType(types, makeLocation(first, last));
     t.nullness = Monotype.absent;
 
-    return FormalParameters.createParameter(t, ident ,val);
+    return bossa.syntax.dispatch.createParameter(t, ident ,val);
   }
 )  
 }
@@ -893,7 +893,7 @@ FormalParameters.Parameter formalParameter(List statements):
 FormalParameters formalParameters(boolean leaveRoomForThis, List statements):
 {
   List params = new LinkedList();
-  FormalParameters.Parameter p;
+  Parameter p;
 }
 {
   { if (leaveRoomForThis) params.add(null); }
@@ -901,7 +901,7 @@ FormalParameters formalParameters(boolean leaveRoomForThis, List statements):
     p = formalParameter(statements) { params.add(p); }
     ( "," p = formalParameter(statements) { params.add(p); } )*
   ]
-  { return new FormalParameters(params.isEmpty() ? null : params ); }
+  { return bossa.syntax.dispatch.createFormalParameters(params.isEmpty() ? null : params ); }
 }
 
 Definition internalMethodOrFunction(MethodContainer c, boolean isOverride):

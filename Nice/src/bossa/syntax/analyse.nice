@@ -519,13 +519,13 @@ Expression analyseIdent(IdentExp e, Info info, boolean assigned)
         {
 	  VarSymbol sym = symbols[0];
 
-	  if (sym instanceof FormalParameters.Parameter.Symbol)
+	  if (sym instanceof ParameterSymbol)
 	    {
 	      int state = sym.getState();
-	      if (state == 0/*XXX: FormalParameters.Parameter.Symbol.NOT_ACCESSIBLE*/)
+	      if (state == NOT_ACCESSIBLE)
 	        throw error(e, "Parameter " + e + " is not accessible");
 
-	      if (state == 1/*XXX: FormalParameters.Parameter.Symbol.ARGUMENT_REFERENCE*/)
+	      if (state == ARGUMENT_REFERENCE)
 		  return createParameterAccessExp(sym, e.location());
 	      // Otherwise, we are in the normal case.
 	    }

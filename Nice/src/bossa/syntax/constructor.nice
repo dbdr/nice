@@ -68,8 +68,8 @@ abstract class Constructor extends MethodDeclaration
     // - three different messages depending on whether
     //an explanation of the syntax is necessary
     res = new StringBuffer();
-    List<FormalParameters.Parameter> missing = notNull(arguments).missingArgs(notNull(parameters));
-    List<FormalParameters.Parameter> fieldsToList;
+    List<Parameter> missing = notNull(arguments).missingArgs(notNull(parameters));
+    List<Parameter> fieldsToList;
 
     if (notNull(arguments).size() == 0)
       {
@@ -109,12 +109,12 @@ abstract class Constructor extends MethodDeclaration
     res.append("Use the following syntax:\n")
       .append("  new ").append(name).append("(");
 
-    let Iterator<FormalParameters.Parameter> params = notNull(parameters).getRequiredParameters().iterator();
+    let Iterator<Parameter> params = notNull(parameters).getRequiredParameters().iterator();
     int paramCount = 0;
     int len = name.length();
     while(params.hasNext())
       {
-        FormalParameters.Parameter param = params.next();
+        Parameter param = params.next();
         if (paramCount != 0)
           res.append(", ");
         if (paramCount == 3 && params.hasNext())
@@ -124,7 +124,7 @@ abstract class Constructor extends MethodDeclaration
             res.append("        ");
             paramCount = 0;
           }
-        if (param instanceof FormalParameters.NamedParameter)
+        if (param instanceof NamedParameter)
           res.append(param.getName()).append(": value");
         else
           res.append("value");
@@ -135,10 +135,10 @@ abstract class Constructor extends MethodDeclaration
   }
 }
 
-List<FormalParameters.Parameter> missingArgs(Arguments args, FormalParameters parameters)
+List<Parameter> missingArgs(Arguments args, FormalParameters parameters)
 {
-  List<FormalParameters.Parameter> missing = new LinkedList();
-  Iterator<FormalParameters.Parameter> reqParams = parameters.getRequiredParameters().iterator();
+  List<Parameter> missing = new LinkedList();
+  Iterator<Parameter> reqParams = parameters.getRequiredParameters().iterator();
   int lastUsedPositional = -1;
   while(reqParams.hasNext()) 
     {
@@ -146,7 +146,7 @@ List<FormalParameters.Parameter> missingArgs(Arguments args, FormalParameters pa
       let param = reqParams.next();
       if (param.value() != null)
         continue;
-      if (param instanceof FormalParameters.NamedParameter) 
+      if (param instanceof NamedParameter) 
         {
           for (int i = 0; i < args.arguments.length; i++)
             if (args.arguments[i].name != null)

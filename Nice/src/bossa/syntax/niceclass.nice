@@ -230,7 +230,7 @@ public class CNiceClass extends NiceClass
     mlsub.typing.Monotype thisType =
       Monotype.sure(new mlsub.typing.MonotypeConstructor(definition.getTC(),
 			definition.getTypeParameters()));
-    thisSymbol = new ThisSymbol(FormalParameters.thisName, thisType, declaringClass: this);
+    thisSymbol = new ThisSymbol(thisName, thisType, declaringClass: this);
 
     Node.thisExp = createSymbolExp(notNull(thisSymbol), definition.location());
     scope.addSymbol(thisSymbol);
@@ -373,7 +373,7 @@ public class CNiceClass extends NiceClass
      Collect in 'constraints' the constraints set by each class
      on the type parameters.
   */
-  private List<(?MethodDeclaration, List<FormalParameters.Parameter>)>
+  private List<(?MethodDeclaration, List<Parameter>)>
 	getNativeConstructorParameters(TypeConstructor tc)
   {
     let constructors = getConstructors(tc);
@@ -383,7 +383,7 @@ public class CNiceClass extends NiceClass
         return new ArrayList([(null, new ArrayList())]);
       }
 
-    List<(?MethodDeclaration, List<FormalParameters.Parameter>)> res = 
+    List<(?MethodDeclaration, List<Parameter>)> res = 
 		new ArrayList(constructors.size());
 
     for (msym : constructors)
@@ -399,9 +399,9 @@ public class CNiceClass extends NiceClass
               continue;
           }
 
-	List<FormalParameters.Parameter> params = new ArrayList();
+	List<Parameter> params = new ArrayList();
 	for (arg : m.getArgTypes())
-	  params.add(new FormalParameters.Parameter(Monotype.create(arg)));
+	  params.add(new Parameter(type: Monotype.create(arg)));
 
         res.add((m, params));
       }
@@ -409,7 +409,7 @@ public class CNiceClass extends NiceClass
     return res;
   }
 
-  private List<(?MethodDeclaration, List<FormalParameters.Parameter>)>
+  private List<(?MethodDeclaration, List<Parameter>)>
  	getParentConstructorParameters(mlsub.typing.Monotype[?] typeParameters,
 		?List<mlsub.typing.AtomicConstraint> constraints)
   {
@@ -432,7 +432,7 @@ public class CNiceClass extends NiceClass
 	  } catch(TypeScope.DuplicateName e) {}
       }
 
-    List<(?MethodDeclaration, List<FormalParameters.Parameter>)> res = new ArrayList();
+    List<(?MethodDeclaration, List<Parameter>)> res = new ArrayList();
     for (msym : constructors)
       {
         let MethodDeclaration decl = cast(msym.getMethodDeclaration());
@@ -451,14 +451,14 @@ public class CNiceClass extends NiceClass
     return res;
   }
 
-  private List<(?MethodDeclaration, List<FormalParameters.Parameter>)> 
+  private List<(?MethodDeclaration, List<Parameter>)> 
 		getConstructorParameters(?List<mlsub.typing.AtomicConstraint> constraints, 
 		mlsub.typing.Monotype[] typeParameters)
   {
     let supTC = definition.getSuperClass();
 
     let ?NiceClass sup = (supTC == null) ? null : NiceClass.get(supTC);
-    List<(?MethodDeclaration, List<FormalParameters.Parameter>)> res;
+    List<(?MethodDeclaration, List<Parameter>)> res;
     if (sup == null)
       res = this.getNativeConstructorParameters(cast(supTC));
     else
@@ -471,7 +471,7 @@ public class CNiceClass extends NiceClass
     if ((! overrides.isEmpty()) || (! valueOverrides.isEmpty()))
       for (cparams : res)
         {
-          (?MethodDeclaration m, List<FormalParameters.Parameter> params) = cparams;
+          (?MethodDeclaration m, List<Parameter> params) = cparams;
 
           for (or : overrides)
             or.updateConstructorParameter(params);
@@ -483,7 +483,7 @@ public class CNiceClass extends NiceClass
     if (! fields.isEmpty())
       for (cparams : res)
         {
-          (?MethodDeclaration m, List<FormalParameters.Parameter> params) = cparams;
+          (?MethodDeclaration m, List<Parameter> params) = cparams;
           for (field : fields)
             params.add(field.asParameter());
          }
@@ -497,7 +497,7 @@ public class CNiceClass extends NiceClass
   /**
      This must be done only once per class.
   */
-  private void checkFields(List<FormalParameters.Parameter> allFields)
+  private void checkFields(List<Parameter> allFields)
   {
     for (int f = 0; f < fields.size(); f++)
       fields[f].checkNoDuplicate(allFields, f);
@@ -529,7 +529,7 @@ public class CNiceClass extends NiceClass
 
     mlsub.typing.Monotype[] typeParameters = definition.getTypeParameters();
 
-    List<(?MethodDeclaration, List<FormalParameters.Parameter>)> allConstructorParams = 
+    List<(?MethodDeclaration, List<Parameter>)> allConstructorParams = 
       this.getConstructorParameters(constraints, typeParameters);
 
     mlsub.typing.Constraint cst;
@@ -541,13 +541,13 @@ public class CNiceClass extends NiceClass
     constructorMethod = cast(new Constructor[allConstructorParams.size()]);
     for (int i = 0; i < allConstructorParams.size(); i++)
       {
-        (?MethodDeclaration parent, List<FormalParameters.Parameter> params) = allConstructorParams[i];
+        (?MethodDeclaration parent, List<Parameter> params) = allConstructorParams[i];
 
         // Check only once.
         if (i == 0)
           this.checkFields(params);
 
-	FormalParameters values = new FormalParameters(params.toArray());
+	FormalParameters values = createFormalParameters(params);
 
 	mlsub.typing.Constraint specificCst = cst;
 	// If the parent is a native method, it might have been retyped

@@ -98,17 +98,17 @@ Expression createSymbolExp(VarSymbol symbol, Location loc)
 */
 class ParameterAccessExp extends SymbolExp
 {
-  override FormalParameters.Parameter.Symbol symbol;
+  override ParameterSymbol symbol;
 
   isAssignable() = false;
 
   compile ()
   {
-     return new gnu.expr.CopyArgument(this.symbol.copies);
+    return new gnu.expr.CopyArgument(notNull(this.symbol.copies));
   }
 }
 
-SymbolExp createParameterAccessExp(FormalParameters.Parameter.Symbol symbol, Location loc)
+SymbolExp createParameterAccessExp(ParameterSymbol symbol, Location loc)
 {
   let res = new ParameterAccessExp(symbol: symbol);
   res.setLocation(loc);

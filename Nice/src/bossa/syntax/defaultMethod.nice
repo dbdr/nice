@@ -127,7 +127,7 @@ DefaultMethodImplementation createDefaultMethodImplementation
      Statement body)
 {
   let res = new DefaultMethodImplementation(name, Node.down, body: body,
-	formals: parameters.asList().mapToArray(FormalParameters.Parameter param =>
+	formals: parameters.asList().mapToArray(Parameter param =>
         createPattern(param.getName() || new LocatedString("_", name.location()))));
   res.declaration = new MethodWithDefault(name, Node.down,
 	parameters: parameters, arity: parameters.size, 

@@ -1,0 +1,481 @@
+/**************************************************************************/
+/*                                N I C E                                 */
+/*             A high-level object-oriented research language             */
+/*                        (c) Daniel Bonniot 2004                         */
+/*                                                                        */
+/*  This program is free software; you can redistribute it and/or modify  */
+/*  it under the terms of the GNU General Public License as published by  */
+/*  the Free Software Foundation; either version 2 of the License, or     */
+/*  (at your option) any later version.                                   */
+/*                                                                        */
+/**************************************************************************/
+
+package bossa.syntax;
+
+import bossa.util.*;
+
+/**
+   Parameters of a method declaration.
+
+ */
+public class FormalParameters extends Node
+{
+  private Parameter[] parameters;
+  int size;
+
+  void addThis(Monotype type)
+  {
+    if (parameters[0] != null)
+      Internal.error("No room for \"this\"");
+    
+    parameters[0] = new NamedParameter(type: type, name: thisName);
+  }
+
+  boolean hasThis()
+  {
+    return parameters.length > 0 && parameters[0].match("this");
+  }
+
+  /**
+     @return the name of the <code>rank</code>th parameter,
+             or null if it is an anonymous parameter.
+  */
+  public ?LocatedString getName(int rank)
+  {
+    return parameters[rank].getName();
+  }
+
+  boolean hasDefaultValue(int rank)
+  {
+    Parameter p = parameters[rank];
+    return p.value() != null && ! p.isOverriden();
+  }
+
+  boolean hasDefaultValue()
+  {
+    for (int i = size; --i>=0; )
+      if (parameters[i].value() != null)
+        return true;
+
+    return false;
+  }
+
+  boolean containsAlike()
+  {
+    for (int i = size; --i>=0; )
+      if (parameters[i] != null && parameters[i].type.containsAlike())
+	return true;
+
+    return false;
+  }
+  
+  void substitute(Map<java.lang.String, bossa.syntax.Monotype> map)
+  {
+    for (int i = size; --i>=0; )
+      if (parameters[i] != null) // it is the case for "this" placeholder
+	parameters[i].type = parameters[i].type.substitute(map);
+  }
+  
+  Monotype[?] types()
+  {
+    if (parameters.length == 0)
+      return null;
+    
+    Monotype[] res = cast(new Monotype[size]);
+    for (int i = 0; i < size; i++)
+      res[i] = parameters[i].type;
+
+    return res;
+  }
+
+  public MonoSymbol[] getMonoSymbols()
+  {
+    MonoSymbol[] res = cast(new MonoSymbol[size]);
+    for (int i = 0; i < size; i++)
+      res[i] = parameters[i].getSymbol();
+ 
+    return res;
+  }
+
+  void typecheck(mlsub.typing.Monotype[] domain)
+  {
+    for (int i = 0; i<size; i++)
+      parameters[i].typecheck(domain[i]);
+  }
+
+  resolve()
+  {
+    for (int i = 0; i<size; i++)
+      parameters[i].resolve(scope, typeScope);
+
+    for (int i = 0; i<size; i++)
+      if (parameters[i].symbol != null)
+	notNull(parameters[i].symbol).state = ACCESSIBLE;
+  }
+
+  /** This is a hack to allow bossa.syntax.analyse to make the
+      default values be resolved.
+  */
+  void resolveCalledFromAnalyse(Info info)
+  {
+    for (int i = 0; i<size; i++)
+      parameters[i].resolve(info);
+  }
+
+  /**
+     Check if arguments match the formal parameters.
+
+     If succesfull, append to <code>args</code>'s applicationExpressions
+     the computed array of expressions, that denote the call,
+     including the default values of the optional parameters not passed.
+  */
+  // FIXME change VarSymbol to FunSymbol once converted to nice
+  boolean match(Arguments args, VarSymbol symbol)
+  {
+    int[] map = new int[size];
+
+    // first pass, fill holes with names given at the call site
+    for (int i = 0; i< args.size(); i++)
+      {
+	Arguments.Argument a = args.get(i);
+	if (a.name != null)
+	  if (this.fill(map, notNull(a.name).toString(), i))
+	    return false;
+      }
+
+    // second pass, fill with the positional parameters
+    for (int i = 0; i< args.size(); i++)
+      {
+	Arguments.Argument a = args.get(i);
+	if (a.name == null)
+	  if (this.fill(map, i))
+	    return false;
+      }
+
+    // check that each parameter is either supplied or optional
+    // stores the invocation expressions
+    ?Expression[] exps = new Expression[size];
+    for (int i = 0; i < size; i++)
+      if (map[i] == 0)
+	{
+	  exps[i] = parameters[i].value();
+	  if (exps[i] == null)
+	    return false;
+	}
+      else
+	exps[i] = args.getExp(map[i] - 1);
+
+    args.applicationExpressions.put(symbol, cast(exps));
+    args.usedArguments.put(symbol, map);
+    return true;
+  }
+  
+  boolean fill(int[] map, int num)
+  {
+    int i = 0;
+    while (i < map.length && (map[i] != 0 || parameters[i].requiresName()))
+      i++;
+    
+    if (i == map.length)
+      return true;
+
+    map[i] = num + 1;
+    return false;
+  }
+  
+  boolean fill(int[] map, String id, int num)
+  {
+    int i = 0;
+    while (i < map.length && (map[i] != 0 || !parameters[i].match(id)))
+      i++;
+    
+    if (i == map.length)
+      return true;
+
+    map[i] = num + 1;
+    return false;
+  }
+  
+  public boolean hasMatchFor(String s)
+  {
+    for (int i = 0; i<size; i++)
+      if (parameters[i].match(s))
+	return true;
+
+    return false;
+  }  
+
+  toString() = Util.map("", ", ", "", parameters);
+
+  public List<Parameter> asList()
+  {
+    if (parameters.length != 0)
+      return Arrays.asList(parameters);
+   
+    return new ArrayList();
+  }
+
+  public List<Parameter> getRequiredParameters()
+  {
+    LinkedList<Parameter> res = new LinkedList();
+    for(int i = 0; i < size; i++) 
+      {
+        Parameter param = parameters[i];
+        if (!(param instanceof OptionalParameter))
+          {
+            res.add(parameters[i]);
+          }
+      }
+    return res;
+  }
+
+  public java.util.Stack<gnu.bytecode.Variable>[?] getParameterCopies()
+  {
+    java.util.Stack<gnu.bytecode.Variable>[?] res = null;
+
+    for(int i = 0; i < size; i++) 
+      {
+        Parameter param = parameters[i];
+        if (notNull(param.symbol).copies != null)
+          {
+            if (res == null)
+              res = cast(new java.util.Stack[parameters.length]);
+            notNull(res)[i] = notNull(notNull(param.symbol).copies);
+          }
+      }
+
+    return res;
+  }
+
+  List<Parameter> getParameters(TypeScope scope)
+  {
+    ArrayList<Parameter> res = new ArrayList(size);
+    for (int i = 0; i < size; i++)
+      {
+        Parameter p = parameters[i].cloneParam();
+        p.type = Monotype.create(p.type.resolve(scope));
+        res.add(p);
+      }
+    return res;
+  }
+
+  gnu.bytecode.Attribute asBytecodeAttribute()
+  {
+    return new gnu.bytecode.MiscAttr("parameters", this.toString().getBytes());
+  }
+}
+
+public FormalParameters createFormalParameters(?List<Parameter> parameters)
+{
+  if (parameters == null)
+    return new FormalParameters(Node.none, parameters: [], size: 0);
+
+  return new FormalParameters(Node.none, parameters: parameters.toArray(),
+	size: parameters.size());
+}
+/*
+  FormalParameters(Parameter[] parameters)
+  {
+    super(Node.none);
+
+    if (parameters == null)
+      return;
+
+    this.parameters = parameters;
+    this.size = parameters.length;
+  }
+*/
+let LocatedString thisName = new LocatedString("this", Location.nowhere());
+
+FormalParameters readParametersFromBytecodeAttribute(gnu.bytecode.MiscAttr attr,
+                                                bossa.modules.Parser parser)
+{
+  String value = new String(attr.data);
+
+  if (bossa.util.Debug.bytecodeAttributes)
+    bossa.util.Debug.println("Read attribute " + attr.getName() + "=\"" + value + 
+                    "\" from " + attr.getContainer());
+
+  ?FormalParameters res = cast(parser.formalParameters(value));
+
+  if (res == null)
+    throw Internal.error
+        ("Could not parse '" + attr.getName() + "' bytecode attribute:\n" +
+         "In method: " + attr.getContainer() + "\n" +
+         "Value    : " + value);
+
+  return res;
+}
+
+/**
+  An anonymous formal parameter.
+ */
+public class Parameter
+{
+  Monotype type;
+
+  private ?ParameterSymbol symbol = null;
+
+  Parameter cloneParam() =  new Parameter(type: type);
+
+  boolean match(String id) = false;
+  boolean requiresName() = false;
+
+  void typecheck(mlsub.typing.Monotype domain) {}
+
+  ?Expression value() = null;
+
+  boolean isOverriden() = false;
+
+  void resolve(?VarScope scope, ?TypeScope typeScope)
+  {
+    if (symbol != null)
+      notNull(symbol).state = ARGUMENT_REFERENCE;
+  }
+
+  void resolve(Info info)
+  {
+    if (symbol != null)
+      notNull(symbol).state = ARGUMENT_REFERENCE;
+  }
+
+  toString() = type.toString();
+
+  ?LocatedString getName() = null;
+
+  void resetType(Monotype type)
+  {
+    this.type = type;
+    if (symbol != null)
+      notNull(symbol).syntacticType = type;
+  }
+
+  ParameterSymbol getSymbol()
+  {
+    symbol = new ParameterSymbol(this.getName(), type);
+    return notNull(symbol);
+  }
+}
+
+class ParameterSymbol extends MonoSymbol
+{
+  private int state = NOT_ACCESSIBLE;
+
+  ?Stack<gnu.bytecode.Variable> copies = null;
+ 
+  int getState () 
+  { 
+    if (state == ARGUMENT_REFERENCE)
+      // This parameter is referenced by a later one.
+      // We will need to copy its value.
+      copies = new Stack();
+
+     return state;
+  }
+
+  setDeclaration(declaration, isThis)
+  {
+    super;
+  }
+}
+
+/** The symbol is not accessible.
+    This ensures that there are no forward references to
+    another parameter inside a default value.
+*/
+let int NOT_ACCESSIBLE = 0;
+/** The symbol can be accessed by later arguments, using special means. 
+*/
+let int ARGUMENT_REFERENCE = 1;
+/** The symbol is fully accessible, for the body of the function.
+*/
+let int ACCESSIBLE = 2;
+
+/**
+   A named parameter. 
+   It can thus be used out-of-order at the call site.
+*/
+public class NamedParameter extends Parameter
+{
+  LocatedString name;
+
+  boolean nameRequired = false;
+
+  requiresName() = nameRequired;
+
+  getName() = name;
+
+  cloneParam() = new NamedParameter(type: type, name: name, nameRequired: nameRequired);
+
+  match(id) = name.toString().equals(id);
+
+  toString() = type + " " + name;
+}
+
+/**
+   A named parameter with a default value.
+   It can thus be omitted at the call site.
+*/
+public class OptionalParameter extends NamedParameter
+{
+  Expression defaultValue;
+
+  boolean overriden = false;
+
+  value() = defaultValue;
+
+  isOverriden() = overriden;
+
+  cloneParam()
+  {
+    return new OptionalParameter(type: type, name: name, nameRequired: nameRequired,
+	defaultValue: defaultValue, overriden: overriden);
+  }
+
+  resolve(scope, typeScope)
+  {
+    defaultValue = analyse(defaultValue, notNull(scope), notNull(typeScope));
+    super;
+  }
+
+  resolve(info)
+  {
+    defaultValue = analyse(defaultValue, info);
+    //   super.resolve(null, null);
+    // XXX: this code is from Parameter.resolve
+    if (symbol != null)
+      notNull(symbol).state = ARGUMENT_REFERENCE;    
+  }
+
+  typecheck(domain)
+  {
+    defaultValue = defaultValue.noOverloading();
+    //defaultValue = defaultValue.resolveOverloading(new mlsub.typing.Polytype(domain));
+    typecheck(defaultValue);
+
+    try {
+      mlsub.typing.Typing.leq(defaultValue.getType(), domain);
+    }
+    catch(mlsub.typing.TypingEx e){
+      User.error(name, defaultValue + " is not a value of type " + type);
+    }
+  }
+
+  toString()
+  {
+    defaultValue = defaultValue.noOverloading();
+    return type + " " + name + " = " + defaultValue;
+  }
+}
+
+public Parameter createParameter(Monotype type, ?LocatedString name,
+					?Expression defaultValue)
+{
+  if (defaultValue != null)
+    return new OptionalParameter(type: type, name: notNull(name), defaultValue: defaultValue);
+
+  if (name != null)
+    return new NamedParameter(type: type, name: name);
+
+  return new Parameter(type: type);
+}

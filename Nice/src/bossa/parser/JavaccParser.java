@@ -85,7 +85,7 @@ public class JavaccParser implements bossa.modules.Parser
   }
 
 
-  public FormalParameters formalParameters(String parameters)
+  public /*bossa.syntax.FormalParameters*/Object formalParameters(String parameters)
   {
     try {
       return getParser(parameters).formalParameters(false, null);

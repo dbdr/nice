@@ -102,8 +102,8 @@ public ?ImportedConstructor loadImportedConstructor(NiceClass def, gnu.bytecode.
           bossa.syntax.Constraint.True : notNull(classDef.classConstraint).shallowClone();
 
   let name = new LocatedString("<init>",def.getDefinition().location());
-  let parameters = FormalParameters.readBytecodeAttribute(attr, 
-		notNull(Node.compilation).parser);
+  let parameters = readParametersFromBytecodeAttribute(attr, 
+		notNull(notNull(Node.compilation).parser));
 
   let res = new ImportedConstructor(name, Node.down,
         parameters: parameters,

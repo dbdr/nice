@@ -76,7 +76,7 @@ class FunSymbol extends PolySymbol
 
   isFunSymbol() = true;
 
-  getFormalParameters() = this.parameters;
+  getFormalParameters() = cast(this.parameters);
 
   String describeParameters() 
   {

@@ -28,5 +28,5 @@ public interface Parser
 
   void read(Reader r, List definitions);
 
-  bossa.syntax.FormalParameters formalParameters(String parameters);
+  /*bossa.syntax.FormalParameters*/Object formalParameters(String parameters);
 }

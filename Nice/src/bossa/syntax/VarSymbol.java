@@ -81,7 +81,7 @@ public abstract class VarSymbol extends Node implements Located
   /**
    *  Get the FormalParameters, or null if this is not a functional symbol
    */
-  FormalParameters getFormalParameters()
+  /*FormalParameters*/Object getFormalParameters()
   {
     return null;
   }

@@ -12,7 +12,7 @@
 
 // File    : AtomicConstraint.java
 // Created : Mon Jul 19 16:40:18 1999 by bonniot
-//$Modified: Thu Aug 19 13:38:25 1999 by bonniot $
+//$Modified: Wed Aug 25 18:13:32 1999 by bonniot $
 
 package bossa.syntax;
 
@@ -31,8 +31,6 @@ public abstract class AtomicConstraint extends Node
     super(Node.down);
   }
   
-  abstract AtomicConstraint substitute(Map map);
-
   /****************************************************************
    * Scoping
    ****************************************************************/
@@ -49,6 +47,8 @@ public abstract class AtomicConstraint extends Node
 
     return res;
   }
+
+  abstract AtomicConstraint substitute(Map map);
 
   static List substitute(Map map, Collection c)
   {

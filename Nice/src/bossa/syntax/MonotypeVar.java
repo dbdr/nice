@@ -12,7 +12,7 @@
 
 // File    : MonotypeVar.java
 // Created : Fri Jul 23 15:36:39 1999 by bonniot
-//$Modified: Tue Aug 24 16:24:27 1999 by bonniot $
+//$Modified: Wed Aug 25 18:27:30 1999 by bonniot $
 
 package bossa.syntax;
 
@@ -45,6 +45,15 @@ public class MonotypeVar extends Monotype
     this.imperative=false;
   }
 
+  public TypeSymbol cloneTypeSymbol()
+  {
+    MonotypeVar res=new MonotypeVar(name,imperative);
+    res.soft=soft;
+    res.kind=null;
+    res.id=-1;
+    return res;
+  }
+  
   Monotype cloneType()
   {
     return this;
@@ -138,8 +147,8 @@ public class MonotypeVar extends Monotype
 
   Monotype substitute(java.util.Map map)
   {
-    if(map.containsKey(name))
-      return (Monotype) map.get(name);
+    if(map.containsKey(this))
+      return (Monotype) map.get(this);
     return this;
   }
 
@@ -157,7 +166,7 @@ public class MonotypeVar extends Monotype
     if(soft)
       return name.toString();
     else
-      return "\""+name+"\"";
+      return "\""+name+"("+id+")\"";
   }
 
   public LocatedString getName()
@@ -184,17 +193,12 @@ public class MonotypeVar extends Monotype
   public void setKind(Kind value)
   {
     // it is ok to reset kind to null
-    if(kind!=null && value!=null)
-      {
-	Internal.warning(this,this+": kind was "+kind+", value is "+value);
-	throw new Error();
-      }
-    
-    
-    Internal.error(kind!=null && value!=null,"Variance already set in MonotypeVar");
+    Internal.error(kind!=null && value!=null 
+		   && kind!=value //TODO: not sure if this case is OK to appen
+		   ,"Variance already set in MonotypeVar :\n"+
+		   this+": kind was "+kind+", value is "+value);
     
     kind=value;
-
     if(value==null)
       {
 	// Reset the equivalent* fields so that
@@ -203,6 +207,7 @@ public class MonotypeVar extends Monotype
 	equivalentTC=null;
 	equivalentCodomain=null;
 	equivalentDomain=null;
+	id=-1;
       }
     else
       {

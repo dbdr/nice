@@ -12,7 +12,7 @@
 
 // File    : ClassDefinition.java
 // Created : Thu Jul 01 11:25:14 1999 by bonniot
-//$Modified: Tue Aug 24 15:06:28 1999 by bonniot $
+//$Modified: Fri Aug 27 10:17:41 1999 by bonniot $
 // Description : Abstract syntax for a class definition
 
 package bossa.syntax;
@@ -30,7 +30,7 @@ public class ClassDefinition extends Node
 			 List fields,
 			 List methods)
   {
-    super(Node.global);
+    super(Node.forward);
     
     this.name=name;
     if(typeParameters==null)

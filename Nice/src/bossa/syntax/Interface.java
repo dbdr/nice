@@ -10,71 +10,89 @@
 /*                                                                        */
 /**************************************************************************/
 
-// File    : TypeIdent.java
-// Created : Sat Jul 24 14:02:08 1999 by bonniot
-//$Modified: Wed Aug 25 16:05:48 1999 by bonniot $
+// File    : Interface.java
+// Created : Thu Jul 08 11:51:09 1999 by bonniot
+//$Modified: Fri Aug 27 10:58:25 1999 by bonniot $
 
 package bossa.syntax;
 
+import java.util.*;
 import bossa.util.*;
 
-/**
- * A syntactic type identifier.
- * 
- * After scoping, it will either reveal to be a 
- * TypeConstructor or a MonotypeVar.
- *
- * @author bonniot
+/** 
+ * An interface symbol
  */
-
-public class TypeIdent
-  implements TypeSymbol
+public class Interface extends Node
+  implements Located, TypeSymbol
 {
-  public TypeIdent(LocatedString name)
+  /**
+   * Constructs a new Interface symbol
+   *
+   * @param name the name of the interface
+   */
+  public Interface(LocatedString name)
   {
+    super(Node.down);
     this.name=name;
+    this.id=-1;
   }
 
   public TypeSymbol cloneTypeSymbol()
   {
-    return new TypeIdent(name);
+    return new Interface(name);
   }
   
+  public boolean hasName(LocatedString s)
+  {
+    return name.equals(s);
+  }
+
   /****************************************************************
-   * 
+   * Scoping
    ****************************************************************/
 
-  TypeSymbol resolve(TypeScope scope)
+  void resolve()
   {
-    TypeSymbol res;
-    res=scope.lookup(name);
-    User.error(res==null,this,name+" is not defined in "+scope);
-    return res;
+    if(definition==null)
+      {
+	TypeSymbol s=typeScope.lookup(name);
+	if(s==null)
+	  User.error(name,"Interface "+name+" is not defined");
+	if(s instanceof InterfaceDefinition)
+	  definition=(InterfaceDefinition)s;
+	else
+	  User.error(name,name+" is not an interface but a "
+		     +s.getClass()); 
+      }
   }
-  
+
   /****************************************************************
    * Printing
    ****************************************************************/
 
+  public Location location()
+  {
+    return name.location();
+  }
+
   public String toString()
   {
-    return "\""+name+"\"";
+    if(definition==null)
+      return "\""+name+"\"";
+    else 
+      return definition.name.toString();
   }
 
   public LocatedString getName()
   {
     return name;
   }
-  
-  public boolean hasName(LocatedString name)
-  {
-    return this.name.equals(name);
-  }
-  
-  public Location location()
-  {
-    return name.location();
-  }
+
+  /****************************************************************
+   * Fields
+   ****************************************************************/
 
   LocatedString name;
+  InterfaceDefinition definition;
+  public int id;
 }

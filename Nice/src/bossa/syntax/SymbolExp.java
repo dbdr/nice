@@ -12,7 +12,7 @@
 
 // File    : SymbolExpr.java
 // Created : Thu Jul 08 12:20:59 1999 by bonniot
-//$Modified: Tue Aug 24 17:04:47 1999 by bonniot $
+//$Modified: Thu Aug 26 10:36:19 1999 by bonniot $
 // Description : Access to the value of a symbol
 
 package bossa.syntax;
@@ -47,7 +47,13 @@ public class SymbolExp extends Expression
   
   void computeType()
   {
-    type=symbol.getType();
+    // Very important: each SymbolExp gets a copy of the type of the symbol.
+    // Thus it has fresh binders.
+    // Otherwise there is an "aliasing" effect.
+    // An important supposition is that two uses of a symbol
+    // are two different SymbolExp objects (with a reference to the same symbol).
+    // So they hold different (but equivalent) types.
+    type=symbol.getType().cloneType();
   }
 
   public String toString()

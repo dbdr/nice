@@ -621,6 +621,7 @@ abstract public class K0 implements Cloneable {
    * Marking / Backtracking
    ***********************************************************************/
   private class Backup {
+    Backup savedBackup = backup;
     BitMatrix savedC = (BitMatrix)C.clone();
     
     // XXX: necessary to clone ?
@@ -667,9 +668,10 @@ abstract public class K0 implements Cloneable {
       this.garbage = backup.savedGarbage;
       this.domains = backup.savedDomains;
       this.virtual = backup.savedVirtual;
+      this.backup  = backup.savedBackup; // leave this statement at the end !
     }
-    mark();
-    clearTags();
+    //mark();
+    clearTags(); //TODO:?? should I leave this ?
   }
 
   /***********************************************************************

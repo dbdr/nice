@@ -12,7 +12,7 @@
 
 // File    : Engine.java
 // Created : Tue Jul 27 15:34:53 1999 by bonniot
-//$Modified: Tue Aug 24 18:16:35 1999 by bonniot $
+//$Modified: Thu Aug 26 18:25:11 1999 by bonniot $
 
 package bossa.engine;
 
@@ -36,13 +36,14 @@ public abstract class Engine
   public static void enter()
   {
     if(dbg) Debug.println("Enter");
-    
+    floating.mark();
+    frozenLeqs.mark();
     for(Iterator i=kinds.iterator();
 	i.hasNext();)
       { 
 	K k=(K)i.next();
-	k.rigidify();
 	k.mark();
+	k.rigidify();
       }
   }
   
@@ -64,7 +65,7 @@ public abstract class Engine
       { 
 	K k=(K)i.next();
 	k.satisfy();
-	// the rigidify() is done in the inner enter if necessary
+	k.rigidify();
       }
   }
   
@@ -79,14 +80,29 @@ public abstract class Engine
     assertFrozens();
 
     if(dbg) Debug.println("Leave");
-
+      
     for(Iterator i=kinds.iterator();
 	i.hasNext();)
       { 
 	K k=(K)i.next();
 	k.satisfy();
+      }
+    backtrack();
+  }
+  
+  private static void backtrack()
+  {
+    for(Iterator i=kinds.iterator();
+	i.hasNext();)
+      { 
+	K k=(K)i.next();
 	k.backtrack();
       }
+    floating.backtrack();
+    for(Iterator i=floating.iterator();i.hasNext();)
+      ((Element)i.next()).setKind(null);
+    floating.endOfIteration();
+    frozenLeqs.backtrack();
   }
 
   /**
@@ -126,7 +142,10 @@ public abstract class Engine
 	    k1.leq(e1,e2);
 	  else
 	    {
-	      if(dbg) Debug.println("Bad kinding discovered by Engine : "+k1+" != "+k2);
+	      if(dbg) 
+		Debug.println("Bad kinding discovered by Engine : "+
+			      k1+" != "+k2+
+			      " for elements "+e1+" and "+e2);
 	      throw new LowlevelUnsatisfiable("Bad Kinding");
 	    }
 	}
@@ -153,7 +172,9 @@ public abstract class Engine
 	      floating.add(e2);
 	      Internal.warning("Engine: floating added 2 : "+e2);
 	    }
-	  
+	  if(dbg)
+	    Debug.println("Freezing "+e1+" <: "+e2+
+			  " ("+e1.getId()+" <: "+e2.getId()+")");
 	  frozenLeqs.add(new Leq(e1,e2));
 	}
   }
@@ -164,7 +185,6 @@ public abstract class Engine
   
   /**
    * Prepare a new Element to be used
-   *
    */
   public static void register(Element e)
   {
@@ -187,46 +207,65 @@ public abstract class Engine
       this.e1=e1;
       this.e2=e2;
     }
+    public String toString()
+    {
+      return e1+" <: "+e2;
+    }
     Element e1,e2;
   }
 
-  private static ArrayList frozenLeqs=new ArrayList();
+  private static final BackableList frozenLeqs=new BackableList();
   
   // TODO: This is for sure quite slow and ugly
-  private static void setKind(Element e, Kind k)
+  private static void setKind(Element element, Kind k)
     throws Unsatisfiable
   {
-    // Usefull since this is recursive
-    if(e.getKind()!=null)
-      return;
-    
-    e.setKind(k);
-    k.register(e);
-    
-    floating.remove(e);
-    //Propagates the kind to all comparable elements
+    Stack s=new Stack();
 
-    //TODO: modifiy frozenLeqs in place
-    final ArrayList newFrozenLeqs=new ArrayList(frozenLeqs.size());
-    
-    for(Iterator i=frozenLeqs.iterator();
-	i.hasNext();)
+    s.push(element);
+    while(!s.empty())
       {
-	Leq leq=(Leq)i.next();
-	if(leq.e1==e)
+	Element e=(Element)s.pop();
+	
+	if(e.getKind()!=null)
+	  if(e.getKind()==k)
+	    continue;
+	  else
+	    Internal.error("Bad kinding in setKind for "+e);
+	
+	e.setKind(k);
+	k.register(e);
+	
+	floating.remove(e);
+
+	//Propagates the kind to all comparable elements
+	for(Iterator i=frozenLeqs.iterator();
+	    i.hasNext();)
 	  {
-	    setKind(leq.e2,k);
-	    k.leq(leq.e1,leq.e2);
+	    Leq leq=(Leq)i.next();
+	    if(leq.e1==e)
+	      if(leq.e2.getKind()==null)
+		s.push(leq.e2);
+	      else
+		{
+		  Internal.error(leq.e1.getKind()!=leq.e2.getKind(),
+				 "Bad kinding in Engine.setKind 1");
+		  i.remove();
+		  k.leq(leq.e1,leq.e2);
+		}
+	    else if(leq.e2==e)
+	      if(leq.e1.getKind()==null)
+		s.push(leq.e1);
+	      else
+		{
+		  Internal.error(leq.e1.getKind()!=leq.e2.getKind(),
+				 "Bad kinding in Engine.setKind 2");
+		  i.remove();
+		  k.leq(leq.e1,leq.e2);
+		}
 	  }
-	else if(leq.e2==e)
-	  {
-	    setKind(leq.e1,k);
-	    k.leq(leq.e1,leq.e2);
-	  }
-	else
-	  newFrozenLeqs.add(leq);
+	frozenLeqs.endOfIteration();
       }
-    frozenLeqs=newFrozenLeqs;
   }
   
   /**
@@ -247,6 +286,7 @@ public abstract class Engine
 	e.setKind(variablesKind);
 	variablesKind.register(e);
       }
+    floating.endOfIteration();
     floating.clear();
     
     for(Iterator i=frozenLeqs.iterator();
@@ -255,14 +295,20 @@ public abstract class Engine
 	Leq leq=(Leq)i.next();
 	variablesKind.leq(leq.e1,leq.e2);
       }
-    frozenLeqs=new ArrayList(frozenLeqs.size()); // We asume that the old size is a good hint
+    frozenLeqs.endOfIteration();
+    frozenLeqs.clear();
   }
   
   /** The elements that have not yet been added to a Kind  */
-  private static final ArrayList floating=new ArrayList();
+  private static final BackableList floating=new BackableList();
   
   /** The constraint of type variables */
-  private static final K variablesKind=new K();
+  private static final K variablesKind=new K(){
+//      public String toString()
+//      { 
+//        return "Kind of type variables";
+//      }
+  };
   
   private static final ArrayList createKinds()
   {
@@ -299,7 +345,17 @@ public abstract class Engine
       throws Unsatisfiable
     {
       if(dbg) Debug.println(e1+" <: "+e2+" ("+e1.getId()+" <: "+e2.getId()+")");
-      leq(e1.getId(),e2.getId());
+      try{ 
+	leq(e1.getId(),e2.getId()); 
+      }
+      catch(Unsatisfiable e){
+	// We call backtrack here to go the good state
+	// since the leave() method will not be called
+	// (or the call to backtrack() in leave will not occur
+	// if we are in leave now)
+	Engine.backtrack();
+	throw e;
+      }
     }
     
     public final void register(Element e)
@@ -309,13 +365,15 @@ public abstract class Engine
     }
     
     protected void indexMerged(int src, int dest) {
-      if(dbg) Debug.println(this+" merged "+src+" and "+dest);
+      Internal.warning("Engine: Indexes merged");
     }
     protected void indexMoved(int src, int dest) {
+      Internal.warning("Engine: Index moved");
     }
     protected void indexDiscarded(int index) {
+      Internal.warning("Engine: Index discarded");
     }
   }
 
-  static final boolean dbg = true;
+  static final boolean dbg = false;
 }

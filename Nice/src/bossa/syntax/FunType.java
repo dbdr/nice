@@ -12,7 +12,7 @@
 
 // File    : FunType.java
 // Created : Fri Jul 02 17:41:24 1999 by bonniot
-//$Modified: Tue Aug 24 16:28:28 1999 by bonniot $
+//$Modified: Thu Aug 26 12:49:57 1999 by bonniot $
 
 package bossa.syntax;
 
@@ -28,6 +28,8 @@ public class FunType extends Monotype
 {
   public FunType(Collection /* of Monotype */ in, Monotype out)
   {
+    if(in==null)
+      in=new ArrayList(0);
     this.in=in;
     this.out=out;
     this.kind=new FunTypeKind(in.size());

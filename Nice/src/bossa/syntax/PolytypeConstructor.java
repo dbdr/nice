@@ -12,7 +12,7 @@
 
 // File    : PolytypeConstructor.java
 // Created : Mon Jul 19 17:47:49 1999 by bonniot
-//$Modified: Tue Aug 24 16:39:25 1999 by bonniot $
+//$Modified: Thu Aug 26 10:32:06 1999 by bonniot $
 
 package bossa.syntax;
 
@@ -46,6 +46,12 @@ public class PolytypeConstructor extends Type
     return this;
   }
   
+  Type cloneType()
+  {
+    //TODO:create new type parameters?
+    return new PolytypeConstructor(parameters,(Polytype)polytype.cloneType());
+  }
+  
   //Acces methods
 
   public List getTypeParameters()
@@ -77,7 +83,7 @@ public class PolytypeConstructor extends Type
     while(formals.hasNext())
       {
 	MonotypeVar var=(MonotypeVar) formals.next();
-	map.put(var.name,effectives.next());
+	map.put(var/*.name*/,effectives.next());
       }
 
     res=polytype.substitute(map);

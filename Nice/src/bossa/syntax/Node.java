@@ -12,7 +12,7 @@
 
 // File    : Node.java
 // Created : Thu Jul 08 10:24:56 1999 by bonniot
-//$Modified: Tue Aug 24 12:19:09 1999 by bonniot $
+//$Modified: Fri Aug 27 10:34:13 1999 by bonniot $
 
 package bossa.syntax;
 
@@ -92,23 +92,37 @@ abstract class Node
     typeMapsSymbols.addAll(symbols);
   }
   
+  class Scopes
+  {
+    Scopes(VarScope v, TypeScope t)
+    { scope=v; typeScope=t; }
+
+    VarScope scope;
+    TypeScope typeScope;
+  }
+  
+  void buildScope()
+  {
+    buildScope(null,null);
+  }
+  
   /** Sets up the scope, once the outer scope is given 
    * return the scope to pass to the following brothers 
    * (for forward scoping)
    */
-  VarScope buildScope(VarScope outer, TypeScope typeOuter)
+  Scopes buildScope(VarScope outer, TypeScope typeOuter)
   // Default behaviour, must be overriden in nodes
   // that really define a new scope
   {
     Internal.error(this.scope!=null,"Scope set twice for "+this);
 
-    VarScope res=null;
+    Scopes res=null;
     switch(propagate)
       {
       case down: 
 	this.scope=new VarScope(outer,varSymbols);
 	this.typeScope=new TypeScope(typeOuter);
-	res=outer;
+	res=new Scopes(outer,typeOuter);
 	break;
 
       case global:
@@ -119,13 +133,13 @@ abstract class Node
 	if(typeOuter==null)
 	  typeOuter=new TypeScope(null);
 	this.typeScope=typeOuter;
-	res=outer;
+	res=new Scopes(outer,typeOuter);
 	break;
 	
       case forward:
 	this.scope=new VarScope(outer,varSymbols);
 	this.typeScope=new TypeScope(typeOuter);
-	res=this.scope;
+	res=new Scopes(this.scope,this.typeScope);
 	break;
 
       case none:
@@ -139,13 +153,14 @@ abstract class Node
     this.typeScope.addSymbols(typeSymbols);
     this.typeScope.addMappings(typeMapsNames,typeMapsSymbols);
 
-    VarScope currentScope=this.scope;
+    // builds the scope of the children
+    Scopes current=new Scopes(this.scope,this.typeScope);
     Iterator i=children.iterator();
     while(i.hasNext())
       {
 	Object d=i.next();
 	if(d!=null)
-	  currentScope=((Node)d).buildScope(currentScope,typeScope);
+	  current=((Node)d).buildScope(current.scope,current.typeScope);
       }
 
     return res;
@@ -185,12 +200,21 @@ abstract class Node
   /** override this when typechecking is needed */
   void typecheck() { }
 
+  /** 
+   * Usefull when children are to be typechecked in a content
+   * defined by this Node :
+   * the Typing.enter() goes in typecheck()
+   * and the Typing.leave() goes here
+   */
+  void endTypecheck() { }
+  
   void doTypecheck()
   {
     typecheck();
     Iterator i=children.iterator();
     while(i.hasNext())
       ((Node)i.next()).doTypecheck();
+    endTypecheck();
   }
 
   /****************************************************************

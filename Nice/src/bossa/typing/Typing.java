@@ -12,7 +12,7 @@
 
 // File    : Typing.java
 // Created : Tue Jul 20 11:57:17 1999 by bonniot
-//$Modified: Tue Aug 24 15:14:31 1999 by bonniot $
+//$Modified: Fri Aug 27 11:15:59 1999 by bonniot $
 
 package bossa.typing;
 
@@ -40,7 +40,7 @@ abstract public class Typing
    */
   public static void enter()
   {
-    enter(null);
+    enter("");
   }
 
   /**
@@ -327,5 +327,5 @@ abstract public class Typing
       }
   }
 
-  static final boolean dbg = false;
+  static final boolean dbg = true;
 }

@@ -12,22 +12,30 @@
 
 // File    : FieldExp.java
 // Created : Mon Jul 05 17:29:46 1999 by bonniot
-//$Modified: Tue Aug 24 17:01:30 1999 by bonniot $
-// Description : 
+//$Modified: Thu Aug 26 13:09:58 1999 by bonniot $
 
 package bossa.syntax;
 
 import bossa.util.*;
+import java.util.*;
 
 /**
  * Access to the field of an expression.
+ * Replaced by the call of a field access method.
  */
-public class FieldExp extends Expression
+abstract public class FieldExp extends Expression
 {
-  public FieldExp(Expression prefix, LocatedString field)
+  private FieldExp(Expression prefix, LocatedString field)
   {
     this.prefix=expChild(prefix);
     this.field=field;
+  }
+  
+  public static Expression create(Expression prefix, LocatedString field)
+  {
+    List params=new ArrayList(1);
+    params.add(prefix);
+    return new CallExp(new IdentExp(field),params);
   }
   
   Expression resolveExp()

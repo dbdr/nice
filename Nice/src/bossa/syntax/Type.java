@@ -12,15 +12,17 @@
 
 // File    : Type.java
 // Created : Mon Jul 19 17:45:27 1999 by bonniot
-//$Modified: Tue Aug 24 16:38:21 1999 by bonniot $
-// Description : Any type. 
-//   Can either be a Polytype or a PolytypeConstructor
+//$Modified: Thu Aug 26 10:30:38 1999 by bonniot $
 
 package bossa.syntax;
 
 import java.util.*;
 import bossa.util.*;
 
+/**
+ * Any type. 
+ * Can either be a Polytype or a PolytypeConstructor.
+ */
 public abstract class Type extends Node
 {
   Type()
@@ -48,6 +50,11 @@ public abstract class Type extends Node
     return this;
   }
 
+  /**
+   * Returns an equivalent type, but with fresh binders.
+   */
+  abstract Type cloneType();
+  
   //the get* methods are used to construct new Type. 
   //See FunExp for instance
   public abstract List getTypeParameters();

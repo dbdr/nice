@@ -12,7 +12,7 @@
 
 // File    : AST.java
 // Created : Thu Jul 01 11:01:56 1999 by bonniot
-//$Modified: Thu Aug 19 14:27:19 1999 by bonniot $
+//$Modified: Fri Aug 27 10:31:23 1999 by bonniot $
 
 package bossa.syntax;
 
@@ -34,7 +34,7 @@ public class AST extends Node
     this.definitions=defs;
     
     Debug.println("Scoping (build  )");
-    buildScope(null,null);
+    buildScope();
 
     Debug.println("Scoping (resolve)");
     doResolve();
@@ -43,37 +43,13 @@ public class AST extends Node
     doTypecheck();
   }
 
-  private static Collection findSymbols(Collection defs, boolean types)
-  {
-    Collection res=new ArrayList();
-    Iterator i=defs.iterator();
-    while(i.hasNext())
-      {
-	Object d=i.next();
-	if(types && d instanceof ClassDefinition)
-	  res.add(((ClassDefinition)d).tc);
-	else if(types && d instanceof TypeSymbol)
-	  res.add((TypeSymbol)d);
-	else if(!types && d instanceof VarSymbol)
-	  res.add(d);
-	if(!types && d instanceof ClassDefinition)
-	  res.addAll(((ClassDefinition)d).methodDefinitions());
-      }
-    return res;
-  }
-
   /****************************************************************
    * Type checking
    ****************************************************************/
 
   public String toString()
   {
-    String res="";
-    Iterator i=definitions.iterator();
-    while(i.hasNext()){
-      res=res+i.next().toString();
-    }
-    return res;
+    return Util.map(definitions);
   }
 
   private List /* of Definition */ definitions;

@@ -10,26 +10,38 @@
 /*                                                                        */
 /**************************************************************************/
 
-// File    : TypeSymbol.java
-// Created : Fri Jul 09 11:20:46 1999 by bonniot
-//$Modified: Wed Aug 25 16:01:46 1999 by bonniot $
-// Description : Used to lookup Type names
-//   Separed from VarSymbol since it can only appear in types 
-//   (and New expression)
-//   whereas VarSymbol can only appear in Expressions
+// File    : ItfType.java
+// Created : Thu Jul 08 11:19:31 1999 by bonniot
+//$Modified: Fri Aug 27 11:20:36 1999 by bonniot $
+// Description : Interface considered as a type
 
 package bossa.syntax;
 
 import java.util.*;
 import bossa.util.*;
 
-public interface TypeSymbol extends Located
+//TODO: remove ?
+public abstract class ItfType extends Polytype
 {
-  /****************************************************************
-   * Scoping
-   ****************************************************************/
+  public ItfType(InterfaceDefinition i)
+  {
+    this.itf=i;
+  }
 
-  boolean hasName(LocatedString name);
-  LocatedString getName();
-  TypeSymbol cloneTypeSymbol();
+  Type cloneType()
+  {
+    return this;
+  }
+
+  Type resolve()
+  {
+    return this;
+  }
+
+  public String toString()
+  {
+    return itf.name.toString();
+  }
+
+  private InterfaceDefinition itf;
 }

@@ -12,7 +12,7 @@
 
 // File    : LocalDeclarationStmt.java
 // Created : Tue Jul 06 12:06:20 1999 by bonniot
-//$Modified: Tue Aug 24 11:19:20 1999 by bonniot $
+//$Modified: Thu Aug 26 15:49:07 1999 by bonniot $
 // Description : Declaration of a local variable
 //   with optional initial value
 
@@ -22,6 +22,7 @@ import bossa.util.*;
 import bossa.typing.*;
 
 public class LocalDeclarationStmt extends Statement
+  implements Definition
 {
   public LocalDeclarationStmt(LocatedString name, Type type, Expression value)
   {

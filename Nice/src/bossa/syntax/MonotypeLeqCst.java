@@ -10,46 +10,62 @@
 /*                                                                        */
 /**************************************************************************/
 
-// File    : TypeIdent.java
-// Created : Sat Jul 24 14:02:08 1999 by bonniot
-//$Modified: Wed Aug 25 16:05:48 1999 by bonniot $
+// File    : MonotypeLeqCst.java
+// Created : Fri Jul 23 19:26:17 1999 by bonniot
+//$Modified: Wed Aug 18 13:29:52 1999 by bonniot $
 
 package bossa.syntax;
+
+import java.util.*;
 
 import bossa.util.*;
 
 /**
- * A syntactic type identifier.
+ * Inequality between monotypes
  * 
- * After scoping, it will either reveal to be a 
- * TypeConstructor or a MonotypeVar.
- *
  * @author bonniot
  */
 
-public class TypeIdent
-  implements TypeSymbol
+public class MonotypeLeqCst extends AtomicConstraint
 {
-  public TypeIdent(LocatedString name)
+  public MonotypeLeqCst(Monotype m1, Monotype m2)
   {
-    this.name=name;
+    this.m1=m1;
+    this.m2=m2;
   }
 
-  public TypeSymbol cloneTypeSymbol()
+  static Constraint constraint(Collection c1, Collection c2)
   {
-    return new TypeIdent(name);
+    List a=new ArrayList(c1.size());
+    
+    for(Iterator i1=c1.iterator(),i2=c2.iterator();
+	i1.hasNext();)
+      a.add(new MonotypeLeqCst((Monotype) i1.next(),
+			       (Monotype) i2.next()));
+    
+    return new Constraint(new ArrayList(0),a);
   }
   
+  AtomicConstraint substitute(java.util.Map map)
+  {
+    return new MonotypeLeqCst(m1.substitute(map),m2.substitute(map));
+  }
+
+  AtomicConstraint resolve(TypeScope ts)
+  {
+    m1=m1.resolve(ts);
+    m2=m2.resolve(ts);
+    return this;
+  }
+
   /****************************************************************
-   * 
+   * Typechecking
    ****************************************************************/
 
-  TypeSymbol resolve(TypeScope scope)
+  void assert()
+    throws bossa.typing.TypingEx
   {
-    TypeSymbol res;
-    res=scope.lookup(name);
-    User.error(res==null,this,name+" is not defined in "+scope);
-    return res;
+    bossa.typing.Typing.leq(m1,m2);
   }
   
   /****************************************************************
@@ -58,23 +74,8 @@ public class TypeIdent
 
   public String toString()
   {
-    return "\""+name+"\"";
+    return m1+" <: "+m2;
   }
 
-  public LocatedString getName()
-  {
-    return name;
-  }
-  
-  public boolean hasName(LocatedString name)
-  {
-    return this.name.equals(name);
-  }
-  
-  public Location location()
-  {
-    return name.location();
-  }
-
-  LocatedString name;
+  Monotype m1,m2;
 }

@@ -12,7 +12,7 @@
 
 // File    : Front.java
 // Created : Thu Jul 01 15:11:18 1999 by bonniot
-//$Modified: Tue Aug 17 17:37:48 1999 by bonniot $
+//$Modified: Thu Aug 26 11:42:41 1999 by bonniot $
 
 package bossa.test;
 
@@ -40,7 +40,8 @@ public class Front
       {
 	System.out.println("Usage: bossa file.bossa");
 	//System.exit(0);
-	file="t.bossa";
+	//file="GJ-loophole.bossa";
+	file="s.bossa";
       }
     else file=args[0];
     
@@ -50,6 +51,7 @@ public class Front
     try{
       AST ast=new AST(defs);
       //System.out.print(ast);
+      System.out.println("\nThe program is well typed");
     }
     catch(Exception e){
       System.out.println("Uncaught exception :");

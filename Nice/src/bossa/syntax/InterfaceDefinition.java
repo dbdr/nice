@@ -12,26 +12,32 @@
 
 // File    : InterfaceDefinition.java
 // Created : Thu Jul 01 17:00:14 1999 by bonniot
-//$Modified: Thu Aug 19 13:40:13 1999 by bonniot $
+//$Modified: Fri Aug 27 11:02:50 1999 by bonniot $
 
 package bossa.syntax;
 
 import java.util.*;
 import bossa.util.*;
 
-/** Abstract syntax for an interface definition
- *
+/** 
+ * Abstract syntax for an interface definition
  */
 public class InterfaceDefinition extends Node
   implements Definition,TypeSymbol
 {
   public InterfaceDefinition(LocatedString name, Collection typeParameters)
   {
-    super(Node.global);
+    super(Node.forward);
     this.name=name;
     this.parameters=typeParameters;
+    addTypeSymbol(this);
   }
 
+  public TypeSymbol cloneTypeSymbol()
+  {
+    return new InterfaceDefinition(name,parameters);
+  }
+  
   public boolean hasName(LocatedString s)
   {
     return name.equals(s);

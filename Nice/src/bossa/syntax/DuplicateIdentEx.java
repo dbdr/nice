@@ -10,26 +10,22 @@
 /*                                                                        */
 /**************************************************************************/
 
-// File    : TypeSymbol.java
-// Created : Fri Jul 09 11:20:46 1999 by bonniot
-//$Modified: Wed Aug 25 16:01:46 1999 by bonniot $
-// Description : Used to lookup Type names
-//   Separed from VarSymbol since it can only appear in types 
-//   (and New expression)
-//   whereas VarSymbol can only appear in Expressions
+// File    : DuplicateIdentEx.java
+// Created : Wed Jul 21 13:12:08 1999 by bonniot
+//$Modified: Fri Jul 23 11:57:31 1999 by bonniot $
+// Description : thrown when the same ident is defined twice 
+//   in the same scope level
 
 package bossa.syntax;
 
-import java.util.*;
 import bossa.util.*;
 
-public interface TypeSymbol extends Located
+public class DuplicateIdentEx extends Exception
 {
-  /****************************************************************
-   * Scoping
-   ****************************************************************/
-
-  boolean hasName(LocatedString name);
-  LocatedString getName();
-  TypeSymbol cloneTypeSymbol();
+  public DuplicateIdentEx(LocatedString name)
+  {
+    this.ident=name;
+  }
+  
+  LocatedString ident;
 }

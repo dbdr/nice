@@ -1,0 +1,81 @@
+/**************************************************************************/
+/*                           B O S S A                                    */
+/*        A simple imperative object-oriented research language           */
+/*                   (c)  Daniel Bonniot 1999                             */
+/*                                                                        */
+/*  This program is free software; you can redistribute it and/or modify  */
+/*  it under the terms of the GNU General Public License as published by  */
+/*  the Free Software Foundation; either version 2 of the License, or     */
+/*  (at your option) any later version.                                   */
+/*                                                                        */
+/**************************************************************************/
+
+// File    : stdlib.bossa
+// Created : Thu Jul 08 16:20:19 1999 by bonniot
+//$Modified: Fri Aug 27 11:11:07 1999 by bonniot $
+// Description : Prolog file, included before all bossa file
+
+variable {Any T} T null;
+
+class void {}
+
+// Booleans
+class Boolean {}
+class True  extends Boolean {}
+class False extends Boolean {}
+
+variable True  true =new True();
+variable False false=new False();
+
+Boolean not(Boolean);
+not(b@True)  { return false; }
+not(b@False) { return true;  }
+
+// builtin control structures
+T _if { Any T } (Boolean,fun()(T),fun()(T));
+
+_if(cond@True,t,e)
+{
+  return t();
+}
+
+_if(cond@False,t,e)
+{
+  return e();
+}
+
+void _while(fun()(Boolean),fun()(void));
+_while(test,body)
+{
+  if(not(test()))
+    return;
+  body();
+  _while(test,body);
+}
+
+// Numeric
+class Float{}
+class Integer extends Float {}
+Integer succ(Integer);
+Boolean lt(Integer, Integer);
+Boolean equal(Integer,Integer);
+
+class String{}
+
+// Array
+class Array<T>{}
+
+T 
+get<T>(Array<T>,Integer);
+
+void 
+set<T>(Array<T>, Integer, T);
+
+Integer
+capacity<T>(Array<T>);
+
+void
+resize<T>(Array<T>, Integer);
+
+// Main function, called with command line arguments in an array
+Integer main(Array<String>);

@@ -12,7 +12,7 @@
 
 // File    : Expression.java
 // Created : Mon Jul 05 16:25:02 1999 by bonniot
-//$Modified: Tue Aug 24 17:03:48 1999 by bonniot $
+//$Modified: Thu Aug 26 10:32:13 1999 by bonniot $
 // Description : 
 
 package bossa.syntax;
@@ -115,7 +115,7 @@ public abstract class Expression extends Node
 
     while(i.hasNext())
       {
-	Type t=((Expression) i.next()) .getType();
+	Type t=((Expression) i.next()).getType();
 	if(!(t instanceof Polytype))
 	  return null;
 	res.add(t);

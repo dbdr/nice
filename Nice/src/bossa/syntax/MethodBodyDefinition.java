@@ -12,7 +12,7 @@
 
 // File    : MethodBodyDefinition.java
 // Created : Thu Jul 01 18:12:46 1999 by bonniot
-//$Modified: Mon Aug 23 18:54:58 1999 by bonniot $
+//$Modified: Fri Aug 27 11:07:22 1999 by bonniot $
 // Description : Abstract syntax for a method body
 
 package bossa.syntax;
@@ -42,8 +42,13 @@ public class MethodBodyDefinition extends Node
 
   private Collection buildSymbols(Collection names, Collection types)
   {
-    User.error(names.size()!=types.size(),this,
-	       "Method "+name+" has "+types.size()+" parameters");
+    if(names.size()!=types.size())
+      switch(types.size()){
+      case 0: User.error(this,"Method "+name+" has no parameters");
+      case 1: User.error(this,"Method "+name+" has 1 parameter");
+      default:User.error(this,"Method "+name+" has "+types.size()+
+			 " parameters");
+      }
     
     Collection res=new ArrayList(names.size());
     for(Iterator n=names.iterator(),t=types.iterator();
@@ -77,22 +82,24 @@ public class MethodBodyDefinition extends Node
     addSymbols(parameters);
   }
 
-  VarScope buildScope(VarScope outer, TypeScope typeOuter)
+  Scopes buildScope(VarScope outer, TypeScope typeOuter)
   {
     setDefinition((MethodDefinition)outer.lookupLast(name));
 
-    addTypeSymbols(definition.type.getConstraint().binders);
+    //addTypeSymbols(definition.type.getTypeParameters());
+    //addTypeSymbols(definition.type.getConstraint().binders);
     
     // Get imperative type parameters
-    try{
-      addTypeMaps
-	(TypeConstructor.toLocatedString(this.typeParameters),
-	 definition.type.getTypeParameters());
-    }
-    catch(BadSizeEx e){
-      User.error(name,"Method \""+name+"\" expects "+e.expected+
-		 " imperative type parameters");
-    }
+    if(typeParameters.size()>0)
+      try{
+	addTypeMaps
+	  (TypeConstructor.toLocatedString(typeParameters),
+	   definition.type.getTypeParameters());
+      }
+      catch(BadSizeEx e){
+	User.error(name,"Method \""+name+"\" expects "+e.expected+
+		   " imperative type parameters");
+      }
 
     // Get functional type parameters
     if(binders!=null)
@@ -106,7 +113,7 @@ public class MethodBodyDefinition extends Node
 		 " functional type parameters");
     }
 
-    VarScope res=super.buildScope(definition.scope,definition.typeScope);
+    Scopes res=super.buildScope(outer,typeOuter);
 
     return res;
   }
@@ -156,8 +163,10 @@ public class MethodBodyDefinition extends Node
     catch(TypingEx e) {
       User.error(name,"Typing error in method body \""+name+"\":\n"+e);
     }
+  }
 
-    // Used to call body.typecheck() here. Now it is done as it is a child
+  void endTypecheck()
+  {
     try{
       Type t=body.getType();
       if(t==null)
@@ -166,10 +175,10 @@ public class MethodBodyDefinition extends Node
       Typing.leave();
     }
     catch(TypingEx e){
-      User.error(this,"Return type is not correct");
+      User.error(this,"Return type is not correct :"+e);
     }
   }
-
+  
   /****************************************************************
    * Printing
    ****************************************************************/

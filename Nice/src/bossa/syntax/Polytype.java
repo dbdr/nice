@@ -12,7 +12,7 @@
 
 // File    : Polytype.java
 // Created : Tue Jul 13 12:51:38 1999 by bonniot
-//$Modified: Tue Aug 24 16:22:12 1999 by bonniot $
+//$Modified: Thu Aug 26 10:29:44 1999 by bonniot $
 
 package bossa.syntax;
 
@@ -55,7 +55,7 @@ public class Polytype extends Type
   static Polytype voidType(TypeScope typeScope)
   {
     Monotype m=new MonotypeConstructor(new TypeConstructor(new LocatedString("void",Location.nowhere())),null,Location.nowhere());
-    m.resolve(typeScope);
+    m=m.resolve(typeScope);
     
     return new Polytype(m);
   }
@@ -69,13 +69,24 @@ public class Polytype extends Type
     return res;
   }
   
-  Polytype clonePolytype()
+  public Type cloneType()
   {
-    // we don't clone the monotype, it is unnecessary
-    // see PolytypeConstructor.instantiate
-    return new Polytype(constraint.cloneConstraint(), monotype);
-  }
+    //Optimization
+    if(!constraint.hasBinders())
+      return this;
 
+    Map map=new HashMap();
+    List newBinders=new ArrayList(constraint.binders.size());
+    for(Iterator i=constraint.binders.iterator();i.hasNext();)
+      {
+	TypeSymbol old=(TypeSymbol)i.next();
+	TypeSymbol nou=old.cloneTypeSymbol();
+	newBinders.add(nou);
+	map.put(old,nou);
+      }
+    return new Polytype(new Constraint(newBinders,AtomicConstraint.substitute(map,constraint.atomics)),monotype.substitute(map));
+  }
+  
   //Acces methods
   public List getTypeParameters()
   {

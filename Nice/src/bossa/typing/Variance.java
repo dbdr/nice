@@ -12,7 +12,7 @@
 
 // File    : Variance.java
 // Created : Fri Jul 23 12:15:46 1999 by bonniot
-//$Modified: Tue Aug 24 16:29:22 1999 by bonniot $
+//$Modified: Wed Aug 25 11:19:17 1999 by bonniot $
 
 package bossa.typing;
 
@@ -121,6 +121,15 @@ public class Variance
   public boolean equals(Object o)
   {
     return (o instanceof Variance) && (((Variance) o).size==size);
+  }
+  
+  /****************************************************************
+   * Printing
+   ****************************************************************/
+
+  public String toString()
+  {
+    return "Variance (arity "+size+")";
   }
   
   public int size;

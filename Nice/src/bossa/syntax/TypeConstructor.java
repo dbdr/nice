@@ -12,7 +12,7 @@
 
 // File    : TypeConstructor.java
 // Created : Thu Jul 08 11:51:09 1999 by bonniot
-//$Modified: Thu Aug 19 13:24:49 1999 by bonniot $
+//$Modified: Wed Aug 25 18:11:27 1999 by bonniot $
 
 package bossa.syntax;
 
@@ -77,6 +77,19 @@ public class TypeConstructor
     Internal.error(kind!=null,"Kind should be null in TC.setVariance");
     
     this.kind=bossa.engine.Engine.getConstraint(v);
+  }
+
+  TypeConstructor substitute(Map map)
+  {
+    if(map.containsKey(this))
+      return (TypeConstructor)map.get(this);
+    else
+      return this;
+  }
+
+  public TypeSymbol cloneTypeSymbol()
+  {
+    return new TypeConstructor(name);
   }
   
   static Collection toLocatedString(Collection c)

@@ -12,7 +12,7 @@
 
 // File    : Internal.java
 // Created : Wed Jul 07 18:23:19 1999 by bonniot
-//$Modified: Tue Aug 24 14:43:39 1999 by bonniot $
+//$Modified: Wed Aug 25 10:17:17 1999 by bonniot $
 // Description : Internal errors...
 
 package bossa.util;
@@ -23,6 +23,16 @@ package bossa.util;
 
 public class Internal
 {
+  public static void printStackTrace()
+  {
+    try{  
+      throw new Exception();
+    }
+    catch(Exception e){
+      e.printStackTrace();
+    }
+  }
+        
   public static void warning(Located loc, String message)
   {
     warning(loc.location()+message);
@@ -53,14 +63,7 @@ public class Internal
   public static void error(String message)
   {
     System.out.println("[Internal error] "+message);
-    
-    try{  
-      throw new Exception();
-    }
-    catch(Exception e){
-      e.printStackTrace();
-    }
-    
+    printStackTrace();
     System.exit(1);
   }
 

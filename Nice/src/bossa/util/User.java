@@ -12,7 +12,7 @@
 
 // File    : User.java
 // Created : Wed Jul 07 18:20:58 1999 by bonniot
-//$Modified: Mon Aug 23 17:44:00 1999 by bonniot $
+//$Modified: Thu Aug 26 10:49:04 1999 by bonniot $
 // Description : Messages for the user
 
 package bossa.util;

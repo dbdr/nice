@@ -12,7 +12,7 @@
 
 // File    : CallExp.java
 // Created : Mon Jul 05 16:27:27 1999 by bonniot
-//$Modified: Tue Aug 24 17:20:49 1999 by bonniot $
+//$Modified: Thu Aug 26 17:38:21 1999 by bonniot $
 
 package bossa.syntax;
 
@@ -38,6 +38,15 @@ public class CallExp extends Expression
     addChildren(this.parameters);
   }
 
+  public static CallExp create(Expression fun, 
+			Expression param1, Expression param2)
+  {
+    List params=new ArrayList(2);
+    params.add(param1);
+    params.add(param2);
+    return new CallExp(fun,params);
+  }
+  
   void resolve()
   {
     fun=fun.resolveExp();
@@ -50,7 +59,7 @@ public class CallExp extends Expression
 		      boolean report)
   {
     Type funt=fun.getType();
-    Collection parametersTypes=null;
+    Collection parametersTypes=null;//=Expression.getPolytype(parameters);
 
     Collection dom=funt.domain();
     Monotype codom=funt.codomain();
@@ -67,12 +76,11 @@ public class CallExp extends Expression
     else if(dom==null || codom==null || !(funt instanceof Polytype))
       return null;
 
-    if(report)
-      Typing.enter(funt.getTypeParameters(),"call "+fun);
+    Typing.enter(funt.getTypeParameters(),"call "+fun);
 
     try{
       Typing.implies();
-      
+
       try{ funt.getConstraint().assert(); }
       catch(TypingEx e) { 
 	if(report)
@@ -88,7 +96,6 @@ public class CallExp extends Expression
 		Domain.fromMonotypes(funt.domain()));
 
       Typing.leave();
-
     }
     catch(BadSizeEx e){
       if(report)
@@ -98,23 +105,23 @@ public class CallExp extends Expression
 	return null;
     }
     catch(TypingEx e){
-      if(report)
+      if(report){
+	String end="not within the domain of the function \""+fun+"\"";
 	if(parameters.size()>=2)
 	  User.error(loc,"The parameters "+
 		     Util.map("(",", ",")",parameters) +
-		     " are not within the domain of the function");
+		     " are "+end);
 	else
 	  User.error(loc,"The parameter \""+
 		     Util.map("",", ","",parameters) +
-		     "\" is not within the domain of the function");
+		     "\" is "+end);
+      }
       else
 	return null;
     }
-    
     //computes the resulting type
     Constraint cst=funt.getConstraint().and(Type.getConstraint(parametersTypes));
-    cst.and(MonotypeLeqCst.constraint(Type.getMonotype(parametersTypes),dom));
-    
+    cst.and(MonotypeLeqCst.constraint(Type.getMonotype(parametersTypes),dom));    
     return new Polytype(cst,codom);
   }
   

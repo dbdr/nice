@@ -12,7 +12,7 @@
 
 // File    : parser.jj
 // Created : Thu Jul 01 10:27:05 1999 by bonniot
-//$Modified: Tue Aug 24 16:27:08 1999 by bonniot $
+//$Modified: Fri Aug 27 10:53:14 1999 by bonniot $
 // Description : Parseur JavaCC pour Bossa
 //   Tokens based on the Jazz parser
 
@@ -33,15 +33,49 @@ import bossa.syntax.*;
 
 class Parser
 {
-    // it is better to get a Collection than an AST:
-    // it is thus easier to get some definitions from a prolog first
-    public static Collection parse(Reader r) throws ParseException
-    {
-	Parser p=new Parser(r);
-	return p.definitions();
-    }
-}
+  // it is better to get a Collection than an AST:
+  // it is thus easier to get some definitions from a prolog first
+  public static Collection parse(Reader r) throws ParseException
+  {
+    Parser p=new Parser(r);
+    return p.definitions();
+  }
 
+  /** 
+   * Returns a function with no parameters that returns the expression.
+   * if exp is 'null', this functions returns void.
+   */
+  private static FunExp lazyExp(Expression exp)
+  {
+    List statements=new ArrayList(1);
+    if(exp!=null)
+      statements.add(new ReturnStmt(exp));
+    return new FunExp(new ArrayList(0),
+		      Constraint.True(),
+		      new ArrayList(0),
+		      statements);
+  }
+
+  private static FunExp lazyStmt(Statement statement)
+  {
+    if(statement==null)
+      return lazyExp(null);
+    if(statement instanceof ExpressionStmt)
+      return lazyExp(((ExpressionStmt)statement).exp);
+
+    List statements=new ArrayList(1);
+    statements.add(statement);
+    return new FunExp(new ArrayList(0),
+		      Constraint.True(),
+		      new ArrayList(0),
+		      statements);
+  }
+
+  private static IdentExp symb(String name, Token t)
+  {
+    return new IdentExp(new LocatedString(name,new Location(t)));
+  }
+}
 PARSER_END(Parser)
 
 /***********************************************************************
@@ -163,8 +197,10 @@ TOKEN: /* Keywords */
 | < FOR:        "for"        >
 | < IF:         "if"         >
 | < ELSE:       "else"       >
-| < TRUE:       "true"       >
-| < FALSE:      "false"      >
+| < ENDIF:      "endif"      >
+| < WHILE:      "while"      >
+		  //| < TRUE:       "true"       >
+		  //| < FALSE:      "false"      >
 | < PRINT:      "print"      >
 | < FORMAT:     "format"     >
 | < ERROR:      "error"      >
@@ -194,6 +230,7 @@ TOKEN: /* Keywords */
 | < ANY_:	"Any"        >
 // Statements
 | < RETURN:     "return"     >
+| < VARIABLE:   "variable"   >
 
 // reserved for future use
 | < PRIVATE:    "private"    >
@@ -447,7 +484,7 @@ TypeSymbol binder(Collection atomics):
       return first;
     atomics.add(new TypeConstructorLeqCst(second,first)); 
     return second; 
-   }
+  }
 }
 
 List binders(Collection atomics):
@@ -464,27 +501,25 @@ List binders(Collection atomics):
 AtomicConstraint atomicConstraint():
 {
   Monotype m1,m2;  
-  TypeIdent t1,t2;
+  TypeConstructor t;
+  Interface i;
   AtomicConstraint res;
 }
 {
+  LOOKAHEAD(2)
   (
    m1=monotype()
    "<:"
    m2=monotype()
-   {
-     res=new MonotypeLeqCst(m1,m2);
-   }
+   { res=new MonotypeLeqCst(m1,m2); }
   )
-    /*
 |
   (
-   t1=typeIdent()
-   "<:"
-   t2=typeIdent()
-  { res=new LeqCst(t1,t2); }
+   t=typeConstructor()
+   ":"
+   i=itf()
+   { res=new ImplementsCst(t,i); }
   )
-    */
   { return res; }
 }
 
@@ -533,6 +568,8 @@ MonotypeVar monotypeVar(boolean imperative):
   LocatedString name;
 }
 {
+  //TMP
+  [ "+" ]
   name=string()
   { return new MonotypeVar(name,imperative); }
 }
@@ -573,11 +610,11 @@ Monotype monotypeConstructor():
 FunType funmonotype():
 {
     Monotype codom;
-    Collection dom;
+    Collection dom=null;
     Constraint cst;
 }
 {
-    "fun" "(" dom=monotypes() ")" "(" codom=monotype() ")"
+    "fun" "(" [ dom=monotypes() ] ")" "(" codom=monotype() ")"
     { return new FunType(dom,codom); }
 }
 
@@ -743,7 +780,7 @@ ClassDefinition classDefinition():
     ( 
       (
        //LOOKAHEAD(monoSymbol() ";") 
-       field=monoSymbol() ";" { fields.add(field); }
+       ["final"] field=monoSymbol() ";" { fields.add(field); }
 	//| 
         //methodDecl(res)
       )
@@ -822,6 +859,21 @@ MethodDefinition methodDefinition():
     { return new MethodDefinition(name,tp,cst,returnType,parameters); }
 }
 
+Definition globalVariable():
+{
+  LocatedString name;
+  Type t;
+  Expression value=null;
+}
+{
+  "variable"
+  t=type()
+  name=string()
+  [ "=" value=expression() ]
+  ";"
+  { return new LocalDeclarationStmt(name,t,value); }
+}
+
 Definition definition():
 {
     Definition res;
@@ -832,6 +884,8 @@ Definition definition():
   | 
     res=interfaceDefinition()
   | 
+    res=globalVariable()
+  |
     LOOKAHEAD( monotype() string() )
     res=methodDefinition()
   | 
@@ -884,6 +938,31 @@ ConstantExp constantExp():
 { return res; }
 }
 
+Expression ifExp():
+{
+  Token iftoken;
+  Expression condition;
+  Statement t,e=null;
+}
+{
+  iftoken="if"
+  "("
+  condition=expression()
+  ")"
+  t=statementInIf()
+  [ "else" e=statementInIf() "endif" ]
+  {
+    List params=new ArrayList(3);
+    params.add(condition);
+    params.add(lazyStmt(t));
+    // if e is 'null', this means 'void'
+    params.add(lazyStmt(e));
+    return new CallExp
+    (symb("_if",iftoken),
+     params);
+  }
+}
+
 IdentExp identExp():
 {
   LocatedString i;
@@ -924,7 +1003,7 @@ Expression computedExp(Expression prefix):
 {
   (
     "." name=string()
-    { res=new FieldExp(res,name); }
+    { res=FieldExp.create(res,name); }
   | 
     tp=typeParameters()
     { res=new InstantiateExp(res,tp); }
@@ -951,7 +1030,7 @@ FunExp funExp():
   { return new FunExp(tp,cst,formals,body); }
 }
 
-Expression expression():
+Expression expression1():
 {
   Expression res;
   IdentExp e;
@@ -962,6 +1041,8 @@ Expression expression():
   (
   res=constantExp()
 | 
+  res=ifExp()
+|
   res=newExp()
 |
   res=funExp()
@@ -973,6 +1054,19 @@ Expression expression():
     res.setLocation(new Location(first).englobe(new Location(last)));
     return res; 
   }
+}
+
+Expression expression():
+{
+  Expression res,e;
+  Token t;
+}
+{
+  res=expression1() 
+    [ t="==" e=expression() 
+    { res=CallExp.create(symb("equal",t),res,e); }
+    ]
+  { return res; }
 }
 
 List expressions():
@@ -1014,17 +1108,79 @@ LocalDeclarationStmt localDeclaration():
   { return new LocalDeclarationStmt(id,t,e); }
 }
 
-Statement statement():
+Statement statementInIf():
 {
   Statement res;
-  Expression e;
+  Expression e=null;
   Token first,last;
 }
 {
   { first=getToken(1); }
 (
-  "return" e=expression() ";" { res=new ReturnStmt(e); }
+  "return" [ e=expression() ]
+  { 
+    if(e==null)
+      res=new ReturnStmt(new VoidConstantExp());
+    else
+      res=new ReturnStmt(e); 
+  }
+| 
+  (
+   // Common prefix
+   e=expression()
+   (
+    res=affectation(e)
+   |
+    { res=new ExpressionStmt(e); }
+   )
+  )
+)
+  { last=getToken(0);
+    res.setLocation(new Location(first).englobe(new Location(last)));
+    return res; }
+}
+
+Statement whileStmt():
+{
+  Token whiletoken;
+  Expression test;
+  List stmts;
+}
+{
+  whiletoken="while" "(" test=expression() ")"
+  "{"
+  stmts=statements()
+  "}"
+  { 
+    return new ExpressionStmt(CallExp.create
+			      (symb("_while",whiletoken),
+			       lazyExp(test),
+			       new FunExp(new ArrayList(0),
+					  Constraint.True(),
+					  new ArrayList(0),
+					  stmts)));
+  }
+}
+
+Statement statement():
+{
+  Statement res;
+  Expression e=null;
+  Token first,last;
+}
+{
+  { first=getToken(1); }
+(
+  "return" [ e=expression() ] ";" 
+  { 
+    if(e==null)
+      res=new ReturnStmt(new VoidConstantExp());
+    else
+      res=new ReturnStmt(e); 
+  }
 |
+  res=whileStmt()
+|  
   LOOKAHEAD(type() string())
   res=localDeclaration() ";" 
 | 

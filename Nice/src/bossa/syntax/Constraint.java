@@ -12,7 +12,7 @@
 
 // File    : Constraint.java
 // Created : Fri Jul 02 17:51:35 1999 by bonniot
-//$Modified: Tue Aug 24 15:06:39 1999 by bonniot $
+//$Modified: Wed Aug 25 18:07:34 1999 by bonniot $
 
 package bossa.syntax;
 
@@ -61,6 +61,11 @@ public class Constraint extends Node
     this.atomics=atomics;
   }
 
+  boolean hasBinders()
+  {
+    return binders.size()>0;
+  }
+  
   /**
    * The trivial constraint 
    *
@@ -71,15 +76,14 @@ public class Constraint extends Node
     return new Constraint(new ArrayList(0),new ArrayList(0));
   }
 
-  Constraint cloneConstraint()
+  Constraint shallowClone()
   {
-    return new Constraint((List)((ArrayList)binders).clone(),
-			  (List)((ArrayList)atomics).clone());
+    return new Constraint((List)((ArrayList)binders).clone(),(List)((ArrayList)atomics).clone());
   }
 
   public static Constraint and(Constraint c1, Constraint c2)
   {
-    Constraint res=c1.cloneConstraint();
+    Constraint res=c1.shallowClone();
     c1.addBinders(c2.binders);
 
     return res;
@@ -87,10 +91,11 @@ public class Constraint extends Node
 
   Constraint and(Collection c)
   {
+    Constraint res=shallowClone();
     for(Iterator i=c.iterator();
 	i.hasNext();)
-      and((Constraint) i.next());
-    return this;
+      res.and((Constraint) i.next());
+    return res;
   }
 
   void and(Constraint c)

@@ -94,22 +94,25 @@ List<String> split(String str, char separator)
 }
 
 /**
- * Join a collection of strings together, interspersing <code>separator</code>
+ * Represent the elements of a collection, interspersing <code>separator</code>
  * among them.
  *
- * @param strings the strings to join
- * @param separator the separator string to place between each 
+ * @param collection the collection to join
+ * @param separator the separator string to place between each
  *    string and the one before it
  */
-String join(Collection<String> strings, String separator)
+<T> String join (Collection<T> collection, String value = " ")
 {
   StringBuffer buff = new StringBuffer();
-  Iterator<String> it = strings.iterator();
-  while(it.hasNext())
+  let size = collection.size();
+  var x = 0;
+
+  for (T elem : collection)
     {
-      buff.append(it.next());
-      if (it.hasNext())
-	buff.append(separator);
+      buff.append(elem);
+      if(++x < size)
+	buff.append(value);
     }
+
   return buff.toString();
 }

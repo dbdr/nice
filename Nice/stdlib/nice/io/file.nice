@@ -51,13 +51,17 @@ File[] listDir(File dir, File->boolean filter = always(true)) =
  * list of all files/directories in
  * all subdirectories which match the filter.
  */
-void->File traverse(File dir, File->boolean filter = always(true))
+void->File traverse(File dir, File->boolean filter = always(true),
+		    (File,File)->int sortBy = 
+		          (File f, File f2) => f.compareTo(f2))
   requires dir.isDirectory() :  "Only directories can be passed to traverse()."
 { 
   //Explicit stack management, since 
   //Java doesn't do tail call elimination...
   let stack = new Stack();
-  var current = dir.listDir(filter).iterator();
+  var list = dir.listDir(filter).toArrayList();
+  list.sort(sortBy);
+  var current = list.iterator();
   return () => {
     while(!current.hasNext()) {
       if (stack.isEmpty()) {
@@ -69,7 +73,9 @@ void->File traverse(File dir, File->boolean filter = always(true))
     let f = current.next();
     if (f.isDirectory()) {
       stack.push(current);
-      current = f.listDir(filter).iterator();
+      list = f.listDir(filter).toArrayList();
+      list.sort(sortBy);
+      current = list.iterator();
     }
     return f;
   };
@@ -133,7 +139,7 @@ void->String readLines(File file, ?String encoding = null)
                         : new java.io.InputStreamReader(
 			                new java.io.FileInputStream(file), encoding)
                             );
-  void close() { input.close(); stop(); }
+  String close() { input.close(); return stop(); }
   return ()=> {
     try {
       return input.readLine() || close();
@@ -142,6 +148,34 @@ void->String readLines(File file, ?String encoding = null)
       throw t;
     }
   };
+}
+
+/**
+ * Writes all the lines yielded by the <code>lines</code> parameter
+ * to a file.
+ */
+void writeLines(File file, void->String lines, ?String encoding = null)
+{
+  using(let writer = new java.io.BufferedWriter(
+			(encoding == null) 
+			? new java.io.FileWriter(file)
+			: new java.io.OutputStreamWriter(
+				new java.io.FileOutputStream(file), encoding)))
+  {
+    for(line:lines.iterator())
+      {
+	writer.write(line);
+	writer.newLine();
+      }
+  }
+}
+
+/**
+ * Writes all the line in the list to a file.
+ */
+void writeLines(File file, List<String> lines, ?String encoding = null)
+{
+  file.writeLines(lines.generator());
 }
 
 /**
@@ -213,13 +247,13 @@ void _testTraverse() {
       let res = gen();
       assert res.equals(file) : "Expected " + file + " got " + res;
     }
-    test(tmpdir/"one"/"two");  
-    test(tmpdir/"one"/"two"/"three");
-    test(tmpdir/"one"/"two"/"c.txt");
-    test(tmpdir/"one"/"four");
-    test(tmpdir/"one"/"four"/"d.txt");
     test(tmpdir/"one"/"a.txt");
     test(tmpdir/"one"/"b.bmp");    
+    test(tmpdir/"one"/"four");
+    test(tmpdir/"one"/"four"/"d.txt");
+    test(tmpdir/"one"/"two");  
+    test(tmpdir/"one"/"two"/"c.txt");
+    test(tmpdir/"one"/"two"/"three");
     try {
       gen();
       assert false;
@@ -235,9 +269,9 @@ void _testTraverseWithFilter() {
       let res = gen();
       assert res.equals(file) : "Expected " + file + " got " + res;
     }
+    test(tmpdir/"one"/"four");
     test(tmpdir/"one"/"two");  
     test(tmpdir/"one"/"two"/"three");
-    test(tmpdir/"one"/"four");
     try {
       gen();
       assert false;
@@ -255,15 +289,29 @@ void _testTraverseWithFilter2() {
       let res = gen();
       assert res.equals(file) : "Expected " + file + " got " + res;
     }
+    test(tmpdir/"one"/"b.bmp");    
+    test(tmpdir/"one"/"four");
     test(tmpdir/"one"/"two");  
     test(tmpdir/"one"/"two"/"three");
-    test(tmpdir/"one"/"four");
-    test(tmpdir/"one"/"b.bmp");    
     try {
       gen();
       assert false;
     } catch (GeneratorEnd e) {}
   }
+}
+
+void _testLines()
+{
+  let lines = ["Line 1", "Line 2", "Line 3"];
+  let f = createTempFile("_testLines", ".tmp");
+  f.writeLines(lines);
+  let lines2 = f.readLines().toList().toArray();
+  f.delete();
+  assert lines.size == lines2.size;
+  for(int i = 0; i < lines.size; i++)
+    {
+      assert lines[i].equals(lines2[i]): "Expected: " lines[i] ", got: " lines2[i];
+    }
 }
 
 

@@ -224,6 +224,7 @@
   </target>
   <target name="libs" depends="initialize">
     <mac-nicec-new package="nice.functional" />
+    <mac-nicec-new package="nice.io" />
   </target>
   <target name="bootstrap"
           depends="core-bootstrap,javacc,parser,recompile,compiler1,compiler2,tools,libs,recompile"

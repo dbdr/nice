@@ -252,6 +252,7 @@ public class OverloadedSymbolExp extends Expression
     if(symbols.size()==1)
       return uniqueExpression();
 
+    // Field access has precedence over method call.
     List fieldAccesses = filterFieldAccesses();
     if (fieldAccesses.size() != 0)
       return accessToFieldInThis(fieldAccesses);

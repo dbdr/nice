@@ -655,9 +655,9 @@ public class Pattern implements Located
       { //we need to skip possible '@' or '#' content of the string literal
         pos[0] += 2;
 	while(pos[0] < len &&
-		( ( rep.charAt(pos[0]) != '@' && rep.charAt(pos[0]) != '#') ||
-		  ( rep.charAt(pos[0]-1) == '\"' &&
-		    rep.charAt(pos[0]-2) != '\\' ) ) )
+		! ( ( rep.charAt(pos[0]) == '@' || rep.charAt(pos[0]) != '#')
+		&& rep.charAt(pos[0]-1) == '\"' 
+		&& rep.charAt(pos[0]-2) != '\\') )
 	  pos[0]++;
 
       }

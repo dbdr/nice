@@ -68,3 +68,19 @@ foos("abc") {}
   foo("\\\"x") = false;
   /// package b import a
   assert foo("\"x");
+
+/// PASS
+  /// package a
+  /// Toplevel
+  class X {}
+  int foo(X x1, String s, X x2) = 0;
+  foo(x1, "xyz", x2) = 1;
+  foo(x1, "xy\"@", x2) = 2;
+  foo(x1, "xy\"#z", x2) = 3;
+  foo(x1, "", x2) = 4;
+  /// package b import a
+  let x = new X();
+  assert foo(x, "xyz", x) == 1;
+  assert foo(x, "xy\"@", x) == 2;
+  assert foo(x, "xy\"#z", x) == 3;
+  assert foo(x, "", x) == 4;

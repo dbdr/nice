@@ -766,6 +766,37 @@ interface Buffer<Elem>
       or <literal>let</literal> must be used, the Java style is not accepted.
      </para>
     </section>
+    <section id="forStatements"><title>Extended <literal>for</literal> statement</title>
+     <para>
+      Nice supports the traditional <literal>for</literal> loop, with the same
+      syntax as in Java. In addition, it provides a form that allows iterating 
+      over the items in a sequence like C#'s <literal>foreach</literal>.
+      Here is the syntax:
+     </para>
+     <para>
+      <literal>for (
+      <replaceable>item-type</replaceable> 
+      <replaceable>variable-name</replaceable> : 
+      <replaceable>container</replaceable> ) { <replaceable>body</replaceable> }
+      </literal>
+     </para>
+     <para>
+      Currently, this version of the <literal>for</literal> statement can be
+      used to iterate over <literal>Collection</literal>s, arrays, 
+      <literal>String</literal>s, and <literal>StringBuffer</literal>s.
+     </para>
+     <para>
+      <example><title>Extended <literal>for</literal> statement</title>
+	<programlisting lang="nice">
+let String[] strings = ["one", "two", "three"];
+for(String s : strings)
+{
+  println(s);
+}
+</programlisting>
+      </example>
+     </para>
+    </section>
     <section id="localFunctions"><title>Local functions</title>
       <para>
 	Local functions are similar to toplevel functions, 

@@ -69,3 +69,24 @@ abstract interface Addable<T>
 interface java.util.Collection implements Addable;
 
 <Addable A, T> void addTwice(A<T> a, T e) { a.add(e); a.add(e); }
+
+/// FAIL
+  /// package a
+  /// Toplevel
+interface A { void foo() {} }
+
+  /// package b import a
+  new C().doAdd();
+  /// Toplevel
+class B { void foo() {} }
+
+abstract interface I { void /*/// FAIL HERE */ foo(); }
+<I T> void doAdd(T x) = x.foo();
+
+interface a.A implements I;
+
+class C extends B implements I {
+  // Missing implementation of foo.
+  // Another option would be to accept the foo(B) implementation
+  // as implementing the foo(I) method for C.
+}

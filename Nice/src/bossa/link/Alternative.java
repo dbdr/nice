@@ -27,6 +27,7 @@ import gnu.bytecode.*;
 import gnu.expr.*;
 
 import nice.tools.code.Gen;
+import nice.tools.typing.Types;
 
 import java.util.*;
 
@@ -235,8 +236,38 @@ public class Alternative implements Located
     for(Iterator i = list.iterator(); i.hasNext();)
       {
         Alternative a = (Alternative) i.next();
-        a.add(fullName);
+        a.addDefaultPatterns(from).add(fullName);
       }
+  }
+
+  Alternative addDefaultPatterns(MethodDeclaration def)
+  {
+    Monotype[] parameters = Types.parameters(def.getType());
+    Pattern[] newPatterns = null;
+
+    for (int i = 0; i < patterns.length; i++)
+      if (patterns[i].getTC() == null)
+        {
+          if (newPatterns == null)
+            {
+              newPatterns = new Pattern[patterns.length];
+              System.arraycopy(patterns, 0, newPatterns, 0, i);
+            }
+          newPatterns[i] = bossa.syntax.dispatch.createPattern
+            (patterns[i].getName(),
+             Types.concreteConstructor(parameters[i]),
+             Types.isSure(parameters[i]));
+        }
+
+    if (newPatterns == null)
+      return this;
+    else
+      return new Alternative(methodName, newPatterns) {
+          public Expression methodExp()
+          {
+            return Alternative.this.methodExp();
+          }
+        };
   }
 
   public static Stack sortedAlternatives(MethodDeclaration m)

@@ -124,7 +124,7 @@ nullnessInfo(test@CallExp)
     varPosition = 1;
   else if (isNullExp(notNull(notNull(test.arguments).getExp(1))))
     varPosition = 0;
-  else /// give up
+  else // Give up.
     return (null, false);
 
   return (localVariable(notNull(notNull(test.arguments).getExp(varPosition))), isAlwaysNull);

@@ -37,9 +37,10 @@ class SourceMap extends Attribute
 
   private static final String trailer = "*E\n";
 
-  public int getLength() 
+  public int getLength()
   {
-    return getBytes().length;
+    // Truncate the content to keep it under 65535, because of a JVM bug.
+    return Math.min(65535, getBytes().length);
   }
 
   private byte[] getBytes()
@@ -58,11 +59,12 @@ class SourceMap extends Attribute
     }
   }
 
-  public void write(java.io.DataOutputStream out) 
+  public void write(java.io.DataOutputStream out)
     throws java.io.IOException
   {
     byte[] bytes = getBytes();
-    out.write(bytes, 0, bytes.length);
+    // Truncate the content to keep it under 65535, because of a JVM bug.
+    out.write(bytes, 0, Math.min(65535, bytes.length));
  }
 
   /*

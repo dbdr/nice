@@ -146,8 +146,12 @@ char `^`(char, char) = inline nice.lang.inline.NumOp("iXOr");
 
 // Note: we should have testcases for this section.
 
+// Upcasts
+long long(int) = inline nice.lang.inline.Nop();
+
+
 // Accessing individual bits of a word
-boolean get(long x, int bit) = (x & (1 << bit)) != 0;
+boolean get(long x, int bit) = (x & (long(1) << bit)) != 0;
 boolean get(int  x, int bit) = (x & (1 << bit)) != 0;
 
 /** Returns a random positive number smaller than limit. */

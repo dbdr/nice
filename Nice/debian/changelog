@@ -1,6 +1,6 @@
 nice (0.7.2) unstable; urgency=low
 
-  * Implemented bitwise complement on long integers.
+  * Implemented bitwise complement and "get bit" on long integers.
 
  --
 

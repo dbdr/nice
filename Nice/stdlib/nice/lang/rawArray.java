@@ -205,28 +205,6 @@ public final class rawArray extends java.util.AbstractList
     return res;
   }
 
-  /**
-     Return a T[] array, 
-     where T is given by componentClass (T should not be primitive),
-     holding the same elements as <code>array</code>.
-  */
-  public static Object convert(Object[] array, String componentClass)
-  {
-    if (array == null)
-      return null;
-
-    try{
-      Object res = java.lang.reflect.Array.newInstance
-	(Class.forName(componentClass), array.length);
-      java.lang.System.arraycopy(array, 0, res, 0, array.length);
-      return res;
-    }
-    catch(ClassNotFoundException e){
-      throw new Error("Could not find class " + componentClass +
-		      " during array conversion");
-    }
-  }
-
   /****************************************************************
    * Conversion from generic Object array
    ****************************************************************/

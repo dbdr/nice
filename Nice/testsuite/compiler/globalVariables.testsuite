@@ -112,6 +112,20 @@ var Map<String,String> classMap = (()=> {
   /// package b import a
   {}
 
+/// PASS bug
+  /// package a
+  /// TOPLEVEL
+  let char x = '\n';
+  /// package b import a
+  {}
+
+/// PASS
+  /// package a
+  /// TOPLEVEL
+  let String x = "\n\r";
+  /// package b import a
+  {}
+
 /// PASS
   check();
   /// Toplevel

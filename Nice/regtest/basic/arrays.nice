@@ -3,7 +3,7 @@ package regtest.basic;
 // native arrays
 // Array<T> and T[] are synonyms
 
-<Any T> void p(Array<T>);
+<T> void p(Array<T>);
 p(a)
 {
   print("size = " + a.length + ", elements = ");
@@ -12,7 +12,7 @@ p(a)
   println("");
 }
 
-<Any T> Array<T> rev(Array<T>);
+<T> Array<T> rev(Array<T>);
 /* this is an interesting case to keep: 
    dispatch on Array for a method that only accepts (polymorphic) arrays.
    The difficulty here is that the bytecode type for the argument is Object,
@@ -162,18 +162,18 @@ void test_literal_arrays()
 }
 
 // We test how functions on polymorphic arrays deal with native type components
-<Any T> T getFirst(T[] a) = a[0];
+<T> T getFirst(T[] a) = a[0];
 
 // Use a polymorphic array as a collection after losing its type
 // because of bytecode types' monomorphicity.
-<Any T> void polyArrayAsCollection(T[] a) { a = id(a).map(id); }
+<T> void polyArrayAsCollection(T[] a) { a = id(a).map(id); }
 
 class V<T>
 {
   T[] elements;
 }
 
-<Any T> V<T> makeV() = new V(elements: cast(new T[1]));
+<T> V<T> makeV() = new V(elements: cast(new T[1]));
 
 void test_polymorphism()
 {
@@ -236,7 +236,7 @@ void test_null_arrays()
   aS = arrayId(aS);
 }
 
-<Any T> ?Array<T> arrayId(?Array<T> a) = id(a);
+<T> ?Array<T> arrayId(?Array<T> a) = id(a);
 
 // Using array -> Collection implicit conversion in the returned value
-<Any T> Collection<T> wrap(T x) = [ x ];
+<T> Collection<T> wrap(T x) = [ x ];

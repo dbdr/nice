@@ -63,7 +63,7 @@ test_exceptions()
   testFinallyInt(false);  
 }
 
-<Any T> T neverReturns()
+<T> T neverReturns()
 {
   throw new Error();
 }

@@ -47,7 +47,7 @@ String pToString(?String);
 pToString(null(String)) = "Null string";
 pToString(s@String) = "String";
 
-<Any T> boolean isNull(T);
+<T> boolean isNull(T);
 isNull(x) = false;
 isNull(null) = true;
 

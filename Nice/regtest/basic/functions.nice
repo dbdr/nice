@@ -27,7 +27,7 @@ class FunctionClass
 String optFun(String value, String end = ": ") = value + end;
 
 // Function with a parametric type
-<Any T> T identity(T x) = x;
+<T> T identity(T x) = x;
 
 // anonymous argument is ok 
 // (it would also be acceptable for this to fail graciously)

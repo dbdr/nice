@@ -11,7 +11,7 @@ package regtest.basic;
 
 import java.io.*;
 
-//<Any T> T nop(T) = inline regtest.basic.Nop();
+//<T> T nop(T) = inline regtest.basic.Nop();
 
 // rebind static and non-static fields
 String stringS() = native Fields.stringS;

@@ -20,7 +20,7 @@ void test_null()
 
 // Testing the coverage test
 
-<Any T1, Any T2 | T1 <: ?String , T2 <: T1> void cov(T1 s1, T2 s2);
+<T1, T2 | T1 <: ?String , T2 <: T1> void cov(T1 s1, T2 s2);
 
 // The domain of cov is exactly (?String, ?String)
 // Therefore there are exactly four cases:
@@ -31,7 +31,7 @@ cov(null,      s2@String) {}
 cov(null,      null)   {}
 
 // nullness marker with a parameterized type in constraint
-<Any T | T <: ?List<String>> void cov2(T x) {}
+<T | T <: ?List<String>> void cov2(T x) {}
 
 // Test inference of non-nullness
 

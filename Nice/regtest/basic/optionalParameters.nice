@@ -24,7 +24,7 @@ void oPFunction(int, int b, int c = 3, int d, int e, boolean skip = false) {}
    See comment at bossa.syntax.MethodDeclaration method typedResolve,
    line 148 as of CVS version 1.41.
 */
-//<Any T> void printAny(T what = "Nothing");
+//<T> void printAny(T what = "Nothing");
 //printAny(what) = println(what);
 
 void test_optional();

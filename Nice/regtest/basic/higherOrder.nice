@@ -2,9 +2,9 @@ package regtest.basic;
 
 /** Tests higher order functions */
 
-<Any T, Any U> U apply(T->U f, T x) = f(x);
+<T, U> U apply(T->U f, T x) = f(x);
 
-<Any T, Any U> U apply2(T->U f, T x);
+<T, U> U apply2(T->U f, T x);
 apply2(f, x) = f(x);
 
 class High
@@ -25,8 +25,8 @@ void test_parsingStmt(High h)
 void test_higher_order()
 {
   println(id("ID"));
-  println((<Any T>(T x)=>x)("LAMBDA"));
-  println(apply(<Any T>(T x)=>x, "LAMBDA"));
+  println((<T>(T x)=>x)("LAMBDA"));
+  println(apply(<T>(T x)=>x, "LAMBDA"));
   println(apply(nativeToString, "Using native methods as first class values"));
   println(apply(id(intIdentity), 42));
 }

@@ -34,35 +34,20 @@ public class CompOp extends Procedure2 implements Inlineable
 
   public static CompOp create(String param)
   {
-    char typeChar = param.charAt(0);
-    PrimType argType;
-    switch(typeChar)
-      {
-      case 'i': argType = Type.int_type; break;
-      case 'j': argType = Type.long_type; break;
-      case 'f': argType = Type.float_type; break;
-      case 'd': argType = Type.double_type; break;
-      default: 
-	bossa.util.User.error("Unknown type in inlined numeric operator: " +
-			      typeChar);
-	argType = null;
-      }
+    PrimType argType = Tools.numericType(param.charAt(0));
+    if (argType == null)
+      bossa.util.User.error("Unknown type in inlined comparison operator: " +
+			    param);
 
     param = param.substring(1);
 
     int kind = error;
-    if ("Eq".equals(param))
-      kind = Eq;
-    else if ("Ge".equals(param))
-      kind = Ge;
-    else if ("Le".equals(param))
-      kind = Le;
-    else if ("Lt".equals(param))
-      kind = Lt;
-    else if ("Gt".equals(param))
-      kind = Gt;
-    else if ("Ne".equals(param))
-      kind = Ne;
+    if ("Eq".equals(param))      kind = Eq;
+    else if ("Ge".equals(param)) kind = Ge;
+    else if ("Le".equals(param)) kind = Le;
+    else if ("Lt".equals(param)) kind = Lt;
+    else if ("Gt".equals(param)) kind = Gt;
+    else if ("Ne".equals(param)) kind = Ne;
     else
       bossa.util.User.error("Unknown inlined numeric operator " + param);
     return new CompOp (kind, argType);
@@ -100,6 +85,27 @@ public class CompOp extends Procedure2 implements Inlineable
     code.emitFi();
 
     target.compileFromStack(comp, retType);
+  }
+
+  /** 
+      Jump to label <code>to</code> if the comparison is true.
+  */
+  public void compileJump (Compilation comp, Expression[] args, Label to)
+  {
+    CodeAttr code = comp.getCode();
+    Target stack = new StackTarget(argType);
+
+    args[0].compile(comp, stack);
+    args[1].compile(comp, stack);
+
+    switch(kind){
+    case Eq: code.emitGotoIfEq(to); break;
+    case Le: code.emitGotoIfLe(to); break;
+    case Ge: code.emitGotoIfGe(to); break;
+    case Lt: code.emitGotoIfLt(to); break;
+    case Gt: code.emitGotoIfGt(to); break;
+    case Ne: code.emitGotoIfNE(to); break;
+    }    
   }
 
   private final PrimType argType;

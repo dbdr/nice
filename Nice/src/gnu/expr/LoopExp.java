@@ -32,31 +32,55 @@ public class LoopExp extends Expression
   public void compile(Compilation comp, Target target)
   {
     CodeAttr code = comp.getCode();
-    Label start = new Label(code);
-    Label 
-      trueLabel = new Label(code), 
-      falseLabel = new Label(code);
+
+    /*
+      The test is placed at the end of the loop.
+      This leads to N+1 gotos for N iterations.
       
-    ConditionalTarget ctarget;
-    ctarget = new ConditionalTarget(trueLabel, falseLabel, 
-				    comp.getInterpreter());
+      A test at the begining would lead to 2*N+1 gotos.
+    */
+    Label start = new Label(code);
+    Label test  = new Label(code);
+      
+    code.emitGoto(test);
 
     start.define(code);
-    whileExp.compile(comp,
-		     ctarget
-		     //Target.pushObject
-		     //Type.boolean_type
-		     );
-    
-    code.emitIfThen();
-    trueLabel.define(code);
     loopBody.compile(comp, Target.Ignore);
     beforeNextIteration.compile(comp, Target.Ignore);
-    code.emitGoto(start);
 
-    code.emitElse();
-    falseLabel.define(code);
-    code.emitFi();
+    test.define(code);
+    compileIfJump(comp, whileExp, start);
+  }
+
+  /** 
+      Jump to label <code>to</code> if <code>ifExp</code> is true.
+
+      Optimizes the case where ifExp is a integer comparison, 
+      since specific JVM bytecode handle these cases.
+  */
+  private void compileIfJump(Compilation comp, Expression ifExp, Label to)
+  {
+    if (ifExp instanceof ApplyExp)
+      {
+	ApplyExp app = (ApplyExp) ifExp;
+	if (app.func instanceof QuoteExp)
+	  {
+	    Object proc = ((QuoteExp) app.func).getValue();
+	    if (proc instanceof nice.lang.inline.CompOp)
+	      {
+		nice.lang.inline.CompOp op = (nice.lang.inline.CompOp) proc;
+		op.compileJump(comp, app.args, to);
+		return;
+	      }
+	    else System.out.println("3" + proc.getClass());
+	  }
+	else System.out.println("2" + app.func.getClass());
+      }
+    else System.out.println("1" + ifExp.getClass());
+
+    // General case
+    whileExp.compile(comp, Type.boolean_type);
+    comp.getCode().emitGotoIfIntNeZero(to);
   }
 
   public Type getType()

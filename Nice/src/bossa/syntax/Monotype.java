@@ -24,6 +24,17 @@ import bossa.util.*;
 abstract public class Monotype
 implements Located
 {
+  final static Monotype[] toArray(List monotypes)
+  {
+    if (monotypes == null)
+      return array0;
+    else
+      return 
+	(Monotype[]) monotypes.toArray(new Monotype[monotypes.size()]);
+  }
+  
+  private static Monotype[] array0 = new Monotype[0];
+
   /****************************************************************
    * Syntactic fresh monotype variables
    ****************************************************************/
@@ -33,11 +44,12 @@ implements Located
     return new TypeIdent(associatedVariable);
   }
   
-  static List freshs(int arity, LocatedString associatedVariable)
+  static Monotype[] freshs(int arity, LocatedString associatedVariable)
   {
-    List res=new ArrayList(arity);
-    for(int i=1;i<=arity;i++)
-      res.add(fresh(new LocatedString(associatedVariable.content+i,associatedVariable.location())));
+    Monotype[] res = new Monotype[arity];
+    for(int i = 0; i < arity; i++)
+      res[i] = fresh(new LocatedString(associatedVariable.content + i,
+				       associatedVariable.location()));
     return res;
   }
   
@@ -52,6 +64,14 @@ implements Located
     return false;
   }
 
+  final static boolean containsAlike(Monotype[] monotypes)
+  {
+    for(int i = monotypes.length; --i >= 0;)
+      if (monotypes[i].containsAlike())
+	return true;
+    return false;
+  }
+
   /**************************************************************
    * Scoping
    **************************************************************/
@@ -61,7 +81,6 @@ implements Located
 
   /** iterates resolve() on the collection of Monotype */
   static final mlsub.typing.Monotype[] resolve(TypeMap s, Collection c)
-  //TODO: imperative version ?
   {
     if(c.size()==0)
       return null;
@@ -87,6 +106,27 @@ implements Located
     return res;
   }
   
+  /** iterates resolve() on the collection of Monotype */
+  static final mlsub.typing.Monotype[] resolve(TypeMap s, Monotype[] c)
+  {
+    if(c == null || c.length == 0)
+      return null;
+    
+    mlsub.typing.Monotype[] res = new mlsub.typing.Monotype[c.length];
+
+    for (int n = c.length; --n >= 0;)
+      {
+	Monotype old = c[n];
+	mlsub.typing.Monotype nou = old.resolve(s);
+
+	if (nou == null)
+	  User.error(old, old + " : Monotype not defined");
+
+	res[n] = nou;
+      }
+    return res;
+  }
+  
   abstract Monotype substitute(Map map);
 
   static List substitute(Map map, Collection c)
@@ -99,6 +139,14 @@ implements Located
     while(i.hasNext())
       res.add( ((Monotype)i.next()).substitute(map));
 
+    return res;
+  }
+
+  static Monotype[] substitute(Map map, Monotype[] m)
+  {
+    Monotype[] res = new Monotype[m.length];
+    for(int i = m.length; --i >= 0;)
+      res[i] = m[i].substitute(map);
     return res;
   }
 

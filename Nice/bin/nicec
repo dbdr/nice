@@ -99,7 +99,9 @@ fi
 
 case $progname in
   nicec) 
-    CLASSPATH=${NICE}:${CLASSPATH} exec ${JAVA} \
+    CLASSPATH=${NICE}:${CLASSPATH}
+    export CLASSPATH
+    exec ${JAVA} \
 	-Dnice.systemJar=${NICEJAR-${NICE}} \
 	nice.tools.compiler.package "$@"
   ;;
@@ -117,8 +119,9 @@ case $progname in
     fi
     shift
 
-    CLASSPATH=$jar:${NICE}:$CLASSPATH exec ${JAVA} \
-	nice.tools.runJar ${jar} "$@"
+    CLASSPATH=$jar:${NICE}:$CLASSPATH
+    export CLASPATH
+    exec ${JAVA} nice.tools.runJar ${jar} "$@"
   ;;
   *)
     echo "unknow nice command: ${progname}"

@@ -12,7 +12,7 @@
 
 package bossa.syntax;
 
-import java.util.ListIterator;
+import java.util.Iterator;
 import gnu.bytecode.ClassType;
 import gnu.bytecode.Method;
 
@@ -25,7 +25,7 @@ import gnu.bytecode.Method;
 
 public interface Module extends mlsub.compilation.Module
 {
-  abstract ListIterator listImplicitPackages();
+  abstract Iterator listImplicitPackages();
 
   abstract String mangleName(String name);
 

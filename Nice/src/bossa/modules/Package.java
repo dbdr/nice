@@ -88,7 +88,7 @@ public class Package implements mlsub.compilation.Module, Located, bossa.syntax.
       imports.add(new LocatedString("nice.lang", 
 				    bossa.util.Location.nowhere()));
     
-    opens  = new LinkedList();
+    opens  = new TreeSet();
 
     findPackageSource();
     if (source == null)
@@ -244,9 +244,9 @@ public class Package implements mlsub.compilation.Module, Located, bossa.syntax.
     return getImports();
   }
   
-  public ListIterator /* of String */ listImplicitPackages()
+  public Iterator /* of String */ listImplicitPackages()
   {
-    return opens.listIterator();
+    return opens.iterator();
   }
   
   private List /* of LocatedString */ imports;
@@ -272,7 +272,7 @@ public class Package implements mlsub.compilation.Module, Located, bossa.syntax.
   }
 
   /** List of the LocatedStrings of packages implicitely opened. */
-  List opens;
+  Collection opens;
 
   /****************************************************************
    * Passes

@@ -33,7 +33,7 @@ public abstract class Loader
   public static LocatedString open(Reader r, 
 				   List definitions,
 				   List imports,
-				   List importStars)
+				   Collection importStars)
   {
     if(parser==null)
       parser = new Parser(r);

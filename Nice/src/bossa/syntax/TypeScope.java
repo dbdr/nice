@@ -111,7 +111,12 @@ public class TypeScope implements TypeMap
       {
 	boolean notFullyQualified = name.indexOf('.') == -1;
 	
-	// Try first to find the symbol in Nice definitions
+	/* Try first to find the symbol in Nice definitions.
+	   The first package is the current package.
+	   If the symbol is not found there, we check there is no 
+	   ambiguity with another symbol from another package.
+	*/
+	boolean first = true;
 	if (notFullyQualified)
 	  if (module != null)
 	    for (Iterator i = module.listImplicitPackages(); i.hasNext();)
@@ -122,11 +127,15 @@ public class TypeScope implements TypeMap
 		TypeSymbol sym = (TypeSymbol) map.get(fullName);
 		if (sym != null)
 		  if (res == null)
-		    res = sym;
+		    {
+		      res = sym;
+		      if (first) break;
+		    }
 		  else
 		    User.error(loc, "Ambiguity for symbol " + name + 
 			       ":\n" + res + " and " + sym +
 			       " both exist");
+		first = false;
 	      }
 	  else
 	    Internal.warning("null module in TypeScope");
@@ -139,7 +148,8 @@ public class TypeScope implements TypeMap
 	
 	if (tc != null)
 	  return tc;
-	    
+	
+	first = true;
 	if (notFullyQualified && (module != null))
 	  for (Iterator i = module.listImplicitPackages(); i.hasNext();)
 	    {
@@ -149,11 +159,15 @@ public class TypeScope implements TypeMap
 	      tc = JavaClasses.lookup(fullName);
 	      if (tc != null)
 		  if (res == null)
-		    res = tc;
+		    {
+		      res = tc;
+		      if (first) break;
+		    }
 		  else
 		      User.error(loc, "Ambiguity for native class " + name + 
 				 ":\n" + res + " and " + tc +
 				 " both exist");
+	      first = false;
 	    }
       }
     

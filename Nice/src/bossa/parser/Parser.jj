@@ -1361,7 +1361,7 @@ Expression arrayLiteralExp():
  * Imported Packages
  ****************************************************************/
 
-LocatedString readImports(List imports, List opens):
+LocatedString readImports(List imports, Collection opens):
 {
   LocatedString pkgName=null, name;
 }
@@ -1384,8 +1384,8 @@ LocatedString readImports(List imports, List opens):
  ****************************************************************/
 
 LocatedString module(List definitions,
-	    List imports,
-	    List opens):
+	             List imports,
+	             Collection opens):
 {
   LocatedString pkgName;
 }

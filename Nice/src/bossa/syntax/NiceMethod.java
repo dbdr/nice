@@ -243,8 +243,15 @@ public class NiceMethod extends UserOperator
             // check if the reverse relation holds with that method
             if (! d.specializesMethods() &&
                 Typing.smaller(itsDomain, ourDomain, true) &&
-                ! Types.typeParameterDispatch(getType(), s.getType()))
+                ! Types.typeParameterDispatch(s.getType(), getType()))
               {
+                if (! Types.covariantSpecialization(s.getType(), getType()))
+                  User.error
+                    (returnTypeLocation!=null ? returnTypeLocation :location(),
+"The return type should be less precise than the return type of method\n" +
+d + "\ndefined in:\n" +
+                     d.location());
+
                 // d is a specialized version of this.
                 // Therefore, all its implementations also belong to this.
                 bossa.link.Alternative.addAll(d, this);

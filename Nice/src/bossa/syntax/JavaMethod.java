@@ -97,11 +97,11 @@ public class JavaMethod extends MethodDeclaration
     return new QuoteExp(new PrimProcedure(reflectMethod));
   }
 
-  gnu.expr.Expression getCode() 
+  public gnu.expr.Expression getCode()
   {
     return nice.tools.code.Gen.wrapInLambda(new PrimProcedure(reflectMethod));
   }
-  
+
   /****************************************************************
    * Module interface
    ****************************************************************/

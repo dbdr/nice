@@ -454,7 +454,7 @@ public abstract class MethodDeclaration extends Definition
 
   protected abstract gnu.expr.Expression computeCode();
 
-  gnu.expr.Expression getCode() 
+  public gnu.expr.Expression getCode() 
   {
     // Default implementation.
     return getCodeInCallPosition();

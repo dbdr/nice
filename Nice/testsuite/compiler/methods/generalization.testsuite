@@ -33,8 +33,39 @@ abstract interface Fooable
 
 class a.Collection implements Fooable;
 
-/// PASS bug
+/// PASS
+  let c = new ArrayList();
+  c.addTwice("A");
+  assert c.size() == 2;
+
+  // Check that overrides work
+  let l = new SilentlyEmptyList();
+  l.addTwice("A");
+  assert l.size() == 0;
   /// Toplevel
 abstract interface Addable<T> { void add(T item); }
 
 interface java.util.Collection implements Addable;
+
+<Addable A, T> void addTwice(A<T> a, T e) { a.add(e); a.add(e); }
+
+class SilentlyEmptyList<T> extends LinkedList
+{
+  add(e) = false;
+}
+
+/// FAIL
+  let c = new ArrayList();
+  c.addTwice("A");
+  assert c.size() == 2;
+
+  /// Toplevel
+abstract interface Addable<T>
+{
+  // Wrong return type
+  /*/// FAIL HERE */ String add(T item);
+}
+
+interface java.util.Collection implements Addable;
+
+<Addable A, T> void addTwice(A<T> a, T e) { a.add(e); a.add(e); }

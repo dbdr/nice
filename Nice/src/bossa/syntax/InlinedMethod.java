@@ -169,7 +169,7 @@ public class InlinedMethod extends MethodDeclaration
     return new gnu.expr.QuoteExp(getProcedure());
   }
 
-  gnu.expr.Expression getCode() 
+  public gnu.expr.Expression getCode() 
   {
     return nice.tools.code.Gen.wrapInLambda(getProcedure());
   }

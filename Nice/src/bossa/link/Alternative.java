@@ -17,6 +17,7 @@ import bossa.util.*;
 import mlsub.typing.*;
 
 import bossa.syntax.MethodDeclaration;
+import bossa.syntax.JavaMethod;
 import bossa.syntax.Pattern;
 import bossa.syntax.LocatedString;
 import bossa.syntax.Node;
@@ -32,7 +33,7 @@ import java.util.*;
 /**
  * Represents a method alternative in the link.
  *
- * It can be build either from information in a Bossa source,
+ * It can be build either from information in a Nice source,
  * or read from a compiled bytecode file.
  *
  * @author bonniot
@@ -221,12 +222,15 @@ public class Alternative implements Located
 
   public static void addAll(MethodDeclaration from, MethodDeclaration to)
   {
+    String fullName = to.getFullName();
+
+    if (from instanceof JavaMethod)
+      new JavaAlternative((JavaMethod) from).add(fullName);
+
     List list = (List) alternatives.get(from.getFullName());
 
     if (list == null)
       return;
-
-    String fullName = to.getFullName();
 
     for(Iterator i = list.iterator(); i.hasNext();)
       {

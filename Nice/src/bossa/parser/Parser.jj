@@ -1235,13 +1235,6 @@ Pattern pattern():
     |
       t ="#" tc=typeIdent() { exactlyAt = true; }
     |
-      t="="
-      (
-        val=patternLiteral() {loc = val.location(); }
-      |
-        refName=ident() {loc = refName.location(); } 	
-      )
-    |
      {} //name only
     )
     { loc = name.location(); }

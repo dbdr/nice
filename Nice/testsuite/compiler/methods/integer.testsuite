@@ -62,15 +62,15 @@ foo(1) {}
   /// Toplevel
   int fib(int n);
   fib(n) = fib(n-2) + fib(n-1);
-  fib(n=1) = 1;
-  fib(n=2) = 1;
+  fib(1) = 1;
+  fib(2) = 1;
 
 /// PASS  
   /// Toplevel
   String toStr(char);
   toStr(c@char) = "";
-  toStr(c='a') = "a";
-  toStr(c='b') = "b";
+  toStr('a') = "a";
+  toStr('b') = "b";
 
 /// FAIL
   /// Toplevel

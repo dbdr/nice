@@ -46,8 +46,8 @@ class Compilation extends mlsub.compilation.Compilation
 
   ?Locator locator = null;
 
-  Map<String,Package> packages = hashtable();
-  Map<String,mlsub.typing.TypeConstructor> javaTypeConstructors = hashtable();
+  Map<String,Package> packages = new HashMap();
+  Map<String,mlsub.typing.TypeConstructor> javaTypeConstructors = new HashMap();
 
   void setMainPackage(String packageName)
   {
@@ -60,11 +60,12 @@ class Compilation extends mlsub.compilation.Compilation
     if (this.destinationDir == null && this.packagePath == null)
       this.packagePath = ".";
 
-    nice.tools.code.Types.setClasspath((this.destinationDir | "") + 
-				       java.io.File.pathSeparator + 
-				       (this.packagePath | "") + 
-				       java.io.File.pathSeparator + 
-				       this.runtimeFile);
+    nice.tools.code.TypeImport.setClasspath
+    ((this.destinationDir | "") + 
+     java.io.File.pathSeparator + 
+     (this.packagePath | "") + 
+     java.io.File.pathSeparator + 
+     this.runtimeFile);
 
     Package.startNewCompilation();
 

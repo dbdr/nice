@@ -17,19 +17,19 @@ javac = javac
 
 JAVAC_FLAGS = -O -g
 
-JAVAC= ${javac} -classpath "${TOP}/classes" -sourcepath "${TOP}/src" -d "${TOP}/classes" $(JAVAC_FLAGS)
+JAVAC= ${javac} -classpath "${TOP}/classes:${TOP}/classes.old" -sourcepath "${TOP}/src" -d "${TOP}/classes" $(JAVAC_FLAGS)
 JAVACC= CLASSPATH="${TOP}/external/JavaCC.zip:${CLASSPATH}" java COM.sun.labs.javacc.Main
 JAVADOC=javadoc
 
-NICEC_ARGS= -d "${TOP}/classes" --exclude-runtime 
-NICEC=nicec ${NICEC_ARGS} --sourcepath="${TOP}/stdlib:${TOP}/src" 
-NICEC1=${TOP}/bin/nicec ${NICEC_ARGS} --sourcepath="${TOP}/stdlib.new:${TOP}/src.new" 
+NICEC_ARGS= --exclude-runtime 
+NICEC=nicec ${NICEC_ARGS} -d "${TOP}/classes.old" --sourcepath="${TOP}/stdlib.old:${TOP}/stdlib:${TOP}/src.old:${TOP}/src" --classpath="${TOP}/classes"
+NICEC1=${TOP}/bin/nicec ${NICEC_ARGS} -d "${TOP}/classes" --sourcepath="${TOP}/stdlib:${TOP}/src" 
 
 
 
 all: src/nice/tools/compiler.jar compiler2 archive2
 
-stable:   clean bootstrap compiler1 ant testengine archive
+stable:   clean bootstrap compiler1 ant testengine archiveOld
 complete: stable   compiler2 archive2
 fixpoint: complete compiler3 archive3
 world:    fixpoint check test
@@ -42,15 +42,19 @@ compiler1: setDate
 	${NICEC}  -R -a src/nice/tools/compiler.jar nice.tools.compiler
 
 compiler2 compiler3: setDate
-	if [ ! -r stdlib.new ]; then ln -s stdlib stdlib.new; fi
-	if [ ! -r src.new ]; then ln -s src src.new; fi
 	${NICEC1} -R bossa.syntax
 	${NICEC1} -R -a src/nice/tools/compiler.jar nice.tools.compiler
 
-archive archive2 archive3 share/java/nice.jar: src/nice/tools/compiler.jar
+archiveOld: src/nice/tools/compiler.jar
 	mkdir -p share/java
 	cp src/nice/tools/compiler.jar share/java/nice.jar
-	jar umf src/mainClass share/java/nice.jar -C classes nice -C classes mlsub -C classes bossa -C classes gnu
+	jar umf src/mainClass share/java/nice.jar -C classes java -C classes nice -C classes mlsub -C classes bossa -C classes gnu -C classes.old bossa -C classes.old mlsub -C classes.old nice
+	if [ -r classes/lang/package.nicei ]; then cd classes; jar uf ../share/java/nice.jar nice/*/package.nicei; fi
+
+archive2 archive3 share/java/nice.jar: src/nice/tools/compiler.jar
+	mkdir -p share/java
+	cp src/nice/tools/compiler.jar share/java/nice.jar
+	jar umf src/mainClass share/java/nice.jar -C classes java -C classes nice -C classes mlsub -C classes bossa -C classes gnu
 	if [ -r classes/lang/package.nicei ]; then cd classes; jar uf ../share/java/nice.jar nice/*/package.nicei; fi
 
 
@@ -117,6 +121,7 @@ bootstrap: parser
 	ln -sf nicec bin/nicer
 	mkdir -p classes
 	cd classes; jar xf ../external/java-getopt.jar gnu
+	cd classes; jar xf ../external/gj.jar java
 	-cd src/bossa/syntax && mv -f dispatch.java.bootstrap dispatch.java
 	${JAVAC} \
 		stdlib/nice/lang/Native.java stdlib/nice/lang/inline/*.java \
@@ -137,7 +142,7 @@ bootstrap: parser
 
 ant:
 	@echo "Building the Ant task definition..."
-	@${javac} -classpath "/usr/share/java/ant.jar:./external/ant.jar:./classes" -d classes src/nice/tools/ant/Nicec.java ||\
+	@${javac} -classpath "/usr/share/java/ant.jar:./external/ant.jar:./classes:./classes.old" -d classes src/nice/tools/ant/Nicec.java ||\
 	echo "Compilation of the Ant task definition failed.\nAnt should be in the classpath, or linked to by ./external/ant.jar"
 
 testengine:

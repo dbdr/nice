@@ -20,6 +20,7 @@ import gnu.expr.*;
 import bossa.util.Location;
 import mlsub.typing.TypeConstructor;
 import nice.tools.code.Types;
+import nice.tools.code.TypeImport;
 
 import java.util.*;
 
@@ -61,72 +62,34 @@ public class JavaMethod extends MethodDeclaration
 
   JavaMethod
     (
-     // Informations about the java method
-     // These 3 args are null if we are in an interface file
-     LocatedString className,
-     String methodName,
-     List /* of LocatedString */ javaTypes,
-     // Nice information
      LocatedString name, 
-     mlsub.typing.Constraint constraint,
-     mlsub.typing.Monotype returnType,
-     mlsub.typing.Monotype[] parameters
+     mlsub.typing.Polytype type,
+     Method reflectMethod
     )
   {
-    super(name, constraint, parameters, returnType);
+    super(name, null, type);
     
-    this.className = className;
-    this.methodName = methodName;
-    this.javaTypes = javaTypes;
+    this.reflectMethod = reflectMethod;
   }
 
   static JavaMethod make(Method m, boolean constructor)
   {
-    try {
-      JavaMethod res;
+    JavaMethod res;
+    mlsub.typing.Polytype type = nice.tools.code.Import.type(m);
 
-      Type[] paramTypes = m.getParameterTypes();
-      mlsub.typing.Monotype[] params;
-      int n = 0; // index in params
-	
-      if(m.getStaticFlag() || constructor)
-	params = new mlsub.typing.Monotype[paramTypes.length];
-      else
-	{
-	  params = new mlsub.typing.Monotype[paramTypes.length + 1];
-	  params[n++] = Types.monotype(m.getDeclaringClass(), true);
-	}
-    
-      for(int i = 0; i<paramTypes.length; i++)
-	params[n++] = Types.monotype(paramTypes[i]);
-    
-      mlsub.typing.Monotype retType;
-      if(constructor)
-	// the return type is surely not null
-	retType = Types.monotype(m.getDeclaringClass(), true);
-      else
-	retType = Types.monotype(m.getReturnType());
-    
-      LocatedString name = new LocatedString(m.getName(),Location.nowhere());
-      if (constructor)
-	res = new JavaConstructor(m.getName(), name, retType, params);
-      else
-	res = new JavaMethod(null, m.getName(), null, 
-			     name, null, retType, params);
-      res.reflectMethod = m;
-      return res;
-    }
-    catch(Types.ParametricClassException e){
-      // The fetched method involves parametric java classes.
-      // Ignore.
+    // We could not turn the bytecode type into a Nice type.
+    if (type == null)
       return null;
-    }
-    catch(Types.NotIntroducedClassException e){
-      // The fetched method involves invalid types.
-      // Ignore.
-      Internal.warning("Java method " + m + " was ignored.\nReason: " + e);
-      return null;
-    }
+    
+    if (constructor)
+      res = new JavaConstructor
+	(new LocatedString
+	 ("new " + m.getDeclaringClass().getName(), Location.nowhere()),
+	 type, m);
+    else
+      res = new JavaMethod(new LocatedString(m.getName(), Location.nowhere()),
+			   type, m);
+    return res;
   }
   
   void buildScope(VarScope outer, TypeScope typeOuter)
@@ -155,7 +118,7 @@ public class JavaMethod extends MethodDeclaration
   LocatedString className;
 
   /** Its name in the java class */
-  String methodName;
+  private String methodName;
   
   private List /* of LocatedString */ javaTypes;
   
@@ -186,7 +149,7 @@ public class JavaMethod extends MethodDeclaration
     if(reflectMethod != null)
       return;
     
-    Type holder = Types.type(className.toString());
+    Type holder = TypeImport.lookup(className.toString());
     if(holder == null)
       User.error(this,
 		 "Class " + className + " was not found");

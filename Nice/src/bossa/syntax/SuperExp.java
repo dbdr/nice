@@ -146,8 +146,7 @@ public class SuperExp extends Expression
 		    // Our safe bet is to assert that the argument is 
 		    // above Object
 		    superTC = JavaClasses.object
-		      (GlobalTypeScope.compilation, 
-		       currentMethod.firstArgument().variance.arity());
+		      (currentMethod.firstArgument().variance.arity());
 		  }
 	      }
 

@@ -57,8 +57,8 @@ analyse(s@Statement, varScope, typeScope, mustReturnAValue)
 analyse(e@Expression, varScope, typeScope) = 
     analyse(e, buildInfo(varScope, typeScope));
 
-java.util.List lookup(VarScope scope, ?LocatedString i)
-= native java.util.List VarScope.lookup(LocatedString);
+List<VarSymbol> lookup(VarScope scope, ?LocatedString i)
+= native List VarScope.lookup(LocatedString);
 
 class Info
 {
@@ -69,7 +69,7 @@ class Info
   TypeScope outerTypeScope;
 
   ?LoopStmt currentLoop = null;
-  Vector<LabeledStmt> labels = makeVector(10);
+  Stack<LabeledStmt> labels = new Stack();
 
   /* bit 0: point not reachable 
      bit 1..63: indexed local variable is initialized
@@ -85,7 +85,7 @@ class Info
   void setUnreachable() { this.flags |=  1; }
   void setReachable()   { this.flags &= ~1; }
 
-  Stack<long> flagsStack = makeVector(10);
+  Stack<long> flagsStack = new Stack();
 
   void beginInner(boolean reset)
   {
@@ -108,7 +108,7 @@ class Info
   void otherCase()
   {
     long tempResult = this.flagsStack.pop();
-    long outer = this.flagsStack.top();
+    long outer = this.flagsStack.peek();
 
     // If this branch cannot terminate, ignore it for the rest of 
     // the computation. Otherwise merge information with previous branches.
@@ -151,8 +151,8 @@ class Info
 
   ?VarSymbol lookup(String name) = this.vars[name];
 
-  JavaList<VarSymbol> globalLookup(LocatedString name) = 
-    new JavaList(impl: this.outerVarScope.lookup(name));
+  List<VarSymbol> globalLookup(LocatedString name) = 
+    this.outerVarScope.lookup(name);
 
   ?TypeSymbol lookupType(LocatedString name)
   {
@@ -179,11 +179,11 @@ class Info
     this.vars[symbol.name.toString()] = symbol;
   }
 
-  void addVars(Sequence<?MonoSymbol> symbols) = 
-    symbols.iter(fun(?MonoSymbol s)=>this.addVar(notNull(s)));
+  void addVars(Array<?MonoSymbol> symbols) = 
+    symbols.iter(?MonoSymbol s => this.addVar(notNull(s)));
   
-  void addTypeVars(Sequence<?TypeSymbol> symbols) = 
-    symbols.iter(fun(?TypeSymbol s)=>this.typeVars[notNull(s).toString()]=notNull(s));
+  void addTypeVars(Array<?TypeSymbol> symbols) = 
+    symbols.iter(?TypeSymbol s => this.typeVars[notNull(s).toString()]=notNull(s));
 }
 
 void checkInitialized(Block.LocalVariable.Symbol sym, Info info,
@@ -279,8 +279,8 @@ analyse(e@CallExp, info)
 			  (e.function, "This is not a valid class member"));
 	  
 	  int arity = args.size();
-	  java.util.List possibilities = notNull(JavaClasses.findJavaMethods
-	    (e.declaringClass, funName.toString(), arity));
+	  List<VarSymbol> possibilities = JavaClasses.findJavaMethods
+	    (e.declaringClass, funName.toString(), arity);
 
 	  if (possibilities.size() == 0)
 	    throw error(e, "Class " + notNull(e.declaringClass).getName() +
@@ -289,7 +289,7 @@ analyse(e@CallExp, info)
 			 " has no method named ") + 
 			funName);
 	  
-	  e.function = new OverloadedSymbolExp(possibilities, funName);
+	  e.function = newOverloadedSymbolExp(possibilities, funName);
 
 	  return e;
 	}
@@ -364,9 +364,9 @@ Expression analyseIdent(IdentExp e, Info info, boolean assigned)
 	  return new OverloadedSymbolExp(sym, e.ident);
     }
 
-  JavaList<VarSymbol> symbols;
+  List<VarSymbol> symbols;
   if (e.infix)
-    symbols = new JavaList(impl: notNull(Node.getGlobalScope()).lookup(e.ident));
+    symbols = cast(notNull(Node.getGlobalScope()).lookup(e.ident));
   else
     symbols = info.globalLookup(notNull(e.ident));
 
@@ -375,13 +375,13 @@ Expression analyseIdent(IdentExp e, Info info, boolean assigned)
       {
 	VarSymbol sym = symbols[0];
 	if (sym.isFieldAccess())
-	  return new CallExp(new OverloadedSymbolExp(symbols.impl, e.ident),
+	  return new CallExp(newOverloadedSymbolExp(symbols, e.ident),
 			     Arguments.noArguments);
 
 	return new SymbolExp(sym, e.location());
       }
     else
-      return new OverloadedSymbolExp(symbols.impl, e.ident);
+      return newOverloadedSymbolExp(symbols, e.ident);
   if (e.enableClassExp)
     return notNull(ClassExp.create(e.ident));
 
@@ -512,7 +512,7 @@ analyse(decl@Block.LocalFunction, info)
 analyse(b@Block, info)
 {
   info.begin();
-  new JavaList(impl: notNull(b.locals)).iter(fun(Block.LocalDeclaration l) => analyse(l, info));
+  notNull(b.locals).iter(Block.LocalDeclaration l => analyse(l, info));
   b.statements = analyse(b.statements, info);
   info.end();
 }
@@ -581,7 +581,7 @@ private LabeledStmt mustFindLabel(LocatedString label, Info info)
   try {
     return findLabel(label, info);
   }
-  catch(java.util.NoSuchElementException e) {
+  catch(NoSuchElementException e) {
     throw error(label, "unknown label: " + label);
   }
 }
@@ -592,7 +592,7 @@ private void mustNotFindLabel(LocatedString label, Info info)
     findLabel(label, info);
     throw error(label, "duplicate label: " + label);
   }
-  catch(java.util.NoSuchElementException e) {
+  catch(NoSuchElementException e) {
   }
 }
   
@@ -629,7 +629,7 @@ analyse(t@TryStmt, info)
   info.beginCases();
   analyse(t.body, info);
 
-  new JavaList(impl: notNull(t.catches)).iter(fun(TryStmt$Catch c)=>{
+  t.catches.iter(TryStmt.Catch c =>{
     info.otherCase();
     info.begin();
     info.addVar(notNull(c.exnVar));

@@ -46,7 +46,7 @@ public int compile
    boolean memory
   )
 {
-  Vector<String> args = makeVector(10);
+  ArrayList<String> args = new java.util.ArrayList();
   if (sourcepath != null) {
     args.add("--sourcepath");
     args.add(sourcepath);

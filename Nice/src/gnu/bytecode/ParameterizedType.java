@@ -1,7 +1,7 @@
 /**************************************************************************/
 /*                                N I C E                                 */
 /*             A high-level object-oriented research language             */
-/*                        (c) Daniel Bonniot 2001                         */
+/*                        (c) Daniel Bonniot 2002                         */
 /*                                                                        */
 /*  This program is free software; you can redistribute it and/or modify  */
 /*  it under the terms of the GNU General Public License as published by  */
@@ -10,35 +10,23 @@
 /*                                                                        */
 /**************************************************************************/
 
+package gnu.bytecode;
+
 /**
-   Display command-line options in a format suitable for Unix's man.
-   
+   A Generic Java parameterized type.
+
    @version $Date$
    @author Daniel Bonniot (bonniot@users.sourceforge.net)
  */
 
-package nice.getopt;
-
-
-String man(List<Option> os)
+public class ParameterizedType extends ObjectType
 {
-  String res = ".SH OPTIONS\n";
-  os.iter(Option o => { res = res + man(o); });
-  return res;
-}
+  public ParameterizedType(ClassType main, Type[] parameters)
+  {
+    this.main = main;
+    this.parameters = parameters;
+  }
 
-String man(Option opt)
-{
-  StringBuffer res = new StringBuffer(".TP\n.B ");
-
-  if (! opt.noShortName)
-    res.append("\\-").append(opt.shortName);
-  if(opt.longName != null)
-    res.append((opt.noShortName ? "" : ", ") + "\\-\\-" + opt.longName);
-  
-  res.append(paramString(opt));
-  res.append('\n');
-  res.append(opt.purpose).append('\n');
-
-  return res.toString();
+  public ClassType main;
+  public Type[] parameters;
 }

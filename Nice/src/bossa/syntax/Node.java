@@ -188,9 +188,9 @@ abstract public class Node
   {
     // For multiple compilations in the same JVM:
     // If we are starting a new compilation, reset the global scopes.
-    if (GlobalTypeScope.compilation != module.compilation())
+    if (JavaClasses.compilation != module.compilation())
       {
-	GlobalTypeScope.compilation = module.compilation();
+	JavaClasses.compilation = module.compilation();
 	globalScope = new VarScope(null);
 	globalTypeScope= new GlobalTypeScope();
       }

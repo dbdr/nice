@@ -371,4 +371,94 @@ public class Method implements AttrContainer {
       }
     return sbuf.toString();
   }
-};
+
+  /****************************************************************
+   * Generic Java / JDK 1.5
+   ****************************************************************/
+
+  /** Holds the full signature, or "" whene there is none.
+      null before it is initialized.
+  */
+  private String fullSignature;
+
+  private void loadSignature()
+  {
+    Attribute sig = Attribute.get(this, "Signature");
+    if (! (sig instanceof MiscAttr))
+      {
+	fullSignature = "";
+	return;
+      }
+
+    MiscAttr s = (MiscAttr) sig;
+    int index = (s.data[1] & 0xff) | ((s.data[0] & 0xff) << 8);
+    fullSignature = ((CpoolUtf8) getDeclaringClass().constants.getPoolEntry(index)).getString();
+
+    // Class type parameters can appear in bounds.
+    if (! getStaticFlag())
+      TypeVariable.scope2 = getDeclaringClass().getParameters();
+
+    int[] pos = { 0 };
+    if (fullSignature.charAt(0) == '<')
+      typeParameters = TypeVariable.parse(fullSignature, pos);
+    
+    if (fullSignature.charAt(pos[0]++) != '(')
+      throw new Error("Bad full signature: " + fullSignature);
+
+    TypeVariable.scope1 = typeParameters;
+
+    // Parse argument types.
+    java.util.Stack types = new java.util.Stack();
+
+    while (fullSignature.charAt(pos[0]) != ')')
+      {
+	types.push(Type.fullSignatureToType(fullSignature, pos));
+      }
+
+    // Skip the ')'
+    pos[0]++;
+
+    fullArgTypes = new Type[types.size()];
+    for (int i = types.size();  --i >= 0; )
+      fullArgTypes[i] = (Type) types.pop();
+
+    fullReturnType = Type.fullSignatureToType(fullSignature, pos);
+
+    TypeVariable.scope1 = null;
+    TypeVariable.scope2 = null;
+  } 
+
+  private TypeVariable[] typeParameters;
+  private Type fullReturnType;
+  private Type[] fullArgTypes;
+
+  public TypeVariable[] getTypeParameters()
+  {
+    if (fullSignature == null)
+      loadSignature();
+
+    return typeParameters;
+  }
+
+  public Type[] getFullParameterTypes()
+  {
+    if (fullSignature == null)
+      loadSignature();
+
+    if (fullSignature == "")
+      return getParameterTypes();
+    else
+      return fullArgTypes;
+  }
+
+  public Type getFullReturnType()
+  {
+    if (fullSignature == null)
+      loadSignature();
+
+    if (fullSignature == "")
+      return getReturnType();
+    else
+      return fullReturnType;
+  }
+}

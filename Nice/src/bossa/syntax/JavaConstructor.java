@@ -26,14 +26,12 @@ class JavaConstructor extends JavaMethod
 {
   JavaConstructor
     (
-     String methodName,
-     // Nice information
      LocatedString name, 
-     mlsub.typing.Monotype returnType,
-     mlsub.typing.Monotype[] parameters
+     mlsub.typing.Polytype type,
+     gnu.bytecode.Method reflectMethod
     )
   {
-    super(null, methodName, null, name, null, returnType, parameters);
+    super(name, type, reflectMethod);
   }
 
   protected Expression computeCode()

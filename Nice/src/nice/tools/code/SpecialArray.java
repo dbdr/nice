@@ -6,7 +6,8 @@ import gnu.expr.*;
 import bossa.util.Debug;
 
 /**
-   Arrays that are wrapped into objects implementing Sequence when needed.
+   Arrays that are wrapped on the flw into objects implementing java.util.List 
+   when needed.
  */
 
 public final class SpecialArray extends gnu.bytecode.ArrayType
@@ -31,7 +32,7 @@ public final class SpecialArray extends gnu.bytecode.ArrayType
   public static SpecialArray unknownTypeArray()
   {
     if (unknownTypeArray == null)
-      unknownTypeArray = new SpecialArray(Type.pointer_type, null, true);
+      unknownTypeArray = new SpecialArray(objectType, null, true);
     return unknownTypeArray;
   }
   
@@ -61,7 +62,7 @@ public final class SpecialArray extends gnu.bytecode.ArrayType
 
     field = new Field(wrappedType);
     field.setName("value");
-    field.setType(Type.pointer_type);
+    field.setType(objectType);
     
     if (!unknown)
       {
@@ -149,7 +150,7 @@ public final class SpecialArray extends gnu.bytecode.ArrayType
     /* We list explicitely the type between Collection and Array.
        If the hierarchy was changed, this code should be modified.
        An alternative is to use 
-       <code>t.isSubType(ClassType.make("nice.lang.Collection")) &&
+       <code>t.isSubType(ClassType.make("java.util.Collection")) &&
              wrappedType.isSubType(t)
        </code>.
        However it would only work if we ensured that the class hierarchy
@@ -158,8 +159,8 @@ public final class SpecialArray extends gnu.bytecode.ArrayType
     */
     String name = t.getName();
     return 
-      "nice.lang.Collection".equals(name) || 
-      "nice.lang.Sequence".equals(name);
+      "java.util.Collection".equals(name) || 
+      "java.util.List".equals(name);
   }
 
   public void emitCoerceFromObject (CodeAttr code)
@@ -212,7 +213,7 @@ public final class SpecialArray extends gnu.bytecode.ArrayType
   {
     if (toType instanceof ArrayType)
       coerce(code, this, (ArrayType) toType);
-    else if (toType != Type.pointer_type)
+    else if (toType != objectType)
       emitCoerceToObject(code);
   }
   
@@ -259,7 +260,7 @@ public final class SpecialArray extends gnu.bytecode.ArrayType
   public Type getImplementationType()
   {
     if (unknown)
-      return Type.pointer_type;
+      return objectType;
     else
       return this;
   }
@@ -274,7 +275,7 @@ public final class SpecialArray extends gnu.bytecode.ArrayType
   public boolean isAssignableTo (Type other)
   {
     return
-      other == Type.pointer_type || 
+      other == objectType || 
       other instanceof ArrayType &&
       (other == unknownTypeArray ||
        elements.isAssignableTo(((ArrayType) other).getComponentType()));
@@ -292,7 +293,8 @@ public final class SpecialArray extends gnu.bytecode.ArrayType
   
   private Field field;
 
-  private static ArrayType objectArray = new ArrayType(Type.pointer_type);  
+  private static ClassType objectType = ClassType.make("java.lang.Object");
+  private static ArrayType objectArray = new ArrayType(objectType);
 
   private Method convertMethod;
   private Method genericConvertMethod;

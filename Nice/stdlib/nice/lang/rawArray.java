@@ -13,6 +13,7 @@
 package nice.lang;
 
 import java.lang.reflect.Array;
+import java.util.*;
 
 /**
    Class used to wrap native arrays when considered as part of the 
@@ -21,7 +22,7 @@ import java.lang.reflect.Array;
    @version: $Date$
    @author Daniel Bonniot (d.bonniot@mail.dotcom.fr)
 */
-public final class rawArray implements nice.lang.Sequence
+public final class rawArray extends java.util.AbstractList
 {
   private rawArray(Object value)
   {
@@ -39,6 +40,27 @@ public final class rawArray implements nice.lang.Sequence
     if (value == null)
       return null;
     return new rawArray(value);
+  }
+
+  /****************************************************************
+   * Implementation of java.util.List
+   ****************************************************************/
+
+  public int size ()
+  {
+    return Array.getLength(value);
+  }
+
+  public Object get (int index)
+  {
+    return Array.get(value, index);
+  }
+
+  public Object set (int index, Object element)
+  {
+    Object res = get(index);
+    Array.set(value, index, element);
+    return res;
   }
 
   // CONVERSIONS

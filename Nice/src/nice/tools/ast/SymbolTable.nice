@@ -29,7 +29,7 @@ class SymbolTable<Sym>
 
 // Implementation
 
-  nice.lang.Hashtable<String, Binder<Sym>> symbols = hashtable();
+  Map<String, Binder<Sym>> symbols = new HashMap();
 
   ?Binder<Sym> topBinder = null; // list of the binders added since last begin
   ?Binder<Sym> marks = null;     // remembers topBinders at each begin

@@ -87,10 +87,18 @@ abstract public class MethodDeclaration extends Definition
 		    Monotype[] parameters, 
 		    Monotype returnType)
   {
+    this(name, formals, 
+	 new Polytype(cst, new FunType(parameters, returnType)));
+  }
+
+  MethodDeclaration(LocatedString name,
+		    FormalParameters formals,
+		    Polytype type)
+  {
     super(name, Node.global);
     this.parameters = formals;
-    arity = (parameters == null ? 0 : parameters.length);
-    type = new Polytype(cst, new FunType(parameters, returnType));
+    this.arity = type.domain().length;
+    this.type = type;
     symbol = new MethodDeclaration.Symbol(name, type);
   }
 

@@ -20,8 +20,7 @@ package nice.lang;
 */
 
 final class Array<T>
-  implements Sequence<T>
-  finally implements Collection<T>
+  implements java.util.List<T>
   = native;
 
 /** Returns a new copy with newSize elements */
@@ -66,10 +65,6 @@ void set(double[], int, double)  = inline nice.lang.inline.ArraySetOp("d");
 
 // Define collection methods
 
-get(a@Array, n) = get(a, n);
-set(a@Array, n, e) = set(a,n,e);
-size(a@Array) = a.length;
-
 map<C,T,U>(a@Array, f) = fill(new U[a.length], int i => f(a[i]));
 
 filter<C, T>(a@Array, test)
@@ -83,6 +78,22 @@ filter<C, T>(a@Array, test)
 	{ if(test(elem)) res.set(found++, elem); } );
 
   return resize(res, found);
+}
+
+// Specialized versions for arrays.
+
+<Any T> void iter(T[] a, (T)->void f)
+{
+  for (int i = 0; i < a.length; i++)
+    f(a[i]);
+}
+
+<Any T> ?T find(!T[] a, (!T)->boolean test)
+{
+  for (int i = 0; i < a.length; i++)
+    if (test(a[i]))
+      return a[i];
+  return null;
 }
 
 /**

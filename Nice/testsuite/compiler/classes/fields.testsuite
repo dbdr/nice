@@ -24,5 +24,13 @@
   /// TOPLEVEL
   class SymbolTable<Sym>
   {
-    nice.lang.Hashtable<String, Sym> symbols = hashtable();
+    java.util.Hashtable<String, Sym> symbols = new java.util.Hashtable();
   }
+
+/// PASS
+  /// Toplevel
+  class A
+  {
+    B b = new B();
+  }
+  class B {}

@@ -151,7 +151,7 @@ int compile(String[] args)
 	  fun()=>{ timeInfo = true; })
   ];
 
-  Sequence<String> rest = parse(prg, args);
+  List<String> rest = parse(prg, args);
   if (rest.size() != 1 || rest[0].length() == 0)
     {
       if (rest.size() > 1)
@@ -161,6 +161,7 @@ int compile(String[] args)
     }
   mainPackage = rest[0];
 
+  nice.tools.code.TypeImport.setRuntime(compilation.runtimeFile);
   compilation.setMainPackage(mainPackage);
   make(compilation);
 

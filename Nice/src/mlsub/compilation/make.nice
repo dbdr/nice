@@ -24,19 +24,19 @@ void compileComponent(Compilation compilation, List<Module> modules,
 		      boolean doLink)
 {
   print("Compiling");
-  modules.iter(fun(Module m) => print(" "+m));
+  modules.iter(Module m => print(" "+m));
   println("");
 
-  modules.iter(fun(Module m) => m.scope());
-  modules.iter(fun(Module m) => m.load());
+  modules.iter(Module m => m.scope());
+  modules.iter(Module m => m.load());
 
   notNull(compilation.root).freezeGlobalContext();
 
   try {
-    modules.iter(fun(Module m) => m.compile());
+    modules.iter(Module m => m.compile());
 
     if (doLink)
-      modules.iter(fun(Module m) => m.link());
+      modules.iter(Module m => m.link());
   }
   finally {
     notNull(compilation.root).unfreezeGlobalContext();
@@ -47,9 +47,9 @@ void make(mlsub.compilation.Compilation compilation)
 {
   List<List<Module>> sccs =
     stronglyConnectedComponents
-      (notNull(compilation.root), fun(Module m) => new JavaList(impl: notNull(m.getRequirements())));
+      (notNull(compilation.root), Module m => m.getRequirements());
   try{
-    sccs.iter(fun(List<Module> scc) => 
+    sccs.iter(List<Module> scc => 
       { compileComponent(compilation, scc,
 			 !compilation.skipLink); });
   }
@@ -57,3 +57,5 @@ void make(mlsub.compilation.Compilation compilation)
     nice.tools.compiler.OutputMessages.error(e.getMessage());
   }
 }
+
+List<Module> getRequirements(Module) = native List Module.getRequirements();

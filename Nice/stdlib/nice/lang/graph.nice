@@ -8,14 +8,14 @@ package nice.lang;
     The scc are returned in topological order.
     Tarjan's algorithm (linear).
  */
-<Any T> List<List<T>> stronglyConnectedComponents(T start, 
-						  T->List<T> successors)
+<Any T> List<List<T>> 
+  stronglyConnectedComponents(T start, T->List<T> successors)
 {
   Ref<int> id = new Ref(value: 0);
-  Stack<T> stack = makeVector(5);
-  Map<T,int> mark = hashtable();
+  Stack<T> stack = new Stack();
+  Map<T,int> mark = new HashMap();
 
-  List<List<T>> res = makeVector(5);
+  List<List<T>> res = new ArrayList();
   visit(start,successors,id,stack,mark,res);
   
   return res;
@@ -46,9 +46,9 @@ package nice.lang;
 
   if(equals(min,mark.get(node)))
     {
-      Vector<T> scc = makeVector(5);
+      Vector<T> scc = new Vector();
       // XXX: element does not need to be initialized. Remove when stable compiler allow this
-      T element = stack.top();
+      T element = stack.peek();
       do
 	{
 	  element = stack.pop();

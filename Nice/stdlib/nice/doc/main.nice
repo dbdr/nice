@@ -35,11 +35,11 @@ class Program
   ?String author;
   ?String seeAlso;
 
-  Sequence<Option> options;
+  Option[] options;
 }
 
 /** Parses the list of strings according to the options,
     and returns the non-options arguments. */
-Sequence<String> parse(Program prg, Array<String> arguments) = 
+List<String> parse(Program prg, String[] arguments) = 
   parse(prg.name, arguments, prg.options);
 

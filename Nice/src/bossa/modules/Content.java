@@ -75,7 +75,8 @@ class Content
   {
     List definitions = new LinkedList();
     Set opens = new TreeSet();
-    opens.add("java.lang");    
+    opens.add("java.lang");
+    opens.add("java.util");
 
     Content.Unit[] readers = getReaders(shouldReload);
 

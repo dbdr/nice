@@ -12,17 +12,15 @@
 
 package nice.tools.code;
 
-import bossa.util.*;
 import mlsub.typing.*;
 import bossa.util.Debug;
+import bossa.util.Internal;
 import bossa.syntax.PrimitiveType;
 
 import gnu.bytecode.*;
 import gnu.expr.*;
 
 import java.util.*;
-import java.io.File;
-import java.net.URL;
 
 /**
    Conversion between Nice and bytecode types.
@@ -239,11 +237,49 @@ public final class Types
    * into a Nice type.
    * Used for automatic declaration of java methods.
    ****************************************************************/
-  
+
+  public static TypeConstructor typeConstructor (Type javaType)
+    throws NotIntroducedClassException
+  {
+    TypeConstructor tc = bossa.syntax.Node.getGlobalTypeScope().
+      globalLookup(javaType.getName(), null);
+
+    if (tc == null)
+      {
+	Internal.warning(javaType + " is not known");
+	throw new NotIntroducedClassException(tc);
+      }
+
+    if (tc.getId() == -1)
+      throw new NotIntroducedClassException(tc);
+	
+    return tc;
+  }
+
+  public static Monotype[] monotype(Type[] javaTypes,
+				    TypeVariable[] typeVariables,
+				    TypeSymbol[] niceTypeVariables)
+    throws ParametricClassException, NotIntroducedClassException
+  {
+    int len = javaTypes.length;
+    Monotype[] res = new Monotype[len];
+    for (int i = 0; i < len; i++)
+      res[i] = monotype(javaTypes[i], typeVariables, niceTypeVariables);
+    return res;
+  }
+
   public static Monotype monotype(Type javaType, boolean sure)
     throws ParametricClassException, NotIntroducedClassException
   {
-    Monotype res = getMonotype(javaType);
+    return monotype(javaType, sure, null, null);
+  }
+
+  public static Monotype monotype(Type javaType, boolean sure,
+				  TypeVariable[] typeVariables,
+				  TypeSymbol[] niceTypeVariables)
+    throws ParametricClassException, NotIntroducedClassException
+  {
+    Monotype res = getMonotype(javaType, typeVariables, niceTypeVariables);
     if (sure)
       return bossa.syntax.Monotype.sure(res);
     else
@@ -253,15 +289,26 @@ public final class Types
   public static Monotype monotype(Type javaType)
     throws ParametricClassException, NotIntroducedClassException
   {
-    Monotype res = getMonotype(javaType);
-    if (javaType instanceof ObjectType)
+    return monotype(javaType, null, null);
+  }
+
+  public static Monotype monotype(Type javaType,
+				  TypeVariable[] typeVariables,
+				  TypeSymbol[] niceTypeVariables)
+    throws ParametricClassException, NotIntroducedClassException
+  {
+    Monotype res = getMonotype(javaType, typeVariables, niceTypeVariables);
+    if (javaType instanceof ObjectType &&
+	! (javaType instanceof TypeVariable))
       return bossa.syntax.Monotype.maybe(res);
     else
       // the sure is already there in getMonotype
       return res;
   }
 
-  public static Monotype getMonotype(Type javaType)
+  private static Monotype getMonotype(Type javaType,
+				      TypeVariable[] typeVariables,
+				      TypeSymbol[] niceTypeVariables)
     throws ParametricClassException, NotIntroducedClassException
   {
     if(javaType.isVoid())
@@ -286,8 +333,31 @@ public final class Types
     if (javaType instanceof ArrayType)
       return new MonotypeConstructor
 	(PrimitiveType.arrayTC, 
-	 new Monotype[]{monotype(((ArrayType) javaType).getComponentType())});
+	 new Monotype[]{
+	   monotype(((ArrayType) javaType).getComponentType(), 
+		    typeVariables, niceTypeVariables)
+	 });
     
+    if (javaType instanceof ParameterizedType)
+      {
+	ParameterizedType p = (ParameterizedType) javaType;
+	return new MonotypeConstructor
+	  (typeConstructor(p.main), 
+	   monotype(p.parameters, typeVariables, niceTypeVariables));
+      }
+
+    if (javaType instanceof TypeVariable)
+      {
+	if (typeVariables != null)
+	  for (int i = 0; i < typeVariables.length; i++)
+	    if (typeVariables[i] == javaType)
+	      return (Monotype) niceTypeVariables[i];
+
+	Internal.warning("Type variable " + javaType.getName() + 
+			 " is not known");
+	throw new NotIntroducedClassException(null);
+      }
+
     return getMonotype(javaType.getName());
   }
   
@@ -298,7 +368,10 @@ public final class Types
       should not be fetched, as the compiler cannot
       guess the correct type parameters.
   */
-  public static class ParametricClassException extends Exception { }
+  public static class ParametricClassException extends Exception 
+  { 
+    ParametricClassException (String message) { super(message); }
+  }
   
   /**
      Thrown when the type would contain elements that
@@ -317,7 +390,7 @@ public final class Types
     }
   }
 
-  public static Monotype getMonotype(String name)
+  private static Monotype getMonotype(String name)
   throws ParametricClassException, NotIntroducedClassException
   {
     if(name.endsWith("[]"))
@@ -328,33 +401,22 @@ public final class Types
 	   new Monotype[]{ getMonotype(name) });
       }
     
-    TypeSymbol ts = bossa.syntax.Node.getGlobalTypeScope().lookup(name);
-    if(ts==null)
+    TypeConstructor tc = bossa.syntax.Node.getGlobalTypeScope().
+      globalLookup(name, null);
+
+    if (tc == null)
       {
 	Internal.warning(name + " is not known");
-	throw new NotIntroducedClassException(ts);
+	throw new NotIntroducedClassException(tc);
       }
 
-    if(ts instanceof TypeConstructor)
-      {
-	TypeConstructor tc = (TypeConstructor) ts;
+    if (tc.variance != null && tc.arity() != 0)
+      throw new ParametricClassException(tc.toString());
 
-	if (tc.variance != null && tc.arity() != 0)
-	  throw new ParametricClassException();
-
-	if (tc.getId() == -1)
-	  throw new NotIntroducedClassException(tc);
+    if (tc.getId() == -1)
+      throw new NotIntroducedClassException(tc);
 	
-	return new MonotypeConstructor(tc, null);
-      }  
-    // for primitive types, maybe temporary
-    else if(ts instanceof Monotype)
-      return (Monotype) ts;
-    else
-      {
-	Internal.error("Bad java type: "+name+" ("+ts.getClass()+")");
-	return null;
-      }
+    return new MonotypeConstructor(tc, null);
   }
   
   /****************************************************************
@@ -385,12 +447,15 @@ public final class Types
     if(s.equals("float")) 	return SpecialTypes.floatType;
     if(s.equals("double")) 	return SpecialTypes.doubleType;
     
-    Class clas = lookupJavaClass(s);
+    Class clas = TypeImport.lookupJavaClass(s);
     if (clas == null)
       return null;
     return Type.make(clas);
   }
   
+  /**
+     The type is not necessarily fully qulified. 
+  */
   public static final 
   gnu.bytecode.Type typeRepresentationToBytecode(String type, 
 						 bossa.util.Location loc)
@@ -404,8 +469,8 @@ public final class Types
           return SpecialArray.create(res);
       }
     
-    TypeConstructor sym = 
-      bossa.syntax.Node.getGlobalTypeScope().globalLookup(type, loc);
+    TypeConstructor sym = bossa.syntax.Node.getGlobalTypeScope().
+      globalLookup(type, loc);
 
     return get(sym);
   }
@@ -433,124 +498,6 @@ public final class Types
     return null;
   }
   
-  /****************************************************************
-   * On the fly lookup of java types
-   ****************************************************************/
-
-  /** Search className in opened packages too */
-  public final static java.lang.Class lookupJavaClass(String className)
-  {
-    Class res = lookupQualifiedJavaClass(className);
-
-    if (res != null)
-      return res;
-    
-    String[] pkgs = bossa.syntax.Node.getGlobalTypeScope().module.listImplicitPackages();
-    for (int i = 0; i < pkgs.length; i++)
-	{
-	  res = lookupQualifiedJavaClass(pkgs[i] + "." + className);
-	  if(res != null)
-	    return res;
-	}
-    return null;
-  }
-  
-  private static HashMap stringToReflectClass;
-  
-  /** 
-      Searches a native class given by its fully qualified name
-      in the user classpath.
-      
-      This is to be prefered to Class.forName, which searches 
-      in compiler's runtime classpath.
-      
-      This method does not search in opened packages.
-      It uses a hash-table, to speed up multiple lookups on the same name.
-
-      @return the java.lang.Class object corresponding to the class name,
-      or null if the class does not exists or is ill-formed.
-  */
-  public final static Class lookupQualifiedJavaClass(String className)
-  {
-    if (stringToReflectClass.containsKey(className))
-      return (Class) stringToReflectClass.get(className);
-
-    Class c = null;
-
-    try{ c = classLoader.loadClass(className); }
-    catch(ClassNotFoundException e)
-      // when the class does not exist
-      { }
-    catch(NoClassDefFoundError e) 
-      // when a class with similar name but with different case exists
-      // can occur on case-insensitive file-systems (e.g. FAT)
-      { }
-
-    if (c != null && Debug.javaTypes)
-      Debug.println("Loaded " + className + " from " + 
-		    classLoader.getResource(className.replace('.','/') + ".class"));
-
-    stringToReflectClass.put(className, c);
-    
-    return c;
-  }
-
-  private static ClassLoader classLoader;
-  private static String currentClasspath = "NOT INITIALIZED";
-
-  public static void setClasspath(String classpath)
-  {
-    /* Cache: do not reset the classloader if the classpath is unchanged.
-       This it especially important as it seems the previous classloader
-       and its classes do not get garbage collected.
-    */
-    if (currentClasspath.equals(classpath))
-      return;
-
-    currentClasspath = classpath;
-
-    LinkedList components = new LinkedList();
-    
-    int start = 0;
-    // skip starting separators
-    while (start<classpath.length() && 
-	   classpath.charAt(start) == File.pathSeparatorChar)
-      start++;
-    
-    while(start<classpath.length())
-      {
-	int end = classpath.indexOf(File.pathSeparatorChar, start);
-	if (end == -1)
-	  end = classpath.length();
-	    
-	String pathComponent = classpath.substring(start, end);
-	if (pathComponent.length() > 0)
-	  try{
-	    File f = nice.tools.util.System.getFile(pathComponent);
-	    if (f.canRead())
-	      components.add(f.getCanonicalFile().toURL());
-	    else
-	      {
-		if (!f.exists())
-		  User.warning("Classpath component " + pathComponent + " does not exist");
-		else
-		  User.warning("Classpath component " + pathComponent + " is not readable");
-	      }
-	  }
-	  catch(java.net.MalformedURLException e){
-	    User.warning("Classpath component " + pathComponent + " is invalid");
-	  }
-	  catch(java.io.IOException e){
-	    User.warning("Classpath component " + pathComponent + " is invalid");
-	  }
-	start = end+1;
-      }
-
-    classLoader = new java.net.URLClassLoader
-      ((URL[]) components.toArray(new URL[components.size()]), 
-       /* no parent */ null);
-  }
-
   /****************************************************************
    * Default values
    ****************************************************************/
@@ -669,6 +616,6 @@ public final class Types
   public static void reset()
   {
     tcToGBType = new HashMap();
-    stringToReflectClass = new HashMap();
+    TypeImport.stringToReflectClass = new HashMap();
   }
 }

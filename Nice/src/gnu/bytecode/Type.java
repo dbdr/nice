@@ -33,7 +33,7 @@ public abstract class Type {
   /** Maps Java type name (e.g. "java.lang.String[]") to corresponding Type. */
   static java.util.Hashtable mapNameToType;
 
-  public static Type lookupType (String name)
+  static java.util.Hashtable getMapNameToType()
   {
     if (mapNameToType == null)
       {
@@ -48,7 +48,12 @@ public abstract class Type {
 	mapNameToType.put("char",    char_type);
 	mapNameToType.put("void",    void_type);
       }
-    return (Type) mapNameToType.get(name);
+    return mapNameToType;
+  }
+
+  public static Type lookupType (String name)
+  {
+    return (Type) getMapNameToType().get(name);
   }
 
   /** Find an Type with the given name, or create a new one.
@@ -68,13 +73,38 @@ public abstract class Type {
 	  }
 	else
 	  {
-	    ClassType cl = new ClassType(name);
-            cl.flags |= ClassType.EXISTING_CLASS;
-	    type = cl;
+	    type = loadFromClasspath(name);
+	    if (type == null)
+	      type = new ClassType(name, ClassType.EXISTING_CLASS);
 	  }
 	mapNameToType.put(name, type);
       }
     return type;
+  }
+
+  private static nice.tools.util.ClassLoader loader;
+  static {
+    String runtime = nice.tools.code.TypeImport.getRuntime();
+    loader = new nice.tools.util.ClassLoader
+      (runtime, 
+       new nice.tools.util.ClassLoader.Registrar() {
+	 public void register(String name, ClassType type)
+	 {
+	   getMapNameToType().put(name, type);
+	 }
+       });
+  }
+
+  public static Type loadFromClasspath(String name)
+  {
+    Type type = lookupType(name);
+    if (type != null)
+      return type;
+
+    if (name.startsWith("java.util."))
+      return loader.load(name);
+    else
+      return null;
   }
 
   /** Register that the Type for class is type. */
@@ -121,6 +151,11 @@ public abstract class Type {
 	if (t != null)
 	  return (Type) t;
       }
+
+    type = loadFromClasspath(reflectClass.getName());
+    if (type != null)
+      return type;
+
     if (reflectClass.isArray())
       type = nice.tools.code.SpecialArray.create(Type.make(reflectClass.getComponentType()));
     else if (reflectClass.isPrimitive())
@@ -239,6 +274,76 @@ public abstract class Type {
   public static int signatureLength (String sig)
   {
     return signatureLength(sig, 0);
+  }
+
+  /** Get a Type corresponding to the given full signature string
+      starting from offset[0]. 
+      Set offset[0] to the end index of the signature.
+   */
+  public static Type fullSignatureToType(String sig, int[] offset)
+  {
+    char c = sig.charAt(offset[0]++);
+    Type type = signatureToPrimitive(c);
+    if (type != null)
+      return type;
+
+    if (c == '[')
+      {
+	type = fullSignatureToType(sig, offset);
+	return type == null ? null : nice.tools.code.SpecialArray.create(type);
+      }
+
+    if (c == 'L')
+      {
+	int colon = sig.indexOf(';', offset[0]);
+	int angle = sig.indexOf('<', offset[0]);
+	int end = colon < angle || angle == -1 ? colon : angle;
+	type = getType(sig.substring(offset[0], end).replace('/', '.'));
+	offset[0] = end + 1;
+
+	if (end == colon)
+	  return type;
+
+	type = new ParameterizedType((ClassType) type, parseArgs(sig, offset));
+	// Skip ';'
+	offset[0]++;
+	return type;
+      }
+
+    if (c == 'T')
+      {
+	int end = sig.indexOf(';', offset[0]);
+	type = TypeVariable.lookup(sig.substring(offset[0], end));
+	if (type == null)
+	  throw new Error("Could not look up " + sig.substring(offset[0], end));
+	offset[0] = end + 1;
+	return type;
+      }
+
+    offset[0]--;
+    return null;
+  }
+
+  /** Get a Type[] corresponding to the given full signature string
+      starting from offset[0]. 
+      Set offset[0] to the end index of the signature.
+   */
+  private static Type[] parseArgs(String sig, int[] offset)
+  {
+    java.util.Stack args = new java.util.Stack();
+    do {
+      args.push(fullSignatureToType(sig, offset));
+    }
+    while (sig.charAt(offset[0]) != '>');
+    // Skip the '>'
+    offset[0]++;
+
+    Type[] res = new Type[args.size()];
+    for (int i = args.size();  --i >= 0; )
+      res[i] = (Type) args.pop();
+
+    return res;
+
   }
 
   /** Returns the Java-level type name from a given signature.

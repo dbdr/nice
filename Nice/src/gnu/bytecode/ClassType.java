@@ -189,6 +189,12 @@ public class ClassType extends ObjectType implements AttrContainer {
     setName(class_name);
   }
 
+  ClassType (String class_name, int flags)
+  {
+    this(class_name);
+    this.flags |= flags;
+  }
+
   Field fields;
   int fields_count;
   Field last_field;
@@ -958,7 +964,7 @@ public class ClassType extends ObjectType implements AttrContainer {
     return other.compare(this) >= 0;
   }
 
-  private static ClassType collectionType = make("nice.lang.Collection");
+  private static ClassType collectionType = make("java.util.Collection");
 
   public void emitCoerceFromObject (CodeAttr code)
   {
@@ -984,5 +990,80 @@ public class ClassType extends ObjectType implements AttrContainer {
   public String toString()
   {
     return "ClassType " + getName();
+  }
+
+  /****************************************************************
+   * Generic Java / JDK 1.5
+   ****************************************************************/
+
+  /** Holds the full signature, or "" whene there is none.
+      null before it is initialized.
+  */
+  private String signature;
+
+  private void loadSignature()
+  {
+    Attribute sig = Attribute.get(this, "Signature");
+    if (! (sig instanceof MiscAttr))
+      {
+	signature = "";
+	return;
+      }
+
+    MiscAttr s = (MiscAttr) sig;
+    int index = (s.data[1] & 0xff) | ((s.data[0] & 0xff) << 8);
+    signature = ((CpoolUtf8) constants.getPoolEntry(index)).getString();
+
+    if (signature.charAt(0) != '<')
+      {
+	parameters = TypeVariable.none;
+	return;
+      }
+
+    int[] pos = { 0 };
+    parameters = TypeVariable.parse(signature, pos);
+  } 
+
+  private TypeVariable[] parameters;
+
+  /**
+     Returns the number of type parameters. 
+     Returns -1 if this class has no parametrization info.
+  */
+  public int getArity()
+  {
+    if (signature == null)
+      loadSignature();
+
+    if (signature == "")
+      return -1;
+    else
+      return parameters.length;
+  }
+
+  /**
+     Returns the type parameters. 
+     Returns null if this class has no parametrization info.
+  */
+  public TypeVariable[] getParameters()
+  {
+    if (signature == null)
+      loadSignature();
+
+    if (signature == "")
+      return null;
+    else
+      return parameters;
+  }
+
+  public Type thisType()
+  {
+    if (signature == null)
+      loadSignature();
+
+    if (parameters == null)
+      return this;
+    else
+      return new ParameterizedType(this, parameters);
   }
 }

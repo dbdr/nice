@@ -54,13 +54,6 @@ public class JavaFieldAccess extends FieldAccess
   static MethodDeclaration make(Field f)
   {
     try{
-      f.getReflectField();
-    }
-    catch(java.lang.NoSuchFieldException e){
-      User.error("Field " + f + " does not exist");
-    }
-    
-    try{
       mlsub.typing.Monotype[] params;
       if(!f.getStaticFlag())
 	{

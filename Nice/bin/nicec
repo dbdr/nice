@@ -88,7 +88,7 @@ case $progname in
 	CLASSPATH=${NICEC}:${CLASSPATH}
     fi
     if [ $experimental = true ]; then
-	CLASSPATH=${APPHOME}/classes:${CLASSPATH}
+	CLASSPATH=${APPHOME}/classes:${APPHOME}/classes.old:${CLASSPATH}
     fi
     export CLASSPATH
 

@@ -1,250 +1,96 @@
 
 package nice.lang;
 
+import java.util.*;
+
 /****************************************************************
  * Collection
  ****************************************************************/
 
-interface Collection<T>
-{
-  int size();
-  boolean empty();
-  void foreach(T->void);
-  // Backward compatibility. `iter` will probably be removed sometime.
-  void iter(T->void f) = this.foreach(f);
+<Any T> void foreach(java.util.Collection<T>, T->void);
+// Backward compatibility. `iter` will probably be removed sometime.
+<Any T> void iter(java.util.Collection<T> c, T->void f) = c.foreach(f);
 
-  alike<T> filter(T->boolean);
-  <Any U> alike<U> map(T->U);
-}
+<java.util.Collection C, Any T, Any U> C<U> map(C<T>, T->U);
+<java.util.Collection C, Any T> C<T> filter(C<T>, T->boolean);
 
-empty(c@Collection) = c.size() == 0;
-
-/**
-   Equivalent definitions outside the interface:
-<Any T> int size(Collection<T>);
-<Any T> void foreach(Collection<T>, T->void);
-
-<Collection C, Any T, Any U> C<U> map(C<T>, T->U);
-<Collection C, Any T> C<T> filter(C<T>, T->boolean);
-*/
-
-/** A growable Collection */
-interface Container<T> 
-  extends Collection<T> 
-{
-  void add(T);
-}
-
-interface Stack<T> extends Container<T>
-{
-  T pop();
-  T top();
-  void push(T);
-}
-
-add(s@Stack, elem) = s.push(elem);
-
-/** An ordered Collection */
-interface Sequence<T> 
-  extends Collection<T>
-{
-  T    get(int);    // alternative syntax: a[i]
-  void set(int, T); // alternative syntax: a[i]=v
-
-  <Any U> U foldLeft((U, T)->U, U);
-}
-
-foreach(l@Sequence, f)
-{
-  for(int i=0; i<l.size; i++)
-    f(l.get(i));
-}
-
-foldLeft<T, U>(l@Sequence, f, init)
+<Any T, Any U> U foldLeft(java.util.List<T> l, (U, T)->U f, U init)
 {
   U res = init;
-  l.iter(fun(T elem) => { res = f(init, elem); });
-  return init;
+  l.iter(T elem => { res = f(res, elem); });
+  return res;
 }
 
 /*
-val fold_left : f:('a -> 'b -> 'a) -> init:'a -> 'b list -> 'a
-
-    List.fold_left f a [b1; ...; bn] is f (... (f (f a b1) b2) ...) bn. 
-
 val fold_right : f:('a -> 'b -> 'b) -> 'a list -> init:'b -> 'b
 
     List.fold_right f [a1; ...; an] b is f a1 (f a2 (... (f an b) ...)). Not tail-recursive. 
 */
-/** A growable ordered Collection. */
-interface List<T> extends Sequence<T>, Container<T>, Stack<T>
-{
-  T remove(int index);
-}
-
-// List based stacks
-
-push(l@List, elem) = l.add(elem);
-pop(l@List) = l.remove(l.size() - 1);
-top(l@List) = l.get(l.size() - 1);
-
-//  filter<C,T>[<L>](l@List : L<T>, test)
-//  {
-//    L<T> res;
-//    res=emptyCollection(l);
-
-//    l.foreach(T elem => if (test(elem)) res.add(elem));
-
-//   return res;
-//  }
 
 /****************************************************************
- * Functional Lists
+ * Implementations
  ****************************************************************/
 
-abstract class FList<T> 
-  implements Sequence <T> 
-  finally implements Collection<T>
-  {}
-
-final class Nil<T>  extends FList<T> {}
-final class Cons<T> extends FList<T> { T head; FList<T> tail; }
-
-size(l@Nil ) = 0;
-size(l@Cons) = 1+size(l.tail);
-
-get(l@Cons, n) = n == 0 ? head(l) : get(l.tail, n-1);
-get<T>(l@Nil, n)
+foreach(c, f) 
 {
-  throw new IndexOutOfBoundsException("Valid indexes: 0 .. " + (l.size - 1));
+  throw new Error("Foreach not implemented for " + c.getClass());
 }
 
-set(l@Cons, n, elem)
+foreach(l@java.util.List, f)
 {
-  if(n == 0) 
-    head(l)=elem; 
-  else 
-    l.tail.set(n-1, elem);
+  for (int i = 0; i < l.size; i++)
+    f(l.get(i));
 }
 
-set(l@Nil,  n, elem) { throw new Exception(); }
-
-map(l@Nil, f) = new Nil();
-
-map(l@Cons, ff) = new Cons(head: ff(l.head), tail: map(l.tail, ff));
-
-filter(l@Nil , test) = l;
-filter<C,T>(l@Cons, test)
+map(c, f) 
 {
-  FList<T> res = filter(l.tail, test);
-  return test(l.head) ? new Cons(head: l.head, tail: res) : res;
+  throw new Error("Map not implemented for " + c.getClass());
 }
 
-/****************************************************************
- * LinkedList
- ****************************************************************/
-
-final class JavaList<T> implements List<T>
+map<C,T,U>(c#ArrayList, f)
 {
-  java.util.List impl;  
-
-  size() = this.impl.size();
-  get(index) = cast( this.impl.get(index) );
-  set(index, elem) { this.impl.set(index, cast(elem)); }
-  add(elem) { this.impl.add(cast(elem)); }
-  remove(index) = cast(this.impl.remove(index));
-}
-
-/** The returned iterator is always non-null */
-java.util.Iterator iterator(java.util.Collection) =
-  native java.util.Iterator java.util.Collection.iterator();
-
-
-map<C, T, U> (l@JavaList, f)
-{
-  java.util.ArrayList res = new java.util.ArrayList(l.size());
-  for (java.util.Iterator i = l.impl.iterator(); i.hasNext(); )
-    res.add(object(f(cast(i.next()))));
-  return new JavaList(impl: res);
-}
-
-filter<C,T>(l@JavaList, test)
-{
-  java.util.ArrayList res = new java.util.ArrayList(l.size());
-  for(java.util.Iterator i = l.impl.iterator(); i.hasNext(); )
-    {
-      T elem = cast(i.next());
-      if (test(elem))
-	res.add(object(elem));
-    }
-  return new JavaList(impl: res);
-}
-
-
-/****************************************************************
- * Vector
- ****************************************************************/
-
-class Vector<T> 
-  implements List<T> 
-  finally implements Collection<T>
-{
-  T[] elements;
-  int length;
-
-  remove<T>(index)
-  {
-    if (this.length <= index)
-      throw new IndexOutOfBoundsException();
-    T res = this[index];
-    for (int i = index+1; i < this.length; i++)
-      this[i - 1] = this[i];
-    this.length--;
-    // Would avoid possible memory leaks, but difficult to type
-    //this[this.length] = null;
-    return res;
-  }
-}
-
-<Any T> Vector<T> makeVector(int len) = 
-  new Vector(elements:cast(new T[len]), length:0); 
-
-size(v@Vector) = v.length;
-get(v@Vector, index) = get(v.elements, index);
-set(v@Vector, index, element) = v.elements.set(index, element);
-
-map<C,T,U>(v@Vector, f)
-{
-  Vector<U> res = makeVector(v.length);
-
-  for(int i=0; i<v.length; i++)
-    res.elements.set(i, f( v.get(i) ));
-
+  ArrayList<U> res = new ArrayList(c.size());
+  c.iter(T elem => { res.add(f(elem)); });
   return res;
 }
 
-add<T>(v@Vector, element)
+map<C,T,U>(c#java.util.Vector, f)
 {
-  if(v.elements==null)
-    {
-      v.elements = cast(new T[10]);
-      v.length = 0;
-    }
-
-  if (v.length >= 
-      v.elements.size)
-    v.elements = v.elements.resize(v.length * 2);
-
-  v.elements.set(v.length, element);
-  v.length = v.length+1;
+  java.util.Vector<U> res = new java.util.Vector(c.size());
+  c.iter(T elem => { res.add(f(elem)); });
+  return res;
 }
 
-filter<C,T>(v@Vector, test)
+map<C,T,U>(c#java.util.Stack, f)
 {
-  Vector<T> res = makeVector(v.size);
+  java.util.Stack<U> res = new java.util.Stack();
+  c.iter(T elem => { res.add(f(elem)); });
+  return res;
+}
 
-  v.iter(fun(T elem) => { if(test(elem)) res.add(elem); });
+filter(c, f) 
+{
+  throw new Error("Filter not implemented for " + c.getClass());
+}
 
+filter<C,T>(c#ArrayList, test)
+{
+  ArrayList<T> res = new ArrayList(c.size());
+  c.iter(fun(T elem) => { if(test(elem)) res.add(elem); });
+  return res;
+}
+
+filter<C,T>(c#java.util.Vector, test)
+{
+  java.util.Vector<T> res = new java.util.Vector(c.size());
+  c.iter(fun(T elem) => { if(test(elem)) res.add(elem); });
+  return res;
+}
+
+filter<C,T>(c#java.util.Stack, test)
+{
+  java.util.Stack<T> res = new java.util.Stack();
+  c.iter(fun(T elem) => { if(test(elem)) res.add(elem); });
   return res;
 }
 
@@ -252,7 +98,7 @@ filter<C,T>(v@Vector, test)
  * Standard operations
  ****************************************************************/
 
-<Any T> boolean has (Sequence<T> s, T->boolean test)
+<Any T> boolean has (java.util.List<T> s, T->boolean test)
 {
   for (int i = 0; i < s.size(); i++)
     if (test(s.get(i)))
@@ -261,7 +107,7 @@ filter<C,T>(v@Vector, test)
   return false;
 }
 
-<Any T> T find (Sequence<T> s, T->boolean test)
+<Any T> T find (java.util.List<T> s, T->boolean test)
 {
   for (int i = 0; i < s.size(); i++)
     if (test(s.get(i)))
@@ -270,7 +116,7 @@ filter<C,T>(v@Vector, test)
   throw new java.util.NoSuchElementException();
 }
 
-<Any T> T findLast (Sequence<T> s, T->boolean test)
+<Any T> T findLast (java.util.List<T> s, T->boolean test)
 {
   for (int i = s.size(); --i >= 0;)
     if (test(s[i]))
@@ -279,7 +125,7 @@ filter<C,T>(v@Vector, test)
   throw new java.util.NoSuchElementException();
 }
 
-<Any T> ?T find (Sequence<!T> s, !T->boolean test)
+<Any T> ?T find (java.util.List<!T> s, !T->boolean test)
 {
   for (int i = 0; i < s.size(); i++)
     if (test(s.get(i)))
@@ -288,24 +134,22 @@ filter<C,T>(v@Vector, test)
   return null;
 }
 
-boolean or(Sequence<boolean>);
-or(s)
+boolean or(java.util.List<boolean> s)
 {
-  for(int i=0; i<s.size(); i++)
-    if(s.get(i))
+  for (int i = 0; i < s.size(); i++)
+    if (s.get(i))
       return true;
 
   return false;
 }
 
-long max(Sequence<long>);
-max(s)
+long max(java.util.List<long> s)
 {
-  long res=0;
+  long res = 0;
 
-  for(int i=0; i<s.size(); i++)
-    if(s.get(i)>res)
-      res=s.get(i);
+  for(int i = 0; i < s.size(); i++)
+    if (s.get(i) > res)
+      res = s.get(i);
 
   return res;
 }
@@ -316,7 +160,7 @@ max(s)
 
 /*
 We need overriding of native methods for this
-toString(s@Sequence)
+toString(s@List)
 {
   if (s.size() == 0)
     return "[]";
@@ -338,7 +182,7 @@ toString(s@Sequence)
  * toArray
  ****************************************************************/
 
-<Any T> T[] toArray(Collection<T> c)
+<Any T> T[] toArray(java.util.Collection<T> c)
 {
   T[] res = cast(new T[c.size()]);
 
@@ -347,21 +191,6 @@ toString(s@Sequence)
   return res;
 }
 
-
-/****************************************************************
- * Map
- ****************************************************************/
-
-interface Map<Key,Element> = native java.util.Map;
-class Hashtable<Key,Element> implements Map<Key, Element> = 
-  native java.util.HashMap;
-class WeakHashtable<Key,Element> implements Map<Key, Element> = 
-  native java.util.WeakHashMap;
-
-<Any Key, Any Element> Hashtable<Key, Element> hashtable() = 
-  native new java.util.HashMap();
-<Any Key, Any Element> WeakHashtable<Key, Element> weakHashtable() = 
-  native new java.util.WeakHashMap();
 
 // We give two versions of put and get, working on Maps with
 // null and non-null element types.
@@ -382,18 +211,3 @@ class WeakHashtable<Key,Element> implements Map<Key, Element> =
   native Object java.util.Map.put(Object, Object);
 <Any Key, Any Element> ?Element put(Map<Key, ?Element>, Key, ?Element) = 
   native Object java.util.Map.put(Object, Object);
-
-<Any Key, Any Element> boolean containsKey(Map<Key, Element>, Key) = 
-  native boolean java.util.Map.containsKey(Object);
-
-<Any Key, Any Element> int size(Map<Key, Element>) = 
-  native int java.util.Map.size();
-
-<Any Key, Any Element> java.util.Set keySet(Map<Key, Element>) = 
-  native java.util.Set java.util.Map.keySet();
-
-<Any Key, Any Element> void forKeys(Map<Key, Element> map, Key->void it) {
-  for (java.util.Iterator i = map.keySet().iterator(); i.hasNext(); ) {
-    it(cast(i.next()));
-  }
-}

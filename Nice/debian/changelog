@@ -1,3 +1,13 @@
+nice (0.7.4) unstable; urgency=low
+
+  * Added support for Generic Java types. This allows in particular to use 
+    java.util.* collections with parameterized types (e.g. List<String>).
+    These replace the previous (very partial) collections from nice.lang.
+    Functionals on collections (foreach, map, has, ...) are applicable
+    to java.util Collections.
+
+ --
+
 nice (0.7.3) unstable; urgency=low
 
   * Allow subclasses of Java classes to call any of the super-constructors,

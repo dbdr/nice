@@ -56,7 +56,7 @@ public class ObjectType extends Type
   {
     if (reflectClass == null && (flags & EXISTING_CLASS) != 0)
       reflectClass = 
-	nice.tools.code.Types.lookupQualifiedJavaClass(getInternalName().replace('/', '.'));
+	nice.tools.code.TypeImport.lookupQualifiedJavaClass(getInternalName().replace('/', '.'));
 
     if (reflectClass == null && (flags & EXISTING_CLASS) != 0)
       throw new RuntimeException("no such class: "+getName());

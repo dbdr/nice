@@ -77,7 +77,7 @@ monoSymbol(e@SymbolExp)
 
 boolean hasConditionalType(MonoSymbol v)
 {
-  return conditionalTypes.has(fun(<MonoSymbol, mlsub.typing.Monotype> couple) => {
+  return conditionalTypes.has(<MonoSymbol, mlsub.typing.Monotype> couple => {
     (MonoSymbol other, mlsub.typing.Monotype t) = couple;
     return v == other;
   });
@@ -173,15 +173,14 @@ nullnessInfo(test@CallExp)
 */
 
 var int ifLevel;
-var Stack<int> levels = makeVector(10);
-var Vector<<MonoSymbol, mlsub.typing.Monotype>> conditionalTypes = 
-  makeVector(10);
+var Stack<int> levels = new Stack();
+var Stack<(MonoSymbol, mlsub.typing.Monotype)> conditionalTypes = new Stack();
 
 void enterIf() { ifLevel++; }
 
 void enterElse()
 {
-  while (levels.size() > 0 && levels.top() == ifLevel * 2)
+  while (levels.size() > 0 && levels.peek() == ifLevel * 2)
     {
       levels.pop();
       (MonoSymbol variable, mlsub.typing.Monotype baseType) = conditionalTypes.pop();
@@ -191,7 +190,7 @@ void enterElse()
 
 void exitIf()
 { 
-  while (levels.size() > 0 && levels.top() == ifLevel * 2 + 1)
+  while (levels.size() > 0 && levels.peek() == ifLevel * 2 + 1)
     {
       levels.pop();
       (MonoSymbol variable, mlsub.typing.Monotype baseType) = conditionalTypes.pop();
@@ -387,8 +386,8 @@ typecheck(b@Block)
 {
   b.statements = rewrite(b.statements);
 
-  new JavaList(impl: notNull(b.locals)).iter(fun(?Block.LocalDeclaration d)=> typecheck(d));
-  notNull(b.statements).iter(fun(?Statement s)=> typecheck(s));
+  b.locals.iter(?Block.LocalDeclaration d => typecheck(d));
+  b.statements.iter(?Statement s => typecheck(s));
 }
 
 typecheck(decl@Block.LocalVariable)
@@ -498,7 +497,7 @@ typecheck(r@ReturnStmt)
 typecheck(t@TryStmt)
 {
   typecheck(t.body);
-  new JavaList(impl: notNull(t.catches)).iter(fun(TryStmt.Catch c)=> typecheck(c.body));
+  t.catches.iter(TryStmt.Catch c => typecheck(c.body));
   typecheck(t.finallyBody);
 }
 

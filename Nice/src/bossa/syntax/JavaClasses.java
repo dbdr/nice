@@ -21,6 +21,7 @@ import bossa.modules.Compilation;
 import gnu.bytecode.*;
 
 import java.util.*;
+import java.util.jar.*;
 
 /**
    Methods to deal with existing java classes and methods.
@@ -32,17 +33,6 @@ public final class JavaClasses
 {
   private JavaClasses(){}
   
-  /**
-   * Returns a java type constructor with the given name.
-   *
-   * If an existing JTC has the same name, returns it,
-   * else creates a new one.
-   */
-  static TypeConstructor make(Compilation compilation, String name)
-  {
-    return make(compilation, name, ClassType.make(name));
-  }
-
   /**
    * Returns a java type constructor with the given name
    * and the given java type.
@@ -103,7 +93,7 @@ public final class JavaClasses
   {
     if(Debug.javaTypes)
       Debug.println("Registering java class "+className);
-    
+
     // as the tc is not introduced, it should not be set instantiable
     // (thus used at link test with an error)
     // these late TCs should be avoided
@@ -133,6 +123,18 @@ public final class JavaClasses
       {
 	ClassType classType = (ClassType) javaType;
 
+	int arity = classType.getArity();
+	if (arity != -1)
+	  try {
+	    mlsub.typing.lowlevel.Engine.setKind
+	      (res, Variance.make(new int[classType.getArity()]).
+	       getConstraint());
+	  }
+	  catch(mlsub.typing.lowlevel.Unsatisfiable ex) {
+	    User.error("Java class " + className + " cannot have arity " +
+		       classType.getArity());
+	  }
+
 	if (classType.isFinal())
 	  res.setMinimal();
 
@@ -145,7 +147,7 @@ public final class JavaClasses
 	      Typing.initialLeq(res, superTC);
 	    }
 	    catch(TypingEx e){
-	      Internal.error("Invalid java super-class "+superClass+" for "+className);
+	      Internal.warning("Invalid java super-class "+superClass+" for "+className);
 	    }
 	  }
 
@@ -168,9 +170,9 @@ public final class JavaClasses
 		Typing.initialLeq(res, superTC);
 	      }
 	      catch(TypingEx e){
-		Internal.error(res+" cannot implement "+
-			       itfs[i],
-			       ": "+e.toString());
+		Internal.warning
+		  (res+" cannot implement " + itfs[i]
+		   /* + ": " + e.toString()*/);
 	      }
 	    }
       }
@@ -185,10 +187,14 @@ public final class JavaClasses
 
   public static void reset()
   {
-    javaTypeConstructors = new ArrayList(100);
   }
 
-  private static List javaTypeConstructors;
+  /**
+     The list is not reset between two compiles, because in case of error,
+     some TCs will need to be given a variance during the next compilation.
+     Otherwise they would be considered as type variables.
+  */
+  private static List javaTypeConstructors = new ArrayList(100);
 
   /**
       Remembers native methods and fields explicitly bound with a new type.
@@ -352,6 +358,7 @@ public final class JavaClasses
 	if (tc.isMinimal())
 	  Typing.assertMinimal(tc);
       }
+    javaTypeConstructors.clear();
   }
   
   static boolean instantiable(Type javaType)
@@ -374,7 +381,7 @@ public final class JavaClasses
 
   private static final Vector objects = new Vector(5);
   
-  static TypeConstructor object(Compilation compilation, int arity)
+  static TypeConstructor object(int arity)
   {
     if(arity>=objects.size())
       objects.setSize(arity+1);
@@ -387,19 +394,21 @@ public final class JavaClasses
     return res;
   }
   
-  static TypeConstructor lookup(Compilation compilation, String className)
+  /** The current compilation. This is not thread safe! */
+  static bossa.modules.Compilation compilation;
+
+  public static TypeConstructor lookup(String className)
   {
     if (compilation.javaTypeConstructors.containsKey(className))
       return (TypeConstructor) compilation.javaTypeConstructors.get(className);
-    
-    Class c = nice.tools.code.Types.lookupQualifiedJavaClass(className);    
-    
-    if(c==null)
+
+    Type classType = nice.tools.code.TypeImport.lookupQualified(className);
+    if (classType == null)
       {
-	compilation.javaTypeConstructors.put(className,null);
+	compilation.javaTypeConstructors.put(className, null);
 	return null;
       }
-    
-    return create(compilation, c.getName(), gnu.bytecode.Type.make(c));
+    else
+      return create(compilation, classType.getName(), classType);
   }
 }

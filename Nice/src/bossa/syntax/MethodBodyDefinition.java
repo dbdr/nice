@@ -511,7 +511,7 @@ public class MethodBodyDefinition extends Definition
 
   private void compile (JavaMethod declaration)
   {
-    gnu.expr.LambdaExp lexp = createMethod(declaration.methodName, true);
+    gnu.expr.LambdaExp lexp = createMethod(declaration.getName().toString(), true);
     
     // Compile as a method in the class of the first argument
     declaringClass().addJavaMethod(lexp);

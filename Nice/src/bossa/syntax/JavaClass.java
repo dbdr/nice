@@ -47,14 +47,14 @@ public class JavaClass extends ClassDefinition.ClassImplementation
 
   void resolveClass()
   {
-    java.lang.Class refClass 
-      = nice.tools.code.Types.lookupJavaClass(javaName.toString());
+    gnu.bytecode.Type classType
+      = nice.tools.code.TypeImport.lookup(javaName.toString());
     
-    if (refClass == null)
+    if (classType == null)
       User.error(javaName, javaName + " was not found in classpath");
     
-    definition.setJavaType(gnu.bytecode.Type.make(refClass));
-    JavaClasses.fetchMethods(definition.tc, (gnu.bytecode.ClassType) definition.getJavaType());
+    definition.setJavaType(classType);
+    JavaClasses.fetchMethods(definition.tc, (gnu.bytecode.ClassType) classType);
   }
 
   public void printInterface(java.io.PrintWriter s)

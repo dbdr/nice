@@ -3,7 +3,6 @@ package regtest.basic;
 // native arrays
 // Array<T> and T[] are synonyms
 
-
 <Any T> void p(Array<T>);
 p(a)
 {
@@ -169,10 +168,17 @@ void test_literal_arrays()
 // because of bytecode types' monomorphicity.
 <Any T> void polyArrayAsCollection(T[] a) { a = id(a).map(id); }
 
+class V<T>
+{
+  T[] elements;
+}
+
+<Any T> V<T> makeV() = new V(elements: cast(new T[1]));
+
 void test_polymorphism()
 {
   // polymorphic array field
-  Vector<String> v = makeVector(1);
+  V<String> v = makeV();
   String[] elements = v.elements;
   v.elements.size();
 

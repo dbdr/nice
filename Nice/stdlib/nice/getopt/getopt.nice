@@ -5,9 +5,9 @@ import gnu.getopt.*;
 
 /** Parses the list of strings according to the options,
     and returns the non-options arguments. */
-Sequence<String> parse(String, Array<String>,Sequence<Option>);
+List<String> parse(String, Array<String>, Array<Option>);
 
-String printOptions(Sequence<Option>);
+String printOptions(Array<Option>);
 
 int optType(Option);
 optType(o@NoParamOption) = LongOpt.NO_ARGUMENT();
@@ -21,10 +21,10 @@ optSuffix(o@OptionalParamOption) = "::";
 
 parse(progName@String, args, options)
 {
-  Vector<LongOpt> longOptions = makeVector(options.size);
+  List<LongOpt> longOptions = new ArrayList(options.length);
   String shortOptions = "";
 
-  options.iter(fun(Option o)=>
+  options.iter(Option o =>
     {
       if(o.longName != null)
       {
@@ -46,13 +46,16 @@ parse(progName@String, args, options)
         shortOptions = shortOptions + toString(o.shortName) + optSuffix(o);
     });
 
-  Getopt g = newGetopt(progName, args, shortOptions, longOptions.elements);
+  ?LongOpt[] longOpts = new LongOpt[longOptions.size];
+  for (int i = 0; i < longOpts.length; i++)
+    longOpts[i] = longOptions.get(i);
+  Getopt g = newGetopt(progName, args, shortOptions, longOpts);
 
   // Parsing loop
   int c = g.getopt();
   while (c != -1)
     {
-      ?Option chosen = options.find(fun(Option o)=> o.optval == c);
+      ?Option chosen = options.find(Option o => o.optval == c);
       if (chosen != null)
 	chosen.doAction(g);
       
@@ -60,7 +63,7 @@ parse(progName@String, args, options)
     }
 
   int index = getOptind(g);
-  Vector<String> res = makeVector(args.length - index);
+  List<String> res = new ArrayList(args.length - index);
   for(; index<args.length; index++)
     res.add(args[index]);
 
@@ -97,7 +100,7 @@ var int uniqId = 256;
 printOptions(os)
 {
   String res = "";
-  os.iter(fun(Option o)=> { res = res + printOption(o); });
+  os.iter(Option o => { res = res + printOption(o); });
   return res;
 }
 

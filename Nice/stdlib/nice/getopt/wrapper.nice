@@ -7,5 +7,5 @@ package nice.getopt;
 
 // Gives a more precise type, since no parameter or array element can be null.
 Getopt newGetopt(String programName, String[] argv, String optString,
-		 LongOpt[] longOptions) = 
+		 ?LongOpt[?] longOptions) = 
   native new Getopt(String, String[], String, LongOpt[]);

@@ -3,5 +3,6 @@
 if [ ! -r Nice ]; then
   cvs -d:pserver:anonymous@$CVS_SOURCEFORGE:/cvsroot/nice export -rHEAD Nice
 fi
+wget -O Nice/external/nice-bootstrap.jar http://nice.sf.net/nice.jar
 
 cd Nice && make world

@@ -1,6 +1,12 @@
 nice (0.9.7)
 
+  * When importing a java package, it is possible to specify that its methods
+    do not accept null arguments:
+      import some.java.pkg.* (!);
+    Individual methods can be treated specially by retyping them.
   * The 'Any' keyword is now deprecated.
+
+ --
 
 nice (0.9.6)
 

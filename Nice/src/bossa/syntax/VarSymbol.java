@@ -1,7 +1,7 @@
 /**************************************************************************/
-/*                           B O S S A                                    */
-/*        A simple imperative object-oriented research language           */
-/*                   (c)  Daniel Bonniot 1999                             */
+/*                                N I C E                                 */
+/*             A high-level object-oriented research language             */
+/*                        (c) Daniel Bonniot 2000                         */
 /*                                                                        */
 /*  This program is free software; you can redistribute it and/or modify  */
 /*  it under the terms of the GNU General Public License as published by  */
@@ -9,10 +9,6 @@
 /*  (at your option) any later version.                                   */
 /*                                                                        */
 /**************************************************************************/
-
-// File    : VarSymbol.java
-// Created : Wed Jul 07 16:56:06 1999 by bonniot
-//$Modified: Tue Jun 13 19:52:53 2000 by Daniel Bonniot $
 
 package bossa.syntax;
 
@@ -22,8 +18,12 @@ import bossa.util.*;
 import mlsub.typing.Polytype;
 
 /**
- * A variable (local, field, parameter)
- */
+   A variable (local, field of a class, parameter of a method or function).
+
+   @version $Date$
+   @author Daniel Bonniot (d.bonniot@mail.dotcom.fr)
+*/
+
 abstract class VarSymbol extends Node implements Located
 {
   public VarSymbol(LocatedString name)

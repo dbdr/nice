@@ -1,7 +1,7 @@
 /**************************************************************************/
-/*                           B O S S A                                    */
-/*        A simple imperative object-oriented research language           */
-/*                   (c)  Daniel Bonniot 1999                             */
+/*                                N I C E                                 */
+/*             A high-level object-oriented research language             */
+/*                        (c) Daniel Bonniot 2000                         */
 /*                                                                        */
 /*  This program is free software; you can redistribute it and/or modify  */
 /*  it under the terms of the GNU General Public License as published by  */
@@ -9,10 +9,6 @@
 /*  (at your option) any later version.                                   */
 /*                                                                        */
 /**************************************************************************/
-
-// File    : JavaClasses.java
-// Created : Thu Jul 08 11:51:09 1999 by bonniot
-//$Modified: Wed Sep 20 18:12:28 2000 by Daniel Bonniot $
 
 package bossa.syntax;
 
@@ -27,8 +23,11 @@ import gnu.bytecode.*;
 import java.util.*;
 
 /**
- * A java class.
- */
+   Methods to deal with existing java classes and methods.
+
+   @version $Date$
+   @author Daniel Bonniot (d.bonniot@mail.dotcom.fr)
+*/
 public final class JavaClasses
 {
   private JavaClasses(){}

@@ -1,7 +1,7 @@
 /**************************************************************************/
-/*                           B O S S A                                    */
-/*        A simple imperative object-oriented research language           */
-/*                   (c)  Daniel Bonniot 1999                             */
+/*                                N I C E                                 */
+/*             A high-level object-oriented research language             */
+/*                        (c) Daniel Bonniot 2000                         */
 /*                                                                        */
 /*  This program is free software; you can redistribute it and/or modify  */
 /*  it under the terms of the GNU General Public License as published by  */
@@ -10,15 +10,16 @@
 /*                                                                        */
 /**************************************************************************/
 
-// File    : LocatedString.java
-// Created : Fri Jul 09 19:09:47 1999 by bonniot
-//$Modified: Mon Jul 24 12:06:18 2000 by Daniel Bonniot $
-// Description : A string + location information
-
 package bossa.syntax;
 
 import bossa.util.*;
 
+/**
+   A tring with location information.
+
+   @version $Date$
+   @author Daniel Bonniot (d.bonniot@mail.dotcom.fr)
+*/
 public class LocatedString 
   implements Located
 {

@@ -1,7 +1,7 @@
 /**************************************************************************/
-/*                           B O S S A                                    */
-/*        A simple imperative object-oriented research language           */
-/*                   (c)  Daniel Bonniot 1999                             */
+/*                                N I C E                                 */
+/*             A high-level object-oriented research language             */
+/*                        (c) Daniel Bonniot 2000                         */
 /*                                                                        */
 /*  This program is free software; you can redistribute it and/or modify  */
 /*  it under the terms of the GNU General Public License as published by  */
@@ -9,10 +9,6 @@
 /*  (at your option) any later version.                                   */
 /*                                                                        */
 /**************************************************************************/
-
-// File    : GlobalVarDeclaration.java
-// Created : Tue Jul 06 12:06:20 1999 by bonniot
-//$Modified: Mon Aug 07 15:31:51 2000 by Daniel Bonniot $
 
 package bossa.syntax;
 
@@ -23,9 +19,12 @@ import gnu.bytecode.*;
 import java.util.*;
 
 /**
- * Declaration of a local variable
- * with an optional initial value
- */
+   Declaration of a local variable
+   with an optional initial value.
+   
+   @version $Date$
+   @author Daniel Bonniot (d.bonniot@mail.dotcom.fr)
+*/
 public class GlobalVarDeclaration extends Definition
 {
   public GlobalVarDeclaration(LocatedString name, Monotype type, Expression value)

@@ -1,7 +1,7 @@
 /**************************************************************************/
-/*                           B O S S A                                    */
-/*        A simple imperative object-oriented research language           */
-/*                   (c)  Daniel Bonniot 1999                             */
+/*                                N I C E                                 */
+/*             A high-level object-oriented research language             */
+/*                        (c) Daniel Bonniot 2000                         */
 /*                                                                        */
 /*  This program is free software; you can redistribute it and/or modify  */
 /*  it under the terms of the GNU General Public License as published by  */
@@ -10,18 +10,17 @@
 /*                                                                        */
 /**************************************************************************/
 
-// File    : VarScope.java
-// Created : Fri Jul 09 11:28:11 1999 by bonniot
-//$Modified: Mon Jul 24 12:07:11 2000 by Daniel Bonniot $
-
 package bossa.syntax;
 
 import java.util.*;
 import bossa.util.*;
 
 /**
- * A Scope level for variables.
- */
+   A Scope level for variables.
+
+   @version $Date$
+   @author Daniel Bonniot (d.bonniot@mail.dotcom.fr)
+*/
 final class VarScope
 {
   public VarScope(VarScope outer)

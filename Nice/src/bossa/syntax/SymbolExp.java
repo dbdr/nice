@@ -1,7 +1,7 @@
 /**************************************************************************/
-/*                           B O S S A                                    */
-/*        A simple imperative object-oriented research language           */
-/*                   (c)  Daniel Bonniot 1999                             */
+/*                                N I C E                                 */
+/*             A high-level object-oriented research language             */
+/*                        (c) Daniel Bonniot 2000                         */
 /*                                                                        */
 /*  This program is free software; you can redistribute it and/or modify  */
 /*  it under the terms of the GNU General Public License as published by  */
@@ -10,10 +10,6 @@
 /*                                                                        */
 /**************************************************************************/
 
-// File    : SymbolExpr.java
-// Created : Thu Jul 08 12:20:59 1999 by bonniot
-//$Modified: Wed Sep 20 12:33:03 2000 by Daniel Bonniot $
-
 package bossa.syntax;
 
 import java.util.*;
@@ -21,8 +17,11 @@ import bossa.util.*;
 import gnu.expr.*;
 
 /**
- * Access to a symbol (variable, function parameter).
- */
+   Access to a symbol (variable, function parameter).
+
+   @version $Date$
+   @author Daniel Bonniot (d.bonniot@mail.dotcom.fr)
+*/
 public class SymbolExp extends Expression
 {
   SymbolExp(VarSymbol s)

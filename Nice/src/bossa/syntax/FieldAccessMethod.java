@@ -1,7 +1,7 @@
 /**************************************************************************/
-/*                           B O S S A                                    */
-/*        A simple imperative object-oriented research language           */
-/*                   (c)  Daniel Bonniot 1999                             */
+/*                                N I C E                                 */
+/*             A high-level object-oriented research language             */
+/*                        (c) Daniel Bonniot 2000                         */
 /*                                                                        */
 /*  This program is free software; you can redistribute it and/or modify  */
 /*  it under the terms of the GNU General Public License as published by  */
@@ -9,10 +9,6 @@
 /*  (at your option) any later version.                                   */
 /*                                                                        */
 /**************************************************************************/
-
-// File    : FieldAccessMethod.java
-// Created : Thu Jul 01 18:12:46 1999 by bonniot
-//$Modified: Mon Oct 09 12:00:23 2000 by Daniel Bonniot $
 
 package bossa.syntax;
 
@@ -27,11 +23,14 @@ import gnu.expr.*;
 import java.util.*;
 
 /**
- * A bossa field access.
- *
- * In terms of scoping, this is the symbol
- * that is returned when the access to a field is done,
- * either a 'get' or a 'set'.
+   A field access in a Nice class.
+   
+   In terms of scoping, this is the symbol
+   that is returned when the access to a field is done,
+   either a 'get' or a 'set'.
+
+   @version $Date$
+   @author Daniel Bonniot (d.bonniot@mail.dotcom.fr)
  */
 public class FieldAccessMethod extends MethodDeclaration
 {

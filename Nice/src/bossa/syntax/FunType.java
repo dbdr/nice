@@ -1,7 +1,7 @@
 /**************************************************************************/
-/*                           B O S S A                                    */
-/*        A simple imperative object-oriented research language           */
-/*                   (c)  Daniel Bonniot 1999                             */
+/*                                N I C E                                 */
+/*             A high-level object-oriented research language             */
+/*                        (c) Daniel Bonniot 2000                         */
 /*                                                                        */
 /*  This program is free software; you can redistribute it and/or modify  */
 /*  it under the terms of the GNU General Public License as published by  */
@@ -9,10 +9,6 @@
 /*  (at your option) any later version.                                   */
 /*                                                                        */
 /**************************************************************************/
-
-// File    : FunType.java
-// Created : Fri Jul 02 17:41:24 1999 by bonniot
-//$Modified: Wed Aug 02 17:08:43 2000 by Daniel Bonniot $
 
 package bossa.syntax;
 
@@ -24,7 +20,10 @@ import mlsub.typing.Monotype;
 import mlsub.typing.FunTypeKind;
 
 /**
- * Functional type
+   Functional type.
+
+   @version $Date$
+   @author Daniel Bonniot (d.bonniot@mail.dotcom.fr)
  */
 public class FunType extends bossa.syntax.Monotype
 {

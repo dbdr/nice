@@ -1,7 +1,7 @@
 /**************************************************************************/
-/*                             N I C E                                    */
-/*        A simple imperative object-oriented research language           */
-/*                   (c)  Daniel Bonniot 1999                             */
+/*                                N I C E                                 */
+/*             A high-level object-oriented research language             */
+/*                        (c) Daniel Bonniot 2000                         */
 /*                                                                        */
 /*  This program is free software; you can redistribute it and/or modify  */
 /*  it under the terms of the GNU General Public License as published by  */
@@ -10,20 +10,17 @@
 /*                                                                        */
 /**************************************************************************/
 
-// File    : IncrementExp.java
-// Created : Fri Jul 21 13:58:26 2000 by Daniel Bonniot
-//$Modified: Mon Oct 09 18:22:17 2000 by Daniel Bonniot $
-
 package bossa.syntax;
 
 import bossa.util.*;
 import nice.tools.code.*;
 
 /**
- * Postfix or infix incrementation or decrementation of a numeric variable.
- * 
- * @author Daniel Bonniot
- */
+   Postfix or infix incrementation or decrementation of a numeric variable.
+
+   @version $Date$
+   @author Daniel Bonniot (d.bonniot@mail.dotcom.fr)
+*/
 
 public class IncrementExp extends Expression
 {

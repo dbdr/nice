@@ -1,7 +1,7 @@
 /**************************************************************************/
-/*                           B O S S A                                    */
-/*        A simple imperative object-oriented research language           */
-/*                   (c)  Daniel Bonniot 1999                             */
+/*                                N I C E                                 */
+/*             A high-level object-oriented research language             */
+/*                        (c) Daniel Bonniot 2000                         */
 /*                                                                        */
 /*  This program is free software; you can redistribute it and/or modify  */
 /*  it under the terms of the GNU General Public License as published by  */
@@ -9,10 +9,6 @@
 /*  (at your option) any later version.                                   */
 /*                                                                        */
 /**************************************************************************/
-
-// File    : TypeScope.java
-// Created : Fri Jul 09 11:29:17 1999 by bonniot
-//$Modified: Mon Oct 02 16:55:44 2000 by Daniel Bonniot $
 
 package bossa.syntax;
 
@@ -23,9 +19,11 @@ import mlsub.typing.TypeConstructor;
 import mlsub.typing.Variance;
 
 /**
- * A Scope level for types.
- * Is extended in each node that defined a new scope level.
- */
+   A Scope level for types.
+
+   @version $Date$
+   @author Daniel Bonniot (d.bonniot@mail.dotcom.fr)
+*/
 public class TypeScope
 {
   public TypeScope(TypeScope outer)

@@ -1,7 +1,7 @@
 /**************************************************************************/
-/*                           B O S S A                                    */
-/*        A simple imperative object-oriented research language           */
-/*                   (c)  Daniel Bonniot 1999                             */
+/*                                N I C E                                 */
+/*             A high-level object-oriented research language             */
+/*                        (c) Daniel Bonniot 2000                         */
 /*                                                                        */
 /*  This program is free software; you can redistribute it and/or modify  */
 /*  it under the terms of the GNU General Public License as published by  */
@@ -10,18 +10,17 @@
 /*                                                                        */
 /**************************************************************************/
 
-// File    : NewExp.java
-// Created : Thu Jul 08 17:15:15 1999 by bonniot
-//$Modified: Mon Oct 09 17:27:05 2000 by Daniel Bonniot $
-
 package bossa.syntax;
 
 import bossa.util.*;
 import java.util.*;
 
 /**
- * Call of an object constructor.
- */
+   Call of an object constructor.
+
+   @version $Date$
+   @author Daniel Bonniot (d.bonniot@mail.dotcom.fr)
+*/
 public class NewExp extends CallExp
 {
   public NewExp(TypeIdent ti, Arguments arguments)

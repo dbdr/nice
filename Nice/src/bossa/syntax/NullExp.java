@@ -1,7 +1,7 @@
 /**************************************************************************/
-/*                           B O S S A                                    */
-/*        A simple imperative object-oriented research language           */
-/*                   (c)  Daniel Bonniot 1999                             */
+/*                                N I C E                                 */
+/*             A high-level object-oriented research language             */
+/*                        (c) Daniel Bonniot 2000                         */
 /*                                                                        */
 /*  This program is free software; you can redistribute it and/or modify  */
 /*  it under the terms of the GNU General Public License as published by  */
@@ -10,19 +10,16 @@
 /*                                                                        */
 /**************************************************************************/
 
-// File    : NullExp.java
-// Created : Thu Feb 03 19:17:15 2000 by Daniel Bonniot
-//$Modified: Tue Jun 06 14:29:15 2000 by Daniel Bonniot $
-
 package bossa.syntax;
 
 import bossa.util.*;
 
 /**
- * The 'null' expression.
- * 
- * @author Daniel Bonniot
- */
+   The 'null' expression.   
+
+   @version $Date$
+   @author Daniel Bonniot (d.bonniot@mail.dotcom.fr)
+*/
 
 public class NullExp extends Expression
 {

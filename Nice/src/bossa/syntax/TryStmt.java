@@ -1,7 +1,7 @@
 /**************************************************************************/
-/*                           B O S S A                                    */
-/*        A simple imperative object-oriented research language           */
-/*                   (c)  Daniel Bonniot 1999                             */
+/*                                N I C E                                 */
+/*             A high-level object-oriented research language             */
+/*                        (c) Daniel Bonniot 2000                         */
 /*                                                                        */
 /*  This program is free software; you can redistribute it and/or modify  */
 /*  it under the terms of the GNU General Public License as published by  */
@@ -9,10 +9,6 @@
 /*  (at your option) any later version.                                   */
 /*                                                                        */
 /**************************************************************************/
-
-// File    : TryExp.java
-// Created : Thu May 25 12:34:19 2000 by Daniel Bonniot
-//$Modified: Mon Aug 07 15:31:39 2000 by Daniel Bonniot $
 
 package bossa.syntax;
 
@@ -27,10 +23,11 @@ import gnu.expr.TryExp;
 import gnu.expr.CatchClause;
 
 /**
- * A try/catch/finally statement
- * 
- * @author Daniel Bonniot
- */
+   A try/catch/finally statement  
+
+   @version $Date$
+   @author Daniel Bonniot (d.bonniot@mail.dotcom.fr)
+*/
 
 public class TryStmt extends Statement
 {

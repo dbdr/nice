@@ -1,7 +1,7 @@
 /**************************************************************************/
-/*                           B O S S A                                    */
-/*        A simple imperative object-oriented research language           */
-/*                   (c)  Daniel Bonniot 1999                             */
+/*                                N I C E                                 */
+/*             A high-level object-oriented research language             */
+/*                        (c) Daniel Bonniot 2000                         */
 /*                                                                        */
 /*  This program is free software; you can redistribute it and/or modify  */
 /*  it under the terms of the GNU General Public License as published by  */
@@ -9,10 +9,6 @@
 /*  (at your option) any later version.                                   */
 /*                                                                        */
 /**************************************************************************/
-
-// File    : ExpressionRef.java
-// Created : Tue Aug 17 16:04:40 1999 by bonniot
-//$Modified: Mon Oct 09 17:25:45 2000 by Daniel Bonniot $
 
 package bossa.syntax;
 
@@ -22,11 +18,12 @@ import bossa.util.*;
 import mlsub.typing.Polytype;
 
 /**
- * Reference to an expression
- * Usefull for scoping resolution :
- * the reference remains constant, while the expression might change
- * 
- * @author bonniot
+   Reference to an expression.
+   Usefull for scoping resolution :
+   the reference remains constant, while the expression might change.
+
+   @version $Date$
+   @author Daniel Bonniot (d.bonniot@mail.dotcom.fr)
  */
 
 // It set this class final since it may be used intensively

@@ -1,7 +1,7 @@
 /**************************************************************************/
-/*                           B O S S A                                    */
-/*        A simple imperative object-oriented research language           */
-/*                   (c)  Daniel Bonniot 1999                             */
+/*                                N I C E                                 */
+/*             A high-level object-oriented research language             */
+/*                        (c) Daniel Bonniot 2000                         */
 /*                                                                        */
 /*  This program is free software; you can redistribute it and/or modify  */
 /*  it under the terms of the GNU General Public License as published by  */
@@ -10,18 +10,16 @@
 /*                                                                        */
 /**************************************************************************/
 
-// File    : Definition.java
-// Created : Thu Jul 01 11:17:28 1999 by bonniot
-//$Modified: Wed Apr 26 16:47:36 2000 by Daniel Bonniot $
-
 package bossa.syntax;
 
 import java.util.*;
 
 /**
- * Abstract definition.
- * May be a class definition, a method definition, 
- * an interface definition...
+   Abstract definition.
+   May be a class definition, a method definition, an interface definition...
+
+   @version $Date$
+   @author Daniel Bonniot (d.bonniot@mail.dotcom.fr)
  */
 public abstract class Definition extends Node implements bossa.util.Located
 {

@@ -1,7 +1,7 @@
 /**************************************************************************/
-/*                           B O S S A                                    */
-/*        A simple imperative object-oriented research language           */
-/*                   (c)  Daniel Bonniot 1999                             */
+/*                                N I C E                                 */
+/*             A high-level object-oriented research language             */
+/*                        (c) Daniel Bonniot 2000                         */
 /*                                                                        */
 /*  This program is free software; you can redistribute it and/or modify  */
 /*  it under the terms of the GNU General Public License as published by  */
@@ -9,10 +9,6 @@
 /*  (at your option) any later version.                                   */
 /*                                                                        */
 /**************************************************************************/
-
-// File    : TypeConstructors.java
-// Created : Mon Jun 05 14:19:36 2000 by Daniel Bonniot
-//$Modified: Wed Sep 20 12:35:38 2000 by Daniel Bonniot $
 
 package bossa.syntax;
 
@@ -22,10 +18,11 @@ import java.util.*;
 import mlsub.typing.TypeConstructor;
 
 /**
- * Tools for classes and type constructors.
- * 
- * @author Daniel Bonniot
- */
+   Tools for classes and type constructors.
+
+   @version $Date$
+   @author Daniel Bonniot (d.bonniot@mail.dotcom.fr)
+*/
 
 public final class TypeConstructors
 {

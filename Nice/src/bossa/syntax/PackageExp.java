@@ -1,7 +1,7 @@
 /**************************************************************************/
-/*                           B O S S A                                    */
-/*        A simple imperative object-oriented research language           */
-/*                   (c)  Daniel Bonniot 1999                             */
+/*                                N I C E                                 */
+/*             A high-level object-oriented research language             */
+/*                        (c) Daniel Bonniot 2000                         */
 /*                                                                        */
 /*  This program is free software; you can redistribute it and/or modify  */
 /*  it under the terms of the GNU General Public License as published by  */
@@ -10,22 +10,19 @@
 /*                                                                        */
 /**************************************************************************/
 
-// File    : PackageExp.java
-// Created : Wed Jun 14 12:36:45 2000 by Daniel Bonniot
-//$Modified: Tue Jul 25 14:36:31 2000 by Daniel Bonniot $
-
 package bossa.syntax;
 
 import bossa.util.*;
 
 /**
-   Temporary expression to represent a package or a package prefix
+   Temporary expression to represent a package or a package prefix.
    
    For instance, in java.lang.System.exit(0), 
    java and java.lang is represented by a package exp.
    
-   @author Daniel Bonniot
- */
+   @version $Date$
+   @author Daniel Bonniot (d.bonniot@mail.dotcom.fr)
+*/
 
 class PackageExp extends Expression
 {

@@ -1,7 +1,7 @@
 /**************************************************************************/
-/*                           B O S S A                                    */
-/*        A simple imperative object-oriented research language           */
-/*                   (c)  Daniel Bonniot 1999                             */
+/*                                N I C E                                 */
+/*             A high-level object-oriented research language             */
+/*                        (c) Daniel Bonniot 2000                         */
 /*                                                                        */
 /*  This program is free software; you can redistribute it and/or modify  */
 /*  it under the terms of the GNU General Public License as published by  */
@@ -9,10 +9,6 @@
 /*  (at your option) any later version.                                   */
 /*                                                                        */
 /**************************************************************************/
-
-// File    : Polytype.java
-// Created : Tue Jul 13 12:51:38 1999 by bonniot
-//$Modified: Fri Jun 16 12:25:14 2000 by Daniel Bonniot $
 
 package bossa.syntax;
 
@@ -23,7 +19,10 @@ import mlsub.typing.TypeConstructor;
 
 /**
    A constrained monotype.
- */
+
+   @version $Date$
+   @author Daniel Bonniot (d.bonniot@mail.dotcom.fr)
+*/
 public class Polytype extends Node
 {
   public Polytype(Constraint cst, Monotype monotype)

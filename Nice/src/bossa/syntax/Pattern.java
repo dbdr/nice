@@ -1,7 +1,7 @@
 /**************************************************************************/
-/*                           B O S S A                                    */
-/*        A simple imperative object-oriented research language           */
-/*                   (c)  Daniel Bonniot 1999                             */
+/*                                N I C E                                 */
+/*             A high-level object-oriented research language             */
+/*                        (c) Daniel Bonniot 2000                         */
 /*                                                                        */
 /*  This program is free software; you can redistribute it and/or modify  */
 /*  it under the terms of the GNU General Public License as published by  */
@@ -9,11 +9,6 @@
 /*  (at your option) any later version.                                   */
 /*                                                                        */
 /**************************************************************************/
-
-// File    : Pattern.java
-// Created : Mon Jul 05 14:36:52 1999 by bonniot
-//$Modified: Mon Aug 07 15:31:46 2000 by Daniel Bonniot $
-// Description : Syntactic pattern for method bodies declaration
 
 package bossa.syntax;
 
@@ -28,10 +23,13 @@ import mlsub.typing.Constraint;
 import mlsub.typing.MonotypeConstructor;
 
 /**
- * Represents the information about one argument of a method body.
- *
- * @see MethodBodyDefinition
- */
+   Represents the information about one argument of a method body.
+   
+   @see MethodBodyDefinition
+
+   @version $Date$
+   @author Daniel Bonniot (d.bonniot@mail.dotcom.fr)
+*/
 public class Pattern
 {
   /**

@@ -1,7 +1,7 @@
 /**************************************************************************/
-/*                             N I C E                                    */
-/*        A simple imperative object-oriented research language           */
-/*                   (c)  Daniel Bonniot 2000                             */
+/*                                N I C E                                 */
+/*             A high-level object-oriented research language             */
+/*                        (c) Daniel Bonniot 2000                         */
 /*                                                                        */
 /*  This program is free software; you can redistribute it and/or modify  */
 /*  it under the terms of the GNU General Public License as published by  */
@@ -9,9 +9,6 @@
 /*  (at your option) any later version.                                   */
 /*                                                                        */
 /**************************************************************************/
-
-// File    : MethodDeclaration.java
-// Created : Thu Jul 01 18:12:46 1999 by Daniel Bonniot
 
 package bossa.syntax;
 
@@ -37,8 +34,8 @@ import bossa.util.Debug;
    - an {@link bossa.syntax.InlinedMethod inlined method}
    
    @version $Date$
-   @author Daniel Bonniot
- */
+   @author Daniel Bonniot (d.bonniot@mail.dotcom.fr)
+*/
 abstract public class MethodDeclaration extends Definition
 {
   /**

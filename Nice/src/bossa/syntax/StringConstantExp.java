@@ -1,7 +1,7 @@
 /**************************************************************************/
-/*                           B O S S A                                    */
-/*        A simple imperative object-oriented research language           */
-/*                   (c)  Daniel Bonniot 1999                             */
+/*                                N I C E                                 */
+/*             A high-level object-oriented research language             */
+/*                        (c) Daniel Bonniot 2000                         */
 /*                                                                        */
 /*  This program is free software; you can redistribute it and/or modify  */
 /*  it under the terms of the GNU General Public License as published by  */
@@ -10,17 +10,16 @@
 /*                                                                        */
 /**************************************************************************/
 
-// File    : StringConstantExp.java
-// Created : Thu Sep 02 14:49:48 1999 by bonniot
-//$Modified: Thu Jul 20 17:56:03 2000 by Daniel Bonniot $
-
 package bossa.syntax;
 
 import bossa.util.*;
 
 /**
- * A String constant
- */
+   A String constant.
+
+   @version $Date$
+   @author Daniel Bonniot (d.bonniot@mail.dotcom.fr)
+*/
 public class StringConstantExp extends ConstantExp
 {
   public StringConstantExp(String value)

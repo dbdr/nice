@@ -1,7 +1,7 @@
 /**************************************************************************/
-/*                           B O S S A                                    */
-/*        A simple imperative object-oriented research language           */
-/*                   (c)  Daniel Bonniot 1999                             */
+/*                                N I C E                                 */
+/*             A high-level object-oriented research language             */
+/*                        (c) Daniel Bonniot 2000                         */
 /*                                                                        */
 /*  This program is free software; you can redistribute it and/or modify  */
 /*  it under the terms of the GNU General Public License as published by  */
@@ -10,22 +10,19 @@
 /*                                                                        */
 /**************************************************************************/
 
-// File    : ClassExp.java
-// Created : Wed Mar 29 14:30:13 2000 by Daniel Bonniot
-
 package bossa.syntax;
 
 import bossa.util.*;
 
 /**
- * A constant expression representing a class.
- *
- * For instance, in the expression 'java.lang.System.arraycopy(...)',
- * java.lang.System is a ClassExp, and is considered temporarilly
- * as an additional argument.
- * 
- * @version $Revision$, $Date$
- * @author Daniel Bonniot
+   A constant expression representing a class.
+   
+   For instance, in the expression 'java.lang.System.arraycopy(...)',
+   java.lang.System is a ClassExp, and is considered temporarilly
+   as an additional argument.   
+
+   @version $Date$
+   @author Daniel Bonniot (d.bonniot@mail.dotcom.fr)
  */
 
 public final class ClassExp extends Expression

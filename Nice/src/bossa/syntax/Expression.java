@@ -1,7 +1,7 @@
 /**************************************************************************/
-/*                           B O S S A                                    */
-/*        A simple imperative object-oriented research language           */
-/*                   (c)  Daniel Bonniot 1999                             */
+/*                                N I C E                                 */
+/*             A high-level object-oriented research language             */
+/*                        (c) Daniel Bonniot 2000                         */
 /*                                                                        */
 /*  This program is free software; you can redistribute it and/or modify  */
 /*  it under the terms of the GNU General Public License as published by  */
@@ -10,11 +10,6 @@
 /*                                                                        */
 /**************************************************************************/
 
-// File    : Expression.java
-// Created : Mon Jul 05 16:25:02 1999 by bonniot
-//$Modified: Mon Oct 09 16:30:45 2000 by Daniel Bonniot $
-// Description : 
-
 package bossa.syntax;
 
 import java.util.*;
@@ -22,6 +17,14 @@ import bossa.util.*;
 
 import mlsub.typing.Polytype;
 
+/**
+   An expression of the Nice language.
+
+   Subclasses of Expression have the 'Exp' suffix in their name.
+
+   @version $Date$
+   @author Daniel Bonniot (d.bonniot@mail.dotcom.fr)
+*/
 public abstract class Expression extends Node 
   implements Located, Printable
 {

@@ -1,7 +1,7 @@
 /**************************************************************************/
-/*                           B O S S A                                    */
-/*        A simple imperative object-oriented research language           */
-/*                   (c)  Daniel Bonniot 1999                             */
+/*                                N I C E                                 */
+/*             A high-level object-oriented research language             */
+/*                        (c) Daniel Bonniot 2000                         */
 /*                                                                        */
 /*  This program is free software; you can redistribute it and/or modify  */
 /*  it under the terms of the GNU General Public License as published by  */
@@ -9,10 +9,6 @@
 /*  (at your option) any later version.                                   */
 /*                                                                        */
 /**************************************************************************/
-
-// File    : IfExp.java
-// Created : Mon Dec 06 12:01:51 1999 by bonniot
-//$Modified: Mon Aug 07 15:34:45 2000 by Daniel Bonniot $
 
 package bossa.syntax;
 
@@ -23,10 +19,11 @@ import mlsub.typing.Polytype;
 import nice.tools.code.SpecialTypes;
 
 /**
- * Conditional expression (and statement).
- * 
- * @author bonniot
- */
+   Conditional expression (used in statements too).
+   
+   @version $Date$
+   @author Daniel Bonniot (d.bonniot@mail.dotcom.fr)
+*/
 
 public class IfExp extends Expression
 {

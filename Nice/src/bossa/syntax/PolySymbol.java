@@ -1,7 +1,7 @@
 /**************************************************************************/
-/*                           B O S S A                                    */
-/*        A simple imperative object-oriented research language           */
-/*                   (c)  Daniel Bonniot 1999                             */
+/*                                N I C E                                 */
+/*             A high-level object-oriented research language             */
+/*                        (c) Daniel Bonniot 2000                         */
 /*                                                                        */
 /*  This program is free software; you can redistribute it and/or modify  */
 /*  it under the terms of the GNU General Public License as published by  */
@@ -10,20 +10,20 @@
 /*                                                                        */
 /**************************************************************************/
 
-// File    : PolySymbol.java
-// Created : Fri Jul 16 17:03:51 1999 by bonniot
-//$Modified: Fri Jun 09 17:54:13 2000 by Daniel Bonniot $
-
 package bossa.syntax;
 
 import mlsub.typing.Polytype;
 
 import bossa.util.*;
 
-/** A variable symbol which has a polytype (eg a method symbol)
- *
- * @see MonoSymbol
- */
+/**
+   A variable symbol which has a polytype (eg a method symbol)
+   
+   @see MonoSymbol
+
+   @version $Date$
+   @author Daniel Bonniot (d.bonniot@mail.dotcom.fr)
+*/
 public class PolySymbol extends VarSymbol
 {
   public PolySymbol(LocatedString name, bossa.syntax.Polytype type)

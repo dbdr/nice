@@ -1,7 +1,7 @@
 /**************************************************************************/
-/*                           B O S S A                                    */
-/*        A simple imperative object-oriented research language           */
-/*                   (c)  Daniel Bonniot 1999                             */
+/*                                N I C E                                 */
+/*             A high-level object-oriented research language             */
+/*                        (c) Daniel Bonniot 2000                         */
 /*                                                                        */
 /*  This program is free software; you can redistribute it and/or modify  */
 /*  it under the terms of the GNU General Public License as published by  */
@@ -9,10 +9,6 @@
 /*  (at your option) any later version.                                   */
 /*                                                                        */
 /**************************************************************************/
-
-// File    : TypeConstructorLeqCst.java
-// Created : Sat Jul 24 12:02:15 1999 by bonniot
-//$Modified: Mon Sep 04 14:21:42 2000 by Daniel Bonniot $
 
 package bossa.syntax;
 
@@ -22,10 +18,11 @@ import mlsub.typing.TypeSymbol;
 import mlsub.typing.Interface;
 
 /**
- * Inequality between TypeConstructors.
- * 
- * @author bonniot
- */
+   Inequality between TypeConstructors.
+
+   @version $Date$
+   @author Daniel Bonniot (d.bonniot@mail.dotcom.fr)
+*/
 
 public class TypeConstructorLeqCst extends AtomicConstraint
 {

@@ -1,7 +1,7 @@
 /**************************************************************************/
-/*                           B O S S A                                    */
-/*        A simple imperative object-oriented research language           */
-/*                   (c)  Daniel Bonniot 1999                             */
+/*                                N I C E                                 */
+/*             A high-level object-oriented research language             */
+/*                        (c) Daniel Bonniot 2000                         */
 /*                                                                        */
 /*  This program is free software; you can redistribute it and/or modify  */
 /*  it under the terms of the GNU General Public License as published by  */
@@ -9,11 +9,6 @@
 /*  (at your option) any later version.                                   */
 /*                                                                        */
 /**************************************************************************/
-
-// File    : ReturnStmt.java
-// Created : Mon Jul 05 17:21:40 1999 by bonniot
-//$Modified: Mon Oct 09 18:27:18 2000 by Daniel Bonniot $
-// Description : return in a function or method
 
 package bossa.syntax;
 
@@ -23,6 +18,13 @@ import mlsub.typing.*;
 import mlsub.typing.Polytype;
 import mlsub.typing.Monotype;
 import mlsub.typing.Constraint;
+
+/**
+   <tt>return</tt> in a function or method.
+
+   @version $Date$
+   @author Daniel Bonniot (d.bonniot@mail.dotcom.fr)
+*/
 
 public class ReturnStmt extends Statement
 {

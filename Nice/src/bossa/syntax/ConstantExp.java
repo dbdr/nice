@@ -1,7 +1,7 @@
- /**************************************************************************/
-/*                           B O S S A                                    */
-/*        A simple imperative object-oriented research language           */
-/*                   (c)  Daniel Bonniot 1999                             */
+/**************************************************************************/
+/*                                N I C E                                 */
+/*             A high-level object-oriented research language             */
+/*                        (c) Daniel Bonniot 2000                         */
 /*                                                                        */
 /*  This program is free software; you can redistribute it and/or modify  */
 /*  it under the terms of the GNU General Public License as published by  */
@@ -9,10 +9,6 @@
 /*  (at your option) any later version.                                   */
 /*                                                                        */
 /**************************************************************************/
-
-// File    : ConstantExp.java
-// Created : Thu Jul 08 15:36:40 1999 by bonniot
-//$Modified: Tue Sep 05 19:18:18 2000 by Daniel Bonniot $
 
 package bossa.syntax;
 
@@ -25,7 +21,10 @@ import nice.tools.code.SpecialTypes;
 import bossa.util.*;
 
 /**
-   Abstract class for constant values of basic types.
+   Constant expressions (values) of basic types.
+
+   @version $Date$
+   @author Daniel Bonniot (d.bonniot@mail.dotcom.fr)
  */
 public class ConstantExp extends Expression
 {

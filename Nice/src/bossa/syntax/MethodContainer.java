@@ -1,7 +1,7 @@
 /**************************************************************************/
-/*                             N I C E                                    */
-/*        A simple imperative object-oriented research language           */
-/*                   (c)  Daniel Bonniot 1999                             */
+/*                                N I C E                                 */
+/*             A high-level object-oriented research language             */
+/*                        (c) Daniel Bonniot 2000                         */
 /*                                                                        */
 /*  This program is free software; you can redistribute it and/or modify  */
 /*  it under the terms of the GNU General Public License as published by  */
@@ -10,17 +10,14 @@
 /*                                                                        */
 /**************************************************************************/
 
-// File    : MethodContainer.java
-// Created : Thu Sep 21 17:13:29 2000 by Daniel Bonniot
-
 package bossa.syntax;
 
 /**
    An entity in which methods can be declared.
 
    @version $Date$
-   @author Daniel Bonniot
- */
+   @author Daniel Bonniot (d.bonniot@mail.dotcom.fr)
+*/
 
 public interface MethodContainer
 {

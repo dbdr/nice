@@ -1,7 +1,7 @@
 /**************************************************************************/
-/*                           B O S S A                                    */
-/*        A simple imperative object-oriented research language           */
-/*                   (c)  Daniel Bonniot 1999                             */
+/*                                N I C E                                 */
+/*             A high-level object-oriented research language             */
+/*                        (c) Daniel Bonniot 2000                         */
 /*                                                                        */
 /*  This program is free software; you can redistribute it and/or modify  */
 /*  it under the terms of the GNU General Public License as published by  */
@@ -9,11 +9,6 @@
 /*  (at your option) any later version.                                   */
 /*                                                                        */
 /**************************************************************************/
-
-// File    : FunExp.java
-// Created : Mon Jul 12 15:09:50 1999 by bonniot
-//$Modified: Thu Aug 31 17:39:24 2000 by Daniel Bonniot $
-// Description : A functional expression
 
 package bossa.syntax;
 
@@ -25,6 +20,12 @@ import mlsub.typing.Monotype;
 import mlsub.typing.FunType;
 import mlsub.typing.Constraint;
 
+/**
+   A functional abstraction expression.
+
+   @version $Date$
+   @author Daniel Bonniot (d.bonniot@mail.dotcom.fr)
+*/
 public class FunExp extends Expression implements Function
 {
   public FunExp(bossa.syntax.Constraint cst, List formals, Statement body)

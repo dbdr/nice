@@ -1,7 +1,7 @@
 /**************************************************************************/
-/*                           B O S S A                                    */
-/*        A simple imperative object-oriented research language           */
-/*                   (c)  Daniel Bonniot 1999                             */
+/*                                N I C E                                 */
+/*             A high-level object-oriented research language             */
+/*                        (c) Daniel Bonniot 2000                         */
 /*                                                                        */
 /*  This program is free software; you can redistribute it and/or modify  */
 /*  it under the terms of the GNU General Public License as published by  */
@@ -9,10 +9,6 @@
 /*  (at your option) any later version.                                   */
 /*                                                                        */
 /**************************************************************************/
-
-// File    : TypeIdent.java
-// Created : Sat Jul 24 14:02:08 1999 by bonniot
-//$Modified: Wed Oct 04 15:00:15 2000 by Daniel Bonniot $
 
 package bossa.syntax;
 
@@ -24,13 +20,14 @@ import mlsub.typing.MonotypeVar;
 import mlsub.typing.TypeSymbol;
 
 /**
- * A syntactic type identifier.
- * 
- * After scoping, it will either reveal to be a 
- * TypeConstructor or a MonotypeVar.
- *
- * @author bonniot
- */
+   A syntactic type identifier.
+   
+   After scoping, it will either reveal to be a 
+   TypeConstructor or a MonotypeVar.
+
+   @version $Date$
+   @author Daniel Bonniot (d.bonniot@mail.dotcom.fr)
+*/
 
 public final class TypeIdent extends Monotype implements Located
 {

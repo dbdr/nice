@@ -1,7 +1,7 @@
 /**************************************************************************/
-/*                             N I C E                                    */
-/*        A simple imperative object-oriented research language           */
-/*                   (c)  Daniel Bonniot 1999                             */
+/*                                N I C E                                 */
+/*             A high-level object-oriented research language             */
+/*                        (c) Daniel Bonniot 2000                         */
 /*                                                                        */
 /*  This program is free software; you can redistribute it and/or modify  */
 /*  it under the terms of the GNU General Public License as published by  */
@@ -9,10 +9,6 @@
 /*  (at your option) any later version.                                   */
 /*                                                                        */
 /**************************************************************************/
-
-// File    : NewArrayExp.java
-// Created : Mon Aug 28 13:37:29 2000 by Daniel Bonniot
-//$Modified: Mon Sep 04 16:55:23 2000 by Daniel Bonniot $
 
 package bossa.syntax;
 
@@ -32,8 +28,9 @@ import mlsub.typing.TypeSymbol;
 /**
    Allocate a new instance of an Array type.
    
-   @author Daniel Bonniot
- */
+   @version $Date$
+   @author Daniel Bonniot (d.bonniot@mail.dotcom.fr)
+*/
 
 public class NewArrayExp extends Expression
 {

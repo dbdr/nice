@@ -1,7 +1,7 @@
 /**************************************************************************/
-/*                           B O S S A                                    */
-/*        A simple imperative object-oriented research language           */
-/*                   (c)  Daniel Bonniot 1999                             */
+/*                                N I C E                                 */
+/*             A high-level object-oriented research language             */
+/*                        (c) Daniel Bonniot 2000                         */
 /*                                                                        */
 /*  This program is free software; you can redistribute it and/or modify  */
 /*  it under the terms of the GNU General Public License as published by  */
@@ -10,19 +10,16 @@
 /*                                                                        */
 /**************************************************************************/
 
-// File    : Alike.java
-// Created : Tue May 09 15:51:50 2000 by Daniel Bonniot
-//$Modified: Wed Jun 07 17:02:32 2000 by Daniel Bonniot $
-
 package bossa.syntax;
 
 import bossa.util.*;
 import java.util.*;
 
 /**
- * The "alike" syntactic keyword in Monotypes
- * 
- * @author Daniel Bonniot
+   The "alike" syntactic keyword in Monotypes
+
+   @version $Date$
+   @author Daniel Bonniot
  */
 
 public class Alike extends Monotype

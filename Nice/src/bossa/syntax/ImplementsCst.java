@@ -1,7 +1,7 @@
 /**************************************************************************/
-/*                           B O S S A                                    */
-/*        A simple imperative object-oriented research language           */
-/*                   (c)  Daniel Bonniot 1999                             */
+/*                                N I C E                                 */
+/*             A high-level object-oriented research language             */
+/*                        (c) Daniel Bonniot 2000                         */
 /*                                                                        */
 /*  This program is free software; you can redistribute it and/or modify  */
 /*  it under the terms of the GNU General Public License as published by  */
@@ -10,10 +10,6 @@
 /*                                                                        */
 /**************************************************************************/
 
-// File    : ImplementsCst.java
-// Created : Fri Aug 27 10:45:33 1999 by bonniot
-//$Modified: Tue Jun 06 18:14:16 2000 by Daniel Bonniot $
-
 package bossa.syntax;
 
 import bossa.util.*;
@@ -21,10 +17,11 @@ import java.util.*;
 import mlsub.typing.*;
 
 /**
- * A type constructor implements an interface.
- * 
- * @author bonniot
- */
+   A type constructor implements an interface.
+   
+   @version $Date$
+   @author Daniel Bonniot (d.bonniot@mail.dotcom.fr)
+*/
 
 public class ImplementsCst extends AtomicConstraint
 {

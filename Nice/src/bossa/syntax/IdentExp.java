@@ -1,7 +1,7 @@
 /**************************************************************************/
-/*                           B O S S A                                    */
-/*        A simple imperative object-oriented research language           */
-/*                   (c)  Daniel Bonniot 1999                             */
+/*                                N I C E                                 */
+/*             A high-level object-oriented research language             */
+/*                        (c) Daniel Bonniot 2000                         */
 /*                                                                        */
 /*  This program is free software; you can redistribute it and/or modify  */
 /*  it under the terms of the GNU General Public License as published by  */
@@ -10,10 +10,6 @@
 /*                                                                        */
 /**************************************************************************/
 
-// File    : IdentExp.java
-// Created : Mon Jul 05 16:25:58 1999 by bonniot
-//$Modified: Mon Oct 09 18:21:42 2000 by Daniel Bonniot $
-
 package bossa.syntax;
 
 import java.util.*;
@@ -21,7 +17,10 @@ import bossa.util.*;
 
 /**
    Identifier supposed to be a variable (not a type).
- */
+
+   @version $Date$
+   @author Daniel Bonniot (d.bonniot@mail.dotcom.fr)
+*/
 public class IdentExp extends Expression
 {
   public IdentExp(LocatedString i)

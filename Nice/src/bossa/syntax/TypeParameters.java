@@ -1,7 +1,7 @@
 /**************************************************************************/
-/*                           B O S S A                                    */
-/*        A simple imperative object-oriented research language           */
-/*                   (c)  Daniel Bonniot 1999                             */
+/*                                N I C E                                 */
+/*             A high-level object-oriented research language             */
+/*                        (c) Daniel Bonniot 2000                         */
 /*                                                                        */
 /*  This program is free software; you can redistribute it and/or modify  */
 /*  it under the terms of the GNU General Public License as published by  */
@@ -10,10 +10,6 @@
 /*                                                                        */
 /**************************************************************************/
 
-// File    : TypeParameters.java
-// Created : Mon Jul 12 17:51:12 1999 by bonniot
-//$Modified: Tue Jun 06 11:14:04 2000 by Daniel Bonniot $
-
 package bossa.syntax;
 
 import java.util.*;
@@ -21,9 +17,12 @@ import bossa.util.*;
 import mlsub.typing.Variance;
 
 /**
- * Type parameters.
- * Holds a colloction of Monotype.
- */
+   Type parameters.
+   Holds a colloction of Monotype.
+
+   @version $Date$
+   @author Daniel Bonniot (d.bonniot@mail.dotcom.fr)
+*/
 public class TypeParameters
 {
   /**

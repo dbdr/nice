@@ -1,7 +1,7 @@
 /**************************************************************************/
-/*                           B O S S A                                    */
-/*        A simple imperative object-oriented research language           */
-/*                   (c)  Daniel Bonniot 1999                             */
+/*                                N I C E                                 */
+/*             A high-level object-oriented research language             */
+/*                        (c) Daniel Bonniot 2000                         */
 /*                                                                        */
 /*  This program is free software; you can redistribute it and/or modify  */
 /*  it under the terms of the GNU General Public License as published by  */
@@ -9,10 +9,6 @@
 /*  (at your option) any later version.                                   */
 /*                                                                        */
 /**************************************************************************/
-
-// File    : MonotypeConstructor.java
-// Created : Thu Jul 22 09:15:17 1999 by bonniot
-//$Modified: Tue Sep 05 11:14:24 2000 by Daniel Bonniot $
 
 package bossa.syntax;
 
@@ -23,9 +19,12 @@ import mlsub.typing.TypeConstructor;
 import mlsub.typing.TypeSymbol;
 
 /**
- * A monotype, build by application of
- * a type constructor to type parameters.
- */
+   A monotype, build by application of
+   a type constructor to type parameters.
+
+   @version $Date$
+   @author Daniel Bonniot (d.bonniot@mail.dotcom.fr)
+*/
 public class MonotypeConstructor extends Monotype
 {
   /**

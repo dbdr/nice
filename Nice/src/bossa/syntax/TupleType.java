@@ -1,7 +1,7 @@
 /**************************************************************************/
-/*                             N I C E                                    */
-/*        A simple imperative object-oriented research language           */
-/*                   (c)  Daniel Bonniot 1999                             */
+/*                                N I C E                                 */
+/*             A high-level object-oriented research language             */
+/*                        (c) Daniel Bonniot 2000                         */
 /*                                                                        */
 /*  This program is free software; you can redistribute it and/or modify  */
 /*  it under the terms of the GNU General Public License as published by  */
@@ -9,10 +9,6 @@
 /*  (at your option) any later version.                                   */
 /*                                                                        */
 /**************************************************************************/
-
-// File    : TupleType.java
-// Created : Wed Aug 02 19:00:48 2000 by Daniel Bonniot
-//$Modified: Wed Aug 02 19:06:18 2000 by Daniel Bonniot $
 
 package bossa.syntax;
 
@@ -27,8 +23,9 @@ import mlsub.typing.TupleKind;
 /**
    A tuple of types.
    
-   @author Daniel Bonniot
- */
+   @version $Date$
+   @author Daniel Bonniot (d.bonniot@mail.dotcom.fr)
+*/
 
 public class TupleType extends bossa.syntax.Monotype
 {

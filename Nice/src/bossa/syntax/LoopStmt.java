@@ -1,7 +1,7 @@
 /**************************************************************************/
-/*                           B O S S A                                    */
-/*        A simple imperative object-oriented research language           */
-/*                   (c)  Daniel Bonniot 1999                             */
+/*                                N I C E                                 */
+/*             A high-level object-oriented research language             */
+/*                        (c) Daniel Bonniot 2000                         */
 /*                                                                        */
 /*  This program is free software; you can redistribute it and/or modify  */
 /*  it under the terms of the GNU General Public License as published by  */
@@ -10,10 +10,6 @@
 /*                                                                        */
 /**************************************************************************/
 
-// File    : LoopStmt.java
-// Created : Tue Dec 07 17:05:56 1999 by bonniot
-//$Modified: Tue Feb 29 20:56:44 2000 by Daniel Bonniot $
-
 package bossa.syntax;
 
 import bossa.util.*;
@@ -21,10 +17,11 @@ import bossa.util.*;
 import java.util.*;
 
 /**
- * General loop statement (used for 'for', 'while do', 'do while' ...)
- * 
- * @author bonniot
- */
+   General loop statement (used for 'for', 'while do', 'do while' ...)
+
+   @version $Date$
+   @author Daniel Bonniot (d.bonniot@mail.dotcom.fr)
+*/
 
 public class LoopStmt extends Statement
 {

@@ -1,7 +1,7 @@
 /**************************************************************************/
-/*                           B O S S A                                    */
-/*        A simple imperative object-oriented research language           */
-/*                   (c)  Daniel Bonniot 1999                             */
+/*                                N I C E                                 */
+/*             A high-level object-oriented research language             */
+/*                        (c) Daniel Bonniot 2000                         */
 /*                                                                        */
 /*  This program is free software; you can redistribute it and/or modify  */
 /*  it under the terms of the GNU General Public License as published by  */
@@ -10,10 +10,6 @@
 /*                                                                        */
 /**************************************************************************/
 
-// File    : AST.java
-// Created : Thu Jul 01 11:01:56 1999 by bonniot
-//$Modified: Fri Jun 09 15:22:09 2000 by Daniel Bonniot $
-
 package bossa.syntax;
 
 import bossa.util.*;
@@ -21,9 +17,12 @@ import bossa.util.*;
 import java.util.*;
 
 /**
- * The Abstract Syntax Tree : a collection of definitions.
- *
- * @see Definition
+   The Abstract Syntax Tree : a collection of definitions.
+
+   @see Definition
+
+   @version $Date$
+   @author Daniel Bonniot (d.bonniot@mail.dotcom.fr)
  */
 public class AST extends Node
 {

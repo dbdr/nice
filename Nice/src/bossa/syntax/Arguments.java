@@ -1,7 +1,7 @@
 /**************************************************************************/
-/*                             N I C E                                    */
-/*        A simple imperative object-oriented research language           */
-/*                   (c)  Daniel Bonniot 1999                             */
+/*                                N I C E                                 */
+/*             A high-level object-oriented research language             */
+/*                        (c) Daniel Bonniot 2000                         */
 /*                                                                        */
 /*  This program is free software; you can redistribute it and/or modify  */
 /*  it under the terms of the GNU General Public License as published by  */
@@ -9,9 +9,6 @@
 /*  (at your option) any later version.                                   */
 /*                                                                        */
 /**************************************************************************/
-
-// File    : Arguments.java
-// Created : Mon Oct 09 14:02:18 2000 by Daniel Bonniot
 
 package bossa.syntax;
 
@@ -21,7 +18,7 @@ import bossa.util.*;
    Arguments of a function call.
 
    @version $Date$
-   @author Daniel Bonniot
+   @author Daniel Bonniot (d.bonniot@mail.dotcom.fr)
  */
 
 public class Arguments extends Node

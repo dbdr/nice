@@ -1,7 +1,7 @@
 /**************************************************************************/
-/*                           B O S S A                                    */
-/*        A simple imperative object-oriented research language           */
-/*                   (c)  Daniel Bonniot 1999                             */
+/*                                N I C E                                 */
+/*             A high-level object-oriented research language             */
+/*                        (c) Daniel Bonniot 2000                         */
 /*                                                                        */
 /*  This program is free software; you can redistribute it and/or modify  */
 /*  it under the terms of the GNU General Public License as published by  */
@@ -10,19 +10,16 @@
 /*                                                                        */
 /**************************************************************************/
 
-// File    : StatementExp.java
-// Created : Tue Jan 25 17:00:28 2000 by Daniel Bonniot
-//$Modified: Tue Jun 06 13:59:18 2000 by Daniel Bonniot $
-
 package bossa.syntax;
 
 import bossa.util.*;
 
 /**
- * A statement made by the evaluation of an expression.
- * 
- * @author Daniel Bonniot
- */
+   A statement made by the evaluation of an expression.
+   
+   @version $Date$
+   @author Daniel Bonniot (d.bonniot@mail.dotcom.fr)
+*/
 
 public class StatementExp extends Expression
 {

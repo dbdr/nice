@@ -1,7 +1,7 @@
 /**************************************************************************/
-/*                           B O S S A                                    */
-/*        A simple imperative object-oriented research language           */
-/*                   (c)  Daniel Bonniot 1999                             */
+/*                                N I C E                                 */
+/*             A high-level object-oriented research language             */
+/*                        (c) Daniel Bonniot 2000                         */
 /*                                                                        */
 /*  This program is free software; you can redistribute it and/or modify  */
 /*  it under the terms of the GNU General Public License as published by  */
@@ -9,10 +9,6 @@
 /*  (at your option) any later version.                                   */
 /*                                                                        */
 /**************************************************************************/
-
-// File    : Constraint.java
-// Created : Fri Jul 02 17:51:35 1999 by bonniot
-//$Modified: Tue Jun 13 18:55:58 2000 by Daniel Bonniot $
 
 package bossa.syntax;
 
@@ -22,9 +18,12 @@ import mlsub.typing.TypeSymbol;
 import mlsub.typing.TypeConstructor;
 
 /**
- * A list of binders + atomic constraints.
- *
- * @see AtomicConstraint
+   A list of binders + atomic constraints.
+   
+   @see AtomicConstraint
+
+   @version $Date$
+   @author Daniel Bonniot (d.bonniot@mail.dotcom.fr)
  */
 public class Constraint extends Node
 {

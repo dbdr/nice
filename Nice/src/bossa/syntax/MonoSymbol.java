@@ -1,7 +1,7 @@
 /**************************************************************************/
-/*                           B O S S A                                    */
-/*        A simple imperative object-oriented research language           */
-/*                   (c)  Daniel Bonniot 1999                             */
+/*                                N I C E                                 */
+/*             A high-level object-oriented research language             */
+/*                        (c) Daniel Bonniot 2000                         */
 /*                                                                        */
 /*  This program is free software; you can redistribute it and/or modify  */
 /*  it under the terms of the GNU General Public License as published by  */
@@ -10,20 +10,19 @@
 /*                                                                        */
 /**************************************************************************/
 
-// File    : MonoSymbol.java
-// Created : Fri Jul 16 17:10:53 1999 by bonniot
-//$Modified: Fri Jun 09 15:06:11 2000 by Daniel Bonniot $
-
 package bossa.syntax;
 
 import java.util.*;
 import bossa.util.*;
 import mlsub.typing.Polytype;
 
-/** A variable symbol which has a monotype (eg a function parameter)
- *
- * @see PolySymbol
- */
+/**
+   A variable symbol which has a monotype (eg a function parameter)
+ 
+   @see PolySymbol
+   @version $Date$
+   @author Daniel Bonniot (d.bonniot@mail.dotcom.fr)
+*/
 public class MonoSymbol extends VarSymbol
 {
   public MonoSymbol(LocatedString name, Monotype type)

@@ -1,7 +1,7 @@
 /**************************************************************************/
-/*                           B O S S A                                    */
-/*        A simple imperative object-oriented research language           */
-/*                   (c)  Daniel Bonniot 1999                             */
+/*                                N I C E                                 */
+/*             A high-level object-oriented research language             */
+/*                        (c) Daniel Bonniot 2000                         */
 /*                                                                        */
 /*  This program is free software; you can redistribute it and/or modify  */
 /*  it under the terms of the GNU General Public License as published by  */
@@ -9,9 +9,6 @@
 /*  (at your option) any later version.                                   */
 /*                                                                        */
 /**************************************************************************/
-
-// File    : OverloadedSymbolExp.java
-// Created : Thu Jul 08 12:20:59 1999 by bonniot
 
 package bossa.syntax;
 
@@ -27,9 +24,9 @@ import mlsub.typing.Polytype;
 /**
    A symbol, for which overloading resolution has yet to be done.
 
-   @version $Date :$
-   @author Daniel Bonniot
- */
+   @version $Date$
+   @author Daniel Bonniot (d.bonniot@mail.dotcom.fr)
+*/
 public class OverloadedSymbolExp extends Expression
 {
   /**

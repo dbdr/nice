@@ -1,7 +1,7 @@
 /**************************************************************************/
-/*                           B O S S A                                    */
-/*        A simple imperative object-oriented research language           */
-/*                   (c)  Daniel Bonniot 1999                             */
+/*                                N I C E                                 */
+/*             A high-level object-oriented research language             */
+/*                        (c) Daniel Bonniot 2000                         */
 /*                                                                        */
 /*  This program is free software; you can redistribute it and/or modify  */
 /*  it under the terms of the GNU General Public License as published by  */
@@ -10,10 +10,6 @@
 /*                                                                        */
 /**************************************************************************/
 
-// File    : MonotypeLeqCst.java
-// Created : Fri Jul 23 19:26:17 1999 by bonniot
-//$Modified: Tue Jun 13 18:11:37 2000 by Daniel Bonniot $
-
 package bossa.syntax;
 
 import java.util.*;
@@ -21,10 +17,11 @@ import java.util.*;
 import bossa.util.*;
 
 /**
- * Inequality between monotypes
- * 
- * @author bonniot
- */
+   Syntactic inequality between monotypes.
+
+   @version $Date$
+   @author Daniel Bonniot (d.bonniot@mail.dotcom.fr)
+*/
 
 public class MonotypeLeqCst extends AtomicConstraint
 {

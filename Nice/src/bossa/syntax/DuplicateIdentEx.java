@@ -1,7 +1,7 @@
 /**************************************************************************/
-/*                           B O S S A                                    */
-/*        A simple imperative object-oriented research language           */
-/*                   (c)  Daniel Bonniot 1999                             */
+/*                                N I C E                                 */
+/*             A high-level object-oriented research language             */
+/*                        (c) Daniel Bonniot 2000                         */
 /*                                                                        */
 /*  This program is free software; you can redistribute it and/or modify  */
 /*  it under the terms of the GNU General Public License as published by  */
@@ -10,16 +10,17 @@
 /*                                                                        */
 /**************************************************************************/
 
-// File    : DuplicateIdentEx.java
-// Created : Wed Jul 21 13:12:08 1999 by bonniot
-//$Modified: Fri Jul 23 11:57:31 1999 by bonniot $
-// Description : thrown when the same ident is defined twice 
-//   in the same scope level
-
 package bossa.syntax;
 
 import bossa.util.*;
 
+/**
+   Thrown when the same ident is defined twice 
+   in the same scope level.
+
+   @version $Date$
+   @author Daniel Bonniot (d.bonniot@mail.dotcom.fr)
+*/
 public class DuplicateIdentEx extends Exception
 {
   public DuplicateIdentEx(LocatedString name)

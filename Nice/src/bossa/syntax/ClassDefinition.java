@@ -59,6 +59,11 @@ public abstract class ClassDefinition extends MethodContainer
 
     int getBytecodeFlags() { return Access.INTERFACE; }
 
+    boolean implementsJavaInterface(String name)
+    {
+      return false;
+    }
+
     public mlsub.typing.TypeSymbol getTypeSymbol()
     {
       return associatedInterface;
@@ -217,6 +222,15 @@ public abstract class ClassDefinition extends MethodContainer
       else if (isAbstract)
 	return Access.ABSTRACT;
       else return 0;
+    }
+
+    boolean implementsJavaInterface(String name)
+    {
+      if (javaInterfaces != null)
+        for (int i = 0; i < javaInterfaces.length; i++)
+          if (javaInterfaces[i].toString().equals(name))
+            return true;
+      return false;
     }
 
     public mlsub.typing.TypeSymbol getTypeSymbol()
@@ -448,6 +462,8 @@ public abstract class ClassDefinition extends MethodContainer
   public abstract boolean isConcrete();
 
   abstract int getBytecodeFlags();
+
+  abstract boolean implementsJavaInterface(String name);
 
   /****************************************************************
    * Resolution

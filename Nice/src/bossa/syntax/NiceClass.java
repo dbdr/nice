@@ -332,6 +332,7 @@ public class NiceClass extends ClassDefinition.ClassImplementation
     resolveFields();
     resolveIntitializers();
     createConstructor();
+    addPublicCloneMethod();
   }
 
   private void resolveFields()
@@ -515,6 +516,21 @@ public class NiceClass extends ClassDefinition.ClassImplementation
        methods in the future).
     */
     classe = createClassExp();
+  }
+
+  static gnu.bytecode.Method cloneMethod = 
+    gnu.bytecode.Type.pointer_type.getDeclaredMethod("clone", 0);
+
+  private void addPublicCloneMethod()
+  {
+    if (! definition.implementsJavaInterface("java.lang.Cloneable"))
+      return;
+
+    gnu.expr.Expression[] params = new gnu.expr.Expression[1];
+    gnu.expr.LambdaExp lambda = createJavaMethod("clone", cloneMethod, params);
+    Gen.setMethodBody(lambda, 
+		      new gnu.expr.ApplyExp(new gnu.expr.QuoteExp(gnu.expr.PrimProcedure.specialCall(cloneMethod)), params));
+    addJavaMethod(lambda);    
   }
 
   private gnu.expr.ClassExp createClassExp()

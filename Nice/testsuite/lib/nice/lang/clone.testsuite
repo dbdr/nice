@@ -13,3 +13,18 @@ final class A implements Cloneable
 
   clone() = new A(x: this.x);
 }
+
+/// PASS
+  A a = new A().clone();
+  /// Toplevel
+class A implements Cloneable {}
+
+/// PASS
+  try {
+    A.class.getDeclaredMethod("clone", []);
+    assert false;
+  }
+  catch (NoSuchMethodException ex) {}
+
+  /// Toplevel
+class A {}

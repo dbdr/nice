@@ -24,7 +24,7 @@ public class FailTestCase extends TestCase {
 		Performs the test for this testcase.
 		Compilation should fail, otherwise throw exception.
 	*/
-	public void performTest() throws TestSuiteException {
+	public void performTest() {
 		super.performTest();
 		try {
 			compilePackages();
@@ -36,8 +36,8 @@ public class FailTestCase extends TestCase {
 			return;
 		}
 		
+		TestNice.getOutput().log("Compilation was expected to fail, but it succeeded.");
 		fail();
-		throw new TestSuiteException("Compilation was expected to fail, but it succeeded.");
 	}
 
 }

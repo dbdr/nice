@@ -76,7 +76,13 @@ public class TestNice {
 	 * The temporary folder where nice sources and the compiled bytecod is placed.
 	 * 
 	 */
-	private static File _tempFolder = new File("temp-nice-testsuite");
+	private static File _tempFolder = new File("testsuite-temp-folder");
+	
+	/**
+	 * The temporary folder where failed testcases are placed.
+	 * 
+	 */
+	private static File _failFolder = new File("testsuite-fail-folder");
 	
 	/**
 	 * TODO
@@ -128,6 +134,7 @@ public class TestNice {
 		
 		_output.startApplication();
 		cleanupTempFolder();
+		cleanupFailFolder();
 		
 		try {
 			//	iterate through testsuites
@@ -205,6 +212,32 @@ public class TestNice {
 
 
 	/**
+	 * Deletes the fail folder with all its contents and
+	 * creates a new empty one.
+	 * 
+	 */
+	static private void cleanupFailFolder() {
+		if (_failFolder.exists())
+			deleteFolder(_failFolder);
+			
+		_failFolder.mkdir();
+	}
+
+
+
+	/**
+	 * Moves all files and folders of the temp folder to a
+	 * newly created folder inside the fail folder
+	 */
+	static void moveFilesToFailFolder() {
+		File folder = new File(_failFolder, "" + _testCasesFailed);
+		_tempFolder.renameTo(folder);
+		
+		_tempFolder.mkdir();
+	}
+
+
+	/**
 	 * TODO
 	 * 
 	 */
@@ -272,13 +305,23 @@ public class TestNice {
 				getTestSuiteFiles(file, testSuiteFiles);
 		}
 	}
-	
+
+
 	/**
 	 * Returns the temporary folder.
 	 * 
 	 */
 	static public File getTempFolder() {
 		return _tempFolder;
+	}
+	
+
+	/**
+	 * Returns the temporary folder.
+	 * 
+	 */
+	static public File getFailFolder() {
+		return _failFolder;
 	}
 	
 

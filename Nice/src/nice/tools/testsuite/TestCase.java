@@ -128,7 +128,7 @@ public class TestCase {
 	/**
 		Performs the test for this testcase
 	*/
-	public void performTest() throws TestSuiteException {
+	public void performTest() {
 		TestNice.getOutput().startTestCase(this);
 	}
 	
@@ -301,6 +301,9 @@ public class TestCase {
 		//	compiler messages
 		TestNice.getOutput().log("nicec", _compilerMessagesStream.toString());
 		TestNice.getOutput().endTestCase(false);
+		
+		//	move contents of temp folder to a new folder in the fail folder
+		TestNice.moveFilesToFailFolder();
 	}
 	
 	

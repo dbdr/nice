@@ -109,11 +109,10 @@ public class TestSuite {
 
 	/**
 		Creates and returns a specific TestCase object depending upon
-		the keyword
+		the keyword.
 	*/
 	private TestCase createTestCase(String line) throws TestSuiteException {
 		String type = line.substring(TestNice.KEYWORD_SIGN.length()).trim();
-		//System.out.println("testcase type: " + type);
 		
 		if (TESTCASE_TYPE_PASS.equalsIgnoreCase(type))
 			return new PassTestCase(this);

@@ -27,7 +27,7 @@ public class PassTestCase extends TestCase {
 	 * 
 	 * @exception	TestSuiteException	TODO
 	 */
-	public void performTest() throws TestSuiteException {
+	public void performTest() {
 		super.performTest();
 		try {
 			compilePackages();

@@ -239,7 +239,8 @@ public class NiceMethod extends UserOperator
           {
             User.error
               (returnTypeLocation != null ? returnTypeLocation : location(), 
-"The return type is less precise than the original return type defined in:\n" +
+"The return type is less precise than the original return type of method\n" +
+d + "\ndefined in:\n" +
                d.location());
           }
 

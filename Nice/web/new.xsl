@@ -208,7 +208,7 @@
      <a href="http://sourceforge.net/projects/nice">
      <img 
       src="http://sourceforge.net/sflogo.php&quest;group_id=12788&amp;type=1" 
-      width="88" height="31" border="0" alt="SourceForge Logo"/>
+      width="88" height="31" border="0" alt="SourceForge"/>
      </a>
      </div>
 

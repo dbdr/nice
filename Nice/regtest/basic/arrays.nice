@@ -175,3 +175,7 @@ void test_polymorphism()
 
   println("Polymorphic arrays: " + bb + ss + ii + ll + ff + dd + SS + iii);
 }
+
+// Using array -> Collection implicit conversion in the returned value
+<Any T> Collection<T> wrap(T x) = [ x ];
+

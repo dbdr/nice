@@ -131,12 +131,11 @@ public class Gen
 
   public static Expression returnVoid()
   {
-    return nice.tools.code.Inline.inline(nice.lang.inline.Return.returnVoid);
+    return Inline.inline(nice.lang.inline.Return.instance);
   }
 
-  public static Expression returnValue(Expression value, Type type)
+  public static Expression returnValue(Expression value)
   {
-    return nice.tools.code.Inline.inline(nice.lang.inline.Return.create(type),
-					 value);
+    return Inline.inline(nice.lang.inline.Return.instance, value);
   }
 }

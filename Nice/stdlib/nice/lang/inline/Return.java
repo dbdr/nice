@@ -27,40 +27,23 @@ import gnu.expr.*;
 
 public class Return extends Procedure1 implements Inlineable
 {
-  public static Return create (Type valueType)
+  public static Return create (String param)
   {
-    if (valueType instanceof ObjectType)
-      return returnObject;
-    else
-      return new Return(valueType);
+    return instance;
   }
   
-  public  static Return returnVoid   = new Return(null);
-  private static Return returnObject = new Return(Type.pointer_type);
-
-  private Return (Type valueType)
-  {
-    this.type = valueType;
-  }
-  
-  private Type type;
+  public static final Return instance = new Return();
 
   public void compile (ApplyExp exp, Compilation comp, Target target)
   {
     gnu.bytecode.CodeAttr code = comp.getCode();
-    System.out.println("RETURN... " + code.getMethod().getReturnType().getSize() + " t=" + type);
+    Type type = code.getMethod().getReturnType();
     Expression[] args = exp.getArgs();
-    if (args != null && args.length != 0)
-      {
-	if (false && type.isVoid())
-	  {
-	    System.out.println("ARG = ");
-	    args[0].print(OutPort.outDefault());
-	    OutPort.outDefault().flush();
-	  }
-      args[0].compile(comp, new StackTarget(type));
-      }
 
+    if (args != null && args.length != 0)
+      args[0].compile(comp, new StackTarget(type));
+
+    // Probably a hack that should go away sometime
     if (type == Type.void_type 
 	&& code.getMethod().getReturnType().getSize() != 0)
       QuoteExp.voidExp.compile(comp, Target.pushObject);

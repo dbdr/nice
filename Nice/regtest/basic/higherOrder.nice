@@ -23,3 +23,8 @@ void test_higher_order()
 }
 
 String nativeToString(String) = native String Object.toString();
+
+int intIdentity(int x) = id(x);
+
+// Using int -> long implicit conversion in the returned value
+long intWidening(int x) = x;

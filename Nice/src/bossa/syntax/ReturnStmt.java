@@ -50,9 +50,7 @@ public class ReturnStmt extends Statement
     if (value == null)
       return nice.tools.code.Gen.returnVoid();
     else
-      return nice.tools.code.Gen.returnValue
-	(value.generateCode(), 
-	 nice.tools.code.Types.javaType(value.getType()));
+      return nice.tools.code.Gen.returnValue(value.generateCode());
   }
   
   /****************************************************************

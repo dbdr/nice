@@ -83,7 +83,7 @@ public final class Compilation
     if(voidReturn)
       matchCase = new BeginExp(matchCase, Gen.returnVoid());
     else
-      matchCase = Gen.returnValue(matchCase, returnType);
+      matchCase = Gen.returnValue(matchCase);
     
     boolean optimize = false;
 

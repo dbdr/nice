@@ -45,7 +45,7 @@ public class NiceFieldAccess extends FieldAccess
   private static FormalParameters makeList(mlsub.typing.Monotype t)
   {
     List res = new LinkedList();
-    res.add(new FormalParameters.ThisParameter(Monotype.create(t)));
+    res.add(new FormalParameters.Parameter(Monotype.create(t)));
     return new FormalParameters(res);
   }
   

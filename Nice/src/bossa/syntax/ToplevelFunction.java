@@ -83,7 +83,17 @@ implements Function
   void resolveBody()
   {
     if (body != null)
-      body = dispatch.analyse(body, thisScope, thisTypeScope, !voidReturn);
+      {
+        if (parameters.hasThis())
+          Node.thisExp = new SymbolExp(getSymbols()[0], location());
+
+        try {
+          body = dispatch.analyse(body, thisScope, thisTypeScope, !voidReturn);
+        }
+        finally {
+          Node.thisExp = null;
+        }
+      }
   }
 
   /****************************************************************

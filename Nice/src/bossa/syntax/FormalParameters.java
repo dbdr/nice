@@ -221,16 +221,6 @@ public class FormalParameters extends Node
     }
   }
 
-  static class ThisParameter extends Parameter
-  {
-    ThisParameter(Monotype type)
-    {
-      super(type);
-    }
-
-    Expression value() { return Node.thisExp; }
-  }
-
   /****************************************************************
    * Main class
    ****************************************************************/

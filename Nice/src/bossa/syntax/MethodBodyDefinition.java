@@ -368,8 +368,16 @@ public class MethodBodyDefinition extends Definition
 
   void resolveBody()
   {
-    body = bossa.syntax.dispatch.analyse
-      (body, scope, typeScope, !Types.isVoid(declaration.getReturnType()));
+    if (insideClass)
+      Node.thisExp = new SymbolExp(parameters[0], location());
+
+    try {
+      body = bossa.syntax.dispatch.analyse
+        (body, scope, typeScope, !Types.isVoid(declaration.getReturnType()));
+    } 
+    finally {
+      Node.thisExp = null;
+    }
   }
   
   /****************************************************************

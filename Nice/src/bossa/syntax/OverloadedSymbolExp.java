@@ -261,14 +261,19 @@ public class OverloadedSymbolExp extends Expression
     (List fieldAccesses, String errorMessage)
   {
     if (fieldAccesses.size() != 0)
-      try {
-        CallExp res = new CallExp
-          (new OverloadedSymbolExp(fieldAccesses, ident),
-           Arguments.noArguments());
-        res.resolveOverloading();
-        return res;
-      }
-      catch (UserError e) {
+      {
+        if (Node.thisExp != null)
+          try {
+            CallExp res = new CallExp
+              (new OverloadedSymbolExp(fieldAccesses, ident),
+               //Arguments.noArguments());
+               new Arguments(new Arguments.Argument[]{new Arguments.Argument(Node.thisExp)}));
+
+            res.resolveOverloading();
+            return res;
+          }
+          catch (UserError e) {}
+
         symbols.removeAll(filterFieldAccesses());
 
         if (symbols.size() == 0)

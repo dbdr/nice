@@ -392,6 +392,20 @@ abstract public class Node
     return res;
   }
 
+  /*
+    Creates references to expressions.
+  */
+  Expression[] expTabChildren(List values)
+  {
+    Expression[] res = new Expression[values.size()];
+
+    int n = 0;
+    for (Iterator i = values.iterator();i.hasNext();)
+      res[n++] = expChild((Expression) i.next());
+
+    return res;
+  }
+
   protected VarScope scope;
   protected TypeScope typeScope;
 

@@ -20,9 +20,9 @@ import mlsub.typing.lowlevel.Engine;
 import java.util.ArrayList;
 
 /**
- * A constrained monotype.
- * 
- * @author Daniel Bonniot
+   A constrained monotype.
+   
+   @author Daniel Bonniot
  */
 
 public final class Polytype
@@ -132,11 +132,28 @@ public final class Polytype
 
   public static Polytype union(Polytype t1, Polytype t2)
   {
+    if (t1 == t2)
+      return t1;
+
     MonotypeVar t = new MonotypeVar();
     
     Constraint c = Constraint.and(t, t1.constraint,t2.constraint,
 				  new MonotypeLeqCst(t1.monotype,t),
 				  new MonotypeLeqCst(t2.monotype,t));
+    
+    Polytype res = new Polytype(c,t);
+    return res;
+  }
+  
+  public static Polytype union(Polytype[] types)
+  {
+    if (types.length == 0) return null;
+
+    MonotypeVar t = new MonotypeVar();
+    
+    Constraint c = new Constraint(new TypeSymbol[]{t}, null);
+    for (int i = 0; i < types.length; i++)
+      c = Constraint.and(c, types[i].constraint, new MonotypeLeqCst(types[i].monotype, t));
     
     Polytype res = new Polytype(c,t);
     return res;

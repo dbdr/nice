@@ -77,7 +77,7 @@ public final class Constraint
   {
     return atoms;
   }
-  
+
   /****************************************************************
    * Manipulation
    ****************************************************************/
@@ -144,6 +144,34 @@ public final class Constraint
     for(int i=0; i<natoms2; i++)
       res.atoms[natoms1+i] = c2.atoms[i];
     res.atoms[res.natoms-2] = a2;
+    res.atoms[res.natoms-1] = a1;
+
+    return res;
+  }
+  
+  static Constraint and(Constraint c1, Constraint c2, AtomicConstraint a1)
+  {
+    Constraint res = new Constraint();
+
+    final int
+      nbinders1 = (c1 == null ? 0 : c1.nbinders),
+      nbinders2 = (c2 == null ? 0 : c2.nbinders),
+      natoms1   = (c1 == null ? 0 : c1.natoms),
+      natoms2   = (c2 == null ? 0 : c2.natoms);
+    
+    res.nbinders = nbinders1 + nbinders2;
+    res.binders = new TypeSymbol[res.nbinders];
+    for(int i=0; i<nbinders1; i++)
+      res.binders[i] = c1.binders[i];
+    for(int i=0; i<nbinders2; i++)
+      res.binders[nbinders1 + i] = c2.binders[i];
+    
+    res.natoms = natoms1 + natoms2 + 1;
+    res.atoms = new AtomicConstraint[res.natoms];
+    for(int i=0; i<natoms1; i++)
+      res.atoms[i] = c1.atoms[i];
+    for(int i=0; i<natoms2; i++)
+      res.atoms[natoms1+i] = c2.atoms[i];
     res.atoms[res.natoms-1] = a1;
 
     return res;

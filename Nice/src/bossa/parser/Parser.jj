@@ -1066,6 +1066,36 @@ ClassDefinition classDefinition(Constraint cst, List definitions, boolean storeD
   { return res; } 
 }
 
+CustomConstructor customConstructor():
+{
+  LocatedString name;
+  Block block;
+  FormalParameters params;
+  List statements = new LinkedList();
+  Expression exp;
+  Statement stmt;
+}
+{ 
+  "new" name=ident() "(" params=formalParameters(false, statements) ")"
+  ( 
+    "=" exp=Expression() ";" { statements.add(new ExpressionStmt(exp)); }
+  | 
+    "{"
+    ( stmt=BlockStatement(statements) { statements.add(stmt); } )+
+    "}"
+  |
+    ";"
+  )
+  {
+    if (statements.isEmpty()) 
+      block = null;
+    else 
+      block = new Block(statements);
+
+    return new CustomConstructor(name, params, block);
+  }
+}
+
 AbstractInterface interfaceDefinition(Constraint prefix):
 {
   LocatedString name;
@@ -1482,7 +1512,8 @@ Definition definition(List definitions, boolean storeDocString):
     res=methodBodyDefinition(null)
   |
     [ "public" | "private" ]
-    ( res=globalVariable()
+    ( res=customConstructor()
+    | res=globalVariable()
     | res=enumDefinition(definitions)
     | { Constraint cst; } cst = constraint()
       ( 

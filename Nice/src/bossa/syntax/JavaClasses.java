@@ -108,8 +108,14 @@ public final class JavaClasses
     if(Debug.javaTypes)
       Debug.println("Registering java class "+className);
     
+    // as the tc is not introduced, it should not be set instantiable
+    // (thus used at link test with an error)
+    // these late TCs should be avoided
+    boolean instantiable = 
+      !bossa.modules.Package.contextFrozen() && instantiable(javaType);
+      
     TypeConstructor res = new TypeConstructor(className, null, 
-					      instantiable(javaType), true);
+					      instantiable, true);
     hash.put(className, res);
 
     nice.tools.code.Types.set(res, javaType);
@@ -120,6 +126,9 @@ public final class JavaClasses
       // to assert it. It doesn't matter, as this type is not used
       // explicitely.
       {
+	//System.out.println(className + " added late");
+	//Internal.printStackTrace();
+	
 	res.setKind(Variance.empty().getConstraint());
 	return res;
       }

@@ -7,6 +7,8 @@ nice (0.7.5) unstable; urgency=low
     It is equivalent to e1 != null ? e1 : e2, except e1 is not evaluated twice.
     This operator is handy to sequence expression to produce a value:
       find(n@Node, elem) = find(n.left, elem) || find(n.right, elem);
+  * New numeric narrowing functions: int(x), short(x) and byte(x),
+    equivalent to Java's (int), (short) and (byte).
   * Short anonymous functions made of one assignment now return void. Allows:
       [1,2,3].foreach(int j => i += j);
     instead of 
@@ -27,7 +29,7 @@ nice (0.7.5) unstable; urgency=low
     This accounts for the fact that s[0] == null, thus ensuring type safety.
   * Forbade @null patterns for method arguments that cannot be null.
   * Bugfixes (compilation of tuples with primitive types using subtyping,
-    clotures).
+    clotures, returning a value inside try/finally or synchronized).
   * Fixed the nicec script on Max OS X, when gcj is not present.
 
  --

@@ -71,3 +71,10 @@ void foo(Object o) {
 /// PASS
   ?Object[] o1 = new Object[1];
   Object[] o0 = new Object[0];
+
+/// FAIL
+  String s = foo("");
+  /// Toplevel
+  let Object o = 2;
+  <T> T foo(T x) = x;
+  foo(#String s) = /*/// FAIL HERE*/ o;

@@ -41,6 +41,7 @@ public abstract class Engine
   {
     if(dbg) Debug.println("Enter");
     floating.mark();
+    soft.mark();
     frozenLeqs.mark();
     for(Iterator i = constraints.iterator();
 	i.hasNext();)
@@ -132,6 +133,7 @@ public abstract class Engine
 	k.backtrack();
       }
     floating.backtrack();
+    soft.backtrack();
     for(Iterator i = floating.iterator();i.hasNext();)
       ((Element)i.next()).setKind(null);
     floating.endOfIteration();
@@ -279,12 +281,13 @@ public abstract class Engine
       e.getKind().register(e);
     else
       {
-	e.setId(FLOATING); // for debugging purposes
+	e.setId(FLOATING);
 	floating.add(e);
       }
   }
   
   private static final int FLOATING = -3;
+  private static final int RIGID = -4;
 
   public static boolean isRigid(Element e)
   {
@@ -431,6 +434,8 @@ public abstract class Engine
 	e.setKind(k);
 
 	floating.remove(e);
+        if (e.getId() == FLOATING)
+          soft.add(e);
 
 	// Propagates the kind to all comparable elements
 	try{
@@ -528,6 +533,18 @@ public abstract class Engine
     throws Unsatisfiable
   {
     try{
+      for (Iterator i = soft.iterator(); i.hasNext();)
+	{
+	  Element e = (Element) i.next();
+          e.setId(RIGID);
+        }
+    }
+    finally{
+      soft.endOfIteration();
+    }
+    soft.clear();
+
+    try {
       for(Iterator i = floating.iterator();
 	  i.hasNext();)
 	{
@@ -535,7 +552,7 @@ public abstract class Engine
 	  
 	  // useful for nullness head on monotype vars
 	  if (e.getKind() != null)
-	    continue;
+            continue;
 
 	  if(dbg) Debug.println("Registering variable "+e);
 
@@ -598,6 +615,9 @@ public abstract class Engine
   
   /** The elements that have not yet been added to a Kind  */
   private static final BackableList floating = new BackableList();
+  
+  /** The elements that have not yet been rigidified. */
+  private static final BackableList soft = new BackableList();
   
   /** The constraint of monotype variables */
   public static Engine.Constraint variablesConstraint;

@@ -395,9 +395,10 @@ public abstract class TestCase {
 	 * This is the place for output messages.
 	 */
 	public void fail() {
-		if (isKnownBug)
+		if (isKnownBug) {
 			TestNice.increaseKnownBug();
-		else {
+			TestNice.getOutput().endTestCase(true);
+		} else {
 			TestNice.increaseFailed();
 			
 			//	log the sources

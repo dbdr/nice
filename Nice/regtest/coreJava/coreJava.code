@@ -120,11 +120,11 @@
 
   //   ARRAYS
   
-  String[] t;
-  t = new String[2];
-  t[0] = "Hello, ";
-  t[1] = "world!";
+  int[] t;
+  t = new int[2];
+  t[0] = 1;
+  t[1] = 2;
   for (int i = 0; i<t.length; i++)
-    p(t[i]);
+    p("" + t[i]);
   
 }

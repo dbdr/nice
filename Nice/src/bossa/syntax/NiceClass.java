@@ -168,10 +168,10 @@ public class NiceClass extends ClassDefinition.ClassImplementation
   {
     classe.supers = computeSupers();
     localScope = definition.getLocalScope();
+    definition.setJavaType(classe.getType());
     resolveFields();
     resolveIntitializers();
     createConstructor();
-    definition.setJavaType(classe.getType());
   }
 
   private void resolveFields()

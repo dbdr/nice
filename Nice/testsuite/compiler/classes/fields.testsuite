@@ -93,3 +93,10 @@
   {
     String s;
   }
+
+/// PASS
+  /// Toplevel
+  class Foo {}
+  class Bar {
+    final Class[] classes = [Foo.class, Bar.class];
+  }

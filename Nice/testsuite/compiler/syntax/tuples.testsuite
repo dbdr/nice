@@ -24,3 +24,6 @@
   var String x, y;
   (x,y) = ("1","2");
   assert x.equals("1") && y.equals("2");
+
+/// FAIL
+  /*/// FAIL HERE */(String s, int i) = (5, "abc");

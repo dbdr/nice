@@ -48,14 +48,14 @@ public class InlinedMethod extends MethodDeclaration
   void typecheck()
   {
     super.typecheck();
-    findProcedure();
+    getProcedure();
   }
 
-  private void findProcedure()
+  private gnu.mapping.Procedure getProcedure()
   {
     if (this.procedure != null)
       // Already done.
-      return;
+      return this.procedure;
 
     Class refClass = null;
     try{
@@ -106,6 +106,7 @@ public class InlinedMethod extends MethodDeclaration
 		   " cannot be inlined, but will be called anyway");
 
     this.procedure = (gnu.mapping.Procedure) o;
+    return this.procedure;
   }
 
   private Class findClass(String name) throws ClassNotFoundException
@@ -164,14 +165,12 @@ public class InlinedMethod extends MethodDeclaration
 
   protected gnu.expr.Expression computeCode()
   {
-    findProcedure();
-    return new gnu.expr.QuoteExp(procedure);
+    return new gnu.expr.QuoteExp(getProcedure());
   }
 
   gnu.expr.Expression getCode() 
   {
-    findProcedure();
-    return nice.tools.code.Gen.wrapInLambda(procedure);
+    return nice.tools.code.Gen.wrapInLambda(getProcedure());
   }
 
   private static Class[] string1 = new Class[]{ "".getClass() };
@@ -181,8 +180,7 @@ public class InlinedMethod extends MethodDeclaration
 
   void checkSpecialRequirements(Expression[] arguments)
   {
-    getCode();
-    if (procedure instanceof bossa.syntax.Macro)
+    if (getProcedure() instanceof bossa.syntax.Macro)
       ((Macro) procedure).checkSpecialRequirements(arguments);
   }
 

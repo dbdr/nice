@@ -3,13 +3,13 @@ TOP=${PWD}
 NICEJAR=/usr/local/lib/nice/Nice.jar
 
 # Compile with stable version
-JC=javac -classpath ${TOP}/classes:${NICEJAR} -sourcepath ${TOP}/src -d ${TOP}/classes -O -g
-JAVAC=  javac -classpath ${TOP}/classes:${TOP}/src:${TOP}/stdlib -sourcepath ${TOP}/src -d ${TOP}/classes -O -g
-JAVACC= CLASSPATH=${TOP}/external/JavaCC.zip:${CLASSPATH} java COM.sun.labs.javacc.Main
+JC=javac -classpath "${TOP}/classes:${NICEJAR}" -sourcepath "${TOP}/src" -d "${TOP}/classes" -O -g
+JAVAC=  javac -classpath "${TOP}/classes:${TOP}/src:${TOP}/stdlib" -sourcepath "${TOP}/src" -d "${TOP}/classes" -O -g
+JAVACC= CLASSPATH="${TOP}/external/JavaCC.zip:${CLASSPATH}" java COM.sun.labs.javacc.Main
 JAVADOC=javadoc #-linkoffline file:///C%7C/Apps/jdk1.2.1/docs/api file:///usr/opt/java122/docs/api
 
-NICEC= nicec --classpath="${TOP}/classes:${TOP}/src:${NICEJAR}"
-NICEC_DEV= CLASSPATH=${TOP}/src/nice/tools/compiler.jar:${TOP}/src:${TOP}/classes java -Dnice.systemJar=${TOP}/stdlib nice.tools.compiler.package --classpath="${TOP}/stdlib:${TOP}/classes:${TOP}/src" --sourcepath="${TOP}/stdlib:."
+NICEC= nicec --classpath="${TOP}/classes:${NICEJAR}" -d "${TOP}/classes"
+NICEC_DEV= CLASSPATH="${TOP}/src/nice/tools/compiler.jar:${TOP}/classes" java -Dnice.systemJar="${TOP}/stdlib" nice.tools.compiler.package -d "${TOP}/bootstrap.classes" --classpath="${TOP}/stdlib:${TOP}/classes" --sourcepath="${TOP}/stdlib:."
 
 # run this first when you just checked out a fresh version
 first: bootstrap compiler jar
@@ -47,11 +47,11 @@ recompileGNU:
 	cd src; ${JAVAC} gnu/*/*.java gnu/*/*/*.java
 
 recompileSTDLIB:
-	${JAVAC} ${TOP}/stdlib/nice/lang/*.java
+	${JAVAC} "${TOP}"/stdlib/nice/lang/*.java
 
 # Compile individual files with: F=file.java make compile
 compile:
-	${JAVAC} ${F}
+	${JAVAC} "${F}"
 
 # Part of the standard library implemented in Java
 # Since these are not required by the compiler source,
@@ -60,8 +60,8 @@ native:
 	${JAVAC} stdlib/nice/*/*.java src/nice/tools/code/*.java
 
 clean:
-	rm -rf classes lib/nice src/bossa/parser/{Parse*.java,Token*.java,ASCII_*.java}
-	find ${TOP} \( -name "*.class" -o -name "*.nicei" -o -name "*~" \) -exec rm {} \;
+	rm -rf classes lib/nice src/bossa/parser/{Parse*.java,Token*.java,ASCII_*.java} bootstrap.classes
+	find "${TOP}" \( -name "*.class" -o -name "*.nicei" -o -name "*~" \) -exec rm {} \;
 
 scratch: clean first
 
@@ -70,8 +70,8 @@ scratch: clean first
 jdoc:
 	mkdir -p doc
 	cd src; ${JAVADOC} -windowtitle "Nice" -doctitle "The Nice compiler source" \
-	-overview ${TOP}/src/overview.html \
-	-d ${TOP}/doc -private -author -version \
+	-overview "${TOP}"/src/overview.html \
+	-d "${TOP}"/doc -private -author -version \
 	nice.tools.code \
 	mlsub.typing mlsub.typing.lowlevel mlsub.compilation \
 	bossa.syntax bossa.util bossa.link bossa.modules \
@@ -82,19 +82,19 @@ tags:
 
 stdlib.jar:
 	${NICEC_DEV} -o lib/nice/stdlib.jar --sourcepath="${TOP}/stdlib" nice.getopt
+# package.nicei files must be included since the standard library is used
+# to lookup packages when compiling Nice programs
+# the next two lines do just that
+	cd bootstrap.classes; jar uf ../lib/nice/stdlib.jar nice/*/package.nicei
 
 jar: stdlib.jar
 	mkdir -p lib/nice
 	cp src/nice/tools/compiler.jar lib/nice/Nice.jar
 	jar umf src/mainClass lib/nice/Nice.jar -C classes nice -C classes mlsub -C classes bossa -C classes gnu
-	cd src; jar uf ../lib/nice/Nice.jar bossa/syntax/*.class nice/tools/ast/*.class
-# package.nicei files must be included since the standard library is used
-# to lookup packages when compiling Nice programs
-# the next two lines do just that
-	cd stdlib; jar uf ../lib/nice/stdlib.jar nice/*/package.nicei
+
 
 dist: jar
-	tar cf lib/nice/Nice-`date +"%Y.%m.%d"`.tar bin/nicer bin/nicec lib/nice/Nice.jar lib/nice/stdlib.jar lib/emacs/nice-mode.el
+	tar cf Nice-`date +"%Y.%m.%d"`.tar bin/nicer bin/nicec lib/nice/Nice.jar lib/nice/stdlib.jar lib/emacs/nice-mode.el
 
 
 #****************************************************************

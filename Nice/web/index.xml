@@ -151,7 +151,9 @@ The compiler needs a JVM version 1.2 or higher to run.
 <section><title>Availability</title>
 
 <para>
-Nice is freely available under the GPL.
+Nice is freely available under the GPL. The runtime classes are licensed 
+under the "GPL + linking exception" license, which means that libraries and 
+programs written in Nice can be licensed under any terms.
 </para>
 </section>
 

@@ -23,7 +23,7 @@ import nice.tools.ant.Nicec;
 public class TestNice extends Task {
 
 	File niceTestFolder;
-	Set sources = new HashSet();
+	List sources = new ArrayList();
 	List tests = new ArrayList();
 
 

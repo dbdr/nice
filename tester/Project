@@ -4,8 +4,13 @@
 set -e
 
 if [ ! -r Nice ]; then
-  ../cvs Nice || exit 3
+  ../cvs${NICE_MASTER:+-master} Nice || exit 3
   wget -O Nice/external/nice-bootstrap.jar http://nice.sf.net/nice.jar || exit 3
 fi
 
 cd Nice && make world
+
+# If we got here, the whole bootstrap process succeeded.
+if [ NICE_MASTER ]; then
+  scp ./share/java/nice.jar bonniot@shell.sourceforge.net:/home/groups/n/ni/nice/htdocs
+fi

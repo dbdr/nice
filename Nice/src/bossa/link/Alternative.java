@@ -217,7 +217,7 @@ public class Alternative implements Located
     alternatives = new HashMap();
   }
   
-  protected void add(String fullName)
+  public void add(String fullName)
   {
     List l = (List) alternatives.get(fullName);
     if (l == null)

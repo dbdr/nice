@@ -124,7 +124,7 @@ public abstract class MethodImplementation extends Definition
     }
 
     // Register this alternative for the link test
-    alternative = new bossa.link.SourceAlternative(this);
+    alternative = dispatch.createSourceAlternative(this);
   }
 
   private bossa.link.Alternative alternative;

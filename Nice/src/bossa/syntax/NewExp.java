@@ -58,15 +58,17 @@ public class NewExp extends CallExp
   {
     resolveTC();
     
-    List constructors = TypeConstructors.getConstructors(tc);
+    LinkedList constructors = TypeConstructors.getConstructors(tc);
     if (constructors == null)
       User.error(this, tc + " has no constructor");
-    
+
+    // the list of constructors must be cloned, as
+    // OverloadedSymbolExp removes elements from it
+    constructors = (LinkedList) constructors.clone();
+
     fun = new ExpressionRef // not necessary
       (new OverloadedSymbolExp(constructors,
-			       new LocatedString("new "+tc.toString(),
-// not tc.location() which is the location of the definition of the class
-						 location()), 
+			       new LocatedString("new " + tc, location()), 
 			       null));
   }
 

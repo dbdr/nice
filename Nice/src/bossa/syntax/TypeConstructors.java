@@ -37,9 +37,9 @@ public final class TypeConstructors
      @return a list of the MethodDefinition.Symbols of each constructor of
      this class.
    */
-  static List getConstructors(TypeConstructor tc)
+  static LinkedList getConstructors(TypeConstructor tc)
   {
-    return (List) constructors.get(tc);
+    return (LinkedList) constructors.get(tc);
   }
 
   static void addConstructor(TypeConstructor tc, MethodDeclaration m)

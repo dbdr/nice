@@ -51,6 +51,9 @@ public class NewExp extends CallExp
   
   void resolve(TypeMap typeScope)
   {
+    if (tc != null)
+      return;
+
     resolveTC(typeScope);
     
     LinkedList constructors = TypeConstructors.getConstructors(tc);

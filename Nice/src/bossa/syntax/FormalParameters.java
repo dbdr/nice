@@ -90,16 +90,32 @@ public class FormalParameters extends Node
     }
 
     public OptionalParameter
-      (Monotype type, LocatedString name, boolean nameRequired, Expression value)
-    { this(type, name, value); this.nameRequired = nameRequired; }
+      (Monotype type, LocatedString name, boolean nameRequired, 
+       Expression value, VarScope scope, TypeScope typeScope)
+    { 
+      this(type, name, value); 
+      this.nameRequired = nameRequired;
+      this.scope = scope;
+      this.typeScope = typeScope;
+    }
 
-    Expression value() { return defaultValue; }
+    Expression value() 
+    { 
+      if (scope != null)
+	{
+	  resolve();
+	  scope = null;
+	  typeScope = null;
+	}
+      return defaultValue; 
+    }
 
     Expression defaultValue;
 
     void resolve()
     {
       defaultValue = dispatch.analyse(defaultValue, scope, typeScope);
+      defaultValue = defaultValue.noOverloading();
     }
 
     void typecheck(mlsub.typing.Monotype domain)

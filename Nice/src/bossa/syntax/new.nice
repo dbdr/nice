@@ -59,7 +59,7 @@ public class NewExp extends CallExp
     if (definition != null)
       definition.resolve();
     
-    ?LinkedList<MethodDeclaration.Symbol> constructors = TypeConstructors.getConstructors(tc);
+    let constructors = TypeConstructors.getConstructors(tc);
     if (constructors == null)
       {
 	if (tc.arity() > 0)

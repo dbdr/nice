@@ -77,13 +77,8 @@ public class CustomConstructor extends UserOperator
     mlsub.typing.Polytype type = new mlsub.typing.Polytype
       (getType().getConstraint(),
        new mlsub.typing.FunType(getArgTypes(), PrimitiveType.voidType));
-    classe.addConstructorCallSymbol
-      (new MethodDeclaration.Symbol(name, type) {
-          gnu.expr.Expression compileInCallPosition()
-          {
-            return getInitializationCode(true);
-          }
-        });
+    classe.addConstructorCallSymbol(
+	dispatch.createConstructorCallSymbol(this, name, type));
   }
 
   void resolve()

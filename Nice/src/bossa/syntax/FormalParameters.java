@@ -416,7 +416,8 @@ public class FormalParameters extends Node
      the computed array of expressions, that denote the call,
      including the default values of the optional parameters not passed.
   */
-  boolean match(Arguments args, FunSymbol symbol)
+  // FIXME change VarSymbol to FunSymbol once converted to nice
+  boolean match(Arguments args, VarSymbol symbol)
   {
     int[] map = new int[size];
 

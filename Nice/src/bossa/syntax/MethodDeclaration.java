@@ -63,7 +63,7 @@ public abstract class MethodDeclaration extends Definition
     // remember it to print the interface
     syntacticConstraint = constraint.toString();
     
-    symbol = new MethodDeclaration.Symbol(name, constraint, returnType);    
+    symbol = dispatch.createMethodSymbol(this, name, constraint, returnType);
     symbol.propagate = Node.global;
     addChild(symbol);
     
@@ -100,10 +100,10 @@ public abstract class MethodDeclaration extends Definition
     this.parameters = formals;
     this.arity = type.domain().length;
     this.type = type;
-    symbol = new MethodDeclaration.Symbol(name, type);
+    symbol = dispatch.createMethodSymbol(this, name, type);
   }
 
-  private Polytype type;
+  Polytype type;
 
   public final Polytype getType()
   {
@@ -317,95 +317,9 @@ public abstract class MethodDeclaration extends Definition
     return symbol.defaultExplainWhyMatchFails(arguments);
   }
 
-  private MethodDeclaration.Symbol symbol;
-  MethodDeclaration.Symbol getSymbol() { return symbol; }
-
-  public class Symbol extends FunSymbol
-  {
-    Symbol(LocatedString name, bossa.syntax.Constraint constraint, 
-	   bossa.syntax.Monotype returnType)
-    {
-      super(name, constraint,
-	    MethodDeclaration.this.formalParameters(), 
-	    returnType);
-    }
-
-    Symbol(LocatedString name, Polytype type)
-    {
-      super(name, Types.addSure(type), 
-	    MethodDeclaration.this.formalParameters(), 
-	    MethodDeclaration.this.arity);
-    }
-
-    FieldAccess getFieldAccessMethod()
-    {
-      if(getMethodDeclaration() instanceof FieldAccess)
-	return (FieldAccess) getMethodDeclaration();
-
-      return null;
-    }
-
-    boolean isIgnored()
-    {
-      return getMethodDeclaration().isIgnored();
-    }
-
-    void checkSpecialRequirements(Expression[] arguments)
-    {
-      getMethodDeclaration().checkSpecialRequirements(arguments);
-    }
-
-    void resolve()
-    {
-      if (isIgnored())
-        return;
-
-      // Check that resolving has not already been done.
-      if (syntacticType != null)
-        {
-          super.resolve();
-
-          // The method has a raw type, while the symbol needs a nullness marker
-          MethodDeclaration.this.type = this.type;
-          this.type = Types.addSure(this.type);
-        }
-    }
-
-    public Definition getDefinition()
-    {
-      return MethodDeclaration.this;
-    }
- 
-    public MethodDeclaration getMethodDeclaration()
-    {
-      return MethodDeclaration.this;
-    }
-
-    gnu.expr.Expression compile()
-    {
-      return getMethodDeclaration().getCode();
-    }
-
-    gnu.expr.Expression compileInCallPosition()
-    {
-      return getMethodDeclaration().getCodeInCallPosition();
-    }
-
-    String explainWhyMatchFails(Arguments arguments)
-    {
-      return getMethodDeclaration().explainWhyMatchFails(arguments);
-    }
-
-    String defaultExplainWhyMatchFails(Arguments arguments)
-    {
-      return super.explainWhyMatchFails(arguments);
-    }
-
-    public String toString()
-    {
-      return getMethodDeclaration().toString();
-    }
-  }
+  // FIXME: once this class is converted to nice, Change VarSymbol to MethodSymbol
+  private VarSymbol symbol;
+  VarSymbol getSymbol() { return symbol; }
 
   /****************************************************************
    * Code generation

@@ -69,6 +69,11 @@ abstract public class Node
 
     children.remove(n);
   }
+
+  void removeChildren()
+  {
+     children = null;
+  }
   
   /**
    * Always returns the argument (except an empty list for 'null').

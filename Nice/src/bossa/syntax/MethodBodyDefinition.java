@@ -220,7 +220,8 @@ public class MethodBodyDefinition extends MethodImplementation
      */
     if (symbols.size() > 1 && hasAdditionalTags)
       {
-        MethodDeclaration.Symbol[] tempSymbols = new MethodDeclaration.Symbol[symbols.size()];
+        // FIXME change to MethodSymbol[] once converted to nice.
+        VarSymbol[] tempSymbols = new VarSymbol[symbols.size()];
 	symbols.toArray(tempSymbols);
         int size = symbols.size();
 	symbols = new LinkedList();
@@ -267,7 +268,7 @@ public class MethodBodyDefinition extends MethodImplementation
 
     // Check that the non-dispatched parameter names match the declaration
     outer: for(Iterator it = symbols.iterator(); it.hasNext();) {
-      MethodDeclaration m = ((MethodDeclaration.Symbol) it.next()).getMethodDeclaration();
+      MethodDeclaration m = ((VarSymbol) it.next()).getMethodDeclaration();
       if( m instanceof NiceMethod) {
         FormalParameters params = m.formalParameters();
 	for (int i = params.hasThis() ? 1 : 0; i < formals.length; i++)
@@ -300,8 +301,7 @@ public class MethodBodyDefinition extends MethodImplementation
     String methods = "";
     for(Iterator i = symbols.iterator(); i.hasNext();)
       {
-	MethodDeclaration m = 
-	  ((MethodDeclaration.Symbol) i.next()).getMethodDeclaration();
+	MethodDeclaration m = ((VarSymbol) i.next()).getMethodDeclaration();
 	methods += m + " defined " + m.location() + "\n";
       }
     

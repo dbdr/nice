@@ -234,9 +234,9 @@ public class Arguments
     {
       for (Iterator i = noMatches.iterator(); i.hasNext();)     
       {
-	Object noMatch = i.next();
-        if (noMatch instanceof FunSymbol)
-          argnames.retainAll(noMatchByName(((FunSymbol)noMatch).parameters));
+	VarSymbol noMatch = (VarSymbol)i.next();
+        if (noMatch.isFunSymbol())
+          argnames.retainAll(noMatchByName(noMatch.getFormalParameters()));
       }
       if (!argnames.isEmpty())
 	return " has an argument named " + argnames.get(0);

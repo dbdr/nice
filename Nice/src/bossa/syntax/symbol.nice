@@ -1,0 +1,240 @@
+/**************************************************************************/
+/*                                N I C E                                 */
+/*             A high-level object-oriented research language             */
+/*                        (c) Daniel Bonniot 2004                         */
+/*                                                                        */
+/*  This program is free software; you can redistribute it and/or modify  */
+/*  it under the terms of the GNU General Public License as published by  */
+/*  the Free Software Foundation; either version 2 of the License, or     */
+/*  (at your option) any later version.                                   */
+/*                                                                        */
+/**************************************************************************/
+
+package bossa.syntax;
+
+/**
+   A variable symbol which has a polytype (eg a method symbol)
+   
+   @see MonoSymbol
+*/
+public class PolySymbol extends VarSymbol
+{
+  ?mlsub.typing.Polytype type = null;
+  ?mlsub.typing.Polytype clonedType = null;
+  ?bossa.syntax.Polytype syntacticType = null;
+
+  {
+    if(syntacticType!=null)
+      this.addChild(syntacticType);
+  }
+
+  getType() = notNull(type);
+  isAssignable() = false;   // No polymorphic references!
+
+  resolve()
+  {
+    type = notNull(syntacticType).resolveToLowlevel();
+    syntacticType = null;
+    this.removeChildren();
+  }
+  
+  makeClonedType()
+  {
+    if (clonedType != null)
+      Internal.error(this, "clonedType in use");
+
+    clonedType = notNull(type).cloneType();
+  }
+
+  releaseClonedType()
+  {
+    clonedType = null;
+  }
+  
+  getClonedType() = notNull(clonedType);
+
+  toString()
+  {
+    ?mlsub.typing.Polytype type = this.type;
+    return (type==null ? String.valueOf(notNull(syntacticType)) : type.toString()) 
+      + " " + name;
+  }
+}
+
+new PolySymbol( MonoSymbol sym )
+{
+ this(sym.name, syntacticType : new Polytype(sym.syntacticType));
+}
+
+/**
+ * A functional symbol.
+ */
+class FunSymbol extends PolySymbol
+{
+  ?FormalParameters parameters;
+  int arity;
+
+  isFunSymbol() = true;
+
+  getFormalParameters() = this.parameters;
+
+  String describeParameters() 
+  {
+  	?FormalParameters parameters = this.parameters;
+    if (parameters != null)
+      return parameters.toString();
+
+    mlsub.typing.Monotype m = nice.tools.typing.Types.rawType(
+    	notNull(this.getType()).getMonotype());
+    if (m instanceof mlsub.typing.FunType)
+      return bossa.util.Util.map("", ", ", "", m.domain());
+
+    bossa.util.Internal.warning(this, "Non functional type in a functional symbol");
+    return "";
+  }
+
+  /**
+     @return
+     0 : doesn't match
+     1 : wasn't even a function
+     2 : matches
+  */
+  match(Arguments arguments)
+  {
+    let parameters = this.parameters;
+    if (parameters == null)
+      {
+         // true for constructors, for instance. case might be removed
+         if (!arguments.plainApplication(arity, this))
+	   return 0;
+      }
+    else if (!parameters.match(arguments, this))
+      return 0;
+
+    return 2;
+  }
+
+  String explainWhyMatchFailsWithFunSymbol(Arguments arguments)
+  {
+    if (this.isFieldAccess())
+      {
+        if (arguments.size() == 0)
+           return name + " is not defined";
+
+        return name + " is a field of class " + this.describeParameters();
+      }
+
+    return "Method " + name + " expects parameters (" + 
+      this.describeParameters() + ")";
+  }
+  
+  explainWhyMatchFails(Arguments arguments) =
+  	this.explainWhyMatchFailsWithFunSymbol(arguments);
+
+}
+
+new FunSymbol(LocatedString name, Constraint constraint,
+				FormalParameters parameters, Monotype returnType)
+{
+  this(name, parameters: parameters, arity: parameters.size, syntacticType:
+	new Polytype(constraint, new FunType(parameters.types(), returnType)));
+}
+
+/**
+ * A symbol for a declared method.
+ */
+public class MethodSymbol extends FunSymbol
+{
+  MethodDeclaration declaration;
+
+  getFieldAccessMethod()
+  {
+    let decl = this.declaration;
+    if(decl instanceof FieldAccess)
+      return decl;
+
+    return null;
+  }
+
+  isIgnored() = this.declaration.isIgnored();
+ 
+  checkSpecialRequirements(arguments) =
+      this.declaration.checkSpecialRequirements(arguments);
+
+  resolve()
+  {
+    if (this.isIgnored())
+      return;
+
+    // Check that resolving has not already been done.
+    if (syntacticType != null)
+      {
+        super;
+      	  
+      	// The method has a raw type, while the symbol needs a nullness marker
+        declaration.type = this.type;
+	this.type = nice.tools.typing.Types.addSure(this.type); 
+      }
+  }
+
+  getDefinition() = this.declaration;
+ 
+  getMethodDeclaration() = this.declaration;
+ 
+  compile() = this.declaration.getCode();
+  	
+  compileInCallPosition() = declaration.getCodeInCallPosition();
+ 
+  toString() = this.declaration.toString();
+  
+  explainWhyMatchFails(Arguments arguments) =
+    	this.declaration.explainWhyMatchFails(arguments);
+
+  defaultExplainWhyMatchFails(Arguments arguments) =
+    	this.explainWhyMatchFailsWithFunSymbol(arguments);
+}
+
+new MethodSymbol(MethodDeclaration declaration, LocatedString name,
+	Constraint constraint, Monotype returnType )
+{
+  FormalParameters parameters = declaration.formalParameters();
+  this(name, declaration: declaration, parameters: parameters, arity: parameters.size,
+	syntacticType: new Polytype(constraint, new FunType(parameters.types(), returnType)));
+}
+
+new MethodSymbol(MethodDeclaration declaration, LocatedString name,
+	mlsub.typing.Polytype type)
+{
+  this(name, declaration: declaration, type: nice.tools.typing.Types.addSure(type),
+	parameters: declaration.formalParameters(), arity: declaration.arity); 
+}
+
+// FIXME if CustomConstructor is made to extend Constructor, this code can be cleaned up
+class ConstructorCallSymbol extends MethodSymbol
+{
+  compileInCallPosition()
+  {
+    let decl = this.declaration;
+
+    if (decl instanceof bossa.syntax.Constructor)
+      return decl.getInitializationCode(true);
+    else if (decl instanceof bossa.syntax.CustomConstructor)
+      return decl.getInitializationCode(true);
+
+    Internal.error("Declaration associated with ConstructorCallSymbol is not a constructor.");
+    return super;	
+  }
+}
+
+// Bootstrap (for conversion to nice)
+VarSymbol createMethodSymbol(MethodDeclaration declaration,
+	LocatedString name, Constraint constraint, Monotype returnType ) =
+		new MethodSymbol(declaration,name,constraint,returnType);
+
+VarSymbol createMethodSymbol(MethodDeclaration declaration,
+	LocatedString name, mlsub.typing.Polytype type ) =
+		new MethodSymbol(declaration,name,type);
+
+VarSymbol createConstructorCallSymbol(MethodDeclaration declaration,
+	LocatedString name, mlsub.typing.Polytype type ) =
+		new ConstructorCallSymbol(declaration,name,type);

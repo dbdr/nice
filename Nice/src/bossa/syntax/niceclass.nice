@@ -32,7 +32,7 @@ public class CNiceClass extends NiceClass
   private ?gnu.expr.Expression thisExp = null;
 
   /** List of symbols for calling constructors of this class. */
-  private List<MethodDeclaration.Symbol> constructors = new ArrayList();
+  private List<MethodSymbol> constructors = new ArrayList();
   private Constructor[?] constructorMethod = null;
 
   // Used to resolve fields, and constructor constraint.
@@ -110,10 +110,10 @@ public class CNiceClass extends NiceClass
 
   addConstructorCallSymbol(sym)
   {
-    constructors.add(sym);
+    constructors.add(cast(sym));
   }
 
-  List<MethodDeclaration.Symbol> getConstructorCallSymbols() = new LinkedList(constructors);
+  List<MethodSymbol> getConstructorCallSymbols() = new LinkedList(constructors);
 
   resolveClass()
   {

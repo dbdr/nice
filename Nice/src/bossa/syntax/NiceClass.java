@@ -55,7 +55,8 @@ public abstract class NiceClass extends ClassImplementation
     return get(nice.tools.typing.Types.constructor(type));
   }
 
-  abstract void addConstructorCallSymbol(MethodDeclaration.Symbol sym);
+  // FIXME change to MethodSymbol once this is converted to nice
+  abstract void addConstructorCallSymbol(VarSymbol sym);
 
   abstract public void addField(MonoSymbol sym, Expression value, 
      boolean isFinal, boolean isTransient, boolean isVolatile, String docString);

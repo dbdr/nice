@@ -30,6 +30,15 @@ public class dispatch
   public static Expression createCallExp(Expression function, Expression param1, Expression param2)
   { return null; }
 
+  public static VarSymbol createMethodSymbol(MethodDeclaration declaration, LocatedString name, Constraint constraint, Monotype returnType)
+  { return null; }
+  
+  public static VarSymbol createMethodSymbol(MethodDeclaration declaration, LocatedString name, mlsub.typing.Polytype type)
+  { return null; }
+
+  public static VarSymbol createConstructorCallSymbol(MethodDeclaration declaration, LocatedString name, mlsub.typing.Polytype type)
+  { return null; }
+
   public static gnu.bytecode.Method getImplementationAbove(JavaMethod decl, gnu.bytecode.ClassType firstArg)
   { return null; }
 

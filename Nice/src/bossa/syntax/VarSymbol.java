@@ -85,6 +85,19 @@ public abstract class VarSymbol extends Node implements Located
     return null;
   }
 
+  boolean isFunSymbol()
+  {
+    return false;
+  }
+
+  /**
+   *  Get the FormalParameters, or null if this is not a functional symbol
+   */
+  FormalParameters getFormalParameters()
+  {
+    return null;
+  }
+  
   abstract Polytype getType();
 
   /****************************************************************
@@ -102,6 +115,14 @@ public abstract class VarSymbol extends Node implements Located
     return 1;
   }
 
+  /**
+   * Specialized by MethodSymbol only.
+   */
+  String defaultExplainWhyMatchFails(Arguments arguments)
+  {
+    return explainWhyMatchFails(arguments);
+  }
+    
   /** This returns a generic explanation.
       A more precise message should be returned if possible in subclasses.
   */

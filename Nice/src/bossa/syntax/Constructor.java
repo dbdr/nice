@@ -64,13 +64,8 @@ abstract class Constructor extends MethodDeclaration
     mlsub.typing.Polytype type = new mlsub.typing.Polytype
       (getType().getConstraint(),
        new mlsub.typing.FunType(getArgTypes(), PrimitiveType.voidType));
-    classe.addConstructorCallSymbol
-      (new MethodDeclaration.Symbol(name, type) {
-          gnu.expr.Expression compileInCallPosition()
-          {
-            return getInitializationCode(true);
-          }
-        });
+    classe.addConstructorCallSymbol(
+	dispatch.createConstructorCallSymbol(this, name, type));
   }
 
   public void printInterface(java.io.PrintWriter s)

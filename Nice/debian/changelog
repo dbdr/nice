@@ -1,9 +1,11 @@
-nice (0.0.011222) unstable; urgency=low
+nice (0.0.011227) unstable; urgency=low
 
-  * Added the 'instanceof' keyword.
+  * Made nicec smart about when a local variable might be null.
+  * Added the 'instanceof' and '~' (bitwise complement) keywords.
   * Do not stop at the first syntax or type error in more situations.
   * Ehanced error messages.
-  * Emacs mode: allow to interactively set the compiler's location.
+  * Emacs mode: allow to interactively set the compiler's location 
+    (the string variable 'nice-program').
 
  --
 

@@ -45,4 +45,6 @@ public final class Native
 
     return res;
   }
+
+  public static int intValue(double d) { return (int) d; }
 }

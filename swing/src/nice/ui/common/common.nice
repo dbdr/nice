@@ -92,7 +92,7 @@ getListener(this@NoNiceListenerException) = this.listener;
 	{
 		list = new LinkedList();
 		notNull(list).add(listener);
-		map.put(key.object(),list);
+		map.put(key,list);
 	}
 }
 
@@ -115,6 +115,6 @@ getListener(this@NoNiceListenerException) = this.listener;
 	{
 		list = new LinkedList();
 		notNull(list).add(listener);
-		map.put((this.object(),key),list);
+		map.put((this,key),list);
 	}
 }

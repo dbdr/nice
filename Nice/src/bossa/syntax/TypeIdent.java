@@ -59,7 +59,7 @@ public final class TypeIdent extends Monotype implements Located
       return this;
   }
 
-  public final TypeSymbol resolveToTypeSymbol(TypeScope scope)
+  public final TypeSymbol resolveToTypeSymbol(TypeMap scope)
   {
     TypeSymbol res = scope.lookup(name.toString());
 
@@ -69,7 +69,7 @@ public final class TypeIdent extends Monotype implements Located
     return res;
   }
   
-  public mlsub.typing.Monotype resolve(TypeScope scope)
+  public mlsub.typing.Monotype resolve(TypeMap scope)
   {
     TypeSymbol res = resolveToTypeSymbol(scope);
     if (res == null)
@@ -95,7 +95,7 @@ public final class TypeIdent extends Monotype implements Located
     return null;
   }
   
-  public mlsub.typing.TypeConstructor resolveToTC(TypeScope scope)
+  public mlsub.typing.TypeConstructor resolveToTC(TypeMap scope)
   {
     TypeSymbol res = resolveToTypeSymbol(scope);
 
@@ -106,7 +106,7 @@ public final class TypeIdent extends Monotype implements Located
     return null;
   }
   
-  public mlsub.typing.Interface resolveToItf(TypeScope scope)
+  public mlsub.typing.Interface resolveToItf(TypeMap scope)
   {
     TypeSymbol res = resolveToTypeSymbol(scope);
 
@@ -124,7 +124,7 @@ public final class TypeIdent extends Monotype implements Located
     return null;
   }
   
-  public static TypeConstructor[] resolveToTC(TypeScope scope, List idents)
+  public static TypeConstructor[] resolveToTC(TypeMap scope, List idents)
   {
     if (idents==null || idents.size()==0) return null;
     
@@ -137,7 +137,7 @@ public final class TypeIdent extends Monotype implements Located
     return res;
   }
   
-  public static Interface[] resolveToItf(TypeScope scope, List idents)
+  public static Interface[] resolveToItf(TypeMap scope, List idents)
   {
     if (idents==null || idents.size()==0) return null;
     

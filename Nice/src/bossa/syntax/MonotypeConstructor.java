@@ -62,7 +62,7 @@ public class MonotypeConstructor extends Monotype
    * Scoping
    ****************************************************************/
 
-  public mlsub.typing.Monotype resolve(TypeScope typeScope) 
+  public mlsub.typing.Monotype resolve(TypeMap typeScope) 
   {
     if(lowlevelTC==null)
       {

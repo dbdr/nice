@@ -24,7 +24,7 @@ import mlsub.typing.Variance;
    @version $Date$
    @author Daniel Bonniot (d.bonniot@mail.dotcom.fr)
 */
-public class TypeScope
+public class TypeScope implements TypeMap
 {
   public TypeScope(TypeScope outer)
   {

@@ -29,23 +29,19 @@ public class FunType extends bossa.syntax.Monotype
 {
   public FunType(List /* of Monotype */ in, bossa.syntax.Monotype out)
   {
-    if(in==null)
-      in=new ArrayList(0);
-    this.in=in;
-    this.out=out;
+    if (in == null)
+      in = emptyList;
+    this.in = in;
+    this.out = out;
   }
 
-  /*
-  Monotype cloneType()
-  {
-    return new FunType(cloneTypes(in),out.cloneType());
-  }
-  */
+  private static emptyList = new LinkedList();
+  
   /****************************************************************
    * Scoping
    ****************************************************************/
 
-  public Monotype resolve(TypeScope typeScope)
+  public Monotype resolve(TypeMap typeScope)
   {
     return new mlsub.typing.FunType
       (bossa.syntax.Monotype.resolve(typeScope, in),

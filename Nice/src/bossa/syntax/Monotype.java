@@ -41,18 +41,6 @@ implements Located
     return res;
   }
   
-  /*abstract Monotype cloneType();
-
-  List cloneTypes(Collection types)
-  {
-    List res=new ArrayList(types.size());
-    Iterator i=types.iterator();
-    while(i.hasNext())
-      res.add((Monotype)i.next());
-    return res;
-  }
-  */
-
   /** @return true if "alike" appears inside this monotype. */
   abstract boolean containsAlike();
   
@@ -69,29 +57,10 @@ implements Located
    **************************************************************/
   
   // public since it is called from bossa.dispatch
-  public abstract mlsub.typing.Monotype resolve(TypeScope ts);
+  public abstract mlsub.typing.Monotype resolve(TypeMap tm);
 
   /** iterates resolve() on the collection of Monotype */
-  static List oldresolve(TypeScope s, Collection c)
-  //TODO: imperative version ?
-  {
-    List res=new ArrayList();
-    Iterator i=c.iterator();
-    while(i.hasNext())
-      { 
-	Monotype old=(Monotype)i.next();
-	mlsub.typing.Monotype nou=old.resolve(s);
-
-	if(nou==null)
-	  User.error(old,old+" : Monotype not defined");
-
-	res.add(nou);
-      }
-    return res;
-  }
-  
-  /** iterates resolve() on the collection of Monotype */
-  static final mlsub.typing.Monotype[] resolve(TypeScope s, Collection c)
+  static final mlsub.typing.Monotype[] resolve(TypeMap s, Collection c)
   //TODO: imperative version ?
   {
     if(c.size()==0)
@@ -137,7 +106,7 @@ implements Located
    * JavaClasses
    ****************************************************************/
 
-  static void findJavaClasses(List types, TypeScope typeScope)
+  static void findJavaClasses(List types, TypeMap typeScope)
   {
     for(Iterator i=types.iterator();
 	i.hasNext();)
@@ -178,7 +147,7 @@ implements Located
 
     boolean containsAlike() { return false; }
     
-    public mlsub.typing.Monotype resolve(TypeScope s)
+    public mlsub.typing.Monotype resolve(TypeMap s)
     {
       return type;
     }

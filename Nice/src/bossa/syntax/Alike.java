@@ -32,7 +32,7 @@ public class Alike extends Monotype
 
   // Alike should be removed as soon as types are constructed.
 
-  public mlsub.typing.Monotype resolve(TypeScope ts)
+  public mlsub.typing.Monotype resolve(TypeMap ts)
   {
     User.error(this, "\"alike\" can only be used in class method definitions");
     return null;

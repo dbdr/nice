@@ -50,7 +50,7 @@ public class TypeParameters
     return new TypeParameters(res);
   }
   
-  mlsub.typing.Monotype[] resolve(TypeScope ts)
+  mlsub.typing.Monotype[] resolve(TypeMap ts)
   {
     return Monotype.resolve(ts,content);
   }

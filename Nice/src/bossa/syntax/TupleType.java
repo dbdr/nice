@@ -39,7 +39,7 @@ public class TupleType extends bossa.syntax.Monotype
    * Scoping
    ****************************************************************/
 
-  public Monotype resolve(TypeScope typeScope)
+  public Monotype resolve(TypeMap typeScope)
   {
     return new mlsub.typing.TupleType
       (bossa.syntax.Monotype.resolve(typeScope, types));

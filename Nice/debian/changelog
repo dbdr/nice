@@ -6,6 +6,8 @@ nice (0.7.9-1) unstable; urgency=low
         int x;
         equals(that@A) = this.x == that.x;
       }
+  * Compilation does not fail anymore if some classes on the classpath
+    have an invalid bytecode format.
   * In a method implementation, binding the type parameters should now
     be done in front:
       <T> T foo(T);
@@ -27,13 +29,34 @@ nice (0.7.9-1) unstable; urgency=low
         // so we could not declare its type as List<U>.
         return res;
       }
-  * Improved error messages for possibly null values in assignments (Daniel),
-    and for incorrect calls to constructors (Bryn Keller).
+  * Changed the syntax for local variables. The "final" keyword is deprecated 
+    now for local variables, use "let" instead. In addition to the standard 
+    "type name = ..." syntax two new forms are allowed:
+    let [ type ] name = [ expression ] 
+    var [ type ] name = [ expression ]
+    At least a type or a default value are required.
+    The type can only be left away when the compiler is able to interfere 
+    the type which is not always possible.
+    A non function example to show some aspects the new syntax:
+      let int[] arr = [1,2,3,4]; // here type interference doesn't work.
+      List<int> list = new ArrayList();
+      list.addAll(arr);
+      for(let iter = list.iterator(); iter.hasNext();) {
+	let String s;
+        var i = iter.next();
+        if (i % 2 == 0) { s = "even"; }
+        else { s = "odd"; }
+        println(i.toString()+" is "+s);
+      }
+  * Added global constants similar to the global variables, the syntax is:
+    let type name = somexpression ;
   * Integer values can used as arrays of bits, as in
       if (x[index]) ...
       x[index] = true;
   * Compilation does not fail anymore if some classes on the classpath
     have an invalid bytecode format.
+  * Improved error messages for possibly null values in assignments (Daniel),
+    and for incorrect calls to constructors (Bryn Keller).
   * Bugfix (overloaded symbols used inside && or || expressions).
 
  -- Daniel Bonniot <bonniot@users.sourceforge.net>  Sat, 19 Apr 2003 10:40:02 +0200

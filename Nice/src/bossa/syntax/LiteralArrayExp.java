@@ -114,7 +114,7 @@ public class LiteralArrayExp extends Expression
   public gnu.expr.Expression compile()
   {
     gnu.expr.Expression[] args = Expression.compile(elements);
-    ArrayType t = (ArrayType) nice.tools.code.SpecialTypes.array(Types.lowestUpperBound(args));
+    ArrayType t = nice.tools.code.SpecialTypes.array(Types.lowestUpperBound(args));
 
     return new gnu.expr.ApplyExp
       (new nice.tools.code.LiteralArrayProc

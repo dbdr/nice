@@ -58,7 +58,7 @@ public class SpecialTypes
        or the array type with unknown elements (can be primitive)
        if elements is null.
   */
-  static public Type array(Type elements)
+  static public ArrayType array(Type elements)
   {
     if (elements == null)
       return SpecialArray.unknownTypeArray();

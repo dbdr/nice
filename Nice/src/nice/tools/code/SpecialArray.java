@@ -15,7 +15,7 @@ public class SpecialArray extends gnu.bytecode.ArrayType
   /**
      Return a SpecialArray holding elements of type <tt>elements</tt>.
   */
-  public static Type create(Type elements)
+  public static SpecialArray create(Type elements)
   {
     String prefix;
     if(elements instanceof PrimType)
@@ -24,7 +24,7 @@ public class SpecialArray extends gnu.bytecode.ArrayType
       prefix = null;
     Type res = Type.lookupType("[" + elements.getSignature());
     if(res != null && res instanceof SpecialArray)
-      return res;
+      return (SpecialArray) res;
     
     return new SpecialArray(elements, prefix, false, true);
   }

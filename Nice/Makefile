@@ -29,7 +29,7 @@ NICEC1=${TOP}/bin/nicec ${NICEC_ARGS}
 # Get the version from the debian changelog.
 VERSION = ${shell dpkg-parsechangelog | sed -n 's/^Version: //p'}
 DEB = nice_${VERSION}_all.deb
-TARFILE = Nice-`date +"%Y.%m.%d"`.tar
+TARFILE = Nice-${VERSION}.tar
 CVSBUILDDIR = /tmp/cvs-build
 
 

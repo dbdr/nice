@@ -1,0 +1,28 @@
+/**************************************************************************/
+/*                                N I C E                                 */
+/*             A high-level object-oriented research language             */
+/*                        (c) Daniel Bonniot 2003                         */
+/*                                                                        */
+/*  This program is free software; you can redistribute it and/or modify  */
+/*  it under the terms of the GNU General Public License as published by  */
+/*  the Free Software Foundation; either version 2 of the License, or     */
+/*  (at your option) any later version.                                   */
+/*                                                                        */
+/**************************************************************************/
+
+package nice.getopt;
+
+/**
+   Unit tests.
+
+   @author Daniel Bonniot (bonniot@users.sourceforge.net)
+ */
+
+void test()
+{
+  var nick = "";
+  let Option[] options = 
+    [ option("nick", "foo", "name", String value => nick = value) ];
+  parse("", ["--nick", "bar"], options);
+  assert nick.equals("bar");
+}

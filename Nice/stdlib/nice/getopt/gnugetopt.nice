@@ -56,6 +56,8 @@ private boolean long_only = false;
 //       LongOpt[] long_options, boolean long_only)
 public void initGetopt()
 {
+  if (optstring.length() == 0)
+    optstring = " ";
 
   // Determine how to handle the ordering of options and non-options
   if (optstring.charAt(0) == '-')

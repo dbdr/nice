@@ -187,7 +187,7 @@ public class CallExp extends Expression
     
     try
       {
-	try{ Constraint.assert(cst); }
+	try{ Constraint.enter(cst); }
 	catch(TypingEx e) { 
 	  throw new ReportErrorEx
 	    ("The conditions for using this function are not fullfiled");

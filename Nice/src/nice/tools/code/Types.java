@@ -135,7 +135,7 @@ public final class Types
       {
 	Typing.enter();
 	try{
-	  Constraint.assert(cst);
+	  Constraint.enter(cst);
 	  setBytecodeType(t.getMonotype());
 	}
 	catch(TypingEx e) {}

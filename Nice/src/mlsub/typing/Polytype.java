@@ -118,7 +118,7 @@ public final class Polytype
     Typing.enter();
     
     try{
-      constraint.assert();
+      constraint.enter();
     }
     finally{
       Typing.leave();
@@ -258,7 +258,7 @@ public final class Polytype
 
     Engine.startSimplify();
     try{
-      Constraint.assert(constraint);
+      Constraint.enter(constraint);
       Engine.satisfy();
       monotype.tag(Variance.COVARIANT);      
       Engine.simplify(binders, atoms);

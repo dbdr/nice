@@ -76,7 +76,7 @@ public final class TypeConstructorLeqCst extends AtomicConstraint
       ((TypeConstructor) tt1, (TypeConstructor) tt2);
   }
 
-  public void assert()
+  public void enter()
   throws TypingEx
   {
     Typing.leq(t1, t2);

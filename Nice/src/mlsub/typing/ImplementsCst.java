@@ -63,7 +63,7 @@ public final class ImplementsCst extends AtomicConstraint
   /**
    * Enter the constraint into the typing context.
    */
-  void assert() throws TypingEx
+  void enter() throws TypingEx
   {
     Typing.assertImp(tc, itf, false);
   }

@@ -54,7 +54,7 @@ public class Enumeration
 	int l = Typing.enter();
 
 	try{
-	  Constraint.assert(domain.getConstraint());
+	  Constraint.enter(domain.getConstraint());
 	  setFloatingKinds(tags,0,res);
 	}
 	finally{
@@ -91,7 +91,7 @@ public class Enumeration
 	int l = Typing.enter();
 
 	try{
-	  Constraint.assert(cst);
+	  Constraint.enter(cst);
 	  setFloatingKinds(tags, 0, res);
 	}
 	finally{

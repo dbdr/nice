@@ -108,7 +108,7 @@ typecheck(e@CallExp)
     try{
       Typing.enter();
       try{
-	mlsub.typing.Constraint.assert(t.getConstraint());
+	mlsub.typing.Constraint.enter(t.getConstraint());
 	nice.tools.code.Types.setBytecodeType(t.getMonotype());
       }
       finally{
@@ -593,7 +593,7 @@ void checkNotNull(mlsub.typing.Polytype type)
   else
     try {
     Typing.enter();
-    type.getConstraint().assert();
+    type.getConstraint().enter();
     Typing.leq(type.getMonotype(), PrimitiveType.sureTC);
     Typing.implies();
   }

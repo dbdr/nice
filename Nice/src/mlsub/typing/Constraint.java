@@ -274,14 +274,14 @@ public final class Constraint
    * Typechecking
    ****************************************************************/
 
-  public static void assert(Constraint c)
+  public static void enter(Constraint c)
     throws TypingEx
   {
     if( c != null)
-      c.assert();
+      c.enter();
   }
   
-  public void assert()
+  public void enter()
     throws TypingEx
   {
     if (binders != null) 
@@ -289,7 +289,7 @@ public final class Constraint
 
     if (atoms != null)
       for (int i=0; i<natoms; i++)
-	atoms[i].assert();
+	atoms[i].enter();
   }
   
   /****************************************************************

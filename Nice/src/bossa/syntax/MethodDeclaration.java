@@ -148,7 +148,7 @@ abstract public class MethodDeclaration extends Definition
       Typing.enter();
     
       try{
-	type.getConstraint().assert();
+	type.getConstraint().enter();
 	parameters.typecheck(type.domain());
 	innerTypecheck();
       }

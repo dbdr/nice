@@ -255,11 +255,11 @@ public final class Typing
     if(dbg) l=enter("#"); else l=enter();
     
     try{
-      Constraint.assert(t2.getConstraint());
+      Constraint.enter(t2.getConstraint());
 
       implies();
     
-      Constraint.assert(t1.getConstraint());
+      Constraint.enter(t1.getConstraint());
       leq(t1.getMonotype(), t2.getMonotype());
     }
     finally{
@@ -287,7 +287,7 @@ public final class Typing
     try{
       implies();
     
-      Constraint.assert(t1.getConstraint());
+      Constraint.enter(t1.getConstraint());
       leq(t1.getMonotype(), m2);
     }
     finally{
@@ -380,11 +380,11 @@ public final class Typing
     
     enter();
     try{
-      Constraint.assert(d1.getConstraint());
+      Constraint.enter(d1.getConstraint());
 
       Typing.implies();
 
-      Constraint.assert(d2.getConstraint());
+      Constraint.enter(d2.getConstraint());
       leq(d1.getMonotype(), d2.getMonotype());
     }
     finally{
@@ -401,8 +401,8 @@ public final class Typing
     if(domain == Domain.bot)
       return;
     
-    Constraint.assert(type.getConstraint());
-    Constraint.assert(domain.getConstraint());
+    Constraint.enter(type.getConstraint());
+    Constraint.enter(domain.getConstraint());
     leq(type.getMonotype(),domain.getMonotype());
   }
   
@@ -415,7 +415,7 @@ public final class Typing
     if(domain == Domain.bot)
       return;
     
-    Constraint.assert(domain.getConstraint());
+    Constraint.enter(domain.getConstraint());
     leq(type, domain.getMonotype());
   }
   

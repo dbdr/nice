@@ -55,7 +55,7 @@ public final class TypeConstructorLeqMonotypeCst extends AtomicConstraint
       ((TypeConstructor) tt1, (Monotype) tt2);
   }
 
-  public void assert()
+  public void enter()
   throws TypingEx
   {
     // Use the raw type of t2, after the nullness marker.

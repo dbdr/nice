@@ -52,7 +52,7 @@ public class MonotypeLeqCst extends AtomicConstraint
     return new MonotypeLeqCst(new1, new2);
   }
 
-  void assert()
+  void enter()
   throws TypingEx
   {
     Typing.leq(m1,m2);

@@ -201,7 +201,7 @@ public class MethodBodyDefinition extends Definition
 
 	try{
 	  mlsub.typing.Polytype t = m.getType();
-	  Constraint.assert(t.getConstraint());
+	  Constraint.enter(t.getConstraint());
 	  tagLeq(tags, t.domain());
 	  tagLeq(additionalTags, t.domain());
 	}
@@ -330,7 +330,7 @@ public class MethodBodyDefinition extends Definition
       entered = true;
 
       try { 
-	Constraint.assert(declaration.getType().getConstraint());
+	Constraint.enter(declaration.getType().getConstraint());
       }
       catch(TypingEx e){
 	User.error(name,

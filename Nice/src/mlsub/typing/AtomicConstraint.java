@@ -24,7 +24,7 @@ package mlsub.typing;
 
 public abstract class AtomicConstraint
 {
-  abstract void assert() throws TypingEx;
+  abstract void enter() throws TypingEx;
 
   /**
    * Perform type symbol substitution inside the constraint.

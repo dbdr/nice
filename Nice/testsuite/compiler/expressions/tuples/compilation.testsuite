@@ -48,3 +48,6 @@
   (String fst, String snd) = foo("abc","xyz");
   /// Toplevel
   <T,U> (T,U) foo(T x, U y) = (x,y); 
+
+/// PASS
+  (?int,?int) tup = (null, 3);

@@ -49,16 +49,15 @@ public class LiteralArrayProc extends gnu.mapping.ProcedureN
     Expression[] args = exp.getArgs();
     CodeAttr code = comp.getCode();
 
-    Type componentType = getComponentType(args);
+    Type componentType = arrayType.getComponentType().getImplementationType();
 
     code.emitPushInt(nbElements);
     code.emitNewArray(componentType);
 
     // Set a special type, not the legacy array type.
     code.popType();
-    code.pushType(SpecialTypes.array(componentType));
+    code.pushType(arrayType);
 
-    
     /*
       Optimization:
       We need to keep the reference to the array.
@@ -102,33 +101,12 @@ public class LiteralArrayProc extends gnu.mapping.ProcedureN
       target.compileFromStack(comp, code.topType());
   }
 
-  private Type getComponentType (Expression[] args)
-  {
-    Type type = Types.lowestUpperBound(args);
-    
-    if (type.isSubtype(arrayType.getComponentType()))
-      {
-        // We could precise that type of the array, but this is not
-        // necessary given the context, and it would even be bas for primitive
-        // types (byte[] will need conversion if int[] is expected).
-        // Just keep the original type.
-        type = arrayType.getComponentType();
-      }
-
-    if (type == Type.nullType)
-      // All we know is that this array will contain only null, and will be
-      // used generically. Let's make that Object.
-      type = Type.pointer_type;
-
-    return type;
-  }
-
   public Type getReturnType(Expression[] args)
   {
     if (wrapAsCollection)
       return ClassType.make("java.util.List");
 
-    return SpecialTypes.array(getComponentType(args));
+    return arrayType;
   }
 
   public Object applyN(Object[] args)

@@ -324,74 +324,27 @@ public class Nicec extends Task {
 	 */
 	public void execute() throws BuildException {
 		log("runtime: " + getRuntime(), Project.MSG_VERBOSE);
-		Vector args = new Vector();
 
-		if (sourcepath != null) {
-			args.addElement("--sourcepath");
-			args.addElement(sourcepath);
-		}
-		if (destination != null) {
-			args.addElement("--destination");
-			args.addElement(destination.getAbsolutePath());
-		}
-		if (classpath != null) {
-			args.addElement("--classpath");
-			args.addElement(classpath);
-		}
-		if (jar != null) {
-			args.addElement("--jar");
-			args.addElement(jar);
-		}
-		if (output != null) {
-			args.addElement("--output");
-			args.addElement(output);
-		}
-		if (recompile) {
-			args.addElement("--recompile");
-		}
-		if (recompile_all) {
-			args.addElement("--recompile-all");
-		}
-		if (compile) {
-			args.addElement("--compile");
-		}
-		if (exclude_runtime) {
-			args.addElement("--exclude-runtime");
-		}
-		if (runtime != null) {
-			args.addElement("--runtime");
-			args.addElement(runtime);
-		}
-		if (native_compiler != null) {
-			args.addElement("--native-compiler");
-			args.addElement(native_compiler);
-		}
-		if (help) {
-			args.addElement("--help");
-		}
-		if (editor) {
-			args.addElement("--editor");
-		}
-		if (man) {
-			args.addElement("--man");
-		}
-		if (version) {
-			args.addElement("--version");
-		}
-		if (usage) {
-			args.addElement("--usage");
-		}
-		if (memory) {
-			args.addElement("--memory");
-		}
-		if (pack != null) {
-			args.addElement(pack);
-		}
-
-		String[] argArray = new String[args.size()];
-		System.arraycopy(args.toArray(), 0, argArray, 0, args.size());
+		int retval = nice.tools.compiler.fun.compile
+		  (pack,
+		   sourcepath,
+		   destination,
+		   classpath,
+		   jar,
+		   output,
+		   recompile,
+		   recompile_all,
+		   compile,
+		   exclude_runtime,
+		   runtime,
+		   native_compiler,
+		   help,
+		   editor,
+		   man,
+		   version,
+		   usage,
+		   memory);
 		
-		int retval = nice.tools.compiler.fun.compile(argArray);
 		switch (retval) {
 			case OutputMessages.ERROR:
 				throw new BuildException(ERROR_MSG, location);

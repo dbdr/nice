@@ -1,0 +1,116 @@
+/**************************************************************************/
+/*                                N I C E                                 */
+/*             A high-level object-oriented research language             */
+/*                        (c) Daniel Bonniot 2002                         */
+/*                                                                        */
+/*  This program is free software; you can redistribute it and/or modify  */
+/*  it under the terms of the GNU General Public License as published by  */
+/*  the Free Software Foundation; either version 2 of the License, or     */
+/*  (at your option) any later version.                                   */
+/*                                                                        */
+/**************************************************************************/
+
+package nice.tools.compiler;
+
+/**
+   Public interface to use the compilation services.
+
+   @version $Date$
+   @author Daniel Bonniot (bonniot@users.sourceforge.net)
+ */
+
+/**
+   The arguments match the command line arguments. 
+   For now, see the output of nicec -h for their meaning.
+   @return a status code describing if the compilation was successful.
+     The codes are found in OutputMessages (OK, WARNING, ERROR, BUG).
+*/
+public int compile
+  (String mainPackage,
+   ?String sourcepath = null,
+   ?java.io.File destination = null,
+   ?String classpath = null,
+   ?String jar = null,
+   ?String output = null,
+   boolean recompile,
+   boolean recompileAll,
+   boolean compileOnly,
+   boolean excludeRuntime,
+   ?String runtime = null,
+   ?String nativeCompiler = null,
+   boolean help,
+   boolean editor,
+   boolean man,
+   boolean version,
+   boolean usage,
+   boolean memory
+  )
+{
+  Vector<String> args = makeVector(10);
+  if (sourcepath != null) {
+    args.add("--sourcepath");
+    args.add(sourcepath);
+  }
+  if (destination != null) {
+    args.add("--destination");
+    args.add(destination.getAbsolutePath());
+  }
+  if (classpath != null) {
+    args.add("--classpath");
+    args.add(classpath);
+  }
+  if (jar != null) {
+    args.add("--jar");
+    args.add(jar);
+  }
+  if (output != null) {
+    args.add("--output");
+    args.add(output);
+  }
+  if (recompile) {
+    args.add("--recompile");
+  }
+  if (recompileAll) {
+    args.add("--recompile-all");
+  }
+  if (compileOnly) {
+    args.add("--compile");
+  }
+  if (excludeRuntime) {
+    args.add("--exclude-runtime");
+  }
+  if (runtime != null) {
+    args.add("--runtime");
+    args.add(runtime);
+  }
+  if (nativeCompiler != null) {
+    args.add("--native-compiler");
+    args.add(nativeCompiler);
+  }
+  if (help) {
+    args.add("--help");
+  }
+  if (editor) {
+    args.add("--editor");
+  }
+  if (man) {
+    args.add("--man");
+  }
+  if (version) {
+    args.add("--version");
+  }
+  if (usage) {
+    args.add("--usage");
+  }
+  if (memory) {
+    args.add("--memory");
+  }
+  args.add(mainPackage);
+
+  return compile(args.toArray());
+}
+
+
+// Local Variables:
+// nice-xprogram: "nicec -d \"$HOME/Nice/classes\" --sourcepath=\"$HOME/Nice/src\" --classpath=\"$HOME/Nice/classes\""
+// End:

@@ -112,7 +112,7 @@ public final class Polytype
   throws TypingEx
   {
     // Optimization
-    if(!Constraint.hasBinders(constraint))
+    if (isMonomorphic())
       return;
     
     Typing.enter();
@@ -256,7 +256,7 @@ public final class Polytype
 
   public void simplify()
   {
-    if (!Constraint.hasBinders(constraint) || simplified)
+    if (isMonomorphic() || simplified || Polytype.noSimplify)
       return;
 
     ArrayList binders = new ArrayList(), atoms = new ArrayList();
@@ -330,5 +330,7 @@ public final class Polytype
   }
 
   private Constraint constraint;
-  private Monotype monotype;  
+  private Monotype monotype;
+
+  public static boolean noSimplify;
 }

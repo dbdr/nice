@@ -96,6 +96,7 @@ public abstract class Debug
     mlsub.typing.lowlevel.Engine.dbg = Debug.engine;
     mlsub.typing.Typing.dbg = Debug.typing;
     mlsub.typing.Enumeration.linkDbg = Debug.linkTests;
+    mlsub.typing.Polytype.noSimplify = getBoolean("debug.noSimplify", false);
   }
   
   public static final String

@@ -69,4 +69,9 @@ main(args)
 
   Vector<String> v = makeVector(1);
   v.elements.size();
+
+  // Tuples
+
+  <String, String> cs = ("1", "2");
+  println(cs);
 }

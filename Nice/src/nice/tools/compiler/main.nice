@@ -12,7 +12,7 @@
 
 // File    : main.nice
 // Created : Sat Feb 19 16:21:04 2000 by Daniel Bonniot
-//$Modified: Mon Jul 31 20:32:58 2000 by Daniel Bonniot $
+//$Modified: Wed Aug 02 15:10:00 2000 by Daniel Bonniot $
 
 package nice.tools.compiler;
 
@@ -139,7 +139,7 @@ version()
 {
   println("Nice compiler alpha version");
   println("Copyright (C) 2000 Daniel Bonniot");
-  println("Visit Nice homepage: http://purl.org/net/nice");
+  println("Visit the Nice homepage: http://purl.org/net/nice");
   println("Report bugs to d.bonniot@mail.dotcom.fr");
   System.exit(0);
 }

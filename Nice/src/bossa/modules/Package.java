@@ -12,7 +12,7 @@
 
 // File    : Package.java
 // Created : Wed Oct 13 16:09:47 1999 by bonniot
-//$Modified: Fri Jul 28 21:54:05 2000 by Daniel Bonniot $
+//$Modified: Tue Aug 01 19:01:35 2000 by Daniel Bonniot $
 
 package bossa.modules;
 
@@ -28,6 +28,7 @@ import java.util.jar.*;
 import java.io.*;
 
 import bossa.modules.Compilation;
+import bossa.util.Location;
 
 /**
  * A Nice package.
@@ -35,11 +36,11 @@ import bossa.modules.Compilation;
  * @author bonniot
  */
 
-public class Package implements mlsub.compilation.Module
+public class Package implements mlsub.compilation.Module, Located
 {
   public long lastModification()
   {
-    return lastModified;
+    return source.lastModification;
   }
   
   public void lastModifiedRequirement(long date)
@@ -47,21 +48,18 @@ public class Package implements mlsub.compilation.Module
     // If we've already loaded the source
     // or none of our imports changed since last time we compiled,
     // there is nothing to do
-    if (sourcesRead || date<=lastModified)
+    if (source.sourcesRead || date<=lastModification())
       return;
     
-    if (itfFromJar != null)
-      User.error(name + " should be recompiled, but it was loaded from an archive file");
+    if (source instanceof JarSource)
+      User.error(this, name + " should be recompiled, but it was loaded from an archive file");
     
     if (Debug.modules)
       Debug.println("Recompiling " + this + 
 		    " because a required package changed " + 
 		    new java.util.Date(date));
-    
-    List definitions = new LinkedList();
-    sourcesRead();
-    read(getSources(), definitions);
-    ast = new AST(this, definitions);
+
+    read(true);
   }
   
   public void compile()
@@ -124,8 +122,8 @@ public class Package implements mlsub.compilation.Module
     
     opens  = new LinkedList();
 
-    findPackageDirectory();
-    if (directory == null && itfFromJar == null)
+    findPackageSource();
+    if (source == null)
       User.error(name, "Could not find package " + name);
     
     opens.add(this.name);
@@ -146,31 +144,16 @@ public class Package implements mlsub.compilation.Module
     Definition.currentModule = this;
     
     List definitions = new LinkedList();
-    if (itfFromJar != null)
-      bossa.parser.Loader.open(itfFromJar, name.toString(), 
-			       definitions, imports, opens);
-    else
-      {
-	File[] sources = getSources();
-	File itf = getInterface();
 
-	lastModified = maxLastModified(sources);
+    if (Debug.passes)
+      Debug.println(this + ": parsing " + source.getName());
+
+    BufferedReader[] readers = source.getDefinitions(forceReload);
+    if(source.sourcesRead)
+      sourcesRead();
     
-	if (!forceReload &&
-	    itf != null && 
-	    lastModified <= itf.lastModified())
-	  read(itf, definitions);
-	else
-	  {
-	    if (sources.length == 0)
-	      User.error(name, 
-			 "Package " + name + 
-			 " has no source file in "+directory);
-	
-	    sourcesRead();
-	    read(sources, definitions);
-	  }
-      }
+    for(int i = 0; i<readers.length; i++)
+      read(readers[i], definitions);
     
     this.ast = new AST(this, expand(definitions));
 
@@ -191,10 +174,10 @@ public class Package implements mlsub.compilation.Module
     
     // We are going to generate new code, create the class file
     // Do not use ClassType.make, we want to create a NEW class
-    bytecode = new ClassType(name + ".package");
-    bytecode.setSuper("java.lang.Object");
-    bytecode.setModifiers(Access.FINAL | Access.PUBLIC);
-    bytecode.requireExistingClass(false);
+    outputBytecode = new ClassType(name + ".package");
+    outputBytecode.setSuper("java.lang.Object");
+    outputBytecode.setModifiers(Access.FINAL | Access.PUBLIC);
+    outputBytecode.requireExistingClass(false);
   }
   
   private static List expand(List definitions)
@@ -211,46 +194,20 @@ public class Package implements mlsub.compilation.Module
     return definitions;
   }
   
-  private long maxLastModified(File[] files)
+  private void read(BufferedReader reader, List definitions)
   {
-    long res = 0;
-    for(int i = 0; i<files.length; i++)
-      {
-	long time = files[i].lastModified();
-	if (time>res) res = time;
-      }
-    return res;
-  }
-  
-  private void read(File sourceFile, List definitions)
-  {
-    if (Debug.passes)
-      Debug.println(this + ": parsing " + sourceFile);
-    
-    try{
-      Reader reader = new BufferedReader(new FileReader(sourceFile));
-      LocatedString pkgName = 
-	bossa.parser.Loader.open(reader, sourceFile.getName(),
-				 definitions, imports, opens);
-      if (pkgName!=null && !pkgName.equals(this.name))
-	User.error(pkgName,
-		   sourceFile+" declares it belongs to package "+pkgName+
-		   ", but it was found in package "+name);
-    }
-    catch(FileNotFoundException e){
-      User.error(sourceFile.getName()+" of package "+name+" could not be found");
-    }
-  }
-  
-  private void read(File[] sources, List definitions)
-  {
-    for(int i = 0; i<sources.length; i++)
-      read(sources[i], definitions);
+    LocatedString pkgName = 
+      bossa.parser.Loader.open(reader,
+			       definitions, imports, opens);
+    if (pkgName!=null && !pkgName.equals(this.name))
+      User.error(pkgName,
+		 source + " declares it belongs to package " + pkgName +
+		 ", but it was found in package " + name);
   }
   
   private void readAlternatives()
   {
-    for(Method method = bytecode.getMethods();
+    for(Method method = source.bytecode.getMethods();
 	method != null;
 	method = method.getNext())
       {
@@ -269,13 +226,13 @@ public class Package implements mlsub.compilation.Module
 	    )
 	  continue;
 
-	new bossa.link.Alternative(methodName, bytecode, method);
+	new bossa.link.Alternative(methodName, source.bytecode, method);
       }
   }
   
   private boolean alternativesHaveMain()
   {
-    for(Method method = bytecode.getMethods();
+    for(Method method = source.bytecode.getMethods();
 	method != null;
 	method = method.getNext())
       if (method.getName().equals("main"))
@@ -332,9 +289,6 @@ public class Package implements mlsub.compilation.Module
   
   private void typecheck()
   {
-    //if (!sourcesRead)
-    //return;
-    
     if (Debug.passes)
       Debug.println(this + ": typechecking");
     
@@ -375,7 +329,7 @@ public class Package implements mlsub.compilation.Module
       name = name.substring(lastDot+1, name.length());
     
     try{
-      jarDestFile = new File(directory.getParent(), name + ".jar");
+      jarDestFile = new File(source.getOutputDirectory().getParent(), name + ".jar");
       
       OutputStream out = new FileOutputStream(jarDestFile);
       Manifest manifest = new Manifest();
@@ -387,7 +341,7 @@ public class Package implements mlsub.compilation.Module
       jar = new JarOutputStream(out, manifest);
     }
     catch(IOException e){
-      User.error(this.name, "Error during creation of executable file: "+e);
+      User.error(this.name, "Error during creation of executable file: " + e);
     }
   }
   
@@ -433,7 +387,7 @@ public class Package implements mlsub.compilation.Module
 
     try{
       PrintWriter f = new PrintWriter
-	(new BufferedWriter(new FileWriter(new File(directory,"package.nicei"))));
+	(new BufferedWriter(new FileWriter(new File(source.getOutputDirectory(), "package.nicei"))));
       f.print("package "+name+";\n\n");
       
       for(Iterator i = getImports().iterator(); i.hasNext();)
@@ -470,8 +424,9 @@ public class Package implements mlsub.compilation.Module
     return name;
   }
   
-  private ClassType bytecode;
-  public  ClassType getBytecode() { return bytecode; }
+  private ClassType outputBytecode;
+  public  ClassType getOutputBytecode() { return outputBytecode; }
+  public  ClassType getReadBytecode() { return source.bytecode; }
 
   private static ModuleExp pkg;
   public ScopeExp getPackageScopeExp()
@@ -532,6 +487,22 @@ public class Package implements mlsub.compilation.Module
     if (!sourcesRead)
       {
 	ast.compile();
+
+	if (jar!=null && compilation.staticLink)
+	  {
+	    if (Debug.passes)
+	      Debug.println(this + ": adding up-to-date bytecode");
+
+	    try{
+	      jar.putNextEntry(new JarEntry(getName().replace('.', '/') 
+					    + "/package.class"));
+	      copyStreams(source.getBytecodeStream(), jar);
+	    }
+	    catch(IOException e){
+	      User.error(this, "Error writing bytecode in archive", e);
+	    }
+	  }
+
 	return;
       }
 
@@ -541,7 +512,7 @@ public class Package implements mlsub.compilation.Module
     //comp = new gnu.expr.Compilation(pkg, name.toString()+"DUMMY",
     //name.toString()+".", false);
 
-    comp = new gnu.expr.Compilation(bytecode,name.toString(),
+    comp = new gnu.expr.Compilation(outputBytecode,name.toString(),
 				    name.toString(),"prefix",false);
     
     ast.compile();
@@ -551,11 +522,33 @@ public class Package implements mlsub.compilation.Module
     
     comp.compileClassInit(initStatements);
     
-    addClass(bytecode);
+    addClass(outputBytecode);
     for (int iClass = 0;  iClass < comp.numClasses;  iClass++)
       addClass(comp.classes[iClass]);
   }
 
+  private void copyStreams(InputStream in, OutputStream out)
+  throws IOException
+  {
+    int size = in.available();
+    if (size < 1024) size = 1024;
+    byte[] buf = new byte[size];
+    
+    try{
+      int read;
+      do
+	{
+	  read = in.read(buf);
+	  if (read>0)
+	    out.write(buf, 0, read);
+	}
+      while (read != -1);
+    }
+    finally{
+      in.close();
+    }
+  }
+  
   public ClassType createClass(String name)
   {
     ClassType res = new ClassType(this.name + "." + name);
@@ -588,7 +581,7 @@ public class Package implements mlsub.compilation.Module
 	}
     }
     catch(IOException e){
-      User.error(this.name, "Could not write code for "+this, ": "+e);
+      User.error(this.name, "Could not write code for " + this, ": " + e);
     }
   }
 
@@ -655,7 +648,7 @@ public class Package implements mlsub.compilation.Module
    * File searching
    ****************************************************************/
 
-  private static final String sourceExt = ".nice";
+  static final String sourceExt = ".nice";
   
   private static final Object[] packageRoots;
   static 
@@ -699,128 +692,35 @@ public class Package implements mlsub.compilation.Module
     packageRoots = res.toArray(new Object[res.size()]);
   }
   
-  private InputStream openClass()
-  {
-    File f = new File(directory, "package.class");
-
-    try{
-      if (f != null)
-	return new FileInputStream(f);
-    }
-    catch(FileNotFoundException e){}
-
-    return null;
-  } 
-
-  private File[] getSources()
-  {
-    File[] res = directory.listFiles
-      (new FilenameFilter()
-	{ 
-	  public boolean accept(File dir, String name)
-	  { return name.endsWith(sourceExt); }
-	}
-       );
-    if (res == null)
-      User.error(name,"Could not list source files in "+name);
-    
-    // put nice.lang.prelude first if it exists
-    if (name.toString().equals("nice.lang"))
-      for(int i = 0; i<res.length; i++)
-	if (res[i].getName().equals("prelude" + sourceExt))
-	  {
-	    File tmp = res[i];
-	    res[i] = res[0];
-	    res[0] = tmp;
-	    break;
-	  }
-    
-    return res;
-  }
-
-  private File getInterface()
-  {
-    File itf = new File(directory, "package.nicei");
-
-    if (!itf.exists())
-      return null;
-    
-    InputStream s = openClass();
-    if (s == null)
-      {
-	User.warning("Bytecode for " + this + 
-		     " was not found, altough its interface exists.\n"+
-		     "Ignoring and recompiling");
-	return null;
-      }
-    
-    try{ bytecode = ClassFileInput.readClassType(s); }
-    catch(LinkageError e){}
-    catch(IOException e){}
-
-    if (bytecode != null)
-      return itf;
-    
-    User.warning("Bytecode for " + this + 
-		 " is not correct, altough its interface exists.\n"+
-		 "Ignoring and recompiling");
-    
-    return null;
-  }
-  
-  private void findPackageDirectory()
+  private void findPackageSource()
   {
     String filesystemName = name.toString().replace('.', File.separatorChar);
-    // Jar and Zip files use forward slashes
-    String jarName = name.toString().replace('.', '/');
-    JarFile jar = null;
     
     search:
-    for (int i = 0; i<packageRoots.length; i++)
+    for (int i = 0; source==null && i<packageRoots.length; i++)
       if (packageRoots[i] instanceof File)
 	{
-	  directory = new File((File) packageRoots[i], filesystemName);
-	  if (directory.exists())
-	    {
-	      rootDirectory = (File) packageRoots[i];
-	      break search;
-	    }
-	  else
-	    directory = null;
+	  source = DirectorySource.create
+	    (this, new File((File) packageRoots[i], filesystemName));
+	  if (source != null)
+	    rootDirectory = (File) packageRoots[i];
 	}
       else
-	{
-	  jar = (JarFile) packageRoots[i];
-	  JarEntry ent = jar.getJarEntry(jarName + "/package.nicei");
-
-	  if (ent != null)
-	    try{
-	      itfFromJar = new BufferedReader
-		(new InputStreamReader(jar.getInputStream(ent)));
-	      ent = jar.getJarEntry(jarName + "/package.class");
-	      bytecode = ClassFileInput.readClassType(jar.getInputStream(ent));
-	      break search;
-	    }
-	    catch(IOException e){
-	      // We just issue a warning and go on, trying to find it elsewhere
-	      User.warning(this.name, 
-			   "Error reading archive " + jar.getName());
-	      itfFromJar = null;
-	      bytecode = null;
-	    }
-	}
-
-    if (Debug.modules)
-      Debug.println(this + " was found in " +
-		    (directory != null 
-		     ? directory.toString()
-		     : jar != null ? jar.getName() : "nothing"));
+	source = JarSource.create(this, (JarFile) packageRoots[i]);
+    
+    if (Debug.modules && source!=null)
+      Debug.println(this + " was found in " + source.getName());
   }
   
   /****************************************************************
    * Misc
    ****************************************************************/
 
+  public Location location()
+  {
+    return name.location();
+  }
+  
   public String getName()
   {
     return name.toString();
@@ -860,15 +760,12 @@ public class Package implements mlsub.compilation.Module
 
   private AST ast;
 
-  /** The directory where this package resides. */
-  private File directory;
-
+  /** The "source" where this package resides. */
+  private PackageSource source;
+  
   /** The component of the package path this package was found in. */
   private File rootDirectory;
 
-  /** The interface file of the package if it was found in a jar file */
-  private Reader itfFromJar;
-  
   /** The compilation that is in process. */
   private Compilation compilation;
   
@@ -903,6 +800,4 @@ public class Package implements mlsub.compilation.Module
       or from source files.
   */
   private boolean sourcesRead;
-
-  private long lastModified;
 }

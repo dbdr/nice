@@ -12,7 +12,7 @@
 
 // File    : GlobalVarDeclaration.java
 // Created : Tue Jul 06 12:06:20 1999 by bonniot
-//$Modified: Tue Jun 06 11:49:17 2000 by Daniel Bonniot $
+//$Modified: Tue Aug 01 17:42:13 2000 by Daniel Bonniot $
 
 package bossa.syntax;
 
@@ -59,9 +59,9 @@ public class GlobalVarDeclaration extends Definition
 			       bossa.CodeGen.javaType(left.type));
 
     if(!module.generatingBytecode())
-      // We are in an interface file, module.bytecode is the compiled class
+      // The code is already there
       {
-	declaration.field = module.getBytecode().getField(left.name.toString());
+	declaration.field = module.getReadBytecode().getField(left.name.toString());
 	
 	if(declaration.field==null)
 	  Internal.error(this,
@@ -69,7 +69,7 @@ public class GlobalVarDeclaration extends Definition
       }
     else
       {
-	declaration.field = module.getBytecode()
+	declaration.field = module.getOutputBytecode()
 	  .addField(left.name.toString(),
 		    bossa.CodeGen.javaType(left.type),
 		    Access.PUBLIC|Access.STATIC);

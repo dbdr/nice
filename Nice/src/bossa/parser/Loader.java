@@ -12,7 +12,7 @@
 
 // File    : Loader.java
 // Created : Thu Jul 29 09:43:50 1999 by bonniot
-//$Modified: Mon May 15 17:38:50 2000 by Daniel Bonniot $
+//$Modified: Tue Aug 01 18:08:01 2000 by Daniel Bonniot $
 
 package bossa.parser;
 
@@ -31,13 +31,10 @@ import bossa.util.*;
 public abstract class Loader
 {
   public static LocatedString open(Reader r, 
-				   String filename, // only for locating identifiers
 				   List definitions,
 				   List imports,
 				   List importStars)
   {
-    Location.currentFile = filename;
-
     if(parser==null)
       parser = new Parser(r);
     else

@@ -38,7 +38,7 @@ public class Parser
 {
   private static IdentExp symb(String name, Token t, boolean quoted)
   {
-    return new IdentExp(new LocatedString(name, Location.make(t),quoted));
+    return new IdentExp(new LocatedString(name, makeLocation(t),quoted));
   }
   private static IdentExp symb(String name, Token t)
   {
@@ -59,6 +59,18 @@ public class Parser
     ex.currentToken = getToken(0);
     throw ex;
   }
+
+  private static Location makeLocation(Token t)
+  {
+    return Location.make(t.beginLine, t.beginColumn, t.endLine, t.endColumn);
+  }
+
+  private static Location makeLocation(Token start, Token end)
+  {
+    return Location.make(start.beginLine, start.beginColumn, end.endLine, end.endColumn);
+  }
+
+
 }
 PARSER_END(Parser)
 
@@ -400,7 +412,7 @@ LocatedString ident():
 { Token t; }
 {
   t=<IDENT> 
-  { return new LocatedString(t.image, Location.make(t)); }
+  { return new LocatedString(t.image, makeLocation(t)); }
 }
 
 String unlocIdent():
@@ -419,7 +431,7 @@ LocatedString identOrBackquoted():
   (
    name=<BACKQUOTEDSTRING>
    { res = new LocatedString(name.image.substring(1, name.image.length() - 1),
-			     Location.make(name), true); }
+			     makeLocation(name), true); }
   |
    res = ident()
   )
@@ -456,7 +468,7 @@ LocatedString doted_string():
     { image.append(".").append(t.image); } 
   )*
 
-  { return new LocatedString(image.toString(), Location.make(start, t)); }
+  { return new LocatedString(image.toString(), makeLocation(start, t)); }
 }
 
 /** Contains at least one "." */
@@ -472,7 +484,7 @@ LocatedString fullyQualifiedName():
     "." t=doted_string_component() 
     { image.append(".").append(t.image); } 
   )+
-  { return new LocatedString(image.toString(), Location.make(start, t)); }
+  { return new LocatedString(image.toString(), makeLocation(start, t)); }
 }
 
 LocatedString doted_array_string():
@@ -498,14 +510,14 @@ LocatedString floatingLiteral():
 { Token t; }
 {
   t = <FLOATING_POINT_LITERAL> 
-  { return new LocatedString(t.image, Location.make(t)); }
+  { return new LocatedString(t.image, makeLocation(t)); }
 }
 
 LocatedString integerLiteral():
 { Token t; }
 {
   t = <INTEGER_LITERAL> 
-  { return new LocatedString(t.image, Location.make(t)); }
+  { return new LocatedString(t.image, makeLocation(t)); }
 }
 
 ConstantExp typeExpression():
@@ -571,7 +583,7 @@ TypeSymbol binder(Collection atomics):
     return second; 
   }
 | { boolean sure = false; }
-  [ t="Any" { User.warning(Location.make(t), "The 'Any' keyword is deprecated, leave it away."); }
+  [ t="Any" { User.warning(makeLocation(t), "The 'Any' keyword is deprecated, leave it away."); }
   | "!" { sure = true; } 
   ]
   id=monotypeVar()
@@ -659,7 +671,7 @@ Monotype monotypeConstructor():
       last=getToken(0);
 
       return new MonotypeConstructor(t,new TypeParameters(p),
-				     Location.make(first, last)); 
+				     makeLocation(first, last)); 
     }
 }
 
@@ -690,9 +702,9 @@ Monotype funOrTupleMonotype():
       }
     Monotype res;
     if (domain != null)
-      res = new TupleType(domain, Location.make(start, end)); 
+      res = new TupleType(domain, makeLocation(start, end)); 
     else
-      res = new TypeIdent(new LocatedString("void",Location.make(start, end)));
+      res = new TypeIdent(new LocatedString("void",makeLocation(start, end)));
  
     res.nullness = res.absent;
     return res;
@@ -769,7 +781,7 @@ Monotype simpleMonotype():
   res=funOrTupleMonotype()
 |
   start="alike" [ "<" p=monotypes() ">" ]
-  { res=new Alike(p, Location.make(start)); }
+  { res=new Alike(p, makeLocation(start)); }
   { res.nullness = res.absent; }
 |
   LOOKAHEAD(monotypeConstructor())
@@ -823,7 +835,7 @@ Expression ParameterTuplePart(List statements, List monotypes):
   part = ParameterTuplePart(statements, types) { parts.add(part); }
   ( "," part = ParameterTuplePart(statements, types) { parts.add(part); } )+
   last=")"
-  { Monotype t = new TupleType(types, Location.make(first, last));
+  { Monotype t = new TupleType(types, makeLocation(first, last));
     t.nullness = Monotype.absent;
     monotypes.add(t); 
     return new TupleExp(parts); }
@@ -862,12 +874,12 @@ FormalParameters.Parameter formalParameter(List statements):
   [ id=ident() [ "=" val=Expression() ] ]
   { if (id == null) {
       ident = new LocatedString("tuple_arg_" + first.beginLine + "_" + first.beginColumn, 
-				Location.make(first, last));
+				makeLocation(first, last));
     } else { ident = id; }
     Expression exp = AssignExp.create(new TupleExp(parts),new IdentExp(ident));
-    exp.setLocation(Location.make(first,last));
+    exp.setLocation(makeLocation(first,last));
     statements.add(new ExpressionStmt(exp));
-    t = new TupleType(types, Location.make(first, last));
+    t = new TupleType(types, makeLocation(first, last));
     t.nullness = Monotype.absent;
     if (val != null)
       return new FormalParameters.OptionalParameter(t, ident, val);
@@ -1166,7 +1178,7 @@ MethodContainer.Constraint classTypeParameters(Constraint prefix, List tags):
     // and the type parameters.
     if (prefix != Constraint.True && atoms.size() > 0)
       throw bossa.util.User.error
-        (Location.make(start), "Constraints on type parameters should all be specified in the prefix constraint");
+        (makeLocation(start), "Constraints on type parameters should all be specified in the prefix constraint");
 
     MonotypeVar[] b = (MonotypeVar[]) binders.toArray(new MonotypeVar[binders.size()]);
     return MethodContainer.Constraint.make(prefix, b, atoms); 
@@ -1592,14 +1604,14 @@ ConstantExp nullConstantExp():
 { Token t; }
 {
   t="null" 
-  { return NullExp.create(Location.make(t)); }
+  { return NullExp.create(makeLocation(t)); }
 }
 
 ConstantExp booleanConstantExp():
 { Token t; }
 {
-  t = "true"  { return ConstantExp.makeBoolean(true,  Location.make(t)); }
-| t = "false" { return ConstantExp.makeBoolean(false, Location.make(t)); }
+  t = "true"  { return ConstantExp.makeBoolean(true,  makeLocation(t)); }
+| t = "false" { return ConstantExp.makeBoolean(false, makeLocation(t)); }
 }
 
 ConstantExp intConstantExp():
@@ -1631,7 +1643,7 @@ ConstantExp charConstantExp():
   t = <CHARACTER_LITERAL> 
   { return ConstantExp.makeChar
       (new LocatedString(t.image.substring(1, t.image.length() - 1),
-			 Location.make(t)));
+			 makeLocation(t)));
   }
 }
 
@@ -1682,7 +1694,7 @@ Expression newExp():
     { Arguments arguments; }
     arguments = arguments(false)
     { e = new NewExp(classe, arguments); 
-      e.setLocation(Location.make(t));
+      e.setLocation(makeLocation(t));
       return e;
     }
   |
@@ -1735,12 +1747,12 @@ MonoSymbol funExpParameter(List statements):
   [ ident=ident() ]
   { if (ident == null) {
       name = new LocatedString("tuple_arg_" + first.beginLine + "_" + first.beginColumn, 
-				Location.make(first, last));
+				makeLocation(first, last));
     } else { name = ident; }
     Expression exp = AssignExp.create(new TupleExp(parts),new IdentExp(name));
-    exp.setLocation(Location.make(first,last));
+    exp.setLocation(makeLocation(first,last));
     statements.add(new ExpressionStmt(exp));
-    type = new TupleType(types, Location.make(first, last));
+    type = new TupleType(types, makeLocation(first, last));
     type.nullness = Monotype.absent;
     return new MonoSymbol(name, type);
   }
@@ -1917,7 +1929,7 @@ Expression Expression() :
   |
     e1=ConditionalExpression()
     [ 
-      { e1.setLocation(Location.make(first, getToken(0))); }
+      { e1.setLocation(makeLocation(first, getToken(0))); }
       op=AssignmentOperator() 
       e2=Expression()
       {
@@ -1930,7 +1942,7 @@ Expression Expression() :
   )
   { 
     last=getToken(0);
-    e1.setLocation(Location.make(first, last));
+    e1.setLocation(makeLocation(first, last));
     return e1;
   }
 }
@@ -1962,7 +1974,7 @@ Expression ConditionalExpression() :
   res=ImpliesExpression() 
     [
       "?" e1=Expression() start=":" e2=ConditionalExpression() 
-      { e2.setLocation(Location.make(start, getToken(0))); 
+      { e2.setLocation(makeLocation(start, getToken(0))); 
         res=new IfExp(res,e1,e2); }
     ]
   { return res; }
@@ -2054,7 +2066,7 @@ Expression RelationalExpression() :
       {
         e1=CallExp.create(symb("&&",t),e1,CallExp.create(symb(t),e3,e2));
         if (t.image.charAt(0) != t_prev.image.charAt(0))
-	  User.error(Location.make(t), "All chained comparisons should be in the same direction");
+	  User.error(makeLocation(t), "All chained comparisons should be in the same direction");
       }
       e3 = e2;
       t_prev = t;
@@ -2173,7 +2185,7 @@ Expression PrimaryExpression() :
 {
   res=PrimaryPrefix() 
     ( res=PrimarySuffix(res) )*
-  { res.setLocation(Location.make(first, getToken(0))); 
+  { res.setLocation(makeLocation(first, getToken(0))); 
     return res; }
 }
 
@@ -2357,7 +2369,7 @@ Statement Statement() :
 | res=SynchronizedStatement()
 )
   { 
-    res.setLocation(Location.make(first, getToken(0)));
+    res.setLocation(makeLocation(first, getToken(0)));
     return res; 
   }
 }
@@ -2394,7 +2406,7 @@ Statement Block() :
   { 
     last = getToken(0);
     Statement res = new Block(statements); 
-    res.setLocation(Location.make(first, last));
+    res.setLocation(makeLocation(first, last));
     return res;
   }
 }
@@ -2478,7 +2490,7 @@ Statement LocalTupleDeclaration(List statements) :
   last=")"
   "=" e=Expression() ";" 
   { Expression exp = AssignExp.create(new TupleExp(parts), e);
-    exp.setLocation(Location.make(first,last));
+    exp.setLocation(makeLocation(first,last));
     return new ExpressionStmt(exp); }
 }
 
@@ -2586,7 +2598,7 @@ Statement RealStatementExpression() :
 )
   {
     last = getToken(0);
-    e1.setLocation(Location.make(first, last));
+    e1.setLocation(makeLocation(first, last));
     return new ExpressionStmt(e1); 
   }
 }
@@ -2616,7 +2628,7 @@ Statement ShortStatementExpression() :
 )
   {
     last = getToken(0);
-    e1.setLocation(Location.make(first, last));
+    e1.setLocation(makeLocation(first, last));
     return new ExpressionStmt(e1); 
   }
 
@@ -2631,7 +2643,7 @@ Expression PostfixStatementExpression(Expression e1, Token first) :
     "--" { e1=new IncrementExp(e1, false, false); }
   |
     { Token op; Expression e2; 
-      e1.setLocation(Location.make(first, getToken(0)));
+      e1.setLocation(makeLocation(first, getToken(0)));
     }
     op=AssignmentOperator() 
     e2=Expression()
@@ -2658,7 +2670,7 @@ Statement IfStatement() :
   { 
     ifExp = new IfExp(cond, new StatementExp(s1),
 	              (s2 == null ? null : new StatementExp(s2)));
-    ifExp.setLocation(Location.make(first, getToken(0)));
+    ifExp.setLocation(makeLocation(first, getToken(0)));
     return new ExpressionStmt(ifExp);
   }
 }
@@ -2676,7 +2688,7 @@ Statement ShortIfStatement() :
   { 
     ifExp = new IfExp(cond, new StatementExp(s1),
 	              (s2 == null ? null : new StatementExp(s2)));
-    ifExp.setLocation(Location.make(first, getToken(0)));
+    ifExp.setLocation(makeLocation(first, getToken(0)));
     return new ExpressionStmt(ifExp);
   }
 }
@@ -2735,7 +2747,7 @@ Statement ForInStatement() :
   ) 
   t=":" container=Expression() ")"
   body=Statement()
-  { return LoopStmt.forInLoop(vartype,var,Location.make(t),container,body); }
+  { return LoopStmt.forInLoop(vartype,var,makeLocation(t),container,body); }
 }
 
 List LocalDeclarationList() :
@@ -2778,7 +2790,7 @@ Statement ReturnStatement() :
   t="return" [ val=Expression() ] ";"
   {
     Statement res = new ReturnStmt(val); 
-    res.setLocation(Location.make(t));
+    res.setLocation(makeLocation(t));
     return res;
   }
 }

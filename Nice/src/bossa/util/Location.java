@@ -14,8 +14,6 @@ package bossa.util;
 
 import java.util.*;
 
-import bossa.parser.Token;
-
 /**
    Represents a portion of the input file.
    Used to report errors to the user.
@@ -48,17 +46,9 @@ public abstract class Location implements Located
     return make(currentFile, startLine, startColumn, endLine, endColumn);
   }
 
-  public static Location make (Token t)
+  public static Location make(int startLine, int startColumn)
   {
-    return make(t.beginLine, t.beginColumn, t.endLine, t.endColumn);
-  }
-
-  /**
-     Return a location that goes from start to end.
-   */
-  public static Location make (Token start, Token end)
-  {
-    return make(start.beginLine, start.beginColumn, end.endLine, end.endColumn);
+    return make(currentFile, startLine, startColumn, -1, -1);
   }
 
   /**

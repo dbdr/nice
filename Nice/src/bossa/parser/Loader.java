@@ -85,7 +85,8 @@ public abstract class Loader
         if (token.next != null)
           token = token.next;
 
-        User.error(Location.make(token), removeLocation(e.getMessage()));
+        User.error(Location.make(token.beginLine, token.beginColumn),
+			removeLocation(e.getMessage()));
       }
     else
       User.error(e.getMessage());

@@ -73,6 +73,12 @@ Enumeration<String> propertyNames(Properties<String,String>) =
 <java.lang.Comparable T> int compareTo(T,T) =
  native int java.lang.Comparable.compareTo(Object);
 
+// result maybe null
+
+?Throwable getCause(Throwable) = native Throwable Throwable.getCause();
+?java.io.InputStream getResourceAsStream(ClassLoader, String name) =
+ native java.io.InputStream ClassLoader.getResourceAsStream(String);
+
 //               PACKAGE: java.text
 
 DateFormat getDateInstance() = native DateFormat DateFormat.getDateInstance();

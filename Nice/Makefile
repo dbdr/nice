@@ -166,7 +166,7 @@ core-bootstrap:
 		src/bossa/modules/{Package,CompilationListener}.java \
 		src/nice/tools/{code/*.java,util/JDK.java}
 	$(JAVAC_GENERIC) -d classes-inline stdlib/nice/lang/inline/*.java
-	cp -a classes-inline/* classes
+	cp -R -p classes-inline/* classes
 #	We put code used by inline methods inside classes-inline so that it is
 #	used when running the inline methods, not the versions in the running
 #	compiler, which might be outdated.

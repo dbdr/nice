@@ -82,3 +82,16 @@
 
     { T y = x; }
   }
+
+/// PASS
+  /// Toplevel
+class test {
+  {this.doTest();}
+  void doTest() {}
+}
+	
+class test2 {
+  {this.doTest2();}
+  void doTest2() {}
+}
+

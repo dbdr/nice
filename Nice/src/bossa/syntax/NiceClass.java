@@ -220,13 +220,16 @@ public class NiceClass extends ClassDefinition.ClassImplementation
           return NiceClass.this.thisExp;
         }
       };
+
     Node.thisExp = new SymbolExp(thisSymbol, definition.location());
     scope.addSymbol(thisSymbol);
 
     for (int i = 0; i < initializers.length; i++)
       initializers[i] = bossa.syntax.dispatch.analyse
         (initializers[i], definition.scope, localScope, false);
+
     Node.thisExp = null;
+    scope.removeSymbol(thisSymbol);
   }
 
   private MonoSymbol thisSymbol;

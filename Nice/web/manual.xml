@@ -109,7 +109,7 @@
     </para>
     <para>
       Note that this is somewhat different from Java packages.
-      In Java, a class can be used independantly of its declaring package.
+      In Java, a class can be used independently of its declaring package.
       In Nice methods can be declared outside classes, so importing
       the whole package is important to know the methods available for a
       given class.
@@ -359,7 +359,7 @@ void main(String[] args)
 	it is possible to specify the name of a parameter, followed by
 	<literal>:</literal> before the value given to that parameter.
 	Named parameters can be given in any order.
-	This is useful when writting the call, because one does not
+	This is useful when writing the call, because one does not
 	need to remember the order of the arguments, but only their names.
 	When reading the code, it is much easier to understand
 	what each parameter is, provided the name was well chosen.
@@ -882,7 +882,7 @@ Window createMyWindow()
 
     <section><title>Tuples</title>
       <para>
-       A tuple is a groupment of several values in a single expression.
+       A tuple is a grouping of several values in a single expression.
        For instance, <literal>("Hello", 2*3, x.toString())</literal> 
        is a tuple whose elements are the string <literal>"Hello"</literal>,
        the number <literal>6</literal> and the string representation of 
@@ -1003,7 +1003,7 @@ String concat2(Collection<String> strings)
 	and <type>char</type> which is smaller than 
 	<type>int</type> but incomparable with <type>short</type>.
 	Conversion from a smaller to a larger type is automatic.
-	Conversion from a larger to a smaller type must be done explicitely,
+	Conversion from a larger to a smaller type must be done explicitly,
 	since they can lose information about the magnitude of the value.
       </para>
       <para>
@@ -1088,7 +1088,7 @@ while ((v = r.read()) != -1) {
 	  <type>?String</type> in Nice? 
 	  Since Java allows the value to be &NULL;, 
 	  the Nice compiler 
-	  currently suposes it's <type>?String</type> (it can only be 
+	  currently supposes it's <type>?String</type> (it can only be 
 	  sure about primitive types like <type>int</type>).
 	</para>
 
@@ -1232,10 +1232,10 @@ public class Main
     Person p = new Person("John");
     Worker w = new Worker("Julia", 1000);
 
-    println(my.nice.pkg.dispatch.display(p));
-    println(my.nice.pkg.dispatch.display(w));
-    if (my.nice.pkg.fun.isRich(w))
-      println("A well paid worker!");
+    System.out.println(dispatch.display(p));
+    System.out.println(dispatch.display(w));
+    if (fun.isRich(w))
+      System.out.println("A well paid worker!");
   }
 }
         </programlisting>
@@ -1340,7 +1340,7 @@ public class Main
 	writing the code so that this is not needed. However, if there
 	is none, a solution is to use <literal>cast(null)</literal>.
 	This expression will be accepted in any context.
-	It is then your responsability to make sure that this value is
+	It is then your responsibility to make sure that this value is
 	not used.
       </para>
 

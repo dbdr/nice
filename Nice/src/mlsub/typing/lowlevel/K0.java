@@ -1025,45 +1025,45 @@ public final class K0 {
     do
       {
 	changed=false;
-
-	for(int iid=0; iid<nInterfaces(); iid++)
+	int nInt = nInterfaces();
+	for(int iid=0; iid<nInt; iid++)
 	  {
 	    Interface i=getInterface(iid);
 	    int n1;
-            //XXX optim: if we had a BitVector i.hasApprox, 
-            //           this could be faster.
-	    for(int node=0; node<n; node++)
-	      if((n1=i.getApprox(node))!=BitVector.UNDEFINED_INDEX)
+            BitVector hasApprox = i.getHasApprox();
+	    for(int node=hasApprox.getLowestSetBit();
+		node != BitVector.UNDEFINED_INDEX;
+		node = hasApprox.getNextBit(node))
+	      { 
 		// node  ->_i  n1
-		for(int p=0; p<n; p++)
+		n1=i.getApprox(node);
+		for(int p = i.implementors.getLowestSetBit();
+		    p != BitVector.UNDEFINED_INDEX;
+		    p = i.implementors.getNextBit(p))
 		  // is implementors OK ?
 		  // or should not we compute rigidImplementors first ?
-                  //XXX optim: use i.implementors.getXXXbit to find p candidates
-		  if(i.implementors.get(p)
-		     && leq.get(node,p))
+		  if(leq.get(node,p) && !leq.get(n1,p))
 		    if(this.isRigid(p))
-		      if(!leq.get(n1,p))
-			throw new LowlevelUnsatisfiable
+		      throw new LowlevelUnsatisfiable
 			  ("saturateAbs: there should be "+
 			   indexToString(n1)+" <: "+
 			   indexToString(p)+
 			   " (node="+indexToString(node)+")\n"+
 			   "interface "+interfaceToString(iid)+"\n"+
 			   this);
-		      else /* Nothing to do. Cool! */ ;
 		    else 
-		      if(!leq.get(n1,p))
-			 {
-			   if(debugK0) 
+		      {
+			 if(debugK0) 
 			     System.err.println("Abs rule applied : "+
 					   indexToString(n1)+" < "+indexToString(p)+
 					   " using "+indexToString(node)+
 					   " for interface "+interfaceToString(iid));
-			   C .set(n1,p);
-			   Ct.set(p,n1);
-			   leq.set(n1,p);
-			   changed=true;
-			 }
+			 C .set(n1,p);
+			 Ct.set(p,n1);
+			 leq.set(n1,p);
+			 changed=true;
+		      }
+	      }
 	  }
 	if(changed)
 	  leq.closure();

@@ -39,12 +39,22 @@ class Interface {
   
   // the approximation of each node of the original context
   private final IntVect approx = new IntVect(BitVector.UNDEFINED_INDEX);
-  
+  private final BitVector hasapprox = new BitVector();
+
+  public BitVector getHasApprox()
+  {
+    return hasapprox;
+  }
+   
   public void setApprox(int node, int approx)
   {
     if (node >= this.approx.size())
       this.approx.setSize(node+1, BitVector.UNDEFINED_INDEX);
     this.approx.set(node, approx);
+    if (approx == BitVector.UNDEFINED_INDEX)
+      hasapprox.clear(node);
+    else    
+      hasapprox.set(node);
   }
   
   /**
@@ -61,10 +71,12 @@ class Interface {
   void setIndexSize(int n) {
     implementors.truncate(n);
     approx.setSize(n,BitVector.UNDEFINED_INDEX);
+    hasapprox.truncate(n);
   }
   void indexMove(int src, int dest) {
     implementors.bitCopy(src, dest);
     approx.set(dest,approx.get(src));
+    hasapprox.set(dest);
     if (k0.isRigid(src)) {
       // strange as the relation on the rigid indexes should already be
       // condensed... but let's be general

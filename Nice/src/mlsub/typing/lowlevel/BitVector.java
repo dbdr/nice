@@ -24,7 +24,7 @@ public class BitVector implements Cloneable, java.io.Serializable {
   /**
      @return number of WORDS allocated
   */
-  private int length()
+  final private int length()
   {
     if (bits1 == null)
       return 1;
@@ -35,13 +35,13 @@ public class BitVector implements Cloneable, java.io.Serializable {
   /**
    * Convert bitIndex to a subscript into the bits[] array.
    */
-  private static int subscript(int bitIndex) {
+  final private static int subscript(int bitIndex) {
     return bitIndex >> BITS_PER_UNIT;
   }
   /**
    * Convert a subscript into the bits[] array to a (maximum) bitIndex.
    */
-  private static int bitIndex(int subscript) {
+  final private static int bitIndex(int subscript) {
     return (subscript << BITS_PER_UNIT) + MASK;
   }
 
@@ -49,7 +49,8 @@ public class BitVector implements Cloneable, java.io.Serializable {
    * Creates an empty set.
    */
   public BitVector() {
-    this(1 << BITS_PER_UNIT);
+    bits0 = 0L;
+    bits1 = null;
   }
 
   /**
@@ -85,10 +86,28 @@ public class BitVector implements Cloneable, java.io.Serializable {
    * This cannot leave the bits array at length 0.
    * @param    nth the 0-origin number of the bit to ensure is there.
    */
-  private void ensureCapacity(int nth) {
+  final private void ensureCapacity(int nth) {
     int required = subscript(nth) + 1;  /* +1 to get length, not index */
     if (required == 1)
       return;
+    if (required > length()) {
+      /* Ask for larger of doubled size or required size */
+      int request = Math.max(2 * length(), required);
+      if (bits1 == null)
+	{
+	  bits1 = new long[request];
+	  bits1[0] = bits0;
+	}
+      else
+	{
+	  long[] newBits = new long[request];
+	  System.arraycopy(bits1, 0, newBits, 0, bits1.length);
+	  bits1 = newBits;
+	}
+    }
+  }
+
+  final private void ensureChunkCapacity(int required) {
     if (required > length()) {
       /* Ask for larger of doubled size or required size */
       int request = Math.max(2 * length(), required);
@@ -110,7 +129,7 @@ public class BitVector implements Cloneable, java.io.Serializable {
    * Sets a bit.
    * @param bit the bit to be set
    */
-  public void set(int bit) {
+  final public void set(int bit) {
     if (bit < 0) {
       throw new IndexOutOfBoundsException(Integer.toString(bit));
     }
@@ -129,11 +148,9 @@ public class BitVector implements Cloneable, java.io.Serializable {
     if (bit < 0) {
       throw new IndexOutOfBoundsException(Integer.toString(bit));
     }
-    ensureCapacity(bit);
-    if (bits1 == null)
-      bits0 &= ~(1L << bit); // we know that bit <= 64
-    else
-      bits1[subscript(bit)] &= ~(1L << (bit & MASK));
+    int sub = subscript(bit);
+    if (sub < length())
+      andW(sub, ~(1L << (bit & MASK)));
   }
 
   /**
@@ -233,7 +250,7 @@ public class BitVector implements Cloneable, java.io.Serializable {
 
       @return  bits[i] 
   */
-  private long getW(int i)
+  final private long getW(int i)
   {
     if (bits1 == null)
       return bits0; // since i is valid, it must be 0
@@ -246,7 +263,7 @@ public class BitVector implements Cloneable, java.io.Serializable {
 
       Assumes i is a valid word index.      
   */
-  private void setW(int i, long w)
+  final private void setW(int i, long w)
   {
     if (bits1 == null)
       bits0 = w;
@@ -259,7 +276,7 @@ public class BitVector implements Cloneable, java.io.Serializable {
 
       Assumes i is a valid word index.
   */
-  private void andW(int i, long w)
+  final private void andW(int i, long w)
   {
     if (bits1 == null)
       bits0 &= w;
@@ -272,7 +289,7 @@ public class BitVector implements Cloneable, java.io.Serializable {
 
       Assumes i is a valid word index.
   */
-  private void orW(int i, long w)
+  final private void orW(int i, long w)
   {
     if (bits1 == null)
       bits0 |= w;
@@ -285,7 +302,7 @@ public class BitVector implements Cloneable, java.io.Serializable {
 
       Assumes i is a valid word index.
   */
-  private void xorW(int i, long w)
+  final private void xorW(int i, long w)
   {
     if (bits1 == null)
       bits0 ^= w;
@@ -382,12 +399,9 @@ public class BitVector implements Cloneable, java.io.Serializable {
    * Do this = this | set
    **/
   final public void or(BitVector set) {
-    if (this == set) {
-      return;
-    }
-    int setLength = set.nonZeroLength();
+    int setLength = set.length();
     if (setLength > 1) {
-      ensureCapacity(bitIndex(setLength-1));
+      ensureChunkCapacity(setLength);
       for (int i = setLength; i-- > 0 ;) {
         bits1[i] |= set.bits1[i];
       }
@@ -399,66 +413,38 @@ public class BitVector implements Cloneable, java.io.Serializable {
   }
 
   /**
-   * Do this = this | (set1 & ~set2)
-   **/
-  final public void orNotIn(BitVector set1, BitVector set2) {
-    if (this == set1) {
-      return;
-    }
-    int set1Length = set1.nonZeroLength();
-    int set2Length = set2.length();
-    if (set1Length > 0) {
-      ensureCapacity(bitIndex(set1Length - 1)); // XXX: problem ?
-    }
-    for (int i = set1Length; i-- > 0;) {
-      if (i < set2Length) {
-        orW(i, set1.getW(i) & ~set2.getW(i));
-      } else {
-        orW(i, set1.getW(i));
-      }
-    }
-  }
-      
-      
-  /**
    * Do this = this | (set1 & set2)
    **/
   final public void orAnd(BitVector set1, BitVector set2) {
-    if (this == set1 || this == set2) {
-      return;
-    }
     int setLength = Math.min(set1.nonZeroLength(),set2.nonZeroLength());
-    if (setLength > 0) {
-      ensureCapacity(bitIndex(setLength-1));// this might cause some problem...
+    if (setLength > 1) {
+      ensureChunkCapacity(setLength);
     }
     for (int i = setLength; i-- > 0 ;) {
       orW(i, set1.getW(i) & set2.getW(i));
     }
   }
   
-  
-  
   /*
    * If there are some trailing zeros, don't count them
    * result is greater or equal to 1
    */
-  private int nonZeroLength() {
+  final private int nonZeroLength() {
     if (bits1 == null)
       return 1;
     
-    int n = bits1.length;
-    while (n > 1 && bits1[n-1] == 0L) { n--; }
-    return n;
+    int n = bits1.length-1;
+    while (n > 0 && bits1[n] == 0L) { n--; }
+    return n+1;
   }
-
 
   /**
    * Do this = this ^ set
    **/
   final public void xor(BitVector set) {
     int setLength = set.length();
-    if (setLength > 0) {
-      ensureCapacity(bitIndex(setLength-1));
+    if (setLength > 1) {
+      ensureChunkCapacity(setLength);
     }
     for (int i = setLength; i-- > 0 ;) {
       xorW(i, set.getW(i));
@@ -520,8 +506,6 @@ public class BitVector implements Cloneable, java.io.Serializable {
     }
     return true;
   }
-
-
 
   /**
    * Clones the BitVector.
@@ -612,7 +596,7 @@ public class BitVector implements Cloneable, java.io.Serializable {
     return cnt;
   }
 
-  private 
+  final private 
   static /* XXX: work around Symantec JIT bug: comment static */
   int chunkLowestSetBit(long chunk) {
     int bit = 0;
@@ -632,7 +616,7 @@ public class BitVector implements Cloneable, java.io.Serializable {
    * Compute the first bit set in this BitVector or UNDEFINED_INDEX if this
    * set is empty.
    **/
-  final public int getLowestSetBit() {
+  public int getLowestSetBit() {
     if (bits1 == null)
     {
       if (bits0 != 0L)
@@ -699,7 +683,6 @@ public class BitVector implements Cloneable, java.io.Serializable {
     return getLowestSetBit(i + 1);
   }
     
-
   /**
    * Compute the first bit set in this & ~set.
    * @return UNDEFINED_INDEX if there is no such bit
@@ -801,13 +784,14 @@ public class BitVector implements Cloneable, java.io.Serializable {
    * Returns true if no bit is set in this BitVector
    **/
   public boolean isEmpty() {
-    int n = length();
-    for (int i = 0; i < n; i++) {
-      if (getW(i) != 0L) {
+    if (bits1 == null)
+      return bits0 == 0L;
+
+    for (int i = bits1.length; --i>0; )
+      if (bits1[i] != 0L) 
         return false;
-      }
-    }
-    return true;
+
+    return bits1[0] == 0L;
   }
 
       
@@ -872,7 +856,6 @@ public class BitVector implements Cloneable, java.io.Serializable {
     }
   }
 
-
   /**
    * Clears the first n bits of this BitVector
    **/
@@ -894,12 +877,25 @@ public class BitVector implements Cloneable, java.io.Serializable {
    **/
   final public void addProduct(BitMatrix M, BitVector v) {
     int n = M.size();
-    
+    ensureCapacity(n);
     for(int i = v.getLowestSetBit(); 
 	i >= 0;
 	i = v.getLowestSetBit(i+1))
-      or(M.getRow(i));
+      {
+	BitVector set = M.getRow(i);
+	int setLength = set.nonZeroLength();
+	if (setLength > 1) {
+	  for (int j = setLength; j-- > 0 ;)
+	    bits1[j] |= set.bits1[j];
+	}
+      	else
+      	{
+          orW(0, set.getW(0));
+      	}
+
+      }
   }
+
   final public void slowaddProduct(BitMatrix M, BitVector v) {
     int n = M.size();
     for (int i = 0; i < n; i++) {

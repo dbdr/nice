@@ -92,6 +92,7 @@ class JarCompiledContent extends CompiledContent
 	JarEntry e = (JarEntry) enum.nextElement();
 	String fullname = e.getName();
 	if (fullname.startsWith(pkgPrefix)
+	    && fullname.indexOf('/', pkgPrefix.length()) == -1
 	    && fullname.endsWith(".class"))
 	  {
 	    String name = fullname.substring(pkgPrefix.length());

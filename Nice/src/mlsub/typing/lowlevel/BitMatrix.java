@@ -167,6 +167,33 @@ final public class BitMatrix implements Cloneable {
    * Performs in-place reflexive transitive closure of the relation.
    **/
   public void closure() {
+    if (S.debug) {
+      BitMatrix testcopy = (BitMatrix)this.clone();
+      BitMatrix original = (BitMatrix)this.clone();
+      this.closure2();
+      testcopy.closure1();
+      boolean equal = true;
+      for(int i = 0; i<size; i++)
+	if (! ( (this.getRow(i)==testcopy.getRow(i)) || 
+		(this.getRow(i).equals( testcopy.getRow(i))))) 
+	  equal = false;
+      if (!equal) {
+	Debug.println("Warning new closure method produced incorrect results.");
+	Debug.println("orginal matrix:");
+	Debug.println(original.toString());
+	Debug.println("closure using new method:");
+	Debug.println(this.toString());
+	Debug.println("closure using standard method:");
+	Debug.println(testcopy.toString());
+      }
+
+    } else if (size < 16)
+      closure1();
+    else
+      closure2();
+  }
+
+  private void closure1() {
     // Warshall algorithm
     int size = this.size;
     for (int k = 0; k < size; k++) {
@@ -182,6 +209,73 @@ final public class BitMatrix implements Cloneable {
       }
     }
     //for (int i = 0; i < size; i++) set(i, i);
+    reflexive = true;
+  }
+
+  /**
+     This algorithm is O(n*m) (m = average number bits set per row) when there 
+     are no cylcic relations in the a matrix, while closure1 is O(n2). 
+     This algorithm has a much larger overhead so for small matrices 
+     the old one still faster. 
+  */
+  private void closure2() {
+    int size = this.size;
+    boolean[] done = new boolean[size];
+    boolean[] busy = new boolean[size];
+    int[] index = new int[size];
+    int[] bitpos = new int[size];
+    int ndone = 0;
+    while (ndone < size) {
+      if ((rows[ndone] != null) && !done[ndone]) {
+	int stackpos = 0;
+	index[0] = ndone;
+	bitpos[0] = 0;
+	busy[ndone] = true;
+	BitVector current = rows[ndone];
+	while (stackpos >= 0) {
+	  if (bitpos[stackpos] < 0) {
+	    if (stackpos > 0){
+	      rows[index[stackpos-1]].or(rows[index[stackpos]]);
+	      current = rows[index[stackpos-1]];
+	    }	
+	    done[index[stackpos]] = true;
+	    busy[index[stackpos--]] = false;
+	  } else {
+	    int nextbitpos = current.getLowestSetBit(bitpos[stackpos]);
+	    if (nextbitpos < 0 || nextbitpos >= size) bitpos[stackpos] = -1;
+	    else{
+	      bitpos[stackpos] = nextbitpos+1;
+	      if (rows[nextbitpos] != null) {
+		if (done[nextbitpos]) {
+		  rows[index[stackpos]].or(rows[nextbitpos]);
+		} else {    
+		  if (!busy[nextbitpos]) {
+		    busy[nextbitpos] = true;
+		    index[++stackpos] = nextbitpos;
+		    bitpos[stackpos] = 0;
+		    current = rows[index[stackpos]];
+		  } else {
+		    if (index[stackpos] != nextbitpos) {
+		      int tempsp = stackpos-1;
+		      BitVector cyclicmask = new BitVector(size);
+		      do {
+			bitpos[tempsp] = -1;
+			rows[index[stackpos]].or(rows[index[tempsp]]);
+			cyclicmask.set(index[tempsp]);
+		      } while (index[tempsp--] != nextbitpos);
+		      current = (BitVector)current.clone();
+		      current.andNot(cyclicmask);
+		      bitpos[stackpos] = 0;
+		    }
+		  }
+		}
+	      }
+	    }
+	  }
+	}
+      }
+      ndone++;
+    }
     reflexive = true;
   }
 

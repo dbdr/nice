@@ -200,8 +200,16 @@
 
 
 
+  <target name="install" depends="dist">
+    <delete includeEmptyDirs="true">
+      <fileset dir="${eclipse.home}/plugins" includes="${plugin.id}_*/**"/>
+    </delete>
+    <mkdir dir="${eclipse.home}/plugins/${plugin.id.version}"/>
+    <copy todir="${eclipse.home}/plugins/${plugin.id.version}">
+      <fileset dir="${plugin.dir}" includes="**/*"/>
+    </copy> 
 
-
+  </target>
 
 
 </project>

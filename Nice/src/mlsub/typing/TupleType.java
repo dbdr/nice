@@ -74,7 +74,7 @@ public class TupleType extends Monotype
   
   public String toString()
   {
-    return bossa.util.Util.map("<", ", ", ">", types);
+    return bossa.util.Util.map("(", ", ", ")", types);
   }
 
   Monotype[] types;

@@ -70,7 +70,7 @@ public class TupleType extends bossa.syntax.Monotype
 
   public String toString()
   {
-    return Util.map("<",", ",">", types);
+    return Util.map("(", ", " ,")", types);
   }
   
   private List types;

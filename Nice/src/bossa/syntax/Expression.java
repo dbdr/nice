@@ -168,8 +168,11 @@ public abstract class Expression
   {    
     Polytype[] res = new Polytype[expressions.length];
 
-    for(int i = 0; i< expressions.length; i++)
-      res[i] = expressions[i].getType();
+    for (int i = 0; i< expressions.length; i++)
+      {
+	expressions[i] = expressions[i].noOverloading();
+	res[i] = expressions[i].getType();
+      }
 
     return res;
   }

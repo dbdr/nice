@@ -24,3 +24,11 @@ class A3 extends A1 {}
 
 /// PASS
   int[][] array2 = [[11,12],[21,22]];
+
+/// PASS
+  // Use an implicit this inside a literal expression.
+  /// Toplevel
+class A {
+  String name;
+  String[] a() = [name];
+}

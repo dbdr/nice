@@ -263,7 +263,6 @@ public class ClassExp extends LambdaExp
           }
         else
           {
-            System.out.println(getName());
             instanceType = type = new ClassType(getName());
             type.setSuper(superType);
           }

@@ -49,6 +49,7 @@ public class Range<T | T <: int, int <: T>  extends OpenRange<T>
   }
   
   add(elem) =  throw new UnsupportedOperationException();
+  add(index, elem) =  throw new UnsupportedOperationException();
 
   contains(elem) = begin.index <= cast(elem) <= end.index;
 
@@ -59,6 +60,7 @@ public class Range<T | T <: int, int <: T>  extends OpenRange<T>
   listIterator(index) = new RangeIterator(range: this, pos: begin.index + index-1);
 
   remove(elem) = throw new UnsupportedOperationException();
+  removeAt(index) = throw new UnsupportedOperationException();
   removeAll(elems) = throw new UnsupportedOperationException();
 }
 

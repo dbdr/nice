@@ -2076,7 +2076,7 @@ Expression InstanceOfExpression() :
         sym = symb("optionInstanceof", t, true);
       else
         sym = symb(t);
-      return bossa.syntax.dispatch.createCallExp(symb(t), res, type); }
+      return bossa.syntax.dispatch.createCallExp(sym, res, type); }
   ]
   { return res; }
 }

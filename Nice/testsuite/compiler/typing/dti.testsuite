@@ -292,3 +292,9 @@ StringBuffer func( ?StringBuffer foo ) {
    }
 
  assert a.y == 1;
+
+/// FAIL
+  //no nullness inference on option instanceof
+  ?B x = null;
+  if (x instanceof ?B)
+    assert x. /*/// FAIL HERE*/ x == 1;

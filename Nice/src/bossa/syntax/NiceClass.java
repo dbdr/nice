@@ -252,7 +252,8 @@ public class NiceClass extends ClassDefinition.ClassImplementation
           {
             if (value != null)
               inherited[i] = new FormalParameters.OptionalParameter
-                (type, sym.getName(), true, value, true);
+                (type, sym.getName(), true, value, 
+                 inherited[i].value() == null || inherited[i].isOverriden());
             else
               inherited[i].resetType(type);
           }

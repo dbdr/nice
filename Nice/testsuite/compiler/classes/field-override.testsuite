@@ -164,3 +164,29 @@ class B extends A
   class B extends A {
     override String s = "abc";
   }
+
+/// PASS
+  /// Toplevel
+class FOOA {
+    final byte b = 1;
+    byte b2 = 2;
+}
+
+class FOOB extends FOOA {
+    override byte b = 2;
+}
+
+/// PASS
+  /// Toplevel
+class FOOA {
+    final byte b = 1;
+    byte b2 = 2;
+}
+
+class FOOB extends FOOA {
+    override byte b;
+}
+
+class FOOC extends FOOB {
+    override byte b = 2;
+}

@@ -127,9 +127,10 @@ class SourceMap extends Attribute
         lastFileNumber++;
         fileNumber = new Integer(lastFileNumber);
         fileMap.put(file, fileNumber);
+
+        buffer.append(lastFileNumber).append(' ').append(file).append('\n');
       }
 
-    buffer.append(fileNumber.intValue()).append(' ').append(file).append('\n');
     return fileNumber.intValue();
   }
 

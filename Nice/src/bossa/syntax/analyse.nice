@@ -405,7 +405,7 @@ Expression analyseQualifiedCall(CallExp e, Info info)
     throw error(e, "Class " + notNull(e.declaringClass).getName() +
 		(arity == 0 ? " has no static method or static field named " :
 		 arity == 1 ? " has no method or field named " : 
-		 " has no method named ") + 
+		 " has no method with "arity" arguments and named ") + 
 		funName);
   
   e.function = newOverloadedSymbolExp(possibilities, funName);

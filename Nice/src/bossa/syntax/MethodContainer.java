@@ -95,7 +95,7 @@ public abstract class MethodContainer extends Definition
       }
   }
 
-  mlsub.typing.MonotypeVar[] getTypeParameters ()
+  public mlsub.typing.MonotypeVar[] getTypeParameters ()
   {
     if (classConstraint == null)
       return null;
@@ -103,12 +103,12 @@ public abstract class MethodContainer extends Definition
       return classConstraint.typeParameters;
   }
 
-  mlsub.typing.Constraint getResolvedConstraint()
+  public mlsub.typing.Constraint getResolvedConstraint()
   {
     if (classConstraint == null)
       return mlsub.typing.Constraint.True;
     else
-      return new  mlsub.typing.Constraint
+      return new mlsub.typing.Constraint
 	(classConstraint.typeParameters, resolvedConstraints);
   }
 

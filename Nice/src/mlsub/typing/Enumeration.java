@@ -244,7 +244,7 @@ public class Enumeration
       BitVector[] pObs = (BitVector[]) 
 	observers.toArray(new BitVector[observers.size()]);
       
-      if (enumerateInConstraints(pKinds,pObs,tuples))
+      if (enumerateInConstraints(pKinds, pObs, tuples, tags))
 	return emptyList;
     }
     finally{
@@ -260,7 +260,8 @@ public class Enumeration
   private static boolean enumerateInConstraints
     (Engine.Constraint[] kinds,
      BitVector[] observers,
-     final TagsList tuples)
+     final TagsList tuples,
+     final Element[] tags)
   {
     for(int act = 0; act<kinds.length;act++)
       {
@@ -275,6 +276,21 @@ public class Enumeration
 	     {
 	       public void handle()
 		 {
+                   // Check if this is really a solution, because of
+                   // class constraints.
+		   for (int x = obs.getLowestSetBit();
+			x != BitVector.UNDEFINED_INDEX;
+			x = obs.getNextBit(x))
+		     {
+		       TypeConstructor var,sol;
+		       var=(TypeConstructor) kind.getElement(x);
+		       sol=(TypeConstructor) kind.getElement(getSolutionOf(x));
+                       int index = var.enumerateTagIndex;
+                       if (! checkClassConstraint(tags[index], sol))
+                         return;
+                     }
+
+                   // It is a solution, let's add it to the list.
 		   tuples.startEntry();
 		   for (int x = obs.getLowestSetBit();
 			x != BitVector.UNDEFINED_INDEX;
@@ -296,6 +312,49 @@ public class Enumeration
 	  return true;
       }
     return false;
+  }
+
+  /**
+     Return true if and only if sol can be the runtime tag of a 
+     subtype of var. This especially involves checking the eventual
+     constraints on the type parameters of the class sol.
+  */
+  private static boolean checkClassConstraint(Element var, 
+                                              TypeConstructor sol)
+  {
+    bossa.syntax.ClassDefinition def = bossa.syntax.ClassDefinition.get(sol);
+    
+    if (def == null)
+      return true;
+
+    Constraint constraint = def.getResolvedConstraint();
+
+    if (constraint == null)
+      return true;
+
+    if (! (var instanceof Monotype))
+      {
+        System.out.println("Warning: possibly abnormal condition during dispatch tests.\nThis involves class " + sol);
+        return true;
+      }
+
+    Monotype m = (Monotype) var;
+
+    MonotypeConstructor type = 
+      new MonotypeConstructor(sol, def.getTypeParameters());
+
+    try {
+      constraint.enter();
+      Engine.leq(type, var);
+
+      return true;
+    }
+    catch (TypingEx ex) {
+      return false;
+    }
+    catch (Unsatisfiable ex) {
+      return false;
+    }
   }
 
   /** 

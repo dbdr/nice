@@ -1,4 +1,4 @@
-///PASS bug
+/// PASS
   ///Toplevel
   class A{}
   class B extends A{}
@@ -8,3 +8,57 @@
   class X<T | A <: T> implements I<T>{}
 
   void foo(I<B>);
+  /* 
+     A type X<T> can only exist for T >: A, so there cannot be X<T> <: I<B>. 
+     Therefore foo does not need to be implemented @X.
+  */
+
+/// PASS
+  ///Toplevel
+  class A{}
+  class B extends A{}
+  
+  interface I<A T>{}
+
+  class X<T | A <: T> implements I<T>{}
+
+  void foo(I<A>, I<B>);
+
+/// FAIL
+  ///Toplevel
+  class A{}
+  class B extends A{}
+  
+  interface I<A T>{}
+
+  class X<T | A <: T> implements I<T>{}
+
+  void foo(I<A>);
+
+/// FAIL
+  ///Toplevel
+  class A{}
+  class B extends A{}
+  
+  interface I<A T>{}
+
+  class X<T | A <: T> implements I<T>{}
+  class Y<T> implements I<T> {}
+
+  void foo(I<A>, I<B>);
+  foo(@Y,@Y) {}
+  // @X,@Y is missing
+
+/// PASS
+  ///Toplevel
+  class A{}
+  class B extends A{}
+  
+  interface I<A T>{}
+
+  class X<T | A <: T> implements I<T>{}
+  class Y<T> implements I<T> {}
+
+  void foo(I<A>, I<B>);
+  foo(@Y,@Y) {}
+  foo(@X,@Y) {}

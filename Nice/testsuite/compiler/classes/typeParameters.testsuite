@@ -263,3 +263,22 @@ class Foo<T> {
 
   { t = t; this.t = t; t = this.t; this.t = this.t; }
 }
+
+/// PASS
+  /// Toplevel
+abstract interface A { 
+  void aOp();
+}
+
+<A SomeA> class AWrapper<SomeA> {
+  SomeA a;
+  // Check that we can use a as an A.
+  void op() = a.aOp();
+}
+
+/// FAIL bug
+  new AWrapper();
+  /// Toplevel
+class A<T> {}
+<A SomeA> class AWrapper<SomeA> {
+}

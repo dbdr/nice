@@ -14,6 +14,9 @@ package bossa.syntax;
 
 import mlsub.typing.Variance;
 import mlsub.typing.MonotypeVar;
+import mlsub.typing.TypeSymbol;
+import mlsub.typing.TypeConstructor;
+import bossa.util.User;
 import java.util.List;
 
 /**
@@ -70,14 +73,68 @@ public abstract class MethodContainer extends Definition
 
   public static class Constraint
   {
-    public Constraint(MonotypeVar[] typeParameters, List atoms)
+    /**
+       @param cst an additional constraint for the type parameters
+                  of this class.
+    */
+    public Constraint(bossa.syntax.Constraint cst, MonotypeVar[] typeParameters, List atoms)
     {
-      this.typeParameters = typeParameters;
-      this.atoms = atoms;
+      if (cst == bossa.syntax.Constraint.True || cst == null) 
+        {
+          this.binders = typeParameters;
+          this.typeParameters = typeParameters;
+          this.atoms = atoms;
+        }
+      else
+        {
+          this.syntacticConstraint = cst.toString();
+          this.atoms = cst.getAtoms();
+          this.binders = (TypeSymbol[]) cst.getBinders().
+            toArray(new TypeSymbol[cst.getBinders().size()]);
+          findBinders(typeParameters);
+        }
     }
 
-    MonotypeVar[] typeParameters;
+    /**
+       Replace those type parameters that have been introduced in the 
+       constraint by their definition.
+    */
+    private void findBinders(MonotypeVar[] typeParameters)
+    {
+      this.typeParameters = new mlsub.typing.Monotype[typeParameters.length];
+      for (int i = 0; i < typeParameters.length; i++) 
+        {
+          this.typeParameters[i] = findBinder(typeParameters[i]);
+        }
+    }
+
+    private mlsub.typing.Monotype findBinder(MonotypeVar binder)
+    {
+      for (int i = 0; i < binders.length; i++) 
+        if (binders[i].toString().equals(binder.getName()))
+          {
+            if (binders[i] instanceof MonotypeVar)
+              return (MonotypeVar) binders[i];
+            else
+              // The type parameter must be in fact a type constructor
+              // of variance zero.
+              return new mlsub.typing.MonotypeConstructor
+                ((TypeConstructor) binders[i], null);
+          }
+
+      // Not found. It was not introduced earlier, use it as the binder.
+      return binder;
+    }
+
+    /** The binders of the constraint. */
+    TypeSymbol[] binders;
+
+    /** The type parameters of the class. */
+    mlsub.typing.Monotype[] typeParameters;
+
     List atoms;
+
+    String syntacticConstraint;
   }
 
   final Constraint classConstraint;
@@ -88,14 +145,24 @@ public abstract class MethodContainer extends Definition
     if (classConstraint != null)
       {
 	TypeScope scope = new TypeScope(this.typeScope);
-	try { scope.addSymbols(classConstraint.typeParameters); }
+	try { scope.addSymbols(classConstraint.binders); }
 	catch(TypeScope.DuplicateName ex) {}
 	resolvedConstraints = 
 	  AtomicConstraint.resolve(scope, classConstraint.atoms);
       }
   }
 
-  public mlsub.typing.MonotypeVar[] getTypeParameters ()
+  /** The binders of the constraint. */
+  public mlsub.typing.TypeSymbol[] getBinders ()
+  {
+    if (classConstraint == null)
+      return null;
+    else
+      return classConstraint.binders;
+  }
+
+  /** The type parameters of the class. */
+  public mlsub.typing.Monotype[] getTypeParameters ()
   {
     if (classConstraint == null)
       return null;
@@ -109,19 +176,32 @@ public abstract class MethodContainer extends Definition
       return mlsub.typing.Constraint.True;
     else
       return new mlsub.typing.Constraint
-	(classConstraint.typeParameters, resolvedConstraints);
+	(classConstraint.binders, resolvedConstraints);
   }
 
   /****************************************************************
    * Module Interface
    ****************************************************************/
 
+  /**
+     Children should call this implementation (super) then print
+     their specific information. 
+   */
+  public void printInterface(java.io.PrintWriter s)
+  {
+    // print the constraint as a prefix constraint
+    if (classConstraint == null || classConstraint.syntacticConstraint == null)
+      return;
+
+    s.print(classConstraint.syntacticConstraint);
+  }
+
   String printTypeParameters()
   {
     if (classConstraint == null)
       return "";
 
-    MonotypeVar[] typeParameters = classConstraint.typeParameters;
+    mlsub.typing.Monotype[] typeParameters = classConstraint.typeParameters;
     StringBuffer res = new StringBuffer("<");
     for (int n = 0; n < typeParameters.length; n++)
       {

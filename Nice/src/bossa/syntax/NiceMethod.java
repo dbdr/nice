@@ -54,10 +54,10 @@ public class NiceMethod extends UserOperator
       || params.containsAlike();
 
     MethodContainer.Constraint thisConstraint = c.classConstraint;
-    mlsub.typing.MonotypeVar[] thisTypeParams = c.getTypeParameters();
+    mlsub.typing.TypeSymbol[] thisBinders = c.getBinders();
     
-    int thisTypeParamsLen = (thisTypeParams == null ? 0 
-			     : thisTypeParams.length);
+    int thisBindersLen = (thisBinders == null ? 0 
+			     : thisBinders.length);
 
     TypeSymbol container = c.getTypeSymbol();
     // contains the interface if container is one
@@ -77,11 +77,11 @@ public class NiceMethod extends UserOperator
     // modify other methods!
     if(constraint == Constraint.True)
       constraint = new Constraint
-	(new ArrayList(thisTypeParamsLen + (hasAlike ? 1 : 0)),
+	(new ArrayList(thisBindersLen + (hasAlike ? 1 : 0)),
 	 new ArrayList((hasAlike ? 1 : 0) + (thisConstraint == null ? 0 
 					     : thisConstraint.atoms.size())));
 	
-    constraint.addBinders(thisTypeParams);
+    constraint.addBinders(thisBinders);
     if (thisConstraint != null)
       constraint.addAtoms(thisConstraint.atoms);
 
@@ -106,7 +106,7 @@ public class NiceMethod extends UserOperator
 	  atom = new mlsub.typing.TypeConstructorLeqCst(alikeTC, tc);
 	constraint.addAtom(AtomicConstraint.create(atom));
 	
-	thisType = new mlsub.typing.MonotypeConstructor(alikeTC, thisTypeParams);
+	thisType = new mlsub.typing.MonotypeConstructor(alikeTC, c.getTypeParameters());
 	
 	if (hasAlike)
 	  {
@@ -118,7 +118,7 @@ public class NiceMethod extends UserOperator
       }
     else
       thisType = 
-	new mlsub.typing.MonotypeConstructor(tc, thisTypeParams);
+	new mlsub.typing.MonotypeConstructor(tc, c.getTypeParameters());
     
     params.addThis(Monotype.create(Monotype.sure(thisType)));
     

@@ -103,6 +103,7 @@ public class AbstractInterface extends MethodContainer
 
   public void printInterface(java.io.PrintWriter w)
   {
+    super.printInterface(w);
     w.print("abstract interface "
             + getSimpleName()
             + printTypeParameters()

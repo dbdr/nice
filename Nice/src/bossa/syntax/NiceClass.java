@@ -561,12 +561,12 @@ public class NiceClass extends ClassDefinition.ClassImplementation
   */
   private static FormalParameters.Parameter[][] getFieldsAsParameters
     (TypeConstructor tc, int nbFields, List constraints, 
-     MonotypeVar[] typeParams)
+     TypeSymbol[] binders)
   {
     ClassDefinition sup = ClassDefinition.get(tc);
     if (sup != null && sup.implementation instanceof NiceClass)
       return ((NiceClass) sup.implementation).
-	getFieldsAsParameters(nbFields, constraints, typeParams);
+	getFieldsAsParameters(nbFields, constraints, binders);
 
     List constructors = TypeConstructors.getConstructors(tc);
     if (constructors == null)
@@ -593,15 +593,15 @@ public class NiceClass extends ClassDefinition.ClassImplementation
   */
   private TypeScope translationScope(NiceClass other)
   {
-    mlsub.typing.MonotypeVar[] typeParams = other.definition.getTypeParameters();
+    mlsub.typing.TypeSymbol[] binders = other.definition.getBinders();
     TypeScope scope = Node.getGlobalTypeScope();
     Map map = null;
-    if (typeParams != null)
+    if (binders != null)
       {
 	scope = new TypeScope(scope);
-	for (int i = 0; i < typeParams.length; i++)
+	for (int i = 0; i < binders.length; i++)
 	  try {
-	    scope.addMapping(definition.classConstraint.typeParameters[i].getName(), typeParams[i]);
+	    scope.addMapping(definition.classConstraint.binders[i].toString(), binders[i]);
 	  } catch(TypeScope.DuplicateName e) {}
       }
 
@@ -609,11 +609,11 @@ public class NiceClass extends ClassDefinition.ClassImplementation
   }
 
   private FormalParameters.Parameter[][] getFieldsAsParameters
-    (int nbFields, List constraints, MonotypeVar[] typeParams)
+    (int nbFields, List constraints, TypeSymbol[] binders)
   {
     nbFields += this.fields.length;
     FormalParameters.Parameter[][] res = getFieldsAsParameters
-      (definition.getSuperClass(), nbFields, constraints, typeParams);
+      (definition.getSuperClass(), nbFields, constraints, binders);
 
     if (fields.length == 0 && overrides.length == 0 && 
         definition.classConstraint == null)
@@ -621,16 +621,16 @@ public class NiceClass extends ClassDefinition.ClassImplementation
 
     TypeScope scope = Node.getGlobalTypeScope();
     Map map = null;
-    if (typeParams != null)
+    if (binders != null)
       {
 	// Constructs a type scope that maps the type parameters of this
 	// class to the corresponding symbol in the constructor.
 	scope = new TypeScope(scope);
 	map = new HashMap();
-	for (int i = 0; i < typeParams.length; i++)
+	for (int i = 0; i < binders.length; i++)
 	  try {
-	    scope.addMapping(definition.classConstraint.typeParameters[i].getName(), typeParams[i]);
-	    map.put(definition.classConstraint.typeParameters[i], typeParams[i]);
+	    scope.addMapping(definition.classConstraint.binders[i].toString(), binders[i]);
+	    map.put(definition.classConstraint.binders[i], binders[i]);
 	  } catch(TypeScope.DuplicateName e) {}
       }
 
@@ -689,21 +689,21 @@ public class NiceClass extends ClassDefinition.ClassImplementation
       return;
 
     List constraints;
-    mlsub.typing.MonotypeVar[] typeParams = definition.getTypeParameters();
-    if (typeParams == null)
+    mlsub.typing.TypeSymbol[] binders = definition.getBinders();
+    if (binders == null)
       constraints = null;
     else 
       constraints = new LinkedList();
 
     FormalParameters.Parameter[][] params = 
-      getFieldsAsParameters(0, constraints, typeParams);
+      getFieldsAsParameters(0, constraints, binders);
 
     checkFields(params[0]);
 
     Constraint cst;
-    if (typeParams != null)
+    if (binders != null)
       cst = new Constraint
-	(typeParams, (AtomicConstraint[])
+	(binders, (AtomicConstraint[])
 	 constraints.toArray(new AtomicConstraint[constraints.size()]));
     else
       cst = Constraint.True;
@@ -718,7 +718,7 @@ public class NiceClass extends ClassDefinition.ClassImplementation
 	   values, 
 	   cst,
 	   Monotype.resolve(definition.typeScope, values.types()),
-	   Monotype.sure(new MonotypeConstructor(definition.tc, typeParams)));
+	   Monotype.sure(new MonotypeConstructor(definition.tc, definition.getTypeParameters())));
 
 	TypeConstructors.addConstructor(definition.tc, constructorMethod[i]);
       }

@@ -948,7 +948,9 @@ List getField(NiceClass c, List fields, List overrides):
   }
 }
 
-ClassDefinition classDefinition(List definitions):
+// The constraint prefixing the class keyword is optional
+// It is useful for complex constraints
+ClassDefinition classDefinition(Constraint cst, List definitions):
 {
   ClassDefinition res;
   LocatedString name;
@@ -958,10 +960,11 @@ ClassDefinition classDefinition(List definitions):
   List imp = null, abs = null;
 }
 {
+
 (
   "interface"
   name=ident() 
-  [ parameters=classTypeParameters(typeParametersVariances) ]
+  [ parameters=classTypeParameters(cst, typeParametersVariances) ]
   { List ext = null; }
   [ "extends" ext = interfaces() ]
   [ "implements" imp=interfaces() ]
@@ -975,7 +978,7 @@ ClassDefinition classDefinition(List definitions):
   ]
   "class"
   name=ident() 
-  [ parameters=classTypeParameters(typeParametersVariances) ]
+  [ parameters=classTypeParameters(cst, typeParametersVariances) ]
 
   { TypeIdent sup = null; }
 
@@ -1048,7 +1051,7 @@ ClassDefinition classDefinition(List definitions):
   { return res; } 
 }
 
-AbstractInterface interfaceDefinition():
+AbstractInterface interfaceDefinition(Constraint prefix):
 {
   LocatedString name;
   MethodContainer.Constraint parameters = null;
@@ -1059,7 +1062,7 @@ AbstractInterface interfaceDefinition():
 {
   "abstract" "interface"
   name=ident()
-  [ parameters=classTypeParameters(typeParametersVariances) ]
+  [ parameters=classTypeParameters(prefix, typeParametersVariances) ]
   [ "extends" extensions=interfaces() ]
   "{"
   { res = new AbstractInterface(name,parameters,typeParametersVariances,
@@ -1091,21 +1094,28 @@ AbstractInterfaceImplementation abstractInterfaceImplementation():
 }
 
 
-MethodContainer.Constraint classTypeParameters(List tags):
+MethodContainer.Constraint classTypeParameters(Constraint prefix, List tags):
 {
   List binders = new ArrayList(3);
   List atoms = new ArrayList(3);
   MonotypeVar var;
+  Token start;
 }
 {
-  "<" 
+  start="<" 
   var=taggedMonotypeVar(tags, atoms) { binders.add(var); }
   ( "," var=taggedMonotypeVar(tags, atoms) { binders.add(var); } )*
   [ "|" atomics(atoms) ]
   ">" 
-  { 
+  {
+    // For the moment, disallow constraints to come from both the prefix
+    // and the type parameters.
+    if (prefix != Constraint.True && atoms.size() > 0)
+      throw bossa.util.User.error
+        (Location.make(start), "Constraints on type parameters should all be specified in the prefix constraint");
+
     MonotypeVar[] b = (MonotypeVar[]) binders.toArray(new MonotypeVar[binders.size()]);
-    return new MethodContainer.Constraint(b, atoms); 
+    return new MethodContainer.Constraint(prefix, b, atoms); 
   }
 }
 
@@ -1262,17 +1272,15 @@ MethodBodyDefinition methodBodyDefinition(NiceClass container):
 				      parameters,body); }
 }
 
-Definition methodDeclaration():
+Definition methodDeclaration(Constraint cst):
 {
     LocatedString name;
     Monotype returnType;
     FormalParameters parameters;
-    Constraint cst;
     Definition res;
     List statements = new LinkedList();
 }
 {
-  cst=constraint()
     returnType=monotype()
     name=identOrBackquoted()
     "(" parameters = formalParameters(false, statements) ")"
@@ -1438,7 +1446,7 @@ Definition definition(List definitions):
 {
   (
     LOOKAHEAD ( "abstract" "interface" )
-    res=interfaceDefinition()
+    res=interfaceDefinition(Constraint.True)
   |
     LOOKAHEAD( ("class" | "interface") fullyQualifiedName() )
     res=abstractInterfaceImplementation()
@@ -1449,8 +1457,10 @@ Definition definition(List definitions):
     [ "public" | "private" ]
     ( res=globalVariable()
     | res=enumDefinition()
-    | res=classDefinition(definitions)
-    | res=methodDeclaration()
+    | { Constraint cst; } cst = constraint()
+      (  res=classDefinition(cst, definitions)
+      | res=methodDeclaration(cst)
+      )
     )
   )
   { return res; }

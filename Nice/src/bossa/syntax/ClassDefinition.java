@@ -127,6 +127,7 @@ public abstract class ClassDefinition extends MethodContainer
 
     public void printInterface(java.io.PrintWriter s)
     {
+      super.printInterface(s);
       s.print("interface ");
       s.print(getSimpleName());
       s.print(this.printTypeParameters());
@@ -327,6 +328,7 @@ public abstract class ClassDefinition extends MethodContainer
 
     public void printInterface(java.io.PrintWriter s)
     {
+      super.printInterface(s);
       if (isFinal) s.print("final ");
       if (isAbstract) s.print("abstract ");
       s.print("class ");
@@ -442,11 +444,11 @@ public abstract class ClassDefinition extends MethodContainer
     if (classConstraint != null)
       try{
 	localScope = new TypeScope(localScope);
-        mlsub.typing.MonotypeVar[] typeParams = classConstraint.typeParameters;
+        mlsub.typing.TypeSymbol[] binders = classConstraint.binders;
 	//add only nonvariant type parameter so no possibly unsafe co/contra-variant fields can exist.
-        for (int i = 0; i < typeParams.length; i++)
+        for (int i = 0; i < binders.length; i++)
 	  if (variance.getVariance(i) == mlsub.typing.Variance.INVARIANT)
-	    localScope.addSymbol(typeParams[i]);
+	    localScope.addSymbol(binders[i]);
       }
       catch(TypeScope.DuplicateName e){
 	User.error(this, e);

@@ -260,6 +260,9 @@ public class Constraint extends Node
     atomics.addAll(l);
   }
 
+  List getBinders() { return binders; }
+  List getAtoms() { return atomics; }
+
   private List /* of TypeSymbol */ binders;
   private List /* of AtomicConstraint */ atomics;
 }

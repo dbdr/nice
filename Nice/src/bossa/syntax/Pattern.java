@@ -384,12 +384,12 @@ public class Pattern implements Located
       return that.tc == PrimitiveType.boolTC; 
 
     if (this.atEnum() && that.atEnum())
-      return this.atValue.toString().compareTo(that.atValue.toString()) < 0;
+      return false;
 
     if (this.atIntCompare() && that.atIntCompare())
       {
 	if (this.atLess() != that.atLess())
-	  return atLess();
+	  return false;
 
         long val = this.atValue.longValue();
         if (this.compareKind == LT) val--;
@@ -841,4 +841,5 @@ public class Pattern implements Located
   public boolean atEnum() { return atReference() && atValue.value instanceof EnumDefinition.EnumSymbol; }
   public boolean atIntCompare() { return compareKind > 0;}
   public boolean atLess() { return compareKind == LT || compareKind == LE; }
+  public boolean atTypeMatchingValue() { return atEnum() || atIntCompare(); }
 }

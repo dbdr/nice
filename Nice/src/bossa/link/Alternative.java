@@ -125,6 +125,14 @@ public abstract class Alternative implements Located
     return true;
   }
 
+  boolean containsTypeMatchingValue()
+  {
+    for(int i = 0; i < patterns.length; i++)
+      if (patterns[i].atTypeMatchingValue())
+	return true;
+
+    return false;
+  }
 
   /****************************************************************
    * Code generation

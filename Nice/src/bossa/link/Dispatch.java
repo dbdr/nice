@@ -234,7 +234,8 @@ public final class Dispatch
 	if (a.matches(tags))
 	  if (first == null)
 	    first = a;
-	  else if (!Alternative.less(first, a))
+	  else if (!Alternative.less(first, a) &&
+		   !a.containsTypeMatchingValue())
 	    {
 	      failed = true;
 	      User.warning

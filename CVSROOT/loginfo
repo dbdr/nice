@@ -29,6 +29,9 @@
 ## Send CVSROOT changes to Daniel.
 CVSROOT /cvsroot/sitedocs/CVSROOT/cvstools/syncmail %{sVv} bonniot@users.sourceforge.net
 
+## Send nicedoc changes to Frank and the nice-commit mailing list.
+Nice/src/nice/tools/doc/ /cvsroot/sitedocs/CVSROOT/cvstools/syncmail %{sVv} fbarber@users.sourceforge.net nice-commit@lists.sourceforge.net
+
 ## Send other changes to the nice-commit mailing list.
 DEFAULT /cvsroot/sitedocs/CVSROOT/cvstools/syncmail %{sVv} nice-commit@lists.sourceforge.net
 

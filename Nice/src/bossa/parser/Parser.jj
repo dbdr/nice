@@ -2141,6 +2141,10 @@ Expression patternLiteral() :
 {
   (
   "null" { res = NullExp.instance; }
+| "-" res=intConstantExp() 
+  { res = ConstantExp.makeNumber(
+         new LocatedString("-"+res.toString(), res.location()));
+  }
 | res=intConstantExp() 
 | res=charConstantExp()
   )

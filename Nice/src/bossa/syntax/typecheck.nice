@@ -426,7 +426,12 @@ typecheck(b@Block)
   b.statements = rewrite(b.statements);
 
   b.locals.iter(?Block.LocalDeclaration d => typecheck(d));
-  b.statements.iter(?Statement s => typecheck(s));
+  b.statements.foreach
+  (?Statement s => {
+    try { typecheck(s); } 
+    catch (bossa.util.UserError ex) 
+    { throw ensureLocated(ex, notNull(s)); }
+  });
 }
 
 typecheck(decl@Block.LocalVariable)
@@ -526,7 +531,9 @@ typecheck(r@ReturnStmt)
       else
 	r.value = notNull(r.value).resolveOverloading
 	  (new mlsub.typing.Polytype(expectedType));
-      typecheck(r.value);
+
+      try { typecheck(r.value); }
+      catch (bossa.util.UserError ex) { throw ensureLocated(ex, r); }
     }
   
   try{

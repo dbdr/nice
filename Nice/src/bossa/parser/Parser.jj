@@ -833,7 +833,7 @@ Monotype simpleMonotype():
   { res=bossa.syntax.dispatch.createAlike(p, makeLocation(start)); }
   { res.nullness = /*absent*/3; }
 |
-  LOOKAHEAD(monotypeConstructor())
+  LOOKAHEAD( typeConstructorIdent() "<" )
   res=monotypeConstructor()
   { res.nullness = /*absent*/3; }
 |
@@ -905,23 +905,19 @@ Expression ParameterTuplePart(List statements, List monotypes):
 )
 }
 
-Parameter formalParameter(List statements):
+Parameter tupleParameter(List statements):
 {
   Monotype t;
   LocatedString id = null;
   Expression val = null;
-}
-{
-(
-  LOOKAHEAD(monotype())
-  t=monotype() [ id=ident() [ "=" val=Expression() ]]
-  { return t.createParameter(id ,val); }
-|
-  { Token first,last;
+
+  Token first,last;
   List parts = new LinkedList();
   Expression part;
   List types = new LinkedList();
-  LocatedString ident; }
+  LocatedString ident;
+}
+{
   first="("
   part = ParameterTuplePart(statements, types) { parts.add(part); }
   ( "," part = ParameterTuplePart(statements, types) { parts.add(part); } )+
@@ -939,6 +935,20 @@ Parameter formalParameter(List statements):
 
     return t.createParameter(ident ,val);
   }
+}
+
+Parameter formalParameter(List statements):
+{}
+{
+(
+  LOOKAHEAD( "(" monotype() ident() )
+  { Parameter res; }
+  res=tupleParameter(statements)
+  { return res; }
+|
+  { Monotype t; LocatedString id = null; Expression val = null; }
+  t=monotype() [ id=ident() [ "=" val=Expression() ]]
+  { return t.createParameter(id ,val); }
 )
 }
 

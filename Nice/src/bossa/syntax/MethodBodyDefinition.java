@@ -153,6 +153,9 @@ public class MethodBodyDefinition extends Definition
 		 d.getName() + " is a function.\nIt was defined at:\n" + 
 		 d.location());
 
+    if (d.isMain())
+      User.warning(this, "This syntax for the main function is deprecated.\nPlease use instead the following:\n\nvoid main(String[] args)\n{\n  ...\n}");
+
     this.declaration = d;
     parameters = buildSymbols(this.formals, declaration.getArgTypes());
     scope.addSymbols(parameters);

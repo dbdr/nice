@@ -70,18 +70,16 @@ install: share/java/nice.jar
 
 
 setDate:
-	cd src/nice/tools/compiler; ./setBuildDate ${VERSION} ${TAG}
+	cd src/nice/tools/compiler; ./setBuildDate "${VERSION}" "${TAG}"
 
 test:
 	cd regtest; JAVA="${java}" /usr/bin/time ./regtest
 
-check: check_compiler check_lib
-
-check_compiler:
+check: 
 	if [ `${java} -h 2>&1 | grep -- -enableassertions | wc -l` = 0 ]; then\
-	  /usr/bin/time ${java} -Dassertions=true -classpath "classes" nice.tools.testsuite.TestNice testsuite/compiler; \
+	  /usr/bin/time ${java} -Dassertions=true -classpath "classes" nice.tools.testsuite.TestNice testsuite; \
 	else \
-	  /usr/bin/time ${java} -enableassertions -classpath "classes" nice.tools.testsuite.TestNice testsuite/compiler; \
+	  /usr/bin/time ${java} -enableassertions -classpath "classes" nice.tools.testsuite.TestNice testsuite; \
 	fi
 
 check_lib:

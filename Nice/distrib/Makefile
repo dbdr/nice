@@ -5,7 +5,7 @@ DEBIAN_REVISION = ${shell expr "$(FULL_DEB_VERSION)" : '.*-\([^-]*\)'}
 
 CVS_TAG = $(shell echo -n "version_$(VERSION)" | tr -c -- "-_a-zA-Z0-9" "_")
 
-DEB = nice_${VERSION}_all.deb
+DEB = nice_${FULL_DEB_VERSION}_all.deb
 
 BUILDROOT = nice-$(VERSION)
 BUILDDIR = ${CURDIR}/$(BUILDROOT)

@@ -12,9 +12,11 @@
 
 // File    : PolySymbol.java
 // Created : Fri Jul 16 17:03:51 1999 by bonniot
-//$Modified: Fri Mar 31 19:12:52 2000 by Daniel Bonniot $
+//$Modified: Fri Jun 09 17:54:13 2000 by Daniel Bonniot $
 
 package bossa.syntax;
+
+import mlsub.typing.Polytype;
 
 import bossa.util.*;
 
@@ -24,17 +26,17 @@ import bossa.util.*;
  */
 public class PolySymbol extends VarSymbol
 {
-  public PolySymbol(LocatedString name, Polytype type)
+  public PolySymbol(LocatedString name, bossa.syntax.Polytype type)
   {
     super(name);
-    if(type!=null)
-      addChild(type);
-    this.type=type;
+    this.syntacticType = type;
+    if(syntacticType!=null)
+      addChild(syntacticType);
   }
-
+  
   public PolySymbol(MonoSymbol s)
   {
-    this(s.name,new Polytype(s.type));
+    this(s.name, new bossa.syntax.Polytype(s.syntacticType));
   }
   
   public Polytype getType()
@@ -43,13 +45,55 @@ public class PolySymbol extends VarSymbol
   }
 
   /****************************************************************
+   * Resolution
+   ****************************************************************/
+
+  void resolve()
+  {
+    type = syntacticType.resolveToLowlevel();
+    syntacticType = null;
+  }
+  
+  /****************************************************************
+   * Cloning types
+   ****************************************************************/
+
+  // explained in OverloadedSymbolExp
+
+  private boolean clonedTypeInUse;
+  private Polytype clonedType;
+  
+  final void makeClonedType()
+  {
+    if(clonedTypeInUse)
+      Internal.error(this, "clonedType in use");
+    clonedTypeInUse = true;
+    
+    if(clonedType==null)
+      clonedType = type.cloneType();
+  }
+  
+  void releaseClonedType()
+  {
+    clonedTypeInUse = false;
+    clonedType = null;
+  }
+  
+  final Polytype getClonedType()
+  {
+    return clonedType;
+  }
+  
+  /****************************************************************
    * Printing
    ****************************************************************/
 
   public String toString()
   {
-    return type+" "+name;
+    return (type==null ? String.valueOf(syntacticType) : type.toString()) 
+      + " " + name;
   }
 
   protected Polytype type;
+  private bossa.syntax.Polytype syntacticType;
 }

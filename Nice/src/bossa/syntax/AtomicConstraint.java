@@ -12,7 +12,7 @@
 
 // File    : AtomicConstraint.java
 // Created : Mon Jul 19 16:40:18 1999 by bonniot
-//$Modified: Mon Dec 06 11:36:41 1999 by bonniot $
+//$Modified: Tue Jun 13 18:34:10 2000 by Daniel Bonniot $
 
 package bossa.syntax;
 
@@ -34,53 +34,22 @@ public abstract class AtomicConstraint extends Node
   /****************************************************************
    * Scoping
    ****************************************************************/
-
-  abstract AtomicConstraint resolve(TypeScope scope);
   
-  static List resolve(TypeScope scope, Collection c)
+  abstract mlsub.typing.AtomicConstraint resolve(TypeScope scope);
+  
+  static mlsub.typing.AtomicConstraint[] resolve(TypeScope scope, Collection c)
   {
-    List res=new ArrayList(c.size());
-    Iterator i=c.iterator();
+    if(c.size()==0)
+      return null;
+    
+    mlsub.typing.AtomicConstraint[] res = 
+      new mlsub.typing.AtomicConstraint[c.size()];
 
-    while(i.hasNext())
-      res.add( ((AtomicConstraint)i.next()).resolve(scope));
+    int n =0;
+    for(Iterator i=c.iterator(); i.hasNext(); )
+      res[n++] = ((AtomicConstraint) i.next()).resolve(scope);
 
     return res;
-  }
-
-  abstract AtomicConstraint substitute(Map map);
-
-  static List substitute(Map map, Collection c)
-  {
-    List res=new ArrayList(c.size());
-    Iterator i=c.iterator();
-
-    while(i.hasNext())
-      res.add( ((AtomicConstraint)i.next()).substitute(map));
-
-    return res;
-  }
-
-  /****************************************************************
-   * Typechecking
-   ****************************************************************/
-
-  /**
-   * Enter the constraint into the typing context
-   *
-   */
-  abstract void assert() throws bossa.typing.TypingEx;
-  
-  /**
-   * Iterates assert
-   *
-   * @param atomics a collection of AtomicConstraints
-   */
-  static void assert(Collection atomics)
-    throws bossa.typing.TypingEx
-  {
-    for(Iterator i=atomics.iterator();i.hasNext();)
-      ((AtomicConstraint) i.next()).assert();
   }
 
   /****************************************************************
@@ -92,14 +61,67 @@ public abstract class AtomicConstraint extends Node
    * another element was introduced in comparison of.
    *
    * For instance, in <Num N | ... >
-   * getParent(N) should be "Num".
+   * getParentFor(N) should be "Num".
    * Used to reproduce a parsable form of the constraint.
    *
    * @param tc a constraint element
    * @return the representation of its "parent", or <code>null</code>
    */
-  String getParentFor(TypeConstructor tc)
+  String getParentFor(mlsub.typing.TypeConstructor tc)
   {
     return null;
+  }
+
+  /****************************************************************
+   * Wrapper for lowlevel AtomicConstraint
+   ****************************************************************/
+
+  static final AtomicConstraint create(mlsub.typing.AtomicConstraint atom)
+  {
+    return new Wrapper(atom);
+  }
+  
+  private static final class Wrapper extends AtomicConstraint
+  {
+    Wrapper(mlsub.typing.AtomicConstraint atom)
+    {
+      this.atom = atom;
+    }
+    
+    private final mlsub.typing.AtomicConstraint atom;
+    
+    mlsub.typing.AtomicConstraint resolve(TypeScope scope)
+    {
+      return atom;
+    }
+
+    String getParentFor(mlsub.typing.TypeConstructor tc)
+    {
+      if(atom instanceof mlsub.typing.TypeConstructorLeqCst)
+	{
+	  mlsub.typing.TypeConstructorLeqCst leq = 
+	    (mlsub.typing.TypeConstructorLeqCst) atom;
+	  if(leq.t1()==tc)
+	    return leq.t2().toString();
+	  else
+	    return null;
+	}
+      if(atom instanceof mlsub.typing.ImplementsCst)
+	{
+	  mlsub.typing.ImplementsCst leq = 
+	    (mlsub.typing.ImplementsCst) atom;
+	  if(leq.tc()==tc)
+	    return leq.itf().toString();
+	  else
+	    return null;
+	}
+      
+      return null;
+    }
+
+    public String toString()
+    {
+      return atom.toString();
+    }
   }
 }

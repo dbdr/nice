@@ -12,7 +12,7 @@
 
 // File    : Monotype.java
 // Created : Thu Jul 01 19:28:28 1999 by bonniot
-//$Modified: Thu May 11 11:27:51 2000 by Daniel Bonniot $
+//$Modified: Thu Jun 08 16:13:07 2000 by Daniel Bonniot $
 // Description : Abstract syntactic type, without constraint
 
 package bossa.syntax;
@@ -21,35 +21,15 @@ import java.util.*;
 import bossa.util.*;
 
 abstract public class Monotype
-  implements Located, bossa.engine.Element
+implements Located
 {
-  abstract Monotype cloneType();
-
-  List cloneTypes(Collection types)
-  {
-    List res=new ArrayList(types.size());
-    Iterator i=types.iterator();
-    while(i.hasNext())
-      res.add((Monotype)i.next());
-    return res;
-  }
-
-  /**
-   * Constructs a fresh monotype
-   *
-   * @param associatedVariable a hint to make the name understandable by the user
-   * @param m a monotype the new one should be comparable to
-   * @return the fresh monotype
-   */
-  static MonotypeVar fresh(LocatedString associatedVariable,Monotype m)
-  {
-    MonotypeVar res=new MonotypeVar(true,associatedVariable);
-    return res;
-  }
+  /****************************************************************
+   * Syntactic fresh monotype variables
+   ****************************************************************/
   
-  static MonotypeVar fresh(LocatedString associatedVariable)
+  static Monotype fresh(LocatedString associatedVariable)
   {
-    return fresh(associatedVariable,null);
+    return new TypeIdent(associatedVariable);
   }
   
   static List freshs(int arity, LocatedString associatedVariable)
@@ -60,20 +40,18 @@ abstract public class Monotype
     return res;
   }
   
-  /**
-   * Returns the name of a java class that is decribed by this type
-   */
-  public gnu.bytecode.Type getJavaType()
-  {
-    return gnu.bytecode.Type.pointer_type;
-  }
+  /*abstract Monotype cloneType();
 
-  final public boolean isConcrete()
+  List cloneTypes(Collection types)
   {
-    // No Monotype lives at runtime.
-    return false;
+    List res=new ArrayList(types.size());
+    Iterator i=types.iterator();
+    while(i.hasNext())
+      res.add((Monotype)i.next());
+    return res;
   }
-  
+  */
+
   /** @return true if "alike" appears inside this monotype. */
   abstract boolean containsAlike();
   
@@ -90,10 +68,10 @@ abstract public class Monotype
    **************************************************************/
   
   // public since it is called from bossa.dispatch
-  public abstract Monotype resolve(TypeScope ts);
+  public abstract mlsub.typing.Monotype resolve(TypeScope ts);
 
   /** iterates resolve() on the collection of Monotype */
-  static List resolve(TypeScope s, Collection c)
+  static List oldresolve(TypeScope s, Collection c)
   //TODO: imperative version ?
   {
     List res=new ArrayList();
@@ -101,7 +79,7 @@ abstract public class Monotype
     while(i.hasNext())
       { 
 	Monotype old=(Monotype)i.next();
-	Monotype nou=old.resolve(s);
+	mlsub.typing.Monotype nou=old.resolve(s);
 
 	if(nou==null)
 	  User.error(old,old+" : Monotype not defined");
@@ -111,48 +89,42 @@ abstract public class Monotype
     return res;
   }
   
-  abstract void typecheck();
-  
-  final static void typecheck(List monotypes)
+  /** iterates resolve() on the collection of Monotype */
+  static final mlsub.typing.Monotype[] resolve(TypeScope s, Collection c)
+  //TODO: imperative version ?
   {
-    for(Iterator i=monotypes.iterator(); i.hasNext();)
-      ((Monotype) i.next()).typecheck();
-  }
-  
-  /****************************************************************
-   * Functional types
-   ****************************************************************/
+    if(c.size()==0)
+      return null;
+    
+    mlsub.typing.Monotype[] res = new mlsub.typing.Monotype[c.size()];
 
-  /** the list of input Monotypes if this type is functional */
-  public List domain()
-  {
-    return null;
-  }
+    int n=0;
+    Iterator i=c.iterator();
+    while(i.hasNext())
+      {
+	Object o = i.next();
+	if (!(o instanceof Monotype))
+	  Debug.println(o+" ::: "+o.getClass());
+	
+	Monotype old = (Monotype) o;
+	mlsub.typing.Monotype nou = old.resolve(s);
 
-  /** the return type if this type is functional */
-  public Monotype codomain()
-  {
-    return null;
-  }
+	if(nou==null)
+	  User.error(old,old+" : Monotype not defined");
 
-  public TypeConstructor getTC()
-  {
-    Internal.error("getTC should not be called in class "+getClass());
-    return null;
-  }
-  
-  public TypeParameters getTP()
-  {
-    Internal.error("getTP should not be called in class "+getClass());
-    return null;
+	res[n++]=nou;
+      }
+    return res;
   }
   
   abstract Monotype substitute(Map map);
 
   static List substitute(Map map, Collection c)
   {
-    List res=new ArrayList(c.size());
-    Iterator i=c.iterator();
+    if(c==null) return null;
+    
+    List res = new ArrayList(c.size());
+    Iterator i = c.iterator();
 
     while(i.hasNext())
       res.add( ((Monotype)i.next()).substitute(map));
@@ -172,16 +144,6 @@ abstract public class Monotype
   }
 
   /****************************************************************
-   * Code generation
-   ****************************************************************/
-
-  /** The value of an initialized variable of this monotype. */
-  gnu.expr.Expression defaultValue()
-  {
-    return gnu.expr.QuoteExp.nullExp;
-  }
-  
-  /****************************************************************
    * Printing
    ****************************************************************/
 
@@ -197,6 +159,45 @@ abstract public class Monotype
     return toString();
   }
 
-  //??? Constraint constraint=Constraint.True;
+  /****************************************************************
+   * Wrapping a mlsub Monotype in a syntactic monotype
+   ****************************************************************/
+  
+  static Monotype create(mlsub.typing.Monotype m)
+  {
+    return new Wrapper(m);
+  }
+  
+  private static final class Wrapper extends Monotype
+  {
+    Wrapper(mlsub.typing.Monotype m)
+    {
+      this.type = m;
+    }
+
+    boolean containsAlike() { return false; }
+    
+    public mlsub.typing.Monotype resolve(TypeScope s)
+    {
+      return type;
+    }
+
+    Monotype substitute(Map m)
+    {
+      return this;
+    }
+
+    public Location location()
+    {
+      return Location.nowhere();
+    }
+
+    public String toString() 
+    {
+      return String.valueOf(type);
+    }
+    
+    private final mlsub.typing.Monotype type;
+  }  
 }
 

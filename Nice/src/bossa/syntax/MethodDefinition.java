@@ -12,11 +12,12 @@
 
 // File    : MethodDefinition.java
 // Created : Thu Jul 01 18:12:46 1999 by bonniot
-//$Modified: Tue May 16 18:15:39 2000 by Daniel Bonniot $
+//$Modified: Tue Jun 13 18:52:44 2000 by Daniel Bonniot $
 
 package bossa.syntax;
 
 import bossa.util.*;
+import mlsub.typing.*;
 
 import gnu.bytecode.*;
 import gnu.expr.*;
@@ -24,6 +25,7 @@ import gnu.expr.*;
 import java.util.*;
 
 import bossa.util.Location;
+import bossa.util.Debug;
 
 /**
  * Abstract syntax for a global method declaration.
@@ -49,32 +51,50 @@ public class MethodDefinition extends Definition
     super(name, Node.global);
     this.memberOf = c;
 
-    List params = new ArrayList();
+    List params = null;
 
     // if it is a class method, there is an implicit "this" argument
     if(c!=null)
       {
-	Polytype classType = c.getType().cloneType();
-	constraint = Constraint.and(constraint, classType.getConstraint());
+	boolean hasAlike = returnType.containsAlike() 
+	  || Monotype.containsAlike(parameters);
 
-	Monotype thisType;
-	if(returnType.containsAlike() || Monotype.containsAlike(parameters))
+	// create type parameters with the same names as in the class
+	mlsub.typing.MonotypeVar[] thisTypeParams =
+	  c.createSameTypeParameters();
+
+	int thisTypeParamsLen = (thisTypeParams == null ? 0 
+				 : thisTypeParams.length);
+	    
+	// if the constraint is True
+	// we must create a new one, otherwise we would
+	// modify other methods!
+	if(constraint==Constraint.True)
+	  constraint = new Constraint
+	    (new ArrayList(thisTypeParamsLen + (hasAlike ? 1 : 0)),
+	     new ArrayList((hasAlike ? 1 : 0)));
+	
+	constraint.addBinders(thisTypeParams);
+	
+	mlsub.typing.Monotype thisType;
+	if(hasAlike)
 	  {
 	    TypeConstructor alikeTC = 
-	      new TypeConstructor(c.getName(), c.tc.variance);
-	    alikeTC.preventResolving();
+	      new TypeConstructor("Alike", 
+				  c.variance(), false);
 	    
 	    constraint.addBinder(alikeTC);
 	    // added in front. Important for rebinding in method alternatives
 
-	    AtomicConstraint atom;
+	    mlsub.typing.AtomicConstraint atom;
 	    if(c.getAssociatedInterface()!=null)
-	      atom = new ImplementsCst(alikeTC, c.getAssociatedInterface());
+	      atom = new mlsub.typing.ImplementsCst
+		(alikeTC, c.getAssociatedInterface());
 	    else
-	      atom = new TypeConstructorLeqCst(alikeTC, c.tc);
-	    constraint.addAtom(atom);
-
-	    thisType = new MonotypeConstructor(alikeTC, classType.getMonotype().getTP(), location());
+	      atom = new mlsub.typing.TypeConstructorLeqCst(alikeTC, c.tc);
+	    constraint.addAtom(AtomicConstraint.create(atom));
+	    
+	    thisType = new mlsub.typing.MonotypeConstructor(alikeTC, thisTypeParams);
 
 	    Map map = new HashMap();
 	    map.put(Alike.id, alikeTC);
@@ -82,18 +102,32 @@ public class MethodDefinition extends Definition
 	    parameters = Monotype.substitute(map, parameters);
 	  }
 	else
-	  thisType = classType.getMonotype();
+	  thisType = 
+	    new mlsub.typing.MonotypeConstructor(c.tc, thisTypeParams);
 	
-	params.add(thisType);
+	params = new ArrayList(parameters.size()+1);
+	params.add(Monotype.create(thisType));
       }
-    
-    params.addAll(parameters);
-    
-    this.arity = params.size();
 
-    symbol = new MethodDefinition.Symbol
-      (name, new Polytype(constraint, new FunType(params, returnType)), this);
-    addChild(symbol);
+    if(params==null)
+      params = parameters;
+    else
+      params.addAll(parameters);
+    
+    if(returnType!=null)
+      // otherwise, symbol and arity are supposed to be set by someone else
+      // a child class for instance
+      // This should them be done through setLowlevelTypes(...)
+      {
+	// remember it to print the interface
+	syntacticConstraint = constraint.toString();
+	
+	symbol = new MethodDefinition.Symbol
+	  (name, new Polytype(constraint, new FunType(params, returnType)));
+	addChild(symbol);
+
+	this.arity = params.size();
+      }
 
     boolean isConstructor = name.toString().equals("<init>");
     
@@ -123,6 +157,16 @@ public class MethodDefinition extends Definition
   MethodDefinition(LocatedString name)
   {
     super(name, Node.global);
+  }
+  
+  void setLowlevelTypes(mlsub.typing.Constraint cst,
+			mlsub.typing.Monotype[] parameters, 
+			mlsub.typing.Monotype returnType)
+  {
+    arity = (parameters==null ? 0 : parameters.length);
+    symbol = new MethodDefinition.Symbol(name, null);
+    symbol.type = new mlsub.typing.Polytype
+      (cst, new mlsub.typing.FunType(parameters, returnType));
   }
   
   public Collection associatedDefinitions()
@@ -162,48 +206,16 @@ public class MethodDefinition extends Definition
 
   void typecheck()
   {
-    Constraint cst = getType().getConstraint();
-    
-    // Optimization
-    if(cst==Constraint.True ||
-       cst.binders.size()==0)
-      return;
-    
-    bossa.typing.Typing.enter("Definition of "+symbol.name);
-    
     try{
-      // Explanation for the assert(false) statement:
-      // We just want to check the type is well formed,
-      // so there is not need to enter top implementations.
-      // This is just an optimization, this shouldn't
-      // change anything.
-      getType().getConstraint().assert(false);
+      getType().checkWellFormedness();
     }
-    catch(bossa.typing.TypingEx e){
-      User.error(this,
-		 "The constraint of method "+symbol.name+
-		 " is not well formed");
-    }
-  }
-
-  void endTypecheck()
-  {
-    Constraint cst = getType().getConstraint();
-    
-    if(cst==Constraint.True ||
-       cst.binders.size()==0)
-      return;
-    
-    try{
-      bossa.typing.Typing.leave();
-    }
-    catch(bossa.typing.TypingEx e){
+    catch(TypingEx e){
       User.error(this,
 		 "The type of method "+symbol.name+
 		 " is not well formed");
     }
   }
-  
+
   /****************************************************************
    * Code generation
    ****************************************************************/
@@ -251,17 +263,12 @@ public class MethodDefinition extends Definition
   
   public gnu.bytecode.Type javaReturnType()
   {
-    return this.getType().codomain().getJavaType();
+    return bossa.CodeGen.javaType(getType().codomain());
   }
   
   public gnu.bytecode.Type[] javaArgTypes()
   {
-    List domain=this.getType().domain();
-    gnu.bytecode.Type[] res=new gnu.bytecode.Type[domain.size()];
-    int n=0;
-    for(Iterator i=domain.iterator();i.hasNext();n++)
-      res[n]=((Monotype)i.next()).getJavaType();
-    return res;
+    return bossa.CodeGen.javaType(getType().domain());
   }
   
   public void compile()
@@ -272,16 +279,20 @@ public class MethodDefinition extends Definition
    * Module interface
    ****************************************************************/
 
+  String syntacticConstraint;
+  
   public void printInterface(java.io.PrintWriter s)
   {
     s.print(
-	    getType().getConstraint().toString()
-	    + String.valueOf(getType().codomain())
+	    //mlsub.typing.Constraint.toString(getType().getConstraint())
+	    syntacticConstraint
+	    + getType().codomain()
 	    + " "
 	    + symbol.name.toQuotedString()
 	    + "("
 	    + Util.map("",", ","",getType().domain())
 	    + ");\n");
+    syntacticConstraint = null;
   }
   
   /************************************************************
@@ -291,7 +302,7 @@ public class MethodDefinition extends Definition
   public String toString()
   {
     return
-      getType().getConstraint().toString()
+      mlsub.typing.Constraint.toString(getType().getConstraint())
       + String.valueOf(getType().codomain())
       + " "
       + symbol.name.toQuotedString()
@@ -323,7 +334,7 @@ public class MethodDefinition extends Definition
     return module.getName().replace('.','$')+'$'+bytecodeName;
   }
 
-  public Polytype getType()
+  public mlsub.typing.Polytype getType()
   {
     return symbol.getType();
   }
@@ -333,10 +344,10 @@ public class MethodDefinition extends Definition
 
   class Symbol extends PolySymbol
   {
-    Symbol(LocatedString name, Polytype type, MethodDefinition definition)
+    Symbol(LocatedString name, Polytype type)
     {
       super(name, type);
-      this.definition=definition;
+      this.definition = MethodDefinition.this;
     }
 
     MethodDefinition definition;

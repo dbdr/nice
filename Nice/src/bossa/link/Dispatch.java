@@ -12,12 +12,14 @@
 
 // File    : Dispatch.java
 // Created : Mon Nov 15 10:36:41 1999 by bonniot
-//$Modified: Wed May 24 15:04:37 2000 by Daniel Bonniot $
+//$Modified: Tue Jun 13 19:07:44 2000 by Daniel Bonniot $
 
 package bossa.link;
 
 import bossa.syntax.*;
 import bossa.util.*;
+
+import mlsub.typing.*;
 
 import gnu.expr.*;
 
@@ -29,7 +31,7 @@ import java.util.*;
  * @author bonniot
  */
 
-public class Dispatch
+public final class Dispatch
 {
   // Non instantiable
   private Dispatch() { }
@@ -43,7 +45,7 @@ public class Dispatch
 
   public static void test(bossa.modules.Package module)
   {
-    for(Iterator i=methods.iterator();
+    for(Iterator i = methods.iterator();
 	i.hasNext();)
       test((MethodDefinition)i.next(), module);
   }
@@ -69,7 +71,7 @@ public class Dispatch
       // It's not an error for a method to have no alternative
       // if its domain is void.
       // this will be checked later
-      alternatives=new LinkedList();
+      alternatives = new LinkedList();
     
     Stack sortedAlternatives = sort(alternatives);
     
@@ -90,12 +92,9 @@ public class Dispatch
       return false;
     
     Alternative a = (Alternative) alternatives.peek();
-    for(Iterator i = a.patterns.iterator(); i.hasNext();)
-      {
-	Domain d = (Domain) i.next();
-	if(d!=Domain.bot)
+    for(int i = 0; i<a.patterns.length; i++)
+      if(a.patterns[i]!=null)
 	  return false;
-      }
     return true;
   }
 
@@ -134,11 +133,11 @@ public class Dispatch
     switch(a.mark)
       {
       case Alternative.VISITING : User.error("Cycle in alternatives: "+a);
-      case Alternative.UNVISITED: a.mark=Alternative.VISITING; break;
+      case Alternative.UNVISITED: a.mark = Alternative.VISITING; break;
       case Alternative.VISITED  : return; //should not happen
       }
     
-    for(Iterator i=alternatives.iterator();
+    for(Iterator i = alternatives.iterator();
 	i.hasNext();)
       {
 	Alternative daughter = (Alternative) i.next();
@@ -147,7 +146,7 @@ public class Dispatch
 	   && Alternative.leq(daughter,a))
 	  visit(daughter,alternatives,sortedAlternatives);
       }
-    a.mark=Alternative.VISITED;
+    a.mark = Alternative.VISITED;
     sortedAlternatives.push(a);
   }
 
@@ -157,17 +156,17 @@ public class Dispatch
     if(Debug.linkTests)
       {
 	Debug.print("\nLink test for "+method);
-	for(Iterator i=sortedAlternatives.iterator();
+	for(Iterator i = sortedAlternatives.iterator();
 	    i.hasNext();)
 	  Debug.println("Alternative: "+i.next().toString());
       }
     
 
-    Domain domain = method.getType().getDomain();
+    TupleDomain domain = method.getType().getDomain();
     
-    List multitags = bossa.typing.Typing.enumerate(domain);
+    List multitags = Typing.enumerate(domain);
 
-    for(Iterator i=multitags.iterator();
+    for(Iterator i = multitags.iterator();
 	i.hasNext();)
       {
 	TypeConstructor[] tags = (TypeConstructor[]) i.next();
@@ -183,7 +182,8 @@ public class Dispatch
    * @param tags a tuple of TypeConstructors
    * @param alternatives a list of Alternatives
    */
-  private static void test(MethodDefinition method, TypeConstructor[] tags, 
+  private static void test(MethodDefinition method, 
+			   TypeConstructor[] tags, 
 			   final Stack sortedAlternatives)
   {
     if(Debug.linkTests)
@@ -193,7 +193,7 @@ public class Dispatch
 
     Alternative first = null;
 
-    for(Iterator i=sortedAlternatives.iterator();
+    for(Iterator i = sortedAlternatives.iterator();
 	i.hasNext();)
       {
 	Alternative a = (Alternative) i.next();
@@ -238,13 +238,13 @@ public class Dispatch
     // parameters of the alternative function are the same in each case, so we compute them just once
     gnu.bytecode.Type[] types = m.javaArgTypes();
     gnu.expr.Expression[] params = new gnu.expr.Expression[types.length];
-    lexp.min_args=lexp.max_args=types.length;
+    lexp.min_args = lexp.max_args = types.length;
     
-    for(int n=0; n<types.length; n++)
+    for(int n = 0; n<types.length; n++)
       {
-	Declaration param = lexp.addDeclaration("parameter_"+n,types[n]);
+	Declaration param = lexp.addDeclaration("parameter_"+n, types[n]);
 	param.setParameter(true);
-	params[n]=new ReferenceExp(param);
+	params[n] = new ReferenceExp(param);
       }
     
     if(m instanceof FieldAccessMethod)
@@ -254,7 +254,8 @@ public class Dispatch
     else
       block.setBody(dispatch(sortedAlternatives.iterator(),
 			     m.javaReturnType()==gnu.bytecode.Type.void_type,
-			     block,params));
+			     block,
+			     params));
 
     lexp.setPrimMethod(m.getDispatchPrimMethod());
     
@@ -264,15 +265,17 @@ public class Dispatch
   private static gnu.expr.Expression compileFieldAccess
     (FieldAccessMethod method, gnu.expr.Expression value)
   {
-    ListIterator types = method.classTC.getJavaInstanceTypes();
+    //ListIterator types = method.classTC.getJavaInstanceTypes();
+    gnu.bytecode.ClassType type = (gnu.bytecode.ClassType) 
+      bossa.CodeGen.javaType(method.classTC);
     
     gnu.expr.Expression[] param = new gnu.expr.Expression[1];
     param[0] = value;
     
     gnu.expr.Expression res =
-      new ApplyExp(new kawa.lang.GetFieldProc((gnu.bytecode.ClassType) types.next(),method.fieldName, method.javaReturnType(), gnu.bytecode.Access.PUBLIC),
+      new ApplyExp(new kawa.lang.GetFieldProc(type,method.fieldName, method.javaReturnType(), gnu.bytecode.Access.PUBLIC),
 		   param);
-    
+    /*
     while(types.hasNext())
       {
 	gnu.bytecode.ClassType type = (gnu.bytecode.ClassType) types.next();
@@ -280,22 +283,24 @@ public class Dispatch
 				 new ApplyExp(new kawa.lang.GetFieldProc(type,method.fieldName),param),
 			res);
       }
-    
+    */
     return res;
   }
 
   private static gnu.expr.Expression compileSetField(SetFieldMethod method, gnu.expr.Expression obj, gnu.expr.Expression value)
   {
-    ListIterator types = method.classTC.getJavaInstanceTypes();
+    //ListIterator types = method.classTC.getJavaInstanceTypes();
+    gnu.bytecode.ClassType type = (gnu.bytecode.ClassType) 
+      bossa.CodeGen.javaType(method.classTC);
     
     gnu.expr.Expression[] params = new gnu.expr.Expression[2];
     params[0] = obj;
     params[1] = value;
     
     gnu.expr.Expression res =
-      new ApplyExp(new QuoteExp(new kawa.lang.SetFieldProc((gnu.bytecode.ClassType) types.next(),method.fieldName, method.javaArgTypes()[1], gnu.bytecode.Access.PUBLIC)),
+      new ApplyExp(new QuoteExp(new kawa.lang.SetFieldProc(type,method.fieldName, method.javaArgTypes()[1], gnu.bytecode.Access.PUBLIC)),
 		   params);
-    
+    /*
     while(types.hasNext())
       {
 	gnu.bytecode.ClassType type = (gnu.bytecode.ClassType) types.next();
@@ -308,7 +313,7 @@ public class Dispatch
 	      gnu.bytecode.Access.PUBLIC)), params),
 			res);
       }
-    
+    */
     return res;
   }
 

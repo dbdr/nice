@@ -12,7 +12,7 @@
 
 // File    : StaticFieldAccess.java
 // Created : Thu Jul 01 18:12:46 1999 by bonniot
-//$Modified: Wed May 10 15:06:58 2000 by Daniel Bonniot $
+//$Modified: Fri Jun 09 19:05:03 2000 by Daniel Bonniot $
 
 package bossa.syntax;
 
@@ -42,30 +42,52 @@ public class StaticFieldAccess extends MethodDefinition
 		 name+" should have no parameters");    
   }
   
+  private StaticFieldAccess(LocatedString className,String fieldName,
+			    LocatedString name,
+			    mlsub.typing.Constraint cst,
+			    mlsub.typing.Monotype returnType, 
+			    mlsub.typing.Monotype[] parameters)
+  {
+    super(name, null, null, null);
+    this.className = className;
+    this.fieldName = fieldName;
+    
+    setLowlevelTypes(cst, parameters, returnType);
+  }
+  
   static MethodDefinition make(Field f)
   {
-    Monotype retType = JavaMethodDefinition.getMonotype(f.getType());
-
-    List params = new LinkedList();
-    if(!f.getStaticFlag())
-      params.add(JavaMethodDefinition.getMonotype(f.getDeclaringClass()));
-    
-    StaticFieldAccess res =
-      new StaticFieldAccess(new LocatedString(f.getDeclaringClass().getName(),
-					      Location.nowhere()),
-			    f.getName(),
-			    new LocatedString(f.getName(),
-					      Location.nowhere()),
-			    Constraint.True,
-			    retType, params);
     try{
-      res.field = f.getReflectField();
-    }
-    catch(java.lang.NoSuchFieldException e){
-      User.error("Field "+f+" does not exist");
-    }
+      mlsub.typing.Monotype[] params;
+      if(!f.getStaticFlag())
+	{
+	  params = new mlsub.typing.Monotype[]
+	  { bossa.CodeGen.getMonotype(f.getDeclaringClass()) };
+	}
+      else
+	params = null;
     
-    return res;
+      StaticFieldAccess res = new StaticFieldAccess
+	(new LocatedString(f.getDeclaringClass().getName(),
+			   Location.nowhere()),
+	 f.getName(),
+	 new LocatedString(f.getName(),
+			   Location.nowhere()),
+	 null,
+	 bossa.CodeGen.getMonotype(f.getType()), 
+	 params);
+      try{
+	res.field = f.getReflectField();
+      }
+      catch(java.lang.NoSuchFieldException e){
+	User.error("Field "+f+" does not exist");
+      }
+    
+      return res;
+    }
+    catch(bossa.CodeGen.ParametricClassException e){
+      return null;
+    }
   }
   
   public void createContext()
@@ -91,7 +113,7 @@ public class StaticFieldAccess extends MethodDefinition
 
   java.lang.reflect.Field getField(LocatedString javaClass, String name)
   {
-    Class c = JavaTypeConstructor.lookupJavaClass(javaClass.toString());
+    Class c = JavaClasses.lookupJavaClass(javaClass.toString());
 
     if(c==null)
       User.error(javaClass,"Class "+javaClass+" not found");
@@ -139,7 +161,7 @@ public class StaticFieldAccess extends MethodDefinition
   private String interfaceString()
   {
     return
-      getType().getConstraint().toString()
+      mlsub.typing.Constraint.toString(getType().getConstraint())
       + getType().codomain().toString()
       + " "
       + symbol.name

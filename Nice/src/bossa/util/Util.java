@@ -12,7 +12,7 @@
 
 // File    : Util.java
 // Created : Fri Jul 02 18:35:58 1999 by bonniot
-//$Modified: Tue Nov 16 19:17:49 1999 by bonniot $
+//$Modified: Fri Jun 09 19:12:38 2000 by Daniel Bonniot $
 // Description : Usefull fonctions used everywhere
 
 package bossa.util;
@@ -36,13 +36,13 @@ public class Util
     if(c==null || c.size()==0)
       return "";
 
-    String res=init;
+    String res = init;
 
-    Iterator i=c.iterator();
+    Iterator i = c.iterator();
     while(i.hasNext()){
-      res=res+String.valueOf(i.next());
+      res += String.valueOf(i.next());
       if(i.hasNext())
-	res=res+delim;
+	res += delim;
     }
     return res+end;
   }
@@ -53,13 +53,17 @@ public class Util
     if(c==null || c.size()==0)
       return "";
 
-    String res=init;
+    String res = init;
 
-    Iterator i=c.iterator();
+    Iterator i = c.iterator();
     while(i.hasNext()){
-      res=res+((Printable)i.next()).toString(param);
+      Object o = i.next();
+      if(o instanceof Printable)
+	res += ((Printable) o).toString(param);
+      else
+	res += o.toString();
       if(i.hasNext())
-	res=res+delim;
+	res += delim;
     }
     return res+end;
   }
@@ -82,14 +86,13 @@ public class Util
   public static String map(String init, boolean keyFirst, String delim1, String delim2,
 			   String end, Set s)
   {
-    String res=init;
+    String res = init;
     Iterator i;
-    i=s.iterator();
+    i = s.iterator();
 
     while(i.hasNext()){
-      Map.Entry e=(Map.Entry)i.next();
-      res=res
-	+e.getValue().toString()
+      Map.Entry e = (Map.Entry)i.next();
+      res += e.getValue().toString()
 	+delim1
 	+e.getKey().toString()
 	+delim2;
@@ -102,10 +105,10 @@ public class Util
     if(c==null || c.length==0)
       return "";
 
-    String res=init;
+    String res = init;
 
-    for(int i=0;i<c.length-1;i++)
-      res=res+String.valueOf(c[i])+delim;
-    return res+c[c.length-1]+end;
+    for(int i = 0; i<c.length-1; i++)
+      res += String.valueOf(c[i]) + delim;
+    return res + c[c.length-1] + end;
   }
 }

@@ -12,12 +12,12 @@
 
 // File    : ClassDefinition.java
 // Created : Thu Jul 01 11:25:14 1999 by bonniot
-//$Modified: Fri May 26 17:59:42 2000 by Daniel Bonniot $
+//$Modified: Tue Jun 13 16:39:37 2000 by Daniel Bonniot $
 
 package bossa.syntax;
 
 import bossa.util.*;
-import bossa.typing.*;
+import mlsub.typing.*;
 
 import gnu.bytecode.*;
 import java.util.*;
@@ -57,7 +57,7 @@ abstract public class ClassDefinition extends Definition
     this.isConcrete = isConcrete;
     
     if(isInterface)
-      isAbstract=true;
+      isAbstract = true;
     
     // Testing well formedness
     if(isInterface)
@@ -78,10 +78,10 @@ abstract public class ClassDefinition extends Definition
     this.simpleName = this.name.toString();
     this.name.prepend(module.getName()+".");
     
-    this.isFinal=isFinal;
-    this.isAbstract=isAbstract;
-    this.isInterface=isInterface;
-
+    this.isFinal = isFinal;
+    this.isAbstract = isAbstract;
+    this.isInterface = isInterface;
+    
     if(typeParameters==null)
       this.typeParameters = new ArrayList(0);
     else
@@ -89,44 +89,96 @@ abstract public class ClassDefinition extends Definition
 	this.typeParameters = typeParameters;
 	//addTypeSymbols(typeParameters);    
       }
-
-    this.extensions=extensions;
-
-    this.tc=new TypeConstructor(this);
+    this.variance = mlsub.typing.Variance.make(typeParameters.size());
     
-    this.implementations=addChildren(implementations);
-    this.abstractions=addChildren(abstractions);
-  }
+    this.extensions = extensions;
 
+    this.tc = new mlsub.typing.TypeConstructor
+      (this.name.toString(), variance, isConcrete);
+
+    if(isInterface)
+      associatedInterface = new Interface(variance, tc);
+
+    tcToClassDef.put(tc, this);
+    Typing.introduce(tc);
+    addTypeSymbol(this.tc);    
+    
+    this.implementations = implementations;
+    this.abstractions = abstractions;
+  }
+  
   public Collection associatedDefinitions()
   {
     return null;
   }
 
+  private Variance variance;
+  public  Variance variance()
+  {
+    return variance;
+  }
+  
+  /****************************************************************
+   * Map TypeConstructors to ClassDefinitions
+   ****************************************************************/
+
+  private static final HashMap tcToClassDef = new HashMap();
+  
+  static final ClassDefinition get(TypeConstructor tc)
+  {
+    return (ClassDefinition) tcToClassDef.get(tc);
+  }
+  
   /****************************************************************
    * Selectors
    ****************************************************************/
 
-  Constraint getConstraint()
+  List getTypeParameters()
   {
-    return new Constraint(typeParameters,null);
+    return typeParameters;
   }
 
+  /** create type parameters with the same names as in the class */
+  mlsub.typing.MonotypeVar[] createSameTypeParameters()
+  {
+    mlsub.typing.MonotypeVar[] thisTypeParams;
+    if(tc.arity()>0)
+      {
+	thisTypeParams = new mlsub.typing.MonotypeVar[tc.arity()];
+	List tp = getTypeParameters();
+	for(int i=0; i<thisTypeParams.length; i++)
+	  thisTypeParams[i] = new MonotypeVar(tp.get(i).toString());
+      }
+    else
+      thisTypeParams = null;
+    return thisTypeParams;
+  }
+
+  /*
   Polytype getType()
   {
-    return new Polytype(new Constraint(typeParameters,null),getMonotype());
+    return new Polytype(new Constraint(typeParameters,null), getMonotype());
   }
-
+  */
   /**
    * Returns the 'Monotype' part of the type.
    * Private use only (to compute the type of the field access methods).
    */
+  /*
   protected Monotype getMonotype()
   {
     return new MonotypeConstructor
-      (this.tc,
-       TypeParameters.fromSymbols(typeParameters),
+      (new TypeIdent(this.name), //TODO: optimize, no lookup
+       TypeParameters.fromMonotypeVars(typeParameters),
        name.location());
+  }
+  */
+  protected mlsub.typing.Monotype lowlevelMonotype()
+  {
+    return new mlsub.typing.MonotypeConstructor
+      (tc, typeParameters.size()==0 
+       ? null : 
+       (mlsub.typing.Monotype[]) typeParameters.toArray(new MonotypeVar[typeParameters.size()]));
   }
   
   final boolean isConcrete;
@@ -141,15 +193,25 @@ abstract public class ClassDefinition extends Definition
 
   void resolve()
   {
-    extensions=TypeConstructor.resolve(typeScope,extensions);
-
+    // if superClass is non null, it was build before
+    // extensions should be null in that case
+    if(superClass==null)
+      {
+	superClass = TypeIdent.resolveToTC(typeScope, extensions);
+	extensions = null;
+      }
+    
+    impl = TypeIdent.resolveToItf(typeScope, implementations);
+    abs = TypeIdent.resolveToItf(typeScope, abstractions);
+    
+    implementations = abstractions = null;
+    
     // A class cannot extend an interface
-    if(!isInterface)
-      for(Iterator e = extensions.iterator(); e.hasNext();)
+    if(!isInterface && superClass!=null)
+      for(int i=0; i<superClass.length; i++)
 	{
-	  TypeConstructor tc = (TypeConstructor) e.next();
-	  if(tc.getDefinition() !=null &&
-	     tc.getDefinition().getAssociatedInterface()!=null)
+	  ClassDefinition def = ClassDefinition.get(superClass[i]);
+	  if(def!=null && def.getAssociatedInterface()!=null)
 	    User.error(name,
 		       tc+" is an interface, so "+name+
 		       " may only implement it");
@@ -166,7 +228,8 @@ abstract public class ClassDefinition extends Definition
   {
     try{
       try{
-	Typing.initialLeq(tc,extensions);
+	if(superClass!=null)
+	  Typing.initialLeq(tc, superClass);
       }
       catch(KindingEx e){
 	User.error(name,
@@ -174,26 +237,29 @@ abstract public class ClassDefinition extends Definition
 		   ": they do not have the same kind");
       }
       
-      Typing.assertImp(tc,implementations,true);
+      if(impl!=null)
+	Typing.assertImp(tc,impl,true);
+
       if(associatedInterface!=null)
 	Typing.assertImp(tc, associatedInterface, true);
-      Typing.assertImp(tc,abstractions,true);
-
+      
+      if(abs!=null)
+	{
+	  Typing.assertImp(tc, abs, true);
+	  Typing.assertAbs(tc, abs);
+	}
+      
       if(implementsTop())
-	Typing.assertImp(tc,
-			 InterfaceDefinition.top(typeParameters.size()),
-			 true);
-
-      Typing.assertAbs(tc,abstractions);
+	Typing.assertImp(tc, variance.top, true);
       if(isFinal)
-	Typing.assertAbs(tc,InterfaceDefinition.top(typeParameters.size()));
+	Typing.assertAbs(tc, variance.top);
     }
     catch(TypingEx e){
       User.error(name,"Error in class "+name+" : "+e.getMessage());
     }
 
-    if(associatedInterface!=null)
-      associatedInterface.createContext();
+    //if(associatedInterface!=null)
+    //associatedInterface.createContext();
   }
 
   /****************************************************************
@@ -209,9 +275,9 @@ abstract public class ClassDefinition extends Definition
 	  (isAbstract ? "abstract " : "") + "class ")
        + simpleName
        + Util.map("<",", ",">",typeParameters)
-       + Util.map(" extends ",", ","",extensions)
-       + Util.map(" implements ",", ","",implementations)
-       + Util.map(" finally implements ",", ","",abstractions)
+       + Util.map(" extends ",", ","",superClass)
+       + Util.map(" implements ",", ","",impl)
+       + Util.map(" finally implements ",", ","",abs)
       );
   }
   
@@ -226,9 +292,9 @@ abstract public class ClassDefinition extends Definition
   // A child class of A whose javaSuperClass is not A
   // is called an "illegitimate" child
 
-  ClassDefinition superClass(int n)
+  final ClassDefinition superClass(int n)
   {
-    return ((TypeConstructor) extensions.get(n)).getDefinition();
+    return get(superClass[n]);
   }
   
   /**
@@ -236,7 +302,7 @@ abstract public class ClassDefinition extends Definition
    */
   ClassDefinition distinguishedSuperClass()
   {
-    if(extensions.size()==0)
+    if(superClass == null)
       return null;
     else
       return superClass(0);
@@ -265,13 +331,14 @@ abstract public class ClassDefinition extends Definition
   {
     ClassDefinition abs = abstractClass();
     Type res;
-    if(abs.extensions.size()==0)
+    
+    if(abs.superClass == null)
       res = gnu.bytecode.Type.pointer_type;
     else
-      res = ((TypeConstructor) abs.extensions.get(0)).getJavaType();
+      res = bossa.CodeGen.javaType(abs.superClass[0]);
     
     if(!(res instanceof ClassType))
-      Internal.error("Only _Array is not a class type, and it must be final");
+      Internal.error("Java type="+res+"\nOnly _Array is not a class type, and it must be final");
     
     return (ClassType) res;
   }
@@ -327,7 +394,7 @@ abstract public class ClassDefinition extends Definition
    * Associated interface
    ****************************************************************/
 
-  private AssociatedInterface associatedInterface;
+  private mlsub.typing.Interface associatedInterface;
 
   /**
    * Returns the abstract interface associated to this class, or null.
@@ -335,39 +402,39 @@ abstract public class ClassDefinition extends Definition
    * An associated abstract interface in created 
    * for each "interface" class.
    */
-  public AssociatedInterface getAssociatedInterface()
+  public mlsub.typing.Interface getAssociatedInterface()
   { return associatedInterface; }
     
-
   private void createAssociatedInterface()
   {
-    if(!isInterface)
+    if(associatedInterface==null)
       return;
 
     // the associated interface extends the associated interfaces
     // of the classes we extend
-    List ext = new LinkedList();
-    for(Iterator i = extensions.iterator(); i.hasNext();)
-      {
-	TypeConstructor tc = (TypeConstructor) i.next();
-	ClassDefinition c = tc.getDefinition();
-	if(c==null)
-	  Internal.error(name,
-			 "Superclass "+tc+
-			 "("+tc.getClass()+")"+
-			 " of "+name+
-			 " has no definition");
+    if(superClass!=null)
+      for(int i = 0; i<superClass.length; i++)
+	{
+	  ClassDefinition c = ClassDefinition.get(superClass[i]);
+	  if(c==null)
+	    Internal.error(name,
+			   "Superclass "+tc+
+			   "("+tc.getClass()+")"+
+			   " of "+name+
+			   " has no definition");
 	
-	InterfaceDefinition ai = c.getAssociatedInterface();
-	if(ai==null)
-	  Internal.error("We should extend only \"interface\" classes");
-	ext.add(new Interface(ai));
-      }
-    
-    associatedInterface = new AssociatedInterface
-      (name, typeParameters, ext, this);
-    
-    addChild(associatedInterface);
+	  Interface ai = c.getAssociatedInterface();
+	  if(ai==null)
+	    Internal.error("We should extend only \"interface\" classes");
+	
+	  try{
+	    Typing.assertLeq(associatedInterface, ai);
+	  }
+	  catch(KindingEx e){
+	    User.error(this, "Cannot extend interface " + ai + 
+		       " which has a different variance");
+	  }
+	}
   }
   
   /****************************************************************
@@ -382,12 +449,15 @@ abstract public class ClassDefinition extends Definition
   /** The name of the class without package qualification. */
   String simpleName;
   
-  TypeConstructor tc;
+  mlsub.typing.TypeConstructor tc;
+
   List /* of TypeSymbol */ typeParameters;
   protected List
     /* of TypeConstructor */ extensions,
     /* of Interface */ implementations,
     /* of Interface */ abstractions;
+  TypeConstructor[] superClass;
+  Interface[] impl, abs;
   protected boolean isFinal, isInterface;
   
   abstract protected boolean implementsTop();

@@ -12,7 +12,7 @@
 
 // File    : FunExp.java
 // Created : Mon Jul 12 15:09:50 1999 by bonniot
-//$Modified: Thu May 25 14:27:02 2000 by Daniel Bonniot $
+//$Modified: Fri Jun 09 17:21:34 2000 by Daniel Bonniot $
 // Description : A functional expression
 
 package bossa.syntax;
@@ -20,23 +20,32 @@ package bossa.syntax;
 import java.util.*;
 import bossa.util.*;
 
+import mlsub.typing.Polytype;
+import mlsub.typing.Monotype;
+import mlsub.typing.FunType;
+import mlsub.typing.Constraint;
+
 public class FunExp extends Expression implements Function
 {
-  public FunExp(Constraint cst, List formals, Statement body)
+  public FunExp(bossa.syntax.Constraint cst, List formals, Statement body)
   {
     this.formals=addChildren(formals);
     this.constraint=cst;
     this.body = child(body);
-
-    addChild(constraint);
   }
 
+  void resolve()
+  {
+    cst = constraint.resolveToLowlevel();
+    constraint = null;
+  }
+  
   void computeType()
   {
     try{
-      constraint.assert();
+      Constraint.assert(cst);
     }
-    catch(bossa.typing.TypingEx e){
+    catch(mlsub.typing.TypingEx e){
       User.error(this,"functional expression is ill-typed");
     }
     
@@ -59,9 +68,9 @@ public class FunExp extends Expression implements Function
 	returnType=null;
       }
     
-    type=new Polytype(Constraint.and(constraint,returnType.getConstraint()),
-		      new FunType(MonoSymbol.getMonotype(formals),
-				  returnType.getMonotype()));
+    type = new Polytype
+      (Constraint.and(cst, returnType.getConstraint()),
+       new FunType(MonoSymbol.getMonotype(formals), returnType.getMonotype()));
   }
 
   public Monotype getReturnType()
@@ -71,8 +80,8 @@ public class FunExp extends Expression implements Function
   
   void findJavaClasses()
   {
-    List types = MonoSymbol.getMonotype(formals);
-    Monotype.findJavaClasses(types, typeScope);
+    List types = MonoSymbol.getSyntacticMonotype(formals);
+    bossa.syntax.Monotype.findJavaClasses(types, typeScope);
   }
   
   /****************************************************************
@@ -139,6 +148,7 @@ public class FunExp extends Expression implements Function
   }
   
   Collection /* of MonoSymbol */ formals;
-  Constraint constraint;
+  bossa.syntax.Constraint constraint;
+  Constraint cst;
   Statement body;
 }

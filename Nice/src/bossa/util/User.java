@@ -12,7 +12,7 @@
 
 // File    : User.java
 // Created : Wed Jul 07 18:20:58 1999 by bonniot
-//$Modified: Fri May 26 16:03:22 2000 by Daniel Bonniot $
+//$Modified: Mon Jun 05 13:52:27 2000 by Daniel Bonniot $
 
 package bossa.util;
 
@@ -25,7 +25,7 @@ package bossa.util;
  * since the latter, forcing evaluation of the string,
  * would slow down compilation.
  */
-public class User
+public final class User
 {
   public static void error(Located responsible, Exception exn)
   {

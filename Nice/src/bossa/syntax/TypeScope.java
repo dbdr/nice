@@ -12,18 +12,20 @@
 
 // File    : TypeScope.java
 // Created : Fri Jul 09 11:29:17 1999 by bonniot
-//$Modified: Wed May 24 16:14:34 2000 by Daniel Bonniot $
+//$Modified: Mon Jun 05 18:18:07 2000 by Daniel Bonniot $
 
 package bossa.syntax;
 
 import java.util.*;
 import bossa.util.*;
+import mlsub.typing.TypeSymbol;
+import mlsub.typing.TypeConstructor;
 
 /**
  * A Scope level for types.
  * Is extended in each node that defined a new scope level.
  */
-class TypeScope
+public class TypeScope
 {
   public TypeScope(TypeScope outer)
   {
@@ -32,16 +34,13 @@ class TypeScope
   }
 
   void addSymbol(TypeSymbol s)
+  throws DuplicateName
   {
-    try{
-      addMapping(s.getName().toString(),s);
-    }
-    catch(DuplicateName d){
-      User.error(s, d);
-    }
+    addMapping(s.toString(),s);
   }
   
   void addSymbols(Collection c)
+  throws DuplicateName
   {
     Iterator i=c.iterator();
     while(i.hasNext())
@@ -52,8 +51,7 @@ class TypeScope
   {
     DuplicateName(String name, TypeSymbol old, TypeSymbol nou)
     {
-      super(name+" is defined twice: old="+
-	    old.location()+", new="+nou.location()+" in "+TypeScope.this);
+      super(name+" is defined twice");
     }
   }
   
@@ -61,25 +59,20 @@ class TypeScope
   throws DuplicateName
   {
     Object old = map.get(name);
-    if(old!=null && old!=TypeSymbol.dummy)
+    if(old!=null && old!=dummyTypeSymbol)
       throw new DuplicateName(name, (TypeSymbol) old, s);
     
     map.put(name,s);
   }
 
-  void addMappings(Collection names, Collection symbols) 
-  throws BadSizeEx, DuplicateName
+  void addMappings(Collection names, TypeSymbol[] symbols) 
+  throws DuplicateName
   {
-    Iterator is;
-    if(symbols==null)
-      is=null;
-    else
-      {
-	is=symbols.iterator();
-	if(names.size()!=symbols.size())
-	  throw new BadSizeEx(names.size(),symbols.size());
-      }
+    if(symbols!=null &&
+       names.size()!=symbols.length)
+      throw new Error(names.size()+" != "+symbols.length);
     
+    int n = 0;
     for(Iterator in=names.iterator();
 	in.hasNext();)
       {
@@ -90,13 +83,19 @@ class TypeScope
 	else
 	  name = (String) name_o;
 	
-	if(is==null)
-	  addMapping(name,TypeSymbol.dummy);
+	if(symbols==null)
+	  addMapping(name, dummyTypeSymbol);
 	else
-	  addMapping(name,(TypeSymbol)is.next());
+	  addMapping(name, symbols[n++]);
       }
   }
   
+  /**
+   * Used for the search of java classes, as the type symbol
+   * of type binders. See MethodBodyDefinition.
+   */
+  private TypeSymbol dummyTypeSymbol = new TypeConstructor(null);
+
   public TypeSymbol lookup(String name)
   {
     TypeSymbol res;
@@ -106,9 +105,9 @@ class TypeScope
     if(outer!=null)
       return outer.lookup(name);
     else
-      // We are in the global type scope
+      // This is the global type scope
       {
-	TypeConstructor tc = JavaTypeConstructor.lookup(name);
+	TypeConstructor tc = JavaClasses.lookup(name);
 	    
 	if(tc!=null)
 	  return tc;
@@ -122,7 +121,7 @@ class TypeScope
 	      if(map.containsKey(fullName))
 		return (TypeSymbol)map.get(fullName);
 	      
-	      tc = JavaTypeConstructor.lookup(fullName);
+	      tc = JavaClasses.lookup(fullName);
 	      if(tc!=null)
 		return tc;
 	    }

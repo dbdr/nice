@@ -12,12 +12,13 @@
 
 // File    : Node.java
 // Created : Thu Jul 08 10:24:56 1999 by bonniot
-//$Modified: Thu May 25 14:46:13 2000 by Daniel Bonniot $
+//$Modified: Tue Jun 06 18:49:52 2000 by Daniel Bonniot $
 
 package bossa.syntax;
 
 import java.util.*;
 import bossa.util.*;
+import mlsub.typing.TypeSymbol;
 
 /**
  * Basic component of the syntax tree.
@@ -134,9 +135,9 @@ abstract public class Node
   }
   
   void addTypeMaps(Collection names, Collection symbols)
-    throws BadSizeEx
   {
-    if(names.size()!=symbols.size()) throw new BadSizeEx(symbols.size(),names.size());
+    if(names.size()!=symbols.size()) 
+      throw new Error(symbols.size()+" != "+names.size());
     
     for(Iterator n=names.iterator();n.hasNext();)
       typeMapsNames.add(((LocatedString) n.next()).toString());
@@ -234,12 +235,11 @@ abstract public class Node
 
     if(propagate!=none)
       {
-	this.typeScope.addSymbols(typeSymbols);
-	try{ 
-	  this.typeScope.addMappings(typeMapsNames,typeMapsSymbols);
-	}
-	catch(BadSizeEx e){
-	  Internal.error(e.toString());
+	try{
+	  this.typeScope.addSymbols(typeSymbols);
+	  this.typeScope.addMappings
+	    (typeMapsNames, (TypeSymbol[]) 
+	     typeMapsSymbols.toArray(new TypeSymbol[typeMapsSymbols.size()]));
 	}
 	catch(TypeScope.DuplicateName e){
 	  User.error(e);

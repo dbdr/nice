@@ -12,12 +12,14 @@
 
 // File    : ExpressionRef.java
 // Created : Tue Aug 17 16:04:40 1999 by bonniot
-//$Modified: Fri May 26 12:38:22 2000 by Daniel Bonniot $
+//$Modified: Wed Jun 14 12:53:26 2000 by Daniel Bonniot $
 
 package bossa.syntax;
 
 import java.util.*;
 import bossa.util.*;
+
+import mlsub.typing.Polytype;
 
 /**
  * Reference to an expression
@@ -57,10 +59,9 @@ final public class ExpressionRef extends Expression
 
   void resolve()
   {
-    content=content.resolveExp();
-    if(content==null)
-      User.error(this,
-		 this+" was not declared");
+    content = content.resolveExp();
+    if(content == null)
+      User.error(this, this+" was not declared");
   }
   
   void typecheck()
@@ -100,7 +101,7 @@ final public class ExpressionRef extends Expression
     return content.staticClass();
   }  
 
-  Expression resolveOverloading(List /* of Polytype */ parameters,
+  Expression resolveOverloading(Polytype[] parameters,
 				CallExp callExp)
   {
     content = content.resolveOverloading(parameters, callExp);
@@ -140,12 +141,8 @@ final public class ExpressionRef extends Expression
 
   public void setLocation(Location l)
   {
+    super.setLocation(l);
     content.setLocation(l);
-  }
-
-  public Location location()
-  {
-    return content.location();
   }
 
   public String toString()

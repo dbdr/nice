@@ -10,24 +10,26 @@
 /*                                                                        */
 /**************************************************************************/
 
-// File    : BadSizeEx.java
-// Created : Wed Jul 21 17:23:36 1999 by bonniot
-//$Modified: Wed Jul 28 21:29:12 1999 by bonniot $
-// Description : Thrown when to lists do not have the same size
+// File    : InternalError.java
+// Created : Wed May 31 10:42:34 2000 by Daniel Bonniot
+//$Modified: Mon Jun 05 15:24:35 2000 by Daniel Bonniot $
 
 package bossa.syntax;
 
-import bossa.util.*;
+/**
+ * Error in sizes.
+ * 
+ * @author Daniel Bonniot
+ */
 
-public class BadSizeEx extends bossa.engine.Unsatisfiable
+public class BadSizeEx extends Exception
 {
   public BadSizeEx(int expected, int actual)
   {
-    super(expected+" expected, "+actual+" actual");
-    
-    this.expected=expected;
-    this.actual=actual;
+    super(expected+" expected, "+ actual+" given");
+    this.expected = expected;
+    this.actual = actual;
   }
 
-  int expected,actual;
+  int expected, actual;
 }

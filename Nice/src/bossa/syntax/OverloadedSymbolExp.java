@@ -12,12 +12,18 @@
 
 // File    : OverloadedSymbolExp.java
 // Created : Thu Jul 08 12:20:59 1999 by bonniot
-//$Modified: Tue May 02 12:09:13 2000 by Daniel Bonniot $
+//$Modified: Wed Jun 14 14:32:56 2000 by Daniel Bonniot $
 
 package bossa.syntax;
 
 import java.util.*;
 import bossa.util.*;
+
+import bossa.util.Debug;
+
+import mlsub.typing.*;
+import mlsub.typing.lowlevel.Kind;
+import mlsub.typing.Polytype;
 
 /**
  * A symbol, for which overloading resolution has yet to be done.
@@ -29,7 +35,7 @@ public class OverloadedSymbolExp extends Expression
    * @param ident the original identifier
    * @param originalScope the scope where the symbol has been looked for.
    */
-  OverloadedSymbolExp(Collection symbols, LocatedString ident,
+  OverloadedSymbolExp(List symbols, LocatedString ident,
 		      VarScope originalScope)
   {
     this.symbols = symbols;
@@ -81,18 +87,26 @@ public class OverloadedSymbolExp extends Expression
 
   private Expression uniqueExpression()
   {
-    return new SymbolExp((VarSymbol) symbols.iterator().next(),location());
+    return new SymbolExp((VarSymbol) symbols.get(0),location());
   }
   
-  Expression resolveOverloading(List /* of Polytype */ parameters,
+  private Expression uniqueExpression(VarSymbol sym, Polytype t)
+  {
+    SymbolExp res = new SymbolExp(sym);
+    res.type = t;
+    return res;
+  }
+  
+  Expression resolveOverloading(Polytype[] parameters,
 				CallExp callExp)
   {
     if(Debug.overloading) 
-      Debug.println("Overloading resolution for "+this);
+      Debug.println("Overloading resolution for "+this +
+		    "\nwith parameters ("+Util.map("", ", ", "", parameters)+")");
     
     //addJavaFieldAccess(ident,parameters,symbols);
     
-    final int arity = parameters.size();
+    final int arity = parameters.length;
 
     // We remember if some method was discarded
     // in order to enhance the error message
@@ -104,9 +118,9 @@ public class OverloadedSymbolExp extends Expression
 
 	if(s instanceof MonoSymbol)
 	  {
-	    bossa.engine.Kind k = ((MonoSymbol) s).type.getKind();
-	    if(k instanceof bossa.typing.FunTypeKind)
-	      if(((bossa.typing.FunTypeKind) k).domainArity!=arity)
+	    Kind k = ((MonoSymbol) s).type.getKind();
+	    if(k instanceof FunTypeKind)
+	      if(((FunTypeKind) k).domainArity!=arity)
 		{ i.remove(); removedSomething=true; continue; }
 	      else ;  
 	    else { i.remove(); continue; }
@@ -117,7 +131,7 @@ public class OverloadedSymbolExp extends Expression
 	      { i.remove(); removedSomething=true; continue; }
 	  }
 	else
-	  { i.remove(); continue; }
+	  { Debug.println(s.getClass()+""); i.remove(); continue; }
       }
 
     if(symbols.size()==0)
@@ -141,10 +155,19 @@ public class OverloadedSymbolExp extends Expression
 	
 	if(Debug.overloading) 
 	  Debug.println("Overloading: Trying with "+s);
-	
-	Polytype t = CallExp.wellTyped(new SymbolExp(s,location()),parameters);
+
+	// we clone the type to avoid clashes with another use
+	// of the same symbol
+	// the cloned type is stored in the VarSymbol
+	// and we check that cloneType() is not called twice
+	// before the clone type is released
+	s.makeClonedType();
+	Polytype t = CallExp.wellTyped(s.getClonedType(), parameters);
 	if(t==null)
-	  i.remove();
+	  {
+	    i.remove();
+	    s.releaseClonedType();
+	  }
 	else
 	  {
 	    types[symNum] = t;
@@ -157,7 +180,9 @@ public class OverloadedSymbolExp extends Expression
     
     if(symbols.size()==1)
       {
-	VarSymbol res = (VarSymbol) symbols.iterator().next();
+	VarSymbol res = (VarSymbol) symbols.get(0);
+	res.releaseClonedType();
+
 	for(int i=0;;i++)
 	  if(syms[i]==res)
 	    {
@@ -179,28 +204,35 @@ public class OverloadedSymbolExp extends Expression
   Expression resolveOverloading(Polytype expectedType)
   {
     if(Debug.overloading) 
-      Debug.println("Overloading resolution (expected type "+expectedType+
-		    ") for "+this);
-    Iterator i=symbols.iterator();
-    while(i.hasNext())
+      Debug.println("Overloading resolution (expected type " + expectedType +
+		    ") for " + this);
+
+    VarSymbol s = null;
+    Polytype symType = null;
+    for(Iterator i = symbols.iterator(); i.hasNext();)
       {
-	VarSymbol s=(VarSymbol)i.next();
-	Polytype t=s.getType();
+	s = (VarSymbol) i.next();
+	s.makeClonedType();
+	symType = s.getClonedType();
 	try{
-	  bossa.typing.Typing.leq(t,expectedType);
+	  Typing.leq(symType, expectedType);
 	  if(Debug.overloading)
-	    Debug.println(s+"("+s.location()+") of type "+t+" matches");
+	    Debug.println(s+"("+s.location()+") of type "+symType+" matches");
 	}
-	catch(bossa.typing.TypingEx e){
+	catch(TypingEx e){
 	  i.remove();
+	  s.releaseClonedType();
 	  if(Debug.overloading) 
-	    Debug.println("Not "+s+" of type\n"+t+"\nbecause "+e);
+	    Debug.println("Not "+s+" of type\n" + symType + "\nbecause "+e);
 	}
       }
 
     if(symbols.size()==1)
-      return uniqueExpression();
-
+      {
+	s.releaseClonedType();
+	return uniqueExpression(s, symType);
+      }
+    
     if(symbols.size()==0)
       if(notFound("No alternative has expected type "+expectedType))
 	return resolveOverloading(expectedType);
@@ -208,7 +240,7 @@ public class OverloadedSymbolExp extends Expression
     //There is ambiguity
     User.error(this,"Ambiguity for symbol "+ident+".\nPossibilities are :\n"+
 	       Util.map("","\n","",symbols));
-    return null;    
+    return null;
   }
   
   Expression noOverloading()
@@ -216,9 +248,6 @@ public class OverloadedSymbolExp extends Expression
     if(Debug.overloading) 
       Debug.println("(no)Overloading resolution for "+this);
 
-    if(ident.content.equals("action"))
-      Internal.printStackTrace();
-    
     if(symbols.size()==1)
       return uniqueExpression();
 
@@ -227,15 +256,7 @@ public class OverloadedSymbolExp extends Expression
 	if(notFound())
 	  return noOverloading();
 	else
-	  {
-	    TypeConstructor tc = (TypeConstructor)
-	      Node.getGlobalTypeScope().lookup(ident.toString());
-	    if(tc!=null && tc instanceof JavaTypeConstructor)
-	      return new ClassExp((gnu.bytecode.ClassType) 
-				  ((JavaTypeConstructor) tc).getJavaType());
-	  }
-	
-	User.error(ident, ident + " is not defined");
+	  return ClassExp.create(ident.toString());
       }
     
     User.error(this,"Ambiguity for symbol "+ident+". Possibilities are :\n"+
@@ -276,28 +297,32 @@ public class OverloadedSymbolExp extends Expression
     removeNonMinimal(symbols);
   }
   
-  static void removeNonMinimal(Collection symbols)
+  static void removeNonMinimal(List symbols)
   {
     // optimization
     if(symbols.size()<2)
       return;
     
+    int len = symbols.size();
     VarSymbol[] syms = (VarSymbol[])
-      symbols.toArray(new VarSymbol[symbols.size()]);
-    boolean[] remove = new boolean[syms.length];
+      symbols.toArray(new VarSymbol[len]);
+    boolean[] remove = new boolean[len];
     
-    for(int s1 = 0; s1<syms.length; s1++)
-      for(int s2 = s1+1; s2<syms.length; s2++)
+    for(int s1 = 0; s1<len; s1++)
+      for(int s2 = s1+1; s2<len; s2++)
 	try{
-	  bossa.typing.Typing.leq(syms[s2].getType(), syms[s1].getType());
-	  remove[s1]=true;
+	  Typing.leq(syms[s2].getClonedType(), syms[s1].getClonedType());
+	  remove[s1] = true;
 	  break;
 	}
-	catch(bossa.typing.TypingEx e){
+	catch(TypingEx e){
 	}
-    for(int i = 0; i<syms.length; i++)
+    for(int i = 0; i<len; i++)
       if(remove[i])
-	symbols.remove(syms[i]);
+	{
+	  syms[i].releaseClonedType();
+	  symbols.remove(syms[i]);
+	}
   }
   
   void computeType()
@@ -325,7 +350,7 @@ public class OverloadedSymbolExp extends Expression
     return "["+Util.map(""," | ","",symbols)+"]";
   }
 
-  Collection symbols;
+  List symbols;
   LocatedString ident;
   private boolean refinementInProgress;
 }

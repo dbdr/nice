@@ -12,13 +12,20 @@
 
 // File    : Pattern.java
 // Created : Mon Jul 05 14:36:52 1999 by bonniot
-//$Modified: Thu May 04 17:32:51 2000 by Daniel Bonniot $
+//$Modified: Tue Jun 13 15:36:22 2000 by Daniel Bonniot $
 // Description : Syntactic pattern for method bodies declaration
 
 package bossa.syntax;
 
 import java.util.*;
 import bossa.util.*;
+import mlsub.typing.Domain;
+import mlsub.typing.TypeConstructor;
+import mlsub.typing.Polytype;
+import mlsub.typing.Monotype;
+import mlsub.typing.MonotypeVar;
+import mlsub.typing.Constraint;
+import mlsub.typing.MonotypeConstructor;
 
 /**
  * Represents the information about one argument of a method body.
@@ -37,83 +44,89 @@ public class Pattern
    *    the argument's runtime type. This is usefull to introduce
    *    a type constructor variable with the exact type of the argument.
    */
-  public Pattern(LocatedString name, TypeConstructor tc, Monotype type)
+  public Pattern(LocatedString name, TypeIdent tc, bossa.syntax.Monotype type)
   {
-    this.name=name;
-    this.typeConstructor=tc;
-    this.type=type;
+    this.name = name;
+    this.typeConstructor = tc;
+    this.type = type;
   }
 
-  final TypeConstructor getTC()
+  final mlsub.typing.Monotype getType()
   {
-    return typeConstructor;
-  }
-  
-  final Monotype getType()
-  {
-    return type;
+    return t;
   }
 
   final boolean isSharp()
   {
-    return typeConstructor!=null &&
-      typeConstructor.isConcrete();
+    return tc!=null &&
+      TypeConstructors.isSharp(tc);
   }
-  
+
   Domain getDomain()
   {
-    if(typeConstructor==null)
+    if(tc==null)
       return Domain.bot;
     
-    TypeParameters tp=new TypeParameters(typeConstructor.name,typeConstructor.variance);
+    MonotypeVar[] tp = MonotypeVar.news(tc.arity());
     
-    return new Domain(new Constraint(tp.content,null),
-		      new MonotypeConstructor(typeConstructor,
-					      tp,
-					      typeConstructor.location()));
+    return new Domain(new Constraint(tp,null),
+		      new MonotypeConstructor(tc, tp));
   }
   
   /**
    * Iterates getDomain on a collection of Pattern.
    */
-  static List getDomain(Collection patterns)
+  static Domain[] getDomain(Collection patterns)
   {
     Iterator i=patterns.iterator();
-    List res=new ArrayList(patterns.size());
+    Domain[] res = new Domain[patterns.size()];
 
+    int n = 0;
     while(i.hasNext())
-      res.add(((Pattern)i.next()).getDomain());
+      res[n++] = ((Pattern) i.next()).getDomain();
+
+    return res;
+  }
+
+  /**
+   * Iterates getTypeConstructor on a collection of Pattern.
+   */
+  static TypeConstructor[] getTC(Collection patterns)
+  {
+    Iterator i=patterns.iterator();
+    TypeConstructor[] res = new TypeConstructor[patterns.size()];
+
+    int n = 0;
+    while(i.hasNext())
+      res[n++] = ((Pattern)i.next()).tc;
 
     return res;
   }
   
   Polytype getPolytype()
   {
-    if(typeConstructor==null)
+    if(tc==null)
       return Polytype.bottom();
     
-    TypeParameters tp=new TypeParameters
-      (typeConstructor.name,typeConstructor.variance);
-    
-    return new Polytype(new Constraint(tp.content,null),
-			new MonotypeConstructor(typeConstructor,
-						tp,
-						typeConstructor.location()));
+    MonotypeVar[] params = MonotypeVar.news(tc.arity());
+    return new Polytype(new Constraint(params, null),
+			new MonotypeConstructor(tc, params));
   }
   
   /**
    * Iterates getPolytype on a collection of Pattern.
    */
-  static Collection getPolytype(Collection patterns)
+  static Polytype[] getPolytype(Collection patterns)
   {
     Iterator i=patterns.iterator();
-    Collection res=new ArrayList(patterns.size());
+    Polytype[] res = new Polytype[patterns.size()];
 
+    int n = 0;
     while(i.hasNext())
       {
 	Pattern p=(Pattern)i.next();
 	if(!p.thisAtNothing())
-	  res.add(p.getPolytype());
+	  res[n++] = p.getPolytype();
       }
     return res;
   }
@@ -121,17 +134,23 @@ public class Pattern
   /****************************************************************
    * Scoping
    ****************************************************************/
-
+  
   void resolveTC(TypeScope scope)
   {
     if(typeConstructor!=null)
-      typeConstructor=typeConstructor.resolve(scope);
+      {
+	tc = typeConstructor.resolveToTC(scope);
+	typeConstructor = null;
+      }
   }
   
   void resolveType(TypeScope scope)
   {
     if(type!=null)
-      type=type.resolve(scope);
+      {
+	t = type.resolve(scope);
+	type = null;
+      }
   }
   
   static void resolveTC(TypeScope scope, Collection patterns)
@@ -156,9 +175,13 @@ public class Pattern
 
   public String toString()
   {
-    String res=name.toString();
+    String res = name.toString();
+
     if(typeConstructor!=null)
-      res=res+"@"+typeConstructor;
+      res += "@" + typeConstructor;
+    else if(tc!=null)
+      res += "@" + tc;
+    
     return res;
   }
 
@@ -172,11 +195,7 @@ public class Pattern
    */
   public String bytecodeRepresentation()
   {
-    String enc;
-    if(typeConstructor==null)
-      enc = "_";
-    else
-      enc = typeConstructor.bytecodeRepresentation();
+    String enc = bossa.CodeGen.bytecodeRepresentation(tc);
 
     return AT_encoding+enc;
   }
@@ -204,6 +223,8 @@ public class Pattern
   }
 
   LocatedString name;
-  TypeConstructor typeConstructor;
-  private Monotype type;
+  TypeIdent typeConstructor;
+  TypeConstructor tc;
+  private bossa.syntax.Monotype type;
+  private mlsub.typing.Monotype t;
 }

@@ -12,14 +12,15 @@
 
 // File    : MonotypeConstructor.java
 // Created : Thu Jul 22 09:15:17 1999 by bonniot
-//$Modified: Tue May 16 15:24:27 2000 by Daniel Bonniot $
+//$Modified: Thu Jun 08 15:41:21 2000 by Daniel Bonniot $
 
 package bossa.syntax;
 
 import java.util.*;
 
 import bossa.util.*;
-import bossa.engine.*;
+import mlsub.typing.TypeConstructor;
+import mlsub.typing.TypeSymbol;
 
 /**
  * A monotype, build by application of
@@ -34,43 +35,68 @@ public class MonotypeConstructor extends Monotype
    * @param tc the type constructor
    * @param parameters the type parameters
    */
-  public MonotypeConstructor(TypeConstructor tc, TypeParameters parameters,
+  public MonotypeConstructor(TypeIdent tc, TypeParameters parameters,
 			     Location loc)
   {
-    if(tc==null)
-      Internal.error(loc, "Null tc in MonotypeConstructor");
-    this.tc=tc;
+    this.tc = tc;
     if(parameters==null)
-      this.parameters=new TypeParameters(null);
+      this.parameters = new TypeParameters(null);
     else
-      this.parameters=parameters;
-    this.loc=loc;
+      this.parameters = parameters;
+    this.loc = loc;
   }
 
+  MonotypeConstructor(TypeConstructor tc, TypeParameters parameters,
+		      Location loc)
+  {
+    this.lowlevelTC = tc;
+    this.parameters = parameters;
+    this.loc = loc;
+  }
+  
   Monotype cloneType()
   {
     return new MonotypeConstructor(tc,parameters,loc);
   }
 
-  public gnu.bytecode.Type getJavaType()
-  {
-    return tc.getJavaType();
-  }
-  
   /****************************************************************
    * Scoping
    ****************************************************************/
 
-  public Monotype resolve(TypeScope typeScope) 
+  public mlsub.typing.Monotype resolve(TypeScope typeScope) 
   {
-    TypeConstructor newTC = this.tc.resolve(typeScope);
-    return new MonotypeConstructor(newTC,parameters.resolve(typeScope),loc);
+    if(lowlevelTC==null)
+      {
+	TypeSymbol newTC = this.tc.resolveToTC(typeScope);
+	if (!(newTC instanceof TypeConstructor))
+	  User.error(this.tc, this.tc+" should be a type constructor");
+	lowlevelTC = (TypeConstructor) newTC;
+      }
+    
+    try{
+      return new mlsub.typing.MonotypeConstructor
+	(lowlevelTC, parameters.resolve(typeScope));
+    }
+    catch(mlsub.typing.BadSizeEx e){
+      int arity = e.expected;
+      
+      User.error(this,
+		 "Class "+tc+" has "+
+		 (arity==0 ? "no" : ""+arity)+
+		 " type parameter"+(arity>1 ? "s" : ""));
+
+      return null;
+    }
   }
-  
+
   Monotype substitute(Map map)
   {
+    TypeIdent newTC = (TypeIdent) map.get(tc);
+    if (newTC==null)
+      newTC = tc;
+    
     return new MonotypeConstructor
-      (tc.substitute(map),
+      (newTC,
        new TypeParameters(Monotype.substitute(map,parameters.content)),
        loc);
   }
@@ -80,7 +106,7 @@ public class MonotypeConstructor extends Monotype
     return Monotype.containsAlike(parameters.content);
   }
   
-  public TypeConstructor getTC()
+  public TypeIdent getTC()
   {
     return tc;
   }
@@ -90,45 +116,18 @@ public class MonotypeConstructor extends Monotype
     return parameters;
   }
   
-  void typecheck()
-  {
-    int arity = tc.arity();
-    
-    if(arity!=parameters.size())
-      User.error(this,
-		 "Class "+tc+" has "+
-		 (arity==0 ? "no" : ""+arity)+
-		 " type parameter"+(arity>1 ? "s" : ""));
-
-    Monotype.typecheck(parameters.content);
-  }
-  
-  /****************************************************************
-   * Kinding
-   ****************************************************************/
-
-  private int id;
-  public int getId() 		{ return id; }
-  public void setId(int value) 	{ id=value; }
-  
-  public Kind getKind() 	{ return tc.variance; }
-  public void setKind(Kind value)
-  {
-    if(value instanceof bossa.typing.Variance)
-      tc.setVariance((bossa.typing.Variance) value);
-  }
-  
   /****************************************************************
    * Code generation
    ****************************************************************/
 
   /** The value of an initialized variable of this monotype. */
+  /*
   gnu.expr.Expression defaultValue()
   {
-    if(tc==ConstantExp.primByte ||
-       tc==ConstantExp.primChar ||
+    if(tc==ConstantExp.primByte  ||
+       tc==ConstantExp.primChar  ||
        tc==ConstantExp.primShort ||
-       tc==ConstantExp.primInt ||
+       tc==ConstantExp.primInt   ||
        tc==ConstantExp.primLong)
       return zeroInt;
     else if(tc==ConstantExp.primFloat ||
@@ -137,7 +136,7 @@ public class MonotypeConstructor extends Monotype
     else
       return super.defaultValue();
   }
-  
+  */
   private gnu.expr.Expression zeroInt = 
     new gnu.expr.QuoteExp(new gnu.math.IntNum(0));
   private gnu.expr.Expression zeroFloat = 
@@ -169,7 +168,11 @@ public class MonotypeConstructor extends Monotype
     return ""+tc+parameters;
   }
 
-  public TypeConstructor tc;
+  public TypeIdent tc;
+
+  // used when the lowlevel TC is know in advance
+  private mlsub.typing.TypeConstructor lowlevelTC;
+
   TypeParameters parameters;
   Location loc;
 }

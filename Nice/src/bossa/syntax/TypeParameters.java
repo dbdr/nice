@@ -12,16 +12,16 @@
 
 // File    : TypeParameters.java
 // Created : Mon Jul 12 17:51:12 1999 by bonniot
-//$Modified: Thu May 11 12:25:38 2000 by Daniel Bonniot $
+//$Modified: Tue Jun 06 11:14:04 2000 by Daniel Bonniot $
 
 package bossa.syntax;
 
 import java.util.*;
 import bossa.util.*;
-import bossa.typing.Variance;
+import mlsub.typing.Variance;
 
 /**
- * Ground type parameters.
+ * Type parameters.
  * Holds a colloction of Monotype.
  */
 public class TypeParameters
@@ -42,32 +42,23 @@ public class TypeParameters
   {
     if(v==null)
       Internal.error(s,s+" has no variance");
-    this.content=Monotype.freshs(v.size,s);
-  }
-  
-  static TypeParameters fromSymbols(Collection symbols)
-  {
-    List res=new ArrayList(symbols.size());
-    Iterator i=symbols.iterator();
-    while(i.hasNext())
-      {
-	TypeSymbol s=(TypeSymbol) i.next();
-	if(s instanceof ClassDefinition)
-	  res.add(new MonotypeConstructor(((ClassDefinition) s).tc,null,null));
-	else if(s instanceof MonotypeVar)
-	  res.add((MonotypeVar)s);
-      }
-    return new TypeParameters(res);
+    this.content = Monotype.freshs(v.size,s);
   }
 
-  TypeParameters resolve(TypeScope ts)
+  static TypeParameters fromMonotypeVars(Collection symbols)
   {
-    return new TypeParameters(Monotype.resolve(ts,content));
+    List res = new ArrayList(symbols);
+    return new TypeParameters(res);
+  }
+  
+  mlsub.typing.Monotype[] resolve(TypeScope ts)
+  {
+    return Monotype.resolve(ts,content);
   }
 
   public String toString()
   {
-    return Util.map("<",", ",">",/* true ,*/ content);
+    return Util.map("<",", ",">", content);
   }
 
   public int size()

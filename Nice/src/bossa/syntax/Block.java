@@ -12,13 +12,15 @@
 
 // File    : Block.java
 // Created : Wed Jul 07 17:42:15 1999 by bonniot
-//$Modified: Fri May 12 18:58:03 2000 by Daniel Bonniot $
+//$Modified: Fri Jun 09 17:34:10 2000 by Daniel Bonniot $
 // Description : A block : a list of statements with local variables
 
 package bossa.syntax;
 
 import java.util.*;
 import bossa.util.*;
+
+import mlsub.typing.Polytype;
 
 public class Block extends Statement
 {
@@ -128,7 +130,7 @@ public class Block extends Statement
 	i.hasNext();)
       {
 	LocalDeclaration d = (LocalDeclaration) i.next();
-	d.left.getMonotype().resolve(typeScope);
+	d.left.getSyntacticMonotype().resolve(typeScope);
       }
   }
   
@@ -156,7 +158,7 @@ public class Block extends Statement
 	try{
 	  AssignExp.checkAssignment(local.left.getType(),local.value);
 	}
-	catch(bossa.typing.TypingEx t){
+	catch(mlsub.typing.TypingEx t){
 	  User.error(local.left,"Typing error : "+local.left.name+
 		     " cannot be assigned value \""+local.value+"\"",
 		     " of type "+local.value.getType()+" since "+
@@ -170,14 +172,14 @@ public class Block extends Statement
   {
     if(statements.size()>0)
       {
-	Object o=statements.get(statements.size()-1);
+	Object o = statements.get(statements.size()-1);
 	if(o instanceof ReturnStmt)
 	  {
 	    ((ReturnStmt)o).value.noOverloading();
 	    return ((ReturnStmt)o).value.getType();
 	  }
       }
-    return Polytype.voidType(typeScope);
+    return ConstantExp.voidPolytype;
   }
 
   /****************************************************************
@@ -198,7 +200,7 @@ public class Block extends Statement
     // addLocals must appear before Statement.compile(statements)
     // in order to define the locals before their use.
     // That is why we can't set body's body at construction.
-    gnu.expr.Expression res = addLocals(locals.iterator(),body);
+    gnu.expr.Expression res = addLocals(locals.iterator(), body);
 
     if(statements.size()!=0)
       ((gnu.expr.BeginExp) body).setExpressions(Statement.compile(statements));
@@ -208,7 +210,8 @@ public class Block extends Statement
     return res;
   }
 
-  private gnu.expr.Expression addLocals(Iterator vars, gnu.expr.Expression body)
+  private gnu.expr.Expression addLocals(Iterator vars, 
+					gnu.expr.Expression body)
   {
     if(!vars.hasNext())
       return body;
@@ -222,12 +225,12 @@ public class Block extends Statement
     Statement.currentScopeExp = res;
     
     if(local.value==null)
-      eVal[0] = local.left.type.defaultValue();
+      eVal[0] = bossa.CodeGen.defaultValue(local.left.type);
     else
       eVal[0] = local.value.generateCode();
     gnu.expr.Declaration decl = 
       res.addDeclaration(local.left.name.toString(),
-			 local.left.type.getJavaType());
+			 bossa.CodeGen.javaType(local.left.type));
     decl.noteValue(null);
     local.left.setDeclaration(decl);
     

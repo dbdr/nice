@@ -12,7 +12,7 @@
 
 // File    : JavaMethodDefinition.java
 // Created : Tue Nov 09 11:49:47 1999 by bonniot
-//$Modified: Fri May 26 12:39:26 2000 by Daniel Bonniot $
+//$Modified: Tue Jun 13 19:40:32 2000 by Daniel Bonniot $
 
 package bossa.syntax;
 
@@ -22,6 +22,7 @@ import gnu.bytecode.*;
 import gnu.expr.*;
 
 import bossa.util.Location;
+import mlsub.typing.TypeConstructor;
 
 import java.util.*;
 
@@ -57,83 +58,68 @@ public class JavaMethodDefinition extends MethodDefinition
     this.javaTypes = javaTypes;
   }
 
-  /****************************************************************
-   * Converting a bytecode type (coming from reflection
-   * into a bossa type.
-   * Used for automatic declaration of jav methods.
-   ****************************************************************/
-  
-  static Monotype getMonotype(Type javaType)
+  private JavaMethodDefinition(
+			       // Informations about the java method
+			       // These 3 args are null if we are in an interface file
+			       LocatedString className,
+			       String methodName,
+			       List /* of LocatedString */ javaTypes,
+			       // Bossa information
+			       LocatedString name, 
+			       mlsub.typing.Constraint constraint,
+			       mlsub.typing.Monotype returnType,
+			       mlsub.typing.Monotype[] parameters
+			       )
   {
-    if(javaType == Type.neverReturnsType)
-      return ConstantExp.voidType;
+    super(name, null ,null , null);
     
-    return getMonotype(javaType.getName());
+    this.className = className;
+    this.methodName = methodName;
+    this.javaTypes = javaTypes;
+
+    setLowlevelTypes(constraint, parameters, returnType);
   }
-  
-  static Monotype getMonotype(String name)
-  {
-    if(name.endsWith("[]"))
-      {
-	name=name.substring(0,name.length()-2);
-	List params = new LinkedList();
-	params.add(getMonotype(name));
-	return new MonotypeConstructor
-	  (ConstantExp.arrayTC, 
-	   new TypeParameters(params),
-	   Location.nowhere());
-      }
-    
-    TypeSymbol ts = Node.getGlobalTypeScope().lookup(name);
-    if(ts==null)
-      Internal.error(name+" is not known");
-    if(ts instanceof JavaTypeConstructor)
-      return ((JavaTypeConstructor) ts).getMonotype();
-    // for primitive types, maybe temporary
-    else if(ts instanceof TypeConstructor)
-      return new MonotypeConstructor((TypeConstructor) ts,null,
-				     Location.nowhere());
-    else if(ts instanceof Monotype)
-      return (Monotype) ts;
-    else
-      {
-	Internal.error("Bad java type: "+name+" ("+ts.getClass()+")");
-	return null;
-      }
-  }
-  
+
   private static JavaMethodDefinition make(Method m, boolean constructor)
   {
-    JavaMethodDefinition res;
-
-    Type[] paramTypes = m.getParameterTypes();
-    List params;
-    if(m.getStaticFlag() || constructor)
-      params = new ArrayList(paramTypes.length);
-    else
+    try
       {
-	params = new ArrayList(paramTypes.length+1);
-	params.add(getMonotype(m.getDeclaringClass()));
-      }
-    
-    for(int i=0; i<paramTypes.length; i++)
-      params.add(getMonotype(paramTypes[i]));
-    
-    Monotype retType;
-    if(constructor)
-      retType = getMonotype(m.getDeclaringClass());
-    else
-      retType = getMonotype(m.getReturnType());
-    
-    res = new JavaMethodDefinition(null, m.getName(), null,
-				   new LocatedString(m.getName(), 
-						     Location.nowhere()),
-				   Constraint.True,
-				   retType,
-				   params);
+	JavaMethodDefinition res;
 
-    res.reflectMethod = m;
-    return res;
+	Type[] paramTypes = m.getParameterTypes();
+	mlsub.typing.Monotype[] params;
+	int n = 0; // index in params
+	
+	if(m.getStaticFlag() || constructor)
+	  params = new mlsub.typing.Monotype[paramTypes.length];
+	else
+	  {
+	    params = new mlsub.typing.Monotype[paramTypes.length + 1];
+	    params[n++] = bossa.CodeGen.getMonotype(m.getDeclaringClass());
+	  }
+    
+	for(int i=0; i<paramTypes.length; i++)
+	  params[n++] = bossa.CodeGen.getMonotype(paramTypes[i]);
+    
+	mlsub.typing.Monotype retType;
+	if(constructor)
+	  retType = bossa.CodeGen.getMonotype(m.getDeclaringClass());
+	else
+	  retType = bossa.CodeGen.getMonotype(m.getReturnType());
+    
+	res = new JavaMethodDefinition(null, m.getName(), null,
+				       new LocatedString(m.getName(), 
+							 Location.nowhere()),
+				       null,
+				       retType, params);
+	res.reflectMethod = m;
+	return res;
+      }
+    catch(bossa.CodeGen.ParametricClassException e){
+      // The fetched method involves parametric java classes.
+      // Ignore.
+      return null;
+    }
   }
   
   /****************************************************************
@@ -158,19 +144,24 @@ public class JavaMethodDefinition extends MethodDefinition
 
     JavaMethodDefinition md = JavaMethodDefinition.make(m, false);
 
-    Node.getGlobalScope().addSymbol(md.symbol);
+    if(md!=null)
+      Node.getGlobalScope().addSymbol(md.symbol);
+
     return md;
   }
 
   public static JavaMethodDefinition addFetchedConstructor
     (Method m,
-     JavaTypeConstructor declaringClass)
+     TypeConstructor declaringClass)
   {
     if(declaredMethods.get(m)!=null)
       return null;
     
     JavaMethodDefinition md = JavaMethodDefinition.make(m, true);
-    declaringClass.addConstructor(md);
+    
+    if(md!=null)
+      TypeConstructors.addConstructor(declaringClass, md);
+
     return md;
   }
 
@@ -217,7 +208,7 @@ public class JavaMethodDefinition extends MethodDefinition
     if(s.equals("long")) 	return bossa.SpecialTypes.longType;
     if(s.equals("boolean")) 	return bossa.SpecialTypes.booleanType;
     
-    Class clas = JavaTypeConstructor.lookupJavaClass(s);
+    Class clas = JavaClasses.lookupJavaClass(s);
     if(clas==null)
       return null;
     return Type.make(clas);
@@ -280,6 +271,10 @@ public class JavaMethodDefinition extends MethodDefinition
     javaTypes.set(0,new LocatedString(javaRetType.getName(),t.location()));
     
     Type holder = type(className.toString());
+    if(holder == null)
+      User.error(this,
+		 "Class " + className + " was not found");
+    
     className = new LocatedString(holder.getName(),className.location());
     
     if(!(holder instanceof ClassType))
@@ -292,7 +287,7 @@ public class JavaMethodDefinition extends MethodDefinition
     //reflectMethod.return_type = javaRetType;
 
     if(reflectMethod==null)
-      User.error(this, this+" was not found");
+      User.error(this, this+" was not found in "+holder);
 
     declaredMethods.put(reflectMethod, Boolean.TRUE);
 
@@ -324,8 +319,8 @@ public class JavaMethodDefinition extends MethodDefinition
   private String interfaceString()
   {
     String res =
-      symbol.type.getConstraint().toString()
-      + symbol.type.codomain().toString()
+      syntacticConstraint
+      + symbol.type.codomain()
       + " "
       + symbol.name.toQuotedString()
       + "("

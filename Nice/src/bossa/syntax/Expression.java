@@ -12,13 +12,15 @@
 
 // File    : Expression.java
 // Created : Mon Jul 05 16:25:02 1999 by bonniot
-//$Modified: Sat May 06 15:17:53 2000 by Daniel Bonniot $
+//$Modified: Wed Jun 14 12:25:22 2000 by Daniel Bonniot $
 // Description : 
 
 package bossa.syntax;
 
 import java.util.*;
 import bossa.util.*;
+
+import mlsub.typing.Polytype;
 
 public abstract class Expression extends Node 
   implements Located
@@ -89,7 +91,7 @@ public abstract class Expression extends Node
    *
    * @return the resolved expression. Doesn't return if OR is not possible.
    */
-  Expression resolveOverloading(List /* of Expression */ parameters,
+  Expression resolveOverloading(Polytype[] parameters,
 				CallExp callExp)
   {
     return this;
@@ -109,7 +111,7 @@ public abstract class Expression extends Node
   
   /**
    * No overloading information is known,
-   * just checks there is one alternative.
+   * just checks there is only one alternative.
    *
    * @return the resolved expression. Doesn't return if OR is not possible.
    */
@@ -150,13 +152,13 @@ public abstract class Expression extends Node
    * @param Expressions the list of Expressions
    * @return the list of their PolyTypes
    */
-  static List getType(List expressions)
-  {
-    Iterator i=expressions.iterator();
-    List res=new ArrayList(expressions.size());
+  static Polytype[] getType(List expressions)
+  {    
+    Polytype[] res = new Polytype[expressions.size()];
 
-    while(i.hasNext())
-      res.add( ((Expression) i.next()) .getType());
+    int n = 0;
+    for(Iterator i=expressions.iterator(); i.hasNext();)
+      res[n++] = ((Expression) i.next()).getType();
 
     return res;
   }
@@ -213,14 +215,14 @@ public abstract class Expression extends Node
 
   public void setLocation(Location l)
   {
-    loc=l;
+    location = l;
   }
 
-  public Location location()
+  public final Location location()
   {
-    return loc;
+    return location;
   }
 
-  Location loc=Location.nowhere();
+  private Location location = Location.nowhere();
   protected Polytype type;
 }

@@ -12,15 +12,20 @@
 
 // File    : MethodBodyDefinition.java
 // Created : Thu Jul 01 18:12:46 1999 by bonniot
-//$Modified: Wed May 24 16:08:35 2000 by Daniel Bonniot $
+//$Modified: Tue Jun 13 19:49:38 2000 by Daniel Bonniot $
 
 package bossa.syntax;
 
 import bossa.util.*;
-import bossa.typing.*;
+import mlsub.typing.*;
 
 import gnu.bytecode.*;
 import java.util.*;
+
+import bossa.util.Debug;
+import mlsub.typing.Monotype;
+import mlsub.typing.MonotypeConstructor;
+import mlsub.typing.Constraint;
 
 /**
  * Definition of an alternative for a method.
@@ -42,7 +47,7 @@ public class MethodBodyDefinition extends Definition
    */
   public MethodBodyDefinition(LocatedString name, 
 			      Collection binders,
-			      List newTypeVars,
+			      //List newTypeVars,
 			      List formals, 
 			      Statement body)
   {
@@ -50,7 +55,7 @@ public class MethodBodyDefinition extends Definition
 
     this.binders=binders; 
 
-    this.newTypeVars=newTypeVars;
+    //this.newTypeVars=newTypeVars;
 
     this.formals=formals;
     this.body=body;
@@ -67,28 +72,29 @@ public class MethodBodyDefinition extends Definition
     return null;
   }
   
-  private Collection buildSymbols(Collection names, Collection types)
+  private Collection buildSymbols(Collection names, Monotype[] types)
   {
-    if(names.size()!=types.size())
-      switch(types.size()){
+    if(names.size()!=types.length)
+      switch(types.length){
       case 0: User.error(this,"Method "+name+" has no parameters");
       case 1: User.error(this,"Method "+name+" has 1 parameter");
       default:User.error(this,
-			 "Method "+name+" has "+types.size()+" parameters");
+			 "Method "+name+" has "+types.length+" parameters");
       }
     
     Collection res=new ArrayList(names.size());
-    for(Iterator n=names.iterator(),t=types.iterator();
+    int tn = 0;
+    for(Iterator n=names.iterator();
 	n.hasNext();)
       {
-	Pattern p=(Pattern)n.next();
-	Monotype domt=(Monotype)t.next();
+	Pattern p = (Pattern)n.next();
+	Monotype domt = types[tn++];
 
 	LocatedString typeName = p.name.cloneLS();
 	typeName.prepend("typeof(");
 	typeName.append(")");
 	
-	MonotypeVar type = Monotype.fresh(typeName,domt);
+	MonotypeVar type = new MonotypeVar(typeName.toString());
 	if(!p.isSharp())
 	  type.rememberToImplementTop();
 	
@@ -118,7 +124,7 @@ public class MethodBodyDefinition extends Definition
       }
     */
     
-    parameters=buildSymbols(this.formals,definition.symbol.type.domain());
+    parameters = buildSymbols(this.formals,definition.symbol.type.domain());
     scope.addSymbols(parameters);
   }
 
@@ -150,11 +156,11 @@ public class MethodBodyDefinition extends Definition
 	    }
 	  
 	  try{
-	    int level=Typing.enter("Trying definition "+m+" for method body "+name);
+	    int level = Typing.enter("Trying definition "+m+" for method body "+name);
 	    try{
-	      m.symbol.type.getConstraint().assert();
+	      Constraint.assert(m.symbol.type.getConstraint());
 	      Typing.in(Pattern.getPolytype(formals),
-		      Domain.fromMonotypes(m.getType().domain()));
+			Domain.fromMonotypes(m.getType().domain()));
 	      Typing.implies();
 	    }
 	    finally{
@@ -166,7 +172,7 @@ public class MethodBodyDefinition extends Definition
 	    if(Debug.typing) Debug.println("Not the right choice :"+e);
 	    i.remove();
 	  }
-	  catch(BadSizeEx e){
+	  catch(mlsub.typing.BadSizeEx e){
 	    i.remove();
 	  }
 	}
@@ -205,7 +211,7 @@ public class MethodBodyDefinition extends Definition
     if(binders!=null) 
       {
 	try{ this.typeScope.addMappings(binders,null); } 
-	catch(BadSizeEx e) {
+	catch(mlsub.typing.BadSizeEx e) {
 	  Internal.error("Should not happen");
 	}
 	catch(TypeScope.DuplicateName e) {
@@ -213,8 +219,8 @@ public class MethodBodyDefinition extends Definition
 	}
       }
 
-    if(newTypeVars!=null)
-      this.typeScope.addSymbols(newTypeVars);
+    //if(newTypeVars!=null)
+    //this.typeScope.addSymbols(newTypeVars);
     
     return res;
   }
@@ -226,7 +232,7 @@ public class MethodBodyDefinition extends Definition
     // we look for java classes
     body.doFindJavaClasses();
     
-    Pattern.resolveTC(typeScope,formals);
+    Pattern.resolveTC(typeScope, formals);
   }
   
   void lateBuildScope()
@@ -253,9 +259,9 @@ public class MethodBodyDefinition extends Definition
     try{
       typeScope.addMappings
 	(binders,
-	 definition.getType().getConstraint().binders);
+	 definition.getType().getConstraint().binders());
     }
-    catch(BadSizeEx e){
+    catch(mlsub.typing.BadSizeEx e){
       User.error(name,
 		 "Method \""+name+"\" expects "+e.expected+
 		 " type parameters");
@@ -265,7 +271,7 @@ public class MethodBodyDefinition extends Definition
     }
 
     // We can resolve now
-    Pattern.resolveType(this.typeScope,formals);
+    Pattern.resolveType(this.typeScope, formals);
     super.doResolve();
   }
 
@@ -282,7 +288,7 @@ public class MethodBodyDefinition extends Definition
    * Type checking
    ****************************************************************/
 
-  public Monotype getReturnType()
+  public mlsub.typing.Monotype getReturnType()
   {
     return definition.getType().codomain();
   }
@@ -291,17 +297,17 @@ public class MethodBodyDefinition extends Definition
   {
     lateBuildScope();
 
-    Typing.enter("method body of "+name);
-    
+    Typing.enter("METHOD BODY of "+name+"\n\n");
+
     try{
-      try { definition.getType().getConstraint().assert(); }
+      try { Constraint.assert(definition.getType().getConstraint()); }
       catch(TypingEx e){
 	User.error(name,
 		   "the constraint will never be satisfied",
 		   ": "+e.getMessage());
       }
       
-      Collection monotypes = MonoSymbol.getMonotype(parameters);
+      Monotype[] monotypes = MonoSymbol.getMonotype(parameters);
       Typing.introduce(monotypes);
 
       Typing.leqMono
@@ -310,13 +316,13 @@ public class MethodBodyDefinition extends Definition
       
       try{
 	Typing.in
-	  (VarSymbol.getType(parameters),
+	  (monotypes,
 	   Pattern.getDomain(formals));
 
 	Typing.implies();
       }
       catch(TypingEx e){
-	User.error(name,"The patterns are not correct");
+	User.error(name,"The patterns are not correct", e);
       }
       
       // New Constraint
@@ -358,7 +364,7 @@ public class MethodBodyDefinition extends Definition
 	}
       // end of New Constraint
     }
-    catch(BadSizeEx e){
+    catch(mlsub.typing.BadSizeEx e){
       Internal.error("Bad size in MethodBodyDefinition.typecheck()");
     }
     catch(TypingEx e) {
@@ -418,17 +424,20 @@ public class MethodBodyDefinition extends Definition
 
     // Parameters
     lexp.min_args=lexp.max_args=parameters.size();
-    Iterator p,t;
-    for(p=parameters.iterator(),t=definition.getType().domain().iterator();
+    Iterator p;
+    Monotype[] t;
+    int n = 0;
+    for(p = parameters.iterator(),
+	  t = definition.getType().domain();
 	p.hasNext();)
       {
 	MonoSymbol param = (MonoSymbol) p.next();
-	Monotype paramType = (Monotype) t.next();
+	Monotype paramType = t[n++];
 	
 	gnu.expr.Declaration d = lexp.addDeclaration(param.name.toString());
 
 	d.setParameter(true);
-	d.setType(paramType.getJavaType());
+	d.setType(bossa.CodeGen.javaType(paramType));
 	d.noteValue(null);
 	param.setDeclaration(d);
       }
@@ -438,7 +447,10 @@ public class MethodBodyDefinition extends Definition
     module.compileMethod(lexp);
 
     //Register this alternative for the link test
-    new bossa.link.Alternative(this.definition,Pattern.getDomain(this.formals),module.getBytecode(),lexp.getMainMethod());
+    new bossa.link.Alternative(this.definition,
+			       Pattern.getTC(this.formals),
+			       module.getBytecode(),
+			       lexp.getMainMethod());
   }
 
   //  public static void compileMethod(gnu.expr.LambdaExp lexp, ClassType inClass, String name)
@@ -492,11 +504,11 @@ public class MethodBodyDefinition extends Definition
     return name+"("+Util.map("",", ","",parameters)+")";
   }
 
-  private MethodDefinition definition;
+  /*private*/ MethodDefinition definition;
   protected Collection /* of FieldSymbol */  parameters;
   protected List       /* of Patterns */   formals;
   Collection /* of LocatedString */ binders; // Null if type parameters are not bound
   private Statement body;
 
-  private List /* of TypeSymbol */  newTypeVars;
+  //private List /* of TypeSymbol */  newTypeVars;
 }

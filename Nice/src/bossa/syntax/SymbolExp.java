@@ -12,7 +12,7 @@
 
 // File    : SymbolExpr.java
 // Created : Thu Jul 08 12:20:59 1999 by bonniot
-//$Modified: Sat May 06 16:06:48 2000 by Daniel Bonniot $
+//$Modified: Wed Jun 14 15:16:44 2000 by Daniel Bonniot $
 
 package bossa.syntax;
 
@@ -21,13 +21,13 @@ import bossa.util.*;
 import gnu.expr.*;
 
 /**
- * Access to a symbol
+ * Access to a symbol (variable, function parameter).
  */
 public class SymbolExp extends Expression
 {
   SymbolExp(VarSymbol s)
   {
-    this.symbol=s;
+    this.symbol = s;
     setLocation(s.name.location());
   }
 
@@ -55,13 +55,21 @@ public class SymbolExp extends Expression
 
   void computeType()
   {
+    //Internal.printStackTrace();
+    
     // Very important: each SymbolExp gets a copy of the type of the symbol.
     // Thus it has fresh binders.
     // Otherwise there would be an "aliasing" effect.
     // An important supposition is that two uses of a symbol
-    // are two different SymbolExp objects (with a reference to the same symbol).
+    // are two different SymbolExp objects 
+    // (with a reference to the same symbol).
     // So they hold different (but equivalent) types.
-    type = symbol.getType().cloneType();
+
+    // it's not necessary if the symbol is monomorphic
+    if (symbol instanceof PolySymbol)
+      type = symbol.getType().cloneType();
+    else
+      type = symbol.getType();
   }
 
   /****************************************************************
@@ -100,6 +108,11 @@ public class SymbolExp extends Expression
    * Printing
    ****************************************************************/
 
+  public LocatedString getName()
+  {
+    return symbol.name;
+  }
+  
   public String toString()
   {
     return symbol.name.toString();

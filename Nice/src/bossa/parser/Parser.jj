@@ -12,7 +12,7 @@
 
 // File    : parser.jj
 // Created : Thu Jul 01 10:27:05 1999 by bonniot
-//$Modified: Tue May 30 22:26:29 2000 by Daniel Bonniot $
+//$Modified: Wed Jun 14 12:14:46 2000 by Daniel Bonniot $
 // Description : Parseur JavaCC pour Bossa
 //   Tokens based on the Jazz parser
 
@@ -30,6 +30,10 @@ import java.util.*;
 
 import bossa.util.*;
 import bossa.syntax.*;
+
+import mlsub.typing.TypeSymbol;
+import mlsub.typing.TypeConstructor;
+import mlsub.typing.MonotypeVar;
 
 class Parser
 {
@@ -362,6 +366,15 @@ LocatedString ident():
   { return new LocatedString(t.image,new Location(t)); }
 }
 
+String unlocIdent():
+{
+  Token t;
+}
+{
+  t=<IDENT> 
+  { return t.image; }
+}
+
 LocatedString methodName():
 {
   LocatedString res;
@@ -424,36 +437,34 @@ LocatedString number():
 /*                          Type Symbols                               */
 /***********************************************************************/
 
-TypeConstructor typeConstructor():
+TypeIdent typeConstructorIdent():
 {
   LocatedString name;
 }
 {
   name=doted_string()
-  { return new TypeConstructor(name); }
+  { return new TypeIdent(name); }
 }
 
-Interface itf():
+TypeConstructor trueTypeConstructor():
 {
-  LocatedString name;
+  String name;
 }
 {
-  name=doted_string()
-  {
-    return new Interface(name);
-  }
+  name=unlocIdent()
+  { return new TypeConstructor(name, null, false); }
 }
 
 List typeConstructors():
 {
   List res=new ArrayList();
-  TypeConstructor t;
+  TypeIdent t;
 }
 {
   [
    "<" 
-      t=typeConstructor() { res.add(t); }
-      ( "," t=typeConstructor() { res.add(t); } )*   
+      t=typeConstructorIdent() { res.add(t); }
+      ( "," t=typeConstructorIdent() { res.add(t); } )*   
    ">"
   ]
   { return res; }
@@ -464,7 +475,7 @@ TypeIdent typeIdent():
   LocatedString name;
 }
 {
-  name=ident()
+  name=doted_string()
   { return new TypeIdent(name);
   }
 }
@@ -499,7 +510,8 @@ List monoSymbols():
 
 TypeSymbol binder(Collection atomics):
 {
-  TypeConstructor first,second=null;
+  TypeIdent first;
+  TypeConstructor second;
   MonotypeVar id;
 }
 {
@@ -507,11 +519,9 @@ TypeSymbol binder(Collection atomics):
   { return id;
   }
 |
-  first=typeConstructor() 
-  second=typeConstructor()
+  first=typeIdent() 
+  second=trueTypeConstructor()
   { 
-    //if(second==null)
-      //return first;
     atomics.add(new TypeConstructorLeqCst(second,first)); 
     return second; 
   }
@@ -531,8 +541,8 @@ List binders(Collection atomics):
 AtomicConstraint atomicConstraint():
 {
   Monotype m1,m2;  
-  TypeConstructor t;
-  Interface i;
+  TypeIdent t;
+  TypeIdent i;
   AtomicConstraint res;
 }
 {
@@ -546,9 +556,9 @@ AtomicConstraint atomicConstraint():
   )
 |
   (
-   t=typeConstructor()
+   t=typeConstructorIdent()
    ":"
-   i=itf()
+   i=typeIdent()
    { res=new ImplementsCst(t,i); }
   )
 )
@@ -598,12 +608,12 @@ Constraint constraint():
 
 MonotypeVar monotypeVar():
 {
-  LocatedString name;
+  String name;
 }
 {
   //TMP
   [ "+" ]
-  name=doted_string()
+  name=unlocIdent()
   { return new MonotypeVar(name); }
 }
 
@@ -622,7 +632,7 @@ List monotypeVars():
 
 Monotype monotypeConstructor():
 {
-    TypeConstructor t;
+    TypeIdent t;
     List p=null;
     Token first,last;
 }
@@ -631,7 +641,7 @@ Monotype monotypeConstructor():
   // monotypeConstructors with no type parameters (and no "<" ">")
   // are parsed as MonotypeVars, not here.
   // This is fixed during scoping.
-    t=typeConstructor() 
+    t=typeConstructorIdent() 
     "<" [  p=monotypes() ] ">"
     { if(p==null) p=new ArrayList(0);
       last=getToken(0);
@@ -652,7 +662,7 @@ FunType funmonotype():
     t="(" [ codom=monotype() ] ")"
     { if(codom==null) codom=
       new MonotypeConstructor
-      (new TypeConstructor(new LocatedString("void",new Location(t))),
+      (new TypeIdent(new LocatedString("void",new Location(t))),
        new TypeParameters(null),new Location(t)); }
     { return new FunType(dom,codom); }
 }
@@ -673,7 +683,7 @@ Monotype monotype():
   LOOKAHEAD(monotypeConstructor())
   res=monotypeConstructor()
 | 
-  res=monotypeVar() 
+  res=typeIdent() 
   )
   { return res; }
 }
@@ -765,16 +775,16 @@ MethodDefinition classMethodDefinition(BossaClass c):
 List extensions():
 {
   List res=new ArrayList(0);
-  TypeConstructor name;
+  TypeIdent name;
 }
 {
   "extends"
-  name=typeConstructor() 
+  name=typeIdent() 
     // ignore type parameters
     // they should be checked
     [ "<" ident() ( "," ident() )* ">" ]
   { res.add(name); }
-  ( "," name=typeConstructor() 
+  ( "," name=typeIdent() 
     // ignore type parameters
     // they should be checked
     [ "<" ident() ( "," ident() )* ">" ]
@@ -785,15 +795,15 @@ List extensions():
 List interfaces():
 {
   List res=new ArrayList(0);
-  Interface name;
+  TypeIdent name;
 }
 {
-  name=itf() 
+  name=typeIdent() 
     // ignore type parameters
     // they should be checked
     [ "<" ident() ( "," ident() )* ">" ]
   { res.add(name); }
-  ( "," name=itf() [ "<" ident() ( "," ident() )* ">" ]
+  ( "," name=typeIdent() [ "<" ident() ( "," ident() )* ">" ]
     { res.add(name); } )*
     { return res; }
 }
@@ -878,6 +888,7 @@ ClassDefinition classDefinition():
   }
 }
 
+/*
 InterfaceDefinition interfaceDefinition():
 {
   LocatedString name;
@@ -892,17 +903,17 @@ InterfaceDefinition interfaceDefinition():
   ";"
   { return new InterfaceDefinition(name,parameters,extensions,true); }
 }
-
+*/
 Pattern pattern(LocatedString name):
 {
-    TypeConstructor tc=null;
+    TypeIdent tc=null;
     Monotype type=null;
 }
 {
   [
-    "@" tc=typeConstructor() 
+    "@" tc=typeIdent() 
   | 
-    "#" tc=typeConstructor()
+    "#" tc=typeIdent()
     { tc.name.prepend("#"); }
   ]
   [
@@ -916,7 +927,7 @@ MethodBodyDefinition methodBodyDefinition():
     LocatedString name,i;
     Pattern p;
     Collection binders=null;
-    List newTypeVars=null;
+    //List newTypeVars=null;
     List parameters=new LinkedList();
     Statement code;
     Expression exp;
@@ -925,7 +936,7 @@ MethodBodyDefinition methodBodyDefinition():
     name=methodName()
     [ "<" binders=strings() ">" ]
 // introducing new Type variables
-    [ "[" newTypeVars=typeConstructors() "]" ]
+//    [ "[" newTypeVars=typeConstructors() "]" ]
 //    p=pattern(new LocatedString("this",new Location(0,0,0,0))) 
 //    { parameters.add(p); }
     "("
@@ -946,7 +957,7 @@ MethodBodyDefinition methodBodyDefinition():
       }
     )
     { return new MethodBodyDefinition(name,binders,
-				      newTypeVars,
+				      //newTypeVars,
 				      parameters,code); }
 }
 
@@ -1051,9 +1062,11 @@ Definition definition():
 }
 {
   (
+/*
     LOOKAHEAD ( "abstract" "interface" )
     res=interfaceDefinition()
   | 
+*/
     res=classDefinition()
   | 
     res=globalVariable()
@@ -1119,12 +1132,12 @@ IdentExp identExp():
 
 NewExp newExp():
 {
-  TypeConstructor t;
+  TypeIdent t;
   List args;
 }
 {
   "new" 
-  t=typeConstructor()
+  t=typeConstructorIdent()
   "(" 
     args=Arguments()
   ")" 
@@ -1149,6 +1162,7 @@ FunExp funExp():
     exp=Expression()
     { 
       body=new ReturnStmt(exp);
+      body.setLocation(exp.location());
     }
   )
   { return new FunExp(cst,formals,body); }
@@ -1524,7 +1538,7 @@ Expression PrimarySuffix(Expression start) :
     if(parameters==null)
       parameters=new ArrayList(1);
     parameters.add(0,start);
-    return new CallExp(res,parameters); 
+    return new CallExp(res,parameters,true); 
   }
 
 |
@@ -1712,8 +1726,9 @@ Statement StatementExpression() :
  * Java expansions for StatementExpression.  This expansion does not
  * use PostfixExpression for performance reasons.
  */
-{ Expression e1; }
+{ Expression e1; Token first, last; }
 {
+  { first = getToken(1); }
   (
   e1=PreIncrementExpression()
 |
@@ -1738,7 +1753,12 @@ Statement StatementExpression() :
     }
   ]
   )
-  { return new ExpressionStmt(e1); }
+  { 
+    last = getToken(0);
+    Location loc=new Location(first).englobe(new Location(last));
+    e1.setLocation(loc);
+    return new ExpressionStmt(e1); 
+  }
 }
 
 /*
@@ -1841,10 +1861,14 @@ Statement ContinueStatement() :
 */
 
 Statement ReturnStatement() :
-{ Expression val=null; }
+{ Expression val=null; Token t; }
 {
-  "return" [ val=Expression() ] ";"
-  { return new ReturnStmt(val); }
+  t="return" [ val=Expression() ] ";"
+  {
+    Statement res = new ReturnStmt(val); 
+    res.setLocation(new Location(t));
+    return res;
+  }
 }
 
 Statement ThrowStatement() :
@@ -1860,13 +1884,13 @@ Statement TryStatement() :
  * finally/catch is present.
  */
 { TryStmt res; Statement body, b; 
-  TypeConstructor tc;
+  TypeIdent tc;
   LocatedString i;
 }
 {
   "try" body=Block()
   { res = new TryStmt(body); }
-  ( "catch" "(" tc=typeConstructor() i=ident() ")" b=Block() 
+  ( "catch" "(" tc=typeConstructorIdent() i=ident() ")" b=Block() 
   { res.addCatch(tc, i, b); }
   )*
   [ "finally" b=Block() { res.setFinally(b); } ]

@@ -12,7 +12,7 @@
 
 // File    : Internal.java
 // Created : Wed Jul 07 18:23:19 1999 by bonniot
-//$Modified: Tue May 09 16:52:45 2000 by Daniel Bonniot $
+//$Modified: Wed Jun 07 13:48:01 2000 by Daniel Bonniot $
 // Description : Internal errors...
 
 package bossa.util;
@@ -21,7 +21,7 @@ package bossa.util;
    Internal messages are sent through this static class
  */
 
-public class Internal
+public final class Internal
 {
   public static void printStackTrace()
   {
@@ -66,10 +66,29 @@ public class Internal
       error(l+": "+message);
   }
 
+  public static void error(String message, String dbgMsg)
+  {
+    if(Debug.powerUser)
+      error(message+dbgMsg);
+    else
+      error(message);
+  }
+  
   public static void error(String message)
   {
     System.out.println("[Internal error] "+message);
     printStackTrace();
+    System.exit(1);
+  }
+  
+  public static void error(Throwable e)
+  {
+    String msg = e.getMessage();
+    if (msg == null)
+      msg = "";
+    
+    System.out.println("[Internal error] "+msg);
+    e.printStackTrace();
     System.exit(1);
   }
 

@@ -12,11 +12,15 @@
 
 // File    : ThrowStmt.java
 // Created : Thu May 25 17:33:52 2000 by Daniel Bonniot
-//$Modified: Fri May 26 18:12:48 2000 by Daniel Bonniot $
+//$Modified: Thu Jun 08 15:45:08 2000 by Daniel Bonniot $
 
 package bossa.syntax;
 
 import bossa.util.*;
+
+import mlsub.typing.*;
+import mlsub.typing.Polytype;
+import mlsub.typing.MonotypeConstructor;
 
 /**
  * Throw statement.
@@ -35,10 +39,9 @@ public class ThrowStmt extends Statement
   static TypeConstructor throwableTC()
   {
     if(throwableTC==null)
-      {
-	throwableTC = JavaTypeConstructor.make
-	  ("java.lang.Throwable", gnu.bytecode.Type.throwable_type);
-      }
+      throwableTC = JavaClasses.make
+	("java.lang.Throwable", gnu.bytecode.Type.throwable_type);
+
     return throwableTC;
   }
 	
@@ -47,8 +50,9 @@ public class ThrowStmt extends Statement
   {
     if(throwableType==null)
       {
-	throwableType = new Polytype(new MonotypeConstructor
-	  (throwableTC() ,null, Location.nowhere()));
+	throwableType = new Polytype
+	  (mlsub.typing.Constraint.True, 
+	   new MonotypeConstructor(throwableTC() ,null));
       }
     return throwableType;
   }
@@ -56,9 +60,9 @@ public class ThrowStmt extends Statement
   public void typecheck()
   {
     try{
-      bossa.typing.Typing.leq(exn.getType(), throwableType());
+      Typing.leq(exn.getType(), throwableType());
     }
-    catch(bossa.typing.TypingEx e){
+    catch(TypingEx e){
       User.error(exn,
 		 exn+" is not throwable",
 		 e);

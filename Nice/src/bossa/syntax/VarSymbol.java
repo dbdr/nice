@@ -12,12 +12,14 @@
 
 // File    : VarSymbol.java
 // Created : Wed Jul 07 16:56:06 1999 by bonniot
-//$Modified: Thu Mar 02 17:14:43 2000 by Daniel Bonniot $
+//$Modified: Tue Jun 13 19:52:53 2000 by Daniel Bonniot $
 
 package bossa.syntax;
 
 import java.util.*;
 import bossa.util.*;
+
+import mlsub.typing.Polytype;
 
 /**
  * A variable (local, field, parameter)
@@ -27,7 +29,7 @@ abstract class VarSymbol extends Node implements Located
   public VarSymbol(LocatedString name)
   {
     super(Node.upper);
-    this.name=name;
+    this.name = name;
     addSymbol(this);
   }
 
@@ -49,16 +51,31 @@ abstract class VarSymbol extends Node implements Located
    * @param varsymbols the colleciton of Varsymbols
    * @return the collection of their Types
    */
-  static Collection getType(Collection varsymbols)
+  static Polytype[] getType(Collection varsymbols)
   {
     Iterator i=varsymbols.iterator();
-    Collection res=new ArrayList(varsymbols.size());
+    Polytype[] res = new Polytype[varsymbols.size()];
 
+    int n = 0;
     while(i.hasNext())
-      res.add(((VarSymbol)i.next()).getType());
+      res[n++] = ((VarSymbol) i.next()).getType();
 
     return res;
   }
+
+  /****************************************************************
+   * Cloning types
+   ****************************************************************/
+
+  // explained in OverloadedSymbolExp
+
+  abstract void makeClonedType();
+  abstract void releaseClonedType();
+  abstract Polytype getClonedType();
+  
+  /****************************************************************
+   * Misc.
+   ****************************************************************/
 
   public Location location()
   {

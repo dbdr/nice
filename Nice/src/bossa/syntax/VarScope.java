@@ -12,7 +12,7 @@
 
 // File    : VarScope.java
 // Created : Fri Jul 09 11:28:11 1999 by bonniot
-//$Modified: Wed Mar 29 14:45:42 2000 by Daniel Bonniot $
+//$Modified: Fri Jun 09 15:14:00 2000 by Daniel Bonniot $
 
 package bossa.syntax;
 
@@ -27,8 +27,8 @@ class VarScope
 {
   public VarScope(VarScope outer, boolean isStop)
   {
-    this.outer=outer;
-    this.defs=new HashMultiTable();
+    this.outer = outer;
+    this.defs = new HashMultiTable();
     this.stop = isStop;
   }
   
@@ -51,10 +51,10 @@ class VarScope
    */
   void addSymbols(Collection c)
   {
-    Iterator i=c.iterator();
+    Iterator i = c.iterator();
     while(i.hasNext())
       {
-	VarSymbol s=(VarSymbol)i.next();
+	VarSymbol s = (VarSymbol)i.next();
 	addSymbol(s);
       }
   }
@@ -66,9 +66,9 @@ class VarScope
    * @param i the identifier to lookup
    * @return the symbols if it was found, null otherwise
    */
-  public Collection lookup(LocatedString i)
+  public List lookup(LocatedString i)
   {
-    Collection res=defs.getAll(i);
+    List res = defs.getAll(i);
     
     if(outer!=null)
       if(!stop || res==null)
@@ -84,9 +84,9 @@ class VarScope
   }
 
   /** Do not stop at stops. */
-  public Collection lookupGlobal(LocatedString i)
+  public List lookupGlobal(LocatedString i)
   {
-    Collection res=defs.getAll(i);
+    List res = defs.getAll(i);
     
     if(outer!=null)
       {
@@ -102,7 +102,7 @@ class VarScope
 
   public VarSymbol lookupOne(LocatedString s)
   {
-    Collection i=lookup(s);
+    Collection i = lookup(s);
     if(i==null || i.size()==0)
       return null;
     if(i.size()>1)
@@ -112,7 +112,7 @@ class VarScope
 
   public VarSymbol lookupLast(LocatedString s)
   {
-    VarSymbol res=(VarSymbol)defs.getLast(s);
+    VarSymbol res = (VarSymbol)defs.getLast(s);
     if(res!=null)
       return res;
     if(outer==null)
@@ -141,11 +141,11 @@ class VarScope
     throws DuplicateIdentEx
   {
     LocatedString name;
-    Collection seen=new ArrayList(symbols.size());
-    Iterator i=symbols.iterator();
+    Collection seen = new ArrayList(symbols.size());
+    Iterator i = symbols.iterator();
     while(i.hasNext())
       {
-	name=((VarSymbol)i.next()).name;
+	name = ((VarSymbol)i.next()).name;
 	if(seen.contains(name))
 	  throw new DuplicateIdentEx(name);
 	seen.add(name);

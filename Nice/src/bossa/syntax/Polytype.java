@@ -12,15 +12,17 @@
 
 // File    : Polytype.java
 // Created : Tue Jul 13 12:51:38 1999 by bonniot
-//$Modified: Thu Apr 27 19:12:57 2000 by Daniel Bonniot $
+//$Modified: Fri Jun 09 17:33:36 2000 by Daniel Bonniot $
 
 package bossa.syntax;
 
 import java.util.*;
 import bossa.util.*;
 
+import mlsub.typing.TypeConstructor;
+
 /**
- * A constrained monotype.
+   A constrained monotype.
  */
 public class Polytype extends Node
 {
@@ -38,39 +40,6 @@ public class Polytype extends Node
     this(Constraint.True,monotype);
   }
 
-  static Polytype bottom()
-  {
-    MonotypeVar alpha = Monotype.fresh(new LocatedString("alpha",
-							 Location.nowhere()),
-				       null);
-    return new Polytype
-      (new Constraint(alpha,null),
-       alpha);
-  }
-
-  static Polytype voidType(TypeScope typeScope)
-  {
-    Monotype m=new MonotypeConstructor(new TypeConstructor(new LocatedString("void",Location.nowhere())),null,Location.nowhere());
-    m=m.resolve(typeScope);
-    
-    return new Polytype(m);
-  }
-  
-  private static int unionNumber = 0;
-  
-  static Polytype union(Polytype t1, Polytype t2)
-  {
-    MonotypeVar t = new MonotypeVar(true,new LocatedString("union_"+unionNumber++,Location.nowhere()));
-    
-    Constraint c = Constraint.and(t1.constraint,t2.constraint);
-    c.addBinder(t);
-    c.addAtom(new MonotypeLeqCst(t1.monotype,t));
-    c.addAtom(new MonotypeLeqCst(t2.monotype,t));
-
-    Polytype res = new Polytype(c,t);
-    return res;
-  }
-  
   static Collection fromMonotypes(Collection monotypes)
   {
     Collection res=new ArrayList(monotypes.size());
@@ -78,40 +47,13 @@ public class Polytype extends Node
 	i.hasNext();)
       res.add(new Polytype(Constraint.True,(Monotype)i.next()));
     return res;
-  }
-  
-  Polytype cloneType()
-  {
-    //Optimization
-    if(!constraint.hasBinders())
-      return this;
+  }  
 
-    Map map = new HashMap();
-    List newBinders = new ArrayList(constraint.binders.size());
-    for(Iterator i = constraint.binders.iterator();i.hasNext();)
-      {
-	TypeSymbol old = (TypeSymbol)i.next();
-	TypeSymbol nou = old.cloneTypeSymbol();
-	newBinders.add(nou);
-	map.put(old,nou);
-      }
-    return new Polytype(new Constraint(newBinders,AtomicConstraint.substitute(map,constraint.atomics)),monotype.substitute(map));
-  }
-  
   public Constraint getConstraint()
   {
     return constraint;
   }
 
-  static Collection getConstraint(Collection c)
-  {
-    Collection res = new ArrayList(c.size());
-    for(Iterator i = c.iterator();
-	i.hasNext();)
-      res.add(((Polytype)i.next()).getConstraint());
-    return res;
-  }
-  
   static Collection getMonotype(Collection c)
   {
     Collection res = new ArrayList(c.size());
@@ -126,54 +68,16 @@ public class Polytype extends Node
     return monotype;
   }
 
-  /**
-   * Returns the domain of a functional polytype.
-   *
-   * @return a 'tuple' Domain
-   */
-  public Domain getDomain()
-  {
-    List domains = monotype.domain();
-
-    if(domains==null)
-      Internal.error("getDomain on non functional polytype "+this);
-    
-    return new Domain(constraint,domains);
-  }
-  
-  /****************************************************************
-   * Functional types
-   ****************************************************************/
-
-  List /* of Monotype */ domain()
-  {
-    return monotype.domain();
-  }
-
-  Monotype codomain()
-  {
-    return monotype.codomain();
-  }
-
   /*******************************************************************
    * Scoping
    *******************************************************************/
 
-  void resolve()
+  mlsub.typing.Polytype resolveToLowlevel()
   {
-    monotype = monotype.resolve(typeScope);
-  }
-  
-  Polytype substitute(Map map)
-  {
-    return new Polytype(constraint.substitute(map), monotype.substitute(map));
-  }
+    return new mlsub.typing.Polytype(constraint.resolveToLowlevel(),
+				     monotype.resolve(typeScope));
+  }  
 
-  void typecheck()
-  {
-    monotype.typecheck();
-  }
-  
   /************************************************************
    * Printing
    ************************************************************/

@@ -12,12 +12,14 @@
 
 // File    : JavaClass.java
 // Created : Wed Feb 02 16:20:12 2000 by Daniel Bonniot
-//$Modified: Fri May 26 16:19:18 2000 by Daniel Bonniot $
+//$Modified: Tue Jun 13 11:12:41 2000 by Daniel Bonniot $
 
 package bossa.syntax;
 
 import bossa.util.*;
 import java.util.*;
+
+import mlsub.typing.*;
 
 /**
  * A class definition which reflects an existing native java class.
@@ -57,10 +59,12 @@ public class JavaClass extends ClassDefinition
 	  typeParameters, extensions, implementations, abstractions);
     this.javaName = javaName;
 
-    addTypeSymbol(this.tc);
-
     if(name.toString().equals("nice.lang.Array"))
-      ConstantExp.arrayTC = this.tc;
+      {
+	ConstantExp.arrayTC = this.tc;
+	javaType = bossa.SpecialTypes.arrayType;
+	bossa.CodeGen.set(tc, javaType);
+      }
     
     if(javaName == null) // primitive type
       {
@@ -69,17 +73,19 @@ public class JavaClass extends ClassDefinition
 	if(javaType == null)
 	  User.error(this,
 		     name+" is not a known primitive type");
+      
+	bossa.CodeGen.set(tc, javaType);
       }
     else
       {
 	TypeConstructor old = 
-	  JavaTypeConstructor.setTypeConstructorForJavaClass
+	  JavaClasses.setTypeConstructorForJavaClass
 	  (this.tc, javaName.toString());
 
 	if(old!=null)
 	  User.error(this, 
 		     javaName+" was already associated with bossa class "+
-		     old+" defined in "+old.location());
+		     old);
       }
   }
 
@@ -87,21 +93,19 @@ public class JavaClass extends ClassDefinition
   {
     super.resolve();
 
-    if(isPrimitive)
-      return;
+    if(isPrimitive) return;
     
-    if(javaName.toString().equals("_Array"))
-      javaType = new bossa.SpecialArray(gnu.bytecode.Type.pointer_type);
-    else
+    if (javaType == null)
       {
 	java.lang.Class refClass 
-	  = JavaTypeConstructor.lookupJavaClass(javaName.toString());
+	  = JavaClasses.lookupJavaClass(javaName.toString());
     
 	if(refClass==null)
 	  User.error(javaName,
 		     javaName+" was not found");
     
 	javaType = (gnu.bytecode.ClassType) gnu.bytecode.Type.make(refClass);
+	bossa.CodeGen.set(tc, javaType);
       }
   }
 

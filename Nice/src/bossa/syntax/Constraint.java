@@ -12,15 +12,17 @@
 
 // File    : Constraint.java
 // Created : Fri Jul 02 17:51:35 1999 by bonniot
-//$Modified: Thu May 11 11:08:31 2000 by Daniel Bonniot $
+//$Modified: Tue Jun 13 18:55:58 2000 by Daniel Bonniot $
 
 package bossa.syntax;
 
 import java.util.*;
 import bossa.util.*;
+import mlsub.typing.TypeSymbol;
+import mlsub.typing.TypeConstructor;
 
 /**
- * A constraint between type constructors
+ * A list of binders + atomic constraints.
  *
  * @see AtomicConstraint
  */
@@ -38,14 +40,6 @@ public class Constraint extends Node
     construct(binders,atomics);
   }
   
-  Constraint(MonotypeVar binder, ArrayList atomics)
-  {
-    super(Node.upper);
-    ArrayList binders=new ArrayList(1);
-    binders.add(binder);
-    construct(binders,atomics);
-  }
-  
   private void construct(List binders, List atomics)
   {
     if(binders==null)
@@ -56,10 +50,11 @@ public class Constraint extends Node
     this.atomics = addChildren(atomics);
   }
 
-  boolean hasBinders()
-  {
-    return binders.size()>0;
-  }
+  //REMOVE
+//    boolean hasBinders()
+//    {
+//      return binders.size()>0;
+//    }
   
   /**
    * The trivial constraint.
@@ -90,7 +85,7 @@ public class Constraint extends Node
       return (List) ((LinkedList) l).clone();
   }
   
-  public static Constraint and(Constraint c1, Constraint c2)
+  /*public static Constraint and(Constraint c1, Constraint c2)
   {
     Constraint res=c1.shallowClone();
     res.addBinders(c2.binders);
@@ -113,59 +108,25 @@ public class Constraint extends Node
     this.addBinders(c.binders);
     this.atomics.addAll(c.atomics);
   }
-  
+  /*
   /****************************************************************
    * Scoping
    ****************************************************************/
 
-  void resolve()
-  {
-    atomics = AtomicConstraint.resolve(typeScope, atomics);
-  }
+  mlsub.typing.Constraint resolveToLowlevel()
+  { 
+    TypeSymbol[] newBinders = null;
+    if(binders.size()>0)
+      {
+	newBinders = new TypeSymbol[binders.size()];
+	
+	int n = 0;
+	for(java.util.Iterator i = binders.iterator(); i.hasNext();)
+	  newBinders[n++] = (TypeSymbol) i.next();
+      }    
 
-  Constraint substitute(Map map)
-  {
-    // Substitution is not done on binders.
-    // This is intended for imperative type parameters substitution only.
-    return new Constraint(binders, AtomicConstraint.substitute(map,atomics));
-  }
-  
-  /****************************************************************
-   * Typechecking
-   ****************************************************************/
-
-  public void assert()
-    throws bossa.typing.TypingEx
-  {
-    // All user defined variables implicitely implement Top
-    assert(true);
-  }
-  
-  void assert(boolean implementTop)
-    throws bossa.typing.TypingEx
-  {
-    bossa.typing.Typing.introduce(binders);
-
-    // This should be before the stuff about implementing Top
-    // since it should allow to find variance of type constructors
-    AtomicConstraint.assert(atomics);
-
-    if(implementTop)
-      for(Iterator i=binders.iterator();i.hasNext();)
-	{
-	  TypeSymbol s=(TypeSymbol)i.next();
-	  if(s instanceof TypeConstructor)
-	    {
-	      TypeConstructor t=(TypeConstructor)s;
-	      if(t.variance!=null)
-		bossa.typing.Typing.assertImp
-		  (t,InterfaceDefinition.top(t.variance.size),false);
-	      else
-		Internal.warning(t, t+" has no known variance, so I can't assert it implement some Top<n> interface");
-	    }
-	  else if(s instanceof MonotypeVar)
-	    ((MonotypeVar)s).rememberToImplementTop();
-	}
+    return mlsub.typing.Constraint.create
+      (newBinders, AtomicConstraint.resolve(typeScope, atomics));
   }
 
   /****************************************************************
@@ -175,53 +136,55 @@ public class Constraint extends Node
   public String toString()
   {
     if(atomics.size()==0)
-      return Util.map("<",", ",">",binders,Printable.inConstraint);
+      return Util.map("<Any ",", Any ","> ",binders);
     else if(binders.size()==0)
-      return Util.map("<",", ",">",atomics);
+      return Util.map("<",", ","> ",atomics);
     else 
       {
 	// Put in a parsable format.
-	String res="<";
-	boolean first=true;
+	String res = "<";
+	boolean first = true;
 	
-	Constraint c=this.shallowClone();
+	Constraint c = this.shallowClone();
 
-	for(Iterator i=c.binders.iterator();i.hasNext();)
+	for(Iterator i = c.binders.iterator();i.hasNext();)
 	  {
-	    TypeSymbol s=(TypeSymbol)i.next();
+	    TypeSymbol s = (TypeSymbol)i.next();
 	    if(!(s instanceof TypeConstructor))
 	      continue;
 
-	    TypeConstructor tc=(TypeConstructor)s;
-	    boolean ok=false;
+	    TypeConstructor tc = (TypeConstructor)s;
+	    boolean ok = false;
 
-	    for(Iterator j=c.atomics.iterator();j.hasNext();)
+	    for(Iterator j = c.atomics.iterator(); j.hasNext();)
 	      {
-		AtomicConstraint atom=(AtomicConstraint)j.next();
+		AtomicConstraint atom = (AtomicConstraint)j.next();
 		
 		String parent = atom.getParentFor(tc);
 		if(parent!=null)
 		  {
 		    if(first)
-		      first=false;
+		      first = false;
 		    else
-		      res+=",";
-		    res+=parent+" "+tc;
+		      res += ",";
+		    res += parent + " " + tc;
 		    j.remove();
 		    i.remove();
-		    ok=true;
+		    ok = true;
 		    break;
 		  }
+		Debug.println(atom+"");
 	      }
 	    if(!ok)
-	      Internal.error(tc,
-			     "Unable to print the constraint in a parsable form because of "+tc);
+	      Internal.error("Unable to print the constraint in a parsable form because of "+tc);
 	  }
-		  
-	return 
-	  res+Util.map(res.length()>1 ? ", " : "",", ","",c.binders,Printable.inConstraint)
-	  + Util.map(" | ",", ","",c.atomics)
-	  + ">";
+	
+	return
+	  res + 
+	  Util.map((res.length()>1 ? ", " : "") + "Any ",", Any ","", 
+		   c.binders) +
+	  Util.map(" | ",", ","",c.atomics) + 
+	  "> ";
       }
   }
 
@@ -229,6 +192,9 @@ public class Constraint extends Node
    * Internal manipulation
    ****************************************************************/
 
+  /**
+     Add the binder if it is not already there.
+  */
   void addBinder(TypeSymbol s)
   {
     if(!binders.contains(s))
@@ -237,17 +203,19 @@ public class Constraint extends Node
 	addTypeSymbol(s);
       }
   }
-  
+
   /**
    * Adds binders that are not already present
    *
    * @param b a collection of TypeSymbol
    */
-  private void addBinders(Collection b)
+  void addBinders(TypeSymbol[] bs)
   {
-    Iterator i=b.iterator();
-    while(i.hasNext())
-      addBinder((TypeSymbol) i.next());
+    if(bs==null)
+      return;
+    
+    for(int i = 0; i<bs.length; i++)
+      addBinder(bs[i]);
   }
 
   void addAtom(AtomicConstraint atom)

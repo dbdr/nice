@@ -12,7 +12,7 @@
 
 // File    : SpecialTypes.java
 // Created : Mon Jan 17 14:19:30 2000 by bonniot
-//$Modified: Sat Mar 11 16:51:01 2000 by Daniel Bonniot $
+//$Modified: Tue Jun 13 11:37:38 2000 by Daniel Bonniot $
 
 package bossa;
 
@@ -31,8 +31,13 @@ public class SpecialTypes
 {
   static public final Type intType, longType, byteType, charType, 
     shortType, floatType, doubleType, booleanType, voidType, arrayType;
-
-  static 
+  
+  public static void init()
+  {
+    // if called, we know the static initializers are executed
+  }
+  
+  static
   {
     intType = Scheme.intType;
     longType = Scheme.longType;

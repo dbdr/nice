@@ -12,9 +12,12 @@
 
 // File    : ConstantExp.java
 // Created : Thu Jul 08 15:36:40 1999 by bonniot
-//$Modified: Fri May 26 16:19:59 2000 by Daniel Bonniot $
+//$Modified: Tue Jun 06 14:56:27 2000 by Daniel Bonniot $
 
 package bossa.syntax;
+
+import mlsub.typing.TypeConstructor;
+import mlsub.typing.TypeSymbol;
 
 import bossa.util.*;
 
@@ -32,7 +35,9 @@ public class ConstantExp extends Expression
   ConstantExp(TypeConstructor tc, Object value, String representation,
 	      Location location)
   {
-    this.type = new Polytype(new MonotypeConstructor(tc,null,null));
+    this.type = new mlsub.typing.Polytype
+      (mlsub.typing.Constraint.True, 
+       new mlsub.typing.MonotypeConstructor(tc,null));
     this.value = value;
     this.representation = representation;
     setLocation(location);
@@ -43,7 +48,7 @@ public class ConstantExp extends Expression
     if(type!=null)
       return;
     
-    TypeSymbol s=typeScope.lookup(className);
+    TypeSymbol s = typeScope.lookup(className);
     
     if(s==null)
       Internal.error("Base class "+className+
@@ -53,8 +58,10 @@ public class ConstantExp extends Expression
       Internal.error("Base class "+className+
 		     " is not a class !");
     
-    TypeConstructor tc=(TypeConstructor) s;
-    type=new Polytype(new MonotypeConstructor(tc,null,null));
+    TypeConstructor tc = (TypeConstructor) s;
+    type = new mlsub.typing.Polytype
+      (mlsub.typing.Constraint.True, 
+       new mlsub.typing.MonotypeConstructor(tc,null));
   }
 
   void computeType()
@@ -159,7 +166,8 @@ public class ConstantExp extends Expression
     if(name.equals("nice.lang.boolean"))
       {
 	primBool = tc;
-	boolType = new MonotypeConstructor(primBool, null, tc.location());
+	boolType = new mlsub.typing.MonotypeConstructor(primBool, null);
+	boolPolytype = new mlsub.typing.Polytype(boolType);
 	return bossa.SpecialTypes.booleanType;
       }
     
@@ -183,14 +191,19 @@ public class ConstantExp extends Expression
     
     if(name.equals("nice.lang.void"))
       {
-	voidType = new MonotypeConstructor(tc, null, tc.location());
+	voidType = new mlsub.typing.MonotypeConstructor(tc, null);
+	voidPolytype = new mlsub.typing.Polytype
+	  (mlsub.typing.Constraint.True, voidType);
+	synVoidType = Monotype.create(voidType);
 	return bossa.SpecialTypes.voidType;
       }
     
     return null;
   }
   
-  static TypeConstructor primByte, primChar, primInt, primLong, primBool, 
+  public static TypeConstructor primByte, primChar, primInt, primLong, primBool, 
     primShort, primDouble, primFloat, arrayTC;
-  static Monotype voidType, boolType;
+  public static mlsub.typing.Monotype voidType, boolType;
+  static mlsub.typing.Polytype voidPolytype, boolPolytype;
+  static Monotype synVoidType;
 }

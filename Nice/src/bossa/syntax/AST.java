@@ -12,7 +12,7 @@
 
 // File    : AST.java
 // Created : Thu Jul 01 11:01:56 1999 by bonniot
-//$Modified: Mon Mar 13 18:09:40 2000 by Daniel Bonniot $
+//$Modified: Fri Jun 09 15:22:09 2000 by Daniel Bonniot $
 
 package bossa.syntax;
 
@@ -31,8 +31,8 @@ public class AST extends Node
   {
     super(defs,Node.global);
     
-    this.module=module;
-    this.definitions=defs;
+    this.module = module;
+    this.definitions = defs;
   }
   
   public void buildScope()
@@ -47,7 +47,7 @@ public class AST extends Node
   
   public void createContext()
   {
-    for(Iterator i=definitions.iterator();i.hasNext();)
+    for(Iterator i = definitions.iterator();i.hasNext();)
       ((Definition) i.next()).createContext();
   }
   
@@ -58,13 +58,21 @@ public class AST extends Node
 
   public void printInterface(java.io.PrintWriter s)
   {
-    for(Iterator i=definitions.iterator();i.hasNext();)
+    /*
+    for(Iterator i = definitions.iterator();i.hasNext();)
+      {
+	Object o = i.next();
+	
+	Debug.println(o.getClass() + " " + o);
+      }
+    */
+    for(Iterator i = definitions.iterator();i.hasNext();)
       ((Definition)i.next()).printInterface(s);
   }
 
   public void compile()
   {
-    for(Iterator i=definitions.iterator();i.hasNext();)
+    for(Iterator i = definitions.iterator();i.hasNext();)
       ((Definition)i.next()).compile();
   }
   

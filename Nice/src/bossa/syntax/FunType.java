@@ -12,100 +12,56 @@
 
 // File    : FunType.java
 // Created : Fri Jul 02 17:41:24 1999 by bonniot
-//$Modified: Tue May 16 15:17:47 2000 by Daniel Bonniot $
+//$Modified: Tue Jun 06 18:14:16 2000 by Daniel Bonniot $
 
 package bossa.syntax;
 
 import java.util.*;
 import bossa.util.*;
-import bossa.typing.FunTypeKind;
-import bossa.engine.*;
+
+import mlsub.typing.*;
+import mlsub.typing.Monotype;
+import mlsub.typing.FunTypeKind;
 
 /**
  * Functional type
  */
-public class FunType extends Monotype
+public class FunType extends bossa.syntax.Monotype
 {
-  public FunType(List /* of Monotype */ in, Monotype out)
+  public FunType(List /* of Monotype */ in, bossa.syntax.Monotype out)
   {
     if(in==null)
       in=new ArrayList(0);
     this.in=in;
     this.out=out;
-    this.kind=new FunTypeKind(in.size());
   }
 
+  /*
   Monotype cloneType()
   {
     return new FunType(cloneTypes(in),out.cloneType());
   }
-
-  /** the list of input types */
-  public List domain()
-  {
-    return in;
-  }
-
-  /** the return type */
-  public Monotype codomain()
-  {
-    return out;
-  }
-
+  */
   /****************************************************************
    * Scoping
    ****************************************************************/
 
   public Monotype resolve(TypeScope typeScope)
   {
-    in=Monotype.resolve(typeScope,in);
-    if(out==null)
-      {
-	Debug.println(in+"");
-	User.error(this, this+" ");
-      }
-    
-    out=out.resolve(typeScope);
-    return this;
+    return new mlsub.typing.FunType
+      (bossa.syntax.Monotype.resolve(typeScope,in),
+       out.resolve(typeScope));
   }
 
-  Monotype substitute(Map map)
+  bossa.syntax.Monotype substitute(Map map)
   {
-    return new FunType(Monotype.substitute(map,in),out.substitute(map));
+    return new bossa.syntax.FunType
+      (bossa.syntax.Monotype.substitute(map,in),out.substitute(map));
   }
 
   boolean containsAlike()
   {
-    return Monotype.containsAlike(in) || out.containsAlike();
-  }
-  
-  /****************************************************************
-   * Typechecking
-   ****************************************************************/
-
-  void typecheck()
-  {
-    out.typecheck();
-    typecheck(in);
-  }
-
-  /****************************************************************
-   * Kinding
-   ****************************************************************/
-
-  private int id;
-  
-  public int getId() 		{ return id; }
-  
-  public void setId(int value) 	{ id=value; }
-
-  FunTypeKind kind;
-  
-  public Kind getKind() 	{ return kind; }
-  
-  public void setKind(Kind value)
-  {
-    Internal.error("Kind set in FunType");
+    return bossa.syntax.Monotype.containsAlike(in) || out.containsAlike();
   }
   
   /****************************************************************
@@ -138,5 +94,5 @@ public class FunType extends Monotype
   }
   
   private List in;
-  private Monotype out;
+  private bossa.syntax.Monotype out;
 }

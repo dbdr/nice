@@ -12,12 +12,18 @@
 
 // File    : Alternative.java
 // Created : Mon Nov 15 12:20:40 1999 by bonniot
-//$Modified: Thu May 04 17:52:58 2000 by Daniel Bonniot $
+//$Modified: Tue Jun 13 10:48:32 2000 by Daniel Bonniot $
 
 package bossa.link;
 
-import bossa.syntax.*;
 import bossa.util.*;
+
+import mlsub.typing.*;
+
+import bossa.syntax.MethodDefinition;
+import bossa.syntax.Pattern;
+import bossa.syntax.LocatedString;
+import bossa.syntax.Node;
 
 import gnu.bytecode.*;
 import gnu.expr.*;
@@ -38,13 +44,14 @@ public class Alternative
   /**
    * When read from a source file.
    */
-  public Alternative(MethodDefinition m, List patterns, ClassType c, Method method)
+  public Alternative(MethodDefinition m, TypeConstructor[] patterns, 
+		     ClassType c, Method method)
   {
     this.definitionClass = c;
     this.primProcedure = new PrimProcedure(method);
     
     this.methodName=m.getFullName();
-    this.patterns=patterns;
+    this.patterns = patterns;
     add();
   }
 
@@ -60,7 +67,7 @@ public class Alternative
     
     int numCode = s.indexOf('$');
     if(numCode==-1)
-      Internal.error("Method "+s+" in class "+c.getName()+
+      Internal.error("Methd "+s+" in class "+c.getName()+
 		     " has no valid name");
 
     int at = s.indexOf(Pattern.AT_encoding, numCode+1);
@@ -73,7 +80,7 @@ public class Alternative
     
     //Debug.println("name="+methodName);
     
-    this.patterns = new ArrayList(5);
+    ArrayList patterns = new ArrayList(5);
 
     while(at<s.length())
       {
@@ -84,21 +91,19 @@ public class Alternative
 	String name = s.substring(at+Pattern.AT_len,next);
 	//Debug.println("pattern="+name);
 	if(name.equals("_"))
-	  patterns.add(Domain.bot); // Domain Ex a .a 
+	  patterns.add(null);
 	else
 	  {
-	    bossa.util.Location loc = bossa.util.Location.nowhere();
+	    TypeSymbol tc = Node.getGlobalTypeScope().lookup(name);
 	    
-	    Monotype type = new MonotypeConstructor
-	      (new TypeConstructor(new LocatedString(name,loc)),
-	       null,loc);
-
-	    type = type.resolve(Node.getGlobalTypeScope());    
-	    patterns.add(new Domain(null,type));
+	    patterns.add((TypeConstructor) tc);
 	  }
 	
 	at = next;
       }
+    
+    this.patterns = (TypeConstructor[]) 
+      patterns.toArray(new TypeConstructor[patterns.size()]);
     
     add();
   }
@@ -123,13 +128,17 @@ public class Alternative
    */
   static boolean leq(Alternative a, Alternative b)
   {
-    Iterator i = a.patterns.iterator();
-    Iterator j = b.patterns.iterator();
-    while(i.hasNext())
+    for(int i=0; i<a.patterns.length; i++)
       {
-	Domain pa = (Domain) i.next();
-	Domain pb = (Domain) j.next();
-	if(!Domain.leq(pa,pb))
+	TypeConstructor tb = b.patterns[i];
+	if(tb==null)
+	  continue;
+	
+	TypeConstructor ta = a.patterns[i];
+	if(ta==null)
+	  return false;
+	
+	if(!Typing.testRigidLeq(ta, tb))
 	  return false;
       }
     return true;
@@ -140,12 +149,21 @@ public class Alternative
    */
   boolean matches(TypeConstructor[] tags)
   {
-    int n=0;
-    for(Iterator i=patterns.iterator();
-	i.hasNext();n++)
-      if(!Domain.in(tags[n], (Domain) i.next()))
-	return false;
-    
+    for(int i=0; i<patterns.length; i++)
+      {
+	TypeConstructor td = patterns[i];
+	if(td ==null)
+	  continue;
+	
+	TypeConstructor tc = tags[i];
+	// a null tc is an unmatchable argument (e.g. function)
+	if(tc==null)
+	  return false;
+	
+	if(!Typing.testRigidLeq(tc, td))
+	  return false;
+      }
+
     return true;
   }
 
@@ -163,7 +181,7 @@ public class Alternative
    */
   gnu.expr.Expression matchTest(gnu.expr.Expression[] parameters)
   {
-    if(parameters.length!=patterns.size())
+    if (parameters.length != patterns.length)
       Internal.error("Incorrect parameters "+
 		     Util.map("",", ","",parameters)+
 		     " for " + this);
@@ -171,18 +189,20 @@ public class Alternative
     gnu.expr.Expression result = QuoteExp.trueExp;
     
     for(int n = parameters.length-1; n>=0; n--)
-      result = new gnu.expr.IfExp(matchTest((Domain) patterns.get(n),parameters[n]),
+      result = new gnu.expr.IfExp(matchTest(patterns[n],parameters[n]),
 				  result,
 				  QuoteExp.falseExp);
     
     return result;
   }
   
-  private static gnu.expr.Expression matchTest(Domain d, gnu.expr.Expression parameter)
+  private static gnu.expr.Expression matchTest(TypeConstructor dom, 
+					       gnu.expr.Expression parameter)
   {
-    if(d == Domain.bot)
+    if(dom == null)
       return QuoteExp.trueExp;
 
+    /*
     ListIterator types = d.getMonotype().getTC().getJavaInstanceTypes();
     
     gnu.expr.Expression res =
@@ -190,8 +210,9 @@ public class Alternative
     
     while(types.hasNext())
       res = orExp(instanceOfExp(parameter,(gnu.bytecode.Type) types.next()),res);
-    
-    return res;
+    */
+
+    return instanceOfExp(parameter, bossa.CodeGen.javaType(dom));
   }
 
   private static final gnu.mapping.Procedure instanceProc = 
@@ -229,7 +250,7 @@ public class Alternative
   private PrimProcedure primProcedure;
   
   String methodName;
-  List /* of Domain */ patterns;
+  TypeConstructor[] patterns;
 
   boolean visiting;
   

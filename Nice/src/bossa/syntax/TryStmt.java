@@ -12,12 +12,16 @@
 
 // File    : TryExp.java
 // Created : Thu May 25 12:34:19 2000 by Daniel Bonniot
-//$Modified: Fri May 26 18:13:49 2000 by Daniel Bonniot $
+//$Modified: Thu Jun 08 17:13:43 2000 by Daniel Bonniot $
 
 package bossa.syntax;
 
 import bossa.util.*;
 import java.util.*;
+
+import mlsub.typing.Typing;
+import mlsub.typing.TypingEx;
+import mlsub.typing.TypeConstructor;
 
 import gnu.expr.TryExp;
 import gnu.expr.CatchClause;
@@ -40,7 +44,7 @@ public class TryStmt extends Statement
     finallyBody = child(body);
   }
   
-  public void addCatch(TypeConstructor tc, LocatedString var, Statement body)
+  public void addCatch(TypeIdent tc, LocatedString var, Statement body)
   {
     catchs.add(child(new Catch(tc, var, body)));
   }
@@ -79,7 +83,7 @@ public class TryStmt extends Statement
   
   public class Catch extends Node
   {
-    Catch(TypeConstructor tc, LocatedString var, Statement body)
+    Catch(TypeIdent tc, LocatedString var, Statement body)
     {
       super(Node.down);
 
@@ -96,7 +100,8 @@ public class TryStmt extends Statement
 
     void findJavaClasses()
     {
-      tc = tc.resolve(typeScope);
+      t = tc.resolveToTC(typeScope);
+      tc = null;
     }
     
     void resolve()
@@ -108,14 +113,15 @@ public class TryStmt extends Statement
     CatchClause clause()
     {
       try{
-	bossa.typing.Typing.leq(tc, ThrowStmt.throwableTC());
+	Typing.leq(t, ThrowStmt.throwableTC());
       }
-      catch(bossa.typing.TypingEx e){
+      catch(TypingEx e){
 	User.error(typeLocation, tc + " is not catchable");
       }
 
       CatchClause res = new CatchClause
-	(var.toString(), (gnu.bytecode.ClassType) tc.getJavaType());
+	(var.toString(), 
+	 (gnu.bytecode.ClassType) bossa.CodeGen.javaType(t));
       res.outer = Statement.currentScopeExp;
       
       exnVar.setDeclaration(res.getDeclaration());
@@ -125,7 +131,8 @@ public class TryStmt extends Statement
     }
     
     private MonoSymbol exnVar;
-    private TypeConstructor tc;
+    private TypeIdent tc;
+    private TypeConstructor t;
     private LocatedString var;
     private Statement body;
     private Location typeLocation;

@@ -70,10 +70,10 @@ public class HashMultiTable {
    * Returns a collection of all the values mapped from key
    * Last entered elements are enumerated first
    */
-  public Collection getAll(final Object key) {
+  public List getAll(final Object key) {
     if(!containsKey(key))
       return null;
-    Collection res=new ArrayList();
+    List res=new ArrayList();
 
     Bucket walker = (Bucket)HashMultiTable.this.table.get(key);
     while(walker != null)

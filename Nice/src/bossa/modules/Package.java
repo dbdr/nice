@@ -12,7 +12,7 @@
 
 // File    : Package.java
 // Created : Wed Oct 13 16:09:47 1999 by bonniot
-//$Modified: Tue May 30 17:54:11 2000 by Daniel Bonniot $
+//$Modified: Tue Jun 13 19:05:27 2000 by Daniel Bonniot $
 
 package bossa.modules;
 
@@ -93,7 +93,14 @@ public class Package implements mlsub.compilation.Module
     if(res!=null)
       return res;
     
-    return new Package(lname, compilation, forceReload);
+    try{
+      return new Package(lname, compilation, forceReload);
+    }
+    catch(ExceptionInInitializerError e){
+      e.getException().printStackTrace();
+      Internal.error("Exception in initializer: "+e.getException());
+      return null;
+    }
   }
 
   /****************************************************************
@@ -165,7 +172,7 @@ public class Package implements mlsub.compilation.Module
   
   private void sourcesRead()
   {
-    sourcesRead=true;
+    sourcesRead = true;
     
     bytecode = ClassType.make(name+".package");
     bytecode.setSuper("java.lang.Object");
@@ -190,7 +197,7 @@ public class Package implements mlsub.compilation.Module
   private long maxLastModified(File[] files)
   {
     long res = 0;
-    for(int i=0; i<files.length; i++)
+    for(int i = 0; i<files.length; i++)
       {
 	long time = files[i].lastModified();
 	if(time>res) res = time;
@@ -220,15 +227,15 @@ public class Package implements mlsub.compilation.Module
   
   private void read(File[] sources, List definitions)
   {
-    for(int i=0; i<sources.length; i++)
+    for(int i = 0; i<sources.length; i++)
       read(sources[i], definitions);
   }
   
   private void readAlternatives()
   {
-    for(Method method=bytecode.getMethods();
+    for(Method method = bytecode.getMethods();
 	method!=null;
-	method=method.getNext())
+	method = method.getNext())
       {
 	String methodName = bossa.Bytecode.unescapeString(method.getName());
 
@@ -270,26 +277,27 @@ public class Package implements mlsub.compilation.Module
   
   public void load()
   {
-    ast.resolveScoping();
-    ast.createContext();
+    try{
+      ast.resolveScoping();
+      ast.createContext();
+    }
+    catch(Exception e){
+      Internal.error(e);
+    }
   }
 
   public void freezeGlobalContext()
   {
-    contextFrozen=true;
-    try{
-      bossa.syntax.JavaTypeConstructor.createContext();
-      bossa.engine.Engine.createInitialContext();
-    }
-    catch(bossa.engine.Unsatisfiable e){
-      bossa.util.User.error("Unsatisfiable initial context: "+e.getMessage());
-    }
+    contextFrozen = true;
+
+    bossa.syntax.JavaClasses.createContext();
+    mlsub.typing.Typing.createInitialContext();
   }
 
   public void unfreezeGlobalContext()
   {
-    contextFrozen=false;
-    bossa.engine.Engine.releaseInitialContext();
+    contextFrozen = false;
+    mlsub.typing.Typing.releaseInitialContext();
   }
 
   private static boolean contextFrozen;
@@ -375,7 +383,7 @@ public class Package implements mlsub.compilation.Module
       return;
 
     try{
-      PrintWriter f=new PrintWriter
+      PrintWriter f = new PrintWriter
 	(new BufferedWriter(new FileWriter(new File(directory,"package.nicei"))));
       f.print("package "+name+";\n\n");
       
@@ -383,6 +391,11 @@ public class Package implements mlsub.compilation.Module
 	{
 	  Package m = (Package) i.next();
 	  f.print("import "+m.getName()+";\n");
+	}
+    
+      for(Iterator i = opens.iterator(); i.hasNext();)
+	{
+	  f.print("import " + i.next() + ".*;\n");
 	}
     
       ast.printInterface(f);
@@ -424,6 +437,14 @@ public class Package implements mlsub.compilation.Module
     pkg = new ModuleExp();
     pkg.setName("packageExp");
     pkg.body = QuoteExp.voidExp;
+
+    try{
+      bossa.SpecialTypes.init();
+    }
+    catch(ExceptionInInitializerError e){
+      e.getException().printStackTrace();
+      Internal.error("Exception in initializer: "+e.getException());
+    }
   }
 
   private gnu.expr.Compilation comp;
@@ -433,8 +454,8 @@ public class Package implements mlsub.compilation.Module
   public static final gnu.expr.Compilation dispatchComp;
   static
   {
-    ClassType ct=null;
-    gnu.expr.Compilation comp=null;
+    ClassType ct = null;
+    gnu.expr.Compilation comp = null;
     try{
       kawa.standard.Scheme.registerEnvironment();
       
@@ -448,8 +469,8 @@ public class Package implements mlsub.compilation.Module
       Internal.error("Error initializing Package class:\n"+
 		     e.getException());
     }
-    dispatchClass=ct;
-    dispatchComp=comp;
+    dispatchClass = ct;
+    dispatchComp = comp;
   }
   
   /**
@@ -567,7 +588,7 @@ public class Package implements mlsub.compilation.Module
   
   public String mangleName(String str)
   {
-    int i=0;
+    int i = 0;
     String res;
     do 
       {
@@ -591,14 +612,14 @@ public class Package implements mlsub.compilation.Module
     String path = Debug.getProperty("nice.package.path",".");
     LinkedList res = new LinkedList();
     
-    int start=0;
+    int start = 0;
     while(start<path.length())
       {
-	int end=path.indexOf(File.pathSeparatorChar,start);
+	int end = path.indexOf(File.pathSeparatorChar,start);
 	if(end==-1)
-	  end=path.length();
+	  end = path.length();
 	    
-	String pathComponent=path.substring(start,end);
+	String pathComponent = path.substring(start,end);
 	if(pathComponent.length()>0)
 	  {
 	    File f = new File(pathComponent);
@@ -613,7 +634,7 @@ public class Package implements mlsub.compilation.Module
 		  res.add(f);
 	      }
 	  }
-	start=end+1;
+	start = end+1;
       }
 
     packageRoots = res.toArray(new Object[res.size()]);
@@ -634,7 +655,7 @@ public class Package implements mlsub.compilation.Module
 
   private File[] getSources()
   {
-    File[] res=directory.listFiles
+    File[] res = directory.listFiles
       (new FilenameFilter()
 	{ 
 	  public boolean accept(File dir, String name)
@@ -646,7 +667,7 @@ public class Package implements mlsub.compilation.Module
     
     // put nice.lang.prelude first if it exists
     if(name.toString().equals("nice.lang"))
-      for(int i=0; i<res.length; i++)
+      for(int i = 0; i<res.length; i++)
 	if(res[i].getName().equals("prelude"+sourceExt))
 	  {
 	    File tmp = res[i];
@@ -668,7 +689,7 @@ public class Package implements mlsub.compilation.Module
     InputStream s = openClass();
     if(s!=null)
       try{ bytecode = ClassFileInput.readClassType(s); }
-      catch(IOException e){ s=null; }
+      catch(IOException e){ s = null; }
 
     if(s!=null)
       return itf;
@@ -683,7 +704,7 @@ public class Package implements mlsub.compilation.Module
   {
     String rname = name.toString().replace('.',File.separatorChar);
     
-    for(int i=0; i<packageRoots.length; i++)
+    for(int i = 0; i<packageRoots.length; i++)
       if(packageRoots[i] instanceof File)
 	{
 	  directory = new File((File) packageRoots[i], rname);
@@ -741,7 +762,7 @@ public class Package implements mlsub.compilation.Module
   
   private void computeImportedPackages()
   {
-    importedPackages=new ArrayList(imports.size());
+    importedPackages = new ArrayList(imports.size());
 
     for(Iterator i = imports.iterator(); i.hasNext();)
       {
@@ -780,10 +801,10 @@ public class Package implements mlsub.compilation.Module
       createJar();
   }
 
-  private gnu.bytecode.Method mainAlternative=null;
+  private gnu.bytecode.Method mainAlternative = null;
   public void setMainAlternative(gnu.bytecode.Method main)
   {
-    mainAlternative=main;
+    mainAlternative = main;
   }
   public gnu.bytecode.Method getMainAlternative()
   {

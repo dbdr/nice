@@ -12,7 +12,7 @@
 
 // File    : NewExp.java
 // Created : Thu Jul 08 17:15:15 1999 by bonniot
-//$Modified: Fri May 26 12:40:08 2000 by Daniel Bonniot $
+//$Modified: Tue Jun 13 15:41:28 2000 by Daniel Bonniot $
 
 package bossa.syntax;
 
@@ -24,26 +24,26 @@ import java.util.*;
  */
 public class NewExp extends CallExp
 {
-  public NewExp(TypeConstructor tc, List arguments)
+  public NewExp(TypeIdent ti, List arguments)
   {
     super(null, arguments);
-    this.tc = tc;
+    this.ti = ti;
   }
 
   void findJavaClasses()
   {
     super.findJavaClasses();
-    tc = tc.resolve(typeScope);
+    tc = ti.resolveToTC(typeScope);
+    ti = null;
   }
   
   void resolve()
   {
     super.resolve();
-    tc = tc.resolve(typeScope);
     
     fun = new ExpressionRef // not necessary
-      (new OverloadedSymbolExp(tc.getConstructors(),
-			       new LocatedString("new "+tc.getName(),
+      (new OverloadedSymbolExp(TypeConstructors.getConstructors(tc),
+			       new LocatedString("new "+tc.toString(),
 // not tc.location() which is the location of the definition of the class
 						 location()), 
 			       null));
@@ -51,8 +51,8 @@ public class NewExp extends CallExp
 
   void typecheck()
   {
-    if(!tc.instantiable())
-      if(tc.constant())
+    if(!TypeConstructors.instantiable(tc))
+      if(TypeConstructors.constant(tc))
 	User.error(this,
 		   tc+" is abstract, it can't be instantiated");
       else
@@ -67,8 +67,10 @@ public class NewExp extends CallExp
 
   public String toString()
   {
-    return "new "+tc+"("+Util.map("", ", ", "", parameters)+")";
+    String cl = (ti == null ? tc.toString() : ti.toString());
+    return "new "+cl+"("+Util.map("", ", ", "", parameters)+")";
   }
 
-  private TypeConstructor tc;
+  private TypeIdent ti;
+  private mlsub.typing.TypeConstructor tc;
 }

@@ -12,11 +12,14 @@
 
 // File    : IfExp.java
 // Created : Mon Dec 06 12:01:51 1999 by bonniot
-//$Modified: Tue Feb 29 22:04:17 2000 by Daniel Bonniot $
+//$Modified: Tue Jun 06 15:00:11 2000 by Daniel Bonniot $
 
 package bossa.syntax;
 
 import bossa.util.*;
+
+import mlsub.typing.*;
+import mlsub.typing.Polytype;
 
 /**
  * Conditional expression (and statement).
@@ -45,10 +48,10 @@ public class IfExp extends Expression
   {
     this.type = Polytype.union(thenExp.getType(),elseExp.getType());
   }
-
+  
   void typecheck()
   {
-    condition.resolveOverloading(new Polytype(ConstantExp.boolType));
+    condition.resolveOverloading(ConstantExp.boolPolytype);
   }
 
   /****************************************************************

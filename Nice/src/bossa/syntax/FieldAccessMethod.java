@@ -12,11 +12,13 @@
 
 // File    : FieldAccessMethod.java
 // Created : Thu Jul 01 18:12:46 1999 by bonniot
-//$Modified: Wed May 24 14:03:39 2000 by Daniel Bonniot $
+//$Modified: Wed Jun 07 13:14:12 2000 by Daniel Bonniot $
 
 package bossa.syntax;
 
 import bossa.util.*;
+
+import mlsub.typing.TypeConstructor;
 
 import gnu.bytecode.*;
 import gnu.expr.*;
@@ -41,7 +43,7 @@ public class FieldAccessMethod extends MethodDefinition
      List classTypeParameters)
   {
     super(fieldName,new Constraint(classTypeParameters,null),
-	  fieldType,makeList(classDef.getType().getMonotype()));
+	  fieldType,makeList(Monotype.create(classDef.lowlevelMonotype())));
     this.definition=classDef;
     this.classTC = classDef.tc;
     this.fieldName = fieldName.toString();

@@ -12,7 +12,7 @@
 
 // File    : IdentExp.java
 // Created : Mon Jul 05 16:25:58 1999 by bonniot
-//$Modified: Tue Mar 14 18:28:55 2000 by Daniel Bonniot $
+//$Modified: Wed Jun 14 15:07:19 2000 by Daniel Bonniot $
 
 package bossa.syntax;
 
@@ -26,31 +26,40 @@ public class IdentExp extends Expression
 {
   public IdentExp(LocatedString i)
   {
-    this.ident=i;
-    loc=i.location();
+    this.ident = i;
+    setLocation(i.location());
   }
   
-  void computeType()
-  {
-    Internal.error("computeType in IdentExp ("+this+")");
-  }
-
   /****************************************************************
    * Scoping
    ****************************************************************/
 
   Expression resolveExp()
   {
-    // Always returns a collection, because of java fields access
-
-    //if(scope.overloaded(ident))
+    if(scope.overloaded(ident))
        {
-	 Collection c=scope.lookup(ident);
+	 List c = scope.lookup(ident);
 	 return new OverloadedSymbolExp(c,ident,scope);
        }
-       //VarSymbol s=scope.lookupOne(ident);
-       //User.error(s==null,ident,"Variable \""+ident+"\" is not declared");
-       //return new SymbolExp(s);
+    VarSymbol s = scope.lookupOne(ident);
+    if (s==null)
+      if(ignoreInexistant)
+	return this;
+      else if(enableClassExp)
+	return ClassExp.create(ident.toString());
+      else
+	User.error(ident, "Variable "+ident+" is not declared");
+    
+    return new SymbolExp(s);
+  }
+
+  /****************************************************************
+   * Unimplemented methods
+   ****************************************************************/
+
+  void computeType()
+  {
+    Internal.error("computeType in IdentExp ("+this+")");
   }
 
   /****************************************************************
@@ -67,12 +76,25 @@ public class IdentExp extends Expression
    * Printing
    ****************************************************************/
 
+  public LocatedString getIdent()
+  {
+    return ident;
+  }
+  
   public String toString()
   {
-    return "\""
-      +ident
-      +"\"";
+    return ident.toString();
   }
 
   protected LocatedString ident;
+  
+  /** True if it should not be an error 
+      if this ident does not exist. 
+      Then it should resolve to itself.
+      Set by CallExp.
+  */
+  boolean ignoreInexistant;
+
+  /** Idem, except it should resolve to a ClassExp or a PackageExp. */
+  boolean enableClassExp;
 }

@@ -12,13 +12,20 @@
 
 // File    : CallExp.java
 // Created : Mon Jul 05 16:27:27 1999 by bonniot
-//$Modified: Fri May 26 12:28:16 2000 by Daniel Bonniot $
+//$Modified: Wed Jun 14 15:17:37 2000 by Daniel Bonniot $
 
 package bossa.syntax;
 
 import java.util.*;
+
 import bossa.util.*;
-import bossa.typing.*;
+import bossa.util.Debug;
+
+import mlsub.typing.*;
+import mlsub.typing.Polytype;
+import mlsub.typing.Monotype;
+import mlsub.typing.Constraint;
+import mlsub.typing.MonotypeLeqCst;
 
 /**
  * A function call.
@@ -26,7 +33,6 @@ import bossa.typing.*;
 public class CallExp extends Expression
 {
   /**
-   *
    * @param fun the function to call
    * @param parameters a collection of Expressions
    */
@@ -37,12 +43,24 @@ public class CallExp extends Expression
     this.parameters = expChildren(parameters);
   }
 
+  /**
+     @param fun the function to call
+     @param parameters a collection of Expressions
+     @param infix true if the first parameter was written before the function,
+     using dot notation: e.f(x)
+   */
+  public CallExp(Expression fun, List parameters, boolean infix)
+  {
+    this(fun, parameters);
+    this.infix = infix;
+  }
+
   public static CallExp create(Expression fun, 
 			       Expression param1)
   {
     List params = new ArrayList(1);
     params.add(param1);
-    return new CallExp(fun,params);
+    return new CallExp(fun, params);
   }
   
   public static CallExp create(Expression fun, 
@@ -54,11 +72,33 @@ public class CallExp extends Expression
     return new CallExp(fun,params);
   }
   
-  static Polytype wellTyped(Expression fun,
-			    List /* of Polytype */ parameters)
+  void resolve()
+  {
+    // in infix applications, the symbol is either a
+    // class method or a field name, so it must be found in
+    // global scope
+    if(infix)
+      {
+	Expression e = fun.content();
+	e.scope = Node.getGlobalScope();
+	if(e instanceof IdentExp)
+	  ((IdentExp) e).ignoreInexistant = true;
+	
+	e = ((ExpressionRef) parameters.get(0)).content();
+	if(e instanceof IdentExp)
+	  ((IdentExp) e).enableClassExp = true;
+      }
+  }
+  
+  /****************************************************************
+   * Type checking
+   ****************************************************************/
+
+  static Polytype wellTyped(Polytype funt,
+			    Polytype[] parameters)
   {
     try{
-      Polytype t = getType(fun.getType(),parameters);
+      Polytype t = getType(funt, parameters);
       return t;
     }
     catch(ReportErrorEx e){}
@@ -72,29 +112,30 @@ public class CallExp extends Expression
 					 Expression fun,
 					 List /* of Expression */ parameters)
   {
-    List paramTypes = Expression.getType(parameters);
+    Polytype[] paramTypes = Expression.getType(parameters);
     
     try{
-      return getType(fun.getType(),paramTypes);
+      return getType(fun.getType(), paramTypes);
     }
     catch(BadSizeEx e){
-      User.error(loc,e.expected+" parameters expected, "+
+      User.error(loc, e.expected+" parameters expected, "+
 		 "not "+e.actual);
     }
     catch(ReportErrorEx e){
-      User.error(loc,e.getMessage());
+      User.error(loc, e.getMessage());
     }
     catch(TypingEx e){
-      if(Typing.dbg) Debug.println(e.getMessage());
+      //if(Typing.dbg) 
+	Debug.println(e.getMessage());
 
       if(fun.isFieldAccess())
 	{
 	  // There must be just one parameter in a field access
-	  User.error(loc,parameters.get(0)+
+	  User.error(loc, parameters.get(0)+
 		     " has no field "+fun);
 	}
       else
-	{  
+	{
 	  String end = "not within the domain of function \""+fun+"\"";
 	  if(parameters.size()>=2)
 	    User.error(loc,"Parameters \n"+
@@ -118,44 +159,66 @@ public class CallExp extends Expression
   }
   
   private static Polytype getType(Polytype funt,
-				  List /* of Polytype */ parameters)
+				  Polytype[] parameters)
     throws TypingEx,BadSizeEx,ReportErrorEx
   {
-    Collection dom = funt.domain();
+    Monotype[] dom = funt.domain();
     Monotype codom = funt.codomain();
 
     if(dom==null || codom==null)
       throw new ReportErrorEx("Not a function");
 
-    Typing.enter("call ?");
+    Constraint cst = funt.getConstraint();
+    boolean doEnter = true; //Constraint.hasBinders(cst);
+    if(doEnter) Typing.enter("call ?");
     
     try
       {
-	try{ funt.getConstraint().assert(); }
+	try{ Constraint.assert(cst); }
 	catch(TypingEx e) { 
 	  throw new ReportErrorEx
 	    ("The conditions for using this function are not fullfiled");
 	}
     
 	if(Typing.dbg)
-	  {
-	    Debug.println("Parameters:\n"+
-			  Util.map("",", ","\n",parameters));
-	  }
-    
-	Typing.in(parameters,
-		  Domain.fromMonotypes(funt.domain()));
+	  Debug.println("Parameters:\n"+
+			Util.map("",", ","\n",parameters));
+	
+	Typing.in(parameters, Domain.fromMonotypes(dom));
       }
     finally{
-      Typing.leave();
+      if(doEnter) 
+	Typing.leave();
+      else 
+	Typing.implies();
     }
     
     //computes the resulting type
-    Constraint cst = funt.getConstraint().and(Polytype.getConstraint(parameters));
-    cst.and(MonotypeLeqCst.constraint(Polytype.getMonotype(parameters),dom));
-    return new Polytype(cst,codom);
+    cst = Constraint.and
+      (Polytype.getConstraint(parameters),
+       cst,
+       MonotypeLeqCst.constraint(Polytype.getMonotype(parameters),dom));
+    
+    return new Polytype(cst, codom);
   }
 
+  public Expression noOverloading()
+  {
+    parameters = Expression.noOverloading(parameters);
+
+    // case where the parameters is a package, or a package prefix
+    if(parameters.size() == 1)
+      {
+	Expression param0 = ((ExpressionRef) parameters.get(0)).content();
+	if(param0 instanceof PackageExp &&
+	   (fun.content() instanceof IdentExp || 
+	    fun.content() instanceof SymbolExp))
+	  return ClassExp.create((PackageExp) param0, fun.toString());
+      }
+    
+    return this;
+  }
+  
   private boolean overloadingResolved;
   
   private void resolveOverloading()
@@ -166,7 +229,15 @@ public class CallExp extends Expression
     overloadingResolved = true;
     
     parameters = Expression.noOverloading(parameters);
+    
+    resolveStaticClassPrefix();
+    
+    fun.resolveOverloading(Expression.getType(parameters), this);
+  }
 
+  /** Handle static functions, prefixed by the class name */
+  private void resolveStaticClassPrefix()
+  {
     if(parameters.size()>=1)
       {
 	gnu.bytecode.ClassType javaClass = 
@@ -174,13 +245,27 @@ public class CallExp extends Expression
 	if(javaClass!=null)
 	  // A static function is called
 	  {
-	    if(!(fun.content() instanceof OverloadedSymbolExp))
-	      Internal.error("Should not happen for the time being");
-	    LocatedString funName = 
-	      ((OverloadedSymbolExp) fun.content()).ident;
+	    Expression funExp = fun.content();
+	    
+	    LocatedString funName;
+	    
+	    if(funExp instanceof OverloadedSymbolExp)
+	      funName = ((OverloadedSymbolExp) funExp).ident;
+	    else if(funExp instanceof IdentExp)
+	      funName = ((IdentExp) funExp).getIdent();
+	    else if(funExp instanceof SymbolExp)
+	      funName = ((SymbolExp) funExp).getName();
+	    else
+	      {
+		Debug.println(this+"");
+		
+		Internal.error("Unknown case " +
+			       funExp.getClass() + " in CallExp");
+		return;
+	      }
 
 	    parameters.remove(0);
-	    Collection possibilities = new LinkedList();
+	    List possibilities = new LinkedList();
 	    javaClass.addMethods();
 	    
 	    // search methods
@@ -194,7 +279,6 @@ public class CallExp extends Expression
 		  if(md!=null)
 		    possibilities.add(md.symbol);
 		}
-	    
 
 	    // search a field
 	    if(parameters.size()==0)
@@ -209,15 +293,13 @@ public class CallExp extends Expression
 				       fun.content().getScope()));
 	  }
       }
-    
-    fun.resolveOverloading(Expression.getType(parameters), this);
   }
   
   void computeType()
   {
     resolveOverloading();
     if(type==null)
-      type = getTypeAndReportErrors(location(),fun,parameters);
+      type = getTypeAndReportErrors(location(), fun, parameters);
   }
 
   boolean isAssignable()
@@ -240,7 +322,7 @@ public class CallExp extends Expression
    * Code generation
    ****************************************************************/
 
-  public gnu.expr.Expression compile()
+  protected gnu.expr.Expression compile()
   {
     // wraps the arguments that reference methods into LambdaExps
     gnu.expr.Expression[] params = Expression.compile(parameters);
@@ -277,4 +359,7 @@ public class CallExp extends Expression
 
   protected ExpressionRef fun;
   protected List /* of ExpressionRef */ parameters;
+  
+  /** true iff the first argument was written before the application: e.f(x) */
+  boolean infix;
 }

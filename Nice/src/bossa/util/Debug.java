@@ -12,7 +12,7 @@
 
 // File    : Debug.java
 // Created : Thu Jul 22 15:37:02 1999 by bonniot
-//$Modified: Wed May 10 14:33:50 2000 by Daniel Bonniot $
+//$Modified: Sat Jun 03 15:03:37 2000 by Daniel Bonniot $
 
 package bossa.util;
 
@@ -90,7 +90,14 @@ public abstract class Debug
     alwaysDumpStack     = getBoolean("debug.alwaysDumpStack", false),
     ignorePrelude	= getBoolean("debug.ignorePrelude", false);
   
-
+  static
+  {
+    mlsub.typing.lowlevel.K0.debugK0 = Debug.K0;
+    mlsub.typing.lowlevel.Engine.dbg = Debug.engine;
+    mlsub.typing.Typing.dbg = Debug.typing;
+    mlsub.typing.Typing.linkDbg = Debug.linkTests;
+  }
+  
   public static final String
     defaultFile = props.getProperty("debug.defaultFile", null);
 }

@@ -12,24 +12,31 @@
 
 // File    : ReturnStmt.java
 // Created : Mon Jul 05 17:21:40 1999 by bonniot
-//$Modified: Tue Feb 29 19:22:39 2000 by Daniel Bonniot $
+//$Modified: Tue Jun 13 16:20:32 2000 by Daniel Bonniot $
 // Description : return in a function or method
 
 package bossa.syntax;
 
 import bossa.util.*;
-import bossa.typing.*;
+
+import mlsub.typing.*;
+import mlsub.typing.Polytype;
+import mlsub.typing.Monotype;
+import mlsub.typing.Constraint;
 
 public class ReturnStmt extends Statement
 {
   public ReturnStmt(Expression value)
   {
-    this.value=expChild(value);
+    this.value = expChild(value);
   }
 
   Polytype returnType()
   {
-    return value.getType();
+    if(value==null)
+      return ConstantExp.voidPolytype;
+    else
+      return value.getType();
   }
   
   void typecheck()
@@ -41,12 +48,12 @@ public class ReturnStmt extends Statement
       return;
     
     try{
-      Typing.leq(returnType(),new Polytype(declaredRetType));
+      Typing.leq(returnType(),new Polytype(Constraint.True, declaredRetType));
     }
     catch(TypingEx e){
       User.error(this,
 		 "Return type "+returnType()+" is not correct",
-		 " :"+e);
+		 ": "+e);
     }
   }
   
@@ -56,8 +63,11 @@ public class ReturnStmt extends Statement
 
   public gnu.expr.Expression generateCode()
   {
-    return new gnu.expr.ExitExp(value.generateCode(),
-				includingFunction.getBlock());
+    if(value==null)
+      return new gnu.expr.ExitExp(includingFunction.getBlock());
+    else
+      return new gnu.expr.ExitExp(value.generateCode(),
+				  includingFunction.getBlock());
   }
   
   /****************************************************************
@@ -66,7 +76,7 @@ public class ReturnStmt extends Statement
   
   public String toString()
   {
-    return "return "+value;
+    return "return" + (value!=null ? " " + value : "");
   }
   
   protected Expression value;

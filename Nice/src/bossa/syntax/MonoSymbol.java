@@ -12,12 +12,13 @@
 
 // File    : MonoSymbol.java
 // Created : Fri Jul 16 17:10:53 1999 by bonniot
-//$Modified: Thu May 11 12:03:42 2000 by Daniel Bonniot $
+//$Modified: Fri Jun 09 15:06:11 2000 by Daniel Bonniot $
 
 package bossa.syntax;
 
 import java.util.*;
 import bossa.util.*;
+import mlsub.typing.Polytype;
 
 /** A variable symbol which has a monotype (eg a function parameter)
  *
@@ -30,24 +31,35 @@ public class MonoSymbol extends VarSymbol
     this(name,type,null);
   }
   
+  public MonoSymbol(LocatedString name, mlsub.typing.Monotype type)
+  {
+    super(name);
+    this.type = type;
+  }
+  
   public MonoSymbol(LocatedString name, Monotype type, ClassDefinition memberOf)
   {
     super(name);
-    this.type=type;
-    this.memberOf=memberOf;
+    this.syntacticType=type;
+    this.memberOf = memberOf;
   }
 
   public Polytype getType()
   {
     if(memberOf!=null)
-      return new Polytype(memberOf.getConstraint(),type);
+      return null; //new Polytype(memberOf.getConstraint(),type);
     else
-      return new Polytype(Constraint.True,type);
+      return new Polytype(mlsub.typing.Constraint.True, type);
   }
 
-  public Monotype getMonotype()
+  public mlsub.typing.Monotype getMonotype()
   {
     return type;
+  }
+
+  public bossa.syntax.Monotype getSyntacticMonotype()
+  {
+    return syntacticType;
   }
 
   /**
@@ -56,11 +68,28 @@ public class MonoSymbol extends VarSymbol
    * @param varsymbols the collection of MonoSymbols
    * @return the list of their Monotypes
    */
-  static List getMonotype(Collection c)
+  static mlsub.typing.Monotype[] getMonotype(Collection c)
+  {
+    mlsub.typing.Monotype[] res =
+      new mlsub.typing.Monotype[c.size()];
+
+    int n = 0;
+    for(Iterator i=c.iterator();i.hasNext();)
+      res[n++] = ((MonoSymbol)i.next()).getMonotype();
+    return res;
+  }
+
+  /**
+   * Maps getSyntacticMonotype over a collection of MonoSymbols
+   *
+   * @param varsymbols the collection of MonoSymbols
+   * @return the list of their Monotypes
+   */
+  static List getSyntacticMonotype(Collection c)
   {
     List res=new ArrayList(c.size());
     for(Iterator i=c.iterator();i.hasNext();)
-      res.add(((MonoSymbol)i.next()).getMonotype());
+      res.add(((MonoSymbol)i.next()).syntacticType);
     return res;
   }
 
@@ -70,16 +99,23 @@ public class MonoSymbol extends VarSymbol
 
   void resolve()
   {
-    type=type.resolve(typeScope);
+    type = syntacticType.resolve(typeScope);
+    syntacticType = null;
   }
 
   /****************************************************************
-   * Typechecking
+   * Cloning types
    ****************************************************************/
 
-  void typecheck()
+  // explained in OverloadedSymbolExp
+
+  final void makeClonedType() {}
+  
+  final void releaseClonedType() {}
+
+  final Polytype getClonedType() 
   {
-    type.typecheck();
+    return getType();
   }
   
   /****************************************************************
@@ -91,7 +127,8 @@ public class MonoSymbol extends VarSymbol
     return type+" "+name;
   }
 
-  Monotype type;
+  Monotype syntacticType;
+  mlsub.typing.Monotype type;
   //When this is a field. Maybe unusefull
   ClassDefinition memberOf;
 }

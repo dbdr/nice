@@ -12,15 +12,17 @@
 
 // File    : BossaClass.java
 // Created : Thu Jul 01 11:25:14 1999 by bonniot
-//$Modified: Fri May 26 18:01:42 2000 by Daniel Bonniot $
+//$Modified: Tue Jun 13 15:44:19 2000 by Daniel Bonniot $
 
 package bossa.syntax;
 
 import bossa.util.*;
-import bossa.typing.*;
+import mlsub.typing.*;
 
 import gnu.bytecode.*;
 import java.util.*;
+
+import bossa.util.Debug;
 
 /**
  * Abstract syntax for a class definition.
@@ -54,13 +56,11 @@ public class BossaClass extends ClassDefinition
     this.simpleName = name;
     this.isSharp = isSharp;
     
-    addTypeSymbol(this.tc);
-    
     // if this class is final, 
     // no #class is created below.
     // the associated #class is itself
     if(this.isFinal && !isSharp)
-      addTypeMap("#"+name.content,this.tc);
+      addTypeMap("#"+name.content, this.tc);
   }
 
   public void setFieldsAndMethods(List fields, List methods)
@@ -78,6 +78,9 @@ public class BossaClass extends ClassDefinition
 	// since no associated concrete class is created,
 	// it needs its own classtype
 	classType = module.createClass(simpleName.toString());
+
+    if(classType!=null)
+      bossa.CodeGen.set(tc, classType);
   }
   
   /**
@@ -91,14 +94,17 @@ public class BossaClass extends ClassDefinition
 
     LocatedString name = this.simpleName.cloneLS();
     name.prepend("#");
-    List parent = new ArrayList(1);
-    parent.add(this.tc);
+
     BossaClass c = new BossaClass
-      (name,true,false,false,true,typeParameters,parent,
-       new LinkedList(),new LinkedList());
+      (name,true,false,false,true,typeParameters,
+       null, null, null);
+    c.superClass = new TypeConstructor[]{ this.tc };
+    
     c.setFieldsAndMethods(fields, null);
     associatedConcreteClass = c;
     concreteClasses.add(c);
+    
+    bossa.CodeGen.set(this.tc, c.classType);
     
     Collection res = new ArrayList(1);
     res.add(c);
@@ -166,7 +172,7 @@ public class BossaClass extends ClassDefinition
 
 	MonoSymbol s = f.sym;
 	MethodDefinition m = 
-	  new FieldAccessMethod(this,s.name,s.type,typeParameters);
+	  new FieldAccessMethod(this, s.name, s.syntacticType, typeParameters);
 
 	addChild(m);
       }
@@ -181,14 +187,19 @@ public class BossaClass extends ClassDefinition
       return;
     
     TypeScope localScope = new TypeScope(typeScope);
-    localScope.addSymbols(typeParameters);
+    try{
+      localScope.addSymbols(typeParameters);
+    }
+    catch(TypeScope.DuplicateName e){
+      User.error(this, e);
+    }
     
     for(Iterator i=fields.iterator();
 	i.hasNext();)
       {
 	Field f=(Field)i.next();
 	
-	f.sym.type = f.sym.type.resolve(localScope);
+	f.sym.type = f.sym.syntacticType.resolve(localScope);
       }
   }
   
@@ -249,7 +260,7 @@ public class BossaClass extends ClassDefinition
   ClassDefinition abstractClass()
   {
     if(isSharp)
-      return ((TypeConstructor) extensions.get(0)).getDefinition();
+      return ClassDefinition.get(superClass[0]);
     else
       return this;
   }
@@ -321,7 +332,7 @@ public class BossaClass extends ClassDefinition
     
     ClassDefinition me = abstractClass();
 
-    ClassType[] itfs;
+    ClassType[] itfs = null;
     if(!isInterface)
       {
 	classType.setSuper(javaSuperClass());
@@ -331,39 +342,37 @@ public class BossaClass extends ClassDefinition
 	classType.setSuper(gnu.bytecode.Type.pointer_type);
       }
     
+  createItfs:
     if(!isInterface)
       {
-	List imp = new ArrayList(me.implementations.size());
-	for(Iterator i = me.implementations.iterator(); i.hasNext();)
+	if(me.impl==null) break createItfs;
+	
+	ArrayList imp = new ArrayList(me.impl.length);
+	for(int i=0; i<me.impl.length; i++)
 	  {
-	    InterfaceDefinition itf = ((Interface) i.next()).definition;
-	    if(!(itf instanceof AssociatedInterface))
-	      {
-		//Debug.println(itf+" ---- "+this);
-		continue;
-	      }
+	    TypeConstructor assocTC = me.impl[i].associatedTC();
 	    
-	    imp.add(((AssociatedInterface) itf).getAssociatedClass().getJavaType());
+	    if(assocTC==null)
+	      continue;
+	    
+	    imp.add(bossa.CodeGen.javaType(assocTC));
 	  }
-	itfs = new ClassType[imp.size()];
-	int n=0;
-	for(Iterator i = imp.iterator(); i.hasNext();)
-	  itfs[n++] = (ClassType) i.next();
+	itfs = (ClassType[]) imp.toArray(new ClassType[imp.size()]);
       }
-    else
+    else 
       {
-	itfs = new ClassType[extensions.size()];
-	int n=0;
-	for(Iterator i = extensions.iterator(); i.hasNext();)
+	if(superClass==null) break createItfs;
+	
+	itfs = new ClassType[superClass.length];
+	for(int i=0; i<superClass.length; i++)
 	  {
-	    ClassDefinition c = ((TypeConstructor)i.next()).getDefinition();
-	    AssociatedInterface itf = c.getAssociatedInterface();
+	    Interface itf = get(superClass[i]).getAssociatedInterface();
 	    if(itf==null)
 	      {
 		Internal.warning("Should not happen. size of itfs gona be wrong");
 		continue;
 	      }
-	    itfs[n++] = (ClassType) itf.getAssociatedClass().getJavaType();
+	    itfs[i] = (ClassType) bossa.CodeGen.javaType(itf.associatedTC());
 	  }
       }
     
@@ -394,18 +403,28 @@ public class BossaClass extends ClassDefinition
     code.emitLoad(thisVar);    
     code.emitInvokeSpecial(constructor(javaSuperClass()));
     code.emitReturn();
-
-    TypeParameters tp = new TypeParameters(tc.name,tc.variance);
+    /*
+    TypeParameters tp = new TypeParameters(name, tc.variance);
 
     MethodDefinition md = new MethodDefinition
       (null, new LocatedString("<init>", location()),
        new Constraint(tp.content, null),
-       new MonotypeConstructor(tc,tp,tc.location()),
+       new MonotypeConstructor(new TypeIdent(name),tp,location()),
        new LinkedList());
+    */
+
+    mlsub.typing.MonotypeVar[] params = createSameTypeParameters();
+    MethodDefinition md = new MethodDefinition
+      (null, new LocatedString("<init>", location()),
+       null, null, null);
+    md.setLowlevelTypes
+      (mlsub.typing.Constraint.create(params, null),
+       null, 
+       new mlsub.typing.MonotypeConstructor(this.tc, params));
 
     md.setDispatchMethod(new gnu.expr.PrimProcedure
       (classType, gnu.bytecode.Type.typeArray0));
-    abstractClass().tc.addConstructor(md);
+    TypeConstructors.addConstructor(abstractClass().tc, md);
   }
 
   private static gnu.bytecode.Method constructor(ClassType ct)
@@ -427,7 +446,7 @@ public class BossaClass extends ClassDefinition
 	
 	gnu.bytecode.Field field=
 	  c.addField(f.sym.name.toString(),
-		     f.sym.type.getJavaType(),
+		     bossa.CodeGen.javaType(f.sym.type),
 		     Access.PUBLIC);
       }
   }

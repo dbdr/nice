@@ -12,13 +12,13 @@
 
 // File    : AssignExp.java
 // Created : Mon Jul 05 15:49:27 1999 by bonniot
-//$Modified: Fri May 12 18:11:36 2000 by Daniel Bonniot $
+//$Modified: Tue Jun 06 09:44:01 2000 by Daniel Bonniot $
 
 package bossa.syntax;
 
 import bossa.util.*;
-import bossa.parser.ParseException;
-import bossa.typing.*;
+import mlsub.typing.*;
+import mlsub.typing.Polytype;
 
 /**
  * Assignment.
@@ -40,7 +40,7 @@ public class AssignExp extends Expression
     throws TypingEx
   {
     right.resolveOverloading(left);
-    Typing.leq(right.getType(),left);
+    Typing.leq(right.getType(), left);
   }
   
   void typecheck()

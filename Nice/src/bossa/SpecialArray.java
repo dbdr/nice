@@ -12,12 +12,20 @@ import _Array;
  * Based on kawa.lang.SpecialType
  */
 
-public class SpecialArray extends gnu.bytecode.ArrayType
+public final class SpecialArray extends gnu.bytecode.ArrayType
 {
   public SpecialArray (Type elements)
   {
     super (elements);
     setSignature("L_Array;");
+
+    try{
+      Type.registerTypeForClass(Class.forName("_Array"), this);
+    }
+    catch(ClassNotFoundException e){
+      bossa.util.Internal.warning("Nice class for arrays not found");
+    }
+    Type.registerTypeForName("_Array", this);
   }
   
   public String getNameOrSignature()
@@ -41,7 +49,7 @@ public class SpecialArray extends gnu.bytecode.ArrayType
       {
 	Type[] args = new Type[1];
 	args[0] = ArrayType.make(Type.pointer_type);
-	_ArrayMakeMethod = _ArrayType.getDeclaredMethod("make", args, _ArrayType);
+	_ArrayMakeMethod = _ArrayType.getDeclaredMethod("make", args, this);
       }
     
     code.emitInvokeStatic(_ArrayMakeMethod);
@@ -60,11 +68,7 @@ public class SpecialArray extends gnu.bytecode.ArrayType
 
   public boolean isSubtype (Type other)
   {
-    boolean res = other instanceof SpecialArray || _ArrayType.isSubtype(other);
-    //if(!res)
-    //bossa.util.Debug.println("SpecialArray is not subtype of "+other);
-    
-    return res;
+    return other instanceof SpecialArray || _ArrayType.isSubtype(other);
   }
   
   /****************************************************************

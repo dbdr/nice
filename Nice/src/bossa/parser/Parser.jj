@@ -1004,12 +1004,11 @@ void classDefinitionLookahead():
   ( "interface" | [ "final" | "abstract" ] "class") 
 }
 
-ClassDefinition classDefinition():
+ClassDefinition classDefinition(List definitions):
 {
   ClassDefinition res;
   LocatedString name;
   MethodContainer.Constraint parameters;
-  List fields=new ArrayList(),methods=null;
   List l;
   List typeParametersVariances = new ArrayList(0);
   boolean isFinal=false, isAbstract=false, isInterface=false;
@@ -1049,6 +1048,7 @@ ClassDefinition classDefinition():
    "{"
    { NiceClass impl = new NiceClass(res); }
    // internal fields and methods
+   { List fields = new ArrayList(), methods = null; }
    (
       LOOKAHEAD( getField(null, null) )
       getField(impl, fields)
@@ -1072,8 +1072,10 @@ ClassDefinition classDefinition():
    )* 
    "}"
    {
-     impl.setFieldsAndMethods(fields, methods);
+     impl.setFields(fields);
      res.setImplementation(impl);
+     if (methods != null)
+       definitions.addAll(methods);
    }
   | 
    "=" "native"
@@ -1481,7 +1483,7 @@ Contract contract() :
   { return res; }
 }
 
-Definition definition():
+Definition definition(List definitions):
 {
     Definition res;
 }
@@ -1496,7 +1498,7 @@ Definition definition():
     res=abstractInterfaceImplementation()
   | 
     LOOKAHEAD ( classDefinitionLookahead() )
-    res=classDefinition()
+    res=classDefinition(definitions)
   | 
     LOOKAHEAD( methodBodyDefinitionLookahead() )
     res=methodBodyDefinition(null)
@@ -1513,7 +1515,7 @@ void readDefinitions(List definitions):
 }
 {
   ( 
-   d = definition() { definitions.add(d); } 
+   d = definition(definitions) { definitions.add(d); } 
   )*
   <EOF> 
 }

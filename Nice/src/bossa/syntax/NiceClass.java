@@ -45,7 +45,7 @@ public class NiceClass extends ClassDefinition.ClassImplementation
 
   public String getName() { return definition.getName().toString(); }
 
-  public void setFieldsAndMethods(List fields, List methods) 
+  public void setFields(List fields) 
   {
     if (fields == null || fields.size() == 0)
       this.fields = noFields;
@@ -64,9 +64,6 @@ public class NiceClass extends ClassDefinition.ClassImplementation
 	    definition.addChild(f);
 	  }
       }
-    
-    if(methods != null)
-      this.methods = definition.addChildren(methods);
   }
 
   ClassDefinition definition;
@@ -193,17 +190,6 @@ public class NiceClass extends ClassDefinition.ClassImplementation
       fields[i].createField();
   }
 
-  void resolveBody()
-  {
-    if (methods != null)
-      for (Iterator i = methods.iterator(); i.hasNext();)
-	{
-	  Object child = i.next();
-	  if (child instanceof ToplevelFunction)
-	    ((ToplevelFunction) child).resolveBody();
-	}
-  }
-
   /****************************************************************
    * Type checking
    ****************************************************************/
@@ -257,7 +243,6 @@ public class NiceClass extends ClassDefinition.ClassImplementation
        + Util.map("",";\n",";\n",fields)
        + "}\n\n"
        );
-    Definition.printInterface(methods, s);
   }
   
   /****************************************************************
@@ -441,14 +426,6 @@ public class NiceClass extends ClassDefinition.ClassImplementation
 
   public void compile()
   {
-    if (methods != null)
-      for (Iterator i = methods.iterator(); i.hasNext();)
-	{
-	  Object child = i.next();
-	  if (child instanceof ToplevelFunction)
-	    ((ToplevelFunction) child).compile();
-	}
-
     recompile();
   }
 
@@ -561,5 +538,4 @@ public class NiceClass extends ClassDefinition.ClassImplementation
   public String toString() { return definition.toString(); }
 
   private Field[] fields;
-  private List methods;
 }

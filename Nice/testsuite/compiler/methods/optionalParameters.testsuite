@@ -122,6 +122,16 @@ adjust(this, aint) = this;
 }
 
 /// PASS
+  /// Toplevel
+class A {
+  int aint;
+  alike f() {
+    return this.adjust();
+  }
+  alike adjust(int aint = this.aint)  = this;
+}
+
+/// PASS
   assert new A(x: 13).getValue() == 13;
 
   /// Toplevel

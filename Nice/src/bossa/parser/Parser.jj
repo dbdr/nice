@@ -2531,21 +2531,35 @@ Statement DoStatement() :
 }
 
 Statement ForStatement() :
-{ Statement init=null,update=null,body,loop; Expression cond=null; }
+{ Statement init=null,update=null,body,loop,block; Expression cond=null; }
 {
-  "for" "(" ( init=ForInit() | ";" )
+  "for" "(" 
+  (  
+    LOOKAHEAD( monotype() <IDENT> ":" ) block=ForInStatement()
+  |
+    ( init=ForInit() | ";" )
     [ cond=Expression() ] ";" [ update=StatementExpressionList() ] ")" 
     body=Statement()
-  { 
-    loop=LoopStmt.forLoop(cond,update,body);
-    if(init==null)
-      return loop;
+    { 
+      loop=LoopStmt.forLoop(cond,update,body);
+      if(init==null)
+        return loop;
+  
+      List l = new LinkedList();
+      l.add(init);
+      l.add(loop);
+      block = new Block(l);
+    }
+  )
+  { return block; }
+}
 
-    List l = new LinkedList();
-    l.add(init);
-    l.add(loop);
-    return new Block(l);
-  }
+Statement ForInStatement() :                                                
+{ Statement body; Monotype vartype; LocatedString var; Expression container; Token t; }
+{
+  vartype=monotype() var=ident() t=":" container=Expression() ")"
+  body=Statement()
+  {return LoopStmt.forInLoop(vartype,var,new Location(t),container,body); }
 }
 
 Statement ForInit() :

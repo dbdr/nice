@@ -41,6 +41,36 @@ public class LoopStmt extends Statement
     return new LoopStmt(test, body, null, false);
   }
 
+  public static Statement forInLoop(Monotype vartype, LocatedString var, Location loc, Expression container, Statement body)
+  {
+    Monotype itertype;
+    LocatedString iter;
+    Expression getiter,iterexp,cond,getvar;
+    Statement loop,init,assign;
+
+    List tparams = new ArrayList(1);
+    tparams.add(vartype);	
+    itertype = new MonotypeConstructor(new TypeIdent(new LocatedString("ForInIterator", loc)),
+			new TypeParameters(tparams), loc);
+    itertype.nullness = Monotype.sure;
+    getiter = CallExp.create(new IdentExp(new LocatedString("forInIterator", loc)), container); 
+    iter = new LocatedString("for_in_iter", loc);
+    init = new Block.LocalVariable(iter, itertype, true, getiter);
+    iterexp = new IdentExp(iter);
+    cond = CallExp.create(new IdentExp(new LocatedString("next", loc)), iterexp);
+    getvar = CallExp.create(new IdentExp(new LocatedString("current", loc)), iterexp);
+    assign = new Block.LocalVariable(var, vartype, false, getvar);
+    List loopbody = new LinkedList();
+    loopbody.add(assign);
+    loopbody.add(body);
+    loop = LoopStmt.whileLoop(cond, new Block(loopbody));
+    List l = new LinkedList();
+    l.add(init);
+    l.add(loop);
+    return new Block(l);
+  
+  }
+
   /**
    * Create a loop statement.
    *

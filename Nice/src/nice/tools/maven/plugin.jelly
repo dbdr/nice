@@ -1,0 +1,247 @@
+<?xml version="1.0"?>
+
+<project 
+  xmlns:j="jelly:core"
+  xmlns:ant="jelly:ant"
+  xmlns:define="jelly:define"
+  xmlns:maven="jelly:maven"
+  xmlns:util="jelly:util"
+  xmlns:nice="http://nice.sf.net"
+  xmlns:doc="doc"
+>
+
+  <goal name="nice"
+    description="Build a Nice project"
+    prereqs="nice:compile">
+
+    <!-- Give a warning if sources were not found, to let the user know
+         what's (not) happening. 
+    -->
+    <nice:ifNotNeeded>
+      <ant:echo>No Nice source files found in ${mainPkgDir}</ant:echo>
+    </nice:ifNotNeeded>
+  </goal>
+
+  <!-- ================================================================== -->
+  <!-- P R E P A R E  F I L E  S Y S T E M                                -->
+  <!-- ================================================================== -->
+
+  <goal name="nice:prepare-filesystem">
+    <ant:mkdir dir="${maven.build.dest}"/>
+  </goal>
+
+  <!-- ================================================================== -->
+  <!-- C O M P I L E                                                      -->
+  <!-- ================================================================== -->
+
+  <goal name="nice:compile"
+        description="Compile the project"
+        prereqs="nice:prepare-filesystem">
+
+    <nice:ifNotNeeded>
+      <ant:echo level="debug">No Nice source files found in ${mainPkgDir}
+      </ant:echo>
+    </nice:ifNotNeeded>
+
+    <nice:ifNeeded>
+
+      <ant:echo level="verbose">Compiling to ${maven.build.dest}</ant:echo>
+
+      <ant:taskdef name="nicec" classname="nice.tools.ant.Nicec">
+        <ant:classpath>
+	  <ant:pathelement path="${plugin.getDependencyPath('nice:tools')}"/>
+        </ant:classpath>
+      </ant:taskdef>
+
+      <ant:nicec
+        package="${pom.package}"
+        sourcepath="${pom.build.sourceDirectory}"
+        destination="${maven.build.dest}"
+        jar="${maven.build.dir}/${maven.final.name}.jar"
+      >
+
+      <ant:sourcepath>
+        <ant:path refid="maven.compile.src.set"/>
+      </ant:sourcepath>
+      
+      <ant:classpath>
+        <ant:path refid="maven.dependency.classpath"/>
+        <ant:pathelement path="${maven.build.dest}"/>
+      </ant:classpath>
+      <j:if test="${context.getVariable('maven.compile.compilerargs') != null}">
+        <ant:compilerarg line="${maven.compile.compilerargs}" />
+      </j:if>
+      
+      <j:if test="${context.getVariable('maven.compile.encoding') != null}">
+        <ant:setProperty name="encoding" value="${maven.compile.encoding}" />
+      </j:if>
+      
+      <j:if test="${context.getVariable('maven.compile.executable') != null}">
+        <ant:setProperty name="executable" value="${maven.compile.executable}" />
+      </j:if>
+      
+      <j:if test="${context.getVariable('maven.compile.fork') != null}">
+        <ant:setProperty name="fork" value="${maven.compile.fork}" />
+      </j:if>
+      
+      <j:if test="${context.getVariable('maven.compile.source') != null}">
+        <ant:setProperty name="source" value="${maven.compile.source}" />
+      </j:if>
+      
+      <j:if test="${context.getVariable('maven.compile.verbose') != null}">
+        <ant:setProperty name="verbose" value="${maven.compile.verbose}" />
+      </j:if>
+
+      </ant:nicec>
+
+    </nice:ifNeeded>
+
+  </goal>
+
+  <!-- ================================================================== -->
+  <!-- N I C E D O C                                                      -->
+  <!-- ================================================================== -->
+
+  <goal name="nice:doc">
+
+      <ant:taskdef name="nicedoc" classname="nice.tools.ant.NiceDoc">
+        <ant:classpath>
+	  <ant:pathelement path="${plugin.getDependencyPath('nice:tools')}"/>
+        </ant:classpath>
+      </ant:taskdef>
+
+    <ant:nicedoc
+      sourcepath="${pom.build.sourceDirectory}"
+      destination="${maven.docs.dest}/apidocs"
+      package="${pom.package}"
+    />
+
+  </goal>
+
+  <!-- Registration -->
+
+  <goal name="maven-nice-plugin:register">
+
+    <nice:ifNeeded>
+      <doc:registerReport 
+        name="NiceDocs" 
+        pluginName="maven-nice-plugin"
+        link="apidocs/index"
+        description="NiceDoc API documentation."/>
+    </nice:ifNeeded>
+  </goal>
+
+  <goal name="maven-nice-plugin:deregister">
+    <doc:deregisterReport name="NiceDocs"/>
+    <doc:deregisterReport name="NiceDoc Report"/>
+  </goal>
+
+  <goal name="maven-nice-plugin:report" prereqs="nice:doc" />
+
+  <!-- Force nicedoc to be registered -->
+  <postGoal name="xdoc:register-reports">
+    <attainGoal name="maven-nice-plugin:register" />
+  </postGoal>
+
+  <!-- ================================================================== -->
+  <!-- J A R  R E S O U R C E S                                           -->
+  <!-- ================================================================== -->
+
+  <goal name="nice:jar-resources"
+        description="Copy any resources that must be present in the deployed JAR file">
+        
+    <j:if test="${!pom.build.resources.isEmpty()}">
+      <maven:copy-resources
+        resources="${pom.build.resources}"
+        todir="${maven.build.dest}"/>
+    </j:if>
+  </goal>
+  
+  <define:taglib uri="nice">
+    <define:tag name="dependency-handle">
+      <!-- XXX Use this tag to allow this plugin to be loaded into another -->
+    </define:tag>
+  </define:taglib>
+
+  <!-- ================================================================== -->
+  <!-- I N T E G R A T I O N  W I T H  O T H E R  P L U G I N S           -->
+  <!-- ================================================================== -->
+
+  <preGoal name="jar:jar">
+
+    <nice:ifNeeded>
+
+      <attainGoal name="nice:compile"/>
+
+      <!-- We store the generated jar for later use. -->
+      <ant:move file="${maven.build.dir}/${maven.final.name}.jar"
+        tofile="${maven.build.dir}/${maven.final.name}.jar.tmp" />
+
+      <!-- Make the jar plugin write the correct Main-Class.
+	   This should not be needed, but filesetmanifest is only working
+	   in ant 1.6 and later. -->
+      ${pom.getPluginContext('maven-java-plugin').setVariable('maven.jar.mainclass', pom.package.concat(".fun"))}
+
+    </nice:ifNeeded>
+
+  </preGoal>
+
+  <postGoal name="jar:jar">
+
+    <nice:ifNeeded>
+      <!-- Update the jar with the files nicec generated. -->
+      <ant:jar jarfile="${maven.build.dir}/${maven.final.name}.jar"
+        update="true" filesetmanifest="merge">
+        <zipfileset src="${maven.build.dir}/${maven.final.name}.jar.tmp" />
+      </ant:jar>
+    </nice:ifNeeded>
+
+  </postGoal>
+
+  <preGoal name="maven-jdepend-plugin:report">
+    <attainGoal name="nice:compile" />
+  </preGoal>
+
+
+  <!-- ================================================================== -->
+  <!-- T E S T I N G  I F  N I C E  I S  N E E D E D                      -->
+  <!-- ================================================================== -->
+
+  <!-- This is executed at startup, and will set the variable 'needed' to
+       true if there are Nice sources present.
+  -->
+
+  <j:set var="mainPkgDir" 
+    value="${pom.build.sourceDirectory}/${pom.package.replaceAll('\.', '/')}"/>
+
+  <util:available file="${mainPkgDir}">
+    <ant:fileset id="niceSourceSet" dir="${mainPkgDir}">
+      <ant:include name="*.nice"/>
+    </ant:fileset>
+
+    <ant:fileScanner var="sources">
+      <ant:fileset refid="niceSourceSet" />
+    </ant:fileScanner>
+
+    <j:if test="${sources.iterator().hasNext()}">
+      <j:set var="needed" value="true" />
+    </j:if>
+  </util:available>
+
+  <define:taglib uri="http://nice.sf.net">
+
+    <define:tag name="ifNeeded">
+      <j:if test="${needed}">
+        <define:invokeBody/>
+      </j:if>
+    </define:tag>
+
+    <define:tag name="ifNotNeeded">
+      <j:if test="${!needed}">
+        <define:invokeBody/>
+      </j:if>
+    </define:tag>
+
+  </define:taglib>
+
+</project>

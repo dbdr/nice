@@ -72,17 +72,12 @@ public class LiteralArrayProc extends gnu.mapping.ProcedureN
 
     for (int i = 0; i < nbElements; i++)
       {
-	if (i < nbElements - 2)
-	  {
+        // Duplicate the reference to the array, according to our future needs.
+	if (i % 2 == 0)
+          if (i < nbElements - 2)
 	    code.emitDup(2);
-
-	    code.emitPushInt(i);
-	    args[i].compile(comp, arrayType.elements);
-	    code.emitArrayStore(arrayType.elements);
-	    i++;
-	  }
-	else if (i == nbElements - 2)
-	  code.emitDup();
+          else if (i == nbElements - 2)
+            code.emitDup();
 
 	code.emitPushInt(i);
 	args[i].compile(comp, arrayType.elements);

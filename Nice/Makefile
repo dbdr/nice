@@ -16,7 +16,7 @@ JAVAC_FLAGS = -O -g
 
 JAVAC= ${javac} -classpath "${TOP}/classes" -sourcepath "${TOP}/src" -d "${TOP}/classes" $(JAVAC_FLAGS)
 JAVACC= CLASSPATH="${TOP}/external/JavaCC.zip:${CLASSPATH}" java COM.sun.labs.javacc.Main
-JAVADOC=javadoc #-linkoffline file:///C%7C/Apps/jdk1.2.1/docs/api file:///usr/opt/java122/docs/api
+JAVADOC=javadoc
 
 NICEC_ARGS= -d "${TOP}/classes" --exclude-runtime --classpath="${TOP}/classes"
 NICEC=nicec ${NICEC_ARGS} --sourcepath="${TOP}/stdlib:${TOP}/src" 
@@ -32,7 +32,7 @@ CVSBUILDDIR = /tmp/cvs-build
 
 all: complete
 
-stable:   clean bootstrap compiler1 archive
+stable:   clean bootstrap ant compiler1 archive
 complete: stable   compiler2 archive2
 fixpoint: complete compiler3 archive3
 
@@ -159,6 +159,10 @@ bootstrap: parser
 	cd src;\
 	${JAVAC} bossa/modules/Package.java nice/tools/runJar.java ../stdlib/nice/lang/rawArray.java gnu/bytecode/dump.java
 
+ant:
+	@echo "Building the Ant task definition..."
+	@${javac} -classpath "/usr/share/java/ant.jar:./external/ant.jar:./classes" src/nice/tools/ant/Nicec.java ||\
+	echo "Compilation of the Ant task definition failed.\nAnt should be in the classpath, or linked to by ./external/ant.jar"
 
 #****************************************************************
 #    Recompilations

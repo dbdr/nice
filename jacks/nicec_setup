@@ -18,8 +18,8 @@ set JAVA_FLAGS ""
 #set JAVAC_ENCODING_FLAG "-encoding "
 #set tcltest::testConstraints(encoding) 1
 
-# Activate javac only test cases
-#set tcltest::testConstraints(javac) 1
+# Activate nicec only test cases
+set tcltest::testConstraints(nicec) 1
 
 # Uncomment this to test the assert statement
 #set tcltest::testConstraints(assert) 1

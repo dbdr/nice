@@ -199,28 +199,29 @@ public class OverloadedSymbolExp extends Expression
     // Useful in case of failure.
     List fieldAccesses = filterFieldAccesses();
 
-    VarSymbol s = null;
-    Polytype symType = null;
-    for(Iterator i = symbols.iterator(); i.hasNext();)
+    for (Iterator i = symbols.iterator(); i.hasNext();)
       {
-	s = (VarSymbol) i.next();
+	VarSymbol s = (VarSymbol) i.next();
 	s.makeClonedType();
-	symType = s.getClonedType();
 	try{
-	  Typing.leq(symType, expectedType);
+	  Typing.leq(s.getClonedType(), expectedType);
 	  if(Debug.overloading)
-	    Debug.println(s+"("+s.location()+") of type "+symType+" matches");
+	    Debug.println(s + "(" + s.location() + ") of type " +
+			  s.getClonedType() + " matches");
 	}
 	catch(TypingEx e){
 	  i.remove();
 	  s.releaseClonedType();
 	  if(Debug.overloading) 
-	    Debug.println("Not "+s+" of type\n" + symType + "\nbecause "+e);
+	    Debug.println("Not "+s+" of type\n" + s.getClonedType() + 
+			  "\nbecause "+e);
 	}
       }
 
     if(symbols.size()==1)
       {
+	VarSymbol s = (VarSymbol) symbols.get(0);
+	Polytype symType = s.getClonedType();	
 	s.releaseClonedType();
 	return uniqueExpression(s, symType);
       }

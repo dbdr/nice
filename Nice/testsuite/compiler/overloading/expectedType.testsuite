@@ -1,0 +1,13 @@
+/// COMMENT Overloading resolved by looking at the expected type in the context
+
+/// PASS
+  int->int v = f;
+  /// Toplevel
+  boolean f(boolean x) = x;
+  int f(int x) = x;
+
+/// FAIL
+  String->String v = f;
+  /// Toplevel
+  boolean f(boolean x) = x;
+  int f(int x) = x;

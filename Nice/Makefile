@@ -163,6 +163,7 @@ core-bootstrap:
 	${NICEC} nice.tools.locator
 	${JAVAC} \
 		src/bossa/syntax/dispatch.java \
+		src/mlsub/typing/TypeConstructorLeqMonotypeCst.java \
 		src/gnu/expr/LoopExp.java \
 		stdlib/nice/lang/{Native,rawArray}.java \
 		src/bossa/modules/{Package,CompilationListener}.java \

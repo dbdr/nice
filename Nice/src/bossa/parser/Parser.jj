@@ -1424,6 +1424,7 @@ Definition globalVariable():
   boolean constant;
 }
 {
+  [ "public" | "private" ]
   (
     "var" {constant = false;} 
     t=monotype() name=ident() 
@@ -1491,6 +1492,7 @@ Definition definition(List definitions):
 }
 {
   (
+    LOOKAHEAD(2)
     res=globalVariable()
   | 
     LOOKAHEAD ( "abstract" "interface" )

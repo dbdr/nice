@@ -1678,15 +1678,23 @@ String getName(MyJavaClass) = native String MyJavaClass.getName();</programlisti
 	with javac.
       </para>
 
-      <section><title>Calling a method</title>
+      <section id="compilationMethods"><title>Calling a method</title>
+        <para>
+	  For <link linkend="method">methods</link> declared inside a
+          class, and for those declared at the package level and whose
+          first argument is a Nice class, you can simply use them as
+          usual in Java.
+	</para>
 	<para>
-	  You can call a <link linkend="method">method</link>
-	   <literal>m</literal>
-	  defined in a nice package <literal>pkg</literal> 
+	  This is not possible for methods declared at the package
+          level and whose first argument is a Java class, a possibly
+          null type or a primitive type.
+	  You can call a such a method <literal>m</literal>
+	  declared in a nice package <literal>pkg</literal>
 	  by naming it <literal>pkg.dispatch.m</literal> in the Java program.
-	  It does not matter in what package(s) <literal>m</literal> 
-	  is implemented: 
-	  <literal>pkg</literal> must simply be the package where the method 
+	  It does not matter in what package(s) <literal>m</literal>
+	  is implemented:
+	  <literal>pkg</literal> must simply be the package where the method
 	  was declared.
 	</para>
       </section>
@@ -1720,8 +1728,7 @@ class Person
   String name;
 
   // A method:
-  String display();
-  display() = "Person: " + name;
+  String display() = "Person: " + name;
 }
 
 class Worker extends Person
@@ -1730,7 +1737,6 @@ class Worker extends Person
 
   display() = "Worker: " + name + " salary: " + salary;
 
-  // A method:
   boolean isRich() = salary > 500;
 }
 
@@ -1749,16 +1755,17 @@ public class Main
     Person p = new Person("John");
     Worker w = new Worker("Julia", 1000);
 
-    System.out.println(dispatch.display(p));
-    System.out.println(dispatch.display(w));
-    if (fun.isRich(w))
+    System.out.println(p.display());
+    System.out.println(w.display());
+    if (w.isRich())
       System.out.println("A well paid worker!");
   }
 }
         </programlisting>
 	</para>
       </example>
-      </para></section>
+      </para>
+      </section>
 
       <section><title>Optional parameters</title>
 	<para>
@@ -1779,8 +1786,12 @@ public class Main
 	It is possible to declare a Java subclass of a Nice class.
 	The constructor will need to call the 
 	<link linkend="constructorFromJava">parent constructor</link>.
-	It is not possible to override a Nice multi-methods in a Java
-	program.
+	It is not fully possible to override a Nice multi-method in a Java
+	program. However, provided that the method is compiled as an
+	instance method, as specified <link
+	linkend="compilationMethods">above</link>, you can override
+	that method as usual for Java. That is, only the first
+	(implicit) argument can be used to perform the override.
 	</para>
       </section>
 

@@ -421,7 +421,7 @@ public class Pattern implements Located
       return that.tc == PrimitiveType.boolTC; 
 
     if (this.atEnum() && that.atEnum())
-      return false;
+      return this.atValue.equals(that.atValue);
 
     if (this.atIntCompare() && that.atIntCompare())
       {

@@ -118,3 +118,13 @@
   enum Signal { High, Low, X }
   Signal `&`(Signal x, Signal y) = x;
   `&`(Low, Low) = Low;
+
+/// PASS
+  assert (Low & High) == Low;
+  /// Toplevel
+  enum Signal { High, Low, X }
+  Signal `&`(Signal, Signal);
+  `&`(High, x)    = x;
+  `&`(X, x)       = X;
+  `&`(Low, Low)   = Low;
+  `&`(Low, z)     = z & Low;

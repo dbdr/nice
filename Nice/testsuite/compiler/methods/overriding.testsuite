@@ -71,9 +71,7 @@ boolean foo(A) = false;
 class B extends A {}
 override boolean foo(B); foo(B x) = true;
 
-/// PASS bug
- // Should we allow a more general method to be declared in a later package
- // and still discover overriding?
+/// PASS
   /// package a
   /// Toplevel
 class A {}

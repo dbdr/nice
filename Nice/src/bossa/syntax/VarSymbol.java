@@ -92,16 +92,6 @@ abstract class VarSymbol extends Node implements Located
    * Misc.
    ****************************************************************/
 
-  Assignable getAssignable()
-  {
-    return null;
-  }
-
-  gnu.mapping.Procedure getDispatchMethod()
-  {
-    return null;
-  }
-
   public Location location()
   {
     return name.location();

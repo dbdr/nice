@@ -326,7 +326,7 @@ abstract public class MethodDeclaration extends Definition
 	return 2;
     }
 
-    Assignable getFieldAccessMethod()
+    FieldAccess getFieldAccessMethod()
     {
       if(definition instanceof FieldAccess)
 	return (FieldAccess) definition;

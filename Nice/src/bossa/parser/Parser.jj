@@ -723,7 +723,7 @@ FunType funmonotype():
   codomain = monotype()
   { 
     FunType res = new FunType(domain, codomain); 
-    res.nullness = maybe ? res.maybe : res.absent;
+    res.nullness = maybe ? res.maybe : res.sure;
     return res; 
   }
 }
@@ -741,25 +741,33 @@ Monotype monotype():
 
   (
   res=OLDfunmonotype()
+  { res.nullness = res.sure; }
 |
   res=funmonotype()
 |
   start="alike" [ "<" p=monotypes() ">" ]
   { res=new Alike(p, new Location(start)); }
+  { res.nullness = res.sure; }
 |
   start="<"
   p=monotypes()
   end=">"
   { res = new TupleType(p, new Location(start, end)); }
+  { res.nullness = res.sure; }
 |
   LOOKAHEAD(monotypeConstructor())
   res=monotypeConstructor()
+  { res.nullness = res.absent; }
 | 
   res=typeIdent() 
+  { res.nullness = res.absent; }
   )
   
   { 
-    res.nullness = maybe ? res.maybe : sure ? res.sure : res.absent;
+    if (maybe)
+      res.nullness = res.maybe;
+    else if (sure)
+      res.nullness = res.sure;
   }
 
 // T[] as a shortcut for Array<T>
@@ -775,7 +783,7 @@ Monotype monotype():
       (new TypeIdent(new LocatedString("Array", loc)),
        new TypeParameters(tp),
        loc);
-    res.nullness = res.absent;
+    res.nullness = res.sure;
   }
 
   |
@@ -784,7 +792,7 @@ Monotype monotype():
   "->"
   { Monotype codomain; } codomain = monotype()
   { res = new FunType(new Monotype[]{ res }, codomain); 
-    res.nullness = maybe ? res.maybe : res.absent; }
+    res.nullness = maybe ? res.maybe : res.sure; }
   
 )*
 

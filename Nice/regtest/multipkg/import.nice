@@ -50,4 +50,6 @@ void test_funs()
 
   f.f7 = null;
   f.f8 = null;
+
+  f.f10 = [ f.f1 ];
 }

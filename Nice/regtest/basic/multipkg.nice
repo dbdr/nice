@@ -66,4 +66,7 @@ class Funs
 
   int ?-> int f7;
   (int,int)?->int f8;
+
+  int->int[] f9;
+  Array<int->int> f10;
 }

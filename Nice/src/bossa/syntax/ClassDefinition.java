@@ -89,7 +89,13 @@ abstract public class ClassDefinition extends MethodContainer
 	(name.toString(), variance, isConcrete(), true)
 	{
 	  public String toString(mlsub.typing.Monotype[] parameters)
-	  { return parameters[0] + "[]"; }
+	  { 
+	    String component = parameters[0].toString();
+	    if (component.indexOf("->") != -1)
+	      return "nice.lang.Array<"+ component + ">";
+	    else
+	      return component + "[]"; 
+	  }
 	};
     else if (name.equals("nice.lang.Sure"))
       tc = new mlsub.typing.TypeConstructor

@@ -22,7 +22,7 @@ The visitor pattern is a programming pattern that has been advocated strongly
 for writing code operating on a hierarchy of classes. <a href="http://www.ti.et-inf.uni-siegen.de/Entwurfsmuster/ArtikelImport/osefa/patterns/visitor/intent.htm">A
 thorough description is available there</a> from the <i>Design Patterns</i>
 book.
-<p>A typical exemple is the definition of operations on an Abstract Syntax
+<p>A typical example is the definition of operations on an Abstract Syntax
 Tree. Here is Java code using a Visitor:
 <PRE>
 <FONT COLOR="#0000ee">package</FONT> syntax;
@@ -93,7 +93,7 @@ would be added to each class.
 Anothe possiblity would be to define a static method
 in the new package. But then it would be necessary to test 
 the argument with <tt>instanceof</tt> and use downcasts.
-In short, loose the benefits of object-orientation.
+In short, lose the benefits of object-orientation.
 
 <br>&nbsp;
 <h2>
@@ -103,8 +103,8 @@ However, the Visitor pattern has serious flaws:
 <ol>
 <li>
 An obvious problem is that the arguments and the return type of visiting
-methods have to be known in advance. In this exemple, to define a <tt>prettyPrint</tt>
-function that returns a <tt>String</tt>, a new Visitor class has tyo be
+methods have to be known in advance. In this example, to define a <tt>prettyPrint</tt>
+function that returns a <tt>String</tt>, a new Visitor class has to be
 defined, as well as a new <tt>accept</tt> method <b>in every class of the
 hierarchy</b>. And the same job has to be done again to define an evaluation
 function that returns an integer. The same problem occurs if the visiting
@@ -133,7 +133,7 @@ be applied at all.</li>
 
 <h2>
 Alternative solution with Multimethods</h2>
-Here is the same exemple, using multi-methods, 
+Here is the same example, using multi-methods, 
 in <a href="index.html"><font face="Comic Sans MS">Nice</font></a>. 
 As you can see, it is much
 shorter and natural, and it solves all the problems above.

@@ -131,7 +131,7 @@ In addition to traditional object-oriented features, Nice offers:
 <para>
 The current implementation is tightly integrated with the Java environment,
 which offers several advantages. 
-The huge amnount of Java libraries can be used directly in Nice programs. 
+The huge amount of Java libraries can be used directly in Nice programs. 
 Libraries can also be written in Nice and called from a Java program.
 The Nice compiler produces java bytecode, which means
 Nice programs can be executed on virtually any platform, with any Java

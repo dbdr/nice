@@ -454,7 +454,7 @@ safe: when they are used in a read-only way.
 <para>
 In &nice;, arrays are not covariant. Therefore run time errors like
 <javaexn name="ArrayStoreException"/> never occur. Moreover, it is still
-possible to use covariantly arrays while only reading from them. This
+possible to use arrays covariantly while only reading from them. This
 require &nice;'s powerful type system: constrained type parameters:
 <literal>&lt;java.awt.Component T> void read(T[]);</literal>
 can be applied to arrays whose component types are subtypes of

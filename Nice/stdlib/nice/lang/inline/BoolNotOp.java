@@ -12,40 +12,27 @@
 
 package nice.lang.inline;
 
-import gnu.mapping.Procedure2;
+import gnu.mapping.Procedure1;
 import gnu.expr.*;
 import gnu.bytecode.*;
 
 /**
-   Inlining of native boolean operators.
+   Inlining of native unary boolean operators.
 
    @author Daniel Bonniot
 */
-public class BoolOp extends Procedure2 implements Inlineable
+public class BoolNotOp extends Procedure1 implements Inlineable
 {
-  private final static int
-    error = 0,
-    And = 1,
-    Or = 2;
-
-  public static BoolOp create(String param)
+  private BoolNotOp()
   {
-    int kind = error;
-    if ("&".equals(param))
-      kind = And;
-    else if ("|".equals(param))
-      kind = Or;
-    else
-      bossa.util.User.error("Unknown inlined boolean operator " + param);
-    return new BoolOp(kind);
   }
 
-  private BoolOp (int kind)
-  {
-    this.kind = kind;
-  }
+  public static BoolNotOp instance = new BoolNotOp();
 
-  private final int kind;
+  public static BoolNotOp create(String param)
+  {
+    return instance;
+  }
 
   public void compile (ApplyExp exp, Compilation comp, Target target)
   {
@@ -54,13 +41,8 @@ public class BoolOp extends Procedure2 implements Inlineable
     Target stack = new StackTarget(Type.boolean_type);
 
     args[0].compile(comp, stack);
-    args[1].compile(comp, stack);
-
-    switch(kind){
-    case And: code.emitAnd(); break;
-    case Or:  code.emitIOr(); break;
-    }
-    
+    code.emitPushConstant(1, Type.int_type); 
+    code.emitXOr();
     target.compileFromStack(comp, retType);
   }
 
@@ -73,7 +55,7 @@ public class BoolOp extends Procedure2 implements Inlineable
 
   // Interpretation
 
-  public Object apply2 (Object arg1, Object arg2)
+  public Object apply1 (Object arg)
   {
     throw new Error("Not implemented");
   }

@@ -25,7 +25,7 @@ var boolean false = FALSE();
 `|`(b1@boolean,b2@boolean) = b1 ? true : b2;
 
 // same methods, but overloaded for better efficiency (no dispatch and no boxing).
-boolean `!`(boolean) = inline nice.lang.inline.BoolOp("!");
+boolean `!`(boolean) = inline nice.lang.inline.BoolNotOp();
 boolean `&`(boolean, boolean) = inline nice.lang.inline.BoolOp("&");
 boolean `|`(boolean, boolean) = inline nice.lang.inline.BoolOp("|");
 

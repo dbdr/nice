@@ -166,3 +166,35 @@ foo() {
 
   /// Toplevel
 <T,U | U <: T> (List<T>,List<U>) foo(List<U> x) = (new ArrayList(x), x);
+
+/// PASS
+   // bug #923443
+   byte n = 10;
+   let L1 = new LinkedList();
+   L1.add(n);
+
+   foo(L1[0]);
+
+  /// Toplevel
+void foo(byte) {}
+void foo(boolean) {}
+
+/// PASS
+   // self-contained test inspired by #923443
+   let a = new A();
+
+   int i = 0;
+   poly(a, i);
+
+   foo(a);
+
+  /// Toplevel
+void foo(A<int>) {}
+void foo(A<boolean>) { assert false; }
+
+/// PASS
+ let testmap = new HashMap();
+ for(i : 1..10)
+   testmap[i] = i.toString();
+ for(i : testmap.keySet())
+   println(i + " => " + testmap[i]);

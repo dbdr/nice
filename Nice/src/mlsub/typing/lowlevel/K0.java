@@ -1335,7 +1335,7 @@ public final class K0 {
     // may be non-null if backtrackMode==BACKTRACK_UNLIMITED    
     Backup previous;
     int savedM;
-    int savedN;
+    BitMatrix savedC;
     BitVector savedGarbage;
     DomainVector savedDomains;
     //BitVector[] savedImplementors;
@@ -1347,8 +1347,12 @@ public final class K0 {
         this.previous = null;
       }
       this.savedM = K0.this.m;
-      this.savedN = K0.this.n;
-      
+
+      // We only need to save C if there are soft variables, since
+      // others can't be modified anyway.
+      if (K0.this.m != K0.this.n)
+        this.savedC = (BitMatrix) K0.this.C.clone();
+
       this.savedGarbage = (BitVector)K0.this.garbage.clone();
       this.savedDomains = (DomainVector)K0.this.domains.clone();
       /*
@@ -1388,9 +1392,18 @@ public final class K0 {
     this.R.setSize(m);
     this.Rt.setSize(m);
 
-    this.n = backup.savedN;
-    this.C.setSize(n);
-    this.Ct.setSize(n);
+    if (backup.savedC != null)
+      {
+        this.C = backup.savedC;
+        this.Ct = backup.savedC.transpose();
+        this.n = backup.savedC.size();
+      }
+    else
+      {
+        this.n = backup.savedM;
+        this.C.setSize(n);
+        this.Ct.setSize(n);
+      }
 
     this.garbage = backup.savedGarbage;
     this.domains = backup.savedDomains;

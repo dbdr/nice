@@ -139,18 +139,6 @@ public class Arguments
     return res;
   }
   
-  PackageExp packageExp()
-  {
-    // case where the parameters is a package, or a package prefix
-    if(arguments.length == 1)
-      {
-	Expression param0 = getExp(0);
-	if(param0 instanceof PackageExp)
-	  return (PackageExp) param0;
-      }
-    return null;
-  }
-  
   gnu.bytecode.ClassType staticClass()
   {
     gnu.bytecode.ClassType res = getExp(0).staticClass();

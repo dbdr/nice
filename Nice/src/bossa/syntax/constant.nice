@@ -281,7 +281,7 @@ Expression createTypeConstantExp(?PackageExp root, LocatedString name)
     // name has been appended to root's name
     return root;
 
-  let res = new PackageExp(fullName);
+  let res = createPackageExp(fullName);
   res.setLocation(name.location());
   return res;
 }

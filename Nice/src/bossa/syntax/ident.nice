@@ -61,3 +61,55 @@ public Expression createIdentExp(LocatedString i)
   res.setLocation(i.location());
   return res;
 }
+
+/**
+   Temporary expression to represent a package or a package prefix.
+   
+   For instance, in java.lang.System.exit(0), 
+   java and java.lang is represented by a package exp.
+*/
+class PackageExp extends Expression
+{
+  StringBuffer name;
+
+  LocatedString locatedName()
+  {
+    return new LocatedString(name.toString(), this.location());
+  }
+  
+  toString() = "PackageExp " + name;
+
+  private void error()
+  {
+    User.error(this, 
+	       name + " is neither a valid expression nor a valid package");
+  }
+
+  computeType()
+  {
+    this.error();
+  }
+  
+  compile()
+  {
+    this.error();
+    return cast(null);
+  }
+}
+
+PackageExp createPackageExp(String name)
+{
+  return new PackageExp(name: new StringBuffer(name));
+}
+
+?PackageExp packageExp(Arguments args)
+{
+  // case where the parameters is a package, or a package prefix
+  if (args.size() == 1)
+    {
+      Expression param0 = args.getExp(0);
+      if (param0 instanceof PackageExp)
+	return param0;
+    }
+  return null;
+}

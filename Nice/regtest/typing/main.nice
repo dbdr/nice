@@ -1,8 +1,0 @@
-package regtest.typing;
-
-// Typing doesn't need execution
-// fake main
-
-void main(String[] args)
-{
-}

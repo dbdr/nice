@@ -142,7 +142,7 @@ List<VarSymbol> findJavaMethods(gnu.bytecode.ClassType declaringClass, String fu
     
   // search methods
   for (?gnu.bytecode.Method method = declaringClass.getMethods();
-  	     method != null; method = method.next)
+  	     method != null; method = method.getNext())
   {
     if (!method.getName().equals(funName))
       continue;
@@ -210,11 +210,11 @@ void fetchMethods(TypeConstructor tc, gnu.bytecode.ClassType classType)
   try {
     classType.addMethods();
 
-    for (?gnu.bytecode.Field f = classType.getFields(); f != null; f = f.next)
+    for (?gnu.bytecode.Field f = classType.getFields(); f != null; f = f.getNext())
       if (retyped.get(f) == null)
         addJavaSymbol(f, makeJavaFieldAccess(f));
 
-    for (?gnu.bytecode.Method m = classType.getMethods(); m != null; m = m.next)
+    for (?gnu.bytecode.Method m = classType.getMethods(); m != null; m = m.getNext())
       {
          // Ignore the method if it is explicitely retyped
          if (retyped.get(m) != null)

@@ -31,7 +31,7 @@ import mlsub.typing.Constraint;
    Definition of an alternative for a method.
 
    @version $Date$
-   @author Daniel Bonniot (d.bonniot@mail.dotcom.fr)
+   @author Daniel Bonniot (bonniot@users.sourceforge.net)
 */
 public class MethodBodyDefinition extends Definition 
   implements Function
@@ -326,112 +326,113 @@ public class MethodBodyDefinition extends Definition
 
   void typecheck()
   {
-    int level = -1;
-    try{
-      if (Debug.typing)
-	level = Typing.enter("METHOD BODY " + this + "\n\n");
-      else
-	level = Typing.enter();
+    boolean errorFound = false;
+    int level;
+    if (Debug.typing)
+      level = Typing.enter("METHOD BODY " + this + "\n\n");
+    else
+      level = Typing.enter();
 
-      // remember that enter was called, to leave.
-      // usefull if previous code throws an exception
-      entered = true;
+    try {
+      try {
+	try { 
+	  Constraint.enter(declaration.getType().getConstraint());
+	}
+	catch(TypingEx e){
+	  throw User.error(name,
+			   "the constraint will never be satisfied",
+			   ": "+e.getMessage());
+	}
 
-      try { 
-	Constraint.enter(declaration.getType().getConstraint());
-      }
-      catch(TypingEx e){
-	User.error(name,
-		   "the constraint will never be satisfied",
-		   ": "+e.getMessage());
-      }
-	
-      // Introduce the types of the arguments
-      Monotype[] monotypes = MonoSymbol.getMonotype(parameters);
-      Typing.introduce(monotypes);
+	// Introduce the types of the arguments
+	Monotype[] monotypes = MonoSymbol.getMonotype(parameters);
+	Typing.introduce(monotypes);
 
-      // The arguments are specialized by the patterns
-      try{
-	Pattern.in(monotypes, formals);
-      }
-      catch(TypingEx e){
-	User.error(name,"The patterns are not correct", e);
-      }
+	// The arguments are specialized by the patterns
+	try{
+	  Pattern.in(monotypes, formals);
+	}
+	catch(TypingEx e){
+	  throw User.error(name,"The patterns are not correct", e);
+	}
       
-      try{
 	// The arguments have types below the method declaration domain
 	Monotype[] domain = declaration.getType().domain();
 	for (int i = 0; i < monotypes.length; i++)
-	  Typing.leq(monotypes[i], domain[i]);
-      }
-      catch(mlsub.typing.BadSizeEx e){
-	Internal.error("Bad size in MethodBodyDefinition.typecheck()");
-      }
-      catch(TypingEx e) {
-	User.error(name,"Type error in arguments of method body \""+name+"\":\n"+e);
-      }
-      
-      try {
-	Types.setBytecodeType(monotypes);
-
-	Typing.implies();
-      }
-      catch(TypingEx e) {
-	throw User.error(name, "Type error in method body \""+name+"\":\n"+e);
-      }
-
-      // Introduction of binders for the types of the arguments
-      // as in f(x@C : X)
-      for(int n = 0; n < formals.length; n++)
-	{
-	  Pattern pat = formals[n];
-	  Monotype type = pat.getType();
-	  if (type == null)
-	    continue;
-	    
-	  MonoSymbol sym = parameters[n];
-	  
 	  try{
-	    TypeConstructor 
-	      tc = type.head(),
-	      formalTC = ((MonotypeConstructor) sym.getMonotype()).getTC();
-		  
-	    if (tc == null)
-	      Internal.error("Not implemented ?");
+	    Typing.leq(monotypes[i], domain[i]);
+	  }
+	  catch(TypingEx e) {
+	    /*
+	       This type error originates from an inadequation between
+	       the pattern and the domain. The parameter types are just 
+	       variables that connected the two.
+	    */
+	    throw User.error(formals[i], 
+			     "Pattern " + formals[i] + 
+			     " is incompatible with type " + domain[i]);
+	  }
 
-	    tc.setId(formalTC.getId());
-	    Typing.eq(type, sym.getMonotype());
-	  }
-	  catch(TypingEx e){
-	    User.error(pat.name, 
-		       "\":\" constraint for argument "+pat.name+
-		       " is not correct",
-		       ": "+e);
-	  }
+	try {
+	  Types.setBytecodeType(monotypes);
+
+	  Typing.implies();
+	}
+	catch(TypingEx e) {
+	  throw User.error(name, "Type error in method body \""+name+"\":\n"+e);
 	}
 
-      Node.currentFunction = this;
-      if (declaration.hasThis())
-	Node.thisExp = new SymbolExp(parameters[0], location());
+	// Introduction of binders for the types of the arguments
+	// as in f(x@C : X)
+	for(int n = 0; n < formals.length; n++)
+	  {
+	    Pattern pat = formals[n];
+	    Monotype type = pat.getType();
+	    if (type == null)
+	      continue;
+	    
+	    MonoSymbol sym = parameters[n];
+	  
+	    try{
+	      TypeConstructor 
+		tc = type.head(),
+		formalTC = ((MonotypeConstructor) sym.getMonotype()).getTC();
+		  
+	      if (tc == null)
+		Internal.error("Not implemented ?");
 
-      try{
+	      tc.setId(formalTC.getId());
+	      Typing.eq(type, sym.getMonotype());
+	    }
+	    catch(TypingEx e){
+	      throw User.error(pat.name, 
+			       "\":\" constraint for argument "+pat.name+
+			       " is not correct",
+			       ": "+e);
+	    }
+	  }
+
+	Node.currentFunction = this;
+	if (declaration.hasThis())
+	  Node.thisExp = new SymbolExp(parameters[0], location());
+
 	bossa.syntax.dispatch.typecheck(body);
       } catch(UserError ex){
 	nice.tools.compiler.OutputMessages.error(ex.getMessage());
+	errorFound = true;
       }
     }
     finally{
       Node.currentFunction = null;
       Node.thisExp = null;
-      if(entered)
-	try{
-	  if (Typing.leave() != level)
-	    Internal.error("Unmatching enter/leave");
-	  entered = false;
-	}
-	catch(TypingEx e){
+      try{
+	if (Typing.leave() != level)
+	  Internal.error("Unmatching enter/leave");
+      }
+      catch(TypingEx e){
+	if (! errorFound)
 	  User.error(this, "Type error in method "+name, ": "+e);
-	}
+      }
     }
   }
 

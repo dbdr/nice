@@ -35,7 +35,7 @@ import nice.tools.code.*;
    @version $Date$
    @author Daniel Bonniot (d.bonniot@mail.dotcom.fr)
 */
-public class Pattern
+public class Pattern implements Located
 {
   /**
      Builds a new pattern.
@@ -56,7 +56,8 @@ public class Pattern
   public Pattern(LocatedString name, 
 		 TypeIdent tc, Expression atValue,
 		 boolean exactlyAt, TypeIdent additional,
-		 bossa.syntax.Monotype type)
+		 bossa.syntax.Monotype type,
+		 Location location)
   {
     this.name = name;
     this.typeConstructor = tc;
@@ -64,16 +65,17 @@ public class Pattern
     this.type = type;
     this.atValue = atValue;
     this.exactlyAt = exactlyAt;
-  }
-
-  public Pattern(LocatedString name, TypeIdent tc)
-  {
-    this(name, tc, null, false, null, null);
+    this.location = location;
   }
 
   public Pattern(LocatedString name)
   {
-    this(name, null, null, false, null, null);
+    this(name, null, null, false, null, null, name.location());
+  }
+
+  Pattern(LocatedString name, TypeIdent tc)
+  {
+    this(name, tc, null, false, null, null, name.location());
   }
 
   Pattern(TypeConstructor tc, Expression atValue, boolean exactlyAt)
@@ -153,7 +155,6 @@ public class Pattern
     for (int i = 0; i < monotypes.length; i++)
       {
 	Pattern p = patterns[i];
-	if (p.tc == null) continue;
 	p.leq(monotypes[i]);
       }
   }
@@ -170,6 +171,14 @@ public class Pattern
     
     MonotypeConstructor mc = (MonotypeConstructor) m;
 
+    if (atNull())
+      {
+	Typing.leq(PrimitiveType.maybeTC, mc.getTC());
+      }
+
+    if (tc == null)
+      return;
+    
     // the argument is not null
     Typing.leq(mc.getTC(), PrimitiveType.sureTC);
     Monotype type = mc.getTP()[0];
@@ -300,6 +309,11 @@ public class Pattern
     return res.toString();
   }
 
+  public Location location()
+  {
+    return location;
+  }
+
   /****************************************************************
    * Bytecode representation
    ****************************************************************/
@@ -418,6 +432,8 @@ public class Pattern
 
   private boolean exactlyAt;
   private Expression atValue;
+
+  private Location location;
 
   //XXX change to == NullExp.instance
   public boolean atNull() { return atValue instanceof NullExp; }

@@ -1,0 +1,25 @@
+/// COMMENT Tests the method coverage test.
+
+/// PASS
+  /// TOPLEVEL
+
+abstract interface Abstract {}
+
+// These methods are covered, because no concrete class implements Abstract
+<Abstract A> void method1(A);
+<Abstract A> void method2(A, String);
+
+/// FAIL
+  /// TOPLEVEL
+void method3(String->String);
+
+/// PASS
+  /// TOPLEVEL
+void method3(String->String);
+method3(f) {} // this case is mandatory to cover method3
+
+/// FAIL
+  /// TOPLEVEL
+void method3(String);
+method3(f@String) {} // this case is mandatory to cover method3
+method3(/*/// FAIL HERE */ f@null) {}

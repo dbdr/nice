@@ -56,6 +56,7 @@ public class ConstantExp extends Expression
   public ConstantExp(Object value)
   {
     this.value = value;
+    this.representation = value.toString();
   }
   
   boolean isZero()

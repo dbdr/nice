@@ -25,3 +25,7 @@
   assert """abc
   def\nghi
   xyz""".equals("abc\n  def\nghi\n  xyz");
+
+/// PASS
+  String x = """ " """;
+  assert x.equals(" \" ");

@@ -1,3 +1,15 @@
+nice (0.5.5) unstable; urgency=low
+
+  * Merged --classpath and --packagepath options into --classpath.
+    This is simpler, and the behaviour is more logical.
+  * The compiler is now reentrant. This should not make any difference
+    when running from the command-line, but this is important to allow
+    tools written in Java or Nice (like the Ant task, the testsuite, 
+    an IDE) to call the compiler repetively, without starting a new JVM.
+  * Fixed a bug in the export of optional functional types.
+
+ --
+
 nice (0.5.4) unstable; urgency=low
 
   * Added short syntax for anonymous functions:

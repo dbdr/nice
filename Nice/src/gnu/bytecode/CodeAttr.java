@@ -177,12 +177,12 @@ public class CodeAttr extends Attribute implements AttrContainer
     put2(cnst.index);
   }
 
-  public final void putLineNumber (int linenumber)
+  public final void putLineNumber (String file, int linenumber)
   {
     if (lines == null)
       lines = new LineNumbersAttr(this);
     readPC = PC;
-    lines.put(linenumber, PC);
+    lines.put(file, linenumber, PC);
   }
 
   public final void pushType(Type type)

@@ -50,6 +50,7 @@ public class CodeFragment extends Label
     if (linenumbers != null)
       {
 	for (int i = 0;  i < linenumbers.length;  i += 2)
+          // The line numbers are already translated by the source map.
 	  cattr.lines.put(linenumbers[i+1], linenumbers[i] + cattr.PC);
       }
     cattr.PC += length;

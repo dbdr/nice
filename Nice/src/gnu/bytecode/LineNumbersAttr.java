@@ -34,8 +34,22 @@ public class LineNumbersAttr extends Attribute
   }
 
   /** Add a new line number entry.
+    * @param file the source file for this entry
     * @param linenumber the number in the source file for this entry
     * @param PC the byte code location for the code for this line number. */
+  void put (String file, int linenumber, int PC)
+  {
+    Method method = ((CodeAttr) container).getMethod();
+    linenumber = method.classfile.getSourceMap().translate(file, linenumber);
+    put(linenumber, PC);
+  }
+
+  /** Add a new line number entry.
+    * @param linenumber the number in the source file for this entry
+    * @param PC the byte code location for the code for this line number. 
+    * The line number is supposed to have already been translated by a source
+    * map.
+    */
   public void put (int linenumber, int PC)
   {
     if (linenumber_table == null)

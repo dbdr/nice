@@ -1356,7 +1356,7 @@ public class Compilation
 
     int line = module.getLine();
     if (line > 0)
-      code.putLineNumber(line);
+      code.putLineNumber(module.getFile(), line);
 
     /*
     if (arg_letter == 'N')

@@ -1111,4 +1111,16 @@ public class ClassType extends ObjectType implements AttrContainer {
     else
       return new ParameterizedType(this, parameters);
   }
+
+  private SourceMap sourceMap;
+
+  SourceMap getSourceMap()
+  {
+    if (sourceMap == null)
+      {
+        sourceMap = new SourceMap(this);
+        sourceMap.addToFrontOf(this);
+      }
+    return sourceMap;
+  }
 }

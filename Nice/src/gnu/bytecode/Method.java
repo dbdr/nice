@@ -221,11 +221,11 @@ public class Method implements AttrContainer {
     code.emitPushThis();
   }
 
-  public void compile_linenumber (int linenumber)
+  public void compile_linenumber (String file, int linenumber)
   {
     if (code == null)
       code = new CodeAttr(this);
-    code.putLineNumber(linenumber);
+    code.putLineNumber(file, linenumber);
   }
 
   void write (DataOutputStream dstr, ClassType classfile)

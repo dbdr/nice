@@ -138,7 +138,7 @@ public class CheckedTarget extends StackTarget
       }
     int line = comp.position >> 12;
     if (line > 0)
-      code.putLineNumber(line);
+      code.putLineNumber(comp.filename, line);
     if (thisIsProc)
       code.emitPushThis();
     else

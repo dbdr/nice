@@ -361,7 +361,7 @@ public abstract class ClassDefinition extends MethodContainer
     String name = this.name.toString();
     if (name.equals("nice.lang.Array"))
       tc = new mlsub.typing.TypeConstructor
-	(name.toString(), variance, isConcrete(), true)
+	(name, variance, isConcrete(), true)
 	{
 	  public String toString(mlsub.typing.Monotype[] parameters)
 	  { 
@@ -379,7 +379,7 @@ public abstract class ClassDefinition extends MethodContainer
 	};
     else if (name.equals("nice.lang.Sure"))
       tc = new mlsub.typing.TypeConstructor
-	(name.toString(), mlsub.typing.NullnessKind.instance, isConcrete(), true)
+	(name, mlsub.typing.NullnessKind.instance, isConcrete(), true)
 	{
 	  public String toString(mlsub.typing.Monotype[] parameters,
 				 boolean isNull, String suffix)
@@ -393,7 +393,7 @@ public abstract class ClassDefinition extends MethodContainer
 	};
     else if (name.equals("nice.lang.Maybe"))
       tc = new mlsub.typing.TypeConstructor
-	(name.toString(), mlsub.typing.NullnessKind.instance, isConcrete(), true)
+	(name, mlsub.typing.NullnessKind.instance, isConcrete(), true)
 	{
 	  public String toString(mlsub.typing.Monotype[] parameters,
 				 boolean isNull, String suffix)
@@ -403,12 +403,12 @@ public abstract class ClassDefinition extends MethodContainer
       {
 	tc = new mlsub.typing.TypeConstructor
 	  ("null", mlsub.typing.NullnessKind.instance, isConcrete(), true);
-	PrimitiveType.registerPrimType(name.toString(),tc);
+	PrimitiveType.registerPrimType(name, tc);
       }
     else
       {
 	tc = new mlsub.typing.TypeConstructor
-	  (name.toString(), variance, isConcrete(), true);
+	  (name, variance, isConcrete(), true);
 	if (name.equals("nice.lang.Throwable"))
 	  PrimitiveType.throwableTC = tc;
       }
@@ -445,7 +445,7 @@ public abstract class ClassDefinition extends MethodContainer
    * Map TypeConstructors to ClassDefinitions
    ****************************************************************/
 
-  private static HashMap tcToClassDef;
+  private static Map tcToClassDef;
   public static void reset() { tcToClassDef = new HashMap(); }
   
   public static final ClassDefinition get(TypeConstructor tc)

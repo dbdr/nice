@@ -189,6 +189,7 @@ public abstract class Expression
 
     for (int i = 0; i< expressions.length; i++)
       {
+        //why has this different behavior compared to the previous method???     
 	expressions[i] = expressions[i].noOverloading();
 	res[i] = expressions[i].getType();
       }

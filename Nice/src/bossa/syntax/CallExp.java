@@ -192,7 +192,6 @@ public class CallExp extends Expression
     FunType funt = (FunType) m;
 
     Monotype[] dom = funt.domain();
-    Monotype codom = funt.codomain();
 
     Constraint cst = type.getConstraint();
     final boolean doEnter = true; //Constraint.hasBinders(cst);

@@ -107,8 +107,6 @@ public class TupleExp extends bossa.syntax.Expression
     // Force computation of the component types.
     getType();
 
-    int len = expressions.length;
-
     /*
       We base the array type on the expected type, but we record the
       real type of the components.

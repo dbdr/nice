@@ -74,7 +74,7 @@ public class LocatedString
   
   public LocatedString cloneLS()
   {
-    return new LocatedString(new String(content),location);
+    return new LocatedString(content, location);
   }
   
   public LocatedString substring(int beginIndex, int endIndex)

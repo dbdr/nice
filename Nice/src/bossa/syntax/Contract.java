@@ -26,26 +26,28 @@ public class Contract
 {
   public void addRequire(Expression condition)
   {
-    pre.add(CallExp.create(symbol("alwaysAssert", condition), condition));
+    pre.add(CallExp.create(symbol(assertName, condition), condition));
   }
 
   public void addRequire(Expression condition, Expression name)
   {
-    pre.add(CallExp.create(symbol("alwaysAssert", condition), condition, name));
+    pre.add(CallExp.create(symbol(assertName, condition), condition, name));
   }
 
   public void addEnsure(Expression condition)
   {
-    post.add(CallExp.create(symbol("alwaysAssert", condition), condition));
+    post.add(CallExp.create(symbol(assertName, condition), condition));
   }
 
   public void addEnsure(Expression condition, Expression name)
   {
-    post.add(CallExp.create(symbol("alwaysAssert", condition), condition, name));
+    post.add(CallExp.create(symbol(assertName, condition), condition, name));
   }
 
-  private LinkedList pre  = new LinkedList();
-  private LinkedList post = new LinkedList();
+  private static final String assertName = "alwaysAssert";
+
+  private List pre  = new LinkedList();
+  private List post = new LinkedList();
 
   private Expression symbol(String name, Located loc)
   {

@@ -164,8 +164,6 @@ public class MethodBodyDefinition extends Definition
    */
   private VarSymbol findSymbol(VarScope scope)
   {
-    VarSymbol res;
-    
     List symbols = scope.lookup(name);
     if(symbols.size() == 0) return null;
 

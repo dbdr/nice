@@ -38,7 +38,6 @@ public class SuperExp extends Expression
     currentMethod = m;
 
     MethodDeclaration decl = currentMethod.getDeclaration();
-    gnu.expr.Expression code;
     superAlternative = getSuper(decl);
   }
 
@@ -54,7 +53,7 @@ public class SuperExp extends Expression
     java.util.Iterator alternatives = Alternative.sortedAlternatives(decl).iterator();
 
     // Look for the first alternative more general than the current one.
-    for (; alternatives.hasNext();)
+    while (alternatives.hasNext())
       {
 	Alternative a = (Alternative) alternatives.next();
 	if (a == current) continue;

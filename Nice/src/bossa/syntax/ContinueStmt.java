@@ -26,8 +26,6 @@ public class ContinueStmt extends Statement
     return new ContinueStmt(label);
   }
 
-  private static ContinueStmt instance = new ContinueStmt(null);
-
   private ContinueStmt(LocatedString label)
   {
     this.label = label;

@@ -45,6 +45,8 @@ class Parser
   {
     return symb(t.image,t);
   }
+
+  static List globalDefinitions;
 }
 PARSER_END(Parser)
 
@@ -878,8 +880,6 @@ ClassDefinition classDefinition():
   List l;
   List typeParametersVariances = new ArrayList(0);
   boolean isFinal=false, isAbstract=false, isInterface=false;
-  MethodDeclaration m;
-  ClassDefinition res;
 }
 {
 (
@@ -901,6 +901,7 @@ ClassDefinition classDefinition():
   ( 
    "{"
    {
+     NiceClass res;
      res=new NiceClass
      (name,
       isFinal,isAbstract,isInterface,
@@ -913,28 +914,34 @@ ClassDefinition classDefinition():
       getField(fields)
     |
       [ "public" | "private" ]
-      m = internalMethodDeclaration(res)
-      { methods.add(m); }
+      (
+	LOOKAHEAD( methodBodyDefinitionLookahead() )
+	{ MethodBodyDefinition mb; }
+	mb = methodBodyDefinition(res)
+	{ globalDefinitions.add(mb); }
+      |
+        { MethodDeclaration m; }
+        m = internalMethodDeclaration(res)
+        { methods.add(m); }
+      )
    )* 
    "}"
    {
-     ((NiceClass) res).setFieldsAndMethods(fields, methods);
+     res.setFieldsAndMethods(fields, methods);
+     return res;
    }
   | 
    "=" "native"
    { LocatedString javaName=null; }
    [ javaName=doted_string() ] ";"
    {
-     res = new JavaClass
-       (name,
+     return new JavaClass
+	(name,
 	isFinal,isAbstract,isInterface,
 	parameters,typeParametersVariances,
 	ext,imp,abs,javaName);
    }
   ) 
-  { 
-    return res;
-  }
 }
 
 AbstractInterface interfaceDefinition():
@@ -981,13 +988,19 @@ Pattern pattern(LocatedString name):
   { return new Pattern(name,tc,type); }
 }
 
-MethodBodyDefinition methodBodyDefinition():
+void methodBodyDefinitionLookahead():
+{}
+{
+  methodName() [ "<" strings() ">" ] "("
+}
+
+MethodBodyDefinition methodBodyDefinition(NiceClass container):
 {
     LocatedString name,i;
     Pattern p;
     Collection binders=null;
     //List newTypeVars=null;
-    List parameters=new LinkedList();
+    LinkedList parameters=new LinkedList();
     Statement code;
     Expression exp;
 }
@@ -1015,7 +1028,7 @@ MethodBodyDefinition methodBodyDefinition():
 	code.setLocation(exp.location());
       }
     )
-    { return new MethodBodyDefinition(name,binders,
+    { return new MethodBodyDefinition(container,name,binders,
 				      //newTypeVars,
 				      parameters,code); }
 }
@@ -1116,8 +1129,8 @@ MethodDeclaration nativeMethodDeclaration(LocatedString name,
       return new JavaMethod(className,methodName,javaTypes,
 			    name,cst,returnType,parameters);
     else
-      return new StaticFieldAccess(className,methodName,
-				   name,cst,returnType,parameters);
+      return new JavaFieldAccess(className,methodName,
+				 name,cst,returnType,parameters);
   }
 }
 
@@ -1148,11 +1161,11 @@ Definition definition():
     res=classDefinition()
   | 
     res=globalVariable()
-  |
-    LOOKAHEAD( constraint() monotype() methodName() )
-    res=methodDeclaration()
   | 
-    res=methodBodyDefinition()
+    LOOKAHEAD( methodBodyDefinitionLookahead() )
+    res=methodBodyDefinition(null)
+  |
+    res=methodDeclaration()
   )
   { return res; }
 }
@@ -1160,6 +1173,7 @@ Definition definition():
 void readDefinitions(List definitions):
 {
     Definition d;
+    globalDefinitions = definitions;
 }
 {
   ( 

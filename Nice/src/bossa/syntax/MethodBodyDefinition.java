@@ -19,6 +19,7 @@ import gnu.bytecode.*;
 import java.util.*;
 
 import bossa.util.Debug;
+import bossa.util.Location;
 import mlsub.typing.Monotype;
 import mlsub.typing.MonotypeConstructor;
 import mlsub.typing.Constraint;
@@ -44,7 +45,8 @@ public class MethodBodyDefinition extends Definition
    * @param formals list of Pattern
    * @param body s statement representing the body of the method.
    */
-  public MethodBodyDefinition(LocatedString name, 
+  public MethodBodyDefinition(NiceClass container,
+			      LocatedString name, 
 			      Collection binders,
 			      //List newTypeVars,
 			      List formals, 
@@ -62,9 +64,15 @@ public class MethodBodyDefinition extends Definition
     
     addChild(this.body);
 
-    if(name.content.equals("main") && formals.size()==1) // no dummy "this" parameter
+    if (container != null)
+      formals.add(0, new Pattern(THIS, new TypeIdent(container.getName())));
+
+    if(name.content.equals("main") && formals.size()==1)
       module.isRunnable(true);
   }
+
+  private static LocatedString THIS = 
+    new LocatedString("this", Location.nowhere());
 
   public Collection associatedDefinitions()
   {

@@ -11,9 +11,35 @@ import java.util.*;
 // Backward compatibility. `iter` will probably be removed sometime.
 <Any T> void iter(java.util.Collection<T> c, T->void f) = c.foreach(f);
 
+<java.util.Collection C, T, U> C<U> similarEmptyCollection(C<T>);
+
 <java.util.Collection C, Any T, Any U> C<U> map(C<T>, T->U);
+
+// A more precise type for filter would be:
+// <Collection C, T, U | T <: U> C<U> filter(C<T>, T -> boolean);
+// This would allow List<A> lA = lB.filter(...) where B is a subclass of A.
+
 <java.util.Collection C, Any T> C<T> filter(C<T>, T->boolean);
 
+/** Return a collection containing all elements for which converter
+    returns a non-null value.
+    It is possible to retain only elemnts with a subtype of the original
+    element type, in which case the returned collection has that 
+    element type.
+*/
+<Collection C, T, U> C<!U> filter(C<T> source, T->?U converter)
+{
+  C<!U> res = source.similarEmptyCollection();
+  source.foreach(T elem => {
+    ?U converted = converter(elem);
+    if (converted != null)
+      res.add(converted);
+  });
+  return res;
+}
+
+
+/** Modifies c, only keeping the elements for which test returns true. */
 <T> void keep  (Collection<T> c, T->boolean test)
 {
   Iterator<T> i = c.iterator();
@@ -25,6 +51,7 @@ import java.util.*;
     }
 }
 
+/** Modifies c, removing the elements for which test returns true. */
 <T> void remove(Collection<T> c, T->boolean test)
 {
   Iterator<T> i = c.iterator();
@@ -36,9 +63,6 @@ import java.util.*;
     }
 }
 
-// A more precise type for filter would be:
-// <Collection C, T, U | T <: U> C<U> filter(C<T>, T -> boolean);
-// This would allow List<A> lA = lB.filter(...) where B is a subclass of A.
 
 <Any T, Any U> U foldLeft(java.util.List<T> l, (U, T)->U f, U init)
 {
@@ -92,55 +116,46 @@ foreach(l@java.util.List, f)
     f(l.get(i));
 }
 
-map(c, f) 
+map<C,T,U>(c, f)
 {
-  throw new Error("Map not implemented for " + c.getClass());
+  C<U> res = c.similarEmptyCollection();
+  c.foreach(T elem => { res.add(f(elem)); });
+  return res;
 }
 
-map<C,T,U>(c#ArrayList, f)
+filter<C,T>(c, test)
+{
+  C<T> res = c.similarEmptyCollection();
+  c.foreach(T elem => { if(test(elem)) res.add(elem); });
+  return res;
+}
+
+similarEmptyCollection(c) 
+{
+  throw new Error("The method similarEmptyCollection is not yet implemented for " + c.getClass());
+}
+
+similarEmptyCollection<C,T,U>(c#ArrayList)
 {
   ArrayList<U> res = new ArrayList(c.size());
-  c.foreach(T elem => { res.add(f(elem)); });
   return res;
 }
 
-map<C,T,U>(c#java.util.Vector, f)
+similarEmptyCollection<C,T,U>(c#LinkedList)
+{
+  LinkedList<U> res = new LinkedList();
+  return res;
+}
+
+similarEmptyCollection<C,T,U>(c#java.util.Vector)
 {
   java.util.Vector<U> res = new java.util.Vector(c.size());
-  c.foreach(T elem => { res.add(f(elem)); });
   return res;
 }
 
-map<C,T,U>(c#java.util.Stack, f)
+similarEmptyCollection<C,T,U>(c#java.util.Stack)
 {
   java.util.Stack<U> res = new java.util.Stack();
-  c.foreach(T elem => { res.add(f(elem)); });
-  return res;
-}
-
-filter(c, f) 
-{
-  throw new Error("Filter not implemented for " + c.getClass());
-}
-
-filter<C,T>(c#ArrayList, test)
-{
-  ArrayList<T> res = new ArrayList(c.size());
-  c.foreach(T elem => { if(test(elem)) res.add(elem); });
-  return res;
-}
-
-filter<C,T>(c#java.util.Vector, test)
-{
-  java.util.Vector<T> res = new java.util.Vector(c.size());
-  c.foreach(T elem => { if(test(elem)) res.add(elem); });
-  return res;
-}
-
-filter<C,T>(c#java.util.Stack, test)
-{
-  java.util.Stack<T> res = new java.util.Stack();
-  c.foreach(T elem => { if(test(elem)) res.add(elem); });
   return res;
 }
 

@@ -18,7 +18,7 @@ import mlsub.typing.TypeSymbol;
    A mapping from type names to type symbols.
 
    @version $Date$
-   @author Daniel Bonniot (d.bonniot@mail.dotcom.fr)
+   @author Daniel Bonniot (bonniot@users.sf.net)
 */
 public class TypeMaper implements TypeMap
 {
@@ -33,15 +33,20 @@ public class TypeMaper implements TypeMap
   
   public TypeSymbol lookup(LocatedString name)
   {
-    return lookup(name.toString());
+    return lookup(name.toString(), name.location());
   }
 
   public TypeSymbol lookup(String name)
+  {
+    return lookup(name, null);
+  }
+
+  public TypeSymbol lookup(String name, bossa.util.Location loc)
   {
     TypeSymbol res = (TypeSymbol) nice.tools.ast.dispatch.get(inner, name);
     if (res != null)
       return res;
     else
-      return global.lookup(name);
+      return global.lookup(name, loc);
   }
 }

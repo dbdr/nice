@@ -24,6 +24,22 @@
   mapTest.put("test", (1,2));
   ?(int,int) res = mapTest.get("test");
 
-/// PASS bug
-  (int,int) ints;
-  (String s, ints) = ("A", (1,2));
+/// PASS
+  (long,long) longs;
+  (byte,byte) bytes = (1,2);
+  (longs, longs) = (bytes, bytes);
+  (long i, long j) = longs;
+  i += j;
+
+/// PASS
+  (long,long) longs;
+  (byte,byte) bytes = (1,2);
+  (String s, longs) = ("A", bytes);
+  (long i, long j) = longs;
+  i += j;
+
+/// PASS
+  (long,long) longs;
+  (String s, longs) = ("A", (1,2));
+  (long i, long j) = longs;
+  i += j;

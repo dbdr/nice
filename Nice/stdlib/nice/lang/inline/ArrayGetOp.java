@@ -35,14 +35,21 @@ extends Procedure2 implements Inlineable
     return new ArrayGetOp(type);
   }
 
+  /**
+     @param type   The expected component type of the array, or null to keep
+                   it unconstrained.
+  */
   public ArrayGetOp(Type type)
   {
     this.type = type;
-    arrayTarget = new StackTarget(nice.tools.code.SpecialTypes.array(type));
+    if (type != null)
+      arrayTarget = new StackTarget(nice.tools.code.SpecialTypes.array(type));
+    else
+      arrayTarget = StackTarget.pushObject;
   }
 
   private final Type type;
-  private final StackTarget arrayTarget;
+  private final Target arrayTarget;
 
   public void compile (ApplyExp exp, Compilation comp, Target target)
   {
@@ -73,7 +80,10 @@ extends Procedure2 implements Inlineable
       return ((ArrayType) array).getComponentType();
 
     // If not (possible with polymorphism) the base type is a safe bet
-    return type;
+    if (type != null)
+      return type;
+
+    return Type.pointer_type;
   }
 
   // Interpretation

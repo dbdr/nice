@@ -77,8 +77,8 @@ public final class Types
   {
     m = equivalent(m);
     
-    if (m instanceof TupleType)
-      setBytecodeType(((TupleType) m).getComponents());
+    if (m instanceof mlsub.typing.TupleType)
+      setBytecodeType(((mlsub.typing.TupleType) m).getComponents());
 
     TypeConstructor tc = m.head();
     if (tc == null)
@@ -175,9 +175,8 @@ public final class Types
     if (res != null)
       return res;
 
-    if (m instanceof TupleType)
-      // not SpecialArray
-      return ArrayType.make(componentType((TupleType) m));
+    if (m instanceof mlsub.typing.TupleType)
+      return new TupleType(javaType(((mlsub.typing.TupleType) m).getComponents()));
     
     if (m instanceof FunType)
       return gnu.expr.Compilation.typeProcedure;
@@ -210,12 +209,6 @@ public final class Types
     return javaType(t.getMonotype());
   }
 
-  /** Returns the common bytecode type used for elements of this tuple. */
-  public static Type componentType(TupleType t)
-  {
-    return lowestCommonSupertype(t.getComponents());
- }
-  
   /**
      @return the most precise bytecode type able to store values of the given
        Nice types
@@ -225,6 +218,18 @@ public final class Types
     Type res = javaType(types[0]);
     for (int i = 1; res!=null && i<types.length; i++)
       res = Type.lowestCommonSuperType(res, javaType(types[i]));
+    
+    if (res == null)
+      return Type.pointer_type;
+    else
+      return res;
+  }
+
+  static Type lowestCommonSupertype(Type[] types)
+  {
+    Type res = types[0];
+    for (int i = 1; res != null && i < types.length; i++)
+      res = Type.lowestCommonSuperType(res, types[i]);
     
     if (res == null)
       return Type.pointer_type;

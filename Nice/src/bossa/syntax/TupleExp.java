@@ -81,6 +81,7 @@ public class TupleExp extends bossa.syntax.Expression
     return this;
   }
 
+  private Monotype[] components;
   private Monotype[] expectedComponents;
 
   void computeType()
@@ -89,43 +90,48 @@ public class TupleExp extends bossa.syntax.Expression
     // should create a new <tt>and</tt> method without the last dummy parameters
     Constraint cst = Constraint.and(Polytype.getConstraint(types), 
 				    null, null);
-    Monotype[] components = Polytype.getMonotype(types);
+    components = Polytype.getMonotype(types);
     TupleType tupleType = new TupleType(components);
     Types.setBytecodeType(components);
-    this.componentType = Types.lowestCommonSupertype
-      (expectedComponents != null ? expectedComponents : components);
+    if (expectedComponents == null)
+      expectedComponents = components;
 
     type = new Polytype(cst, bossa.syntax.Monotype.sure(tupleType));
   }
 
-  private Type componentType;
-  
   /****************************************************************
    * Code generation
    ****************************************************************/
 
   protected gnu.expr.Expression compile()
   {
-    // force computation of componentType
+    // Force computation of the component types.
     getType();
 
     int len = expressions.length;
 
-    return new gnu.expr.ApplyExp
-      (new nice.tools.code.LiteralArrayProc(new ArrayType(componentType), len),
+    /*
+      We base the array type on the expected type, but we record the
+      real type of the components.
+    */
+    return nice.tools.code.TupleType.createExp
+      (Types.lowestCommonSupertype(expectedComponents),
+       Types.javaType(components), 
        bossa.syntax.Expression.compile(expressions));
   }
 
   gnu.expr.Expression compileAssign(gnu.expr.Expression array)
   {
-    // force computation of componentType
-    getType();
-
     int len = expressions.length;
 
     LetExp let = null;
     Expression tupleExp;
     
+    Type arrayType = array.getType();
+    nice.tools.code.TupleType tupleType = null;
+    if (arrayType instanceof nice.tools.code.TupleType)
+      tupleType = (nice.tools.code.TupleType) arrayType;
+
     // if array is a complex expression, 
     // we have to evaluate it and store the result 
     // to avoid evaluating it several times.
@@ -133,7 +139,7 @@ public class TupleExp extends bossa.syntax.Expression
       {
 	let = new LetExp(new Expression[]{array});
 	Declaration tupleDecl = let.addDeclaration
-	  ("tupleRef", ArrayType.make(componentType));
+	  ("tupleRef", arrayType);
 
 	//FIXME: CanRead should be set automatically.
 	tupleDecl.setCanRead(true);
@@ -144,11 +150,15 @@ public class TupleExp extends bossa.syntax.Expression
     
     Expression[] stmts = new Expression[len];
     for (int i=0; i<len; i++)
-      stmts[i] = expressions[i].compileAssign
-	(new ApplyExp(new nice.lang.inline.ArrayGetOp(componentType),
-		      new Expression[]{
-			tupleExp, 
-			intExp(i)}));
+      {
+	Expression value = new ApplyExp
+	  (new nice.lang.inline.ArrayGetOp(null),
+	   new Expression[]{ tupleExp, intExp(i)});
+	if (tupleType != null)
+	  value = nice.tools.code.EnsureTypeProc.ensure(value, tupleType.componentTypes[i]);
+
+	stmts[i] = expressions[i].compileAssign(value);
+      }
     
     if (let != null)
       {

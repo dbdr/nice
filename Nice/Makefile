@@ -9,7 +9,7 @@ NICEC= NICEJAR="${TOP}/stdlib" CLASSPATH="${TOP}/classes" nicec --classpath="${T
 NICEC_DEV= CLASSPATH=${TOP}/src/nice/tools/.compiler.jar:${TOP}/src:${TOP}/classes java -Dnice.systemJar=${TOP}/stdlib nice.tools.compiler.package --classpath="${TOP}/stdlib:${TOP}/classes:${TOP}/src"
 
 # run this first when you just checked out a fresh version
-first: parser bootstrap compiler jar
+first: bootstrap compiler jar
 
 parser: src/bossa/parser/Parser.java
 src/bossa/parser/Parser.java: src/bossa/parser/Parser.jj
@@ -42,6 +42,10 @@ recompileGNU:
 
 recompileSTDLIB:
 	${JAVAC} ${TOP}/stdlib/nice/lang/*.java
+
+# Compile individual files with: F=file.java make compile
+compile:
+	${JAVAC} ${F}
 
 # Part of the standard library implemented in Java
 # Since these are not required by the compiler source,
@@ -108,7 +112,7 @@ sourceforge:
 # Bootstrap
 #****************************************************************
 
-bootstrap:
+bootstrap: parser
 	ln -sf nicec bin/nicer
 	mkdir -p classes
 	cd classes; jar xf ../external/java-getopt-1.0.7.jar gnu

@@ -37,6 +37,7 @@ public final class MonotypeVar extends Monotype
   }
 
   private String name;
+  public String getName() { return name; }
 
   public TypeSymbol cloneTypeSymbol()
   {

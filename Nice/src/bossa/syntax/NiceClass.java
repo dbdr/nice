@@ -408,18 +408,28 @@ public class NiceClass extends ClassDefinition.ClassImplementation
 
       if (checkValue && original.value != null)
         {
-	  try {
-	    Typing.leq(original.value.getType(), this.sym.getType());
-	  }
-	  catch (mlsub.typing.TypingEx ex) {
-            User.error(sym, "The default value declared in " +
-                       original.getDeclaringClass() +
-                       "\nis not compatible with the overriden type");
-          }
+          checkValue(original.value, original.getDeclaringClass());
           return false;
         }
 
       return checkValue;
+    }
+
+    void checkOverride(ValueOverride original)
+    {
+      checkValue(original.value, original.getDeclaringClass());
+    }
+
+    private void checkValue(Expression value, NiceClass location)
+    {
+      try {
+        Typing.leq(value.getType(), this.sym.getType());
+      }
+      catch (mlsub.typing.TypingEx ex) {
+        User.error(sym, "The default value declared in " +
+                   location +
+                   "\nis not compatible with the overriden type");
+      }
     }
 
     public String toString()
@@ -434,6 +444,16 @@ public class NiceClass extends ClassDefinition.ClassImplementation
     {
       this.name = name;
       this.value = value;
+    }
+
+    NiceClass getDeclaringClass()
+    {
+      return NiceClass.this;
+    }
+
+    boolean hasName(String name)
+    {
+      return this.name.toString().equals(name);
     }
 
     void updateConstructorParameter(List inherited)
@@ -496,7 +516,6 @@ public class NiceClass extends ClassDefinition.ClassImplementation
 
     for (Iterator it = valueOverrides.iterator(); it.hasNext(); )
       ((ValueOverride)it.next()).resolve(definition.scope, localScope);
-
   }
 
   private void createFields()
@@ -525,6 +544,18 @@ public class NiceClass extends ClassDefinition.ClassImplementation
     for (int i = 0; i < overrides.length; i++)
       if (overrides[i].hasName(name))
         checkValue = field.checkOverride(overrides[i], checkValue);
+
+    if (checkValue)
+      for (Iterator it = valueOverrides.iterator(); it.hasNext(); )
+        {
+          ValueOverride original = (ValueOverride) it.next();
+          if (original.hasName(name))
+            {
+              field.checkOverride(original);
+              checkValue = false;
+              break;
+            }
+        }
 
     NiceClass parent = getParent();
     if (parent != null)

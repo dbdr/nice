@@ -88,7 +88,7 @@ class B extends A {
   override /* /// FAIL HERE */ x = 5;
 }
 
-/// FAIL bug
+/// FAIL
   /// Toplevel
 class A {
   final int x = 1;
@@ -97,5 +97,18 @@ class B extends A {
   override x = 1000;
 }
 class C extends B {
-  override /* /// FAIL HERE */ byte x;
+  override byte /* /// FAIL HERE */ x;
+}
+
+/// FAIL
+  let c = new C();
+  /// Toplevel
+class A {
+  final List<int> x = new LinkedList();
+}
+class B extends A {
+  override x = new ArrayList();
+}
+class C extends B {
+  override LinkedList<int> /* /// FAIL HERE */ x;
 }

@@ -1,0 +1,9 @@
+/// PASS
+  String[] s = concat(["0"], ["1"]);
+  assert s.length == 2;
+  assert s[0].equals("0");
+  assert s[1].equals("1");
+
+/// PASS
+  // Concatenation can be covariant.
+  float[] f = concat([0], [128]);

@@ -143,3 +143,24 @@ filter<C, T>(a@Array, test) = a.filter(test);
     array[i] = value(i);
   return cast(array);
 }
+
+/** Returns an array containing, in order, the elements of both arguments.
+
+    The type of the elements of the arguments can be subtypes of the result 
+    elements, since a new array is created.
+*/
+<T, T1, T2 | T1 <: T, T2 <: T> T[] concat(T1[] a1, T2[] a2)
+{
+  int index = a1.length + a2.length;
+  T[] res = cast(new T[index]);
+
+  // We fill the result array backwards.
+
+  for (int i = a2.length; --i >= 0;)
+    res[--index] = a2[i];
+
+  for (int i = a1.length; --i >= 0;)
+    res[--index] = a1[i];
+
+  return res;
+}

@@ -84,7 +84,7 @@ In addition to traditional object-oriented features, Nice offers:
   They allow methods to be defined outside classes.
   This means that new methods can be defined on classes that
   belong to a different package (even in java.*). 
-  Multi-methods alse extend usual methods with the possibility to
+  Multi-methods also extend usual methods with the possibility to
   dispatch on every argument, instead of only the receiver class.
   <ulink url="visitor.html">This article</ulink> shows why using multi-methods 
   is preferable to applying the Visitor pattern.

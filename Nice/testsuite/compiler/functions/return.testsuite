@@ -12,6 +12,22 @@
   }
 
 /// FAIL
+  ///Toplevel
+  String f(String b) {
+    while (true) {
+      try {
+        if (b == "")
+          break;
+	return "f2(b)";
+      } catch(Exception e) {
+	// modify and try again
+	b = "adjust(b)";
+      }
+    }
+    // No return in this case.
+  }
+
+/// FAIL
   int x = 0;
   // local function
   int f()

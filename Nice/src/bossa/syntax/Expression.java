@@ -87,6 +87,16 @@ public abstract class Expression
       ((Number) ((ConstantExp) this).value).intValue() == 0;
   }
 
+  boolean isFalse()
+  {
+    return false;
+  }
+
+  boolean isTrue()
+  {
+    return false;
+  }
+
   /**
    * Resolves overloading, taking into account the parameters 
    * the expressions is applied to.

@@ -108,6 +108,12 @@ public class LoopStmt extends Statement
     mustCreateBlock = true;
   }
 
+  /**
+     Returns true iff there exists a break statement that target this loop.
+     This means that the loop can complete abruptly because of that break.
+  */
+  boolean isBreakTarget() { return mustCreateBlock; }
+
   private boolean mustCreateBlock = false;
 
   gnu.expr.Expression generateCode()

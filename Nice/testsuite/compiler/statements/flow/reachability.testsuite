@@ -1,0 +1,12 @@
+/// FAIL bug
+  while (false) { 
+    ; // Unreachable
+  }
+
+/// FAIL bug
+  while (true) ;
+  ; // Unreachable
+
+/// PASS
+  while (true) break;
+  ; // Reachable

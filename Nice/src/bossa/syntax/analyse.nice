@@ -597,11 +597,19 @@ analyse(s@ExpressionStmt, info)
 analyse(l@LoopStmt, info)
 {
   info.beginInner();
+
   if (l.isTestFirst())
-    l.whileExp = analyse(l.whileExp, info);
+    {
+      l.whileExp = analyse(l.whileExp, info);
+      if (notNull(l.whileExp).isFalse())
+	info.setUnreachable();
+    }
+
   ?LoopStmt save = info.currentLoop;
   info.currentLoop = l;
+
   analyse(l.loopBody, info);
+
   info.currentLoop = save;
 
   /* The update code is considered reachable even if the loop cannot terminate
@@ -615,13 +623,16 @@ analyse(l@LoopStmt, info)
     l.whileExp = analyse(l.whileExp, info);
 
   info.endInner();
+
+  if (notNull(l.whileExp).isTrue() && ! l.isBreakTarget())
+    info.setUnreachable();
 }
 
 analyse(b@BreakStmt, info)
 {
   ?LoopStmt loop = info.currentLoop;
   if (loop == null)
-    throw error(b, "continue must only occur inside loops");
+    throw error(b, "break must only occur inside loops");
 
   loop.createBlock();
   info.setUnreachable();

@@ -1,5 +1,17 @@
 nice (0.9.5)
 
+  * Added new syntax for patterns in method implementations.
+    'Type param' for 'param@Type' and '#Type param' for 'param#Type
+    example usage:
+      class Dummy {
+	int x;
+	equals(Dummy other) = this.x == other.x;
+      }
+    This syntax should be more consistent and familiar, and is now
+    prefered to the old one, which will eventually be deprecated.
+  * Object is now recognized as a super-type of every type. This allows
+    easier use of Java libraries, creation of heterogeneous collections,
+    and type-safe handling of values with unknown types.
   * String concatenation can be performed by mere juxtaposition of string
     literals and simple expressions, which are converted into strings. For
     instance:
@@ -13,36 +25,25 @@ nice (0.9.5)
         }
   * Enums are serializable now and have a family() method that returns a list
     of all elements in that enum.
-  * Reduced memory usage when doing multiple compilations in one jvm.
-  * The compiler is now more clever about loading imported Java classes
-    only if they are actually used. This reduces memory usage and improves
-    compilation speed.
-  * Added alternative syntax for patterns in method implementations.
-    'Type param' for 'param@Type' and '#Type param' for 'param#Type
-    example usage:
-      class Dummy {
-	int x;
-	equals(Dummy other) = this.x == other.x;
-      }
-  * Object is now recognized as a super-type of every type. This allows
-    easier use of Java libraries, creation of heterogeneous collections,
-    and type-safe handling of values with unknown types.
-  * Simplified some complex type in error messages.
+  * Simplified some complex types in error messages.
   * Safe dynamic type inference in presence of anonymous and local functions.
-  * Reduced memory usage when repeatedly compiling in the same JVM (eclipse
-    plugin, ant, testsuite, ...).
   * Unused local variables will give a warning.
   * Nested multi-line comments are allowed.
   * Empty statements (made of a single ';') have been removed. This avoids the 
     risk of an accidental ';' changing the meaning of a statement. Empty 
     statements are very rarely needed, and can easily be replaced by '{}'.
   * The Emacs mode is updated to work with recent versions of GNU and XEmacs.
+  * Reduced memory usage when repeatedly compiling in the same JVM (eclipse
+    plugin, ant, testsuite, ...).
+  * The compiler is now more clever about loading imported Java classes
+    only if they are actually used. This reduces memory usage and improves
+    compilation speed.
   * Bug fixes (accessing static fields of an superclass or interface, 
     compilation of polymorphic tuples, captured 'this' in initializer, 
     duplication of constructors in bytecode, disappearing contracts during 
     recompilation, ... )
 
- -- Wed, 10 Dec 2003 20:17:43 +0100
+ -- Thu, 11 Dec 2003 16:05:18 +0100
 
 nice (0.9.4)
 

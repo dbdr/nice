@@ -28,3 +28,12 @@
 /// FAIL
   /// Toplevel
   interface I extends /*/// FAIL HERE */ java.io.File {}
+
+/// FAIL
+  /// Toplevel
+  class A extends A {}
+
+/// FAIL
+  /// Toplevel
+  class A extends B {}
+  class B extends A {}

@@ -475,15 +475,33 @@ abstract public class ClassDefinition extends MethodContainer
    * Resolution
    ****************************************************************/
 
-  private boolean resolved = false;
+  /** Marker to avoid cycles and multiple resolutions. */
+  private int status = NOT_RESOLVED;
+  private static int NOT_RESOLVED = 0;
+  private static int RESOLVING = 1;
+  private static int RESOLVED = 2;
 
   void resolve()
   {
-    if (resolved)
+    if (status == RESOLVED)
       return;
+    else if (status == RESOLVING)
+      {
+	// We found a cycle.
+	String message;
+	if (TypeConstructors.isInterface(tc))
+	  message = "Interface " + getName() + " extends itself";
+	else
+	  message = "Class " + getName() + " extends itself";
 
-    resolved = true;
+	throw User.error(this, message);
+      }
+
+    status = RESOLVING;
+
     resolveClass();
+
+    status = RESOLVED;
   }
 
   void resolveClass()

@@ -94,8 +94,12 @@ case $progname in
 
     system_args="--runtime=${NICEC}"
 
-    if which gcj >/dev/null 2>&1; then
-      system_args="${system_args} --native-compiler=`which gcj 2>/dev/null`"
+    gcj="`which gcj 2>/dev/null`"
+    # Check the string found is really a file
+    # This is a work-around for a bug in OS X: 
+    #   which gcj returns 0 (success) and prints "no gcj in $PATH"
+    if [ -f "$gcj" ]; then
+        system_args="${system_args} --native-compiler=${gcj}"
     fi
 
     exec ${JAVA} nice.tools.compiler.fun ${system_args} "$@"

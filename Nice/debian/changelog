@@ -28,6 +28,7 @@ nice (0.7.5) unstable; urgency=low
   * Forbade @null patterns for method arguments that cannot be null.
   * Bugfixes (compilation of tuples with primitive types using subtyping,
     clotures).
+  * Fixed the nicec script on Max OS X, when gcj is not present.
 
  --
 

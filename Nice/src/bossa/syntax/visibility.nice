@@ -22,3 +22,12 @@ import nice.tools.visibility;
 
 Visibility visibility(boolean pub, boolean priv) =
   pub ? general : priv ? intimate: familial;
+
+Visibility loosen(int dummy, Visibility vis) =
+  vis == familial ? general : vis;
+
+String keyword(int dummy, Visibility);
+keyword(dummy, intimate) = "private ";
+keyword(dummy, familial) = "";
+keyword(dummy, general) = "public ";
+

@@ -59,7 +59,7 @@ void->File traverse(File dir, File->boolean filter = always(true),
   //Explicit stack management, since 
   //Java doesn't do tail call elimination...
   let stack = new Stack();
-  var list = dir.listDir(filter).toArrayList();
+  var list = Arrays.asList(dir.listDir(filter));
   list.sort(sortBy);
   var current = list.iterator();
   return () => {
@@ -73,7 +73,7 @@ void->File traverse(File dir, File->boolean filter = always(true),
     let f = current.next();
     if (f.isDirectory()) {
       stack.push(current);
-      list = f.listDir(filter).toArrayList();
+      list = Arrays.asList(f.listDir(filter));
       list.sort(sortBy);
       current = list.iterator();
     }

@@ -156,7 +156,7 @@ public class NiceClass extends ClassImplementation
       valueOverride.resolve(notNull(definition.scope), notNull(localScope));
   }
 
-  private ?gnu.expr.Declaration getOverridenField
+  ?gnu.expr.Declaration getOverridenField
     (OverridenField field, boolean checkValue)
   {
     let name = field.getName();
@@ -340,7 +340,7 @@ public class NiceClass extends ClassImplementation
 
   private boolean entered = false;
 
-  private void enterTypingContext()
+  void enterTypingContext()
   {
     if (entered || definition.classConstraint == null)
       return;

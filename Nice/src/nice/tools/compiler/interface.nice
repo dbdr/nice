@@ -74,15 +74,15 @@ void compile(Compilation compilation, String mainPackage,
 
 /**
  * Determines the location of the nice runtime.
- * 
+ *
  */
-private ?String getNiceRuntime() 
+?String getNiceRuntime()
 {
   String resource = "/nice/tools/compiler/fun.class";
 
   // Attempt to locate the file using the class loader.
   ?java.net.URL classUrl = dispatch.class.getResource(resource);
-		
+
   if (classUrl == null)
     return null;
 

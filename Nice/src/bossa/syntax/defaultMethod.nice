@@ -49,14 +49,14 @@ public Definition createMethodWithDefault
        Monotype returnType,
        FormalParameters parameters,
        ?Statement body,
-       Contract contract, boolean isOverride)
+       Contract contract, boolean isOverride, Visibility vis)
 {
   if (body == null)
     return createNiceMethod(name, constraint, returnType, parameters,
-	contract, isOverride);
+	contract, isOverride, vis);
 
   return createDefaultMethodImplementation(name, constraint, returnType,
-	parameters, contract, isOverride, body);
+	parameters, contract, isOverride, body, vis);
 }
 
 /**
@@ -119,7 +119,8 @@ DefaultMethodImplementation createDefaultMethodImplementation
      Monotype returnType,
      FormalParameters parameters,
      Contract contract, boolean isOverride,
-     Statement body)
+     Statement body,
+     Visibility vis)
 {
   let res = new DefaultMethodImplementation(name, Node.down, body: body,
 	formals: parameters.asList().mapToArray(Parameter param =>
@@ -130,7 +131,8 @@ DefaultMethodImplementation createDefaultMethodImplementation
 	contract: contract, isOverride: isOverride, implementation: res);
   notNull(res.declaration).addChild(parameters);
   notNull(res.declaration).setSymbol
-    (new MethodSymbol(notNull(res.declaration), name, constraint, returnType));
+    (new MethodSymbol(notNull(res.declaration), name, constraint, returnType),
+     vis);
 
   res.addChild(res.declaration);
   return res;

@@ -218,6 +218,7 @@ public class NiceMethod extends UserOperator
 
   printInterface(s)
   {
+    s.print(keyword(0, visibility));
     if (specializedMethods != null)
       s.print("override ");
     s.print(this.toString() + ";\n");
@@ -228,7 +229,7 @@ public class NiceMethod extends UserOperator
 public NiceMethod createNiceMethod(LocatedString name, 
 	Constraint constraint, Monotype returnType, 
 	FormalParameters parameters,
-	Contract contract, boolean isOverride)
+	Contract contract, boolean isOverride, Visibility vis)
 {
   let res = new NiceMethod(name, Node.down, 
 	parameters: parameters,
@@ -240,7 +241,7 @@ public NiceMethod createNiceMethod(LocatedString name,
 	returnTypeLocation: returnType.location());
 
   res.addChild(parameters);
-  res.setSymbol(new MethodSymbol(res, name, constraint, returnType));
+  res.setSymbol(new MethodSymbol(res, name, constraint, returnType), vis);
   return res;
 }
 
@@ -263,7 +264,7 @@ public Definition createMemberMethod
      FormalParameters params,
      ?Statement body, 
      Contract contract,
-     boolean isOverride)
+     boolean isOverride, Visibility vis)
 {
   // it is a class method, there is an implicit "this" argument
 
@@ -337,10 +338,10 @@ public Definition createMemberMethod
 
     if (body == null)
       return createNiceMethod(name, constraint, returnType, params, contract,
-                            isOverride);
+                            isOverride, vis);
     else
       return createMethodWithDefault
-        (name, constraint, returnType, params, body, contract, isOverride);
+        (name, constraint, returnType, params, body, contract, isOverride, vis);
   }
 
 public gnu.expr.Expression getDispatchMethod(NiceMethod def, Module module)

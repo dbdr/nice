@@ -868,6 +868,17 @@ List monotypes():
 }
 
 /***********************************************************************/
+/*                          Visibility                                 */
+/***********************************************************************/
+
+Visibility visibility():
+{ boolean pub = false, priv = false; }
+{
+  [ "public" { pub = true; } | "private"  { priv = true; } ]
+  { return dispatch.visibility(pub, priv); }
+}
+
+/***********************************************************************/
 /*                          Classes                                    */
 /***********************************************************************/
 
@@ -944,7 +955,8 @@ FormalParameters formalParameters(List statements):
   { return bossa.syntax.dispatch.createFormalParameters(params); }
 }
 
-Definition internalMethodOrFunction(MethodContainer c, boolean isOverride):
+Definition internalMethodOrFunction
+  (MethodContainer c, boolean isOverride, Visibility vis):
 {
   LocatedString name;
   FormalParameters parameters;
@@ -962,9 +974,11 @@ Definition internalMethodOrFunction(MethodContainer c, boolean isOverride):
   contract = contract()
   ( ";" | body = code() {statements.add(body);} )
 
-  { return c.createMemberMethod(name, cst, returnType, parameters,
-                             body != null ? bossa.syntax.dispatch.createBlock(statements) : null,
-                             contract, isOverride); }
+  { return c.createMemberMethod
+      (name, cst, returnType, parameters,
+       body != null ? bossa.syntax.dispatch.createBlock(statements) : null,
+       contract, isOverride, vis);
+  }
 }
 
 MonotypeConstructor superClass():
@@ -1105,14 +1119,15 @@ TypeDefinition typeDefinition(Constraint cst, List definitions, boolean storeDoc
       LOOKAHEAD( fieldLookahead() )
       getField(impl, storeDocString)
     | { Definition m; Token t = getToken(1); boolean isOverride = false; }
-      [ "public" | "private" ]
+      { Visibility vis; }
+      vis = visibility()
       [ "override" { isOverride = true; } ]
       (
 	LOOKAHEAD( methodBodyDefinitionLookahead() )
 	m = methodBodyDefinition(impl)
 	{ definitions.add(m); }
       |
-        m = internalMethodOrFunction(res, isOverride)
+        m = internalMethodOrFunction(res, isOverride, vis)
         { methods.add(m); }
       )
       { if (storeDocString && isDocStringToken(t))
@@ -1174,9 +1189,9 @@ AbstractInterface interfaceDefinition(Constraint prefix, List definitions):
   { res = bossa.syntax.dispatch.createAbstractInterface(name,parameters,typeParametersVariances,
 				extensions); }
     (
-      { Definition m; }
-      [ "public" | "private" ]
-      m = internalMethodOrFunction(res, false)
+      { Definition m; Visibility vis; }
+      vis = visibility()
+      m = internalMethodOrFunction(res, false, vis)
       { definitions.add(m); }
     )*
   "}"
@@ -1422,7 +1437,7 @@ MethodBodyDefinition methodBodyDefinition(NiceClass container):
 				      parameters,body); }
 }
 
-Definition methodDeclaration(Constraint cst, boolean isOverride):
+Definition methodDeclaration(Constraint cst, boolean isOverride, Visibility vis):
 {
     LocatedString name;
     Monotype returnType;
@@ -1458,13 +1473,13 @@ Definition methodDeclaration(Constraint cst, boolean isOverride):
         { res = bossa.syntax.dispatch.createMethodWithDefault
             (name, cst, returnType, parameters,
              bossa.syntax.dispatch.createBlock(statements),
-             contract, isOverride);
+             contract, isOverride, vis);
         }
       |
         // Nice method
         ";"
         { res = bossa.syntax.dispatch.createNiceMethod
-            (name, cst, returnType, parameters, contract, isOverride); }
+            (name, cst, returnType, parameters, contract, isOverride, vis); }
       )
     )
   { return res; }
@@ -1584,7 +1599,7 @@ void contractElement(Contract contract, boolean precond) :
 
 
 Definition definition(List definitions, boolean storeDocString):
-{ Definition res; boolean pub = false, priv = false; }
+{ Definition res; Visibility vis; }
 {
   (
     LOOKAHEAD( ("class" | "interface") fullyQualifiedName() )
@@ -1593,20 +1608,19 @@ Definition definition(List definitions, boolean storeDocString):
     LOOKAHEAD( methodBodyDefinitionLookahead() )
     res=methodBodyDefinition(null)
   |
-    [ "public" { pub = true; } | "private"  { priv = true; } ]
-    { Visibility vis = dispatch.visibility(pub, priv); }
+    vis = visibility()
     (
       res=globalVariable(vis)
     | res=enumDefinition(definitions)
     | "override" { Constraint cst; } cst = constraint()
-      res=methodDeclaration(cst, true)
+      res=methodDeclaration(cst, true, vis)
     | cst = constraint()
       (
         res=customConstructor(cst)
       | LOOKAHEAD ( "abstract" "interface" )
         res=interfaceDefinition(cst, definitions)
       | res=typeDefinition(cst, definitions, storeDocString)
-      | res=methodDeclaration(cst, false)
+      | res=methodDeclaration(cst, false, vis)
       )
     )
   )

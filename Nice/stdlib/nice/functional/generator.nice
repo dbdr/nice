@@ -554,7 +554,7 @@ private <R> R unsafeUnzip(()->Object gen)
 /**
  * Is the number even?
  */
-private boolean _even(int num) = num % 2 == 0;
+boolean _even(int num) = num % 2 == 0;
 
 /**
  * Is the number odd?

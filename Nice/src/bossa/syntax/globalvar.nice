@@ -47,14 +47,14 @@ public class GlobalVarDeclaration extends Definition
     }
   }
 
-  String modifier(Visibility);
-  modifier(intimate) = "private ";
-  modifier(familial) = "";
-  modifier(general) = "public ";
-
   printInterface(s)
   {
-    s.print(this.modifier(visibility) + (constant? "let ": "var ") +left +" = " +value.toString() +";\n");
+    s.print(keyword(0, visibility));
+    s.print(constant ? "let " : "var ");
+    s.print(left);
+    s.print(" = ");
+    s.print(value);
+    s.print(";\n");
   }
 
   compile()

@@ -36,11 +36,14 @@ public abstract class MethodDeclaration extends Definition
 
   ?gnu.expr.Expression code = null;
 
-  void setSymbol(MethodSymbol symbol)
+  Visibility visibility = general;
+
+  void setSymbol(MethodSymbol symbol, Visibility vis = general)
   {
     this.symbol = symbol;
     symbol.propagate = Node.none;
     this.addChild(symbol);
+    this.visibility = loosen(0, vis);
   }
 
   buildScope(outer, typeOuter)
@@ -51,7 +54,7 @@ public abstract class MethodDeclaration extends Definition
 
   void addToScope()
   {
-    module.scope.addSymbol(symbol);
+    module.scope.addSymbol(symbol, visibility);
   }
 
   public ?mlsub.typing.Polytype getType()

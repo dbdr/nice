@@ -17,3 +17,50 @@ String thief(A a) = /*///FAIL HERE*/ a.hidden;
 private let String hidden = "secret";
   /// package b import a
   String s = /*///FAIL HERE*/ hidden;
+
+
+/// FAIL
+  /// package a
+  /// Toplevel
+private String hidden() = "secret";
+
+  /// package b import a
+  let s = /*///FAIL HERE*/ hidden();
+
+/// FAIL
+  /// package a dontcompile
+  /// Toplevel
+private String hidden() = "secret";
+
+  /// package b import a
+  let s = /*///FAIL HERE*/ hidden();
+
+/// FAIL
+  /// package a
+  /// Toplevel
+private String hidden();
+hidden() = "secret";
+
+  /// package b import a
+  let s = /*///FAIL HERE*/ hidden();
+
+/// FAIL
+  /// package a dontcompile
+  /// Toplevel
+private String hidden();
+hidden() = "secret";
+
+  /// package b import a
+  let s = /*///FAIL HERE*/ hidden();
+
+
+/// FAIL
+  /// package a
+  /// Toplevel
+public class A {}
+private String hidden(A a) = "fixed";
+
+  /// package b import a
+  /// Toplevel
+class B extends A {}
+/*/// FAIL HERE*/ hidden(B b) = "changed";

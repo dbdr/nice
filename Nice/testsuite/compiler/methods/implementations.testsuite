@@ -1,4 +1,10 @@
 /// FAIL
+  /// Toplevel
+  class A {
+    void m();
+  }
+
+/// FAIL
   /// TOPLEVEL
   class A { 
     void fA() {} // fA is a function

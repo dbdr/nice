@@ -1,7 +1,7 @@
 /**************************************************************************/
-/*                           B O S S A                                    */
-/*        A simple imperative object-oriented research language           */
-/*                   (c)  Daniel Bonniot 1999                             */
+/*                                N I C E                                 */
+/*             A high-level object-oriented research language             */
+/*                        (c) Daniel Bonniot 2002                         */
 /*                                                                        */
 /*  This program is free software; you can redistribute it and/or modify  */
 /*  it under the terms of the GNU General Public License as published by  */
@@ -9,9 +9,6 @@
 /*  (at your option) any later version.                                   */
 /*                                                                        */
 /**************************************************************************/
-
-// File    : Dispatch.java
-// Created : Mon Nov 15 10:36:41 1999 by bonniot
 
 package bossa.link;
 
@@ -93,6 +90,29 @@ public final class Dispatch
     return true;
   }
 
+  private static boolean[] findUsedPositions(int len, Stack alternatives)
+  {
+    boolean[] res = new boolean[len];
+
+    if (alternatives.isEmpty())
+      {
+	/* If there are no alternatives, we must say that all positions
+	   are used, to check that if there is no possible call. */
+	for (int i = 0; i < len; i++)
+	  res[i] = true;
+      }
+
+    for (Iterator it = alternatives.iterator(); it.hasNext();)
+      {
+	Alternative a = (Alternative) it.next();
+	for (int i = 0; i < len; i++)
+	  if (! a.patterns[i].atAny())
+	    res[i] = true;
+      }
+
+    return res;
+  }
+
   private static void test(NiceMethod method,
 			   final Stack sortedAlternatives)
   {
@@ -102,20 +122,22 @@ public final class Dispatch
 	for(Iterator i = sortedAlternatives.iterator(); i.hasNext();)
 	  Debug.println("Alternative: "+i.next().toString());
       }
-    
+
+    boolean[] used = findUsedPositions(method.getArity(),
+					     sortedAlternatives);
 
     mlsub.typing.Polytype type = method.getType();
     if (type == null)
       throw Internal.error(method + " is not in a proper state.");
 
-    List multitags = enumerate(type);
+    List multitags = enumerate(type, used);
 
     int nb_errors = 0;
     for(Iterator i = multitags.iterator(); i.hasNext();)
       {
 	TypeConstructor[] tags = (TypeConstructor[]) i.next();
 	
-	if (test(method,tags,sortedAlternatives))
+	if (test(method, used, tags, sortedAlternatives))
 	  if (++nb_errors > 9)
 	    break;
       }
@@ -134,6 +156,7 @@ public final class Dispatch
      @return true if the test failed
    */
   private static boolean test(NiceMethod method, 
+			      boolean[] used,
 			      TypeConstructor[] tags, 
 			      final Stack sortedAlternatives)
   {
@@ -150,7 +173,7 @@ public final class Dispatch
 	i.hasNext();)
       {
 	Alternative a = (Alternative) i.next();
-	if(a.matches(tags))
+	if(a.matches(used, tags))
 	  if(first==null)
 	    first = a;
 	  else if(!Alternative.leq(first,a))
@@ -159,7 +182,7 @@ public final class Dispatch
 	      User.warning
 		(method,
 		 "Ambiguity for method "+method+
-		 "For parameters of type "+Util.map("(",", ",")",tags)+
+		 "For parameters of type " + toString(used, tags)+
 		 "\nboth "+first+" and "+a+" match");
 	    }
       }
@@ -169,14 +192,30 @@ public final class Dispatch
 	if(sortedAlternatives.size()==0)
 	  User.error
 	    (method, "Method " + method + " is declared but never defined:\n" +
-	     "no alternative matches " + Util.map("(",", ",")",tags));
+	     "no alternative matches " + toString(used, tags));
 	else
 	  User.warning(method,
 		       "Method " + method + " is not exhaustive:\n" + 
 		       "no alternative matches " + 
-		       Util.map("(",", ",")",tags));
+		       toString(used, tags));
       }
     return failed;
+  }
+
+  private static String toString(boolean[] used, TypeConstructor[] tags)
+  {
+    StringBuffer res = new StringBuffer();
+    res.append('(');
+    for (int i = 0, n = 0; i < used.length; i++)
+      {
+	if (used[i])
+	  res.append(tags[n++]);
+	else
+	  res.append("_");
+	if (i + 1 < used.length)
+	  res.append(", ");
+      }
+    return res.append(')').toString();
   }
 
   /**
@@ -187,15 +226,25 @@ public final class Dispatch
          null if it cannot be matched (e.g. a function type)
 	 PrimtiveType.nullTC if it can be matched by @null
   **/
-  private static List enumerate(Polytype type)
+  private static List enumerate(Polytype type, boolean[] used)
   {
     Monotype[] domains = type.domain();
     Constraint cst = type.getConstraint();
 
-    Element[] types = new Element[2 * domains.length];
+    int nbUsed = 0;
+    for (int i = 0; i < used.length; i++)
+      if (used[i])
+	nbUsed++;
 
-    for (int i = 0; i < domains.length; i++)
-      { 
+    int len = nbUsed * 2;
+
+    Element[] types = new Element[len];
+
+    for (int i = domains.length; --i >= 0;)
+      {
+	if (! used[i])
+	  continue;
+
 	Monotype arg = domains[i];
 
 	TypeConstructor marker;
@@ -220,11 +269,12 @@ public final class Dispatch
 				 new MonotypeLeqCst(arg, t));
 	  }
 
-	types[2 * i] = marker;
-	types[2 * i + 1] = raw;
+	types[--len] = raw;
+	types[--len] = marker;
       }
+    if (! (len == 0)) throw new Error();
     List res = mlsub.typing.Enumeration.enumerate(cst, types);
-    return mergeNullCases(res, domains.length);
+    return mergeNullCases(res, nbUsed);
   }
 
   /** 

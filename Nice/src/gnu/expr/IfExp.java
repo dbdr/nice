@@ -21,6 +21,23 @@ public class IfExp extends Expression
     test = i;  then_clause = t;  else_clause = e;
   }
 
+  /**
+     Create an if expression.
+     Optimizes the case where i is a constant.
+   */
+  public static Expression make(Expression i, Expression t, Expression e)
+  {
+    Interpreter interpreter = Interpreter.getInterpreter();
+
+    if (i instanceof QuoteExp)
+      if (interpreter.isTrue(((QuoteExp) i).getValue()))
+	return t;
+      else
+	return e;
+
+    return new IfExp(i, t, e);
+  }
+
   protected final Interpreter getInterpreter()
   {
     return Interpreter.defaultInterpreter; // FIXME

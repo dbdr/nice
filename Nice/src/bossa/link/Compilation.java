@@ -76,10 +76,9 @@ public final class Compilation
 	return throwExp;
       }
 
-    Alternative a = (Alternative) sortedAlternatives.next();
-    Expression matchTest = a.matchTest(params);
+    Alternative alt = (Alternative) sortedAlternatives.next();
+    Expression matchCase = new ApplyExp(alt.methodExp(), params);
 
-    Expression matchCase = new ApplyExp(a.methodExp(), params);
     if(voidReturn)
       matchCase = new BeginExp(matchCase, Gen.returnVoid());
     else
@@ -90,8 +89,9 @@ public final class Compilation
     if(optimize && !sortedAlternatives.hasNext())
       return matchCase;
     else
-      return new gnu.expr.IfExp
-	(matchTest, matchCase, 
+      return gnu.expr.IfExp.make
+	(alt.matchTest(params), 
+	 matchCase, 
 	 dispatch(sortedAlternatives, returnType, voidReturn, params));
   }
 }

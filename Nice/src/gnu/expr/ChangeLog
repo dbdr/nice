@@ -1,3 +1,7 @@
+2001-11-27  Daniel Bonniot  <bonniot@users.sourceforge.net>
+
+	* IfExp.java (make): New method.
+
 2001-11-24  Per Bothner  <per@bothner.com>
 
 	* Expression.java (makeGetField):  Moved to gnu.kawa.reflect.SlotGet.

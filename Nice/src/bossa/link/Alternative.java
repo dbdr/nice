@@ -187,9 +187,9 @@ public class Alternative
     Expression result = QuoteExp.trueExp;
     
     for(int n = parameters.length; --n >= 0; )
-      result = new gnu.expr.IfExp(patterns[n].matchTest(parameters[n]),
-				  result,
-				  QuoteExp.falseExp);
+      result = gnu.expr.IfExp.make(patterns[n].matchTest(parameters[n]),
+				   result,
+				   QuoteExp.falseExp);
     
     return result;
   }

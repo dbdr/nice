@@ -33,6 +33,9 @@ List<bossa.modules.Package> load(Compilation compilation, String mainPackage)
     // We know that the Modules are in fact Packages
     return cast(flatten(load(compilation)));
   }
+  catch(bossa.modules.Exit e){
+    // Compilation stopped because of errors in the source
+  }
   catch(bossa.util.UserError e){
     bossa.util.Internal.warning("user error only caught in main"); 
     compilation.listener.error(e.location, notNull(e.message));

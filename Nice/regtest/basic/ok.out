@@ -28,6 +28,9 @@ size = 2, elements = e2e2 e4e4
 6 7 8 9 
 A
 B
+2.5
+3.0
+4.7
 ### Testing named and optional parameters ###
 
 68

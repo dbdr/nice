@@ -12,7 +12,7 @@
 
 // File    : StringConstantExp.java
 // Created : Thu Sep 02 14:49:48 1999 by bonniot
-//$Modified: Fri Feb 25 18:51:27 2000 by Daniel Bonniot $
+//$Modified: Thu Jul 20 17:56:03 2000 by Daniel Bonniot $
 
 package bossa.syntax;
 
@@ -67,8 +67,8 @@ public class StringConstantExp extends ConstantExp
                 char c4 = s.charAt(i+1);
                 if (c4 >= '0' && c4 <= '7') {
                   code = 8*code + (c4 - '0');
+		  i++;
                 }
-                i++;
               }
             }
           }

@@ -46,6 +46,13 @@ public class TypeScope implements TypeMap
       addSymbol((TypeSymbol)i.next());
   }
 
+  void addSymbols(TypeSymbol[] c)
+  throws DuplicateName
+  {
+    for (int i = c.length; --i >= 0;)
+      addSymbol(c[i]);
+  }
+
   class DuplicateName extends Exception
   {
     DuplicateName(String name, TypeSymbol old, TypeSymbol nou)

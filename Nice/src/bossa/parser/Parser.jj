@@ -35,9 +35,13 @@ import mlsub.typing.MonotypeVar;
 
 class Parser
 {
+  private static IdentExp symb(String name, Token t, boolean quoted)
+  {
+    return new IdentExp(new LocatedString(name,new Location(t),quoted));
+  }
   private static IdentExp symb(String name, Token t)
   {
-    return new IdentExp(new LocatedString(name,new Location(t)));
+    return symb(name,t,true);
   }
   private static IdentExp symb(Token t)
   {
@@ -2075,7 +2079,7 @@ Expression PrimarySuffix(Expression start) :
 
   { Token t; }
   t="[" res=Expression() "]"
-  { return CallExp.create(symb("get",t),start,res); }
+  { return CallExp.create(symb("get",t,false),start,res); }
 
 |
   "." res=identExp()

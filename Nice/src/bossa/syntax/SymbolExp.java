@@ -98,7 +98,7 @@ public class SymbolExp extends Expression
   
   public String toString()
   {
-    return symbol.name.toString();
+    return symbol.name.toQuotedString();
   }
 
   VarSymbol getSymbol()

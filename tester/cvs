@@ -5,7 +5,7 @@
 # Usage:
 #   cvs <module name>
 
-# Try at most 10 times times, in case the cvs server is busy
+# Try at most 20 times times, in case the cvs server is busy
 tries=0
 
 while ! cvs -d:pserver:anonymous@$CVS_SOURCEFORGE:/cvsroot/nice export \
@@ -13,7 +13,7 @@ while ! cvs -d:pserver:anonymous@$CVS_SOURCEFORGE:/cvsroot/nice export \
 
   tries=`expr $tries + 1`
 
-  if [ $tries -ge 10 ]; then 
+  if [ $tries -ge 20 ]; then 
       # Signal that we failed because of a network problem
       exit 1
   fi

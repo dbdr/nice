@@ -11,7 +11,7 @@
 
 package nice.eclipse.core.builder;
 
-
+import nice.tools.compiler;
 
 class NiceBuilder extends IncrementalProjectBuilder {
 
@@ -46,8 +46,8 @@ class NiceBuilder extends IncrementalProjectBuilder {
 			this.getProject().deleteMarkers(
 				NICE_MODEL_PROBLEM_MARKER, true, IResource.DEPTH_INFINITE);
 
-			Compilation compilation =
-				bossa.modules.fun.createCompilation(embedded);
+			Compilation compilation = 
+			  new bossa.modules.Compilation(listener: embedded);
 
 			File projectFolder = currentProject.getLocation().toFile();
 			compilation.sourcePath = new File(projectFolder, getSourcepathProperty(currentProject)).toString();
@@ -65,17 +65,7 @@ class NiceBuilder extends IncrementalProjectBuilder {
 			runtime = Platform.asLocalURL(runtime);
 			compilation.runtimeFile = runtime.getFile();
 
-			nice.tools.compiler.fun.compile(
-					compilation,
-					getMainPackageProperty(currentProject),
-					null,
-					//output,
-					null, //native_compiler,
-					false //editor
-				);
-
-			//int retval = console.statusCode;
-
+			compile(compilation, getMainPackageProperty(currentProject));
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

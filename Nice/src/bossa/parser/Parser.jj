@@ -1421,9 +1421,19 @@ Definition globalVariable():
 }
 {
   ( "var" {constant = false;} 
-    t=monotype() name=ident() [ "=" value=SideEffectFreeExpression() ]
+    t=monotype() name=ident() 
+    [ "=" 
+      ( LOOKAHEAD(funExp()) value=funExp() 
+      | LOOKAHEAD(monoSymbol() "=>") value=simpleVarFunExp() 
+      |	value=SideEffectFreeExpression()
+      )
+    ]
   | "let" {constant = true;}
-    t=monotype() name=ident() "=" value=SideEffectFreeExpression() 
+    t=monotype() name=ident() "="
+    ( LOOKAHEAD(funExp()) value=funExp() 
+    | LOOKAHEAD(monoSymbol() "=>") value=simpleVarFunExp() 
+    | value=SideEffectFreeExpression()
+    )
   )
   ";"
   { return new GlobalVarDeclaration(name,t,value,constant); }

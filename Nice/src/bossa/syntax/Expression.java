@@ -148,7 +148,7 @@ public abstract class Expression
   /** computes the static type of the expression */
   abstract void computeType();
 
-  Polytype getType()
+  public Polytype getType()
   {
     if(type==null)
       {

@@ -19,7 +19,7 @@ import gnu.bytecode.*;
 /**
    Inlining of native reference operators.
 */
-public class ReferenceOp extends Procedure2 implements Inlineable, Branchable
+public class ReferenceOp extends Procedure2 implements Branchable, bossa.syntax.Macro
 {
   private final static int
     Eq = 1,
@@ -171,6 +171,19 @@ public class ReferenceOp extends Procedure2 implements Inlineable, Branchable
   public Type getReturnType (Expression[] args)
   {
     return retType;
+  }
+
+  public void checkSpecialRequirements(bossa.syntax.Expression[] arguments)
+  {
+    bossa.syntax.Expression exp = null;
+    if (arguments[0] instanceof bossa.syntax.NullExp)
+      exp = arguments[1];
+    else if (arguments[1] instanceof bossa.syntax.NullExp)
+      exp = arguments[0];
+
+ 
+    if (exp != null && nice.tools.code.Types.isSure(exp.getType().getMonotype()))
+      bossa.util.User.warning(exp, "Warning: comparing a non-null value with null");
   }
 
   // Interpretation

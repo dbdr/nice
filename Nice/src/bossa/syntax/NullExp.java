@@ -40,7 +40,7 @@ public class NullExp extends ConstantExp
     // The type needs to be generated each time, since it is polymorphic.
   }
   
-  Polytype getType()
+  public Polytype getType()
   {
     MonotypeVar alpha = new MonotypeVar("any");
     return new Polytype(new Constraint(new TypeSymbol[]{alpha}, null), 

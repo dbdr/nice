@@ -1,0 +1,307 @@
+/**************************************************************************/
+/*                                N I C E                                 */
+/*             A high-level object-oriented research language             */
+/*                        (c) Daniel Bonniot 2000                         */
+/*                                                                        */
+/*  This program is free software; you can redistribute it and/or modify  */
+/*  it under the terms of the GNU General Public License as published by  */
+/*  the Free Software Foundation; either version 2 of the License, or     */
+/*  (at your option) any later version.                                   */
+/*                                                                        */
+/**************************************************************************/
+
+/*
+   Type checking.
+*/
+
+package bossa.syntax;
+
+import mlsub.typing.*;
+
+// Interface
+
+void typecheck(Statement);
+void typecheck(Expression);
+
+/****************************************************************
+ * Expressions
+ ****************************************************************/
+
+typecheck(e@Expression) {}
+
+/**
+   Checks that right can be assigned to a variable of type left.
+   Returns a new expression to be used instead of right,
+   since overloading resolution is done on the expected type.
+*/
+/*Expression checkAssignment(Polytype left, Expression right);
+checkAssignment(left, right)
+{
+  Expression val = right.resolveOverloading(left);
+  Typing.leq(val.getType(), left);
+  return val;
+}
+  
+/*
+typecheck(e@AssignExp)
+{
+  typecheck(e.value);
+  e.to = e.to.noOverloading();
+  typecheck(e.to);
+
+    if(!to.isAssignable())
+      User.error(this, to + " cannot be assigned a value");
+    
+    try{
+      value = checkAssignment(to.getType(), value);
+    }
+    catch(TypingEx t){
+      User.error(this,
+		 "Typing error : " + to + 
+		 " cannot be assigned value " + value + 
+		 " of type " + value.getType(),
+		 "\n" + t.getMessage());
+    }
+}
+
+void typecheckExps(Expression[]);
+typecheckExps(exps)
+{
+  for (int i = 0; i < exps.length; i++)
+    typecheck(exps[i]);
+}
+
+void typecheck(Arguments);
+typecheck(args@Arguments)
+{
+  for (int i = 0; i < args.arguments.length; i++)
+    typecheck(args.getExp(i));
+}
+
+typecheck(e@CallExp)
+{
+  if (e.infix)
+    markAsCallFirstArg(e.arguments.getExp(0));
+
+  e.arguments.typecheck(i);
+
+  if (e.infix)
+    {
+      e.declaringClass = e.arguments.staticClass();
+      
+      if (e.declaringClass != null)
+	{
+	  LocatedString funName = identString(e.function);
+	  if (funName == null)
+	    bossa.util.Internal.error(e.function, "This is not a valid class member");
+	  
+	  java.util.List possibilities = JavaMethod.findJavaMethods
+	    (e.declaringClass, funName.toString(), e.arguments.size());
+
+	  if (possibilities.size() == 0)
+	    bossa.util.User.error(e, "class " + e.declaringClass.getName() +
+				  " has no method or field " + funName);
+	  
+	  e.function = new OverloadedSymbolExp(possibilities, funName);
+
+		}
+      
+      PackageExp pkg = e.arguments.packageExp();
+      if (pkg != null)
+	{
+	  LocatedString nextComponent = identString(e.function);
+
+	  if (nextComponent == null)
+	    throw unknownIdent(pkg.locatedName());
+
+	  return ClassExp.create(pkg, nextComponent);
+	}
+    }
+
+  markAsCallFun(e.function, e.infix);
+  e.function = typecheck(e.function);
+
+}
+
+typecheck(e@FunExp)
+{
+  info.beginInner(true);
+  info.begin();
+  addVars(info, javaList(e.formals));
+  typecheck(e.body);
+  if (!info.getUnreachable() 
+      && !e.inferredReturnType().toString().equals("nice.lang.void"))
+    bossa.util.User.error(e, "Missing return statement");
+  info.end();
+  info.endInner();
+}
+
+typecheck(e@IdentExp)
+{
+  String name = e.ident.toString();
+  
+  if (!e.infix) // infix symbols can only come from the global scope
+    {
+      VarSymbol s = i.lookup(name);
+      if (s != null)
+	if (!e.alwaysOverloadedSymbol)
+	  return new SymbolExp(s);
+	else
+	  return new OverloadedSymbolExp(s, e.ident);
+    }
+
+  JavaList<VarSymbol> symbols;
+  if (e.infix)
+    symbols = javaList(Node.getGlobalScope().lookup(e.ident));
+  else
+    symbols = i.globalLookup(e.ident);
+
+  if (symbols != null && symbols.size() > 0)
+    if (!e.alwaysOverloadedSymbol() && symbols.size() == 1)
+      return new SymbolExp(symbols[0]);
+    else
+      return new OverloadedSymbolExp(symbols.impl, e.ident);
+
+  if (e.enableClassExp)
+    return ClassExp.create(e.ident);
+
+  //if (e.infix)
+    //return e;
+
+  if (true) throw unknownIdent(e.ident);
+  return null; // work-around pb with non-reachable code
+}
+
+typecheck(e@IfExp)
+{
+  e.condition = typecheck(e.condition);
+
+  info.beginCases();
+  e.thenExp = typecheck(e.thenExp);
+
+  info.otherCase();
+  e.elseExp = typecheck(e.elseExp);
+
+  info.endCases();
+}
+
+typecheck(e@IncrementExp)
+{
+  e.variable = typecheck(e.variable);
+}
+
+typecheck(e@LiteralArrayExp)
+{
+  typecheckExps(e.elements);
+}
+
+typecheck(e@NewArrayExp)
+{
+  e.resolveTC(info.typeMap);
+  typecheckExps(e.knownDimensions);
+}
+
+typecheck(e@NewExp)
+{
+  e.arguments.typecheck(i);
+  e.resolve(info.typeMap);
+}
+
+typecheck(e@StatementExp)
+{
+  typecheck(e.statement);
+}
+
+typecheck(c@ConstantExp)
+{
+  if (c.type != null)
+    return c;
+    
+  TypeSymbol s = info.lookupType(c.className);
+    
+  if (s == null)
+    bossa.util.Internal.error
+      ("Base type " + c.className + " was not found in the standard library");
+
+  TypeConstructor tc = TypeConstructor.fromTypeSymbol(s);
+  if (s == null)
+    bossa.util.Internal.error("Base type " + c.className + " is not valid");
+  
+  c.type = new mlsub.typing.Polytype
+    (new mlsub.typing.MonotypeConstructor(tc, null));
+
+  return c;
+}
+
+typecheck(e@TupleExp)
+{
+  typecheckExps(e.expressions);
+}
+
+/****************************************************************
+ * Statements
+ ****************************************************************/
+
+typecheck(s@Statement) {}
+/*
+typecheck(b@Block)
+{
+  info.begin();
+  javaList(b.locals).iter(fun(Block$LocalDeclaration l)=>{
+    if (l.value != null)
+      l.value = typecheck(l.value);
+    info.addVar(l.left);
+  });
+  javaList(b.statements).iter(fun(Statement s)=>{
+    if (info.getUnreachable())
+      bossa.util.User.error(s, "Statement is never executed");
+    typecheck(s);
+  });
+  info.end();
+}
+
+typecheck(s@ExpressionStmt)
+{
+  s.exp = typecheck(s.exp);
+}
+
+typecheck(l@LoopStmt)
+{
+  info.beginInner(false);
+  l.whileExp = typecheck(l.whileExp);
+  typecheck(l.loopBody);
+  typecheck(l.iterationStatements);
+  info.endInner();
+}
+
+typecheck(r@ReturnStmt)
+{
+  r.value = typecheck(r.value);
+  info.setUnreachable();
+}
+
+typecheck(t@ThrowStmt)
+{
+  t.exn = typecheck(t.exn);
+  info.setUnreachable();
+}
+
+typecheck(t@TryStmt)
+{
+  info.beginCases();
+  typecheck(t.body);
+
+  javaList(t.catches).iter(fun(TryStmt$Catch c)=>{
+    info.otherCase();
+    info.begin();
+    info.addVar(c.exnVar);
+    c.t = c.tc.resolveToTC(info.typeMap);
+    c.tc = null;
+    typecheck(c.body);
+    info.end();
+  });
+  info.endCases();
+  typecheck(t.finallyBody);
+}
+
+*/

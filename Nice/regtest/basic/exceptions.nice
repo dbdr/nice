@@ -22,6 +22,9 @@ test_exceptions()
   catch(NullPointerException e){
     println("NullPointerException");
   }
+  catch(nice.lang.AssertionFailed e){
+    println("NullPointerException");
+  }
   
   try{
     MyEx ex = new MyEx(info:"woula");

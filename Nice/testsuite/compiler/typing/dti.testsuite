@@ -29,6 +29,15 @@ boolean maybeTrue() = true;
 
   s. /*/// FAIL HERE*/ substring(1);
 
+/// FAIL
+  ?String s = null;
+  if(maybeTrue())
+    s = null;
+  else
+    s = "abc";
+
+  s. /*/// FAIL HERE*/ substring(1);
+
 /// PASS bug
   ?String s = maybeString();
   if (s != null)

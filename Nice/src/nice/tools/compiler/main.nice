@@ -38,6 +38,8 @@ main(args)
 {
   ?Throwable uncaughtException = null;
   boolean memInfo = false;
+  String mainPackage;
+  ?String nativeProgram = null;
 
   try{
 
@@ -83,7 +85,10 @@ main(args)
    option('o', "output",
 	  "Generate native executable (not supported yet)",
 	  "file",
-	  fun(String output) => { compilation.output = output; }),
+	  fun(String output) => { 
+	    compilation.output = output + ".jar"; 
+	    nativeProgram = output;
+	  }),
 
 
    option('r', "recompile",
@@ -133,8 +138,9 @@ main(args)
 		"nicec will automatically find dependancies.");
       usage(prg);
     }
+  mainPackage = rest[0];
 
-  compilation.setMainPackage(rest[0]);
+  compilation.setMainPackage(mainPackage);
   make(compilation);
   }
   catch(bossa.util.UserError e){
@@ -161,7 +167,10 @@ main(args)
       exn.printStackTrace();
       System.exit(1);
     }
-  
+
+  if (nativeProgram != null)
+    produceNativeProgram(mainPackage, nativeProgram);
+
   if (memInfo) printMemoryUsage();
 
   OutputMessages.exit();

@@ -89,10 +89,11 @@ case $progname in
 	CLASSPATH=${APPHOME}/classes:${CLASSPATH}
     fi
     export CLASSPATH
-    exec ${JAVA} \
-	-Dnice.systemJar=${NICEC} \
-	-Dnice.runtime=${NICEC} \
-	nice.tools.compiler.package "$@"
+    properties="-Dnice.systemJar=${NICEC} -Dnice.runtime=${NICEC}"
+    if which gcj 2>/dev/null; then
+      properties="$properties -Dgcj=`which gcj 2>/dev/null`"
+    fi
+    exec ${JAVA} ${properties} nice.tools.compiler.package "$@"
   ;;
   nicer) 
     jar=$1

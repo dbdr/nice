@@ -6,14 +6,18 @@ JAVACC= CLASSPATH=${TOP}/external/JavaCC.zip:${CLASSPATH} java COM.sun.labs.java
 JAVADOC=javadoc #-linkoffline file:///C%7C/Apps/jdk1.2.1/docs/api file:///usr/opt/java122/docs/api
 
 # run this first when you just checked out a fresh version
-first: parser bootstrap jar
+first: parser bootstrap class jar
 
-bootstrap:
-	cd ${TOP}/src/nice/tools/compiler; ./setBuildDate
+setDate:
+	cd src/nice/tools/compiler; ./setBuildDate
+
+bootstrap: setDate
 	cd stdlib; nicec nice.getopt
 	cd src; nicec bossa.modules
 	cd src; NICEJAR=${HOME}/Nice/stdlib nicec -Rs nice.tools.compiler
 	cd src; NICEJAR=${HOME}/Nice/stdlib nicec bossa.modules
+
+class:
 	mkdir -p classes
 	cd classes; jar xf ../external/java-getopt-1.0.7.jar gnu
 	cd src;\
@@ -35,8 +39,7 @@ recompileGNU:
 recompileSTDLIB:
 	${JAVAC} ${TOP}/stdlib/nice/lang/*.java
 
-compiler:
-	cd ${TOP}/src/nice/tools/compiler; ./setBuildDate
+compiler: setDate
 	cd src; nicec -e -Rs nice.tools.compiler
 
 parser:

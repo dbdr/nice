@@ -33,11 +33,25 @@ class Info
   SymbolTable<TypeSymbol> typeVars;
 
   void begin();
-  void end();
-}
+  begin()
+  {
+    this.vars.begin();
+    this.typeVars.begin();
+  }
 
-VarSymbol lookup(String, Info);
-VarSymbol[] globalLookup(String, Info);
+  void end();
+  end()
+  {
+    this.vars.end();
+    this.typeVars.end();
+  }
+
+  VarSymbol lookup(String);
+  lookup(name) = this.vars[name];
+
+  VarSymbol[] globalLookup(String);
+  globalLookup(name) = null;
+}
 
 void setInitialized(Expression, Info);
 setInitialized(e, i) {}
@@ -101,7 +115,7 @@ analyse(e@IdentExp, i)
 
   if (!e.infix) // infix symbols can only come from the global scope
     {
-      VarSymbol s = lookup(name, i);
+      VarSymbol s = i.lookup(name);
       if (s != null)
 	if (!e.alwaysOverloadedSymbol)
 	  return new SymbolExp(s);
@@ -113,7 +127,7 @@ analyse(e@IdentExp, i)
 	  }
     }
 
-  Array<VarSymbol> symbols = globalLookup(name, i);
+  Array<VarSymbol> symbols = i.globalLookup(name);
   if (symbols != null)
     return new OverloadedSymbolExp(symbols, e.ident);
 

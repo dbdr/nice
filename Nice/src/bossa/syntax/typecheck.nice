@@ -134,35 +134,82 @@ typecheck(e@IdentExp)
 
 /**
    Analyse a boolean test to check if it ensures that some
-   local variable is always null or alwyas non-null.
+   local variables are not null if the tests succeeds, and if it fails.
 
-    @return 
-      the local variable found, or null
-    and
-      true  if the variable if always null     when the test succeeds
-      false if the variable if always non-null when the test succeeds
+    @return a tuple
+      (local variables that are guaranteed not to be null if the test succeeds,
+       local variables that are guaranteed not to be null if the test fails)
 */
-(?MonoSymbol, boolean) nullnessInfo(Expression test);
-nullnessInfo(test) = (null, false);
+(?List<MonoSymbol>, ?List<MonoSymbol>) nullnessInfo(Expression test);
+nullnessInfo(test) = (null, null);
 nullnessInfo(test@CallExp)
 {
+  (?List<MonoSymbol>, ?List<MonoSymbol>) res;
+
+  if (test.isCallTo("||"))
+    {
+      (?List<MonoSymbol> notNullIfTrue0, ?List<MonoSymbol> notNullIfFalse0) =
+	nullnessInfo(notNull(test.arguments.getExp(0)));
+      (?List<MonoSymbol> notNullIfTrue1, ?List<MonoSymbol> notNullIfFalse1) =
+	nullnessInfo(notNull(test.arguments.getExp(1)));
+
+      // If this test is fase, it is because both subtests are.
+      return (null, combine(notNullIfFalse0, notNullIfFalse1));
+    }
+
+  if (test.isCallTo("&&"))
+    {
+      (?List<MonoSymbol> notNullIfTrue0, ?List<MonoSymbol> notNullIfFalse0) =
+	nullnessInfo(notNull(test.arguments.getExp(0)));
+      (?List<MonoSymbol> notNullIfTrue1, ?List<MonoSymbol> notNullIfFalse1) =
+	nullnessInfo(notNull(test.arguments.getExp(1)));
+
+      // If this test is fase, it is because both subtests are.
+      return (combine(notNullIfTrue0, notNullIfTrue1), null);
+    }
+
   boolean isAlwaysNull;
   if (test.isCallTo("=="))
     isAlwaysNull = true;
   else if (test.isCallTo("!="))
     isAlwaysNull = false;
   else /// give up
-    return (null, false);
+    return (null, null);
 
   int varPosition;
-  if (isNullExp(notNull(notNull(test.arguments).getExp(0))))
+  if (isNullExp(notNull(test.arguments.getExp(0))))
     varPosition = 1;
-  else if (isNullExp(notNull(notNull(test.arguments).getExp(1))))
+  else if (isNullExp(notNull(test.arguments.getExp(1))))
     varPosition = 0;
   else // Give up.
-    return (null, false);
+    return (null, null);
 
-  return (localVariable(notNull(notNull(test.arguments).getExp(varPosition))), isAlwaysNull);
+  ?MonoSymbol variable = localVariable(notNull(test.arguments.getExp(varPosition)));
+  if (variable == null)
+    return (null, null);
+
+  if (isAlwaysNull)
+    return (null,[variable]);
+  else 
+    return ([variable],null);
+}
+
+// Returns a list combining l1 and l2, possibly modifying l1.
+private ?List<MonoSymbol> combine(?List<MonoSymbol> l1, ?List<MonoSymbol> l2)
+{
+  if (l1 == null)
+    return l2;
+
+  if (l2 != null)
+    l1.addAll(l2);
+  return l1;
+}
+
+?List<MonoSymbol> variablesNotNullIfTestSucceeds(Expression test)
+{
+  (?List<MonoSymbol> notNullIfTrue, ?List<MonoSymbol> notNullIfFalse) = 
+    nullnessInfo(test);
+  return notNullIfTrue;
 }
 
 /** 
@@ -232,9 +279,37 @@ typecheck(e@IfExp)
   enterIf();
 
   try{
-    (?MonoSymbol variable, boolean isAlwaysNull) = nullnessInfo(condition);
+    (?List<MonoSymbol> notNullInThen, ?List<MonoSymbol> notNullInElse) = 
+      nullnessInfo(condition);
 
-    if (variable == null)
+    if (notNullInThen != null)
+      notNullInThen.foreach(MonoSymbol variable => {
+	mlsub.typing.Monotype type = notNull(variable.type);
+	mlsub.typing.Monotype sureType = makeSure(type);
+	setVarType(variable, now: sureType, brothers: type);
+      });
+
+    typecheck(thenExp);
+    // since the type of the variable is destructively changed,
+    // it is important to compute the branch's type and to store it now.
+    thenExp.computeType();
+
+    enterElse();
+
+    if (notNullInElse != null)
+      notNullInElse.iter(MonoSymbol variable => {
+	mlsub.typing.Monotype type = notNull(variable.type);
+	mlsub.typing.Monotype sureType = makeSure(type);
+	setVarType(variable, now: sureType, brothers: type);
+      });
+
+    typecheck(elseExp);
+    // since the type of the variable is destructively changed,
+    // it is important to compute the branch's type and to store it now.
+    elseExp.computeType();
+
+/*
+    if (variables == null)
       {
 	typecheck(thenExp);
 	enterElse();
@@ -277,6 +352,7 @@ typecheck(e@IfExp)
 	// it is important to compute the branch's type and to store it now.
 	elseExp.computeType();
       }
+*/
   }
   finally{
     exitIf();
@@ -445,11 +521,12 @@ typecheck(l@LoopStmt)
   if (whileExp != null)
     if (l.isTestFirst)
       {
-	(?MonoSymbol variable, boolean isAlwaysNull) = nullnessInfo(whileExp);
-	if (variable != null)
-	  if (isAlwaysNull == false)
-	    setVarType(variable, 
-		       now: makeSure(variable.type), brothers: variable.type);
+	?List<MonoSymbol> variables = variablesNotNullIfTestSucceeds(whileExp);
+	if (variables != null)
+	  variables.foreach (MonoSymbol variable => 
+			     setVarType(variable, 
+					now: makeSure(variable.type), 
+					brothers: variable.type));
       }
 
   typecheck(l.loopBody);

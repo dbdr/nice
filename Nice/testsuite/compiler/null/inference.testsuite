@@ -145,3 +145,164 @@
   ?int x = null;
   while (x == null)
     x++;
+
+/// COMMENT Check several variables at the same time
+
+/// PASS
+  ?int x1 = null;
+  ?int x2 = null;
+  if (x1 != null && x2 != null)
+    { x1++; x2++; }
+
+
+/// PASS
+  ?int x1 = null;
+  ?int x2 = null;
+  if (x1 == null || x2 == null)
+    ;
+  else
+    { x1++; x2++; }
+
+
+/// PASS
+  ?int x1 = null;
+  ?int x2 = null;
+  if (x1 == null || x2 == null)
+    return;
+  { x1++; x2++; }
+
+
+/// PASS
+  ?int x1 = null;
+  ?int x2 = null;
+  if (x1 != null && x2 != null)
+    ;
+  else
+    return;
+  { x1++; x2++; }
+
+
+/// PASS
+  ?int x1 = 0;
+  ?int x2 = 0;
+  if (true)
+    if (x1 != null && x2 != null)
+      { x1++; x2++; }
+    else
+      return;
+  else
+    return;
+  { x1++; x2++; }
+
+
+/// PASS
+  ?int x1 = 0;
+  ?int x2 = 0;
+  if (true)
+    if (true)
+      if (x1 != null && x2 != null)
+	{ x1++; x2++; }
+      else
+        return;
+    else
+      return;
+  else return;
+  { x1++; x2++; }
+
+/// PASS
+  ?int x1 = 0;
+  ?int x2 = 0;
+  if (true)
+  {
+    if (true)
+      if (x1 != null && x2 != null)
+	{ x1++; x2++; }
+      else
+        return;
+    else
+      return;
+    { x1++; x2++; }
+  }
+
+/// FAIL
+  ?int x1 = null;
+  ?int x2 = null;
+  if (false)
+    if (x1 == null || x2 == null)
+      return;
+  { x1++; x2++; }
+  
+
+/// FAIL
+  ?int x1 = null;
+  ?int x2 = null;
+  if (false)
+    if (x1 != null && x2 != null)
+      ;
+    else
+      return;
+  { x1++; x2++; }
+
+
+// Assigning a null value
+
+/// PASS
+  ?int x1 = 0;
+  ?int x2 = 0;
+  if (x1 != null && x2 != null)
+    x = null;
+
+
+/// FAIL
+  ?int x1 = 0;
+  ?int x2 = 0;
+  if (x1 != null && x2 != null)
+    {
+      x = null;
+      { x1++; x2++; }
+    }
+
+
+/// PASS
+  ?int x1 = 0;
+  ?int x2 = 0;
+  if (x1 != null && x2 != null)
+    if (false)
+      x = null;
+    else
+      { x1++; x2++; }
+
+
+/// FAIL
+  ?int x1 = 0;
+  ?int x2 = 0;
+  if (x1 != null && x2 != null)
+    {
+      if (false)
+        x = null;
+      { x1++; x2++; }
+    }
+
+
+/// FAIL
+  ?String x = null;
+  ?String y = null;
+  if (y != null)
+    if (x1 != null && x2 != null)
+      x = x + "";
+  y = y + "";
+
+
+/// PASS
+  ?int x1 = 0;
+  ?int x2 = 0;
+  while (x1 != null && x2 != null)
+    { x1++; x2++; }
+
+
+/// FAIL
+  ?int x1 = null;
+  ?int x2 = null;
+  while (x1 == null || x2 == null)
+    { x1++; x2++; }
+

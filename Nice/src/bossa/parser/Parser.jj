@@ -530,6 +530,20 @@ TypeConstructor typeConstructor():
   { return new TypeConstructor(name); }
 }
 
+List typeConstructors():
+{
+  List res;
+  TypeConstructor tc;
+}
+{
+  { res = new LinkedList(); }
+  tc = typeConstructor() { res.add(tc); }
+  ( "," 
+  tc = typeConstructor() { res.add(tc); }
+  )*
+  { return res; }
+}
+
 TypeIdent typeIdent():
 {
   LocatedString name;
@@ -1204,6 +1218,7 @@ Pattern pattern():
         val=patternLiteral()
       |
         tc=typeIdent()
+        [ ":" type=monotype() ]
       )
     |
       t ="#" tc=typeIdent() { exactlyAt = true; }
@@ -1213,7 +1228,6 @@ Pattern pattern():
     { loc = name.location(); }
   )
   [ "(" additional=typeIdent() ")" ]
-  [ ":" type=monotype() ]
   {
     return new Pattern(name, tc, val, exactlyAt, additional, type, loc);
   }
@@ -1222,7 +1236,7 @@ Pattern pattern():
 void methodBodyDefinitionLookahead():
 {}
 {
-  identOrBackquoted() [ "<" strings() ">" ] "("
+  [ "<" typeConstructors() ">" ] identOrBackquoted() [ "<" strings() ">" ] "("
 }
 
 Statement code():
@@ -1253,17 +1267,17 @@ MethodBodyDefinition methodBodyDefinition(NiceClass container):
     LocatedString name;
     Pattern p;
     Collection binders=null;
-    //List newTypeVars=null;
+    List newTypeVars=null;
     LinkedList parameters=new LinkedList();
     Statement body;
     Expression exp;
 }
 {
+// introducing new Type variables
+    [ "<" newTypeVars=typeConstructors() ">" ]
+
     name=identOrBackquoted()
     [ "<" binders=strings() ">" ]
-
-// introducing new Type variables
-//    [ "[" newTypeVars=typeConstructors() "]" ]
 
     "("
     ( 
@@ -1273,7 +1287,7 @@ MethodBodyDefinition methodBodyDefinition(NiceClass container):
     ")"
     body = code()
     { return new MethodBodyDefinition(container,name,binders,
-				      //newTypeVars,
+				      newTypeVars,
 				      parameters,body); }
 }
 

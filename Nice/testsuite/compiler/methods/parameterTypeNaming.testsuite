@@ -1,0 +1,19 @@
+/// Global
+class A {}
+class B extends A { String b; }
+<A T> T foo(T);
+
+/// PASS
+  /// Toplevel
+foo(a) = a;
+
+<X> foo<T>(b@B : X) {
+  X copy = b.foo();
+  String useB = copy.b;
+  return copy;
+}
+
+/// FAIL
+  /// Toplevel
+// : can only come after a real dispatch, otherwise it is useless.
+<X> foo<T>(a : X) {}

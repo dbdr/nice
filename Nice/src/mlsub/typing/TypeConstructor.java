@@ -87,7 +87,7 @@ public class TypeConstructor
    * Tell which variance this TypeConstructor has.
    * Can be called from ImplementsCst.
    */
-  protected void setVariance(AtomicKind v)
+  public void setVariance(AtomicKind v)
   {
     setKind(v.getConstraint());
   }

@@ -50,6 +50,7 @@ public class MethodBodyDefinition extends Definition
   public MethodBodyDefinition(NiceClass container,
 			      LocatedString name, 
 			      Collection binders,
+			      List newTypeVars,
 			      List formals, 
 			      Statement body)
   {
@@ -60,6 +61,9 @@ public class MethodBodyDefinition extends Definition
     this.formals = makeFormals(formals, container, name.location());
     this.body = body;
     this.declaration = null;
+    if (newTypeVars != null)
+      this.newTypeVars = (TypeConstructor[]) 
+	newTypeVars.toArray(new TypeConstructor[newTypeVars.size()]);
 
     this.insideClass = container != null || 
       this.formals != null &&
@@ -286,6 +290,14 @@ public class MethodBodyDefinition extends Definition
       User.error(this, e);
     }
 
+    if (newTypeVars != null)
+    try{
+      typeScope.addSymbols(newTypeVars);
+    }
+    catch(TypeScope.DuplicateName e) {
+      User.error(this, e);
+    }
+
     // We can resolve now
     Pattern.resolveType(this.typeScope, formals);
   }
@@ -338,7 +350,29 @@ public class MethodBodyDefinition extends Definition
 
 	// Introduce the types of the arguments
 	Monotype[] monotypes = MonoSymbol.getMonotype(parameters);
-	Typing.introduce(monotypes);
+
+	for(int n = 0; n < formals.length; n++)
+	  {
+	    Pattern pat = formals[n];
+	    Monotype type = pat.getType();
+	    if (type == null)
+	      Typing.introduce(monotypes[n]);
+	    else
+	      {
+		parameters[n].type = monotypes[n] = type;
+
+		// We need to find the variance of the constructor.
+		// This is the only case where a type constructor is created
+		// without a known variance. But we can get it easily from the
+		// pattern.
+		TypeConstructor tc = Types.rawType(type).head();
+		if (tc != null && tc.variance == null)
+		  tc.setVariance(pat.tc.variance);
+	      }
+	  }
+
+	if (newTypeVars != null)
+	  Typing.introduce(newTypeVars);
 
 	// The arguments are specialized by the patterns
 	try{
@@ -373,36 +407,6 @@ public class MethodBodyDefinition extends Definition
 	catch(TypingEx e) {
 	  throw User.error(name, "Type error in method body \""+name+"\":\n"+e);
 	}
-
-	// Introduction of binders for the types of the arguments
-	// as in f(x@C : X)
-	for(int n = 0; n < formals.length; n++)
-	  {
-	    Pattern pat = formals[n];
-	    Monotype type = pat.getType();
-	    if (type == null)
-	      continue;
-	    
-	    MonoSymbol sym = parameters[n];
-	  
-	    try{
-	      TypeConstructor 
-		tc = type.head(),
-		formalTC = ((MonotypeConstructor) sym.getMonotype()).getTC();
-		  
-	      if (tc == null)
-		Internal.error("Not implemented ?");
-
-	      tc.setId(formalTC.getId());
-	      Typing.eq(type, sym.getMonotype());
-	    }
-	    catch(TypingEx e){
-	      throw User.error(pat.name, 
-			       "\":\" constraint for argument "+pat.name+
-			       " is not correct",
-			       ": "+e);
-	    }
-	  }
 
 	for(int n = 0; n < formals.length; n++)
 	{
@@ -538,6 +542,7 @@ public class MethodBodyDefinition extends Definition
   protected MonoSymbol[] parameters;
   private Pattern[] formals;
   Collection /* of LocatedString */ binders; // Null if type parameters are not bound
+  private TypeConstructor[] newTypeVars;
   private Statement body;
   private boolean insideClass;
 }

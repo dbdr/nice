@@ -150,6 +150,11 @@ public class Location implements Located
     return startColumn;
   }
   
+  public String getFile()
+  {
+    return fileName;
+  }
+  
   private int startLine,startColumn,endLine,endColumn;
   private String fileName;
   private String abstractLocation = null; // if non-null, overseeds everyting

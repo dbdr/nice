@@ -339,6 +339,7 @@ public class Nicec extends Task {
 	/**	Executes the ant Nice compiler.
 	 */
 	public void execute() throws BuildException {
+		log("runtime: " + getRuntime(), Project.MSG_VERBOSE);
 		Vector args = new Vector();
 
 		if (sourcepath != null) {
@@ -435,9 +436,7 @@ public class Nicec extends Task {
 		//	when Nicec is in the nice.jar, then we should use
 		//	nice.tools.ant.Nicec dummy = new ...
 		nice.tools.runJar dummy = new nice.tools.runJar();
-		String className = nice.tools.runJar.class.getName();
-
-		String resource = new String(className);
+		String resource = nice.tools.runJar.class.getName();
 
 		// Format the file name into a valid resource name.
 		if (!resource.startsWith("/")) {
@@ -448,12 +447,18 @@ public class Nicec extends Task {
 
 		// Attempt to locate the file using the class loader.
 		java.net.URL classUrl = Nicec.class.getResource(resource);
-		String file = classUrl.getFile();
 		
 		if (classUrl == null) {
 			return null;
 		} else {
-			return file.substring(file.indexOf(":")+1, file.indexOf("!"));
+			String file = classUrl.getFile();
+			try {
+				//	handle as jarfile
+				return file.substring(file.indexOf(":")+1, file.indexOf("!"));
+			} catch(StringIndexOutOfBoundsException e) {
+				//	oops it is a class file
+				return file.substring(0, file.indexOf(resource));
+			}
 		}
 	}
 

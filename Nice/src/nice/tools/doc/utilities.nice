@@ -6,6 +6,16 @@ package nice.tools.doc;
  * @author Francis Barber
  * @date 26/11/2004
  */
+
+/**
+ * Checks to see if you have the source code for a package available.
+ * If we have the source code for a package, then we can provide hyperlinks to
+ * the method, variables, etc within that package.
+ */
+boolean isSourceAvailable(String packageName) {
+    let pkg = compilation.packages.get(packageName);
+    return pkg != null && pkg.compiling;
+}
  
  /**
  * Checks a filename to make sure it doesn't contain funny characters.

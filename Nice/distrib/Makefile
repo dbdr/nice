@@ -70,12 +70,16 @@ rpm ${RPMDIR}/${RPMFILE}: $(DEB)
 	rpmbuild --target=noarch --buildroot=${RPMTMP} -bb tmp/Nice-${VERSION}.spec
 
 
+WIN_TEXT_FILES = ${BUILDDIR}/{bin/{nicec,nicedoc}.bat,web/Readme.txt}
+
 .PHONY: zip
 zip ${ZIPFILE}: $(DEB)
 	${clean-tmp}
 	mkdir ${ZIP_ROOT}
 	../bin/nicec --man | groff -mandoc -Thtml - > ${ZIP_ROOT}/nicec.html
-	ln -sf ${BUILDDIR}/bin/nicec.bat ${BUILDDIR}/share/java/nice.jar ${BUILDDIR}/web/Readme.txt ${ZIP_ROOT}
+#	Make sure that the files are in DOS mode
+	unix2dos -p ${WIN_TEXT_FILES} ${ZIP_ROOT}/nicec.html
+	ln -sf ${WIN_TEXT_FILES} ${BUILDDIR}/share/java/nice.jar ${ZIP_ROOT}
 	mkdir -p ${ZIP_ROOT}/Emacs
 	ln -sf ${BUILDDIR}/lib/emacs/*.el ${ZIP_ROOT}/Emacs
 	-rm ${ZIPFILE}

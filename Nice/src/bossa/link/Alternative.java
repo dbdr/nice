@@ -12,7 +12,7 @@
 
 // File    : Alternative.java
 // Created : Mon Nov 15 12:20:40 1999 by bonniot
-//$Modified: Tue Jan 18 20:23:17 2000 by bonniot $
+//$Modified: Mon Jan 24 19:20:46 2000 by Daniel Bonniot $
 
 package bossa.link;
 
@@ -164,10 +164,10 @@ public class Alternative
     
     gnu.expr.Expression result = QuoteExp.trueExp;
     
-    for(int n=parameters.length-1;n>=0;n--)
+    for(int n = parameters.length-1; n>=0; n--)
       result = new gnu.expr.IfExp(matchTest((Domain) patterns.get(n),parameters[n]),
-			 result,
-			 QuoteExp.falseExp);
+				  result,
+				  QuoteExp.falseExp);
     
     return result;
   }
@@ -220,7 +220,7 @@ public class Alternative
   /** The bytecode class this alternative is defined in */
   ClassType definitionClass;
 
-  PrimProcedure primProcedure;
+  private PrimProcedure primProcedure;
   
   String methodName;
   List /* of Domain */ patterns;

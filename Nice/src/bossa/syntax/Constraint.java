@@ -12,7 +12,7 @@
 
 // File    : Constraint.java
 // Created : Fri Jul 02 17:51:35 1999 by bonniot
-//$Modified: Tue Dec 07 20:02:53 1999 by bonniot $
+//$Modified: Tue Jan 25 15:59:34 2000 by Daniel Bonniot $
 
 package bossa.syntax;
 
@@ -128,23 +128,32 @@ public class Constraint extends Node
   public void assert()
     throws bossa.typing.TypingEx
   {
-    bossa.typing.Typing.introduce(binders);
     // All user defined variables implicitely implement Top
-    for(Iterator i=binders.iterator();i.hasNext();)
-      {
-	TypeSymbol s=(TypeSymbol)i.next();
-	if(s instanceof TypeConstructor)
-	  {
-	    TypeConstructor t=(TypeConstructor)s;
-	    if(t.variance!=null)
-	      bossa.typing.Typing.assertImp
-		(t,InterfaceDefinition.top(t.variance.size),false);
-	    else
-	      Internal.warning(t+" has no known variance, so I can't assert it implement some Top<n> interface");
-	  }
-	else if(s instanceof MonotypeVar)
-	  ((MonotypeVar)s).rememberToImplementTop();
-      }
+    assert(true);
+  }
+  
+  void assert(boolean implementTop)
+    throws bossa.typing.TypingEx
+  {
+    bossa.typing.Typing.introduce(binders);
+    
+    if(implementTop)
+      for(Iterator i=binders.iterator();i.hasNext();)
+	{
+	  TypeSymbol s=(TypeSymbol)i.next();
+	  if(s instanceof TypeConstructor)
+	    {
+	      TypeConstructor t=(TypeConstructor)s;
+	      if(t.variance!=null)
+		bossa.typing.Typing.assertImp
+		  (t,InterfaceDefinition.top(t.variance.size),false);
+	      else
+		Internal.warning(t+" has no known variance, so I can't assert it implement some Top<n> interface");
+	    }
+	  else if(s instanceof MonotypeVar)
+	    ((MonotypeVar)s).rememberToImplementTop();
+	}
+
     AtomicConstraint.assert(atomics);
   }
 

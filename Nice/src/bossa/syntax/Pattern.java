@@ -12,7 +12,7 @@
 
 // File    : Pattern.java
 // Created : Mon Jul 05 14:36:52 1999 by bonniot
-//$Modified: Fri Nov 26 17:00:12 1999 by bonniot $
+//$Modified: Tue Jan 25 18:27:46 2000 by Daniel Bonniot $
 // Description : Syntactic pattern for method bodies declaration
 
 package bossa.syntax;
@@ -20,19 +20,41 @@ package bossa.syntax;
 import java.util.*;
 import bossa.util.*;
 
+/**
+ * Represents the information about one argument of a method body.
+ *
+ * @see MethodBodyDefinition
+ */
 public class Pattern
 {
-  public Pattern(LocatedString name)
-  {
-    this(name,null);
-  }
-
-  public Pattern(LocatedString name, TypeConstructor tc)
+  /**
+   * Builds a new pattern.
+   *
+   * @param name the name of the argument
+   * @param tc a TypeConstructor that the argument must match
+       for this alternative to be selected
+   * @param type a monotype that must be equal to 
+   *    the argument's runtime type. This is usefull to introduce
+   *    a type constructor variable with the exact type of the argument.
+   */
+  public Pattern(LocatedString name, TypeConstructor tc, Monotype type)
   {
     this.name=name;
     this.typeConstructor=tc;
+    this.type=type;
   }
 
+  final Monotype getType()
+  {
+    return type;
+  }
+
+  final boolean isSharp()
+  {
+    return typeConstructor!=null &&
+      typeConstructor.name.toString().charAt(0)=='#';
+  }
+  
   Domain getDomain()
   {
     if(typeConstructor==null)
@@ -95,20 +117,32 @@ public class Pattern
    * Scoping
    ****************************************************************/
 
-  void resolve(TypeScope scope)
+  void resolveTC(TypeScope scope)
   {
-    if(typeConstructor==null)
-      return;
-    
-    typeConstructor=typeConstructor.resolve(scope);
+    if(typeConstructor!=null)
+      typeConstructor=typeConstructor.resolve(scope);
   }
   
-  static void resolve(TypeScope scope, Collection patterns)
+  void resolveType(TypeScope scope)
+  {
+    if(type!=null)
+      type=type.resolve(scope);
+  }
+  
+  static void resolveTC(TypeScope scope, Collection patterns)
   {
     Iterator i=patterns.iterator();
 
     while(i.hasNext())
-      ((Pattern)i.next()).resolve(scope);
+      ((Pattern)i.next()).resolveTC(scope);
+  }
+  
+  static void resolveType(TypeScope scope, Collection patterns)
+  {
+    Iterator i=patterns.iterator();
+
+    while(i.hasNext())
+      ((Pattern)i.next()).resolveType(scope);
   }
   
   /****************************************************************
@@ -134,8 +168,12 @@ public class Pattern
   {
     if(typeConstructor==null)
       return AT_encoding+"_";
-    else
-      return AT_encoding+typeConstructor.name;
+
+    String enc=typeConstructor.name.toString();
+    if(isSharp())
+      enc=enc.substring(1);
+    
+    return AT_encoding+enc;
   }
   
   public static String bytecodeRepresentation(List patterns)
@@ -151,8 +189,9 @@ public class Pattern
    * Misc.
    ****************************************************************/
   
-  /** expresses that this pattern was a fake one.
-   *  @see MethodBodyDefinition
+  /** 
+   * Expresses that this pattern was a fake one.
+   * @see MethodBodyDefinition
    */
   boolean thisAtNothing()
   {
@@ -161,4 +200,5 @@ public class Pattern
 
   LocatedString name;
   TypeConstructor typeConstructor;
+  private Monotype type;
 }

@@ -12,7 +12,7 @@
 
 // File    : MethodBodyDefinition.java
 // Created : Thu Jul 01 18:12:46 1999 by bonniot
-//$Modified: Mon Jan 24 13:56:48 2000 by Daniel Bonniot $
+//$Modified: Tue Jan 25 16:10:06 2000 by Daniel Bonniot $
 
 package bossa.syntax;
 
@@ -29,13 +29,33 @@ import java.util.*;
 public class MethodBodyDefinition extends Node 
   implements Definition, Located
 {
+  /**
+   * Describe constructor here.
+   *
+   * @param name the name of the method.
+   * @param binders 
+   *    used to rebind the type parameters of the method definition. 
+   *    Null if one doesn't want to rebind them.
+   * @param newTypeVars list of TypeSymbol
+   * @param newConstraint list of AtomicConstraint
+   * @param formals list of Pattern
+   * @param body list of Statement
+   */
   public MethodBodyDefinition(LocatedString name, 
 			      Collection binders,
+			      List newTypeVars, List newConstraint,
 			      List formals, List body)
   {
     super(Node.down);
     this.name=name;
     this.binders=binders; 
+
+    if(newTypeVars!=null || newConstraint!=null && newConstraint.size()>0)
+      {
+	this.newConstraint = new Constraint(newTypeVars, newConstraint);
+	addChild(this.newConstraint);
+      }
+
     this.formals=formals;
     this.body=new Block(body);
     this.definition=null;
@@ -64,8 +84,16 @@ public class MethodBodyDefinition extends Node
       {
 	Pattern p=(Pattern)n.next();
 	Monotype domt=(Monotype)t.next();
-	res.add(new MonoSymbol(p.name,
-			       Monotype.fresh(p.name,domt)));
+
+	LocatedString typeName = p.name.cloneLS();
+	typeName.prepend("typeof(");
+	typeName.append(")");
+	
+	MonotypeVar type = Monotype.fresh(typeName,domt);
+	if(!p.isSharp())
+	  type.rememberToImplementTop();
+	
+	res.add(new MonoSymbol(p.name, type));
       }
     return res;
   }
@@ -152,6 +180,9 @@ public class MethodBodyDefinition extends Node
 
     // we just want Java classes to be discovered at this stage,
     // to add them in the rigid context.
+
+    // Binders must be taken into account,
+    // to distinguish them from Java Classes
     if(binders!=null) 
       {
 	try{ this.typeScope.addMappings(binders,null); } 
@@ -159,18 +190,13 @@ public class MethodBodyDefinition extends Node
 	  Internal.error("Should not happen");
 	}
       }
+
+    if(newConstraint!=null)
+      this.typeScope.addSymbols(newConstraint.binders);
+    
     body.buildScope(this.scope,this.typeScope);
     
     body.findJavaClasses();
-    
-    // FIXME: Super hacky
-    // we just want types to be resolved now
-    // otherwise ident symbols are resolved in a bad scope
-
-    //  boolean tmp = Node.resolveIdents;
-//      Node.resolveIdents = false;
-//      body.doResolve();
-//      Node.resolveIdents = tmp;
     
     return new Scopes(outer,typeOuter);
   }
@@ -182,7 +208,8 @@ public class MethodBodyDefinition extends Node
   
   void lateBuildScope(VarScope outer, TypeScope typeOuter)
   {
-    Pattern.resolve(typeScope,formals);
+    Pattern.resolveTC(this.typeScope,formals);
+
     VarSymbol s=findSymbol(outer);
 
     if(s==null)
@@ -206,6 +233,8 @@ public class MethodBodyDefinition extends Node
     }
 
     Scopes res=super.buildScope(outer,typeOuter);
+
+    Pattern.resolveType(this.typeScope,formals);
   }
 
   /****************************************************************
@@ -237,7 +266,7 @@ public class MethodBodyDefinition extends Node
       
       Collection monotypes=MonoSymbol.getMonotype(parameters);
       Typing.introduce(monotypes);
-      
+
       Typing.leqMono
 	(monotypes,
 	 definition.type.domain());
@@ -253,6 +282,43 @@ public class MethodBodyDefinition extends Node
       
       Typing.implies();
 
+      // New Constraint
+      if(newConstraint!=null)
+	{
+	  Typing.enter("Binding-constraint for "+name);
+
+	  newConstraint.assert(true);
+	}
+      
+      for(Iterator f=formals.iterator(), p=parameters.iterator();
+	  f.hasNext();)
+	{
+	  Pattern pat = (Pattern)f.next();
+	  MonoSymbol sym = (MonoSymbol) p.next();
+	  
+	  Monotype type = pat.getType();
+	  if(type==null)
+	    continue;
+	  
+	  if(newConstraint==null)
+	    User.error(pat.name,
+		       "\":\" constraints are not allowed when no local type variable has been introduced (with \"[ ]\")");
+	  
+	  try{
+	    Typing.leq(type, sym.getMonotype());
+	    Typing.leq(sym.getMonotype(), type);
+	  }
+	  catch(TypingEx e){
+	    User.error(pat.name, 
+		       "\":\" constraint for argument "+pat.name+
+		       " is not correct",
+		       ": "+e);
+	  }       
+	}
+      if(newConstraint!=null)
+	Typing.implies();
+
+      // end of New Constraint
     }
     catch(BadSizeEx e){
       Internal.error("Bad size in MethodBodyDefinition.typecheck()");
@@ -270,6 +336,8 @@ public class MethodBodyDefinition extends Node
 	User.error(this,"Last statement of body should be \"return\"");
       Typing.leq(t,new Polytype(definition.type.codomain()));
       Typing.leave();
+      if(newConstraint!=null)
+	Typing.leave();
     }
     catch(TypingEx e){
       User.error(this,"Return type "+t+" is not correct"," :"+e);
@@ -300,13 +368,13 @@ public class MethodBodyDefinition extends Node
     gnu.expr.LambdaExp lexp = new gnu.expr.LambdaExp(block);
     Statement.currentScopeExp = lexp;
     
-    lexp.primMethod=module.bytecode.addMethod
+    lexp.setPrimMethod(module.bytecode.addMethod
       (bossa.Bytecode.escapeString(definition.getName()+Pattern.bytecodeRepresentation(formals)),
        definition.javaArgTypes(),definition.javaReturnType(),
-       Access.PUBLIC|Access.STATIC|Access.FINAL);
+       Access.PUBLIC|Access.STATIC|Access.FINAL));
 
     if(name.content.equals("main") && formals.size()==1)
-      mainAlternative=lexp.primMethod;
+      mainAlternative=lexp.getMainMethod();
 
     // Parameters
     lexp.min_args=lexp.max_args=parameters.size();
@@ -330,7 +398,7 @@ public class MethodBodyDefinition extends Node
     lexp.compileAsMethod(module.compilation);
 
     //Register this alternative for the link test
-    new bossa.link.Alternative(this.definition,Pattern.getDomain(this.formals),module.bytecode,lexp.primMethod);
+    new bossa.link.Alternative(this.definition,Pattern.getDomain(this.formals),module.bytecode,lexp.getMainMethod());
   }
 
   //  public static void compileMethod(gnu.expr.LambdaExp lexp, ClassType inClass, String name)
@@ -375,10 +443,10 @@ public class MethodBodyDefinition extends Node
     block.setBody
       (new gnu.expr.ApplyExp(new gnu.expr.QuoteExp(new gnu.expr.PrimProcedure(mainAlternative)),eVal));
 
-    lexp.primMethod=module.bytecode.addMethod
+    lexp.setPrimMethod(module.bytecode.addMethod
       ("main",
        "([Ljava.lang.String;)V",
-       Access.PUBLIC | Access.STATIC);
+       Access.PUBLIC | Access.STATIC));
 
     lexp.compileAsMethod(module.compilation);
   }
@@ -421,4 +489,6 @@ public class MethodBodyDefinition extends Node
   protected List       /* of Patterns */   formals;
   Collection /* of LocatedString */ binders; // Null if type parameters are not bound
   private Block body;
+
+  private Constraint newConstraint;
 }

@@ -12,7 +12,7 @@
 
 // File    : Block.java
 // Created : Wed Jul 07 17:42:15 1999 by bonniot
-//$Modified: Thu Jan 20 14:49:27 2000 by bonniot $
+//$Modified: Tue Jan 25 17:56:41 2000 by Daniel Bonniot $
 // Description : A block : a list of statements with local variables
 
 package bossa.syntax;
@@ -137,7 +137,8 @@ public class Block extends Statement
 	}
 	catch(bossa.typing.TypingEx t){
 	  User.error(local.left,"Typing error : "+local.left+
-		     " cannot be assigned value "+local.value);
+		     " cannot be assigned value "+local.value,
+		     " with type "+local.value.getType());
 	}
       }
   }
@@ -167,12 +168,13 @@ public class Block extends Statement
     gnu.expr.Expression body;
 
     if(statements.size()!=0)
-      body = new gnu.expr.BeginExp();
+      body = new gnu.expr.BeginExp(null);
     else
-      body = new gnu.expr.QuoteExp(null);
+      body = gnu.expr.QuoteExp.voidExp;
 
     // addLocals must appear before Statement.compile(statements)
-    // in order to define the locals before their use
+    // in order to define the locals before their use.
+    // That is why we can't set body's body at construction.
     gnu.expr.Expression res = addLocals(locals.iterator(),body);
 
     if(statements.size()!=0)
@@ -197,7 +199,7 @@ public class Block extends Statement
     Statement.currentScopeExp = res;
     
     if(local.value==null)
-      eVal[0]=new gnu.expr.QuoteExp(null);
+      eVal[0]=gnu.expr.QuoteExp.nullExp;
     else
       eVal[0]=local.value.generateCode();
     local.left.setDeclaration(res.addDeclaration(local.left.name.toString(),

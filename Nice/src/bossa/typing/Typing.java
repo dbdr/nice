@@ -12,7 +12,7 @@
 
 // File    : Typing.java
 // Created : Tue Jul 20 11:57:17 1999 by bonniot
-//$Modified: Wed Jan 19 16:40:19 2000 by bonniot $
+//$Modified: Tue Jan 25 15:06:49 2000 by Daniel Bonniot $
 
 package bossa.typing;
 
@@ -67,12 +67,16 @@ abstract public class Typing
    */
   public static int enter(Collection symbols, String message)
   {
+    if(symbols==null)
+      return enter(message);
+    
     if(dbg) Debug.println("## Typechecking "+message+
 		  Util.map(" [",", ","]",symbols)
 		  );
     Engine.enter();
     
     introduce(symbols);
+
     return level++;
   }
 
@@ -229,6 +233,13 @@ abstract public class Typing
       if(dbg) e.printStackTrace();
       throw new TypingEx("Typing.leq("+m1+","+m2+") [was "+e.getMessage()+"]");
     }    
+  }
+  
+  public static void eq(Monotype m1, Monotype m2)
+    throws TypingEx
+  {
+    leq(m1,m2);
+    leq(m2,m1);
   }
   
   /****************************************************************

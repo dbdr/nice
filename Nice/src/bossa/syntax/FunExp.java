@@ -12,7 +12,7 @@
 
 // File    : FunExp.java
 // Created : Mon Jul 12 15:09:50 1999 by bonniot
-//$Modified: Thu Jan 20 12:06:48 2000 by bonniot $
+//$Modified: Tue Jan 25 10:49:59 2000 by Daniel Bonniot $
 // Description : A functional expression
 
 package bossa.syntax;
@@ -82,7 +82,11 @@ public class FunExp extends Expression
 	MonoSymbol s = (MonoSymbol) i.next();
 	
 	gnu.expr.Declaration decl = 
-	  res.addDeclaration(s.name.toString(), s.type.getJavaType());
+	  res.addDeclaration(s.name.toString(), 
+			     // Since a applyN method will be produced,
+			     // we must forget about the types... :-(
+			     gnu.bytecode.Type.pointer_type);
+
 	decl.setParameter(true);	
 	s.setDeclaration(decl);
       }

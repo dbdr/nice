@@ -12,7 +12,7 @@
 
 // File    : VoidConstantExp.java
 // Created : Mon Jul 05 17:30:56 1999 by bonniot
-//$Modified: Thu Aug 26 14:59:51 1999 by bonniot $
+//$Modified: Tue Jan 25 16:28:35 2000 by Daniel Bonniot $
 // Description : An integer constant
 
 package bossa.syntax;
@@ -24,6 +24,7 @@ public class VoidConstantExp extends ConstantExp
   public VoidConstantExp()
   {
     className="void";
+    value = gnu.mapping.Values.empty;
   }
 
   public String toString()

@@ -12,7 +12,7 @@
 
 // File    : Expression.java
 // Created : Mon Jul 05 16:25:02 1999 by bonniot
-//$Modified: Thu Jan 20 14:46:55 2000 by bonniot $
+//$Modified: Tue Jan 25 10:55:56 2000 by Daniel Bonniot $
 // Description : 
 
 package bossa.syntax;
@@ -191,7 +191,7 @@ public abstract class Expression extends Node
   final gnu.expr.Expression generateCode()
   {
     gnu.expr.Expression res = compile();
-    res.setLine(location().getLine());
+    res.setLine(location().getLine(), location().getColumn());
     
     return res;
   }

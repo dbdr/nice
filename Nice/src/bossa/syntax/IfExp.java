@@ -12,7 +12,7 @@
 
 // File    : IfExp.java
 // Created : Mon Dec 06 12:01:51 1999 by bonniot
-//$Modified: Mon Dec 13 14:41:09 1999 by bonniot $
+//$Modified: Mon Jan 24 19:22:36 2000 by Daniel Bonniot $
 
 package bossa.syntax;
 
@@ -53,7 +53,9 @@ public class IfExp extends Expression
   public gnu.expr.Expression compile()
   {
     condition.noOverloading();
-    return new gnu.expr.IfExp(condition.compile(),thenExp.compile(),elseExp.compile());
+    return new gnu.expr.IfExp(condition.generateCode(),
+			      thenExp.generateCode(),
+			      elseExp.generateCode());
   }
   
   /****************************************************************

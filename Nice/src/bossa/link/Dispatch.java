@@ -12,7 +12,7 @@
 
 // File    : Dispatch.java
 // Created : Mon Nov 15 10:36:41 1999 by bonniot
-//$Modified: Fri Jan 21 15:40:11 2000 by Daniel Bonniot $
+//$Modified: Mon Jan 24 19:13:12 2000 by Daniel Bonniot $
 
 package bossa.link;
 
@@ -220,7 +220,7 @@ public class Dispatch
 			     m.javaReturnType()==gnu.bytecode.Type.void_type,
 			     block,params));
 
-    lexp.primMethod = m.getDispatchPrimMethod();
+    lexp.setPrimMethod(m.getDispatchPrimMethod());
     
     lexp.compileAsMethod(module.dispatchComp);
   }
@@ -270,9 +270,13 @@ public class Dispatch
     return res;
   }
 
-  private static final gnu.mapping.Procedure throwProc = new kawa.standard.prim_throw();
+  private static final gnu.mapping.Procedure throwProc 
+    = new kawa.standard.prim_throw();
   
-  private static gnu.expr.Expression dispatch(Iterator sortedAlternatives, boolean voidReturn, final BlockExp block, gnu.expr.Expression[] params)
+  private static gnu.expr.Expression dispatch(Iterator sortedAlternatives, 
+					      boolean voidReturn, 
+					      final BlockExp block, 
+					      gnu.expr.Expression[] params)
   {
     if(!sortedAlternatives.hasNext())
       {

@@ -12,7 +12,7 @@
 
 // File    : Statement.java
 // Created : Mon Jul 05 15:48:25 1999 by bonniot
-//$Modified: Thu Jan 20 11:47:08 2000 by bonniot $
+//$Modified: Tue Jan 25 16:57:21 2000 by Daniel Bonniot $
 
 package bossa.syntax;
 
@@ -20,8 +20,8 @@ import bossa.util.*;
 import java.util.*;
 
 /**
- * Abstract ancestor for all statements
- * Descendants have "Stmt" suffix
+ * Abstract ancestor for all statements.
+ * Descendants have "Stmt" suffix.
  */
 public abstract class Statement extends Node
   implements Located

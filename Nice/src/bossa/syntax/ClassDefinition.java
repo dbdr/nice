@@ -12,7 +12,7 @@
 
 // File    : ClassDefinition.java
 // Created : Thu Jul 01 11:25:14 1999 by bonniot
-//$Modified: Mon Jan 24 09:31:23 2000 by bonniot $
+//$Modified: Mon Jan 24 18:28:52 2000 by Daniel Bonniot $
 
 package bossa.syntax;
 
@@ -413,9 +413,7 @@ public class ClassDefinition extends Node
 	i.hasNext();)
       ((ClassDefinition) i.next()).addFields(classType);
     
-    gnu.bytecode.Method constructor = classType.addMethod("<init>",Access.PUBLIC);
-    constructor.setArgTypes(new gnu.bytecode.Type[0]);
-    constructor.setReturnType(gnu.bytecode.Type.void_type);
+    gnu.bytecode.Method constructor = classType.addNewMethod("<init>", Access.PUBLIC, new gnu.bytecode.Type[0], gnu.bytecode.Type.void_type);
 
     constructor.initCode();
     gnu.bytecode.CodeAttr code = constructor.getCode();
@@ -437,9 +435,8 @@ public class ClassDefinition extends Node
     if(parent==null)
       parent = gnu.bytecode.Type.pointer_type;
     
-    gnu.bytecode.Method res = parent.addMethod("<init>",Access.PUBLIC);
-    res.setArgTypes(new gnu.bytecode.Type[0]);
-    res.setReturnType(gnu.bytecode.Type.void_type);
+    gnu.bytecode.Method res = parent.addNewMethod("<init>", Access.PUBLIC, new gnu.bytecode.Type[0], gnu.bytecode.Type.void_type);
+
     return res;
   }
   

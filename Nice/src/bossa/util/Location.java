@@ -12,7 +12,7 @@
 
 // File    : Location.java
 // Created : Tue Jul 13 11:55:08 1999 by bonniot
-//$Modified: Tue Jan 11 19:17:05 2000 by bonniot $
+//$Modified: Tue Jan 25 10:56:34 2000 by Daniel Bonniot $
 
 package bossa.util;
 
@@ -118,6 +118,11 @@ public class Location implements Located
   public int getLine()
   {
     return startLine;
+  }
+  
+  public int getColumn()
+  {
+    return startColumn;
   }
   
   private int startLine,startColumn,endLine,endColumn;

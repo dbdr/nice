@@ -230,6 +230,13 @@ public class Declaration
     setFlag(isPrivate, PRIVATE);
   }
 
+  public final boolean isSpecifiedPrivate() { return (flags & PRIVATE_SPECIFIED) != 0; }
+
+  public final void setSpecifiedPrivate(boolean isPrivate)
+  {
+    setFlag(isPrivate, PRIVATE_SPECIFIED);
+  }
+
   public final boolean isAlias() { return (flags & IS_ALIAS) != 0; }
   public final void setAlias(boolean flag) { setFlag(flag, IS_ALIAS); }
 

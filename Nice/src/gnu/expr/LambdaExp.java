@@ -774,8 +774,13 @@ public class LambdaExp extends ScopeExp
     if (Compilation.usingTailCalls && ! isInitMethod && ! isClassMethod())
       nameBuf.append("$T");
 
-   int mflags = (isStatic ? Access.STATIC : 0)
-      + (nameDecl != null && ! nameDecl.isPrivate() ? Access.PUBLIC : 0);
+    int mflags = (isStatic ? Access.STATIC : 0);
+    if (nameDecl != null)
+      if (nameDecl.isSpecifiedPrivate())
+        mflags |= Access.PRIVATE;
+      else if (! nameDecl.isPrivate())
+        mflags |= Access.PUBLIC;
+
     if (isInitMethod)
       {
 	// Make it provide to prevent inherited $finit$ from overriding

@@ -155,6 +155,8 @@ public abstract class MethodImplementation extends Definition
       Debug.println("Compiling method body " + this);
 
     getRefExp();
+
+    createSerializationMethod();
   }
 
   private gnu.expr.ReferenceExp createRef ()
@@ -179,6 +181,45 @@ public abstract class MethodImplementation extends Definition
     compiledMethod.addBytecodeAttribute
       (new MiscAttr("patterns", 
 		    Pattern.bytecodeRepresentation(formals).getBytes()));
+  }
+
+  abstract TypeConstructor firstArgument();
+
+  /**
+     If the method implemented corresponds to readObject or writeObject,
+     create private member methods in the class of the first argument,
+     so that the Java serialization process picks them up.
+  */
+  private void createSerializationMethod()
+  {
+    final int arity = formals.length;
+
+    if (arity != 2)
+      return;
+
+    String name = this.name.toString();
+
+    if (name.equals("writeObject") || name.equals("readObject"))
+      {
+        ClassDefinition def = ClassDefinition.get(firstArgument());
+        if (def == null || ! (def.getImplementation() instanceof NiceClass))
+          return;
+
+        NiceClass c = (NiceClass) def.getImplementation();
+
+	gnu.expr.Expression[] params = new gnu.expr.Expression[arity];
+        gnu.expr.LambdaExp method = Gen.createMemberMethod
+          (name.toString(), 
+           c.getClassExp().getType(),
+           new Type[]{declaration.javaArgTypes()[1]},
+           declaration.javaReturnType(),
+           params);
+
+        Gen.setMethodBody(method, 
+                          new gnu.expr.ApplyExp(getRefExp(), params));
+
+        c.getClassExp().addMethod(method, true);
+      }
   }
 
   /****************************************************************

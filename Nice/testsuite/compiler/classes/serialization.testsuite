@@ -1,12 +1,21 @@
-/// PASS
-  A a = new A(x: 10);
+/// global
+import java.io.*;
+
+<T> T serializeThenDeserialize(T obj)
+{
   let outb = new ByteArrayOutputStream();
   let outs = new ObjectOutputStream(outb);
-  outs.writeObject(a);
+  outs.writeObject(obj);
   let store = outb.toByteArray();
+
   let inb = new ByteArrayInputStream(store);
   let ins = new ObjectInputStream(inb);
-  A b = ins.readObject();
+  return ins.readObject();
+}
+
+/// PASS
+  A a = new A(x: 10);
+  A b = serializeThenDeserialize(a);
   assert a.x == b.x;
   let osc = ObjectStreamClass.lookup(A.class);
   assert osc.getSerialVersionUID() == 123456789L;
@@ -22,3 +31,42 @@
   class A implements java.io.Serializable {
     final long /* /// FAIL HERE */serialVersionUID = "xyz";
   }
+
+/// PASS
+  A a = serializeThenDeserialize(new A());
+  assert a.ok;
+
+  B b = serializeThenDeserialize(new B());
+  assert b.ok;
+
+  /// Toplevel
+import java.io.*;
+
+class A implements Serializable
+{
+  transient boolean ok = true;
+
+  private void writeObject(ObjectOutputStream out) {
+    out.writeBoolean(true);
+  }
+
+  private void readObject(ObjectInputStream in) {
+    ok = in.readBoolean();
+  }
+}
+
+class B implements Serializable
+{
+  transient boolean ok = true;
+
+  private void writeObject(ObjectOutputStream out);
+  private void readObject(ObjectInputStream in);
+}
+
+writeObject(this@B, out) {
+  out.writeBoolean(true);
+}
+
+readObject(this@B, in) {
+  ok = in.readBoolean();
+}

@@ -924,7 +924,7 @@ public class NiceClass extends ClassDefinition.ClassImplementation
     fieldDecl.setSimple(false);
     fieldDecl.setCanRead(true);
     fieldDecl.setFlag(Declaration.IS_CONSTANT);
-    fieldDecl.setPrivate(true);
+    fieldDecl.setSpecifiedPrivate(true);
     fieldDecl.setFlag(Declaration.STATIC_SPECIFIED);
     fieldDecl.setFlag(Declaration.TYPE_SPECIFIED);
     fieldDecl.noteValue(new QuoteExp(serialVersionUIDValue, SpecialTypes.longType));

@@ -82,12 +82,14 @@ public class ClassExp extends LambdaExp
      Add a method to this class.
      @return the expression that should be used to call that method.
   */
-  public ReferenceExp addMethod(LambdaExp method)
+  public ReferenceExp addMethod(LambdaExp method, boolean isPrivate)
   {
     Declaration decl = new Declaration(method.getName());
     decl.noteValue(method);
     decl.setFlag(Declaration.IS_CONSTANT|Declaration.STATIC_SPECIFIED);
     decl.setProcedureDecl(true);
+    if (isPrivate)
+      decl.setSpecifiedPrivate(true);
     method.nameDecl.context = this;
 
     method.nextSibling = this.firstChild;
@@ -106,6 +108,15 @@ public class ClassExp extends LambdaExp
       }
 
     return new ReferenceExp(decl);
+  }
+
+  /**
+     Add a method to this class.
+     @return the expression that should be used to call that method.
+  */
+  public ReferenceExp addMethod(LambdaExp method)
+  {
+    return addMethod(method, false);
   }
 
   /*
@@ -294,7 +305,11 @@ public class ClassExp extends LambdaExp
         // compiled package.
 	if (decl.getCanRead() && decl.field == null)
 	  {
-	    int flags = Access.PUBLIC;
+	    int flags = 0;
+            if (decl.isSpecifiedPrivate())
+              flags |= Access.PRIVATE;
+            else
+              flags |= Access.PUBLIC;
 	    if (decl.getFlag(Declaration.STATIC_SPECIFIED))
 	      flags |= Access.STATIC;
 	    if (isMakingClassPair())

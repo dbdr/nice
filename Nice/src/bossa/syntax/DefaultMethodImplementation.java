@@ -52,6 +52,11 @@ public class DefaultMethodImplementation extends MethodImplementation
     return res;
   }
 
+  final mlsub.typing.TypeConstructor firstArgument()
+  {
+    return nice.tools.code.Types.equivalent(declaration.getArgTypes()[0]).head();
+  }
+
   void doResolve()
   {
     //scope = declaration.scope;

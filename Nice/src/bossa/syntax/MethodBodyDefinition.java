@@ -89,7 +89,14 @@ public class MethodBodyDefinition extends MethodImplementation
   
   final TypeConstructor firstArgument()
   {
-    return formals[0].tc;
+    if (formals[0].tc != null)
+      return formals[0].tc;
+    else
+      // Either there is no specialization on the first parameter, or
+      // it was equivalent to the declaration type and has been erased,
+      // so we return the information in the declaration.
+      return nice.tools.code.Types.equivalent(declaration.getArgTypes()[0]).
+        head();
   }
 
   private void setDeclaration(MethodDeclaration d)

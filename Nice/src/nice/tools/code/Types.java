@@ -454,7 +454,11 @@ public final class Types
       // when a class with similar name but with different case exists
       // can occur on case-insensitive file-systems (e.g. FAT)
       { }
-      
+
+    if (c != null && bossa.util.Debug.javaTypes)
+      Debug.println("Loaded " + className + " from " + 
+		    classLoader.getResource(className.replace('.','/') + ".class"));
+
     stringToReflectClass.put(className, c);
     
     return c;

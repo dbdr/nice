@@ -112,26 +112,26 @@ public ConstantExp createIntegerConstantExp(LocatedString representation)
     
     if (Byte.MIN_VALUE <= value <= Byte.MAX_VALUE && !isLong)
       {
-	type = notNull(nice.tools.typing.PrimitiveType.bytePolytype);
-        tc = notNull(nice.tools.typing.PrimitiveType.byteTC);
+	type = nice.tools.typing.PrimitiveType.bytePolytype;
+        tc = nice.tools.typing.PrimitiveType.byteTC;
 	object = new Byte(byte(value));
       }
     else if (Short.MIN_VALUE <= value <= Short.MAX_VALUE && !isLong)
       {
-	type = notNull(nice.tools.typing.PrimitiveType.shortPolytype);
-        tc = notNull(nice.tools.typing.PrimitiveType.shortTC);
+	type = nice.tools.typing.PrimitiveType.shortPolytype;
+        tc = nice.tools.typing.PrimitiveType.shortTC;
 	object = new Short(short(value));
       }
     else if (Integer.MIN_VALUE <= value <= Integer.MAX_VALUE && !isLong)
       {
-	type = notNull(nice.tools.typing.PrimitiveType.intPolytype);
-        tc = notNull(nice.tools.typing.PrimitiveType.intTC);
+	type = nice.tools.typing.PrimitiveType.intPolytype;
+        tc = nice.tools.typing.PrimitiveType.intTC;
 	object = value;
       }
     else
       {
-	type = notNull(nice.tools.typing.PrimitiveType.longPolytype);
-        tc = notNull(nice.tools.typing.PrimitiveType.longTC);
+	type = nice.tools.typing.PrimitiveType.longPolytype;
+        tc = nice.tools.typing.PrimitiveType.longTC;
 	object = value;
       }
     
@@ -252,7 +252,7 @@ public class NullExp extends ConstantExp
 			maybeMonotype(alpha));
   }
 
-  compile() = notNull(gnu.expr.QuoteExp.nullExp);
+  compile() = gnu.expr.QuoteExp.nullExp;
  
   toString() = "null";
 }
@@ -279,7 +279,7 @@ public ConstantExp createBooleanConstant(boolean value, Location location)
 {
   let res = new BooleanConstantExp(tc: nice.tools.typing.PrimitiveType.boolTC,
 	value: value, representation: value ? "true" : "false",
-	compiledValue: notNull(value ? gnu.expr.QuoteExp.trueExp : gnu.expr.QuoteExp.falseExp));
+	compiledValue: value ? gnu.expr.QuoteExp.trueExp : gnu.expr.QuoteExp.falseExp);
   res.type = nice.tools.typing.PrimitiveType.boolPolytype;
   res.setLocation(location);
   return res;
@@ -306,7 +306,7 @@ public ConstantExp createCharConstant(LocatedString value)
   if (s.length() != 1)
     User.error(value, "Invalid character constant: " + value);
 
-  return createCharConstant(s[0], notNull(value.location()));
+  return createCharConstant(s[0], value.location());
 }
 
 public ConstantExp createCharConstant(char value, Location loc)

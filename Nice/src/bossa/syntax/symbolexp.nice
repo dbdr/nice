@@ -79,10 +79,10 @@ public class SymbolExp extends Expression
   
   public LocatedString getName()
   {
-    return symbol.name;
+    return symbol.getName();
   }
   
-  toString() = symbol.name.toQuotedString();
+  toString() = symbol.getName().toQuotedString();
 }
 
 Expression createSymbolExp(VarSymbol symbol, Location loc)

@@ -14,7 +14,7 @@ package bossa.syntax;
 
 import bossa.util.*;
 
-List<mlsub.typing.TypeConstructor[]> enumerate(?mlsub.typing.Constraint, mlsub.typing.lowlevel.Element[], boolean[]) = native List mlsub.typing.Enumeration.enumerate(mlsub.typing.Constraint, mlsub.typing.lowlevel.Element[], boolean[]);
+List<?mlsub.typing.TypeConstructor[]> enumerate(?mlsub.typing.Constraint, mlsub.typing.lowlevel.Element[], boolean[]) = native List mlsub.typing.Enumeration.enumerate(mlsub.typing.Constraint, mlsub.typing.lowlevel.Element[], boolean[]);
 
 /**
    Methods performing the coverage and non-ambiguity test.
@@ -200,7 +200,7 @@ private void testMethod(MethodDeclaration method,
   if (type == null)
     throw Internal.error(method + " is not in a proper state.");
 
-  List<mlsub.typing.TypeConstructor[]> multitags = enumerateTags(type, used);
+  List<?mlsub.typing.TypeConstructor[]> multitags = enumerateTags(type, used);
 
   boolean[] isValue = new boolean[method.getArity()];
   List<?ConstantExp[]> values = generateValues(sortedAlternatives, isValue);
@@ -235,7 +235,7 @@ private void testMethod(MethodDeclaration method,
 		 Util.map("", "\n", "", errors));
 }
 
-private ?gnu.bytecode.ClassType classTypeOfNiceClass(mlsub.typing.TypeConstructor tc)
+private ?gnu.bytecode.ClassType classTypeOfNiceClass(?mlsub.typing.TypeConstructor tc)
 {
   let def = getTypeDefinition(tc);
 
@@ -256,7 +256,7 @@ private ?gnu.bytecode.ClassType classTypeOfNiceClass(mlsub.typing.TypeConstructo
    @return true if the test failed
  */
 private boolean testTypes(MethodDeclaration method, 
-                          mlsub.typing.TypeConstructor[] tags, 
+                          ?mlsub.typing.TypeConstructor[] tags, 
 			  Stack<Alternative> sortedAlternatives,
 			  ?gnu.bytecode.ClassType firstArg,
 			  List<String> errors)
@@ -310,7 +310,7 @@ private boolean testTypes(MethodDeclaration method,
  */
 private boolean testValues
     (MethodDeclaration method, 
-     mlsub.typing.TypeConstructor[] tags,
+     ?mlsub.typing.TypeConstructor[] tags,
      List<?ConstantExp[]> valueCombis,
      boolean[] isValue, 
      Stack<Alternative> sortedAlternatives,
@@ -352,7 +352,7 @@ private boolean testValues
   return failed;
 }
 
-private String tagsToString(mlsub.typing.TypeConstructor[] tags)
+private String tagsToString(?mlsub.typing.TypeConstructor[] tags)
 {
   let res = new StringBuffer();
   res.append('(');
@@ -365,7 +365,7 @@ private String tagsToString(mlsub.typing.TypeConstructor[] tags)
   return res.append(')').toString();
 }
 
-private String tagsToString(mlsub.typing.TypeConstructor[] tags, ?ConstantExp[] values, boolean[] isValue)
+private String tagsToString(?mlsub.typing.TypeConstructor[] tags, ?ConstantExp[] values, boolean[] isValue)
 {
   let res = new StringBuffer();
   res.append('(');
@@ -389,7 +389,7 @@ private String tagsToString(mlsub.typing.TypeConstructor[] tags, ?ConstantExp[] 
    null if it cannot be matched (e.g. a function type)
    PrimtiveType.nullTC if it can be matched by @null
 **/
-private List<mlsub.typing.TypeConstructor[]> enumerateTags(mlsub.typing.Polytype type, boolean[] used)
+private List<?mlsub.typing.TypeConstructor[]> enumerateTags(mlsub.typing.Polytype type, boolean[] used)
 {
   mlsub.typing.Monotype[] domains = type.domain();
   ?mlsub.typing.Constraint cst = type.getConstraint();
@@ -429,7 +429,7 @@ private List<mlsub.typing.TypeConstructor[]> enumerateTags(mlsub.typing.Polytype
   if (len != 0)
     throw new Error();
 
-  List<mlsub.typing.TypeConstructor[]> res = mlsub.typing.Enumeration.enumerate(cst, types, used);
+  List<?mlsub.typing.TypeConstructor[]> res = mlsub.typing.Enumeration.enumerate(cst, types, used);
   return mergeNullCases(res, domains.length);
 }
 
@@ -440,13 +440,13 @@ private List<mlsub.typing.TypeConstructor[]> enumerateTags(mlsub.typing.Polytype
     Each tuple has 2 * length elements, 
     alternatively a nullness marker TC and a normal TC
 */
-private List<mlsub.typing.TypeConstructor[]> mergeNullCases(List<mlsub.typing.TypeConstructor[]> tuples, int length)
+private List<?mlsub.typing.TypeConstructor[]> mergeNullCases(List<?mlsub.typing.TypeConstructor[]> tuples, int length)
 {
-  LinkedList<mlsub.typing.TypeConstructor[]> res = new LinkedList();
-  Set<mlsub.typing.TypeConstructor[]> tupleSet = new TreeSet(tagComp);
+  LinkedList<?mlsub.typing.TypeConstructor[]> res = new LinkedList();
+  Set<?mlsub.typing.TypeConstructor[]> tupleSet = new TreeSet(tagComp);
   for (tuple : tuples)
     {
-      mlsub.typing.TypeConstructor[] tags = flattenTags(tuple, length);
+      ?mlsub.typing.TypeConstructor[] tags = flattenTags(tuple, length);
       //add only non duplicate tags
       if (tupleSet.add(tags))
         res.add(tags);
@@ -454,14 +454,14 @@ private List<mlsub.typing.TypeConstructor[]> mergeNullCases(List<mlsub.typing.Ty
   return res;
 }
 
-private let Comparator<mlsub.typing.TypeConstructor[]> tagComp = new TagComparator();
+private let Comparator<?mlsub.typing.TypeConstructor[]> tagComp = new TagComparator();
 
 private class TagComparator<-T> implements Comparator<T>
 {
   compare(o1, o2)
   {
-    mlsub.typing.TypeConstructor[] tc1 = cast(o1);
-    mlsub.typing.TypeConstructor[] tc2 = cast(o2);
+    ?mlsub.typing.TypeConstructor[] tc1 = cast(o1);
+    ?mlsub.typing.TypeConstructor[] tc2 = cast(o2);
 
     for(int i = 0; i<tc1.length; i++)
       {
@@ -472,8 +472,8 @@ private class TagComparator<-T> implements Comparator<T>
           }
         if (tc2[i] == null)
           return 1;
-        int a = tc1[i].getId();
-        int b = tc2[i].getId();
+        int a = notNull(tc1[i]).getId();
+        int b = notNull(tc2[i]).getId();
         if (a<b)
           return -1;
         if (a>b)
@@ -496,9 +496,9 @@ private class TagComparator<-T> implements Comparator<T>
     Each tuple has 2 * length elements, 
     alternatively a nullness marker TC and a normal TC
 */
-private mlsub.typing.TypeConstructor[] flattenTags(mlsub.typing.TypeConstructor[] tags, int length)
+private ?mlsub.typing.TypeConstructor[] flattenTags(?mlsub.typing.TypeConstructor[] tags, int length)
 {
-  mlsub.typing.TypeConstructor[] res = cast(new mlsub.typing.TypeConstructor[length]);
+  ?mlsub.typing.TypeConstructor[] res = new mlsub.typing.TypeConstructor[length];
   for (int i = length; --i >= 0 ;)
     if (tags[2 * i] == nice.tools.typing.PrimitiveType.nullTC)
       res[i] = notNull(nice.tools.typing.PrimitiveType.nullTC);

@@ -94,7 +94,7 @@ final class NewField extends NiceField
   void createField()
   {
     let decl = declaringClass.classe.addField
-	(sym.name.toString(), nice.tools.code.Types.javaType(sym.type));
+	(sym.getName().toString(), nice.tools.code.Types.javaType(sym.type));
     method.fieldDecl = decl;
     decl.setFlag(isFinal_,     gnu.expr.Declaration.IS_CONSTANT);
     decl.setFlag(isTransient, gnu.expr.Declaration.TRANSIENT);

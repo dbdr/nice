@@ -197,7 +197,7 @@ class Info
       }
 
     this.checkNotDefined(symbol);
-    this.vars[symbol.name.toString()] = symbol;
+    this.vars[notNull(symbol.name).toString()] = symbol;
   }
 
   void addVar(MonoSymbol symbol)
@@ -215,7 +215,7 @@ class Info
       }
 
     this.checkNotDefined(symbol);
-    this.vars[symbol.name.toString()] = symbol;
+    this.vars[notNull(symbol.name).toString()] = symbol;
     symbol.depth = this.depth;
   }
 
@@ -227,7 +227,7 @@ class Info
 
   void checkNotDefined(VarSymbol symbol)
   {
-    ?VarSymbol old = this.vars[symbol.name.toString()];
+    ?VarSymbol old = this.vars[notNull(symbol.name).toString()];
     if (old != null)
       throw error(symbol, "Symbol " + symbol.name + " is already defined.\n" +
 		  "Previous definition: " + old.location().toString());
@@ -275,7 +275,7 @@ analyseAssigned(e, i) = notNull(analyse(e, i));
 analyseAssigned(IdentExp e, info) = analyseIdent(e, info, true);
 analyseAssigned(TupleExp e, info)
 {
-  Expression[] es = notNull(e.expressions);
+  Expression[] es = e.expressions;
   for (int i = 0; i < es.length; i++)
     es[i] = es[i].analyseAssigned(info);
 
@@ -328,7 +328,7 @@ analyse(CallExp e, info)
   Arguments args = e.arguments;
   
   if (e.infix)
-    markAsCallFirstArg(notNull(args.getExp(0)));
+    markAsCallFirstArg(args.getExp(0));
 
   List<ExpLocalVariable> expLocals = new ArrayList();
 
@@ -365,7 +365,7 @@ analyse(CallExp e, info)
 	  ?LocatedString nextComponent = identString(e.function);
 
 	  if (nextComponent == null)
-	    throw unknownIdent(notNull(pkg.locatedName()));
+	    throw unknownIdent(pkg.locatedName());
 
 	  return createTypeConstantExp(pkg, nextComponent);
 	}
@@ -389,8 +389,7 @@ Expression analyseQualifiedCall(CallExp e, Info info)
 
   ?LocatedString funName = identString(e.function);
   if (funName == null)
-    throw notNull(bossa.util.Internal.error
-		  (e.function, "This is not a valid class member"));
+    throw Internal.error(e.function, "This is not a valid class member");
 	  
   int arity = args.size();
 
@@ -480,7 +479,7 @@ Expression analyseIdent(IdentExp e, Info info, boolean assigned)
 {
   if (!e.isInfix()) // infix symbols can only come from the global scope
     {
-      ?VarSymbol sym = info.lookup(notNull(e.ident).toString());
+      ?VarSymbol sym = info.lookup(e.ident.toString());
 
       if (sym != null)
         {
@@ -501,7 +500,7 @@ Expression analyseIdent(IdentExp e, Info info, boolean assigned)
 	    }
 
 	  if (e.alwaysOverloadedSymbol)
-	    return createOverloadedSymbolExp(sym, notNull(e.ident));
+	    return createOverloadedSymbolExp(sym, e.ident);
 	  else
 	    return createSymbolExp(sym, e.location());
 	}
@@ -511,7 +510,7 @@ Expression analyseIdent(IdentExp e, Info info, boolean assigned)
   if (e.isInfix())
     symbols = cast(notNull(Node.getGlobalScope()).lookup(e.ident));
   else
-    symbols = info.globalLookup(notNull(e.ident));
+    symbols = info.globalLookup(e.ident);
 
   if (symbols != null && symbols.size() > 0)
     {
@@ -532,7 +531,7 @@ Expression analyseIdent(IdentExp e, Info info, boolean assigned)
 
 	  if (sym.isNonStaticFieldAccess() && Node.thisExp != null)
             {
-	      CallExp res = new CallExp(function: createOverloadedSymbolExp(symbols, notNull(e.ident)),
+	      CallExp res = new CallExp(function: createOverloadedSymbolExp(symbols, e.ident),
 	        	arguments: new Arguments(arguments: [new Argument(value: notNull(Node.thisExp))]));
               res.setLocation(e.location());
               return res;
@@ -541,7 +540,7 @@ Expression analyseIdent(IdentExp e, Info info, boolean assigned)
 	    // Refering to an unqualified static field.
 	    {
 	      // Make an implicit call to fetch the static field's value.
-	      CallExp res = new CallExp(function: createOverloadedSymbolExp(symbols, notNull(e.ident)), 
+	      CallExp res = new CallExp(function: createOverloadedSymbolExp(symbols, e.ident), 
 	         		arguments: new Arguments(arguments: []));
               res.setLocation(e.location());
               return res;
@@ -550,13 +549,13 @@ Expression analyseIdent(IdentExp e, Info info, boolean assigned)
 	  return createSymbolExp(sym, e.location());
         }
       else
-        return createOverloadedSymbolExp(symbols, notNull(e.ident));
+        return createOverloadedSymbolExp(symbols, e.ident);
     }
 
   if (e.enableClassExp)
-    return createTypeConstantExp(null, notNull(e.ident));
+    return createTypeConstantExp(null, e.ident);
 
-  throw unknownIdent(notNull(e.ident));
+  throw unknownIdent(e.ident);
 }
 
 analyse(IfExp e, info)
@@ -727,7 +726,7 @@ analyse(LocalFunction decl, info)
 analyse(Block b, info)
 {
   info.begin();
-  notNull(b.locals).foreach(LocalDeclaration l => analyse(l, info));
+  b.locals.foreach(LocalDeclaration l => analyse(l, info));
   analyse(b.statements, info);
   info.end();
 

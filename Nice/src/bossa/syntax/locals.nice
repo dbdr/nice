@@ -27,7 +27,7 @@ abstract class LocalDeclaration extends Statement
     return notNull(value).generateCode();
   }
 
-  location() = this.getSymbol().name.location();
+  location() = notNull(this.getSymbol().name).location();
 
   gnu.expr.Expression compile(gnu.expr.LetExp letExp)
   {
@@ -92,7 +92,7 @@ public class LocalVariable extends LocalValue
 {
   LocalVariableSymbol left;
 
-  getName() = left.name.toString();
+  getName() = notNull(left.name).toString();
   getSymbol() = left;
   getBytecodeType() = nice.tools.code.Types.javaType(left.type);
 
@@ -151,7 +151,7 @@ public class LocalConstant extends LocalValue
 {
   MonoSymbol left; 
 
-  getName() = left.name.toString();
+  getName() = notNull(left.name).toString();
   getSymbol() = left;
   getBytecodeType() = nice.tools.code.Types.javaType(left.type);
 
@@ -184,7 +184,7 @@ public class LocalFunction extends LocalDeclaration
   FunSymbol left;
   FormalParameters parameters;
 
-  getName() = left.name.toString();
+  getName() = notNull(left.name).toString();
   getSymbol() = left;
   getBytecodeType() = nice.tools.code.Types.javaType(left.type);
 

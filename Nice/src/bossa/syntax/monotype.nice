@@ -205,13 +205,13 @@ public class MonotypeConstructor extends Monotype
   {
     Monotype res = createMonotypeConstructor
       (notNull(tc),
-       new TypeParameters(content: notNull(parameters.content).mapToArray(Monotype t => t.substitute(map))),
+       new TypeParameters(content: parameters.content.mapToArray(Monotype t => t.substitute(map))),
        loc);
     res.nullness = this.nullness;
     return res;
   }
 
-  containsAlike() = notNull(parameters.content).any(Monotype t => t.containsAlike());
+  containsAlike() = parameters.content.any(Monotype t => t.containsAlike());
 
   public ?TypeIdent getTC() = tc;
   

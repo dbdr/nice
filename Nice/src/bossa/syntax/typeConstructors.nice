@@ -18,7 +18,7 @@ import bossa.util.*;
    Tools for classes and type constructors.
 
 */
-var HashMap<mlsub.typing.TypeConstructor,?LinkedList<VarSymbol>> constructorsMap = new HashMap();
+var HashMap<mlsub.typing.TypeConstructor,?LinkedList<MethodSymbol>> constructorsMap = new HashMap();
 public void resetConstructorsMap() { constructorsMap = new HashMap(); }
  
 /**
@@ -28,14 +28,14 @@ public void resetConstructorsMap() { constructorsMap = new HashMap(); }
    @return a list of the MethodDefinition.Symbols of each constructor of
    this class.
  */
-?LinkedList<VarSymbol> getConstructors(mlsub.typing.TypeConstructor tc)
+?LinkedList<MethodSymbol> getConstructors(mlsub.typing.TypeConstructor tc)
 {
   return constructorsMap.get(tc);
 }
 
 void addConstructor(mlsub.typing.TypeConstructor tc, MethodDeclaration m)
 {
-  ?LinkedList<VarSymbol> l =  constructorsMap.get(tc);
+  ?LinkedList<MethodSymbol> l =  constructorsMap.get(tc);
   if (l==null)
     {
       l = new LinkedList();
@@ -46,7 +46,7 @@ void addConstructor(mlsub.typing.TypeConstructor tc, MethodDeclaration m)
 
 void removeConstructor(TypeConstructor tc, MethodDeclaration m)
 {
-  ?LinkedList<VarSymbol> l =  constructorsMap.get(tc);
+  ?LinkedList<MethodSymbol> l =  constructorsMap.get(tc);
   if (l == null)
     return;
 

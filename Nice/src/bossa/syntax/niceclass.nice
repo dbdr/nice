@@ -406,7 +406,7 @@ public class NiceClass extends ClassImplementation
 
     for (msym : constructors)
       {
-	let MethodDeclaration m = notNull(msym.getMethodDeclaration());
+	let m = msym.getMethodDeclaration();
 
         // Only consider parent methods for which a call from this class
         // is legal.
@@ -453,7 +453,7 @@ public class NiceClass extends ClassImplementation
     List<(?MethodDeclaration, List<Parameter>)> res = new ArrayList();
     for (msym : constructors)
       {
-        let MethodDeclaration decl = notNull(msym.getMethodDeclaration());
+        let decl = msym.getMethodDeclaration();
         res.add((decl, notNull(decl.formalParameters()).getParameters(scope)));
       }
 
@@ -727,7 +727,7 @@ mlsub.typing.Constraint identifyTypeParameters
   let n = atoms == null ? 0 : atoms.length;
   let allAtoms = new mlsub.typing.AtomicConstraint[n + typeParameters.length * 2];
   if (n > 0)
-    System.arraycopy(atoms, 0, allAtoms, 2 * typeParameters.length, n);
+    System.arraycopy(notNull(atoms), 0, allAtoms, 2 * typeParameters.length, n);
 
   for(int i = 0; i < typeParameters.length; i++)
     {

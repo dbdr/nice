@@ -65,7 +65,7 @@ public gnu.expr.ConstructorExp generateCustomConstructor
 void generateMethod
     (gnu.expr.LambdaExp lexp, 
      ?String bytecodeName,
-     gnu.bytecode.Type[] argTypes,
+     gnu.bytecode.Type[?] argTypes,
      gnu.bytecode.Type retType,
      MonoSymbol[?] args,
      boolean toplevel,
@@ -88,9 +88,9 @@ void generateMethod
   for (int n = 0; n < arity; n++)
     {
       boolean isThis = member && n == 0;
-      String parameterName = notNull(args)[n].getName() == null 
+      String parameterName = notNull(args)[n].name == null 
 	  ? "anonymous_" + n 
-	  : notNull(notNull(args)[n].getName()).toString();
+	  : notNull(notNull(args)[n].name).toString();
 
       gnu.expr.Declaration d;
       if (isThis)

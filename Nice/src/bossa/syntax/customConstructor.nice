@@ -184,3 +184,45 @@ private Monotype getCCReturnType(LocatedString className, Constraint cst)
   res.nullness = /*sure*/2;
   return res;
 }
+
+void resolveCCThis(Statement stmt, Located thisLoc, NiceClass classe)
+{
+  void missingThisError()
+  {
+    User.error(thisLoc, "The last statement must be a call to 'this' constructor");
+  }
+
+  Block block = cast(stmt);
+
+  if (block.statements.length == 0)
+    missingThisError();
+
+  Statement last = block.last;
+  if (last instanceof Block)
+  {
+    resolveCCThis(last, thisLoc, classe);
+    return;
+  }
+  
+  if (! (last instanceof ExpressionStmt))
+    missingThisError();
+
+  ExpressionStmt expstmt = cast(last);
+
+  if (! (expstmt.exp instanceof CallExp))
+    missingThisError();
+
+  CallExp call = cast(expstmt.exp);
+
+  if (! (call.function instanceof IdentExp))
+    missingThisError();
+
+  IdentExp ident = cast(call.function);
+
+  if (! ident.toString().equals("this"))
+    missingThisError();
+
+  call.function = createOverloadedSymbolExp(new ArrayList(cast(classe).getConstructorCallSymbols()),
+					thisName);
+  call.function.setLocation(ident.location());
+}

@@ -87,7 +87,7 @@ public class SuperExp extends Expression
 
   private void getSuper(JavaMethod decl)
   {
-    gnu.bytecode.Type firstArg = nice.tools.code.Types.get(notNull(currentMethod).firstArgument());
+    let firstArg = nice.tools.code.Types.get(notNull(currentMethod).firstArgument());
 
     if (! (firstArg instanceof gnu.bytecode.ClassType))
       throw User.error(this, "The first argument of this method is not a class");

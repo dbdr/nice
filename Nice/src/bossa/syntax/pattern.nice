@@ -75,10 +75,7 @@ public abstract class Pattern implements Located
       }
 
     // Class constraints
-    if (tc == null)
-      return;
-
-    let def = getTypeDefinition(notNull(tc));
+    let def = getTypeDefinition(tc);
     if (def == null)
       return;
 
@@ -478,7 +475,7 @@ public class EnumPattern extends ReferencePattern
   {
     let EnumSymbol esym = cast(atValue.value);
     for (sym : esym.getDefinition().symbols)
-      values.add(createSymbolConstantExp(notNull(tc), sym, sym.name.toString(), this.location));
+      values.add(createSymbolConstantExp(notNull(tc), sym, sym.getName().toString(), this.location));
   }
 
   atTypeMatchingValue() = true;

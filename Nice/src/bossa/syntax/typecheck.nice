@@ -711,9 +711,9 @@ typecheck(ExpLocalVariable e)
       } 
       catch(TypingEx t){
 	reportNullAssignmentError(decl, t, value: value, 
-				  target.name.toString(),
+				  target.getName.toString(),
 				  notNull(target.getMonotype()));
-	throw assignmentError(target, target.name.toString(), 
+	throw assignmentError(target, target.getName().toString(), 
 			      String.valueOf(target.getMonotype), 
 			      value);
       }
@@ -787,9 +787,9 @@ typecheck(LocalVariable decl)
       } 
       catch(TypingEx t){
 	reportNullAssignmentError(decl, t, value: value, 
-				  target.name.toString(),
+				  target.getName().toString(),
 				  notNull(target.getMonotype()));
-	throw assignmentError(target, target.name.toString(), 
+	throw assignmentError(target, target.getName().toString(), 
 			      String.valueOf(target.getMonotype), 
 			      value);
       }

@@ -32,13 +32,13 @@ public class IncrementExp extends Expression
   compile()
   {
     variable = variable.noOverloading();
-    if(!variable.isAssignable())
+    if (!variable.isAssignable())
       User.error(this, variable + " cannot be incremented");
 
     let decl = variable.getDeclaration();
     if (decl != null)
       return new gnu.expr.IncrementExp
-	(decl, (short) (increment ? 1 : -1), !returnOld);
+	(decl, short(increment ? 1 : -1), !returnOld);
 
     // variable is not a local variable, so it must be a field
     if (! (variable instanceof CallExp))

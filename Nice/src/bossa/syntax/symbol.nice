@@ -23,11 +23,11 @@ public abstract class VarSymbol extends Symbol implements Located
   private ?gnu.expr.Declaration decl = null;
   private boolean isThis = false;
 
-  location() = name.location();
+  location() = notNull(name).location();
   
-  public LocatedString getName() = name;
+  public LocatedString getName() = notNull(name);
 
-  public boolean hasName(LocatedString i) = this.name.equals(i);
+  public boolean hasName(LocatedString i) = notNull(name).equals(i);
 
   boolean isAssignable() = true;
 
@@ -90,7 +90,7 @@ public abstract class VarSymbol extends Symbol implements Located
     if (isThis)
       return new gnu.expr.ThisExp(decl);
     else
-      return new gnu.expr.ReferenceExp(name == null ? null : name.toString(), 
+      return new gnu.expr.ReferenceExp(name == null ? null : notNull(name).toString(), 
 				       decl);
   }
 
@@ -114,7 +114,7 @@ public abstract class VarSymbol extends Symbol implements Located
     this.decl = declaration;
     this.isThis = isThis;
     if (name != null) 
-      name.location().write(declaration);
+      notNull(name).location().write(declaration);
     declaration.setCanRead(true);
     declaration.setCanWrite(true);
   }
@@ -178,14 +178,14 @@ public class MonoSymbol extends VarSymbol
       { 
 	int arity = k.domainArity;
 	if (notNull(arguments).size() != arity)
-	  return name + Util.has(arity, "parameter", notNull(arguments).size());
+	  return notNull(name) + Util.has(arity, "parameter", notNull(arguments).size());
 	else
 	  // If the number of arguments is correct, it must be that
 	  // some arguments are named.
-	  return name + " does not have named parameters";
+	  return notNull(name) + " does not have named parameters";
       }
     else 
-      return name + " is not a function";
+      return notNull(name) + " is not a function";
   }
 
   // explained in OverloadedSymbolExp
@@ -323,9 +323,9 @@ class FunSymbol extends PolySymbol
     if (this.isFieldAccess())
       {
         if (arguments.size() == 0)
-           return name + " is not defined";
+           return notNull(name) + " is not defined";
 
-        return name + " is a field of class " + this.describeParameters();
+        return notNull(name) + " is a field of class " + this.describeParameters();
       }
 
     return "Method " + name + " expects parameters (" + 
@@ -383,7 +383,7 @@ public class MethodSymbol extends FunSymbol
 
   getDefinition() = this.declaration;
  
-  getMethodDeclaration() = this.declaration;
+  public override MethodDeclaration getMethodDeclaration() = this.declaration;
  
   compile() = this.declaration.getCode();
   	

@@ -26,7 +26,7 @@ public abstract class Symbol extends Node
     addSymbol(this);
   }
 
-  LocatedString name;
+  final LocatedString name;
 
   // commenting this triggers a bug
   abstract mlsub.typing.Polytype getType();

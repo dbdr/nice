@@ -32,7 +32,8 @@ PrimitiveTypeImplementation createPrimitiveType(TypeDefinition definition)
 {
   ?gnu.bytecode.Type t = nice.tools.typing.PrimitiveType.register(definition.name.toString(), definition.getTC());
   if (t == null)
-    User.error(definition, definition.name + " is not a known primitive type");
+    throw User.error(definition, definition.name + " is not a known primitive type");
+
   definition.setJavaType(t);
   return new PrimitiveTypeImplementation();
 }

@@ -116,7 +116,7 @@ public class AbstractInterfaceImplementation extends Definition
 			 interfaceName.location()));
     interfaceITF = ident.resolveToItf(notNull(typeScope));
 
-    let def = getTypeDefinition(notNull(classTC));
+    let def = getTypeDefinition(classTC);
 
     boolean isNiceClass = def != null &&
       (def.getImplementation() instanceof NiceClass);
@@ -126,7 +126,7 @@ public class AbstractInterfaceImplementation extends Definition
                  "It can only implement abstract interfaces.");
 
     if (def != null)
-      def.addInterfaceImplementation(interfaceITF);
+      def.addInterfaceImplementation(notNull(interfaceITF));
 
     this.createContext();
   }

@@ -129,7 +129,7 @@ class EnumSymbol extends MonoSymbol
     ?gnu.expr.Declaration res = super;
     if (res == null)
       {
-          res = new gnu.expr.Declaration(name.toString(), nice.tools.code.Types.javaType(type));
+          res = new gnu.expr.Declaration(notNull(name).toString(), nice.tools.code.Types.javaType(type));
           this.setDeclaration(notNull(res));
           definition.module.addGlobalVar(res, true);
       }

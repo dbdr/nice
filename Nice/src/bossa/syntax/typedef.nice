@@ -329,10 +329,7 @@ public abstract class TypeDefinition extends MethodContainer
 
   mlsub.typing.Monotype[?] resolveParams(MonotypeConstructor parent, TypeScope typeScope)
   {
-    if (parent.parameters == null)
-      return null;
-
-    return resolveMonotypes(typeScope, cast(notNull(parent.parameters).content));
+    return resolveMonotypes(typeScope, parent.parameters.content);
   }
 
   resolveBody()
@@ -379,7 +376,7 @@ public abstract class TypeDefinition extends MethodContainer
     this.parentParams = cast(params);
     let parentMap = new int[params.length];
     this.parentTypeParameterMap = parentMap;
-	let parentParams = notNull( this.parentParams );
+    let parentParams = notNull(this.parentParams);
 
     List<mlsub.typing.TypeSymbol> binders = new ArrayList();
     List<AtomicConstraint> atoms = new ArrayList();
@@ -428,19 +425,15 @@ public abstract class TypeDefinition extends MethodContainer
   
   getInterfaces() = interfaces.toArray();
 
-  void addInterfaceImplementation(?Interface itf)
+  void addInterfaceImplementation(Interface itf)
   {
-    if (itf != null)
-      interfaces.add(itf);
+    interfaces.add(itf);
   }
 
   getJavaInterfaces() = javaInterfaces;
 
-  void setJavaType(?gnu.bytecode.Type javaType)
+  void setJavaType(gnu.bytecode.Type javaType)
   {
-    if (javaType == null)
-      return;
-
     this.javaType = javaType;
     nice.tools.code.Types.set(tc, javaType);
   }
@@ -462,7 +455,7 @@ public abstract class TypeDefinition extends MethodContainer
  */
 class ClassDefinition extends TypeDefinition
 { 
-	// Super class
+  // Super class
   ?MonotypeConstructor superClassIdent = null;
   ?mlsub.typing.TypeConstructor superClass = null;
 
@@ -470,9 +463,7 @@ class ClassDefinition extends TypeDefinition
   
   getSuperClassDefinition()
   {
-    if (superClass == null)
-      return null;
-    let s = getTypeDefinition(notNull(superClass));
+    let s = getTypeDefinition(superClass);
     if (s instanceof ClassDefinition)
       return s;
     else
@@ -704,11 +695,16 @@ void resetTypeDefinitionMappings()
   tcToTypeDef = new HashMap();
 }
 
-?TypeDefinition getTypeDefinition(mlsub.typing.TypeConstructor tc) =
-  tcToTypeDef.get(tc);
+?TypeDefinition getTypeDefinition(?mlsub.typing.TypeConstructor tc)
+{
+  if (tc == null)
+    return null;
+
+  return tcToTypeDef.get(tc);
+}
 
 ?TypeDefinition getTypeDefinition(mlsub.typing.Interface itf) =
-  tcToTypeDef.get( itf.associatedTC() );
+	getTypeDefinition(itf.associatedTC());
 
 //used in mlsub.typing.Enumeration
 public ?mlsub.typing.Constraint getTypeDefResolvedConstraint(mlsub.typing.TypeConstructor tc)
@@ -732,7 +728,7 @@ public mlsub.typing.Monotype[?] getTypeDefTypeParameters(mlsub.typing.TypeConstr
  */
 ?mlsub.typing.Monotype getTypeWithTC(TypeConstructor tc)
 {
-  ?TypeDefinition def = cast(getTypeDefinition(tc));
+  ?TypeDefinition def = getTypeDefinition(tc);
 
   if (def == null)
     return null;
@@ -761,7 +757,7 @@ public mlsub.typing.Monotype[?] getTypeDefTypeParameters(mlsub.typing.TypeConstr
  */
 ?mlsub.typing.Monotype getTypeWithTC(TypeConstructor tc, mlsub.typing.Monotype[?] sourceParams )
 {
-  ?TypeDefinition def = cast(getTypeDefinition(tc));
+  ?TypeDefinition def = getTypeDefinition(tc);
 
   if (def == null)
     return null;
@@ -844,15 +840,11 @@ int getVariance(?MonotypeConstructor parent)
   if (parent == null)
     return -1;
 
-  if (notNull(parent.parameters).content == null)
-    return -1;
-
   // Assume non-variance
-  return notNull(notNull(parent.parameters).content).length;
+  return notNull(parent.parameters).content.length;
 }
 
 // Constructors
-  
 ClassDefinition makeClass(LocatedString name,
 		    boolean isFinal, boolean isAbstract,
 		    ?ClassConstraint typeParameters,

@@ -116,7 +116,7 @@ void registerMethod(gnu.bytecode.Method m)
 {
   ?List<gnu.bytecode.Method> methods = knownMethods.get(m.getName());
   if (methods == null)
-    knownMethods.put( m.getName(), methods = new ArrayList() );
+    knownMethods.put(m.getName(), methods = new ArrayList());
 
   assert methods != null;
 

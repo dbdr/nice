@@ -70,7 +70,7 @@ class GlobalVarSymbol extends MonoSymbol
     if (res == null)
       {
         res = new gnu.expr.Declaration
-            (name.toString(), nice.tools.code.Types.javaType(type));
+            (notNull(name).toString(), nice.tools.code.Types.javaType(type));
         this.setDeclaration(notNull(res));
 
         if (! definition.inInterfaceFile())

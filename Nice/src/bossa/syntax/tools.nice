@@ -132,48 +132,6 @@ bossa.util.UserError ensureLocated(bossa.util.UserError e,
   }
 }
 
-void resolveCCThis(Statement stmt, Located thisLoc, NiceClass classe)
-{
-  void missingThisError()
-  {
-    User.error(thisLoc, "The last statement must be a call to 'this' constructor");
-  }
-
-  Block block = cast(stmt);
-
-  if (block.statements.length == 0)
-    missingThisError();
-
-  Statement last = block.last;
-  if (last instanceof Block)
-  {
-    resolveCCThis(last, thisLoc, classe);
-    return;
-  }
-  
-  if (! (last instanceof ExpressionStmt))
-    missingThisError();
-
-  ExpressionStmt expstmt = cast(last);
-
-  if (! (expstmt.exp instanceof CallExp))
-    missingThisError();
-
-  CallExp call = cast(expstmt.exp);
-
-  if (! (call.function instanceof IdentExp))
-    missingThisError();
-
-  IdentExp ident = cast(call.function);
-
-  if (! ident.toString().equals("this"))
-    missingThisError();
-
-  call.function = createOverloadedSymbolExp(new ArrayList(cast(classe).getConstructorCallSymbols()),
-					thisName);
-  call.function.setLocation(ident.location());
-}
-
 /**
    A mapping from type names to type symbols.
 
@@ -233,19 +191,32 @@ AST AST(List<Definition>, int) = native new AST(List, int);
 ?mlsub.typing.TypeSymbol lookup(TypeMap, String) = native mlsub.typing.TypeSymbol TypeMap.lookup(String);
 List<VarSymbol> lookup(VarScope, LocatedString) = native List VarScope.lookup(LocatedString);
 Map<gnu.bytecode.Type,mlsub.typing.TypeConstructor> javaTypeConstructors(bossa.modules.Compilation ) = native bossa.modules.Compilation.javaTypeConstructors;
-LocatedString name(Symbol) = native Symbol.name;
+?LocatedString name(Symbol) = native Symbol.name;
+?TypeConstructor associatedTC(mlsub.typing.Interface) = native TypeConstructor mlsub.typing.Interface.associatedTC();
+mlsub.typing.AtomicConstraint[?] atoms(mlsub.typing.Constraint) = native mlsub.typing.AtomicConstraint[] mlsub.typing.Constraint.atoms();
+?gnu.bytecode.Type Types_get(mlsub.typing.TypeConstructor) = native gnu.bytecode.Type nice.tools.code.Types.get(mlsub.typing.TypeConstructor);
 gnu.bytecode.ClassType Type_pointer_type() = native gnu.bytecode.Type.pointer_type;
-gnu.expr.QuoteExp QuoteExp_undefined_exp() = native gnu.expr.QuoteExp.undefined_exp;
 
 // Retypings needed since java types are not strict.
 mlsub.typing.Polytype boolPolytype() = native nice.tools.typing.PrimitiveType.boolPolytype;
 mlsub.typing.Polytype longPolytype() = native nice.tools.typing.PrimitiveType.longPolytype;
+mlsub.typing.Polytype intPolytype() = native nice.tools.typing.PrimitiveType.intPolytype;
+mlsub.typing.Polytype shortPolytype() = native nice.tools.typing.PrimitiveType.shortPolytype;
+mlsub.typing.Polytype bytePolytype() = native nice.tools.typing.PrimitiveType.bytePolytype;
 mlsub.typing.Polytype voidPolytype() = native nice.tools.typing.PrimitiveType.voidPolytype;
 mlsub.typing.Monotype boolType() = native nice.tools.typing.PrimitiveType.boolType;
 mlsub.typing.Monotype intType() = native nice.tools.typing.PrimitiveType.intType;
 mlsub.typing.Monotype longType() = native nice.tools.typing.PrimitiveType.longType;
+gnu.bytecode.ClassType Type_pointer_type() = native gnu.bytecode.Type.pointer_type;
+mlsub.typing.TypeConstructor longTC() = native nice.tools.typing.PrimitiveType.longTC;
+mlsub.typing.TypeConstructor intTC() = native nice.tools.typing.PrimitiveType.intTC;
+mlsub.typing.TypeConstructor shortTC() = native nice.tools.typing.PrimitiveType.shortTC;
+mlsub.typing.TypeConstructor byteTC() = native nice.tools.typing.PrimitiveType.byteTC;
+gnu.expr.QuoteExp nullExp() = native gnu.expr.QuoteExp.nullExp;
+gnu.expr.QuoteExp falseExp() = native gnu.expr.QuoteExp.falseExp;
 gnu.expr.QuoteExp trueExp() = native gnu.expr.QuoteExp.trueExp;
 gnu.expr.QuoteExp voidExp() = native gnu.expr.QuoteExp.voidExp;
+gnu.expr.QuoteExp QuoteExp_undefined_exp() = native gnu.expr.QuoteExp.undefined_exp;
 
 // Local Variables:
 // nice-xprogram: "../bin/nicec -d ../classes"

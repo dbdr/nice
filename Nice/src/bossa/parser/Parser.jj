@@ -1265,10 +1265,20 @@ Statement code():
     "=" 
     ( ".." "." { return null; } // toplevel function in interface file
     |
-    exp=Expression() ";"
-    { 
-      code = new ReturnStmt(exp, /* fake */ true);
-    }
+    exp=Expression() ";" { code = new ReturnStmt(exp, /* fake */ true); }
+    |
+      {Statement res;}
+      (
+	res = ShortIfStatement()
+      |
+	res = ShortAssertStatement()
+      |
+	res = ShortThrowStatement()
+      )
+      ";" 
+      { List statements = new LinkedList();
+        statements.add(res);
+	return new Block(statements); }
     )
   )
   { return code; }

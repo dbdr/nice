@@ -33,3 +33,9 @@
 
 /// PASS
   void m(boolean->() f) {}
+
+/// PASS
+  void foo() = throw new Exception();
+  void bar(int i) = if (i > 0) foo();
+  void foobar(boolean b) = assert b;
+

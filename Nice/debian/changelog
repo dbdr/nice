@@ -28,6 +28,8 @@ nice (0.9.0) unstable; urgency=low
     name(color) = "unknown color";
     name(=red) = "red";
     name(=blue) = "blue";
+  * Method bodies with a single statement can be written without brackets.
+    example: void foo() = throw new Exception; 
   * Bugfixes (Parsing of nested tuples, global constants of type char,
     Overloading resolving of methods implementation with additional tc's, ...)
   * Improved some error messages.

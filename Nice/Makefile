@@ -11,6 +11,7 @@ first: parser
 	cd stdlib; nicec nice.getopt
 	cd src; nicec bossa.modules
 	cd src; NICEJAR=${HOME}/Nice/stdlib nicec -Rs nice.tools.compiler
+	cd src; NICEJAR=${HOME}/Nice/stdlib nicec bossa.modules
 	mkdir -p classes
 	cd classes; jar xf ../external/java-getopt-1.0.7.jar gnu
 	ln -sf nicec bin/nicer
@@ -83,5 +84,7 @@ cvs-Nice:
 	find ${TOP}/src/gnu -type d -name 'CVS-Kawa' \
 	-exec sh -c 'dir=`dirname "$$0"`; mv -i $${dir}/CVS-Kawa $${dir}/CVS' {} \;
 
-dumm:
-	echo ${TOP}
+# Sourceforge
+
+sourceforge:
+	scp web/*.html web/*.css bonniot@shell.sourceforge.net:/home/groups/nice/htdocs

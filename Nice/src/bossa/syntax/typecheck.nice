@@ -432,6 +432,7 @@ typecheck(decl@Block.LocalFunction)
 
 typecheck(s@ExpressionStmt)
 {
+  s.exp = notNull(s.exp).noOverloading();
   typecheck(s.exp);
 }
 

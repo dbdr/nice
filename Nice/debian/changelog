@@ -1,3 +1,31 @@
+nice (0.7.5) unstable; urgency=low
+
+  * Addition of the || operator on optional values:
+      e1 || e2
+    evalues e1 and returns its value if it is not null (without evaluating e2).
+    If e1 evaluates to null it returns the value of e2.
+    It is equivalent to e1 != null ? e1 : e2, except e1 is not evaluated twice.
+    This operator is handy to sequence expression to produce a value:
+      find(n@Node, elem) = find(n.left, elem) || find(n.right, elem);
+  * Arrays created with 0 elements have a non-option component type:
+      String[] s0 = new String[0];
+      ?String[] s1 = new String[1];
+    They can still be used with option component type:
+      ?String[] s0 = new String[0];
+  * Changed suffix notation for multiple-dimension array types, to match 
+    initialization. Dimensions are listed in order, instead of reverse order.
+    For instance,
+      String[][?]
+    is the type of a non-null array of optional string arrays.
+  * Changed typing for creation of arrays with multiple dimensions.
+    The dimensions that are not initialized are given an option type:
+      String[][?] s = new String[1][];
+    This accounts for the fact that s[0] == null, thus ensuring type safety.
+  * Forbade @null patterns for method arguments that cannot be null.
+  * Bugfixes (compilation of tuples with primitive types using subtyping).
+
+ --
+
 nice (0.7.4) unstable; urgency=low
 
   * Added support for Generic Java types. This allows in particular to use 

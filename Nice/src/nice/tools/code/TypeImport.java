@@ -157,6 +157,7 @@ public class TypeImport
       c = classLoader.loadClass(className); 
     }
     catch(ClassNotFoundException e) {} // The class does not exist.
+    catch(NoClassDefFoundError e){} // idem
 
     stringToReflectClass.put(className, c);
     

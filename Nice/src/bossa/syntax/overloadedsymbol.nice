@@ -320,6 +320,11 @@ public class OverloadedSymbolExp extends Expression
       {
         if (Node.thisExp != null)
           try {
+	    // Some fields might have been valid candidates until now,
+	    // so we need to release their cloned type before starting a
+	    // different overloading resolution.
+	    fieldAccesses.foreach(VarSymbol s => s.releaseClonedType());
+
             let res = new CallExp(function: createOverloadedSymbolExp(fieldAccesses, ident, true),
                arguments: new Arguments(arguments: [new Argument(value: notNull(Node.thisExp))]));
 

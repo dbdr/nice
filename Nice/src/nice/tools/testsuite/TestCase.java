@@ -522,6 +522,10 @@ public abstract class TestCase {
 				// Add the number of lines of the toplevel code, 
 				// plus two lines for the main section header.
 				res += _sourceFile.getTopLevelSectionLength() + 2;
+      else
+        // The main method is moved after toplevel, so adjust by removing
+        // that count.
+        res -= _sourceFile.getMainSectionLength();
 			return res;
 		}
 		

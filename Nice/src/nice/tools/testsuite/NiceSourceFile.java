@@ -64,6 +64,13 @@ public class NiceSourceFile {
 	 */
 
 	private int _topLevelSectionLength = 0;
+
+	/**
+	 * Number of lines in the main method section.
+	 */
+
+	private int _mainSectionLength = 0;
+
 	/**
 	 * TODO
 	 * 
@@ -147,6 +154,7 @@ public class NiceSourceFile {
 	 */
 	public void addToMainMethod(String line) {
 		_mainMethodContent.append(line).append('\n');
+		_mainSectionLength++;
 	}
 
 	/**
@@ -162,6 +170,10 @@ public class NiceSourceFile {
 
 	public int getTopLevelSectionLength() {
 		return _topLevelSectionLength;
+	}
+
+	public int getMainSectionLength() {
+		return _mainSectionLength;
 	}
 
 	/**

@@ -124,13 +124,13 @@ bootstrap: parser
 		src/gnu/expr/*.java src/gnu/mapping/*.java \
 		src/nice/tools/code/*.java src/mlsub/typing/*.java src/mlsub/typing/lowlevel/*.java \
 		src/bossa/syntax/dispatch.java
-	cd src; ${NICEC} -R bossa.modules
-	cd src; ${NICEC} -r nice.tools.ast
+	${NICEC} -R bossa.modules
+	${NICEC} -r nice.tools.ast
 	cd src/bossa/syntax && \
 	${JAVAC} *.java && \
 	mv dispatch.java dispatch.java.bootstrap
 	rm classes/bossa/syntax/dispatch.class
-	cd src; ${NICEC} -r bossa.syntax
+	${NICEC} -r bossa.syntax
 	cd src;\
 	${JC} bossa/modules/Package.java nice/tools/runJar.java ../stdlib/nice/lang/rawArray.java gnu/bytecode/dump.java
 

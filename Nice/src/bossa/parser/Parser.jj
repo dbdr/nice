@@ -2009,7 +2009,7 @@ Statement LocalDeclaration() :
   | 
     [ "=" e=Expression() ] 
     { Block.LocalVariable res = new Block.LocalVariable(id,t,constant,e); }
-    ( "," id=ident() [ "=" e=Expression() ] { res.addNext(id,e); } )*
+    ( "," id=ident() {e=null;} [ "=" e=Expression() ] { res.addNext(id,e); } )*
     ";" 
     { return res; }
   )

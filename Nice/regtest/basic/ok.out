@@ -10,7 +10,7 @@ Hello, world!
 x,y,z = 334
 ### Testing native numbers ###
 
-truetruetruetruetrue
+truetruetruetruetruetrue
 14 falsefalsetruetruefalsefalsefalsetruetruefalse
 14.1 falsefalsetruetruefalsefalsefalsetruetruefalse
 

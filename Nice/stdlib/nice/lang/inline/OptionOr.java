@@ -24,7 +24,7 @@ import nice.tools.code.EnsureTypeProc;
 
    @author Daniel Bonniot
 */
-public class OptionOr extends Procedure2 implements Inlineable
+public class OptionOr extends Procedure2 implements bossa.syntax.Macro
 {
   public static OptionOr create(String param)
   {
@@ -53,6 +53,12 @@ public class OptionOr extends Procedure2 implements Inlineable
   public Type getReturnType (Expression[] args)
   {
     return Type.pointer_type;
+  }
+
+  public void checkSpecialRequirements(bossa.syntax.Expression[] arguments)
+  {
+    if (nice.tools.code.Types.isSure(arguments[0].getType().getMonotype()))
+      bossa.util.User.warning(arguments[0], "First argument is a non-null value thus the second one will not be used.");
   }
 
   // Interpretation

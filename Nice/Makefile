@@ -110,7 +110,9 @@ bootstrap:
 	${JAVAC} \
 		stdlib/nice/lang/Native.java stdlib/nice/lang/inline/*.java \
 		src/mlsub/compilation/Module.java \
-		src/bossa/modules/Package.java
+		src/bossa/modules/Package.java \
+		src/gnu/expr/*.java src/gnu/mapping/*.java \
+		src/nice/tools/code/*.java src/mlsub/typing/*.java src/mlsub/typing/lowlevel/*.java
 	cd src; ${NICEC} bossa.modules
 	cd src; ${NICEC} nice.tools.ast
 	cd src/bossa/syntax && \
@@ -119,7 +121,7 @@ bootstrap:
 	rm classes/bossa/syntax/dispatch.class
 	cd src; ${NICEC} bossa.syntax
 	cd src;\
-	${JAVAC} bossa/modules/Package.java nice/tools/runJar.java nice/tools/code/*.java ../stdlib/nice/lang/rawArray.java gnu/mapping/*.java gnu/bytecode/dump.java
+	${JAVAC} bossa/modules/Package.java nice/tools/runJar.java ../stdlib/nice/lang/rawArray.java gnu/bytecode/dump.java
 
 nice-pass: 
 	cd src; ${NICEC} bossa.syntax

@@ -108,6 +108,11 @@ implements Function
    * Typechecking
    ****************************************************************/
 
+  public mlsub.typing.Monotype getExpectedType()
+  {
+    return getReturnType();
+  }
+
   public void checkReturnedType(mlsub.typing.Polytype returned)
     throws Function.WrongReturnType
   {

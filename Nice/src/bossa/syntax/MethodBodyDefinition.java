@@ -308,6 +308,11 @@ public class MethodBodyDefinition extends Definition
    * Type checking
    ****************************************************************/
 
+  public mlsub.typing.Monotype getExpectedType()
+  {
+    return declaration.getReturnType();
+  }
+
   public void checkReturnedType(mlsub.typing.Polytype returned)
     throws Function.WrongReturnType
   {

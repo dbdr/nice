@@ -48,6 +48,11 @@ public class FunExp extends Expression implements Function
     this.body = body;
   }
 
+  public mlsub.typing.Monotype getExpectedType()
+  {
+    return null;
+  }
+
   public void checkReturnedType(mlsub.typing.Polytype returned)
     throws Function.WrongReturnType
   {

@@ -22,6 +22,12 @@ package bossa.syntax;
 interface Function
 {
   /**
+     The expected return type of this function.
+     Can be null if it is not know (e.g. the type is inferred).
+  */
+  mlsub.typing.Monotype getExpectedType();
+
+  /**
      Called with each type returned from the function.
      Can be used for either type checking or type inference.
    */

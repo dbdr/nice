@@ -480,7 +480,12 @@ typecheck(r@ReturnStmt)
 
   if (r.value != null)
     {
-      r.value = notNull(r.value).noOverloading();
+      ?mlsub.typing.Monotype expectedType = function.getExpectedType();
+      if (expectedType == null)
+	r.value = notNull(r.value).noOverloading();
+      else
+	r.value = notNull(r.value).resolveOverloading
+	  (new mlsub.typing.Polytype(expectedType));
       typecheck(r.value);
     }
   

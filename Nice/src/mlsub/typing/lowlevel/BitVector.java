@@ -311,24 +311,9 @@ public class BitVector implements Cloneable, java.io.Serializable {
   }
       
   /**
-   * do this = this & (~set) on bits >= from
-   */
-  final public void andNot(int from, BitVector set) {
-    int n = Math.min(length(), set.length());
-    int i = subscript(from);
-    if (i < n) {
-      andW(i, ~set.getW(i) & (-1L) << (from & MASK));
-      i++;
-      for (; i < n; i++) {
-        bits1[i] &= ~set.getW(i);
-      }
-    }
-  }
-
-  /**
    * Do this = this & (~set1 | set2) on all bits >= from
    **/
-  final public void andNotOr(int from, BitVector set1, BitVector set2) {
+  final private void andNotOr(int from, BitVector set1, BitVector set2) {
     int bitsLength = length();
     int set1Length = set1.length();
     int set2Length = set2.length();
@@ -436,19 +421,6 @@ public class BitVector implements Cloneable, java.io.Serializable {
     int n = bits1.length-1;
     while (n > 0 && bits1[n] == 0L) { n--; }
     return n+1;
-  }
-
-  /**
-   * Do this = this ^ set
-   **/
-  final public void xor(BitVector set) {
-    int setLength = set.length();
-    if (setLength > 1) {
-      ensureChunkCapacity(setLength);
-    }
-    for (int i = setLength; i-- > 0 ;) {
-      xorW(i, set.getW(i));
-    }
   }
 
   /**
@@ -726,30 +698,6 @@ public class BitVector implements Cloneable, java.io.Serializable {
     return UNDEFINED_INDEX;
   }
 
-  final public int getLowestSetBitAndNotIn(BitVector set, BitVector exclude) {
-    int n = length();
-    int setLength = set.length();
-    int excludeLength = exclude.length();
-    int result = 0;
-    for (int i = 0; i < n; i++) {
-      long chunk = getW(i);
-      if (i < setLength) {
-        chunk &= set.getW(i);
-      } else {
-        return UNDEFINED_INDEX;
-      }
-      if (i < excludeLength) {
-        chunk &= ~exclude.getW(i);
-      }
-      if (chunk != 0L) {
-        return result + chunkLowestSetBit(chunk);
-      } else {
-        result += 64;
-      }
-    }
-    return UNDEFINED_INDEX;
-  }
-
   /**
    * Return true if this BitVector is included in set
    **/
@@ -896,12 +844,4 @@ public class BitVector implements Cloneable, java.io.Serializable {
       }
   }
 
-  final public void slowaddProduct(BitMatrix M, BitVector v) {
-    int n = M.size();
-    for (int i = 0; i < n; i++) {
-      if (v.get(i)) {
-        or(M.getRow(i));
-      }
-    }
-  }
 }

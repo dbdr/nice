@@ -201,7 +201,7 @@ final class Domain extends BitVector {
   /**
    * Iteration thru the domain elements
    **/
-  int getFirstBit() { // unused method ???
+  public int getLowestSetBit() {
     int result = super.getLowestSetBit();
     if (result == UNDEFINED_INDEX && containsUnit) {
       // don't forget unit !

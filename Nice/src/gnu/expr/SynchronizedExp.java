@@ -31,21 +31,20 @@ public class SynchronizedExp extends Expression
     Variable objvar = scope.addVariable(code, Type.pointer_type, null);
     code.emitStore(objvar); 
     code.emitMonitorEnter();
-    code.emitTryStart(false,
+    code.emitTryStart(true,
 		      (target instanceof IgnoreTarget
 		       || target instanceof ConsumerTarget) ? null
 		      : target.getType());
 
-    body.compileWithPosition(comp, target); 
-    code.emitLoad(objvar);
-    code.emitMonitorExit();
+    body.compileWithPosition(comp, target);
+    
     code.emitTryEnd();
-    code.emitCatchStart(null);
+    code.emitFinallyStart();
     code.emitLoad(objvar);
     code.emitMonitorExit(); 
-    code.emitThrow(); 
-    code.emitCatchEnd();
+    code.emitFinallyEnd();
     code.emitTryCatchEnd();
+
     code.popScope();
  }
 

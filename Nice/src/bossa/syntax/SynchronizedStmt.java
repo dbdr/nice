@@ -29,7 +29,13 @@ public class SynchronizedStmt extends Statement
 
   public gnu.expr.Expression generateCode()
   {
-    return new gnu.expr.SynchronizedExp(object.generateCode(), body.generateCode());
+    /* Make sure that the synchronized statement is compiled
+       with a void target by embedding it in a BeginExp. 
+    */
+    return new gnu.expr.BeginExp
+      (new gnu.expr.SynchronizedExp(object.generateCode(), 
+				    body.generateCode()),
+       gnu.expr.QuoteExp.voidExp);
   }
 
   public String toString()

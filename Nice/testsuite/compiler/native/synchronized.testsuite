@@ -15,3 +15,13 @@
   // COMMENT Synchronization must be done on non-null values.
   ?String s = "S";
   synchronized(s) { }
+
+/// PASS
+  assert f("") == "";
+  /// Toplevel
+String f(String s)
+{
+  synchronized (s) {
+    return s;
+  }
+}

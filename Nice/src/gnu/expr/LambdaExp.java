@@ -465,7 +465,12 @@ public class LambdaExp extends ScopeExp
     gnu.bytecode.CodeAttr code = comp.getCode();
     if (! getInlineOnly())
       {
-	if (comp.method.reachableHere()
+	if (comp.method.reachableHere() 
+	    /* Work-around since reachableHere is not computed properly:
+	       Only return if the method is void or if there is a value 
+	       on the stack.
+	    */
+	    && (comp.method.getReturnType().isVoid() || code.SP > 0)
 	    && (! Compilation.usingTailCalls
 		|| isModuleBody() || isClassMethod() || isHandlingTailCalls()))
 	  code.emitReturn();

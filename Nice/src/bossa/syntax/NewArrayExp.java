@@ -115,7 +115,6 @@ public class NewArrayExp extends Expression
             else
               monotype = bossa.syntax.Monotype.maybe(raw);
             */
-          }
       }
     else if (resolvedType == mlsub.typing.TopMonotype.instance)
       {

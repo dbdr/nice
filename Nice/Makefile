@@ -1,4 +1,4 @@
-
+SHELL = /bin/zsh
 TOP=${PWD}
 
 JAVAC=  javac -classpath ${TOP}/classes:${TOP}/src:${TOP}/stdlib -sourcepath ${TOP}/src -d ${TOP}/classes -O -g
@@ -18,10 +18,13 @@ setDate:
 	cd src/nice/tools/compiler; ./setBuildDate
 
 compiler: setDate
-	cd src; ${NICEC} -Rs nice.tools.compiler
+	cd src; ${NICEC} -Rs nice.tools.compiler; cp -f nice/tools/compiler.jar nice/tools/.compiler.jar
+
+compiler-bootstrap: setDate
+	cd src; CLASSPATH=${TOP}/src/nice/tools/.compiler.jar:${TOP}/src:${TOP}/classes java -Dnice.systemJar=${TOP}/stdlib nice.tools.compiler.package --classpath="${TOP}/stdlib:${TOP}/classes:${TOP}/src" -Rs nice.tools.compiler
 
 test:
-	cd regtest; ./regtest
+	cd regtest; /usr/bin/time ./regtest
 
 # erase out-of-date class files and 'make dep' to recompile if javac 
 # has no -[X]depend

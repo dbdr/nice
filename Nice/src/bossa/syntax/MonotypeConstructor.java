@@ -77,7 +77,7 @@ public class MonotypeConstructor extends Monotype
       return type;
     }
     catch(mlsub.typing.BadSizeEx e){
-      throw User.error(this, "Class " + tc + 
+      throw User.error(this, (tc!=null ? "Class "+tc : lowlevelTC.toString()) +  
 		       Util.has(e.expected, "type parameter", e.actual));
     }
   }

@@ -32,5 +32,15 @@
   let s = str;
   s = "xyz";
 
+/// PASS
+  if (str != null)
+    str.trim();
+  /// Toplevel
+  let ?String str = null;
 
+/// FAIL
+  if (str != null)
+    str.trim();
+  /// Toplevel
+  var ?String str = null;
   

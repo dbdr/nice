@@ -42,8 +42,15 @@ isNullExp(e@NullExp) = true;
 localVariable(e@Expression) = null;
 localVariable(e@SymbolExp)
 {
-  if (e.getSymbol() instanceof bossa.syntax.MonoSymbol)
+  let sym = e.getSymbol();
+  if (sym instanceof bossa.syntax.MonoSymbol) {
+    //don't allow nullness inference on global variables.
+    if (sym instanceof GlobalVarDeclaration.GlobalVarSymbol &&
+		sym.isAssignable())
+      return null;
+
     return cast(e.getSymbol());
+  }
   return null;
 }
 localVariable(e@AssignExp) = localVariable(notNull(e.to));

@@ -911,6 +911,10 @@ void getField(List fields):
   { fields.add(new NiceClass.Field(field, isFinal)); }
 }
 
+void classDefinitionLookahead():
+{}
+{ [ "public" | "private" ] [ "final" | "abstract" ] ( "class" | "interface" ) }
+
 ClassDefinition classDefinition():
 {
   LocatedString name;
@@ -923,6 +927,7 @@ ClassDefinition classDefinition():
 }
 {
 (
+  [ "public" | "private" ]
   [ "final"    { isFinal=true; } 
   | "abstract" { isAbstract=true; }
   ]
@@ -1232,12 +1237,13 @@ Definition definition():
 }
 {
   (
+    res=globalVariable()
+  | 
     LOOKAHEAD ( "abstract" "interface" )
     res=interfaceDefinition()
   | 
+    LOOKAHEAD ( classDefinitionLookahead() )
     res=classDefinition()
-  | 
-    res=globalVariable()
   | 
     LOOKAHEAD( methodBodyDefinitionLookahead() )
     res=methodBodyDefinition(null)
@@ -1621,8 +1627,8 @@ Expression UnaryExpression() :
 { Expression res; Token t=null; }
 {
   (
-  ( "+" | t="-" ) res=UnaryExpression() 
-    { if(t!=null) res=CallExp.create(symb(t),res); }
+  ( t="+" | t="-" ) res=UnaryExpression() 
+    { res=CallExp.create(symb(t),res); }
 |
   res=PreIncrementExpression()
 |

@@ -64,6 +64,10 @@ public class AbstractInterfaceImplementation extends Definition
 			 interfaceName.location()));
     interfaceITF = ident.resolveToItf(typeScope);
 
+    ClassDefinition def = ClassDefinition.get(classTC);
+    if (def != null)
+      def.addInterfaceImplementation(interfaceITF);
+
     createContext();
   }
 

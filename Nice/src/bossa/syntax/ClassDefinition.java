@@ -71,21 +71,10 @@ public abstract class ClassDefinition extends MethodContainer
   
     TypeConstructor getSuperClass() { return null; }
 
-    mlsub.typing.Interface[] getInterfaces() { return extendedInterfaces; }
-
     void resolveClass()
     {
-      extendedInterfaces = this.resolveInterfaces(extensions);
+      this.resolveInterfaces(extensions);
       extensions = null;
-
-      // Resolve the super-interfaces first.
-      if (extendedInterfaces != null)
-	for (int i = 0; i < extendedInterfaces.length; i++)
-	  {
-	    ClassDefinition d = ClassDefinition.get(extendedInterfaces[i].associatedTC());
-	    if (d != null)
-	      d.resolve();
-	  }
 
       createAssociatedInterface();
 
@@ -95,31 +84,10 @@ public abstract class ClassDefinition extends MethodContainer
     void createContext()
     {
       try{
-	if (extendedInterfaces != null)
-	  try{
-	    Typing.assertImp(tc, extendedInterfaces, true);
-	  }
-	  catch(KindingEx e){
-	    User.error(name,
-		       "Interface " + name + " cannot extend " + e.t2 +
-		       ": they do not have the same number or kind of type parameters");
-	  }
-      
-	if (javaInterfaces != null)
-	  for (int i = 0; i < javaInterfaces.length; i++)
-	    try {
-	      Typing.initialLeq(tc, javaInterfaces[i]);
-	    }
-	    catch(KindingEx e){
-	      User.error(name,
-			 "Interface " + name + " cannot extend " + e.t2 +
-			 ": they do not have the same number or kind of type parameters");
-	    }
-
 	Typing.assertImp(tc, associatedInterface, true);
       }
       catch(TypingEx e){
-	User.error(name, "Error in interface " + name + " : " + e.getMessage());
+	User.error(name, "Error in interface " + name, e.getMessage());
       }
 
       super.createContext();
@@ -131,47 +99,45 @@ public abstract class ClassDefinition extends MethodContainer
       s.print("interface ");
       s.print(getSimpleName());
       s.print(this.printTypeParameters());
-      s.print(printInterfaces(" extends ", extendedInterfaces));
+      s.print(printInterfaces(" extends ", interfaces));
       implementation.printInterface(s);
     }
 
-  /****************************************************************
-   * Associated interface
-   ****************************************************************/
+    /****************************************************************
+     * Associated interface
+     ****************************************************************/
 
-  private mlsub.typing.Interface associatedInterface;
+    private mlsub.typing.Interface associatedInterface;
 
-  /**
-   * Returns the abstract interface associated to this class, or null.
-   *
-   * An associated abstract interface in created 
-   * for each "interface" class.
-   */
-  public mlsub.typing.Interface getAssociatedInterface()
-  { return associatedInterface; }
-    
+    /**
+     * Returns the abstract interface associated to this class, or null.
+     *
+     * An associated abstract interface in created
+     * for each "interface" class.
+     */
+    public mlsub.typing.Interface getAssociatedInterface()
+    { return associatedInterface; }
+
     private void createAssociatedInterface()
     {
       // the associated interface extends the associated interfaces
       // of the classes we extend
-      if (extendedInterfaces != null)
-	for(int i = 0; i < extendedInterfaces.length; i++)
-	  {
-	    mlsub.typing.Interface ai = extendedInterfaces[i];
-	
-	    try{
-	      Typing.assertLeq(associatedInterface, ai);
-	    }
-	    catch(KindingEx e){
-	      User.error(this, "Cannot extend interface " + ai + 
-			 " which has a different variance");
-	    }
-	  }
+      for (Iterator i = interfaces.iterator(); i.hasNext();)
+        {
+          mlsub.typing.Interface ai = (mlsub.typing.Interface) i.next();
+
+          try{
+            Typing.assertLeq(associatedInterface, ai);
+          }
+          catch(KindingEx e){
+            User.error(this, "Cannot extend interface " + ai +
+                       " which has a different variance");
+          }
+        }
     }
-  
+
     protected List
       /* of TypeConstructor */ extensions;
-    mlsub.typing.Interface[] extendedInterfaces;
   }
 
   public static 
@@ -251,16 +217,16 @@ public abstract class ClassDefinition extends MethodContainer
       return (ClassDefinition.Class) ClassDefinition.get(superClass);
     }
 
-    mlsub.typing.Interface[] getInterfaces() { return impl; }
-
     public ClassDefinition.Interface[] getImplementedInterfaces()
     {
-      if (impl == null) return null;
+      if (interfaces.size() == 0) return null;
       List res = new LinkedList();
 
-      for (int i = 0; i < impl.length; i++)
-        { 
-          Object itf = ClassDefinition.get(impl[i].associatedTC());
+      for (Iterator i = interfaces.iterator(); i.hasNext();)
+        {
+          mlsub.typing.Interface ai = (mlsub.typing.Interface) i.next();
+
+          ClassDefinition itf = ClassDefinition.get(ai.associatedTC());
           if (itf != null)
             res.add(itf);
         }
@@ -311,18 +277,6 @@ public abstract class ClassDefinition extends MethodContainer
 		       ": they do not have the same number or kind of type parameters");
 	  }
 
-	if (javaInterfaces != null)
-	  for (int i = 0; i < javaInterfaces.length; i++)
-            if (tc.arity() == 0 || 
-                ! JavaClasses.excludedInterface(javaInterfaces[i]))
-              try {
-                Typing.initialLeq(tc, javaInterfaces[i]);
-              }
-              catch(KindingEx e){
-                User.error(name,
-                           "Class " + name + " cannot implement " + e.t2 +
-                           ": they do not have the same number or kind of type parameters");
-              }
       }
       catch(TypingEx e){
 	User.error(name, "Error in class " + name + " : " + e.getMessage());
@@ -341,7 +295,7 @@ public abstract class ClassDefinition extends MethodContainer
       s.print(this.printTypeParameters());
       if (superClass != null)
 	s.print(" extends " + superClass);
-      s.print(printInterfaces(" implements ", impl));
+      s.print(printInterfaces(" implements ", interfaces));
       s.print(Util.map(" finally implements ",", ","",abs));
       implementation.printInterface(s);
     }
@@ -352,6 +306,10 @@ public abstract class ClassDefinition extends MethodContainer
   
     boolean isAbstract;
   }
+
+  /****************************************************************
+   * Generic definition, common to classes and interfaces
+   ****************************************************************/
 
   /**
    * Creates a class definition.
@@ -374,7 +332,10 @@ public abstract class ClassDefinition extends MethodContainer
   protected List
     /* of Interface */ implementations,
     /* of Interface */ abstractions;
-  mlsub.typing.Interface[] impl, abs;
+
+  mlsub.typing.Interface[] abs;
+
+  List interfaces = new ArrayList(5);
 
   void createTC()
   {
@@ -527,19 +488,19 @@ public abstract class ClassDefinition extends MethodContainer
 
   void resolveClass()
   {
-    impl = this.resolveInterfaces(implementations);
+    this.resolveInterfaces(implementations);
     abs = TypeIdent.resolveToItf(typeScope, abstractions);
     
     implementations = abstractions = null;
 
     // Resolve the super-interfaces first.
-    if (impl != null)
-      for (int i = 0; i < impl.length; i++)
-        {
-          ClassDefinition d = ClassDefinition.get(impl[i].associatedTC());
-          if (d != null)
-            d.resolve();
-        }
+    for (Iterator i = interfaces.iterator(); i.hasNext();)
+      {
+        mlsub.typing.Interface itf = (mlsub.typing.Interface) i.next();
+        ClassDefinition d = ClassDefinition.get(itf.associatedTC());
+        if (d != null)
+          d.resolve();
+      }
 
     createContext();
     implementation.resolveClass();
@@ -548,13 +509,11 @@ public abstract class ClassDefinition extends MethodContainer
   /** Java interfaces implemented or extended by this class/interface. */
   TypeConstructor[] javaInterfaces;
 
-  mlsub.typing.Interface[] resolveInterfaces(List names)
+  void resolveInterfaces(List names)
   {
     if (names == null)
-      return null;
+      return;
 
-    mlsub.typing.Interface[] res = new mlsub.typing.Interface[names.size()];
-    int n = 0;
     ArrayList javaInterfaces = null;
 
     for (Iterator i = names.iterator(); i.hasNext();)
@@ -563,7 +522,7 @@ public abstract class ClassDefinition extends MethodContainer
 	TypeSymbol s = name.resolvePreferablyToItf(typeScope);
 	
 	if (s instanceof mlsub.typing.Interface)
-	  res[n++] = (mlsub.typing.Interface) s;
+	  interfaces.add(s);
 	else
 	  {
 	    TypeConstructor tc = (TypeConstructor) s;
@@ -577,16 +536,9 @@ public abstract class ClassDefinition extends MethodContainer
 	  }
       }
 
-    if (n < res.length) // The array is too long
-      {
-	mlsub.typing.Interface[] tmp = new mlsub.typing.Interface[n];
-	System.arraycopy(res, 0, tmp, 0, n);
-	res = tmp;
-	this.javaInterfaces = (TypeConstructor[])
-	  javaInterfaces.toArray(new TypeConstructor[javaInterfaces.size()]);
-      }
-
-    return res;
+    if (javaInterfaces != null)
+      this.javaInterfaces = (TypeConstructor[])
+        javaInterfaces.toArray(new TypeConstructor[javaInterfaces.size()]);
   }
 
   void resolveBody()
@@ -630,9 +582,10 @@ public abstract class ClassDefinition extends MethodContainer
   void createContext()
   {
     try {
-      if (impl != null)
+      for (Iterator i = interfaces.iterator(); i.hasNext();)
         try{
-          Typing.assertImp(tc, impl, true);
+          mlsub.typing.Interface itf = (mlsub.typing.Interface) i.next();
+          Typing.assertImp(tc, itf, true);
         }
         catch(KindingEx e){
           User.error(name,
@@ -645,6 +598,19 @@ public abstract class ClassDefinition extends MethodContainer
           Typing.assertImp(tc, abs, true);
           Typing.assertAbs(tc, abs);
         }
+
+	if (javaInterfaces != null)
+	  for (int i = 0; i < javaInterfaces.length; i++)
+            if (tc.arity() == 0 ||
+                ! JavaClasses.excludedInterface(javaInterfaces[i]))
+              try {
+                Typing.initialLeq(tc, javaInterfaces[i]);
+              }
+              catch(KindingEx e){
+                User.error(name,
+                           "Class " + name + " cannot implement " + e.t2 +
+                           ": they do not have the same number or kind of type parameters");
+              }
     }
     catch(TypingEx e){
       User.error(name, "Error in " + name + " : " + e.getMessage());
@@ -660,8 +626,17 @@ public abstract class ClassDefinition extends MethodContainer
    */
   abstract TypeConstructor getSuperClass();
 
-  abstract mlsub.typing.Interface[] getInterfaces();
-  
+  mlsub.typing.Interface[] getInterfaces()
+  {
+    return (mlsub.typing.Interface[])
+      interfaces.toArray(new mlsub.typing.Interface[interfaces.size()]);
+  }
+
+  void addInterfaceImplementation(mlsub.typing.Interface itf)
+  {
+    interfaces.add(itf);
+  }
+
   private Type javaType;
 
   protected void setJavaType(Type javaType)
@@ -684,10 +659,10 @@ public abstract class ClassDefinition extends MethodContainer
     return "class "+name;
   }
 
-  String printInterfaces(String keyword, mlsub.typing.Interface[] interfaces)
+  String printInterfaces(String keyword, List interfaces)
   {
     StringBuffer res = new StringBuffer();
-    if (interfaces != null || javaInterfaces != null)
+    if (interfaces.size() != 0 || javaInterfaces != null)
       {
 	res.append(keyword);
 	String sNice = Util.map("", ", ", "", interfaces);

@@ -893,6 +893,11 @@ public class NiceClass extends ClassDefinition.ClassImplementation
     if (constructorMethod != null)
       for (int i = 0; i < constructorMethod.length; i++)
 	constructorMethod[i].getCode();
+
+    // Take into account external interface implementations, which 
+    // can add new interfaces to implement in the bytecode.
+    classe.supers = computeSupers();
+    classe.recomputeInterfaces();
   }
 
   private gnu.expr.Expression typeExpression(TypeConstructor tc)

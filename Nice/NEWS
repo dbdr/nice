@@ -3,6 +3,9 @@ nice (0.9.8)
   * Nice methods are now compiled inside classes whenever possible. This does
     not make any difference for Nice programs, but simplifies integration with
     Java tools and usage of Nice code from Java sources.
+  * Is is now possible to make a class of an imported package implement
+    an interface defined in the current package, with:
+      class some.pkg.ClassName implements MyInterface;
   * Allow calls to Java methods defined in a Java class that implements
     several Java interfaces declaring that same method, like
     java.io.ObjectOutputStream.flush()

@@ -212,6 +212,11 @@ public class ClassExp extends LambdaExp
     return type;
   }
 
+  public void recomputeInterfaces()
+  {
+    setTypes();
+  }
+
   private void setTypes()
   {
     int len = supers == null ? 0 : supers.length;
@@ -233,35 +238,42 @@ public class ClassExp extends LambdaExp
 	else
 	  superTypes[j++] = t;
       }
-    if (superType == null)
+
+    // If type is null, we simply want to recompute interfaces
+    if (type == null)
       {
-	if (! isSimple())
-	  {
-	    PairClassType ptype = new PairClassType();
-	    type = ptype;
-	    setMakingClassPair(true);
-	    instanceType = new ClassType();
-	    type.setInterface(true);
-	    ClassType[] interfaces = { type };
-	    // Can we better.  FIXME.
-	    instanceType.setSuper(Type.pointer_type);
-	    instanceType.setInterfaces(interfaces);
-	    ptype.instanceType = instanceType;
-	  }
-	else
-	  instanceType = type = new ClassType(getName());
-	type.setSuper(Type.pointer_type);
+        if (superType == null)
+          {
+            if (! isSimple())
+              {
+                PairClassType ptype = new PairClassType();
+                type = ptype;
+                setMakingClassPair(true);
+                instanceType = new ClassType();
+                type.setInterface(true);
+                ClassType[] interfaces = { type };
+                // Can we better.  FIXME.
+                instanceType.setSuper(Type.pointer_type);
+                instanceType.setInterfaces(interfaces);
+                ptype.instanceType = instanceType;
+              }
+            else
+              instanceType = type = new ClassType(getName());
+            type.setSuper(Type.pointer_type);
+          }
+        else
+          {
+            System.out.println(getName());
+            instanceType = type = new ClassType(getName());
+            type.setSuper(superType);
+          }
+
+        instanceType.collectable = true;
+        // Access.SUPER mut be set on all non-interface classes
+        if (! isInterface())
+          accessFlags |= Access.SUPER;
+        instanceType.setModifiers(accessFlags);
       }
-    else
-      {
-	instanceType = type = new ClassType(getName());
-	type.setSuper(superType);
-      }
-    instanceType.collectable = true;
-    // Access.SUPER mut be set on all non-interface classes
-    if (! isInterface())
-      accessFlags |= Access.SUPER;
-    instanceType.setModifiers(accessFlags);
 
     if (j > 0)
       {

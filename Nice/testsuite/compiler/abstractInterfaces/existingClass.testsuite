@@ -76,3 +76,23 @@
   abstract interface AI {}
   // String is not an interface
   interface java.lang.String implements AI;
+
+/// PASS
+  // bug #904327
+  // When implementing a non-abstract interface, the class must really 
+  // implement that interface in the bytecode.
+
+  /// package vendor
+  /// Toplevel
+public class Vendor {}
+
+  /// package test import vendor
+  Vendor a = new Vendor();
+  a.vend();
+
+  /// Toplevel
+public interface ITest {}
+
+public void vend(ITest i){ println("ITest"); }
+
+class vendor.Vendor implements ITest;

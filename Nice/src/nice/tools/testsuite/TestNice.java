@@ -2,6 +2,7 @@ package nice.tools.testsuite;
 
 
 import java.io.*;
+import java.util.*;
 
 
 
@@ -24,6 +25,12 @@ import java.io.*;
  */
 
 public class TestNice {
+
+	/**
+	 * Testsuite file extension.
+	 * 
+	 */
+	static private final String TESTSUITE_FILE_EXTENSION = ".testsuite";
 
 	/**
 	 * TODO
@@ -78,13 +85,23 @@ public class TestNice {
 	private static int _fileCounter = 0;
 
 	/**
-	 * TODO
+	 * Nice source file that contains the gathered global sources.
+	 These sources are available for all testcases.
 	 * 
 	 */
 	private static GlobalSourceFile _globalSource = new GlobalSourceFile();
 
+	/**
+	 * Number of successful testcases.
+	 * 
+	 */
+	private static int _testCasesSucceeded = 0;
 
-
+	/**
+	 * Number of failed testcases.
+	 * 
+	 */
+	private static int _testCasesFailed = 0;
 
 
 
@@ -96,16 +113,36 @@ public class TestNice {
 	 * @exception	Exception	TODO
 	 */
 	static public void main(String[] args) {
+		if (args.length != 1) {
+			usage();
+			System.exit(1);
+		}
+		
 		cleanupTempFolder();
 		
 		try {
 			new TestNice().performTests(args[0]);
+			
+			System.out.println();
+			System.out.println("number of testcases: " + (_testCasesSucceeded + _testCasesFailed));
+			System.out.println("succeeded: " + _testCasesSucceeded);
+			System.out.println("failed   : " + _testCasesFailed);
 		} catch(TestSuiteException e) {
 			e.printStackTrace();
 		}
 	}
 
 
+	static private void usage() {
+		System.out.println("usage:\n java nice.tools.testsuiteTestNice [testSuiteFile | folder]");
+	}
+
+
+	/**
+	 * Deletes the temporary folder with all its contents and
+	 creates a new empty one.
+	 * 
+	 */
 	static void cleanupTempFolder() {
 		if (_tempFolder.exists())
 			deleteFolder(_tempFolder);
@@ -114,15 +151,19 @@ public class TestNice {
 	}
 
 
+	/**
+	 * TODO
+	 * 
+	 */
 	static int getFileCounter() {
 		return ++_fileCounter;
 	}
 
 
 	/**
-	 * TODO
+	 * deletes the specified folder and all its contents.
 	 * 
-	 * @param	folder	TODO
+	 * @param	folder	The folder that should be deleted
 	 */
 	private static void deleteFolder(File folder) {
 		File[] files = folder.listFiles();
@@ -139,19 +180,45 @@ public class TestNice {
 
 
 	/**
-	 * This method could collect testsuite files and run the testcases inside of them.
+	 * Performs the tests in a single testsuite file or in all testsuite files in 
+	 a folder
 	 * 
-	 * @exception	TestSuiteException	TODO
 	 * @param	testSuitePath	TODO
 	 * @exception	TestSuiteException	TODO
 	 */
 	private void performTests(String testSuitePath) throws TestSuiteException {
+		File file = new File(testSuitePath);
+		if (! file.exists())
+			throw new TestSuiteException("Could not find testsuite file or folder: " + file.getAbsolutePath());
 		//TestSuite testsuite = new TestSuite(new File("/Users/agreif/projects/Nice/sf/testsuite/compiler/first.testsuite"));
-		TestSuite testsuite = new TestSuite(new File(testSuitePath));
-	
+		if (file.isFile()) {
+			new TestSuite(file);
+			return;
+		}
+		
+		//	collect all testsuite files and perform its tests
+		Set testSuiteFiles = new HashSet();
+		getTestSuiteFiles(file, testSuiteFiles);
+		for (Iterator iter = testSuiteFiles.iterator(); iter.hasNext();)
+			new TestSuite((File)iter.next());
 	}
 
 
+	/**
+	 * Collects all testsuite files in the specified folder in the given collection.
+	 * 
+	 */
+	private void getTestSuiteFiles(File folder, Set testSuiteFiles) {
+		File[] files = folder.listFiles();
+		for(int i = 0; i < files.length; i++) {
+			File file = files[i];
+			if (file.isFile()) {
+				if (file.getName().endsWith(TESTSUITE_FILE_EXTENSION))
+					testSuiteFiles.add(file);
+			} else
+				getTestSuiteFiles(file, testSuiteFiles);
+		}
+	}
 	
 	/**
 	 * Returns the temporary folder.
@@ -163,8 +230,30 @@ public class TestNice {
 	
 
 
+	/**
+	 * Returns the global source file.
+	 * 
+	 */
 	static GlobalSourceFile getGlobalSource() {
 		return _globalSource;
+	}
+
+
+
+	/**
+	 * Increases the number of successful testcases.
+	 * 
+	 */
+	public static void increaseSucceeded() {
+		++_testCasesSucceeded;
+	}
+
+	/**
+	 * Increases the number of failed testcases.
+	 * 
+	 */
+	public static void increaseFailed() {
+		++_testCasesFailed;
 	}
 
 

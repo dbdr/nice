@@ -221,3 +221,19 @@ class B<T> extends A<T> {
   get(index) = /*/// FAIL HERE*/ super;
   get(0) = cast(null);
 }
+
+/// PASS
+  let a = new A();
+  let b = new B();
+
+  assert a.equals(a);
+  assert ! a.equals(b);
+  assert ! b.equals(a);
+  assert b.equals(b);
+
+  /// TOPLEVEL
+class A { int i = 0; }
+class B extends A { int k = 0; }
+
+equals (#A x, #A y) = x.i == y.i;
+equals (#B x, #B y) = x.k == y.k;

@@ -768,15 +768,19 @@ public class Pattern implements Located
 
   /**
      Returns code that tests if the parameter is matched.
+
+     @param dispatchMade indicates that dispatch has already occured. It is
+       still necessary to check for exact matching if applicable.
   */
-  public gnu.expr.Expression matchTest(gnu.expr.Expression parameter)
+  public gnu.expr.Expression matchTest(gnu.expr.Expression parameter,
+                                       boolean dispatchMade)
   {
+    if (atAny() || (dispatchMade && ! exactlyAt))
+      return QuoteExp.trueExp;
+
     if (atNull())
       return Gen.isNullExp(parameter);
 
-    if (atAny())
-      return QuoteExp.trueExp;
-	
     if (atBool())
       {
 	if (atFalse())

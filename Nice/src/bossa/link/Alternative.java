@@ -154,13 +154,12 @@ public abstract class Alternative implements Located
 		     Util.map("",", ","",parameters)+
 		     " for " + this);
 
-    int index = skipFirst ? 1 : 0;
-
     Expression result = QuoteExp.trueExp;
 
-    for(; index<parameters.length; index++)
+    for (int index = 0; index < parameters.length; index++)
       result = Gen.shortCircuitAnd
-        (result, patterns[index].matchTest(parameters[index]));
+        (result,
+         patterns[index].matchTest(parameters[index], index == 0 && skipFirst));
 
     return result;
   }

@@ -189,9 +189,6 @@ public class NiceClass extends ClassDefinition.ClassImplementation
 
   private void createFields()
   {
-    if (fields.length == 0)
-      return;
-
     for (int i = 0; i < fields.length; i++)
       fields[i].createField();
   }
@@ -440,12 +437,6 @@ public class NiceClass extends ClassDefinition.ClassImplementation
     // We have to do this after resolution, so that bytecode types are known, 
     // but before compilation.
     createFields();
-
-    // This needs to be done even if we don't recompile, 
-    // since classes are always regenerated.
-    if (constructorMethod != null)
-      for (int i = 0; i < constructorMethod.length; i++)
-	constructorMethod[i].getCode();
   }
 
   public void compile()
@@ -457,6 +448,20 @@ public class NiceClass extends ClassDefinition.ClassImplementation
 	  if (child instanceof ToplevelFunction)
 	    ((ToplevelFunction) child).compile();
 	}
+
+    recompile();
+  }
+
+  /**
+     Called instead of compile is the package is up-to-date.
+  */
+  public void recompile()
+  {
+    // This needs to be done even if we don't recompile, 
+    // since classes are always regenerated.
+    if (constructorMethod != null)
+      for (int i = 0; i < constructorMethod.length; i++)
+	constructorMethod[i].getCode();
   }
 
   private gnu.expr.Expression typeExpression(TypeConstructor tc)

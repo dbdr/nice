@@ -44,3 +44,10 @@ Class.forName("a.A").getDeclaredConstructor([ String.class ]);
   /// Toplevel
 class B extends A {}
 equals(this@A, that@B) = true;
+
+/// PASS
+  /// Toplevel
+// The subclass comes before the parent.
+class B extends A { int b; }
+
+class A { int a; }

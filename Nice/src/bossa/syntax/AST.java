@@ -146,10 +146,15 @@ public class AST extends Node
   public void compile(boolean generateCode)
   {
     if (! generateCode)
-      return;
-
-    for(Iterator i = children.iterator();i.hasNext();)
-      ((Definition)i.next()).compile();
+      {
+	for (int i = 0; i < classes.length; i++)
+	  classes[i].recompile();
+      }
+    else
+      {
+	for(Iterator i = children.iterator();i.hasNext();)
+	  ((Definition)i.next()).compile();
+      }
   }
   
   public String toString()

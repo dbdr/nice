@@ -579,6 +579,14 @@ abstract public class ClassDefinition extends MethodContainer
     implementation.compile();
   }
 
+  /**
+     Called instead of compile is the package is up-to-date.
+  */
+  void recompile()
+  {
+    implementation.recompile();
+  }
+
   /****************************************************************
    * Initial Context
    ****************************************************************/
@@ -660,6 +668,7 @@ abstract public class ClassDefinition extends MethodContainer
     void resolveBody() {}
     void typecheck() {}
     void compile() {}
+    void recompile() {}
     abstract void printInterface(java.io.PrintWriter s);
   }
 

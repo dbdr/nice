@@ -284,6 +284,7 @@ bossa.syntax.Monotype[] substitute(Map<TypeIdent,bossa.syntax.Monotype>,bossa.sy
 Monotype[?] types(FormalParameters) = native Monotype[] FormalParameters.types();
 ?mlsub.typing.TypeSymbol lookup(TypeMap, LocatedString) = native mlsub.typing.TypeSymbol TypeMap.lookup(LocatedString);
 ?mlsub.typing.TypeSymbol lookup(TypeMap, String) = native mlsub.typing.TypeSymbol TypeMap.lookup(String);
+void substitute(bossa.syntax.FormalParameters, Map<java.lang.String, bossa.syntax.Monotype>) = native void FormalParameters.substitute(Map);
 
 // Retypings needed since java types are not strict.
 mlsub.typing.Polytype boolPolytype() = native nice.tools.typing.PrimitiveType.boolPolytype;

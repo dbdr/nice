@@ -125,7 +125,7 @@ U foldRight(List<T> list, (T, U)->U func, U init, int from)
 }
 
 /** self modifying map over an list */
-<T,U,V | U <: T, T <: V> void apply(List<T> list, V->U func)
+<T> void apply(List<T> list, T->T func)
 {
   for (int i = 0; i < list.size(); i++)
     list[i] = func(list[i]);

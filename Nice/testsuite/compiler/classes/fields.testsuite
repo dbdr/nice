@@ -86,3 +86,10 @@
   {
     () -> String f = () => "";
   }
+
+/// FAIL
+  /// Toplevel
+  interface I
+  {
+    String s;
+  }

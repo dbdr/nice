@@ -81,6 +81,8 @@ public class NiceClass extends ClassDefinition.ClassImplementation
     (MonoSymbol sym, Expression value, 
      boolean isFinal, boolean isTransient, boolean isVolatile)
   {
+    if (definition instanceof ClassDefinition.Interface)
+      User.error(sym, "An interface cannot have a field.");
     return new Field(sym, value, isFinal, isTransient, isVolatile);
   }
 

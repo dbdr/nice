@@ -82,3 +82,17 @@ void foo() {
   {} 
   /// package d import a,c 
   AA<?String> dummy = new AA(x:null);
+
+
+/// PASS
+  /// package a
+  /// Toplevel
+public class A
+{
+  private B b = new B();
+}
+ 
+public class B { }
+
+  /// package b import a
+  {}

@@ -266,11 +266,11 @@ public abstract class CustomConstructor extends UserOperator
     {
       super(def, FormalParameters.readBytecodeAttribute(attr));
       this.method = method;
+      TypeConstructors.addConstructor(classe.definition.tc, this);
     }
 
     void resolve()
     {
-      TypeConstructors.addConstructor(classe.definition.tc, this);
       addConstructorCallSymbol();
     }
 

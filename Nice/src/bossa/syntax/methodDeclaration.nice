@@ -194,7 +194,9 @@ public abstract class MethodDeclaration extends Definition
   {
     if(this.getType() == null)
       return "method " + this.getName();
-    
+
+    let domain = notNull(this.getType()).domain();
+
     return
       (syntacticConstraint != null ? notNull(syntacticConstraint)
        : mlsub.typing.Constraint.toString(notNull(this.getType()).getConstraint()))
@@ -204,7 +206,7 @@ public abstract class MethodDeclaration extends Definition
       + "("
       // parameters can be null if type was set lowlevel (native code, ...)
       + (parameters != null ?
-	 notNull(parameters).toString() : Util.map("",", ","", notNull(this.getType()).domain()))
+	 notNull(parameters).toString(domain) : Util.map("",", ","", domain))
       + ")"
       ;
   }

@@ -184,6 +184,12 @@ public class FormalParameters extends Node
 
   toString() = Util.map("", ", ", "", parameters);
 
+  String toString(mlsub.typing.Monotype[] types)
+  {
+    int i = 0;
+    return parameters.map(Parameter p => p.toString(types[i++])).join(",");
+  }
+
   public List<Parameter> asList() = new ArrayList(parameters);
 
   public List<Parameter> getRequiredParameters()
@@ -292,6 +298,8 @@ public class Parameter
 
   toString() = type.toString();
 
+  String toString(mlsub.typing.Monotype type) = type.toString();
+
   ?LocatedString getName() = null;
 
   void resetType(Monotype type)
@@ -360,7 +368,8 @@ public class NamedParameter extends Parameter
 
   match(id) = name.toString().equals(id);
 
-  toString() = type + " " + name;
+  toString() = super + " " + name;
+  toString(type) = super + " " + name;
 }
 
 /**
@@ -423,7 +432,13 @@ public class OptionalParameter extends NamedParameter
   toString()
   {
     defaultValue = defaultValue.noOverloading();
-    return type + " " + name + " = " + defaultValue;
+    return super + " = " + defaultValue;
+  }
+
+  toString(type)
+  {
+    defaultValue = defaultValue.noOverloading();
+    return super + " = " + defaultValue;
   }
 }
 

@@ -1347,21 +1347,25 @@ IdentExp identExp():
 
 Expression newExp():
 {
-  TypeIdent t;
+  Token t;
+  TypeIdent classe;
   Expression e;
 }
 {
-  "new" 
-  t=typeConstructorIdent()
+  t="new" 
+  classe=typeConstructorIdent()
   ( 
     { Arguments arguments; }
     arguments = arguments(false)
-    { return new NewExp(t, arguments); }
+    { e = new NewExp(classe, arguments); 
+      e.setLocation(new Location(t));
+      return e;
+    }
   |
     { List args = new LinkedList(); int furtherDimensions = 0; }
     ( LOOKAHEAD(2) "[" e=Expression() "]" { args.add(e); } )+ 
     ( LOOKAHEAD(2) "[]" { furtherDimensions++; } )*
-    { return new NewArrayExp(t, args, furtherDimensions); }
+    { return new NewArrayExp(classe, args, furtherDimensions); }
   )
 }
 

@@ -107,22 +107,20 @@ abstract class Constructor extends MethodDeclaration
     //an explanation of the syntax is necessary
     res = new StringBuffer();
     List missing = arguments.missingArgs(parameters);
-    Iterator missingFields = null;
+    Iterator fieldsToList;
 
-    if (arguments.size() == 0 || missing.size() > 0)
+    if (arguments.size() == 0)
       {
-        res.append("Fields of class ").append(name).append(" require initial values.\n");
-        if (arguments.size() == 0)
-          {
-            res.append(syntaxExample())
-              .append("Class ").append(name).append(" has the following fields:\n");
-            missingFields = parameters.iterator();
-          }
-        else
-          {
-            res.append("These fields are missing:\n");
-            missingFields = missing.iterator();
-          }
+        res.append("Fields of class ").append(name)
+          .append(" require initial values.\n");
+        res.append(syntaxExample())
+          .append("Class ").append(name).append(" has the following fields:\n");
+        fieldsToList = parameters.iterator();
+      }
+    else if (missing.size() > 0)
+      {
+        res.append("The following fields require initial values:\n");
+        fieldsToList = missing.iterator();
       }
     else
       {
@@ -130,12 +128,12 @@ abstract class Constructor extends MethodDeclaration
           .append(name)
           .append(".\n")
           .append("The constructor accepts the following arguments:\n" );
-        missingFields = parameters.iterator();
+        fieldsToList = parameters.iterator();
       }
-    while(missingFields.hasNext())
+    while (fieldsToList.hasNext())
       {
         res.append("  ")
-          .append(missingFields.next())
+          .append(fieldsToList.next())
           .append("\n");
       }
     return res.toString();

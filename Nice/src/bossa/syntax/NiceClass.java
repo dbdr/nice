@@ -670,6 +670,13 @@ public class NiceClass extends ClassDefinition.ClassImplementation
     int len = allFields.length;
     for (int f = 0; f < fields.length; f++)
       fields[f].checkNoDuplicate(allFields, f);
+
+    for (int i = 0; i < overrides.length; i++)
+      for (int k = i+1; k < overrides.length; k++)
+        if (overrides[i].sym.hasName(overrides[k].sym.getName()))
+          User.error(overrides[k].sym, 
+             "A field override of the same field exists in this class");
+
   }
 
   private Constructor[] constructorMethod;

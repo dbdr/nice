@@ -206,3 +206,17 @@ class BB extends AA {
 
   /// package b import a
 B b = new BB(val: new B()).val;
+
+/// FAIL
+  /// Toplevel
+  abstract class A {}
+  class B extends A {}
+  class C extends A {}
+
+  abstract class AA {
+    final A val;
+  }
+  class BB extends AA {
+    override B val;
+    override C val;
+  }

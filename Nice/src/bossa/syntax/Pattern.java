@@ -153,7 +153,7 @@ public class Pattern implements Located
     return symbol;
   }
 
-  void resolveGlobalConstants(VarScope scope, TypeScope typeScope)
+  void resolveGlobalConstants()
   {
     if (refName != null)
       {
@@ -187,7 +187,6 @@ public class Pattern implements Located
          EnumDefinition.EnumSymbol symbol = (EnumDefinition.EnumSymbol)sym;
 	 NewExp val = (NewExp)symbol.getValue();
 
-	 symbol.getDefinition().resolve();
 	 tc = val.tc;
 	 atValue = new ConstantExp(null, tc, symbol,
 				name.toString(), location);
@@ -220,14 +219,20 @@ public class Pattern implements Located
 				name.toString(), location);
        }
      else
-       User.error(name, "The value of " + name + "can't be used as pattern");
+       User.error(name, "The value of " + name + " can't be used as pattern");
   }
 
   static void resolve(TypeScope tscope, VarScope vscope, Pattern[] patterns)
   {
     for(int i = 0; i < patterns.length; i++) {
-      patterns[i].resolveGlobalConstants(vscope, tscope);
       patterns[i].resolveTC(tscope);
+    }
+  }
+ 
+  static void resolveValues(Pattern[] patterns)
+  {
+    for(int i = 0; i < patterns.length; i++) {
+      patterns[i].resolveGlobalConstants();
     }
   }
  

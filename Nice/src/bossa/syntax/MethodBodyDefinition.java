@@ -326,6 +326,8 @@ public class MethodBodyDefinition extends Definition
   
   void lateBuildScope()
   {
+    Pattern.resolveValues(formals);
+
     VarSymbol s = findSymbol(scope);
 
     if(s==null)

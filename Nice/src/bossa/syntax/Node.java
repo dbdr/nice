@@ -246,6 +246,7 @@ abstract public class Node
 	       typeMapsSymbols.toArray(new TypeSymbol[typeMapsSymbols.size()]));
 	}
 	catch(TypeScope.DuplicateName e){
+	  // XXX Produce a better, localized error message.
 	  User.error(e);
 	}
       }

@@ -1,0 +1,43 @@
+package examples.helloworld;
+
+import nice.ui.common;
+
+import javax.swing.*;
+
+class HelloPanel extends JPanel
+{
+	private String greeting = new String("come inside");
+	
+	void setGreeting(String);
+}
+
+paintComponent(this@HelloPanel,g) 
+{ 
+	super;
+	g.setColor(java.awt.Color.blue); 
+	g.drawString(this.greeting,5,40); 
+}
+	
+setGreeting(this@HelloPanel,s) 
+{ 
+	this.greeting = s; 
+	this.repaint(); 
+}
+
+void main(String[] args) 
+{ 
+  HelloPanel panel = new HelloPanel();
+  panel.init
+    (mouseEntered: (java.awt.event.MouseEvent e) => { panel.setGreeting("Hello Nice World"); },
+     mouseExited: (java.awt.event.MouseEvent e) => { panel.setGreeting("  Bye Nice World"); } 
+     );
+  
+  JFrame frame = new JFrame("Hello new swinglib API").init
+    (windowClosing: java.awt.event.WindowEvent e => System.exit(0)
+     );
+  
+  ?java.awt.Container c = frame.getContentPane();
+  if(c != null) c.add(panel);
+  frame.setSize(100,100);
+  frame.show();
+} 

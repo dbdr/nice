@@ -1,0 +1,67 @@
+/**************************************************************************/
+/*                                N I C E                                 */
+/*             A high-level object-oriented research language             */
+/*                        (c) Daniel Bonniot 2004                         */
+/*                                                                        */
+/*  This program is free software; you can redistribute it and/or modify  */
+/*  it under the terms of the GNU General Public License as published by  */
+/*  the Free Software Foundation; either version 2 of the License, or     */
+/*  (at your option) any later version.                                   */
+/*                                                                        */
+/**************************************************************************/
+
+package nice.tools.ant;
+
+import nice.tools.unit;
+
+import org.apache.tools.ant.*;
+
+/**
+   Listener for NiceUnit that reports to Ant.
+
+   @author Daniel Bonniot (bonniot@users.sf.net)
+ */
+
+class TestListener implements nice.tools.unit.TestListener
+{
+  org.apache.tools.ant.Task task;
+
+  private int failures = 0;
+  private int tests = 0;
+
+  start(test)
+  {
+    task.log("Running " + test, Project.MSG_VERBOSE);
+  }
+
+  end(test)
+  {
+    tests++;
+
+    task.log("Finished " + test, Project.MSG_DEBUG);
+  }
+
+  failure(test, cause)
+  {
+    failures++;
+
+    task.log("Test failed:\n " + cause);
+
+    let couldPrint = iterLocations
+      (test, cause, (?String file, String method, int line) =>
+       println("Location: " + file + " method " + method + 
+	       (line < 0 ? "" : " line " + line)));
+
+    if (! couldPrint)
+      cause.printStackTrace();
+  }
+
+  void printSummary()
+  {
+    if (failures > 0)
+      throw new BuildException(""failures" tests failed", task.getLocation);
+
+    task.log("Unit testing done: "tests" tests successful", 
+	     Project.MSG_INFO);
+  }
+}

@@ -55,3 +55,10 @@
   import java.lang.reflect.*;
 
   class A extends Thread { ?Runnable dummy = null; }
+
+/// PASS
+  // bug #1090888
+  HashMap<String,String> m = new HashMap();
+  MyMap<String,String> env = new MyMap(m);
+  /// Toplevel
+class MyMap<A,B> extends HashMap<A,B> {}

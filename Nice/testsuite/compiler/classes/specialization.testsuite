@@ -71,3 +71,12 @@ interface Buffer<Elem> {}
 class Aha implements Buffer<int> {
   void foo() {}
 }
+
+/// PASS bug
+  // bug #1090888
+  /// Toplevel
+class Env extends HashMap<String, String> {}
+
+void _test_makeEnv() {
+  Env env = new Env(new HashMap());
+}

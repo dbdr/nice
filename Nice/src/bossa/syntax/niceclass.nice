@@ -549,8 +549,18 @@ public class CNiceClass extends NiceClass
 
 	FormalParameters values = new FormalParameters(params.toArray());
 
+	mlsub.typing.Constraint specificCst = cst;
+	// If the parent is a native method, it might have been retyped
+	// with a complex constraint. In that case we need to combine
+	// the two constraints.
+	// There might be simpler code to do this, and we could avoid
+	// duplicating the type variables.
+	if (parent instanceof JavaMethod && ! parent.getType().isMonomorphic())
+	  specificCst = identifyTypeParameters(cst, parent, typeParameters);
+
 	notNull(constructorMethod)[i] = new DefaultConstructor
-	  (new LocatedString("<init>",definition.location()), values, cst,
+	  (new LocatedString("<init>",definition.location()), values,
+	   specificCst,
 	   Monotype.resolve(definition.getLocalScope(), values.types()),
 	   Monotype.sure(new mlsub.typing.MonotypeConstructor(definition.getTC(), definition.getTypeParameters())),
            classe: this, isDefault: true, fields: fields, parent: parent);
@@ -674,6 +684,38 @@ public class CNiceClass extends NiceClass
   }
 
   toString() = definition.toString();
+}
+
+/**
+   Return a constraint that includes cst, the method's type constraint,
+   further constraining type parameters to be the same as the type parameters
+   of the return type of the method.
+*/
+mlsub.typing.Constraint identifyTypeParameters
+  (mlsub.typing.Constraint cst,
+   MethodDeclaration method,
+   mlsub.typing.Monotype[] typeParameters)
+{
+  mlsub.typing.MonotypeConstructor result =
+    cast(nice.tools.typing.Types.rawType(method.getType().codomain()));
+  let methodTP = result.getTP();
+
+  let cst2 = method.getType().getConstraint();
+  mlsub.typing.Constraint and = mlsub.typing.Constraint.and(cst, cst2);
+
+  let atoms = and.atoms();
+  let n = atoms == null ? 0 : atoms.length;
+  let allAtoms = new mlsub.typing.AtomicConstraint[n + typeParameters.length * 2];
+  if (n > 0)
+    System.arraycopy(atoms, 0, allAtoms, 2 * typeParameters.length, n);
+
+  for(int i = 0; i < typeParameters.length; i++)
+    {
+      allAtoms[2*i]   = new mlsub.typing.MonotypeLeqCst(typeParameters[i], methodTP[i]);
+      allAtoms[2*i+1] = new mlsub.typing.MonotypeLeqCst(methodTP[i], typeParameters[i]);
+    }
+
+  return new mlsub.typing.Constraint(and.binders(), cast(allAtoms));
 }
 
 let gnu.bytecode.Method cloneMethod = 

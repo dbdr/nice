@@ -98,7 +98,10 @@ public final class Internal
       msg = "";
     
     System.out.println("[Internal error]\n" + msg);
+    System.out.println("Upstream error:\n");
     e.printStackTrace();
+    System.out.println("Internal error:\n");
+    printStackTrace();
     System.exit(1);
   }
 

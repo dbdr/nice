@@ -8,6 +8,11 @@ nice (0.0.020300) unstable; urgency=low
     - checks that all statements are reachable
     - classes can be declared public or private
     - ...
+    More than half of the Jacks (java compiler testsuite) tests now pass!
+    Most failures come from the difference in the syntax of method declaration.
+  * Arrays of void values are forbidden. They most probably originate from
+    a bug in the source program.
+  * Bugfixes for some polymorphic operations on arrays.
 
  --
 

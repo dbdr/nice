@@ -25,27 +25,20 @@ or <ulink url="mailto:bonniot@users.sourceforge.net">privately</ulink>
 
 <para>
 <!-- The current stable version is 0.6, released July 11th, 2002. -->
-The latest version is 0.7.5, released November 20th, 2002.
+The latest version is 0.7.9, released May 6th, 2003.
 It includes all the planned features for version 0.8, which should be
-released soon.
+released real soon now!
 </para>
 
 <para>
 <variablelist>
-<varlistentry><term>0.8</term>
-<listitem>
-<para>
-Add various missing Java constructs: super, synchronized statements
-and Java 1.4 style assertions.
-Also consider more Design By Contract features: pre- and post-conditions, 
-class invariants. These might be part of a later release.
-</para>
-</listitem>
-</varlistentry>
 <varlistentry><term>1.0</term>
 <listitem>
 <para>
 Implement visibility modifiers (private, default, public).
+Improve the support for object creation, besides automatic constructors.
+A plugin to write Nice programs in <ulink url="http://www.eclipse.org">Eclipse
+</ulink> will likely be included.
 Finish a first version of the User's manual.
 </para>
 
@@ -56,6 +49,18 @@ in every aspect.
 This will be the time for more widespread publicity. 
 <ulink url="mailto:bonniot@users.sourceforge.net">What are the best places 
 to announce Nice ? Tell me !</ulink>
+</para>
+</listitem>
+</varlistentry>
+
+<varlistentry><term>0.8 (done)</term>
+<listitem>
+<para>
+Added various missing Java constructs: super, synchronized statements,
+Java 1.4 style assertions, and Java 1.5-compatible generic classes.
+Also implemented Design By Contract features: pre- and post-conditions for 
+methods.
+Method dispatch can be done on boolean and integer values.
 </para>
 </listitem>
 </varlistentry>

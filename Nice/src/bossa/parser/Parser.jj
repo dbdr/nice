@@ -1256,7 +1256,7 @@ Statement code():
     |
     exp=Expression() ";"
     { 
-      code = new ReturnStmt(exp);
+      code = new ReturnStmt(exp, /* fake */ true);
     }
     )
   )

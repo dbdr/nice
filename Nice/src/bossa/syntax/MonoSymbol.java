@@ -90,6 +90,9 @@ public class MonoSymbol extends VarSymbol
   {
     type = syntacticType.resolve(typeScope);
     syntacticType = null;
+
+    if (Types.isVoid(type))
+      throw User.error(name, "A variable cannot have a void type");
   }
 
   /****************************************************************

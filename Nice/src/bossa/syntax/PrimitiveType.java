@@ -116,6 +116,8 @@ public class PrimitiveType extends ClassDefinition.ClassImplementation
     
     if(name.equals("nice.lang.void"))
       {
+	voidTC = tc;
+	mlsub.typing.lowlevel.Engine.setTop(tc);
 	voidType = Monotype.sure(new MonotypeConstructor(tc, null));
 	voidPolytype = new mlsub.typing.Polytype
 	  (mlsub.typing.Constraint.True, voidType);
@@ -161,7 +163,7 @@ public class PrimitiveType extends ClassDefinition.ClassImplementation
     return null;
   }
   
-  public static TypeConstructor byteTC, charTC, intTC, longTC, boolTC, shortTC, doubleTC, floatTC, arrayTC;
+  public static TypeConstructor byteTC, charTC, intTC, longTC, boolTC, shortTC, doubleTC, floatTC, arrayTC, voidTC;
 //these two only for dispatch testing booleans   
   public static TypeConstructor trueBoolTC, falseBoolTC;
 

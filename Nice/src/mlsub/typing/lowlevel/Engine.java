@@ -182,6 +182,13 @@ public abstract class Engine
     leq(e1,e2,false);
   }
   
+  public static void setTop(Element top)
+  {
+    Engine.top = top;
+  }
+
+  private static Element top;
+
   /**
      Asserts that elements have some ordering relation.
      
@@ -193,6 +200,8 @@ public abstract class Engine
   public static final void leq(Element e1, Element e2, boolean initial) 
     throws Unsatisfiable
   {
+    if (e2 == top) return;
+
     Kind k1 = e1.getKind(), k2 = e2.getKind();
     
     if(k1!=null)

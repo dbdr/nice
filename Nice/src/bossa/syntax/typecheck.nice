@@ -625,8 +625,13 @@ typecheck(r@ReturnStmt)
       if (expectedType == null)
 	r.value = notNull(r.value).noOverloading();
       else
-	r.value = notNull(r.value).resolveOverloading
-	  (new mlsub.typing.Polytype(expectedType));
+	{
+	  if (! r.fake && nice.tools.code.Types.isVoid(expectedType))
+	    throw bossa.util.User.error(r, "Cannot return a value here");
+	  
+	  r.value = notNull(r.value).resolveOverloading
+	    (new mlsub.typing.Polytype(expectedType));
+	}
 
       try { typecheck(r.value); }
       catch (bossa.util.UserError ex) { throw ensureLocated(ex, r); }

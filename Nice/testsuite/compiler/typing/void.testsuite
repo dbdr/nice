@@ -1,0 +1,36 @@
+/// PASS
+  // A fonction A->B can be used where A->void is expected.
+
+  List<String> l = new LinkedList();
+  StringBuffer buffer = new StringBuffer( );
+  l.add( "foo" );
+  l.add( "bar" );
+  l.foreach( (String s) => buffer.append( s ) );
+
+  assert buffer.toString().equals("foobar");
+
+/// FAIL
+  /// Toplevel
+void goo() { 
+  /* /// FAIL HERE */ return 1; 
+}
+
+/// PASS
+  /// Toplevel
+void foo(int i) {}
+void goo() = foo(3);
+
+/// FAIL
+  void x;
+
+/// FAIL
+  /// Toplevel
+var void x;
+
+/// FAIL
+  /// Toplevel
+void f(void x) {}
+
+/// FAIL
+  /// Toplevel
+void f(void) {}

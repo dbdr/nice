@@ -52,12 +52,16 @@ abstract class UserOperator extends MethodDeclaration
     if (symbols != null)
       {
 	mlsub.typing.Monotype[] paramTypes = getArgTypes();
-	for (int i = 0; i < symbols.length; i++)
+	for (int i = 0; i < symbols.length; i++) {
+	  if (Types.isVoid(paramTypes[i]))
+	    throw bossa.util.User.error(symbols[i].syntacticType, 
+					"A parameter cannot have a void type");
 	  if (symbols[i].name != null)
 	    {
 	      symbols[i].type = paramTypes[i];
 	      scope.addSymbol(symbols[i]);
 	    }
+	}
       }
 
     VarScope scope = this.scope;

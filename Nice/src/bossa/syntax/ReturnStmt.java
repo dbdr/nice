@@ -30,9 +30,19 @@ public class ReturnStmt extends Statement
 {
   public ReturnStmt(Expression value)
   {
+    this(value, false);
+  }
+
+  /**
+     @param fake  This return was not explicitely written, but is the result
+                  of syntactic sugar.
+  */
+  public ReturnStmt(Expression value, boolean fake)
+  {
     this.value = value;
     if (value != null)
       this.setLocation(value.location());
+    this.fake = fake;
   }
 
   Polytype returnType()
@@ -65,4 +75,5 @@ public class ReturnStmt extends Statement
   }
   
   Expression value;
+  boolean fake;
 }

@@ -4,6 +4,8 @@ nice (0.7.8) unstable; urgency=low
       x != null && x.dereference()
     and
       x == null || x.dereference()
+  * Allow functions returning a value to be used as arguments where
+    functions returning void are expected.
   * Allow ?(T[]) syntax for optional arrays, as an alternative to T[?].
   * Allow // comments at then end of a file, without a trailing newline.
     Also report more nicely /* comments that are not closed.

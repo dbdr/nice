@@ -51,7 +51,7 @@ parse(progName@String, args, options)
   char c = g.getopt();
   while (c != noOptionsLeft)
     {
-      ?Option chosen = options.find(Option o => o.optval == c);
+      ?Option chosen = options.search(Option o => o.optval == c);
       if (chosen != null)
 	chosen.doAction(g);
       

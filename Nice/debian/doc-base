@@ -1,0 +1,10 @@
+Document: nicec
+Title: The Nice Compiler
+Author: Daniel Bonniot <bonniot@users.sourceforge.net>
+Abstract: This document describes how to compile programs 
+ with the nicec compiler.
+Section: devel
+
+Format: HTML
+Index: /usr/share/doc/nice/nicec.html
+Files: /usr/share/doc/nice/*.html

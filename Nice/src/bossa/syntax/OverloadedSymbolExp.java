@@ -12,7 +12,7 @@
 
 // File    : OverloadedSymbolExp.java
 // Created : Thu Jul 08 12:20:59 1999 by bonniot
-//$Modified: Fri Sep 01 19:19:39 2000 by Daniel Bonniot $
+//$Modified: Wed Sep 06 13:05:43 2000 by Daniel Bonniot $
 
 package bossa.syntax;
 
@@ -69,8 +69,9 @@ public class OverloadedSymbolExp extends Expression
 				CallExp callExp)
   {
     if(Debug.overloading) 
-      Debug.println("Overloading resolution for "+this +
-		    "\nwith parameters ("+Util.map("", ", ", "", parameters)+")");
+      Debug.println("Overloading resolution for \n" + this +
+		    "\nwith parameters (" + 
+		    Util.map("", ", ", "", parameters) + ")");
     
     //addJavaFieldAccess(ident,parameters,symbols);
     
@@ -128,7 +129,7 @@ public class OverloadedSymbolExp extends Expression
 	// before the clone type is released
 	s.makeClonedType();
 	Polytype t = CallExp.wellTyped(s.getClonedType(), parameters);
-	if(t==null)
+	if (t == null)
 	  {
 	    i.remove();
 	    s.releaseClonedType();
@@ -143,7 +144,7 @@ public class OverloadedSymbolExp extends Expression
 
     removeNonMinimal();
     
-    if(symbols.size()==1)
+    if (symbols.size() == 1)
       {
 	VarSymbol res = (VarSymbol) symbols.get(0);
 	res.releaseClonedType();
@@ -252,7 +253,15 @@ public class OverloadedSymbolExp extends Expression
     
     for(int s1 = 0; s1<len; s1++)
       for(int s2 = 0; s2<len; s2++)
-	if (s1 != s2)
+	// avoid the diagonal
+	// if s2 was removed, there is s'1 below s2 so we can ignore it
+	// makes removal faster
+	// funny special case is when too symbols have the same domain,
+	// we silently remove only one of them
+	// should do something about that 
+	// (but maybe only once per package, 
+	//  checking all symbols with same name).
+	if (s1 != s2 && !remove[s2])
 	  try{
 	    Typing.leq(syms[s2].getClonedType().getDomain(), 
 		       syms[s1].getClonedType().getDomain());
@@ -264,6 +273,9 @@ public class OverloadedSymbolExp extends Expression
     for(int i = 0; i<len; i++)
       if(remove[i])
 	{
+	  if (Debug.overloading)
+	    Debug.println("Removing " + syms[i] + " since it is not minimal");
+	  
 	  syms[i].releaseClonedType();
 	  symbols.remove(syms[i]);
 	}
@@ -291,7 +303,7 @@ public class OverloadedSymbolExp extends Expression
 
   public String toString()
   {
-    return "["+Util.map(""," | ","",symbols)+"]";
+    return "[" + Util.map("","\n|","",symbols) + "]";
   }
 
   List symbols;

@@ -21,7 +21,6 @@ package mlsub.typing;
    @version $Date$
    @author Daniel Bonniot
  */
-
 public class Domain
 {
   public Domain(Constraint constraint, Monotype monotype)

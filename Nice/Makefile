@@ -15,6 +15,10 @@ recompileGNU:
 recompileSTDLIB:
 	${JAVAC} ${TOP}/stdlib/nice/lang/*.java
 
+compiler:
+	${TOP}/src/nice/tools/compiler/setBuildDate ${TOP}/src/nice/tools/compiler
+	nicec -e -Rs nice.tools.compiler
+
 parser:
 	cd src/bossa/parser; ${JAVACC} Parser.jj
 

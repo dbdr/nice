@@ -388,8 +388,11 @@ Expression analyseIdent(IdentExp e, Info info, boolean assigned)
   if (!e.infix) // infix symbols can only come from the global scope
     {
       ?VarSymbol sym = info.lookup(notNull(e.ident).toString());
+
       if (sym != null)
-	if (!e.alwaysOverloadedSymbol)
+	if (e.alwaysOverloadedSymbol)
+	  return new OverloadedSymbolExp(sym, e.ident);
+	else
 	  {
 	    if (sym instanceof Block.LocalVariable.Symbol)
 	      {
@@ -401,8 +404,6 @@ Expression analyseIdent(IdentExp e, Info info, boolean assigned)
 	      }
 	    return new SymbolExp(sym, e.location());
 	  }
-	else
-	  return new OverloadedSymbolExp(sym, e.ident);
     }
 
   List<VarSymbol> symbols;

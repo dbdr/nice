@@ -62,7 +62,7 @@
     k &= 5;
     p("" + k);
 
-    A a = new A(0, 0);
+    A a = createA(0, 0);
 
     p("x=" + a.x);
     a.x = 3;

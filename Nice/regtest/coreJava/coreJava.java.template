@@ -22,6 +22,11 @@ public class coreJava
     System.out.println(s);
   }
 
+  static A createA(int x, long y)
+  {
+    return new A(x, y);
+  }
+
   public static void main(String[] args)
   BODY    
 }

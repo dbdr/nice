@@ -15,6 +15,8 @@ class A
   long y;
 }
 
+A createA(int x, long y) = new A(x: x, y: y);
+
 main(args)
 {
 BODY

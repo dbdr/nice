@@ -31,8 +31,12 @@ class Constr
 
 void test_constructors()
 {
-  Constr c = new Constr(0, "1");
+  Constr c = new Constr(a: 0, b: "1");
   println(c);
-  println(new Constr(0));
+  println(new Constr(a: 0));
   println(new Constr(b: "", a: 0));
 }
+
+// Local Variables:
+// nice-xprogram: "$HOME/Nice/bin/nicec -e -r -d \"$HOME/Nice/classes\" --classpath=\"$HOME/Nice:$HOME/Nice/classes\""
+// End:

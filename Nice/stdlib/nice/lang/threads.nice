@@ -1,0 +1,15 @@
+package nice.lang;
+
+class NiceThread extends java.lang.Thread
+{
+  ()->void action;
+
+  run()
+  {
+    (this.action)();
+  }
+}
+
+Thread thread(()->void action) = new NiceThread(action: action);
+
+void startThread(()->void action) = thread(action).start();

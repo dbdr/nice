@@ -1,0 +1,261 @@
+/**************************************************************************/
+/*                                N I C E                                 */
+/*             A high-level object-oriented research language             */
+/*                        (c) Daniel Bonniot 2004                         */
+/*                                                                        */
+/*  This program is free software; you can redistribute it and/or modify  */
+/*  it under the terms of the GNU General Public License as published by  */
+/*  the Free Software Foundation; either version 2 of the License, or     */
+/*  (at your option) any later version.                                   */
+/*                                                                        */
+/**************************************************************************/
+
+package bossa.syntax;
+
+import bossa.util.*;
+
+abstract class LocalDeclaration extends Statement
+{
+  ?Expression value;
+
+  String getName();
+  VarSymbol getSymbol();
+  gnu.bytecode.Type getBytecodeType();
+
+  gnu.expr.Expression initValue()
+  {
+    return notNull(value).generateCode();
+  }
+
+  location() = notNull(this.getSymbol().name.location());
+
+  gnu.expr.Expression compile(gnu.expr.LetExp letExp)
+  {
+    gnu.expr.Declaration decl = letExp.addDeclaration(this.getName(), this.getBytecodeType());
+    decl.noteValue(null);
+    if (! this.getSymbol().isAssignable())
+      decl.setFlag(gnu.expr.Declaration.IS_CONSTANT);
+    if (value == null)
+      decl.setFlag(gnu.expr.Declaration.NOT_INITIALIZED);
+    this.getSymbol().setDeclaration(decl);
+
+    return this.initValue();
+  }
+
+  generateCode()
+  {
+    Internal.error("Should not be called");
+    return cast(null);
+  }
+
+  public String display()
+  {
+    if (value == null)
+      return this.getSymbol().toString();
+    else
+      return this.getSymbol().toString() + '=' + value;        
+  }
+}
+
+public abstract class LocalValue extends LocalDeclaration
+{
+  ?LocalValue next = null;
+  LocalValue last = cast(null);
+  {
+    last = this;
+  }
+
+  /* 
+     Local variables are chained to handle multiple var declarations like
+     "int x = 3, y = x, z = y;"
+     We have to be careful about the order, so that dependencies like above
+     work as expected.
+  */
+  public void addNext(LocatedString name, ?Expression value);
+
+  toString()
+  {
+    let res = new StringBuffer();
+    ?LocalValue v = this;
+    while (true) {
+      res.append(notNull(v).display());
+      v = notNull(v).next;
+      if (v == null)
+        break;
+      else
+        res.append(',');
+    }
+    return res.toString();
+  }
+}
+
+public class LocalVariable extends LocalValue
+{
+  LocalVariableSymbol left;
+
+  getName() = left.name.toString();
+  getSymbol() = left;
+  getBytecodeType() = nice.tools.code.Types.javaType(left.type);
+
+  initValue()
+  {
+    if (value == null)
+      return notNull(gnu.expr.QuoteExp.undefined_exp);
+    else
+      return notNull(value).generateCode();
+  }
+
+  int getIndex()
+  {
+    return left.index;
+  }
+
+  void setIndex(int i)
+  {
+    left.index = i;
+  }
+
+  addNext(name, value)
+  {
+    if (left.syntacticType == null && value == null)
+      User.error(name,"A local variable requires a type or a default value");     
+
+    last.next = new LocalVariable(name, left.syntacticType, 
+				    ! left.isAssignable(), value);
+    last = notNull(last.next);
+  }
+
+  display()
+  {
+    if (left.constant)
+      return "let "+ super;
+    else
+      return "var " + super;
+  }
+}
+
+class LocalVariableSymbol extends MonoSymbol
+{
+  /* 
+    Index to make the initialization analysis or -1 if 
+    this variable is always initialized.
+  */
+  int index = -1;
+
+  boolean constant;
+
+  isAssignable() 
+  { 
+    /* For a constant symbol with no initial value, index != -1.
+       We allow assignments, but check with dataflow in analyse.nice
+       that assignment occurs only in the uninitialized state.
+     */
+     return ! constant || index != -1;
+   }
+}
+
+public new LocalVariable(LocatedString name, ?Monotype type, boolean constant, ?Expression value)
+{
+  this(value: value, left:new LocalVariableSymbol(name, type, constant: constant));
+}
+
+public class LocalConstant extends LocalValue
+{
+  MonoSymbol left; 
+
+  getName() = left.name.toString();
+  getSymbol() = left;
+  getBytecodeType() = nice.tools.code.Types.javaType(left.type);
+
+  addNext(name, value)
+  {
+    if (value == null)
+      User.error(name,"A local constant requires a type or a default value");     
+
+    last.next = new LocalConstant(name, notNull(value));
+    last = notNull(last.next);
+  }
+
+  toString() = "let " + super;
+}
+
+class LocalConstantSymbol extends MonoSymbol
+{
+   isAssignable() = false;
+}
+
+public new LocalConstant(LocatedString name, Expression value)
+{
+  ?Monotype t = null;
+  this(value: value, left: new LocalConstantSymbol(name,t));
+}
+
+
+public class LocalFunction extends LocalDeclaration
+{
+  FunSymbol left;
+  FormalParameters parameters;
+
+  getName() = left.name.toString();
+  getSymbol() = left;
+  getBytecodeType() = nice.tools.code.Types.javaType(left.type);
+
+  mlsub.typing.Polytype inferredReturnType()
+  {
+    return notNull(value).inferredReturnType();
+  }
+
+  mlsub.typing.Monotype declaredReturnType()
+  {
+    return nice.tools.typing.Types.result(left.getType());
+  }
+}
+
+public Statement createLocalFunction(LocatedString name, Monotype returnType, FormalParameters parameters, Statement body)
+{
+  let value = createFunExp(Constraint.True, parameters.getMonoSymbols(), body);
+  let symbol = new FunSymbol(name, Constraint.True, parameters, returnType);
+  notNull(notNull(symbol.syntacticType).getMonotype()).nullness = Monotype.sure;
+  return new LocalFunction(left: symbol, value: value, parameters: parameters);
+}
+
+
+public Statement createLocalVariable(LocatedString name, ?Monotype type, boolean constant, ?Expression value)
+{
+  if (type == null && value == null)
+    User.error(name,"A local variable requires a type or a default value");     
+
+  if (constant && type == null)
+    return new LocalConstant(name, value: notNull(value));
+
+  return new LocalVariable(name, type, constant: constant, value: value);
+}
+
+public void addNextLocal(Statement localValue, LocatedString name, ?Expression value)
+{
+  LocalValue lv = cast(localValue);
+  lv.addNext(name, value);  
+}
+
+public class ExpLocalVariable extends Expression
+{
+  LocalVariable variable;
+  Expression initValue;
+
+  computeType()
+  {
+    this.type = variable.left.getType();
+  }
+
+  compile() = this.compileAssign(initValue.generateCode());
+
+  getDeclaration() = variable.getSymbol().getDeclaration();
+
+}
+
+public Expression createExpLocalVariable(LocatedString name, Expression value, boolean constant, ?Monotype type)
+{
+  let res = new ExpLocalVariable(variable: new LocalVariable(name, type, constant, null), initValue: value);
+  res.setLocation(name.location());
+  return res;
+}

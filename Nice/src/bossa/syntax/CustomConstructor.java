@@ -31,7 +31,7 @@ public abstract class CustomConstructor extends UserOperator
 {
   public static CustomConstructor make
     (LocatedString className, Constraint cst, FormalParameters params, 
-     Block body)
+     Statement body)
   {
     return new SourceCustomConstructor(className, cst, params, body);
   }
@@ -120,7 +120,7 @@ public abstract class CustomConstructor extends UserOperator
   static class SourceCustomConstructor extends CustomConstructor
   {
     SourceCustomConstructor(LocatedString className, Constraint cst,
-                            FormalParameters params, Block body)
+                            FormalParameters params, Statement body)
     {
       super(className, cst, params);
 

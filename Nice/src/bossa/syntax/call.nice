@@ -30,7 +30,7 @@ public class CallExp extends Expression
   /** Class this static method is defined in, or null */
   ?gnu.bytecode.ClassType declaringClass = null;
 
-  ExpLocalVariable[?] localVars = null;
+  ?List<ExpLocalVariable> localVars = null;
 
   /** The type of the function, constrained by the actual arguments. */
   private ?mlsub.typing.Polytype instanciatedDomain = null;
@@ -134,12 +134,12 @@ public class CallExp extends Expression
     ?gnu.expr.Expression letExpRes = null;
     if (localVars != null)
       {
-        for(int i = notNull(localVars).length-1; i >= 0; i--)
+        for(int i = notNull(localVars).size()-1; i >= 0; i--)
 	  {
             gnu.expr.Expression[] eVal = cast(new gnu.expr.Expression[1]);
             gnu.expr.LetExp letExp = new gnu.expr.LetExp(eVal);
-            eVal[0] = notNull(notNull(localVars)[i].variable).compile(letExp);
-            if (i == notNull(localVars).length-1)
+            eVal[0] = notNull(localVars)[i].variable.compile(letExp);
+            if (i == notNull(localVars).size()-1)
               {
 		firstLetExp = letExp;
               }

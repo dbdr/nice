@@ -217,7 +217,7 @@ class Info
   }
 }
 
-void checkInitialized(Block.LocalVariable.Symbol sym, Info info,
+void checkInitialized(LocalVariableSymbol sym, Info info,
 		      ?bossa.util.Location loc)
 {
   if (sym.index == -1)
@@ -238,7 +238,7 @@ void analyse(?Statement, Info);
 
 analyse(Expression e, i) = e;
 
-void setInitialized (Block.LocalVariable.Symbol v, Info info, 
+void setInitialized (LocalVariableSymbol v, Info info, 
 		     bossa.util.Location loc)
 {
   if (v.index != -1)
@@ -310,13 +310,18 @@ analyse(CallExp e, info)
 {
   Arguments args = e.arguments;
   
-  let ExpLocalVariable[?] expLocals = e.localVars = cast(args.extractLocalVars());  
-
   if (e.infix)
     markAsCallFirstArg(notNull(args.getExp(0)));
 
-  if (expLocals != null)
+  List<ExpLocalVariable> expLocals = new ArrayList();
+
+  for (int i = args.size(); --i>=0; )
+    if (args.getExp(i) instanceof ExpLocalVariable)
+      expLocals.add(cast(args.getExp(i)));
+
+  if (!expLocals.isEmpty())
     {
+      e.localVars = expLocals;
       info.begin();
       for (local : expLocals)
         analyse(local.variable, info);
@@ -327,7 +332,7 @@ analyse(CallExp e, info)
      e.isCallTo("filter"));
   args.analyse(info, noEscape);
 
-  if (expLocals != null)
+  if (!expLocals.isEmpty())
     info.end();
 
   if (e.infix)
@@ -470,7 +475,7 @@ Expression analyseIdent(IdentExp e, Info info, boolean assigned)
 	      if (assigned && sym.depth < info.anonFunDepth)
 	        sym.captured = true;
 
-	      if (sym instanceof Block.LocalVariable.Symbol)
+	      if (sym instanceof LocalVariableSymbol)
 	        {
 	          if (assigned)
 		    setInitialized(sym, info, e.location());
@@ -678,7 +683,7 @@ analyse(SuperExp e, info)
 analyse(Statement s, info) {}
 analyse(null(Statement), info) {}
 
-analyse(Block.LocalVariable decl, info)
+analyse(LocalVariable decl, info)
 {
   if (decl.value != null)
     decl.value = analyse(decl.value, info);
@@ -691,13 +696,13 @@ analyse(Block.LocalVariable decl, info)
     notNull(info.localsOfCurrentLoop).add(notNull(decl.left));
 }
 
-analyse(Block.LocalConstant decl, info)
+analyse(LocalConstant decl, info)
 {
   decl.value = analyse(decl.value, info);
   info.addVar(notNull(decl.left));
 }
 
-analyse(Block.LocalFunction decl, info)
+analyse(LocalFunction decl, info)
 {
   notNull(decl.parameters).resolveCalledFromAnalyse(cast(info));
 
@@ -708,7 +713,7 @@ analyse(Block.LocalFunction decl, info)
 analyse(Block b, info)
 {
   info.begin();
-  notNull(b.locals).foreach(Block.LocalDeclaration l => analyse(l, info));
+  notNull(b.locals).foreach(LocalDeclaration l => analyse(l, info));
   analyse(b.statements, info);
   info.end();
 
@@ -716,11 +721,11 @@ analyse(Block b, info)
     info.setReachable();
 }
 
-void analyse(?Statement[] statements, Info info)
+void analyse(Statement[] statements, Info info)
 {
   for (int i = 0; i < statements.length; i++)
     {
-      ?Statement s = statements[i];
+      Statement s = statements[i];
       if (info.getUnreachable())
 	throw error(s, "This statement is never executed");
 

@@ -1,0 +1,154 @@
+/**************************************************************************/
+/*                                N I C E                                 */
+/*             A high-level object-oriented research language             */
+/*                        (c) Daniel Bonniot 2004                         */
+/*                                                                        */
+/*  This program is free software; you can redistribute it and/or modify  */
+/*  it under the terms of the GNU General Public License as published by  */
+/*  the Free Software Foundation; either version 2 of the License, or     */
+/*  (at your option) any later version.                                   */
+/*                                                                        */
+/**************************************************************************/
+
+package bossa.syntax;
+
+import bossa.util.*;
+
+/**
+   A block : a list of statements with local variables.
+
+*/
+public class Block extends Statement
+{
+  ArrayList<LocalDeclaration> locals = new ArrayList();
+  Statement[] statements;
+  boolean isBreakTarget = false;
+
+  public Statement last()
+  {
+    return statements[statements.length - 1];
+  }
+
+  /**
+     Divides the statements in an hierarchy of blocks.
+     
+     Each block has a list of local variables
+     accessible in the block, and a list of statements (possibly sub-blocks).
+     
+     @param statements the list of statements, with LocalDeclarations
+     @return the list of statements of the current block.
+   */
+  private Statement[] cutInBlocks(List<Statement> statements)
+  {
+    ArrayList<Statement> res = new ArrayList();
+    let i = statements.listIterator();
+
+    // Finds locals at the beginning
+    while(i.hasNext())
+      {
+	let s = i.next();
+	
+        if (s instanceof LocalValue)
+          {
+            ?LocalValue decl = s;
+            do
+              {
+                locals.add(notNull(decl));
+                decl = notNull(decl).next;
+              }
+            while (decl != null);
+          }
+	else if (s instanceof LocalDeclaration)
+	  locals.add(s);
+	else 
+	  {
+	    res.add(s);
+	    break;
+	  }
+      }
+    // There will be no more locals, let's save space :-)
+    locals.trimToSize();
+    
+    // Finds statements. Creates a new Block if a local declaration is found
+    while(i.hasNext())
+      {
+	let s = i.next();
+	
+	if (s instanceof LocalDeclaration)
+	  {
+	    // Create a subblock with all the statements starting from this one
+	    let end = createBlock(statements.subList(i.previousIndex(),
+						     statements.size()));
+	    end.setLocation(s.location());
+	    res.add(end);
+	    break;
+	  }
+	
+	res.add(s);
+      }
+
+    return  new Statement[res.size()].fillWith(res);
+  }
+
+  /****************************************************************
+   * Code generation
+   ****************************************************************/
+
+  generateCode()
+  {
+    if (statements.length != 0)
+      {
+        let body = new gnu.expr.BeginExp();
+        // addLocals must appear before Statement.compile(statements)
+        // in order to define the locals before their use.
+        // That is why we can't set body's body at construction.
+        let res = this.addLocals(locals.iterator(), body);
+        body.setExpressions(Statement.compile(statements));
+        return res;
+      }
+
+    return this.addLocals(locals.iterator(), notNull(gnu.expr.QuoteExp.voidExp));
+  }
+
+  private gnu.expr.Expression addLocals(Iterator<LocalDeclaration> vars, 
+					gnu.expr.Expression body)
+  {
+    if (!vars.hasNext())
+      return body;
+    
+    let local = vars.next();
+
+    gnu.expr.Expression[] eVal = cast(new gnu.expr.Expression[1]);
+    gnu.expr.LetExp res = new gnu.expr.LetExp(eVal);
+
+    eVal[0] = local.compile(res);
+    
+    res.setBody(this.addLocals(vars,body));
+    local.location().write(res);
+    
+    return res;
+  }
+  
+  /****************************************************************
+   * Printing
+   ****************************************************************/
+
+  toString()
+  {
+    return "{\n"
+      + Util.map("",";\n",";\n",locals)
+      + Util.map("","\n","\n",statements)
+      + "}\n";
+  }
+
+}
+
+public Statement createBlock(List<Statement> statements)
+{
+    let res = new Block(statements: cast(null));
+    let stmts = res.cutInBlocks(statements);
+    res.statements = stmts;
+    if (stmts != null && stmts.length > 0 && stmts[0] != null)
+      res.setLocation(stmts[0].location());
+    return res;
+}

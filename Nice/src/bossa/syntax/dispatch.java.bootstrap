@@ -88,6 +88,20 @@ public class dispatch
   public static boolean disjoint(Pattern a, Pattern b)
   { return false; }
   
+  public static Expression createExpLocalVariable(LocatedString name, Expression value, boolean constant, Monotype type)
+  { return null; }
+
+  public static Statement createLocalVariable(LocatedString name, Monotype type, boolean constant, Expression value)
+  { return null; }
+
+  public void addNextLocal(Statement localValue, LocatedString name, Expression value) {}
+
+  public static Statement createLocalFunction(LocatedString name, Monotype returnType, FormalParameters parameters, Statement body)
+  { return null; }
+
+  public static Statement createBlock(List statements)
+  { return null; }
+
   static Statement  analyse(Statement  s, VarScope v, TypeScope t, boolean r)
   { return null; }
   

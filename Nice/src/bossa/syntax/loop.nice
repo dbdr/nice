@@ -22,7 +22,7 @@ public class LoopStmt extends Statement
 {
   ?Expression whileExp;
   final Statement loopBody;
-  final ?Block iterationStatements = null;
+  final ?Statement iterationStatements = null;
   final boolean testFirst;
 
   ?gnu.expr.LoopExp code = null;
@@ -97,7 +97,8 @@ public class LoopStmt extends Statement
       return "while (" + whileExp + ")" +
 		(loopBody == null ? ";" : loopBody.toString());
 
-    Statement[] itStatements = cast(notNull(iterationStatements).statements);
+    Block itbl = cast(iterationStatements);
+    Statement[] itStatements = itbl.statements;
     String itStats = "";
     for(int i = 0; i<itStatements.length; i++)
       {
@@ -112,7 +113,7 @@ public class LoopStmt extends Statement
 }
 
 public LoopStmt createForLoop
-  (Expression test, Block update, Statement body)
+  (Expression test, Statement update, Statement body)
 {
   return new LoopStmt(whileExp:test, loopBody: body, iterationStatements: update, testFirst: true);
 }
@@ -142,13 +143,13 @@ public Statement createForInLoop(?Monotype vartype, LocatedString varName, Locat
 
   let getiter = createCallExp(new IdentExp(new LocatedString("forIterator", loc)), container); 
   let iter = new LocatedString(loc.uniqueIdentifier("for_in_iter_"), loc);
-  let init = new Block.LocalVariable(iter, itertype, true, getiter);
+  let init = new LocalVariable(iter, itertype, true, getiter);
   let iterexp = new IdentExp(iter);
   let cond = createCallExp(new IdentExp(new LocatedString("hasNext", loc)), iterexp);
   let getvar = createCallExp(new IdentExp(new LocatedString("next", loc)), iterexp);
-  let assign = new Block.LocalVariable(varName, vartype, true, getvar);
-  let loop = createWhileLoop(cond, new Block(new LinkedList([assign, body])));
-  return new Block(new LinkedList([init, loop]));
+  let assign = new LocalVariable(varName, vartype, true, getvar);
+  let loop = createWhileLoop(cond, createBlock(new LinkedList([assign, body])));
+  return createBlock(new LinkedList([init, loop]));
 
 }
 

@@ -834,7 +834,7 @@ Expression ParameterTuplePart(List statements, List monotypes):
   LOOKAHEAD( monotype() ident() )
   type=monotype()  id=ident()
   { monotypes.add(type);
-    statements.add(new Block.LocalVariable(id, type, false, null)); 
+    statements.add(bossa.syntax.dispatch.createLocalVariable(id, type, false, null)); 
     return new IdentExp(id); }
 | { Token first,last; }
   first="(" 
@@ -930,7 +930,7 @@ Definition internalMethodOrFunction(MethodContainer c, boolean isOverride):
   ( ";" | body = code() {statements.add(body);} )
   
   { return NiceMethod.create(c, name, cst, returnType, parameters, 
-                             body != null ? new Block(statements) : null,
+                             body != null ? bossa.syntax.dispatch.createBlock(statements) : null,
                              contract, isOverride); }
 }
 
@@ -1121,7 +1121,7 @@ CustomConstructor customConstructor(Constraint cst):
     "}"
   )
   {
-    return CustomConstructor.make(name, cst, params, new Block(statements));
+    return CustomConstructor.make(name, cst, params, bossa.syntax.dispatch.createBlock(statements));
   }
 }
 
@@ -1362,7 +1362,7 @@ Statement code():
       ";" 
       { List statements = new LinkedList();
         statements.add(res);
-	return new Block(statements); }
+	return bossa.syntax.dispatch.createBlock(statements); }
     )
   )
   { return code; }
@@ -1425,7 +1425,7 @@ Definition methodDeclaration(Constraint cst, boolean isOverride):
         body=code() { statements.add(body); }
         { res = NiceMethod.WithDefault.create
             (name, cst, returnType, parameters, 
-             body != null ? new Block(statements) : null, 
+             body != null ? bossa.syntax.dispatch.createBlock(statements) : null, 
              contract, isOverride);
         }
       |
@@ -1798,7 +1798,7 @@ Expression funExp():
     exp=Expression() { body = bossa.syntax.dispatch.createReturnStmt(exp); }
   )
   { statements.add(body);
-    return bossa.syntax.dispatch.createFunExp(cst, formals, new Block(statements)); }
+    return bossa.syntax.dispatch.createFunExp(cst, formals, bossa.syntax.dispatch.createBlock(statements)); }
 }
 
 /** A statement not terminated by a ";" if applicable. */
@@ -2306,7 +2306,7 @@ ConstantExp patternLiteral() :
 { return res; }
 }
 
-ExpLocalVariable ExpLocalVariable():
+Expression ExpLocalVariable():
 {
   boolean constant = false;
   LocatedString name;
@@ -2319,7 +2319,7 @@ ExpLocalVariable ExpLocalVariable():
   name=ident()
   "="
   value=Expression()
-  { return new ExpLocalVariable(name, value, constant, type); }
+  { return bossa.syntax.dispatch.createExpLocalVariable(name, value, constant, type); }
 }
 
 Arguments.Argument argument():
@@ -2406,7 +2406,7 @@ Statement LabeledStatement() :
   }
 }
 
-Block Block() :
+Statement Block() :
 { Token first, last; Statement s; List statements; }
 {
   { first = getToken(1); }
@@ -2416,7 +2416,7 @@ Block Block() :
   "}"
   { 
     last = getToken(0);
-    Block res = new Block(statements); 
+    Statement res = bossa.syntax.dispatch.createBlock(statements); 
     res.setLocation(makeLocation(first, last));
     return res;
   }
@@ -2452,7 +2452,7 @@ Statement LocalDeclaration() :
   Expression e = null;
   boolean constant = false;
   Token t = null;
-  Block.LocalValue res;
+  Statement res;
 }
 {
   (
@@ -2463,9 +2463,9 @@ Statement LocalDeclaration() :
   )
   id=ident()
   [ "=" e=Expression() ] 
-  { res = Block.createLocalVariable(id,type,constant,e); }
+  { res = bossa.syntax.dispatch.createLocalVariable(id,type,constant,e); }
   ( LOOKAHEAD( "," <IDENT> ( "=" | ";" | ",") ) 
-    "," id=ident() {e=null;} [ "=" e=Expression() ] { res.addNext(id,e); } )*
+    "," id=ident() {e=null;} [ "=" e=Expression() ] { bossa.syntax.dispatch.addNextLocal(res,id,e); } )*
 
   { return res; }
 }
@@ -2486,7 +2486,7 @@ Statement LocalFunctionDeclaration() :
   id=ident()
   "(" parameters=formalParameters(false, statements) ")" 
   body=code() { statements.add(body); } 
-  { return Block.LocalFunction.make(id, type, parameters, body!=null?new Block(statements):null); }
+  { return bossa.syntax.dispatch.createLocalFunction(id, type, parameters, body!=null?bossa.syntax.dispatch.createBlock(statements):null); }
 }
 
 Statement LocalTupleDeclaration(List statements) :
@@ -2513,7 +2513,7 @@ Expression LocalTuplePart(List statements) :
   { return new IdentExp(id); }
 | //then look for a monotype without matching a tuplePart
   LOOKAHEAD( monotype() ident() ) type=monotype()  id=ident() 
-  { statements.add(new Block.LocalVariable(id, type, false, null)); 
+  { statements.add(bossa.syntax.dispatch.createLocalVariable(id, type, false, null)); 
     return new IdentExp(id); }
 | //otherwise it's localtuple part
   "(" { List parts = new LinkedList(); Expression part; }
@@ -2715,7 +2715,7 @@ Statement DoStatement() :
 }
 
 Statement ForStatement() :
-{ Block update = null;
+{ Statement update = null;
   Statement loop = null, body, statexp;
   Expression cond = null;
   List init = new ArrayList();
@@ -2739,7 +2739,7 @@ Statement ForStatement() :
       List l = new LinkedList();
       l.addAll(init);
       l.add(loop);
-      loop = new Block(l);
+      loop = bossa.syntax.dispatch.createBlock(l);
     }
   )
   { return loop; }
@@ -2767,13 +2767,13 @@ List LocalDeclarationList() :
   { return declarations; }
 }
 
-Block StatementExpressionList() :
+Statement StatementExpressionList() :
 { Statement s; List statements=new LinkedList(); }
 {
   s=ShortStatementExpression() { statements.add(s); }
   ( "," s=ShortStatementExpression() { statements.add(s); }
   )*
-  { return new Block(statements); }
+  { return bossa.syntax.dispatch.createBlock(statements); }
 }
 
 Statement BreakStatement() :

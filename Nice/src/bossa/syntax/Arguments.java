@@ -160,20 +160,6 @@ public class Arguments
     return res;
   }
 
-  ExpLocalVariable[] extractLocalVars()
-  {
-    List res = new ArrayList();
-   
-    for (int i = arguments.length; --i>=0; )
-      if (arguments[i].value instanceof ExpLocalVariable)
-        res.add(arguments[i].value);
-
-    if (res.isEmpty())
-      return null;
-
-    return (ExpLocalVariable[])res.toArray(new ExpLocalVariable[res.size()]);
-  }
-
   java.util.Map applicationExpressions = new java.util.HashMap();
   
   Expression[] getExpressions(VarSymbol s)

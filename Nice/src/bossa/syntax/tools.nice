@@ -62,7 +62,7 @@ mlsub.typing.Monotype makeUnsure(mlsub.typing.Monotype m) =
   notNull(bossa.syntax.Monotype.maybe(nice.tools.typing.Types.rawType(m)));
 
 mlsub.typing.Monotype ensureMonomorphic(mlsub.typing.Polytype type,
-					Block.LocalValue decl)
+					LocalValue decl)
 {
   type.simplify();
 
@@ -191,16 +191,14 @@ mlsub.typing.Polytype getType(Expression) =
   native mlsub.typing.Polytype Expression.getType();
 mlsub.typing.Monotype type(MonoSymbol) = native MonoSymbol.type;
 GlobalTypeScope getGlobalTypeScope() = native GlobalTypeScope Node.getGlobalTypeScope();
-List<Block.LocalDeclaration> locals(Block) = native Block.locals;
-?Statement[] statements(Block) = native Block.statements;
 ?gnu.bytecode.ClassType staticClass(Arguments) = native gnu.bytecode.ClassType Arguments.staticClass();
 List<VarSymbol> findJavaMethods(?gnu.bytecode.ClassType, String, int) = native List JavaClasses.findJavaMethods(gnu.bytecode.ClassType,java.lang.String,int);
 List<VarSymbol> findJavaMethods(?gnu.bytecode.ClassType, String) = native List JavaClasses.findJavaMethods(gnu.bytecode.ClassType,java.lang.String);
 TypeParameters TypeParameters(List<Monotype>) = native new bossa.syntax.TypeParameters(List);
-Block Block(List<Statement>) = native new bossa.syntax.Block(List);
 String explainNoMatch(Arguments, List<VarSymbol>) = native String Arguments.explainNoMatch(List);
 Map<VarSymbol,mlsub.typing.Polytype> types(Arguments) = native Arguments.types;
 <T> String map(String, String, String, T[]) = native String bossa.util.Util.map(String, String, String, Object[]);
+<T> String map(String, String, String, Collection<T>) = native String bossa.util.Util.map(String, String, String, Collection);
 Stack<bossa.link.Alternative> sortedAlternatives(MethodDeclaration) = native Stack bossa.link.Alternative.sortedAlternatives(MethodDeclaration);
 List<VarSymbol> getConstructorCallSymbols(NiceClass) = native List NiceClass.getConstructorCallSymbols();
 LinkedList<VarSymbol> getConstructors(mlsub.typing.TypeConstructor) = native LinkedList TypeConstructors.getConstructors(mlsub.typing.TypeConstructor);
@@ -210,7 +208,6 @@ void addValues(Pattern, List<ConstantExp>) = native void Pattern.addValues(List)
 boolean matchesValue(Pattern, ConstantExp) = native boolean Pattern.matchesValue(ConstantExp);
 // Retypings needed since java types are not strict.
 
-Block newBlock(?Statement[] statements) = native new Block(Statement[]);
 mlsub.typing.Polytype boolPolytype() = native PrimitiveType.boolPolytype;
 mlsub.typing.Polytype longPolytype() = native PrimitiveType.longPolytype;
 mlsub.typing.Monotype boolType() = native PrimitiveType.boolType;

@@ -282,8 +282,7 @@ public class CallExp extends Expression
 	  User.error(this, "class " + declaringClass.getName() +
 		     " has no method or field " + funName);
 	    
-	function = new OverloadedSymbolExp
-	  (possibilities, funName, function.getScope());
+	function = new OverloadedSymbolExp(possibilities, funName);
       }
   }
 

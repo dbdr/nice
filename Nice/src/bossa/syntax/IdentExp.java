@@ -35,11 +35,7 @@ public class IdentExp extends Expression
 
   void computeType()
   {
-    if(ignoreInexistant)
-      User.error(ident, "Variable " + ident + " is not declared");
-    else
-      Internal.error(this, "computeType in IdentExp (" + this + 
-		     " @ " + location() + ")");
+    Internal.error(this, "computeType in IdentExp (" + this + ")");
   }
 
   /****************************************************************
@@ -68,14 +64,7 @@ public class IdentExp extends Expression
 
   protected LocatedString ident;
   
-  /** True if it should not be an error 
-      if this ident does not exist. 
-      Then it should resolve to itself.
-      Set by CallExp.
-  */
-  boolean ignoreInexistant;
-
-  /** Idem, except it should resolve to a ClassExp or a PackageExp. */
+  /** Resolve to a ClassExp or a PackageExp if ident is not known. */
   boolean enableClassExp;
 
   /**

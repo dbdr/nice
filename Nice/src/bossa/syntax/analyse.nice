@@ -218,7 +218,7 @@ analyse(e@IdentExp, i)
     if (!e.alwaysOverloadedSymbol() && symbols.size() == 1)
       return new SymbolExp(symbols[0]);
     else
-      return new OverloadedSymbolExp(symbols.impl, e.ident, null);
+      return new OverloadedSymbolExp(symbols.impl, e.ident);
 
   if (e.enableClassExp)
     return ClassExp.create(e.ident);

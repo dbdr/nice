@@ -30,19 +30,16 @@ import mlsub.typing.Polytype;
 public class OverloadedSymbolExp extends Expression
 {
   /**
-   * @param symbols All the possible VarSymbols
-   * @param ident the original identifier
-   * @param originalScope the scope where the symbol has been looked for.
+     @param symbols All the possible VarSymbols
+     @param ident the original identifier
    */
-  OverloadedSymbolExp(List symbols, LocatedString ident,
-		      VarScope originalScope)
+  OverloadedSymbolExp(List symbols, LocatedString ident)
   {
     if(symbols == null)
       Internal.error("No symbols");
     
     this.symbols = symbols;
     this.ident = ident;
-    this.scope = originalScope;
     setLocation(ident.location());
   }
 
@@ -265,9 +262,6 @@ public class OverloadedSymbolExp extends Expression
     if(symbols.size()==1)
       return uniqueExpression();
 
-    if(symbols.size()==0)
-      return ClassExp.create(ident);
-    
     User.error(this,"Ambiguity for symbol "+ident+". Possibilities are :\n"+
 	       Util.map("","\n","",symbols));
     return null;

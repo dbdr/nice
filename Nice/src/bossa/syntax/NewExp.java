@@ -58,7 +58,7 @@ public class NewExp extends CallExp
     constructors = (LinkedList) constructors.clone();
 
     function = new OverloadedSymbolExp
-      (constructors, new LocatedString("new " + tc, location()), null);
+      (constructors, new LocatedString("new " + tc, location()));
   }
 
   /****************************************************************

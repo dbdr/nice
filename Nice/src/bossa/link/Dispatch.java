@@ -85,9 +85,10 @@ public final class Dispatch
   private static void test(NiceMethod m, bossa.modules.Package module)
   {
     Stack sortedAlternatives = Alternative.sortedAlternatives(m);
-    
+
     if (! trivialTestOK(sortedAlternatives))
-      test(m, sortedAlternatives, false);
+      if (! shortTestOk(m, sortedAlternatives))
+       test(m, sortedAlternatives, false);
     
     if(Debug.codeGeneration)
       Debug.println("Generating dispatch function for "+m);
@@ -98,7 +99,7 @@ public final class Dispatch
   private static void test(JavaMethod m, bossa.modules.Package module)
   {
     Stack sortedAlternatives = Alternative.sortedAlternatives(m);
-    
+
     if (! trivialTestJava(m, sortedAlternatives))
       test(m, sortedAlternatives, true);
     
@@ -116,10 +117,7 @@ public final class Dispatch
       return false;
     
     Alternative a = (Alternative) alternatives.peek();
-    for (int i = 0; i<a.patterns.length; i++)
-      if (! a.patterns[i].atAny())
-	  return false;
-    return true;
+    return a.allAtAny();
   }
 
   private static boolean trivialTestJava(JavaMethod m, Stack alternatives)
@@ -142,6 +140,33 @@ public final class Dispatch
 
     // This method will need testing.
     return false;
+  }
+
+  private static boolean shortTestOk(NiceMethod method, Stack alternatives)
+  {
+    if (alternatives.size() < 2)
+      return false;
+
+    //check for default implementation
+    if (! ((Alternative) alternatives.peek()).allAtAny())
+      return false;
+
+    for (int i = 0; i < alternatives.size(); i++)
+      for (int k = i+1; k < alternatives.size(); k++)
+        {
+          Alternative altA = (Alternative)alternatives.get(i);
+          Alternative altB = (Alternative)alternatives.get(k);
+
+          if (Alternative.leq(altB, altA))
+	    User.error(method, "ambiguity because of equivalent patterns in:\n" +
+				altA.printLocated() + "\nand\n" +
+				altB.printLocated());
+
+          if (! (Alternative.leq(altA, altB) || Alternative.disjoint(altA, altB)))
+            return false;
+        }
+
+    return true;
   }
 
   private static boolean[] findUsedPositions(int len, Stack alternatives)

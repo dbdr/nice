@@ -81,6 +81,15 @@ public class Alternative implements Located
     return strictly;
   }
 
+  static boolean disjoint(Alternative a, Alternative b)
+  {
+    for(int i = 0; i<a.patterns.length; i++)
+      if (a.patterns[i].disjoint(b.patterns[i]))
+	return true;
+
+    return false;
+  }
+
   /**
    * Tests the matching of tags against a method alternative.
    */
@@ -118,6 +127,15 @@ public class Alternative implements Located
 	return true;
 
     return false;
+  }
+
+  boolean allAtAny()
+  {
+    for (int i = 0; i<patterns.length; i++)
+      if (! patterns[i].atAny())
+	return false;
+
+    return true;
   }
 
   /****************************************************************

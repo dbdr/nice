@@ -447,6 +447,60 @@ public class Pattern implements Located
     return Typing.testRigidLeq(this.tc, that.tc); 
   }
 
+  /**
+   returns true when the patterns can't match the same values.
+   May return false if it can't be determined easily.
+  */
+  public boolean disjoint(Pattern that)
+  {
+    if (this.atAny() || that.atAny())
+      return false;
+
+    if (this.atNull() ^ that.atNull())
+      return true;
+
+    if (this.atBool() && that.atBool())
+      return this.atTrue() ^ that.atTrue();
+
+    if (this.atReference() && that.atReference())
+      return ! this.atValue.equals(that.atValue);
+
+    if (this.atString() && that.atString())
+      return ! this.atValue.equals(that.atValue);
+    
+    if (this.atIntCompare() && that.atIntCompare())
+      {
+	if (this.atLess() == that.atLess())
+	  return false;
+
+        long val = this.atValue.longValue();
+        if (this.compareKind == LT) val--;
+        if (this.compareKind == GT) val++;
+
+	return ! that.matchesCompareValue(val);
+      }
+
+    if (this.atIntCompare() && that.atIntValue())
+      return ! this.matchesCompareValue(that.atValue.longValue());
+
+    if (this.atIntValue() && that.atIntCompare())
+      return ! that.matchesCompareValue(this.atValue.longValue());
+
+    if (this.atIntValue() && that.atIntValue())
+      return ! this.atValue.equals(that.atValue);    
+
+    if (this.exactlyAt && that.exactlyAt)
+      return this.tc != that.tc;
+
+    if (TypeConstructors.isClass(this.tc) && TypeConstructors.isClass(that.tc))
+      return (! Typing.testRigidLeq(this.tc, that.tc)) &&
+	     (! Typing.testRigidLeq(that.tc, this.tc));
+
+    //TODO: check disjoints for all tc's with a <T | T <: TC_PA, T <: TC_PB> constraint
+
+    return false;
+  }
+
   public boolean matches(TypeConstructor tag)
   {
     if (atAny())

@@ -37,9 +37,12 @@ package nice.lang;
       m = visit(child, successors, id, stack, mark, res);
     else 
       m = cast(mark.get(child));
+/* XXX Use this instead after 0.7.8 is released
+    m = mark.get(child) || visit(child, successors, id, stack, mark, res);
+*/
 
-    if(m<min) 
-      min=m;
+    if (m < min) 
+      min = m;
   });
 
   if(equals(min,mark.get(node)))

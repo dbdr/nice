@@ -774,11 +774,14 @@ public class Pattern implements Located
     TypeSymbol sym = Node.getGlobalTypeScope().lookup(name);
 
     if (sym == null)
-      User.error("Pattern " + name + " of method " + methodName + 
-	     " is not known");
+      // This can happen if the class exists only in a later version
+      // of the JDK.
+      throw new Unknown();
 
     return new Pattern((TypeConstructor) sym, exact);
   }
+
+  public static class Unknown extends RuntimeException {}
 
   /****************************************************************
    * Code generation

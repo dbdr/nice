@@ -58,31 +58,37 @@ public class ImportedAlternative extends Alternative
 
     ArrayList patterns = new ArrayList(5);
 
-    Pattern p;
-    while ((p = Pattern.read(rep, at, fullName)) != null)
-      {
-	if (p.getTC() == bossa.syntax.PrimitiveType.arrayTC)
-	  /* Special treatment for arrays:
-	     they are compiled into Object,
-	     but we want a SpecialArray in the method bytecode type.
-	  */
-	  {
-	    int argnum = patterns.size();
-	    if (method.arg_types[argnum] == Type.pointer_type)
-	      method.arg_types[argnum] = SpecialArray.unknownTypeArray();
-	  }
+    try {
+      Pattern p;
+      while ((p = Pattern.read(rep, at, fullName)) != null)
+        {
+          if (p.getTC() == bossa.syntax.PrimitiveType.arrayTC)
+            /* Special treatment for arrays:
+               they are compiled into Object,
+               but we want a SpecialArray in the method bytecode type.
+            */
+            {
+              int argnum = patterns.size();
+              if (method.arg_types[argnum] == Type.pointer_type)
+                method.arg_types[argnum] = SpecialArray.unknownTypeArray();
+            }
 
-	patterns.add(p);
-      }
-    
-    Alternative alt = 
-      new ImportedAlternative(method.getName(), (Pattern[]) 
-                              patterns.toArray(new Pattern[patterns.size()]),
-                              new QuoteExp(new PrimProcedure(method)),
-                              location);
+          patterns.add(p);
+        }
 
-    alt.add(nice.tools.util.System.split
-            (fullName, MethodDeclaration.methodListSeparator));
+      Alternative alt = 
+        new ImportedAlternative(method.getName(), (Pattern[]) 
+                                patterns.toArray(new Pattern[patterns.size()]),
+                                new QuoteExp(new PrimProcedure(method)),
+                                location);
+
+      alt.add(nice.tools.util.System.split
+              (fullName, MethodDeclaration.methodListSeparator));
+    }
+    catch(Pattern.Unknown ex) {
+      // This can happen if the class exists only in a later version
+      // of the JDK. We just ignore this alternative.
+    }
   }
 
   /**

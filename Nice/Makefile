@@ -7,7 +7,7 @@ MANDIR= ${PREFIX}/share/man/man1
 LISPDIR=${PREFIX}/share/emacs/site-lisp/nice
 
 # Get the version from the debian changelog.
-VERSION = ${shell expr "`head -1 ../debian/changelog`" : '.*(\(.*\))'}
+VERSION = ${shell expr "`head -1 debian/changelog`" : '.*(\(.*\))'}
 
 SHELL = /bin/zsh
 TOP=${PWD}
@@ -27,11 +27,15 @@ NICEC1=${TOP}/bin/nicec ${NICEC_ARGS} --sourcepath="${TOP}/stdlib.new:${TOP}/src
 
 
 
-all: complete
+all: src/nice/tools/compiler.jar compiler2 archive2
 
 stable:   clean bootstrap compiler1 ant testengine archive
 complete: stable   compiler2 archive2
 fixpoint: complete compiler3 archive3
+world:    fixpoint check test
+
+src/nice/tools/compiler.jar:
+	$(MAKE) complete
 
 compiler1: setDate
 	${NICEC}  bossa.syntax

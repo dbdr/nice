@@ -55,3 +55,9 @@ class Container<T> = native nativePkg.Container;
   NonExist NonExist(long) = native new NonExist(long);
   /// package b import a
   {}
+
+/// PASS bug
+  // retyping of constructor should not break usage of static fields/functions
+  String str = String.valueOf(true);
+  /// Toplevel
+  String String(char[]) = native new String(char[]);

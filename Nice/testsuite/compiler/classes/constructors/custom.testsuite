@@ -72,3 +72,11 @@ new Point((double angle, double distance) polarCoordinates)
   /// Toplevel
   new Point2(double angle, double distance) 
     { this(x: distance * cos(angle), y: distance * sin(angle)); }
+
+/// FAIL
+  /// Toplevel
+new /*/// FAIL HERE */ String(int x) = this("xyz");
+
+/// FAIL
+  /// Toplevel
+new /*/// FAIL HERE */ FooBar(int x) = this("xyz");

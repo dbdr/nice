@@ -103,6 +103,10 @@ public abstract class CustomConstructor extends UserOperator
       TypeConstructors.addConstructor(tc, this);
       classe = NiceClass.get(tc);
 
+      if (classe == null)
+        User.error(this, 
+                   "It is impossible to add a constructor to class " + tc);
+
       addConstructorCallSymbol();
 
       // Save the scopes, since we need them later, but they get null'ed.

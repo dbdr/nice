@@ -29,8 +29,8 @@ test_installation()
 {
     if [ ! -r ${NICE} ]; then
 	echo "Nice was not found in ${NICE}"
-	echo "Please move the Nice.jar there"
-	echo "or set the NICE environment variable to the location of the Nice.jar file"
+	echo "Please move the nice.jar file there"
+	echo "or set the NICE environment variable to the location of the nice.jar file"
 	exit 1
     fi
 }
@@ -76,7 +76,7 @@ while true; do
   done
 
 find_home "$scriptName"
-NICEC=${APPHOME}/share/java/Nice.jar
+NICEC=${APPHOME}/share/java/nice.jar
 
 if [ "$EMACS" = t ]; then
   JAVA="${JAVA} -Demacs=true"

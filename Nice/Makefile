@@ -9,7 +9,7 @@ LISPDIR= ${INSTALLDIR}/share/emacs/site-lisp/nice
 
 SHELL = /bin/zsh
 TOP=${PWD}
-NICEJAR=/usr/share/java/Nice.jar
+NICEJAR=/usr/share/java/nice.jar
 
 # Compile with stable version
 JC=javac -classpath "${TOP}/classes:${NICEJAR}" -sourcepath "${TOP}/src" -d "${TOP}/classes" -O -g
@@ -25,7 +25,7 @@ NICEC1=${TOP}/bin/nicec ${NICEC_ARGS} --sourcepath="${TOP}/stdlib:${TOP}/src"
 VERSION = ${shell dpkg-parsechangelog | sed -n 's/^Version: //p'}
 
 
-all: clean bootstrap compiler1 share/java/Nice.jar compiler2 archive
+all: clean bootstrap compiler1 share/java/nice.jar compiler2 archive
 
 compiler1: setDate
 	${NICEC}  bossa.syntax
@@ -35,11 +35,11 @@ compiler2: setDate
 	${NICEC1} -R bossa.syntax
 	${NICEC1} -R -a src/nice/tools/compiler.jar nice.tools.compiler
 
-share/java/Nice.jar archive: src/nice/tools/compiler.jar
+share/java/nice.jar archive: src/nice/tools/compiler.jar
 	mkdir -p share/java
-	cp src/nice/tools/compiler.jar share/java/Nice.jar
-	jar umf src/mainClass share/java/Nice.jar -C classes nice -C classes mlsub -C classes bossa -C classes gnu
-	if [ -r classes/lang/package.nicei ]; then cd classes; jar uf ../share/java/Nice.jar nice/*/package.nicei; fi
+	cp src/nice/tools/compiler.jar share/java/nice.jar
+	jar umf src/mainClass share/java/nice.jar -C classes nice -C classes mlsub -C classes bossa -C classes gnu
+	if [ -r classes/lang/package.nicei ]; then cd classes; jar uf ../share/java/nice.jar nice/*/package.nicei; fi
 
 
 
@@ -50,16 +50,16 @@ deb:
 	@echo Creating Debian package version ${VERSION}
 	env CVSROOT=:pserver:anonymous@cvs.nice.sourceforge.net:/cvsroot/nice cvs-buildpackage -MNice -W/tmp/cvs-build -us -uc -rfakeroot -THEAD -d
 
-dist: share/java/Nice.jar
+dist: share/java/nice.jar
 	# make sure that nicec is executable
 	chmod a+rx bin/nicec
-	tar cf Nice-`date +"%Y.%m.%d"`.tar bin/nicer bin/nicec share/java/Nice.jar lib/emacs/nice-mode.el
+	tar cf Nice-`date +"%Y.%m.%d"`.tar bin/nicer bin/nicec share/java/nice.jar lib/emacs/nice-mode.el
 
-install: share/java/Nice.jar
+install: share/java/nice.jar
 	mkdir -p ${INSTALLDIR}/bin ${INSTALLDIR}/share/java \
                  ${MANDIR} ${LISPDIR} ${DOCDIR}
 	cp bin/nicec ${INSTALLDIR}/bin/
-	cp share/java/Nice.jar ${INSTALLDIR}/share/java/ 
+	cp share/java/nice.jar ${INSTALLDIR}/share/java/ 
 	cp lib/emacs/nice-mode.el ${LISPDIR}
 	./bin/nicec --man > ${MANDIR}/nicec.1
 	groff -mandoc -Thtml ${MANDIR}/nicec.1 > ${DOCDIR}/nicec.html

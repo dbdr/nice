@@ -46,24 +46,26 @@ extends Procedure3 implements Inlineable
   {
     Expression[] args = exp.getArgs();
     CodeAttr code = comp.getCode();
+    boolean needReturn = !(target instanceof IgnoreTarget);
 
     args[0].compile(comp, Target.pushObject);
     boolean bytecodeArray = Tools.monomorphicArray(code.topType());
     args[1].compile(comp, Tools.intTarget);
 
-    Type componentType = type;
-    // Try to get bytecode type information from the target array.
-    if (type == Type.pointer_type)
-      try {
-	componentType = ((ArrayType) args[0].getType()).getComponentType();
-      }
-      catch (ClassCastException ex) {}
+    Type componentType = getComponentType(args[0].getType());
+
     args[2].compile(comp, componentType);
     
+    if (needReturn)
+      code.emitDup(componentType.getSize() > 4 ? 2 : 1, 2);
+
     if (bytecodeArray)
       code.emitArrayStore(componentType);
     else
       code.emitInvokeStatic(reflectSet);
+
+    if (needReturn)
+      target.compileFromStack(comp, componentType);
   }
 
   private static Method reflectSet = 
@@ -71,7 +73,16 @@ extends Procedure3 implements Inlineable
 
   public Type getReturnType (Expression[] args)
   {
-    return Type.void_type;
+    return getComponentType(args[0].getType());
+  }
+
+  private Type getComponentType(Type array)
+  {
+    // Try to get bytecode type information from the target array.
+    if (this.type == Type.pointer_type && array instanceof ArrayType)
+      return ((ArrayType) array).getComponentType();
+
+    return this.type;
   }
 
   // Interpretation

@@ -48,3 +48,21 @@ void foo(Object[] oo)
     (java.lang.Integer.class.getConstructor([String.class]).newInstance(oo));
   assert i.intValue() == 1;
 }
+
+/// PASS
+  int[] arr = [1,2,3];
+  int x = arr[0] = 5;
+  arr[1] = 7;
+  assert x == 5 && arr[0] == 5 && arr[1] == 7; 
+
+/// PASS
+  long[] arr = [1,2,3];
+  long x = arr[0] = 5L;
+  arr[1] = 7L;
+  assert x == 5L && arr[0] == 5L && arr[1] == 7L; 
+
+/// PASS
+  String[] arr = ["abc", "def"];
+  String x = arr[0] = "xyz";
+  arr[1] = "pqr";
+  assert x.equals("xyz") && arr[0].equals("xyz") && arr[1].equals("pqr"); 

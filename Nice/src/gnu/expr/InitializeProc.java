@@ -94,7 +94,13 @@ public class InitializeProc extends ProcedureN implements Inlineable
     for (int i = 0; i < dummyArgs; i++)
       code.emitPushInt(0);
 
-    code.emitInvokeSpecial(constructor);
+    try {
+      code.emitInvokeSpecial(constructor);
+    }
+    catch (VerificationError e) {
+      throw bossa.util.User.error(bossa.util.Location.make(exp), 
+                                  e.getMessage());
+    }
   }
 
   public Type getReturnType (Expression[] args)

@@ -51,7 +51,22 @@ public class Instanceof extends Procedure2 implements Inlineable
 	(exp, "instanceof cannot be used with primitive types");
 
     value.compile(comp, Target.pushObject);
-    code.emitInstanceof(type);
+
+    if (type == nice.tools.code.SpecialArray.wrappedType() &&
+        code.topType().isArray())
+      {
+        /* If we want to test if the value is 'instanceof Array', and 
+           we know statically that it is an array, we just need to make
+           sure it is not null.
+        */
+        code.emitIfNull();
+        code.emitPushBoolean(false);
+        code.emitElse();
+        code.emitPushBoolean(true);
+        code.emitFi();
+      }
+    else
+      code.emitInstanceof(type);
     target.compileFromStack(comp, Type.boolean_type);
   }
 

@@ -19,7 +19,7 @@ foo(/*/// FAIL HERE */ i@int) {}
   foo(t) {}
   foo(/*/// FAIL HERE */n<3) {}
 
-/// PASS bug
+/// PASS
   assert foo(['a']);
   /// Toplevel
   boolean foo(char[?] cbuf);

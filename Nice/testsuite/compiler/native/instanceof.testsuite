@@ -35,3 +35,12 @@
     {}
   else
     throw new Error();
+
+/// PASS
+  assert [] instanceof Array;
+
+  int[] i = [0];
+  assert i instanceof Array;
+
+  List<String> l = [""];
+  assert l instanceof Array;

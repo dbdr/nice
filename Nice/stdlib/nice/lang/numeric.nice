@@ -126,6 +126,20 @@ long `&`(long, long) = inline nice.lang.inline.NumOp("lAnd");
 long `|`(long, long) = inline nice.lang.inline.NumOp("lIOr");
 long `^`(long, long) = inline nice.lang.inline.NumOp("lXOr");
 
+// Shorter-than-int bitwise operations: 
+// we give more precise types than in Java.
+byte `&`(byte, byte) = inline nice.lang.inline.NumOp("iAnd");
+byte `|`(byte, byte) = inline nice.lang.inline.NumOp("iIOr");
+byte `^`(byte, byte) = inline nice.lang.inline.NumOp("iXOr");
+
+short `&`(short, short) = inline nice.lang.inline.NumOp("iAnd");
+short `|`(short, short) = inline nice.lang.inline.NumOp("iIOr");
+short `^`(short, short) = inline nice.lang.inline.NumOp("iXOr");
+
+char `&`(char, char) = inline nice.lang.inline.NumOp("iAnd");
+char `|`(char, char) = inline nice.lang.inline.NumOp("iIOr");
+char `^`(char, char) = inline nice.lang.inline.NumOp("iXOr");
+
 // Accessing individual bits
 boolean get(long x, int bit) = (x & (1 << bit)) != 0;
 boolean get(int  x, int bit) = (x & (1 << bit)) != 0;

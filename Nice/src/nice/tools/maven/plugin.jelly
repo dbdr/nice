@@ -15,7 +15,7 @@
     prereqs="nice:compile">
 
     <!-- Give a warning if sources were not found, to let the user know
-         what's (not) happening. 
+         what's (not) happening.
     -->
     <nice:ifNotNeeded>
       <ant:echo>No Nice source files found in ${mainPkgDir}</ant:echo>
@@ -149,14 +149,14 @@
 
   <goal name="nice:jar-resources"
         description="Copy any resources that must be present in the deployed JAR file">
-        
+
     <j:if test="${!pom.build.resources.isEmpty()}">
       <maven:copy-resources
         resources="${pom.build.resources}"
         todir="${maven.build.dest}"/>
     </j:if>
   </goal>
-  
+
   <define:taglib uri="nice">
     <define:tag name="dependency-handle">
       <!-- XXX Use this tag to allow this plugin to be loaded into another -->
@@ -211,8 +211,10 @@
        true if there are Nice sources present.
   -->
 
-  <j:set var="mainPkgDir" 
-    value="${pom.build.sourceDirectory}/${pom.package.replaceAll('\.', '/')}"/>
+  <j:set var="mainPkgDir" value="${pom.package}" />
+  <util:replace var="mainPkgDir"
+    oldChar="." newChar="/" value="${mainPkgDir}" />
+  <j:set var="mainPkgDir" value="${pom.build.sourceDirectory}/${mainPkgDir}"/>
 
   <util:available file="${mainPkgDir}">
     <ant:fileset id="niceSourceSet" dir="${mainPkgDir}">

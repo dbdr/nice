@@ -1,3 +1,9 @@
+nice (0.9.9-1) unstable; urgency=low
+
+  * New upstream version.
+
+ -- Daniel Bonniot <bonniot@users.sf.net>  Sat,  4 Sep 2004 21:09:53 +0200
+
 nice (0.9.8-3) unstable; urgency=high
 
   * Work-around kaffe's jar tool bug, which creates duplicate entries.

@@ -12,7 +12,7 @@
 
 // File    : JavaMethodDefinition.java
 // Created : Tue Nov 09 11:49:47 1999 by bonniot
-//$Modified: Tue Jun 13 19:40:32 2000 by Daniel Bonniot $
+//$Modified: Wed Jun 14 19:59:59 2000 by Daniel Bonniot $
 
 package bossa.syntax;
 
@@ -183,35 +183,10 @@ public class JavaMethodDefinition extends MethodDefinition
   
   private gnu.bytecode.Type type(LocatedString s)
   {
-    Type res = type(s.toString());
+    Type res = bossa.CodeGen.type(s.toString());
     if(res==null)
       User.error(s, "Unknown java class "+s);
     return res;
-  }
-  
-  private gnu.bytecode.Type type(String s)
-  {
-    if(s.length()==0)
-      return null;
-    
-    if(s.charAt(0)=='[')
-      {
-	Type res = type(s.substring(1));
-	if(res==null)
-	  return null;
-	else
-	  return gnu.bytecode.ArrayType.make(res);
-      }
-    
-    if(s.equals("void")) 	return bossa.SpecialTypes.voidType;
-    if(s.equals("int"))  	return bossa.SpecialTypes.intType;
-    if(s.equals("long")) 	return bossa.SpecialTypes.longType;
-    if(s.equals("boolean")) 	return bossa.SpecialTypes.booleanType;
-    
-    Class clas = JavaClasses.lookupJavaClass(s);
-    if(clas==null)
-      return null;
-    return Type.make(clas);
   }
   
   /** The java class this method is defined in */
@@ -270,7 +245,7 @@ public class JavaMethodDefinition extends MethodDefinition
     // set the fully qualified name of the return type back
     javaTypes.set(0,new LocatedString(javaRetType.getName(),t.location()));
     
-    Type holder = type(className.toString());
+    Type holder = bossa.CodeGen.type(className.toString());
     if(holder == null)
       User.error(this,
 		 "Class " + className + " was not found");
@@ -286,8 +261,8 @@ public class JavaMethodDefinition extends MethodDefinition
     //if(!methodName.equals("<init>"))
     //reflectMethod.return_type = javaRetType;
 
-    if(reflectMethod==null)
-      User.error(this, this+" was not found in "+holder);
+    if(reflectMethod == null)
+      User.error(this, this + " was not found in " + holder);
 
     declaredMethods.put(reflectMethod, Boolean.TRUE);
 

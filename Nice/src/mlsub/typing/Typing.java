@@ -12,7 +12,7 @@
 
 // File    : Typing.java
 // Created : Tue Jul 20 11:57:17 1999 by bonniot
-//$Modified: Tue Jun 13 20:08:26 2000 by Daniel Bonniot $
+//$Modified: Fri Jun 16 11:48:51 2000 by Daniel Bonniot $
 
 package mlsub.typing;
 
@@ -25,7 +25,7 @@ import mlsub.typing.lowlevel.Unsatisfiable;
 /**
  * Static class for comparing types
  */
-abstract public class Typing
+public final class Typing
 {
   /****************************************************************
    * Typing contexts
@@ -119,18 +119,6 @@ abstract public class Typing
     }    
   }
 
-  public static void satisfy()
-    throws TypingEx
-  {
-    if(dbg) Debug.println("SATISFY");
-    try{
-      Engine.satisfy();
-    }
-    catch(Unsatisfiable e){
-      throw new TypingEx("Not satisfiable "+e.getMessage());
-    }    
-  }
-
   public static void createInitialContext()
   {
     try{
@@ -190,6 +178,33 @@ abstract public class Typing
     
     while(i.hasNext())
       leq(t,(TypeConstructor)i.next());
+  }
+  
+  /** Test that t is leq that m's head */
+  public static void leq(TypeConstructor t, Monotype m)
+  throws TypingEx
+  {
+    if(t==null)
+      return;
+    
+    Variance v = t.variance;
+    if(v==null)
+      throw new InternalError("Don't know how to handle this");
+    
+    try{
+      Engine.setKind(m, v);
+    }
+    catch(Unsatisfiable e){
+      throw new TypingEx(t+" < "+m+"'s head");
+    }
+    leq(t, m.getTC());
+  }
+  
+  public static void leq(TypeConstructor[] ts, Monotype[] ms)
+  throws TypingEx
+  {
+    for(int i = 0; i < ts.length; i++)
+      leq(ts[i], ms[i]);
   }
   
   /****************************************************************

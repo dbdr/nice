@@ -12,7 +12,7 @@
 
 // File    : Engine.java
 // Created : Tue Jul 27 15:34:53 1999 by bonniot
-//$Modified: Tue Jun 13 20:06:49 2000 by Daniel Bonniot $
+//$Modified: Fri Jun 16 11:47:44 2000 by Daniel Bonniot $
 
 package mlsub.typing.lowlevel;
 
@@ -29,7 +29,7 @@ public abstract class Engine
 {
   static
   {
-    LowlevelUnsatisfiable.refinedReports=true;
+    LowlevelUnsatisfiable.refinedReports = false;
   }
   
   /**
@@ -70,17 +70,6 @@ public abstract class Engine
 	Engine.Constraint k=(Engine.Constraint)i.next();
 	k.satisfy();
 	k.rigidify();
-      }
-  }
-  
-  public static void satisfy()
-    throws Unsatisfiable
-  {
-    for(Iterator i=constraints.iterator();
-	i.hasNext();)
-      { 
-	Engine.Constraint k=(Engine.Constraint)i.next();
-	k.satisfy();
       }
   }
   
@@ -150,7 +139,7 @@ public abstract class Engine
       leq(e1[i], e2[i]);
   }
       
-  public static void leq(Element e1, Element e2) 
+  public static final void leq(Element e1, Element e2) 
     throws Unsatisfiable
   {
     leq(e1,e2,false);
@@ -164,7 +153,7 @@ public abstract class Engine
    * @exception Unsatisfiable if the constraint is not satisfiable.
    * However this fact may also be discovered later
    */
-  public static void leq(Element e1, Element e2, boolean initial) 
+  public static final void leq(Element e1, Element e2, boolean initial) 
     throws Unsatisfiable
   {
     Kind k1 = e1.getKind(), k2 = e2.getKind();
@@ -602,14 +591,15 @@ public abstract class Engine
     public final void leq(Element e1, Element e2, boolean initial)
       throws Unsatisfiable
     {
-      if(e1.getId()<0 || e1.getId()>=k0.size())
-	Debug.println(e1 + " has invalid index");
-      
-      if(e2.getId()<0 || e2.getId()>=k0.size())
-	Debug.println(e2 + " has invalid index");
-      
       if(dbg)
-	Debug.println(e1+" <: "+e2+" ("+e1.getId()+" <: "+e2.getId()+")");
+	{	  
+	  Debug.println(e1+" <: "+e2+" ("+e1.getId()+" <: "+e2.getId()+")");
+	  if(e1.getId()<0 || e1.getId()>=k0.size())
+	    Debug.println(e1 + " has invalid index");
+      
+	  if(e2.getId()<0 || e2.getId()>=k0.size())
+	    Debug.println(e2 + " has invalid index");
+	}
 
       if(initial)
 	k0.initialLeq(e1.getId(),e2.getId());

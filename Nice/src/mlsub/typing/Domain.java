@@ -12,7 +12,7 @@
 
 // File    : Domain.java
 // Created : Fri Jun 02 16:59:06 2000 by Daniel Bonniot
-//$Modified: Tue Jun 13 16:57:48 2000 by Daniel Bonniot $
+//$Modified: Thu Jun 15 16:25:14 2000 by Daniel Bonniot $
 
 package mlsub.typing;
 
@@ -97,7 +97,7 @@ public class Domain
 
   public String toString()
   {
-    return "Ex "+constraint+monotype.toString();
+    return (constraint==null ? "" : "Ex "+constraint) + monotype.toString();
   }
 
   private Constraint constraint;

@@ -12,7 +12,7 @@
 
 // File    : MethodDefinition.java
 // Created : Thu Jul 01 18:12:46 1999 by bonniot
-//$Modified: Tue Jun 13 18:52:44 2000 by Daniel Bonniot $
+//$Modified: Thu Jun 15 17:41:22 2000 by Daniel Bonniot $
 
 package bossa.syntax;
 
@@ -301,11 +301,14 @@ public class MethodDefinition extends Definition
 
   public String toString()
   {
+    if(getType()==null)
+      return "method "+getName();
+    
     return
       mlsub.typing.Constraint.toString(getType().getConstraint())
       + String.valueOf(getType().codomain())
       + " "
-      + symbol.name.toQuotedString()
+      + getName().toQuotedString()
       + "("
       + Util.map("",", ","",getType().domain())
       + ")"
@@ -334,7 +337,7 @@ public class MethodDefinition extends Definition
     return module.getName().replace('.','$')+'$'+bytecodeName;
   }
 
-  public mlsub.typing.Polytype getType()
+  public final mlsub.typing.Polytype getType()
   {
     return symbol.getType();
   }

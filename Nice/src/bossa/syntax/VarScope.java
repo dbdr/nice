@@ -12,7 +12,7 @@
 
 // File    : VarScope.java
 // Created : Fri Jul 09 11:28:11 1999 by bonniot
-//$Modified: Fri Jun 09 15:14:00 2000 by Daniel Bonniot $
+//$Modified: Fri Jun 16 11:35:53 2000 by Daniel Bonniot $
 
 package bossa.syntax;
 
@@ -21,22 +21,19 @@ import bossa.util.*;
 
 /**
  * A Scope level for variables.
- * Is extended in each node that defined a new scope level.
  */
-class VarScope
+final class VarScope
 {
-  public VarScope(VarScope outer, boolean isStop)
+  public VarScope(VarScope outer)
   {
     this.outer = outer;
     this.defs = new HashMultiTable();
-    this.stop = isStop;
   }
   
   public VarScope(VarScope outer, 
-		  Collection /* of VarSymbol */ defs,
-		  boolean isStop)
+		  Collection /* of VarSymbol */ defs)
   {
-    this(outer, isStop);
+    this(outer);
     addSymbols(defs);
   }
 
@@ -70,66 +67,15 @@ class VarScope
   {
     List res = defs.getAll(i);
     
-    if(outer!=null)
-      if(!stop || res==null)
-	{
-	  if(res==null)
-	    res = new ArrayList();
-	  res.addAll(outer.lookup(i));
-	}
-    
-    if(res==null)
-      res = new LinkedList();
-    return res;
-  }
-
-  /** Do not stop at stops. */
-  public List lookupGlobal(LocatedString i)
-  {
-    List res = defs.getAll(i);
-    
-    if(outer!=null)
-      {
-	if(res==null)
-	  res = new ArrayList();
-	res.addAll(outer.lookupGlobal(i));
-      }
-    
-    if(res==null)
-      res = new LinkedList();
-    return res;
-  }
-
-  public VarSymbol lookupOne(LocatedString s)
-  {
-    Collection i = lookup(s);
-    if(i==null || i.size()==0)
-      return null;
-    if(i.size()>1)
-      User.error(s,s+"'s usage is ambiguous");
-    return (VarSymbol)i.iterator().next();
-  }
-
-  public VarSymbol lookupLast(LocatedString s)
-  {
-    VarSymbol res = (VarSymbol)defs.getLast(s);
     if(res!=null)
       return res;
-    if(outer==null)
-      return null;
-    return outer.lookupLast(s);
+    
+    if(outer!=null)
+      return outer.lookup(i);
+
+    return new LinkedList();
   }
-  
-  public boolean overloaded(LocatedString s)
-  {
-    if(defs.containsKey(s))
-      return defs.elementCount(s)>1 || (outer!=null && outer.lookup(s).size()>0);
-    else if(outer!=null)
-      return outer.overloaded(s);
-    else 
-      return false;
-  }
-	
+
   /**
    * Verifies that a collection of VarSymbol
    * does not contains twice the same identifier
@@ -163,5 +109,4 @@ class VarScope
   
   private VarScope outer;
   private HashMultiTable defs;
-  private boolean stop;
 }

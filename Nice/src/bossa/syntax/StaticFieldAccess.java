@@ -12,7 +12,7 @@
 
 // File    : StaticFieldAccess.java
 // Created : Thu Jul 01 18:12:46 1999 by bonniot
-//$Modified: Fri Jun 09 19:05:03 2000 by Daniel Bonniot $
+//$Modified: Wed Jun 14 19:39:07 2000 by Daniel Bonniot $
 
 package bossa.syntax;
 
@@ -96,7 +96,7 @@ public class StaticFieldAccess extends MethodDefinition
 
     // We put this here, since we need 'module' to be computed
     // since it is used to open the imported packages.
-    this.field=getField(className,fieldName);
+    this.field = getField(className,fieldName);
 
     if(field==null)
       User.error(this,
@@ -113,7 +113,7 @@ public class StaticFieldAccess extends MethodDefinition
 
   java.lang.reflect.Field getField(LocatedString javaClass, String name)
   {
-    Class c = JavaClasses.lookupJavaClass(javaClass.toString());
+    Class c = bossa.CodeGen.lookupJavaClass(javaClass.toString());
 
     if(c==null)
       User.error(javaClass,"Class "+javaClass+" not found");
@@ -121,9 +121,9 @@ public class StaticFieldAccess extends MethodDefinition
     // remembers the fully qualified name
     className.content = c.getName();
     
-    java.lang.reflect.Field[] fields=c.getFields();
+    java.lang.reflect.Field[] fields = c.getFields();
     
-    for(int i=0;i<fields.length;i++)
+    for(int i = 0;i<fields.length;i++)
       if(name.equals(fields[i].getName()))
 	return fields[i];
     

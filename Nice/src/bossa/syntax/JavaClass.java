@@ -12,7 +12,7 @@
 
 // File    : JavaClass.java
 // Created : Wed Feb 02 16:20:12 2000 by Daniel Bonniot
-//$Modified: Tue Jun 13 11:12:41 2000 by Daniel Bonniot $
+//$Modified: Wed Jun 14 19:31:09 2000 by Daniel Bonniot $
 
 package bossa.syntax;
 
@@ -98,7 +98,7 @@ public class JavaClass extends ClassDefinition
     if (javaType == null)
       {
 	java.lang.Class refClass 
-	  = JavaClasses.lookupJavaClass(javaName.toString());
+	  = bossa.CodeGen.lookupJavaClass(javaName.toString());
     
 	if(refClass==null)
 	  User.error(javaName,

@@ -12,7 +12,7 @@
 
 // File    : Node.java
 // Created : Thu Jul 08 10:24:56 1999 by bonniot
-//$Modified: Tue Jun 06 18:49:52 2000 by Daniel Bonniot $
+//$Modified: Wed Jun 14 15:44:17 2000 by Daniel Bonniot $
 
 package bossa.syntax;
 
@@ -40,12 +40,12 @@ abstract public class Node
   Node(List /* of Node */ children, 
        int propagate)
   {
-    this.propagate=propagate;
-    this.children=new ArrayList();
-    this.varSymbols=new ArrayList();
-    this.typeSymbols=new ArrayList();
-    typeMapsNames=new ArrayList();
-    typeMapsSymbols=new ArrayList();
+    this.propagate = propagate;
+    this.children = new ArrayList();
+    this.varSymbols = new ArrayList();
+    this.typeSymbols = new ArrayList();
+    typeMapsNames = new ArrayList();
+    typeMapsSymbols = new ArrayList();
 
     addChildren(children);
   }
@@ -88,19 +88,19 @@ abstract public class Node
   void removeChildren(List c)
   {
     if(c==null) return;
-    for(Iterator i=c.iterator();
+    for(Iterator i = c.iterator();
 	i.hasNext();)
       removeChild((Node) i.next());
   }
 
   /**
    * Always returns the argument (except an empty list for 'null').
-   * This is just a convenience to be able to write 'this.f=addChildren(f)'.
+   * This is just a convenience to be able to write 'this.f = addChildren(f)'.
    */
   List addChildren(List c)
   {
     if(c==null) return new LinkedList();
-    for(Iterator i=c.iterator();
+    for(Iterator i = c.iterator();
 	i.hasNext();)
       addChild((Node) i.next());
     return c;
@@ -139,7 +139,7 @@ abstract public class Node
     if(names.size()!=symbols.size()) 
       throw new Error(symbols.size()+" != "+names.size());
     
-    for(Iterator n=names.iterator();n.hasNext();)
+    for(Iterator n = names.iterator();n.hasNext();)
       typeMapsNames.add(((LocatedString) n.next()).toString());
     typeMapsSymbols.addAll(symbols);
   }
@@ -147,7 +147,7 @@ abstract public class Node
   class Scopes
   {
     Scopes(VarScope v, TypeScope t)
-    { scope=v; typeScope=t; }
+    { scope = v; typeScope = t; }
 
     VarScope scope;
     TypeScope typeScope;
@@ -157,7 +157,7 @@ abstract public class Node
    * Scopes shared by all modules.
    */
 
-  private static final VarScope globalScope=new VarScope(null, true);
+  private static final VarScope globalScope = new VarScope(null);
   public static final VarScope getGlobalScope()
   {
     return globalScope;
@@ -189,44 +189,44 @@ abstract public class Node
   // that really define a new scope
   {
     if(scope!=null)
-      scope=null;
+      scope = null;
     if(this.scope!=null)
       Internal.error("Scope set twice for "+this);
 
-    Scopes res=null;
+    Scopes res = null;
     switch(propagate)
       {
       case none:
       case down: 
-	this.scope=new VarScope(outer,varSymbols, true);
-	this.typeScope=new TypeScope(typeOuter);
-	res=new Scopes(outer,typeOuter);
+	this.scope = new VarScope(outer,varSymbols);
+	this.typeScope = new TypeScope(typeOuter);
+	res = new Scopes(outer,typeOuter);
 	break;
 
       case global:
-	outer=globalScope;
+	outer = globalScope;
 	outer.addSymbols(varSymbols);
-	this.scope=outer;
-	typeOuter=globalTypeScope;
-	this.typeScope=typeOuter;
-	res=new Scopes(outer,typeOuter);
+	this.scope = outer;
+	typeOuter = globalTypeScope;
+	this.typeScope = typeOuter;
+	res = new Scopes(outer,typeOuter);
 	break;
 	
       case upper:
 	if(outer==null)
-	  outer=new VarScope(null, true);
+	  outer = new VarScope(null);
 	outer.addSymbols(varSymbols);
-	this.scope=outer;
+	this.scope = outer;
 	if(typeOuter==null)
-	  typeOuter=new TypeScope(null);
-	this.typeScope=typeOuter;
-	res=new Scopes(outer,typeOuter);
+	  typeOuter = new TypeScope(null);
+	this.typeScope = typeOuter;
+	res = new Scopes(outer,typeOuter);
 	break;
 	
       case forward:
-	this.scope=new VarScope(outer,varSymbols, false);
-	this.typeScope=new TypeScope(typeOuter);
-	res=new Scopes(this.scope,this.typeScope);
+	this.scope = new VarScope(outer,varSymbols);
+	this.typeScope = new TypeScope(typeOuter);
+	res = new Scopes(this.scope,this.typeScope);
 	break;
 
       default:
@@ -247,13 +247,13 @@ abstract public class Node
       }
     
     // builds the scope of the children
-    Scopes current=new Scopes(this.scope,this.typeScope);
-    Iterator i=children.iterator();
+    Scopes current = new Scopes(this.scope,this.typeScope);
+    Iterator i = children.iterator();
     while(i.hasNext())
       {
-	Object d=i.next();
+	Object d = i.next();
 	if(d!=null)
-	  current=((Node)d).buildScope(current.scope,current.typeScope);
+	  current = ((Node)d).buildScope(current.scope,current.typeScope);
       }
     return res;
   }
@@ -284,7 +284,7 @@ abstract public class Node
     
     resolve();
 
-    Iterator i=children.iterator();
+    Iterator i = children.iterator();
     while(i.hasNext())
       ((Node)i.next()).doResolve();
 
@@ -304,7 +304,7 @@ abstract public class Node
   final void doFindJavaClasses()
   {
     findJavaClasses();
-    for(Iterator i=children.iterator();
+    for(Iterator i = children.iterator();
 	i.hasNext();)
       ((Node)i.next()).doFindJavaClasses();
   }
@@ -332,21 +332,21 @@ abstract public class Node
   {
     typecheck();
 
-    Function savedFunction=null;
+    Function savedFunction = null;
     if(this instanceof Function)
       {
 	savedFunction = currentFunction;
 	currentFunction = (Function) this;
       }
     
-    Iterator i=children.iterator();
+    Iterator i = children.iterator();
     while(i.hasNext())
       ((Node)i.next()).doTypecheck();
 
     endTypecheck();
 
     if(savedFunction!=null)
-      currentFunction=savedFunction;
+      currentFunction = savedFunction;
   }
 
   /****************************************************************
@@ -374,7 +374,7 @@ abstract public class Node
   {
     List res = new ArrayList(values.size());
     
-    for(Iterator i=values.iterator();i.hasNext();)
+    for(Iterator i = values.iterator();i.hasNext();)
       res.add(expChild((Expression) i.next()));
     
     return res;

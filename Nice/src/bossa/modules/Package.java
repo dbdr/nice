@@ -12,7 +12,7 @@
 
 // File    : Package.java
 // Created : Wed Oct 13 16:09:47 1999 by bonniot
-//$Modified: Tue Jun 13 19:05:27 2000 by Daniel Bonniot $
+//$Modified: Wed Jun 14 20:28:38 2000 by Daniel Bonniot $
 
 package bossa.modules;
 
@@ -122,13 +122,14 @@ public class Package implements mlsub.compilation.Module
 				    bossa.util.Location.nowhere()));
     
     opens  = new LinkedList();
-    opens.add(this.name);
-    opens.add(new LocatedString("java.lang", bossa.util.Location.nowhere()));
 
     findPackageDirectory();
     if(directory==null && itfFromJar==null)
       User.error(name,"Could not find package "+name);
     //Debug.println("Dir of "+this+" is "+directory.getPath());
+    
+    opens.add(this.name);
+    opens.add(new LocatedString("java.lang", bossa.util.Location.nowhere()));
     
     read(forceReload || compilation.recompileAll);
     

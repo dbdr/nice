@@ -718,8 +718,9 @@ public final class K0 {
     }
     if (x1 == x2) { return; }
     if (C.get(x1, x2)) { return; }
-    C.set(x1, x2);
-    Ct.set(x2, x1);
+    // Modify C and Ct after test for rigid clash
+    // so that the constraint if both x1 and x2 are rigid
+    // makes it unnecessary to mark-backtrack in some cases
     if (isRigid(x1) && isRigid(x2)) {
       if (!R.get(x1, x2)) {
         throw new LowlevelRigidClash(indexToString(x1), indexToString(x2));
@@ -727,6 +728,8 @@ public final class K0 {
         return;
       }
     }
+    C.set(x1, x2);
+    Ct.set(x2, x1);
     if (isRigid(x1)) {
       // !isRigid(x2)
       // exclude unit since unit is not comparable to x1

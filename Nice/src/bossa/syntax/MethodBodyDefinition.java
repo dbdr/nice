@@ -12,7 +12,7 @@
 
 // File    : MethodBodyDefinition.java
 // Created : Thu Jul 01 18:12:46 1999 by bonniot
-//$Modified: Tue Jun 13 19:49:38 2000 by Daniel Bonniot $
+//$Modified: Thu Jun 15 19:10:52 2000 by Daniel Bonniot $
 
 package bossa.syntax;
 
@@ -53,13 +53,13 @@ public class MethodBodyDefinition extends Definition
   {
     super(name,Node.down);
 
-    this.binders=binders; 
+    this.binders = binders; 
 
-    //this.newTypeVars=newTypeVars;
+    //this.newTypeVars = newTypeVars;
 
-    this.formals=formals;
-    this.body=body;
-    this.definition=null;
+    this.formals = formals;
+    this.body = body;
+    this.definition = null;
     
     addChild(this.body);
 
@@ -82,9 +82,9 @@ public class MethodBodyDefinition extends Definition
 			 "Method "+name+" has "+types.length+" parameters");
       }
     
-    Collection res=new ArrayList(names.size());
+    Collection res = new ArrayList(names.size());
     int tn = 0;
-    for(Iterator n=names.iterator();
+    for(Iterator n = names.iterator();
 	n.hasNext();)
       {
 	Pattern p = (Pattern)n.next();
@@ -108,7 +108,7 @@ public class MethodBodyDefinition extends Definition
     if(d==null)
       User.error(this,"Method \""+name+"\" has not been declared");
 
-    this.definition=d;
+    this.definition = d;
     
     // if the method is not a class member,
     // the "this" formal is useless
@@ -134,34 +134,39 @@ public class MethodBodyDefinition extends Definition
   private VarSymbol findSymbol(VarScope scope)
   {
     VarSymbol res;
-    if(!(scope.overloaded(name)))
-      return scope.lookupOne(name);
-
-    Collection symbols=scope.lookup(name);
-    if(symbols.size()==0) return null;
     
-    // TODO
-    for(Iterator i=symbols.iterator();i.hasNext();){
-      VarSymbol s=(VarSymbol)i.next();
+    List symbols = scope.lookup(name);
+    if(symbols.size()==0) return null;
+
+    if(symbols.size()==1)
+      return (VarSymbol) symbols.get(0);
+    
+    for(Iterator i = symbols.iterator(); i.hasNext();){
+      VarSymbol s = (VarSymbol)i.next();
       if(!(s instanceof MethodDefinition.Symbol))
 	i.remove();
       else
 	{
-	  MethodDefinition m=(MethodDefinition)((MethodDefinition.Symbol)s).definition;
-	  if(m instanceof JavaMethodDefinition)
+	  MethodDefinition m = (MethodDefinition)((MethodDefinition.Symbol)s).definition;
+	  if(m instanceof JavaMethodDefinition
 // It doesn't make sense to define a body for a native method, does it ?
+	     || m.getArity() != formals.size()
+	     )
 	    {
 	      i.remove();
 	      continue;
 	    }
 	  
 	  try{
-	    int level = Typing.enter("Trying definition "+m+" for method body "+name);
+	    int level;
+	    if(Debug.overloading)
+	      level = Typing.enter("Trying definition "+m+" for method body "+name);
+	    else
+	      level = Typing.enter();
+	    
 	    try{
-	      Constraint.assert(m.symbol.type.getConstraint());
-	      Typing.in(Pattern.getPolytype(formals),
-			Domain.fromMonotypes(m.getType().domain()));
-	      Typing.implies();
+	      Constraint.assert(m.getType().getConstraint());
+	      Typing.leq(Pattern.getTC(formals), m.getType().domain());
 	    }
 	    finally{
 	      if(Typing.leave()!=level)
@@ -178,14 +183,15 @@ public class MethodBodyDefinition extends Definition
 	}
     }
 
-    if(symbols.size()==1) return (VarSymbol)symbols.iterator().next();
+    if(symbols.size()==1) 
+      return (VarSymbol) symbols.get(0);
 
     if(symbols.size()==0)
       User.error(this,
 		 "No definition of \""+name+"\" is compatible with the patterns");
 
-    String methods="";
-    for(Iterator i=symbols.iterator();i.hasNext();){
+    String methods = "";
+    for(Iterator i = symbols.iterator(); i.hasNext();){
       MethodDefinition m = 
 	((MethodDefinition.Symbol)i.next()).definition;
       methods+=m+" defined "+m.location()+"\n";
@@ -237,7 +243,7 @@ public class MethodBodyDefinition extends Definition
   
   void lateBuildScope()
   {
-    VarSymbol s=findSymbol(scope);
+    VarSymbol s = findSymbol(scope);
 
     if(s==null)
       User.error(this, name+" is not defined");
@@ -292,7 +298,7 @@ public class MethodBodyDefinition extends Definition
   {
     return definition.getType().codomain();
   }
-  
+
   void typecheck()
   {
     lateBuildScope();
@@ -330,8 +336,8 @@ public class MethodBodyDefinition extends Definition
       //Typing.enter(newTypeVars,
       //"Binding-constraint for "+name);
       
-      for(Iterator f=formals.iterator(), 
-	    p=parameters.iterator();
+      for(Iterator f = formals.iterator(), 
+	    p = parameters.iterator();
 	  f.hasNext();)
 	{
 	  Pattern pat = (Pattern)f.next();
@@ -423,7 +429,7 @@ public class MethodBodyDefinition extends Definition
       module.setMainAlternative(lexp.getMainMethod());
 
     // Parameters
-    lexp.min_args=lexp.max_args=parameters.size();
+    lexp.min_args = lexp.max_args = parameters.size();
     Iterator p;
     Monotype[] t;
     int n = 0;
@@ -474,14 +480,14 @@ public class MethodBodyDefinition extends Definition
     gnu.expr.LambdaExp lexp = new gnu.expr.LambdaExp(block);
     
     // Main arguments
-    lexp.min_args=lexp.max_args=1;
-    gnu.expr.Declaration args=lexp.addDeclaration("args");
+    lexp.min_args = lexp.max_args = 1;
+    gnu.expr.Declaration args = lexp.addDeclaration("args");
     args.setParameter(true);
     args.noteValue(null);
     args.setType(gnu.bytecode.ArrayType.make(Type.string_type));
 
     // Call arguments
-    gnu.expr.Expression[] eVal=new gnu.expr.Expression[1];
+    gnu.expr.Expression[] eVal = new gnu.expr.Expression[1];
     eVal[0]= new gnu.expr.ReferenceExp("args",args);
 
     block.setBody

@@ -12,7 +12,7 @@
 
 // File    : CallExp.java
 // Created : Mon Jul 05 16:27:27 1999 by bonniot
-//$Modified: Wed Jun 14 15:17:37 2000 by Daniel Bonniot $
+//$Modified: Thu Jun 15 17:32:52 2000 by Daniel Bonniot $
 
 package bossa.syntax;
 
@@ -169,8 +169,9 @@ public class CallExp extends Expression
       throw new ReportErrorEx("Not a function");
 
     Constraint cst = funt.getConstraint();
-    boolean doEnter = true; //Constraint.hasBinders(cst);
-    if(doEnter) Typing.enter("call ?");
+    final boolean doEnter = Constraint.hasBinders(cst);
+    
+    if(doEnter) Typing.enter();
     
     try
       {
@@ -189,10 +190,8 @@ public class CallExp extends Expression
     finally{
       if(doEnter) 
 	Typing.leave();
-      else 
-	Typing.implies();
     }
-    
+
     //computes the resulting type
     cst = Constraint.and
       (Polytype.getConstraint(parameters),
@@ -201,6 +200,10 @@ public class CallExp extends Expression
     
     return new Polytype(cst, codom);
   }
+
+  /****************************************************************
+   * Overloading resolution
+   ****************************************************************/
 
   public Expression noOverloading()
   {
@@ -334,8 +337,7 @@ public class CallExp extends Expression
 	    params[i] = ((gnu.expr.PrimProcedure) q.getValue()).wrapInLambda();
 	}
     
-    return new gnu.expr.ApplyExp(fun.generateCode(),
-				 params);
+    return new gnu.expr.ApplyExp(fun.generateCode(), params);
   }
   
   gnu.expr.Expression compileAssign(gnu.expr.Expression value)

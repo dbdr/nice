@@ -12,7 +12,7 @@
 
 // File    : parser.jj
 // Created : Thu Jul 01 10:27:05 1999 by bonniot
-//$Modified: Wed Jun 14 12:14:46 2000 by Daniel Bonniot $
+//$Modified: Wed Jun 14 20:28:13 2000 by Daniel Bonniot $
 // Description : Parseur JavaCC pour Bossa
 //   Tokens based on the Jazz parser
 
@@ -1182,7 +1182,7 @@ LocatedString readImports(List imports, List opens):
   (
    "import" name=doted_string() 
 
-   ( ".*" { opens.add(0,name); }
+   ( ".*" { opens.add(name); }
    | { imports.add(name); }
    )
    ";"

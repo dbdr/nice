@@ -346,6 +346,8 @@ class WeakHashMap<K,V> extends AbstractMap<K,V> = native java.util.WeakHashMap;
 <T,U,V | U <: T, V <: T> boolean Arrays_equals(U[], V[]) = 
   native boolean Arrays.equals(Object[],Object[]);
 
+<T> List<T> asList(T[]) = native List Arrays.asList(Object[]);
+
 /* StringTokenizer inherits from Enumeration, which makes it 
    wrongly parameterized. We ignore that inheritance.
 */

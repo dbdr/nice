@@ -168,6 +168,7 @@ final public class BitMatrix implements Cloneable {
    **/
   public void closure() {
     // Warshall algorithm
+    int size = this.size;
     for (int k = 0; k < size; k++) {
       BitVector row_k = rows[k];
       if (row_k != null) {

@@ -154,7 +154,7 @@ public class BitVector implements Cloneable, java.io.Serializable {
 
     int n = subscript(bit);     /* always positive */
     
-    if (n < length())
+    if (n < bits1.length)
       return (bits1[n] & (1L << (bit & MASK))) != 0L;
     return false;
   }

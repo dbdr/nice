@@ -12,7 +12,7 @@
 
 // File    : MonoSymbol.java
 // Created : Fri Jul 16 17:10:53 1999 by bonniot
-//$Modified: Tue Mar 14 17:18:22 2000 by Daniel Bonniot $
+//$Modified: Thu May 11 12:03:42 2000 by Daniel Bonniot $
 
 package bossa.syntax;
 

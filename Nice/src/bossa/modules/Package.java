@@ -12,7 +12,7 @@
 
 // File    : Package.java
 // Created : Wed Oct 13 16:09:47 1999 by bonniot
-//$Modified: Thu May 04 17:34:24 2000 by Daniel Bonniot $
+//$Modified: Mon May 15 18:08:56 2000 by Daniel Bonniot $
 
 package bossa.modules;
 
@@ -110,7 +110,7 @@ public class Package implements mlsub.compilation.Module
 
     imports = new LinkedList();
     
-    if(!name.toString().equals("nice.lang"))
+    if(!name.toString().equals("nice.lang") && !Debug.ignorePrelude)
       imports.add(new LocatedString("nice.lang", 
 				    bossa.util.Location.nowhere()));
     
@@ -205,8 +205,13 @@ public class Package implements mlsub.compilation.Module
     
     try{
       Reader reader = new BufferedReader(new FileReader(sourceFile));
-      bossa.parser.Loader.open(reader, sourceFile.getName(),
-			       definitions, imports, opens);
+      LocatedString pkgName = 
+	bossa.parser.Loader.open(reader, sourceFile.getName(),
+				 definitions, imports, opens);
+      if(pkgName!=null && !pkgName.equals(this.name))
+	User.error(pkgName,
+		   sourceFile+" declares belonging to package "+pkgName+
+		   ", but it was found in package "+name);
     }
     catch(FileNotFoundException e){
       User.error(sourceFile.getName()+" of package "+name+" could not be found");
@@ -362,13 +367,17 @@ public class Package implements mlsub.compilation.Module
   
   private void saveInterface()
   {
-    if(!sourcesRead)
+    // do not save the interface if a Jar is produced for this package
+    // because it's not supposed to be a library,
+    // and it produces a warning! (interface, but no bytecode)
+    if(!sourcesRead || jar!=null)
       return;
 
     try{
       PrintWriter f=new PrintWriter
 	(new BufferedWriter(new FileWriter(new File(directory,"package.nicei"))));
-
+      f.print("package "+name+";\n\n");
+      
       for(Iterator i = getImports().iterator(); i.hasNext();)
 	{
 	  Package m = (Package) i.next();

@@ -235,7 +235,7 @@ public final class K0 {
     StringBuffer sb = new StringBuffer();
     Separator sep = new Separator(", ");
     int nvars = 0;
-    for (int x = m0; x < n; x++) {
+    for (int x = 0; x < n; x++) {
       if (component.get(x)) {
         sb.append(sep).append(indexToString(x));
         if (isRigid(x)) {
@@ -254,7 +254,7 @@ public final class K0 {
     // enumerate the (x, y) where x < y and at least one of x or y is >= m0
     for (int x = 0; x < n; x++) {
       if (component.get(x)) {
-        for (int y = (x < m0 ? m0 : x+1); y < n; y++) {
+        for (int y = (x < m0 ? x+1 /*m0*/ : x+1); y < n; y++) {
           if (component.get(y)) {
             if (C.get(y, x)) {
               sb.append(sep).append(ineqToString(y, x));
@@ -886,7 +886,7 @@ public final class K0 {
       }
     } else {
       if(debugK0){
-	S.dbg.println("Reducing domain of "+x);
+	S.dbg.println("Reducing domain of "+indexToString(x));
 	S.dbg.println("from "+domains.getDomain(x));
 	S.dbg.println("with "+set);
       }

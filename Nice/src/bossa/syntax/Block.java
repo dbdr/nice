@@ -12,7 +12,7 @@
 
 // File    : Block.java
 // Created : Wed Jul 07 17:42:15 1999 by bonniot
-//$Modified: Tue Mar 14 17:22:21 2000 by Daniel Bonniot $
+//$Modified: Fri May 12 18:58:03 2000 by Daniel Bonniot $
 // Description : A block : a list of statements with local variables
 
 package bossa.syntax;
@@ -26,19 +26,20 @@ public class Block extends Statement
   {
     super(Node.down);
     this.statements=addChildren(cutInBlocks(statements));
-    addChildren(locals);
+    //addChildren(locals);
   }
 
   public static class LocalDeclaration extends Statement
   {
     public LocalDeclaration(LocatedString name, Monotype type, Expression value)
     {
-      super(Node.down);
+      super(Node.forward);
       this.left=new MonoSymbol(name,type);
-      addChild(this.left);
+      //addChild(this.left);
       
       if(value!=null)
-	this.value=expChild(value);
+	//this.value=expChild(value);
+	this.value = new ExpressionRef(value);
     }
     
     public gnu.expr.Expression generateCode()
@@ -224,9 +225,11 @@ public class Block extends Statement
       eVal[0] = local.left.type.defaultValue();
     else
       eVal[0] = local.value.generateCode();
-    local.left.setDeclaration
-      (res.addDeclaration(local.left.name.toString(),
-			  local.left.type.getJavaType()));
+    gnu.expr.Declaration decl = 
+      res.addDeclaration(local.left.name.toString(),
+			 local.left.type.getJavaType());
+    decl.noteValue(null);
+    local.left.setDeclaration(decl);
     
     res.setBody(addLocals(vars,body));
     res.setLine(local.left.name.location().getLine());

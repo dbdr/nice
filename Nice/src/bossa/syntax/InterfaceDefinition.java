@@ -12,7 +12,7 @@
 
 // File    : InterfaceDefinition.java
 // Created : Thu Jul 01 17:00:14 1999 by bonniot
-//$Modified: Mon Mar 13 17:36:55 2000 by Daniel Bonniot $
+//$Modified: Tue May 16 15:43:46 2000 by Daniel Bonniot $
 
 package bossa.syntax;
 

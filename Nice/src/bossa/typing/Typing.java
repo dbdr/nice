@@ -12,7 +12,7 @@
 
 // File    : Typing.java
 // Created : Tue Jul 20 11:57:17 1999 by bonniot
-//$Modified: Wed Apr 05 16:53:59 2000 by Daniel Bonniot $
+//$Modified: Tue May 16 17:11:57 2000 by Daniel Bonniot $
 
 package bossa.typing;
 
@@ -431,8 +431,6 @@ abstract public class Typing
 	}
       }
     catch(TypingEx e){
-      // There used to be a Engine.enter() here
-
       // There is no solution
       return new LinkedList();
     }
@@ -471,6 +469,8 @@ abstract public class Typing
 		  Engine.forceKind(tags[minFloating],c.associatedKind);
 		else
 		  Engine.forceKind(tags[minFloating],c);
+
+		// recursive call
 		setFloatingKinds(tags,minFloating+1,res);
 		tags[minFloating].setKind(null);
 	    }
@@ -526,23 +526,22 @@ abstract public class Typing
 	    k.reduceDomainToConcrete(varTC);
 	  }
 	  catch(Unsatisfiable e){
+	    Debug.println(e+"");
+	    
 	    // tuples is empty here
 	    return tuples;
 	  }
 	}
     
-      tuples.add(new TypeConstructor[tags.length]);
-    
       Object[] a = kinds.toArray();
       Engine.Constraint[] pKinds = new Engine.Constraint[a.length];
       System.arraycopy(a,0,pKinds,0,a.length);
-    
+      
       a = observers.toArray();
       bossa.engine.BitVector[] pObs = new bossa.engine.BitVector[a.length];
       System.arraycopy(a,0,pObs,0,a.length);
-    
+      
       enumerateInConstraints(pKinds,pObs,tuples,tags.length);
-    
     }
     finally{
       Engine.backtrack();
@@ -555,7 +554,7 @@ abstract public class Typing
     (Engine.Constraint[] kinds,
      bossa.engine.BitVector[] observers,
      final List tuples,
-     int width)
+     final int width)
   {
     final boolean[] first=new boolean[1]; /* using final boolean[] 
 					     is a trick to access it 
@@ -563,7 +562,7 @@ abstract public class Typing
     for(int act=0;act<kinds.length;act++)
       {
 	first[0]=true;
-	final int ancientSize=tuples.size();
+	final int ancientSize=(tuples.size()==0 ? 1 : tuples.size());
 	
 	final bossa.engine.BitVector obs = observers[act];
 	final bossa.engine.Engine.Constraint kind = kinds[act];
@@ -575,7 +574,11 @@ abstract public class Typing
 	       public void handle()
 		 {
 		   if(first[0])
-		     first[0]=false;
+		     {
+		       first[0]=false;
+		       if(tuples.size()==0)
+			 tuples.add(new TypeConstructor[width]);
+		     }
 		   else
 		     // copy the ancientSize first elements at the end
 		     {

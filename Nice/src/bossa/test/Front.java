@@ -12,7 +12,7 @@
 
 // File    : Front.java
 // Created : Thu Jul 01 15:11:18 1999 by bonniot
-//$Modified: Thu May 04 12:28:02 2000 by Daniel Bonniot $
+//$Modified: Wed May 10 15:24:34 2000 by Daniel Bonniot $
 
 package bossa.test;
 
@@ -62,7 +62,7 @@ public class Front
     bossa.modules.Compilation compilation = new bossa.modules.Compilation();
     
     bossa.modules.Package p;
-    if(!file.equals("nice.lang"))
+    if(!file.equals("nice.lang") && !bossa.util.Debug.ignorePrelude)
       Package.make("nice.lang",compilation,false);
     p = Package.make(file,compilation,true);
     

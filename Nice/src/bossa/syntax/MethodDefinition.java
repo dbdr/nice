@@ -12,7 +12,7 @@
 
 // File    : MethodDefinition.java
 // Created : Thu Jul 01 18:12:46 1999 by bonniot
-//$Modified: Thu May 04 15:28:04 2000 by Daniel Bonniot $
+//$Modified: Tue May 16 18:15:39 2000 by Daniel Bonniot $
 
 package bossa.syntax;
 
@@ -54,9 +54,37 @@ public class MethodDefinition extends Definition
     // if it is a class method, there is an implicit "this" argument
     if(c!=null)
       {
-	Polytype t = c.getType().cloneType();
-	constraint = Constraint.and(constraint, t.getConstraint());
-	params.add(t.getMonotype());
+	Polytype classType = c.getType().cloneType();
+	constraint = Constraint.and(constraint, classType.getConstraint());
+
+	Monotype thisType;
+	if(returnType.containsAlike() || Monotype.containsAlike(parameters))
+	  {
+	    TypeConstructor alikeTC = 
+	      new TypeConstructor(c.getName(), c.tc.variance);
+	    alikeTC.preventResolving();
+	    
+	    constraint.addBinder(alikeTC);
+	    // added in front. Important for rebinding in method alternatives
+
+	    AtomicConstraint atom;
+	    if(c.getAssociatedInterface()!=null)
+	      atom = new ImplementsCst(alikeTC, c.getAssociatedInterface());
+	    else
+	      atom = new TypeConstructorLeqCst(alikeTC, c.tc);
+	    constraint.addAtom(atom);
+
+	    thisType = new MonotypeConstructor(alikeTC, classType.getMonotype().getTP(), location());
+
+	    Map map = new HashMap();
+	    map.put(Alike.id, alikeTC);
+	    returnType = returnType.substitute(map);
+	    parameters = Monotype.substitute(map, parameters);
+	  }
+	else
+	  thisType = classType.getMonotype();
+	
+	params.add(thisType);
       }
     
     params.addAll(parameters);
@@ -263,14 +291,13 @@ public class MethodDefinition extends Definition
   public String toString()
   {
     return
-      module+" "+
       getType().getConstraint().toString()
       + String.valueOf(getType().codomain())
       + " "
       + symbol.name.toQuotedString()
       + "("
       + Util.map("",", ","",getType().domain())
-      + ");\n"
+      + ")"
       ;
   }
 
@@ -293,7 +320,7 @@ public class MethodDefinition extends Definition
   
   public String getFullName()
   {
-    return module.getName().replace('.','$')+"$"+bytecodeName;
+    return module.getName().replace('.','$')+'$'+bytecodeName;
   }
 
   public Polytype getType()

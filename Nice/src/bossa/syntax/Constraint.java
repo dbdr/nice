@@ -12,7 +12,7 @@
 
 // File    : Constraint.java
 // Created : Fri Jul 02 17:51:35 1999 by bonniot
-//$Modified: Tue May 02 12:40:43 2000 by Daniel Bonniot $
+//$Modified: Thu May 11 11:08:31 2000 by Daniel Bonniot $
 
 package bossa.syntax;
 
@@ -233,7 +233,7 @@ public class Constraint extends Node
   {
     if(!binders.contains(s))
       {
-	binders.add(s);
+	binders.add(0, s); // MethodDefinition assumes it is added first. 
 	addTypeSymbol(s);
       }
   }

@@ -12,7 +12,7 @@
 
 // File    : FunExp.java
 // Created : Mon Jul 12 15:09:50 1999 by bonniot
-//$Modified: Tue Feb 29 19:24:46 2000 by Daniel Bonniot $
+//$Modified: Fri May 12 18:16:58 2000 by Daniel Bonniot $
 // Description : A functional expression
 
 package bossa.syntax;
@@ -111,7 +111,8 @@ public class FunExp extends Expression implements Function
 			     gnu.bytecode.Type.pointer_type
 			     );
 
-	decl.setParameter(true);	
+	decl.setParameter(true);
+	decl.noteValue(null);
 	s.setDeclaration(decl);
       }
     

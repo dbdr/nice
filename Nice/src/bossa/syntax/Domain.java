@@ -12,7 +12,7 @@
 
 // File    : Domain.java
 // Created : Sat Jul 24 19:10:04 1999 by bonniot
-//$Modified: Tue Feb 15 22:14:43 2000 by Daniel Bonniot $
+//$Modified: Tue May 16 15:09:23 2000 by Daniel Bonniot $
 
 package bossa.syntax;
 
@@ -65,7 +65,6 @@ public class Domain
     return monotype;
   }
   
-  // TODO: make better
   public final static Domain bot = null;
   
   static Domain bottom()
@@ -119,10 +118,14 @@ public class Domain
 
   public String toString()
   {
+    String cst = String.valueOf(constraint);
+    if(cst.length()>0)
+      cst = "Ex "+cst+" ";
+    
     if(monotypes!=null)
-      return "Ex "+constraint+" "+Util.map("(",",",")",monotypes);
+      return cst+Util.map("(",",",")",monotypes);
     else
-      return "Ex "+constraint+" "+monotype;
+      return cst+monotype;
   }
 
   static List fromMonotypes(Collection monotypes)

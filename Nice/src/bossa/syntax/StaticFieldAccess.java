@@ -12,7 +12,7 @@
 
 // File    : StaticFieldAccess.java
 // Created : Thu Jul 01 18:12:46 1999 by bonniot
-//$Modified: Sat May 06 14:50:55 2000 by Daniel Bonniot $
+//$Modified: Wed May 10 15:06:58 2000 by Daniel Bonniot $
 
 package bossa.syntax;
 

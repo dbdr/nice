@@ -12,7 +12,7 @@
 
 // File    : AssignExp.java
 // Created : Mon Jul 05 15:49:27 1999 by bonniot
-//$Modified: Tue Mar 14 14:09:18 2000 by Daniel Bonniot $
+//$Modified: Fri May 12 18:11:36 2000 by Daniel Bonniot $
 
 package bossa.syntax;
 
@@ -81,7 +81,8 @@ public class AssignExp extends Expression
     let.outer=Statement.currentScopeExp;
     
     gnu.expr.Declaration tmp = let.addDeclaration("tmp",val[0].getType());
-    tmp.setCanRead(true);    
+    tmp.setCanRead(true);
+    tmp.noteValue(null);
     gnu.expr.Expression tmpExp = new gnu.expr.ReferenceExp(tmp);
 
     gnu.expr.Expression[] exps = new gnu.expr.Expression[2];

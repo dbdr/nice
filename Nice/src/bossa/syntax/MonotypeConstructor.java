@@ -12,7 +12,7 @@
 
 // File    : MonotypeConstructor.java
 // Created : Thu Jul 22 09:15:17 1999 by bonniot
-//$Modified: Mon Apr 03 16:23:13 2000 by Daniel Bonniot $
+//$Modified: Tue May 16 15:24:27 2000 by Daniel Bonniot $
 
 package bossa.syntax;
 
@@ -38,7 +38,7 @@ public class MonotypeConstructor extends Monotype
 			     Location loc)
   {
     if(tc==null)
-      Internal.error("Null tc in MonotypeConstructor");
+      Internal.error(loc, "Null tc in MonotypeConstructor");
     this.tc=tc;
     if(parameters==null)
       this.parameters=new TypeParameters(null);
@@ -75,6 +75,11 @@ public class MonotypeConstructor extends Monotype
        loc);
   }
 
+  boolean containsAlike()
+  {
+    return Monotype.containsAlike(parameters.content);
+  }
+  
   public TypeConstructor getTC()
   {
     return tc;
@@ -94,6 +99,8 @@ public class MonotypeConstructor extends Monotype
 		 "Class "+tc+" has "+
 		 (arity==0 ? "no" : ""+arity)+
 		 " type parameter"+(arity>1 ? "s" : ""));
+
+    Monotype.typecheck(parameters.content);
   }
   
   /****************************************************************
@@ -148,6 +155,15 @@ public class MonotypeConstructor extends Monotype
       return loc;
   }
 
+  public boolean equals(Object o)
+  {
+    if(!(o instanceof MonotypeConstructor))
+      return false;
+    MonotypeConstructor that = (MonotypeConstructor) o;
+    
+    return tc.equals(that.tc) && parameters.equals(that.parameters);
+  }
+  
   public String toString()
   {
     return ""+tc+parameters;

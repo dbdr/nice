@@ -12,9 +12,9 @@
 
 // File    : compiler.nice
 // Created : Sat Feb 19 16:21:04 2000 by Daniel Bonniot
-//$Modified: Thu May 04 14:36:48 2000 by Daniel Bonniot $
+//$Modified: Mon May 15 18:31:20 2000 by Daniel Bonniot $
 
-package nice.tools;
+package bossa.tools;
 
 /**
  * Bossa compiler main file.
@@ -75,7 +75,7 @@ main(args)
     }
   String packageName = rest.get(0);
 
-  //println("Bossa compiler");
+  //println("Nice compiler");
 
   bossa.modules.Compilation compilation = 
     make(packageName, ddoLink, recompileCL, recAll);

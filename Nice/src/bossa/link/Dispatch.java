@@ -12,7 +12,7 @@
 
 // File    : Dispatch.java
 // Created : Mon Nov 15 10:36:41 1999 by bonniot
-//$Modified: Sat May 06 11:56:23 2000 by Daniel Bonniot $
+//$Modified: Tue May 16 17:11:48 2000 by Daniel Bonniot $
 
 package bossa.link;
 
@@ -73,30 +73,30 @@ public class Dispatch
     
     Stack sortedAlternatives = sort(alternatives);
     
-    if(Debug.linkTests)
-      {
-	Debug.print("\nLink test for "+m);
-	for(Iterator i=sortedAlternatives.iterator();
-	    i.hasNext();)
-	  Debug.println("Alternative: "+i.next().toString());
-      }
+    if(!(trivialTestOK(sortedAlternatives)))
+      test(m, sortedAlternatives);
     
-    Domain domain = m.getType().getDomain();
-    
-    List multitags = bossa.typing.Typing.enumerate(domain);
-    
-    for(Iterator i=multitags.iterator();
-	i.hasNext();)
-      {
-	TypeConstructor[] tags = (TypeConstructor[]) i.next();
-	
-	test(m,tags,sortedAlternatives);
-      }
-
     if(Debug.codeGeneration)
       Debug.println("Generating dispatch function for "+m);
     
     compile(m,sortedAlternatives,module);
+  }
+
+  private static boolean trivialTestOK(Stack alternatives)
+  {
+    // return true iff
+    //   there is only one alternative which does not constrain its arguments
+    if(alternatives.size()!=1)
+      return false;
+    
+    Alternative a = (Alternative) alternatives.peek();
+    for(Iterator i = a.patterns.iterator(); i.hasNext();)
+      {
+	Domain d = (Domain) i.next();
+	if(d!=Domain.bot)
+	  return false;
+      }
+    return true;
   }
 
   /**
@@ -142,13 +142,40 @@ public class Dispatch
 	i.hasNext();)
       {
 	Alternative daughter = (Alternative) i.next();
-	if(daughter!=a && daughter.mark==Alternative.UNVISITED && Alternative.leq(daughter,a))
+	if(daughter!=a 
+	   && daughter.mark==Alternative.UNVISITED 
+	   && Alternative.leq(daughter,a))
 	  visit(daughter,alternatives,sortedAlternatives);
       }
     a.mark=Alternative.VISITED;
     sortedAlternatives.push(a);
   }
+
+  private static void test(MethodDefinition method,
+	    final Stack sortedAlternatives)
+  {
+    if(Debug.linkTests)
+      {
+	Debug.print("\nLink test for "+method);
+	for(Iterator i=sortedAlternatives.iterator();
+	    i.hasNext();)
+	  Debug.println("Alternative: "+i.next().toString());
+      }
     
+
+    Domain domain = method.getType().getDomain();
+    
+    List multitags = bossa.typing.Typing.enumerate(domain);
+
+    for(Iterator i=multitags.iterator();
+	i.hasNext();)
+      {
+	TypeConstructor[] tags = (TypeConstructor[]) i.next();
+	
+	test(method,tags,sortedAlternatives);
+      }
+  }
+  
   /**
    * Tests that the 'tags' tuple has a best-match in alternatives
    *
@@ -156,10 +183,11 @@ public class Dispatch
    * @param tags a tuple of TypeConstructors
    * @param alternatives a list of Alternatives
    */
-  private static void test(MethodDefinition method, TypeConstructor[] tags, final Stack sortedAlternatives)
+  private static void test(MethodDefinition method, TypeConstructor[] tags, 
+			   final Stack sortedAlternatives)
   {
-    //if(Debug.linkTests)
-    //Debug.println(Util.map("Multitag: ",", ","",tags));
+    if(Debug.linkTests)
+      Debug.println(Util.map("Multitag: ",", ","",tags));
 
     // Tests that a match exists, and that the first match is a "best-match"
 
@@ -177,7 +205,7 @@ public class Dispatch
 	      User.error(method,
 			 "Ambiguity for method "+method+
 			 "For parameters of type "+Util.map("(",", ",")",tags)+
-			 "\neither "+first+" or "+a+" match");
+			 "\nboth "+first+" and "+a+" match");
       }
     if(first==null)
       {

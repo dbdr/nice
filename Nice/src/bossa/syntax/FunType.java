@@ -12,7 +12,7 @@
 
 // File    : FunType.java
 // Created : Fri Jul 02 17:41:24 1999 by bonniot
-//$Modified: Tue Feb 15 19:52:19 2000 by Daniel Bonniot $
+//$Modified: Tue May 16 15:17:47 2000 by Daniel Bonniot $
 
 package bossa.syntax;
 
@@ -59,6 +59,12 @@ public class FunType extends Monotype
   public Monotype resolve(TypeScope typeScope)
   {
     in=Monotype.resolve(typeScope,in);
+    if(out==null)
+      {
+	Debug.println(in+"");
+	User.error(this, this+" ");
+      }
+    
     out=out.resolve(typeScope);
     return this;
   }
@@ -68,6 +74,11 @@ public class FunType extends Monotype
     return new FunType(Monotype.substitute(map,in),out.substitute(map));
   }
 
+  boolean containsAlike()
+  {
+    return Monotype.containsAlike(in) || out.containsAlike();
+  }
+  
   /****************************************************************
    * Typechecking
    ****************************************************************/
@@ -117,6 +128,15 @@ public class FunType extends Monotype
     return Util.map("(",", ",")",true,in)+"->"+out.toStringExtern();
   }
 
+  public boolean equals(Object o)
+  {
+    if(!(o instanceof FunType))
+      return false;
+    FunType that = (FunType) o;
+    
+    return out.equals(that.out) && in.equals(that.in);
+  }
+  
   private List in;
   private Monotype out;
 }

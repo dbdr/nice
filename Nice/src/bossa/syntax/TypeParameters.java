@@ -12,7 +12,7 @@
 
 // File    : TypeParameters.java
 // Created : Mon Jul 12 17:51:12 1999 by bonniot
-//$Modified: Mon Apr 03 16:23:36 2000 by Daniel Bonniot $
+//$Modified: Thu May 11 12:25:38 2000 by Daniel Bonniot $
 
 package bossa.syntax;
 
@@ -78,6 +78,11 @@ public class TypeParameters
   public Iterator iterator()
   {
     return content.iterator();
+  }
+
+  public boolean equals(TypeParameters that)
+  {
+    return content.equals(that.content);
   }
   
   public List /* of Monotype */ content;

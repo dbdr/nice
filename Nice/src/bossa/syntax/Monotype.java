@@ -12,7 +12,7 @@
 
 // File    : Monotype.java
 // Created : Thu Jul 01 19:28:28 1999 by bonniot
-//$Modified: Tue Mar 14 14:25:17 2000 by Daniel Bonniot $
+//$Modified: Thu May 11 11:27:51 2000 by Daniel Bonniot $
 // Description : Abstract syntactic type, without constraint
 
 package bossa.syntax;
@@ -74,6 +74,17 @@ abstract public class Monotype
     return false;
   }
   
+  /** @return true if "alike" appears inside this monotype. */
+  abstract boolean containsAlike();
+  
+  final static boolean containsAlike(List monotypes)
+  {
+    for(Iterator i = monotypes.iterator(); i.hasNext();)
+      if(((Monotype) i.next()).containsAlike())
+	return true;
+    return false;
+  }
+  
   /**************************************************************
    * Scoping
    **************************************************************/
@@ -102,7 +113,7 @@ abstract public class Monotype
   
   abstract void typecheck();
   
-  final void typecheck(List monotypes)
+  final static void typecheck(List monotypes)
   {
     for(Iterator i=monotypes.iterator(); i.hasNext();)
       ((Monotype) i.next()).typecheck();

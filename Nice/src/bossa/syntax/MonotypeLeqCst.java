@@ -12,7 +12,7 @@
 
 // File    : MonotypeLeqCst.java
 // Created : Fri Jul 23 19:26:17 1999 by bonniot
-//$Modified: Wed Aug 18 13:29:52 1999 by bonniot $
+//$Modified: Thu May 11 13:45:25 2000 by Daniel Bonniot $
 
 package bossa.syntax;
 
@@ -40,8 +40,17 @@ public class MonotypeLeqCst extends AtomicConstraint
     
     for(Iterator i1=c1.iterator(),i2=c2.iterator();
 	i1.hasNext();)
-      a.add(new MonotypeLeqCst((Monotype) i1.next(),
-			       (Monotype) i2.next()));
+      {
+	Monotype m1 = (Monotype) i1.next(),
+	  m2 = (Monotype) i2.next();
+
+	// optimization: the constraint m<=m is useless since trivially true
+	if(m1.equals(m2))
+	  continue;
+	//Debug.println(m1+"!="+m2);
+	
+	a.add(new MonotypeLeqCst(m1,m2));
+      }
     
     return new Constraint(new ArrayList(0),a);
   }

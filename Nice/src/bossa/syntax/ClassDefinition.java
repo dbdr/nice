@@ -12,7 +12,7 @@
 
 // File    : ClassDefinition.java
 // Created : Thu Jul 01 11:25:14 1999 by bonniot
-//$Modified: Tue May 02 14:27:54 2000 by Daniel Bonniot $
+//$Modified: Tue May 16 17:08:39 2000 by Daniel Bonniot $
 
 package bossa.syntax;
 
@@ -31,6 +31,7 @@ abstract public class ClassDefinition extends Definition
    * Creates a class definition.
    *
    * @param name the name of the class
+   * @param isConcrete
    * @param isFinal 
    * @param isAbstract 
    * @param isInterface true iff the class is an "interface" 
@@ -43,6 +44,7 @@ abstract public class ClassDefinition extends Definition
    * @param abstractions a list of Interfaces
    */
   public ClassDefinition(LocatedString name, 
+			 boolean isConcrete,
 			 boolean isFinal, boolean isAbstract, 
 			 boolean isInterface,
 			 List typeParameters,
@@ -52,6 +54,8 @@ abstract public class ClassDefinition extends Definition
   {
     super(name, Node.upper);
 
+    this.isConcrete = isConcrete;
+    
     if(isInterface)
       isAbstract=true;
     
@@ -126,7 +130,11 @@ abstract public class ClassDefinition extends Definition
        name.location());
   }
   
-  abstract public boolean isConcrete();
+  final boolean isConcrete;
+  public final boolean isConcrete()
+  {
+    return isConcrete;
+  }
 
   /****************************************************************
    * Resolution
@@ -163,8 +171,8 @@ abstract public class ClassDefinition extends Definition
       }
       catch(KindingEx e){
 	User.error(name,
-		   "Class "+name+" cannot extend "+e.t2
-		   +": they do not have the same kind");
+		   "Class "+name+" cannot extend "+e.t2+
+		   ": they do not have the same kind");
       }
       
       Typing.assertImp(tc,implementations,true);
@@ -172,7 +180,7 @@ abstract public class ClassDefinition extends Definition
 	Typing.assertImp(tc, associatedInterface, true);
       Typing.assertImp(tc,abstractions,true);
 
-      if(implementsTop)
+      if(implementsTop())
 	Typing.assertImp(tc,
 			 InterfaceDefinition.top(typeParameters.size()),
 			 true);
@@ -376,6 +384,8 @@ abstract public class ClassDefinition extends Definition
     /* of Interface */ implementations,
     /* of Interface */ abstractions;
   protected boolean isFinal, isInterface;
-  protected boolean implementsTop = true;
+  
+  abstract protected boolean implementsTop();
+  
   boolean isAbstract;
 }

@@ -12,7 +12,7 @@
 
 // File    : MonotypeVar.java
 // Created : Fri Jul 23 15:36:39 1999 by bonniot
-//$Modified: Wed Apr 26 17:26:52 2000 by Daniel Bonniot $
+//$Modified: Tue May 16 18:07:41 2000 by Daniel Bonniot $
 
 package bossa.syntax;
 
@@ -124,6 +124,11 @@ public class MonotypeVar extends Monotype
       return new MonotypeConstructor
 	((TypeConstructor) s, null,name.location());
 
+    if(s instanceof InterfaceDefinition)
+      User.error(this, 
+		 this.name + " is an abstract interface.\n"+
+		 "It can't be used as a type.");
+    
     Internal.error(this,this.name+" is not well kinded :"+s.getClass());
     return null;
   }
@@ -132,9 +137,15 @@ public class MonotypeVar extends Monotype
   {
     if(map.containsKey(this))
       return (Monotype) map.get(this);
-    return this;
+    else
+      return this;
   }
-
+  
+  boolean containsAlike()
+  {
+    return false;
+  }
+  
   /****************************************************************
    * Typechecking
    ****************************************************************/

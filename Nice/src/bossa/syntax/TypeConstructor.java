@@ -12,7 +12,7 @@
 
 // File    : TypeConstructor.java
 // Created : Thu Jul 08 11:51:09 1999 by bonniot
-//$Modified: Tue May 02 14:30:17 2000 by Daniel Bonniot $
+//$Modified: Mon May 15 17:34:15 2000 by Daniel Bonniot $
 
 package bossa.syntax;
 
@@ -74,9 +74,14 @@ public class TypeConstructor
       Internal.error(name, name+" : null Variance");
     
     setVariance(v);
-    this.definition=null;
+    this.definition = null;  
   }
 
+  public void preventResolving()
+  {
+    this.resolved = true;
+  }
+  
   /**
    * Tell which variance this TypeConstructor has.
    * Can be called from ImplementsCst.
@@ -188,7 +193,7 @@ public class TypeConstructor
 
   TypeConstructor resolve(TypeScope typeScope)
   {
-    if(definition!=null)
+    if(definition!=null || resolved)
       return this;  
     
     TypeSymbol s=typeScope.lookup(name.toString());
@@ -254,6 +259,7 @@ public class TypeConstructor
 	res=name.toString();
     if(bossa.typing.Typing.dbg) res+="("+id+")";
     //if(bossa.typing.Typing.dbg) res+=super.toString();
+
     return res;
   }
 
@@ -294,8 +300,11 @@ public class TypeConstructor
   public void setKind(Kind value)
   {
     if(kind!=null)
-      Internal.error(this,
-		     "Variance already set in type constructor "+this);
+      if(kind==value)
+	return;
+      else
+	Internal.error(this,
+		       "Variance already set in type constructor "+this);
 
     variance=(Variance)((Engine.Constraint)value).associatedKind;
     kind=value;
@@ -348,4 +357,7 @@ public class TypeConstructor
   private ClassDefinition definition;
   public LocatedString name;
   public Variance variance;
+
+  /** true if the TC should not be resolved, or is already */
+  private boolean resolved = false;
 }

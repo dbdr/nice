@@ -12,7 +12,7 @@
 
 // File    : Internal.java
 // Created : Wed Jul 07 18:23:19 1999 by bonniot
-//$Modified: Mon Apr 03 16:18:35 2000 by Daniel Bonniot $
+//$Modified: Tue May 09 16:52:45 2000 by Daniel Bonniot $
 // Description : Internal errors...
 
 package bossa.util;
@@ -39,7 +39,7 @@ public class Internal
     if(l==null)
       warning(message);
     else
-      warning(l+message);
+      warning(l+": "+message);
   }
   
   public static void warning(String message)
@@ -63,7 +63,7 @@ public class Internal
     if(l==null)
       error(message);
     else
-      error(l+message);
+      error(l+": "+message);
   }
 
   public static void error(String message)

@@ -12,7 +12,7 @@
 
 // File    : parser.jj
 // Created : Thu Jul 01 10:27:05 1999 by bonniot
-//$Modified: Thu May 04 13:56:15 2000 by Daniel Bonniot $
+//$Modified: Mon May 15 17:38:01 2000 by Daniel Bonniot $
 // Description : Parseur JavaCC pour Bossa
 //   Tokens based on the Jazz parser
 
@@ -664,10 +664,15 @@ FunType funmonotype():
 Monotype monotype():
 {
   Monotype res;
+  List p=null;
+  Token t;
 }
 {
   (
   res=funmonotype()
+|
+  t="alike" [ "<" p=monotypes() ">" ]
+  { res=new Alike(p, new Location(t)); }
 |
   LOOKAHEAD(monotypeConstructor())
   res=monotypeConstructor()
@@ -768,8 +773,16 @@ List extensions():
 }
 {
   "extends"
-  name=typeConstructor() { res.add(name); }
-  ( "," name=typeConstructor() { res.add(name); } )*
+  name=typeConstructor() 
+    // ignore type parameters
+    // they should be checked
+    [ "<" ident() ( "," ident() )* ">" ]
+  { res.add(name); }
+  ( "," name=typeConstructor() 
+    // ignore type parameters
+    // they should be checked
+    [ "<" ident() ( "," ident() )* ">" ]
+    { res.add(name); } )*
     { return res; }    
 }
 
@@ -779,8 +792,13 @@ List interfaces():
   Interface name;
 }
 {
-  name=itf() { res.add(name); }
-  ( "," name=itf() { res.add(name); } )*
+  name=itf() 
+    // ignore type parameters
+    // they should be checked
+    [ "<" ident() ( "," ident() )* ">" ]
+  { res.add(name); }
+  ( "," name=itf() [ "<" ident() ( "," ident() )* ">" ]
+    { res.add(name); } )*
     { return res; }
 }
 
@@ -1139,12 +1157,12 @@ FunExp funExp():
  * Imported Packages
  ****************************************************************/
 
-void readImports(List imports, List opens):
+LocatedString readImports(List imports, List opens):
 {
-  LocatedString name;
+  LocatedString pkgName=null, name;
 }
 {
-  [ "package" doted_string() ";" ]
+  [ "package" pkgName=doted_string() ";" ]
 
   (
    "import" name=doted_string() 
@@ -1154,21 +1172,24 @@ void readImports(List imports, List opens):
    )
    ";"
   )*
+  { return pkgName; }
 }
 
 /****************************************************************
  * Modules
  ****************************************************************/
 
-void module(List definitions,
+LocatedString module(List definitions,
 	    List imports,
 	    List opens):
 {
+  LocatedString pkgName;
 }
 {
-  { 
-    readImports(imports, opens);
+  pkgName = readImports(imports, opens)
+  {
     readDefinitions(definitions);
+    return pkgName;
   }
 }
 
@@ -1244,7 +1265,7 @@ Expression ConditionalOrExpression() :
 {
   e1=ConditionalAndExpression() 
     ( t="||" e2=ConditionalAndExpression() 
-      { e1=CallExp.create(symb(t),e1,e2); } )*
+      { e1=new IfExp(e1, new IdentExp(new LocatedString("true", Location.nowhere())), e2); } )*
   { return e1; }
 }
 
@@ -1253,7 +1274,7 @@ Expression ConditionalAndExpression() :
 {
   e1=InclusiveOrExpression() 
     ( t="&&" e2=InclusiveOrExpression() 
-      { e1=CallExp.create(symb(t),e1,e2); } )*
+      { e1=new IfExp(e1, e2, new IdentExp(new LocatedString("false", Location.nowhere()))); } )*
   { return e1; }
 }
 

@@ -12,7 +12,7 @@
 
 // File    : MethodBodyDefinition.java
 // Created : Thu Jul 01 18:12:46 1999 by bonniot
-//$Modified: Sat May 06 15:01:57 2000 by Daniel Bonniot $
+//$Modified: Fri May 12 18:17:47 2000 by Daniel Bonniot $
 
 package bossa.syntax;
 
@@ -423,6 +423,7 @@ public class MethodBodyDefinition extends Definition
 
 	d.setParameter(true);
 	d.setType(paramType.getJavaType());
+	d.noteValue(null);
 	param.setDeclaration(d);
       }
 
@@ -458,6 +459,7 @@ public class MethodBodyDefinition extends Definition
     lexp.min_args=lexp.max_args=1;
     gnu.expr.Declaration args=lexp.addDeclaration("args");
     args.setParameter(true);
+    args.noteValue(null);
     args.setType(gnu.bytecode.ArrayType.make(Type.string_type));
 
     // Call arguments

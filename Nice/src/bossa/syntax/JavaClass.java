@@ -12,7 +12,7 @@
 
 // File    : JavaClass.java
 // Created : Wed Feb 02 16:20:12 2000 by Daniel Bonniot
-//$Modified: Thu May 04 12:58:00 2000 by Daniel Bonniot $
+//$Modified: Tue May 16 17:09:24 2000 by Daniel Bonniot $
 
 package bossa.syntax;
 
@@ -53,7 +53,7 @@ public class JavaClass extends ClassDefinition
 		   List extensions, List implementations, List abstractions,
 		   LocatedString javaName)
   {
-    super(name, isFinal, isAbstract, isInterface,
+    super(name, true, isFinal, isAbstract, isInterface,
 	  typeParameters, extensions, implementations, abstractions);
     this.javaName = javaName;
 
@@ -105,11 +105,6 @@ public class JavaClass extends ClassDefinition
 
   private boolean isPrimitive;
   
-  public boolean isConcrete()
-  {
-    return !isPrimitive; // primitive type don't have "new"
-  }
-
   private gnu.bytecode.Type javaType;
   
   gnu.bytecode.Type javaClass()
@@ -127,6 +122,11 @@ public class JavaClass extends ClassDefinition
     //??
   }
 
+  protected boolean implementsTop()
+  {
+    return true;
+  }
+  
   public void printInterface(java.io.PrintWriter s)
   {
     super.printInterface(s);

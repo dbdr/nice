@@ -12,7 +12,7 @@
 
 // File    : BossaClass.java
 // Created : Thu Jul 01 11:25:14 1999 by bonniot
-//$Modified: Tue May 02 15:24:48 2000 by Daniel Bonniot $
+//$Modified: Tue May 16 17:19:02 2000 by Daniel Bonniot $
 
 package bossa.syntax;
 
@@ -49,19 +49,18 @@ public class BossaClass extends ClassDefinition
 		    List typeParameters,
 		    List extensions, List implementations, List abstractions)
   {
-    super(name.cloneLS(), isFinal, isAbstract, isInterface,
+    super(name.cloneLS(), isSharp || isFinal, isFinal, isAbstract, isInterface,
 	  typeParameters, extensions, implementations, abstractions);
 
     this.simpleName = name;    
-    this.isSharp=isSharp;
-    this.implementsTop = !isSharp;
+    this.isSharp = isSharp;
     
     addTypeSymbol(this.tc);
     
     // if this class is final, 
     // no #class is created below.
     // the associated #class is itself
-    if(this.isFinal && !this.isSharp)
+    if(this.isFinal && !isSharp)
       addTypeMap("#"+name.content,this.tc);
   }
 
@@ -89,7 +88,7 @@ public class BossaClass extends ClassDefinition
   public Collection associatedDefinitions()
   {
     if(isFinal || isAbstract)
-      return new LinkedList();
+      return null;
 
     LocatedString name = this.simpleName.cloneLS();
     name.prepend("#");
@@ -107,18 +106,18 @@ public class BossaClass extends ClassDefinition
     return res;
   }
 
-  static private List concreteClasses = new LinkedList();
+  protected boolean implementsTop()
+  {
+    return !isSharp;
+  }
+  
+    static private List concreteClasses = new LinkedList();
 
   static public ListIterator listConcreteClasses()
   {
     return concreteClasses.listIterator();
   }
   
-  public boolean isConcrete()
-  {
-    return isSharp;
-  }
-
   /****************************************************************
    * Fields
    ****************************************************************/
@@ -189,7 +188,7 @@ public class BossaClass extends ClassDefinition
 	if(!isInterface)
 	  createConstructor();
 
-	// we need this before compile, 
+	// we need this before compile(), 
 	// to know this type is, say, an interface
 	// when it appears in other definitions
 	ClassDefinition me = abstractClass();
@@ -296,7 +295,7 @@ public class BossaClass extends ClassDefinition
 
   public void compile()
   {
-    if(!(isSharp || isAbstract || isFinal))
+    if(classType==null)
       return;
     
     if(Debug.codeGeneration)
@@ -426,10 +425,10 @@ public class BossaClass extends ClassDefinition
 
   private List /* of ClassDefinition.Field */ fields;
   private List methods;
-  boolean isSharp; // This class is a #A (not directly visible to the user)
   private ClassType classType;  
 
   /** Not the fully qualified name */
   private LocatedString simpleName;
+  private boolean isSharp;
   private ClassDefinition associatedConcreteClass; // non-null if !isSharp
 }

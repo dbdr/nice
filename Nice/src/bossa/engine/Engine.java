@@ -12,7 +12,7 @@
 
 // File    : Engine.java
 // Created : Tue Jul 27 15:34:53 1999 by bonniot
-//$Modified: Wed Apr 05 16:42:43 2000 by Daniel Bonniot $
+//$Modified: Tue May 16 19:25:05 2000 by Daniel Bonniot $
 
 package bossa.engine;
 
@@ -483,7 +483,7 @@ public abstract class Engine
     
     Constraint(String name)
     {
-      this.name=name;  
+      this.name=name;
     }
     private String name;
 
@@ -503,7 +503,7 @@ public abstract class Engine
       return !variables;
     }
     
-    final K0 k0 = new K0(K0.BACKTRACK_UNLIMITED,new Callbacks());
+    final K0 k0 = new K0(K0.BACKTRACK_UNLIMITED, new Callbacks());
     
     private Vector elements=new Vector(10); // ArrayList would be better, but has no setSize method
     private BitVector concreteElements = new BitVector();
@@ -525,7 +525,7 @@ public abstract class Engine
     // public for Typing.enumerate...
     public Element getElement(int index)
     {
-      return (Element)elements.get(index);
+      return (Element) elements.get(index);
     }
     
     class Callbacks extends K0.Callbacks

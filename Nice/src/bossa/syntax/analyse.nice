@@ -152,13 +152,13 @@ class Info
   void addVar(PolySymbol symbol)
   {
     symbol.type = notNull(symbol.syntacticType).resolve(this.typeMap);
-    this.vars[notNull(symbol.name).toString()] = symbol;
+    this.vars[symbol.name.toString()] = symbol;
   }
 
   void addVar(MonoSymbol symbol)
   {
     symbol.type = notNull(symbol.syntacticType).resolve(this.typeMap);
-    this.vars[notNull(symbol.name).toString()] = symbol;
+    this.vars[symbol.name.toString()] = symbol;
   }
 
   void addVars(Sequence<?MonoSymbol> symbols) = 

@@ -328,7 +328,7 @@ typecheck(decl@Block.LocalVariable)
   }
   catch(TypingEx t){
     if (notNullError(t, target, value.toString()))
-      throw assignmentError(target, notNull(target.name).toString(), 
+      throw assignmentError(target, target.name.toString(), 
 			    String.valueOf(target.getMonotype), 
 			    value);
   }

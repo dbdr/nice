@@ -51,8 +51,7 @@ mlsub.typing.Monotype makeSure(mlsub.typing.Monotype m) =
  * in Nice, with precise types for the fields.
  ****************************************************************/
 
-//LocatedString name(MonoSymbol) = native MonoSymbol.name;
-//LocatedString name(PolySymbol) = native PolySymbol.name;
+LocatedString name(VarSymbol) = native VarSymbol.name;
 
 // Local Variables:
 // nice-xprogram: "nicec -d \"$HOME/Nice/classes\" --sourcepath=\"$HOME/Nice/src\" --classpath=\"$HOME/Nice/classes\""

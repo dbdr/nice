@@ -45,7 +45,7 @@ public abstract class TypeDefinition extends MethodContainer
 
   void computeVariance()
   {
-    int arity = getVariance(this);
+    int arity = findVariance(this);
 
     let tpv = notNull( typeParametersVariances );
 
@@ -832,29 +832,29 @@ public mlsub.typing.Monotype[?] getTypeDefTypeParameters(mlsub.typing.TypeConstr
 
 // Variance lookup
 
-int getVariance(TypeDefinition t)
+int findVariance(TypeDefinition t)
 {
-  int arity = getVariance(t.implementations);
+  int arity = findVariance(t.implementations);
   if (arity != -1)
     return arity;
 
-  arity = getVariance(t.abstractions);
+  arity = findVariance(t.abstractions);
   return arity;
 }
 
-getVariance(ClassDefinition c)
+findVariance(ClassDefinition c)
 {
-  int arity = getVariance(c.superClassIdent);
+  int arity = findVariance(c.superClassIdent);
   return arity >= 0 ? arity : super;
 }
 
-getVariance(InterfaceDefinition i)
+findVariance(InterfaceDefinition i)
 {
-  int arity = getVariance(i.extensions);
+  int arity = findVariance(i.extensions);
   return arity >= 0 ? arity : super;
 }
 
-int getVariance(?List<MonotypeConstructor> parents)
+int findVariance(?List<MonotypeConstructor> parents)
 {
   if (parents == null)
     return -1;
@@ -862,7 +862,7 @@ int getVariance(?List<MonotypeConstructor> parents)
   int res;
   for (MonotypeConstructor m : parents)
     {
-      res = getVariance(m);
+      res = findVariance(m);
       if (res != -1)
         return res;
      }
@@ -870,7 +870,7 @@ int getVariance(?List<MonotypeConstructor> parents)
   return -1;
 }
 
-int getVariance(?MonotypeConstructor parent)
+int findVariance(?MonotypeConstructor parent)
 {
   if (parent == null)
     return -1;

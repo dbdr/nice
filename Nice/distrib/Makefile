@@ -33,7 +33,7 @@ deb $(DEB):
 	mv -f $(BUILDROOT).orig/debian $(BUILDROOT).orig-debian
 	find $(BUILDROOT).orig -name '.cvsignore' | xargs rm
 	cp ../share/java/nice.jar $(BUILDROOT).orig/external/nice-bootstrap.jar
-	tar zcvf $(BUILTSOURCEFILE) $(BUILDROOT).orig
+	tar zcf $(BUILTSOURCEFILE) $(BUILDROOT).orig
 	mv $(BUILDROOT).orig-debian $(BUILDROOT).orig/debian
 	mv $(BUILDROOT).orig $(BUILDROOT)
 	cd $(BUILDROOT) && dpkg-buildpackage -us -uc -rfakeroot -sa
@@ -52,7 +52,7 @@ rpm ${RPMDIR}/${RPMFILE}: ${TARFILE}
 	mkdir -p ${RPMTMP}/usr
 	mkdir -p tmp/BUILD
 	cd ${RPMTMP}/usr && tar xzf ${CURDIR}/${TARFILE}
-	cd tmp && tar zcvf ${CURDIR}/tmp/Nice-${VERSION}.tar.gz Nice-${VERSION}
+	cd tmp && tar zcf ${CURDIR}/tmp/Nice-${VERSION}.tar.gz Nice-${VERSION}
 	sed "s/VERSION/${VERSION}/" Nice.spec > tmp/Nice-${VERSION}.spec
 	rpmbuild --target=noarch --buildroot=${CURDIR}/${RPMTMP} -bb tmp/Nice-${VERSION}.spec
 

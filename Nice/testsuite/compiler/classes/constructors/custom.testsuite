@@ -80,3 +80,14 @@ new /*/// FAIL HERE */ String(int x) = this("xyz");
 /// FAIL
   /// Toplevel
 new /*/// FAIL HERE */ FooBar(int x) = this("xyz");
+
+/// PASS bug
+  A<String> a = new A(x: 5, z: "abc");
+  assert a.t.equals("abc");
+  /// Toplevel
+  class A<T>
+  {
+    String str;
+    T t;
+  }
+  new A(int x, T z) = this(str: x.toString(), t: z);

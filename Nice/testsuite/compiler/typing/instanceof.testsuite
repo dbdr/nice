@@ -55,3 +55,38 @@ class B extends A { int life = 42; }
         a = new A();
       i = a.life;
     }
+
+/// PASS
+  A a;
+  a = new B();
+  var test = false;
+  while (a instanceof B)
+    {
+      assert a.life == 42;
+      test = true;
+      break;
+    }
+  assert test;
+
+/// PASS
+  A a = new B();
+  while (a instanceof B)
+    {
+      int i = a.life;
+      if (i == 42)
+        a = new A();
+      else
+        i = a.life + 1;
+      break;
+    }
+
+/// FAIL
+  A a = new B();
+  while (a instanceof B)
+    {
+      int i = a.life;
+      if (i == 42)
+        a = new A();
+      i = a.life;
+      break;
+    }

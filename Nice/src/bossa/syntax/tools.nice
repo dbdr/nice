@@ -92,12 +92,12 @@ bossa.util.UserError ensureLocated(bossa.util.UserError e,
   return e;
 }
 
-?(MonoSymbol, TypeConstructor) getInstanceof(IfExp ifExp)
+?(MonoSymbol, mlsub.typing.Monotype) getInstanceof(Expression cond)
 {
-  if (! (ifExp.condition instanceof CallExp))
+  if (! (cond instanceof CallExp))
     return null;
 
-  CallExp condition = cast(ifExp.condition);
+  CallExp condition = cast(cond);
   if (! condition.isCallTo("instanceof") || condition.arguments.size() != 2)
     return null;
 
@@ -119,7 +119,21 @@ bossa.util.UserError ensureLocated(bossa.util.UserError e,
   if (type.representedType == null)
     return null;
 
-  return (sym, notNull(type.representedType));
+
+  TypeConstructor tc = notNull(type.representedType);
+  mlsub.typing.Monotype[?] parameters;
+
+  if (tc.arity() == 0)
+	  parameters = null;
+  else if (sym.getMonotype() instanceof mlsub.typing.MonotypeConstructor)
+    {
+      mlsub.typing.MonotypeConstructor mc = cast(sym.getMonotype());
+      parameters = mc.getTP();
+    }
+  else
+    return null;
+
+  return (sym, Monotype.sure(new mlsub.typing.MonotypeConstructor(tc, parameters)));
 }
 
 /****************************************************************

@@ -391,26 +391,11 @@ typecheck(e@IfExp)
 	setVarType(variable, now: sureType, otherBranch: type);
       });
 
-    ?(MonoSymbol, TypeConstructor) test = getInstanceof(e);
+    ?(MonoSymbol, mlsub.typing.Monotype) test = getInstanceof(notNull(e.condition));
     if (test != null)
       {
-	(MonoSymbol variable, TypeConstructor tc) = test;
-	mlsub.typing.Monotype[?] parameters = null;
-	if (tc.arity() == 0)
-	  parameters = null;
-	else if (variable.getMonotype() instanceof mlsub.typing.MonotypeConstructor)
-	  {
-	    mlsub.typing.MonotypeConstructor mc = cast(variable.getMonotype());
-	    parameters = mc.getTP();
-	  }
-	else
-	  test = null;
-
-	if (test != null)
-	  {
-	    mlsub.typing.Monotype type = Monotype.sure(new mlsub.typing.MonotypeConstructor(tc, parameters));
-	    setVarType(variable, now: type, otherBranch: variable.type);
-	  }
+	(MonoSymbol variable, mlsub.typing.Monotype type) = test;
+	setVarType(variable, now: type, otherBranch: variable.type);
       }
 
 
@@ -656,6 +641,13 @@ typecheck(l@LoopStmt)
 			     setVarType(variable, 
 					now: makeSure(variable.type), 
 					out: variable.type));
+
+	?(MonoSymbol, mlsub.typing.Monotype) test = getInstanceof(notNull(whileExp));
+	if (test != null)
+	{
+	  (MonoSymbol variable, mlsub.typing.Monotype type) = test;
+	  setVarType(variable, now: type, otherBranch: variable.type);
+	}
       }
 
   typecheck(l.loopBody);

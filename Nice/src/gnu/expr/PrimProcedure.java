@@ -411,31 +411,6 @@ public class PrimProcedure extends MethodProc implements gnu.expr.Inlineable
     target.compileFromStack(comp, retType);
   }
 
-  /** Creates a LambdaExp that applies this PrimProcedure
-   * to the appropriate number and type of arguments.
-   *
-   * This is usefull to generate an Expression from a given PrimProcedure.
-   */
-  public LambdaExp wrapInLambda()
-  {
-    int numArgs = minArgs();
-
-    LambdaExp lambda = new LambdaExp();
-    lambda.min_args = lambda.max_args = numArgs;
-
-    Expression[] args = new Expression[numArgs];
-    for (int i = 0; i<numArgs; i++)
-      {
-	Declaration decl = lambda.addDeclaration("param__"+i,
-						 getParameterType(i));
-	
-	args[i] = new ReferenceExp(decl);
-      }
-    
-    lambda.body = new ApplyExp(this, args);
-    return lambda;
-  }
-  
   public Type getParameterType(int index)
   {
     if (! getStaticFlag())

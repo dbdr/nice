@@ -85,6 +85,18 @@ public abstract class ScopeExp extends Expression
       }
   }
 
+  public ClassExp currentClass ()
+  {
+    ScopeExp exp = this;
+    for (;; exp = exp.outer)
+      {
+	if (exp == null)
+	  return null;
+	if (exp instanceof ClassExp)
+	  return (ClassExp) exp;
+      }
+  }
+
   public ModuleExp currentModule ()
   {
     ScopeExp exp = this;

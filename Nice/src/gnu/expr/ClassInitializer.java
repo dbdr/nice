@@ -21,7 +21,7 @@ public class ClassInitializer extends Initializer
       }
     else
       {
-	LambdaExp heapLambda = LambdaExp.getHeapLambda(cexp.outer);
+	LambdaExp heapLambda = cexp.getHeapLambda();
 	next = heapLambda.initChain;
 	heapLambda.initChain = this;
       }

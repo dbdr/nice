@@ -228,7 +228,7 @@ public class ApplyExp extends Expression
 		if (comp.curLambda == func_lambda)
 		  code.emitLoad(func_lambda.closureEnv);  // Recursive call.
 		else
-		  LambdaExp.getHeapLambda(func_lambda.outerLambda()).loadHeapFrame(comp);
+		  func_lambda.getHeapLambda().loadHeapFrame(comp);
 	      }
 
 	    boolean varArgs = func_lambda.restArgType() != null;

@@ -5,6 +5,8 @@ nice (0.9.4) unstable; urgency=low
     unused, without needing to return a dummy value when the method does not
     return void.
   * Added source-level debugging information for recent debuggers (jsr 45).
+  * Generate more efficient code for anonymous functions that do not capture
+    the environment. This also avoids a memory leak.
 
  --
 

@@ -533,7 +533,7 @@ public class LambdaExp extends ScopeExp
 	if (! getNeedsClosureEnv())
 	  fflags = (fflags | Access.STATIC) & ~Access.FINAL;
       }
-    ClassType frameType = getHeapLambda(outer).getHeapFrameType();
+    ClassType frameType = getHeapLambda().getHeapFrameType();
     Type rtype = Compilation.getMethodProcType(frameType);
     Field field = frameType.addField (fname, rtype, fflags);
     if (nameDecl != null)
@@ -561,7 +561,7 @@ public class LambdaExp extends ScopeExp
     else
       {
 	compileAsMethod(comp);
-	getHeapLambda(outer).addApplyMethod(this);
+	getHeapLambda().addApplyMethod(this);
       }
 
     return (new ProcInitializer(this, comp)).field;
@@ -678,25 +678,40 @@ public class LambdaExp extends ScopeExp
       return (ClassType) heapFrame.getType();
   }
 
-  public static LambdaExp getHeapLambda(ScopeExp scope)
+  public LambdaExp getHeapLambda()
   {
-    ScopeExp exp = scope;
-    for (;; exp = exp.outer)
-      {
-	if (exp == null)
-	  return null;
-	if (exp instanceof ModuleExp
-	    || (exp instanceof ClassExp 
-		&& ((ClassExp) exp).needsConstructor)
-	    || (exp instanceof LambdaExp 
-		&& ((LambdaExp) exp).heapFrame != null))
-	  return (LambdaExp) exp;
-      }
+    ScopeExp exp = outer;
+    
+    if (getNeedsClosureEnv())
+      for (;; exp = exp.outer)
+        {
+          if (exp == null)
+            return null;
+          if (exp instanceof ModuleExp
+              || (exp instanceof ClassExp 
+                  && ((ClassExp) exp).needsConstructor)
+              || (exp instanceof LambdaExp 
+                  && ((LambdaExp) exp).heapFrame != null))
+            return (LambdaExp) exp;
+        }
+
+    // No need for heap, return the englobing class
+    ClassExp res = currentClass();
+
+    /*
+      For user classes, needsConstructor is false, but their outer
+      class (lambda) is the package class.
+    */
+    if (res.needsConstructor)
+      return res;
+    else
+      return res.outerLambda();
+
   }
 
   void addMethodFor (Compilation comp, ObjectType closureEnvType)
   {
-    LambdaExp heapLambda = getHeapLambda(outer);
+    LambdaExp heapLambda = getHeapLambda();
     ClassType ctype = heapLambda.getHeapFrameType();
     addMethodFor(ctype, comp, closureEnvType);
   }

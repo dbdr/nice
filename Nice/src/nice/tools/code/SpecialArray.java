@@ -97,13 +97,11 @@ public final class SpecialArray extends gnu.bytecode.ArrayType
    * Conversions
    ****************************************************************/
 
+  // Only valid for primitive types.
   private void callConvert(CodeAttr code)
   {
     if (convertMethod == null)
-      if (primitive)
-	convertMethod = wrappedType.getDeclaredMethod("convert_"+prefix, 1);
-      else
-	convertMethod = wrappedType.getDeclaredMethod("convert", 2);
+      convertMethod = wrappedType.getDeclaredMethod("convert_" + prefix, 1);
 
     code.emitInvokeStatic(convertMethod);
   }
@@ -184,30 +182,70 @@ public final class SpecialArray extends gnu.bytecode.ArrayType
     if (unknown)
       return;
     
-    Label cast = new Label(code), end = new Label(code);
+    Label convert = new Label(code), end = new Label(code);
 
     code.emitDup();
     code.emitInstanceof(this);
-    code.emitGotoIfIntNeZero(cast);
+    code.emitGotoIfIntEqZero(convert);
+
+    code.emitCheckcast(this);
+    code.emitGoto(end);
     
+    convert.define(code);
     code.emitCheckcast(objectArray);
 
-    // For non primitive arrays, we pass a string that represents
-    // the type of the elements, so that the correct array type
-    // can be created.
-    if (!primitive)
-      code.emitPushString
-	(((ObjectType) elements).getInternalName().replace('/', '.'));
-    callConvert(code);
-    // non primitive need the cast
     if (primitive)
-      code.emitGoto(end);
-    
-    cast.define(code);
-    code.emitCheckcast(this);
+      callConvert(code);
+    else
+      convertReferenceArray(code, this, elements);
     
     end.define(code);
   }
+
+  private static void convertReferenceArray
+    (CodeAttr code, ArrayType toType, Type elements)
+  {
+    code.emitDup();
+    code.emitIfNotNull();
+
+    code.emitDup();
+    code.emitArrayLength();
+
+    code.pushScope();
+    Variable len = code.addLocal(Type.int_type);
+    code.emitStore(len);
+
+    code.emitPushInt(0);
+
+    code.emitLoad(len);
+    code.emitNewArray(elements);
+
+    Variable dest = code.addLocal(toType);
+    code.emitDup();
+    code.emitStore(dest);
+
+    code.emitPushInt(0);
+
+    code.emitLoad(len);
+	
+    code.emitInvokeStatic(arraycopy);
+    code.emitLoad(dest);
+    code.emitCheckcast(toType);
+
+    code.popScope();
+
+    code.emitElse();
+
+    code.emitPop(1);
+    code.emitPushNull();
+    // Set the type
+    code.popType(); code.pushType(toType);
+
+    code.emitFi();
+  }
+
+  public static final Method arraycopy = ClassType.make("java.lang.System").
+    getDeclaredMethod("arraycopy", 5);
 
   public void emitCoerceTo (Type toType, CodeAttr code)
   {
@@ -237,19 +275,21 @@ public final class SpecialArray extends gnu.bytecode.ArrayType
       {
 	boolean generic = ! from.getSignature().startsWith("[L");
 
-	// For non primitive arrays, we pass a string that represents
-	// the type of the elements, so that the correct array type
-	// can be created
-	code.emitPushString
-	  (((ObjectType) elements).getInternalName().replace('/', '.'));
+	if (generic) 
+	  {
+	    // For generic arrays, we pass a string that represents
+	    // the type of the elements, so that the correct array type
+	    // can be created
+	    code.emitPushString
+	      (((ObjectType) elements).getInternalName().replace('/', '.'));
 
-	if (generic)
-	  unknownTypeArray.callGenericConvert(code);
+	    unknownTypeArray.callGenericConvert(code);
+
+	    // Assert what we now guarantee.
+	    code.emitCheckcast(to);
+	  }
 	else
-	  unknownTypeArray.callConvert(code);
-
-	// Assert what we now guarantee.
-	code.emitCheckcast(to);
+	  convertReferenceArray(code, to, elements);
       }
   }
 

@@ -12,6 +12,15 @@ boolean maybeTrue() = true;
   s.substring(1);
 
 /// PASS bug
+  // Nullness analysis on assignments. RFE# 681385
+  func( null ).append( "123" );
+  /// Toplevel
+StringBuffer func( ?StringBuffer foo ) {
+  if( foo == null ) foo = new StringBuffer( 22 );
+  return foo.append( "bar" );
+}
+
+/// PASS bug
   ?String s = null; 
   if(maybeTrue())
     s = "abc";
@@ -46,7 +55,7 @@ boolean maybeTrue() = true;
   void foo() { s = null; }
   foo();
 
-/// PASS bug
+/// PASS
   ?String s = maybeString();
   ?String t = null;
   if (s != null)
@@ -134,4 +143,3 @@ boolean maybeTrue() = true;
     func = () => {s = null; };
     func();
   }
-  

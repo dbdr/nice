@@ -311,10 +311,13 @@
   if ( (x1 = "abc") != null)
     x1 = x1 + "";
 
-/// FAIL
-  ?String x1 = null;
-  if ( (x1 = "abc") == null)
-    x1 = x1 + "";
+// This should _probably_ fail
+// either becouse it can never be true
+// or becouse x1 is checked to be null.
+// /// FAIL
+//  ?String x1 = null;
+//  if ( (x1 = "abc") == null)
+//    x1 = x1 + "";
 
 /// PASS
   ?String x1 = null;

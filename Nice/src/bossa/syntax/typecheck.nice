@@ -51,6 +51,21 @@ typecheck(AssignExp e)
   try{
     e.value = e.value.resolveOverloading(to.getType());
     checkAssignment(to.getType(), e.value);
+    
+    // RFE 681385
+    // To debug in jdb use "stop at bossa.syntax.fun:LINE".
+    if( variable != null ){
+      let valueType = e.value.type, toType = to.type, varType = variable.type;
+      if( valueType != null && toType != null && varType != null ){
+        let toNotNull = isNotNull( toType );
+        let valueNotNull = isNotNull( valueType );
+        if( ! toNotNull && valueNotNull ){
+          //bossa.util.User.warning( e, e.toString() );
+          mlsub.typing.Monotype type = varType;
+          mlsub.typing.Monotype sureType = makeSure( type );
+          variable.setVarType( now: sureType, otherBranch: type, out: type );
+    } } }
+    
   }
   catch(mlsub.typing.TypingEx t){
     if (variable != null) {
@@ -416,41 +431,48 @@ void exitBlock () { enterElse(); exitIf(); }
 
 void enterElse()
 {
-  while (levels.size() > 0 && levels.peek() == ifLevel * 2)
+  // "out" (ifLevel * 2) and "otherBranch" (ifLevel * 2 + 1) records might be mixed in the stack,
+  // therefore we scan the tail of the stack while "level >= ifLevel * 2", ignoring "out" records.
+  for (int i = levels.size() - 1; i >= 0; i--)
     {
-      levels.pop();
-      (MonoSymbol variable, mlsub.typing.Monotype baseType) = conditionalTypes.pop();
+      int level = levels.get(i);
+      if( level < ifLevel * 2 ) break;
+      if( level != ifLevel * 2 + 1 ) continue;
+      (MonoSymbol variable, mlsub.typing.Monotype baseType) = conditionalTypes.get(i);
       variable.type = baseType;
     }
 }
 
 void exitIf()
-{ 
-  while (levels.size() > 0 && levels.peek() == ifLevel * 2 + 1)
+{
+  // since "out" and "otherBranch" records might be mixed,
+  // we should pop everything which is "level >= ifLevel * 2",
+  // but ignore "otherBranch" (ifLevel * 2 + 1) records.
+  while (levels.size() > 0 && levels.peek() >= ifLevel * 2)
     {
-      levels.pop();
+      int level = levels.pop();
       (MonoSymbol variable, mlsub.typing.Monotype baseType) = conditionalTypes.pop();
-      variable.type = baseType;
+      if( level == ifLevel * 2 ) variable.type = baseType;
     }
   ifLevel--;
 }
 
 void pushBranchType(MonoSymbol variable, mlsub.typing.Monotype baseType)
 {
-  levels.push(2 * ifLevel);
+  levels.push(2 * ifLevel + 1);
   conditionalTypes.push((variable, baseType));
 }
 
 void pushOuterType(MonoSymbol variable, mlsub.typing.Monotype baseType)
 {
-  levels.push(2 * ifLevel + 1);
+  levels.push(2 * ifLevel);
   conditionalTypes.push((variable, baseType));
 }
 
 void overrideOuterType(MonoSymbol variable, mlsub.typing.Monotype newType)
 {
   for (int i = 0; i < levels.size(); i++)
-    if (levels.get(i) % 2 == 1)
+    if (levels.get(i) % 2 == 0)
       {
 	(MonoSymbol v, mlsub.typing.Monotype t) = conditionalTypes.get(i);
 	if (variable == v)
@@ -939,9 +961,16 @@ typecheck(VoidReturnStmt r)
 
 typecheck(TryStmt t)
 {
-  typecheck(t.body);
-  t.catches.foreach(ACatch c => typecheck(c.body));
-  typecheck(t.finallyBody);
+  enterBlock();
+  try{
+    typecheck( t.body );
+    enterElse();
+    for( ACatch c : t.catches ){
+      typecheck( c.body );
+      enterElse();
+    }
+    typecheck( t.finallyBody );
+  }finally{ exitIf(); }
 }
 
 typecheck(SynchronizedStmt s)
@@ -1062,6 +1091,16 @@ void checkNotNull(mlsub.typing.Polytype type)
   }
   finally {
     mlsub.typing.Typing.leave();
+  }
+}
+
+boolean isNotNull( mlsub.typing.Polytype type )
+{
+  try{
+    checkNotNull( type ); // Will throw a TypingEx if the 'value' is not a sureTC.
+    return true;
+  }catch( mlsub.typing.TypingEx skip ){
+    return false;
   }
 }
 

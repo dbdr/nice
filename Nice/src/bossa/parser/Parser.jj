@@ -2187,7 +2187,11 @@ Statement LabeledStatement() :
 {
   label=ident() ":" 
   { forLoop = "for".equals(getToken(1).toString()); }
-  res=Statement()
+  ( res=Block()
+  | res=ForStatement()
+  | res=WhileStatement()
+  | res=DoStatement()
+  )
   { 
     // Fix labeling of for loops:
     // for(int i, ...) is parsed as a block defining a local variable i

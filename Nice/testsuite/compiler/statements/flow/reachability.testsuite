@@ -24,7 +24,7 @@
   for (;;) break;
   ; // Reachable
 
-/// PASS bug
+/// PASS
   label: {
     assert true;
     break label;

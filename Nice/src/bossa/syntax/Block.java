@@ -418,4 +418,5 @@ public class Block extends Statement
   }
 
   Statement[] statements;
+  boolean isBreakTarget = false;
 }

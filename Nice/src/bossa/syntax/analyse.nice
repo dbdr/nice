@@ -606,6 +606,9 @@ analyse(b@Block, info)
   notNull(b.locals).foreach(Block.LocalDeclaration l => analyse(l, info));
   analyse(b.statements, info);
   info.end();
+
+  if (b.isBreakTarget)
+    info.setReachable();
 }
 
 void analyse(?Statement[] statements, Info info)
@@ -724,7 +727,9 @@ analyse(b@BreakLabelStmt, info)
     }
   else
     {
-      // TODO: fix reachability when not targetting a loop
+      // if it isn't a loop it must be a block because of the parser
+      Block b = cast(target.getStatement());
+      b.isBreakTarget = true;
     }   
 
   info.setUnreachable();

@@ -7,7 +7,8 @@ nice (0.9.3) unstable; urgency=low
       interface packagename.SomeInterface implements AbstractInterface;
   * Bugfixes (various pretty printing issues, type hole in instanceof inference,
     calls to abstract methods, chained assignments with arrays like
-    'x = arr[y] = z;', error messages of integer dispatch, ...)
+    'x = arr[y] = z;', error messages of integer dispatch, reachability of
+    labeled break's, ...)
 
  --
 

@@ -104,7 +104,7 @@ public ConstantExp createIntegerConstantExp(LocatedString representation)
     rep = rep.substring(0, lastCharIndex);
 
   try {
-    long value = parseInteger(removeUnderscores(rep));
+    (long value, boolean isDecimal) = parseInteger(removeUnderscores(rep));
 
     mlsub.typing.Polytype type;
     mlsub.typing.TypeConstructor tc;
@@ -127,6 +127,21 @@ public ConstantExp createIntegerConstantExp(LocatedString representation)
 	type = nice.tools.typing.PrimitiveType.intPolytype;
         tc = nice.tools.typing.PrimitiveType.intTC;
 	object = value;
+      }
+    else if (!isLong && !isDecimal && (-(1L << 32) ) < value < (1L << 32))
+      { // handle 32 bit bin/hex literals which don't fit in a int
+        if (value > 0)
+          value = (1L << 32) - value;
+        else
+          value = (1L << 32) + value;
+
+	type = nice.tools.typing.PrimitiveType.intPolytype;
+        tc = nice.tools.typing.PrimitiveType.intTC;
+	object = value;
+      }
+    else if (!isLong && !isDecimal)
+      { // a non decimal long must be explicit
+        throw User.error(representation, rep + " is too large for an int literal");
       }
     else
       {
@@ -163,7 +178,7 @@ ConstantExp createLongConstantExp(long value)
 }
 
 
-private long parseInteger(String rep)
+private (long, boolean) parseInteger(String rep)
 {
   int radix = 10;
   int index = 0;
@@ -205,7 +220,7 @@ private long parseInteger(String rep)
   if (negative) 
     result = -result;
 
-  return result;
+  return (result, radix == 10);
 }
 
 private String removeUnderscores(String s)

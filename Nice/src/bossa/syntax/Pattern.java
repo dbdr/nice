@@ -48,14 +48,13 @@ public class Pattern implements Located
      @param runtimeTC a type constructor that will be bound to 
        the argument's runtime class.
    */
-  public Pattern(LocatedString name, LocatedString refName, 
+  public Pattern(LocatedString name,
 		 TypeIdent tc, ConstantExp atValue,
 		 boolean exactlyAt, TypeIdent additional,
 		 TypeConstructor runtimeTC,
 		 Location location)
   {
     this.name = name;
-    this.refName = refName;
     this.typeConstructor = tc;
     this.additional = additional;
     this.runtimeTC = runtimeTC;
@@ -75,7 +74,7 @@ public class Pattern implements Located
 
   Pattern(LocatedString name, TypeIdent tc)
   {
-    this(name, null, tc, null, false, null, null, name.location());
+    this(name, tc, null, false, null, null, name.location());
   }
 
   Pattern(TypeConstructor tc, boolean exactlyAt)
@@ -86,13 +85,13 @@ public class Pattern implements Located
 
   Pattern(ConstantExp atValue)
   {
-    this(null, null, null, atValue, false, null, null, 
+    this(null, null, atValue, false, null, null, 
 	atValue!=null ? atValue.location() : Location.nowhere() );    
   }
 
-  Pattern(LocatedString refName)
+  Pattern(LocatedString name)
   {
-    this(null, refName, null, null, false, null, null, refName.location());
+    this(name, null, null, false, null, null, name.location());
   }
 
   final TypeConstructor getRuntimeTC()
@@ -142,18 +141,18 @@ public class Pattern implements Located
           symbol = (VarSymbol)sym;
       }
 
-    if (symbol == null)
-      User.error(refName, "" + refName + " is not declared");
- 
     return symbol;
   }
 
   void resolveGlobalConstants(VarScope scope, TypeScope typeScope)
   {
-    if (refName == null)
+    if (name == null)
       return;
 
-    VarSymbol sym = findRefSymbol(refName);
+    VarSymbol sym = findRefSymbol(name);
+    if (sym == null)
+      return;
+
     if (sym instanceof EnumDefinition.EnumSymbol)
       {
          EnumDefinition.EnumSymbol symbol = (EnumDefinition.EnumSymbol)sym;
@@ -162,7 +161,7 @@ public class Pattern implements Located
 	 symbol.getDefinition().resolve();
 	 tc = val.tc;
 	 atValue = new ConstantExp(null, tc, symbol,
-				refName.toString(), location);
+				name.toString(), location);
         return;
       }
     
@@ -170,7 +169,7 @@ public class Pattern implements Located
     if (symbol.getValue() instanceof ConstantExp)
       {
         if (!symbol.constant)
-          User.error(refName, "" + refName + " is not constant");
+          User.error(name, "" + name + " is not constant");
 
 	ConstantExp val = (ConstantExp)symbol.getValue();
 
@@ -190,10 +189,10 @@ public class Pattern implements Located
 	 symbol.getDefinition().resolve();
 	 tc = val.tc;
 	 atValue = new ConstantExp(null, tc, symbol,
-				refName.toString(), location);
+				name.toString(), location);
        }
      else
-       User.error(refName, "The value of " + refName + "can't be used as pattern");
+       User.error(name, "The value of " + name + "can't be used as pattern");
   }
 
   static void resolve(TypeScope tscope, VarScope vscope, Pattern[] patterns)
@@ -479,7 +478,7 @@ public class Pattern implements Located
           return "@" + (atValue.longValue() >= 0 ? "+" : "") + atValue;
 
 	if (atReference())
-          return "@=" + refName;
+          return "@=" + name;
 
 	return "@" + atValue;
       }
@@ -621,7 +620,7 @@ public class Pattern implements Located
    * Fields
    ****************************************************************/
   
-  LocatedString name, refName;
+  LocatedString name;
   TypeIdent typeConstructor, additional;
   public TypeConstructor tc;
   TypeConstructor tc2;

@@ -1248,8 +1248,6 @@ EnumDefinition enumDefinition():
 Pattern pattern():
 {
   LocatedString name = null;
-  LocatedString refName = null;
-  Token t;
   TypeIdent tc=null, additional = null;
   TypeConstructor runtimeTC = null;
   ConstantExp val = null;
@@ -1261,21 +1259,16 @@ Pattern pattern():
     val=patternLiteral() { loc = val.location(); }
   |
     (
-      t="@" tc=typeIdent() { loc = tc.location(); }
+      "@" tc=typeIdent() { loc = tc.location(); }
     |
-      t="#" tc=typeIdent() { exactlyAt = true; loc = tc.location(); }
+      "#" tc=typeIdent() { exactlyAt = true; loc = tc.location(); }
     | 
-      t="=" 
-      (
-        val=patternLiteral() {loc = val.location(); }
-      |
-        refName=ident() {loc = refName.location(); } 	
-      )
+      "=" val=patternLiteral() {loc = val.location(); }
     )
   |
     name=ident()
     (
-      t ="@"
+      "@"
       (
         val=patternLiteral() 
 	{ User.warning(name, 
@@ -1285,7 +1278,7 @@ Pattern pattern():
         [ ":" runtimeTC = typeConstructor() ]
       )
     |
-      t ="#" tc=typeIdent() { exactlyAt = true; }
+      "#" tc=typeIdent() { exactlyAt = true; }
     |
      {} //name only
     )
@@ -1293,7 +1286,7 @@ Pattern pattern():
   )
   [ "(" additional=typeIdent() ")" ]
   {
-    return new Pattern(name, refName, tc, val, exactlyAt, additional, runtimeTC, loc);
+    return new Pattern(name, tc, val, exactlyAt, additional, runtimeTC, loc);
   }
 }
 

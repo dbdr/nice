@@ -8,3 +8,19 @@
   class X<T> {}
   <T | T <: X<T> > void f() {}
   // should fail without causing a stack overflow.
+
+/// PASS
+  /// Toplevel
+abstract interface A<T> {
+  void foo();
+  void bar(alike<T> other);
+}
+
+class B<T> implements A {
+
+  void foobar()
+  { this.foo(); }
+
+  foo() {}
+  bar(other) {}
+}

@@ -108,6 +108,10 @@ public abstract class MethodContainer extends Definition
         findBinders(typeParameters);
       else
         this.typeParameters = typeParameters;
+
+      // The type parameters have nullness markers.
+      for (int i = 0; i < typeParameters.length; i++)
+        nice.tools.code.Types.makeMarkedType(typeParameters[i]);
     }
 
     /**

@@ -55,7 +55,7 @@
     { throw new Exception(); }
   }
 
-/// PASS bug
+/// PASS
   // Initializers should be executed after all the instance variables are set
   let dummy = new B();
 

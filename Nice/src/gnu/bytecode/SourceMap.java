@@ -12,6 +12,8 @@
 
 package gnu.bytecode;
 
+import java.util.*;
+
 /**
    A mapping from source files to the bytecode line numbers.
    The format is specified by the JSR 45.
@@ -27,6 +29,7 @@ class SourceMap extends Attribute
     buffer = new StringBuffer("SMAP\n");
     buffer.append(classfile.getName()).append('\n');
     buffer.append("Default\n*S Default\n*F\n");
+    fileMap = new HashMap();
   }
 
   private StringBuffer buffer;
@@ -70,10 +73,11 @@ class SourceMap extends Attribute
   */
 
   private String currentFile = null;
-  private int fileNumber = 0;
+  private int lastFileNumber = 0;
   private int firstLine = -1;
   private int lastLine = -1;
   private int outputBase = 1;
+  private Map fileMap;
 
   /**
      Return a line number which is unique in this source map, 
@@ -101,9 +105,7 @@ class SourceMap extends Attribute
   {
     if (currentFile != null)
       {
-        fileNumber++;
-        buffer.append(fileNumber).append(' ').append(currentFile)
-          .append('\n');
+        int fileNumber = writeFile(currentFile);
         int len = lastLine - firstLine + 1;
         lines.append("" + firstLine + '#' + fileNumber + 
                      ',' + len +
@@ -112,4 +114,19 @@ class SourceMap extends Attribute
         outputBase += len;
       }
   }
+  
+  private int writeFile(String file)
+  {
+    Integer fileNumber = (Integer)fileMap.get(file);
+    if (fileNumber == null)
+      {
+        lastFileNumber++;
+        fileNumber = new Integer(lastFileNumber);
+        fileMap.put(file, fileNumber);
+      }
+
+    buffer.append(fileNumber.intValue()).append(' ').append(file).append('\n');
+    return fileNumber.intValue();
+  }
+
 }

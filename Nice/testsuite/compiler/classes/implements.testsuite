@@ -6,3 +6,18 @@
   interface I {}
   class B extends A {}
   class A implements I {}
+
+/// PASS
+  use(new A());
+  /// Toplevel
+  class A implements java.lang.Comparable {}
+
+  void use(java.lang.Comparable c) {}
+
+/// PASS
+  use(new A());
+  /// Toplevel
+  interface I extends java.lang.Comparable {}
+  class A implements I {}
+
+  void use(java.lang.Comparable c) {}

@@ -2,6 +2,8 @@ nice (0.7.2) unstable; urgency=low
 
   * Implemented synchronized statements.
   * Implemented bitwise complement and "get bit" on long integers.
+  * Allow Nice classes and interfaces to implement and extend java interfaces
+    without pretending they are classes.
 
  --
 

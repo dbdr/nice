@@ -374,6 +374,8 @@ public class NiceClass extends ClassDefinition.ClassImplementation
     int len = superClass == null ? 0 : 1;
     if (interfaces != null)
       len += interfaces.length;
+    if (definition.javaInterfaces != null)
+      len += definition.javaInterfaces.length;
     if (len == 0)
       return null;
 
@@ -390,6 +392,11 @@ public class NiceClass extends ClassDefinition.ClassImplementation
 	    
 	  res[--len] = typeExpression(assocTC);
 	}
+
+    if (definition.javaInterfaces != null)
+      for (int i = 0; i < definition.javaInterfaces.length; i++)
+	res[--len] = typeExpression(definition.javaInterfaces[i]);
+
     if (superClass != null)
       res[--len] = typeExpression(superClass);
 

@@ -110,6 +110,27 @@ public final class TypeIdent extends Monotype implements Located
     throw User.error(this, this + " is not a class");
   }
   
+  public TypeSymbol resolvePreferablyToItf(TypeMap scope)
+  {
+    TypeSymbol res = resolveToTypeSymbol(scope);
+
+    if (res instanceof Interface)
+      return (Interface) res;
+
+    if (res instanceof TypeConstructor)
+      {
+	ClassDefinition def = ClassDefinition.get((TypeConstructor) res);
+	if (def != null)
+	  {
+	    mlsub.typing.Interface itf = def.getAssociatedInterface();
+	    if (itf != null)
+	      return itf;
+	  }
+      }
+
+    return res;
+  }
+  
   public mlsub.typing.Interface resolveToItf(TypeMap scope)
   {
     TypeSymbol res = resolveToTypeSymbol(scope);
@@ -127,10 +148,10 @@ public final class TypeIdent extends Monotype implements Located
 	      return itf;
 	  }
       }
-    
+
     throw User.error(this, res + " should be an interface");
   }
-  
+
   public static TypeConstructor[] resolveToTC(TypeMap scope, List idents)
   {
     if (idents==null || idents.size()==0) return null;

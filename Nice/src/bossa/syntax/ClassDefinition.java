@@ -70,7 +70,7 @@ abstract public class ClassDefinition extends MethodContainer
       // Extensions should be null in that case.
       if (extendedInterfaces == null)
 	{
-	  extendedInterfaces = TypeIdent.resolveToItf(typeScope, extensions);
+	  extendedInterfaces = resolveInterfaces(extensions);
 	  extensions = null;
 	}
 
@@ -101,6 +101,17 @@ abstract public class ClassDefinition extends MethodContainer
 		       ": they do not have the same number or kind of type parameters");
 	  }
       
+	if (javaInterfaces != null)
+	  for (int i = 0; i < javaInterfaces.length; i++)
+	    try {
+	      Typing.initialLeq(tc, javaInterfaces[i]);
+	    }
+	    catch(KindingEx e){
+	      User.error(name,
+			 "Class " + name + " cannot extend " + e.t2 +
+			 ": they do not have the same number or kind of type parameters");
+	    }
+
 	Typing.assertImp(tc, associatedInterface, true);
       }
       catch(TypingEx e){
@@ -242,7 +253,7 @@ abstract public class ClassDefinition extends MethodContainer
 	    d.resolve();
 	}
 
-      impl = TypeIdent.resolveToItf(typeScope, implementations);
+      impl = resolveInterfaces(implementations);
       abs = TypeIdent.resolveToItf(typeScope, abstractions);
     
       implementations = abstractions = null;
@@ -262,7 +273,18 @@ abstract public class ClassDefinition extends MethodContainer
 		       "Class " + name + " cannot extend " + e.t2 +
 		       ": they do not have the same number or kind of type parameters");
 	  }
-      
+
+	if (javaInterfaces != null)
+	  for (int i = 0; i < javaInterfaces.length; i++)
+	    try {
+	      Typing.initialLeq(tc, javaInterfaces[i]);
+	    }
+	    catch(KindingEx e){
+	      User.error(name,
+			 "Class " + name + " cannot implement " + e.t2 +
+			 ": they do not have the same number or kind of type parameters");
+	    }
+
 	if (isFinal)
 	  Typing.assertMinimal(tc);
 
@@ -451,6 +473,45 @@ abstract public class ClassDefinition extends MethodContainer
   {
     createContext();
     implementation.resolveClass();
+  }
+
+  /** Java interfaces implemented or extended by this class/interface. */
+  TypeConstructor javaInterfaces[];
+
+  mlsub.typing.Interface[] resolveInterfaces(List names)
+  {
+    if (names == null)
+      return null;
+
+    mlsub.typing.Interface[] res = new mlsub.typing.Interface[names.size()];
+    int n = 0;
+    ArrayList javaInterfaces = null;
+
+    for (Iterator i = names.iterator(); i.hasNext();)
+      {
+	TypeIdent name = (TypeIdent) i.next();
+	TypeSymbol s = name.resolvePreferablyToItf(typeScope);
+	
+	if (s instanceof mlsub.typing.Interface)
+	  res[n++] = (mlsub.typing.Interface) s;
+	else
+	  {
+	    if (javaInterfaces == null)
+	      javaInterfaces = new ArrayList(5);
+	    javaInterfaces.add(s);
+	  }
+      }
+
+    if (n < res.length) // The array is too long
+      {
+	mlsub.typing.Interface[] tmp = new mlsub.typing.Interface[n];
+	System.arraycopy(res, 0, tmp, 0, n);
+	res = tmp;
+	this.javaInterfaces = (TypeConstructor[])
+	  javaInterfaces.toArray(new TypeConstructor[javaInterfaces.size()]);
+      }
+
+    return res;
   }
 
   void resolveBody()

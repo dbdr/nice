@@ -42,7 +42,7 @@ typecheck(e@AssignExp)
 
   let variable = localVariable(to);
   if (variable != null && Node.getCurrentFunction() instanceof FunExp)
-    variable.captured = true;
+    setCaptured(variable);
   
   try{
     e.value = notNull(e.value).resolveOverloading(to.getType());
@@ -233,7 +233,15 @@ typecheck(e@FunExp)
 {
   ?Function saved = Node.getCurrentFunction();
   Node.setCurrentFunction(e);
-  typecheck(e.body);
+
+  enterClosure();
+  try {
+    typecheck(e.body);
+  }
+  finally {
+    exitClosure();
+  }
+
   Node.setCurrentFunction(saved);
 }
 
@@ -445,6 +453,62 @@ void overrideOuterType(MonoSymbol variable, mlsub.typing.Monotype newType)
 	return t;
     }
   return null;
+}
+
+var Stack<(Stack<int>, Stack<(MonoSymbol, mlsub.typing.Monotype)>)> closureEnvironments = new Stack();
+var Stack<List<(MonoSymbol, mlsub.typing.Monotype)>> replacedTypes = new Stack();
+
+void enterClosure()
+{
+  Set<MonoSymbol> done = new HashSet();
+  List<(MonoSymbol, mlsub.typing.Monotype)> replaced = new ArrayList();
+  for (int i = 0; i < levels.size(); i++)
+    {
+      (MonoSymbol variable, mlsub.typing.Monotype type) = conditionalTypes.get(i);
+      if (!done.contains(variable))
+        {
+	  replaced.add((variable, variable.type));
+	  variable.type = type;
+          done.add(variable);
+        }
+    }
+  
+  replacedTypes.push(replaced);
+  closureEnvironments.push((levels, conditionalTypes));
+  levels = new Stack();
+  conditionalTypes = new Stack();
+}
+
+void exitClosure()
+{ 
+  List<(MonoSymbol, mlsub.typing.Monotype)> replaced = replacedTypes.pop();
+  for (int i = 0; i < replaced.size(); i++)
+    {    
+      (MonoSymbol variable, mlsub.typing.Monotype type) = replaced.get(i);
+      variable.type = type;
+    }
+
+  (levels, conditionalTypes) = closureEnvironments.pop();
+}
+
+void setCaptured(MonoSymbol variable)
+{
+  if (!variable.captured)
+    {
+      variable.captured = true;
+      let origType = getOriginalType(variable) || variable.type;
+      variable.type = origType;
+      for (int i = 0; i < closureEnvironments.size(); i++)
+        {
+	  (Stack<int> lvls, Stack<(MonoSymbol, mlsub.typing.Monotype)> condTypes) = closureEnvironments.get(i);
+          for (int k = 0; k < condTypes.size(); k++)
+	    {
+              (MonoSymbol v, mlsub.typing.Monotype t) = condTypes.get(k);
+              if (v == variable)
+		condTypes.set(k, (v, origType));
+	    }
+        }
+    }
 }
 
 typecheck(e@IfExp)

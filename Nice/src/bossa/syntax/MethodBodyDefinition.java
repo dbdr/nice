@@ -59,7 +59,7 @@ public class MethodBodyDefinition extends Definition
 
     this.formals = makeFormals(formals, container);
     this.body = body;
-    this.definition = null;
+    this.declaration = null;
     
     if (name.content.equals("main") && formals.size() == 1)
       module.isRunnable(true);
@@ -122,13 +122,19 @@ public class MethodBodyDefinition extends Definition
     return res;
   }
   
-  private void setDeclaration(NiceMethod d)
+  private void setDeclaration(MethodDeclaration d)
   {
     if (d == null)
       User.error(this, "Method " + name + " is not declared");
     
-    this.definition = d;
-    parameters = buildSymbols(this.formals, definition.getArgTypes());
+    // Overriding a mono-method can currently not dispatch on other args
+    if (d instanceof JavaMethod)
+      for (int i = 1; i < formals.length; i++)
+	if (!(formals[i].atAny()))
+	  User.error(this, this + " is a native method. Dispatch can only occur on the first argument");
+    
+    this.declaration = d;
+    parameters = buildSymbols(this.formals, declaration.getArgTypes());
     scope.addSymbols(parameters);
   }
 
@@ -158,9 +164,8 @@ public class MethodBodyDefinition extends Definition
       
       MethodDeclaration m = ((MethodDeclaration.Symbol) s).getDefinition();
 
-      // It doesn't make sense to define a body for a native method, does it ?
-      if(!(m instanceof NiceMethod) 
-	 || m.getArity() != formals.length)
+      if (!(m instanceof NiceMethod || m instanceof JavaMethod) 
+	  || m.getArity() != formals.length)
 	{
 	  i.remove();
 	  continue;
@@ -169,7 +174,7 @@ public class MethodBodyDefinition extends Definition
       try{
 	int level;
 	if (Debug.overloading)
-	  level = Typing.enter("Trying definition " + m + 
+	  level = Typing.enter("Trying declaration " + m + 
 			       " for method body "+name);
 	else
 	  level = Typing.enter();
@@ -269,22 +274,16 @@ public class MethodBodyDefinition extends Definition
     if(!(s instanceof MethodDeclaration.Symbol))
       User.error(this, name+" is not a method");
 
-    MethodDeclaration def = ((MethodDeclaration.Symbol) s).getDefinition();
+    MethodDeclaration decl = ((MethodDeclaration.Symbol) s).getDefinition();
     
-    if(!(def instanceof NiceMethod))
-      User.error(this, name + " is not a Nice method.\n" +
-		 "An alternative cannot be defined for it.\n" +
-		 name + " was declared at " + def.location()
-		 );
-    
-    setDeclaration((NiceMethod) def);
+    setDeclaration(decl);
 
     // Get type parameters
     if (binders != null)
     try{
       typeScope.addMappingsLS
 	(binders,
-	 definition.getType().getConstraint().binders());
+	 declaration.getType().getConstraint().binders());
     }
     catch(mlsub.typing.BadSizeEx e){
       User.error(name, "Method " + name + 
@@ -301,7 +300,7 @@ public class MethodBodyDefinition extends Definition
   void resolveBody()
   {
     body = bossa.syntax.dispatch.analyse$0
-      (body, scope, typeScope, !Types.isVoid(definition.getReturnType()));
+      (body, scope, typeScope, !Types.isVoid(declaration.getReturnType()));
   }
   
   /****************************************************************
@@ -319,7 +318,7 @@ public class MethodBodyDefinition extends Definition
 
   public mlsub.typing.Monotype getReturnType()
   {
-    return definition.getReturnType();
+    return declaration.getReturnType();
   }
 
   void typecheck()
@@ -336,7 +335,7 @@ public class MethodBodyDefinition extends Definition
       entered = true;
 
       try { 
-	assert(definition.getType().getConstraint()); 
+	assert(declaration.getType().getConstraint()); 
       }
       catch(TypingEx e){
 	User.error(name,
@@ -352,7 +351,7 @@ public class MethodBodyDefinition extends Definition
 	//monotypes[i].setKind(ConstantExp.maybeTC.variance);
 	
 	// The arguments have types below the method declaration domain
-	Monotype[] domain = definition.getType().domain();
+	Monotype[] domain = declaration.getType().domain();
 	for (int i = 0; i < monotypes.length; i++)
 	  Typing.leq(monotypes[i], domain[i]);
       }
@@ -455,23 +454,20 @@ public class MethodBodyDefinition extends Definition
   {
     if(Debug.codeGeneration)
       Debug.println("Compiling method body " + this);
-    
-    if(definition == null)
-      Internal.error(this, this+" has no definition");
 
+    if (declaration instanceof NiceMethod)
+      compile((NiceMethod) declaration);
+    else
+      compile((JavaMethod) declaration);
+  }
+
+  private void compile (NiceMethod definition)
+  {
     String bytecodeName = definition.getBytecodeName() + 
       Pattern.bytecodeRepresentation(formals);
 
-    gnu.expr.LambdaExp lexp = 
-      Gen.createMethod(bytecodeName, 
-		       javaArgTypes(),
-		       definition.javaReturnType(),
-		       parameters);
+    gnu.expr.LambdaExp lexp = createMethod(bytecodeName);
     gnu.expr.ReferenceExp ref = Gen.referenceTo(lexp);
-
-    //FIXME: comment the next line?
-    Statement.currentScopeExp = lexp;
-    Gen.setMethodBody(lexp, body.generateCode());
     module.addMethod(lexp, true);
 
     lexp.addBytecodeAttribute
@@ -484,8 +480,41 @@ public class MethodBodyDefinition extends Definition
       module.setMainAlternative(ref);
 
     // Register this alternative for the link test
-    new bossa.link.Alternative(this.definition, this.formals, ref);
+    new bossa.link.Alternative(definition, this.formals, ref);
   }
+
+  private void compile (JavaMethod declaration)
+  {
+    gnu.expr.LambdaExp lexp = createMethod(declaration.methodName);
+    
+    // Compile as a method in the class of the first argument
+    try {
+      NiceClass c = (NiceClass) ClassDefinition.get(formals[0].tc);
+      c.addJavaMethod(lexp);
+    }
+    catch(ClassCastException e) {
+      User.error(this, declaration + " is a native method.\nIt can not be overriden because " + formals[0].tc + " is not a class defined in Nice");
+    }
+  }
+
+  private gnu.expr.LambdaExp createMethod (String bytecodeName)
+  {
+    gnu.expr.LambdaExp lexp = 
+      Gen.createMethod(bytecodeName, 
+		       javaArgTypes(),
+		       declaration.javaReturnType(),
+		       parameters);
+
+    //FIXME: comment the next line?
+    Statement.currentScopeExp = lexp;
+    Gen.setMethodBody(lexp, body.generateCode());
+
+    return lexp;
+  }
+
+  /****************************************************************
+   * Main method
+   ****************************************************************/
 
   public static void compileMain(Module module, 
 				 gnu.expr.ReferenceExp mainAlternative)
@@ -523,7 +552,7 @@ public class MethodBodyDefinition extends Definition
     return name + "(" + Util.map("", ", ", "", formals) + ")";
   }
 
-  private NiceMethod definition;
+  private MethodDeclaration declaration;
   protected MonoSymbol[] parameters;
   protected Pattern[] formals;
   Collection /* of LocatedString */ binders; // Null if type parameters are not bound

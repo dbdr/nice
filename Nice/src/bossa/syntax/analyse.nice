@@ -258,7 +258,7 @@ analyse(e@CallExp, info)
 	  LocatedString nextComponent = identString(e.function);
 
 	  if (nextComponent == null)
-	    throw unknownIdent(pkg.locatedName());
+	    throw unknownIdent(notNull(pkg.locatedName()));
 
 	  return ClassExp.create(pkg, nextComponent);
 	}
@@ -330,7 +330,7 @@ analyse(e@IdentExp, info)
   //if (e.infix)
     //return e;
 
-  if (true) throw unknownIdent(e.ident);
+  if (true) throw unknownIdent(notNull(e.ident));
   return null; // work-around pb with non-reachable code
 }
 

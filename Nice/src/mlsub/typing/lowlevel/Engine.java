@@ -716,7 +716,7 @@ public abstract class Engine
   
     public String toString()
     {
-      return "Constraint for "+associatedKind+":\n"+k0.toString();
+      return "Constraint " + name + " for "+associatedKind+":\n"+k0.toString();
     }
 
     public final boolean isValid(Element e)

@@ -154,8 +154,15 @@ public class RetypedJavaMethod extends JavaMethod
     
     JavaClasses.registerNativeMethod(this, reflectMethod);    
 
-    //if (reflectMethod.isConstructor())
-    //.addConstructor(this);
+    if (reflectMethod.isConstructor())
+      {
+	try {
+	  mlsub.typing.TypeConstructor tc = Types.typeConstructor(holder);
+	  if (tc != null)
+	    TypeConstructors.addConstructor(tc, this);
+	}
+	catch(Types.NotIntroducedClassException ex) {}
+      }
     
     int javaArity;
     if(reflectMethod.getStaticFlag() || reflectMethod.isConstructor())

@@ -32,3 +32,15 @@ interface CharacterIterator<T> = native java.text.CharacterIterator;
 /// FAIL
   /// Toplevel
 class Int = native int;
+
+/// PASS
+  /// package nativePkg
+  /// Toplevel
+class Container { Object element; }
+
+  /// package nice
+  Container<String> c = new Container("Allo");
+  /// Toplevel
+  // We do not import java, so Container is like a Java class.
+class Container<T> = native nativePkg.Container;
+<T> Container<T> newContainer(T) = native new nativePkg.Container(Object);

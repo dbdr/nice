@@ -10,7 +10,7 @@ import java.util.*;
  */
 public class HashMultiTable {
   // underlying hash table that contains linked lists of objects (Bucket)
-  private Hashtable table = new Hashtable();
+  private HashMap table = new HashMap();
   
   private static class Bucket {
     Bucket(Object value, Bucket next) {

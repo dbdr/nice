@@ -19,7 +19,10 @@ void main(String[] args)
    option("classpath",
 	  "Search path for compiled packages to be tested\nPATH is a list of directories and .jar archives",
 	  "path",
-	  String path => { classpath = path; })
+	  String path => { classpath = path; }),
+
+   option("man", "Print man page to stdout", visible: false,
+	  () => man(prg))
   ];
 
   List<String> rest = parse(prg, args);

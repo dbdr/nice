@@ -38,9 +38,4 @@ class JavaConstructor extends JavaMethod
   {
     return new QuoteExp(new InstantiateProc(reflectMethod));
   }
-  
-  Expression getConstructorInvocation()
-  {
-    return new QuoteExp(new InitializeProc(reflectMethod));
-  }
 }

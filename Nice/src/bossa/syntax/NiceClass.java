@@ -732,7 +732,7 @@ public class NiceClass extends ClassDefinition.ClassImplementation
 	constructorMethod[index].getConstructorInvocation(omitDefaults);
 
     List constructors = TypeConstructors.getConstructors(tc);
-    JavaConstructor m = (JavaConstructor)
+    JavaMethod m = (JavaMethod)
       ((MethodDeclaration.Symbol) constructors.get(index)).getDefinition();
     return m.getConstructorInvocation();
   }

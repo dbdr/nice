@@ -109,6 +109,9 @@ public abstract class MethodDeclaration extends Definition
   
   public final Monotype[] getArgTypes()
   {
+    if (type == null)
+      symbol.resolve();
+
     return type.domain();
   }
   

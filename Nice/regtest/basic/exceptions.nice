@@ -56,6 +56,8 @@ test_exceptions()
 
   testFinally(true);
   testFinally(false);  
+  testFinallyInt(true);
+  testFinallyInt(false);  
 }
 
 <Any T> T neverReturns()
@@ -82,6 +84,23 @@ void testFinally(boolean callReturn)
       println("Finally is executed if return is called from try");
     }
     return;
+  }
+  finally{
+    println("Outer finally blocks must be executed too");
+  }
+}
+
+int testFinallyInt(boolean callReturn)
+{
+  try{
+    try{
+      if (callReturn)
+	return 0;
+    }
+    finally{
+      println("Finally is executed if return is called from try");
+    }
+    return 1;
   }
   finally{
     println("Outer finally blocks must be executed too");

@@ -32,7 +32,7 @@ public class CodeAttr extends Attribute implements AttrContainer
   // stack errors, while being more general and less hassle.  FIXME.
   Type[] stack_types;
 
-  int SP;  // Current stack size (in "words")
+  public int SP;  // Current stack size (in "words")
   private int max_stack;
   private int max_locals;
   int PC;
@@ -1582,19 +1582,42 @@ public class CodeAttr extends Attribute implements AttrContainer
     put1 (195);  // monitorexit
   }
 
+  private void callFinallyBlocks()
+  {
+    TryState state = try_stack;
+
+    /* If a value is returned, it must be saved to a local variable,
+       to prevent a verification error because of inconsistent stack sizes.
+    */
+    boolean saveResult = ! getMethod().getReturnType().isVoid();
+    Variable result = null;
+
+    while (state != null)
+      {
+	if (state.finally_subr != null         // there is a finally block
+	    && state.finally_ret_addr == null) // 'return' is not inside it
+	  {
+	    if (saveResult && result == null)
+	      {
+		result = addLocal(topType());
+		emitStore(result);
+	      }
+	    emitJsr(state.finally_subr);
+	  }
+
+	state = state.previous;
+      }
+
+    if (result != null)
+      emitLoad(result);
+  }
+	    
   /**
    * Compile a method return.
    */
   public final void emitReturn ()
   {
-    TryState stack = try_stack;
-    while (stack != null)
-      {
-	if (stack.finally_subr != null         // there is a finally block
-	    && stack.finally_ret_addr == null) // 'return' is not inside it
-	  emitJsr(stack.finally_subr);
-	stack = stack.previous;
-      }
+    callFinallyBlocks();
 
     if (getMethod().getReturnType().size == 0)
       {

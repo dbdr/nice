@@ -604,7 +604,7 @@ public class ClassType extends ObjectType implements AttrContainer {
     for (;;)
       {
         Method method = cl.getDeclaredMethod(name, arg_types);
-        if (method != null)
+        if (method != null && (! (concrete && method.isAbstract())))
           return method;
 
         if (! concrete)

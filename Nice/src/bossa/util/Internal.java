@@ -44,9 +44,12 @@ public final class Internal
   
   public static void warning(String message)
   {
-    if(Debug.alwaysDumpStack)
-      printStackTrace();
-    nice.tools.compiler.OutputMessages.warning("[Internal warning] "+message);
+    if (Debug.powerUser)
+      {
+	if(Debug.alwaysDumpStack)
+	  printStackTrace();
+	nice.tools.compiler.OutputMessages.warning("[Internal warning] "+message);
+      }
   }
 
   public static void error(Located loc, String message, String dbgMsg)

@@ -3,61 +3,20 @@ package nice.getopt;
 
 import gnu.getopt.*;
 
-/** Creates a no parameter option. */
-Option option(char shortName,
-	      String longName,
-	      String purpose, 
-	      fun()() action);
-
-/** Creates a required parameter option. */
-Option option(char,String,String,String,fun(String)());
-
-/** Creates an optional parameter option. */
-Option option(char,String,String,String,fun()(),fun(String)());
-
 /** Parses the list of strings according to the options,
     and returns the non-options arguments. */
 Sequence<String> parse(String, Array<String>,Sequence<Option>);
 
 String printOptions(Sequence<Option>);
 
-abstract class Option
-{
-  char shortName;
-
-  String longName;
-
-  String purpose;
-
-  int optval; // the int value of shortName
-}
-
-class NoParamOption extends Option
-{
-  fun()() action;
-}
-
-class RequiredParamOption extends Option
-{
-  String optionHint;
-  fun(String)() action;
-}
-
-class OptionalParamOption extends Option
-{
-  String optionHint;
-  fun()() actionNoParam;
-  fun(String)() actionParam;
-}
-
 int optType(Option);
 optType(o@NoParamOption) = LongOpt.NO_ARGUMENT();
-optType(o@RequiredParamOption) = LongOpt.REQUIRED_ARGUMENT();
+optType(o@ParamOption) = LongOpt.REQUIRED_ARGUMENT();
 optType(o@OptionalParamOption) = LongOpt.OPTIONAL_ARGUMENT();
 
 String optSuffix(Option);
 optSuffix(o@NoParamOption) = "";
-optSuffix(o@RequiredParamOption) = ":";
+optSuffix(o@ParamOption) = ":";
 optSuffix(o@OptionalParamOption) = "::";
 
 parse(progName, args, options)
@@ -108,16 +67,25 @@ parse(progName, args, options)
   return res;
 }
 
+<Any T> T notNull(T) = inline nice.lang.inline.Nop();
+
 void doAction(Option, Getopt);
 doAction(o@NoParamOption,g) = action(o)();
-doAction(o@RequiredParamOption,g) = action(o)(notNull(g.getOptarg()));
+doAction(o@ParamOption,g) = actionParam(o)(notNull(g.getOptarg()));
 doAction(o@OptionalParamOption,g)
 {
+
   ?String arg = g.getOptarg();
   if(arg == null)
     actionNoParam(o)();
   else
     actionParam(o)(notNull(arg));
+
+/*  String arg = g.getOptarg();
+  if(arg == null)
+    actionNoParam(o)();
+  else
+    actionParam(o)(arg);*/
 }
 
 var int uniqId = 256;

@@ -226,7 +226,7 @@ public class Block extends Statement
     gnu.expr.Expression body;
 
     if (statements.length != 0)
-      body = new gnu.expr.BeginExp(null);
+      body = new gnu.expr.BeginExp();
     else
       body = gnu.expr.QuoteExp.voidExp;
 

@@ -178,7 +178,7 @@ public class FormalParameters extends Node
     return res;
   }
 
-  MonoSymbol[] getMonoSymbols()
+  public MonoSymbol[] getMonoSymbols()
   {
     if (parameters == null) return null;
     

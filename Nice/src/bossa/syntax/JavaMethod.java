@@ -123,6 +123,7 @@ public class JavaMethod extends MethodDeclaration
     catch(Types.NotIntroducedClassException e){
       // The fetched method involves invalid types.
       // Ignore.
+      Internal.warning("Java method " + m + " was ignored.\nReason: " + e);
       return null;
     }
   }
@@ -255,9 +256,9 @@ public class JavaMethod extends MethodDeclaration
   public gnu.bytecode.Type[] javaArgTypes()
   { return javaArgType; }
 
-  protected gnu.mapping.Procedure computeDispatchMethod()
+  protected gnu.expr.Expression computeCode()
   {
-    return new gnu.expr.PrimProcedure(reflectMethod);
+    return new gnu.expr.QuoteExp(new gnu.expr.PrimProcedure(reflectMethod));
   }
   
   private void findReflectMethod()

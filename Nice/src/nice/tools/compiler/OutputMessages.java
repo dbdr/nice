@@ -47,7 +47,11 @@ public final class OutputMessages
 
   public static void exit()
   {
-    System.exit(statusCode);
+    // A non-zero code is interpreted as error, e.g. by make
+    if (statusCode == WARNING)
+      System.exit(OK);
+    else
+      System.exit(statusCode);
   }
   
   public static final int 

@@ -82,9 +82,9 @@ public class TryStmt extends Statement
   {
     Catch(TypeIdent tc, LocatedString var, Statement body)
     {
-      this.exnVar = new MonoSymbol
-	(var, 
-	 new MonotypeConstructor(tc, null, tc.location()));
+      Monotype type = new MonotypeConstructor(tc, null, tc.location());
+      type.nullness = Monotype.sure;
+      this.exnVar = new MonoSymbol(var, type);
       
       this.tc = tc;
       this.typeLocation = tc.location();

@@ -49,10 +49,10 @@ public class InlinedMethod extends MethodDeclaration
   {
     super.typecheck();
     // forces the reflection search
-    getDispatchMethod();
+    getCode();
   }
 
-  protected gnu.mapping.Procedure computeDispatchMethod()
+  protected gnu.expr.Expression computeCode()
   {
     Class refClass = null;
     try{
@@ -101,7 +101,7 @@ public class InlinedMethod extends MethodDeclaration
 		   "Inlined method " + inlineProcedure + 
 		   " cannot be inlined, but will be called anyway");
 
-    return (gnu.mapping.Procedure) o;
+    return new gnu.expr.QuoteExp((gnu.mapping.Procedure) o);
   }
 
   private static Class[] string1 = new Class[]{ "".getClass() };

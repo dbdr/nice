@@ -114,6 +114,7 @@ abstract public class ClassDefinition extends Definition
 	    if (parameters[0] instanceof MonotypeVar)
 	      return "!" + parameters[0].toString();
 	    else
+	      //  return "!" + parameters[0].toString(); 
 	      return parameters[0].toString(); 
 	  }
 	};

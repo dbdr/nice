@@ -16,6 +16,8 @@ import bossa.util.*;
 import mlsub.typing.*;
 
 import gnu.bytecode.*;
+import gnu.expr.Declaration;
+
 import java.util.*;
 
 /**
@@ -31,11 +33,26 @@ public class GlobalVarDeclaration extends Definition
   {
     super(name, Node.global);
     
-    this.left=new MonoSymbol(name,type);
-    //addSymbol(left);
+    this.left = new MonoSymbol(name,type)
+      {
+	Declaration getDeclaration()
+	{
+	  Declaration res = super.getDeclaration();
+	  
+	  if (res == null)
+	    {
+	      res = module.addGlobalVar
+		(left.name.toString(), 
+		 nice.tools.code.Types.javaType(left.type));
+	      setDeclaration(res);
+	    }
+
+	  return res;
+	}
+      };
     addChild(left);
     
-    if(value!=null)
+    if (value != null)
       this.value = value;
   }
 
@@ -56,35 +73,6 @@ public class GlobalVarDeclaration extends Definition
 
   public void createContext()
   {
-    // Not really related to the rigid context, 
-    // but it a good time to do this (must be done after resolving).
-    gnu.expr.Declaration declaration = 
-      new gnu.expr.Declaration(left.name.toString(),
-			       nice.tools.code.Types.javaType(left.type));
-
-    if(!module.generatingBytecode())
-      // The code is already there
-      {
-	declaration.field = 
-	  module.getReadBytecode().getField(left.name.toString());
-	
-	if (declaration.field == null)
-	  Internal.error(this,
-			 "The compiled file is not consistant with the interface file");
-      }
-    else
-      {
-	declaration.field = module.getOutputBytecode()
-	  .addField(left.name.toString(),
-		    nice.tools.code.Types.javaType(left.type),
-		    Access.PUBLIC|Access.STATIC);
-	declaration.setSimple(false);
-	declaration.noteValue(null);
-      }
-    
-    module.getPackageScopeExp().addDeclaration(declaration);
-    
-    left.setDeclaration(declaration);
   }
 
   /****************************************************************
@@ -123,9 +111,12 @@ public class GlobalVarDeclaration extends Definition
 
   public void compile()
   {
-    if(value!=null)
-      module.addClassInitStatement
-	(new gnu.expr.SetExp(left.getDeclaration(),value.compile()));    
+    gnu.expr.Declaration declaration = left.getDeclaration();
+
+    if (value == null)
+      declaration.noteValue(null);
+    else
+      declaration.noteValue(value.compile());
   }
 
   /****************************************************************

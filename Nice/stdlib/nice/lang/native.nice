@@ -10,22 +10,13 @@
 /*                                                                        */
 /**************************************************************************/
 
+package nice.lang;
+
 /**
-   String manipulation functions.
-*/
+   Various native constructs.
 
-/****************************************************************
- * Strings
- ****************************************************************/
+   @version $Date$
+   @author Daniel Bonniot (Daniel.Bonniot@inria.fr)
+ */
 
-<Any R> String `+`(String,R);
-`+`(s@String,o) = s.concat(toString(o));
-
-/****************************************************************
- * Java methods
- ****************************************************************/
-
-/** The returned string is always non-null */
-String concat(String, String) = native String String.concat(String);
-StringBuffer append(StringBuffer, ?String) 
-= native StringBuffer StringBuffer.append(String);
+void `throw`(java.lang.Throwable exception) = inline nice.lang.inline.Throw();

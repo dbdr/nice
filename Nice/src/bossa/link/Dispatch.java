@@ -55,13 +55,9 @@ public final class Dispatch
   
   private static void test(NiceMethod m, bossa.modules.Package module)
   {
-    // main does not have to be implemented if the module is not runnable
-    if (m.isMain() && !module.isRunnable())
-      return;
-    
     Stack sortedAlternatives = Alternative.sortedAlternatives(m);
     
-    if(!(trivialTestOK(sortedAlternatives)))
+    if (!(m.isMain() || trivialTestOK(sortedAlternatives)))
       test(m, sortedAlternatives);
     
     if(Debug.codeGeneration)
@@ -166,14 +162,24 @@ public final class Dispatch
 	  User.warning(method,
 		       "Method "+method+" is not exhaustive:\n"+
 		       "no alternative matches "+Util.map("(",", ",")",tags));
+	  //FIXME: write 'null' for the tags that code null values (maybeTC)
       }
     return failed;
   }
 
+  /**
+     Enumerate all the tuples of tags in the domain of a polytype.
+     
+     @return a List of TypeConstructor[]
+       an element of an array is set to:
+         null if it cannot be matched (e.g. a function type)
+	 ConstantExp.maybeTC if it is matche by @null
+  **/
   private static List enumerate(Polytype type)
   {
     Monotype[] domains = type.domain();
     Monotype[] types = new Monotype[domains.length];
+    boolean[] maybeNull = new boolean[domains.length];
 
     for (int i = 0; i < domains.length; i++)
       { 
@@ -186,13 +192,38 @@ public final class Dispatch
 
 	MonotypeConstructor mc = (MonotypeConstructor) domains[i];
 	TypeConstructor tc = mc.getTC();
-	if (tc == ConstantExp.sureTC)
-	  types[i] = mc.getTP()[0];
-	else
-	  Internal.error("Not implemented: " + tc);
+	if (tc != ConstantExp.sureTC)
+	  maybeNull[i] = true;
+
+	types[i] = mc.getTP()[0];
       }
 
     Domain domain = new Domain(type.getConstraint(), new TupleType(types));
-    return mlsub.typing.Enumeration.enumerate(domain);
+    List res = mlsub.typing.Enumeration.enumerate(domain);
+    return addNullCases(res, maybeNull);
+  }
+
+  /** Extend the list of tuples to add the case where some tags 
+      must be matches by @null
+  */
+  private static List addNullCases(List tuples, boolean[] maybeNull)
+  {
+    // FIXME
+    // This implementation creates duplicate tuples
+
+    for(int index = 0; index < maybeNull.length; index++)
+      if (maybeNull[index])
+	{
+	  int size = tuples.size();
+
+	  // duplicate all entries
+	  for(int i = 0; i < size; i++)
+	    tuples.add(((Object[]) tuples.get(i)).clone());
+
+	  // put the @null tag for the first half
+	  for(int i = 0; i < size; i++)
+	    ((TypeConstructor[]) tuples.get(i))[index] = ConstantExp.maybeTC;
+	}
+    return tuples;
   }
 }

@@ -22,7 +22,6 @@ package nice.tools.ast;
 
 class SymbolTable<Sym>
 {
-  public Sym get(String name);
   public void set(String name, Sym sym);
 
   public void begin();
@@ -32,15 +31,17 @@ class SymbolTable<Sym>
 
   nice.lang.Hashtable<String, Binder<Sym>> symbols;
 
-  Binder<Sym> topBinder; // list of the binders added since last begin
+  ?Binder<Sym> topBinder; // list of the binders added since last begin
   Binder<Sym> marks;     // remembers topBinders at each begin
 }
+
+<Any Sym> ?Sym get(SymbolTable<!Sym>, String name);
 
 class Binder<Sym>
 {
   Sym value;
   String name;
-  Binder<Sym> nextBinder;
+  ?Binder<Sym> nextBinder;
   Binder<Sym> oldBinding;
 }
 
@@ -53,7 +54,7 @@ symbolTable<Sym>()
 
 get<Sym>(t@SymbolTable, name)
 {
-  Binder<Sym> binder = t.symbols.get(name);
+  Binder<!Sym> binder = t.symbols.get(name);
   if (binder == null)
     return null;
   else
@@ -80,12 +81,13 @@ begin<Sym>(t@SymbolTable)
   t.marks = mark;
 }
 
-end(t@SymbolTable)
+end<Sym>(t@SymbolTable)
 {
   while (t.topBinder != null)
     {
-      t.symbols.put(t.topBinder.name, t.topBinder.oldBinding);
-      t.topBinder = t.topBinder.nextBinder;
+      Binder<Sym> top = notNull(t.topBinder);
+      t.symbols.put(top.name, top.oldBinding);
+      t.topBinder = top.nextBinder;
     }
   t.topBinder = t.marks.nextBinder;
   t.marks = t.marks.oldBinding;

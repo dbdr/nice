@@ -77,20 +77,7 @@ public class SymbolExp extends Expression
 
   public gnu.expr.Expression compile()
   {
-    if(symbol instanceof MethodDeclaration.Symbol)
-      {
-        gnu.mapping.Procedure proc = ((MethodDeclaration.Symbol) symbol)
-	  .getDefinition().getDispatchMethod();
-
-        return new QuoteExp(proc);
-      }
-    
-    gnu.expr.Declaration decl = symbol.getDeclaration();
-    
-    if(decl==null)
-      Internal.error(this+" has no bytecode declaration");
-    
-    return new gnu.expr.ReferenceExp(symbol.name.toString(),decl);
+    return symbol.compile();
   }
   
   /** @return the declaration of the variable denoted by this expression,

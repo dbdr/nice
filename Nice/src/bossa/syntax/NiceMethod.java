@@ -193,20 +193,16 @@ public class NiceMethod extends MethodDeclaration
     return module.getName().replace('.','$')+'$'+bytecodeName;
   }
 
-  private gnu.bytecode.Method dispatchPrimMethod;
-
-  protected gnu.mapping.Procedure computeDispatchMethod()
+  protected gnu.expr.Expression computeCode()
   {
-    dispatchPrimMethod = module.addDispatchMethod(this);
-    return new gnu.expr.PrimProcedure(dispatchPrimMethod);
+    return module.getDispatchMethod(this);
   }
-  
-  public final gnu.bytecode.Method getDispatchPrimMethod() 
-  { 
-    getDispatchMethod();
-    return dispatchPrimMethod;
+
+  public final LambdaExp getLambda()
+  {
+    return nice.tools.code.Gen.dereference(getCode());
   }
-  
+
   public void compile()
   {
   }

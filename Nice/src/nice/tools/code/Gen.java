@@ -54,20 +54,39 @@ public class Gen
 
   /**
      Create a lambda expression to generate code for the method.
-     @param args can be null if there are no parameters.
+
+     @param can be null if there are no arguments
   */
-  public static LambdaExp createMethod(Method method, MonoSymbol[] args)
+  public static LambdaExp createMethod(String bytecodeName,
+				       Type[] argTypes,
+				       Type retType,
+				       MonoSymbol[] args)
   {
-    Type[] argTypes = method.getParameterTypes();
-    Type retType = method.getReturnType();
+    return createMethod(bytecodeName, argTypes, retType, args, true);
+  }
+
+  /**
+     @param forceGeneration
+  **/
+  public static LambdaExp createMethod(String bytecodeName,
+				       Type[] argTypes,
+				       Type retType,
+				       MonoSymbol[] args,
+				       boolean forceGeneration)
+  {
+    bytecodeName = nice.tools.code.Strings.escape(bytecodeName);
     int arity = args == null ? 0 : args.length;
 
     BlockExp blockExp = new gnu.expr.BlockExp(retType);
 
     gnu.expr.LambdaExp lexp = new gnu.expr.LambdaExp(blockExp);
-    lexp.setName(method.getName());
-    lexp.setPrimMethod(method);
+    lexp.setName(bytecodeName);
     lexp.min_args = lexp.max_args = arity;
+    if (forceGeneration)
+      {
+	lexp.setCanCall(true);
+	lexp.forceGeneration();
+      }
 
     // Parameters
     for(int n = 0; n < arity; n++)
@@ -77,12 +96,32 @@ public class Gen
 	  : args[n].getName().toString();
 
 	gnu.expr.Declaration d = lexp.addDeclaration(parameterName);
-	d.setParameter(true);
-	d.setType(argTypes[n]);
+	if (argTypes != null)
+	  d.setType(argTypes[n]);
 	d.noteValue(null);
 	args[n].setDeclaration(d);
       }
 
     return lexp;
+  }
+
+  /**
+     @return an expression that references the lambda expression.
+  */
+  public static ReferenceExp referenceTo(LambdaExp lambda)
+  {
+    Declaration decl = new Declaration(lambda.getName());
+    decl.noteValue(lambda);
+    decl.setFlag(Declaration.IS_CONSTANT|Declaration.STATIC_SPECIFIED);
+    decl.setProcedureDecl(true);
+    return new ReferenceExp(decl);
+  }
+
+  /**
+     @return the lambda expression referenced.
+  */
+  public static LambdaExp dereference(Expression ref)
+  {
+    return (LambdaExp) ((ReferenceExp) ref).getBinding().getValue();
   }
 }

@@ -59,6 +59,7 @@ implements Function
   private Statement body;
   private MonoSymbol[] symbols;
   private boolean voidReturn ;
+  private String bytecodeName;
 
   void resolve()
   {
@@ -75,6 +76,9 @@ implements Function
     
     if(body != null)
       body = dispatch.analyse$0(body, scope, typeScope, !voidReturn);
+
+    // this must be done in a deterministic way
+    bytecodeName = module.mangleName(name.toString());
   }
 
   private void buildParameterSymbols()
@@ -107,6 +111,12 @@ implements Function
     Node.currentFunction = this;
     try{ bossa.syntax.dispatch.typecheck$0(body); }
     finally{ Node.currentFunction = null; }
+
+    // set bytecode types for type variables
+    mlsub.typing.FunType ft = (mlsub.typing.FunType) getType().getMonotype();
+
+    Types.setBytecodeType(ft.domain());
+    Types.setBytecodeType(ft.codomain());
   }
 
   /****************************************************************
@@ -116,14 +126,26 @@ implements Function
   private gnu.expr.BlockExp blockExp;
   public gnu.expr.BlockExp getBlock() { return blockExp; }
 
-  private Method primMethod;
-
-  protected gnu.mapping.Procedure computeDispatchMethod()
+  protected gnu.expr.Expression computeCode()
   {
-    String bytecodeName = module.mangleName(name.toString());  
-    primMethod = module.addPackageMethod
-      (bytecodeName, javaArgTypes(), javaReturnType());
-    return new gnu.expr.PrimProcedure(primMethod);
+    if (body == null)
+      {
+	// Just get the handle to the already compiled function.
+	gnu.expr.Expression res = module.lookupPackageMethod(bytecodeName);
+
+	if (res != null)
+	  return res;
+
+	Internal.error(this, "Toplevel function " + name +
+		       " was not found in compiled package " + module);
+      }
+
+    LambdaExp code = nice.tools.code.Gen.createMethod
+      (bytecodeName, 
+       javaArgTypes(), javaReturnType(), symbols);
+    gnu.expr.ReferenceExp ref = nice.tools.code.Gen.referenceTo(code);
+    module.addMethod(code, true);
+    return ref;
   }
   
   public void compile()
@@ -131,17 +153,11 @@ implements Function
     if (body == null)
       return;
 
-    // forces computation of primMethod
-    // it already exists if this function is called 
-    // by code anterior to its definition
-    getDispatchMethod();
+    LambdaExp lexp = nice.tools.code.Gen.dereference(getCode());
 
-    gnu.expr.LambdaExp lexp = 
-      nice.tools.code.Gen.createMethod(primMethod, symbols);
     Statement.currentScopeExp = lexp;
     blockExp = (gnu.expr.BlockExp) lexp.body;
     blockExp.setBody(body.generateCode());
-    module.compileMethod(lexp);
   }
 
   /****************************************************************

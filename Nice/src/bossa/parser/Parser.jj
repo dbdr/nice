@@ -754,7 +754,7 @@ Monotype monotype():
        new TypeParameters(tp),
        loc);
     res.nullness = res.absent;
-  }			  
+  }
 )*
 
   { 
@@ -2144,6 +2144,8 @@ Statement ReturnStatement() :
 Statement ThrowStatement() :
 { Expression e; }
 {
+  //XXX change by using nice.lang.`throw` with ApplyExp("throw", e)
+  //XXX and remove bossa.syntax.ThrowStmt and gnu.expr.ThrowExp
   "throw" e=Expression() ";"
   { return new ThrowStmt(e); }
 }

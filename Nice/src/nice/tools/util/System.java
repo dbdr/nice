@@ -18,6 +18,9 @@ package nice.tools.util;
 import java.io.File;
 import java.util.jar.JarFile;
 
+import java.util.Date;
+import java.text.DateFormat;
+
 /**
    Communication with the system environment.
    
@@ -72,4 +75,15 @@ public class System
 
   private static final String home = java.lang.System.getProperty("user.home");
   private static final int homeLength = home.length();  
+
+  /**
+     Format dates.
+  */
+
+  public static String date(long date)
+  {
+    return longDate.format(new Date(date));
+  }
+
+  private static final DateFormat longDate = DateFormat.getDateTimeInstance();
 }

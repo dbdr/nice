@@ -235,7 +235,7 @@ public class NiceClass extends ClassDefinition
     addFields(classType);
 
     classType.sourcefile = location().getFile();
-    module.addClass(classType);
+    module.addImplementationClass(classType);
   }
 
   private ClassType[] computeImplementedInterfaces()
@@ -295,8 +295,8 @@ public class NiceClass extends ClassDefinition
     code.emitInvokeSpecial(constructor(javaSuperClass()));
     code.emitReturn();
 
-    constructorMethod.setDispatchMethod
-      (new gnu.expr.PrimProcedure(constructor));
+    constructorMethod.setCode( new gnu.expr.QuoteExp
+      (new gnu.expr.PrimProcedure(constructor)));
   }
 
   private static gnu.bytecode.Method constructor(ClassType ct)

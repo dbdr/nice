@@ -276,7 +276,9 @@ public class CallExp extends Expression
 	{
 	  gnu.expr.QuoteExp q = (gnu.expr.QuoteExp) params[i];
 	  if(q.getValue() instanceof gnu.expr.PrimProcedure)
-	    params[i] = ((gnu.expr.PrimProcedure) q.getValue()).wrapInLambda();
+	    {
+	      params[i] = ((gnu.expr.PrimProcedure) q.getValue()).wrapInLambda();
+	    }
 	}
     
     gnu.expr.Expression res;

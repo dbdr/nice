@@ -22,7 +22,7 @@ import mlsub.typing.*;
 // Interface
 
 Statement analyse(Statement, VarScope, TypeScope, boolean mustReturnAValue);
-Expression analyse(Expression, VarScope, TypeScope);
+?Expression analyse(Expression, VarScope, TypeScope);
 
 TypeMaper typeMaper(SymbolTable<TypeSymbol>,TypeScope) = 
   native new TypeMaper(SymbolTable, TypeScope);
@@ -65,6 +65,9 @@ analyse(s@Statement, varScope, typeScope, mustReturnAValue)
 
 analyse(e@Expression, varScope, typeScope) = 
     analyse(e, buildInfo(varScope, typeScope));
+
+java.util.List lookup(VarScope scope, ?LocatedString i)
+= native java.util.List VarScope.lookup(LocatedString);
 
 class Info
 {
@@ -130,14 +133,14 @@ class Info
     this.typeVars.end();
   }
 
-  VarSymbol lookup(String name) = this.vars[name];
+  ?VarSymbol lookup(String name) = this.vars[name];
 
   JavaList<VarSymbol> globalLookup(LocatedString name) = 
     javaList(this.globalVarScope.lookup(name));
 
-  TypeSymbol lookupType(LocatedString name)
+  ?TypeSymbol lookupType(LocatedString name)
   {
-    TypeSymbol res = this.typeVars[name.toString()];
+    ?TypeSymbol res = this.typeVars[name.toString()];
     if (res != null)
       return res;
     else
@@ -146,29 +149,29 @@ class Info
 
   void addVar(PolySymbol symbol)
   {
-    symbol.type = symbol.syntacticType.resolve(this.typeMap);
+    symbol.type = notNull(symbol.syntacticType).resolve(this.typeMap);
     this.vars[symbol.name.toString()] = symbol;
   }
 
   void addVar(MonoSymbol symbol)
   {
-    symbol.type = symbol.syntacticType.resolve(this.typeMap);
+    symbol.type = notNull(symbol.syntacticType).resolve(this.typeMap);
     this.vars[symbol.name.toString()] = symbol;
   }
 
-  void addVars(Sequence<MonoSymbol> symbols) = 
-    symbols.iter(fun(MonoSymbol s)=>this.addVar(s));
+  void addVars(Sequence<?MonoSymbol> symbols) = 
+    symbols.iter(fun(?MonoSymbol s)=>this.addVar(notNull(s)));
   
-  void addTypeVars(Sequence<TypeSymbol> symbols) = 
-    symbols.iter(fun(TypeSymbol s)=>this.typeVars[s.toString()]=s);
+  void addTypeVars(Sequence<?TypeSymbol> symbols) = 
+    symbols.iter(fun(?TypeSymbol s)=>this.typeVars[notNull(s).toString()]=notNull(s));
 }
 
-void setInitialized(Expression, Info);
+void setInitialized(?Expression, Info);
 setInitialized(e, i) {}
 setInitialized(e@SymbolExp, i) {}
 
-Expression analyse(Expression, Info);
-void analyse(Statement, Info);
+?Expression analyse(?Expression, Info);
+void analyse(?Statement, Info);
 
 /****************************************************************
  * Expressions
@@ -185,7 +188,7 @@ analyse(e@AssignExp, i)
   return e;
 }
 
-void analyseExps(Expression[] exps, Info info)
+void analyseExps(?Expression[] exps, Info info)
 {
   for (int i = 0; i < exps.length; i++)
     exps[i] = analyse(exps[i], info);
@@ -194,7 +197,7 @@ void analyseExps(Expression[] exps, Info info)
 void analyse(Arguments, Info);
 analyse(args@Arguments, info)
 {
-  for (int i = 0; i < args.arguments.length; i++)
+  for (int i = 0; i < args.size(); i++)
     args.setExp(i, analyse(args.getExp(i), info));
 }
 
@@ -213,32 +216,34 @@ markAsCallFirstArg(e@IdentExp)
   e.enableClassExp = true;
 }
 
-LocatedString identString(Expression);
+?LocatedString identString(Expression);
 identString(e) = null;
 identString(e@IdentExp) = e.ident;
 
 analyse(e@CallExp, info)
 {
-  if (e.infix)
-    markAsCallFirstArg(e.arguments.getExp(0));
+  Arguments args = notNull(e.arguments);
 
-  e.arguments.analyse(info);
+  if (e.infix)
+    markAsCallFirstArg(notNull(args.getExp(0)));
+
+  args.analyse(info);
 
   if (e.infix)
     {
-      e.declaringClass = e.arguments.staticClass();
+      e.declaringClass = args.staticClass();
       
       if (e.declaringClass != null)
 	{
-	  LocatedString funName = identString(e.function);
+	  ?LocatedString funName = identString(notNull(e.function));
 	  if (funName == null)
 	    bossa.util.Internal.error(e.function, "This is not a valid class member");
 	  
 	  java.util.List possibilities = JavaMethod.findJavaMethods
-	    (e.declaringClass, funName.toString(), e.arguments.size());
+	    (e.declaringClass, funName.toString(), args.size());
 
 	  if (possibilities.size() == 0)
-	    bossa.util.User.error(e, "class " + e.declaringClass.getName() +
+	    bossa.util.User.error(e, "class " + notNull(e.declaringClass).getName() +
 				  " has no method or field " + funName);
 	  
 	  e.function = new OverloadedSymbolExp(possibilities, funName);
@@ -246,10 +251,10 @@ analyse(e@CallExp, info)
 	  return e;
 	}
       
-      PackageExp pkg = e.arguments.packageExp();
+      PackageExp pkg = args.packageExp();
       if (pkg != null)
 	{
-	  LocatedString nextComponent = identString(e.function);
+	  LocatedString nextComponent = identString(notNull(e.function));
 
 	  if (nextComponent == null)
 	    throw unknownIdent(pkg.locatedName());
@@ -258,7 +263,7 @@ analyse(e@CallExp, info)
 	}
     }
 
-  markAsCallFun(e.function, e.infix);
+  markAsCallFun(notNull(e.function), e.infix);
   e.function = analyse(e.function, info);
 
   return e;
@@ -271,13 +276,13 @@ analyse(e@FunExp, info)
 
   if (e.constraint != Constraint.True)
     {
-      e.cst = e.constraint.resolveToLowlevel();
-      addTypeVars(info, e.cst.binders());
+      e.cst = notNull(e.constraint).resolveToLowlevel();
+      addTypeVars(info, notNull(notNull(e.cst).binders()));
     }
   e.constraint = null;
 
   if (e.formals != null)
-    addVars(info, e.formals);
+    addVars(info, notNull(e.formals));
 
   analyse(e.body, info);
   if (!info.getUnreachable() 
@@ -293,7 +298,7 @@ analyse(e@IdentExp, info)
 {
   if (!e.infix) // infix symbols can only come from the global scope
     {
-      VarSymbol s = info.lookup(e.ident.toString());
+      ?VarSymbol s = info.lookup(e.ident.toString());
       if (s != null)
 	if (!e.alwaysOverloadedSymbol)
 	  return new SymbolExp(s, e.location());
@@ -303,9 +308,9 @@ analyse(e@IdentExp, info)
 
   JavaList<VarSymbol> symbols;
   if (e.infix)
-    symbols = javaList(Node.getGlobalScope().lookup(e.ident));
+    symbols = javaList(notNull(Node.getGlobalScope()).lookup(e.ident));
   else
-    symbols = info.globalLookup(e.ident);
+    symbols = info.globalLookup(notNull(e.ident));
 
   if (symbols != null && symbols.size() > 0)
     if (!e.alwaysOverloadedSymbol() && symbols.size() == 1)
@@ -345,20 +350,20 @@ analyse(e@IncrementExp, info)
 
 analyse(e@LiteralArrayExp, info)
 {
-  analyseExps(e.elements, info);
+  analyseExps(notNull(e.elements), info);
   return e;
 }
 
 analyse(e@NewArrayExp, info)
 {
   e.resolveTC(info.typeMap);
-  analyseExps(e.knownDimensions, info);
+  analyseExps(notNull(e.knownDimensions), info);
   return e;
 }
 
 analyse(e@NewExp, info)
 {
-  e.arguments.analyse(info);
+  notNull(e.arguments).analyse(info);
   e.resolve(info.typeMap);
   return e;
 }
@@ -374,14 +379,14 @@ analyse(c@ConstantExp, info)
   if (c.type != null)
     return c;
     
-  TypeSymbol s = info.lookupType(c.className);
+  ?TypeSymbol s = info.lookupType(notNull(c.className));
     
   if (s == null)
     bossa.util.Internal.error
       ("Base type " + c.className + " was not found in the standard library");
 
-  TypeConstructor tc = TypeConstructor.fromTypeSymbol(s);
-  if (s == null)
+  ?TypeConstructor tc = TypeConstructor.fromTypeSymbol(notNull(s));
+  if (tc == null)
     bossa.util.Internal.error("Base type " + c.className + " is not valid");
   
   c.type = new mlsub.typing.Polytype
@@ -392,7 +397,7 @@ analyse(c@ConstantExp, info)
 
 analyse(e@TupleExp, info)
 {
-  analyseExps(e.expressions, info);
+  analyseExps(notNull(e.expressions), info);
   return e;
 }
 
@@ -407,21 +412,21 @@ analyse(decl@Block.LocalVariable, info)
 {
   if (decl.value != null)
     decl.value = analyse(decl.value, info);
-  info.addVar(decl.left);
+  info.addVar(notNull(decl.left));
 }
 
 analyse(decl@Block.LocalFunction, info)
 {
   if (decl.value != null)
     decl.value = analyse(decl.value, info);
-  info.addVar(decl.left);
+  info.addVar(notNull(decl.left));
 }
 
 analyse(b@Block, info)
 {
   info.begin();
-  javaList(b.locals).iter(fun(Block.LocalDeclaration l) => analyse(l, info));
-  b.statements.iter(fun(Statement s)=>{
+  javaList(notNull(b.locals)).iter(fun(Block.LocalDeclaration l) => analyse(l, info));
+  notNull(b.statements).iter(fun(?Statement s)=>{
     if (info.getUnreachable())
       bossa.util.User.error(s, "Statement is never executed");
     analyse(s, info);
@@ -460,11 +465,11 @@ analyse(t@TryStmt, info)
   info.beginCases();
   analyse(t.body, info);
 
-  javaList(t.catches).iter(fun(TryStmt$Catch c)=>{
+  javaList(notNull(t.catches)).iter(fun(TryStmt$Catch c)=>{
     info.otherCase();
     info.begin();
-    info.addVar(c.exnVar);
-    c.t = c.tc.resolveToTC(info.typeMap);
+    info.addVar(notNull(c.exnVar));
+    c.t = notNull(c.tc).resolveToTC(info.typeMap);
     c.tc = null;
     analyse(c.body, info);
     info.end();
@@ -474,5 +479,5 @@ analyse(t@TryStmt, info)
 }
 
 // Local Variables:
-// nice-xprogram: "NICEJAR=$HOME/Nice/stdlib nicec --classpath=\"$HOME/Nice/stdlib:$HOME/Nice/classes:/$HOME/Nice/src\""
+// nice-xprogram: "nicec --classpath=\"$HOME/Nice/stdlib:$HOME/Nice/classes\""
 // End:

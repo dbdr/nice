@@ -82,9 +82,13 @@ public class TupleExp extends bossa.syntax.Expression
 		   new Expression[]{intExp(len)});
 
     LetExp let = new LetExp(new Expression[]{arrayVal});
-    let.outer = Statement.currentScopeExp;
+    //let.outer = Statement.currentScopeExp;
     Declaration arrayDecl = let.addDeclaration("tuple", 
 					       ArrayType.make(componentType));
+
+    //FIXME: CanRead should be set automatically if it is true
+    arrayDecl.setCanRead(true);
+
     Expression array = new ReferenceExp(arrayDecl);
     
     Expression[] stmts = new Expression[1 + len];
@@ -115,9 +119,12 @@ public class TupleExp extends bossa.syntax.Expression
     if (!(array instanceof ReferenceExp))
       {
 	let = new LetExp(new Expression[]{array});
-	let.outer = Statement.currentScopeExp;
+	//let.outer = Statement.currentScopeExp;
 	Declaration tupleDecl = let.addDeclaration
 	  ("tupleRef", ArrayType.make(componentType));
+
+	//FIXME: Idem, see above
+	tupleDecl.setCanRead(true);
 	tupleExp = new ReferenceExp(tupleDecl);
       }
     else

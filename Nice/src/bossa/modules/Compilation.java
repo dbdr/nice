@@ -11,9 +11,16 @@ public class Compilation extends mlsub.compilation.Compilation
 {
   public boolean recompileAll;
   public boolean recompileCommandLine;
-  public boolean staticLink;
 
   /** Set if at least one package is not up-to-date. */
   public boolean recompilationNeeded;
+
+  public String sourcePath;
+  public String packagePath;
+  public String destinationDir;
+
+  public String output;
+
+  public Locator locator;
 }
 

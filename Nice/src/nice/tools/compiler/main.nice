@@ -40,58 +40,82 @@ main(args)
 
   try{
 
-  boolean recompileCL = false;
-  boolean recAll = false;
-  boolean doLink = true;
-  boolean staticLink = false;
+  Compilation compilation = new Compilation();
 
-  Sequence<Option> opts;
-  opts = 
+  Sequence<Option> options;
+  options = 
   [
    option('r', "recompile",
 	  "Force recompilation of package",
 	  "none/command-line/all",
-	  fun()=>{ recompileCL=true; },
+	  fun()=>{ compilation.recompileCommandLine = true; },
 	  fun(String arg)=>
           {
 	    if ("all".equals(arg))
-	      recAll=true;
+	      compilation.recompileAll = true;
 	    else if ("command-line".equals(arg))
-	      recompileCL=true;
+	      compilation.recompileCommandLine = true;
 	    else if ("none".equals(arg))
 	      {
-		recompileCL=false;
-		recAll=false;
+		compilation.recompileCommandLine = false;
+		compilation.recompileAll = false;
 	      }
 	    else println("Unkown argument to \'recompile\': " + arg);
 	  }),
 
    option('R', "recompileAll",
 	  "Force recompilation of all dependant packages",
-	  fun()=>{ recAll = true; }),
+	  fun()=>{ compilation.recompileAll = true; }),
 
    option('c', "compile",
 	  "Compile packages, do not link them",
-	  fun()=>{ doLink=false; }),
+	  fun()=>{ compilation.skipLink = true; }),
+
+
+
+   option('?', "sourcepath",
+	  "Lookup path for source packages",
+	  ": separated list of directories and jar archives",
+	  fun(String path) => { compilation.sourcePath = path; }),
+
+   option('d', "destination",
+	  "Destination directory for compiled packages",
+	  "directory",
+	  fun(String dir)=>{ compilation.destinationDir = dir; }),
+
+   option('?', "packagepath",
+	  "Additional lookup path for compiled packages",
+	  ": separated list of directories and jar archives",
+	  fun() => nice.tools.code.Types.setClasspath(null),
+	  fun(String path) =>{ compilation.packagePath = path; }),
 
    option('?', "classpath",
-	  "Set path for searching external classes",
+	  "Lookup path for external classes",
 	  ": separated list of directories and jar archives",
 	  fun() => nice.tools.code.Types.setClasspath(null),
 	  fun(String path) => nice.tools.code.Types.setClasspath(path)),
 
+
+   option('o', "output",
+	  "Compile to archive",
+	  "file",
+	  fun(String output)=>{ compilation.output = output; }),
+
+/*
    option('s', "static",
 	  "Store compiled packages in the jar file",
-	  fun()=>{ staticLink=true; }),
+	  fun()=>{ compilation.staticLink = true; }),
 
    option('?', "dynamic",
 	  "Store compiled packages in their directory (default)",
-	  fun()=>{ staticLink=false; }),
+	  fun()=>{ compilation.staticLink = false; }),
+*/
+
 
    option('h', "help", "Print help message and exit",
 	  fun()=>
             {
-	      println(printOptions(opts));
+	      println(printOptions(options));
 	      System.exit(1);
 	    }),
 
@@ -108,7 +132,7 @@ main(args)
 	  fun()=>{ memInfo = true; })
   ];
 
-  Sequence<String> rest = parse("nicec", args, opts);
+  Sequence<String> rest = parse("nicec", args, options);
   if (rest.size() != 1 || rest[0].length() == 0)
     {
       if (rest.size() > 1)
@@ -116,13 +140,9 @@ main(args)
 		"nicec will automatically find dependancies.");
       usage();
     }
-  String packageName = rest[0];
 
-  Compilation compilation = 
-    make(packageName, doLink, recompileCL, recAll, staticLink);
-
+  compilation.setMainPackage(rest[0]);
   make(compilation);
-  
   }
   catch(bossa.util.UserError e){
     nice.tools.compiler.OutputMessages.error(e.getMessage());
@@ -136,7 +156,7 @@ main(args)
 
   if(uncaughtException != null)
     {
-      System.out.println
+      println
       ("\nAn exception has occured in the compiler\n" +
        "Please fill-in a bug report at the following webpage:\n" +
        "http://sourceforge.net/tracker/?func=add&group_id=12788&atid=112788" +

@@ -64,7 +64,6 @@ find_home()
 
 scriptName="$0"
 progname=`basename $0`
-doTest=true
 experimental=false
 
 while true; do 
@@ -72,7 +71,6 @@ while true; do
     x-J*) read_java_arg "`expr substr "$1" 3 1000`";;
     x-e) 
 	experimental=true
-	doTest=false
 	NICE_TOP="$HOME"/Nice
     ;;
     *) break;;
@@ -80,13 +78,9 @@ while true; do
   shift
   done
 
-if [ $doTest = true ]; then 
-  if [ -z "${NICE}" ]; then
-    find_home "$scriptName"
-    NICE=${APPHOME}/lib/nice/${JARNAME-Nice.jar}
-  fi
-  test_installation 
-fi
+find_home "$scriptName"
+NICEC=${APPHOME}/lib/nice/Nice.jar
+STDLIB=${APPHOME}/lib/nice/stdlib.jar
 
 if [ "$EMACS" = t ]; then
   JAVA="${JAVA} -Demacs=true"
@@ -95,18 +89,18 @@ fi
 case $progname in
   nicec) 
     if [ $experimental = true ]; then
-	NICE=${NICE_TOP}/src/nice/tools/.compiler.jar:${NICE_TOP}/src:${NICE_TOP}/classes
-	NICEJAR=${NICE_TOP}/stdlib
+	NICEC=${NICE_TOP}/src/nice/tools/compiler.jar:${NICE_TOP}/stdlib:${NICE_TOP}/src:${NICE_TOP}/classes
+	STDLIB=${NICE_TOP}/stdlib
     fi
-    CLASSPATH=${NICE}:${CLASSPATH}
+    CLASSPATH=${NICEC}:${CLASSPATH}
     export CLASSPATH
     exec ${JAVA} \
-	-Dnice.systemJar=${NICEJAR-${NICE}} \
+	-Dnice.systemJar=${STDLIB} \
 	nice.tools.compiler.package "$@"
   ;;
   nicer) 
     if [ $experimental = true ]; then
-	NICE=${NICE_TOP}/stdlib:${NICE_TOP}/classes
+	NICEC=${NICE_TOP}/stdlib:${NICE_TOP}/classes
     fi
     jar=$1
     if [ -z "$jar" ]; then
@@ -121,7 +115,7 @@ case $progname in
     fi
     shift
 
-    CLASSPATH=$jar:${NICE}:$CLASSPATH
+    CLASSPATH=$jar:${NICEC}:$CLASSPATH
     export CLASSPATH
     exec ${JAVA} nice.tools.runJar ${jar} "$@"
   ;;

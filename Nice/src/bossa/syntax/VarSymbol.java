@@ -105,6 +105,18 @@ abstract class VarSymbol extends Node implements Located
    * Code generation
    ****************************************************************/
 
+  /** @return code that accesses this variable. */
+  gnu.expr.Expression compile()
+  {
+    // Allow a sub-class to compute decl a la demande in getDeclaration().
+    gnu.expr.Declaration decl = getDeclaration();
+
+    if (decl == null)
+      Internal.error(this + " has no bytecode declaration");
+    
+    return new gnu.expr.ReferenceExp(name.toString(), decl);
+  }
+
   public void setDeclaration(gnu.expr.Declaration declaration)
   {
     this.decl = declaration;
@@ -113,7 +125,7 @@ abstract class VarSymbol extends Node implements Located
     this.decl.setCanWrite(true);
 
     if(declaration.getContext() == null)
-      Internal.error(this+" has no englobing context");
+      Internal.warning(this + " has no englobing context");
   }
   
   gnu.expr.Declaration getDeclaration()

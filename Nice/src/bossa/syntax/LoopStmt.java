@@ -78,7 +78,7 @@ public class LoopStmt extends Statement
     if(whileExp==null)
       test = new gnu.expr.QuoteExp(Boolean.TRUE);
     else
-      test = whileExp.compile();
+      test = whileExp.generateCode();
     
     if(iterationStatements==null)
       iteration = gnu.expr.QuoteExp.voidExp;

@@ -306,7 +306,10 @@ public final class Types
     
     TypeSymbol ts = bossa.syntax.Node.getGlobalTypeScope().lookup(name);
     if(ts==null)
-      Internal.error(name + " is not known");
+      {
+	Internal.warning(name + " is not known");
+	throw new NotIntroducedClassException(ts);
+      }
 
     if(ts instanceof TypeConstructor)
       {

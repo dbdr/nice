@@ -17,6 +17,7 @@ package nice.tools.code;
 
 import gnu.bytecode.*;
 import gnu.expr.*;
+import gnu.mapping.*;
 
 /**
    Implements language dependant methods of gnu.expr.Interpreter.
@@ -49,22 +50,35 @@ public class NiceInterpreter extends gnu.expr.Interpreter
   }
   
   /** Not implemented. */
-  public Object read (gnu.mapping.InPort in)
+  public Object read (InPort in)
     throws java.io.IOException, gnu.text.SyntaxException
   {
     throw new Error("Not implemented");
   }
-  
-  /** Not implemented. */
-  public void print (Object obj, gnu.mapping.OutPort out)
-  {
-    throw new Error("Not implemented");
-  }    
+
 
   /** Not implemented. */
-  public gnu.text.Lexer getLexer(gnu.mapping.InPort inp, 
-				 gnu.text.SourceMessages messages)
+  public gnu.text.Lexer getLexer(InPort inp, gnu.text.SourceMessages messages)
   {
     throw new Error("Not implemented");
+  }
+
+  /** Not implemented. */
+  public ModuleExp parse(Environment env, gnu.text.Lexer lexer)
+    throws java.io.IOException, gnu.text.SyntaxException
+  {
+    throw new Error("Not implemented");
+  }
+
+  /** Not implemented. */
+  public ModuleExp parseFile (InPort port, gnu.text.SourceMessages messages)
+  {
+    throw new Error("Not implemented");
+  }
+
+  /** Not implemented. */
+  public gnu.lists.FormatToConsumer getFormat(boolean readable)
+  {
+    return null;
   }
 }

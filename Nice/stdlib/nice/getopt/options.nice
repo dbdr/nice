@@ -1,0 +1,99 @@
+/**************************************************************************/
+/*                                N I C E                                 */
+/*             A high-level object-oriented research language             */
+/*                        (c) Daniel Bonniot 2001                         */
+/*                                                                        */
+/*  This program is free software; you can redistribute it and/or modify  */
+/*  it under the terms of the GNU General Public License as published by  */
+/*  the Free Software Foundation; either version 2 of the License, or     */
+/*  (at your option) any later version.                                   */
+/*                                                                        */
+/**************************************************************************/
+
+package nice.getopt;
+
+/**
+    Command-line options.
+
+    The Option abstract class represents one command line parameter.
+    The three kinds of parameters can be created by the option functions.
+**/
+
+/** Creates a no parameter option. */
+Option option(char shortName = '?',
+	      String longName,
+	      String purpose, 
+	      fun()() action);
+
+/** Creates a required parameter option. */
+Option option(char shortName = '?',
+	      String,String,String,fun(String)());
+
+/** Creates an optional parameter option. */
+Option option(char shortName = '?',
+	      String,String,String,fun()(),fun(String)());
+
+
+abstract class Option
+{
+  char shortName;
+  String longName;
+  String purpose;
+  int optval; // the int value of shortName
+}
+
+class NoParamOption extends Option
+{
+  fun()() action;
+}
+
+class ParamOption extends Option
+{
+  String optionHint;
+  fun(String)() actionParam;
+}
+
+class OptionalParamOption extends ParamOption
+{
+  fun()() actionNoParam;
+}
+
+boolean noShortName(Option o) = o.shortName.equals('?');
+
+/****************************************************************
+ * "Constructors"
+ ****************************************************************/
+
+option(shortName, longName, purpose, action)
+{
+  NoParamOption res = new NoParamOption();
+  res.shortName=shortName;
+  res.longName=longName;
+  res.purpose=purpose;
+  res.action=action;
+  return res;
+}
+
+option(shortName, longName, purpose, optionHint, action)
+{
+  ParamOption res = new ParamOption();
+  res.shortName=shortName;
+  res.longName=longName;
+  res.purpose=purpose;
+  res.optionHint=optionHint;
+  res.actionParam=action;
+  return res;
+}
+
+option(shortName, longName, purpose, optionHint, actionNoParam, actionParam)
+{
+  OptionalParamOption res = new OptionalParamOption();
+  res.shortName=shortName;
+  res.longName=longName;
+  res.purpose=purpose;
+  res.optionHint=optionHint;
+  res.actionNoParam=actionNoParam;
+  res.actionParam=actionParam;
+  return res;
+}
+

@@ -51,7 +51,7 @@ visit<T>(node, successors, id, stack, mark, res)
   if(equals(min,mark.get(node)))
     {
       Vector<T> scc = makeVector(5);
-      T element = null;
+      T element;
       while(element!=node)
 	{
 	  element = stack.pop();

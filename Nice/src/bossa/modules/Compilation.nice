@@ -1,7 +1,7 @@
 /**************************************************************************/
-/*                           B O S S A                                    */
-/*        A simple imperative object-oriented research language           */
-/*                   (c)  Daniel Bonniot 1999                             */
+/*                                N I C E                                 */
+/*             A high-level object-oriented research language             */
+/*                        (c) Daniel Bonniot 2001                         */
 /*                                                                        */
 /*  This program is free software; you can redistribute it and/or modify  */
 /*  it under the terms of the GNU General Public License as published by  */
@@ -10,65 +10,55 @@
 /*                                                                        */
 /**************************************************************************/
 
-// File    : Compilation.bossa
-// Created : Wed Mar 01 17:01:48 2000 by Daniel Bonniot
-//$Modified: Fri Aug 04 14:01:11 2000 by Daniel Bonniot $
-
 package bossa.modules;
 
 import mlsub.compilation;
 
 /**
    Stores information about a Nice compilation.
- */
+
+   @version $Date$
+   @author Daniel Bonniot (Daniel.Bonniot@inria.fr)
+**/
 
 class Compilation extends mlsub.compilation.Compilation
 {
   boolean recompileAll;
   boolean recompileCommandLine;
-  boolean staticLink;
 
   /** Set if at least one package is not up-to-date. */
   boolean recompilationNeeded;
+
+  String sourcePath;
+  String packagePath;
+  String destinationDir;
+
+  /** Archive file in which to write the program. */
+  String output;
+
+  Locator locator;
+
+  void setMainPackage(String packageName)
+  {
+    // Normalizes the compilation options.
+    this.recompileCommandLine = this.recompileCommandLine || this.recompileAll;
+
+    // Use the defaults if necessary
+    // The default for destinationDir is <null>
+    // which means place generated files in the source directory
+    if (this.sourcePath == null)
+      this.sourcePath = ".";
+    if (this.destinationDir == null && this.packagePath == null)
+      this.packagePath = ".";
+
+    // Create the locator that uses these two pathes to locate packages.
+    this.locator = new Locator(this);
+
+    // forces reading nice.lang first
+    if(!(packageName.equals("nice.lang")) && !bossa.util.Debug.ignorePrelude())
+      Package.make("nice.lang", this, false);
+
+    this.root = Package.make(new bossa.syntax.LocatedString(packageName, new bossa.util.Location("Command line")), this, true);
+  }
 }
 
-Compilation compilation(boolean, boolean, boolean, boolean);
-compilation(doLink, recompileCommandLine, recompileAll, staticLink)
-{
-  Compilation res = new Compilation();
-
-  res.root = null;
-  res.skipLink = !doLink;
-  res.recompileCommandLine = recompileCommandLine;
-  res.recompileAll = recompileAll;
-  res.staticLink = staticLink;
-
-  return res;
-}
-
-Compilation make(String packageName, 
-		 boolean doLink, 
-		 boolean recompileCommandLine, 
-		 boolean recompileAll,
-		 boolean staticLink);
-make(packageName@String, 
-     doLink, recompileCommandLine, recompileAll, staticLink)
-{
-  recompileCommandLine = recompileCommandLine || recompileAll;
-  Compilation res = 
-    compilation(doLink, recompileCommandLine, recompileAll, staticLink);
-
-  // forces reading nice.lang first
-  if(!(packageName.equals("nice.lang")) && !bossa.util.Debug.ignorePrelude())
-    Package.make("nice.lang", res, false);
-
-  Package root = Package.make(new bossa.syntax.LocatedString(packageName, new bossa.util.Location("Command line")), res, true);
-  res.root = root;
-
-  if (root.isRunnable() && 
-      res.recompilationNeeded &&
-      !res.skipLink)
-    root.createJar();
-
-  return res;
-}

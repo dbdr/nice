@@ -2,46 +2,6 @@
 package nice.getopt;
 
 /****************************************************************
- * "Constructors"
- ****************************************************************/
-
-option(shortName, longName, purpose, action)
-{
-  NoParamOption res = new NoParamOption();
-  res.shortName=shortName;
-  res.longName=longName;
-  res.purpose=purpose;
-  res.action=action;
-  return res;
-}
-
-option(shortName, longName, purpose, optionHint, action)
-{
-  RequiredParamOption res = new RequiredParamOption();
-  res.shortName=shortName;
-  res.longName=longName;
-  res.purpose=purpose;
-  res.optionHint=optionHint;
-  res.action=action;
-  return res;
-}
-
-option(shortName, longName, purpose, optionHint, actionNoParam, actionParam)
-{
-  OptionalParamOption res = new OptionalParamOption();
-  res.shortName=shortName;
-  res.longName=longName;
-  res.purpose=purpose;
-  res.optionHint=optionHint;
-  res.actionNoParam=actionNoParam;
-  res.actionParam=actionParam;
-  return res;
-}
-
-boolean noShortName(Option);
-noShortName(o) = o.shortName.equals('?');
-
-/****************************************************************
  * Wrappers for gnu.getopt
  ****************************************************************/
 

@@ -122,7 +122,11 @@ size(l@Nil ) = 0;
 size(l@Cons) = 1+size(l.tail);
 
 get(l@Cons, n) = n == 0 ? head(l) : get(l.tail, n-1);
-get<T>(l@Nil, n) = null;
+get<T>(l@Nil, n)
+{
+  if (true) throw new IndexOutOfBoundsException("Valid indexes: 0 .. " + (l.size - 1));
+  return l.get(n);
+}
 
 set(l@Cons, n, elem)
 {
@@ -229,18 +233,19 @@ class Vector<T>
   Array<T> elements;
   int length;
 
-}
-  remove<T>(this@Vector,index)
+  remove<T>(index)
   {
-    if (this.length == 0)
+    if (this.length <= index)
       throw new IndexOutOfBoundsException();
     T res = this[index];
     for (int i = index+1; i < this.length; i++)
       this[i - 1] = this[i];
     this.length--;
-    this[this.length] = null;
+    // Would avoid possible memory leaks, but difficult to type
+    //this[this.length] = null;
     return res;
   }
+}
 
 <Any T> Vector<T> makeVector(int);
 makeVector<T>(len)
@@ -302,7 +307,8 @@ find(s, test)
     if(test(s.get(i)))
       return s.get(i);
 
-  return null;
+  if (true) throw new java.util.NoSuchElementException();
+  return s.get(0);
 }
 
 boolean or(Sequence<boolean>);

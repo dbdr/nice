@@ -461,47 +461,54 @@ public class MethodBodyDefinition extends Definition
     if(definition == null)
       Internal.error(this, this+" has no definition");
 
-    Method primMethod = module.addPackageMethod
-      (definition.getBytecodeName() + 
-       nice.tools.code.Strings.escape(Pattern.bytecodeRepresentation(formals)),
-       javaArgTypes(), definition.javaReturnType());
-    new MiscAttr("definition", 
-		 definition.getFullName().getBytes())
-      .addToFrontOf(primMethod);
-    new MiscAttr("patterns", 
-		 Pattern.bytecodeRepresentation(formals).getBytes())
-      .addToFrontOf(primMethod);
+    String bytecodeName = definition.getBytecodeName() + 
+      Pattern.bytecodeRepresentation(formals);
 
     gnu.expr.LambdaExp lexp = 
-      nice.tools.code.Gen.createMethod(primMethod, parameters);
+      nice.tools.code.Gen.createMethod(bytecodeName, 
+				       javaArgTypes(),
+				       definition.javaReturnType(),
+				       parameters);
+    gnu.expr.ReferenceExp ref = nice.tools.code.Gen.referenceTo(lexp);
+
+    //FIXME: comment the next line?
     Statement.currentScopeExp = lexp;
     blockExp = (gnu.expr.BlockExp) lexp.body;
     blockExp.setBody(body.generateCode());
-    module.compileMethod(lexp);
+    module.addMethod(lexp, true);
+
+    lexp.addBytecodeAttribute
+      (new MiscAttr("definition", definition.getFullName().getBytes()));
+    lexp.addBytecodeAttribute
+      (new MiscAttr("patterns", 
+		    Pattern.bytecodeRepresentation(formals).getBytes()));
 
     if(name.content.equals("main") && formals.length == 1)
-      module.setMainAlternative(primMethod);
+      module.setMainAlternative(ref);
 
-    //Register this alternative for the link test
-    new bossa.link.Alternative(this.definition,
-			       this.formals,
-			       module.getOutputBytecode(),
-			       primMethod);
+    // Register this alternative for the link test
+    new bossa.link.Alternative(this.definition, this.formals, ref);
   }
 
   public static void compileMain(Module module, 
-				 gnu.bytecode.Method mainAlternative)
+				 gnu.expr.ReferenceExp mainAlternative)
   {
     if(Debug.codeGeneration)
       Debug.println("Compiling MAIN method");
     
+    // We should probably use Gen.createMethod here too.
+
     gnu.expr.BlockExp block = new gnu.expr.BlockExp(Type.void_type);
     gnu.expr.LambdaExp lexp = new gnu.expr.LambdaExp(block);
-    
+    lexp.setName("main");
+
     // Main arguments
     lexp.min_args = lexp.max_args = 1;
+    lexp.setCanCall(true);
+    lexp.forceGeneration();
+
     gnu.expr.Declaration args = lexp.addDeclaration("args");
-    args.setParameter(true);
+    //args.setParameter(true);
     args.noteValue(null);
     args.setType(gnu.bytecode.ArrayType.make(Type.string_type));
 
@@ -509,16 +516,13 @@ public class MethodBodyDefinition extends Definition
     gnu.expr.Expression[] eVal = new gnu.expr.Expression[] 
     { new gnu.expr.ReferenceExp("args",args) };
 
-    block.setBody
-      (new gnu.expr.ApplyExp(new gnu.expr.PrimProcedure(mainAlternative),
-			     eVal));
+    block.setBody(new gnu.expr.ApplyExp(mainAlternative, eVal));
 
-    lexp.setPrimMethod(module.getOutputBytecode().addMethod
-      ("main",
-       "([Ljava.lang.String;)V",
-       Access.PUBLIC | Access.STATIC));
+    module.addMethod(lexp, true);
 
-    module.compileMethod(lexp);
+    // fake reference, just to force main to be public.
+    // Ah! the magic of the internals of Kawa...
+    nice.tools.code.Gen.referenceTo(lexp);
   }
 
   /****************************************************************

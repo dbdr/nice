@@ -22,6 +22,7 @@ import java.util.jar.*;
 import java.io.*;
 
 import bossa.util.Location;
+import gnu.expr.ClassExp;
 
 /**
    A Nice package.
@@ -85,17 +86,28 @@ public class Package implements mlsub.compilation.Module, Located, bossa.syntax.
       imports.add(new LocatedString("nice.lang", 
 				    bossa.util.Location.nowhere()));
     
-    findPackageSource();
+    source = compilation.locator.find(this);
     if (source == null)
       User.error(name, "Could not find package " + name);
-    
+
     read(compilation.recompileAll || 
-	 isRoot && compilation.recompileCommandLine);
+	 isRoot && compilation.recompileCommandLine, false);
     
     computeImportedPackages();
+
+    thisPkg = new gnu.expr.Package(getName());
+    
+    // Create it before any module compiles
+
+    //if (isRoot)
+    //module = createModule(name.toString() + "module");
   }
 
-  private void read(boolean forceReload)
+  /**
+     @param shouldReload reload if the source if available.
+     @param mustReload   fail if source is not available.
+   **/
+  private void read(boolean shouldReload, boolean mustReload)
   {
     Module oldModule = Definition.currentModule;
     Definition.currentModule = this;
@@ -106,11 +118,12 @@ public class Package implements mlsub.compilation.Module, Located, bossa.syntax.
     opens.add("java.lang");    
 
     if (Debug.passes)
-      Debug.println(this + ": parsing " + source.getName());
+      Debug.println(this + ": parsing " + source);
 
-    PackageSource.Unit[] readers = source.getDefinitions(forceReload);
-    if(source.sourcesRead)
-      sourcesRead();
+    Content.Unit[] readers = source.getDefinitions(shouldReload, mustReload);
+    if (compiling())
+      // Inform compilation that at least one package is going to generate code
+      compilation.recompilationNeeded = true;
     
     for(int i = 0; i<readers.length; i++)
       read(readers[i], definitions, opens);
@@ -124,7 +137,7 @@ public class Package implements mlsub.compilation.Module, Located, bossa.syntax.
 
     // if we are root, and read the AST from an interface file, 
     // we don't know yet if we are runnable
-    if (isRoot && !sourcesRead)
+    if (isRoot && !compiling())
       isRunnable(alternativesHaveMain());
     
     Definition.currentModule = oldModule;
@@ -140,33 +153,15 @@ public class Package implements mlsub.compilation.Module, Located, bossa.syntax.
     // If we've already loaded the source
     // or none of our imports changed since last time we compiled,
     // there is nothing to do
-    if (source.sourcesRead || date <= source.lastCompilation)
+    if (compiling() || date <= source.lastCompilation)
       return;
-    
-    if (source instanceof JarSource)
-      User.error(this, name + " should be recompiled, but it was loaded from an archive file");
     
     if (Debug.modules && date > source.lastCompilation)
       Debug.println
       (this + " was compiled " + new java.util.Date(source.lastCompilation) + 
        "\nA required package changed " + new java.util.Date(date) );
 
-    read(true);
-  }
-  
-  private void sourcesRead()
-  {
-    sourcesRead = true;
-    
-    // Inform compilation that at least one package is going to generate code
-    compilation.recompilationNeeded = true;
-    
-    // We are going to generate new code, create the class file
-    // Do not use ClassType.make, we want to create a NEW class
-    outputBytecode = new ClassType(name + ".package");
-    outputBytecode.setSuper("java.lang.Object");
-    outputBytecode.setModifiers(Access.FINAL | Access.PUBLIC);
-    outputBytecode.setExisting(false);
+    read(true, true);
   }
   
   private static List expand(List definitions)
@@ -183,7 +178,7 @@ public class Package implements mlsub.compilation.Module, Located, bossa.syntax.
     return definitions;
   }
   
-  private void read(PackageSource.Unit unit, List definitions, Set opens)
+  private void read(Content.Unit unit, List definitions, Set opens)
   {
     bossa.util.Location.setCurrentFile(unit.name);
 
@@ -198,15 +193,15 @@ public class Package implements mlsub.compilation.Module, Located, bossa.syntax.
   
   private void readAlternatives()
   {
-    for(Method method = source.bytecode.getMethods();
+    for(Method method = source.getBytecode().getMethods();
 	method != null;
 	method = method.getNext())
-      bossa.link.Alternative.read(source.bytecode, method);
+      bossa.link.Alternative.read(source.getBytecode(), method);
   }
   
   private boolean alternativesHaveMain()
   {
-    for(Method method = source.bytecode.getMethods();
+    for(Method method = source.getBytecode().getMethods();
 	method != null;
 	method = method.getNext())
       if (method.getName().equals("main"))
@@ -270,7 +265,7 @@ public class Package implements mlsub.compilation.Module, Located, bossa.syntax.
       ast.createContext();
 
       // this must be done before freezing
-      if (!sourcesRead)
+      if (!compiling())
 	readAlternatives();
     }
     catch(Throwable e){
@@ -310,7 +305,7 @@ public class Package implements mlsub.compilation.Module, Located, bossa.syntax.
   {
     // An interface file does not have to be typecheked.
     // It is known to be type correct from previous compilation!
-    if (!sourcesRead)
+    if (!compiling())
       return;
 
     if (Debug.passes)
@@ -325,23 +320,20 @@ public class Package implements mlsub.compilation.Module, Located, bossa.syntax.
       return;
     
     // If at least one package is recompiled, the root will also be recompiled
-    if (!sourcesRead)
-      return;
-    
-    if (!Debug.skipLinkTests || isRunnable())
+    if (compiling())
       {
 	if (Debug.passes)
 	  Debug.println(this + ": linking");
-	
 	bossa.link.Dispatch.test(this);
+    
+	finishCompilation();
+    
+	nice.tools.compiler.OutputMessages.exitIfErrors();
       }
 
-    if (jar != null)
-      closeJar();
-    else
-      finishCompilation();
-    
-    nice.tools.compiler.OutputMessages.exitIfErrors();
+    // Write the archive even if nothing was compiled.
+    // This is useful to bundle the application after it was compiled.
+    writeArchive();
   }
 
   /**
@@ -350,26 +342,61 @@ public class Package implements mlsub.compilation.Module, Located, bossa.syntax.
   */
   private void finishCompilation()
   {
-    if (dispatchClass == null)
-      return;
-    
-    addClass(dispatchClass);
-    for (Iterator i = getImports().iterator(); i.hasNext();)
-      ((Package) i.next()).finishCompilation();
+    gnu.expr.Package pkg = compilePackages(null);
+
+    try {
+      pkg.compileToFiles();
+      pkg = null;
+    }
+    catch(IOException e) {
+      User.error(this.name, "Error during creation of bytecode files:\n" + e);
+    }
   }
-  
+
+  /**
+     Recursive traversal of the import graph.
+
+     Root package are compiled first.
+
+     Setting module to false allows to reclaim memory, 
+     and avoids infinite recursion.
+  */
+  private gnu.expr.Package compilePackages(gnu.expr.Package res)
+  {
+    if (dispatchClass == null)
+      return res;
+
+    // The implementation class is null if this package was up-to-date.
+    if (implementationClass != null)
+      thisPkg.addClass(implementationClass);
+
+    thisPkg.addClass(dispatchClass);
+    thisPkg.directory = source.getOutputDirectory();
+
+    this.implementationClass = null;
+    this.dispatchClass = null;
+
+    thisPkg.next = res;
+    res = thisPkg;
+
+    for (Iterator i = getImports().iterator(); i.hasNext();)
+      res = ((Package) i.next()).compilePackages(res);
+
+    return res;
+  }
+
   private void saveInterface()
   {
     // do not save the interface 
-    // if this package already comes from an interface file, or
-    // if we produce a jar whith all the libraries (staticLink)
-    //   since we wont need the interface to execute
-    if (!sourcesRead || jar != null && compilation.staticLink)
+    // if this package already comes from an interface file
+    if (!compiling())
       return;
+
+    File dir = source.getOutputDirectory();
 
     try{
       PrintWriter f = new PrintWriter
-	(new BufferedWriter(new FileWriter(new File(source.getOutputDirectory(), "package.nicei"))));
+	(new BufferedWriter(new FileWriter(new File(dir, "package.nicei"))));
       f.print("package "+name+";\n\n");
       
       for(Iterator i = getImports().iterator(); i.hasNext();)
@@ -391,123 +418,54 @@ public class Package implements mlsub.compilation.Module, Located, bossa.syntax.
 		   "Could not save the interface of package "+name);
     }
   }
-  
 
   /****************************************************************
-   * Code generation
+   * Archive
    ****************************************************************/
 
-  /**
-   * Transform the name of a class to its
-   * fully qualified name.
-   */
-  public static String className(String name)
-  {
-    return name;
-  }
-  
-  private ClassType outputBytecode;
-  public  ClassType getOutputBytecode() { return outputBytecode; }
-  public  ClassType getReadBytecode() { return source.bytecode; }
-  ClassType getBytecode()
-  {
-    if (sourcesRead)
-      return getOutputBytecode();
-    else
-      return getReadBytecode();
-  }
-
-  private static ModuleExp pkg;
-  public ScopeExp getPackageScopeExp()
-  {
-    return pkg;
-  }
-  static
-  {
-    // pkg is shared by all packages for now
-    // if we change this, there should be a "super-ModuleExp"
-    // (or change FindCapturedVars, and maybe others...)
-    pkg = new ModuleExp();
-    pkg.setName("packageExp");
-    pkg.body = QuoteExp.voidExp;
-
-    try{
-      nice.tools.code.SpecialTypes.init();
-    }
-    catch(ExceptionInInitializerError e){
-      e.getException().printStackTrace();
-      Internal.error("Exception in initializer: "+e.getException());
-    }
-  }
-
-  private gnu.expr.Compilation comp;
-  public  gnu.expr.Compilation getCompilation() { return comp; }
-  
-  static
-  {
-    nice.tools.code.NiceInterpreter.init();
-  }
-
-  private static LinkedList dispatchClasses = new LinkedList();
-
-  private ClassType dispatchClass;
-  private gnu.expr.Compilation dispatchComp;
-
-  private void initDispatch()
-  {
-    /*
-      If no recompilation is done,
-      it is best to reuse the previous dispatch class
-      (and possibly save it elsewhere):
-      - We get the most precise bytecode type for methods,
-        as computed during the initial compilation.
-        This would not be the case if we recomputed it,
-	as the precise types are found during typechecking.
-      - it is probably faster, as we don't recreate the ClassType internals
-     */
-    if (!sourcesRead)
-      {
-	if (source.dispatch == null)
-	  Internal.error(this, "Dispatch class is needed");
-	dispatchClass = source.dispatch;
-      }
-    else
-      {
-	String name = this.name.toString();
-	dispatchClass = new ClassType(name+".dispatch");
-	dispatchClass.setSuper(Type.pointer_type);
-	dispatchClass.setModifiers(Access.PUBLIC|Access.FINAL);
-	dispatchComp = 
-	  new gnu.expr.Compilation(dispatchClass, name, name, "prefix", false);
-      }
-    
-    dispatchClasses.add(dispatchClass);
-  }
-  
   private static JarOutputStream jar;
   private static File jarDestFile;
   
-  public void createJar()
+  void writeArchive()
+  {
+    if (compilation.output == null)
+      return;
+
+    try{
+      createJar();
+      addToArchive();
+      closeJar();
+    }
+    finally{
+      if (jarDestFile != null)
+	// The jar file was not completed
+	// it must be corrupt, so it's cleaner to delete it
+	{
+	  jarDestFile.delete();
+	  jarDestFile = null;
+	}
+    }
+  }
+  
+  void createJar()
   {
     if (jar != null)
       Internal.error(this + " can't create a jar file again");
     
-    String name = this.name.toString();
-    int lastDot = name.lastIndexOf('.');
-    if (lastDot!=-1)
-      name = name.substring(lastDot+1, name.length());
+    if (!compilation.output.endsWith(".jar"))
+      compilation.output = compilation.output + ".jar";
     
     try{
-      jarDestFile = new File(source.getOutputDirectory().getParent(), name + ".jar");
-      
-      OutputStream out = new FileOutputStream(jarDestFile);
-      Manifest manifest = new Manifest();
+      jarDestFile = new File(compilation.output);
+      // Create the directory if necessary
+      jarDestFile.getParentFile().mkdirs();
 
+      Manifest manifest = new Manifest();
       manifest.getMainAttributes().put(Attributes.Name.MANIFEST_VERSION,"1.0");
       manifest.getMainAttributes().put(Attributes.Name.MAIN_CLASS, 
-				       this.name + ".package");
+                                       this.name + ".package");
      
-      jar = new JarOutputStream(out, manifest);
+      jar = new JarOutputStream(new FileOutputStream(jarDestFile), manifest);
     }
     catch(IOException e){
       User.error(this.name, "Error during creation of executable file: " + e);
@@ -517,8 +475,6 @@ public class Package implements mlsub.compilation.Module, Located, bossa.syntax.
   private void closeJar()
   {
     try{
-      for (Iterator i = dispatchClasses.iterator(); i.hasNext();)
-	addClass((ClassType) i.next(), true);
       jar.close();
       jar = null;
       jarDestFile = null;
@@ -528,79 +484,37 @@ public class Package implements mlsub.compilation.Module, Located, bossa.syntax.
     }
   }
 
-  static
-  {
-    System.runFinalizersOnExit(true);
-  }
-  
-  protected void finalize()
-  {
-    if (jarDestFile != null)
-      // The jar file was not completed
-      // it must be corrupt, so it's cleaner to delete it
-      {
-	jarDestFile.delete();
-	jarDestFile = null;
-      }
-  }
-  
-  /**
-   * Creates bytecode for the alternatives defined in the module.
-   */
-  private void generateCode()
-  {
-    initDispatch();
-    
-    if (!sourcesRead)
-      {
-	ast.compile();
+  private boolean addedToArchive;
 
-	if (jar!=null && compilation.staticLink)
-	  {
-	    if (Debug.passes)
-	      Debug.println(this + ": adding up-to-date bytecode");
-
-	    try{
-	      String packagePrefix = getName().replace('.', '/') + "/";
-	      PackageSource.Stream[] classes = source.getClasses();
-	      
-	      for (int i = 0; i < classes.length; i++)
-		{
-		  PackageSource.Stream s = classes[i];
-		  jar.putNextEntry(new JarEntry(packagePrefix + s.name));
-		  copyStreams(s.stream, jar);
-		}
-	    }
-	    catch(IOException e){
-	      User.error(this, "Error writing bytecode in archive", e);
-	    }
-	  }
-
-	return;
-      }
+  private void addToArchive()
+  {
+    if (addedToArchive)
+      return;
+    addedToArchive = true;
 
     if (Debug.passes)
-      Debug.println(this + ": generating code");    
-    
-    //comp = new gnu.expr.Compilation(pkg, name.toString()+"DUMMY",
-    //name.toString()+".", false);
+      Debug.println(this + ": writing to archive");
 
-    comp = new gnu.expr.Compilation(outputBytecode,name.toString(),
-				    name.toString(),"prefix",false);
-    
-    ast.compile();
-    
-    if (isRunnable()) 
-      MethodBodyDefinition.compileMain(this, mainAlternative);
-    
-    comp.compileClassInit(initStatements);
-    
-    addClass(outputBytecode);
-    for (int iClass = 0;  iClass < comp.numClasses;  iClass++)
-      addClass(comp.classes[iClass]);
+    try{
+      String packagePrefix = getName().replace('.', '/') + "/";
+      Content.Stream[] classes = source.getClasses();
+      
+      for (int i = 0; i < classes.length; i++)
+	{
+	  Content.Stream s = classes[i];
+	  jar.putNextEntry(new JarEntry(packagePrefix + s.name));
+	  copyStreams(s.stream, jar);
+	}
+    }
+    catch(IOException e){
+      User.error(this, "Error writing bytecode in archive", e);
+    }
+
+    for (Iterator i = getImports().iterator(); i.hasNext();)
+      ((Package) i.next()).addToArchive();
   }
 
-  private void copyStreams(InputStream in, OutputStream out)
+  private static void copyStreams(InputStream in, OutputStream out)
   throws IOException
   {
     int size = in.available();
@@ -612,7 +526,7 @@ public class Package implements mlsub.compilation.Module, Located, bossa.syntax.
       do
 	{
 	  read = in.read(buf);
-	  if (read>0)
+	  if (read > 0)
 	    out.write(buf, 0, read);
 	}
       while (read != -1);
@@ -622,6 +536,131 @@ public class Package implements mlsub.compilation.Module, Located, bossa.syntax.
     }
   }
   
+  public void writeJar()
+  {
+    String name = this.name.toString();
+    int lastDot = name.lastIndexOf('.');
+    if (lastDot!=-1)
+      name = name.substring(lastDot+1, name.length());
+    
+    System.out.println("NOT WRITING JAR");
+  }
+
+  /****************************************************************
+   * Code generation
+   ****************************************************************/
+
+  public void addImplementationClass(gnu.bytecode.ClassType classe)
+  {
+    thisPkg.addClass(classe);
+  }
+
+  public gnu.expr.Declaration addGlobalVar(String name, Type type)
+  {
+    gnu.expr.Declaration declaration = new gnu.expr.Declaration(name, type);
+
+    if (!compiling())
+      // The code is already there
+      {
+	declaration.field = source.getBytecode().getField(name);
+	
+	if (declaration.field == null)
+	  Internal.error(this,
+			 "The compiled file is not consistant with the interface file for global variable " + name);
+      }
+    else
+      {
+	implementationClass.addDeclaration(declaration);
+	declaration.setFlag(Declaration.STATIC_SPECIFIED|Declaration.TYPE_SPECIFIED);
+	//declaration.setSimple(true);
+      }
+    
+    return declaration;
+  }
+
+  //private static ModuleExp module;
+  private gnu.expr.Package thisPkg;
+  private ClassExp implementationClass, dispatchClass;
+
+  private static ModuleExp createModule(String name)
+  {
+    ModuleExp res = new ModuleExp();
+    res.setName(name);
+    res.body = QuoteExp.voidExp;
+    res.setFlag(ModuleExp.STATIC_SPECIFIED);
+    res.setSuperType(gnu.bytecode.Type.pointer_type);
+    return res;
+  }
+
+  private ClassExp createClassExp(String name)
+  {
+    ClassExp res = new ClassExp();
+    res.setName(name);
+    res.setSimple(true);
+    res.body = QuoteExp.voidExp;
+    
+    return res;
+  }
+
+  /**
+   * Transform the name of a class to its
+   * fully qualified name.
+   */
+  public static String className(String name)
+  {
+    return name;
+  }
+
+  static
+  {
+    try{
+      nice.tools.code.SpecialTypes.init();
+    }
+    catch(ExceptionInInitializerError e){
+      e.getException().printStackTrace();
+      Internal.error("Exception in initializer: "+e.getException());
+    }
+  }
+
+  static
+  {
+    nice.tools.code.NiceInterpreter.init();
+  }
+
+  private void initDispatch()
+  {
+  }
+  
+
+  /**
+   * Creates bytecode for the alternatives defined in the module.
+   */
+  private void generateCode()
+  {
+    dispatchClass = createClassExp(name + ".dispatch");
+
+    if (!compiling())
+      {
+	// XXX OPTIM:
+	// This generates ClassType objects for nice classes, 
+	// while they are not used. 
+	//ast.compile();
+
+
+	return;
+      }
+
+    if (Debug.passes)
+      Debug.println(this + ": generating code");    
+    
+    implementationClass = createClassExp(name + ".package");
+
+    ast.compile();
+    
+    if (isRunnable()) 
+      MethodBodyDefinition.compileMain(this, mainAlternative);
+  }
+
   public ClassType createClass(String name)
   {
     // If we use new ClassType(), we may end up with two different 
@@ -641,6 +680,7 @@ public class Package implements mlsub.compilation.Module, Located, bossa.syntax.
     return res;
   }
 
+  /*
   public final void addClass(ClassType c)
   {
     addClass(c, false);
@@ -649,7 +689,7 @@ public class Package implements mlsub.compilation.Module, Located, bossa.syntax.
   void addClass(ClassType c, boolean alwaysInJar)
   {
     // if we did not have to recompile, no class has to be regenerated
-    if (!sourcesRead)
+    if (!compiling())
       return;
     
     try{
@@ -675,19 +715,38 @@ public class Package implements mlsub.compilation.Module, Located, bossa.syntax.
       User.error(this.name, "Could not write code for " + this + ": " + e);
     }
   }
-
+  */
   /**
-     @return the bytecode method with this (unique) name
+     @return an expression to call this method 
      if the package has not been recompiled.
   */
-  private Method getDispatchMethod(String methodName)
+  public gnu.expr.Expression lookupPackageMethod(String methodName)
   {
-    if (sourcesRead || source.dispatch == null) 
+    if (source.getBytecode() == null) 
       return null;
 
     methodName = nice.tools.code.Strings.escape(methodName);
     
-    for (Method m = source.dispatch.getDeclaredMethods();
+    for (Method m = source.getBytecode().getDeclaredMethods();
+	 m != null; m = m.getNext())
+      if (m.getName().equals(methodName))
+	return new gnu.expr.QuoteExp(new gnu.expr.PrimProcedure(m));
+
+    return null;
+  }
+  
+  /**
+     @return the bytecode method with this (unique) name
+     if the package has not been recompiled.
+  */
+  private Method lookupDispatchMethod(String methodName)
+  {
+    if (source.getDispatch() == null) 
+      return null;
+
+    methodName = nice.tools.code.Strings.escape(methodName);
+    
+    for (Method m = source.getDispatch().getDeclaredMethods();
 	 m != null; m = m.getNext())
       if (m.getName().equals(methodName))
 	{
@@ -699,64 +758,53 @@ public class Package implements mlsub.compilation.Module, Located, bossa.syntax.
     return null;
   }
   
-  public gnu.bytecode.Method addDispatchMethod(NiceMethod def)
+  public gnu.expr.Expression getDispatchMethod(NiceMethod def)
   {
-    Method res = getDispatchMethod(def.getBytecodeName());
-    if (res != null)
-      return res;
-    
-    return dispatchClass.addMethod
-      (nice.tools.code.Strings.escape(def.getBytecodeName()),
-       Access.PUBLIC|Access.STATIC|Access.FINAL,
-       def.javaArgTypes(),def.javaReturnType());
+    String bytecodeName = def.getBytecodeName();
+    LambdaExp res;
+
+    /*
+      If this package is not recompiled,
+      we fetch the bytecode type information
+      from the previous dispatch class.
+      Benefits: we get the most precise bytecode type for methods,
+        as computed during the initial compilation.
+        This would not be the case if we recomputed it,
+	as the precise types are found during typechecking.
+    */
+    Method meth = lookupDispatchMethod(bytecodeName);
+    if (meth != null)
+      res = nice.tools.code.Gen.createMethod
+	(bytecodeName,
+	 meth.arg_types,
+	 meth.return_type,
+	 def.formalParameters().getMonoSymbols());
+    else
+      res = nice.tools.code.Gen.createMethod
+	(bytecodeName, 
+	 def.javaArgTypes(),
+	 def.javaReturnType(),
+	 def.formalParameters().getMonoSymbols());
+
+    ReferenceExp ref = nice.tools.code.Gen.referenceTo(res);
+    addMethod(res, false);
+    return ref;
   }
 
-  public gnu.bytecode.Method addPackageMethod
-    (String name, Type[] argTypes, Type retType)
+  public void addMethod(LambdaExp method, boolean packageMethod)
   {
-    return getBytecode().addMethod
-      (nice.tools.code.Strings.escape(name),
-       argTypes, retType,
-       Access.PUBLIC|Access.STATIC|Access.FINAL);
+    ClassExp classe = packageMethod ? implementationClass : dispatchClass;
+    method.nextSibling = classe.firstChild;
+    classe.firstChild = method;
+    method.outer = classe;
+
+    if (method.nameDecl != null && method.nameDecl.context == null)
+      method.nameDecl.context = classe;
   }
 
   public String bytecodeName()
   {
     return name.toString();
-  }
-  
-  private List initStatements = new LinkedList();
-  
-  public void addClassInitStatement(gnu.expr.Expression exp)
-  {
-    initStatements.add(exp);
-  }
-
-  public void compileMethod(gnu.expr.LambdaExp meth)
-  {
-    pkg.addMethod(meth);
-    
-    //FIXME: a bit too lowlevel
-    gnu.expr.ChainLambdas.chainLambdas(meth, comp);
-    gnu.expr.PushApply.pushApply(meth);
-    gnu.expr.FindTailCalls.findTailCalls(meth);
-    meth.setCanRead(true);
-    gnu.expr.FindCapturedVars.findCapturedVars(meth);
-
-    try {
-      meth.compileAsMethod(comp);
-    }
-    catch(Error e) {
-      Debug.println("Error while generating bytecode for method " + 
-		    meth.getName());
-      throw e;
-    }
-  }
-  
-  public void compileDispatchMethod(gnu.expr.LambdaExp meth)
-  {
-    if (dispatchComp != null)
-      meth.compileAsMethod(dispatchComp);
   }
   
   /****************************************************************
@@ -777,74 +825,6 @@ public class Package implements mlsub.compilation.Module, Located, bossa.syntax.
 
     takenNames.put(res,null);
     return res;
-  }
-  
-  /****************************************************************
-   * File searching
-   ****************************************************************/
-
-  static final String sourceExt = ".nice";
-  
-  private static final Object[] packageRoots;
-  static 
-  {
-    String systemJar = Debug.getProperty("nice.systemJar", "");
-    String path = Debug.getProperty("nice.package.path", ".") +
-      File.pathSeparatorChar + systemJar;
-    
-    LinkedList res = new LinkedList();
-    
-    int start = 0;
-    // skip starting separators
-    while (start<path.length() && 
-	   path.charAt(start) == File.pathSeparatorChar)
-      start++;
-    
-    while(start<path.length())
-      {
-	int end = path.indexOf(File.pathSeparatorChar, start);
-	if (end == -1)
-	  end = path.length();
-	
-	String pathComponent = path.substring(start, end);
-	if (pathComponent.length() > 0)
-	  {
-	    File f = nice.tools.util.System.getFile(pathComponent);
-	    if (f.exists())
-	      {
-		if (pathComponent.endsWith(".jar"))
-		  try{
-		    res.add(new JarFile(f));
-		  }
-		  catch(IOException e){}
-		else
-		  res.add(f);
-	      }
-	  }
-	start = end+1;
-      }
-
-    packageRoots = res.toArray(new Object[res.size()]);
-  }
-  
-  private void findPackageSource()
-  {
-    String filesystemName = name.toString().replace('.', File.separatorChar);
-    
-    search:
-    for (int i = 0; source==null && i<packageRoots.length; i++)
-      if (packageRoots[i] instanceof File)
-	{
-	  source = DirectorySource.create
-	    (this, new File((File) packageRoots[i], filesystemName));
-	  if (source != null)
-	    rootDirectory = (File) packageRoots[i];
-	}
-      else
-	source = JarSource.create(this, (JarFile) packageRoots[i]);
-    
-    if (Debug.modules && source!=null)
-      Debug.println(this + " was found in " + source.getName());
   }
   
   /****************************************************************
@@ -874,13 +854,10 @@ public class Package implements mlsub.compilation.Module, Located, bossa.syntax.
   private AST ast;
 
   /** The "source" where this package resides. */
-  private PackageSource source;
+  private Content source;
   
-  /** The component of the package path this package was found in. */
-  private File rootDirectory;
-
   /** The compilation that is in process. */
-  private Compilation compilation;
+  Compilation compilation;
   
   /** Whether this package has a "main" method */
   private boolean isRunnable;
@@ -893,19 +870,14 @@ public class Package implements mlsub.compilation.Module, Located, bossa.syntax.
     this.isRunnable = isRunnable;
   }
 
-  private gnu.bytecode.Method mainAlternative = null;
-  public void setMainAlternative(gnu.bytecode.Method main)
+  private ReferenceExp mainAlternative = null;
+  public void setMainAlternative(ReferenceExp main)
   {
     mainAlternative = main;
   }
-  public gnu.bytecode.Method getMainAlternative()
+  public ReferenceExp getMainAlternative()
   {
     return mainAlternative;
-  }
-  
-  public boolean generatingBytecode()
-  {
-    return sourcesRead;
   }
   
   /** 
@@ -914,12 +886,14 @@ public class Package implements mlsub.compilation.Module, Located, bossa.syntax.
   */
   public boolean interfaceFile()
   {
-    return !sourcesRead;
+    return !compiling();
   }
-  
-  /** Whether we read this package from its interface
-      (it was already compiled and up to date)
-      or from source files.
+
+  /** 
+      @return true if this package is recompiled.
   */
-  private boolean sourcesRead;
+  public boolean compiling()
+  {
+    return source.sourceRead;
+  }
 }

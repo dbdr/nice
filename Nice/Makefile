@@ -8,8 +8,8 @@ JAVAC=  javac -classpath ${TOP}/classes:${TOP}/src:${TOP}/stdlib -sourcepath ${T
 JAVACC= CLASSPATH=${TOP}/external/JavaCC.zip:${CLASSPATH} java COM.sun.labs.javacc.Main
 JAVADOC=javadoc #-linkoffline file:///C%7C/Apps/jdk1.2.1/docs/api file:///usr/opt/java122/docs/api
 
-NICEC= nicec --classpath="${TOP}/stdlib:${TOP}/classes:${TOP}/src"
-NICEC_DEV= CLASSPATH=${TOP}/src/nice/tools/.compiler.jar:${TOP}/src:${TOP}/classes java -Dnice.systemJar=${TOP}/stdlib nice.tools.compiler.package --classpath="${TOP}/stdlib:${TOP}/classes:${TOP}/src"
+NICEC= nicec --classpath="${TOP}/classes:${TOP}/src:${NICEJAR}"
+NICEC_DEV= CLASSPATH=${TOP}/src/nice/tools/compiler.jar:${TOP}/src:${TOP}/classes java -Dnice.systemJar=${TOP}/stdlib nice.tools.compiler.package --classpath="${TOP}/stdlib:${TOP}/classes:${TOP}/src" --sourcepath="${TOP}/stdlib:."
 
 # run this first when you just checked out a fresh version
 first: bootstrap compiler jar
@@ -21,12 +21,15 @@ src/bossa/parser/Parser.java: src/bossa/parser/Parser.jj
 setDate:
 	cd src/nice/tools/compiler; ./setBuildDate
 
-compiler: setDate
-	cd src; ${NICEC} -Rs nice.tools.compiler && cp -f nice/tools/compiler.jar nice/tools/.compiler.jar
+nice-pass: 
+	cd src; ${NICEC} bossa.syntax
+
+compiler: setDate nice-pass
+	cd src; ${NICEC} -R -o nice/tools/compiler.jar nice.tools.compiler
 
 compiler-bootstrap: setDate
 	cd src; ${NICEC_DEV} -r bossa.syntax
-	cd src; ${NICEC_DEV} -Rs nice.tools.compiler
+	cd src; ${NICEC_DEV} -R nice.tools.compiler
 
 test:
 	cd regtest; /usr/bin/time ./regtest
@@ -77,7 +80,10 @@ jdoc:
 tags:
 	jtags
 
-jar:
+stdlib.jar:
+	${NICEC_DEV} -o lib/nice/stdlib.jar --sourcepath="${TOP}/stdlib" nice.getopt
+
+jar: stdlib.jar
 	mkdir -p lib/nice
 	cp src/nice/tools/compiler.jar lib/nice/Nice.jar
 	jar umf src/mainClass lib/nice/Nice.jar -C classes nice -C classes mlsub -C classes bossa -C classes gnu
@@ -85,11 +91,10 @@ jar:
 # package.nicei files must be included since the standard library is used
 # to lookup packages when compiling Nice programs
 # the next two lines do just that
-	cd stdlib; ${NICEC_DEV} nice.getopt
-	cd stdlib; jar uf ../lib/nice/Nice.jar nice/*/package.nicei
+	cd stdlib; jar uf ../lib/nice/stdlib.jar nice/*/package.nicei
 
 dist: jar
-	tar cf lib/nice/Nice-`date +"%Y.%m.%d"`.tar bin/nicer bin/nicec lib/nice/Nice.jar lib/emacs/nice-mode.el
+	tar cf lib/nice/Nice-`date +"%Y.%m.%d"`.tar bin/nicer bin/nicec lib/nice/Nice.jar lib/nice/stdlib.jar lib/emacs/nice-mode.el
 
 
 #****************************************************************
@@ -129,6 +134,3 @@ bootstrap: parser
 	cd src; ${NICEC} bossa.syntax
 	cd src;\
 	${JC} bossa/modules/Package.java nice/tools/runJar.java ../stdlib/nice/lang/rawArray.java gnu/bytecode/dump.java
-
-nice-pass: 
-	cd src; ${NICEC} bossa.syntax

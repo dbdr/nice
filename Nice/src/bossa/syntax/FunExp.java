@@ -94,42 +94,17 @@ public class FunExp extends Expression implements Function
 
   public gnu.expr.Expression compile()
   {
-    //if(Debug.codeGeneration)
-    //Debug.println("Compiling "+this);
-    
-    gnu.expr.LambdaExp res = new gnu.expr.LambdaExp();
+    gnu.expr.LambdaExp res = nice.tools.code.Gen.createMethod
+      (null, null, nice.tools.code.Types.javaType(getType()), formals, false);
 
-    blockExp = new gnu.expr.BlockExp
-      (nice.tools.code.Types.javaType(getType()));
-
-    res.min_args = res.max_args = formals == null ? 0 : formals.length;
-    
-    res.setCanRead(true);
-    res.outer = Statement.currentScopeExp;
+    gnu.expr.ScopeExp save = Statement.currentScopeExp;
     Statement.currentScopeExp = res;       // push
-    
-    for(int i = 0; i < res.min_args; i++)
-      {
-	MonoSymbol s = formals[i];
-	
-	gnu.expr.Declaration decl = 
-	  res.addDeclaration(s.name.toString(), 
-			     //s.getMonotype().getJavaType()
-			     // Since a applyN method will be produced,
-			     // we must forget about the types... :-(
-			     gnu.bytecode.Type.pointer_type
-			     );
 
-	decl.setParameter(true);
-	decl.noteValue(null);
-	s.setDeclaration(decl);
-      }
+    this.blockExp = (gnu.expr.BlockExp) res.body;
+    this.blockExp.setBody(body.generateCode());
     
-    res.body = blockExp;
-    blockExp.setBody(body.generateCode());
+    Statement.currentScopeExp = save; // pop
 
-    Statement.currentScopeExp = res.outer; // pop
-    
     return res;
   }
   

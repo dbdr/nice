@@ -28,7 +28,7 @@ compileComponent(modules, doLink)
   println("");
 
   modules.iter(fun(Module m) =>
-	       m.lastModifiedRequirement(max(javaList(m.getRequirements()).map(fun(Module mi)=>mi.lastModification()))));
+	       m.lastModifiedRequirement(max(javaList(notNull(m.getRequirements())).map(fun(Module mi)=>mi.lastModification()))));
 
   modules.iter(fun(Module m) => m.scope());
   modules.iter(fun(Module m) => m.load());
@@ -50,7 +50,7 @@ make(compilation@mlsub.compilation.Compilation)
 {
   List<List<Module>> sccs =
     stronglyConnectedComponents
-      (compilation.root, fun(Module m) => javaList(m.getRequirements()));
+      (notNull(compilation.root), fun(Module m) => javaList(notNull(m.getRequirements())));
   try{
     sccs.iter(fun(List<Module> scc) => 
       { compileComponent(scc,

@@ -83,7 +83,7 @@ public final class SpecialArray extends gnu.bytecode.ArrayType
       convertMethod = wrappedType.getDeclaredMethod("convert", 2);
   }
 
-  public String getNameOrSignature()
+  public String getInternalName()
   { 
     if(unknown)
       return "java.lang.Object";
@@ -122,7 +122,8 @@ public final class SpecialArray extends gnu.bytecode.ArrayType
     // the type of the elements, so that the correct array type
     // can be created
     if (!primitive)
-      code.emitPushString(((ObjectType) elements).getNameOrSignature());
+      code.emitPushString
+	(((ObjectType) elements).getInternalName().replace('/', '.'));
     code.emitInvokeStatic(convertMethod);
     // non primitive need the cast
     if (primitive)

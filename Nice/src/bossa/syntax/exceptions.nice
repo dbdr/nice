@@ -6,8 +6,7 @@ class UnknownIdentException extends bossa.util.UserError
   LocatedString ident;
 }
 
-UnknownIdentException unknownIdent(LocatedString);
-unknownIdent(name)
+UnknownIdentException unknownIdent(?LocatedString name)
 {
   UnknownIdentException res = new UnknownIdentException();
   res.ident = name;

@@ -67,14 +67,16 @@ public final class User
 
   public static void warning(Located responsible, String message)
   {
-    warning(responsible.location() + ":\n" + message);
+    if(Debug.alwaysDumpStack)
+      Internal.printStackTrace();
+    
+    nice.tools.compiler.OutputMessages.warning
+      ((responsible == null ? "" : responsible.location().toString() + ": ") +
+       "Warning:\n" + message);
   }
 
   public static void warning(String message)
   {
-    if(Debug.alwaysDumpStack)
-      Internal.printStackTrace();
-    
-    nice.tools.compiler.OutputMessages.warning("Warning: " + message);
+    warning(null, message);
   }
 }

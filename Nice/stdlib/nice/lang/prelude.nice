@@ -41,7 +41,15 @@ final class Sure<+T> extends Maybe<T> = native;
     is coming next and will detect nullness.
     This should probably be fixed so that the semantics is well defined.
 */
-<Any T> !T notNull(?T) = inline nice.lang.inline.Nop();
+<Any T> !T notNull(?T value)
+{
+  if (value != null)
+    return cast(value);
+
+  if (true) 
+    throw new NullPointerException("Null value");
+  return cast(null);
+}
 
 /****************************************************************
  * Primitive types

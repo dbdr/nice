@@ -35,33 +35,28 @@ public final class Compilation
 		      Stack sortedAlternatives, 
 		      bossa.modules.Package module)
   {
-    BlockExp block = new BlockExp(m.javaReturnType());
-    LambdaExp lexp = new LambdaExp(block);
+    LambdaExp lexp = m.getLambda();
+    BlockExp block = (gnu.expr.BlockExp) lexp.body;
     
     // parameters of the alternative function are the same in each case, 
     // so we compute them just once
-    gnu.bytecode.Type[] types = m.javaArgTypes();
-    Expression[] params = new Expression[types.length];
-    lexp.min_args = lexp.max_args = types.length;
-    
-    for(int n = 0; n<types.length; n++)
-      {
-	Declaration param = lexp.addDeclaration("parameter_"+n, types[n]);
-	param.setParameter(true);
-	params[n] = new ReferenceExp(param);
-      }
+    int arity = m.getArity();
+    Expression[] params = new Expression[arity];
+    int rank = 0;
+    for(Declaration param = lexp.firstDecl(); rank < arity; 
+	param = param.nextDecl())
+      params[rank++] = new ReferenceExp(param);
 
     block.setBody(dispatch(sortedAlternatives.iterator(),
 			   m.getType().codomain(),
 			   m.javaReturnType().isVoid(),
 			   block,
 			   params));
-
-    lexp.setPrimMethod(m.getDispatchPrimMethod());
-    
-    module.compileDispatchMethod(lexp);
   }
   
+  private static gnu.bytecode.Method newError =
+    ClassType.make("java.lang.Error").getDeclaredMethod("<init>", 1);
+
   private static Expression dispatch(Iterator sortedAlternatives, 
 				     mlsub.typing.Monotype returnType, 
 				     boolean voidReturn,
@@ -69,13 +64,23 @@ public final class Compilation
 				     Expression[] params)
   {
     if(!sortedAlternatives.hasNext())
-      if (voidReturn)
-	return new ThrowExp(new QuoteExp(new Error("Message not understood")));
-      else
-	return new BeginExp
-	  (new ThrowExp(new QuoteExp(new Error("Message not understood"))),
-	   nice.tools.code.Types.defaultValue(returnType));
-    
+      {
+	// We produce code that should never be reached at run-time.
+
+	Expression message = new QuoteExp("Message not understood");
+	Expression exception = new ApplyExp(newError, 
+					    new Expression[]{ message });
+	Expression throwExp = 
+	  new ApplyExp(nice.lang.inline.Throw.instance,
+		       new Expression[]{exception});
+
+	if (voidReturn)
+	  return throwExp;
+	else
+	  return new BeginExp
+	    (throwExp, nice.tools.code.Types.defaultValue(returnType));
+      }
+
     Alternative a = (Alternative) sortedAlternatives.next();
     Expression matchTest = a.matchTest(params);
 

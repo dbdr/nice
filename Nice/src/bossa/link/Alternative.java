@@ -45,11 +45,9 @@ public class Alternative
   /**
    * When read from a source file.
    */
-  public Alternative(NiceMethod m, Pattern[] patterns, 
-		     ClassType c, Method method)
+  public Alternative(NiceMethod m, Pattern[] patterns, ReferenceExp method)
   {
-    this.definitionClass = c;
-    this.primProcedure = new PrimProcedure(method);
+    this.code = method;
     
     this.methodName = m.getFullName();
     this.patterns = patterns;
@@ -93,8 +91,7 @@ public class Alternative
 		     " in class " + c.getName() + " has no patterns");
     String rep = new String(attr.data);
 
-    this.definitionClass = c;
-    this.primProcedure = new PrimProcedure(method);
+    this.code = new QuoteExp(new PrimProcedure(method));
     
     int[]/*ref*/ at = new int[]{ 0 };
 
@@ -171,8 +168,10 @@ public class Alternative
    */
   Expression methodExp()
   {
-    return new gnu.expr.QuoteExp(primProcedure);
+    return code;
   }
+
+  private Expression code;  
   
   /**
      @return the expression that tests if this alternative matches
@@ -200,11 +199,6 @@ public class Alternative
     return methodName + Util.map("(", ", ", ")", patterns);
   }
 
-  /** The bytecode class this alternative is defined in. */
-  ClassType definitionClass;
-
-  private PrimProcedure primProcedure;
-  
   String methodName;
   Pattern[] patterns;
 

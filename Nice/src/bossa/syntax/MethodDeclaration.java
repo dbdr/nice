@@ -264,6 +264,11 @@ abstract public class MethodDeclaration extends Definition
       return MethodDeclaration.this;
     }
     
+    gnu.expr.Expression compile()
+    {
+      return getDefinition().getCode();
+    }
+
     public String toString()
     {
       return MethodDeclaration.this.toString();
@@ -274,29 +279,29 @@ abstract public class MethodDeclaration extends Definition
    * Code generation
    ****************************************************************/
 
-  private gnu.mapping.Procedure dispatchMethod;
+  private gnu.expr.Expression code;
 
-  protected abstract gnu.mapping.Procedure computeDispatchMethod();
+  protected abstract gnu.expr.Expression computeCode();
   
-  final void setDispatchMethod(gnu.mapping.Procedure p) 
+  final void setCode(gnu.expr.Expression code) 
   {
-    if(dispatchMethod != null)
-      Internal.error("dispatch method already set");
+    if(this.code != null)
+      Internal.error("code already set");
     
-    dispatchMethod = p;
+    this.code = code;
   }
   
-  final gnu.mapping.Procedure getDispatchMethod() 
+  final gnu.expr.Expression getCode() 
   {
-    if(dispatchMethod == null)
+    if (code == null)
       {
-	dispatchMethod = computeDispatchMethod();
-      
-	if(dispatchMethod==null)
-	  Internal.error(this,"No dispatch method for "+this);
+	code = computeCode();
+	
+	if (code == null)
+	  Internal.error(this, "No code for " + this);
       }
-    
-    return dispatchMethod;
+
+    return code;
   }
   
   public gnu.bytecode.Type javaReturnType()

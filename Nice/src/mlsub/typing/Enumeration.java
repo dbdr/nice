@@ -154,9 +154,9 @@ public class Enumeration
 	    if (c.hasConstants() && 
 		c != bossa.syntax.PrimitiveType.nullTC.getKind())
 	      {
-		if(linkDbg)
+		if(linkDbg && Typing.dbg)
 		  Debug.println("Choosing kind " + c + " for " + tag);
-		
+
 		if (tag instanceof MonotypeVar)
 		  Engine.forceKind(tag, c.associatedKind);
 		else

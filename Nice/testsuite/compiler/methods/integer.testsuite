@@ -200,3 +200,15 @@ foo(1) {}
   foo('(') = false;
   /// package b import a
   assert foo('#');
+
+/// PASS
+  /// Toplevel
+  int g(int m, int n);
+  g(m, n<0) = 1;
+  g(m, n>=0) = 1;
+
+/// PASS
+  /// Toplevel
+  int g(int m, int n);
+  g(m<0, n) = 1;
+  g(m>=0, n) = 1;

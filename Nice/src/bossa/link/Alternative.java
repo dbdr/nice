@@ -100,8 +100,8 @@ public abstract class Alternative implements Located
    */
   boolean matches(TypeConstructor[] tags)
   {
-    for(int i = 0, n = 0; i < patterns.length; i++)
-      if (!patterns[i].matches(tags[n++]))
+    for(int i = 0; i < patterns.length; i++)
+      if (!patterns[i].matches(tags[i]))
 	return false;
 
     return true;
@@ -109,8 +109,8 @@ public abstract class Alternative implements Located
 
   boolean matchesTypePart(TypeConstructor[] tags, boolean[] isValue)
   {
-    for(int i = 0, n = 0; i < patterns.length; i++)
-      if (!isValue[i] && !patterns[i].matches(tags[n++]))
+    for(int i = 0; i < patterns.length; i++)
+      if (!isValue[i] && !patterns[i].matches(tags[i]))
 	return false;
 
     return true;
@@ -118,8 +118,8 @@ public abstract class Alternative implements Located
 
   boolean matchesValuePart(ConstantExp[] values, boolean[] isValue)
   {
-    for(int i = 0, n = 0; i < patterns.length; i++)
-      if (isValue[i] && !patterns[i].matchesValue(values[n++]))
+    for(int i = 0; i < patterns.length; i++)
+      if (isValue[i] && !patterns[i].matchesValue(values[i]))
 	return false;
 
     return true;

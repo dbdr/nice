@@ -95,9 +95,6 @@ class Ref<T> { T value; }
  * Strings
  ****************************************************************/
 
-//<Any T> String add(T,String);
-//add(o@Object,s@String) = add(toString(o),s);
-
 <Any T> String `+`(String,T);
 `+`(s@String,o) = concat(s,toString(o));
 

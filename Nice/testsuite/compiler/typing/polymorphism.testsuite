@@ -42,3 +42,7 @@ A[?] foo()
 {
   return (true) ? null : poly(new A[0]);
 }
+
+/// PASS bug
+  int[][] l = [[0,1],[1,2]];
+  int[] bar = l.map(<T> (T[] x) => x[1]);

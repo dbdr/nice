@@ -608,8 +608,6 @@ public class Package implements mlsub.compilation.Module, Located, bossa.syntax.
     if (classe == null)
       Internal.error("Compiled class " + def + " was not found");
     
-    Type.registerTypeForName(name, classe);
-    
     ClassExp res = new ClassExp(classe);
     addImplementationClass(res);
     return res;

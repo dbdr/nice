@@ -68,6 +68,7 @@ public class ClassFileInput extends DataInputStream
     if (ctype.constants != null)
       {
         ctype = new ClassType(name);
+        Type.registerTypeForName(name, ctype);
         ctype.collectable = true;
       }
 

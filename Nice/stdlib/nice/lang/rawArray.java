@@ -1,7 +1,7 @@
 /****************************************************************************
  *                                 N I C E                                  *
  *              A high-level object-oriented research language              *
- *                         (c) Daniel Bonniot 2003                          *
+ *                         (c) Daniel Bonniot 2004                          *
  *                                                                          *
  *  This package is free software; you can redistribute it and/or modify    *
  *  it under the terms of the GNU General Public License as published by    *
@@ -27,14 +27,14 @@ import java.util.*;
    @version: $Date$
    @author Daniel Bonniot (d.bonniot@mail.dotcom.fr)
 */
-public final class rawArray extends java.util.AbstractList
+public class rawArray extends java.util.AbstractList
 {
-  private rawArray(Object value)
+  protected rawArray(Object value)
   {
     this.value = value;
   }
   
-  public Object value;
+  public final Object value;
   public Object value()
   {
     return value;
@@ -44,6 +44,34 @@ public final class rawArray extends java.util.AbstractList
   {
     if (value == null)
       return null;
+
+    if (value instanceof Object[])
+      return new rawObjectArray((Object[])value);
+
+    if (value instanceof int[])
+      return new rawIntArray((int[])value);
+
+    if (value instanceof byte[])
+      return new rawByteArray((byte[])value);
+
+    if (value instanceof long[])
+      return new rawLongArray((long[])value);
+
+    if (value instanceof char[])
+      return new rawCharArray((char[])value);
+
+    if (value instanceof boolean[])
+      return new rawBooleanArray((boolean[])value);
+
+    if (value instanceof double[])
+      return new rawDoubleArray((double[])value);
+
+    if (value instanceof float[])
+      return new rawFloatArray((float[])value);
+
+    if (value instanceof short[])
+      return new rawShortArray((short[])value);
+
     return new rawArray(value);
   }
 

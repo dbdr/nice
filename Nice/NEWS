@@ -8,6 +8,7 @@ nice (0.9.6)
     arguments. For example 'loop(5) { doSomeThing(); }' is shorthand for
     'loop(5, () => { doSomeThing(); });'
   * Stricter parsing of expression used as statement.
+  * Improved performance of arrays used as lists.
   * Bug fixes (checking of local variables in a call position, make it possible
     to use new Object() and dispatch on Object again, ... )
 

@@ -6,10 +6,10 @@
     : i - i;
 
 /// FAIL
+  let dummy = false ? 0 : /*/// FAIL HERE */ nameX;
   /// Toplevel
-  int nameX() = 0;
-  byte nameX() = 1;
-  int dummy() = false ? 0 : nameX;
+  let int nameX = 0;
+  let String nameX = "";
 
 /// PASS
   int i = 0;

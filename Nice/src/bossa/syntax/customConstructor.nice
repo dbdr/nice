@@ -187,9 +187,9 @@ private Monotype getCCReturnType(LocatedString className, Constraint cst)
 
 void resolveCCThis(Statement stmt, Located thisLoc, NiceClass classe)
 {
-  void missingThisError()
+  UserError missingThisError()
   {
-    User.error(thisLoc, "The last statement must be a call to 'this' constructor");
+    return User.error(thisLoc, "The last statement must be a call to 'this' constructor");
   }
 
   var last = stmt;
@@ -201,14 +201,12 @@ void resolveCCThis(Statement stmt, Located thisLoc, NiceClass classe)
     }
 
   if (! (last instanceof ExpressionStmt))
+    throw missingThisError();
+
+  if (! (last.exp instanceof CallExp))
     missingThisError();
 
-  ExpressionStmt expstmt = cast(last);
-
-  if (! (expstmt.exp instanceof CallExp))
-    missingThisError();
-
-  CallExp call = cast(expstmt.exp);
+  CallExp call = cast(last.exp);
 
   if (! (call.function instanceof IdentExp))
     missingThisError();

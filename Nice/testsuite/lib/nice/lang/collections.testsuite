@@ -2,25 +2,3 @@
   int count = 0;
   [0,1,2].foreach(int i => `assert`(i == count++));
   assert count == 3;
-
-/// PASS
-  List<String> list = [ "C", "BA", "BB", "A" ];
-  sort(list, (String s1, String s2) => s1.compareTo(s2));
-  assert list[0] == "A";
-  assert list[1] == "BA";
-
-  /// Toplevel
-interface Comparator<T> = native java.util.Comparator;
-
-<T> int compare(Comparator<T>,T,T) = 
-  native int Comparator.compare(Object, Object);
-
-final class NiceComparator<T> implements Comparator
-{
-  (T,T) -> int compare;
-
-  compare(x1, x2) = (this.compare)(x1,x2);
-}
-
-<T> void sort(List<T> list, (T,T) -> int comp) =
-  Collections.sort(list, new NiceComparator(compare: comp));

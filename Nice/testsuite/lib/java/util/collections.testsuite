@@ -31,3 +31,8 @@
   String[] s = [ "a", "aa", "aaa" ];
   s.sort((String s1, String s2) => s2.length - s1.length);
   assert s[0] == "aaa";
+
+  List<String> list = [ "C", "BA", "BB", "A" ];
+  sort(list, (String s1, String s2) => s1.compareTo(s2));
+  assert list[0] == "A";
+  assert list[1] == "BA";

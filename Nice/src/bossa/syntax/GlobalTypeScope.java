@@ -45,6 +45,11 @@ public class GlobalTypeScope extends TypeScope
       throw new DuplicateName(name);
   }
 
+  public TypeConstructor globalLookup(LocatedString name)
+  {
+    return globalLookup(name.toString(), name.location());
+  }
+
   public TypeConstructor globalLookup(String name, Location loc)
   {
     TypeSymbol res = lookup(name, loc);

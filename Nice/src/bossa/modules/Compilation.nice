@@ -66,17 +66,19 @@ class Compilation extends CompilationInterface
     if (this.destinationDir == null && this.packagePath == null)
       this.packagePath = ".";
 
-    nice.tools.code.TypeImport.setClasspath
-    ((this.destinationDir || "") + 
-     java.io.File.pathSeparator + 
-     (this.packagePath || "") + 
-     java.io.File.pathSeparator + 
-     this.runtimeFile);
+    String classpath =
+      (this.packagePath || "") + 
+      java.io.File.pathSeparator + 
+      (this.destinationDir || "") + 
+      java.io.File.pathSeparator + 
+      this.runtimeFile;
+
+    nice.tools.code.TypeImport.setClasspath(classpath);
 
     Package.startNewCompilation();
 
     // Create the locator that uses these two pathes to locate packages.
-    this.locator = new Locator(this);
+    this.locator = new Locator(this, classpath);
 
     // forces reading nice.lang first
     if(!(packageName.equals("nice.lang")) && !bossa.util.Debug.ignorePrelude())

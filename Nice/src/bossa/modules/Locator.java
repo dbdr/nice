@@ -16,6 +16,7 @@ import java.io.*;
 import java.util.LinkedList;
 import java.util.jar.JarFile;
 import bossa.util.Debug;
+import bossa.util.User;
 
 /**
    Locates package definitions.
@@ -26,12 +27,10 @@ import bossa.util.Debug;
 
 final class Locator
 {
-  Locator (Compilation compilation)
+  Locator (Compilation compilation, String classpath)
   {
     sourceRoots = splitPath(compilation.sourcePath);
-    packageRoots = splitPath(compilation.packagePath + File.pathSeparator + 
-			     compilation.destinationDir + File.pathSeparator + 
-			     compilation.runtimeFile);
+    packageRoots = splitPath(classpath);
   }
 
   Content find (Package pkg)
@@ -91,7 +90,7 @@ final class Locator
 	String pathComponent = path.substring(start, end);
 	if (pathComponent.length() > 0)
 	  {
-	    File f = nice.tools.util.System.getFile(pathComponent);
+	    File f = nice.tools.util.System.getFile(pathComponent).getAbsoluteFile();
 	    // Ignore non-existing directories and archives
 	    if (f.exists())
 	      {
@@ -100,9 +99,13 @@ final class Locator
 		    res.add(new JarFile(f));
 		  }
 		  catch(IOException e){}
-		else
+		else if (f.isDirectory())
 		  res.add(f);
+                else
+                  User.warning("Path " + f + " is not valid");
 	      }
+            else
+              User.warning("Path " + f + " does not exist");
 	  }
 	start = end + 1;
       }

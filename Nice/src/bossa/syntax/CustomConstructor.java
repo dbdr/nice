@@ -267,7 +267,8 @@ public abstract class CustomConstructor extends UserOperator
   {
     ImportedCustomConstructor(NiceClass def, Method method, MiscAttr attr)
     {
-      super(def, FormalParameters.readBytecodeAttribute(attr));
+      super(def, FormalParameters.readBytecodeAttribute
+            (attr, JavaClasses.compilation.parser));
       this.method = method;
       TypeConstructors.addConstructor(classe.definition.tc, this);
     }

@@ -1,7 +1,7 @@
 /**************************************************************************/
 /*                                N I C E                                 */
 /*             A high-level object-oriented research language             */
-/*                        (c) Daniel Bonniot 2002                         */
+/*                        (c) Daniel Bonniot 2004                         */
 /*                                                                        */
 /*  This program is free software; you can redistribute it and/or modify  */
 /*  it under the terms of the GNU General Public License as published by  */
@@ -16,20 +16,32 @@ import java.util.*;
 import java.io.*;
 
 import bossa.syntax.LocatedString;
+import bossa.syntax.FormalParameters;
 import bossa.util.*;
 import nice.tools.util.Chronometer;
 
-/** 
-    Static class for loading and parsing files.
-    
-    @version $Date$
-    @author bonniot
+/**
+    Nice parser using the JavaCC-generated parser.
+
+    @author Daniel Bonniot
  */
 
-public abstract class Loader
+public class JavaccParser implements bossa.modules.Parser
 {
-  public static LocatedString readImports(Reader r, 
-					  List imports, Collection opens)
+  public final boolean storeDocStrings;
+
+  public JavaccParser(boolean storeDocStrings)
+  {
+    this.storeDocStrings = storeDocStrings;
+  }
+
+  public JavaccParser()
+  {
+    this(false);
+  }
+
+
+  public LocatedString readImports(Reader r, List imports, Collection opens)
   {
     chrono.start();
     try {
@@ -47,10 +59,11 @@ public abstract class Loader
     }
   }
 
-  public static void open(Reader r, List definitions, boolean storeDocStrings)
+  public void read(Reader r, List definitions)
   {
     chrono.start();
     try {
+
       Parser parser = new Parser(r);
 
       try{
@@ -65,9 +78,20 @@ public abstract class Loader
 	  message = "Unexpected end of file";
 	User.error(Location.nowhere(), message);
       }
-    }
+      }
     finally {
       chrono.stop();
+    }
+  }
+
+
+  public FormalParameters formalParameters(String parameters)
+  {
+    try {
+      return getParser(parameters).formalParameters(false, null);
+    }
+    catch(ParseException ex) {
+      return null;
     }
   }
 
@@ -85,14 +109,11 @@ public abstract class Loader
         if (token.next != null)
           token = token.next;
 
-        User.error(Location.make(token.beginLine, token.beginColumn),
-			removeLocation(e.getMessage()));
+        throw User.error(Location.make(token.beginLine, token.beginColumn),
+                         removeLocation(e.getMessage()));
       }
     else
-      User.error(e.getMessage());
-
-    // We never get here anyway.
-    return null;
+      throw User.error(e.getMessage());
   }
 
   private static Chronometer chrono = Chronometer.make("Parsing");
@@ -107,16 +128,15 @@ public abstract class Loader
     if (start == -1)
       return message;
     int end = message.indexOf('.', start);
-    return 
-      message.substring(0, start) + 
+    return
+      message.substring(0, start) +
       message.substring(end, message.length());
   }
-  
-  public static Parser getParser(String toParse)
+
+  private static Parser getParser(String toParse)
   {
     Reader r = new StringReader(toParse);
     Parser parser = new Parser(r);
     return parser;
   }
-
 }

@@ -73,13 +73,13 @@ class Content
     return imports;
   }
 
-  void getDefinitions(List definitions, boolean shouldReload, boolean storeDocStrings)
+  void getDefinitions(List definitions, boolean shouldReload)
   {
     Content.Unit[] readers = getReaders(shouldReload);
 
     for(int i = 0; i<readers.length; i++)
       try{
-        read(readers[i], definitions, storeDocStrings);
+        read(readers[i], definitions);
       }
       catch(UserError ex){
         pkg.compilation.error(ex);
@@ -92,20 +92,21 @@ class Content
   {
     bossa.util.Location.setCurrentFile(unit.file);
 
-    bossa.syntax.LocatedString pkgName = 
-      bossa.parser.Loader.readImports(unit.reader, imports, opens);
+    bossa.syntax.LocatedString pkgName =
+      pkg.compilation.parser.readImports(unit.reader, imports, opens);
+
     if (pkgName != null && ! pkgName.equals(pkg.name))
       User.error(pkgName,
 		 source + " declares it belongs to package " + pkgName +
 		 ", but it was found in package " + pkg.name);
   }
-  
-  private void read(Content.Unit unit, List definitions, boolean storeDocStrings)
+
+  private void read(Content.Unit unit, List definitions)
   {
     bossa.util.Location.setCurrentFile(unit.file);
-    bossa.parser.Loader.open(unit.reader, definitions, storeDocStrings);
+    pkg.compilation.parser.read(unit.reader, definitions);
   }
-  
+
   /**
      @param shouldReload reload if the source if available.
    **/

@@ -49,7 +49,8 @@ int compile(String[] args)
   boolean editorMode = false;
 
   ConsoleOutput consOutput = new ConsoleOutput();
-  Compilation compilation = new Compilation(listener: consOutput);
+  Compilation compilation = new Compilation
+    (listener: consOutput, parser: new bossa.parser.JavaccParser());
 
   Program prg = new Program
     (name: "nicec", longName: "The Nice Compiler",

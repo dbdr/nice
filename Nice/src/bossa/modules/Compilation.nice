@@ -45,14 +45,14 @@ class Compilation extends CompilationInterface
    */
   boolean strictJavaTypes = false;
 
-  boolean storeDocStrings = false;
-
   /** Location of the nice.jar file. */
   ?String runtimeFile = null;
 
   ?Locator locator = null;
 
   CompilationListener listener;
+
+  Parser parser;
 
   Map<String,Package> packages = new HashMap();
   Map<String,mlsub.typing.TypeConstructor> javaTypeConstructors = new HashMap();
@@ -147,7 +147,7 @@ class Compilation extends CompilationInterface
   }
 }
 
-Compilation createCompilation(CompilationListener listener) = 
-  new Compilation(listener: listener);
+Compilation createCompilation(CompilationListener listener, Parser parser) =
+  new Compilation(listener: listener, parser: parser);
 
 class Exit extends RuntimeException {}

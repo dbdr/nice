@@ -17,8 +17,8 @@ void main(String[] args)
   File outdir = new File(".");
 
   ConsoleOutput consOutput = new ConsoleOutput();
-  Compilation compilation = new Compilation(listener: consOutput);
-  compilation.storeDocStrings = true;
+  Compilation compilation = new Compilation
+    (listener: consOutput, parser: new bossa.parser.JavaccParser(true));
 
   Program prg = new Program
     (name: "nicedoc", longName: "The Nice Documentation Generator",

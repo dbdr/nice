@@ -559,7 +559,8 @@ public class FormalParameters extends Node
     return new gnu.bytecode.MiscAttr("parameters", this.toString().getBytes());
   }
 
-  static FormalParameters readBytecodeAttribute(gnu.bytecode.MiscAttr attr)
+  static FormalParameters readBytecodeAttribute(gnu.bytecode.MiscAttr attr,
+                                                bossa.modules.Parser parser)
   {
     String value = new String(attr.data);
 
@@ -567,16 +568,15 @@ public class FormalParameters extends Node
       Debug.println("Read attribute " + attr.getName() + "=\"" + value + 
                     "\" from " + attr.getContainer());
 
-    try {
-      return 
-        bossa.parser.Loader.getParser(value).formalParameters(false, null);
-    }
-    catch (bossa.parser.ParseException ex) {
+    FormalParameters res = parser.formalParameters(value);
+
+    if (res == null)
       throw Internal.error
         ("Could not parse '" + attr.getName() + "' bytecode attribute:\n" +
          "In method: " + attr.getContainer() + "\n" +
          "Value    : " + value);
-    }
+
+    return res;
   }
 
   private Parameter[] parameters;

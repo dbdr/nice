@@ -324,9 +324,10 @@ public abstract class TestCase {
 	 * @exception	TestSuiteException	TODO
 	 */
 	private int compilePackage(String packageName) throws TestSuiteException {
-    nice.tools.compiler.console.ConsoleOutput output = 
+    nice.tools.compiler.console.ConsoleOutput output =
       nice.tools.compiler.console.fun.consoleOutput();
-	  Compilation compilation = bossa.modules.fun.createCompilation(output);
+	  Compilation compilation = bossa.modules.fun.createCompilation
+	    (output, new bossa.parser.JavaccParser());
 	  String tempDir = TestNice.getTempFolder().getAbsolutePath();
 	  compilation.sourcePath = tempDir;
 	  compilation.destinationDir = tempDir;

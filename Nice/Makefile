@@ -154,19 +154,14 @@ web:
 #    Bootstrap
 #****************************************************************
 
-parser: src/bossa/parser/Parser.java
-src/bossa/parser/Parser.java: src/bossa/parser/Parser.jj
-	cd src/bossa/parser; CLASSPATH=`TOP=${TOP} ${TOP}/external/javacc` \
-		${java} javacc Parser.jj
-
-bootstrap: parser
+core-bootstrap:
 	mkdir -p classes classes-inline
 	ln -sf nicec bin/nicedoc; ln -sf nicec bin/niceunit
 	-cd src/bossa/syntax && mv -f dispatch.java.bootstrap dispatch.java
 	${JAVAC} \
-		stdlib/nice/lang/Native.java \
-		src/mlsub/compilation/Module.java \
-		src/bossa/modules/Package.java src/bossa/util/*.java \
+		stdlib/nice/lang/{Native,rawArray}.java \
+		src/bossa/modules/{Package,CompilationListener}.java \
+		src/bossa/util/*.java \
 		src/gnu/expr/*.java src/gnu/mapping/*.java \
 		src/nice/tools/{code/*.java,util/JDK.java} \
 		src/mlsub/typing/{*.java,lowlevel/*.java} \
@@ -185,8 +180,13 @@ bootstrap: parser
 	mv dispatch.java dispatch.java.bootstrap
 	rm classes/bossa/syntax/dispatch.class
 	${NICEC} -r bossa.syntax
-	cd src;\
-	${JAVAC} bossa/modules/Package.java ../stdlib/nice/lang/rawArray.java gnu/bytecode/dump.java
+
+src/bossa/parser/Parser.java: src/bossa/parser/Parser.jj
+	cd src/bossa/parser; CLASSPATH=`TOP=${TOP} ${TOP}/external/javacc` \
+		${java} javacc Parser.jj
+
+bootstrap: core-bootstrap src/bossa/parser/Parser.java
+	${JAVAC} src/bossa/parser/JavaccParser.java
 
 ant:
 	@echo "Building the Ant task definition..."
@@ -220,6 +220,9 @@ testengine:
 # has no -[X]depend
 dep:
 	cd src; ${JAVAC} bossa/modules/Package.java
+
+parser: src/bossa/parser/Parser.java
+	${JAVAC} src/bossa/parser/Parser.java
 
 recompile: parser
 #	${JAVAC} -Xdepend src/bossa/modules/Package.java

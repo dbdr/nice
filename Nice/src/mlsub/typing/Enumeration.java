@@ -179,7 +179,7 @@ public class Enumeration
       }
     else
       {
-	List solutions = enumerateTags(tags);
+	List solutions = enumerateTags(tags, all);
 	res.addAll(solutions);
 	if (solutions.size() > 0) 
 	  /*
@@ -201,12 +201,15 @@ public class Enumeration
 
   private static class SolutionFound extends RuntimeException {}
 
-  private static List enumerateTags(Element[] tags)
+  private static List enumerateTags(Element[] tags, boolean[] all)
   {
     TagsList tuples = new TagsList(tags.length);
     List kinds = new ArrayList(tags.length); /* euristic: 
 						at most one kind per tag */
     List observers = new ArrayList(tags.length); // idem
+
+    // The variable TCs that will hold the solutions.
+    TypeConstructor[] vars = new TypeConstructor[tags.length];
 
     Engine.enter();
     try{
@@ -242,10 +245,14 @@ public class Enumeration
 	      (tags[i].getKind() + " is not a valid kind in enumerate");
 	
 	  TypeConstructor varTC = new TypeConstructor(constTC.variance);
-	  
-	  varTC.enumerateTagIndex = i;
+	  vars[i] = varTC;
+
 	  Typing.introduce(varTC);
-	  obs.set(varTC.getId());
+
+          // We only observe those positions where all solutions are needed.
+	  if (all[i])
+            obs.set(varTC.getId());
+
 	  try{
 	    k.leq(varTC, constTC);
 	    k.reduceDomainToConcrete(varTC);
@@ -260,8 +267,8 @@ public class Enumeration
       
       BitVector[] pObs = (BitVector[]) 
 	observers.toArray(new BitVector[observers.size()]);
-      
-      if (enumerateInConstraints(pKinds, pObs, tuples, tags))
+
+      if (enumerateInConstraints(pKinds, pObs, tuples, tags, vars, all))
 	return emptyList;
     }
     finally{
@@ -278,7 +285,9 @@ public class Enumeration
     (Engine.Constraint[] kinds,
      BitVector[] observers,
      final TagsList tuples,
-     final Element[] tags)
+     final Element[] tags,
+     final TypeConstructor[] vars,
+     final boolean[] all)
   {
     for(int act = 0; act<kinds.length;act++)
       {
@@ -295,28 +304,46 @@ public class Enumeration
 		 {
                    // Check if this is really a solution, because of
                    // class constraints.
-		   for (int x = obs.getLowestSetBit();
-			x != BitVector.UNDEFINED_INDEX;
-			x = obs.getNextBit(x))
-		     {
-		       TypeConstructor var,sol;
-		       var=(TypeConstructor) kind.getElement(x);
-		       sol=(TypeConstructor) kind.getElement(getSolutionOf(x));
-                       int index = var.enumerateTagIndex;
-                       if (! checkClassConstraint(tags[index], sol))
+                   for (int index = 0; index < vars.length; index++)
+                     {
+                       /* If this index does not need all solutions
+                          (i.e. all[index] is false), and the solution
+                          sol does not pass checkClassConstraint, 
+                          it might have been that some other solution, which
+                          we don't generate, would pass. So in this case
+                          we should restart to try other solutions for this
+                          index to see if at least one passes or not.
+                       */
+
+		       TypeConstructor var,solution;
+                       var = vars[index];
+
+                       // We only deal with matchable tags, 
+                       // and those that belong to this kind.
+                       if (var == null || var.getKind() != kind)
+                         continue;
+
+		       solution = (TypeConstructor)
+                         kind.getElement(getSolutionOf(var.getId()));
+                       if (! checkClassConstraint(tags[index], solution))
                          return;
                      }
 
                    // It is a solution, let's add it to the list.
 		   tuples.startEntry();
-		   for (int x = obs.getLowestSetBit();
-			x != BitVector.UNDEFINED_INDEX;
-			x = obs.getNextBit(x))
+                   for (int index = 0; index < vars.length; index++)
 		     {
-		       TypeConstructor var,sol;
-		       var=(TypeConstructor) kind.getElement(x);
-		       sol=(TypeConstructor) kind.getElement(getSolutionOf(x));
-		       tuples.set(var.enumerateTagIndex, sol);
+		       TypeConstructor var, solution;
+		       var = vars[index];
+
+                       // We only deal with matchable tags, 
+                       // and those that belong to this kind.
+                       if (var == null || var.getKind() != kind)
+                         continue;
+
+		       solution = (TypeConstructor) 
+                         kind.getElement(getSolutionOf(var.getId()));
+		       tuples.set(index, solution);
 		     }
 		 }
 	     }

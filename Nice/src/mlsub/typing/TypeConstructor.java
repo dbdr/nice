@@ -179,8 +179,6 @@ public class TypeConstructor
    * Fields
    ****************************************************************/
 
-  public int enumerateTagIndex = -1; // used in Typing.enumerate. ugly ! Subclass
-
   public AtomicKind variance;
   private boolean concrete;
   private boolean rigid;

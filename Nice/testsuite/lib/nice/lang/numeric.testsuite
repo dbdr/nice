@@ -102,18 +102,8 @@ var int x = 0;
 
 /// PASS
   assert 7**0 == 1;
-
-/// PASS
   assert -5**1 == -5;
-
-/// PASS
   assert -4**6 == 4096;
-
-/// PASS
   assert 3**9 == 19683;
-
-/// PASS
   assert -7**5 == -16807;
-
-/// PASS
   assert 5**3**2 == 1953125;

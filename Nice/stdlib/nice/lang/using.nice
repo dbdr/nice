@@ -1,0 +1,109 @@
+/**************************************************************************/
+/*                                N I C E                                 */
+/*             A high-level object-oriented research language             */
+/*                        (c) Daniel Bonniot 2003                         */
+/*                                                                        */
+/*  This package is free software; you can redistribute it and/or modify  */
+/*  it under the terms of the GNU Lesser General Public License as        */
+/*  published by the Free Software Foundation; either version 2 of the    */
+/*  License, or (at your option) any later version.                       */
+/*                                                                        */
+/**************************************************************************/
+
+/**
+   Implementation of the <code>using</code> statement, familiar from
+   C#. Essentially, this code:
+   <pre>
+   let f = new FileOutputStream("hello.txt");
+   using(f) 
+   {
+     f.write("Hello, world!".getBytes());
+   }
+   </pre>
+   is equivalent to this code:
+   let f = new FileOutputStream("hello.txt");
+   try 
+   {
+     f.write("Hello, world!".getBytes());
+   }
+   finally
+   {
+     f.close();
+   }
+   </pre>
+
+
+   The using() method accepts any value whose type implements the 
+   <code>Disposable</code> abstract interface. For instance, to make
+   <code>OutputStream</code>s work with <code>using</code>, this
+   code was added:
+   <pre>
+   class java.io.OutputStream implements Disposable;
+   dispose(OutputStream s) = s.close();
+   </pre>
+   
+   @author Bryn Keller (xoltar@users.sourceforge.net)
+ */
+
+import java.io.*;
+
+abstract interface Disposable 
+{
+  void dispose();
+}
+
+
+<Disposable T> void using(T obj, ()->void action)
+{
+  try 
+  {
+    action();
+  }
+  finally
+  {
+    obj.dispose();
+  }
+}
+
+class java.io.InputStream implements Disposable;
+dispose(InputStream s) = s.close();
+  
+class java.io.OutputStream implements Disposable;
+dispose(OutputStream s) = s.close();
+
+class java.io.Reader implements Disposable;
+dispose(Reader r) = r.close();
+
+class java.io.Writer implements Disposable;
+dispose(Writer w) = w.close();
+
+/** For testing only */
+private class NonReclosableOutputStream extends ByteArrayOutputStream {
+    boolean closed = false;
+    close() {
+      if (closed)
+	throw new IOException("Already closed");
+      closed = true;
+    }
+  }
+
+void _testUsing()
+{
+  NonReclosableOutputStream os = new NonReclosableOutputStream();
+  using(os)
+  {
+    os.write("Hello".getBytes());
+  }
+  try {
+    os.close();
+    throw new Exception("Should have been closed!");
+  } catch (IOException e) {
+    //Passed.
+  }
+  byte[] test = "Hello".getBytes();
+  byte[] output = os.toByteArray();
+  assert test.length == output.length;
+  for(int i = 0; i < test.length; i++) {
+    assert test[i] == output[i];
+  }
+}

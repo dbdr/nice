@@ -1,10 +1,10 @@
 /// PASS
   /// Toplevel
 int f(int x, int y)
-  require 
+  requires 
     x > 3 : "x is big enough",
     y < x;
-  ensure 
+  ensures 
     result > 3;
 
 f(x,y) = x;
@@ -12,7 +12,7 @@ f(x,y) = x;
 /// FAIL
   /// Toplevel
 int f(int x, int y)
-  require 
+  requires 
     /*/// FAIL HERE */ x : "x is big enough";
 
 f(x,y) = x;
@@ -20,7 +20,7 @@ f(x,y) = x;
 /// FAIL
   /// Toplevel
 void f(int x)
-  ensure result == result;
+  ensures result == result;
 
 f(x) {}
 
@@ -28,7 +28,7 @@ f(x) {}
   f(1);
   /// Toplevel
 int f(int x)
-  ensure result > 0;
+  ensures result > 0;
 
 f(x) = x;
 
@@ -39,7 +39,7 @@ f(x) = x;
   } catch (AssertionFailed e) {}
   /// Toplevel
 int f(int x)
-  ensure result > 0;
+  ensures result > 0;
 
 f(x) = x;
 
@@ -47,7 +47,7 @@ f(x) = x;
   f();
   /// Toplevel
 void f()
-  ensure true;
+  ensures true;
 
 f() {}
 
@@ -58,12 +58,12 @@ f() {}
   } catch(AssertionFailed e) {}
   /// Toplevel
 void f()
-  ensure false;
+  ensures false;
 
 f() {}
 
 /// FAIL
   /// Toplevel
-  int f() ensure ((/*/// FAIL HERE */ result = 0) == 0);
+  int f() ensures ((/*/// FAIL HERE */ result = 0) == 0);
  
   f() = 1;

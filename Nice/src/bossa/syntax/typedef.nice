@@ -110,7 +110,7 @@ public abstract class TypeDefinition extends MethodContainer
  
   void createTC()
   {
-    String name = notNull(this.name).toString();
+    String name = this.name.toString();
 
     if (name.equals("nice.lang.Array"))
       tc = new ArrayTypeConstructor(name,variance,this.isConcrete(),true);      
@@ -300,7 +300,7 @@ public abstract class TypeDefinition extends MethodContainer
 
     for (MonotypeConstructor parent : names)
       {
-        this.useInheritanceParams(this.resolveParams(parent, notNull(this.getLocalScope())));
+        this.useInheritanceParams(this.resolveParams(parent, this.getLocalScope()));
 
         let name = notNull(parent.tc);
         let s = name.resolvePreferablyToItf(notNull(typeScope));
@@ -318,7 +318,7 @@ public abstract class TypeDefinition extends MethodContainer
             if (javaInterfaces == null)
               javaInterfaces = new ArrayList(5);
 
-            notNull(javaInterfaces).add(s);
+            javaInterfaces.add(s);
           }
         else
 	  Internal.error("Symbol "+s+" is not Interface or TypeConstructor");
@@ -478,7 +478,7 @@ class ClassDefinition extends TypeDefinition
       {
         this.useInheritanceParams(this.resolveParams(s, this.getLocalScope()));
         let superClass = notNull(s.tc).resolveToTC(notNull(typeScope));
-        let name = notNull(this.name);
+        let name = this.name;
 
         this.superClass = superClass;
 	
@@ -876,7 +876,7 @@ int getVariance(?MonotypeConstructor parent)
     return -1;
 
   // Assume non-variance
-  return notNull(parent.parameters).content.length;
+  return parent.parameters.content.length;
 }
 
 // Variance lookup after resolution

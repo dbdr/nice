@@ -56,7 +56,7 @@ public class InlinedMethod extends MethodDeclaration
 
     try{
       m = notNull(refClass).getMethod("create", [String.class]);
-      if (! java.lang.reflect.Modifier.isStatic(notNull(m).getModifiers()))
+      if (! java.lang.reflect.Modifier.isStatic(m.getModifiers()))
 	throw new NoSuchMethodException();
     }
     catch(NoSuchMethodException e){

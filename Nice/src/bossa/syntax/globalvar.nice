@@ -80,13 +80,13 @@ class GlobalVarSymbol extends MonoSymbol
       {
         res = new gnu.expr.Declaration
             (notNull(name).toString(), nice.tools.code.Types.javaType(type));
-        this.setDeclaration(notNull(res));
+        this.setDeclaration(res);
 
         if (! definition.inInterfaceFile())
           {
             // Compute the value first, which might use another global value,
             // which will then be properly initialized before use.
-            notNull(res).noteValue(definition.compileValue());
+            res.noteValue(definition.compileValue());
           }
 
         definition.module.pkg.addGlobalVar(res, definition.constant);

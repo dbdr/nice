@@ -103,7 +103,7 @@ public class Block extends Statement
         return res;
       }
 
-    return this.addLocals(locals.iterator(), notNull(gnu.expr.QuoteExp.voidExp));
+    return this.addLocals(locals.iterator(), gnu.expr.QuoteExp.voidExp);
   }
 
   private gnu.expr.Expression addLocals(Iterator<LocalDeclaration> vars, 

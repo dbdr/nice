@@ -39,9 +39,9 @@ void addConstructor(mlsub.typing.TypeConstructor tc, MethodDeclaration m)
   if (l==null)
     {
       l = new LinkedList();
-      constructorsMap.put(tc, notNull(l));
+      constructorsMap.put(tc, l);
     }
-  notNull(l).add(m.getSymbol());
+  l.add(m.getSymbol());
 }
 
 void removeConstructor(mlsub.typing.TypeConstructor tc, MethodDeclaration m)

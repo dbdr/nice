@@ -203,7 +203,7 @@ public class FormalParameters extends Node
           {
             if (res == null)
               res = cast(new java.util.Stack[this.size()]);
-            notNull(res)[i] = notNull(notNull(param.symbol).copies);
+            res[i] = notNull(notNull(param.symbol).copies);
           }
       }
 

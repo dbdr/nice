@@ -149,7 +149,7 @@ public class TupleExp extends Expression
     if (!(array instanceof gnu.expr.ReferenceExp))
       {
 	letExp = new gnu.expr.LetExp([array]);
-	let tupleDecl = notNull(letExp).addDeclaration("tupleRef", arrayType);
+	let tupleDecl = letExp.addDeclaration("tupleRef", arrayType);
 
 	//FIXME: CanRead should be set automatically.
 	tupleDecl.setCanRead(true);

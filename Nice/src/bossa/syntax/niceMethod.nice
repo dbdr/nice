@@ -282,7 +282,7 @@ public Definition createMemberMethod
   else
     {
       itf = cast(container);
-      tc = notNull(itf).associatedTC();
+      tc = itf.associatedTC();
     }
     
   // if the constraint is True

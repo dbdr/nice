@@ -273,9 +273,7 @@ public class FunType extends Monotype
 
   rawResolve(tm)
   {
-    return new mlsub.typing.FunType
-      (resolveMonotypes(notNull(tm), in),
-       out.resolve(tm));
+    return new mlsub.typing.FunType(resolveMonotypes(tm,in), out.resolve(tm));
   }
 
  substitute(map)

@@ -497,7 +497,7 @@ public class TypeConstantExp extends ConstantExp
 
   ?mlsub.typing.TypeConstructor getTC()
   {
-    return notNull(nice.tools.typing.Types.rawType(representedType)).head();
+    return nice.tools.typing.Types.rawType(representedType).head();
   }
 
   ?mlsub.typing.Monotype representedType = null;
@@ -521,7 +521,7 @@ Expression createTypeConstantExp(?PackageExp root, LocatedString name)
 {
   String fullName = name.toString();
   if (root != null)
-    fullName =notNull(root.name).append(".").append(fullName).toString();
+    fullName = root.name.append(".").append(fullName).toString();
 
   ?mlsub.typing.TypeConstructor tc =
       Node.getGlobalTypeScope().globalLookup(fullName, name.location());

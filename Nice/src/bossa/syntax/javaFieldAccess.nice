@@ -74,9 +74,8 @@ public class JavaFieldAccess extends FieldAccess
       if (type instanceof gnu.bytecode.ClassType)
         {
           c = type;
-          assert c != null; // Typechecker limitation
-           // remembers the fully qualified name
-           className.content = c.getName();
+          // remembers the fully qualified name
+          className.content = c.getName();
 
           for (?gnu.bytecode.Field f = c.getFields(); f != null; f = f.getNext())
 	    if (name.equals(f.getName()))

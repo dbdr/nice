@@ -18,8 +18,8 @@ package bossa.syntax;
 
  */
 
-let gnu.bytecode.Method newError = notNull(gnu.bytecode.ClassType.
-	make("java.lang.Error")).getDeclaredMethod("<init>",
+let gnu.bytecode.Method newError = gnu.bytecode.ClassType.
+	make("java.lang.Error").getDeclaredMethod("<init>",
 	[cast(gnu.bytecode.Type.string_type)]);
 
 public void compileNiceMethod(NiceMethod m, 

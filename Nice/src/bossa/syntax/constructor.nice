@@ -55,7 +55,7 @@ abstract class Constructor extends MethodDeclaration
       }
 
     //No such field
-    List<String> nonmatching = notNull(arguments).noMatchByName(notNull(parameters));
+    List<String> nonmatching = arguments.noMatchByName(parameters);
     if (!nonmatching.isEmpty())
       {
         res.append(" has no field named "+nonmatching[0]);
@@ -66,10 +66,10 @@ abstract class Constructor extends MethodDeclaration
     // - three different messages depending on whether
     //an explanation of the syntax is necessary
     res = new StringBuffer();
-    List<Parameter> missing = notNull(arguments).missingArgs(notNull(parameters));
+    List<Parameter> missing = arguments.missingArgs(notNull(parameters));
     List<Parameter> fieldsToList;
 
-    if (notNull(arguments).size() == 0)
+    if (arguments.size() == 0)
       {
         res.append("Fields of class ").append(name)
           .append(" require initial values.\n");

@@ -186,6 +186,6 @@ public ?gnu.bytecode.Method getImplementationAbove(JavaMethod decl, gnu.bytecode
   if (superClass == null)
     return null;
     
-  return superClass.getMethod(notNull(thisMethod).getName(), 
-				notNull(thisMethod).getParameterTypes(), true);
+  return superClass.getMethod(thisMethod.getName(), 
+		thisMethod.getParameterTypes(), true);
   }

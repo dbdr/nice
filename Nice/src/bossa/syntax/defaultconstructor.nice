@@ -140,7 +140,7 @@ class DefaultConstructor extends Constructor
 
 let gnu.expr.Expression objectConstructor = new gnu.expr.QuoteExp
 	(new gnu.expr.InitializeProc(
-	notNull(gnu.bytecode.Type.pointer_type).getDeclaredMethod("<init>", 0)));
+	gnu.bytecode.Type.pointer_type.getDeclaredMethod("<init>", 0)));
 
 /**
    A wrapper for a bytecode version of this constructor.

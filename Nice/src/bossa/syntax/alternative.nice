@@ -126,11 +126,11 @@ public class Alternative implements Located
       {
 	// XXX change to LinkedList
 	l = new ArrayList();
-	alternativesMap.put(fullName,notNull(l));
+	alternativesMap.put(fullName, l);
       }
     // Dispatch.sort(final List alternatives) assumes that new alternatives
     // are added at the end
-    notNull(l).add(this);
+    l.add(this);
   }
   
   public void add(String[] fullNames)
@@ -150,9 +150,9 @@ public class Alternative implements Located
           if (newPatterns == null)
             {
               newPatterns = cast(new Pattern[patterns.length]);
-              System.arraycopy(patterns, 0, notNull(newPatterns), 0, i);
+              System.arraycopy(patterns, 0, newPatterns, 0, i);
             }
-          notNull(newPatterns)[i] = createPattern
+          newPatterns[i] = createPattern
             (patterns[i].getName(),
              nice.tools.typing.Types.concreteConstructor(notNull(parameters)[i]),
              nice.tools.typing.Types.isSure(notNull(parameters)[i]));

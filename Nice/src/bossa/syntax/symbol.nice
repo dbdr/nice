@@ -162,7 +162,7 @@ public class MonoSymbol extends VarSymbol
   {
     let k = nice.tools.typing.Types.rawType(type).getKind();
     if (k instanceof mlsub.typing.FunTypeKind)
-      if (!notNull(arguments).plainApplication(k.domainArity, this))
+      if (!arguments.plainApplication(k.domainArity, this))
 	return 0;
       else
 	return 2;
@@ -176,8 +176,8 @@ public class MonoSymbol extends VarSymbol
     if (k instanceof mlsub.typing.FunTypeKind)
       { 
 	int arity = k.domainArity;
-	if (notNull(arguments).size() != arity)
-	  return notNull(name) + Util.has(arity, "parameter", notNull(arguments).size());
+	if (arguments.size() != arity)
+	  return notNull(name) + Util.has(arity, "parameter", arguments.size());
 	else
 	  // If the number of arguments is correct, it must be that
 	  // some arguments are named.
@@ -291,7 +291,7 @@ class FunSymbol extends PolySymbol
       return parameters.toString();
 
     mlsub.typing.Monotype m = nice.tools.typing.Types.rawType(
-    	notNull(this.getType()).getMonotype());
+    	this.getType().getMonotype());
     if (m instanceof mlsub.typing.FunType)
       return bossa.util.Util.map("", ", ", "", m.domain());
 

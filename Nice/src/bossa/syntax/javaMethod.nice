@@ -118,8 +118,6 @@ void registerMethod(gnu.bytecode.Method m)
   if (methods == null)
     knownMethods.put(m.getName(), methods = new ArrayList());
 
-  assert methods != null;
-
   methods.add(m);
 }
 
@@ -283,8 +281,6 @@ private ?gnu.bytecode.Method findBaseMethod(gnu.bytecode.ClassType classType, gn
   if (superClass == null)
     superClass = gnu.bytecode.Type.pointer_type;
 
-  assert superClass != null;  // Typechecker limitation
-
   res = alreadyHasMethod(superClass,m);
   if (res != null)
     return res;
@@ -341,7 +337,7 @@ void resetJavaClasses()
 JavaMethod getJavaObjectConstructor()
 {
   if (javaObjectConstructor == null)
-    javaObjectConstructor = makeJavaMethod(getDeclaredMethod(notNull(gnu.bytecode.Type.pointer_type),"<init>", 0), true);
+    javaObjectConstructor = makeJavaMethod(getDeclaredMethod(gnu.bytecode.Type.pointer_type,"<init>", 0), true);
 
   return notNull(javaObjectConstructor);
 }

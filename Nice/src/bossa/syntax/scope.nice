@@ -89,9 +89,6 @@ public class GlobalTypeScope extends TypeScope
     if (res instanceof mlsub.typing.TypeConstructor)
       return res;
 
-    if (res != null)
-      Internal.warning("Non type-constructor found in global type scope");
-
     return cast(null);
   }
 

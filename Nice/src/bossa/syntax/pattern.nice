@@ -247,7 +247,7 @@ public Pattern createPattern(LocatedString name)
 public Pattern createPattern(LocatedString name, TypeIdent ti)
 {
   if (ti.toString().equals("Object"))
-    return new NotNullPattern(name: name, tc: nice.tools.typing.PrimitiveType.sureTC, loc: notNull(name.location));
+    return new NotNullPattern(name: name, tc: nice.tools.typing.PrimitiveType.sureTC, loc: name.location);
 
   return new TypePattern(name: name, typeConstructor: ti, loc: name.location(), exactlyAt: false);
 }

@@ -36,7 +36,7 @@ public final class TypeIdent extends Monotype implements Located
 
   public mlsub.typing.TypeSymbol resolveToTypeSymbol(TypeMap scope)
   {
-    let res = notNull(scope).lookup(name);
+    let res = scope.lookup(name);
     if (res == null)
       throw unknownIdent(name);
     

@@ -454,7 +454,7 @@ public class NiceClass extends ClassImplementation
             let ourSym = asTypeSymbol(ourTypeParameters[i]);
             let sym = asTypeSymbol(typeParameters[i]);
             scope.addMapping(ourSym.toString(), sym);
-            notNull(map).put(ourSym, sym);
+            map.put(ourSym, sym);
 	  } catch(TypeScope.DuplicateName e) {}
       }
 

@@ -294,9 +294,9 @@ nullnessInfo(CallExp test)
   if (test.isCallTo("||"))
     {
       ?List<MonoSymbol> notNullIfFalse0 = 
-	 second_(nullnessInfo(notNull(test.arguments.getExp(0))));
+	 second_(nullnessInfo(test.arguments.getExp(0)));
       ?List<MonoSymbol> notNullIfFalse1 = 
-	second_(nullnessInfo(notNull(test.arguments.getExp(1))));
+	second_(nullnessInfo(test.arguments.getExp(1)));
 
       // If this test is false, it is because both subtests are.
       return (null, combine(notNullIfFalse0, notNullIfFalse1));
@@ -305,9 +305,9 @@ nullnessInfo(CallExp test)
   if (test.isCallTo("&&"))
     {
       ?List<MonoSymbol> notNullIfTrue0 =
-	first_(nullnessInfo(notNull(test.arguments.getExp(0))));
+	first_(nullnessInfo(test.arguments.getExp(0)));
       ?List<MonoSymbol> notNullIfTrue1 =
-	first_(nullnessInfo(notNull(test.arguments.getExp(1))));
+	first_(nullnessInfo(test.arguments.getExp(1)));
 
       // If this test is true, it is because both subtests are.
       return (combine(notNullIfTrue0, notNullIfTrue1), null);
@@ -322,14 +322,14 @@ nullnessInfo(CallExp test)
     return (null, null);
 
   int varPosition;
-  if (isNull(notNull(test.arguments.getExp(0))))
+  if (isNull(test.arguments.getExp(0)))
     varPosition = 1;
-  else if (isNull(notNull(test.arguments.getExp(1))))
+  else if (isNull(test.arguments.getExp(1)))
     varPosition = 0;
   else // Give up.
     return (null, null);
 
-  ?MonoSymbol variable = localVariable(notNull(test.arguments.getExp(varPosition)));
+  ?MonoSymbol variable = localVariable(test.arguments.getExp(varPosition));
   if (variable == null)
     return (null, null);
 
@@ -378,9 +378,9 @@ instanceofInfo(CallExp test)
   if (test.isCallTo("||"))
     {
       ?List<(MonoSymbol, mlsub.typing.Monotype)> instanceofIfFalse0 = 
-	 second_(instanceofInfo(notNull(test.arguments.getExp(0))));
+	 second_(instanceofInfo(test.arguments.getExp(0)));
       ?List<(MonoSymbol, mlsub.typing.Monotype)> instanceofIfFalse1 = 
-	second_(instanceofInfo(notNull(test.arguments.getExp(1))));
+	second_(instanceofInfo(test.arguments.getExp(1)));
 
       return (null, combine(instanceofIfFalse0, instanceofIfFalse1));
     }
@@ -388,9 +388,9 @@ instanceofInfo(CallExp test)
   if (test.isCallTo("&&"))
     {
       ?List<(MonoSymbol, mlsub.typing.Monotype)> instanceofIfTrue0 =
-	first_(instanceofInfo(notNull(test.arguments.getExp(0))));
+	first_(instanceofInfo(test.arguments.getExp(0)));
       ?List<(MonoSymbol, mlsub.typing.Monotype)> instanceofIfTrue1 =
-	first_(instanceofInfo(notNull(test.arguments.getExp(1))));
+	first_(instanceofInfo(test.arguments.getExp(1)));
 
       return (combine(instanceofIfTrue0, instanceofIfTrue1), null);
     }
@@ -399,7 +399,7 @@ instanceofInfo(CallExp test)
     {
 	(?List<(MonoSymbol, mlsub.typing.Monotype)> ifTrue, 
 		?List<(MonoSymbol, mlsub.typing.Monotype)> ifFalse) =
- 		instanceofInfo(notNull(test.arguments.getExp(0)));
+ 		instanceofInfo(test.arguments.getExp(0));
 	return (ifFalse, ifTrue);
     }
 
@@ -915,7 +915,7 @@ typecheck(LoopStmt l)
 					  out: notNull(variable.type)));
 
 	  ?List<(MonoSymbol, mlsub.typing.Monotype)> instanceofIfTrue = 
-	    first_(instanceofInfo(notNull(whileExp)));
+	    first_(instanceofInfo(whileExp));
 
 	  if (instanceofIfTrue != null)
 	    instanceofIfTrue.foreach( ((MonoSymbol variable, mlsub.typing.Monotype type)) =>
@@ -962,9 +962,9 @@ typecheck(ReturnStmt r)
       function.checkReturnedType(r.returnType());
   }
   catch(WrongReturnType e){
-    if (notNullError(notNull(e.typingException), r, String.valueOf(r.value)))
+    if (notNullError(e.typingException, r, String.valueOf(r.value)))
       wrongReturnType(r, r.returnType().toString(), 
-		      valueOf(e.expectedReturnType), notNull(e.typingException));
+		      valueOf(e.expectedReturnType), e.typingException);
   }
   catch(IncompatibleReturnType e){
     throw bossa.util.User.error(r, "The returned value is incompatible with the return type: " + e.previouslyInferredType);
@@ -985,7 +985,7 @@ typecheck(VoidReturnStmt r)
   }
   catch(WrongReturnType e){
     wrongReturnType(r, r.returnType().toString(), 
-		      valueOf(e.expectedReturnType), notNull(e.typingException));
+		      valueOf(e.expectedReturnType), e.typingException);
   }
   catch(IncompatibleReturnType e){
     throw bossa.util.User.error(r, "The returned value is incompatible with the return type: " + e.previouslyInferredType);
@@ -1061,8 +1061,8 @@ isNullError(mlsub.typing.MonotypeLeqEx ex)
     An exact report of nullness errors would probably need
     to keep track of the lowlevel exception.
   */
-  let tc1 = notNull(ex.getM1()).head();
-  let tc2 = notNull(ex.getM2()).head();
+  let tc1 = ex.getM1().head();
+  let tc2 = ex.getM2().head();
 
   if (tc1 == tc2) return false;
 

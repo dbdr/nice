@@ -103,7 +103,7 @@ public ?ImportedConstructor loadImportedConstructor(NiceClass def, gnu.bytecode.
 
   let name = new LocatedString("<init>",def.getDefinition().location());
   let parameters = readParametersFromBytecodeAttribute(attr, 
-		notNull(notNull(Node.compilation).parser));
+		notNull(Node.compilation.parser));
 
   let res = new ImportedConstructor(name, Node.down,
         parameters: parameters,

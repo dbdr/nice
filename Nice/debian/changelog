@@ -1,3 +1,12 @@
+nice (0.0.011222) unstable; urgency=low
+
+  * Added the 'instanceof' keyword.
+  * Do not stop at the first syntax or type error in more situations.
+  * Ehanced error messages.
+  * Emacs mode: allow to interactively set the compiler's location.
+
+ --
+
 nice (0.0.011219) unstable; urgency=low
 
   * Initial Release.

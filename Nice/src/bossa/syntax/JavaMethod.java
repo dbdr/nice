@@ -207,8 +207,7 @@ public class JavaMethod extends MethodDeclaration
     // search a field
     if (arity == 0)
       {
-	gnu.bytecode.Field field = 
-	  declaringClass.getField(funName);
+	gnu.bytecode.Field field = declaringClass.getField(funName);
 	if(field!=null)
 	  possibilities.add(JavaMethod.addFetchedMethod(field).getSymbol());
       }

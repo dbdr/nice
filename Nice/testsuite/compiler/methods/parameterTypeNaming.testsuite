@@ -2,7 +2,7 @@
   /// Toplevel
 <Collection C, T, U> C<U> bar(C<T>, T->U);
 bar(x, f) { throw new Error(); }
-bar<C,T,U>(l@List : L, f)
+<C,T,U> bar(l@List : L, f)
 {
   L<U> res = similarEmptyCollection(l);
   res.add(f(l[0]));
@@ -25,7 +25,7 @@ class B extends A { String b; }
   /// Toplevel
 foo(a) = a;
 
-foo<T>(b@B : X) {
+<T> foo(b@B : X) {
   X copy = b.foo();
   String useB = copy.b;
   return copy;
@@ -34,4 +34,4 @@ foo<T>(b@B : X) {
 /// FAIL
   /// Toplevel
 // : can only come after a real dispatch, otherwise it is useless.
-foo<T>(a : X) {}
+<T> foo(a : X) {}

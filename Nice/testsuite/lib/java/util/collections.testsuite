@@ -59,7 +59,7 @@
   /// Toplevel
   <T,U,V | U <: T, V <: T> Set<T> intersection(Set<U>, Set<V>);
   
-  intersection<T,U,V>(s1@Set, s2@Set) {
+  <T,U,V> intersection(s1@Set, s2@Set) {
      Set<T> res = new HashSet();
      if (s1.size() < s2.size()) {
          for(U elem : s1) 

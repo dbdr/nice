@@ -1236,7 +1236,7 @@ Pattern pattern():
 void methodBodyDefinitionLookahead():
 {}
 {
-  [ "<" typeConstructors() ">" ] identOrBackquoted() [ "<" strings() ">" ] "("
+  [ "<" strings() ">" ] identOrBackquoted() [ "<" strings() ">" ] "("
 }
 
 Statement code():
@@ -1272,8 +1272,18 @@ MethodBodyDefinition methodBodyDefinition(NiceClass container):
     Expression exp;
 }
 {
-    name=identOrBackquoted()
     [ "<" binders=strings() ">" ]
+
+    name=identOrBackquoted()
+
+    // Deprecated.
+    [ { Token t; } 
+      t="<" binders=strings() ">" 
+      { User.warning(new Location(t), 
+                     "This syntax is deprecated.\n" + 
+"Type parameters should now be placed in front of the method implementation.");
+      }
+    ]
 
     "("
     ( 

@@ -220,7 +220,7 @@ typecheck(CallExp e)
   else
     e.arguments.typecheckArgs();
 
-  if (e.isCallTo("assert") && 1 <= e.arguments.size() <= 2)
+  if ((e.isCallTo("?assert") || e.isCallTo("!assert")) && 1 <= e.arguments.size() <= 2)
     {
       ?List<MonoSymbol> l = variablesNotNullIfTestSucceeds(e.arguments.getExp(0));
       if (l != null)

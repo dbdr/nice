@@ -209,7 +209,7 @@ TOKEN: /* Keywords */
 | < EXACTLY_AT: "#"		>
 
 // Assertions
-| < ASSERT:     "assert"	>
+| < ASSERT:     "assert"	> { matchedToken.image = "?assert"; }
 | < SUREASSERT: "!assert"	> /* Nice specific */
 | < MAYBEASSERT: "?assert"	> /* Nice specific */
 | < REQUIRE:    "requires"	>

@@ -17,6 +17,7 @@ Installing the Nice compiler
 <para>
 Select your system:
 <link linkend="deb">Debian</link>
+<link linkend="rpm">Redhat or Mandrake Linux (rpm)</link>
 <link linkend="unix">Unix</link>
 <link linkend="win">Windows</link>
 <link linkend="other">Other</link>
@@ -27,6 +28,13 @@ Select your system:
 <para>
 Simply download the <ulink url="nice.deb">Debian package</ulink>
 and install it with <literal>dpkg -i nice_*.deb</literal>.
+</para>
+</section>
+
+<section id="rpm"><title>Redhat or Mandrake Linux (rpm)</title>
+<para>
+Simply download the <ulink url="nice.rpm">RPM package</ulink>
+and install it with <literal>rpm -i Nice_*.rpm</literal>.
 </para>
 </section>
 

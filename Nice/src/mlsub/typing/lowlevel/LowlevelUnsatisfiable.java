@@ -16,6 +16,8 @@ public class LowlevelUnsatisfiable extends Unsatisfiable
     this("[NO MESSAGE]");
   }
   
+  static LowlevelUnsatisfiable instance = new LowlevelUnsatisfiable();
+
   static boolean refinedReports = true;
   public static void setRefinedReports(boolean flag) {
     refinedReports = flag;

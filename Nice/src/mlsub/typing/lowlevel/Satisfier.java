@@ -17,7 +17,9 @@ final class Satisfier {
   }
 
   private static boolean satisfiable = false;
+
   private static class Satisfiable extends Exception {}
+  private static Satisfiable sat = new Satisfiable();
 
   private static void enumerate(int[] strategy, DomainVector domains,
                                 BitMatrix C, BitMatrix Ct,
@@ -39,7 +41,7 @@ final class Satisfier {
         handler.handle(domains);
 
         // backtrack
-        throw new Satisfiable();
+        throw sat;
       }
     }
     Domain dx = (Domain)domains.getDomain(x).clone();
@@ -65,7 +67,7 @@ final class Satisfier {
         }
       }
     }
-    throw new LowlevelUnsatisfiable();
+    throw LowlevelUnsatisfiable.instance;
   }
   
   private static void enumerate(int[] strategy, DomainVector domains,
@@ -81,10 +83,10 @@ final class Satisfier {
       // no more domains to be instantiated: a solution has been found
       satisfiable = true;
       if (handler == null) {
-        throw new Satisfiable();
+        throw sat;
       }
       handler.handle(domains);
-      throw new LowlevelUnsatisfiable();
+      throw LowlevelUnsatisfiable.instance;
     }
     Domain dx = (Domain)domains.getDomain(x).clone();
     // iterate through the elements of dx
@@ -97,13 +99,13 @@ final class Satisfier {
         enumerate(strategy, domainsCopy, C, Ct, R, Rt, m, n, handler);
 
         // XXX: reachable ?
-        throw new Satisfiable();
+        throw sat;
       }
       catch (LowlevelUnsatisfiable _) {
         // try another value
       }
     }
-    throw new LowlevelUnsatisfiable();
+    throw LowlevelUnsatisfiable.instance;
   }
     
   static void enumerateSolutions(int[] strategy, DomainVector domains,

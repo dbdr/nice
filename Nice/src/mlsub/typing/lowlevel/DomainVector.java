@@ -120,7 +120,7 @@ final class DomainVector extends java.util.Vector {
       if (dx != null) {
         // XXX: already tested ??
         if (dx.isEmpty()) {
-          throw new LowlevelUnsatisfiable();
+          throw LowlevelUnsatisfiable.instance;
         }
         if (dx.needPropagation(direction)) {
           changed = true;

@@ -825,13 +825,13 @@ public final class K0 {
     S.assume(S.a&& x >= -1);
     if (x == -1) {
       if (!unit) {
-        throw new LowlevelUnsatisfiable();
+        throw LowlevelUnsatisfiable.instance;
       }
     } else if (x < m) {
       // the domain must contain x itself (we assume here that the relation
       // is condensed on the rigid variables)
       if (!set.get(x)) {
-        throw new LowlevelUnsatisfiable();
+        throw LowlevelUnsatisfiable.instance;
       }
     } else {
       if(debugK0){
@@ -1105,7 +1105,7 @@ public final class K0 {
     if (m > 0) {
       if (T.includedIn(m, R) != null) {
         // T is NOT included in R on [0, m[ x [0, m[
-        throw new LowlevelUnsatisfiable();// will be refined if necessary
+        throw LowlevelUnsatisfiable.instance; // will be refined if necessary
       }
     }
     BitMatrix Tt = (BitMatrix)Ct.clone();

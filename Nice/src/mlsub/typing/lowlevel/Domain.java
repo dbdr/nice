@@ -80,7 +80,7 @@ final class Domain extends BitVector {
     this.and(set);
     this.containsUnit &= unit; 
     if (this.isEmpty()) {
-      throw new LowlevelUnsatisfiable();
+      throw LowlevelUnsatisfiable.instance;
     }
   }
 
@@ -91,7 +91,7 @@ final class Domain extends BitVector {
   throws LowlevelUnsatisfiable {
     this.andNot(set);
     if (this.isEmpty()) {
-      throw new LowlevelUnsatisfiable();
+      throw LowlevelUnsatisfiable.instance;
     }
   }
 
@@ -102,7 +102,7 @@ final class Domain extends BitVector {
   public void excludeUnit() throws LowlevelUnsatisfiable {
     this.containsUnit = false;
     if (this.isEmpty()) {
-      throw new LowlevelUnsatisfiable();
+      throw LowlevelUnsatisfiable.instance;
     }
   }
 
@@ -117,7 +117,7 @@ final class Domain extends BitVector {
       super.clear(value);
     }
     if (this.isEmpty()) {
-      throw new LowlevelUnsatisfiable();
+      throw LowlevelUnsatisfiable.instance;
     }
   }
 
@@ -146,7 +146,7 @@ final class Domain extends BitVector {
       if (unit && containsUnit()) {
         return -1;
       } else {
-        throw new LowlevelUnsatisfiable();
+        throw LowlevelUnsatisfiable.instance;
       }
     }
   }
@@ -169,7 +169,7 @@ final class Domain extends BitVector {
    **/
   public void instantiate(int value) throws LowlevelUnsatisfiable {
     if (!containsValue(value)) {
-      throw new LowlevelUnsatisfiable();
+      throw LowlevelUnsatisfiable.instance;
     }
     clearAll();
     this.containsUnit = false;

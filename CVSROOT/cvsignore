@@ -1,2 +1,4 @@
 *.class
 *.nicei
+maven.log
+velocity.log

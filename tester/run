@@ -25,8 +25,8 @@ rm -rf builds
 mkdir -p builds
 cd builds
 
-export NICEC=${PWD}/builds/Nice/bin/nicec
-export NICE_JAR=${PWD}/builds/Nice/share/java/nice.jar
+export NICEC=${PWD}/Nice/bin/nicec
+export NICE_JAR=${PWD}/Nice/share/java/nice.jar
 
 # We run the whole set of tests once per configuration.
 # This means that the test scripts must first clean up the tree, 

@@ -17,7 +17,7 @@ nice (0.5.4) unstable; urgency=low
   * Fixed inference for possibly null variables in some complex cases.
   * Other bugfixes (valid error message when trying to implement a function).
 
- --
+ -- Daniel Bonniot <daniel@blanche>  Thu, 13 Jun 2002 16:30:27 +0200
 
 nice (0.5.3) unstable; urgency=low
 

@@ -1,13 +1,28 @@
+
+/**************************************************************************/
+/*                                                                        */
+/*  This program is free software; you can redistribute it and/or modify  */
+/*  it under the terms of the GNU General Public License as published by  */
+/*  the Free Software Foundation; either version 2 of the License, or     */
+/*  (at your option) any later version.                                   */
+/*                                                                        */
+/**************************************************************************/
+
+
 package nice.ui.common.types.swing;
 
 // all imports for this package
 // are defined in this file
 
+import java.beans.*;
 import java.awt.*;
+import java.awt.event.*;
 import javax.swing.*;
 import javax.swing.event.*;
 import javax.swing.text.*;
 import javax.swing.tree.*;
+import javax.swing.border.*;
+import javax.swing.plaf.*;
 
 
 /**
@@ -158,9 +173,320 @@ void undoableEditHappened(UndoableEditListener, UndoableEditEvent)
 
 
 
+
+/**
+ * INTERFACES SECTION
+ */
+
+// interface Action
+Object getValue(Action, String)
+  = native Object Action.getValue(String);
+void putValue(Action, String, Object)
+  = native void Action.putValue(String, Object);
+
+
+// interface BoundedRangeModel
+void addChangeListener(BoundedRangeModel, ChangeListener)
+  = native void BoundedRangeModel.addChangeListener(ChangeListener);
+void removeChangeListener(BoundedRangeModel, ChangeListener)
+  = native void BoundedRangeModel.removeChangeListener(ChangeListener);
+
+
+// interface ButtonModel 
+void addActionListener(ButtonModel, ActionListener)
+  = native void ButtonModel.addActionListener(ActionListener);
+void addChangeListener(ButtonModel, ChangeListener)
+  = native void ButtonModel.addChangeListener(ChangeListener);
+void removeActionListener(ButtonModel, ActionListener)
+  = native void ButtonModel.removeActionListener(ActionListener);
+void removeChangeListener(ButtonModel, ChangeListener)
+  = native void ButtonModel.removeChangeListener(ChangeListener);
+void setActionCommand(ButtonModel, String)
+  = native void ButtonModel.setActionCommand(String);
+void setGroup(ButtonModel, ButtonGroup)
+  = native void ButtonModel.setGroup(ButtonGroup);
+
+
+// interface CellEditor 
+void addCellEditorListener(CellEditor, CellEditorListener)
+  = native void CellEditor.addCellEditorListener(CellEditorListener);
+void removeCellEditorListener(CellEditor, CellEditorListener)
+  = native void CellEditor.removeCellEditorListener(CellEditorListener);
+Object getCellEditorValue(CellEditor)
+  = native Object CellEditor.getCellEditorValue();
+boolean isCellEditable(CellEditor, EventObject)
+  = native boolean CellEditor.isCellEditable(EventObject);
+boolean shouldSelectCell(CellEditor, EventObject)
+  = native boolean CellEditor.shouldSelectCell(EventObject);
+
+
+// interface ComboBoxEditor
+void addActionListener(ComboBoxEditor, ActionListener)
+  = native void ComboBoxEditor.addActionListener(ActionListener);
+void removeActionListener(ComboBoxEditor, ActionListener)
+  = native void ComboBoxEditor.removeActionListener(ActionListener);
+Component getEditorComponent(ComboBoxEditor)
+  = native Component ComboBoxEditor.getEditorComponent();
+Object getItem(ComboBoxEditor)
+  = native Object ComboBoxEditor.getItem();
+void setItem(ComboBoxEditor, Object)
+  = native void ComboBoxEditor.setItem(Object);
+
+
+// interface ComboBoxModel 
+
+
+
+// interface DesktopManager 
+void activateFrame(DesktopManager, JInternalFrame)
+  = native void DesktopManager.activateFrame(JInternalFrame);
+void beginDraggingFrame(DesktopManager, JComponent)
+  = native void DesktopManager.beginDraggingFrame(JComponent);
+void beginResizingFrame(DesktopManager, JComponent, int)
+  = native void DesktopManager.beginResizingFrame(JComponent, int);
+void closeFrame(DesktopManager, JInternalFrame)
+  = native void DesktopManager.closeFrame(JInternalFrame);
+void deactivateFrame(DesktopManager, JInternalFrame)
+  = native void DesktopManager.deactivateFrame(JInternalFrame);
+void deiconifyFrame(DesktopManager, JInternalFrame)
+  = native void DesktopManager.deiconifyFrame(JInternalFrame);
+void dragFrame(DesktopManager, JComponent, int, int)
+  = native void DesktopManager.dragFrame(JComponent, int, int);
+void endDraggingFrame(DesktopManager, JComponent)
+  = native void DesktopManager.endDraggingFrame(JComponent);
+void endResizingFrame(DesktopManager, JComponent)
+  = native void DesktopManager.endResizingFrame(JComponent);
+void iconifyFrame(DesktopManager, JInternalFrame)
+  = native void DesktopManager.iconifyFrame(JInternalFrame);
+void maximizeFrame(DesktopManager, JInternalFrame)
+  = native void DesktopManager.maximizeFrame(JInternalFrame);
+void minimizeFrame(DesktopManager, JInternalFrame)
+  = native void DesktopManager.minimizeFrame(JInternalFrame);
+void openFrame(DesktopManager, JInternalFrame)
+  = native void DesktopManager.openFrame(JInternalFrame);
+void resizeFrame(DesktopManager, JComponent, int, int, int, int)
+  = native void DesktopManager.resizeFrame(JComponent, int, int, int, int);
+void setBoundsForFrame(DesktopManager, JComponent, int, int, int, int)
+  = native void DesktopManager.setBoundsForFrame(JComponent, int, int, int, int);
+
+
+// interface Icon 
+void paintIcon(Icon, Component, Graphics, int, int)
+  = native void Icon.paintIcon(Component, Graphics, int, int);
+
+
+// interface ListCellRenderer
+Component getListCellRendererComponent(ListCellRenderer, JList, Object, int, boolean, boolean)
+  = native Component ListCellRenderer.getListCellRendererComponent(JList, Object, int, boolean, boolean);
+
+
+// interface ListModel 
+void addListDataListener(ListModel, ListDataListener)
+  = native void ListModel.addListDataListener(ListDataListener);
+void removeListDataListener(ListModel, ListDataListener)
+  = native void ListModel.removeListDataListener(ListDataListener);
+Object getElementAt(ListModel, int)
+  = native Object ListModel.getElementAt(int);
+
+
+// interface ListSelectionModel
+void addListSelectionListener(ListSelectionModel, ListSelectionListener)
+  = native void ListSelectionModel.addListSelectionListener(ListSelectionListener);
+void removeListSelectionListener(ListSelectionModel, ListSelectionListener)
+  = native void ListSelectionModel.removeListSelectionListener(ListSelectionListener);
+
+
+// interface MenuElement 
+Component getComponent(MenuElement)
+  = native Component MenuElement.getComponent();
+MenuElement[] getSubElements(MenuElement)
+  = native MenuElement[] MenuElement.getSubElements();
+void processKeyEvent(MenuElement, KeyEvent, MenuElement[], MenuSelectionManager)
+  = native void MenuElement.processKeyEvent(KeyEvent, MenuElement[], MenuSelectionManager);
+void processMouseEvent(MenuElement, MouseEvent, MenuElement[], MenuSelectionManager)
+  = native void MenuElement.processMouseEvent(MouseEvent, MenuElement[], MenuSelectionManager);
+
+
+// interface MutableComboBoxModel
+void addElement(MutableComboBoxModel, Object)
+  = native void MutableComboBoxModel.addElement(Object);
+void insertElementAt(MutableComboBoxModel, Object, int)
+  = native void MutableComboBoxModel.insertElementAt(Object, int);
+void removeElement(MutableComboBoxModel, Object)
+  = native void MutableComboBoxModel.removeElement(Object);
+
+
+// interface Renderer
+Component getComponent(Renderer)
+  = native Component Renderer.getComponent();
+void setValue(Renderer, Object, boolean)
+  = native void Renderer.setValue(Object, boolean);
+
+
+// interface RootPaneContainer 
+Container getContentPane(RootPaneContainer)
+  = native Container RootPaneContainer.getContentPane();
+Component getGlassPane(RootPaneContainer)
+  = native Component RootPaneContainer.getGlassPane();
+JLayeredPane getLayeredPane(RootPaneContainer)
+  = native JLayeredPane RootPaneContainer.getLayeredPane();
+JRootPane getRootPane(RootPaneContainer)
+  = native JRootPane RootPaneContainer.getRootPane();
+void setContentPane(RootPaneContainer, Container)
+  = native void RootPaneContainer.setContentPane(Container);
+void setGlassPane(RootPaneContainer, Component)
+  = native void RootPaneContainer.setGlassPane(Component);
+void setLayeredPane(RootPaneContainer, JLayeredPane)
+  = native void RootPaneContainer.setLayeredPane(JLayeredPane);
+
+
+// interface Scrollable 
+Dimension getPreferredScrollableViewportSize(Scrollable)
+  = native Dimension Scrollable.getPreferredScrollableViewportSize();
+int getScrollableBlockIncrement(Scrollable, Rectangle, int, int)
+  = native int Scrollable.getScrollableBlockIncrement(Rectangle, int, int);
+int getScrollableUnitIncrement(Scrollable, Rectangle, int, int)
+  = native int Scrollable.getScrollableUnitIncrement(Rectangle, int, int);
+
+
+// interface ScrollPaneConstants 
+
+
+
+// interface SingleSelectionModel 
+void addChangeListener(SingleSelectionModel, ChangeListener)
+  = native void SingleSelectionModel.addChangeListener(ChangeListener);
+void removeChangeListener(SingleSelectionModel, ChangeListener)
+  = native void SingleSelectionModel.removeChangeListener(ChangeListener);
+
+
+//JDK1.4  // interface SpinnerModel 
+//JDK1.4  void addChangeListener(SpinnerModel, ChangeListener)
+//JDK1.4    = native void SpinnerModel.addChangeListener(ChangeListener);
+//JDK1.4  void removeChangeListener(SpinnerModel, ChangeListener)
+//JDK1.4    = native void SpinnerModel.removeChangeListener(ChangeListener);
+//JDK1.4  void setValue(SpinnerModel, Object)
+//JDK1.4    = native void SpinnerModel.setValue(Object);
+
+
+
+/**
+ * CLASSES SECTION
+ */
+
 // class JComponent
+
+// static methods
+boolean isLightweightComponent(Component)
+  = native boolean JComponent.isLightweightComponent(Component);
+// non-static methods
+void addAncestorListener(JComponent, AncestorListener)
+  = native void JComponent.addAncestorListener(AncestorListener);
+void removeAncestorListener(JComponent, AncestorListener)
+  = native void JComponent.removeAncestorListener(AncestorListener);
+void addVetoableChangeListener(JComponent, VetoableChangeListener)
+  = native void JComponent.addVetoableChangeListener(VetoableChangeListener);
+void removeVetoableChangeListener(JComponent, VetoableChangeListener)
+  = native void JComponent.removeVetoableChangeListener(VetoableChangeListener);
+void computeVisibleRect(JComponent, Rectangle)
+  = native void JComponent.computeVisibleRect(Rectangle);
+JToolTip createToolTip(JComponent)
+  = native JToolTip JComponent.createToolTip();
+void firePropertyChange(JComponent, String, byte, byte)
+  = native void JComponent.firePropertyChange(String, byte, byte);
+void firePropertyChange(JComponent, String, char, char)
+  = native void JComponent.firePropertyChange(String, char, char);
+void firePropertyChange(JComponent, String, double, double)
+  = native void JComponent.firePropertyChange(String, double, double);
+void firePropertyChange(JComponent, String, float, float)
+  = native void JComponent.firePropertyChange(String, float, float);
+void firePropertyChange(JComponent, String, int, int)
+  = native void JComponent.firePropertyChange(String, int, int);
+void firePropertyChange(JComponent, String, long, long)
+  = native void JComponent.firePropertyChange(String, long, long);
+void firePropertyChange(JComponent, String, short, short)
+  = native void JComponent.firePropertyChange(String, short, short);
+void fireVetoableChange(JComponent, String, Object, Object)
+  = native void JComponent.fireVetoableChange(String, Object, Object);
+ActionListener getActionForKeyStroke(JComponent, KeyStroke)
+  = native ActionListener JComponent.getActionForKeyStroke(KeyStroke);
+ActionMap getActionMap(JComponent)
+  = native ActionMap JComponent.getActionMap();
+?Object getClientProperty(JComponent, Object)
+  = native Object JComponent.getClientProperty(Object);
+Graphics getComponentGraphics(JComponent, Graphics)
+  = native Graphics JComponent.getComponentGraphics(Graphics);
+int getConditionForKeyStroke(JComponent, KeyStroke)
+  = native int JComponent.getConditionForKeyStroke(KeyStroke);
+InputMap getInputMap(JComponent)
+  = native InputMap JComponent.getInputMap();
+InputMap getInputMap(JComponent, int)
+  = native InputMap JComponent.getInputMap(int);
+InputVerifier getInputVerifier(JComponent)
+  = native InputVerifier JComponent.getInputVerifier();
+Insets getInsets(JComponent, Insets)
+  = native Insets JComponent.getInsets(Insets);
+KeyStroke[] getRegisteredKeyStrokes(JComponent)
+  = native KeyStroke[] JComponent.getRegisteredKeyStrokes();
+String getToolTipText(JComponent, MouseEvent)
+  = native String JComponent.getToolTipText(MouseEvent);
+String getUIClassID(JComponent)
+  = native String JComponent.getUIClassID();
+Rectangle getVisibleRect(JComponent)
+  = native Rectangle JComponent.getVisibleRect();
+void paintBorder(JComponent, Graphics)
+  = native void JComponent.paintBorder(Graphics);
+void paintChildren(JComponent, Graphics)
+  = native void JComponent.paintChildren(Graphics);
+void paintImmediately(JComponent, Rectangle)
+  = native void JComponent.paintImmediately(Rectangle);
 void paintComponent(JComponent, Graphics)
   = native void JComponent.paintComponent(Graphics);
+void printBorder(JComponent, Graphics)
+  = native void JComponent.printBorder(Graphics);
+void printChildren(JComponent, Graphics)
+  = native void JComponent.printChildren(Graphics);
+void printComponent(JComponent, Graphics)
+  = native void JComponent.printComponent(Graphics);
+void processComponentKeyEvent(JComponent, KeyEvent)
+  = native void JComponent.processComponentKeyEvent(KeyEvent);
+boolean processKeyBinding(JComponent, KeyStroke, KeyEvent, int, boolean)
+  = native boolean JComponent.processKeyBinding(KeyStroke, KeyEvent, int, boolean);
+void putClientProperty(JComponent, Object, ?Object)
+  = native void JComponent.putClientProperty(Object, Object);
+void registerKeyboardAction(JComponent, ActionListener, KeyStroke, int)
+  = native void JComponent.registerKeyboardAction(ActionListener, KeyStroke, int);
+void registerKeyboardAction(JComponent, ActionListener, String, KeyStroke, int)
+  = native void JComponent.registerKeyboardAction(ActionListener, String, KeyStroke, int);
+void repaint(JComponent, Rectangle)
+  = native void JComponent.repaint(Rectangle);
+void scrollRectToVisible(JComponent, Rectangle)
+  = native void JComponent.scrollRectToVisible(Rectangle);
+void setActionMap(JComponent, ActionMap)
+  = native void JComponent.setActionMap(ActionMap);
+void setBorder(JComponent, Border)
+  = native void JComponent.setBorder(Border);
+void setInputMap(JComponent, int, InputMap)
+  = native void JComponent.setInputMap(int, InputMap);
+void setInputVerifier(JComponent, InputVerifier)
+  = native void JComponent.setInputVerifier(InputVerifier);
+void setMaximumSize(JComponent, Dimension)
+  = native void JComponent.setMaximumSize(Dimension);
+void setMinimumSize(JComponent, Dimension)
+  = native void JComponent.setMinimumSize(Dimension);
+void setUI(JComponent, ComponentUI)
+  = native void JComponent.setUI(ComponentUI);
+void unregisterKeyboardAction(JComponent, KeyStroke)
+  = native void JComponent.unregisterKeyboardAction(KeyStroke);
+//JDK1.4  Locale getDefaultLocale(JComponent)
+//JDK1.4    = native Locale JComponent.getDefaultLocale();
+//JDK1.4  void setDefaultLocale(JComponent, Locale)
+//JDK1.4    = native void JComponent.setDefaultLocale(Locale);
+//JDK1.4  AncestorListener[?] getAncestorListeners(JComponent)
+//JDK1.4    = native AncestorListener[] JComponent.getAncestorListeners();
+//JDK1.4  VetoableChangeListener[?] getVetoableChangeListeners(JComponent)
+//JDK1.4    = native VetoableChangeListener[] JComponent.getVetoableChangeListeners();
+
 
 // class DefaultButtonModel
 EventListener[?] getListeners(DefaultButtonModel, Class)

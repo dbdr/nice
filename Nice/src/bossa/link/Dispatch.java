@@ -161,7 +161,7 @@ public final class Dispatch
 
     boolean[] isValue = new boolean[method.getArity()];
     List values = generateValues(sortedAlternatives, isValue);
-    boolean hasValues = values.size() > 0;  
+    boolean hasValues = values.size() > 0;
    
     int nb_errors = 0;
     for(Iterator i = multitags.iterator(); i.hasNext();)

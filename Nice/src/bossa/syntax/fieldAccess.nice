@@ -26,11 +26,6 @@ abstract class FieldAccess extends MethodDeclaration
 {
   ?gnu.expr.Declaration fieldDecl = null;
 
-  /** 
-   * true if this method represent the access to the field of an object.
-   */
-  isFieldAccess() = true;
-
   public boolean isFinal();
   public boolean isStatic() = false;
 

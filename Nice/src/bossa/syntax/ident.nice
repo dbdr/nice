@@ -79,9 +79,9 @@ class PackageExp extends Expression
   
   toString() = "PackageExp " + name;
 
-  private void error()
+  private UserError error()
   {
-    User.error(this, 
+    throw User.error(this, 
 	       name + " is neither a valid expression nor a valid package");
   }
 
@@ -92,8 +92,7 @@ class PackageExp extends Expression
   
   compile()
   {
-    this.error();
-    return cast(null);
+    throw this.error();
   }
 }
 

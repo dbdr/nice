@@ -41,7 +41,7 @@ public class LocatedString
   public LocatedString(String content, Location loc, boolean quoted)
   {
     this.content = content;
-    this.location = loc;
+    this.loc = loc;
     this.quoted = quoted;
   }
 
@@ -60,7 +60,7 @@ public class LocatedString
 
   public Location location()
   {
-    return location;
+    return loc;
   }
 
   /****************************************************************
@@ -79,12 +79,12 @@ public class LocatedString
   
   public LocatedString cloneLS()
   {
-    return new LocatedString(content, location);
+    return new LocatedString(content, loc);
   }
   
   public LocatedString substring(int beginIndex, int endIndex)
   {
-    return new LocatedString(content.substring(beginIndex,endIndex),location);
+    return new LocatedString(content.substring(beginIndex,endIndex),loc);
   }
   
   public boolean equals(Object o)
@@ -112,6 +112,6 @@ public class LocatedString
   }
 
   public String content;
-  Location location;
+  Location loc;
   private boolean quoted;
 }

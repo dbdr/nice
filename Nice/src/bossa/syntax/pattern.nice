@@ -160,7 +160,7 @@ public abstract class Pattern implements Located
       mlsub.typing.Typing.assertImp(rawType.head(), itf2, false);
   }
 
-  public boolean matches(mlsub.typing.TypeConstructor tag);
+  public boolean matches(?mlsub.typing.TypeConstructor tag);
 
   public boolean matchesValue(ConstantExp val);
 
@@ -244,7 +244,7 @@ public class UnknownPattern extends RuntimeException {}
 
 public Pattern createPattern(LocatedString name)
 {
-  return new VariablePattern(name: name, loc: notNull(name.location()));
+  return new VariablePattern(name: name, loc: name.location());
 }
 
 public Pattern createPattern(LocatedString name, TypeIdent ti)
@@ -252,13 +252,13 @@ public Pattern createPattern(LocatedString name, TypeIdent ti)
   if (ti.toString().equals("Object"))
     return new NotNullPattern(name: name, tc: nice.tools.typing.PrimitiveType.sureTC, loc: notNull(name.location));
 
-  return new TypePattern(name: name, typeConstructor: ti, loc: notNull(name.location()), exactlyAt: false);
+  return new TypePattern(name: name, typeConstructor: ti, loc: name.location(), exactlyAt: false);
 }
 
 //for use in MethodImplementation
 public Pattern createPattern(?LocatedString name, ?mlsub.typing.TypeConstructor tc, boolean sure)
 { // TODO: don't generate NotNullPatterns if the overriden domain is sure.
-  let loc = (name != null) ? notNull(name.location()) : Location.nowhere();
+  let loc = (name != null) ? name.location() : Location.nowhere();
 
   if (nice.tools.typing.Types.isPrimitive(tc))
     tc = null;

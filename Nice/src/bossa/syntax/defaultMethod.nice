@@ -48,7 +48,7 @@ public Definition createMethodWithDefault
        Constraint constraint,
        Monotype returnType,
        FormalParameters parameters,
-       Statement body,
+       ?Statement body,
        Contract contract, boolean isOverride)
 {
   if (body == null)
@@ -129,7 +129,7 @@ DefaultMethodImplementation createDefaultMethodImplementation
 	syntacticConstraint: constraint.toString(), symbol: cast(null),
 	contract: contract, isOverride: isOverride, implementation: res);
   notNull(res.declaration).addChild(parameters);
-  let symbol = createMethodSymbol(notNull(res.declaration), name, constraint, returnType);
+  let symbol = new MethodSymbol(notNull(res.declaration), name, constraint, returnType);
   notNull(res.declaration).symbol = symbol;
   symbol.propagate = Node.global;
   notNull(res.declaration).addChild(symbol);

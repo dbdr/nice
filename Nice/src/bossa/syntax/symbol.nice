@@ -23,7 +23,7 @@ public abstract class VarSymbol extends Symbol implements Located
   private ?gnu.expr.Declaration decl = null;
   private boolean isThis = false;
 
-  location() = notNull(name.location());
+  location() = name.location();
   
   public LocatedString getName() = name;
 
@@ -114,9 +114,9 @@ public abstract class VarSymbol extends Symbol implements Located
     this.decl = declaration;
     this.isThis = isThis;
     if (name != null) 
-      notNull(name.location).write(notNull(this.decl));
-    notNull(this.decl).setCanRead(true);
-    notNull(this.decl).setCanWrite(true);
+      name.location().write(declaration);
+    declaration.setCanRead(true);
+    declaration.setCanWrite(true);
   }
 }
 
@@ -230,7 +230,7 @@ public class PolySymbol extends VarSymbol
   ?bossa.syntax.Polytype syntacticType = null;
 
   {
-    if(syntacticType!=null)
+    if (syntacticType!=null)
       this.addChild(syntacticType);
   }
 
@@ -284,7 +284,7 @@ class FunSymbol extends PolySymbol
 
   String describeParameters() 
   {
-  	?FormalParameters parameters = this.parameters;
+    ?FormalParameters parameters = this.parameters;
     if (parameters != null)
       return parameters.toString();
 
@@ -354,7 +354,7 @@ public class MethodSymbol extends FunSymbol
   getFieldAccessMethod()
   {
     let decl = this.declaration;
-    if(decl instanceof FieldAccess)
+    if (decl instanceof FieldAccess)
       return decl;
 
     return null;
@@ -425,33 +425,18 @@ class ConstructorCallSymbol extends MethodSymbol
     else if (decl instanceof bossa.syntax.CustomConstructor)
       return decl.getInitializationCode(true);
 
-    Internal.error("Declaration associated with ConstructorCallSymbol is not a constructor.");
-    return super;	
+    throw Internal.error("Declaration associated with ConstructorCallSymbol is not a constructor.");
   }
 }
 
-// Bootstrap (for conversion to nice)
-MethodSymbol createMethodSymbol(MethodDeclaration declaration,
-	LocatedString name, Constraint constraint, Monotype returnType ) =
-		new MethodSymbol(declaration,name,constraint,returnType);
-
-MethodSymbol createMethodSymbol(MethodDeclaration declaration,
-	LocatedString name, mlsub.typing.Polytype type ) =
-		new MethodSymbol(declaration,name,type);
-
-VarSymbol createConstructorCallSymbol(MethodDeclaration declaration,
-	LocatedString name, mlsub.typing.Polytype type ) =
-		new ConstructorCallSymbol(declaration,name,type);
-
-
 boolean isNonStaticFieldAccess(VarSymbol sym)
 {
-  FieldAccess access = cast(sym.getFieldAccessMethod());
+  let access = sym.getFieldAccessMethod();
   return access != null && ! access.isStatic();
 }
 
 boolean isStaticFieldAccess(VarSymbol sym)
 {
-  FieldAccess access = cast(sym.getFieldAccessMethod());
+  let access = sym.getFieldAccessMethod();
   return access != null && access.isStatic();
 }

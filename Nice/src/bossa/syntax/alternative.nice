@@ -443,7 +443,7 @@ private void registerJavaMethod(String fullName)
       if (sym.getMethodDeclaration() == null)
         continue;
 
-      MethodDeclaration md = cast(sym.getMethodDeclaration());
+      MethodDeclaration md = notNull(sym.getMethodDeclaration());
       if (md.getFullName().equals(fullName))
         {
           cast(md).registerForDispatch();

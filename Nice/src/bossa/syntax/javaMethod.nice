@@ -95,7 +95,7 @@ class JavaConstructor extends JavaMethod
       let res = new JavaConstructor(name, Node.global,
 		parameters: null, arity: type.domain().length,
 		type: type, symbol: cast(null), reflectMethod: m);
-      res.symbol = createMethodSymbol(res, name, type);
+      res.symbol = new MethodSymbol(res, name, type);
       return res;
     }
 
@@ -103,7 +103,7 @@ class JavaConstructor extends JavaMethod
   let res = new JavaMethod(name, Node.global,
 		parameters: null, arity: type.domain().length,
 		type: type, symbol: cast(null), reflectMethod: m);
-  res.symbol = createMethodSymbol(res, name, type);
+  res.symbol = new MethodSymbol(res, name, type);
   return res;
 }
 

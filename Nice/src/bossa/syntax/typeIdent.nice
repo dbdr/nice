@@ -21,15 +21,10 @@ import bossa.util.*;
    TypeConstructor or a MonotypeVar.
 
 */
-public final class TypeIdent extends bossa.syntax.Monotype implements Located
+public final class TypeIdent extends Monotype implements Located
 {
   public LocatedString name;
 
-  public TypeIdent cloneTypeIdent()
-  {
-    return new TypeIdent(name: name);
-  }
-  
   containsAlike() = false;
   
   isVoid() = "void".equals(name.toString());
@@ -120,11 +115,5 @@ public final class TypeIdent extends bossa.syntax.Monotype implements Located
 
   public LocatedString getName() = name;
   
-  public boolean hasName(LocatedString name)
-  {
-    return this.name.equals(name);
-  }
-  
-  location() = notNull(name.location());
-
+  location() = name.location();
 }

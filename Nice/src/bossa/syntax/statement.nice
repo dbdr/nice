@@ -40,12 +40,6 @@ gnu.expr.Expression[] compileStatements(Statement[] statements)
     {
       Statement s = statements[i];
 
-      if (s == null)
-        {
-          res[i] = gnu.expr.QuoteExp.voidExp;
-          continue;
-        }
-
       try {
          res[i] = s.generateCode();
       }

@@ -35,7 +35,7 @@ public class CustomConstructor extends UserOperator
       (notNull(this.getType()).getConstraint(),
        new mlsub.typing.FunType(this.getArgTypes(), nice.tools.typing.PrimitiveType.voidType));
     notNull(classe).addConstructorCallSymbol(
-	createConstructorCallSymbol(this, name, type));
+	new ConstructorCallSymbol(this, name, type));
   }
 
   resolve()
@@ -154,7 +154,7 @@ public CustomConstructor createCustomConstructor(LocatedString className, Constr
 	body: body);
 
   res.addChild(params);
-  let symbol = createMethodSymbol(res, name, cst, returnType);
+  let symbol = new MethodSymbol(res, name, cst, returnType);
   res.symbol = symbol;
   symbol.propagate = Node.global;
   res.addChild(symbol);
@@ -176,7 +176,7 @@ private Monotype getCCReturnType(LocatedString className, Constraint cst)
     {
       if (! (syms[i] instanceof mlsub.typing.MonotypeVar))
         User.error(classe, syms[i] + " is not a type");
-      notNull(params)[i] = new MonotypeWrapper(type: cast(syms[i]));
+      params[i] = new MonotypeWrapper(type: cast(syms[i]));
     }
 
   let res = createMonotypeConstructor

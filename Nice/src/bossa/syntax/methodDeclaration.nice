@@ -197,11 +197,6 @@ public abstract class MethodDeclaration extends Definition
     return parameters;
   }
   
-  /** 
-   * true if this method represent the access to the field of an object.
-   */
-  public boolean isFieldAccess() { return false; }
-
   void checkSpecialRequirements(Expression[?] arguments)
   {
     // Do nothing by default.

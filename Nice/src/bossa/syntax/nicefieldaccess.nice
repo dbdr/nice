@@ -30,7 +30,7 @@ public class NiceFieldAccess extends FieldAccess
 
   printInterface(s)
   {
-    bossa.util.Internal.error("Should not be part of the module interface");
+    Internal.error("Should not be part of the module interface");
   }
   
   toString()
@@ -55,7 +55,7 @@ NiceFieldAccess createNiceFieldAccess(NiceField field)
         field: field);
 
   res.addChild(params);
-  let symbol = createMethodSymbol(res, field.getName(), constr, notNull(field.sym.syntacticType));
+  let symbol = new MethodSymbol(res, field.getName(), constr, notNull(field.sym.syntacticType));
   res.symbol = symbol;
   symbol.propagate = Node.global;
   res.addChild(symbol);

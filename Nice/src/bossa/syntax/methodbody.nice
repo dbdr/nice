@@ -42,10 +42,10 @@ public class MethodBodyDefinition extends MethodImplementation
         head());
   }
 
-  private void setDeclaration(MethodDeclaration d)
+  private void setDeclaration(?MethodDeclaration d)
   {
     if (d == null)
-      User.error(this, "Method " + name + " is not declared");
+      throw User.error(this, "Method " + name + " is not declared");
     
     this.declaration = d;
 
@@ -84,7 +84,7 @@ public class MethodBodyDefinition extends MethodImplementation
 	  continue;
 	}
 
-      MethodDeclaration m = cast(s.getMethodDeclaration());
+      MethodDeclaration m = notNull(s.getMethodDeclaration());
       if (m.isIgnored())
         {
           i.remove();
@@ -150,14 +150,14 @@ public class MethodBodyDefinition extends MethodImplementation
 	boolean[] removed = new boolean[size];
         for (int m1 = 0; m1 < size; m1++)
           {
-            let MethodDeclaration md1 = cast(tempSymbols[m1].getMethodDeclaration());
+            let MethodDeclaration md1 = notNull(tempSymbols[m1].getMethodDeclaration());
 	    mlsub.typing.Monotype[] dom1 = notNull(md1.getType()).domain();
 	    for (int m2 = 0; m2 < size; m2++)
 	      if (m1 != m2)
                 {
                   boolean remove = true;
 		  boolean additionalsEqual = true;
-                 let MethodDeclaration md2 = cast(tempSymbols[m2].getMethodDeclaration());
+                 let MethodDeclaration md2 = notNull(tempSymbols[m2].getMethodDeclaration());
 		  mlsub.typing.Monotype[] dom2 = notNull(md2.getType()).domain();
 		  for (int i = 0; i < len; i++)
 		    if (additionalTags[i] != null)
@@ -191,8 +191,8 @@ public class MethodBodyDefinition extends MethodImplementation
 
     // Check that the non-dispatched parameter names match the declaration
     outer: for(let it = symbols.iterator(); it.hasNext();) {
-      MethodDeclaration m = cast(it.next().getMethodDeclaration());
-      if( m instanceof NiceMethod) {
+      ?MethodDeclaration m = it.next().getMethodDeclaration();
+      if (m instanceof NiceMethod) {
         FormalParameters params = notNull(m.formalParameters());
 	for (int i = params.hasThis() ? 1 : 0; i < formals.length; i++)
           if (formals[i].atAny() && formals[i].name != null && params.getName(i) != null &&
@@ -224,7 +224,7 @@ public class MethodBodyDefinition extends MethodImplementation
     String methods = "";
     for (s : symbols)
       {
-	MethodDeclaration m = cast(s.getMethodDeclaration());
+	MethodDeclaration m = notNull(s.getMethodDeclaration());
 	methods += m + " defined " + m.location() + "\n";
       }
     
@@ -270,7 +270,7 @@ public class MethodBodyDefinition extends MethodImplementation
     if (s.getMethodDeclaration() == null)
       User.error(this, name+" is not a method");
 
-    MethodDeclaration decl = cast(s.getMethodDeclaration());
+    ?MethodDeclaration decl = s.getMethodDeclaration();
     
     this.setDeclaration(decl);
 
@@ -488,7 +488,7 @@ public MethodBodyDefinition createMethodBodyDefinition(?NiceClass container,
 			      Statement body)
 {
   let res = new MethodBodyDefinition(name, Node.down, body: body, 
-	formals: makeFormals(formals, container, notNull(name.location())),
+	formals: makeFormals(formals, container, name.location()),
         binders: binders);
 
   res.declaration = null;

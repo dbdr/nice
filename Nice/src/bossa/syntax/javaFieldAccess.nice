@@ -118,7 +118,7 @@ JavaFieldAccess createJavaFieldAccess(LocatedString className,String fieldName,
 	className : className,
 	fieldName : fieldName );
   res.addChild(parameters);
-  let symbol = createMethodSymbol(res, name, cst, returnType);
+  let symbol = new MethodSymbol(res, name, cst, returnType);
   res.symbol = symbol;
   symbol.propagate = Node.global;
   res.addChild(symbol);
@@ -138,7 +138,7 @@ JavaFieldAccess createJavaFieldAccess(gnu.bytecode.Field field, mlsub.typing.Mon
 	field: field,
 	className: new LocatedString(field.getDeclaringClass().getName(), Location.nowhere()),
 	fieldName: field.getName() );
-  res.symbol = createMethodSymbol(res, new LocatedString(field.getName(),Location.nowhere()), type);
+  res.symbol = new MethodSymbol(res, new LocatedString(field.getName(),Location.nowhere()), type);
   return res;
 }
 

@@ -21,7 +21,7 @@ import bossa.util.*;
 public class NiceMethod extends UserOperator
 {
   private boolean isOverride;
-  private bossa.util.Location returnTypeLocation = Location.nowhere();
+  private ?bossa.util.Location returnTypeLocation = null;
 
   private ?List<VarSymbol> homonyms = null;
   private ?List<MethodDeclaration> specializedMethods = null;
@@ -94,7 +94,7 @@ public class NiceMethod extends UserOperator
 
     for (s : notNull(homonyms))
       {
-        let MethodDeclaration d = cast(s.getMethodDeclaration());
+        let ?MethodDeclaration d = s.getMethodDeclaration();
 
         // Ignore non-methods.
         if (d == null || d.isIgnored())
@@ -212,7 +212,7 @@ public NiceMethod createNiceMethod(LocatedString name,
 	returnTypeLocation: returnType.location());
 
   res.addChild(parameters);
-  let symbol = createMethodSymbol(res, name, constraint, returnType);
+  let symbol = new MethodSymbol(res, name, constraint, returnType);
   res.symbol = symbol;
   symbol.propagate = Node.global;
   res.addChild(symbol);
@@ -236,7 +236,7 @@ public Definition createMemberMethod
      Constraint constraint,
      Monotype returnType,
      FormalParameters params,
-     Statement body, 
+     ?Statement body, 
      Contract contract,
      boolean isOverride)
 {
@@ -301,7 +301,7 @@ public Definition createMemberMethod
 	    Map<String, bossa.syntax.Monotype> map = new HashMap();
 	    map.put(getAlikeID(), 
 		createMonotypeConstructor(alikeTC,
-			createTypeParameters(new ArrayList()), notNull(name.location())));
+			createTypeParameters(new ArrayList()), name.location()));
 	    returnType = returnType.substitute(map);
 	    params.substitute(map);
 	  }

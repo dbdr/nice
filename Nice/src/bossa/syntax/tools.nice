@@ -234,6 +234,8 @@ AST AST(List<Definition>, int) = native new AST(List, int);
 List<VarSymbol> lookup(VarScope, LocatedString) = native List VarScope.lookup(LocatedString);
 Map<gnu.bytecode.Type,mlsub.typing.TypeConstructor> javaTypeConstructors(bossa.modules.Compilation ) = native bossa.modules.Compilation.javaTypeConstructors;
 LocatedString name(Symbol) = native Symbol.name;
+gnu.bytecode.ClassType Type_pointer_type() = native gnu.bytecode.Type.pointer_type;
+gnu.expr.QuoteExp QuoteExp_undefined_exp() = native gnu.expr.QuoteExp.undefined_exp;
 
 // Retypings needed since java types are not strict.
 mlsub.typing.Polytype boolPolytype() = native nice.tools.typing.PrimitiveType.boolPolytype;

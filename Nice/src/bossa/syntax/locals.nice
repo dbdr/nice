@@ -27,7 +27,7 @@ abstract class LocalDeclaration extends Statement
     return notNull(value).generateCode();
   }
 
-  location() = notNull(this.getSymbol().name.location());
+  location() = this.getSymbol().name.location();
 
   gnu.expr.Expression compile(gnu.expr.LetExp letExp)
   {
@@ -44,8 +44,7 @@ abstract class LocalDeclaration extends Statement
 
   generateCode()
   {
-    Internal.error("Should not be called");
-    return cast(null);
+    throw Internal.error("Should not be called");
   }
 
   public String display()
@@ -100,14 +99,9 @@ public class LocalVariable extends LocalValue
   initValue()
   {
     if (value == null)
-      return notNull(gnu.expr.QuoteExp.undefined_exp);
+      return gnu.expr.QuoteExp.undefined_exp;
     else
       return notNull(value).generateCode();
-  }
-
-  int getIndex()
-  {
-    return left.index;
   }
 
   void setIndex(int i)
@@ -207,7 +201,7 @@ public class LocalFunction extends LocalDeclaration
 
 public Statement createLocalFunction(LocatedString name, Monotype returnType, FormalParameters parameters, Statement body)
 {
-  let value = createFunExp(trueConstraint, parameters.getMonoSymbols() || new MonoSymbol[0], body);
+  let value = createFunExp(trueConstraint, parameters.getMonoSymbols(), body);
   let symbol = new FunSymbol(name, trueConstraint, parameters, returnType);
   notNull(symbol.syntacticType).monotype.nullness = /*sure*/2;
   return new LocalFunction(left: symbol, value: value, parameters: parameters);

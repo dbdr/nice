@@ -29,7 +29,7 @@ abstract class Constructor extends MethodDeclaration
   {
     let type = new mlsub.typing.Polytype(notNull(this.getType()).getConstraint(),
        new mlsub.typing.FunType(this.getArgTypes(), nice.tools.typing.PrimitiveType.voidType));
-    classe.addConstructorCallSymbol(createConstructorCallSymbol(this, name, type));
+    classe.addConstructorCallSymbol(new ConstructorCallSymbol(this, name, type));
   }
 
   printInterface(s)

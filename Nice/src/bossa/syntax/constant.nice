@@ -61,14 +61,12 @@ public class IntegerConstantExp extends NumberConstantExp
 {
   public long longValue()
   {
-    let Number val = cast(value);
-    return val.longValue();
+    return value.longValue();
   }
 
   isZero()
   {
-    let Number val = cast(value);
-    return val.intValue() == 0;
+    return value.intValue() == 0;
   }
  
 }
@@ -84,8 +82,7 @@ public class SymbolConstantExp extends ConstantExp
 
   compile()
   {
-    let VarSymbol val = cast(value);
-    return val.compile();
+    return value.compile();
   }
 }
 
@@ -290,10 +287,11 @@ public ConstantExp createBooleanConstant(boolean value, Location location)
 
 class CharConstantExp extends ConstantExp
 {
+  override char value;
+
   public long longValue()
   {
-    Character val = cast(this.value);
-    return int(val.charValue());
+    return int(value);
   } 
 
   compile()

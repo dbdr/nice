@@ -718,7 +718,7 @@ analyse(LocalConstant decl, info)
 
 analyse(LocalFunction decl, info)
 {
-  decl.parameters.resolveCalledFromAnalyse(cast(info));
+  decl.parameters.resolveCalledFromAnalyse(info);
 
   info.addVar(decl.left);
   decl.value = analyse(decl.value, info);

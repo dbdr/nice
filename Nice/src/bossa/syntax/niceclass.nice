@@ -126,10 +126,9 @@ public class NiceClass extends ClassImplementation
     return getNiceClass(superTC);
   }
 
-  // FIXME change to MethodSymbol once this is converted to nice
-  void addConstructorCallSymbol(VarSymbol sym)
+  void addConstructorCallSymbol(ConstructorCallSymbol sym)
   {
-    constructors.add(cast(sym));
+    constructors.add(sym);
   }
 
   List<MethodSymbol> getConstructorCallSymbols() = new LinkedList(constructors);
@@ -407,7 +406,7 @@ public class NiceClass extends ClassImplementation
 
     for (msym : constructors)
       {
-	let MethodDeclaration m = cast(msym.getMethodDeclaration());
+	let MethodDeclaration m = notNull(msym.getMethodDeclaration());
 
         // Only consider parent methods for which a call from this class
         // is legal.
@@ -454,7 +453,7 @@ public class NiceClass extends ClassImplementation
     List<(?MethodDeclaration, List<Parameter>)> res = new ArrayList();
     for (msym : constructors)
       {
-        let MethodDeclaration decl = cast(msym.getMethodDeclaration());
+        let MethodDeclaration decl = notNull(msym.getMethodDeclaration());
         res.add((decl, notNull(decl.formalParameters()).getParameters(scope)));
       }
 
@@ -583,7 +582,7 @@ public class NiceClass extends ClassImplementation
 	  (cname, Node.global, parameters: values, arity: values.size,
 	   symbol: cast(null), type: ctype,
 	   classe: this, isDefault: true, fields: fields, parent: parent);
-        notNull(constructorMethod)[i].symbol = createMethodSymbol(notNull(constructorMethod)[i], cname, ctype);
+        notNull(constructorMethod)[i].symbol = new MethodSymbol(notNull(constructorMethod)[i], cname, ctype);
 
 	addConstructor(definition.getTC(), notNull(constructorMethod)[i]);
       }
@@ -611,8 +610,8 @@ public class NiceClass extends ClassImplementation
     // This needs to be done even if we don't recompile, 
     // since classes are always regenerated.
     if (constructorMethod != null)
-      for (int i = 0; i < notNull(constructorMethod).length; i++)
-	notNull(constructorMethod)[i].getCode();
+      for (cm : notNull(constructorMethod))
+	cm.getCode();
 
     // Take into account external interface implementations, which 
     // can add new interfaces to implement in the bytecode.
@@ -740,7 +739,7 @@ mlsub.typing.Constraint identifyTypeParameters
 }
 
 let gnu.bytecode.Method cloneMethod = 
-	notNull(gnu.bytecode.Type.pointer_type).getDeclaredMethod("clone", 0);
+	gnu.bytecode.Type.pointer_type.getDeclaredMethod("clone", 0);
 
 class ThisSymbol extends MonoSymbol
 {

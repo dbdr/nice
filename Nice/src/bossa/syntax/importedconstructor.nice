@@ -114,7 +114,7 @@ public ?ImportedConstructor loadImportedConstructor(NiceClass def, gnu.bytecode.
 	isDefault: gnu.bytecode.Attribute.get(method, "default") != null,
 	method: method);
   res.addChild(parameters);
-  let symbol = createMethodSymbol(res, name, constraint, returnType);
+  let symbol = new MethodSymbol(res, name, constraint, returnType);
   res.symbol = symbol;
   symbol.propagate = Node.global;
   res.addChild(symbol);

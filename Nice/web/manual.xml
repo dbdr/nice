@@ -1046,12 +1046,32 @@ while ((v = r.read()) != -1) {
         The Java libraries are automatically imported as necessary. 
 	Therefore it is straightforward	to use existing Java code
 	in Nice programs.
+	In particular, it is possible to call Java methods, to
+	instantiate Java classes, to create a Nice subclass of a Java
+        class, overriding methods from the parent, ...
       </para>
 
       <para>
 	This section lists advanced features related to the use of Java code
 	in Nice.
       </para>
+
+      <section id="subclassJavaInNice"><title>Subclassing a Java class</title>
+	<para>
+	  A Nice class can extend a Java class, simply by naming it in
+	  its <literal>extends</literal> clause. Similarly, it can
+	  implement Java interfaces.	
+	</para>
+
+	<para>
+	  When instantiating a Nice class with a Java parent, the 
+	  <link linkend="constructor">automatic constructor</link>
+	  comes in several versions, one for each constructor of the
+	  parent class. The call must then provide the values for one
+	  of the constructors of the parent, followed by the named
+	  values for the fields defined in the Nice class.
+	</para>
+      </section>
 
       <section id="importJava"><title>Importing packages</title>
 	<para>
@@ -1186,6 +1206,10 @@ String getName(MyJavaClass) = native String MyJavaClass.getName();</programlisti
 	generated constructor</link>, 
 	with one parameter for each field of the class, 
 	including those inherited from Nice super-classes.
+	Additionally, if some fields have default values, then a
+	second constructor is generated. It only has parameters for
+	the fields without a default value, and assigns to the other
+	fields their default value.
 	</para>
       </section>
 

@@ -259,7 +259,10 @@ public class MethodBodyDefinition extends Definition
     MethodDeclaration def = ((MethodDeclaration.Symbol) s).definition;
     
     if(!(def instanceof NiceMethod))
-      User.error(this, name + " is not a nice method, you can not define an alternative for it");
+      User.error(this, name + " is not a Nice method.\n" +
+		 "An alternative cannot be defined for it.\n" +
+		 name + " was defined at " + def.location()
+		 );
     
     //Debug.println("Def for "+this+" is "+s+" "+s.location());
     

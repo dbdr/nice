@@ -12,7 +12,7 @@
 
 // File    : Location.java
 // Created : Tue Jul 13 11:55:08 1999 by bonniot
-//$Modified: Thu Aug 31 16:08:30 2000 by Daniel Bonniot $
+//$Modified: Tue Oct 03 12:02:39 2000 by Daniel Bonniot $
 
 package bossa.util;
 
@@ -41,8 +41,6 @@ public class Location implements Located
   {
     this.fileName = file;
     this.startLine = startLine;
-    // JavaCC has 1 as first column,
-    // and Emacs has 0 !!
     this.startColumn = startColumn;
     this.endLine = endLine;
     this.endColumn = endColumn;
@@ -106,9 +104,15 @@ public class Location implements Located
 	return res+"[no location]";
       else
 	return res;
-    return res+
-      (res.length()>0 ? ": " : "")+
-      "line "+startLine+", column "+(startColumn-1);
+
+    if (emacsMode)
+      return 
+	(res.length()>0 ? (res + ":") : "") +
+	startLine + ":" + startColumn;
+    else
+      return 
+	(res.length()>0 ? (res + ": ") : "") +
+	"line "+startLine+", column "+startColumn;
   }
 
   public boolean isValid()
@@ -145,4 +149,10 @@ public class Location implements Located
   private int startLine,startColumn,endLine,endColumn;
   private String fileName;
   private String abstractLocation = null; // if non-null, overseeds everyting
+
+  /****************************************************************
+   * Different behaviour wether compiler is invoked by emacs
+   ****************************************************************/
+
+  private static boolean emacsMode = Boolean.getBoolean("emacs");
 }

@@ -68,7 +68,6 @@ public final class Dispatch
       // if its domain is void.
       // this will be checked later
       alternatives = new LinkedList();
-   
     
     Stack sortedAlternatives = sort(alternatives);
     
@@ -157,7 +156,7 @@ public final class Dispatch
   }
 
   private static void test(MethodDeclaration method,
-	    final Stack sortedAlternatives)
+			   final Stack sortedAlternatives)
   {
     if(Debug.linkTests)
       {
@@ -171,8 +170,7 @@ public final class Dispatch
     
     List multitags = Typing.enumerate(domain);
 
-    for(Iterator i = multitags.iterator();
-	i.hasNext();)
+    for(Iterator i = multitags.iterator(); i.hasNext();)
       {
 	TypeConstructor[] tags = (TypeConstructor[]) i.next();
 	
@@ -246,7 +244,7 @@ public final class Dispatch
 	param.setParameter(true);
 	params[n] = new ReferenceExp(param);
       }
-    Debug.println("Dispatching " + m);
+
     block.setBody(dispatch(sortedAlternatives.iterator(),
 			   m.javaReturnType().isVoid(),
 			   block,

@@ -12,7 +12,7 @@
 
 // File    : main.nice
 // Created : Sat Feb 19 16:21:04 2000 by Daniel Bonniot
-//$Modified: Wed Sep 06 14:36:28 2000 by Daniel Bonniot $
+//$Modified: Tue Oct 03 12:38:20 2000 by Daniel Bonniot $
 
 package nice.tools.compiler;
 
@@ -23,6 +23,10 @@ package nice.tools.compiler;
    0 : Normal exit (compilation sucessful, version message)
    1 : Abnormal termination (bug in the compiler)
    2 : Error reported (file missing, type error, ...)
+
+   Changes to this table should be reflected in function 
+   <code>nice-compilation-exit</code> in emacs mode file 
+   <tt>nice-mode.el</tt>.
 
    @author Daniel Bonniot (d.bonniot@mail.dotcom.fr)
  */

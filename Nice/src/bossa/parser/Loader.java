@@ -12,7 +12,6 @@
 
 // File    : Loader.java
 // Created : Thu Jul 29 09:43:50 1999 by bonniot
-//$Modified: Tue Aug 01 18:08:01 2000 by Daniel Bonniot $
 
 package bossa.parser;
 
@@ -23,9 +22,10 @@ import bossa.syntax.LocatedString;
 import bossa.util.*;
 
 /** 
- * Static class for loading and parsing files
- * 
- * @author bonniot
+    Static class for loading and parsing files.
+    
+    @version $Date$
+    @author bonniot
  */
 
 public abstract class Loader
@@ -45,12 +45,28 @@ public abstract class Loader
     }
     catch(ParseException e){
       if(e.currentToken!=null)
-	User.error(new Location(e.currentToken.next),e.getMessage());
+	User.error(new Location(e.currentToken.next), 
+		   removeLocation(e.getMessage()));
       else
 	User.error(e.getMessage());
       return null;
     }
   } 
 
+  /**
+     Remove the "at line L, column C." in the error message,
+     since it is already in the location.
+  */
+  private static String removeLocation(String message)
+  {
+    int start = message.indexOf(" at line ");
+    if (start == -1)
+      return message;
+    int end = message.indexOf('.', start);
+    return 
+      message.substring(0, start) + 
+      message.substring(end, message.length());
+  }
+  
   static Parser parser = null;
 }

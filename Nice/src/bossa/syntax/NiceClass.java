@@ -182,7 +182,12 @@ public class NiceClass extends ClassDefinition
   void resolve()
   {
     super.resolve();
-    
+
+    // must be called when bytecode types are set, 
+    // but before compilation, so that constructors are known
+    // even in package variable initializers.
+    prepareClassType();
+
     //optim
     if(fields.size()==0)
       return;
@@ -200,33 +205,6 @@ public class NiceClass extends ClassDefinition
 	Field f = (Field) i.next();
 	
 	f.sym.type = f.sym.syntacticType.resolve(localScope);
-      }
-  }
-  
-  /****************************************************************
-   * Initial Context
-   ****************************************************************/
-
-  public void createContext()
-  {
-    super.createContext();
-
-    // This is done here for convenience only
-    if(classType != null)
-      {
-	if(!isInterface)
-	  createConstructor();
-
-	// we need this before compile(), 
-	// to know this type is, say, an interface
-	// when it appears in other definitions
-	ClassDefinition me = abstractClass();
-
-	classType.setModifiers(Access.PUBLIC 
-			       | (me.isAbstract  ? Access.ABSTRACT  : 0)
-			       | (me.isFinal     ? Access.FINAL     : 0)
-			       | (me.isInterface ? Access.INTERFACE : 0)
-			       );
       }
   }
 
@@ -283,6 +261,28 @@ public class NiceClass extends ClassDefinition
    * Code generation
    ****************************************************************/
 
+  private void prepareClassType()
+  {
+    if (associatedConcreteClass != null)
+      associatedConcreteClass.prepareClassType();
+    else if(classType != null)
+      {
+	if(!isInterface)
+	  createConstructor();
+
+	// we need this before compile(), 
+	// to know this type is, say, an interface
+	// when it appears in other definitions
+	ClassDefinition me = abstractClass();
+
+	classType.setModifiers(Access.PUBLIC 
+			       | (me.isAbstract  ? Access.ABSTRACT  : 0)
+			       | (me.isFinal     ? Access.FINAL     : 0)
+			       | (me.isInterface ? Access.INTERFACE : 0)
+			       );
+      }
+  }
+  
   public void compile()
   {
     if(classType == null)
@@ -354,7 +354,7 @@ public class NiceClass extends ClassDefinition
     thisVar.setParameter(true);
     thisVar.allocateLocal(code);
 
-    code.emitLoad(thisVar);    
+    code.emitLoad(thisVar);
     code.emitInvokeSpecial(constructor(javaSuperClass()));
     code.emitReturn();
 
@@ -414,5 +414,5 @@ public class NiceClass extends ClassDefinition
   /** Not the fully qualified name */
   private LocatedString simpleName;
   private boolean isSharp;
-  private ClassDefinition associatedConcreteClass; // non-null if !isSharp
+  private NiceClass associatedConcreteClass; // non-null if !isSharp
 }

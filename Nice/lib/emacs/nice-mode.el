@@ -19,7 +19,7 @@
 (require 'cc-defs)
 (require 'cc-langs)
 
-(defvar nice-program "nicec"
+(defvar nice-program (if (eq window-system 'w32) "nicec.bat" "nicec")
   "Nice compiler name.")
 
 (defvar nice-xprogram nil
@@ -183,11 +183,11 @@
      1 nice-type-face)
    
    ;; Keywords
-   '("\\<\\(fun\\|static\\|final\\|extends\\|implements\\|abstract\\|public\\|var\\|class\\|interface\\|new\\|for\\|if\\|else\\|native\\|inline\\|import\\|require\\|package\\|alike\\|Any\\|return\\|try\\|catch\\|finally\\|throw\\)\\>\\|@"
+   '("\\<\\(fun\\|static\\|final\\|extends\\|implements\\|abstract\\|public\\|var\\|class\\|interface\\|new\\|else\\|native\\|inline\\|import\\|require\\|package\\|alike\\|Any\\|return\\|try\\|catch\\|finally\\|throw\\)\\>\\|@"
      0 nice-keyword-face)
    
-   ;; For/if/assert
-   '("^\\s-*\\(dynamic\\|assert\\|for\\|reset\\|enable\\|if\\)\\s-*("
+   ;; for/if/assert followed by '('
+   '("^\\s-*\\(dynamic\\|assert\\|for\\|while\\|if\\)\\s-*("
      1 nice-keyword-face t)
    )
   "Nice mode keywords.")
@@ -407,6 +407,10 @@ Mode for editing/compiling Nice programs.
       (access-label . +)
       (inher-cont . c-lineup-java-inher)
       (func-decl-cont . c-lineup-java-throws))) t)
+
+  ;(make-local-variable 'compilation-exit-message-function)
+  (setq compilation-exit-message-function 'nice-compilation-exit)
+
   (local-set-key "\C-c\C-b" 'nice-compile-buffer)
   (local-set-key "\C-c\C-c" 'nice-comment-region-or-line)
   (local-set-key "\C-c\C-u" 'nice-uncomment-region-or-line)
@@ -462,7 +466,7 @@ Mode for editing/compiling Nice programs.
     (let ((start (search-forward "package " nil t))
 	  (end (search-forward ";")))
       (if start
-	  (buffer-substring start (- end 1))
+	  (buffer-substring-no-properties start (- end 1))
 	(error "\"package\" statement not found"))
     )
   )
@@ -487,24 +491,38 @@ Mode for editing/compiling Nice programs.
 
     ;; Build process command
     (setq cmd
-          (append
-           (if nice-xprogram nice-xprogram (cons nice-program nil))
-           (if nice-recompile-flag '("-r"))
-           (if nice-recompile-all-flag '("-R"))
-           (cons (nice-buffer-pkg-name)
-                 nil)))
+          (concat
+           (if nice-xprogram nice-xprogram nice-program)
+	   " "
+           (if nice-recompile-flag '("-r "))
+           (if nice-recompile-all-flag '("-R "))
+           (nice-buffer-pkg-name))
+    )
     
     ;; Save the current directory
     (setq nice-directory (file-name-directory (buffer-file-name)))
 
-    ;; Start process
-    (setq nice-process (nice-start-process nice-directory cmd))
+    (setq nice-compile-buffer (compile-internal cmd "No more errors"))
 
+    ;; Start process
+    ;(setq nice-process (nice-start-process nice-directory cmd))
     ;; User feedback
-    (setq nice-compiling t)
-    
+    ;(setq nice-compiling t)
     ;; Display the compilation buffer
-    (display-buffer nice-compile-buffer)))
+    ;(display-buffer nice-compile-buffer)
+  )
+)
+
+(defun nice-compilation-exit (process-status exit-status exit-message)
+  (case exit-status 
+    ((0) (let ((win (get-buffer-window nice-compile-buffer)))
+	   (if win (delete-window win)))
+     '("successful" . "OK"))
+    ((1) '("Compiler bug" . "Bug"))
+    ((2) (save-excursion (next-error) '("error" . "error")))
+    ('otherwise '("Unknown exit status" . ""))
+  ) 
+)
 
 (defun nice-next-error ()
   "Find next Nice error."

@@ -3,10 +3,15 @@ package nice.lang;
 
 abstract interface BooleanAlgebra
 {
-  alike `&`(alike);
-  alike `|`(alike);
-  alike `!`();
+  alike `&`(alike); // and
+  alike `|`(alike); // or
+  alike `!`();      // not
+  alike `^`(alike); // xor
+  alike `->`(alike, alike); // conditional
 }
+
+`^`(x, y) = (x & !y) | (!x & y);
+`->`(x, y, z) = (x & y) | (!x & z);
 
 <BooleanAlgebra B> B nand(B, B);
 nand(b1, b2) = !(b1 & b2);

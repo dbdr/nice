@@ -51,6 +51,9 @@ char `!=`(char, char) = native char Native.neq(char,char);
 
 
 <Any T> boolean equals(T,T) = native boolean Object.equals(Object);
+// can be overriden
+<Any T> boolean eq(T,T);
+eq(o1, o2) = equals(o1, o2);
 
 <Any T> String toString(T) = native String String.valueOf(Object);
 <Any T> Class getClass(T) = native Class Object.getClass();

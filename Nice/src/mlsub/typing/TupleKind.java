@@ -12,7 +12,7 @@
 
 // File    : TupleKind.java
 // Created : Wed Aug 02 15:36:53 2000 by Daniel Bonniot
-//$Modified: Wed Aug 30 16:16:24 2000 by Daniel Bonniot $
+//$Modified: Tue Oct 03 17:20:33 2000 by Daniel Bonniot $
 
 package mlsub.typing;
 
@@ -36,6 +36,7 @@ public class TupleKind implements Kind
   private TupleKind(int arity)
   {
     this.arity = arity;
+    
     // forces the creation of the constraint
     // we don't want it to be created during link.
     Engine.getConstraint(this);

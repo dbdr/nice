@@ -99,13 +99,20 @@ public class AbstractInterface extends Definition
    * Module interface
    ****************************************************************/
 
-  public void printInterface(java.io.PrintWriter s)
+  public void printInterface(java.io.PrintWriter w)
   {
-    s.print("abstract interface "
+    w.print("abstract interface "
             +name
             +Util.map("<",", ",">",parameters)
             +Util.map(" extends ",", ","",extensions)
             +"{}\n");
+
+    for(Iterator i = children.iterator(); i.hasNext(); )
+      {
+	Object o = i.next();
+	if (o instanceof Definition)
+	  ((Definition) o).printInterface(w);
+      }
   }
   
   /****************************************************************

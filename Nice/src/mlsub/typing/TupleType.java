@@ -12,7 +12,7 @@
 
 // File    : TupleType.java
 // Created : Wed Aug 02 15:21:55 2000 by Daniel Bonniot
-//$Modified: Tue Aug 29 17:07:36 2000 by Daniel Bonniot $
+//$Modified: Tue Oct 03 17:17:53 2000 by Daniel Bonniot $
 
 package mlsub.typing;
 
@@ -30,7 +30,7 @@ public class TupleType extends Monotype
   {
     this.types = types;
 
-    kind = TupleKind.get(types.length);
+    kind = TupleKind.get(types == null ? 0 : types.length);
   }
 
   public Monotype[] getComponents()

@@ -12,7 +12,7 @@
 
 // File    : CallExp.java
 // Created : Mon Jul 05 16:27:27 1999 by bonniot
-//$Modified: Mon Oct 02 17:09:52 2000 by Daniel Bonniot $
+//$Modified: Tue Oct 03 17:39:04 2000 by Daniel Bonniot $
 
 package bossa.syntax;
 
@@ -100,8 +100,8 @@ public class CallExp extends Expression
     if(infix)
       {
 	Expression e = fun.content();
-	 e.scope = Node.getGlobalScope();
-	if(e instanceof IdentExp)
+	e.scope = Node.getGlobalScope();
+  	if(e instanceof IdentExp)
 	  ((IdentExp) e).ignoreInexistant = true;
       }
   }
@@ -275,65 +275,72 @@ public class CallExp extends Expression
       {
 	declaringClass = 
 	  ((Expression) parameters.get(0)).staticClass();
-	if(declaringClass != null)
-	  // A static function is called
+
+	Expression funExp = fun.content();
+	    
+	if(declaringClass == null)
+	  // check that the function was found in scope
 	  {
-	    Expression funExp = fun.content();
-	    
-	    LocatedString funName;
-	    
-	    if(funExp instanceof OverloadedSymbolExp)
-	      funName = ((OverloadedSymbolExp) funExp).ident;
-	    else if(funExp instanceof IdentExp)
-	      funName = ((IdentExp) funExp).getIdent();
-	    else if(funExp instanceof SymbolExp)
-	      funName = ((SymbolExp) funExp).getName();
-	    else
-	      {
-		Debug.println(this+"");
-		
-		Internal.error("Unknown case " +
-			       funExp.getClass() + " in CallExp");
-		return;
-	      }
-
-	    parameters.remove(0);
-	    List possibilities = new LinkedList();
-	    declaringClass.addMethods();
-	    int arity = parameters.size();
-	    
-	    // search methods
-	    for(gnu.bytecode.Method method = declaringClass.getMethods();
-		method!=null; method = method.getNext())
-	      if(method.getName().equals(funName.content) &&
-		 (method.arg_types.length + 
-		  (method.getStaticFlag() ? 0 : 1)) == arity)
-		{
-		  MethodDeclaration md = 
-		    JavaMethod.addFetchedMethod(method);
-		  if(md!=null)
-		    possibilities.add(md.symbol);
-		  else
-		    Debug.println(method + " ignored");
-		}
-
-	    // search a field
-	    if(parameters.size()==0)
-	      {
-		gnu.bytecode.Field field = 
-		  declaringClass.getField(funName.toString());
-		if(field!=null)
-		  possibilities.add(JavaMethod.addFetchedMethod(field).symbol);
-	      }
-	    
-	    if (possibilities.size() == 0)
-	      User.error(this, "class " + declaringClass.getName() +
-			 " has no method or field " + funName);
-	    
-	    fun = new ExpressionRef
-	      (new OverloadedSymbolExp(possibilities, funName,
-				       fun.content().getScope()));
+	    if (funExp instanceof IdentExp)
+	      User.error(funExp, 
+			 funExp + " is not declared");
+	    return;
 	  }
+	
+	// A static function is called
+	LocatedString funName;
+	    
+	if(funExp instanceof OverloadedSymbolExp)
+	  funName = ((OverloadedSymbolExp) funExp).ident;
+	else if(funExp instanceof IdentExp)
+	  funName = ((IdentExp) funExp).getIdent();
+	else if(funExp instanceof SymbolExp)
+	  funName = ((SymbolExp) funExp).getName();
+	else
+	  {
+	    Debug.println(this+"");
+		
+	    Internal.error("Unknown case " +
+			   funExp.getClass() + " in CallExp");
+	    return;
+	  }
+
+	parameters.remove(0);
+	List possibilities = new LinkedList();
+	declaringClass.addMethods();
+	int arity = parameters.size();
+	    
+	// search methods
+	for(gnu.bytecode.Method method = declaringClass.getMethods();
+	    method!=null; method = method.getNext())
+	  if(method.getName().equals(funName.content) &&
+	     (method.arg_types.length + 
+	      (method.getStaticFlag() ? 0 : 1)) == arity)
+	    {
+	      MethodDeclaration md = 
+		JavaMethod.addFetchedMethod(method);
+	      if(md!=null)
+		possibilities.add(md.symbol);
+	      else
+		Debug.println(method + " ignored");
+	    }
+
+	// search a field
+	if(parameters.size()==0)
+	  {
+	    gnu.bytecode.Field field = 
+	      declaringClass.getField(funName.toString());
+	    if(field!=null)
+	      possibilities.add(JavaMethod.addFetchedMethod(field).symbol);
+	  }
+	    
+	if (possibilities.size() == 0)
+	  User.error(this, "class " + declaringClass.getName() +
+		     " has no method or field " + funName);
+	    
+	fun = new ExpressionRef
+	  (new OverloadedSymbolExp(possibilities, funName,
+				   fun.content().getScope()));
       }
   }
   

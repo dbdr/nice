@@ -106,6 +106,10 @@ if [ $doTest = true ]; then
   test_installation 
 fi
 
+if [ "$EMACS" = t ]; then
+  JAVA="${JAVA} -Demacs=true"
+fi
+
 case $progname in
   nicec) 
     ${JAVA} -classpath ${NICE}:$CLASSPATH \

@@ -118,7 +118,8 @@ int compile(String[] args)
 	  "Location of nice.jar", 
 	  "file",
 	  String file => { compilation.runtimeFile = file; }),
-   option("native-compiler", visible: false,
+
+   option("native-compiler",
 	  "Location of the native compiler binary (gcj)", 
 	  "file",
 	  String file => { nativeCompiler = file; }),

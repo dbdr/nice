@@ -88,6 +88,11 @@ public class FunTypeKind implements Kind
 	   " it's a " + e.getClass());
       }
   }
+ 
+  public String toString()
+  {
+    return "Fun(" + domainArity + ")";
+  }
   
   public int domainArity;
   

@@ -86,5 +86,10 @@ public class TupleKind implements Kind
       }
   }
   
+  public String toString()
+  {
+    return "Tuple(" + arity + ")";
+  }
+  
   int arity;
 }

@@ -67,11 +67,6 @@ class JavaMethod extends MethodDeclaration
     return res;
   }
   
-  boolean hasThis()
-  {
-    return true;
-  }
-
   /****************************************************************
    * Code generation
    ****************************************************************/

@@ -13,6 +13,13 @@ nice (0.9.2) unstable; urgency=low
     'f' or 'F' at the end will make them of type float.
   * Method parameters that are not dispatched on simply get their declared
     type. This avoids some type errors, and simplifies error messages.
+  * Some more methods are added to nice.lang.
+  * Implemented simple range expressions. 'a..b' is an immutable list of int's
+    from a to b(inclusive) where b >= a. Example usage:
+      for (i : 1..10) println(i);
+  * In local variable declarations like 'var x = exp' is the type of x infered
+    to int when 'exp' is of type byte or short. This will avoid unexpected 
+    behaviour some cases.
   * Bugfixes (incrementation of byte local variables, require a default value
     for global variables, ...)
 

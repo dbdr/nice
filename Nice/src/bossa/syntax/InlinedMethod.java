@@ -147,7 +147,13 @@ public class InlinedMethod extends MethodDeclaration
                 catch (ClassNotFoundException ex) {}
 
               if (res == null)
-                res = getParent().loadClass(name);
+                {
+                  ClassLoader parent = getParent();
+                  // A JVM may represent the system classloader by null.
+                  if (parent == null)
+                    parent = ClassLoader.getSystemClassLoader();
+                  res = parent.loadClass(name);
+                }
 
               if (resolve && res != null)
                 resolveClass(res);

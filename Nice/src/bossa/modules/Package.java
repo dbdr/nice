@@ -740,9 +740,12 @@ public class Package implements mlsub.compilation.Module, Located, bossa.syntax.
     return res;
   }
 
-  public Method lookupDispatchClassMethod(String name, String attribute, String value)
+  public Method lookupDispatchClassMethod
+    (ClassType clas, String name, String attribute, String value)
   {
-    return lookupClassMethod(source.getDispatch(), name, attribute, value);
+    if (clas == null)
+      clas = source.getDispatch();
+    return lookupClassMethod(clas, name, attribute, value);
   }
 
   /**

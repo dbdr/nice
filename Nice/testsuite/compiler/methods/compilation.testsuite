@@ -8,3 +8,29 @@ class A
 {
   String foo() = "ABC";
 }
+
+/// PASS
+  // Check that polymorphic methods compiled inside classes get the right
+  // bytecode type.
+  /// package a
+  /// Toplevel
+class A {
+  <A T> T foo(T x) = x;
+}
+  /// package b import a
+  let B b = new B();
+  let A a = new A();
+
+  // invoke foo reflexively.
+  // the method should be A.foo(A);
+  let methodFoo = A.class.getMethod("foo", [A.class]);
+  methodFoo.invoke(a, [b]);
+
+  assert b.ran;
+
+  /// Toplevel
+final class B extends A {
+  boolean ran = false;
+}
+
+foo(A a, B b) { b.ran = true; return b; }

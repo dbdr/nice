@@ -387,6 +387,8 @@ public class NiceClass extends ClassImplementation
 
   public gnu.expr.ClassExp getClassExp() = classe;
 
+  public gnu.bytecode.ClassType getClassType() = classe.getClassType();
+
   /**
      Collect in 'constraints' the constraints set by each class
      on the type parameters.

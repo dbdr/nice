@@ -325,36 +325,9 @@ public gnu.expr.Expression getDispatchMethod(NiceMethod def, Module module)
   gnu.bytecode.Type[] argTypes;
   gnu.bytecode.Type retType;
 
-  /*
-    If this package is not recompiled,
-    we fetch the bytecode type information
-    from the previous dispatch class.
-    Benefits: we get the most precise bytecode type for methods,
-      as computed during the initial compilation.
-      This would not be the case if we recomputed it,
-      as the precise types are found during typechecking.
-  */
-  ?gnu.bytecode.Method meth = module.lookupDispatchClassMethod(name, "id", def.getFullName());
-  if (meth != null) // Reuse existing dispatch method header
-    {
-      // The dispatch code will have to be regenerated anyway
-      meth.eraseCode();
-
-      argTypes = notNull(meth.arg_types);
-      retType  = notNull(meth.return_type);
-      // Make sure we use the same bytecode name, since compiled code
-      // can rely on it.
-      name = meth.getName();
-    }
-  else // Get type information from the nice declaration
-    {
-      argTypes = def.javaArgTypes();
-      retType  = def.javaReturnType();
-    }
-
   // Try to compile the dispatch method as a member method if possible.
   ?NiceClass receiver;
-  if (argTypes.length == 0)
+  if (def.getArity() == 0)
     receiver = null;
   else
     {
@@ -365,9 +338,43 @@ public gnu.expr.Expression getDispatchMethod(NiceMethod def, Module module)
         receiver = null;
 
       // Special treatment for serialization at the moment.
-      if (def.getArity() == 2 && 
+      if (def.getArity() == 2 &&
           (name.equals("writeObject")||name.equals("readObject")))
         receiver = null;
+    }
+
+  /*
+    If this package is not recompiled,
+    we fetch the bytecode type information
+    from the previous dispatch class.
+    Benefits: we get the most precise bytecode type for methods,
+      as computed during the initial compilation.
+      This would not be the case if we recomputed it,
+      as the precise types are found during typechecking.
+  */
+  ?gnu.bytecode.Method meth = module.lookupDispatchClassMethod
+   (receiver == null ? null : receiver.getClassType(),
+    name, "id", def.getFullName());
+  if (meth != null) // Reuse existing dispatch method header
+    {
+      // The dispatch code will have to be regenerated anyway
+      meth.eraseCode();
+
+      argTypes = notNull(meth.arg_types);
+
+      if (receiver != null)
+	argTypes = [receiver.getClassType()] + argTypes;
+
+      retType  = notNull(meth.return_type);
+
+      // Make sure we use the same bytecode name, since compiled code
+      // can rely on it.
+      name = meth.getName();
+    }
+  else // Get type information from the nice declaration
+    {
+      argTypes = def.javaArgTypes();
+      retType  = def.javaReturnType();
     }
 
   res = generateMethod

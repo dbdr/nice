@@ -40,10 +40,15 @@ public final class Polytype
     this.monotype = monotype;
   }
 
+  public final boolean isMonomorphic()
+  {
+    return ! Constraint.hasBinders(constraint);
+  }
+
   public Polytype cloneType()
   {
     //Optimization
-    if(!Constraint.hasBinders(constraint))
+    if (isMonomorphic())
       return this;
 
     java.util.Map map = new java.util.HashMap();

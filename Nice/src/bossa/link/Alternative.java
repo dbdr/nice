@@ -45,10 +45,8 @@ public class Alternative
   /**
    * When read from a source file.
    */
-  public Alternative(NiceMethod m, Pattern[] patterns, ReferenceExp method)
+  public Alternative(NiceMethod m, Pattern[] patterns)
   {
-    this.code = method;
-    
     this.methodName = m.getFullName();
     this.patterns = patterns;
     add();
@@ -127,7 +125,7 @@ public class Alternative
   /**
    * Returns true iff 'a' is more precise than 'b'.
    */
-  static boolean leq(Alternative a, Alternative b)
+  public static boolean leq(Alternative a, Alternative b)
   {
     for(int i = 0; i<a.patterns.length; i++)
       if (!a.patterns[i].leq(b.patterns[i]))
@@ -151,10 +149,15 @@ public class Alternative
    * Code generation
    ****************************************************************/
 
+  public void setCode(ReferenceExp code)
+  {
+    this.code = code;
+  }
+
   /**
    * @return the expression that represents the method body.
    */
-  Expression methodExp()
+  public Expression methodExp()
   {
     return code;
   }
@@ -190,6 +193,8 @@ public class Alternative
   String methodName;
   Pattern[] patterns;
 
+  public Pattern[] getPatterns() { return patterns; }
+
   boolean visiting;
   
   /****************************************************************
@@ -216,7 +221,7 @@ public class Alternative
     l.add(this);
   }
   
-  static Stack sortedAlternatives(NiceMethod m)
+  public static Stack sortedAlternatives(NiceMethod m)
   {
     List list = (List) alternatives.get(m.getFullName());
     

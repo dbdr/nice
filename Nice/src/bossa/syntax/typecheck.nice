@@ -361,6 +361,16 @@ typecheck(e@TupleExp)
   typecheckExps(notNull(e.expressions));
 }
 
+typecheck(e@SuperExp)
+{
+  if (Node.currentFunction instanceof MethodBodyDefinition)
+    {
+      e.setCurrentMethod(cast(Node.currentFunction));
+    }
+  else
+    throw bossa.util.User.error(e, "super can only be used in method implementations");
+}
+
 typecheck(e@ClassExp) {}
 typecheck(c@ConstantExp){}
 typecheck(e@NullExp) {}
@@ -511,7 +521,7 @@ Expression checkAssignment(mlsub.typing.Polytype left, Expression right)
 }
 
 boolean isNullError(TypingEx ex);
-isNullError(@TypingEx) = true;
+isNullError(@TypingEx) = false;
 isNullError(ex@MonotypeLeqEx)
 {
   /*

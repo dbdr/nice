@@ -86,8 +86,7 @@ public final class JavaClasses
     new gnu.bytecode.Type[] {
       ClassType.make("java.io.Serializable"),
       ClassType.make("java.lang.Cloneable"),
-      ClassType.make("java.lang.Comparable"),
-      ClassType.make("java.lang.Runnable")
+      ClassType.make("java.lang.Comparable")
     };
   
   private static boolean excluded(gnu.bytecode.Type[] blackList, 
@@ -269,24 +268,45 @@ public final class JavaClasses
 	  }
 	else
 	  {
-	    // skips m if it was just overriden in classType
-	    // but declared in a superclass or superinterface.
-	    ClassType superClass = classType.getSuperclass();
-	    if(superClass!=null
-	       && alreadyHasMethod(superClass,m))
+	    Method base = baseMethod(classType, m);
+	    if (base != null)
 	      continue;
-	    ClassType[] itfs = classType.getInterfaces();
-	    if(itfs!=null)
-	      for(int i=0; i<itfs.length; i++)
-		if(alreadyHasMethod(itfs[i],m))
-		  continue addingFetchedMethod;
-	
+
 	    // Ignore the method if it is explicitely retyped
 	    if (retyped.get(m) == null)
-	      addSymbol(JavaMethod.make(m, false));
+	      {
+		if (Debug.javaTypes)
+		  Debug.println("Loaded native method " + m);
+		addSymbol(JavaMethod.make(m, false));
+	      }
 	  }
       }
   }
+
+  private static Method baseMethod(ClassType classType, Method m)
+  {
+    Method res = null;
+
+    // skips m if it was just overriden in classType
+    // but declared in a superclass or superinterface.
+    ClassType superClass = classType.getSuperclass();
+    if (superClass != null)
+      res = alreadyHasMethod(superClass,m);
+    if (res != null)
+      return res;
+
+    ClassType[] itfs = classType.getInterfaces();
+    if (itfs != null)
+      for (int i = 0; i < itfs.length; i++)
+	{
+	  res = alreadyHasMethod(itfs[i],m);
+	  if (res != null)
+	    return res;
+	}
+
+    return null;
+  }	
+
 
   private static void addSymbol(MethodDeclaration def)
   {
@@ -294,11 +314,11 @@ public final class JavaClasses
       Node.getGlobalScope().addSymbol(def.getSymbol());
   }
 
-  private static boolean alreadyHasMethod(ClassType c, Method m)
+  private static Method alreadyHasMethod(ClassType c, Method m)
   {
     // not exact if the new method overload the old one 
     // with more precise types.
-    return c.getMethod(m.getName(), m.getParameterTypes())!=null;
+    return c.getMethod(m.getName(), m.getParameterTypes());
   }
   
   /**
@@ -340,9 +360,9 @@ public final class JavaClasses
    * List of TCs for java.lang.Object: one per variance.
    ****************************************************************/
 
-  private final Vector objects = new Vector(5);
+  private static final Vector objects = new Vector(5);
   
-  TypeConstructor object(Compilation compilation, int arity)
+  static TypeConstructor object(Compilation compilation, int arity)
   {
     if(arity>=objects.size())
       objects.setSize(arity+1);

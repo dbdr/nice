@@ -1,0 +1,110 @@
+/// FAIL
+ /// Comment: super can only occur inside methods.
+ /// Toplevel
+void f() 
+{ /*/// FAIL HERE */ super; }
+
+/// GLOBAL
+class A {}
+class B extends A {}
+
+/// PASS
+ /// Toplevel
+void m(A);
+m(x@A) {}
+m(x@B) { super; }
+
+/// PASS
+ /// Toplevel
+void m(A);
+m(x#A) {}
+m(x@B) { super; }
+
+/// PASS
+/// Comment: checks that super is really called.
+ m(new B());
+ /// Toplevel
+void m(A);
+m(x@A) { throw new RuntimeException(); }
+m(x@B) 
+{ 
+  try {
+    super;
+    throw new Error();
+  }
+  catch (RuntimeException e) {
+  }
+}
+
+/// FAIL
+/// Comment: Ambiguous call to super
+  /// Toplevel
+void m(A, A);
+m(a, a) {}
+m(a@A, b@B) {}
+m(b@B, a@A) {}
+m(b@B, b@B) { /*/// FAIL HERE */ super; } 
+
+/// PASS
+ /// Comment: Calling a Java super method.
+ new MyThread().run();
+ /// Toplevel
+class MyThread extends Thread
+{
+  run() 
+  { 
+    super; 
+  }
+}
+
+/// PASS
+ /// COMMENT: A super that returns a value.
+ assert(m(new B()).equals("A->B"));
+ /// Toplevel
+String m(A);
+
+m(a@A) = "A";
+m(b@B) = super + "->B";
+
+/// PASS
+ assert(new B().toString().endsWith("@A@B"));
+ /// Toplevel
+toString(a@A) = super + "@A";
+toString(b@B) = super + "@B";
+
+/// FAIL
+ B b = m(new B());
+ /// Toplevel
+<A T> T m(T);
+
+m(a#A) = new A();
+m(b@B) = super;
+
+/// FAIL
+ B b = m(new B());
+ /// Toplevel
+<A T> T m(T);
+
+m(a#A) = new A();
+m(b#B) = super;
+
+/// FAIL
+ /// Toplevel
+<Any T> T myclone(T) = native Object Object.clone();
+
+myclone(a#A) = new A();
+myclone(b#B) = super;
+
+/// FAIL
+ /// Toplevel
+<Any T> T myclone(T) = native Object Object.clone();
+
+class C extends java.text.DecimalFormat {}
+
+myclone(c#C) = super;
+
+/// FAIL
+ /// Toplevel
+<Any T> T myclone(T) = native Object Object.clone();
+
+myclone(a#A) = super;

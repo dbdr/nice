@@ -36,12 +36,18 @@ public final class MonotypeVar extends Monotype
     this.name = name;
   }
 
+  private MonotypeVar(String name, TypeConstructor persistentHeadLeq)
+  {
+    this.name = name;
+    this.persistentHeadLeq = persistentHeadLeq;
+  }
+
   private String name;
   public String getName() { return name; }
 
   public TypeSymbol cloneTypeSymbol()
   {
-    return new MonotypeVar(name);
+    return new MonotypeVar(name, persistentHeadLeq);
   }
   
   /**

@@ -120,6 +120,16 @@ abstract class VarSymbol extends Node implements Located
       return new gnu.expr.ReferenceExp(name.toString(), decl);
   }
 
+  static gnu.expr.Expression[] compile(VarSymbol[] syms)
+  {
+    gnu.expr.Expression[] res = new gnu.expr.Expression[syms.length];
+
+    for (int i = 0; i < syms.length; i++)
+      res[i] = syms[i].compile();
+
+    return res;
+  }
+
   public void setDeclaration(gnu.expr.Declaration declaration)
   {
     setDeclaration(declaration, false);

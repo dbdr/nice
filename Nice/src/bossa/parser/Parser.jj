@@ -177,6 +177,7 @@ TOKEN: /* Keywords */
 | < FUN:        "fun"        	> /* Nice specific */
 | < ALIKE:      "alike"      	> /* Nice specific */
 //| < THIS:       "this"       	>
+| < SUPER:      "super"         >
 | < INSTANCEOF: "instanceof" 	>
 | < NEW:        "new"        	>
 | < NULL:	"null"		>
@@ -1854,9 +1855,11 @@ Expression PrimaryPrefix() :
 /*
 |
   "this"
-|
-  "super" "." <IDENTIFIER>
 */
+
+|
+  "super" 
+  { res = new SuperExp(); }
 
 |
   // This includes the case "(" Expression() ")" to avoid lookahead

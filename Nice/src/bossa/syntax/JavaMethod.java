@@ -160,7 +160,7 @@ public class JavaMethod extends MethodDeclaration
 
   private Type javaRetType;
   private Type[] javaArgType;
-  private Method reflectMethod;
+  Method reflectMethod;
   
   public gnu.bytecode.Type javaReturnType() 
   { return javaRetType; }
@@ -280,4 +280,20 @@ public class JavaMethod extends MethodDeclaration
       }
     return res + ")";
   }    
+
+  /****************************************************************
+   * List of implementations
+   ****************************************************************/
+
+  Iterator getImplementations()
+  {
+    return implementations.iterator();
+  }
+
+  private LinkedList implementations = new LinkedList();
+
+  void addImplementation(MethodBodyDefinition impl)
+  {
+    implementations.add(impl);
+  }
 }

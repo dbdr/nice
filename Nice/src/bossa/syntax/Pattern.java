@@ -194,6 +194,22 @@ public class Pattern
     return res;
   }
 
+  /**
+     Order on pattern that is compatible with the specificity of patterns.
+
+     If that mathes all values that this matches, the result is true.
+     Additionally, if this matches values that are more specific than
+     the values that matches, the result is also true. 
+
+     For instance, assuming class B extends A, exactly the following are true:
+       @A less @A
+       #A less @A
+       @B less @A
+       #B less @A
+       #A less #A
+       @B less #A
+       #B less #A
+  */
   public boolean leq(Pattern that)
   {
     if (that.atAny() || this == that)
@@ -208,13 +224,10 @@ public class Pattern
     if (that.atNull() || this.atNull())
       return false;
 
-    if (!that.exactlyAt)
-      return Typing.testRigidLeq(this.tc, that.tc); 
-    else if (this.exactlyAt)
-      return Typing.testRigidLeq(this.tc, that.tc) 
-	&& Typing.testRigidLeq(that.tc, this.tc);
-    else 
-      return false;
+    if (this.tc == that.tc)
+      return this.exactlyAt || ! that.exactlyAt;
+
+    return Typing.testRigidLeq(this.tc, that.tc); 
   }
 
   public boolean matches(TypeConstructor tag)

@@ -119,6 +119,11 @@ public class MethodBodyDefinition extends Definition
     return res;
   }
   
+  MethodDeclaration getDeclaration()
+  {
+    return declaration;
+  }
+
   private void setDeclaration(MethodDeclaration d)
   {
     if (d == null)
@@ -130,9 +135,16 @@ public class MethodBodyDefinition extends Definition
 	for (int i = 1; i < formals.length; i++)
 	  if (!(formals[i].atAny()))
 	    User.error(this, this + " is a native method. Dispatch can only occur on the first argument");
+
+	((JavaMethod) d).addImplementation(this);
       }
-    else if (! (d instanceof NiceMethod))
-      User.error(this, "Implementations can only be made for methods, but " + d.getName() + " is a function.\nIt was defined at:\n" + d.location());
+    else if (d instanceof NiceMethod)
+      // Register this alternative for the link test
+      alternative = new bossa.link.Alternative((NiceMethod) d, this.formals);
+    else
+      User.error(this, "Implementations can only be made for methods, but " + 
+		 d.getName() + " is a function.\nIt was defined at:\n" + 
+		 d.location());
 
     this.declaration = d;
     parameters = buildSymbols(this.formals, declaration.getArgTypes());
@@ -356,7 +368,7 @@ public class MethodBodyDefinition extends Definition
 	Typing.implies();
       }
       catch(TypingEx e) {
-	User.error(name, "Type error in method body \""+name+"\":\n"+e);
+	throw User.error(name, "Type error in method body \""+name+"\":\n"+e);
       }
 
       // Introduction of binders for the types of the arguments
@@ -459,8 +471,22 @@ public class MethodBodyDefinition extends Definition
       (new MiscAttr("patterns", 
 		    Pattern.bytecodeRepresentation(formals).getBytes()));
 
-    // Register this alternative for the link test
-    new bossa.link.Alternative(definition, this.formals, ref);
+    alternative.setCode(ref);
+  }
+
+  final TypeConstructor firstArgument()
+  {
+    return formals[0].tc;
+  }
+
+  NiceClass declaringClass()
+  {
+    try {
+      return (NiceClass) ClassDefinition.get(firstArgument());
+    }
+    catch (ClassCastException e) {
+      throw User.error(this, declaration + " is a native method.\nIt can not be overriden because " + formals[0].tc + " is not a class defined in Nice");
+    }
   }
 
   private void compile (JavaMethod declaration)
@@ -468,13 +494,7 @@ public class MethodBodyDefinition extends Definition
     gnu.expr.LambdaExp lexp = createMethod(declaration.methodName, true);
     
     // Compile as a method in the class of the first argument
-    try {
-      NiceClass c = (NiceClass) ClassDefinition.get(formals[0].tc);
-      c.addJavaMethod(lexp);
-    }
-    catch(ClassCastException e) {
-      User.error(this, declaration + " is a native method.\nIt can not be overriden because " + formals[0].tc + " is not a class defined in Nice");
-    }
+    declaringClass().addJavaMethod(lexp);
   }
 
   private gnu.expr.LambdaExp createMethod (String bytecodeName, boolean member)
@@ -488,6 +508,15 @@ public class MethodBodyDefinition extends Definition
     Gen.setMethodBody(lexp, body.generateCode());
     return lexp;
   }
+
+  gnu.expr.Expression[] compiledArguments()
+  {
+    return VarSymbol.compile(parameters);
+  }
+
+  private bossa.link.Alternative alternative;
+
+  bossa.link.Alternative getAlternative() { return alternative; }
 
   /****************************************************************
    * Printing

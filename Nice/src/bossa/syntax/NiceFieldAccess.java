@@ -71,4 +71,12 @@ public class NiceFieldAccess extends FieldAccess
     return javaReturnType();
   }
 
+  /****************************************************************
+   * Debug only
+   ****************************************************************/
+
+  public String toString()
+  {
+    return "Field access to " + field;
+  }
 }

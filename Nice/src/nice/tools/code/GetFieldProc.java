@@ -27,6 +27,10 @@ public class GetFieldProc extends Procedure1 implements Inlineable
   public GetFieldProc (Declaration fieldDecl)
   {
     this.fieldDecl = fieldDecl;
+
+    // Fail fast.
+    if (fieldDecl == null)
+      throw new NullPointerException();
   }
 
   private Declaration fieldDecl;

@@ -41,6 +41,17 @@ yet present in Nice.
 </para>
 
 <para>
+The <ulink url="http://cristal.inria.fr/~bonniot/bonniot02using.ps">
+extension of the type system with kinds</ulink> 
+was presented at the 
+<ulink url="http://www.informatik.uni-freiburg.de/~thiemann/tip02/">
+Workshop on Types in Programming (TIP'02)</ulink>
+by Daniel Bonniot.
+It forms the theoretical basis for <emphasis>abstract interfaces</emphasis>
+in Nice.
+</para>
+
+<para>
 <ulink url="http://nice.sourceforge.net/DEA.ps">Daniel Bonniot's 
 graduation report</ulink> contains information about the language, 
 and the theory of <emphasis>abstract interfaces</emphasis> 

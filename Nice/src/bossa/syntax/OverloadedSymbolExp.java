@@ -12,7 +12,7 @@
 
 // File    : OverloadedSymbolExp.java
 // Created : Thu Jul 08 12:20:59 1999 by bonniot
-//$Modified: Wed Sep 06 13:05:43 2000 by Daniel Bonniot $
+//$Modified: Wed Sep 20 12:32:59 2000 by Daniel Bonniot $
 
 package bossa.syntax;
 
@@ -94,9 +94,9 @@ public class OverloadedSymbolExp extends Expression
 	      else ;  
 	    else { i.remove(); continue; }
 	  }
-	else if(s instanceof MethodDefinition.Symbol)
+	else if(s instanceof MethodDeclaration.Symbol)
 	  {
-	    if(((MethodDefinition.Symbol)s).definition.getArity()!=arity)
+	    if(((MethodDeclaration.Symbol)s).definition.getArity()!=arity)
 	      { i.remove(); removedSomething = true; continue; }
 	  }
 	else

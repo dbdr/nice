@@ -1,7 +1,7 @@
 /**************************************************************************/
-/*                           B O S S A                                    */
+/*                             N I C E                                    */
 /*        A simple imperative object-oriented research language           */
-/*                   (c)  Daniel Bonniot 1999                             */
+/*                   (c)  Daniel Bonniot 2000                             */
 /*                                                                        */
 /*  This program is free software; you can redistribute it and/or modify  */
 /*  it under the terms of the GNU General Public License as published by  */
@@ -9,10 +9,6 @@
 /*  (at your option) any later version.                                   */
 /*                                                                        */
 /**************************************************************************/
-
-// File    : BossaClass.java
-// Created : Thu Jul 01 11:25:14 1999 by bonniot
-//$Modified: Mon Aug 07 15:31:55 2000 by Daniel Bonniot $
 
 package bossa.syntax;
 
@@ -25,9 +21,12 @@ import java.util.*;
 import bossa.util.Debug;
 
 /**
- * Abstract syntax for a class definition.
+   Abstract syntax for a class definition.
+   
+   @version $Date$
+   @author Daniel Bonniot
  */
-public class BossaClass extends ClassDefinition
+public class NiceClass extends ClassDefinition
 {
   /**
    * Creates a class definition.
@@ -44,11 +43,11 @@ public class BossaClass extends ClassDefinition
    * @param implementations a list of Interfaces
    * @param abstractions a list of Interfaces
    */
-  public BossaClass(LocatedString name, 
-		    boolean isFinal, boolean isAbstract, 
-		    boolean isInterface, boolean isSharp,
-		    List typeParameters,
-		    List extensions, List implementations, List abstractions)
+  public NiceClass(LocatedString name, 
+		   boolean isFinal, boolean isAbstract, 
+		   boolean isInterface, boolean isSharp,
+		   List typeParameters,
+		   List extensions, List implementations, List abstractions)
   {
     super(name.cloneLS(), isSharp || isFinal, isFinal, isAbstract, isInterface,
 	  typeParameters, extensions, implementations, abstractions);
@@ -95,7 +94,7 @@ public class BossaClass extends ClassDefinition
     LocatedString name = this.simpleName.cloneLS();
     name.prepend("#");
 
-    BossaClass c = new BossaClass
+    NiceClass c = new NiceClass
       (name,true,false,false,true,typeParameters,
        null, null, null);
     c.superClass = new TypeConstructor[]{ this.tc };
@@ -171,7 +170,7 @@ public class BossaClass extends ClassDefinition
 	Field f = (Field) i.next();
 
 	MonoSymbol s = f.sym;
-	MethodDefinition m = 
+	MethodDeclaration m = 
 	  new FieldAccessMethod(this, s.name, s.syntacticType, typeParameters);
 
 	addChild(m);
@@ -359,7 +358,7 @@ public class BossaClass extends ClassDefinition
     /*
     TypeParameters tp = new TypeParameters(name, tc.variance);
 
-    MethodDefinition md = new MethodDefinition
+    MethodDeclaration md = new MethodDeclaration
       (null, new LocatedString("<init>", location()),
        new Constraint(tp.content, null),
        new MonotypeConstructor(new TypeIdent(name),tp,location()),
@@ -367,8 +366,8 @@ public class BossaClass extends ClassDefinition
     */
 
     mlsub.typing.MonotypeVar[] params = createSameTypeParameters();
-    MethodDefinition md = new MethodDefinition
-      (null, new LocatedString("<init>", location()),
+    MethodDeclaration md = new NiceMethod
+      (new LocatedString("<init>", location()),
        null, null, null);
     md.setLowlevelTypes
       (mlsub.typing.Constraint.create(params, null),

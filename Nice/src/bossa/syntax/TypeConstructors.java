@@ -12,7 +12,7 @@
 
 // File    : TypeConstructors.java
 // Created : Mon Jun 05 14:19:36 2000 by Daniel Bonniot
-//$Modified: Thu Aug 31 15:50:28 2000 by Daniel Bonniot $
+//$Modified: Wed Sep 20 12:35:38 2000 by Daniel Bonniot $
 
 package bossa.syntax;
 
@@ -45,7 +45,7 @@ public final class TypeConstructors
     return (List) constructors.get(tc);
   }
 
-  static void addConstructor(TypeConstructor tc, MethodDefinition m)
+  static void addConstructor(TypeConstructor tc, MethodDeclaration m)
   {
     List l = (List) constructors.get(tc);
     if (l==null)

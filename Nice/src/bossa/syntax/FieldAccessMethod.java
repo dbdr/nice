@@ -12,7 +12,7 @@
 
 // File    : FieldAccessMethod.java
 // Created : Thu Jul 01 18:12:46 1999 by bonniot
-//$Modified: Thu Sep 07 17:52:08 2000 by Daniel Bonniot $
+//$Modified: Wed Sep 20 12:33:11 2000 by Daniel Bonniot $
 
 package bossa.syntax;
 
@@ -33,7 +33,7 @@ import java.util.*;
  * that is returned when the access to a field is done,
  * either a 'get' or a 'set'.
  */
-public class FieldAccessMethod extends MethodDefinition
+public class FieldAccessMethod extends MethodDeclaration
 {
   public FieldAccessMethod
     (ClassDefinition classDef, 

@@ -12,7 +12,7 @@
 
 // File    : CallExp.java
 // Created : Mon Jul 05 16:27:27 1999 by bonniot
-//$Modified: Tue Sep 05 16:11:33 2000 by Daniel Bonniot $
+//$Modified: Wed Sep 20 12:33:08 2000 by Daniel Bonniot $
 
 package bossa.syntax;
 
@@ -298,8 +298,8 @@ public class CallExp extends Expression
 		 (method.arg_types.length + 
 		  (method.getStaticFlag() ? 0 : 1)) == arity)
 		{
-		  MethodDefinition md = 
-		    JavaMethodDefinition.addFetchedMethod(method);
+		  MethodDeclaration md = 
+		    JavaMethod.addFetchedMethod(method);
 		  if(md!=null)
 		    possibilities.add(md.symbol);
 		}
@@ -310,7 +310,7 @@ public class CallExp extends Expression
 		gnu.bytecode.Field field = 
 		  declaringClass.getField(funName.toString());
 		if(field!=null)
-		  possibilities.add(JavaMethodDefinition.addFetchedMethod(field).symbol);
+		  possibilities.add(JavaMethod.addFetchedMethod(field).symbol);
 	      }
 	    
 	    if (possibilities.size() == 0)

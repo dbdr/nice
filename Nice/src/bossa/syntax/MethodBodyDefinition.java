@@ -12,7 +12,7 @@
 
 // File    : MethodBodyDefinition.java
 // Created : Thu Jul 01 18:12:46 1999 by bonniot
-//$Modified: Thu Aug 31 16:29:22 2000 by Daniel Bonniot $
+//$Modified: Wed Sep 20 13:56:36 2000 by Daniel Bonniot $
 
 package bossa.syntax;
 
@@ -102,7 +102,7 @@ public class MethodBodyDefinition extends Definition
     return res;
   }
   
-  private void setDefinition(MethodDefinition d)
+  private void setDeclaration(MethodDeclaration d)
   {
     if(d==null)
       User.error(this,"Method \""+name+"\" has not been declared");
@@ -142,14 +142,14 @@ public class MethodBodyDefinition extends Definition
     
     for(Iterator i = symbols.iterator(); i.hasNext();){
       VarSymbol s = (VarSymbol)i.next();
-      if(!(s instanceof MethodDefinition.Symbol))
+      if(!(s instanceof MethodDeclaration.Symbol))
 	i.remove();
       else
 	{
-	  MethodDefinition m = (MethodDefinition)((MethodDefinition.Symbol)s).definition;
+	  MethodDeclaration m = (MethodDeclaration)((MethodDeclaration.Symbol)s).definition;
 	  if(
 // It doesn't make sense to define a body for a native method, does it ?
-	     m instanceof JavaMethodDefinition
+	     m instanceof JavaMethod
 	     || m instanceof FieldAccessMethod
 	     || m.getArity() != formals.size()
 	     )
@@ -193,8 +193,8 @@ public class MethodBodyDefinition extends Definition
 
     String methods = "";
     for(Iterator i = symbols.iterator(); i.hasNext();){
-      MethodDefinition m = 
-	((MethodDefinition.Symbol)i.next()).definition;
+      MethodDeclaration m = 
+	((MethodDeclaration.Symbol)i.next()).definition;
       methods+=m+" defined "+m.location()+"\n";
     }
     
@@ -249,17 +249,17 @@ public class MethodBodyDefinition extends Definition
     if(s==null)
       User.error(this, name+" is not defined");
     
-    if(!(s instanceof MethodDefinition.Symbol))
+    if(!(s instanceof MethodDeclaration.Symbol))
       User.error(this, name+" is not a method");
 
-    MethodDefinition def = ((MethodDefinition.Symbol) s).definition;
+    MethodDeclaration def = ((MethodDeclaration.Symbol) s).definition;
     
-    if(!def.getClass().getName().equals("bossa.syntax.MethodDefinition"))
-      User.error(this, name+" is not a bossa method, you can not define an alternative for it");
+    if(!(def instanceof NiceMethod))
+      User.error(this, name + " is not a bossa method, you can not define an alternative for it");
     
     //Debug.println("Def for "+this+" is "+s+" "+s.location());
     
-    setDefinition(def);
+    setDeclaration(def);
 
     // Get type parameters
     if(binders != null)
@@ -534,7 +534,7 @@ public class MethodBodyDefinition extends Definition
     return name + "(" + Util.map("", ", ", "", formals) + ")";
   }
 
-  /*private*/ MethodDefinition definition;
+  /*private*/ MethodDeclaration definition;
   protected Collection /* of FieldSymbol */  parameters;
   protected List       /* of Patterns */   formals;
   Collection /* of LocatedString */ binders; // Null if type parameters are not bound

@@ -12,7 +12,7 @@
 
 // File    : JavaClasses.java
 // Created : Thu Jul 08 11:51:09 1999 by bonniot
-//$Modified: Mon Aug 07 15:31:50 2000 by Daniel Bonniot $
+//$Modified: Wed Sep 20 12:33:06 2000 by Daniel Bonniot $
 
 package bossa.syntax;
 
@@ -194,7 +194,7 @@ public final class JavaClasses
     for(Method m = classType.getMethods(); m!=null; m = m.getNext())
       {
 	if(m.isConstructor())
-	  JavaMethodDefinition.addFetchedConstructor(m, tc);
+	  JavaMethod.addFetchedConstructor(m, tc);
 	else
 	  {  
 	    // skips m if it was just overriden in classType
@@ -209,7 +209,7 @@ public final class JavaClasses
 		if(alreadyHasMethod(itfs[i],m))
 		  continue addingFetchedMethod;
 	
-	    JavaMethodDefinition.addFetchedMethod(m);
+	    JavaMethod.addFetchedMethod(m);
 	  }
       }
   }

@@ -10,7 +10,7 @@
 /*                                                                        */
 /**************************************************************************/
 
-// File    : JavaMethodDefinition.java
+// File    : JavaMethod.java
 // Created : Tue Nov 09 11:49:47 1999 by bonniot
 
 package bossa.syntax;
@@ -31,7 +31,7 @@ import java.util.*;
    @version $Date$
    @author Daniel Bonniot
  */
-public class JavaMethodDefinition extends MethodDefinition
+public class JavaMethod extends MethodDeclaration
 {
   /**
    * @param name the name of the method
@@ -40,18 +40,19 @@ public class JavaMethodDefinition extends MethodDefinition
    * @param returnType the return type
    * @param parameters the MonoTypes of the parameters
    */
-  public JavaMethodDefinition(
-			      // Informations about the java method
-			      // These 3 args are null if we are in an interface file
-			      LocatedString className,
-			      String methodName,
-			      List /* of LocatedString */ javaTypes,
-			      // Nice information
-			      LocatedString name, 
-			      Constraint constraint,
-			      Monotype returnType,
-			      List parameters
-			      )
+  public JavaMethod
+    (
+     // Informations about the java method
+     // These 3 args are null if we are in an interface file
+     LocatedString className,
+     String methodName,
+     List /* of LocatedString */ javaTypes,
+     // Nice information
+     LocatedString name, 
+     Constraint constraint,
+     Monotype returnType,
+     List parameters
+    )
   {
     super(name,constraint,returnType,parameters);
     
@@ -60,18 +61,19 @@ public class JavaMethodDefinition extends MethodDefinition
     this.javaTypes = javaTypes;
   }
 
-  private JavaMethodDefinition(
-			       // Informations about the java method
-			       // These 3 args are null if we are in an interface file
-			       LocatedString className,
-			       String methodName,
-			       List /* of LocatedString */ javaTypes,
-			       // Nice information
-			       LocatedString name, 
-			       mlsub.typing.Constraint constraint,
-			       mlsub.typing.Monotype returnType,
-			       mlsub.typing.Monotype[] parameters
-			       )
+  private JavaMethod
+    (
+     // Informations about the java method
+     // These 3 args are null if we are in an interface file
+     LocatedString className,
+     String methodName,
+     List /* of LocatedString */ javaTypes,
+     // Nice information
+     LocatedString name, 
+     mlsub.typing.Constraint constraint,
+     mlsub.typing.Monotype returnType,
+     mlsub.typing.Monotype[] parameters
+    )
   {
     super(name, null, null , null);
     
@@ -82,11 +84,11 @@ public class JavaMethodDefinition extends MethodDefinition
     setLowlevelTypes(constraint, parameters, returnType);
   }
 
-  private static JavaMethodDefinition make(Method m, boolean constructor)
+  private static JavaMethod make(Method m, boolean constructor)
   {
     try
       {
-	JavaMethodDefinition res;
+	JavaMethod res;
 
 	Type[] paramTypes = m.getParameterTypes();
 	mlsub.typing.Monotype[] params;
@@ -109,11 +111,9 @@ public class JavaMethodDefinition extends MethodDefinition
 	else
 	  retType = nice.tools.code.Types.getMonotype(m.getReturnType());
     
-	res = new JavaMethodDefinition(null, m.getName(), null,
-				       new LocatedString(m.getName(), 
-							 Location.nowhere()),
-				       null,
-				       retType, params);
+	res = new JavaMethod(null, m.getName(), null,
+			     new LocatedString(m.getName(),Location.nowhere()),
+			     null, retType, params);
 	res.reflectMethod = m;
 	return res;
       }
@@ -142,14 +142,14 @@ public class JavaMethodDefinition extends MethodDefinition
    * and puts it in global scope.
    *
    * @param m the native method.
-   * @return the created JavaMethodDefinition.
+   * @return the created JavaMethod.
    */
-  public static JavaMethodDefinition addFetchedMethod(Method m)
+  public static JavaMethod addFetchedMethod(Method m)
   {
     if(declaredMethods.get(m) != null)
       return null;
 
-    JavaMethodDefinition md = JavaMethodDefinition.make(m, false);
+    JavaMethod md = JavaMethod.make(m, false);
 
     if(md != null)
       Node.getGlobalScope().addSymbol(md.symbol);
@@ -157,14 +157,14 @@ public class JavaMethodDefinition extends MethodDefinition
     return md;
   }
 
-  public static JavaMethodDefinition addFetchedConstructor
+  public static JavaMethod addFetchedConstructor
     (Method m,
      TypeConstructor declaringClass)
   {
     if(declaredMethods.get(m) != null)
       return null;
     
-    JavaMethodDefinition md = JavaMethodDefinition.make(m, true);
+    JavaMethod md = JavaMethod.make(m, true);
     
     if(md != null)
       TypeConstructors.addConstructor(declaringClass, md);
@@ -172,9 +172,9 @@ public class JavaMethodDefinition extends MethodDefinition
     return md;
   }
 
-  public static MethodDefinition addFetchedMethod(Field m)
+  public static MethodDeclaration addFetchedMethod(Field m)
   {
-    MethodDefinition md = StaticFieldAccess.make(m);
+    MethodDeclaration md = StaticFieldAccess.make(m);
     Node.getGlobalScope().addSymbol(md.symbol);
     return md;
   }

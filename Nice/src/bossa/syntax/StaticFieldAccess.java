@@ -12,7 +12,7 @@
 
 // File    : StaticFieldAccess.java
 // Created : Thu Jul 01 18:12:46 1999 by bonniot
-//$Modified: Mon Aug 07 15:31:40 2000 by Daniel Bonniot $
+//$Modified: Wed Sep 20 12:35:42 2000 by Daniel Bonniot $
 
 package bossa.syntax;
 
@@ -27,7 +27,7 @@ import bossa.util.Location;
 /**
  * A native java static field access.
  */
-public class StaticFieldAccess extends MethodDefinition
+public class StaticFieldAccess extends MethodDeclaration
 {
   public StaticFieldAccess(LocatedString className,String fieldName,
 			   LocatedString name,Constraint cst,
@@ -55,7 +55,7 @@ public class StaticFieldAccess extends MethodDefinition
     setLowlevelTypes(cst, parameters, returnType);
   }
   
-  static MethodDefinition make(Field f)
+  static MethodDeclaration make(Field f)
   {
     try{
       mlsub.typing.Monotype[] params;

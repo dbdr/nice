@@ -26,8 +26,11 @@ import java.lang.reflect.*;
    It has to be a subclass of <code>gnu.mapping.Procedure</code>, 
    and should implement interface <code>gnu.expr.Inlineable</code>
    to be actually inlined.
+   
+   @version $Date$
+   @author Daniel Bonniot
 */
-public class InlinedMethod extends MethodDefinition
+public class InlinedMethod extends MethodDeclaration
 {
   public InlinedMethod(LocatedString name, 
 		       Constraint constraint,

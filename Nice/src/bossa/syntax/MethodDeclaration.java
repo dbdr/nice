@@ -1,7 +1,7 @@
 /**************************************************************************/
-/*                           B O S S A                                    */
+/*                             N I C E                                    */
 /*        A simple imperative object-oriented research language           */
-/*                   (c)  Daniel Bonniot 1999                             */
+/*                   (c)  Daniel Bonniot 2000                             */
 /*                                                                        */
 /*  This program is free software; you can redistribute it and/or modify  */
 /*  it under the terms of the GNU General Public License as published by  */
@@ -10,9 +10,8 @@
 /*                                                                        */
 /**************************************************************************/
 
-// File    : MethodDefinition.java
-// Created : Thu Jul 01 18:12:46 1999 by bonniot
-//$Modified: Wed Aug 30 14:55:56 2000 by Daniel Bonniot $
+// File    : MethodDeclaration.java
+// Created : Thu Jul 01 18:12:46 1999 by Daniel Bonniot
 
 package bossa.syntax;
 
@@ -29,93 +28,36 @@ import bossa.util.Location;
 import bossa.util.Debug;
 
 /**
- * Abstract syntax for a global method declaration.
+   Declaration of a method.
+   
+   Can be 
+   - a {@link bossa.syntax.NiceMethod Nice method}, 
+     with several method bodies @see bossa.syntax.
+   - a {@link bossa.syntax.JavaMethod Java method}
+   - an {@link bossa.syntax.InlinedMethod inlined method}
+   
+   @version $Date$
+   @author Daniel Bonniot
  */
-public class MethodDefinition extends Definition
+abstract public class MethodDeclaration extends Definition
 {
   /**
    * The method is a class member if c!=null.
    *
-   * @param c the class this method belongs to, or 'null'
    * @param name the name of the method
    * @param typeParameters the type parameters
    * @param constraint the constraint
    * @param returnType the return type
    * @param parameters the MonoTypes of the parameters
    */
-  public MethodDefinition(ClassDefinition c,
-			  LocatedString name, 
-			  Constraint constraint,
-			  Monotype returnType,
-			  List parameters)
+  public MethodDeclaration(LocatedString name, 
+			   Constraint constraint,
+			   Monotype returnType,
+			   List parameters)
   {
     super(name, Node.global);
-    this.memberOf = c;
 
-    List params = null;
-
-    // if it is a class method, there is an implicit "this" argument
-    if(c!=null)
-      {
-	boolean hasAlike = returnType.containsAlike() 
-	  || Monotype.containsAlike(parameters);
-
-	// create type parameters with the same names as in the class
-	mlsub.typing.MonotypeVar[] thisTypeParams =
-	  c.createSameTypeParameters();
-
-	int thisTypeParamsLen = (thisTypeParams == null ? 0 
-				 : thisTypeParams.length);
-	    
-	// if the constraint is True
-	// we must create a new one, otherwise we would
-	// modify other methods!
-	if(constraint==Constraint.True)
-	  constraint = new Constraint
-	    (new ArrayList(thisTypeParamsLen + (hasAlike ? 1 : 0)),
-	     new ArrayList((hasAlike ? 1 : 0)));
-	
-	constraint.addBinders(thisTypeParams);
-	
-	mlsub.typing.Monotype thisType;
-	if(hasAlike)
-	  {
-	    TypeConstructor alikeTC = 
-	      new TypeConstructor("Alike", 
-				  c.variance(), false, false);
-	    
-	    constraint.addBinder(alikeTC);
-	    // added in front. Important for rebinding in method alternatives
-
-	    mlsub.typing.AtomicConstraint atom;
-	    if(c.getAssociatedInterface()!=null)
-	      atom = new mlsub.typing.ImplementsCst
-		(alikeTC, c.getAssociatedInterface());
-	    else
-	      atom = new mlsub.typing.TypeConstructorLeqCst(alikeTC, c.tc);
-	    constraint.addAtom(AtomicConstraint.create(atom));
-	    
-	    thisType = new mlsub.typing.MonotypeConstructor(alikeTC, thisTypeParams);
-
-	    Map map = new HashMap();
-	    map.put(Alike.id, alikeTC);
-	    returnType = returnType.substitute(map);
-	    parameters = Monotype.substitute(map, parameters);
-	  }
-	else
-	  thisType = 
-	    new mlsub.typing.MonotypeConstructor(c.tc, thisTypeParams);
-	
-	params = new ArrayList(parameters.size()+1);
-	params.add(Monotype.create(thisType));
-      }
-
-    if(params==null)
-      params = parameters;
-    else
-      params.addAll(parameters);
-    
-    if(returnType!=null)
+    if(returnType != null)
       // otherwise, symbol and arity are supposed to be set by someone else
       // a child class for instance
       // This should them be done through setLowlevelTypes(...)
@@ -123,11 +65,12 @@ public class MethodDefinition extends Definition
 	// remember it to print the interface
 	syntacticConstraint = constraint.toString();
 	
-	symbol = new MethodDefinition.Symbol
-	  (name, new Polytype(constraint, new FunType(params, returnType)));
+	symbol = new MethodDeclaration.Symbol
+	  (name, new Polytype(constraint, 
+			      new FunType(parameters, returnType)));
 	addChild(symbol);
 
-	this.arity = params.size();
+	this.arity = parameters.size();
       }
 
     boolean isConstructor = name.toString().equals("<init>");
@@ -135,27 +78,19 @@ public class MethodDefinition extends Definition
     // do not generate mangled names for methods
     // that are not defined in a bossa file 
     // (e.g. native methods automatically imported).
-    if(module!=null && !isConstructor)
+    if(module != null && !isConstructor)
       bytecodeName = module.mangleName(name.toString());  
 
     if(!isConstructor)
       bossa.link.Dispatch.register(this);
   }
 
-  public MethodDefinition(LocatedString name, 
-			  Constraint constraint,
-			  Monotype returnType,
-			  List parameters)
-  {
-    this(null,name,constraint,returnType,parameters);
-  }
-  
   /** 
       Does not specify the type of the method.
-      Used in JavaMethodDefinition to lazyfy
+      Used in JavaMethod to lazyfy
       the lookup of java types.
   */
-  MethodDefinition(LocatedString name)
+  MethodDeclaration(LocatedString name)
   {
     super(name, Node.global);
   }
@@ -165,31 +100,9 @@ public class MethodDefinition extends Definition
 			mlsub.typing.Monotype returnType)
   {
     arity = (parameters==null ? 0 : parameters.length);
-    symbol = new MethodDefinition.Symbol(name, null);
+    symbol = new MethodDeclaration.Symbol(name, null);
     symbol.type = new mlsub.typing.Polytype
       (cst, new mlsub.typing.FunType(parameters, returnType));
-  }
-  
-  public Collection associatedDefinitions()
-  {
-    return null;
-  }
-  
-  /** true iff the method was declared inside a class */
-  boolean isMember()
-  {
-    return memberOf!=null;
-  }
-
-  // from VarSymbol 
-  boolean isAssignable()
-  {
-    return false;
-  }
-
-  int getArity()
-  {
-    return arity;
   }
   
   /****************************************************************
@@ -205,6 +118,13 @@ public class MethodDefinition extends Definition
    * Typechecking
    ****************************************************************/
 
+  /**
+     Do further typechecking, once the context of the method is entered.
+  */
+  void innerTypecheck()
+  {
+  }
+  
   void typecheck()
   {
     // what we do here is equivalent to getType().checkWellFormedness();
@@ -223,18 +143,7 @@ public class MethodDefinition extends Definition
     
       try{
 	type.getConstraint().assert(false);
-	
-	if (this instanceof JavaMethodDefinition)
-	  // No need to find bytecode types in that case, they are given.
-	  /// code in 'finally' is executed after 'return' ;-)
-	  return;
-    
-	// set bytecode types for type variables
-	mlsub.typing.FunType ft = 
-	  (mlsub.typing.FunType) type.getMonotype();
-
-	Types.setBytecodeType(ft.domain());
-	Types.setBytecodeType(ft.codomain());
+	innerTypecheck();
       }
       finally{
 	Typing.leave();
@@ -252,17 +161,13 @@ public class MethodDefinition extends Definition
    ****************************************************************/
 
   private gnu.mapping.Procedure dispatchMethod;
-  private gnu.bytecode.Method   dispatchPrimMethod;
+  protected gnu.bytecode.Method   dispatchPrimMethod;
 
-  protected gnu.mapping.Procedure computeDispatchMethod()
-  {
-    dispatchPrimMethod = module.addDispatchMethod(this);
-    return new gnu.expr.PrimProcedure(dispatchPrimMethod);
-  }
+  protected abstract gnu.mapping.Procedure computeDispatchMethod();
   
   public final void setDispatchMethod(gnu.mapping.Procedure p) 
   {
-    if(dispatchMethod!=null)
+    if(dispatchMethod != null)
       Internal.error("dispatch method already set");
     
     dispatchMethod = p;
@@ -270,12 +175,12 @@ public class MethodDefinition extends Definition
   
   public final gnu.mapping.Procedure getDispatchMethod() 
   {
-    if(dispatchMethod==null)
+    if(dispatchMethod == null)
       {
 	dispatchMethod = computeDispatchMethod();
       
 	if(dispatchMethod==null)
-	  Internal.error(this,"Null dispatch method for "+this);
+	  Internal.error(this,"No dispatch method for "+this);
       }
     
     return dispatchMethod;
@@ -283,11 +188,11 @@ public class MethodDefinition extends Definition
   
   public final gnu.bytecode.Method getDispatchPrimMethod() 
   { 
-    if(dispatchMethod==null)
+    if(dispatchMethod == null)
       dispatchMethod = computeDispatchMethod();
  
-    if(dispatchPrimMethod==null)
-      Internal.error(this,"dispatchPrimMethod not computed in "+this);
+    if(dispatchPrimMethod == null)
+      Internal.error(this, "dispatchPrimMethod not computed in "+this);
     
     return dispatchPrimMethod;
   }
@@ -310,33 +215,22 @@ public class MethodDefinition extends Definition
    * Module interface
    ****************************************************************/
 
-  String syntacticConstraint;
+  private String syntacticConstraint;
   
-  public void printInterface(java.io.PrintWriter s)
-  {
-    s.print(
-	    //mlsub.typing.Constraint.toString(getType().getConstraint())
-	    syntacticConstraint
-	    + getType().codomain()
-	    + " "
-	    + symbol.name.toQuotedString()
-	    + "("
-	    + Util.map("",", ","",getType().domain())
-	    + ");\n");
-    syntacticConstraint = null;
-  }
-  
+  public abstract void printInterface(java.io.PrintWriter s);
+
   /************************************************************
    * Printing
    ************************************************************/
 
   public String toString()
   {
-    if(getType()==null)
-      return "method "+getName();
+    if(getType() == null)
+      return "method " + getName();
     
     return
       mlsub.typing.Constraint.toString(getType().getConstraint())
+      // syntacticConstraint?
       + String.valueOf(getType().codomain())
       + " "
       + getName().toQuotedString()
@@ -346,9 +240,14 @@ public class MethodDefinition extends Definition
       ;
   }
 
-  private ClassDefinition memberOf;
+  protected ClassDefinition memberOf;
   protected int arity;
 
+  public int getArity()
+  {
+    return arity;
+  }
+  
   /** 
    * true if this method represent the access to the field of an object.
    */
@@ -374,14 +273,14 @@ public class MethodDefinition extends Definition
   }
   
   String bytecodeName;
-  MethodDefinition.Symbol symbol;
+  MethodDeclaration.Symbol symbol;
 
   class Symbol extends PolySymbol
   {
     Symbol(LocatedString name, Polytype type)
     {
       super(name, type);
-      this.definition = MethodDefinition.this;
+      this.definition = MethodDeclaration.this;
     }
 
     public String toString()
@@ -389,6 +288,6 @@ public class MethodDefinition extends Definition
       return definition.toString();
     }
     
-    MethodDefinition definition;
+    MethodDeclaration definition;
   }
 }

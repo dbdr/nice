@@ -12,7 +12,7 @@
 
 // File    : Dispatch.java
 // Created : Mon Nov 15 10:36:41 1999 by bonniot
-//$Modified: Wed Apr 05 16:14:28 2000 by Daniel Bonniot $
+//$Modified: Thu May 04 16:58:59 2000 by Daniel Bonniot $
 
 package bossa.link;
 
@@ -180,16 +180,24 @@ public class Dispatch
 			 "\neither "+first+" or "+a+" match");
       }
     if(first==null)
-      User.error(method,
-		 "Method "+method+" is not exhaustive:\n"+
-		 "no alternative matches "+Util.map("(",", ",")",tags));
+      {
+	if(sortedAlternatives.size()==0)
+	  User.error(method,
+		     "Method "+method+" has is declared but never defined");
+	else
+	  User.error(method,
+		     "Method "+method+" is not exhaustive:\n"+
+		     "no alternative matches "+Util.map("(",", ",")",tags));
+      }
   }
 
   /****************************************************************
    * Compilation
    ****************************************************************/
 
-  private static void compile(MethodDefinition m, Stack sortedAlternatives, bossa.modules.Package module)
+  private static void compile(MethodDefinition m, 
+			      Stack sortedAlternatives, 
+			      bossa.modules.Package module)
   {
     if(m instanceof JavaMethodDefinition
        || m instanceof StaticFieldAccess

@@ -12,7 +12,7 @@
 
 // File    : MethodDefinition.java
 // Created : Thu Jul 01 18:12:46 1999 by bonniot
-//$Modified: Tue May 02 17:48:08 2000 by Daniel Bonniot $
+//$Modified: Thu May 04 15:28:04 2000 by Daniel Bonniot $
 
 package bossa.syntax;
 
@@ -293,7 +293,7 @@ public class MethodDefinition extends Definition
   
   public String getFullName()
   {
-    return module.getName()+"$"+bytecodeName;
+    return module.getName().replace('.','$')+"$"+bytecodeName;
   }
 
   public Polytype getType()

@@ -12,7 +12,7 @@
 
 // File    : Package.java
 // Created : Wed Oct 13 16:09:47 1999 by bonniot
-//$Modified: Thu May 04 12:57:32 2000 by Daniel Bonniot $
+//$Modified: Thu May 04 17:34:24 2000 by Daniel Bonniot $
 
 package bossa.modules;
 
@@ -105,8 +105,6 @@ public class Package implements mlsub.compilation.Module
   {
     this.name = name;
     this.compilation = compilation;
-    
-    Debug.println(name+"");
     
     map.put(name.toString(),this);
 
@@ -554,11 +552,12 @@ public class Package implements mlsub.compilation.Module
   public String mangleName(String str)
   {
     int i=0;
-    String res = str+"$0";
-    while(takenNames.containsKey(res))
+    String res;
+    do 
       {
-	res = str + "$" + (++i);
+	res = str + "$" + (i++);
       }
+    while(takenNames.containsKey(res));
     
     takenNames.put(res,null);
     return res;

@@ -12,7 +12,7 @@
 
 // File    : Bytecode.java
 // Created : Fri Dec 10 19:03:56 1999 by bonniot
-//$Modified: Fri Feb 18 18:57:15 2000 by Daniel Bonniot $
+//$Modified: Thu May 04 16:20:25 2000 by Daniel Bonniot $
 
 package bossa;
 
@@ -26,15 +26,18 @@ import bossa.util.*;
 
 public abstract class Bytecode
 {
-  private static final char firstEscapeChar = '£';
-  private static final char escapeChar = '£';
-
   static
   {
     //System.out.println(Character.isJavaIdentifierStart(firstEscapeChar));
     //System.out.println(Character.isJavaIdentifierPart(escapeChar));  
   }
   
+  /**
+     Encode une chaine pour en faire un identificateur Java valide.
+
+     Tout character offendant est remplacé par '$$' suivi de son
+     (uni)code en Hexadecimal.
+  */
   public static String escapeString(String s)
   {
     if(s==null || s.length()==0)
@@ -47,17 +50,17 @@ public abstract class Bytecode
     
     if(!Character.isJavaIdentifierStart(chars[0]))
       {
-	res.append(""+firstEscapeChar+escapeChar);
+	res.append("$$");
 	appendHexRepr(res,(int) chars[0]);
       }
     else
       res.append(chars[0]);
     
     for(int i=1; i<chars.length; i++)
-      if(chars[i]!='.' &&
+      if(//chars[i]!='.' &&
 	 !Character.isJavaIdentifierPart(chars[i]))
 	{
-	  res.append(escapeChar);
+	  res.append("$$");
 	  appendHexRepr(res,(int) chars[i]);
 	}
       else
@@ -73,7 +76,7 @@ public abstract class Bytecode
       sb.append("0");
     sb.append(num);
   }
-    
+  
   public static String unescapeString(String s)
   {
     if(s==null)
@@ -82,23 +85,11 @@ public abstract class Bytecode
     char[] chars = s.toCharArray();
     StringBuffer res = new StringBuffer();
 
-    int i;
-    if(chars[0]==firstEscapeChar && chars[1]==escapeChar)
-      {
-	res.append((char) Integer.parseInt(s.substring(2,6),16));
-	i=6;
-      }
-    else
-      {
-	res.append(chars[0]);
-	i=1;
-      }
-    
-    for(; i<chars.length; i++)
-      if(chars[i]==escapeChar)
+    for(int i=0; i<chars.length; i++)
+      if(chars[i]=='$' && chars[i+1]=='$')
 	{
-	  res.append((char) Integer.parseInt(s.substring(i+1,i+5),16));
-	  i+=4;
+	  res.append((char) Integer.parseInt(s.substring(i+2,i+6),16));
+	  i+=5;
 	}
       else
 	res.append(chars[i]);

@@ -12,7 +12,7 @@
 
 // File    : Pattern.java
 // Created : Mon Jul 05 14:36:52 1999 by bonniot
-//$Modified: Tue Feb 15 22:30:35 2000 by Daniel Bonniot $
+//$Modified: Thu May 04 17:32:51 2000 by Daniel Bonniot $
 // Description : Syntactic pattern for method bodies declaration
 
 package bossa.syntax;
@@ -163,6 +163,7 @@ public class Pattern
   }
 
   public final static String AT_encoding = "$";
+  public final static int AT_len = AT_encoding.length();
   
   /**
    * Returns a string used to recognize this pattern in the bytecode.

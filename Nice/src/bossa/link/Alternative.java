@@ -12,7 +12,7 @@
 
 // File    : Alternative.java
 // Created : Mon Nov 15 12:20:40 1999 by bonniot
-//$Modified: Fri Feb 18 21:12:55 2000 by Daniel Bonniot $
+//$Modified: Thu May 04 17:52:58 2000 by Daniel Bonniot $
 
 package bossa.link;
 
@@ -56,28 +56,33 @@ public class Alternative
     this.definitionClass = c;
     this.primProcedure = new PrimProcedure(m);
     
-    int numCode = s.indexOf(Pattern.AT_encoding);
+    //Debug.println(s);
+    
+    int numCode = s.indexOf('$');
     if(numCode==-1)
       Internal.error("Method "+s+" in class "+c.getName()+
 		     " has no valid name");
 
-    int at = s.indexOf(Pattern.AT_encoding,numCode+1);
+    int at = s.indexOf(Pattern.AT_encoding, numCode+1);
     if(at==-1)
       // This is valid if this method has no parameter
       at = s.length();
     
-    methodName = c.getName().substring(0,c.getName().length()-".package".length())
+    methodName = c.getName().substring(0,c.getName().length()-".package".length()).replace('.','$')
       +"$"+s.substring(0,at);
+    
+    //Debug.println("name="+methodName);
     
     this.patterns = new ArrayList(5);
 
     while(at<s.length())
       {
-	int next = s.indexOf(Pattern.AT_encoding,at+1);
+	int next = s.indexOf(Pattern.AT_encoding,at+Pattern.AT_len);
 	if(next==-1)
 	  next=s.length();
 	
-	String name = s.substring(at+1,next);
+	String name = s.substring(at+Pattern.AT_len,next);
+	//Debug.println("pattern="+name);
 	if(name.equals("_"))
 	  patterns.add(Domain.bot); // Domain Ex a .a 
 	else

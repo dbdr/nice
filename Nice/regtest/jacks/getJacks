@@ -10,4 +10,4 @@ else
   echo "Password is 'anoncvs' $CVSROOT"
   cvs -d$CVSROOT login
 fi
-cvs -d$CVSROOT -z 3 checkout -P jacks
+cvs -d$CVSROOT -z 3 export -r HEAD jacks

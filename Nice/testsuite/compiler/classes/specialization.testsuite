@@ -80,3 +80,17 @@ class Env extends HashMap<String, String> {}
 void _test_makeEnv() {
   Env env = new Env(new HashMap());
 }
+
+/// PASS bug
+  // bug #1097571 
+  /// Toplevel
+  class A<T> {}
+  class B extends A<boolean> {}
+  class C extends B {}
+
+/// PASS bug
+  // bug #1097571 
+  /// Toplevel
+  interface A<T> {}
+  interface B extends A<boolean> {}
+  class C implements B {}

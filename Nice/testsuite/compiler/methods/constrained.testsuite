@@ -1,0 +1,10 @@
+///PASS bug
+  ///Toplevel
+  class A{}
+  class B extends A{}
+  
+  interface I<A T>{}
+
+  class X<T | A <: T> implements I<T>{}
+
+  void foo(I<B>);

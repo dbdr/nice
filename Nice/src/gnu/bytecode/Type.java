@@ -469,6 +469,10 @@ public abstract class Type {
       return t2;
     else if (t2.isSubtype(t1))
       return t1;
+    else if (t1 == char_type && t2.isSubtype(int_type))
+      return int_type;
+    else if (t2 == char_type && t1.isSubtype(int_type))
+      return int_type;
     else
       {
        // the only chance left is that t1 and t2 are ClassTypes.

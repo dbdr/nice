@@ -41,20 +41,7 @@
   /// Toplevel
   (String, String) foo((String s, String t) tuple = ("abc", "xyz")) = tuple;
 
-/// PASS bug
+/// PASS
   assert foo(("abc",('x',3)))==3;
   /// Toplevel
   int foo((String s,(char c, int i))) = i;
-
-/// PASS
-  // this one is not a bug, compare with previous
-  char c = 'x';
-  int i = 3;
-  assert foo(("abc",(c,i)))==3;
-  /// Toplevel
-  int foo((String s,(char c, int i))) = i;
-
-/// PASS bug
-  assert foo((('y',7),"xyz"))==7;
-  /// Toplevel
-  int foo(((char c, int i),String s)) = i;

@@ -29,6 +29,7 @@ package nice.lang;
 
 import java.text.*;
 import java.lang.reflect.*;
+import java.lang.ref.*;
 
 //               PACKAGE: java.lang
 
@@ -351,3 +352,25 @@ class StringTokenizer = native java.util.StringTokenizer;
 
 <T> void update(Observer, Observable, T) = 
   native void Observer.update(Observable, Object);
+
+// java.lang.ref
+class Reference<T> = native java.lang.ref.Reference;
+class WeakReference<T> extends Reference<T> = native java.lang.ref.WeakReference;
+class SoftReference<T> extends Reference<T> = native java.lang.ref.SoftReference;
+class PhantomReference<T> extends Reference<T> = native java.lang.ref.PhantomReference;
+class ReferenceQueue<T> = native java.lang.ref.ReferenceQueue;
+
+<T> WeakReference<T> WeakReference(T) = native new WeakReference(Object);
+<T,U | T <: U > WeakReference<T> WeakReference(T, ReferenceQueue<U>) = native new WeakReference(Object, ReferenceQueue);
+<T> SoftReference<T> SoftReference(T) = native new SoftReference(Object);
+<T,U | T <: U > SoftReference<T> SoftReference(T, ReferenceQueue<U>) = native new SoftReference(Object, ReferenceQueue);
+<T,U | T <: U > PhantomReference<T> PhantomReference(T, ReferenceQueue<U>) = native new PhantomReference(Object, ReferenceQueue);
+
+<T> void clear(Reference<T>) = native void Reference.clear();
+<T> boolean enqueue(Reference<T>) = native boolean Reference.enqueue();
+<T> boolean isEnqueued(Reference<T>) = native boolean Reference.isEnqueued();
+<T, V | T <: ?V> ?V get(Reference<T>) = native Object Reference.get();
+
+<T,U | T <: U > Reference<U> poll(ReferenceQueue<T>) = native Reference ReferenceQueue.poll();
+<T,U | T <: U > Reference<U> remove(ReferenceQueue<T>) = native Reference ReferenceQueue.remove();
+<T,U | T <: U > Reference<U> remove(ReferenceQueue<T>, long) = native Reference ReferenceQueue.remove(long);

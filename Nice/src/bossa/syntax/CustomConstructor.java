@@ -25,12 +25,17 @@ public class CustomConstructor extends UserOperator
   public CustomConstructor(LocatedString className, FormalParameters params, Block body)
   {
     super(new LocatedString("<init>", className.location()), Constraint.True, 
-	  new TypeIdent(className), params, Contract.noContract);
+	  returnType(className), params, Contract.noContract);
 
-   this.className = className;
-   this.body = body;
+    this.className = className;
+    this.body = body;
+  }
 
-   User.error("custom constructors are not implemented yet");
+  private static Monotype returnType(LocatedString className)
+  {
+    Monotype res = new TypeIdent(className);
+    res.nullness = Monotype.sure;
+    return res;
   }
 
   public void printInterface(java.io.PrintWriter s)

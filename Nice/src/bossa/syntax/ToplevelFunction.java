@@ -53,28 +53,15 @@ implements Function
 
     this.body = body;
     this.voidReturn = returnType.toString().equals("nice.lang.void");
-
-    this.parameters = parameters.getMonoSymbols();
-
-    // add the named parameters in the scope
-    if (this.parameters != null)
-      for (int i = this.parameters.length; --i >= 0;)
-	{
-	  MonoSymbol m = this.parameters[i];
-	  if (m.name != null)
-	    addSymbol(m);
-	}
   }
 
   private Statement body;
-  private MonoSymbol[] parameters;
+  private MonoSymbol[] symbols;
   private boolean voidReturn ;
 
   void resolve()
   {
-    // the type must be found before
-    removeChild(symbol);
-    symbol.doResolve();
+    buildParameterSymbols();
     
     mlsub.typing.Constraint cst = getType().getConstraint();
     if (mlsub.typing.Constraint.hasBinders(cst))
@@ -85,6 +72,22 @@ implements Function
 	User.error(this, e);
       }
     body = bossa.syntax.dispatch.analyse$0(body, scope, typeScope, voidReturn);
+  }
+
+  private void buildParameterSymbols()
+  {
+    // the type must be found before
+    removeChild(symbol);
+    symbol.doResolve();
+
+    symbols = parameters.getMonoSymbols();
+    mlsub.typing.Monotype[] paramTypes = getArgTypes();
+    for (int i = 0; i < paramTypes.length; i++)
+      if (symbols[i].name != null)
+	{
+	  symbols[i].type = paramTypes[i];
+	  scope.addSymbol(symbols[i]);
+	}
   }
 
   /****************************************************************
@@ -128,7 +131,7 @@ implements Function
     getDispatchMethod();
 
     gnu.expr.LambdaExp lexp = 
-      nice.tools.code.Gen.createMethod(primMethod, parameters);
+      nice.tools.code.Gen.createMethod(primMethod, symbols);
     Statement.currentScopeExp = lexp;
     blockExp = (gnu.expr.BlockExp) lexp.body;
     blockExp.setBody(body.generateCode());

@@ -227,7 +227,7 @@ abstract public class MethodDeclaration extends Definition
   }
   
   protected int arity;
-  private FormalParameters parameters;
+  protected FormalParameters parameters;
   
   public int getArity()
   {
@@ -255,6 +255,11 @@ abstract public class MethodDeclaration extends Definition
   public final mlsub.typing.Polytype getType()
   {
     return symbol.getType();
+  }
+  
+  public final mlsub.typing.Monotype[] getArgTypes()
+  {
+    return symbol.getType().domain();
   }
   
   public final mlsub.typing.Monotype getReturnType()

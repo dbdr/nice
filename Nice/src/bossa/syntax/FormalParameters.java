@@ -184,7 +184,7 @@ public class FormalParameters extends Node
     
     MonoSymbol[] res = new MonoSymbol[size];
     for (int i = 0; i < size; i++)
-      res[i] = new MonoSymbol(parameters[i].getName(), parameters[i].type);
+      res[i] = new MonoSymbol(parameters[i].getName(), (Monotype) null);
     return res;
   }
 

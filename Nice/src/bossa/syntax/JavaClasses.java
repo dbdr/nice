@@ -64,8 +64,6 @@ public final class JavaClasses
     return (TypeConstructor) old;
   }
   
-  private gnu.bytecode.Type javaType;
-  
   private static final gnu.bytecode.Type[] blackListClass =
     new gnu.bytecode.Type[] {
       ClassType.make("java.lang.Object")

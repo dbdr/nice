@@ -27,7 +27,7 @@ public class BoolNotOp extends Procedure1 implements Inlineable, Branchable
   {
   }
 
-  public static BoolNotOp instance = new BoolNotOp();
+  public final static BoolNotOp instance = new BoolNotOp();
 
   public static BoolNotOp create(String param)
   {

@@ -21,7 +21,7 @@ package bossa.syntax;
 
 public class BreakStmt extends Statement
 {
-  public static BreakStmt instance = new BreakStmt();
+  public final static BreakStmt instance = new BreakStmt();
 
   private BreakStmt() {}
 

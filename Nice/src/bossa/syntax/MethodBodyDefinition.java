@@ -427,8 +427,6 @@ public class MethodBodyDefinition extends Definition
     }
   }
 
-  private boolean entered = false;
-  
   /****************************************************************
    * Module interface
    ****************************************************************/

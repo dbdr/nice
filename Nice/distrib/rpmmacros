@@ -1,0 +1,15 @@
+%packager		Alex Greif
+%distribution		Nice
+%vendor			nice.sourceforge.net
+
+%_root		        %(echo $PWD)
+%_topdir                %{_root}/tmp
+%_tmppath		%{_topdir}
+
+%_rpmtopdir		%{_topdir}
+%_builddir		%{_tmppath}/BUILD
+%_rpmdir		%{_rpmtopdir}
+%_sourcedir		%{_rpmtopdir}
+%_specdir		%{_rpmtopdir}
+%_srcrpmdir		%{_rpmtopdir}
+

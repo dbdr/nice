@@ -329,7 +329,10 @@ final public class BitMatrix implements Cloneable {
       for (int i = 0; i < size; i++) {
         BitVector row = v[i];
         if (row != null) {
-          v[i] = (BitVector) row.clone();
+          if (!row.isEmpty())
+	    v[i] = (BitVector) row.clone();
+          else
+ 	    v[i] = null;
         }
       }
       m.rows = v;

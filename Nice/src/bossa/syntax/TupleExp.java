@@ -22,7 +22,6 @@ import mlsub.typing.Polytype;
 import mlsub.typing.Constraint;
 
 import gnu.bytecode.Type;
-import gnu.bytecode.ArrayType;
 import gnu.expr.*;
 import gnu.expr.Expression;
 

@@ -16,8 +16,6 @@ import bossa.util.*;
 
 import mlsub.typing.*;
 import mlsub.typing.Polytype;
-import mlsub.typing.Monotype;
-import mlsub.typing.Constraint;
 
 /**
    <tt>return</tt> in a function or method.
@@ -42,6 +40,7 @@ public class ReturnStmt extends Statement
     this.value = value;
     if (value != null)
       this.setLocation(value.location());
+
     this.fake = fake;
   }
 
@@ -49,8 +48,8 @@ public class ReturnStmt extends Statement
   {
     if (value == null)
       return PrimitiveType.voidPolytype;
-    else
-      return value.getType();
+    
+    return value.getType();
   }
   
   /****************************************************************
@@ -61,8 +60,8 @@ public class ReturnStmt extends Statement
   {
     if (value == null)
       return nice.tools.code.Gen.returnVoid();
-    else
-      return nice.tools.code.Gen.returnValue(value.generateCode());
+    
+    return nice.tools.code.Gen.returnValue(value.generateCode());
   }
   
   /****************************************************************

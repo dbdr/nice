@@ -43,7 +43,7 @@ public class Block extends Statement
     return statements[statements.length - 1];
   }
 
-  static abstract class LocalDeclaration extends Statement
+  abstract static class LocalDeclaration extends Statement
   {
     abstract String getName();
     abstract VarSymbol getSymbol();
@@ -82,7 +82,7 @@ public class Block extends Statement
     }
   }
 
-  public static abstract class LocalValue extends LocalDeclaration
+  public abstract static class LocalValue extends LocalDeclaration
   {
     public LocalValue()
     {

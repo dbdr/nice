@@ -20,9 +20,6 @@ import gnu.expr.*;
 
 import java.util.*;
 
-import bossa.util.Location;
-import bossa.util.Debug;
-
 /**
    A method defined in Nice.
    

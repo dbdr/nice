@@ -14,12 +14,8 @@ package bossa.syntax;
 
 import java.util.*;
 import bossa.util.*;
-import mlsub.typing.Domain;
 import mlsub.typing.TypeConstructor;
-import mlsub.typing.Polytype;
 import mlsub.typing.Monotype;
-import mlsub.typing.MonotypeVar;
-import mlsub.typing.Constraint;
 import mlsub.typing.MonotypeConstructor;
 import mlsub.typing.Typing;
 import mlsub.typing.TypingEx;
@@ -340,6 +336,7 @@ public class Pattern implements Located
       {
 	if (atBool())
           return atTrue();
+
         return tc == PrimitiveType.boolTC;
       }
 
@@ -347,6 +344,7 @@ public class Pattern implements Located
       {
 	if (atBool())
           return atFalse();
+
         return tc == PrimitiveType.boolTC;
       }
 	
@@ -536,6 +534,7 @@ public class Pattern implements Located
       {
 	if (atFalse())
           return Gen.boolNotExp(parameter);
+
         return parameter;
       }
 

@@ -42,9 +42,11 @@ public class StringConstantExp extends ConstantExp
       if (c == '\\') {
         i++;
 	char c2;
-        if (! (i < n)) {
-          //throw new IllegalEscapeSequenceException("\\");
+        /*
+	if (! (i < n)) {
+          throw new IllegalEscapeSequenceException("\\");
         }
+        */         
 	switch (c2 = s.charAt(i)) {
         case 'b': sb.append('\b'); break;
         case 't': sb.append('\t'); break;

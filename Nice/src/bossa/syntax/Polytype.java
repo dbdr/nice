@@ -15,8 +15,6 @@ package bossa.syntax;
 import java.util.*;
 import bossa.util.*;
 
-import mlsub.typing.TypeConstructor;
-
 /**
    A constrained monotype.
 

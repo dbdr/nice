@@ -19,13 +19,7 @@ import gnu.bytecode.*;
 
 import mlsub.typing.Monotype;
 import mlsub.typing.MonotypeConstructor;
-import mlsub.typing.MonotypeVar;
 import mlsub.typing.Polytype;
-import mlsub.typing.Constraint;
-import mlsub.typing.TypeConstructor;
-import mlsub.typing.TypeSymbol;
-import mlsub.typing.Typing;
-import mlsub.typing.TypingEx;
 
 /**
    Creates an array containing the given elements.

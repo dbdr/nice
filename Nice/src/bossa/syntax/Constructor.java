@@ -15,7 +15,6 @@ package bossa.syntax;
 import java.util.*;
 import bossa.util.*;
 import bossa.util.Location;
-import nice.tools.code.Types;
 import nice.tools.code.Gen;
 
 import mlsub.typing.*;

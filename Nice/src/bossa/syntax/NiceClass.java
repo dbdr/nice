@@ -18,10 +18,8 @@ import mlsub.typing.Constraint;
 import mlsub.typing.MonotypeConstructor;
 import mlsub.typing.AtomicConstraint;
 
-import gnu.bytecode.Access;
 import java.util.*;
 
-import bossa.util.Debug;
 import nice.tools.code.Types;
 import nice.tools.code.Gen;
 

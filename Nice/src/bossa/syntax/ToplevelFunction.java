@@ -14,7 +14,6 @@ package bossa.syntax;
 
 import bossa.util.*;
 import mlsub.typing.*;
-import nice.tools.code.Types;
 import nice.tools.code.Gen;
 
 import gnu.bytecode.*;
@@ -22,7 +21,6 @@ import gnu.expr.*;
 
 import java.util.*;
 
-import bossa.util.Location;
 import bossa.util.Debug;
 
 /**

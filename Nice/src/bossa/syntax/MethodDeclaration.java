@@ -13,8 +13,6 @@
 package bossa.syntax;
 
 import bossa.util.*;
-import bossa.util.Location;
-import bossa.util.Debug;
 
 import mlsub.typing.*;
 import mlsub.typing.Polytype;
@@ -41,7 +39,7 @@ import java.util.*;
    @version $Date$
    @author Daniel Bonniot (d.bonniot@mail.dotcom.fr)
 */
-abstract public class MethodDeclaration extends Definition
+public abstract class MethodDeclaration extends Definition
 {
   /**
      @param name the name of the method
@@ -307,8 +305,8 @@ abstract public class MethodDeclaration extends Definition
     {
       if(getDefinition() instanceof FieldAccess)
 	return (FieldAccess) getDefinition();
-      else
-	return null;
+
+      return null;
     }
 
     void checkSpecialRequirements(Expression[] arguments)

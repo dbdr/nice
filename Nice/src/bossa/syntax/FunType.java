@@ -17,7 +17,6 @@ import bossa.util.*;
 
 import mlsub.typing.*;
 import mlsub.typing.Monotype;
-import mlsub.typing.FunTypeKind;
 
 /**
    Functional type.

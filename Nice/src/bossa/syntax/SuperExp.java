@@ -20,7 +20,6 @@ import mlsub.typing.*;
 
 import mlsub.typing.Polytype;
 import mlsub.typing.Monotype;
-import mlsub.typing.MonotypeConstructor;
 import mlsub.typing.FunType;
 import mlsub.typing.Constraint;
 import mlsub.typing.AtomicConstraint;
@@ -166,12 +165,17 @@ public class SuperExp extends Expression
   private static Constraint addLeq(Constraint c, Pattern[] p, Monotype[] m)
   {
     AtomicConstraint[] oldAtoms = c.atoms();
-    AtomicConstraint[] newAtoms = new AtomicConstraint
-      [(oldAtoms == null ? 0 : oldAtoms.length) + p.length];
-    if (oldAtoms != null)
+    AtomicConstraint[] newAtoms;
+    if (oldAtoms != null) {
+      newAtoms = new AtomicConstraint[oldAtoms.length + p.length];
       System.arraycopy(oldAtoms, 0, newAtoms, 0, oldAtoms.length);
+    }
+    else
+      newAtoms = new AtomicConstraint[p.length];
+
     for (int i = 0; i < p.length; i++)
       newAtoms[newAtoms.length - 1 - i] = new TypeConstructorLeqMonotypeCst(p[i].tc, m[i]);
+
     return new Constraint(c.binders(), newAtoms);
   }
 
@@ -183,11 +187,7 @@ public class SuperExp extends Expression
 
     TypeConstructor superClass = ClassDefinition.get(tc).getSuperClass();
     if (superClass != null)
-      {
-	TypeConstructor res = findTCforClass(superClass, t);
-	if (res != null)
-	  return res;
-      }
+      return findTCforClass(superClass, t);
 
     return null;
   }

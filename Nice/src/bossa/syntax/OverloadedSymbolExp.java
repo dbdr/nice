@@ -18,7 +18,6 @@ import bossa.util.*;
 import bossa.util.Debug;
 
 import mlsub.typing.*;
-import mlsub.typing.lowlevel.Kind;
 import mlsub.typing.Polytype;
 import mlsub.typing.FunType;
 import mlsub.typing.TupleType;

@@ -15,8 +15,6 @@ package bossa.syntax;
 import java.util.*;
 import bossa.util.*;
 import mlsub.typing.TypeSymbol;
-import mlsub.typing.TypeConstructor;
-import mlsub.typing.Variance;
 
 /**
    A Scope level for types.

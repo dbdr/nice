@@ -16,7 +16,6 @@ import bossa.util.*;
 import java.util.*;
 
 import mlsub.typing.Interface;
-import mlsub.typing.Variance;
 import mlsub.typing.Typing;
 
 /**

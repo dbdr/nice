@@ -23,16 +23,15 @@ import mlsub.typing.MonotypeVar;
    @version $Date$
    @author Daniel Bonniot (d.bonniot@mail.dotcom.fr)
 */
-abstract public class Monotype
+public abstract class Monotype
 implements Located
 {
-  final static Monotype[] toArray(List monotypes)
+  static final Monotype[] toArray(List monotypes)
   {
     if (monotypes == null)
       return array0;
-    else
-      return 
-	(Monotype[]) monotypes.toArray(new Monotype[monotypes.size()]);
+
+    return (Monotype[]) monotypes.toArray(new Monotype[monotypes.size()]);
   }
   
   static final Monotype[] array0 = new Monotype[0];
@@ -58,19 +57,21 @@ implements Located
   /** @return true if "alike" appears inside this monotype. */
   abstract boolean containsAlike();
   
-  final static boolean containsAlike(List monotypes)
+  static final boolean containsAlike(List monotypes)
   {
     for(Iterator i = monotypes.iterator(); i.hasNext();)
       if(((Monotype) i.next()).containsAlike())
 	return true;
-    return false;
+ 
+   return false;
   }
 
-  final static boolean containsAlike(Monotype[] monotypes)
+  static final boolean containsAlike(Monotype[] monotypes)
   {
     for(int i = monotypes.length; --i >= 0;)
       if (monotypes[i].containsAlike())
 	return true;
+
     return false;
   }
 
@@ -117,8 +118,9 @@ implements Located
 	  }
 	else
 	  return sure(raw);
+      default: 
+	throw Internal.error("Bad nullness tag");
       }
-    throw Internal.error("Bad nullness tag");
   }
 
   abstract mlsub.typing.Monotype rawResolve(TypeMap tm);
@@ -191,6 +193,7 @@ implements Located
     Monotype[] res = new Monotype[m.length];
     for(int i = m.length; --i >= 0;)
       res[i] = m[i].substitute(map);
+
     return res;
   }
 
@@ -268,8 +271,8 @@ implements Located
       mlsub.typing.TypeSymbol res = s.lookup(type.toString());
       if (res != null)
 	return (mlsub.typing.Monotype) res;
-      else
-	return type;
+
+      return type;
     }
   }
 

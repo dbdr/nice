@@ -20,6 +20,6 @@ package bossa.syntax;
 */
 public interface TypeMap
 {
-  abstract mlsub.typing.TypeSymbol lookup(LocatedString name);
-  abstract mlsub.typing.TypeSymbol lookup(String name);
+  mlsub.typing.TypeSymbol lookup(LocatedString name);
+  mlsub.typing.TypeSymbol lookup(String name);
 }

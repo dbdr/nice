@@ -23,9 +23,7 @@ import mlsub.typing.Polytype;
 import mlsub.typing.Monotype;
 import mlsub.typing.FunType;
 import mlsub.typing.TupleType;
-import mlsub.typing.MonotypeConstructor;
 import mlsub.typing.Constraint;
-import mlsub.typing.MonotypeLeqCst;
 
 /**
    A function call.

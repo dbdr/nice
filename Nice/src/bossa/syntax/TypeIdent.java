@@ -18,7 +18,6 @@ import mlsub.typing.TypeConstructor;
 import mlsub.typing.Interface;
 import mlsub.typing.MonotypeVar;
 import mlsub.typing.TypeSymbol;
-import nice.tools.code.Types;
 
 /**
    A syntactic type identifier.

@@ -14,7 +14,6 @@ package bossa.syntax;
 
 import bossa.util.*;
 import mlsub.typing.*;
-import nice.tools.code.Types;
 
 import gnu.bytecode.*;
 import java.util.*;
@@ -25,7 +24,7 @@ import java.util.*;
    @version $Date$
    @author Daniel Bonniot (bonniot@users.sourceforge.net)
  */
-abstract public class ClassDefinition extends MethodContainer
+public abstract class ClassDefinition extends MethodContainer
 {
   public static 
     Interface makeInterface(LocatedString name, 
@@ -258,7 +257,8 @@ abstract public class ClassDefinition extends MethodContainer
       impl = this.resolveInterfaces(implementations);
       abs = TypeIdent.resolveToItf(typeScope, abstractions);
     
-      implementations = abstractions = null;
+      implementations = null;
+      abstractions = null;
 
       // Resolve the super-interfaces first.
       if (impl != null)
@@ -515,7 +515,7 @@ abstract public class ClassDefinition extends MethodContainer
   }
 
   /** Java interfaces implemented or extended by this class/interface. */
-  TypeConstructor javaInterfaces[];
+  TypeConstructor[] javaInterfaces;
 
   mlsub.typing.Interface[] resolveInterfaces(List names)
   {
@@ -541,6 +541,7 @@ abstract public class ClassDefinition extends MethodContainer
 
 	    if (javaInterfaces == null)
 	      javaInterfaces = new ArrayList(5);
+
 	    javaInterfaces.add(s);
 	  }
       }
@@ -626,12 +627,12 @@ abstract public class ClassDefinition extends MethodContainer
     return (ClassType) javaType;
   }
 
-  final static Type javaClass(ClassDefinition c)
+  static final Type javaClass(ClassDefinition c)
   {
     if (c == null)
       return gnu.bytecode.Type.pointer_type;
-    else
-      return c.getJavaType();
+
+    return c.getJavaType();
   }
   
   /****************************************************************
@@ -666,7 +667,7 @@ abstract public class ClassDefinition extends MethodContainer
     this.implementation = implementation;
   }
 
-  static abstract class ClassImplementation
+  abstract static class ClassImplementation
   {
     abstract void resolveClass();
     void resolveBody() {}

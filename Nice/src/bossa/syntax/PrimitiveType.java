@@ -18,7 +18,6 @@ import java.util.*;
 import mlsub.typing.*;
 
 import mlsub.typing.TypeConstructor;
-import mlsub.typing.TypeSymbol;
 import mlsub.typing.MonotypeConstructor;
 
 import nice.tools.code.SpecialTypes;

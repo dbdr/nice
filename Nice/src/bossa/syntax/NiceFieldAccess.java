@@ -15,8 +15,6 @@ package bossa.syntax;
 import bossa.util.*;
 import nice.tools.code.*;
 
-import mlsub.typing.TypeConstructor;
-
 import gnu.bytecode.*;
 import gnu.expr.*;
 

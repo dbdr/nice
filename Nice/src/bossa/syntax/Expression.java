@@ -28,12 +28,12 @@ import mlsub.typing.Polytype;
 public abstract class Expression
   implements Located, Printable
 {
-  final static Expression[] toArray(List expressions)
+  static final Expression[] toArray(List expressions)
   {
     if (expressions == null || expressions.size() == 0)
       return noExpressions;
-    else
-      return (Expression[]) 
+
+    return (Expression[]) 
 	expressions.toArray(new Expression[expressions.size()]);
   }
   
@@ -211,7 +211,7 @@ public abstract class Expression
    * This must be overrided in any Expression, but not called directly. 
    * Call {@link #generateCode()} instead.
    */
-  abstract protected gnu.expr.Expression compile();
+  protected abstract gnu.expr.Expression compile();
   
   /**
    * Creates the bytecode expression to evaluate this Expression.

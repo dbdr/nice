@@ -26,7 +26,7 @@ public class Alike extends Monotype
 {
   public Alike(List parameters, Location location)
   {
-    this.parameters = Monotype.toArray(parameters);;
+    this.parameters = Monotype.toArray(parameters);
     this.location = location;
   }
 

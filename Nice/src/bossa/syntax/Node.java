@@ -269,7 +269,9 @@ abstract public class Node
 
     // They won't be used anymore
     // Let's enable the memory to be reclamed
-    varSymbols = typeMapsSymbols = typeMapsNames = null;
+    varSymbols = null;
+    typeMapsSymbols = null;
+    typeMapsNames = null;
 
     // builds the scope of the children
     if (children != null)

@@ -31,7 +31,10 @@ float  float (double) = inline nice.lang.inline.Nop();
 int    int   (double) = inline nice.lang.inline.Nop();
 short  short (double) = inline nice.lang.inline.Nop();
 byte   byte  (double) = inline nice.lang.inline.Nop();
-char   char  (double) = inline nice.lang.inline.Nop();
+
+// Conversions between characters and their unicode representation
+char   char  (int)  = inline nice.lang.inline.Nop();
+int    int   (char) = inline nice.lang.inline.Nop();
 
 
 // Comparison
@@ -143,10 +146,6 @@ byte `^`(byte, byte) = inline nice.lang.inline.NumOp("iXOr");
 short `&`(short, short) = inline nice.lang.inline.NumOp("iAnd");
 short `|`(short, short) = inline nice.lang.inline.NumOp("iIOr");
 short `^`(short, short) = inline nice.lang.inline.NumOp("iXOr");
-
-char `&`(char, char) = inline nice.lang.inline.NumOp("iAnd");
-char `|`(char, char) = inline nice.lang.inline.NumOp("iIOr");
-char `^`(char, char) = inline nice.lang.inline.NumOp("iXOr");
 
 /****************************************************************
  * Utilities (specific to Nice)

@@ -65,7 +65,7 @@ class int    extends long   = native;
 class short  extends int    = native;
 class byte   extends short  = native;
 
-class char   extends int    = native;
+final class char = native;
 
 double doubleValue(Number) = native double Number.doubleValue();
 

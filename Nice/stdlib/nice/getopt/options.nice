@@ -49,7 +49,7 @@ abstract class Option
   char shortName;
   String longName;
   String purpose;
-  int optval = 0; // the int value of shortName
+  char optval = '\0'; 
 
   boolean visible;
 }

@@ -134,12 +134,7 @@ public final class rawArray extends java.util.AbstractList
     for (int i = array.length; --i >= 0;)
       {
 	Object o = array[i];
-	try{
-	  res[i] = ((Number) o).intValue();
-	}
-	catch(ClassCastException e){
-	  res[i] = ((Character) o).charValue();
-	}
+        res[i] = ((Number) o).intValue();
       }
     
     return res;
@@ -154,12 +149,7 @@ public final class rawArray extends java.util.AbstractList
     for (int i = array.length; --i >= 0;)
       {
 	Object o = array[i];
-	try{
-	  res[i] = ((Number) o).longValue();
-	}
-	catch(ClassCastException e){
-	  res[i] = ((Character) o).charValue();
-	}
+        res[i] = ((Number) o).longValue();
       }
     
     return res;
@@ -174,12 +164,7 @@ public final class rawArray extends java.util.AbstractList
     for (int i = array.length; --i >= 0;)
       {
 	Object o = array[i];
-	try{
-	  res[i] = ((Number) o).floatValue();
-	}
-	catch(ClassCastException e){
-	  res[i] = ((Character) o).charValue();
-	}
+        res[i] = ((Number) o).floatValue();
       }
     
     return res;
@@ -194,12 +179,7 @@ public final class rawArray extends java.util.AbstractList
     for (int i = array.length; --i >= 0;)
       {
 	Object o = array[i];
-	try{
-	  res[i] = ((Number) o).doubleValue();
-	}
-	catch(ClassCastException e){
-	  res[i] = ((Character) o).charValue();
-	}
+        res[i] = ((Number) o).doubleValue();
       }
     
     return res;
@@ -283,12 +263,7 @@ public final class rawArray extends java.util.AbstractList
     for (int i = len; --i >= 0;)
       {
 	Object o = Array.get(array, i);
-	try{
-	  res[i] = ((Number) o).intValue();
-	}
-	catch(ClassCastException e){
-	  res[i] = ((Character) o).charValue();
-	}
+        res[i] = ((Number) o).intValue();
       }
     
     return res;
@@ -304,12 +279,7 @@ public final class rawArray extends java.util.AbstractList
     for (int i = len; --i >= 0;)
       {
 	Object o = Array.get(array, i);
-	try{
-	  res[i] = ((Number) o).longValue();
-	}
-	catch(ClassCastException e){
-	  res[i] = ((Character) o).charValue();
-	}
+        res[i] = ((Number) o).longValue();
       }
     
     return res;
@@ -325,12 +295,7 @@ public final class rawArray extends java.util.AbstractList
     for (int i = len; --i >= 0;)
       {
 	Object o = Array.get(array, i);
-	try{
-	  res[i] = ((Number) o).floatValue();
-	}
-	catch(ClassCastException e){
-	  res[i] = ((Character) o).charValue();
-	}
+        res[i] = ((Number) o).floatValue();
       }
     
     return res;
@@ -346,12 +311,7 @@ public final class rawArray extends java.util.AbstractList
     for (int i = len; --i >= 0;)
       {
 	Object o = Array.get(array, i);
-	try{
-	  res[i] = ((Number) o).doubleValue();
-	}
-	catch(ClassCastException e){
-	  res[i] = ((Character) o).charValue();
-	}
+        res[i] = ((Number) o).doubleValue();
       }
     
     return res;

@@ -104,8 +104,8 @@ test_collection_arrays(a)
   bs[0] = 127;
   short[] shs = map(bs, id);
   shs[0] = 129;
-  char[] cs = new char[1];
-  cs[0] = 'A';
+  int[] cs = new int[1];
+  cs[0] = 65;
   double[] ds = map(cs, id);
   p(ds);
   Number[] ns = map(ds, id);

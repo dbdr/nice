@@ -4,7 +4,7 @@ nice (0.9.0) unstable; urgency=low
       void foo(String color);
       foo("blue") { ... }
       foo("red") { ... }
-      foo(color) { println("unknown color" + color); }
+      foo(color) { println("unknown color: " + color); }
   * Added operator ** to calculate powers of longs, doubles and BigIntegers.
   * Archives (generated with the -a option) can now be used to distribute
     Nice libraries.
@@ -12,6 +12,8 @@ nice (0.9.0) unstable; urgency=low
   * 'true' and 'false' are now keywords, and better code is generated for them.
     The termination properties of loops with literal boolean values are now 
     recognized, as in Java.
+  * The 'char' type is no longer a subtype of int. The integer unicode 
+    representation of a character c can be obtained by int(c).
 
  --
 

@@ -22,6 +22,11 @@ package nice.lang;
 
 <Any R> String `+`(String s, R o) = s.concat(String.valueOf(o));
 
+int indexOf(String, char)          = native int String.indexOf(int);
+int indexOf(String, char, int)     = native int String.indexOf(int, int);
+int lastIndexOf(String, char)      = native int String.lastIndexOf(int);
+int lastIndexOf(String, char, int) = native int String.lastIndexOf(int, int);
+
 String replace(String source, char c, String with)
 {
   StringBuffer res = new StringBuffer();

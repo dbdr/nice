@@ -19,7 +19,7 @@
   assert byte(l) == -128;
 
 /// PASS
-  int i = 'A';
+  int i = int('A');
   char c = char(i);
   assert c == 'A';
   assert char(i) == 'A';

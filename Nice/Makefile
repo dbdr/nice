@@ -18,7 +18,7 @@ JAVAC= ${javac} -classpath "${TOP}/classes" -sourcepath "${TOP}/src" -d "${TOP}/
 JAVACC= CLASSPATH="${TOP}/external/JavaCC.zip:${CLASSPATH}" java COM.sun.labs.javacc.Main
 JAVADOC=javadoc
 
-NICEC_ARGS= -d "${TOP}/classes" --exclude-runtime --classpath="${TOP}/classes"
+NICEC_ARGS= -d "${TOP}/classes" --exclude-runtime 
 NICEC=nicec ${NICEC_ARGS} --sourcepath="${TOP}/stdlib:${TOP}/src" 
 NICEC1=${TOP}/bin/nicec ${NICEC_ARGS} --sourcepath="${TOP}/stdlib.new:${TOP}/src.new" 
 

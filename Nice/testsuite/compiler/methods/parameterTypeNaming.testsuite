@@ -1,3 +1,21 @@
+/// PASS
+  /// Toplevel
+<Collection C, T, U> C<U> bar(C<T>, T->U);
+bar(x, f) { throw new Error(); }
+bar<C,T,U>(l@List : L, f)
+{
+  L<U> res = similarEmptyCollection(l);
+  res.add(f(l[0]));
+
+  // Now we use the fact the res is a list.
+  // Therefore, it would be impossible to declare its type as C<U>.
+  res.add(res[0]); 
+
+  // By returning res, we need the fact that it is a subtype of C<U>,
+  // so we could not declare its type as List<U>.
+  return res;
+}
+
 /// Global
 class A {}
 class B extends A { String b; }
@@ -7,7 +25,7 @@ class B extends A { String b; }
   /// Toplevel
 foo(a) = a;
 
-<X> foo<T>(b@B : X) {
+foo<T>(b@B : X) {
   X copy = b.foo();
   String useB = copy.b;
   return copy;
@@ -16,4 +34,4 @@ foo(a) = a;
 /// FAIL
   /// Toplevel
 // : can only come after a real dispatch, otherwise it is useless.
-<X> foo<T>(a : X) {}
+foo<T>(a : X) {}

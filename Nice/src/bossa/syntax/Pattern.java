@@ -49,20 +49,19 @@ public class Pattern implements Located
        the argument must match.
        It must be a super-class of <code>tc</code>.
        It is only used for overloading resolution, not at runtime.
-     @param type a monotype that must be equal to 
-       the argument's runtime type. This is usefull to introduce
-       a type constructor variable with the exact type of the argument.
+     @param runtimeTC a type constructor that will be bound to 
+       the argument's runtime class.
    */
   public Pattern(LocatedString name, 
 		 TypeIdent tc, Expression atValue,
 		 boolean exactlyAt, TypeIdent additional,
-		 bossa.syntax.Monotype type,
+		 TypeConstructor runtimeTC,
 		 Location location)
   {
     this.name = name;
     this.typeConstructor = tc;
     this.additional = additional;
-    this.type = type;
+    this.runtimeTC = runtimeTC;
     this.atValue = atValue;
     this.exactlyAt = exactlyAt;
     this.location = location;
@@ -147,9 +146,9 @@ public class Pattern implements Located
   }
 
 
-  final mlsub.typing.Monotype getType()
+  final TypeConstructor getRuntimeTC()
   {
-    return t;
+    return runtimeTC;
   }
 
   /****************************************************************
@@ -183,25 +182,10 @@ public class Pattern implements Located
     patternType = new MonotypeConstructor(tc, def.getTypeParameters());
   }
   
-  void resolveType(TypeScope scope)
-  {
-    if(type!=null)
-      {
-	t = type.resolve(scope);
-	type = null;
-      }
-  }
-  
   static void resolveTC(TypeScope scope, Pattern[] patterns)
   {
     for(int i = 0; i < patterns.length; i++)
       patterns[i].resolveTC(scope);
-  }
-  
-  static void resolveType(TypeScope scope, Pattern[] patterns)
-  {
-    for(int i = 0; i < patterns.length; i++)
-      patterns[i].resolveType(scope);
   }
   
   /****************************************************************
@@ -582,8 +566,7 @@ public class Pattern implements Located
   TypeIdent typeConstructor, additional;
   public TypeConstructor tc;
   TypeConstructor tc2;
-  private bossa.syntax.Monotype type;
-  private mlsub.typing.Monotype t;
+  private TypeConstructor runtimeTC;
 
   // The class constraint verified by this pattern.
   private mlsub.typing.Constraint constraint;

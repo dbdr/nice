@@ -1186,7 +1186,7 @@ Pattern pattern():
   LocatedString name = null;
   Token t;
   TypeIdent tc=null, additional = null;
-  Monotype type=null;
+  TypeConstructor runtimeTC = null;
   Expression val = null;
   boolean exactlyAt = false;
   Location loc = null;
@@ -1218,7 +1218,7 @@ Pattern pattern():
         val=patternLiteral()
       |
         tc=typeIdent()
-        [ ":" type=monotype() ]
+        [ ":" runtimeTC = typeConstructor() ]
       )
     |
       t ="#" tc=typeIdent() { exactlyAt = true; }
@@ -1229,7 +1229,7 @@ Pattern pattern():
   )
   [ "(" additional=typeIdent() ")" ]
   {
-    return new Pattern(name, tc, val, exactlyAt, additional, type, loc);
+    return new Pattern(name, tc, val, exactlyAt, additional, runtimeTC, loc);
   }
 }
 
@@ -1267,15 +1267,11 @@ MethodBodyDefinition methodBodyDefinition(NiceClass container):
     LocatedString name;
     Pattern p;
     Collection binders=null;
-    List newTypeVars=null;
     LinkedList parameters=new LinkedList();
     Statement body;
     Expression exp;
 }
 {
-// introducing new Type variables
-    [ "<" newTypeVars=typeConstructors() ">" ]
-
     name=identOrBackquoted()
     [ "<" binders=strings() ">" ]
 
@@ -1287,7 +1283,6 @@ MethodBodyDefinition methodBodyDefinition(NiceClass container):
     ")"
     body = code()
     { return new MethodBodyDefinition(container,name,binders,
-				      newTypeVars,
 				      parameters,body); }
 }
 

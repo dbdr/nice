@@ -50,7 +50,6 @@ public class MethodBodyDefinition extends Definition
   public MethodBodyDefinition(NiceClass container,
 			      LocatedString name, 
 			      Collection binders,
-			      List newTypeVars,
 			      List formals, 
 			      Statement body)
   {
@@ -61,9 +60,6 @@ public class MethodBodyDefinition extends Definition
     this.formals = makeFormals(formals, container, name.location());
     this.body = body;
     this.declaration = null;
-    if (newTypeVars != null)
-      this.newTypeVars = (TypeConstructor[]) 
-	newTypeVars.toArray(new TypeConstructor[newTypeVars.size()]);
 
     this.insideClass = container != null || 
       this.formals != null &&
@@ -106,20 +102,32 @@ public class MethodBodyDefinition extends Definition
       {
 	Pattern p = names[tn];
 
-	MonotypeVar type;
+	Monotype type;
 
-	if (p.name == null)
-	  // anonymous pattern
-	  type = new MonotypeVar("anonymous argument " + tn);
-	else
-	  // XXX optimize using this:
-	  // type = new MonotypeVar("type(" + p.name + ")<" + types[tn]);
+	if (p.getRuntimeTC() != null)
 	  {
-	    LocatedString typeName;
-	    typeName = p.name.cloneLS();
-	    typeName.prepend("type(");	
-	    typeName.append(")<" + types[tn]);
-	    type = new MonotypeVar(typeName.toString());
+	    AtomicKind v = p.tc.variance;
+	    p.getRuntimeTC().setVariance(v);
+	    type = new mlsub.typing.MonotypeConstructor(p.getRuntimeTC(), mlsub.typing.MonotypeVar.news(v.arity()));
+	    type.setKind(v);
+
+	    type = bossa.syntax.Monotype.sure(type);
+	  }
+	else
+	  {
+	    if (p.name == null)
+	      // anonymous pattern
+	      type = new MonotypeVar("anonymous argument " + tn);
+	    else
+	      // XXX optimize using this:
+	      // type = new MonotypeVar("type(" + p.name + ")<" + types[tn]);
+	      {
+		LocatedString typeName;
+		typeName = p.name.cloneLS();
+		typeName.prepend("type(");	
+		typeName.append(")<" + types[tn]);
+		type = new MonotypeVar(typeName.toString());
+	      }
 	  }
 
 	res[tn] = new MonoSymbol(p.name, type);
@@ -290,16 +298,17 @@ public class MethodBodyDefinition extends Definition
       User.error(this, e);
     }
 
-    if (newTypeVars != null)
     try{
-      typeScope.addSymbols(newTypeVars);
+      for(int n = 0; n < formals.length; n++)
+	{
+	  TypeConstructor tc = formals[n].getRuntimeTC();
+	  if (tc != null)
+	    typeScope.addSymbol(tc);
+	}
     }
     catch(TypeScope.DuplicateName e) {
       User.error(this, e);
     }
-
-    // We can resolve now
-    Pattern.resolveType(this.typeScope, formals);
   }
 
   void resolveBody()
@@ -353,26 +362,12 @@ public class MethodBodyDefinition extends Definition
 
 	for(int n = 0; n < formals.length; n++)
 	  {
-	    Pattern pat = formals[n];
-	    Monotype type = pat.getType();
-	    if (type == null)
+	    TypeConstructor runtimeTC = formals[n].getRuntimeTC();
+	    if (runtimeTC == null)
 	      Typing.introduce(monotypes[n]);
 	    else
-	      {
-		parameters[n].type = monotypes[n] = type;
-
-		// We need to find the variance of the constructor.
-		// This is the only case where a type constructor is created
-		// without a known variance. But we can get it easily from the
-		// pattern.
-		TypeConstructor tc = Types.rawType(type).head();
-		if (tc != null && tc.variance == null)
-		  tc.setVariance(pat.tc.variance);
-	      }
+	      Typing.introduce(runtimeTC);
 	  }
-
-	if (newTypeVars != null)
-	  Typing.introduce(newTypeVars);
 
 	// The arguments are specialized by the patterns
 	try{
@@ -542,7 +537,6 @@ public class MethodBodyDefinition extends Definition
   protected MonoSymbol[] parameters;
   private Pattern[] formals;
   Collection /* of LocatedString */ binders; // Null if type parameters are not bound
-  private TypeConstructor[] newTypeVars;
   private Statement body;
   private boolean insideClass;
 }

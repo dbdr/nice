@@ -284,6 +284,9 @@ Monotype[?] types(FormalParameters) = native Monotype[] FormalParameters.types()
 ?mlsub.typing.TypeSymbol lookup(TypeMap, LocatedString) = native mlsub.typing.TypeSymbol TypeMap.lookup(LocatedString);
 ?mlsub.typing.TypeSymbol lookup(TypeMap, String) = native mlsub.typing.TypeSymbol TypeMap.lookup(String);
 void substitute(bossa.syntax.FormalParameters, Map<java.lang.String, bossa.syntax.Monotype>) = native void FormalParameters.substitute(Map);
+?Iterator<MethodDeclaration> listSpecializedMethods(MethodDeclaration) = native Iterator MethodDeclaration.listSpecializedMethods();
+Monotype[] Monotype_toArray(?List<Monotype>) = native Monotype[] Monotype.toArray(List);
+
 
 // Retypings needed since java types are not strict.
 mlsub.typing.Polytype boolPolytype() = native nice.tools.typing.PrimitiveType.boolPolytype;

@@ -62,7 +62,7 @@ public abstract class MethodImplementation extends Definition
           User.error(this, "Method "+name+" has "+types.length+" parameters");
       }
     
-    MonoSymbol[] res = cast(new MonoSymbol[formals.length]);
+    VarSymbol[] res = cast(new MonoSymbol[formals.length]);
     for (int tn = 0; tn < formals.length; tn++)
       {
 	Pattern p = formals[tn];
@@ -97,7 +97,7 @@ public abstract class MethodImplementation extends Definition
 	res[tn] = new MonoSymbol(argName, type);
       }
     notNull(scope).addSymbols(res);
-    parameters = res;
+    parameters = cast(res);
   }
 
   /** Where no patterns are present, add those corresponding to the method

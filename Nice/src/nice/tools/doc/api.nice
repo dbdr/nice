@@ -1,0 +1,47 @@
+/**************************************************************************/
+/*                                N I C E                                 */
+/*             A high-level object-oriented research language             */
+/*                        (c) Daniel Bonniot 2004                         */
+/*                                                                        */
+/*  This program is free software; you can redistribute it and/or modify  */
+/*  it under the terms of the GNU General Public License as published by  */
+/*  the Free Software Foundation; either version 2 of the License, or     */
+/*  (at your option) any later version.                                   */
+/*                                                                        */
+/**************************************************************************/
+
+package nice.tools.doc;
+
+/**
+   Interface to call nicedoc from Nice/Java programs.
+
+   @author Daniel Bonniot (bonniot@users.sf.net)
+ */
+
+//A global variable specifying the output directory
+var File outdir = new File(".");
+
+void generate(Compilation compilation, String mainPackage, ?File outDirectory)
+{
+  if (outDirectory != null)
+    outdir = outDirectory;
+
+  // Make sure the meaning of outdir is fixed.
+  outdir = outdir.getAbsoluteFile();
+
+  if (! outdir.exists() && ! outdir.mkdirs()) {
+    throw new Error("Could not create the output directory " + outdir);
+  }
+
+  try {
+    List<bossa.modules.Package> packages = load(compilation, mainPackage);
+
+    // Here the real work begins
+    Documenter d = new Documenter();
+    d.document(packages);
+    packages.foreach(bossa.modules.Package p => d.document(p));
+  }
+  catch (bossa.modules.Exit e) {
+    // There was an error. Stop working.
+  }
+}

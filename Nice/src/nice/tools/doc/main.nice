@@ -11,13 +11,11 @@ import nice.tools.compiler;
 import nice.tools.compiler.console;
 import bossa.modules.*;
 
-//A global variable specifying the output directory
-var File outdir = new File(".");
-
 void main(String[] args)
 {
   String mainPackage;
   ?String classpath = null;
+  File outdir = new File(".");
 
   ConsoleOutput consOutput = new ConsoleOutput();
   Compilation compilation = new Compilation(listener: consOutput);
@@ -69,13 +67,6 @@ void main(String[] args)
     }
   mainPackage = rest[0];
 
-  // Make sure the meaning of outdir is fixed.
-  outdir = outdir.getAbsoluteFile();
-
-  if (! outdir.exists() && ! outdir.mkdirs()) {
-    throw new Error("Could not create the output directory " + outdir);
-  }
-
   /* 
      For convenience of command-line tools (shells) with completions, 
      we treat a directory name as the corresponding package name.
@@ -83,16 +74,5 @@ void main(String[] args)
   */
   mainPackage = mainPackage.deleteAtEnd("/").replace('/', ".");
 
-  try {
-    List<bossa.modules.Package> packages = load(compilation, mainPackage);
-
-    // Here the real work begins
-    //packages.foreach(bossa.modules.Package p => document(p.getDefinitions));
-    Documenter d = new Documenter();
-    d.document(packages);
-    packages.foreach(bossa.modules.Package p => d.document(p));
-  }
-  catch (bossa.modules.Exit e) {
-    // There was an error. Stop working.
-  }
+  generate(compilation, mainPackage, outdir);
 }
